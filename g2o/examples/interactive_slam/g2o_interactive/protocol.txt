@@ -1,0 +1,63 @@
+Protocol
+
+The SLAM executable accepts actions, such as adding (ADD) a constraint, solving
+the system (SOLVE), and retrieving estimates (QUERY). The executable responds
+to a query by returning the data enclosed in a BEGIN...END block. 
+
+Variables, or vertices in the graph, explicitly state the reprensentation. 2D
+poses are represented by VERTEX_XYT, 3D poses by VERTEX_XYZRPY. In the future,
+Quaternions and other representations could be supported, but note that it is
+up to the SLAM algorithm to choose the internal representation of the angles.
+The keyword is followed by a unique vertex ID and an optional initialization of
+the values:
+VERTEX_XYT id x y t
+
+Constraints, or edges in the graph, explicitly state the type of the
+constraint. 2D pose constraints are given by EDGE_XYT, 3D pose constraints by
+EDGE_XYZRPY. The keyword is followed by a unique edge ID, the IDs of the
+referenced vertices, the measurement itself and the measurement information
+matrix (inverse of covariance matrix, because of symmetry only upper triangular
+and diagonal parts in row major form).
+EDGE_XYT id id1 id2 x y t ixx ixy ixt iyy iyt itt
+
+Simple 2D example:
+
+ADD VERTEX_XYT 0;
+ADD VERTEX_XYT 1;
+ADD EDGE_XYT 0 0 1 .1 .2 .3 1 0 0 1 0 1;
+FIX 0;
+SOLVE_STATE;
+QUERY_STATE;
+ADD VERTEX_XYT 2;
+ADD EDGE_XYT 1 1 2 .1 .2 .3 1 0 0 1 0 1;
+SOLVE_STATE;
+QUERY_STATE 1 2;
+
+Simple 3D example:
+
+ADD VERTEX_XYZRPY 0;
+ADD VERTEX_XYZRPY 1;
+ADD EDGE_XYZRPY 0 0 1 .1 .2 .3 .01 .02 .03 1 0 0 0 0 0 1 0 0 0 0 1 0 0 0 1 0 0 1 0 1;
+FIX 0;
+SOLVE_STATE;
+QUERY_STATE;
+
+The FIX command will cause a variable to be treated as a constant, but can
+safely be ignored for now as it will always apply to the first pose.
+SOLVE_STATE is provided as guidance - the SLAM algorithm can make its own
+decision on when to solve. QUERY_STATE without arguments expects all variables
+to be returned. ADD VERTEX is provided as declaration of the variable and can
+optionally include an initialization (not used for now). The automated
+evaluation system is expected to eventually include additional features such as
+evaluation of covariances. 
+
+The SLAM executable responds to "QUERY_STATE" by providing a list of all
+requested vertices, ordered by the vertex ID, and enclosed between a
+BEGIN...END expression. For the second query in the 2D example the query
+results in (note that the poses are wrong as the example_slam code does not
+perform any calculations)
+
+BEGIN
+VERTEX_XYT 1 0. 0. 0.
+VERTEX_XYT 2 0. 0. 0.
+END

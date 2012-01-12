@@ -1,0 +1,53 @@
+stuff:		is a general library containing utilities to manipulate
+       		strings, to open files and other unsorted components.  
+
+core:  		this is the base library of g2o
+
+math_groups:	classes to represent some domainsfor variables used by 
+		the types. These are for example SE2, SE3, Sim3, 
+		ProjectiveCamera.
+
+types: 		Here are some types plugins for g2o, organized as
+		application domain.  This is the list:
+
+		slam2d: types for 2d SLAM. The vertices can represent
+		robot poses and point landmarks. The edges can
+		represent pose-pose constraints, pose-landmark
+		constraints, and pose-landmark (bearing only)
+		constraints.
+			
+		slam3d: types for 3D slam. The vertices can represent
+		robot poses with 6dof and the constraints can
+		represent pose-pose constraint.
+		
+		sim3: types for representing an unknown-scale SLAM
+		problem.  the vertices represent elements of sim3 (3d
+		pose + scale), and the edges represent constraints
+		spatial constraints between these sim3 vertices.
+
+		sba: types for bundle adjustment. The vertices include
+		intrinsic camera parameters, 3D points, extrinsic
+		parameters.  The edges include: monocular projection,
+		monocular projection with parameters (3-edge), stereo
+		projection and scale constraint between extrinsic
+		nodes.  There are also types for BA that are based on
+		the exponential map parameterization.
+
+		icp: hmmmm dunno what this is....
+
+solvers:	Here are the linear solver plugins: PCG, colamd, and CHOLMOD.
+
+examples: 	Application examples. These dirs build executables
+		
+		ba: a simple demo on bundle adjustment that constructs
+		a simulated scene and optimizes it
+		
+		tutorial_slam2d: a complete tutorial on how to build a
+		slam2d subsystem. It does not require the types
+		plugins, as it defines everything from scratch.
+
+		icp: ???
+		
+apps: 		here are the main applications that use g2o. they
+		include a command line interface and a gui
+		application.  

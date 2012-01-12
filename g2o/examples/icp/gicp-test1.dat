@@ -1,0 +1,11 @@
+# Simple GICP example
+#
+# Vertices at origin, second one is rotated
+VERTEX_SE3:QUAT 0  0 0 0  0 0 0 1
+VERTEX_SE3:QUAT 1  0 0 0  0.5 0 0 0.5
+#
+# Edges displaced by 1m on Z axis
+EDGE_V_V_GICP 1 0   0 0 1  0 0 1   0 0 2  0 0 1
+EDGE_V_V_GICP 1 0   0 1 1  0 0 1   0 1 2  0 0 1
+EDGE_V_V_GICP 1 0   1 0 1  0 0 1   1 0 2  0 0 1
+EDGE_V_V_GICP 1 0   1 1 1  0 0 1   1 1 2  0 0 1
