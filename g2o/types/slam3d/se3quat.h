@@ -45,11 +45,11 @@ namespace g2o {
         _t.setZero();
       }
 
-      SE3Quat(const Matrix3d& R, const Vector3d t):_r(Quaterniond(R)),_t(t){ 
+      SE3Quat(const Matrix3d& R, const Vector3d& t):_r(Quaterniond(R)),_t(t){ 
         normalizeRotation();
       }
 
-      SE3Quat(const Quaterniond& q, const Vector3d t):_r(q),_t(t){
+      SE3Quat(const Quaterniond& q, const Vector3d& t):_r(q),_t(t){
         normalizeRotation();
       }
 
