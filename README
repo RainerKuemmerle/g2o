@@ -1,0 +1,84 @@
+g2o - General Graph Optimization
+
+g2o is an open-source C++ framework for optimizing graph-based nonlinear error
+functions. g2o has been designed to be easily extensible to a wide range of
+problems and a new problem typically can be specified in a few lines of code.
+The current implementation provides solutions to several variants of SLAM and
+BA.
+
+A wide range of problems in robotics as well as in computer-vision involve the
+minimization of a non-linear error function that can be represented as a graph.
+Typical instances are simultaneous localization and mapping (SLAM) or bundle
+adjustment (BA). The overall goal in these problems is to find the
+configuration of parameters or state variables that maximally explain a set of
+measurements affected by Gaussian noise. g2o is an open-source C++ framework
+for such nonlinear least squares problems. g2o has been designed to be easily
+extensible to a wide range of problems and a new problem typically can be
+specified in a few lines of code. The current implementation provides solutions
+to several variants of SLAM and BA. g2o offers a performance comparable to
+implementations of state-of-the-art approaches for the specific problems
+(02/2011).
+
+Papers Describing the Approach:
+Rainer Kuemmerle, Giorgio Grisetti, Hauke Strasdat, Kurt Konolige, and Wolfram
+Burgard: g2o: A General Framework for Graph Optimization, IEEE International
+Conference on Robotics and Automation (ICRA), 2011
+http://ais.informatik.uni-freiburg.de/publications/papers/kuemmerle11icra.pdf
+
+g2o is licensed under LGPL version 3, whereas the following parts are
+licensed under GPL version 3:
+- g2o_viewer
+- g2o_incremental
+
+See the doc folder for the full text of the licenses.
+
+g2o is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+licenses for more details.
+
+
+Requirements:
+g2o requires cmake to build. The other requirements are optional.
+  * cmake             http://www.cmake.org/
+  * suitesparse       http://www.cise.ufl.edu/research/sparse/SuiteSparse/
+  * Qt4               http://qt.nokia.com/
+  * libQGLViewer      http://www.libqglviewer.com/
+
+  On Ubuntu / Debian these dependencies are resolved by installing the
+  following packages.
+    - cmake
+    - libsuitesparse-dev
+    - libqt4-dev
+    - qt4-qmake
+    - libqglviewer-qt4-dev
+
+
+Compilation:
+Our primary development platform is Linux. Experimental support for
+Mac OS X and Windows (with MinGW as a compiler).
+We recommend a so-called out of source build which can be achieved
+by the following command sequence.
+
+- mkdir build
+- cd build
+- cmake ../
+- make
+
+The binaries will be placed in bin and the libraries in lib which
+are both located in the top-level folder.
+
+
+
+Acknowledgments:
+We thank Simon J. Julier for submitting patches to achieve compatibility
+with Mac OS X and Michael A. Eriksen for submitting patches to compile
+with MSVC.
+
+
+Contact information:
+Rainer Kuemmerle <kuemmerl@informatik.uni-freiburg.de>
+Giorgio Grisetti <grisetti@dis.uniroma1.it>
+Hauke Strasdat <strasdat@gmail.com>
+Kurt Konolige <konolige@willowgarage.com>
+Wolfram Burgard <burgard@informatik.uni-freiburg.de>
