@@ -18,7 +18,8 @@ IF(G2O_BUILD_EXAMPLES)
   ADD_SUBDIRECTORY(examples)
 ENDIF(G2O_BUILD_EXAMPLES)
 
-IF(IS_DIRECTORY playground)
+IF(IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/playground")
   # Playground
+  MESSAGE(STATUS "building playground")
   ADD_SUBDIRECTORY(playground)
 ENDIF()
