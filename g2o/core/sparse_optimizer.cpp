@@ -325,7 +325,7 @@ namespace g2o{
 
       double ts =  get_time();
 
-      ok = _algorithm->solve(i, online);
+      ok = _algorithm->solve(i, online) == OptimizationAlgorithm::OK;
 
       bool errorComputed = false;
       if (cstat) {

@@ -24,6 +24,9 @@
 #include <Eigen/Geometry>
 
 namespace g2o {
+  namespace types_six_dof_expmap {
+    void init();
+  }
 
   using namespace Eigen;
 

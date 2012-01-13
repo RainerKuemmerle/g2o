@@ -18,11 +18,8 @@ namespace g2o {
     ParameterVector pv(1);
     pv[0]=params;
     resolveCache(cache, (OptimizableGraph::Vertex*)_vertices[0],"CACHE_CAMERA",pv);
-    return cache;
+    return cache != 0;
   }
-
-
-
 
   bool EdgeSE3PointXYZDepth::read(std::istream& is) {
     int pid;

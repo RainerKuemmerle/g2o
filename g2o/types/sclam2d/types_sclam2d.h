@@ -14,34 +14,16 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "g2o/config.h"
+#ifndef G2O_TYPES_SCLAM_H
+#define G2O_TYPES_SCLAM_H
 
-#include "robot_laser.h"
-
-#include "g2o/core/factory.h"
-#include "g2o/core/creators.h"
-#include "g2o/stuff/macros.h"
+#include "edge_se2_sensor_calib.h"
+#include "edge_se2_odom_differential_calib.h"
 
 namespace g2o {
-
-  namespace types_data {
-    int initialized = 0;
-
-    void init()
-    {
-      if (types_data::initialized)
-        return;
-      Factory* factory = Factory::instance();
-      //cerr << "Calling " << __FILE__ << " " << __PRETTY_FUNCTION__ << endl;
-
-      factory->registerType("ROBOTLASER1", new HyperGraphElementCreator<RobotLaser>);
-      types_data::initialized = 1;
-    }
+  namespace types_sclam {
+    void init();
   }
+}
 
-  G2O_ATTRIBUTE_CONSTRUCTOR(init_types_data)
-  {
-    types_data::init();
-  }
-
-} // end namespace
+#endif

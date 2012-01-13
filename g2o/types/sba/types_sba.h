@@ -26,6 +26,10 @@
 
 namespace g2o {
 
+  namespace types_sba {
+    void init();
+  }
+
   using namespace Eigen;
 
 /**
