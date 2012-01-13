@@ -131,9 +131,6 @@ class CommandArgs
     std::string trim(const std::string& s) const;
 };
 
-    std::istream& operator>>(std::istream& is, std::vector<int>& v);
-    std::ostream& operator<<(std::ostream& os, const std::vector<int>& v);
-
 } // end namespace
 
 #endif

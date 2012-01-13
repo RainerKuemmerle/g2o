@@ -43,6 +43,11 @@ using namespace std;
 
 namespace g2o {
 
+// forward decl of some operators
+std::istream& operator>>(std::istream& is, std::vector<int>& v);
+std::ostream& operator<<(std::ostream& os, const std::vector<int>& v);
+
+
 /** Helper class to sort pair based on first elem */
 template<class T1, class T2, class Pred = std::less<T1> >
 struct CmpPairFirst {
@@ -434,16 +439,14 @@ std::string CommandArgs::trim(const std::string& s) const
   return std::string(s, b, e - b + 1);
 }
 
-std::istream& operator >> (std::istream& is, std::vector<int>& v){
+std::istream& operator>>(std::istream& is, std::vector<int>& v){
   string s;
   if (! (is >> s) )
     return is;
 
-  char* cbase=new char[s.length()];
-  char* c=cbase;
-  char* caux=cbase;
+  const char* c = s.c_str();
+  char* caux = const_cast<char*>(c);
 
-  strcpy(c, s.c_str());
   v.clear();
   bool hasNextValue=true;
   while(hasNextValue){
@@ -455,11 +458,10 @@ std::istream& operator >> (std::istream& is, std::vector<int>& v){
     } else
       hasNextValue = false;
   }
-  delete [] cbase;
   return is;
 }
 
-std::ostream& operator << (std::ostream& os, const std::vector<int>& v){
+std::ostream& operator<<(std::ostream& os, const std::vector<int>& v){
   if (v.size()){
     os << v[0];
   }
