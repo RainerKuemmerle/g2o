@@ -24,6 +24,37 @@ namespace g2o {
 
   namespace types_icp {
     int initialized = 0;
+
+    void init()
+    {
+      if (types_icp::initialized)
+        return;
+      //cerr << "Calling " << __FILE__ << " " << __PRETTY_FUNCTION__ << endl;
+      Factory* factory = Factory::instance();
+      factory->registerType("EDGE_V_V_GICP", new HyperGraphElementCreator<Edge_V_V_GICP>);
+
+      Edge_V_V_GICP::dRidx << 0.0,0.0,0.0,
+        0.0,0.0,2.0,
+        0.0,-2.0,0.0;
+      Edge_V_V_GICP::dRidy  << 0.0,0.0,-2.0,
+        0.0,0.0,0.0,
+        2.0,0.0,0.0;
+      Edge_V_V_GICP::dRidz  << 0.0,2.0,0.0,
+        -2.0,0.0,0.0,
+        0.0,0.0,0.0;
+
+      VertexSCam::dRidx << 0.0,0.0,0.0,
+        0.0,0.0,2.0,
+        0.0,-2.0,0.0;
+      VertexSCam::dRidy  << 0.0,0.0,-2.0,
+        0.0,0.0,0.0,
+        2.0,0.0,0.0;
+      VertexSCam::dRidz  << 0.0,2.0,0.0,
+        -2.0,0.0,0.0,
+        0.0,0.0,0.0;
+
+      types_icp::initialized = 1;
+    }
   }
 
   using namespace std;
@@ -42,33 +73,7 @@ namespace g2o {
   // global initialization
   G2O_ATTRIBUTE_CONSTRUCTOR(init_icp_types)
   {
-    if (types_icp::initialized)
-      return;
-    //cerr << "Calling " << __FILE__ << " " << __PRETTY_FUNCTION__ << endl;
-    Factory* factory = Factory::instance();
-    factory->registerType("EDGE_V_V_GICP", new HyperGraphElementCreator<Edge_V_V_GICP>);
-
-    Edge_V_V_GICP::dRidx << 0.0,0.0,0.0,
-      0.0,0.0,2.0,
-      0.0,-2.0,0.0;
-    Edge_V_V_GICP::dRidy  << 0.0,0.0,-2.0,
-      0.0,0.0,0.0,
-      2.0,0.0,0.0;
-    Edge_V_V_GICP::dRidz  << 0.0,2.0,0.0,
-      -2.0,0.0,0.0,
-      0.0,0.0,0.0;
-
-    VertexSCam::dRidx << 0.0,0.0,0.0,
-      0.0,0.0,2.0,
-      0.0,-2.0,0.0;
-    VertexSCam::dRidy  << 0.0,0.0,-2.0,
-      0.0,0.0,0.0,
-      2.0,0.0,0.0;
-    VertexSCam::dRidz  << 0.0,2.0,0.0,
-      -2.0,0.0,0.0,
-      0.0,0.0,0.0;
-
-    types_icp::initialized = 1;
+    types_icp::init();
   }
 
   // Copy constructor

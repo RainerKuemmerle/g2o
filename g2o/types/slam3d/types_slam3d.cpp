@@ -25,41 +25,46 @@ namespace g2o {
 
   namespace types_slam3d {
     int initialized = 0;
+
+    void init()
+    {
+      if (types_slam3d::initialized)
+        return;
+      Factory* factory = Factory::instance();
+      //cerr << "Calling " << __FILE__ << " " << __PRETTY_FUNCTION__ << endl;
+      factory->registerType("VERTEX_SE3:QUAT", new HyperGraphElementCreator<VertexSE3>);
+      factory->registerType("EDGE_SE3:QUAT", new HyperGraphElementCreator<EdgeSE3>);
+      factory->registerType("VERTEX_TRACKXYZ", new HyperGraphElementCreator<VertexPointXYZ>);
+
+      factory->registerType("PARAMS_SE3OFFSET", new HyperGraphElementCreator<ParameterSE3Offset>);
+      factory->registerType("EDGE_SE3_TRACKXYZ", new HyperGraphElementCreator<EdgeSE3PointXYZ>);
+      factory->registerType("EDGE_SE3_PRIOR", new HyperGraphElementCreator<EdgeSE3Prior>);
+      factory->registerType("CACHE_SE3_OFFSET", new HyperGraphElementCreator<CacheSE3Offset>);
+      factory->registerType("EDGE_SE3_OFFSET", new HyperGraphElementCreator<EdgeSE3Offset>);
+
+      factory->registerType("PARAMS_CAMERACALIB", new HyperGraphElementCreator<ParameterCamera>);
+      factory->registerType("CACHE_CAMERA", new HyperGraphElementCreator<CacheCamera>);
+      factory->registerType("EDGE_PROJECT_DISPARITY", new HyperGraphElementCreator<EdgeSE3PointXYZDisparity>);
+      factory->registerType("EDGE_PROJECT_DEPTH", new HyperGraphElementCreator<EdgeSE3PointXYZDepth>);
+
+
+      HyperGraphActionLibrary* actionLib = HyperGraphActionLibrary::instance();
+      actionLib->registerAction(new VertexSE3WriteGnuplotAction);
+      actionLib->registerAction(new EdgeSE3WriteGnuplotAction);
+
+#ifdef G2O_HAVE_OPENGL
+      actionLib->registerAction(new VertexPointXYZDrawAction);
+      actionLib->registerAction(new VertexSE3DrawAction);
+      actionLib->registerAction(new EdgeSE3DrawAction);
+      actionLib->registerAction(new CacheCameraDrawAction);
+#endif
+      types_slam3d::initialized = 1;
+    }
   }
 
   G2O_ATTRIBUTE_CONSTRUCTOR(init_slam3d_types)
   {
-    if (types_slam3d::initialized)
-      return;
-    Factory* factory = Factory::instance();
-    //cerr << "Calling " << __FILE__ << " " << __PRETTY_FUNCTION__ << endl;
-    factory->registerType("VERTEX_SE3:QUAT", new HyperGraphElementCreator<VertexSE3>);
-    factory->registerType("EDGE_SE3:QUAT", new HyperGraphElementCreator<EdgeSE3>);
-    factory->registerType("VERTEX_TRACKXYZ", new HyperGraphElementCreator<VertexPointXYZ>);
-
-    factory->registerType("PARAMS_SE3OFFSET", new HyperGraphElementCreator<ParameterSE3Offset>);
-    factory->registerType("EDGE_SE3_TRACKXYZ", new HyperGraphElementCreator<EdgeSE3PointXYZ>);
-    factory->registerType("EDGE_SE3_PRIOR", new HyperGraphElementCreator<EdgeSE3Prior>);
-    factory->registerType("CACHE_SE3_OFFSET", new HyperGraphElementCreator<CacheSE3Offset>);
-    factory->registerType("EDGE_SE3_OFFSET", new HyperGraphElementCreator<EdgeSE3Offset>);
-
-    factory->registerType("PARAMS_CAMERACALIB", new HyperGraphElementCreator<ParameterCamera>);
-    factory->registerType("CACHE_CAMERA", new HyperGraphElementCreator<CacheCamera>);
-    factory->registerType("EDGE_PROJECT_DISPARITY", new HyperGraphElementCreator<EdgeSE3PointXYZDisparity>);    
-    factory->registerType("EDGE_PROJECT_DEPTH", new HyperGraphElementCreator<EdgeSE3PointXYZDepth>);
-
-
-    HyperGraphActionLibrary* actionLib = HyperGraphActionLibrary::instance();
-    actionLib->registerAction(new VertexSE3WriteGnuplotAction);
-    actionLib->registerAction(new EdgeSE3WriteGnuplotAction);
-
-#ifdef G2O_HAVE_OPENGL
-    actionLib->registerAction(new VertexPointXYZDrawAction);
-    actionLib->registerAction(new VertexSE3DrawAction);
-    actionLib->registerAction(new EdgeSE3DrawAction);
-    actionLib->registerAction(new CacheCameraDrawAction);
-#endif
-    types_slam3d::initialized = 1;
+    types_slam3d::init();
   }
 
 } // end namespace

@@ -25,6 +25,10 @@
 
 namespace g2o {
 
+  namespace types_seven_dof_expmap {
+    void init();
+  }
+
   using namespace Eigen;
 
   /**
