@@ -129,15 +129,6 @@ class CommandArgs
     }
 
     std::string trim(const std::string& s) const;
-
-    /** Helper class to sort pair based on first elem */
-    template<class T1, class T2, class Pred = std::less<T1> >
-    struct CmpPairFirst {
-      bool operator()(const std::pair<T1,T2>& left, const std::pair<T1,T2>& right) {
-        return Pred()(left.first, right.first);
-      }
-    };
-
 };
 
     std::istream& operator>>(std::istream& is, std::vector<int>& v);
