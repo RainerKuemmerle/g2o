@@ -14,8 +14,8 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef G2O_SOLVER_PROPERTY_H
-#define G2O_SOLVER_PROPERTY_H
+#ifndef G2O_OPTIMIZATION_ALGORITHM_PROPERTY_H
+#define G2O_OPTIMIZATION_ALGORITHM_PROPERTY_H
 
 #include <string>
 
@@ -24,7 +24,7 @@ namespace g2o {
 /**
  * \brief describe the properties of a solver
  */
-struct SolverProperty
+struct OptimizationAlgorithmProperty
 {
   std::string name;           ///< name of the solver, e.g., var
   std::string desc;           ///< short description of the solver
@@ -32,11 +32,11 @@ struct SolverProperty
   bool requiresMarginalize;   ///< whether the solver requires marginalization of landmarks
   int poseDim;                ///< dimension of the pose vertices (-1 if variable)
   int landmarkDim;            ///< dimension of the landmar vertices (-1 if variable)
-  SolverProperty() :
+  OptimizationAlgorithmProperty() :
     name(), desc(), type(), requiresMarginalize(false), poseDim(-1), landmarkDim(-1)
   {
   }
-  SolverProperty(const std::string& name_, const std::string& desc_, const std::string& type_, bool requiresMarginalize_, int poseDim_, int landmarkDim_) :
+  OptimizationAlgorithmProperty(const std::string& name_, const std::string& desc_, const std::string& type_, bool requiresMarginalize_, int poseDim_, int landmarkDim_) :
     name(name_), desc(desc_), type(type_), requiresMarginalize(requiresMarginalize_), poseDim(poseDim_), landmarkDim(landmarkDim_)
   {
   }

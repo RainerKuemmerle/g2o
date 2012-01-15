@@ -30,7 +30,7 @@
 #include "g2o/core/estimate_propagator.h"
 #include "g2o/core/sparse_optimizer.h"
 #include "g2o/core/factory.h"
-#include "g2o/core/solver_factory.h"
+#include "g2o/core/optimization_algorithm_factory.h"
 #include "g2o/core/hyper_dijkstra.h"
 #include "g2o/core/hyper_graph_action.h"
 #include "g2o/core/batch_stats.h"
@@ -147,7 +147,7 @@ int main(int argc, char** argv)
   loadStandardTypes(dlTypesWrapper, argc, argv);
 
   // register all the solvers
-  SolverFactory* solverFactory = SolverFactory::instance();
+  OptimizationAlgorithmFactory* solverFactory = OptimizationAlgorithmFactory::instance();
   DlWrapper dlSolverWrapper;
   loadStandardSolver(dlSolverWrapper, argc, argv);
   if (listSolvers)
@@ -162,7 +162,7 @@ int main(int argc, char** argv)
   optimizer.setForceStopFlag(&hasToStop);
 
   // allocating the desired solver + testing whether the solver is okay
-  SolverProperty solverProperty;
+  OptimizationAlgorithmProperty solverProperty;
   optimizer.setAlgorithm(solverFactory->construct(strSolver, solverProperty));
   if (! optimizer.solver()) {
     cerr << "Error allocating solver. Allocating \"" << strSolver << "\" failed!" << endl;
@@ -563,7 +563,7 @@ int main(int argc, char** argv)
 
   // destroy all the singletons
   Factory::destroy();
-  SolverFactory::destroy();
+  OptimizationAlgorithmFactory::destroy();
   HyperGraphActionLibrary::destroy();
 
   return 0;

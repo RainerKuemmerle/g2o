@@ -27,7 +27,7 @@
 
 #include "g2o/core/sparse_optimizer.h"
 #include "g2o/core/factory.h"
-#include "g2o/core/solver_factory.h"
+#include "g2o/core/optimization_algorithm_factory.h"
 #include "g2o/core/hyper_graph_action.h"
 
 #include "g2o/apps/g2o_cli/g2o_common.h"
@@ -90,7 +90,7 @@ int main(int argc, char** argv)
 
   // destroy all the singletons
   Factory::destroy();
-  SolverFactory::destroy();
+  OptimizationAlgorithmFactory::destroy();
   HyperGraphActionLibrary::destroy();
 
   return 0;

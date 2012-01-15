@@ -850,10 +850,10 @@ parameters of the algorithms can be controlled.
 
 \begin{lstlisting}[float,label=lst:initsolvers,caption=Registering
   solvers by a constructor from a library]
-class PCGSolverCreator : public AbstractSolverCreator
+class PCGSolverCreator : public AbstractOptimizationAlgorithmCreator
 {
   public:
-    PCGSolverCreator(const SolverProperty& p) : AbstractSolverCreator(p) {}
+    PCGSolverCreator(const OptimizationAlgorithmProperty& p) : AbstractOptimizationAlgorithmCreator(p) {}
     virtual Solver* construct(SparseOptimizer* optimizer)
     {
       // create the solver, see g2o/solver_pcg/solver_pcg.cpp for the full code
@@ -862,8 +862,8 @@ class PCGSolverCreator : public AbstractSolverCreator
 
 void __attribute__ ((constructor)) init_solver_csparse()
 {
-  SolverFactory* factory = SolverFactory::instance();
-  factory->registerSolver(new PCGSolverCreator(SolverProperty("pcg",
+  OptimizationAlgorithmFactory* factory = OptimizationAlgorithmFactory::instance();
+  factory->registerSolver(new PCGSolverCreator(OptimizationAlgorithmProperty("pcg",
      "PCG solver using block-Jacobi pre-conditioner (variable blocksize)",
      "PCG", false, -1, -1)));
   //...

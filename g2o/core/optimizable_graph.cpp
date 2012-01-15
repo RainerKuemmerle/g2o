@@ -24,7 +24,7 @@
 
 #include "estimate_propagator.h"
 #include "factory.h"
-#include "solver_property.h"
+#include "optimization_algorithm_property.h"
 #include "hyper_graph_action.h"
 #include "cache.h"
 
@@ -680,7 +680,7 @@ void OptimizableGraph::setRenamedTypesFromString(const std::string& types)
   }
 }
 
-bool OptimizableGraph::isSolverSuitable(const SolverProperty& solverProperty, const std::set<int>& vertDims_) const
+bool OptimizableGraph::isSolverSuitable(const OptimizationAlgorithmProperty& solverProperty, const std::set<int>& vertDims_) const
 {
   std::set<int> auxDims;
   if (vertDims_.size() == 0) {

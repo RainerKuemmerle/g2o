@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "solver_factory.h"
+#include "optimization_algorithm_factory.h"
 
 #include <iostream>
 #include <typeinfo>
@@ -24,32 +24,32 @@ using namespace std;
 
 namespace g2o {
 
-  AbstractSolverCreator::AbstractSolverCreator(const SolverProperty& p) :
+  AbstractOptimizationAlgorithmCreator::AbstractOptimizationAlgorithmCreator(const OptimizationAlgorithmProperty& p) :
     _property(p)
   {
   }
 
-  SolverFactory* SolverFactory::factoryInstance = 0;
+  OptimizationAlgorithmFactory* OptimizationAlgorithmFactory::factoryInstance = 0;
 
-  SolverFactory::SolverFactory()
+  OptimizationAlgorithmFactory::OptimizationAlgorithmFactory()
   {
   }
 
-  SolverFactory::~SolverFactory()
+  OptimizationAlgorithmFactory::~OptimizationAlgorithmFactory()
   {
     for (CreatorList::iterator it = _creator.begin(); it != _creator.end(); ++it)
       delete *it;
   }
 
-  SolverFactory* SolverFactory::instance()
+  OptimizationAlgorithmFactory* OptimizationAlgorithmFactory::instance()
   {
     if (factoryInstance == 0) {
-      factoryInstance = new SolverFactory;
+      factoryInstance = new OptimizationAlgorithmFactory;
     }
     return factoryInstance;
   }
 
-  void SolverFactory::registerSolver(AbstractSolverCreator* c)
+  void OptimizationAlgorithmFactory::registerSolver(AbstractOptimizationAlgorithmCreator* c)
   {
     const string& name = c->property().name;
     CreatorList::iterator foundIt = findSolver(name);
@@ -61,7 +61,7 @@ namespace g2o {
     _creator.push_back(c);
   }
 
-  OptimizationAlgorithm* SolverFactory::construct(const std::string& name, SolverProperty& solverProperty) const
+  OptimizationAlgorithm* OptimizationAlgorithmFactory::construct(const std::string& name, OptimizationAlgorithmProperty& solverProperty) const
   {
     CreatorList::const_iterator foundIt = findSolver(name);
     if (foundIt != _creator.end()) {
@@ -72,34 +72,34 @@ namespace g2o {
     return 0;
   }
 
-  void SolverFactory::destroy()
+  void OptimizationAlgorithmFactory::destroy()
   {
     delete factoryInstance;
     factoryInstance = 0;
   }
 
-  void SolverFactory::listSolvers(std::ostream& os) const
+  void OptimizationAlgorithmFactory::listSolvers(std::ostream& os) const
   {
     for (CreatorList::const_iterator it = _creator.begin(); it != _creator.end(); ++it) {
-      const SolverProperty& sp = (*it)->property();
+      const OptimizationAlgorithmProperty& sp = (*it)->property();
       os << sp.name << "\t " << sp.desc << endl;
     }
   }
 
-  SolverFactory::CreatorList::const_iterator SolverFactory::findSolver(const std::string& name) const
+  OptimizationAlgorithmFactory::CreatorList::const_iterator OptimizationAlgorithmFactory::findSolver(const std::string& name) const
   {
     for (CreatorList::const_iterator it = _creator.begin(); it != _creator.end(); ++it) {
-      const SolverProperty& sp = (*it)->property();
+      const OptimizationAlgorithmProperty& sp = (*it)->property();
       if (sp.name == name)
         return it;
     }
     return _creator.end();
   }
 
-  SolverFactory::CreatorList::iterator SolverFactory::findSolver(const std::string& name)
+  OptimizationAlgorithmFactory::CreatorList::iterator OptimizationAlgorithmFactory::findSolver(const std::string& name)
   {
     for (CreatorList::iterator it = _creator.begin(); it != _creator.end(); ++it) {
-      const SolverProperty& sp = (*it)->property();
+      const OptimizationAlgorithmProperty& sp = (*it)->property();
       if (sp.name == name)
         return it;
     }

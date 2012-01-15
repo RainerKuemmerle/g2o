@@ -21,7 +21,7 @@
 
 #include "g2o/core/block_solver.h"
 #include "g2o/core/solver.h"
-#include "g2o/core/solver_factory.h"
+#include "g2o/core/optimization_algorithm_factory.h"
 #include "g2o/core/sparse_optimizer.h"
 #include "g2o/core/optimization_algorithm.h"
 
@@ -55,10 +55,10 @@ namespace g2o {
     return snl;
   }
 
-  class SLAM2DLinearSolverCreator : public AbstractSolverCreator
+  class SLAM2DLinearSolverCreator : public AbstractOptimizationAlgorithmCreator
   {
     public:
-      SLAM2DLinearSolverCreator(const SolverProperty& p) : AbstractSolverCreator(p) {}
+      SLAM2DLinearSolverCreator(const OptimizationAlgorithmProperty& p) : AbstractOptimizationAlgorithmCreator(p) {}
       virtual OptimizationAlgorithm* construct()
       {
         return createSolver(property().name);
@@ -76,8 +76,8 @@ namespace g2o {
       static bool initialized = false;
       if (initialized)
         return;
-      SolverFactory* factory = SolverFactory::instance();
-      factory->registerSolver(new SLAM2DLinearSolverCreator(SolverProperty("2dlinear", "Solve Orientation + Gauss-Newton: Works only on 2D pose graphs!!", "CSparse", false, 3, 3)));
+      OptimizationAlgorithmFactory* factory = OptimizationAlgorithmFactory::instance();
+      factory->registerSolver(new SLAM2DLinearSolverCreator(OptimizationAlgorithmProperty("2dlinear", "Solve Orientation + Gauss-Newton: Works only on 2D pose graphs!!", "CSparse", false, 3, 3)));
       initialized = 1;
     }
   }

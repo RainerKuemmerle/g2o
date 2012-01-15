@@ -29,7 +29,7 @@
 #include "g2o/core/estimate_propagator.h"
 #include "g2o/core/sparse_optimizer.h"
 #include "g2o/core/factory.h"
-#include "g2o/core/solver_factory.h"
+#include "g2o/core/optimization_algorithm_factory.h"
 #include "g2o/core/hyper_dijkstra.h"
 
 #include "g2o/stuff/macros.h"
@@ -149,7 +149,7 @@ int main(int argc, char** argv)
   loadStandardTypes(dlTypesWrapper, argc, argv);
 
   // register all the solvers
-  //SolverFactory* solverFactory = SolverFactory::instance();
+  //OptimizationAlgorithmFactory* solverFactory = OptimizationAlgorithmFactory::instance();
   //DlWrapper dlSolverWrapper;
   //loadStandardSolver(dlSolverWrapper, argc, argv);
   //if (listSolvers)
