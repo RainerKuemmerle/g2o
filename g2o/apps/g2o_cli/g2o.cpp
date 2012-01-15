@@ -118,7 +118,7 @@ int main(int argc, char** argv)
   arg.param("v", verbose, false, "verbose output of the optimization process");
   arg.param("guess", initialGuess, false, "initial guess based on spanning tree");
   arg.param("inc", incremental, false, "run incremetally");
-  arg.param("update", updateGraphEachN, 10, "updates after x odometry nodes, (default: 10)");
+  arg.param("update", updateGraphEachN, 10, "updates after x odometry nodes");
   arg.param("guiout", guiOut, false, "gui output while running incrementally");
   arg.param("marginalize", marginalize, false, "on or off");
   arg.param("printSolverProperties", printSolverProperties, false, "print the properties of the solver");
@@ -129,7 +129,7 @@ int main(int argc, char** argv)
   arg.param("gaugeId", gaugeId, -1, "force the gauge");
   arg.param("huberWidth", huberWidth, -1., "width for the robust Huber Kernel (only if robustKernel)");
   arg.param("o", outputfilename, "", "output final version of the graph");
-  arg.param("solver", strSolver, "gn_var", "specify which solver to use underneat\n\t {var, fix3_2, fix6_3, fix_7_3}");
+  arg.param("solver", strSolver, "gn_var", "specify which solver to use underneat\n\t {gn_var, lm_fix3_2, gn_fix6_3, lm_fix7_3}");
   arg.param("solverlib", dummy, "", "specify a solver library which will be loaded");
   arg.param("typeslib", dummy, "", "specify a types library which will be loaded");
   arg.param("stats", statsFile, "", "specify a file for the statistics");
