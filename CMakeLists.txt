@@ -55,6 +55,13 @@ IF (BUILD_SHARED_LIBS)
   SET (G2O_LIB_TYPE SHARED)
 ENDIF()
 
+# There seems to be an issue with MSVC8
+# see http://eigen.tuxfamily.org/bz/show_bug.cgi?id=83
+if(MSVC90)
+  add_definitions(-DEIGEN_DONT_ALIGN_STATICALLY=1)
+  message(STATUS "Disabling static for MSVC8")
+endif(MSVC90)
+
 # On the Mac platform, configure the RPATH as per the install, to
 # avoid the problem of loading both the built and installed versions
 # of the shared targets
