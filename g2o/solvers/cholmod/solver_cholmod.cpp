@@ -19,7 +19,7 @@
 
 #include "g2o/core/block_solver.h"
 #include "g2o/core/solver.h"
-#include "g2o/core/solver_factory.h"
+#include "g2o/core/optimization_algorithm_factory.h"
 
 #include "g2o/core/optimization_algorithm_gauss_newton.h"
 #include "g2o/core/optimization_algorithm_levenberg.h"
@@ -81,10 +81,10 @@ namespace g2o {
     return snl;
   }
 
-  class CholmodSolverCreator : public AbstractSolverCreator
+  class CholmodSolverCreator : public AbstractOptimizationAlgorithmCreator
   {
     public:
-      CholmodSolverCreator(const SolverProperty& p) : AbstractSolverCreator(p) {}
+      CholmodSolverCreator(const OptimizationAlgorithmProperty& p) : AbstractOptimizationAlgorithmCreator(p) {}
       virtual OptimizationAlgorithm* construct()
       {
         return createSolver(property().name);
@@ -102,22 +102,22 @@ namespace g2o {
       static bool initialized = false;
       if (initialized)
         return;
-      SolverFactory* factory = SolverFactory::instance();
-      factory->registerSolver(new CholmodSolverCreator(SolverProperty("gn_var_cholmod", "Gauss-Newton: Cholesky solver using CHOLMOD (variable blocksize)", "CHOLMOD", false, -1, -1)));
-      factory->registerSolver(new CholmodSolverCreator(SolverProperty("gn_fix3_2_cholmod", "Gauss-Newton: Cholesky solver using CHOLMOD (fixed blocksize)", "CHOLMOD", true, 3, 2)));
-      factory->registerSolver(new CholmodSolverCreator(SolverProperty("gn_fix6_3_cholmod", "Gauss-Newton: Cholesky solver using CHOLMOD (fixed blocksize)", "CHOLMOD", true, 6, 3)));
-      factory->registerSolver(new CholmodSolverCreator(SolverProperty("gn_fix7_3_cholmod", "Gauss-Newton: Cholesky solver using CHOLMOD (fixed blocksize)", "CHOLMOD", true, 7, 3)));
-      factory->registerSolver(new CholmodSolverCreator(SolverProperty("gn_fix3_2_cholmod_scalar", "Gauss-Newton: Cholesky solver using CHOLMOD (fixed blocksize, scalar ordering)", "CHOLMOD", true, 3, 2)));
-      factory->registerSolver(new CholmodSolverCreator(SolverProperty("gn_fix6_3_cholmod_scalar", "Gauss-Newton: Cholesky solver using CHOLMOD (fixed blocksize, scalar ordering)", "CHOLMOD", true, 6, 3)));
-      factory->registerSolver(new CholmodSolverCreator(SolverProperty("gn_fix7_3_cholmod_scalar", "Gauss-Newton: Cholesky solver using CHOLMOD (fixed blocksize, scalar ordering)", "CHOLMOD", true, 7, 3)));
+      OptimizationAlgorithmFactory* factory = OptimizationAlgorithmFactory::instance();
+      factory->registerSolver(new CholmodSolverCreator(OptimizationAlgorithmProperty("gn_var_cholmod", "Gauss-Newton: Cholesky solver using CHOLMOD (variable blocksize)", "CHOLMOD", false, -1, -1)));
+      factory->registerSolver(new CholmodSolverCreator(OptimizationAlgorithmProperty("gn_fix3_2_cholmod", "Gauss-Newton: Cholesky solver using CHOLMOD (fixed blocksize)", "CHOLMOD", true, 3, 2)));
+      factory->registerSolver(new CholmodSolverCreator(OptimizationAlgorithmProperty("gn_fix6_3_cholmod", "Gauss-Newton: Cholesky solver using CHOLMOD (fixed blocksize)", "CHOLMOD", true, 6, 3)));
+      factory->registerSolver(new CholmodSolverCreator(OptimizationAlgorithmProperty("gn_fix7_3_cholmod", "Gauss-Newton: Cholesky solver using CHOLMOD (fixed blocksize)", "CHOLMOD", true, 7, 3)));
+      factory->registerSolver(new CholmodSolverCreator(OptimizationAlgorithmProperty("gn_fix3_2_cholmod_scalar", "Gauss-Newton: Cholesky solver using CHOLMOD (fixed blocksize, scalar ordering)", "CHOLMOD", true, 3, 2)));
+      factory->registerSolver(new CholmodSolverCreator(OptimizationAlgorithmProperty("gn_fix6_3_cholmod_scalar", "Gauss-Newton: Cholesky solver using CHOLMOD (fixed blocksize, scalar ordering)", "CHOLMOD", true, 6, 3)));
+      factory->registerSolver(new CholmodSolverCreator(OptimizationAlgorithmProperty("gn_fix7_3_cholmod_scalar", "Gauss-Newton: Cholesky solver using CHOLMOD (fixed blocksize, scalar ordering)", "CHOLMOD", true, 7, 3)));
 
-      factory->registerSolver(new CholmodSolverCreator(SolverProperty("lm_var_cholmod", "Levenberg: Cholesky solver using CHOLMOD (variable blocksize)", "CHOLMOD", false, -1, -1)));
-      factory->registerSolver(new CholmodSolverCreator(SolverProperty("lm_fix3_2_cholmod", "Levenberg: Cholesky solver using CHOLMOD (fixed blocksize)", "CHOLMOD", true, 3, 2)));
-      factory->registerSolver(new CholmodSolverCreator(SolverProperty("lm_fix6_3_cholmod", "Levenberg: Cholesky solver using CHOLMOD (fixed blocksize)", "CHOLMOD", true, 6, 3)));
-      factory->registerSolver(new CholmodSolverCreator(SolverProperty("lm_fix7_3_cholmod", "Levenberg: Cholesky solver using CHOLMOD (fixed blocksize)", "CHOLMOD", true, 7, 3)));
-      factory->registerSolver(new CholmodSolverCreator(SolverProperty("lm_fix3_2_cholmod_scalar", "Levenberg: Cholesky solver using CHOLMOD (fixed blocksize, scalar ordering)", "CHOLMOD", true, 3, 2)));
-      factory->registerSolver(new CholmodSolverCreator(SolverProperty("lm_fix6_3_cholmod_scalar", "Levenberg: Cholesky solver using CHOLMOD (fixed blocksize, scalar ordering)", "CHOLMOD", true, 6, 3)));
-      factory->registerSolver(new CholmodSolverCreator(SolverProperty("lm_fix7_3_cholmod_scalar", "Levenberg: Cholesky solver using CHOLMOD (fixed blocksize, scalar ordering)", "CHOLMOD", true, 7, 3)));
+      factory->registerSolver(new CholmodSolverCreator(OptimizationAlgorithmProperty("lm_var_cholmod", "Levenberg: Cholesky solver using CHOLMOD (variable blocksize)", "CHOLMOD", false, -1, -1)));
+      factory->registerSolver(new CholmodSolverCreator(OptimizationAlgorithmProperty("lm_fix3_2_cholmod", "Levenberg: Cholesky solver using CHOLMOD (fixed blocksize)", "CHOLMOD", true, 3, 2)));
+      factory->registerSolver(new CholmodSolverCreator(OptimizationAlgorithmProperty("lm_fix6_3_cholmod", "Levenberg: Cholesky solver using CHOLMOD (fixed blocksize)", "CHOLMOD", true, 6, 3)));
+      factory->registerSolver(new CholmodSolverCreator(OptimizationAlgorithmProperty("lm_fix7_3_cholmod", "Levenberg: Cholesky solver using CHOLMOD (fixed blocksize)", "CHOLMOD", true, 7, 3)));
+      factory->registerSolver(new CholmodSolverCreator(OptimizationAlgorithmProperty("lm_fix3_2_cholmod_scalar", "Levenberg: Cholesky solver using CHOLMOD (fixed blocksize, scalar ordering)", "CHOLMOD", true, 3, 2)));
+      factory->registerSolver(new CholmodSolverCreator(OptimizationAlgorithmProperty("lm_fix6_3_cholmod_scalar", "Levenberg: Cholesky solver using CHOLMOD (fixed blocksize, scalar ordering)", "CHOLMOD", true, 6, 3)));
+      factory->registerSolver(new CholmodSolverCreator(OptimizationAlgorithmProperty("lm_fix7_3_cholmod_scalar", "Levenberg: Cholesky solver using CHOLMOD (fixed blocksize, scalar ordering)", "CHOLMOD", true, 7, 3)));
       initialized = true;
     }
   }

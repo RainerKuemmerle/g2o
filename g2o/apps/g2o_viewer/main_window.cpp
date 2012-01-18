@@ -19,8 +19,8 @@
 #include "main_window.h"
 #include "viewer_properties_widget.h"
 
-#include "g2o/core/solver_property.h"
-#include "g2o/core/solver_factory.h"
+#include "g2o/core/optimization_algorithm_property.h"
+#include "g2o/core/optimization_algorithm_factory.h"
 #include "g2o/core/sparse_optimizer.h"
 #include "g2o/core/estimate_propagator.h"
 #include "g2o/core/optimization_algorithm.h"
@@ -149,12 +149,12 @@ void MainWindow::on_actionQuit_triggered(bool)
 
 void MainWindow::updateDisplayedSolvers()
 {
-  const SolverFactory::CreatorList& knownSolvers = SolverFactory::instance()->creatorList();
+  const OptimizationAlgorithmFactory::CreatorList& knownSolvers = OptimizationAlgorithmFactory::instance()->creatorList();
 
   bool varFound = false;
   string varType = "";
-  for (SolverFactory::CreatorList::const_iterator it = knownSolvers.begin(); it != knownSolvers.end(); ++it) {
-    const SolverProperty& sp = (*it)->property();
+  for (OptimizationAlgorithmFactory::CreatorList::const_iterator it = knownSolvers.begin(); it != knownSolvers.end(); ++it) {
+    const OptimizationAlgorithmProperty& sp = (*it)->property();
     if (sp.name == "gn_var" || sp.name == "gn_var_cholmod") {
       varType = sp.type;
       varFound = true;
@@ -163,8 +163,8 @@ void MainWindow::updateDisplayedSolvers()
   }
 
   if (varFound) {
-    for (SolverFactory::CreatorList::const_iterator it = knownSolvers.begin(); it != knownSolvers.end(); ++it) {
-      const SolverProperty& sp = (*it)->property();
+    for (OptimizationAlgorithmFactory::CreatorList::const_iterator it = knownSolvers.begin(); it != knownSolvers.end(); ++it) {
+      const OptimizationAlgorithmProperty& sp = (*it)->property();
       if (sp.type == varType) {
         coOptimizer->addItem(QString::fromStdString(sp.name));
         _knownSolvers.push_back(sp);
@@ -172,21 +172,21 @@ void MainWindow::updateDisplayedSolvers()
     }
   }
 
-  map<string, vector<SolverProperty> > solverLookUp;
+  map<string, vector<OptimizationAlgorithmProperty> > solverLookUp;
 
-  for (SolverFactory::CreatorList::const_iterator it = knownSolvers.begin(); it != knownSolvers.end(); ++it) {
-    const SolverProperty& sp = (*it)->property();
+  for (OptimizationAlgorithmFactory::CreatorList::const_iterator it = knownSolvers.begin(); it != knownSolvers.end(); ++it) {
+    const OptimizationAlgorithmProperty& sp = (*it)->property();
     if (varFound && varType == sp.type)
       continue;
     solverLookUp[sp.type].push_back(sp); 
   }
 
-  for (map<string, vector<SolverProperty> >::iterator it = solverLookUp.begin(); it != solverLookUp.end(); ++it) {
+  for (map<string, vector<OptimizationAlgorithmProperty> >::iterator it = solverLookUp.begin(); it != solverLookUp.end(); ++it) {
     if (_knownSolvers.size() > 0) {
       coOptimizer->insertSeparator(coOptimizer->count());
-      _knownSolvers.push_back(SolverProperty());
+      _knownSolvers.push_back(OptimizationAlgorithmProperty());
     }
-    const vector<SolverProperty>& vsp = it->second;
+    const vector<OptimizationAlgorithmProperty>& vsp = it->second;
     for (size_t j = 0; j < vsp.size(); ++j) {
       coOptimizer->addItem(QString::fromStdString(vsp[j].name));
       _knownSolvers.push_back(vsp[j]);
@@ -210,7 +210,7 @@ bool MainWindow::load(const QString& filename)
   // update the solvers which are suitable for this graph
   set<int> vertDims = optimizer->dimensions();
   for (size_t i = 0; i < _knownSolvers.size(); ++i) {
-    const SolverProperty& sp = _knownSolvers[i];
+    const OptimizationAlgorithmProperty& sp = _knownSolvers[i];
     if (sp.name == "" && sp.desc == "")
       continue;
 
@@ -242,8 +242,8 @@ bool MainWindow::allocateSolver(bool& allocatedNewSolver)
   delete viewer->graph->algorithm();
   viewer->graph->setAlgorithm(0);
 
-  SolverFactory* solverFactory = SolverFactory::instance();
-  _currentSolver = solverFactory->construct(strSolver.toStdString(), _currentSolverProperty);
+  OptimizationAlgorithmFactory* solverFactory = OptimizationAlgorithmFactory::instance();
+  _currentSolver = solverFactory->construct(strSolver.toStdString(), _currentOptimizationAlgorithmProperty);
   viewer->graph->setAlgorithm(_currentSolver);
 
   _lastSolver = currentIndex;
@@ -253,12 +253,12 @@ bool MainWindow::allocateSolver(bool& allocatedNewSolver)
 bool MainWindow::prepare()
 {
   SparseOptimizer* optimizer = viewer->graph;
-  if (_currentSolverProperty.requiresMarginalize) {
+  if (_currentOptimizationAlgorithmProperty.requiresMarginalize) {
     cerr << "Marginalizing Landmarks" << endl;
     for (SparseOptimizer::VertexIDMap::const_iterator it = optimizer->vertices().begin(); it != optimizer->vertices().end(); ++it) {
       OptimizableGraph::Vertex* v = static_cast<OptimizableGraph::Vertex*>(it->second);
       int vdim = v->dimension();
-      v->setMarginalized((vdim == _currentSolverProperty.landmarkDim));
+      v->setMarginalized((vdim == _currentOptimizationAlgorithmProperty.landmarkDim));
     }
   }
   else {

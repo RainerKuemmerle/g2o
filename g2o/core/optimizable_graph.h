@@ -35,7 +35,7 @@
 namespace g2o {
 
   class HyperGraphAction;
-  struct SolverProperty;
+  struct OptimizationAlgorithmProperty;
   class Cache;
   class CacheContainer;
 
@@ -575,7 +575,7 @@ namespace g2o {
      * @param solverProperty the solver property to evaluate.
      * @param vertDims should equal to the set returned by dimensions() to avoid re-evaluating.
      */
-    bool isSolverSuitable(const SolverProperty& solverProperty, const std::set<int>& vertDims = std::set<int>()) const;
+    bool isSolverSuitable(const OptimizationAlgorithmProperty& solverProperty, const std::set<int>& vertDims = std::set<int>()) const;
 
     virtual void clear();
 

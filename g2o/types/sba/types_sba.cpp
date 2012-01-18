@@ -26,26 +26,31 @@ namespace g2o {
 
   namespace types_sba {
     int initialized = 0;
+
+    void init()
+    {
+      if (types_sba::initialized)
+        return;
+      //cerr << "Calling " << __FILE__ << " " << __PRETTY_FUNCTION__ << endl;
+      Factory* factory = Factory::instance();
+
+      factory->registerType("VERTEX_CAM", new HyperGraphElementCreator<VertexCam>);
+      factory->registerType("VERTEX_XYZ", new HyperGraphElementCreator<VertexSBAPointXYZ>);
+      factory->registerType("VERTEX_INTRINSICS", new HyperGraphElementCreator<VertexIntrinsics>);
+
+      factory->registerType("EDGE_PROJECT_P2MC", new HyperGraphElementCreator<EdgeProjectP2MC>);
+      factory->registerType("EDGE_PROJECT_P2MC_INTRINSICS", new HyperGraphElementCreator<EdgeProjectP2MC_Intrinsics>);
+      factory->registerType("EDGE_PROJECT_P2SC", new HyperGraphElementCreator<EdgeProjectP2SC>);
+      factory->registerType("EDGE_CAM", new HyperGraphElementCreator<EdgeSBACam>);
+      factory->registerType("EDGE_SCALE", new HyperGraphElementCreator<EdgeSBAScale>);
+
+      types_sba::initialized = 1;
+    }
   }
 
   G2O_ATTRIBUTE_CONSTRUCTOR(init_sba_types)
   {
-    if (types_sba::initialized)
-      return;
-    //cerr << "Calling " << __FILE__ << " " << __PRETTY_FUNCTION__ << endl;
-    Factory* factory = Factory::instance();
-
-    factory->registerType("VERTEX_CAM", new HyperGraphElementCreator<VertexCam>);
-    factory->registerType("VERTEX_XYZ", new HyperGraphElementCreator<VertexSBAPointXYZ>);
-    factory->registerType("VERTEX_INTRINSICS", new HyperGraphElementCreator<VertexIntrinsics>);
-
-    factory->registerType("EDGE_PROJECT_P2MC", new HyperGraphElementCreator<EdgeProjectP2MC>);
-    factory->registerType("EDGE_PROJECT_P2MC_INTRINSICS", new HyperGraphElementCreator<EdgeProjectP2MC_Intrinsics>);
-    factory->registerType("EDGE_PROJECT_P2SC", new HyperGraphElementCreator<EdgeProjectP2SC>);
-    factory->registerType("EDGE_CAM", new HyperGraphElementCreator<EdgeSBACam>);
-    factory->registerType("EDGE_SCALE", new HyperGraphElementCreator<EdgeSBAScale>);
-
-    types_sba::initialized = 1;
+    types_sba::init();
   }
 
   // constructor

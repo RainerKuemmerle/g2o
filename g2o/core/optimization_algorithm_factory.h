@@ -14,10 +14,10 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef G2O_SOLVER_FACTORY_H
-#define G2O_SOLVER_FACTORY_H
+#ifndef G2O_OPTMIZATION_ALGORITHM_PROPERTY_H
+#define G2O_OPTMIZATION_ALGORITHM_PROPERTY_H
 
-#include "solver_property.h"
+#include "optimization_algorithm_property.h"
 
 #include <list>
 
@@ -28,21 +28,21 @@ namespace g2o {
   class SparseOptimizer;
 
   /**
-   * \brief base for allocating a solver
+   * \brief base for allocating an optimization algorithm
    *
    * Allocating a solver for a given optimizer. The method construct() has to be
    * implemented in your derived class to allocate the desired solver.
    */
-  class AbstractSolverCreator
+  class AbstractOptimizationAlgorithmCreator
   {
     public:
-      AbstractSolverCreator(const SolverProperty& p);
+      AbstractOptimizationAlgorithmCreator(const OptimizationAlgorithmProperty& p);
       //! allocate a solver operating on optimizer, re-implement for your creator
       virtual OptimizationAlgorithm* construct() = 0;
       //! return the properties of the solver
-      const SolverProperty& property() const { return _property;}
+      const OptimizationAlgorithmProperty& property() const { return _property;}
     protected:
-      SolverProperty _property;
+      OptimizationAlgorithmProperty _property;
   };
   
   /**
@@ -52,13 +52,13 @@ namespace g2o {
    * The Factory is implemented as a sigleton and the single
    * instance can be accessed via the instance() function.
    */
-  class SolverFactory
+  class OptimizationAlgorithmFactory
   {
     public:
-      typedef std::list<AbstractSolverCreator*>      CreatorList;
+      typedef std::list<AbstractOptimizationAlgorithmCreator*>      CreatorList;
 
       //! return the instance
-      static SolverFactory* instance();
+      static OptimizationAlgorithmFactory* instance();
 
       //! free the instance
       static void destroy();
@@ -66,12 +66,12 @@ namespace g2o {
       /**
        * register a specific creator for allocating a solver
        */
-      void registerSolver(AbstractSolverCreator* c);
+      void registerSolver(AbstractOptimizationAlgorithmCreator* c);
 
       /**
        * construct a solver based on its name, e.g., var, fix3_2_cholmod
        */
-      OptimizationAlgorithm* construct(const std::string& tag, SolverProperty& solverProperty) const;
+      OptimizationAlgorithm* construct(const std::string& tag, OptimizationAlgorithmProperty& solverProperty) const;
 
       //! list the known solvers into a stream
       void listSolvers(std::ostream& os) const;
@@ -80,8 +80,8 @@ namespace g2o {
       const CreatorList& creatorList() const { return _creator;}
 
     protected:
-      SolverFactory();
-      ~SolverFactory();
+      OptimizationAlgorithmFactory();
+      ~OptimizationAlgorithmFactory();
 
       CreatorList _creator;
 
@@ -89,7 +89,7 @@ namespace g2o {
       CreatorList::iterator findSolver(const std::string& name);
 
     private:
-      static SolverFactory* factoryInstance;
+      static OptimizationAlgorithmFactory* factoryInstance;
   };
 
 }

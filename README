@@ -20,9 +20,10 @@ implementations of state-of-the-art approaches for the specific problems
 (02/2011).
 
 Papers Describing the Approach:
-Rainer Kuemmerle, Giorgio Grisetti, Hauke Strasdat, Kurt Konolige, and Wolfram
-Burgard: g2o: A General Framework for Graph Optimization, IEEE International
-Conference on Robotics and Automation (ICRA), 2011
+Rainer Kuemmerle, Giorgio Grisetti, Hauke Strasdat,
+Kurt Konolige, and Wolfram Burgard
+g2o: A General Framework for Graph Optimization
+IEEE International Conference on Robotics and Automation (ICRA), 2011
 http://ais.informatik.uni-freiburg.de/publications/papers/kuemmerle11icra.pdf
 
 g2o is licensed under LGPL version 3, whereas the following parts are

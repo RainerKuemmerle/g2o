@@ -29,4 +29,10 @@
 #include "edge_se2_offset.h"
 #include "edge_se2_pointxy_offset.h"
 
+namespace g2o {
+  namespace types_slam2d {
+    void init();
+  }
+}
+
 #endif

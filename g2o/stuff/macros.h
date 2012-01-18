@@ -43,7 +43,7 @@
 // MSVC on Windows
 #elif defined _MSC_VER
 #  define __PRETTY_FUNCTION__ __FUNCTION__
-#  define G2O_ATTRIBUTE_CONSTRUCTOR(func) func
+#  define G2O_ATTRIBUTE_CONSTRUCTOR(func) static void func(void)
 #  define G2O_ATTRIBUTE_UNUSED
 #  define G2O_ATTRIBUTE_FORMAT12
 #  define G2O_ATTRIBUTE_FORMAT23

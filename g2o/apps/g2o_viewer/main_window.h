@@ -21,7 +21,7 @@
 
 #include "ui_base_main_window.h"
 
-#include "g2o/core/solver_property.h"
+#include "g2o/core/optimization_algorithm_property.h"
 
 #include <vector>
 
@@ -74,10 +74,10 @@ class MainWindow : public QMainWindow, public Ui::BaseMainWindow
     void setRobustKernel();
     bool load(const QString& filename);
 
-    std::vector<g2o::SolverProperty> _knownSolvers;
+    std::vector<g2o::OptimizationAlgorithmProperty> _knownSolvers;
     int _lastSolver;
     bool _forceStopFlag;
-    g2o::SolverProperty _currentSolverProperty;
+    g2o::OptimizationAlgorithmProperty _currentOptimizationAlgorithmProperty;
     g2o::OptimizationAlgorithm* _currentSolver;
 
     ViewerPropertiesWidget* _viewerPropertiesWidget;

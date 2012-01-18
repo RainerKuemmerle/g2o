@@ -19,7 +19,7 @@
 
 #include "g2o/core/block_solver.h"
 #include "g2o/core/solver.h"
-#include "g2o/core/solver_factory.h"
+#include "g2o/core/optimization_algorithm_factory.h"
 #include "g2o/stuff/macros.h"
 
 #include "g2o/core/optimization_algorithm_gauss_newton.h"
@@ -67,10 +67,10 @@ namespace g2o {
     return snl;
   }
 
-  class PCGSolverCreator : public AbstractSolverCreator
+  class PCGSolverCreator : public AbstractOptimizationAlgorithmCreator
   {
     public:
-      PCGSolverCreator(const SolverProperty& p) : AbstractSolverCreator(p) {}
+      PCGSolverCreator(const OptimizationAlgorithmProperty& p) : AbstractOptimizationAlgorithmCreator(p) {}
       virtual OptimizationAlgorithm* construct()
       {
         return createSolver(property().name);
@@ -88,15 +88,15 @@ namespace g2o {
       static bool initialized = false;
       if (initialized)
         return;
-      SolverFactory* factory = SolverFactory::instance();
-      factory->registerSolver(new PCGSolverCreator(SolverProperty("gn_pcg", "Gauss-Newton: PCG solver using block-Jacobi pre-conditioner (variable blocksize)", "PCG", false, -1, -1)));
-      factory->registerSolver(new PCGSolverCreator(SolverProperty("gn_pcg3_2", "Gauss-Newton: PCG solver using block-Jacobi pre-conditioner (fixed blocksize)", "PCG", true, 3, 2)));
-      factory->registerSolver(new PCGSolverCreator(SolverProperty("gn_pcg6_3", "Gauss-Newton: PCG solver using block-Jacobi pre-conditioner (fixed blocksize)", "PCG", true, 6, 3)));
-      factory->registerSolver(new PCGSolverCreator(SolverProperty("gn_pcg7_3", "Gauss-Newton: PCG solver using block-Jacobi pre-conditioner (fixed blocksize)", "PCG", true, 7, 3)));
-      factory->registerSolver(new PCGSolverCreator(SolverProperty("lm_pcg", "Levenberg: PCG solver using block-Jacobi pre-conditioner (variable blocksize)", "PCG", false, -1, -1)));
-      factory->registerSolver(new PCGSolverCreator(SolverProperty("lm_pcg3_2", "Levenberg: PCG solver using block-Jacobi pre-conditioner (fixed blocksize)", "PCG", true, 3, 2)));
-      factory->registerSolver(new PCGSolverCreator(SolverProperty("lm_pcg6_3", "Levenberg: PCG solver using block-Jacobi pre-conditioner (fixed blocksize)", "PCG", true, 6, 3)));
-      factory->registerSolver(new PCGSolverCreator(SolverProperty("lm_pcg7_3", "Levenberg: PCG solver using block-Jacobi pre-conditioner (fixed blocksize)", "PCG", true, 7, 3)));
+      OptimizationAlgorithmFactory* factory = OptimizationAlgorithmFactory::instance();
+      factory->registerSolver(new PCGSolverCreator(OptimizationAlgorithmProperty("gn_pcg", "Gauss-Newton: PCG solver using block-Jacobi pre-conditioner (variable blocksize)", "PCG", false, -1, -1)));
+      factory->registerSolver(new PCGSolverCreator(OptimizationAlgorithmProperty("gn_pcg3_2", "Gauss-Newton: PCG solver using block-Jacobi pre-conditioner (fixed blocksize)", "PCG", true, 3, 2)));
+      factory->registerSolver(new PCGSolverCreator(OptimizationAlgorithmProperty("gn_pcg6_3", "Gauss-Newton: PCG solver using block-Jacobi pre-conditioner (fixed blocksize)", "PCG", true, 6, 3)));
+      factory->registerSolver(new PCGSolverCreator(OptimizationAlgorithmProperty("gn_pcg7_3", "Gauss-Newton: PCG solver using block-Jacobi pre-conditioner (fixed blocksize)", "PCG", true, 7, 3)));
+      factory->registerSolver(new PCGSolverCreator(OptimizationAlgorithmProperty("lm_pcg", "Levenberg: PCG solver using block-Jacobi pre-conditioner (variable blocksize)", "PCG", false, -1, -1)));
+      factory->registerSolver(new PCGSolverCreator(OptimizationAlgorithmProperty("lm_pcg3_2", "Levenberg: PCG solver using block-Jacobi pre-conditioner (fixed blocksize)", "PCG", true, 3, 2)));
+      factory->registerSolver(new PCGSolverCreator(OptimizationAlgorithmProperty("lm_pcg6_3", "Levenberg: PCG solver using block-Jacobi pre-conditioner (fixed blocksize)", "PCG", true, 6, 3)));
+      factory->registerSolver(new PCGSolverCreator(OptimizationAlgorithmProperty("lm_pcg7_3", "Levenberg: PCG solver using block-Jacobi pre-conditioner (fixed blocksize)", "PCG", true, 7, 3)));
 
       initialized = true;
     }

@@ -36,10 +36,25 @@
 #include <cstring>
 #include <fstream>
 #include <algorithm>
+#include <functional>
+
 #include "os_specific.h"
 using namespace std;
 
 namespace g2o {
+
+// forward decl of some operators
+std::istream& operator>>(std::istream& is, std::vector<int>& v);
+std::ostream& operator<<(std::ostream& os, const std::vector<int>& v);
+
+
+/** Helper class to sort pair based on first elem */
+template<class T1, class T2, class Pred = std::less<T1> >
+struct CmpPairFirst {
+  bool operator()(const std::pair<T1,T2>& left, const std::pair<T1,T2>& right) {
+    return Pred()(left.first, right.first);
+  }
+};
 
 enum CommandArgumentType
 {
@@ -245,9 +260,13 @@ void CommandArgs::printHelp(std::ostream& os)
     tableStrings.reserve(_args.size());
     size_t maxArgLen = 0;
     for (size_t i = 0; i < _args.size(); ++i) {
-      if (_args[i].type != CAT_BOOL)
-        tableStrings.push_back(make_pair(_args[i].name + " " + type2str(_args[i].type), _args[i].description));
-      else
+      if (_args[i].type != CAT_BOOL) {
+        string defaultValueStr = arg2str(_args[i]);
+        if (! defaultValueStr.empty())
+          tableStrings.push_back(make_pair(_args[i].name + " " + type2str(_args[i].type), _args[i].description + " (default: " + defaultValueStr + ")"));
+        else
+          tableStrings.push_back(make_pair(_args[i].name + " " + type2str(_args[i].type), _args[i].description));
+      } else
         tableStrings.push_back(make_pair(_args[i].name, _args[i].description));
       maxArgLen = (std::max)(maxArgLen, tableStrings.back().first.size());
     }
@@ -355,7 +374,7 @@ void CommandArgs::str2arg(const std::string& input, CommandArgument& ca) const
       break;
     case CAT_VECTOR_INT:
       {
-  std::vector<int> aux;
+        std::vector<int> aux;
         bool convertStatus = convertString(input, aux);
         if (convertStatus) {
           std::vector<int>* data = static_cast< std::vector<int>* >(ca.data);
@@ -401,10 +420,16 @@ std::string CommandArgs::arg2str(const CommandArgument& ca) const
         return auxStream.str();
       }
       break;
+    case CAT_STRING:
+      {
+        string* data = static_cast<string*>(ca.data);
+        return *data;
+      }
+      break;
     case CAT_VECTOR_INT:
       {
-  std::vector<int> * data = static_cast< std::vector<int> * >(ca.data);
-  stringstream auxStream;
+        std::vector<int> * data = static_cast< std::vector<int> * >(ca.data);
+        stringstream auxStream;
         auxStream << (*data);
         return auxStream.str();
       }
@@ -424,16 +449,14 @@ std::string CommandArgs::trim(const std::string& s) const
   return std::string(s, b, e - b + 1);
 }
 
-std::istream& operator >> (std::istream& is, std::vector<int>& v){
+std::istream& operator>>(std::istream& is, std::vector<int>& v){
   string s;
   if (! (is >> s) )
     return is;
 
-  char* cbase=new char[s.length()];
-  char* c=cbase;
-  char* caux=cbase;
+  const char* c = s.c_str();
+  char* caux = const_cast<char*>(c);
 
-  strcpy(c, s.c_str());
   v.clear();
   bool hasNextValue=true;
   while(hasNextValue){
@@ -445,11 +468,10 @@ std::istream& operator >> (std::istream& is, std::vector<int>& v){
     } else
       hasNextValue = false;
   }
-  delete [] cbase;
   return is;
 }
 
-std::ostream& operator << (std::ostream& os, const std::vector<int>& v){
+std::ostream& operator<<(std::ostream& os, const std::vector<int>& v){
   if (v.size()){
     os << v[0];
   }

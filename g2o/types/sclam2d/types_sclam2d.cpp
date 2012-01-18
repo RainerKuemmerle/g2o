@@ -29,27 +29,32 @@ namespace g2o {
 
   namespace types_sclam {
     int initialized = 0;
+
+    void init()
+    {
+      if (types_sclam::initialized)
+        return;
+      Factory* factory = Factory::instance();
+      //cerr << "Calling " << __FILE__ << " " << __PRETTY_FUNCTION__ << endl;
+
+      factory->registerType("VERTEX_ODOM_DIFFERENTIAL", new HyperGraphElementCreator<VertexOdomDifferentialParams>);
+
+      factory->registerType("EDGE_SE2_CALIB", new HyperGraphElementCreator<EdgeSE2SensorCalib>);
+      factory->registerType("EDGE_SE2_ODOM_DIFFERENTIAL_CALIB", new HyperGraphElementCreator<EdgeSE2OdomDifferentialCalib>);
+
+#ifdef G2O_HAVE_OPENGL
+      HyperGraphActionLibrary* actionLib = HyperGraphActionLibrary::instance();
+      actionLib->registerAction(new EdgeSE2SensorCalibDrawAction);
+      actionLib->registerAction(new EdgeSE2OdomDifferentialCalibDrawAction);
+#endif
+
+      types_sclam::initialized = 1;
+    }
   }
 
   G2O_ATTRIBUTE_CONSTRUCTOR(init_types_sclam2d)
   {
-    if (types_sclam::initialized)
-      return;
-    Factory* factory = Factory::instance();
-    //cerr << "Calling " << __FILE__ << " " << __PRETTY_FUNCTION__ << endl;
-
-    factory->registerType("VERTEX_ODOM_DIFFERENTIAL", new HyperGraphElementCreator<VertexOdomDifferentialParams>);
-
-    factory->registerType("EDGE_SE2_CALIB", new HyperGraphElementCreator<EdgeSE2SensorCalib>);
-    factory->registerType("EDGE_SE2_ODOM_DIFFERENTIAL_CALIB", new HyperGraphElementCreator<EdgeSE2OdomDifferentialCalib>);
-
-#ifdef G2O_HAVE_OPENGL
-    HyperGraphActionLibrary* actionLib = HyperGraphActionLibrary::instance();
-    actionLib->registerAction(new EdgeSE2SensorCalibDrawAction);
-    actionLib->registerAction(new EdgeSE2OdomDifferentialCalibDrawAction);
-#endif
-
-    types_sclam::initialized = 1;
+    types_sclam::init();
   }
 
 } // end namespace

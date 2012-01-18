@@ -15,10 +15,10 @@ parameter.cpp               parameter.h
 cache.cpp                   cache.h
 optimizable_graph.cpp       optimizable_graph.h         
 solver.cpp                  solver.h
-creators.h                  solver_factory.cpp
-estimate_propagator.cpp     solver_factory.h
+creators.h                  optimization_algorithm_factory.cpp
+estimate_propagator.cpp     optimization_algorithm_factory.h
 estimate_propagator.h       
-factory.cpp                 solver_property.h
+factory.cpp                 optimization_algorithm_property.h
 factory.h                   sparse_block_matrix.h
 sparse_optimizer.cpp  sparse_block_matrix.hpp
 sparse_optimizer.h

@@ -30,6 +30,10 @@
 
 namespace g2o {
 
+  namespace types_icp {
+    void init();
+  }
+
   using namespace Eigen;
   using namespace std;
   typedef  Matrix<double, 6, 1> Vector6d;

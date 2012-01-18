@@ -21,7 +21,7 @@
 
 #include "g2o/stuff/macros.h"
 #include "g2o/core/block_solver.h"
-#include "g2o/core/solver_factory.h"
+#include "g2o/core/optimization_algorithm_factory.h"
 #include "g2o/core/optimization_algorithm_gauss_newton.h"
 
 #include "g2o/solvers/pcg/linear_solver_pcg.h"
@@ -194,8 +194,8 @@ static Solver* createSolver(const std::string& solverName)
 bool SparseOptimizerOnline::initSolver(int dimension, int /*batchEveryN*/)
 {
   slamDimension = dimension;
-  SolverFactory* solverFactory = SolverFactory::instance();
-  SolverProperty solverProperty;
+  OptimizationAlgorithmFactory* solverFactory = OptimizationAlgorithmFactory::instance();
+  OptimizationAlgorithmProperty solverProperty;
   if (_usePcg) {
     Solver* s = 0;
     if (dimension == 3) {
