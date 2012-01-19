@@ -39,7 +39,7 @@
 
 namespace g2o {
   namespace types_slam3d {
-    void init();
+    G2O_TYPES_SLAM3D_API void init();
   }
 }
 

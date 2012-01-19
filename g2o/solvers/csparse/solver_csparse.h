@@ -17,9 +17,11 @@
 #ifndef G2O_SOLVER_CSPARSE_CREATOR_
 #define G2O_SOLVER_CSPARSE_CREATOR_
 
+#include "g2o_csparse_api.h"
+
 namespace g2o {
   namespace solver_csparse {
-    void init();
+    void G2O_SOLVER_CSPARSE_API init();
   }
 }
 

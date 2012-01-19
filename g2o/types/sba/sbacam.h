@@ -28,11 +28,14 @@
 #ifndef G2O_SBACam_
 #define G2O_SBACam_
 
+#include <Eigen/Core>
+#include <Eigen/Geometry>
+
 #include "g2o/stuff/misc.h"
 #include "g2o/stuff/macros.h"
 #include "g2o/types/slam3d/se3quat.h"
-#include <Eigen/Core>
-#include <Eigen/Geometry>
+
+#include "g2o_types_sba_api.h"
 
 // this seems to have to go outside of the AISNav namespace...
 //USING_PART_OF_NAMESPACE_EIGEN;
@@ -44,7 +47,7 @@ namespace g2o {
   // useful types
   //  typedef  Matrix<double, 6, 6> Matrix6d;
 
-  class SBACam: public SE3Quat
+  class G2O_TYPES_SBA_API SBACam: public SE3Quat
   {
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
@@ -188,7 +191,7 @@ namespace g2o {
   // class for edges from vps to points with normals
   //
 
-  class EdgeNormal
+  class G2O_TYPES_SBA_API EdgeNormal
   {
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 

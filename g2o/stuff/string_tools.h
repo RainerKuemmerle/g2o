@@ -23,6 +23,7 @@
 #include <vector>
 
 #include "macros.h"
+#include "g2o_stuff_api.h"
 
 namespace g2o {
 
@@ -36,27 +37,27 @@ namespace g2o {
 /**
  * remove whitespaces from the start/end of a string
  */
-std::string trim(const std::string& s);
+G2O_STUFF_API std::string trim(const std::string& s);
 
 /**
  * remove whitespaces from the left side of the string
  */
-std::string trimLeft(const std::string& s);
+G2O_STUFF_API std::string trimLeft(const std::string& s);
 
 /**
  * remove whitespaced from the right side of the string
  */
-std::string trimRight(const std::string& s);
+G2O_STUFF_API std::string trimRight(const std::string& s);
 
 /**
  * convert the string to lower case
  */
-std::string strToLower(const std::string& s);
+G2O_STUFF_API std::string strToLower(const std::string& s);
 
 /**
  * convert a string to upper case
  */
-std::string strToUpper(const std::string& s);
+G2O_STUFF_API std::string strToUpper(const std::string& s);
 
 /**
  * read integer values (seperated by spaces) from a string and store
@@ -151,13 +152,13 @@ std::string strExpandFilename(const std::string& filename);
 /**
  * split a string into token based on the characters given in delim
  */
-std::vector<std::string> strSplit(const std::string& s, const std::string& delim);
+G2O_STUFF_API std::vector<std::string> strSplit(const std::string& s, const std::string& delim);
 
 /**
  * read a line from is into currentLine.
  * @return the number of characters read into currentLine (excluding newline), -1 on eof()
  */
-int readLine(std::istream& is, std::stringstream& currentLine);
+G2O_STUFF_API int readLine(std::istream& is, std::stringstream& currentLine);
 
 // @}
 

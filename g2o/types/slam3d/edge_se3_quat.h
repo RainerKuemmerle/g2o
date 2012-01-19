@@ -27,6 +27,8 @@
 
 #include "vertex_se3_quat.h"
 
+#include "g2o_types_slam3d_api.h"
+
 namespace g2o {
 
   using namespace Eigen;
@@ -35,7 +37,7 @@ namespace g2o {
 /**
  * \brief 3D edge between two VertexSE3
  */
- class EdgeSE3 : public BaseBinaryEdge<6, SE3Quat, VertexSE3, VertexSE3>
+ class G2O_TYPES_SLAM3D_API EdgeSE3 : public BaseBinaryEdge<6, SE3Quat, VertexSE3, VertexSE3>
 {
   public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW

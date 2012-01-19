@@ -21,6 +21,7 @@
 #include "g2o/core/base_vertex.h"
 #include "g2o/core/hyper_graph_action.h"
 #include "se3quat.h"
+#include "g2o_types_slam3d_api.h"
 
 namespace g2o {
 
@@ -29,7 +30,7 @@ namespace g2o {
  * the parameterization for the increments constructed is a 6d vector
  * (x,y,z,qx,qy,qz) (note that we leave out the w part of the quaternion.
  */
-class VertexSE3 : public BaseVertex<6, SE3Quat>
+class G2O_TYPES_SLAM3D_API VertexSE3 : public BaseVertex<6, SE3Quat>
 {
   public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
@@ -83,7 +84,7 @@ class VertexSE3 : public BaseVertex<6, SE3Quat>
     }
 };
 
-  class VertexSE3WriteGnuplotAction: public WriteGnuplotAction {
+  class G2O_TYPES_SLAM3D_API VertexSE3WriteGnuplotAction: public WriteGnuplotAction {
   public:
     VertexSE3WriteGnuplotAction();
     virtual HyperGraphElementAction* operator()(HyperGraph::HyperGraphElement* element, 
@@ -91,7 +92,7 @@ class VertexSE3 : public BaseVertex<6, SE3Quat>
   };
 
 #ifdef G2O_HAVE_OPENGL
-  class VertexSE3DrawAction: public DrawAction{
+  class G2O_TYPES_SLAM3D_API VertexSE3DrawAction: public DrawAction{
   public:
     VertexSE3DrawAction();
     virtual HyperGraphElementAction* operator()(HyperGraph::HyperGraphElement* element, 

@@ -56,6 +56,7 @@ ADD_LIBRARY(csparse ${G2O_LIB_TYPE}
   cs_usolve.c
   cs_util.c
   cs_utsolve.c
+  cs_api.h
 )
 
 SET_TARGET_PROPERTIES(csparse PROPERTIES OUTPUT_NAME ${LIB_PREFIX}ext_csparse)

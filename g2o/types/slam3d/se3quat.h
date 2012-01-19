@@ -28,7 +28,7 @@ namespace g2o {
   typedef Matrix<double, 6, 1> Vector6d;
   typedef Matrix<double, 7, 1> Vector7d;
 
-  class SE3Quat {
+  class G2O_TYPES_SLAM3D_API SE3Quat {
     public:
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
 
@@ -268,10 +268,10 @@ namespace g2o {
       }
 
       void normalizeRotation(){
-  if (_r.w()<0){
-    _r.coeffs() *= -1;
-  }
-  _r.normalize();
+        if (_r.w()<0){
+          _r.coeffs() *= -1;
+        }
+        _r.normalize();
       }
   };
 
@@ -281,9 +281,9 @@ namespace g2o {
     return out_str;
   }
 
-  Eigen::Quaterniond euler_to_quat(double yaw, double pitch, double roll);
-  void quat_to_euler(const Eigen::Quaterniond& q, double& yaw, double& pitch, double& roll);
-  void jac_quat3_euler3(Eigen::Matrix<double, 6, 6>& J, const SE3Quat& t);
+  G2O_TYPES_SLAM3D_API Eigen::Quaterniond euler_to_quat(double yaw, double pitch, double roll);
+  G2O_TYPES_SLAM3D_API void quat_to_euler(const Eigen::Quaterniond& q, double& yaw, double& pitch, double& roll);
+  G2O_TYPES_SLAM3D_API void jac_quat3_euler3(Eigen::Matrix<double, 6, 6>& J, const SE3Quat& t);
 
 } // end namespace
 

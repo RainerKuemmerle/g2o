@@ -26,24 +26,24 @@ namespace g2o {
   typedef Matrix<double, 6, 1> Vector6d;
   typedef Matrix<double, 7, 1> Vector7d;
   
-  Quaterniond normalized(const Quaterniond& q);
-  Quaterniond& normalize(Quaterniond& q);
+  Quaterniond G2O_TYPES_SLAM3D_API normalized(const Quaterniond& q);
+  Quaterniond& G2O_TYPES_SLAM3D_API normalize(Quaterniond& q);
 
   // functions to handle the rotation part
-  Vector3d toEuler(const Eigen::Matrix3d& R);
-  Matrix3d fromEuler(const Vector3d& v);
-  Vector3d toCompactQuaternion(const Eigen::Matrix3d& R);
-  Matrix3d fromCompactQuaternion(const Vector3d& v);
+  Vector3d G2O_TYPES_SLAM3D_API toEuler(const Eigen::Matrix3d& R);
+  Matrix3d G2O_TYPES_SLAM3D_API fromEuler(const Vector3d& v);
+  Vector3d G2O_TYPES_SLAM3D_API toCompactQuaternion(const Eigen::Matrix3d& R);
+  Matrix3d G2O_TYPES_SLAM3D_API fromCompactQuaternion(const Vector3d& v);
 
   
   // functions to handle the toVector of the whole transformations
-  Vector6d toVectorMQT(const Isometry3d& t);
-  Vector6d toVectorET(const Isometry3d& t);
-  Vector7d toVectorQT(const Isometry3d& t);
+  Vector6d G2O_TYPES_SLAM3D_API toVectorMQT(const Isometry3d& t);
+  Vector6d G2O_TYPES_SLAM3D_API toVectorET(const Isometry3d& t);
+  Vector7d G2O_TYPES_SLAM3D_API toVectorQT(const Isometry3d& t);
   
-  Isometry3d fromVectorMQT(const Vector6d& v);
-  Isometry3d fromVectorET(const Vector6d& v);
-  Isometry3d fromVectorQT(const Vector7d& v);
+  Isometry3d G2O_TYPES_SLAM3D_API fromVectorMQT(const Vector6d& v);
+  Isometry3d G2O_TYPES_SLAM3D_API fromVectorET(const Vector6d& v);
+  Isometry3d G2O_TYPES_SLAM3D_API fromVectorQT(const Vector7d& v);
   
 }
 

@@ -103,7 +103,7 @@ void BaseMultiEdge<D, E>::linearizeOplus()
 
     const int vi_dim = vi->dimension();
 #ifdef _MSC_VER
-  double* add_vi = new double[vi_dim];
+    double* add_vi = new double[vi_dim];
 #else
     double add_vi[vi_dim];
 #endif
@@ -129,7 +129,7 @@ void BaseMultiEdge<D, E>::linearizeOplus()
       _jacobianOplus[i].col(d) = scalar * errorBak;
     } // end dimension
 #ifdef _MSC_VER
-  delete[] add_vi;
+    delete[] add_vi;
 #endif
   }
   _error = errorBeforeNumeric;

@@ -36,7 +36,7 @@ namespace g2o {
  * \brief SE3 Vertex parameterized internally with a transformation matrix
  and externally with its exponential map 
  */
-  class VertexSE3Expmap : public BaseVertex<6, SE3Quat>
+  class G2O_TYPES_SBA_API VertexSE3Expmap : public BaseVertex<6, SE3Quat>
     {
     public:
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW
@@ -107,7 +107,7 @@ namespace g2o {
 /**
  * \brief 6D edge between two Vertex6
  */
-class EdgeSE3Expmap : public BaseBinaryEdge<6, SE3Quat, VertexSE3Expmap, VertexSE3Expmap>
+class G2O_TYPES_SBA_API EdgeSE3Expmap : public BaseBinaryEdge<6, SE3Quat, VertexSE3Expmap, VertexSE3Expmap>
 {
   // no chain rule, numeric differentiation on linearizeOplus
   public:
@@ -130,7 +130,7 @@ class EdgeSE3Expmap : public BaseBinaryEdge<6, SE3Quat, VertexSE3Expmap, VertexS
 };
 
 
-class EdgeProjectXYZ2UV : public  BaseBinaryEdge<2, Vector2d, VertexSBAPointXYZ, VertexSE3Expmap>
+class G2O_TYPES_SBA_API EdgeProjectXYZ2UV : public  BaseBinaryEdge<2, Vector2d, VertexSBAPointXYZ, VertexSE3Expmap>
 {
   public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
@@ -151,7 +151,7 @@ class EdgeProjectXYZ2UV : public  BaseBinaryEdge<2, Vector2d, VertexSBAPointXYZ,
 };
 
 
-class EdgeProjectXYZ2UVQ : public  BaseBinaryEdge<3, Vector3d, VertexSBAPointXYZ, VertexSE3Expmap>
+class G2O_TYPES_SBA_API EdgeProjectXYZ2UVQ : public  BaseBinaryEdge<3, Vector3d, VertexSBAPointXYZ, VertexSE3Expmap>
 {
   public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
@@ -176,7 +176,7 @@ class EdgeProjectXYZ2UVQ : public  BaseBinaryEdge<3, Vector3d, VertexSBAPointXYZ
 // U: left u
 // V: left v
 // U: right u
-class EdgeProjectXYZ2UVU : public  BaseBinaryEdge<3, Vector3d, VertexSBAPointXYZ, VertexSE3Expmap>
+class G2O_TYPES_SBA_API EdgeProjectXYZ2UVU : public  BaseBinaryEdge<3, Vector3d, VertexSBAPointXYZ, VertexSE3Expmap>
 {
   public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW

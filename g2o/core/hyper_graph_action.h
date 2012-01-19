@@ -19,19 +19,20 @@
 
 #include "hyper_graph.h"
 #include "g2o/stuff/property.h"
-#include "g2o/stuff/scoped_pointer.h"
 
 #include <typeinfo>
 #include <iosfwd>
 #include <set>
 #include <string>
 
+#include "g2o_core_api.h"
+
 namespace g2o {
 
   /**
    * \brief Abstract action that operates on an entire graph
    */
-  class HyperGraphAction {
+  class G2O_CORE_API HyperGraphAction {
     public:
       class Parameters {
         public:
@@ -55,7 +56,7 @@ namespace g2o {
   /**
    * \brief Abstract action that operates on a graph entity
    */
-  class HyperGraphElementAction{
+  class G2O_CORE_API HyperGraphElementAction{
     public:
       struct Parameters{
         virtual ~Parameters();
@@ -94,7 +95,7 @@ namespace g2o {
    * collection of actions calls contains homogeneous actions operating on different types
    * all collected actions have the same name and should have the same functionality
    */
-  class HyperGraphElementActionCollection: public HyperGraphElementAction{
+  class G2O_CORE_API HyperGraphElementActionCollection: public HyperGraphElementAction{
     public:
       //! constructor. name_ is the name of the action e.g.draw).
       HyperGraphElementActionCollection(const std::string& name_);
@@ -118,7 +119,7 @@ namespace g2o {
    * library of actions, indexed by the action name;
    * one can use ti to register a collection of actions
    */
-  class HyperGraphActionLibrary{
+  class G2O_CORE_API HyperGraphActionLibrary{
     public:
       //! return the single instance of the HyperGraphActionLibrary
       static HyperGraphActionLibrary* instance();
@@ -135,22 +136,18 @@ namespace g2o {
       ~HyperGraphActionLibrary();
       HyperGraphElementAction::ActionMap _actionMap;
     private:
-      struct Deleter
-      {
-        template<typename T> void operator()(T* t) { delete t;}
-      };
       static HyperGraphActionLibrary* actionLibInstance;
   };
 
   /**
    * apply an action to all the elements of the graph.
    */
-  void applyAction(HyperGraph* graph, HyperGraphElementAction* action, HyperGraphElementAction::Parameters* parameters=0, const std::string& typeName="");
+  void G2O_CORE_API applyAction(HyperGraph* graph, HyperGraphElementAction* action, HyperGraphElementAction::Parameters* parameters=0, const std::string& typeName="");
 
   /**
    * brief write into gnuplot
    */
-  class WriteGnuplotAction: public HyperGraphElementAction{
+  class G2O_CORE_API WriteGnuplotAction: public HyperGraphElementAction{
     public:
       struct Parameters: public HyperGraphElementAction::Parameters{
         std::ostream* os;
@@ -162,7 +159,7 @@ namespace g2o {
    * \brief draw actions
    */
 
-  class DrawAction : public HyperGraphElementAction{
+  class G2O_CORE_API DrawAction : public HyperGraphElementAction{
   public:
     class Parameters: public HyperGraphElementAction::Parameters,  public PropertyMap{
     public:

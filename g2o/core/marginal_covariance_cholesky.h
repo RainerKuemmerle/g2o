@@ -29,12 +29,14 @@
 #include <tr1/unordered_map>
 #endif
 
+#include "g2o_core_api.h"
+
 namespace g2o {
 
   /**
    * \brief computing the marginal covariance given a cholesky factor (lower triangle of the factor)
    */
-  class MarginalCovarianceCholesky {
+  class G2O_CORE_API MarginalCovarianceCholesky {
     protected:
       /**
        * hash struct for storing the matrix elements needed to compute the covariance
