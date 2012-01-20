@@ -2,6 +2,8 @@
 #define G2O_SIMULATOR_H
 
 #include "se2.h"
+#include "g2o_tutorial_slam2d_api.h"
+
 #include <Eigen/StdVector>
 
 #include <vector>
@@ -12,10 +14,10 @@ namespace g2o {
 
     using namespace Eigen;
 
-    class Simulator {
+    class G2O_TUTORIAL_SLAM2D_API Simulator {
       public:
 
-        enum MotionType {
+        enum G2O_TUTORIAL_SLAM2D_API MotionType {
           MO_LEFT, MO_RIGHT,
           MO_NUM_ELEMS
         };
@@ -23,7 +25,7 @@ namespace g2o {
         /**
          * \brief simulated landmark
          */
-        struct Landmark
+        struct G2O_TUTORIAL_SLAM2D_API Landmark
         {
           EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
           int id;
@@ -38,7 +40,7 @@ namespace g2o {
         /**
          * simulated pose of the robot
          */
-        struct GridPose
+        struct G2O_TUTORIAL_SLAM2D_API GridPose
         {
           EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
           int id;
@@ -51,7 +53,7 @@ namespace g2o {
         /**
          * \brief odometry constraint
          */
-        struct GridEdge
+        struct G2O_TUTORIAL_SLAM2D_API GridEdge
         {
           int from;
           int to;
@@ -62,7 +64,7 @@ namespace g2o {
         };
         typedef std::vector<GridEdge, Eigen::aligned_allocator<GridEdge> >  GridEdgeVector;
 
-        struct LandmarkEdge
+        struct G2O_TUTORIAL_SLAM2D_API LandmarkEdge
         {
           int from;
           int to;

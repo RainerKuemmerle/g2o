@@ -21,10 +21,11 @@
 #include "vertex_se2.h"
 #include "vertex_point_xy.h"
 #include "g2o/core/base_binary_edge.h"
+#include "g2o_types_slam2d_api.h"
 
 namespace g2o {
 
-  class EdgeSE2PointXYBearing: public BaseBinaryEdge<1, double, VertexSE2, VertexPointXY>
+  class G2O_TYPES_SLAM2D_API EdgeSE2PointXYBearing: public BaseBinaryEdge<1, double, VertexSE2, VertexPointXY>
   {
     public:
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW
@@ -65,7 +66,7 @@ namespace g2o {
       virtual void initialEstimate(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to);
   };
 
-  class EdgeSE2PointXYBearingWriteGnuplotAction: public WriteGnuplotAction {
+  class G2O_TYPES_SLAM2D_API EdgeSE2PointXYBearingWriteGnuplotAction: public WriteGnuplotAction {
   public:
     EdgeSE2PointXYBearingWriteGnuplotAction();
     virtual HyperGraphElementAction* operator()(HyperGraph::HyperGraphElement* element, 
@@ -73,7 +74,7 @@ namespace g2o {
   };
 
 #ifdef G2O_HAVE_OPENGL
-  class EdgeSE2PointXYBearingDrawAction: public DrawAction{
+  class G2O_TYPES_SLAM2D_API EdgeSE2PointXYBearingDrawAction: public DrawAction{
   public:
     EdgeSE2PointXYBearingDrawAction();
     virtual HyperGraphElementAction* operator()(HyperGraph::HyperGraphElement* element, 

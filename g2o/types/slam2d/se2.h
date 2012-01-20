@@ -18,6 +18,7 @@
 #define G2O_SE2_H_
 
 #include "g2o/stuff/misc.h"
+#include "g2o_types_slam2d_api.h"
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 
@@ -27,7 +28,7 @@ namespace g2o {
   /**
    * \brief represent SE2
    */
-  class SE2 {
+  class G2O_TYPES_SLAM2D_API SE2 {
     public:
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
       SE2():_R(0),_t(0,0){}

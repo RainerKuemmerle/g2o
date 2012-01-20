@@ -18,6 +18,7 @@
 #define G2O_ROBOT_LASER_H
 
 #include "raw_laser.h"
+#include "g2o_types_data_api.h"
 
 namespace g2o {
 
@@ -27,7 +28,7 @@ namespace g2o {
    * A laser measurement obtained by a robot. The measurement is equipped with a pose of the robot at which
    * the measurement was taken. The read/write function correspond to the CARMEN logfile format.
    */
-  class RobotLaser : public RawLaser
+  class G2O_TYPES_DATA_API RobotLaser : public RawLaser
   {
     public:
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW;

@@ -31,7 +31,7 @@
 #include <tr1/unordered_map>
 #endif
 
-#include"g2o_core_api.h"
+#include "g2o_core_api.h"
 
 /** @addtogroup graph */
 //@{
@@ -53,7 +53,7 @@ namespace g2o {
       /**
        * \brief enum of all the types we have in our graphs
        */
-      enum HyperGraphElementType {
+      enum G2O_CORE_API HyperGraphElementType {
         HGET_VERTEX,
         HGET_EDGE,
         HGET_PARAMETER,
@@ -106,7 +106,7 @@ namespace g2o {
        * Abstract Edge class. Your nice edge classes should inherit from that one.
        * An hyper-edge has pointers to the vertices it connects and stores them in a vector.
        */
-      class Edge : public HyperGraphElement {
+      class G2O_CORE_API Edge : public HyperGraphElement {
         public:
           //! creates and empty edge with no vertices
           explicit Edge(int id = -1);

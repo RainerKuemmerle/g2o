@@ -20,6 +20,7 @@
 #include "hyper_graph.h"
 #include "batch_stats.h"
 #include "sparse_block_matrix.h"
+#include "g2o_core_api.h"
 #include <cstddef>
 
 namespace g2o {
@@ -30,7 +31,7 @@ namespace g2o {
   /**
    * \brief Generic interface for a sparse solver operating on a graph which solves one iteration of the linearized objective function
    */
-  class Solver
+  class G2O_CORE_API Solver
   {
     public:
       Solver();

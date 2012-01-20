@@ -11,10 +11,12 @@
 #include <tr1/random>
 #endif
 
+#include "g2o_stuff_api.h"
+
 namespace g2o {
 
-  double sampleUniform(double min=0, double max=1, std::tr1::ranlux_base_01* generator=0);
-  double sampleGaussian(std::tr1::ranlux_base_01* generator = 0);
+  double G2O_STUFF_API sampleUniform(double min=0, double max=1, std::tr1::ranlux_base_01* generator=0);
+  double G2O_STUFF_API sampleGaussian(std::tr1::ranlux_base_01* generator = 0);
 
   template <class SampleType, class CovarianceType>
   class GaussianSampler {

@@ -1,6 +1,7 @@
 #ifndef G2O_EDGE_SE2_ODOM_CALIB_DIFFERENTIAL_H
 #define G2O_EDGE_SE2_ODOM_CALIB_DIFFERENTIAL_H
 
+#include "g2o_types_sclam2d_api.h"
 #include "odometry_measurement.h"
 #include "vertex_odom_differential_params.h"
 
@@ -9,7 +10,7 @@
 
 namespace g2o {
 
-  class EdgeSE2OdomDifferentialCalib : public BaseMultiEdge<3, VelocityMeasurement>
+  class G2O_TYPES_SCLAM2D_API EdgeSE2OdomDifferentialCalib : public BaseMultiEdge<3, VelocityMeasurement>
   {
     public:
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
@@ -40,7 +41,7 @@ namespace g2o {
   };
 
 #ifdef G2O_HAVE_OPENGL
-  class EdgeSE2OdomDifferentialCalibDrawAction: public DrawAction {
+  class G2O_TYPES_SCLAM2D_API EdgeSE2OdomDifferentialCalibDrawAction: public DrawAction {
     public:
       EdgeSE2OdomDifferentialCalibDrawAction();
       virtual HyperGraphElementAction* operator()(HyperGraph::HyperGraphElement* element, HyperGraphElementAction::Parameters* params_);

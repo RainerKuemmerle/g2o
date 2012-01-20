@@ -2,6 +2,7 @@
 #define G2O_DATA_QUEUE_H
 
 #include <map>
+#include "g2o_types_data_api.h"
 
 namespace g2o {
 
@@ -10,7 +11,7 @@ namespace g2o {
   /**
    * \brief a simple queue to store data and retrieve based on a timestamp
    */
-  class DataQueue
+  class G2O_TYPES_DATA_API DataQueue
   {
     public:
       typedef std::map<double, RobotData*>           Buffer;

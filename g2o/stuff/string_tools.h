@@ -101,12 +101,12 @@ OutputIterator readFloats(const char* str, OutputIterator out)
  * format a string and return a std::string.
  * Format is just like printf, see man 3 printf
  */
-std::string formatString(const char* fmt, ...) G2O_ATTRIBUTE_FORMAT12;
+G2O_STUFF_API std::string formatString(const char* fmt, ...) G2O_ATTRIBUTE_FORMAT12;
 
 /**
  * replacement function for sprintf which fills a std::string instead of a char*
  */
-int strPrintf(std::string& str, const char* fmt, ...) G2O_ATTRIBUTE_FORMAT23;
+G2O_STUFF_API int strPrintf(std::string& str, const char* fmt, ...) G2O_ATTRIBUTE_FORMAT23;
 
 /**
  * convert a string into an other type.
@@ -136,18 +136,18 @@ T stringToType(const std::string& s, bool failIfLeftoverChars = true)
 /**
  * return true, if str starts with substr
  */
-bool strStartsWith(const std::string & str, const std::string& substr);
+G2O_STUFF_API bool strStartsWith(const std::string & str, const std::string& substr);
 
 /**
  * return true, if str ends with substr
  */
-bool strEndsWith(const std::string & str, const std::string& substr);
+G2O_STUFF_API bool strEndsWith(const std::string & str, const std::string& substr);
 
 /**
  * expand the given filename like a posix shell, e.g., ~ $CARMEN_HOME and other will get expanded.
  * Also command substitution, e.g. `pwd` will give the current directory.
  */
-std::string strExpandFilename(const std::string& filename);
+G2O_STUFF_API std::string strExpandFilename(const std::string& filename);
 
 /**
  * split a string into token based on the characters given in delim

@@ -18,6 +18,7 @@
 #define G2O_SOLVER_SLAM2D_LINEAR
 
 #include "g2o/core/optimization_algorithm_gauss_newton.h"
+#include "g2o_slam2d_linear_api.h"
 
 namespace g2o {
 
@@ -38,7 +39,7 @@ namespace g2o {
    * More or less the solver is an implementation of the approach described
    * by Carlone et al, RSS'11.
    */
-  class SolverSLAM2DLinear : public OptimizationAlgorithmGaussNewton
+  class G2O_SLAM2D_LINEAR_API SolverSLAM2DLinear : public OptimizationAlgorithmGaussNewton
   {
     public:
       /**

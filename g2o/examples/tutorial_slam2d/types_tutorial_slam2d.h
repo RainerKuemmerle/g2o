@@ -24,4 +24,8 @@
 #include "edge_se2.h"
 #include "edge_se2_pointxy.h"
 
+namespace g2o {
+  G2O_TUTORIAL_SLAM2D_API bool init_tutorial_slam2d_types();
+}
+
 #endif

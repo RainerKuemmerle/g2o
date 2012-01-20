@@ -60,7 +60,7 @@ namespace g2o {
     size_t choleskyNNZ;               ///< number of non-zeros in the cholesky factor
   };
 
-  std::ostream& operator<<(std::ostream&, const G2OBatchStatistics&);
+  G2O_CORE_API std::ostream& operator<<(std::ostream&, const G2OBatchStatistics&);
 
   // this is really ugly: global stat variable to write statistics
   extern G2O_CORE_API G2OBatchStatistics * globalStats;

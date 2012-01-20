@@ -37,7 +37,7 @@ namespace g2o {
   class G2O_CORE_API OptimizationAlgorithm
   {
     public:
-      enum SolverResult {Terminate=2, OK=1, Fail=-1};
+      enum G2O_CORE_API SolverResult {Terminate=2, OK=1, Fail=-1};
       OptimizationAlgorithm();
       virtual ~OptimizationAlgorithm();
 

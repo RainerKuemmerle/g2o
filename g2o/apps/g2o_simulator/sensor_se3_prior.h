@@ -2,10 +2,11 @@
 #define G2O_SENSOR_SE3_PRIOR_H_
 #include "simulator3d_base.h"
 #include "pointsensorparameters.h"
+#include "g2o_simulator_api.h"
 
 namespace g2o {
 
-  class SensorSE3Prior: public PointSensorParameters, public UnarySensor<Robot3D, EdgeSE3Prior>{
+  class G2O_SIMULATOR_API SensorSE3Prior: public PointSensorParameters, public UnarySensor<Robot3D, EdgeSE3Prior>{
   public:
     typedef PoseVertexType::EstimateType RobotPoseType;
     SensorSE3Prior(const std::string& name_);

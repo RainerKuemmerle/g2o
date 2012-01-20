@@ -20,6 +20,7 @@
 #include "g2o/core/base_vertex.h"
 #include "g2o/core/hyper_graph_action.h"
 #include "se2.h"
+#include "g2o_tutorial_slam2d_api.h"
 
 namespace g2o {
   namespace tutorial {
@@ -27,7 +28,7 @@ namespace g2o {
     /**
      * \brief 2D pose Vertex, (x,y,theta)
      */
-    class VertexSE2 : public BaseVertex<3, SE2>
+    class G2O_TUTORIAL_SLAM2D_API VertexSE2 : public BaseVertex<3, SE2>
     {
       public:
         EIGEN_MAKE_ALIGNED_OPERATOR_NEW;

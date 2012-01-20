@@ -1,5 +1,7 @@
 #include <string>
 
+#include "g2o_calibration_odom_laser_api.h"
+
 namespace g2o {
 
   class SparseOptimizer;
@@ -8,7 +10,7 @@ namespace g2o {
   /**
    * \brief read / write gm2dl file into / out of a SparseOptimizer
    */
-  class Gm2dlIO
+  class G2O_CALIBRATION_ODOM_LASER_API Gm2dlIO
   {
     public:
       /**

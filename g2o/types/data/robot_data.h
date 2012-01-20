@@ -21,13 +21,14 @@
 #include <string>
 
 #include "g2o/core/optimizable_graph.h"
+#include "g2o_types_data_api.h"
 
 namespace g2o {
 
   /**
    * \brief data recorded by the robot
    */
-  class RobotData : public OptimizableGraph::Data
+  class G2O_TYPES_DATA_API RobotData : public OptimizableGraph::Data
   {
     public:
       RobotData();

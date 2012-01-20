@@ -34,12 +34,12 @@ namespace g2o {
    */
   class G2O_CORE_API HyperGraphAction {
     public:
-      class Parameters {
+      class G2O_CORE_API Parameters {
         public:
           virtual ~Parameters();
       };
 
-      class ParametersIteration : public Parameters {
+      class G2O_CORE_API ParametersIteration : public Parameters {
         public:
           explicit ParametersIteration(int iter);
           int iteration;
@@ -58,7 +58,7 @@ namespace g2o {
    */
   class G2O_CORE_API HyperGraphElementAction{
     public:
-      struct Parameters{
+      struct G2O_CORE_API Parameters{
         virtual ~Parameters();
       };
       typedef std::map<std::string, HyperGraphElementAction*> ActionMap;
@@ -149,7 +149,7 @@ namespace g2o {
    */
   class G2O_CORE_API WriteGnuplotAction: public HyperGraphElementAction{
     public:
-      struct Parameters: public HyperGraphElementAction::Parameters{
+      struct G2O_CORE_API Parameters: public HyperGraphElementAction::Parameters{
         std::ostream* os;
       };
       WriteGnuplotAction(const std::string& typeName_);
@@ -161,7 +161,7 @@ namespace g2o {
 
   class G2O_CORE_API DrawAction : public HyperGraphElementAction{
   public:
-    class Parameters: public HyperGraphElementAction::Parameters,  public PropertyMap{
+    class G2O_CORE_API Parameters: public HyperGraphElementAction::Parameters,  public PropertyMap{
     public:
       Parameters();
     };

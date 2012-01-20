@@ -27,6 +27,7 @@ ADD_LIBRARY(types_slam3d ${G2O_LIB_TYPE}
   edge_se3_pointxyz_depth.h
   types_slam3d.cpp
   types_slam3d.h
+  g2o_types_slam3d_api.h
 )
 
 
@@ -44,7 +45,7 @@ INSTALL(TARGETS types_slam3d
 ADD_EXECUTABLE(test_se3quat test_se3quat)
 SET_TARGET_PROPERTIES(test_se3quat PROPERTIES OUTPUT_NAME test_se3quat${EXE_POSTFIX})
 
-TARGET_LINK_LIBRARIES(test_se3quat types_slam3d ${OPENGL_gl_LIBRARY} core m)
+TARGET_LINK_LIBRARIES(test_se3quat types_slam3d)
 
 
 FILE(GLOB headers "${CMAKE_CURRENT_SOURCE_DIR}/*.h" "${CMAKE_CURRENT_SOURCE_DIR}/*.hpp")

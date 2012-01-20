@@ -35,7 +35,7 @@ namespace g2o {
       if (types_sclam::initialized)
         return;
       Factory* factory = Factory::instance();
-      //cerr << "Calling " << __FILE__ << " " << __PRETTY_FUNCTION__ << endl;
+      //std::cerr << "Calling " << __FILE__ << " " << __PRETTY_FUNCTION__ << std::endl;
 
       factory->registerType("VERTEX_ODOM_DIFFERENTIAL", new HyperGraphElementCreator<VertexOdomDifferentialParams>);
 

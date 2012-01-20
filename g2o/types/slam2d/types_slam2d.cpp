@@ -33,7 +33,7 @@ namespace g2o {
         return;
 
       Factory* factory = Factory::instance();
-      //cerr << "Calling " << __FILE__ << " " << __PRETTY_FUNCTION__ << endl;
+      //std::cerr << "Calling " << __FILE__ << " " << __PRETTY_FUNCTION__ << std::endl;
 
       factory->registerType("VERTEX_SE2", new HyperGraphElementCreator<VertexSE2>);
       factory->registerType("VERTEX_XY", new HyperGraphElementCreator<VertexPointXY>);

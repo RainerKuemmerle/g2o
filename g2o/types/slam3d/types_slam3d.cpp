@@ -31,7 +31,7 @@ namespace g2o {
       if (types_slam3d::initialized)
         return;
       Factory* factory = Factory::instance();
-      //cerr << "Calling " << __FILE__ << " " << __PRETTY_FUNCTION__ << endl;
+      //std::cerr << "Calling " << __FILE__ << " " << __PRETTY_FUNCTION__ << std::endl;
       factory->registerType("VERTEX_SE3:QUAT", new HyperGraphElementCreator<VertexSE3>);
       factory->registerType("EDGE_SE3:QUAT", new HyperGraphElementCreator<EdgeSE3>);
       factory->registerType("VERTEX_TRACKXYZ", new HyperGraphElementCreator<VertexPointXYZ>);

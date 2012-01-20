@@ -17,6 +17,7 @@
 #ifndef G2O_VERTEX_POINT_XY_H
 #define G2O_VERTEX_POINT_XY_H
 
+#include "g2o_types_slam2d_api.h"
 #include "g2o/config.h"
 #include "g2o/core/base_vertex.h"
 #include "g2o/core/hyper_graph_action.h"
@@ -25,7 +26,7 @@
 
 namespace g2o {
 
-  class VertexPointXY : public BaseVertex<2, Eigen::Vector2d>
+  class G2O_TYPES_SLAM2D_API VertexPointXY : public BaseVertex<2, Eigen::Vector2d>
   {
     public:
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
@@ -74,7 +75,7 @@ namespace g2o {
 
   };
 
-  class VertexPointXYWriteGnuplotAction: public WriteGnuplotAction {
+  class G2O_TYPES_SLAM2D_API VertexPointXYWriteGnuplotAction: public WriteGnuplotAction {
   public:
     VertexPointXYWriteGnuplotAction();
     virtual HyperGraphElementAction* operator()(HyperGraph::HyperGraphElement* element, 
@@ -82,7 +83,7 @@ namespace g2o {
   };
 
 #ifdef G2O_HAVE_OPENGL
-  class VertexPointXYDrawAction: public DrawAction{
+  class G2O_TYPES_SLAM2D_API VertexPointXYDrawAction: public DrawAction{
   public:
     VertexPointXYDrawAction();
     virtual HyperGraphElementAction* operator()(HyperGraph::HyperGraphElement* element, 

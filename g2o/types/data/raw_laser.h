@@ -19,6 +19,7 @@
 
 #include "robot_data.h"
 #include "laser_parameters.h"
+#include "g2o_types_data_api.h"
 
 #include <vector>
 
@@ -32,7 +33,7 @@ namespace g2o {
    *
    * A raw laser measuerement. The read/write function correspond to the format of CARMEN.
    */
-  class RawLaser : public RobotData {
+  class G2O_TYPES_DATA_API RawLaser : public RobotData {
     public:
       typedef std::vector<Eigen::Vector2d, Eigen::aligned_allocator<Eigen::Vector2d> >      Point2DVector;
 

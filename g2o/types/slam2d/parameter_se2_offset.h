@@ -4,6 +4,7 @@
 #include "g2o/core/optimizable_graph.h"
 
 #include "se2.h"
+#include "g2o_types_slam2d_api.h"
 #include "g2o/core/hyper_graph_action.h"
 #include "g2o/core/cache.h"
 
@@ -16,7 +17,7 @@ namespace g2o {
   /**
    * \brief offset for an SE2
    */
-  class ParameterSE2Offset: public Parameter
+  class G2O_TYPES_SLAM2D_API ParameterSE2Offset: public Parameter
   {
     public:
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
@@ -48,7 +49,7 @@ namespace g2o {
   /**
    * \brief caching the offset related to a vertex
    */
-  class CacheSE2Offset: public Cache {
+  class G2O_TYPES_SLAM2D_API CacheSE2Offset: public Cache {
     public:
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
       CacheSE2Offset();

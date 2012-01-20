@@ -1,9 +1,13 @@
 #ifndef G2O_POINTSENSORPARAMETERS_H_
 #define G2O_POINTSENSORPARAMETERS_H_
+
 #include <cmath>
+
+#include "g2o_simulator_api.h"
+
 namespace g2o {
 
-  class PointSensorParameters{
+  class G2O_SIMULATOR_API PointSensorParameters{
   public:
     PointSensorParameters();
     double maxRange() const {return sqrt(_maxRange2);}

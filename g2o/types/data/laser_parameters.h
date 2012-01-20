@@ -18,13 +18,14 @@
 #define G2O_LASER_PARAMETERS_H
 
 #include "g2o/types/slam2d/se2.h"
+#include "g2o_types_data_api.h"
 
 namespace g2o {
 
   /**
    * \brief parameters for a 2D range finder
    */
-  struct LaserParameters
+  struct G2O_TYPES_DATA_API LaserParameters
   {
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
     LaserParameters(int type, int beams, double firstBeamAngle, double angularStep, double maxRange, double accuracy, int remissionMode);

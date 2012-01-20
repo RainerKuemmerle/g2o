@@ -25,18 +25,18 @@
 
 namespace g2o{
 
-  struct HyperDijkstra{
-    struct CostFunction {
+  struct G2O_CORE_API HyperDijkstra{
+    struct G2O_CORE_API CostFunction {
       virtual double operator() (HyperGraph::Edge* e, HyperGraph::Vertex* from, HyperGraph::Vertex* to)=0;
     };
 
-    struct TreeAction {
+    struct G2O_CORE_API TreeAction {
       virtual double perform(HyperGraph::Vertex* v, HyperGraph::Vertex* vParent, HyperGraph::Edge* e);
       virtual double perform(HyperGraph::Vertex* v, HyperGraph::Vertex* vParent, HyperGraph::Edge* e, double distance);
     };
 
     
-    struct AdjacencyMapEntry{
+    struct G2O_CORE_API AdjacencyMapEntry{
       friend struct HyperDijkstra;
       AdjacencyMapEntry(HyperGraph::Vertex* _child=0, 
           HyperGraph::Vertex* _parent=0, 
@@ -93,13 +93,9 @@ namespace g2o{
     HyperGraph* _graph;
   };
 
-  
-
-  struct UniformCostFunction: public HyperDijkstra::CostFunction {
+  struct G2O_CORE_API UniformCostFunction: public HyperDijkstra::CostFunction {
     virtual double operator ()(HyperGraph::Edge* edge, HyperGraph::Vertex* from, HyperGraph::Vertex* to);
   };
-
-  
 
 }
 #endif

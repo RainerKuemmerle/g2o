@@ -54,7 +54,7 @@ Modified by Mark Pupilli from:
 
 	(As posted on Stack OVerflow)
 */
-#  define G2O_ATTRIBUTE_CONSTRUCTOR(f) static void f(void) \
+#  define G2O_ATTRIBUTE_CONSTRUCTOR(f) \
      __pragma(section(".CRT$XCU",read)) \
      static void __cdecl f(void); \
      __declspec(allocate(".CRT$XCU")) void (__cdecl*f##_)(void) = f; \

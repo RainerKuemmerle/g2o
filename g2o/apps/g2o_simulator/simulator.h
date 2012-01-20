@@ -6,13 +6,14 @@
 #include "g2o/config.h"
 #include "g2o/types/slam3d/types_slam3d.h"
 #include "g2o/stuff/sampler.h"
+#include "g2o_simulator_api.h"
 
 namespace g2o{
 
 class World;
 class BaseSensor;
 
-class BaseWorldObject{
+class G2O_SIMULATOR_API BaseWorldObject{
  public:
   BaseWorldObject(World* world_=0) {_world = world_; _vertex=0;}
   virtual ~BaseWorldObject();
@@ -48,7 +49,7 @@ class WorldObject: public BaseWorldObject, VertexType_{
   }
 };
 
-class BaseRobot {
+class G2O_SIMULATOR_API BaseRobot {
  public:
   BaseRobot(World* world_, const std::string& name_){_world = world_; _name = name_; }
   void setWorld(World* world_) {_world = world_;}
@@ -95,7 +96,7 @@ class Robot: public BaseRobot{
   PoseType _pose;
 };
  
-class BaseSensor{
+class G2O_SIMULATOR_API BaseSensor{
  public:
   BaseSensor(const std::string& name_){ _name = name_;}
   inline BaseRobot* robot() {return _robot;}
@@ -242,7 +243,7 @@ class BinarySensor: public BaseSensor {
   virtual void addNoise(EdgeType*){};
 };
 
-class World{
+class G2O_SIMULATOR_API World{
  public:
   World(OptimizableGraph* graph_) {_graph = graph_; _runningId=0; _paramId=0;}
   OptimizableGraph* graph() {return _graph;}

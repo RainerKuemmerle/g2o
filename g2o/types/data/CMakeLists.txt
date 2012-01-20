@@ -5,11 +5,12 @@ ADD_LIBRARY(types_data ${G2O_LIB_TYPE}
   raw_laser.cpp raw_laser.h
   robot_laser.cpp robot_laser.h
   data_queue.cpp data_queue.h
+  g2o_types_data_api.h
 )
 
 SET_TARGET_PROPERTIES(types_data PROPERTIES OUTPUT_NAME ${LIB_PREFIX}types_data)
 
-TARGET_LINK_LIBRARIES(types_data core)
+TARGET_LINK_LIBRARIES(types_data core types_slam2d)
 
 INSTALL(TARGETS types_data
   RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/bin

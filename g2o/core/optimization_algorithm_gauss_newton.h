@@ -17,6 +17,7 @@
 #ifndef G2O_OPTIMIZATION_ALGORITHM_GAUSS_NEWTON_H
 #define G2O_OPTIMIZATION_ALGORITHM_GAUSS_NEWTON_H
 
+#include "g2o_core_api.h"
 #include "optimization_algorithm_with_hessian.h"
 
 namespace g2o {
@@ -24,7 +25,7 @@ namespace g2o {
   /**
    * \brief Implementation of the Gauss Newton Algorithm
    */
-  class OptimizationAlgorithmGaussNewton : public OptimizationAlgorithmWithHessian
+  class G2O_CORE_API OptimizationAlgorithmGaussNewton : public OptimizationAlgorithmWithHessian
   {
     public:
       /**

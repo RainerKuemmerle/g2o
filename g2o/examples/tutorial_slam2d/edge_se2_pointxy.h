@@ -20,6 +20,7 @@
 #include "vertex_se2.h"
 #include "vertex_point_xy.h"
 #include "parameter_se2_offset.h"
+#include "g2o_tutorial_slam2d_api.h"
 
 #include "g2o/core/base_binary_edge.h"
 
@@ -30,7 +31,7 @@ namespace g2o {
     class ParameterSE2Offset;
     class CacheSE2Offset;
 
-    class EdgeSE2PointXY : public BaseBinaryEdge<2, Eigen::Vector2d, VertexSE2, VertexPointXY>
+    class G2O_TUTORIAL_SLAM2D_API EdgeSE2PointXY : public BaseBinaryEdge<2, Eigen::Vector2d, VertexSE2, VertexPointXY>
     {
       public:
         EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
