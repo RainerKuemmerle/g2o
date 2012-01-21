@@ -592,10 +592,12 @@ These classes are \verb+BaseVertex+ and \verb+BaseUnaryEdge+,
   efficiency). Furthermore, it implements some mapping operators to
   store the Hessian and the parameter blocks of the linearized
   problem, and a stack of previous values that can be used to
-  save/restore parts of the graph.  The method \verb+oplus(double* v)+
+  save/restore parts of the graph.  The method \verb+oplusImpl(double* v)+
   that applies the perturbation $\bDeltax_i$ represented by \verb+v+,
   to the member variable \verb+_estimate+ should be implemented. This
-  is the $\boxplus$ operator.
+  is the $\boxplus$ operator. Additionally,
+  \verb+setToOriginImpl()+ that should set the internal state of the vertex
+  to $\bZero$ has to specified.
 
 \item \verb+BaseUnaryEdge+ is a template class to model a unary
   hyper-edge, which can be used to represent a prior. It offers for
@@ -638,7 +640,7 @@ problem, like the one described in many SLAM papers.
 
 \begin{lstlisting}[float,label=lst:inittypes,caption=Registering types
   by a constructor from a library]
-void __attribute__ ((constructor)) init_types_slam2d(void)
+G2O_ATTRIBUTE_CONSTRUCTOR(init_types_slam2d)
 {
   Factory* factory = Factory::instance();
   factory->registerType("VERTEX_SE2", new HyperGraphElementCreator<VertexSE2>);
@@ -854,16 +856,19 @@ class PCGSolverCreator : public AbstractOptimizationAlgorithmCreator
 {
   public:
     PCGSolverCreator(const OptimizationAlgorithmProperty& p) : AbstractOptimizationAlgorithmCreator(p) {}
-    virtual Solver* construct(SparseOptimizer* optimizer)
+    virtual OptimizationAlgorithm* construct()
     {
       // create the solver, see g2o/solver_pcg/solver_pcg.cpp for the full code
     }
 };
 
-void __attribute__ ((constructor)) init_solver_csparse()
+G2O_ATTRIBUTE_CONSTRUCTOR(init_solver_csparse)
 {
+  static bool initialized = false;
+  if (initialized)
+    return;
   OptimizationAlgorithmFactory* factory = OptimizationAlgorithmFactory::instance();
-  factory->registerSolver(new PCGSolverCreator(OptimizationAlgorithmProperty("pcg",
+  factory->registerSolver(new PCGSolverCreator(OptimizationAlgorithmProperty("gn_pcg",
      "PCG solver using block-Jacobi pre-conditioner (variable blocksize)",
      "PCG", false, -1, -1)));
   //...
@@ -873,14 +878,14 @@ void __attribute__ ((constructor)) init_solver_csparse()
 Both tools support the loading of types and solvers at run-time from
 dynamic libraries. This is realized as follows. The tools load from the
 libs folder all libraries matching ``*\_types\_*'' and ``\_solver\_*''
-to register types and solvers, respectively. We assume that by loading
-the libraries register the types and the solvers via their respective
-constructors to the system. Listing~\ref{lst:inittypes} shows how to
-register types to the system and Listing~\ref{lst:initsolvers} is an
-example, which shows how to register a solver via the plug-in
-architecture.
+to register types and optimization algorithms, respectively. We assume
+that by loading the libraries the types and the algorithms register via
+their respective constructors to the system. Listing~\ref{lst:inittypes}
+shows how to register types to the system and
+Listing~\ref{lst:initsolvers} is an example, which shows how to register
+an optimization algorithm via the plug-in architecture.
 
-For loading dynamic library containing types or solvers, we support two
+For loading dynamic library containing types or optimization algorithms, we support two
 different methods:
 \begin{itemize}
   \item The tools recognize the command line switch \verb+-typeslib+
@@ -1386,7 +1391,7 @@ class EdgeSE2PointXY : public BaseBinaryEdge<2, Eigen::Vector2d, VertexSE2, Vert
 
 };
 \end{lstlisting}
-The final thing we should do to make our system operational, is to
+The final step we should do to make our system operational, is to
 register the types to let \gopt{} know that there are new types ready.
 However, if you intend to manually construct your graph without doing
 any i/o operation on disk, this step is not even necessary. Have fun!
