@@ -1,6 +1,6 @@
 ADD_LIBRARY(types_icp ${G2O_LIB_TYPE}
-  types_icp.cpp
-  types_icp.h
+  types_icp.cpp  types_icp.h
+  g2o_types_icp_api.h
 )
 
 SET_TARGET_PROPERTIES(types_icp PROPERTIES OUTPUT_NAME ${LIB_PREFIX}types_icp)

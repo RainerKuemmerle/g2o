@@ -43,7 +43,23 @@
 // MSVC on Windows
 #elif defined _MSC_VER
 #  define __PRETTY_FUNCTION__ __FUNCTION__
-#  define G2O_ATTRIBUTE_CONSTRUCTOR(func) static void func(void)
+
+/**
+Modified by Mark Pupilli from:
+
+	"Initializer/finalizer sample for MSVC and GCC.
+    2010 Joe Lowe. Released into the public domain."
+
+	"For MSVC, places a ptr to the function in the user initializer section (.CRT$XCU), basically the same thing the compiler does for the constructor calls for static C++ objects. For GCC, uses a constructor attribute."
+
+	(As posted on Stack OVerflow)
+*/
+#  define G2O_ATTRIBUTE_CONSTRUCTOR(f) \
+     __pragma(section(".CRT$XCU",read)) \
+     static void __cdecl f(void); \
+     __declspec(allocate(".CRT$XCU")) void (__cdecl*f##_)(void) = f; \
+     static void __cdecl f(void)
+
 #  define G2O_ATTRIBUTE_UNUSED
 #  define G2O_ATTRIBUTE_FORMAT12
 #  define G2O_ATTRIBUTE_FORMAT23

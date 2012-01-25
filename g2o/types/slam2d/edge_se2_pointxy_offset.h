@@ -6,6 +6,7 @@
 #include "vertex_se2.h"
 #include "vertex_point_xy.h"
 #include "parameter_se2_offset.h"
+#include "g2o_types_slam2d_api.h"
 
 namespace g2o {
 
@@ -14,7 +15,7 @@ namespace g2o {
    * \brief g2o edge from a track to a point node
    */
   // first two args are the measurement type, second two the connection classes
-  class EdgeSE2PointXYOffset : public BaseBinaryEdge<2, Vector2d, VertexSE2, VertexPointXY> {
+  class G2O_TYPES_SLAM2D_API EdgeSE2PointXYOffset : public BaseBinaryEdge<2, Vector2d, VertexSE2, VertexPointXY> {
   public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
     EdgeSE2PointXYOffset();

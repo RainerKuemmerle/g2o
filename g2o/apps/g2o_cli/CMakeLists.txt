@@ -2,6 +2,7 @@ ADD_LIBRARY(g2o_cli_library ${G2O_LIB_TYPE}
   dl_wrapper.cpp dl_wrapper.h
   output_helper.cpp output_helper.h
   g2o_common.cpp g2o_common.h
+  g2o_cli_api.h
 )
 
 SET_TARGET_PROPERTIES(g2o_cli_library PROPERTIES OUTPUT_NAME ${LIB_PREFIX}cli)

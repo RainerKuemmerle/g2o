@@ -190,7 +190,8 @@ ENDIF(EIGEN3_FOUND)
 # Set up the top-level include directories
 INCLUDE_DIRECTORIES(${g2o_SOURCE_DIR} ${G2O_EIGEN3_INCLUDE})
 
-# Generate config.h 
+# Generate config.h
+SET(G2O_SHARED_LIBS ${BUILD_SHARED_LIBS})
 configure_file(config.h.in ${PROJECT_BINARY_DIR}/g2o/config.h)
 include_directories(${PROJECT_BINARY_DIR})
 INSTALL(FILES ${PROJECT_BINARY_DIR}/g2o/config.h DESTINATION ${CMAKE_INSTALL_PREFIX}/include/g2o)

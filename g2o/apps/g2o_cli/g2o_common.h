@@ -17,6 +17,8 @@
 #ifndef G2O_COMMON_H
 #define G2O_COMMON_H
 
+#include "g2o_cli_api.h"
+
 namespace g2o {
 
   class DlWrapper;
@@ -25,12 +27,12 @@ namespace g2o {
   /**
    * will also look for -typeslib in (argc, argv) and load that types
    */
-  void loadStandardTypes(DlWrapper& dlWrapper, int argc = 0, char** argv = 0);
+  G2O_CLI_API void loadStandardTypes(DlWrapper& dlWrapper, int argc = 0, char** argv = 0);
 
   /**
    * will also look for -solverlib in (argc, argv) and load that solver
    */
-  void loadStandardSolver(DlWrapper& dlSolverWrapper, int argc = 0, char** argv = 0);
+  G2O_CLI_API void loadStandardSolver(DlWrapper& dlSolverWrapper, int argc = 0, char** argv = 0);
 
 } // end namespace
 

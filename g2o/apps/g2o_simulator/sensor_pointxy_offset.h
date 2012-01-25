@@ -3,10 +3,11 @@
 
 #include "simulator2d_base.h"
 #include "pointsensorparameters.h"
+#include "g2o_simulator_api.h"
 
 namespace g2o {
   
-  class SensorPointXYOffset: public PointSensorParameters, public BinarySensor<Robot2D, EdgeSE2PointXYOffset, WorldObjectPointXY>{ 
+  class G2O_SIMULATOR_API SensorPointXYOffset: public PointSensorParameters, public BinarySensor<Robot2D, EdgeSE2PointXYOffset, WorldObjectPointXY>{ 
   public:
     typedef PoseVertexType::EstimateType RobotPoseType;
     SensorPointXYOffset(const std::string& name_);

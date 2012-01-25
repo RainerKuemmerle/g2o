@@ -14,7 +14,7 @@ namespace g2o {
    * \brief Offset edge
    */
   // first two args are the measurement type, second two the connection classes
-  class EdgeSE3Offset : public BaseBinaryEdge<6, SE3Quat, VertexSE3, VertexSE3> {
+  class G2O_TYPES_SLAM3D_API EdgeSE3Offset : public BaseBinaryEdge<6, SE3Quat, VertexSE3, VertexSE3> {
     public:
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
       EdgeSE3Offset();

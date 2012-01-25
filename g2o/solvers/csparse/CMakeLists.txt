@@ -1,6 +1,7 @@
 ADD_LIBRARY(solver_csparse ${G2O_LIB_TYPE}
   csparse_helper.h         solver_csparse.cpp solver_csparse.h
   csparse_helper.cpp  linear_solver_csparse.h
+  g2o_csparse_api.h
 )
 
 INCLUDE_DIRECTORIES(${CSPARSE_INCLUDE_DIR})

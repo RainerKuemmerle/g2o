@@ -4,6 +4,7 @@
 #include "g2o/core/base_binary_edge.h"
 
 #include "vertex_se2.h"
+#include "g2o_types_slam2d_api.h"
 
 namespace g2o {
 
@@ -14,7 +15,7 @@ namespace g2o {
    * \brief Offset edge
    */
   // first two args are the measurement type, second two the connection classes
-  class EdgeSE2Offset : public BaseBinaryEdge<3, SE2, VertexSE2, VertexSE2> {
+  class G2O_TYPES_SLAM2D_API EdgeSE2Offset : public BaseBinaryEdge<3, SE2, VertexSE2, VertexSE2> {
     public:
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
       EdgeSE2Offset();

@@ -25,6 +25,8 @@
 #include "g2o/core/base_multi_edge.h"
 #include "g2o/types/sba/types_sba.h"
 #include "g2o/types/slam3d/types_slam3d.h"
+#include "g2o_types_icp_api.h"
+
 #include <Eigen/Geometry>
 #include <iostream>
 
@@ -38,8 +40,6 @@ namespace g2o {
   using namespace std;
   typedef  Matrix<double, 6, 1> Vector6d;
 
-
-
 //
 // GICP-type edges
 // Each measurement is between two rigid points on each 6DOF vertex
@@ -50,7 +50,7 @@ namespace g2o {
   // class for edges between two points rigidly attached to vertices
   //
 
-  class EdgeGICP
+  class G2O_TYPES_ICP_API EdgeGICP
   {
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
@@ -154,7 +154,7 @@ namespace g2o {
   //    3 values for position wrt frame
   //    3 values for normal wrt frame, not used here
   // first two args are the measurement type, second two the connection classes
-  class Edge_V_V_GICP : public  BaseBinaryEdge<3, EdgeGICP, VertexSE3, VertexSE3>
+  class G2O_TYPES_ICP_API Edge_V_V_GICP : public  BaseBinaryEdge<3, EdgeGICP, VertexSE3, VertexSE3>
   {
   public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
@@ -227,9 +227,10 @@ namespace g2o {
 #endif
 
     // global derivative matrices
-    static Matrix3d dRidx, dRidy, dRidz; // differential quat matrices
+    static Matrix3d dRidx;
+	static Matrix3d dRidy;
+	static Matrix3d dRidz; // differential quat matrices
   };
-
 
 
 /**
@@ -238,9 +239,7 @@ namespace g2o {
  * than the transform from RW to camera coords.
  * Uses static vars for camera params, so there is a single camera setup.
  */
-
-
-  class VertexSCam : public VertexSE3
+  class G2O_TYPES_ICP_API VertexSCam : public VertexSE3
     {
     public:
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW
@@ -348,7 +347,9 @@ namespace g2o {
         res(2) = p2(0)/p2(2);
       }
 
-      static Matrix3d dRidx, dRidy, dRidz;
+      static Matrix3d dRidx;
+	  static Matrix3d dRidy;
+	  static Matrix3d dRidz;
     };
 
 
@@ -359,7 +360,7 @@ namespace g2o {
 
 // stereo projection
 // first two args are the measurement type, second two the connection classes
-  class Edge_XYZ_VSC : public  BaseBinaryEdge<3, Vector3d, VertexSBAPointXYZ, VertexSCam>
+  class G2O_TYPES_ICP_API Edge_XYZ_VSC : public  BaseBinaryEdge<3, Vector3d, VertexSBAPointXYZ, VertexSCam>
 {
   public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW

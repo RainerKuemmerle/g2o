@@ -20,6 +20,7 @@
 #include <string>
 #include <iosfwd>
 #include "g2o/core/hyper_graph.h"
+#include "g2o_cli_api.h"
 
 namespace g2o {
 
@@ -28,13 +29,13 @@ namespace g2o {
   /**
    * save the state of the optimizer into files for visualizing using Gnuplot
    */
-  bool saveGnuplot(const std::string& gnudump, const OptimizableGraph& optimizer);
-  bool saveGnuplot(const std::string& gnudump, const HyperGraph::VertexSet& vertices, const HyperGraph::EdgeSet& edges);
+  G2O_CLI_API bool saveGnuplot(const std::string& gnudump, const OptimizableGraph& optimizer);
+  G2O_CLI_API bool saveGnuplot(const std::string& gnudump, const HyperGraph::VertexSet& vertices, const HyperGraph::EdgeSet& edges);
 
   /**
    * dump the edges to a stream, e.g., cout and redirect to gnuplot
    */
-  bool dumpEdges(std::ostream& os, const OptimizableGraph& optimizer);
+  G2O_CLI_API bool dumpEdges(std::ostream& os, const OptimizableGraph& optimizer);
 
 } // end namespace
 

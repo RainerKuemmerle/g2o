@@ -20,13 +20,14 @@
 #include "vertex_se2.h"
 #include "g2o/config.h"
 #include "g2o/core/base_binary_edge.h"
+#include "g2o_types_slam2d_api.h"
 
 namespace g2o {
 
   /**
    * \brief 2D edge between two Vertex2
    */
-  class EdgeSE2 : public BaseBinaryEdge<3, SE2, VertexSE2, VertexSE2>
+  class G2O_TYPES_SLAM2D_API EdgeSE2 : public BaseBinaryEdge<3, SE2, VertexSE2, VertexSE2>
   {
     public:
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW
@@ -81,7 +82,7 @@ namespace g2o {
       SE2 _inverseMeasurement;
   };
 
-  class EdgeSE2WriteGnuplotAction: public WriteGnuplotAction {
+  class G2O_TYPES_SLAM2D_API EdgeSE2WriteGnuplotAction: public WriteGnuplotAction {
   public:
     EdgeSE2WriteGnuplotAction();
     virtual HyperGraphElementAction* operator()(HyperGraph::HyperGraphElement* element, 
@@ -89,7 +90,7 @@ namespace g2o {
   };
 
 #ifdef G2O_HAVE_OPENGL
-  class EdgeSE2DrawAction: public DrawAction{
+  class G2O_TYPES_SLAM2D_API EdgeSE2DrawAction: public DrawAction{
   public:
     EdgeSE2DrawAction();
     virtual HyperGraphElementAction* operator()(HyperGraph::HyperGraphElement* element, 

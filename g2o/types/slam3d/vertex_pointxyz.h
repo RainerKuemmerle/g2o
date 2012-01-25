@@ -4,12 +4,14 @@
 #include "g2o/core/base_vertex.h"
 #include "g2o/core/hyper_graph_action.h"
 
+#include "g2o_types_slam3d_api.h"
+
 namespace g2o {
 
   /**
    * Vertex for a tracked point in space
    */
-  class VertexPointXYZ : public BaseVertex<3, Eigen::Vector3d>
+  class G2O_TYPES_SLAM3D_API VertexPointXYZ : public BaseVertex<3, Eigen::Vector3d>
     {
       public:
         EIGEN_MAKE_ALIGNED_OPERATOR_NEW    
@@ -58,7 +60,7 @@ namespace g2o {
     };
 
 #ifdef G2O_HAVE_OPENGL
-  class VertexPointXYZDrawAction: public DrawAction{
+  class G2O_TYPES_SLAM3D_API VertexPointXYZDrawAction: public DrawAction{
   public:
     VertexPointXYZDrawAction();
     virtual HyperGraphElementAction* operator()(HyperGraph::HyperGraphElement* element, 

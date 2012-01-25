@@ -22,13 +22,14 @@
 #include "g2o/core/base_vertex.h"
 #include "g2o/core/hyper_graph_action.h"
 #include "se2.h"
+#include "g2o_types_slam2d_api.h"
 
 namespace g2o {
 
   /**
    * \brief 2D pose Vertex, (x,y,theta)
    */
-  class VertexSE2 : public BaseVertex<3, SE2>
+  class G2O_TYPES_SLAM2D_API VertexSE2 : public BaseVertex<3, SE2>
   {
     public:
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW
@@ -75,7 +76,7 @@ namespace g2o {
 
   };
 
-  class VertexSE2WriteGnuplotAction: public WriteGnuplotAction {
+  class G2O_TYPES_SLAM2D_API VertexSE2WriteGnuplotAction: public WriteGnuplotAction {
   public:
     VertexSE2WriteGnuplotAction();
     virtual HyperGraphElementAction* operator()(HyperGraph::HyperGraphElement* element, 
@@ -83,7 +84,7 @@ namespace g2o {
   };
 
 #ifdef G2O_HAVE_OPENGL
-  class VertexSE2DrawAction: public DrawAction{
+  class G2O_TYPES_SLAM2D_API VertexSE2DrawAction: public DrawAction{
   public:
     VertexSE2DrawAction();
     virtual HyperGraphElementAction* operator()(HyperGraph::HyperGraphElement* element, 

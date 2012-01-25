@@ -38,6 +38,8 @@
 #include <iostream>
 #include <sstream>
 
+#include "g2o_stuff_api.h"
+
 namespace g2o {
 
 /**
@@ -47,7 +49,7 @@ namespace g2o {
  * we can store the config in a file and reload a parameter set from
  * this file.
  */
-class CommandArgs
+class G2O_STUFF_API CommandArgs
 {
   public:
     struct CommandArgument

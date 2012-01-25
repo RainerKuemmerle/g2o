@@ -29,6 +29,7 @@ optimization_algorithm.cpp optimization_algorithm.h
 optimization_algorithm_with_hessian.cpp optimization_algorithm_with_hessian.h
 optimization_algorithm_gauss_newton.cpp optimization_algorithm_gauss_newton.h
 optimization_algorithm_levenberg.cpp optimization_algorithm_levenberg.h
+g2o_core_api.h
 )
 
 SET_TARGET_PROPERTIES(core PROPERTIES OUTPUT_NAME ${LIB_PREFIX}core)

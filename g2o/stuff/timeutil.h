@@ -25,6 +25,8 @@
 
 #include <string>
 
+#include "g2o_stuff_api.h"
+
 /** @addtogroup utils **/
 // @{
 
@@ -71,7 +73,7 @@ typedef struct timeval {
   long tv_sec;
   long tv_usec;
 } timeval;
-int gettimeofday(struct timeval *tv, struct timezone *tz);
+G2O_STUFF_API int gettimeofday(struct timeval *tv, struct timezone *tz);
 #endif
 
 /**

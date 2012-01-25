@@ -18,6 +18,7 @@
 #define G2O_TUTORIAL_EDGE_SE2_H
 
 #include "vertex_se2.h"
+#include "g2o_tutorial_slam2d_api.h"
 #include "g2o/core/base_binary_edge.h"
 
 namespace g2o {
@@ -27,7 +28,7 @@ namespace g2o {
     /**
      * \brief 2D edge between two Vertex2, i.e., the odometry
      */
-    class EdgeSE2 : public BaseBinaryEdge<3, SE2, VertexSE2, VertexSE2>
+    class G2O_TUTORIAL_SLAM2D_API EdgeSE2 : public BaseBinaryEdge<3, SE2, VertexSE2, VertexSE2>
     {
       public:
         EIGEN_MAKE_ALIGNED_OPERATOR_NEW;

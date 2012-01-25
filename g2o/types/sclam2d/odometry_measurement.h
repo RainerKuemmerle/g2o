@@ -1,6 +1,7 @@
 #ifndef G2O_ODOMETRY_MEASUREMENT_H
 #define G2O_ODOMETRY_MEASUREMENT_H
 
+#include "g2o_types_sclam2d_api.h"
 #include <Eigen/Core>
 
 namespace g2o {
@@ -8,7 +9,7 @@ namespace g2o {
   /**
    * \brief velocity measurement of a differential robot
    */
-  class VelocityMeasurement
+  class G2O_TYPES_SCLAM2D_API VelocityMeasurement
   {
     public:
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
@@ -34,7 +35,7 @@ namespace g2o {
   /**
    * \brief A 2D odometry measurement expressed as a transformation
    */
-  class MotionMeasurement
+  class G2O_TYPES_SCLAM2D_API MotionMeasurement
   {
     public:
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
@@ -64,7 +65,7 @@ namespace g2o {
   /**
    * \brief convert between the different types of odometry measurements
    */
-  class OdomConvert
+  class G2O_TYPES_SCLAM2D_API OdomConvert
   {
     public:
       static VelocityMeasurement convertToVelocity(const MotionMeasurement& m);

@@ -2,10 +2,11 @@
 #define G2O_SENSOR_POINTXYZ_H_
 #include "simulator3d_base.h"
 #include "pointsensorparameters.h"
+#include "g2o_simulator_api.h"
 
 namespace g2o {
 
-  class SensorPointXYZ: public PointSensorParameters, public BinarySensor<Robot3D, EdgeSE3PointXYZ, WorldObjectTrackXYZ>{
+  class G2O_SIMULATOR_API SensorPointXYZ: public PointSensorParameters, public BinarySensor<Robot3D, EdgeSE3PointXYZ, WorldObjectTrackXYZ>{
   public:
     typedef PoseVertexType::EstimateType RobotPoseType;
     SensorPointXYZ(const std::string& name_);

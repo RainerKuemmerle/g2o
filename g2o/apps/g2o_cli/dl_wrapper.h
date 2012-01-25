@@ -24,12 +24,14 @@
 #include <windows.h>
 #endif
 
+#include "g2o_cli_api.h"
+
 namespace g2o {
 
   /**
    * \brief Loading libraries during run-time
    */
-  class DlWrapper
+  class G2O_CLI_API DlWrapper
   {
     public:
       DlWrapper();

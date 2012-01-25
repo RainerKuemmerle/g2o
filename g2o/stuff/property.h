@@ -22,10 +22,11 @@
 #include <sstream>
 
 #include "string_tools.h"
+#include "g2o_stuff_api.h"
 
 namespace g2o {
 
-  class BaseProperty {
+  class G2O_STUFF_API BaseProperty {
     public:
       BaseProperty(const std::string name_);
       virtual ~BaseProperty();
@@ -62,7 +63,7 @@ namespace g2o {
   /**
    * \brief a collection of properties mapping from name to the property itself
    */
-  class PropertyMap : protected std::map<std::string, BaseProperty*>
+  class G2O_STUFF_API PropertyMap : protected std::map<std::string, BaseProperty*>
   {
     public:
       typedef std::map<std::string, BaseProperty*>        BaseClass;

@@ -21,6 +21,8 @@
 #include <cmath>
 #include <ctime>
 
+#include "g2o_tutorial_slam2d_api.h"
+
 namespace g2o {
 
   namespace tutorial {
@@ -28,7 +30,7 @@ namespace g2o {
     /**
      * \brief generate random numbers
      */
-    class Rand
+    class G2O_TUTORIAL_SLAM2D_API Rand
     {
       public:
         /**

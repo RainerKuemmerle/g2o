@@ -1,11 +1,12 @@
 #ifndef G2O_VERTEX_ODOM_DIFFERENTIAL_PARAMS_H
 #define G2O_VERTEX_ODOM_DIFFERENTIAL_PARAMS_H
 
+#include "g2o_types_sclam2d_api.h"
 #include "g2o/core/base_vertex.h"
 
 namespace g2o {
 
-  class VertexOdomDifferentialParams: public BaseVertex <3, Vector3d> {
+  class G2O_TYPES_SCLAM2D_API VertexOdomDifferentialParams: public BaseVertex <3, Vector3d> {
     public:
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
       VertexOdomDifferentialParams();

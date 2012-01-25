@@ -19,6 +19,9 @@
 
 #include "g2o/stuff/misc.h"
 #include "g2o/stuff/macros.h"
+
+#include "g2o_tutorial_slam2d_api.h"
+
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 
@@ -27,7 +30,7 @@ namespace g2o {
 
   namespace tutorial {
 
-    class SE2 {
+    class G2O_TUTORIAL_SLAM2D_API SE2 {
       public:
         EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
         SE2():_R(0),_t(0,0){}

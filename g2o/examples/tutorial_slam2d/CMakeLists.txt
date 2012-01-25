@@ -7,6 +7,7 @@ ADD_LIBRARY(tutorial_slam2d_library ${G2O_LIB_TYPE}
   parameter_se2_offset.h parameter_se2_offset.cpp
   types_tutorial_slam2d.h types_tutorial_slam2d.cpp
   simulator.h simulator.cpp
+  g2o_tutorial_slam2d_api.h
 )
 
 SET_TARGET_PROPERTIES(tutorial_slam2d_library PROPERTIES OUTPUT_NAME ${LIB_PREFIX}tutorial_slam2d)

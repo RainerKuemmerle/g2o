@@ -19,13 +19,14 @@
 
 #include "g2o/core/base_vertex.h"
 #include "g2o/core/hyper_graph_action.h"
+#include "g2o_tutorial_slam2d_api.h"
 
 #include <Eigen/Core>
 
 namespace g2o {
   namespace tutorial {
 
-    class VertexPointXY : public BaseVertex<2, Eigen::Vector2d>
+    class G2O_TUTORIAL_SLAM2D_API VertexPointXY : public BaseVertex<2, Eigen::Vector2d>
     {
       public:
         EIGEN_MAKE_ALIGNED_OPERATOR_NEW;

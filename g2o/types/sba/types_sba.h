@@ -24,6 +24,8 @@
 #include <Eigen/Geometry>
 #include <iostream>
 
+#include "g2o_types_sba_api.h"
+
 namespace g2o {
 
   namespace types_sba {
@@ -36,7 +38,7 @@ namespace g2o {
  * \brief Vertex encoding the intrinsics of the camera fx, fy, cx, xy, baseline;
  */
 
-class VertexIntrinsics : public BaseVertex<4, Matrix<double, 5, 1> >
+class G2O_TYPES_SBA_API VertexIntrinsics : public BaseVertex<4, Matrix<double, 5, 1> >
 {
   public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
@@ -60,7 +62,9 @@ class VertexIntrinsics : public BaseVertex<4, Matrix<double, 5, 1> >
  * (x,y,z,qx,qy,qz) (note that we leave out the w part of the quaternion.
  * qw is assumed to be positive, otherwise there is an ambiguity in qx,qy,qz as a rotation
  */
-class VertexCam : public BaseVertex<6, SBACam>
+
+
+  class G2O_TYPES_SBA_API VertexCam : public BaseVertex<6, SBACam>
 {
   public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
@@ -126,7 +130,7 @@ class VertexCam : public BaseVertex<6, SBACam>
 /**
  * \brief Point vertex, XYZ
  */
- class VertexSBAPointXYZ : public BaseVertex<3, Vector3d>
+ class G2O_TYPES_SBA_API VertexSBAPointXYZ : public BaseVertex<3, Vector3d>
 {
   public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW    
@@ -148,7 +152,7 @@ class VertexCam : public BaseVertex<6, SBACam>
 
 // monocular projection
 // first two args are the measurement type, second two the connection classes
- class EdgeProjectP2MC : public  BaseBinaryEdge<2, Vector2d, VertexSBAPointXYZ, VertexCam> 
+ class G2O_TYPES_SBA_API EdgeProjectP2MC : public  BaseBinaryEdge<2, Vector2d, VertexSBAPointXYZ, VertexCam> 
 {
   public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
@@ -187,7 +191,7 @@ class VertexCam : public BaseVertex<6, SBACam>
 
 // stereo projection
 // first two args are the measurement type, second two the connection classes
- class EdgeProjectP2SC : public  BaseBinaryEdge<3, Vector3d, VertexSBAPointXYZ, VertexCam>
+ class G2O_TYPES_SBA_API EdgeProjectP2SC : public  BaseBinaryEdge<3, Vector3d, VertexSBAPointXYZ, VertexCam>
 {
   public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
@@ -243,7 +247,7 @@ class VertexCam : public BaseVertex<6, SBACam>
 
 // monocular projection with parameter calibration
 // first two args are the measurement type, second two the connection classes
- class EdgeProjectP2MC_Intrinsics : public  BaseMultiEdge<2, Vector2d> 
+ class G2O_TYPES_SBA_API EdgeProjectP2MC_Intrinsics : public  BaseMultiEdge<2, Vector2d> 
 {
   public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
@@ -274,7 +278,7 @@ class VertexCam : public BaseVertex<6, SBACam>
 /**
  * \brief 3D edge between two SBAcam
  */
- class EdgeSBACam : public BaseBinaryEdge<6, SE3Quat, VertexCam, VertexCam>
+ class G2O_TYPES_SBA_API EdgeSBACam : public BaseBinaryEdge<6, SE3Quat, VertexCam, VertexCam>
 {
   public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
@@ -327,7 +331,7 @@ class VertexCam : public BaseVertex<6, SBACam>
 /**
  * \brief edge between two SBAcam that specifies the distance between them
  */
- class EdgeSBAScale : public BaseBinaryEdge<1, double, VertexCam, VertexCam>
+ class G2O_TYPES_SBA_API EdgeSBAScale : public BaseBinaryEdge<1, double, VertexCam, VertexCam>
 {
   public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW

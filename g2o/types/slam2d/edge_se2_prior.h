@@ -19,13 +19,14 @@
 
 #include "vertex_se2.h"
 #include "g2o/core/base_unary_edge.h"
+#include "g2o_types_slam2d_api.h"
 
 namespace g2o {
 
   /**
    * \brief Prior for a two D pose
    */
-  class EdgeSE2Prior : public BaseUnaryEdge<3, SE2, VertexSE2>
+  class G2O_TYPES_SLAM2D_API EdgeSE2Prior : public BaseUnaryEdge<3, SE2, VertexSE2>
   {
     public:
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW;

@@ -10,7 +10,7 @@ namespace g2o {
    * prior for an SE3 element
    */
   // first two args are the measurement type, third connection class
-  class EdgeSE3Prior : public BaseUnaryEdge<6, SE3Quat, VertexSE3> {
+  class G2O_TYPES_SLAM3D_API EdgeSE3Prior : public BaseUnaryEdge<6, SE3Quat, VertexSE3> {
   public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
     EdgeSE3Prior();

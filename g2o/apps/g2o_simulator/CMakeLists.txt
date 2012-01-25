@@ -19,6 +19,7 @@ ADD_LIBRARY(g2o_simulator_library ${G2O_LIB_TYPE}
    sensor_se3_prior.cpp sensor_se3_prior.h
    simulator3d.h
 
+   g2o_simulator_api.h
 )
 
 SET_TARGET_PROPERTIES(g2o_simulator_library PROPERTIES OUTPUT_NAME ${LIB_PREFIX}simulator)

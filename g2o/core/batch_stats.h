@@ -19,12 +19,14 @@
 
 #include <iostream>
 
+#include "g2o_core_api.h"
+
 namespace g2o {
 
   /**
    * \brief statistics about the optimization
    */
-  struct G2OBatchStatistics {
+  struct G2O_CORE_API G2OBatchStatistics {
     G2OBatchStatistics();
     int iteration;                    ///< which iteration
     int numVertices;                  ///< how many vertices are involved
@@ -58,10 +60,10 @@ namespace g2o {
     size_t choleskyNNZ;               ///< number of non-zeros in the cholesky factor
   };
 
-  std::ostream& operator<<(std::ostream&, const G2OBatchStatistics&);
+  G2O_CORE_API std::ostream& operator<<(std::ostream&, const G2OBatchStatistics&);
 
   // this is really ugly: global stat variable to write statistics
-  extern G2OBatchStatistics * globalStats;
+  extern G2O_CORE_API G2OBatchStatistics * globalStats;
 }
 
 #endif

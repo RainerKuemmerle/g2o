@@ -23,6 +23,7 @@
 #include "g2o/core/batch_stats.h"
 #include "g2o/core/marginal_covariance_cholesky.h"
 #include "g2o/stuff/timeutil.h"
+#include "g2o_csparse_api.h"
 
 #include <iostream>
 
@@ -31,7 +32,7 @@ namespace g2o {
 /**
  * \brief Our C++ version of the csparse struct
  */
-struct CSparseExt : public cs
+struct G2O_SOLVER_CSPARSE_API CSparseExt : public cs
 {
   CSparseExt()
   {
