@@ -18,9 +18,11 @@
 #define G2O_FACTORY_H
 
 #include "hyper_graph.h"
+#include "creators.h"
 
 #include <string>
 #include <map>
+#include <iostream>
 
 namespace g2o {
 
@@ -43,6 +45,11 @@ namespace g2o {
        * register a tag for a specific creator
        */
       void registerType(const std::string& tag, AbstractHyperGraphElementCreator* c);
+
+      /**
+       * unregister a tag for a specific creator
+       */
+      void unregisterType(const std::string& tag);
 
       /**
        * construct a graph element based on its tag
@@ -79,10 +86,21 @@ namespace g2o {
         public:
           AbstractHyperGraphElementCreator* creator;
           int elementTypeBit;
-          CreatorInformation();
+          CreatorInformation()
+          {
+            creator = 0;
+            elementTypeBit = -1;
+          }
+        
+          ~CreatorInformation()
+          {
+            std::cout << "Deleting " << (void*) creator << std::endl;
+            
+            delete creator;
+          }
       };
 
-      typedef std::map<std::string, CreatorInformation>               CreatorMap;
+      typedef std::map<std::string, CreatorInformation*>               CreatorMap;
       typedef std::map<std::string, std::string>                      TagLookup;
       Factory();
       ~Factory();
@@ -94,6 +112,32 @@ namespace g2o {
       static Factory* factoryInstance;
   };
 
+  template<typename T> class RegisterTypeProxy
+    {
+      public:
+      RegisterTypeProxy(const std::string& name) : _name(name)
+          {
+#ifndef NDEBUG
+            std::cout << __FUNCTION__ << ": Registering " << _name << " of type " << typeid(T).name() << std::endl;
+#endif
+            Factory::instance()->registerType(_name, new HyperGraphElementCreator<T>());
+          }
+      
+        ~RegisterTypeProxy()
+          {
+#ifndef NDEBUG
+            std::cout << __FUNCTION__ << ": Unregistering " << _name << " of type " << typeid(T).name() << std::endl;
+#endif
+            Factory::instance()->unregisterType(_name);
+          }
+
+    private:
+      std::string _name;
+  };
+
+#define REGISTER_G2O_TYPE(name, classname) \
+    extern "C" void g2o_type_##classname(void) {} \
+    static g2o::RegisterTypeProxy<classname> g_proxy_##classname(#name);
 }
 
 #endif
