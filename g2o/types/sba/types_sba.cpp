@@ -24,34 +24,15 @@ namespace g2o {
 
   using namespace std;
 
-  namespace types_sba {
-    int initialized = 0;
+      G2O_REGISTER_TYPE(VERTEX_CAM, VertexCam);
+      G2O_REGISTER_TYPE(VERTEX_XYZ, VertexSBAPointXYZ);
+      G2O_REGISTER_TYPE(VERTEX_INTRINSICS, VertexIntrinsics);
 
-    void init()
-    {
-      if (types_sba::initialized)
-        return;
-      //cerr << "Calling " << __FILE__ << " " << __PRETTY_FUNCTION__ << endl;
-      Factory* factory = Factory::instance();
-
-      factory->registerType("VERTEX_CAM", new HyperGraphElementCreator<VertexCam>);
-      factory->registerType("VERTEX_XYZ", new HyperGraphElementCreator<VertexSBAPointXYZ>);
-      factory->registerType("VERTEX_INTRINSICS", new HyperGraphElementCreator<VertexIntrinsics>);
-
-      factory->registerType("EDGE_PROJECT_P2MC", new HyperGraphElementCreator<EdgeProjectP2MC>);
-      factory->registerType("EDGE_PROJECT_P2MC_INTRINSICS", new HyperGraphElementCreator<EdgeProjectP2MC_Intrinsics>);
-      factory->registerType("EDGE_PROJECT_P2SC", new HyperGraphElementCreator<EdgeProjectP2SC>);
-      factory->registerType("EDGE_CAM", new HyperGraphElementCreator<EdgeSBACam>);
-      factory->registerType("EDGE_SCALE", new HyperGraphElementCreator<EdgeSBAScale>);
-
-      types_sba::initialized = 1;
-    }
-  }
-
-  G2O_ATTRIBUTE_CONSTRUCTOR(init_sba_types)
-  {
-    types_sba::init();
-  }
+      G2O_REGISTER_TYPE(EDGE_PROJECT_P2MC, EdgeProjectP2MC);
+      G2O_REGISTER_TYPE(EDGE_PROJECT_P2MC_INTRINSICS, EdgeProjectP2MC_Intrinsics);
+      G2O_REGISTER_TYPE(EDGE_PROJECT_P2SC, EdgeProjectP2SC);
+      G2O_REGISTER_TYPE(EDGE_CAM, EdgeSBACam);
+      G2O_REGISTER_TYPE(EDGE_SCALE, EdgeSBAScale);
 
   // constructor
   VertexIntrinsics::VertexIntrinsics() 
