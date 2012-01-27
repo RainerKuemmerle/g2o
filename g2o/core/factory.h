@@ -135,9 +135,9 @@ namespace g2o {
       std::string _name;
   };
 
-#define REGISTER_G2O_TYPE(name, classname) \
+#define G2O_REGISTER_TYPE(name, classname) \
     extern "C" void g2o_type_##classname(void) {} \
-    static g2o::RegisterTypeProxy<classname> g_proxy_##classname(#name);
+    static g2o::RegisterTypeProxy<classname> g_type_proxy_##classname(#name);
 }
 
 #endif
