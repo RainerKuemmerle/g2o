@@ -156,10 +156,10 @@ struct TypeFunctionProxy
     static g2o::TypeFunctionProxy proxy_##classname(g2o_type_##classname);
 
 #define G2O_REGISTER_TYPE_GROUP(typegroupname) \
-    extern "C" void g2o_types_##typegroupname(void) {}
+    extern "C" void g2o_type_group_##typegroupname(void) {}
 
 #define G2O_USE_TYPE_GROUP(typegroupname) \
-    extern "C" void g2o_type_##typegroupname(void); \
-    static g2o::TypeFunctionProxy proxy_##typegroupname(g2o_types_##typegroupname);
+    extern "C" void g2o_type_group_##typegroupname(void); \
+    static g2o::TypeFunctionProxy proxy_##typegroupname(g2o_type_group_##typegroupname);
 
 #endif
