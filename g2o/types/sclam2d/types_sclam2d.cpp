@@ -27,6 +27,9 @@
 
 namespace g2o {
 
+  G2O_USE_TYPE_GROUP(slam2d);
+  
+  G2O_REGISTER_TYPE_GROUP(sclam);
       G2O_REGISTER_TYPE(VERTEX_ODOM_DIFFERENTIAL, VertexOdomDifferentialParams);
       G2O_REGISTER_TYPE(EDGE_SE2_CALIB, EdgeSE2SensorCalib);
       G2O_REGISTER_TYPE(EDGE_SE2_ODOM_DIFFERENTIAL_CALIB, EdgeSE2OdomDifferentialCalib);

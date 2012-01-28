@@ -24,6 +24,11 @@
 #include <map>
 #include <iostream>
 
+extern "C"
+{
+    typedef void (* CTypeFunction) (void);
+}
+
 namespace g2o {
 
   class AbstractHyperGraphElementCreator;
@@ -135,9 +140,26 @@ namespace g2o {
       std::string _name;
   };
 
+struct TypeFunctionProxy
+{
+    TypeFunctionProxy(CTypeFunction function) { (function)(); }
+};
+
+}
+
 #define G2O_REGISTER_TYPE(name, classname) \
     extern "C" void g2o_type_##classname(void) {} \
     static g2o::RegisterTypeProxy<classname> g_type_proxy_##classname(#name);
-}
+
+#define G2O_USE_TYPE_BY_CLASS_NAME(classname) \
+    extern "C" void g2o_type_##classname(void); \
+    static g2o::TypeFunctionProxy proxy_##classname(g2o_type_##classname);
+
+#define G2O_REGISTER_TYPE_GROUP(typegroupname) \
+    extern "C" void g2o_types_##typegroupname(void) {}
+
+#define G2O_USE_TYPE_GROUP(typegroupname) \
+    extern "C" void g2o_type_##typegroupname(void); \
+    static g2o::TypeFunctionProxy proxy_##typegroupname(g2o_types_##typegroupname);
 
 #endif

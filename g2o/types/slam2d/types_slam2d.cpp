@@ -26,6 +26,8 @@ namespace g2o {
 
 namespace types_slam2d {
 
+  G2O_REGISTER_TYPE_GROUP(slam2d);
+
   G2O_REGISTER_TYPE(VERTEX_SE2, VertexSE2);
   G2O_REGISTER_TYPE(VERTEX_XY, VertexPointXY);
   G2O_REGISTER_TYPE(PARAMS_SE2OFFSET, ParameterSE2Offset);

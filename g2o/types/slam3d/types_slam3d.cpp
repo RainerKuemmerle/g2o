@@ -23,6 +23,8 @@
 namespace g2o {
   using namespace std;
 
+  G2O_REGISTER_TYPE_GROUP(slam3d);
+
       G2O_REGISTER_TYPE(VERTEX_SE3:QUAT, VertexSE3);
       G2O_REGISTER_TYPE(EDGE_SE3:QUAT, EdgeSE3);
       G2O_REGISTER_TYPE(VERTEX_TRACKXYZ, VertexPointXYZ);
