@@ -16,7 +16,7 @@
 
 #include "g2o_slam_interface.h"
 
-#include "g2o/stuff/fast_output.h"
+#include "fast_output.h"
 
 #include "types_slam2d_online.h"
 #include "types_slam3d_online.h"
