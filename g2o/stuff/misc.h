@@ -160,6 +160,20 @@ inline T wrap(T l, T x, T u)
   return x;
 }
 
+/**
+ * The following two functions are used to force linkage with static libraries.
+ */
+extern "C"
+{
+    typedef void (* ForceLinkFunction) (void);
+}
+
+struct ForceLinker
+{
+    ForceLinker(ForceLinkFunction function) { (function)(); }
+};
+
+
 } // end namespace
 
 // @}

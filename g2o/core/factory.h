@@ -24,11 +24,6 @@
 #include <map>
 #include <iostream>
 
-extern "C"
-{
-    typedef void (* CTypeFunction) (void);
-}
-
 namespace g2o {
 
   class AbstractHyperGraphElementCreator;
@@ -140,12 +135,7 @@ namespace g2o {
       std::string _name;
   };
 
-struct TypeFunctionProxy
-{
-    TypeFunctionProxy(CTypeFunction function) { (function)(); }
-};
-
-}
+  // These macros are used to automate registering types and forcing linkage
 
 #define G2O_REGISTER_TYPE(name, classname) \
     extern "C" void g2o_type_##classname(void) {} \
@@ -155,11 +145,12 @@ struct TypeFunctionProxy
     extern "C" void g2o_type_##classname(void); \
     static g2o::TypeFunctionProxy proxy_##classname(g2o_type_##classname);
 
-#define G2O_REGISTER_TYPE_GROUP(typegroupname) \
-    extern "C" void g2o_type_group_##typegroupname(void) {}
+#define G2O_REGISTER_TYPE_GROUP(typeGroupName) \
+    extern "C" void g2o_type_group_##typeGroupName(void) {}
 
-#define G2O_USE_TYPE_GROUP(typegroupname) \
-    extern "C" void g2o_type_group_##typegroupname(void); \
-    static g2o::TypeFunctionProxy proxy_##typegroupname(g2o_type_group_##typegroupname);
+#define G2O_USE_TYPE_GROUP(typeGroupName) \
+    extern "C" void g2o_type_group_##typeGroupName(void); \
+    static g2o::ForceLinker g2o_force_type_link_##typeGroupName(g2o_type_group_##typeGroupName);
+}
 
 #endif
