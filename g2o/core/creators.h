@@ -49,6 +49,9 @@ namespace g2o
   {
     public:
       HyperGraphElementCreator() : _name(typeid(T).name()) {}
+#if defined (WINDOWS) && defined(__GNUC__) // force stack alignment on Windows with GCC
+      __attribute__((force_align_arg_pointer))
+#endif
       HyperGraph::HyperGraphElement* construct() { return new T;}
       const std::string& name() const { return _name;}
     protected:

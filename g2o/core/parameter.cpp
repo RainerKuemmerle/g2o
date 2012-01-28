@@ -18,9 +18,8 @@
 
 namespace g2o {
 
-  Parameter::Parameter()
+  Parameter::Parameter() : _id(-1)
   {
-    _id = -1;
   }
 
   void Parameter::setId(int id_)
