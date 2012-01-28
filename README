@@ -26,10 +26,21 @@ g2o: A General Framework for Graph Optimization
 IEEE International Conference on Robotics and Automation (ICRA), 2011
 http://ais.informatik.uni-freiburg.de/publications/papers/kuemmerle11icra.pdf
 
-g2o is licensed under LGPL version 3, whereas the following parts are
-licensed under GPL version 3:
+g2o is licensed under the BSD License. However, some libraries are available
+under different license terms. See below.
+
+The following parts are licensed under LGPL3+:
+- csparse_extension
+
+The following parts are licensed under GPL3+:
 - g2o_viewer
 - g2o_incremental
+- slam2d_g2o (example for 2D SLAM with a QGLviewer GUI)
+
+Within the folder EXTERNAL we include software not written by us to
+guarantee easy compilation.
+- csparse: LPGL2.1 (see EXTERNAL/csparse/License.txt)
+- Eigen: LGPL3+
 
 See the doc folder for the full text of the licenses.
 
@@ -57,7 +68,7 @@ g2o requires cmake to build. The other requirements are optional.
 
 Compilation:
 Our primary development platform is Linux. Experimental support for
-Mac OS X and Windows (with MinGW as a compiler).
+Mac OS X and Windows (MinGW or MSVC).
 We recommend a so-called out of source build which can be achieved
 by the following command sequence.
 
@@ -72,9 +83,10 @@ are both located in the top-level folder.
 
 
 Acknowledgments:
-We thank Simon J. Julier for submitting patches to achieve compatibility
-with Mac OS X and Michael A. Eriksen for submitting patches to compile
-with MSVC.
+We thank the following contributors for providing patches:
+- Simon J. Julier: patches to achieve compatibility with Mac OS X and others.
+- Michael A. Eriksen for submitting patches to compile with MSVC.
+- Mark Pupilli for submitting patches to compile with MSVC.
 
 
 Contact information:
