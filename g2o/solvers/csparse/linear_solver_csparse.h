@@ -113,11 +113,11 @@ class LinearSolverCSparse : public LinearSolver<MatrixType>
       // _x = _b for calling csparse
       if (x != b)
         memcpy(x, b, _ccsA->n * sizeof(double));
-      int ok = cs_cholsolsymb(_ccsA, x, _symbolicDecomposition, _csWorkspace, _csIntWorkspace);
+      int ok = csparse_extension::cs_cholsolsymb(_ccsA, x, _symbolicDecomposition, _csWorkspace, _csIntWorkspace);
       if (! ok) {
         if (_writeDebug) {
           std::cerr << "Cholesky failure, writing debug.txt (Hessian loadable by Octave)" << std::endl;
-          writeCs2Octave("debug.txt", _ccsA, true);
+          csparse_extension::writeCs2Octave("debug.txt", _ccsA, true);
         }
         return false;
       }
@@ -157,7 +157,7 @@ class LinearSolverCSparse : public LinearSolver<MatrixType>
       }
 
       int ok = 1;
-      csn* numericCholesky = cs_chol_workspace(_ccsA, _symbolicDecomposition, _csIntWorkspace, _csWorkspace);
+      csn* numericCholesky = csparse_extension::cs_chol_workspace(_ccsA, _symbolicDecomposition, _csIntWorkspace, _csWorkspace);
       if (numericCholesky) {
         MarginalCovarianceCholesky mcc;
         mcc.setCholeskyFactor(_ccsA->n, numericCholesky->L->p, numericCholesky->L->i, numericCholesky->L->x, _symbolicDecomposition->pinv);
@@ -193,7 +193,7 @@ class LinearSolverCSparse : public LinearSolver<MatrixType>
 
 
       int ok = 1;
-      csn* numericCholesky = cs_chol_workspace(_ccsA, _symbolicDecomposition, _csIntWorkspace, _csWorkspace);
+      csn* numericCholesky = csparse_extension::cs_chol_workspace(_ccsA, _symbolicDecomposition, _csIntWorkspace, _csWorkspace);
       if (numericCholesky) {
         MarginalCovarianceCholesky mcc;
         mcc.setCholeskyFactor(_ccsA->n, numericCholesky->L->p, numericCholesky->L->i, numericCholesky->L->x, _symbolicDecomposition->pinv);
