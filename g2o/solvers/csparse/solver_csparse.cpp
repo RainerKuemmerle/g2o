@@ -92,6 +92,9 @@ namespace g2o {
       }
   };
 
+  G2O_REGISTER_OPTIMIZATION_LIBRARY(csparse);
+
+  G2O_REGISTER_OPTIMIZATION_ALGORITHM(gn_var, new CSparseSolverCreator(OptimizationAlgorithmProperty("gn_var", "Gauss-Newton: Cholesky solver using CSparse (variable blocksize)", "CSparse", false, Eigen::Dynamic, Eigen::Dynamic)));
 
   namespace solver_csparse {
     void init()
@@ -100,7 +103,7 @@ namespace g2o {
       if (initialized)
         return;
       OptimizationAlgorithmFactory* factory = OptimizationAlgorithmFactory::instance();
-      factory->registerSolver(new CSparseSolverCreator(OptimizationAlgorithmProperty("gn_var", "Gauss-Newton: Cholesky solver using CSparse (variable blocksize)", "CSparse", false, -1, -1)));
+      //      factory->registerSolver(new CSparseSolverCreator(OptimizationAlgorithmProperty("gn_var", "Gauss-Newton: Cholesky solver using CSparse (variable blocksize)", "CSparse", false, -1, -1)));
       factory->registerSolver(new CSparseSolverCreator(OptimizationAlgorithmProperty("gn_fix3_2", "Gauss-Newton: Cholesky solver using CSparse (fixed blocksize)", "CSparse", true, 3, 2)));
       factory->registerSolver(new CSparseSolverCreator(OptimizationAlgorithmProperty("gn_fix6_3", "Gauss-Newton: Cholesky solver using CSparse (fixed blocksize)", "CSparse", true, 6, 3)));
       factory->registerSolver(new CSparseSolverCreator(OptimizationAlgorithmProperty("gn_fix7_3", "Gauss-Newton: Cholesky solver using CSparse (fixed blocksize)", "CSparse", true, 7, 3)));
