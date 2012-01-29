@@ -91,10 +91,14 @@ namespace g2o {
       }
   };
 
+  G2O_REGISTER_OPTIMIZATION_LIBRARY(cholmod);
+
   G2O_ATTRIBUTE_CONSTRUCTOR(init_solver_cholmod)
   {
     solver_cholmod::init();
   }
+
+  G2O_REGISTER_OPTIMIZATION_ALGORITHM(gn_var_cholmod, new CholmodSolverCreator(OptimizationAlgorithmProperty("gn_var_cholmod", "Gauss-Newton: Cholesky solver using CHOLMOD (variable blocksize)", "CHOLMOD", false, Eigen::Dynamic, Eigen::Dynamic)));
 
   namespace solver_cholmod {
     void init()
@@ -103,7 +107,7 @@ namespace g2o {
       if (initialized)
         return;
       OptimizationAlgorithmFactory* factory = OptimizationAlgorithmFactory::instance();
-      factory->registerSolver(new CholmodSolverCreator(OptimizationAlgorithmProperty("gn_var_cholmod", "Gauss-Newton: Cholesky solver using CHOLMOD (variable blocksize)", "CHOLMOD", false, -1, -1)));
+      //      factory->registerSolver(new CholmodSolverCreator(OptimizationAlgorithmProperty("gn_var_cholmod", "Gauss-Newton: Cholesky solver using CHOLMOD (variable blocksize)", "CHOLMOD", false, -1, -1)));
       factory->registerSolver(new CholmodSolverCreator(OptimizationAlgorithmProperty("gn_fix3_2_cholmod", "Gauss-Newton: Cholesky solver using CHOLMOD (fixed blocksize)", "CHOLMOD", true, 3, 2)));
       factory->registerSolver(new CholmodSolverCreator(OptimizationAlgorithmProperty("gn_fix6_3_cholmod", "Gauss-Newton: Cholesky solver using CHOLMOD (fixed blocksize)", "CHOLMOD", true, 6, 3)));
       factory->registerSolver(new CholmodSolverCreator(OptimizationAlgorithmProperty("gn_fix7_3_cholmod", "Gauss-Newton: Cholesky solver using CHOLMOD (fixed blocksize)", "CHOLMOD", true, 7, 3)));
