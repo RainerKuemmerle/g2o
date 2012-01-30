@@ -82,6 +82,9 @@ namespace g2o {
     solver_pcg::init();
   }
 
+  G2O_REGISTER_OPTIMIZATION_LIBRARY(pcg);
+  G2O_REGISTER_OPTIMIZATION_ALGORITHM(gn_pcg, new PCGSolverCreator(OptimizationAlgorithmProperty("gn_pcg", "Gauss-Newton: PCG solver using block-Jacobi pre-conditioner (variable blocksize)", "PCG", false, Eigen::Dynamic, Eigen::Dynamic)));
+
   namespace solver_pcg {
     void init()
     {
@@ -89,11 +92,11 @@ namespace g2o {
       if (initialized)
         return;
       OptimizationAlgorithmFactory* factory = OptimizationAlgorithmFactory::instance();
-      factory->registerSolver(new PCGSolverCreator(OptimizationAlgorithmProperty("gn_pcg", "Gauss-Newton: PCG solver using block-Jacobi pre-conditioner (variable blocksize)", "PCG", false, -1, -1)));
+      //factory->registerSolver(new PCGSolverCreator(OptimizationAlgorithmProperty("gn_pcg", "Gauss-Newton: PCG solver using block-Jacobi pre-conditioner (variable blocksize)", "PCG", false, Eigen::Dynamic, Eigen::Dynamic)));
       factory->registerSolver(new PCGSolverCreator(OptimizationAlgorithmProperty("gn_pcg3_2", "Gauss-Newton: PCG solver using block-Jacobi pre-conditioner (fixed blocksize)", "PCG", true, 3, 2)));
       factory->registerSolver(new PCGSolverCreator(OptimizationAlgorithmProperty("gn_pcg6_3", "Gauss-Newton: PCG solver using block-Jacobi pre-conditioner (fixed blocksize)", "PCG", true, 6, 3)));
       factory->registerSolver(new PCGSolverCreator(OptimizationAlgorithmProperty("gn_pcg7_3", "Gauss-Newton: PCG solver using block-Jacobi pre-conditioner (fixed blocksize)", "PCG", true, 7, 3)));
-      factory->registerSolver(new PCGSolverCreator(OptimizationAlgorithmProperty("lm_pcg", "Levenberg: PCG solver using block-Jacobi pre-conditioner (variable blocksize)", "PCG", false, -1, -1)));
+      factory->registerSolver(new PCGSolverCreator(OptimizationAlgorithmProperty("lm_pcg", "Levenberg: PCG solver using block-Jacobi pre-conditioner (variable blocksize)", "PCG", false, Eigen::Dynamic, Eigen::Dynamic)));
       factory->registerSolver(new PCGSolverCreator(OptimizationAlgorithmProperty("lm_pcg3_2", "Levenberg: PCG solver using block-Jacobi pre-conditioner (fixed blocksize)", "PCG", true, 3, 2)));
       factory->registerSolver(new PCGSolverCreator(OptimizationAlgorithmProperty("lm_pcg6_3", "Levenberg: PCG solver using block-Jacobi pre-conditioner (fixed blocksize)", "PCG", true, 6, 3)));
       factory->registerSolver(new PCGSolverCreator(OptimizationAlgorithmProperty("lm_pcg7_3", "Levenberg: PCG solver using block-Jacobi pre-conditioner (fixed blocksize)", "PCG", true, 7, 3)));

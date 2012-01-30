@@ -24,24 +24,8 @@
 
 namespace g2o {
 
-  namespace types_data {
-    int initialized = 0;
+  G2O_REGISTER_TYPE_GROUP(data);
 
-    void init()
-    {
-      if (types_data::initialized)
-        return;
-      Factory* factory = Factory::instance();
-      //cerr << "Calling " << __FILE__ << " " << __PRETTY_FUNCTION__ << endl;
-
-      factory->registerType("ROBOTLASER1", new HyperGraphElementCreator<RobotLaser>);
-      types_data::initialized = 1;
-    }
-  }
-
-  G2O_ATTRIBUTE_CONSTRUCTOR(init_types_data)
-  {
-    types_data::init();
-  }
+  G2O_REGISTER_TYPE(ROBOTLASER1, RobotLaser);
 
 } // end namespace
