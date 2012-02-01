@@ -92,40 +92,25 @@ namespace g2o {
       }
   };
 
+
+  namespace solver_csparse {
+
   G2O_REGISTER_OPTIMIZATION_LIBRARY(csparse);
 
   G2O_REGISTER_OPTIMIZATION_ALGORITHM(gn_var, new CSparseSolverCreator(OptimizationAlgorithmProperty("gn_var", "Gauss-Newton: Cholesky solver using CSparse (variable blocksize)", "CSparse", false, Eigen::Dynamic, Eigen::Dynamic)));
+    G2O_REGISTER_OPTIMIZATION_ALGORITHM(gn_fix3_2, new CSparseSolverCreator(OptimizationAlgorithmProperty("gn_fix3_2", "Gauss-Newton: Cholesky solver using CSparse (fixed blocksize)", "CSparse", true, 3, 2)));
+    G2O_REGISTER_OPTIMIZATION_ALGORITHM(gn_fix6_3, new CSparseSolverCreator(OptimizationAlgorithmProperty("gn_fix6_3", "Gauss-Newton: Cholesky solver using CSparse (fixed blocksize)", "CSparse", true, 6, 3)));
+    G2O_REGISTER_OPTIMIZATION_ALGORITHM(gn_fix7_3, new CSparseSolverCreator(OptimizationAlgorithmProperty("gn_fix7_3", "Gauss-Newton: Cholesky solver using CSparse (fixed blocksize)", "CSparse", true, 7, 3)));
+    G2O_REGISTER_OPTIMIZATION_ALGORITHM(gn_fix3_2_scalar, new CSparseSolverCreator(OptimizationAlgorithmProperty("gn_fix3_2_scalar", "Gauss-Newton: Cholesky solver using CSparse (fixed blocksize, scalar ordering)", "CSparse", true, 3, 2)));
+    G2O_REGISTER_OPTIMIZATION_ALGORITHM(gn_fix6_3_scalar, new CSparseSolverCreator(OptimizationAlgorithmProperty("gn_fix6_3_scalar", "Gauss-Newton: Cholesky solver using CSparse (fixed blocksize, scalar ordering)", "CSparse", true, 6, 3)));
+    G2O_REGISTER_OPTIMIZATION_ALGORITHM(gn_fix7_3_scalar, new CSparseSolverCreator(OptimizationAlgorithmProperty("gn_fix7_3_scalar", "Gauss-Newton: Cholesky solver using CSparse (fixed blocksize, scalar ordering)", "CSparse", true, 7, 3)));
 
-  namespace solver_csparse {
-    void init()
-    {
-      static bool initialized = false;
-      if (initialized)
-        return;
-      OptimizationAlgorithmFactory* factory = OptimizationAlgorithmFactory::instance();
-      //      factory->registerSolver(new CSparseSolverCreator(OptimizationAlgorithmProperty("gn_var", "Gauss-Newton: Cholesky solver using CSparse (variable blocksize)", "CSparse", false, -1, -1)));
-      factory->registerSolver(new CSparseSolverCreator(OptimizationAlgorithmProperty("gn_fix3_2", "Gauss-Newton: Cholesky solver using CSparse (fixed blocksize)", "CSparse", true, 3, 2)));
-      factory->registerSolver(new CSparseSolverCreator(OptimizationAlgorithmProperty("gn_fix6_3", "Gauss-Newton: Cholesky solver using CSparse (fixed blocksize)", "CSparse", true, 6, 3)));
-      factory->registerSolver(new CSparseSolverCreator(OptimizationAlgorithmProperty("gn_fix7_3", "Gauss-Newton: Cholesky solver using CSparse (fixed blocksize)", "CSparse", true, 7, 3)));
-      factory->registerSolver(new CSparseSolverCreator(OptimizationAlgorithmProperty("gn_fix3_2_scalar", "Gauss-Newton: Cholesky solver using CSparse (fixed blocksize, scalar ordering)", "CSparse", true, 3, 2)));
-      factory->registerSolver(new CSparseSolverCreator(OptimizationAlgorithmProperty("gn_fix6_3_scalar", "Gauss-Newton: Cholesky solver using CSparse (fixed blocksize, scalar ordering)", "CSparse", true, 6, 3)));
-      factory->registerSolver(new CSparseSolverCreator(OptimizationAlgorithmProperty("gn_fix7_3_scalar", "Gauss-Newton: Cholesky solver using CSparse (fixed blocksize, scalar ordering)", "CSparse", true, 7, 3)));
-
-      factory->registerSolver(new CSparseSolverCreator(OptimizationAlgorithmProperty("lm_var", "Levenberg: Cholesky solver using CSparse (variable blocksize)", "CSparse", false, -1, -1)));
-      factory->registerSolver(new CSparseSolverCreator(OptimizationAlgorithmProperty("lm_fix3_2", "Levenberg: Cholesky solver using CSparse (fixed blocksize)", "CSparse", true, 3, 2)));
-      factory->registerSolver(new CSparseSolverCreator(OptimizationAlgorithmProperty("lm_fix6_3", "Levenberg: Cholesky solver using CSparse (fixed blocksize)", "CSparse", true, 6, 3)));
-      factory->registerSolver(new CSparseSolverCreator(OptimizationAlgorithmProperty("lm_fix7_3", "Levenberg: Cholesky solver using CSparse (fixed blocksize)", "CSparse", true, 7, 3)));
-      factory->registerSolver(new CSparseSolverCreator(OptimizationAlgorithmProperty("lm_fix3_2_scalar", "Levenberg: Cholesky solver using CSparse (fixed blocksize, scalar ordering)", "CSparse", true, 3, 2)));
-      factory->registerSolver(new CSparseSolverCreator(OptimizationAlgorithmProperty("lm_fix6_3_scalar", "Levenberg: Cholesky solver using CSparse (fixed blocksize, scalar ordering)", "CSparse", true, 6, 3)));
-      factory->registerSolver(new CSparseSolverCreator(OptimizationAlgorithmProperty("lm_fix7_3_scalar", "Levenberg: Cholesky solver using CSparse (fixed blocksize, scalar ordering)", "CSparse", true, 7, 3)));
-
-      initialized = true;
-    }
+    G2O_REGISTER_OPTIMIZATION_ALGORITHM(lm_var, new CSparseSolverCreator(OptimizationAlgorithmProperty("lm_var", "Levenberg: Cholesky solver using CSparse (variable blocksize)", "CSparse", false, Eigen::Dynamic, Eigen::Dynamic)));
+    G2O_REGISTER_OPTIMIZATION_ALGORITHM(lm_fix3_2, new CSparseSolverCreator(OptimizationAlgorithmProperty("lm_fix3_2", "Levenberg: Cholesky solver using CSparse (fixed blocksize)", "CSparse", true, 3, 2)));
+    G2O_REGISTER_OPTIMIZATION_ALGORITHM(lm_fix6_3, new CSparseSolverCreator(OptimizationAlgorithmProperty("lm_fix6_3", "Levenberg: Cholesky solver using CSparse (fixed blocksize)", "CSparse", true, 6, 3)));
+    G2O_REGISTER_OPTIMIZATION_ALGORITHM(lm_fix7_3, new CSparseSolverCreator(OptimizationAlgorithmProperty("lm_fix7_3", "Levenberg: Cholesky solver using CSparse (fixed blocksize)", "CSparse", true, 7, 3)));
+    G2O_REGISTER_OPTIMIZATION_ALGORITHM(lm_fix3_2_scalar, new CSparseSolverCreator(OptimizationAlgorithmProperty("lm_fix3_2_scalar", "Levenberg: Cholesky solver using CSparse (fixed blocksize, scalar ordering)", "CSparse", true, 3, 2)));
+    G2O_REGISTER_OPTIMIZATION_ALGORITHM(lm_fix6_3_scalar, new CSparseSolverCreator(OptimizationAlgorithmProperty("lm_fix6_3_scalar", "Levenberg: Cholesky solver using CSparse (fixed blocksize, scalar ordering)", "CSparse", true, 6, 3)));
+    G2O_REGISTER_OPTIMIZATION_ALGORITHM(lm_fix7_3_scalar,new CSparseSolverCreator(OptimizationAlgorithmProperty("lm_fix7_3_scalar", "Levenberg: Cholesky solver using CSparse (fixed blocksize, scalar ordering)", "CSparse", true, 7, 3)));
   }
-
-  G2O_ATTRIBUTE_CONSTRUCTOR(init_solver_csparse)
-  {
-    solver_csparse::init();
-  }
-
-} // end namespace
+}

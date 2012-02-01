@@ -56,12 +56,13 @@ using namespace std;
 
 namespace g2o {
 
+  G2O_USE_OPTIMIZATION_LIBRARY(cholmod);
+
 SparseOptimizerOnline::SparseOptimizerOnline(bool pcg) :
   SparseOptimizer(),
   slamDimension(3), newEdges(0), batchStep(true), vizWithGnuplot(false),
   _gnuplot(0), _usePcg(pcg), _underlyingSolver(0)
 {
-  solver_cholmod::init();
 }
 
 SparseOptimizerOnline::~SparseOptimizerOnline()

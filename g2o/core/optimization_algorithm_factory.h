@@ -141,7 +141,7 @@ namespace g2o {
 
 #define G2O_USE_OPTIMIZATION_LIBRARY(libraryname) \
     extern "C" void g2o_optimization_library_##libraryname(void); \
-    static g2o::ForceLinker g2o_force_optimization_algorithm_library_##classname(g2o_optimization_library_##libraryname);
+    static g2o::ForceLinker g2o_force_optimization_algorithm_library_##libraryname(g2o_optimization_library_##libraryname);
 
 #define G2O_REGISTER_OPTIMIZATION_ALGORITHM(optimizername, instance) \
     extern "C" void g2o_optimization_algorithm_##optimizername(void) {} \
