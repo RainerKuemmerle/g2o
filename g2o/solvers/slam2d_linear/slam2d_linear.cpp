@@ -75,21 +75,10 @@ namespace g2o {
       }
   };
 
-  G2O_ATTRIBUTE_CONSTRUCTOR(init_solver_csparse)
-  {
-    solver_slam2d_linear::init();
-  }
+  G2O_REGISTER_OPTIMIZATION_LIBRARY(slam2d_linear);
 
   namespace solver_slam2d_linear {
-    void init()
-    {
-      static bool initialized = false;
-      if (initialized)
-        return;
-      OptimizationAlgorithmFactory* factory = OptimizationAlgorithmFactory::instance();
-      factory->registerSolver(new SLAM2DLinearSolverCreator(OptimizationAlgorithmProperty("2dlinear", "Solve Orientation + Gauss-Newton: Works only on 2D pose graphs!!", "CSparse", false, 3, 3)));
-      initialized = 1;
-    }
+    G2O_REGISTER_OPTIMIZATION_ALGORITHM(2dlinear, new SLAM2DLinearSolverCreator(OptimizationAlgorithmProperty("2dlinear", "Solve Orientation + Gauss-Newton: Works only on 2D pose graphs!!", "CSparse", false, 3, 3)));
   }
 
 } // end namespace

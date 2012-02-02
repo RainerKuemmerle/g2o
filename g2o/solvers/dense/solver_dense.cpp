@@ -87,9 +87,10 @@ namespace g2o {
       }
   };
 
+  G2O_REGISTER_OPTIMIZATION_LIBRARY(dense);
+
   namespace solver_dense {
 
-  G2O_REGISTER_OPTIMIZATION_LIBRARY(dense);
   G2O_REGISTER_OPTIMIZATION_ALGORITHM(gn_dense, new DenseSolverCreator(OptimizationAlgorithmProperty("gn_dense", "Gauss-Newton: Dense solver (variable blocksize)", "Dense", false, Eigen::Dynamic, Eigen::Dynamic)));
     G2O_REGISTER_OPTIMIZATION_ALGORITHM(gn_dense3_2, new DenseSolverCreator(OptimizationAlgorithmProperty("gn_dense3_2", "Gauss-Newton: Dense solver (fixed blocksize)", "Dense", true, 3, 2)));
     G2O_REGISTER_OPTIMIZATION_ALGORITHM(gn_dense6_3, new DenseSolverCreator(OptimizationAlgorithmProperty("gn_dense6_3", "Gauss-Newton: Dense solver (fixed blocksize)", "Dense", true, 6, 3)));
