@@ -31,6 +31,7 @@
 using namespace std;
 
 namespace g2o {
+namespace csparse_extension {
 
   struct SparseMatrixEntry{
     SparseMatrixEntry(int r=-1, int c=-1, double x=0.) :
@@ -185,4 +186,5 @@ namespace g2o {
     return fout.good();
   }
 
+} // end namespace
 } // end namespace

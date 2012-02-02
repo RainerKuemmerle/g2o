@@ -22,19 +22,22 @@
 #endif
 #include <cs.h>
 
-#include "g2o_csparse_api.h"
+#include "g2o_csparse_extension_api.h"
 
 namespace g2o {
+
+  namespace csparse_extension {
 
 /**
  * write the sparse matrix to a file loadable with ocatve
  */
-G2O_SOLVER_CSPARSE_API bool writeCs2Octave(const char* filename, const cs* A, bool upperTriangular = true);
+G2O_CSPARSE_EXTENSION_API bool writeCs2Octave(const char* filename, const cs* A, bool upperTriangular = true);
 
 // our extensions to csparse
-G2O_SOLVER_CSPARSE_API csn* cs_chol_workspace (const cs *A, const css *S, int* cin, double* xin);
-G2O_SOLVER_CSPARSE_API int cs_cholsolsymb(const cs *A, double *b, const css* S, double* workspace, int* work);
+G2O_CSPARSE_EXTENSION_API csn* cs_chol_workspace (const cs *A, const css *S, int* cin, double* xin);
+G2O_CSPARSE_EXTENSION_API int cs_cholsolsymb(const cs *A, double *b, const css* S, double* workspace, int* work);
 
+} // end namespace
 } // end namespace
 
 #endif
