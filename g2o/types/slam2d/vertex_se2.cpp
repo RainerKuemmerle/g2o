@@ -79,12 +79,19 @@ namespace g2o {
   }
 
 #ifdef G2O_HAVE_OPENGL
-  VertexSE2DrawAction::VertexSE2DrawAction(): DrawAction(typeid(VertexSE2).name()){}
+  VertexSE2DrawAction::VertexSE2DrawAction(): DrawAction(typeid(VertexSE2).name()){
+    _drawActions = 0;
+  }
 
   HyperGraphElementAction* VertexSE2DrawAction::operator()(HyperGraph::HyperGraphElement* element, 
-                 HyperGraphElementAction::Parameters* /*params_*/){
+                 HyperGraphElementAction::Parameters* params_){
     if (typeid(*element).name()!=_typeName)
       return 0;
+
+    if (! _drawActions){
+      _drawActions = HyperGraphActionLibrary::instance()->actionByName("draw");
+    }
+
     VertexSE2* that = static_cast<VertexSE2*>(element);
     glColor3f(0.5,0.5,0.8);
     glPushAttrib(GL_ENABLE_BIT);
@@ -97,6 +104,8 @@ namespace g2o {
     glVertex3f(-0.1 ,-0.05, 0.);
     glVertex3f(-0.1 , 0.05, 0.);
     glEnd();
+    if (that->userData() && _drawActions )
+      (*_drawActions)(that->userData(), params_);
     glPopMatrix();
     glPopAttrib();
     return this;

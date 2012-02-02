@@ -29,6 +29,7 @@
 
 #include "raw_laser.h"
 #include "g2o_types_data_api.h"
+#include "g2o/core/hyper_graph_action.h"
 
 namespace g2o {
 
@@ -57,6 +58,20 @@ namespace g2o {
       //! velocities and safety distances of the robot.
       double _laserTv, _laserRv, _forwardSafetyDist, _sideSaftyDist, _turnAxis;
   };
+
+#ifdef G2O_HAVE_OPENGL
+  class G2O_TYPES_SLAM2D_API RobotLaserDrawAction: public DrawAction{
+  public:
+    RobotLaserDrawAction();
+    virtual HyperGraphElementAction* operator()(HyperGraph::HyperGraphElement* element, 
+            HyperGraphElementAction::Parameters* params_ );
+  protected:
+    virtual bool refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_);
+    IntProperty* _beamsDownsampling;
+    FloatProperty* _pointSize;
+
+  };
+#endif
 
 }
 

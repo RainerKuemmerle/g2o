@@ -45,6 +45,12 @@ namespace g2o {
       //cerr << "Calling " << __FILE__ << " " << __PRETTY_FUNCTION__ << endl;
 
       factory->registerType("ROBOTLASER1", new HyperGraphElementCreator<RobotLaser>);
+
+      HyperGraphActionLibrary* actionLib = HyperGraphActionLibrary::instance();
+#ifdef G2O_HAVE_OPENGL
+      actionLib->registerAction(new RobotLaserDrawAction);
+#endif
+
       types_data::initialized = 1;
     }
   }
