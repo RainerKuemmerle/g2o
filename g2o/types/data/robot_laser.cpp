@@ -158,7 +158,7 @@ namespace g2o {
     RawLaser::Point2DVector points=that->cartesian();
 
     glPushMatrix();
-    SE2 laserPose = that->laserParams().laserPose;
+    const SE2& laserPose = that->laserParams().laserPose;
     glTranslatef(laserPose.translation().x(), laserPose.translation().y(), 0);
     glRotatef(RAD2DEG(laserPose.rotation().angle()),0.,0.,1.);
     glBegin(GL_POINTS);
