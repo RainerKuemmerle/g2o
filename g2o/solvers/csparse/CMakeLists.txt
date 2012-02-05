@@ -7,9 +7,9 @@ ADD_LIBRARY(csparse_extension ${G2O_LIB_TYPE}
 SET_TARGET_PROPERTIES(csparse_extension PROPERTIES OUTPUT_NAME ${LIB_PREFIX}csparse_extension)
 
 IF(BUILD_CSPARSE)
-  TARGET_LINK_LIBRARIES(csparse_extension csparse)
+  TARGET_LINK_LIBRARIES(csparse_extension csparse stuff)
 ELSE()
-  TARGET_LINK_LIBRARIES(csparse_extension ${CSPARSE_LIBRARY})
+  TARGET_LINK_LIBRARIES(csparse_extension ${CSPARSE_LIBRARY} stuff)
 ENDIF()
 
 

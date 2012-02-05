@@ -46,8 +46,8 @@ namespace g2o {
 
       factory->registerType("ROBOTLASER1", new HyperGraphElementCreator<RobotLaser>);
 
-      HyperGraphActionLibrary* actionLib = HyperGraphActionLibrary::instance();
 #ifdef G2O_HAVE_OPENGL
+      HyperGraphActionLibrary* actionLib = HyperGraphActionLibrary::instance();
       actionLib->registerAction(new RobotLaserDrawAction);
 #endif
 
