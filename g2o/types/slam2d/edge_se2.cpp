@@ -133,9 +133,17 @@ namespace g2o {
   EdgeSE2DrawAction::EdgeSE2DrawAction(): DrawAction(typeid(EdgeSE2).name()){}
 
   HyperGraphElementAction* EdgeSE2DrawAction::operator()(HyperGraph::HyperGraphElement* element, 
-               HyperGraphElementAction::Parameters* /*params_*/){
+               HyperGraphElementAction::Parameters* params_){
     if (typeid(*element).name()!=_typeName)
       return 0;
+
+    refreshPropertyPtrs(params_);
+    if (! _previousParams)
+      return this;
+    
+    if (_show && !_show->value())
+      return this;
+
     EdgeSE2* e =  static_cast<EdgeSE2*>(element);
     VertexSE2* fromEdge = static_cast<VertexSE2*>(e->vertex(0));
     VertexSE2* toEdge   = static_cast<VertexSE2*>(e->vertex(1));

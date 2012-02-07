@@ -100,6 +100,9 @@ namespace g2o {
             HyperGraphElementAction::Parameters* params_ );
   protected:
     HyperGraphElementAction* _drawActions;
+    virtual bool refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_);
+    FloatProperty* _triangleX, *_triangleY;
+
   };
 #endif
 

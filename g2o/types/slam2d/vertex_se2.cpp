@@ -83,6 +83,20 @@ namespace g2o {
     _drawActions = 0;
   }
 
+  bool VertexSE2DrawAction::refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_){
+    if (!DrawAction::refreshPropertyPtrs(params_))
+      return false;
+    if (_previousParams){
+      _triangleX = _previousParams->makeProperty<FloatProperty>(_typeName + "::TRIANGLE_X", .2);
+      _triangleY = _previousParams->makeProperty<FloatProperty>(_typeName + "::TRIANGLE_Y", .05);
+    } else {
+      _triangleX = 0;
+      _triangleY = 0;
+    }
+    return true;
+  }
+
+
   HyperGraphElementAction* VertexSE2DrawAction::operator()(HyperGraph::HyperGraphElement* element, 
                  HyperGraphElementAction::Parameters* params_){
     if (typeid(*element).name()!=_typeName)
@@ -92,6 +106,14 @@ namespace g2o {
       _drawActions = HyperGraphActionLibrary::instance()->actionByName("draw");
     }
 
+    refreshPropertyPtrs(params_);
+    if (! _previousParams)
+      return this;
+
+    if (_show && !_show->value())
+      return this;
+    
+
     VertexSE2* that = static_cast<VertexSE2*>(element);
     glColor3f(0.5,0.5,0.8);
     glPushAttrib(GL_ENABLE_BIT);
@@ -99,10 +121,15 @@ namespace g2o {
     glPushMatrix();
     glTranslatef(that->estimate().translation().x(),that->estimate().translation().y(),0.);
     glRotatef(RAD2DEG(that->estimate().rotation().angle()),0.,0.,1.);
+    double tx=0.1, ty=0.05;
+    if (_triangleX && _triangleY){
+      tx=_triangleX->value();
+      ty=_triangleY->value();
+    }
     glBegin(GL_TRIANGLE_FAN);
-    glVertex3f( 0.1 ,0.  ,0.);
-    glVertex3f(-0.1 ,-0.05, 0.);
-    glVertex3f(-0.1 , 0.05, 0.);
+    glVertex3f( tx ,0.  ,0.);
+    glVertex3f(-tx ,-ty, 0.);
+    glVertex3f(-tx , ty, 0.);
     glEnd();
     if (that->userData() && _drawActions )
       (*_drawActions)(that->userData(), params_);
