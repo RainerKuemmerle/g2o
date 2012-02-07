@@ -58,12 +58,12 @@ static bool hasToStop=false;
 using namespace std;
 using namespace g2o;
 
-// sort according to max id, dimension, min id
+// sort according to max id, dimension
 struct IncrementalEdgesCompare {
   bool operator()(SparseOptimizer::Edge* const & e1, SparseOptimizer::Edge* const & e2)
   {
-    const SparseOptimizer::Vertex* to1 = static_cast<const SparseOptimizer::Vertex*>(e1->vertices()[0]);
-    const SparseOptimizer::Vertex* to2 = static_cast<const SparseOptimizer::Vertex*>(e2->vertices()[0]);
+    const SparseOptimizer::Vertex* to1 = static_cast<const SparseOptimizer::Vertex*>(e1->vertices()[1]);
+    const SparseOptimizer::Vertex* to2 = static_cast<const SparseOptimizer::Vertex*>(e2->vertices()[1]);
 
     int i11 = e1->vertices()[0]->id(), i12 = e1->vertices()[1]->id();
     if (i11 > i12){
@@ -77,10 +77,8 @@ struct IncrementalEdgesCompare {
       return true;
     if (i12 > i22)
       return false;
-    if (to1->dimension() != to2->dimension()) { // push the odometry to be the first
-      return to1->dimension() > to2->dimension();
-    }
-    return (i11<i21);
+    // push the odometry to be the first
+    return to1->dimension() > to2->dimension();
   }
 };
 
@@ -240,13 +238,13 @@ int main(int argc, char** argv)
       int id=gaugeList[i];
       OptimizableGraph::Vertex* v=optimizer.vertex(id);
       if (!v){
-  cerr << "fatal, not found the vertex of id " << id << " in the gaugeList. Aborting";
-  return -1;
+        cerr << "fatal, not found the vertex of id " << id << " in the gaugeList. Aborting";
+        return -1;
       } else {
-  if (i==0)
-    gauge = v;
-  cerr << v->id() << " ";
-  v->setFixed(1);
+        if (i==0)
+          gauge = v;
+        cerr << v->id() << " ";
+        v->setFixed(1);
       }
     }
     cerr << endl;
@@ -331,41 +329,27 @@ int main(int argc, char** argv)
 
     // sort the edges in a way that inserting them makes sense
     sort(edges.begin(), edges.end(), IncrementalEdgesCompare());
-
+    
     double cumTime = 0.;
     int vertexCount=0;
     int lastOptimizedVertexCount = 0;
     int lastVisUpdateVertexCount = 0;
-    bool addNextEdge=true;
     bool freshlyOptimized=false;
     bool firstRound = true;
     HyperGraph::VertexSet verticesAdded;
     HyperGraph::EdgeSet edgesAdded;
-    int maxInGraph = -1;
     for (vector<SparseOptimizer::Edge*>::iterator it = edges.begin(); it != edges.end(); ++it) {
       SparseOptimizer::Edge* e = *it;
-      bool optimize=false;
-
-      if (addNextEdge && !optimizer.vertices().empty()){
-        int idMax = max(e->vertices()[0]->id(), e->vertices()[1]->id());
-        if (maxInGraph < idMax && ! freshlyOptimized){
-          addNextEdge=false;
-          optimize=true;
-        } else {
-          addNextEdge=true;
-          optimize=false;
-        }
-      }
 
       int doInit = 0;
       SparseOptimizer::Vertex* v1 = optimizer.vertex(e->vertices()[0]->id());
       SparseOptimizer::Vertex* v2 = optimizer.vertex(e->vertices()[1]->id());
-      if (! v1 && addNextEdge) {
-        //cerr << " adding vertex " << it->id1 << endl;
-        SparseOptimizer::Vertex* v = dynamic_cast<SparseOptimizer::Vertex*>(e->vertices()[0]);
+
+      if (! v1) {
+        SparseOptimizer::Vertex* v = v1 = dynamic_cast<SparseOptimizer::Vertex*>(e->vertices()[0]);
         bool v1Added = optimizer.addVertex(v);
-        maxInGraph = max(maxInGraph, v->id());
-  //cerr << "adding" << v->id() << "(" << v->dimension() << ")" << endl;
+        //maxInGraph = max(maxInGraph, v->id());
+        //cerr << "adding" << v->id() << "(" << v->dimension() << ")" << endl;
         assert(v1Added);
         if (! v1Added)
           cerr << "Error adding vertex " << v->id() << endl;
@@ -376,12 +360,11 @@ int main(int argc, char** argv)
           vertexCount++;
       }
 
-      if (! v2 && addNextEdge) {
-        SparseOptimizer::Vertex* v = dynamic_cast<SparseOptimizer::Vertex*>(e->vertices()[1]);
-        //cerr << " adding vertex " << v->id() << endl;
+      if (! v2) {
+        SparseOptimizer::Vertex* v = v2 = dynamic_cast<SparseOptimizer::Vertex*>(e->vertices()[1]);
         bool v2Added = optimizer.addVertex(v);
-        maxInGraph = max(maxInGraph, v->id());
-  //cerr << "adding" << v->id() << "(" << v->dimension() << ")" << endl;
+        //maxInGraph = max(maxInGraph, v->id());
+        //cerr << "adding" << v->id() << "(" << v->dimension() << ")" << endl;
         assert(v2Added);
         if (! v2Added)
           cerr << "Error adding vertex " << v->id() << endl;
@@ -392,7 +375,11 @@ int main(int argc, char** argv)
           vertexCount++;
       }
 
-      if (addNextEdge){
+      //if (v1->id() > 444)
+        //return 0;
+
+      // adding the edge and initialization of the vertices
+      {
         //cerr << " adding edge " << e->vertices()[0]->id() <<  " " << e->vertices()[1]->id() << endl;
         if (! optimizer.addEdge(e)) {
           cerr << "Unable to add edge " << e->vertices()[0]->id() << " -> " << e->vertices()[1]->id() << endl;
@@ -412,7 +399,9 @@ int main(int argc, char** argv)
                   //cerr << "init: " 
                     //<< to->id() << "(" << to->dimension() << ") -> " 
                     //<< from->id() << "(" << from->dimension() << ") " << endl;
-                  e->initialEstimate(toSet, from);
+                   e->initialEstimate(toSet, from);
+                } else {
+                  assert(0 && "Added unitialized variable to the graph");
                 }
                 break;
               }
@@ -425,6 +414,8 @@ int main(int argc, char** argv)
                     //<< from->id() << "(" << from->dimension() << ") -> " 
                     //<< to->id() << "(" << to->dimension() << ") " << endl;
                   e->initialEstimate(fromSet, to);  
+                } else {
+                  assert(0 && "Added unitialized variable to the graph");
                 }
                 break;
               }
@@ -436,7 +427,7 @@ int main(int argc, char** argv)
       }
 
       freshlyOptimized=false;
-      if (optimize){
+      {
         //cerr << "Optimize" << endl;
         if (vertexCount - lastOptimizedVertexCount >= updateGraphEachN) {
           if (firstRound) {
@@ -464,22 +455,21 @@ int main(int argc, char** argv)
               << "\t time= " << dts << "\t iterations= " << currentIt <<  "\t cumTime= " << cumTime << endl;
           }
           lastOptimizedVertexCount = vertexCount;
+          freshlyOptimized = true;
+
+          if (guiOut) {
+            if (vertexCount - lastVisUpdateVertexCount >= updateDisplayEveryN) {
+              dumpEdges(cout, optimizer);
+              lastVisUpdateVertexCount = vertexCount;
+            }
+          }
+
         }
 
         if (! verbose)
           cerr << ".";
-        addNextEdge=true;
-        freshlyOptimized=true;
-        it--;
       }
-
-      if (guiOut) {
-        if (vertexCount - lastVisUpdateVertexCount >= updateDisplayEveryN && freshlyOptimized) {
-          dumpEdges(cout, optimizer);
-          lastVisUpdateVertexCount = vertexCount;
-        }
-      }
-
+      
     } // for all edges
 
     if (! freshlyOptimized) {
@@ -557,7 +547,10 @@ int main(int argc, char** argv)
 
   // saving again
   if (gnudump.size() > 0) {
-    return saveGnuplot(gnudump, optimizer);
+    bool gnuPlotStatus = saveGnuplot(gnudump, optimizer);
+    if (! gnuPlotStatus) {
+      cerr << "Error while writing gnuplot files" << endl;
+    }
   }
 
   if (outputfilename.size() > 0) {
