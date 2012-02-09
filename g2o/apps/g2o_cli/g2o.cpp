@@ -351,7 +351,6 @@ int main(int argc, char** argv)
       if (! v1) {
         SparseOptimizer::Vertex* v = v1 = dynamic_cast<SparseOptimizer::Vertex*>(e->vertices()[0]);
         bool v1Added = optimizer.addVertex(v);
-        //maxInGraph = max(maxInGraph, v->id());
         //cerr << "adding" << v->id() << "(" << v->dimension() << ")" << endl;
         assert(v1Added);
         if (! v1Added)
@@ -366,7 +365,6 @@ int main(int argc, char** argv)
       if (! v2) {
         SparseOptimizer::Vertex* v = v2 = dynamic_cast<SparseOptimizer::Vertex*>(e->vertices()[1]);
         bool v2Added = optimizer.addVertex(v);
-        //maxInGraph = max(maxInGraph, v->id());
         //cerr << "adding" << v->id() << "(" << v->dimension() << ")" << endl;
         assert(v2Added);
         if (! v2Added)
@@ -377,9 +375,6 @@ int main(int argc, char** argv)
         if (v->dimension() == maxDim)
           vertexCount++;
       }
-
-      //if (v1->id() > 444)
-        //return 0;
 
       // adding the edge and initialization of the vertices
       {

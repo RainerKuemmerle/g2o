@@ -78,6 +78,7 @@ namespace g2o {
     public:
       typedef std::map<std::string, BaseProperty*>        BaseClass;
       typedef BaseClass::iterator                         PropertyMapIterator;
+      typedef BaseClass::const_iterator                   PropertyMapConstIterator;
 
       ~PropertyMap();
 
@@ -138,7 +139,7 @@ namespace g2o {
        */
       bool updateMapFromString(const std::string& values);
 
-      void writeToCSV(std::ostream& os);
+      void writeToCSV(std::ostream& os) const;
 
       using BaseClass::size;
       using BaseClass::begin;
