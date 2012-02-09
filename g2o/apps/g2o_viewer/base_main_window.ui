@@ -167,6 +167,13 @@
          </property>
         </spacer>
        </item>
+       <item>
+        <widget class="QPushButton" name="btnSaveSnapshot">
+         <property name="text">
+          <string>Save Snapshot</string>
+         </property>
+        </widget>
+       </item>
       </layout>
      </widget>
     </item>
@@ -210,7 +217,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>23</height>
+     <height>25</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">

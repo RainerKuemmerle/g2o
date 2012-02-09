@@ -66,6 +66,7 @@ class MainWindow : public QMainWindow, public Ui::BaseMainWindow
     void on_btnInitialGuess_clicked();
     void on_btnForceStop_clicked();
     void on_btnOptimizerParamaters_clicked();
+    void on_btnSaveSnapshot_clicked();
 
   protected:
     void fixGraph();

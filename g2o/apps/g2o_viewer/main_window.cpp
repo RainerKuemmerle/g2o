@@ -43,6 +43,7 @@ MainWindow::MainWindow(QWidget * parent, Qt::WindowFlags flags) :
   plainTextEdit->setMaximumBlockCount(1000);
   btnForceStop->hide();
   QObject::connect(cbDrawAxis, SIGNAL(toggled(bool)), viewer, SLOT(setAxisIsDrawn(bool)));
+  QObject::connect(btnSaveSnapshot, SIGNAL(pressed()), this, SLOT(on_btnSaveSnapshot_clicked()));
 }
 
 MainWindow::~MainWindow()
@@ -115,6 +116,18 @@ void MainWindow::on_btnInitialGuess_clicked()
   viewer->graph->computeInitialGuess();
   viewer->setUpdateDisplay(true);
   viewer->updateGL();
+}
+
+void MainWindow::on_btnSaveSnapshot_clicked()
+{
+  QString filename = QFileDialog::getSaveFileName(this, "Save eps file", "", "eps files (*.eps)");
+  if (! filename.isNull()) {
+    viewer->setSnapshotFormat("EPS");
+    viewer->saveSnapshot(filename);
+    viewer->updateGL();
+    viewer->setSnapshotFormat("JPG");
+    cerr << "saved snapshot";
+  }
 }
 
 void MainWindow::fixGraph()
