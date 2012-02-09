@@ -61,12 +61,14 @@ class MainWindow : public QMainWindow, public Ui::BaseMainWindow
     void on_actionWhite_Background_triggered(bool);
     void on_actionDefault_Background_triggered(bool);
     void on_actionProperties_triggered(bool);
+    void on_actionSave_Screenshot_triggered(bool);
+    void on_actionLoad_Viewer_State_triggered(bool);
+    void on_actionSave_Viewer_State_triggered(bool);
 
     void on_btnOptimize_clicked();
     void on_btnInitialGuess_clicked();
     void on_btnForceStop_clicked();
     void on_btnOptimizerParamaters_clicked();
-    void on_btnSaveSnapshot_clicked();
 
   protected:
     void fixGraph();
