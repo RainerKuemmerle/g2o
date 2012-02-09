@@ -138,6 +138,8 @@ namespace g2o {
        */
       bool updateMapFromString(const std::string& values);
 
+      void writeToCSV(std::ostream& os);
+
       using BaseClass::size;
       using BaseClass::begin;
       using BaseClass::end;

@@ -327,6 +327,7 @@ namespace g2o{
       return -1;
     }
 
+    OptimizationAlgorithm::SolverResult result = OptimizationAlgorithm::OK;
     for (int i=0; i<iterations && ! terminate() && ok; i++){
       preIteration(i);
 
@@ -339,8 +340,8 @@ namespace g2o{
       }
 
       double ts =  get_time();
-
-      ok = _algorithm->solve(i, online) == OptimizationAlgorithm::OK;
+      result = _algorithm->solve(i, online);
+      ok = ( result == OptimizationAlgorithm::OK );
 
       bool errorComputed = false;
       if (cstat) {
@@ -366,8 +367,9 @@ namespace g2o{
       ++cjIterations; 
       postIteration(i);
     }
-    if (! ok)
+    if (result == OptimizationAlgorithm::Fail) {
       return 0;
+    }
     return cjIterations;
   }
 

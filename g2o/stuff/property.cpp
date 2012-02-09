@@ -71,6 +71,19 @@ namespace g2o {
     return true;
   }
 
+  void PropertyMap::writeToCSV(std::ostream& os) {
+    for (PropertyMapIterator it=begin(); it!=end(); it++){
+      BaseProperty* p =it->second;
+      os << p->name() << ", ";
+    }
+    os << std::endl;
+    for (PropertyMapIterator it=begin(); it!=end(); it++){
+      BaseProperty* p =it->second;
+      os << p->toString() << ", ";
+    }
+    os << std::endl;
+  }
+
   bool PropertyMap::updateMapFromString(const std::string& values)
   {
     bool status = true;
