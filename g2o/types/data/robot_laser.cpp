@@ -28,6 +28,19 @@
 
 #include "g2o/stuff/macros.h"
 
+#ifdef WINDOWS
+#include <windows.h>
+#endif
+
+#ifdef G2O_HAVE_OPENGL
+#ifdef __APPLE__
+#include <OpenGL/gl.h>
+#else
+#include <GL/gl.h>
+#endif
+#endif
+
+
 #include <iomanip>
 using namespace std;
 
@@ -110,5 +123,59 @@ namespace g2o {
   {
     _odomPose = odomPose;
   }
+
+
+
+
+#ifdef G2O_HAVE_OPENGL
+  RobotLaserDrawAction::RobotLaserDrawAction(): DrawAction(typeid(RobotLaser).name()){
+  }
+
+  bool RobotLaserDrawAction::refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_){
+    if (!DrawAction::refreshPropertyPtrs(params_))
+      return false;
+    if (_previousParams){
+      _beamsDownsampling = _previousParams->makeProperty<IntProperty>(_typeName + "::BEAMS_DOWNSAMPLING", 1);
+      _pointSize = _previousParams->makeProperty<FloatProperty>(_typeName + "::POINT_SIZE", .05);
+    } else {
+      _beamsDownsampling = 0;
+      _pointSize= 0;
+    }
+    return true;
+  }
+
+  HyperGraphElementAction* RobotLaserDrawAction::operator()(HyperGraph::HyperGraphElement* element, 
+                 HyperGraphElementAction::Parameters* params_){
+    if (typeid(*element).name()!=_typeName)
+      return 0;
+
+    refreshPropertyPtrs(params_);
+    if (! _previousParams){
+      return this;
+    }
+    RobotLaser* that = static_cast<RobotLaser*>(element);
+
+    RawLaser::Point2DVector points=that->cartesian();
+
+    glPushMatrix();
+    const SE2& laserPose = that->laserParams().laserPose;
+    glTranslatef(laserPose.translation().x(), laserPose.translation().y(), 0);
+    glRotatef(RAD2DEG(laserPose.rotation().angle()),0.,0.,1.);
+    glBegin(GL_POINTS);
+    glColor4f(1.,0.,0.,0.5);
+    int step = 1;
+    if (_beamsDownsampling )
+      step = _beamsDownsampling->value();
+    if (_pointSize) {
+      glPointSize(_pointSize->value());
+    }
+    for (size_t i=0; i<points.size(); i+=step){
+      glVertex3f(points[i].x(), points[i].y(), 0);
+    }
+    glEnd();
+    glPopMatrix();
+    return this;
+  }
+#endif
 
 }

@@ -220,7 +220,7 @@ namespace g2o {
       return false;
     OptimizableGraph::Vertex* ov=dynamic_cast<OptimizableGraph::Vertex*>(v);
     assert(ov && "Vertex does not inherit from OptimizableGraph::Vertex");
-    if (ov->_graph != 0) {
+    if (ov->_graph != 0 && ov->_graph != this) {
       cerr << __FUNCTION__ << ": FATAL, vertex " << v->id() << " already registered with graph " << ov->_graph << endl;
       return false;
     }

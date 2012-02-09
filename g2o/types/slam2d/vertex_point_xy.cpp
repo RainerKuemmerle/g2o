@@ -82,13 +82,36 @@ namespace g2o {
 #ifdef G2O_HAVE_OPENGL
   VertexPointXYDrawAction::VertexPointXYDrawAction(): DrawAction(typeid(VertexPointXY).name()){}
 
+  bool VertexPointXYDrawAction::refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_){
+    if (! DrawAction::refreshPropertyPtrs(params_))
+      return false;
+    if (_previousParams){
+      _pointSize = _previousParams->makeProperty<FloatProperty>(_typeName + "::POINT_SIZE", 1.);
+    } else {
+      _pointSize = 0;
+    }
+    return true;
+  }
+
   HyperGraphElementAction* VertexPointXYDrawAction::operator()(HyperGraph::HyperGraphElement* element, 
-                     HyperGraphElementAction::Parameters* /*params_*/ ){
+                     HyperGraphElementAction::Parameters* params_ ){
 
     if (typeid(*element).name()!=_typeName)
       return 0;
+
+    refreshPropertyPtrs(params_);
+    if (! _previousParams)
+      return this;
+
+    if (_show && !_show->value())
+      return this;
+    
+
     VertexPointXY* that = static_cast<VertexPointXY*>(element);
     glColor3f(0.8,0.5,0.3);
+    if (_pointSize) {
+      glPointSize(_pointSize->value());
+    }
     glBegin(GL_POINTS);
     glVertex3f(that->estimate().x(),that->estimate().y(),0.);
     glEnd();

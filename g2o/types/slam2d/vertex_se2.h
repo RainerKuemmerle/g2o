@@ -98,6 +98,11 @@ namespace g2o {
     VertexSE2DrawAction();
     virtual HyperGraphElementAction* operator()(HyperGraph::HyperGraphElement* element, 
             HyperGraphElementAction::Parameters* params_ );
+  protected:
+    HyperGraphElementAction* _drawActions;
+    virtual bool refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_);
+    FloatProperty* _triangleX, *_triangleY;
+
   };
 #endif
 

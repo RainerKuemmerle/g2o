@@ -53,7 +53,7 @@ namespace g2o {
   }
 
   bool VertexPointXYZ::write(std::ostream& os) const {
-    Vector3d lv=estimate();
+    const Vector3d& lv = estimate();
     for (int i=0; i<3; i++){
       os << lv[i] << " ";
     }
