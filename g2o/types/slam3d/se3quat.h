@@ -267,14 +267,14 @@ namespace g2o {
         return res;
       }
 
-      Matrix<double,4,4> to_homogenious_matrix() const
+      Matrix<double,4,4> to_homogeneous_matrix() const
       {
-        Matrix<double,4,4> homogenious_matrix;
-        homogenious_matrix.setIdentity();
-        homogenious_matrix.block(0,0,3,3) = _r.toRotationMatrix();
-        homogenious_matrix.col(3).head(3) = translation();
+        Matrix<double,4,4> homogeneous_matrix;
+        homogeneous_matrix.setIdentity();
+        homogeneous_matrix.block(0,0,3,3) = _r.toRotationMatrix();
+        homogeneous_matrix.col(3).head(3) = translation();
 
-        return homogenious_matrix;
+        return homogeneous_matrix;
       }
 
       void normalizeRotation(){
@@ -287,7 +287,7 @@ namespace g2o {
 
   inline std::ostream& operator <<(std::ostream& out_str, const SE3Quat& se3)
   {
-    out_str << se3.to_homogenious_matrix()  << std::endl;
+    out_str << se3.to_homogeneous_matrix()  << std::endl;
     return out_str;
   }
 

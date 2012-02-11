@@ -155,6 +155,7 @@ template<typename Scalar, int Options> void quaternion(void)
   // test bug 369 - improper alignment.
   Quaternionx *q = new Quaternionx;
   delete q;
+<<<<<<< HEAD
 
   q1 = AngleAxisx(a, v0.normalized());
   q2 = AngleAxisx(b, v1.normalized());

@@ -31,30 +31,13 @@
 
 namespace g2o {
 
-  namespace types_six_dof_expmap {
-    int initialized = 0;
+  G2O_REGISTER_TYPE_GROUP(expmap);
 
-    void init()
-    {
-      if (types_six_dof_expmap::initialized)
-        return;
-      //cerr << "Calling " << __FILE__ << " " << __PRETTY_FUNCTION__ << endl;
-      Factory* factory = Factory::instance();
-      factory->registerType("VERTEX_SE3:EXPMAP", new HyperGraphElementCreator<VertexSE3Expmap>);
-
-      factory->registerType("EDGE_SE3:EXPMAP", new HyperGraphElementCreator<EdgeSE3Expmap>);
-      factory->registerType("EDGE_PROJECT_XYZ2UV:EXPMAP", new HyperGraphElementCreator<EdgeProjectXYZ2UV>);
-      factory->registerType("EDGE_PROJECT_XYZ2UVQ:EXPMAP", new HyperGraphElementCreator<EdgeProjectXYZ2UVQ>);
-      factory->registerType("EDGE_PROJECT_XYZ2UVU:EXPMAP", new HyperGraphElementCreator<EdgeProjectXYZ2UVU>);
-
-      types_six_dof_expmap::initialized = 1;
-    }
-  }
-
-  G2O_ATTRIBUTE_CONSTRUCTOR(init_six_dof_types)
-  {
-    types_six_dof_expmap::init();
-  }
+  G2O_REGISTER_TYPE(VERTEX_SE3:EXPMAP, VertexSE3Expmap);
+  G2O_REGISTER_TYPE(EDGE_SE3:EXPMAP, EdgeSE3Expmap);
+  G2O_REGISTER_TYPE(EDGE_PROJECT_XYZ2UV:EXPMAP, EdgeProjectXYZ2UV);
+  G2O_REGISTER_TYPE(EDGE_PROJECT_XYZ2UVQ:EXPMAP, EdgeProjectXYZ2UVQ);
+  G2O_REGISTER_TYPE(EDGE_PROJECT_XYZ2UVU:EXPMAP, EdgeProjectXYZ2UVU);
 
   VertexSE3Expmap::VertexSE3Expmap() : BaseVertex<6, SE3Quat>()
   {

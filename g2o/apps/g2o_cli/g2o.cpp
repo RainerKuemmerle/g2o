@@ -611,9 +611,9 @@ int main(int argc, char** argv)
   }
 
   // destroy all the singletons
-  Factory::destroy();
-  OptimizationAlgorithmFactory::destroy();
-  HyperGraphActionLibrary::destroy();
+  //Factory::destroy();
+  //OptimizationAlgorithmFactory::destroy();
+  //HyperGraphActionLibrary::destroy();
 
   return 0;
 }

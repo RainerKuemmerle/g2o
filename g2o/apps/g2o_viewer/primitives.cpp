@@ -18,9 +18,13 @@
 
 #include "primitives.h"
 
-#include "qglviewer.h"
+#include <qglviewer.h>
 #include <cstdlib>
 #include <cmath>
+
+#ifdef __APPLE__
+#include <OpenGL/glu.h>
+#endif
 
 namespace g2o {
 

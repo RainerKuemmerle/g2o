@@ -27,6 +27,9 @@
 #include "draw_helpers.h"
 
 #include <cmath>
+#ifdef __APPLE__
+#include <OpenGL/glu.h>
+#endif
 
 namespace g2o {
 

@@ -32,6 +32,9 @@
 
 namespace g2o {
 
+  G2O_REGISTER_TYPE_GROUP(icp);
+  G2O_REGISTER_TYPE(EDGE_V_V_GICP, Edge_V_V_GICP);
+
   namespace types_icp {
     int initialized = 0;
 
@@ -40,8 +43,6 @@ namespace g2o {
       if (types_icp::initialized)
         return;
       //cerr << "Calling " << __FILE__ << " " << __PRETTY_FUNCTION__ << endl;
-      Factory* factory = Factory::instance();
-      factory->registerType("EDGE_V_V_GICP", new HyperGraphElementCreator<Edge_V_V_GICP>);
 
       Edge_V_V_GICP::dRidx << 0.0,0.0,0.0,
         0.0,0.0,2.0,

@@ -49,6 +49,8 @@ namespace g2o
        * name of the class to be created. Has to implemented in derived class.
        */
       virtual const std::string& name() const = 0;
+
+      virtual ~AbstractHyperGraphElementCreator() { }
   };
 
   /**
@@ -63,7 +65,7 @@ namespace g2o
       __attribute__((force_align_arg_pointer))
 #endif
       HyperGraph::HyperGraphElement* construct() { return new T;}
-      const std::string& name() const { return _name;}
+      virtual const std::string& name() const { return _name;}
     protected:
       std::string _name;
   };

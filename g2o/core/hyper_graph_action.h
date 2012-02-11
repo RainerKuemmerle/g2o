@@ -34,6 +34,7 @@
 #include <iosfwd>
 #include <set>
 #include <string>
+#include <iostream>
 
 #include "g2o_core_api.h"
 
@@ -117,8 +118,9 @@ namespace g2o {
       virtual HyperGraphElementAction* operator()(const HyperGraph::HyperGraphElement* element, Parameters* parameters);
       ActionMap& actionMap() {return _actionMap;}
       //! inserts an action in the pool. The action should have the same name of the container.
-      //! returns falseon failure (the container has a different name than the action);
+      //! returns false on failure (the container has a different name than the action);
       bool registerAction(HyperGraphElementAction* action);
+      bool unregisterAction(HyperGraphElementAction* action);
     protected:
       ActionMap _actionMap;
   };
@@ -140,6 +142,8 @@ namespace g2o {
       HyperGraphElementAction* actionByName(const std::string& name);
       // registers a basic action in the pool. If necessary a container is created
       bool registerAction(HyperGraphElementAction* action);
+      bool unregisterAction(HyperGraphElementAction* action);
+      
       inline HyperGraphElementAction::ActionMap& actionMap() {return _actionMap;}
     protected:
       HyperGraphActionLibrary();
@@ -182,7 +186,35 @@ namespace g2o {
     BoolProperty* _show;
     BoolProperty* _showId;
   };
-  
+
+  template<typename T> class RegisterActionProxy
+    {
+      public:
+      RegisterActionProxy()
+          {
+#ifndef NDEBUG
+            std::cout << __FUNCTION__ << ": Registering action of type " << typeid(T).name() << std::endl;
+#endif
+            _action = new T();
+            HyperGraphActionLibrary::instance()->registerAction(_action);
+          }
+      
+        ~RegisterActionProxy()
+          {
+#ifndef NDEBUG
+            std::cout << __FUNCTION__ << ": Unregistering action of type " << typeid(T).name() << std::endl;
+#endif
+            HyperGraphActionLibrary::instance()->unregisterAction(_action);
+            delete _action;
+          }
+
+    private:
+        HyperGraphElementAction* _action;
+  };
+
+#define G2O_REGISTER_ACTION(classname) \
+    extern "C" void g2o_action_##classname(void) {} \
+    static g2o::RegisterActionProxy<classname> g_action_proxy_##classname;
 };
 
 #endif

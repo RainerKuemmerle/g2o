@@ -30,7 +30,7 @@ namespace g2o {
 
   
   SensorPointXYBearing::SensorPointXYBearing(const std::string& name_): BinarySensor<Robot2D, EdgeSE2PointXYBearing, WorldObjectPointXY>(name_) {
-    _information(0,0)=1000;
+    _information(0,0)=180.0 / M_PI;
   }
 
   void SensorPointXYBearing::addNoise(EdgeType* e){

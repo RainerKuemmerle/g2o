@@ -34,30 +34,12 @@
 
 namespace g2o {
 
-  namespace types_data {
-    int initialized = 0;
+  G2O_REGISTER_TYPE_GROUP(data);
 
-    void init()
-    {
-      if (types_data::initialized)
-        return;
-      Factory* factory = Factory::instance();
-      //cerr << "Calling " << __FILE__ << " " << __PRETTY_FUNCTION__ << endl;
+  G2O_REGISTER_TYPE(ROBOTLASER1, RobotLaser);
 
-      factory->registerType("ROBOTLASER1", new HyperGraphElementCreator<RobotLaser>);
-
-#ifdef G2O_HAVE_OPENGL
-      HyperGraphActionLibrary* actionLib = HyperGraphActionLibrary::instance();
-      actionLib->registerAction(new RobotLaserDrawAction);
+#ifdef G2O_HAVE_OPENGL 
+  G2O_REGISTER_ACTION(RobotLaserDrawAction);
 #endif
-
-      types_data::initialized = 1;
-    }
-  }
-
-  G2O_ATTRIBUTE_CONSTRUCTOR(init_types_data)
-  {
-    types_data::init();
-  }
 
 } // end namespace

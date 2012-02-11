@@ -31,29 +31,14 @@
 
 namespace g2o {
 
-  namespace types_seven_dof_expmap {
-    int initialized = 0;
+  G2O_USE_TYPE_GROUP(sba);
+  
+  G2O_REGISTER_TYPE_GROUP(sim3);
 
-    void init()
-    {
-      if (types_seven_dof_expmap::initialized)
-        return;
-      //cerr << "Calling " << __FILE__ << " " << __PRETTY_FUNCTION__ << endl;
-      Factory* factory = Factory::instance();
-      factory->registerType("VERTEX_SIM3:EXPMAP", new HyperGraphElementCreator<VertexSim3Expmap>);
-
-      factory->registerType("EDGE_SIM3:EXPMAP", new HyperGraphElementCreator<EdgeSim3>);
-      factory->registerType("EDGE_PROJECT_SIM3_XYZ:EXPMAP", new HyperGraphElementCreator<EdgeSim3ProjectXYZ>);
-
-      types_seven_dof_expmap::initialized = 1;
-    }
-  }
-
-  G2O_ATTRIBUTE_CONSTRUCTOR(init_seven_dof_types)
-  {
-    types_seven_dof_expmap::init();
-  }
-
+    G2O_REGISTER_TYPE(VERTEX_SIM3:EXPMAP, VertexSim3Expmap);
+    G2O_REGISTER_TYPE(EDGE_SIM3:EXPMAP, EdgeSim3);
+    G2O_REGISTER_TYPE(EDGE_PROJECT_SIM3_XYZ:EXPMAP, EdgeSim3ProjectXYZ);
+  
   VertexSim3Expmap::VertexSim3Expmap() : BaseVertex<7, Sim3>()
   {
     _marginalized=false;

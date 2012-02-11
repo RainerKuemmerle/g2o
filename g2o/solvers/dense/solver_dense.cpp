@@ -87,28 +87,18 @@ namespace g2o {
       }
   };
 
-  G2O_ATTRIBUTE_CONSTRUCTOR(init_solver_csparse)
-  {
-    solver_dense::init();
-  }
+  G2O_REGISTER_OPTIMIZATION_LIBRARY(dense);
 
   namespace solver_dense {
-    void init()
-    {
-      static bool initialized;
-      if (initialized)
-        return;
-      OptimizationAlgorithmFactory* factory = OptimizationAlgorithmFactory::instance();
-      factory->registerSolver(new DenseSolverCreator(OptimizationAlgorithmProperty("gn_dense", "Gauss-Newton: Dense solver (variable blocksize)", "Dense", false, -1, -1)));
-      factory->registerSolver(new DenseSolverCreator(OptimizationAlgorithmProperty("gn_dense3_2", "Gauss-Newton: Dense solver (fixed blocksize)", "Dense", true, 3, 2)));
-      factory->registerSolver(new DenseSolverCreator(OptimizationAlgorithmProperty("gn_dense6_3", "Gauss-Newton: Dense solver (fixed blocksize)", "Dense", true, 6, 3)));
-      factory->registerSolver(new DenseSolverCreator(OptimizationAlgorithmProperty("gn_dense7_3", "Gauss-Newton: Dense solver (fixed blocksize)", "Dense", true, 7, 3)));
-      factory->registerSolver(new DenseSolverCreator(OptimizationAlgorithmProperty("lm_dense", "Levenberg: Dense solver (variable blocksize)", "Dense", false, -1, -1)));
-      factory->registerSolver(new DenseSolverCreator(OptimizationAlgorithmProperty("lm_dense3_2", "Levenberg: Dense solver (fixed blocksize)", "Dense", true, 3, 2)));
-      factory->registerSolver(new DenseSolverCreator(OptimizationAlgorithmProperty("lm_dense6_3", "Levenberg: Dense solver (fixed blocksize)", "Dense", true, 6, 3)));
-      factory->registerSolver(new DenseSolverCreator(OptimizationAlgorithmProperty("lm_dense7_3", "Levenberg: Dense solver (fixed blocksize)", "Dense", true, 7, 3)));
-      initialized = true;
-    }
+
+  G2O_REGISTER_OPTIMIZATION_ALGORITHM(gn_dense, new DenseSolverCreator(OptimizationAlgorithmProperty("gn_dense", "Gauss-Newton: Dense solver (variable blocksize)", "Dense", false, Eigen::Dynamic, Eigen::Dynamic)));
+    G2O_REGISTER_OPTIMIZATION_ALGORITHM(gn_dense3_2, new DenseSolverCreator(OptimizationAlgorithmProperty("gn_dense3_2", "Gauss-Newton: Dense solver (fixed blocksize)", "Dense", true, 3, 2)));
+    G2O_REGISTER_OPTIMIZATION_ALGORITHM(gn_dense6_3, new DenseSolverCreator(OptimizationAlgorithmProperty("gn_dense6_3", "Gauss-Newton: Dense solver (fixed blocksize)", "Dense", true, 6, 3)));
+    G2O_REGISTER_OPTIMIZATION_ALGORITHM(gn_dense7_3, new DenseSolverCreator(OptimizationAlgorithmProperty("gn_dense7_3", "Gauss-Newton: Dense solver (fixed blocksize)", "Dense", true, 7, 3)));
+    G2O_REGISTER_OPTIMIZATION_ALGORITHM(lm_dense, new DenseSolverCreator(OptimizationAlgorithmProperty("lm_dense", "Levenberg: Dense solver (variable blocksize)", "Dense", false, -1, -1)));
+    G2O_REGISTER_OPTIMIZATION_ALGORITHM(lm_dense3_2, new DenseSolverCreator(OptimizationAlgorithmProperty("lm_dense3_2", "Levenberg: Dense solver (fixed blocksize)", "Dense", true, 3, 2)));
+    G2O_REGISTER_OPTIMIZATION_ALGORITHM(lm_dense6_3, new DenseSolverCreator(OptimizationAlgorithmProperty("lm_dense6_3", "Levenberg: Dense solver (fixed blocksize)", "Dense", true, 6, 3)));
+    G2O_REGISTER_OPTIMIZATION_ALGORITHM(lm_dense7_3, new DenseSolverCreator(OptimizationAlgorithmProperty("lm_dense7_3", "Levenberg: Dense solver (fixed blocksize)", "Dense", true, 7, 3)));
   }
 
 } // end namespace

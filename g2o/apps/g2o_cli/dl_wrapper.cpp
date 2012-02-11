@@ -58,7 +58,7 @@ DlWrapper::DlWrapper()
 
 DlWrapper::~DlWrapper()
 {
-  clear();
+  //clear();
 }
 
 int DlWrapper::openLibraries(const std::string& directory, const std::string& pattern)

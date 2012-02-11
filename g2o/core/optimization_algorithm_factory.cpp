@@ -71,6 +71,16 @@ namespace g2o {
     _creator.push_back(c);
   }
 
+  void OptimizationAlgorithmFactory::unregisterSolver(AbstractOptimizationAlgorithmCreator* c)
+  {
+    const string& name = c->property().name;
+    CreatorList::iterator foundIt = findSolver(name);
+    if (foundIt != _creator.end()) {
+      delete *foundIt;
+      _creator.erase(foundIt);
+    }
+  }
+
   OptimizationAlgorithm* OptimizationAlgorithmFactory::construct(const std::string& name, OptimizationAlgorithmProperty& solverProperty) const
   {
     CreatorList::const_iterator foundIt = findSolver(name);

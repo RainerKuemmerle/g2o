@@ -30,6 +30,8 @@
 #include "optimization_algorithm_property.h"
 
 #include <list>
+#include <iostream>
+#include <typeinfo>
 
 #include "g2o_core_api.h"
 
@@ -81,6 +83,11 @@ namespace g2o {
       void registerSolver(AbstractOptimizationAlgorithmCreator* c);
 
       /**
+       * unregister a specific creator for allocating a solver
+       */
+      void unregisterSolver(AbstractOptimizationAlgorithmCreator* c);
+      
+      /**
        * construct a solver based on its name, e.g., var, fix3_2_cholmod
        */
       OptimizationAlgorithm* construct(const std::string& tag, OptimizationAlgorithmProperty& solverProperty) const;
@@ -104,6 +111,44 @@ namespace g2o {
       static OptimizationAlgorithmFactory* factoryInstance;
   };
 
+  class RegisterOptimizationAlgorithmProxy
+    {
+      public:
+      RegisterOptimizationAlgorithmProxy(AbstractOptimizationAlgorithmCreator* c)
+          {
+            _creator = c;
+#ifndef NDEBUG
+            std::cout << __FUNCTION__ << ": Registering " << _creator->property().name << " of type " << typeid(*_creator).name() << std::endl;
+#endif
+            OptimizationAlgorithmFactory::instance()->registerSolver(c);
+          }
+      
+        ~RegisterOptimizationAlgorithmProxy()
+          {
+#ifndef NDEBUG
+            std::cout << __FUNCTION__ << ": Unregistering " << _creator->property().name << std::endl;
+#endif
+            OptimizationAlgorithmFactory::instance()->unregisterSolver(_creator);
+          }
+    private:
+        AbstractOptimizationAlgorithmCreator* _creator;
+  };
+
 }
+
+#define G2O_REGISTER_OPTIMIZATION_LIBRARY(libraryname) \
+    extern "C" void g2o_optimization_library_##libraryname(void) {}
+
+#define G2O_USE_OPTIMIZATION_LIBRARY(libraryname) \
+    extern "C" void g2o_optimization_library_##libraryname(void); \
+    static g2o::ForceLinker g2o_force_optimization_algorithm_library_##libraryname(g2o_optimization_library_##libraryname);
+
+#define G2O_REGISTER_OPTIMIZATION_ALGORITHM(optimizername, instance) \
+    extern "C" void g2o_optimization_algorithm_##optimizername(void) {} \
+    static g2o::RegisterOptimizationAlgorithmProxy g_optimization_algorithm_proxy_##optimizername(instance);
+
+#define G2O_USE_OPTIMIZATION_ALGORITHM(optimizername) \
+    extern "C" void g2o_optimization_algorithm_##optimizername(void); \
+    static g2o::ForceLinker g2o_force_optimization_algorithm_link_##optimizername(g2o_optimization_algorithm_##optimizername);
 
 #endif

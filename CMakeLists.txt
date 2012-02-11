@@ -1,17 +1,5 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 
-# We need to build with GCC 4.5 (or later). The default system Xcode
-# version is too old. Therefore, this manually sets the values for the
-# MacPort version of 4.6 instead. However, note that some other
-# libraries (e.g., PCL) can't use the MacPort version of the
-# compiler. The reason is that the MacPort versions don't understand
-# Apple specific options and, in particular, -no-cpp-precomp.
-IF(APPLE)
-  SET(CMAKE_C_COMPILER gcc-mp-4.6)
-  SET(CMAKE_CXX_COMPILER g++-mp-4.6)
-  SET(CMAKE_Fortran_COMPILER gfortran-mp-4.6)
-ENDIF(APPLE)
-
 PROJECT(g2o)
 
 # The library prefix
@@ -152,12 +140,6 @@ IF(CMAKE_COMPILER_IS_GNUCXX)
   # Generic settings for optimisation
   SET(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -msse4") 
   SET(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -O3 -msse4") 
-
-IF(APPLE)
-  SET(CMAKE_C_COMPILER gcc-mp-4.6)
-  SET(CMAKE_CXX_COMPILER g++-mp-4.6)
-  SET(CMAKE_Fortran_COMPILER gfortran-mp-4.6)
-ENDIF(APPLE)
 
   # OS X
   #IF(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
