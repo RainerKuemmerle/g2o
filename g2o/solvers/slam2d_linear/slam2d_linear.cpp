@@ -24,7 +24,6 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "slam2d_linear.h"
 #include "solver_slam2d_linear.h"
 
 #include "g2o/solvers/csparse/linear_solver_csparse.h"
@@ -77,8 +76,6 @@ namespace g2o {
 
   G2O_REGISTER_OPTIMIZATION_LIBRARY(slam2d_linear);
 
-  namespace solver_slam2d_linear {
-    G2O_REGISTER_OPTIMIZATION_ALGORITHM(2dlinear, new SLAM2DLinearSolverCreator(OptimizationAlgorithmProperty("2dlinear", "Solve Orientation + Gauss-Newton: Works only on 2D pose graphs!!", "CSparse", false, 3, 3)));
-  }
+  G2O_REGISTER_OPTIMIZATION_ALGORITHM(2dlinear, new SLAM2DLinearSolverCreator(OptimizationAlgorithmProperty("2dlinear", "Solve Orientation + Gauss-Newton: Works only on 2D pose graphs!!", "CSparse", false, 3, 3)));
 
 } // end namespace

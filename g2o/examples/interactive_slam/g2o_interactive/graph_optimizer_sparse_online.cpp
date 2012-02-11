@@ -35,7 +35,6 @@
 #include "g2o/core/optimization_algorithm_gauss_newton.h"
 
 #include "g2o/solvers/pcg/linear_solver_pcg.h"
-#include "g2o/solvers/cholmod/solver_cholmod.h"
 #include "g2o/solvers/cholmod/linear_solver_cholmod.h"
 
 
@@ -56,6 +55,7 @@ using namespace std;
 
 namespace g2o {
 
+  // force linking to the cholmod solver
   G2O_USE_OPTIMIZATION_LIBRARY(cholmod);
 
 SparseOptimizerOnline::SparseOptimizerOnline(bool pcg) :
