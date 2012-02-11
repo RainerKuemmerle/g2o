@@ -210,7 +210,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>23</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -219,6 +219,11 @@
     </property>
     <addaction name="actionLoad"/>
     <addaction name="actionSave"/>
+    <addaction name="separator"/>
+    <addaction name="actionSave_Screenshot"/>
+    <addaction name="separator"/>
+    <addaction name="actionLoad_Viewer_State"/>
+    <addaction name="actionSave_Viewer_State"/>
     <addaction name="separator"/>
     <addaction name="actionQuit"/>
    </widget>
@@ -273,6 +278,21 @@
   <action name="actionProperties">
    <property name="text">
     <string>Draw Options</string>
+   </property>
+  </action>
+  <action name="actionSave_Screenshot">
+   <property name="text">
+    <string>Save Screenshot</string>
+   </property>
+  </action>
+  <action name="actionSave_Viewer_State">
+   <property name="text">
+    <string>Save Viewer State</string>
+   </property>
+  </action>
+  <action name="actionLoad_Viewer_State">
+   <property name="text">
+    <string>Load Viewer State</string>
    </property>
   </action>
  </widget>

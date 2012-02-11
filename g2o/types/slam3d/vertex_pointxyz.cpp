@@ -82,6 +82,7 @@ namespace g2o {
 
     if (typeid(*element).name()!=_typeName)
       return 0;
+
     refreshPropertyPtrs(params);
     if (! _previousParams)
       return this;

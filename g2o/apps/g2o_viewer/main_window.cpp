@@ -31,6 +31,7 @@
 
 #include <fstream>
 #include <iostream>
+#include <cassert>
 using namespace std;
 using namespace g2o;
 
@@ -343,4 +344,50 @@ void MainWindow::on_btnOptimizerParamaters_clicked()
     _optimizerPropertiesWidget->setProperties(0);
   }
   _optimizerPropertiesWidget->show();
+}
+
+void MainWindow::on_actionSave_Screenshot_triggered(bool)
+{
+  QString selectedFilter;
+  QString filename = QFileDialog::getSaveFileName(this, "Save screen to a file", "viewer.png",
+      "PNG files (*.png);;JPG files (*.jpg);;EPS files (*.eps)", &selectedFilter);
+
+  if (! filename.isNull()) {
+    // extract the file format from the filter options
+    int spacePos = selectedFilter.indexOf(' ');
+    assert(spacePos > 0 && "extracting the image format failed");
+    QString format = selectedFilter.left(spacePos);
+    // setting up the snapshot and save to file
+    if (format == "JPG") {
+      viewer->setSnapshotQuality(90);
+    } else {
+      viewer->setSnapshotQuality(-1);
+    }
+    viewer->setSnapshotFormat(format);
+    viewer->saveSnapshot(filename);
+    cerr << "saved snapshot " << filename.toStdString() << "(" << format.toStdString() << ")" << endl;
+  }
+}
+
+void MainWindow::on_actionLoad_Viewer_State_triggered(bool)
+{
+  QString filename = QFileDialog::getOpenFileName(this, "Load State", "camera.xml", "Camera/State file (*.xml)");
+  if (!filename.isEmpty()) {
+    viewer->setStateFileName(filename);
+    viewer->restoreStateFromFile();
+    viewer->setStateFileName(QString::null);
+    viewer->updateGL();
+    cerr << "Loaded state from " << filename.toStdString() << endl;
+  }
+}
+
+void MainWindow::on_actionSave_Viewer_State_triggered(bool)
+{
+  QString filename = QFileDialog::getSaveFileName(this, "Save State", "camera.xml", "Camera/State file (*.xml)");
+  if (!filename.isEmpty()) {
+    viewer->setStateFileName(filename);
+    viewer->saveStateToFile();
+    viewer->setStateFileName(QString::null);
+    cerr << "Saved state to " << filename.toStdString() << endl;
+  }
 }

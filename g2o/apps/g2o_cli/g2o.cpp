@@ -118,6 +118,7 @@ int main(int argc, char** argv)
   //double lambdaInit;
   int updateGraphEachN = 10;
   string statsFile;
+  string summaryFile;
   string dummy;
   // command line parsing
   std::vector<int> gaugeList;
@@ -145,6 +146,7 @@ int main(int argc, char** argv)
   arg.param("listSolvers", listSolvers, false, "list the available solvers");
   arg.param("renameTypes", loadLookup, "", "create a lookup for loading types into other types,\n\t TAG_IN_FILE=INTERNAL_TAG_FOR_TYPE,TAG2=INTERNAL2\n\t e.g., VERTEX_CAM=VERTEX_SE3:EXPMAP");
   arg.param("gaugeList", gaugeList, std::vector<int>(), "set the list of gauges separated by commas without spaces \n  e.g: 1,2,3,4,5 ");
+  arg.param("summary", summaryFile, "", "append a summary of this optimization run to the summary file passed as argument");
   arg.paramLeftOver("graph-input", inputFilename, "", "graph file which will be processed", true);
   
 
@@ -229,6 +231,7 @@ int main(int argc, char** argv)
   //optimizer.setMethod(str2method(strMethod));
   //optimizer.setUserLambdaInit(lambdaInit);
 
+ 
   // check for vertices to fix to remove DoF
   bool gaugeFreedom = optimizer.gaugeFreedom();
   OptimizableGraph::Vertex* gauge=0;
@@ -348,7 +351,6 @@ int main(int argc, char** argv)
       if (! v1) {
         SparseOptimizer::Vertex* v = v1 = dynamic_cast<SparseOptimizer::Vertex*>(e->vertices()[0]);
         bool v1Added = optimizer.addVertex(v);
-        //maxInGraph = max(maxInGraph, v->id());
         //cerr << "adding" << v->id() << "(" << v->dimension() << ")" << endl;
         assert(v1Added);
         if (! v1Added)
@@ -363,7 +365,6 @@ int main(int argc, char** argv)
       if (! v2) {
         SparseOptimizer::Vertex* v = v2 = dynamic_cast<SparseOptimizer::Vertex*>(e->vertices()[1]);
         bool v2Added = optimizer.addVertex(v);
-        //maxInGraph = max(maxInGraph, v->id());
         //cerr << "adding" << v->id() << "(" << v->dimension() << ")" << endl;
         assert(v2Added);
         if (! v2Added)
@@ -374,9 +375,6 @@ int main(int argc, char** argv)
         if (v->dimension() == maxDim)
           vertexCount++;
       }
-
-      //if (v1->id() > 444)
-        //return 0;
 
       // adding the edge and initialization of the vertices
       {
@@ -496,13 +494,17 @@ int main(int argc, char** argv)
     }
     optimizer.initializeOptimization();
     optimizer.computeActiveErrors();
-    cerr << "Initial chi2 = " << FIXED(optimizer.chi2()) << endl;
+    double loadChi = optimizer.chi2();
+    cerr << "Initial chi2 = " << FIXED(loadChi) << endl;
 
-    if (initialGuess)
+    if (initialGuess) {
       optimizer.computeInitialGuess();
+    }
+    double initChi = optimizer.chi2();
+
     signal(SIGINT, sigquit_handler);
-    int i=optimizer.optimize(maxIterations);
-    if (maxIterations > 0 && !i){
+    int result=optimizer.optimize(maxIterations);
+    if (maxIterations > 0 && result==OptimizationAlgorithm::Fail){
       cerr << "Cholesky failed, result might be invalid" << endl;
     } else if (computeMarginals){
       std::vector<std::pair<int, int> > blockIndices;
@@ -533,6 +535,50 @@ int main(int argc, char** argv)
         }
       }
     }
+    
+    optimizer.computeActiveErrors();
+    double finalChi=optimizer.chi2();
+
+    if  (summaryFile!="") {
+      PropertyMap summary;
+      summary.makeProperty<StringProperty>("filename", inputFilename);
+      summary.makeProperty<IntProperty>("n_vertices", optimizer.vertices().size());
+      summary.makeProperty<IntProperty>("n_edges", optimizer.edges().size());
+      
+      int nLandmarks=0;
+      int nPoses=0;
+      int maxDim = *vertexDimensions.rbegin();
+      for (HyperGraph::VertexIDMap::iterator it=optimizer.vertices().begin(); it!=optimizer.vertices().end(); it++){
+	OptimizableGraph::Vertex* v=static_cast<OptimizableGraph::Vertex*>(it->second);
+	if (v->dimension() != maxDim) {
+	  nLandmarks++;
+	} else
+	  nPoses++;
+      }
+      set<string> edgeTypes;
+      for (HyperGraph::EdgeSet::iterator it=optimizer.edges().begin(); it!=optimizer.edges().end(); it++){
+	edgeTypes.insert(Factory::instance()->tag(*it));
+      }
+      stringstream edgeTypesString;
+      for (std::set<string>::iterator it=edgeTypes.begin(); it!=edgeTypes.end(); it++){
+	edgeTypesString << *it << " ";
+      }
+
+      summary.makeProperty<IntProperty>("n_poses", nPoses);
+      summary.makeProperty<IntProperty>("n_landmarks", nLandmarks);
+      summary.makeProperty<StringProperty>("edge_types", edgeTypesString.str());
+      summary.makeProperty<DoubleProperty>("load_chi", loadChi);
+      summary.makeProperty<StringProperty>("solver", strSolver);
+      summary.makeProperty<BoolProperty>("robustKernel", robustKernel);
+      summary.makeProperty<DoubleProperty>("init_chi", initChi);
+      summary.makeProperty<DoubleProperty>("final_chi", finalChi);
+      summary.makeProperty<IntProperty>("maxIterations", maxIterations);
+      summary.makeProperty<IntProperty>("realIterations", result);
+      ofstream os;
+      os.open(summaryFile.c_str(), ios::app);
+      summary.writeToCSV(os);
+    }
+    
 
     if (statsFile!=""){
       cerr << "writing stats to file \"" << statsFile << "\" ... ";
