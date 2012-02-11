@@ -38,4 +38,8 @@ namespace g2o {
 
   G2O_REGISTER_TYPE(ROBOTLASER1, RobotLaser);
 
+#ifdef G2O_HAVE_OPENGL 
+  G2O_REGISTER_ACTION(RobotLaserDrawAction);
+#endif
+
 } // end namespace
