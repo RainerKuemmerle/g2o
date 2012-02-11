@@ -30,10 +30,4 @@
 #include "edge_se2_sensor_calib.h"
 #include "edge_se2_odom_differential_calib.h"
 
-namespace g2o {
-  namespace types_sclam {
-    void init();
-  }
-}
-
 #endif
