@@ -27,6 +27,7 @@
 #ifndef G2O_FACTORY_H
 #define G2O_FACTORY_H
 
+#include "g2o/stuff/misc.h"
 #include "hyper_graph.h"
 #include "creators.h"
 
@@ -122,24 +123,25 @@ namespace g2o {
       static Factory* factoryInstance;
   };
 
-  template<typename T> class RegisterTypeProxy
-    {
-      public:
+  template<typename T>
+  class RegisterTypeProxy
+  {
+    public:
       RegisterTypeProxy(const std::string& name) : _name(name)
-          {
+      {
 #ifndef NDEBUG
-            std::cout << __FUNCTION__ << ": Registering " << _name << " of type " << typeid(T).name() << std::endl;
+        std::cout << __FUNCTION__ << ": Registering " << _name << " of type " << typeid(T).name() << std::endl;
 #endif
-            Factory::instance()->registerType(_name, new HyperGraphElementCreator<T>());
-          }
-      
-        ~RegisterTypeProxy()
-          {
+        Factory::instance()->registerType(_name, new HyperGraphElementCreator<T>());
+      }
+
+      ~RegisterTypeProxy()
+      {
 #ifndef NDEBUG
-            std::cout << __FUNCTION__ << ": Unregistering " << _name << " of type " << typeid(T).name() << std::endl;
+        std::cout << __FUNCTION__ << ": Unregistering " << _name << " of type " << typeid(T).name() << std::endl;
 #endif
-            Factory::instance()->unregisterType(_name);
-          }
+        Factory::instance()->unregisterType(_name);
+      }
 
     private:
       std::string _name;
