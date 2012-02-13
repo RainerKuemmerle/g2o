@@ -58,6 +58,8 @@ namespace g2o {
 
     protected:
       Solver* _solver;
+      Property<bool>* _writeDebug;
+
   };
 
 }// end namespace

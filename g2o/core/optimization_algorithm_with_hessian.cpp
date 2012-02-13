@@ -39,6 +39,8 @@ namespace g2o {
     OptimizationAlgorithm(),
     _solver(solver)
   {
+    _writeDebug = _properties.makeProperty<Property<bool> >("maxTrialsAfterFailurewriteDebug", 10);
+
   }
 
   OptimizationAlgorithmWithHessian::~OptimizationAlgorithmWithHessian()
@@ -50,6 +52,7 @@ namespace g2o {
   {
     assert(_optimizer && "_optimizer not set");
     assert(_solver && "Solver not set");
+    _solver->setWriteDebug(_writeDebug->value());
     bool useSchur=false;
     for (OptimizableGraph::VertexContainer::const_iterator it=_optimizer->activeVertices().begin(); it!=_optimizer->activeVertices().end(); ++it) {
       OptimizableGraph::Vertex* v= *it;
