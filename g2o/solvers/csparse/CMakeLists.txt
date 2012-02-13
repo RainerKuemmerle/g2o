@@ -14,7 +14,7 @@ ENDIF()
 
 
 ADD_LIBRARY(solver_csparse ${G2O_LIB_TYPE}
-  solver_csparse.cpp solver_csparse.h
+  solver_csparse.cpp
   linear_solver_csparse.h
   g2o_csparse_api.h
 )
