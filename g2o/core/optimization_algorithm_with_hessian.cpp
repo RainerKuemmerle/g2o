@@ -39,8 +39,7 @@ namespace g2o {
     OptimizationAlgorithm(),
     _solver(solver)
   {
-    _writeDebug = _properties.makeProperty<Property<bool> >("maxTrialsAfterFailurewriteDebug", 10);
-
+    _writeDebug = _properties.makeProperty<Property<bool> >("writeDebug", true);
   }
 
   OptimizationAlgorithmWithHessian::~OptimizationAlgorithmWithHessian()
