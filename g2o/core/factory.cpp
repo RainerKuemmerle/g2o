@@ -37,7 +37,7 @@
 #include <cassert>
 
 // define to get some verbose output
-#define DEBUG_FACTORY
+//#define DEBUG_FACTORY
 
 using namespace std;
 

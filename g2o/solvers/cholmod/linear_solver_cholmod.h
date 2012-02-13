@@ -247,8 +247,8 @@ class LinearSolverCholmod : public LinearSolver<MatrixType>
     void setBlockOrdering(bool blockOrdering) { _blockOrdering = blockOrdering;}
 
     //! write a debug dump of the system matrix if it is not SPD in solve
-    bool writeDebug() const { return _writeDebug;}
-    void setWriteDebug(bool b) { _writeDebug = b;}
+    virtual bool writeDebug() const { return _writeDebug;}
+    virtual void setWriteDebug(bool b) { _writeDebug = b;}
 
   protected:
     // temp used for cholesky with cholmod

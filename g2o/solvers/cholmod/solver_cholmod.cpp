@@ -24,7 +24,6 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "solver_cholmod.h"
 #include "linear_solver_cholmod.h"
 
 #include "g2o/core/block_solver.h"
@@ -103,8 +102,6 @@ namespace g2o {
 
   G2O_REGISTER_OPTIMIZATION_LIBRARY(cholmod);
 
-  namespace solver_cholmod {
-    
   G2O_REGISTER_OPTIMIZATION_ALGORITHM(gn_var_cholmod, new CholmodSolverCreator(OptimizationAlgorithmProperty("gn_var_cholmod", "Gauss-Newton: Cholesky solver using CHOLMOD (variable blocksize)", "CHOLMOD", false, Eigen::Dynamic, Eigen::Dynamic)));
   G2O_REGISTER_OPTIMIZATION_ALGORITHM(gn_fix3_2_cholmod, new CholmodSolverCreator(OptimizationAlgorithmProperty("gn_fix3_2_cholmod", "Gauss-Newton: Cholesky solver using CHOLMOD (fixed blocksize)", "CHOLMOD", true, 3, 2)));
   G2O_REGISTER_OPTIMIZATION_ALGORITHM(gn_fix6_3_cholmod, new CholmodSolverCreator(OptimizationAlgorithmProperty("gn_fix6_3_cholmod", "Gauss-Newton: Cholesky solver using CHOLMOD (fixed blocksize)", "CHOLMOD", true, 6, 3)));
@@ -119,5 +116,4 @@ namespace g2o {
   G2O_REGISTER_OPTIMIZATION_ALGORITHM(lm_fix3_2_cholmod_scalar, new CholmodSolverCreator(OptimizationAlgorithmProperty("lm_fix3_2_cholmod_scalar", "Levenberg: Cholesky solver using CHOLMOD (fixed blocksize, scalar ordering)", "CHOLMOD", true, 3, 2)));
   G2O_REGISTER_OPTIMIZATION_ALGORITHM(lm_fix6_3_cholmod_scalar, new CholmodSolverCreator(OptimizationAlgorithmProperty("lm_fix6_3_cholmod_scalar", "Levenberg: Cholesky solver using CHOLMOD (fixed blocksize, scalar ordering)", "CHOLMOD", true, 6, 3)));
   G2O_REGISTER_OPTIMIZATION_ALGORITHM(lm_fix7_3_cholmod_scalar, new CholmodSolverCreator(OptimizationAlgorithmProperty("lm_fix7_3_cholmod_scalar", "Levenberg: Cholesky solver using CHOLMOD (fixed blocksize, scalar ordering)", "CHOLMOD", true, 7, 3)));
-  }
 }

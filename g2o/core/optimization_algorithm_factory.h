@@ -27,6 +27,7 @@
 #ifndef G2O_OPTMIZATION_ALGORITHM_PROPERTY_H
 #define G2O_OPTMIZATION_ALGORITHM_PROPERTY_H
 
+#include "g2o/stuff/misc.h"
 #include "optimization_algorithm_property.h"
 
 #include <list>
@@ -112,26 +113,26 @@ namespace g2o {
   };
 
   class RegisterOptimizationAlgorithmProxy
-    {
-      public:
+  {
+    public:
       RegisterOptimizationAlgorithmProxy(AbstractOptimizationAlgorithmCreator* c)
-          {
-            _creator = c;
+      {
+        _creator = c;
 #ifndef NDEBUG
-            std::cout << __FUNCTION__ << ": Registering " << _creator->property().name << " of type " << typeid(*_creator).name() << std::endl;
+        std::cout << __FUNCTION__ << ": Registering " << _creator->property().name << " of type " << typeid(*_creator).name() << std::endl;
 #endif
-            OptimizationAlgorithmFactory::instance()->registerSolver(c);
-          }
-      
-        ~RegisterOptimizationAlgorithmProxy()
-          {
+        OptimizationAlgorithmFactory::instance()->registerSolver(c);
+      }
+
+      ~RegisterOptimizationAlgorithmProxy()
+      {
 #ifndef NDEBUG
-            std::cout << __FUNCTION__ << ": Unregistering " << _creator->property().name << std::endl;
+        std::cout << __FUNCTION__ << ": Unregistering " << _creator->property().name << std::endl;
 #endif
-            OptimizationAlgorithmFactory::instance()->unregisterSolver(_creator);
-          }
+        OptimizationAlgorithmFactory::instance()->unregisterSolver(_creator);
+      }
     private:
-        AbstractOptimizationAlgorithmCreator* _creator;
+      AbstractOptimizationAlgorithmCreator* _creator;
   };
 
 }

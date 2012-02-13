@@ -28,9 +28,3 @@
 #define G2O_TYPES_DATA_H
 
 #include "robot_laser.h"
-
-namespace g2o {
-  namespace types_data {
-    void init();
-  }
-}

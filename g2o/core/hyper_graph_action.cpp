@@ -126,14 +126,12 @@ namespace g2o {
 
   bool HyperGraphElementActionCollection::unregisterAction(HyperGraphElementAction* action)
   {
-    for (HyperGraphElementAction::ActionMap::iterator it=_actionMap.begin(); it != _actionMap.end(); ++it)
-      {
-        if (it->second == action)
-          {
-            _actionMap.erase(it);
-            return true;
-          }
+    for (HyperGraphElementAction::ActionMap::iterator it=_actionMap.begin(); it != _actionMap.end(); ++it) {
+      if (it->second == action){
+        _actionMap.erase(it);
+        return true;
       }
+    }
     return false;
   }
   
@@ -191,30 +189,24 @@ namespace g2o {
   
   bool HyperGraphActionLibrary::unregisterAction(HyperGraphElementAction* action)
   {
-    
     list<HyperGraphElementActionCollection*> collectionDeleteList;
 
     // Search all the collections and delete the registered actions; if a collection becomes empty, schedule it for deletion; note that we can't delete the collections as we go because this will screw up the state of the iterators
-    for (HyperGraphElementAction::ActionMap::iterator it=_actionMap.begin(); it != _actionMap.end(); ++it)
-      {
-        HyperGraphElementActionCollection* collection = dynamic_cast<HyperGraphElementActionCollection*> (it->second);
-        if (collection != 0)
-          {
-            collection->unregisterAction(action);
-            if (collection->actionMap().size() == 0)
-              {
-                collectionDeleteList.push_back(collection);
-              }
-          }
+    for (HyperGraphElementAction::ActionMap::iterator it=_actionMap.begin(); it != _actionMap.end(); ++it) {
+      HyperGraphElementActionCollection* collection = dynamic_cast<HyperGraphElementActionCollection*> (it->second);
+      if (collection != 0) {
+        collection->unregisterAction(action);
+        if (collection->actionMap().size() == 0) {
+          collectionDeleteList.push_back(collection);
+        }
       }
+    }
 
     // Delete any empty action collections
-    for (list<HyperGraphElementActionCollection*>::iterator itc = collectionDeleteList.begin();
-         itc != collectionDeleteList.end(); ++itc)
-      {
-        cout << "Deleting collection " << (*itc)->name() << endl;
-        _actionMap.erase((*itc)->name());
-      }
+    for (list<HyperGraphElementActionCollection*>::iterator itc = collectionDeleteList.begin(); itc != collectionDeleteList.end(); ++itc) {
+      //cout << "Deleting collection " << (*itc)->name() << endl;
+      _actionMap.erase((*itc)->name());
+    }
 
     return true;
   }

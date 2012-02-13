@@ -116,6 +116,9 @@ namespace g2o {
       size_t additionalVectorSpace() const { return _additionalVectorSpace;}
       void setAdditionalVectorSpace(size_t s);
 
+      virtual void setWriteDebug(bool){};
+      virtual bool writeDebug(){return false;}
+
     protected:
       SparseOptimizer* _optimizer;
       double* _x;

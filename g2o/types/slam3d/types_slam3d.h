@@ -47,10 +47,4 @@
 #include "edge_se3_pointxyz_depth.h"
 #include "edge_se3_prior.h"
 
-namespace g2o {
-  namespace types_slam3d {
-    G2O_TYPES_SLAM3D_API void init();
-  }
-}
-
 #endif
