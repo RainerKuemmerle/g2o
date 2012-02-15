@@ -35,8 +35,6 @@
 namespace g2o {
   using namespace Eigen;
 
-  typedef Matrix<double,4,1> Vector4d;
-
   inline G2O_TYPES_SLAM3D_API Matrix3d skew(const Vector3d&v);
   inline G2O_TYPES_SLAM3D_API Vector3d deltaR(const Matrix3d& R);
   inline G2O_TYPES_SLAM3D_API Vector2d project(const Vector3d&);
