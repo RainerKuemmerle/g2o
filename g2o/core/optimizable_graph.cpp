@@ -154,25 +154,23 @@ namespace g2o {
 
 
   bool OptimizableGraph::Edge::resolveParameters() {
-    if (!graph())
-      {
-        cerr << __PRETTY_FUNCTION__ << ": edge not registered with a graph" << endl;
-        return false;
-      }
+    if (!graph()) {
+      cerr << __PRETTY_FUNCTION__ << ": edge not registered with a graph" << endl;
+      return false;
+    }
     
     assert (_parameters.size() == _parameterIds.size());
-    cerr << __PRETTY_FUNCTION__ << ": encountered " << _parameters.size() << " parameters" << endl;
+    //cerr << __PRETTY_FUNCTION__ << ": encountered " << _parameters.size() << " parameters" << endl;
     for (size_t i=0; i<_parameters.size(); i++){
       int index = _parameterIds[i];
       *_parameters[i] = graph()->parameter(index);
       if (typeid(**_parameters[i]).name()!=_parameterTypes[i]){
         cerr << __PRETTY_FUNCTION__ << ": FATAL, parameter type mismatch - encountered " << typeid(**_parameters[i]).name() << "; should be " << _parameterTypes[i] << endl;
       }
-      if (!*_parameters[i])
-        {
-          cerr << __PRETTY_FUNCTION__ << ": FATAL, *_parameters[i] == 0" << endl;
-          return false;
-        }
+      if (!*_parameters[i]) {
+        cerr << __PRETTY_FUNCTION__ << ": FATAL, *_parameters[i] == 0" << endl;
+        return false;
+      }
     }
     return true;
   }
