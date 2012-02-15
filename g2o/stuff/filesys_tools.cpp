@@ -48,8 +48,12 @@
 #include <wordexp.h>
 #endif
 
-using namespace ::std;
+#ifdef __APPLE__
+//#include <chrono>
+//#include <thread>
+#endif
 
+using namespace ::std;
 
 namespace g2o {
 
@@ -139,7 +143,9 @@ std::vector<std::string> getFilesByPattern(const char* pattern)
   // return anything; therefore, run it several times until we do find
   // something - or give up
 #ifdef __APPLE__
-  for (int k = 0; (k < 5) && (p.we_wordc == 0); k++) {
+  for (int k = 0; (k < 100) && (p.we_wordc == 0); k++) {
+    //chrono::milliseconds duration(20);
+    //this_thread::sleep_for(duration);
     wordexp(pattern, &p, WRDE_APPEND);
   }
 #endif
