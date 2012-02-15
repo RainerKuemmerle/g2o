@@ -155,16 +155,24 @@ namespace g2o {
 
   bool OptimizableGraph::Edge::resolveParameters() {
     if (!graph())
-      return false;
+      {
+        cerr << __PRETTY_FUNCTION__ << ": edge not registered with a graph" << endl;
+        return false;
+      }
+    
     assert (_parameters.size() == _parameterIds.size());
+    cerr << __PRETTY_FUNCTION__ << ": encountered " << _parameters.size() << " parameters" << endl;
     for (size_t i=0; i<_parameters.size(); i++){
       int index = _parameterIds[i];
       *_parameters[i] = graph()->parameter(index);
       if (typeid(**_parameters[i]).name()!=_parameterTypes[i]){
-        cerr << __FUNCTION__ << ": FATAL, parameter type mismatch " << typeid(**_parameters[i]).name() << " " << _parameterTypes[i] << endl;
+        cerr << __PRETTY_FUNCTION__ << ": FATAL, parameter type mismatch - encountered " << typeid(**_parameters[i]).name() << "; should be " << _parameterTypes[i] << endl;
       }
       if (!*_parameters[i])
-        return false;
+        {
+          cerr << __PRETTY_FUNCTION__ << ": FATAL, *_parameters[i] == 0" << endl;
+          return false;
+        }
     }
     return true;
   }
@@ -217,11 +225,14 @@ namespace g2o {
   {
     Vertex* inserted = vertex(v->id());
     if (inserted)
-      return false;
+      {
+        cerr << __FUNCTION__ << ": FATAL, a vertex with ID " << v->id() << " has already been registered with this graph" << endl;
+        return false;
+      }
     OptimizableGraph::Vertex* ov=dynamic_cast<OptimizableGraph::Vertex*>(v);
     assert(ov && "Vertex does not inherit from OptimizableGraph::Vertex");
     if (ov->_graph != 0 && ov->_graph != this) {
-      cerr << __FUNCTION__ << ": FATAL, vertex " << v->id() << " already registered with graph " << ov->_graph << endl;
+      cerr << __FUNCTION__ << ": FATAL, vertex with ID " << v->id() << " has already registered with another graph " << ov->_graph << endl;
       return false;
     }
     if (userData)
