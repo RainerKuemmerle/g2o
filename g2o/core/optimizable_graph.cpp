@@ -210,7 +210,7 @@ namespace g2o {
 
   OptimizableGraph::OptimizableGraph()
   {
-    _upperGraph=0; _lowerGraph=0; _nextEdgeId = 0; _edge_has_id = false;
+    _nextEdgeId = 0; _edge_has_id = false;
     _graphActions.resize(AT_NUM_ELEMENTS);
   }
 

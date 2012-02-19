@@ -92,7 +92,7 @@ namespace g2o {
       typedef std::set<Vertex*>                         VertexSet;
 
       typedef std::tr1::unordered_map<int, Vertex*>     VertexIDMap;
-      typedef std::vector<Vertex*>                      VertexVector;
+      typedef std::vector<Vertex*>                      VertexContainer;
 
       //! abstract Vertex, your types must derive from that one
       class G2O_CORE_API Vertex : public HyperGraphElement {
@@ -129,11 +129,11 @@ namespace g2o {
           /**
             returns the vector of pointers to the vertices connected by the hyper-edge.
             */
-          const VertexVector& vertices() const { return _vertices;}
+          const VertexContainer& vertices() const { return _vertices;}
           /**
             returns the vector of pointers to the vertices connected by the hyper-edge.
             */
-          VertexVector& vertices() { return _vertices;}
+          VertexContainer& vertices() { return _vertices;}
           /**
             returns the pointer to the ith vertex connected to the hyper-edge.
             */
@@ -151,7 +151,7 @@ namespace g2o {
           void setId(int id);
           virtual HyperGraphElementType elementType() const { return HGET_EDGE;}
         protected:
-          VertexVector _vertices;
+          VertexContainer _vertices;
           int _id; ///< unique id
       };
 

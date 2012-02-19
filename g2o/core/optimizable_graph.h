@@ -78,7 +78,7 @@ namespace g2o {
      * \brief data packet for a vertex. Extend this class to store in the vertices
      * the potential additional information you need (e.g. images, laser scans, ...).
      */
-    class Data : public HyperGraph::HyperGraphElement
+    class G2O_CORE_API Data : public HyperGraph::HyperGraphElement
     {
       public:
         //! read the data from a stream
@@ -313,7 +313,7 @@ namespace g2o {
 
     };
     
-    class Edge: public HyperGraph::Edge {
+    class G2O_CORE_API Edge: public HyperGraph::Edge {
       private:
         friend struct OptimizableGraph;
       public:
@@ -603,10 +603,6 @@ namespace g2o {
     }
 
   protected:
-    std::list<Vertex*> 
-      _taintedList, ///< this is the list of higher level vertices whose connectivity and information has to be recomputed
-      _partialList; //< this is the list of higher level vertices which need to be deleted.
-    OptimizableGraph* _upperGraph, *_lowerGraph;
     std::map<std::string, std::string> _renamedTypesLookup;
     long long _nextEdgeId;
     std::vector<HyperGraphActionSet> _graphActions;
