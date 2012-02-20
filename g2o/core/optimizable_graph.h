@@ -590,10 +590,6 @@ namespace g2o {
 
     virtual void clear();
 
-    G2O_ATTRIBUTE_DEPRECATED(bool setParameter(Parameter* p)) {
-      return addParameter(p);
-    }
-
     bool addParameter(Parameter* p) {
       return _parameters.addParameter(p);
     }
