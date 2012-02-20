@@ -510,11 +510,11 @@ int main(int argc, char** argv)
       std::vector<std::pair<int, int> > blockIndices;
       for (size_t i=0; i<optimizer.activeVertices().size(); i++){
         OptimizableGraph::Vertex* v=optimizer.activeVertices()[i];
-        if (v->tempIndex()>=0){
-          blockIndices.push_back(make_pair(v->tempIndex(), v->tempIndex()));
+        if (v->hessianIndex()>=0){
+          blockIndices.push_back(make_pair(v->hessianIndex(), v->hessianIndex()));
         }
-        if (v->tempIndex()>0){
-          blockIndices.push_back(make_pair(v->tempIndex()-1, v->tempIndex()));
+        if (v->hessianIndex()>0){
+          blockIndices.push_back(make_pair(v->hessianIndex()-1, v->hessianIndex()));
         }
       }
       SparseBlockMatrix<MatrixXd> spinv;
@@ -522,14 +522,14 @@ int main(int argc, char** argv)
         for (size_t i=0; i<optimizer.activeVertices().size(); i++){
           OptimizableGraph::Vertex* v=optimizer.activeVertices()[i];
           cerr << "Vertex id:" << v->id() << endl;
-          if (v->tempIndex()>=0){
-            cerr << "inv block :" << v->tempIndex() << ", " << v->tempIndex()<< endl;
-            cerr << *(spinv.block(v->tempIndex(), v->tempIndex()));
+          if (v->hessianIndex()>=0){
+            cerr << "inv block :" << v->hessianIndex() << ", " << v->hessianIndex()<< endl;
+            cerr << *(spinv.block(v->hessianIndex(), v->hessianIndex()));
             cerr << endl;
           }
-          if (v->tempIndex()>0){
-            cerr << "inv block :" << v->tempIndex()-1 << ", " << v->tempIndex()<< endl;
-            cerr << *(spinv.block(v->tempIndex()-1, v->tempIndex()));
+          if (v->hessianIndex()>0){
+            cerr << "inv block :" << v->hessianIndex()-1 << ", " << v->hessianIndex()<< endl;
+            cerr << *(spinv.block(v->hessianIndex()-1, v->hessianIndex()));
             cerr << endl;
           }
         }

@@ -231,9 +231,9 @@ namespace g2o {
         }
 
         //! temporary index of this node in the parameter vector obtained from linearization
-        int tempIndex() const { return _tempIndex;}
+        int hessianIndex() const { return _hessianIndex;}
         //! set the temporary index of the vertex in the parameter blocks
-        void setTempIndex(int ti) { _tempIndex = ti;}
+        void setHessianIndex(int ti) { _hessianIndex = ti;}
 
         //! true => this node is fixed during the optimization
         bool fixed() const {return _fixed;}
@@ -281,7 +281,7 @@ namespace g2o {
       protected:
         OptimizableGraph* _graph;
         Data* _userData;
-        int _tempIndex;
+        int _hessianIndex;
         bool _fixed;
         bool _marginalized;
         int _dimension;

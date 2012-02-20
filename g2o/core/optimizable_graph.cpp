@@ -50,7 +50,7 @@ namespace g2o {
 
   OptimizableGraph::Vertex::Vertex() :
     HyperGraph::Vertex(),
-    _graph(0), _userData(0), _tempIndex(-1), _fixed(false), _marginalized(false),
+    _graph(0), _userData(0), _hessianIndex(-1), _fixed(false), _marginalized(false),
     _colInHessian(-1), _cacheContainer(0)
   {
   }
@@ -647,7 +647,7 @@ void OptimizableGraph::addGraph(OptimizableGraph* g){
       continue;
     OptimizableGraph::Vertex* v2=v->clone();
     v2->edges().clear();
-    v2->setTempIndex(-1);
+    v2->setHessianIndex(-1);
     addVertex(v2);
   }
   for (HyperGraph::EdgeSet::iterator it=g->edges().begin(); it!=g->edges().end(); ++it){
