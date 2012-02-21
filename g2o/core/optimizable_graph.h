@@ -232,8 +232,10 @@ namespace g2o {
 
         //! temporary index of this node in the parameter vector obtained from linearization
         int hessianIndex() const { return _hessianIndex;}
+        int G2O_ATTRIBUTE_DEPRECATED(tempIndex() const) { return hessianIndex();}
         //! set the temporary index of the vertex in the parameter blocks
         void setHessianIndex(int ti) { _hessianIndex = ti;}
+        void G2O_ATTRIBUTE_DEPRECATED(setTempIndex(int ti)) { setHessianIndex(ti);}
 
         //! true => this node is fixed during the optimization
         bool fixed() const {return _fixed;}
