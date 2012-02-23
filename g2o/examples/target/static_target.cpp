@@ -30,12 +30,13 @@ int main()
 
   // Create the block solver - the dimensions are specified because
   // 3D observations marginalise to a 3D estimate
-  typedef BlockSolver< BlockSolverTraits<3, 3> > BlockSolver_3_3;
-  BlockSolver_3_3::LinearSolverType * linearSolver
+  typedef BlockSolver<BlockSolverTraits<3, 3> > BlockSolver_3_3;
+  BlockSolver_3_3::LinearSolverType* linearSolver
       = new LinearSolverCholmod<BlockSolver_3_3::PoseMatrixType>();
-  BlockSolver_3_3 * solver_ptr
+  BlockSolver_3_3* blockSolver
       = new BlockSolver_3_3(linearSolver);
-  OptimizationAlgorithmGaussNewton* solver = new OptimizationAlgorithmGaussNewton(solver_ptr);
+  OptimizationAlgorithmGaussNewton* solver
+    = new OptimizationAlgorithmGaussNewton(blockSolver);
   optimizer.setAlgorithm(solver);
 
   // Sample the actual location of the target
@@ -84,9 +85,14 @@ int main()
 
   optimizer.computeMarginals(spinv, position);
 
+
+
   //optimizer.solver()->computeMarginals();
 
   // covariance
   //
-  cerr << "covariance\n" << spinv << endl;
+  cout << "covariance\n" << spinv << endl;
+
+  cout << spinv.block(0,0) << endl;
+  
 }
