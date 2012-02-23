@@ -75,7 +75,7 @@ namespace g2o {
 
       /**
        * this function installs and satisfies a cache
-       * @param type_: the typename of the dependancy
+       * @param type_: the typename of the dependency
        * @param parameterIndices: a vector containing the indices if the parameters
        * in _parameters that will be used to assemble the Key of the cache being created
        * For example if I have a cache of type C2, having parameters "A, B, and C",
@@ -84,11 +84,11 @@ namespace g2o {
        * parameter vector of C2 of the parameters needed to construct C1.
        * @returns the newly created cache
        */
-      Cache* installDependancy(const std::string& type_, const std::vector<int>& parameterIndices);
+      Cache* installDependency(const std::string& type_, const std::vector<int>& parameterIndices);
 
       /**
        * Function to be called from a cache that has dependencies. It just invokes a
-       * sequence of installDependancy().
+       * sequence of installDependency().
        * Although the caches returned are stored in the _parentCache vector,
        * it is better that you redefine your own cache member variables, for better readability
        */
