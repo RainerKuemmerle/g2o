@@ -538,9 +538,10 @@ namespace g2o{
     _forceStopFlag=flag;
   }
 
-  bool SparseOptimizer::removeVertex(Vertex* v)
+  bool SparseOptimizer::removeVertex(HyperGraph::Vertex* v)
   {
-    if (v->tempIndex() >= 0) {
+    OptimizableGraph::Vertex* vv = static_cast<OptimizableGraph::Vertex*>(v);
+    if (vv->tempIndex() >= 0) {
       clearIndexMapping();
       _ivMap.clear();
     }
