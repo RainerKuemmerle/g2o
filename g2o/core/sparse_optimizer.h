@@ -177,7 +177,13 @@ namespace g2o {
     //! the edges active in the current optimization
     const EdgeContainer& activeEdges() const { return _activeEdges;}
 
-    virtual bool removeVertex(Vertex* v);
+    /**
+     * Remove a vertex. If the vertex is contained in the currently active set
+     * of vertices, then the internal temporary structures are cleaned, e.g., the index
+     * mapping is erased. In case you need the index mapping for manipulating the
+     * graph, you have to store it in your own copy.
+     */
+    virtual bool removeVertex(HyperGraph::Vertex* v);
 
     /**
      * search for an edge in _activeVertices and return the iterator pointing to it

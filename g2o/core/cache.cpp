@@ -87,7 +87,7 @@ namespace g2o {
     _updateNeeded=false;
   }
 
-  Cache* Cache::installDependancy(const std::string& type_, const std::vector<int>& parameterIndices){
+  Cache* Cache::installDependency(const std::string& type_, const std::vector<int>& parameterIndices){
     ParameterVector pv(parameterIndices.size());
     for (size_t i=0; i<parameterIndices.size(); i++){
       if (parameterIndices[i]<0 || parameterIndices[i] >=(int)_parameters.size())
