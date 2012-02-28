@@ -243,12 +243,16 @@ bool BlockSolver<Traits>::buildStructure(bool zeroBlocks)
     if (v->marginalized()){
       const HyperGraph::EdgeSet& vedges=v->edges();
       for (HyperGraph::EdgeSet::const_iterator it1=vedges.begin(); it1!=vedges.end(); ++it1){
+        if ((*it1)->vertices().size() != 2)
+          continue;
         OptimizableGraph::Vertex* v1= (OptimizableGraph::Vertex*) (*it1)->vertex(0);
         if (v1==v)
-          v1 = (OptimizableGraph::Vertex*) (*it1)->vertices()[1];
+          v1 = (OptimizableGraph::Vertex*) (*it1)->vertex(1);
         if (v1->tempIndex()==-1)
           continue;
         for  (HyperGraph::EdgeSet::const_iterator it2=vedges.begin(); it2!=vedges.end(); ++it2){
+          if ((*it2)->vertices().size() != 2)
+            continue;
           OptimizableGraph::Vertex* v2= (OptimizableGraph::Vertex*) (*it2)->vertex(0);
           if (v2==v)
             v2 = (OptimizableGraph::Vertex*) (*it2)->vertex(1);
@@ -382,6 +386,8 @@ bool BlockSolver<Traits>::solve(){
 #     endif
       for (size_t l=0; l < tmpIdx; ++l) {
         OptimizableGraph::Edge* e1 = tmpEdges[l];
+        if (e1->vertices().size() != 2)
+          continue;
         OptimizableGraph::Vertex* v1= static_cast<OptimizableGraph::Vertex*>( e1->vertex(0) );
         if (v1==v)
           v1 = (OptimizableGraph::Vertex*) e1->vertex(1);
@@ -403,6 +409,8 @@ bool BlockSolver<Traits>::solve(){
 
         for (size_t k =0; k < tmpIdx; ++k) {
           OptimizableGraph::Edge* e2 = tmpEdges[k];
+          if (e2->vertices().size() != 2)
+            continue;
           OptimizableGraph::Vertex* v2= (OptimizableGraph::Vertex*) e2->vertex(0);
           if (v2==v)
             v2 = (OptimizableGraph::Vertex*) e2->vertex(1);
