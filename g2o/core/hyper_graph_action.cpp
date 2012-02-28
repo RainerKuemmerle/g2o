@@ -180,7 +180,9 @@ namespace g2o {
       }
     }
     if (! collection) {
+#ifndef NDEBUG
       cerr << __PRETTY_FUNCTION__ << ": creating collection for \"" << action->name() << "\"" << endl;
+#endif
       collection = new HyperGraphElementActionCollection(action->name());
       _actionMap.insert(make_pair(action->name(), collection));
     }

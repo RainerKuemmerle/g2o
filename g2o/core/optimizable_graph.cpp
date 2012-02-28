@@ -332,7 +332,9 @@ bool OptimizableGraph::load(istream& is, bool createEdges)
   // scna for the paramers in the whole file
   if (!_parameters.read(is))
     return false;
+#ifndef NDEBUG
   cerr << "Loaded " << _parameters.size() << " parameters" << endl;
+#endif
   is.clear();
   is.seekg(ios_base::beg);
   set<string> warnedUnknownTypes;
