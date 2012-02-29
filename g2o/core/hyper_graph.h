@@ -137,15 +137,15 @@ namespace g2o {
           /**
             returns the pointer to the ith vertex connected to the hyper-edge.
             */
-          const Vertex* vertex(size_t i) const { return _vertices[i];}
+          const Vertex* vertex(size_t i) const { assert(i < _vertices.size() && "index out of bounds"); return _vertices[i];}
           /**
             returns the pointer to the ith vertex connected to the hyper-edge.
             */
-          Vertex* vertex(size_t i) { return _vertices[i];}
+          Vertex* vertex(size_t i) { assert(i < _vertices.size() && "index out of bounds"); return _vertices[i];}
           /**
             set the ith vertex on the hyper-edge to the pointer supplied
             */
-          void setVertex(size_t i, Vertex* v) { _vertices[i]=v;}
+          void setVertex(size_t i, Vertex* v) { assert(i < _vertices.size() && "index out of bounds"); _vertices[i]=v;}
 
           int id() const {return _id;}
           void setId(int id);
