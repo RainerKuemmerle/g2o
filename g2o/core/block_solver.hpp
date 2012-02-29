@@ -247,13 +247,8 @@ bool BlockSolver<Traits>::buildStructure(bool zeroBlocks)
           continue;
         OptimizableGraph::Vertex* v1= (OptimizableGraph::Vertex*) (*it1)->vertex(0);
         if (v1==v)
-<<<<<<< HEAD
-          v1 = (OptimizableGraph::Vertex*) (*it1)->vertices()[1];
-        if (v1->hessianIndex()==-1)
-=======
           v1 = (OptimizableGraph::Vertex*) (*it1)->vertex(1);
-        if (v1->tempIndex()==-1)
->>>>>>> 621bafbf6cb065008c21b8940d51c0895520df98
+        if (v1->hessianIndex()==-1)
           continue;
         for  (HyperGraph::EdgeSet::const_iterator it2=vedges.begin(); it2!=vedges.end(); ++it2){
           if ((*it2)->vertices().size() != 2)
