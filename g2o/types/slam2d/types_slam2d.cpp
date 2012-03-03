@@ -34,8 +34,6 @@
 
 namespace g2o {
 
-namespace types_slam2d {
-
   G2O_REGISTER_TYPE_GROUP(slam2d);
 
   G2O_REGISTER_TYPE(VERTEX_SE2, VertexSE2);
@@ -63,7 +61,4 @@ namespace types_slam2d {
   G2O_REGISTER_ACTION(EdgeSE2PointXYDrawAction);
   G2O_REGISTER_ACTION(EdgeSE2PointXYBearingDrawAction);
 #endif
-}
 } // end namespace
-
-
