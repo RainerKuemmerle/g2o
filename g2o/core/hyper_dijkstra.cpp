@@ -88,7 +88,11 @@ namespace g2o{
     std::priority_queue< AdjacencyMapEntry > frontier;
     for (HyperGraph::VertexSet::iterator vit=vset.begin(); vit!=vset.end(); ++vit){
       HyperGraph::Vertex* v=*vit;
+      assert(v!=0);
       AdjacencyMap::iterator it=_adjacencyMap.find(v);
+      if (it == _adjacencyMap.end()) {
+        cerr << __PRETTY_FUNCTION__ << "Vertex " << v->id() << " is not in the adjacency map" << endl;
+      }
       assert(it!=_adjacencyMap.end());
       it->second._distance=0.;
       it->second._parent=0;
@@ -100,6 +104,9 @@ namespace g2o{
       frontier.pop();
       HyperGraph::Vertex* u=entry.child();
       AdjacencyMap::iterator ut=_adjacencyMap.find(u);
+      if (ut == _adjacencyMap.end()) {
+        cerr << __PRETTY_FUNCTION__ << "Vertex " << u->id() << " is not in the adjacency map" << endl;
+      }
       assert(ut!=_adjacencyMap.end());
       double uDistance=ut->second.distance();
 
