@@ -15,6 +15,7 @@
 #include <g2o/stuff/sampler.h>
 
 #include "targetTypes6D.hpp"
+#include "continuous_to_discrete.h"
 
 using namespace Eigen;
 using namespace std;
@@ -33,24 +34,12 @@ int main()
   SparseOptimizer optimizer;
   optimizer.setVerbose(false);
 
-#if 0
-
-  g2o::BlockSolver_6_3::LinearSolverType * linearSolver
-      = new g2o::LinearSolverCholmod<g2o
-        ::BlockSolver_6_3::PoseMatrixType>();
-
-#else
-
-  g2o::BlockSolver_6_3::LinearSolverType * linearSolver
-    = new g2o::LinearSolverPCG<g2o::BlockSolver_6_3::PoseMatrixType>();
-
-#endif
-
-  g2o::BlockSolver_6_3 * solver_ptr
-      = new g2o::BlockSolver_6_3(linearSolver);
-
-  OptimizationAlgorithmGaussNewton* solver = new OptimizationAlgorithmGaussNewton(solver_ptr);
-  optimizer.setAlgorithm(solver);
+  typedef BlockSolver< BlockSolverTraits<3, 3> > BlockSolver_3_3;
+  BlockSolver_3_3::LinearSolverType * linearSolver
+      = new LinearSolverCholmod<BlockSolver_3_3::PoseMatrixType>();
+  BlockSolver_3_3 * blockSolver = new BlockSolver_3_3(linearSolver);
+  OptimizationAlgorithm* optimizationAlgorithm = new OptimizationAlgorithmGaussNewton(blockSolver);
+  optimizer.setAlgorithm(optimizationAlgorithm);
 
   // Sample the start location of the target
   Vector6d state;

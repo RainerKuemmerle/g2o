@@ -15,12 +15,10 @@
 #include <g2o/stuff/sampler.h>
 
 #include "targetTypes3D.hpp"
-#include "discrete_to_continuous.h"
 
 using namespace Eigen;
 using namespace std;
 using namespace g2o;
-
 
 int main()
 {
@@ -33,10 +31,9 @@ int main()
   typedef BlockSolver< BlockSolverTraits<3, 3> > BlockSolver_3_3;
   BlockSolver_3_3::LinearSolverType * linearSolver
       = new LinearSolverCholmod<BlockSolver_3_3::PoseMatrixType>();
-  BlockSolver_3_3 * solver_ptr
-      = new BlockSolver_3_3(linearSolver);
-  OptimizationAlgorithmGaussNewton* solver = new OptimizationAlgorithmGaussNewton(solver_ptr);
-  optimizer.setAlgorithm(solver);
+  BlockSolver_3_3 * blockSolver = new BlockSolver_3_3(linearSolver);
+  OptimizationAlgorithm* optimizationAlgorithm = new OptimizationAlgorithmGaussNewton(blockSolver);
+  optimizer.setAlgorithm(optimizationAlgorithm);
 
   // Sample the actual location of the target
   Vector3d truePoint(sampleUniform(-500, 500),

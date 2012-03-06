@@ -1,13 +1,13 @@
-#ifndef G2O_DISCRETE_TO_CONTINUOUS_H_
-#define G2O_DISCRETE_TO_CONTINUOUS_H_
+#ifndef G2O_CONTINUOUS_TO_DISCRETE_H_
+#define G2O_CONTINUOUS_TO_DISCRETE_H_
 
 #include <unsupported/Eigen/MatrixFunctions>
 #include <iostream>
 
 // Form for fixed-size matrices
 template<typename MatrixType>
-void discreteToContinuous(MatrixType& Fd, MatrixType& Qd,
-                    const MatrixType& Fc, const MatrixType& Qc, double dt)
+void continuousToDiscrete(MatrixType& Fd, MatrixType& Qd,
+                          const MatrixType& Fc, const MatrixType& Qc, double dt)
 {
   enum
   {
@@ -34,4 +34,4 @@ void discreteToContinuous(MatrixType& Fd, MatrixType& Qd,
   Qd = Fd * bigB.template topRightCorner<NX,NX>();
 }
 
-#endif // __DISCRETE_TO_CONTINUOUS_H__
+#endif // __CONTINUOUS_TO_DISCRETE_H__
