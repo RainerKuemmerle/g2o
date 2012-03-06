@@ -119,6 +119,9 @@ namespace g2o {
       virtual void setWriteDebug(bool){};
       virtual bool writeDebug(){return false;}
 
+      //! write the hessian to disk using the specified file name
+      virtual bool saveHessian(const std::string& fileName) {(void) fileName; return false;}
+
     protected:
       SparseOptimizer* _optimizer;
       double* _x;
