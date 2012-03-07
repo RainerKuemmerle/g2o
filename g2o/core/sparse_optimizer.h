@@ -119,6 +119,35 @@ namespace g2o {
      */
     bool computeMarginals(SparseBlockMatrix<MatrixXd>& spinv, const std::vector<std::pair<int, int> >& blockIndices);
 
+    /**
+     * computes the inverse of the specified vertex.
+     * @param vertex: the vertex whose state is to be marginalised
+     * @param spinv: the sparse block matrix with the result
+     * @returns false if the operation is not supported by the solver
+     */
+    bool computeMarginals(SparseBlockMatrix<MatrixXd>& spinv, const Vertex* vertex) {
+      if (vertex->hessianIndex() < 0) {
+          return false;
+      }
+      std::vector<std::pair<int, int> > index;
+      index.push_back(std::pair<int, int>(vertex->hessianIndex(), vertex->hessianIndex()));
+      return computeMarginals(spinv, index);
+    }
+
+    /**
+     * computes the inverse of the set specified vertices, assembled into a single covariance matrix.
+     * @param vertex: the pattern
+     * @param spinv: the sparse block matrix with the result
+     * @returns false if the operation is not supported by the solver
+     */
+    bool computeMarginals(SparseBlockMatrix<MatrixXd>& spinv, const VertexContainer& vertices) {
+      std::vector<std::pair<int, int> > indices;
+      for (VertexContainer::const_iterator it = vertices.begin(); it != vertices.end(); ++it) {
+        indices.push_back(std::pair<int, int>((*it)->hessianIndex(),(*it)->hessianIndex()));
+      }
+      return computeMarginals(spinv, indices);
+    }
+
     //! finds a gauge in the graph to remove the undefined dof.
     // The gauge should be fixed() and then the optimization can work (if no additional dof are in
     // the system. The default implementation returns a node with maximum dimension.

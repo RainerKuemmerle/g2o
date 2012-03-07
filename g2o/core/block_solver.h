@@ -59,10 +59,10 @@ namespace g2o {
    * \brief traits to summarize the properties of the dynamic size optimization problem
    */
   template <>
-  struct BlockSolverTraits<-1, -1>
+    struct BlockSolverTraits<Eigen::Dynamic, Eigen::Dynamic>
   {
-    static const int PoseDim = -1;
-    static const int LandmarkDim = -1;
+    static const int PoseDim = Eigen::Dynamic;
+    static const int LandmarkDim = Eigen::Dynamic;
     typedef MatrixXd PoseMatrixType;
     typedef MatrixXd LandmarkMatrixType;
     typedef MatrixXd PoseLandmarkMatrixType;
@@ -145,7 +145,7 @@ namespace g2o {
 
 
   //variable size solver
-  typedef BlockSolver< BlockSolverTraits<-1, -1> > BlockSolverX;
+  typedef BlockSolver< BlockSolverTraits<Eigen::Dynamic, Eigen::Dynamic> > BlockSolverX;
   // solver for BA/3D SLAM
   typedef BlockSolver< BlockSolverTraits<6, 3> > BlockSolver_6_3;  
   // solver fo BA with scale

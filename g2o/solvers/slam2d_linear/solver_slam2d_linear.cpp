@@ -56,13 +56,13 @@ namespace g2o {
         EdgeSE2* odom    = static_cast<EdgeSE2*>(e);
         VertexSE2* from  = static_cast<VertexSE2*>(vParent);
         VertexSE2* to    = static_cast<VertexSE2*>(v);
-        assert(to->tempIndex() >= 0);
-        double fromTheta = from->tempIndex() < 0 ? 0. : _thetaGuess[from->tempIndex()];
+        assert(to->hessianIndex() >= 0);
+        double fromTheta = from->hessianIndex() < 0 ? 0. : _thetaGuess[from->hessianIndex()];
         bool direct      = odom->vertices()[0] == from;
         if (direct) 
-          _thetaGuess[to->tempIndex()] = fromTheta + odom->measurement().rotation().angle();
+          _thetaGuess[to->hessianIndex()] = fromTheta + odom->measurement().rotation().angle();
         else
-          _thetaGuess[to->tempIndex()] = fromTheta - odom->measurement().rotation().angle();
+          _thetaGuess[to->hessianIndex()] = fromTheta - odom->measurement().rotation().angle();
         return 1.;
       }
     protected:
@@ -108,7 +108,7 @@ namespace g2o {
     // building the structure, diagonal for each active vertex
     for (size_t i = 0; i < _optimizer->indexMapping().size(); ++i) {
       OptimizableGraph::Vertex* v = _optimizer->indexMapping()[i];
-      int poseIdx = v->tempIndex();
+      int poseIdx = v->hessianIndex();
       ScalarMatrix* m = H.block(poseIdx, poseIdx, true);
       m->setZero();
     }
@@ -126,8 +126,8 @@ namespace g2o {
       OptimizableGraph::Vertex* from = static_cast<OptimizableGraph::Vertex*>(e->vertices()[0]);
       OptimizableGraph::Vertex* to   = static_cast<OptimizableGraph::Vertex*>(e->vertices()[1]);
 
-      int ind1 = from->tempIndex();
-      int ind2 = to->tempIndex();
+      int ind1 = from->hessianIndex();
+      int ind2 = to->hessianIndex();
       if (ind1 == -1 || ind2 == -1) {
         if (ind1 == -1) fixedSet.insert(from); // collect the fixed vertices
         if (ind2 == -1) fixedSet.insert(to);
@@ -164,8 +164,8 @@ namespace g2o {
 
       double omega = e->information()(2,2);
 
-      double fromThetaGuess = from->tempIndex() < 0 ? 0. : thetaGuess[from->tempIndex()];
-      double toThetaGuess   = to->tempIndex() < 0 ? 0. : thetaGuess[to->tempIndex()];
+      double fromThetaGuess = from->hessianIndex() < 0 ? 0. : thetaGuess[from->hessianIndex()];
+      double toThetaGuess   = to->hessianIndex() < 0 ? 0. : thetaGuess[to->hessianIndex()];
       double error          = normalize_theta(-e->measurement().rotation().angle() + toThetaGuess - fromThetaGuess);
 
       bool fromNotFixed = !(from->fixed());
@@ -174,18 +174,18 @@ namespace g2o {
       if (fromNotFixed || toNotFixed) {
         double omega_r = - omega * error;
         if (fromNotFixed) {
-          b(from->tempIndex()) -= omega_r;
-          (*H.block(from->tempIndex(), from->tempIndex()))(0,0) += omega;
+          b(from->hessianIndex()) -= omega_r;
+          (*H.block(from->hessianIndex(), from->hessianIndex()))(0,0) += omega;
           if (toNotFixed) {
-            if (from->tempIndex() > to->tempIndex())
-              (*H.block(to->tempIndex(), from->tempIndex()))(0,0) -= omega;
+            if (from->hessianIndex() > to->hessianIndex())
+              (*H.block(to->hessianIndex(), from->hessianIndex()))(0,0) -= omega;
             else
-              (*H.block(from->tempIndex(), to->tempIndex()))(0,0) -= omega;
+              (*H.block(from->hessianIndex(), to->hessianIndex()))(0,0) -= omega;
           }
         } 
         if (toNotFixed ) {
-          b(to->tempIndex()) += omega_r;
-          (*H.block(to->tempIndex(), to->tempIndex()))(0,0) += omega;
+          b(to->hessianIndex()) += omega_r;
+          (*H.block(to->hessianIndex(), to->hessianIndex()))(0,0) += omega;
         }
       }
     }
@@ -204,7 +204,7 @@ namespace g2o {
     root->setToOrigin();
     for (size_t i = 0; i < _optimizer->indexMapping().size(); ++i) {
       VertexSE2* v = static_cast<VertexSE2*>(_optimizer->indexMapping()[i]);
-      int poseIdx = v->tempIndex();
+      int poseIdx = v->hessianIndex();
       SE2 poseUpdate(0, 0, normalize_theta(thetaGuess(poseIdx) + x(poseIdx)));
       v->setEstimate(poseUpdate);
     }

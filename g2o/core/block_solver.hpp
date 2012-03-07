@@ -167,7 +167,7 @@ bool BlockSolver<Traits>::buildStructure(bool zeroBlocks)
   for (size_t i = 0; i < _optimizer->indexMapping().size(); ++i) {
     OptimizableGraph::Vertex* v = _optimizer->indexMapping()[i];
     if (! v->marginalized()){
-      //assert(poseIdx == v->tempIndex());
+      //assert(poseIdx == v->hessianIndex());
       PoseMatrixType* m = _Hpp->block(poseIdx, poseIdx, true);
       if (zeroBlocks)
         m->setZero();
@@ -191,13 +191,13 @@ bool BlockSolver<Traits>::buildStructure(bool zeroBlocks)
 
     for (size_t viIdx = 0; viIdx < e->vertices().size(); ++viIdx) {
       OptimizableGraph::Vertex* v1 = (OptimizableGraph::Vertex*) e->vertex(viIdx);
-      int ind1 = v1->tempIndex();
+      int ind1 = v1->hessianIndex();
       if (ind1 == -1)
         continue;
       int indexV1Bak = ind1;
       for (size_t vjIdx = viIdx + 1; vjIdx < e->vertices().size(); ++vjIdx) {
         OptimizableGraph::Vertex* v2 = (OptimizableGraph::Vertex*) e->vertex(vjIdx);
-        int ind2 = v2->tempIndex();
+        int ind2 = v2->hessianIndex();
         if (ind2 == -1)
           continue;
         ind1 = indexV1Bak;
@@ -220,12 +220,12 @@ bool BlockSolver<Traits>::buildStructure(bool zeroBlocks)
           e->mapHessianMemory(m->data(), viIdx, vjIdx, false);
         } else { 
           if (v1->marginalized()){ 
-            PoseLandmarkMatrixType* m = _Hpl->block(v2->tempIndex(),v1->tempIndex()-_numPoses, true);
+            PoseLandmarkMatrixType* m = _Hpl->block(v2->hessianIndex(),v1->hessianIndex()-_numPoses, true);
             if (zeroBlocks)
               m->setZero();
             e->mapHessianMemory(m->data(), viIdx, vjIdx, true); // transpose the block before writing to it
           } else {
-            PoseLandmarkMatrixType* m = _Hpl->block(v1->tempIndex(),v2->tempIndex()-_numPoses, true);
+            PoseLandmarkMatrixType* m = _Hpl->block(v1->hessianIndex(),v2->hessianIndex()-_numPoses, true);
             if (zeroBlocks)
               m->setZero();
             e->mapHessianMemory(m->data(), viIdx, vjIdx, false); // directly the block
@@ -248,7 +248,7 @@ bool BlockSolver<Traits>::buildStructure(bool zeroBlocks)
         OptimizableGraph::Vertex* v1= (OptimizableGraph::Vertex*) (*it1)->vertex(0);
         if (v1==v)
           v1 = (OptimizableGraph::Vertex*) (*it1)->vertex(1);
-        if (v1->tempIndex()==-1)
+        if (v1->hessianIndex()==-1)
           continue;
         for  (HyperGraph::EdgeSet::const_iterator it2=vedges.begin(); it2!=vedges.end(); ++it2){
           if ((*it2)->vertices().size() != 2)
@@ -256,10 +256,10 @@ bool BlockSolver<Traits>::buildStructure(bool zeroBlocks)
           OptimizableGraph::Vertex* v2= (OptimizableGraph::Vertex*) (*it2)->vertex(0);
           if (v2==v)
             v2 = (OptimizableGraph::Vertex*) (*it2)->vertex(1);
-          if (v2->tempIndex()==-1)
+          if (v2->hessianIndex()==-1)
             continue;
-          int i1=v1->tempIndex();
-          int i2=v2->tempIndex();
+          int i1=v1->hessianIndex();
+          int i2=v2->hessianIndex();
           if (i1<=i2)
             _Hschur->block(i1,i2,true)->setZero();
         }
@@ -283,7 +283,7 @@ bool BlockSolver<Traits>::updateStructure(const std::vector<HyperGraph::Vertex*>
       _Hpp->colBlockIndices().push_back(_sizePoses);
       _Hpp->blockCols().push_back(typename SparseBlockMatrix<PoseMatrixType>::IntBlockMap());
       ++_numPoses;
-      int ind = v->tempIndex();
+      int ind = v->hessianIndex();
       PoseMatrixType* m = _Hpp->block(ind, ind, true);
       v->mapHessianMemory(m->data());
     } else {
@@ -298,13 +298,13 @@ bool BlockSolver<Traits>::updateStructure(const std::vector<HyperGraph::Vertex*>
 
     for (size_t viIdx = 0; viIdx < e->vertices().size(); ++viIdx) {
       OptimizableGraph::Vertex* v1 = (OptimizableGraph::Vertex*) e->vertex(viIdx);
-      int ind1 = v1->tempIndex();
+      int ind1 = v1->hessianIndex();
       int indexV1Bak = ind1;
       if (ind1 == -1)
         continue;
       for (size_t vjIdx = viIdx + 1; vjIdx < e->vertices().size(); ++vjIdx) {
         OptimizableGraph::Vertex* v2 = (OptimizableGraph::Vertex*) e->vertex(vjIdx);
-        int ind2 = v2->tempIndex();
+        int ind2 = v2->hessianIndex();
         if (ind2 == -1)
           continue;
         ind1 = indexV1Bak;
@@ -393,7 +393,7 @@ bool BlockSolver<Traits>::solve(){
           v1 = (OptimizableGraph::Vertex*) e1->vertex(1);
 
         assert (!v1->marginalized());
-        int i1=v1->tempIndex();
+        int i1=v1->hessianIndex();
         if (i1<0)
           continue;
 
@@ -416,7 +416,7 @@ bool BlockSolver<Traits>::solve(){
             v2 = (OptimizableGraph::Vertex*) e2->vertex(1);
 
           assert (!v2->marginalized());
-          int i2=v2->tempIndex();
+          int i2=v2->hessianIndex();
           if (i2<0)
             continue;
           if (i1>i2)

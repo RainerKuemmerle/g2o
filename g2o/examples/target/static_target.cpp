@@ -28,12 +28,14 @@ int main()
 
   // Create the block solver - the dimensions are specified because
   // 3D observations marginalise to a 3D estimate
-  typedef BlockSolver< BlockSolverTraits<3, 3> > BlockSolver_3_3;
-  BlockSolver_3_3::LinearSolverType * linearSolver
+  typedef BlockSolver<BlockSolverTraits<3, 3> > BlockSolver_3_3;
+  BlockSolver_3_3::LinearSolverType* linearSolver
       = new LinearSolverCholmod<BlockSolver_3_3::PoseMatrixType>();
-  BlockSolver_3_3 * blockSolver = new BlockSolver_3_3(linearSolver);
-  OptimizationAlgorithm* optimizationAlgorithm = new OptimizationAlgorithmGaussNewton(blockSolver);
-  optimizer.setAlgorithm(optimizationAlgorithm);
+  BlockSolver_3_3* blockSolver
+      = new BlockSolver_3_3(linearSolver);
+  OptimizationAlgorithmGaussNewton* solver
+    = new OptimizationAlgorithmGaussNewton(blockSolver);
+  optimizer.setAlgorithm(solver);
 
   // Sample the actual location of the target
   Vector3d truePoint(sampleUniform(-500, 500),
@@ -43,15 +45,14 @@ int main()
   // Construct vertex which corresponds to the actual point of the target
   VertexPosition3D* position = new VertexPosition3D();
   position->setId(0);
-  position->setMarginalized(false);
   optimizer.addVertex(position);
 
   // Now generate some noise corrupted measurements; for simplicity
   // these are uniformly distributed about the true target. These are
   // modelled as a unary edge because they do not like to, say,
   // another node in the map.
-  int numMeasurements = 100;
-  double noiseLimit = 500;
+  int numMeasurements = 10;
+  double noiseLimit = sqrt(12);
   double noiseSigma = noiseLimit*noiseLimit / 12.0;
 
   for (int i = 0; i < numMeasurements; i++)
@@ -63,24 +64,33 @@ int main()
       GPSObservationPosition3DEdge* goe = new GPSObservationPosition3DEdge();
       goe->setVertex(0, position);
       goe->setMeasurement(measurement);
-      goe->information() = Matrix3d::Identity() / noiseSigma;
-      goe->setRobustKernel(false);
+      goe->setInformation(Matrix3d::Identity() / noiseSigma);
       optimizer.addEdge(goe);
     }
 
   // Configure and set things going
   optimizer.initializeOptimization();
   optimizer.setVerbose(true);
-  optimizer.optimize(1);
+  optimizer.optimize(5);
   
   cout << "truePoint=\n" << truePoint << endl;
 
   cerr <<  "computed estimate=\n" << dynamic_cast<VertexPosition3D*>(optimizer.vertices().find(0)->second)->estimate() << endl;
 
   //position->setMarginalized(true);
+  
+  SparseBlockMatrix<MatrixXd> spinv;
+
+  optimizer.computeMarginals(spinv, position);
+
+
+
   //optimizer.solver()->computeMarginals();
 
   // covariance
   //
-  //cerr << "covariance\n" << position->uncertainty() << endl;
+  cout << "covariance\n" << spinv << endl;
+
+  cout << spinv.block(0,0) << endl;
+  
 }

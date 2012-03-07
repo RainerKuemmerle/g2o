@@ -147,13 +147,13 @@ namespace g2o{
       OptimizableGraph::Vertex* v = *it;
       if (! v->fixed()){
         if (static_cast<int>(v->marginalized()) == k){
-          v->setTempIndex(i);
+          v->setHessianIndex(i);
           _ivMap[i]=v;
           i++;
         }
       }
       else {
-        v->setTempIndex(-1);
+        v->setHessianIndex(-1);
       }
     }
     _ivMap.resize(i);
@@ -162,7 +162,7 @@ namespace g2o{
 
   void SparseOptimizer::clearIndexMapping(){
     for (size_t i=0; i<_ivMap.size(); i++){
-      _ivMap[i]->setTempIndex(-1);
+      _ivMap[i]->setHessianIndex(-1);
       _ivMap[i]=0;
     }
   }
@@ -282,7 +282,7 @@ namespace g2o{
             }
           }
         }
-        if (v->tempIndex() == -1) {
+        if (v->hessianIndex() == -1) {
           std::set<Vertex*>::const_iterator foundIt = backupVertices.find(v);
           if (foundIt == backupVertices.end()) {
             v->push();
@@ -422,7 +422,7 @@ namespace g2o{
       OptimizableGraph::Vertex* v=static_cast<OptimizableGraph::Vertex*>(*it);
       if (! v->fixed()){
         if (! v->marginalized()){
-          v->setTempIndex(next);
+          v->setHessianIndex(next);
           _ivMap.push_back(v);
           newVertices.push_back(v);
           _activeVertices.push_back(v);
@@ -432,7 +432,7 @@ namespace g2o{
           abort();
       }
       else {
-        v->setTempIndex(-1);
+        v->setHessianIndex(-1);
       }
     }
 
@@ -541,7 +541,7 @@ namespace g2o{
   bool SparseOptimizer::removeVertex(HyperGraph::Vertex* v)
   {
     OptimizableGraph::Vertex* vv = static_cast<OptimizableGraph::Vertex*>(v);
-    if (vv->tempIndex() >= 0) {
+    if (vv->hessianIndex() >= 0) {
       clearIndexMapping();
       _ivMap.clear();
     }

@@ -43,12 +43,12 @@ namespace g2o {
      */
     struct VertexBackup
     {
-      int tempIndex;
+      int hessianIndex;
       OptimizableGraph::Vertex* vertex;
       double* hessianData;
       bool operator<(const VertexBackup& other) const
       {
-        return tempIndex < other.tempIndex;
+        return hessianIndex < other.hessianIndex;
       }
     };
   }
@@ -135,10 +135,10 @@ namespace g2o {
             OptimizableGraph::Edge* e = static_cast<OptimizableGraph::Edge*>(*it);
             OptimizableGraph::Vertex* v1 = static_cast<OptimizableGraph::Vertex*>(e->vertices()[0]);
             OptimizableGraph::Vertex* v2 = static_cast<OptimizableGraph::Vertex*>(e->vertices()[1]);
-            if (v1->tempIndex() >= 0)
-              _cmember(v1->tempIndex()) = 1;
-            if (v2->tempIndex() >= 0)
-              _cmember(v2->tempIndex()) = 1;
+            if (v1->hessianIndex() >= 0)
+              _cmember(v1->hessianIndex()) = 1;
+            if (v2->hessianIndex() >= 0)
+              _cmember(v2->hessianIndex()) = 1;
           }
         }
       }
@@ -223,7 +223,7 @@ namespace g2o {
       OptimizableGraph::Vertex* v=static_cast<OptimizableGraph::Vertex*>(*it);
       if (! v->fixed()){
         if (! v->marginalized()){
-          v->setTempIndex(next);
+          v->setHessianIndex(next);
           _ivMap.push_back(v);
           newVertices.push_back(v);
           _activeVertices.push_back(v);
@@ -233,7 +233,7 @@ namespace g2o {
           abort();
       }
       else {
-        v->setTempIndex(-1);
+        v->setHessianIndex(-1);
       }
     }
     //cerr << "updating index mapping done." << endl;
@@ -244,14 +244,14 @@ namespace g2o {
     int idx = 0;
     for (HyperGraph::VertexSet::iterator it = _touchedVertices.begin(); it != _touchedVertices.end(); ++it) {
       OptimizableGraph::Vertex* v = static_cast<OptimizableGraph::Vertex*>(*it);
-      backupIdx[idx].tempIndex = v->tempIndex();
+      backupIdx[idx].hessianIndex = v->hessianIndex();
       backupIdx[idx].vertex = v;
       backupIdx[idx].hessianData = v->hessianData();
       ++idx;
     }
-    sort(backupIdx, backupIdx + _touchedVertices.size()); // sort according to the tempIndex which is the same order as used later by the optimizer
+    sort(backupIdx, backupIdx + _touchedVertices.size()); // sort according to the hessianIndex which is the same order as used later by the optimizer
     for (int i = 0; i < idx; ++i) {
-      backupIdx[i].vertex->setTempIndex(i);
+      backupIdx[i].vertex->setHessianIndex(i);
     }
     //cerr << "backup tempindex done." << endl;
 
@@ -271,7 +271,7 @@ namespace g2o {
       _updateMat.rowBlockIndices().push_back(sizePoses);
       _updateMat.colBlockIndices().push_back(sizePoses);
       _updateMat.blockCols().push_back(SparseBlockMatrix<MatrixXd>::IntBlockMap());
-      int ind = v->tempIndex();
+      int ind = v->hessianIndex();
       //cerr << PVAR(ind) << endl;
       if (ind >= 0) {
         MatrixXd* m = _updateMat.block(ind, ind, true);
@@ -287,10 +287,10 @@ namespace g2o {
       OptimizableGraph::Vertex* v1 = (OptimizableGraph::Vertex*) e->vertices()[0];
       OptimizableGraph::Vertex* v2 = (OptimizableGraph::Vertex*) e->vertices()[1];
 
-      int ind1 = v1->tempIndex();
+      int ind1 = v1->hessianIndex();
       if (ind1 == -1)
         continue;
-      int ind2 = v2->tempIndex();
+      int ind2 = v2->hessianIndex();
       if (ind2 == -1)
         continue;
       bool transposedBlock = ind1 > ind2;
@@ -317,7 +317,7 @@ namespace g2o {
 
     // restore the original data for the vertex
     for (int i = 0; i < idx; ++i) {
-      backupIdx[i].vertex->setTempIndex(backupIdx[i].tempIndex);
+      backupIdx[i].vertex->setHessianIndex(backupIdx[i].hessianIndex);
       if (backupIdx[i].hessianData)
         backupIdx[i].vertex->mapHessianMemory(backupIdx[i].hessianData);
     }
