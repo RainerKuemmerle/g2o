@@ -56,6 +56,12 @@ namespace g2o {
       //! return the underlying solver used to solve the linear system
       Solver* solver() { return _solver;}
 
+      /**
+       * write debug output of the Hessian if system is not positive definite
+       */
+      virtual void setWriteDebug(bool writeDebug);
+      virtual bool writeDebug() const { return _writeDebug->value();}
+
     protected:
       Solver* _solver;
       Property<bool>* _writeDebug;

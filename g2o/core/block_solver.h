@@ -119,6 +119,11 @@ namespace g2o {
 
       LinearSolver<PoseMatrixType>* linearSolver() const { return _linearSolver;}
 
+      virtual void setWriteDebug(bool writeDebug);
+      virtual bool writeDebug() const {return _linearSolver->writeDebug();}
+
+      virtual bool saveHessian(const std::string& fileName) const;
+
     protected:
       void resize(int* blockPoseIndices, int numPoseBlocks, 
           int* blockLandmarkIndices, int numLandmarkBlocks, int totalDim);
