@@ -29,6 +29,7 @@ optimization_algorithm.cpp optimization_algorithm.h
 optimization_algorithm_with_hessian.cpp optimization_algorithm_with_hessian.h
 optimization_algorithm_gauss_newton.cpp optimization_algorithm_gauss_newton.h
 optimization_algorithm_levenberg.cpp optimization_algorithm_levenberg.h
+sparse_optimizer_terminate_action.cpp sparse_optimizer_terminate_action.h
 g2o_core_api.h
 )
 

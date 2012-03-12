@@ -137,6 +137,7 @@ namespace g2o {
      * sets a variable checked at every iteration to force a user stop. The iteration exits when the variable is true;
      */
     void setForceStopFlag(bool* flag);
+    bool* forceStopFlag() const { return _forceStopFlag;};
 
     //! if external stop flag is given, return its state. False otherwise
     bool terminate() {return _forceStopFlag ? (*_forceStopFlag) : false; }
