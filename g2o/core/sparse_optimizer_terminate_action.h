@@ -5,6 +5,14 @@
 
 namespace g2o {
 
+  /**
+   * \brief stop iterating based on the gain which is (oldChi - currentChi) / currentChi.
+   *
+   * stop iterating based on the gain which is (oldChi - currentChi) / currentChi.
+   * If the gain is larger than zero and below the threshold, then the optimizer is stopped.
+   * Typically usage of this action includes adding it as a postIteration action, by calling
+   * addPostIterationAction on a sparse optimizer.
+   */
   class G2O_CORE_API SparseOptimizerTerminateAction : public HyperGraphAction
   {
     public:
