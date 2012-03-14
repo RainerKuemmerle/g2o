@@ -22,8 +22,7 @@ factory.cpp                 optimization_algorithm_property.h
 factory.h                   sparse_block_matrix.h
 sparse_optimizer.cpp  sparse_block_matrix.hpp
 sparse_optimizer.h
-hyper_dijkstra.cpp          structure_only_solver.h
-hyper_dijkstra.h
+hyper_dijkstra.cpp hyper_dijkstra.h
 parameter_container.cpp     parameter_container.h
 optimization_algorithm.cpp optimization_algorithm.h
 optimization_algorithm_with_hessian.cpp optimization_algorithm_with_hessian.h
