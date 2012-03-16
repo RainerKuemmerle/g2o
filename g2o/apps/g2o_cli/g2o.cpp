@@ -45,6 +45,7 @@
 #include "g2o/core/hyper_graph_action.h"
 #include "g2o/core/batch_stats.h"
 #include "g2o/core/optimization_algorithm.h"
+#include "g2o/core/sparse_optimizer_terminate_action.h"
 
 #include "g2o/stuff/macros.h"
 #include "g2o/stuff/color_macros.h"
@@ -123,7 +124,7 @@ int main(int argc, char** argv)
   // command line parsing
   std::vector<int> gaugeList;
   CommandArgs arg;
-  arg.param("i", maxIterations, 5, "perform n iterations");
+  arg.param("i", maxIterations, 5, "perform n iterations, if negative consider the gain");
   arg.param("v", verbose, false, "verbose output of the optimization process");
   arg.param("guess", initialGuess, false, "initial guess based on spanning tree");
   arg.param("inc", incremental, false, "run incremetally");
@@ -170,6 +171,14 @@ int main(int argc, char** argv)
   SparseOptimizer optimizer;
   optimizer.setVerbose(verbose);
   optimizer.setForceStopFlag(&hasToStop);
+
+  SparseOptimizerTerminateAction* terminateAction = 0;
+  if (maxIterations < 0) {
+    cerr << "# setup termination criterion based on the gain of the iteration" << endl;
+    maxIterations = std::numeric_limits<int>::max();
+    terminateAction = new SparseOptimizerTerminateAction;
+    optimizer.addPostIterationAction(terminateAction);
+  }
 
   // allocating the desired solver + testing whether the solver is okay
   OptimizationAlgorithmProperty solverProperty;

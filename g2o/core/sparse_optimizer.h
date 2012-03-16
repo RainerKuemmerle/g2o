@@ -166,6 +166,7 @@ namespace g2o {
      * sets a variable checked at every iteration to force a user stop. The iteration exits when the variable is true;
      */
     void setForceStopFlag(bool* flag);
+    bool* forceStopFlag() const { return _forceStopFlag;};
 
     //! if external stop flag is given, return its state. False otherwise
     bool terminate() {return _forceStopFlag ? (*_forceStopFlag) : false; }
@@ -189,12 +190,12 @@ namespace g2o {
      * search for an edge in _activeVertices and return the iterator pointing to it
      * getActiveVertices().end() if not found
      */
-    VertexContainer::const_iterator findActiveVertex(OptimizableGraph::Vertex* v) const;
+    VertexContainer::const_iterator findActiveVertex(const OptimizableGraph::Vertex* v) const;
     /**
      * search for an edge in _activeEdges and return the iterator pointing to it
      * getActiveEdges().end() if not found
      */
-    EdgeContainer::const_iterator findActiveEdge(OptimizableGraph::Edge* e) const;
+    EdgeContainer::const_iterator findActiveEdge(const OptimizableGraph::Edge* e) const;
 
     //! the solver used by the optimizer
     const OptimizationAlgorithm* algorithm() const { return _algorithm;}

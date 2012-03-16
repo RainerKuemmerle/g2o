@@ -38,7 +38,7 @@
 #include "g2o/solvers/dense/linear_solver_dense.h"
 #include "g2o/types/sba/types_six_dof_expmap.h"
 //#include "g2o/math_groups/se3quat.h"
-#include "g2o/core/structure_only_solver.h"
+#include "g2o/solvers/structure_only/structure_only_solver.h"
 
 using namespace Eigen;
 using namespace std;
@@ -336,16 +336,18 @@ int main(int argc, const char* argv[])
   optimizer.setVerbose(true);
 
 
-  g2o::StructureOnlySolver<3> structure_only_ba;
-
   if (STRUCTURE_ONLY)
   {
+    g2o::StructureOnlySolver<3> structure_only_ba;
     cout << "Performing structure-only BA:"   << endl;
-    structure_only_ba.setVerbose(true);
-    structure_only_ba.calc(optimizer.vertices(),
-                           10);
+    g2o::OptimizableGraph::VertexContainer points;
+    for (g2o::OptimizableGraph::VertexIDMap::const_iterator it = optimizer.vertices().begin(); it != optimizer.vertices().end(); ++it) {
+      g2o::OptimizableGraph::Vertex* v = static_cast<g2o::OptimizableGraph::Vertex*>(it->second);
+      if (v->dimension() == 3)
+        points.push_back(v);
+    }
 
-
+    structure_only_ba.calc(points, 10);
   }
 
     cout << endl;

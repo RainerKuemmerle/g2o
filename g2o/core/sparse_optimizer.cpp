@@ -455,7 +455,7 @@ namespace g2o{
     HyperGraph::clear();
   }
 
-  SparseOptimizer::VertexContainer::const_iterator SparseOptimizer::findActiveVertex(OptimizableGraph::Vertex* v) const
+  SparseOptimizer::VertexContainer::const_iterator SparseOptimizer::findActiveVertex(const OptimizableGraph::Vertex* v) const
   {
     VertexContainer::const_iterator lower = lower_bound(_activeVertices.begin(), _activeVertices.end(), v, VertexIDCompare());
     if (lower == _activeVertices.end())
@@ -465,7 +465,7 @@ namespace g2o{
     return _activeVertices.end();
   }
 
-  SparseOptimizer::EdgeContainer::const_iterator SparseOptimizer::findActiveEdge(OptimizableGraph::Edge* e) const
+  SparseOptimizer::EdgeContainer::const_iterator SparseOptimizer::findActiveEdge(const OptimizableGraph::Edge* e) const
   {
     EdgeContainer::const_iterator lower = lower_bound(_activeEdges.begin(), _activeEdges.end(), e, EdgeIDCompare());
     if (lower == _activeEdges.end())
