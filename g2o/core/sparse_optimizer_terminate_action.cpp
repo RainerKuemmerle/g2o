@@ -17,7 +17,7 @@ namespace g2o {
 
   HyperGraphAction* SparseOptimizerTerminateAction::operator()(const HyperGraph* graph, Parameters* parameters)
   {
-    assert(dynamic_cast<SparseOptimizer*>(graph) && "graph is not a SparseOptimizer");
+    assert(dynamic_cast<const SparseOptimizer*>(graph) && "graph is not a SparseOptimizer");
     assert(dynamic_cast<HyperGraphAction::ParametersIteration*>(parameters) && "error casting parameters");
 
     const SparseOptimizer* optimizer = static_cast<const SparseOptimizer*>(graph);
