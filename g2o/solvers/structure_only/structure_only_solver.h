@@ -151,7 +151,7 @@ class StructureOnlySolver : public OptimizationAlgorithm
                   e->computeError();
                   new_chi2 += e->chi2();
                 }
-                assert(isnan(new_chi2)==false);
+                assert(g2o_isnan(new_chi2)==false);
                 double rho = (chi2 - new_chi2);
                 if (rho > 0) {
                   goodStep = true;
