@@ -93,4 +93,9 @@ namespace g2o {
     return _solver ? _solver->updateStructure(vset, edges) : false;
   }
 
+  void OptimizationAlgorithmWithHessian::setWriteDebug(bool writeDebug)
+  {
+    _writeDebug->setValue(writeDebug);
+  }
+
 } // end namespace

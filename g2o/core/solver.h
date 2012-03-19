@@ -116,8 +116,14 @@ namespace g2o {
       size_t additionalVectorSpace() const { return _additionalVectorSpace;}
       void setAdditionalVectorSpace(size_t s);
 
-      virtual void setWriteDebug(bool){};
-      virtual bool writeDebug(){return false;}
+      /**
+       * write debug output of the Hessian if system is not positive definite
+       */
+      virtual void setWriteDebug(bool) = 0;
+      virtual bool writeDebug() const = 0;
+
+      //! write the hessian to disk using the specified file name
+      virtual bool saveHessian(const std::string& /*fileName*/) const = 0;
 
     protected:
       SparseOptimizer* _optimizer;

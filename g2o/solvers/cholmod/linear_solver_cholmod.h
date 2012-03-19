@@ -135,7 +135,7 @@ class LinearSolverCholmod : public LinearSolver<MatrixType>
       if (_cholmodCommon.status == CHOLMOD_NOT_POSDEF) {
         if (_writeDebug) {
           std::cerr << "Cholesky failure, writing debug.txt (Hessian loadable by Octave)" << std::endl;
-          writeCCSMatrix("debug.txt", _cholmodSparse->nrow, _cholmodSparse->ncol, (int*)_cholmodSparse->p, (int*)_cholmodSparse->i, (double*)_cholmodSparse->x, true);
+          saveMatrix("debug.txt");
         }
         return false;
       }
@@ -249,6 +249,11 @@ class LinearSolverCholmod : public LinearSolver<MatrixType>
     //! write a debug dump of the system matrix if it is not SPD in solve
     virtual bool writeDebug() const { return _writeDebug;}
     virtual void setWriteDebug(bool b) { _writeDebug = b;}
+
+    virtual bool saveMatrix(const std::string& fileName) {
+      writeCCSMatrix(fileName, _cholmodSparse->nrow, _cholmodSparse->ncol, (int*)_cholmodSparse->p, (int*)_cholmodSparse->i, (double*)_cholmodSparse->x, true);
+      return true;
+    }
 
   protected:
     // temp used for cholesky with cholmod

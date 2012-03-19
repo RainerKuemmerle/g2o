@@ -52,16 +52,16 @@ namespace g2o {
     };
   }
 
-  bool writeVector(const char* filename, const double*v, int n)
+  bool writeVector(const string& filename, const double*v, int n)
   {
-    ofstream os(filename);
+    ofstream os(filename.c_str());
     os << fixed;
     for (int i=0; i<n; i++)
       os << *v++ << endl;
     return os.good();
   }
 
-  bool writeCCSMatrix(const char* filename, int rows, int cols, const int* Ap, const int* Ai, const double* Ax, bool upperTriangleSymmetric)
+  bool writeCCSMatrix(const string& filename, int rows, int cols, const int* Ap, const int* Ai, const double* Ax, bool upperTriangleSymmetric)
   {
     vector<TripletEntry> entries;
     entries.reserve(Ap[cols]);
@@ -81,7 +81,7 @@ namespace g2o {
     if (lastDot != std::string::npos) 
       name = name.substr(0, lastDot);
 
-    std::ofstream fout(filename);
+    std::ofstream fout(filename.c_str());
     fout << "# name: " << name << std::endl;
     fout << "# type: sparse matrix" << std::endl;
     fout << "# nnz: " << entries.size() << std::endl;

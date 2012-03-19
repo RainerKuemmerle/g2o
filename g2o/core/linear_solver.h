@@ -72,6 +72,10 @@ class LinearSolver
       (void) A;
       return false;
     }
+
+    //! write a debug dump of the system matrix if it is not PSD in solve
+    virtual bool writeDebug() const { return false;}
+    virtual void setWriteDebug(bool) {}
 };
 
 } // end namespace

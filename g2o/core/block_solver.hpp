@@ -582,4 +582,16 @@ bool BlockSolver<Traits>::init(SparseOptimizer* optimizer, bool online)
   return true;
 }
 
+template <typename Traits>
+void BlockSolver<Traits>::setWriteDebug(bool writeDebug)
+{
+  _linearSolver->setWriteDebug(writeDebug);
+}
+
+template <typename Traits>
+bool BlockSolver<Traits>::saveHessian(const std::string& fileName) const
+{
+  return _Hpp->writeOctave(fileName.c_str(), true);
+}
+
 } // end namespace
