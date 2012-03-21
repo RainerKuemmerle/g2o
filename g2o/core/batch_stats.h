@@ -28,6 +28,7 @@
 #define G2O_BATCH_STATS_H_
 
 #include <iostream>
+#include <vector>
 
 #include "g2o_core_api.h"
 
@@ -71,6 +72,8 @@ namespace g2o {
   };
 
   G2O_CORE_API std::ostream& operator<<(std::ostream&, const G2OBatchStatistics&);
+
+  typedef std::vector<G2OBatchStatistics> BatchStatisticsContainer;
 
   // this is really ugly: global stat variable to write statistics
   extern G2O_CORE_API G2OBatchStatistics * globalStats;

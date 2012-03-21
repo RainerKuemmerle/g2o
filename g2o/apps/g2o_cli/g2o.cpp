@@ -499,7 +499,7 @@ int main(int argc, char** argv)
 
     if (statsFile!=""){
       // allocate buffer for statistics;
-      optimizer._statistics=new G2OBatchStatistics[maxIterations];
+      optimizer.setComputeBatchStatistics(true);
     }
     optimizer.initializeOptimization();
     optimizer.computeActiveErrors();
@@ -592,8 +592,10 @@ int main(int argc, char** argv)
     if (statsFile!=""){
       cerr << "writing stats to file \"" << statsFile << "\" ... ";
       ofstream os(statsFile.c_str());
-      for (int i=0; i<maxIterations; i++){
-        os << optimizer._statistics[i] << endl;
+      const BatchStatisticsContainer& bsc = optimizer.batchStatistics();
+      
+      for (int i=0; i<maxIterations; i++) {
+        os << bsc[i] << endl;
       }
       cerr << "done." << endl;
     }
