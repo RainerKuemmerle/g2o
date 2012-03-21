@@ -27,6 +27,10 @@
 #include "parameter_se2_offset.h"
 #include "vertex_se2.h"
 
+#ifdef WINDOWS
+#include <windows.h>
+#endif
+
 #ifdef G2O_HAVE_OPENGL
 #ifdef __APPLE__
 #include <OpenGL/gl.h>
