@@ -105,7 +105,11 @@ class StructureOnlySolver : public OptimizationAlgorithm
               g2o::OptimizableGraph::Edge* e = dynamic_cast<g2o::OptimizableGraph::Edge *>(*it_t);
 
               // fix all the other vertices and remember their fix value
+#ifdef WINDOWS
+              std::vector<bool> remember_fix_status(e->vertices().size());
+#else
               bool remember_fix_status[e->vertices().size()];
+#endif
               for (size_t k = 0; k < e->vertices().size(); ++k) {
                 OptimizableGraph::Vertex* otherV = static_cast<OptimizableGraph::Vertex*>(e->vertex(k));
                 if (otherV != v) {

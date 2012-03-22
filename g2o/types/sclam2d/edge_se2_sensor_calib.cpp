@@ -26,6 +26,10 @@
 
 #include "edge_se2_sensor_calib.h"
 
+#ifdef WINDOWS
+#include <windows.h>
+#endif
+
 #ifdef G2O_HAVE_OPENGL
 #ifdef __APPLE__
 #include <OpenGL/gl.h>
