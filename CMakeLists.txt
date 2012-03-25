@@ -96,9 +96,9 @@ ENDIF(WIN32)
 # For building the CHOLMOD / CSPARSE solvers
 FIND_PACKAGE(SuiteSparse)
 IF(CSPARSE_FOUND)
-  SET( BUILD_CSPARSE OFF CACHE BOOL "Build local CSparse library")
+  SET(BUILD_CSPARSE OFF CACHE BOOL "Build local CSparse library")
 ELSE(CSPARSE_FOUND)
-  SET( BUILD_CSPARSE ON CACHE BOOL "Build local CSparse library")
+  SET(BUILD_CSPARSE ON CACHE BOOL "Build local CSparse library")
   SET(CSPARSE_FOUND TRUE)
 ENDIF(CSPARSE_FOUND)
 
