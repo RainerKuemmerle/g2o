@@ -60,7 +60,7 @@ namespace g2o {
     }
     std::cerr <<  std::endl;
     setOffset(SE2(off));
-    return is.good();
+    return is.good() || is.eof();
   }
   
   bool ParameterSE2Offset::write(std::ostream& os) const {
