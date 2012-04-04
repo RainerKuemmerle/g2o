@@ -18,8 +18,6 @@
 
 #include <iostream>
 
-#include <unistd.h>
-
 #include "main_window.h"
 #include "stream_redirect.h"
 
@@ -36,8 +34,19 @@
 #include "g2o/stuff/command_args.h"
 
 #include <QApplication>
+#include <QThread>
 using namespace std;
 using namespace g2o;
+
+/**
+ * \brief helper for calling usleep on any system using Qt
+ */
+class SleepThread : public QThread
+{
+  public: // make the proctected methods publicly available
+    using QThread::msleep;
+    using QThread::usleep;
+};
 
 int main(int argc, char** argv)
 {
@@ -83,7 +92,7 @@ int main(int argc, char** argv)
   while (mw.isVisible()) {
     guiHyperGraphAction.dumpScreenshots = mw.actionDump_Images->isChecked();
     qapp.processEvents();
-    usleep(10000);
+    SleepThread::msleep(10);
   }
 
   delete optimizer;
