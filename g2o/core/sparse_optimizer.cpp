@@ -211,7 +211,7 @@ namespace g2o{
         int estimateDim = v->estimateDimension();
         if (estimateDim > 0) {
 #        ifdef _MSC_VER
-          double* estimateData = new double[];
+          double* estimateData = new double[estimateDim];
 #        else
           double estimateData[estimateDim];
 #        endif
