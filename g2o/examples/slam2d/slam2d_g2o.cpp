@@ -18,8 +18,6 @@
 
 #include <iostream>
 
-#include <unistd.h>
-
 #include "main_window.h"
 
 #include "g2o/core/sparse_optimizer.h"
@@ -54,9 +52,5 @@ int main(int argc, char** argv)
   mw.solverLevenberg = solverLevenberg;
   mw.viewer->graph->setAlgorithm(solverGauss);
 
-  while (mw.isVisible()) {
-    qapp.processEvents();
-    usleep(10000);
-  }
-  return 0;
+  return qapp.exec();
 }
