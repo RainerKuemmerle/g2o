@@ -30,14 +30,20 @@
 #include <stdint.h>
 #include <tr1/unordered_set>
 
+#include "g2o/config.h"
 #include "g2o/core/sparse_optimizer.h"
 #include "g2o/core/block_solver.h"
 #include "g2o/core/solver.h"
 #include "g2o/core/optimization_algorithm_levenberg.h"
-#include "g2o/solvers/cholmod/linear_solver_cholmod.h"
 #include "g2o/solvers/dense/linear_solver_dense.h"
 #include "g2o/types/icp/types_icp.h"
 #include "g2o/solvers/structure_only/structure_only_solver.h"
+
+#if defined G2O_HAVE_CHOLMOD
+#include "g2o/solvers/cholmod/linear_solver_cholmod.h"
+#elif defined G2O_HAVE_CSPARSE
+#include "g2o/solvers/csparse/linear_solver_csparse.h"
+#endif
 
 using namespace Eigen;
 using namespace std;
@@ -144,9 +150,15 @@ int main(int argc, const char* argv[])
   }
   else
   {
+#ifdef G2O_HAVE_CHOLMOD
     linearSolver
         = new g2o::LinearSolverCholmod<g2o
         ::BlockSolver_6_3::PoseMatrixType>();
+#elif defined G2O_HAVE_CSPARSE
+    linearSolver = new g2o::LinearSolverCSparse<g2o::BlockSolver_6_3::PoseMatrixType>();
+#else
+#error neither CSparse nor Cholmod are available
+#endif
   }
 
 
