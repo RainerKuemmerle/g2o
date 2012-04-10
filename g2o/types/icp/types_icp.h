@@ -263,7 +263,7 @@ namespace g2o {
       // capture the update function to reset aux transforms
       virtual void oplusImpl(const double* update)
       {
-        VertexSE3::oplus(update);
+        VertexSE3::oplusImpl(update);
         setAll();
       }
 
