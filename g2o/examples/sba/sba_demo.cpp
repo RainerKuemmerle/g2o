@@ -27,10 +27,8 @@
 #include <Eigen/StdVector>
 
 #ifdef _MSC_VER
-#include <random>
 #include <unordered_set>
 #else
-#include <tr1/random>
 #include <tr1/unordered_set>
 #endif
 
@@ -58,18 +56,12 @@ using namespace std;
 
 class Sample
 {
-
-  static tr1::ranlux_base_01 gen_real;
-  static tr1::mt19937 gen_int;
 public:
   static int uniform(int from, int to);
-
   static double uniform();
-
   static double gaussian(double sigma);
 };
 
-#ifdef _MSC_VER
 static double uniform_rand(double lowerBndr, double upperBndr)
 {
   return lowerBndr + ((double) std::rand() / (RAND_MAX + 1.0)) * (upperBndr - lowerBndr);
@@ -85,45 +77,20 @@ static double gauss_rand(double mean, double sigma)
   } while (r2 > 1.0 || r2 == 0.0);
   return mean + sigma * y * std::sqrt(-2.0 * log(r2) / r2);
 }
-#endif
-
-tr1::ranlux_base_01 Sample::gen_real;
-tr1::mt19937 Sample::gen_int;
 
 int Sample::uniform(int from, int to)
 {
-  // there seems to be some issues in the TR1 sampling with MSVC
-#ifdef _MSC_VER
   return static_cast<int>(uniform_rand(from, to));
-#else
-  tr1::uniform_int<int> unif(from, to);
-  int sam = unif(gen_int);
-  return  sam;
-#endif
 }
 
 double Sample::uniform()
 {
-  // there seems to be some issues in the TR1 sampling with MSVC
-#ifdef _MSC_VER
   return uniform_rand(0., 1.);
-#else
-  std::tr1::uniform_real<double> unif(0.0, 1.0);
-  double sam = unif(gen_real);
-  return  sam;
-#endif
 }
 
 double Sample::gaussian(double sigma)
 {
-  // there seems to be some issues in the TR1 sampling with MSVC
-#ifdef _MSC_VER
   return gauss_rand(0., sigma);
-#else
-  std::tr1::normal_distribution<double> gauss(0.0, sigma);
-  double sam = gauss(gen_real);
-  return  sam;
-#endif
 }
 
 int main(int argc, const char* argv[])
