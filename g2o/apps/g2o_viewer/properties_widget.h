@@ -23,6 +23,8 @@
 #include <string>
 
 #include <QDialog>
+
+#include "g2o_viewer_api.h"
 #include "ui_base_properties_widget.h"
 
 namespace g2o
@@ -31,7 +33,7 @@ namespace g2o
   class PropertyMap;
 }
 
-class PropertiesWidget : public QDialog, public Ui::BasePropertiesWidget
+class G2O_VIEWER_API PropertiesWidget : public QDialog, public Ui::BasePropertiesWidget
 {
   Q_OBJECT
   public:

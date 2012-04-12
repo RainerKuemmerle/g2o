@@ -25,19 +25,30 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <Eigen/StdVector>
-#include <tr1/random>
+
+#ifdef _MSC_VER
+#include <unordered_set>
+#else
+#include <tr1/unordered_set>
+#endif
+
 #include <iostream>
 #include <stdint.h>
-#include <tr1/unordered_set>
 
+#include "g2o/config.h"
 #include "g2o/core/sparse_optimizer.h"
 #include "g2o/core/block_solver.h"
 #include "g2o/core/solver.h"
 #include "g2o/core/optimization_algorithm_levenberg.h"
-#include "g2o/solvers/cholmod/linear_solver_cholmod.h"
 #include "g2o/solvers/dense/linear_solver_dense.h"
 #include "g2o/types/icp/types_icp.h"
 #include "g2o/solvers/structure_only/structure_only_solver.h"
+
+#if defined G2O_HAVE_CHOLMOD
+#include "g2o/solvers/cholmod/linear_solver_cholmod.h"
+#elif defined G2O_HAVE_CSPARSE
+#include "g2o/solvers/csparse/linear_solver_csparse.h"
+#endif
 
 using namespace Eigen;
 using namespace std;
@@ -45,40 +56,41 @@ using namespace std;
 
 class Sample
 {
-
-  static tr1::ranlux_base_01 gen_real;
-  static tr1::mt19937 gen_int;
 public:
   static int uniform(int from, int to);
-
   static double uniform();
-
   static double gaussian(double sigma);
 };
 
+static double uniform_rand(double lowerBndr, double upperBndr)
+{
+  return lowerBndr + ((double) std::rand() / (RAND_MAX + 1.0)) * (upperBndr - lowerBndr);
+}
 
-tr1::ranlux_base_01 Sample::gen_real;
-tr1::mt19937 Sample::gen_int;
+static double gauss_rand(double mean, double sigma)
+{
+  double x, y, r2;
+  do {
+    x = -1.0 + 2.0 * uniform_rand(0.0, 1.0);
+    y = -1.0 + 2.0 * uniform_rand(0.0, 1.0);
+    r2 = x * x + y * y;
+  } while (r2 > 1.0 || r2 == 0.0);
+  return mean + sigma * y * std::sqrt(-2.0 * log(r2) / r2);
+}
 
 int Sample::uniform(int from, int to)
 {
-  tr1::uniform_int<int> unif(from, to);
-  int sam = unif(gen_int);
-  return  sam;
+  return static_cast<int>(uniform_rand(from, to));
 }
 
 double Sample::uniform()
 {
-  std::tr1::uniform_real<double> unif(0.0, 1.0);
-  double sam = unif(gen_real);
-  return  sam;
+  return uniform_rand(0., 1.);
 }
 
 double Sample::gaussian(double sigma)
 {
-  std::tr1::normal_distribution<double> gauss(0.0, sigma);
-  double sam = gauss(gen_real);
-  return  sam;
+  return gauss_rand(0., sigma);
 }
 
 int main(int argc, const char* argv[])
@@ -112,18 +124,18 @@ int main(int argc, const char* argv[])
   bool ROBUST_KERNEL = false;
   if (argc>3)
   {
-    ROBUST_KERNEL = atof(argv[3]);
+    ROBUST_KERNEL = atoi(argv[3]) != 0;
   }
   bool STRUCTURE_ONLY = false;
   if (argc>4)
   {
-    STRUCTURE_ONLY = atof(argv[4]);
+    STRUCTURE_ONLY = atoi(argv[4]) != 0;
   }
 
   bool DENSE = false;
   if (argc>5)
   {
-    DENSE = atof(argv[5]);
+    DENSE = atoi(argv[5]) != 0;
   }
 
   cout << "PIXEL_NOISE: " <<  PIXEL_NOISE << endl;
@@ -139,14 +151,20 @@ int main(int argc, const char* argv[])
   g2o::BlockSolver_6_3::LinearSolverType * linearSolver;
   if (DENSE)
   {
-        linearSolver= new g2o::LinearSolverDense<g2o
-        ::BlockSolver_6_3::PoseMatrixType>();
+        linearSolver= new g2o::LinearSolverDense<g2o::BlockSolver_6_3::PoseMatrixType>();
+		cerr << "Using DENSE" << endl;
   }
   else
   {
-    linearSolver
-        = new g2o::LinearSolverCholmod<g2o
-        ::BlockSolver_6_3::PoseMatrixType>();
+#ifdef G2O_HAVE_CHOLMOD
+	cerr << "Using CHOLMOD" << endl;
+    linearSolver = new g2o::LinearSolverCholmod<g2o::BlockSolver_6_3::PoseMatrixType>();
+#elif defined G2O_HAVE_CSPARSE
+    linearSolver = new g2o::LinearSolverCSparse<g2o::BlockSolver_6_3::PoseMatrixType>();
+	cerr << "Using CSPARSE" << endl;
+#else
+#error neither CSparse nor Cholmod are available
+#endif
   }
 
 
@@ -249,6 +267,7 @@ int main(int argc, const char* argv[])
 
     if (num_obs>=2)
     {
+      optimizer.addVertex(v_p);
 
       bool inlier = true;
       for (size_t j=0; j<true_poses.size(); ++j)
@@ -310,31 +329,23 @@ int main(int argc, const char* argv[])
      // else
      //   cout << "Point: " << point_id <<  "has at least one spurious observation" <<endl;
 
-
-      optimizer.addVertex(v_p);
-
       pointid_2_trueid.insert(make_pair(point_id,i));
 
       ++point_id;
       ++point_num;
-
-
     }
 
   }
-
 
   cout << endl;
   optimizer.initializeOptimization();
 
   optimizer.setVerbose(true);
 
-
   if (STRUCTURE_ONLY)
   {
     cout << "Performing structure-only BA:"   << endl;
     g2o::StructureOnlySolver<3> structure_only_ba;
-    cout << "Performing structure-only BA:"   << endl;
     g2o::OptimizableGraph::VertexContainer points;
     for (g2o::OptimizableGraph::VertexIDMap::const_iterator it = optimizer.vertices().begin(); it != optimizer.vertices().end(); ++it) {
       g2o::OptimizableGraph::Vertex* v = static_cast<g2o::OptimizableGraph::Vertex*>(it->second);

@@ -257,6 +257,7 @@ int main(int argc, const char* argv[])
 
     if (num_obs>=2)
     {
+      optimizer.addVertex(v_p);
 
       bool inlier = true;
       for (size_t j=0; j<true_poses.size(); ++j)
@@ -312,12 +313,6 @@ int main(int argc, const char* argv[])
       }
      // else
      //   cout << "Point: " << point_id <<  "has at least one spurious observation" <<endl;
-
-
-      optimizer.addVertex(v_p);
-
-
-
 
       pointid_2_trueid.insert(make_pair(point_id,i));
 
