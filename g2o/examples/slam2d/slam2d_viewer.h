@@ -23,7 +23,7 @@
 
 namespace g2o {
 
-  struct SparseOptimizer;
+  class SparseOptimizer;
 
   class Slam2DViewer : public QGLViewer
   {

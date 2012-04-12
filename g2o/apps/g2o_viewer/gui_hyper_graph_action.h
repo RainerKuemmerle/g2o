@@ -19,6 +19,7 @@
 #ifndef G2O_GUI_HYPER_GRAPH_ACTION_H
 #define G2O_GUI_HYPER_GRAPH_ACTION_H
 
+#include "g2o_viewer_api.h"
 #include "g2o/core/hyper_graph_action.h"
 
 namespace g2o {
@@ -28,7 +29,7 @@ namespace g2o {
   /**
    * \brief action which calls an GUI update after each iteration
    */
-  class GuiHyperGraphAction : public HyperGraphAction
+  class G2O_VIEWER_API GuiHyperGraphAction : public HyperGraphAction
   {
     public:
       GuiHyperGraphAction();

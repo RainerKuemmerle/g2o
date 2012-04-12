@@ -25,6 +25,9 @@
 #ifdef __APPLE__
 #include <OpenGL/glu.h>
 #endif
+#ifdef _WINDOWS
+#include <gl/GLU.h>
+#endif
 
 namespace g2o {
 

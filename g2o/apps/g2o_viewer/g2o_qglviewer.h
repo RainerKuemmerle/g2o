@@ -20,16 +20,17 @@
 #define G2O_QGL_GRAPH_VIEWER_H
 
 #include "qglviewer.h"
+#include "g2o_viewer_api.h"
 #include "g2o/core/hyper_graph_action.h"
 
 namespace g2o {
 
-  struct SparseOptimizer;
+  class SparseOptimizer;
 
   /**
    * \brief OpenGL based viewer for the graph
    */
-  class G2oQGLViewer : public QGLViewer
+  class G2O_VIEWER_API G2oQGLViewer : public QGLViewer
   {
     public:
       G2oQGLViewer(QWidget* parent=NULL, const QGLWidget* shareWidget=0, Qt::WFlags flags=0);

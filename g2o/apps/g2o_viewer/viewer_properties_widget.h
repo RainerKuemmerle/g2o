@@ -19,6 +19,7 @@
 #ifndef G2O_VIEWER_PROPERTIES_WIDGET_H
 #define G2O_VIEWER_PROPERTIES_WIDGET_H
 
+#include "g2o_viewer_api.h"
 #include "properties_widget.h"
 
 namespace g2o
@@ -26,7 +27,7 @@ namespace g2o
   class G2oQGLViewer;
 }
 
-class ViewerPropertiesWidget : public PropertiesWidget
+class G2O_VIEWER_API ViewerPropertiesWidget : public PropertiesWidget
 {
   public:
     ViewerPropertiesWidget(QWidget * parent = 0, Qt::WindowFlags f = 0);
