@@ -85,6 +85,8 @@ void G2oQGLViewer::draw()
     assert(_drawActions);
   }
   
+  if (! _drawActions) // avoid segmentation fault in release build
+    return;
   if (_updateDisplay) {
     _updateDisplay = false;
     glNewList(_drawList, GL_COMPILE_AND_EXECUTE);
