@@ -87,8 +87,8 @@ namespace g2o {
     if (!DrawAction::refreshPropertyPtrs(params_))
       return false;
     if (_previousParams){
-      _triangleX = _previousParams->makeProperty<FloatProperty>(_typeName + "::TRIANGLE_X", .2);
-      _triangleY = _previousParams->makeProperty<FloatProperty>(_typeName + "::TRIANGLE_Y", .05);
+      _triangleX = _previousParams->makeProperty<FloatProperty>(_typeName + "::TRIANGLE_X", .2f);
+      _triangleY = _previousParams->makeProperty<FloatProperty>(_typeName + "::TRIANGLE_Y", .05f);
     } else {
       _triangleX = 0;
       _triangleY = 0;
@@ -115,21 +115,21 @@ namespace g2o {
     
 
     VertexSE2* that = static_cast<VertexSE2*>(element);
-    glColor3f(0.5,0.5,0.8);
+    glColor3f(0.5f,0.5f,0.8f);
     glPushAttrib(GL_ENABLE_BIT);
     glDisable(GL_LIGHTING);
     glPushMatrix();
-    glTranslatef(that->estimate().translation().x(),that->estimate().translation().y(),0.);
-    glRotatef(RAD2DEG(that->estimate().rotation().angle()),0.,0.,1.);
-    double tx=0.1, ty=0.05;
+    glTranslatef((float)that->estimate().translation().x(),(float)that->estimate().translation().y(),0.f);
+    glRotatef((float)RAD2DEG(that->estimate().rotation().angle()),0.f,0.f,1.f);
+    float tx=0.1f, ty=0.05f;
     if (_triangleX && _triangleY){
       tx=_triangleX->value();
       ty=_triangleY->value();
     }
     glBegin(GL_TRIANGLE_FAN);
-    glVertex3f( tx ,0.  ,0.);
-    glVertex3f(-tx ,-ty, 0.);
-    glVertex3f(-tx , ty, 0.);
+    glVertex3f( tx ,0.f ,0.f);
+    glVertex3f(-tx ,-ty, 0.f);
+    glVertex3f(-tx , ty, 0.f);
     glEnd();
     if (that->userData() && _drawActions )
       (*_drawActions)(that->userData(), params_);
