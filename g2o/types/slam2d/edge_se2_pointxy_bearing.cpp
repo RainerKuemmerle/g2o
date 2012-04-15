@@ -113,10 +113,10 @@ namespace g2o {
     EdgeSE2PointXYBearing* e =  static_cast<EdgeSE2PointXYBearing*>(element);
     VertexSE2* fromEdge = static_cast<VertexSE2*>(e->vertex(0));
     VertexPointXY* toEdge   = static_cast<VertexPointXY*>(e->vertex(1));
-    glColor3f(0.3,0.3,0.1);
+    glColor3f(0.3f,0.3f,0.1f);
     glBegin(GL_LINES);
-    glVertex3f(fromEdge->estimate().translation().x(),fromEdge->estimate().translation().y(),0.);
-    glVertex3f(toEdge->estimate().x(),toEdge->estimate().y(),0.);
+    glVertex3f((float)fromEdge->estimate().translation().x(),(float)fromEdge->estimate().translation().y(),0.f);
+    glVertex3f((float)toEdge->estimate().x(),(float)toEdge->estimate().y(),0.f);
     glEnd();
     return this;
   }

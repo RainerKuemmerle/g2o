@@ -233,12 +233,12 @@ namespace g2o {
     EdgeSE3PointXYZDisparity* e =  static_cast<EdgeSE3PointXYZDisparity*>(element);
     VertexSE3* fromEdge = static_cast<VertexSE3*>(e->vertex(0));
     VertexPointXYZ* toEdge   = static_cast<VertexPointXYZ*>(e->vertex(1));
-    glColor3f(0.4,0.4,0.2);
+    glColor3f(0.4f,0.4f,0.2f);
     glPushAttrib(GL_ENABLE_BIT);
     glDisable(GL_LIGHTING);
     glBegin(GL_LINES);
-    glVertex3f(fromEdge->estimate().translation().x(),fromEdge->estimate().translation().y(),fromEdge->estimate().translation().z());
-    glVertex3f(toEdge->estimate().x(),toEdge->estimate().y(),toEdge->estimate().z());
+    glVertex3f((float)fromEdge->estimate().translation().x(),(float)fromEdge->estimate().translation().y(),(float)fromEdge->estimate().translation().z());
+    glVertex3f((float)toEdge->estimate().x(),(float)toEdge->estimate().y(),(float)toEdge->estimate().z());
     glEnd();
     glPopAttrib();
     return this;

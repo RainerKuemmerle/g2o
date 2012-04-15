@@ -140,12 +140,12 @@ namespace g2o {
     EdgeSE2PointXY* e =  static_cast<EdgeSE2PointXY*>(element);
     VertexSE2* fromEdge = static_cast<VertexSE2*>(e->vertex(0));
     VertexPointXY* toEdge   = static_cast<VertexPointXY*>(e->vertex(1));
-    glColor3f(0.4,0.4,0.2);
+    glColor3f(0.4f,0.4f,0.2f);
     glPushAttrib(GL_ENABLE_BIT);
     glDisable(GL_LIGHTING);
     glBegin(GL_LINES);
-    glVertex3f(fromEdge->estimate().translation().x(),fromEdge->estimate().translation().y(),0.);
-    glVertex3f(toEdge->estimate().x(),toEdge->estimate().y(),0.);
+    glVertex3f((float)fromEdge->estimate().translation().x(),(float)fromEdge->estimate().translation().y(),0.f);
+    glVertex3f((float)toEdge->estimate().x(),(float)toEdge->estimate().y(),0.f);
     glEnd();
     glPopAttrib();
     return this;

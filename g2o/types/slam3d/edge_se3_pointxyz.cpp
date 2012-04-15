@@ -156,7 +156,7 @@ namespace g2o {
     //   cerr << "fatal error in retrieving cache" << endl;
     // }
     // SE3OffsetParameters* params=vcache->params;
-    Eigen::Vector3d p=_measurement;
+    const Eigen::Vector3d& p=_measurement;
     point->setEstimate(cam->estimate() * (offsetParam->offsetMatrix() * p));
   }
 
