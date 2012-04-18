@@ -176,10 +176,35 @@ namespace g2o {
         bool setEstimateData(const double* estimate);
 
         /**
+         * sets the initial estimate from an array of double
+         * Implement setEstimateDataImpl()
+         * @return true on success
+         */
+        bool setEstimateData(const std::vector<double>& estimate) { 
+#ifndef NDEBUG
+          int dim = estimateDimension();
+          assert((dim == -1) || (estimate.size() == std::size_t(dim)));
+#endif
+          return setEstimateData(estimate.data());
+        };
+
+        /**
          * writes the estimater to an array of double
          * @returns true on success
          */
-        virtual bool getEstimateData(double* estimate) const ;
+        virtual bool getEstimateData(double* estimate) const;
+
+        /**
+         * writes the estimater to an array of double
+         * @returns true on success
+         */
+        virtual bool getEstimateData(std::vector<double>& estimate) const {
+          int dim = estimateDimension();
+          if (dim < 0)
+            return false;
+          estimate.resize(dim);
+          return getEstimateData(estimate.data());
+        };
 
         /**
          * returns the dimension of the extended representation used by get/setEstimate(double*)
@@ -195,10 +220,35 @@ namespace g2o {
         bool setMinimalEstimateData(const double* estimate);
 
         /**
+         * sets the initial estimate from an array of double.
+         * Implement setMinimalEstimateDataImpl()
+         * @return true on success
+         */
+        bool setMinimalEstimateData(const std::vector<double>& estimate) {
+#ifndef NDEBUG
+          int dim = minimalEstimateDimension();
+          assert((dim == -1) || (estimate.size() == std::size_t(dim)));
+#endif
+          return setMinimalEstimateData(estimate.data());
+        };
+
+        /**
          * writes the estimate to an array of double
          * @returns true on success
          */
         virtual bool getMinimalEstimateData(double* estimate) const ;
+
+        /**
+         * writes the estimate to an array of double
+         * @returns true on success
+         */
+        virtual bool getMinimalEstimateData(std::vector<double>& estimate) const {
+          int dim = minimalEstimateDimension();
+          if (dim < 0)
+            return false;
+          estimate.resize(dim);
+          return getMinimalEstimateData(estimate.data());
+        };
 
         /**
          * returns the dimension of the extended representation used by get/setEstimate(double*)
