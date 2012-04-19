@@ -54,7 +54,7 @@ namespace g2o {
 
       virtual bool getEstimateData(double* est) const{
   est[0] = _estimate[0];
-  est[0] = _estimate[1];
+  est[1] = _estimate[1];
   return true;
       }
       
