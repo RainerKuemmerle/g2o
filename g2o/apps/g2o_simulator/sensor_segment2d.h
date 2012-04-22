@@ -24,18 +24,25 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef G2O_SIMULATOR2D_
-#define G2O_SIMULATOR2D_
+#ifndef G2O_SENSOR_SEGMENT2D_H_
+#define G2O_SENSOR_SEGMENT2D_H_
 
 #include "simulator2d_base.h"
-#include "sensor_odometry2d.h"
-#include "sensor_pose2d.h"
-#include "sensor_pointxy.h"
-#include "sensor_pointxy_bearing.h"
-#include "sensor_pointxy_offset.h"
-#include "sensor_segment2d.h"
-#include "sensor_segment2d_line.h"
-#include "sensor_segment2d_pointline.h"
+#include "pointsensorparameters.h"
+#include "g2o_simulator_api.h"
 
+namespace g2o {
+  
+  // sensor that senses segments, only if the extremas are visible
+  class G2O_SIMULATOR_API SensorSegment2D: public PointSensorParameters, public BinarySensor<Robot2D, EdgeSE2Segment2D,WorldObjectSegment2D>{ 
+  public:
+    SensorSegment2D(const std::string& name_);
+    virtual void sense();
+    virtual void addNoise(EdgeType* e);
+  protected:
+    bool isVisible(WorldObjectType* to);
+  }; 
+
+}
 
 #endif

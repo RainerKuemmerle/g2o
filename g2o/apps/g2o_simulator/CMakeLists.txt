@@ -2,11 +2,15 @@ ADD_LIBRARY(g2o_simulator_library ${G2O_LIB_TYPE}
    simulator.cpp simulator.h
    pointsensorparameters.cpp  pointsensorparameters.h
    simulator2d_base.h
+   simutils.cpp  simutils.h
    sensor_odometry2d.cpp sensor_odometry2d.h 
    sensor_pose2d.cpp sensor_pose2d.h
    sensor_pointxy.cpp sensor_pointxy.h
    sensor_pointxy_bearing.cpp sensor_pointxy_bearing.h
    sensor_pointxy_offset.cpp sensor_pointxy_offset.h
+   sensor_segment2d.cpp  sensor_segment2d.h
+   sensor_segment2d_line.cpp  sensor_segment2d_line.h
+   sensor_segment2d_pointline.cpp  sensor_segment2d_pointline.h
    simulator2d.h
    
    simulator3d_base.h

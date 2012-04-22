@@ -40,18 +40,27 @@ using namespace std;
 int main(int argc, char** argv) {
   CommandArgs arg;
   int nlandmarks;
+  int nSegments;
   int simSteps;
   double worldSize;
   bool hasOdom;
   bool hasPoseSensor;
   bool hasPointSensor;
   bool hasPointBearingSensor;
+  bool hasSegmentSensor;
   bool hasCompass;
   bool hasGPS;
+
+  int segmentGridSize;
+  double minSegmentLenght, maxSegmentLenght;
 
   std::string outputFilename;
   arg.param("simSteps", simSteps, 100, "number of simulation steps");
   arg.param("nLandmarks", nlandmarks, 1000, "number of landmarks");
+  arg.param("nSegments", nSegments, 1000, "number of segments");
+  arg.param("segmentGridSize", segmentGridSize, 50, "number of cells of the grid where to align the segments");
+  arg.param("minSegmentLenght", minSegmentLenght, 0.5, "minimal lenght of a segment in the world");
+  arg.param("maxSegmentLenght", maxSegmentLenght, 3,  "maximal lenght of a segment in the world");
   arg.param("worldSize", worldSize, 25.0, "size of the world");
   arg.param("hasOdom",        hasOdom, false,  "the robot has an odometry" );
   arg.param("hasPointSensor", hasPointSensor, false, "the robot has a point sensor" );
@@ -59,6 +68,7 @@ int main(int argc, char** argv) {
   arg.param("hasPoseSensor",  hasPoseSensor, false,  "the robot has a pose sensor" );
   arg.param("hasCompass",     hasCompass, false, "the robot has a compass");
   arg.param("hasGPS",         hasGPS, false, "the robot has a GPS");
+  arg.param("hasSegmentSensor", hasSegmentSensor, false, "the robot has a segment sensor" );
   arg.paramLeftOver("graph-output", outputFilename, "simulator_out.g2o", "graph file which will be written", true);
 
 
@@ -74,6 +84,33 @@ int main(int argc, char** argv) {
     landmark->vertex()->setEstimate(Vector2d(x,y));
     world.addWorldObject(landmark);
   }
+
+  cerr << "nSegments = " << nSegments << endl;
+
+  for (int i=0; i<nSegments; i++){
+    WorldObjectSegment2D * segment = new WorldObjectSegment2D;
+    int ix = sampleUniform(-segmentGridSize,segmentGridSize, &generator);
+    int iy = sampleUniform(-segmentGridSize,segmentGridSize, &generator);
+    int ith = sampleUniform(0,3, &generator);
+    double th= (M_PI/2)*ith;
+    th=atan2(sin(th),cos(th));
+    double xc = ix*(worldSize/segmentGridSize);
+    double yc = iy*(worldSize/segmentGridSize);
+    
+    double l2 = sampleUniform(minSegmentLenght, maxSegmentLenght, &generator);
+    
+    double x1 = xc + cos(th)*l2;
+    double y1 = yc + sin(th)*l2;
+    double x2 = xc - cos(th)*l2;
+    double y2 = yc - sin(th)*l2;
+
+
+    segment->vertex()->setEstimateP1(Vector2d(x1,y1));
+    segment->vertex()->setEstimateP2(Vector2d(x2,y2));
+    world.addWorldObject(segment);
+  }
+
+
   Robot2D robot(&world, "myRobot");
   world.addRobot(&robot);
 
@@ -120,6 +157,34 @@ int main(int argc, char** argv) {
     robot.addSensor(bearingSensor);
     bearingSensor->setInformation(bearingSensor->information()*1000);
     ss << "-pointBearing";
+  }
+
+  if (hasSegmentSensor) {
+    SensorSegment2D* segmentSensor = new SensorSegment2D("segmentSensorSensor");
+    segmentSensor->setMaxRange(3);
+    segmentSensor->setMinRange(.1);
+    robot.addSensor(segmentSensor);
+    segmentSensor->setInformation(segmentSensor->information()*1000);
+
+    SensorSegment2DLine* segmentSensorLine = new SensorSegment2DLine("segmentSensorSensorLine");
+    segmentSensorLine->setMaxRange(3);
+    segmentSensorLine->setMinRange(.1);
+    robot.addSensor(segmentSensorLine);
+    Matrix2d m=segmentSensorLine->information();
+    m=m*1000;
+    m(0,0)*=10;
+    segmentSensorLine->setInformation(m);
+
+    SensorSegment2DPointLine* segmentSensorPointLine = new SensorSegment2DPointLine("segmentSensorSensorPointLine");
+    segmentSensorPointLine->setMaxRange(3);
+    segmentSensorPointLine->setMinRange(.1);
+    robot.addSensor(segmentSensorPointLine);
+    Matrix3d m3=segmentSensorPointLine->information();
+    m3=m3*1000;
+    m3(3,3)*=10;
+    segmentSensorPointLine->setInformation(m3);
+
+    ss << "-segment2d";
   }
   
 
