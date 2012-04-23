@@ -650,6 +650,14 @@ namespace g2o {
       return _parameters.getParameter(id);
     }
 
+    /**
+     * verify that all the information of the edges are semi positive definite, i.e.,
+     * all Eigenvalues are >= 0.
+     * @param verbose output edges with not SPD information matrix on cerr
+     * @return true if all edges have SPD information matrix
+     */
+    bool verifyInformationMatrices(bool verbose = false) const;
+
   protected:
     std::map<std::string, std::string> _renamedTypesLookup;
     long long _nextEdgeId;

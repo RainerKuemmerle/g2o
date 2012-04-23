@@ -117,6 +117,9 @@ namespace g2o {
 
   bool HyperGraphElementActionCollection::registerAction(HyperGraphElementAction* action)
   {
+#  ifndef NDEBUG
+    cerr << __PRETTY_FUNCTION__ << " " << action->name() << " " << action->typeName() << endl;
+#  endif
     if (action->name()!=name()){
       cerr << __PRETTY_FUNCTION__  << ": invalid attempt to register an action in a collection with a different name " <<  name() << " " << action->name() << endl;
     }

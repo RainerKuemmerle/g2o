@@ -108,12 +108,12 @@ namespace g2o {
     
 
     VertexPointXY* that = static_cast<VertexPointXY*>(element);
-    glColor3f(0.8,0.5,0.3);
+    glColor3f(0.8f,0.5f,0.3f);
     if (_pointSize) {
       glPointSize(_pointSize->value());
     }
     glBegin(GL_POINTS);
-    glVertex3f(that->estimate().x(),that->estimate().y(),0.);
+    glVertex3f((float)that->estimate().x(),(float)that->estimate().y(),0.f);
     glEnd();
     return this;
   }

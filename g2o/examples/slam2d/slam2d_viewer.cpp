@@ -41,7 +41,7 @@ namespace {
 
       float zNear() const {
         if (_standard) 
-          return 0.001; 
+          return 0.001f; 
         else 
           return Camera::zNear(); 
       }
@@ -49,7 +49,7 @@ namespace {
       float zFar() const
       {  
         if (_standard) 
-          return 1000.0; 
+          return 1000.0f; 
         else 
           return Camera::zFar();
       }

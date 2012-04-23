@@ -32,13 +32,13 @@
 #include "optimizable_graph.h"
 #include "sparse_block_matrix.h"
 #include "g2o_core_api.h"
+#include "batch_stats.h"
 
 #include <map>
 
 namespace g2o {
 
   // forward declaration
-  struct G2OBatchStatistics;
   class ActivePathCostFunction;
   class OptimizationAlgorithm;
 
@@ -243,11 +243,26 @@ namespace g2o {
      */
     void update(const double* update);
 
+    /**
+       returns the set of batch statistics about the optimisation
+    */
+    const BatchStatisticsContainer& batchStatistics() const { return _batchStatistics;}
+    /**
+       returns the set of batch statistics about the optimisation
+    */
+    BatchStatisticsContainer& batchStatistics() { return _batchStatistics;}
+    
+    void setComputeBatchStatistics(bool computeBatchStatistics);
+    
+    bool computeBatchStatistics() const { return _computeBatchStatistics;}
+
     /**** callbacks ****/
     //! add an action to be executed before the error vectors are computed
     bool addComputeErrorAction(HyperGraphAction* action);
     //! remove an action that should no longer be execured before computing the error vectors
     bool removeComputeErrorAction(HyperGraphAction* action);
+
+    
 
     protected:
     bool* _forceStopFlag;
@@ -267,11 +282,9 @@ namespace g2o {
     bool buildIndexMapping(SparseOptimizer::VertexContainer& vlist);
     void clearIndexMapping();
 
-  public:
-    G2OBatchStatistics* _statistics;   ///< global statistics of the optimizer, e.g., timing, num-non-zeros
-
+    BatchStatisticsContainer _batchStatistics;   ///< global statistics of the optimizer, e.g., timing, num-non-zeros
+    bool _computeBatchStatistics;
   };
-
 } // end namespace
 
 #endif

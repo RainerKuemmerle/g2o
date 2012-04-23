@@ -32,6 +32,8 @@
 #include <fstream>
 #include <algorithm>
 
+#include <Eigen/Dense>
+
 #include "estimate_propagator.h"
 #include "factory.h"
 #include "optimization_algorithm_property.h"
@@ -825,6 +827,40 @@ void OptimizableGraph::clear()
 {
   HyperGraph::clear();
   _parameters.clear();
+}
+
+bool OptimizableGraph::verifyInformationMatrices(bool verbose) const
+{
+  bool allEdgeOk = true;
+  SelfAdjointEigenSolver<MatrixXd> eigenSolver;
+  for (OptimizableGraph::EdgeSet::const_iterator it = edges().begin(); it != edges().end(); ++it) {
+    OptimizableGraph::Edge* e = static_cast<OptimizableGraph::Edge*>(*it);
+    Eigen::MatrixXd::MapType information(e->informationData(), e->dimension(), e->dimension());
+    // test on symmetry
+    bool okay = true;
+    bool isSymmetric = information.transpose() == information;
+    if (isSymmetric) {
+      // compute the eigenvalues
+      eigenSolver.compute(information, Eigen::EigenvaluesOnly);
+      bool isSPD = eigenSolver.eigenvalues()(0) >= 0.;
+      okay = okay && isSPD;
+    }
+    allEdgeOk = allEdgeOk && okay;
+    if (! okay) {
+      if (verbose) {
+        if (! isSymmetric)
+          cerr << "Information Matrix for an edge is not symmetric:";
+        else
+          cerr << "Information Matrix for an edge is not SPD:";
+        for (size_t i = 0; i < e->vertices().size(); ++i)
+          cerr << " " << e->vertex(i)->id();
+        if (isSymmetric)
+          cerr << "\teigenvalues: " << eigenSolver.eigenvalues().transpose();
+        cerr << endl;
+      }
+    }
+  }
+  return allEdgeOk;
 }
 
 } // end namespace

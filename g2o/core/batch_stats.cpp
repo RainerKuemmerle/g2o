@@ -40,6 +40,9 @@ namespace g2o {
   G2OBatchStatistics::G2OBatchStatistics(){
     // zero all.
     memset (this, 0, sizeof(G2OBatchStatistics));
+
+    // set the iteration to -1 to show that it isn't valid
+    iteration = -1;
   }
 
   std::ostream& operator << (std::ostream& os , const G2OBatchStatistics& st)

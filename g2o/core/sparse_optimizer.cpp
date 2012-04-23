@@ -46,14 +46,14 @@ namespace g2o{
 
 
   SparseOptimizer::SparseOptimizer() :
-    _forceStopFlag(0), _verbose(false), _algorithm(0), _statistics(0)
+    _forceStopFlag(0), _verbose(false), _algorithm(0), _computeBatchStatistics(false)
   {
     _graphActions.resize(AT_NUM_ELEMENTS);
   }
 
   SparseOptimizer::~SparseOptimizer(){
     delete _algorithm;
-    delete[] _statistics;
+    globalStats = 0;
   }
 
   void SparseOptimizer::computeActiveErrors()
@@ -327,28 +327,31 @@ namespace g2o{
       return -1;
     }
 
+    _batchStatistics.clear();
+    _batchStatistics.reserve(iterations);
+    
     OptimizationAlgorithm::SolverResult result = OptimizationAlgorithm::OK;
     for (int i=0; i<iterations && ! terminate() && ok; i++){
       preIteration(i);
 
-      G2OBatchStatistics* cstat = _statistics ? &(_statistics[i]) : 0;
-      globalStats = cstat;
-      if (cstat) {
-        cstat->iteration = i;
-        cstat->numEdges =  _activeEdges.size();
-        cstat->numVertices = _activeVertices.size();
+      if (_computeBatchStatistics) {
+        G2OBatchStatistics& cstat = _batchStatistics[i];
+        globalStats = &cstat;
+        cstat.iteration = i;
+        cstat.numEdges =  _activeEdges.size();
+        cstat.numVertices = _activeVertices.size();
       }
-
+      
       double ts =  get_time();
       result = _algorithm->solve(i, online);
       ok = ( result == OptimizationAlgorithm::OK );
 
       bool errorComputed = false;
-      if (cstat) {
+      if (_computeBatchStatistics) {
         computeActiveErrors();
         errorComputed = true;
-        cstat->chi2 = activeChi2();
-        cstat->timeIteration = get_time()-ts;
+        _batchStatistics[i].chi2 = activeChi2();
+        _batchStatistics[i].timeIteration = get_time()-ts;
       }
 
       if (verbose()){
@@ -403,6 +406,15 @@ namespace g2o{
       v->oplus(update);
       update += v->dimension();
     }
+  }
+
+  void SparseOptimizer::setComputeBatchStatistics(bool computeBatchStatistics)
+  {
+    if ((_computeBatchStatistics == true) && (computeBatchStatistics == false)) {
+      globalStats = 0;
+      _batchStatistics.clear();
+    }
+    _computeBatchStatistics = computeBatchStatistics;
   }
 
   bool SparseOptimizer::updateInitialization(HyperGraph::VertexSet& vset, HyperGraph::EdgeSet& eset)

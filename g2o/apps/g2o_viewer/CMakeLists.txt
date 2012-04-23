@@ -10,6 +10,7 @@ QT4_WRAP_CPP(UI_SOURCES main_window.h properties_widget.h)
 INCLUDE_DIRECTORIES(${QGLVIEWER_INCLUDE_DIR} ${QT_QTCORE_INCLUDE_DIR} ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR} ${QT_QTCORE_INCLUDE_DIR}/..)
 
 ADD_LIBRARY(viewer_library ${G2O_LIB_TYPE}
+  g2o_viewer_api.h
   g2o_qglviewer.cpp g2o_qglviewer.h
   primitives.cpp primitives.h
   main_window.cpp main_window.h

@@ -39,7 +39,7 @@ namespace {
 
       float zNear() const {
         if (_standard) 
-          return 0.001; 
+          return 0.001f; 
         else 
           return Camera::zNear(); 
       }
@@ -47,13 +47,13 @@ namespace {
       float zFar() const
       {  
         if (_standard) 
-          return 10000.0; 
+          return 10000.0f; 
         else 
           return Camera::zFar();
       }
 
-      const bool& standard() const {return _standard;}
-      bool& standard() {return _standard;}
+      bool standard() const {return _standard;}
+      void setStandard(bool s) { _standard = s;}
 
     private:
       bool _standard;
@@ -85,6 +85,8 @@ void G2oQGLViewer::draw()
     assert(_drawActions);
   }
   
+  if (! _drawActions) // avoid segmentation fault in release build
+    return;
   if (_updateDisplay) {
     _updateDisplay = false;
     glNewList(_drawList, GL_COMPILE_AND_EXECUTE);

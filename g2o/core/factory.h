@@ -27,6 +27,7 @@
 #ifndef G2O_FACTORY_H
 #define G2O_FACTORY_H
 
+#include "g2o/config.h"
 #include "g2o/stuff/misc.h"
 #include "hyper_graph.h"
 #include "creators.h"
@@ -147,21 +148,28 @@ namespace g2o {
       std::string _name;
   };
 
-  // These macros are used to automate registering types and forcing linkage
+#if defined _MSC_VER && defined G2O_SHARED_LIBS
+#  define G2O_FACTORY_EXPORT __declspec(dllexport)
+#  define G2O_FACTORY_IMPORT __declspec(dllimport)
+#else
+#  define G2O_FACTORY_EXPORT
+#  define G2O_FACTORY_IMPORT
+#endif
 
+  // These macros are used to automate registering types and forcing linkage
 #define G2O_REGISTER_TYPE(name, classname) \
-    extern "C" void g2o_type_##classname(void) {} \
+    extern "C" void G2O_FACTORY_EXPORT g2o_type_##classname(void) {} \
     static g2o::RegisterTypeProxy<classname> g_type_proxy_##classname(#name);
 
 #define G2O_USE_TYPE_BY_CLASS_NAME(classname) \
-    extern "C" void g2o_type_##classname(void); \
+    extern "C" void G2O_FACTORY_IMPORT g2o_type_##classname(void); \
     static g2o::TypeFunctionProxy proxy_##classname(g2o_type_##classname);
 
 #define G2O_REGISTER_TYPE_GROUP(typeGroupName) \
-    extern "C" void g2o_type_group_##typeGroupName(void) {}
+    extern "C" void G2O_FACTORY_EXPORT g2o_type_group_##typeGroupName(void) {}
 
 #define G2O_USE_TYPE_GROUP(typeGroupName) \
-    extern "C" void g2o_type_group_##typeGroupName(void); \
+    extern "C" void G2O_FACTORY_IMPORT g2o_type_group_##typeGroupName(void); \
     static g2o::ForceLinker g2o_force_type_link_##typeGroupName(g2o_type_group_##typeGroupName);
 }
 

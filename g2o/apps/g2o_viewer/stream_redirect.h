@@ -22,12 +22,14 @@
 #include <string>
 #include <QMutex>
 
+#include "g2o_viewer_api.h"
+
 class QPlainTextEdit;
 
 /**
  * \brief redirect a stream to a QPlainTextEdit
  */
-class StreamRedirect : public std::basic_streambuf<char>
+class G2O_VIEWER_API StreamRedirect : public std::basic_streambuf<char>
 {
   public:
     typedef std::char_traits<char>::int_type int_type;

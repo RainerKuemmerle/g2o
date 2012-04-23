@@ -69,7 +69,7 @@ namespace g2o {
     if (! DrawAction::refreshPropertyPtrs(params_))
       return false;
     if (_previousParams){
-      _pointSize = _previousParams->makeProperty<FloatProperty>(_typeName + "::POINT_SIZE", 1.);
+      _pointSize = _previousParams->makeProperty<FloatProperty>(_typeName + "::POINT_SIZE", 1.f);
     } else {
       _pointSize = 0;
     }
@@ -94,12 +94,12 @@ namespace g2o {
 
     glPushAttrib(GL_ENABLE_BIT | GL_POINT_BIT);
     glDisable(GL_LIGHTING);
-    glColor3f(0.8,0.5,0.3);
+    glColor3f(0.8f,0.5f,0.3f);
     if (_pointSize) {
       glPointSize(_pointSize->value());
     }
     glBegin(GL_POINTS);
-    glVertex3f(that->estimate()(0),that->estimate()(1),that->estimate()(2));
+    glVertex3f((float)that->estimate()(0),(float)that->estimate()(1),(float)that->estimate()(2));
     glEnd();
     glPopAttrib();
     return this;

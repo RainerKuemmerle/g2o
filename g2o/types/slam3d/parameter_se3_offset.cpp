@@ -114,7 +114,7 @@ namespace g2o {
     if (! DrawAction::refreshPropertyPtrs(params_))
       return false;
     if (_previousParams){
-      _cubeSide = _previousParams->makeProperty<FloatProperty>(_typeName + "::CUBE_SIDE", .05);
+      _cubeSide = _previousParams->makeProperty<FloatProperty>(_typeName + "::CUBE_SIDE", .05f);
     } else {
       _cubeSide = 0;
     }
@@ -136,8 +136,8 @@ namespace g2o {
     glPushMatrix();
     const Vector3d& offsetT=that->offsetParam()->offset().translation();
     AngleAxisd aa(that->offsetParam()->offset().rotation());
-    glTranslatef(offsetT.x(), offsetT.y(), offsetT.z());
-    glRotatef(RAD2DEG(aa.angle()),aa.axis().x(),aa.axis().y(),aa.axis().z());
+    glTranslatef((float)offsetT.x(), (float)offsetT.y(), (float)offsetT.z());
+    glRotatef((float)RAD2DEG(aa.angle()),(float)aa.axis().x(),(float)aa.axis().y(),(float)aa.axis().z());
     // if (_cubeSide)
     //   drawMyPyramid(_cubeSide->value(), _cubeSide->value());
     glPopMatrix();

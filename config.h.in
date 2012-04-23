@@ -5,4 +5,8 @@
 #cmakedefine G2O_OPENMP 1
 #cmakedefine G2O_SHARED_LIBS 1
 
+// available sparse matrix libraries
+#cmakedefine G2O_HAVE_CHOLMOD 1
+#cmakedefine G2O_HAVE_CSPARSE 1
+
 #endif

@@ -25,6 +25,9 @@
 #ifdef __APPLE__
 #include <OpenGL/glu.h>
 #endif
+#ifdef _WINDOWS
+#include <gl/GLU.h>
+#endif
 
 namespace g2o {
 
@@ -72,48 +75,48 @@ void drawGrid(float size, int nbSubdivisions)
 void drawArrow2D(float len, float head_width, float head_len)
 {
   glBegin(GL_LINES);
-  glVertex2f(0, 0);
-  glVertex2f(len, 0);
+  glVertex2f(0.f, 0.f);
+  glVertex2f(len, 0.f);
   glEnd();
 
-  glNormal3f(0,0,1);
+  glNormal3f(0.f,0.f,1.f);
   glBegin(GL_TRIANGLES);
-  glVertex2f(len, 0);
-  glVertex2f(len - head_len,  0.5*head_width);
-  glVertex2f(len - head_len, -0.5*head_width);
+  glVertex2f(len, 0.f);
+  glVertex2f(len - head_len,  0.5f*head_width);
+  glVertex2f(len - head_len, -0.5f*head_width);
   glEnd();
 }
 
 void drawPoseBox()
 {
   glPushMatrix();
-  glScalef(0.5,1,1);
+  glScalef(0.5f,1.f,1.f);
   glPushMatrix();
-  glScalef(1,0.25,0.5);
-  glTranslatef(-0.5,0.5,0);
-  glColor3f(1.0, 0.3, 0.3);
-  drawBox(1, 1, 1);
+  glScalef(1.f,0.25f,0.5f);
+  glTranslatef(-0.5f,0.5f,0.f);
+  glColor3f(1.0f, 0.3f, 0.3f);
+  drawBox(1.f, 1.f, 1.f);
   glPopMatrix();
 
   glPushMatrix();
-  glScalef(1,0.25,0.5);
-  glTranslatef(-0.5,-0.5,0);
-  glColor3f(1.0, 0.1, 0.1);
-  drawBox(1, 1, 1);
+  glScalef(1.f,0.25f,0.5f);
+  glTranslatef(-0.5f,-0.5f,0.f);
+  glColor3f(1.0f, 0.1f, 0.1f);
+  drawBox(1.f, 1.f, 1.f);
   glPopMatrix();
 
   glPushMatrix();
-  glScalef(1,0.25,0.5);
-  glTranslatef(+0.5,0.5,0);
-  glColor3f(0.3, 0.3, 1.0);
-  drawBox(1, 1, 1);
+  glScalef(1.f,0.25f,0.5f);
+  glTranslatef(+0.5f,0.5f,0.f);
+  glColor3f(0.3f, 0.3f, 1.0f);
+  drawBox(1.f, 1.f, 1.f);
   glPopMatrix();
 
   glPushMatrix();
-  glScalef(1,0.25,0.5);
-  glTranslatef(+0.5,-0.5,0);
-  glColor3f(0.1, 0.1, 1.);
-  drawBox(1, 1, 1);
+  glScalef(1.f,0.25f,0.5f);
+  glTranslatef(+0.5f,-0.5f,0.f);
+  glColor3f(0.1f, 0.1f, 1.f);
+  drawBox(1.f, 1.f, 1.f);
   glPopMatrix();
   glPopMatrix();
 }
@@ -190,7 +193,7 @@ void drawEllipsoid(GLfloat r1, GLfloat r2, GLfloat r3)
     glEnable(GL_NORMALIZE);
   glPushMatrix();
   glScalef(r1, r2, r3);
-  gluSphere(GLUWrapper::getQuadradic(), 1.0, 32, 32);
+  gluSphere(GLUWrapper::getQuadradic(), 1.0f, 32, 32);
   glPopMatrix();
   if (!hasNormalization)
     glDisable(GL_NORMALIZE);
@@ -200,7 +203,7 @@ void drawCone(GLfloat radius, GLfloat height)
 {
   glPushMatrix();
   glRotatef(-90.f, 1.f, 0.f, 0.f);
-  glTranslatef(0, 0, - height/2.0);
+  glTranslatef(0.f, 0.f, - height/2.0f);
   gluCylinder(GLUWrapper::getQuadradic(), radius, 0.f, height, 32, 1);
   gluDisk(GLUWrapper::getQuadradic(), 0, radius, 32, 1);
   glPopMatrix();
