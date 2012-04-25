@@ -54,6 +54,8 @@ namespace g2o {
   // 3: all clipped
   int clipSegmentFov(Vector2d& p1, Vector2d& p2, double min, double max);
 
+  
+  Vector2d computeLineParameters(const Vector2d& p1, const Vector2d& p2);
 }
 
 #endif

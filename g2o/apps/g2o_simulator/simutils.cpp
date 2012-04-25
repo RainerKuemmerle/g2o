@@ -116,4 +116,13 @@ namespace g2o {
       if (clip2) return 1;
     return 2;
   }
+
+  Vector2d computeLineParameters(const Vector2d& p1, const Vector2d& p2){
+    Vector2d lp;
+    Vector2d dp=p2-p1;
+    lp[0]=atan2(-dp.x(), dp.y());
+    Vector2d n(cos(lp[0]), sin(lp[0]));
+    lp[1]=n.dot(p1+p2)*.5;
+    return lp;
+  } 
 } // end namespace
