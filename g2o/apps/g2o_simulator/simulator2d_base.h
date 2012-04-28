@@ -36,8 +36,6 @@ namespace g2o {
 
   typedef WorldObject<VertexPointXY> WorldObjectPointXY;
 
-  typedef WorldObject<VertexSegment2D> WorldObjectSegment2D;
-
   typedef Robot<WorldObjectSE2>  Robot2D;
 
 }

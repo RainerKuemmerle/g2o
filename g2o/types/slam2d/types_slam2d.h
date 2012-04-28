@@ -30,7 +30,6 @@
 #include "g2o/config.h"
 #include "vertex_se2.h"
 #include "vertex_point_xy.h"
-#include "vertex_segment2d.h"
 #include "parameter_se2_offset.h"
 #include "edge_se2_prior.h"
 #include "edge_se2.h"
@@ -39,12 +38,5 @@
 #include "edge_se2_pointxy_calib.h"
 #include "edge_se2_offset.h"
 #include "edge_se2_pointxy_offset.h"
-// line slam ver 1
-#include "edge_se2_segment2d.h"
-#include "edge_se2_segment2d_line.h"
-#include "edge_se2_segment2d_pointLine.h"
-// line slam ver 2
-#include "edge_se2_line2d.h"
-#include "edge_line2d_pointxy.h"
 
 #endif

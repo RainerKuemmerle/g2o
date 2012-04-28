@@ -33,9 +33,6 @@
 #include "sensor_pointxy.h"
 #include "sensor_pointxy_bearing.h"
 #include "sensor_pointxy_offset.h"
-#include "sensor_segment2d.h"
-#include "sensor_segment2d_line.h"
-#include "sensor_segment2d_pointline.h"
 
 
 #endif
