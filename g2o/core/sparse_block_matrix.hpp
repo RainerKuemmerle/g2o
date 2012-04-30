@@ -233,6 +233,12 @@ namespace g2o {
     y.segment<MatrixType::RowsAtCompileTime>(yoff) += A * x.segment<MatrixType::ColsAtCompileTime>(xoff);
   }
 
+  template<int t>
+  inline void axpy(const Eigen::Matrix<double, Eigen::Dynamic, t>& A, const Map<VectorXd>& x, int xoff, Map<VectorXd>& y, int yoff)
+  {
+    y.segment(yoff, A.rows()) += A * x.segment<Eigen::Matrix<double, Eigen::Dynamic, t>::ColsAtCompileTime>(xoff);
+  }
+
   template<>
   inline void axpy(const MatrixXd& A, const Map<VectorXd>& x, int xoff, Map<VectorXd>& y, int yoff)
   {
@@ -243,6 +249,12 @@ namespace g2o {
   inline void atxpy(const MatrixType& A, Map<const VectorXd>& x, int xoff, Map<VectorXd>& y, int yoff)
   {
     y.segment<MatrixType::ColsAtCompileTime>(yoff) += A.transpose() * x.segment<MatrixType::RowsAtCompileTime>(xoff);
+  }
+
+  template<int t>
+  inline void atxpy(const Eigen::Matrix<double, Eigen::Dynamic, t>& A, Map<const VectorXd>& x, int xoff, Map<VectorXd>& y, int yoff)
+  {
+    y.segment<Eigen::Matrix<double, Eigen::Dynamic, t>::ColsAtCompileTime>(yoff) += A.transpose() * x.segment(xoff, A.cols());
   }
 
   template<>
