@@ -65,8 +65,11 @@ namespace g2o{
         (*(*it))(this);
     }
 
-    for (EdgeContainer::const_iterator it = _activeEdges.begin(); it != _activeEdges.end(); it++) {
-      OptimizableGraph::Edge* e = *it;
+#   ifdef G2O_OPENMP
+#   pragma omp parallel for default (shared) if (_activeEdges.size() > 50)
+#   endif
+    for (size_t k = 0; k < _activeEdges.size(); ++k) {
+      OptimizableGraph::Edge* e = _activeEdges[k];
       e->computeError();
       if (e->robustKernel()) { 
         e->robustifyError();
