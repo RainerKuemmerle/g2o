@@ -254,7 +254,7 @@ namespace g2o {
   template<int t>
   inline void atxpy(const Eigen::Matrix<double, Eigen::Dynamic, t>& A, Map<const VectorXd>& x, int xoff, Map<VectorXd>& y, int yoff)
   {
-    y.segment<Eigen::Matrix<double, Eigen::Dynamic, t>::ColsAtCompileTime>(yoff) += A.transpose() * x.segment(xoff, A.cols());
+    y.segment<Eigen::Matrix<double, Eigen::Dynamic, t>::ColsAtCompileTime>(yoff) += A.transpose() * x.segment(xoff, A.rows());
   }
 
   template<>
