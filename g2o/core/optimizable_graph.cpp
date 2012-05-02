@@ -365,6 +365,7 @@ bool OptimizableGraph::load(istream& is, bool createEdges)
     if (bytesRead == -1)
       break;
     currentLine >> token;
+    cerr << "Token=" << token << endl;
     if (bytesRead == 0 || token.size() == 0 || token[0] == '#')
       continue;
 
@@ -407,8 +408,12 @@ bool OptimizableGraph::load(istream& is, bool createEdges)
     }
 
     HyperGraph::HyperGraphElement* element = factory->construct(token, elemBitset);
-
+    if (element) {
+      cerr << "element instance created: " << element << endl; 
+    }
     if (dynamic_cast<Vertex*>(element)) { // it's a vertex type
+      cerr << "it is a vertex" << endl;
+      previousData = 0;
       Vertex* v = static_cast<Vertex*>(element);
       int id;
       currentLine >> id;
@@ -421,10 +426,11 @@ bool OptimizableGraph::load(istream& is, bool createEdges)
         delete v;
       } else {
         previousVertex = v;
-        previousData = 0;
       }
     }
     else if (dynamic_cast<Edge*>(element)) {
+      cerr << "it is an edge" << endl;
+      previousData = 0;
       Edge* e = static_cast<Edge*>(element);
       int numV = e->vertices().size();
       if (_edge_has_id){
@@ -520,26 +526,29 @@ bool OptimizableGraph::load(istream& is, bool createEdges)
           }
         }
       }
-    }
-    else if (dynamic_cast<Data*>(element)) { // reading in the data packet for the vertex
-      Data* d = static_cast<Data*>(element);
+    } else if (dynamic_cast<Data*>(element)) { // reading in the data packet for the vertex
       //cerr << "read data packet " << token << " vertex " << previousVertex->id() << endl;
-      if (! previousData){
-        previousData->setNext(d);
+      Data* d = static_cast<Data*>(element);
+      bool r = d->read(currentLine);
+      if (! r) {
+	cerr << __PRETTY_FUNCTION__ << ": Error reading data " << token << " for vertex " << previousVertex->id() << endl;
+	delete d;
+	previousData = 0;
+      } else if (previousData){
+	//cerr << "chaining" << endl;
+	previousData->setNext(d);
         previousData = d;
-      } else if (! previousVertex) {
+	//cerr << "done" << endl;
+      } else if (previousVertex){
+	//cerr << "embedding in vertex" << endl;
+	previousVertex->setUserData(d);
+	previousData = d;
+	previousVertex = 0;
+	//cerr << "done" << endl;
+      } else {
         cerr << __PRETTY_FUNCTION__ << ": got data element, but no vertex available" << endl;
         delete d;
-      } else {
-        bool r = d->read(currentLine);
-        if (! r) {
-          cerr << __PRETTY_FUNCTION__ << ": Error reading data " << token << " for vertex " << previousVertex->id() << endl;
-          delete d;
-        } else {
-          previousVertex->setUserData(d);
-          previousVertex = 0;
-          previousData = d;
-        }
+	previousData = 0;
       }
     }
   } // while read line
