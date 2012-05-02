@@ -49,6 +49,15 @@ namespace g2o {
 
   using namespace std;
 
+  OptimizableGraph::Data::Data(){
+    _next = 0;
+  }
+  
+  OptimizableGraph::Data::~Data(){
+    if (_next)
+      delete _next;
+  }
+  
 
   OptimizableGraph::Vertex::Vertex() :
     HyperGraph::Vertex(),
@@ -350,6 +359,7 @@ bool OptimizableGraph::load(istream& is, bool createEdges)
   elemBitset.flip();
 
   Vertex* previousVertex = 0;
+  Data* previousData = 0;
 
   while (1) {
     int bytesRead = readLine(is, currentLine);
@@ -412,6 +422,7 @@ bool OptimizableGraph::load(istream& is, bool createEdges)
         delete v;
       } else {
         previousVertex = v;
+        previousData = 0;
       }
     }
     else if (dynamic_cast<Edge*>(element)) {
@@ -509,14 +520,15 @@ bool OptimizableGraph::load(istream& is, bool createEdges)
             delete e;
           }
         }
-
       }
-
     }
     else if (dynamic_cast<Data*>(element)) { // reading in the data packet for the vertex
       Data* d = static_cast<Data*>(element);
       //cerr << "read data packet " << token << " vertex " << previousVertex->id() << endl;
-      if (! previousVertex) {
+      if (! previousData){
+        previousData->setNext(d);
+        previousData = d;
+      } else if (! previousVertex) {
         cerr << __PRETTY_FUNCTION__ << ": got data element, but no vertex available" << endl;
         delete d;
       } else {
@@ -527,6 +539,7 @@ bool OptimizableGraph::load(istream& is, bool createEdges)
         } else {
           previousVertex->setUserData(d);
           previousVertex = 0;
+          previousData = d;
         }
       }
     }
@@ -789,12 +802,14 @@ bool OptimizableGraph::saveVertex(std::ostream& os, OptimizableGraph::Vertex* v)
     os << tag << " " << v->id() << " ";
     v->write(os);
     os << endl;
-    if (v->userData()) { // write the data packet for the vertex
-      tag = factory->tag(v->userData());
+    Data* d=v->userData();
+    while (d) { // write the data packet for the vertex
+      tag = factory->tag(d);
       if (tag.size() > 0) {
         os << tag << " ";
-        v->userData()->write(os);
+        d->write(os);
         os << endl;
+        d=d->next();
       }
     }
     if (v->fixed()) {
