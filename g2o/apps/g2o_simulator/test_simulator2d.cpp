@@ -52,6 +52,7 @@ int main(int argc, char** argv) {
 
 
   std::string outputFilename;
+  arg.param("nlandmarks", nlandmarks, 100, "number of landmarks in the map");
   arg.param("simSteps", simSteps, 100, "number of simulation steps");
   arg.param("worldSize", worldSize, 25.0, "size of the world");
   arg.param("hasOdom",        hasOdom, false,  "the robot has an odometry" );
