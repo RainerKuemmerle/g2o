@@ -80,12 +80,20 @@ namespace g2o {
      */
     class G2O_CORE_API Data : public HyperGraph::HyperGraphElement
     {
+      friend class OptimizableGraph;
       public:
+        virtual ~Data();
+        Data();
         //! read the data from a stream
         virtual bool read(std::istream& is) = 0;
         //! write the data to a stream
         virtual bool write(std::ostream& os) const = 0;
         virtual HyperGraph::HyperGraphElementType elementType() const { return HyperGraph::HGET_DATA;}
+        const Data* next() const {return _next;}
+        Data* next() {return _next;}
+        void setNext(Data* next_) { _next = next_; }
+    protected:
+        Data* _next; // linked list of multiple data;
     };
 
     /**
