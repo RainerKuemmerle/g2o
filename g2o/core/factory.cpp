@@ -36,9 +36,6 @@
 #include <typeinfo>
 #include <cassert>
 
-// define to get some verbose output
-//#define DEBUG_FACTORY
-
 using namespace std;
 
 namespace g2o {
@@ -51,7 +48,7 @@ Factory::Factory()
 
 Factory::~Factory()
 {
-# ifdef DEBUG_FACTORY
+# ifdef G2O_DEBUG_FACTORY
   cerr << "# Factory destroying " << (void*)this << endl;
 # endif
   for (CreatorMap::iterator it = _creator.begin(); it != _creator.end(); ++it) {
@@ -65,7 +62,7 @@ Factory* Factory::instance()
 {
   if (factoryInstance == 0) {
     factoryInstance = new Factory;
-#  ifdef DEBUG_FACTORY
+#  ifdef G2O_DEBUG_FACTORY
     cerr << "# Factory allocated " << (void*)factoryInstance << endl;
 #  endif
   }
@@ -89,14 +86,14 @@ void Factory::registerType(const std::string& tag, AbstractHyperGraphElementCrea
   CreatorInformation* ci = new CreatorInformation();
   ci->creator = c;
 
-#ifdef DEBUG_FACTORY
+#ifdef G2O_DEBUG_FACTORY
   cerr << "# Factory " << (void*)this << " constructing type " << tag << " ";
 #endif
   // construct an element once to figur out its type
   HyperGraph::HyperGraphElement* element = c->construct();
   ci->elementTypeBit = element->elementType();
 
-#ifdef DEBUG_FACTORY
+#ifdef G2O_DEBUG_FACTORY
   cerr << "done." << endl;
   cerr << "# Factory " << (void*)this << " registering " << tag;
   cerr << " " << (void*) c << " ";
