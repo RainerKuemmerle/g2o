@@ -181,3 +181,14 @@ void BaseMultiEdge<D, E>::resize(size_t size)
   _hessian.resize(maxIdx);
   _jacobianOplus.resize(size);
 }
+
+template <int D, typename E>
+bool BaseMultiEdge<D, E>::allVerticesFixed() const
+{
+  for (size_t i = 0; i < _vertices.size(); ++i) {
+    if (!static_cast<const OptimizableGraph::Vertex*> (_vertices[i])->fixed()) {
+      return false;
+    }
+  }
+  return true;
+}

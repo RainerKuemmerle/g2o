@@ -45,6 +45,13 @@ void BaseBinaryEdge<D, E, VertexXiType, VertexXjType>::resize(size_t size)
 }
 
 template <int D, typename E, typename VertexXiType, typename VertexXjType>
+bool BaseBinaryEdge<D, E, VertexXiType, VertexXjType>::allVerticesFixed() const
+{
+  return (static_cast<const VertexXiType*> (_vertices[0])->fixed() &&
+          static_cast<const VertexXjType*> (_vertices[1])->fixed());
+}
+
+template <int D, typename E, typename VertexXiType, typename VertexXjType>
 void BaseBinaryEdge<D, E, VertexXiType, VertexXjType>::constructQuadraticForm()
 {
   VertexXiType* from = static_cast<VertexXiType*>(_vertices[0]);
@@ -76,7 +83,7 @@ void BaseBinaryEdge<D, E, VertexXiType, VertexXjType>::constructQuadraticForm()
           _hessian.noalias() += AtO * B;
       }
     } 
-    if (toNotFixed ) {
+    if (toNotFixed) {
       to->b().noalias() += B.transpose() * omega_r;
       to->A().noalias() += B.transpose() * omega * B;
     }

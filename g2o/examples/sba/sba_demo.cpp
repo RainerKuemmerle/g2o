@@ -247,8 +247,7 @@ int main(int argc, const char* argv[])
         + Vector3d(Sample::gaussian(1),
                    Sample::gaussian(1),
                    Sample::gaussian(1)));
-
-
+    v_p->setFixed(i%2);
 
     int num_obs = 0;
 

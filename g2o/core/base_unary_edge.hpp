@@ -34,6 +34,12 @@ void BaseUnaryEdge<D, E, VertexXiType>::resize(size_t size)
 }
 
 template <int D, typename E, typename VertexXiType>
+bool BaseUnaryEdge<D, E, VertexXiType>::allVerticesFixed() const
+{
+  return static_cast<const VertexXiType*> (_vertices[0])->fixed();
+}
+
+template <int D, typename E, typename VertexXiType>
 void BaseUnaryEdge<D, E, VertexXiType>::constructQuadraticForm()
 {
   VertexXiType* from=static_cast<VertexXiType*>(_vertices[0]);
