@@ -67,6 +67,7 @@ void sigquit_handler(int sig)
 
 int main(int argc, char** argv)
 {
+  bool fixLaser;
   int maxIterations;
   bool verbose;
   string inputFilename;
@@ -81,6 +82,7 @@ int main(int argc, char** argv)
   commandLineArguments.param("o", outputfilename, "", "output final version of the graph");
   commandLineArguments.param("test", odomTestFilename, "", "apply odometry calibration to some test data");
   commandLineArguments.param("dump", dumpGraphFilename, "", "write the graph to the disk");
+  commandLineArguments.param("fixLaser", fixLaser, false, "keep the laser offset fixed during optimization");
   commandLineArguments.paramLeftOver("gm2dl-input", inputFilename, "", "gm2dl file which will be processed");
   commandLineArguments.paramLeftOver("raw-log", rawFilename, "", "raw log file containing the odometry");
 
@@ -150,6 +152,11 @@ int main(int argc, char** argv)
 
   VertexSE2* laserOffset = dynamic_cast<VertexSE2*>(optimizer.vertex(Gm2dlIO::ID_LASERPOSE));
   VertexOdomDifferentialParams* odomParamsVertex = dynamic_cast<VertexOdomDifferentialParams*>(optimizer.vertex(Gm2dlIO::ID_ODOMCALIB));
+
+  if (fixLaser) {
+    cerr << "Fix position of the laser offset" << endl;
+    laserOffset->setFixed(true);
+  }
 
   signal(SIGINT, sigquit_handler);
   cerr << "Doing full estimation" << endl;

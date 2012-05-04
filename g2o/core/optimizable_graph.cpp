@@ -233,15 +233,16 @@ namespace g2o {
   bool OptimizableGraph::addVertex(Vertex* v, Data* userData)
   {
     Vertex* inserted = vertex(v->id());
-    if (inserted)
-      {
-        cerr << __FUNCTION__ << ": FATAL, a vertex with ID " << v->id() << " has already been registered with this graph" << endl;
-        return false;
-      }
+    if (inserted) {
+      cerr << __FUNCTION__ << ": FATAL, a vertex with ID " << v->id() << " has already been registered with this graph" << endl;
+      assert(0 && "Vertex with this ID already contained in the graph");
+      return false;
+    }
     OptimizableGraph::Vertex* ov=dynamic_cast<OptimizableGraph::Vertex*>(v);
     assert(ov && "Vertex does not inherit from OptimizableGraph::Vertex");
     if (ov->_graph != 0 && ov->_graph != this) {
       cerr << __FUNCTION__ << ": FATAL, vertex with ID " << v->id() << " has already registered with another graph " << ov->_graph << endl;
+      assert(0 && "Vertex already registered with another graph");
       return false;
     }
     if (userData)
