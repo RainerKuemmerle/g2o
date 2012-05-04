@@ -365,7 +365,7 @@ bool OptimizableGraph::load(istream& is, bool createEdges)
     if (bytesRead == -1)
       break;
     currentLine >> token;
-    cerr << "Token=" << token << endl;
+    //cerr << "Token=" << token << endl;
     if (bytesRead == 0 || token.size() == 0 || token[0] == '#')
       continue;
 
@@ -408,11 +408,11 @@ bool OptimizableGraph::load(istream& is, bool createEdges)
     }
 
     HyperGraph::HyperGraphElement* element = factory->construct(token, elemBitset);
-    if (element) {
-      cerr << "element instance created: " << element << endl; 
-    }
+    // if (element) {
+    //   cerr << "element instance created: " << element << endl; 
+    // }
     if (dynamic_cast<Vertex*>(element)) { // it's a vertex type
-      cerr << "it is a vertex" << endl;
+      //cerr << "it is a vertex" << endl;
       previousData = 0;
       Vertex* v = static_cast<Vertex*>(element);
       int id;
@@ -429,7 +429,7 @@ bool OptimizableGraph::load(istream& is, bool createEdges)
       }
     }
     else if (dynamic_cast<Edge*>(element)) {
-      cerr << "it is an edge" << endl;
+      //cerr << "it is an edge" << endl;
       previousData = 0;
       Edge* e = static_cast<Edge*>(element);
       int numV = e->vertices().size();
