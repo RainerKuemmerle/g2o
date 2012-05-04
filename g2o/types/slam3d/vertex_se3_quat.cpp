@@ -155,6 +155,9 @@ namespace g2o {
         (*_cacheDrawActions)(c, params_);
       }
     }
+    if (that->userData() && _cacheDrawActions )
+      (*_cacheDrawActions)(that->userData(), params_);
+
     glPopMatrix();
     return this;
   }

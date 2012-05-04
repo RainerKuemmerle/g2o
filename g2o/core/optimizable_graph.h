@@ -666,6 +666,12 @@ namespace g2o {
      */
     bool verifyInformationMatrices(bool verbose = false) const;
 
+    // helper functions to save an individual vertex
+    bool saveVertex(std::ostream& os, Vertex* v) const;
+
+    // helper functions to save an individual edge
+    bool saveEdge(std::ostream& os, Edge* e) const;
+
   protected:
     std::map<std::string, std::string> _renamedTypesLookup;
     long long _nextEdgeId;
@@ -674,8 +680,6 @@ namespace g2o {
     // do not watch this. To be removed soon, or integrated in a nice way
     bool _edge_has_id;
 
-    bool saveVertex(std::ostream& os, Vertex* v) const;
-    bool saveEdge(std::ostream& os, Edge* e) const;
     ParameterContainer _parameters;
   };
   
