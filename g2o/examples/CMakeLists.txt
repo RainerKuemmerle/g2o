@@ -1,3 +1,4 @@
+ADD_SUBDIRECTORY(circle)
 ADD_SUBDIRECTORY(tutorial_slam2d)
 
 IF(CHOLMOD_FOUND)
