@@ -4,4 +4,4 @@ ADD_EXECUTABLE(bal_example
 
 INCLUDE_DIRECTORIES(${CHOLMOD_INCLUDE_DIR})
 
-TARGET_LINK_LIBRARIES(bal_example core solver_cholmod types_slam3d)
+TARGET_LINK_LIBRARIES(bal_example core solver_csparse)

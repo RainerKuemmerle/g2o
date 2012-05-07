@@ -34,38 +34,16 @@
 #include "g2o/core/block_solver.h"
 #include "g2o/core/solver.h"
 #include "g2o/core/optimization_algorithm_levenberg.h"
-#include "g2o/solvers/cholmod/linear_solver_cholmod.h"
+#include "g2o/core/base_vertex.h"
+#include "g2o/core/base_binary_edge.h"
+#include "g2o/solvers/csparse/linear_solver_csparse.h"
 #include "g2o/solvers/dense/linear_solver_dense.h"
 #include "g2o/solvers/structure_only/structure_only_solver.h"
 
-#include "g2o/types/slam3d/se3quat.h"
-#include "g2o/types/slam3d/vertex_pointxyz.h"
-
 using namespace g2o;
-using namespace Eigen;
 using namespace std;
 
-class CameraBAL : public SE3Quat
-{
-  public:
-    CameraBAL():
-      SE3Quat(),
-      focalLength(1.), radial1(1.), radial2(2.)
-    {
-    }
-
-    CameraBAL(const Quaterniond& q, const Vector3d& t, double focalLength_, double radial1_, double radial2_):
-      SE3Quat(q, t),
-      focalLength(focalLength_), radial1(radial1_), radial2(radial2_)
-    {
-    }
-
-    double focalLength;
-    double radial1;
-    double radial2;
-};
-
-class VertexCameraBAL : public BaseVertex<9, CameraBAL>
+class VertexCameraBAL : public BaseVertex<9, Eigen::VectorXd>
 {
   public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
@@ -92,17 +70,44 @@ class VertexCameraBAL : public BaseVertex<9, CameraBAL>
 
     virtual void oplusImpl(const double* update)
     {
-      Vector6d::ConstMapType v(update);
-      SE3Quat increment(v);
-      _estimate *= increment;
-
-      _estimate.focalLength += update[6];
-      _estimate.radial1 += update[7];
-      _estimate.radial2 += update[8];
+      Eigen::VectorXd::ConstMapType v(update, 9);
+      _estimate += v;
     }
 };
 
-class EdgeObservationBAL : public BaseBinaryEdge<2, Vector2d, VertexCameraBAL, VertexPointXYZ>
+class VertexPointBAL : public BaseVertex<3, Eigen::Vector3d>
+{
+  public:
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
+    VertexPointBAL()
+    {
+    }
+
+    virtual bool read(std::istream& /*is*/)
+    {
+      cerr << __PRETTY_FUNCTION__ << " not implemented yet" << endl;
+      return false;
+    }
+
+    virtual bool write(std::ostream& /*os*/) const
+    {
+      cerr << __PRETTY_FUNCTION__ << " not implemented yet" << endl;
+      return false;
+    }
+
+    virtual void setToOriginImpl()
+    {
+      cerr << __PRETTY_FUNCTION__ << " not implemented yet" << endl;
+    }
+
+    virtual void oplusImpl(const double* update)
+    {
+      Eigen::Vector3d::ConstMapType v(update);
+      _estimate += v;
+    }
+};
+
+class EdgeObservationBAL : public BaseBinaryEdge<2, Vector2d, VertexCameraBAL, VertexPointBAL>
 {
   public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
@@ -123,10 +128,26 @@ class EdgeObservationBAL : public BaseBinaryEdge<2, Vector2d, VertexCameraBAL, V
     void computeError()
     {
       const VertexCameraBAL* cam = static_cast<const VertexCameraBAL*>(vertex(0));
-      const VertexPointXYZ* point = static_cast<const VertexPointXYZ*>(vertex(1));
+      const VertexPointBAL* point = static_cast<const VertexPointBAL*>(vertex(1));
 
       // conversion from world to camera coordinates
-      Eigen::Vector3d p = cam->estimate() * point->estimate();
+      Eigen::Vector3d::ConstMapType angleAxisVector(cam->estimate().data(), 3);
+
+      // Rodrigues' formula for the rotation
+      Eigen::Vector3d p; 
+      double theta = angleAxisVector.norm();
+      if (theta > 0.) {
+        Eigen::Vector3d v = angleAxisVector / theta;
+        double cth = cos(theta);
+        double sth = sin(theta);
+        p = point->estimate() * cth + v.cross(point->estimate()) * sth + v * v.dot(point->estimate()) * (1. - cth);
+      } else {
+        p = point->estimate();
+      }
+
+      // translation of the camera
+      Eigen::Vector3d::ConstMapType translation(cam->estimate().data()+3, 3);
+      p += translation;
 
       // perspective division
       Eigen::Vector2d projectedPoint;
@@ -135,10 +156,13 @@ class EdgeObservationBAL : public BaseBinaryEdge<2, Vector2d, VertexCameraBAL, V
 
       // conversion to pixel coordinates
       double radiusSqr = projectedPoint.squaredNorm();
-      double r_p = 1. + cam->estimate().radial1 * radiusSqr + cam->estimate().radial2 * radiusSqr * radiusSqr;
+      const double& f  = cam->estimate()(6);
+      const double& k1 = cam->estimate()(7);
+      const double& k2 = cam->estimate()(8);
+      double r_p       = 1. + k1 * radiusSqr + k2 * radiusSqr * radiusSqr;
       Eigen::Vector2d prediction;
-      prediction(0) = cam->estimate().focalLength * r_p * projectedPoint(0);
-      prediction(1) = cam->estimate().focalLength * r_p * projectedPoint(1);
+      prediction(0) = f * r_p * projectedPoint(0);
+      prediction(1) = f * r_p * projectedPoint(1);
 
       _error = prediction - measurement();
       //cout << PVAR(prediction.transpose()) << "\t\t" << PVAR(measurement().transpose()) << endl;
@@ -159,7 +183,7 @@ int main(int argc, char** argv)
   arg.parseArgs(argc, argv);
 
   typedef g2o::BlockSolver< g2o::BlockSolverTraits<9, 3> >  BalBlockSolver;
-  typedef g2o::LinearSolverCholmod<BalBlockSolver::PoseMatrixType> BalLinearSolver;
+  typedef g2o::LinearSolverCSparse<BalBlockSolver::PoseMatrixType> BalLinearSolver;
 
   g2o::SparseOptimizer optimizer;
   optimizer.setVerbose(false);
@@ -167,10 +191,10 @@ int main(int argc, char** argv)
   linearSolver->setBlockOrdering(true);
   BalBlockSolver* solver_ptr = new BalBlockSolver(linearSolver);
   g2o::OptimizationAlgorithmLevenberg* solver = new g2o::OptimizationAlgorithmLevenberg(solver_ptr);
-  solver->setUserLambdaInit(1000.);
+  solver->setUserLambdaInit(1);
   optimizer.setAlgorithm(solver);
 
-  vector<VertexPointXYZ*> points;
+  vector<VertexPointBAL*> points;
   vector<VertexCameraBAL*> cameras;
 
   // parse BAL dataset
@@ -186,14 +210,14 @@ int main(int argc, char** argv)
     for (int i = 0; i < numCameras; ++i, ++id) {
       VertexCameraBAL* cam = new VertexCameraBAL;
       cam->setId(id);
-      cam->setFixed(id == 0);
+      //cam->setFixed(id == 0);
       optimizer.addVertex(cam);
       cameras.push_back(cam);
     }
 
     points.reserve(numPoints);
     for (int i = 0; i < numPoints; ++i, ++id) {
-      VertexPointXYZ* p = new VertexPointXYZ;
+      VertexPointBAL* p = new VertexPointBAL;
       p->setId(id);
       p->setMarginalized(true);
       bool addedVertex = optimizer.addVertex(p);
@@ -212,7 +236,7 @@ int main(int argc, char** argv)
       assert(camIndex >= 0 && (size_t)camIndex < cameras.size() && "Index out of bounds");
       VertexCameraBAL* cam = cameras[camIndex];
       assert(pointIndex >= 0 && (size_t)pointIndex < points.size() && "Index out of bounds");
-      VertexPointXYZ* point = points[pointIndex];
+      VertexPointBAL* point = points[pointIndex];
 
       EdgeObservationBAL* e = new EdgeObservationBAL;
       e->setVertex(0, cam);
@@ -226,31 +250,25 @@ int main(int argc, char** argv)
     }
 
     // read in the camera params
+    Eigen::VectorXd cameraParameter(9);
     for (int i = 0; i < numCameras; ++i) {
-      Eigen::Vector3d rotation;
-      Eigen::Vector3d translation;
-      double f, k1, k2;
-      ifs >> rotation(0) >> rotation(1) >> rotation(2);
-      ifs >> translation(0) >> translation(1) >> translation(2);
-      ifs >> f >> k1 >> k2;
-      Eigen::AngleAxisd rot(rotation.norm(), rotation.normalized());
-
+      for (int j = 0; j < 9; ++j)
+        ifs >> cameraParameter(j);
       VertexCameraBAL* cam = cameras[i];
-      cam->setEstimate(CameraBAL((Eigen::Quaterniond)rot, translation, f, k1, k2));
+      cam->setEstimate(cameraParameter);
     }
 
     // read in the points
+    Eigen::Vector3d p;
     for (int i = 0; i < numPoints; ++i) {
-      Eigen::Vector3d p;
       ifs >> p(0) >> p(1) >> p(2);
 
-      VertexPointXYZ* point = points[i];
+      VertexPointBAL* point = points[i];
       point->setEstimate(p);
     }
 
   }
 
-  
   optimizer.initializeOptimization();
   optimizer.setVerbose(verbose);
   optimizer.optimize(maxIterations);
@@ -273,7 +291,7 @@ int main(int argc, char** argv)
     << "  geometry PointSet {\n"
     << "    coord Coordinate {\n"
     << "      point [\n";
-  for (vector<VertexPointXYZ*>::const_iterator it = points.begin(); it != points.end(); ++it) {
+  for (vector<VertexPointBAL*>::const_iterator it = points.begin(); it != points.end(); ++it) {
     fout << (*it)->estimate().transpose() << endl;
   }
   fout << "    ]\n" << "  }\n" << "}\n" << "  }\n";
