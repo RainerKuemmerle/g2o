@@ -248,8 +248,6 @@ int main(int argc, const char* argv[])
                    Sample::gaussian(1),
                    Sample::gaussian(1)));
 
-
-
     int num_obs = 0;
 
     for (size_t j=0; j<true_poses.size(); ++j)

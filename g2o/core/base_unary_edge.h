@@ -56,6 +56,8 @@ namespace g2o {
 
       virtual void resize(size_t size);
 
+      virtual bool allVerticesFixed() const;
+
       /**
        * Linearizes the oplus operator in the vertex, and stores
        * the result in temporary variables _jacobianOplusXi and _jacobianOplusXj
