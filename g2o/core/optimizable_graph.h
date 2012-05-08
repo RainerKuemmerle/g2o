@@ -39,6 +39,7 @@
 #include "hyper_graph.h"
 #include "parameter.h"
 #include "parameter_container.h"
+#include "jacobian_workspace.h"
 
 #include "g2o/stuff/macros.h"
 #include "g2o_core_api.h"
@@ -448,10 +449,10 @@ namespace g2o {
         virtual void mapHessianMemory(double* d, int i, int j, bool rowMajor) = 0;
 
         /**
-         * Linearizes the constraint in the edge in the manifold space, and stores
-         * the result in temporary variables _jacobianOplusXi and _jacobianOplusXj (see base_edge).
+         * Linearizes the constraint in the edge in the manifold space, and store
+         * the result in the given workspace
          */
-        virtual void linearizeOplus() = 0;
+        virtual void linearizeOplus(JacobianWorkspace& jacobianWorkspace) = 0;
 
         /** set the estimate of the to vertex, based on the estimate of the from vertices in the edge. */
         virtual void initialEstimate(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to) = 0;
@@ -669,6 +670,10 @@ namespace g2o {
      */
     bool verifyInformationMatrices(bool verbose = false) const;
 
+    //! the workspace for storing the Jacobians of the graph
+    JacobianWorkspace& jacobianWorkspace() { return _jacobianWorkspace;}
+    const JacobianWorkspace& jacobianWorkspace() const { return _jacobianWorkspace;}
+
   protected:
     std::map<std::string, std::string> _renamedTypesLookup;
     long long _nextEdgeId;
@@ -680,6 +685,7 @@ namespace g2o {
     bool saveVertex(std::ostream& os, Vertex* v) const;
     bool saveEdge(std::ostream& os, Edge* e) const;
     ParameterContainer _parameters;
+    JacobianWorkspace _jacobianWorkspace;
   };
   
   /**

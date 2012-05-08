@@ -231,12 +231,6 @@ namespace g2o {
     void computeActiveErrors();
 
     /**
-     * Linearizes the system by computing the Jacobians for the nodes
-     * and edges in the graph
-     */
-    void linearizeSystem();
-
-    /**
      * update the estimate of the active vertices 
      * @param update: the double vector containing the stacked
      * elements of the increments on the vertices.

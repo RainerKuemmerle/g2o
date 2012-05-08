@@ -330,6 +330,7 @@ namespace g2o{
       return -1;
     }
 
+    _jacobianWorkspace.allocate();
     _batchStatistics.clear();
     _batchStatistics.reserve(iterations);
     
@@ -377,17 +378,6 @@ namespace g2o{
       return 0;
     }
     return cjIterations;
-  }
-
-  void SparseOptimizer::linearizeSystem()
-  {
-#   ifdef G2O_OPENMP
-#   pragma omp parallel for default (shared) if (_activeEdges.size() > 50)
-#   endif
-    for (size_t k = 0; k < _activeEdges.size(); ++k) {
-      OptimizableGraph::Edge* e = _activeEdges[k];
-      e->linearizeOplus(); // jacobian of the nodes' oplus (manifold)
-    }
   }
 
   void SparseOptimizer::update(const double* update)

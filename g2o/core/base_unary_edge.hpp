@@ -62,6 +62,13 @@ void BaseUnaryEdge<D, E, VertexXiType>::constructQuadraticForm()
 }
 
 template <int D, typename E, typename VertexXiType>
+void BaseUnaryEdge<D, E, VertexXiType>::linearizeOplus(JacobianWorkspace& jacobianWorkspace)
+{
+  new (&_jacobianOplusXi) JacobianXiOplusType(jacobianWorkspace.workspaceForVertex(0), D, VertexXiType::Dimension);
+  linearizeOplus();
+}
+
+template <int D, typename E, typename VertexXiType>
 void BaseUnaryEdge<D, E, VertexXiType>::linearizeOplus()
 {
   //Xi - estimate the jacobian numerically

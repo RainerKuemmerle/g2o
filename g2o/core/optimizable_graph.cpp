@@ -266,6 +266,7 @@ namespace g2o {
       cerr << __FUNCTION__ << ": FATAL, cannot resolve caches for edge " << e << endl;
       return false;
     } 
+    _jacobianWorkspace.updateSize(e);
 
     return true;
   }

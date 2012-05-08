@@ -527,6 +527,8 @@ bool BlockSolver<Traits>::buildSystem()
 # endif
   for (int k = 0; k < static_cast<int>(_optimizer->activeEdges().size()); ++k) {
     OptimizableGraph::Edge* e = _optimizer->activeEdges()[k];
+    // TODO if running with threads need to produce copies of the workspace
+    e->linearizeOplus(_optimizer->jacobianWorkspace()); // jacobian of the nodes' oplus (manifold)
     e->constructQuadraticForm();
   }
 

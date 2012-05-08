@@ -45,11 +45,12 @@ namespace g2o {
       static const int Dimension = BaseEdge<D, E>::Dimension;
       typedef typename BaseEdge<D,E>::Measurement Measurement;
       typedef VertexXi VertexXiType;
-      typedef Matrix<double, D, VertexXiType::Dimension> JacobianXiOplusType;
+      typedef typename Matrix<double, D, VertexXiType::Dimension>::AlignedMapType JacobianXiOplusType;
       typedef typename BaseEdge<D,E>::ErrorVector ErrorVector;
       typedef typename BaseEdge<D,E>::InformationType InformationType;
 
-      BaseUnaryEdge() : BaseEdge<D,E>()
+      BaseUnaryEdge() : BaseEdge<D,E>(),
+        _jacobianOplusXi(0, D, VertexXiType::Dimension)
       {
         _vertices.resize(1);
       }
@@ -57,6 +58,8 @@ namespace g2o {
       virtual void resize(size_t size);
 
       virtual bool allVerticesFixed() const;
+
+      virtual void linearizeOplus(JacobianWorkspace& jacobianWorkspace);
 
       /**
        * Linearizes the oplus operator in the vertex, and stores

@@ -26,6 +26,7 @@
 
 #include "edge_se3_quat.h"
 #include "g2o/core/factory.h"
+#include "se3quat_gradients.h"
 
 #ifdef WINDOWS
 #include <windows.h>
@@ -41,13 +42,9 @@
 
 #include <iostream>
 
+using namespace std;
+
 namespace g2o {
-
-  // forward declaration for the analytic jacobian
-  void  jacobian_3d_qman ( Matrix< double, 6 , 6> &  Ji , Matrix< double, 6 , 6> &  Jj, const double&  z11 , const double&  z12 , const double&  z13 , const double&  z14 , const double&  z21 , const double&  z22 , const double&  z23 , const double&  z24 , const double&  z31 , const double&  z32 , const double&  z33 , const double&  z34 , const double&  xab11 , const double&  xab12 , const double&  xab13 , const double&  xab14 , const double&  xab21 , const double&  xab22 , const double&  xab23 , const double&  xab24 , const double&  xab31 , const double&  xab32 , const double&  xab33 , const double&  xab34 );
-
-  using namespace std;
-
 
   EdgeSE3::EdgeSE3() :
     BaseBinaryEdge<6, SE3Quat, VertexSE3, VertexSE3>()
