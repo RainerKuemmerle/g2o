@@ -117,7 +117,7 @@ namespace g2o {
 
   bool HyperGraphElementActionCollection::registerAction(HyperGraphElementAction* action)
   {
-#  ifndef NDEBUG
+#  ifdef G2O_DEBUG_ACTIONLIB
     cerr << __PRETTY_FUNCTION__ << " " << action->name() << " " << action->typeName() << endl;
 #  endif
     if (action->name()!=name()){
@@ -183,7 +183,7 @@ namespace g2o {
       }
     }
     if (! collection) {
-#ifndef NDEBUG
+#ifndef G2O_DEBUG_ACTIONLIB
       cerr << __PRETTY_FUNCTION__ << ": creating collection for \"" << action->name() << "\"" << endl;
 #endif
       collection = new HyperGraphElementActionCollection(action->name());

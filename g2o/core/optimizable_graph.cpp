@@ -409,9 +409,6 @@ bool OptimizableGraph::load(istream& is, bool createEdges)
     }
 
     HyperGraph::HyperGraphElement* element = factory->construct(token, elemBitset);
-    // if (element) {
-    //   cerr << "element instance created: " << element << endl; 
-    // }
     if (dynamic_cast<Vertex*>(element)) { // it's a vertex type
       //cerr << "it is a vertex" << endl;
       previousData = 0;

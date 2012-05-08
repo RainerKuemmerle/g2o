@@ -1,0 +1,181 @@
+// g2o - General Graph Optimization
+// Copyright (C) 2012 R. Kümmerle
+// All rights reserved.
+//
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted provided that the following conditions are
+// met:
+//
+// * Redistributions of source code must retain the above copyright notice,
+//   this list of conditions and the following disclaimer.
+// * Redistributions in binary form must reproduce the above copyright
+//   notice, this list of conditions and the following disclaimer in the
+//   documentation and/or other materials provided with the distribution.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS
+// IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+// TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+// PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+// HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+// SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
+// TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+// PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+// LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+// NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+// SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+#include <Eigen/Core>
+#include <Eigen/StdVector>
+#include <Eigen/Geometry>
+#include <iostream>
+
+#include "g2o/stuff/sampler.h"
+#include "g2o/stuff/command_args.h"
+#include "g2o/core/sparse_optimizer.h"
+#include "g2o/core/block_solver.h"
+#include "g2o/core/solver.h"
+#include "g2o/core/optimization_algorithm_levenberg.h"
+#include "g2o/core/optimization_algorithm_gauss_newton.h"
+#include "g2o/core/base_vertex.h"
+#include "g2o/core/base_unary_edge.h"
+#include "g2o/solvers/csparse/linear_solver_csparse.h"
+
+using namespace std;
+
+/**
+ * \brief a circle located at x,y with radius r
+ */
+class VertexCircle : public g2o::BaseVertex<3, Eigen::Vector3d>
+{
+  public:
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
+    VertexCircle()
+    {
+    }
+
+    virtual bool read(std::istream& /*is*/)
+    {
+      cerr << __PRETTY_FUNCTION__ << " not implemented yet" << endl;
+      return false;
+    }
+
+    virtual bool write(std::ostream& /*os*/) const
+    {
+      cerr << __PRETTY_FUNCTION__ << " not implemented yet" << endl;
+      return false;
+    }
+
+    virtual void setToOriginImpl()
+    {
+      cerr << __PRETTY_FUNCTION__ << " not implemented yet" << endl;
+    }
+
+    virtual void oplusImpl(const double* update)
+    {
+      Eigen::Vector3d::ConstMapType v(update);
+      _estimate += v;
+    }
+};
+
+/**
+ * \brief measurement for a point on the circle
+ *
+ * Here the measurement is the point which is on the circle.
+ * The error function computes the distance of the point to
+ * the center minus the radius of the circle.
+ */
+class EdgePointOnCircle : public g2o::BaseUnaryEdge<1, Eigen::Vector2d, VertexCircle>
+{
+  public:
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+    EdgePointOnCircle()
+    {
+    }
+    virtual bool read(std::istream& /*is*/)
+    {
+      cerr << __PRETTY_FUNCTION__ << " not implemented yet" << endl;
+      return false;
+    }
+    virtual bool write(std::ostream& /*os*/) const
+    {
+      cerr << __PRETTY_FUNCTION__ << " not implemented yet" << endl;
+      return false;
+    }
+
+    void computeError()
+    {
+      const VertexCircle* circle = static_cast<const VertexCircle*>(vertex(0));
+
+      const Eigen::Vector2d& center = circle->estimate().head<2>();
+      const double& radius = circle->estimate()(2);
+
+      _error(0) = (measurement() - center).norm() - radius;
+    }
+};
+
+int main(int argc, char** argv)
+{
+  int numPoints;
+  int maxIterations;
+  bool verbose;
+  std::vector<int> gaugeList;
+  g2o::CommandArgs arg;
+  arg.param("numPoints", numPoints, 100, "number of points sampled from the circle");
+  arg.param("i", maxIterations, 10, "perform n iterations");
+  arg.param("v", verbose, false, "verbose output of the optimization process");
+
+  arg.parseArgs(argc, argv);
+
+  // generate random data
+  Eigen::Vector2d center(4, 2);
+  double radius = 2.;
+  Eigen::Vector2d* points = new Eigen::Vector2d[numPoints];
+  for (int i = 0; i < numPoints; ++i) {
+    double r = g2o::sampleUniform(radius-0.1, radius+0.1);
+    double angle = g2o::sampleUniform(0., 2. * M_PI);
+    points[i].x() = center.x() + r * cos(angle);
+    points[i].y() = center.y() + r * sin(angle);
+  }
+
+  // some handy typedefs
+  typedef g2o::BlockSolver< g2o::BlockSolverTraits<Eigen::Dynamic, Eigen::Dynamic> >  MyBlockSolver;
+  typedef g2o::LinearSolverCSparse<MyBlockSolver::PoseMatrixType> MyLinearSolver;
+
+  // setup the solver
+  g2o::SparseOptimizer optimizer;
+  optimizer.setVerbose(false);
+  MyLinearSolver* linearSolver = new MyLinearSolver();
+  MyBlockSolver* solver_ptr = new MyBlockSolver(linearSolver);
+  g2o::OptimizationAlgorithmLevenberg* solver = new g2o::OptimizationAlgorithmLevenberg(solver_ptr);
+  //g2o::OptimizationAlgorithmGaussNewton* solver = new g2o::OptimizationAlgorithmGaussNewton(solver_ptr);
+  optimizer.setAlgorithm(solver);
+
+  // build the optimization problem given the points
+  // 1. add the circle vertex
+  VertexCircle* circle = new VertexCircle();
+  circle->setId(0);
+  circle->setEstimate(Eigen::Vector3d(3,3,3)); // some initial value for the circle
+  optimizer.addVertex(circle);
+  // 2. add the points we measured
+  for (int i = 0; i < numPoints; ++i) {
+    EdgePointOnCircle* e = new EdgePointOnCircle;
+    e->setInformation(Eigen::Matrix<double, 1, 1>::Identity());
+    e->setVertex(0, circle);
+    e->setMeasurement(points[i]);
+    optimizer.addEdge(e);
+  }
+
+  // perform the optimization
+  optimizer.initializeOptimization();
+  optimizer.setVerbose(verbose);
+  optimizer.optimize(maxIterations);
+
+  // print out the result
+  cout << "Estimated center of the circle " << circle->estimate().head<2>().transpose() << endl;
+  cout << "Estimated radius of the cirlce " << circle->estimate()(2) << endl;
+
+  // clean up
+  delete[] points;
+
+  return 0;
+}

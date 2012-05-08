@@ -36,6 +36,9 @@
 #include <map>
 #include <iostream>
 
+// define to get some verbose output
+//#define G2O_DEBUG_FACTORY
+
 namespace g2o {
 
   class AbstractHyperGraphElementCreator;
@@ -130,7 +133,7 @@ namespace g2o {
     public:
       RegisterTypeProxy(const std::string& name) : _name(name)
       {
-#ifndef NDEBUG
+#ifdef G2O_DEBUG_FACTORY
         std::cout << __FUNCTION__ << ": Registering " << _name << " of type " << typeid(T).name() << std::endl;
 #endif
         Factory::instance()->registerType(_name, new HyperGraphElementCreator<T>());
@@ -138,7 +141,7 @@ namespace g2o {
 
       ~RegisterTypeProxy()
       {
-#ifndef NDEBUG
+#ifdef G2O_DEBUG_FACTORY
         std::cout << __FUNCTION__ << ": Unregistering " << _name << " of type " << typeid(T).name() << std::endl;
 #endif
         Factory::instance()->unregisterType(_name);

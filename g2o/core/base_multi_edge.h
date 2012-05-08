@@ -77,6 +77,8 @@ namespace g2o {
       
       virtual void resize(size_t size);
 
+      virtual bool allVerticesFixed() const;
+
       virtual void constructQuadraticForm() ;
 
       virtual void mapHessianMemory(double* d, int i, int j, bool rowMajor);

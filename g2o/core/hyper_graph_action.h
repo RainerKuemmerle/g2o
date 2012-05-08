@@ -38,6 +38,9 @@
 
 #include "g2o_core_api.h"
 
+// define to get verbose output
+//#define G2O_DEBUG_ACTIONLIB
+
 namespace g2o {
 
   /**
@@ -192,7 +195,7 @@ namespace g2o {
       public:
       RegisterActionProxy()
           {
-#ifndef NDEBUG
+#ifdef G2O_DEBUG_ACTIONLIB
             std::cout << __FUNCTION__ << ": Registering action of type " << typeid(T).name() << std::endl;
 #endif
             _action = new T();
@@ -201,7 +204,7 @@ namespace g2o {
       
         ~RegisterActionProxy()
           {
-#ifndef NDEBUG
+#ifdef G2O_DEBUG_ACTIONLIB
             std::cout << __FUNCTION__ << ": Unregistering action of type " << typeid(T).name() << std::endl;
 #endif
             HyperGraphActionLibrary::instance()->unregisterAction(_action);
