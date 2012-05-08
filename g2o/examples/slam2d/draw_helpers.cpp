@@ -35,6 +35,9 @@
 #ifdef _WINDOWS
 #include <gl/GLU.h>
 #endif
+#ifdef UNIX
+#include <GL/glut.h>
+#endif
 
 namespace g2o {
 
