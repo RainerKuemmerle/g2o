@@ -126,7 +126,7 @@ namespace g2o {
       scale += 1e-3; // make sure it's non-zero :)
       rho /=  scale;
 
-      if (rho>0){ // last step was good
+      if (rho>0 && g2o_isfinite(tempChi)){ // last step was good
         double alpha = 1.-pow((2*rho-1),3);
         // crop lambda between minimum and maximum factors
         alpha = (std::min)(alpha, _goodStepUpperScale);

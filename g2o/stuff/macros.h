@@ -49,6 +49,7 @@
 
 #define g2o_isnan(x)     std::isnan(x)
 #define g2o_isinf(x)     std::isinf(x)
+# define g2o_isfinite(x) std::isfinite(x)
 
 // MSVC on Windows
 #elif defined _MSC_VER
@@ -78,6 +79,7 @@ Modified by Mark Pupilli from:
 
 # define g2o_isnan(x)    _isnan(x)
 # define g2o_isinf(x)    (_finite(x) == 0)
+# define g2o_isfinite(x) (_finite(x) != 0)
 
 // unknown compiler
 #else
@@ -94,6 +96,7 @@ Modified by Mark Pupilli from:
 #include <math.h>
 #define g2o_isnan(x)    isnan(x)
 #define g2o_isinf(x)    isinf(x)
+#define g2o_isfinite(x) isfinite(x)
 
 #endif
 
