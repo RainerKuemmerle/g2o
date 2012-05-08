@@ -36,6 +36,9 @@
 
 #include "g2o_core_api.h"
 
+// define to get some verbose output
+//#define G2O_DEBUG_OPTIMIZATION_ALGORITHM_FACTORY
+
 namespace g2o {
 
   // forward decl
@@ -118,7 +121,7 @@ namespace g2o {
       RegisterOptimizationAlgorithmProxy(AbstractOptimizationAlgorithmCreator* c)
       {
         _creator = c;
-#ifndef NDEBUG
+#ifdef G2O_DEBUG_OPTIMIZATION_ALGORITHM_FACTORY
         std::cout << __FUNCTION__ << ": Registering " << _creator->property().name << " of type " << typeid(*_creator).name() << std::endl;
 #endif
         OptimizationAlgorithmFactory::instance()->registerSolver(c);
@@ -126,7 +129,7 @@ namespace g2o {
 
       ~RegisterOptimizationAlgorithmProxy()
       {
-#ifndef NDEBUG
+#ifdef G2O_DEBUG_OPTIMIZATION_ALGORITHM_FACTORY
         std::cout << __FUNCTION__ << ": Unregistering " << _creator->property().name << std::endl;
 #endif
         OptimizationAlgorithmFactory::instance()->unregisterSolver(_creator);
