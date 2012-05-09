@@ -412,9 +412,6 @@ namespace g2o {
   {
     information().setIdentity();
     resize(3);
-    _jacobianOplus[0].resize(2,3);
-    _jacobianOplus[1].resize(2,6);
-    _jacobianOplus[2].resize(2,4);
   }
 
 /**
@@ -422,6 +419,9 @@ namespace g2o {
  */
   void EdgeProjectP2MC_Intrinsics::linearizeOplus()
   {
+    _jacobianOplus[0].resize(2,3);
+    _jacobianOplus[1].resize(2,6);
+    _jacobianOplus[2].resize(2,4);
     VertexCam *vc = static_cast<VertexCam *>(_vertices[1]);
     const SBACam &cam = vc->estimate();
 
