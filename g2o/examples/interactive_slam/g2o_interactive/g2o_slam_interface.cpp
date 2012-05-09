@@ -66,6 +66,7 @@ bool G2oSlamInterface::addEdge(const std::string& tag, int id, int dimension, in
 {
   (void) tag;
   (void) id;
+  size_t oldEdgesSize = _optimizer->edges().size();
 
   if (dimension == 3) {
 
@@ -228,6 +229,10 @@ bool G2oSlamInterface::addEdge(const std::string& tag, int id, int dimension, in
   else {
     cerr << __PRETTY_FUNCTION__ << " not implemented for this dimension" << endl;
     return false;
+  }
+
+  if (oldEdgesSize == 0) {
+    _optimizer->jacobianWorkspace().allocate();
   }
 
   return true;
