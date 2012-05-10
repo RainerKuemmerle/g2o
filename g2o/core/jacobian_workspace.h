@@ -42,6 +42,11 @@ namespace g2o {
 
   /**
    * \brief provide memory workspace for computing the Jacobians
+   *
+   * The workspace is used by an OptimizableGraph to provide temporary memory
+   * for computing the Jacobian of the error functions.
+   * Before calling linearizeOplus on an edge, the workspace needs to be allocated
+   * by calling allocate().
    */
   class G2O_CORE_API JacobianWorkspace
   {
@@ -77,9 +82,9 @@ namespace g2o {
       }
 
     protected:
-      WorkspaceVector _workspace;
-      int _maxNumVertices;
-      int _maxDimension;
+      WorkspaceVector _workspace;   ///< the memory pre-allocated for computing the Jacobians
+      int _maxNumVertices;          ///< the maximum number of vertices connected by a hyper-edge
+      int _maxDimension;            ///< the maximum dimension (number of elements) for a Jacobian
   };
 
 } // end namespace

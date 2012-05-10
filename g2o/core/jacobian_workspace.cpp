@@ -45,6 +45,8 @@ JacobianWorkspace::~JacobianWorkspace()
 
 bool JacobianWorkspace::allocate()
 {
+  if (_maxNumVertices <=0 || _maxDimension <= 0)
+    return false;
   //cerr << __PRETTY_FUNCTION__ << " " << _maxNumVertices << " " << _maxDimension << endl;
   _workspace.resize(_maxNumVertices);
   for (WorkspaceVector::iterator it = _workspace.begin(); it != _workspace.end(); ++it)
