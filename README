@@ -80,6 +80,8 @@ by the following command sequence.
 
 The binaries will be placed in bin and the libraries in lib which
 are both located in the top-level folder.
+If you are compiling on Windows, please download Eigen3 and extract it.
+Within cmake-gui set the variable G2O_EIGEN3_INCLUDE to that directory.
 
 
 
