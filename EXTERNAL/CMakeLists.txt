@@ -1,6 +1,4 @@
-CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
-
-# Only link with CSPARSE if we need to
+# Only build CSPARSE if we need to
 IF(BUILD_CSPARSE)
   ADD_SUBDIRECTORY(csparse)
 ENDIF(BUILD_CSPARSE)

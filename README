@@ -40,7 +40,6 @@ The following parts are licensed under GPL3+:
 Within the folder EXTERNAL we include software not written by us to
 guarantee easy compilation.
 - csparse: LPGL2.1 (see EXTERNAL/csparse/License.txt)
-- Eigen: LGPL3+
 
 See the doc folder for the full text of the licenses.
 
@@ -51,8 +50,9 @@ licenses for more details.
 
 
 Requirements:
-g2o requires cmake to build. The other requirements are optional.
+g2o requires cmake and Eigen3 to build. The other requirements are optional.
   * cmake             http://www.cmake.org/
+  * Eigen3            http://eigen.tuxfamily.org
   * suitesparse       http://www.cise.ufl.edu/research/sparse/SuiteSparse/
   * Qt4               http://qt.nokia.com/
   * libQGLViewer      http://www.libqglviewer.com/
@@ -60,6 +60,7 @@ g2o requires cmake to build. The other requirements are optional.
   On Ubuntu / Debian these dependencies are resolved by installing the
   following packages.
     - cmake
+    - libeigen3-dev
     - libsuitesparse-dev
     - libqt4-dev
     - qt4-qmake
