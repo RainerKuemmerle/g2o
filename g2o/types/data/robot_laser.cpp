@@ -136,7 +136,7 @@ namespace g2o {
       return false;
     if (_previousParams){
       _beamsDownsampling = _previousParams->makeProperty<IntProperty>(_typeName + "::BEAMS_DOWNSAMPLING", 1);
-      _pointSize = _previousParams->makeProperty<FloatProperty>(_typeName + "::POINT_SIZE", .05);
+      _pointSize = _previousParams->makeProperty<FloatProperty>(_typeName + "::POINT_SIZE", .05f);
     } else {
       _beamsDownsampling = 0;
       _pointSize= 0;
@@ -159,10 +159,10 @@ namespace g2o {
 
     glPushMatrix();
     const SE2& laserPose = that->laserParams().laserPose;
-    glTranslatef(laserPose.translation().x(), laserPose.translation().y(), 0);
-    glRotatef(RAD2DEG(laserPose.rotation().angle()),0.,0.,1.);
+    glTranslatef((float)laserPose.translation().x(), (float)laserPose.translation().y(), 0.f);
+    glRotatef((float)RAD2DEG(laserPose.rotation().angle()),0.f,0.f,1.f);
     glBegin(GL_POINTS);
-    glColor4f(1.,0.,0.,0.5);
+    glColor4f(1.f,0.f,0.f,0.5f);
     int step = 1;
     if (_beamsDownsampling )
       step = _beamsDownsampling->value();
@@ -170,7 +170,7 @@ namespace g2o {
       glPointSize(_pointSize->value());
     }
     for (size_t i=0; i<points.size(); i+=step){
-      glVertex3f(points[i].x(), points[i].y(), 0);
+      glVertex3f((float)points[i].x(), (float)points[i].y(), 0.f);
     }
     glEnd();
     glPopMatrix();

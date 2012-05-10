@@ -81,7 +81,7 @@ namespace g2o {
      */
     class G2O_CORE_API Data : public HyperGraph::HyperGraphElement
     {
-      friend class OptimizableGraph;
+      friend struct OptimizableGraph;
       public:
         virtual ~Data();
         Data();
@@ -93,7 +93,7 @@ namespace g2o {
         const Data* next() const {return _next;}
         Data* next() {return _next;}
         void setNext(Data* next_) { _next = next_; }
-    protected:
+      protected:
         Data* _next; // linked list of multiple data;
     };
 

@@ -60,7 +60,7 @@ namespace g2o {
   };
 
 #ifdef G2O_HAVE_OPENGL
-  class G2O_TYPES_SLAM2D_API RobotLaserDrawAction: public DrawAction{
+  class G2O_TYPES_DATA_API RobotLaserDrawAction: public DrawAction{
   public:
     RobotLaserDrawAction();
     virtual HyperGraphElementAction* operator()(HyperGraph::HyperGraphElement* element, 

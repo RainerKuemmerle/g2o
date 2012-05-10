@@ -38,7 +38,7 @@
 
 namespace g2o {
 
-  class OptimizableGraph;
+  struct OptimizableGraph;
 
   /**
    * \brief provide memory workspace for computing the Jacobians

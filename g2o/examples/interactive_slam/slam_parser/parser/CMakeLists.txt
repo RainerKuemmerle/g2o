@@ -1,4 +1,4 @@
-ADD_LIBRARY(parser_library ${G2O_LIB_TYPE}
+SET(G2O_PARSER_SRC
   slam_context.h slam_context.cpp
   bison_parser.cpp bison_parser.h
   commands.h
@@ -8,6 +8,16 @@ ADD_LIBRARY(parser_library ${G2O_LIB_TYPE}
   scanner.h flex_scanner.cpp
   stack.hh
 )
+
+IF (MSVC)
+ADD_LIBRARY(parser_library STATIC
+  ${G2O_PARSER_SRC}
+)
+ELSE()
+ADD_LIBRARY(parser_library ${G2O_LIB_TYPE}
+  ${G2O_PARSER_SRC}
+)
+ENDIF()
 
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR})
 
