@@ -29,7 +29,7 @@
 #include <gl/GLU.h>
 #endif
 #ifdef UNIX
-#include <GL/glut.h>
+#include <GL/glu.h>
 #endif
 
 namespace g2o {

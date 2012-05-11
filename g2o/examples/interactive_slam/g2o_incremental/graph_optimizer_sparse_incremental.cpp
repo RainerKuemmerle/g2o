@@ -120,7 +120,7 @@ namespace g2o {
       }
 
       SparseOptimizer::computeActiveErrors();
-      SparseOptimizer::linearizeSystem();
+      //SparseOptimizer::linearizeSystem();
       _underlyingSolver->buildSystem();
 
       int numBlocksRequired = _ivMap.size();
@@ -308,10 +308,7 @@ namespace g2o {
     }
     for (HyperGraph::EdgeSet::iterator it = eset.begin(); it != eset.end(); ++it) {
       OptimizableGraph::Edge* e = static_cast<OptimizableGraph::Edge*>(*it);
-      e->linearizeOplus();
-    }
-    for (HyperGraph::EdgeSet::iterator it = eset.begin(); it != eset.end(); ++it) {
-      OptimizableGraph::Edge* e = static_cast<OptimizableGraph::Edge*>(*it);
+      e->linearizeOplus(jacobianWorkspace());
       e->constructQuadraticForm();
     }
 

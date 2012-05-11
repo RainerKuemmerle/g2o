@@ -76,12 +76,6 @@ namespace g2o {
     double currentChi = _optimizer->activeChi2();
     double tempChi=currentChi;
 
-    _optimizer->linearizeSystem();
-    if (globalStats) {
-      globalStats->timeLinearize = get_time()-t;
-      t=get_time();
-    }
-
     _solver->buildSystem();
     if (globalStats) {
       globalStats->timeQuadraticForm = get_time()-t;

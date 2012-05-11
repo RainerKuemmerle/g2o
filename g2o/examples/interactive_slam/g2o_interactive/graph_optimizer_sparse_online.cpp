@@ -112,7 +112,7 @@ int SparseOptimizerOnline::optimize(int iterations, bool online)
     }
 
     SparseOptimizer::computeActiveErrors();
-    SparseOptimizer::linearizeSystem();
+    //SparseOptimizer::linearizeSystem();
     _underlyingSolver->buildSystem();
   }
   else {
@@ -122,14 +122,10 @@ int SparseOptimizerOnline::optimize(int iterations, bool online)
       OptimizableGraph::Edge * e = static_cast<OptimizableGraph::Edge*>(*it);
       e->computeError();
     }
-    // linearize the constraints
+    // linearize the constraints and update the Hessian
     for (HyperGraph::EdgeSet::iterator it = newEdges->begin(); it != newEdges->end(); ++it) {
       OptimizableGraph::Edge* e = static_cast<OptimizableGraph::Edge*>(*it);
-      e->linearizeOplus();
-    }
-    // add the updated constraints again to the Hessian
-    for (HyperGraph::EdgeSet::iterator it = newEdges->begin(); it != newEdges->end(); ++it) {
-      OptimizableGraph::Edge* e = static_cast<OptimizableGraph::Edge*>(*it);
+      e->linearizeOplus(jacobianWorkspace());
       e->constructQuadraticForm();
     }
     // update the b vector

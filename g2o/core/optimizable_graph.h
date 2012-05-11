@@ -39,6 +39,7 @@
 #include "hyper_graph.h"
 #include "parameter.h"
 #include "parameter_container.h"
+#include "jacobian_workspace.h"
 
 #include "g2o/stuff/macros.h"
 #include "g2o_core_api.h"
@@ -80,7 +81,7 @@ namespace g2o {
      */
     class G2O_CORE_API Data : public HyperGraph::HyperGraphElement
     {
-      friend class OptimizableGraph;
+      friend struct OptimizableGraph;
       public:
         virtual ~Data();
         Data();
@@ -92,7 +93,7 @@ namespace g2o {
         const Data* next() const {return _next;}
         Data* next() {return _next;}
         void setNext(Data* next_) { _next = next_; }
-    protected:
+      protected:
         Data* _next; // linked list of multiple data;
     };
 
@@ -448,10 +449,10 @@ namespace g2o {
         virtual void mapHessianMemory(double* d, int i, int j, bool rowMajor) = 0;
 
         /**
-         * Linearizes the constraint in the edge in the manifold space, and stores
-         * the result in temporary variables _jacobianOplusXi and _jacobianOplusXj (see base_edge).
+         * Linearizes the constraint in the edge in the manifold space, and store
+         * the result in the given workspace
          */
-        virtual void linearizeOplus() = 0;
+        virtual void linearizeOplus(JacobianWorkspace& jacobianWorkspace) = 0;
 
         /** set the estimate of the to vertex, based on the estimate of the from vertices in the edge. */
         virtual void initialEstimate(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to) = 0;
@@ -674,6 +675,9 @@ namespace g2o {
 
     // helper functions to save an individual edge
     bool saveEdge(std::ostream& os, Edge* e) const;
+    //! the workspace for storing the Jacobians of the graph
+    JacobianWorkspace& jacobianWorkspace() { return _jacobianWorkspace;}
+    const JacobianWorkspace& jacobianWorkspace() const { return _jacobianWorkspace;}
 
   protected:
     std::map<std::string, std::string> _renamedTypesLookup;
@@ -684,6 +688,7 @@ namespace g2o {
     bool _edge_has_id;
 
     ParameterContainer _parameters;
+    JacobianWorkspace _jacobianWorkspace;
   };
   
   /**

@@ -26,6 +26,7 @@
 
 #include "edge_se3_quat.h"
 #include "g2o/core/factory.h"
+#include "se3quat_gradients.h"
 
 #ifdef WINDOWS
 #include <windows.h>
@@ -41,13 +42,9 @@
 
 #include <iostream>
 
+using namespace std;
+
 namespace g2o {
-
-  // forward declaration for the analytic jacobian
-  void  jacobian_3d_qman ( Matrix< double, 6 , 6> &  Ji , Matrix< double, 6 , 6> &  Jj, const double&  z11 , const double&  z12 , const double&  z13 , const double&  z14 , const double&  z21 , const double&  z22 , const double&  z23 , const double&  z24 , const double&  z31 , const double&  z32 , const double&  z33 , const double&  z34 , const double&  xab11 , const double&  xab12 , const double&  xab13 , const double&  xab14 , const double&  xab21 , const double&  xab22 , const double&  xab23 , const double&  xab24 , const double&  xab31 , const double&  xab32 , const double&  xab33 , const double&  xab34 );
-
-  using namespace std;
-
 
   EdgeSE3::EdgeSE3() :
     BaseBinaryEdge<6, SE3Quat, VertexSE3, VertexSE3>()
@@ -171,12 +168,12 @@ namespace g2o {
     EdgeSE3* e =  static_cast<EdgeSE3*>(element);
     VertexSE3* fromEdge = static_cast<VertexSE3*>(e->vertex(0));
     VertexSE3* toEdge   = static_cast<VertexSE3*>(e->vertex(1));
-    glColor3f(0.5,0.5,0.8);
+    glColor3f(0.5f,0.5f,0.8f);
     glPushAttrib(GL_ENABLE_BIT);
     glDisable(GL_LIGHTING);
     glBegin(GL_LINES);
-    glVertex3f(fromEdge->estimate().translation().x(),fromEdge->estimate().translation().y(),fromEdge->estimate().translation().z());
-    glVertex3f(toEdge->estimate().translation().x(),toEdge->estimate().translation().y(),toEdge->estimate().translation().z());
+    glVertex3f((float)fromEdge->estimate().translation().x(),(float)fromEdge->estimate().translation().y(),(float)fromEdge->estimate().translation().z());
+    glVertex3f((float)toEdge->estimate().translation().x(),(float)toEdge->estimate().translation().y(),(float)toEdge->estimate().translation().z());
     glEnd();
     glPopAttrib();
     return this;

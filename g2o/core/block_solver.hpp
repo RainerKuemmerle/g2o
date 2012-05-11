@@ -522,11 +522,17 @@ bool BlockSolver<Traits>::buildSystem()
 
   // resetting the terms for the pairwise constraints
   // built up the current system by storing the Hessian blocks in the edges and vertices
-# ifdef G2O_OPENMP
-# pragma omp parallel for default (shared) if (_optimizer->activeEdges().size() > 100)
+# ifndef G2O_OPENMP
+  // no threading, we do not need to copy the workspace
+  JacobianWorkspace& jacobianWorkspace = _optimizer->jacobianWorkspace();
+# else
+  // if running with threads need to produce copies of the workspace for each thread
+  JacobianWorkspace jacobianWorkspace = _optimizer->jacobianWorkspace();
+# pragma omp parallel for default (shared) firstprivate(jacobianWorkspace) if (_optimizer->activeEdges().size() > 100)
 # endif
   for (int k = 0; k < static_cast<int>(_optimizer->activeEdges().size()); ++k) {
     OptimizableGraph::Edge* e = _optimizer->activeEdges()[k];
+    e->linearizeOplus(jacobianWorkspace); // jacobian of the nodes' oplus (manifold)
     e->constructQuadraticForm();
   }
 

@@ -89,6 +89,17 @@ void BaseMultiEdge<D, E>::constructQuadraticForm()
 
 }
 
+
+template <int D, typename E>
+void BaseMultiEdge<D, E>::linearizeOplus(JacobianWorkspace& jacobianWorkspace)
+{
+  for (size_t i = 0; i < _vertices.size(); ++i) {
+    OptimizableGraph::Vertex* v = static_cast<OptimizableGraph::Vertex*>(_vertices[i]);
+    new (&_jacobianOplus[i]) JacobianType(jacobianWorkspace.workspaceForVertex(i), D, v->dimension());
+  }
+  linearizeOplus();
+}
+
 template <int D, typename E>
 void BaseMultiEdge<D, E>::linearizeOplus()
 {
@@ -118,7 +129,7 @@ void BaseMultiEdge<D, E>::linearizeOplus()
     double add_vi[vi_dim];
 #endif
     std::fill(add_vi, add_vi + vi_dim, 0.0);
-    if (_jacobianOplus[i].rows() != _dimension || _jacobianOplus[i].cols() != vi_dim)
+    assert(_jacobianOplus[i].rows() == _dimension && _jacobianOplus[i].cols() == vi_dim && "jacobian cache dimension does not match");
       _jacobianOplus[i].resize(_dimension, vi_dim);
     // add small step along the unit vector in each dimension
     for (int d = 0; d < vi_dim; ++d) {
@@ -179,7 +190,7 @@ void BaseMultiEdge<D, E>::resize(size_t size)
   int maxIdx = (n * (n-1))/2;
   assert(maxIdx >= 0);
   _hessian.resize(maxIdx);
-  _jacobianOplus.resize(size);
+  _jacobianOplus.resize(size, JacobianType(0,0,0));
 }
 
 template <int D, typename E>

@@ -50,8 +50,8 @@ namespace g2o {
 
       static const int Dimension = BaseEdge<D, E>::Dimension;
       typedef typename BaseEdge<D,E>::Measurement Measurement;
-      typedef Matrix<double, D, Di> JacobianXiOplusType;
-      typedef Matrix<double, D, Dj> JacobianXjOplusType;
+      typedef typename Matrix<double, D, Di>::AlignedMapType JacobianXiOplusType;
+      typedef typename Matrix<double, D, Dj>::AlignedMapType JacobianXjOplusType;
       typedef typename BaseEdge<D,E>::ErrorVector ErrorVector;
       typedef typename BaseEdge<D,E>::InformationType InformationType;
 
@@ -61,7 +61,8 @@ namespace g2o {
       BaseBinaryEdge() : BaseEdge<D,E>(),
       _hessianRowMajor(false),
       _hessian(0, VertexXiType::Dimension, VertexXjType::Dimension), // HACK we map to the null pointer for initializing the Maps
-      _hessianTransposed(0, VertexXjType::Dimension, VertexXiType::Dimension)
+      _hessianTransposed(0, VertexXjType::Dimension, VertexXiType::Dimension),
+      _jacobianOplusXi(0, D, Di), _jacobianOplusXj(0, D, Dj)
       {
         _vertices.resize(2);
       }
@@ -72,6 +73,8 @@ namespace g2o {
       virtual void resize(size_t size);
 
       virtual bool allVerticesFixed() const;
+
+      virtual void linearizeOplus(JacobianWorkspace& jacobianWorkspace);
 
       /**
        * Linearizes the oplus operator in the vertex, and stores

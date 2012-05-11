@@ -68,7 +68,7 @@ namespace g2o{
 #   ifdef G2O_OPENMP
 #   pragma omp parallel for default (shared) if (_activeEdges.size() > 50)
 #   endif
-    for (size_t k = 0; k < _activeEdges.size(); ++k) {
+    for (int k = 0; k < static_cast<int>(_activeEdges.size()); ++k) {
       OptimizableGraph::Edge* e = _activeEdges[k];
       e->computeError();
       if (e->robustKernel()) { 
@@ -213,21 +213,12 @@ namespace g2o{
 #      ifndef NDEBUG
         int estimateDim = v->estimateDimension();
         if (estimateDim > 0) {
-#        ifdef _MSC_VER
-          double* estimateData = new double[estimateDim];
-#        else
-          double estimateData[estimateDim];
-#        endif
-          if (v->getEstimateData(estimateData) == true) {
-            for (int k = 0; k < estimateDim; ++k) {
-              if (g2o_isnan(estimateData[k])) {
+          Eigen::VectorXd estimateData(estimateDim);
+          if (v->getEstimateData(estimateData.data()) == true) {
+            for (int k = 0; k < estimateDim; ++k)
+              if (g2o_isnan(estimateData[k]))
                 cerr << __PRETTY_FUNCTION__ << ": Vertex " << v->id() << " contains a nan entry at index " << k << endl;
-              }
-            }
           }
-#        ifdef _MSC_VER
-          delete[] estimateData;
-#        endif
         }
 #      endif
 
@@ -330,6 +321,8 @@ namespace g2o{
       return -1;
     }
 
+    bool workspaceAllocated = _jacobianWorkspace.allocate(); (void) workspaceAllocated;
+    assert(workspaceAllocated && "Error while allocating memory for the Jacobians");
     _batchStatistics.clear();
     _batchStatistics.reserve(iterations);
     
@@ -345,7 +338,7 @@ namespace g2o{
         cstat.numVertices = _activeVertices.size();
       }
       
-      double ts =  get_time();
+      double ts = get_time();
       result = _algorithm->solve(i, online);
       ok = ( result == OptimizationAlgorithm::OK );
 
@@ -379,17 +372,6 @@ namespace g2o{
     return cjIterations;
   }
 
-  void SparseOptimizer::linearizeSystem()
-  {
-#   ifdef G2O_OPENMP
-#   pragma omp parallel for default (shared) if (_activeEdges.size() > 50)
-#   endif
-    for (size_t k = 0; k < _activeEdges.size(); ++k) {
-      OptimizableGraph::Edge* e = _activeEdges[k];
-      e->linearizeOplus(); // jacobian of the nodes' oplus (manifold)
-    }
-  }
-
   void SparseOptimizer::update(const double* update)
   {
 #ifndef NDEBUG
@@ -399,12 +381,9 @@ namespace g2o{
     for (size_t i=0; i < _ivMap.size(); ++i) {
       OptimizableGraph::Vertex* v= _ivMap[i];
 #ifndef NDEBUG
-      for (int k = 0; k < v->dimension(); k++) {
-        if (g2o_isnan(update[k])) {
+      for (int k = 0; k < v->dimension(); ++k, ++nan_idx)
+        if (g2o_isnan(update[k]))
           cerr << __PRETTY_FUNCTION__ << ": Update contains a nan at " << nan_idx << endl;
-        }
-        nan_idx++;
-      }
 #endif
       v->oplus(update);
       update += v->dimension();
@@ -425,8 +404,6 @@ namespace g2o{
     std::vector<HyperGraph::Vertex*> newVertices;
     newVertices.reserve(vset.size());
     _activeVertices.reserve(_activeVertices.size() + vset.size());
-    //for (HyperGraph::VertexSet::iterator it = vset.begin(); it != vset.end(); ++it)
-      //_activeVertices.push_back(static_cast<OptimizableGraph::Vertex*>(*it));
     _activeEdges.reserve(_activeEdges.size() + eset.size());
     for (HyperGraph::EdgeSet::iterator it = eset.begin(); it != eset.end(); ++it) {
       OptimizableGraph::Edge* e = static_cast<OptimizableGraph::Edge*>(*it);

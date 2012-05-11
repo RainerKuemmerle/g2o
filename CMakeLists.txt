@@ -68,10 +68,8 @@ ELSE(WIN32)
 ENDIF(WIN32)
 
 # Set search directory for looking for our custom CMake scripts to
-# look for SuiteSparse and QGLViewer. Also pick up Eigen3's cmake
-# module path because this will let us look for the system-wide
-# installation of eigen3.
-SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${g2o_SOURCE_DIR}/cmake_modules ${g2o_SOURCE_DIR}/EXTERNAL/eigen3/cmake)
+# look for SuiteSparse, QGLViewer, and Eigen3.
+SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${g2o_SOURCE_DIR}/cmake_modules)
 
 # Detect OS and define macros appropriately
 IF(WIN32)
@@ -170,8 +168,7 @@ FIND_PACKAGE(Eigen3)
 IF(EIGEN3_FOUND)
   SET(G2O_EIGEN3_INCLUDE ${EIGEN3_INCLUDE_DIR} CACHE PATH "Directory of Eigen3")
 ELSE(EIGEN3_FOUND)
-  MESSAGE("Using g2o-bundled version of Eigen3.")
-  SET(G2O_EIGEN3_INCLUDE ${g2o_SOURCE_DIR}/EXTERNAL/eigen3 CACHE PATH "Directory of Eigen3")
+  SET(G2O_EIGEN3_INCLUDE "" CACHE PATH "Directory of Eigen3")
 ENDIF(EIGEN3_FOUND)
 
 # Set up the top-level include directories

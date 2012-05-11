@@ -67,15 +67,15 @@ namespace g2o {
     for (int i=0; i<7; i++) 
       is >> meas[i];
     setMeasurement(SE3Quat(meas));
-    
+
     if (is.bad()) {
       return false;
     }
     for ( int i=0; i<information().rows() && is.good(); i++)
       for (int j=i; j<information().cols() && is.good(); j++){
-  is >> information()(i,j);
-  if (i!=j)
-    information()(j,i)=information()(i,j);
+        is >> information()(i,j);
+        if (i!=j)
+          information()(j,i)=information()(i,j);
       }
     if (is.bad()) {
       //  we overwrite the information matrix with the Identity
@@ -134,7 +134,7 @@ namespace g2o {
     // cerr << Ji-_jacobianOplusXi << endl;
     // cerr  << "Jj:" << endl;
     // cerr << Jj-_jacobianOplusXj << endl;
-    computeEdgeSE3Gradient(E, _jacobianOplusXi , _jacobianOplusXj,
+    internal::computeEdgeSE3Gradient<JacobianXiOplusType>(E, _jacobianOplusXi , _jacobianOplusXj,
                        Z, Xi, Xj, Pi, Pj);
   }
 

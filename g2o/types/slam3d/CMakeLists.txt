@@ -27,6 +27,7 @@ ADD_LIBRARY(types_slam3d ${G2O_LIB_TYPE}
   edge_se3_pointxyz_depth.h
   types_slam3d.cpp
   types_slam3d.h
+  dquat2mat.cpp
   g2o_types_slam3d_api.h
 )
 

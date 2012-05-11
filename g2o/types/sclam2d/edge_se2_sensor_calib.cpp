@@ -103,8 +103,8 @@ namespace g2o {
     glPushAttrib(GL_ENABLE_BIT);
     glDisable(GL_LIGHTING);
     glBegin(GL_LINES);
-    glVertex3f(fromEdge->estimate().translation().x(),fromEdge->estimate().translation().y(),0.);
-    glVertex3f(toEdge->estimate().translation().x(),toEdge->estimate().translation().y(),0.);
+    glVertex3f((float)fromEdge->estimate().translation().x(),(float)fromEdge->estimate().translation().y(),0.f);
+    glVertex3f((float)toEdge->estimate().translation().x(),(float)toEdge->estimate().translation().y(),0.f);
     glEnd();
     glPopAttrib();
     return this;

@@ -120,7 +120,7 @@ class StructureOnlySolver : public OptimizationAlgorithm
 
               // build the matrix
               e->computeError();
-              e->linearizeOplus();
+              e->linearizeOplus(optimizer()->jacobianWorkspace());
               e->constructQuadraticForm();
 
               // Restore frame's initial fixed() values

@@ -111,7 +111,7 @@ namespace g2o {
     P.translation()=_cache->offsetParam()->offset().translation();
     Z=_measurement.rotation().toRotationMatrix();
     Z.translation()=_measurement.translation();
-    computeEdgeSE3PriorGradient(E, _jacobianOplusXi, Z, X, P);
+    internal::computeEdgeSE3PriorGradient(E, _jacobianOplusXi, Z, X, P);
   }
 
 

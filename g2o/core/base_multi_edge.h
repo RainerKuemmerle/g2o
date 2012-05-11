@@ -31,6 +31,8 @@
 #include <iomanip>
 #include <limits>
 
+#include <Eigen/StdVector>
+
 #include "base_edge.h"
 #include "g2o/config.h"
 
@@ -60,7 +62,7 @@ namespace g2o {
     public:
       static const int Dimension = BaseEdge<D,E>::Dimension;
       typedef typename BaseEdge<D,E>::Measurement Measurement;
-      typedef MatrixXd JacobianType;
+      typedef MatrixXd::MapType JacobianType;
       typedef typename BaseEdge<D,E>::ErrorVector ErrorVector;
       typedef typename BaseEdge<D,E>::InformationType InformationType;
       typedef Map<MatrixXd, MatrixXd::Flags & AlignedBit ? Aligned : Unaligned > HessianBlockType;
@@ -68,10 +70,12 @@ namespace g2o {
       BaseMultiEdge() : BaseEdge<D,E>()
       {
       }
+      
+      virtual void linearizeOplus(JacobianWorkspace& jacobianWorkspace);
 
       /**
        * Linearizes the oplus operator in the vertex, and stores
-       * the result in temporary variables _jacobianOplusXi and _jacobianOplusXj
+       * the result in temporary variable vector _jacobianOplus
        */
       virtual void linearizeOplus();
       
@@ -93,7 +97,7 @@ namespace g2o {
       using BaseEdge<D,E>::_dimension;
 
       std::vector<HessianHelper> _hessian;
-      std::vector<JacobianType> _jacobianOplus; ///< jacobians of the edge (w.r.t. oplus)
+      std::vector<JacobianType, aligned_allocator<JacobianType> > _jacobianOplus; ///< jacobians of the edge (w.r.t. oplus)
 
     public:
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW
