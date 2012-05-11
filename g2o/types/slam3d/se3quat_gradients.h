@@ -42,8 +42,8 @@ void jacobian_3d_qman ( MatrixBase<Derived> &  Ji , MatrixBase<Derived> &  Jj,
   const double&  xab21 , const double&  xab22 , const double&  xab23 , const double&  xab24 ,
   const double&  xab31 , const double&  xab32 , const double&  xab33 , const double&  xab34 )
 {
-  Ji.resize(6,6);
-  Jj.resize(6,6);
+  Ji.derived().resize(6,6);
+  Jj.derived().resize(6,6);
   (void) z14;
   (void) z24;
   (void) z34;
