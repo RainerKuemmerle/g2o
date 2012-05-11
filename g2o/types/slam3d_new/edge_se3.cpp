@@ -69,7 +69,6 @@ namespace Slam3dNew {
   
   void EdgeSE3::linearizeOplus(){
     //BaseBinaryEdge<6, SE3Quat, VertexSE3, VertexSE3>::linearizeOplus();
-
     VertexSE3 *from = static_cast<VertexSE3*>(_vertices[0]);
     VertexSE3 *to   = static_cast<VertexSE3*>(_vertices[1]);
     Eigen::Isometry3d E;
@@ -77,8 +76,7 @@ namespace Slam3dNew {
     Xi=from->estimate();
     Xj=to->estimate();
     Z=_measurement;
-    computeEdgeSE3Gradient(E, _jacobianOplusXi , _jacobianOplusXj,
-                           Z, Xi, Xj, Eigen::Isometry3d::Identity(), Eigen::Isometry3d::Identity());
+    computeEdgeSE3Gradient(E, _jacobianOplusXi , _jacobianOplusXj, Z, Xi, Xj);
   }
 
   void EdgeSE3::initialEstimate(const OptimizableGraph::VertexSet& from_, OptimizableGraph::Vertex* /*to_*/) {
