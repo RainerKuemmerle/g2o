@@ -1,5 +1,5 @@
-#ifndef G2O_EDGE_SE3_POINTXYZ_DISPARITY_H_
-#define G2O_EDGE_SE3_POINTXYZ_DISPARITY_H_
+#ifndef G2O_EDGE_SE3_POINTXYZ_DISPARITY_NEW_H_
+#define G2O_EDGE_SE3_POINTXYZ_DISPARITY_NEW_H_
 
 #include "vertex_se3.h"
 #include "vertex_pointxyz.h"

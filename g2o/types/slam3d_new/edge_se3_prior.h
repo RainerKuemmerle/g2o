@@ -1,5 +1,5 @@
-#ifndef G2O_EDGE_SE3_PRIOR_H_
-#define G2O_EDGE_SE3_PRIOR_H_
+#ifndef G2O_EDGE_SE3_PRIOR_NEW_H_
+#define G2O_EDGE_SE3_PRIOR_NEW_H_
 
 #include "vertex_se3.h"
 #include "g2o/core/base_unary_edge.h"

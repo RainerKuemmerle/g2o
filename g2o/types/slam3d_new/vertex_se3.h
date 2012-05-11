@@ -14,8 +14,8 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef G2O_VERTEX_SE3_
-#define G2O_VERTEX_SE3_
+#ifndef G2O_VERTEX_SE3_NEW_
+#define G2O_VERTEX_SE3_NEW_
 
 #include "g2o/config.h"
 #include "g2o/core/base_vertex.h"

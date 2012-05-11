@@ -1,5 +1,5 @@
-#ifndef G2O_EDGE_SE3_OFFSET_H_
-#define G2O_EDGE_SE3_OFFSET_H_
+#ifndef G2O_EDGE_SE3_OFFSET_NEW_H_
+#define G2O_EDGE_SE3_OFFSET_NEW_H_
 
 #include "g2o/core/base_binary_edge.h"
 

@@ -1,5 +1,5 @@
-#ifndef G2O_VERTEX_TRACKXYZ_H_
-#define G2O_VERTEX_TRACKXYZ_H_
+#ifndef G2O_VERTEX_TRACKXYZ_NEW_H_
+#define G2O_VERTEX_TRACKXYZ_NEW_H_
 
 #include "g2o/core/base_vertex.h"
 #include "g2o/core/hyper_graph_action.h"

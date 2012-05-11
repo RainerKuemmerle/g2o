@@ -94,7 +94,7 @@ namespace g2o {
     return true;
   }
 
-  bool ParameterContainer::read(std::istream& is){
+  bool ParameterContainer::read(std::istream& is, const std::map<std::string, std::string>* _renamedTypesLookup){
     stringstream currentLine;
     string token;
 
@@ -109,6 +109,12 @@ namespace g2o {
       currentLine >> token;
       if (bytesRead == 0 || token.size() == 0 || token[0] == '#')
         continue;
+      if (_renamedTypesLookup && _renamedTypesLookup->size()>0){
+	map<string, string>::const_iterator foundIt = _renamedTypesLookup->find(token);
+	if (foundIt != _renamedTypesLookup->end()) {
+	  token = foundIt->second;
+	}
+      }
 
       HyperGraph::HyperGraphElement* element = factory->construct(token, elemBitset);
       if (! element) // not a parameter or otherwise unknown tag

@@ -29,6 +29,7 @@
 
 #include <iosfwd>
 #include <map>
+#include <string>
 
 namespace g2o {
     
@@ -55,7 +56,7 @@ namespace g2o {
       //! remove a parameter from the container, i.e., the user now owns the pointer
       Parameter* detachParameter(int id);
       //! read parameters from a stream
-      virtual bool read(std::istream& is);
+      virtual bool read(std::istream& is, const std::map<std::string, std::string>* renamedMap =0);
       //! write the data to a stream
       virtual bool write(std::ostream& os) const;
       bool isMainStorage() const {return _isMainStorage;}

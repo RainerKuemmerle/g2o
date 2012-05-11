@@ -343,7 +343,7 @@ void OptimizableGraph::discardTop(HyperGraph::VertexSet& vset)
 bool OptimizableGraph::load(istream& is, bool createEdges)
 {
   // scna for the paramers in the whole file
-  if (!_parameters.read(is))
+  if (!_parameters.read(is,&_renamedTypesLookup))
     return false;
 #ifndef NDEBUG
   cerr << "Loaded " << _parameters.size() << " parameters" << endl;

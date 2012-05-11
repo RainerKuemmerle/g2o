@@ -89,7 +89,7 @@ namespace Slam3dNew {
       to->setEstimate(from->estimate() * _measurement);
     } else
       from->setEstimate(to->estimate() * _measurement.inverse());
-    cerr << "IE" << endl;
+    //cerr << "IE" << endl;
   }
 
 
