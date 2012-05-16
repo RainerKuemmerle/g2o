@@ -76,7 +76,10 @@ namespace Slam3dNew {
     const Eigen::Isometry3d& Xi=from->estimate();
     const Eigen::Isometry3d& Xj=to->estimate();
     const Eigen::Isometry3d& Z=_measurement;
-    computeEdgeSE3Gradient(E, _jacobianOplusXi , _jacobianOplusXj, Z, Xi, Xj);
+    // FIXME there is an error in the simpler function which results in wrong Jacobians
+    //computeEdgeSE3Gradient(E, _jacobianOplusXi , _jacobianOplusXj, Z, Xi, Xj);
+    Eigen::Isometry3d zeroOffset = Eigen::Isometry3d::Identity();
+    computeEdgeSE3Gradient(E, _jacobianOplusXi , _jacobianOplusXj, Z, Xi, Xj, zeroOffset, zeroOffset);
   }
 
   void EdgeSE3::initialEstimate(const OptimizableGraph::VertexSet& from_, OptimizableGraph::Vertex* /*to_*/) {
