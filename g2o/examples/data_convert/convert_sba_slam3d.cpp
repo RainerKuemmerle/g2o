@@ -79,7 +79,10 @@ int main(int argc, char** argv)
 
       VertexSE3* ov = new VertexSE3;
       ov->setId(v->id());
-      ov->setEstimate(v->estimate());
+      Eigen::Isometry3d p;
+      p = v->estimate().rotation();
+      p.translation() = v->estimate().translation();
+      ov->setEstimate(p);
       if (! outputGraph.addVertex(ov)) {
         assert(0 && "Failure adding camera vertex");
       }

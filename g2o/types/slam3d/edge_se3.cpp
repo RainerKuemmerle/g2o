@@ -13,7 +13,6 @@
 
 namespace g2o {
   using namespace std;
-  using namespace g2o;
 
   EdgeSE3::EdgeSE3() : BaseBinaryEdge<6, Eigen::Isometry3d, VertexSE3, VertexSE3>() {
     information().setIdentity();

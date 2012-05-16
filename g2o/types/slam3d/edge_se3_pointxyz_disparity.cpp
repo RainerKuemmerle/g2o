@@ -16,7 +16,6 @@
 #endif
 
 namespace g2o {
-  using namespace g2o;
   using namespace std;
 
 

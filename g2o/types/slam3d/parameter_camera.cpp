@@ -13,7 +13,6 @@
 using namespace std;
 
 namespace g2o {
-  using namespace g2o;
 
   ParameterCamera::ParameterCamera(){
     setId(-1);

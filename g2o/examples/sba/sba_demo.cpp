@@ -190,8 +190,8 @@ int main(int argc, const char* argv[])
   double baseline = 0.075;      // 7.5 cm baseline
 
 
-  vector<g2o::SE3Quat,
-      aligned_allocator<g2o::SE3Quat> > true_poses;
+  vector<Eigen::Isometry3d,
+      aligned_allocator<Eigen::Isometry3d> > true_poses;
 
   // set up camera params
   g2o::VertexSCam::setKcam(focal_length[0],focal_length[1],
@@ -208,7 +208,9 @@ int main(int argc, const char* argv[])
 
     Eigen:: Quaterniond q;
     q.setIdentity();
-    g2o::SE3Quat pose(q,trans);
+    Eigen::Isometry3d pose;
+    pose = q;
+    pose.translation() = trans;
 
 
     g2o::VertexSCam * v_se3

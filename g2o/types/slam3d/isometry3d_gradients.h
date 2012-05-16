@@ -27,6 +27,7 @@
 #ifndef G2O_ISOMETRY3D_GRADIENTS_NEW_H
 #define G2O_ISOMETRY3D_GRADIENTS_NEW_H_
 
+#include "g2o_types_slam3d_api.h"
 #include "isometry3d_mappings.h"
 
 #include <Eigen/Core>
@@ -35,7 +36,7 @@
 namespace g2o {
   namespace internal {
     // forward declaration
-    void  compute_dq_dR (Eigen::Matrix<double, 3 , 9 >&  dq_dR , const double&  r11 , const double&  r21 , const double&  r31 , const double&  r12 , const double&  r22 , const double&  r32 , const double&  r13 , const double&  r23 , const double&  r33 ); 
+    void G2O_TYPES_SLAM3D_API compute_dq_dR (Eigen::Matrix<double, 3 , 9 >&  dq_dR , const double&  r11 , const double&  r21 , const double&  r31 , const double&  r12 , const double&  r22 , const double&  r32 , const double&  r13 , const double&  r23 , const double&  r33 ); 
 
     inline void skew(Eigen::Matrix3d& s, const Eigen::Matrix<double, 3, 1>& v){
       const double x=2*v(0);

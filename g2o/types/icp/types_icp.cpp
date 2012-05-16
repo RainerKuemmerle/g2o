@@ -175,14 +175,15 @@ namespace g2o {
     VertexSE3* vp0 = static_cast<VertexSE3*>(_vertices[0]);
     VertexSE3* vp1 = static_cast<VertexSE3*>(_vertices[1]);
 
-    Matrix3d R0T = vp0->estimate().rotation().toRotationMatrix().transpose();
+    // topLeftCorner<3,3>() is the rotation matrix
+    Matrix3d R0T = vp0->estimate().matrix().topLeftCorner<3,3>().transpose();
     Vector3d p1 = measurement().pos1;
 
     // this could be more efficient
     if (!vp0->fixed())
       {
-        SE3Quat T01 = vp0->estimate().inverse() *  vp1->estimate();
-        Vector3d p1t = T01.map(p1);
+        Eigen::Isometry3d T01 = vp0->estimate().inverse() *  vp1->estimate();
+        Vector3d p1t = T01 * p1;
         _jacobianOplusXi.block<3,3>(0,0) = -Matrix3d::Identity();
         _jacobianOplusXi.block<3,1>(0,3) = dRidx*p1t;
         _jacobianOplusXi.block<3,1>(0,4) = dRidy*p1t;
@@ -191,7 +192,7 @@ namespace g2o {
 
     if (!vp1->fixed())
       {
-        Matrix3d R1 = vp1->estimate().rotation().toRotationMatrix();
+        Matrix3d R1 = vp1->estimate().matrix().topLeftCorner<3,3>();
         R0T = R0T*R1;
         _jacobianOplusXj.block<3,3>(0,0) = R0T;
         _jacobianOplusXj.block<3,1>(0,3) = R0T*dRidx.transpose()*p1;

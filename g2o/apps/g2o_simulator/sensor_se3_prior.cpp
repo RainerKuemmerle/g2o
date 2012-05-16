@@ -48,8 +48,7 @@ namespace g2o {
 
   void SensorSE3Prior::addNoise(EdgeType* e){
     EdgeType::ErrorVector _n=_sampler.generateSample();
-    SE3Quat n;
-    n.fromMinimalVector(_n);
+    EdgeType::Measurement n = internal::fromVectorMQT(_n);
     e->setMeasurement(e->measurement()*n);
     e->setInformation(information());
   }

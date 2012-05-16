@@ -12,7 +12,6 @@
 #endif
 
 namespace g2o {
-  using namespace g2o;
 
   ParameterSE3Offset::ParameterSE3Offset(){
     setOffset();
@@ -95,10 +94,7 @@ namespace g2o {
       return this;
 
     glPushMatrix();
-    const Vector3d& offsetT=that->offsetParam()->offset().translation();
-    AngleAxisd aa(that->offsetParam()->offset().rotation());
-    glTranslatef(offsetT.x(), offsetT.y(), offsetT.z());
-    glRotatef(RAD2DEG(aa.angle()),aa.axis().x(),aa.axis().y(),aa.axis().z());
+    glMultMatrixd(that->offsetParam()->offset().matrix().data());
     // if (_cubeSide)
     //   drawMyPyramid(_cubeSide->value(), _cubeSide->value());
     glPopMatrix();

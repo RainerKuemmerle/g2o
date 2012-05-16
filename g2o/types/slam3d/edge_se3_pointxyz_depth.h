@@ -9,7 +9,6 @@
 #include "g2o_types_slam3d_api.h"
 
 namespace g2o {
-  using namespace g2o;
 
   /*! \class EdgeProjectDepth
    * \brief g2o edge from a track to a depth camera node using a depth measurement (true distance, not disparity)

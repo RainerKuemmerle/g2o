@@ -96,14 +96,14 @@ int main(int argc, char** argv) {
     SensorPointXYZ* pointSensor =  new SensorPointXYZ("pointSensor");
     pointSensor->setFov(M_PI/4);
     robot.addSensor(pointSensor);
-    SE3Quat cameraPose;
+    Eigen::Isometry3d cameraPose;
     Eigen::Matrix3d R;
     R  << 0,  0,  1,
          -1,  0,  0,
           0, -1,  0;
     pointSensor->setMaxRange(2.);
-    cameraPose.setRotation(Quaterniond(R));
-    cameraPose.setTranslation(Vector3d(0.,0.,0.3));
+    cameraPose = R;
+    cameraPose.translation() = Vector3d(0.,0.,0.3);
     pointSensor->offsetParam()->setOffset(cameraPose);
     ss << "-pointXYZ";
   }
@@ -114,13 +114,13 @@ int main(int argc, char** argv) {
     disparitySensor->setMinRange(0.5);
     disparitySensor->setMaxRange(2.);
     robot.addSensor(disparitySensor);
-    SE3Quat cameraPose;
+    Eigen::Isometry3d cameraPose;
     Eigen::Matrix3d R;
     R  << 0,  0,  1,
          -1,  0,  0, 
           0, -1,  0;
-    cameraPose.setRotation(Quaterniond(R));
-    cameraPose.setTranslation(Vector3d(0.,0.,0.3));
+    cameraPose = R;
+    cameraPose.translation() = Vector3d(0.,0.,0.3);
     disparitySensor->offsetParam()->setOffset(cameraPose);
     ss << "-disparity";
   }
@@ -131,13 +131,13 @@ int main(int argc, char** argv) {
     depthSensor->setMinRange(0.5);
     depthSensor->setMaxRange(2.);
     robot.addSensor(depthSensor);
-    SE3Quat cameraPose;
+    Eigen::Isometry3d cameraPose;
     Eigen::Matrix3d R;
     R  << 0,  0,  1,
          -1,  0,  0, 
           0, -1,  0;
-    cameraPose.setRotation(Quaterniond(R));
-    cameraPose.setTranslation(Vector3d(0.,0.,0.3));
+    cameraPose = R;
+    cameraPose.translation() = Vector3d(0.,0.,0.3);
     depthSensor->offsetParam()->setOffset(cameraPose);
     ss << "-depth";
   }
@@ -153,13 +153,13 @@ int main(int argc, char** argv) {
   SensorSE3Prior posePriorSensor("posePriorSensor");
   robot.addSensor(&posePriorSensor);
   {
-    SE3Quat cameraPose;
+    Eigen::Isometry3d cameraPose;
     Eigen::Matrix3d R;
     R  << 0,  0,  1,
          -1,  0,  0,
           0, -1,  0;
-    cameraPose.setRotation(Quaterniond(R));
-    cameraPose.setTranslation(Vector3d(0.,0.,0.3));
+    cameraPose = R;
+    cameraPose.translation() = Vector3d(0.,0.,0.3);
     posePriorSensor.offsetParam()->setOffset(cameraPose);
   }
 #endif
@@ -171,57 +171,57 @@ int main(int argc, char** argv) {
   poseSensor.setMaxRange(5);
   robot.addSensor(&poseSensor);
   if(0){
-    SE3Quat cameraPose;
+    Eigen::Isometry3d cameraPose;
     Eigen::Matrix3d R;
     R  << 0,  0,  1,
          -1,  0,  0, 
           0, -1,  0;
-    cameraPose.setRotation(Quaterniond(R));
-    cameraPose.setTranslation(Vector3d(0.,0.,0.3));
+    cameraPose = R;
+    cameraPose.translation() = Vector3d(0.,0.,0.3);
     poseSensor.offsetParam1()->setOffset(cameraPose);
     poseSensor.offsetParam2()->setOffset(cameraPose);
   }
 #endif  
 
 
-  robot.move(SE3Quat());
+  robot.move(Eigen::Isometry3d::Identity());
   double pStraight=0.7;
-  SE3Quat moveStraight; moveStraight.setTranslation(Vector3d(1., 0., 0.));
+  Eigen::Isometry3d moveStraight = Eigen::Isometry3d::Identity(); moveStraight.translation() = Vector3d(1., 0., 0.);
   double pLeft=0.15;
-  SE3Quat moveLeft; moveLeft.setRotation(Quaterniond(AngleAxisd(M_PI/2,Vector3d::UnitZ())));
+  Eigen::Isometry3d moveLeft = Eigen::Isometry3d::Identity(); moveLeft = AngleAxisd(M_PI/2, Vector3d::UnitZ());
   //double pRight=0.15;
-  SE3Quat moveRight; moveRight.setRotation(Quaterniond(AngleAxisd(-M_PI/2,Vector3d::UnitZ())));
+  Eigen::Isometry3d moveRight = Eigen::Isometry3d::Identity(); moveRight = AngleAxisd(-M_PI/2,Vector3d::UnitZ());
   
-  Quaterniond dtheta(1.,0.,0.,0.);
+  Eigen::Matrix3d dtheta = Eigen::Matrix3d::Identity();
   for (int i=0; i<simSteps; i++){
     bool boundariesReached = true;
     cerr << "m";
     Vector3d dt;
-    SE3Quat pose=robot.pose();
+    const Eigen::Isometry3d& pose = robot.pose();
     if (pose.translation().x() < -.5*worldSize){
-      dtheta = Quaterniond(AngleAxisd(0,Vector3d::UnitZ()));
+      dtheta = AngleAxisd(0,Vector3d::UnitZ());
     } else if (pose.translation().x() >  .5*worldSize){
-      dtheta = Quaterniond(AngleAxisd(-M_PI,Vector3d::UnitZ()));
+      dtheta = AngleAxisd(-M_PI,Vector3d::UnitZ());
     } else if (pose.translation().y() < -.5*worldSize){
-      dtheta = Quaterniond(AngleAxisd(M_PI/2,Vector3d::UnitZ()));
+      dtheta = AngleAxisd(M_PI/2,Vector3d::UnitZ());
     } else if (pose.translation().y() >  .5*worldSize){
-      dtheta = Quaterniond(AngleAxisd(-M_PI/2,Vector3d::UnitZ()));
+      dtheta = AngleAxisd(-M_PI/2,Vector3d::UnitZ());
     } else {
       boundariesReached=false;
     }
     
-    SE3Quat move;
+    Eigen::Isometry3d move = Eigen::Isometry3d::Identity();
     if (boundariesReached){
-      Quaterniond mTheta=pose.rotation().inverse()*dtheta;
-      move.setRotation(mTheta);
-      AngleAxisd aa(mTheta.toRotationMatrix());
+      Eigen::Matrix3d mTheta = pose.rotation().inverse() * dtheta;
+      move = mTheta;
+      AngleAxisd aa(mTheta);
       if (aa.angle()<std::numeric_limits<double>::epsilon()){
-        move.setTranslation(Vector3d(1., 0., 0.));
+        move.translation() = Vector3d(1., 0., 0.);
       }
     } else {
       double sampled=sampleUniform();
       if (sampled<pStraight)
-      move=moveStraight;
+        move=moveStraight;
       else if (sampled<pStraight+pLeft)
         move=moveLeft;
       else

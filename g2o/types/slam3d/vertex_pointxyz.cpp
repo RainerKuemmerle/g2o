@@ -78,5 +78,25 @@ namespace g2o {
   }
 #endif
 
+  VertexPointXYZWriteGnuplotAction::VertexPointXYZWriteGnuplotAction() :
+    WriteGnuplotAction(typeid(VertexPointXYZ).name())
+  {
+  }
+
+  HyperGraphElementAction* VertexPointXYZWriteGnuplotAction::operator()(HyperGraph::HyperGraphElement* element, HyperGraphElementAction::Parameters* params_ )
+  {
+    if (typeid(*element).name()!=_typeName)
+      return 0;
+    WriteGnuplotAction::Parameters* params=static_cast<WriteGnuplotAction::Parameters*>(params_);
+    if (!params->os){
+      std::cerr << __PRETTY_FUNCTION__ << ": warning, no valid os specified" << std::endl;
+      return 0;
+    }
+
+    VertexPointXYZ* v = static_cast<VertexPointXYZ*>(element);
+    *(params->os) << v->estimate().x() << " " << v->estimate().y() << " " << v->estimate().z() << " " << std::endl;
+    return this;
+  }
+
 }
 

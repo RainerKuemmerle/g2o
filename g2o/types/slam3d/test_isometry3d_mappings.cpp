@@ -3,6 +3,7 @@
 
 using namespace std;
 using namespace g2o;
+using namespace g2o::internal;
 
 int main(int , char** ){
   Vector3d eulerAngles(.1,.2,.3);

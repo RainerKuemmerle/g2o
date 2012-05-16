@@ -29,17 +29,16 @@
 #include "g2o/core/cache.h"
 
 namespace g2o {
-  using namespace g2o;
 
   VertexSE3::VertexSE3() :
     BaseVertex<6, Eigen::Isometry3d>()
   {
+    setToOriginImpl();
     updateCache();
   }
 
   bool VertexSE3::read(std::istream& is)
   {
-
     Vector7d est;
     for (int i=0; i<7; i++)
       is  >> est[i];
@@ -128,10 +127,7 @@ namespace g2o {
 
     glColor3f(0.5,0.5,0.8);
     glPushMatrix();
-    // TODO glMultMatrix ???
-    glTranslatef(that->estimate().translation().x(),that->estimate().translation().y(),that->estimate().translation().z());
-    AngleAxisd aa(that->estimate().rotation());
-    glRotatef(RAD2DEG(aa.angle()),aa.axis().x(),aa.axis().y(),aa.axis().z());
+    glMultMatrixd(that->estimate().matrix().data());
     if (_triangleX && _triangleY){
       drawTriangle(_triangleX->value(), _triangleY->value());
     }

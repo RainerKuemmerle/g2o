@@ -32,12 +32,79 @@
 #include "types_slam3d_online.h"
 
 #include "graph_optimizer_sparse_online.h"
+#include "g2o/types/slam3d/se3quat.h"
 
 #include <iostream>
 using namespace std;
 
 namespace g2o {
 
+  namespace {
+    void quat_to_euler(const Eigen::Quaterniond& q, double& yaw, double& pitch, double& roll)
+    {
+      const double& q0 = q.w();
+      const double& q1 = q.x();
+      const double& q2 = q.y();
+      const double& q3 = q.z();
+      roll = atan2(2*(q0*q1+q2*q3), 1-2*(q1*q1+q2*q2));
+      pitch = asin(2*(q0*q2-q3*q1));
+      yaw = atan2(2*(q0*q3+q1*q2), 1-2*(q2*q2+q3*q3));
+    }
+
+    void jac_quat3_euler3(Eigen::Matrix<double, 6, 6>& J, const SE3Quat& t)
+    {
+      const Vector3d& tr0 = t.translation();
+      const Quaterniond& q0 = t.rotation();
+
+      double delta=1e-6;
+      double idelta= 1. / (2. * delta);
+
+      for (int i=0; i<6; i++){
+        SE3Quat ta, tb;
+        if (i<3){
+          Vector3d tra=tr0;
+          Vector3d trb=tr0;
+          tra[i] -= delta;
+          trb[i] += delta;
+          ta = SE3Quat(q0, tra); 
+          tb = SE3Quat(q0, trb); 
+        } else {
+          Quaterniond qa=q0;
+          Quaterniond qb=q0;
+          if (i == 3) {
+            qa.x() -= delta;
+            qb.x() += delta;
+          }
+          else if (i == 4) {
+            qa.y() -= delta;
+            qb.y() += delta;
+          }
+          else if (i == 5) {
+            qa.z() -= delta;
+            qb.z() += delta;
+          }
+          qa.normalize();
+          qb.normalize();
+          ta = SE3Quat(qa, tr0); 
+          tb = SE3Quat(qb, tr0); 
+        }
+
+        Vector3d dtr = (tb.translation() - ta.translation())*idelta;
+        Vector3d taAngles, tbAngles;
+        quat_to_euler(ta.rotation(), taAngles(2), taAngles(1), taAngles(0));
+        quat_to_euler(tb.rotation(), tbAngles(2), tbAngles(1), tbAngles(0));
+        Vector3d da = (tbAngles - taAngles) * idelta; //TODO wraparounds not handled
+
+        for (int j=0; j<6; j++){
+          if (j<3){
+            J(j, i) = dtr(j);
+          } else {
+            J(j, i) = da(j-3);
+          }
+        }
+      }
+    }
+  }
 
 G2oSlamInterface::G2oSlamInterface(SparseOptimizerOnline* optimizer) :
   _optimizer(optimizer), _firstOptimization(true), _nodesAdded(0),
@@ -146,9 +213,9 @@ bool G2oSlamInterface::addEdge(const std::string& tag, int id, int dimension, in
   }
   else if (dimension == 6) {
 
-    Vector3d translation(measurement[0], measurement[1], measurement[2]);
-    Quaterniond rotation = euler_to_quat(measurement[5], measurement[4], measurement[3]);
-    SE3Quat transf(rotation, translation);
+    Vector6d aux;
+    aux << measurement[0], measurement[1], measurement[2],measurement[3], measurement[4], measurement[5];
+    Eigen::Isometry3d transf = internal::fromVectorET(aux);
     Matrix<double, 6, 6> infMatEuler;
     int idx = 0;
     for (int r = 0; r < 6; ++r)
@@ -158,8 +225,10 @@ bool G2oSlamInterface::addEdge(const std::string& tag, int id, int dimension, in
       }
     // convert information matrix to our internal representation
     Matrix<double, 6, 6> J;
-    jac_quat3_euler3(J, transf);
+    SE3Quat transfAsSe3(transf.matrix().topLeftCorner<3,3>(), transf.translation());
+    jac_quat3_euler3(J, transfAsSe3);
     Matrix<double, 6, 6> infMat = J.transpose() * infMatEuler * J;
+    //cerr << PVAR(transf.matrix()) << endl;
     //cerr << PVAR(infMat) << endl;
 
     int doInit = 0;
@@ -346,8 +415,10 @@ bool G2oSlamInterface::printVertex(OptimizableGraph::Vertex* v)
   else if (vdim == 6) {
     char* s = buffer;
     OnlineVertexSE3* v3 = static_cast<OnlineVertexSE3*>(v);
-    double roll, pitch, yaw;
-    quat_to_euler(v3->updatedEstimate.rotation(), yaw, pitch, roll);
+    Vector3d eulerAngles = internal::toEuler(v3->updatedEstimate.matrix().topLeftCorner<3,3>());
+    const double& roll = eulerAngles(0);
+    const double& pitch = eulerAngles(1);
+    const double& yaw = eulerAngles(2);
     memcpy(s, "VERTEX_XYZRPY ", 14);
     s += 14;
     s += modp_itoa10(v->id(), s);

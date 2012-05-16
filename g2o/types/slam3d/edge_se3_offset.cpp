@@ -6,7 +6,6 @@
 
 namespace g2o {
   using namespace std;
-  using namespace g2o;
 
   EdgeSE3Offset::EdgeSE3Offset() : EdgeSE3() {
     information().setIdentity();

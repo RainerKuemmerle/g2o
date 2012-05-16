@@ -204,8 +204,8 @@ namespace g2o {
       else
 #endif
         {
-          p1 = vp1->estimate().map(measurement().pos1);
-          p1 = vp0->estimate().inverse().map(p1);
+          p1 = vp1->estimate() * measurement().pos1;
+          p1 = vp0->estimate().inverse() * p1;
         }
 
       //      cout << endl << "Error computation; points are: " << endl;
@@ -226,7 +226,8 @@ namespace g2o {
       if (!pl_pl) return;
 
       // re-define the information matrix
-      const Matrix3d transform = ( vp0->estimate().inverse() *  vp1->estimate() ).rotation().toRotationMatrix();
+      // topLeftCorner<3,3>() is the rotation()
+      const Matrix3d transform = ( vp0->estimate().inverse() *  vp1->estimate() ).matrix().topLeftCorner<3,3>();
       information() = ( cov0 + transform * cov1 * transform.transpose() ).inverse();
 
     }
@@ -313,8 +314,10 @@ namespace g2o {
       }
 
       // set transform from world to cam coords
-      void setTransform()  { transformW2F(w2n,estimate().translation(),
-                                          estimate().rotation()); }
+      void setTransform()  {
+        w2n = estimate().inverse().matrix().block<3,4>(0, 0);
+        //transformW2F(w2n,estimate().translation(), estimate().rotation());
+      }
 
       // Set up world-to-image projection matrix (w2i), assumes camera parameters
       // are filled.

@@ -7,7 +7,6 @@
 #include "vertex_se3.h"
 
 namespace g2o {
-  using namespace g2o;
 
   /**
    * \brief Offset edge

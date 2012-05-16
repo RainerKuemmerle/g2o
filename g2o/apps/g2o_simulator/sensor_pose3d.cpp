@@ -26,6 +26,8 @@
 
 #include "sensor_pose3d.h"
 
+#include "g2o/types/slam3d/isometry3d_mappings.h"
+
 namespace g2o {
   using namespace std;
 
@@ -41,8 +43,7 @@ namespace g2o {
 
   void SensorPose3D::addNoise(EdgeType* e){
     EdgeType::ErrorVector noise=_sampler.generateSample();
-    EdgeType::Measurement n;
-    n.fromMinimalVector(noise);
+    EdgeType::Measurement n = internal::fromVectorMQT(noise);
     e->setMeasurement(e->measurement()*n);
     e->setInformation(information());
   }

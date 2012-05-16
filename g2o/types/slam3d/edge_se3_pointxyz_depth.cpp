@@ -2,8 +2,6 @@
 
 namespace g2o {
   using namespace g2o;
-  using namespace std;
-
 
   // point to camera projection, monocular
   EdgeSE3PointXYZDepth::EdgeSE3PointXYZDepth() : BaseBinaryEdge<3, Vector3d, VertexSE3, VertexPointXYZ>() {

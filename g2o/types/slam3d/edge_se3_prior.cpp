@@ -4,8 +4,6 @@
 
 namespace g2o {
   using namespace std;
-  using namespace g2o;
-
 
   // point to camera projection, monocular
   EdgeSE3Prior::EdgeSE3Prior() : BaseUnaryEdge<6, Eigen::Isometry3d, VertexSE3>() {
