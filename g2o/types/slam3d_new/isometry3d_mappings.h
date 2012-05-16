@@ -37,25 +37,26 @@ namespace Slam3dNew {
   typedef Matrix<double, 6, 1> Vector6d;
   typedef Matrix<double, 7, 1> Vector7d;
   
-  Quaterniond G2O_TYPES_SLAM3D_NEW_API normalized(const Quaterniond& q);
-  Quaterniond& G2O_TYPES_SLAM3D_NEW_API normalize(Quaterniond& q);
+  inline Quaterniond G2O_TYPES_SLAM3D_NEW_API normalized(const Quaterniond& q);
+  inline Quaterniond& G2O_TYPES_SLAM3D_NEW_API normalize(Quaterniond& q);
 
   // functions to handle the rotation part
-  Vector3d G2O_TYPES_SLAM3D_NEW_API toEuler(const Eigen::Matrix3d& R);
-  Matrix3d G2O_TYPES_SLAM3D_NEW_API fromEuler(const Vector3d& v);
-  Vector3d G2O_TYPES_SLAM3D_NEW_API toCompactQuaternion(const Eigen::Matrix3d& R);
-  Matrix3d G2O_TYPES_SLAM3D_NEW_API fromCompactQuaternion(const Vector3d& v);
+  inline Vector3d G2O_TYPES_SLAM3D_NEW_API toEuler(const Eigen::Matrix3d& R);
+  inline Matrix3d G2O_TYPES_SLAM3D_NEW_API fromEuler(const Vector3d& v);
+  inline Vector3d G2O_TYPES_SLAM3D_NEW_API toCompactQuaternion(const Eigen::Matrix3d& R);
+  inline Matrix3d G2O_TYPES_SLAM3D_NEW_API fromCompactQuaternion(const Vector3d& v);
 
   
   // functions to handle the toVector of the whole transformations
-  Vector6d G2O_TYPES_SLAM3D_NEW_API toVectorMQT(const Isometry3d& t);
-  Vector6d G2O_TYPES_SLAM3D_NEW_API toVectorET(const Isometry3d& t);
-  Vector7d G2O_TYPES_SLAM3D_NEW_API toVectorQT(const Isometry3d& t);
+  inline Vector6d G2O_TYPES_SLAM3D_NEW_API toVectorMQT(const Isometry3d& t);
+  inline Vector6d G2O_TYPES_SLAM3D_NEW_API toVectorET(const Isometry3d& t);
+  inline Vector7d G2O_TYPES_SLAM3D_NEW_API toVectorQT(const Isometry3d& t);
   
-  Isometry3d G2O_TYPES_SLAM3D_NEW_API fromVectorMQT(const Vector6d& v);
-  Isometry3d G2O_TYPES_SLAM3D_NEW_API fromVectorET(const Vector6d& v);
-  Isometry3d G2O_TYPES_SLAM3D_NEW_API fromVectorQT(const Vector7d& v);
+  inline Isometry3d G2O_TYPES_SLAM3D_NEW_API fromVectorMQT(const Vector6d& v);
+  inline Isometry3d G2O_TYPES_SLAM3D_NEW_API fromVectorET(const Vector6d& v);
+  inline Isometry3d G2O_TYPES_SLAM3D_NEW_API fromVectorQT(const Vector7d& v);
   
 }
 
+#include "isometry3d_mappings.cpp"
 #endif
