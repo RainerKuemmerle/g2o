@@ -4,13 +4,13 @@
 #include "vertex_se3.h"
 #include "g2o/core/base_unary_edge.h"
 #include "parameter_se3_offset.h"
+#include "g2o_types_slam3d_api.h"
 namespace g2o {
-  using namespace g2o;
   /**
    * prior for an SE3 element
    */
   // first two args are the measurement type, third connection class
-  class EdgeSE3Prior : public BaseUnaryEdge<6, Eigen::Isometry3d, VertexSE3> {
+  class G2O_TYPES_SLAM3D_API EdgeSE3Prior : public BaseUnaryEdge<6, Eigen::Isometry3d, VertexSE3> {
   public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
     EdgeSE3Prior();

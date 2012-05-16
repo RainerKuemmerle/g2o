@@ -3,13 +3,13 @@
 
 #include "g2o/core/hyper_graph_action.h"
 #include "parameter_se3_offset.h"
+#include "g2o_types_slam3d_api.h"
 
 namespace g2o {
-  using namespace g2o;
   /**
    * \brief parameters for a camera
    */
-  class ParameterCamera: public ParameterSE3Offset {
+  class G2O_TYPES_SLAM3D_API ParameterCamera: public ParameterSE3Offset {
     public:
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
       ParameterCamera();
@@ -29,7 +29,7 @@ namespace g2o {
       Eigen::Matrix3d _Kcam_inverseOffsetR;
   };
 
-  class CacheCamera: public CacheSE3Offset {
+  class G2O_TYPES_SLAM3D_API CacheCamera: public CacheSE3Offset {
   public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
     //! parameters of the camera
@@ -45,7 +45,7 @@ namespace g2o {
 
 
 #ifdef G2O_HAVE_OPENGL
-  class CacheCameraDrawAction: public DrawAction{
+  class G2O_TYPES_SLAM3D_API CacheCameraDrawAction: public DrawAction{
     public:
       CacheCameraDrawAction();
       virtual HyperGraphElementAction* operator()(HyperGraph::HyperGraphElement* element, HyperGraphElementAction::Parameters* params_ );

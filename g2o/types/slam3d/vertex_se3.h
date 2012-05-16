@@ -21,6 +21,7 @@
 #include "g2o/core/base_vertex.h"
 #include "g2o/core/hyper_graph_action.h"
 #include "isometry3d_mappings.h"
+#include "g2o_types_slam3d_api.h"
 
 namespace g2o {
 
@@ -31,7 +32,7 @@ namespace g2o {
  * the parameterization for the increments constructed is a 6d vector
  * (x,y,z,qx,qy,qz) (note that we leave out the w part of the quaternion.
  */
-  class VertexSE3 : public BaseVertex<6, Eigen::Isometry3d>
+  class G2O_TYPES_SLAM3D_API VertexSE3 : public BaseVertex<6, Eigen::Isometry3d>
     {
     public:
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW;

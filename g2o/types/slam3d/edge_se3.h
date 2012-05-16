@@ -3,6 +3,7 @@
 
 #include "g2o/core/base_binary_edge.h"
 
+#include "g2o_types_slam3d_api.h"
 #include "vertex_se3.h"
 
 namespace g2o {
@@ -12,7 +13,7 @@ namespace g2o {
    * \brief Offset edge
    */
   // first two args are the measurement type, second two the connection classes
-  class EdgeSE3 : public BaseBinaryEdge<6, Eigen::Isometry3d, VertexSE3, VertexSE3> {
+  class G2O_TYPES_SLAM3D_API EdgeSE3 : public BaseBinaryEdge<6, Eigen::Isometry3d, VertexSE3, VertexSE3> {
     public:
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
       EdgeSE3();
@@ -56,7 +57,7 @@ namespace g2o {
       Eigen::Isometry3d _inverseMeasurement;
   };
 
-  class EdgeSE3WriteGnuplotAction: public WriteGnuplotAction {
+  class G2O_TYPES_SLAM3D_API EdgeSE3WriteGnuplotAction: public WriteGnuplotAction {
   public:
     EdgeSE3WriteGnuplotAction();
     virtual HyperGraphElementAction* operator()(HyperGraph::HyperGraphElement* element, 
@@ -64,7 +65,7 @@ namespace g2o {
   };
 
 #ifdef G2O_HAVE_OPENGL
-  class EdgeSE3DrawAction: public DrawAction{
+  class G2O_TYPES_SLAM3D_API EdgeSE3DrawAction: public DrawAction{
   public:
     EdgeSE3DrawAction();
     virtual HyperGraphElementAction* operator()(HyperGraph::HyperGraphElement* element, 

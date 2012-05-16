@@ -1,16 +1,15 @@
 #ifndef G2O_VERTEX_TRACKXYZ_NEW_H_
 #define G2O_VERTEX_TRACKXYZ_NEW_H_
 
-#include "g2o_types_slam3d_new_api.h"
+#include "g2o_types_slam3d_api.h"
 #include "g2o/core/base_vertex.h"
 #include "g2o/core/hyper_graph_action.h"
 
 namespace g2o {
-  using namespace g2o;
   /**
    * Vertex for a tracked point in space
    */
-  class VertexPointXYZ : public BaseVertex<3, Eigen::Vector3d>
+  class G2O_TYPES_SLAM3D_API VertexPointXYZ : public BaseVertex<3, Eigen::Vector3d>
   {
     public:
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
@@ -58,7 +57,7 @@ namespace g2o {
 
   };
 
-  class G2O_TYPES_SLAM3D_NEW_API VertexPointXYZWriteGnuplotAction: public WriteGnuplotAction
+  class G2O_TYPES_SLAM3D_API VertexPointXYZWriteGnuplotAction: public WriteGnuplotAction
   {
     public:
       VertexPointXYZWriteGnuplotAction();

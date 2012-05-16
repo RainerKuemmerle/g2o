@@ -6,6 +6,7 @@
 #include "vertex_se3.h"
 #include "vertex_pointxyz.h"
 #include "parameter_camera.h"
+#include "g2o_types_slam3d_api.h"
 
 namespace g2o {
   using namespace g2o;
@@ -14,7 +15,7 @@ namespace g2o {
    * \brief g2o edge from a track to a depth camera node using a depth measurement (true distance, not disparity)
    */
   // first two args are the measurement type, second two the connection classes
-  class EdgeSE3PointXYZDepth : public BaseBinaryEdge<3, Vector3d, VertexSE3, VertexPointXYZ> {
+  class G2O_TYPES_SLAM3D_API EdgeSE3PointXYZDepth : public BaseBinaryEdge<3, Vector3d, VertexSE3, VertexPointXYZ> {
   public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
     EdgeSE3PointXYZDepth();

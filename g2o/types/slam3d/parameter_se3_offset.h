@@ -5,18 +5,18 @@
 
 #include "g2o/core/hyper_graph_action.h"
 #include "g2o/core/cache.h"
+#include "g2o_types_slam3d_api.h"
 
 #include <Eigen/Geometry>
 
 namespace g2o {
-  using namespace g2o;
 
   class VertexSE3;
 
   /**
    * \brief offset for an SE3
    */
-  class ParameterSE3Offset: public Parameter
+  class G2O_TYPES_SLAM3D_API ParameterSE3Offset: public Parameter
   {
     public:
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
@@ -45,7 +45,7 @@ namespace g2o {
   /**
    * \brief caching the offset related to a vertex
    */
-  class CacheSE3Offset: public Cache {
+  class G2O_TYPES_SLAM3D_API CacheSE3Offset: public Cache {
     public:
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
       CacheSE3Offset();
@@ -70,7 +70,7 @@ namespace g2o {
 
 
 #ifdef G2O_HAVE_OPENGL
-  class CacheSE3OffsetDrawAction: public DrawAction{
+  class G2O_TYPES_SLAM3D_API CacheSE3OffsetDrawAction: public DrawAction{
     public:
       CacheSE3OffsetDrawAction();
       virtual HyperGraphElementAction* operator()(HyperGraph::HyperGraphElement* element, 

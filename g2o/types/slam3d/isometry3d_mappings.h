@@ -1,5 +1,5 @@
 // g2o - General Graph Optimization
-// Copyright (C) 2011 H. Strasdat
+// Copyright (C) 2011 H. Strasdat, G. Grisetti, R. Kümmerle
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -27,7 +27,6 @@
 #ifndef G2O_ISOMATRY3D_MAPPINGS_NEW_H_
 #define G2O_ISOMATRY3D_MAPPINGS_NEW_H_
 
-#include "g2o_types_slam3d_new_api.h"
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 

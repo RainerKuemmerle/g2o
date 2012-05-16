@@ -9,7 +9,6 @@
 
 #define EDGE_PROJECT_DISPARITY_ANALYTIC_JACOBIAN
 namespace g2o {
-  using namespace g2o;
 
   /**
    * edge from a track to a depth camera node using a disparity measurement
@@ -17,7 +16,7 @@ namespace g2o {
    * the disparity measurement is normalized: disparity / (focal_x * baseline)
    */
   // first two args are the measurement type, second two the connection classes
-  class EdgeSE3PointXYZDisparity : public BaseBinaryEdge<3, Vector3d, VertexSE3, VertexPointXYZ> {
+  class G2O_TYPES_SLAM3D_API EdgeSE3PointXYZDisparity : public BaseBinaryEdge<3, Vector3d, VertexSE3, VertexPointXYZ> {
   public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
     EdgeSE3PointXYZDisparity();
@@ -68,7 +67,7 @@ namespace g2o {
 
 
 #ifdef G2O_HAVE_OPENGL
-  class EdgeProjectDisparityDrawAction: public DrawAction{
+  class G2O_TYPES_SLAM3D_API EdgeProjectDisparityDrawAction: public DrawAction{
   public:
     EdgeProjectDisparityDrawAction();
     virtual HyperGraphElementAction* operator()(HyperGraph::HyperGraphElement* element, 
