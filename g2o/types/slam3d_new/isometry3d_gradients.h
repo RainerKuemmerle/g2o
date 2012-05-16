@@ -26,6 +26,9 @@
 
 #ifndef G2O_ISOMETRY3D_GRADIENTS_NEW_H
 #define G2O_ISOMETRY3D_GRADIENTS_NEW_H_
+
+#include "isometry3d_mappings.h"
+
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 
@@ -34,16 +37,16 @@ namespace Slam3dNew {
     void  compute_dq_dR (Eigen::Matrix<double, 3 , 9 >&  dq_dR , const double&  r11 , const double&  r21 , const double&  r31 , const double&  r12 , const double&  r22 , const double&  r32 , const double&  r13 , const double&  r23 , const double&  r33 ); 
 
     inline void skew(Eigen::Matrix3d& s, const Eigen::Matrix<double, 3, 1>& v){
-      const double& x=2*v(0);
-      const double& y=2*v(1);
-      const double& z=2*v(2);
+      const double x=2*v(0);
+      const double y=2*v(1);
+      const double z=2*v(2);
       s <<  0.,  z, -y, -z,  0,  x,  y, -x,  0;
     }
 
     inline void skewT(Eigen::Matrix3d& s, const Eigen::Matrix<double, 3, 1>& v){
-      const double& x=2*v(0);
-      const double& y=2*v(1);
-      const double& z=2*v(2);
+      const double x=2*v(0);
+      const double y=2*v(1);
+      const double z=2*v(2);
       s <<  0., -z,  y,  z,  0, -x,  -y,  x,  0;
     }
 
@@ -51,7 +54,7 @@ namespace Slam3dNew {
         Eigen::Matrix3d& Sy, 
         Eigen::Matrix3d& Sz, 
         const Eigen::Matrix3d& R){
-      const double& 
+      const double 
         r11=2*R(0,0), r12=2*R(0,1), r13=2*R(0,2),
       r21=2*R(1,0), r22=2*R(1,1), r23=2*R(1,2),
       r31=2*R(2,0), r32=2*R(2,1), r33=2*R(2,2);
@@ -64,7 +67,7 @@ namespace Slam3dNew {
         Eigen::Matrix3d& Sy, 
         Eigen::Matrix3d& Sz, 
         const Eigen::Matrix3d& R){
-      const double&
+      const double
         r11=2*R(0,0), r12=2*R(0,1), r13=2*R(0,2),
 	r21=2*R(1,0), r22=2*R(1,1), r23=2*R(1,2),
 	r31=2*R(2,0), r32=2*R(2,1), r33=2*R(2,2);
@@ -89,23 +92,23 @@ namespace Slam3dNew {
     Ji.derived().resize(6,6);
     Jj.derived().resize(6,6);
     // compute the error at the linearization point
-    const Isometry3d& A=Z.inverse()*Pi.inverse();
-    const Isometry3d& B=Xi.inverse()*Xj;
+    const Isometry3d A=Z.inverse()*Pi.inverse();
+    const Isometry3d B=Xi.inverse()*Xj;
     const Isometry3d& C=Pj;
 
-    const Isometry3d& AB=A*B;  
-    const Isometry3d& BC=B*C;
+    const Isometry3d AB=A*B;  
+    const Isometry3d BC=B*C;
     E=AB*C;
 
-    const Matrix3d& Re=E.rotation();
-    const Matrix3d& Ra=A.rotation();
-    const Matrix3d& Rb=B.rotation();
-    const Matrix3d& Rc=C.rotation();
-    const Vector3d& tc=C.translation();
+    const Matrix3d Re = extractRotation(E);
+    const Matrix3d Ra = extractRotation(A);
+    const Matrix3d Rb = extractRotation(B);
+    const Matrix3d Rc = extractRotation(C);
+    const Vector3d& tc = C.translation();
     //const Vector3d tab=AB.translation();
-    const Matrix3d& Rab=AB.rotation();
-    const Vector3d& tbc=BC.translation();  
-    const Matrix3d& Rbc=BC.rotation();
+    const Matrix3d Rab = extractRotation(AB);
+    const Vector3d& tbc = BC.translation();  
+    const Matrix3d Rbc = extractRotation(BC);
 
     Matrix<double, 3 , 9 >  dq_dR;
     compute_dq_dR (dq_dR, 
@@ -175,15 +178,15 @@ namespace Slam3dNew {
     Ji.derived().resize(6,6);
     Jj.derived().resize(6,6);
     // compute the error at the linearization point
-    const Isometry3d& A=Z.inverse();
-    const Isometry3d& B=Xi.inverse()*Xj;
+    const Isometry3d A=Z.inverse();
+    const Isometry3d B=Xi.inverse()*Xj;
 
     E=A*B;
 
-    const Matrix3d& Re=E.rotation();
-    const Matrix3d& Ra=A.rotation();
-    const Matrix3d& Rb=B.rotation();
-    const Vector3d& tb=B.translation();  
+    const Matrix3d Re = extractRotation(E);
+    const Matrix3d Ra = extractRotation(A);
+    const Matrix3d Rb = extractRotation(B);
+    const Vector3d& tb = B.translation();  
 
     Matrix<double, 3 , 9 >  dq_dR;
     compute_dq_dR (dq_dR, 
@@ -216,10 +219,10 @@ namespace Slam3dNew {
     }
 
     // dre/dqi
+    double buf[27];
+    Map<Matrix<double, 9,3> > M(buf);
+    Matrix3d Sxt,Syt,Szt;
     {
-      double buf[27];
-      Map<Matrix<double, 9,3> > M(buf);
-      Matrix3d Sxt,Syt,Szt;
       skewT(Sxt,Syt,Szt,Re);
       Map<Matrix3d> Mx(buf);    Mx = Ra*Sxt;
       Map<Matrix3d> My(buf+9);  My = Ra*Syt;
@@ -229,9 +232,9 @@ namespace Slam3dNew {
 
     // dre/dqj
     {
-      double buf[27];
-      Map<Matrix<double, 9,3> > M(buf);
-      Matrix3d Sx,Sy,Sz;
+      Matrix3d& Sx = Sxt;
+      Matrix3d& Sy = Syt;
+      Matrix3d& Sz = Szt;
       skew(Sx,Sy,Sz,Matrix3d::Identity());
       Map<Matrix3d> Mx(buf);    Mx = Rb*Sx;
       Map<Matrix3d> My(buf+9);  My = Rb*Sy;
@@ -251,13 +254,13 @@ namespace Slam3dNew {
     Eigen::MatrixBase<Derived>& J = const_cast<Eigen::MatrixBase<Derived>&>(JConstRef);
     J.derived().resize(6,6);
     // compute the error at the linearization point
-    const Isometry3d& A = Z.inverse()*X;
-    const Isometry3d& B = P;
-    const Matrix3d& Ra = A.rotation();
-    const Matrix3d& Rb = B.rotation();
-    const Vector3d& tb = B.translation();
+    const Isometry3d A = Z.inverse()*X;
+    const Isometry3d B = P;
+    const Matrix3d Ra = extractRotation(A);
+    const Matrix3d Rb = extractRotation(B);
+    const Vector3d tb = B.translation();
     E = A*B;
-    const Matrix3d& Re=E.rotation();
+    const Matrix3d Re = extractRotation(E);
 
     Matrix<double, 3 , 9 >  dq_dR;
     compute_dq_dR (dq_dR, 

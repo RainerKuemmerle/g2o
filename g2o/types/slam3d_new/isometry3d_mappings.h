@@ -36,6 +36,16 @@ namespace Slam3dNew {
   
   typedef Matrix<double, 6, 1> Vector6d;
   typedef Matrix<double, 7, 1> Vector7d;
+
+  /**
+   * extract the rotation matrix from an Isometry3d matrix. Eigen itself performs an
+   * unecessary SVD decomposition, since its function also handles a scaling matrix
+   * which is not present if we have an Isometry3d matrix.
+   */
+  inline Eigen::Matrix3d extractRotation(const Eigen::Isometry3d& A)
+  {
+    return A.matrix().topLeftCorner<3,3>();
+  }
   
   inline Quaterniond G2O_TYPES_SLAM3D_NEW_API normalized(const Quaterniond& q);
   inline Quaterniond& G2O_TYPES_SLAM3D_NEW_API normalize(Quaterniond& q);
@@ -46,7 +56,6 @@ namespace Slam3dNew {
   inline Vector3d G2O_TYPES_SLAM3D_NEW_API toCompactQuaternion(const Eigen::Matrix3d& R);
   inline Matrix3d G2O_TYPES_SLAM3D_NEW_API fromCompactQuaternion(const Vector3d& v);
 
-  
   // functions to handle the toVector of the whole transformations
   inline Vector6d G2O_TYPES_SLAM3D_NEW_API toVectorMQT(const Isometry3d& t);
   inline Vector6d G2O_TYPES_SLAM3D_NEW_API toVectorET(const Isometry3d& t);
