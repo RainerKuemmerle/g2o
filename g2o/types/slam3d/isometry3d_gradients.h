@@ -104,7 +104,7 @@ namespace g2o {
 
     const Matrix3d Re = extractRotation(E);
     const Matrix3d Ra = extractRotation(A);
-    const Matrix3d Rb = extractRotation(B);
+    //const Matrix3d Rb = extractRotation(B);
     const Matrix3d Rc = extractRotation(C);
     const Vector3d& tc = C.translation();
     //const Vector3d tab=AB.translation();
@@ -125,7 +125,7 @@ namespace g2o {
     Ji.template block<3,3>(0,0)=-Ra;
 
     // dte/dtj
-    Jj.template block<3,3>(0,0)=Ra*Rb;
+    Jj.template block<3,3>(0,0)=Rab;
 
     // dte/dqi
     {
@@ -168,9 +168,9 @@ namespace g2o {
 
   template <typename Derived>
   void computeEdgeSE3Gradient(Eigen::Isometry3d& E,
-                              Eigen::MatrixBase<Derived> const & JiConstRef,
+                              Eigen::MatrixBase<Derived> const & JiConstRef, 
                               Eigen::MatrixBase<Derived> const & JjConstRef,
-                              const Eigen::Isometry3d& Z,
+                              const Eigen::Isometry3d& Z, 
                               const Eigen::Isometry3d& Xi,
                               const Eigen::Isometry3d& Xj)
   {
@@ -179,6 +179,7 @@ namespace g2o {
     Eigen::MatrixBase<Derived>& Jj = const_cast<Eigen::MatrixBase<Derived>&>(JjConstRef);
     Ji.derived().resize(6,6);
     Jj.derived().resize(6,6);
+    //Vector3d tc(0.,0.,0.);
     // compute the error at the linearization point
     const Isometry3d A=Z.inverse();
     const Isometry3d B=Xi.inverse()*Xj;
@@ -203,7 +204,7 @@ namespace g2o {
     Ji.template block<3,3>(0,0)=-Ra;
 
     // dte/dtj
-    Jj.template block<3,3>(0,0)=Ra*Rb;
+    Jj.template block<3,3>(0,0)=Re;
 
     // dte/dqi
     {
@@ -212,20 +213,19 @@ namespace g2o {
       Ji.template block<3,3>(0,3)=Ra*S;
     }
 
-    // dte/dqj
-    {
-      //this is zero
-      /* Matrix3d S; */
-      /* skew(S,tc); */
-      /* Jj.template block<3,3>(0,3)=Rab*S; */
-    }
+    // dte/dqj: this is zero
+    /* { */
+    /*   Matrix3d S; */
+    /*   skew(S,tc); */
+    /*   Jj.template block<3,3>(0,3)=Re*S; */
+    /* } */
 
     // dre/dqi
-    double buf[27];
-    Map<Matrix<double, 9,3> > M(buf);
-    Matrix3d Sxt,Syt,Szt;
     {
-      skewT(Sxt,Syt,Szt,Re);
+      double buf[27];
+      Map<Matrix<double, 9,3> > M(buf);
+      Matrix3d Sxt,Syt,Szt;
+      skewT(Sxt,Syt,Szt,Rb);
       Map<Matrix3d> Mx(buf);    Mx = Ra*Sxt;
       Map<Matrix3d> My(buf+9);  My = Ra*Syt;
       Map<Matrix3d> Mz(buf+18); Mz = Ra*Szt;
@@ -234,16 +234,18 @@ namespace g2o {
 
     // dre/dqj
     {
-      Matrix3d& Sx = Sxt;
-      Matrix3d& Sy = Syt;
-      Matrix3d& Sz = Szt;
-      skew(Sx,Sy,Sz,Matrix3d::Identity());
-      Map<Matrix3d> Mx(buf);    Mx = Rb*Sx;
-      Map<Matrix3d> My(buf+9);  My = Rb*Sy;
-      Map<Matrix3d> Mz(buf+18); Mz = Rb*Sz;
+      double buf[27];
+      Map<Matrix<double, 9,3> > M(buf);
+      Matrix3d Sx,Sy,Sz;
+      const Matrix3d I=Matrix3d::Identity();
+      skew(Sx,Sy,Sz,I);
+      Map<Matrix3d> Mx(buf);    Mx = Re*Sx;
+      Map<Matrix3d> My(buf+9);  My = Re*Sy;
+      Map<Matrix3d> Mz(buf+18); Mz = Re*Sz;
       Jj.template block<3,3>(3,3) = dq_dR * M;
     }
   }
+
 
   template <typename Derived>
   void computeEdgeSE3PriorGradient(Eigen::Isometry3d& E,

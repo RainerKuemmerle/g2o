@@ -2,7 +2,6 @@
 #include "isometry3d_gradients.h"
 #include <iostream>
 
-
 #ifdef G2O_HAVE_OPENGL
 #ifdef __APPLE__
 #include <OpenGL/gl.h>
@@ -17,7 +16,6 @@ namespace g2o {
   EdgeSE3::EdgeSE3() : BaseBinaryEdge<6, Eigen::Isometry3d, VertexSE3, VertexSE3>() {
     information().setIdentity();
   }
-
 
   bool EdgeSE3::read(std::istream& is) {
     Vector7d meas;
@@ -77,7 +75,7 @@ namespace g2o {
     const Eigen::Isometry3d& Xi=from->estimate();
     const Eigen::Isometry3d& Xj=to->estimate();
     const Eigen::Isometry3d& Z=_measurement;
-    computeEdgeSE3Gradient(E, _jacobianOplusXi , _jacobianOplusXj, Z, Xi, Xj);
+    internal::computeEdgeSE3Gradient(E, _jacobianOplusXi , _jacobianOplusXj, Z, Xi, Xj);
   }
 
   void EdgeSE3::initialEstimate(const OptimizableGraph::VertexSet& from_, OptimizableGraph::Vertex* /*to_*/) {
