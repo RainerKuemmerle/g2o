@@ -47,6 +47,19 @@ namespace g2o {
   {
     return A.matrix().topLeftCorner<3,3>();
   }
+
+  /**
+   * computes the nearest orthonormal matrix of a rotation matrix which might
+   * be affected by numerical inaccuracies
+   */
+  inline Eigen::Matrix3d nearestOrthogonalMatrix(const Eigen::Matrix3d& R)
+  {
+    JacobiSVD<Eigen::Matrix3d> svd(R, ComputeFullU | ComputeFullV);
+    double det = (svd.matrixU() * svd.matrixV().adjoint()).determinant();
+    Eigen::Matrix3d scaledU(svd.matrixU());
+    scaledU.col(0) /= det;
+    return scaledU * svd.matrixV().transpose();
+  } 
   
   inline Quaterniond normalized(const Quaterniond& q);
   inline Quaterniond& normalize(Quaterniond& q);

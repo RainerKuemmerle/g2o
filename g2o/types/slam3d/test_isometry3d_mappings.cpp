@@ -1,11 +1,44 @@
 #include <iostream>
 #include "isometry3d_mappings.h"
+#include "g2o/stuff/macros.h"
+
+#include <cstdio>
 
 using namespace std;
 using namespace g2o;
 using namespace g2o::internal;
 
 int main(int , char** ){
+
+  Matrix3d R = Matrix3d::Identity();
+  Matrix3d rot = (Matrix3d)AngleAxisd(0.01, Vector3d::UnitZ());
+  rot = rot * (Matrix3d)AngleAxisd(0.01, Vector3d::UnitX());
+  for (int i = 0; i < 10000; ++i)
+    R = R * rot;
+  Matrix3d I = R * R.transpose();
+  for (int i = 0; i < 3; ++i) {
+    for (int j = 0; j < 3; ++j) {
+      printf("%.30f   ", I(i,j));
+    }
+    printf("\n");
+  }
+
+  cerr << PVAR(R) << endl;
+  printf("det %.30f\n", R.determinant());
+  printf("\nUsing nearest orthonormal matrix\n");
+  R = nearestOrthogonalMatrix(R);
+  cerr << PVAR(R) << endl;
+  printf("det %.30f\n", R.determinant());
+  I = R * R.transpose();
+  for (int i = 0; i < 3; ++i) {
+    for (int j = 0; j < 3; ++j) {
+      printf("%.30f   ", I(i,j));
+    }
+    printf("\n");
+  }
+
+  return 1;
+
   Vector3d eulerAngles(.1,.2,.3);
   Matrix3d m1=fromEuler(eulerAngles);
   cerr << "m1=fromEuler(eulerAngles)" << endl;
@@ -18,7 +51,7 @@ int main(int , char** ){
   cerr << "eulerAngles1 =  toEuler(m1) " << endl;
   cerr << "eulerAngles1:" << endl;
   cerr << eulerAngles1 << endl;
-  
+
   Vector3d q=toCompactQuaternion(m1);
   cerr << "q=toCompactQuaternion(m1)" << endl;
   cerr << "q:" << endl;
@@ -44,7 +77,7 @@ int main(int , char** ){
   cerr << "et2=toVectorET(i1);" << endl;
   cerr << "et2" << endl;
   cerr << et2 << endl;
-  
+
   Vector6d qt1=toVectorMQT(i1);
   cerr << "qt1=toVectorMQT(i1)" << endl;
   cerr << "qt1:" << endl;
