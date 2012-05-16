@@ -1,3 +1,29 @@
+// g2o - General Graph Optimization
+// Copyright (C) 2011 R. Kuemmerle, G. Grisetti, W. Burgard
+// All rights reserved.
+//
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted provided that the following conditions are
+// met:
+//
+// * Redistributions of source code must retain the above copyright notice,
+//   this list of conditions and the following disclaimer.
+// * Redistributions in binary form must reproduce the above copyright
+//   notice, this list of conditions and the following disclaimer in the
+//   documentation and/or other materials provided with the distribution.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS
+// IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+// TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+// PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+// HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+// SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
+// TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+// PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+// LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+// NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+// SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
 #include "edge_se3_pointxyz_disparity.h"
 
 #include <iostream>
@@ -16,7 +42,6 @@
 #endif
 
 namespace g2o {
-  using namespace g2o;
   using namespace std;
 
 
@@ -34,7 +59,7 @@ namespace g2o {
   bool EdgeSE3PointXYZDisparity::resolveCaches(){
     ParameterVector pv(1);
     pv[0]=params;
-    resolveCache(cache, (OptimizableGraph::Vertex*)_vertices[0],"CACHE_CAMERA_NEW",pv);
+    resolveCache(cache, (OptimizableGraph::Vertex*)_vertices[0],"CACHE_CAMERA",pv);
     return cache != 0;
   }
 
@@ -52,9 +77,9 @@ namespace g2o {
       return false;
     for ( int i=0; i<information().rows() && is.good(); i++)
       for (int j=i; j<information().cols() && is.good(); j++){
-  is >> information()(i,j);
-  if (i!=j)
-    information()(j,i)=information()(i,j);
+        is >> information()(i,j);
+        if (i!=j)
+          information()(j,i)=information()(i,j);
       }
     if (is.bad()) {
       //  we overwrite the information matrix
@@ -122,7 +147,7 @@ namespace g2o {
 
     const Eigen::Vector3d& pt = vp->estimate();
 
-    Eigen::Vector3d Zcam = cache->w2l() * vp->estimate();
+    Eigen::Vector3d Zcam = cache->w2lMatrix() * vp->estimate();
 
     //  J(0,3) = -0.0;
     J(0,4) = -2*Zcam(2);
@@ -136,7 +161,7 @@ namespace g2o {
     J(2,4) = 2*Zcam(0);
     //  J(2,5) = -0.0;
 
-    J.block<3,3>(0,6) = cache->w2l().rotation();
+    J.block<3,3>(0,6) = cache->w2lMatrix().rotation();
 
     //Eigen::Matrix<double,3,9> Jprime = vcache->params->Kcam_inverseOffsetR  * J;
     Eigen::Matrix<double,3,9> Jprime = params->Kcam_inverseOffsetR()  * J;
@@ -192,7 +217,7 @@ namespace g2o {
     p.head<2>() = _measurement.head<2>()*w;
     p(2) = w;
     p = invKcam * p;
-    p = cam->estimate() * (params->offset() * p);
+    p = cam->estimate() * (params->offsetMatrix() * p);
     point->setEstimate(p);
   }
 
@@ -206,14 +231,14 @@ namespace g2o {
     if (typeid(*element).name()!=_typeName)
       return 0;
     EdgeSE3PointXYZDisparity* e =  static_cast<EdgeSE3PointXYZDisparity*>(element);
-    VertexSE3* fromEdge = static_cast<VertexSE3*>(e->vertices()[0]);
-    VertexPointXYZ* toEdge   = static_cast<VertexPointXYZ*>(e->vertices()[1]);
-    glColor3f(0.4,0.4,0.2);
+    VertexSE3* fromEdge = static_cast<VertexSE3*>(e->vertex(0));
+    VertexPointXYZ* toEdge   = static_cast<VertexPointXYZ*>(e->vertex(1));
+    glColor3f(0.4f,0.4f,0.2f);
     glPushAttrib(GL_ENABLE_BIT);
     glDisable(GL_LIGHTING);
     glBegin(GL_LINES);
-    glVertex3f(fromEdge->estimate().translation().x(),fromEdge->estimate().translation().y(),fromEdge->estimate().translation().z());
-    glVertex3f(toEdge->estimate().x(),toEdge->estimate().y(),toEdge->estimate().z());
+    glVertex3f((float)fromEdge->estimate().translation().x(),(float)fromEdge->estimate().translation().y(),(float)fromEdge->estimate().translation().z());
+    glVertex3f((float)toEdge->estimate().x(),(float)toEdge->estimate().y(),(float)toEdge->estimate().z());
     glEnd();
     glPopAttrib();
     return this;

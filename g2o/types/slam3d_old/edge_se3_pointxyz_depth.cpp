@@ -1,7 +1,32 @@
+// g2o - General Graph Optimization
+// Copyright (C) 2011 R. Kuemmerle, G. Grisetti, W. Burgard
+// All rights reserved.
+//
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted provided that the following conditions are
+// met:
+//
+// * Redistributions of source code must retain the above copyright notice,
+//   this list of conditions and the following disclaimer.
+// * Redistributions in binary form must reproduce the above copyright
+//   notice, this list of conditions and the following disclaimer in the
+//   documentation and/or other materials provided with the distribution.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS
+// IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+// TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+// PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+// HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+// SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
+// TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+// PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+// LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+// NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+// SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
 #include "edge_se3_pointxyz_depth.h"
 
 namespace g2o {
-  using namespace g2o;
   using namespace std;
 
 
@@ -18,12 +43,9 @@ namespace g2o {
   bool EdgeSE3PointXYZDepth::resolveCaches(){
     ParameterVector pv(1);
     pv[0]=params;
-    resolveCache(cache, (OptimizableGraph::Vertex*)_vertices[0],"CACHE_CAMERA_NEW",pv);
-    return cache;
+    resolveCache(cache, (OptimizableGraph::Vertex*)_vertices[0],"CACHE_CAMERA",pv);
+    return cache != 0;
   }
-
-
-
 
   bool EdgeSE3PointXYZDepth::read(std::istream& is) {
     int pid;
@@ -86,7 +108,7 @@ namespace g2o {
 
     const Eigen::Vector3d& pt = vp->estimate();
 
-    Eigen::Vector3d Zcam = cache->w2l() * pt;
+    Eigen::Vector3d Zcam = cache->w2lMatrix() * pt;
 
     //  J(0,3) = -0.0;
     J(0,4) = -2*Zcam(2);
@@ -100,7 +122,7 @@ namespace g2o {
     J(2,4) = 2*Zcam(0);
     //  J(2,5) = -0.0;
 
-    J.block<3,3>(0,6) = cache->w2l().rotation();
+    J.block<3,3>(0,6) = cache->w2lMatrix().rotation();
 
     Eigen::Matrix<double,3,9> Jprime = params->Kcam_inverseOffsetR()  * J;
     Eigen::Vector3d Zprime = cache->w2i() * pt;
@@ -142,7 +164,7 @@ namespace g2o {
     p(2) = _measurement(2);
     p.head<2>() = _measurement.head<2>()*p(2);
     p=invKcam*p;
-    point->setEstimate(cam->estimate() * (params->offset() * p));
+    point->setEstimate(cam->estimate() * (params->offsetMatrix() * p));
   }
 
 }

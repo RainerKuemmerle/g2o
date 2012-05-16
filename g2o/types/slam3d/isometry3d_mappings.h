@@ -24,37 +24,51 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef G2O_ISOMATRY3D_MAPPINGS_H_
-#define G2O_ISOMATRY3D_MAPPINGS_H_
+#ifndef G2O_ISOMATRY3D_MAPPINGS_NEW_H_
+#define G2O_ISOMATRY3D_MAPPINGS_NEW_H_
 
+#include "g2o_types_slam3d_new_api.h"
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 
 namespace g2o {
   using namespace Eigen;
-  
   typedef Matrix<double, 6, 1> Vector6d;
   typedef Matrix<double, 7, 1> Vector7d;
+
   
-  Quaterniond G2O_TYPES_SLAM3D_API normalized(const Quaterniond& q);
-  Quaterniond& G2O_TYPES_SLAM3D_API normalize(Quaterniond& q);
+  namespace internal {
+  /**
+   * extract the rotation matrix from an Isometry3d matrix. Eigen itself
+   * performs an unecessary SVD decomposition to make the matrix orthonormal
+   * again. Furthermore, its function also handles a scaling matrix which is
+   * not present if we have an Isometry3d matrix
+   */
+  inline Eigen::Matrix3d extractRotation(const Eigen::Isometry3d& A)
+  {
+    return A.matrix().topLeftCorner<3,3>();
+  }
+  
+  inline Quaterniond normalized(const Quaterniond& q);
+  inline Quaterniond& normalize(Quaterniond& q);
 
   // functions to handle the rotation part
-  Vector3d G2O_TYPES_SLAM3D_API toEuler(const Eigen::Matrix3d& R);
-  Matrix3d G2O_TYPES_SLAM3D_API fromEuler(const Vector3d& v);
-  Vector3d G2O_TYPES_SLAM3D_API toCompactQuaternion(const Eigen::Matrix3d& R);
-  Matrix3d G2O_TYPES_SLAM3D_API fromCompactQuaternion(const Vector3d& v);
+  inline Vector3d toEuler(const Eigen::Matrix3d& R);
+  inline Matrix3d fromEuler(const Vector3d& v);
+  inline Vector3d toCompactQuaternion(const Eigen::Matrix3d& R);
+  inline Matrix3d fromCompactQuaternion(const Vector3d& v);
 
-  
   // functions to handle the toVector of the whole transformations
-  Vector6d G2O_TYPES_SLAM3D_API toVectorMQT(const Isometry3d& t);
-  Vector6d G2O_TYPES_SLAM3D_API toVectorET(const Isometry3d& t);
-  Vector7d G2O_TYPES_SLAM3D_API toVectorQT(const Isometry3d& t);
+  inline Vector6d toVectorMQT(const Isometry3d& t);
+  inline Vector6d toVectorET(const Isometry3d& t);
+  inline Vector7d toVectorQT(const Isometry3d& t);
   
-  Isometry3d G2O_TYPES_SLAM3D_API fromVectorMQT(const Vector6d& v);
-  Isometry3d G2O_TYPES_SLAM3D_API fromVectorET(const Vector6d& v);
-  Isometry3d G2O_TYPES_SLAM3D_API fromVectorQT(const Vector7d& v);
+  inline Isometry3d fromVectorMQT(const Vector6d& v);
+  inline Isometry3d fromVectorET(const Vector6d& v);
+  inline Isometry3d fromVectorQT(const Vector7d& v);
   
-}
+  } // end namespace internal
+} // end namespace g2o
 
+#include "isometry3d_mappings.cpp"
 #endif

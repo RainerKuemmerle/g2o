@@ -30,8 +30,4 @@ namespace g2o {
   using namespace std;
   using namespace Eigen;
 
-  namespace internal {
-  #include "dquat2mat.cpp"
-  } // end namespace internal
-
 } // end namespace

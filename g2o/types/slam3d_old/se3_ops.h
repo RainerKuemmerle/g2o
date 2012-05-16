@@ -1,5 +1,5 @@
 // g2o - General Graph Optimization
-// Copyright (C) 2011 R. Kuemmerle, G. Grisetti, W. Burgard
+// Copyright (C) 2011 H. Strasdat
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -24,14 +24,26 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "isometry3d_gradients.h"
-#include <iostream>
+#ifndef G2O_MATH_STUFF
+#define G2O_MATH_STUFF
+
+#include <Eigen/Core>
+#include <Eigen/Geometry>
+
+#include "g2o_types_slam3d_api.h"
+
 namespace g2o {
-  using namespace std;
   using namespace Eigen;
 
-  namespace internal {
-  #include "dquat2mat.cpp"
-  } // end namespace internal
+  inline G2O_TYPES_SLAM3D_API Matrix3d skew(const Vector3d&v);
+  inline G2O_TYPES_SLAM3D_API Vector3d deltaR(const Matrix3d& R);
+  inline G2O_TYPES_SLAM3D_API Vector2d project(const Vector3d&);
+  inline G2O_TYPES_SLAM3D_API Vector3d project(const Vector4d&);
+  inline G2O_TYPES_SLAM3D_API Vector3d unproject(const Vector2d&);
+  inline G2O_TYPES_SLAM3D_API Vector4d unproject(const Vector3d&);
 
-} // end namespace
+#include "se3_ops.hpp"
+
+}
+
+#endif //MATH_STUFF

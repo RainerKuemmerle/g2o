@@ -24,14 +24,27 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "isometry3d_gradients.h"
-#include <iostream>
-namespace g2o {
-  using namespace std;
-  using namespace Eigen;
+#ifndef G2O_TYPES_SLAM3D_
+#define G2O_TYPES_SLAM3D_
 
-  namespace internal {
-  #include "dquat2mat.cpp"
-  } // end namespace internal
+#include "g2o/config.h"
+#include "g2o/core/base_vertex.h"
+#include "g2o/core/base_binary_edge.h"
+#include "g2o/core/hyper_graph_action.h"
 
-} // end namespace
+#define THREE_D_TYPES_ANALYTIC_JACOBIAN
+
+#include "vertex_se3_quat.h"
+#include "edge_se3_quat.h"
+#include "vertex_pointxyz.h"
+
+#include "parameter_se3_offset.h"
+#include "edge_se3_pointxyz.h"
+#include "edge_se3_offset.h"
+
+#include "parameter_camera.h"
+#include "edge_se3_pointxyz_disparity.h"
+#include "edge_se3_pointxyz_depth.h"
+#include "edge_se3_prior.h"
+
+#endif

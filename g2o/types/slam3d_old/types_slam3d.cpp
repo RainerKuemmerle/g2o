@@ -24,14 +24,42 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "isometry3d_gradients.h"
+#include "types_slam3d.h"
+#include "g2o/core/factory.h"
+#include "g2o/stuff/macros.h"
+
 #include <iostream>
+
 namespace g2o {
   using namespace std;
-  using namespace Eigen;
 
-  namespace internal {
-  #include "dquat2mat.cpp"
-  } // end namespace internal
+  G2O_REGISTER_TYPE_GROUP(slam3d);
+
+  G2O_REGISTER_TYPE(VERTEX_SE3:QUAT, VertexSE3);
+  G2O_REGISTER_TYPE(EDGE_SE3:QUAT, EdgeSE3);
+  G2O_REGISTER_TYPE(VERTEX_TRACKXYZ, VertexPointXYZ);
+
+  G2O_REGISTER_TYPE(PARAMS_SE3OFFSET, ParameterSE3Offset);
+  G2O_REGISTER_TYPE(EDGE_SE3_TRACKXYZ, EdgeSE3PointXYZ);
+  G2O_REGISTER_TYPE(EDGE_SE3_PRIOR, EdgeSE3Prior);
+  G2O_REGISTER_TYPE(CACHE_SE3_OFFSET, CacheSE3Offset);
+  G2O_REGISTER_TYPE(EDGE_SE3_OFFSET, EdgeSE3Offset);
+
+  G2O_REGISTER_TYPE(PARAMS_CAMERACALIB, ParameterCamera);
+  G2O_REGISTER_TYPE(CACHE_CAMERA, CacheCamera);
+  G2O_REGISTER_TYPE(EDGE_PROJECT_DISPARITY, EdgeSE3PointXYZDisparity);
+  G2O_REGISTER_TYPE(EDGE_PROJECT_DEPTH, EdgeSE3PointXYZDepth);
+
+  /*********** ACTIONS ************/
+  G2O_REGISTER_ACTION(VertexSE3WriteGnuplotAction);
+  G2O_REGISTER_ACTION(VertexPointXYZWriteGnuplotAction);
+  G2O_REGISTER_ACTION(EdgeSE3WriteGnuplotAction);
+
+#ifdef G2O_HAVE_OPENGL
+  G2O_REGISTER_ACTION(VertexPointXYZDrawAction);
+  G2O_REGISTER_ACTION(VertexSE3DrawAction);
+  G2O_REGISTER_ACTION(EdgeSE3DrawAction);
+  G2O_REGISTER_ACTION(CacheCameraDrawAction);
+#endif
 
 } // end namespace

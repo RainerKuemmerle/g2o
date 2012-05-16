@@ -24,21 +24,30 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-//#include "isometry3d_mappings.h"
+#include "isometry3d_mappings.h"
 
 namespace g2o {
-  namespace internal {
+  using namespace Eigen;
  
   Quaterniond normalized(const Quaterniond& q) {
     Quaterniond q2(q);
-    normalize(q2);
+    q2.normalize();
+    if (q2.w()<0) {
+      q2.x() = -q2.x();
+      q2.y() = -q2.y();
+      q2.z() = -q2.z();
+      q2.w() = -q2.w();
+    }
     return q2;
   }
 
    Quaterniond& normalize(Quaterniond& q){
     q.normalize();
     if (q.w()<0) {
-      q.coeffs() *= -1;
+      q.x() = -q.x();
+      q.y() = -q.y();
+      q.z() = -q.z();
+      q.w() = -q.w();
     }
     return q;
   }
@@ -93,20 +102,20 @@ namespace g2o {
   // functions to handle the toVector of the whole transformations
    Vector6d toVectorMQT(const Isometry3d& t) {
     Vector6d v;
-    v.block<3,1>(3,0) = toCompactQuaternion(extractRotation(t));
+    v.block<3,1>(3,0) = toCompactQuaternion(t.rotation());
     v.block<3,1>(0,0) = t.translation();
     return v;
   }
 
    Vector6d toVectorET(const Isometry3d& t) {
     Vector6d v;
-    v.block<3,1>(3,0)=toEuler(extractRotation(t));
+    v.block<3,1>(3,0)=toEuler(t.rotation());
     v.block<3,1>(0,0) = t.translation();
     return v;
   }
 
    Vector7d toVectorQT(const Isometry3d& t){
-    Quaterniond q(extractRotation(t));
+    Quaterniond q(t.rotation());
     q.normalize();
     Vector7d v;
     v[3] = q.x(); v[4] = q.y(); v[5] = q.z(); v[6] = q.w();
@@ -135,5 +144,4 @@ namespace g2o {
      return t;
    }
    
-} // end namespace internal
-} // end namespace g2o
+}
