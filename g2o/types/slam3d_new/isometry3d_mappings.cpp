@@ -44,10 +44,7 @@ namespace Slam3dNew {
    Quaterniond& normalize(Quaterniond& q){
     q.normalize();
     if (q.w()<0) {
-      q.x() = -q.x();
-      q.y() = -q.y();
-      q.z() = -q.z();
-      q.w() = -q.w();
+      q.coeffs() *= -1;
     }
     return q;
   }
@@ -102,20 +99,20 @@ namespace Slam3dNew {
   // functions to handle the toVector of the whole transformations
    Vector6d toVectorMQT(const Isometry3d& t) {
     Vector6d v;
-    v.block<3,1>(3,0) = toCompactQuaternion(t.rotation());
+    v.block<3,1>(3,0) = toCompactQuaternion(extractRotation(t));
     v.block<3,1>(0,0) = t.translation();
     return v;
   }
 
    Vector6d toVectorET(const Isometry3d& t) {
     Vector6d v;
-    v.block<3,1>(3,0)=toEuler(t.rotation());
+    v.block<3,1>(3,0)=toEuler(extractRotation(t));
     v.block<3,1>(0,0) = t.translation();
     return v;
   }
 
    Vector7d toVectorQT(const Isometry3d& t){
-    Quaterniond q(t.rotation());
+    Quaterniond q(extractRotation(t));
     q.normalize();
     Vector7d v;
     v[3] = q.x(); v[4] = q.y(); v[5] = q.z(); v[6] = q.w();

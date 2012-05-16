@@ -25,15 +25,15 @@ namespace Slam3dNew {
     for (int i=0; i<7; i++) 
       is >> meas[i];
     setMeasurement(fromVectorQT(meas));
-    
+
     if (is.bad()) {
       return false;
     }
     for ( int i=0; i<information().rows() && is.good(); i++)
       for (int j=i; j<information().cols() && is.good(); j++){
-  is >> information()(i,j);
-  if (i!=j)
-    information()(j,i)=information()(i,j);
+        is >> information()(i,j);
+        if (i!=j)
+          information()(j,i)=information()(i,j);
       }
     if (is.bad()) {
       //  we overwrite the information matrix with the Identity
@@ -68,14 +68,14 @@ namespace Slam3dNew {
   }
   
   void EdgeSE3::linearizeOplus(){
-    //BaseBinaryEdge<6, SE3Quat, VertexSE3, VertexSE3>::linearizeOplus();
+    //BaseBinaryEdge<6, Eigen::Isometry3d, VertexSE3, VertexSE3>::linearizeOplus();
+    //return;
     VertexSE3 *from = static_cast<VertexSE3*>(_vertices[0]);
     VertexSE3 *to   = static_cast<VertexSE3*>(_vertices[1]);
     Eigen::Isometry3d E;
-    Eigen::Isometry3d Z, Xi, Xj;
-    Xi=from->estimate();
-    Xj=to->estimate();
-    Z=_measurement;
+    const Eigen::Isometry3d& Xi=from->estimate();
+    const Eigen::Isometry3d& Xj=to->estimate();
+    const Eigen::Isometry3d& Z=_measurement;
     computeEdgeSE3Gradient(E, _jacobianOplusXi , _jacobianOplusXj, Z, Xi, Xj);
   }
 
@@ -89,8 +89,6 @@ namespace Slam3dNew {
       from->setEstimate(to->estimate() * _measurement.inverse());
     //cerr << "IE" << endl;
   }
-
-
 
   EdgeSE3WriteGnuplotAction::EdgeSE3WriteGnuplotAction(): WriteGnuplotAction(typeid(EdgeSE3).name()){}
 
