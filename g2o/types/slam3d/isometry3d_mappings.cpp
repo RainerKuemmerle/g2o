@@ -1,5 +1,5 @@
 // g2o - General Graph Optimization
-// Copyright (C) 2011 H. Strasdat, G. Grisetti, R. Kümmerle
+// Copyright (C) 2011 H. Strasdat, G. Grisetti, R. Kümmerle, W. Burgard
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
