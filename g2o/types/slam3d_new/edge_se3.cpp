@@ -68,18 +68,17 @@ namespace Slam3dNew {
   }
   
   void EdgeSE3::linearizeOplus(){
-    //BaseBinaryEdge<6, Eigen::Isometry3d, VertexSE3, VertexSE3>::linearizeOplus();
-    //return;
+    
+    // BaseBinaryEdge<6, Eigen::Isometry3d, VertexSE3, VertexSE3>::linearizeOplus();
+    // return;
+
     VertexSE3 *from = static_cast<VertexSE3*>(_vertices[0]);
     VertexSE3 *to   = static_cast<VertexSE3*>(_vertices[1]);
     Eigen::Isometry3d E;
     const Eigen::Isometry3d& Xi=from->estimate();
     const Eigen::Isometry3d& Xj=to->estimate();
     const Eigen::Isometry3d& Z=_measurement;
-    // FIXME there is an error in the simpler function which results in wrong Jacobians
-    //computeEdgeSE3Gradient(E, _jacobianOplusXi , _jacobianOplusXj, Z, Xi, Xj);
-    Eigen::Isometry3d zeroOffset = Eigen::Isometry3d::Identity();
-    computeEdgeSE3Gradient(E, _jacobianOplusXi , _jacobianOplusXj, Z, Xi, Xj, zeroOffset, zeroOffset);
+    computeEdgeSE3Gradient(E, _jacobianOplusXi , _jacobianOplusXj, Z, Xi, Xj);
   }
 
   void EdgeSE3::initialEstimate(const OptimizableGraph::VertexSet& from_, OptimizableGraph::Vertex* /*to_*/) {
