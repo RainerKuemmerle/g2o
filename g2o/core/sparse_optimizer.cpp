@@ -324,7 +324,8 @@ namespace g2o{
     bool workspaceAllocated = _jacobianWorkspace.allocate(); (void) workspaceAllocated;
     assert(workspaceAllocated && "Error while allocating memory for the Jacobians");
     _batchStatistics.clear();
-    _batchStatistics.reserve(iterations);
+    if (_computeBatchStatistics)
+      _batchStatistics.resize(iterations);
     
     OptimizationAlgorithm::SolverResult result = OptimizationAlgorithm::OK;
     for (int i=0; i<iterations && ! terminate() && ok; i++){
