@@ -1,5 +1,6 @@
 ADD_LIBRARY(types_slam3d_new ${G2O_LIB_TYPE}
   isometry3d_mappings.h
+  isometry3d_mappings.cpp
   isometry3d_gradients.cpp
   isometry3d_gradients.h
   vertex_se3.cpp
@@ -25,8 +26,6 @@ ADD_LIBRARY(types_slam3d_new ${G2O_LIB_TYPE}
   types_slam3d_new.cpp
   types_slam3d_new.h
 )
-
-ADD_DEPENDENCIES(types_slam3d_new isometry3d_mappings.cpp)
 
 SET_TARGET_PROPERTIES(types_slam3d_new PROPERTIES OUTPUT_NAME ${LIB_PREFIX}types_slam3d_new)
 
