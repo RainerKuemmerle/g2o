@@ -144,5 +144,18 @@ namespace g2o {
       return t;
     }
 
+    SE3Quat toSE3Quat(const Isometry3d& t)
+    {
+      SE3Quat result(t.matrix().topLeftCorner<3,3>(), t.translation());
+      return result;
+    }
+
+    Isometry3d fromSE3Quat(const SE3Quat& t)
+    {
+      Isometry3d result = (Eigen::Isometry3d) t.rotation();
+      result.translation() = t.translation();
+      return result;
+    }
+
   } // end namespace internal
 } // end namespace g2o

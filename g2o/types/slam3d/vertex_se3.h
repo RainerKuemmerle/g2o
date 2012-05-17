@@ -55,7 +55,6 @@ namespace g2o {
       virtual bool read(std::istream& is);
       virtual bool write(std::ostream& os) const;
 
-
       virtual bool setEstimateDataImpl(const double* est){
         Map<const Vector7d> v(est);
         _estimate=internal::fromVectorQT(v);
@@ -94,7 +93,12 @@ namespace g2o {
         Eigen::Isometry3d increment = internal::fromVectorMQT(v);
         _estimate = _estimate * increment;
       }
-};
+
+      //! wrapper function to use the old SE3 type
+      SE3Quat G2O_ATTRIBUTE_DEPRECATED(estimateAsSE3Quat() const) { return internal::toSE3Quat(estimate());}
+      //! wrapper function to use the old SE3 type
+      void G2O_ATTRIBUTE_DEPRECATED(setEstimateFromSE3Quat(const SE3Quat& se3)) { setEstimate(internal::fromSE3Quat(se3));}
+  };
 
   class VertexSE3WriteGnuplotAction: public WriteGnuplotAction {
     public:

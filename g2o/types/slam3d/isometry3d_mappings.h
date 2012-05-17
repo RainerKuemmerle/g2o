@@ -28,6 +28,7 @@
 #define G2O_ISOMETRY3D_MAPPINGS_H_
 
 #include "g2o_types_slam3d_api.h"
+#include "se3quat.h"
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 
@@ -119,6 +120,15 @@ namespace g2o {
      * (x, y, z, qx, qy, qz, qw) -> Isometry3d
      */
     Isometry3d G2O_TYPES_SLAM3D_API fromVectorQT(const Vector7d& v);
+
+    /**
+     * convert an Isometry3d to the old SE3Quat class
+     */
+    SE3Quat G2O_TYPES_SLAM3D_API toSE3Quat(const Isometry3d& t);
+    /**
+     * convert from an old SE3Quat into Isometry3d
+     */
+    Isometry3d G2O_TYPES_SLAM3D_API fromSE3Quat(const SE3Quat& t);
 
   } // end namespace internal
 } // end namespace g2o
