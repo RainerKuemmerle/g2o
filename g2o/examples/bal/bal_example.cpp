@@ -43,6 +43,15 @@
 using namespace g2o;
 using namespace std;
 
+/**
+ * \brief camera vertex which stores the parameters for a pinhole camera
+ *
+ * The parameters of the camera are 
+ * - rx,ry,rz representing the rotation axis, whereas the angle is given by ||(rx,ry,rz)||
+ * - tx,ty,tz the translation of the camera
+ * - f the focal length of the camera
+ * - k1, k2 two radial distortion parameters
+ */
 class VertexCameraBAL : public BaseVertex<9, Eigen::VectorXd>
 {
   public:
@@ -75,6 +84,11 @@ class VertexCameraBAL : public BaseVertex<9, Eigen::VectorXd>
     }
 };
 
+/**
+ * \brief 3D world feature
+ *
+ * A 3D point feature in the world
+ */
 class VertexPointBAL : public BaseVertex<3, Eigen::Vector3d>
 {
   public:
@@ -107,6 +121,28 @@ class VertexPointBAL : public BaseVertex<3, Eigen::Vector3d>
     }
 };
 
+/**
+ * \brief edge representing the observation of a world feature by a camera
+ *
+ * see: http://grail.cs.washington.edu/projects/bal/
+ * We use a pinhole camera model; the parameters we estimate for each camera
+ * area rotation R, a translation t, a focal length f and two radial distortion
+ * parameters k1 and k2. The formula for projecting a 3D point X into a camera
+ * R,t,f,k1,k2 is:
+ * P  =  R * X + t       (conversion from world to camera coordinates)
+ * p  = -P / P.z         (perspective division)
+ * p' =  f * r(p) * p    (conversion to pixel coordinates) where P.z is the third (z) coordinate of P.
+ *
+ * In the last equation, r(p) is a function that computes a scaling factor to undo the radial
+ * distortion:
+ * r(p) = 1.0 + k1 * ||p||^2 + k2 * ||p||^4. 
+ *
+ * This gives a projection in pixels, where the origin of the image is the
+ * center of the image, the positive x-axis points right, and the positive
+ * y-axis points up (in addition, in the camera coordinate system, the positive
+ * z-axis points backwards, so the camera is looking down the negative z-axis,
+ * as in OpenGL).
+ */
 class EdgeObservationBAL : public BaseBinaryEdge<2, Vector2d, VertexCameraBAL, VertexPointBAL>
 {
   public:
