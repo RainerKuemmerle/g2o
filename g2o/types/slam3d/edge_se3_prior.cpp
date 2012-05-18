@@ -46,7 +46,7 @@ namespace g2o {
     assert(_offsetParam);
     ParameterVector pv(1);
     pv[0]=_offsetParam;
-    resolveCache(_cache, (OptimizableGraph::Vertex*)_vertices[0],"CACHE_SE3_OFFSET_NEW",pv);
+    resolveCache(_cache, (OptimizableGraph::Vertex*)_vertices[0],"CACHE_SE3_OFFSET",pv);
     return _cache != 0;
   }
 

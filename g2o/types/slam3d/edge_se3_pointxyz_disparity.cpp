@@ -59,7 +59,7 @@ namespace g2o {
   bool EdgeSE3PointXYZDisparity::resolveCaches(){
     ParameterVector pv(1);
     pv[0]=params;
-    resolveCache(cache, (OptimizableGraph::Vertex*)_vertices[0],"CACHE_CAMERA_NEW",pv);
+    resolveCache(cache, (OptimizableGraph::Vertex*)_vertices[0],"CACHE_CAMERA",pv);
     return cache != 0;
   }
 

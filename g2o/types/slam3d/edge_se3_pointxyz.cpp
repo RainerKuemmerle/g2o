@@ -45,7 +45,7 @@ namespace g2o {
   bool EdgeSE3PointXYZ::resolveCaches(){
     ParameterVector pv(1);
     pv[0]=offsetParam;
-    resolveCache(cache, (OptimizableGraph::Vertex*)_vertices[0],"CACHE_SE3_OFFSET_NEW",pv);
+    resolveCache(cache, (OptimizableGraph::Vertex*)_vertices[0],"CACHE_SE3_OFFSET",pv);
     return cache != 0;
   }
 

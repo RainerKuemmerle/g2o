@@ -49,9 +49,9 @@ namespace g2o {
 
     ParameterVector pv(2);
     pv[0]=_offsetFrom;
-    resolveCache(_cacheFrom, (OptimizableGraph::Vertex*)_vertices[0],"CACHE_SE3_OFFSET_NEW",pv);
+    resolveCache(_cacheFrom, (OptimizableGraph::Vertex*)_vertices[0],"CACHE_SE3_OFFSET",pv);
     pv[1]=_offsetTo;
-    resolveCache(_cacheTo, (OptimizableGraph::Vertex*)_vertices[1],"CACHE_SE3_OFFSET_NEW",pv);
+    resolveCache(_cacheTo, (OptimizableGraph::Vertex*)_vertices[1],"CACHE_SE3_OFFSET",pv);
     return (_cacheFrom && _cacheTo);
   }
 
