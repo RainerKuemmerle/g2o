@@ -307,6 +307,7 @@ class LinearSolverCSparse : public LinearSolver<MatrixType>
     {
       int m = A.rows();
       int n = A.cols();
+      assert(m > 0 && n > 0 && "Hessian has 0 rows/cols");
 
       if (_ccsA->columnsAllocated < n) {
         _ccsA->columnsAllocated = _ccsA->columnsAllocated == 0 ? n : 2 * n; // pre-allocate more space if re-allocating

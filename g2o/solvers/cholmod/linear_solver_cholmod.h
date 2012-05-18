@@ -337,6 +337,7 @@ class LinearSolverCholmod : public LinearSolver<MatrixType>
     {
       size_t m = A.rows();
       size_t n = A.cols();
+      assert(m > 0 && n > 0 && "Hessian has 0 rows/cols");
 
       if (_cholmodSparse->columnsAllocated < n) {
         //std::cerr << __PRETTY_FUNCTION__ << ": reallocating columns" << std::endl;
