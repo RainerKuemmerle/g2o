@@ -63,8 +63,16 @@ namespace g2o {
      * computes the nearest orthogonal matrix of a rotation matrix which might
      * be affected by numerical inaccuracies. We periodically call this function
      * after performinag a large number of updates on vertices.
+     * This function computes an SVD to reconstruct the nearest orthogonal matrix.
      */
     Eigen::Matrix3d nearestOrthogonalMatrix(const Eigen::Matrix3d& R);
+
+    /**
+     * compute a fast approximation for the nearest orthogonal rotation matrix.
+     * The function computes the residual E = RR^T - I which is then used as follows:
+     * R := R - 1/2 R E
+     */
+    Eigen::Matrix3d approximateNearestOrthogonalMatrix(const Eigen::Matrix3d& R);
 
     /**
      * normalize the quaternion, such that ||q|| == 1 and q.w() > 0

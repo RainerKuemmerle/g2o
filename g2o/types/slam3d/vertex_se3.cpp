@@ -41,7 +41,8 @@
 namespace g2o {
 
   VertexSE3::VertexSE3() :
-    BaseVertex<6, Eigen::Isometry3d>()
+    BaseVertex<6, Eigen::Isometry3d>(),
+    _numOplusCalls(0)
   {
     setToOriginImpl();
     updateCache();

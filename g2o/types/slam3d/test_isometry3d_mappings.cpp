@@ -36,12 +36,24 @@ using namespace g2o::internal;
 
 int main(int , char** ){
 
+Matrix3d I;
   Matrix3d R = Matrix3d::Identity();
   Matrix3d rot = (Matrix3d)AngleAxisd(0.01, Vector3d::UnitZ());
   rot = rot * (Matrix3d)AngleAxisd(0.01, Vector3d::UnitX());
+  
+  cerr << "Initial rotation matrix accuracy" << endl;
+  I = R * R.transpose();
+  for (int i = 0; i < 3; ++i) {
+    for (int j = 0; j < 3; ++j) {
+      printf("%.30f   ", I(i,j));
+    }
+    printf("\n");
+  }
+
+  cerr << "After further multiplications" << endl;
   for (int i = 0; i < 10000; ++i)
     R = R * rot;
-  Matrix3d I = R * R.transpose();
+  I = R * R.transpose();
   for (int i = 0; i < 3; ++i) {
     for (int j = 0; j < 3; ++j) {
       printf("%.30f   ", I(i,j));
@@ -51,7 +63,8 @@ int main(int , char** ){
 
   cerr << PVAR(R) << endl;
   printf("det %.30f\n", R.determinant());
-  printf("\nUsing nearest orthonormal matrix\n");
+  printf("\nUsing nearest orthogonal matrix\n");
+  Eigen::Matrix3d approxSolution = approximateNearestOrthogonalMatrix(R);
   R = nearestOrthogonalMatrix(R);
   cerr << PVAR(R) << endl;
   printf("det %.30f\n", R.determinant());
@@ -62,8 +75,25 @@ int main(int , char** ){
     }
     printf("\n");
   }
+  cerr << "Norm of the columns" << endl;
+  for (int i = 0; i < 3; ++i)
+    printf("%.30f   ", R.col(i).norm());
+  printf("\nUsing approximate nearest orthogonal matrix\n");
+  I = approxSolution * approxSolution.transpose();
+  cerr << PVAR(approxSolution) << endl;
+  printf("det %.30f\n", approxSolution.determinant());
+  for (int i = 0; i < 3; ++i) {
+    for (int j = 0; j < 3; ++j) {
+      printf("%.30f   ", I(i,j));
+    }
+    printf("\n");
+  }
+  cerr << "Norm of the columns" << endl;
+  for (int i = 0; i < 3; ++i)
+    printf("%.30f   ", approxSolution.col(i).norm());
 
-  return 1;
+  cerr << endl;
+  return 0;
 
   Vector3d eulerAngles(.1,.2,.3);
   Matrix3d m1=fromEuler(eulerAngles);

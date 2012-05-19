@@ -38,6 +38,13 @@ namespace g2o {
       return scaledU * svd.matrixV().transpose();
     }
 
+    Eigen::Matrix3d approximateNearestOrthogonalMatrix(const Eigen::Matrix3d& R)
+    {
+      Eigen::Matrix3d E = R.transpose() * R;
+      E.diagonal().array() -= 1;
+      return R - 0.5 * R * E;
+    }
+
     Quaterniond normalized(const Quaterniond& q) {
       Quaterniond q2(q);
       normalize(q2);

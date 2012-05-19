@@ -46,6 +46,9 @@ namespace g2o {
   {
     public:
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
+
+      static const int orthogonalizeAfter = 1000; //< orthogonalize the rotation matrix after N updates
+
       VertexSE3();
 
       virtual void setToOriginImpl() {
@@ -92,12 +95,19 @@ namespace g2o {
         Map<const Vector6d> v(update);
         Eigen::Isometry3d increment = internal::fromVectorMQT(v);
         _estimate = _estimate * increment;
+        if (++_numOplusCalls > orthogonalizeAfter) {
+          _numOplusCalls = 0;
+          _estimate.matrix().topLeftCorner<3,3>() = internal::approximateNearestOrthogonalMatrix(_estimate.matrix().topLeftCorner<3,3>());
+        }
       }
 
       //! wrapper function to use the old SE3 type
       SE3Quat G2O_ATTRIBUTE_DEPRECATED(estimateAsSE3Quat() const) { return internal::toSE3Quat(estimate());}
       //! wrapper function to use the old SE3 type
       void G2O_ATTRIBUTE_DEPRECATED(setEstimateFromSE3Quat(const SE3Quat& se3)) { setEstimate(internal::fromSE3Quat(se3));}
+
+    protected:
+      int _numOplusCalls;
   };
 
   class VertexSE3WriteGnuplotAction: public WriteGnuplotAction {
