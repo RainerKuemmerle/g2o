@@ -534,6 +534,19 @@ bool BlockSolver<Traits>::buildSystem()
     OptimizableGraph::Edge* e = _optimizer->activeEdges()[k];
     e->linearizeOplus(jacobianWorkspace); // jacobian of the nodes' oplus (manifold)
     e->constructQuadraticForm();
+#  ifndef NDEBUG
+    for (size_t i = 0; i < e->vertices().size(); ++i) {
+      OptimizableGraph::Vertex* v = static_cast<OptimizableGraph::Vertex*>(e->vertex(i));
+      int jacSize = e->dimension() * v->dimension();
+      double* jacobian = jacobianWorkspace.workspaceForVertex(i);
+      for (int j = 0; j < jacSize; ++j) {
+        if (g2o_isnan(jacobian[j])) {
+          cerr << "buildSystem(): NaN within Jacobian for edge " << e << endl;
+          break;
+        }
+      }
+    }
+#  endif
   }
 
   // flush the current system in a sparse block matrix
