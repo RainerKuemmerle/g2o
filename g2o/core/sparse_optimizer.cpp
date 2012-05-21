@@ -75,6 +75,20 @@ namespace g2o{
         e->robustifyError();
       }
     }
+
+#  ifndef NDEBUG
+    for (int k = 0; k < static_cast<int>(_activeEdges.size()); ++k) {
+      OptimizableGraph::Edge* e = _activeEdges[k];
+      double* errorData = e->errorData();
+      int dim = e->dimension();
+      for (int i = 0; i < dim; ++i) {
+        if (g2o_isnan(errorData[i])) {
+          cerr << "computeActiveErrors(): found NaN in error for edge " << e << endl;
+        }
+      }
+    }
+#  endif
+
   }
 
   double SparseOptimizer::activeChi2( ) const
