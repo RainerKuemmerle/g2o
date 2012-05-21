@@ -29,22 +29,6 @@
 namespace g2o {
   namespace internal {
 
-    Eigen::Matrix3d nearestOrthogonalMatrix(const Eigen::Matrix3d& R)
-    {
-      JacobiSVD<Eigen::Matrix3d> svd(R, ComputeFullU | ComputeFullV);
-      double det = (svd.matrixU() * svd.matrixV().adjoint()).determinant();
-      Eigen::Matrix3d scaledU(svd.matrixU());
-      scaledU.col(0) /= det;
-      return scaledU * svd.matrixV().transpose();
-    }
-
-    Eigen::Matrix3d approximateNearestOrthogonalMatrix(const Eigen::Matrix3d& R)
-    {
-      Eigen::Matrix3d E = R.transpose() * R;
-      E.diagonal().array() -= 1;
-      return R - 0.5 * R * E;
-    }
-
     Quaterniond normalized(const Quaterniond& q) {
       Quaterniond q2(q);
       normalize(q2);

@@ -54,7 +54,6 @@ namespace g2o {
     for (int i=0; i<7; i++)
       is  >> est[i];
     setEstimate(internal::fromVectorQT(est));
-    updateCache();
     return true;
   }
 

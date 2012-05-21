@@ -48,15 +48,17 @@ namespace g2o {
     /**
      * extract the rotation matrix from an Isometry3d matrix. Eigen itself
      * performs an SVD decomposition to recover the nearest orthogonal matrix,
-     * since its function also handles a scaling matrix.  An Isometry3d does
+     * since its rotation() function also handles a scaling matrix.  An Isometry3d does
      * not have a scaling portion and we assume that the Isometry3d is
      * numerically stable while we compute the error and the Jacobians.  Hence,
      * we directly extract the rotation block out of the full matrix.
+     *
+     * Note, we could also call .linear() on the Isometry3d. However, I dislike
+     * the name of that function a bit.
      */
-    inline Eigen::Matrix3d extractRotation(const Eigen::Isometry3d& A)
+    inline Eigen::Isometry3d::ConstLinearPart extractRotation(const Eigen::Isometry3d& A)
     {
-      Matrix3d m = A.matrix().topLeftCorner<3,3>();
-      return m;
+      return A.matrix().topLeftCorner<3,3>();
     }
 
     /**
@@ -65,14 +67,28 @@ namespace g2o {
      * after performinag a large number of updates on vertices.
      * This function computes an SVD to reconstruct the nearest orthogonal matrix.
      */
-    Eigen::Matrix3d nearestOrthogonalMatrix(const Eigen::Matrix3d& R);
+    template <typename Derived>
+    void nearestOrthogonalMatrix(const Eigen::MatrixBase<Derived>& R)
+    {
+      JacobiSVD<Eigen::Matrix3d> svd(R, ComputeFullU | ComputeFullV);
+      double det = (svd.matrixU() * svd.matrixV().adjoint()).determinant();
+      Eigen::Matrix3d scaledU(svd.matrixU());
+      scaledU.col(0) /= det;
+      const_cast<Eigen::MatrixBase<Derived>&>(R) = scaledU * svd.matrixV().transpose();
+    }
 
     /**
      * compute a fast approximation for the nearest orthogonal rotation matrix.
      * The function computes the residual E = RR^T - I which is then used as follows:
      * R := R - 1/2 R E
      */
-    Eigen::Matrix3d approximateNearestOrthogonalMatrix(const Eigen::Matrix3d& R);
+    template <typename Derived>
+    void approximateNearestOrthogonalMatrix(const Eigen::MatrixBase<Derived>& R)
+    {
+      Eigen::Matrix3d E = R.transpose() * R;
+      E.diagonal().array() -= 1;
+      const_cast<Eigen::MatrixBase<Derived>&>(R) -= 0.5 * R * E;
+    }
 
     /**
      * normalize the quaternion, such that ||q|| == 1 and q.w() > 0

@@ -97,7 +97,7 @@ namespace g2o {
         _estimate = _estimate * increment;
         if (++_numOplusCalls > orthogonalizeAfter) {
           _numOplusCalls = 0;
-          _estimate.matrix().topLeftCorner<3,3>() = internal::approximateNearestOrthogonalMatrix(_estimate.matrix().topLeftCorner<3,3>());
+          internal::approximateNearestOrthogonalMatrix(_estimate.matrix().topLeftCorner<3,3>());
         }
       }
 
