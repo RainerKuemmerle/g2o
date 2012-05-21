@@ -2,6 +2,10 @@
 #include "isometry3d_gradients.h"
 #include <iostream>
 
+#ifdef WINDOWS
+#include <windows.h>
+#endif
+
 #ifdef G2O_HAVE_OPENGL
 #ifdef __APPLE__
 #include <OpenGL/gl.h>

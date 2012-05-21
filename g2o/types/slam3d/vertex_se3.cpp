@@ -27,6 +27,10 @@
 #include "vertex_se3.h"
 #include "g2o/core/factory.h"
 
+#ifdef WINDOWS
+#include <windows.h>
+#endif
+
 #ifdef G2O_HAVE_OPENGL
 #ifdef __APPLE__
 #include <OpenGL/gl.h>
@@ -109,8 +113,8 @@ namespace g2o {
     if (!DrawAction::refreshPropertyPtrs(params_))
       return false;
     if (_previousParams){
-      _triangleX = _previousParams->makeProperty<FloatProperty>(_typeName + "::TRIANGLE_X", .2);
-      _triangleY = _previousParams->makeProperty<FloatProperty>(_typeName + "::TRIANGLE_Y", .05);
+      _triangleX = _previousParams->makeProperty<FloatProperty>(_typeName + "::TRIANGLE_X", .2f);
+      _triangleY = _previousParams->makeProperty<FloatProperty>(_typeName + "::TRIANGLE_Y", .05f);
     } else {
       _triangleX = 0;
       _triangleY = 0;
@@ -135,7 +139,7 @@ namespace g2o {
 
     VertexSE3* that = static_cast<VertexSE3*>(element);
 
-    glColor3f(0.5,0.5,0.8);
+    glColor3f(0.5f,0.5f,0.8f);
     glPushMatrix();
     glMultMatrixd(that->estimate().matrix().data());
     if (_triangleX && _triangleY){

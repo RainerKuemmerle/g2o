@@ -28,6 +28,9 @@
 #include "vertex_se3.h"
 #include "isometry3d_gradients.h"
 
+#ifdef WINDOWS
+#include <windows.h>
+#endif
 
 #ifdef G2O_HAVE_OPENGL
 #ifdef __APPLE__
@@ -100,7 +103,7 @@ namespace g2o {
     if (! DrawAction::refreshPropertyPtrs(params_))
       return false;
     if (_previousParams){
-      _cubeSide = _previousParams->makeProperty<FloatProperty>(_typeName + "::CUBE_SIDE", .05);
+      _cubeSide = _previousParams->makeProperty<FloatProperty>(_typeName + "::CUBE_SIDE", .05f);
     } else {
       _cubeSide = 0;
     }

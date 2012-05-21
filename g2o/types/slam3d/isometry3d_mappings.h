@@ -93,66 +93,66 @@ namespace g2o {
     /**
      * normalize the quaternion, such that ||q|| == 1 and q.w() > 0
      */
-    Quaterniond G2O_TYPES_SLAM3D_API normalized(const Quaterniond& q);
+    G2O_TYPES_SLAM3D_API Quaterniond normalized(const Quaterniond& q);
     /**
      * as above, but in-place
      */
-    Quaterniond& G2O_TYPES_SLAM3D_API normalize(Quaterniond& q);
+    G2O_TYPES_SLAM3D_API Quaterniond& normalize(Quaterniond& q);
 
     // functions to handle the rotation part
     /**
      * Rotation matrix -> Euler angles (roll, pitch, yaw)
      */
-    Vector3d G2O_TYPES_SLAM3D_API toEuler(const Eigen::Matrix3d& R);
+    G2O_TYPES_SLAM3D_API Vector3d toEuler(const Eigen::Matrix3d& R);
     /**
      * Euler angles (roll, pitch, yaw) -> Rotation matrix
      */
-    Matrix3d G2O_TYPES_SLAM3D_API fromEuler(const Vector3d& v);
+    G2O_TYPES_SLAM3D_API Matrix3d fromEuler(const Vector3d& v);
     /**
      * Rotation matrix -> (qx qy, qz)
      */
-    Vector3d G2O_TYPES_SLAM3D_API toCompactQuaternion(const Eigen::Matrix3d& R);
+    G2O_TYPES_SLAM3D_API Vector3d toCompactQuaternion(const Eigen::Matrix3d& R);
     /**
      * (qx qy, qz) -> Rotation matrix, whereas (qx, qy, qz) are assumed to be
      * part of a quaternion which was normalized with the function above.
      */
-    Matrix3d G2O_TYPES_SLAM3D_API fromCompactQuaternion(const Vector3d& v);
+    G2O_TYPES_SLAM3D_API Matrix3d fromCompactQuaternion(const Vector3d& v);
 
     // functions to handle the toVector of the whole transformations
     /**
      * Isometry3d -> (x, y, z, qx, qy, qz)
      */
-    Vector6d G2O_TYPES_SLAM3D_API toVectorMQT(const Isometry3d& t);
+    G2O_TYPES_SLAM3D_API Vector6d toVectorMQT(const Isometry3d& t);
     /**
      * Isometry3d -> (x, y, z, roll, pitch, yaw)
      */
-    Vector6d G2O_TYPES_SLAM3D_API toVectorET(const Isometry3d& t);
+    G2O_TYPES_SLAM3D_API Vector6d toVectorET(const Isometry3d& t);
     /**
      * Isometry3d -> (x, y, z, qx, qy, qz, qw)
      */
-    Vector7d G2O_TYPES_SLAM3D_API toVectorQT(const Isometry3d& t);
+    G2O_TYPES_SLAM3D_API Vector7d toVectorQT(const Isometry3d& t);
 
     /**
      * (x, y, z, qx, qy, qz) -> Isometry3d
      */
-    Isometry3d G2O_TYPES_SLAM3D_API fromVectorMQT(const Vector6d& v);
+    G2O_TYPES_SLAM3D_API Isometry3d fromVectorMQT(const Vector6d& v);
     /**
      * (x, y, z, roll, pitch, yaw) -> Isometry3d
      */
-    Isometry3d G2O_TYPES_SLAM3D_API fromVectorET(const Vector6d& v);
+    G2O_TYPES_SLAM3D_API Isometry3d fromVectorET(const Vector6d& v);
     /**
      * (x, y, z, qx, qy, qz, qw) -> Isometry3d
      */
-    Isometry3d G2O_TYPES_SLAM3D_API fromVectorQT(const Vector7d& v);
+    G2O_TYPES_SLAM3D_API Isometry3d fromVectorQT(const Vector7d& v);
 
     /**
      * convert an Isometry3d to the old SE3Quat class
      */
-    SE3Quat G2O_TYPES_SLAM3D_API toSE3Quat(const Isometry3d& t);
+    G2O_TYPES_SLAM3D_API SE3Quat toSE3Quat(const Isometry3d& t);
     /**
      * convert from an old SE3Quat into Isometry3d
      */
-    Isometry3d G2O_TYPES_SLAM3D_API fromSE3Quat(const SE3Quat& t);
+    G2O_TYPES_SLAM3D_API Isometry3d fromSE3Quat(const SE3Quat& t);
 
   } // end namespace internal
 } // end namespace g2o
