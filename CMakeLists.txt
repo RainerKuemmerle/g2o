@@ -143,6 +143,9 @@ IF(CMAKE_COMPILER_IS_GNUCXX)
   # Generic settings for optimisation
   SET(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -msse4") 
   SET(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -O3 -msse4") 
+  # switch off optimization for debug builds
+  SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0")
+  SET(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -O0")
 
   # OS X
   #IF(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
