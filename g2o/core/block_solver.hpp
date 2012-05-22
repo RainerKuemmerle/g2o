@@ -541,7 +541,7 @@ bool BlockSolver<Traits>::buildSystem()
       double* jacobian = jacobianWorkspace.workspaceForVertex(i);
       for (int j = 0; j < jacSize; ++j) {
         if (g2o_isnan(jacobian[j])) {
-          cerr << "buildSystem(): NaN within Jacobian for edge " << e << endl;
+          cerr << "buildSystem(): NaN within Jacobian for edge " << e << " in vertex " << i << endl;
           break;
         }
       }
