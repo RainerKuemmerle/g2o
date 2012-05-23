@@ -1,4 +1,5 @@
 ADD_LIBRARY(types_slam3d ${G2O_LIB_TYPE}
+  dquat2mat.cpp dquat2mat.h
   isometry3d_mappings.h
   isometry3d_mappings.cpp
   isometry3d_gradients.cpp
