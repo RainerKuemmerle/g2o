@@ -47,7 +47,6 @@ namespace g2o {
  * Templatized BaseVertex
  * D  : minimal dimension of the vertex, e.g., 3 for rotation in 3D
  * T  : internal type to represent the estimate, e.g., Quaternion for rotation in 3D
- * ID : dimension of the internal representaion, defaults to D, e.g., 4 for the Quaternion in 3D
  */
   template <int D, typename T>
   class BaseVertex : public OptimizableGraph::Vertex {
