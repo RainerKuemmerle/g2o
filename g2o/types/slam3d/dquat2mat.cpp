@@ -55,7 +55,7 @@ namespace g2o {
 	break;
       }
       if (qw<=0)
-	dq_dR = -dq_dR;
+	dq_dR *= -1;
     }
   }
 }
