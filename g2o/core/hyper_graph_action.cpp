@@ -183,7 +183,7 @@ namespace g2o {
       }
     }
     if (! collection) {
-#ifndef G2O_DEBUG_ACTIONLIB
+#ifdef G2O_DEBUG_ACTIONLIB
       cerr << __PRETTY_FUNCTION__ << ": creating collection for \"" << action->name() << "\"" << endl;
 #endif
       collection = new HyperGraphElementActionCollection(action->name());
