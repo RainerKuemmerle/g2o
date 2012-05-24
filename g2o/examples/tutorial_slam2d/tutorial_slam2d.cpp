@@ -94,7 +94,7 @@ int main()
 
   // second add the odometry constraints
   cerr << "Optimization: Adding odometry measurements ... ";
-  for (size_t i = 1; i < simulator.odometry().size(); ++i) {
+  for (size_t i = 0; i < simulator.odometry().size(); ++i) {
     const Simulator::GridEdge& simEdge = simulator.odometry()[i];
 
     EdgeSE2* odometry = new EdgeSE2;
