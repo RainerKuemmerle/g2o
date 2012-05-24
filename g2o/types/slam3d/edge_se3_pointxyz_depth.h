@@ -39,7 +39,6 @@ namespace g2o {
   /*! \class EdgeProjectDepth
    * \brief g2o edge from a track to a depth camera node using a depth measurement (true distance, not disparity)
    */
-  // first two args are the measurement type, second two the connection classes
   class G2O_TYPES_SLAM3D_API EdgeSE3PointXYZDepth : public BaseBinaryEdge<3, Vector3d, VertexSE3, VertexPointXYZ> {
   public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW

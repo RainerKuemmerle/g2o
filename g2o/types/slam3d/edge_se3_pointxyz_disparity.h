@@ -37,7 +37,7 @@
 namespace g2o {
 
   /**
-   * edge from a track to a depth camera node using a disparity measurement
+   * \brief edge from a track to a depth camera node using a disparity measurement
    *
    * the disparity measurement is normalized: disparity / (focal_x * baseline)
    */

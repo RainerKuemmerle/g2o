@@ -114,7 +114,6 @@ namespace g2o {
                 HyperGraphElementAction::Parameters* params){
     if (typeid(*element).name()!=_typeName)
       return 0;
-    CacheSE3Offset* that = static_cast<CacheSE3Offset*>(element);
     refreshPropertyPtrs(params);
     if (! _previousParams)
       return this;
@@ -122,11 +121,12 @@ namespace g2o {
     if (_show && !_show->value())
       return this;
 
-    glPushMatrix();
-    glMultMatrixd(that->offsetParam()->offset().matrix().data());
+    //CacheSE3Offset* that = static_cast<CacheSE3Offset*>(element);
+    //glPushMatrix();
+    //glMultMatrixd(that->offsetParam()->offset().matrix().data());
     // if (_cubeSide)
     //   drawMyPyramid(_cubeSide->value(), _cubeSide->value());
-    glPopMatrix();
+    //glPopMatrix();
 
     return this;
   }

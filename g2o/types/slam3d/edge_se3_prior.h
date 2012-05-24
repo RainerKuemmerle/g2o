@@ -33,9 +33,11 @@
 #include "g2o_types_slam3d_api.h"
 namespace g2o {
   /**
-   * prior for an SE3 element
+   * \brief prior for an SE3 element
+   *
+   * Provides a prior for a 3d pose vertex. Again the measurement is represented by an
+   * Isometry3d matrix.
    */
-  // first two args are the measurement type, third connection class
   class G2O_TYPES_SLAM3D_API EdgeSE3Prior : public BaseUnaryEdge<6, Eigen::Isometry3d, VertexSE3> {
   public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW

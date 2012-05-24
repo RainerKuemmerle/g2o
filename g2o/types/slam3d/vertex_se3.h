@@ -38,8 +38,15 @@ namespace g2o {
   using namespace Eigen;
 
 /**
- * \brief 3D pose Vertex, (x,y,z,qw,qx,qy,qz)
- * the parameterization for the increments constructed is a 6d vector
+ * \brief 3D pose Vertex, represented as an Isometry3d
+ *
+ * 3D pose vertex, represented as an Isometry3d, i.e., an affine transformation
+ * which is constructed by only concatenating rotation and translation
+ * matrices. Hence, no scaling or projection.  To avoid that the rotational
+ * part of the Isometry3d gets numerically unstable we compute the nearest
+ * orthogonal matrix after a large number of calls to the oplus method.
+ * 
+ * The parameterization for the increments constructed is a 6d vector
  * (x,y,z,qx,qy,qz) (note that we leave out the w part of the quaternion.
  */
   class G2O_TYPES_SLAM3D_API VertexSE3 : public BaseVertex<6, Eigen::Isometry3d>
@@ -90,6 +97,13 @@ namespace g2o {
         return 6;
       }
 
+      /**
+       * update the position of this vertex. The update is in the form
+       * (x,y,z,qx,qy,qz) whereas (x,y,z) represents the translational update
+       * and (qx,qy,qz) corresponds to the respective elements. The missing
+       * element qw of the quaternion is recovred by
+       * || (qw,qx,qy,qz) || == 1 => qw = sqrt(1 - || (qx,qy,qz) ||
+       */
       virtual void oplusImpl(const double* update)
       {
         Map<const Vector6d> v(update);
@@ -107,9 +121,12 @@ namespace g2o {
       void G2O_ATTRIBUTE_DEPRECATED(setEstimateFromSE3Quat(const SE3Quat& se3)) { setEstimate(internal::fromSE3Quat(se3));}
 
     protected:
-      int _numOplusCalls;
+      int _numOplusCalls;     ///< store how often opluse was called to trigger orthogonaliation of the rotation matrix
   };
 
+  /**
+   * \brief write the vertex to some Gnuplot data file
+   */
   class VertexSE3WriteGnuplotAction: public WriteGnuplotAction {
     public:
       VertexSE3WriteGnuplotAction();
@@ -118,6 +135,9 @@ namespace g2o {
   };
 
 #ifdef G2O_HAVE_OPENGL
+  /**
+   * \brief visualize the 3D pose vertex
+   */
   class VertexSE3DrawAction: public DrawAction{
     public:
       VertexSE3DrawAction();

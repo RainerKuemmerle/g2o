@@ -9,9 +9,12 @@
 namespace g2o {
 
   /**
-   * \brief Offset edge
+   * \brief Edge between two 3D pose vertices
+   *
+   * The transformation between the two vertices is given as an Isometry3d.
+   * If z denotes the measurement, then the error function is given as follows:
+   * z^-1 * (x_i^-1 * x_j)
    */
-  // first two args are the measurement type, second two the connection classes
   class G2O_TYPES_SLAM3D_API EdgeSE3 : public BaseBinaryEdge<6, Eigen::Isometry3d, VertexSE3, VertexSE3> {
     public:
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
@@ -28,8 +31,7 @@ namespace g2o {
 
       virtual bool setMeasurementData(const double* d){
         Map<const Vector7d> v(d);
-        _measurement=internal::fromVectorQT(v);
-        _inverseMeasurement = _measurement.inverse();
+        setMeasurement(internal::fromVectorQT(v));
         return true;
       }
 
@@ -56,6 +58,9 @@ namespace g2o {
       Eigen::Isometry3d _inverseMeasurement;
   };
 
+  /**
+   * \brief Output the pose-pose constraint to Gnuplot data file
+   */
   class G2O_TYPES_SLAM3D_API EdgeSE3WriteGnuplotAction: public WriteGnuplotAction {
   public:
     EdgeSE3WriteGnuplotAction();
@@ -64,6 +69,9 @@ namespace g2o {
   };
 
 #ifdef G2O_HAVE_OPENGL
+  /**
+   * \brief Visualize a 3D pose-pose constraint
+   */
   class G2O_TYPES_SLAM3D_API EdgeSE3DrawAction: public DrawAction{
   public:
     EdgeSE3DrawAction();

@@ -33,7 +33,7 @@
 
 namespace g2o {
   /**
-   * Vertex for a tracked point in space
+   * \brief Vertex for a tracked point in space
    */
   class G2O_TYPES_SLAM3D_API VertexPointXYZ : public BaseVertex<3, Eigen::Vector3d>
   {
@@ -91,6 +91,9 @@ namespace g2o {
   };
 
 #ifdef G2O_HAVE_OPENGL
+  /**
+   * \brief visualize a 3D point
+   */
   class VertexPointXYZDrawAction: public DrawAction{
     public:
       VertexPointXYZDrawAction();
