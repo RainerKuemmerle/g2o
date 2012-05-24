@@ -44,9 +44,7 @@ printretarg(name,expr):=(
      sprint(s, ">& "),
      sprint(name)
     ) else (
-     sprint ("double&", name)      if (qw<0)	
-	dq_dR = -dq_dR;
-
+     sprint ("double&", name)      
     )
 )$                                                
 
@@ -116,7 +114,6 @@ expr2c(funcname, expr, outarg, args) := (
 )$
 /* [wxMaxima: input   end   ] */
 
-
 /* [wxMaxima: input   start ] */
 mat2lin(A):=[A[1,1], A[2,1], A[3,1], A[1,2], A[2,2], A[3,2], A[1,3], A[2,3], A[3,3]]$
 
@@ -154,8 +151,6 @@ mat2quat(R):= [(R[3,2]-R[2,3])/(2*sqrt(1+R[1,1]+R[2,2]+R[3,3])),
 linMat2quat(r) := mat2quat(lin2mat(r))$
 /* [wxMaxima: input   end   ] */
 
-
-
 /* [wxMaxima: input   start ] */
 dr_dq:jacobian(quat2linMat([qx, qy, qz]), [qx, qy, qz])$
 dr_dq:ratsubst(qw,sqrt(1.-qx^2-qy^2-qz^2),dr_dq)$
@@ -176,73 +171,65 @@ R:matrix([r11, r12, r13],[r21, r22, r23],[r31, r32, r33])$
 s_times_R:[Sx.R, Sy.R, Sz.R]$
 st_times_R:[SxT.R, SyT.R, SzT.R]$
 
-dq_dr:jacobian(linMat2quat([r11, r21, r31, r12, r22, r32, r13, r23, r33]), [r11, r21, r31, r12, r22, r32, r13, r23, r33])$
-/* q_dr:ratsubst(qw,1/2*sqrt(r11+r22+r33+1),dq_dr); */
-optimize(dq_dr)$
+dq_dr:jacobian(linMat2quat([r00, r10, r20, r01, r11, r21, r02, r12, r22]), [r00, r10, r20, r01, r11, r21, r02, r12, r22])$
+dq_dr_old:ratsubst(qw,.5*sqrt(r00+r11+r22+1),dq_dr);
 /* [wxMaxima: input   end   ] */
 
 /* [wxMaxima: input   start ] */
-S_base(r11, r21, r31, r12, r22, r32, r13, r23, r33):=2.*sqrt(r11+r22+r33+1.)$
-m2q_base(r11, r21, r31, r12, r22, r32, r13, r23, r33):=[
-    (r32-r23)/S_base(r11, r21, r31, r12, r22, r32, r13, r23, r33),
-    (r13-r31)/S_base(r11, r21, r31, r12, r22, r32, r13, r23, r33),
-    (r21-r12)/S_base(r11, r21, r31, r12, r22, r32, r13, r23, r33)
+S_w(r00, r11, r22) := sqrt(1 + r00 + r11 + r22) * 2$ 
+m2q_w(r00, r10, r20, r01, r11, r21, r02, r12, r22):=
+[(r21 - r12) / S_w(r00, r11, r22),
+ (r02 - r20) / S_w(r00, r11, r22), 
+ (r10 - r01) / S_w(r00, r11, r22)]$
+
+S_x(r00, r11, r22) := sqrt(1.0 + r00 - r11 - r22) * 2$
+m2q_x(r00, r10, r20, r01, r11, r21, r02, r12, r22):=
+[ 0.25 * S_x(r00, r11, r22),
+  (r01 + r10) / S_x(r00, r11, r22), 
+  (r02 + r20) / S_x(r00, r11, r22)]$
+
+S_y(r00, r11, r22) := sqrt(1.0 - r00 + r11 - r22) * 2$
+m2q_y(r00, r10, r20, r01, r11, r21, r02, r12, r22):=
+[ (r01 + r10) / S_y(r00, r11, r22), 
+  0.25 * S_y(r00, r11, r22),
+  (r12 + r21) / S_y(r00, r11, r22)
+ ]$
+
+S_z(r00, r11, r22) := sqrt(1.0 - r00 - r11 + r22) * 2$
+m2q_z(r00, r10, r20, r01, r11, r21, r02, r12, r22):=
+[
+  (r02 + r20) / S_z(r00, r11, r22),
+  (r12 + r21) / S_z(r00, r11, r22),
+  0.25 * S_z(r00, r11, r22)
 ]$
 
-S_11(r11, r21, r31, r12, r22, r32, r13, r23, r33):=
-    2.*sqrt(r11-r22-r33+1.)$
-m2q_11(r11, r21, r31, r12, r22, r32, r13, r23, r33):=[
-    .25*S_11(r11, r21, r31, r12, r22, r32, r13, r23, r33),
-    (r12+r21)/S_11(r11, r21, r31, r12, r22, r32, r13, r23, r33),
-    (r13+r31)/S_11(r11, r21, r31, r12, r22, r32, r13, r23, r33)
-]$
+dq_dR_w:jacobian(m2q_w(r00, r10, r20, r01, r11, r21, r02, r12, r22),[r00, r10, r20, r01, r11, r21, r02, r12, r22])$
+dq_dR_w:ratsubst(qw, .25*S_w(r00, r11, r22), dq_dR_w);
 
-S_22(r11, r21, r31, r12, r22, r32, r13, r23, r33):=
-    2.*sqrt(-r11+r22-r33+1.)$
-m2q_22(r11, r21, r31, r12, r22, r32, r13, r23, r33):=[
-    (r12+r21)/S_22(r11, r21, r31, r12, r22, r32, r13, r23, r33),
-    .25*S_22(r11, r21, r31, r12, r22, r32, r13, r23, r33),
-    (r23+r32)/S_22(r11, r21, r31, r12, r22, r32, r13, r23, r33)
-]$
-S_33(r11, r21, r31, r12, r22, r32, r13, r23, r33):=
-    2.*sqrt(-r11-r22+r33+1.)$
+dq_dR_x:jacobian(m2q_x(r00, r10, r20, r01, r11, r21, r02, r12, r22),[r00, r10, r20, r01, r11, r21, r02, r12, r22])$
+dq_dR_x:ratsubst(qx, .25*S_x(r00, r11, r22), dq_dR_x);
 
-m2q_33(r11, r21, r31, r12, r22, r32, r13, r23, r33):=[
-    (r13+r31)/S_33(r11, r21, r31, r12, r22, r32, r13, r23, r33),
-    (r23+r32)/S_33(r11, r21, r31, r12, r22, r32, r13, r23, r33),
-    .25*S_33(r11, r21, r31, r12, r22, r32, r13, r23, r33)
-]$
+dq_dR_y:jacobian(m2q_y(r00, r10, r20, r01, r11, r21, r02, r12, r22),[r00, r10, r20, r01, r11, r21, r02, r12, r22])$
+dq_dR_y:ratsubst(qy, .25*S_y(r00, r11, r22), dq_dR_y);
 
-dq_dR_base:jacobian(m2q_base(r11, r21, r31, r12, r22, r32, r13, r23, r33),[r11, r21, r31, r12, r22, r32, r13, r23, r33])$
-dq_dR_base:ratsubst(q_base, .5*S_base(r11, r21, r31, r12, r22, r32, r13, r23, r33), dq_dR_base)$
-
-dq_dR_11:jacobian(m2q_11(r11, r21, r31, r12, r22, r32, r13, r23, r33),[r11, r21, r31, r12, r22, r32, r13, r23, r33])$
-dq_dR_11:ratsubst(q_11, .5*S_11(r11, r21, r31, r12, r22, r32, r13, r23, r33), dq_dR_11)$
-
-dq_dR_22:jacobian(m2q_22(r11, r21, r31, r12, r22, r32, r13, r23, r33),[r11, r21, r31, r12, r22, r32, r13, r23, r33])$
-dq_dR_22:ratsubst(q_22, .5*S_22(r11, r21, r31, r12, r22, r32, r13, r23, r33), dq_dR_22)$
-
-dq_dR_33:jacobian(m2q_33(r11, r21, r31, r12, r22, r32, r13, r23, r33),[r11, r21, r31, r12, r22, r32, r13, r23, r33])$
-dq_dR_33:ratsubst(q_33, .5*S_33(r11, r21, r31, r12, r22, r32, r13, r23, r33), dq_dR_33)$
-
-optimprefix:_aux$
-opt_dq_dR_base:optimize(dq_dR_base)$
-opt_dq_dR_11:optimize(dq_dR_11)$
-opt_dq_dR_22:optimize(dq_dR_22)$
-opt_dq_dR_33:optimize(dq_dR_33)$
+dq_dR_z:jacobian(m2q_z(r00, r10, r20, r01, r11, r21, r02, r12, r22),[r00, r10, r20, r01, r11, r21, r02, r12, r22])$
+dq_dR_z:ratsubst(qz, .25*S_z(r00, r11, r22), dq_dR_z);
 /* [wxMaxima: input   end   ] */
 
 /* [wxMaxima: input   start ] */
 optimprefix:_aux$
-opt_dq_dR:optimize(dq_dr)$
-opt_dR_dq:optimize(dr_dq)$
+opt_dR_dq:optimize(dr_dq);
+opt_dq_dR_old:optimize(dq_dr_old);
+opt_dq_dR_w:optimize(dq_dR_w);
+opt_dq_dR_x:optimize(dq_dR_x);
+opt_dq_dR_y:optimize(dq_dR_y);
+opt_dq_dR_z:optimize(dq_dR_z);
 
-with_stdout("dquat2mat.cpp",
-    	expr2c("compute_dq_dR", opt_dq_dR, "dq_dR", [r11, r21, r31, r12, r22, r32, r13, r23, r33]),
-        expr2c("compute_dq_dR_base", opt_dq_dR_base, "dq_dR_base", [r11, r21, r31, r12, r22, r32, r13, r23, r33, q_base]),
-        expr2c("compute_dq_dR_11", opt_dq_dR_11, "dq_dR_11", [r11, r21, r31, r12, r22, r32, r13, r23, r33, q_11]),
-        expr2c("compute_dq_dR_22", opt_dq_dR_22, "dq_dR_22", [r11, r21, r31, r12, r22, r32, r13, r23, r33, q_22]),
-        expr2c("compute_dq_dR_33", opt_dq_dR_33, "dq_dR_33", [r11, r21, r31, r12, r22, r32, r13, r23, r33, q_33]),
+with_stdout("dquat2mat_maxima_generated.cpp",
+        expr2c("compute_dq_dR_w", opt_dq_dR_w, "dq_dR_w", [qw, r00, r10, r20, r01, r11, r21, r02, r12, r22]),
+        expr2c("compute_dq_dR_x", opt_dq_dR_x, "dq_dR_x", [qx, r00, r10, r20, r01, r11, r21, r02, r12, r22]),
+        expr2c("compute_dq_dR_y", opt_dq_dR_y, "dq_dR_y", [qy, r00, r10, r20, r01, r11, r21, r02, r12, r22]),
+        expr2c("compute_dq_dR_z", opt_dq_dR_z, "dq_dR_z", [qz, r00, r10, r20, r01, r11, r21, r02, r12, r22]),
         expr2c("compute_dR_dq", opt_dR_dq, "dR_dq", [qx, qy, qz, qw]))$
 /* [wxMaxima: input   end   ] */
 

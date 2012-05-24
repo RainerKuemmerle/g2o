@@ -1,7 +1,8 @@
 #include "dquat2mat.h"
-
+#include <iostream>
 namespace g2o {
   namespace internal {
+    using namespace std;
 
 #include "dquat2mat_maxima_generated.cpp"
 
@@ -43,6 +44,11 @@ namespace g2o {
       double S;
       int whichCase=_q2m( S, qx,qy,qz,qw, r11 ,  r21 ,  r31 ,  r12 ,  r22 ,  r32 ,  r13 ,  r23 ,  r33 );
       S*=.25;
+      bool flip=false;
+      if (qw<0){
+	flip=true;
+	//std::cerr <<"F";
+      }
       switch(whichCase){
       case 0: compute_dq_dR_w(dq_dR, S, r11 ,  r21 ,  r31 ,  r12 ,  r22 ,  r32 ,  r13 ,  r23 ,  r33 ); 
 	break;
@@ -53,7 +59,8 @@ namespace g2o {
       case 3: compute_dq_dR_z(dq_dR, S, r11 ,  r21 ,  r31 ,  r12 ,  r22 ,  r32 ,  r13 ,  r23 ,  r33 ); 
 	break;
       }
+      if (flip)
+	dq_dR = -dq_dR;
     }
-
   }
 }
