@@ -53,6 +53,8 @@ namespace g2o {
       case 3: compute_dq_dR_z(dq_dR, S, r11 ,  r21 ,  r31 ,  r12 ,  r22 ,  r32 ,  r13 ,  r23 ,  r33 ); 
 	break;
       }
+      if (qw < 0.)
+        dq_dR *= -1;
     }
 
   }
