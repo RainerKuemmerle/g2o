@@ -1,4 +1,7 @@
 void  compute_dq_dR_w ( Eigen::Matrix<double, 3 , 9 >&  dq_dR_w , const double&  qw , const double&  r00 , const double&  r10 , const double&  r20 , const double&  r01 , const double&  r11 , const double&  r21 , const double&  r02 , const double&  r12 , const double&  r22 ) { 
+  (void) r00;
+  (void) r11;
+  (void) r22;
   double  _aux1 = 1/pow(qw,3) ; 
   double  _aux2 = -0.03125*(r21-r12)*_aux1 ; 
   double  _aux3 = 1/qw ; 
@@ -35,6 +38,11 @@ void  compute_dq_dR_w ( Eigen::Matrix<double, 3 , 9 >&  dq_dR_w , const double& 
    dq_dR_w ( 2 , 8 ) = _aux7 ; 
 } 
 void  compute_dq_dR_x ( Eigen::Matrix<double, 3 , 9 >&  dq_dR_x , const double&  qx , const double&  r00 , const double&  r10 , const double&  r20 , const double&  r01 , const double&  r11 , const double&  r21 , const double&  r02 , const double&  r12 , const double&  r22 ) { 
+  (void) r00;
+  (void) r11;
+  (void) r21;
+  (void) r12;
+  (void) r22;
   double  _aux1 = 1/qx ; 
   double  _aux2 = -0.125*_aux1 ; 
   double  _aux3 = 1/pow(qx,3) ; 
@@ -72,6 +80,11 @@ void  compute_dq_dR_x ( Eigen::Matrix<double, 3 , 9 >&  dq_dR_x , const double& 
    dq_dR_x ( 2 , 8 ) = _aux8 ; 
 } 
 void  compute_dq_dR_y ( Eigen::Matrix<double, 3 , 9 >&  dq_dR_y , const double&  qy , const double&  r00 , const double&  r10 , const double&  r20 , const double&  r01 , const double&  r11 , const double&  r21 , const double&  r02 , const double&  r12 , const double&  r22 ) { 
+  (void) r00;
+  (void) r20;
+  (void) r11;
+  (void) r02;
+  (void) r22;
   double  _aux1 = 1/pow(qy,3) ; 
   double  _aux2 = r10+r01 ; 
   double  _aux3 = 0.03125*_aux1*_aux2 ; 
@@ -109,6 +122,11 @@ void  compute_dq_dR_y ( Eigen::Matrix<double, 3 , 9 >&  dq_dR_y , const double& 
    dq_dR_y ( 2 , 8 ) = _aux8 ; 
 } 
 void  compute_dq_dR_z ( Eigen::Matrix<double, 3 , 9 >&  dq_dR_z , const double&  qz , const double&  r00 , const double&  r10 , const double&  r20 , const double&  r01 , const double&  r11 , const double&  r21 , const double&  r02 , const double&  r12 , const double&  r22 ) { 
+  (void) r00;
+  (void) r10;
+  (void) r01;
+  (void) r11;
+  (void) r22;
   double  _aux1 = 1/pow(qz,3) ; 
   double  _aux2 = r20+r02 ; 
   double  _aux3 = 0.03125*_aux1*_aux2 ; 
