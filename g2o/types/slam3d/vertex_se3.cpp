@@ -76,7 +76,7 @@ namespace g2o {
       return 0;
     WriteGnuplotAction::Parameters* params=static_cast<WriteGnuplotAction::Parameters*>(params_);
     if (!params->os){
-      std::cerr << __PRETTY_FUNCTION__ << ": warning, on valid os specified" << std::endl;
+      std::cerr << __PRETTY_FUNCTION__ << ": warning, no valid os specified" << std::endl;
       return 0;
     }
     
@@ -154,7 +154,7 @@ namespace g2o {
     }
     if (that->userData() && _cacheDrawActions )
       (*_cacheDrawActions)(that->userData(), params_);
-glPopMatrix();
+    glPopMatrix();
     return this;
   }
 #endif

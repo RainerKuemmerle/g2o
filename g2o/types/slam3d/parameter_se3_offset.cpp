@@ -55,9 +55,9 @@ namespace g2o {
     Vector7d off;
     for (int i=0; i<7; i++) {
       is >> off[i];
-      std::cerr << off[i] << " " ;
     }
-    std::cerr <<  std::endl;
+    // normalize the quaternion to recover numerical precision lost by storing as human readable text
+    Vector4d::MapType(off.data()+3).normalize();
     setOffset(internal::fromVectorQT(off));
     return is.good();
   }

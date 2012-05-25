@@ -66,6 +66,8 @@ namespace g2o {
     Vector7d meas;
     for (int i=0; i<7; i++) 
       is >> meas[i];
+    // normalize the quaternion to recover numerical precision lost by storing as human readable text
+    Vector4d::MapType(meas.data()+3).normalize();
     setMeasurement(internal::fromVectorQT(meas));
     
     if (is.bad()) {
