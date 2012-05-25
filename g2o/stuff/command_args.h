@@ -82,6 +82,8 @@ class G2O_STUFF_API CommandArgs
     void param(const std::string& name, std::string& p, const std::string& defValue, const std::string& desc);
     /** add an int vector parameter */
     void param(const std::string& name, std::vector<int>& p, const std::vector<int>& defValue, const std::string& desc);
+    /** add an vector of doubles as a parameter */
+    void param(const std::string& name, std::vector<double>& p, const std::vector<double>& defValue, const std::string& desc);
     /** add a param wich is specified as a plain argument */
     void paramLeftOver(const std::string& name, std::string& p, const std::string& defValue, const std::string& desc, bool optional = false);
 
