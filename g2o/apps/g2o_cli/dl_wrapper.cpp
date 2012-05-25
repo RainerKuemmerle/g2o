@@ -31,6 +31,7 @@
 #include <algorithm>
 
 #include "dl_wrapper.h"
+#include "g2o/stuff/macros.h"
 #include "g2o/stuff/filesys_tools.h"
 
 #if defined (UNIX) || defined(CYGWIN)
@@ -63,7 +64,7 @@ DlWrapper::~DlWrapper()
 
 int DlWrapper::openLibraries(const std::string& directory, const std::string& pattern)
 {
-  cerr << "# loading libraries from " << directory << "\t pattern: " << pattern << endl;
+  //cerr << "# loading libraries from " << directory << "\t pattern: " << pattern << endl;
   string searchPattern = directory + "/" + pattern;
   if (pattern == "")
     searchPattern = directory + "/*";
@@ -116,13 +117,13 @@ bool DlWrapper::openLibrary(const std::string& filename)
 # if defined (UNIX) || defined(CYGWIN)
   void* handle = dlopen(filename.c_str(), RTLD_LAZY);
   if (! handle) {
-    cerr << "Cannot open library: " << dlerror() << '\n';
+    cerr << __PRETTY_FUNCTION__ << " Cannot open library: " << dlerror() << '\n';
     return false;
   }
 # elif defined (WINDOWS)
   HMODULE handle = LoadLibrary(filename.c_str());
   if (! handle) {
-    cerr << "Cannot open library." << endl;
+    cerr << __PRETTY_FUNCTION__ << " Cannot open library." << endl;
     return false;
   }
 # endif
