@@ -91,7 +91,7 @@ basicstyle=\footnotesize%
 
 In this document we describe a C++ framework for performing the
 optimization of nonlinear least squares problems that can be embedded
-as a graph or in an hyper-graph. An hyper-graph is an extension of a
+as a graph or in a hyper-graph. A hyper-graph is an extension of a
 graph where an edge can connect multiple nodes and not only two.
 Several problems in robotics and in computer vision require to find
 the optimum of an error function with respect of a set of parameters.
@@ -286,7 +286,7 @@ initial guess.
 The Levenberg-Marquardt (LM) algorithm is a nonlinear variant to gauss newton that introduces 
 a damping factor and backup actions to control the convergence.
 Instead of solving directly Eq.~\ref{eq:oneLinearIteration}
-LM solved a damped version of it
+LM solves a damped version of it
 \begin{eqnarray}
        (\bH +\lambda \bI)\,\bDeltax^* &=& - \bb. 
 \label{eq:oneLinearIterationLevenberg}
@@ -566,6 +566,7 @@ documentation. To better visualize the interplay of the components of
 \centering
 \includegraphics[width=0.7\columnwidth]{pics/classes.eps}
 \caption{Class diagram of \gopt{}.}
+%% TODO update by adding OptimizationAlgorithm
 \label{fig:classes}
 \end{figure}
 
@@ -660,7 +661,7 @@ This is easily done by assigning a string tag to a new type, via the
 \verb+registerType+ function. This should be called once before
 all files are loaded.
 
-\gopt{} provides an easy macro to carry out the registration of the
+To this end, \gopt{} provides an easy macro to carry out the registration of the
 class to the factory.  See Listing~\ref{lst:inittypes} for an example,
 the full example can be found in \verb+types_slam2d.cpp+.  The first
 parameter given to the macro \verb+G2O_REGISTER_TYPE+ specifies the tag
@@ -783,7 +784,7 @@ $\lambda \bI$ term. This function is called
 \verb+setLambda(double lambda)+ and needs to be implemented by the
 specific solver.
 
-We provided a templatized implementation of the solver class, the
+We provide a templatized implementation of the solver class, the
 \verb+BlockSolver<>+ that stores the linear system in a
 \verb+SparseBlockMatrix<>+ class. The \verb+BlockSolver<>+ implements
 also the Schur complement, and relies on another abstract class, the
@@ -818,7 +819,7 @@ of c++, and to define an abstract ``drawable'' object, on which the a
 viewer operates.  This solution is a bit better, however we cannot
 have more than one ``drawing'' function for each object.
 
-The, solution used in \gopt{} consists in creating a library of
+The solution used in \gopt{} consists in creating a library of
 function objects that operate on the elements (vertices or edges) of
 the graph.  One of these function objects is identified by a function
 name and by a type on which it operates.  These function objects can
@@ -882,15 +883,15 @@ G2O_REGISTER_OPTIMIZATION_ALGORITHM(gn_pcg3_2, new PCGSolverCreator(Optimization
 //...
 \end{lstlisting}
 
-Both tools support the loading of types and solvers at run-time from
-dynamic libraries. This is realized as follows. The tools load from the
-libs folder all libraries matching ``*\_types\_*'' and ``\_solver\_*''
-to register types and optimization algorithms, respectively. We assume
-that by loading the libraries the types and the algorithms register via
-their respective constructors to the system. Listing~\ref{lst:inittypes}
-shows how to register types to the system and
-Listing~\ref{lst:initsolvers} is an example, which shows how to register
-an optimization algorithm via the plug-in architecture.
+Both tools support the loading of types and optimization algorithms at
+run-time from dynamic libraries. This is realized as follows. The tools
+load from the libs folder all libraries matching ``*\_types\_*'' and
+``\_solver\_*'' to register types and optimization algorithms,
+respectively. We assume that by loading the libraries the types and the
+algorithms register via their respective constructors to the system.
+Listing~\ref{lst:inittypes} shows how to register types to the system
+and Listing~\ref{lst:initsolvers} is an example, which shows how to
+register an optimization algorithm via the plug-in architecture.
 
 For loading dynamic library containing types or optimization algorithms, we support two
 different methods:
@@ -904,7 +905,7 @@ different methods:
 \end{itemize}
 
 \section{2D SLAM: An Example}
-SLAM is a well known problem in robotics, and this acronym stands for
+SLAM is a well known problem in robotics and this acronym stands for
 ``Simultaneous Localization And Mapping''. The problem can be stated
 as follows: given a moving robot equipped with some sensors, we want
 to estimate both the map and the pose of the robot in the environment
@@ -936,13 +937,13 @@ the scope of this document.  However, in the reminder we will present a
 simplified but meaningful version of the problem that contains all the relevant elements
 and that is well suited to be implemented with \gopt.
 
-The scenario is of a robot moving on a plane. The robot is equipped
+The scenario is a robot moving on a plane. The robot is equipped
 with an odometry sensor that is able to measure the relative movement
-of the robot between two time frames, and of a ``landmark'' sensor,
+of the robot between two time frames and of a ``landmark'' sensor
 that is able to measure the position of some environment landmarks
-nearby the robot, \emph{in the robot reference frame}. One could
+nearby the robot \emph{in the robot reference frame}. One could
 implement this landmark detector, for instance, by extracting corners
-from a laser scan, or by detecting the position of relevant features
+from a laser scan or by detecting the position of relevant features
 from a stereo image pair. A simplification that we make in this
 section is that the landmarks are uniquely identifiable. In other
 words whenever the robot sees a landmark, it can tell if it is a new
