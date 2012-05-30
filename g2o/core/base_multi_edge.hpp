@@ -47,6 +47,7 @@ void BaseMultiEdge<D, E>::constructQuadraticForm()
 
       MatrixXd AtO = A.transpose() * omega;
       int fromDim = from->dimension();
+      assert(fromDim >= 0);
       Map<MatrixXd> fromMap(from->hessianData(), fromDim, fromDim);
       Map<VectorXd> fromB(from->bData(), fromDim);
 
@@ -95,6 +96,7 @@ void BaseMultiEdge<D, E>::linearizeOplus(JacobianWorkspace& jacobianWorkspace)
 {
   for (size_t i = 0; i < _vertices.size(); ++i) {
     OptimizableGraph::Vertex* v = static_cast<OptimizableGraph::Vertex*>(_vertices[i]);
+    assert(v->dimension() >= 0);
     new (&_jacobianOplus[i]) JacobianType(jacobianWorkspace.workspaceForVertex(i), D, v->dimension());
   }
   linearizeOplus();
@@ -123,12 +125,14 @@ void BaseMultiEdge<D, E>::linearizeOplus()
       continue;
 
     const int vi_dim = vi->dimension();
+    assert(vi_dim >= 0);
 #ifdef _MSC_VER
     double* add_vi = new double[vi_dim];
 #else
     double add_vi[vi_dim];
 #endif
     std::fill(add_vi, add_vi + vi_dim, 0.0);
+    assert(_dimension >= 0);
     assert(_jacobianOplus[i].rows() == _dimension && _jacobianOplus[i].cols() == vi_dim && "jacobian cache dimension does not match");
       _jacobianOplus[i].resize(_dimension, vi_dim);
     // add small step along the unit vector in each dimension
@@ -169,8 +173,10 @@ void BaseMultiEdge<D, E>::mapHessianMemory(double* d, int i, int j, bool rowMajo
 {
   int idx = computeUpperTriangleIndex(i, j);
   assert(idx < (int)_hessian.size());
-  OptimizableGraph::Vertex* vi = static_cast<OptimizableGraph::Vertex*>(_vertices[i]);
-  OptimizableGraph::Vertex* vj = static_cast<OptimizableGraph::Vertex*>(_vertices[j]);
+  OptimizableGraph::Vertex* vi = static_cast<OptimizableGraph::Vertex*>(HyperGraph::Edge::vertex(i));
+  OptimizableGraph::Vertex* vj = static_cast<OptimizableGraph::Vertex*>(HyperGraph::Edge::vertex(j));
+  assert(vi->dimension() >= 0);
+  assert(vj->dimension() >= 0);
   HessianHelper& h = _hessian[idx];
   if (rowMajor) {
     if (h.matrix.data() != d || h.transposed != rowMajor)
