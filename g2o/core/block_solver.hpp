@@ -31,6 +31,7 @@
 
 #include "g2o/stuff/timeutil.h"
 #include "g2o/stuff/macros.h"
+#include "g2o/stuff/misc.h"
 
 namespace g2o {
   using namespace std;
@@ -537,13 +538,10 @@ bool BlockSolver<Traits>::buildSystem()
 #  ifndef NDEBUG
     for (size_t i = 0; i < e->vertices().size(); ++i) {
       OptimizableGraph::Vertex* v = static_cast<OptimizableGraph::Vertex*>(e->vertex(i));
-      int jacSize = e->dimension() * v->dimension();
-      double* jacobian = jacobianWorkspace.workspaceForVertex(i);
-      for (int j = 0; j < jacSize; ++j) {
-        if (g2o_isnan(jacobian[j])) {
-          cerr << "buildSystem(): NaN within Jacobian for edge " << e << endl;
-          break;
-        }
+      bool hasANan = arrayHasNaN(jacobianWorkspace.workspaceForVertex(i), e->dimension() * v->dimension());
+      if (hasANan) {
+        cerr << "buildSystem(): NaN within Jacobian for edge " << e << endl;
+        break;
       }
     }
 #  endif
