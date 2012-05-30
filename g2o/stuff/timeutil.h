@@ -97,6 +97,16 @@ inline double get_time()
 }
 
 /**
+ * return a monotonic increasing time which basically does not need to
+ * have a reference point. Consider this for measuring how long some
+ * code fragments required to execute.
+ *
+ * On Linux we call clock_gettime() on other systems we currently
+ * call get_time().
+ */
+double get_monotonic_time();
+
+/**
  * \brief Class to measure the time spent in a scope
  *
  * To use this class, e.g. to measure the time spent in a function,

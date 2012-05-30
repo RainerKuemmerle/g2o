@@ -83,7 +83,7 @@ class LinearSolverCholmodOnline : public LinearSolver<MatrixType>, public Linear
 
       computeSymbolicDecomposition(A);
       assert(_cholmodFactor && "Symbolic cholesky failed");
-      double t=get_time();
+      double t=get_monotonic_time();
 
       // setting up b for calling cholmod
       cholmod_dense bcholmod;
@@ -105,7 +105,7 @@ class LinearSolverCholmodOnline : public LinearSolver<MatrixType>, public Linear
       cholmod_free_dense(&xcholmod, &_cholmodCommon);
 
       if (globalStats){
-        globalStats->timeNumericDecomposition = get_time() - t;
+        globalStats->timeNumericDecomposition = get_monotonic_time() - t;
         globalStats->choleskyNNZ = _cholmodCommon.method[0].lnz;
       }
 
@@ -156,7 +156,7 @@ class LinearSolverCholmodOnline : public LinearSolver<MatrixType>, public Linear
   public:
     void computeSymbolicDecomposition(const SparseBlockMatrix<MatrixType>& A)
     {
-      double t = get_time();
+      double t = get_monotonic_time();
 
       A.fillBlockStructure(_matrixStructure);
 
@@ -193,7 +193,7 @@ class LinearSolverCholmodOnline : public LinearSolver<MatrixType>, public Linear
       _cholmodFactor = cholmod_analyze_p(_cholmodSparse, _scalarPermutation.data(), NULL, 0, &_cholmodCommon);
 
       if (globalStats)
-        globalStats->timeSymbolicDecomposition = get_time() - t;
+        globalStats->timeSymbolicDecomposition = get_monotonic_time() - t;
 
     }
 

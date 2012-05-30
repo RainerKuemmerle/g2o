@@ -353,7 +353,7 @@ namespace g2o{
         cstat.numVertices = _activeVertices.size();
       }
       
-      double ts = get_time();
+      double ts = get_monotonic_time();
       result = _algorithm->solve(i, online);
       ok = ( result == OptimizationAlgorithm::OK );
 
@@ -362,11 +362,11 @@ namespace g2o{
         computeActiveErrors();
         errorComputed = true;
         _batchStatistics[i].chi2 = activeChi2();
-        _batchStatistics[i].timeIteration = get_time()-ts;
+        _batchStatistics[i].timeIteration = get_monotonic_time()-ts;
       }
 
       if (verbose()){
-        double dts = get_time()-ts;
+        double dts = get_monotonic_time()-ts;
         cumTime += dts;
         if (! errorComputed)
           computeActiveErrors();
