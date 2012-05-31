@@ -565,8 +565,8 @@ namespace g2o {
      * adds a new vertex. The new vertex is then "taken".
      * @return false if a vertex with the same id as v is already in the graph, true otherwise.
      */
-    virtual bool addVertex(OptimizableGraph::Vertex* v, Data* userData);
-    virtual bool addVertex(OptimizableGraph::Vertex* v) { return addVertex(v, 0);}
+    virtual bool addVertex(HyperGraph::Vertex* v, Data* userData);
+    virtual bool addVertex(HyperGraph::Vertex* v) { return addVertex(v, 0);}
 
     /**
      * adds a new edge.

@@ -230,7 +230,7 @@ namespace g2o {
     clear();
   }
 
-  bool OptimizableGraph::addVertex(Vertex* v, Data* userData)
+  bool OptimizableGraph::addVertex(HyperGraph::Vertex* v, Data* userData)
   {
     Vertex* inserted = vertex(v->id());
     if (inserted) {
@@ -254,6 +254,7 @@ namespace g2o {
   bool OptimizableGraph::addEdge(HyperGraph::Edge* e_)
   {
     OptimizableGraph::Edge* e = dynamic_cast<OptimizableGraph::Edge*>(e_);
+    assert(e && "Edge does not inherit from OptimizableGraph::Edge");
     if (! e)
       return false;
     bool eresult = HyperGraph::addEdge(e);
