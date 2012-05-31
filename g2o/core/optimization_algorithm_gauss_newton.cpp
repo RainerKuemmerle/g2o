@@ -60,27 +60,28 @@ namespace g2o {
       }
     }
 
-    double t=get_time();
+    double t=get_monotonic_time();
     _optimizer->computeActiveErrors();
     if (globalStats) {
-      globalStats->timeResiduals = get_time()-t;
-      t=get_time();
+      globalStats->timeResiduals = get_monotonic_time()-t;
+      t=get_monotonic_time();
     }
 
     _solver->buildSystem();
     if (globalStats) {
-      globalStats->timeQuadraticForm = get_time()-t;
+      globalStats->timeQuadraticForm = get_monotonic_time()-t;
+      t=get_monotonic_time();
     }
 
-    t=get_time();
     ok = _solver->solve();
-    if (globalStats)
-      globalStats->timeLinearSolution = get_time()-t;
+    if (globalStats) {
+      globalStats->timeLinearSolution = get_monotonic_time()-t;
+      t=get_monotonic_time();
+    }
 
-    t=get_time();
     _optimizer->update(_solver->x());
     if (globalStats) {
-      globalStats->timeUpdate = get_time()-t;
+      globalStats->timeUpdate = get_monotonic_time()-t;
     }
     if (ok)
       return OK;

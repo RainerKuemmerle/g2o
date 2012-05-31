@@ -536,9 +536,9 @@ int main(int argc, char** argv)
       if (optimize){
         //cerr << "Optimize" << endl;
         if (vertexCount - lastOptimizedVertexCount >= updateGraphEachN) {
-          double ts = get_time();
+          double ts = get_monotonic_time();
           int currentIt=optimizer.optimize(incIterations);
-          double dts = get_time() - ts;
+          double dts = get_monotonic_time() - ts;
           cumTime += dts;
           //optimizer->setOptimizationTime(cumTime);
           if (verbose) {

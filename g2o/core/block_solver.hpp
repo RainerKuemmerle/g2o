@@ -31,6 +31,7 @@
 
 #include "g2o/stuff/timeutil.h"
 #include "g2o/stuff/macros.h"
+#include "g2o/stuff/misc.h"
 
 namespace g2o {
   using namespace std;
@@ -330,10 +331,10 @@ template <typename Traits>
 bool BlockSolver<Traits>::solve(){
   //cerr << __PRETTY_FUNCTION__ << endl;
   if (! _doSchur){
-    double t=get_time();
+    double t=get_monotonic_time();
     bool ok = _linearSolver->solve(*_Hpp, _x, _b);
     if (globalStats) {
-      globalStats->timeLinearSolver = get_time() - t;
+      globalStats->timeLinearSolver = get_monotonic_time() - t;
       globalStats->hessianDimension = globalStats->hessianPoseDimension = _Hpp->cols();
     }
     return ok;
@@ -342,7 +343,7 @@ bool BlockSolver<Traits>::solve(){
   // schur thing
 
   // backup the coefficient matrix
-  double t=get_time();
+  double t=get_monotonic_time();
   _Hschur->clear();
   _Hpp->add(_Hschur);
   _DInvSchur->clear();
@@ -436,7 +437,7 @@ bool BlockSolver<Traits>::solve(){
 #     endif
     }
   }
-  //cerr << "Solve [marginalize] = " <<  get_time()-t << endl;
+  //cerr << "Solve [marginalize] = " <<  get_monotonic_time()-t << endl;
 
   // _bschur = _b for calling solver, and not touching _b
   memcpy(_bschur, _b, _xSize * sizeof(double));
@@ -445,18 +446,18 @@ bool BlockSolver<Traits>::solve(){
   }
 
   if (globalStats){
-    globalStats->timeSchurrComplement = get_time() - t;
+    globalStats->timeSchurrComplement = get_monotonic_time() - t;
   }
 
-  t=get_time();
+  t=get_monotonic_time();
   bool solvedPoses = _linearSolver->solve(*_Hschur, _x, _bschur);
   if (globalStats) {
-    globalStats->timeLinearSolver = get_time() - t;
+    globalStats->timeLinearSolver = get_monotonic_time() - t;
     globalStats->hessianPoseDimension = _Hpp->cols();
     globalStats->hessianLandmarkDimension = _Hll->cols();
     globalStats->hessianDimension = globalStats->hessianPoseDimension + globalStats->hessianLandmarkDimension;
   }
-  //cerr << "Solve [decompose and solve] = " <<  get_time()-t << endl;
+  //cerr << "Solve [decompose and solve] = " <<  get_monotonic_time()-t << endl;
 
   if (! solvedPoses)
     return false;
@@ -485,7 +486,7 @@ bool BlockSolver<Traits>::solve(){
   memset(xl,0, _sizeLandmarks*sizeof(double));
   //_DInvSchur->multiply(xl,cl);
   _DInvSchur->rightMultiply(xl,cl);
-  //cerr << "Solve [landmark delta] = " <<  get_time()-t << endl;
+  //cerr << "Solve [landmark delta] = " <<  get_monotonic_time()-t << endl;
 
   return true;
 }
@@ -494,10 +495,10 @@ bool BlockSolver<Traits>::solve(){
 template <typename Traits>
 bool BlockSolver<Traits>::computeMarginals(SparseBlockMatrix<MatrixXd>& spinv, const std::vector<std::pair<int, int> >& blockIndices)
 {
-  double t = get_time();
+  double t = get_monotonic_time();
   bool ok = _linearSolver->solvePattern(spinv, blockIndices, *_Hpp);
   if (globalStats) {
-    globalStats->timeMarginals = get_time() - t;
+    globalStats->timeMarginals = get_monotonic_time() - t;
   }
   return ok;
 }
@@ -537,13 +538,10 @@ bool BlockSolver<Traits>::buildSystem()
 #  ifndef NDEBUG
     for (size_t i = 0; i < e->vertices().size(); ++i) {
       OptimizableGraph::Vertex* v = static_cast<OptimizableGraph::Vertex*>(e->vertex(i));
-      int jacSize = e->dimension() * v->dimension();
-      double* jacobian = jacobianWorkspace.workspaceForVertex(i);
-      for (int j = 0; j < jacSize; ++j) {
-        if (g2o_isnan(jacobian[j])) {
-          cerr << "buildSystem(): NaN within Jacobian for edge " << e << " in vertex " << i << endl;
-          break;
-        }
+      bool hasANan = arrayHasNaN(jacobianWorkspace.workspaceForVertex(i), e->dimension() * v->dimension());
+      if (hasANan) {
+        cerr << "buildSystem(): NaN within Jacobian for edge " << e << " for vertex " << i << endl;
+        break;
       }
     }
 #  endif

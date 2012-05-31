@@ -248,13 +248,15 @@ namespace g2o {
     if (userData)
       ov->setUserData(userData);
     ov->_graph=this;
-    HyperGraph::addVertex(v);
-    return true;
+    return HyperGraph::addVertex(v);
   }
 
-  bool OptimizableGraph::addEdge(OptimizableGraph::Edge* e)
+  bool OptimizableGraph::addEdge(HyperGraph::Edge* e_)
   {
-    OptimizableGraph::Edge* eresult = dynamic_cast<OptimizableGraph::Edge*>(HyperGraph::addEdge(e));
+    OptimizableGraph::Edge* e = dynamic_cast<OptimizableGraph::Edge*>(e_);
+    if (! e)
+      return false;
+    bool eresult = HyperGraph::addEdge(e);
     if (! eresult)
       return false;
     e->_internalId = _nextEdgeId++;

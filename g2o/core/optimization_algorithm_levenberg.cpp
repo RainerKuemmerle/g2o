@@ -66,11 +66,11 @@ namespace g2o {
       }
     }
 
-    double t=get_time();
+    double t=get_monotonic_time();
     _optimizer->computeActiveErrors();
     if (globalStats) {
-      globalStats->timeResiduals = get_time()-t;
-      t=get_time();
+      globalStats->timeResiduals = get_monotonic_time()-t;
+      t=get_monotonic_time();
     }
 
     double currentChi = _optimizer->activeChi2();
@@ -78,7 +78,7 @@ namespace g2o {
 
     _solver->buildSystem();
     if (globalStats) {
-      globalStats->timeQuadraticForm = get_time()-t;
+      globalStats->timeQuadraticForm = get_monotonic_time()-t;
     }
 
     // core part of the Levenbarg algorithm
@@ -92,18 +92,18 @@ namespace g2o {
       _optimizer->push();
       if (globalStats) {
         globalStats->levenbergIterations++;
-        t=get_time();
+        t=get_monotonic_time();
       }
       // update the diagonal of the system matrix
       _solver->setLambda(_currentLambda);
       bool ok2 = _solver->solve();
       if (globalStats) {
-        globalStats->timeLinearSolution+=get_time()-t;
-        t=get_time();
+        globalStats->timeLinearSolution+=get_monotonic_time()-t;
+        t=get_monotonic_time();
       }
       _optimizer->update(_solver->x());
       if (globalStats) {
-        globalStats->timeUpdate = get_time()-t;
+        globalStats->timeUpdate = get_monotonic_time()-t;
       }
 
       // restore the diagonal

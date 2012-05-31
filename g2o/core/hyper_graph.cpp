@@ -73,25 +73,25 @@ namespace g2o {
     return it->second;
   }
 
-  HyperGraph::Vertex* HyperGraph::addVertex(Vertex* v)
+  bool HyperGraph::addVertex(Vertex* v)
   {
     Vertex* vn=vertex(v->id());
     if (vn)
-      return 0;
+      return false;
     _vertices.insert( std::make_pair(v->id(),v) );
-    return v;
+    return true;
   }
 
-  HyperGraph::Edge* HyperGraph::addEdge(Edge* e)
+  bool HyperGraph::addEdge(Edge* e)
   {
     std::pair<EdgeSet::iterator, bool> result = _edges.insert(e);
     if (! result.second)
-      return 0;
+      return false;
     for (std::vector<Vertex*>::iterator it = e->vertices().begin(); it != e->vertices().end(); ++it) {
       Vertex* v = *it;
       v->edges().insert(e);
     }
-    return e;
+    return true;
   }
 
   bool HyperGraph::removeVertex(Vertex* v)

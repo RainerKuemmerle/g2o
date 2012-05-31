@@ -565,14 +565,15 @@ namespace g2o {
      * adds a new vertex. The new vertex is then "taken".
      * @return false if a vertex with the same id as v is already in the graph, true otherwise.
      */
-    virtual bool addVertex(OptimizableGraph::Vertex* v, Data* userData=0);
+    virtual bool addVertex(OptimizableGraph::Vertex* v, Data* userData);
+    virtual bool addVertex(OptimizableGraph::Vertex* v) { return addVertex(v, 0);}
 
     /**
      * adds a new edge.
      * The edge should point to the vertices that it is connecting (setFrom/setTo).
      * @return false if the insertion does not work (incompatible types of the vertices/missing vertex). true otherwise.
      */
-    virtual bool addEdge(OptimizableGraph::Edge* e);
+    virtual bool addEdge(HyperGraph::Edge* e);
 
     //! returns the chi2 of the current configuration
     double chi2() const;

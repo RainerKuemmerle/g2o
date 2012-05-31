@@ -39,6 +39,7 @@
 #include "hyper_graph_action.h"
 #include "g2o/stuff/timeutil.h"
 #include "g2o/stuff/macros.h"
+#include "g2o/stuff/misc.h"
 #include "g2o/config.h"
 
 namespace g2o{
@@ -79,12 +80,9 @@ namespace g2o{
 #  ifndef NDEBUG
     for (int k = 0; k < static_cast<int>(_activeEdges.size()); ++k) {
       OptimizableGraph::Edge* e = _activeEdges[k];
-      double* errorData = e->errorData();
-      int dim = e->dimension();
-      for (int i = 0; i < dim; ++i) {
-        if (g2o_isnan(errorData[i])) {
-          cerr << "computeActiveErrors(): found NaN in error for edge " << e << endl;
-        }
+      bool hasNan = arrayHasNaN(e->errorData(), e->dimension());
+      if (hasNan) {
+        cerr << "computeActiveErrors(): found NaN in error for edge " << e << endl;
       }
     }
 #  endif
@@ -229,9 +227,10 @@ namespace g2o{
         if (estimateDim > 0) {
           Eigen::VectorXd estimateData(estimateDim);
           if (v->getEstimateData(estimateData.data()) == true) {
-            for (int k = 0; k < estimateDim; ++k)
-              if (g2o_isnan(estimateData[k]))
-                cerr << __PRETTY_FUNCTION__ << ": Vertex " << v->id() << " contains a nan entry at index " << k << endl;
+            int k;
+            bool hasNan = arrayHasNaN(estimateData.data(), estimateDim, &k);
+            if (hasNan)
+              cerr << __PRETTY_FUNCTION__ << ": Vertex " << v->id() << " contains a nan entry at index " << k << endl;
           }
         }
 #      endif
@@ -353,7 +352,7 @@ namespace g2o{
         cstat.numVertices = _activeVertices.size();
       }
       
-      double ts = get_time();
+      double ts = get_monotonic_time();
       result = _algorithm->solve(i, online);
       ok = ( result == OptimizationAlgorithm::OK );
 
@@ -362,11 +361,11 @@ namespace g2o{
         computeActiveErrors();
         errorComputed = true;
         _batchStatistics[i].chi2 = activeChi2();
-        _batchStatistics[i].timeIteration = get_time()-ts;
+        _batchStatistics[i].timeIteration = get_monotonic_time()-ts;
       }
 
       if (verbose()){
-        double dts = get_time()-ts;
+        double dts = get_monotonic_time()-ts;
         cumTime += dts;
         if (! errorComputed)
           computeActiveErrors();
@@ -389,16 +388,13 @@ namespace g2o{
 
   void SparseOptimizer::update(const double* update)
   {
-#ifndef NDEBUG
-    size_t nan_idx = 0;
-#endif
     // update the graph by calling oplus on the vertices
     for (size_t i=0; i < _ivMap.size(); ++i) {
       OptimizableGraph::Vertex* v= _ivMap[i];
 #ifndef NDEBUG
-      for (int k = 0; k < v->dimension(); ++k, ++nan_idx)
-        if (g2o_isnan(update[k]))
-          cerr << __PRETTY_FUNCTION__ << ": Update contains a nan at " << nan_idx << endl;
+      bool hasNan = arrayHasNaN(update, v->dimension());
+      if (hasNan)
+        cerr << __PRETTY_FUNCTION__ << ": Update contains a nan for vertex " << v->id() << endl;
 #endif
       v->oplus(update);
       update += v->dimension();

@@ -450,9 +450,9 @@ int main(int argc, char** argv)
           }
           verticesAdded.clear();
           edgesAdded.clear();
-          double ts = get_time();
+          double ts = get_monotonic_time();
           int currentIt=optimizer.optimize(incIterations, !firstRound);
-          double dts = get_time() - ts;
+          double dts = get_monotonic_time() - ts;
           cumTime += dts;
           firstRound = false;
           //optimizer->setOptimizationTime(cumTime);
@@ -480,9 +480,9 @@ int main(int argc, char** argv)
     } // for all edges
 
     if (! freshlyOptimized) {
-      double ts = get_time();
+      double ts = get_monotonic_time();
       int currentIt=optimizer.optimize(incIterations, !firstRound);
-      double dts = get_time() - ts;
+      double dts = get_monotonic_time() - ts;
       cumTime += dts;
       //optimizer->setOptimizationTime(cumTime);
       if (verbose) {

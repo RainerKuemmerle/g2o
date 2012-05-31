@@ -32,6 +32,10 @@
 #include <windows.h>
 #endif
 
+#ifdef UNIX
+#include <unistd.h>
+#endif
+
 namespace g2o {
 
 #ifdef _WINDOWS
@@ -104,6 +108,17 @@ ScopeTime::ScopeTime(const char* title) : _title(title), _startTime(get_time()) 
 
 ScopeTime::~ScopeTime() {
   std::cerr << _title<<" took "<<1000*(get_time()-_startTime)<<"ms.\n";
+}
+
+double get_monotonic_time()
+{
+#if (defined(_POSIX_TIMERS) && (_POSIX_TIMERS+0 >= 0))
+  struct timespec ts;
+  clock_gettime(CLOCK_MONOTONIC, &ts);
+  return ts.tv_sec + ts.tv_nsec*1e-9;
+#else
+  return get_time();
+#endif
 }
 
 } // end namespace

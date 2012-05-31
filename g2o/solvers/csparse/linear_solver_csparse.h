@@ -119,7 +119,7 @@ class LinearSolverCSparse : public LinearSolver<MatrixType>
         _csIntWorkspace = new int[2*_csWorkspaceSize];
       }
 
-      double t=get_time();
+      double t=get_monotonic_time();
       // _x = _b for calling csparse
       if (x != b)
         memcpy(x, b, _ccsA->n * sizeof(double));
@@ -133,7 +133,7 @@ class LinearSolverCSparse : public LinearSolver<MatrixType>
       }
 
       if (globalStats){
-        globalStats->timeNumericDecomposition = get_time() - t;
+        globalStats->timeNumericDecomposition = get_monotonic_time() - t;
         globalStats->choleskyNNZ = static_cast<size_t>(_symbolicDecomposition->lnz);
       }
 
@@ -242,7 +242,7 @@ class LinearSolverCSparse : public LinearSolver<MatrixType>
 
     void computeSymbolicDecomposition(const SparseBlockMatrix<MatrixType>& A)
     {
-      double t=get_time();
+      double t=get_monotonic_time();
       if (! _blockOrdering) {
         _symbolicDecomposition = cs_schol (1, _ccsA) ;
       } else {
@@ -296,7 +296,7 @@ class LinearSolverCSparse : public LinearSolver<MatrixType>
 
       }
       if (globalStats){
-        globalStats->timeSymbolicDecomposition = get_time() - t;
+        globalStats->timeSymbolicDecomposition = get_monotonic_time() - t;
       }
 
       /* std::cerr << "# Number of nonzeros in L: " << (int)_symbolicDecomposition->lnz << " by " */

@@ -27,6 +27,7 @@
 #ifndef G2O_STUFF_MISC_H
 #define G2O_STUFF_MISC_H
 
+#include "macros.h"
 #include <cmath>
 
 #ifndef M_PI
@@ -168,6 +169,20 @@ inline T wrap(T l, T x, T u)
   while (x > u)
     x -= intervalWidth;
   return x;
+}
+
+/**
+ * tests whether there is a NaN in the array
+ */
+inline bool arrayHasNaN(const double* array, int size, int* nanIndex = 0)
+{
+  for (int i = 0; i < size; ++i)
+    if (g2o_isnan(array[i])) {
+      if (nanIndex)
+        *nanIndex = i;
+      return true;
+    }
+  return false;
 }
 
 /**
