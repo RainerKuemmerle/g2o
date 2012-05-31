@@ -70,14 +70,15 @@ namespace g2o {
     _solver->buildSystem();
     if (globalStats) {
       globalStats->timeQuadraticForm = get_monotonic_time()-t;
+      t=get_monotonic_time();
     }
 
-    t=get_monotonic_time();
     ok = _solver->solve();
-    if (globalStats)
+    if (globalStats) {
       globalStats->timeLinearSolution = get_monotonic_time()-t;
+      t=get_monotonic_time();
+    }
 
-    t=get_monotonic_time();
     _optimizer->update(_solver->x());
     if (globalStats) {
       globalStats->timeUpdate = get_monotonic_time()-t;

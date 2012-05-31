@@ -187,12 +187,15 @@ namespace g2o {
        * adds a vertex to the graph. The id of the vertex should be set before
        * invoking this function. the function fails if another vertex
        * with the same id is already in the graph.
-       * returns a poiner to the vertex, on success, or 0 on failure.
+       * returns true, on success, or false on failure.
        */
-      Vertex* addVertex(Vertex* v);
+      virtual bool addVertex(Vertex* v);
 
-      //! adds an edge  to the graph. If the edge is already in the graph, it does nothing and returns 0. otherwise it returns <i>e</i>.
-      Edge* addEdge(Edge* e);
+      /**
+       * Adds an edge  to the graph. If the edge is already in the graph, it
+       * does nothing and returns false. Otherwise it returns true.
+       */
+      virtual bool addEdge(Edge* e);
 
     protected:
       VertexIDMap _vertices;
