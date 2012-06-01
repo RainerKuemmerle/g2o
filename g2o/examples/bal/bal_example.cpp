@@ -30,15 +30,21 @@
 #include <iostream>
 
 #include "g2o/stuff/command_args.h"
+#include "g2o/core/batch_stats.h"
 #include "g2o/core/sparse_optimizer.h"
 #include "g2o/core/block_solver.h"
 #include "g2o/core/solver.h"
 #include "g2o/core/optimization_algorithm_levenberg.h"
 #include "g2o/core/base_vertex.h"
 #include "g2o/core/base_binary_edge.h"
-#include "g2o/solvers/csparse/linear_solver_csparse.h"
 #include "g2o/solvers/dense/linear_solver_dense.h"
 #include "g2o/solvers/structure_only/structure_only_solver.h"
+
+#if defined G2O_HAVE_CHOLMOD
+#include "g2o/solvers/cholmod/linear_solver_cholmod.h"
+#elif defined G2O_HAVE_CSPARSE
+#include "g2o/solvers/csparse/linear_solver_csparse.h"
+#endif
 
 using namespace g2o;
 using namespace std;
@@ -174,16 +180,23 @@ int main(int argc, char** argv)
   int maxIterations;
   bool verbose;
   string inputFilename;
-  std::vector<int> gaugeList;
+  string statsFilename;
   CommandArgs arg;
   arg.param("i", maxIterations, 5, "perform n iterations");
   arg.param("v", verbose, false, "verbose output of the optimization process");
+  arg.param("stats", statsFilename, "", "specify a file for the statistics");
   arg.paramLeftOver("graph-input", inputFilename, "", "file which will be processed");
 
   arg.parseArgs(argc, argv);
 
   typedef g2o::BlockSolver< g2o::BlockSolverTraits<9, 3> >  BalBlockSolver;
+#ifdef G2O_HAVE_CHOLMOD
+  typedef g2o::LinearSolverCholmod<BalBlockSolver::PoseMatrixType> BalLinearSolver;
+#elif defined G2O_HAVE_CSPARSE
   typedef g2o::LinearSolverCSparse<BalBlockSolver::PoseMatrixType> BalLinearSolver;
+#else
+#error neither CSparse nor Cholmod are available
+#endif
 
   g2o::SparseOptimizer optimizer;
   optimizer.setVerbose(false);
@@ -193,6 +206,9 @@ int main(int argc, char** argv)
   g2o::OptimizationAlgorithmLevenberg* solver = new g2o::OptimizationAlgorithmLevenberg(solver_ptr);
   solver->setUserLambdaInit(1);
   optimizer.setAlgorithm(solver);
+  if (statsFilename.size() > 0){
+    optimizer.setComputeBatchStatistics(true);
+  }
 
   vector<VertexPointBAL*> points;
   vector<VertexCameraBAL*> cameras;
@@ -272,6 +288,15 @@ int main(int argc, char** argv)
   optimizer.initializeOptimization();
   optimizer.setVerbose(verbose);
   optimizer.optimize(maxIterations);
+
+  if (statsFilename!=""){
+    cerr << "writing stats to file \"" << statsFilename << "\" ... ";
+    ofstream fout(statsFilename.c_str());
+    const BatchStatisticsContainer& bsc = optimizer.batchStatistics();
+    for (size_t i=0; i<bsc.size(); i++)
+      fout << bsc[i] << endl;
+    cerr << "done." << endl;
+  }
 
   // dump the points
   ofstream fout("points.wrl"); // loadable with meshlab
