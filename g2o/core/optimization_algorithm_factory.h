@@ -55,6 +55,7 @@ namespace g2o {
   {
     public:
       AbstractOptimizationAlgorithmCreator(const OptimizationAlgorithmProperty& p);
+      virtual ~AbstractOptimizationAlgorithmCreator() { }
       //! allocate a solver operating on optimizer, re-implement for your creator
       virtual OptimizationAlgorithm* construct() = 0;
       //! return the properties of the solver
