@@ -40,6 +40,8 @@
 #include "g2o/solvers/dense/linear_solver_dense.h"
 #include "g2o/solvers/structure_only/structure_only_solver.h"
 
+#include "EXTERNAL/ceres/autodiff.h"
+
 #if defined G2O_HAVE_CHOLMOD
 #include "g2o/solvers/cholmod/linear_solver_cholmod.h"
 #elif defined G2O_HAVE_CSPARSE
@@ -152,7 +154,7 @@ class VertexPointBAL : public BaseVertex<3, Eigen::Vector3d>
 class EdgeObservationBAL : public BaseBinaryEdge<2, Vector2d, VertexCameraBAL, VertexPointBAL>
 {
   public:
-    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
     EdgeObservationBAL()
     {
     }
@@ -167,47 +169,84 @@ class EdgeObservationBAL : public BaseBinaryEdge<2, Vector2d, VertexCameraBAL, V
       return false;
     }
 
+    /**
+     * templatized function to compute the error as described in the comment above
+     */
+    template<typename T>
+    bool operator()(const T* camera, const T* pointArray, T* error) const
+    {
+      typedef Eigen::Matrix<T, 3, 1>    PointType;
+
+      // conversion from world to camera coordinates
+      typename PointType::ConstMapType angleAxisVector(camera, 3);
+
+      // Rodrigues' formula for the rotation
+      typename PointType::ConstMapType point(pointArray);
+      PointType p;
+      T theta = angleAxisVector.norm();
+      if (theta > T(0)) {
+        PointType v = angleAxisVector / theta;
+        T cth = cos(theta);
+        T sth = sin(theta);
+        p = point * cth + v.cross(point) * sth + v * v.dot(point) * (T(1) - cth);
+      } else {
+        // taylor expansion for theta close to zero
+        p = point + angleAxisVector.cross(point);
+      }
+
+      // translation of the camera
+      typename PointType::ConstMapType translation(camera+3, 3);
+      p += translation;
+
+      // perspective division
+      T projectedPoint[2];
+      projectedPoint[0] = - p[0] / p[2];
+      projectedPoint[1] = - p[1] / p[2];
+
+      // conversion to pixel coordinates
+      T radiusSqr = projectedPoint[0]*projectedPoint[0] + projectedPoint[1]*projectedPoint[1];
+      T f         = T(camera[6]);
+      T k1        = T(camera[7]);
+      T k2        = T(camera[8]);
+      T r_p       = 1. + k1 * radiusSqr + k2 * radiusSqr * radiusSqr;
+      T prediction[2];
+      prediction[0] = f * r_p * projectedPoint[0];
+      prediction[1] = f * r_p * projectedPoint[1];
+
+      error[0] = prediction[0] - T(measurement()(0));
+      error[1] = prediction[1] - T(measurement()(1));
+
+      return true;
+    }
+
     void computeError()
     {
       const VertexCameraBAL* cam = static_cast<const VertexCameraBAL*>(vertex(0));
       const VertexPointBAL* point = static_cast<const VertexPointBAL*>(vertex(1));
 
-      // conversion from world to camera coordinates
-      Eigen::Vector3d::ConstMapType angleAxisVector(cam->estimate().data(), 3);
+      (*this)(cam->estimate().data(), point->estimate().data(), _error.data());
+    }
 
-      // Rodrigues' formula for the rotation
-      Eigen::Vector3d p; 
-      double theta = angleAxisVector.norm();
-      if (theta > 0.) {
-        Eigen::Vector3d v = angleAxisVector / theta;
-        double cth = cos(theta);
-        double sth = sin(theta);
-        p = point->estimate() * cth + v.cross(point->estimate()) * sth + v * v.dot(point->estimate()) * (1. - cth);
-      } else {
-        p = point->estimate();
-      }
+    void linearizeOplus()
+    {
+      // use numeric Jacobians
+      //BaseBinaryEdge<2, Vector2d, VertexCameraBAL, VertexPointBAL>::linearizeOplus();
+      //return;
 
-      // translation of the camera
-      Eigen::Vector3d::ConstMapType translation(cam->estimate().data()+3, 3);
-      p += translation;
+      const VertexCameraBAL* cam = static_cast<const VertexCameraBAL*>(vertex(0));
+      const VertexPointBAL* point = static_cast<const VertexPointBAL*>(vertex(1));
+      typedef ceres::internal::AutoDiff<EdgeObservationBAL, double, 9, 3> BalAutoDiff;
 
-      // perspective division
-      Eigen::Vector2d projectedPoint;
-      projectedPoint(0) = - p(0) / p(2);
-      projectedPoint(1) = - p(1) / p(2);
+      Matrix<double, 2 , 9, Eigen::RowMajor> dError_dCamera;
+      Matrix<double, 2 , 3, Eigen::RowMajor> dError_dPoint;
+      double *parameters[] = { const_cast<double*>(cam->estimate().data()), const_cast<double*>(point->estimate().data()) };
+      double *jacobians[] = { dError_dCamera.data(), dError_dPoint.data() };
+      double value[2];
+      BalAutoDiff::Differentiate(*this, parameters, 2, value, jacobians);
 
-      // conversion to pixel coordinates
-      double radiusSqr = projectedPoint.squaredNorm();
-      const double& f  = cam->estimate()(6);
-      const double& k1 = cam->estimate()(7);
-      const double& k2 = cam->estimate()(8);
-      double r_p       = 1. + k1 * radiusSqr + k2 * radiusSqr * radiusSqr;
-      Eigen::Vector2d prediction;
-      prediction(0) = f * r_p * projectedPoint(0);
-      prediction(1) = f * r_p * projectedPoint(1);
-
-      _error = prediction - measurement();
-      //cout << PVAR(prediction.transpose()) << "\t\t" << PVAR(measurement().transpose()) << endl;
+      // copy over the Jacobians (convert row-major -> column-major)
+      _jacobianOplusXi = dError_dCamera;
+      _jacobianOplusXj = dError_dPoint;
     }
 };
 
@@ -215,10 +254,12 @@ int main(int argc, char** argv)
 {
   int maxIterations;
   bool verbose;
+  string outputFilename;
   string inputFilename;
   string statsFilename;
   CommandArgs arg;
   arg.param("i", maxIterations, 5, "perform n iterations");
+  arg.param("o", outputFilename, "", "write points into a vrml file");
   arg.param("v", verbose, false, "verbose output of the optimization process");
   arg.param("stats", statsFilename, "", "specify a file for the statistics");
   arg.paramLeftOver("graph-input", inputFilename, "", "file which will be processed");
@@ -227,15 +268,16 @@ int main(int argc, char** argv)
 
   typedef g2o::BlockSolver< g2o::BlockSolverTraits<9, 3> >  BalBlockSolver;
 #ifdef G2O_HAVE_CHOLMOD
+  cout << "Using CHOLMOD" << endl;
   typedef g2o::LinearSolverCholmod<BalBlockSolver::PoseMatrixType> BalLinearSolver;
 #elif defined G2O_HAVE_CSPARSE
+  cout << "Using CSparse" << endl;
   typedef g2o::LinearSolverCSparse<BalBlockSolver::PoseMatrixType> BalLinearSolver;
 #else
 #error neither CSparse nor Cholmod are available
 #endif
 
   g2o::SparseOptimizer optimizer;
-  optimizer.setVerbose(false);
   BalLinearSolver * linearSolver = new BalLinearSolver();
   linearSolver->setBlockOrdering(true);
   BalBlockSolver* solver_ptr = new BalBlockSolver(linearSolver);
@@ -250,6 +292,7 @@ int main(int argc, char** argv)
   vector<VertexCameraBAL*> cameras;
 
   // parse BAL dataset
+  cout << "Loading BAL dataset " << inputFilename << endl;
   {
     ifstream ifs(inputFilename.c_str());
     int numCameras, numPoints, numObservations;
@@ -262,7 +305,6 @@ int main(int argc, char** argv)
     for (int i = 0; i < numCameras; ++i, ++id) {
       VertexCameraBAL* cam = new VertexCameraBAL;
       cam->setId(id);
-      //cam->setFixed(id == 0);
       optimizer.addVertex(cam);
       cameras.push_back(cam);
     }
@@ -320,6 +362,7 @@ int main(int argc, char** argv)
     }
 
   }
+  cout << "done." << endl;
 
   optimizer.initializeOptimization();
   optimizer.setVerbose(verbose);
@@ -335,27 +378,29 @@ int main(int argc, char** argv)
   }
 
   // dump the points
-  ofstream fout("points.wrl"); // loadable with meshlab
-  fout 
-    << "#VRML V2.0 utf8\n"
-    << "Shape {\n"
-    << "  appearance Appearance {\n"
-    << "    material Material {\n"
-    << "      diffuseColor " << 1 << " " << 0 << " " << 0 << "\n"
-    << "      ambientIntensity 0.2\n"
-    << "      emissiveColor 0.0 0.0 0.0\n"
-    << "      specularColor 0.0 0.0 0.0\n"
-    << "      shininess 0.2\n"
-    << "      transparency 0.0\n"
-    << "    }\n"
-    << "  }\n"
-    << "  geometry PointSet {\n"
-    << "    coord Coordinate {\n"
-    << "      point [\n";
-  for (vector<VertexPointBAL*>::const_iterator it = points.begin(); it != points.end(); ++it) {
-    fout << (*it)->estimate().transpose() << endl;
+  if (outputFilename.size() > 0) {
+    ofstream fout(outputFilename.c_str()); // loadable with meshlab
+    fout 
+      << "#VRML V2.0 utf8\n"
+      << "Shape {\n"
+      << "  appearance Appearance {\n"
+      << "    material Material {\n"
+      << "      diffuseColor " << 1 << " " << 0 << " " << 0 << "\n"
+      << "      ambientIntensity 0.2\n"
+      << "      emissiveColor 0.0 0.0 0.0\n"
+      << "      specularColor 0.0 0.0 0.0\n"
+      << "      shininess 0.2\n"
+      << "      transparency 0.0\n"
+      << "    }\n"
+      << "  }\n"
+      << "  geometry PointSet {\n"
+      << "    coord Coordinate {\n"
+      << "      point [\n";
+    for (vector<VertexPointBAL*>::const_iterator it = points.begin(); it != points.end(); ++it) {
+      fout << (*it)->estimate().transpose() << endl;
+    }
+    fout << "    ]\n" << "  }\n" << "}\n" << "  }\n";
   }
-  fout << "    ]\n" << "  }\n" << "}\n" << "  }\n";
   
   return 0;
 }
