@@ -208,7 +208,7 @@ class EdgeObservationBAL : public BaseBinaryEdge<2, Vector2d, VertexCameraBAL, V
       T f         = T(camera[6]);
       T k1        = T(camera[7]);
       T k2        = T(camera[8]);
-      T r_p       = 1. + k1 * radiusSqr + k2 * radiusSqr * radiusSqr;
+      T r_p       = T(1) + k1 * radiusSqr + k2 * radiusSqr * radiusSqr;
       T prediction[2];
       prediction[0] = f * r_p * projectedPoint[0];
       prediction[1] = f * r_p * projectedPoint[1];
