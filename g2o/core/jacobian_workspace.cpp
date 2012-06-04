@@ -49,8 +49,10 @@ bool JacobianWorkspace::allocate()
   if (_maxNumVertices <=0 || _maxDimension <= 0)
     return false;
   _workspace.resize(_maxNumVertices);
-  for (WorkspaceVector::iterator it = _workspace.begin(); it != _workspace.end(); ++it)
+  for (WorkspaceVector::iterator it = _workspace.begin(); it != _workspace.end(); ++it) {
     it->resize(_maxDimension);
+    it->setZero();
+  }
   return true;
 }
 
