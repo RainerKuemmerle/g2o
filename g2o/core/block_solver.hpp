@@ -537,7 +537,7 @@ bool BlockSolver<Traits>::buildSystem()
     e->constructQuadraticForm();
 #  ifndef NDEBUG
     for (size_t i = 0; i < e->vertices().size(); ++i) {
-      OptimizableGraph::Vertex* v = static_cast<OptimizableGraph::Vertex*>(e->vertex(i));
+      const OptimizableGraph::Vertex* v = static_cast<const OptimizableGraph::Vertex*>(e->vertex(i));
       bool hasANan = arrayHasNaN(jacobianWorkspace.workspaceForVertex(i), e->dimension() * v->dimension());
       if (hasANan) {
         cerr << "buildSystem(): NaN within Jacobian for edge " << e << endl;
