@@ -73,6 +73,11 @@ namespace g2o {
       void updateSize(const OptimizableGraph& graph);
 
       /**
+       * manually update with the given parameters
+       */
+      void updateSize(int numVertices, int dimension);
+
+      /**
        * return the workspace for a vertex in an edge
        */
       double* workspaceForVertex(int vertexIndex)
