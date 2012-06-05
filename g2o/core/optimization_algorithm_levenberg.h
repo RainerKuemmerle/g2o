@@ -33,7 +33,7 @@
 namespace g2o {
 
   /**
-   * \brief Implementation of the Gauss Newton Algorithm
+   * \brief Implementation of the Levenberg Algorithm
    */
   class G2O_CORE_API OptimizationAlgorithmLevenberg : public OptimizationAlgorithmWithHessian
   {
