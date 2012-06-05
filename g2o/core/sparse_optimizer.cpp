@@ -190,6 +190,8 @@ namespace g2o{
   }
 
   bool SparseOptimizer::initializeOptimization(HyperGraph::VertexSet& vset, int level){
+    bool workspaceAllocated = _jacobianWorkspace.allocate(); (void) workspaceAllocated;
+    assert(workspaceAllocated && "Error while allocating memory for the Jacobians");
     clearIndexMapping();
     _activeVertices.clear();
     _activeVertices.reserve(vset.size());
@@ -247,6 +249,8 @@ namespace g2o{
   }
 
   bool SparseOptimizer::initializeOptimization(HyperGraph::EdgeSet& eset){
+    bool workspaceAllocated = _jacobianWorkspace.allocate(); (void) workspaceAllocated;
+    assert(workspaceAllocated && "Error while allocating memory for the Jacobians");
     clearIndexMapping();
     _activeVertices.clear();
     _activeEdges.clear();
@@ -334,8 +338,6 @@ namespace g2o{
       return -1;
     }
 
-    bool workspaceAllocated = _jacobianWorkspace.allocate(); (void) workspaceAllocated;
-    assert(workspaceAllocated && "Error while allocating memory for the Jacobians");
     _batchStatistics.clear();
     if (_computeBatchStatistics)
       _batchStatistics.resize(iterations);
