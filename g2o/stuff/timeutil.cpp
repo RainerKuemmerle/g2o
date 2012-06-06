@@ -112,7 +112,7 @@ ScopeTime::~ScopeTime() {
 
 double get_monotonic_time()
 {
-#if (defined(_POSIX_TIMERS) && (_POSIX_TIMERS+0 >= 0))
+#if (defined(_POSIX_TIMERS) && (_POSIX_TIMERS+0 >= 0) && defined(_POSIX_MONOTONIC_CLOCK))
   struct timespec ts;
   clock_gettime(CLOCK_MONOTONIC, &ts);
   return ts.tv_sec + ts.tv_nsec*1e-9;
