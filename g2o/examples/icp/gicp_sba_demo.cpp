@@ -33,7 +33,7 @@
 #include "g2o/core/block_solver.h"
 #include "g2o/core/solver.h"
 #include "g2o/core/optimization_algorithm_levenberg.h"
-#include "g2o/solvers/cholmod/linear_solver_cholmod.h"
+#include "g2o/solvers/csparse/linear_solver_csparse.h"
 #include "g2o/types/icp/types_icp.h"
 
 using namespace Eigen;
@@ -102,7 +102,7 @@ int main(int argc, char **argv)
 
   // variable-size block solver
   BlockSolverX::LinearSolverType * linearSolver
-      = new LinearSolverCholmod<g2o
+      = new LinearSolverCSparse<g2o
         ::BlockSolverX::PoseMatrixType>();
 
 

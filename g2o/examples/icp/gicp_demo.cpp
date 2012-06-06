@@ -33,7 +33,7 @@
 #include "g2o/core/block_solver.h"
 #include "g2o/core/solver.h"
 #include "g2o/core/optimization_algorithm_levenberg.h"
-#include "g2o/solvers/cholmod/linear_solver_cholmod.h"
+#include "g2o/solvers/dense/linear_solver_dense.h"
 #include "g2o/types/icp/types_icp.h"
 
 using namespace Eigen;
@@ -94,18 +94,11 @@ int main()
   optimizer.setVerbose(false);
 
   // variable-size block solver
-  BlockSolverX::LinearSolverType * linearSolver
-      = new LinearSolverCholmod<g2o
-        ::BlockSolverX::PoseMatrixType>();
-
-
-  BlockSolverX * solver_ptr
-      = new BlockSolverX(linearSolver);
-
+  BlockSolverX::LinearSolverType * linearSolver = new LinearSolverDense<g2o::BlockSolverX::PoseMatrixType>();
+  BlockSolverX * solver_ptr = new BlockSolverX(linearSolver);
   g2o::OptimizationAlgorithmLevenberg* solver = new g2o::OptimizationAlgorithmLevenberg(solver_ptr);
 
   optimizer.setAlgorithm(solver);
-
 
   vector<Vector3d> true_points;
   for (size_t i=0;i<1000; ++i)
