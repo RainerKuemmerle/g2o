@@ -37,10 +37,49 @@ using namespace std;
 
 namespace g2o {
 
-// forward decl of some operators
-std::istream& operator>>(std::istream& is, std::vector<int>& v);
-std::ostream& operator<<(std::ostream& os, const std::vector<int>& v);
+std::istream& operator>>(std::istream& is, std::vector<int>& v){
+  string s;
+  if (! (is >> s) )
+    return is;
 
+  const char* c = s.c_str();
+  char* caux = const_cast<char*>(c);
+
+  v.clear();
+  bool hasNextValue=true;
+  while(hasNextValue){
+    int i=strtol(c,&caux,10);
+    if (c!=caux){
+      c=caux;
+      c++;
+      v.push_back(i);
+    } else
+      hasNextValue = false;
+  }
+  return is;
+}
+
+std::ostream& operator<<(std::ostream& os, const std::vector<int>& v){
+  if (v.size()){
+    os << v[0];
+  }
+  for (size_t i=1; i<v.size(); i++){
+    os << "," << v[i];
+  }
+  return os;
+}
+
+/**
+ * convert a string into an other type.
+ */
+template<typename T>
+bool convertString(const std::string& s, T& x)
+{
+  std::istringstream i(s);
+  if (! (i >> x))
+    return false;
+  return true;
+}
 
 /** Helper class to sort pair based on first elem */
 template<class T1, class T2, class Pred = std::less<T1> >
@@ -443,36 +482,5 @@ std::string CommandArgs::trim(const std::string& s) const
   return std::string(s, b, e - b + 1);
 }
 
-std::istream& operator>>(std::istream& is, std::vector<int>& v){
-  string s;
-  if (! (is >> s) )
-    return is;
-
-  const char* c = s.c_str();
-  char* caux = const_cast<char*>(c);
-
-  v.clear();
-  bool hasNextValue=true;
-  while(hasNextValue){
-    int i=strtol(c,&caux,10);
-    if (c!=caux){
-      c=caux;
-      c++;
-      v.push_back(i);
-    } else
-      hasNextValue = false;
-  }
-  return is;
-}
-
-std::ostream& operator<<(std::ostream& os, const std::vector<int>& v){
-  if (v.size()){
-    os << v[0];
-  }
-  for (size_t i=1; i<v.size(); i++){
-    os << "," << v[i];
-  }
-  return os;
-}
 
 }
