@@ -145,9 +145,19 @@ namespace Slam3dNew {
       Map<Matrix<double, 9,3> > M(buf);
       Matrix3d Sxt,Syt,Szt;
       skewT(Sxt,Syt,Szt,Rbc);
+#ifdef __clang__
+      Matrix3d product = Rab * Sxt;
+      Map<Matrix3d> M2(product.data());
+      Map<Matrix3d> Mx(buf);    Mx = M2;
+      product = Ra*Syt;
+      Map<Matrix3d> My(buf+9);  My = M2;
+      product = Ra*Szt;
+      Map<Matrix3d> Mz(buf+18); Mz = M2;
+#else
       Map<Matrix3d> Mx(buf);    Mx = Ra*Sxt;
       Map<Matrix3d> My(buf+9);  My = Ra*Syt;
       Map<Matrix3d> Mz(buf+18); Mz = Ra*Szt;
+#endif
       Ji.template block<3,3>(3,3) = dq_dR * M;
     }
 
@@ -157,9 +167,19 @@ namespace Slam3dNew {
       Map<Matrix<double, 9,3> > M(buf);
       Matrix3d Sx,Sy,Sz;
       skew(Sx,Sy,Sz,Rc);
+#ifdef __clang__
+      Matrix3d product = Rab * Sx;
+      Map<Matrix3d> M2(product.data());
+      Map<Matrix3d> Mx(buf);    Mx = M2;
+      product = Rab*Sy;
+      Map<Matrix3d> My(buf+9);  My = M2;
+      product = Rab*Sz;
+      Map<Matrix3d> Mz(buf+18); Mz = M2;
+#else
       Map<Matrix3d> Mx(buf);    Mx = Rab*Sx;
       Map<Matrix3d> My(buf+9);  My = Rab*Sy;
       Map<Matrix3d> Mz(buf+18); Mz = Rab*Sz;
+#endif
       Jj.template block<3,3>(3,3) = dq_dR * M;
     }
   }
@@ -224,9 +244,19 @@ namespace Slam3dNew {
       Map<Matrix<double, 9,3> > M(buf);
       Matrix3d Sxt,Syt,Szt;
       skewT(Sxt,Syt,Szt,Rb);
+#ifdef __clang__
+      Matrix3d product = Ra * Sxt;
+      Map<Matrix3d> M2(product.data());
+      Map<Matrix3d> Mx(buf);    Mx = M2;
+      product = Ra*Syt;
+      Map<Matrix3d> My(buf+9);  My = M2;
+      product = Ra*Szt;
+      Map<Matrix3d> Mz(buf+18); Mz = M2;
+#else
       Map<Matrix3d> Mx(buf);    Mx = Ra*Sxt;
       Map<Matrix3d> My(buf+9);  My = Ra*Syt;
       Map<Matrix3d> Mz(buf+18); Mz = Ra*Szt;
+#endif
       Ji.template block<3,3>(3,3) = dq_dR * M;
     }
 
@@ -237,9 +267,19 @@ namespace Slam3dNew {
       Matrix3d Sx,Sy,Sz;
       const Matrix3d I=Matrix3d::Identity();
       skew(Sx,Sy,Sz,I);
+#ifdef __clang__
+      Matrix3d product = Re * Sx;
+      Map<Matrix3d> M2(product.data());
+      Map<Matrix3d> Mx(buf);    Mx = M2;
+      product = Re*Sy;
+      Map<Matrix3d> My(buf+9);  My = M2;
+      product = Re*Sz;
+      Map<Matrix3d> Mz(buf+18); Mz = M2;
+#else
       Map<Matrix3d> Mx(buf);    Mx = Re*Sx;
       Map<Matrix3d> My(buf+9);  My = Re*Sy;
       Map<Matrix3d> Mz(buf+18); Mz = Re*Sz;
+#endif
       Jj.template block<3,3>(3,3) = dq_dR * M;
     }
   }
@@ -291,9 +331,19 @@ namespace Slam3dNew {
       Map<Matrix<double, 9,3> > M(buf);
       Matrix3d Sx,Sy,Sz;
       skew(Sx,Sy,Sz,Rb);
+#ifdef __clang__
+      Matrix3d product = Ra * Sx;
+      Map<Matrix3d> M2(product.data());
+      Map<Matrix3d> Mx(buf);    Mx = M2;
+      product = Ra*Sy;
+      Map<Matrix3d> My(buf+9);  My = M2;
+      product = Ra*Sz;
+      Map<Matrix3d> Mz(buf+18); Mz = M2;
+#else
       Map<Matrix3d> Mx(buf);    Mx = Ra*Sx;
       Map<Matrix3d> My(buf+9);  My = Ra*Sy;
       Map<Matrix3d> Mz(buf+18); Mz = Ra*Sz;
+#endif
       J.template block<3,3>(3,3) = dq_dR * M;
     }
 
