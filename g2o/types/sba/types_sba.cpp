@@ -267,11 +267,10 @@ namespace g2o {
     double py = pc(1);
     double pz = pc(2);
     double ipz2 = 1.0/(pz*pz);
-    if (g2o_isnan(ipz2) ) 
-      { 
-  std::cout << "[SetJac] infinite jac" << std::endl;
-  *(int *)0x0 = 0; 
-      }
+    if (g2o_isnan(ipz2) ) {
+      std::cout << "[SetJac] infinite jac" << std::endl;
+      abort();
+    }
 
     double ipz2fx = ipz2*cam.Kcam(0,0); // Fx
     double ipz2fy = ipz2*cam.Kcam(1,1); // Fy
@@ -353,11 +352,10 @@ namespace g2o {
     double py = pc(1);
     double pz = pc(2);
     double ipz2 = 1.0/(pz*pz);
-    if (g2o_isnan(ipz2) ) 
-      { 
-  std::cout << "[SetJac] infinite jac" << std::endl;
-  *(int *)0x0 = 0; 
-      }
+    if (g2o_isnan(ipz2) ) {
+      std::cout << "[SetJac] infinite jac" << std::endl;
+      abort();
+    }
 
     double ipz2fx = ipz2*cam.Kcam(0,0); // Fx
     double ipz2fy = ipz2*cam.Kcam(1,1); // Fy
@@ -444,11 +442,10 @@ namespace g2o {
     double py = pc(1);
     double pz = pc(2);
     double ipz2 = 1.0/(pz*pz);
-    if (g2o_isnan(ipz2) ) 
-      { 
-  std::cout << "[SetJac] infinite jac" << std::endl;
-  *(int *)0x0 = 0; 
-      }
+    if (g2o_isnan(ipz2) ) {
+      std::cout << "[SetJac] infinite jac" << std::endl;
+      abort();
+    }
 
     double ipz2fx = ipz2*cam.Kcam(0,0); // Fx
     double ipz2fy = ipz2*cam.Kcam(1,1); // Fy
