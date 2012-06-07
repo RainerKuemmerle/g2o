@@ -37,6 +37,10 @@ using namespace std;
 
 namespace g2o {
 
+// forward declarations
+std::istream& operator>>(std::istream& is, std::vector<int>& v);
+std::ostream& operator<<(std::ostream& os, const std::vector<int>& v);
+
 std::istream& operator>>(std::istream& is, std::vector<int>& v){
   string s;
   if (! (is >> s) )
@@ -48,7 +52,7 @@ std::istream& operator>>(std::istream& is, std::vector<int>& v){
   v.clear();
   bool hasNextValue=true;
   while(hasNextValue){
-    int i=strtol(c,&caux,10);
+    int i = static_cast<int>(strtol(c,&caux,10));
     if (c!=caux){
       c=caux;
       c++;
@@ -144,7 +148,7 @@ bool CommandArgs::parseArgs(int argc, char** argv, bool exitOnError)
             it->parsed = true;
           } else {
             if(i >= argc-1) {
-              fprintf(stderr, "Argument %s needs value.\n", name.c_str());
+              cerr << "Argument " << name << "needs value.\n";
               printHelp(cerr);
               if (exitOnError)
                 exit(1);
@@ -158,7 +162,7 @@ bool CommandArgs::parseArgs(int argc, char** argv, bool exitOnError)
         }
       }
       if (it == _args.end()) {
-        fprintf(stderr, "Error: Unknown Option '%s' (use -help to get list of options).\n", name.c_str());
+        cerr << "Error: Unknown Option '" << name << "' (use -help to get list of options).\n";
         if (exitOnError)
           exit(1);
         return false;
@@ -428,7 +432,6 @@ std::string CommandArgs::arg2str(const CommandArgument& ca) const
         auxStream << *data;
         return auxStream.str();
       }
-      break;
     case CAT_DOUBLE:
       {
         double* data = static_cast<double*>(ca.data);
@@ -436,7 +439,6 @@ std::string CommandArgs::arg2str(const CommandArgument& ca) const
         auxStream << *data;
         return auxStream.str();
       }
-      break;
     case CAT_INT:
       {
         int* data = static_cast<int*>(ca.data);
@@ -444,7 +446,6 @@ std::string CommandArgs::arg2str(const CommandArgument& ca) const
         auxStream << *data;
         return auxStream.str();
       }
-      break;
     case CAT_BOOL:
       {
         bool* data = static_cast<bool*>(ca.data);
@@ -452,13 +453,11 @@ std::string CommandArgs::arg2str(const CommandArgument& ca) const
         auxStream << *data;
         return auxStream.str();
       }
-      break;
     case CAT_STRING:
       {
         string* data = static_cast<string*>(ca.data);
         return *data;
       }
-      break;
     case CAT_VECTOR_INT:
       {
         std::vector<int> * data = static_cast< std::vector<int> * >(ca.data);
@@ -466,7 +465,6 @@ std::string CommandArgs::arg2str(const CommandArgument& ca) const
         auxStream << (*data);
         return auxStream.str();
       }
-      break;
   }
   return "";
 }

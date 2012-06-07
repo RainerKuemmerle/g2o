@@ -24,7 +24,7 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-namespace {
+namespace internal {
   inline int computeUpperTriangleIndex(int i, int j)
   {
     int elemsUpToCol = ((j-1) * j) / 2;
@@ -67,7 +67,7 @@ void BaseMultiEdge<D, E>::constructQuadraticForm()
         bool jstatus = !(to->fixed());
         if (jstatus) {
           const MatrixXd& B = _jacobianOplus[j];
-          int idx = computeUpperTriangleIndex(i, j);
+          int idx = internal::computeUpperTriangleIndex(i, j);
           assert(idx < (int)_hessian.size());
           HessianHelper& hhelper = _hessian[idx];
           if (hhelper.transposed) { // we have to write to the block as transposed
@@ -171,7 +171,7 @@ void BaseMultiEdge<D, E>::linearizeOplus()
 template <int D, typename E>
 void BaseMultiEdge<D, E>::mapHessianMemory(double* d, int i, int j, bool rowMajor)
 {
-  int idx = computeUpperTriangleIndex(i, j);
+  int idx = internal::computeUpperTriangleIndex(i, j);
   assert(idx < (int)_hessian.size());
   OptimizableGraph::Vertex* vi = static_cast<OptimizableGraph::Vertex*>(HyperGraph::Edge::vertex(i));
   OptimizableGraph::Vertex* vj = static_cast<OptimizableGraph::Vertex*>(HyperGraph::Edge::vertex(j));
