@@ -24,9 +24,6 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include <assert.h>
-#include "sparse_block_matrix.h"
-
 namespace g2o {
   using namespace Eigen;
 
@@ -300,7 +297,7 @@ namespace g2o {
     Map<const VectorXd> srcVec(src, rows());
 
 #   ifdef G2O_OPENMP
-#   pragma omp parallel for default (shared)
+#   pragma omp parallel for default (shared) schedule(dynamic, 10)
 #   endif
     for (int i=0; i < static_cast<int>(_blockCols.size()); ++i){
       int destOffset = colBaseOfBlock(i);
@@ -584,7 +581,7 @@ namespace g2o {
     fout << "# nnz: " << nz << std::endl;
     fout << "# rows: " << rows() << std::endl;
     fout << "# columns: " << cols() << std::endl;
-    fout << std::setprecision(9) << std::endl;
+    fout << std::setprecision(9) << std::fixed << std::endl;
 
     for (std::vector<TripletEntry>::const_iterator it = entries.begin(); it != entries.end(); ++it) {
       const TripletEntry& entry = *it;

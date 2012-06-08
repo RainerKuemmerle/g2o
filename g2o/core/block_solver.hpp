@@ -348,45 +348,33 @@ bool BlockSolver<Traits>::solve(){
   _Hpp->add(_Hschur);
   _DInvSchur->clear();
   memset (_coefficients, 0, _xSize*sizeof(double));
-  for (size_t i = 0; i < _optimizer->indexMapping().size(); ++i) {
+# ifdef G2O_OPENMP
+# pragma omp parallel for default (shared) schedule(dynamic, 10)
+# endif
+  for (size_t i = _numPoses; i < _optimizer->indexMapping().size(); ++i) {
     OptimizableGraph::Vertex* v = _optimizer->indexMapping()[i];
     if (v->marginalized()){
       int landmarkIndex=i-_numPoses;
       const HyperGraph::EdgeSet& vedges=v->edges();
 
+      // calculate inverse block for the landmark
       const LandmarkMatrixType * D=_Hll->block(landmarkIndex,landmarkIndex);
       assert (D);
       assert (D->rows()==D->cols());
-      LandmarkMatrixType Dinv=D->inverse();
-      LandmarkMatrixType * _DInvSchurBlock=_DInvSchur->block(landmarkIndex, landmarkIndex, false);
+      LandmarkMatrixType* _DInvSchurBlock=_DInvSchur->block(landmarkIndex, landmarkIndex, false);
       assert(_DInvSchurBlock);
-      assert(_DInvSchurBlock->rows()==D->rows());
-      assert(_DInvSchurBlock->cols()==D->cols());
+      assert(_DInvSchurBlock->rows()==D->rows() && _DInvSchurBlock->cols()==D->cols());
+      LandmarkMatrixType& Dinv = *_DInvSchurBlock;
+      Dinv = D->inverse();
 
-      *_DInvSchurBlock=Dinv;
       LandmarkVectorType  db(D->rows());
       for (int j=0; j<D->rows(); ++j) {
         db[j]=_b[v->colInHessian()+_sizePoses+j];
       }
       db=Dinv*db;
 
-      // helper array for OpenMP parallel
-      size_t tmpIdx = 0;
-#     ifdef _MSC_VER
-      OptimizableGraph::Edge** tmpEdges = new OptimizableGraph::Edge*[vedges.size()];
-#     else
-      OptimizableGraph::Edge* tmpEdges[vedges.size()];
-#     endif
-      for (HyperGraph::EdgeSet::const_iterator it2=vedges.begin(); it2!=vedges.end(); ++it2) {
-        OptimizableGraph::Edge* e2 = static_cast<OptimizableGraph::Edge*>(*it2);
-        tmpEdges[tmpIdx++] = e2;
-      }
-
-#     ifdef G2O_OPENMP
-#     pragma omp parallel for default (shared)
-#     endif
-      for (size_t l=0; l < tmpIdx; ++l) {
-        OptimizableGraph::Edge* e1 = tmpEdges[l];
+      for (HyperGraph::EdgeSet::const_iterator eit_outer = vedges.begin(); eit_outer != vedges.end(); ++eit_outer) {
+        OptimizableGraph::Edge* e1 = static_cast<OptimizableGraph::Edge*>(*eit_outer);
         if (e1->vertices().size() != 2)
           continue;
         OptimizableGraph::Vertex* v1= static_cast<OptimizableGraph::Vertex*>( e1->vertex(0) );
@@ -408,8 +396,8 @@ bool BlockSolver<Traits>::solve(){
         }
         PoseLandmarkMatrixType BDinv = (*Bi)*(Dinv);
 
-        for (size_t k =0; k < tmpIdx; ++k) {
-          OptimizableGraph::Edge* e2 = tmpEdges[k];
+        for (HyperGraph::EdgeSet::const_iterator eit_inner = vedges.begin(); eit_inner != vedges.end(); ++eit_inner) {
+          OptimizableGraph::Edge* e2 = static_cast<OptimizableGraph::Edge*>(*eit_inner);
           if (e2->vertices().size() != 2)
             continue;
           OptimizableGraph::Vertex* v2= (OptimizableGraph::Vertex*) e2->vertex(0);
@@ -426,9 +414,13 @@ bool BlockSolver<Traits>::solve(){
           const PoseLandmarkMatrixType* Bj = _Hpl->block(i2,landmarkIndex);
           assert(Bj); 
 
+          //if (v2 != v1)
+            //v2->lockQuadraticForm();
           PoseMatrixType* Hi1i2 = _Hschur->block(i1,i2);
           assert(Hi1i2);
           (*Hi1i2).noalias() -= BDinv*Bj->transpose();
+          //if (v2 != v1)
+            //v2->unlockQuadraticForm();
         }
         v1->unlockQuadraticForm();
       }

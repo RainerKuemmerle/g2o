@@ -282,7 +282,7 @@ int main(int argc, char** argv)
   linearSolver->setBlockOrdering(true);
   BalBlockSolver* solver_ptr = new BalBlockSolver(linearSolver);
   g2o::OptimizationAlgorithmLevenberg* solver = new g2o::OptimizationAlgorithmLevenberg(solver_ptr);
-  solver->setUserLambdaInit(1);
+  //solver->setUserLambdaInit(1);
   optimizer.setAlgorithm(solver);
   if (statsFilename.size() > 0){
     optimizer.setComputeBatchStatistics(true);

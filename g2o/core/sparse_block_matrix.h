@@ -32,6 +32,7 @@
 #include <fstream>
 #include <iostream>
 #include <iomanip>
+#include <cassert>
 #include <Eigen/Core>
 
 #include "matrix_structure.h"
