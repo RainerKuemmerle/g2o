@@ -71,6 +71,11 @@ class StructureOnlySolver : public OptimizationAlgorithm
 
     OptimizationAlgorithm::SolverResult calc(OptimizableGraph::VertexContainer& vertices, int num_iters, int num_max_trials=10)
     {
+      double chi2_sum=0;
+      JacobianWorkspace auxWorkspace;
+      auxWorkspace.updateSize(2, 50);
+      auxWorkspace.allocate();
+
       for (OptimizableGraph::VertexContainer::iterator it_v=vertices.begin(); it_v!=vertices.end(); ++it_v) {
         bool stop = false;
         g2o::OptimizableGraph::Vertex* v = dynamic_cast<OptimizableGraph::Vertex*>(*it_v);
@@ -118,7 +123,7 @@ class StructureOnlySolver : public OptimizationAlgorithm
 
               // build the matrix
               e->computeError();
-              e->linearizeOplus(optimizer()->jacobianWorkspace());
+              e->linearizeOplus(auxWorkspace);
               e->constructQuadraticForm();
 
               // Restore frame's initial fixed() values

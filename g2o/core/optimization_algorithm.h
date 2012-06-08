@@ -106,6 +106,11 @@ namespace g2o {
     protected:
       SparseOptimizer* _optimizer;   ///< the optimizer the solver is working on
       PropertyMap _properties;       ///< the properties of your solver, use this to store the parameters of your solver
+
+    private:
+      // Disable the copy constructor and assignment operator
+      OptimizationAlgorithm(const OptimizationAlgorithm&) { }
+      OptimizationAlgorithm& operator= (const OptimizationAlgorithm&) { return *this; }
   };
 
 } // end namespace

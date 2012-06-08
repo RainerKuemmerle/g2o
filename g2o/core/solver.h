@@ -134,8 +134,12 @@ namespace g2o {
       size_t _additionalVectorSpace;
 
       void resizeVector(size_t sx);
-  };
 
+    private:
+      // Disable the copy constructor and assignment operator
+      Solver(const Solver&) { }
+      Solver& operator= (const Solver&) { return *this; }
+  };
 } // end namespace
 
 #endif

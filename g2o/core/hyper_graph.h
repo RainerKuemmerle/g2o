@@ -200,6 +200,11 @@ namespace g2o {
     protected:
       VertexIDMap _vertices;
       EdgeSet _edges;
+
+    private:
+      // Disable the copy constructor and assignment operator
+      HyperGraph(const HyperGraph&) { }
+      HyperGraph& operator= (const HyperGraph&) { return *this; }
   };
 
 } // end namespace
