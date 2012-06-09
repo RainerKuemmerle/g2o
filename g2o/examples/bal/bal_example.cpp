@@ -364,8 +364,11 @@ int main(int argc, char** argv)
   }
   cout << "done." << endl;
 
+  cout << "Initializing ... " << flush;
   optimizer.initializeOptimization();
+  cout << "done." << endl;
   optimizer.setVerbose(verbose);
+  cout << "Start to optimize" << endl;
   optimizer.optimize(maxIterations);
 
   if (statsFilename!=""){
