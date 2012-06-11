@@ -59,6 +59,7 @@ namespace g2o {
   {
     is >> _name;
     is >> _position.x() >> _position.y() >> _position.z();
+    is >> _odom2d.x() >> _odom2d.y() >> _odom2d.z();
     is >> _timestamp;
     is >> _hostname;
     is >> _loggerTimestamp;
@@ -69,6 +70,7 @@ namespace g2o {
   {
     os << _name << " ";
     os << FIXED(_position.x() << " " << _position.y() << " " << _position.z() << " ");
+    os << FIXED(_odom2d.x() << " " << _odom2d.y() << " " << _odom2d.z() << " ");
     os << FIXED(" " << timestamp() << " " << hostname() << " " << loggerTimestamp());
     return os.good();
   }
