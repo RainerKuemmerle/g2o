@@ -155,9 +155,11 @@ namespace g2o {
         (*_cacheDrawActions)(c, params_);
       }
     }
-    if (that->userData() && _cacheDrawActions )
-      (*_cacheDrawActions)(that->userData(), params_);
-
+    OptimizableGraph::Data* d=that->userData();
+    while (d && _cacheDrawActions ){
+      (*_cacheDrawActions)(d, params_);
+      d=d->next();
+    }
     glPopMatrix();
     return this;
   }

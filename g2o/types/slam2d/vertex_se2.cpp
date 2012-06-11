@@ -131,8 +131,11 @@ namespace g2o {
     glVertex3f(-tx ,-ty, 0.f);
     glVertex3f(-tx , ty, 0.f);
     glEnd();
-    if (that->userData() && _drawActions )
-      (*_drawActions)(that->userData(), params_);
+    OptimizableGraph::Data* d=that->userData();
+    while (d && _drawActions ){
+      (*_drawActions)(d, params_);
+      d=d->next();
+    }
     glPopMatrix();
     glPopAttrib();
     return this;
