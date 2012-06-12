@@ -30,6 +30,7 @@
 #include "solver.h"
 #include "linear_solver.h"
 #include "sparse_block_matrix.h"
+#include "openmp_mutex.h"
 #include "g2o/config.h"
 
 namespace g2o {
@@ -138,6 +139,10 @@ namespace g2o {
       SparseBlockMatrix<LandmarkMatrixType>* _DInvSchur;
 
       LinearSolver<PoseMatrixType>* _linearSolver;
+
+#    ifdef G2O_OPENMP
+      std::vector<OpenMPMutex> _coefficientsMutex;
+#    endif
 
       bool _doSchur;
 
