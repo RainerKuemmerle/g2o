@@ -424,9 +424,6 @@ bool BlockSolver<Traits>::solve(){
         }
         v1->unlockQuadraticForm();
       }
-#     ifdef _MSC_VER
-      delete[] tmpEdges;
-#     endif
     }
   }
   //cerr << "Solve [marginalize] = " <<  get_monotonic_time()-t << endl;
