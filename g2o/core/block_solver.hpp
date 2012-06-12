@@ -79,6 +79,9 @@ void BlockSolver<Traits>::resize(int* blockPoseIndices, int numPoseBlocks,
     _Hll=new LandmarkHessianType(blockLandmarkIndices, blockLandmarkIndices, numLandmarkBlocks, numLandmarkBlocks);
     _DInvSchur=new LandmarkHessianType(blockLandmarkIndices, blockLandmarkIndices, numLandmarkBlocks, numLandmarkBlocks);
     _Hpl=new PoseLandmarkHessianType(blockPoseIndices, blockLandmarkIndices, numPoseBlocks, numLandmarkBlocks);
+#ifdef G2O_OPENMP
+    _coefficientsMutex.resize(numPoseBlocks);
+#endif
   }
 }
 
@@ -261,8 +264,9 @@ bool BlockSolver<Traits>::buildStructure(bool zeroBlocks)
             continue;
           int i1=v1->hessianIndex();
           int i2=v2->hessianIndex();
-          if (i1<=i2)
+          if (i1<=i2) {
             _Hschur->block(i1,i2,true)->setZero();
+          }
         }
       }
     }
@@ -344,89 +348,63 @@ bool BlockSolver<Traits>::solve(){
 
   // backup the coefficient matrix
   double t=get_monotonic_time();
+
+  // _Hschur = _Hpp, but keeping the pattern of _Hschur
   _Hschur->clear();
   _Hpp->add(_Hschur);
-  _DInvSchur->clear();
+
+  //_DInvSchur->clear();
   memset (_coefficients, 0, _xSize*sizeof(double));
 # ifdef G2O_OPENMP
 # pragma omp parallel for default (shared) schedule(dynamic, 10)
 # endif
-  for (size_t i = _numPoses; i < _optimizer->indexMapping().size(); ++i) {
-    OptimizableGraph::Vertex* v = _optimizer->indexMapping()[i];
-    if (v->marginalized()){
-      int landmarkIndex=i-_numPoses;
-      const HyperGraph::EdgeSet& vedges=v->edges();
+  for (int landmarkIndex = 0; landmarkIndex < static_cast<int>(_Hll->blockCols().size()); ++landmarkIndex) {
+    const typename SparseBlockMatrix<LandmarkMatrixType>::IntBlockMap& marginalizeColumn = _Hll->blockCols()[landmarkIndex];
+    assert(marginalizeColumn.size() == 1 && "more than one block in _Hll column");
 
-      // calculate inverse block for the landmark
-      const LandmarkMatrixType * D=_Hll->block(landmarkIndex,landmarkIndex);
-      assert (D);
-      assert (D->rows()==D->cols());
-      LandmarkMatrixType* _DInvSchurBlock=_DInvSchur->block(landmarkIndex, landmarkIndex, false);
-      assert(_DInvSchurBlock);
-      assert(_DInvSchurBlock->rows()==D->rows() && _DInvSchurBlock->cols()==D->cols());
-      LandmarkMatrixType& Dinv = *_DInvSchurBlock;
-      Dinv = D->inverse();
+    // calculate inverse block for the landmark
+    const LandmarkMatrixType * D = marginalizeColumn.begin()->second;
+    assert (D && D->rows()==D->cols() && "Error in landmark matrix");
+    const typename SparseBlockMatrix<LandmarkMatrixType>::IntBlockMap& dInvColumn = _DInvSchur->blockCols()[landmarkIndex];
+    assert(dInvColumn.size() == 1 && "more than one block in _DInvSchur column");
 
-      LandmarkVectorType  db(D->rows());
-      for (int j=0; j<D->rows(); ++j) {
-        db[j]=_b[v->colInHessian()+_sizePoses+j];
+    LandmarkMatrixType* _DInvSchurBlock = dInvColumn.begin()->second;
+    assert(_DInvSchurBlock &&_DInvSchurBlock->rows()==D->rows() && _DInvSchurBlock->cols()==D->cols() && "Error in _DInvSchur matrix block");
+    LandmarkMatrixType& Dinv = *_DInvSchurBlock;
+    Dinv = D->inverse();
+
+    LandmarkVectorType  db(D->rows());
+    for (int j=0; j<D->rows(); ++j) {
+      db[j]=_b[_Hll->rowBaseOfBlock(landmarkIndex) + _sizePoses + j];
+    }
+    db=Dinv*db;
+
+    assert((size_t)landmarkIndex < _Hpl.blockCols().size() && "Index out of bounds");
+    const typename SparseBlockMatrix<PoseLandmarkMatrixType>::IntBlockMap& landmarkColumn = _Hpl->blockCols()[landmarkIndex];
+
+    for (typename SparseBlockMatrix<PoseLandmarkMatrixType>::IntBlockMap::const_iterator it_outer = landmarkColumn.begin();
+        it_outer != landmarkColumn.end(); ++it_outer) {
+      int i1 = it_outer->first;
+
+      const PoseLandmarkMatrixType* Bi = it_outer->second;
+      assert(Bi);
+
+      PoseLandmarkMatrixType BDinv = (*Bi)*(Dinv);
+      typename PoseVectorType::MapType Bb(&_coefficients[_Hpl->rowBaseOfBlock(i1)], Bi->rows());
+#    ifdef G2O_OPENMP
+      ScopedOpenMPMutex mutexLock(&_coefficientsMutex[i1]);
+#    endif
+      Bb.noalias() += (*Bi)*db;
+
+      typename SparseBlockMatrix<PoseLandmarkMatrixType>::IntBlockMap::const_iterator it_inner = landmarkColumn.lower_bound(i1);
+      for (; it_inner != landmarkColumn.end(); ++it_inner) {
+        int i2 = it_inner->first;
+        const PoseLandmarkMatrixType* Bj = it_inner->second;
+        assert(Bj); 
+        PoseMatrixType* Hi1i2 = _Hschur->block(i1,i2);
+        assert(Hi1i2);
+        (*Hi1i2).noalias() -= BDinv*Bj->transpose();
       }
-      db=Dinv*db;
-
-      for (HyperGraph::EdgeSet::const_iterator eit_outer = vedges.begin(); eit_outer != vedges.end(); ++eit_outer) {
-        OptimizableGraph::Edge* e1 = static_cast<OptimizableGraph::Edge*>(*eit_outer);
-        if (e1->vertices().size() != 2)
-          continue;
-        OptimizableGraph::Vertex* v1= static_cast<OptimizableGraph::Vertex*>( e1->vertex(0) );
-        if (v1==v)
-          v1 = (OptimizableGraph::Vertex*) e1->vertex(1);
-
-        assert (!v1->marginalized());
-        int i1=v1->hessianIndex();
-        if (i1<0)
-          continue;
-
-        const PoseLandmarkMatrixType* Bi=_Hpl->block(i1,landmarkIndex);
-        assert(Bi);
-
-        PoseVectorType Bb=(*Bi)*db;
-        v1->lockQuadraticForm();
-        for (int j=0; j<Bb.rows(); ++j){
-          _coefficients[v1->colInHessian()+j]+=Bb(j);
-        }
-        PoseLandmarkMatrixType BDinv = (*Bi)*(Dinv);
-
-        for (HyperGraph::EdgeSet::const_iterator eit_inner = vedges.begin(); eit_inner != vedges.end(); ++eit_inner) {
-          OptimizableGraph::Edge* e2 = static_cast<OptimizableGraph::Edge*>(*eit_inner);
-          if (e2->vertices().size() != 2)
-            continue;
-          OptimizableGraph::Vertex* v2= (OptimizableGraph::Vertex*) e2->vertex(0);
-          if (v2==v)
-            v2 = (OptimizableGraph::Vertex*) e2->vertex(1);
-
-          assert (!v2->marginalized());
-          int i2=v2->hessianIndex();
-          if (i2<0)
-            continue;
-          if (i1>i2)
-            continue;
-
-          const PoseLandmarkMatrixType* Bj = _Hpl->block(i2,landmarkIndex);
-          assert(Bj); 
-
-          //if (v2 != v1)
-            //v2->lockQuadraticForm();
-          PoseMatrixType* Hi1i2 = _Hschur->block(i1,i2);
-          assert(Hi1i2);
-          (*Hi1i2).noalias() -= BDinv*Bj->transpose();
-          //if (v2 != v1)
-            //v2->unlockQuadraticForm();
-        }
-        v1->unlockQuadraticForm();
-      }
-#     ifdef _MSC_VER
-      delete[] tmpEdges;
-#     endif
     }
   }
   //cerr << "Solve [marginalize] = " <<  get_monotonic_time()-t << endl;
