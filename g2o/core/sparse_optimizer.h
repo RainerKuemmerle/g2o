@@ -219,6 +219,7 @@ namespace g2o {
     void discardTop(SparseOptimizer::VertexContainer& vlist);
     //! same as above, but for the active vertices
     void discardTop();
+    using OptimizableGraph::discardTop;
 
     /**
      * clears the graph, and polishes some intermediate structures

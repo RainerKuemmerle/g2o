@@ -26,7 +26,7 @@
 
 // helpers for doing fixed or variable size operations on the matrices
 
-namespace {
+namespace internal {
 
 #ifdef _MSC_VER
   // MSVC does not like the template specialization, seems like MSVC applies type conversion
@@ -159,7 +159,7 @@ void LinearSolverPCG<MatrixType>::multDiag(const std::vector<int>& colBlockIndic
 {
   int row = 0;
   for (size_t i = 0; i < A.size(); ++i) {
-    pcg_axy(A[i], src, row, dest, row);
+    internal::pcg_axy(A[i], src, row, dest, row);
     row = colBlockIndices[i];
   }
 }
@@ -169,7 +169,7 @@ void LinearSolverPCG<MatrixType>::multDiag(const std::vector<int>& colBlockIndic
 {
   int row = 0;
   for (size_t i = 0; i < A.size(); ++i) {
-    pcg_axy(*A[i], src, row, dest, row);
+    internal::pcg_axy(*A[i], src, row, dest, row);
     row = colBlockIndices[i];
   }
 }
@@ -189,8 +189,8 @@ void LinearSolverPCG<MatrixType>::mult(const std::vector<int>& colBlockIndices, 
 
     const typename SparseBlockMatrix<MatrixType>::SparseMatrixBlock* a = _sparseMat[i];
     // destVec += *a * srcVec (according to the sub-vector parts)
-    pcg_axpy(*a, src, srcOffset, dest, destOffset);
+    internal::pcg_axpy(*a, src, srcOffset, dest, destOffset);
     // destVec += *a.transpose() * srcVec (according to the sub-vector parts)
-    pcg_atxpy(*a, src, srcOffsetT, dest, destOffsetT);
+    internal::pcg_atxpy(*a, src, srcOffsetT, dest, destOffsetT);
   }
 }

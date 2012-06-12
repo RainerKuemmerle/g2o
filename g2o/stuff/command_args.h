@@ -112,20 +112,6 @@ class G2O_STUFF_API CommandArgs
     void str2arg(const std::string& input, CommandArgument& ca) const;
     std::string arg2str(const CommandArgument& ca) const;
 
-
-
-    /**
-     * convert a string into an other type.
-     */
-    template<typename T>
-    bool convertString(const std::string& s, T& x) const
-    {
-      std::istringstream i(s);
-      if (! (i >> x))
-        return false;
-      return true;
-    }
-
     std::string trim(const std::string& s) const;
 };
 

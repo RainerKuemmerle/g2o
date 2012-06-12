@@ -64,7 +64,7 @@ namespace g2o {
   bool writeCCSMatrix(const string& filename, int rows, int cols, const int* Ap, const int* Ai, const double* Ax, bool upperTriangleSymmetric)
   {
     vector<TripletEntry> entries;
-    entries.reserve(Ap[cols]);
+    entries.reserve((size_t)Ap[cols]);
     for (int i=0; i < cols; i++) {
       const int& rbeg = Ap[i];
       const int& rend = Ap[i+1];

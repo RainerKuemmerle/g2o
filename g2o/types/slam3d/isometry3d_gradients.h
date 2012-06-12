@@ -151,22 +151,42 @@ namespace g2o {
       double buf[27];
       Map<Matrix<double, 9,3> > M(buf);
       Matrix3d Sxt,Syt,Szt;
-      skewT(Sxt,Syt,Szt,Rbc);
+      internal::skewT(Sxt,Syt,Szt,Rbc);
+#ifdef __clang__
+      Matrix3d temp = Rab * Sxt;
+      Map<Matrix3d> M2(temp.data());
+      Map<Matrix3d> Mx(buf);    Mx = M2;
+      temp = Ra*Syt;
+      Map<Matrix3d> My(buf+9);  My = M2;
+      temp = Ra*Szt;
+      Map<Matrix3d> Mz(buf+18); Mz = M2;
+#else
       Map<Matrix3d> Mx(buf);    Mx = Ra*Sxt;
       Map<Matrix3d> My(buf+9);  My = Ra*Syt;
       Map<Matrix3d> Mz(buf+18); Mz = Ra*Szt;
+#endif
       Ji.template block<3,3>(3,3) = dq_dR * M;
     }
 
     // dre/dqj
     {
       double buf[27];
-      Map<Matrix<double, 9,3> > M(buf);
+      Map <Matrix<double, 9,3> > M(buf);
       Matrix3d Sx,Sy,Sz;
-      skew(Sx,Sy,Sz,Rc);
+      internal::skew(Sx,Sy,Sz,Rc);
+#ifdef __clang__
+      Matrix3d temp = Rab * Sx;
+      Map<Matrix3d> M2(temp.data());
+      Map<Matrix3d> Mx(buf);    Mx = M2;
+      temp = Rab*Sy;
+      Map<Matrix3d> My(buf+9);  My = M2;
+      temp = Rab*Sz;
+      Map<Matrix3d> Mz(buf+18); Mz = M2;
+#else
       Map<Matrix3d> Mx(buf);    Mx = Rab*Sx;
       Map<Matrix3d> My(buf+9);  My = Rab*Sy;
       Map<Matrix3d> Mz(buf+18); Mz = Rab*Sz;
+#endif
       Jj.template block<3,3>(3,3) = dq_dR * M;
     }
   }
@@ -290,10 +310,20 @@ namespace g2o {
       double buf[27];
       Map<Matrix<double, 9,3> > M(buf);
       Matrix3d Sx,Sy,Sz;
-      skew(Sx,Sy,Sz,Rb);
+      internal::skew(Sx,Sy,Sz,Rb);
+#ifdef __clang__
+      Matrix3d temp = Ra * Sx;
+      Map<Matrix3d> M2(temp.data());
+      Map<Matrix3d> Mx(buf);    Mx = M2;
+      temp = Ra*Sy;
+      Map<Matrix3d> My(buf+9);  My = M2;
+      temp = Ra*Sz;
+      Map<Matrix3d> Mz(buf+18); Mz = M2;
+#else
       Map<Matrix3d> Mx(buf);    Mx = Ra*Sx;
       Map<Matrix3d> My(buf+9);  My = Ra*Sy;
       Map<Matrix3d> Mz(buf+18); Mz = Ra*Sz;
+#endif
       J.template block<3,3>(3,3) = dq_dR * M;
     }
 
