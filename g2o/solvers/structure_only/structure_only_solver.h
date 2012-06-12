@@ -71,7 +71,6 @@ class StructureOnlySolver : public OptimizationAlgorithm
 
     OptimizationAlgorithm::SolverResult calc(OptimizableGraph::VertexContainer& vertices, int num_iters, int num_max_trials=10)
     {
-      double chi2_sum=0;
       JacobianWorkspace auxWorkspace;
       auxWorkspace.updateSize(2, 50);
       auxWorkspace.allocate();
