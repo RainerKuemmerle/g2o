@@ -379,7 +379,7 @@ bool BlockSolver<Traits>::solve(){
     }
     db=Dinv*db;
 
-    assert((size_t)landmarkIndex < _Hpl.blockCols().size() && "Index out of bounds");
+    assert((size_t)landmarkIndex < _Hpl->blockCols().size() && "Index out of bounds");
     const typename SparseBlockMatrix<PoseLandmarkMatrixType>::IntBlockMap& landmarkColumn = _Hpl->blockCols()[landmarkIndex];
 
     for (typename SparseBlockMatrix<PoseLandmarkMatrixType>::IntBlockMap::const_iterator it_outer = landmarkColumn.begin();
