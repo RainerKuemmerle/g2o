@@ -138,6 +138,8 @@ namespace g2o {
       SparseBlockMatrix<PoseMatrixType>* _Hschur;
       SparseBlockMatrix<LandmarkMatrixType>* _DInvSchur;
 
+      SparseBlockMatrixCCS<PoseLandmarkMatrixType>* _HplCCS;
+
       LinearSolver<PoseMatrixType>* _linearSolver;
 
 #    ifdef G2O_OPENMP

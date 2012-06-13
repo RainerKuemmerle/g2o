@@ -35,13 +35,14 @@
 #include <cassert>
 #include <Eigen/Core>
 
+#include "sparse_block_matrix_ccs.h"
 #include "matrix_structure.h"
 #include "g2o/config.h"
 
 namespace g2o {
   using namespace Eigen;
 /**
- * \brief Sparse matrix which using blocks
+ * \brief Sparse matrix which uses blocks
  *
  * Template class that specifies a sparse block matrix.  A block
  * matrix is a sparse matrix made of dense blocks.  These blocks
@@ -183,6 +184,12 @@ class SparseBlockMatrix {
      * @param upperTriangle does this matrix store only the upper triangular blocks
      */
     bool writeOctave(const char* filename, bool upperTriangle = true) const;
+
+    /**
+     * copy into CCS structure
+     * @return number of processed blocks, -1 on error
+     */
+    int fillSparseBlockMatrixCCS(SparseBlockMatrixCCS<MatrixType>& blockCCS) const;
 
   protected:
     std::vector<int> _rowBlockIndices; ///< vector of the indices of the blocks along the rows.

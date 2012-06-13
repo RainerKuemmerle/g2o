@@ -46,6 +46,7 @@ BlockSolver<Traits>::BlockSolver(LinearSolverType* linearSolver) :
   _Hpp=0;
   _Hll=0;
   _Hpl=0;
+  _HplCCS = 0;
   _Hschur=0;
   _DInvSchur=0;
   _coefficients=0;
@@ -79,6 +80,7 @@ void BlockSolver<Traits>::resize(int* blockPoseIndices, int numPoseBlocks,
     _Hll=new LandmarkHessianType(blockLandmarkIndices, blockLandmarkIndices, numLandmarkBlocks, numLandmarkBlocks);
     _DInvSchur=new LandmarkHessianType(blockLandmarkIndices, blockLandmarkIndices, numLandmarkBlocks, numLandmarkBlocks);
     _Hpl=new PoseLandmarkHessianType(blockPoseIndices, blockLandmarkIndices, numPoseBlocks, numLandmarkBlocks);
+    _HplCCS = new SparseBlockMatrixCCS<PoseLandmarkMatrixType>(_Hpl->rowBlockIndices(), _Hpl->colBlockIndices());
 #ifdef G2O_OPENMP
     _coefficientsMutex.resize(numPoseBlocks);
 #endif
@@ -115,6 +117,10 @@ void BlockSolver<Traits>::deallocate()
   if (_bschur) {
     delete[] _bschur;
     _bschur = 0;
+  }
+  if (_HplCCS) {
+    delete _HplCCS;
+    _HplCCS = 0;
   }
 }
 
@@ -241,6 +247,9 @@ bool BlockSolver<Traits>::buildStructure(bool zeroBlocks)
 
   if (! _doSchur)
     return true;
+
+  _Hpl->fillSparseBlockMatrixCCS(*_HplCCS);
+
   // allocate the blocks for the schur complement
   for (size_t i = 0; i < _optimizer->indexMapping().size(); ++i) {
     OptimizableGraph::Vertex* v = _optimizer->indexMapping()[i];
@@ -379,27 +388,28 @@ bool BlockSolver<Traits>::solve(){
     }
     db=Dinv*db;
 
-    assert((size_t)landmarkIndex < _Hpl->blockCols().size() && "Index out of bounds");
-    const typename SparseBlockMatrix<PoseLandmarkMatrixType>::IntBlockMap& landmarkColumn = _Hpl->blockCols()[landmarkIndex];
+    assert((size_t)landmarkIndex < _HplCCS->blockCols().size() && "Index out of bounds");
+    const typename SparseBlockMatrixCCS<PoseLandmarkMatrixType>::SparseColumn& landmarkColumn = _HplCCS->blockCols()[landmarkIndex];
 
-    for (typename SparseBlockMatrix<PoseLandmarkMatrixType>::IntBlockMap::const_iterator it_outer = landmarkColumn.begin();
+    for (typename SparseBlockMatrixCCS<PoseLandmarkMatrixType>::SparseColumn::const_iterator it_outer = landmarkColumn.begin();
         it_outer != landmarkColumn.end(); ++it_outer) {
-      int i1 = it_outer->first;
+      int i1 = it_outer->row;
 
-      const PoseLandmarkMatrixType* Bi = it_outer->second;
+      const PoseLandmarkMatrixType* Bi = it_outer->block;
       assert(Bi);
 
       PoseLandmarkMatrixType BDinv = (*Bi)*(Dinv);
-      typename PoseVectorType::MapType Bb(&_coefficients[_Hpl->rowBaseOfBlock(i1)], Bi->rows());
+      typename PoseVectorType::MapType Bb(&_coefficients[_HplCCS->rowBaseOfBlock(i1)], Bi->rows());
 #    ifdef G2O_OPENMP
       ScopedOpenMPMutex mutexLock(&_coefficientsMutex[i1]);
 #    endif
       Bb.noalias() += (*Bi)*db;
 
-      typename SparseBlockMatrix<PoseLandmarkMatrixType>::IntBlockMap::const_iterator it_inner = landmarkColumn.lower_bound(i1);
+      typename SparseBlockMatrixCCS<PoseLandmarkMatrixType>::RowBlock aux(i1, 0);
+      typename SparseBlockMatrixCCS<PoseLandmarkMatrixType>::SparseColumn::const_iterator it_inner = lower_bound(landmarkColumn.begin(), landmarkColumn.end(), aux);
       for (; it_inner != landmarkColumn.end(); ++it_inner) {
-        int i2 = it_inner->first;
-        const PoseLandmarkMatrixType* Bj = it_inner->second;
+        int i2 = it_inner->row;
+        const PoseLandmarkMatrixType* Bj = it_inner->block;
         assert(Bj); 
         PoseMatrixType* Hi1i2 = _Hschur->block(i1,i2);
         assert(Hi1i2);
