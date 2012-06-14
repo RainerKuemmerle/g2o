@@ -69,9 +69,10 @@ void BlockSolver<Traits>::resize(int* blockPoseIndices, int numPoseBlocks,
   resizeVector(s);
 
   if (_doSchur) {
-    // TODO the following two are only used in schur, actually too large...
+    // the following two are only used in schur
+    assert(_sizePoses > 0 && "allocating with wrong size");
     _coefficients = new double [s];
-    _bschur = new double[s];
+    _bschur = new double[_sizePoses];
   }
 
   _Hpp=new PoseHessianType(blockPoseIndices, blockPoseIndices, numPoseBlocks, numPoseBlocks);
@@ -363,7 +364,7 @@ bool BlockSolver<Traits>::solve(){
   _Hpp->add(_Hschur);
 
   //_DInvSchur->clear();
-  memset (_coefficients, 0, _xSize*sizeof(double));
+  memset (_coefficients, 0, _sizePoses*sizeof(double));
 # ifdef G2O_OPENMP
 # pragma omp parallel for default (shared) schedule(dynamic, 10)
 # endif
@@ -399,6 +400,7 @@ bool BlockSolver<Traits>::solve(){
       assert(Bi);
 
       PoseLandmarkMatrixType BDinv = (*Bi)*(Dinv);
+      assert(_HplCCS->rowBaseOfBlock(i1) < _sizePoses && "Index out of bounds");
       typename PoseVectorType::MapType Bb(&_coefficients[_HplCCS->rowBaseOfBlock(i1)], Bi->rows());
 #    ifdef G2O_OPENMP
       ScopedOpenMPMutex mutexLock(&_coefficientsMutex[i1]);
@@ -420,7 +422,7 @@ bool BlockSolver<Traits>::solve(){
   //cerr << "Solve [marginalize] = " <<  get_monotonic_time()-t << endl;
 
   // _bschur = _b for calling solver, and not touching _b
-  memcpy(_bschur, _b, _xSize * sizeof(double));
+  memcpy(_bschur, _b, _sizePoses * sizeof(double));
   for (int i=0; i<_sizePoses; ++i){
     _bschur[i]-=_coefficients[i];
   }

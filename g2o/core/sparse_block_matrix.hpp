@@ -225,19 +225,19 @@ namespace g2o {
   }
 
   template<typename MatrixType>
-  inline void axpy(const MatrixType& A, const Map<VectorXd>& x, int xoff, Map<VectorXd>& y, int yoff)
+  inline void axpy(const MatrixType& A, const Map<const VectorXd>& x, int xoff, Map<VectorXd>& y, int yoff)
   {
     y.segment<MatrixType::RowsAtCompileTime>(yoff) += A * x.segment<MatrixType::ColsAtCompileTime>(xoff);
   }
 
   template<int t>
-  inline void axpy(const Eigen::Matrix<double, Eigen::Dynamic, t>& A, const Map<VectorXd>& x, int xoff, Map<VectorXd>& y, int yoff)
+  inline void axpy(const Eigen::Matrix<double, Eigen::Dynamic, t>& A, const Map<const VectorXd>& x, int xoff, Map<VectorXd>& y, int yoff)
   {
     y.segment(yoff, A.rows()) += A * x.segment<Eigen::Matrix<double, Eigen::Dynamic, t>::ColsAtCompileTime>(xoff);
   }
 
   template<>
-  inline void axpy(const MatrixXd& A, const Map<VectorXd>& x, int xoff, Map<VectorXd>& y, int yoff)
+  inline void axpy(const MatrixXd& A, const Map<const VectorXd>& x, int xoff, Map<VectorXd>& y, int yoff)
   {
     y.segment(yoff, A.rows()) += A * x.segment(xoff, A.cols());
   }
@@ -269,7 +269,7 @@ namespace g2o {
 
     // map the memory by Eigen
     Map<VectorXd> destVec(dest, rows());
-    const Map<VectorXd> srcVec(src, cols());
+    const Map<const VectorXd> srcVec(src, cols());
 
     for (size_t i=0; i<_blockCols.size(); ++i){
       int srcOffset = i ? _colBlockIndices[i-1] : 0;
