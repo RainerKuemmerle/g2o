@@ -30,6 +30,7 @@
 #include "solver.h"
 #include "linear_solver.h"
 #include "sparse_block_matrix.h"
+#include "sparse_block_matrix_diagonal.h"
 #include "openmp_mutex.h"
 #include "g2o/config.h"
 
@@ -136,10 +137,10 @@ namespace g2o {
       SparseBlockMatrix<PoseLandmarkMatrixType>* _Hpl;
 
       SparseBlockMatrix<PoseMatrixType>* _Hschur;
-      SparseBlockMatrix<LandmarkMatrixType>* _DInvSchur;
+      SparseBlockMatrixDiagonal<LandmarkMatrixType>* _DInvSchur;
 
       SparseBlockMatrixCCS<PoseLandmarkMatrixType>* _HplCCS;
-      SparseBlockMatrixCCS<PoseMatrixType>* _HschurCCS;
+      SparseBlockMatrixCCS<PoseMatrixType>* _HschurTransposedCCS;
 
       LinearSolver<PoseMatrixType>* _linearSolver;
 

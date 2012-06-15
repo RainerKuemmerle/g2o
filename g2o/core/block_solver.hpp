@@ -47,7 +47,7 @@ BlockSolver<Traits>::BlockSolver(LinearSolverType* linearSolver) :
   _Hll=0;
   _Hpl=0;
   _HplCCS = 0;
-  _HschurCCS = 0;
+  _HschurTransposedCCS = 0;
   _Hschur=0;
   _DInvSchur=0;
   _coefficients=0;
@@ -80,10 +80,10 @@ void BlockSolver<Traits>::resize(int* blockPoseIndices, int numPoseBlocks,
   if (_doSchur) {
     _Hschur=new PoseHessianType(blockPoseIndices, blockPoseIndices, numPoseBlocks, numPoseBlocks);
     _Hll=new LandmarkHessianType(blockLandmarkIndices, blockLandmarkIndices, numLandmarkBlocks, numLandmarkBlocks);
-    _DInvSchur=new LandmarkHessianType(blockLandmarkIndices, blockLandmarkIndices, numLandmarkBlocks, numLandmarkBlocks);
+    _DInvSchur = new SparseBlockMatrixDiagonal<LandmarkMatrixType>(_Hll->colBlockIndices());
     _Hpl=new PoseLandmarkHessianType(blockPoseIndices, blockLandmarkIndices, numPoseBlocks, numLandmarkBlocks);
     _HplCCS = new SparseBlockMatrixCCS<PoseLandmarkMatrixType>(_Hpl->rowBlockIndices(), _Hpl->colBlockIndices());
-    _HschurCCS = new SparseBlockMatrixCCS<PoseMatrixType>(_Hschur->rowBlockIndices(), _Hschur->colBlockIndices());
+    _HschurTransposedCCS = new SparseBlockMatrixCCS<PoseMatrixType>(_Hschur->colBlockIndices(), _Hschur->rowBlockIndices());
 #ifdef G2O_OPENMP
     _coefficientsMutex.resize(numPoseBlocks);
 #endif
@@ -125,9 +125,9 @@ void BlockSolver<Traits>::deallocate()
     delete _HplCCS;
     _HplCCS = 0;
   }
-  if (_HschurCCS) {
-    delete _HschurCCS;
-    _HschurCCS = 0;
+  if (_HschurTransposedCCS) {
+    delete _HschurTransposedCCS;
+    _HschurTransposedCCS = 0;
   }
 }
 
@@ -195,10 +195,10 @@ bool BlockSolver<Traits>::buildStructure(bool zeroBlocks)
       if (zeroBlocks)
         m->setZero();
       v->mapHessianMemory(m->data());
-      _DInvSchur->block(landmarkIdx, landmarkIdx, true);
       ++landmarkIdx;
     }
   }
+  _DInvSchur->diagonal().resize(landmarkIdx);
   assert(poseIdx == _numPoses && landmarkIdx == _numLandmarks);
 
   // here we assume that the landmark indices start after the pose ones
@@ -287,7 +287,7 @@ bool BlockSolver<Traits>::buildStructure(bool zeroBlocks)
       }
     }
   }
-  _Hschur->fillSparseBlockMatrixCCSTransposed(*_HschurCCS);
+  _Hschur->fillSparseBlockMatrixCCSTransposed(*_HschurTransposedCCS);
 
   return true;
 }
@@ -382,12 +382,7 @@ bool BlockSolver<Traits>::solve(){
     // calculate inverse block for the landmark
     const LandmarkMatrixType * D = marginalizeColumn.begin()->second;
     assert (D && D->rows()==D->cols() && "Error in landmark matrix");
-    const typename SparseBlockMatrix<LandmarkMatrixType>::IntBlockMap& dInvColumn = _DInvSchur->blockCols()[landmarkIndex];
-    assert(dInvColumn.size() == 1 && "more than one block in _DInvSchur column");
-
-    LandmarkMatrixType* _DInvSchurBlock = dInvColumn.begin()->second;
-    assert(_DInvSchurBlock &&_DInvSchurBlock->rows()==D->rows() && _DInvSchurBlock->cols()==D->cols() && "Error in _DInvSchur matrix block");
-    LandmarkMatrixType& Dinv = *_DInvSchurBlock;
+    LandmarkMatrixType& Dinv = _DInvSchur->diagonal()[landmarkIndex];
     Dinv = D->inverse();
 
     LandmarkVectorType  db(D->rows());
@@ -414,8 +409,8 @@ bool BlockSolver<Traits>::solve(){
 #    endif
       Bb.noalias() += (*Bi)*db;
 
-      assert(i1 >= 0 && i1 < static_cast<int>(_HschurCCS->blockCols().size()) && "Index out of bounds");
-      typename SparseBlockMatrixCCS<PoseMatrixType>::SparseColumn::iterator targetColumnIt = _HschurCCS->blockCols()[i1].begin();
+      assert(i1 >= 0 && i1 < static_cast<int>(_HschurTransposedCCS->blockCols().size()) && "Index out of bounds");
+      typename SparseBlockMatrixCCS<PoseMatrixType>::SparseColumn::iterator targetColumnIt = _HschurTransposedCCS->blockCols()[i1].begin();
 
       typename SparseBlockMatrixCCS<PoseLandmarkMatrixType>::RowBlock aux(i1, 0);
       typename SparseBlockMatrixCCS<PoseLandmarkMatrixType>::SparseColumn::const_iterator it_inner = lower_bound(landmarkColumn.begin(), landmarkColumn.end(), aux);
@@ -423,9 +418,9 @@ bool BlockSolver<Traits>::solve(){
         int i2 = it_inner->row;
         const PoseLandmarkMatrixType* Bj = it_inner->block;
         assert(Bj); 
-        while (targetColumnIt->row < i2 /*&& targetColumnIt != _HschurCCS->blockCols()[i1].end()*/)
+        while (targetColumnIt->row < i2 /*&& targetColumnIt != _HschurTransposedCCS->blockCols()[i1].end()*/)
           ++targetColumnIt;
-        assert(targetColumnIt != _HschurCCS->blockCols()[i1].end() && targetColumnIt->row == i2 && "invalid iterator, something wrong with the matrix structure");
+        assert(targetColumnIt != _HschurTransposedCCS->blockCols()[i1].end() && targetColumnIt->row == i2 && "invalid iterator, something wrong with the matrix structure");
         PoseMatrixType* Hi1i2 = targetColumnIt->block;//_Hschur->block(i1,i2);
         assert(Hi1i2);
         (*Hi1i2).noalias() -= BDinv*Bj->transpose();
@@ -479,8 +474,8 @@ bool BlockSolver<Traits>::solve(){
 
   // xl = Dinv * cl
   memset(xl,0, _sizeLandmarks*sizeof(double));
-  //_DInvSchur->multiply(xl,cl);
-  _DInvSchur->rightMultiply(xl,cl);
+  _DInvSchur->multiply(xl,cl);
+  //_DInvSchur->rightMultiply(xl,cl);
   //cerr << "Solve [landmark delta] = " <<  get_monotonic_time()-t << endl;
 
   return true;
