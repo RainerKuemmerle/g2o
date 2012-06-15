@@ -191,6 +191,8 @@ class SparseBlockMatrix {
      */
     int fillSparseBlockMatrixCCS(SparseBlockMatrixCCS<MatrixType>& blockCCS) const;
 
+    int fillSparseBlockMatrixCCSTransposed(SparseBlockMatrixCCS<MatrixType>& blockCCS) const;
+
   protected:
     std::vector<int> _rowBlockIndices; ///< vector of the indices of the blocks along the rows.
     std::vector<int> _colBlockIndices; ///< vector of the indices of the blocks along the cols

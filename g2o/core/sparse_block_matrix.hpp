@@ -608,4 +608,21 @@ namespace g2o {
     return numblocks;
   }
 
+  template <class MatrixType>
+  int SparseBlockMatrix<MatrixType>::fillSparseBlockMatrixCCSTransposed(SparseBlockMatrixCCS<MatrixType>& blockCCS) const
+  {
+    blockCCS.blockCols().clear();
+    blockCCS.blockCols().resize(_rowBlockIndices.size());
+    int numblocks = 0;
+    for (size_t i = 0; i < blockCols().size(); ++i) {
+      const IntBlockMap& row = blockCols()[i];
+      for (typename IntBlockMap::const_iterator it = row.begin(); it != row.end(); ++it) {
+        typename SparseBlockMatrixCCS<MatrixType>::SparseColumn& dest = blockCCS.blockCols()[it->first];
+        dest.push_back(typename SparseBlockMatrixCCS<MatrixType>::RowBlock(i, it->second));
+        ++numblocks;
+      }
+    }
+    return numblocks;
+  }
+
 }// end namespace

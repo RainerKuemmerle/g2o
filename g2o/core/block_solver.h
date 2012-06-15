@@ -139,6 +139,7 @@ namespace g2o {
       SparseBlockMatrix<LandmarkMatrixType>* _DInvSchur;
 
       SparseBlockMatrixCCS<PoseLandmarkMatrixType>* _HplCCS;
+      SparseBlockMatrixCCS<PoseMatrixType>* _HschurCCS;
 
       LinearSolver<PoseMatrixType>* _linearSolver;
 

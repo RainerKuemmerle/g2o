@@ -47,6 +47,7 @@ BlockSolver<Traits>::BlockSolver(LinearSolverType* linearSolver) :
   _Hll=0;
   _Hpl=0;
   _HplCCS = 0;
+  _HschurCCS = 0;
   _Hschur=0;
   _DInvSchur=0;
   _coefficients=0;
@@ -82,6 +83,7 @@ void BlockSolver<Traits>::resize(int* blockPoseIndices, int numPoseBlocks,
     _DInvSchur=new LandmarkHessianType(blockLandmarkIndices, blockLandmarkIndices, numLandmarkBlocks, numLandmarkBlocks);
     _Hpl=new PoseLandmarkHessianType(blockPoseIndices, blockLandmarkIndices, numPoseBlocks, numLandmarkBlocks);
     _HplCCS = new SparseBlockMatrixCCS<PoseLandmarkMatrixType>(_Hpl->rowBlockIndices(), _Hpl->colBlockIndices());
+    _HschurCCS = new SparseBlockMatrixCCS<PoseMatrixType>(_Hschur->rowBlockIndices(), _Hschur->colBlockIndices());
 #ifdef G2O_OPENMP
     _coefficientsMutex.resize(numPoseBlocks);
 #endif
@@ -122,6 +124,10 @@ void BlockSolver<Traits>::deallocate()
   if (_HplCCS) {
     delete _HplCCS;
     _HplCCS = 0;
+  }
+  if (_HschurCCS) {
+    delete _HschurCCS;
+    _HschurCCS = 0;
   }
 }
 
@@ -281,6 +287,7 @@ bool BlockSolver<Traits>::buildStructure(bool zeroBlocks)
       }
     }
   }
+  _Hschur->fillSparseBlockMatrixCCSTransposed(*_HschurCCS);
 
   return true;
 }
@@ -407,13 +414,19 @@ bool BlockSolver<Traits>::solve(){
 #    endif
       Bb.noalias() += (*Bi)*db;
 
+      assert(i1 >= 0 && i1 < static_cast<int>(_HschurCCS->blockCols().size()) && "Index out of bounds");
+      typename SparseBlockMatrixCCS<PoseMatrixType>::SparseColumn::iterator targetColumnIt = _HschurCCS->blockCols()[i1].begin();
+
       typename SparseBlockMatrixCCS<PoseLandmarkMatrixType>::RowBlock aux(i1, 0);
       typename SparseBlockMatrixCCS<PoseLandmarkMatrixType>::SparseColumn::const_iterator it_inner = lower_bound(landmarkColumn.begin(), landmarkColumn.end(), aux);
       for (; it_inner != landmarkColumn.end(); ++it_inner) {
         int i2 = it_inner->row;
         const PoseLandmarkMatrixType* Bj = it_inner->block;
         assert(Bj); 
-        PoseMatrixType* Hi1i2 = _Hschur->block(i1,i2);
+        while (targetColumnIt->row < i2 /*&& targetColumnIt != _HschurCCS->blockCols()[i1].end()*/)
+          ++targetColumnIt;
+        assert(targetColumnIt != _HschurCCS->blockCols()[i1].end() && targetColumnIt->row == i2 && "invalid iterator, something wrong with the matrix structure");
+        PoseMatrixType* Hi1i2 = targetColumnIt->block;//_Hschur->block(i1,i2);
         assert(Hi1i2);
         (*Hi1i2).noalias() -= BDinv*Bj->transpose();
       }
