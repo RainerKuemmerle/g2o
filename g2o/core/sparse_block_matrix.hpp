@@ -224,42 +224,6 @@ namespace g2o {
     return false;
   }
 
-  template<typename MatrixType>
-  inline void axpy(const MatrixType& A, const Map<const VectorXd>& x, int xoff, Map<VectorXd>& y, int yoff)
-  {
-    y.segment<MatrixType::RowsAtCompileTime>(yoff) += A * x.segment<MatrixType::ColsAtCompileTime>(xoff);
-  }
-
-  template<int t>
-  inline void axpy(const Eigen::Matrix<double, Eigen::Dynamic, t>& A, const Map<const VectorXd>& x, int xoff, Map<VectorXd>& y, int yoff)
-  {
-    y.segment(yoff, A.rows()) += A * x.segment<Eigen::Matrix<double, Eigen::Dynamic, t>::ColsAtCompileTime>(xoff);
-  }
-
-  template<>
-  inline void axpy(const MatrixXd& A, const Map<const VectorXd>& x, int xoff, Map<VectorXd>& y, int yoff)
-  {
-    y.segment(yoff, A.rows()) += A * x.segment(xoff, A.cols());
-  }
-
-  template<typename MatrixType>
-  inline void atxpy(const MatrixType& A, Map<const VectorXd>& x, int xoff, Map<VectorXd>& y, int yoff)
-  {
-    y.segment<MatrixType::ColsAtCompileTime>(yoff) += A.transpose() * x.segment<MatrixType::RowsAtCompileTime>(xoff);
-  }
-
-  template<int t>
-  inline void atxpy(const Eigen::Matrix<double, Eigen::Dynamic, t>& A, Map<const VectorXd>& x, int xoff, Map<VectorXd>& y, int yoff)
-  {
-    y.segment<Eigen::Matrix<double, Eigen::Dynamic, t>::ColsAtCompileTime>(yoff) += A.transpose() * x.segment(xoff, A.rows());
-  }
-
-  template<>
-  inline void atxpy(const MatrixXd& A, Map<const VectorXd>& x, int xoff, Map<VectorXd>& y, int yoff)
-  {
-    y.segment(yoff, A.cols()) += A.transpose() * x.segment(xoff, A.rows());
-  }
-
   template <class MatrixType>
   void SparseBlockMatrix<MatrixType>::multiply(double*& dest, const double* src) const {
     if (! dest){
@@ -278,7 +242,7 @@ namespace g2o {
         const typename SparseBlockMatrix<MatrixType>::SparseMatrixBlock* a=it->second;
         int destOffset = it->first ? _rowBlockIndices[it->first - 1] : 0;
         // destVec += *a * srcVec (according to the sub-vector parts)
-        axpy(*a, srcVec, srcOffset, destVec, destOffset);
+        internal::axpy(*a, srcVec, srcOffset, destVec, destOffset);
       }
     }
   }
@@ -307,7 +271,7 @@ namespace g2o {
         const typename SparseBlockMatrix<MatrixType>::SparseMatrixBlock* a=it->second;
         int srcOffset = rowBaseOfBlock(it->first);
         // destVec += *a.transpose() * srcVec (according to the sub-vector parts)
-        atxpy(*a, srcVec, srcOffset, destVec, destOffset);
+        internal::atxpy(*a, srcVec, srcOffset, destVec, destOffset);
       }
     }
     

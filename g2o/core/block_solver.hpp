@@ -475,7 +475,7 @@ bool BlockSolver<Traits>::solve(){
 
   // cl = bl - Bt * xp
   //Bt->multiply(cl, cp);
-  _Hpl->rightMultiply(cl, cp);
+  _HplCCS->rightMultiply(cl, cp);
 
   // xl = Dinv * cl
   memset(xl,0, _sizeLandmarks*sizeof(double));

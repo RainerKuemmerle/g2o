@@ -32,6 +32,7 @@
 #include <Eigen/Core>
 
 #include "g2o/config.h"
+#include "matrix_operations.h"
 
 namespace g2o {
 
@@ -89,6 +90,33 @@ namespace g2o {
 
       //! indices of the column blocks
       const std::vector<int>& colBlockIndices() const { return _colBlockIndices;}
+
+      void rightMultiply(double*& dest, const double* src) const
+      {
+        int destSize=cols();
+
+        if (! dest){
+          dest=new double [ destSize ];
+          memset(dest,0, destSize*sizeof(double));
+        }
+
+        // map the memory by Eigen
+        Eigen::Map<Eigen::VectorXd> destVec(dest, destSize);
+        Eigen::Map<const Eigen::VectorXd> srcVec(src, rows());
+
+#      ifdef G2O_OPENMP
+#      pragma omp parallel for default (shared) schedule(dynamic, 10)
+#      endif
+        for (int i=0; i < static_cast<int>(_blockCols.size()); ++i){
+          int destOffset = colBaseOfBlock(i);
+          for (typename SparseColumn::const_iterator it = _blockCols[i].begin(); it!=_blockCols[i].end(); ++it) {
+            const SparseMatrixBlock* a = it->block;
+            int srcOffset = rowBaseOfBlock(it->row);
+            // destVec += *a.transpose() * srcVec (according to the sub-vector parts)
+            internal::atxpy(*a, srcVec, srcOffset, destVec, destOffset);
+          }
+        }
+      }
 
     protected:
       const std::vector<int>& _rowBlockIndices; ///< vector of the indices of the blocks along the rows.

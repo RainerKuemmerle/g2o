@@ -37,6 +37,7 @@
 
 #include "sparse_block_matrix_ccs.h"
 #include "matrix_structure.h"
+#include "matrix_operations.h"
 #include "g2o/config.h"
 
 namespace g2o {
