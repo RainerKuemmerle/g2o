@@ -85,7 +85,7 @@ namespace g2o {
     if (!DrawAction::refreshPropertyPtrs(params_))
       return false;
     if (_previousParams){
-      _textSize = _previousParams->makeProperty<IntProperty>(_typeName + "::TEXT_SIZE", 10);
+      _textSize = _previousParams->makeProperty<IntProperty>(_typeName + "::TEXT_SIZE", 1);
     } else {
       _textSize = 0;
     }
@@ -104,13 +104,13 @@ namespace g2o {
     VertexTag* that = static_cast<VertexTag*>(element);
 
     glPushMatrix();
-    glColor3f(1.,0.2,0.2);
+    glColor3f(1.,0.2,1.);
     glTranslatef(that->position().x(), that->position().y(), that->position().z());
     int textSize = 1;
     if (_textSize )
       textSize = _textSize->value();
-    glutSolidCube(0.7*textSize);
-    glTranslatef(textSize, 0, 0);
+    glutSolidCube(0.1*textSize);
+    glTranslatef(0.2*textSize, 0, 0);
     glScalef(0.003*textSize,0.003*textSize,1);
     glutStrokeString(GLUT_STROKE_ROMAN, (const unsigned char*)that->name().c_str());
     glPopMatrix();

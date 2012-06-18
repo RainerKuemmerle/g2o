@@ -110,27 +110,27 @@ namespace g2o {
     if (! _previousParams)
       return this;
 
-    if (_show && !_show->value())
-      return this;
-    
 
     VertexSE2* that = static_cast<VertexSE2*>(element);
+
     glColor3f(0.5f,0.5f,0.8f);
     glPushAttrib(GL_ENABLE_BIT);
     glDisable(GL_LIGHTING);
     glPushMatrix();
     glTranslatef((float)that->estimate().translation().x(),(float)that->estimate().translation().y(),0.f);
     glRotatef((float)RAD2DEG(that->estimate().rotation().angle()),0.f,0.f,1.f);
-    float tx=0.1f, ty=0.05f;
-    if (_triangleX && _triangleY){
-      tx=_triangleX->value();
-      ty=_triangleY->value();
+    if (_show && _show->value()) {
+      float tx=0.1f, ty=0.05f;
+      if (_triangleX && _triangleY){
+	tx=_triangleX->value();
+	ty=_triangleY->value();
+      }
+      glBegin(GL_TRIANGLE_FAN);
+      glVertex3f( tx ,0.f ,0.f);
+      glVertex3f(-tx ,-ty, 0.f);
+      glVertex3f(-tx , ty, 0.f);
+      glEnd();
     }
-    glBegin(GL_TRIANGLE_FAN);
-    glVertex3f( tx ,0.f ,0.f);
-    glVertex3f(-tx ,-ty, 0.f);
-    glVertex3f(-tx , ty, 0.f);
-    glEnd();
     OptimizableGraph::Data* d=that->userData();
     while (d && _drawActions ){
       (*_drawActions)(d, params_);
