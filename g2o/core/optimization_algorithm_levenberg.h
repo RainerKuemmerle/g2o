@@ -63,6 +63,9 @@ namespace g2o {
       //! specify the initial lambda used for the first iteraion, if not given the SparseOptimizer tries to compute a suitable value
       void setUserLambdaInit(double lambda);
 
+      //! return the number of levenberg iterations performed in the last round
+      int levenbergIteration() { return _levenbergIterations;}
+
     protected:
       // Levenberg parameters
       Property<int>* _maxTrialsAfterFailure;
@@ -72,6 +75,7 @@ namespace g2o {
       double _goodStepLowerScale; ///< lower bound for lambda decrease if a good LM step
       double _goodStepUpperScale; ///< upper bound for lambda decrease if a good LM step
       double _ni;
+      int _levenbergIterations;   ///< the numer of levenberg iterations performed to accept the last step
 
       /**
        * helper for Levenberg, this function computes the initial damping factor, if the user did not

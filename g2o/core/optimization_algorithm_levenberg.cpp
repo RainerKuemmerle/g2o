@@ -47,6 +47,7 @@ namespace g2o {
     _userLambdaInit = _properties.makeProperty<Property<double> >("initialLambda", 0.);
     _maxTrialsAfterFailure = _properties.makeProperty<Property<int> >("maxTrialsAfterFailure", 10);
     _ni=2.;
+    _levenbergIterations = 0;
   }
 
   OptimizationAlgorithmLevenberg::~OptimizationAlgorithmLevenberg()
@@ -87,7 +88,8 @@ namespace g2o {
     }
 
     double rho=0;
-    int qmax=0;
+    int& qmax = _levenbergIterations;
+    qmax = 0;
     do {
       _optimizer->push();
       if (globalStats) {
@@ -181,7 +183,8 @@ namespace g2o {
   {
     os
       << "\t schur= " << _solver->schur()
-      << "\t lambda= " << FIXED(_currentLambda);
+      << "\t lambda= " << FIXED(_currentLambda)
+      << "\t levenbergIter= " << _levenbergIterations;
   }
 
 } // end namespace
