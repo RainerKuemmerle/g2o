@@ -33,6 +33,15 @@
 #define CERES_PUBLIC_INTERNAL_FIXED_ARRAY_H_
 
 #include <cstddef>
+
+#if defined(_MSC_VER)
+#define CERES_ALIGN_ATTRIBUTE(n) __declspec(align(n))
+#define CERES_ALIGN_OF(T) __alignof(T)
+#elif defined(__GNUC__)
+#define CERES_ALIGN_ATTRIBUTE(n) __attribute__((aligned(n)))
+#define CERES_ALIGN_OF(T) __alignof(T)
+#endif
+
 #include "manual_constructor.h"
 
 namespace ceres {
@@ -144,7 +153,7 @@ class FixedArray {
 
   // Allocate some space, not an array of elements of type T, so that we can
   // skip calling the T constructors and destructors for space we never use.
-  ManualConstructor<InnerContainer> inline_space_[kInlineElements];
+  ManualConstructor<InnerContainer> inline_space_[kInlineElements] CERES_ALIGN_ATTRIBUTE(16);
 };
 
 // Implementation details follow
