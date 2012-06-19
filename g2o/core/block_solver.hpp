@@ -37,6 +37,16 @@ namespace g2o {
   using namespace std;
   using namespace Eigen;
 
+  namespace internal {
+    /** Helper class to sort pair based on first elem */
+    template<class T1, class T2, class Pred = std::less<T1> >
+    struct CmpPairFirst {
+      bool operator()(const std::pair<T1,T2>& left, const std::pair<T1,T2>& right) {
+        return Pred()(left.first, right.first);
+      }
+    };
+  }
+
 template <typename Traits>
 BlockSolver<Traits>::BlockSolver(LinearSolverType* linearSolver) :
   Solver(),
@@ -148,13 +158,8 @@ bool BlockSolver<Traits>::buildStructure(bool zeroBlocks)
   _numLandmarks=0;
   _sizePoses=0;
   _sizeLandmarks=0;
-#ifdef _MSC_VER
   int* blockPoseIndices = new int[_optimizer->indexMapping().size()];
   int* blockLandmarkIndices = new int[_optimizer->indexMapping().size()];
-#else
-  int blockPoseIndices[_optimizer->indexMapping().size()];
-  int blockLandmarkIndices[_optimizer->indexMapping().size()];
-#endif
 
   for (size_t i = 0; i < _optimizer->indexMapping().size(); ++i) {
     OptimizableGraph::Vertex* v = _optimizer->indexMapping()[i];
@@ -173,10 +178,8 @@ bool BlockSolver<Traits>::buildStructure(bool zeroBlocks)
     sparseDim += dim;
   }
   resize(blockPoseIndices, _numPoses, blockLandmarkIndices, _numLandmarks, sparseDim);
-#ifdef _MSC_VER
   delete[] blockLandmarkIndices;
   delete[] blockPoseIndices;
-#endif
   
   // allocate the diagonal on Hpp and Hll
   int poseIdx = 0;
@@ -258,32 +261,76 @@ bool BlockSolver<Traits>::buildStructure(bool zeroBlocks)
   _Hpl->fillSparseBlockMatrixCCS(*_HplCCS);
 
   // allocate the blocks for the schur complement
-  for (size_t i = 0; i < _optimizer->indexMapping().size(); ++i) {
-    OptimizableGraph::Vertex* v = _optimizer->indexMapping()[i];
-    if (v->marginalized()){
-      const HyperGraph::EdgeSet& vedges=v->edges();
-      for (HyperGraph::EdgeSet::const_iterator it1=vedges.begin(); it1!=vedges.end(); ++it1){
-        if ((*it1)->vertices().size() != 2)
-          continue;
-        OptimizableGraph::Vertex* v1= (OptimizableGraph::Vertex*) (*it1)->vertex(0);
-        if (v1==v)
-          v1 = (OptimizableGraph::Vertex*) (*it1)->vertex(1);
-        if (v1->hessianIndex()==-1)
-          continue;
-        for  (HyperGraph::EdgeSet::const_iterator it2=vedges.begin(); it2!=vedges.end(); ++it2){
-          if ((*it2)->vertices().size() != 2)
+  // by first storing the blocks into a temporary hash map
+  // afterwards sort each column and it to the block matrix structure
+  {
+    typedef std::tr1::unordered_map<int, PoseMatrixType*> SparseColumn;
+    std::vector<SparseColumn> schurMatrixLookup;
+    schurMatrixLookup.resize(_Hschur->blockCols().size());
+
+    for (size_t i = 0; i < _optimizer->indexMapping().size(); ++i) {
+      OptimizableGraph::Vertex* v = _optimizer->indexMapping()[i];
+      if (v->marginalized()){
+        const HyperGraph::EdgeSet& vedges=v->edges();
+        for (HyperGraph::EdgeSet::const_iterator it1=vedges.begin(); it1!=vedges.end(); ++it1){
+          if ((*it1)->vertices().size() != 2)
             continue;
-          OptimizableGraph::Vertex* v2= (OptimizableGraph::Vertex*) (*it2)->vertex(0);
-          if (v2==v)
-            v2 = (OptimizableGraph::Vertex*) (*it2)->vertex(1);
-          if (v2->hessianIndex()==-1)
+          OptimizableGraph::Vertex* v1= (OptimizableGraph::Vertex*) (*it1)->vertex(0);
+          if (v1==v)
+            v1 = (OptimizableGraph::Vertex*) (*it1)->vertex(1);
+          if (v1->hessianIndex()==-1)
             continue;
-          int i1=v1->hessianIndex();
-          int i2=v2->hessianIndex();
-          if (i1<=i2) {
-            _Hschur->block(i1,i2,true)->setZero();
+          for  (HyperGraph::EdgeSet::const_iterator it2=vedges.begin(); it2!=vedges.end(); ++it2){
+            if ((*it2)->vertices().size() != 2)
+              continue;
+            OptimizableGraph::Vertex* v2= (OptimizableGraph::Vertex*) (*it2)->vertex(0);
+            if (v2==v)
+              v2 = (OptimizableGraph::Vertex*) (*it2)->vertex(1);
+            if (v2->hessianIndex()==-1)
+              continue;
+            int i1=v1->hessianIndex();
+            int i2=v2->hessianIndex();
+            if (i1<=i2) {
+
+              SparseColumn& sparseRow = schurMatrixLookup[i2];
+              typename SparseColumn::iterator foundIt = sparseRow.find(i1);
+              if (foundIt == sparseRow.end()) {
+                int rb = _Hschur->rowsOfBlock(i1);
+                int cb = _Hschur->colsOfBlock(i2);
+                PoseMatrixType* m = new PoseMatrixType(rb, cb);
+                m->setZero();
+                sparseRow[i1] = m;
+              }
+
+            }
           }
         }
+      }
+    }
+
+    // now sort the sparse columns and add them to the _Hschur map structures by
+    // exploiting that we are inserting a sorted structure
+    typedef std::pair<int, PoseMatrixType*> SparseColumnPair;
+    for (size_t i = 0; i < schurMatrixLookup.size(); ++i) {
+      // prepare a temporary vector for sorting
+      SparseColumn& column = schurMatrixLookup[i];
+      if (column.size() == 0)
+        continue;
+      std::vector<SparseColumnPair> sparseRowSorted; // temporary structure
+      sparseRowSorted.reserve(column.size());
+      for (typename SparseColumn::const_iterator it = column.begin(); it != column.end(); ++it)
+        sparseRowSorted.push_back(*it);
+      std::sort(sparseRowSorted.begin(), sparseRowSorted.end(), internal::CmpPairFirst<int, PoseMatrixType*>());
+      // try to free some memory early
+      SparseColumn aux;
+      swap(aux, column);
+      // now insert sorted vector to the std::map structure
+      typename SparseBlockMatrix<PoseMatrixType>::IntBlockMap& destColumnMap = _Hschur->blockCols()[i];
+      destColumnMap.insert(sparseRowSorted[0]);
+      for (size_t j = 1; j < sparseRowSorted.size(); ++j) {
+        typename SparseBlockMatrix<PoseMatrixType>::IntBlockMap::iterator hint = destColumnMap.end();
+        --hint; // cppreference says the element goes after the hint (until C++11)
+        destColumnMap.insert(hint, sparseRowSorted[j]);
       }
     }
   }

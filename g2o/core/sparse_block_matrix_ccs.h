@@ -55,10 +55,13 @@ namespace g2o {
       //! rows of the matrix
       int rows() const {return _rowBlockIndices.size() ? _rowBlockIndices.back() : 0;}
 
+      /**
+       * \brief A block within a column
+       */
       struct RowBlock
       {
-        int row;
-        MatrixType* block;
+        int row;              ///< row of the block
+        MatrixType* block;    ///< matrix pointer for the block
         RowBlock() : row(-1), block(0) {}
         RowBlock(int r, MatrixType* b) : row(r), block(b) {}
         bool operator<(const RowBlock& other) const { return row < other.row;}
@@ -70,16 +73,16 @@ namespace g2o {
       {}
 
       //! how many rows does the block at block-row r has?
-      inline int rowsOfBlock(int r) const { return r ? _rowBlockIndices[r] - _rowBlockIndices[r-1] : _rowBlockIndices[0] ; }
+      int rowsOfBlock(int r) const { return r ? _rowBlockIndices[r] - _rowBlockIndices[r-1] : _rowBlockIndices[0] ; }
 
       //! how many cols does the block at block-col c has?
-      inline int colsOfBlock(int c) const { return c ? _colBlockIndices[c] - _colBlockIndices[c-1] : _colBlockIndices[0]; }
+      int colsOfBlock(int c) const { return c ? _colBlockIndices[c] - _colBlockIndices[c-1] : _colBlockIndices[0]; }
 
-      //! where does the row at block-row r starts?
-      inline int rowBaseOfBlock(int r) const { return r ? _rowBlockIndices[r-1] : 0 ; }
+      //! where does the row at block-row r start?
+      int rowBaseOfBlock(int r) const { return r ? _rowBlockIndices[r-1] : 0 ; }
 
-      //! where does the col at block-col r starts?
-      inline int colBaseOfBlock(int c) const { return c ? _colBlockIndices[c-1] : 0 ; }
+      //! where does the col at block-col r start?
+      int colBaseOfBlock(int c) const { return c ? _colBlockIndices[c-1] : 0 ; }
 
       //! the block matrices per block-column
       const std::vector<SparseColumn>& blockCols() const { return _blockCols;}
@@ -118,10 +121,20 @@ namespace g2o {
         }
       }
 
+      /**
+       * sort the blocks in each column
+       */
+      void sortColumns()
+      {
+        for (int i=0; i < static_cast<int>(_blockCols.size()); ++i){
+          std::sort(_blockCols[i].begin(), _blockCols[i].end());
+        }
+      }
+
     protected:
       const std::vector<int>& _rowBlockIndices; ///< vector of the indices of the blocks along the rows.
       const std::vector<int>& _colBlockIndices; ///< vector of the indices of the blocks along the cols
-      std::vector<SparseColumn> _blockCols;
+      std::vector<SparseColumn> _blockCols;     ///< the matrices stored in CCS order
   };
 
 } //end namespace
