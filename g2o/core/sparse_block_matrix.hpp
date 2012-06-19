@@ -41,6 +41,13 @@ namespace g2o {
         return e1.c < e2.c || (e1.c == e2.c && e1.r < e2.r);
       }
     };
+    /** Helper class to sort pair based on first elem */
+    template<class T1, class T2, class Pred = std::less<T1> >
+    struct CmpPairFirst {
+      bool operator()(const std::pair<T1,T2>& left, const std::pair<T1,T2>& right) {
+        return Pred()(left.first, right.first);
+      }
+    };
   }
 
   template <class MatrixType>
@@ -587,6 +594,37 @@ namespace g2o {
       }
     }
     return numblocks;
+  }
+
+  template <class MatrixType>
+  void SparseBlockMatrix<MatrixType>::takePatternFromHash(SparseBlockMatrixHashMap<MatrixType>& hashMatrix)
+  {
+    // sort the sparse columns and add them to the map structures by
+    // exploiting that we are inserting a sorted structure
+    typedef std::pair<int, MatrixType*> SparseColumnPair;
+    typedef typename SparseBlockMatrixHashMap<MatrixType>::SparseColumn HashSparseColumn;
+    for (size_t i = 0; i < hashMatrix.blockCols().size(); ++i) {
+      // prepare a temporary vector for sorting
+      HashSparseColumn& column = hashMatrix.blockCols()[i];
+      if (column.size() == 0)
+        continue;
+      std::vector<SparseColumnPair> sparseRowSorted; // temporary structure
+      sparseRowSorted.reserve(column.size());
+      for (typename HashSparseColumn::const_iterator it = column.begin(); it != column.end(); ++it)
+        sparseRowSorted.push_back(*it);
+      std::sort(sparseRowSorted.begin(), sparseRowSorted.end(), CmpPairFirst<int, MatrixType*>());
+      // try to free some memory early
+      HashSparseColumn aux;
+      swap(aux, column);
+      // now insert sorted vector to the std::map structure
+      IntBlockMap& destColumnMap = blockCols()[i];
+      destColumnMap.insert(sparseRowSorted[0]);
+      for (size_t j = 1; j < sparseRowSorted.size(); ++j) {
+        typename SparseBlockMatrix<MatrixType>::IntBlockMap::iterator hint = destColumnMap.end();
+        --hint; // cppreference says the element goes after the hint (until C++11)
+        destColumnMap.insert(hint, sparseRowSorted[j]);
+      }
+    }
   }
 
 }// end namespace

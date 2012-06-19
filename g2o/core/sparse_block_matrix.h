@@ -192,7 +192,17 @@ class SparseBlockMatrix {
      */
     int fillSparseBlockMatrixCCS(SparseBlockMatrixCCS<MatrixType>& blockCCS) const;
 
+    /**
+     * copy as transposed into a CCS structure
+     * @return number of processed blocks, -1 on error
+     */
     int fillSparseBlockMatrixCCSTransposed(SparseBlockMatrixCCS<MatrixType>& blockCCS) const;
+
+    /**
+     * take over the memory and matrix pattern from a hash matrix.
+     * The structure of the hash matrix will be cleared.
+     */
+    void takePatternFromHash(SparseBlockMatrixHashMap<MatrixType>& hashMatrix);
 
   protected:
     std::vector<int> _rowBlockIndices; ///< vector of the indices of the blocks along the rows.
