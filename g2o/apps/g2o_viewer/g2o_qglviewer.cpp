@@ -17,10 +17,16 @@
 // along with g2o.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "g2o_qglviewer.h"
-
 #include "primitives.h"
 #include "g2o/core/sparse_optimizer.h"
 #include "g2o/core/hyper_graph_action.h"
+
+#ifdef __APPLE__
+#include <OpenGL/gl.h>
+#else
+#include <GL/gl.h>
+#include <GL/glut.h>
+#endif
 
 #include <iostream>
 using namespace std;
@@ -100,8 +106,7 @@ void G2oQGLViewer::draw()
 void G2oQGLViewer::init()
 {
   QGLViewer::init();
-
- //glDisable(GL_LIGHT0);
+  //glDisable(GL_LIGHT0);
  //glDisable(GL_LIGHTING);
 
   setBackgroundColor(QColor::fromRgb(51, 51, 51));

@@ -33,6 +33,15 @@
 
 #include "g2o/stuff/command_args.h"
 
+#ifdef G2O_HAVE_OPENGL
+#ifdef __APPLE__
+#include <OpenGL/gl.h>
+#else
+#include <GL/gl.h>
+#include <GL/freeglut.h>
+#endif
+#endif
+
 #include <QApplication>
 #include <QThread>
 using namespace std;
@@ -51,6 +60,7 @@ class SleepThread : public QThread
 int main(int argc, char** argv)
 {
   QApplication qapp(argc, argv);
+  glutInit(&argc, argv);
 
   string dummy;
   string inputFilename;

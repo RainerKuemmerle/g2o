@@ -153,6 +153,8 @@ namespace g2o {
     if (! _previousParams){
       return this;
     }
+    if (_show && !_show->value())
+      return this;
     RobotLaser* that = static_cast<RobotLaser*>(element);
 
     RawLaser::Point2DVector points=that->cartesian();
