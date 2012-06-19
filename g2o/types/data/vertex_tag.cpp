@@ -37,10 +37,12 @@
 #include <OpenGL/gl.h>
 #else
 #include <GL/gl.h>
-#include <GL/freeglut.h>
 #endif
 #endif
 
+#ifdef G2O_HAVE_GLUT
+#include <GL/freeglut.h>
+#endif
 
 #include <iomanip>
 using namespace std;
@@ -109,10 +111,12 @@ namespace g2o {
     int textSize = 1;
     if (_textSize )
       textSize = _textSize->value();
+#ifdef G2O_HAVE_GLUT
     glutSolidCube(0.1*textSize);
     glTranslatef(0.2*textSize, 0, 0);
     glScalef(0.003*textSize,0.003*textSize,1);
     glutStrokeString(GLUT_STROKE_ROMAN, (const unsigned char*)that->name().c_str());
+#endif
     glPopMatrix();
     return this;
   }
