@@ -23,6 +23,7 @@
 
 #include "gui_hyper_graph_action.h"
 
+#include "g2o/config.h"
 #include "g2o/core/sparse_optimizer.h"
 #include "g2o/core/factory.h"
 #include "g2o/core/optimization_algorithm_factory.h"
@@ -38,8 +39,11 @@
 #include <OpenGL/gl.h>
 #else
 #include <GL/gl.h>
-#include <GL/freeglut.h>
 #endif
+#endif
+
+#ifdef G2O_HAVE_GLUT
+#include <GL/freeglut.h>
 #endif
 
 #include <QApplication>
@@ -60,7 +64,9 @@ class SleepThread : public QThread
 int main(int argc, char** argv)
 {
   QApplication qapp(argc, argv);
+#ifdef G2O_HAVE_GLUT
   glutInit(&argc, argv);
+#endif
 
   string dummy;
   string inputFilename;
