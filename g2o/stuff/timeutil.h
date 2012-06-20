@@ -104,7 +104,7 @@ inline double get_time()
  * On Linux we call clock_gettime() on other systems we currently
  * call get_time().
  */
-double get_monotonic_time();
+G2O_STUFF_API double get_monotonic_time();
 
 /**
  * \brief Class to measure the time spent in a scope
@@ -112,7 +112,7 @@ double get_monotonic_time();
  * To use this class, e.g. to measure the time spent in a function,
  * just create and instance at the beginning of the function.
  */
-class ScopeTime {
+class G2O_STUFF_API ScopeTime {
   public: 
     ScopeTime(const char* title);
     ~ScopeTime();

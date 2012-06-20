@@ -143,8 +143,8 @@ int main(int argc, char** argv)
   double radius = 2.;
   Eigen::Vector2d* points = new Eigen::Vector2d[numPoints];
   for (int i = 0; i < numPoints; ++i) {
-    double r = g2o::sampleUniform(radius-0.1, radius+0.1);
-    double angle = g2o::sampleUniform(0., 2. * M_PI);
+    double r = g2o::Sampler::uniformRand(radius-0.1, radius+0.1);
+    double angle = g2o::Sampler::uniformRand(0., 2. * M_PI);
     points[i].x() = center.x() + r * cos(angle);
     points[i].y() = center.y() + r * sin(angle);
   }
@@ -193,6 +193,15 @@ int main(int argc, char** argv)
   cout << endl;
 
   // solve by linear least squares
+  // Let (a, b) be the center of the circle and r the radius of the circle.
+  // For a point (x, y) on the circle we have:
+  // (x - a)^2 + (y - b)^2 = r^2
+  // This leads to
+  // (-2x -2y 1)^T * (a b c) = -x^2 - y^2   (1)
+  // where c = a^2 + b^2 - r^2.
+  // Since we have a bunch of points, we accumulate Eqn (1) in a matrix and
+  // compute the normal equation to obtain a solution for (a b c).
+  // Afterwards the radius r is recovered.
   Eigen::MatrixXd A(numPoints, 3);
   Eigen::VectorXd b(numPoints);
   for (int i = 0; i < numPoints; ++i) {

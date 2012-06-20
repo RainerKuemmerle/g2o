@@ -10,4 +10,4 @@ ADD_EXECUTABLE(curve_fit
   curve_fit.cpp
 )
 SET_TARGET_PROPERTIES(curve_fit PROPERTIES OUTPUT_NAME curve_fit${EXE_POSTFIX})
-TARGET_LINK_LIBRARIES(curve_fit core solver_dense)
+TARGET_LINK_LIBRARIES(curve_fit core)

@@ -25,7 +25,11 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <Eigen/StdVector>
+#ifdef _MSC_VER
+#include <random>
+#else
 #include <tr1/random>
+#endif
 #include <iostream>
 #include <stdint.h>
 

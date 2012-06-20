@@ -10,6 +10,6 @@ SET_TARGET_PROPERTIES(gicp_sba_demo PROPERTIES OUTPUT_NAME gicp_sba_demo${EXE_PO
 
 INCLUDE_DIRECTORIES(${CSPARSE_INCLUDE_DIR})
 
-TARGET_LINK_LIBRARIES(gicp_demo core solver_cholmod types_sba types_slam3d types_icp ${OPENGL_LIBRARIES} solver_csparse)
-TARGET_LINK_LIBRARIES(gicp_sba_demo core solver_cholmod types_sba types_slam3d types_icp ${OPENGL_LIBRARIES} solver_csparse)
+TARGET_LINK_LIBRARIES(gicp_demo core types_sba types_slam3d types_icp ${OPENGL_LIBRARIES} solver_csparse)
+TARGET_LINK_LIBRARIES(gicp_sba_demo core types_sba types_slam3d types_icp ${OPENGL_LIBRARIES} solver_csparse)
 

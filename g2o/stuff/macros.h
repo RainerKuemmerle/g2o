@@ -77,6 +77,8 @@ Modified by Mark Pupilli from:
 #  define G2O_ATTRIBUTE_WARNING(func) func
 #  define G2O_ATTRIBUTE_DEPRECATED(func) func
 
+#include <float.h>
+
 # define g2o_isnan(x)    _isnan(x)
 # define g2o_isinf(x)    (_finite(x) == 0)
 # define g2o_isfinite(x) (_finite(x) != 0)

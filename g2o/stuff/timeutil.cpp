@@ -104,10 +104,10 @@ int gettimeofday(struct timeval *tv, struct timezone *tz)
 }
 #endif
 
-ScopeTime::ScopeTime(const char* title) : _title(title), _startTime(get_time()) {}
+ScopeTime::ScopeTime(const char* title) : _title(title), _startTime(get_monotonic_time()) {}
 
 ScopeTime::~ScopeTime() {
-  std::cerr << _title<<" took "<<1000*(get_time()-_startTime)<<"ms.\n";
+  std::cerr << _title<<" took "<<1000*(get_monotonic_time()-_startTime)<<"ms.\n";
 }
 
 double get_monotonic_time()
