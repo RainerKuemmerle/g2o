@@ -42,6 +42,18 @@
 
 using namespace std;
 
+double errorOfSolution(int numPoints, Eigen::Vector2d* points, const Eigen::Vector3d& circle)
+{
+  Eigen::Vector2d center = circle.head<2>();
+  double radius = circle(2);
+  double error = 0.;
+  for (int i = 0; i < numPoints; ++i) {
+    double d = (points[i] - center).norm() - radius;
+    error += d*d;
+  }
+  return error;
+}
+
 /**
  * \brief a circle located at x,y with radius r
  */
@@ -170,9 +182,32 @@ int main(int argc, char** argv)
   optimizer.setVerbose(verbose);
   optimizer.optimize(maxIterations);
 
+  if (verbose)
+    cout << endl;
+
   // print out the result
-  cout << "Estimated center of the circle " << circle->estimate().head<2>().transpose() << endl;
-  cout << "Estimated radius of the cirlce " << circle->estimate()(2) << endl;
+  cout << "Iterative least squares solution" << endl;
+  cout << "center of the circle " << circle->estimate().head<2>().transpose() << endl;
+  cout << "radius of the cirlce " << circle->estimate()(2) << endl;
+  cout << "error " << errorOfSolution(numPoints, points, circle->estimate()) << endl;
+  cout << endl;
+
+  // solve by linear least squares
+  Eigen::MatrixXd A(numPoints, 3);
+  Eigen::VectorXd b(numPoints);
+  for (int i = 0; i < numPoints; ++i) {
+    A(i, 0) = -2*points[i].x();
+    A(i, 1) = -2*points[i].y();
+    A(i, 2) = 1;
+    b(i) = -pow(points[i].x(), 2) - pow(points[i].y(), 2);
+  }
+  Eigen::Vector3d solution = (A.transpose()*A).ldlt().solve(A.transpose() * b);
+  // calculate the radius of the circle given the solution so far
+  solution(2) = sqrt(pow(solution(0), 2) + pow(solution(1), 2) - solution(2));
+  cout << "Linear least squares solution" << endl;
+  cout << "center of the circle " << solution.head<2>().transpose() << endl;
+  cout << "radius of the cirlce " << solution(2) << endl;
+  cout << "error " << errorOfSolution(numPoints, points, solution) << endl;
 
   // clean up
   delete[] points;

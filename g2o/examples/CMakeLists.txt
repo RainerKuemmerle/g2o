@@ -1,4 +1,4 @@
-ADD_SUBDIRECTORY(circle)
+ADD_SUBDIRECTORY(data_fitting)
 ADD_SUBDIRECTORY(tutorial_slam2d)
 ADD_SUBDIRECTORY(sphere)
 
