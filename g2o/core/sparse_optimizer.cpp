@@ -190,6 +190,10 @@ namespace g2o{
   }
 
   bool SparseOptimizer::initializeOptimization(HyperGraph::VertexSet& vset, int level){
+    if (edges().size() == 0) {
+      cerr << __PRETTY_FUNCTION__ << ": Attempt to initialize an empty graph" << endl;
+      return false;
+    }
     bool workspaceAllocated = _jacobianWorkspace.allocate(); (void) workspaceAllocated;
     assert(workspaceAllocated && "Error while allocating memory for the Jacobians");
     clearIndexMapping();
