@@ -23,6 +23,7 @@
 
 #include "g2o/core/optimization_algorithm_gauss_newton.h"
 #include "g2o/core/optimization_algorithm_levenberg.h"
+#include "g2o/core/optimization_algorithm_dogleg.h"
 
 #include "g2o/stuff/macros.h"
 
@@ -77,6 +78,10 @@ namespace g2o {
     else if (methodName == "lm") {
       snl = new OptimizationAlgorithmLevenberg(s);
     }
+    else if (methodName == "dl") {
+      BlockSolverBase* blockSolver = dynamic_cast<BlockSolverBase*>(s);
+      snl = new OptimizationAlgorithmDogleg(blockSolver);
+    }
 
     return snl;
   }
@@ -108,4 +113,6 @@ namespace g2o {
   G2O_REGISTER_OPTIMIZATION_ALGORITHM(lm_fix3_2_scalar, new CSparseSolverCreator(OptimizationAlgorithmProperty("lm_fix3_2_scalar", "Levenberg: Cholesky solver using CSparse (fixed blocksize, scalar ordering)", "CSparse", true, 3, 2)));
   G2O_REGISTER_OPTIMIZATION_ALGORITHM(lm_fix6_3_scalar, new CSparseSolverCreator(OptimizationAlgorithmProperty("lm_fix6_3_scalar", "Levenberg: Cholesky solver using CSparse (fixed blocksize, scalar ordering)", "CSparse", true, 6, 3)));
   G2O_REGISTER_OPTIMIZATION_ALGORITHM(lm_fix7_3_scalar,new CSparseSolverCreator(OptimizationAlgorithmProperty("lm_fix7_3_scalar", "Levenberg: Cholesky solver using CSparse (fixed blocksize, scalar ordering)", "CSparse", true, 7, 3)));
+
+  G2O_REGISTER_OPTIMIZATION_ALGORITHM(dl_var, new CSparseSolverCreator(OptimizationAlgorithmProperty("dl_var", "Dogleg: Cholesky solver using CSparse (variable blocksize)", "CSparse", false, Eigen::Dynamic, Eigen::Dynamic)));
 }

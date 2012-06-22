@@ -59,7 +59,7 @@ namespace g2o {
    * \brief traits to summarize the properties of the dynamic size optimization problem
    */
   template <>
-    struct BlockSolverTraits<Eigen::Dynamic, Eigen::Dynamic>
+  struct BlockSolverTraits<Eigen::Dynamic, Eigen::Dynamic>
   {
     static const int PoseDim = Eigen::Dynamic;
     static const int LandmarkDim = Eigen::Dynamic;
@@ -69,7 +69,6 @@ namespace g2o {
     typedef VectorXd PoseVectorType;
     typedef VectorXd LandmarkVectorType;
 
-
     typedef SparseBlockMatrix<PoseMatrixType> PoseHessianType;
     typedef SparseBlockMatrix<LandmarkMatrixType> LandmarkHessianType;
     typedef SparseBlockMatrix<PoseLandmarkMatrixType> PoseLandmarkHessianType;
@@ -77,10 +76,23 @@ namespace g2o {
   };
 
   /**
+   * \brief base for the block solvers with some basic function interfaces
+   */
+  class BlockSolverBase : public Solver
+  {
+    public:
+      virtual ~BlockSolverBase() {}
+      /**
+       * compute dest = H * src
+       */
+      virtual void multiplyHessian(double* dest, const double* src) const = 0;
+  };
+
+  /**
    * \brief Implementation of a solver operating on the blocks of the Hessian
    */
   template <typename Traits>
-  class BlockSolver: public Solver {
+  class BlockSolver: public BlockSolverBase {
     public:
 
       static const int PoseDim = Traits::PoseDim;
@@ -123,6 +135,8 @@ namespace g2o {
       virtual bool writeDebug() const {return _linearSolver->writeDebug();}
 
       virtual bool saveHessian(const std::string& fileName) const;
+
+      virtual void multiplyHessian(double* dest, const double* src) const { _Hpp->multiplySymmetricUpperTriangle(dest, src);}
 
     protected:
       void resize(int* blockPoseIndices, int numPoseBlocks, 

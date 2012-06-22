@@ -228,37 +228,37 @@ namespace g2o {
   }
 
   template<typename MatrixType>
-  inline void axpy(const MatrixType& A, const Map<VectorXd>& x, int xoff, Map<VectorXd>& y, int yoff)
+  inline void axpy(const MatrixType& A, const Map<const VectorXd>& x, int xoff, Map<VectorXd>& y, int yoff)
   {
     y.segment<MatrixType::RowsAtCompileTime>(yoff) += A * x.segment<MatrixType::ColsAtCompileTime>(xoff);
   }
 
   template<int t>
-  inline void axpy(const Eigen::Matrix<double, Eigen::Dynamic, t>& A, const Map<VectorXd>& x, int xoff, Map<VectorXd>& y, int yoff)
+  inline void axpy(const Eigen::Matrix<double, Eigen::Dynamic, t>& A, const Map<const VectorXd>& x, int xoff, Map<VectorXd>& y, int yoff)
   {
     y.segment(yoff, A.rows()) += A * x.segment<Eigen::Matrix<double, Eigen::Dynamic, t>::ColsAtCompileTime>(xoff);
   }
 
   template<>
-  inline void axpy(const MatrixXd& A, const Map<VectorXd>& x, int xoff, Map<VectorXd>& y, int yoff)
+  inline void axpy(const MatrixXd& A, const Map<const VectorXd>& x, int xoff, Map<VectorXd>& y, int yoff)
   {
     y.segment(yoff, A.rows()) += A * x.segment(xoff, A.cols());
   }
 
   template<typename MatrixType>
-  inline void atxpy(const MatrixType& A, Map<const VectorXd>& x, int xoff, Map<VectorXd>& y, int yoff)
+  inline void atxpy(const MatrixType& A, const Map<const VectorXd>& x, int xoff, Map<VectorXd>& y, int yoff)
   {
     y.segment<MatrixType::ColsAtCompileTime>(yoff) += A.transpose() * x.segment<MatrixType::RowsAtCompileTime>(xoff);
   }
 
   template<int t>
-  inline void atxpy(const Eigen::Matrix<double, Eigen::Dynamic, t>& A, Map<const VectorXd>& x, int xoff, Map<VectorXd>& y, int yoff)
+  inline void atxpy(const Eigen::Matrix<double, Eigen::Dynamic, t>& A, const Map<const VectorXd>& x, int xoff, Map<VectorXd>& y, int yoff)
   {
     y.segment<Eigen::Matrix<double, Eigen::Dynamic, t>::ColsAtCompileTime>(yoff) += A.transpose() * x.segment(xoff, A.rows());
   }
 
   template<>
-  inline void atxpy(const MatrixXd& A, Map<const VectorXd>& x, int xoff, Map<VectorXd>& y, int yoff)
+  inline void atxpy(const MatrixXd& A, const Map<const VectorXd>& x, int xoff, Map<VectorXd>& y, int yoff)
   {
     y.segment(yoff, A.cols()) += A.transpose() * x.segment(xoff, A.rows());
   }
@@ -272,7 +272,7 @@ namespace g2o {
 
     // map the memory by Eigen
     Map<VectorXd> destVec(dest, rows());
-    const Map<VectorXd> srcVec(src, cols());
+    const Map<const VectorXd> srcVec(src, cols());
 
     for (size_t i=0; i<_blockCols.size(); ++i){
       int srcOffset = i ? _colBlockIndices[i-1] : 0;
@@ -282,6 +282,33 @@ namespace g2o {
         int destOffset = it->first ? _rowBlockIndices[it->first - 1] : 0;
         // destVec += *a * srcVec (according to the sub-vector parts)
         axpy(*a, srcVec, srcOffset, destVec, destOffset);
+      }
+    }
+  }
+
+  template <class MatrixType>
+  void SparseBlockMatrix<MatrixType>::multiplySymmetricUpperTriangle(double*& dest, const double* src) const
+  {
+    if (! dest){
+      dest=new double [_rowBlockIndices[_rowBlockIndices.size()-1] ];
+      memset(dest,0, _rowBlockIndices[_rowBlockIndices.size()-1]*sizeof(double));
+    }
+
+    // map the memory by Eigen
+    Map<VectorXd> destVec(dest, rows());
+    const Map<const VectorXd> srcVec(src, cols());
+
+    for (size_t i=0; i<_blockCols.size(); ++i){
+      int srcOffset = colBaseOfBlock(i);
+      for (typename SparseBlockMatrix<MatrixType>::IntBlockMap::const_iterator it=_blockCols[i].begin(); it!=_blockCols[i].end(); ++it){
+        const typename SparseBlockMatrix<MatrixType>::SparseMatrixBlock* a=it->second;
+        int destOffset = rowBaseOfBlock(it->first);
+        if (destOffset > srcOffset) // only upper triangle
+          break;
+        // destVec += *a * srcVec (according to the sub-vector parts)
+        axpy(*a, srcVec, srcOffset, destVec, destOffset);
+        if (destOffset < srcOffset)
+          atxpy(*a, srcVec, destOffset, destVec, srcOffset);
       }
     }
   }
