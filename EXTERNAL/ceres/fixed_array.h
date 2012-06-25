@@ -33,6 +33,7 @@
 #define CERES_PUBLIC_INTERNAL_FIXED_ARRAY_H_
 
 #include <cstddef>
+#include <Eigen/Core>
 
 #if defined(_MSC_VER)
 #define CERES_ALIGN_ATTRIBUTE(n) __declspec(align(n))
@@ -135,6 +136,7 @@ class FixedArray {
   // of this code will be broken.
   struct InnerContainer {
     T element;
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
   };
 
   // How many elements should we store inline?
