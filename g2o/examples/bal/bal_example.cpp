@@ -169,34 +169,56 @@ class EdgeObservationBAL : public BaseBinaryEdge<2, Vector2d, VertexCameraBAL, V
       return false;
     }
 
+    template<typename T>
+    inline void cross(const T x[3], const T y[3], T result[3]) const
+    {
+      result[0] = x[1] * y[2] - x[2] * y[1];
+      result[1] = x[2] * y[0] - x[0] * y[2];
+      result[2] = x[0] * y[1] - x[1] * y[0];
+    }
+
+    template<typename T>
+    inline T dot(const T x[3], const T y[3]) const { return (x[0] * y[0] + x[1] * y[1] + x[2] * y[2]);}
+
+    template<typename T>
+    inline T squaredNorm(const T x[3]) const { return dot<T>(x, x);}
+
     /**
      * templatized function to compute the error as described in the comment above
      */
     template<typename T>
-    bool operator()(const T* camera, const T* pointArray, T* error) const
+    bool operator()(const T* camera, const T* point, T* error) const
     {
-      typedef Eigen::Matrix<T, 3, 1>    PointType;
-
-      // conversion from world to camera coordinates
-      typename PointType::ConstMapType angleAxisVector(camera, 3);
-
       // Rodrigues' formula for the rotation
-      typename PointType::ConstMapType point(pointArray);
-      PointType p;
-      T theta = angleAxisVector.norm();
+      T p[3];
+      T theta = sqrt(squaredNorm(camera));
       if (theta > T(0)) {
-        PointType v = angleAxisVector / theta;
+        T v[3];
+        v[0] = camera[0] / theta;
+        v[1] = camera[1] / theta;
+        v[2] = camera[2] / theta;
         T cth = cos(theta);
         T sth = sin(theta);
-        p = point * cth + v.cross(point) * sth + v * v.dot(point) * (T(1) - cth);
+
+        T vXp[3];
+        cross(v, point, vXp);
+        T vDotp = dot(v, point);
+        T oneMinusCth = T(1) - cth;
+
+        for (int i = 0; i < 3; ++i)
+          p[i] = point[i] * cth + vXp[i] * sth + v[i] * vDotp * oneMinusCth;
       } else {
         // taylor expansion for theta close to zero
-        p = point + angleAxisVector.cross(point);
+        T aux[3];
+        cross(camera, point, aux);
+        for (int i = 0; i < 3; ++i)
+          p[i] = point[i] + aux[i];
       }
 
       // translation of the camera
-      typename PointType::ConstMapType translation(camera+3, 3);
-      p += translation;
+      p[0] += camera[3];
+      p[1] += camera[4];
+      p[2] += camera[5];
 
       // perspective division
       T projectedPoint[2];
