@@ -38,6 +38,7 @@
 #if defined(_MSC_VER)
 #define CERES_ALIGN_ATTRIBUTE(n) __declspec(align(n))
 #define CERES_ALIGN_OF(T) __alignof(T)
+typedef int ssize_t;
 #elif defined(__GNUC__)
 #define CERES_ALIGN_ATTRIBUTE(n) __attribute__((aligned(n)))
 #define CERES_ALIGN_OF(T) __alignof(T)
@@ -155,13 +156,13 @@ class FixedArray {
 
   // Allocate some space, not an array of elements of type T, so that we can
   // skip calling the T constructors and destructors for space we never use.
-  ManualConstructor<InnerContainer> inline_space_[kInlineElements] CERES_ALIGN_ATTRIBUTE(16);
+  CERES_ALIGN_ATTRIBUTE(16) ManualConstructor<InnerContainer> inline_space_[kInlineElements];
 };
 
 // Implementation details follow
 
 template <class T, ssize_t S>
-inline FixedArray<T, S>::FixedArray(FixedArray<T, S>::size_type n)
+inline FixedArray<T, S>::FixedArray(typename FixedArray<T, S>::size_type n)
     : size_(n),
       array_((n <= kInlineElements
               ? reinterpret_cast<InnerContainer*>(inline_space_)

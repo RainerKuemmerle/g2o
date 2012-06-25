@@ -401,10 +401,12 @@ inline double cos     (double x) { return std::cos(x);      }
 inline double acos    (double x) { return std::acos(x);     }
 inline double sin     (double x) { return std::sin(x);      }
 inline double asin    (double x) { return std::asin(x);     }
+#ifndef _MSC_VER
 inline bool   isfinite(double x) { return std::isfinite(x); }
 inline bool   isinf   (double x) { return std::isinf(x);    }
 inline bool   isnan   (double x) { return std::isnan(x);    }
 inline bool   isnormal(double x) { return std::isnormal(x); }
+#endif
 inline double pow  (double x, double y) { return std::pow(x, y);   }
 inline double atan2(double y, double x) { return std::atan2(y, x); }
 
