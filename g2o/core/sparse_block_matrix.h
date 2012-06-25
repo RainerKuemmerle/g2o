@@ -139,6 +139,12 @@ class SparseBlockMatrix {
     //! dest = (*this) *  src
     void multiply(double*& dest, const double* src) const;
 
+    /**
+     * compute dest = (*this) *  src
+     * However, assuming that this is a symmetric matrix where only the upper triangle is stored
+     */
+    void multiplySymmetricUpperTriangle(double*& dest, const double* src) const;
+
     //! dest = M * (*this)
     void rightMultiply(double*& dest, const double* src) const;
 

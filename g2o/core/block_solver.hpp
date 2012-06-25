@@ -39,7 +39,7 @@ namespace g2o {
 
 template <typename Traits>
 BlockSolver<Traits>::BlockSolver(LinearSolverType* linearSolver) :
-  Solver(),
+  BlockSolverBase(),
   _linearSolver(linearSolver)
 {
   // workspace

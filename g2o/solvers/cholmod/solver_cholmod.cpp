@@ -32,6 +32,7 @@
 
 #include "g2o/core/optimization_algorithm_gauss_newton.h"
 #include "g2o/core/optimization_algorithm_levenberg.h"
+#include "g2o/core/optimization_algorithm_dogleg.h"
 
 #include "g2o/stuff/macros.h"
 
@@ -83,6 +84,10 @@ namespace g2o {
     else if (methodName == "lm") {
       snl = new OptimizationAlgorithmLevenberg(s);
     }
+    else if (methodName == "dl") {
+      BlockSolverBase* blockSolver = dynamic_cast<BlockSolverBase*>(s);
+      snl = new OptimizationAlgorithmDogleg(blockSolver);
+    }
     else {
       delete s;
     }
@@ -116,4 +121,6 @@ namespace g2o {
   G2O_REGISTER_OPTIMIZATION_ALGORITHM(lm_fix3_2_cholmod_scalar, new CholmodSolverCreator(OptimizationAlgorithmProperty("lm_fix3_2_cholmod_scalar", "Levenberg: Cholesky solver using CHOLMOD (fixed blocksize, scalar ordering)", "CHOLMOD", true, 3, 2)));
   G2O_REGISTER_OPTIMIZATION_ALGORITHM(lm_fix6_3_cholmod_scalar, new CholmodSolverCreator(OptimizationAlgorithmProperty("lm_fix6_3_cholmod_scalar", "Levenberg: Cholesky solver using CHOLMOD (fixed blocksize, scalar ordering)", "CHOLMOD", true, 6, 3)));
   G2O_REGISTER_OPTIMIZATION_ALGORITHM(lm_fix7_3_cholmod_scalar, new CholmodSolverCreator(OptimizationAlgorithmProperty("lm_fix7_3_cholmod_scalar", "Levenberg: Cholesky solver using CHOLMOD (fixed blocksize, scalar ordering)", "CHOLMOD", true, 7, 3)));
+
+  G2O_REGISTER_OPTIMIZATION_ALGORITHM(dl_var_cholmod, new CholmodSolverCreator(OptimizationAlgorithmProperty("dl_var_cholmod", "Dogleg: Cholesky solver using CHOLMOD (variable blocksize)", "CHOLMOD", false, Eigen::Dynamic, Eigen::Dynamic)));
 }
