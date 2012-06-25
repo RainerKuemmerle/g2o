@@ -255,6 +255,33 @@ namespace g2o {
   }
 
   template <class MatrixType>
+  void SparseBlockMatrix<MatrixType>::multiplySymmetricUpperTriangle(double*& dest, const double* src) const
+  {
+    if (! dest){
+      dest=new double [_rowBlockIndices[_rowBlockIndices.size()-1] ];
+      memset(dest,0, _rowBlockIndices[_rowBlockIndices.size()-1]*sizeof(double));
+    }
+
+    // map the memory by Eigen
+    Map<VectorXd> destVec(dest, rows());
+    const Map<const VectorXd> srcVec(src, cols());
+
+    for (size_t i=0; i<_blockCols.size(); ++i){
+      int srcOffset = colBaseOfBlock(i);
+      for (typename SparseBlockMatrix<MatrixType>::IntBlockMap::const_iterator it=_blockCols[i].begin(); it!=_blockCols[i].end(); ++it){
+        const typename SparseBlockMatrix<MatrixType>::SparseMatrixBlock* a=it->second;
+        int destOffset = rowBaseOfBlock(it->first);
+        if (destOffset > srcOffset) // only upper triangle
+          break;
+        // destVec += *a * srcVec (according to the sub-vector parts)
+        internal::axpy(*a, srcVec, srcOffset, destVec, destOffset);
+        if (destOffset < srcOffset)
+          internal::atxpy(*a, srcVec, destOffset, destVec, srcOffset);
+      }
+    }
+  }
+
+  template <class MatrixType>
   void SparseBlockMatrix<MatrixType>::rightMultiply(double*& dest, const double* src) const {
     int destSize=cols();
 

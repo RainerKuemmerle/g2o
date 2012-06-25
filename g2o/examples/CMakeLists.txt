@@ -1,7 +1,10 @@
 ADD_SUBDIRECTORY(data_fitting)
+
 ADD_SUBDIRECTORY(tutorial_slam2d)
 ADD_SUBDIRECTORY(sphere)
 
+# The condition on cholmod is required here because the cholmod solver
+# is explicitly used in these examples.
 IF(CHOLMOD_FOUND)
   ADD_SUBDIRECTORY(target)
   ADD_SUBDIRECTORY(ba)
