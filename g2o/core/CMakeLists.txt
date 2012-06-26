@@ -31,6 +31,8 @@ optimization_algorithm_levenberg.cpp optimization_algorithm_levenberg.h
 optimization_algorithm_dogleg.cpp optimization_algorithm_dogleg.h
 sparse_optimizer_terminate_action.cpp sparse_optimizer_terminate_action.h
 jacobian_workspace.cpp jacobian_workspace.h
+robust_kernel.cpp robust_kernel.h
+robust_kernel_factory.cpp robust_kernel_factory.h
 g2o_core_api.h
 )
 

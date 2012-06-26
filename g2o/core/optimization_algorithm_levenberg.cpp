@@ -73,7 +73,7 @@ namespace g2o {
       t=get_monotonic_time();
     }
 
-    double currentChi = _optimizer->activeChi2();
+    double currentChi = _optimizer->activeRobustChi2();
     double tempChi=currentChi;
 
     _solver->buildSystem();
@@ -110,7 +110,7 @@ namespace g2o {
       _solver->setLambda(- _currentLambda);
 
       _optimizer->computeActiveErrors();
-      tempChi = _optimizer->activeChi2();
+      tempChi = _optimizer->activeRobustChi2();
 
       if (! ok2)
         tempChi=std::numeric_limits<double>::max();

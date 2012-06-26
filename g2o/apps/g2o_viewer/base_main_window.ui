@@ -71,6 +71,13 @@
         </widget>
        </item>
        <item>
+        <widget class="QComboBox" name="coRobustKernel">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QLabel" name="label_4">
          <property name="enabled">
           <bool>false</bool>
@@ -210,7 +217,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>22</height>
+     <height>23</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -313,12 +320,12 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>111</x>
-     <y>285</y>
+     <x>131</x>
+     <y>142</y>
     </hint>
     <hint type="destinationlabel">
-     <x>105</x>
-     <y>306</y>
+     <x>125</x>
+     <y>194</y>
     </hint>
    </hints>
   </connection>
@@ -329,12 +336,12 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>154</x>
-     <y>285</y>
+     <x>147</x>
+     <y>142</y>
     </hint>
     <hint type="destinationlabel">
-     <x>154</x>
-     <y>337</y>
+     <x>147</x>
+     <y>225</y>
     </hint>
    </hints>
   </connection>
@@ -345,12 +352,28 @@
    <slot>close()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>62</x>
-     <y>527</y>
+     <x>82</x>
+     <y>458</y>
     </hint>
     <hint type="destinationlabel">
      <x>5</x>
      <y>554</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cbRobustKernel</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>coRobustKernel</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>33</x>
+     <y>133</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>37</x>
+     <y>162</y>
     </hint>
    </hints>
   </connection>

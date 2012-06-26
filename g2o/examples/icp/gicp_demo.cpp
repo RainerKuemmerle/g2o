@@ -192,7 +192,7 @@ int main()
     //    e->information().setIdentity();
 
     //    e->setRobustKernel(true);
-    e->setHuberWidth(0.01);
+    //e->setHuberWidth(0.01);
 
     optimizer.addEdge(e);
   }

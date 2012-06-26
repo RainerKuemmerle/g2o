@@ -50,6 +50,7 @@ namespace g2o {
   struct OptimizationAlgorithmProperty;
   class Cache;
   class CacheContainer;
+  class RobustKernel;
 
   /**
      @addtogroup g2o
@@ -379,6 +380,7 @@ namespace g2o {
         friend struct OptimizableGraph;
       public:
         Edge();
+        virtual ~Edge();
         virtual Edge* clone() const;
 
         // indicates if all vertices are fixed
@@ -405,19 +407,12 @@ namespace g2o {
          */
         virtual bool setMeasurementFromState();
 
+        //! if NOT NULL, error of this edge will be robustifed with the kernel
+        RobustKernel* robustKernel() const { return _robustKernel;}
         /**
-         * robustify the error of the edge using an robust kernel/M-estimator
-         * this is only called if robustKernel==true
+         * specify the robust kernel to be used in this edge
          */
-        virtual void robustifyError() = 0;
-
-        //! if true, error will be robustifed (not for computing Jacobians)
-        bool robustKernel() const { return _robustKernel;}
-        void setRobustKernel(bool rk) { _robustKernel = rk;}
-
-        //! width of the robust huber kernel
-        double huberWidth() const { return _huberWidth;}
-        void setHuberWidth(double hw) { _huberWidth = hw;}
+        void setRobustKernel(RobustKernel* ptr);
 
         //! returns the error vector cached after calling the computeError;
         virtual const double* errorData() const = 0;
@@ -497,8 +492,7 @@ namespace g2o {
       protected:
         int _dimension;
         int _level;
-        bool _robustKernel;
-        double _huberWidth;
+        RobustKernel* _robustKernel;
         long long _internalId;
 
         std::vector<int> _cacheIds;
@@ -524,28 +518,6 @@ namespace g2o {
         std::vector<std::string> _parameterTypes;
         std::vector<Parameter**> _parameters;
         std::vector<int> _parameterIds;
-
-        /** Square root of huber cost function devided by delta
-         *
-         *  Let delta be the generalized 2-norm of the error e, thus
-         *  delta = sqrt(e*Omega*e).
-         *
-         *  Let rho be the Huber cost function,
-         *  rho(x) =  if |x|<b : x^2 | else: 2b|x|-b^2
-         *  (Thus, b is the "width" of the quadratic component.)
-         *
-         *  This function computes "sqrt(rho(delta))/delta" which can
-         *  be used as a weight to robustify the error e.
-         *
-         *  For details: See Hartley, Zisserman: "Multiple View Geometry in Computer Vision", 2nd edition, 2003, pp.616.
-         */
-        inline double sqrtOfHuberByNrm(double delta, double b) const
-        {
-          if (delta<b)
-            return 1;
-          return sqrt(2*b*fabs(delta) - b*b)/delta;
-        }
-
     };
 
     //! returns the vertex number <i>id</i> appropriately casted

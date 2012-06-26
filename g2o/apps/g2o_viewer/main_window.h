@@ -51,6 +51,11 @@ class G2O_VIEWER_API MainWindow : public QMainWindow, public Ui::BaseMainWindow
     void updateDisplayedSolvers();
 
     /**
+     * list the available robust kernels in the GUI
+     */
+    void updateRobustKernels();
+
+    /**
      * load a graph on which we will operate from a file
      */
     bool loadFromFile(const QString& filename);

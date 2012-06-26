@@ -220,7 +220,7 @@ int main(int argc, char **argv)
     //    e->information().setIdentity();
 
     //    e->setRobustKernel(true);
-    e->setHuberWidth(0.01);
+    //e->setHuberWidth(0.01);
 
     optimizer.addEdge(e);
   }
@@ -279,8 +279,8 @@ int main(int argc, char **argv)
           //e->inverseMeasurement() = -z;
           e->information() = Matrix3d::Identity();
 
-          e->setRobustKernel(false);
-          e->setHuberWidth(1);
+          //e->setRobustKernel(false);
+          //e->setHuberWidth(1);
 
           optimizer.addEdge(e);
         }

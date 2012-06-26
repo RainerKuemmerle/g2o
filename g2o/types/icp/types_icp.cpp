@@ -107,8 +107,8 @@ namespace g2o {
     cov0 = e->cov0;
     cov1 = e->cov1;
 
-    _robustKernel = e->_robustKernel;
-    _huberWidth = e->_huberWidth;
+    // TODO the robust kernel is not correctly copied
+    //_robustKernel = e->_robustKernel;
   }
 
   //
@@ -154,7 +154,7 @@ namespace g2o {
     //    information().setIdentity();
 
     //    setRobustKernel(true);
-    setHuberWidth(0.01);      // units? m?
+    //setHuberWidth(0.01);      // units? m?
 
     return true;
   }
