@@ -25,7 +25,6 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "robust_kernel.h"
-#include "robust_kernel_factory.h"
 
 namespace g2o {
 
@@ -43,61 +42,5 @@ void RobustKernel::setDelta(double delta)
 {
   _delta = delta;
 }
-
-RobustKernelScaleDelta::RobustKernelScaleDelta(const RobustKernelPtr& kernel, double delta) :
-  RobustKernel(delta),
-  _kernel(kernel)
-{
-}
-
-void RobustKernelScaleDelta::setKernel(const RobustKernelPtr& ptr)
-{
-  _kernel = ptr;
-}
-
-void RobustKernelScaleDelta::robustify(double error, Eigen::Vector3d& rho) const
-{
-  if (_kernel.get()) {
-    double dsqr = _delta * _delta;
-    double dsqrReci = 1. / dsqr;
-    _kernel->robustify(dsqrReci * error, rho);
-    rho[0] *= dsqr;
-    rho[2] *= dsqrReci;
-  } else { // no robustification
-    rho[0] = error;
-    rho[1] = 1.;
-    rho[2] = 0.;
-  }
-}
-
-void RobustKernelHuber::robustify(double e, Eigen::Vector3d& rho) const
-{
-  double dsqr = _delta * _delta;
-  if (e <= dsqr) { // inlier
-    rho[0] = e;
-    rho[1] = 1.;
-    rho[2] = 0.;
-  } else { // outlier
-    double sqrte = sqrt(e); // absolut value of the error
-    rho[0] = 2*sqrte*_delta - dsqr; // rho(e)   = 2 * delta * e^(1/2) - delta^2
-    rho[1] = _delta / sqrte;        // rho'(e)  = delta / sqrt(e)
-    rho[2] = - 0.5 * rho[1] / e;    // rho''(e) = -1 / (2*e^(3/2)) = -1/2 * (delta/e) / e
-  }
-}
-
-void RobustKernelPseudoHuber::robustify(double e2, Eigen::Vector3d& rho) const
-{
-  double dsqr = _delta * _delta;
-  double dsqrReci = 1. / dsqr;
-  double aux1 = dsqrReci * e2 + 1.0;
-  double aux2 = sqrt(aux1);
-  rho[0] = 2 * dsqr * (aux2 - 1);
-  rho[1] = 1. / aux2;
-  rho[2] = -0.5 * dsqrReci * rho[1] / aux1;
-}
-
-// register the kernel to their factory
-G2O_REGISTER_ROBUST_KERNEL(Huber, RobustKernelHuber)
-G2O_REGISTER_ROBUST_KERNEL(PseudoHuber, RobustKernelPseudoHuber)
 
 } // end namespace g2o

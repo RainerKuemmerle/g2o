@@ -33,7 +33,15 @@
 namespace g2o {
 
   /**
-   * \brief base for all robust kernels
+   * \brief base for all robust cost functions
+   *
+   * Note in all the implementations for the other cost functions the e in the
+   * funtions corresponds to the sqaured errors, i.e., the robustification
+   * functions gets passed the squared error.
+   *
+   * e.g. the robustified least squares function is
+   *
+   * chi^2 = sum_{e} rho( e^T Omega e )
    */
   class RobustKernel
   {
@@ -62,61 +70,6 @@ namespace g2o {
       double _delta;
   };
   typedef std::tr1::shared_ptr<RobustKernel> RobustKernelPtr;
-
-  /**
-   * \brief scale a robust kernel to another delta (window size)
-   *
-   * Scales a robust kernel to another window size. Useful, in case if
-   * one implements a kernel which only is designed for a fixed window
-   * size.
-   */
-  class RobustKernelScaleDelta : public RobustKernel
-  {
-    public:
-      explicit RobustKernelScaleDelta(const RobustKernelPtr& kernel, double delta = 1.);
-      explicit RobustKernelScaleDelta(double delta = 1.);
-
-      const RobustKernelPtr kernel() const { return _kernel;}
-      void setKernel(const RobustKernelPtr& ptr);
-
-      void robustify(double error, Eigen::Vector3d& rho) const;
-
-    protected:
-      RobustKernelPtr _kernel;
-  };
-
-  /**
-   * \brief Huber Loss Function
-   *
-   * Loss function as described by Huber
-   * See http://en.wikipedia.org/wiki/Huber_loss_function
-   *
-   *               1/2    2
-   * rho(x) = 2 d x    - d
-   */
-  class RobustKernelHuber : public RobustKernel
-  {
-    public:
-      virtual void robustify(double e2, Eigen::Vector3d& rho) const;
-  };
-
-  /**
-   * \brief Pseudo Huber Loss Function
-   *
-   * The smooth pseudo huber cost function:
-   * See http://en.wikipedia.org/wiki/Huber_loss_function
-   *
-   *             2
-   *    2       e
-   * 2 d  (sqrt(-- + 1) - 1)
-   *             2
-   *            d
-   */
-  class RobustKernelPseudoHuber : public RobustKernel
-  {
-    public:
-      virtual void robustify(double e2, Eigen::Vector3d& rho) const;
-  };
 
 } // end namespace g2o
 
