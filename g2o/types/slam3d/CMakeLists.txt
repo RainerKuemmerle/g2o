@@ -39,10 +39,8 @@ TARGET_LINK_LIBRARIES(types_slam3d ${OPENGL_gl_LIBRARY} core)
 ADD_EXECUTABLE(test_isometry3d_mappings test_isometry3d_mappings.cpp)
 TARGET_LINK_LIBRARIES(test_isometry3d_mappings types_slam3d)
 
-IF (NOT MSVC)
-  ADD_EXECUTABLE(test_mat2quat_jacobian test_mat2quat_jacobian.cpp)
-  TARGET_LINK_LIBRARIES(test_mat2quat_jacobian types_slam3d)
-ENDIF()
+ADD_EXECUTABLE(test_mat2quat_jacobian test_mat2quat_jacobian.cpp)
+TARGET_LINK_LIBRARIES(test_mat2quat_jacobian types_slam3d)
 
 ADD_EXECUTABLE(test_slam3d_jacobian test_slam3d_jacobian.cpp)
 TARGET_LINK_LIBRARIES(test_slam3d_jacobian types_slam3d)

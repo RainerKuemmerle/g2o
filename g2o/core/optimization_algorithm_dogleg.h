@@ -48,7 +48,7 @@ namespace g2o {
 
     public:
       /**
-       * construct the Levenberg algorithm, which will use the given Solver for solving the
+       * construct the Dogleg algorithm, which will use the given Solver for solving the
        * linearized system.
        */
       explicit OptimizationAlgorithmDogleg(BlockSolverBase* solver);
@@ -67,7 +67,7 @@ namespace g2o {
       static const char* stepType2Str(int stepType);
 
     protected:
-      // Levenberg parameters
+      // parameters
       Property<int>* _maxTrialsAfterFailure;
       Property<double>* _userDeltaInit;
 

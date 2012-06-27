@@ -40,6 +40,7 @@
 #ifndef CERES_PUBLIC_INTERNAL_MANUAL_CONSTRUCTOR_H_
 #define CERES_PUBLIC_INTERNAL_MANUAL_CONSTRUCTOR_H_
 
+#include "macros.h"
 #include <new>
 
 namespace ceres {

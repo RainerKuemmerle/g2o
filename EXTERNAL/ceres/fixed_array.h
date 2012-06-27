@@ -33,18 +33,9 @@
 #define CERES_PUBLIC_INTERNAL_FIXED_ARRAY_H_
 
 #include <cstddef>
-#include <Eigen/Core>
-
-#if defined(_MSC_VER)
-#define CERES_ALIGN_ATTRIBUTE(n) __declspec(align(n))
-#define CERES_ALIGN_OF(T) __alignof(T)
-typedef int ssize_t;
-#elif defined(__GNUC__)
-#define CERES_ALIGN_ATTRIBUTE(n) __attribute__((aligned(n)))
-#define CERES_ALIGN_OF(T) __alignof(T)
-#endif
-
+#include "Eigen/Core"
 #include "manual_constructor.h"
+#include "macros.h"
 
 namespace ceres {
 namespace internal {
@@ -76,6 +67,12 @@ namespace internal {
 //
 // Non-POD types will be default-initialized just like regular vectors or
 // arrays.
+
+#if defined(_WIN64)
+   typedef __int64      ssize_t;
+#elif defined(_WIN32)
+   typedef __int32      ssize_t;
+#endif
 
 template <typename T, ssize_t inline_elements = -1>
 class FixedArray {
@@ -137,7 +134,7 @@ class FixedArray {
   // of this code will be broken.
   struct InnerContainer {
     T element;
-    EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   };
 
   // How many elements should we store inline?
@@ -156,7 +153,7 @@ class FixedArray {
 
   // Allocate some space, not an array of elements of type T, so that we can
   // skip calling the T constructors and destructors for space we never use.
-  CERES_ALIGN_ATTRIBUTE(16) ManualConstructor<InnerContainer> inline_space_[kInlineElements];
+  ManualConstructor<InnerContainer> CERES_ALIGN_ATTRIBUTE(16) inline_space_[kInlineElements];
 };
 
 // Implementation details follow
@@ -167,7 +164,6 @@ inline FixedArray<T, S>::FixedArray(typename FixedArray<T, S>::size_type n)
       array_((n <= kInlineElements
               ? reinterpret_cast<InnerContainer*>(inline_space_)
               : new InnerContainer[n])) {
-
   // Construct only the elements actually used.
   if (array_ == reinterpret_cast<InnerContainer*>(inline_space_)) {
     for (size_type i = 0; i != size_; ++i) {

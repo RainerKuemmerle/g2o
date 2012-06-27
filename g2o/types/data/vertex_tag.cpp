@@ -41,7 +41,11 @@
 #endif
 
 #ifdef G2O_HAVE_GLUT
+#ifdef __APPLE__
+#include <GLUT/glut.h>
+#else
 #include <GL/freeglut.h>
+#endif
 #endif
 
 #include <iomanip>
@@ -115,7 +119,9 @@ namespace g2o {
     glutSolidCube(0.1*textSize);
     glTranslatef(0.2*textSize, 0, 0);
     glScalef(0.003*textSize,0.003*textSize,1);
+#ifndef __APPLE__
     glutStrokeString(GLUT_STROKE_ROMAN, (const unsigned char*)that->name().c_str());
+#endif
 #endif
     glPopMatrix();
     return this;
