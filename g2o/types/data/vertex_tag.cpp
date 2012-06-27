@@ -110,7 +110,7 @@ namespace g2o {
     VertexTag* that = static_cast<VertexTag*>(element);
 
     glPushMatrix();
-    glColor3f(1.,0.2,1.);
+    glColor3f(1.f,0.2f,1.f);
     glTranslatef(that->position().x(), that->position().y(), that->position().z());
     int textSize = 1;
     if (_textSize )

@@ -92,12 +92,12 @@ namespace g2o {
 
     glPushAttrib(GL_ENABLE_BIT | GL_POINT_BIT);
     glDisable(GL_LIGHTING);
-    glColor3f(0.8,0.5,0.3);
+    glColor3f(0.8f,0.5f,0.3f);
     if (_pointSize) {
       glPointSize(_pointSize->value());
     }
     glBegin(GL_POINTS);
-    glVertex3f(that->estimate()(0),that->estimate()(1),that->estimate()(2));
+    glVertex3f((float)that->estimate()(0),(float)that->estimate()(1),(float)that->estimate()(2));
     glEnd();
     glPopAttrib();
     return this;

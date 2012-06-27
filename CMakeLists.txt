@@ -33,7 +33,7 @@ ELSEIF(CMAKE_BUILD_TYPE MATCHES MinSizeRel)
 ENDIF(CMAKE_BUILD_TYPE MATCHES Release)
 
 # Allow the developer to select if Dynamic or Static libraries are built
-IF(MSVC) # MSVC only works if we link statically
+IF(MSVC) # prefer static libraries on MSVC
   OPTION (BUILD_SHARED_LIBS "Build Shared Libraries (preferred and required for the g2o plugin system)" OFF)
 ELSE(MSVC)
   OPTION (BUILD_SHARED_LIBS "Build Shared Libraries (preferred and required for the g2o plugin system)" ON)
@@ -84,6 +84,10 @@ IF(WIN32)
     MESSAGE(STATUS "Compiling on Windows (MSVC)")
     ADD_DEFINITIONS(-DNOMINMAX)
     ADD_DEFINITIONS(-D_USE_MATH_DEFINES)
+    IF (BUILD_SHARED_LIBS)
+      # disable warning on missing DLL interfaces
+      ADD_DEFINITIONS("/wd4251")
+    ENDIF()
   ENDIF(MSVC)
 ELSEIF(UNIX)
   ADD_DEFINITIONS(-DUNIX)
