@@ -16,6 +16,8 @@ ADD_LIBRARY(types_slam3d ${G2O_LIB_TYPE}
   vertex_pointxyz.h
   parameter_camera.cpp
   parameter_camera.h
+  parameter_stereo_camera.cpp
+  parameter_stereo_camera.h
   edge_se3_pointxyz.cpp
   edge_se3_pointxyz.h
   edge_se3_pointxyz_disparity.cpp
