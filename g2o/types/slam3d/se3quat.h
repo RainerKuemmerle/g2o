@@ -283,6 +283,16 @@ namespace g2o {
         }
         _r.normalize();
       }
+
+      /**
+       * cast SE3Quat into an Eigen::Isometry3d
+       */
+      operator Eigen::Isometry3d()
+      {
+        Eigen::Isometry3d result = (Eigen::Isometry3d) rotation();
+        result.translation() = translation();
+        return result;
+      }
   };
 
   inline std::ostream& operator <<(std::ostream& out_str, const SE3Quat& se3)
