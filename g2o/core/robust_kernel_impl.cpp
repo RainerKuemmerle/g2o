@@ -37,6 +37,11 @@ RobustKernelScaleDelta::RobustKernelScaleDelta(const RobustKernelPtr& kernel, do
 {
 }
 
+RobustKernelScaleDelta::RobustKernelScaleDelta(double delta) :
+  RobustKernel(delta)
+{
+}
+
 void RobustKernelScaleDelta::setKernel(const RobustKernelPtr& ptr)
 {
   _kernel = ptr;

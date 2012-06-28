@@ -27,7 +27,11 @@
 #ifndef G2O_ROBUST_KERNEL_H
 #define G2O_ROBUST_KERNEL_H
 
+#ifdef _MSC_VER
+#include <memory>
+#else
 #include <tr1/memory>
+#endif
 #include <Eigen/Core>
 
 #include "g2o_core_api.h"
