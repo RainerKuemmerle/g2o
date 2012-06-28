@@ -165,7 +165,6 @@ public:
   {
     setMeasurement(measurement);
     setInformation(Eigen::Matrix3d::Identity() / (noiseSigma*noiseSigma));
-    setRobustKernel(false);
   }
   
   void computeError()

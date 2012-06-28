@@ -157,6 +157,12 @@ namespace g2o {
 
     /**returns the cached chi2 of the active portion of the graph*/
     double activeChi2() const;
+    /**
+     * returns the cached chi2 of the active portion of the graph.
+     * In contrast to activeChi2() this functions considers the weighting
+     * of the error according to the robustification of the error functions.
+     */
+    double activeRobustChi2() const;
 
     //! verbose information during optimization
     bool verbose()  const {return _verbose;}

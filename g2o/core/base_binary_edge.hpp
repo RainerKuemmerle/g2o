@@ -61,7 +61,6 @@ void BaseBinaryEdge<D, E, VertexXiType, VertexXjType>::constructQuadraticForm()
   const JacobianXiOplusType& A = jacobianOplusXi();
   const JacobianXjOplusType& B = jacobianOplusXj();
 
-  const InformationType& omega = _information;
 
   bool fromNotFixed = !(from->fixed());
   bool toNotFixed = !(to->fixed());
@@ -71,21 +70,47 @@ void BaseBinaryEdge<D, E, VertexXiType, VertexXjType>::constructQuadraticForm()
     from->lockQuadraticForm();
     to->lockQuadraticForm();
 #endif
+    const InformationType& omega = _information;
     Matrix<double, D, 1> omega_r = - omega * _error;
-    if (fromNotFixed) {
-      Matrix<double, VertexXiType::Dimension, D> AtO = A.transpose() * omega;
-      from->b().noalias() += A.transpose() * omega_r;
-      from->A().noalias() += AtO*A;
-      if (toNotFixed ) {
-        if (_hessianRowMajor) // we have to write to the block as transposed
-          _hessianTransposed.noalias() += B.transpose() * AtO.transpose();
-        else
-          _hessian.noalias() += AtO * B;
+    if (this->robustKernel() == 0) {
+      if (fromNotFixed) {
+        Matrix<double, VertexXiType::Dimension, D> AtO = A.transpose() * omega;
+        from->b().noalias() += A.transpose() * omega_r;
+        from->A().noalias() += AtO*A;
+        if (toNotFixed ) {
+          if (_hessianRowMajor) // we have to write to the block as transposed
+            _hessianTransposed.noalias() += B.transpose() * AtO.transpose();
+          else
+            _hessian.noalias() += AtO * B;
+        }
+      } 
+      if (toNotFixed) {
+        to->b().noalias() += B.transpose() * omega_r;
+        to->A().noalias() += B.transpose() * omega * B;
       }
-    } 
-    if (toNotFixed) {
-      to->b().noalias() += B.transpose() * omega_r;
-      to->A().noalias() += B.transpose() * omega * B;
+    } else { // robust (weighted) error according to some kernel
+      double error = this->chi2();
+      Eigen::Vector3d rho;
+      this->robustKernel()->robustify(error, rho);
+      InformationType weightedOmega = this->robustInformation(rho);
+      //std::cout << PVAR(rho.transpose()) << std::endl;
+      //std::cout << PVAR(weightedOmega) << std::endl;
+
+      omega_r *= rho[1];
+      if (fromNotFixed) {
+        from->b().noalias() += A.transpose() * omega_r;
+        from->A().noalias() += A.transpose() * weightedOmega * A;
+        if (toNotFixed ) {
+          if (_hessianRowMajor) // we have to write to the block as transposed
+            _hessianTransposed.noalias() += B.transpose() * weightedOmega * A;
+          else
+            _hessian.noalias() += A.transpose() * weightedOmega * B;
+        }
+      } 
+      if (toNotFixed) {
+        to->b().noalias() += B.transpose() * omega_r;
+        to->A().noalias() += B.transpose() * weightedOmega * B;
+      }
     }
 #ifdef G2O_OPENMP
     to->unlockQuadraticForm();

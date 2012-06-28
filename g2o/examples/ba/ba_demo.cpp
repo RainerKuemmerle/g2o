@@ -33,6 +33,7 @@
 #include "g2o/core/sparse_optimizer.h"
 #include "g2o/core/block_solver.h"
 #include "g2o/core/solver.h"
+#include "g2o/core/robust_kernel_impl.h"
 #include "g2o/core/optimization_algorithm_levenberg.h"
 #include "g2o/solvers/cholmod/linear_solver_cholmod.h"
 #include "g2o/solvers/dense/linear_solver_dense.h"
@@ -294,8 +295,10 @@ int main(int argc, const char* argv[])
           //e->inverseMeasurement() = -z;
           e->information() = Matrix2d::Identity();
 
-          e->setRobustKernel(ROBUST_KERNEL);
-          e->setHuberWidth(1);
+          if (ROBUST_KERNEL) {
+            g2o::RobustKernelHuber* rk = new g2o::RobustKernelHuber;
+            e->setRobustKernel(rk);
+          }
 
           optimizer.addEdge(e);
 

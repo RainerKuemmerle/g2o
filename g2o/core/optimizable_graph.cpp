@@ -39,6 +39,7 @@
 #include "optimization_algorithm_property.h"
 #include "hyper_graph_action.h"
 #include "cache.h"
+#include "robust_kernel.h"
 
 #include "g2o/stuff/macros.h"
 #include "g2o/stuff/color_macros.h"
@@ -130,10 +131,14 @@ namespace g2o {
 
   OptimizableGraph::Edge::Edge() :
     HyperGraph::Edge(),
-    _dimension(-1), _level(0), _robustKernel(false), _huberWidth(1.)
+    _dimension(-1), _level(0), _robustKernel(0)
   {
   }
 
+  OptimizableGraph::Edge::~Edge()
+  {
+    delete _robustKernel;
+  }
 
   OptimizableGraph* OptimizableGraph::Edge::graph(){
     if (! _vertices.size())
@@ -163,7 +168,6 @@ namespace g2o {
     return true;
   }
 
-
   bool OptimizableGraph::Edge::resolveParameters() {
     if (!graph()) {
       cerr << __PRETTY_FUNCTION__ << ": edge not registered with a graph" << endl;
@@ -186,7 +190,12 @@ namespace g2o {
     return true;
   }
 
-  
+  void OptimizableGraph::Edge::setRobustKernel(RobustKernel* ptr)
+  {
+    if (_robustKernel)
+      delete _robustKernel;
+    _robustKernel = ptr;
+  }
 
   bool OptimizableGraph::Edge::resolveCaches() {
     return true;
@@ -890,3 +899,4 @@ bool OptimizableGraph::verifyInformationMatrices(bool verbose) const
 }
 
 } // end namespace
+

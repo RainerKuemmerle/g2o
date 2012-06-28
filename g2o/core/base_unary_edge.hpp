@@ -53,8 +53,18 @@ void BaseUnaryEdge<D, E, VertexXiType>::constructQuadraticForm()
 #ifdef G2O_OPENMP
     from->lockQuadraticForm();
 #endif
-    from->b().noalias() -= A.transpose() * omega * _error;
-    from->A().noalias() += A.transpose() * omega * A;
+    if (this->robustKernel()) {
+      double error = this->chi2();
+      Eigen::Vector3d rho;
+      this->robustKernel()->robustify(error, rho);
+      InformationType weightedOmega = this->robustInformation(rho);
+
+      from->b().noalias() -= rho[1] * A.transpose() * omega * _error;
+      from->A().noalias() += A.transpose() * weightedOmega * A;
+    } else {
+      from->b().noalias() -= A.transpose() * omega * _error;
+      from->A().noalias() += A.transpose() * omega * A;
+    }
 #ifdef G2O_OPENMP
     from->unlockQuadraticForm();
 #endif

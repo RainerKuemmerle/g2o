@@ -34,6 +34,7 @@
 #include <Eigen/StdVector>
 
 #include "base_edge.h"
+#include "robust_kernel.h"
 #include "g2o/config.h"
 
 namespace g2o {
@@ -98,6 +99,8 @@ namespace g2o {
 
       std::vector<HessianHelper> _hessian;
       std::vector<JacobianType, aligned_allocator<JacobianType> > _jacobianOplus; ///< jacobians of the edge (w.r.t. oplus)
+
+      void computeQuadraticForm(const InformationType& omega, const ErrorVector& weightedError);
 
     public:
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW

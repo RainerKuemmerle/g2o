@@ -35,59 +35,16 @@ namespace internal {
 template <int D, typename E>
 void BaseMultiEdge<D, E>::constructQuadraticForm()
 {
-  const InformationType& omega = _information;
-  Matrix<double, D, 1> omega_r = - omega * _error;
-
-  for (size_t i = 0; i < _vertices.size(); ++i) {
-    OptimizableGraph::Vertex* from = static_cast<OptimizableGraph::Vertex*>(_vertices[i]);
-    bool istatus = !(from->fixed());
-
-    if (istatus) {
-      const MatrixXd& A = _jacobianOplus[i];
-
-      MatrixXd AtO = A.transpose() * omega;
-      int fromDim = from->dimension();
-      assert(fromDim >= 0);
-      Map<MatrixXd> fromMap(from->hessianData(), fromDim, fromDim);
-      Map<VectorXd> fromB(from->bData(), fromDim);
-
-      // ii block in the hessian
-#ifdef G2O_OPENMP
-      from->lockQuadraticForm();
-#endif
-      fromMap.noalias() += AtO * A;
-      fromB.noalias() += A.transpose() * omega_r;
-
-      // compute the off-diagonal blocks ij for all j
-      for (size_t j = i+1; j < _vertices.size(); ++j) {
-        OptimizableGraph::Vertex* to = static_cast<OptimizableGraph::Vertex*>(_vertices[j]);
-#ifdef G2O_OPENMP
-        to->lockQuadraticForm();
-#endif
-        bool jstatus = !(to->fixed());
-        if (jstatus) {
-          const MatrixXd& B = _jacobianOplus[j];
-          int idx = internal::computeUpperTriangleIndex(i, j);
-          assert(idx < (int)_hessian.size());
-          HessianHelper& hhelper = _hessian[idx];
-          if (hhelper.transposed) { // we have to write to the block as transposed
-            hhelper.matrix.noalias() += B.transpose() * AtO.transpose();
-          } else {
-            hhelper.matrix.noalias() += AtO * B;
-          }
-        }
-#ifdef G2O_OPENMP
-        to->unlockQuadraticForm();
-#endif
-      }
-
-#ifdef G2O_OPENMP
-      from->unlockQuadraticForm();
-#endif
-    }
-
+  if (this->robustKernel()) {
+    double error = this->chi2();
+    Eigen::Vector3d rho;
+    this->robustKernel()->robustify(error, rho);
+    Matrix<double, D, 1> omega_r = - _information * _error;
+    omega_r *= rho[1];
+    computeQuadraticForm(this->robustInformation(rho), omega_r);
+  } else {
+    computeQuadraticForm(_information, - _information * _error);
   }
-
 }
 
 
@@ -208,4 +165,58 @@ bool BaseMultiEdge<D, E>::allVerticesFixed() const
     }
   }
   return true;
+}
+
+template <int D, typename E>
+void BaseMultiEdge<D, E>::computeQuadraticForm(const InformationType& omega, const ErrorVector& weightedError)
+{
+  for (size_t i = 0; i < _vertices.size(); ++i) {
+    OptimizableGraph::Vertex* from = static_cast<OptimizableGraph::Vertex*>(_vertices[i]);
+    bool istatus = !(from->fixed());
+
+    if (istatus) {
+      const MatrixXd& A = _jacobianOplus[i];
+
+      MatrixXd AtO = A.transpose() * omega;
+      int fromDim = from->dimension();
+      assert(fromDim >= 0);
+      Map<MatrixXd> fromMap(from->hessianData(), fromDim, fromDim);
+      Map<VectorXd> fromB(from->bData(), fromDim);
+
+      // ii block in the hessian
+#ifdef G2O_OPENMP
+      from->lockQuadraticForm();
+#endif
+      fromMap.noalias() += AtO * A;
+      fromB.noalias() += A.transpose() * weightedError;
+
+      // compute the off-diagonal blocks ij for all j
+      for (size_t j = i+1; j < _vertices.size(); ++j) {
+        OptimizableGraph::Vertex* to = static_cast<OptimizableGraph::Vertex*>(_vertices[j]);
+#ifdef G2O_OPENMP
+        to->lockQuadraticForm();
+#endif
+        bool jstatus = !(to->fixed());
+        if (jstatus) {
+          const MatrixXd& B = _jacobianOplus[j];
+          int idx = internal::computeUpperTriangleIndex(i, j);
+          assert(idx < (int)_hessian.size());
+          HessianHelper& hhelper = _hessian[idx];
+          if (hhelper.transposed) { // we have to write to the block as transposed
+            hhelper.matrix.noalias() += B.transpose() * AtO.transpose();
+          } else {
+            hhelper.matrix.noalias() += AtO * B;
+          }
+        }
+#ifdef G2O_OPENMP
+        to->unlockQuadraticForm();
+#endif
+      }
+
+#ifdef G2O_OPENMP
+      from->unlockQuadraticForm();
+#endif
+    }
+
+  }
 }

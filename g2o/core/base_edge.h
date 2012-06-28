@@ -60,13 +60,6 @@ namespace g2o {
         return _error.dot(information()*_error);
       }
 
-      virtual void robustifyError()
-      {
-        double nrm = sqrt(_error.dot(information()*_error));
-        double w = sqrtOfHuberByNrm(nrm,_huberWidth);
-        _error *= w;
-      }
-
       virtual const double* errorData() const { return _error.data();}
       virtual double* errorData() { return _error.data();}
       const ErrorVector& error() const { return _error;}
@@ -96,6 +89,18 @@ namespace g2o {
       Measurement _measurement;
       InformationType _information;
       ErrorVector _error;
+
+      /**
+       * calculate the robust information matrix by updating the information matrix of the error
+       */
+      InformationType robustInformation(const Eigen::Vector3d& rho)
+      {
+        InformationType result = rho[1] * _information;
+        //ErrorVector weightedErrror = _information * _error;
+        //result.noalias() += 2 * rho[2] * (weightedErrror * weightedErrror.transpose());
+        return result;
+      }
+
     public:
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   };

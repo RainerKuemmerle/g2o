@@ -23,7 +23,7 @@ ADD_LIBRARY(deprecated_types_slam3d ${G2O_LIB_TYPE}
   edge_se3_pointxyz_depth.h
   types_slam3d.cpp
   types_slam3d.h
-  g2o_types_slam3d_api.h
+  g2o_deprecated_types_slam3d_api.h
 )
 
 SET_TARGET_PROPERTIES(deprecated_types_slam3d PROPERTIES OUTPUT_NAME ${LIB_PREFIX}deprecated_types_slam3d)
