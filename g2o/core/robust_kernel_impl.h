@@ -28,6 +28,7 @@
 #define G2O_ROBUST_KERNEL_IMPL_H
 
 #include "robust_kernel.h"
+#include "g2o_core_api.h"
 
 namespace g2o {
 
@@ -38,13 +39,19 @@ namespace g2o {
    * one implements a kernel which only is designed for a fixed window
    * size.
    */
-  class RobustKernelScaleDelta : public RobustKernel
+  class G2O_CORE_API RobustKernelScaleDelta : public RobustKernel
   {
     public:
+      /**
+       * construct the scaled kernel ontop of another kernel which might be shared accross
+       * several scaled kernels
+       */
       explicit RobustKernelScaleDelta(const RobustKernelPtr& kernel, double delta = 1.);
       explicit RobustKernelScaleDelta(double delta = 1.);
 
+      //! return the underlying kernel
       const RobustKernelPtr kernel() const { return _kernel;}
+      //! use another kernel for the underlying operation
       void setKernel(const RobustKernelPtr& ptr);
 
       void robustify(double error, Eigen::Vector3d& rho) const;
@@ -67,7 +74,7 @@ namespace g2o {
    *               1/2    2
    * rho(e) = 2 d e    - d
    */
-  class RobustKernelHuber : public RobustKernel
+  class G2O_CORE_API RobustKernelHuber : public RobustKernel
   {
     public:
       virtual void robustify(double e2, Eigen::Vector3d& rho) const;
@@ -84,7 +91,7 @@ namespace g2o {
    *             2
    *            d
    */
-  class RobustKernelPseudoHuber : public RobustKernel
+  class G2O_CORE_API RobustKernelPseudoHuber : public RobustKernel
   {
     public:
       virtual void robustify(double e2, Eigen::Vector3d& rho) const;
@@ -98,7 +105,7 @@ namespace g2o {
    *         2
    *        d
    */
-  class RobustKernelCauchy : public RobustKernel
+  class G2O_CORE_API RobustKernelCauchy : public RobustKernel
   {
     public:
       virtual void robustify(double e2, Eigen::Vector3d& rho) const;
@@ -109,7 +116,7 @@ namespace g2o {
    *
    * The error is at most delta^2
    */
-  class RobustKernelSaturated : public RobustKernel
+  class G2O_CORE_API RobustKernelSaturated : public RobustKernel
   {
     public:
       virtual void robustify(double e2, Eigen::Vector3d& rho) const;
