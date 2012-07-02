@@ -27,16 +27,8 @@
 #include "vertex_pointxyz.h"
 #include <stdio.h>
 
-#ifdef WINDOWS
-#include <windows.h>
-#endif
-
 #ifdef G2O_HAVE_OPENGL
-#ifdef __APPLE__
-#include <OpenGL/gl.h>
-#else
-#include <GL/gl.h>
-#endif
+#include "g2o/stuff/opengl_wrapper.h"
 #endif
 
 #include <typeinfo>

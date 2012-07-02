@@ -16,9 +16,8 @@
 // You should have received a copy of the GNU General Public License
 // along with g2o.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "primitives.h"
+#include "opengl_primitives.h"
 
-#include <qglviewer.h>
 #include <cstdlib>
 #include <cmath>
 
@@ -59,21 +58,6 @@ class GLUWrapper
     }
     GLUquadricObj* _quadratic;;
 };
-
-void drawAxis(float length)
-{
-  QGLViewer::drawAxis(length);
-}
-
-void drawArrow(float length, float radius, int nbSubdivisions)
-{
-  QGLViewer::drawArrow(length, radius, nbSubdivisions);
-}
-
-void drawGrid(float size, int nbSubdivisions)
-{
-  QGLViewer::drawGrid(size, nbSubdivisions);
-}
 
 void drawArrow2D(float len, float head_width, float head_len)
 {

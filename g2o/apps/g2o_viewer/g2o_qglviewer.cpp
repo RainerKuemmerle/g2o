@@ -17,7 +17,7 @@
 // along with g2o.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "g2o_qglviewer.h"
-#include "primitives.h"
+#include "g2o/stuff/opengl_primitives.h"
 #include "g2o/core/sparse_optimizer.h"
 #include "g2o/core/hyper_graph_action.h"
 
