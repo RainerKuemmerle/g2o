@@ -43,15 +43,28 @@ namespace g2o {
  * \brief linear solver which uses the sparse Cholesky solver from Eigen
  *
  * Has no dependencies except Eigen. Hence, should compile almost everywhere
- * without to much issue. Performance should be similar to CSparse.
+ * without to much issues. Performance should be similar to CSparse, I guess.
  */
 template <typename MatrixType>
 class LinearSolverEigen: public LinearSolver<MatrixType>
 {
   public:
-    typedef Eigen::SparseMatrix<double> MySparseMatrix;
+    typedef Eigen::SparseMatrix<double, ColMajor> SparseMatrix;
     typedef Eigen::Triplet<double> Triplet;
-    typedef Eigen::SimplicialLDLT< MySparseMatrix, Eigen::Upper > CholeskyDecomposition;
+    class CholeskyDecomposition : public Eigen::SimplicialLDLT<SparseMatrix, Eigen::Upper>
+    {
+      public:
+        CholeskyDecomposition() : Eigen::SimplicialLDLT<SparseMatrix, Eigen::Upper>() {}
+        using Eigen::SimplicialLDLT< SparseMatrix, Eigen::Upper>::analyzePattern_preordered;
+
+        void analyzeWithCurrentPermutation(SparseMatrix& a)
+        {
+          int size = a.cols();
+          SparseMatrix ap(size,size);
+          ap.template selfadjointView<Upper>() = a.template selfadjointView<UpLo>().twistedBy(m_P);
+          analyzePattern_preordered(ap, true);
+        }
+    };
 
   public:
     LinearSolverEigen() :
@@ -81,7 +94,7 @@ class LinearSolverEigen: public LinearSolver<MatrixType>
 
       double t=get_monotonic_time();
       _cholesky.factorize(_sparseMatrix);
-      if (_cholesky.info() != Eigen::Success) {
+      if (_cholesky.info() != Eigen::Success) { // the matrix is not positive definite
         if (_writeDebug) {
           std::cerr << "Cholesky failure, writing debug.txt (Hessian loadable by Octave)" << std::endl;
           A.writeOctave("debug.txt");
@@ -89,9 +102,9 @@ class LinearSolverEigen: public LinearSolver<MatrixType>
         return false;
       }
 
+      // Solving the system
       Eigen::VectorXd::MapType xx(x, _sparseMatrix.cols());
       Eigen::VectorXd::ConstMapType bb(b, _sparseMatrix.cols());
-
       xx = _cholesky.solve(bb);
       if (globalStats) {
         globalStats->timeNumericDecomposition = get_monotonic_time() - t;
@@ -113,7 +126,7 @@ class LinearSolverEigen: public LinearSolver<MatrixType>
     bool _init;
     bool _blockOrdering;
     bool _writeDebug;
-    MySparseMatrix _sparseMatrix;
+    SparseMatrix _sparseMatrix;
     CholeskyDecomposition _cholesky;
 
     /**
@@ -128,9 +141,55 @@ class LinearSolverEigen: public LinearSolver<MatrixType>
       if (! _blockOrdering) {
         _cholesky.analyzePattern(_sparseMatrix);
       } else {
-        (void) A;
-        abort();
-        // TODO implement the block ordering with the Eigen Interface
+        // block ordering with the Eigen Interface
+        // This is really ugly currently, as it calls internal functions from Eigen
+        // and modifies the SparseMatrix class
+
+        // prepare a block structure matrix for calling AMD
+        std::vector<Triplet> triplets;
+        for (int i = 0; i < static_cast<int>(A.blockCols().size()); ++i){
+          const int& c = i;
+          for (typename SparseBlockMatrix<MatrixType>::IntBlockMap::const_iterator it = A.blockCols()[i].begin(); it != A.blockCols()[i].end(); ++it) {
+            const int& r = it->first;
+            if (r <= c) // only upper triangle
+              triplets.push_back(Triplet(r, c, 0.));
+            else
+              break;
+          }
+        }
+
+        Eigen::PermutationMatrix<Eigen::Dynamic,Eigen::Dynamic> pinv;
+        { // call the AMD ordering on the block matrix.
+          // Relies on Eigen's internal stuff, probably bad idea
+          SparseMatrix auxBlockMatrix(A.blockCols().size(), A.blockCols().size());
+          auxBlockMatrix.setFromTriplets(triplets.begin(), triplets.end());
+          typename CholeskyDecomposition::CholMatrixType C;
+          C = auxBlockMatrix.selfadjointView<Eigen::Upper>();
+          Eigen::internal::minimum_degree_ordering(C, pinv);
+        }
+
+        int rows = A.rows();
+        //int cols = A.cols();
+        assert(rows == A.cols() && "Matrix A is not square");
+
+        // Adapt the block permutation to the scalar matrix
+        typedef Eigen::PermutationMatrix<Eigen::Dynamic, Eigen::Dynamic, SparseMatrix::Index> PermutationMatrix;
+        PermutationMatrix& mpinv = *const_cast<PermutationMatrix*>(&_cholesky.permutationPinv());
+        mpinv.resize(rows);
+        int scalarIdx = 0;
+        for (int i = 0; i < pinv.size(); ++i) {
+          const int& p = pinv.indices()(i);
+          int base  = A.colBaseOfBlock(p);
+          int nCols = A.colsOfBlock(p);
+          for (int j = 0; j < nCols; ++j)
+            mpinv.indices()(scalarIdx++) = base++;
+        }
+        assert(scalarIdx == rows && "did not completely fill the permutation matrix");
+        PermutationMatrix& mp = *const_cast<PermutationMatrix*>(&_cholesky.permutationP());
+        mp = mpinv.inverse();
+
+        // analyze the given permutation
+        _cholesky.analyzeWithCurrentPermutation(_sparseMatrix);
       }
       if (globalStats){
         globalStats->timeSymbolicDecomposition = get_monotonic_time() - t;

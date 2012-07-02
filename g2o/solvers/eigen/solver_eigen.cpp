@@ -50,8 +50,9 @@ namespace g2o {
     string solverName = fullSolverName.substr(3);
 
     if (solverName == "var_eigen") {
-      ALLOC_CSPARSE(s, -1, -1, false);
+      ALLOC_CSPARSE(s, -1, -1, true);
     }
+#if 0
     else if (solverName == "fix3_2_eigen") {
       ALLOC_CSPARSE(s, 3, 2, true);
     }
@@ -70,6 +71,7 @@ namespace g2o {
     else if (solverName == "fix7_3_scalar_eigen") {
       ALLOC_CSPARSE(s, 7, 3, false);
     }
+#endif
 
     OptimizationAlgorithm* snl = 0;
     if (methodName == "gn") {
@@ -101,7 +103,7 @@ namespace g2o {
 
   G2O_REGISTER_OPTIMIZATION_ALGORITHM(gn_var_eigen, new EigenSolverCreator(OptimizationAlgorithmProperty("gn_var_eigen", "Gauss-Newton: Cholesky solver using Eigen's Sparse Cholesky methods (variable blocksize)", "Eigen", false, Eigen::Dynamic, Eigen::Dynamic)));
 
-  //G2O_REGISTER_OPTIMIZATION_ALGORITHM(lm_var_eigen, new EigenSolverCreator(OptimizationAlgorithmProperty("lm_var_eigen", "Levenberg: Cholesky solver using Eigen's Sparse Cholesky methods (variable blocksize)", "Eigen", false, Eigen::Dynamic, Eigen::Dynamic)));
+  G2O_REGISTER_OPTIMIZATION_ALGORITHM(lm_var_eigen, new EigenSolverCreator(OptimizationAlgorithmProperty("lm_var_eigen", "Levenberg: Cholesky solver using Eigen's Sparse Cholesky methods (variable blocksize)", "Eigen", false, Eigen::Dynamic, Eigen::Dynamic)));
 
-  //G2O_REGISTER_OPTIMIZATION_ALGORITHM(dl_var_eigen, new EigenSolverCreator(OptimizationAlgorithmProperty("dl_var_eigen", "Dogleg: Cholesky solver using Eigen's Sparse Cholesky methods (variable blocksize)", "Eigen", false, Eigen::Dynamic, Eigen::Dynamic)));
+  G2O_REGISTER_OPTIMIZATION_ALGORITHM(dl_var_eigen, new EigenSolverCreator(OptimizationAlgorithmProperty("dl_var_eigen", "Dogleg: Cholesky solver using Eigen's Sparse Cholesky methods (variable blocksize)", "Eigen", false, Eigen::Dynamic, Eigen::Dynamic)));
 }
