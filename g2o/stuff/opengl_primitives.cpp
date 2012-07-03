@@ -32,6 +32,7 @@
 #endif
 
 namespace g2o {
+namespace opengl {
 
 /**
  * \brief handle the GLU quadratic
@@ -301,4 +302,5 @@ void drawSlice(GLfloat radius, GLfloat height, GLfloat fov, int slices_per_circl
   glPopMatrix();
 }
 
+} // end namespace
 } // end namespace

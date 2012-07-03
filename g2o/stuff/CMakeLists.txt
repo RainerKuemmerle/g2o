@@ -19,7 +19,6 @@ INSTALL(TARGETS stuff
 
 # build our OpenGL helper library
 IF(OPENGL_FOUND)
-  INCLUDE_DIRECTORIES(${QT_INCLUDES})
   ADD_LIBRARY(opengl_helper ${G2O_LIB_TYPE}
     opengl_primitives.cpp opengl_primitives.h
   )

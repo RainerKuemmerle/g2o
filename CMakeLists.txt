@@ -113,19 +113,14 @@ IF(OPENMP_FOUND AND G2O_USE_OPENMP)
   MESSAGE(STATUS "Compiling with OpenMP support")
 ENDIF(OPENMP_FOUND AND G2O_USE_OPENMP)
 
-FIND_PACKAGE(GLUT)
 # OpenGL is used in the draw actions for the different types, as well
 # as for creating the GUI itself
 FIND_PACKAGE(OpenGL)
 SET(G2O_USE_OPENGL ON CACHE BOOL "Build g2o with OpenGL support for visualization")
 IF (OPENGL_FOUND AND G2O_USE_OPENGL)
   SET (G2O_HAVE_OPENGL 1)
-  INCLUDE_DIRECTORIES(${OPENGL_INCLUDE})
+  INCLUDE_DIRECTORIES(${OPENGL_INCLUDE_DIR})
   MESSAGE(STATUS "Compiling with OpenGL support")
-  IF(GLUT_FOUND)
-    INCLUDE_DIRECTORIES(${GLUT_INCLUDE})
-    MESSAGE(STATUS "Compiling with GLUT support")
-  ENDIF()
 ENDIF()
 
 # For building the GUI
@@ -196,7 +191,6 @@ INCLUDE_DIRECTORIES(${g2o_SOURCE_DIR} ${G2O_EIGEN3_INCLUDE})
 # Generate config.h
 SET(G2O_HAVE_CHOLMOD ${CHOLMOD_FOUND})
 SET(G2O_HAVE_CSPARSE ${CSPARSE_FOUND})
-SET(G2O_HAVE_GLUT ${GLUT_FOUND})
 SET(G2O_SHARED_LIBS ${BUILD_SHARED_LIBS})
 configure_file(config.h.in ${PROJECT_BINARY_DIR}/g2o/config.h)
 include_directories(${PROJECT_BINARY_DIR})

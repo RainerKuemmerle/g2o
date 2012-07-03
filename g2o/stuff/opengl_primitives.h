@@ -30,6 +30,7 @@
 #include "opengl_wrapper.h"
 
 namespace g2o {
+namespace opengl {
 
 /**
  * draw a box that is centered in the current coordinate frame
@@ -111,6 +112,7 @@ void G2O_STUFF_API drawArrow2D(float len, float head_width, float head_len);
 
 // @}
 
+} // end namespace
 } // end namespace
 
 #endif

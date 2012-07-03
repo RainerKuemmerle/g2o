@@ -1,6 +1,6 @@
 INCLUDE_DIRECTORIES(${CSPARSE_INCLUDE_DIR})
 
-ADD_LIBRARY(csparse_extension ${G2O_LIB_TYPE}
+ADD_LIBRARY(csparse_extension SHARED
   csparse_helper.cpp csparse_helper.h
   g2o_csparse_extension_api.h
 )
