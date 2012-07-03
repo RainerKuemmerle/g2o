@@ -518,7 +518,7 @@ std::istream& operator>>(std::istream& is, std::vector<double>& v){
   v.clear();
   bool hasNextValue=true;
   while(hasNextValue){
-    int i=strtod(c,&caux);
+    double i=strtod(c,&caux);
     if (c!=caux){
       c=caux;
       c++;
