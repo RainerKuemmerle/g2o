@@ -33,18 +33,7 @@
 #include "g2o/apps/g2o_cli/dl_wrapper.h"
 
 #include "g2o/stuff/command_args.h"
-
-#ifdef G2O_HAVE_OPENGL
-#ifdef __APPLE__
-#include <OpenGL/gl.h>
-#else
-#include <GL/gl.h>
-#endif
-#endif
-
-#ifdef G2O_HAVE_GLUT
-#include <GL/freeglut.h>
-#endif
+#include "g2o/stuff/opengl_wrapper.h"
 
 #include <QApplication>
 #include <QThread>
@@ -64,9 +53,6 @@ class SleepThread : public QThread
 int main(int argc, char** argv)
 {
   QApplication qapp(argc, argv);
-#ifdef G2O_HAVE_GLUT
-  glutInit(&argc, argv);
-#endif
 
   string dummy;
   string inputFilename;
