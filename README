@@ -43,6 +43,8 @@ guarantee easy compilation.
   csparse is compiled if it is not provided by the system.
 - ceres: BSD (see EXTERNAL/ceres/LICENSE)
   Headers to perform Automatic Differentiation
+- freeglut: X Consortium (Copyright (c) 1999-2000 Pawel W. Olszta)
+  We use a stripped down version for drawing text in OpenGL.
 
 See the doc folder for the full text of the licenses.
 

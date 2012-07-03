@@ -12,8 +12,8 @@ ADD_LIBRARY(types_data ${G2O_LIB_TYPE}
 SET_TARGET_PROPERTIES(types_data PROPERTIES OUTPUT_NAME ${LIB_PREFIX}types_data)
 
 TARGET_LINK_LIBRARIES(types_data core types_slam2d)
-IF(GLUT_FOUND)
-  TARGET_LINK_LIBRARIES(types_data ${GLUT_glut_LIBRARY})
+IF(OPENGL_FOUND)
+  TARGET_LINK_LIBRARIES(types_data freeglut_minimal opengl_helper)
 ENDIF()
 
 INSTALL(TARGETS types_data

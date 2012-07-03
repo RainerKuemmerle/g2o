@@ -528,7 +528,7 @@ namespace g2o {
     int nz = 0;
     int* Cp = ms.Ap;
     int* Ci = ms.Aii;
-    for (size_t i = 0; i<_blockCols.size(); ++i){
+    for (int i = 0; i < static_cast<int>(_blockCols.size()); ++i){
       *Cp = nz;
       const int& c = i;
       for (typename SparseBlockMatrix<MatrixType>::IntBlockMap::const_iterator it=_blockCols[i].begin(); it!=_blockCols[i].end(); ++it) {

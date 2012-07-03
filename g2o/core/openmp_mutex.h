@@ -31,6 +31,8 @@
 
 #ifdef G2O_OPENMP
 #include <omp.h>
+#else
+#include <cassert>
 #endif
 
 namespace g2o {
@@ -47,7 +49,6 @@ namespace g2o {
       ~OpenMPMutex() { omp_destroy_lock(&_lock); }
       void lock() { omp_set_lock(&_lock); }
       void unlock() { omp_unset_lock(&_lock); }
-
     protected:
       omp_lock_t _lock;
   };
@@ -55,12 +56,24 @@ namespace g2o {
 #else
 
   /*
-   * dummy which does nothing in case we don't have OpenMP support
+   * dummy which does nothing in case we don't have OpenMP support.
+   * In debug mode, the mutex allows to verify the correct lock and unlock behavior
    */
-  struct OpenMPMutex 
+  class OpenMPMutex
   {
-    void lock() {}
-    void unlock() {}
+    public:
+#ifdef NDEBUG
+      OpenMPMutex() {}
+#else
+      OpenMPMutex() : _cnt(0) {}
+#endif
+      ~OpenMPMutex() { assert(_cnt == 0 && "Freeing locked mutex");}
+      void lock() { assert(++_cnt == 1 && "Locking already locked mutex");}
+      void unlock() { assert(--_cnt == 0 && "Trying to unlock a mutex which is not locked");}
+    protected:
+#ifndef NDEBUG
+      char _cnt;
+#endif
   };
 
 #endif

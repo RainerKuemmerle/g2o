@@ -4,7 +4,7 @@ PROJECT(csparse)
 
 SET(CMAKE_C_FLAGS_RELEASE "-O3 -DNDEBUG")
 
-ADD_LIBRARY(csparse ${G2O_LIB_TYPE}
+ADD_LIBRARY(csparse SHARED
   cs_add.c
   cs_amd.c
   cs_chol.c

@@ -28,18 +28,9 @@
 
 #include "g2o/stuff/macros.h"
 
-#ifdef WINDOWS
-#include <windows.h>
-#endif
-
 #ifdef G2O_HAVE_OPENGL
-#ifdef __APPLE__
-#include <OpenGL/gl.h>
-#else
-#include <GL/gl.h>
+#include "g2o/stuff/opengl_wrapper.h"
 #endif
-#endif
-
 
 #include <iomanip>
 using namespace std;

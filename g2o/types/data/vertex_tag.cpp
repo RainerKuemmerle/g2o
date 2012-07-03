@@ -28,24 +28,10 @@
 
 #include "g2o/stuff/macros.h"
 
-#ifdef WINDOWS
-#include <windows.h>
-#endif
-
 #ifdef G2O_HAVE_OPENGL
-#ifdef __APPLE__
-#include <OpenGL/gl.h>
-#else
-#include <GL/gl.h>
-#endif
-#endif
-
-#ifdef G2O_HAVE_GLUT
-#ifdef __APPLE__
-#include <GLUT/glut.h>
-#else
-#include <GL/freeglut.h>
-#endif
+#include "g2o/stuff/opengl_wrapper.h"
+#include "g2o/stuff/opengl_primitives.h"
+#include "EXTERNAL/freeglut/freeglut_minimal.h"
 #endif
 
 #include <iomanip>
@@ -115,14 +101,10 @@ namespace g2o {
     int textSize = 1;
     if (_textSize )
       textSize = _textSize->value();
-#ifdef G2O_HAVE_GLUT
-    glutSolidCube(0.1*textSize);
+    opengl::drawBox(0.1*textSize, 0.1*textSize, 0.1*textSize);
     glTranslatef(0.2*textSize, 0, 0);
     glScalef(0.003*textSize,0.003*textSize,1);
-#ifndef __APPLE__
-    glutStrokeString(GLUT_STROKE_ROMAN, (const unsigned char*)that->name().c_str());
-#endif
-#endif
+    freeglut_minimal::glutStrokeString(freeglut_minimal::GLUT_STROKE_ROMAN, that->name().c_str());
     glPopMatrix();
     return this;
   }

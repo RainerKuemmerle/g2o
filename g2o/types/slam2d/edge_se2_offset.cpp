@@ -57,23 +57,24 @@ namespace g2o {
 
   bool EdgeSE2Offset::read(std::istream& is) {
     int pidFrom, pidTo;
-    is >> pidFrom >> pidTo   ;
+    is >> pidFrom >> pidTo;
     if (! setParameterId(0,pidFrom))
       return false;
     if (! setParameterId(1,pidTo))
       return false;
 
     Vector3d meas;
-    for (int i=0; i<3; i++) meas[i];
+    for (int i=0; i<3; i++)
+      is >> meas[i];
     setMeasurement(SE2(meas));
     if (is.bad()) {
       return false;
     }
     for ( int i=0; i<information().rows() && is.good(); i++)
       for (int j=i; j<information().cols() && is.good(); j++){
-  is >> information()(i,j);
-  if (i!=j)
-    information()(j,i)=information()(i,j);
+        is >> information()(i,j);
+        if (i!=j)
+          information()(j,i)=information()(i,j);
       }
     if (is.bad()) {
       //  we overwrite the information matrix with the Identity
