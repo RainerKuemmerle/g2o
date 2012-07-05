@@ -100,7 +100,7 @@ adjustment.
 
 In the literature, many approaches have been proposed to address this
 class of problems. The naive implementation of standard methods, like
-Levenberg-Marquardt or Gauss-newton can lead to acceptable results for
+Levenberg-Marquardt or Gauss-Newton can lead to acceptable results for
 most applications, when the correct parameterization is
 chosen. However, to achieve the maximum performances substantial
 efforts might be required.
@@ -154,7 +154,7 @@ Here
   \item $\bz_{k}$ and $\bOmega_{k}$ represent 
     respectively the mean and the information matrix of a constraint
     relating the parameters in $\bx_k$.
-  \item $\be_k(\bx_k \bz_{k})$ is a vector error function function
+  \item $\be_k(\bx_k \bz_{k})$ is a vector error function
     that measures how well the parameter blocks in $\bx_k$ satisfy the
     constraint $\bz_{k}$. It is $\bZero$ when $\bx_k$ and $\bx_j$
     perfectly match the constraint.  As an example, if one has a
@@ -283,7 +283,7 @@ and the update step in \eqref{eq:linearPropagation}. In every
 iteration, the previous solution is used as linearization point and as
 initial guess.
 
-The Levenberg-Marquardt (LM) algorithm is a nonlinear variant to gauss newton that introduces 
+The Levenberg-Marquardt (LM) algorithm is a nonlinear variant to Gauss-Newton that introduces 
 a damping factor and backup actions to control the convergence.
 Instead of solving directly Eq.~\ref{eq:oneLinearIteration}
 LM solves a damped version of it
@@ -968,7 +968,7 @@ These are:
 \begin{itemize}
 \item identification of the state variables $\bx_i$ and of their domain,
 \item characterization of the constraints and identification of the graph structure,
-\item choice of the parameterization for the increments for the increments $\bTDeltax_i$, and definition of the
+\item choice of the parameterization for the increments $\bTDeltax_i$, and definition of the
 $\boxplus$ operator.
 \item construction of the error functions $e_k(\bx_k)$.
 \end{itemize}
@@ -1162,7 +1162,7 @@ edge connecting two robot poses $\bx^\mathrm{s}_t$ and
 $\bx^\mathrm{s}_{t+1}$. As stated before, an odometry measurement lives in $SE(2)$.
 By using the $\oplus$ operator we can write a synthetic measurement function:
 \begin{eqnarray}
-    \bh^\mathrm{s}_{t,t+1}(\bx^\mathrm{s}_t, \bx^\mathrm{t}_{t+1})   & \doteq & \bx^\mathrm{s}_{t+1} \ominus \bx^\mathrm{t}_{t}.
+    \bh^\mathrm{s}_{t,t+1}(\bx^\mathrm{s}_t, \bx^\mathrm{s}_{t+1})   & \doteq & \bx^\mathrm{s}_{t+1} \ominus \bx^\mathrm{s}_{t}.
 \end{eqnarray}
 In short this function returns the motion that brings the robot from
 $\bx^\mathrm{s}_t$ to $\bx^\mathrm{s}_{t+1}$, that is the ``ideal''
@@ -1274,7 +1274,7 @@ type \verb+SE2+.  Then all we need to do is to redefine the methods
 \verb+setToOriginImpl()+ that resets the estimate to a known
 configuration, and the method \verb+\oplusImpl(double*)+.  The method
 should apply an increment, expressed in the increment parameterization
-(that is a vector $(\Delta x \; Delta y \; \Delta \theta )^t$ to the
+(that is a vector $(\Delta x \; \Delta y \; \Delta \theta )^t$ to the
 current estimate.  To do this, we first convert the vector passed as
 argument into an \verb+SE(2)+, then we multiply this increment at the
 right of the previous estimate.  After that we should implement the
@@ -1335,7 +1335,7 @@ class VertexPointXY : public BaseVertex<2, Eigen::Vector2d>
 Now we are done with the vertices. We should go for the edges.  Since
 both edges are binary edges we, extend the class
 \verb+BaseBinaryEdge<>+.
-To represent an odometry edge (see Listing~\ref{lst:edgese2})that
+To represent an odometry edge (see Listing~\ref{lst:edgese2}) that
 connects two \verb+VertexSE2+, we need to extend 
 \verb+BaseBinaryEdge<>+,  specialized with the types of the
 connected vertices (the order matters), where the measurement itself
@@ -1346,7 +1346,7 @@ function, by redefining the \verb+computeError()+ method.  The
 \verb+computeError()+ should put the error vector in a member variable
 \verb+error+ that has type \verb+Eigen::Vector<double,3>+. Here the 3
 comes from the template parameter that specifies the dimension.
-Again, the the read and write functions can be looked up in the code.
+Again, the read and write functions can be looked up in the code.
 Now we are done with this edge. The Jacobians are computed numerically
 by \gopt{}.  However, if you want to speed up the execution of your
 code after everything works, you are warmly invited to redefine the
