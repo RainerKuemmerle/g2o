@@ -83,6 +83,8 @@ IF(WIN32)
     IF (BUILD_SHARED_LIBS)
       # disable warning on missing DLL interfaces
       ADD_DEFINITIONS("/wd4251")
+      # SSE2 optimizations
+      ADD_DEFINITIONS("/arch:SSE2")
     ENDIF()
   ENDIF(MSVC)
 ELSEIF(UNIX)
