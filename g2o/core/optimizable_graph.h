@@ -680,6 +680,14 @@ namespace g2o {
     JacobianWorkspace& jacobianWorkspace() { return _jacobianWorkspace;}
     const JacobianWorkspace& jacobianWorkspace() const { return _jacobianWorkspace;}
 
+    /**
+     * Eigen starting from version 3.1 requires that we call an initialize
+     * function, if we perform calls to Eigen from several threads.
+     * Currently, this function calls Eigen::initParallel if g2o is compiled
+     * with OpenMP support and Eigen's version is at least 3.1
+     */
+    static bool initMultiThreading();
+
   protected:
     std::map<std::string, std::string> _renamedTypesLookup;
     long long _nextEdgeId;

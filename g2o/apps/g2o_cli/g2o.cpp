@@ -97,6 +97,7 @@ void sigquit_handler(int sig)
 
 int main(int argc, char** argv)
 {
+  OptimizableGraph::initMultiThreading();
   int maxIterations;
   bool verbose;
   string inputFilename;

@@ -863,8 +863,8 @@ bool OptimizableGraph::verifyInformationMatrices(bool verbose) const
     OptimizableGraph::Edge* e = static_cast<OptimizableGraph::Edge*>(*it);
     Eigen::MatrixXd::MapType information(e->informationData(), e->dimension(), e->dimension());
     // test on symmetry
-    bool okay = true;
     bool isSymmetric = information.transpose() == information;
+    bool okay = isSymmetric;
     if (isSymmetric) {
       // compute the eigenvalues
       eigenSolver.compute(information, Eigen::EigenvaluesOnly);
@@ -887,6 +887,14 @@ bool OptimizableGraph::verifyInformationMatrices(bool verbose) const
     }
   }
   return allEdgeOk;
+}
+
+bool OptimizableGraph::initMultiThreading()
+{
+# if (defined G2O_OPENMP) && EIGEN_VERSION_AT_LEAST(3,1,0)
+  Eigen::initParallel();
+# endif
+  return true;
 }
 
 } // end namespace
