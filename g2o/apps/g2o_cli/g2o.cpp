@@ -37,6 +37,7 @@
 #include "output_helper.h"
 #include "g2o_common.h"
 
+#include "g2o/config.h"
 #include "g2o/core/estimate_propagator.h"
 #include "g2o/core/sparse_optimizer.h"
 #include "g2o/core/factory.h"
@@ -156,6 +157,10 @@ int main(int argc, char** argv)
   
 
   arg.parseArgs(argc, argv);
+
+  if (verbose) {
+    cout << "# Used Compiler: " << G2O_CXX_COMPILER << endl;
+  }
 
   // registering all the types from the libraries
   DlWrapper dlTypesWrapper;

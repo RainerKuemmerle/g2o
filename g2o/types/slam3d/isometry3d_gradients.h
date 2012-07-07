@@ -245,9 +245,9 @@ namespace g2o {
     // dre/dqi
     {
       skewT(Sxt,Syt,Szt,Rb);
-      Map<Matrix3d> Mx(buf);    Mx = Ra*Sxt;
-      Map<Matrix3d> My(buf+9);  My = Ra*Syt;
-      Map<Matrix3d> Mz(buf+18); Mz = Ra*Szt;
+      Map<Matrix3d> Mx(buf);    Mx.noalias() = Ra*Sxt;
+      Map<Matrix3d> My(buf+9);  My.noalias() = Ra*Syt;
+      Map<Matrix3d> Mz(buf+18); Mz.noalias() = Ra*Szt;
       Ji.template block<3,3>(3,3) = dq_dR * M;
     }
 
@@ -257,9 +257,9 @@ namespace g2o {
       Matrix3d& Sy = Syt;
       Matrix3d& Sz = Szt;
       skew(Sx,Sy,Sz,Matrix3d::Identity());
-      Map<Matrix3d> Mx(buf);    Mx = Re*Sx;
-      Map<Matrix3d> My(buf+9);  My = Re*Sy;
-      Map<Matrix3d> Mz(buf+18); Mz = Re*Sz;
+      Map<Matrix3d> Mx(buf);    Mx.noalias() = Re*Sx;
+      Map<Matrix3d> My(buf+9);  My.noalias() = Re*Sy;
+      Map<Matrix3d> Mz(buf+18); Mz.noalias() = Re*Sz;
       Jj.template block<3,3>(3,3) = dq_dR * M;
     }
   }
