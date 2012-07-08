@@ -52,6 +52,7 @@ class SleepThread : public QThread
 
 int main(int argc, char** argv)
 {
+  OptimizableGraph::initMultiThreading();
   QApplication qapp(argc, argv);
 
   string dummy;
