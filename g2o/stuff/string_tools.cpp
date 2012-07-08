@@ -183,7 +183,7 @@ int readLine(std::istream& is, std::stringstream& currentLine)
   if (is.fail()) // fail is set on empty lines
     is.clear();
   G2O_FSKIP_LINE(is); // read \n not read by get()
-  return currentLine.str().size();
+  return static_cast<int>(currentLine.str().size());
 }
 
 } // end namespace

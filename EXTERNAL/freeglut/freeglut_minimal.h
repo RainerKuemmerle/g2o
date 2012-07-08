@@ -83,11 +83,17 @@ namespace freeglut_minimal {
   extern const SFG_StrokeFont fgStrokeRoman;
   extern const SFG_StrokeFont fgStrokeMonoRoman;
 
+  G2O_FGAPI void glutStrokeString(FontID font, const char* string);
+
   /*
    * Font stuff, see freeglut_font.c
    */
   G2O_FGAPI GLfloat glutStrokeHeight(FontID font);
-  G2O_FGAPI void glutStrokeString(FontID font, const char* string);
+
+  /*
+   * Return the width of a string drawn using a stroke font
+   */
+  G2O_FGAPI int glutStrokeLength(FontID fontID, const char* string);
 
 } // end namespace
 

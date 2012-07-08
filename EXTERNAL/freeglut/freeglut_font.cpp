@@ -26,7 +26,7 @@
  */
 
 #include "freeglut_minimal.h"
-#include <cstdio>
+#include <iostream>
 
 #define  freeglut_return_if_fail( expr ) \
     if( !(expr) )                        \
@@ -48,45 +48,13 @@ static SFG_StrokeFont* fghStrokeByID(FontID font )
     if( font == GLUT_STROKE_MONO_ROMAN )
         return (SFG_StrokeFont*)&fgStrokeMonoRoman;
 
-    fprintf(stderr, "stroke font %d not found", (int)font);
+    std::cerr << "stroke font " << (int)font << " not found" << std::endl;
     return 0;
 }
 
-/*
- * Draw a stroke character
- */
-void glutStrokeCharacter(FontID fontID, int character )
+void glutStrokeString(FontID fontID, const char *string_)
 {
-    const SFG_StrokeChar *schar;
-    const SFG_StrokeStrip *strip;
-    int i, j;
-    SFG_StrokeFont* font;
-    //FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutStrokeCharacter" );
-    font = fghStrokeByID( fontID );
-    freeglut_return_if_fail( character >= 0 );
-    freeglut_return_if_fail( character < font->Quantity );
-    freeglut_return_if_fail( font );
-
-    schar = font->Characters[ character ];
-    freeglut_return_if_fail( schar );
-    strip = schar->Strips;
-
-    for( i = 0; i < schar->Number; i++, strip++ )
-    {
-        glBegin( GL_LINE_STRIP );
-        for( j = 0; j < strip->Number; j++ )
-            glVertex2f( strip->Vertices[ j ].X, strip->Vertices[ j ].Y );
-        glEnd( );
-				glBegin( GL_POINTS );
-        for( j = 0; j < strip->Number; j++ )
-            glVertex2f( strip->Vertices[ j ].X, strip->Vertices[ j ].Y );
-				glEnd( );
-    }
-    glTranslatef( schar->Right, 0.0, 0.0 );
-}
-
-void glutStrokeString( FontID fontID, const char *string )
-{
+    const unsigned char* string = reinterpret_cast<const unsigned char*>(string_);
     unsigned char c;
     int i, j;
     float length = 0.0;
@@ -128,37 +96,18 @@ void glutStrokeString( FontID fontID, const char *string )
                     }
 
                     length += schar->Right;
-                    glTranslatef( schar->Right, 0.0, 0.0 );
+                    glTranslatef( schar->Right, 0.0f, 0.0f );
                 }
             }
         }
 }
 
 /*
- * Return the width in pixels of a stroke character
- */
-int glutStrokeWidth( FontID fontID, int character )
-{
-    const SFG_StrokeChar *schar;
-    SFG_StrokeFont* font;
-    //FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutStrokeWidth" );
-    font = fghStrokeByID( fontID );
-    freeglut_return_val_if_fail( ( character >= 0 ) &&
-                                 ( character < font->Quantity ),
-                                 0
-    );
-    freeglut_return_val_if_fail( font, 0 );
-    schar = font->Characters[ character ];
-    freeglut_return_val_if_fail( schar, 0 );
-
-    return ( int )( schar->Right + 0.5 );
-}
-
-/*
  * Return the width of a string drawn using a stroke font
  */
-int glutStrokeLength( FontID fontID, const char* string )
+int glutStrokeLength( FontID fontID, const char* string_ )
 {
+    const unsigned char* string = reinterpret_cast<const unsigned char*>(string_);
     unsigned char c;
     float length = 0.0;
     float this_line_length = 0.0;
