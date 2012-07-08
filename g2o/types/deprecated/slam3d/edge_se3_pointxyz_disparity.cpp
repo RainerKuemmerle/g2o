@@ -29,17 +29,7 @@
 #include <iostream>
 #include <iomanip>
 
-#ifdef WINDOWS
-#include <windows.h>
-#endif
-
-#ifdef G2O_HAVE_OPENGL
-#ifdef __APPLE__
-#include <OpenGL/gl.h>
-#else
-#include <GL/gl.h>
-#endif
-#endif
+#include "g2o/stuff/opengl_wrapper.h"
 
 namespace g2o {
 namespace deprecated {

@@ -25,20 +25,10 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vertex_pointxyz.h"
-#include <stdio.h>
 
-#ifdef WINDOWS
-#include <windows.h>
-#endif
+#include "g2o/stuff/opengl_wrapper.h"
 
-#ifdef G2O_HAVE_OPENGL
-#ifdef __APPLE__
-#include <OpenGL/gl.h>
-#else
-#include <GL/gl.h>
-#endif
-#endif
-
+#include <cstdio>
 #include <typeinfo>
 
 namespace g2o {
