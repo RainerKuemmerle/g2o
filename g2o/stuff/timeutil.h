@@ -123,8 +123,10 @@ class G2O_STUFF_API ScopeTime {
 
 } // end namespace
 
+#ifndef MEASURE_FUNCTION_TIME
 #define MEASURE_FUNCTION_TIME \
   g2o::ScopeTime scopeTime(__PRETTY_FUNCTION__)
+#endif
 
 
 // @}
