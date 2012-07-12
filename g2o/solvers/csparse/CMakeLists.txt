@@ -7,9 +7,9 @@ ADD_LIBRARY(csparse_extension SHARED
 SET_TARGET_PROPERTIES(csparse_extension PROPERTIES OUTPUT_NAME ${LIB_PREFIX}csparse_extension)
 
 IF(BUILD_CSPARSE)
-  TARGET_LINK_LIBRARIES(csparse_extension csparse stuff)
+  TARGET_LINK_LIBRARIES(csparse_extension csparse)
 ELSE()
-  TARGET_LINK_LIBRARIES(csparse_extension ${CSPARSE_LIBRARY} stuff)
+  TARGET_LINK_LIBRARIES(csparse_extension ${CSPARSE_LIBRARY})
 ENDIF()
 
 
