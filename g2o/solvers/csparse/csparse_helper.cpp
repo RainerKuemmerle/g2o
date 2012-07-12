@@ -16,9 +16,6 @@
 
 #include "csparse_helper.h"
 
-#include "g2o/stuff/sparse_helper.h"
-#include "g2o/stuff/macros.h"
-
 #include <string>
 #include <cassert>
 #include <fstream>
@@ -148,25 +145,35 @@ namespace csparse_extension {
     int cols = A->n;
     int rows = A->m;
 
-    if (A->nz == -1) { // CCS matrix
-      return writeCCSMatrix(filename, rows, cols, A->p, A->i, A->x, upperTriangular);
-    }
-
-    // Triplet matrix
     string name = filename;
     std::string::size_type lastDot = name.find_last_of('.');
     if (lastDot != std::string::npos) 
       name = name.substr(0, lastDot);
 
     vector<SparseMatrixEntry> entries;
-    entries.reserve(A->nz);
-    int *Aj = A->p;             // column indeces
-    int *Ai = A->i;             // row indices
-    double *Ax = A->x;          // values;
-    for (int i = 0; i < A->nz; ++i) {
-      entries.push_back(SparseMatrixEntry(Ai[i], Aj[i], Ax[i]));
-      if (upperTriangular && Ai[i] != Aj[i])
-        entries.push_back(SparseMatrixEntry(Aj[i], Ai[i], Ax[i]));
+    if (A->nz == -1) { // CCS matrix
+      const int* Ap = A->p;
+      const int* Ai = A->i;
+      const double* Ax = A->x;
+      for (int i=0; i < cols; i++) {
+        const int& rbeg = Ap[i];
+        const int& rend = Ap[i+1];
+        for (int j = rbeg; j < rend; j++) {
+          entries.push_back(SparseMatrixEntry(Ai[j], i, Ax[j]));
+          if (upperTriangular && Ai[j] != i)
+            entries.push_back(SparseMatrixEntry(i, Ai[j], Ax[j]));
+        }
+      }
+    } else { // Triplet matrix
+      entries.reserve(A->nz);
+      int *Aj = A->p;             // column indeces
+      int *Ai = A->i;             // row indices
+      double *Ax = A->x;          // values;
+      for (int i = 0; i < A->nz; ++i) {
+        entries.push_back(SparseMatrixEntry(Ai[i], Aj[i], Ax[i]));
+        if (upperTriangular && Ai[i] != Aj[i])
+          entries.push_back(SparseMatrixEntry(Aj[i], Ai[i], Ax[i]));
+      }
     }
     sort(entries.begin(), entries.end(), SparseMatrixEntryColSort());
 
