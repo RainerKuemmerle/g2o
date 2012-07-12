@@ -30,8 +30,12 @@
 namespace g2o {
 namespace deprecated {
 
-  G2O_REGISTER_TYPE_GROUP(slam3d);
+  G2O_REGISTER_TYPE_GROUP(deprecated_slam3d);
 
+  // cannot register the types right now, as the macros use the class name
+  // which declares duplicate functions, if also linking with the default
+  // slam3d types
+#if 0
   G2O_REGISTER_TYPE(DEPRECATED_VERTEX_SE3:QUAT, VertexSE3);
   G2O_REGISTER_TYPE(DEPRECATED_EDGE_SE3:QUAT, EdgeSE3);
   G2O_REGISTER_TYPE(DEPRECATED_VERTEX_TRACKXYZ, VertexPointXYZ);
@@ -57,6 +61,7 @@ namespace deprecated {
   G2O_REGISTER_ACTION(VertexSE3DrawAction);
   G2O_REGISTER_ACTION(EdgeSE3DrawAction);
   G2O_REGISTER_ACTION(CacheCameraDrawAction);
+#endif
 #endif
 
 } // end namespace
