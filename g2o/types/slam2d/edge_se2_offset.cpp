@@ -96,7 +96,7 @@ namespace g2o {
   void EdgeSE2Offset::computeError() {
     SE2 delta=_inverseMeasurement * _cacheFrom->w2n() * _cacheTo->n2w();
     _error.head<2>() = delta.translation();
-    _error(3)=delta.rotation().angle();
+    _error(2)=delta.rotation().angle();
   }
 
   bool EdgeSE2Offset::setMeasurementFromState(){
