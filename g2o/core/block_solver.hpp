@@ -357,6 +357,7 @@ bool BlockSolver<Traits>::solve(){
   if (! _doSchur){
     double t=get_monotonic_time();
     bool ok = _linearSolver->solve(*_Hpp, _x, _b);
+    G2OBatchStatistics* globalStats = G2OBatchStatistics::globalStats();
     if (globalStats) {
       globalStats->timeLinearSolver = get_monotonic_time() - t;
       globalStats->hessianDimension = globalStats->hessianPoseDimension = _Hpp->cols();
@@ -438,6 +439,7 @@ bool BlockSolver<Traits>::solve(){
     _bschur[i]-=_coefficients[i];
   }
 
+  G2OBatchStatistics* globalStats = G2OBatchStatistics::globalStats();
   if (globalStats){
     globalStats->timeSchurrComplement = get_monotonic_time() - t;
   }
@@ -490,6 +492,7 @@ bool BlockSolver<Traits>::computeMarginals(SparseBlockMatrix<MatrixXd>& spinv, c
 {
   double t = get_monotonic_time();
   bool ok = _linearSolver->solvePattern(spinv, blockIndices, *_Hpp);
+  G2OBatchStatistics* globalStats = G2OBatchStatistics::globalStats();
   if (globalStats) {
     globalStats->timeMarginals = get_monotonic_time() - t;
   }

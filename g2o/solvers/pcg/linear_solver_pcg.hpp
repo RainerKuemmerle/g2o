@@ -147,6 +147,7 @@ bool LinearSolverPCG<MatrixType>::solve(const SparseBlockMatrix<MatrixType>& A, 
   }
   //std::cerr << "residual[" << iteration << "]: " << dn << std::endl;
   _residual = 0.5 * dn;
+  G2OBatchStatistics* globalStats = G2OBatchStatistics::globalStats();
   if (globalStats) {
     globalStats->iterationsLinearSolver = iteration;
   }

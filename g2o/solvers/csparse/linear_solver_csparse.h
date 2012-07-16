@@ -132,6 +132,7 @@ class LinearSolverCSparse : public LinearSolver<MatrixType>
         return false;
       }
 
+      G2OBatchStatistics* globalStats = G2OBatchStatistics::globalStats();
       if (globalStats){
         globalStats->timeNumericDecomposition = get_monotonic_time() - t;
         globalStats->choleskyNNZ = static_cast<size_t>(_symbolicDecomposition->lnz);
@@ -178,6 +179,7 @@ class LinearSolverCSparse : public LinearSolver<MatrixType>
         std::cerr << "inverse fail (numeric decomposition)" << std::endl;
       }
 
+      G2OBatchStatistics* globalStats = G2OBatchStatistics::globalStats();
       if (globalStats){
         globalStats->choleskyNNZ = static_cast<size_t>(_symbolicDecomposition->lnz);
       }
@@ -214,6 +216,7 @@ class LinearSolverCSparse : public LinearSolver<MatrixType>
         std::cerr << "inverse fail (numeric decomposition)" << std::endl;
       }
 
+      G2OBatchStatistics* globalStats = G2OBatchStatistics::globalStats();
       if (globalStats){
         globalStats->choleskyNNZ = static_cast<size_t>(_symbolicDecomposition->lnz);
       }
@@ -295,6 +298,7 @@ class LinearSolverCSparse : public LinearSolver<MatrixType>
         }
 
       }
+      G2OBatchStatistics* globalStats = G2OBatchStatistics::globalStats();
       if (globalStats){
         globalStats->timeSymbolicDecomposition = get_monotonic_time() - t;
       }

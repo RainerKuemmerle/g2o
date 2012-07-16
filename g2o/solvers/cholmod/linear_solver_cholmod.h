@@ -144,6 +144,7 @@ class LinearSolverCholmod : public LinearSolver<MatrixType>
       memcpy(x, xcholmod->x, sizeof(double) * bcholmod.nrow); // copy back to our array
       cholmod_free_dense(&xcholmod, &_cholmodCommon);
 
+      G2OBatchStatistics* globalStats = G2OBatchStatistics::globalStats();
       if (globalStats){
         globalStats->timeNumericDecomposition = get_monotonic_time() - t;
         globalStats->choleskyNNZ = _cholmodCommon.method[0].lnz;
@@ -195,6 +196,7 @@ class LinearSolverCholmod : public LinearSolver<MatrixType>
           (double*)_cholmodFactor->x, pinv.data());
       mcc.computeCovariance(blocks, A.rowBlockIndices());
 
+      G2OBatchStatistics* globalStats = G2OBatchStatistics::globalStats();
       if (globalStats) {
         globalStats->choleskyNNZ = _cholmodCommon.method[_cholmodCommon.selected].lnz;
       }
@@ -235,6 +237,7 @@ class LinearSolverCholmod : public LinearSolver<MatrixType>
           (double*)_cholmodFactor->x, pinv.data());
       mcc.computeCovariance(spinv, A.rowBlockIndices(), blockIndices);
 
+      G2OBatchStatistics* globalStats = G2OBatchStatistics::globalStats();
       if (globalStats) {
         globalStats->choleskyNNZ = _cholmodCommon.method[_cholmodCommon.selected].lnz;
       }
@@ -324,6 +327,7 @@ class LinearSolverCholmod : public LinearSolver<MatrixType>
         _cholmodFactor = cholmod_analyze_p(_cholmodSparse, _scalarPermutation.data(), NULL, 0, &_cholmodCommon);
 
       }
+      G2OBatchStatistics* globalStats = G2OBatchStatistics::globalStats();
       if (globalStats)
         globalStats->timeSymbolicDecomposition = get_monotonic_time() - t;
 

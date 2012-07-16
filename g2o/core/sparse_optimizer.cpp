@@ -55,7 +55,7 @@ namespace g2o{
 
   SparseOptimizer::~SparseOptimizer(){
     delete _algorithm;
-    globalStats = 0;
+    G2OBatchStatistics::setGlobalStats(0);
   }
 
   void SparseOptimizer::computeActiveErrors()
@@ -366,7 +366,7 @@ namespace g2o{
 
       if (_computeBatchStatistics) {
         G2OBatchStatistics& cstat = _batchStatistics[i];
-        globalStats = &cstat;
+        G2OBatchStatistics::setGlobalStats(&cstat);
         cstat.iteration = i;
         cstat.numEdges =  _activeEdges.size();
         cstat.numVertices = _activeVertices.size();
@@ -424,7 +424,7 @@ namespace g2o{
   void SparseOptimizer::setComputeBatchStatistics(bool computeBatchStatistics)
   {
     if ((_computeBatchStatistics == true) && (computeBatchStatistics == false)) {
-      globalStats = 0;
+      G2OBatchStatistics::setGlobalStats(0);
       _batchStatistics.clear();
     }
     _computeBatchStatistics = computeBatchStatistics;

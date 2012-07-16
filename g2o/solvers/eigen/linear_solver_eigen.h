@@ -106,6 +106,7 @@ class LinearSolverEigen: public LinearSolver<MatrixType>
       Eigen::VectorXd::MapType xx(x, _sparseMatrix.cols());
       Eigen::VectorXd::ConstMapType bb(b, _sparseMatrix.cols());
       xx = _cholesky.solve(bb);
+      G2OBatchStatistics* globalStats = G2OBatchStatistics::globalStats();
       if (globalStats) {
         globalStats->timeNumericDecomposition = get_monotonic_time() - t;
         globalStats->choleskyNNZ = _cholesky.matrixL().nestedExpression().nonZeros() + _sparseMatrix.cols(); // the elements of D
@@ -191,6 +192,7 @@ class LinearSolverEigen: public LinearSolver<MatrixType>
         // analyze the given permutation
         _cholesky.analyzeWithCurrentPermutation(_sparseMatrix);
       }
+      G2OBatchStatistics* globalStats = G2OBatchStatistics::globalStats();
       if (globalStats){
         globalStats->timeSymbolicDecomposition = get_monotonic_time() - t;
       }
