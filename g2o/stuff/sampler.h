@@ -66,17 +66,17 @@ namespace g2o {
       cholDecomp.compute(cov);
       if (cholDecomp.info()==Eigen::NumericalIssue)
   return;
-      _L=cholDecomp.matrixL();
+      _cholesky=cholDecomp.matrixL();
     }
     SampleType generateSample() {
       SampleType s;
       for (int i=0; i<s.size(); i++){
         s(i) = (_generator) ? sampleGaussian(_generator) : sampleGaussian();
       }
-      return _L*s;
+      return _cholesky*s;
     }
   protected:
-    CovarianceType _L;
+    CovarianceType _cholesky;
     std::tr1::ranlux_base_01* _generator;
   };
 

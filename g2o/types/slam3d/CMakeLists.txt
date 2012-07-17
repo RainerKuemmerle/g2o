@@ -34,7 +34,10 @@ ADD_LIBRARY(types_slam3d ${G2O_LIB_TYPE}
 
 
 SET_TARGET_PROPERTIES(types_slam3d PROPERTIES OUTPUT_NAME ${LIB_PREFIX}types_slam3d)
-TARGET_LINK_LIBRARIES(types_slam3d ${OPENGL_gl_LIBRARY} core)
+TARGET_LINK_LIBRARIES(types_slam3d core)
+IF(OPENGL_FOUND)
+  TARGET_LINK_LIBRARIES(types_slam3d ${OPENGL_gl_LIBRARY})
+ENDIF()
 
 ADD_EXECUTABLE(test_isometry3d_mappings test_isometry3d_mappings.cpp)
 TARGET_LINK_LIBRARIES(test_isometry3d_mappings types_slam3d)

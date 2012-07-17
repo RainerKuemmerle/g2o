@@ -37,7 +37,7 @@
 #include <iostream>
 #include <iterator>
 
-#ifdef UNIX
+#if (defined UNIX) || (defined CYGWIN)
 #include <wordexp.h>
 #endif
 
@@ -124,7 +124,7 @@ int strPrintf(std::string& str, const char* fmt, ...)
 std::string strExpandFilename(const std::string& filename)
 {
 
-  #ifdef UNIX
+  #if (defined UNIX) || (defined CYGWIN)
   string result = filename;
   wordexp_t p;
 
