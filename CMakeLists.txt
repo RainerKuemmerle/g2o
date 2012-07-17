@@ -104,12 +104,14 @@ ELSE()
   SET(CHOLMOD_FOUND FALSE)
 ENDIF()
 
-
+FIND_PACKAGE(CSparse)
 IF(CSPARSE_FOUND)
   SET(BUILD_CSPARSE OFF CACHE BOOL "Build local CSparse library")
 ELSE(CSPARSE_FOUND)
   SET(BUILD_CSPARSE ON CACHE BOOL "Build local CSparse library")
-  SET(CSPARSE_FOUND TRUE)
+  IF(BUILD_CSPARSE)
+    SET(CSPARSE_FOUND TRUE)
+  ENDIF()
 ENDIF(CSPARSE_FOUND)
 
 # Eigen library parallelise itself, though, presumably due to performance issues
