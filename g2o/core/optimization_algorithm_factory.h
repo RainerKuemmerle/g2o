@@ -27,6 +27,7 @@
 #ifndef G2O_OPTMIZATION_ALGORITHM_PROPERTY_H
 #define G2O_OPTMIZATION_ALGORITHM_PROPERTY_H
 
+#include "g2o/config.h"
 #include "g2o/stuff/misc.h"
 #include "optimization_algorithm_property.h"
 
@@ -141,19 +142,27 @@ namespace g2o {
 
 }
 
+#if defined _MSC_VER && defined G2O_SHARED_LIBS
+#  define G2O_OAF_EXPORT __declspec(dllexport)
+#  define G2O_OAF_IMPORT __declspec(dllimport)
+#else
+#  define G2O_OAF_EXPORT
+#  define G2O_OAF_IMPORT
+#endif
+
 #define G2O_REGISTER_OPTIMIZATION_LIBRARY(libraryname) \
-    extern "C" void g2o_optimization_library_##libraryname(void) {}
+    extern "C" void G2O_OAF_EXPORT g2o_optimization_library_##libraryname(void) {}
 
 #define G2O_USE_OPTIMIZATION_LIBRARY(libraryname) \
-    extern "C" void g2o_optimization_library_##libraryname(void); \
+    extern "C" void G2O_OAF_IMPORT g2o_optimization_library_##libraryname(void); \
     static g2o::ForceLinker g2o_force_optimization_algorithm_library_##libraryname(g2o_optimization_library_##libraryname);
 
 #define G2O_REGISTER_OPTIMIZATION_ALGORITHM(optimizername, instance) \
-    extern "C" void g2o_optimization_algorithm_##optimizername(void) {} \
+    extern "C" void G2O_OAF_EXPORT g2o_optimization_algorithm_##optimizername(void) {} \
     static g2o::RegisterOptimizationAlgorithmProxy g_optimization_algorithm_proxy_##optimizername(instance);
 
 #define G2O_USE_OPTIMIZATION_ALGORITHM(optimizername) \
-    extern "C" void g2o_optimization_algorithm_##optimizername(void); \
+    extern "C" void G2O_OAF_IMPORT g2o_optimization_algorithm_##optimizername(void); \
     static g2o::ForceLinker g2o_force_optimization_algorithm_link_##optimizername(g2o_optimization_algorithm_##optimizername);
 
 #endif

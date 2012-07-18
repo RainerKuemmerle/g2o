@@ -96,7 +96,7 @@ class LinearSolverCholmod : public LinearSolver<MatrixType>
     virtual ~LinearSolverCholmod()
     {
       delete _cholmodSparse;
-      if (_cholmodFactor) {
+      if (_cholmodFactor != 0) {
         cholmod_free_factor(&_cholmodFactor, &_cholmodCommon);
         _cholmodFactor = 0;
       }
@@ -105,7 +105,7 @@ class LinearSolverCholmod : public LinearSolver<MatrixType>
 
     virtual bool init()
     {
-      if (_cholmodFactor) {
+      if (_cholmodFactor != 0) {
         cholmod_free_factor(&_cholmodFactor, &_cholmodCommon);
         _cholmodFactor = 0;
       }
@@ -115,11 +115,11 @@ class LinearSolverCholmod : public LinearSolver<MatrixType>
     bool solve(const SparseBlockMatrix<MatrixType>& A, double* x, double* b)
     {
       //cerr << __PRETTY_FUNCTION__ << " using cholmod" << endl;
-      fillCholmodExt(A, _cholmodFactor); // _cholmodFactor used as bool, if not existing will copy the whole structure, otherwise only the values
+      fillCholmodExt(A, _cholmodFactor != 0); // _cholmodFactor used as bool, if not existing will copy the whole structure, otherwise only the values
 
-      if (! _cholmodFactor) {
+      if (_cholmodFactor == 0) {
         computeSymbolicDecomposition(A);
-        assert(_cholmodFactor && "Symbolic cholesky failed");
+        assert(_cholmodFactor != 0 && "Symbolic cholesky failed");
       }
       double t=get_monotonic_time();
 
@@ -147,7 +147,7 @@ class LinearSolverCholmod : public LinearSolver<MatrixType>
       G2OBatchStatistics* globalStats = G2OBatchStatistics::globalStats();
       if (globalStats){
         globalStats->timeNumericDecomposition = get_monotonic_time() - t;
-        globalStats->choleskyNNZ = _cholmodCommon.method[0].lnz;
+        globalStats->choleskyNNZ = static_cast<size_t>(_cholmodCommon.method[0].lnz);
       }
 
       return true;
@@ -156,9 +156,9 @@ class LinearSolverCholmod : public LinearSolver<MatrixType>
     bool solveBlocks(double**& blocks, const SparseBlockMatrix<MatrixType>& A)
     {
       //cerr << __PRETTY_FUNCTION__ << " using cholmod" << endl;
-      fillCholmodExt(A, _cholmodFactor); // _cholmodFactor used as bool, if not existing will copy the whole structure, otherwise only the values
+      fillCholmodExt(A, _cholmodFactor != 0); // _cholmodFactor used as bool, if not existing will copy the whole structure, otherwise only the values
 
-      if (! _cholmodFactor) {
+      if (_cholmodFactor == 0) {
         computeSymbolicDecomposition(A);
         assert(_cholmodFactor && "Symbolic cholesky failed");
       }
@@ -198,7 +198,7 @@ class LinearSolverCholmod : public LinearSolver<MatrixType>
 
       G2OBatchStatistics* globalStats = G2OBatchStatistics::globalStats();
       if (globalStats) {
-        globalStats->choleskyNNZ = _cholmodCommon.method[_cholmodCommon.selected].lnz;
+        globalStats->choleskyNNZ = static_cast<size_t>(_cholmodCommon.method[_cholmodCommon.selected].lnz);
       }
 
       return true;
@@ -207,9 +207,9 @@ class LinearSolverCholmod : public LinearSolver<MatrixType>
     virtual bool solvePattern(SparseBlockMatrix<MatrixXd>& spinv, const std::vector<std::pair<int, int> >& blockIndices, const SparseBlockMatrix<MatrixType>& A)
     {
       //cerr << __PRETTY_FUNCTION__ << " using cholmod" << endl;
-      fillCholmodExt(A, _cholmodFactor); // _cholmodFactor used as bool, if not existing will copy the whole structure, otherwise only the values
+      fillCholmodExt(A, _cholmodFactor != 0); // _cholmodFactor used as bool, if not existing will copy the whole structure, otherwise only the values
 
-      if (! _cholmodFactor) {
+      if (_cholmodFactor == 0) {
         computeSymbolicDecomposition(A);
         assert(_cholmodFactor && "Symbolic cholesky failed");
       }
@@ -239,7 +239,7 @@ class LinearSolverCholmod : public LinearSolver<MatrixType>
 
       G2OBatchStatistics* globalStats = G2OBatchStatistics::globalStats();
       if (globalStats) {
-        globalStats->choleskyNNZ = _cholmodCommon.method[_cholmodCommon.selected].lnz;
+        globalStats->choleskyNNZ = static_cast<size_t>(_cholmodCommon.method[_cholmodCommon.selected].lnz);
       }
 
       return true;

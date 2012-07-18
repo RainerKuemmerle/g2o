@@ -68,7 +68,11 @@ SparseOptimizerOnline::SparseOptimizerOnline(bool pcg) :
 SparseOptimizerOnline::~SparseOptimizerOnline()
 {
   if (_gnuplot) {
+#ifdef WINDOWS
+    _pclose(_gnuplot);
+#else
     pclose(_gnuplot);
+#endif
   }
 }
 
@@ -235,7 +239,13 @@ void SparseOptimizerOnline::gnuplotVisualization()
 {
   if (slamDimension == 3) {
     if (! _gnuplot) {
+#ifdef WINDOWS
+      _gnuplot = _popen("gnuplot -persistent", "w");
+#else
       _gnuplot = popen("gnuplot -persistent", "w");
+#endif
+      if (_gnuplot == 0)
+        return;
       fprintf(_gnuplot, "set terminal X11 noraise\n");
       fprintf(_gnuplot, "set size ratio -1\n");
     }
@@ -251,7 +261,13 @@ void SparseOptimizerOnline::gnuplotVisualization()
   }
   if (slamDimension == 6) {
     if (! _gnuplot) {
+#ifdef WINDOWS
+      _gnuplot = _popen("gnuplot -persistent", "w");
+#else
       _gnuplot = popen("gnuplot -persistent", "w");
+#endif
+      if (_gnuplot == 0)
+        return;
       fprintf(_gnuplot, "set terminal X11 noraise\n");
     }
     fprintf(_gnuplot, "splot \"-\" w l\n");

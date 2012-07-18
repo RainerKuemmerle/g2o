@@ -27,6 +27,7 @@
 #ifndef G2O_TYPES_SLAM3D_ONLINE_H
 #define G2O_TYPES_SLAM3D_ONLINE_H
 
+#include "g2o_interactive_api.h"
 #include "g2o/types/slam3d/edge_se3.h"
 
 #include <iostream>
@@ -35,7 +36,7 @@ namespace g2o {
   
   using namespace Eigen;
 
-  class OnlineVertexSE3 : public VertexSE3
+  class G2O_INTERACTIVE_API OnlineVertexSE3 : public VertexSE3
   {
     public:
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
@@ -57,7 +58,7 @@ namespace g2o {
       VertexSE3::EstimateType updatedEstimate;
   };
 
-  class OnlineEdgeSE3 : public EdgeSE3
+  class G2O_INTERACTIVE_API OnlineEdgeSE3 : public EdgeSE3
   {
     public:
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW;

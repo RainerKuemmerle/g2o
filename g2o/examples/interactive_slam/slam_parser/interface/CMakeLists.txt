@@ -1,10 +1,20 @@
-ADD_LIBRARY(interface_library ${G2O_LIB_TYPE}
+SET(interface_library_src
   abstract_slam_interface.h
   parser_interface.cpp
   parser_interface.h
   slam_context_interface.cpp
   slam_context_interface.h
 )
+
+IF (MSVC)
+  ADD_LIBRARY(interface_library STATIC
+    ${interface_library_src}
+  )
+ELSE()
+  ADD_LIBRARY(interface_library ${G2O_LIB_TYPE}
+    ${interface_library_src}
+  )
+ENDIF()
 
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/../../)
 

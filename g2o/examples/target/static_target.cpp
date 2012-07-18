@@ -3,7 +3,6 @@
 // its position
 
 #include <Eigen/StdVector>
-#include <tr1/random>
 #include <iostream>
 #include <stdint.h>
  
@@ -52,7 +51,7 @@ int main()
   // modelled as a unary edge because they do not like to, say,
   // another node in the map.
   int numMeasurements = 10;
-  double noiseLimit = sqrt(12);
+  double noiseLimit = sqrt(12.);
   double noiseSigma = noiseLimit*noiseLimit / 12.0;
 
   for (int i = 0; i < numMeasurements; i++)
