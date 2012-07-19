@@ -1,4 +1,4 @@
-ADD_LIBRARY(freeglut_minimal SHARED
+ADD_LIBRARY(freeglut_minimal ${G2O_LIB_TYPE}
   freeglut_font.cpp
   freeglut_stroke_mono_roman.cpp
   freeglut_stroke_roman.cpp
