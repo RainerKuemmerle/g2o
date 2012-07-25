@@ -34,8 +34,8 @@
 
 #include <cstddef>
 #include "Eigen/Core"
-#include "manual_constructor.h"
 #include "macros.h"
+#include "manual_constructor.h"
 
 namespace ceres {
 namespace internal {
@@ -134,7 +134,6 @@ class FixedArray {
   // of this code will be broken.
   struct InnerContainer {
     T element;
-    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   };
 
   // How many elements should we store inline?
@@ -153,7 +152,7 @@ class FixedArray {
 
   // Allocate some space, not an array of elements of type T, so that we can
   // skip calling the T constructors and destructors for space we never use.
-  ManualConstructor<InnerContainer> CERES_ALIGN_ATTRIBUTE(16) inline_space_[kInlineElements];
+  ManualConstructor<InnerContainer> inline_space_[kInlineElements];
 };
 
 // Implementation details follow
