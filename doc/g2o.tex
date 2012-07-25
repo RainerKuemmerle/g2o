@@ -1171,7 +1171,7 @@ between the measurement and the prediction. However, since our measurements
 do not live in an euclidean space we can use the $\ominus$ instead of the vector difference.
 
 \begin{eqnarray}
-    \be^\mathrm{l}_{t,t+1}(\bx^\mathrm{s}_t, \bx^\mathrm{s}_{t+1})   & \doteq & \bz_{t,t+1} \ominus \bh^\mathrm{l}_{t,t+1}(\bx^\mathrm{s}_t, \bx^\mathrm{s}_{t+1}).
+    \be^\mathrm{s}_{t,t+1}(\bx^\mathrm{s}_t, \bx^\mathrm{s}_{t+1})   & \doteq & \bz_{t,t+1} \ominus \bh^\mathrm{s}_{t,t+1}(\bx^\mathrm{s}_t, \bx^\mathrm{s}_{t+1}).
     \label{eq:odometryError}
 \end{eqnarray}
 
@@ -1192,7 +1192,7 @@ Landmark pose     & $\bx^\mathrm{l}_i$ & $\Re^2$         & 2                  & 
 \hline
 \textbf{Measurement} & \textbf{Symbol}         & \textbf{Domain} & \textbf{Dimension} & \textbf{Set $\bx_k$ of variables involved}             & \textbf{error function}\\
 \hline
-Odometry             & = $\bz^\mathrm{l}_{t,t+1}$ & $SE(2)$         & 3                  & $\left\{ \bx^\mathrm{s}_t, \bx^\mathrm{s}_{t+1} \right\}$ & Eq.~\ref{eq:odometryError} \\
+Odometry             & = $\bz^\mathrm{s}_{t,t+1}$ & $SE(2)$         & 3                  & $\left\{ \bx^\mathrm{s}_t, \bx^\mathrm{s}_{t+1} \right\}$ & Eq.~\ref{eq:odometryError} \\
 \hline
 Landmark             & = $\bz^\mathrm{l}_{t,i}$   & $\Re^2$         & 2                  & $\left\{ \bx^\mathrm{s}_t, \bx^\mathrm{l}_{i} \right\}$  & Eq.~\ref{eq:landmarkError} \\
 \hline
