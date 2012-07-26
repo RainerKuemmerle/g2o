@@ -36,7 +36,7 @@
 
 namespace g2o {
 
-  /*! \class EdgeSE3TrackXYZ
+  /*! \class EdgeSE3PointXYZ
    * \brief g2o edge from a track to a point node
    */
   // first two args are the measurement type, second two the connection classes
@@ -87,6 +87,15 @@ namespace g2o {
     CacheSE3Offset* cache;
     virtual bool resolveCaches();
   };
+
+#ifdef G2O_HAVE_OPENGL
+  class EdgeSE3PointXYZDrawAction: public DrawAction{
+  public:
+    EdgeSE3PointXYZDrawAction();
+    virtual HyperGraphElementAction* operator()(HyperGraph::HyperGraphElement* element,
+            HyperGraphElementAction::Parameters* params_);
+  };
+#endif
 
 }
 #endif
