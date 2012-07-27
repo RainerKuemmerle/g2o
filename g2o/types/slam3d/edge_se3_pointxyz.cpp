@@ -197,33 +197,4 @@ namespace g2o {
   }
 #endif
 
-#ifdef G2O_HAVE_OPENGL
-  EdgeSE3PointXYZDrawAction::EdgeSE3PointXYZDrawAction(): DrawAction(typeid(EdgeSE3PointXYZ).name()){}
-
-  HyperGraphElementAction* EdgeSE3PointXYZDrawAction::operator()(HyperGraph::HyperGraphElement* element, 
-               HyperGraphElementAction::Parameters* params_){
-    if (typeid(*element).name()!=_typeName)
-      return 0;
-    refreshPropertyPtrs(params_);
-    if (! _previousParams)
-      return this;
-    
-    if (_show && !_show->value())
-      return this;
-    
-    EdgeSE3PointXYZ* e =  static_cast<EdgeSE3PointXYZ*>(element);
-    VertexSE3* fromEdge = static_cast<VertexSE3*>(e->vertex(0));
-    VertexPointXYZ* toEdge   = static_cast<VertexPointXYZ*>(e->vertex(1));
-    glColor3f(0.8f,0.3f,0.3f);
-    glPushAttrib(GL_ENABLE_BIT);
-    glDisable(GL_LIGHTING);
-    glBegin(GL_LINES);
-    glVertex3f((float)fromEdge->estimate().translation().x(),(float)fromEdge->estimate().translation().y(),(float)fromEdge->estimate().translation().z());
-    glVertex3f((float)toEdge->estimate().x(),(float)toEdge->estimate().y(),(float)toEdge->estimate().z());
-    glEnd();
-    glPopAttrib();
-    return this;
-  }
-#endif
-
 } // end namespace
