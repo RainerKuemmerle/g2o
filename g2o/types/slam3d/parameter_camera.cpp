@@ -25,6 +25,8 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "parameter_camera.h"
+#include "isometry3d_gradients.h"
+#include "isometry3d_mappings.h"
 
 #ifdef G2O_HAVE_OPENGL
 #include "g2o/stuff/opengl_wrapper.h"
@@ -40,9 +42,9 @@ namespace g2o {
     setOffset();
   }
 
-  void ParameterCamera::setOffset(const SE3Quat& offset_){
+  void ParameterCamera::setOffset(const Eigen::Isometry3d& offset_){
     ParameterSE3Offset::setOffset(offset_);
-    _Kcam_inverseOffsetR = _Kcam * inverseOffsetMatrix().rotation();
+    _Kcam_inverseOffsetR = _Kcam * inverseOffset().rotation();
   }
 
   void ParameterCamera::setKcam(double fx, double fy, double cx, double cy){
@@ -53,7 +55,7 @@ namespace g2o {
     _Kcam(1,2) = cy;
     _Kcam(2,2) = 1.0;
     _invKcam = _Kcam.inverse();
-    _Kcam_inverseOffsetR = _Kcam * inverseOffsetMatrix().rotation();
+    _Kcam_inverseOffsetR = _Kcam * inverseOffset().rotation();
   }
 
 
@@ -61,7 +63,9 @@ namespace g2o {
     Vector7d off;
     for (int i=0; i<7; i++)
       is >> off[i];
-    setOffset(SE3Quat(off));
+    // normalize the quaternion to recover numerical precision lost by storing as human readable text
+    Vector4d::MapType(off.data()+3).normalize();
+    setOffset(internal::fromVectorQT(off));
     double fx,fy,cx,cy;
     is >> fx >> fy >> cx >> cy;
     setKcam(fx,fy,cx,cy);
@@ -69,7 +73,7 @@ namespace g2o {
   }
   
   bool ParameterCamera::write(std::ostream& os) const {
-    Vector7d off = offset().toVector();
+    Vector7d off = internal::toVectorQT(_offset);
     for (int i=0; i<7; i++)
       os << off[i] << " ";
     os << _Kcam(0,0) << " ";
@@ -88,7 +92,7 @@ namespace g2o {
 
   void CacheCamera::updateImpl(){
     CacheSE3Offset::updateImpl();
-    _w2i.matrix().topLeftCorner<3,4>() = params->Kcam() * w2nMatrix().matrix().topLeftCorner<3,4>();
+    _w2i.matrix().topLeftCorner<3,4>() = params->Kcam() * w2n().matrix().topLeftCorner<3,4>();
   }
 
 #ifdef G2O_HAVE_OPENGL
@@ -145,7 +149,7 @@ namespace g2o {
       return this;
 
     glPushMatrix();
-    glMultMatrixd(that->camParams()->offsetMatrix().data());
+    glMultMatrixd(that->camParams()->offset().data());
     if (_cameraZ && _cameraSide)
       drawMyPyramid(_cameraZ->value(), _cameraSide->value());
     glPopMatrix();

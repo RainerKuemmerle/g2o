@@ -29,14 +29,14 @@
 
 #include "g2o/core/base_binary_edge.h"
 
-#include "vertex_se3_quat.h"
+#include "vertex_se3.h"
 #include "vertex_pointxyz.h"
 #include "parameter_se3_offset.h"
+#include "g2o_types_slam3d_api.h"
 
 namespace g2o {
 
-
-  /*! \class EdgeSE3TrackXYZ
+  /*! \class EdgeSE3PointXYZ
    * \brief g2o edge from a track to a point node
    */
   // first two args are the measurement type, second two the connection classes
@@ -86,18 +86,16 @@ namespace g2o {
     ParameterSE3Offset* offsetParam;
     CacheSE3Offset* cache;
     virtual bool resolveCaches();
-    
-
   };
-  
-  #ifdef G2O_HAVE_OPENGL
+
+#ifdef G2O_HAVE_OPENGL
   class EdgeSE3PointXYZDrawAction: public DrawAction{
   public:
     EdgeSE3PointXYZDrawAction();
-    virtual HyperGraphElementAction* operator()(HyperGraph::HyperGraphElement* element, 
+    virtual HyperGraphElementAction* operator()(HyperGraph::HyperGraphElement* element,
             HyperGraphElementAction::Parameters* params_);
   };
-  #endif
+#endif
 
 }
 #endif

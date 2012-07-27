@@ -1,0 +1,237 @@
+/* [wxMaxima batch file version 1] [ DO NOT EDIT BY HAND! ]*/
+/* [ Created with wxMaxima version 11.04.0 ] */
+
+/* [wxMaxima: comment start ]
+wxMaxima 0.8.2 http://wxmaxima.sourceforge.net
+Maxima 5.17.1 http://maxima.sourceforge.net
+Using Lisp GNU Common Lisp (GCL) GCL 2.6.7 (aka GCL)
+Distributed under the GNU Public License. See the file COPYING.
+Dedicated to the memory of William Schelter.
+The function bug_report() provides bug reporting information.
+   [wxMaxima: comment end   ] */
+
+/* [wxMaxima: input   start ] */
+/*routines to produce C++ code*/
+
+matchdeclare(__b,integerp)$
+matchdeclare(__a,lambda([e],true))$
+defrule(makefloat,div(__a,__b),__a/float(__b))$
+defrule(addfrac,pow(__a,-1),1./__a)$
+
+cstring(expr):=(
+    e:subst(div,"/",subst(pow,"^",expr)),
+    e2:apply2(e,makefloat,addfrac),
+    string(subst("/",div,e2))
+)$
+
+
+printargs(args):=(
+ for d in args do (
+    sprint(", const double& ", d))
+)$
+
+printretarg(name,expr):=(
+    e:last(expr),
+    if (matrixp(e)) then (
+     s:matrix_size(e),
+     sprint("Eigen::Matrix<double,"),
+     sprint(s[1],",",s[2]),
+     sprint(">& "),
+     sprint(name)
+    ) else if (listp(e)) then (
+     s:length(e),
+     sprint("Eigen::Vector<double,"),
+     sprint(s, ">& "),
+     sprint(name)
+    ) else (
+     sprint ("double&", name)      
+    )
+)$                                                
+
+printretexpr(name,expr):=(
+    if (matrixp(expr)) then (
+        printmatrix(name,expr)
+    ) else if (listp(expr)) then (
+        printlist(name,expr)
+    ) else (
+        sprint ("  ",name,"=",cstring(expr))
+    )
+)$
+
+
+printdef(expr) := (sprint("  double ", first(expr), "=", cstring(second(expr)), ";"), 
+                                freshline())$
+
+printmatrix(dest,exp):=(
+    if (matrixp(expr)) then(
+        s:matrix_size(expr),
+        for r:1 thru s[1] step 1 do(
+            for c:1 thru s[2] step 1 do(
+                sprint ("  ",dest,"(",r-1,",",c-1,") ="),
+                sprint(cstring(expr[r,c])),
+                sprint(";"),
+                freshline()
+            )
+        )
+
+    ) 
+)$
+
+printlist(dest,expr):=(
+    if (listp(expr)) then(
+        s:length(expr),
+        for r:1 thru s step 1 do(
+            sprint ("  ",dest,"(",r-1,") ="),
+            sprint(cstring(expr[r])),
+            sprint(";"),
+            freshline()
+        )
+
+    ) 
+)$
+
+block2c(name,expr) :=
+        if ?equal(op(expr), block) then (
+                for d in reverse(rest(reverse(rest(expr)))) do printdef(d),
+                printretexpr(name,last(expr)))
+        else
+                printretexpr(name,expr)$
+
+expr2c(funcname, expr, outarg, args) := (
+        sprint("void ",funcname, "("),
+
+        printretarg(outarg,expr),
+        printargs(args),
+        sprint(") {"),
+        freshline(),
+        expr2:subst(pow, "^", expr), 
+        block2c(outarg, expr2),
+        sprint("}"),
+        freshline(),
+        freshline(),
+        freshline(),
+        freshline()
+)$
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+mat2lin(A):=[A[1,1], A[2,1], A[3,1], A[1,2], A[2,2], A[3,2], A[1,3], A[2,3], A[3,3]]$
+
+lin2mat(r):=matrix([r[1],r[4],r[7]], [r[2],r[5],r[8]], [r[3],r[6],r[9]])$
+
+R:matrix([r11,r12,r13],[r21,r22,r23],[r31,r32,r33])$
+
+lin2mat(mat2lin(R))$
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+_fullQuat2mat(qx, qy, qz, qw) := matrix([qw*qw + qx*qx - qy*qy - qz*qz, 2*(qx*qy - qw*qz), 2*(qx*qz + qw*qy)],
+    [2*(qx*qy + qz*qw), qw*qw - qx*qx + qy*qy - qz*qz, 2*(qy*qz - qx*qw)],
+    [2*(qx*qz - qy*qw), 2*(qy*qz + qx*qw), qw*qw - qx*qx - qy*qy + qz*qz])$
+
+fullQuat2mat(q) := _fullQuat2mat(q[1], q[2], q[3], q[4])$
+fullQuat2linMat(q) := mat2lin(fullQuat2mat(q))$
+
+mat2fullQuat(R) := 
+  [(R[3,2]-R[2,3])/(2*sqrt(1+R[1,1]+R[2,2]+R[3,3])),
+   (R[1,3]-R[3,1])/(2*sqrt(1+R[1,1]+R[2,2]+R[3,3])),
+   (R[2,1]-R[1,2])/(2*sqrt(1+R[1,1]+R[2,2]+R[3,3])),
+    .5*sqrt(1+R[1,1]+R[2,2]+R[3,3])]$
+
+linMat2fullQuat(r) :=mat2fullQuat(lin2mat(r))$
+
+w3(q):=sqrt(1.-q[1]^2-q[2]^2-q[3]^2)$
+
+quat2mat(q):= fullQuat2mat([q[1], q[2], q[3], w3(q)])$
+quat2linMat(q):= fullQuat2linMat([q[1], q[2], q[3], w3(q)])$
+mat2quat(R):= [(R[3,2]-R[2,3])/(2*sqrt(1+R[1,1]+R[2,2]+R[3,3])),
+   (R[1,3]-R[3,1])/(2*sqrt(1+R[1,1]+R[2,2]+R[3,3])),
+   (R[2,1]-R[1,2])/(2*sqrt(1+R[1,1]+R[2,2]+R[3,3]))]$
+
+linMat2quat(r) := mat2quat(lin2mat(r))$
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+dr_dq:jacobian(quat2linMat([qx, qy, qz]), [qx, qy, qz])$
+dr_dq:ratsubst(qw,sqrt(1.-qx^2-qy^2-qz^2),dr_dq)$
+dr_dqx:diff(quat2mat([qx, qy, qz]), qx)$
+dr_dqy:diff(quat2mat([qx, qy, qz]), qy)$
+dr_dqz:diff(quat2mat([qx, qy, qz]), qz)$
+Sx:ev(dr_dqx, qx:0, qy:0, qz:0)$
+Sy:ev(dr_dqy, qx:0, qy:0, qz:0)$
+Sz:ev(dr_dqz, qx:0, qy:0, qz:0)$
+SxT:transpose(Sx)$
+SyT:transpose(Sy)$
+SzT:transpose(Sz)$
+
+
+s_times_t:[Sx.[tx,ty, tz], Sy.[tx,ty, tz], Sz.[tx,ty, tz]]$
+st_times_t:[SxT.[tx,ty, tz], SyT.[tx,ty, tz], SzT.[tx,ty, tz]]$
+R:matrix([r11, r12, r13],[r21, r22, r23],[r31, r32, r33])$
+s_times_R:[Sx.R, Sy.R, Sz.R]$
+st_times_R:[SxT.R, SyT.R, SzT.R]$
+
+dq_dr:jacobian(linMat2quat([r00, r10, r20, r01, r11, r21, r02, r12, r22]), [r00, r10, r20, r01, r11, r21, r02, r12, r22])$
+dq_dr_old:ratsubst(qw,.5*sqrt(r00+r11+r22+1),dq_dr);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+S_w(r00, r11, r22) := sqrt(1 + r00 + r11 + r22) * 2$ 
+m2q_w(r00, r10, r20, r01, r11, r21, r02, r12, r22):=
+[(r21 - r12) / S_w(r00, r11, r22),
+ (r02 - r20) / S_w(r00, r11, r22), 
+ (r10 - r01) / S_w(r00, r11, r22)]$
+
+S_x(r00, r11, r22) := sqrt(1.0 + r00 - r11 - r22) * 2$
+m2q_x(r00, r10, r20, r01, r11, r21, r02, r12, r22):=
+[ 0.25 * S_x(r00, r11, r22),
+  (r01 + r10) / S_x(r00, r11, r22), 
+  (r02 + r20) / S_x(r00, r11, r22)]$
+
+S_y(r00, r11, r22) := sqrt(1.0 - r00 + r11 - r22) * 2$
+m2q_y(r00, r10, r20, r01, r11, r21, r02, r12, r22):=
+[ (r01 + r10) / S_y(r00, r11, r22), 
+  0.25 * S_y(r00, r11, r22),
+  (r12 + r21) / S_y(r00, r11, r22)
+ ]$
+
+S_z(r00, r11, r22) := sqrt(1.0 - r00 - r11 + r22) * 2$
+m2q_z(r00, r10, r20, r01, r11, r21, r02, r12, r22):=
+[
+  (r02 + r20) / S_z(r00, r11, r22),
+  (r12 + r21) / S_z(r00, r11, r22),
+  0.25 * S_z(r00, r11, r22)
+]$
+
+dq_dR_w:jacobian(m2q_w(r00, r10, r20, r01, r11, r21, r02, r12, r22),[r00, r10, r20, r01, r11, r21, r02, r12, r22])$
+dq_dR_w:ratsubst(qw, .25*S_w(r00, r11, r22), dq_dR_w);
+
+dq_dR_x:jacobian(m2q_x(r00, r10, r20, r01, r11, r21, r02, r12, r22),[r00, r10, r20, r01, r11, r21, r02, r12, r22])$
+dq_dR_x:ratsubst(qx, .25*S_x(r00, r11, r22), dq_dR_x);
+
+dq_dR_y:jacobian(m2q_y(r00, r10, r20, r01, r11, r21, r02, r12, r22),[r00, r10, r20, r01, r11, r21, r02, r12, r22])$
+dq_dR_y:ratsubst(qy, .25*S_y(r00, r11, r22), dq_dR_y);
+
+dq_dR_z:jacobian(m2q_z(r00, r10, r20, r01, r11, r21, r02, r12, r22),[r00, r10, r20, r01, r11, r21, r02, r12, r22])$
+dq_dR_z:ratsubst(qz, .25*S_z(r00, r11, r22), dq_dR_z);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+optimprefix:_aux$
+opt_dR_dq:optimize(dr_dq);
+opt_dq_dR_old:optimize(dq_dr_old);
+opt_dq_dR_w:optimize(dq_dR_w);
+opt_dq_dR_x:optimize(dq_dR_x);
+opt_dq_dR_y:optimize(dq_dR_y);
+opt_dq_dR_z:optimize(dq_dR_z);
+
+with_stdout("dquat2mat_maxima_generated.cpp",
+        expr2c("compute_dq_dR_w", opt_dq_dR_w, "dq_dR_w", [qw, r00, r10, r20, r01, r11, r21, r02, r12, r22]),
+        expr2c("compute_dq_dR_x", opt_dq_dR_x, "dq_dR_x", [qx, r00, r10, r20, r01, r11, r21, r02, r12, r22]),
+        expr2c("compute_dq_dR_y", opt_dq_dR_y, "dq_dR_y", [qy, r00, r10, r20, r01, r11, r21, r02, r12, r22]),
+        expr2c("compute_dq_dR_z", opt_dq_dR_z, "dq_dR_z", [qz, r00, r10, r20, r01, r11, r21, r02, r12, r22]),
+        expr2c("compute_dR_dq", opt_dR_dq, "dR_dq", [qx, qy, qz, qw]))$
+/* [wxMaxima: input   end   ] */
+
+/* Maxima can't load/batch files which end with a comment! */
+"Created with wxMaxima"$

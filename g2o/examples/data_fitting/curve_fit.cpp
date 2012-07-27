@@ -131,10 +131,10 @@ int main(int argc, char** argv)
   double lambda = 0.2;
   Eigen::Vector2d* points = new Eigen::Vector2d[numPoints];
   for (int i = 0; i < numPoints; ++i) {
-    double x = g2o::sampleUniform(0, 10);
+    double x = g2o::Sampler::uniformRand(0, 10);
     double y = a * exp(-lambda * x) + b;
     // add Gaussian noise
-    y += g2o::sampleGaussian() * 0.02;
+    y += g2o::Sampler::gaussRand(0, 0.02);
     points[i].x() = x;
     points[i].y() = y;
   }

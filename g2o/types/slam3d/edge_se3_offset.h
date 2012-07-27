@@ -29,10 +29,11 @@
 
 #include "g2o/core/base_binary_edge.h"
 
-#include "vertex_se3_quat.h"
+#include "vertex_se3.h"
+#include "edge_se3.h"
+#include "g2o_types_slam3d_api.h"
 
 namespace g2o {
-
   class ParameterSE3Offset;
   class CacheSE3Offset;
 
@@ -40,7 +41,7 @@ namespace g2o {
    * \brief Offset edge
    */
   // first two args are the measurement type, second two the connection classes
-  class G2O_TYPES_SLAM3D_API EdgeSE3Offset : public BaseBinaryEdge<6, SE3Quat, VertexSE3, VertexSE3> {
+  class G2O_TYPES_SLAM3D_API EdgeSE3Offset : public EdgeSE3 {
     public:
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
       EdgeSE3Offset();
@@ -49,30 +50,8 @@ namespace g2o {
 
       void computeError();
 
-      // jacobian
-      //virtual void linearizeOplus();
-
-      virtual void setMeasurement(const SE3Quat& m){
-        _measurement = m;
-        _inverseMeasurement = m.inverse();
-      }
-
-      virtual bool setMeasurementData(const double* d){
-        Map<const Vector7d> v(d);
-        _measurement.fromVector(v);
-        _inverseMeasurement = _measurement.inverse();
-        return true;
-      }
-
-      virtual bool getMeasurementData(double* d) const{
-        Map<Vector7d> v(d);
-        v = _measurement.toVector();
-        return true;
-      }
 
       void linearizeOplus();
-
-      virtual int measurementDimension() const {return 7;}
 
       virtual bool setMeasurementFromState() ;
 
@@ -84,7 +63,6 @@ namespace g2o {
       virtual void initialEstimate(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to);
 
     protected:
-      SE3Quat _inverseMeasurement;
       virtual bool resolveCaches();
       ParameterSE3Offset *_offsetFrom, *_offsetTo;
       CacheSE3Offset  *_cacheFrom, *_cacheTo;

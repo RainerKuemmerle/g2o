@@ -26,8 +26,23 @@
  * \brief draw primitives with OpenGL
  */
 
-#include "g2o_stuff_api.h"
 #include "opengl_wrapper.h"
+
+#include "g2o/config.h"
+
+#ifdef _MSC_VER
+#  ifdef G2O_SHARED_LIBS
+#    ifdef opengl_helper_EXPORTS
+#      define G2O_OPENGL_API __declspec(dllexport)
+#    else
+#      define G2O_OPENGL_API __declspec(dllimport)
+#    endif
+#  else
+#    define G2O_OPENGL_API
+#  endif
+#else
+#  define G2O_OPENGL_API
+#endif
 
 namespace g2o {
 namespace opengl {
@@ -38,20 +53,20 @@ namespace opengl {
  * @param w width of the box (y dimension)
  * @param h height of the box (z dimension)
  */
-void G2O_STUFF_API drawBox(GLfloat l, GLfloat w, GLfloat h);
+void G2O_OPENGL_API drawBox(GLfloat l, GLfloat w, GLfloat h);
 
 /**
  * draw a plane in x-y dimension with a height of zero
  * @param l length in x
  * @param w width in y
  */
-void G2O_STUFF_API drawPlane(GLfloat l, GLfloat w);
+void G2O_OPENGL_API drawPlane(GLfloat l, GLfloat w);
 
 /**
  * draw a sphere whose center is in the origin of the current coordinate frame
  * @param radius the radius of the sphere
  */
-void G2O_STUFF_API drawSphere(GLfloat radius);
+void G2O_OPENGL_API drawSphere(GLfloat radius);
 
 /**
  * draw a ellipsoid whose center is in the origin of the current coordinate frame
@@ -59,29 +74,29 @@ void G2O_STUFF_API drawSphere(GLfloat radius);
  * @param r2 radius along y axis
  * @param r3 radius along z axis
  */
-void G2O_STUFF_API drawEllipsoid(GLfloat r1, GLfloat r2, GLfloat r3);
+void G2O_OPENGL_API drawEllipsoid(GLfloat r1, GLfloat r2, GLfloat r3);
 
 /**
  * draw a cone
  */
-void G2O_STUFF_API drawCone(GLfloat radius, GLfloat height);
+void G2O_OPENGL_API drawCone(GLfloat radius, GLfloat height);
 
 /**
  * draw a disk
  */
-void G2O_STUFF_API drawDisk(GLfloat radius);
+void G2O_OPENGL_API drawDisk(GLfloat radius);
 
 /**
  * draw a (closed) cylinder
  * @param radius the radius of the cylinder
  * @param height the height of the cylinder
  */
-void G2O_STUFF_API drawCylinder(GLfloat radius, GLfloat height);
+void G2O_OPENGL_API drawCylinder(GLfloat radius, GLfloat height);
 
 /**
  * draw a pyramid
  */
-void G2O_STUFF_API drawPyramid(GLfloat length, GLfloat height);
+void G2O_OPENGL_API drawPyramid(GLfloat length, GLfloat height);
 
 /**
  * draw a range ring
@@ -89,7 +104,7 @@ void G2O_STUFF_API drawPyramid(GLfloat length, GLfloat height);
  * @param fov Field Of View of the range sensor
  * @param range_width specify how thick the ring should be drawn
  */
-void G2O_STUFF_API drawRangeRing(GLfloat range, GLfloat fov, GLfloat range_width = 0.05);
+void G2O_OPENGL_API drawRangeRing(GLfloat range, GLfloat fov, GLfloat range_width = 0.05);
 
 /**
  * draw a slice of a cylinder (approximated with slices_per_circle triangles for the complete circle)
@@ -98,17 +113,17 @@ void G2O_STUFF_API drawRangeRing(GLfloat range, GLfloat fov, GLfloat range_width
  * @param fov the "fov" of the slice (om degree)
  * @param slices_per_circle the number of triangle used to approximate the fulle circle
  */
-void G2O_STUFF_API drawSlice(GLfloat radius, GLfloat height, GLfloat fov, int slices_per_circle = 32);
+void G2O_OPENGL_API drawSlice(GLfloat radius, GLfloat height, GLfloat fov, int slices_per_circle = 32);
 
 /**
  * draws a box used to represent a 6d pose
  */
-void G2O_STUFF_API drawPoseBox();
+void G2O_OPENGL_API drawPoseBox();
 
 /**
  * draw a 2D arrow along the x axis with the given len
  */
-void G2O_STUFF_API drawArrow2D(float len, float head_width, float head_len);
+void G2O_OPENGL_API drawArrow2D(float len, float head_width, float head_len);
 
 // @}
 

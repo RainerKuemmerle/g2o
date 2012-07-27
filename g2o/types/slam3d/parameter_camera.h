@@ -27,12 +27,11 @@
 #ifndef G2O_CAMERA_PARAMETERS_H_
 #define G2O_CAMERA_PARAMETERS_H_
 
-#include "se3quat.h"
 #include "g2o/core/hyper_graph_action.h"
 #include "parameter_se3_offset.h"
+#include "g2o_types_slam3d_api.h"
 
 namespace g2o {
-
   /**
    * \brief parameters for a camera
    */
@@ -41,7 +40,7 @@ namespace g2o {
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
       ParameterCamera();
       void setKcam(double fx, double fy, double cx, double cy);
-      void setOffset(const SE3Quat& offset_ = SE3Quat());
+      void setOffset(const Eigen::Isometry3d& offset_ = Eigen::Isometry3d::Identity());
 
       virtual bool read(std::istream& is);
       virtual bool write(std::ostream& os) const;

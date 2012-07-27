@@ -201,8 +201,8 @@ void drawCylinder(GLfloat radius, GLfloat height)
 {
   glPushMatrix();
   glRotatef(-90, 1.f, 0.f, 0.f);
-  glTranslatef(0, 0, + height/2.0);
-  gluDisk(GLUWrapper::getQuadradic(), 0, radius, 32, 1);
+  glTranslatef(0.f, 0.f, + height/2.0f);
+  gluDisk(GLUWrapper::getQuadradic(), 0.f, radius, 32, 1);
   glTranslatef(0, 0, - height);
   gluCylinder(GLUWrapper::getQuadradic(), radius, radius, height, 32, 1);
   glRotatef(180, 1.f, 0.f, 0.f);
@@ -219,7 +219,7 @@ void drawDisk(GLfloat radius)
 void drawPyramid(GLfloat length, GLfloat height)
 {
   glPushMatrix();
-  glTranslatef(0, 0, - height/2.0);
+  glTranslatef(0.f, 0.f, - height/2.0f);
   glRotatef(45, 0.f, 0.f, 1.f);
   gluCylinder(GLUWrapper::getQuadradic(), length, 0.f, height, 32, 1);
   gluDisk(GLUWrapper::getQuadradic(), 0, length, 32, 1);
@@ -245,12 +245,12 @@ void drawSlice(GLfloat radius, GLfloat height, GLfloat fov, int slices_per_circl
   GLfloat lower_z = -height_half;
   GLfloat upper_z =  height_half;
 
-  GLfloat last_x = std::cos(-fov_rad * 0.5) * radius;
-  GLfloat last_y = std::sin(-fov_rad * 0.5) * radius;
+  GLfloat last_x = float(std::cos(-fov_rad * 0.5f) * radius);
+  GLfloat last_y = float(std::sin(-fov_rad * 0.5f) * radius);
 
   glPushMatrix();
   glBegin(GL_TRIANGLES);
-  glNormal3f(std::sin(-fov_rad * 0.5), -std::cos(-fov_rad * 0.5), -0.f);
+  glNormal3f((float)std::sin(-fov_rad * 0.5), (float)-std::cos(-fov_rad * 0.5), 0.f);
   glVertex3f(0.f, 0.f, upper_z);
   glVertex3f(0.f, 0.f, lower_z);
   glVertex3f(last_x, last_y, upper_z);
@@ -261,10 +261,10 @@ void drawSlice(GLfloat radius, GLfloat height, GLfloat fov, int slices_per_circl
   double start_angle = -0.5*fov_rad + angle_step;
   double angle       = start_angle;
   for (int i = 0; i < num_slices; ++i) {
-    GLfloat x = std::cos(angle) * radius;
-    GLfloat y = std::sin(angle) * radius;
-    GLfloat front_normal_x = std::cos(angle + angle_step_half);
-    GLfloat front_normal_y = std::sin(angle + angle_step_half);
+    GLfloat x = float(std::cos(angle) * radius);
+    GLfloat y = float(std::sin(angle) * radius);
+    GLfloat front_normal_x = (float)std::cos(angle + angle_step_half);
+    GLfloat front_normal_y = (float)std::sin(angle + angle_step_half);
 
     // lower triangle
     glNormal3f(0.f, 0.f, -1.f);
@@ -290,7 +290,7 @@ void drawSlice(GLfloat radius, GLfloat height, GLfloat fov, int slices_per_circl
     angle += angle_step;
   }
 
-  glNormal3f(-std::sin(fov_rad * 0.5), std::cos(fov_rad * 0.5), -0.f);
+  glNormal3f(float(-std::sin(fov_rad * 0.5)), float(std::cos(fov_rad * 0.5)), -0.f);
   glVertex3f(0.f, 0.f, upper_z);
   glVertex3f(0.f, 0.f, lower_z);
   glVertex3f(last_x, last_y, upper_z);

@@ -27,7 +27,8 @@
 #ifndef G2O_TYPES_SLAM3D_ONLINE_H
 #define G2O_TYPES_SLAM3D_ONLINE_H
 
-#include "g2o/types/slam3d/edge_se3_quat.h"
+#include "g2o_interactive_api.h"
+#include "g2o/types/slam3d/edge_se3.h"
 
 #include <iostream>
 
@@ -35,11 +36,11 @@ namespace g2o {
   
   using namespace Eigen;
 
-  class OnlineVertexSE3 : public VertexSE3
+  class G2O_INTERACTIVE_API OnlineVertexSE3 : public VertexSE3
   {
     public:
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
-      OnlineVertexSE3() : VertexSE3() {}
+      OnlineVertexSE3() : VertexSE3(), updatedEstimate(Eigen::Isometry3d::Identity()) {}
 
       virtual void oplusImpl(const double* update)
       {
@@ -49,15 +50,15 @@ namespace g2o {
 
       void oplusUpdatedEstimate(double* update)
       {
-        Map<Vector6d> v(update);
-        SE3Quat increment(v);
-        updatedEstimate = estimate() * increment;
+        Map<const Vector6d> v(update);
+        Eigen::Isometry3d increment = internal::fromVectorMQT(v);
+        updatedEstimate = _estimate * increment;
       }
 
       VertexSE3::EstimateType updatedEstimate;
   };
 
-  class OnlineEdgeSE3 : public EdgeSE3
+  class G2O_INTERACTIVE_API OnlineEdgeSE3 : public EdgeSE3
   {
     public:
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW;

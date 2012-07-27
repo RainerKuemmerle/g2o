@@ -25,8 +25,8 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "parameter_se3_offset.h"
-
-#include "vertex_se3_quat.h"
+#include "vertex_se3.h"
+#include "isometry3d_gradients.h"
 
 #ifdef G2O_HAVE_OPENGL
 #include "g2o/stuff/opengl_wrapper.h"
@@ -38,26 +38,24 @@ namespace g2o {
     setOffset();
   }
 
-  void ParameterSE3Offset::setOffset(const SE3Quat& offset_){
+  void ParameterSE3Offset::setOffset(const Isometry3d& offset_){
     _offset = offset_;
-    _offsetMatrix= _offset.rotation().toRotationMatrix();
-    _offsetMatrix.translation() = _offset.translation();
-    _inverseOffsetMatrix = _offsetMatrix.inverse();
+    _inverseOffset = _offset.inverse();
   }
 
   bool ParameterSE3Offset::read(std::istream& is) {
     Vector7d off;
     for (int i=0; i<7; i++) {
       is >> off[i];
-      std::cerr << off[i] << " " ;
     }
-    std::cerr <<  std::endl;
-    setOffset(SE3Quat(off));
+    // normalize the quaternion to recover numerical precision lost by storing as human readable text
+    Vector4d::MapType(off.data()+3).normalize();
+    setOffset(internal::fromVectorQT(off));
     return is.good();
   }
   
   bool ParameterSE3Offset::write(std::ostream& os) const {
-    Vector7d off = _offset.toVector();
+    Vector7d off =internal::toVectorQT(_offset);
     for (int i=0; i<7; i++)
       os << off[i] << " ";
     return os.good();
@@ -76,18 +74,9 @@ namespace g2o {
 
   void CacheSE3Offset::updateImpl(){
     const VertexSE3* v = static_cast<const VertexSE3*>(vertex());
-    _se3_n2w = v->estimate() * _offsetParam->offset();
-
-    _n2w = _se3_n2w.rotation().toRotationMatrix();
-    _n2w.translation() = _se3_n2w.translation();
-
-    _se3_w2n = _se3_n2w.inverse();
-    _w2n = _se3_w2n.rotation().toRotationMatrix();
-    _w2n.translation() = _se3_w2n.translation();
-
-    SE3Quat w2l = v->estimate().inverse();
-    _w2l = w2l.rotation().toRotationMatrix();
-    _w2l.translation() = w2l.translation();
+    _n2w = v->estimate() * _offsetParam->offset();
+    _w2n = _n2w.inverse();
+    _w2l = v->estimate().inverse();
   }  
 
   void CacheSE3Offset::setOffsetParam(ParameterSE3Offset* offsetParam)
@@ -117,7 +106,6 @@ namespace g2o {
                 HyperGraphElementAction::Parameters* params){
     if (typeid(*element).name()!=_typeName)
       return 0;
-    CacheSE3Offset* that = static_cast<CacheSE3Offset*>(element);
     refreshPropertyPtrs(params);
     if (! _previousParams)
       return this;
@@ -125,14 +113,12 @@ namespace g2o {
     if (_show && !_show->value())
       return this;
 
-    glPushMatrix();
-    const Vector3d& offsetT=that->offsetParam()->offset().translation();
-    AngleAxisd aa(that->offsetParam()->offset().rotation());
-    glTranslatef((float)offsetT.x(), (float)offsetT.y(), (float)offsetT.z());
-    glRotatef((float)RAD2DEG(aa.angle()),(float)aa.axis().x(),(float)aa.axis().y(),(float)aa.axis().z());
+    //CacheSE3Offset* that = static_cast<CacheSE3Offset*>(element);
+    //glPushMatrix();
+    //glMultMatrixd(that->offsetParam()->offset().matrix().data());
     // if (_cubeSide)
     //   drawMyPyramid(_cubeSide->value(), _cubeSide->value());
-    glPopMatrix();
+    //glPopMatrix();
 
     return this;
   }

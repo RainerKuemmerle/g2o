@@ -62,6 +62,7 @@ namespace g2o {
 
     double t=get_monotonic_time();
     _optimizer->computeActiveErrors();
+    G2OBatchStatistics* globalStats = G2OBatchStatistics::globalStats();
     if (globalStats) {
       globalStats->timeResiduals = get_monotonic_time()-t;
       t=get_monotonic_time();

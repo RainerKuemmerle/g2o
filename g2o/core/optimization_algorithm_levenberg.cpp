@@ -47,6 +47,7 @@ namespace g2o {
     _userLambdaInit = _properties.makeProperty<Property<double> >("initialLambda", 0.);
     _maxTrialsAfterFailure = _properties.makeProperty<Property<int> >("maxTrialsAfterFailure", 10);
     _ni=2.;
+    _levenbergIterations = 0;
   }
 
   OptimizationAlgorithmLevenberg::~OptimizationAlgorithmLevenberg()
@@ -68,12 +69,13 @@ namespace g2o {
 
     double t=get_monotonic_time();
     _optimizer->computeActiveErrors();
+    G2OBatchStatistics* globalStats = G2OBatchStatistics::globalStats();
     if (globalStats) {
       globalStats->timeResiduals = get_monotonic_time()-t;
       t=get_monotonic_time();
     }
 
-    double currentChi = _optimizer->activeChi2();
+    double currentChi = _optimizer->activeRobustChi2();
     double tempChi=currentChi;
 
     _solver->buildSystem();
@@ -87,7 +89,8 @@ namespace g2o {
     }
 
     double rho=0;
-    int qmax=0;
+    int& qmax = _levenbergIterations;
+    qmax = 0;
     do {
       _optimizer->push();
       if (globalStats) {
@@ -110,7 +113,7 @@ namespace g2o {
       _solver->setLambda(- _currentLambda);
 
       _optimizer->computeActiveErrors();
-      tempChi = _optimizer->activeChi2();
+      tempChi = _optimizer->activeRobustChi2();
 
       if (! ok2)
         tempChi=std::numeric_limits<double>::max();
@@ -181,7 +184,8 @@ namespace g2o {
   {
     os
       << "\t schur= " << _solver->schur()
-      << "\t lambda= " << FIXED(_currentLambda);
+      << "\t lambda= " << FIXED(_currentLambda)
+      << "\t levenbergIter= " << _levenbergIterations;
   }
 
 } // end namespace

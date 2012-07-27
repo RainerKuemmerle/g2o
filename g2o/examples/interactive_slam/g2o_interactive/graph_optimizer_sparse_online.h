@@ -27,13 +27,14 @@
 #ifndef G2O_GRAPH_OPTIMIZER_SPARSE_ONLINE_H
 #define G2O_GRAPH_OPTIMIZER_SPARSE_ONLINE_H
 
+#include "g2o_interactive_api.h"
 #include "g2o/core/sparse_optimizer.h"
 
 namespace g2o {
 
   class Solver;
 
-  class SparseOptimizerOnline : public SparseOptimizer
+  class G2O_INTERACTIVE_API SparseOptimizerOnline : public SparseOptimizer
   {
     public:
       explicit SparseOptimizerOnline(bool pcg=false);

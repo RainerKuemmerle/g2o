@@ -37,6 +37,7 @@
 #include "optimization_algorithm.h"
 #include "batch_stats.h"
 #include "hyper_graph_action.h"
+#include "robust_kernel.h"
 #include "g2o/stuff/timeutil.h"
 #include "g2o/stuff/macros.h"
 #include "g2o/stuff/misc.h"
@@ -54,7 +55,7 @@ namespace g2o{
 
   SparseOptimizer::~SparseOptimizer(){
     delete _algorithm;
-    globalStats = 0;
+    G2OBatchStatistics::setGlobalStats(0);
   }
 
   void SparseOptimizer::computeActiveErrors()
@@ -72,9 +73,6 @@ namespace g2o{
     for (int k = 0; k < static_cast<int>(_activeEdges.size()); ++k) {
       OptimizableGraph::Edge* e = _activeEdges[k];
       e->computeError();
-      if (e->robustKernel()) { 
-        e->robustifyError();
-      }
     }
 
 #  ifndef NDEBUG
@@ -95,6 +93,22 @@ namespace g2o{
     for (EdgeContainer::const_iterator it = _activeEdges.begin(); it != _activeEdges.end(); ++it) {
       const OptimizableGraph::Edge* e = *it;
       chi += e->chi2();
+    }
+    return chi;
+  }
+
+  double SparseOptimizer::activeRobustChi2() const
+  {
+    Eigen::Vector3d rho;
+    double chi = 0.0;
+    for (EdgeContainer::const_iterator it = _activeEdges.begin(); it != _activeEdges.end(); ++it) {
+      const OptimizableGraph::Edge* e = *it;
+      if (e->robustKernel()) {
+        e->robustKernel()->robustify(e->chi2(), rho);
+        chi += rho[0];
+      }
+      else
+        chi += e->chi2();
     }
     return chi;
   }
@@ -352,7 +366,7 @@ namespace g2o{
 
       if (_computeBatchStatistics) {
         G2OBatchStatistics& cstat = _batchStatistics[i];
-        globalStats = &cstat;
+        G2OBatchStatistics::setGlobalStats(&cstat);
         cstat.iteration = i;
         cstat.numEdges =  _activeEdges.size();
         cstat.numVertices = _activeVertices.size();
@@ -366,7 +380,7 @@ namespace g2o{
       if (_computeBatchStatistics) {
         computeActiveErrors();
         errorComputed = true;
-        _batchStatistics[i].chi2 = activeChi2();
+        _batchStatistics[i].chi2 = activeRobustChi2();
         _batchStatistics[i].timeIteration = get_monotonic_time()-ts;
       }
 
@@ -376,7 +390,7 @@ namespace g2o{
         if (! errorComputed)
           computeActiveErrors();
         cerr << "iteration= " << i
-          << "\t chi2= " << FIXED(activeChi2())
+          << "\t chi2= " << FIXED(activeRobustChi2())
           << "\t time= " << dts
           << "\t cumTime= " << cumTime
           << "\t edges= " << _activeEdges.size();
@@ -410,7 +424,7 @@ namespace g2o{
   void SparseOptimizer::setComputeBatchStatistics(bool computeBatchStatistics)
   {
     if ((_computeBatchStatistics == true) && (computeBatchStatistics == false)) {
-      globalStats = 0;
+      G2OBatchStatistics::setGlobalStats(0);
       _batchStatistics.clear();
     }
     _computeBatchStatistics = computeBatchStatistics;

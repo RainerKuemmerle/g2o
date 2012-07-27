@@ -103,28 +103,30 @@ public:
   }
 
   /** set the estimate of the to vertex, based on the estimate of the from vertex in the edge. */
-  virtual void initialEstimate(g2o::OptimizableGraph::Vertex* from, g2o::OptimizableGraph::Vertex* to){
-    const VertexPositionVelocity3D* vi = static_cast<const VertexPositionVelocity3D*>(from);
+  virtual void initialEstimate(const g2o::OptimizableGraph::VertexSet& from, g2o::OptimizableGraph::Vertex* to){
+    assert(from.size() == 1);
+    const VertexPositionVelocity3D* vi = static_cast<const VertexPositionVelocity3D*>(*from.begin());
     VertexPositionVelocity3D* vj = static_cast<VertexPositionVelocity3D*>(to);
     Vector6d viEst=vi->estimate();
     Vector6d vjEst=viEst;
-    
-    for (int m = 0; m < 3; m++)
-      {
-  vjEst[m] += _dt * (vjEst[m+3] + 0.5 * _dt * _measurement[m]);
-      }
 
     for (int m = 0; m < 3; m++)
-      {
-  vjEst[m+3] += _dt * _measurement[m];
-      }
+    {
+      vjEst[m] += _dt * (vjEst[m+3] + 0.5 * _dt * _measurement[m]);
+    }
+
+    for (int m = 0; m < 3; m++)
+    {
+      vjEst[m+3] += _dt * _measurement[m];
+    }
     vj->setEstimate(vjEst);
   }
 
   /** override in your class if it's not possible to initialize the vertices in certain combinations */
-  virtual bool initialEstimatePossible(g2o::OptimizableGraph::Vertex* from, g2o::OptimizableGraph::Vertex* to) { 
+  virtual double initialEstimatePossible(const g2o::OptimizableGraph::VertexSet& from, g2o::OptimizableGraph::Vertex* to) {
     //only works on sequential vertices
-    return (to->id()-from->id()==1);
+    const VertexPositionVelocity3D* vi = static_cast<const VertexPositionVelocity3D*>(*from.begin());
+    return (to->id() - vi->id() == 1) ? 1.0 : -1.0;
   }
 
 
@@ -165,7 +167,6 @@ public:
   {
     setMeasurement(measurement);
     setInformation(Eigen::Matrix3d::Identity() / (noiseSigma*noiseSigma));
-    setRobustKernel(false);
   }
   
   void computeError()

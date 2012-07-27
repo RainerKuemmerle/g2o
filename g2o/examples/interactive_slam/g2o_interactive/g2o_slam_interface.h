@@ -27,6 +27,7 @@
 #ifndef G2O_SLAM_INTERFACE_H
 #define G2O_SLAM_INTERFACE_H
 
+#include "g2o_interactive_api.h"
 #include "g2o/core/optimizable_graph.h"
 #include "slam_parser/interface/abstract_slam_interface.h"
 
@@ -37,7 +38,7 @@ namespace g2o {
 
   class SparseOptimizerOnline;
 
-  class G2oSlamInterface : public SlamParser::AbstractSlamInterface
+  class G2O_INTERACTIVE_API G2oSlamInterface : public SlamParser::AbstractSlamInterface
   {
     public:
       G2oSlamInterface(SparseOptimizerOnline* optimizer);

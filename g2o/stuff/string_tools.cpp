@@ -37,7 +37,7 @@
 #include <iostream>
 #include <iterator>
 
-#ifdef UNIX
+#if (defined UNIX) || (defined CYGWIN)
 #include <wordexp.h>
 #endif
 
@@ -124,7 +124,7 @@ int strPrintf(std::string& str, const char* fmt, ...)
 std::string strExpandFilename(const std::string& filename)
 {
 
-  #ifdef UNIX
+  #if (defined UNIX) || (defined CYGWIN)
   string result = filename;
   wordexp_t p;
 
@@ -183,7 +183,7 @@ int readLine(std::istream& is, std::stringstream& currentLine)
   if (is.fail()) // fail is set on empty lines
     is.clear();
   G2O_FSKIP_LINE(is); // read \n not read by get()
-  return currentLine.str().size();
+  return static_cast<int>(currentLine.str().size());
 }
 
 } // end namespace

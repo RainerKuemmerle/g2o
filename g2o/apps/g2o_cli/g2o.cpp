@@ -37,6 +37,7 @@
 #include "output_helper.h"
 #include "g2o_common.h"
 
+#include "g2o/config.h"
 #include "g2o/core/estimate_propagator.h"
 #include "g2o/core/sparse_optimizer.h"
 #include "g2o/core/factory.h"
@@ -44,6 +45,8 @@
 #include "g2o/core/hyper_dijkstra.h"
 #include "g2o/core/hyper_graph_action.h"
 #include "g2o/core/batch_stats.h"
+#include "g2o/core/robust_kernel.h"
+#include "g2o/core/robust_kernel_factory.h"
 #include "g2o/core/optimization_algorithm.h"
 #include "g2o/core/sparse_optimizer_terminate_action.h"
 
@@ -110,10 +113,11 @@ int main(int argc, char** argv)
   bool marginalize;
   bool listTypes;
   bool listSolvers;
+  bool listRobustKernels;
   bool incremental;
   bool guiOut;
   int gaugeId;
-  bool robustKernel;
+  string robustKernel;
   bool computeMarginals;
   bool printSolverProperties;
   double huberWidth;
@@ -135,16 +139,17 @@ int main(int argc, char** argv)
   arg.param("printSolverProperties", printSolverProperties, false, "print the properties of the solver");
   arg.param("solverProperties", solverProperties, "", "set the internal properties of a solver,\n\te.g., initialLambda=0.0001,maxTrialsAfterFailure=2");
   arg.param("gnudump", gnudump, "", "dump to gnuplot data file");
-  arg.param("robustKernel", robustKernel, false, "use robust error functions");
+  arg.param("robustKernel", robustKernel, "", "use this robust error function");
+  arg.param("robustKernelWidth", huberWidth, -1., "width for the robust Kernel (only if robustKernel)");
   arg.param("computeMarginals", computeMarginals, false, "computes the marginal covariances of something. FOR TESTING ONLY");
   arg.param("gaugeId", gaugeId, -1, "force the gauge");
-  arg.param("huberWidth", huberWidth, -1., "width for the robust Huber Kernel (only if robustKernel)");
   arg.param("o", outputfilename, "", "output final version of the graph");
   arg.param("solver", strSolver, "gn_var", "specify which solver to use underneat\n\t {gn_var, lm_fix3_2, gn_fix6_3, lm_fix7_3}");
   arg.param("solverlib", dummy, "", "specify a solver library which will be loaded");
   arg.param("typeslib", dummy, "", "specify a types library which will be loaded");
   arg.param("stats", statsFile, "", "specify a file for the statistics");
   arg.param("listTypes", listTypes, false, "list the registered types");
+  arg.param("listRobustKernels", listRobustKernels, false, "list the registered robust kernels");
   arg.param("listSolvers", listSolvers, false, "list the available solvers");
   arg.param("renameTypes", loadLookup, "", "create a lookup for loading types into other types,\n\t TAG_IN_FILE=INTERNAL_TAG_FOR_TYPE,TAG2=INTERNAL2\n\t e.g., VERTEX_CAM=VERTEX_SE3:EXPMAP");
   arg.param("gaugeList", gaugeList, std::vector<int>(), "set the list of gauges separated by commas without spaces \n  e.g: 1,2,3,4,5 ");
@@ -153,6 +158,10 @@ int main(int argc, char** argv)
   
 
   arg.parseArgs(argc, argv);
+
+  if (verbose) {
+    cout << "# Used Compiler: " << G2O_CXX_COMPILER << endl;
+  }
 
   // registering all the types from the libraries
   DlWrapper dlTypesWrapper;
@@ -167,6 +176,15 @@ int main(int argc, char** argv)
 
   if (listTypes) {
     Factory::instance()->printRegisteredTypes(cout, true);
+  }
+
+  if (listRobustKernels) {
+    std::vector<std::string> kernels;
+    RobustKernelFactory::instance()->fillKnownKernels(kernels);
+    cout << "Robust Kernels:" << endl;
+    for (size_t i = 0; i < kernels.size(); ++i) {
+      cout << kernels[i] << endl;
+    }
   }
 
   SparseOptimizer optimizer;
@@ -293,15 +311,20 @@ int main(int argc, char** argv)
     }
   }
 
-  if (robustKernel) {
+  if (robustKernel.size() > 0) {
+    AbstractRobustKernelCreator* creator = RobustKernelFactory::instance()->creator(robustKernel);
     cerr << "# Preparing robust error function ... ";
-    for (SparseOptimizer::EdgeSet::iterator it = optimizer.edges().begin(); it != optimizer.edges().end(); ++it) {
-      SparseOptimizer::Edge* e = dynamic_cast<SparseOptimizer::Edge*>(*it);
-      e->setRobustKernel(true);
-      if (huberWidth > 0)
-        e->setHuberWidth(huberWidth);
+    if (creator) {
+      for (SparseOptimizer::EdgeSet::iterator it = optimizer.edges().begin(); it != optimizer.edges().end(); ++it) {
+        SparseOptimizer::Edge* e = dynamic_cast<SparseOptimizer::Edge*>(*it);
+        e->setRobustKernel(creator->construct());
+        if (huberWidth > 0)
+          e->robustKernel()->setDelta(huberWidth);
+      }
+      cerr << "done." << endl;
+    } else {
+      cerr << "Unknown Robust Kernel: " << robustKernel << endl;
     }
-    cerr << "done." << endl;
   }
 
   // sanity check
@@ -579,7 +602,7 @@ int main(int argc, char** argv)
       summary.makeProperty<StringProperty>("edge_types", edgeTypesString.str());
       summary.makeProperty<DoubleProperty>("load_chi", loadChi);
       summary.makeProperty<StringProperty>("solver", strSolver);
-      summary.makeProperty<BoolProperty>("robustKernel", robustKernel);
+      summary.makeProperty<BoolProperty>("robustKernel", robustKernel.size() > 0);
       summary.makeProperty<DoubleProperty>("init_chi", initChi);
       summary.makeProperty<DoubleProperty>("final_chi", finalChi);
       summary.makeProperty<IntProperty>("maxIterations", maxIterations);

@@ -48,9 +48,13 @@ using namespace ::std;
 
 // This is used to determine where this library is
 #if defined (UNIX) || defined(CYGWIN)
-#include <dlfcn.h>
-static Dl_info info;
-#define PATH_SEPARATOR ":"
+# ifdef UNIX
+   // dladdr is not available on a recent installation of Cygwin
+#  define _GNU_SOURCE
+#  include <dlfcn.h>
+   static Dl_info info;
+#  endif
+# define PATH_SEPARATOR ":"
 #else // WINDOWS
 #define PATH_SEPARATOR ";"
 
@@ -96,11 +100,11 @@ void loadStandardTypes(DlWrapper& dlTypesWrapper, int argc, char** argv)
     typesPath = envTypesPath;
   } else {
     typesPath = G2O_DEFAULT_TYPES_DIR_;
-#if defined (UNIX) || defined(CYGWIN)
+#if (defined UNIX)
     if (dladdr(&info, &info) != 0) {
       typesPath = getDirname(info.dli_fname);
     }
-#else // Windows
+#elif (defined WINDOWS)
     char libFilename[MAX_PATH + 1];
     HMODULE instance = getMyInstance();
     if (instance && GetModuleFileName(instance, libFilename, MAX_PATH) > 0) {
@@ -132,13 +136,13 @@ void loadStandardSolver(DlWrapper& dlSolverWrapper, int argc, char** argv)
   if (envSolversPath != NULL) {
       solversPath = envSolversPath;
   } else {
-#if defined (UNIX) || defined(CYGWIN)
+#if (defined UNIX)
     if (dladdr(&info, &info) != 0) {
       solversPath = getDirname(info.dli_fname);
     } else {
       solversPath = G2O_DEFAULT_SOLVERS_DIR_;
     }
-#else // Windows
+#elif (defined WINDOWS)
     char libFilename[MAX_PATH + 1];
     HMODULE instance = getMyInstance();
     if (instance && GetModuleFileName(instance, libFilename, MAX_PATH) > 0) {

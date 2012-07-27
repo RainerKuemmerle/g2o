@@ -24,9 +24,6 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include <assert.h>
-#include "sparse_block_matrix.h"
-
 namespace g2o {
   using namespace Eigen;
 
@@ -42,6 +39,13 @@ namespace g2o {
       bool operator()(const TripletEntry& e1, const TripletEntry& e2) const
       {
         return e1.c < e2.c || (e1.c == e2.c && e1.r < e2.r);
+      }
+    };
+    /** Helper class to sort pair based on first elem */
+    template<class T1, class T2, class Pred = std::less<T1> >
+    struct CmpPairFirst {
+      bool operator()(const std::pair<T1,T2>& left, const std::pair<T1,T2>& right) {
+        return Pred()(left.first, right.first);
       }
     };
   }
@@ -227,42 +231,6 @@ namespace g2o {
     return false;
   }
 
-  template<typename MatrixType>
-  inline void axpy(const MatrixType& A, const Map<const VectorXd>& x, int xoff, Map<VectorXd>& y, int yoff)
-  {
-    y.segment<MatrixType::RowsAtCompileTime>(yoff) += A * x.segment<MatrixType::ColsAtCompileTime>(xoff);
-  }
-
-  template<int t>
-  inline void axpy(const Eigen::Matrix<double, Eigen::Dynamic, t>& A, const Map<const VectorXd>& x, int xoff, Map<VectorXd>& y, int yoff)
-  {
-    y.segment(yoff, A.rows()) += A * x.segment<Eigen::Matrix<double, Eigen::Dynamic, t>::ColsAtCompileTime>(xoff);
-  }
-
-  template<>
-  inline void axpy(const MatrixXd& A, const Map<const VectorXd>& x, int xoff, Map<VectorXd>& y, int yoff)
-  {
-    y.segment(yoff, A.rows()) += A * x.segment(xoff, A.cols());
-  }
-
-  template<typename MatrixType>
-  inline void atxpy(const MatrixType& A, const Map<const VectorXd>& x, int xoff, Map<VectorXd>& y, int yoff)
-  {
-    y.segment<MatrixType::ColsAtCompileTime>(yoff) += A.transpose() * x.segment<MatrixType::RowsAtCompileTime>(xoff);
-  }
-
-  template<int t>
-  inline void atxpy(const Eigen::Matrix<double, Eigen::Dynamic, t>& A, const Map<const VectorXd>& x, int xoff, Map<VectorXd>& y, int yoff)
-  {
-    y.segment<Eigen::Matrix<double, Eigen::Dynamic, t>::ColsAtCompileTime>(yoff) += A.transpose() * x.segment(xoff, A.rows());
-  }
-
-  template<>
-  inline void atxpy(const MatrixXd& A, const Map<const VectorXd>& x, int xoff, Map<VectorXd>& y, int yoff)
-  {
-    y.segment(yoff, A.cols()) += A.transpose() * x.segment(xoff, A.rows());
-  }
-
   template <class MatrixType>
   void SparseBlockMatrix<MatrixType>::multiply(double*& dest, const double* src) const {
     if (! dest){
@@ -281,7 +249,7 @@ namespace g2o {
         const typename SparseBlockMatrix<MatrixType>::SparseMatrixBlock* a=it->second;
         int destOffset = it->first ? _rowBlockIndices[it->first - 1] : 0;
         // destVec += *a * srcVec (according to the sub-vector parts)
-        axpy(*a, srcVec, srcOffset, destVec, destOffset);
+        internal::axpy(*a, srcVec, srcOffset, destVec, destOffset);
       }
     }
   }
@@ -306,9 +274,9 @@ namespace g2o {
         if (destOffset > srcOffset) // only upper triangle
           break;
         // destVec += *a * srcVec (according to the sub-vector parts)
-        axpy(*a, srcVec, srcOffset, destVec, destOffset);
+        internal::axpy(*a, srcVec, srcOffset, destVec, destOffset);
         if (destOffset < srcOffset)
-          atxpy(*a, srcVec, destOffset, destVec, srcOffset);
+          internal::atxpy(*a, srcVec, destOffset, destVec, srcOffset);
       }
     }
   }
@@ -327,7 +295,7 @@ namespace g2o {
     Map<const VectorXd> srcVec(src, rows());
 
 #   ifdef G2O_OPENMP
-#   pragma omp parallel for default (shared)
+#   pragma omp parallel for default (shared) schedule(dynamic, 10)
 #   endif
     for (int i=0; i < static_cast<int>(_blockCols.size()); ++i){
       int destOffset = colBaseOfBlock(i);
@@ -337,7 +305,7 @@ namespace g2o {
         const typename SparseBlockMatrix<MatrixType>::SparseMatrixBlock* a=it->second;
         int srcOffset = rowBaseOfBlock(it->first);
         // destVec += *a.transpose() * srcVec (according to the sub-vector parts)
-        atxpy(*a, srcVec, srcOffset, destVec, destOffset);
+        internal::atxpy(*a, srcVec, srcOffset, destVec, destOffset);
       }
     }
     
@@ -496,6 +464,7 @@ namespace g2o {
   template <class MatrixType>
   int SparseBlockMatrix<MatrixType>::fillCCS(double* Cx, bool upperTriangle) const
   {
+    assert(Cx && "Target destination is NULL");
     double* CxStart = Cx;
     for (size_t i=0; i<_blockCols.size(); ++i){
       int cstart=i ? _colBlockIndices[i-1] : 0;
@@ -520,6 +489,7 @@ namespace g2o {
   template <class MatrixType>
   int SparseBlockMatrix<MatrixType>::fillCCS(int* Cp, int* Ci, double* Cx, bool upperTriangle) const
   {
+    assert(Cp && Ci && Cx && "Target destination is NULL");
     int nz=0;
     for (size_t i=0; i<_blockCols.size(); ++i){
       int cstart=i ? _colBlockIndices[i-1] : 0;
@@ -609,13 +579,79 @@ namespace g2o {
     fout << "# nnz: " << nz << std::endl;
     fout << "# rows: " << rows() << std::endl;
     fout << "# columns: " << cols() << std::endl;
-    fout << std::setprecision(9) << std::endl;
+    fout << std::setprecision(9) << std::fixed << std::endl;
 
     for (std::vector<TripletEntry>::const_iterator it = entries.begin(); it != entries.end(); ++it) {
       const TripletEntry& entry = *it;
       fout << entry.r+1 << " " << entry.c+1 << " " << entry.x << std::endl;
     }
     return fout.good();
+  }
+
+  template <class MatrixType>
+  int SparseBlockMatrix<MatrixType>::fillSparseBlockMatrixCCS(SparseBlockMatrixCCS<MatrixType>& blockCCS) const
+  {
+    blockCCS.blockCols().resize(blockCols().size());
+    int numblocks = 0;
+    for (size_t i = 0; i < blockCols().size(); ++i) {
+      const IntBlockMap& row = blockCols()[i];
+      typename SparseBlockMatrixCCS<MatrixType>::SparseColumn& dest = blockCCS.blockCols()[i];
+      dest.clear();
+      dest.reserve(row.size());
+      for (typename IntBlockMap::const_iterator it = row.begin(); it != row.end(); ++it) {
+        dest.push_back(typename SparseBlockMatrixCCS<MatrixType>::RowBlock(it->first, it->second));
+        ++numblocks;
+      }
+    }
+    return numblocks;
+  }
+
+  template <class MatrixType>
+  int SparseBlockMatrix<MatrixType>::fillSparseBlockMatrixCCSTransposed(SparseBlockMatrixCCS<MatrixType>& blockCCS) const
+  {
+    blockCCS.blockCols().clear();
+    blockCCS.blockCols().resize(_rowBlockIndices.size());
+    int numblocks = 0;
+    for (size_t i = 0; i < blockCols().size(); ++i) {
+      const IntBlockMap& row = blockCols()[i];
+      for (typename IntBlockMap::const_iterator it = row.begin(); it != row.end(); ++it) {
+        typename SparseBlockMatrixCCS<MatrixType>::SparseColumn& dest = blockCCS.blockCols()[it->first];
+        dest.push_back(typename SparseBlockMatrixCCS<MatrixType>::RowBlock(i, it->second));
+        ++numblocks;
+      }
+    }
+    return numblocks;
+  }
+
+  template <class MatrixType>
+  void SparseBlockMatrix<MatrixType>::takePatternFromHash(SparseBlockMatrixHashMap<MatrixType>& hashMatrix)
+  {
+    // sort the sparse columns and add them to the map structures by
+    // exploiting that we are inserting a sorted structure
+    typedef std::pair<int, MatrixType*> SparseColumnPair;
+    typedef typename SparseBlockMatrixHashMap<MatrixType>::SparseColumn HashSparseColumn;
+    for (size_t i = 0; i < hashMatrix.blockCols().size(); ++i) {
+      // prepare a temporary vector for sorting
+      HashSparseColumn& column = hashMatrix.blockCols()[i];
+      if (column.size() == 0)
+        continue;
+      std::vector<SparseColumnPair> sparseRowSorted; // temporary structure
+      sparseRowSorted.reserve(column.size());
+      for (typename HashSparseColumn::const_iterator it = column.begin(); it != column.end(); ++it)
+        sparseRowSorted.push_back(*it);
+      std::sort(sparseRowSorted.begin(), sparseRowSorted.end(), CmpPairFirst<int, MatrixType*>());
+      // try to free some memory early
+      HashSparseColumn aux;
+      swap(aux, column);
+      // now insert sorted vector to the std::map structure
+      IntBlockMap& destColumnMap = blockCols()[i];
+      destColumnMap.insert(sparseRowSorted[0]);
+      for (size_t j = 1; j < sparseRowSorted.size(); ++j) {
+        typename SparseBlockMatrix<MatrixType>::IntBlockMap::iterator hint = destColumnMap.end();
+        --hint; // cppreference says the element goes after the hint (until C++11)
+        destColumnMap.insert(hint, sparseRowSorted[j]);
+      }
+    }
   }
 
 }// end namespace

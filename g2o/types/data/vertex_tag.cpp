@@ -96,14 +96,14 @@ namespace g2o {
     VertexTag* that = static_cast<VertexTag*>(element);
 
     glPushMatrix();
-    glColor3f(1.,0.2,1.);
+    glColor3f(1.f,0.2f,1.f);
     glTranslatef(that->position().x(), that->position().y(), that->position().z());
     int textSize = 1;
     if (_textSize )
       textSize = _textSize->value();
-    opengl::drawBox(0.1*textSize, 0.1*textSize, 0.1*textSize);
-    glTranslatef(0.2*textSize, 0, 0);
-    glScalef(0.003*textSize,0.003*textSize,1);
+    opengl::drawBox(0.1f*textSize, 0.1f*textSize, 0.1f*textSize);
+    glTranslatef(0.2f*textSize, 0.f, 0.f);
+    glScalef(0.003f*textSize,0.003f*textSize,1.f);
     freeglut_minimal::glutStrokeString(freeglut_minimal::GLUT_STROKE_ROMAN, that->name().c_str());
     glPopMatrix();
     return this;

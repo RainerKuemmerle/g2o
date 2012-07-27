@@ -40,6 +40,8 @@ namespace g2o {
 // forward declarations
 std::istream& operator>>(std::istream& is, std::vector<int>& v);
 std::ostream& operator<<(std::ostream& os, const std::vector<int>& v);
+std::istream& operator>>(std::istream& is, std::vector<double>& v);
+std::ostream& operator<<(std::ostream& os, const std::vector<double>& v);
 
 std::istream& operator>>(std::istream& is, std::vector<int>& v){
   string s;
@@ -95,7 +97,7 @@ struct CmpPairFirst {
 
 enum CommandArgumentType
 {
-  CAT_DOUBLE, CAT_FLOAT, CAT_INT, CAT_STRING, CAT_BOOL, CAT_VECTOR_INT
+  CAT_DOUBLE, CAT_FLOAT, CAT_INT, CAT_STRING, CAT_BOOL, CAT_VECTOR_INT, CAT_VECTOR_DOUBLE
 };
 
 CommandArgs::CommandArgs()
@@ -253,11 +255,23 @@ void CommandArgs::param(const std::string& name, std::string& p, const std::stri
   _args.push_back(ca);
 }
 
- void CommandArgs::param(const std::string& name, std::vector<int>& p, const std::vector<int>& defValue, const std::string& desc){
+void CommandArgs::param(const std::string& name, std::vector<int>& p, const std::vector<int>& defValue, const std::string& desc){
   CommandArgument ca;
   ca.name = name;
   ca.description = desc;
   ca.type = CAT_VECTOR_INT;
+  ca.data = static_cast<void*>(&p);
+  ca.parsed = false;
+  p = defValue;
+  _args.push_back(ca);
+}
+
+void CommandArgs::param(const std::string& name, std::vector<double>& p, const std::vector<double>& defValue, const std::string& desc)
+{
+  CommandArgument ca;
+  ca.name = name;
+  ca.description = desc;
+  ca.type = CAT_VECTOR_DOUBLE;
   ca.data = static_cast<void*>(&p);
   ca.parsed = false;
   p = defValue;
@@ -356,6 +370,8 @@ const char* CommandArgs::type2str(int t) const
       return "<bool>";
     case CAT_VECTOR_INT:
       return "<vector_int>";
+    case CAT_VECTOR_DOUBLE:
+      return "<vector_double>";
   }
   return "";
 }
@@ -415,6 +431,16 @@ void CommandArgs::str2arg(const std::string& input, CommandArgument& ca) const
         bool convertStatus = convertString(input, aux);
         if (convertStatus) {
           std::vector<int>* data = static_cast< std::vector<int>* >(ca.data);
+          *data = aux;
+        }
+      }
+      break;
+    case CAT_VECTOR_DOUBLE:
+      {
+        std::vector<double> aux;
+        bool convertStatus = convertString(input, aux);
+        if (convertStatus) {
+          std::vector<double>* data = static_cast< std::vector<double>* >(ca.data);
           *data = aux;
         }
       }
@@ -481,4 +507,35 @@ std::string CommandArgs::trim(const std::string& s) const
 }
 
 
+std::istream& operator>>(std::istream& is, std::vector<double>& v){
+  string s;
+  if (! (is >> s) )
+    return is;
+
+  const char* c = s.c_str();
+  char* caux = const_cast<char*>(c);
+
+  v.clear();
+  bool hasNextValue=true;
+  while(hasNextValue){
+    double i=strtod(c,&caux);
+    if (c!=caux){
+      c=caux;
+      c++;
+      v.push_back(i);
+    } else
+      hasNextValue = false;
+  }
+  return is;
 }
+
+std::ostream& operator<<(std::ostream& os, const std::vector<double>& v)
+{
+  if (v.size())
+    os << v[0];
+  for (size_t i=1; i<v.size(); i++)
+    os << ";" << v[i];
+  return os;
+}
+
+} // end namespace g2o

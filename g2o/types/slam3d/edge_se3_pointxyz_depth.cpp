@@ -27,8 +27,7 @@
 #include "edge_se3_pointxyz_depth.h"
 
 namespace g2o {
-  using namespace std;
-
+  using namespace g2o;
 
   // point to camera projection, monocular
   EdgeSE3PointXYZDepth::EdgeSE3PointXYZDepth() : BaseBinaryEdge<3, Vector3d, VertexSE3, VertexPointXYZ>() {
@@ -46,6 +45,9 @@ namespace g2o {
     resolveCache(cache, (OptimizableGraph::Vertex*)_vertices[0],"CACHE_CAMERA",pv);
     return cache != 0;
   }
+
+
+
 
   bool EdgeSE3PointXYZDepth::read(std::istream& is) {
     int pid;
@@ -108,7 +110,7 @@ namespace g2o {
 
     const Eigen::Vector3d& pt = vp->estimate();
 
-    Eigen::Vector3d Zcam = cache->w2lMatrix() * pt;
+    Eigen::Vector3d Zcam = cache->w2l() * pt;
 
     //  J(0,3) = -0.0;
     J(0,4) = -2*Zcam(2);
@@ -122,7 +124,7 @@ namespace g2o {
     J(2,4) = 2*Zcam(0);
     //  J(2,5) = -0.0;
 
-    J.block<3,3>(0,6) = cache->w2lMatrix().rotation();
+    J.block<3,3>(0,6) = cache->w2l().rotation();
 
     Eigen::Matrix<double,3,9> Jprime = params->Kcam_inverseOffsetR()  * J;
     Eigen::Vector3d Zprime = cache->w2i() * pt;
@@ -164,7 +166,7 @@ namespace g2o {
     p(2) = _measurement(2);
     p.head<2>() = _measurement.head<2>()*p(2);
     p=invKcam*p;
-    point->setEstimate(cam->estimate() * (params->offsetMatrix() * p));
+    point->setEstimate(cam->estimate() * (params->offset() * p));
   }
 
 }

@@ -283,6 +283,16 @@ namespace g2o {
         }
         _r.normalize();
       }
+
+      /**
+       * cast SE3Quat into an Eigen::Isometry3d
+       */
+      operator Eigen::Isometry3d()
+      {
+        Eigen::Isometry3d result = (Eigen::Isometry3d) rotation();
+        result.translation() = translation();
+        return result;
+      }
   };
 
   inline std::ostream& operator <<(std::ostream& out_str, const SE3Quat& se3)
@@ -291,9 +301,9 @@ namespace g2o {
     return out_str;
   }
 
-  G2O_TYPES_SLAM3D_API Eigen::Quaterniond euler_to_quat(double yaw, double pitch, double roll);
-  G2O_TYPES_SLAM3D_API void quat_to_euler(const Eigen::Quaterniond& q, double& yaw, double& pitch, double& roll);
-  G2O_TYPES_SLAM3D_API void jac_quat3_euler3(Eigen::Matrix<double, 6, 6>& J, const SE3Quat& t);
+  //G2O_TYPES_SLAM3D_API Eigen::Quaterniond euler_to_quat(double yaw, double pitch, double roll);
+  //G2O_TYPES_SLAM3D_API void quat_to_euler(const Eigen::Quaterniond& q, double& yaw, double& pitch, double& roll);
+  //G2O_TYPES_SLAM3D_API void jac_quat3_euler3(Eigen::Matrix<double, 6, 6>& J, const SE3Quat& t);
 
 } // end namespace
 

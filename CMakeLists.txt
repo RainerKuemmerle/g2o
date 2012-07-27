@@ -1,4 +1,5 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
+SET(CMAKE_LEGACY_CYGWIN_WIN32 0)
 
 PROJECT(g2o)
 
@@ -33,11 +34,7 @@ ELSEIF(CMAKE_BUILD_TYPE MATCHES MinSizeRel)
 ENDIF(CMAKE_BUILD_TYPE MATCHES Release)
 
 # Allow the developer to select if Dynamic or Static libraries are built
-IF(MSVC) # MSVC only works if we link statically
-  OPTION (BUILD_SHARED_LIBS "Build Shared Libraries (preferred and required for the g2o plugin system)" OFF)
-ELSE(MSVC)
-  OPTION (BUILD_SHARED_LIBS "Build Shared Libraries (preferred and required for the g2o plugin system)" ON)
-ENDIF()
+OPTION (BUILD_SHARED_LIBS "Build Shared Libraries (preferred and required for the g2o plugin system)" ON)
 SET (G2O_LIB_TYPE STATIC)
 IF (BUILD_SHARED_LIBS)
   SET (G2O_LIB_TYPE SHARED)
@@ -73,18 +70,22 @@ LIST(APPEND CMAKE_MODULE_PATH ${g2o_SOURCE_DIR}/cmake_modules)
 
 # Detect OS and define macros appropriately
 IF(WIN32)
-  IF(CYGWIN)
-    MESSAGE(STATUS "Compiling on Cygwin")
-    ADD_DEFINITIONS(-DCYGWIN)
-  ELSE(CYGWIN)
-    ADD_DEFINITIONS(-DWINDOWS)
-    MESSAGE(STATUS "Compiling on Windows")
-  ENDIF(CYGWIN)
+  ADD_DEFINITIONS(-DWINDOWS)
+  MESSAGE(STATUS "Compiling on Windows")
   IF(MSVC)
-    MESSAGE(STATUS "Compiling on Windows (MSVC)")
+    MESSAGE(STATUS "Compiling with MSVC")
     ADD_DEFINITIONS(-DNOMINMAX)
     ADD_DEFINITIONS(-D_USE_MATH_DEFINES)
+    IF (BUILD_SHARED_LIBS)
+      # disable warning on missing DLL interfaces
+      ADD_DEFINITIONS("/wd4251")
+      # SSE2 optimizations
+      ADD_DEFINITIONS("/arch:SSE2")
+    ENDIF()
   ENDIF(MSVC)
+ELSEIF(CYGWIN)
+  MESSAGE(STATUS "Compiling on Cygwin")
+  ADD_DEFINITIONS(-DCYGWIN)
 ELSEIF(UNIX)
   ADD_DEFINITIONS(-DUNIX)
   MESSAGE(STATUS "Compiling on Unix")
@@ -157,6 +158,9 @@ IF(CMAKE_COMPILER_IS_GNUCXX)
   # Generic settings for optimisation
   SET(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -msse4") 
   SET(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -O3 -msse4") 
+  # switch off optimization for debug builds
+  SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0")
+  SET(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -O0")
 
   # OS X
   #IF(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
@@ -201,9 +205,11 @@ ENDIF(EIGEN3_FOUND)
 INCLUDE_DIRECTORIES(${g2o_SOURCE_DIR} ${G2O_EIGEN3_INCLUDE})
 
 # Generate config.h
+SET(G2O_OPENGL_FOUND ${OPENGL_FOUND})
 SET(G2O_HAVE_CHOLMOD ${CHOLMOD_FOUND})
 SET(G2O_HAVE_CSPARSE ${CSPARSE_FOUND})
 SET(G2O_SHARED_LIBS ${BUILD_SHARED_LIBS})
+SET(G2O_CXX_COMPILER "${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER}")
 configure_file(config.h.in ${PROJECT_BINARY_DIR}/g2o/config.h)
 include_directories(${PROJECT_BINARY_DIR})
 INSTALL(FILES ${PROJECT_BINARY_DIR}/g2o/config.h DESTINATION ${CMAKE_INSTALL_PREFIX}/include/g2o)

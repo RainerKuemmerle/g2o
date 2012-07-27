@@ -19,6 +19,7 @@
 
 #include <camd.h>
 
+#include "g2o_incremental_api.h"
 #include "g2o/solvers/cholmod/linear_solver_cholmod.h"
 
 namespace g2o {
@@ -26,7 +27,7 @@ namespace g2o {
 /**
  * \brief generic interface for the online solver
  */
-class LinearSolverCholmodOnlineInterface
+class G2O_INCREMENTAL_API LinearSolverCholmodOnlineInterface
 {
   public:
     LinearSolverCholmodOnlineInterface() : cmember(0), batchEveryN(100) {}
@@ -104,9 +105,10 @@ class LinearSolverCholmodOnline : public LinearSolver<MatrixType>, public Linear
       memcpy(x, xcholmod->x, sizeof(double) * bcholmod.nrow); // copy back to our array
       cholmod_free_dense(&xcholmod, &_cholmodCommon);
 
+      G2OBatchStatistics* globalStats = G2OBatchStatistics::globalStats();
       if (globalStats){
         globalStats->timeNumericDecomposition = get_monotonic_time() - t;
-        globalStats->choleskyNNZ = _cholmodCommon.method[0].lnz;
+        globalStats->choleskyNNZ = static_cast<size_t>(_cholmodCommon.method[0].lnz);
       }
 
       return true;
@@ -192,6 +194,7 @@ class LinearSolverCholmodOnline : public LinearSolver<MatrixType>, public Linear
       _cholmodCommon.method[0].ordering = CHOLMOD_GIVEN;
       _cholmodFactor = cholmod_analyze_p(_cholmodSparse, _scalarPermutation.data(), NULL, 0, &_cholmodCommon);
 
+      G2OBatchStatistics* globalStats = G2OBatchStatistics::globalStats();
       if (globalStats)
         globalStats->timeSymbolicDecomposition = get_monotonic_time() - t;
 

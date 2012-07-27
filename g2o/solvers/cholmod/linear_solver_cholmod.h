@@ -96,7 +96,7 @@ class LinearSolverCholmod : public LinearSolver<MatrixType>
     virtual ~LinearSolverCholmod()
     {
       delete _cholmodSparse;
-      if (_cholmodFactor) {
+      if (_cholmodFactor != 0) {
         cholmod_free_factor(&_cholmodFactor, &_cholmodCommon);
         _cholmodFactor = 0;
       }
@@ -105,7 +105,7 @@ class LinearSolverCholmod : public LinearSolver<MatrixType>
 
     virtual bool init()
     {
-      if (_cholmodFactor) {
+      if (_cholmodFactor != 0) {
         cholmod_free_factor(&_cholmodFactor, &_cholmodCommon);
         _cholmodFactor = 0;
       }
@@ -115,11 +115,11 @@ class LinearSolverCholmod : public LinearSolver<MatrixType>
     bool solve(const SparseBlockMatrix<MatrixType>& A, double* x, double* b)
     {
       //cerr << __PRETTY_FUNCTION__ << " using cholmod" << endl;
-      fillCholmodExt(A, _cholmodFactor); // _cholmodFactor used as bool, if not existing will copy the whole structure, otherwise only the values
+      fillCholmodExt(A, _cholmodFactor != 0); // _cholmodFactor used as bool, if not existing will copy the whole structure, otherwise only the values
 
-      if (! _cholmodFactor) {
+      if (_cholmodFactor == 0) {
         computeSymbolicDecomposition(A);
-        assert(_cholmodFactor && "Symbolic cholesky failed");
+        assert(_cholmodFactor != 0 && "Symbolic cholesky failed");
       }
       double t=get_monotonic_time();
 
@@ -144,9 +144,10 @@ class LinearSolverCholmod : public LinearSolver<MatrixType>
       memcpy(x, xcholmod->x, sizeof(double) * bcholmod.nrow); // copy back to our array
       cholmod_free_dense(&xcholmod, &_cholmodCommon);
 
+      G2OBatchStatistics* globalStats = G2OBatchStatistics::globalStats();
       if (globalStats){
         globalStats->timeNumericDecomposition = get_monotonic_time() - t;
-        globalStats->choleskyNNZ = _cholmodCommon.method[0].lnz;
+        globalStats->choleskyNNZ = static_cast<size_t>(_cholmodCommon.method[0].lnz);
       }
 
       return true;
@@ -155,9 +156,9 @@ class LinearSolverCholmod : public LinearSolver<MatrixType>
     bool solveBlocks(double**& blocks, const SparseBlockMatrix<MatrixType>& A)
     {
       //cerr << __PRETTY_FUNCTION__ << " using cholmod" << endl;
-      fillCholmodExt(A, _cholmodFactor); // _cholmodFactor used as bool, if not existing will copy the whole structure, otherwise only the values
+      fillCholmodExt(A, _cholmodFactor != 0); // _cholmodFactor used as bool, if not existing will copy the whole structure, otherwise only the values
 
-      if (! _cholmodFactor) {
+      if (_cholmodFactor == 0) {
         computeSymbolicDecomposition(A);
         assert(_cholmodFactor && "Symbolic cholesky failed");
       }
@@ -195,8 +196,9 @@ class LinearSolverCholmod : public LinearSolver<MatrixType>
           (double*)_cholmodFactor->x, pinv.data());
       mcc.computeCovariance(blocks, A.rowBlockIndices());
 
+      G2OBatchStatistics* globalStats = G2OBatchStatistics::globalStats();
       if (globalStats) {
-        globalStats->choleskyNNZ = _cholmodCommon.method[_cholmodCommon.selected].lnz;
+        globalStats->choleskyNNZ = static_cast<size_t>(_cholmodCommon.method[_cholmodCommon.selected].lnz);
       }
 
       return true;
@@ -205,9 +207,9 @@ class LinearSolverCholmod : public LinearSolver<MatrixType>
     virtual bool solvePattern(SparseBlockMatrix<MatrixXd>& spinv, const std::vector<std::pair<int, int> >& blockIndices, const SparseBlockMatrix<MatrixType>& A)
     {
       //cerr << __PRETTY_FUNCTION__ << " using cholmod" << endl;
-      fillCholmodExt(A, _cholmodFactor); // _cholmodFactor used as bool, if not existing will copy the whole structure, otherwise only the values
+      fillCholmodExt(A, _cholmodFactor != 0); // _cholmodFactor used as bool, if not existing will copy the whole structure, otherwise only the values
 
-      if (! _cholmodFactor) {
+      if (_cholmodFactor == 0) {
         computeSymbolicDecomposition(A);
         assert(_cholmodFactor && "Symbolic cholesky failed");
       }
@@ -235,8 +237,9 @@ class LinearSolverCholmod : public LinearSolver<MatrixType>
           (double*)_cholmodFactor->x, pinv.data());
       mcc.computeCovariance(spinv, A.rowBlockIndices(), blockIndices);
 
+      G2OBatchStatistics* globalStats = G2OBatchStatistics::globalStats();
       if (globalStats) {
-        globalStats->choleskyNNZ = _cholmodCommon.method[_cholmodCommon.selected].lnz;
+        globalStats->choleskyNNZ = static_cast<size_t>(_cholmodCommon.method[_cholmodCommon.selected].lnz);
       }
 
       return true;
@@ -324,6 +327,7 @@ class LinearSolverCholmod : public LinearSolver<MatrixType>
         _cholmodFactor = cholmod_analyze_p(_cholmodSparse, _scalarPermutation.data(), NULL, 0, &_cholmodCommon);
 
       }
+      G2OBatchStatistics* globalStats = G2OBatchStatistics::globalStats();
       if (globalStats)
         globalStats->timeSymbolicDecomposition = get_monotonic_time() - t;
 
@@ -337,6 +341,7 @@ class LinearSolverCholmod : public LinearSolver<MatrixType>
     {
       size_t m = A.rows();
       size_t n = A.cols();
+      assert(m > 0 && n > 0 && "Hessian has 0 rows/cols");
 
       if (_cholmodSparse->columnsAllocated < n) {
         //std::cerr << __PRETTY_FUNCTION__ << ": reallocating columns" << std::endl;

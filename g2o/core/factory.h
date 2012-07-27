@@ -166,7 +166,7 @@ namespace g2o {
 
 #define G2O_USE_TYPE_BY_CLASS_NAME(classname) \
     extern "C" void G2O_FACTORY_IMPORT g2o_type_##classname(void); \
-    static g2o::TypeFunctionProxy proxy_##classname(g2o_type_##classname);
+    static g2o::ForceLinker proxy_##classname(g2o_type_##classname);
 
 #define G2O_REGISTER_TYPE_GROUP(typeGroupName) \
     extern "C" void G2O_FACTORY_EXPORT g2o_type_group_##typeGroupName(void) {}

@@ -71,7 +71,6 @@ class StructureOnlySolver : public OptimizationAlgorithm
 
     OptimizationAlgorithm::SolverResult calc(OptimizableGraph::VertexContainer& vertices, int num_iters, int num_max_trials=10)
     {
-      double chi2_sum=0;
       JacobianWorkspace auxWorkspace;
       auxWorkspace.updateSize(2, 50);
       auxWorkspace.allocate();
@@ -147,20 +146,20 @@ class StructureOnlySolver : public OptimizationAlgorithm
               Matrix<double,PointDoF,PointDoF> H_pp_mu = H_pp;
               H_pp_mu.diagonal().array() += mu;
               LDLT<Matrix<double,PointDoF,PointDoF> > chol_H_pp(H_pp_mu);
-              bool goodStep = true;
+              bool goodStep = false;
               if (chol_H_pp.isPositive()) {
                 Matrix<double,PointDoF,1> delta_p = chol_H_pp.solve(b);
                 v->push();
-                v->oplus(&(delta_p[0]));
+                v->oplus(delta_p.data());
                 double new_chi2 = 0.;
                 for (g2o::HyperGraph::EdgeSet::iterator it_t=track.begin(); it_t!=track.end(); ++it_t) {
                   g2o::OptimizableGraph::Edge* e = dynamic_cast<g2o::OptimizableGraph::Edge *>(*it_t);
                   e->computeError();
                   new_chi2 += e->chi2();
                 }
-                assert(g2o_isnan(new_chi2)==false);
+                assert(g2o_isnan(new_chi2)==false && "Chi is NaN");
                 double rho = (chi2 - new_chi2);
-                if (rho > 0) {
+                if (rho > 0 && g2o_isfinite(new_chi2)) {
                   goodStep = true;
                   chi2 = new_chi2;
                   v->discardTop();
@@ -190,7 +189,6 @@ class StructureOnlySolver : public OptimizationAlgorithm
               break;
           }
         }
-        chi2_sum += chi2;
       }
       return OK;
     }

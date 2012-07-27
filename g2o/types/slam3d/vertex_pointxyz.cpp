@@ -34,7 +34,6 @@
 #include <typeinfo>
 
 namespace g2o {
-  // TRACK VERTEX
 
   bool VertexPointXYZ::read(std::istream& is) {
     Vector3d lv;
@@ -45,7 +44,7 @@ namespace g2o {
   }
 
   bool VertexPointXYZ::write(std::ostream& os) const {
-    const Vector3d& lv = estimate();
+    Vector3d lv=estimate();
     for (int i=0; i<3; i++){
       os << lv[i] << " ";
     }
@@ -61,7 +60,7 @@ namespace g2o {
     if (! DrawAction::refreshPropertyPtrs(params_))
       return false;
     if (_previousParams){
-      _pointSize = _previousParams->makeProperty<FloatProperty>(_typeName + "::POINT_SIZE", 1.f);
+      _pointSize = _previousParams->makeProperty<FloatProperty>(_typeName + "::POINT_SIZE", 1.);
     } else {
       _pointSize = 0;
     }
@@ -74,7 +73,6 @@ namespace g2o {
 
     if (typeid(*element).name()!=_typeName)
       return 0;
-
     refreshPropertyPtrs(params);
     if (! _previousParams)
       return this;
@@ -118,4 +116,5 @@ namespace g2o {
     return this;
   }
 
-} // end namespace
+}
+

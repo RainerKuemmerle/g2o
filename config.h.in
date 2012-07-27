@@ -2,12 +2,15 @@
 #define G2O_CONFIG_H
 
 #cmakedefine G2O_HAVE_OPENGL 1
+#cmakedefine G2O_OPENGL_FOUND 1
 #cmakedefine G2O_OPENMP 1
 #cmakedefine G2O_SHARED_LIBS 1
 
 // available sparse matrix libraries
 #cmakedefine G2O_HAVE_CHOLMOD 1
 #cmakedefine G2O_HAVE_CSPARSE 1
+
+#cmakedefine G2O_CXX_COMPILER "@G2O_CXX_COMPILER@"
 
 // give a warning if Eigen defaults to row-major matrices.
 // We internally assume column-major matrices throughout the code.

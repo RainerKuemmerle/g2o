@@ -69,9 +69,9 @@ namespace g2o {
       return false;
     for ( int i=0; i<information().rows() && is.good(); i++)
       for (int j=i; j<information().cols() && is.good(); j++){
-        is >> information()(i,j);
-        if (i!=j)
-          information()(j,i)=information()(i,j);
+  is >> information()(i,j);
+  if (i!=j)
+    information()(j,i)=information()(i,j);
       }
     if (is.bad()) {
       //  we overwrite the information matrix
@@ -139,7 +139,7 @@ namespace g2o {
 
     const Eigen::Vector3d& pt = vp->estimate();
 
-    Eigen::Vector3d Zcam = cache->w2lMatrix() * vp->estimate();
+    Eigen::Vector3d Zcam = cache->w2l() * vp->estimate();
 
     //  J(0,3) = -0.0;
     J(0,4) = -2*Zcam(2);
@@ -153,7 +153,7 @@ namespace g2o {
     J(2,4) = 2*Zcam(0);
     //  J(2,5) = -0.0;
 
-    J.block<3,3>(0,6) = cache->w2lMatrix().rotation();
+    J.block<3,3>(0,6) = cache->w2l().rotation();
 
     //Eigen::Matrix<double,3,9> Jprime = vcache->params->Kcam_inverseOffsetR  * J;
     Eigen::Matrix<double,3,9> Jprime = params->Kcam_inverseOffsetR()  * J;
@@ -209,7 +209,7 @@ namespace g2o {
     p.head<2>() = _measurement.head<2>()*w;
     p(2) = w;
     p = invKcam * p;
-    p = cam->estimate() * (params->offsetMatrix() * p);
+    p = cam->estimate() * (params->offset() * p);
     point->setEstimate(p);
   }
 
@@ -223,8 +223,8 @@ namespace g2o {
     if (typeid(*element).name()!=_typeName)
       return 0;
     EdgeSE3PointXYZDisparity* e =  static_cast<EdgeSE3PointXYZDisparity*>(element);
-    VertexSE3* fromEdge = static_cast<VertexSE3*>(e->vertex(0));
-    VertexPointXYZ* toEdge   = static_cast<VertexPointXYZ*>(e->vertex(1));
+    VertexSE3* fromEdge = static_cast<VertexSE3*>(e->vertices()[0]);
+    VertexPointXYZ* toEdge   = static_cast<VertexPointXYZ*>(e->vertices()[1]);
     glColor3f(0.4f,0.4f,0.2f);
     glPushAttrib(GL_ENABLE_BIT);
     glDisable(GL_LIGHTING);

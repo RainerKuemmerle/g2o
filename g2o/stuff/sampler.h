@@ -31,6 +31,10 @@
 #include <Eigen/Cholesky>
 #include <Eigen/StdVector>
 
+#include <cstdlib>
+#include <cmath>
+#include <ctime>
+
 #ifdef _MSC_VER
 #include <random>
 #else
@@ -62,18 +66,58 @@ namespace g2o {
       cholDecomp.compute(cov);
       if (cholDecomp.info()==Eigen::NumericalIssue)
   return;
-      _L=cholDecomp.matrixL();
+      _cholesky=cholDecomp.matrixL();
     }
     SampleType generateSample() {
       SampleType s;
       for (int i=0; i<s.size(); i++){
         s(i) = (_generator) ? sampleGaussian(_generator) : sampleGaussian();
       }
-      return _L*s;
+      return _cholesky*s;
     }
   protected:
-    CovarianceType _L;
+    CovarianceType _cholesky;
     std::tr1::ranlux_base_01* _generator;
+  };
+
+  class G2O_STUFF_API Sampler
+  {
+    public:
+      /**
+       * Gaussian random with a mean and standard deviation. Uses the
+       * Polar method of Marsaglia.
+       */
+      static double gaussRand(double mean, double sigma)
+      {
+        double x, y, r2;
+        do {
+          x = -1.0 + 2.0 * uniformRand(0.0, 1.0);
+          y = -1.0 + 2.0 * uniformRand(0.0, 1.0);
+          r2 = x * x + y * y;
+        } while (r2 > 1.0 || r2 == 0.0);
+        return mean + sigma * y * std::sqrt(-2.0 * log(r2) / r2);
+      }
+
+      /**
+       * sample a number from a uniform distribution
+       */
+      static double uniformRand(double lowerBndr, double upperBndr)
+      {
+        return lowerBndr + ((double) std::rand() / (RAND_MAX + 1.0)) * (upperBndr - lowerBndr);
+      }
+      /**
+       * default seed function using the current time in seconds
+       */
+      static void seedRand()
+      {
+        seedRand(static_cast<unsigned int>(std::time(NULL)));
+      }
+
+      /** seed the random number generator */
+      static void seedRand(unsigned int seed)
+      {
+        std::srand(seed);
+      }
   };
 
 }

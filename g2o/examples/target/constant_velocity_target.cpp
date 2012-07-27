@@ -107,7 +107,9 @@ int main()
       optimizer.addEdge(toe);
       
       // compute the initial guess via the odometry
-      toe->initialEstimate(vPrev,vCurr);
+      g2o::OptimizableGraph::VertexSet vPrevSet;
+      vPrevSet.insert(vPrev);
+      toe->initialEstimate(vPrevSet,vCurr);
 
       lastStateNode = stateNode;
 

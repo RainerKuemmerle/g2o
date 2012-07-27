@@ -26,6 +26,11 @@
 
 #include "edge_se3_pointxyz.h"
 #include "parameter_se3_offset.h"
+
+#ifdef G2O_HAVE_OPENGL
+#include "g2o/stuff/opengl_wrapper.h"
+#endif
+
 #include <iostream>
 
 #ifdef G2O_HAVE_OPENGL
@@ -34,7 +39,6 @@
 
 namespace g2o {
   using namespace std;
-
 
   // point to camera projection, monocular
   EdgeSE3PointXYZ::EdgeSE3PointXYZ() : BaseBinaryEdge<3, Vector3d, VertexSE3, VertexPointXYZ>() {
@@ -96,7 +100,7 @@ namespace g2o {
     //VertexSE3 *cam = static_cast<VertexSE3*>(_vertices[0]);
     VertexPointXYZ *point = static_cast<VertexPointXYZ*>(_vertices[1]);
 
-    Eigen::Vector3d perr = cache->w2nMatrix() * point->estimate();
+    Eigen::Vector3d perr = cache->w2n() * point->estimate();
 
     // error, which is backwards from the normal observed - calculated
     // _measurement is the measured projection
@@ -108,7 +112,7 @@ namespace g2o {
     //VertexSE3 *cam = static_cast<VertexSE3 *>(_vertices[0]);
     VertexPointXYZ *vp = static_cast<VertexPointXYZ *>(_vertices[1]);
 
-    Eigen::Vector3d Zcam = cache->w2lMatrix() * vp->estimate();
+    Eigen::Vector3d Zcam = cache->w2l() * vp->estimate();
 
     //  J(0,3) = -0.0;
     J(0,4) = -2*Zcam(2);
@@ -122,9 +126,9 @@ namespace g2o {
     J(2,4) = 2*Zcam(0);
     //  J(2,5) = -0.0;
 
-    J.block<3,3>(0,6) = cache->w2lMatrix().rotation();
+    J.block<3,3>(0,6) = cache->w2l().rotation();
 
-    Eigen::Matrix<double,3,9> Jhom = offsetParam->inverseOffsetMatrix().rotation() * J;
+    Eigen::Matrix<double,3,9> Jhom = offsetParam->inverseOffset().rotation() * J;
 
     _jacobianOplusXi = Jhom.block<3,6>(0,0);
     _jacobianOplusXj = Jhom.block<3,3>(0,6);
@@ -142,7 +146,7 @@ namespace g2o {
     //   cerr << "fatal error in retrieving cache" << endl;
     // }
 
-    Eigen::Vector3d perr = cache->w2nMatrix() * pt;
+    Eigen::Vector3d perr = cache->w2n() * pt;
     _measurement = perr;
     return true;
   }
@@ -160,9 +164,38 @@ namespace g2o {
     //   cerr << "fatal error in retrieving cache" << endl;
     // }
     // SE3OffsetParameters* params=vcache->params;
-    const Eigen::Vector3d& p=_measurement;
-    point->setEstimate(cam->estimate() * (offsetParam->offsetMatrix() * p));
+    Eigen::Vector3d p=_measurement;
+    point->setEstimate(cam->estimate() * (offsetParam->offset() * p));
   }
+
+#ifdef G2O_HAVE_OPENGL
+  EdgeSE3PointXYZDrawAction::EdgeSE3PointXYZDrawAction(): DrawAction(typeid(EdgeSE3PointXYZ).name()){}
+
+  HyperGraphElementAction* EdgeSE3PointXYZDrawAction::operator()(HyperGraph::HyperGraphElement* element,
+               HyperGraphElementAction::Parameters* params_){
+    if (typeid(*element).name()!=_typeName)
+      return 0;
+    refreshPropertyPtrs(params_);
+    if (! _previousParams)
+      return this;
+
+    if (_show && !_show->value())
+      return this;
+
+    EdgeSE3PointXYZ* e =  static_cast<EdgeSE3PointXYZ*>(element);
+    VertexSE3* fromEdge = static_cast<VertexSE3*>(e->vertex(0));
+    VertexPointXYZ* toEdge   = static_cast<VertexPointXYZ*>(e->vertex(1));
+    glColor3f(0.8f,0.3f,0.3f);
+    glPushAttrib(GL_ENABLE_BIT);
+    glDisable(GL_LIGHTING);
+    glBegin(GL_LINES);
+    glVertex3f((float)fromEdge->estimate().translation().x(),(float)fromEdge->estimate().translation().y(),(float)fromEdge->estimate().translation().z());
+    glVertex3f((float)toEdge->estimate().x(),(float)toEdge->estimate().y(),(float)toEdge->estimate().z());
+    glEnd();
+    glPopAttrib();
+    return this;
+  }
+#endif
 
 #ifdef G2O_HAVE_OPENGL
   EdgeSE3PointXYZDrawAction::EdgeSE3PointXYZDrawAction(): DrawAction(typeid(EdgeSE3PointXYZ).name()){}

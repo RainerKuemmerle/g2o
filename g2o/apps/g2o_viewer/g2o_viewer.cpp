@@ -74,6 +74,7 @@ int main(int argc, char** argv)
 
   MainWindow mw;
   mw.updateDisplayedSolvers();
+  mw.updateRobustKernels();
   mw.show();
 
   // redirect the output that normally goes to cerr to the textedit in the viewer

@@ -25,14 +25,19 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <Eigen/StdVector>
-#include <tr1/random>
 #include <iostream>
 #include <stdint.h>
+
+#ifdef _MSC_VER
+#include <unordered_set>
+#else
 #include <tr1/unordered_set>
+#endif
 
 #include "g2o/core/sparse_optimizer.h"
 #include "g2o/core/block_solver.h"
 #include "g2o/core/solver.h"
+#include "g2o/core/robust_kernel_impl.h"
 #include "g2o/core/optimization_algorithm_levenberg.h"
 #include "g2o/solvers/cholmod/linear_solver_cholmod.h"
 #include "g2o/solvers/dense/linear_solver_dense.h"
@@ -46,40 +51,41 @@ using namespace std;
 
 class Sample
 {
-
-  static tr1::ranlux_base_01 gen_real;
-  static tr1::mt19937 gen_int;
 public:
   static int uniform(int from, int to);
-
   static double uniform();
-
   static double gaussian(double sigma);
 };
 
+static double uniform_rand(double lowerBndr, double upperBndr)
+{
+  return lowerBndr + ((double) std::rand() / (RAND_MAX + 1.0)) * (upperBndr - lowerBndr);
+}
 
-tr1::ranlux_base_01 Sample::gen_real;
-tr1::mt19937 Sample::gen_int;
+static double gauss_rand(double mean, double sigma)
+{
+  double x, y, r2;
+  do {
+    x = -1.0 + 2.0 * uniform_rand(0.0, 1.0);
+    y = -1.0 + 2.0 * uniform_rand(0.0, 1.0);
+    r2 = x * x + y * y;
+  } while (r2 > 1.0 || r2 == 0.0);
+  return mean + sigma * y * std::sqrt(-2.0 * log(r2) / r2);
+}
 
 int Sample::uniform(int from, int to)
 {
-  tr1::uniform_int<int> unif(from, to);
-  int sam = unif(gen_int);
-  return  sam;
+  return static_cast<int>(uniform_rand(from, to));
 }
 
 double Sample::uniform()
 {
-  std::tr1::uniform_real<double> unif(0.0, 1.0);
-  double sam = unif(gen_real);
-  return  sam;
+  return uniform_rand(0., 1.);
 }
 
 double Sample::gaussian(double sigma)
 {
-  std::tr1::normal_distribution<double> gauss(0.0, sigma);
-  double sam = gauss(gen_real);
-  return  sam;
+  return gauss_rand(0., sigma);
 }
 
 int main(int argc, const char* argv[])
@@ -113,18 +119,18 @@ int main(int argc, const char* argv[])
   bool ROBUST_KERNEL = false;
   if (argc>3)
   {
-    ROBUST_KERNEL = atof(argv[3]);
+    ROBUST_KERNEL = atoi(argv[3]) != 0;
   }
   bool STRUCTURE_ONLY = false;
   if (argc>4)
   {
-    STRUCTURE_ONLY = atof(argv[4]);
+    STRUCTURE_ONLY = atoi(argv[4]) != 0;
   }
 
   bool DENSE = false;
   if (argc>5)
   {
-    DENSE = atof(argv[5]);
+    DENSE = atoi(argv[5]) != 0;
   }
 
   cout << "PIXEL_NOISE: " <<  PIXEL_NOISE << endl;
@@ -294,8 +300,10 @@ int main(int argc, const char* argv[])
           //e->inverseMeasurement() = -z;
           e->information() = Matrix2d::Identity();
 
-          e->setRobustKernel(ROBUST_KERNEL);
-          e->setHuberWidth(1);
+          if (ROBUST_KERNEL) {
+            g2o::RobustKernelHuber* rk = new g2o::RobustKernelHuber;
+            e->setRobustKernel(rk);
+          }
 
           optimizer.addEdge(e);
 

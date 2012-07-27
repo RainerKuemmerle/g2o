@@ -30,7 +30,7 @@
 namespace g2o {
   using namespace std;
 
-  G2OBatchStatistics * globalStats=0;
+  G2OBatchStatistics* G2OBatchStatistics::_globalStats=0;
 
   #ifndef PTHING
   #define PTHING(s) \
@@ -82,4 +82,9 @@ namespace g2o {
     return os;
   };
 
-}
+  void G2OBatchStatistics::setGlobalStats(G2OBatchStatistics* b)
+  {
+    _globalStats = b;
+  }
+
+} // end namespace

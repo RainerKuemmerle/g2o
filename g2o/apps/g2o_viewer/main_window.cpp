@@ -24,6 +24,8 @@
 #include "g2o/core/sparse_optimizer.h"
 #include "g2o/core/estimate_propagator.h"
 #include "g2o/core/optimization_algorithm.h"
+#include "g2o/core/robust_kernel_factory.h"
+#include "g2o/core/robust_kernel.h"
 
 #include <QFileDialog>
 #include <QStandardItemModel>
@@ -150,6 +152,8 @@ void MainWindow::on_actionQuit_triggered(bool)
 
 void MainWindow::updateDisplayedSolvers()
 {
+  coOptimizer->clear();
+  _knownSolvers.clear();
   const OptimizationAlgorithmFactory::CreatorList& knownSolvers = OptimizationAlgorithmFactory::instance()->creatorList();
 
   bool varFound = false;
@@ -283,10 +287,23 @@ void MainWindow::setRobustKernel()
   bool robustKernel = cbRobustKernel->isChecked();
   double huberWidth = leKernelWidth->text().toDouble();
 
-  for (SparseOptimizer::EdgeSet::const_iterator it = optimizer->edges().begin(); it != optimizer->edges().end(); ++it) {
-    OptimizableGraph::Edge* e = static_cast<OptimizableGraph::Edge*>(*it);
-    e->setRobustKernel(robustKernel);
-    e->setHuberWidth(huberWidth);
+  if (robustKernel) {
+    QString strRobustKernel = coRobustKernel->currentText();
+    AbstractRobustKernelCreator* creator = RobustKernelFactory::instance()->creator(strRobustKernel.toStdString());
+    if (! creator) {
+      cerr << strRobustKernel.toStdString() << " is not a valid robust kernel" << endl;
+      return;
+    }
+    for (SparseOptimizer::EdgeSet::const_iterator it = optimizer->edges().begin(); it != optimizer->edges().end(); ++it) {
+      OptimizableGraph::Edge* e = static_cast<OptimizableGraph::Edge*>(*it);
+      e->setRobustKernel(creator->construct());
+      e->robustKernel()->setDelta(huberWidth);
+    }
+  } else {
+    for (SparseOptimizer::EdgeSet::const_iterator it = optimizer->edges().begin(); it != optimizer->edges().end(); ++it) {
+      OptimizableGraph::Edge* e = static_cast<OptimizableGraph::Edge*>(*it);
+      e->setRobustKernel(0);
+    }
   }
 }
 
@@ -393,5 +410,15 @@ void MainWindow::on_actionSave_Viewer_State_triggered(bool)
     viewer->saveStateToFile();
     viewer->setStateFileName(QString::null);
     cerr << "Saved state to " << filename.toStdString() << endl;
+  }
+}
+
+void MainWindow::updateRobustKernels()
+{
+  coRobustKernel->clear();
+  std::vector<std::string> kernels;
+  RobustKernelFactory::instance()->fillKnownKernels(kernels);
+  for (size_t i = 0; i < kernels.size(); ++i) {
+    coRobustKernel->addItem(QString::fromStdString(kernels[i]));
   }
 }

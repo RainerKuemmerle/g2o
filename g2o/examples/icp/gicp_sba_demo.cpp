@@ -25,7 +25,11 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <Eigen/StdVector>
+#ifdef _MSC_VER
+#include <random>
+#else
 #include <tr1/random>
+#endif
 #include <iostream>
 #include <stdint.h>
 
@@ -142,7 +146,9 @@ int main(int argc, char **argv)
     Quaterniond q;
     q.setIdentity();
 
-    SE3Quat cam(q,t);           // camera pose
+    Eigen::Isometry3d cam;           // camera pose
+    cam = q;
+    cam.translation() = t;
 
     // set up node
     VertexSCam *vc = new VertexSCam();
@@ -175,8 +181,8 @@ int main(int argc, char **argv)
 
     // calculate the relative 3D position of the point
     Vector3d pt0,pt1;
-    pt0 = vp0->estimate().inverse().map(true_points[i]);
-    pt1 = vp1->estimate().inverse().map(true_points[i]);
+    pt0 = vp0->estimate().inverse() * true_points[i];
+    pt1 = vp1->estimate().inverse() * true_points[i];
 
     // add in noise
     pt0 += Vector3d(Sample::gaussian(euc_noise ),
@@ -220,7 +226,7 @@ int main(int argc, char **argv)
     //    e->information().setIdentity();
 
     //    e->setRobustKernel(true);
-    e->setHuberWidth(0.01);
+    //e->setHuberWidth(0.01);
 
     optimizer.addEdge(e);
   }
@@ -279,8 +285,8 @@ int main(int argc, char **argv)
           //e->inverseMeasurement() = -z;
           e->information() = Matrix3d::Identity();
 
-          e->setRobustKernel(false);
-          e->setHuberWidth(1);
+          //e->setRobustKernel(false);
+          //e->setHuberWidth(1);
 
           optimizer.addEdge(e);
         }
@@ -293,8 +299,8 @@ int main(int argc, char **argv)
   // move second cam off of its true position
   VertexSE3* vc = 
     dynamic_cast<VertexSE3*>(optimizer.vertices().find(1)->second);
-  SE3Quat cam = vc->estimate();
-  cam.setTranslation(Vector3d(-0.1,0.1,0.2));
+  Eigen::Isometry3d cam = vc->estimate();
+  cam.translation() = Vector3d(-0.1,0.1,0.2);
   vc->setEstimate(cam);
   optimizer.initializeOptimization();
   optimizer.computeActiveErrors();

@@ -239,7 +239,11 @@ namespace g2o {
     //cerr << "updating index mapping done." << endl;
 
     // backup the tempindex and prepare sorting structure
+#ifdef _MSC_VER
+    VertexBackup* backupIdx = new VertexBackup[_touchedVertices.size()];
+#else
     VertexBackup backupIdx[_touchedVertices.size()];
+#endif
     memset(backupIdx, 0, sizeof(VertexBackup) * _touchedVertices.size());
     int idx = 0;
     for (HyperGraph::VertexSet::iterator it = _touchedVertices.begin(); it != _touchedVertices.end(); ++it) {
@@ -370,6 +374,9 @@ namespace g2o {
       }
     }
     cholmod_free_sparse(&updateAsSparseFactor, &_cholmodCommon);
+#ifdef _MSC_VER
+    delete[] backupIdx;
+#endif
 
 #if 0
     cholmod_sparse* updatePermuted = cholmod_triplet_to_sparse(_permutedUpdate, _permutedUpdate->nnz, &_cholmodCommon);

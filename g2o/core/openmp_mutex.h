@@ -78,6 +78,20 @@ namespace g2o {
 
 #endif
 
+  /**
+   * \brief lock a mutex within a scope
+   */
+  class ScopedOpenMPMutex
+  {
+    public:
+      explicit ScopedOpenMPMutex(OpenMPMutex* mutex) : _mutex(mutex) { _mutex->lock(); }
+      ~ScopedOpenMPMutex() { _mutex->unlock(); }
+    private:
+      OpenMPMutex* const _mutex;
+      ScopedOpenMPMutex(const ScopedOpenMPMutex&);
+      void operator=(const ScopedOpenMPMutex&);
+  };
+
 }
 
 #endif
