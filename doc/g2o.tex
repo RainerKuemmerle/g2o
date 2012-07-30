@@ -757,7 +757,7 @@ main diagonal of $\bH$.
 
 \subsection{Solvers}
 A central component of these least-squares approaches is the solution
-of the linear system $\tilde \bH \, \bTDeltax^* = - \tilde \bb$ . To
+of the linear system $\tilde \bH \, \bTDeltax^* = - \tilde \bb$. To
 this end there are several approaches available, some of them exploit
 the known structure of certain problems and perform intermediate
 reductions of the system, like by applying the Schur complement to a
@@ -815,7 +815,7 @@ functions, one for each of the functionality we want to support.  This
 is of course not elegant, because we would need to patch the base
 classes with the new function every time something new is added.
 Another possibility would be to make use of the multiple inheritance
-of c++, and to define an abstract ``drawable'' object, on which the a
+of C++, and to define an abstract ``drawable'' object, on which the
 viewer operates.  This solution is a bit better, however we cannot
 have more than one ``drawing'' function for each object.
 
@@ -1020,7 +1020,7 @@ robot poses are modeled by the constraints $\bz^\mathrm{s}_*$.}
 Two subsequent robot positions $\bx^\mathrm{s}_t$ and
 $\bx^\mathrm{s}_{t+1}$ are related by an odometry measurement, that
 represent the relative motion that brings the robot from
-$\bx^\mathrm{s}_t$ to $\bx^\mathrm{s}_{t+1}t$ \emph{measured} by the
+$\bx^\mathrm{s}_t$ to $\bx^\mathrm{s}_{t+1}$ \emph{measured} by the
 odometry. This measurement will be typically slightly different from
 the \emph{real} transformation between the two pose because of the
 noise affecting the sensors.  Being an odometry measurement an
