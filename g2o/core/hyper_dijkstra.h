@@ -38,6 +38,7 @@ namespace g2o{
   struct G2O_CORE_API HyperDijkstra{
     struct G2O_CORE_API CostFunction {
       virtual double operator() (HyperGraph::Edge* e, HyperGraph::Vertex* from, HyperGraph::Vertex* to)=0;
+      virtual ~CostFunction() { }
     };
 
     struct G2O_CORE_API TreeAction {
