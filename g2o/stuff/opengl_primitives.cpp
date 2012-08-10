@@ -22,15 +22,16 @@
 #include <cmath>
 
 #ifdef __APPLE__
-#include <OpenGL/glu.h>
+ #include <OpenGL/glu.h>
+#else
+ #ifdef _WINDOWS
+  #include <gl/GLU.h>
+ #else
+  #ifdef UNIX
+   #include <GL/glu.h>
+  #endif
+ #endif
 #endif
-#ifdef _WINDOWS
-#include <gl/GLU.h>
-#endif
-#ifdef UNIX
-#include <GL/glu.h>
-#endif
-
 namespace g2o {
 namespace opengl {
 
