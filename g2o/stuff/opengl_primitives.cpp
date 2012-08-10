@@ -22,13 +22,9 @@
 #include <cmath>
 
 #ifdef __APPLE__
-#include <OpenGL/glu.h>
-#endif
-#ifdef _WINDOWS
-#include <gl/GLU.h>
-#endif
-#ifdef UNIX
-#include <GL/glu.h>
+# include <OpenGL/glu.h>
+#else
+# include <GL/glu.h>
 #endif
 
 namespace g2o {
