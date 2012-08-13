@@ -34,8 +34,9 @@
 #include "g2o/stuff/misc.h"
 
 namespace g2o {
-  using namespace std;
-  using namespace Eigen;
+
+using namespace std;
+using namespace Eigen;
 
 template <typename Traits>
 BlockSolver<Traits>::BlockSolver(LinearSolverType* linearSolver) :
@@ -263,25 +264,23 @@ bool BlockSolver<Traits>::buildStructure(bool zeroBlocks)
     if (v->marginalized()){
       const HyperGraph::EdgeSet& vedges=v->edges();
       for (HyperGraph::EdgeSet::const_iterator it1=vedges.begin(); it1!=vedges.end(); ++it1){
-        if ((*it1)->vertices().size() != 2)
-          continue;
-        OptimizableGraph::Vertex* v1= (OptimizableGraph::Vertex*) (*it1)->vertex(0);
-        if (v1==v)
-          v1 = (OptimizableGraph::Vertex*) (*it1)->vertex(1);
-        if (v1->hessianIndex()==-1)
-          continue;
-        for  (HyperGraph::EdgeSet::const_iterator it2=vedges.begin(); it2!=vedges.end(); ++it2){
-          if ((*it2)->vertices().size() != 2)
+        for (size_t i=0; i<(*it1)->vertices().size(); ++i)
+        {
+          OptimizableGraph::Vertex* v1= (OptimizableGraph::Vertex*) (*it1)->vertex(i);
+          if (v1->hessianIndex()==-1 || v1==v)
             continue;
-          OptimizableGraph::Vertex* v2= (OptimizableGraph::Vertex*) (*it2)->vertex(0);
-          if (v2==v)
-            v2 = (OptimizableGraph::Vertex*) (*it2)->vertex(1);
-          if (v2->hessianIndex()==-1)
-            continue;
-          int i1=v1->hessianIndex();
-          int i2=v2->hessianIndex();
-          if (i1<=i2) {
-            schurMatrixLookup->addBlock(i1, i2);
+          for  (HyperGraph::EdgeSet::const_iterator it2=vedges.begin(); it2!=vedges.end(); ++it2){
+            for (size_t j=0; j<(*it2)->vertices().size(); ++j)
+            {
+              OptimizableGraph::Vertex* v2= (OptimizableGraph::Vertex*) (*it2)->vertex(j);
+              if (v2->hessianIndex()==-1 || v2==v)
+                continue;
+              int i1=v1->hessianIndex();
+              int i2=v2->hessianIndex();
+              if (i1<=i2) {
+                schurMatrixLookup->addBlock(i1, i2);
+              }
+            }
           }
         }
       }

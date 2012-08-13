@@ -1,5 +1,5 @@
 // g2o - General Graph Optimization
-// Copyright (C) 2011 H. Strasdat
+// Copyright (C) 2012 H. Strasdat
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -49,7 +49,7 @@ using namespace Eigen;
 using namespace std;
 
 
-class Sample {
+class Sample{
 public:
   static int uniform(int from, int to);
   static double uniform();
@@ -82,18 +82,36 @@ double Sample::gaussian(double sigma){
   return gauss_rand(0., sigma);
 }
 
+Vector2d project2d(const Vector3d& v){
+  Vector2d res;
+  res(0) = v(0)/v(2);
+  res(1) = v(1)/v(2);
+  return res;
+}
+
+Vector3d unproject2d(const Vector2d& v){
+  Vector3d res;
+  res(0) = v(0);
+  res(1) = v(1);
+  res(2) = 1;
+  return res;
+}
+
+inline Vector3d invert_depth(const Vector3d & x){
+  return unproject2d(x.head<2>())/x[2];
+}
+
 int main(int argc, const char* argv[]){
   if (argc<2)
   {
     cout << endl;
     cout << "Please type: " << endl;
-    cout << "ba_demo [PIXEL_NOISE] [OUTLIER RATIO] [ROBUST_KERNEL] [STRUCTURE_ONLY] [DENSE]" << endl;
+    cout << "ba_demo [PIXEL_NOISE] [OUTLIER RATIO] [ROBUST_KERNEL] [SCHUR-TRICK]" << endl;
     cout << endl;
     cout << "PIXEL_NOISE: noise in image space (E.g.: 1)" << endl;
     cout << "OUTLIER_RATIO: probability of spuroius observation  (default: 0.0)" << endl;
     cout << "ROBUST_KERNEL: use robust kernel (0 or 1; default: 0==false)" << endl;
-    cout << "STRUCTURE_ONLY: performe structure-only BA to get better point initializations (0 or 1; default: 0==false)" << endl;
-    cout << "DENSE: Use dense solver (0 or 1; default: 0==false)" << endl;
+    cout << "SCHUR-TRICK: Use Schur-complement trick (0 or 1; default: 0==true)" << endl;
     cout << endl;
     cout << "Note, if OUTLIER_RATIO is above 0, ROBUST_KERNEL should be set to 1==true." << endl;
     cout << endl;
@@ -101,9 +119,9 @@ int main(int argc, const char* argv[]){
   }
 
   double PIXEL_NOISE = atof(argv[1]);
-  double OUTLIER_RATIO = 0.0;
 
-  if (argc>2)  {
+  double OUTLIER_RATIO = 0.0;
+  if (argc>2){
     OUTLIER_RATIO = atof(argv[2]);
   }
 
@@ -111,46 +129,43 @@ int main(int argc, const char* argv[]){
   if (argc>3){
     ROBUST_KERNEL = atoi(argv[3]) != 0;
   }
-  bool STRUCTURE_ONLY = false;
-  if (argc>4){
-    STRUCTURE_ONLY = atoi(argv[4]) != 0;
-  }
 
-  bool DENSE = false;
-  if (argc>5){
-    DENSE = atoi(argv[5]) != 0;
+  bool SCHUR_TRICK = true;
+  if (argc>4){
+    SCHUR_TRICK = atoi(argv[4]) != 0;
   }
 
   cout << "PIXEL_NOISE: " <<  PIXEL_NOISE << endl;
   cout << "OUTLIER_RATIO: " << OUTLIER_RATIO<<  endl;
   cout << "ROBUST_KERNEL: " << ROBUST_KERNEL << endl;
-  cout << "STRUCTURE_ONLY: " << STRUCTURE_ONLY<< endl;
-  cout << "DENSE: "<<  DENSE << endl;
-
-
+  cout << "SCHUR-TRICK: " << SCHUR_TRICK << endl;
 
   g2o::SparseOptimizer optimizer;
   optimizer.setVerbose(false);
-  g2o::BlockSolver_6_3::LinearSolverType * linearSolver;
-  if (DENSE) {
-    linearSolver= new g2o::LinearSolverDense<g2o
-        ::BlockSolver_6_3::PoseMatrixType>();
-  } else {
+  g2o::OptimizationAlgorithmLevenberg * solver;
+  if (SCHUR_TRICK){
+    g2o::BlockSolver_6_3::LinearSolverType * linearSolver;
+
     linearSolver
         = new g2o::LinearSolverCholmod<g2o
         ::BlockSolver_6_3::PoseMatrixType>();
+    g2o::BlockSolver_6_3 * solver_ptr
+        = new g2o::BlockSolver_6_3(linearSolver);
+    solver = new g2o::OptimizationAlgorithmLevenberg(solver_ptr);
+  } else {
+    g2o::BlockSolverX::LinearSolverType * linearSolver;
+    linearSolver
+        = new g2o::LinearSolverCholmod<g2o
+        ::BlockSolverX::PoseMatrixType>();
+    g2o::BlockSolverX * solver_ptr
+        = new g2o::BlockSolverX(linearSolver);
+    solver = new g2o::OptimizationAlgorithmLevenberg(solver_ptr);
   }
 
-
-  g2o::BlockSolver_6_3 * solver_ptr
-      = new g2o::BlockSolver_6_3(linearSolver);
-  g2o::OptimizationAlgorithmLevenberg* solver = new g2o::OptimizationAlgorithmLevenberg(solver_ptr);
   optimizer.setAlgorithm(solver);
 
-
   vector<Vector3d> true_points;
-  for (size_t i=0;i<500; ++i)
-  {
+  for (size_t i=0;i<500; ++i){
     true_points.push_back(Vector3d((Sample::uniform()-0.5)*3,
                                    Sample::uniform()-0.5,
                                    Sample::uniform()+3));
@@ -161,30 +176,32 @@ int main(int argc, const char* argv[]){
 
   vector<g2o::SE3Quat,
       aligned_allocator<g2o::SE3Quat> > true_poses;
+
   g2o::CameraParameters * cam_params
       = new g2o::CameraParameters (focal_length, principal_point, 0.);
   cam_params->setId(0);
 
-  if (!optimizer.addParameter(cam_params)) {
+  if (!optimizer.addParameter(cam_params)){
     assert(false);
   }
 
   int vertex_id = 0;
-  for (size_t i=0; i<15; ++i) {
+  for (size_t i=0; i<15; ++i){
     Vector3d trans(i*0.04-1.,0,0);
-
     Eigen:: Quaterniond q;
     q.setIdentity();
-    g2o::SE3Quat pose(q,trans);
+    g2o::SE3Quat T_me_from_world(q,trans);
     g2o::VertexSE3Expmap * v_se3
         = new g2o::VertexSE3Expmap();
     v_se3->setId(vertex_id);
+    v_se3->setEstimate(T_me_from_world);
+
     if (i<2){
       v_se3->setFixed(true);
     }
-    v_se3->setEstimate(pose);
+
     optimizer.addVertex(v_se3);
-    true_poses.push_back(pose);
+    true_poses.push_back(T_me_from_world);
     vertex_id++;
   }
   int point_id=vertex_id;
@@ -193,32 +210,46 @@ int main(int argc, const char* argv[]){
 
   cout << endl;
   tr1::unordered_map<int,int> pointid_2_trueid;
+  tr1::unordered_map<int,int> pointid_2_anchorid;
   tr1::unordered_set<int> inliers;
 
   for (size_t i=0; i<true_points.size(); ++i){
     g2o::VertexSBAPointXYZ * v_p
         = new g2o::VertexSBAPointXYZ();
-    v_p->setId(point_id);
-    v_p->setMarginalized(true);
-    v_p->setEstimate(true_points.at(i)
-                     + Vector3d(Sample::gaussian(1),
-                                Sample::gaussian(1),
-                                Sample::gaussian(1)));
     int num_obs = 0;
-    for (size_t j=0; j<true_poses.size(); ++j){
+    for (size_t j=0; j<true_poses.size(); ++j)    {
       Vector2d z = cam_params->cam_map(true_poses.at(j).map(true_points.at(i)));
-      if (z[0]>=0 && z[1]>=0 && z[0]<640 && z[1]<480){
+
+      if (z[0]>=0 && z[1]>=0 && z[0]<640 && z[1]<480)      {
         ++num_obs;
       }
     }
+
+    int anchor_frame_id = -1;
     if (num_obs>=2){
-      optimizer.addVertex(v_p);
       bool inlier = true;
       for (size_t j=0; j<true_poses.size(); ++j){
-        Vector2d z
-            = cam_params->cam_map(true_poses.at(j).map(true_points.at(i)));
+        Vector2d z = cam_params->cam_map(true_poses.at(j).map(true_points.at(i)));
 
-        if (z[0]>=0 && z[1]>=0 && z[0]<640 && z[1]<480){
+        if (z[0]>=0 && z[1]>=0 && z[0]<640 && z[1]<480)        {
+          if (anchor_frame_id==-1){
+            anchor_frame_id = j;
+            pointid_2_anchorid.insert(make_pair(point_id, anchor_frame_id));
+            g2o::SE3Quat T_anchor_from_world = true_poses[anchor_frame_id];
+            v_p->setId(point_id);
+            if (SCHUR_TRICK){
+              v_p->setMarginalized(true);
+            }
+            Vector3d point_w = true_points.at(i)
+                + Vector3d(Sample::gaussian(1),
+                           Sample::gaussian(1),
+                           Sample::gaussian(1));
+
+            Vector3d point_anchor = T_anchor_from_world*point_w;
+            v_p->setEstimate(invert_depth(point_anchor));
+            optimizer.addVertex(v_p);
+          }
+
           double sam = Sample::uniform();
           if (sam<OUTLIER_RATIO){
             z = Vector2d(Sample::uniform(0,640),
@@ -227,25 +258,32 @@ int main(int argc, const char* argv[]){
           }
           z += Vector2d(Sample::gaussian(PIXEL_NOISE),
                         Sample::gaussian(PIXEL_NOISE));
-          g2o::EdgeProjectXYZ2UV * e
-              = new g2o::EdgeProjectXYZ2UV();
+          g2o::EdgeProjectPSI2UV * e
+              = new g2o::EdgeProjectPSI2UV();
+
+          e->resize(3);
           e->setVertex(0, dynamic_cast<g2o::OptimizableGraph::Vertex*>(v_p));
           e->setVertex(1, dynamic_cast<g2o::OptimizableGraph::Vertex*>
                        (optimizer.vertices().find(j)->second));
+          e->setVertex(2, dynamic_cast<g2o::OptimizableGraph::Vertex*>
+                       (optimizer.vertices().find(anchor_frame_id)->second));
+
           e->setMeasurement(z);
           e->information() = Matrix2d::Identity();
+
           if (ROBUST_KERNEL) {
             g2o::RobustKernelHuber* rk = new g2o::RobustKernelHuber;
             e->setRobustKernel(rk);
           }
+
           e->setParameterId(0, 0);
           optimizer.addEdge(e);
         }
       }
-
       if (inlier){
         inliers.insert(point_id);
-        Vector3d diff = v_p->estimate() - true_points[i];
+        Vector3d diff = true_poses[anchor_frame_id].inverse()*invert_depth(v_p->estimate())
+            - true_points[i];
 
         sum_diff2 += diff.dot(diff);
       }
@@ -257,20 +295,11 @@ int main(int argc, const char* argv[]){
   cout << endl;
   optimizer.initializeOptimization();
   optimizer.setVerbose(true);
-  if (STRUCTURE_ONLY){
-    g2o::StructureOnlySolver<3> structure_only_ba;
-    cout << "Performing structure-only BA:"   << endl;
-    g2o::OptimizableGraph::VertexContainer points;
-    for (g2o::OptimizableGraph::VertexIDMap::const_iterator it = optimizer.vertices().begin(); it != optimizer.vertices().end(); ++it) {
-      g2o::OptimizableGraph::Vertex* v = static_cast<g2o::OptimizableGraph::Vertex*>(it->second);
-      if (v->dimension() == 3)
-        points.push_back(v);
-    }
-    structure_only_ba.calc(points, 10);
-  }
   cout << endl;
   cout << "Performing full BA:" << endl;
+
   optimizer.optimize(10);
+
   cout << endl;
   cout << "Point error before optimisation (inliers only): " << sqrt(sum_diff2/point_num) << endl;
   point_num = 0;
@@ -289,7 +318,20 @@ int main(int argc, const char* argv[]){
       cerr << "Vertex " << it->first << "is not a PointXYZ!" << endl;
       exit(-1);
     }
-    Vector3d diff = v_p->estimate()-true_points[it->second];
+    int anchorframe_id = pointid_2_anchorid.find(it->first)->second;
+    v_it
+        = optimizer.vertices().find(anchorframe_id);
+    if (v_it==optimizer.vertices().end()){
+      cerr << "Vertex " << it->first << " not in graph!" << endl;
+      exit(-1);
+    }
+    g2o::VertexSE3Expmap * v_anchor
+        = dynamic_cast< g2o::VertexSE3Expmap * > (v_it->second);
+    if (v_p==0){
+      cerr << "Vertex " << it->first << "is not a SE3Expmap!" << endl;
+      exit(-1);
+    }
+    Vector3d diff = v_anchor->estimate().inverse()*invert_depth(v_p->estimate())-true_points[it->second];
     if (inliers.find(it->first)==inliers.end())
       continue;
     sum_diff2 += diff.dot(diff);
