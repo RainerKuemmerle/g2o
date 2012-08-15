@@ -82,7 +82,7 @@ namespace g2o {
       t=get_monotonic_time();
     }
 
-    double currentChi = _optimizer->activeChi2();
+    double currentChi = _optimizer->activeRobustChi2();
 
     _solver->buildSystem();
     if (globalStats) {
@@ -151,7 +151,7 @@ namespace g2o {
       _optimizer->push();
       _optimizer->update(_hdl.data());
       _optimizer->computeActiveErrors();
-      double newChi = _optimizer->activeChi2();
+      double newChi = _optimizer-> activeRobustChi2();
       double nonLinearGain = currentChi - newChi;
       if (fabs(linearGain) < 1e-12)
         linearGain = 1e-12;
