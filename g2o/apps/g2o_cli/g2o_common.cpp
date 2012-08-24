@@ -48,9 +48,11 @@ using namespace ::std;
 
 // This is used to determine where this library is
 #if defined (UNIX) || defined(CYGWIN)
-# ifdef UNIX
+# if (defined UNIX)
    // dladdr is not available on a recent installation of Cygwin
-#  define _GNU_SOURCE
+#  ifndef _GNU_SOURCE
+#    define _GNU_SOURCE
+#  endif
 #  include <dlfcn.h>
    static Dl_info info;
 #  endif
@@ -131,7 +133,7 @@ void loadStandardTypes(DlWrapper& dlTypesWrapper, int argc, char** argv)
 void loadStandardSolver(DlWrapper& dlSolverWrapper, int argc, char** argv)
 {
   char * envSolversPath = getenv("G2O_SOLVERS_DIR");
-  string solversPath;
+  string solversPath = G2O_DEFAULT_SOLVERS_DIR_;
 
   if (envSolversPath != NULL) {
       solversPath = envSolversPath;
@@ -139,16 +141,12 @@ void loadStandardSolver(DlWrapper& dlSolverWrapper, int argc, char** argv)
 #if (defined UNIX)
     if (dladdr(&info, &info) != 0) {
       solversPath = getDirname(info.dli_fname);
-    } else {
-      solversPath = G2O_DEFAULT_SOLVERS_DIR_;
     }
 #elif (defined WINDOWS)
     char libFilename[MAX_PATH + 1];
     HMODULE instance = getMyInstance();
     if (instance && GetModuleFileName(instance, libFilename, MAX_PATH) > 0) {
       solversPath = getDirname(libFilename);
-    } else {
-      solversPath = G2O_DEFAULT_SOLVERS_DIR_;
     }
 #endif
   }
