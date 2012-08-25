@@ -44,7 +44,7 @@
 #include <WinBase.h>
 #endif
 
-#if defined (UNIX) || defined(CYGWIN)
+#if (defined (UNIX) || defined(CYGWIN)) && !defined(ANDROID)
 #include <wordexp.h>
 #endif
 
@@ -134,7 +134,7 @@ std::vector<std::string> getFilesByPattern(const char* pattern)
     FindClose(hFind);
   }
   
-#elif defined (UNIX) || defined (CYGWIN)
+#elif (defined (UNIX) || defined (CYGWIN)) && !defined(ANDROID)
 
   wordexp_t p;
   wordexp(pattern, &p, 0);

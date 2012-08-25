@@ -30,6 +30,7 @@
 #include "g2o/core/jacobian_workspace.h"
 #include "g2o/stuff/macros.h"
 #include "edge_se3.h"
+#include "edge_se3_prior.h"
 
 using namespace std;
 using namespace g2o;
@@ -46,6 +47,56 @@ Eigen::Isometry3d randomIsometry3d()
 
 int main(int , char** )
 {
+  if (0) {
+    OptimizableGraph graph;
+    ParameterSE3Offset* offsetParam = new ParameterSE3Offset;
+    offsetParam->setId(0);
+    graph.addParameter(offsetParam);
+
+    Eigen::Isometry3d zeroPose = Eigen::Isometry3d::Identity();
+    VertexSE3* v1 = new VertexSE3;
+    v1->setId(0);
+    graph.addVertex(v1);
+    OptimizableGraph::VertexSet auxSet;
+    EdgeSE3Prior* priorEdge = new EdgeSE3Prior;
+    priorEdge->setVertex(0, v1);
+    priorEdge->setMeasurement(randomIsometry3d());
+    priorEdge->setParameterId(0, 0);
+    cout << PVAR(priorEdge->measurement().matrix()) << endl;
+    graph.addEdge(priorEdge);
+
+    Eigen::Matrix<double,6,6> information = Eigen::Matrix<double,6,6>::Identity();
+
+    cout << "Full information" << endl;
+    v1->setEstimate(zeroPose);
+    priorEdge->setInformation(information);
+    priorEdge->initialEstimate(auxSet, 0);
+    cout << PVAR(priorEdge->chi2()) << endl;
+    cout << v1->estimate().matrix() << endl << endl;
+    priorEdge->computeError();
+
+    cout << "Only translation" << endl;
+    v1->setEstimate(zeroPose);
+    information.block<3,3>(0,0) = Eigen::Matrix3d::Identity();
+    information.block<3,3>(3,3) = Eigen::Matrix3d::Zero();
+    priorEdge->setInformation(information);
+    priorEdge->initialEstimate(auxSet, 0);
+    cout << PVAR(priorEdge->chi2()) << endl;
+    cout << v1->estimate().matrix() << endl << endl;
+    priorEdge->computeError();
+
+    cout << "Only rotation" << endl;
+    v1->setEstimate(zeroPose);
+    information.block<3,3>(0,0) = Eigen::Matrix3d::Zero();
+    information.block<3,3>(3,3) = Eigen::Matrix3d::Identity();
+    priorEdge->setInformation(information);
+    priorEdge->initialEstimate(auxSet, 0);
+    cout << PVAR(priorEdge->chi2()) << endl;
+    cout << v1->estimate().matrix() << endl << endl;
+    priorEdge->computeError();
+    return 0;
+  }
+
   VertexSE3 v1;
   v1.setId(0); 
 

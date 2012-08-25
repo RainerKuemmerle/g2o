@@ -115,13 +115,14 @@ namespace g2o {
 
   void EdgeSE3Prior::initialEstimate(const OptimizableGraph::VertexSet& /*from_*/, OptimizableGraph::Vertex* /*to_*/) {
     VertexSE3 *v = static_cast<VertexSE3*>(_vertices[0]);
+    assert(v && "Vertex for the Prior edge is not set");
 
     Eigen::Isometry3d newEstimate = _offsetParam->offset().inverse() * measurement();
-    if (_information.block<3,3>(0,0).squaredNorm()!=0){ // do not set translation 
+    if (_information.block<3,3>(0,0).array().abs().sum() == 0){ // do not set translation, as that part of the information is all zero
       newEstimate.translation()=v->estimate().translation();
     }
-    if (_information.block<3,3>(3,3).squaredNorm()==0){ // do not set rotation
-      newEstimate.matrix().block<3,3>(0,0) = v->estimate().rotation();
+    if (_information.block<3,3>(3,3).array().abs().sum() == 0){ // do not set rotation, as that part of the information is all zero
+      newEstimate.matrix().block<3,3>(0,0) = internal::extractRotation(v->estimate());
     }
     v->setEstimate(newEstimate);
   }
