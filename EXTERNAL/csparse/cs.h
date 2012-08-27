@@ -9,10 +9,10 @@
 #include "mex.h"
 #endif
 #define CS_VER 3                    /* CSparse Version */
-#define CS_SUBVER 0
-#define CS_SUBSUB 1
-#define CS_DATE "Jan 19, 2010"     /* CSparse release date */
-#define CS_COPYRIGHT "Copyright (c) Timothy A. Davis, 2006-2010"
+#define CS_SUBVER 1
+#define CS_SUBSUB 0
+#define CS_DATE "Jun 1, 2012"       /* CSparse release date */
+#define CS_COPYRIGHT "Copyright (c) Timothy A. Davis, 2006-2012"
 
 #include "cs_api.h"
 
@@ -20,7 +20,9 @@
 extern "C" {
 #endif
 
-
+// rk: We define csi to be int to be backward compatible with older CSparse releases.
+//     At some point we might adapt the internal structures of g2o to use the same type
+//     as the one given is this header file.
 #define csi int
 
 /* -------------------------------------------------------------------------- */
@@ -33,6 +35,7 @@ extern "C" {
    can also compile with -Dcsi=int (or whatever) to change csi without editting
    this file. */
 #ifdef MATLAB_MEX_FILE
+#undef csi
 #define csi mwSignedIndex
 #endif
 #ifndef csi

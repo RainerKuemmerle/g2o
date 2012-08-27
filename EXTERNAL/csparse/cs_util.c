@@ -35,7 +35,7 @@ cs *cs_spfree (cs *A)
     cs_free (A->p) ;
     cs_free (A->i) ;
     cs_free (A->x) ;
-    return (cs_free (A)) ;      /* free the cs struct and return NULL */
+    return ((cs *) cs_free (A)) ;   /* free the cs struct and return NULL */
 }
 
 /* free a numeric factorization */
@@ -46,7 +46,7 @@ csn *cs_nfree (csn *N)
     cs_spfree (N->U) ;
     cs_free (N->pinv) ;
     cs_free (N->B) ;
-    return (cs_free (N)) ;      /* free the csn struct and return NULL */
+    return ((csn *) cs_free (N)) ;  /* free the csn struct and return NULL */
 }
 
 /* free a symbolic factorization */
@@ -58,7 +58,7 @@ css *cs_sfree (css *S)
     cs_free (S->parent) ;
     cs_free (S->cp) ;
     cs_free (S->leftmost) ;
-    return (cs_free (S)) ;      /* free the css struct and return NULL */
+    return ((css *) cs_free (S)) ;  /* free the css struct and return NULL */
 }
 
 /* allocate a cs_dmperm or cs_scc result */
@@ -82,7 +82,7 @@ csd *cs_dfree (csd *D)
     cs_free (D->q) ;
     cs_free (D->r) ;
     cs_free (D->s) ;
-    return (cs_free (D)) ;
+    return ((csd *) cs_free (D)) ;  /* free the csd struct and return NULL */
 }
 
 /* free workspace and return a sparse matrix result */
@@ -98,7 +98,7 @@ csi *cs_idone (csi *p, cs *C, void *w, csi ok)
 {
     cs_spfree (C) ;                     /* free temporary matrix */
     cs_free (w) ;                       /* free workspace */
-    return (ok ? p : cs_free (p)) ;     /* return result if OK, else free it */
+    return (ok ? p : (csi *) cs_free (p)) ; /* return result, or free it */
 }
 
 /* free workspace and return a numeric factorization (Cholesky, LU, or QR) */
