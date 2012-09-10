@@ -144,6 +144,13 @@
         </widget>
        </item>
        <item>
+        <widget class="QPushButton" name="btnSetZero">
+         <property name="text">
+          <string>SetZero</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QPushButton" name="btnOptimize">
          <property name="text">
           <string>Optimize</string>
@@ -220,7 +227,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>23</height>
+     <height>25</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">

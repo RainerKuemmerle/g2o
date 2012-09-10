@@ -120,6 +120,16 @@ void MainWindow::on_btnInitialGuess_clicked()
   viewer->updateGL();
 }
 
+void MainWindow::on_btnSetZero_clicked()
+{
+  if (viewer->graph->activeEdges().size() == 0)
+    viewer->graph->initializeOptimization();
+
+  viewer->graph->setToOrigin();
+  viewer->setUpdateDisplay(true);
+  viewer->updateGL();
+}
+
 void MainWindow::fixGraph()
 {
   if (viewer->graph->vertices().size() == 0 || viewer->graph->edges().size() == 0) {
