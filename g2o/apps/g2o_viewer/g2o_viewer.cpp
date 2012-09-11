@@ -87,7 +87,8 @@ int main(int argc, char** argv)
   // set up the GUI action
   GuiHyperGraphAction guiHyperGraphAction;
   guiHyperGraphAction.viewer = mw.viewer;
-  optimizer->addPostIterationAction(&guiHyperGraphAction);
+  //optimizer->addPostIterationAction(&guiHyperGraphAction);
+  optimizer->addPreIterationAction(&guiHyperGraphAction);
 
   if (inputFilename.size() > 0) {
     mw.loadFromFile(QString::fromStdString(inputFilename));
