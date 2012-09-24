@@ -311,7 +311,7 @@ namespace g2o {
         int dimension() const { return _dimension;}
 
         //! sets the id of the node in the graph be sure that the graph keeps consistent after changing the id
-        void setId(int id) {_id = id;}
+        virtual void setId(int id) {_id = id;}
 
         //! set the row of this vertex in the Hessian
         void setColInHessian(int c) { _colInHessian = c;}

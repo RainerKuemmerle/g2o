@@ -82,6 +82,20 @@ namespace g2o {
     return true;
   }
 
+  /**
+   * changes the id of a vertex already in the graph, and updates the bookkeeping
+   @ returns false if the vertex is not in the graph;
+  */
+  bool HyperGraph::changeId(Vertex* v, int newId){
+    Vertex* v2 = vertex(v->id());
+    if (v != v2)
+      return false;
+    _vertices.erase(v->id());
+    v->setId(newId);
+    _vertices.insert(std::make_pair(v->id(), v));
+    return true;
+  }
+
   bool HyperGraph::addEdge(Edge* e)
   {
     std::pair<EdgeSet::iterator, bool> result = _edges.insert(e);

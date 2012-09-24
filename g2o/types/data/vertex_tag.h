@@ -67,7 +67,7 @@ namespace g2o {
             HyperGraphElementAction::Parameters* params_ );
   protected:
     virtual bool refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_);
-    IntProperty* _textSize;
+    DoubleProperty* _textSize;
   };
 #endif
 

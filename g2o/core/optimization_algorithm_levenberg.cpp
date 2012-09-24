@@ -86,6 +86,7 @@ namespace g2o {
     // core part of the Levenbarg algorithm
     if (iteration == 0) {
       _currentLambda = computeLambdaInit();
+      _ni = 2;
     }
 
     double rho=0;
@@ -155,7 +156,7 @@ namespace g2o {
       assert(v);
       int dim = v->dimension();
       for (int j = 0; j < dim; ++j){
-        maxDiagonal = std::max(fabs(v->hessian(j,j)),maxDiagonal); 
+        maxDiagonal = std::max(fabs(v->hessian(j,j)),maxDiagonal);
       }
     }
     return _tau*maxDiagonal;

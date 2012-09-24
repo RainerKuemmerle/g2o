@@ -102,6 +102,11 @@ namespace g2o {
      */
     virtual void computeInitialGuess();
 
+    /**
+     * sets all vertices to their origin.
+     */
+    virtual void setToOrigin();
+
 
     /**
      * starts one optimization run given the current configuration of the graph, 
