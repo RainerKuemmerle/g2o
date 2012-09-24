@@ -69,7 +69,7 @@ namespace g2o {
     virtual bool refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_);
     IntProperty* _beamsDownsampling;
     FloatProperty* _pointSize;
-
+    FloatProperty* _maxRange;
   };
 #endif
 

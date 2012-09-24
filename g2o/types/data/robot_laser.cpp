@@ -128,9 +128,11 @@ namespace g2o {
     if (_previousParams){
       _beamsDownsampling = _previousParams->makeProperty<IntProperty>(_typeName + "::BEAMS_DOWNSAMPLING", 1);
       _pointSize = _previousParams->makeProperty<FloatProperty>(_typeName + "::POINT_SIZE", .05f);
+      _maxRange = _previousParams->makeProperty<FloatProperty>(_typeName + "::MAX_RANGE", -1.);
     } else {
       _beamsDownsampling = 0;
       _pointSize= 0;
+      _maxRange = 0;
     }
     return true;
   }
@@ -149,7 +151,22 @@ namespace g2o {
     RobotLaser* that = static_cast<RobotLaser*>(element);
 
     RawLaser::Point2DVector points=that->cartesian();
-
+    if (_maxRange && _maxRange->value() >=0 ) {
+      // prune the cartesian points;
+      RawLaser::Point2DVector npoints(points.size());
+      int k = 0;
+      float r2=_maxRange->value();
+      r2 *= r2;
+      for (size_t i=0; i<points.size(); i++){
+	float x = points[i].x();
+	float y = points[i].y();
+	if (x*x + y*y < r2)
+	  npoints[k++] = points[i];
+      }
+      points = npoints;
+    }
+    
+    
     glPushMatrix();
     const SE2& laserPose = that->laserParams().laserPose;
     glTranslatef((float)laserPose.translation().x(), (float)laserPose.translation().y(), 0.f);
