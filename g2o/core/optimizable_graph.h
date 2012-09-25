@@ -1,3 +1,4 @@
+
 // g2o - General Graph Optimization
 // Copyright (C) 2011 R. Kuemmerle, G. Grisetti, H. Strasdat, W. Burgard
 // All rights reserved.
@@ -140,7 +141,13 @@ namespace g2o {
         Data* userData() { return _userData; }
 
         void setUserData(Data* obs) { _userData = obs;}
-
+	void addUserData(Data* obs) { 
+	  if (obs) {
+	    obs->setNext(_userData);
+	    _userData=obs;
+	  }
+	}
+	
         virtual ~Vertex();
 
         //! sets the node to the origin (used in the multilevel stuff)
