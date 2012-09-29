@@ -1,4 +1,3 @@
-
 // g2o - General Graph Optimization
 // Copyright (C) 2011 R. Kuemmerle, G. Grisetti, H. Strasdat, W. Burgard
 // All rights reserved.
@@ -645,8 +644,8 @@ namespace g2o {
     /**
      * verify that all the information of the edges are semi positive definite, i.e.,
      * all Eigenvalues are >= 0.
-     * @param verbose output edges with not SPD information matrix on cerr
-     * @return true if all edges have SPD information matrix
+     * @param verbose output edges with not PSD information matrix on cerr
+     * @return true if all edges have PSD information matrix
      */
     bool verifyInformationMatrices(bool verbose = false) const;
 

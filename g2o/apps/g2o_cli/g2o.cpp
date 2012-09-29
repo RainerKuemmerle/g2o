@@ -125,7 +125,6 @@ int main(int argc, char** argv)
   int updateGraphEachN = 10;
   string statsFile;
   string summaryFile;
-  string dummy;
   // command line parsing
   std::vector<int> gaugeList;
   CommandArgs arg;
@@ -145,8 +144,11 @@ int main(int argc, char** argv)
   arg.param("gaugeId", gaugeId, -1, "force the gauge");
   arg.param("o", outputfilename, "", "output final version of the graph");
   arg.param("solver", strSolver, "gn_var", "specify which solver to use underneat\n\t {gn_var, lm_fix3_2, gn_fix6_3, lm_fix7_3}");
+#ifndef G2O_DISABLE_DYNAMIC_LOADING_OF_LIBRARIES
+  string dummy;
   arg.param("solverlib", dummy, "", "specify a solver library which will be loaded");
   arg.param("typeslib", dummy, "", "specify a types library which will be loaded");
+#endif
   arg.param("stats", statsFile, "", "specify a file for the statistics");
   arg.param("listTypes", listTypes, false, "list the registered types");
   arg.param("listRobustKernels", listRobustKernels, false, "list the registered robust kernels");
@@ -163,16 +165,22 @@ int main(int argc, char** argv)
     cout << "# Used Compiler: " << G2O_CXX_COMPILER << endl;
   }
 
+#ifndef G2O_DISABLE_DYNAMIC_LOADING_OF_LIBRARIES
   // registering all the types from the libraries
   DlWrapper dlTypesWrapper;
   loadStandardTypes(dlTypesWrapper, argc, argv);
-
   // register all the solvers
-  OptimizationAlgorithmFactory* solverFactory = OptimizationAlgorithmFactory::instance();
   DlWrapper dlSolverWrapper;
   loadStandardSolver(dlSolverWrapper, argc, argv);
-  if (listSolvers)
-    solverFactory->listSolvers(cerr);
+#else
+  if (verbose)
+    cout << "# linked version of g2o" << endl;
+#endif
+
+  OptimizationAlgorithmFactory* solverFactory = OptimizationAlgorithmFactory::instance();
+  if (listSolvers) {
+    solverFactory->listSolvers(cout);
+  }
 
   if (listTypes) {
     Factory::instance()->printRegisteredTypes(cout, true);
