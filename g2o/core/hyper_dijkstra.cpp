@@ -25,6 +25,7 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <queue>
+#include <deque>
 #include <vector>
 #include <assert.h>
 #include <iostream>
@@ -203,7 +204,7 @@ namespace g2o{
       HyperGraph::VertexSet& childs(parentIt->second.children());
       for (HyperGraph::VertexSet::iterator childsIt=childs.begin(); childsIt!=childs.end(); ++childsIt){
         HyperGraph::Vertex* child=*childsIt;
-  //cerr << child->id();
+        //cerr << child->id();
         AdjacencyMap::iterator adjacencyIt=amap.find(child);
         assert (adjacencyIt!=amap.end());
         HyperGraph::Edge* edge=adjacencyIt->second.edge();  
@@ -211,11 +212,11 @@ namespace g2o{
         assert(adjacencyIt->first==child);
         assert(adjacencyIt->second.child()==child);
         assert(adjacencyIt->second.parent()==parent);
-  if (! useDistance) {
-    action->perform(child, parent, edge);
-  } else {
-    action->perform(child, parent, edge, adjacencyIt->second.distance());
-  }
+        if (! useDistance) {
+          action->perform(child, parent, edge);
+        } else {
+          action->perform(child, parent, edge, adjacencyIt->second.distance());
+        }
         q.push_back(child);
       }
       //cerr << endl;
