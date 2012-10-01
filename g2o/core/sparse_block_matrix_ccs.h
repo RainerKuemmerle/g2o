@@ -137,6 +137,67 @@ namespace g2o {
         }
       }
 
+      /**
+       * fill the CCS arrays of a matrix, arrays have to be allocated beforehand
+       */
+      int fillCCS(int* Cp, int* Ci, double* Cx, bool upperTriangle = false) const
+      {
+        assert(Cp && Ci && Cx && "Target destination is NULL");
+        int nz=0;
+        for (size_t i=0; i<_blockCols.size(); ++i){
+          int cstart=i ? _colBlockIndices[i-1] : 0;
+          int csize=colsOfBlock(i);
+          for (int c=0; c<csize; ++c) {
+            *Cp=nz;
+            for (typename SparseColumn::const_iterator it = _blockCols[i].begin(); it!=_blockCols[i].end(); ++it) {
+              const SparseMatrixBlock* b=it->block;
+              int rstart=it->row ? _rowBlockIndices[it->row-1] : 0;
+
+              int elemsToCopy = b->rows();
+              if (upperTriangle && rstart == cstart)
+                elemsToCopy = c + 1;
+              for (int r=0; r<elemsToCopy; ++r){
+                *Cx++ = (*b)(r,c);
+                *Ci++ = rstart++;
+                ++nz;
+              }
+            }
+            ++Cp;
+          }
+        }
+        *Cp=nz;
+        return nz;
+      }
+
+      /**
+       * fill the CCS arrays of a matrix, arrays have to be allocated beforehand. This function only writes
+       * the values and assumes that column and row structures have already been written.
+       */
+      int fillCCS(double* Cx, bool upperTriangle = false) const
+      {
+        assert(Cx && "Target destination is NULL");
+        double* CxStart = Cx;
+        int cstart = 0;
+        for (size_t i=0; i<_blockCols.size(); ++i){
+          int csize = _colBlockIndices[i] - cstart;
+          for (int c=0; c<csize; ++c) {
+            for (typename SparseColumn::const_iterator it = _blockCols[i].begin(); it!=_blockCols[i].end(); ++it) {
+              const SparseMatrixBlock* b = it->block;
+              int rstart = it->row ? _rowBlockIndices[it->row-1] : 0;
+
+              int elemsToCopy = b->rows();
+              if (upperTriangle && rstart == cstart)
+                elemsToCopy = c + 1;
+              memcpy(Cx, b->data() + c*b->rows(), elemsToCopy * sizeof(double));
+              Cx += elemsToCopy;
+
+            }
+          }
+          cstart = _colBlockIndices[i];
+        }
+        return Cx - CxStart;
+      }
+
     protected:
       const std::vector<int>& _rowBlockIndices; ///< vector of the indices of the blocks along the rows.
       const std::vector<int>& _colBlockIndices; ///< vector of the indices of the blocks along the cols

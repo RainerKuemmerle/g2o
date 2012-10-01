@@ -24,53 +24,19 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef G2O_VERTEX_TAG_H
-#define G2O_VERTEX_TAG_H
-
-#include "robot_data.h"
-#include "g2o_types_data_api.h"
-#include "g2o/core/hyper_graph_action.h"
+#include "g2o_viewer_api.h"
 
 namespace g2o {
 
+  class CommandArgs;
+
   /**
-   * \brief string tag to be attached to a vertex
-   *
-   * A laser measurement obtained by a robot. The measurement is equipped with a pose of the robot at which
-   * the measurement was taken. The read/write function correspond to the CARMEN logfile format.
+   * \brief wrapper for running the g2o viewer
    */
-  class G2O_TYPES_DATA_API VertexTag : public RobotData
+  class G2O_VIEWER_API RunG2OViewer
   {
     public:
-      EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
-      VertexTag();
-      ~VertexTag();
-
-      virtual bool write(std::ostream& os) const;
-      virtual bool read(std::istream& is);
-      
-      const std::string name() const { return _name;} 
-      void setName(const std::string& name_) {_name=name_;}
-      const Eigen::Vector3f& position() const {return _position;}
-      void setPosition( const Eigen::Vector3f& p) {_position = p;}
-    protected:
-      std::string _name;
-      Eigen::Vector3f _position;
-      Eigen::Vector3f _odom2d;
+      static int run(int argc, char** argv, CommandArgs& arg);
   };
 
- #ifdef G2O_HAVE_OPENGL 
-  class G2O_TYPES_DATA_API VertexTagDrawAction: public DrawAction{
-  public:
-    VertexTagDrawAction();
-    virtual HyperGraphElementAction* operator()(HyperGraph::HyperGraphElement* element,
-            HyperGraphElementAction::Parameters* params_ );
-  protected:
-    virtual bool refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_);
-    DoubleProperty* _textSize;
-  };
-#endif
-
-}
-
-#endif
+} // end namespace

@@ -29,7 +29,7 @@
 
 #define DIM_TO_SOLVER(p, l) BlockSolver< BlockSolverTraits<p, l> >
 
-#define ALLOC_CSPARSE(s, p, l, blockorder) \
+#define ALLOC_EIGEN_SPARSE_CHOLESKY(s, p, l, blockorder) \
   if (1) { \
     std::cerr << "# Using EigenSparseCholesky poseDim " << p << " landMarkDim " << l << " blockordering " << blockorder << std::endl; \
     LinearSolverEigen< DIM_TO_SOLVER(p, l)::PoseMatrixType >* linearSolver = new LinearSolverEigen<DIM_TO_SOLVER(p, l)::PoseMatrixType>(); \
@@ -50,26 +50,26 @@ namespace g2o {
     string solverName = fullSolverName.substr(3);
 
     if (solverName == "var_eigen") {
-      ALLOC_CSPARSE(s, -1, -1, true);
+      ALLOC_EIGEN_SPARSE_CHOLESKY(s, -1, -1, true);
     }
 #if 0
     else if (solverName == "fix3_2_eigen") {
-      ALLOC_CSPARSE(s, 3, 2, true);
+      ALLOC_EIGEN_SPARSE_CHOLESKY(s, 3, 2, true);
     }
     else if (solverName == "fix6_3_eigen") {
-      ALLOC_CSPARSE(s, 6, 3, true);
+      ALLOC_EIGEN_SPARSE_CHOLESKY(s, 6, 3, true);
     }
     else if (solverName == "fix7_3_eigen") {
-      ALLOC_CSPARSE(s, 7, 3, true);
+      ALLOC_EIGEN_SPARSE_CHOLESKY(s, 7, 3, true);
     }
     else if (solverName == "fix3_2_scalar_eigen") {
-      ALLOC_CSPARSE(s, 3, 2, false);
+      ALLOC_EIGEN_SPARSE_CHOLESKY(s, 3, 2, false);
     }
     else if (solverName == "fix6_3_scalar_eigen") {
-      ALLOC_CSPARSE(s, 6, 3, false);
+      ALLOC_EIGEN_SPARSE_CHOLESKY(s, 6, 3, false);
     }
     else if (solverName == "fix7_3_scalar_eigen") {
-      ALLOC_CSPARSE(s, 7, 3, false);
+      ALLOC_EIGEN_SPARSE_CHOLESKY(s, 7, 3, false);
     }
 #endif
 

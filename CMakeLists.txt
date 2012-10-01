@@ -88,12 +88,12 @@ IF(WIN32)
 ELSEIF(CYGWIN)
   MESSAGE(STATUS "Compiling on Cygwin")
   ADD_DEFINITIONS(-DCYGWIN)
-ELSEIF(UNIX)
-  ADD_DEFINITIONS(-DUNIX)
-  MESSAGE(STATUS "Compiling on Unix")
 ELSEIF(APPLE)
   ADD_DEFINITIONS(-DUNIX)
   MESSAGE(STATUS "Compiling on OSX")
+ELSEIF(UNIX)
+  ADD_DEFINITIONS(-DUNIX)
+  MESSAGE(STATUS "Compiling on Unix")
 ENDIF(WIN32)
 
 # detect Android Cross Compiler
@@ -160,6 +160,10 @@ SET(G2O_BUILD_APPS ON CACHE BOOL "Build g2o apps")
 IF(G2O_BUILD_APPS)
   MESSAGE(STATUS "Compiling g2o apps")
 ENDIF(G2O_BUILD_APPS)
+
+include(CMakeDependentOption)
+CMAKE_DEPENDENT_OPTION(G2O_BUILD_LINKED_APPS "Build apps linked with the libraries (no plugin system)" OFF
+  "G2O_BUILD_APPS" OFF)
 
 # shall we build the examples
 SET(G2O_BUILD_EXAMPLES ON CACHE BOOL "Build g2o examples")

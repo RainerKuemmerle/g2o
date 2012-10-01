@@ -102,6 +102,7 @@ namespace g2o {
           virtual ~Vertex();
           //! returns the id
           int id() const {return _id;}
+	  virtual void setId( int newId) { _id=newId; }
           //! returns the set of hyper-edges that are leaving/entering in this vertex
           const EdgeSet& edges() const {return _edges;}
           //! returns the set of hyper-edges that are leaving/entering in this vertex
@@ -196,6 +197,12 @@ namespace g2o {
        * does nothing and returns false. Otherwise it returns true.
        */
       virtual bool addEdge(Edge* e);
+
+      /**
+       * changes the id of a vertex already in the graph, and updates the bookkeeping
+       @ returns false if the vertex is not in the graph;
+       */
+      virtual bool changeId(Vertex* v, int newId);
 
     protected:
       VertexIDMap _vertices;

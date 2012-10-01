@@ -139,7 +139,13 @@ namespace g2o {
         Data* userData() { return _userData; }
 
         void setUserData(Data* obs) { _userData = obs;}
-
+	void addUserData(Data* obs) { 
+	  if (obs) {
+	    obs->setNext(_userData);
+	    _userData=obs;
+	  }
+	}
+	
         virtual ~Vertex();
 
         //! sets the node to the origin (used in the multilevel stuff)
@@ -310,7 +316,7 @@ namespace g2o {
         int dimension() const { return _dimension;}
 
         //! sets the id of the node in the graph be sure that the graph keeps consistent after changing the id
-        void setId(int id) {_id = id;}
+        virtual void setId(int id) {_id = id;}
 
         //! set the row of this vertex in the Hessian
         void setColInHessian(int c) { _colInHessian = c;}
@@ -637,8 +643,8 @@ namespace g2o {
     /**
      * verify that all the information of the edges are semi positive definite, i.e.,
      * all Eigenvalues are >= 0.
-     * @param verbose output edges with not SPD information matrix on cerr
-     * @return true if all edges have SPD information matrix
+     * @param verbose output edges with not PSD information matrix on cerr
+     * @return true if all edges have PSD information matrix
      */
     bool verifyInformationMatrices(bool verbose = false) const;
 

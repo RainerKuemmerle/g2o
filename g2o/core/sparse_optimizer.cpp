@@ -290,6 +290,13 @@ namespace g2o{
     return buildIndexMapping(_activeVertices);
   }
 
+  void SparseOptimizer::setToOrigin(){
+    for (VertexIDMap::iterator it=vertices().begin(); it!=vertices().end(); ++it) {
+      OptimizableGraph::Vertex* v = static_cast<OptimizableGraph::Vertex*>(it->second);
+      v->setToOrigin();
+    }
+  }
+
   void SparseOptimizer::computeInitialGuess()
   {
     OptimizableGraph::VertexSet emptySet;
