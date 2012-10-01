@@ -476,9 +476,9 @@ bool OptimizableGraph::load(istream& is, bool createEdges)
           }
         }
         if (from && to) {
-          e->read(currentLine);
           e->setVertex(0, from);
           e->setVertex(1, to);
+          e->read(currentLine);
           if (!addEdge(e)) {
             cerr << __PRETTY_FUNCTION__ << ": Unable to add edge " << token << " " << id1 << " <-> " << id2 << endl;
             delete e;
