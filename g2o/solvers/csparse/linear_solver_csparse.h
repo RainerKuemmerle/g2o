@@ -68,11 +68,11 @@ struct G2O_SOLVER_CSPARSE_API CSparseExt : public cs
  * \brief linear solver which uses CSparse
  */
 template <typename MatrixType>
-class LinearSolverCSparse : public LinearSolver<MatrixType>
+class LinearSolverCSparse : public LinearSolverCCS<MatrixType>
 {
   public:
     LinearSolverCSparse() :
-      LinearSolver<MatrixType>()
+      LinearSolverCCS<MatrixType>()
     {
       _symbolicDecomposition = 0;
       _csWorkspaceSize = -1;
@@ -209,7 +209,7 @@ class LinearSolverCSparse : public LinearSolver<MatrixType>
       if (numericCholesky) {
         MarginalCovarianceCholesky mcc;
         mcc.setCholeskyFactor(_ccsA->n, numericCholesky->L->p, numericCholesky->L->i, numericCholesky->L->x, _symbolicDecomposition->pinv);
-  mcc.computeCovariance(spinv, A.rowBlockIndices(), blockIndices);
+        mcc.computeCovariance(spinv, A.rowBlockIndices(), blockIndices);
         cs_nfree(numericCholesky);
       } else {
         ok = 0;
@@ -309,6 +309,8 @@ class LinearSolverCSparse : public LinearSolver<MatrixType>
 
     void fillCSparse(const SparseBlockMatrix<MatrixType>& A, bool onlyValues)
     {
+      if (! onlyValues)
+        this->initMatrixStructure(A);
       int m = A.rows();
       int n = A.cols();
       assert(m > 0 && n > 0 && "Hessian has 0 rows/cols");
@@ -333,9 +335,9 @@ class LinearSolverCSparse : public LinearSolver<MatrixType>
       _ccsA->n = n;
 
       if (onlyValues) {
-        A.fillCCS(_ccsA->x, true);
+        this->_ccsMatrix->fillCCS(_ccsA->x, true);
       } else {
-        int nz = A.fillCCS(_ccsA->p, _ccsA->i, _ccsA->x, true); (void) nz;
+        int nz = this->_ccsMatrix->fillCCS(_ccsA->p, _ccsA->i, _ccsA->x, true); (void) nz;
         assert(nz <= _ccsA->nzmax);
       }
       _ccsA->nz=-1; // tag as CCS formatted matrix

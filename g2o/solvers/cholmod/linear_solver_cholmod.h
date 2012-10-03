@@ -73,11 +73,11 @@ struct CholmodExt : public cholmod_sparse
  * \brief basic solver for Ax = b which has to reimplemented for different linear algebra libraries
  */
 template <typename MatrixType>
-class LinearSolverCholmod : public LinearSolver<MatrixType>
+class LinearSolverCholmod : public LinearSolverCCS<MatrixType>
 {
   public:
     LinearSolverCholmod() :
-      LinearSolver<MatrixType>()
+      LinearSolverCCS<MatrixType>()
     {
       _writeDebug = true;
       _blockOrdering = false;
@@ -339,6 +339,8 @@ class LinearSolverCholmod : public LinearSolver<MatrixType>
 
     void fillCholmodExt(const SparseBlockMatrix<MatrixType>& A, bool onlyValues)
     {
+      if (! onlyValues)
+        this->initMatrixStructure(A);
       size_t m = A.rows();
       size_t n = A.cols();
       assert(m > 0 && n > 0 && "Hessian has 0 rows/cols");
@@ -364,9 +366,9 @@ class LinearSolverCholmod : public LinearSolver<MatrixType>
       _cholmodSparse->nrow = m;
 
       if (onlyValues)
-        A.fillCCS((double*)_cholmodSparse->x, true);
+        this->_ccsMatrix->fillCCS((double*)_cholmodSparse->x, true);
       else
-        A.fillCCS((int*)_cholmodSparse->p, (int*)_cholmodSparse->i, (double*)_cholmodSparse->x, true);
+        this->_ccsMatrix->fillCCS((int*)_cholmodSparse->p, (int*)_cholmodSparse->i, (double*)_cholmodSparse->x, true);
     }
 
 };

@@ -18,94 +18,35 @@
 
 #include <iostream>
 
-#include "main_window.h"
-#include "stream_redirect.h"
+#include "run_g2o_viewer.h"
 
-#include "gui_hyper_graph_action.h"
-
-#include "g2o/config.h"
-#include "g2o/core/sparse_optimizer.h"
-#include "g2o/core/factory.h"
-#include "g2o/core/optimization_algorithm_factory.h"
-#include "g2o/core/hyper_graph_action.h"
-
+#include "g2o/core/optimizable_graph.h"
 #include "g2o/apps/g2o_cli/g2o_common.h"
 #include "g2o/apps/g2o_cli/dl_wrapper.h"
-
 #include "g2o/stuff/command_args.h"
-#include "g2o/stuff/opengl_wrapper.h"
 
 #include <QApplication>
-#include <QThread>
 using namespace std;
 using namespace g2o;
-
-/**
- * \brief helper for calling usleep on any system using Qt
- */
-class SleepThread : public QThread
-{
-  public: // make the proctected methods publicly available
-    using QThread::msleep;
-    using QThread::usleep;
-};
 
 int main(int argc, char** argv)
 {
   OptimizableGraph::initMultiThreading();
   QApplication qapp(argc, argv);
 
-  string dummy;
-  string inputFilename;
   CommandArgs arg;
+#ifndef G2O_DISABLE_DYNAMIC_LOADING_OF_LIBRARIES
+  string dummy;
   arg.param("solverlib", dummy, "", "specify a solver library which will be loaded");
   arg.param("typeslib", dummy, "", "specify a types library which will be loaded");
-  arg.paramLeftOver("graph-input", inputFilename, "", "graph file which will be processed", true);
-
-  arg.parseArgs(argc, argv);
-  
   // loading the standard solver /  types
   DlWrapper dlTypesWrapper;
   loadStandardTypes(dlTypesWrapper, argc, argv);
-
   // register all the solvers
   DlWrapper dlSolverWrapper;
   loadStandardSolver(dlSolverWrapper, argc, argv);
+#endif
 
-  MainWindow mw;
-  mw.updateDisplayedSolvers();
-  mw.updateRobustKernels();
-  mw.show();
-
-  // redirect the output that normally goes to cerr to the textedit in the viewer
-  StreamRedirect redirect(cerr, mw.plainTextEdit);
-
-  // setting up the optimizer
-  SparseOptimizer* optimizer = new SparseOptimizer();
-  mw.viewer->graph = optimizer;
-
-  // set up the GUI action
-  GuiHyperGraphAction guiHyperGraphAction;
-  guiHyperGraphAction.viewer = mw.viewer;
-  //optimizer->addPostIterationAction(&guiHyperGraphAction);
-  optimizer->addPreIterationAction(&guiHyperGraphAction);
-
-  if (inputFilename.size() > 0) {
-    mw.loadFromFile(QString::fromStdString(inputFilename));
-  }
-
-  while (mw.isVisible()) {
-    guiHyperGraphAction.dumpScreenshots = mw.actionDump_Images->isChecked();
-    qapp.processEvents();
-    SleepThread::msleep(10);
-  }
-
-  delete optimizer;
-
-  // destroy all the singletons
-  //Factory::destroy();
-  //OptimizationAlgorithmFactory::destroy();
-  //HyperGraphActionLibrary::destroy();
-
-  return 0;
+  // run the viewer
+  return RunG2OViewer::run(argc, argv, arg);
 }
