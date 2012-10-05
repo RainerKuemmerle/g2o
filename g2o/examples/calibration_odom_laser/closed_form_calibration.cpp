@@ -102,53 +102,51 @@ bool ClosedFormCalibration::calibrate(const MotionInformationVector& measurement
 
   // compute lagrange multiplier
   // and solve the constrained least squares problem
-  {
-    double m11 = M(0,0);
-    double m13 = M(0,2);
-    double m14 = M(0,3);
-    double m15 = M(0,4);
-    double m22 = M(1,1);
-    double m34 = M(2,3);
-    double m35 = M(2,4);
-    double m44 = M(3,3); 
+  double m11 = M(0,0);
+  double m13 = M(0,2);
+  double m14 = M(0,3);
+  double m15 = M(0,4);
+  double m22 = M(1,1);
+  double m34 = M(2,3);
+  double m35 = M(2,4);
+  double m44 = M(3,3); 
 
-    double a = m11 * SQR(m22) - m22 * SQR(m13);
-    double b = 2*m11 * SQR(m22) * m44 - SQR(m22) * SQR(m14) - 2*m22 * SQR(m13) * m44 - 2*m11 * m22 * SQR(m34) 
-      - 2*m11 * m22 * SQR(m35) - SQR(m22) * SQR(m15) + 2*m13 * m22 * m34 * m14 + SQR(m13) * SQR(m34) 
-      + 2*m13 * m22 * m35 * m15 + SQR(m13) * SQR(m35);
-    double c = - 2*m13 * CUBE(m35) * m15 - m22 * SQR(m13) * SQR(m44) + m11 * SQR(m22) * SQR(m44) + SQR(m13) * SQR(m35) * m44
-      + 2*m13 * m22 * m34 * m14 * m44 + SQR(m13) * SQR(m34) * m44 - 2*m11 * m22 * SQR(m34) * m44 - 2 * m13 * CUBE(m34) * m14
-      - 2*m11 * m22 * SQR(m35) * m44 + 2*m11 * SQR(m35) * SQR(m34) + m22 * SQR(m14) * SQR(m35) - 2*m13 * SQR(m35) * m34 * m14
-      - 2*m13 * SQR(m34) * m35 * m15 + m11 * std::pow(m34, 4) + m22 * SQR(m15) * SQR(m34) + m22 * SQR(m35) * SQR(m15)
-      + m11 * std::pow(m35, 4) - SQR(m22) * SQR(m14) * m44 + 2*m13 * m22 * m35 * m15 * m44 + m22 * SQR(m34) * SQR(m14)
-      - SQR(m22) * SQR(m15) * m44;
+  double a = m11 * SQR(m22) - m22 * SQR(m13);
+  double b = 2*m11 * SQR(m22) * m44 - SQR(m22) * SQR(m14) - 2*m22 * SQR(m13) * m44 - 2*m11 * m22 * SQR(m34) 
+    - 2*m11 * m22 * SQR(m35) - SQR(m22) * SQR(m15) + 2*m13 * m22 * m34 * m14 + SQR(m13) * SQR(m34) 
+    + 2*m13 * m22 * m35 * m15 + SQR(m13) * SQR(m35);
+  double c = - 2*m13 * CUBE(m35) * m15 - m22 * SQR(m13) * SQR(m44) + m11 * SQR(m22) * SQR(m44) + SQR(m13) * SQR(m35) * m44
+    + 2*m13 * m22 * m34 * m14 * m44 + SQR(m13) * SQR(m34) * m44 - 2*m11 * m22 * SQR(m34) * m44 - 2 * m13 * CUBE(m34) * m14
+    - 2*m11 * m22 * SQR(m35) * m44 + 2*m11 * SQR(m35) * SQR(m34) + m22 * SQR(m14) * SQR(m35) - 2*m13 * SQR(m35) * m34 * m14
+    - 2*m13 * SQR(m34) * m35 * m15 + m11 * std::pow(m34, 4) + m22 * SQR(m15) * SQR(m34) + m22 * SQR(m35) * SQR(m15)
+    + m11 * std::pow(m35, 4) - SQR(m22) * SQR(m14) * m44 + 2*m13 * m22 * m35 * m15 * m44 + m22 * SQR(m34) * SQR(m14)
+    - SQR(m22) * SQR(m15) * m44;
 
-    // solve the quadratic equation
-    double lambda1, lambda2;
-    if(a < std::numeric_limits<double>::epsilon()) {
-      if(b <= std::numeric_limits<double>::epsilon())
-        return false;
-      lambda1 = lambda2 = -c/b;
-    } else {
-      double delta = b*b - 4*a*c;
-      if (delta < 0)
-        return false;
-      lambda1 = 0.5 * (-b-sqrt(delta)) / a;
-      lambda2 = 0.5 * (-b+sqrt(delta)) / a;
-    }
-
-    Eigen::VectorXd x1 = solveLagrange(M, lambda1);
-    Eigen::VectorXd x2 = solveLagrange(M, lambda2);
-    double err1 = x1.dot(M * x1);
-    double err2 = x2.dot(M * x2);
-
-    const Eigen::VectorXd& calibrationResult = err1 < err2 ? x1 : x2;
-    odomParams(0) = - calibrationResult(0) * J_21;
-    odomParams(1) = calibrationResult(0) * J_22;
-    odomParams(2) = calibrationResult(0);
-
-    laserOffset = SE2(calibrationResult(1), calibrationResult(2), atan2(calibrationResult(4), calibrationResult(3)));
+  // solve the quadratic equation
+  double lambda1, lambda2;
+  if(a < std::numeric_limits<double>::epsilon()) {
+    if(b <= std::numeric_limits<double>::epsilon())
+      return false;
+    lambda1 = lambda2 = -c/b;
+  } else {
+    double delta = b*b - 4*a*c;
+    if (delta < 0)
+      return false;
+    lambda1 = 0.5 * (-b-sqrt(delta)) / a;
+    lambda2 = 0.5 * (-b+sqrt(delta)) / a;
   }
+
+  Eigen::VectorXd x1 = solveLagrange(M, lambda1);
+  Eigen::VectorXd x2 = solveLagrange(M, lambda2);
+  double err1 = x1.dot(M * x1);
+  double err2 = x2.dot(M * x2);
+
+  const Eigen::VectorXd& calibrationResult = err1 < err2 ? x1 : x2;
+  odomParams(0) = - calibrationResult(0) * J_21;
+  odomParams(1) = calibrationResult(0) * J_22;
+  odomParams(2) = calibrationResult(0);
+
+  laserOffset = SE2(calibrationResult(1), calibrationResult(2), atan2(calibrationResult(4), calibrationResult(3)));
 
   return true;
 }
