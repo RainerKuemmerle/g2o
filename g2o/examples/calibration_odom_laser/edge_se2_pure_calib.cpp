@@ -58,8 +58,6 @@ void EdgeSE2PureCalib::computeError()
   Ku_ij.fromVector(mm.measurement());
 
   SE2 laserMotionInRobotFrame = laserOffset->estimate() * measurement().laserMotion * laserOffset->estimate().inverse();
-  //std::cerr << "laser " << laserMotionInRobotFrame.toVector().transpose() << std::endl;
-  //std::cerr << "odom " << Ku_ij.toVector().transpose() << std::endl;
   SE2 delta = Ku_ij.inverse() * laserMotionInRobotFrame;
   _error = delta.toVector();
 }
