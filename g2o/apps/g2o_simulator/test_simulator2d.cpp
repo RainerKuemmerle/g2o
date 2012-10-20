@@ -72,8 +72,8 @@ int main(int argc, char** argv) {
   World world(&graph);
   for (int i=0; i<nlandmarks; i++){
     WorldObjectPointXY * landmark = new WorldObjectPointXY;
-    double x = sampleUniform(-.5,.5, &generator)*worldSize;
-    double y = sampleUniform(-.5,.5, &generator)*worldSize;
+    double x = sampleUniform(-.5,.5, &generator)*(worldSize+5);
+    double y = sampleUniform(-.5,.5, &generator)*(worldSize+5);
     landmark->vertex()->setEstimate(Vector2d(x,y));
     world.addWorldObject(landmark);
   }
