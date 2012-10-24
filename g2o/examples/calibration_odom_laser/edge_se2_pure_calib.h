@@ -24,55 +24,40 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef G2O_ROBOT_LASER_H
-#define G2O_ROBOT_LASER_H
+#ifndef EDGE_SE2_PURE_CALIB_H
+#define EDGE_SE2_PURE_CALIB_H
 
-#include "raw_laser.h"
-#include "g2o_types_data_api.h"
-#include "g2o/core/hyper_graph_action.h"
+#include "g2o_calibration_odom_laser_api.h"
+
+#include "g2o/types/sclam2d/odometry_measurement.h"
+#include "g2o/types/sclam2d/vertex_odom_differential_params.h"
+#include "g2o/types/slam2d/vertex_se2.h"
+#include "g2o/core/base_binary_edge.h"
 
 namespace g2o {
 
+  struct G2O_CALIBRATION_ODOM_LASER_API OdomAndLaserMotion
+  {
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
+    VelocityMeasurement velocityMeasurement;
+    SE2 laserMotion;
+  };
+
   /**
-   * \brief laser measurement obtained by a robot
-   *
-   * A laser measurement obtained by a robot. The measurement is equipped with a pose of the robot at which
-   * the measurement was taken. The read/write function correspond to the CARMEN logfile format.
+   * \brief calibrate odometry and laser based on a set of measurements
    */
-  class G2O_TYPES_DATA_API RobotLaser : public RawLaser
+  class G2O_CALIBRATION_ODOM_LASER_API EdgeSE2PureCalib : public BaseBinaryEdge<3, OdomAndLaserMotion, VertexSE2, VertexOdomDifferentialParams>
   {
     public:
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
-      RobotLaser();
-      ~RobotLaser();
+      EdgeSE2PureCalib();
 
-      virtual bool write(std::ostream& os) const;
+      void computeError();
+
       virtual bool read(std::istream& is);
-
-      SE2 laserPose() const { return _odomPose * _laserParams.laserPose;} 
-      const SE2& odomPose() const { return _odomPose;}
-      void setOdomPose(const SE2& odomPose);
-
-    protected:
-      SE2 _odomPose;
-      //! velocities and safety distances of the robot.
-      double _laserTv, _laserRv, _forwardSafetyDist, _sideSaftyDist, _turnAxis;
+      virtual bool write(std::ostream& os) const;
   };
 
-#ifdef G2O_HAVE_OPENGL
-  class G2O_TYPES_DATA_API RobotLaserDrawAction: public DrawAction{
-  public:
-    RobotLaserDrawAction();
-    virtual HyperGraphElementAction* operator()(HyperGraph::HyperGraphElement* element, 
-            HyperGraphElementAction::Parameters* params_ );
-  protected:
-    virtual bool refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_);
-    IntProperty* _beamsDownsampling;
-    FloatProperty* _pointSize;
-    FloatProperty* _maxRange;
-  };
-#endif
-
-}
+} // end namespace
 
 #endif
