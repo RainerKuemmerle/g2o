@@ -72,8 +72,8 @@ int main(int argc, char** argv) {
   World world(&graph);
   for (int i=0; i<nlandmarks; i++){
     WorldObjectPointXY * landmark = new WorldObjectPointXY;
-    double x = sampleUniform(-.5,.5, &generator)*worldSize;
-    double y = sampleUniform(-.5,.5, &generator)*worldSize;
+    double x = sampleUniform(-.5,.5, &generator)*(worldSize+5);
+    double y = sampleUniform(-.5,.5, &generator)*(worldSize+5);
     landmark->vertex()->setEstimate(Vector2d(x,y));
     world.addWorldObject(landmark);
   }
@@ -93,8 +93,8 @@ int main(int argc, char** argv) {
     robot.addSensor(odometrySensor);
     Matrix3d odomInfo = odometrySensor->information();
     odomInfo.setIdentity();
-    odomInfo*=100;
-    odomInfo(2,2)=1000;
+    odomInfo*=500;
+    odomInfo(2,2)=5000;
     odometrySensor->setInformation(odomInfo);
     ss << "-odom";
   }
@@ -104,8 +104,8 @@ int main(int argc, char** argv) {
     robot.addSensor(poseSensor);
     Matrix3d poseInfo = poseSensor->information();
     poseInfo.setIdentity();
-    poseInfo*=100;
-    poseInfo(2,2)=1000;
+    poseInfo*=500;
+    poseInfo(2,2)=5000;
     poseSensor->setInformation(poseInfo);
     ss << "-pose";
   }
@@ -115,8 +115,9 @@ int main(int argc, char** argv) {
     robot.addSensor(pointSensor);
     Matrix2d pointInfo = pointSensor->information();
     pointInfo.setIdentity();
-    pointInfo*=100;
+    pointInfo*=1000;
     pointSensor->setInformation(pointInfo);
+    pointSensor->setFov(0.75*M_PI);
     ss << "-pointXY";
   }
 
