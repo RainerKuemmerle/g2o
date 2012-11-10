@@ -28,6 +28,7 @@
 
 #ifdef G2O_HAVE_OPENGL
 #include "g2o/stuff/opengl_wrapper.h"
+#include "g2o/stuff/opengl_primitives.h"
 #endif
 
 namespace g2o {
@@ -124,6 +125,19 @@ namespace g2o {
 #ifdef G2O_HAVE_OPENGL
   EdgeSE2DrawAction::EdgeSE2DrawAction(): DrawAction(typeid(EdgeSE2).name()){}
 
+  bool EdgeSE2DrawAction::refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_){
+    if (!DrawAction::refreshPropertyPtrs(params_))
+      return false;
+    if (_previousParams){
+      _triangleX = _previousParams->makeProperty<FloatProperty>(_typeName + "::GHOST_TRIANGLE_X", .2f);
+      _triangleY = _previousParams->makeProperty<FloatProperty>(_typeName + "::GHOST_TRIANGLE_Y", .05f);
+    } else {
+      _triangleX = 0;
+      _triangleY = 0;
+    }
+    return true;
+  }
+
   HyperGraphElementAction* EdgeSE2DrawAction::operator()(HyperGraph::HyperGraphElement* element, 
                HyperGraphElementAction::Parameters* params_){
     if (typeid(*element).name()!=_typeName)
@@ -145,16 +159,28 @@ namespace g2o {
     SE2 toTransform;
     glPushAttrib(GL_ENABLE_BIT | GL_LIGHTING | GL_COLOR);
     glDisable(GL_LIGHTING);
-    glColor3f(0.7f,0.7f,0.9f);
     if (! from) {
-      glColor3f(0.5f,0.5f,0.8f);
+      glColor3f(POSE_EDGE_GHOST_COLOR);
       toTransform = to->estimate();
       fromTransform = to->estimate()*e->measurement().inverse();
+      // DRAW THE FROM EDGE AS AN ARROW 
+      glPushMatrix();
+      glTranslatef(fromTransform.translation().x(),fromTransform.translation().y(),0.f);
+      glRotatef((float)RAD2DEG(fromTransform.rotation().angle()),0.f,0.f,1.f);
+      opengl::drawArrow2D(_triangleX->value(), _triangleY->value(), _triangleX->value()*.3);
+      glPopMatrix();
     } else if (! to){
-      glColor3f(0.5f,0.5f,0.8f);
+      glColor3f(POSE_EDGE_GHOST_COLOR);
       fromTransform = from->estimate();
       toTransform = from->estimate()*e->measurement();
+      // DRAW THE TO EDGE AS AN ARROW
+      glPushMatrix();
+      glTranslatef(toTransform.translation().x(),toTransform.translation().y(),0.f);
+      glRotatef((float)RAD2DEG(toTransform.rotation().angle()),0.f,0.f,1.f);
+      opengl::drawArrow2D(_triangleX->value(), _triangleY->value(), _triangleX->value()*.3);
+      glPopMatrix();
     } else {
+      glColor3f(POSE_EDGE_COLOR);
       fromTransform = from->estimate();
       toTransform = to->estimate();
     }

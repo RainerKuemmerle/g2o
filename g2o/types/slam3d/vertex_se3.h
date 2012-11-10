@@ -142,7 +142,6 @@ namespace g2o {
     public:
       VertexSE3DrawAction();
       virtual HyperGraphElementAction* operator()(HyperGraph::HyperGraphElement* element, HyperGraphElementAction::Parameters* params_);
-      HyperGraphElementAction* _cacheDrawActions;
     protected:
       virtual bool refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_);
       FloatProperty* _triangleX, *_triangleY;

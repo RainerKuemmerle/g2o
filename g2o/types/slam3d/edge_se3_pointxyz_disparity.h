@@ -84,6 +84,7 @@ namespace g2o {
 
     virtual void initialEstimate(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to);
 
+    const ParameterCamera* cameraParameter() const { return params; }
   private:
     Eigen::Matrix<double,3,9> J; // jacobian before projection
     virtual bool resolveCaches();
