@@ -308,6 +308,8 @@ namespace g2o{
       OptimizableGraph::Edge* e = *it;
       for (size_t i = 0; i < e->vertices().size(); ++i) {
         OptimizableGraph::Vertex* v = static_cast<OptimizableGraph::Vertex*>(e->vertex(i));
+	if (!v)
+	  continue;
         if (v->fixed())
           fixedVertices.insert(v);
         else { // check for having a prior which is able to fully initialize a vertex

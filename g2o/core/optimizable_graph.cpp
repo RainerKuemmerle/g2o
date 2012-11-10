@@ -265,6 +265,8 @@ namespace g2o {
     if (! eresult)
       return false;
     e->_internalId = _nextEdgeId++;
+    if (e->numUndefinedVertices())
+      return true;
     if (! e->resolveParameters()){
       cerr << __FUNCTION__ << ": FATAL, cannot resolve parameters for edge " << e << endl;
       return false;
@@ -275,6 +277,24 @@ namespace g2o {
     } 
     _jacobianWorkspace.updateSize(e);
 
+    return true;
+  }
+
+  bool OptimizableGraph::setEdgeVertex(Edge* e, int pos, Vertex* v){
+    if (! HyperGraph::setEdgeVertex(e,pos,v)){
+      return false;
+    } 
+    if (!e->numUndefinedVertices()){
+      if (! e->resolveParameters()){
+	cerr << __FUNCTION__ << ": FATAL, cannot resolve parameters for edge " << e << endl;
+	return false;
+      }
+      if (! e->resolveCaches()){
+	cerr << __FUNCTION__ << ": FATAL, cannot resolve caches for edge " << e << endl;
+	return false;
+      } 
+      _jacobianWorkspace.updateSize(e);
+    }
     return true;
   }
 
@@ -606,7 +626,8 @@ bool OptimizableGraph::save(ostream& os, int level) const
     OptimizableGraph::Edge* e = static_cast<OptimizableGraph::Edge*>(*it);
     if (e->level() == level) {
       for (vector<HyperGraph::Vertex*>::const_iterator it = e->vertices().begin(); it != e->vertices().end(); ++it) {
-        verticesToSave.insert(static_cast<OptimizableGraph::Vertex*>(*it));
+	if (*it)
+	  verticesToSave.insert(static_cast<OptimizableGraph::Vertex*>(*it));
       }
     }
   }
@@ -672,7 +693,8 @@ bool OptimizableGraph::saveSubset(ostream& os, HyperGraph::EdgeSet& eset)
     HyperGraph::Edge* e = *it;
     for (vector<HyperGraph::Vertex*>::const_iterator it = e->vertices().begin(); it != e->vertices().end(); ++it) {
       OptimizableGraph::Vertex* v = static_cast<OptimizableGraph::Vertex*>(*it);
-      vset.insert(v);
+      if (v)
+	vset.insert(v);
     }
   }
 

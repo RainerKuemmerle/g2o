@@ -104,6 +104,8 @@ namespace g2o {
     }
 
     EdgeSE2PointXY* e =  static_cast<EdgeSE2PointXY*>(element);
+    if (e->numUndefinedVertices())
+      return this;
     VertexSE2* fromEdge = static_cast<VertexSE2*>(e->vertex(0));
     VertexPointXY* toEdge   = static_cast<VertexPointXY*>(e->vertex(1));
     *(params->os) << fromEdge->estimate().translation().x() << " " << fromEdge->estimate().translation().y()
@@ -132,12 +134,27 @@ namespace g2o {
     EdgeSE2PointXY* e =  static_cast<EdgeSE2PointXY*>(element);
     VertexSE2* fromEdge = static_cast<VertexSE2*>(e->vertex(0));
     VertexPointXY* toEdge   = static_cast<VertexPointXY*>(e->vertex(1));
-    glColor3f(0.4f,0.4f,0.2f);
-    glPushAttrib(GL_ENABLE_BIT);
+    if (! fromEdge)
+      return this;
+    Eigen::Vector2d p=e->measurement();
+    glPushAttrib(GL_ENABLE_BIT|GL_LIGHTING|GL_COLOR);
     glDisable(GL_LIGHTING);
+    if (!toEdge){
+      p=fromEdge->estimate()*p;
+      glColor3f(0.4f,0.4f,0.2f);
+      glPushAttrib(GL_POINT_SIZE);
+      glPointSize(3);
+      glBegin(GL_POINTS);
+      glVertex3f((float)p.x(),(float)p.y(),0.f);
+      glEnd();
+      glPopAttrib();
+    } else {
+      p=toEdge->estimate();
+      glColor3f(0.8f,0.8f,0.4f);
+    }
     glBegin(GL_LINES);
     glVertex3f((float)fromEdge->estimate().translation().x(),(float)fromEdge->estimate().translation().y(),0.f);
-    glVertex3f((float)toEdge->estimate().x(),(float)toEdge->estimate().y(),0.f);
+    glVertex3f((float)p.x(),(float)p.y(),0.f);
     glEnd();
     glPopAttrib();
     return this;
