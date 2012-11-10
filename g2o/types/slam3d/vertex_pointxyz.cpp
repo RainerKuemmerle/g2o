@@ -24,6 +24,7 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+#include "g2o/stuff/opengl_primitives.h"
 #include "vertex_pointxyz.h"
 #include <stdio.h>
 
@@ -73,6 +74,7 @@ namespace g2o {
 
     if (typeid(*element).name()!=_typeName)
       return 0;
+    initializeDrawActionsCache();
     refreshPropertyPtrs(params);
     if (! _previousParams)
       return this;
@@ -82,16 +84,17 @@ namespace g2o {
     VertexPointXYZ* that = static_cast<VertexPointXYZ*>(element);
     
 
+    glPushMatrix();
     glPushAttrib(GL_ENABLE_BIT | GL_POINT_BIT);
     glDisable(GL_LIGHTING);
-    glColor3f(0.8f,0.5f,0.3f);
-    if (_pointSize) {
-      glPointSize(_pointSize->value());
-    }
-    glBegin(GL_POINTS);
-    glVertex3f((float)that->estimate()(0),(float)that->estimate()(1),(float)that->estimate()(2));
-    glEnd();
+    glColor3f(LANDMARK_VERTEX_COLOR);
+    float ps = _pointSize ? _pointSize->value() :  1.f;
+    glTranslatef((float)that->estimate()(0),(float)that->estimate()(1),(float)that->estimate()(2));
+    opengl::drawPoint(ps);
     glPopAttrib();
+    drawCache(that->cacheContainer(), params);
+    drawUserData(that->userData(), params);
+    glPopMatrix();
     return this;
   }
 #endif

@@ -29,6 +29,7 @@
 
 #ifdef G2O_HAVE_OPENGL
 #include "g2o/stuff/opengl_wrapper.h"
+#include "g2o/stuff/opengl_primitives.h"
 #endif
 
 namespace g2o {
@@ -91,45 +92,27 @@ namespace g2o {
 
   HyperGraphElementAction* VertexSE2DrawAction::operator()(HyperGraph::HyperGraphElement* element, 
                  HyperGraphElementAction::Parameters* params_){
-    if (typeid(*element).name()!=_typeName)
+   if (typeid(*element).name()!=_typeName)
       return 0;
-
-    if (! _drawActions){
-      _drawActions = HyperGraphActionLibrary::instance()->actionByName("draw");
-    }
-
+    initializeDrawActionsCache();
     refreshPropertyPtrs(params_);
+
     if (! _previousParams)
       return this;
-
+    
+    if (_show && !_show->value())
+      return this;
 
     VertexSE2* that = static_cast<VertexSE2*>(element);
 
-    glColor3f(0.5f,0.5f,0.8f);
-    glPushAttrib(GL_ENABLE_BIT);
-    glDisable(GL_LIGHTING);
+    glColor3f(POSE_VERTEX_COLOR);
     glPushMatrix();
     glTranslatef((float)that->estimate().translation().x(),(float)that->estimate().translation().y(),0.f);
     glRotatef((float)RAD2DEG(that->estimate().rotation().angle()),0.f,0.f,1.f);
-    if (_show && _show->value()) {
-      float tx=0.1f, ty=0.05f;
-      if (_triangleX && _triangleY){
-	tx=_triangleX->value();
-	ty=_triangleY->value();
-      }
-      glBegin(GL_TRIANGLE_FAN);
-      glVertex3f( tx ,0.f ,0.f);
-      glVertex3f(-tx ,-ty, 0.f);
-      glVertex3f(-tx , ty, 0.f);
-      glEnd();
-    }
-    HyperGraph::Data* d=that->userData();
-    while (d && _drawActions ){
-      (*_drawActions)(d, params_);
-      d=d->next();
-    }
+    opengl::drawArrow2D(_triangleX->value(), _triangleY->value(), _triangleX->value()*.3);
+    drawCache(that->cacheContainer(), params_);
+    drawUserData(that->userData(), params_);
     glPopMatrix();
-    glPopAttrib();
     return this;
   }
 #endif

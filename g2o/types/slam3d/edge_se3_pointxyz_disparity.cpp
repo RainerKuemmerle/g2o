@@ -31,6 +31,7 @@
 
 #ifdef G2O_HAVE_OPENGL
 #include "g2o/stuff/opengl_wrapper.h"
+#include "g2o/stuff/opengl_primitives.h"
 #endif
 
 namespace g2o {
@@ -218,18 +219,26 @@ namespace g2o {
   EdgeProjectDisparityDrawAction::EdgeProjectDisparityDrawAction(): DrawAction(typeid(EdgeSE3PointXYZDisparity).name()){}
 
   HyperGraphElementAction* EdgeProjectDisparityDrawAction::operator()(HyperGraph::HyperGraphElement* element, 
-                HyperGraphElementAction::Parameters* /* params_ */){
-    return 0;
-    if (typeid(*element).name()!=_typeName)
+                HyperGraphElementAction::Parameters*  params_ ){
+  if (typeid(*element).name()!=_typeName)
       return 0;
+    refreshPropertyPtrs(params_);
+    if (! _previousParams)
+      return this;
+
+    if (_show && !_show->value())
+      return this;
     EdgeSE3PointXYZDisparity* e =  static_cast<EdgeSE3PointXYZDisparity*>(element);
     VertexSE3* fromEdge = static_cast<VertexSE3*>(e->vertices()[0]);
     VertexPointXYZ* toEdge   = static_cast<VertexPointXYZ*>(e->vertices()[1]);
-    glColor3f(0.4f,0.4f,0.2f);
+    if (! fromEdge || ! toEdge)
+      return this;
+    Eigen::Isometry3d fromTransform=fromEdge->estimate() * e->cameraParameter()->offset();
+    glColor3f(LANDMARK_EDGE_COLOR);
     glPushAttrib(GL_ENABLE_BIT);
     glDisable(GL_LIGHTING);
     glBegin(GL_LINES);
-    glVertex3f((float)fromEdge->estimate().translation().x(),(float)fromEdge->estimate().translation().y(),(float)fromEdge->estimate().translation().z());
+    glVertex3f((float)fromTransform.translation().x(),(float)fromTransform.translation().y(),(float)fromTransform.translation().z());
     glVertex3f((float)toEdge->estimate().x(),(float)toEdge->estimate().y(),(float)toEdge->estimate().z());
     glEnd();
     glPopAttrib();
