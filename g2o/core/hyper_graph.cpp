@@ -149,8 +149,7 @@ namespace g2o {
     return true;
   }
 
-  bool HyperGraph::removeVertex(Vertex* v, bool detach)
-  {
+  bool HyperGraph::removeVertex(Vertex* v, bool detach) {
     if (detach){
       bool result = detachVertex(v);
       if (! result) {
