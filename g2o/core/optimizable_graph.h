@@ -519,6 +519,12 @@ namespace g2o {
      */
     virtual bool addEdge(HyperGraph::Edge* e);
 
+    /**
+     * overridden from HyperGraph, to mantain the bookkeeping of the caches/parameters and jacobian workspaces consistent upon a change in the veretx.
+     * @return false if something goes wriong.
+     */
+    virtual bool setEdgeVertex(Edge* e, int pos, Vertex* v);
+
     //! returns the chi2 of the current configuration
     double chi2() const;
 
