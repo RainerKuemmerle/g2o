@@ -78,7 +78,7 @@ namespace g2o {
       typedef std::bitset<HyperGraph::HGET_NUM_ELEMS> GraphElemBitset;
 
 
-      
+     
       class G2O_CORE_API Data;
       class G2O_CORE_API DataContainer;
       class G2O_CORE_API Vertex;
@@ -257,14 +257,11 @@ namespace g2o {
        */
       virtual bool setEdgeVertex(Edge* e, int pos, Vertex* v);
 
-<<<<<<< HEAD
       /**
        * detaches a vertex from all connected edges
        */
       virtual bool detachVertex(Vertex* v);
 
-=======
->>>>>>> anonymous vertices in edges and payload for edges
       /**
        * changes the id of a vertex already in the graph, and updates the bookkeeping
        @ returns false if the vertex is not in the graph;
