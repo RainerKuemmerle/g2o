@@ -123,7 +123,7 @@ namespace g2o {
       glVertex3f(-tx , ty, 0.f);
       glEnd();
     }
-    OptimizableGraph::Data* d=that->userData();
+    HyperGraph::Data* d=that->userData();
     while (d && _drawActions ){
       (*_drawActions)(d, params_);
       d=d->next();

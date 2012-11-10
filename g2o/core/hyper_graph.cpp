@@ -47,6 +47,15 @@ namespace g2o {
   {
   }
 
+  int HyperGraph::Edge::numUndefinedVertices() const{
+    int undefined=0;
+    for (size_t i=0; i<_vertices.size(); i++){
+      if (!_vertices[i])
+	undefined++;
+    }
+    return undefined;
+  }
+
   void HyperGraph::Edge::resize(size_t size)
   {
     _vertices.resize(size, 0);
