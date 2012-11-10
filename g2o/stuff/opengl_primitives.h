@@ -125,7 +125,23 @@ void G2O_OPENGL_API drawPoseBox();
  */
 void G2O_OPENGL_API drawArrow2D(float len, float head_width, float head_len);
 
+/**
+ * draw a point in the origin, having a size of pointSize
+ */
+void G2O_OPENGL_API drawPoint(float  pointSize);
+
+
 // @}
+
+#define POSE_VERTEX_COLOR 0.5f,0.5f,0.8f
+#define POSE_PARAMETER_COLOR 0.5f,0.5f,0.8f
+#define POSE_EDGE_COLOR 0.4f,0.4f,0.7f
+#define POSE_EDGE_GHOST_COLOR 0.4f,0.4f,0.7f
+
+#define LANDMARK_VERTEX_COLOR 0.8f,0.5f,0.3f
+#define LANDMARK_EDGE_COLOR   0.7f,0.4f,0.2f
+#define LANDMARK_EDGE_GHOST_COLOR   0.7f,0.4f,0.2f
+
 
 } // end namespace
 } // end namespace

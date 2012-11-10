@@ -35,6 +35,7 @@
 
 #ifdef G2O_HAVE_OPENGL
 #include "g2o/stuff/opengl_wrapper.h"
+#include "g2o/stuff/opengl_primitives.h"
 #endif
 
 namespace g2o {
@@ -185,11 +186,14 @@ namespace g2o {
     EdgeSE3PointXYZ* e =  static_cast<EdgeSE3PointXYZ*>(element);
     VertexSE3* fromEdge = static_cast<VertexSE3*>(e->vertex(0));
     VertexPointXYZ* toEdge   = static_cast<VertexPointXYZ*>(e->vertex(1));
-    glColor3f(0.8f,0.3f,0.3f);
+    if (! fromEdge || ! toEdge)
+      return this;
+    Eigen::Isometry3d fromTransform=fromEdge->estimate() * e->offsetParameter()->offset();
+    glColor3f(LANDMARK_EDGE_COLOR);
     glPushAttrib(GL_ENABLE_BIT);
     glDisable(GL_LIGHTING);
     glBegin(GL_LINES);
-    glVertex3f((float)fromEdge->estimate().translation().x(),(float)fromEdge->estimate().translation().y(),(float)fromEdge->estimate().translation().z());
+    glVertex3f((float)fromTransform.translation().x(),(float)fromTransform.translation().y(),(float)fromTransform.translation().z());
     glVertex3f((float)toEdge->estimate().x(),(float)toEdge->estimate().y(),(float)toEdge->estimate().z());
     glEnd();
     glPopAttrib();

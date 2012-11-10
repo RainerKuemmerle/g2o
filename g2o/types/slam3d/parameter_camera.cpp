@@ -30,6 +30,7 @@
 
 #ifdef G2O_HAVE_OPENGL
 #include "g2o/stuff/opengl_wrapper.h"
+#include "g2o/stuff/opengl_primitives.h"
 #endif
 
 using namespace std;
@@ -148,12 +149,14 @@ namespace g2o {
     if (_show && !_show->value())
       return this;
 
+    glPushAttrib(GL_COLOR);
+    glColor3f(POSE_PARAMETER_COLOR);
     glPushMatrix();
     glMultMatrixd(that->camParams()->offset().data());
-    if (_cameraZ && _cameraSide)
-      drawMyPyramid(_cameraZ->value(), _cameraSide->value());
+    glRotatef(180.0f, 0.0f, 1.0f, 0.0f);
+    opengl::drawPyramid(_cameraSide->value(), _cameraZ->value());
     glPopMatrix();
-
+    glPopAttrib();
     return this;
   }
 #endif

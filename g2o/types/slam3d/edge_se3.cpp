@@ -3,6 +3,7 @@
 #include <iostream>
 
 #include "g2o/stuff/opengl_wrapper.h"
+#include "g2o/stuff/opengl_primitives.h"
 
 namespace g2o {
   using namespace std;
@@ -129,7 +130,9 @@ namespace g2o {
     EdgeSE3* e =  static_cast<EdgeSE3*>(element);
     VertexSE3* fromEdge = static_cast<VertexSE3*>(e->vertices()[0]);
     VertexSE3* toEdge   = static_cast<VertexSE3*>(e->vertices()[1]);
-    glColor3f(0.5f,0.5f,0.8f);
+    if (! fromEdge || ! toEdge)
+      return this;
+    glColor3f(POSE_EDGE_COLOR);
     glPushAttrib(GL_ENABLE_BIT);
     glDisable(GL_LIGHTING);
     glBegin(GL_LINES);

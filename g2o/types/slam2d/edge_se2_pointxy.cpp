@@ -28,6 +28,7 @@
 
 #ifdef G2O_HAVE_OPENGL
 #include "g2o/stuff/opengl_wrapper.h"
+#include "g2o/stuff/opengl_primitives.h"
 #endif
 
 namespace g2o {
@@ -141,7 +142,7 @@ namespace g2o {
     glDisable(GL_LIGHTING);
     if (!toEdge){
       p=fromEdge->estimate()*p;
-      glColor3f(0.4f,0.4f,0.2f);
+      glColor3f(LANDMARK_EDGE_GHOST_COLOR);
       glPushAttrib(GL_POINT_SIZE);
       glPointSize(3);
       glBegin(GL_POINTS);
@@ -150,7 +151,7 @@ namespace g2o {
       glPopAttrib();
     } else {
       p=toEdge->estimate();
-      glColor3f(0.8f,0.8f,0.4f);
+      glColor3f(LANDMARK_EDGE_COLOR);
     }
     glBegin(GL_LINES);
     glVertex3f((float)fromEdge->estimate().translation().x(),(float)fromEdge->estimate().translation().y(),0.f);
