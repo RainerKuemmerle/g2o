@@ -72,6 +72,9 @@ namespace g2o {
         HGET_NUM_ELEMS // keep as last elem
       };
 
+      static const int UnassignedId = -1;
+      static const int InvalidId = -2;
+
       typedef std::bitset<HyperGraph::HGET_NUM_ELEMS> GraphElemBitset;
 
       class G2O_CORE_API Vertex;
@@ -98,7 +101,7 @@ namespace g2o {
       class G2O_CORE_API Vertex : public HyperGraphElement {
         public:
           //! creates a vertex having an ID specified by the argument
-          explicit Vertex(int id=-1);
+          explicit Vertex(int id=InvalidId);
           virtual ~Vertex();
           //! returns the id
           int id() const {return _id;}
@@ -113,6 +116,42 @@ namespace g2o {
           EdgeSet _edges;
       };
 
+      /**
+       * \brief data packet for a vertex. Extend this class to store in the vertices
+       * the potential additional information you need (e.g. images, laser scans, ...).
+       */
+      class G2O_CORE_API Data : public HyperGraph::HyperGraphElement {
+      public:
+	Data() {_next=0; }
+	//! read the data from a stream
+	virtual bool read(std::istream& is) = 0;
+	//! write the data to a stream
+	virtual bool write(std::ostream& os) const = 0;
+	virtual HyperGraph::HyperGraphElementType elementType() const { return HyperGraph::HGET_DATA;}
+	const Data* next() const {return _next;}
+	Data* next() {return _next;}
+	void setNext(Data* next_) { _next = next_; }
+      protected:
+	  Data* _next; // linked list of multiple data;
+      };
+
+      /**
+       * \brief Container class that implements an interface for adding/removing Data elements in 
+       a linked list
+       */
+      class G2O_CORE_API DataContainer {
+      public:
+	DataContainer() {_userData = 0;}
+	virtual ~DataContainer() {Data* d=_userData; while (d) {Data* dNext = d->next(); delete d; d=dNext;} }
+        //! the user data associated with this vertex
+        const Data* userData() const { return _userData; }
+        Data* userData() { return _userData; }
+        void setUserData(Data* obs) { _userData = obs;}
+	void addUserData(Data* obs) { if (obs) { obs->setNext(_userData); _userData=obs; } }
+      protected:
+	Data* _userData;
+      };
+
       /** 
        * Abstract Edge class. Your nice edge classes should inherit from that one.
        * An hyper-edge has pointers to the vertices it connects and stores them in a vector.
@@ -120,7 +159,7 @@ namespace g2o {
       class G2O_CORE_API Edge : public HyperGraphElement {
         public:
           //! creates and empty edge with no vertices
-          explicit Edge(int id = -1);
+          explicit Edge(int id = InvalidId);
           virtual ~Edge();
 
           /**
@@ -197,6 +236,13 @@ namespace g2o {
        * does nothing and returns false. Otherwise it returns true.
        */
       virtual bool addEdge(Edge* e);
+
+
+      /**
+       * Sets the vertex un pos "pos" for an edge and keeps the bookkeeping consistent.
+       * If v ==0, the vertex is set to "invalid"
+       */
+      virtual bool setEdgeVertex(Edge* e, int pos, Vertex* v);
 
       /**
        * changes the id of a vertex already in the graph, and updates the bookkeeping

@@ -75,27 +75,6 @@ namespace g2o {
     class G2O_CORE_API Vertex;
     class G2O_CORE_API Edge;
 
-    /**
-     * \brief data packet for a vertex. Extend this class to store in the vertices
-     * the potential additional information you need (e.g. images, laser scans, ...).
-     */
-    class G2O_CORE_API Data : public HyperGraph::HyperGraphElement
-    {
-      friend struct OptimizableGraph;
-      public:
-        virtual ~Data();
-        Data();
-        //! read the data from a stream
-        virtual bool read(std::istream& is) = 0;
-        //! write the data to a stream
-        virtual bool write(std::ostream& os) const = 0;
-        virtual HyperGraph::HyperGraphElementType elementType() const { return HyperGraph::HGET_DATA;}
-        const Data* next() const {return _next;}
-        Data* next() {return _next;}
-        void setNext(Data* next_) { _next = next_; }
-      protected:
-        Data* _next; // linked list of multiple data;
-    };
 
     /**
      * \brief order vertices based on their ID
@@ -125,7 +104,7 @@ namespace g2o {
     /**
      * \brief A general case Vertex for optimization
      */
-    class G2O_CORE_API Vertex : public HyperGraph::Vertex {
+    class G2O_CORE_API Vertex : public HyperGraph::Vertex, public HyperGraph::DataContainer {
       private:
         friend struct OptimizableGraph;
       public:
@@ -133,18 +112,6 @@ namespace g2o {
 
         //! returns a deep copy of the current vertex
         virtual Vertex* clone() const ;
-
-        //! the user data associated with this vertex
-        const Data* userData() const { return _userData; }
-        Data* userData() { return _userData; }
-
-        void setUserData(Data* obs) { _userData = obs;}
-	void addUserData(Data* obs) { 
-	  if (obs) {
-	    obs->setNext(_userData);
-	    _userData=obs;
-	  }
-	}
 	
         virtual ~Vertex();
 
@@ -380,7 +347,7 @@ namespace g2o {
 
     };
     
-    class G2O_CORE_API Edge: public HyperGraph::Edge {
+    class G2O_CORE_API Edge: public HyperGraph::Edge, public HyperGraph::DataContainer {
       private:
         friend struct OptimizableGraph;
       public:
@@ -653,6 +620,10 @@ namespace g2o {
 
     // helper functions to save an individual edge
     bool saveEdge(std::ostream& os, Edge* e) const;
+
+    // helper functions to save the data packets
+    bool saveUserData(std::ostream& os, HyperGraph::Data* v) const;
+
     //! the workspace for storing the Jacobians of the graph
     JacobianWorkspace& jacobianWorkspace() { return _jacobianWorkspace;}
     const JacobianWorkspace& jacobianWorkspace() const { return _jacobianWorkspace;}
