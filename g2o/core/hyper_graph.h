@@ -77,6 +77,8 @@ namespace g2o {
 
       typedef std::bitset<HyperGraph::HGET_NUM_ELEMS> GraphElemBitset;
 
+
+
       class G2O_CORE_API Vertex;
       class G2O_CORE_API Edge;
       
@@ -91,30 +93,6 @@ namespace g2o {
         virtual HyperGraphElementType elementType() const = 0;
       };
 
-      typedef std::set<Edge*>                           EdgeSet;
-      typedef std::set<Vertex*>                         VertexSet;
-
-      typedef std::tr1::unordered_map<int, Vertex*>     VertexIDMap;
-      typedef std::vector<Vertex*>                      VertexContainer;
-
-      //! abstract Vertex, your types must derive from that one
-      class G2O_CORE_API Vertex : public HyperGraphElement {
-        public:
-          //! creates a vertex having an ID specified by the argument
-          explicit Vertex(int id=InvalidId);
-          virtual ~Vertex();
-          //! returns the id
-          int id() const {return _id;}
-	  virtual void setId( int newId) { _id=newId; }
-          //! returns the set of hyper-edges that are leaving/entering in this vertex
-          const EdgeSet& edges() const {return _edges;}
-          //! returns the set of hyper-edges that are leaving/entering in this vertex
-          EdgeSet& edges() {return _edges;}
-          virtual HyperGraphElementType elementType() const { return HGET_VERTEX;}
-        protected:
-          int _id;
-          EdgeSet _edges;
-      };
 
       /**
        * \brief data packet for a vertex. Extend this class to store in the vertices
@@ -151,6 +129,33 @@ namespace g2o {
       protected:
 	Data* _userData;
       };
+
+
+      typedef std::set<Edge*>                           EdgeSet;
+      typedef std::set<Vertex*>                         VertexSet;
+
+      typedef std::tr1::unordered_map<int, Vertex*>     VertexIDMap;
+      typedef std::vector<Vertex*>                      VertexContainer;
+
+      //! abstract Vertex, your types must derive from that one
+      class G2O_CORE_API Vertex : public HyperGraphElement {
+        public:
+          //! creates a vertex having an ID specified by the argument
+          explicit Vertex(int id=InvalidId);
+          virtual ~Vertex();
+          //! returns the id
+          int id() const {return _id;}
+	  virtual void setId( int newId) { _id=newId; }
+          //! returns the set of hyper-edges that are leaving/entering in this vertex
+          const EdgeSet& edges() const {return _edges;}
+          //! returns the set of hyper-edges that are leaving/entering in this vertex
+          EdgeSet& edges() {return _edges;}
+          virtual HyperGraphElementType elementType() const { return HGET_VERTEX;}
+        protected:
+          int _id;
+          EdgeSet _edges;
+      };
+
 
       /** 
        * Abstract Edge class. Your nice edge classes should inherit from that one.
@@ -190,6 +195,8 @@ namespace g2o {
           int id() const {return _id;}
           void setId(int id);
           virtual HyperGraphElementType elementType() const { return HGET_EDGE;}
+
+	  int numUndefinedVertices() const;
         protected:
           VertexContainer _vertices;
           int _id; ///< unique id

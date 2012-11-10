@@ -169,7 +169,7 @@ namespace g2o {
       fout << "VERTEX2 " << v->id() << " ";
       v->write(fout);
       fout << endl;
-      OptimizableGraph::Data* data = v->userData();
+      HyperGraph::Data* data = v->userData();
       if (data) { // writing the data via the factory
         string tag = factory->tag(data);
         if (tag.size() > 0) {

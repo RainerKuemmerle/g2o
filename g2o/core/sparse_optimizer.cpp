@@ -276,6 +276,8 @@ namespace g2o{
     set<Vertex*> auxVertexSet; // temporary structure to avoid duplicates
     for (HyperGraph::EdgeSet::iterator it=eset.begin(); it!=eset.end(); ++it){
       OptimizableGraph::Edge* e=(OptimizableGraph::Edge*)(*it);
+      if (e->numUndefinedVertices())
+	continue;
       for (vector<HyperGraph::Vertex*>::const_iterator vit = e->vertices().begin(); vit != e->vertices().end(); ++vit) {
         auxVertexSet.insert(static_cast<OptimizableGraph::Vertex*>(*vit));
       }
