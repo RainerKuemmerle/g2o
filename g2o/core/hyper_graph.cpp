@@ -103,8 +103,19 @@ namespace g2o {
       return false;
     for (std::vector<Vertex*>::iterator it = e->vertices().begin(); it != e->vertices().end(); ++it) {
       Vertex* v = *it;
-      v->edges().insert(e);
+      if (v)
+	v->edges().insert(e);
     }
+    return true;
+  }
+
+  bool HyperGraph::setEdgeVertex(HyperGraph::Edge* e, int pos, HyperGraph::Vertex* v){
+    Vertex* vOld = e->vertex(pos);
+    if (vOld)
+      vOld->edges().erase(e);
+    e->setVertex(pos, v);
+    if (v)
+      v->edges().insert(e);
     return true;
   }
 
