@@ -137,14 +137,30 @@ namespace g2o {
       return this;
 
     EdgeSE2* e =  static_cast<EdgeSE2*>(element);
-    VertexSE2* fromEdge = static_cast<VertexSE2*>(e->vertex(0));
-    VertexSE2* toEdge   = static_cast<VertexSE2*>(e->vertex(1));
-    glColor3f(0.5f,0.5f,0.8f);
-    glPushAttrib(GL_ENABLE_BIT);
+    VertexSE2* from = static_cast<VertexSE2*>(e->vertex(0));
+    VertexSE2* to   = static_cast<VertexSE2*>(e->vertex(1));
+    if (! from && ! to)
+      return this;
+    SE2 fromTransform;
+    SE2 toTransform;
+    glPushAttrib(GL_ENABLE_BIT | GL_LIGHTING | GL_COLOR);
     glDisable(GL_LIGHTING);
+    glColor3f(0.7f,0.7f,0.9f);
+    if (! from) {
+      glColor3f(0.5f,0.5f,0.8f);
+      toTransform = to->estimate();
+      fromTransform = to->estimate()*e->measurement().inverse();
+    } else if (! to){
+      glColor3f(0.5f,0.5f,0.8f);
+      fromTransform = from->estimate();
+      toTransform = from->estimate()*e->measurement();
+    } else {
+      fromTransform = from->estimate();
+      toTransform = to->estimate();
+    }
     glBegin(GL_LINES);
-    glVertex3f((float)fromEdge->estimate().translation().x(),(float)fromEdge->estimate().translation().y(),0.f);
-    glVertex3f((float)toEdge->estimate().translation().x(),(float)toEdge->estimate().translation().y(),0.f);
+    glVertex3f((float)fromTransform.translation().x(),(float)fromTransform.translation().y(),0.f);
+    glVertex3f((float)toTransform.translation().x(),(float)toTransform.translation().y(),0.f);
     glEnd();
     glPopAttrib();
     return this;
