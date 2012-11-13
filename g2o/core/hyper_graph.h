@@ -252,6 +252,11 @@ namespace g2o {
       virtual bool setEdgeVertex(Edge* e, int pos, Vertex* v);
 
       /**
+       * detaches a vertex from all connected edges
+       */
+      virtual bool detachVertex(Vertex* v);
+
+      /**
        * changes the id of a vertex already in the graph, and updates the bookkeeping
        @ returns false if the vertex is not in the graph;
        */
