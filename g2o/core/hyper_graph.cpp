@@ -128,6 +128,22 @@ namespace g2o {
     return true;
   }
 
+  bool HyperGraph::detachVertex(Vertex* v){
+    VertexIDMap::iterator it=_vertices.find(v->id());
+    if (it==_vertices.end())
+      return false;
+    assert(it->second==v);
+    EdgeSet tmp(v->edges());
+    for (EdgeSet::iterator it=tmp.begin(); it!=tmp.end(); ++it){
+      HyperGraph::Edge* e = *it;
+      for (size_t i = 0 ; i<e->vertices().size(); i++){
+	if (v == e->vertex(i))
+	  setEdgeVertex(e,i,0);
+      }
+    }
+    return true;
+  }
+
   bool HyperGraph::removeVertex(Vertex* v)
   {
     VertexIDMap::iterator it=_vertices.find(v->id());
@@ -152,9 +168,10 @@ namespace g2o {
     if (it == _edges.end())
       return false;
     _edges.erase(it);
-
     for (std::vector<Vertex*>::iterator vit = e->vertices().begin(); vit != e->vertices().end(); ++vit) {
       Vertex* v = *vit;
+      if (!v)
+	continue;
       it = v->edges().find(e);
       assert(it!=v->edges().end());
       v->edges().erase(it);
