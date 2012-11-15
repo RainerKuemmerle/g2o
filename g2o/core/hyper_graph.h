@@ -214,7 +214,7 @@ namespace g2o {
       const Vertex* vertex(int id) const;
 
       //! removes a vertex from the graph. Returns true on success (vertex was present)
-      virtual bool removeVertex(Vertex* v);
+      virtual bool removeVertex(Vertex* v, bool detach=false);
       //! removes a vertex from the graph. Returns true on success (edge was present)
       virtual bool removeEdge(Edge* e);
       //! clears the graph and empties all structures.

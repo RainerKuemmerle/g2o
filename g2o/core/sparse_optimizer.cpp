@@ -574,14 +574,14 @@ namespace g2o{
     _forceStopFlag=flag;
   }
 
-  bool SparseOptimizer::removeVertex(HyperGraph::Vertex* v)
+  bool SparseOptimizer::removeVertex(HyperGraph::Vertex* v, bool detach)
   {
     OptimizableGraph::Vertex* vv = static_cast<OptimizableGraph::Vertex*>(v);
     if (vv->hessianIndex() >= 0) {
       clearIndexMapping();
       _ivMap.clear();
     }
-    return HyperGraph::removeVertex(v);
+    return HyperGraph::removeVertex(v, detach);
   }
 
   bool SparseOptimizer::addComputeErrorAction(HyperGraphAction* action)
