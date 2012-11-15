@@ -144,8 +144,14 @@ namespace g2o {
     return true;
   }
 
-  bool HyperGraph::removeVertex(Vertex* v)
+  bool HyperGraph::removeVertex(Vertex* v, bool detach)
   {
+    if (detach){
+      bool result = detachVertex(v);
+      if (! result) {
+	assert (0 && __PRETTY_FUNCTION__ && "inconsistency in detaching vertex, ");
+      }
+    }
     VertexIDMap::iterator it=_vertices.find(v->id());
     if (it==_vertices.end())
       return false;
@@ -154,7 +160,7 @@ namespace g2o {
     EdgeSet tmp(v->edges());
     for (EdgeSet::iterator it=tmp.begin(); it!=tmp.end(); ++it){
       if (!removeEdge(*it)){
-        assert(0);
+	  assert(0 && __PRETTY_FUNCTION__ && "error in erasing vertex");
       }
     }
     _vertices.erase(it);
