@@ -644,6 +644,9 @@ namespace g2o {
      */
     static bool initMultiThreading();
 
+    inline ParameterContainer& parameters() {return _parameters;}
+    inline const ParameterContainer& parameters() const {return _parameters;}
+
   protected:
     std::map<std::string, std::string> _renamedTypesLookup;
     long long _nextEdgeId;
