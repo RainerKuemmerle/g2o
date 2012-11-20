@@ -580,11 +580,13 @@ bool OptimizableGraph::load(istream& is, bool createEdges)
       } else if (previousData){
 	//cerr << "chaining" << endl;
 	previousData->setNext(d);
+	d->setDataContainer(d->dataContainer());
         previousData = d;
 	//cerr << "done" << endl;
       } else if (previousDataContainer){
 	//cerr << "embedding in vertex" << endl;
 	previousDataContainer->setUserData(d);
+	d->setDataContainer(previousDataContainer);
 	previousData = d;
 	previousDataContainer = 0;
 	//cerr << "done" << endl;
@@ -876,6 +878,18 @@ bool OptimizableGraph::saveVertex(std::ostream& os, OptimizableGraph::Vertex* v)
     return os.good();
   }
   return false;
+}
+
+bool OptimizableGraph::saveParameter(std::ostream& os, Parameter* p) const
+{
+  Factory* factory = Factory::instance();
+  string tag = factory->tag(p);
+  if (tag.size() > 0) {
+    os << tag << " " << p->id() << " ";
+    p->write(os);
+    os << endl;
+  }
+  return os.good();
 }
 
 bool OptimizableGraph::saveEdge(std::ostream& os, OptimizableGraph::Edge* e) const
