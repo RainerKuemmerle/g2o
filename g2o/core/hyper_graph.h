@@ -78,7 +78,9 @@ namespace g2o {
       typedef std::bitset<HyperGraph::HGET_NUM_ELEMS> GraphElemBitset;
 
 
-
+      
+      class G2O_CORE_API Data;
+      class G2O_CORE_API DataContainer;
       class G2O_CORE_API Vertex;
       class G2O_CORE_API Edge;
       
@@ -100,17 +102,21 @@ namespace g2o {
        */
       class G2O_CORE_API Data : public HyperGraph::HyperGraphElement {
       public:
-	Data() {_next=0; }
+	Data();
 	//! read the data from a stream
 	virtual bool read(std::istream& is) = 0;
 	//! write the data to a stream
 	virtual bool write(std::ostream& os) const = 0;
 	virtual HyperGraph::HyperGraphElementType elementType() const { return HyperGraph::HGET_DATA;}
-	const Data* next() const {return _next;}
-	Data* next() {return _next;}
-	void setNext(Data* next_) { _next = next_; }
+	inline const Data* next() const {return _next;}
+	inline Data* next() {return _next;}
+	inline void setNext(Data* next_) { _next = next_; }
+	inline DataContainer* dataContainer() { return _dataContainer;}
+	inline const DataContainer* dataContainer() const { return _dataContainer;}
+	inline void setDataContainer(DataContainer * dataContainer_){ _dataContainer = dataContainer_;}
       protected:
 	  Data* _next; // linked list of multiple data;
+	  DataContainer* _dataContainer;
       };
 
       /**

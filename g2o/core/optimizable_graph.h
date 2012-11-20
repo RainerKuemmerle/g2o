@@ -291,7 +291,6 @@ namespace g2o {
         int colInHessian() const {return _colInHessian;}
 
         const OptimizableGraph* graph() const {return _graph;}
-
         OptimizableGraph* graph() {return _graph;}
 
         /**
@@ -623,6 +622,9 @@ namespace g2o {
 
     // helper functions to save an individual vertex
     bool saveVertex(std::ostream& os, Vertex* v) const;
+    
+    // helper function to save an individual parameter
+    bool saveParameter(std::ostream& os, Parameter* v) const;
 
     // helper functions to save an individual edge
     bool saveEdge(std::ostream& os, Edge* e) const;

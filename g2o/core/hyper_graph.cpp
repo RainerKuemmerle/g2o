@@ -31,6 +31,11 @@
 
 namespace g2o {
 
+  HyperGraph::Data::Data() {			
+    _next = 0;
+    _dataContainer = 0;
+  }
+
   HyperGraph::Vertex::Vertex(int id) : _id(id)
   {
   }
