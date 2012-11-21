@@ -64,7 +64,7 @@ namespace g2o {
     cholDecomp.compute(covariance*(dim+lambda));
     if (cholDecomp.info()==Eigen::NumericalIssue)
       return false;
-    CovarianceType L=cholDecomp.matrixL();
+    const CovarianceType& L=cholDecomp.matrixL();
     int k=1;
     for (int i=0; i<dim; i++) {
       SampleType s(L.col(i));
