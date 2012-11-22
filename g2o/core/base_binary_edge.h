@@ -70,6 +70,7 @@ namespace g2o {
 
       virtual OptimizableGraph::Vertex* createFrom();
       virtual OptimizableGraph::Vertex* createTo();
+      virtual OptimizableGraph::Vertex* createVertex(int i);
 
       virtual void resize(size_t size);
 

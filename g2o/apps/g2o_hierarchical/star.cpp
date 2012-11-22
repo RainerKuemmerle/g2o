@@ -63,9 +63,7 @@ namespace g2o {
         cerr << "FATAL: failure while building linear structure" << endl;
       // cerr << "errors" << endl;
       optimizer()->computeActiveErrors();
-      // cerr << "linearize" << endl;
-      optimizer()->linearizeSystem();
-        // cerr << "system" << endl;
+      // cerr << "system" << endl;
       solverWithHessian->updateLinearSystem();
     }
 
