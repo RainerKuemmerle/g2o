@@ -39,6 +39,7 @@
 #include "g2o/core/base_binary_edge.h"
 #include "g2o/solvers/dense/linear_solver_dense.h"
 #include "g2o/solvers/structure_only/structure_only_solver.h"
+#include "g2o/solvers/pcg/linear_solver_pcg.h"
 
 #include "EXTERNAL/ceres/autodiff.h"
 
@@ -276,12 +277,14 @@ int main(int argc, char** argv)
 {
   int maxIterations;
   bool verbose;
+  bool usePCG;
   string outputFilename;
   string inputFilename;
   string statsFilename;
   CommandArgs arg;
   arg.param("i", maxIterations, 5, "perform n iterations");
   arg.param("o", outputFilename, "", "write points into a vrml file");
+  arg.param("pcg", usePCG, false, "use PCG instead of the Cholesky");
   arg.param("v", verbose, false, "verbose output of the optimization process");
   arg.param("stats", statsFilename, "", "specify a file for the statistics");
   arg.paramLeftOver("graph-input", inputFilename, "", "file which will be processed");
@@ -290,18 +293,27 @@ int main(int argc, char** argv)
 
   typedef g2o::BlockSolver< g2o::BlockSolverTraits<9, 3> >  BalBlockSolver;
 #ifdef G2O_HAVE_CHOLMOD
-  cout << "Using CHOLMOD" << endl;
+  string choleskySolverName = "CHOLMOD";
   typedef g2o::LinearSolverCholmod<BalBlockSolver::PoseMatrixType> BalLinearSolver;
 #elif defined G2O_HAVE_CSPARSE
-  cout << "Using CSparse" << endl;
+  string choleskySolverName = "CSparse";
   typedef g2o::LinearSolverCSparse<BalBlockSolver::PoseMatrixType> BalLinearSolver;
 #else
-#error neither CSparse nor Cholmod are available
+#error neither CSparse nor CHOLMOD are available
 #endif
+  typedef g2o::LinearSolverPCG<BalBlockSolver::PoseMatrixType> BalLinearSolverPCG;
 
   g2o::SparseOptimizer optimizer;
-  BalLinearSolver * linearSolver = new BalLinearSolver();
-  linearSolver->setBlockOrdering(true);
+  g2o::LinearSolver<BalBlockSolver::PoseMatrixType>* linearSolver = 0;
+  if (usePCG) {
+    cout << "Using PCG" << endl;
+    linearSolver = new BalLinearSolverPCG();
+  } else {
+    cout << "Using Cholesky: " << choleskySolverName << endl;
+    BalLinearSolver* cholesky = new BalLinearSolver();
+    cholesky->setBlockOrdering(true);
+    linearSolver = cholesky;
+  }
   BalBlockSolver* solver_ptr = new BalBlockSolver(linearSolver);
   g2o::OptimizationAlgorithmLevenberg* solver = new g2o::OptimizationAlgorithmLevenberg(solver_ptr);
   //solver->setUserLambdaInit(1);
