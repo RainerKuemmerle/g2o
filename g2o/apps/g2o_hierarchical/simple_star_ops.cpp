@@ -300,8 +300,6 @@ void computeBorder(StarSet& stars, EdgeStarMap& hesmap){
           cerr << "FATAL: failure while building linear structure" << endl;
         // cerr << "errors" << endl;
         s->optimizer()->computeActiveErrors();
-        // cerr << "linearize" << endl;
-        s->optimizer()->linearizeSystem();
         // cerr << "system" << endl;
         solverWithHessian->updateLinearSystem();
         // cerr << "directSolove" << endl;
@@ -350,8 +348,6 @@ void computeBorder(StarSet& stars, EdgeStarMap& hesmap){
 #if 1
 
         s->optimizer()->computeActiveErrors();
-        // cerr << "linearize" << endl;
-        s->optimizer()->linearizeSystem();
         // cerr << "system" << endl;
         solverWithHessian->updateLinearSystem();
         HyperGraph::EdgeSet prunedStarEdges = backboneEdges;

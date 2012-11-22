@@ -526,6 +526,8 @@ int main(int argc, char** argv)
   optimizer.setAlgorithm(solver);
   optimizer.initializeOptimization(0);
   int result = optimizer.optimize(lowIterations);
+  if (result <0)
+    cerr << "failure in low level optimization" << endl;
 
   optimizer.computeActiveErrors();
   double finalChi=optimizer.activeChi2();

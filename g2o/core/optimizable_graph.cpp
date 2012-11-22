@@ -476,13 +476,13 @@ bool OptimizableGraph::load(istream& is, bool createEdges)
 
 	if (createEdges){
 	  if (! from && id1 >=0) {
-	    from=e->createFrom();
+	    from=e->createVertex(0);
 	    from->setId(id1);
 	    addVertex(from);
 	    doInit=2;
 	  }
 	  if (! to && id2 >=0) {
-	    to=e->createTo();
+	    to=e->createVertex(1);
 	    to->setId(id2);
 	    addVertex(to);
 	    doInit=1;

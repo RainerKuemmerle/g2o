@@ -26,12 +26,21 @@
 
 template <int D, typename E, typename VertexXiType, typename VertexXjType>
 OptimizableGraph::Vertex* BaseBinaryEdge<D, E, VertexXiType, VertexXjType>::createFrom(){
-  return new VertexXiType();
+  return createVertex(0);
 }
 
 template <int D, typename E, typename VertexXiType, typename VertexXjType>
 OptimizableGraph::Vertex* BaseBinaryEdge<D, E, VertexXiType, VertexXjType>::createTo(){
-  return new VertexXjType();
+  return createVertex(1);
+}
+
+template <int D, typename E, typename VertexXiType, typename VertexXjType>
+OptimizableGraph::Vertex* BaseBinaryEdge<D, E, VertexXiType, VertexXjType>::createVertex(int i){
+  switch(i) {
+  case 0: return new VertexXiType();
+  case 1: return new VertexXjType();
+  default: return 0;
+  }
 }
 
 
