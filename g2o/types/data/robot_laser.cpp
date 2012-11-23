@@ -183,7 +183,6 @@ namespace g2o {
     for (size_t i=0; i<points.size(); i+=step){
       glVertex3f((float)points[i].x(), (float)points[i].y(), 0.f);
     }
-    cout <<  endl;
     glEnd();
     glPopMatrix();
 
