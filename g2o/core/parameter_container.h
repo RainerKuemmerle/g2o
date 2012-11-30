@@ -53,6 +53,8 @@ namespace g2o {
       bool addParameter(Parameter* p);
       //! return a parameter based on its ID
       Parameter* getParameter(int id);
+      //! return a parameter based on its ID
+      const Parameter* getParameter(int id) const;
       //! remove a parameter from the container, i.e., the user now owns the pointer
       Parameter* detachParameter(int id);
       //! read parameters from a stream
