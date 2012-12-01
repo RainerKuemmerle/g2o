@@ -580,7 +580,7 @@ bool OptimizableGraph::load(istream& is, bool createEdges)
       } else if (previousData){
 	//cerr << "chaining" << endl;
 	previousData->setNext(d);
-	d->setDataContainer(d->dataContainer());
+	d->setDataContainer(previousData->dataContainer());
         previousData = d;
 	//cerr << "done" << endl;
       } else if (previousDataContainer){
