@@ -24,22 +24,24 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef G2O_SIMULATOR2D_BASE_H_
-#define G2O_SIMULATOR2D_BASE_H_
+#ifndef G2O_SENSOR_SEGMENT2D_H_
+#define G2O_SENSOR_SEGMENT2D_H_
 
-#include "g2o/types/slam2d/types_slam2d.h"
+#include "simulator2d.h"
+#include "g2o/apps/g2o_simulator/pointsensorparameters.h"
 #include "g2o/types/slam2d_addons/types_slam2d_addons.h"
-#include "simulator.h"
 
 namespace g2o {
-
-  typedef WorldObject<VertexSE2> WorldObjectSE2;
-
-  typedef WorldObject<VertexPointXY> WorldObjectPointXY;
-
-  typedef WorldObject<VertexSegment2D> WorldObjectSegment2D;
-
-  typedef Robot<WorldObjectSE2>  Robot2D;
+  
+  // sensor that senses segments, only if the extremas are visible
+  class G2O_SIMULATOR_API SensorSegment2D: public PointSensorParameters, public BinarySensor<Robot2D, EdgeSE2Segment2D,WorldObjectSegment2D>{ 
+  public:
+    SensorSegment2D(const std::string& name_);
+    virtual void sense();
+    virtual void addNoise(EdgeType* e);
+  protected:
+    bool isVisible(WorldObjectType* to);
+  }; 
 
 }
 

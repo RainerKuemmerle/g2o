@@ -1,5 +1,5 @@
 // g2o - General Graph Optimization
-// Copyright (C) 2011 G. Grisetti, R. Kuemmerle, W. Burgard
+// Copyright (C) 2011 R. Kuemmerle, G. Grisetti, W. Burgard
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -24,23 +24,19 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef G2O_SIMULATOR2D_BASE_H_
-#define G2O_SIMULATOR2D_BASE_H_
+#ifndef G2O_TYPES_SLAM2D_SEGMENT_
+#define G2O_TYPES_SLAM2D_SEGMENT_
 
+#include "g2o/config.h"
 #include "g2o/types/slam2d/types_slam2d.h"
-#include "g2o/types/slam2d_addons/types_slam2d_addons.h"
-#include "simulator.h"
 
-namespace g2o {
+// line slam ver 1
+#include "edge_se2_segment2d.h"
+#include "edge_se2_segment2d_line.h"
+#include "edge_se2_segment2d_pointLine.h"
 
-  typedef WorldObject<VertexSE2> WorldObjectSE2;
-
-  typedef WorldObject<VertexPointXY> WorldObjectPointXY;
-
-  typedef WorldObject<VertexSegment2D> WorldObjectSegment2D;
-
-  typedef Robot<WorldObjectSE2>  Robot2D;
-
-}
+// line slam ver 2
+#include "edge_se2_line2d.h"
+#include "edge_line2d_pointxy.h"
 
 #endif

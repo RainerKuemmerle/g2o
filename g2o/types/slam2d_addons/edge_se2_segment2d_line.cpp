@@ -1,5 +1,5 @@
 // g2o - General Graph Optimization
-// Copyright (C) 2011 G. Grisetti, R. Kuemmerle, W. Burgard
+// Copyright (C) 2011 R. Kuemmerle, G. Grisetti, W. Burgard
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -24,23 +24,48 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef G2O_SIMULATOR2D_BASE_H_
-#define G2O_SIMULATOR2D_BASE_H_
+#include "edge_se2_segment2d_line.h"
 
-#include "g2o/types/slam2d/types_slam2d.h"
-#include "g2o/types/slam2d_addons/types_slam2d_addons.h"
-#include "simulator.h"
+#ifdef WINDOWS
+#include <windows.h>
+#endif
+
+#ifdef G2O_HAVE_OPENGL
+#ifdef __APPLE__
+#include <OpenGL/gl.h>
+#else
+#include <GL/gl.h>
+#endif
+#endif
 
 namespace g2o {
 
-  typedef WorldObject<VertexSE2> WorldObjectSE2;
+  EdgeSE2Segment2DLine::EdgeSE2Segment2DLine() :
+    BaseBinaryEdge<2, Vector2d, VertexSE2, VertexSegment2D>()
+  {
+  }
 
-  typedef WorldObject<VertexPointXY> WorldObjectPointXY;
+  bool EdgeSE2Segment2DLine::read(std::istream& is)
+  {
+    for (size_t i = 0; i < 2 ; i++)
+      is >> _measurement[i];
+    for (size_t i = 0; i < 2 ; i++)
+      for (size_t j = i; j < 2 ; j++) {
+        is >> _information (i,j);
+        _information (j,i) = _information (i,j);
+      }
+    return true;
+  }
 
-  typedef WorldObject<VertexSegment2D> WorldObjectSegment2D;
+  bool EdgeSE2Segment2DLine::write(std::ostream& os) const
+  {
+    for (size_t i = 0; i < 2 ; i++)
+      os << _measurement[i] << " ";
+    for (size_t i = 0; i < 2 ; i++)
+      for (size_t j = i; j < 2 ; j++) {
+        os << _information (i,j) << " ";
+      }
+    return os.good();
+  }
 
-  typedef Robot<WorldObjectSE2>  Robot2D;
-
-}
-
-#endif
+} // end namespace
