@@ -40,29 +40,27 @@ using namespace std;
 int main(int argc, char** argv) {
   CommandArgs arg;
   int nlandmarks;
+  int nSegments;
   int simSteps;
   double worldSize;
   bool hasOdom;
   bool hasPoseSensor;
   bool hasPointSensor;
   bool hasPointBearingSensor;
+  bool hasSegmentSensor;
   bool hasCompass;
   bool hasGPS;
 
-  bool hasSegmentSensor;
-  int nSegments;
   int segmentGridSize;
   double minSegmentLenght, maxSegmentLenght;
 
-
   std::string outputFilename;
-  arg.param("nlandmarks", nlandmarks, 100, "number of landmarks in the map");
+  arg.param("simSteps", simSteps, 100, "number of simulation steps");
+  arg.param("nLandmarks", nlandmarks, 1000, "number of landmarks");
   arg.param("nSegments", nSegments, 1000, "number of segments");
   arg.param("segmentGridSize", segmentGridSize, 50, "number of cells of the grid where to align the segments");
   arg.param("minSegmentLenght", minSegmentLenght, 0.5, "minimal lenght of a segment in the world");
   arg.param("maxSegmentLenght", maxSegmentLenght, 3,  "maximal lenght of a segment in the world");
-
-  arg.param("simSteps", simSteps, 100, "number of simulation steps");
   arg.param("worldSize", worldSize, 25.0, "size of the world");
   arg.param("hasOdom",        hasOdom, false,  "the robot has an odometry" );
   arg.param("hasPointSensor", hasPointSensor, false, "the robot has a point sensor" );
@@ -81,8 +79,8 @@ int main(int argc, char** argv) {
   World world(&graph);
   for (int i=0; i<nlandmarks; i++){
     WorldObjectPointXY * landmark = new WorldObjectPointXY;
-    double x = sampleUniform(-.5,.5, &generator)*(worldSize+5);
-    double y = sampleUniform(-.5,.5, &generator)*(worldSize+5);
+    double x = sampleUniform(-.5,.5, &generator)*worldSize;
+    double y = sampleUniform(-.5,.5, &generator)*worldSize;
     landmark->vertex()->setEstimate(Vector2d(x,y));
     world.addWorldObject(landmark);
   }
@@ -113,9 +111,6 @@ int main(int argc, char** argv) {
   }
 
 
-
-
-
   Robot2D robot(&world, "myRobot");
   world.addRobot(&robot);
 
@@ -130,8 +125,8 @@ int main(int argc, char** argv) {
     robot.addSensor(odometrySensor);
     Matrix3d odomInfo = odometrySensor->information();
     odomInfo.setIdentity();
-    odomInfo*=500;
-    odomInfo(2,2)=5000;
+    odomInfo*=100;
+    odomInfo(2,2)=1000;
     odometrySensor->setInformation(odomInfo);
     ss << "-odom";
   }
@@ -141,8 +136,8 @@ int main(int argc, char** argv) {
     robot.addSensor(poseSensor);
     Matrix3d poseInfo = poseSensor->information();
     poseInfo.setIdentity();
-    poseInfo*=500;
-    poseInfo(2,2)=5000;
+    poseInfo*=100;
+    poseInfo(2,2)=1000;
     poseSensor->setInformation(poseInfo);
     ss << "-pose";
   }
@@ -152,9 +147,8 @@ int main(int argc, char** argv) {
     robot.addSensor(pointSensor);
     Matrix2d pointInfo = pointSensor->information();
     pointInfo.setIdentity();
-    pointInfo*=1000;
+    pointInfo*=100;
     pointSensor->setInformation(pointInfo);
-    pointSensor->setFov(0.75*M_PI);
     ss << "-pointXY";
   }
 
@@ -192,6 +186,7 @@ int main(int argc, char** argv) {
 
     ss << "-segment2d";
   }
+  
 
   
   robot.move(SE2());

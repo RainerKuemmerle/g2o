@@ -1,5 +1,5 @@
 // g2o - General Graph Optimization
-// Copyright (C) 2011 G. Grisetti, R. Kuemmerle, W. Burgard
+// Copyright (C) 2011 R. Kuemmerle, G. Grisetti, W. Burgard
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -24,23 +24,30 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef G2O_SIMULATOR2D_BASE_H_
-#define G2O_SIMULATOR2D_BASE_H_
+#include "types_slam2d_addons.h"
 
-#include "g2o/types/slam2d/types_slam2d.h"
-#include "g2o/types/slam2d_addons/types_slam2d_addons.h"
-#include "simulator.h"
+#include "g2o/core/factory.h"
+
+#include "g2o/stuff/macros.h"
+
+#include <iostream>
 
 namespace g2o {
 
-  typedef WorldObject<VertexSE2> WorldObjectSE2;
+  G2O_REGISTER_TYPE_GROUP(slam2d_segment);
 
-  typedef WorldObject<VertexPointXY> WorldObjectPointXY;
+  G2O_REGISTER_TYPE(VERTEX_SEGMENT2D, VertexSegment2D);
+  G2O_REGISTER_TYPE(VERTEX_LINE2D, VertexLine2D);
 
-  typedef WorldObject<VertexSegment2D> WorldObjectSegment2D;
-
-  typedef Robot<WorldObjectSE2>  Robot2D;
-
-}
+  G2O_REGISTER_TYPE(EDGE_SE2_SEGMENT2D, EdgeSE2Segment2D); 
+  G2O_REGISTER_TYPE(EDGE_SE2_SEGMENT2D_LINE, EdgeSE2Segment2DLine);
+  G2O_REGISTER_TYPE(EDGE_SE2_SEGMENT2D_POINTLINE, EdgeSE2Segment2DPointLine);
+  G2O_REGISTER_TYPE(EDGE_SE2_LINE2D, EdgeSE2Line2D);
+  G2O_REGISTER_TYPE(EDGE_LINE2D_POINTXY, EdgeLine2DPointXY);
+ 
+#ifdef G2O_HAVE_OPENGL
+  G2O_REGISTER_ACTION(VertexSegment2DDrawAction);
+  G2O_REGISTER_ACTION(VertexLine2DDrawAction);
 
 #endif
+} // end namespace
