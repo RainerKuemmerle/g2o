@@ -7,6 +7,9 @@ ADD_LIBRARY(types_slam3d_addons ${G2O_LIB_TYPE}
   vertex_plane.h
   edge_se3_plane_calib.cpp
   edge_se3_plane_calib.h
+  line3d.cpp line3d.h
+  vertex_line3d.cpp vertex_line3d.h
+  edge_se3_line.cpp edge_se3_line.h 
   types_slam3d_addons.cpp
   types_slam3d_addons.h
 )
