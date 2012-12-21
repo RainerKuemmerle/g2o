@@ -1,5 +1,5 @@
-#ifndef G2O_VERTEX_PLANE_H_
-#define G2O_VERTEX_PLANE_H_
+#ifndef G2O_VERTEX_LINE3D_H_
+#define G2O_VERTEX_LINE3D_H_
 
 #include "g2o/core/base_vertex.h"
 #include "g2o/core/hyper_graph_action.h"

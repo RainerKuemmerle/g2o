@@ -39,6 +39,9 @@ namespace g2o {
     factory->registerType("VERTEX_PLANE", new HyperGraphElementCreator< ::Slam3dAddons::VertexPlane>);
     factory->registerType("EDGE_SE3_PLANE_CALIB", new HyperGraphElementCreator< ::Slam3dAddons::EdgeSE3PlaneSensorCalib>);
 
+    factory->registerType("VERTEX_LINE3D", new HyperGraphElementCreator< ::Slam3dAddons::VertexLine3D>);
+    factory->registerType("EDGE_SE3_LINE3D", new HyperGraphElementCreator< ::Slam3dAddons::EdgeSE3Line3D>);
+
     HyperGraphActionLibrary* actionLib = HyperGraphActionLibrary::instance();
 #ifdef G2O_HAVE_OPENGL
     HyperGraphElementAction* vertexse3eulerdraw=new g2o::VertexSE3DrawAction;

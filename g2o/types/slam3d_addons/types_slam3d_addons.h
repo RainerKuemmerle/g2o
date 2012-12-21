@@ -28,4 +28,7 @@
 #include "vertex_plane.h"
 #include "edge_se3_plane_calib.h"
 
+#include "vertex_line3d.h"
+#include "edge_se3_line.h"
+
 #endif

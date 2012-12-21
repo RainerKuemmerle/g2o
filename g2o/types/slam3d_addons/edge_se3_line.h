@@ -3,9 +3,11 @@
 
 #include "g2o/core/base_binary_edge.h"
 
+#include "line3d.h"
 #include "vertex_line3d.h"
 #include "g2o/types/slam3d/g2o_types_slam3d_api.h"
 #include "g2o/types/slam3d/vertex_se3.h"
+#include "g2o/types/slam3d/parameter_se3_offset.h"
 
 namespace Slam3dAddons {
   using namespace g2o;
@@ -17,7 +19,8 @@ namespace Slam3dAddons {
    * If z denotes the measurement, then the error function is given as follows:
    * z^-1 * (x_i^-1 * x_j)
    */
-  class G2O_TYPES_SLAM3D_API EdgeSE3Line3D : public BaseBinaryEdge<6, Line3D, VertexSE3, VertexLine3D> {
+  typedef Eigen::Matrix<double, 7, 1> Vector7d;
+  class G2O_TYPES_SLAM3D_API EdgeSE3Line3D : public BaseBinaryEdge<7, Vector7d, VertexSE3, VertexLine3D> {
     public:
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
       EdgeSE3Line3D();
@@ -27,24 +30,25 @@ namespace Slam3dAddons {
       void computeError();
 
       virtual void setMeasurement(const Line3D& m){
-        _measurement = Line3D(m);
+        _measurement.head<6>() = Line3D(m);
+	_measurement(6) = 1;
       }
 
       virtual bool setMeasurementData(const double* d){
-        Map<const Vector6d> v(d);
-        setMeasurement(Line3D(v));
+        Map<const Vector7d> v(d);
+        _measurement = v;
         return true;
       }
 
       virtual bool getMeasurementData(double* d) const{
-        Map<Vector6d> v(d);
+        Map<Vector7d> v(d);
         v = _measurement;
         return true;
       }
 
       //void linearizeOplus();
 
-      virtual int measurementDimension() const {return 6;}
+      virtual int measurementDimension() const {return 7;}
       /*
       virtual bool setMeasurementFromState() ;
       */
@@ -54,6 +58,12 @@ namespace Slam3dAddons {
       /* } */
 
       /* virtual void initialEstimate(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to); */
+      
+  private:
+      
+    ParameterSE3Offset* offsetParam;
+    CacheSE3Offset* cache;
+    virtual bool resolveCaches();
 
   };
 
