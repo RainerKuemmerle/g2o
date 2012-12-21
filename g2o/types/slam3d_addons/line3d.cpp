@@ -1,16 +1,35 @@
-#include <Eigen/SVD>
+#include <Eigen/Dense>
 #include "line3d.h"
-namespace g2o {
+
+namespace Slam3dAddons {
+  using namespace g2o;
   using namespace Eigen;
+
+
+  inline void _skew(Eigen::Matrix3d& S, const Eigen::Vector3d& t){
+    S <<   
+      0,  -t.z(),   t.y(),
+      t.z(),     0,     -t.x(),
+      -t.y()     ,t.x(),   0;
+  }
+
+  inline Eigen::Matrix3d _skew(const Eigen::Vector3d& t){
+    Eigen::Matrix3d S;
+    S <<   
+      0,  -t.z(),   t.y(),
+      t.z(),     0,     -t.x(),
+      -t.y(),     t.x(),   0;
+    return S;
+  }
 
 
   Vector6d Line3D::toCartesian() const{
     Vector6d cartesian;
     cartesian.tail<3>() = d()/d().norm();
-    Matrix3d A=-_skew(d());
-    Eigen::JacobiSVD<Matrix3d> svd(A);
-    cartesian.head<3>() = w();
-    svd.solve(cartesian.head<3>());
+    Matrix3d W=-_skew(d());
+    double damping =  1e-9;
+    Matrix3d A = W.transpose()*W+Matrix3d::Identity()*damping;
+    cartesian.head<3>() = A.ldlt().solve(w());
     return cartesian;
   }
 
