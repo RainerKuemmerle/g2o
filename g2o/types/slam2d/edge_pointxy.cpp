@@ -24,20 +24,54 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef G2O_TYPES_SLAM2D_
-#define G2O_TYPES_SLAM2D_
-
-#include "g2o/config.h"
-#include "vertex_se2.h"
-#include "vertex_point_xy.h"
-#include "parameter_se2_offset.h"
-#include "edge_se2_prior.h"
-#include "edge_se2.h"
-#include "edge_se2_pointxy.h"
-#include "edge_se2_pointxy_bearing.h"
-#include "edge_se2_pointxy_calib.h"
-#include "edge_se2_offset.h"
-#include "edge_se2_pointxy_offset.h"
 #include "edge_pointxy.h"
 
+#ifdef G2O_HAVE_OPENGL
+#include "g2o/stuff/opengl_wrapper.h"
+#include "g2o/stuff/opengl_primitives.h"
 #endif
+
+namespace g2o {
+
+  EdgePointXY::EdgePointXY() :
+    BaseBinaryEdge<2, Vector2d, VertexPointXY, VertexPointXY>()
+  {
+    _information.setIdentity();
+    _error.setZero();
+  }
+
+  bool EdgePointXY::read(std::istream& is)
+  {
+    Vector2d p;
+    is >> p[0] >> p[1];
+    setMeasurement(p);
+    for (int i = 0; i < 2; ++i)
+      for (int j = i; j < 2; ++j) {
+        is >> information()(i, j);
+        if (i != j)
+          information()(j, i) = information()(i, j);
+      }
+    return true;
+  }
+
+  bool EdgePointXY::write(std::ostream& os) const
+  {
+    Vector2d p = measurement();
+    os << p.x() << " " << p.y();
+    for (int i = 0; i < 2; ++i)
+      for (int j = i; j < 2; ++j)
+        os << " " << information()(i, j);
+    return os.good();
+  }
+
+
+#ifndef NUMERIC_JACOBIAN_TWO_D_TYPES
+  void EdgePointXY::linearizeOplus()
+  {
+    _jacobianOplusXi=-Eigen::Matrix2d::Identity();
+    _jacobianOplusXi= Eigen::Matrix2d::Identity();
+  }
+#endif
+
+
+} // end namespace

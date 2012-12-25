@@ -27,7 +27,7 @@ ADD_LIBRARY(g2o_simulator_library ${G2O_LIB_TYPE}
 
 SET_TARGET_PROPERTIES(g2o_simulator_library PROPERTIES OUTPUT_NAME ${LIB_PREFIX}simulator)
 
-TARGET_LINK_LIBRARIES(g2o_simulator_library types_slam3d types_slam2d_addons types_slam2d  core)
+TARGET_LINK_LIBRARIES(g2o_simulator_library types_slam3d_addons types_slam3d types_slam2d_addons types_slam2d  core)
 
 ADD_EXECUTABLE(g2o_simulator2d_application
   test_simulator2d.cpp
@@ -44,7 +44,7 @@ SET_TARGET_PROPERTIES(convertSegmentLine_application PROPERTIES OUTPUT_NAME conv
 ADD_EXECUTABLE(g2o_simulator3d_application
   test_simulator3d.cpp
 )
-TARGET_LINK_LIBRARIES(g2o_simulator3d_application g2o_simulator_library types_slam3d types_slam2d_addons types_slam2d core)
+TARGET_LINK_LIBRARIES(g2o_simulator3d_application g2o_simulator_library types_slam3d_addons types_slam3d types_slam2d_addons types_slam2d core)
 SET_TARGET_PROPERTIES(g2o_simulator3d_application PROPERTIES OUTPUT_NAME g2o_simulator3d${EXE_POSTFIX})
 
 ADD_EXECUTABLE(g2o_anonymize_observations_application

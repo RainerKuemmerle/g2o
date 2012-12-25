@@ -9,6 +9,7 @@ ADD_LIBRARY(types_slam2d ${G2O_LIB_TYPE}
   parameter_se2_offset.cpp     parameter_se2_offset.h
   edge_se2_offset.cpp          edge_se2_offset.h
   edge_se2_pointxy_offset.cpp  edge_se2_pointxy_offset.h
+  edge_pointxy.cpp             edge_pointxy.h
   g2o_types_slam2d_api.h
 )
 
