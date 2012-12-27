@@ -1,10 +1,11 @@
 #include <Eigen/Dense>
 #include "line3d.h"
+#include <iostream>
 
 namespace Slam3dAddons {
   using namespace g2o;
   using namespace Eigen;
-
+  using namespace std;
 
   inline void _skew(Eigen::Matrix3d& S, const Eigen::Vector3d& t){
     S <<   
@@ -27,9 +28,9 @@ namespace Slam3dAddons {
     Vector6d cartesian;
     cartesian.tail<3>() = d()/d().norm();
     Matrix3d W=-_skew(d());
-    double damping =  1e-9;
-    Matrix3d A = W.transpose()*W+Matrix3d::Identity()*damping;
-    cartesian.head<3>() = A.ldlt().solve(w());
+    double damping = 1e-9;
+    Matrix3d A = W.transpose()*W+(Matrix3d::Identity()*damping);
+    cartesian.head<3>() = A.ldlt().solve(W.transpose()*w());
     return cartesian;
   }
 
@@ -72,7 +73,28 @@ namespace Slam3dAddons {
     A.block<3,3>(0,3)= _skew(t.translation())*t.linear();
     A.block<3,3>(3,3)=t.linear();
     Vector6d v = (Vector6d)line;
-    return Line3D(A*v).normalized();
+    cout << "v" << endl << v << endl;
+    cout << "A" << endl << A << endl;
+    cout << "Av" << endl << A*v << endl;
+    return Line3D(A*v);
+  }
+
+  Vector6d transformCartesianLine(const Eigen::Isometry3d& t, const Vector6d& line){
+    Vector6d l;
+    l.head<3>() = t*line.head<3>();
+    l.tail<3>() = t.linear()*line.tail<3>();
+    return normalizeCartesianLine(l);
+  }
+
+  Vector6d normalizeCartesianLine(const Vector6d& line) {
+    Eigen::Vector3d p0 = line.head<3>();
+    Eigen::Vector3d d0 = line.tail<3>();
+    d0.normalize();
+    p0-=d0*(d0.dot(p0));
+    Vector6d nl;
+    nl.head<3>()=p0;
+    nl.tail<3>()=d0;
+    return nl;
   }
 
 }

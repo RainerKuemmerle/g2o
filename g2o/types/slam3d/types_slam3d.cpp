@@ -40,6 +40,8 @@ namespace g2o {
   G2O_REGISTER_TYPE(EDGE_PROJECT_DISPARITY, EdgeSE3PointXYZDisparity);
   G2O_REGISTER_TYPE(EDGE_PROJECT_DEPTH, EdgeSE3PointXYZDepth);
 
+  G2O_REGISTER_TYPE(EDGE_POINTXYZ, EdgePointXYZ);
+
   /*********** ACTIONS ************/
   G2O_REGISTER_ACTION(VertexSE3WriteGnuplotAction);
   G2O_REGISTER_ACTION(VertexPointXYZWriteGnuplotAction);

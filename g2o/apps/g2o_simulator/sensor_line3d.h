@@ -1,5 +1,5 @@
 // g2o - General Graph Optimization
-// Copyright (C) 2011 R. Kuemmerle, G. Grisetti, W. Burgard
+// Copyright (C) 2011 G. Grisetti, R. Kuemmerle, W. Burgard
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -24,20 +24,28 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef G2O_TYPES_SLAM2D_
-#define G2O_TYPES_SLAM2D_
+#ifndef G2O_SENSOR_LINE3D_H_
+#define G2O_SENSOR_LINE3D_H_
+#include "simulator3d_base.h"
+#include "pointsensorparameters.h"
+#include "g2o_simulator_api.h"
 
-#include "g2o/config.h"
-#include "vertex_se2.h"
-#include "vertex_point_xy.h"
-#include "parameter_se2_offset.h"
-#include "edge_se2_prior.h"
-#include "edge_se2.h"
-#include "edge_se2_pointxy.h"
-#include "edge_se2_pointxy_bearing.h"
-#include "edge_se2_pointxy_calib.h"
-#include "edge_se2_offset.h"
-#include "edge_se2_pointxy_offset.h"
-#include "edge_pointxy.h"
+namespace g2o {
+
+  class G2O_SIMULATOR_API SensorPointLine3D: public PointSensorParameters, public BinarySensor<Robot3D, EdgeSE3Line WorldObjectLine3D>{
+  public:
+    typedef PoseVertexType::EstimateType RobotPoseType;
+    SensorLine3D(const std::string& name_);
+    virtual void sense();
+    virtual void addParameters();
+    ParameterSE3Offset* offsetParam() {return _offsetParam;};
+    void addNoise(EdgeType* e);
+  protected:
+    bool isVisible(WorldObjectType* to);
+    RobotPoseType _sensorPose;
+    ParameterSE3Offset* _offsetParam;
+  };
+
+}
 
 #endif

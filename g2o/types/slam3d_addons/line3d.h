@@ -25,7 +25,7 @@ namespace Slam3dAddons {
       }
 
       Line3D(const Vector6d& v){
-        (Vector6d)*this = v;
+        (Vector6d&)*this = v;
       }
 
       Vector6d toCartesian() const;
@@ -80,6 +80,9 @@ namespace Slam3dAddons {
   
 
   Line3D operator*(const Eigen::Isometry3d& t, const Line3D& line);
+
+  Vector6d transformCartesianLine(const Eigen::Isometry3d& t, const Vector6d& line);
+  Vector6d normalizeCartesianLine(const Vector6d& line);
   
 }
 
