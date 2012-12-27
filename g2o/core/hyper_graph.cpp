@@ -133,6 +133,31 @@ namespace g2o {
     return true;
   }
 
+  bool HyperGraph::mergeVertices(Vertex* vBig, Vertex* vSmall, bool erase){
+
+    VertexIDMap::iterator it=_vertices.find(vBig->id());
+    if (it==_vertices.end())
+      return false;
+
+    it=_vertices.find(vSmall->id());
+    if (it==_vertices.end())
+      return false;
+    
+    EdgeSet tmp(vSmall->edges());
+    bool ok = true;
+    for(EdgeSet::iterator it=tmp.begin(); it!=tmp.end(); ++it){
+      HyperGraph::Edge* e = *it;
+      for (size_t i=0; i<e->vertices().size(); i++){
+	Vertex* v=e->vertex(i);
+	if (v==vSmall)
+	  ok &= setEdgeVertex(e,i,vBig);
+      }
+    }
+    if (erase)
+      removeVertex(vSmall);
+    return ok;
+  }
+
   bool HyperGraph::detachVertex(Vertex* v){
     VertexIDMap::iterator it=_vertices.find(v->id());
     if (it==_vertices.end())

@@ -253,10 +253,17 @@ namespace g2o {
 
 
       /**
-       * Sets the vertex un pos "pos" for an edge and keeps the bookkeeping consistent.
+       * Sets the vertex un position "pos" within the edge and keeps the bookkeeping consistent.
        * If v ==0, the vertex is set to "invalid"
        */
       virtual bool setEdgeVertex(Edge* e, int pos, Vertex* v);
+
+      /**
+       * merges two (valid) vertices, adjusts the bookkeeping and relabels all edges.
+       * the observations of vSmall are retargeted to vBig. If erase = true, vSmall is deleted from the graph
+       * repeatedly calls setEdgeVertex(...)
+       */
+      virtual bool mergeVertices(Vertex* vBig, Vertex* vSmall, bool erase);
 
       /**
        * detaches a vertex from all connected edges
