@@ -163,6 +163,7 @@ namespace g2o {
           EdgeSet _edges;
       };
 
+
       /** 
        * Abstract Edge class. Your nice edge classes should inherit from that one.
        * An hyper-edge has pointers to the vertices it connects and stores them in a vector.
