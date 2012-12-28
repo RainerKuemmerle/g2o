@@ -41,6 +41,7 @@ namespace g2o {
 
     factory->registerType("VERTEX_LINE3D", new HyperGraphElementCreator< ::Slam3dAddons::VertexLine3D>);
     factory->registerType("EDGE_SE3_LINE3D", new HyperGraphElementCreator< ::Slam3dAddons::EdgeSE3Line3D>);
+    factory->registerType("EDGE_LINE3D", new HyperGraphElementCreator< ::Slam3dAddons::EdgeLine3D>);
 
     HyperGraphActionLibrary* actionLib = HyperGraphActionLibrary::instance();
 #ifdef G2O_HAVE_OPENGL
