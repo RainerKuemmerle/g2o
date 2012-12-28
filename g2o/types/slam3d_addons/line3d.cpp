@@ -73,9 +73,9 @@ namespace Slam3dAddons {
     A.block<3,3>(0,3)= _skew(t.translation())*t.linear();
     A.block<3,3>(3,3)=t.linear();
     Vector6d v = (Vector6d)line;
-    cout << "v" << endl << v << endl;
-    cout << "A" << endl << A << endl;
-    cout << "Av" << endl << A*v << endl;
+    // cout << "v" << endl << v << endl;
+    // cout << "A" << endl << A << endl;
+    // cout << "Av" << endl << A*v << endl;
     return Line3D(A*v);
   }
 
