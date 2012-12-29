@@ -69,7 +69,7 @@ namespace g2o {
   void EdgePointXY::linearizeOplus()
   {
     _jacobianOplusXi=-Eigen::Matrix2d::Identity();
-    _jacobianOplusXi= Eigen::Matrix2d::Identity();
+    _jacobianOplusXj= Eigen::Matrix2d::Identity();
   }
 #endif
 

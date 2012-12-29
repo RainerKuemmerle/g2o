@@ -46,7 +46,7 @@ namespace Slam3dAddons {
       {
         const VertexLine3D* v1 = static_cast<const VertexLine3D*>(_vertices[0]);
         const VertexLine3D* v2 = static_cast<const VertexLine3D*>(_vertices[1]);
-        _error = (v2->estimate()-_measurement)-v1->estimate();
+        _error = (v2->estimate()-v1->estimate())-_measurement;
       }
       virtual bool read(std::istream& is);
       virtual bool write(std::ostream& os) const;
@@ -72,7 +72,7 @@ namespace Slam3dAddons {
       virtual bool setMeasurementFromState() {
         const VertexLine3D* v1 = static_cast<const VertexLine3D*>(_vertices[0]);
         const VertexLine3D* v2 = static_cast<const VertexLine3D*>(_vertices[1]);
-        _measurement = v2->estimate()-v1->estimate();
+        _measurement = (Vector6d)(v2->estimate())-(Vector6d)v1->estimate();
         return true;
       }
 

@@ -72,7 +72,7 @@ namespace Slam3dAddons {
   void EdgeLine3D::linearizeOplus()
   {
     _jacobianOplusXi=-Matrix6d::Identity();
-    _jacobianOplusXi= Matrix6d::Identity();
+    _jacobianOplusXj= Matrix6d::Identity();
   }
 #endif
 
