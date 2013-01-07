@@ -24,29 +24,32 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "edge_pointxy.h"
+#include "edge_line3d.h"
 
 #ifdef G2O_HAVE_OPENGL
 #include "g2o/stuff/opengl_wrapper.h"
 #include "g2o/stuff/opengl_primitives.h"
 #endif
 
-namespace g2o {
+namespace Slam3dAddons {
+  using namespace g2o;
+  using namespace Eigen;
 
-  EdgePointXY::EdgePointXY() :
-    BaseBinaryEdge<2, Vector2d, VertexPointXY, VertexPointXY>()
+  EdgeLine3D::EdgeLine3D() :
+    BaseBinaryEdge<6, Vector6d, VertexLine3D, VertexLine3D>()
   {
     _information.setIdentity();
     _error.setZero();
   }
 
-  bool EdgePointXY::read(std::istream& is)
+  bool EdgeLine3D::read(std::istream& is)
   {
-    Vector2d p;
-    is >> p[0] >> p[1];
-    setMeasurement(p);
-    for (int i = 0; i < 2; ++i)
-      for (int j = i; j < 2; ++j) {
+    Vector6d  v;
+    for (int i = 0; i < 6; ++i)
+      is >> v[i];
+    setMeasurement(v);
+    for (int i = 0; i < 6; ++i)
+      for (int j = i; j < 6; ++j) {
         is >> information()(i, j);
         if (i != j)
           information()(j, i) = information()(i, j);
@@ -54,22 +57,22 @@ namespace g2o {
     return true;
   }
 
-  bool EdgePointXY::write(std::ostream& os) const
+  bool EdgeLine3D::write(std::ostream& os) const
   {
-    Vector2d p = measurement();
-    os << p.x() << " " << p.y();
-    for (int i = 0; i < 2; ++i)
-      for (int j = i; j < 2; ++j)
+    for (int i = 0; i < 6; ++i)
+      os << _measurement[i] << " ";
+    for (int i = 0; i < 6; ++i)
+      for (int j = i; j < 6; ++j)
         os << " " << information()(i, j);
     return os.good();
   }
 
 
 #ifndef NUMERIC_JACOBIAN_TWO_D_TYPES
-  void EdgePointXY::linearizeOplus()
+  void EdgeLine3D::linearizeOplus()
   {
-    _jacobianOplusXi=-Eigen::Matrix2d::Identity();
-    _jacobianOplusXj= Eigen::Matrix2d::Identity();
+    _jacobianOplusXi=-Matrix6d::Identity();
+    _jacobianOplusXj= Matrix6d::Identity();
   }
 #endif
 

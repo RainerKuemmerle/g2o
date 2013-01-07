@@ -17,7 +17,7 @@ ostream& printVector(ostream& os, const T& t){
   return os;
 }
 
-int main(int argc, char** argv) {
+int main(int , char** ) {
   
   Vector6d t;
   t <<  -3, -2, -4, .2, .1, .3;

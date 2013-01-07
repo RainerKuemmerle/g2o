@@ -44,7 +44,7 @@ namespace g2o {
       {
         const VertexPointXYZ* v1 = static_cast<const VertexPointXYZ*>(_vertices[0]);
         const VertexPointXYZ* v2 = static_cast<const VertexPointXYZ*>(_vertices[1]);
-        _error = (v2->estimate()-_measurement)-v1->estimate();
+        _error = (v2->estimate()-v1->estimate())-_measurement;
       }
       virtual bool read(std::istream& is);
       virtual bool write(std::ostream& os) const;

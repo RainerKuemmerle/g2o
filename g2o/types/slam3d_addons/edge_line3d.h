@@ -24,58 +24,61 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef G2O_EDGE_POINTXY_H
-#define G2O_EDGE_POINTXY_H
+#ifndef G2O_EDGE_LINE3D_H
+#define G2O_EDGE_LINE3D_H
 
-#include "vertex_point_xy.h"
+#include "vertex_line3d.h"
 #include "g2o/config.h"
 #include "g2o/core/base_binary_edge.h"
-#include "g2o_types_slam2d_api.h"
+#include "types_slam3d_addons.h"
 
-namespace g2o {
+namespace Slam3dAddons {
+  using namespace g2o;
+  using namespace Eigen;
 
-  class G2O_TYPES_SLAM2D_API EdgePointXY : public BaseBinaryEdge<2, Eigen::Vector2d, VertexPointXY, VertexPointXY>
+  class G2O_TYPES_SLAM3D_API EdgeLine3D : public BaseBinaryEdge<6, Vector6d, VertexLine3D, VertexLine3D>
   {
     public:
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-        EdgePointXY();
+        EdgeLine3D();
 
       void computeError()
       {
-        const VertexPointXY* v1 = static_cast<const VertexPointXY*>(_vertices[0]);
-        const VertexPointXY* v2 = static_cast<const VertexPointXY*>(_vertices[1]);
+        const VertexLine3D* v1 = static_cast<const VertexLine3D*>(_vertices[0]);
+        const VertexLine3D* v2 = static_cast<const VertexLine3D*>(_vertices[1]);
         _error = (v2->estimate()-v1->estimate())-_measurement;
       }
       virtual bool read(std::istream& is);
       virtual bool write(std::ostream& os) const;
 
-      virtual void setMeasurement(const Vector2d& m){
+      virtual void setMeasurement(const Vector6d& m){
         _measurement = m;
       }
 
       virtual bool setMeasurementData(const double* d){
-        _measurement=Vector2d(d[0], d[1]);;
+	Eigen::Map<const Vector6d> m(d);
+        _measurement=m;
         return true;
       }
 
       virtual bool getMeasurementData(double* d) const {
-	Eigen::Map<Vector2d> m(d);
+	Eigen::Map<Vector6d> m(d);
 	m=_measurement;
         return true;
       }
 
-      virtual int measurementDimension() const {return 2;}
+      virtual int measurementDimension() const {return 3;}
 
       virtual bool setMeasurementFromState() {
-        const VertexPointXY* v1 = static_cast<const VertexPointXY*>(_vertices[0]);
-        const VertexPointXY* v2 = static_cast<const VertexPointXY*>(_vertices[1]);
-        _measurement = v2->estimate()-v1->estimate();
+        const VertexLine3D* v1 = static_cast<const VertexLine3D*>(_vertices[0]);
+        const VertexLine3D* v2 = static_cast<const VertexLine3D*>(_vertices[1]);
+        _measurement = (Vector6d)(v2->estimate())-(Vector6d)v1->estimate();
         return true;
       }
 
 
       virtual double initialEstimatePossible(const OptimizableGraph::VertexSet& , OptimizableGraph::Vertex* ) { return 0.;}
-#ifndef NUMERIC_JACOBIAN_TWO_D_TYPES
+#ifndef NUMERIC_JACOBIAN_THREE_D_TYPES
       virtual void linearizeOplus();
 #endif
   };
