@@ -295,7 +295,10 @@ void MainWindow::setRobustKernel()
 {
   SparseOptimizer* optimizer = viewer->graph;
   bool robustKernel = cbRobustKernel->isChecked();
-  double huberWidth = leKernelWidth->text().toDouble();
+  double huberWidth = leKernelWidth->text().toDouble();  
+  //odometry edges are those whose node ids differ by 1
+  
+  bool onlyLoop = cbOnlyLoop->isChecked();
 
   if (robustKernel) {
     QString strRobustKernel = coRobustKernel->currentText();
@@ -306,9 +309,17 @@ void MainWindow::setRobustKernel()
     }
     for (SparseOptimizer::EdgeSet::const_iterator it = optimizer->edges().begin(); it != optimizer->edges().end(); ++it) {
       OptimizableGraph::Edge* e = static_cast<OptimizableGraph::Edge*>(*it);
-      e->setRobustKernel(creator->construct());
-      e->robustKernel()->setDelta(huberWidth);
-    }
+      if(onlyLoop){
+	if(e->vertices().size()>=2 && abs(e->vertex(0)->id()-abs(e->vertex(1)->id()))!=1){
+	e->setRobustKernel(creator->construct());
+	e->robustKernel()->setDelta(huberWidth);
+	}
+      }
+    else{
+	e->setRobustKernel(creator->construct());
+	e->robustKernel()->setDelta(huberWidth);
+      }
+    }    
   } else {
     for (SparseOptimizer::EdgeSet::const_iterator it = optimizer->edges().begin(); it != optimizer->edges().end(); ++it) {
       OptimizableGraph::Edge* e = static_cast<OptimizableGraph::Edge*>(*it);
