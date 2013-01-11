@@ -287,7 +287,7 @@ namespace g2o {
       /**
        * cast SE3Quat into an Eigen::Isometry3d
        */
-      operator Eigen::Isometry3d()
+      operator Eigen::Isometry3d() const
       {
         Eigen::Isometry3d result = (Eigen::Isometry3d) rotation();
         result.translation() = translation();
