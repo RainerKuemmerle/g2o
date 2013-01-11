@@ -125,14 +125,14 @@ namespace g2o {
   /**
    * \brief Dynamic covariance scaling - DCS
    *  
-   * See paper Robust Map Optimization from agarwal et. all.  ICRA 2013
+   * See paper Robust Map Optimization from Agarwal et al.  ICRA 2013
    *
    * delta is used as $phi$
    */
   class G2O_CORE_API RobustKernelDCS : public RobustKernel
   {
-  public:
-    virtual void robustify(double e2, Eigen::Vector3d& rho) const;
+    public:
+      virtual void robustify(double e2, Eigen::Vector3d& rho) const;
   };
 
 } // end namespace g2o
