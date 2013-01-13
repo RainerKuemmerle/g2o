@@ -63,14 +63,14 @@ void testMarginals(SparseOptimizer& optimizer){
   VectorXd oldMean(v->minimalEstimateDimension()); //HACK: need to set identity
   v->getMinimalEstimateData(&oldMean[0]);
   MatrixXd& cov= *(spinv.block(v->hessianIndex(), v->hessianIndex()));
-  std::vector<MySigmaPoint> spts;
+  std::vector<MySigmaPoint, Eigen::aligned_allocator<MySigmaPoint> > spts;
   cerr << cov << endl;
   if (! sampleUnscented(spts,mean,cov) )
     continue;
 
   // now apply the oplus operator to the sigma points, 
   // and get the points in the global space
-  std::vector<MySigmaPoint> tspts = spts;
+  std::vector<MySigmaPoint, Eigen::aligned_allocator<MySigmaPoint> > tspts = spts;
 
   for (size_t j=0; j<spts.size(); j++) {
     v->push();
@@ -118,7 +118,7 @@ int unscentedTest(){
   VectorXd mean(6);
   mean.fill(1);
 
-  std::vector<MySigmaPoint> spts;
+  std::vector<MySigmaPoint, Eigen::aligned_allocator<MySigmaPoint> > spts;
   sampleUnscented(spts,mean,m);
   for (size_t i =0; i<spts.size(); i++){
     cerr << "Point " << i << " " << endl << "wi=" << spts[i]._wi << " wp=" << spts[i]._wp << " " << endl;
