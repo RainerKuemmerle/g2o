@@ -233,6 +233,7 @@ namespace g2o {
     _name="draw";
     _previousParams = (Parameters*)0x42;
     refreshPropertyPtrs(0);
+    _cacheDrawActions = 0;
   }
 
   bool DrawAction::refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_){
