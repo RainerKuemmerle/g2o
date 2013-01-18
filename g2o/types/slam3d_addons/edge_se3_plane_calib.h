@@ -48,6 +48,16 @@ namespace Slam3dAddons {
   };
 
 
+  class EdgeSE3PlaneSensorCalibDrawAction: public DrawAction{
+  public:
+    EdgeSE3PlaneSensorCalibDrawAction();
+    virtual HyperGraphElementAction* operator()(HyperGraph::HyperGraphElement* element, 
+            HyperGraphElementAction::Parameters* params_ );
+  protected:
+    virtual bool refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_);
+    FloatProperty* _planeWidth, *_planeHeight;
+  };
+
 } // end namespace
 
 #endif

@@ -56,6 +56,7 @@ namespace g2o {
 
     actionLib->registerAction(new  ::Slam3dAddons::CacheCameraDrawAction);
     actionLib->registerAction(new  ::Slam3dAddons::VertexPlaneDrawAction);
+    actionLib->registerAction(new  ::Slam3dAddons::EdgeSE3PlaneSensorCalibDrawAction);
 #endif
     ::Slam3dAddons::initialized = 1;
   }

@@ -540,13 +540,14 @@ bool OptimizableGraph::load(istream& is, bool createEdges)
 	  HyperGraph::Vertex* v=0;
 	  if (vertexId != HyperGraph::UnassignedId){
 	    v = vertex(vertexId);
+	    e->setVertex(l,v);
 	    if (!v) {
 	      vertsOkay = false;
 	      break;
 	    }
 	  }
         }
-        if (! vertsOkay) {
+	if (! vertsOkay) {
           cerr << __PRETTY_FUNCTION__ << ": Unable to find vertices for edge " << token;
           for (int l = 0; l < numV; ++l) {
             if (l > 0)
@@ -565,7 +566,7 @@ bool OptimizableGraph::load(istream& is, bool createEdges)
             }
             delete e;
 	    e=0;
-          }
+          } 
         }
       }
       previousDataContainer = e;

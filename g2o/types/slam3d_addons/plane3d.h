@@ -95,7 +95,7 @@ namespace g2o {
     Vector4d v2;
     Matrix3d R=t.rotation();
     v2.head<3>() = R*v.head<3>();
-    v2(3)=v(3) + t.translation().dot(v2.head<3>());
+    v2(3)=v(3) - t.translation().dot(v2.head<3>());
     return Plane3D(v2);
   };
 
