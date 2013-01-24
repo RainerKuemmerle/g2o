@@ -24,45 +24,35 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "types_slam2d.h"
-
-#include "g2o/core/factory.h"
-
-#include "g2o/stuff/macros.h"
-
-#include <iostream>
+#include "edge_se2_xyprior.h"
 
 namespace g2o {
+  EdgeSE2XYPrior::EdgeSE2XYPrior() : BaseUnaryEdge< 2, Eigen::Vector2d, g2o::VertexSE2 >()
+  {
+    
+  }
 
-  G2O_REGISTER_TYPE_GROUP(slam2d);
+  bool EdgeSE2XYPrior::read(std::istream& is)
+  {
+    Vector2d p;
+    is >> p[0] >> p[1];
+    setMeasurement(p);    
+    for (int i = 0; i < 2; ++i)
+      for (int j = i; j < 2; ++j) {
+        is >> information()(i, j);
+        if (i != j)
+          information()(j, i) = information()(i, j);
+      }
+    return true;
+  }
 
-  G2O_REGISTER_TYPE(VERTEX_SE2, VertexSE2);
-  G2O_REGISTER_TYPE(VERTEX_XY, VertexPointXY);
-  G2O_REGISTER_TYPE(PARAMS_SE2OFFSET, ParameterSE2Offset);
-  G2O_REGISTER_TYPE(CACHE_SE2_OFFSET, CacheSE2Offset);
-  G2O_REGISTER_TYPE(EDGE_PRIOR_SE2, EdgeSE2Prior);
-  G2O_REGISTER_TYPE(EDGE_PRIOR_SE2_XY, EdgeSE2XYPrior);
-  G2O_REGISTER_TYPE(EDGE_SE2, EdgeSE2);
-  G2O_REGISTER_TYPE(EDGE_SE2_XY, EdgeSE2PointXY);
-  G2O_REGISTER_TYPE(EDGE_BEARING_SE2_XY, EdgeSE2PointXYBearing);
-  G2O_REGISTER_TYPE(EDGE_SE2_XY_CALIB, EdgeSE2PointXYCalib);
-  G2O_REGISTER_TYPE(EDGE_SE2_OFFSET, EdgeSE2Offset);
-  G2O_REGISTER_TYPE(EDGE_SE2_POINTXY_OFFSET, EdgeSE2PointXYOffset);
-
- 
-  G2O_REGISTER_ACTION(VertexSE2WriteGnuplotAction);
-  G2O_REGISTER_ACTION(VertexPointXYWriteGnuplotAction);
-  G2O_REGISTER_ACTION(EdgeSE2WriteGnuplotAction);
-  G2O_REGISTER_ACTION(EdgeSE2PointXYWriteGnuplotAction);
-  G2O_REGISTER_ACTION(EdgeSE2PointXYBearingWriteGnuplotAction);
-
-
-#ifdef G2O_HAVE_OPENGL
-  G2O_REGISTER_ACTION(VertexSE2DrawAction);
-  G2O_REGISTER_ACTION(VertexPointXYDrawAction);
-  G2O_REGISTER_ACTION(EdgeSE2DrawAction);
-  G2O_REGISTER_ACTION(EdgeSE2PointXYDrawAction);
-  G2O_REGISTER_ACTION(EdgeSE2PointXYBearingDrawAction);
-
-#endif
-} // end namespace
+  bool EdgeSE2XYPrior::write(std::ostream& os) const
+  {
+    Vector2d p = measurement();
+    os << p[0] << " " << p[1];
+    for (int i = 0; i < 2; ++i)
+      for (int j = i; j < 2; ++j)
+        os << " " << information()(i, j);
+    return os.good();
+  }
+}

@@ -24,45 +24,50 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "types_slam2d.h"
+#ifndef G2O_EDGE_SE2_PRIOR_XY_H
+#define G2O_EDGE_SE2_PRIOR_XY_H
 
-#include "g2o/core/factory.h"
-
-#include "g2o/stuff/macros.h"
-
-#include <iostream>
+#include "vertex_se2.h"
+#include "g2o/core/base_unary_edge.h"
+#include "g2o_types_slam2d_api.h"
 
 namespace g2o {
 
-  G2O_REGISTER_TYPE_GROUP(slam2d);
+  /**
+   * \brief Prior for a two D pose with constraints only in xy direction (like gps)
+   */
+  class G2O_TYPES_SLAM2D_API EdgeSE2XYPrior : public BaseUnaryEdge<2, Eigen::Vector2d, VertexSE2>
+  {
+  public:
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
+    EdgeSE2XYPrior();
 
-  G2O_REGISTER_TYPE(VERTEX_SE2, VertexSE2);
-  G2O_REGISTER_TYPE(VERTEX_XY, VertexPointXY);
-  G2O_REGISTER_TYPE(PARAMS_SE2OFFSET, ParameterSE2Offset);
-  G2O_REGISTER_TYPE(CACHE_SE2_OFFSET, CacheSE2Offset);
-  G2O_REGISTER_TYPE(EDGE_PRIOR_SE2, EdgeSE2Prior);
-  G2O_REGISTER_TYPE(EDGE_PRIOR_SE2_XY, EdgeSE2XYPrior);
-  G2O_REGISTER_TYPE(EDGE_SE2, EdgeSE2);
-  G2O_REGISTER_TYPE(EDGE_SE2_XY, EdgeSE2PointXY);
-  G2O_REGISTER_TYPE(EDGE_BEARING_SE2_XY, EdgeSE2PointXYBearing);
-  G2O_REGISTER_TYPE(EDGE_SE2_XY_CALIB, EdgeSE2PointXYCalib);
-  G2O_REGISTER_TYPE(EDGE_SE2_OFFSET, EdgeSE2Offset);
-  G2O_REGISTER_TYPE(EDGE_SE2_POINTXY_OFFSET, EdgeSE2PointXYOffset);
+    virtual bool setMeasurementData(const double* d){
+      _measurement[0]=d[0];
+      _measurement[1]=d[1];
+      return true;
+      }
 
- 
-  G2O_REGISTER_ACTION(VertexSE2WriteGnuplotAction);
-  G2O_REGISTER_ACTION(VertexPointXYWriteGnuplotAction);
-  G2O_REGISTER_ACTION(EdgeSE2WriteGnuplotAction);
-  G2O_REGISTER_ACTION(EdgeSE2PointXYWriteGnuplotAction);
-  G2O_REGISTER_ACTION(EdgeSE2PointXYBearingWriteGnuplotAction);
+    virtual bool getMeasurementData(double* d) const{
+      d[0] = _measurement[0];
+      d[1] = _measurement[1];
+      return true;
+      }
 
+    virtual int measurementDimension() const {return 2;}
 
-#ifdef G2O_HAVE_OPENGL
-  G2O_REGISTER_ACTION(VertexSE2DrawAction);
-  G2O_REGISTER_ACTION(VertexPointXYDrawAction);
-  G2O_REGISTER_ACTION(EdgeSE2DrawAction);
-  G2O_REGISTER_ACTION(EdgeSE2PointXYDrawAction);
-  G2O_REGISTER_ACTION(EdgeSE2PointXYBearingDrawAction);
+    virtual bool read(std::istream& is);
+    virtual bool write(std::ostream& os) const;
+      
+    virtual void computeError()
+    {
+      const VertexSE2* v = static_cast<const VertexSE2*>(_vertices[0]);
+      double vxy[3];
+      v->getEstimateData(vxy);
+      _error[0] = vxy[0]-_measurement[0];
+      _error[1] = vxy[1]-_measurement[1];
+    }
+  };
+}
 
 #endif
-} // end namespace
