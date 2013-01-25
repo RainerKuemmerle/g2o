@@ -42,19 +42,23 @@ namespace g2o {
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
     EdgeSE2XYPrior();
 
-    virtual bool setMeasurementData(const double* d){
+    virtual bool setMeasurementData(const double* d)
+    {
       _measurement[0]=d[0];
       _measurement[1]=d[1];
       return true;
-      }
+    }
 
-    virtual bool getMeasurementData(double* d) const{
+    virtual bool getMeasurementData(double* d) const
+    {
       d[0] = _measurement[0];
       d[1] = _measurement[1];
       return true;
-      }
+    }
 
     virtual int measurementDimension() const {return 2;}
+
+    virtual void linearizeOplus();
 
     virtual bool read(std::istream& is);
     virtual bool write(std::ostream& os) const;
@@ -62,12 +66,10 @@ namespace g2o {
     virtual void computeError()
     {
       const VertexSE2* v = static_cast<const VertexSE2*>(_vertices[0]);
-      double vxy[3];
-      v->getEstimateData(vxy);
-      _error[0] = vxy[0]-_measurement[0];
-      _error[1] = vxy[1]-_measurement[1];
+      _error = v->estimate().translation() - _measurement;
     }
   };
-}
+
+} // end namespace
 
 #endif

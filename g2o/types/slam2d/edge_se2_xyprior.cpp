@@ -27,6 +27,7 @@
 #include "edge_se2_xyprior.h"
 
 namespace g2o {
+
   EdgeSE2XYPrior::EdgeSE2XYPrior() : BaseUnaryEdge< 2, Eigen::Vector2d, g2o::VertexSE2 >()
   {
     
@@ -55,4 +56,10 @@ namespace g2o {
         os << " " << information()(i, j);
     return os.good();
   }
-}
+
+  void EdgeSE2XYPrior::linearizeOplus()
+  {
+    _jacobianOplusXi << 1,0,0, 0,1,0;
+  }
+
+} // end namespace
