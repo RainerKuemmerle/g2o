@@ -168,7 +168,7 @@ the measurement in the indices of the error function:
 \begin{equation}
 \be_k(\bx_k, \bz_{k}) \; \defeq \; \be_{k}(\bx_k) \; \defeq \; \be_{k}(\bx).
 \end{equation}
-Note that each error function and each parameter block and each error
+Note that each parameter block and each error
 function can span over a different space.  A problem in this form can
 be effectively represented by a directed hyper-graph. A node $i$ of
 the graph represents the parameter block $\bx_i \in \bx_k$ and an
@@ -612,7 +612,7 @@ These classes are \verb+BaseVertex+ and \verb+BaseUnaryEdge+,
 \item \verb+BaseBinaryEdge+ is a template class that models a binary
   constraint, namely an error function in the form $\be_k(\bx_{k_1},
   \bx_{k_2})$. It offers the same facilities of \verb+BaseUnaryEdge+, and it
-  requires to specify the following things template parameters: the type of the nodes
+  requires to specify the following template parameters: the type of the nodes
   $\bx_{k_1}$ and $\bx_{k_2}$  and the  type and the dimension of the measurement. 
   Again, it implements the numeric Jacobians via
   a default implementation of the \verb+linearizeOplus+ method.
