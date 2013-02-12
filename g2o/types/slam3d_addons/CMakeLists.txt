@@ -10,7 +10,8 @@ ADD_LIBRARY(types_slam3d_addons ${G2O_LIB_TYPE}
   line3d.cpp line3d.h
   vertex_line3d.cpp vertex_line3d.h
   edge_se3_line.cpp edge_se3_line.h 
-  edge_line3d.cpp edge_line3d.h 
+  edge_line3d.cpp edge_line3d.h
+  edge_plane.cpp edge_plane.h  
   types_slam3d_addons.cpp
   types_slam3d_addons.h
 )
