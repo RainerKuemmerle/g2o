@@ -561,13 +561,19 @@ bool BlockSolver<Traits>::buildSystem()
 
 
 template <typename Traits>
-bool BlockSolver<Traits>::setLambda(double lambda)
+bool BlockSolver<Traits>::setLambda(double lambda, bool backup)
 {
+  if (backup) {
+    _diagonalBackupPose.resize(_numPoses);
+    _diagonalBackupLandmark.resize(_numLandmarks);
+  }
 # ifdef G2O_OPENMP
 # pragma omp parallel for default (shared) if (_numPoses > 100)
 # endif
   for (int i = 0; i < _numPoses; ++i) {
     PoseMatrixType *b=_Hpp->block(i,i);
+    if (backup)
+      _diagonalBackupPose[i] = b->diagonal();
     b->diagonal().array() += lambda;
   }
 # ifdef G2O_OPENMP
@@ -575,9 +581,26 @@ bool BlockSolver<Traits>::setLambda(double lambda)
 # endif
   for (int i = 0; i < _numLandmarks; ++i) {
     LandmarkMatrixType *b=_Hll->block(i,i);
+    if (backup)
+      _diagonalBackupLandmark[i] = b->diagonal();
     b->diagonal().array() += lambda;
   }
   return true;
+}
+
+template <typename Traits>
+void BlockSolver<Traits>::restoreDiagonal()
+{
+  assert((int) _diagonalBackupPose.size() == _numPoses && "Mismatch in dimensions");
+  assert((int) _diagonalBackupLandmark.size() == _numLandmarks && "Mismatch in dimensions");
+  for (int i = 0; i < _numPoses; ++i) {
+    PoseMatrixType *b=_Hpp->block(i,i);
+    b->diagonal() = _diagonalBackupPose[i];
+  }
+  for (int i = 0; i < _numLandmarks; ++i) {
+    LandmarkMatrixType *b=_Hll->block(i,i);
+    b->diagonal() = _diagonalBackupLandmark[i];
+  }
 }
 
 template <typename Traits>

@@ -82,8 +82,15 @@ namespace g2o {
        * components of A by doing += lambda along the main diagonal of the Matrix.
        * Note that this function may be called with a positive and a negative lambda.
        * The latter is used to undo a former modification.
+       * If backup is true, then the solver should store a backup of the diagonal, which
+       * can be restored by restoreDiagonal()
        */
-      virtual bool setLambda(double lambda) = 0;
+      virtual bool setLambda(double lambda, bool backup = false) = 0;
+
+      /**
+       * restore a previosly made backup of the diagonal
+       */
+      virtual void restoreDiagonal() = 0;
 
       //! return x, the solution vector
       double* x() { return _x;}

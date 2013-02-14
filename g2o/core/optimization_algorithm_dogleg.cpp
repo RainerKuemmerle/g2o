@@ -122,10 +122,10 @@ namespace g2o {
         bool solverOk = false;
         while(!solverOk) {
           if (! _wasPDInAllIterations)
-            _solver->setLambda(_currentLambda);   // add _currentLambda to the diagonal
+            _solver->setLambda(_currentLambda, true);   // add _currentLambda to the diagonal
           solverOk = _solver->solve();
           if (! _wasPDInAllIterations)
-            _solver->setLambda(- _currentLambda); // restore original diagonal
+            _solver->restoreDiagonal();
           _wasPDInAllIterations = _wasPDInAllIterations && solverOk;
           if (! _wasPDInAllIterations) {
             // simple strategy to control the damping factor
