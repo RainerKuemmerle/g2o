@@ -6,27 +6,39 @@ FIND_PATH(QGLVIEWER_INCLUDE_DIR qglviewer.h
     /opt/local/include/QGLViewer
     /usr/local/include/QGLViewer
     /sw/include/QGLViewer
+    ENV QGLVIEWERROOT
   )
 
+find_library(QGLVIEWER_LIBRARY_RELEASE
+  NAMES qglviewer-qt4 qglviewer QGLViewer QGLViewer2
+  PATHS /usr/lib
+        /usr/local/lib
+        /opt/local/lib
+        /sw/lib
+        ENV QGLVIEWERROOT
+        ENV LD_LIBRARY_PATH
+        ENV LIBRARY_PATH
+  PATH_SUFFIXES QGLViewer QGLViewer/release
+)
+find_library(QGLVIEWER_LIBRARY_DEBUG
+  NAMES dqglviewer dQGLViewer dQGLViewer2 QGLViewerd2
+  PATHS /usr/lib
+        /usr/local/lib
+        /opt/local/lib
+        /sw/lib
+        ENV QGLVIEWERROOT
+        ENV LD_LIBRARY_PATH
+        ENV LIBRARY_PATH
+  PATH_SUFFIXES QGLViewer QGLViewer/release
+)
 
-IF(WIN32)
-  FIND_LIBRARY(QGLVIEWER_RELEASE_LIBRARY QGLViewer2)
-  FIND_LIBRARY(QGLVIEWER_DEBUG_LIBRARY   QGLViewerd2)
-
-  IF(QGLVIEWER_DEBUG_LIBRARY AND QGLVIEWER_RELEASE_LIBRARY)
-    set(QGLVIEWER_LIBRARY debug  ${QGLVIEWER_DEBUG_LIBRARY}
-                          optimized ${QGLVIEWER_RELEASE_LIBRARY} )
-  ENDIF(QGLVIEWER_DEBUG_LIBRARY AND QGLVIEWER_RELEASE_LIBRARY)
-
-ELSE(WIN32)
-  FIND_LIBRARY(QGLVIEWER_LIBRARY NAMES  qglviewer-qt4 QGLViewer
-    PATHS
-    /usr/lib
-    /usr/local/lib
-    /opt/local/lib
-    /sw/lib
-    )
-ENDIF(WIN32)
+if(QGLVIEWER_LIBRARY_RELEASE)
+  if(QGLVIEWER_LIBRARY_DEBUG)
+    set(QGLVIEWER_LIBRARY optimized ${QGLVIEWER_LIBRARY_RELEASE} debug ${QGLVIEWER_LIBRARY_DEBUG})
+  else()
+    set(QGLVIEWER_LIBRARY ${QGLVIEWER_LIBRARY_RELEASE})
+  endif()
+endif()
 
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(QGLVIEWER DEFAULT_MSG
