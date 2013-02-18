@@ -37,6 +37,13 @@ The following parts are licensed under GPL3+:
 - g2o_incremental
 - slam2d_g2o (example for 2D SLAM with a QGLviewer GUI)
 
+Please note that some features of CHOLMOD (which may be used by g2o, see
+libsuitesparse below) are licensed under the GPL. To avoid that your binary has
+to be licensed under the GPL, you may have to re-compile CHOLMOD without
+including its GPL features. The CHOLMOD library distributed with, for example,
+Ubuntu or Debian includes the GPL features. The supernodal factorization is
+considered by g2o, if it is available.
+
 Within the folder EXTERNAL we include software not written by us to
 guarantee easy compilation.
 - csparse: LPGL2.1 (see EXTERNAL/csparse/License.txt)
