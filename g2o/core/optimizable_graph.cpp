@@ -237,6 +237,7 @@ namespace g2o {
   OptimizableGraph::~OptimizableGraph()
   {
     clear();
+    clearParameters();
   }
 
   bool OptimizableGraph::addVertex(HyperGraph::Vertex* v, Data* userData)
@@ -858,9 +859,8 @@ bool OptimizableGraph::saveEdge(std::ostream& os, OptimizableGraph::Edge* e) con
   return false;
 }
 
-void OptimizableGraph::clear()
+void OptimizableGraph::clearParameters()
 {
-  HyperGraph::clear();
   _parameters.clear();
 }
 

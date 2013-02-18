@@ -630,7 +630,10 @@ namespace g2o {
      */
     bool isSolverSuitable(const OptimizationAlgorithmProperty& solverProperty, const std::set<int>& vertDims = std::set<int>()) const;
 
-    virtual void clear();
+    /**
+     * remove the parameters of the graph
+     */
+    virtual void clearParameters();
 
     bool addParameter(Parameter* p) {
       return _parameters.addParameter(p);
