@@ -36,7 +36,7 @@
 
 namespace g2o {
 
-  class G2O_TYPES_SLAM2D_API EdgeSE2Line2D : public BaseBinaryEdge<2, Eigen::Vector2d, VertexSE2, VertexLine2D>
+  class G2O_TYPES_SLAM2D_API EdgeSE2Line2D : public BaseBinaryEdge<2, Line2D, VertexSE2, VertexLine2D>
   {
     public:
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW

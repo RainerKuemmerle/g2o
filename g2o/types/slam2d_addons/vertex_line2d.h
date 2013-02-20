@@ -33,12 +33,13 @@
 #include "g2o/core/hyper_graph_action.h"
 #include "g2o/stuff/misc.h"
 #include "g2o/types/slam2d/vertex_point_xy.h"
+#include "line_2d.h"
 
 #include <Eigen/Core>
 
 namespace g2o {
 
-  class G2O_TYPES_SLAM2D_API VertexLine2D : public BaseVertex<2, Eigen::Vector2d>
+  class G2O_TYPES_SLAM2D_API VertexLine2D : public BaseVertex<2, Line2D>
   {
     public:
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
@@ -56,7 +57,7 @@ namespace g2o {
 
       virtual bool setEstimateDataImpl(const double* est){
         Map<const Vector2d> v(est);
-        _estimate=v;
+        _estimate=Line2D(v);
         return true;
       }
 

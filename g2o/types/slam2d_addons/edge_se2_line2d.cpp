@@ -41,7 +41,7 @@
 namespace g2o {
 
   EdgeSE2Line2D::EdgeSE2Line2D() :
-    BaseBinaryEdge<2, Vector2d, VertexSE2, VertexLine2D>()
+    BaseBinaryEdge<2, Line2D, VertexSE2, VertexLine2D>()
   {
   }
 

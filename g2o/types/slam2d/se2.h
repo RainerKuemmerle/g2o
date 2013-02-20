@@ -43,6 +43,10 @@ namespace g2o {
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
       SE2():_R(0),_t(0,0){}
 
+  SE2(const Eigen::Isometry2d& iso): _R(0), _t(iso.translation()){ 
+		_R.fromRotationMatrix(iso.linear());
+	}
+
       SE2(const Vector3d& v):_R(v[2]),_t(v[0],v[1]){}
 
       SE2(double x, double y, double theta):_R(theta),_t(x,y){}
@@ -104,6 +108,13 @@ namespace g2o {
       //! convert to a 3D vector (x, y, theta)
       inline Vector3d toVector() const {
         return Vector3d(_t.x(), _t.y(), _R.angle());
+      }
+
+      inline Eigen::Isometry2d toIsometry() const {
+				Eigen::Isometry2d iso = Eigen::Isometry2d::Identity();
+				iso.linear() = _R.toRotationMatrix();
+				iso.translation() = _t;
+				return iso;
       }
 
     protected:

@@ -1,4 +1,5 @@
 ADD_LIBRARY(types_slam2d_addons ${G2O_LIB_TYPE}
+  line_2d.h
   types_slam2d_addons.cpp types_slam2d_addons.h
   vertex_segment2d.cpp         vertex_segment2d.h
   edge_se2_segment2d.cpp       edge_se2_segment2d.h
@@ -7,7 +8,7 @@ ADD_LIBRARY(types_slam2d_addons ${G2O_LIB_TYPE}
   vertex_line2d.cpp            vertex_line2d.h
   edge_se2_line2d.cpp          edge_se2_line2d.h
   edge_line2d_pointxy.cpp          edge_line2d_pointxy.h
-	edge_line2d.cpp          edge_line2d.h
+  edge_line2d.cpp          edge_line2d.h
   g2o_types_slam2d_addons_api.h
   
 )

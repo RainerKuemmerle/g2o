@@ -24,54 +24,36 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "edge_line2d.h"
+#ifndef G2O_LINE2D_H
+#define G2O_LINE2D_H
 
-#ifdef G2O_HAVE_OPENGL
-#include "g2o/stuff/opengl_wrapper.h"
-#include "g2o/stuff/opengl_primitives.h"
+#include "g2o/types/slam2d/se2.h"
+
+#include <Eigen/Core>
+#include <Eigen/Geometry>
+
+namespace g2o {
+
+  struct Line2D : public Eigen::Vector2d{
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+    Line2D() {
+      setZero();
+    }
+    Line2D(const Eigen::Vector2d& v) {
+      (*this)(0) = v(0);
+      (*this)(1) = v(1);
+    }
+  };
+
+  inline Line2D operator * (const SE2 & t, const Line2D& l){
+    Line2D est = l;
+    est[0] += t.rotation().angle();
+    est[0] = normalize_theta(est[0]);
+    Vector2d n(cos(est[0]), sin(est[0]));
+    est[1] += n.dot(t.translation());
+    return est;
+  }
+
+}
+
 #endif
-
-  using namespace g2o;
-  using namespace Eigen;
-
-  EdgeLine2D::EdgeLine2D() :
-    BaseBinaryEdge<2, Line2D, VertexLine2D, VertexLine2D>()
-  {
-    _information.setIdentity();
-    _error.setZero();
-  }
-
-  bool EdgeLine2D::read(std::istream& is)
-  {
-    Vector2d  v;
-    for (int i = 0; i < 2; ++i)
-      is >> v[i];
-    setMeasurement(v);
-    for (int i = 0; i < 2; ++i)
-      for (int j = i; j < 2; ++j) {
-        is >> information()(i, j);
-        if (i != j)
-          information()(j, i) = information()(i, j);
-      }
-    return true;
-  }
-
-  bool EdgeLine2D::write(std::ostream& os) const
-  {
-    for (int i = 0; i < 2; ++i)
-      os << _measurement[i] << " ";
-    for (int i = 0; i < 2; ++i)
-      for (int j = i; j < 2; ++j)
-        os << " " << information()(i, j);
-    return os.good();
-  }
-
-
-#ifndef NUMERIC_JACOBIAN_TWO_D_TYPES
-  void EdgeLine2D::linearizeOplus()
-  {
-    _jacobianOplusXi=-Matrix2d::Identity();
-    _jacobianOplusXj= Matrix2d::Identity();
-  }
-#endif
-

@@ -36,7 +36,7 @@ namespace g2o {
 	
   using namespace Eigen;
 
-  class G2O_TYPES_SLAM2D_API EdgeLine2D : public BaseBinaryEdge<2, Vector2d, VertexLine2D, VertexLine2D>
+  class G2O_TYPES_SLAM2D_API EdgeLine2D : public BaseBinaryEdge<2, Line2D, VertexLine2D, VertexLine2D>
   {
     public:
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW
@@ -57,7 +57,7 @@ namespace g2o {
 
       virtual bool setMeasurementData(const double* d){
 	Eigen::Map<const Vector2d> m(d);
-        _measurement=m;
+        _measurement=Line2D(m);
         return true;
       }
 
@@ -72,7 +72,7 @@ namespace g2o {
       virtual bool setMeasurementFromState() {
         const VertexLine2D* v1 = static_cast<const VertexLine2D*>(_vertices[0]);
         const VertexLine2D* v2 = static_cast<const VertexLine2D*>(_vertices[1]);
-        _measurement = (Vector2d)(v2->estimate())-(Vector2d)v1->estimate();
+        _measurement = Line2D((Vector2d)(v2->estimate())-(Vector2d)v1->estimate());
         return true;
       }
 

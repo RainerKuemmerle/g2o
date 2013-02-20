@@ -45,7 +45,7 @@
 namespace g2o {
 
   VertexLine2D::VertexLine2D() :
-    BaseVertex<2, Vector2d>()
+    BaseVertex<2, Line2D>()
   {
     _estimate.setZero();
     p1Id=p2Id=-1;
