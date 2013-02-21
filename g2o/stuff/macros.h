@@ -119,6 +119,11 @@ Modified by Mark Pupilli from:
     #s << " = " << (s) << std::flush
 #endif
 
+#ifndef PVARA
+#define PVARA(s) \
+  #s << " = " << RAD2DEG(s) << "deg" << std::flush
+#endif
+
 #ifndef FIXED
 #define FIXED(s) \
   std::fixed << s << std::resetiosflags(std::ios_base::fixed)
