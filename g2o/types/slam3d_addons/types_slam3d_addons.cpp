@@ -37,12 +37,15 @@ namespace g2o {
     factory->registerType("VERTEX3", new HyperGraphElementCreator< ::Slam3dAddons::VertexSE3Euler>);
     factory->registerType("EDGE3", new HyperGraphElementCreator< ::Slam3dAddons::EdgeSE3Euler>);
     factory->registerType("VERTEX_PLANE", new HyperGraphElementCreator< ::Slam3dAddons::VertexPlane>);
+    factory->registerType("VERTEX_PLANE_NM", new HyperGraphElementCreator< ::Slam3dAddons::VertexPlaneNM>);
     factory->registerType("EDGE_SE3_PLANE_CALIB", new HyperGraphElementCreator< ::Slam3dAddons::EdgeSE3PlaneSensorCalib>);
+factory->registerType("EDGE_SE3_PLANE_NM_CALIB", new HyperGraphElementCreator< ::Slam3dAddons::EdgeSE3PlaneNMSensorCalib>);
 
     factory->registerType("VERTEX_LINE3D", new HyperGraphElementCreator< ::Slam3dAddons::VertexLine3D>);
     factory->registerType("EDGE_SE3_LINE3D", new HyperGraphElementCreator< ::Slam3dAddons::EdgeSE3Line3D>);
     factory->registerType("EDGE_LINE3D", new HyperGraphElementCreator< ::Slam3dAddons::EdgeLine3D>);
     factory->registerType("EDGE_PLANE", new HyperGraphElementCreator< ::Slam3dAddons::EdgePlane>);
+    factory->registerType("EDGE_PLANE_NORMALIZE", new HyperGraphElementCreator< ::Slam3dAddons::EdgePlaneNormalize>);
 
 
     HyperGraphActionLibrary* actionLib = HyperGraphActionLibrary::instance();
@@ -58,7 +61,10 @@ namespace g2o {
 
     actionLib->registerAction(new  ::Slam3dAddons::CacheCameraDrawAction);
     actionLib->registerAction(new  ::Slam3dAddons::VertexPlaneDrawAction);
+    actionLib->registerAction(new  ::Slam3dAddons::VertexPlaneNMDrawAction);
     actionLib->registerAction(new  ::Slam3dAddons::EdgeSE3PlaneSensorCalibDrawAction);
+    actionLib->registerAction(new  ::Slam3dAddons::EdgeSE3PlaneNMSensorCalibDrawAction);
+
 #endif
     ::Slam3dAddons::initialized = 1;
   }

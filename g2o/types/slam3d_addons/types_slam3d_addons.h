@@ -26,11 +26,15 @@
 #include "vertex_se3_euler.h"
 #include "edge_se3_euler.h"
 #include "vertex_plane.h"
+#include "vertex_plane_nm.h"
 #include "edge_se3_plane_calib.h"
+#include "edge_se3_plane_nm_calib.h"
 
 #include "vertex_line3d.h"
 #include "edge_se3_line.h"
 #include "edge_line3d.h"
 #include "edge_plane.h"
+#include "edge_plane_normalize.h"
+
 
 #endif

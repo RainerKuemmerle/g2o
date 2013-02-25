@@ -5,8 +5,14 @@ ADD_LIBRARY(types_slam3d_addons ${G2O_LIB_TYPE}
   edge_se3_euler.h
   vertex_plane.cpp
   vertex_plane.h
+  vertex_plane_nm.cpp
+  vertex_plane_nm.h
+  edge_plane_normalize.cpp
+  edge_plane_normalize.h
   edge_se3_plane_calib.cpp
   edge_se3_plane_calib.h
+  edge_se3_plane_nm_calib.cpp
+  edge_se3_plane_nm_calib.h
   line3d.cpp line3d.h
   vertex_line3d.cpp vertex_line3d.h
   edge_se3_line.cpp edge_se3_line.h 

@@ -26,6 +26,8 @@ namespace g2o {
         return _coeffs;
       }
 
+      inline const Vector4d& coeffs() const {return _coeffs;}
+
       inline void fromVector(const Vector4d& coeffs_) {
         _coeffs=coeffs_;
         normalize(_coeffs);
@@ -78,7 +80,7 @@ namespace g2o {
       return Vector3d(azimuth(n), elevation(n), logD1-logD2);
     }
 
-    protected:
+    //protected:
 
       static inline void normalize(Vector4d& coeffs) {
         double n=coeffs.head<3>().norm();
