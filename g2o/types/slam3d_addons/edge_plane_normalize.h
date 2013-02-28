@@ -69,7 +69,7 @@ namespace Slam3dAddons {
     
     virtual int measurementDimension() const {return 1;}
 
-    virtual bool setMeasurementFromState() ;
+    //virtual bool setMeasurementFromState() ;
 
   protected:
   };
