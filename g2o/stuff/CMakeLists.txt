@@ -6,6 +6,7 @@ ADD_LIBRARY(stuff ${G2O_LIB_TYPE}
   filesys_tools.cpp  os_specific.h    string_tools.cpp
   property.cpp       property.h       
   sampler.cpp        sampler.h        unscented.h
+  tictoc.cpp tictoc.h
   g2o_stuff_api.h
 )
 
