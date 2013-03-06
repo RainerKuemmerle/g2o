@@ -74,7 +74,7 @@ void JacobianWorkspace::updateSize(const HyperGraph::Edge* e_)
 
 void JacobianWorkspace::updateSize(const OptimizableGraph& graph)
 {
-  for (OptimizableGraph::EdgeSet::iterator it = graph.edges().begin(); it != graph.edges().end(); ++it) {
+  for (OptimizableGraph::EdgeSet::const_iterator it = graph.edges().begin(); it != graph.edges().end(); ++it) {
     const OptimizableGraph::Edge* e = static_cast<const OptimizableGraph::Edge*>(*it);
     updateSize(e);
   }
