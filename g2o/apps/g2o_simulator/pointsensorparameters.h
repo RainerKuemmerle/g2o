@@ -35,6 +35,7 @@ namespace g2o {
 
   class G2O_SIMULATOR_API PointSensorParameters{
   public:
+    //EIGEN_MAKE_ALIGNED_OPERATOR_NEW
     PointSensorParameters();
     double maxRange() const {return sqrt(_maxRange2);}
     void setMaxRange(double maxRange_)  {_maxRange2 = maxRange_*maxRange_;}

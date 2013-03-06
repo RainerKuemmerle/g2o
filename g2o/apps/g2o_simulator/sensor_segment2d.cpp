@@ -26,11 +26,14 @@
 
 #include "sensor_segment2d.h"
 #include "g2o/apps/g2o_simulator/simutils.h"
-
+#include <iostream>
 
 namespace g2o{
+  using namespace std;
 
-  SensorSegment2D::SensorSegment2D(const std::string& name_): BinarySensor<Robot2D, EdgeSE2Segment2D, WorldObjectSegment2D>(name_) {}
+  SensorSegment2D::SensorSegment2D(const std::string& name_): BinarySensor<Robot2D, EdgeSE2Segment2D, WorldObjectSegment2D>(name_) {
+    cerr << "I am the constructor" << endl;
+  }
 
   void SensorSegment2D::addNoise(EdgeType* e){
     EdgeType::ErrorVector n=_sampler.generateSample();

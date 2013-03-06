@@ -36,7 +36,8 @@ namespace g2o {
   // sensor that senses segments, only if the extremas are visible
   class G2O_SIMULATOR_API SensorSegment2DLine: public PointSensorParameters, public BinarySensor<Robot2D, EdgeSE2Segment2DLine,WorldObjectSegment2D>{ 
   public:
-    SensorSegment2DLine(const std::string& name_);
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+  SensorSegment2DLine(const std::string& name_);
     virtual void sense();
     virtual void addNoise(EdgeType* e);
   protected:

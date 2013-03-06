@@ -166,7 +166,9 @@ int main(int argc, char** argv) {
   }
 
   if (hasSegmentSensor) {
-    SensorSegment2D* segmentSensor = new SensorSegment2D("segmentSensorSensor");
+    cerr << "creating Segment Sensor" << endl;
+    SensorSegment2D* segmentSensor = new SensorSegment2D("segmentSensor");
+    cerr << "segmentSensorCreated" << endl;
     segmentSensor->setMaxRange(3);
     segmentSensor->setMinRange(.1);
     robot.addSensor(segmentSensor);
