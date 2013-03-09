@@ -82,6 +82,8 @@ namespace g2o {
         std::vector<TicTocElement> sortedElements;
         sortedElements.reserve(tictocElements.size());
         for (TicTocMap::const_iterator it = tictocElements.begin(); it != tictocElements.end(); ++it) {
+          if (it->second.numCalls == 0)
+            continue;
           longestName = std::max(longestName, (int)it->first.size());
           sortedElements.push_back(it->second);
         }
