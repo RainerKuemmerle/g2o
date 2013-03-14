@@ -829,8 +829,8 @@ bool OptimizableGraph::saveVertex(std::ostream& os, OptimizableGraph::Vertex* v)
         os << tag << " ";
         d->write(os);
         os << endl;
-        d=d->next();
       }
+      d=d->next();
     }
     if (v->fixed()) {
       os << "FIX " << v->id() << endl;
