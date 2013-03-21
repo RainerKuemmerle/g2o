@@ -158,8 +158,8 @@ namespace g2o {
       float r2=_maxRange->value();
       r2 *= r2;
       for (size_t i=0; i<points.size(); i++){
-	float x = points[i].x();
-	float y = points[i].y();
+	double x = points[i].x();
+	double y = points[i].y();
 	if (x*x + y*y < r2)
 	  npoints[k++] = points[i];
       }

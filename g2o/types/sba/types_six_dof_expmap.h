@@ -42,7 +42,7 @@ using namespace Eigen;
 
 typedef Matrix<double, 6, 6> Matrix6d;
 
-class CameraParameters : public g2o::Parameter
+class G2O_TYPES_SBA_API CameraParameters : public g2o::Parameter
 {
 public:
   CameraParameters();
