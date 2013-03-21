@@ -201,17 +201,13 @@ int main(int argc, char** argv)
       laserOffset->setFixed(true);
     }
 
-    cerr << "Performing full non-linear estimation" << endl;
+    cerr << "\nPerforming full non-linear estimation" << endl;
     optimizer.initializeOptimization();
     optimizer.computeActiveErrors();
     optimizer.optimize(maxIterations);
-    if (laserOffset) {
-      cerr << "Calibrated laser offset (x, y, theta):" << laserOffset->estimate().toVector().transpose() << endl;
-    }
-    if (odomParamsVertex) {
-      odomCalib = odomParamsVertex->estimate();
-      cerr << "Odometry parameters (scaling factors (v_l, v_r, b)): " << odomParamsVertex->estimate().transpose() << endl;
-    }
+    cerr << "Calibrated laser offset (x, y, theta):" << laserOffset->estimate().toVector().transpose() << endl;
+    odomCalib = odomParamsVertex->estimate();
+    cerr << "Odometry parameters (scaling factors (v_l, v_r, b)): " << odomParamsVertex->estimate().transpose() << endl;
     optimizer.clear();
   }
 
@@ -229,8 +225,9 @@ int main(int argc, char** argv)
       A(i, 1) = velMeas.vr() * timeInterval;
       x(i) = laserMotion.rotation().angle();
     }
-    linearSolution = (A.transpose() * A).inverse() * A.transpose() * x;
-    cout << PVAR(linearSolution.transpose()) << endl;
+    //linearSolution = (A.transpose() * A).inverse() * A.transpose() * x;
+    linearSolution = A.colPivHouseholderQr().solve(x);
+    //cout << PVAR(linearSolution.transpose()) << endl;
   }
 
   //constructing non-linear least squares
@@ -267,25 +264,21 @@ int main(int argc, char** argv)
     laserOffset->setFixed(true);
   }
 
-  cerr << "Performing partial non-linear estimation" << endl;
+  cerr << "\nPerforming partial non-linear estimation" << endl;
   optimizer.initializeOptimization();
   optimizer.computeActiveErrors();
   optimizer.optimize(maxIterations);
-  if (laserOffset) {
-    cerr << "Calibrated laser offset (x, y, theta):" << laserOffset->estimate().toVector().transpose() << endl;
-  }
-  if (odomParamsVertex) {
-    odomCalib(0) = -1. * linearSolution(0) * odomParamsVertex->estimate();
-    odomCalib(1) = linearSolution(1) * odomParamsVertex->estimate();
-    odomCalib(2) = odomParamsVertex->estimate();
-    cerr << "Odometry parameters (scaling factors (v_l, v_r, b)): " << odomCalib.transpose() << endl;
-  }
+  cerr << "Calibrated laser offset (x, y, theta):" << laserOffset->estimate().toVector().transpose() << endl;
+  odomCalib(0) = -1. * linearSolution(0) * odomParamsVertex->estimate();
+  odomCalib(1) = linearSolution(1) * odomParamsVertex->estimate();
+  odomCalib(2) = odomParamsVertex->estimate();
+  cerr << "Odometry parameters (scaling factors (v_l, v_r, b)): " << odomCalib.transpose() << endl;
 
   {
     SE2 closedFormLaser;
     Eigen::Vector3d closedFormOdom;
     ClosedFormCalibration::calibrate(motions, closedFormLaser, closedFormOdom);
-    cerr << "Obtaining closed form solution" << endl;
+    cerr << "\nObtaining closed form solution" << endl;
     cerr << "Calibrated laser offset (x, y, theta):" << closedFormLaser.toVector().transpose() << endl;
     cerr << "Odometry parameters (scaling factors (v_l, v_r, b)): " << closedFormOdom.transpose() << endl;
   }
@@ -296,7 +289,7 @@ int main(int argc, char** argv)
     cerr << "done." << endl;
   }
 
-  // optional input of a seperate file for applying the odometry calibration
+  // optional input of a separate file for applying the odometry calibration
   if (odomTestFilename.size() > 0) {
 
     DataQueue testRobotLaserQueue;
@@ -317,7 +310,7 @@ int main(int argc, char** argv)
         double dt = cur->timestamp() - prev->timestamp();
         SE2 motion = prev->odomPose().inverse() * cur->odomPose();
 
-        // convert to velocity measurment
+        // convert to velocity measurement
         MotionMeasurement motionMeasurement(motion.translation().x(), motion.translation().y(), motion.rotation().angle(), dt);
         VelocityMeasurement velocityMeasurement = OdomConvert::convertToVelocity(motionMeasurement);
 
