@@ -309,15 +309,14 @@ void MainWindow::setRobustKernel()
     }
     for (SparseOptimizer::EdgeSet::const_iterator it = optimizer->edges().begin(); it != optimizer->edges().end(); ++it) {
       OptimizableGraph::Edge* e = static_cast<OptimizableGraph::Edge*>(*it);
-      if(onlyLoop){
-	if(e->vertices().size()>=2 && abs(e->vertex(0)->id()-abs(e->vertex(1)->id()))!=1){
-	e->setRobustKernel(creator->construct());
-	e->robustKernel()->setDelta(huberWidth);
-	}
-      }
-    else{
-	e->setRobustKernel(creator->construct());
-	e->robustKernel()->setDelta(huberWidth);
+      if (onlyLoop) {
+        if (e->vertices().size() >= 2 && std::abs(e->vertex(0)->id() - e->vertex(1)->id()) != 1) {
+          e->setRobustKernel(creator->construct());
+          e->robustKernel()->setDelta(huberWidth);
+        }
+      } else {
+        e->setRobustKernel(creator->construct());
+        e->robustKernel()->setDelta(huberWidth);
       }
     }    
   } else {
