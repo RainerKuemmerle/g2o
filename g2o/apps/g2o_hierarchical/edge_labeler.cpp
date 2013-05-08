@@ -43,13 +43,15 @@ namespace g2o {
       const OptimizableGraph::Vertex* v=(const OptimizableGraph::Vertex*) e->vertices()[i];
       int ti=v->hessianIndex();
       if (ti==-1)
-  continue;
+	continue;
       for (size_t j=i; j<e->vertices().size(); j++){
-  const OptimizableGraph::Vertex* v=(const OptimizableGraph::Vertex*) e->vertices()[j];
-  int tj = v->hessianIndex();
-  if (tj==-1)
-    continue;
-  pattern.insert(std::make_pair(ti, tj));
+	const OptimizableGraph::Vertex* v=(const OptimizableGraph::Vertex*) e->vertices()[j];
+	int tj = v->hessianIndex();
+	if (tj==-1)
+	  continue;
+	if(tj<ti)
+	  swap(ti,tj);
+	pattern.insert(std::make_pair(ti, tj));
       }
     }
   }
@@ -79,7 +81,7 @@ namespace g2o {
       const OptimizableGraph::Vertex* v=(const OptimizableGraph::Vertex*) e->vertices()[i];
       int ti=v->hessianIndex();
       if (ti==-1)
-  continue;
+	continue;
       maxDim+=v->minimalEstimateDimension();
     }
 
@@ -91,33 +93,33 @@ namespace g2o {
       const OptimizableGraph::Vertex* vr=(const OptimizableGraph::Vertex*) e->vertices()[i];
       int ti=vr->hessianIndex();
       if (ti>-1) {
-  int cumCol=0;
-  for (size_t j=0; j<e->vertices().size(); j++){
-    const OptimizableGraph::Vertex* vc=(const OptimizableGraph::Vertex*) e->vertices()[j];
-    int tj = vc->hessianIndex();
-    if (tj>-1){ 
-      // cerr << "ti=" << ti << " tj=" << tj 
-      //    << " cumRow=" << cumRow << " cumCol=" << cumCol << endl;
-      if (ti<=tj){
-        assert(spinv.block(ti, tj));
-        // cerr << "cblock_ptr" << spinv.block(ti, tj) << endl;
-        // cerr << "cblock.size=" << spinv.block(ti, tj)->rows() << "," << spinv.block(ti, tj)->cols() << endl;
-        // cerr << "cblock" << endl;
-        // cerr << *spinv.block(ti, tj) << endl;
-        cov.block(cumRow, cumCol, vr->minimalEstimateDimension(), vc->minimalEstimateDimension()) =
-    *spinv.block(ti, tj);
-      } else {
-        assert(spinv.block(tj, ti));
-        // cerr << "cblock.size=" << spinv.block(tj, ti)->cols() << "," << spinv.block(tj, ti)->rows() << endl;
-        // cerr << "cblock" << endl;
-        // cerr << spinv.block(tj, ti)->transpose() << endl;
-        cov.block(cumRow, cumCol, vr->minimalEstimateDimension(), vc->minimalEstimateDimension()) =
-    spinv.block(tj, ti)->transpose();
-      }
-      cumCol += vc->minimalEstimateDimension();
-    }
-  }
-  cumRow += vr->minimalEstimateDimension();
+	int cumCol=0;
+	for (size_t j=0; j<e->vertices().size(); j++){
+	  const OptimizableGraph::Vertex* vc=(const OptimizableGraph::Vertex*) e->vertices()[j];
+	  int tj = vc->hessianIndex();
+	  if (tj>-1){ 
+	    // cerr << "ti=" << ti << " tj=" << tj 
+	    //    << " cumRow=" << cumRow << " cumCol=" << cumCol << endl;
+	    if (ti<=tj){
+	      assert(spinv.block(ti, tj));
+	      // cerr << "cblock_ptr" << spinv.block(ti, tj) << endl;
+	      // cerr << "cblock.size=" << spinv.block(ti, tj)->rows() << "," << spinv.block(ti, tj)->cols() << endl;
+	      // cerr << "cblock" << endl;
+	      // cerr << *spinv.block(ti, tj) << endl;
+	      cov.block(cumRow, cumCol, vr->minimalEstimateDimension(), vc->minimalEstimateDimension()) =
+		*spinv.block(ti, tj);
+	    } else {
+	      assert(spinv.block(tj, ti));
+	      // cerr << "cblock.size=" << spinv.block(tj, ti)->cols() << "," << spinv.block(tj, ti)->rows() << endl;
+	      // cerr << "cblock" << endl;
+	      // cerr << spinv.block(tj, ti)->transpose() << endl;
+	      cov.block(cumRow, cumCol, vr->minimalEstimateDimension(), vc->minimalEstimateDimension()) =
+		spinv.block(tj, ti)->transpose();
+	    }
+	    cumCol += vc->minimalEstimateDimension();
+	  }
+	}
+	cumRow += vr->minimalEstimateDimension();
       }
     }
 
