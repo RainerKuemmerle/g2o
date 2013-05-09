@@ -349,10 +349,14 @@ int main(int argc, char** argv)
 
   if (incremental) {
     int incIterations = maxIterations;
+    if (! arg.parsedParam("i")) {
+      cerr << "# Setting default number of iterations" << endl;
+      incIterations = 1;
+    }
     int updateDisplayEveryN = updateGraphEachN;
     int maxDim = 0;
 
-    cerr << "# incremental setttings" << endl;
+    cerr << "# incremental settings" << endl;
     cerr << "#\t solve every " << updateGraphEachN << endl;
     cerr << "#\t iterations  " << incIterations << endl;
 
