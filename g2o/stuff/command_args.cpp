@@ -538,4 +538,15 @@ std::ostream& operator<<(std::ostream& os, const std::vector<double>& v)
   return os;
 }
 
+bool CommandArgs::parsedParam(const std::string& param) const
+{
+  std::vector<CommandArgument>::const_iterator it = _args.begin();
+  for ( ; it != _args.end(); ++it) {
+    if (it->name == param) {
+      return it->parsed;
+    }
+  }
+  return false;
+}
+
 } // end namespace g2o
