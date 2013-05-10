@@ -17,6 +17,7 @@ namespace Slam3dAddons {
     BaseMultiEdge<3, Plane3D>()
   {
     resize(3);
+    color << 0.1, 0.1, 0.1;
   }
 
   // void EdgeSE2SensorCalib::initialEstimate(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to)
@@ -39,6 +40,7 @@ namespace Slam3dAddons {
     Vector4d v;
     is >> v(0) >> v(1) >> v(2) >> v(3);
     setMeasurement(Plane3D(v));
+    is >> color(0) >> color(1) >> color(2);
     for (int i = 0; i < information().rows(); ++i)
       for (int j = i; j < information().cols(); ++j) {
         is >> information()(i, j);
@@ -52,6 +54,7 @@ namespace Slam3dAddons {
   {
     Vector4d v = _measurement.toVector();
     os << v(0) << " " << v(1) << " " << v(2) << " " << v(3) << " ";
+    os << color(0) << " " << color(1) << " " << color(2) << " ";
     for (int i = 0; i < information().rows(); ++i)
       for (int j = i; j < information().cols(); ++j)
         os << " " << information()(i, j);
@@ -116,7 +119,7 @@ namespace Slam3dAddons {
     // std::cerr << "elevation=" << azimuth << std::endl;
 
     
-    glColor3f(0.4,0.25,0.25);
+    glColor3f(that->color(0), that->color(1), that->color(2));
     glPushMatrix();
     Eigen::Isometry3d robotAndSensor = robot->estimate() * sensor->estimate();
     glMultMatrixd(robotAndSensor.matrix().data());

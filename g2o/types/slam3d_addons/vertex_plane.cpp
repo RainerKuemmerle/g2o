@@ -18,11 +18,16 @@
 namespace Slam3dAddons {
   using namespace g2o;
 
+  VertexPlane::VertexPlane(){
+    color << .2, .2, .2;
+  }
+  
   bool VertexPlane::read(std::istream& is) {
     Vector4d lv;
     for (int i=0; i<4; i++)
       is >> lv[i];
     setEstimate(Plane3D(lv));
+    is >> color(0) >> color(1) >> color(2);
     return true;
   }
 
@@ -31,6 +36,7 @@ namespace Slam3dAddons {
     for (int i=0; i<4; i++){
       os << lv[i] << " ";
     }
+    os << color(0) << " " << color(1) << " " << color(2) << " ";
     return os.good();
   }
 
@@ -72,7 +78,7 @@ namespace Slam3dAddons {
     // std::cerr << "D=" << d << std::endl;
     // std::cerr << "azimuth=" << azimuth << std::endl;
     // std::cerr << "elevation=" << azimuth << std::endl;
-    glColor3f(0.25,0.25,0.4);
+    glColor3f(that->color(0), that->color(1), that->color(2));
     glPushMatrix();
     glRotatef(RAD2DEG(azimuth),0.,0.,1.);
     glRotatef(RAD2DEG(elevation),0.,-1.,0.);

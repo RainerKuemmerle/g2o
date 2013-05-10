@@ -15,6 +15,7 @@ namespace Slam3dAddons {
     public:
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
       EdgeSE3PlaneSensorCalib();
+      Vector3d color;
 
       void computeError()
       {

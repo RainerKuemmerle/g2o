@@ -12,7 +12,8 @@ namespace Slam3dAddons {
     {
     public:
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
-      VertexPlane() {}
+      VertexPlane();
+
       virtual bool read(std::istream& is);
       virtual bool write(std::ostream& os) const;
 
@@ -55,6 +56,7 @@ namespace Slam3dAddons {
       /*   return 3; */
       /* } */
 
+      Vector3d color;
     };
 
   class VertexPlaneDrawAction: public DrawAction{
