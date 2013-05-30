@@ -70,7 +70,7 @@ namespace g2o {
         break;
       string tag;
       currentLine >> tag;
-      if (tag == "VERTEX" || tag == "VERTEX2"){
+      if (tag == "VERTEX" || tag == "VERTEX2" || tag == "VERTEX_SE2"){
         int id;
         Eigen::Vector3d p;
         currentLine >> id >> p.x() >> p.y() >> p.z();
@@ -87,7 +87,7 @@ namespace g2o {
         v->setEstimate(p);
         previousVertex = v;
 
-      } else if (tag == "EDGE" || tag == "EDGE2"){
+      } else if (tag == "EDGE" || tag == "EDGE2" || tag == "EDGE_SE2"){
         if (! laserOffsetInitDone) {
           cerr << "Error: need laser offset" << endl;
           return false;
@@ -100,7 +100,10 @@ namespace g2o {
         if (overrideCovariances){
           m = Eigen::Matrix3d::Identity();
         } else {
-          currentLine >> m(0, 0) >> m(0, 1) >> m(1, 1) >> m(2, 2) >> m(0, 2) >> m(1, 2);
+          if (tag == "EDGE_SE2")
+            currentLine >> m(0, 0) >> m(0, 1) >> m(0, 2) >> m(1, 1) >> m(1, 2) >> m(2, 2);
+          else // old stupid order of the information matrix
+            currentLine >> m(0, 0) >> m(0, 1) >> m(1, 1) >> m(2, 2) >> m(0, 2) >> m(1, 2);
           m(1, 0) = m(0, 1);
           m(2, 0) = m(0, 2);
           m(2, 1) = m(1, 2);
