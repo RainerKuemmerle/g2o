@@ -213,23 +213,42 @@ bool G2oSlamInterface::addEdge(const std::string& tag, int id, int dimension, in
   }
   else if (dimension == 6) {
 
-    Vector6d aux;
-    aux << measurement[0], measurement[1], measurement[2],measurement[3], measurement[4], measurement[5];
-    Eigen::Isometry3d transf = internal::fromVectorET(aux);
-    Matrix<double, 6, 6> infMatEuler;
-    int idx = 0;
-    for (int r = 0; r < 6; ++r)
-      for (int c = r; c < 6; ++c, ++idx) {
-        assert(idx < (int)information.size());
-        infMatEuler(r,c) = infMatEuler(c,r) = information[idx];
-      }
-    // convert information matrix to our internal representation
-    Matrix<double, 6, 6> J;
-    SE3Quat transfAsSe3(transf.matrix().topLeftCorner<3,3>(), transf.translation());
-    jac_quat3_euler3(J, transfAsSe3);
-    Matrix<double, 6, 6> infMat = J.transpose() * infMatEuler * J;
-    //cerr << PVAR(transf.matrix()) << endl;
-    //cerr << PVAR(infMat) << endl;
+    Eigen::Isometry3d transf;
+    Matrix<double, 6, 6> infMat;
+
+    if (measurement.size() == 7) { // measurement is a Quaternion
+      Vector7d meas;
+      for (int i=0; i<7; ++i) 
+        meas(i) = measurement[i];
+      // normalize the quaternion to recover numerical precision lost by storing as human readable text
+      Vector4d::MapType(meas.data()+3).normalize();
+      transf = internal::fromVectorQT(meas);
+
+      for (int i = 0, idx = 0; i < infMat.rows(); ++i)
+        for (int j = i; j < infMat.cols(); ++j){
+          infMat(i,j) = information[idx++];
+          if (i != j)
+            infMat(j,i)=infMat(i,j);
+        }
+    } else { // measurement consists of Euler angles
+      Vector6d aux;
+      aux << measurement[0], measurement[1], measurement[2],measurement[3], measurement[4], measurement[5];
+      transf = internal::fromVectorET(aux);
+      Matrix<double, 6, 6> infMatEuler;
+      int idx = 0;
+      for (int r = 0; r < 6; ++r)
+        for (int c = r; c < 6; ++c, ++idx) {
+          assert(idx < (int)information.size());
+          infMatEuler(r,c) = infMatEuler(c,r) = information[idx];
+        }
+      // convert information matrix to our internal representation
+      Matrix<double, 6, 6> J;
+      SE3Quat transfAsSe3(transf.matrix().topLeftCorner<3,3>(), transf.translation());
+      jac_quat3_euler3(J, transfAsSe3);
+      infMat.noalias() = J.transpose() * infMatEuler * J;
+      //cerr << PVAR(transf.matrix()) << endl;
+      //cerr << PVAR(infMat) << endl;
+    }
 
     int doInit = 0;
     SparseOptimizer::Vertex* v1 = _optimizer->vertex(v1Id);

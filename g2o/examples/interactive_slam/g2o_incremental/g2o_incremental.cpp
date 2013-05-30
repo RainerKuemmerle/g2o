@@ -20,6 +20,8 @@
 
 #include "g2o/stuff/macros.h"
 #include "g2o/stuff/command_args.h"
+#include "g2o/stuff/string_tools.h"
+#include "g2o/stuff/tictoc.h"
 
 #include "slam_parser/interface/parser_interface.h"
 
@@ -30,6 +32,38 @@ static bool hasToStop=false;
 
 using namespace std;
 using namespace g2o;
+
+/**
+ * \brief Store the information parsed from a g2o file
+ */
+struct EdgeInformation
+{
+  int fromId;
+  int toId;
+  std::vector<double> measurement;
+  std::vector<double> information;
+};
+
+/**
+ * \brief Sort Edges for inserting them sequentially
+ */
+struct IncrementalEdgesCompare
+{
+  bool operator()(const EdgeInformation& e1, const EdgeInformation& e2)
+  {
+    int i11 = e1.fromId, i12 = e1.toId;
+    if (i11 > i12)
+      swap(i11, i12);
+    int i21 = e2.fromId, i22 = e2.toId;
+    if (i21 > i22)
+      swap(i21, i22);
+    if (i12 < i22)
+      return true;
+    if (i12 > i22)
+      return false;
+    return i11 < i21;
+  }
+};
 
 void sigquit_handler(int sig)
 {
@@ -45,6 +79,7 @@ void sigquit_handler(int sig)
 
 int main(int argc, char** argv)
 {
+  string inputFilename;
   string outputFilename;
   int updateEachN;
   bool verbose;
@@ -55,6 +90,7 @@ int main(int argc, char** argv)
   arg.param("v", verbose, false, "verbose output of the optimization process");
   arg.param("g", vis, false, "gnuplot visualization");
   arg.param("o", outputFilename, "", "output the final graph");
+  arg.param("i", inputFilename, "", "input file (default g2o format), if not given read via stdin");
 
   arg.parseArgs(argc, argv);
 
@@ -68,9 +104,74 @@ int main(int argc, char** argv)
 
   cerr << "Updating every " << updateEachN << endl;
 
-  SlamParser::ParserInterface parserInterface(&slamInterface);
+  if (inputFilename.size() > 0) { // operating on a file
+    vector<EdgeInformation> edgesFromGraph;
 
-  while (parserInterface.parseCommand(cin)) {}
+    setenv("G2O_ENABLE_TICTOC", "1", 1); // HACK force tictoc statistics
+
+    // parse the edge from the file
+    int graphDimension = 0;
+    cerr << "Parsing " << inputFilename << " ... ";
+    tictoc("parsing");
+    ifstream ifs(inputFilename.c_str());
+    stringstream currentLine;
+    while (readLine(ifs, currentLine)) {
+      string token;
+      currentLine >> token;
+      if (token == "EDGE_SE2") {
+        graphDimension = 3;
+        edgesFromGraph.push_back(EdgeInformation());
+        EdgeInformation& currentEdge = edgesFromGraph.back();
+        currentLine >> currentEdge.fromId >> currentEdge.toId;
+        currentEdge.measurement.resize(3);
+        currentLine >> currentEdge.measurement[0] >> currentEdge.measurement[1] >> currentEdge.measurement[2];
+        currentEdge.information.resize(6);
+        for (int i = 0; i < 6; ++i)
+          currentLine >> currentEdge.information[i];
+      } else if (token == "EDGE_SE3:QUAT") {
+        graphDimension = 6;
+        edgesFromGraph.push_back(EdgeInformation());
+        EdgeInformation& currentEdge = edgesFromGraph.back();
+        currentLine >> currentEdge.fromId >> currentEdge.toId;
+        currentEdge.measurement.resize(7);
+        for (size_t i = 0; i < currentEdge.measurement.size(); ++i)
+          currentLine >> currentEdge.measurement[i];
+        currentEdge.information.resize(21);
+        for (size_t i = 0; i < currentEdge.information.size(); ++i)
+          currentLine >> currentEdge.information[i];
+      }
+    }
+    assert(graphDimension > 0);
+    sort(edgesFromGraph.begin(), edgesFromGraph.end(), IncrementalEdgesCompare());
+    tictoc("parsing");
+    cerr << "done." << endl;
+
+    // adding edges to the graph. Add all edges connecting a node and then call optimize
+    tictoc("inc_optimize");
+    bool freshlySolved = false;
+    int lastNode = 2;
+    slamInterface.addNode("", 0, graphDimension, vector<double>());
+    for (vector<EdgeInformation>::const_iterator it = edgesFromGraph.begin(); it != edgesFromGraph.end(); ++it) {
+      const EdgeInformation& e = *it;
+      int minNodeId = max(e.fromId, e.toId);
+      if (minNodeId > lastNode) {
+        //cerr << "try to solve" << endl;
+        lastNode = minNodeId;
+        freshlySolved = true;
+        slamInterface.solveState();
+      }
+      //cerr << "adding " << e.fromId << " " << e.toId << endl;
+      slamInterface.addEdge("", 0, graphDimension, e.fromId, e.toId, e.measurement, e.information);
+      freshlySolved = false;
+    }
+    if (! freshlySolved)
+      slamInterface.solveState();
+    tictoc("inc_optimize");
+  } else {
+    // Reading the protocol via stdin
+    SlamParser::ParserInterface parserInterface(&slamInterface);
+    while (parserInterface.parseCommand(cin)) {}
+  }
 
   if (outputFilename.size() > 0) {
     cerr << "Saving " << outputFilename << endl;

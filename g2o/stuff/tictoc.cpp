@@ -62,6 +62,9 @@ namespace g2o {
   };
   typedef std::map<std::string, TicTocElement> TicTocMap;
 
+  /**
+   * \brief helper for printing the struct at the end of the lifetime of the program
+   */
   struct TicTocInitializer
   {
     TicTocMap tictocElements;
@@ -107,10 +110,10 @@ namespace g2o {
       }
     }
   };
-  static TicTocInitializer initializer;
 
   double tictoc(const char* algorithmPart)
   {
+    static TicTocInitializer initializer;
     if (! initializer.enabled)
       return 0.;
 
