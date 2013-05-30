@@ -22,3 +22,9 @@ ADD_EXECUTABLE(sclam_pure_calibration
 )
 SET_TARGET_PROPERTIES(sclam_pure_calibration PROPERTIES OUTPUT_NAME sclam_pure_calibration${EXE_POSTFIX})
 TARGET_LINK_LIBRARIES(sclam_pure_calibration calibration_odom_laser_library)
+
+ADD_EXECUTABLE(sclam_laser_calib
+  sclam_laser_calib.cpp
+)
+SET_TARGET_PROPERTIES(sclam_laser_calib PROPERTIES OUTPUT_NAME sclam_laser_calib${EXE_POSTFIX})
+TARGET_LINK_LIBRARIES(sclam_laser_calib calibration_odom_laser_library)
