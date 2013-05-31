@@ -838,7 +838,7 @@ tools, namely a command line interface and a graphical user interface.
 
 \subsection{\gopt\ Command Line Interface}
 
-\verb+g2o_cli+ is the command line interface included in \gopt. It
+\verb+g2o+ is the command line interface included in \gopt. It
 allows to optimize graphs stored in files and save the result back to a
 file. This allows a fast prototyping of optimization problems, as it is
 only required to implement the new types or solvers. The \gopt\
@@ -858,6 +858,20 @@ which \verb+g2o_cli+ can be applied.
 The Graphical User Interface depicted in Figure~\ref{fig:viewer} allows
 to visualize the optimization problem. Additionally, the various
 parameters of the algorithms can be controlled.
+
+\subsection{\gopt{} incremental}
+
+\gopt{} includes an experimental binary for performing optimization in
+an incremental fashion, i.e., optimizing after inserting one or several
+nodes along with their measurements. In this case, \gopt{} performs
+ranke updates on the Hessian matrix to update the linear system. Please
+see the \verb+README+ in the \verb+g2o_incremental+ sub-folder for
+additional information.
+
+Example for the Manhattan3500 dataset:
+\begin{verbatim}
+g2o_incremental -i manhattanOlson3500.g2o
+\end{verbatim}
 
 \subsection{Plug-in Architecture}
 
