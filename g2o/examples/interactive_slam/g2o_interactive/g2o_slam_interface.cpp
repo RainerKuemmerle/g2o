@@ -361,35 +361,8 @@ bool G2oSlamInterface::queryState(const std::vector<int>& nodes)
 
 bool G2oSlamInterface::solveState()
 {
-  if (_nodesAdded >= _updateGraphEachN) {
-
-    // decide on batch step or normal step
-    _optimizer->batchStep = false;
-    if ((int)_optimizer->vertices().size() - _lastBatchStep >= _batchEveryN) {
-      _lastBatchStep = _optimizer->vertices().size();
-      _optimizer->batchStep = true;
-    }
-
-    if (_firstOptimization) {
-      if (!_optimizer->initializeOptimization()){
-        cerr << "initialization failed" << endl;
-        return false;
-      }
-    } else {
-      if (! _optimizer->updateInitialization(_verticesAdded, _edgesAdded)) {
-        cerr << "updating initialization failed" << endl;
-        return false;
-      }
-    }
-
-    int currentIt = _optimizer->optimize(_incIterations, !_firstOptimization); (void) currentIt;
-    _firstOptimization = false;
-    _nodesAdded = 0;
-    _verticesAdded.clear();
-    _edgesAdded.clear();
-  }
-
-  return true;
+  SolveResult state = solve();
+  return state != ERROR;
 }
 
 OptimizableGraph::Vertex* G2oSlamInterface::addVertex(int dimension, int id)
@@ -463,6 +436,42 @@ bool G2oSlamInterface::printVertex(OptimizableGraph::Vertex* v)
 void G2oSlamInterface::setUpdateGraphEachN(int n)
 {
   _updateGraphEachN = n;
+}
+
+G2oSlamInterface::SolveResult G2oSlamInterface::solve()
+{
+  if (_nodesAdded >= _updateGraphEachN) {
+
+    // decide on batch step or normal step
+    _optimizer->batchStep = false;
+    if ((int)_optimizer->vertices().size() - _lastBatchStep >= _batchEveryN) {
+      _lastBatchStep = _optimizer->vertices().size();
+      _optimizer->batchStep = true;
+    }
+
+    if (_firstOptimization) {
+      if (!_optimizer->initializeOptimization()){
+        cerr << "initialization failed" << endl;
+        return ERROR;
+      }
+    } else {
+      if (! _optimizer->updateInitialization(_verticesAdded, _edgesAdded)) {
+        cerr << "updating initialization failed" << endl;
+        return ERROR;
+      }
+    }
+
+    int currentIt = _optimizer->optimize(_incIterations, !_firstOptimization); (void) currentIt;
+    _firstOptimization = false;
+    _nodesAdded = 0;
+    _verticesAdded.clear();
+    _edgesAdded.clear();
+    if (_optimizer->batchStep)
+      return SOLVED_BATCH;
+    return SOLVED;
+  }
+
+  return NOOP;
 }
 
 } // end namespace

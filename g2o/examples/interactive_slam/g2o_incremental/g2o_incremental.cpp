@@ -158,14 +158,39 @@ int main(int argc, char** argv)
         //cerr << "try to solve" << endl;
         lastNode = minNodeId;
         freshlySolved = true;
-        slamInterface.solveState();
+        G2oSlamInterface::SolveResult solverState = slamInterface.solve();
+        if (!verbose) {
+          switch (solverState) {
+            case G2oSlamInterface::SOLVED:
+              cout << "."; //<< flush;
+              break;
+            case G2oSlamInterface::SOLVED_BATCH:
+              cout << "b " << optimizer.vertices().size() << endl;
+              break;
+            default:
+              break;
+          }
+        }
       }
       //cerr << "adding " << e.fromId << " " << e.toId << endl;
       slamInterface.addEdge("", 0, graphDimension, e.fromId, e.toId, e.measurement, e.information);
       freshlySolved = false;
     }
-    if (! freshlySolved)
-      slamInterface.solveState();
+    if (! freshlySolved) {
+      G2oSlamInterface::SolveResult solverState = slamInterface.solve();
+      if (!verbose) {
+        switch (solverState) {
+          case G2oSlamInterface::SOLVED:
+            cout << "." << endl;
+            break;
+          case G2oSlamInterface::SOLVED_BATCH:
+            cout << "b " << optimizer.vertices().size() << endl;
+            break;
+          default:
+            break;
+        }
+      }
+    }
     tictoc("inc_optimize");
   } else {
     // Reading the protocol via stdin
