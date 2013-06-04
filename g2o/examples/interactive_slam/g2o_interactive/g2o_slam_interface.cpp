@@ -474,4 +474,9 @@ G2oSlamInterface::SolveResult G2oSlamInterface::solve()
   return NOOP;
 }
 
+void G2oSlamInterface::setBatchSolveEachN(int n)
+{
+  _batchEveryN = n;
+}
+
 } // end namespace

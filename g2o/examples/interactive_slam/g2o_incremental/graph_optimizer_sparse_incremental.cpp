@@ -123,6 +123,7 @@ namespace g2o {
       //SparseOptimizer::linearizeSystem();
       _underlyingSolver->buildSystem();
 
+      // mark vertices to be sorted as last
       int numBlocksRequired = _ivMap.size();
       if (_cmember.size() < numBlocksRequired) {
         _cmember.resize(2 * numBlocksRequired);
@@ -141,6 +142,8 @@ namespace g2o {
               _cmember(v2->hessianIndex()) = 1;
           }
         }
+        //OptimizableGraph::Vertex* lastPose = _ivMap.back();
+        //_cmember(lastPose->hessianIndex()) = 2;
       }
 
       ok = _underlyingSolver->solve();
@@ -163,6 +166,10 @@ namespace g2o {
       }
       _solverInterface->solve(_underlyingSolver->x(), _underlyingSolver->b());
     }
+
+    // print statistics for the non-zeros
+    //static ofstream debugNonZeros("non-zeros.txt");
+    //debugNonZeros << _solverInterface->nonZerosInL() << endl;
 
     update(_underlyingSolver->x());
     ++cjIterations; 

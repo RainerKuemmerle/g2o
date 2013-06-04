@@ -61,6 +61,9 @@ namespace g2o {
       int updatedGraphEachN() const { return _updateGraphEachN;}
       void setUpdateGraphEachN(int n);
 
+      int batchSolveEachN() const { return _batchEveryN;}
+      void setBatchSolveEachN(int n);
+
     protected:
       SparseOptimizerOnline* _optimizer;
       bool _firstOptimization;

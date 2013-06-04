@@ -82,10 +82,12 @@ int main(int argc, char** argv)
   string inputFilename;
   string outputFilename;
   int updateEachN;
+  int batchEachN;
   bool verbose;
   bool vis;
   // command line parsing
   CommandArgs arg;
+  arg.param("batch", batchEachN, 100, "solve by a batch Cholesky after inserting N nodes");
   arg.param("update", updateEachN, 10, "update the graph after inserting N nodes");
   arg.param("v", verbose, false, "verbose output of the optimization process");
   arg.param("g", vis, false, "gnuplot visualization");
@@ -101,8 +103,10 @@ int main(int argc, char** argv)
 
   G2oSlamInterface slamInterface(&optimizer);
   slamInterface.setUpdateGraphEachN(updateEachN);
+  slamInterface.setBatchSolveEachN(batchEachN);
 
   cerr << "Updating every " << updateEachN << endl;
+  cerr << "Batch step every " << batchEachN << endl;
 
   if (inputFilename.size() > 0) { // operating on a file
     vector<EdgeInformation> edgesFromGraph;
@@ -114,6 +118,10 @@ int main(int argc, char** argv)
     cerr << "Parsing " << inputFilename << " ... ";
     tictoc("parsing");
     ifstream ifs(inputFilename.c_str());
+    if (!ifs) {
+      cerr << "Failure to open " << inputFilename << endl;
+      return 1;
+    }
     stringstream currentLine;
     while (readLine(ifs, currentLine)) {
       string token;
