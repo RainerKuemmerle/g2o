@@ -348,6 +348,8 @@ int main(int argc, char** argv)
   }
 
   if (incremental) {
+    cerr << CL_RED("# Note: this variant performs batch steps in each time step") << endl;
+    cerr << CL_RED("#       For a variant which updates the Cholesky factor use the binary g2o_incremental") << endl;
     int incIterations = maxIterations;
     if (! arg.parsedParam("i")) {
       cerr << "# Setting default number of iterations" << endl;
