@@ -491,6 +491,13 @@ std::string CommandArgs::arg2str(const CommandArgument& ca) const
         auxStream << (*data);
         return auxStream.str();
       }
+    case CAT_VECTOR_DOUBLE:
+      {
+        std::vector<double> * data = static_cast< std::vector<double> * >(ca.data);
+        stringstream auxStream;
+        auxStream << (*data);
+        return auxStream.str();
+      }
   }
   return "";
 }
