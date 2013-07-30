@@ -29,6 +29,7 @@
 
 #include <Eigen/Core>
 #include "motion_information.h"
+#include "g2o_calibration_odom_laser_api.h"
 
 namespace g2o {
 
@@ -40,7 +41,7 @@ namespace g2o {
    * Simultaneous maximum-likelihood calibration of robot and sensor parameters.
    * In Proceedings of the IEEE International Conference on Robotics and Automation (ICRA). Pasadena, CA, May 2008.
    */
-  class ClosedFormCalibration
+  class G2O_CALIBRATION_ODOM_LASER_API ClosedFormCalibration
   {
     public:
       static bool calibrate(const MotionInformationVector& measurements, SE2& laserOffset, Eigen::Vector3d& odomParams);

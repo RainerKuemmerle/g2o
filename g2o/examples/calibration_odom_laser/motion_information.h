@@ -31,10 +31,11 @@
 #include <Eigen/StdVector>
 
 #include "g2o/types/slam2d/se2.h"
+#include "g2o_calibration_odom_laser_api.h"
 
 namespace g2o {
 
-  struct MotionInformation
+  struct G2O_CALIBRATION_ODOM_LASER_API MotionInformation
   {
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
     SE2 laserMotion;
