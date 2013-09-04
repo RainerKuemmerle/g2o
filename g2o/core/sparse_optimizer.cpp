@@ -299,6 +299,12 @@ namespace g2o{
 
   void SparseOptimizer::computeInitialGuess()
   {
+    EstimatePropagator::PropagateCost costFunction(this);
+    computeInitialGuess(costFunction);
+  }
+
+  void SparseOptimizer::computeInitialGuess(EstimatePropagatorCost& costFunction)
+  {
     OptimizableGraph::VertexSet emptySet;
     std::set<Vertex*> backupVertices;
     HyperGraph::VertexSet fixedVertices; // these are the root nodes where to start the initialization
@@ -329,7 +335,6 @@ namespace g2o{
     }
 
     EstimatePropagator estimatePropagator(this);
-    EstimatePropagator::PropagateCost costFunction(this);
     estimatePropagator.propagate(fixedVertices, costFunction);
 
     // restoring the vertices that should not be initialized

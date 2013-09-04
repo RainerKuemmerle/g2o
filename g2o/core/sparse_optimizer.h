@@ -41,6 +41,7 @@ namespace g2o {
   // forward declaration
   class ActivePathCostFunction;
   class OptimizationAlgorithm;
+  class EstimatePropagatorCost;
 
   class G2O_CORE_API SparseOptimizer : public OptimizableGraph {
 
@@ -101,6 +102,11 @@ namespace g2o {
      * @patam maxDistance: the distance where to stop the search
      */
     virtual void computeInitialGuess();
+
+    /**
+     * Same as above but using a specific propagator
+     */
+    virtual void computeInitialGuess(EstimatePropagatorCost& propagator);
 
     /**
      * sets all vertices to their origin.
