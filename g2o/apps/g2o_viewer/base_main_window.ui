@@ -150,6 +150,23 @@
         </spacer>
        </item>
        <item>
+        <widget class="QComboBox" name="cbxIniitialGuessMethod">
+         <property name="toolTip">
+          <string>Which method is applied to compute the initial guess</string>
+         </property>
+         <item>
+          <property name="text">
+           <string>Spanning Tree</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Odometry</string>
+          </property>
+         </item>
+        </widget>
+       </item>
+       <item>
         <widget class="QPushButton" name="btnInitialGuess">
          <property name="text">
           <string>Initial Guess</string>
