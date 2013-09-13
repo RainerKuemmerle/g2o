@@ -30,6 +30,7 @@
 #include <QFileDialog>
 #include <QStandardItemModel>
 #include <QDoubleValidator>
+#include <QComboBox>
 
 #include <fstream>
 #include <iostream>
@@ -115,7 +116,23 @@ void MainWindow::on_btnInitialGuess_clicked()
   if (viewer->graph->activeEdges().size() == 0)
     viewer->graph->initializeOptimization();
 
-  viewer->graph->computeInitialGuess();
+  switch (cbxIniitialGuessMethod->currentIndex()) {
+    case 0:
+      // spanning tree
+      viewer->graph->computeInitialGuess();
+      break;
+    case 1:
+      // odometry
+      {
+        EstimatePropagatorCostOdometry costFunction(viewer->graph);
+        viewer->graph->computeInitialGuess(costFunction);
+      }
+      break;
+    default:
+      cerr << __PRETTY_FUNCTION__ << " Unknown initialization method" << endl;
+      break;
+  }
+
   viewer->setUpdateDisplay(true);
   viewer->updateGL();
 }

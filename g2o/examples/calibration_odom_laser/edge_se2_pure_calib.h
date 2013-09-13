@@ -31,10 +31,11 @@
 #include "g2o/types/sclam2d/vertex_odom_differential_params.h"
 #include "g2o/types/slam2d/vertex_se2.h"
 #include "g2o/core/base_binary_edge.h"
+#include "g2o_calibration_odom_laser_api.h"
 
 namespace g2o {
 
-  struct OdomAndLaserMotion
+  struct G2O_CALIBRATION_ODOM_LASER_API OdomAndLaserMotion
   {
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
     VelocityMeasurement velocityMeasurement;
@@ -44,7 +45,7 @@ namespace g2o {
   /**
    * \brief calibrate odometry and laser based on a set of measurements
    */
-  class EdgeSE2PureCalib : public BaseBinaryEdge<3, OdomAndLaserMotion, VertexSE2, VertexOdomDifferentialParams>
+  class G2O_CALIBRATION_ODOM_LASER_API EdgeSE2PureCalib : public BaseBinaryEdge<3, OdomAndLaserMotion, VertexSE2, VertexOdomDifferentialParams>
   {
     public:
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW;

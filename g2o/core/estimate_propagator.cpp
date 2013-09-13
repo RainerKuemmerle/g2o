@@ -231,4 +231,37 @@ namespace g2o {
     return entry;
   }
 
+  EstimatePropagatorCost::EstimatePropagatorCost (SparseOptimizer* graph) :
+    _graph(graph)
+  {
+  }
+
+  double EstimatePropagatorCost::operator()(OptimizableGraph::Edge* edge, const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to_) const
+  {
+    OptimizableGraph::Edge* e = dynamic_cast<OptimizableGraph::Edge*>(edge);
+    OptimizableGraph::Vertex* to = dynamic_cast<OptimizableGraph::Vertex*>(to_);
+    SparseOptimizer::EdgeContainer::const_iterator it = _graph->findActiveEdge(e);
+    if (it == _graph->activeEdges().end()) // it has to be an active edge
+      return std::numeric_limits<double>::max();
+    return e->initialEstimatePossible(from, to);
+  }
+
+  EstimatePropagatorCostOdometry::EstimatePropagatorCostOdometry(SparseOptimizer* graph) :
+    EstimatePropagatorCost(graph)
+  {
+  }
+
+  double EstimatePropagatorCostOdometry::operator()(OptimizableGraph::Edge* edge, const OptimizableGraph::VertexSet& from_, OptimizableGraph::Vertex* to_) const
+  {
+    OptimizableGraph::Edge* e = dynamic_cast<OptimizableGraph::Edge*>(edge);
+    OptimizableGraph::Vertex* from = dynamic_cast<OptimizableGraph::Vertex*>(*from_.begin());
+    OptimizableGraph::Vertex* to = dynamic_cast<OptimizableGraph::Vertex*>(to_);
+    if (std::abs(from->id() - to->id()) != 1) // simple method to identify odometry edges in a pose graph
+      return std::numeric_limits<double>::max();
+    SparseOptimizer::EdgeContainer::const_iterator it = _graph->findActiveEdge(e);
+    if (it == _graph->activeEdges().end()) // it has to be an active edge
+      return std::numeric_limits<double>::max();
+    return e->initialEstimatePossible(from_, to);
+  }
+
 } // end namespace

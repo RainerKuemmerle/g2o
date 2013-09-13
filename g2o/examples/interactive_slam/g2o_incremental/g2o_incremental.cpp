@@ -111,7 +111,12 @@ int main(int argc, char** argv)
   if (inputFilename.size() > 0) { // operating on a file
     vector<EdgeInformation> edgesFromGraph;
 
-    setenv("G2O_ENABLE_TICTOC", "1", 1); // HACK force tictoc statistics
+    // HACK force tictoc statistics
+#ifdef _MSC_VER
+    _putenv_s("G2O_ENABLE_TICTOC", "1");
+#else
+    setenv("G2O_ENABLE_TICTOC", "1", 1);
+#endif
 
     // parse the edge from the file
     int graphDimension = 0;
