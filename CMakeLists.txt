@@ -103,6 +103,8 @@ IF(ANDROID)
   MESSAGE(STATUS "Cross compiling for Android")
 ENDIF()
 
+FIND_PACKAGE(SuiteSparse)
+
 # For building the CHOLMOD / CSPARSE solvers
 FIND_PACKAGE(Cholmod)
 FIND_PACKAGE(BLAS)
