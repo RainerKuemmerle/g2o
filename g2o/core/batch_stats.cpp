@@ -60,7 +60,7 @@ namespace g2o {
     os << PTHING(  timeQuadraticForm ); // construct the quadratic form in the graph
     
     // block_solver (constructs Ax=b, plus maybe schur);
-    os << PTHING(  timeSchurrComplement ); // compute schurr complement (0 if not done);
+    os << PTHING(  timeSchurComplement ); // compute schur complement (0 if not done);
     
     // linear solver (computes Ax=b); );
     os << PTHING(  timeSymbolicDecomposition ); // symbolic decomposition (0 if not done);

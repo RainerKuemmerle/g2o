@@ -440,7 +440,7 @@ bool BlockSolver<Traits>::solve(){
 
   G2OBatchStatistics* globalStats = G2OBatchStatistics::globalStats();
   if (globalStats){
-    globalStats->timeSchurrComplement = get_monotonic_time() - t;
+    globalStats->timeSchurComplement = get_monotonic_time() - t;
   }
 
   t=get_monotonic_time();

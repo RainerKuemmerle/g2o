@@ -51,7 +51,7 @@ namespace g2o {
     double timeQuadraticForm;         ///< construct the quadratic form in the graph
     int levenbergIterations;          ///< number of iterations performed by LM
     // block_solver (constructs Ax=b, plus maybe schur)
-    double timeSchurrComplement;      ///< compute schurr complement (0 if not done)
+    double timeSchurComplement;      ///< compute schur complement (0 if not done)
 
     // linear solver (computes Ax=b);
     double timeSymbolicDecomposition; ///< symbolic decomposition (0 if not done)
