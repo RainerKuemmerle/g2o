@@ -268,6 +268,7 @@ int main(int argc, const char* argv[]){
     }
     structure_only_ba.calc(points, 10);
   }
+  //optimizer.save("test.g2o");
   cout << endl;
   cout << "Performing full BA:" << endl;
   optimizer.optimize(10);

@@ -45,6 +45,7 @@ typedef Matrix<double, 6, 6> Matrix6d;
 class G2O_TYPES_SBA_API CameraParameters : public g2o::Parameter
 {
 public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
   CameraParameters();
 
   CameraParameters(double focal_length,

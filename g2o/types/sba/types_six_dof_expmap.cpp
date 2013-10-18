@@ -38,6 +38,7 @@ G2O_REGISTER_TYPE(VERTEX_SE3:EXPMAP, VertexSE3Expmap);
 G2O_REGISTER_TYPE(EDGE_SE3:EXPMAP, EdgeSE3Expmap);
 G2O_REGISTER_TYPE(EDGE_PROJECT_XYZ2UV:EXPMAP, EdgeProjectXYZ2UV);
 G2O_REGISTER_TYPE(EDGE_PROJECT_XYZ2UVU:EXPMAP, EdgeProjectXYZ2UVU);
+G2O_REGISTER_TYPE(PARAMS_CAMERAPARAMETERS, CameraParameters);
 
 CameraParameters
 ::CameraParameters()
@@ -140,6 +141,7 @@ EdgeProjectXYZ2UV::EdgeProjectXYZ2UV() : BaseBinaryEdge<2, Vector2d, VertexSBAPo
 }
 
 bool EdgeProjectPSI2UV::write(std::ostream& os) const  {
+  os << _cam->id() << " ";
   for (int i=0; i<2; i++){
     os << measurement()[i] << " ";
   }
@@ -152,6 +154,10 @@ bool EdgeProjectPSI2UV::write(std::ostream& os) const  {
 }
 
 bool EdgeProjectPSI2UV::read(std::istream& is) {
+  int paramId;
+  is >> paramId;
+  setParameterId(0, paramId);
+
   for (int i=0; i<2; i++){
     is >> _measurement[i];
   }
@@ -233,6 +239,10 @@ EdgeProjectXYZ2UVU::EdgeProjectXYZ2UVU() : BaseBinaryEdge<3, Vector3d, VertexSBA
 }
 
 bool EdgeProjectXYZ2UV::read(std::istream& is){
+  int paramId;
+  is >> paramId;
+  setParameterId(0, paramId);
+
   for (int i=0; i<2; i++){
     is >> _measurement[i];
   }
@@ -246,6 +256,8 @@ bool EdgeProjectXYZ2UV::read(std::istream& is){
 }
 
 bool EdgeProjectXYZ2UV::write(std::ostream& os) const {
+  cout << "camera id " << _cam->id() << endl;
+  os << _cam->id() << " ";
   for (int i=0; i<2; i++){
     os << measurement()[i] << " ";
   }
