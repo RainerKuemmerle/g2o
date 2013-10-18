@@ -256,7 +256,6 @@ bool EdgeProjectXYZ2UV::read(std::istream& is){
 }
 
 bool EdgeProjectXYZ2UV::write(std::ostream& os) const {
-  cout << "camera id " << _cam->id() << endl;
   os << _cam->id() << " ";
   for (int i=0; i<2; i++){
     os << measurement()[i] << " ";
