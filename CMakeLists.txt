@@ -78,11 +78,11 @@ IF(WIN32)
     MESSAGE(STATUS "Compiling with MSVC")
     ADD_DEFINITIONS(-DNOMINMAX)
     ADD_DEFINITIONS(-D_USE_MATH_DEFINES)
+    # SSE2 optimizations
+    ADD_DEFINITIONS("/arch:SSE2")
     IF (BUILD_SHARED_LIBS)
       # disable warning on missing DLL interfaces
       ADD_DEFINITIONS("/wd4251")
-      # SSE2 optimizations
-      ADD_DEFINITIONS("/arch:SSE2")
     ENDIF()
   ENDIF(MSVC)
 ELSEIF(CYGWIN)
