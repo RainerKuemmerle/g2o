@@ -54,7 +54,7 @@ namespace Slam3dAddons {
     Vector3d w = l.w();
     double ln = d.norm();
     double iln = 1./ln;
-    double iln3 = pow(iln,3);
+    double iln3 = std::pow(iln,3);
     Matrix6d Jll;
     Jll << 
       iln,0,0,-(w.x()*d.x())*iln3,-(w.x()*d.y())*iln3,-(w.x()*d.z())*iln3,
