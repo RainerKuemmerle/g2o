@@ -125,6 +125,7 @@ int main(int argc, char** argv)
   int updateGraphEachN = 10;
   string statsFile;
   string summaryFile;
+  bool nonSequential;
   // command line parsing
   std::vector<int> gaugeList;
   CommandArgs arg;
@@ -157,6 +158,7 @@ int main(int argc, char** argv)
   arg.param("gaugeList", gaugeList, std::vector<int>(), "set the list of gauges separated by commas without spaces \n  e.g: 1,2,3,4,5 ");
   arg.param("summary", summaryFile, "", "append a summary of this optimization run to the summary file passed as argument");
   arg.paramLeftOver("graph-input", inputFilename, "", "graph file which will be processed", true);
+  arg.param("nonSequential", nonSequential, false, "apply the robust kernel only on loop closures and not odometries");
   
 
   arg.parseArgs(argc, argv);
@@ -323,11 +325,22 @@ int main(int argc, char** argv)
     AbstractRobustKernelCreator* creator = RobustKernelFactory::instance()->creator(robustKernel);
     cerr << "# Preparing robust error function ... ";
     if (creator) {
-      for (SparseOptimizer::EdgeSet::iterator it = optimizer.edges().begin(); it != optimizer.edges().end(); ++it) {
-        SparseOptimizer::Edge* e = dynamic_cast<SparseOptimizer::Edge*>(*it);
-        e->setRobustKernel(creator->construct());
-        if (huberWidth > 0)
-          e->robustKernel()->setDelta(huberWidth);
+      if (nonSequential) {
+        for (SparseOptimizer::EdgeSet::iterator it = optimizer.edges().begin(); it != optimizer.edges().end(); ++it) {
+          SparseOptimizer::Edge* e = dynamic_cast<SparseOptimizer::Edge*>(*it);
+          if (e->vertices().size() >= 2 && std::abs(e->vertex(0)->id() - e->vertex(1)->id()) != 1) {
+            e->setRobustKernel(creator->construct());
+            if (huberWidth > 0)
+              e->robustKernel()->setDelta(huberWidth);
+          }
+        }
+      } else {
+        for (SparseOptimizer::EdgeSet::iterator it = optimizer.edges().begin(); it != optimizer.edges().end(); ++it) {
+          SparseOptimizer::Edge* e = dynamic_cast<SparseOptimizer::Edge*>(*it);
+          e->setRobustKernel(creator->construct());
+          if (huberWidth > 0)
+            e->robustKernel()->setDelta(huberWidth);
+        }
       }
       cerr << "done." << endl;
     } else {
