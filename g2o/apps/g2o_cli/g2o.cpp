@@ -110,6 +110,7 @@ int main(int argc, char** argv)
   string strSolver;
   string loadLookup;
   bool initialGuess;
+  bool initialGuessOdometry;
   bool marginalize;
   bool listTypes;
   bool listSolvers;
@@ -132,6 +133,7 @@ int main(int argc, char** argv)
   arg.param("i", maxIterations, 5, "perform n iterations, if negative consider the gain");
   arg.param("v", verbose, false, "verbose output of the optimization process");
   arg.param("guess", initialGuess, false, "initial guess based on spanning tree");
+  arg.param("guessOdometry", initialGuessOdometry, false, "initial guess based on odometry");
   arg.param("inc", incremental, false, "run incremetally");
   arg.param("update", updateGraphEachN, 10, "updates after x odometry nodes");
   arg.param("guiout", guiOut, false, "gui output while running incrementally");
@@ -559,6 +561,9 @@ int main(int argc, char** argv)
 
     if (initialGuess) {
       optimizer.computeInitialGuess();
+    } else if (initialGuessOdometry) {
+      EstimatePropagatorCostOdometry costFunction(&optimizer);
+      optimizer.computeInitialGuess(costFunction);
     }
     double initChi = optimizer.chi2();
 
