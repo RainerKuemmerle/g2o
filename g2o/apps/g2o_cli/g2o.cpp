@@ -122,6 +122,8 @@ int main(int argc, char** argv)
   bool computeMarginals;
   bool printSolverProperties;
   double huberWidth;
+  double gain;
+  int maxIterationsWithGain;
   //double lambdaInit;
   int updateGraphEachN = 10;
   string statsFile;
@@ -131,6 +133,8 @@ int main(int argc, char** argv)
   std::vector<int> gaugeList;
   CommandArgs arg;
   arg.param("i", maxIterations, 5, "perform n iterations, if negative consider the gain");
+  arg.param("gain", gain, 1e-6, "the gain used to stop optimization (default = 1e-6)");
+  arg.param("ig",maxIterationsWithGain, std::numeric_limits<int>::max(), "Maximum number of iterations with gain enabled (default: inf)");
   arg.param("v", verbose, false, "verbose output of the optimization process");
   arg.param("guess", initialGuess, false, "initial guess based on spanning tree");
   arg.param("guessOdometry", initialGuessOdometry, false, "initial guess based on odometry");
@@ -206,8 +210,10 @@ int main(int argc, char** argv)
   SparseOptimizerTerminateAction* terminateAction = 0;
   if (maxIterations < 0) {
     cerr << "# setup termination criterion based on the gain of the iteration" << endl;
-    maxIterations = std::numeric_limits<int>::max();
+    maxIterations = maxIterationsWithGain;
     terminateAction = new SparseOptimizerTerminateAction;
+    terminateAction->setGainThreshold(gain);
+    terminateAction->setMaxIterations(maxIterationsWithGain);
     optimizer.addPostIterationAction(terminateAction);
   }
 
