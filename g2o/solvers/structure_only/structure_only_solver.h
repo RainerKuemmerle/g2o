@@ -210,6 +210,10 @@ class StructureOnlySolver : public OptimizationAlgorithm
 
     virtual bool updateStructure(const std::vector<HyperGraph::Vertex*>& , const HyperGraph::EdgeSet& ) { return true;}
 
+    //! return the points of the optimization problem
+    OptimizableGraph::VertexContainer& points() { return _points;}
+    const OptimizableGraph::VertexContainer& points() const { return _points;}
+
   protected:
     bool _verbose;
     OptimizableGraph::VertexContainer _points;
