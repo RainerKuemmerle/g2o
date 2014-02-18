@@ -28,11 +28,11 @@ namespace g2o {
 
     const_cast<SparseOptimizer*>(optimizer)->computeActiveErrors();
     if (params->iteration == 0) {
-      _lastChi = optimizer->activeChi2();
+      _lastChi = optimizer->activeRobustChi2();
     } else {
       bool stopOptimizer = false;
       if (params->iteration < _maxIterations) {
-        double currentChi = optimizer->activeChi2();
+        double currentChi = optimizer->activeRobustChi2();
         double gain = (_lastChi - currentChi) / currentChi;
         _lastChi = currentChi;
         if (gain >= 0 && gain < _gainThreshold)
