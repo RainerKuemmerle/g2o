@@ -112,13 +112,13 @@ namespace g2o {
   void EdgeSE3PointXYZ::linearizeOplus() {
     //VertexSE3 *cam = static_cast<VertexSE3 *>(_vertices[0]);
     VertexPointXYZ *vp = static_cast<VertexPointXYZ *>(_vertices[1]);
-
+    
     Eigen::Vector3d Zcam = cache->w2l() * vp->estimate();
-
+    
     //  J(0,3) = -0.0;
     J(0,4) = -2*Zcam(2);
     J(0,5) = 2*Zcam(1);
-
+    
     J(1,3) = 2*Zcam(2);
     //  J(1,4) = -0.0;
     J(1,5) = -2*Zcam(0);
@@ -133,6 +133,10 @@ namespace g2o {
 
     _jacobianOplusXi = Jhom.block<3,6>(0,0);
     _jacobianOplusXj = Jhom.block<3,3>(0,6);
+    
+    // std::cerr << "just linearized." << std::endl;
+    // std::cerr << "_jacobianOplusXi:" << std::endl << _jacobianOplusXi << std::endl;
+    // std::cerr << "_jacobianOplusXj:" << std::endl << _jacobianOplusXj << std::endl;
   }
 
 
