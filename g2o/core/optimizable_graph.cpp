@@ -123,6 +123,7 @@ namespace g2o {
     HyperGraph::Edge(),
     _dimension(-1), _level(0), _robustKernel(0)
   {
+    //    _variableSize = false;
   }
 
   OptimizableGraph::Edge::~Edge()
@@ -259,24 +260,31 @@ namespace g2o {
   {
     OptimizableGraph::Edge* e = dynamic_cast<OptimizableGraph::Edge*>(e_);
     assert(e && "Edge does not inherit from OptimizableGraph::Edge");
+    //    std::cerr << "subclass of OptimizableGraph::Edge confirmed";
     if (! e)
       return false;
     bool eresult = HyperGraph::addEdge(e);
     if (! eresult)
       return false;
+    //    std::cerr << "called HyperGraph::addEdge" << std::endl;
     e->_internalId = _nextEdgeId++;
     if (e->numUndefinedVertices())
       return true;
+    //    std::cerr << "internalId set" << std::endl;
     if (! e->resolveParameters()){
       cerr << __FUNCTION__ << ": FATAL, cannot resolve parameters for edge " << e << endl;
       return false;
     }
+    //    std::cerr << "parameters set" << std::endl;
     if (! e->resolveCaches()){
       cerr << __FUNCTION__ << ": FATAL, cannot resolve caches for edge " << e << endl;
       return false;
     } 
+    //    std::cerr << "updating jacobian size" << std::endl;
     _jacobianWorkspace.updateSize(e);
-
+    
+    //    std::cerr << "about to return true" << std::endl;
+    
     return true;
   }
 
@@ -529,11 +537,24 @@ bool OptimizableGraph::load(istream& is, bool createEdges)
 
 	  } 
 	}
-      } else {
-        vector<int> ids;
-        ids.resize(numV);
-        for (int l = 0; l < numV; ++l)
-          currentLine >> ids[l];
+      }
+      else { // numV != 2
+	vector<int> ids;
+	if(numV!=0){
+	  ids.resize(numV);
+	  for (int l = 0; l < numV; ++l)
+	    currentLine >> ids[l];
+	}
+	else{
+	  string buff;
+	  currentLine >> buff;
+	  while(buff != "||"){
+	    ids.push_back(atoi(buff.c_str()));
+	    currentLine >> buff;
+	  }
+	  numV = ids.size();
+	  e->resize(numV);
+	}
         bool vertsOkay = true;
         for (int l = 0; l < numV; ++l) {
 	  int vertexId=ids[l];
