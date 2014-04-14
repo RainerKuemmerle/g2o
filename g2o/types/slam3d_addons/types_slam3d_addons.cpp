@@ -45,6 +45,7 @@ namespace g2o {
     factory->registerType("EDGE_SE3_LINE3D", new HyperGraphElementCreator< ::Slam3dAddons::EdgeSE3Line3D>);
     factory->registerType("EDGE_LINE3D", new HyperGraphElementCreator< ::Slam3dAddons::EdgeLine3D>);
     factory->registerType("EDGE_PLANE", new HyperGraphElementCreator< ::Slam3dAddons::EdgePlane>);
+    factory->registerType("EDGE_SE3_CALIB", new HyperGraphElementCreator< ::Slam3dAddons::EdgeSE3Calib>);
     // factory->registerType("EDGE_PLANE_NORMALIZE", new HyperGraphElementCreator< ::Slam3dAddons::EdgePlaneNormalize>);
 
 
