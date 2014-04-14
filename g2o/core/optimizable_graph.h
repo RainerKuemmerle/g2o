@@ -349,11 +349,18 @@ namespace g2o {
     class G2O_CORE_API Edge: public HyperGraph::Edge, public HyperGraph::DataContainer {
       private:
         friend struct OptimizableGraph;
-      public:
+	//bool _variableSize;
+	
+    public:
         Edge();
         virtual ~Edge();
         virtual Edge* clone() const;
-
+	
+	//bool _variableSize;
+	
+	// tells whether this is a variable size edge (the number of vertices is not known a priori)
+	//bool variableSize(){return _variableSize;};
+	
         // indicates if all vertices are fixed
         virtual bool allVerticesFixed() const = 0;
         
@@ -462,11 +469,11 @@ namespace g2o {
           _parameterTypes.resize(newSize, typeid(void*).name());
         }
       protected:
-        int _dimension;
+	int _dimension;
         int _level;
         RobustKernel* _robustKernel;
         long long _internalId;
-
+	
         std::vector<int> _cacheIds;
 
         template <typename ParameterType>

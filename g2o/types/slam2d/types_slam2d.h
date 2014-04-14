@@ -39,5 +39,7 @@
 #include "edge_se2_offset.h"
 #include "edge_se2_pointxy_offset.h"
 #include "edge_pointxy.h"
+#include "edge_se2_twopointsxy.h"
+#include "edge_se2_lotsofxy.h"
 
 #endif
