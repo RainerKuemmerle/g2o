@@ -41,26 +41,43 @@
 #include <float.h>
 #endif
 
+#include <limits>
+
 namespace ceres {
 
 #if defined(_MSC_VER)
-inline bool IsFinite  (double x) { return _finite(x) != 0;           }
+inline bool IsFinite  (double x) { return _finite(x);                }
 inline bool IsInfinite(double x) { return !_finite(x) && !_isnan(x); }
-inline bool IsNaN     (double x) { return _isnan(x) != 0;            }
+inline bool IsNaN     (double x) { return _isnan(x);                 }
 inline bool IsNormal  (double x) {
   int classification = _fpclass(x);
   return classification == _FPCLASS_NN ||
          classification == _FPCLASS_PN;
 }
 #elif defined(ANDROID)
-// On Android, the C++ fpclassify functions are not available. Strictly
-// speaking, the std functions are are not standard until C++11. Instead use
-// the C99 macros on Android.
-inline bool IsFinite  (double x) { return isfinite(x); }
-inline bool IsInfinite(double x) { return isinf(x);    }
+
+// On Android when using the GNU STL, the C++ fpclassify functions are not
+// available. Strictly speaking, the std functions are are not standard until
+// C++11. Instead use the C99 macros on Android.
 inline bool IsNaN     (double x) { return isnan(x);    }
 inline bool IsNormal  (double x) { return isnormal(x); }
+
+// On Android NDK r6, when using STLPort, the isinf and isfinite functions are
+// not available, so reimplement them.
+#  if defined(_STLPORT_VERSION)
+inline bool IsInfinite(double x) {
+  return x ==  std::numeric_limits<double>::infinity() ||
+         x == -std::numeric_limits<double>::infinity();
+}
+inline bool IsFinite(double x) {
+  return !isnan(x) && !IsInfinite(x);
+}
+#  else
+inline bool IsFinite  (double x) { return isfinite(x); }
+inline bool IsInfinite(double x) { return isinf(x);    }
+#  endif  // defined(_STLPORT_VERSION)
 #else
+// These definitions are for the normal Unix suspects.
 // TODO(keir): Test the "else" with more platforms.
 inline bool IsFinite  (double x) { return std::isfinite(x); }
 inline bool IsInfinite(double x) { return std::isinf(x);    }
