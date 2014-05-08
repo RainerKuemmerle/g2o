@@ -104,6 +104,7 @@ namespace g2o {
       class G2O_CORE_API Data : public HyperGraph::HyperGraphElement {
       public:
 	Data();
+	~Data();
 	//! read the data from a stream
 	virtual bool read(std::istream& is) = 0;
 	//! write the data to a stream

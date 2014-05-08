@@ -49,15 +49,15 @@
 namespace g2o {
 
   using namespace std;
-
-  OptimizableGraph::Data::Data(){
-    _next = 0;
-  }
-  
-  OptimizableGraph::Data::~Data(){
-    if (_next)
-      delete _next;
-  }
+//
+//  OptimizableGraph::Data::Data(){
+//    _next = 0;
+//  }
+//
+//  OptimizableGraph::Data::~Data(){
+//    if (_next)
+//      delete _next;
+//  }
   
 
   OptimizableGraph::Vertex::Vertex() :
