@@ -66,7 +66,7 @@ g2o requires cmake and Eigen3 to build. The other requirements are optional.
   * cmake             http://www.cmake.org/
   * Eigen3            http://eigen.tuxfamily.org
   * suitesparse       http://www.cise.ufl.edu/research/sparse/SuiteSparse/
-  * Qt4               http://qt.nokia.com/
+  * Qt4               http://qt-project.org
   * libQGLViewer      http://www.libqglviewer.com/
 
   On Ubuntu / Debian these dependencies are resolved by installing the

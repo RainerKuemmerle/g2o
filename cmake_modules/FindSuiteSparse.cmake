@@ -35,6 +35,16 @@ FIND_LIBRARY(CAMD_LIBRARY NAMES camd
   /sw/lib
   )
 
+FIND_LIBRARY(SUITESPARSECONFIG_LIBRARY NAMES suitesparseconfig
+  PATHS
+  ${SUITE_SPARSE_ROOT}/lib
+  /usr/lib
+  /usr/local/lib
+  /opt/local/lib
+  /sw/lib
+  )
+
+
 # Different platforms seemingly require linking against different sets of libraries
 IF(CYGWIN)
   FIND_PACKAGE(PkgConfig)
