@@ -134,6 +134,8 @@ namespace g2o {
         OptimizableGraph::VertexSet initializedVertices;
         for (size_t i = 0; i < edge->vertices().size(); ++i) {
           OptimizableGraph::Vertex* z = static_cast<OptimizableGraph::Vertex*>(edge->vertex(i));
+	  if (! z)
+	    continue;
           AdjacencyMap::iterator ot = _adjacencyMap.find(z);
           if (ot->second._distance != numeric_limits<double>::max()) {
             initializedVertices.insert(z);
@@ -144,9 +146,10 @@ namespace g2o {
 
         for (size_t i = 0; i < edge->vertices().size(); ++i) {
           OptimizableGraph::Vertex* z = static_cast<OptimizableGraph::Vertex*>(edge->vertex(i));
+	  if (! z)
+	    continue;
           if (z == u)
             continue;
-
           size_t wasInitialized = initializedVertices.erase(z);
 
           double edgeDistance = cost(edge, initializedVertices, z);

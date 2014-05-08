@@ -276,6 +276,8 @@ namespace g2o{
     set<Vertex*> auxVertexSet; // temporary structure to avoid duplicates
     for (HyperGraph::EdgeSet::iterator it=eset.begin(); it!=eset.end(); ++it){
       OptimizableGraph::Edge* e=(OptimizableGraph::Edge*)(*it);
+      if (e->numUndefinedVertices())
+	continue;
       for (vector<HyperGraph::Vertex*>::const_iterator vit = e->vertices().begin(); vit != e->vertices().end(); ++vit) {
         auxVertexSet.insert(static_cast<OptimizableGraph::Vertex*>(*vit));
       }
@@ -312,6 +314,8 @@ namespace g2o{
       OptimizableGraph::Edge* e = *it;
       for (size_t i = 0; i < e->vertices().size(); ++i) {
         OptimizableGraph::Vertex* v = static_cast<OptimizableGraph::Vertex*>(e->vertex(i));
+	if (!v)
+	  continue;
         if (v->fixed())
           fixedVertices.insert(v);
         else { // check for having a prior which is able to fully initialize a vertex
@@ -575,14 +579,14 @@ namespace g2o{
     _forceStopFlag=flag;
   }
 
-  bool SparseOptimizer::removeVertex(HyperGraph::Vertex* v)
+  bool SparseOptimizer::removeVertex(HyperGraph::Vertex* v, bool detach)
   {
     OptimizableGraph::Vertex* vv = static_cast<OptimizableGraph::Vertex*>(v);
     if (vv->hessianIndex() >= 0) {
       clearIndexMapping();
       _ivMap.clear();
     }
-    return HyperGraph::removeVertex(v);
+    return HyperGraph::removeVertex(v, detach);
   }
 
   bool SparseOptimizer::addComputeErrorAction(HyperGraphAction* action)

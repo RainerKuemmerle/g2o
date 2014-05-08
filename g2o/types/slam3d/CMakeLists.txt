@@ -26,8 +26,11 @@ ADD_LIBRARY(types_slam3d ${G2O_LIB_TYPE}
   edge_se3_pointxyz_depth.h
   edge_se3_prior.cpp
   edge_se3_prior.h
+  edge_se3_lotsofxyz.cpp
+  edge_se3_lotsofxyz.h
   se3quat.h
   se3_ops.h se3_ops.hpp
+  edge_pointxyz.cpp edge_pointxyz.h
   types_slam3d.cpp
   types_slam3d.h
 )
@@ -36,7 +39,7 @@ ADD_LIBRARY(types_slam3d ${G2O_LIB_TYPE}
 SET_TARGET_PROPERTIES(types_slam3d PROPERTIES OUTPUT_NAME ${LIB_PREFIX}types_slam3d)
 TARGET_LINK_LIBRARIES(types_slam3d core)
 IF(OPENGL_FOUND)
-  TARGET_LINK_LIBRARIES(types_slam3d ${OPENGL_gl_LIBRARY})
+  TARGET_LINK_LIBRARIES(types_slam3d opengl_helper ${OPENGL_gl_LIBRARY} )
 ENDIF()
 
 ADD_EXECUTABLE(test_isometry3d_mappings test_isometry3d_mappings.cpp)

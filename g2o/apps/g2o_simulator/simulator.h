@@ -93,6 +93,7 @@ class G2O_SIMULATOR_API BaseRobot {
 
 template <class RobotPoseObject>
 class Robot: public BaseRobot{
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW 
  public:
   typedef RobotPoseObject PoseObject;
   typedef std::list<PoseObject*> TrajectoryType;
@@ -141,6 +142,7 @@ class G2O_SIMULATOR_API BaseSensor{
 template <class RobotType_, class EdgeType_>
 class UnarySensor: public BaseSensor {
  public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW 
   typedef RobotType_ RobotType;
   typedef typename RobotType::PoseObject PoseObject;
   typedef typename RobotType::TrajectoryType TrajectoryType;
@@ -202,6 +204,7 @@ class UnarySensor: public BaseSensor {
 template <class RobotType_, class EdgeType_, class WorldObjectType_>
 class BinarySensor: public BaseSensor {
  public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW 
   typedef RobotType_ RobotType;
   typedef typename RobotType::PoseObject PoseObject;
   typedef typename RobotType::TrajectoryType TrajectoryType;

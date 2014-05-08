@@ -10,6 +10,9 @@ ADD_LIBRARY(types_slam2d ${G2O_LIB_TYPE}
   edge_se2_offset.cpp          edge_se2_offset.h
   edge_se2_pointxy_offset.cpp  edge_se2_pointxy_offset.h
   edge_se2_xyprior.cpp edge_se2_xyprior.h
+  edge_pointxy.cpp             edge_pointxy.h
+  edge_se2_twopointsxy.cpp	edge_se2_twopointsxy.h
+  edge_se2_lotsofxy.cpp		edge_se2_lotsofxy.h
   g2o_types_slam2d_api.h
 )
 
@@ -17,7 +20,7 @@ SET_TARGET_PROPERTIES(types_slam2d PROPERTIES OUTPUT_NAME ${LIB_PREFIX}types_sla
 
 TARGET_LINK_LIBRARIES(types_slam2d core)
 IF(OPENGL_FOUND)
-  TARGET_LINK_LIBRARIES(types_slam2d ${OPENGL_gl_LIBRARY})
+  TARGET_LINK_LIBRARIES(types_slam2d opengl_helper ${OPENGL_gl_LIBRARY} )
 ENDIF()
 
 INSTALL(TARGETS types_slam2d

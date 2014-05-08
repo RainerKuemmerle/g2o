@@ -201,7 +201,7 @@ namespace g2o {
      * mapping is erased. In case you need the index mapping for manipulating the
      * graph, you have to store it in your own copy.
      */
-    virtual bool removeVertex(HyperGraph::Vertex* v);
+    virtual bool removeVertex(HyperGraph::Vertex* v, bool detach=false);
 
     /**
      * search for an edge in _activeVertices and return the iterator pointing to it

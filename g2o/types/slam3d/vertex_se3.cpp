@@ -27,6 +27,7 @@
 #include "vertex_se3.h"
 #include "g2o/core/factory.h"
 #include "g2o/stuff/opengl_wrapper.h"
+#include "g2o/stuff/opengl_primitives.h"
 
 #include <iostream>
 #include "g2o/core/cache.h"
@@ -115,11 +116,9 @@ namespace g2o {
                  HyperGraphElementAction::Parameters* params_){
     if (typeid(*element).name()!=_typeName)
       return 0;
-    if (! _cacheDrawActions){
-      _cacheDrawActions = HyperGraphActionLibrary::instance()->actionByName("draw");
-    }
-
+    initializeDrawActionsCache();
     refreshPropertyPtrs(params_);
+
     if (! _previousParams)
       return this;
     
@@ -128,24 +127,12 @@ namespace g2o {
 
     VertexSE3* that = static_cast<VertexSE3*>(element);
 
-    glColor3f(0.5f,0.5f,0.8f);
+    glColor3f(POSE_VERTEX_COLOR);
     glPushMatrix();
     glMultMatrixd(that->estimate().matrix().data());
-    if (_triangleX && _triangleY){
-      drawTriangle(_triangleX->value(), _triangleY->value());
-    }
-    CacheContainer* caches=that->cacheContainer();
-    if (caches){
-      for (CacheContainer::iterator it=caches->begin(); it!=caches->end(); it++){
-        Cache* c = it->second;
-        (*_cacheDrawActions)(c, params_);
-      }
-    }
-    OptimizableGraph::Data* d=that->userData();
-    while (d && _cacheDrawActions ){
-      (*_cacheDrawActions)(d, params_);
-      d=d->next();
-    }
+    opengl::drawArrow2D(_triangleX->value(), _triangleY->value(), _triangleX->value()*.3);
+    drawCache(that->cacheContainer(), params_);
+    drawUserData(that->userData(), params_);
     glPopMatrix();
     return this;
   }

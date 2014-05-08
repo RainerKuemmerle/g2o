@@ -40,6 +40,10 @@ namespace g2o {
   G2O_REGISTER_TYPE(EDGE_PROJECT_DISPARITY, EdgeSE3PointXYZDisparity);
   G2O_REGISTER_TYPE(EDGE_PROJECT_DEPTH, EdgeSE3PointXYZDepth);
 
+  G2O_REGISTER_TYPE(EDGE_POINTXYZ, EdgePointXYZ);
+  
+  G2O_REGISTER_TYPE(EDGE_SE3_LOTSOF_XYZ, EdgeSE3LotsOfXYZ)
+  
   /*********** ACTIONS ************/
   G2O_REGISTER_ACTION(VertexSE3WriteGnuplotAction);
   G2O_REGISTER_ACTION(VertexPointXYZWriteGnuplotAction);
@@ -50,7 +54,9 @@ namespace g2o {
   G2O_REGISTER_ACTION(VertexSE3DrawAction);
   G2O_REGISTER_ACTION(EdgeSE3DrawAction);
   G2O_REGISTER_ACTION(EdgeSE3PointXYZDrawAction);
+  G2O_REGISTER_ACTION(EdgeProjectDisparityDrawAction);
   G2O_REGISTER_ACTION(CacheCameraDrawAction);
+  G2O_REGISTER_ACTION(CacheSE3OffsetDrawAction);
 #endif
 
 } // end namespace

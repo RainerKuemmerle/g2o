@@ -28,6 +28,8 @@
 
 #include "robot_laser.h"
 #include "vertex_tag.h"
+#include "vertex_ellipse.h"
+
 
 #include "g2o/core/factory.h"
 #include "g2o/core/creators.h"
@@ -39,10 +41,12 @@ namespace g2o {
 
   G2O_REGISTER_TYPE(VERTEX_TAG, VertexTag);
   G2O_REGISTER_TYPE(ROBOTLASER1, RobotLaser);
+  G2O_REGISTER_TYPE(VERTEX_ELLIPSE, VertexEllipse);
 
 #ifdef G2O_HAVE_OPENGL 
   G2O_REGISTER_ACTION(RobotLaserDrawAction);
   G2O_REGISTER_ACTION(VertexTagDrawAction);
+  G2O_REGISTER_ACTION(VertexEllipseDrawAction);
 #endif
 
 } // end namespace

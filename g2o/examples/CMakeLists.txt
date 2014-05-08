@@ -23,3 +23,5 @@ ADD_SUBDIRECTORY(calibration_odom_laser)
 ADD_SUBDIRECTORY(data_convert)
 ADD_SUBDIRECTORY(interactive_slam)
 ADD_SUBDIRECTORY(simple_optimize)
+
+ADD_SUBDIRECTORY(plane_slam)

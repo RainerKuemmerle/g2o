@@ -30,6 +30,7 @@
 
 #ifdef G2O_HAVE_OPENGL
 #include "g2o/stuff/opengl_wrapper.h"
+#include "g2o/stuff/opengl_primitives.h"
 #endif
 
 namespace g2o {
@@ -103,23 +104,24 @@ namespace g2o {
   }
 
   HyperGraphElementAction* CacheSE3OffsetDrawAction::operator()(HyperGraph::HyperGraphElement* element, 
-                HyperGraphElementAction::Parameters* params){
+                HyperGraphElementAction::Parameters* params_){
     if (typeid(*element).name()!=_typeName)
       return 0;
-    refreshPropertyPtrs(params);
+    CacheSE3Offset* that = static_cast<CacheSE3Offset*>(element);
+    refreshPropertyPtrs(params_);
     if (! _previousParams)
       return this;
     
     if (_show && !_show->value())
       return this;
-
-    //CacheSE3Offset* that = static_cast<CacheSE3Offset*>(element);
-    //glPushMatrix();
-    //glMultMatrixd(that->offsetParam()->offset().matrix().data());
-    // if (_cubeSide)
-    //   drawMyPyramid(_cubeSide->value(), _cubeSide->value());
-    //glPopMatrix();
-
+    float cs = _cubeSide ? _cubeSide->value() : 1.0f;
+    glPushAttrib(GL_COLOR);
+    glColor3f(POSE_PARAMETER_COLOR);
+    glPushMatrix();
+    glMultMatrixd(that->offsetParam()->offset().data());
+    opengl::drawBox(cs,cs,cs);
+    glPopMatrix();
+    glPopAttrib();
     return this;
   }
 #endif

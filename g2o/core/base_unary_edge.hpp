@@ -40,6 +40,14 @@ bool BaseUnaryEdge<D, E, VertexXiType>::allVerticesFixed() const
 }
 
 template <int D, typename E, typename VertexXiType>
+OptimizableGraph::Vertex* BaseUnaryEdge<D, E, VertexXiType>::createVertex(int i) 
+{
+  if (i!=0)
+    return 0;
+  return new VertexXiType();
+}
+
+template <int D, typename E, typename VertexXiType>
 void BaseUnaryEdge<D, E, VertexXiType>::constructQuadraticForm()
 {
   VertexXiType* from=static_cast<VertexXiType*>(_vertices[0]);
