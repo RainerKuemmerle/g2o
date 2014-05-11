@@ -43,13 +43,13 @@
 #include "g2o/stuff/macros.h"
 
 namespace g2o {
-  
+
   VertexSegment2D::VertexSegment2D() :
     BaseVertex<4, Vector4d>()
   {
     _estimate.setZero();
   }
-  
+
   bool VertexSegment2D::read(std::istream& is)
   {
     for (size_t i=0; i<4; i++)
@@ -75,7 +75,7 @@ namespace g2o {
       std::cerr << __PRETTY_FUNCTION__ << ": warning, on valid os specified" << std::endl;
       return 0;
     }
-         
+
     VertexSegment2D* v =  static_cast<VertexSegment2D*>(element);
     *(params->os) << v->estimateP1().x() << " " << v->estimateP1().y() << std::endl;
     *(params->os) << v->estimateP2().x() << " " << v->estimateP2().y() << std::endl;
@@ -97,7 +97,7 @@ namespace g2o {
     return true;
   }
 
-  HyperGraphElementAction* VertexSegment2DDrawAction::operator()(HyperGraph::HyperGraphElement* element, 
+  HyperGraphElementAction* VertexSegment2DDrawAction::operator()(HyperGraph::HyperGraphElement* element,
                      HyperGraphElementAction::Parameters* params_ ){
 
     if (typeid(*element).name()!=_typeName)
@@ -109,7 +109,7 @@ namespace g2o {
 
     if (_show && !_show->value())
       return this;
-    
+
 
     VertexSegment2D* that = static_cast<VertexSegment2D*>(element);
     glColor3f(0.8f,0.5f,0.3f);

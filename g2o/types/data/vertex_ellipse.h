@@ -35,15 +35,11 @@ namespace g2o {
 
   /**
    * \brief string ellipse to be attached to a vertex
-   *
-   * A laser measurement obtained by a robot. The measurement is equipped with a pose of the robot at which
-   * the measurement was taken. The read/write function correspond to the CARMEN logfile format.
    */
-
-typedef std::vector<Eigen::Vector2f, Eigen::aligned_allocator<Eigen::Vector2f> > myVector2fVector;
-
   class G2O_TYPES_DATA_API VertexEllipse : public RobotData
   {
+    public:
+      typedef std::vector<Eigen::Vector2f, Eigen::aligned_allocator<Eigen::Vector2f> > myVector2fVector;
     public:
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
       VertexEllipse();
@@ -51,7 +47,7 @@ typedef std::vector<Eigen::Vector2f, Eigen::aligned_allocator<Eigen::Vector2f> >
 
       virtual bool write(std::ostream& os) const;
       virtual bool read(std::istream& is);
-      
+
       const Eigen::Matrix3f& covariance() {return _covariance;}
       void setCovariance( Eigen::Matrix3f& c) { _covariance = c; _updateSVD();}
       const Eigen::Matrix2f& U() {return _U;}
@@ -62,9 +58,9 @@ typedef std::vector<Eigen::Vector2f, Eigen::aligned_allocator<Eigen::Vector2f> >
 	Eigen::Vector2f v(x,y);
 	_matchingVertices.push_back(v);
       }
-      
+
       void clearMatchingVertices(){_matchingVertices.clear();}
-      
+
       const std::vector<int>& matchingVerticesIDs() {return _matchingVerticesIDs;}
       void addMatchingVertexID(int id){
 	_matchingVerticesIDs.push_back(id);
@@ -80,7 +76,7 @@ typedef std::vector<Eigen::Vector2f, Eigen::aligned_allocator<Eigen::Vector2f> >
       myVector2fVector _matchingVertices;
   };
 
- #ifdef G2O_HAVE_OPENGL 
+#ifdef G2O_HAVE_OPENGL
   class G2O_TYPES_DATA_API VertexEllipseDrawAction: public DrawAction{
   public:
     VertexEllipseDrawAction();

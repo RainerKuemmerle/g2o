@@ -6,7 +6,7 @@ namespace g2o {
 
   using namespace std;
 
-  BackBoneTreeAction::BackBoneTreeAction(SparseOptimizer* optimizer, std::string vertexTag, int level, int step): 
+  BackBoneTreeAction::BackBoneTreeAction(SparseOptimizer* optimizer, std::string vertexTag, int level, int step):
     _optimizer(optimizer),
     _vertexTag(vertexTag),
     _level(level),
@@ -14,7 +14,7 @@ namespace g2o {
     _factory=Factory::instance();
     init();
   }
-  
+
   void BackBoneTreeAction::init(){
     _vsMap.clear();
     _vsMmap.clear();
@@ -27,9 +27,9 @@ namespace g2o {
     }
   }
 
-  double BackBoneTreeAction::perform(HyperGraph::Vertex* v, 
-             HyperGraph::Vertex* vParent, 
-             HyperGraph::Edge* e, 
+  double BackBoneTreeAction::perform(HyperGraph::Vertex* v,
+             HyperGraph::Vertex* vParent,
+             HyperGraph::Edge* e,
              double distance){
     int depth=(int) distance;
     if (_factory->tag(v)!= _vertexTag)
@@ -42,7 +42,7 @@ namespace g2o {
     }
     addToMap(parentStar,v);
     fillStar(parentStar, e);
-    
+
     // every _step levels you go down in the tree, create a new star
     if (depth && ! (depth%_step )){
       Star* star=new Star(_level+1, _optimizer);
@@ -82,7 +82,7 @@ namespace g2o {
   s->_lowLevelVertices.insert(e->vertices()[i]);
       }
       return true;
-    } 
+    }
     return false;
   }
 }

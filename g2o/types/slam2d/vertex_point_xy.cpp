@@ -95,11 +95,10 @@ namespace g2o {
     refreshPropertyPtrs(params);
     if (! _previousParams)
       return this;
-    
+
     if (_show && !_show->value())
       return this;
     VertexPointXY* that = static_cast<VertexPointXY*>(element);
-    
 
     glPushMatrix();
     glPushAttrib(GL_ENABLE_BIT | GL_POINT_BIT);

@@ -122,7 +122,7 @@ void BaseMultiEdge<D, E>::linearizeOplus()
     v->unlockQuadraticForm();
   }
 #endif
-  
+
 }
 
 template <int D, typename E>
@@ -315,7 +315,7 @@ void BaseMultiEdge<D, E>::computeQuadraticForm(const InformationType& omega, con
 //     v->unlockQuadraticForm();
 //   }
 // #endif
-  
+
 // }
 
 // template <typename E>
@@ -509,7 +509,7 @@ void BaseMultiEdge<-1, E>::linearizeOplus()
     v->unlockQuadraticForm();
   }
 #endif
-  
+
 }
 
 template <typename E>

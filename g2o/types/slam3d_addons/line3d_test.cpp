@@ -9,16 +9,17 @@ using namespace g2o;
 using namespace g2o::internal;
 using namespace Slam3dAddons;
 
-template <typename T> 
-ostream& printVector(ostream& os, const T& t){
+template <typename T>
+ostream& printVector(ostream& os, const T& t)
+{
   for (int i=0; i<t.rows(); i++){
     os << t(i) << " ";
   }
   return os;
 }
 
-int main(int , char** ) {
-  
+int main(int , char** )
+{
   Vector6d t;
   t <<  -3, -2, -4, .2, .1, .3;
   Isometry3d T = fromVectorMQT(t);
@@ -38,7 +39,8 @@ int main(int , char** ) {
 
   cout << "transformed line L2: "; printVector(cout, cl2); cout << endl;
   cout << "transformed pline L2: "; printVector(cout, pl2); cout << endl;
-  cout << "error of cartesian line L2, reconstructed from puecker: "; printVector(cout, cl2 - pl2.toCartesian()); cout << endl;
-  
-  
+  cout << "error of cartesian line L2, reconstructed from puecker: "; printVector(cout, cl2 - pl2.toCartesian());
+  cout << endl;
+
+  return 0;
 }

@@ -57,44 +57,44 @@ void testMarginals(SparseOptimizer& optimizer){
       OptimizableGraph::Vertex* v=optimizer.activeVertices()[i];
       cerr << "Vertex id:" << v->id() << endl;
       if (v->hessianIndex()>=0){
-  cerr << "increments block :" << v->hessianIndex() << ", " << v->hessianIndex()<< " covariance:" <<  endl;
-  VectorXd mean(v->minimalEstimateDimension()); //HACK: need to set identity
-  mean.fill(0);
-  VectorXd oldMean(v->minimalEstimateDimension()); //HACK: need to set identity
-  v->getMinimalEstimateData(&oldMean[0]);
-  MatrixXd& cov= *(spinv.block(v->hessianIndex(), v->hessianIndex()));
-  std::vector<MySigmaPoint, Eigen::aligned_allocator<MySigmaPoint> > spts;
-  cerr << cov << endl;
-  if (! sampleUnscented(spts,mean,cov) )
-    continue;
+        cerr << "increments block :" << v->hessianIndex() << ", " << v->hessianIndex()<< " covariance:" <<  endl;
+        VectorXd mean(v->minimalEstimateDimension()); //HACK: need to set identity
+        mean.fill(0);
+        VectorXd oldMean(v->minimalEstimateDimension()); //HACK: need to set identity
+        v->getMinimalEstimateData(&oldMean[0]);
+        MatrixXd& cov= *(spinv.block(v->hessianIndex(), v->hessianIndex()));
+        std::vector<MySigmaPoint, Eigen::aligned_allocator<MySigmaPoint> > spts;
+        cerr << cov << endl;
+        if (! sampleUnscented(spts,mean,cov) )
+          continue;
 
-  // now apply the oplus operator to the sigma points, 
-  // and get the points in the global space
-  std::vector<MySigmaPoint, Eigen::aligned_allocator<MySigmaPoint> > tspts = spts;
+        // now apply the oplus operator to the sigma points,
+        // and get the points in the global space
+        std::vector<MySigmaPoint, Eigen::aligned_allocator<MySigmaPoint> > tspts = spts;
 
-  for (size_t j=0; j<spts.size(); j++) {
-    v->push();
-    // cerr << "v_before [" << j << "]" << endl;
-    v->getMinimalEstimateData(&mean[0]);
-    // cerr << mean << endl;
-    // cerr << "sigma [" << j << "]" << endl;
-    // cerr << spts[j]._sample << endl;
-    v->oplus(&(spts[j]._sample[0]));
-    v->getMinimalEstimateData(&mean[0]);
-    tspts[j]._sample=mean;
-    // cerr << "oplus [" << j << "]" << endl;
-    // cerr << tspts[j]._sample << endl;
-    v->pop();
-  }
-  MatrixXd cov2=cov;
-  reconstructGaussian(mean, cov2, tspts);
-  cerr << "global block :" << v->hessianIndex() << ", " << v->hessianIndex()<< endl;
-  cerr << "mean: " << endl;
-  cerr <<  mean << endl;
-  cerr << "oldMean: " << endl;
-  cerr <<  oldMean << endl;
-  cerr << "cov: " << endl;
-  cerr << cov2 << endl;
+        for (size_t j=0; j<spts.size(); j++) {
+          v->push();
+          // cerr << "v_before [" << j << "]" << endl;
+          v->getMinimalEstimateData(&mean[0]);
+          // cerr << mean << endl;
+          // cerr << "sigma [" << j << "]" << endl;
+          // cerr << spts[j]._sample << endl;
+          v->oplus(&(spts[j]._sample[0]));
+          v->getMinimalEstimateData(&mean[0]);
+          tspts[j]._sample=mean;
+          // cerr << "oplus [" << j << "]" << endl;
+          // cerr << tspts[j]._sample << endl;
+          v->pop();
+        }
+        MatrixXd cov2=cov;
+        reconstructGaussian(mean, cov2, tspts);
+        cerr << "global block :" << v->hessianIndex() << ", " << v->hessianIndex()<< endl;
+        cerr << "mean: " << endl;
+        cerr <<  mean << endl;
+        cerr << "oldMean: " << endl;
+        cerr <<  oldMean << endl;
+        cerr << "cov: " << endl;
+        cerr << cov2 << endl;
 
       }
       // if (v->hessianIndex()>0){
@@ -124,12 +124,12 @@ int unscentedTest(){
     cerr << "Point " << i << " " << endl << "wi=" << spts[i]._wi << " wp=" << spts[i]._wp << " " << endl;
     cerr << spts[i]._sample << endl;
   }
-  
+
   VectorXd recMean(6);
   MatrixXd recCov(6,6);
-    
+
   reconstructGaussian(recMean, recCov, spts);
-  
+
   cerr << "recMean" << endl;
   cerr << recMean << endl;
 

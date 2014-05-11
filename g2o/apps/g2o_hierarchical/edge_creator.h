@@ -8,13 +8,15 @@
 namespace g2o {
 
   /**
-     Class that implements a simple edge_creation, based on the types and the ordes of the vertices passed as argument.
-     Namely, based on an ordered vector of vertices this class implements a method that construct a new edge compatible
-     with the vertices in the vector. The order of the vector matters.
-     This class is heavily based on the Factory, and utilizes strings to identify the edge types.
+   * Class that implements a simple edge_creation, based on the types and the
+   * ordes of the vertices passed as argument.  Namely, based on an ordered
+   * vector of vertices this class implements a method that construct a new
+   * edge compatible with the vertices in the vector. The order of the vector
+   * matters.  This class is heavily based on the Factory, and utilizes strings
+   * to identify the edge types.
    */
 struct EdgeCreator{
-  struct EdgeCreatorEntry{  
+  struct EdgeCreatorEntry {
     EdgeCreatorEntry(const std::string& edgeTypeName, const std::vector<int>& parameterIds)
     :_edgeTypeName(edgeTypeName), _parameterIds(parameterIds) {}
 
@@ -33,7 +35,6 @@ struct EdgeCreator{
   //! The order matters.
   //! @param edgeType: the tag of edge to create
   //! @returns false on failure (incompatible types). Currently returns always true because i did not have time to implement checks
-  
   bool addAssociation(const std::string& vertexTypes, const std::string& edgeType);
 
   //! Adds an association to the association map

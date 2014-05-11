@@ -32,9 +32,9 @@
 #include "g2o/types/slam2d_addons/types_slam2d_addons.h"
 
 namespace g2o {
-  
+
   // sensor that senses segments, only if the extremas are visible
-  class G2O_SIMULATOR_API SensorSegment2DPointLine: public PointSensorParameters, public BinarySensor<Robot2D, EdgeSE2Segment2DPointLine,WorldObjectSegment2D>{ 
+  class G2O_SIMULATOR_API SensorSegment2DPointLine: public PointSensorParameters, public BinarySensor<Robot2D, EdgeSE2Segment2DPointLine,WorldObjectSegment2D>{
   public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
     SensorSegment2DPointLine(const std::string& name_);
@@ -43,7 +43,7 @@ namespace g2o {
   protected:
     bool isVisible(WorldObjectType* to);
     int _visiblePoint;
-  }; 
+  };
 
 }
 

@@ -14,7 +14,6 @@ namespace g2o {
 
   int EdgeLabeler::labelEdges(std::set<OptimizableGraph::Edge*>& edges){
     // assume the system is "solved"
- 
     // compute the sparse pattern of the inverse
     std::set<std::pair<int, int> > pattern;
     for (std::set<OptimizableGraph::Edge*>::iterator it=edges.begin(); it!=edges.end(); it++){
@@ -55,7 +54,7 @@ namespace g2o {
       }
     }
   }
-  
+
   bool EdgeLabeler::computePartialInverse(SparseBlockMatrix<MatrixXd>& spinv, const std::set<std::pair<int,int> >& pattern){
     std::vector<std::pair<int, int> > blockIndices(pattern.size());
     // Why this does not work???
@@ -97,8 +96,8 @@ namespace g2o {
 	for (size_t j=0; j<e->vertices().size(); j++){
 	  const OptimizableGraph::Vertex* vc=(const OptimizableGraph::Vertex*) e->vertices()[j];
 	  int tj = vc->hessianIndex();
-	  if (tj>-1){ 
-	    // cerr << "ti=" << ti << " tj=" << tj 
+	  if (tj>-1){
+	    // cerr << "ti=" << ti << " tj=" << tj
 	    //    << " cumRow=" << cumRow << " cumCol=" << cumCol << endl;
 	    if (ti<=tj){
 	      assert(spinv.block(ti, tj));
@@ -142,8 +141,6 @@ namespace g2o {
     }
     assert(smss && "Edge::setMeasurementFromState() not implemented");
 
-
-
     //std::vector<MySigmaPoint> globalPoints(incrementPoints.size());
     std::vector<MySigmaPoint, Eigen::aligned_allocator<MySigmaPoint> > errorPoints(incrementPoints.size());
 
@@ -163,7 +160,6 @@ namespace g2o {
         vr->push();
       }
 
-      
       for (size_t j=0; j<e->vertices().size(); j++){
         OptimizableGraph::Vertex* vr=(OptimizableGraph::Vertex*) e->vertices()[j];
         int tj=vr->hessianIndex();
@@ -186,7 +182,7 @@ namespace g2o {
       errorPoints[i]._sample=errorPoint;
       errorPoints[i]._wi=incrementPoints[i]._wi;
       errorPoints[i]._wp=incrementPoints[i]._wp;
-      
+
       // pop all the "active" state variables
       for (size_t j=0; j<e->vertices().size(); j++){
         OptimizableGraph::Vertex* vr=(OptimizableGraph::Vertex*) e->vertices()[j];
@@ -198,12 +194,12 @@ namespace g2o {
 
     }
 
-    // reconstruct the covariance of the error by the sigma points 
+    // reconstruct the covariance of the error by the sigma points
     MatrixXd errorCov(e->dimension(), e->dimension());
-    VectorXd errorMean(e->dimension()); 
+    VectorXd errorMean(e->dimension());
     reconstructGaussian(errorMean, errorCov, errorPoints);
     info=errorCov.inverse();
-    
+
     // cerr << "remapped information matrix" << endl;
     // cerr << info << endl;
     return true;

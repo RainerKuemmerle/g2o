@@ -44,7 +44,7 @@ namespace g2o{
   bool SensorSegment2D::isVisible(SensorSegment2D::WorldObjectType* to){
     if (! _robotPoseObject)
       return false;
-    
+
     assert(to && to->vertex());
     VertexType* v=to->vertex();
 
@@ -52,46 +52,46 @@ namespace g2o{
     SE2 iRobot=_robotPoseObject->vertex()->estimate().inverse();
     p1 = iRobot * v->estimateP1();
     p2 = iRobot * v->estimateP2();
-    
+
     Vector3d vp1(p1.x(), p1.y(), 0.);
     Vector3d vp2(p2.x(), p2.y(), 0.);
     Vector3d cp=vp1.cross(vp2); // visibility check
     if (cp[2]<0)
       return false;
-    
+
     int circleClip = clipSegmentCircle(p1,p2,sqrt(_maxRange2));
     bool clip1=false, clip2=false;
     switch(circleClip){
-    case -1: 
-      return false; 
-    case  0: 
-      clip1 = true; 
-      break;
-    case  1: 
-      clip2 = true; 
-      break;
-    case  3: 
-      clip1 = true; 
-      clip2 = true; 
-      break;
-    default:;
+      case -1:
+        return false;
+      case  0:
+        clip1 = true;
+        break;
+      case  1:
+        clip2 = true;
+        break;
+      case  3:
+        clip1 = true;
+        clip2 = true;
+        break;
+      default:;
     }
 
     int fovClip=clipSegmentFov(p1,p2,-_fov, +_fov);
     switch(fovClip){
-    case -1: 
-      return false; 
-    case  0: 
-      clip1 = true; 
-      break;
-    case  1: 
-      clip2 = true; 
-      break;
-    case  3: 
-      clip1 = true; 
-      clip2 = true; 
-      break;
-    default:;
+      case -1:
+        return false;
+      case  0:
+        clip1 = true;
+        break;
+      case  1:
+        clip2 = true;
+        break;
+      case  3:
+        clip1 = true;
+        clip2 = true;
+        break;
+      default:;
     }
     if (!clip1 && !clip2){  // only if both endpoints have not been clipped do something
       return true;
@@ -114,7 +114,7 @@ namespace g2o{
     for (std::set<BaseWorldObject*>::iterator it=world()->objects().begin(); it!=world()->objects().end(); it++){
       WorldObjectType* o=dynamic_cast<WorldObjectType*>(*it);
       if (o && isVisible(o)){
-        EdgeType* e=mkEdge(o);  
+        EdgeType* e=mkEdge(o);
         if (e && graph()) {
           e->setMeasurementFromState();
           addNoise(e);

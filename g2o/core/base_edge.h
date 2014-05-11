@@ -55,7 +55,7 @@ namespace g2o {
 
       virtual ~BaseEdge() {}
 
-      virtual double chi2() const 
+      virtual double chi2() const
       {
         return _error.dot(information()*_error);
       }
@@ -107,7 +107,7 @@ namespace g2o {
 
 
   template<typename E>
-    class BaseEdge<-1,E> : public OptimizableGraph::Edge
+  class BaseEdge<-1,E> : public OptimizableGraph::Edge
   {
     public:
 
@@ -115,14 +115,14 @@ namespace g2o {
       typedef E Measurement;
       typedef Matrix<double, Eigen::Dynamic, 1> ErrorVector;
       typedef Matrix<double, Eigen::Dynamic, Eigen::Dynamic> InformationType;
-      
-  BaseEdge() : OptimizableGraph::Edge(){
-	
+
+      BaseEdge() : OptimizableGraph::Edge(){
+
       }
 
       virtual ~BaseEdge() {}
 
-      virtual double chi2() const 
+      virtual double chi2() const
       {
         return _error.dot(information()*_error);
       }

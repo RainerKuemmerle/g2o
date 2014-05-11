@@ -12,7 +12,7 @@
 namespace Slam3dAddons {
   using namespace g2o;
   using namespace std;
-  
+
   EdgeSE3PlaneSensorCalib::EdgeSE3PlaneSensorCalib() :
     BaseMultiEdge<3, Plane3D>()
   {
@@ -80,7 +80,7 @@ namespace Slam3dAddons {
     return true;
   }
 
-  HyperGraphElementAction* EdgeSE3PlaneSensorCalibDrawAction::operator()(HyperGraph::HyperGraphElement* element, 
+  HyperGraphElementAction* EdgeSE3PlaneSensorCalibDrawAction::operator()(HyperGraph::HyperGraphElement* element,
                  HyperGraphElementAction::Parameters* params_){
 
     if (typeid(*element).name()!=_typeName)
@@ -88,28 +88,25 @@ namespace Slam3dAddons {
 
 
     refreshPropertyPtrs(params_);
-    if (! _previousParams) 
+    if (! _previousParams)
       return this;
-    
+
     if (_show && !_show->value())
       return this;
 
 
     EdgeSE3PlaneSensorCalib* that = dynamic_cast<EdgeSE3PlaneSensorCalib*>(element);
- 
+
     if (! that)
       return this;
 
     const VertexSE3* robot       = dynamic_cast<const VertexSE3*>(that->vertex(0));
     const VertexSE3* sensor = dynamic_cast<const VertexSE3*>(that->vertex(2));
 
-    cout << "that->vertex(0): " << that->vertex(0
-) << " that->vertex(2): " << that->vertex(2) <<   endl;   
-    
+    //cout << "that->vertex(0): " << that->vertex(0) << " that->vertex(2): " << that->vertex(2) << endl;
 
     if (! robot|| ! sensor)
       return 0;
-
 
     double d=that->measurement().distance();
     double azimuth=Plane3D::azimuth(that->measurement().normal());
@@ -118,18 +115,15 @@ namespace Slam3dAddons {
     // std::cerr << "azimuth=" << azimuth << std::endl;
     // std::cerr << "elevation=" << azimuth << std::endl;
 
-    
     glColor3f(that->color(0), that->color(1), that->color(2));
     glPushMatrix();
     Eigen::Isometry3d robotAndSensor = robot->estimate() * sensor->estimate();
     glMultMatrixd(robotAndSensor.matrix().data());
 
-
     glRotatef(RAD2DEG(azimuth),0.,0.,1.);
     glRotatef(RAD2DEG(elevation),0.,-1.,0.);
     glTranslatef(d,0.,0.);
-    
-    
+
     float planeWidth = 0.5;
     float planeHeight = 0.5;
     if (0) {
@@ -147,7 +141,7 @@ namespace Slam3dAddons {
     }
 
     glPopMatrix();
-    
+
     return this;
   }
 #endif

@@ -54,7 +54,7 @@ namespace g2o {
 	Map<Vector2d> error2(&_error(2));
         SE2 iEst=v1->estimate().inverse();
         error1 = (iEst * l2->estimateP1());
-	error2 = (iEst * l2->estimateP2()); 
+	error2 = (iEst * l2->estimateP2());
 	_error = _error - _measurement;
       }
 
@@ -69,7 +69,7 @@ namespace g2o {
 	data = _measurement;
 	return true;
       }
-      
+
       virtual int measurementDimension() const {return 4;}
 
       virtual bool setMeasurementFromState(){

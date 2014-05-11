@@ -73,7 +73,7 @@ int main(int argc, char** argv) {
 
 
   arg.parseArgs(argc, argv);
-  
+
   std::tr1::ranlux_base_01 generator;
   OptimizableGraph graph;
   World world(&graph);
@@ -96,9 +96,9 @@ int main(int argc, char** argv) {
     th=atan2(sin(th),cos(th));
     double xc = ix*(worldSize/segmentGridSize);
     double yc = iy*(worldSize/segmentGridSize);
-    
+
     double l2 = sampleUniform(minSegmentLenght, maxSegmentLenght, &generator);
-    
+
     double x1 = xc + cos(th)*l2;
     double y1 = yc + sin(th)*l2;
     double x2 = xc - cos(th)*l2;
@@ -141,7 +141,7 @@ int main(int argc, char** argv) {
     poseSensor->setInformation(poseInfo);
     ss << "-pose";
   }
-  
+
   if (hasPointSensor) {
     SensorPointXY* pointSensor = new SensorPointXY("pointSensor");
     robot.addSensor(pointSensor);
@@ -186,9 +186,9 @@ int main(int argc, char** argv) {
 
     ss << "-segment2d";
   }
-  
 
-  
+
+
   robot.move(SE2());
   double pStraight=0.7;
   SE2 moveStraight; moveStraight.setTranslation(Vector2d(1., 0.));
@@ -210,7 +210,7 @@ int main(int argc, char** argv) {
     if (pose.translation().x() >  .5*worldSize){
       dtheta = -M_PI;
     }
-    
+
     if (pose.translation().y() < -.5*worldSize){
       dtheta = M_PI/2;
     }
@@ -242,5 +242,6 @@ int main(int argc, char** argv) {
   //string fname=outputFilename + ss.str() + ".g2o";
   ofstream testStream(outputFilename.c_str());
   graph.save(testStream);
- 
+
+  return 0;
 }

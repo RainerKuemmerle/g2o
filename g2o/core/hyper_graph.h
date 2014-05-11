@@ -77,8 +77,6 @@ namespace g2o {
 
       typedef std::bitset<HyperGraph::HGET_NUM_ELEMS> GraphElemBitset;
 
-
-     
       class G2O_CORE_API Data;
       class G2O_CORE_API DataContainer;
       class G2O_CORE_API Vertex;
@@ -96,46 +94,45 @@ namespace g2o {
 	HyperGraphElement* clone() const { return 0; }
       };
 
-
       /**
        * \brief data packet for a vertex. Extend this class to store in the vertices
        * the potential additional information you need (e.g. images, laser scans, ...).
        */
       class G2O_CORE_API Data : public HyperGraph::HyperGraphElement {
-      public:
-	Data();
-	~Data();
-	//! read the data from a stream
-	virtual bool read(std::istream& is) = 0;
-	//! write the data to a stream
-	virtual bool write(std::ostream& os) const = 0;
-	virtual HyperGraph::HyperGraphElementType elementType() const { return HyperGraph::HGET_DATA;}
-	inline const Data* next() const {return _next;}
-	inline Data* next() {return _next;}
-	inline void setNext(Data* next_) { _next = next_; }
-	inline DataContainer* dataContainer() { return _dataContainer;}
-	inline const DataContainer* dataContainer() const { return _dataContainer;}
-	inline void setDataContainer(DataContainer * dataContainer_){ _dataContainer = dataContainer_;}
-      protected:
-	  Data* _next; // linked list of multiple data;
-	  DataContainer* _dataContainer;
+        public:
+          Data();
+          ~Data();
+          //! read the data from a stream
+          virtual bool read(std::istream& is) = 0;
+          //! write the data to a stream
+          virtual bool write(std::ostream& os) const = 0;
+          virtual HyperGraph::HyperGraphElementType elementType() const { return HyperGraph::HGET_DATA;}
+          inline const Data* next() const {return _next;}
+          inline Data* next() {return _next;}
+          inline void setNext(Data* next_) { _next = next_; }
+          inline DataContainer* dataContainer() { return _dataContainer;}
+          inline const DataContainer* dataContainer() const { return _dataContainer;}
+          inline void setDataContainer(DataContainer * dataContainer_){ _dataContainer = dataContainer_;}
+        protected:
+          Data* _next; // linked list of multiple data;
+          DataContainer* _dataContainer;
       };
 
       /**
-       * \brief Container class that implements an interface for adding/removing Data elements in 
+       * \brief Container class that implements an interface for adding/removing Data elements in
        a linked list
        */
       class G2O_CORE_API DataContainer {
-      public:
-	DataContainer() {_userData = 0;}
-	virtual ~DataContainer() {Data* d=_userData; while (d) {Data* dNext = d->next(); delete d; d=dNext;} }
-        //! the user data associated with this vertex
-        const Data* userData() const { return _userData; }
-        Data* userData() { return _userData; }
-        void setUserData(Data* obs) { _userData = obs;}
-	void addUserData(Data* obs) { if (obs) { obs->setNext(_userData); _userData=obs; } }
-      protected:
-	Data* _userData;
+        public:
+          DataContainer() {_userData = 0;}
+          virtual ~DataContainer() {Data* d=_userData; while (d) {Data* dNext = d->next(); delete d; d=dNext;} }
+          //! the user data associated with this vertex
+          const Data* userData() const { return _userData; }
+          Data* userData() { return _userData; }
+          void setUserData(Data* obs) { _userData = obs;}
+          void addUserData(Data* obs) { if (obs) { obs->setNext(_userData); _userData=obs; } }
+        protected:
+          Data* _userData;
       };
 
 

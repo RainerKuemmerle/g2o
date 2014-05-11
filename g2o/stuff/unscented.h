@@ -76,7 +76,7 @@ namespace g2o {
   }
 
   template <class SampleType, class CovarianceType>
-  void reconstructGaussian(SampleType& mean, CovarianceType& covariance, 
+  void reconstructGaussian(SampleType& mean, CovarianceType& covariance,
 			   const std::vector<SigmaPoint<SampleType>, Eigen::aligned_allocator<SigmaPoint <SampleType> > >& sigmaPoints){
 
     mean.fill(0);

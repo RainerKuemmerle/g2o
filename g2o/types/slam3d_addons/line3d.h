@@ -10,12 +10,12 @@ namespace Slam3dAddons {
   using namespace g2o;
 
   typedef Eigen::Matrix<double, 7, 6> Matrix7x6d;
-  
+
   typedef Eigen::Matrix<double, 6, 1> Vector6d;
-  
+
   typedef Eigen::Matrix<double, 6, 6> Matrix6d;
-  
-  
+
+
   class Line3D : public Vector6d{
     public:
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
@@ -29,7 +29,7 @@ namespace Slam3dAddons {
       }
 
       Vector6d toCartesian() const;
-      
+
       inline Eigen::Vector3d w() const {
 	return head<3>();
       }
@@ -69,7 +69,7 @@ namespace Slam3dAddons {
 	*this+=v;
 	normalize();
       }
-    
+
       inline Vector6d ominus(const Line3D& line){
 	return (Vector6d)(*this)-line;
       }
@@ -77,13 +77,13 @@ namespace Slam3dAddons {
       static void jacobian(Matrix7x6d& Jp, Matrix7x6d& Jl, const Eigen::Isometry3d& x, const Line3D& l);
   };
 
-  
+
 
   Line3D operator*(const Eigen::Isometry3d& t, const Line3D& line);
 
   Vector6d transformCartesianLine(const Eigen::Isometry3d& t, const Vector6d& line);
   Vector6d normalizeCartesianLine(const Vector6d& line);
-  
+
 }
 
 #endif

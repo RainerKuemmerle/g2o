@@ -27,6 +27,6 @@ SET_TARGET_PROPERTIES(g2o_hierarchical_application PROPERTIES OUTPUT_NAME g2o_hi
 # )
 
 FILE(GLOB headers "${CMAKE_CURRENT_SOURCE_DIR}/*.h" "${CMAKE_CURRENT_SOURCE_DIR}/*.hpp")
-INSTALL(FILES 
+INSTALL(FILES
   ${headers}
   DESTINATION ${CMAKE_INSTALL_PREFIX}/include/g2o/apps/g2o_hierarchical)

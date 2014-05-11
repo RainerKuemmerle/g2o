@@ -36,16 +36,16 @@ void constructEdgeStarMap(EdgeStarMap& esmap, StarSet& stars, bool low){
   for (StarSet::iterator it=stars.begin(); it!=stars.end(); it++){
     Star* s = *it;
     if (low) {
-      for (HyperGraph::EdgeSet::iterator it = s->lowLevelEdges().begin(); 
-     it!=s->lowLevelEdges().end(); it++){
-  HyperGraph::Edge* e=*it;
-  esmap.insert(make_pair(e,s));
+      for (HyperGraph::EdgeSet::iterator it = s->lowLevelEdges().begin();
+          it!=s->lowLevelEdges().end(); it++){
+        HyperGraph::Edge* e=*it;
+        esmap.insert(make_pair(e,s));
       }
     } else {
-      for (HyperGraph::EdgeSet::iterator it = s->starEdges().begin(); 
-     it!=s->starEdges().end(); it++){
-  HyperGraph::Edge* e=*it;
-  esmap.insert(make_pair(e,s));
+      for (HyperGraph::EdgeSet::iterator it = s->starEdges().begin();
+          it!=s->starEdges().end(); it++){
+        HyperGraph::Edge* e=*it;
+        esmap.insert(make_pair(e,s));
       }
     }
   }
@@ -93,39 +93,38 @@ void assignHierarchicalEdges(StarSet& stars, EdgeStarMap& esmap, EdgeLabeler* la
       OptimizableGraph::Vertex* v=(OptimizableGraph::Vertex*)*vit;
       vertices[1]=v;
       if (v==vertices[0])
-  continue;
+        continue;
       HyperGraph::EdgeSet eInSt;
       int numEdges = vertexEdgesInStar(eInSt, v, s, esmap);
-      if (Factory::instance()->tag(v)==Factory::instance()->tag(vertices[0]) || numEdges>minNumEdges) { 
-  OptimizableGraph::Edge* e=creator->createEdge(vertices);
-  //cerr << "creating edge" << e << endl;
-  if (e) {
-    e->setLevel(1);
-    optimizer->addEdge(e);
-    s->_starEdges.insert(e);
-  } else {
+      if (Factory::instance()->tag(v)==Factory::instance()->tag(vertices[0]) || numEdges>minNumEdges) {
+        OptimizableGraph::Edge* e=creator->createEdge(vertices);
+        //cerr << "creating edge" << e << endl;
+        if (e) {
+          e->setLevel(1);
+          optimizer->addEdge(e);
+          s->_starEdges.insert(e);
+        } else {
           cerr << "THERE" << endl;
-    cerr << "FATAL, cannot create edge" << endl;
-  }
+          cerr << "FATAL, cannot create edge" << endl;
+        }
       } else {
-  vNew.erase(v);
-  // cerr << numEdges << " ";
-  // cerr << "r " <<  v-> id() << endl;
-  // remove from the star all edges that are not sufficiently connected
-  for (HyperGraph::EdgeSet::iterator it=eInSt.begin(); it!=eInSt.end(); it++){
-    HyperGraph::Edge* e=*it;
-    s->lowLevelEdges().erase(e);
-  }
+        vNew.erase(v);
+        // cerr << numEdges << " ";
+        // cerr << "r " <<  v-> id() << endl;
+        // remove from the star all edges that are not sufficiently connected
+        for (HyperGraph::EdgeSet::iterator it=eInSt.begin(); it!=eInSt.end(); it++){
+          HyperGraph::Edge* e=*it;
+          s->lowLevelEdges().erase(e);
+        }
       }
     }
     s->lowLevelVertices()=vNew;
     //cerr << endl;
-    cerr <<  "gauge: " << (*s->_gauge.begin())->id() 
-   << " edges:" << s->_lowLevelEdges.size() 
-   << " hedges" << s->_starEdges.size() << endl;
-    
-    bool debug = false;
-    
+    cerr <<  "gauge: " << (*s->_gauge.begin())->id()
+      << " edges:" << s->_lowLevelEdges.size()
+      << " hedges" << s->_starEdges.size() << endl;
+
+    const bool debug = false;
     if (debug){
       char starLowName[100];
       sprintf(starLowName, "star-%04d-low.g2o", starNum);
@@ -157,21 +156,21 @@ void computeBorder(StarSet& stars, EdgeStarMap& hesmap){
       starsInEdge(sset, e, hesmap, s->gauge());
       //cerr << "e: " << e << " l:" << e->level() << " sset.size()=" << sset.size() << endl;
       if (sset.size()>1){
-  s->starFrontierEdges().insert(e);
+        s->starFrontierEdges().insert(e);
       }
     }
   }
 }
 
 
-  void computeSimpleStars(StarSet& stars, 
-			  SparseOptimizer* optimizer, 
-			  EdgeLabeler* labeler, 
-			  EdgeCreator* creator, 
-			  OptimizableGraph::Vertex* gauge_, 
-			  std::string edgeTag, 
-			  std::string vertexTag, 
-			  int level, 
+  void computeSimpleStars(StarSet& stars,
+			  SparseOptimizer* optimizer,
+			  EdgeLabeler* labeler,
+			  EdgeCreator* creator,
+			  OptimizableGraph::Vertex* gauge_,
+			  std::string edgeTag,
+			  std::string vertexTag,
+			  int level,
 			  int step,
 			  int backboneIterations,
 			  int starIterations,
@@ -184,14 +183,14 @@ void computeBorder(StarSet& stars, EdgeStarMap& hesmap){
     EdgeTypesCostFunction f(edgeTag, vertexTag, level);
     d.shortestPaths(gauge_,
         &f,
-        std::numeric_limits< double >::max(), 
-        1e-6, 
+        std::numeric_limits< double >::max(),
+        1e-6,
         false,
         std::numeric_limits< double >::max()/2);
 
     HyperDijkstra::computeTree(d.adjacencyMap());
     // constructs the stars on the backbone
-  
+
     BackBoneTreeAction bact(optimizer, vertexTag, level, step);
     bact.init();
 
@@ -201,8 +200,8 @@ void computeBorder(StarSet& stars, EdgeStarMap& hesmap){
     d.visitAdjacencyMap(d.adjacencyMap(),&bact,true);
     stars.clear();
 
-    for (VertexStarMultimap::iterator it=bact.vertexStarMultiMap().begin(); 
-   it!=bact.vertexStarMultiMap().end(); it++){
+    for (VertexStarMultimap::iterator it=bact.vertexStarMultiMap().begin();
+        it!=bact.vertexStarMultiMap().end(); it++){
       stars.insert(it->second);
     }
     cerr << "stars.size: " << stars.size() << endl;
@@ -213,7 +212,7 @@ void computeBorder(StarSet& stars, EdgeStarMap& hesmap){
 
     //    for all vertices in the backbone, select all edges leading/leaving from that vertex
     //    that are contained in freeEdges.
-  
+
     //      mark the corresponding "open" vertices and add them to a multimap (vertex->star)
 
     //    select a gauge in the backbone
@@ -228,17 +227,17 @@ void computeBorder(StarSet& stars, EdgeStarMap& hesmap){
 
     //    push all "open" vertices
 
-    //    for each open vertex, 
+    //    for each open vertex,
     //      compute an initial guess given the backbone
     //      do some rounds of solveDirect
     //      if (fail)
     //        - remove the vertex and the edges in that vertex from the star
     //   - make the structures consistent
-  
+
     //    pop all "open" vertices
     //    pop all "vertices" in the backbone
     //    unfix the vertices in the backbone
-    
+
     int starNum=0;
     for (StarSet::iterator it=stars.begin(); it!=stars.end(); it++){
       Star* s =*it;
@@ -247,7 +246,7 @@ void computeBorder(StarSet& stars, EdgeStarMap& hesmap){
       if (backboneEdges.empty())
 	continue;
 
-    
+
       // cerr << "optimizing backbone" << endl;
       // one of these  should be the gauge, to be simple we select the fisrt one in the backbone
       OptimizableGraph::VertexSet gauge;
@@ -290,7 +289,7 @@ void computeBorder(StarSet& stars, EdgeStarMap& hesmap){
         // cerr << "optimizing vertices out of bbone" << endl;
         // cerr << "push" << endl;
         // cerr << "init" << endl;
-        s->optimizer()->initializeOptimization(otherEdges); 
+        s->optimizer()->initializeOptimization(otherEdges);
         // cerr << "guess" << endl;
         s->optimizer()->computeInitialGuess();
         // cerr << "solver init" << endl;
@@ -306,30 +305,30 @@ void computeBorder(StarSet& stars, EdgeStarMap& hesmap){
       } else {
         cerr << "FATAL: hierarchical thing cannot be used with a solver that does not support the system structure construction" << endl;
       }
-      
-      
+
+
       // // then optimize the vertices one at a time to check if a solution is good
       for (HyperGraph::VertexSet::iterator vit=otherVertices.begin(); vit!=otherVertices.end(); vit++){
         OptimizableGraph::Vertex* v=(OptimizableGraph::Vertex*)(*vit);
         v->solveDirect();
         // cerr << " " << d;
-        // if  a solution is found, add a vertex and all the edges in 
+        // if  a solution is found, add a vertex and all the edges in
         //othervertices that are pointing to that edge to the star
         s->_lowLevelVertices.insert(v);
         for (HyperGraph::EdgeSet::iterator eit=v->edges().begin(); eit!=v->edges().end(); eit++){
           OptimizableGraph::Edge* e = (OptimizableGraph::Edge*) *eit;
           if (otherEdges.find(e)!=otherEdges.end())
             s->_lowLevelEdges.insert(e);
-        } 
+        }
       }
       //cerr <<  endl;
-      
+
       // relax the backbone and optimize it all
       // cerr << "relax bbone" << endl;
       s->optimizer()->setFixed(backboneVertices, false);
       //cerr << "fox gauge bbone" << endl;
       s->optimizer()->setFixed(s->gauge(),true);
-      
+
       //cerr << "opt init" << endl;
       s->optimizer()->initializeOptimization(s->_lowLevelEdges);
       optimizer->computeActiveErrors();
@@ -355,7 +354,7 @@ void computeBorder(StarSet& stars, EdgeStarMap& hesmap){
         for (HyperGraph::VertexSet::iterator vit=otherVertices.begin(); vit!=otherVertices.end(); vit++){
 
 	  //discard the vertices whose error is too big
-	  
+
 
           OptimizableGraph::Vertex* v=(OptimizableGraph::Vertex*)(*vit);
           MatrixXd h(v->dimension(), v->dimension());
@@ -375,17 +374,17 @@ void computeBorder(StarSet& stars, EdgeStarMap& hesmap){
 
           double d=emin/emax;
 
-	  
+
           // cerr << " " << d;
-          if (d>rejectionThreshold){ 
-	  // if  a solution is found, add a vertex and all the edges in 
+          if (d>rejectionThreshold){
+	  // if  a solution is found, add a vertex and all the edges in
 	  //othervertices that are pointing to that edge to the star
             prunedStarVertices.insert(v);
             for (HyperGraph::EdgeSet::iterator eit=v->edges().begin(); eit!=v->edges().end(); eit++){
               OptimizableGraph::Edge* e = (OptimizableGraph::Edge*) *eit;
               if (otherEdges.find(e)!=otherEdges.end())
                 prunedStarEdges.insert(e);
-            } 
+            }
             //cerr << "K( " << v->id() << "," << d << ")" ;
             vKept ++;
           } else {
@@ -401,7 +400,7 @@ void computeBorder(StarSet& stars, EdgeStarMap& hesmap){
 	//now add to the star the hierarchical edges
 	std::vector<OptimizableGraph::Vertex*> vertices(2);
 	vertices[0]= (OptimizableGraph::Vertex*) *s->_gauge.begin();
-	
+
 	for (HyperGraph::VertexSet::iterator vit=s->_lowLevelVertices.begin(); vit!=s->_lowLevelVertices.end(); vit++){
 	  OptimizableGraph::Vertex* v=(OptimizableGraph::Vertex*)*vit;
 	  vertices[1]=v;
@@ -419,15 +418,15 @@ void computeBorder(StarSet& stars, EdgeStarMap& hesmap){
 	  }
 	}
       }
-      
+
       cerr << " gauge: " << (*s->_gauge.begin())->id()
            << " kept: " << vKept
            << " dropped: " << vDropped
-	   << " edges:" << s->_lowLevelEdges.size() 
-	   << " hedges" << s->_starEdges.size() 
-	   << " initial chi " << initialChi 
+	   << " edges:" << s->_lowLevelEdges.size()
+	   << " hedges" << s->_starEdges.size()
+	   << " initial chi " << initialChi
 	   << " final chi " << finalchi << endl;
-      
+
       if (debug) {
 	char starLowName[100];
 	sprintf(starLowName, "star-%04d-low.g2o", starNum);
@@ -435,36 +434,36 @@ void computeBorder(StarSet& stars, EdgeStarMap& hesmap){
 	optimizer->saveSubset(starLowStream, s->_lowLevelEdges);
       }
       bool labelOk=false;
-      if (!starIterations || starOptResult > 0) 
-	labelOk = s->labelStarEdges(0, labeler);
+      if (!starIterations || starOptResult > 0)
+        labelOk = s->labelStarEdges(0, labeler);
       if (labelOk) {
-	if (debug) {
-	  char starHighName[100];
-	  sprintf(starHighName, "star-%04d-high.g2o", starNum);
-	  ofstream starHighStream(starHighName);
-	  optimizer->saveSubset(starHighStream, s->_starEdges);
-	}
+        if (debug) {
+          char starHighName[100];
+          sprintf(starHighName, "star-%04d-high.g2o", starNum);
+          ofstream starHighStream(starHighName);
+          optimizer->saveSubset(starHighStream, s->_starEdges);
+        }
       } else {
 
-	cerr << "FAILURE: " << starOptResult << endl;
+        cerr << "FAILURE: " << starOptResult << endl;
       }
       starNum++;
-      
+
       //label each hierarchical edge
       s->optimizer()->pop(otherVertices);
       s->optimizer()->pop(backboneVertices);
       s->optimizer()->setFixed(s->gauge(),false);
     }
-    
+
 
     StarSet stars2;
     // now erase the stars that have 0 edges. They r useless
     for (StarSet::iterator it=stars.begin(); it!=stars.end(); it++){
       Star* s=*it;
       if (s->lowLevelEdges().size()==0) {
-  delete s;
+        delete s;
       } else
-  stars2.insert(s);
+        stars2.insert(s);
     }
     stars=stars2;
   }

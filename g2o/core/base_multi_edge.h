@@ -108,12 +108,10 @@ namespace g2o {
 
 
 
-  // PARTIAL TEMPLATE SPECIALIZATION 
-
-
+  // PARTIAL TEMPLATE SPECIALIZATION
   template <typename E>
-    class G2O_CORE_API BaseMultiEdge<-1,E> : public BaseEdge<-1,E>
-    {
+  class G2O_CORE_API BaseMultiEdge<-1,E> : public BaseEdge<-1,E>
+  {
     public:
       /**
        * \brief helper for mapping the Hessian memory of the upper triangular block
@@ -121,7 +119,7 @@ namespace g2o {
       struct HessianHelper {
         Map<MatrixXd> matrix;     ///< the mapped memory
         bool transposed;          ///< the block has to be transposed
-      HessianHelper() : matrix(0, 0, 0), transposed(false) {}
+        HessianHelper() : matrix(0, 0, 0), transposed(false) {}
       };
 
     public:
@@ -131,12 +129,12 @@ namespace g2o {
       typedef typename BaseEdge<-1,E>::ErrorVector ErrorVector;
       typedef typename BaseEdge<-1,E>::InformationType InformationType;
       typedef Map<MatrixXd, MatrixXd::Flags & AlignedBit ? Aligned : Unaligned > HessianBlockType;
-      
-    BaseMultiEdge() : BaseEdge<-1,E>()
-	{
-	  // this->_variableSize = true;
-	}
-      
+
+      BaseMultiEdge() : BaseEdge<-1,E>()
+    {
+      // this->_variableSize = true;
+    }
+
       virtual void linearizeOplus(JacobianWorkspace& jacobianWorkspace);
 
       /**
@@ -144,7 +142,7 @@ namespace g2o {
        * the result in temporary variable vector _jacobianOplus
        */
       virtual void linearizeOplus();
-      
+
       virtual void resize(size_t size);
 
       virtual bool allVerticesFixed() const;
@@ -168,8 +166,8 @@ namespace g2o {
       void computeQuadraticForm(const InformationType& omega, const ErrorVector& weightedError);
 
     public:
-      EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-	};
+      EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
+    };
 
 
 #include "base_multi_edge.hpp"

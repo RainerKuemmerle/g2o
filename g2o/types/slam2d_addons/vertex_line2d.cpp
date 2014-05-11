@@ -74,7 +74,7 @@ namespace g2o {
 //       std::cerr << __PRETTY_FUNCTION__ << ": warning, on valid os specified" << std::endl;
 //       return false;
 //     }
-         
+
 //     VertexLine2D* v =  static_cast<VertexLine2D*>(element);
 //     *(params->os) << v->estimate().x() << " " << v->estimate().y() << std::endl;
 //     return this;
@@ -94,7 +94,7 @@ namespace g2o {
     return true;
   }
 
-  HyperGraphElementAction* VertexLine2DDrawAction::operator()(HyperGraph::HyperGraphElement* element, 
+  HyperGraphElementAction* VertexLine2DDrawAction::operator()(HyperGraph::HyperGraphElement* element,
                      HyperGraphElementAction::Parameters* params_ ){
 
     if (typeid(*element).name()!=_typeName)
@@ -106,7 +106,7 @@ namespace g2o {
 
     if (_show && !_show->value())
       return this;
-    
+
 
     VertexLine2D* that = static_cast<VertexLine2D*>(element);
     glPushAttrib(GL_CURRENT_BIT | GL_BLEND);
@@ -120,7 +120,7 @@ namespace g2o {
     VertexPointXY *vp1=0, *vp2=0;
     vp1=dynamic_cast<VertexPointXY*> (that->graph()->vertex(that->p1Id));
     vp2=dynamic_cast<VertexPointXY*> (that->graph()->vertex(that->p2Id));
-    
+
     glColor4f(0.8f,0.5f,0.3f,0.3f);
     if (vp1 && vp2) {
       glColor4f(0.8f,0.5f,0.3f,0.7f);

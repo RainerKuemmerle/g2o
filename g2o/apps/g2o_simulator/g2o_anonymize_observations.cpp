@@ -75,7 +75,7 @@ int main(int argc, char** argv) {
   arg.paramLeftOver("graph-output", inputFilename, "", "graph file which will be read", true);
   arg.parseArgs(argc, argv);
   OptimizableGraph graph;
- 
+
   if (inputFilename.size() == 0) {
     cerr << "No input data specified" << endl;
     return 0;
@@ -97,7 +97,7 @@ int main(int argc, char** argv) {
       return 2;
     }
   }
-  
+
   for (HyperGraph::EdgeSet::iterator it = graph.edges().begin(); it!=graph.edges().end(); it++){
     HyperGraph::Edge* e = *it;
     if (anonymizeLandmarkEdge<EdgeSE2PointXY>(e, graph)) continue;

@@ -54,7 +54,7 @@ namespace Slam3dAddons {
 
   bool EdgeSE3Calib::read(std::istream& is) {
     Vector7d meas;
-    for (int i=0; i<7; i++) 
+    for (int i=0; i<7; i++)
       is >> meas[i];
     // normalize the quaternion to recover numerical precision lost by storing as human readable text
     Vector4d::MapType(meas.data()+3).normalize();
@@ -72,7 +72,7 @@ namespace Slam3dAddons {
     if (is.bad()) {
       //  we overwrite the information matrix with the Identity
       information().setIdentity();
-    } 
+    }
     return true;
   }
 

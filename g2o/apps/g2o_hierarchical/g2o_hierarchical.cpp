@@ -1,16 +1,16 @@
 // g2o - General Graph Optimization
 // Copyright (C) 2011 R. Kuemmerle, G. Grisetti, W. Burgard
-// 
+//
 // g2o is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published
 // by the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // g2o is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU Lesser General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
@@ -177,12 +177,11 @@ int main(int argc, char** argv)
       cout << kernels[i] << endl;
     }
   }
-  
+
   AbstractRobustKernelCreator* kernelCreator=0;
   if (robustKernel.size() > 0) {
     kernelCreator = RobustKernelFactory::instance()->creator(robustKernel);
   }
-  
 
   SparseOptimizer optimizer;
   optimizer.setVerbose(verbose);
@@ -215,7 +214,7 @@ int main(int argc, char** argv)
   }
   cerr << "Loaded " << optimizer.vertices().size() << " vertices" << endl;
   cerr << "Loaded " << optimizer.edges().size() << " edges" << endl;
-  
+
 
   OptimizableGraph::EdgeSet originalEdges=optimizer.edges();
 
@@ -319,21 +318,21 @@ int main(int argc, char** argv)
     }
     break;
   default:
-    cerr << "Fatal: unknown backbone type. The largest vertex dimension is: " << poseDim << "." << endl 
+    cerr << "Fatal: unknown backbone type. The largest vertex dimension is: " << poseDim << "." << endl
 	 <<"Exiting." << endl;
     return -1;
   }
 
   // here we need to chop the graph into many lil pieces
-  
+
 
   // check for vertices to fix to remove DoF
   bool gaugeFreedom = optimizer.gaugeFreedom();
   OptimizableGraph::Vertex* gauge=optimizer.findGauge();
 
-  
-  
-  
+
+
+
   if (gaugeFreedom) {
     if (! gauge) {
       cerr <<  "# cannot find a vertex to fix in this thing" << endl;
@@ -347,7 +346,7 @@ int main(int argc, char** argv)
   }
 
 
-  
+
 
 
 
@@ -397,32 +396,32 @@ int main(int argc, char** argv)
 
 
   StarSet stars;
-  
-  
-  computeSimpleStars(stars, &optimizer, &labeler, &creator, 
-		     gauge, backboneEdgeType, backboneVertexType, 0, hierarchicalDiameter, 
-		     1, starIterations, uThreshold, debug);
-  
+
+
+  computeSimpleStars(stars, &optimizer, &labeler, &creator,
+      gauge, backboneEdgeType, backboneVertexType, 0, hierarchicalDiameter,
+      1, starIterations, uThreshold, debug);
+
   cerr << "stars computed, stars.size()= " << stars.size() << endl;
- 
+
   cerr << "hierarchy done, determining border" << endl;
   EdgeStarMap hesmap;
   constructEdgeStarMap(hesmap, stars, false);
   computeBorder(stars, hesmap);
-  
+
   OptimizableGraph::EdgeSet   eset;
   OptimizableGraph::VertexSet vset;
   OptimizableGraph::EdgeSet   heset;
   OptimizableGraph::VertexSet hvset;
   HyperGraph::VertexSet hgauge;
-  for (StarSet::iterator it=stars.begin(); it!=stars.end(); it++){
-      
+  for (StarSet::iterator it=stars.begin(); it!=stars.end(); it++) {
+
     Star* s=*it;
     if (hgauge.empty())
       hgauge=s->gauge();
 
-    for (HyperGraph::VertexSet::iterator git=s->gauge().begin(); 
-	 git != s->gauge().end(); git++){
+    for (HyperGraph::VertexSet::iterator git=s->gauge().begin();
+	 git != s->gauge().end(); git++) {
       hvset.insert(*git);
     }
 
@@ -440,7 +439,7 @@ int main(int argc, char** argv)
   }
   cerr << "eset.size()= " << eset.size() << endl;
   cerr << "heset.size()= " << heset.size() << endl;
-  
+
   ofstream starStream("stars.g2o");
   optimizer.saveSubset(starStream, eset);
   starStream.close();
@@ -536,7 +535,7 @@ int main(int argc, char** argv)
     PropertyMap summary;
     summary.makeProperty<StringProperty>("filename", inputFilename);
     summary.makeProperty<IntProperty>("n_vertices", optimizer.vertices().size());
-    
+
     int nLandmarks=0;
     int nPoses=0;
     int maxDim = *vertexDimensions.rbegin();
@@ -578,8 +577,8 @@ int main(int argc, char** argv)
     summary.makeProperty<IntProperty>("n_star_h_vertices", hvset.size());
     summary.makeProperty<DoubleProperty>("h_initChi", hInitChi);
     summary.makeProperty<DoubleProperty>("h_finalChi", hFinalChi);
-    
-    
+
+
     ofstream os;
     os.open(summaryFile.c_str(), ios::app);
     summary.writeToCSV(os);

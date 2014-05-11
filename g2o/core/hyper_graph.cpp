@@ -31,16 +31,15 @@
 
 namespace g2o {
 
-  HyperGraph::Data::Data() {			
+  HyperGraph::Data::Data() {
     _next = 0;
     _dataContainer = 0;
   }
 
   HyperGraph::Data::~Data() {
-      if(_next)
-    	  delete _next;
-    }
-
+    if(_next)
+      delete _next;
+  }
 
   HyperGraph::Vertex::Vertex(int id) : _id(id)
   {
@@ -129,7 +128,8 @@ namespace g2o {
     return true;
   }
 
-  bool HyperGraph::setEdgeVertex(HyperGraph::Edge* e, int pos, HyperGraph::Vertex* v){
+  bool HyperGraph::setEdgeVertex(HyperGraph::Edge* e, int pos, HyperGraph::Vertex* v)
+  {
     Vertex* vOld = e->vertex(pos);
     if (vOld)
       vOld->edges().erase(e);
@@ -139,8 +139,8 @@ namespace g2o {
     return true;
   }
 
-  bool HyperGraph::mergeVertices(Vertex* vBig, Vertex* vSmall, bool erase){
-
+  bool HyperGraph::mergeVertices(Vertex* vBig, Vertex* vSmall, bool erase)
+  {
     VertexIDMap::iterator it=_vertices.find(vBig->id());
     if (it==_vertices.end())
       return false;
@@ -148,15 +148,15 @@ namespace g2o {
     it=_vertices.find(vSmall->id());
     if (it==_vertices.end())
       return false;
-    
+
     EdgeSet tmp(vSmall->edges());
     bool ok = true;
     for(EdgeSet::iterator it=tmp.begin(); it!=tmp.end(); ++it){
       HyperGraph::Edge* e = *it;
       for (size_t i=0; i<e->vertices().size(); i++){
-	Vertex* v=e->vertex(i);
-	if (v==vSmall)
-	  ok &= setEdgeVertex(e,i,vBig);
+        Vertex* v=e->vertex(i);
+        if (v==vSmall)
+          ok &= setEdgeVertex(e,i,vBig);
       }
     }
     if (erase)
@@ -180,7 +180,8 @@ namespace g2o {
     return true;
   }
 
-  bool HyperGraph::removeVertex(Vertex* v, bool detach) {
+  bool HyperGraph::removeVertex(Vertex* v, bool detach)
+  {
     if (detach){
       bool result = detachVertex(v);
       if (! result) {
@@ -195,7 +196,7 @@ namespace g2o {
     EdgeSet tmp(v->edges());
     for (EdgeSet::iterator it=tmp.begin(); it!=tmp.end(); ++it){
       if (!removeEdge(*it)){
-	  assert(0 && __PRETTY_FUNCTION__ && "error in erasing vertex");
+        assert(0 && __PRETTY_FUNCTION__ && "error in erasing vertex");
       }
     }
     _vertices.erase(it);

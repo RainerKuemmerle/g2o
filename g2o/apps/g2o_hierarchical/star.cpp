@@ -52,7 +52,7 @@ namespace g2o {
         ok=false;
       }
     }  else {
-      optimizer()->initializeOptimization(_lowLevelEdges); 
+      optimizer()->initializeOptimization(_lowLevelEdges);
       // cerr << "guess" << endl;
       //optimizer()->computeInitialGuess();
       // cerr << "solver init" << endl;
@@ -85,7 +85,7 @@ namespace g2o {
       OptimizableGraph::Vertex* v=(OptimizableGraph::Vertex*)*it;
       v->setFixed(false);
     }
-    
+
     return ok;
   }
 

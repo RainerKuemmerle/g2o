@@ -59,17 +59,17 @@ Vector3d sample_noise_from_plane(const Vector3d& cov ){
   return Vector3d(gauss_rand(cov(0)), gauss_rand(cov(1)), gauss_rand(cov(2)));
 }
 
-struct SimulatorItem{
+struct SimulatorItem {
   SimulatorItem(OptimizableGraph* graph_): _graph(graph_){}
   OptimizableGraph* graph() {return _graph;}
   virtual ~SimulatorItem(){}
-protected:
+  protected:
   OptimizableGraph* _graph;
 };
 
 struct WorldItem: public SimulatorItem {
-  WorldItem(OptimizableGraph* graph_, OptimizableGraph::Vertex* vertex_ = 0) : 
-    SimulatorItem(graph_),_vertex(vertex_) {} 
+  WorldItem(OptimizableGraph* graph_, OptimizableGraph::Vertex* vertex_ = 0) :
+    SimulatorItem(graph_),_vertex(vertex_) {}
   OptimizableGraph::Vertex* vertex() {return _vertex;}
   void  setVertex(OptimizableGraph::Vertex* vertex_) {_vertex = vertex_;}
 protected:
@@ -98,7 +98,7 @@ struct Robot: public WorldItem {
     _planarMotion=false;
     _position = Isometry3d::Identity();
   }
-  
+
 
   void move(const Isometry3d& newPosition, int& id) {
     Isometry3d delta = _position.inverse()*newPosition;
@@ -151,7 +151,7 @@ struct Robot: public WorldItem {
   }
 
   Isometry3d _position;
-  SensorVector _sensors; 
+  SensorVector _sensors;
   Vector6d _nmovecov;
   bool _planarMotion;
 };
@@ -189,7 +189,7 @@ struct PlaneItem: public WorldItem{
     p->setId(id);
     graph()->addVertex(p);
     setVertex(p);
-  } 
+  }
 };
 
 struct PlaneSensor: public Sensor{
@@ -199,7 +199,7 @@ struct PlaneSensor: public Sensor{
     _offsetVertex->setEstimate(offset_);
     robot()->graph()->addVertex(_offsetVertex);
   };
-  
+
   virtual bool isVisible(WorldItem* wi){
     if (! wi)
       return false;
@@ -227,7 +227,7 @@ struct PlaneSensor: public Sensor{
     Isometry3d sensorPose=robotPose*_offsetVertex->estimate();
     VertexPlane* planeVertex=dynamic_cast<VertexPlane*>(pi->vertex());
     Plane3D worldPlane=planeVertex->estimate();
-    
+
     Plane3D measuredPlane=sensorPose.inverse()*worldPlane;
 
     EdgeSE3PlaneSensorCalib* e=new EdgeSE3PlaneSensorCalib();
@@ -245,7 +245,7 @@ struct PlaneSensor: public Sensor{
     robot()->graph()->addEdge(e);
     return true;
   }
-  
+
   VertexSE3* _offsetVertex;
   Vector3d _nplane;
 };
@@ -306,11 +306,11 @@ int main (int argc  , char ** argv){
 
   cerr << "robot" << endl;
   Robot* r=new Robot(g);
-  
+
 
   cerr << "planeSensor" << endl;
   Matrix3d R=Matrix3d::Identity();
-  R << 
+  R <<
     0,  0,   1,
     -1,  0,  0,
     0, -1,   0;
@@ -322,8 +322,8 @@ int main (int argc  , char ** argv){
   ps->_nplane << 0.03, 0.03, 0.005;
   r->_sensors.push_back(ps);
   sim->_robots.push_back(r);
-  
-  cerr  << "p1" << endl; 
+
+  cerr  << "p1" << endl;
   Plane3D plane;
   PlaneItem* pi =new PlaneItem(g,1);
   plane.fromVector(Eigen::Vector4d(0.,0.,1.,5.));
@@ -337,7 +337,7 @@ int main (int argc  , char ** argv){
   pi->vertex()->setFixed(fixPlanes);
   sim->_world.insert(pi);
 
-  cerr  << "p2" << endl; 
+  cerr  << "p2" << endl;
   pi =new PlaneItem(g,3);
   plane.fromVector(Eigen::Vector4d(0.,1.,0.,5.));
   static_cast<VertexPlane*>(pi->vertex())->setEstimate(plane);
@@ -379,13 +379,13 @@ int main (int argc  , char ** argv){
     Isometry3d iDelta = delta.inverse();
     for (int a=0; a<2; a++){
       for (int i=0; i<k; i++){
-  cerr << "m";
-  if (a==0)
-    sim->relativeMove(0,delta);
-  else 
-    sim->relativeMove(0,iDelta);
-  cerr << "s";
-  sim->sense(0);
+        cerr << "m";
+        if (a==0)
+          sim->relativeMove(0,delta);
+        else
+          sim->relativeMove(0,iDelta);
+        cerr << "s";
+        sim->sense(0);
       }
     }
   }
@@ -400,13 +400,13 @@ int main (int argc  , char ** argv){
     Isometry3d iDelta = delta.inverse();
     for (int a=0; a<2; a++){
       for (int i=0; i<k; i++){
-  cerr << "m";
-  if (a==0)
-    sim->relativeMove(0,delta);
-  else 
-    sim->relativeMove(0,iDelta);
-  cerr << "s";
-  sim->sense(0);
+        cerr << "m";
+        if (a==0)
+          sim->relativeMove(0,delta);
+        else
+          sim->relativeMove(0,iDelta);
+        cerr << "s";
+        sim->sense(0);
       }
     }
   }
@@ -419,10 +419,7 @@ int main (int argc  , char ** argv){
   } else {
     Vector6d noffcov;
     noffcov << 0.1,0.1,0.1,0.5, 0.5, 0.5;
-    ps->_offsetVertex->setEstimate(
-           ps->_offsetVertex->estimate() * 
-           sample_noise_from_se3(noffcov)
-           );
+    ps->_offsetVertex->setEstimate(ps->_offsetVertex->estimate() * sample_noise_from_se3(noffcov));
     ps->_offsetVertex->setFixed(false);
   }
 
@@ -435,7 +432,7 @@ int main (int argc  , char ** argv){
   //   Quaterniond q(AngleAxisd(1, Vector3d::UnitZ()).toRotationMatrix());
   //   Vector3d tr(1,0,0);
   //   Isometry3d delta;
-  //   delta.matrix().block<3,3>(0,0)=q.toRotationMatrix(); 
+  //   delta.matrix().block<3,3>(0,0)=q.toRotationMatrix();
   //   delta.translation()=tr;
   //   for (size_t i=0; i< g->vertices().size(); i++){
   //     VertexSE3 *v = dynamic_cast<VertexSE3 *>(g->vertex(i));

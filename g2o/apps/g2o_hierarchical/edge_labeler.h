@@ -6,14 +6,14 @@
 
 namespace g2o {
   /**
-     This class implements the functions to label an edge (measurement) based on the actual configuration of the nodes.
-     It does so by 
-     <ul>
-     <li> computing the expected mean of the measurement (_measurement) based on the state variables
-     <li> computing the joint covariance matrix of all sstate variables on which the measurement depends.
-     <li> extracting the sigma points from this covariance matrix (which is in the space if the increments used by \oplus
-     <li> projecting the sigma points in the error space, and thus computing the information matrix of the labeled edge
-     </ul>
+   * This class implements the functions to label an edge (measurement) based
+   * on the actual configuration of the nodes. It does so by
+   * <ul>
+   * <li> computing the expected mean of the measurement (_measurement) based on the state variables
+   * <li> computing the joint covariance matrix of all sstate variables on which the measurement depends.
+   * <li> extracting the sigma points from this covariance matrix (which is in the space if the increments used by \oplus
+   * <li> projecting the sigma points in the error space, and thus computing the information matrix of the labeled edge
+   * </ul>
    */
 struct EdgeLabeler{
   //! constructs an edge labeler that operates on the optimizer passed as argument
@@ -38,7 +38,7 @@ protected:
   //! @param pattern: the blocks of the inverse covered by the edge
   //! @returns true on successm, false on failure, .
   bool computePartialInverse(SparseBlockMatrix<MatrixXd>& spinv, const std::set<std::pair<int,int> >& pattern);
-  
+
   //! helper function that labes a specific edge based on the marginals in the sparse block inverse
   //! @returns true on success, false on failure
   bool labelEdge( const SparseBlockMatrix<MatrixXd>& spinv, OptimizableGraph::Edge* e);

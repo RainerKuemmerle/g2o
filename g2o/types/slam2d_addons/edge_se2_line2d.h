@@ -67,7 +67,7 @@ namespace g2o {
         d[1] = _measurement[1];
         return true;
       }
-      
+
       virtual int measurementDimension() const {return 2;}
 
       virtual bool setMeasurementFromState(){

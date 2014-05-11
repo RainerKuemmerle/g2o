@@ -33,7 +33,7 @@
 #include "types_slam2d_addons.h"
 
 namespace g2o {
-	
+
   using namespace Eigen;
 
   class G2O_TYPES_SLAM2D_API EdgeLine2D : public BaseBinaryEdge<2, Line2D, VertexLine2D, VertexLine2D>

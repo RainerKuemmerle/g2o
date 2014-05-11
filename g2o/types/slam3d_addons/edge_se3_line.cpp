@@ -22,8 +22,8 @@ namespace Slam3dAddons {
     information().setZero();
     for (int i=0; i<6; i++)
       for (int j=i; j<6; j++){
-	is >> information()(i,j); 
-	information()(i,j) = information()(j,i); 
+	is >> information()(i,j);
+	information()(i,j) = information()(j,i);
       }
     information()(6,6) = 1e9; // normalization constraint
     return is.good();
@@ -39,7 +39,7 @@ namespace Slam3dAddons {
       }
     return os.good();
   }
-  
+
   void EdgeSE3Line3D::computeError() {
     const VertexLine3D* landmark=static_cast<const VertexLine3D*>(vertices()[1]);
     Line3D projected(cache->w2n() * landmark->estimate());
@@ -54,16 +54,5 @@ namespace Slam3dAddons {
     resolveCache(cache, (OptimizableGraph::Vertex*)_vertices[0],"CACHE_SE3_OFFSET",pv);
     return cache != 0;
   }
-
-  // void EdgeSE3Line3D::linearizeOplus() {
-  //   return true;
-  // }
-  
-  // virtual bool EdgeSE3Line3D::setMeasurementFromState() {
-  //   return true;
-  // }
-
-  // virtual void initialEstimate(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to){
-  // }
 
 }

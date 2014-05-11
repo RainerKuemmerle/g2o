@@ -44,13 +44,13 @@ namespace g2o {
     public:
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
       VertexLine2D();
-      
+
       double theta() const {return _estimate[0]; }
       void setTheta(double t) { _estimate[0] = t; }
 
       double rho() const {return _estimate[1]; }
       void setRho(double r) { _estimate[1] = r; }
-      
+
       virtual void setToOriginImpl() {
         _estimate.setZero();
       }
@@ -66,8 +66,8 @@ namespace g2o {
         v=_estimate;
         return true;
       }
-      
-      virtual int estimateDimension() const { 
+
+      virtual int estimateDimension() const {
         return 2;
       }
 
@@ -78,8 +78,8 @@ namespace g2o {
       virtual bool getMinimalEstimateData(double* est) const{
         return getEstimateData(est);
       }
-      
-      virtual int minimalEstimateDimension() const { 
+
+      virtual int minimalEstimateDimension() const {
         return 2;
       }
 
@@ -92,9 +92,6 @@ namespace g2o {
       virtual bool read(std::istream& is);
       virtual bool write(std::ostream& os) const;
       int p1Id, p2Id;
-
-  protected:
-      
   };
 
   /* class G2O_TYPES_SLAM2D_API VertexLine2DWriteGnuplotAction: public WriteGnuplotAction { */

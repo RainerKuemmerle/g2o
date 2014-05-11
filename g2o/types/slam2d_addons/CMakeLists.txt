@@ -10,7 +10,6 @@ ADD_LIBRARY(types_slam2d_addons ${G2O_LIB_TYPE}
   edge_line2d_pointxy.cpp          edge_line2d_pointxy.h
   edge_line2d.cpp          edge_line2d.h
   g2o_types_slam2d_addons_api.h
-  
 )
 
 SET_TARGET_PROPERTIES(types_slam2d_addons PROPERTIES OUTPUT_NAME ${LIB_PREFIX}types_slam2d_addons)

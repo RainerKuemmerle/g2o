@@ -78,7 +78,7 @@ namespace g2o {
 	data = _measurement;
 	return true;
       }
-      
+
       virtual int measurementDimension() const {return 3;}
 
       virtual bool setMeasurementFromState(){
@@ -102,7 +102,7 @@ namespace g2o {
 
   protected:
       int _pointNum;
-      
+
 /* #ifndef NUMERIC_JACOBIAN_TWO_D_TYPES */
 /*       virtual void linearizeOplus(); */
 /* #endif */

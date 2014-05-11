@@ -8,7 +8,7 @@ namespace Slam3dAddons {
   using namespace std;
 
   inline void _skew(Eigen::Matrix3d& S, const Eigen::Vector3d& t){
-    S <<   
+    S <<
       0,  -t.z(),   t.y(),
       t.z(),     0,     -t.x(),
       -t.y()     ,t.x(),   0;
@@ -16,7 +16,7 @@ namespace Slam3dAddons {
 
   inline Eigen::Matrix3d _skew(const Eigen::Vector3d& t){
     Eigen::Matrix3d S;
-    S <<   
+    S <<
       0,  -t.z(),   t.y(),
       t.z(),     0,     -t.x(),
       -t.y(),     t.x(),   0;
@@ -49,14 +49,14 @@ namespace Slam3dAddons {
     D.block<3,3>(0,3) = -2*_skew(l.w());
     D.block<3,3>(3,3) = -2*_skew(l.d());
     Jp.block<6,6>(0,0) = A*D;
-    
+
     Vector3d d = l.d();
     Vector3d w = l.w();
     double ln = d.norm();
     double iln = 1./ln;
     double iln3 = std::pow(iln,3);
     Matrix6d Jll;
-    Jll << 
+    Jll <<
       iln,0,0,-(w.x()*d.x())*iln3,-(w.x()*d.y())*iln3,-(w.x()*d.z())*iln3,
       0,iln,0,-(w.y()*d.x())*iln3,-(w.y()*d.y())*iln3,-(w.y()*d.z())*iln3,
       0,0,iln,-(w.z()*d.x())*iln3,-(w.z()*d.y())*iln3,-(w.z()*d.z())*iln3,

@@ -130,7 +130,7 @@ namespace g2o {
 // #ifdef G2O_HAVE_OPENGL
 //   EdgeSE2Line2DDrawAction::EdgeSE2Line2DDrawAction(): DrawAction(typeid(EdgeSE2Line2D).name()){}
 
-//   HyperGraphElementAction* EdgeSE2Line2DDrawAction::operator()(HyperGraph::HyperGraphElement* element, 
+//   HyperGraphElementAction* EdgeSE2Line2DDrawAction::operator()(HyperGraph::HyperGraphElement* element,
 //                 HyperGraphElementAction::Parameters*  params_){
 //     if (typeid(*element).name()!=_typeName)
 //       return 0;
@@ -138,7 +138,7 @@ namespace g2o {
 //     refreshPropertyPtrs(params_);
 //     if (! _previousParams)
 //       return this;
-    
+
 //     if (_show && !_show->value())
 //       return this;
 

@@ -32,7 +32,7 @@
 
 namespace g2o {
 
-  class G2O_SIMULATOR_API SensorPose3D : public PointSensorParameters, public BinarySensor<Robot3D, EdgeSE3, WorldObjectSE3>  { 
+  class G2O_SIMULATOR_API SensorPose3D : public PointSensorParameters, public BinarySensor<Robot3D, EdgeSE3, WorldObjectSE3>  {
   public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   SensorPose3D(const std::string& name_);
@@ -42,7 +42,7 @@ namespace g2o {
     void addNoise(EdgeType* e);
 
   protected:
-    
+
     bool isVisible(WorldObjectType* to);
     int _stepsToIgnore;
     // these are temporaries

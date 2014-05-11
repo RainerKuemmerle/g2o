@@ -52,7 +52,7 @@ namespace g2o {
       }
 
       virtual bool setMeasurementData(const double* d){
-	_measurement = *d; 
+	_measurement = *d;
         return true;
       }
 
@@ -60,7 +60,7 @@ namespace g2o {
         *d = _measurement;
         return true;
       }
-      
+
       virtual int measurementDimension() const {return 1;}
 
       virtual bool setMeasurementFromState(){

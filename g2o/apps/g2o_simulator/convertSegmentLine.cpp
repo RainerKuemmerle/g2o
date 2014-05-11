@@ -77,7 +77,7 @@ int main(int argc, char** argv)
   CommandArgs arg;
   arg.param("o", outputfilename, "", "output final version of the graph");
   arg.paramLeftOver("graph-input", inputFilename, "", "graph file which will be processed", true);
-  
+
 
   arg.parseArgs(argc, argv);
   OptimizableGraph inGraph;
@@ -189,7 +189,7 @@ int main(int argc, char** argv)
           p1->setId(currentId++);
           outGraph.addVertex(p1);
           line->p1Id=p1->id();
-          
+
           EdgeLine2DPointXY* p1e=new EdgeLine2DPointXY();
           p1e->vertices()[0]=line;
           p1e->vertices()[1]=p1;
@@ -205,7 +205,7 @@ int main(int argc, char** argv)
           p2->setId(currentId++);
           outGraph.addVertex(p2);
           line->p2Id=p2->id();
-          
+
           EdgeLine2DPointXY* p2e=new EdgeLine2DPointXY();
           p2e->vertices()[0]=line;
           p2e->vertices()[1]=p2;
@@ -231,7 +231,7 @@ int main(int argc, char** argv)
         Matrix2d p2i=si.block<2,2>(2,2);
         p2e->setInformation(p2i);
         outGraph.addEdge(p2e);
-        
+
       }
 
       if (espl) {
@@ -284,7 +284,7 @@ int main(int argc, char** argv)
     }
   }
 
-  
+
   if (outputfilename.size() > 0) {
     if (outputfilename == "-") {
       cerr << "saving to stdout";

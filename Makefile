@@ -18,6 +18,6 @@ clean: build/Makefile
 build/Makefile:
 	@ echo "Running cmake to generate Makefile"; \
 	cd build; \
-	cmake -DG2O_EIGEN3_INCLUDE:PATH=/home/giorgio/src/aisnavigation/EXTERNAL/eigen3 ../; \
+	cmake ../; \
 	cd -
 

@@ -163,7 +163,7 @@ namespace g2o {
       glColor3f(POSE_EDGE_GHOST_COLOR);
       toTransform = to->estimate();
       fromTransform = to->estimate()*e->measurement().inverse();
-      // DRAW THE FROM EDGE AS AN ARROW 
+      // DRAW THE FROM EDGE AS AN ARROW
       glPushMatrix();
       glTranslatef(fromTransform.translation().x(),fromTransform.translation().y(),0.f);
       glRotatef((float)RAD2DEG(fromTransform.rotation().angle()),0.f,0.f,1.f);

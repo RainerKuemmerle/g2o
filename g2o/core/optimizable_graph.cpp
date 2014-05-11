@@ -49,16 +49,6 @@
 namespace g2o {
 
   using namespace std;
-//
-//  OptimizableGraph::Data::Data(){
-//    _next = 0;
-//  }
-//
-//  OptimizableGraph::Data::~Data(){
-//    if (_next)
-//      delete _next;
-//  }
-  
 
   OptimizableGraph::Vertex::Vertex() :
     HyperGraph::Vertex(),
@@ -88,7 +78,7 @@ namespace g2o {
     if (_userData)
       delete _userData;
   }
-  
+
   OptimizableGraph::Vertex* OptimizableGraph::Vertex::clone() const
   {
     return 0;
@@ -133,7 +123,6 @@ namespace g2o {
     HyperGraph::Edge(),
     _dimension(-1), _level(0), _robustKernel(0)
   {
-    //    _variableSize = false;
   }
 
   OptimizableGraph::Edge::~Edge()
@@ -149,7 +138,7 @@ namespace g2o {
       return 0;
     return v->graph();
   }
-  
+
   const OptimizableGraph* OptimizableGraph::Edge::graph() const{
     if (! _vertices.size())
       return 0;
@@ -174,7 +163,7 @@ namespace g2o {
       cerr << __PRETTY_FUNCTION__ << ": edge not registered with a graph" << endl;
       return false;
     }
-    
+
     assert (_parameters.size() == _parameterIds.size());
     //cerr << __PRETTY_FUNCTION__ << ": encountered " << _parameters.size() << " parameters" << endl;
     for (size_t i=0; i<_parameters.size(); i++){
@@ -290,19 +279,19 @@ namespace g2o {
     if (! e->resolveCaches()){
       cerr << __FUNCTION__ << ": FATAL, cannot resolve caches for edge " << e << endl;
       return false;
-    } 
+    }
     //    std::cerr << "updating jacobian size" << std::endl;
     _jacobianWorkspace.updateSize(e);
-    
+
     //    std::cerr << "about to return true" << std::endl;
-    
+
     return true;
   }
 
   bool OptimizableGraph::setEdgeVertex(Edge* e, int pos, Vertex* v){
     if (! HyperGraph::setEdgeVertex(e,pos,v)){
       return false;
-    } 
+    }
     if (!e->numUndefinedVertices()){
       if (! e->resolveParameters()){
 	cerr << __FUNCTION__ << ": FATAL, cannot resolve parameters for edge " << e << endl;
@@ -311,7 +300,7 @@ namespace g2o {
       if (! e->resolveCaches()){
 	cerr << __FUNCTION__ << ": FATAL, cannot resolve caches for edge " << e << endl;
 	return false;
-      } 
+      }
       _jacobianWorkspace.updateSize(e);
     }
     return true;
@@ -421,7 +410,7 @@ bool OptimizableGraph::load(istream& is, bool createEdges)
 
     // handle commands encoded in the file
     bool handledCommand = false;
-    
+
     if (token == "FIX") {
       handledCommand = true;
       int id;
@@ -440,7 +429,7 @@ bool OptimizableGraph::load(istream& is, bool createEdges)
 
     if (handledCommand)
       continue;
-     
+
     // do the mapping to an internal type if it matches
     if (_renamedTypesLookup.size() > 0) {
       map<string, string>::const_iterator foundIt = _renamedTypesLookup.find(token);
@@ -516,7 +505,7 @@ bool OptimizableGraph::load(istream& is, bool createEdges)
 	  }
 	  if (! to && id2>=0 ){
             cerr << __PRETTY_FUNCTION__ << ": Unable to find vertex for edge " << token << " " << id1 << " <-> " << id2 << endl;
-	    delete e; 
+	    delete e;
 	    e=0;
 	  }
 	}
@@ -529,7 +518,7 @@ bool OptimizableGraph::load(istream& is, bool createEdges)
             delete e;
           } else {
             switch (doInit){
-              case 1: 
+              case 1:
                 {
                   HyperGraph::VertexSet fromSet;
                   fromSet.insert(from);
@@ -589,7 +578,7 @@ bool OptimizableGraph::load(istream& is, bool createEdges)
         } else {
           bool r = e->read(currentLine);
           if (!r || !addEdge(e)) {
-            cerr << __PRETTY_FUNCTION__ << ": Unable to add edge " << token; 
+            cerr << __PRETTY_FUNCTION__ << ": Unable to add edge " << token;
             for (int l = 0; l < numV; ++l) {
               if (l > 0)
                 cerr << " <->";
@@ -597,7 +586,7 @@ bool OptimizableGraph::load(istream& is, bool createEdges)
             }
             delete e;
 	    e=0;
-          } 
+          }
         }
       }
       previousDataContainer = e;
@@ -629,7 +618,7 @@ bool OptimizableGraph::load(istream& is, bool createEdges)
       }
     }
   } // while read line
-  
+
   return true;
 }
 
@@ -744,7 +733,7 @@ bool OptimizableGraph::saveSubset(ostream& os, HyperGraph::EdgeSet& eset)
 
   return os.good();
 }
-  
+
 void OptimizableGraph::addGraph(OptimizableGraph* g){
   for (HyperGraph::VertexIDMap::iterator it=g->vertices().begin(); it!=g->vertices().end(); ++it){
     OptimizableGraph::Vertex* v= (OptimizableGraph::Vertex*)(it->second);

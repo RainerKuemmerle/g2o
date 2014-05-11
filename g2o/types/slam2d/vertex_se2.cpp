@@ -64,7 +64,7 @@ namespace g2o {
       std::cerr << __PRETTY_FUNCTION__ << ": warning, no valid output stream specified" << std::endl;
       return 0;
     }
-    
+
     VertexSE2* v =  static_cast<VertexSE2*>(element);
     *(params->os) << v->estimate().translation().x() << " " << v->estimate().translation().y()
       << " " << v->estimate().rotation().angle() << std::endl;
@@ -90,7 +90,7 @@ namespace g2o {
   }
 
 
-  HyperGraphElementAction* VertexSE2DrawAction::operator()(HyperGraph::HyperGraphElement* element, 
+  HyperGraphElementAction* VertexSE2DrawAction::operator()(HyperGraph::HyperGraphElement* element,
                  HyperGraphElementAction::Parameters* params_){
    if (typeid(*element).name()!=_typeName)
       return 0;
@@ -99,7 +99,7 @@ namespace g2o {
 
     if (! _previousParams)
       return this;
-    
+
     if (_show && !_show->value())
       return this;
 

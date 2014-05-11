@@ -42,7 +42,7 @@ int main (/*int argc, char** argv*/){
   cerr << "p1  " << p1 << endl;
   Plane3D p2 = p1;
   cerr << "p2  " << p2 << endl;
-  
+
   cerr << "azimuth " << Plane3D::azimuth(p1.normal()) << endl;
   cerr << "elevation " << Plane3D::elevation(p1.normal()) << endl;
   Vector3d mv = p2.ominus(p1);
@@ -59,7 +59,7 @@ int main (/*int argc, char** argv*/){
 
   mv = p2.ominus(p1);
   cerr << "p ominus p " << mv[0] << " " << mv[1] << " " << mv[2] << endl;
-    
+
   Plane3D p3=p1;
   cerr << "p3  " << p3 << endl;
   p3.oplus(mv);
@@ -86,13 +86,12 @@ int main (/*int argc, char** argv*/){
 
   AngleAxisd r(AngleAxisd(0.0, Vector3d::UnitZ())
       * AngleAxisd(0., Vector3d::UnitY())
-      * AngleAxisd(0., Vector3d::UnitX())); 
-  
+      * AngleAxisd(0., Vector3d::UnitX()));
+
   SE3Quat t(r.toRotationMatrix(), Vector3d(0.9,0,0));
   cerr << t << endl;
   transform(l,t);
   cerr << l << endl;
 
-
-  
+  return 0;
 }

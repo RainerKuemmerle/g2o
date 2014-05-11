@@ -83,20 +83,19 @@ namespace g2o {
       is >> x >> y;
       addMatchingVertex(x,y);
     }
- 
+
     return true;
   }
 
   bool VertexEllipse::write(std::ostream& os) const
   {
-    os << _covariance(0,0) << " " << _covariance(0,1) << " " << _covariance(0,2) << " " 
+    os << _covariance(0,0) << " " << _covariance(0,1) << " " << _covariance(0,2) << " "
        << _covariance(1,1) << " " << _covariance(1,2) << " " << _covariance(2,2) << " ";
 
     os << _matchingVertices.size() << " " ;
     for (int i=0 ; i< _matchingVertices.size(); i++){
-      os << _matchingVertices[i].x() << " " << _matchingVertices[i].y() << " ";      
+      os << _matchingVertices[i].x() << " " << _matchingVertices[i].y() << " ";
     }
-
 
     return os.good();
   }
@@ -119,7 +118,7 @@ namespace g2o {
     return true;
   }
 
-  HyperGraphElementAction* VertexEllipseDrawAction::operator()(HyperGraph::HyperGraphElement* element, 
+  HyperGraphElementAction* VertexEllipseDrawAction::operator()(HyperGraph::HyperGraphElement* element,
 							       HyperGraphElementAction::Parameters* params_){
     if (typeid(*element).name()!=_typeName)
       return 0;
@@ -129,7 +128,7 @@ namespace g2o {
       return this;
     }
     if (_show && !_show->value())
-      return this;   
+      return this;
 
     VertexEllipse* that = dynamic_cast<VertexEllipse*>(element);
 
@@ -145,7 +144,7 @@ namespace g2o {
     glVertex3f(0,0,0);
     glVertex3f(x,-y,0);
     glEnd();
-       
+
     glColor3f(0.f,1.f,0.f);
     for (int i=0; i< that->matchingVertices().size(); i++){
       glBegin(GL_LINES);

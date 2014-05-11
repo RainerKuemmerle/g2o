@@ -23,18 +23,17 @@ namespace g2o {
 
   void computeBorder(StarSet& stars, EdgeStarMap& hesmap);
 
-  void computeSimpleStars(StarSet& stars, 
-                          SparseOptimizer* optimizer, 
-                          EdgeLabeler* labeler, 
-                          EdgeCreator* creator, 
-                          OptimizableGraph::Vertex* gauge_, 
-                          std::string edgeTag, std::string vertexTag, 
-                          int level, 
+  void computeSimpleStars(StarSet& stars,
+                          SparseOptimizer* optimizer,
+                          EdgeLabeler* labeler,
+                          EdgeCreator* creator,
+                          OptimizableGraph::Vertex* gauge_,
+                          std::string edgeTag, std::string vertexTag,
+                          int level,
                           int step,
                           int backboneIterations=1,
                           int starIterations=30,
                           double rejectionThreshold=1e-5, bool debug=false);
 
-  
 }
 #endif
