@@ -1,13 +1,14 @@
 #ifndef G2O_PLANE3D_H_
 #define G2O_PLANE3D_H_
 
+#include "g2o_types_slam3d_addons_api.h"
 #include "g2o/stuff/misc.h"
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 
 namespace g2o {
   
-  class Plane3D {
+  class G2O_TYPES_SLAM3D_ADDONS_API Plane3D {
     public:
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
       friend Plane3D operator*(const Eigen::Isometry3d& t, const Plane3D& plane);

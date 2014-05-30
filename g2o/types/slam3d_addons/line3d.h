@@ -1,10 +1,10 @@
 #ifndef G2O_LINE3D_H_
 #define G2O_LINE3D_H_
 
+#include "g2o_types_slam3d_addons_api.h"
 #include "g2o/stuff/misc.h"
 #include <Eigen/Core>
 #include <Eigen/Geometry>
-#include <Eigen/SVD>
 
 namespace g2o {
 
@@ -15,7 +15,7 @@ namespace g2o {
   typedef Eigen::Matrix<double, 6, 6> Matrix6d;
 
 
-  class Line3D : public Vector6d{
+  class G2O_TYPES_SLAM3D_ADDONS_API Line3D : public Vector6d{
     public:
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
       friend Line3D operator*(const Eigen::Isometry3d& t, const Line3D& line);
@@ -80,8 +80,10 @@ namespace g2o {
 
   Line3D operator*(const Eigen::Isometry3d& t, const Line3D& line);
 
-  Vector6d transformCartesianLine(const Eigen::Isometry3d& t, const Vector6d& line);
-  Vector6d normalizeCartesianLine(const Vector6d& line);
+  namespace internal {
+    Vector6d transformCartesianLine(const Eigen::Isometry3d& t, const Vector6d& line);
+    Vector6d normalizeCartesianLine(const Vector6d& line);
+  }
 
 }
 

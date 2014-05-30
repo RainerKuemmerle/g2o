@@ -1,6 +1,7 @@
 #ifndef G2O_VERTEX_PLANE_H_
 #define G2O_VERTEX_PLANE_H_
 
+#include "g2o_types_slam3d_addons_api.h"
 #include "g2o/config.h"
 #include "g2o/core/base_vertex.h"
 #include "g2o/core/hyper_graph_action.h"
@@ -9,7 +10,7 @@
 namespace g2o
 {
 
-  class VertexPlane : public BaseVertex<3, Plane3D>
+  class G2O_TYPES_SLAM3D_ADDONS_API VertexPlane : public BaseVertex<3, Plane3D>
     {
     public:
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW;

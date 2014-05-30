@@ -32,7 +32,6 @@
 #include "simulator.h"
 
 namespace g2o {
-  using namespace Slam3dAddons;
 
   typedef WorldObject<VertexSE3> WorldObjectSE3;
 

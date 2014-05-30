@@ -1,12 +1,14 @@
 #ifndef G2O_VERTEX_LINE3D_H_
 #define G2O_VERTEX_LINE3D_H_
 
-#include "g2o/core/base_vertex.h"
+#include "g2o_types_slam3d_addons_api.h"
 #include "line3d.h"
+
+#include "g2o/core/base_vertex.h"
 
 namespace g2o {
 
-  class VertexLine3D : public BaseVertex<6, Line3D>
+  class G2O_TYPES_SLAM3D_ADDONS_API VertexLine3D : public BaseVertex<6, Line3D>
     {
     public:
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW;

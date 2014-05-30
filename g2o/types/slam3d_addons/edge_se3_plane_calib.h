@@ -10,7 +10,7 @@ namespace g2o {
   /**
    * \brief plane measurement that also calibrates an offset for the sensor
    */
-  class EdgeSE3PlaneSensorCalib : public BaseMultiEdge<3, Plane3D>
+  class G2O_TYPES_SLAM3D_ADDONS_API EdgeSE3PlaneSensorCalib : public BaseMultiEdge<3, Plane3D>
   {
     public:
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
@@ -19,10 +19,10 @@ namespace g2o {
 
       void computeError()
       {
-        const VertexSE3* v1       = static_cast<const VertexSE3*>(_vertices[0]);
-        const VertexPlane* planeVertex     = static_cast<const VertexPlane*>(_vertices[1]);
-        const VertexSE3* offset = static_cast<const VertexSE3*>(_vertices[2]);
-        const Plane3D& plane = planeVertex->estimate();
+        const VertexSE3* v1            = static_cast<const VertexSE3*>(_vertices[0]);
+        const VertexPlane* planeVertex = static_cast<const VertexPlane*>(_vertices[1]);
+        const VertexSE3* offset        = static_cast<const VertexSE3*>(_vertices[2]);
+        const Plane3D& plane           = planeVertex->estimate();
 	// measurement function: remap the plane in global coordinates
 	Isometry3d w2n=(v1->estimate()*offset->estimate()).inverse();
 	Plane3D localPlane=w2n*plane;
@@ -39,7 +39,7 @@ namespace g2o {
   };
 
 #ifdef G2O_HAVE_OPENGL
-  class EdgeSE3PlaneSensorCalibDrawAction: public DrawAction{
+  class G2O_TYPES_SLAM3D_ADDONS_API EdgeSE3PlaneSensorCalibDrawAction: public DrawAction{
   public:
     EdgeSE3PlaneSensorCalibDrawAction();
     virtual HyperGraphElementAction* operator()(HyperGraph::HyperGraphElement* element,

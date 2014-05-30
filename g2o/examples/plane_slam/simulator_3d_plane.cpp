@@ -11,7 +11,6 @@
 
 #include <iostream>
 
-using namespace Slam3dAddons;
 using namespace g2o;
 using namespace std;
 using namespace Eigen;

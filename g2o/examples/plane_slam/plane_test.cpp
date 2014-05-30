@@ -2,8 +2,6 @@
 #include <iostream>
 #include "plane3d.h"
 
-using namespace Slam3dAddons;
-using namespace Slam3dNew;
 using namespace g2o;
 using namespace std;
 using namespace Eigen;

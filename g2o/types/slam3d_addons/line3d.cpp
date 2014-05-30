@@ -77,22 +77,25 @@ namespace g2o {
     return Line3D(A*v);
   }
 
-  Vector6d transformCartesianLine(const Eigen::Isometry3d& t, const Vector6d& line){
-    Vector6d l;
-    l.head<3>() = t*line.head<3>();
-    l.tail<3>() = t.linear()*line.tail<3>();
-    return normalizeCartesianLine(l);
-  }
+  namespace internal
+  {
+    Vector6d transformCartesianLine(const Eigen::Isometry3d& t, const Vector6d& line){
+      Vector6d l;
+      l.head<3>() = t*line.head<3>();
+      l.tail<3>() = t.linear()*line.tail<3>();
+      return normalizeCartesianLine(l);
+    }
 
-  Vector6d normalizeCartesianLine(const Vector6d& line) {
-    Eigen::Vector3d p0 = line.head<3>();
-    Eigen::Vector3d d0 = line.tail<3>();
-    d0.normalize();
-    p0-=d0*(d0.dot(p0));
-    Vector6d nl;
-    nl.head<3>()=p0;
-    nl.tail<3>()=d0;
-    return nl;
-  }
+    Vector6d normalizeCartesianLine(const Vector6d& line) {
+      Eigen::Vector3d p0 = line.head<3>();
+      Eigen::Vector3d d0 = line.tail<3>();
+      d0.normalize();
+      p0-=d0*(d0.dot(p0));
+      Vector6d nl;
+      nl.head<3>()=p0;
+      nl.tail<3>()=d0;
+      return nl;
+    }
+  } // end namespace internal
 
-}
+} // end namespace g2o

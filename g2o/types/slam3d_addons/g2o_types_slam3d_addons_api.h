@@ -6,7 +6,7 @@
 #ifdef _MSC_VER
 // We are using a Microsoft compiler:
 #ifdef G2O_SHARED_LIBS
-#ifdef types_slam3d_EXPORTS
+#ifdef types_slam3d_addons_EXPORTS
 #define G2O_TYPES_SLAM3D_ADDONS_API __declspec(dllexport)
 #else
 #define G2O_TYPES_SLAM3D_ADDONS_API __declspec(dllimport)

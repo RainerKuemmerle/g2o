@@ -244,18 +244,6 @@ int main(int argc, char** argv)
       depthCamHParamsIds[0]=se3OffsetParam->id();
       creator.addAssociation("VERTEX_SE3:QUAT;VERTEX_TRACKXYZ;","EDGE_SE3_TRACKXYZ", depthCamHParamsIds);
     }
-
-    // Slam3dNew::ParameterSE3Offset* originalParamsNew = dynamic_cast<Slam3dNew::ParameterSE3Offset*>(p0);
-    // if (originalParamsNew) {
-    //   cerr << "NEW PARAMS" << endl;
-    //   Slam3dNew::ParameterSE3Offset* se3OffsetParam = new Slam3dNew::ParameterSE3Offset();
-    //   se3OffsetParam->setId(100);
-    //   optimizer.addParameter(se3OffsetParam);
-    //   std::vector<int> depthCamHParamsIds(1);
-    //   depthCamHParamsIds[0]=se3OffsetParam->id();
-    // 	creator.addAssociation("VERTEX_SE3_NEW;VERTEX_TRACKXYZ_NEW;","EDGE_SE3_TRACKXYZ_NEW", depthCamHParamsIds);
-    // 	cerr << "adding association: " << "VERTEX_SE3_NEW;VERTEX_TRACKXYZ_NEW;" << endl;
-    // }
   }
 
   EdgeLabeler labeler(&optimizer);
