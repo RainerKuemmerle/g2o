@@ -26,11 +26,6 @@
 
 #include "edge_pointxyz.h"
 
-#ifdef G2O_HAVE_OPENGL
-#include "g2o/stuff/opengl_wrapper.h"
-#include "g2o/stuff/opengl_primitives.h"
-#endif
-
 namespace g2o {
 
   EdgePointXYZ::EdgePointXYZ() :
@@ -65,13 +60,12 @@ namespace g2o {
   }
 
 
-#ifndef NUMERIC_JACOBIAN_TWO_D_TYPES
+#ifndef NUMERIC_JACOBIAN_THREE_D_TYPES
   void EdgePointXYZ::linearizeOplus()
   {
     _jacobianOplusXi=-Eigen::Matrix3d::Identity();
     _jacobianOplusXj= Eigen::Matrix3d::Identity();
   }
 #endif
-
 
 } // end namespace
