@@ -88,7 +88,7 @@ class VertexCameraBAL : public BaseVertex<9, Eigen::VectorXd>
 
     virtual void oplusImpl(const double* update)
     {
-      Eigen::VectorXd::ConstMapType v(update, 9);
+      Eigen::VectorXd::ConstMapType v(update, VertexCameraBAL::Dimension);
       _estimate += v;
     }
 };
@@ -258,18 +258,24 @@ class EdgeObservationBAL : public BaseBinaryEdge<2, Vector2d, VertexCameraBAL, V
 
       const VertexCameraBAL* cam = static_cast<const VertexCameraBAL*>(vertex(0));
       const VertexPointBAL* point = static_cast<const VertexPointBAL*>(vertex(1));
-      typedef ceres::internal::AutoDiff<EdgeObservationBAL, double, 9, 3> BalAutoDiff;
+      typedef ceres::internal::AutoDiff<EdgeObservationBAL, double, VertexCameraBAL::Dimension, VertexPointBAL::Dimension> BalAutoDiff;
 
-      Matrix<double, 2 , 9, Eigen::RowMajor> dError_dCamera;
-      Matrix<double, 2 , 3, Eigen::RowMajor> dError_dPoint;
+      Matrix<double, Dimension, VertexCameraBAL::Dimension, Eigen::RowMajor> dError_dCamera;
+      Matrix<double, Dimension, VertexPointBAL::Dimension, Eigen::RowMajor> dError_dPoint;
       double *parameters[] = { const_cast<double*>(cam->estimate().data()), const_cast<double*>(point->estimate().data()) };
       double *jacobians[] = { dError_dCamera.data(), dError_dPoint.data() };
-      double value[2];
-      BalAutoDiff::Differentiate(*this, parameters, 2, value, jacobians);
+      double value[Dimension];
+      bool diffState = BalAutoDiff::Differentiate(*this, parameters, Dimension, value, jacobians);
 
       // copy over the Jacobians (convert row-major -> column-major)
-      _jacobianOplusXi = dError_dCamera;
-      _jacobianOplusXj = dError_dPoint;
+      if (diffState) {
+        _jacobianOplusXi = dError_dCamera;
+        _jacobianOplusXj = dError_dPoint;
+      } else {
+        assert(0 && "Error while differentiating");
+        _jacobianOplusXi.setZero();
+        _jacobianOplusXi.setZero();
+      }
     }
 };
 
