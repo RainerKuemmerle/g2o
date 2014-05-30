@@ -27,16 +27,16 @@
 #ifndef G2O_EDGE_PLANE3D_H
 #define G2O_EDGE_PLANE3D_H
 
+#include "g2o_types_slam3d_addons_api.h"
 #include "vertex_plane.h"
 #include "g2o/config.h"
 #include "g2o/core/base_binary_edge.h"
-#include "types_slam3d_addons.h"
 
-namespace Slam3dAddons {
-using namespace g2o;
+namespace g2o
+{
 using namespace Eigen;
 
-class G2O_TYPES_SLAM3D_API EdgePlane : public BaseBinaryEdge<4, Vector4d, VertexPlane, VertexPlane>
+class G2O_TYPES_SLAM3D_ADDONS_API EdgePlane : public BaseBinaryEdge<4, Vector4d, VertexPlane, VertexPlane>
 {
 public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW

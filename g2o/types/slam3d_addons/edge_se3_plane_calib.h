@@ -4,9 +4,9 @@
 #include "g2o/core/base_multi_edge.h"
 #include "g2o/types/slam3d/vertex_se3.h"
 #include "vertex_plane.h"
+#include "g2o/config.h"
 
-namespace Slam3dAddons {
-  using namespace g2o;
+namespace g2o {
   /**
    * \brief plane measurement that also calibrates an offset for the sensor
    */
@@ -33,22 +33,12 @@ namespace Slam3dAddons {
 	_measurement = m;
       }
 
-      /* virtual double initialEstimatePossible(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to) */
-      /* { */
-      /*   if (   from.count(_vertices[2]) == 1 // need the laser offset */
-      /*       && ((from.count(_vertices[0]) == 1 && to == _vertices[1]) || ((from.count(_vertices[1]) == 1 && to == _vertices[0])))) { */
-      /*     return 1.0; */
-      /*   } */
-      /*   return -1.0; */
-      /* } */
-      /* virtual void initialEstimate(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to); */
-
       virtual bool read(std::istream& is);
       virtual bool write(std::ostream& os) const;
 
   };
 
-
+#ifdef G2O_HAVE_OPENGL
   class EdgeSE3PlaneSensorCalibDrawAction: public DrawAction{
   public:
     EdgeSE3PlaneSensorCalibDrawAction();
@@ -58,6 +48,7 @@ namespace Slam3dAddons {
     virtual bool refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_);
     FloatProperty* _planeWidth, *_planeHeight;
   };
+#endif
 
 } // end namespace
 

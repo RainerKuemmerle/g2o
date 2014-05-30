@@ -15,13 +15,12 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "vertex_se3_euler.h"
-#include "g2o/core/factory.h"
 #include "g2o/types/slam3d/isometry3d_mappings.h"
 
 #include <iostream>
 
-namespace Slam3dAddons {
-  using namespace g2o;
+namespace g2o
+{
 
   bool VertexSE3Euler::read(std::istream& is)
   {
@@ -43,4 +42,4 @@ namespace Slam3dAddons {
     return os.good();
   }
 
-}
+} // end namespace

@@ -6,8 +6,7 @@
 #include <Eigen/Geometry>
 #include <Eigen/SVD>
 
-namespace Slam3dAddons {
-  using namespace g2o;
+namespace g2o {
 
   typedef Eigen::Matrix<double, 7, 6> Matrix7x6d;
 

@@ -1,12 +1,13 @@
 #ifndef G2O_VERTEX_PLANE_H_
 #define G2O_VERTEX_PLANE_H_
 
+#include "g2o/config.h"
 #include "g2o/core/base_vertex.h"
 #include "g2o/core/hyper_graph_action.h"
 #include "plane3d.h"
 
-namespace Slam3dAddons {
-  using namespace g2o;
+namespace g2o
+{
 
   class VertexPlane : public BaseVertex<3, Plane3D>
     {
@@ -37,37 +38,24 @@ namespace Slam3dAddons {
       }
 
       virtual int estimateDimension() const {
-  return 4;
+        return 4;
       }
-
-      /* virtual bool setMinimalEstimateDataImpl(const double* est){ */
-      /*   Map<const Vector3d> est_(est); */
-      /*   _estimate.fromMinimalVector(est_); */
-      /*   return true; */
-      /* } */
-
-      /* virtual bool getMinimalEstimateData(double* est) const{ */
-      /*   Map<Vector3d> v(est); */
-      /*   v = _estimate.toMinimalVector(); */
-      /*   return true; */
-      /* } */
-
-      /* virtual int minimalEstimateDimension() const { */
-      /*   return 3; */
-      /* } */
 
       Vector3d color;
     };
 
-  class VertexPlaneDrawAction: public DrawAction{
-  public:
-    VertexPlaneDrawAction();
-    virtual HyperGraphElementAction* operator()(HyperGraph::HyperGraphElement* element, 
-            HyperGraphElementAction::Parameters* params_ );
-  protected:
-    virtual bool refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_);
-    FloatProperty* _planeWidth, *_planeHeight;
+#ifdef G2O_HAVE_OPENGL
+  class VertexPlaneDrawAction: public DrawAction
+  {
+    public:
+      VertexPlaneDrawAction();
+      virtual HyperGraphElementAction* operator()(HyperGraph::HyperGraphElement* element, 
+          HyperGraphElementAction::Parameters* params_ );
+    protected:
+      virtual bool refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_);
+      FloatProperty* _planeWidth, *_planeHeight;
   };
+#endif
 
 }
 #endif

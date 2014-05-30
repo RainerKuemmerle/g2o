@@ -1,5 +1,4 @@
 #include "vertex_plane.h"
-#include <stdio.h>
 
 #ifdef WINDOWS
 #include <windows.h>
@@ -13,10 +12,8 @@
 #endif
 #endif
 
-#include <typeinfo>
-
-namespace Slam3dAddons {
-  using namespace g2o;
+namespace g2o
+{
 
   VertexPlane::VertexPlane(){
     color << .2, .2, .2;
@@ -41,7 +38,6 @@ namespace Slam3dAddons {
   }
 
 #ifdef G2O_HAVE_OPENGL
-  void drawTriangle(float xSize, float ySize);
 
   VertexPlaneDrawAction::VertexPlaneDrawAction(): DrawAction(typeid(VertexPlane).name()){
   }

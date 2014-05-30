@@ -27,20 +27,20 @@
 #ifndef G2O_EDGE_LINE3D_H
 #define G2O_EDGE_LINE3D_H
 
+#include "g2o_types_slam3d_addons_api.h"
 #include "vertex_line3d.h"
 #include "g2o/config.h"
 #include "g2o/core/base_binary_edge.h"
-#include "types_slam3d_addons.h"
 
-namespace Slam3dAddons {
-  using namespace g2o;
+namespace g2o
+{
   using namespace Eigen;
 
-  class G2O_TYPES_SLAM3D_API EdgeLine3D : public BaseBinaryEdge<6, Vector6d, VertexLine3D, VertexLine3D>
+  class G2O_TYPES_SLAM3D_ADDONS_API EdgeLine3D : public BaseBinaryEdge<6, Vector6d, VertexLine3D, VertexLine3D>
   {
     public:
-      EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-        EdgeLine3D();
+      EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
+      EdgeLine3D();
 
       void computeError()
       {
@@ -82,7 +82,6 @@ namespace Slam3dAddons {
       virtual void linearizeOplus();
 #endif
   };
-
 
 } // end namespace
 

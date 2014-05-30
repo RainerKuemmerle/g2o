@@ -7,7 +7,6 @@ using namespace std;
 using namespace Eigen;
 using namespace g2o;
 using namespace g2o::internal;
-using namespace Slam3dAddons;
 
 template <typename T>
 ostream& printVector(ostream& os, const T& t)

@@ -1,11 +1,9 @@
-#include <Eigen/Dense>
 #include "line3d.h"
 #include <iostream>
 
-namespace Slam3dAddons {
-  using namespace g2o;
-  using namespace Eigen;
+namespace g2o {
   using namespace std;
+  using namespace Eigen;
 
   inline void _skew(Eigen::Matrix3d& S, const Eigen::Vector3d& t){
     S <<

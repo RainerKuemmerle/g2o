@@ -19,8 +19,7 @@
 
 #include "g2o/types/slam3d/vertex_se3.h"
 
-namespace Slam3dAddons {
-  using namespace g2o;
+namespace g2o {
 
 /**
  * \brief 3D pose Vertex, (x,y,z,roll,pitch,yaw)

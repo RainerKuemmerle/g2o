@@ -3,24 +3,25 @@
 
 #include "g2o/core/base_binary_edge.h"
 
+#include "g2o_types_slam3d_addons_api.h"
 #include "line3d.h"
 #include "vertex_line3d.h"
-#include "g2o/types/slam3d/g2o_types_slam3d_api.h"
 #include "g2o/types/slam3d/vertex_se3.h"
 #include "g2o/types/slam3d/parameter_se3_offset.h"
 
-namespace Slam3dAddons {
-  using namespace g2o;
+namespace g2o {
+
+  typedef Eigen::Matrix<double, 7, 1> Vector7d;
 
   /**
+   * TODO this documentation is totally wrong... copy and paste
    * \brief Edge between two 3D pose vertices
    *
    * The transformation between the two vertices is given as an Isometry3d.
    * If z denotes the measurement, then the error function is given as follows:
    * z^-1 * (x_i^-1 * x_j)
    */
-  typedef Eigen::Matrix<double, 7, 1> Vector7d;
-  class G2O_TYPES_SLAM3D_API EdgeSE3Line3D : public BaseBinaryEdge<7, Vector7d, VertexSE3, VertexLine3D> {
+  class G2O_TYPES_SLAM3D_ADDONS_API EdgeSE3Line3D : public BaseBinaryEdge<7, Vector7d, VertexSE3, VertexLine3D> {
     public:
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
       EdgeSE3Line3D();

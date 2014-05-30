@@ -2,11 +2,9 @@
 #define G2O_VERTEX_LINE3D_H_
 
 #include "g2o/core/base_vertex.h"
-#include "g2o/core/hyper_graph_action.h"
 #include "line3d.h"
 
-namespace Slam3dAddons {
-  using namespace g2o;
+namespace g2o {
 
   class VertexLine3D : public BaseVertex<6, Line3D>
     {
@@ -39,33 +37,7 @@ namespace Slam3dAddons {
 	return 6;
       }
 
-      /* virtual bool setMinimalEstimateDataImpl(const double* est){ */
-      /*   Map<const Vector3d> est_(est); */
-      /*   _estimate.fromMinimalVector(est_); */
-      /*   return true; */
-      /* } */
-
-      /* virtual bool getMinimalEstimateData(double* est) const{ */
-      /*   Map<Vector3d> v(est); */
-      /*   v = _estimate.toMinimalVector(); */
-      /*   return true; */
-      /* } */
-
-      /* virtual int minimalEstimateDimension() const { */
-      /*   return 3; */
-      /* } */
-
     };
-
-  /* class VertexLine3DDrawAction: public DrawAction{ */
-  /* public: */
-  /*   VertexLine3DDrawAction(); */
-  /*   virtual HyperGraphElementAction* operator()(HyperGraph::HyperGraphElement* element,  */
-  /*           HyperGraphElementAction::Parameters* params_ ); */
-  /* protected: */
-  /*   virtual bool refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_); */
-  /*   FloatProperty* _planeWidth, *_planeHeight; */
-  /* }; */
 
 }
 #endif

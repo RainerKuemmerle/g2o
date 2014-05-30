@@ -26,7 +26,7 @@
 
 #include "edge_se3_calib.h"
 
-namespace Slam3dAddons {
+namespace g2o {
 
   EdgeSE3Calib::EdgeSE3Calib() :
     BaseMultiEdge<6, Eigen::Isometry3d>()

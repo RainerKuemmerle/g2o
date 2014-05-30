@@ -4,6 +4,7 @@
 #include "g2o/stuff/misc.h"
 #include <Eigen/Core>
 #include <Eigen/Geometry>
+
 namespace g2o {
   
   class Plane3D {

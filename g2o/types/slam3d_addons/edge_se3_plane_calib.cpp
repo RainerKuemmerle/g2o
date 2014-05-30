@@ -9,8 +9,8 @@
 #endif
 #endif
 
-namespace Slam3dAddons {
-  using namespace g2o;
+namespace g2o
+{
   using namespace std;
 
   EdgeSE3PlaneSensorCalib::EdgeSE3PlaneSensorCalib() :
@@ -19,21 +19,6 @@ namespace Slam3dAddons {
     resize(3);
     color << 0.1, 0.1, 0.1;
   }
-
-  // void EdgeSE2SensorCalib::initialEstimate(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to)
-  // {
-  //   (void) to;
-  //   VertexSE2* vi = static_cast<VertexSE2*>(_vertices[0]);
-  //   VertexSE2* vj = static_cast<VertexSE2*>(_vertices[1]);
-  //   VertexSE2* l  = static_cast<VertexSE2*>(_vertices[2]);
-  //   if (from.count(l) == 0)
-  //     return;
-  //   if (from.count(vi) == 1) {
-  //     vj->setEstimate(vi->estimate() * l->estimate() * measurement() * l->estimate().inverse());
-  //   } else {
-  //     vi->setEstimate(vj->estimate() * l->estimate() * _inverseMeasurement * l->estimate().inverse());
-  //   }
-  // }
 
   bool EdgeSE3PlaneSensorCalib::read(std::istream& is)
   {

@@ -18,14 +18,10 @@
 #define G2O_EDGE_SE3_EULER_
 
 #include "g2o/types/slam3d/edge_se3.h"
-
-#define EDGE_SE3_QUAT_ANALYTIC_JACOBIAN
-
 #include "g2o/types/slam3d/vertex_se3.h"
 
-namespace Slam3dAddons {
-  using namespace g2o;
-
+namespace g2o
+{
   using namespace Eigen;
 
 

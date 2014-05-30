@@ -18,10 +18,10 @@
 #include "g2o/core/factory.h"
 #include <iostream>
 
-namespace Slam3dAddons {
-  using namespace g2o;
-  /** conversion code from Euler angles */
+namespace g2o
+{
 
+  /** conversion code from Euler angles */
 void jac_quat3_euler3(Eigen::Matrix<double, 6, 6>& J, const Isometry3d& t)
 {
   Vector7d t0 = g2o::internal::toVectorQT(t);
@@ -80,6 +80,5 @@ void jac_quat3_euler3(Eigen::Matrix<double, 6, 6>& J, const Isometry3d& t)
       }
     return os.good();
   }
-
 
 } // end namespace

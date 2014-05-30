@@ -26,14 +26,8 @@
 
 #include "edge_line3d.h"
 
-#ifdef G2O_HAVE_OPENGL
-#include "g2o/stuff/opengl_wrapper.h"
-#include "g2o/stuff/opengl_primitives.h"
-#endif
-
-namespace Slam3dAddons {
-  using namespace g2o;
-  using namespace Eigen;
+namespace g2o
+{
 
   EdgeLine3D::EdgeLine3D() :
     BaseBinaryEdge<6, Vector6d, VertexLine3D, VertexLine3D>()

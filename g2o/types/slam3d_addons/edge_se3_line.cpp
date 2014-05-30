@@ -1,7 +1,6 @@
 #include "edge_se3_line.h"
 
-namespace Slam3dAddons {
-  using namespace g2o;
+namespace g2o {
 
   EdgeSE3Line3D::EdgeSE3Line3D(){
     information().setIdentity();

@@ -26,13 +26,8 @@
 
 #include "edge_plane.h"
 
-#ifdef G2O_HAVE_OPENGL
-#include "g2o/stuff/opengl_wrapper.h"
-#include "g2o/stuff/opengl_primitives.h"
-#endif
-
-namespace Slam3dAddons {
-using namespace g2o;
+namespace g2o
+{
 using namespace Eigen;
 
 EdgePlane::EdgePlane() :
