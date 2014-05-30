@@ -39,7 +39,7 @@
 
 namespace g2o {
 
-  class G2O_TYPES_SLAM2D_API VertexLine2D : public BaseVertex<2, Line2D>
+  class G2O_TYPES_SLAM2D_ADDONS_API VertexLine2D : public BaseVertex<2, Line2D>
   {
     public:
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
@@ -94,7 +94,7 @@ namespace g2o {
       int p1Id, p2Id;
   };
 
-  /* class G2O_TYPES_SLAM2D_API VertexLine2DWriteGnuplotAction: public WriteGnuplotAction { */
+  /* class G2O_TYPES_SLAM2D_ADDONS_API VertexLine2DWriteGnuplotAction: public WriteGnuplotAction { */
   /* public: */
   /*   VertexLine2DWriteGnuplotAction(); */
   /*   virtual HyperGraphElementAction* operator()(HyperGraph::HyperGraphElement* element,  */
@@ -102,7 +102,7 @@ namespace g2o {
   /* }; */
 
 #ifdef G2O_HAVE_OPENGL
-  class G2O_TYPES_SLAM2D_API VertexLine2DDrawAction: public DrawAction{
+  class G2O_TYPES_SLAM2D_ADDONS_API VertexLine2DDrawAction: public DrawAction{
   public:
     VertexLine2DDrawAction();
     virtual HyperGraphElementAction* operator()(HyperGraph::HyperGraphElement* element,

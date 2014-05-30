@@ -36,7 +36,7 @@
 
 namespace g2o {
 
-  class G2O_TYPES_SLAM2D_API EdgeLine2DPointXY : public BaseBinaryEdge<1, double, VertexLine2D, VertexPointXY>
+  class G2O_TYPES_SLAM2D_ADDONS_API EdgeLine2DPointXY : public BaseBinaryEdge<1, double, VertexLine2D, VertexPointXY>
   {
     public:
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW
@@ -82,7 +82,7 @@ namespace g2o {
 /* #endif */
   };
 
-/*   class G2O_TYPES_SLAM2D_API EdgeLine2DPointXYWriteGnuplotAction: public WriteGnuplotAction { */
+/*   class G2O_TYPES_SLAM2D_ADDONS_API EdgeLine2DPointXYWriteGnuplotAction: public WriteGnuplotAction { */
 /*   public: */
 /*     EdgeLine2DPointXYWriteGnuplotAction(); */
 /*     virtual HyperGraphElementAction* operator()(HyperGraph::HyperGraphElement* element,  */
@@ -90,7 +90,7 @@ namespace g2o {
 /*   }; */
 
 /* #ifdef G2O_HAVE_OPENGL */
-/*   class G2O_TYPES_SLAM2D_API EdgeLine2DPointXYDrawAction: public DrawAction{ */
+/*   class G2O_TYPES_SLAM2D_ADDONS_API EdgeLine2DPointXYDrawAction: public DrawAction{ */
 /*   public: */
 /*     EdgeLine2DPointXYDrawAction(); */
 /*     virtual HyperGraphElementAction* operator()(HyperGraph::HyperGraphElement* element,  */
