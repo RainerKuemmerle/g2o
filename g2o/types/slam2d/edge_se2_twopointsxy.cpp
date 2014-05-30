@@ -87,21 +87,7 @@ namespace g2o{
         return 1.0;
       }
     }
-
     return -1.0;
-
-    // if(fixed.size() == 2) return 1.0;
-    // if(fixed.size() < 2){
-    //   // if the fixed vertex is the position, it is possible to estimate the position of the two XY vertices
-    //   bool fixed_pose = false;
-    //   for(std::set<HyperGraph::Vertex *>::iterator it=fixed.begin(); it!=fixed.end(); it++){
-    // 	if(_vertices[0]->id() == (*it)->id()){
-    // 	  fixed_pose = true;
-    // 	}
-    //   }
-    //   if(fixed_pose) return 1.0;
-    // }
-    // return -1.0;
   }
 
 
@@ -118,8 +104,6 @@ namespace g2o{
     _measurement[1] = m1[1];
     _measurement[2] = m2[0];
     _measurement[3] = m2[1];
-
-
     return true;
   }
 

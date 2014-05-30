@@ -11,7 +11,6 @@ namespace g2o{
     resize(0);
   }
 
-
   void EdgeSE2LotsOfXY::computeError(){
     VertexSE2 * pose = static_cast<VertexSE2 *> (_vertices[0]);
 
@@ -23,7 +22,6 @@ namespace g2o{
       _error[index] = m[0] - _measurement[index];
       _error[index+1] = m[1] - _measurement[index+1];
     }
-
   }
 
   bool EdgeSE2LotsOfXY::read(std::istream& is){

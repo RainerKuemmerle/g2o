@@ -7,7 +7,7 @@
 #include "vertex_se2.h"
 #include "vertex_point_xy.h"
 
-namespace g2o{
+namespace g2o {
 
   class G2O_TYPES_SLAM2D_API EdgeSE2LotsOfXY : public BaseMultiEdge<-1,Eigen::VectorXd>
   {
@@ -18,14 +18,16 @@ namespace g2o{
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
       EdgeSE2LotsOfXY();
 
-      void setDimension(int dimension_){
+      void setDimension(int dimension_)
+      {
         _dimension = dimension_;
         _information.resize(dimension_, dimension_);
         _error.resize(dimension_, 1);
         _measurement.resize(dimension_, 1);
       }
 
-      void setSize(int vertices){
+      void setSize(int vertices)
+      {
         resize(vertices);
         _observedPoints = vertices-1;
         setDimension(_observedPoints*2);
@@ -44,6 +46,6 @@ namespace g2o{
       virtual void linearizeOplus();
   };
 
-}
+} // end namespace g2o
 
 #endif	// G2O_EDGE_SE2_LOTSOF_XY
