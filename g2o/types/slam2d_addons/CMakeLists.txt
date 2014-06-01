@@ -16,20 +16,7 @@ SET_TARGET_PROPERTIES(types_slam2d_addons PROPERTIES OUTPUT_NAME ${LIB_PREFIX}ty
 
 TARGET_LINK_LIBRARIES(types_slam2d_addons types_slam2d core ${OPENGL_gl_LIBRARY})
 
-# ADD_EXECUTABLE(g2o_simulator2d_segment_application
-#   simulator2d_segment.cpp
-# )
-# TARGET_LINK_LIBRARIES(g2o_simulator2d_segment_application g2o_simulator_library types_slam2d_segment types_slam3d types_slam2d core)
-# SET_TARGET_PROPERTIES(g2o_simulator2d_segment_application PROPERTIES OUTPUT_NAME g2o_simulator2d_segment${EXE_POSTFIX})
-
-
-# ADD_EXECUTABLE(convertSegmentLine_application convertSegmentLine.cpp)
-
-# TARGET_LINK_LIBRARIES(convertSegmentLine_application g2o_simulator_library types_slam2d_segment types_slam3d types_slam2d core)
-# SET_TARGET_PROPERTIES(convertSegmentLine_application PROPERTIES OUTPUT_NAME convertSegmentLine${EXE_POSTFIX})
-
-
-INSTALL(TARGETS #types_slam2d_segment g2o_simulator2d_segment_application
+INSTALL(TARGETS types_slam2d_addons
   RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/bin
   LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX}/lib
   ARCHIVE DESTINATION ${CMAKE_INSTALL_PREFIX}/lib
