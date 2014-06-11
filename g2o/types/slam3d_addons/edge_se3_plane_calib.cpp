@@ -2,11 +2,7 @@
 #include "edge_se3_plane_calib.h"
 
 #ifdef G2O_HAVE_OPENGL
-#ifdef __APPLE__
-#include <OpenGL/gl.h>
-#else
-#include <GL/gl.h>
-#endif
+#include "g2o/stuff/opengl_wrapper.h"
 #endif
 
 namespace g2o

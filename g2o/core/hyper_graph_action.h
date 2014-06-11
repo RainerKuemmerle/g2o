@@ -43,7 +43,7 @@
 
 namespace g2o {
 
-  struct CacheContainer;
+  class CacheContainer;
   /**
    * \brief Abstract action that operates on an entire graph
    */

@@ -48,7 +48,7 @@ namespace g2o {
    * E - type to represent the measurement
    */
   template <int D, typename E>
-    class G2O_CORE_API BaseMultiEdge : public BaseEdge<D,E>
+    class BaseMultiEdge : public BaseEdge<D,E>
     {
     public:
       /**
@@ -110,7 +110,7 @@ namespace g2o {
 
   // PARTIAL TEMPLATE SPECIALIZATION
   template <typename E>
-  class G2O_CORE_API BaseMultiEdge<-1,E> : public BaseEdge<-1,E>
+  class BaseMultiEdge<-1,E> : public BaseEdge<-1,E>
   {
     public:
       /**

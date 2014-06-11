@@ -165,9 +165,9 @@ namespace g2o {
       fromTransform = to->estimate()*e->measurement().inverse();
       // DRAW THE FROM EDGE AS AN ARROW
       glPushMatrix();
-      glTranslatef(fromTransform.translation().x(),fromTransform.translation().y(),0.f);
+      glTranslatef((float)fromTransform.translation().x(), (float)fromTransform.translation().y(),0.f);
       glRotatef((float)RAD2DEG(fromTransform.rotation().angle()),0.f,0.f,1.f);
-      opengl::drawArrow2D(_triangleX->value(), _triangleY->value(), _triangleX->value()*.3);
+      opengl::drawArrow2D((float)_triangleX->value(), (float)_triangleY->value(), (float)_triangleX->value()*.3f);
       glPopMatrix();
     } else if (! to){
       glColor3f(POSE_EDGE_GHOST_COLOR);
@@ -177,7 +177,7 @@ namespace g2o {
       glPushMatrix();
       glTranslatef(toTransform.translation().x(),toTransform.translation().y(),0.f);
       glRotatef((float)RAD2DEG(toTransform.rotation().angle()),0.f,0.f,1.f);
-      opengl::drawArrow2D(_triangleX->value(), _triangleY->value(), _triangleX->value()*.3);
+      opengl::drawArrow2D((float)_triangleX->value(), (float)_triangleY->value(), (float)_triangleX->value()*.3f);
       glPopMatrix();
     } else {
       glColor3f(POSE_EDGE_COLOR);

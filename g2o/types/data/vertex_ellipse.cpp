@@ -93,7 +93,7 @@ namespace g2o {
        << _covariance(1,1) << " " << _covariance(1,2) << " " << _covariance(2,2) << " ";
 
     os << _matchingVertices.size() << " " ;
-    for (int i=0 ; i< _matchingVertices.size(); i++){
+    for (size_t i=0 ; i< _matchingVertices.size(); i++){
       os << _matchingVertices[i].x() << " " << _matchingVertices[i].y() << " ";
     }
 
@@ -135,8 +135,8 @@ namespace g2o {
     glPushMatrix();
 
     float sigmaTheta = sqrt(that->covariance()(2,2));
-    float x = 0.1*cos(sigmaTheta);
-    float y = 0.1*sin(sigmaTheta);
+    float x = 0.1f*cosf(sigmaTheta);
+    float y = 0.1f*sinf(sigmaTheta);
 
     glColor3f(1.f,0.7f,1.f);
     glBegin(GL_LINE_STRIP);
@@ -146,7 +146,7 @@ namespace g2o {
     glEnd();
 
     glColor3f(0.f,1.f,0.f);
-    for (int i=0; i< that->matchingVertices().size(); i++){
+    for (size_t i=0; i< that->matchingVertices().size(); i++){
       glBegin(GL_LINES);
       glVertex3f(0,0,0);
       glVertex3f(that->matchingVertices()[i].x(),that->matchingVertices()[i].y(),0);

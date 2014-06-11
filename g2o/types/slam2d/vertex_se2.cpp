@@ -109,7 +109,7 @@ namespace g2o {
     glPushMatrix();
     glTranslatef((float)that->estimate().translation().x(),(float)that->estimate().translation().y(),0.f);
     glRotatef((float)RAD2DEG(that->estimate().rotation().angle()),0.f,0.f,1.f);
-    opengl::drawArrow2D(_triangleX->value(), _triangleY->value(), _triangleX->value()*.3);
+    opengl::drawArrow2D((float)_triangleX->value(), (float)_triangleY->value(), (float)_triangleX->value()*.3f);
     drawCache(that->cacheContainer(), params_);
     drawUserData(that->userData(), params_);
     glPopMatrix();
