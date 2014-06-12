@@ -175,7 +175,7 @@ void BaseMultiEdge<D, E>::computeQuadraticForm(const InformationType& omega, con
     bool istatus = !(from->fixed());
 
     if (istatus) {
-      const MatrixXd& A = _jacobianOplus[i];
+      const JacobianType& A = _jacobianOplus[i];
 
       MatrixXd AtO = A.transpose() * omega;
       int fromDim = from->dimension();
@@ -198,7 +198,7 @@ void BaseMultiEdge<D, E>::computeQuadraticForm(const InformationType& omega, con
 #endif
         bool jstatus = !(to->fixed());
         if (jstatus) {
-          const MatrixXd& B = _jacobianOplus[j];
+          const JacobianType& B = _jacobianOplus[j];
           int idx = internal::computeUpperTriangleIndex(i, j);
           assert(idx < (int)_hessian.size());
           HessianHelper& hhelper = _hessian[idx];
@@ -367,7 +367,7 @@ void BaseMultiEdge<-1, E>::computeQuadraticForm(const InformationType& omega, co
     bool istatus = !(from->fixed());
 
     if (istatus) {
-      const MatrixXd& A = _jacobianOplus[i];
+      const JacobianType& A = _jacobianOplus[i];
 
       MatrixXd AtO = A.transpose() * omega;
       int fromDim = from->dimension();
@@ -390,7 +390,7 @@ void BaseMultiEdge<-1, E>::computeQuadraticForm(const InformationType& omega, co
 #endif
         bool jstatus = !(to->fixed());
         if (jstatus) {
-          const MatrixXd& B = _jacobianOplus[j];
+          const JacobianType& B = _jacobianOplus[j];
           int idx = internal::computeUpperTriangleIndex(i, j);
           assert(idx < (int)_hessian.size());
           HessianHelper& hhelper = _hessian[idx];
