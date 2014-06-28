@@ -1,5 +1,5 @@
 // g2o - General Graph Optimization
-// Copyright (C) 2011 R. Kuemmerle, G. Grisetti, W. Burgard
+// Copyright (C) 2014 R. Kuemmerle, G. Grisetti, W. Burgard
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -24,18 +24,15 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include <iostream>
-#include <cstdio>
+#include "gtest/gtest.h"
 
 #include "g2o/core/jacobian_workspace.h"
-#include "g2o/stuff/macros.h"
-#include "edge_se3.h"
-#include "edge_se3_prior.h"
+#include "g2o/types/slam3d/edge_se3.h"
 
 using namespace std;
 using namespace g2o;
 
-Eigen::Isometry3d randomIsometry3d()
+static Eigen::Isometry3d randomIsometry3d()
 {
   Eigen::Vector3d rotAxisAngle = Vector3d::Random();
   rotAxisAngle += Vector3d::Random();
@@ -45,58 +42,8 @@ Eigen::Isometry3d randomIsometry3d()
   return result;
 }
 
-int main(int , char** )
+TEST(EdgeSE3, Jacobian)
 {
-  if (0) {
-    OptimizableGraph graph;
-    ParameterSE3Offset* offsetParam = new ParameterSE3Offset;
-    offsetParam->setId(0);
-    graph.addParameter(offsetParam);
-
-    Eigen::Isometry3d zeroPose = Eigen::Isometry3d::Identity();
-    VertexSE3* v1 = new VertexSE3;
-    v1->setId(0);
-    graph.addVertex(v1);
-    OptimizableGraph::VertexSet auxSet;
-    EdgeSE3Prior* priorEdge = new EdgeSE3Prior;
-    priorEdge->setVertex(0, v1);
-    priorEdge->setMeasurement(randomIsometry3d());
-    priorEdge->setParameterId(0, 0);
-    cout << PVAR(priorEdge->measurement().matrix()) << endl;
-    graph.addEdge(priorEdge);
-
-    Eigen::Matrix<double,6,6> information = Eigen::Matrix<double,6,6>::Identity();
-
-    cout << "Full information" << endl;
-    v1->setEstimate(zeroPose);
-    priorEdge->setInformation(information);
-    priorEdge->initialEstimate(auxSet, 0);
-    cout << PVAR(priorEdge->chi2()) << endl;
-    cout << v1->estimate().matrix() << endl << endl;
-    priorEdge->computeError();
-
-    cout << "Only translation" << endl;
-    v1->setEstimate(zeroPose);
-    information.block<3,3>(0,0) = Eigen::Matrix3d::Identity();
-    information.block<3,3>(3,3) = Eigen::Matrix3d::Zero();
-    priorEdge->setInformation(information);
-    priorEdge->initialEstimate(auxSet, 0);
-    cout << PVAR(priorEdge->chi2()) << endl;
-    cout << v1->estimate().matrix() << endl << endl;
-    priorEdge->computeError();
-
-    cout << "Only rotation" << endl;
-    v1->setEstimate(zeroPose);
-    information.block<3,3>(0,0) = Eigen::Matrix3d::Zero();
-    information.block<3,3>(3,3) = Eigen::Matrix3d::Identity();
-    priorEdge->setInformation(information);
-    priorEdge->initialEstimate(auxSet, 0);
-    cout << PVAR(priorEdge->chi2()) << endl;
-    cout << v1->estimate().matrix() << endl << endl;
-    priorEdge->computeError();
-    return 0;
-  }
-
   VertexSE3 v1;
   v1.setId(0); 
 
@@ -113,8 +60,7 @@ int main(int , char** )
   numericJacobianWorkspace.updateSize(&e);
   numericJacobianWorkspace.allocate();
 
-  for (int k = 0; k < 100000; ++k) {
-
+  for (int k = 0; k < 10000; ++k) {
     v1.setEstimate(randomIsometry3d());
     v2.setEstimate(randomIsometry3d());
     e.setMeasurement(randomIsometry3d());
@@ -128,23 +74,12 @@ int main(int , char** )
     e.BaseBinaryEdge<6, Eigen::Isometry3d, VertexSE3, VertexSE3>::linearizeOplus();
 
     // compare the two Jacobians
-    const double allowedDifference = 1e-6;
     for (int i = 0; i < 2; ++i) {
       double* n = numericJacobianWorkspace.workspaceForVertex(i);
       double* a = jacobianWorkspace.workspaceForVertex(i);
       for (int j = 0; j < 6*6; ++j) {
-        double d = fabs(n[j] - a[j]);
-        if (d > allowedDifference) {
-          cerr << "\ndetected difference in the Jacobians " << d << endl;
-          cerr << PVAR(v1.estimate().matrix()) << endl << endl;
-          cerr << PVAR(v2.estimate().matrix()) << endl << endl;
-          cerr << PVAR(e.measurement().matrix()) << endl << endl;
-          return 1;
-        }
+        EXPECT_NEAR(n[j], a[j], 1e-6);
       }
     }
-    cerr << "+";
-
   }
-  return 0;
 }

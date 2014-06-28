@@ -48,9 +48,6 @@ TARGET_LINK_LIBRARIES(test_isometry3d_mappings types_slam3d)
 ADD_EXECUTABLE(test_mat2quat_jacobian test_mat2quat_jacobian.cpp)
 TARGET_LINK_LIBRARIES(test_mat2quat_jacobian types_slam3d)
 
-ADD_EXECUTABLE(test_slam3d_jacobian test_slam3d_jacobian.cpp)
-TARGET_LINK_LIBRARIES(test_slam3d_jacobian types_slam3d)
-
 INSTALL(TARGETS types_slam3d
   RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/bin
   LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX}/lib
