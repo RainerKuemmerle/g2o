@@ -30,7 +30,7 @@
 
 using namespace std;
 
-TEST(OrthogonalMatrix, nearestOrthogonalMatrix)
+TEST(Slam3D, OrthogonalMatrix)
 {
   Eigen::Matrix3d shouldBeIdentity;
   Eigen::Matrix3d R = Eigen::Matrix3d::Identity();
