@@ -276,6 +276,8 @@ namespace g2o{
     set<Vertex*> auxVertexSet; // temporary structure to avoid duplicates
     for (HyperGraph::EdgeSet::iterator it=eset.begin(); it!=eset.end(); ++it){
       OptimizableGraph::Edge* e=(OptimizableGraph::Edge*)(*it);
+      if (e->numUndefinedVertices())
+	continue;
       for (vector<HyperGraph::Vertex*>::const_iterator vit = e->vertices().begin(); vit != e->vertices().end(); ++vit) {
         auxVertexSet.insert(static_cast<OptimizableGraph::Vertex*>(*vit));
       }
@@ -290,7 +292,20 @@ namespace g2o{
     return buildIndexMapping(_activeVertices);
   }
 
+  void SparseOptimizer::setToOrigin(){
+    for (VertexIDMap::iterator it=vertices().begin(); it!=vertices().end(); ++it) {
+      OptimizableGraph::Vertex* v = static_cast<OptimizableGraph::Vertex*>(it->second);
+      v->setToOrigin();
+    }
+  }
+
   void SparseOptimizer::computeInitialGuess()
+  {
+    EstimatePropagator::PropagateCost costFunction(this);
+    computeInitialGuess(costFunction);
+  }
+
+  void SparseOptimizer::computeInitialGuess(EstimatePropagatorCost& costFunction)
   {
     OptimizableGraph::VertexSet emptySet;
     std::set<Vertex*> backupVertices;
@@ -299,6 +314,8 @@ namespace g2o{
       OptimizableGraph::Edge* e = *it;
       for (size_t i = 0; i < e->vertices().size(); ++i) {
         OptimizableGraph::Vertex* v = static_cast<OptimizableGraph::Vertex*>(e->vertex(i));
+	if (!v)
+	  continue;
         if (v->fixed())
           fixedVertices.insert(v);
         else { // check for having a prior which is able to fully initialize a vertex
@@ -322,7 +339,6 @@ namespace g2o{
     }
 
     EstimatePropagator estimatePropagator(this);
-    EstimatePropagator::PropagateCost costFunction(this);
     estimatePropagator.propagate(fixedVertices, costFunction);
 
     // restoring the vertices that should not be initialized
@@ -335,7 +351,7 @@ namespace g2o{
       cerr << "iteration= -1\t chi2= " << activeChi2()
           << "\t time= 0.0"
           << "\t cumTime= 0.0"
-          << "\t (using initial guess from spanning tree)" << endl;
+          << "\t (using initial guess from " << costFunction.name() << ")" << endl;
     }
   }
 
@@ -477,7 +493,7 @@ namespace g2o{
     _ivMap.clear();
     _activeVertices.clear();
     _activeEdges.clear();
-    HyperGraph::clear();
+    OptimizableGraph::clear();
   }
 
   SparseOptimizer::VertexContainer::const_iterator SparseOptimizer::findActiveVertex(const OptimizableGraph::Vertex* v) const
@@ -563,14 +579,14 @@ namespace g2o{
     _forceStopFlag=flag;
   }
 
-  bool SparseOptimizer::removeVertex(HyperGraph::Vertex* v)
+  bool SparseOptimizer::removeVertex(HyperGraph::Vertex* v, bool detach)
   {
     OptimizableGraph::Vertex* vv = static_cast<OptimizableGraph::Vertex*>(v);
     if (vv->hessianIndex() >= 0) {
       clearIndexMapping();
       _ivMap.clear();
     }
-    return HyperGraph::removeVertex(v);
+    return HyperGraph::removeVertex(v, detach);
   }
 
   bool SparseOptimizer::addComputeErrorAction(HyperGraphAction* action)

@@ -30,6 +30,7 @@
 #include <QFileDialog>
 #include <QStandardItemModel>
 #include <QDoubleValidator>
+#include <QComboBox>
 
 #include <fstream>
 #include <iostream>
@@ -115,7 +116,33 @@ void MainWindow::on_btnInitialGuess_clicked()
   if (viewer->graph->activeEdges().size() == 0)
     viewer->graph->initializeOptimization();
 
-  viewer->graph->computeInitialGuess();
+  switch (cbxIniitialGuessMethod->currentIndex()) {
+    case 0:
+      // spanning tree
+      viewer->graph->computeInitialGuess();
+      break;
+    case 1:
+      // odometry
+      {
+        EstimatePropagatorCostOdometry costFunction(viewer->graph);
+        viewer->graph->computeInitialGuess(costFunction);
+      }
+      break;
+    default:
+      cerr << __PRETTY_FUNCTION__ << " Unknown initialization method" << endl;
+      break;
+  }
+
+  viewer->setUpdateDisplay(true);
+  viewer->updateGL();
+}
+
+void MainWindow::on_btnSetZero_clicked()
+{
+  if (viewer->graph->activeEdges().size() == 0)
+    viewer->graph->initializeOptimization();
+
+  viewer->graph->setToOrigin();
   viewer->setUpdateDisplay(true);
   viewer->updateGL();
 }
@@ -285,7 +312,10 @@ void MainWindow::setRobustKernel()
 {
   SparseOptimizer* optimizer = viewer->graph;
   bool robustKernel = cbRobustKernel->isChecked();
-  double huberWidth = leKernelWidth->text().toDouble();
+  double huberWidth = leKernelWidth->text().toDouble();  
+  //odometry edges are those whose node ids differ by 1
+  
+  bool onlyLoop = cbOnlyLoop->isChecked();
 
   if (robustKernel) {
     QString strRobustKernel = coRobustKernel->currentText();
@@ -296,9 +326,16 @@ void MainWindow::setRobustKernel()
     }
     for (SparseOptimizer::EdgeSet::const_iterator it = optimizer->edges().begin(); it != optimizer->edges().end(); ++it) {
       OptimizableGraph::Edge* e = static_cast<OptimizableGraph::Edge*>(*it);
-      e->setRobustKernel(creator->construct());
-      e->robustKernel()->setDelta(huberWidth);
-    }
+      if (onlyLoop) {
+        if (e->vertices().size() >= 2 && std::abs(e->vertex(0)->id() - e->vertex(1)->id()) != 1) {
+          e->setRobustKernel(creator->construct());
+          e->robustKernel()->setDelta(huberWidth);
+        }
+      } else {
+        e->setRobustKernel(creator->construct());
+        e->robustKernel()->setDelta(huberWidth);
+      }
+    }    
   } else {
     for (SparseOptimizer::EdgeSet::const_iterator it = optimizer->edges().begin(); it != optimizer->edges().end(); ++it) {
       OptimizableGraph::Edge* e = static_cast<OptimizableGraph::Edge*>(*it);

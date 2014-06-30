@@ -33,6 +33,11 @@
 namespace g2o {
   using namespace std;
 
+  Cache::CacheKey::CacheKey() :
+    _type(), _parameters()
+  {
+  }
+
   Cache::CacheKey::CacheKey(const std::string& type_, const ParameterVector& parameters_) :
     _type(type_), _parameters(parameters_)
   {

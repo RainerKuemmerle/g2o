@@ -76,6 +76,15 @@ namespace g2o {
           fromEdge->setEstimate(fromEdge->updatedEstimate);
         }
       }
+
+      double chi2() const
+      {
+        const OnlineVertexSE2* v1 = static_cast<const OnlineVertexSE2*>(_vertices[0]);
+        const OnlineVertexSE2* v2 = static_cast<const OnlineVertexSE2*>(_vertices[1]);
+        SE2 delta = _inverseMeasurement * (v1->updatedEstimate.inverse()*v2->updatedEstimate);
+        Eigen::Vector3d error = delta.toVector();
+        return error.dot(information() * error);
+      }
   };
 
 } // end namespace

@@ -3,3 +3,5 @@
 *.blg
 *.dvi
 *.log
+doxygen/html
+doxygen/YES

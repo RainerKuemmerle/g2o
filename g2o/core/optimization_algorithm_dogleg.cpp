@@ -43,8 +43,11 @@ namespace g2o {
   {
     _userDeltaInit = _properties.makeProperty<Property<double> >("initialDelta", 1e4);
     _maxTrialsAfterFailure = _properties.makeProperty<Property<int> >("maxTrialsAfterFailure", 100);
+    _initialLambda = _properties.makeProperty<Property<double> >("initialLambda", 1e-7);
+    _lamdbaFactor = _properties.makeProperty<Property<double> >("lambdaFactor", 10.);
     _delta = _userDeltaInit->value();
     _lastStep = STEP_UNDEFINED;
+    _wasPDInAllIterations = true;
   }
 
   OptimizationAlgorithmDogleg::~OptimizationAlgorithmDogleg()
@@ -59,7 +62,6 @@ namespace g2o {
 
     BlockSolverBase* blockSolver = static_cast<BlockSolverBase*>(_solver);
 
-
     if (iteration == 0 && !online) { // built up the CCS structure, here due to easy time measure
       bool ok = _solver->buildStructure();
       if (! ok) {
@@ -72,6 +74,8 @@ namespace g2o {
       _hdl.resize(_solver->vectorSize());
       _auxVector.resize(_solver->vectorSize());
       _delta = _userDeltaInit->value();
+      _currentLambda = _initialLambda->value();
+      _wasPDInAllIterations = true;
     }
 
     double t=get_monotonic_time();
@@ -82,7 +86,7 @@ namespace g2o {
       t=get_monotonic_time();
     }
 
-    double currentChi = _optimizer->activeChi2();
+    double currentChi = _optimizer->activeRobustChi2();
 
     _solver->buildSystem();
     if (globalStats) {
@@ -98,25 +102,52 @@ namespace g2o {
     double alpha = bNormSquared / _auxVector.dot(b);
 
     _hsd = alpha * b;
+    double hsdNorm = _hsd.norm();
+    double hgnNorm = -1.;
 
     bool solvedGaussNewton = false;
     bool goodStep = false;
-    int numTries = 0;
+    int& numTries = _lastNumTries;
+    numTries = 0;
     do {
       ++numTries;
-      double hsdNorm = _hsd.norm();
 
       if (! solvedGaussNewton) {
+        const double minLambda = 1e-12;
+        const double maxLambda = 1e3;
         solvedGaussNewton = true;
-        // TODO handle singular case, maybe adding lambda along the diagonal as in Levenberg
-        bool solverOk = _solver->solve();
+        // apply a damping factor to enforce positive definite Hessian, if the matrix appeared
+        // to be not positive definite in at least one iteration before.
+        // We apply a damping factor to obtain a PD matrix.
+        bool solverOk = false;
+        while(!solverOk) {
+          if (! _wasPDInAllIterations)
+            _solver->setLambda(_currentLambda, true);   // add _currentLambda to the diagonal
+          solverOk = _solver->solve();
+          if (! _wasPDInAllIterations)
+            _solver->restoreDiagonal();
+          _wasPDInAllIterations = _wasPDInAllIterations && solverOk;
+          if (! _wasPDInAllIterations) {
+            // simple strategy to control the damping factor
+            if (solverOk) {
+              _currentLambda = std::max(minLambda, _currentLambda / (0.5 * _lamdbaFactor->value()));
+            } else {
+              _currentLambda *= _lamdbaFactor->value();
+              if (_currentLambda > maxLambda) {
+                _currentLambda = maxLambda;
+                return Fail;
+              }
+            }
+          }
+        }
         if (!solverOk) {
           return Fail;
         }
+        hgnNorm = Eigen::VectorXd::ConstMapType(_solver->x(), _solver->vectorSize()).norm();
       }
 
       Eigen::VectorXd::ConstMapType hgn(_solver->x(), _solver->vectorSize());
-      double hgnNorm = hgn.norm();
+      assert(hgnNorm >= 0. && "Norm of the GN step is not computed");
 
       if (hgnNorm < _delta) {
         _hdl = hgn;
@@ -151,7 +182,7 @@ namespace g2o {
       _optimizer->push();
       _optimizer->update(_hdl.data());
       _optimizer->computeActiveErrors();
-      double newChi = _optimizer->activeChi2();
+      double newChi = _optimizer-> activeRobustChi2();
       double nonLinearGain = currentChi - newChi;
       if (fabs(linearGain) < 1e-12)
         linearGain = 1e-12;
@@ -179,7 +210,10 @@ namespace g2o {
   {
     os
       << "\t Delta= " << _delta
-      << "\t step= " << stepType2Str(_lastStep);
+      << "\t step= " << stepType2Str(_lastStep)
+      << "\t tries= " << _lastNumTries;
+    if (! _wasPDInAllIterations)
+      os << "\t lambda= " << _currentLambda;
   }
 
   const char* OptimizationAlgorithmDogleg::stepType2Str(int stepType)

@@ -47,9 +47,15 @@
 #  define G2O_ATTRIBUTE_WARNING(func) func __attribute__((warning))
 #  define G2O_ATTRIBUTE_DEPRECATED(func) func __attribute__((deprecated))
 
-#define g2o_isnan(x)     std::isnan(x)
-#define g2o_isinf(x)     std::isinf(x)
-# define g2o_isfinite(x) std::isfinite(x)
+#ifdef ANDROID
+# define g2o_isnan(x)     isnan(x)
+# define g2o_isinf(x)     isinf(x)
+# define g2o_isfinite(x)  isfinite(x)
+#else
+# define g2o_isnan(x)     std::isnan(x)
+# define g2o_isinf(x)     std::isinf(x)
+# define g2o_isfinite(x)  std::isfinite(x)
+#endif
 
 // MSVC on Windows
 #elif defined _MSC_VER
@@ -111,6 +117,11 @@ Modified by Mark Pupilli from:
 #ifndef PVAR
   #define PVAR(s) \
     #s << " = " << (s) << std::flush
+#endif
+
+#ifndef PVARA
+#define PVARA(s) \
+  #s << " = " << RAD2DEG(s) << "deg" << std::flush
 #endif
 
 #ifndef FIXED

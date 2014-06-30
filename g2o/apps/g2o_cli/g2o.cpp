@@ -110,6 +110,7 @@ int main(int argc, char** argv)
   string strSolver;
   string loadLookup;
   bool initialGuess;
+  bool initialGuessOdometry;
   bool marginalize;
   bool listTypes;
   bool listSolvers;
@@ -121,17 +122,22 @@ int main(int argc, char** argv)
   bool computeMarginals;
   bool printSolverProperties;
   double huberWidth;
+  double gain;
+  int maxIterationsWithGain;
   //double lambdaInit;
   int updateGraphEachN = 10;
   string statsFile;
   string summaryFile;
-  string dummy;
+  bool nonSequential;
   // command line parsing
   std::vector<int> gaugeList;
   CommandArgs arg;
   arg.param("i", maxIterations, 5, "perform n iterations, if negative consider the gain");
+  arg.param("gain", gain, 1e-6, "the gain used to stop optimization (default = 1e-6)");
+  arg.param("ig",maxIterationsWithGain, std::numeric_limits<int>::max(), "Maximum number of iterations with gain enabled (default: inf)");
   arg.param("v", verbose, false, "verbose output of the optimization process");
   arg.param("guess", initialGuess, false, "initial guess based on spanning tree");
+  arg.param("guessOdometry", initialGuessOdometry, false, "initial guess based on odometry");
   arg.param("inc", incremental, false, "run incremetally");
   arg.param("update", updateGraphEachN, 10, "updates after x odometry nodes");
   arg.param("guiout", guiOut, false, "gui output while running incrementally");
@@ -145,8 +151,11 @@ int main(int argc, char** argv)
   arg.param("gaugeId", gaugeId, -1, "force the gauge");
   arg.param("o", outputfilename, "", "output final version of the graph");
   arg.param("solver", strSolver, "gn_var", "specify which solver to use underneat\n\t {gn_var, lm_fix3_2, gn_fix6_3, lm_fix7_3}");
+#ifndef G2O_DISABLE_DYNAMIC_LOADING_OF_LIBRARIES
+  string dummy;
   arg.param("solverlib", dummy, "", "specify a solver library which will be loaded");
   arg.param("typeslib", dummy, "", "specify a types library which will be loaded");
+#endif
   arg.param("stats", statsFile, "", "specify a file for the statistics");
   arg.param("listTypes", listTypes, false, "list the registered types");
   arg.param("listRobustKernels", listRobustKernels, false, "list the registered robust kernels");
@@ -155,6 +164,7 @@ int main(int argc, char** argv)
   arg.param("gaugeList", gaugeList, std::vector<int>(), "set the list of gauges separated by commas without spaces \n  e.g: 1,2,3,4,5 ");
   arg.param("summary", summaryFile, "", "append a summary of this optimization run to the summary file passed as argument");
   arg.paramLeftOver("graph-input", inputFilename, "", "graph file which will be processed", true);
+  arg.param("nonSequential", nonSequential, false, "apply the robust kernel only on loop closures and not odometries");
   
 
   arg.parseArgs(argc, argv);
@@ -163,16 +173,22 @@ int main(int argc, char** argv)
     cout << "# Used Compiler: " << G2O_CXX_COMPILER << endl;
   }
 
+#ifndef G2O_DISABLE_DYNAMIC_LOADING_OF_LIBRARIES
   // registering all the types from the libraries
   DlWrapper dlTypesWrapper;
   loadStandardTypes(dlTypesWrapper, argc, argv);
-
   // register all the solvers
-  OptimizationAlgorithmFactory* solverFactory = OptimizationAlgorithmFactory::instance();
   DlWrapper dlSolverWrapper;
   loadStandardSolver(dlSolverWrapper, argc, argv);
-  if (listSolvers)
-    solverFactory->listSolvers(cerr);
+#else
+  if (verbose)
+    cout << "# linked version of g2o" << endl;
+#endif
+
+  OptimizationAlgorithmFactory* solverFactory = OptimizationAlgorithmFactory::instance();
+  if (listSolvers) {
+    solverFactory->listSolvers(cout);
+  }
 
   if (listTypes) {
     Factory::instance()->printRegisteredTypes(cout, true);
@@ -194,8 +210,10 @@ int main(int argc, char** argv)
   SparseOptimizerTerminateAction* terminateAction = 0;
   if (maxIterations < 0) {
     cerr << "# setup termination criterion based on the gain of the iteration" << endl;
-    maxIterations = std::numeric_limits<int>::max();
+    maxIterations = maxIterationsWithGain;
     terminateAction = new SparseOptimizerTerminateAction;
+    terminateAction->setGainThreshold(gain);
+    terminateAction->setMaxIterations(maxIterationsWithGain);
     optimizer.addPostIterationAction(terminateAction);
   }
 
@@ -315,11 +333,22 @@ int main(int argc, char** argv)
     AbstractRobustKernelCreator* creator = RobustKernelFactory::instance()->creator(robustKernel);
     cerr << "# Preparing robust error function ... ";
     if (creator) {
-      for (SparseOptimizer::EdgeSet::iterator it = optimizer.edges().begin(); it != optimizer.edges().end(); ++it) {
-        SparseOptimizer::Edge* e = dynamic_cast<SparseOptimizer::Edge*>(*it);
-        e->setRobustKernel(creator->construct());
-        if (huberWidth > 0)
-          e->robustKernel()->setDelta(huberWidth);
+      if (nonSequential) {
+        for (SparseOptimizer::EdgeSet::iterator it = optimizer.edges().begin(); it != optimizer.edges().end(); ++it) {
+          SparseOptimizer::Edge* e = dynamic_cast<SparseOptimizer::Edge*>(*it);
+          if (e->vertices().size() >= 2 && std::abs(e->vertex(0)->id() - e->vertex(1)->id()) != 1) {
+            e->setRobustKernel(creator->construct());
+            if (huberWidth > 0)
+              e->robustKernel()->setDelta(huberWidth);
+          }
+        }
+      } else {
+        for (SparseOptimizer::EdgeSet::iterator it = optimizer.edges().begin(); it != optimizer.edges().end(); ++it) {
+          SparseOptimizer::Edge* e = dynamic_cast<SparseOptimizer::Edge*>(*it);
+          e->setRobustKernel(creator->construct());
+          if (huberWidth > 0)
+            e->robustKernel()->setDelta(huberWidth);
+        }
       }
       cerr << "done." << endl;
     } else {
@@ -340,11 +369,17 @@ int main(int argc, char** argv)
   }
 
   if (incremental) {
+    cerr << CL_RED("# Note: this variant performs batch steps in each time step") << endl;
+    cerr << CL_RED("#       For a variant which updates the Cholesky factor use the binary g2o_incremental") << endl;
     int incIterations = maxIterations;
+    if (! arg.parsedParam("i")) {
+      cerr << "# Setting default number of iterations" << endl;
+      incIterations = 1;
+    }
     int updateDisplayEveryN = updateGraphEachN;
     int maxDim = 0;
 
-    cerr << "# incremental setttings" << endl;
+    cerr << "# incremental settings" << endl;
     cerr << "#\t solve every " << updateGraphEachN << endl;
     cerr << "#\t iterations  " << incIterations << endl;
 
@@ -532,6 +567,9 @@ int main(int argc, char** argv)
 
     if (initialGuess) {
       optimizer.computeInitialGuess();
+    } else if (initialGuessOdometry) {
+      EstimatePropagatorCostOdometry costFunction(&optimizer);
+      optimizer.computeInitialGuess(costFunction);
     }
     double initChi = optimizer.chi2();
 

@@ -24,8 +24,8 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef G2O_LINEAR_SOLVERCSPARSE_H
-#define G2O_LINEAR_SOLVERCSPARSE_H
+#ifndef G2O_LINEAR_SOLVER_EIGEN_H
+#define G2O_LINEAR_SOLVER_EIGEN_H
 
 #include <Eigen/Sparse>
 #include <Eigen/SparseCholesky>
@@ -51,17 +51,23 @@ class LinearSolverEigen: public LinearSolver<MatrixType>
   public:
     typedef Eigen::SparseMatrix<double, ColMajor> SparseMatrix;
     typedef Eigen::Triplet<double> Triplet;
+    typedef Eigen::PermutationMatrix<Eigen::Dynamic, Eigen::Dynamic, SparseMatrix::Index> PermutationMatrix;
+    /**
+     * \brief Sub-classing Eigen's SimplicialLDLT to perform ordering with a given ordering
+     */
     class CholeskyDecomposition : public Eigen::SimplicialLDLT<SparseMatrix, Eigen::Upper>
     {
       public:
         CholeskyDecomposition() : Eigen::SimplicialLDLT<SparseMatrix, Eigen::Upper>() {}
         using Eigen::SimplicialLDLT< SparseMatrix, Eigen::Upper>::analyzePattern_preordered;
 
-        void analyzeWithCurrentPermutation(SparseMatrix& a)
+        void analyzePatternWithPermutation(SparseMatrix& a, const PermutationMatrix& permutation)
         {
+          m_Pinv = permutation;
+          m_P = permutation.inverse();
           int size = a.cols();
-          SparseMatrix ap(size,size);
-          ap.template selfadjointView<Upper>() = a.template selfadjointView<UpLo>().twistedBy(m_P);
+          SparseMatrix ap(size, size);
+          ap.selfadjointView<Upper>() = a.selfadjointView<UpLo>().twistedBy(m_P);
           analyzePattern_preordered(ap, true);
         }
     };
@@ -145,64 +151,55 @@ class LinearSolverEigen: public LinearSolver<MatrixType>
         // block ordering with the Eigen Interface
         // This is really ugly currently, as it calls internal functions from Eigen
         // and modifies the SparseMatrix class
-
-        // prepare a block structure matrix for calling AMD
-        std::vector<Triplet> triplets;
-        for (int i = 0; i < static_cast<int>(A.blockCols().size()); ++i){
-          const int& c = i;
-          for (typename SparseBlockMatrix<MatrixType>::IntBlockMap::const_iterator it = A.blockCols()[i].begin(); it != A.blockCols()[i].end(); ++it) {
-            const int& r = it->first;
-            if (r <= c) // only upper triangle
+        Eigen::PermutationMatrix<Eigen::Dynamic,Eigen::Dynamic> blockP;
+        {
+          // prepare a block structure matrix for calling AMD
+          std::vector<Triplet> triplets;
+          for (size_t c = 0; c < A.blockCols().size(); ++c){
+            const typename SparseBlockMatrix<MatrixType>::IntBlockMap& column = A.blockCols()[c];
+            for (typename SparseBlockMatrix<MatrixType>::IntBlockMap::const_iterator it = column.begin(); it != column.end(); ++it) {
+              const int& r = it->first;
+              if (r > static_cast<int>(c)) // only upper triangle
+                break;
               triplets.push_back(Triplet(r, c, 0.));
-            else
-              break;
+            }
           }
-        }
 
-        Eigen::PermutationMatrix<Eigen::Dynamic,Eigen::Dynamic> pinv;
-        { // call the AMD ordering on the block matrix.
+          // call the AMD ordering on the block matrix.
           // Relies on Eigen's internal stuff, probably bad idea
           SparseMatrix auxBlockMatrix(A.blockCols().size(), A.blockCols().size());
           auxBlockMatrix.setFromTriplets(triplets.begin(), triplets.end());
           typename CholeskyDecomposition::CholMatrixType C;
           C = auxBlockMatrix.selfadjointView<Eigen::Upper>();
-          Eigen::internal::minimum_degree_ordering(C, pinv);
+          Eigen::internal::minimum_degree_ordering(C, blockP);
         }
 
         int rows = A.rows();
-        //int cols = A.cols();
         assert(rows == A.cols() && "Matrix A is not square");
 
         // Adapt the block permutation to the scalar matrix
-        typedef Eigen::PermutationMatrix<Eigen::Dynamic, Eigen::Dynamic, SparseMatrix::Index> PermutationMatrix;
-        PermutationMatrix& mpinv = *const_cast<PermutationMatrix*>(&_cholesky.permutationPinv());
-        mpinv.resize(rows);
+        PermutationMatrix scalarP;
+        scalarP.resize(rows);
         int scalarIdx = 0;
-        for (int i = 0; i < pinv.size(); ++i) {
-          const int& p = pinv.indices()(i);
+        for (int i = 0; i < blockP.size(); ++i) {
+          const int& p = blockP.indices()(i);
           int base  = A.colBaseOfBlock(p);
           int nCols = A.colsOfBlock(p);
           for (int j = 0; j < nCols; ++j)
-            mpinv.indices()(scalarIdx++) = base++;
+            scalarP.indices()(scalarIdx++) = base++;
         }
         assert(scalarIdx == rows && "did not completely fill the permutation matrix");
-        PermutationMatrix& mp = *const_cast<PermutationMatrix*>(&_cholesky.permutationP());
-        mp = mpinv.inverse();
+        // analyze with the scalar permutation
+        _cholesky.analyzePatternWithPermutation(_sparseMatrix, scalarP);
 
-        // analyze the given permutation
-        _cholesky.analyzeWithCurrentPermutation(_sparseMatrix);
       }
       G2OBatchStatistics* globalStats = G2OBatchStatistics::globalStats();
-      if (globalStats){
+      if (globalStats)
         globalStats->timeSymbolicDecomposition = get_monotonic_time() - t;
-      }
     }
 
     void fillSparseMatrix(const SparseBlockMatrix<MatrixType>& A, bool onlyValues)
     {
-      //int m = A.rows();
-      //int n = A.cols();
-
       if (onlyValues) {
         A.fillCCS(_sparseMatrix.valuePtr(), true);
       } else {
@@ -210,16 +207,16 @@ class LinearSolverEigen: public LinearSolver<MatrixType>
         // create from triplet structure
         std::vector<Triplet> triplets;
         triplets.reserve(A.nonZeros());
-
-        for (size_t i = 0; i<A.blockCols().size(); ++i) {
-          const int& c = i;
-          for (typename SparseBlockMatrix<MatrixType>::IntBlockMap::const_iterator it=A.blockCols()[i].begin(); it!=A.blockCols()[i].end(); ++it) {
-            const int& r = it->first;
+        for (size_t c = 0; c < A.blockCols().size(); ++c) {
+          int colBaseOfBlock = A.colBaseOfBlock(c);
+          const typename SparseBlockMatrix<MatrixType>::IntBlockMap& column = A.blockCols()[c];
+          for (typename SparseBlockMatrix<MatrixType>::IntBlockMap::const_iterator it = column.begin(); it != column.end(); ++it) {
+            int rowBaseOfBlock = A.rowBaseOfBlock(it->first);
             const MatrixType& m = *(it->second);
             for (int cc = 0; cc < m.cols(); ++cc) {
-              int aux_c = A.colBaseOfBlock(c) + cc;
+              int aux_c = colBaseOfBlock + cc;
               for (int rr = 0; rr < m.rows(); ++rr) {
-                int aux_r = A.rowBaseOfBlock(r) + rr;
+                int aux_r = rowBaseOfBlock + rr;
                 if (aux_r > aux_c)
                   break;
                 triplets.push_back(Triplet(aux_r, aux_c, m(rr, cc)));

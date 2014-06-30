@@ -100,9 +100,17 @@ namespace g2o {
 
   void OptimizationAlgorithmFactory::listSolvers(std::ostream& os) const
   {
+    size_t solverNameColumnLength = 0;
+    for (CreatorList::const_iterator it = _creator.begin(); it != _creator.end(); ++it)
+      solverNameColumnLength = std::max(solverNameColumnLength, (*it)->property().name.size());
+    solverNameColumnLength += 4;
+
     for (CreatorList::const_iterator it = _creator.begin(); it != _creator.end(); ++it) {
       const OptimizationAlgorithmProperty& sp = (*it)->property();
-      os << sp.name << "\t " << sp.desc << endl;
+      os << sp.name;
+      for (size_t i = sp.name.size(); i < solverNameColumnLength; ++i)
+        os << ' ';
+      os << sp.desc << endl;
     }
   }
 

@@ -77,7 +77,7 @@ namespace g2o {
     if (!DrawAction::refreshPropertyPtrs(params_))
       return false;
     if (_previousParams){
-      _textSize = _previousParams->makeProperty<IntProperty>(_typeName + "::TEXT_SIZE", 1);
+      _textSize = _previousParams->makeProperty<DoubleProperty>(_typeName + "::TEXT_SIZE", 1);
     } else {
       _textSize = 0;
     }
@@ -98,9 +98,9 @@ namespace g2o {
     glPushMatrix();
     glColor3f(1.f,0.2f,1.f);
     glTranslatef(that->position().x(), that->position().y(), that->position().z());
-    int textSize = 1;
+    float textSize = 1;
     if (_textSize )
-      textSize = _textSize->value();
+      textSize = (float)_textSize->value();
     opengl::drawBox(0.1f*textSize, 0.1f*textSize, 0.1f*textSize);
     glTranslatef(0.2f*textSize, 0.f, 0.f);
     glScalef(0.003f*textSize,0.003f*textSize,1.f);

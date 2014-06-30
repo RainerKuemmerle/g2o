@@ -44,6 +44,7 @@ namespace g2o {
       {
         public:
           friend class CacheContainer;
+          CacheKey();
           CacheKey(const std::string& type_, const ParameterVector& parameters_);
 
           bool operator<(const CacheKey& c) const;

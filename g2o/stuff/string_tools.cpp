@@ -37,7 +37,7 @@
 #include <iostream>
 #include <iterator>
 
-#if (defined UNIX) || (defined CYGWIN)
+#if (defined (UNIX) || defined(CYGWIN)) && !defined(ANDROID)
 #include <wordexp.h>
 #endif
 
@@ -123,8 +123,7 @@ int strPrintf(std::string& str, const char* fmt, ...)
 
 std::string strExpandFilename(const std::string& filename)
 {
-
-  #if (defined UNIX) || (defined CYGWIN)
+#if (defined (UNIX) || defined(CYGWIN)) && !defined(ANDROID)
   string result = filename;
   wordexp_t p;
 
@@ -134,14 +133,11 @@ std::string strExpandFilename(const std::string& filename)
   }
   wordfree(&p);
   return result;
-  #endif
-
-  #ifdef WINDOWS
+#else
   (void) filename;
   std::cerr << "WARNING: " << __PRETTY_FUNCTION__ << " not implemented" << std::endl;
   return std::string();
-  #endif
-
+#endif
 }
 
 std::vector<std::string> strSplit(const std::string& str, const std::string& delimiters)

@@ -6,6 +6,7 @@ ADD_LIBRARY(stuff ${G2O_LIB_TYPE}
   filesys_tools.cpp  os_specific.h    string_tools.cpp
   property.cpp       property.h       
   sampler.cpp        sampler.h        unscented.h
+  tictoc.cpp tictoc.h
   g2o_stuff_api.h
 )
 
@@ -31,7 +32,7 @@ IF(OPENGL_FOUND)
   SET_TARGET_PROPERTIES(opengl_helper PROPERTIES OUTPUT_NAME ${LIB_PREFIX}opengl_helper)
 ENDIF()
 
-IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux" AND NOT ANDROID)
   TARGET_LINK_LIBRARIES(stuff rt)
 ENDIF()
 

@@ -41,6 +41,9 @@ namespace g2o {
   class G2O_INTERACTIVE_API G2oSlamInterface : public SlamParser::AbstractSlamInterface
   {
     public:
+      enum SolveResult { SOLVED, SOLVED_BATCH, NOOP, ERROR };
+
+    public:
       G2oSlamInterface(SparseOptimizerOnline* optimizer);
 
       bool addNode(const std::string& tag, int id, int dimension, const std::vector<double>& values);
@@ -53,8 +56,13 @@ namespace g2o {
 
       bool solveState();
 
+      SolveResult solve();
+
       int updatedGraphEachN() const { return _updateGraphEachN;}
       void setUpdateGraphEachN(int n);
+
+      int batchSolveEachN() const { return _batchEveryN;}
+      void setBatchSolveEachN(int n);
 
     protected:
       SparseOptimizerOnline* _optimizer;

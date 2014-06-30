@@ -491,6 +491,13 @@ std::string CommandArgs::arg2str(const CommandArgument& ca) const
         auxStream << (*data);
         return auxStream.str();
       }
+    case CAT_VECTOR_DOUBLE:
+      {
+        std::vector<double> * data = static_cast< std::vector<double> * >(ca.data);
+        stringstream auxStream;
+        auxStream << (*data);
+        return auxStream.str();
+      }
   }
   return "";
 }
@@ -536,6 +543,17 @@ std::ostream& operator<<(std::ostream& os, const std::vector<double>& v)
   for (size_t i=1; i<v.size(); i++)
     os << ";" << v[i];
   return os;
+}
+
+bool CommandArgs::parsedParam(const std::string& param) const
+{
+  std::vector<CommandArgument>::const_iterator it = _args.begin();
+  for ( ; it != _args.end(); ++it) {
+    if (it->name == param) {
+      return it->parsed;
+    }
+  }
+  return false;
 }
 
 } // end namespace g2o

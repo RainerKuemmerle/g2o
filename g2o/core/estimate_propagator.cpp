@@ -134,6 +134,8 @@ namespace g2o {
         OptimizableGraph::VertexSet initializedVertices;
         for (size_t i = 0; i < edge->vertices().size(); ++i) {
           OptimizableGraph::Vertex* z = static_cast<OptimizableGraph::Vertex*>(edge->vertex(i));
+	  if (! z)
+	    continue;
           AdjacencyMap::iterator ot = _adjacencyMap.find(z);
           if (ot->second._distance != numeric_limits<double>::max()) {
             initializedVertices.insert(z);
@@ -144,9 +146,10 @@ namespace g2o {
 
         for (size_t i = 0; i < edge->vertices().size(); ++i) {
           OptimizableGraph::Vertex* z = static_cast<OptimizableGraph::Vertex*>(edge->vertex(i));
+	  if (! z)
+	    continue;
           if (z == u)
             continue;
-
           size_t wasInitialized = initializedVertices.erase(z);
 
           double edgeDistance = cost(edge, initializedVertices, z);
@@ -229,6 +232,39 @@ namespace g2o {
     entry->queueIt = end();
     entry->inQueue = false;
     return entry;
+  }
+
+  EstimatePropagatorCost::EstimatePropagatorCost (SparseOptimizer* graph) :
+    _graph(graph)
+  {
+  }
+
+  double EstimatePropagatorCost::operator()(OptimizableGraph::Edge* edge, const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to_) const
+  {
+    OptimizableGraph::Edge* e = dynamic_cast<OptimizableGraph::Edge*>(edge);
+    OptimizableGraph::Vertex* to = dynamic_cast<OptimizableGraph::Vertex*>(to_);
+    SparseOptimizer::EdgeContainer::const_iterator it = _graph->findActiveEdge(e);
+    if (it == _graph->activeEdges().end()) // it has to be an active edge
+      return std::numeric_limits<double>::max();
+    return e->initialEstimatePossible(from, to);
+  }
+
+  EstimatePropagatorCostOdometry::EstimatePropagatorCostOdometry(SparseOptimizer* graph) :
+    EstimatePropagatorCost(graph)
+  {
+  }
+
+  double EstimatePropagatorCostOdometry::operator()(OptimizableGraph::Edge* edge, const OptimizableGraph::VertexSet& from_, OptimizableGraph::Vertex* to_) const
+  {
+    OptimizableGraph::Edge* e = dynamic_cast<OptimizableGraph::Edge*>(edge);
+    OptimizableGraph::Vertex* from = dynamic_cast<OptimizableGraph::Vertex*>(*from_.begin());
+    OptimizableGraph::Vertex* to = dynamic_cast<OptimizableGraph::Vertex*>(to_);
+    if (std::abs(from->id() - to->id()) != 1) // simple method to identify odometry edges in a pose graph
+      return std::numeric_limits<double>::max();
+    SparseOptimizer::EdgeContainer::const_iterator it = _graph->findActiveEdge(e);
+    if (it == _graph->activeEdges().end()) // it has to be an active edge
+      return std::numeric_limits<double>::max();
+    return e->initialEstimatePossible(from_, to);
   }
 
 } // end namespace

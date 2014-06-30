@@ -23,10 +23,14 @@ namespace g2o {
       double gainThreshold() const { return _gainThreshold;}
       void setGainThreshold(double gainThreshold);
 
+      int maxIterations() const { return _maxIterations;}
+      void setMaxIterations(int maxit);
+
     protected:
       double _gainThreshold;
       double _lastChi;
       bool _auxTerminateFlag;
+      int _maxIterations;
   };
 
 } // end namespace

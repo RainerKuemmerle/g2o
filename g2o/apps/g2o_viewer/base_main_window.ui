@@ -74,6 +74,19 @@
         </widget>
        </item>
        <item>
+        <widget class="QCheckBox" name="cbOnlyLoop">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="toolTip">
+          <string>Only apply the robust kernel for loop closures</string>
+         </property>
+         <property name="text">
+          <string>Non Sequential</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QComboBox" name="coRobustKernel">
          <property name="enabled">
           <bool>false</bool>
@@ -137,9 +150,33 @@
         </spacer>
        </item>
        <item>
+        <widget class="QComboBox" name="cbxIniitialGuessMethod">
+         <property name="toolTip">
+          <string>Which method is applied to compute the initial guess</string>
+         </property>
+         <item>
+          <property name="text">
+           <string>Spanning Tree</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Odometry</string>
+          </property>
+         </item>
+        </widget>
+       </item>
+       <item>
         <widget class="QPushButton" name="btnInitialGuess">
          <property name="text">
           <string>Initial Guess</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="btnSetZero">
+         <property name="text">
+          <string>SetZero</string>
          </property>
         </widget>
        </item>
@@ -327,8 +364,8 @@
      <y>142</y>
     </hint>
     <hint type="destinationlabel">
-     <x>125</x>
-     <y>194</y>
+     <x>144</x>
+     <y>233</y>
     </hint>
    </hints>
   </connection>
@@ -343,8 +380,8 @@
      <y>142</y>
     </hint>
     <hint type="destinationlabel">
-     <x>147</x>
-     <y>225</y>
+     <x>148</x>
+     <y>266</y>
     </hint>
    </hints>
   </connection>
@@ -355,8 +392,8 @@
    <slot>close()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>82</x>
-     <y>458</y>
+     <x>101</x>
+     <y>541</y>
     </hint>
     <hint type="destinationlabel">
      <x>5</x>
@@ -375,8 +412,24 @@
      <y>133</y>
     </hint>
     <hint type="destinationlabel">
-     <x>37</x>
-     <y>162</y>
+     <x>56</x>
+     <y>210</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cbRobustKernel</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>cbOnlyLoop</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>103</x>
+     <y>141</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>101</x>
+     <y>160</y>
     </hint>
    </hints>
   </connection>

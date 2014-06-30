@@ -112,10 +112,25 @@ void RobustKernelSaturated::robustify(double e2, Eigen::Vector3d& rho) const
   }
 }
 
+//delta is used as $phi$
+void RobustKernelDCS::robustify(double e2, Eigen::Vector3d& rho) const
+{
+  const double& phi = _delta;
+  double scale = (2.0*phi)/(phi+e2);
+  if(scale>=1.0)
+    scale = 1.0;
+
+  rho[0] = scale*e2*scale;
+  rho[1] = (scale*scale);
+  rho[2] = 0;    
+}
+
+
 // register the kernel to their factory
 G2O_REGISTER_ROBUST_KERNEL(Huber, RobustKernelHuber)
 G2O_REGISTER_ROBUST_KERNEL(PseudoHuber, RobustKernelPseudoHuber)
 G2O_REGISTER_ROBUST_KERNEL(Cauchy, RobustKernelCauchy)
 G2O_REGISTER_ROBUST_KERNEL(Saturated, RobustKernelSaturated)
+G2O_REGISTER_ROBUST_KERNEL(DCS, RobustKernelDCS)
 
 } // end namespace g2o

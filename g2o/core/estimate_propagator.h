@@ -29,6 +29,7 @@
 
 #include "optimizable_graph.h"
 #include "sparse_optimizer.h"
+#include "g2o_core_api.h"
 
 #include <map>
 #include <set>
@@ -43,9 +44,36 @@
 namespace g2o {
 
   /**
+   * \brief cost for traversing along active edges in the optimizer
+   *
+   * You may derive an own one, if necessary. The default is to return initialEstimatePossible(from, to) for the edge.
+   */
+  class G2O_CORE_API EstimatePropagatorCost {
+    public:
+      EstimatePropagatorCost (SparseOptimizer* graph);
+      virtual double operator()(OptimizableGraph::Edge* edge, const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to_) const;
+      virtual const char* name() const { return "spanning tree";}
+    protected:
+      SparseOptimizer* _graph;
+  };
+
+  /**
+   * \brief cost for traversing only odometry edges.
+   *
+   * Initialize your graph along odometry edges. An odometry edge is assumed to connect vertices
+   * whose IDs only differs by one.
+   */
+  class G2O_CORE_API EstimatePropagatorCostOdometry : public EstimatePropagatorCost {
+    public:
+      EstimatePropagatorCostOdometry(SparseOptimizer* graph);
+      virtual double operator()(OptimizableGraph::Edge* edge, const OptimizableGraph::VertexSet& from_, OptimizableGraph::Vertex* to_) const;
+      virtual const char* name() const { return "odometry";}
+  };
+
+  /**
    * \brief propagation of an initial guess
    */
-  class EstimatePropagator {
+  class G2O_CORE_API EstimatePropagator {
     public:
 
       /**
@@ -61,26 +89,7 @@ namespace g2o {
         }
       };
 
-      /**
-       * \brief cost for traversing along active edges in the optimizer
-       *
-       * You may derive an own one, if necessary. The default is to return initialEstimatePossible(from, to) for the edge.
-       */
-      class PropagateCost {
-        public:
-          PropagateCost(SparseOptimizer* graph) : _graph(graph) {}
-          virtual double operator()(OptimizableGraph::Edge* edge, const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to_) const
-          {
-            OptimizableGraph::Edge* e = dynamic_cast<OptimizableGraph::Edge*>(edge);
-            OptimizableGraph::Vertex* to = dynamic_cast<OptimizableGraph::Vertex*>(to_);
-            SparseOptimizer::EdgeContainer::const_iterator it = _graph->findActiveEdge(e);
-            if (it == _graph->activeEdges().end()) // it has to be an active edge
-              return std::numeric_limits<double>::max();
-            return e->initialEstimatePossible(from, to);
-          }
-        protected:
-          SparseOptimizer* _graph;
-      };
+      typedef EstimatePropagatorCost PropagateCost;
 
       class AdjacencyMapEntry;
 

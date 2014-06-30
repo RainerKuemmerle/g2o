@@ -168,7 +168,7 @@ the measurement in the indices of the error function:
 \begin{equation}
 \be_k(\bx_k, \bz_{k}) \; \defeq \; \be_{k}(\bx_k) \; \defeq \; \be_{k}(\bx).
 \end{equation}
-Note that each error function and each parameter block and each error
+Note that each parameter block and each error
 function can span over a different space.  A problem in this form can
 be effectively represented by a directed hyper-graph. A node $i$ of
 the graph represents the parameter block $\bx_i \in \bx_k$ and an
@@ -612,7 +612,7 @@ These classes are \verb+BaseVertex+ and \verb+BaseUnaryEdge+,
 \item \verb+BaseBinaryEdge+ is a template class that models a binary
   constraint, namely an error function in the form $\be_k(\bx_{k_1},
   \bx_{k_2})$. It offers the same facilities of \verb+BaseUnaryEdge+, and it
-  requires to specify the following things template parameters: the type of the nodes
+  requires to specify the following template parameters: the type of the nodes
   $\bx_{k_1}$ and $\bx_{k_2}$  and the  type and the dimension of the measurement. 
   Again, it implements the numeric Jacobians via
   a default implementation of the \verb+linearizeOplus+ method.
@@ -757,7 +757,7 @@ main diagonal of $\bH$.
 
 \subsection{Solvers}
 A central component of these least-squares approaches is the solution
-of the linear system $\tilde \bH \, \bTDeltax^* = - \tilde \bb$ . To
+of the linear system $\tilde \bH \, \bTDeltax^* = - \tilde \bb$. To
 this end there are several approaches available, some of them exploit
 the known structure of certain problems and perform intermediate
 reductions of the system, like by applying the Schur complement to a
@@ -815,7 +815,7 @@ functions, one for each of the functionality we want to support.  This
 is of course not elegant, because we would need to patch the base
 classes with the new function every time something new is added.
 Another possibility would be to make use of the multiple inheritance
-of c++, and to define an abstract ``drawable'' object, on which the a
+of C++, and to define an abstract ``drawable'' object, on which the
 viewer operates.  This solution is a bit better, however we cannot
 have more than one ``drawing'' function for each object.
 
@@ -838,7 +838,7 @@ tools, namely a command line interface and a graphical user interface.
 
 \subsection{\gopt\ Command Line Interface}
 
-\verb+g2o_cli+ is the command line interface included in \gopt. It
+\verb+g2o+ is the command line interface included in \gopt. It
 allows to optimize graphs stored in files and save the result back to a
 file. This allows a fast prototyping of optimization problems, as it is
 only required to implement the new types or solvers. The \gopt\
@@ -858,6 +858,20 @@ which \verb+g2o_cli+ can be applied.
 The Graphical User Interface depicted in Figure~\ref{fig:viewer} allows
 to visualize the optimization problem. Additionally, the various
 parameters of the algorithms can be controlled.
+
+\subsection{\gopt{} incremental}
+
+\gopt{} includes an experimental binary for performing optimization in
+an incremental fashion, i.e., optimizing after inserting one or several
+nodes along with their measurements. In this case, \gopt{} performs
+ranke updates on the Hessian matrix to update the linear system. Please
+see the \verb+README+ in the \verb+g2o_incremental+ sub-folder for
+additional information.
+
+Example for the Manhattan3500 dataset:
+\begin{verbatim}
+g2o_incremental -i manhattanOlson3500.g2o
+\end{verbatim}
 
 \subsection{Plug-in Architecture}
 
@@ -1020,7 +1034,7 @@ robot poses are modeled by the constraints $\bz^\mathrm{s}_*$.}
 Two subsequent robot positions $\bx^\mathrm{s}_t$ and
 $\bx^\mathrm{s}_{t+1}$ are related by an odometry measurement, that
 represent the relative motion that brings the robot from
-$\bx^\mathrm{s}_t$ to $\bx^\mathrm{s}_{t+1}t$ \emph{measured} by the
+$\bx^\mathrm{s}_t$ to $\bx^\mathrm{s}_{t+1}$ \emph{measured} by the
 odometry. This measurement will be typically slightly different from
 the \emph{real} transformation between the two pose because of the
 noise affecting the sensors.  Being an odometry measurement an

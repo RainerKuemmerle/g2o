@@ -34,6 +34,7 @@ class G2O_INCREMENTAL_API LinearSolverCholmodOnlineInterface
     virtual int choleskyUpdate(cholmod_sparse* update) = 0;
     virtual bool solve(double* x, double* b) = 0;
     virtual cholmod_factor* L() const = 0;
+    virtual size_t nonZerosInL() const = 0;
     VectorXi* cmember;
     int batchEveryN;
 };
@@ -117,6 +118,19 @@ class LinearSolverCholmodOnline : public LinearSolver<MatrixType>, public Linear
     bool blockOrdering() const { return true;}
 
     cholmod_factor* L() const { return _cholmodFactor;}
+
+    /**
+     * return the number of non-zeros in the current factorization
+     */
+    size_t nonZerosInL() const {
+      size_t nnz= 0;
+      int* nz = (int*)_cholmodFactor->nz;
+      if (! nz)
+        return 0;
+      for (size_t i = 0; i < _cholmodFactor->n; ++i)
+        nnz += nz[i];
+      return nnz;
+    }
 
     int choleskyUpdate(cholmod_sparse* update)
     {

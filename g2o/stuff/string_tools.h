@@ -79,7 +79,7 @@ OutputIterator readInts(const char* str, OutputIterator out)
   char* cl  = (char*)str;
   char* cle = cl;
   while (1) {
-    int id = strtol(cl, &cle, 10);
+    long int id = strtol(cl, &cle, 10);
     if (cl == cle)
       break;
     *out++ = id;

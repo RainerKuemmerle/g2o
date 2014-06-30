@@ -3,6 +3,7 @@
 FIND_PATH(G2O_INCLUDE_DIR g2o/core/base_vertex.h
   ${G2O_ROOT}/include
   $ENV{G2O_ROOT}/include
+  $ENV{G2O_ROOT}
   /usr/local/include
   /usr/include
   /opt/local/include

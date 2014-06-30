@@ -29,3 +29,6 @@
 
 #include "robot_laser.h"
 #include "vertex_tag.h"
+#include "vertex_ellipse.h"
+
+#endif

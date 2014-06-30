@@ -86,6 +86,7 @@ namespace g2o {
     // core part of the Levenbarg algorithm
     if (iteration == 0) {
       _currentLambda = computeLambdaInit();
+      _ni = 2;
     }
 
     double rho=0;
@@ -98,7 +99,7 @@ namespace g2o {
         t=get_monotonic_time();
       }
       // update the diagonal of the system matrix
-      _solver->setLambda(_currentLambda);
+      _solver->setLambda(_currentLambda, true);
       bool ok2 = _solver->solve();
       if (globalStats) {
         globalStats->timeLinearSolution+=get_monotonic_time()-t;
@@ -110,7 +111,7 @@ namespace g2o {
       }
 
       // restore the diagonal
-      _solver->setLambda(- _currentLambda);
+      _solver->restoreDiagonal();
 
       _optimizer->computeActiveErrors();
       tempChi = _optimizer->activeRobustChi2();
@@ -155,7 +156,7 @@ namespace g2o {
       assert(v);
       int dim = v->dimension();
       for (int j = 0; j < dim; ++j){
-        maxDiagonal = std::max(fabs(v->hessian(j,j)),maxDiagonal); 
+        maxDiagonal = std::max(fabs(v->hessian(j,j)),maxDiagonal);
       }
     }
     return _tau*maxDiagonal;

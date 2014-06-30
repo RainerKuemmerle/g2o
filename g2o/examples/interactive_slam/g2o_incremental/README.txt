@@ -16,4 +16,7 @@ This behavior can be modified via a command line option. Furthermore, by
 specifying -g on the command line a gnuplot instance is created to visualize
 the graph.
 
+Please note that both the visualization via Gnuplot and the verbose output
+affect the timing results.
+
 g2o_incremental is licensed under GPLv3.

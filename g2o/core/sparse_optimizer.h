@@ -41,6 +41,7 @@ namespace g2o {
   // forward declaration
   class ActivePathCostFunction;
   class OptimizationAlgorithm;
+  class EstimatePropagatorCost;
 
   class G2O_CORE_API SparseOptimizer : public OptimizableGraph {
 
@@ -62,7 +63,7 @@ namespace g2o {
     /**
      * Initializes the structures for optimizing a portion of the graph specified by a subset of edges.
      * Before calling it be sure to invoke marginalized() and fixed() to the vertices you want to include in the 
-     * schurr complement or to set as fixed during the optimization.
+     * schur complement or to set as fixed during the optimization.
      * @param eset: the subgraph to be optimized.
      * @returns false if somethings goes wrong
      */
@@ -71,7 +72,7 @@ namespace g2o {
     /**
      * Initializes the structures for optimizing a portion of the graph specified by a subset of vertices.
      * Before calling it be sure to invoke marginalized() and fixed() to the vertices you want to include in the 
-     * schurr complement or to set as fixed during the optimization.
+     * schur complement or to set as fixed during the optimization.
      * @param vset: the subgraph to be optimized.
      * @param level: is the level (in multilevel optimization)
      * @returns false if somethings goes wrong
@@ -81,7 +82,7 @@ namespace g2o {
     /**
      * Initializes the structures for optimizing the whole graph.
      * Before calling it be sure to invoke marginalized() and fixed() to the vertices you want to include in the 
-     * schurr complement or to set as fixed during the optimization.
+     * schur complement or to set as fixed during the optimization.
      * @param level: is the level (in multilevel optimization)
      * @returns false if somethings goes wrong
      */
@@ -101,6 +102,16 @@ namespace g2o {
      * @patam maxDistance: the distance where to stop the search
      */
     virtual void computeInitialGuess();
+
+    /**
+     * Same as above but using a specific propagator
+     */
+    virtual void computeInitialGuess(EstimatePropagatorCost& propagator);
+
+    /**
+     * sets all vertices to their origin.
+     */
+    virtual void setToOrigin();
 
 
     /**
@@ -190,7 +201,7 @@ namespace g2o {
      * mapping is erased. In case you need the index mapping for manipulating the
      * graph, you have to store it in your own copy.
      */
-    virtual bool removeVertex(HyperGraph::Vertex* v);
+    virtual bool removeVertex(HyperGraph::Vertex* v, bool detach=false);
 
     /**
      * search for an edge in _activeVertices and return the iterator pointing to it
@@ -229,6 +240,8 @@ namespace g2o {
 
     /**
      * clears the graph, and polishes some intermediate structures
+     * Note that this only removes nodes / edges. Parameters can be removed
+     * with clearParameters().
      */
     virtual void clear();
 

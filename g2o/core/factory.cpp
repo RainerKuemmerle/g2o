@@ -89,7 +89,7 @@ void Factory::registerType(const std::string& tag, AbstractHyperGraphElementCrea
 #ifdef G2O_DEBUG_FACTORY
   cerr << "# Factory " << (void*)this << " constructing type " << tag << " ";
 #endif
-  // construct an element once to figur out its type
+  // construct an element once to figure out its type
   HyperGraph::HyperGraphElement* element = c->construct();
   ci->elementTypeBit = element->elementType();
 

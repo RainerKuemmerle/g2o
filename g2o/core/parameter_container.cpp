@@ -74,6 +74,13 @@ namespace g2o {
     return it->second;
   }
 
+  const Parameter* ParameterContainer::getParameter(int id) const {
+    const_iterator it=find(id);
+    if (it==end())
+      return 0;
+    return it->second;
+  }
+
   Parameter* ParameterContainer::detachParameter(int id){
     iterator it=find(id);
     if (it==end())

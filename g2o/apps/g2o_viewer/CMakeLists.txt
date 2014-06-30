@@ -13,6 +13,7 @@ ADD_LIBRARY(viewer_library ${G2O_LIB_TYPE}
   gui_hyper_graph_action.cpp gui_hyper_graph_action.h
   properties_widget.cpp properties_widget.h
   viewer_properties_widget.cpp viewer_properties_widget.h
+  run_g2o_viewer.cpp run_g2o_viewer.h
   ${UI_HEADERS} ${UI_SOURCES}
 )
 SET_TARGET_PROPERTIES(viewer_library PROPERTIES OUTPUT_NAME ${LIB_PREFIX}viewer)
@@ -27,13 +28,7 @@ TARGET_LINK_LIBRARIES(viewer_library core g2o_cli_library ${QGLVIEWER_LIBRARY} $
 TARGET_LINK_LIBRARIES(viewer_library core opengl_helper)
 TARGET_LINK_LIBRARIES(g2o_viewer viewer_library)
 
-INSTALL(TARGETS g2o_viewer
-  RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/bin
-  LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX}/lib
-  ARCHIVE DESTINATION ${CMAKE_INSTALL_PREFIX}/lib
-)
-
-INSTALL(TARGETS viewer_library
+INSTALL(TARGETS g2o_viewer viewer_library
   RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/bin
   LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX}/lib
   ARCHIVE DESTINATION ${CMAKE_INSTALL_PREFIX}/lib

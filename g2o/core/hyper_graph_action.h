@@ -43,6 +43,7 @@
 
 namespace g2o {
 
+  class CacheContainer;
   /**
    * \brief Abstract action that operates on an entire graph
    */
@@ -185,9 +186,13 @@ namespace g2o {
     DrawAction(const std::string& typeName_);
   protected:
     virtual bool refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_);
+    void initializeDrawActionsCache() ;
+    void drawCache(CacheContainer* caches, HyperGraphElementAction::Parameters* params_);
+    void drawUserData(HyperGraph::Data* data, HyperGraphElementAction::Parameters* params_);
     Parameters* _previousParams;
     BoolProperty* _show;
     BoolProperty* _showId;
+    HyperGraphElementAction* _cacheDrawActions;
   };
 
   template<typename T> class RegisterActionProxy

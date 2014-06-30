@@ -61,9 +61,15 @@ if (EIGEN3_INCLUDE_DIR)
 
 else (EIGEN3_INCLUDE_DIR)
 
+  # specific additional paths for some OS
+  if (WIN32)
+    set(EIGEN_ADDITIONAL_SEARCH_PATHS ${EIGEN_ADDITIONAL_SEARCH_PATHS} "C:/Program Files/Eigen/include" "C:/Program Files (x86)/Eigen/include")
+  endif(WIN32)
+
   find_path(EIGEN3_INCLUDE_DIR NAMES signature_of_eigen3_matrix_library
       PATHS
       ${CMAKE_INSTALL_PREFIX}/include
+      ${EIGEN_ADDITIONAL_SEARCH_PATHS}
       ${KDE4_INCLUDE_DIR}
       PATH_SUFFIXES eigen3 eigen
     )

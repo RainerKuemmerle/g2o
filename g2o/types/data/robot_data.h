@@ -38,7 +38,7 @@ namespace g2o {
   /**
    * \brief data recorded by the robot
    */
-  class G2O_TYPES_DATA_API RobotData : public OptimizableGraph::Data
+  class G2O_TYPES_DATA_API RobotData : public HyperGraph::Data
   {
     public:
       RobotData();

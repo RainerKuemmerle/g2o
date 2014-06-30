@@ -126,7 +126,8 @@ namespace g2o {
       virtual bool buildSystem();
       virtual bool solve();
       virtual bool computeMarginals(SparseBlockMatrix<MatrixXd>& spinv, const std::vector<std::pair<int, int> >& blockIndices);
-      virtual bool setLambda(double lambda);
+      virtual bool setLambda(double lambda, bool backup = false);
+      virtual void restoreDiagonal();
       virtual bool supportsSchur() {return true;}
       virtual bool schur() { return _doSchur;}
       virtual void setSchur(bool s) { _doSchur = s;}
@@ -157,6 +158,9 @@ namespace g2o {
       SparseBlockMatrixCCS<PoseMatrixType>* _HschurTransposedCCS;
 
       LinearSolver<PoseMatrixType>* _linearSolver;
+
+      std::vector<PoseVectorType, Eigen::aligned_allocator<PoseVectorType> > _diagonalBackupPose;
+      std::vector<LandmarkVectorType, Eigen::aligned_allocator<LandmarkVectorType> > _diagonalBackupLandmark;
 
 #    ifdef G2O_OPENMP
       std::vector<OpenMPMutex> _coefficientsMutex;

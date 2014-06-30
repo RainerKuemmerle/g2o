@@ -64,12 +64,12 @@ namespace g2o {
       return false;
 
     Vector7d meas;
-    for (int i=0; i<7; i++) 
+    for (int i=0; i<7; i++)
       is >> meas[i];
     // normalize the quaternion to recover numerical precision lost by storing as human readable text
     Vector4d::MapType(meas.data()+3).normalize();
     setMeasurement(internal::fromVectorQT(meas));
-    
+
     if (is.bad()) {
       return false;
     }
@@ -82,12 +82,11 @@ namespace g2o {
     if (is.bad()) {
       //  we overwrite the information matrix with the Identity
       information().setIdentity();
-    } 
+    }
     return true;
   }
 
   bool EdgeSE3Offset::write(std::ostream& os) const {
-    os << _offsetFrom->id() << " " << _offsetTo->id() << " ";
     Vector7d meas=internal::toVectorQT(_measurement);
     for (int i=0; i<7; i++) os  << meas[i] << " ";
     for (int i=0; i<information().rows(); i++)
@@ -134,7 +133,7 @@ namespace g2o {
     VertexSE3 *to   = static_cast<VertexSE3*>(_vertices[1]);
 
     Eigen::Isometry3d virtualMeasurement = _cacheFrom->offsetParam()->offset() * measurement() * _cacheTo->offsetParam()->offset().inverse();
-    
+
     if (from_.count(from) > 0) {
       to->setEstimate(from->estimate() * virtualMeasurement);
     } else

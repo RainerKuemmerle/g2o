@@ -1,16 +1,16 @@
 // g2o - General Graph Optimization
 // Copyright (C) 2011 R. Kuemmerle, G. Grisetti, W. Burgard
-// 
+//
 // g2o is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published
 // by the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // g2o is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU Lesser General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
@@ -40,6 +40,10 @@ namespace g2o {
   G2O_REGISTER_TYPE(EDGE_PROJECT_DISPARITY, EdgeSE3PointXYZDisparity);
   G2O_REGISTER_TYPE(EDGE_PROJECT_DEPTH, EdgeSE3PointXYZDepth);
 
+  G2O_REGISTER_TYPE(EDGE_POINTXYZ, EdgePointXYZ);
+
+  G2O_REGISTER_TYPE(EDGE_SE3_LOTSOF_XYZ, EdgeSE3LotsOfXYZ)
+
   /*********** ACTIONS ************/
   G2O_REGISTER_ACTION(VertexSE3WriteGnuplotAction);
   G2O_REGISTER_ACTION(VertexPointXYZWriteGnuplotAction);
@@ -50,7 +54,9 @@ namespace g2o {
   G2O_REGISTER_ACTION(VertexSE3DrawAction);
   G2O_REGISTER_ACTION(EdgeSE3DrawAction);
   G2O_REGISTER_ACTION(EdgeSE3PointXYZDrawAction);
+  G2O_REGISTER_ACTION(EdgeProjectDisparityDrawAction);
   G2O_REGISTER_ACTION(CacheCameraDrawAction);
+  G2O_REGISTER_ACTION(CacheSE3OffsetDrawAction);
 #endif
 
 } // end namespace

@@ -22,13 +22,9 @@
 #include <cmath>
 
 #ifdef __APPLE__
-#include <OpenGL/glu.h>
-#endif
-#ifdef _WINDOWS
-#include <gl/GLU.h>
-#endif
-#ifdef UNIX
-#include <GL/glu.h>
+# include <OpenGL/glu.h>
+#else
+# include <GL/glu.h>
 #endif
 
 namespace g2o {
@@ -221,8 +217,8 @@ void drawPyramid(GLfloat length, GLfloat height)
   glPushMatrix();
   glTranslatef(0.f, 0.f, - height/2.0f);
   glRotatef(45, 0.f, 0.f, 1.f);
-  gluCylinder(GLUWrapper::getQuadradic(), length, 0.f, height, 32, 1);
-  gluDisk(GLUWrapper::getQuadradic(), 0, length, 32, 1);
+  gluCylinder(GLUWrapper::getQuadradic(), length, 0.f, height, 4, 1);
+  gluDisk(GLUWrapper::getQuadradic(), 0, length, 4, 1);
   glPopMatrix();
 }
 
@@ -302,5 +298,11 @@ void drawSlice(GLfloat radius, GLfloat height, GLfloat fov, int slices_per_circl
   glPopMatrix();
 }
 
+  void drawPoint(float pointSize){
+    glPointSize(pointSize);
+    glBegin(GL_POINTS);
+    glVertex3f(0,0,0);
+    glEnd();
+  }
 } // end namespace
 } // end namespace

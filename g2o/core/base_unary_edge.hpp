@@ -29,6 +29,7 @@ void BaseUnaryEdge<D, E, VertexXiType>::resize(size_t size)
 {
   if (size != 1) {
     std::cerr << "WARNING, attempting to resize unary edge " << BaseEdge<D, E>::id() << " to " << size << std::endl;
+    assert(0 && "error resizing unary edge where size != 1");
   }
   BaseEdge<D, E>::resize(size);
 }
@@ -37,6 +38,14 @@ template <int D, typename E, typename VertexXiType>
 bool BaseUnaryEdge<D, E, VertexXiType>::allVerticesFixed() const
 {
   return static_cast<const VertexXiType*> (_vertices[0])->fixed();
+}
+
+template <int D, typename E, typename VertexXiType>
+OptimizableGraph::Vertex* BaseUnaryEdge<D, E, VertexXiType>::createVertex(int i)
+{
+  if (i!=0)
+    return 0;
+  return new VertexXiType();
 }
 
 template <int D, typename E, typename VertexXiType>

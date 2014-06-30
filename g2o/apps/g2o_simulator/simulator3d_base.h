@@ -28,6 +28,7 @@
 #define G2O_SIMULATOR3D_BASE_H_
 
 #include "g2o/types/slam3d/types_slam3d.h"
+#include "g2o/types/slam3d_addons/types_slam3d_addons.h"
 #include "simulator.h"
 
 namespace g2o {
@@ -35,6 +36,8 @@ namespace g2o {
   typedef WorldObject<VertexSE3> WorldObjectSE3;
 
   typedef WorldObject<VertexPointXYZ> WorldObjectTrackXYZ;
+
+  typedef WorldObject<VertexLine3D> WorldObjectLine3D;
 
   typedef Robot<WorldObjectSE3>  Robot3D;
 

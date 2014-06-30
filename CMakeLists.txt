@@ -56,13 +56,15 @@ IF(APPLE)
 ENDIF(APPLE)
 
 # Set the output directory for the build executables and libraries
-SET(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${g2o_SOURCE_DIR}/lib)
-SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${g2o_SOURCE_DIR}/bin)
+SET(g2o_RUNTIME_OUTPUT_DIRECTORY ${g2o_SOURCE_DIR}/bin CACHE PATH "Target for the binaries")
 IF(WIN32)
-  SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${g2o_SOURCE_DIR}/bin)
+  SET(g2o_LIBRARY_OUTPUT_DIRECTORY ${g2o_SOURCE_DIR}/bin CACHE PATH "Target for the libraries")
 ELSE(WIN32)
-  SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${g2o_SOURCE_DIR}/lib)
+  SET(g2o_LIBRARY_OUTPUT_DIRECTORY ${g2o_SOURCE_DIR}/lib CACHE PATH "Target for the libraries")
 ENDIF(WIN32)
+SET(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${g2o_LIBRARY_OUTPUT_DIRECTORY})
+SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${g2o_LIBRARY_OUTPUT_DIRECTORY})
+SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${g2o_RUNTIME_OUTPUT_DIRECTORY})
 
 # Set search directory for looking for our custom CMake scripts to
 # look for SuiteSparse, QGLViewer, and Eigen3.
@@ -76,23 +78,30 @@ IF(WIN32)
     MESSAGE(STATUS "Compiling with MSVC")
     ADD_DEFINITIONS(-DNOMINMAX)
     ADD_DEFINITIONS(-D_USE_MATH_DEFINES)
+    # SSE2 optimizations
+    ADD_DEFINITIONS("/arch:SSE2")
     IF (BUILD_SHARED_LIBS)
       # disable warning on missing DLL interfaces
       ADD_DEFINITIONS("/wd4251")
-      # SSE2 optimizations
-      ADD_DEFINITIONS("/arch:SSE2")
     ENDIF()
   ENDIF(MSVC)
 ELSEIF(CYGWIN)
   MESSAGE(STATUS "Compiling on Cygwin")
   ADD_DEFINITIONS(-DCYGWIN)
-ELSEIF(UNIX)
-  ADD_DEFINITIONS(-DUNIX)
-  MESSAGE(STATUS "Compiling on Unix")
 ELSEIF(APPLE)
   ADD_DEFINITIONS(-DUNIX)
   MESSAGE(STATUS "Compiling on OSX")
+ELSEIF(UNIX)
+  ADD_DEFINITIONS(-DUNIX)
+  MESSAGE(STATUS "Compiling on Unix")
 ENDIF(WIN32)
+
+# detect Android Cross Compiler
+# based on android-cmake which sets the variable ANDROID for us
+IF(ANDROID)
+  ADD_DEFINITIONS(-DANDROID)
+  MESSAGE(STATUS "Cross compiling for Android")
+ENDIF()
 
 # For building the CHOLMOD / CSPARSE solvers
 FIND_PACKAGE(Cholmod)
@@ -114,6 +123,13 @@ ELSE(CSPARSE_FOUND)
     SET(CSPARSE_FOUND TRUE)
   ENDIF()
 ENDIF(CSPARSE_FOUND)
+OPTION(BUILD_LGPL_SHARED_LIBS "Build LGPL Code as Shared Libraries (LGPL Code)" ON)
+SET (G2O_LGPL_LIB_TYPE STATIC)
+IF (BUILD_LGPL_SHARED_LIBS)
+  SET (G2O_LGPL_LIB_TYPE SHARED)
+ELSE()
+  MESSAGE(STATUS "Building LGPL code as static library (affects license of the binary)")
+ENDIF()
 
 # Eigen library parallelise itself, though, presumably due to performance issues
 # OPENMP is experimental. We experienced some slowdown with it
@@ -145,6 +161,10 @@ IF(G2O_BUILD_APPS)
   MESSAGE(STATUS "Compiling g2o apps")
 ENDIF(G2O_BUILD_APPS)
 
+include(CMakeDependentOption)
+CMAKE_DEPENDENT_OPTION(G2O_BUILD_LINKED_APPS "Build apps linked with the libraries (no plugin system)" OFF
+  "G2O_BUILD_APPS" OFF)
+
 # shall we build the examples
 SET(G2O_BUILD_EXAMPLES ON CACHE BOOL "Build g2o examples")
 IF(G2O_BUILD_EXAMPLES)
@@ -153,11 +173,14 @@ ENDIF(G2O_BUILD_EXAMPLES)
 
 # Compiler specific options for gcc
 IF(CMAKE_COMPILER_IS_GNUCXX)
+  OPTION (BUILD_WITH_MARCH_NATIVE "Build with \"-march native\"" ON)
   MESSAGE(STATUS "Compiling with GCC")
   
-  # Generic settings for optimisation
-  SET(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -msse4") 
-  SET(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -O3 -msse4") 
+  IF(NOT ${ARCH} MATCHES arm)
+    # Generic settings for optimisation
+    SET(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -msse4.2")
+    SET(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -O3 -msse4.2")
+  ENDIF()
   # switch off optimization for debug builds
   SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0")
   SET(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -O0")
@@ -168,10 +191,10 @@ IF(CMAKE_COMPILER_IS_GNUCXX)
     #SET(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE}") 
   #ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
   # Linux
-  IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-    SET(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -march=native") 
-    SET(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -march=native") 
-  ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+  IF(BUILD_WITH_MARCH_NATIVE AND NOT ${ARCH} MATCHES arm AND ${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+    SET(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -march=native")
+    SET(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -march=native")
+  ENDIF()
   # activate warnings !!!
   SET(g2o_C_FLAGS "${g2o_C_FLAGS} -Wall -W")
   SET(g2o_CXX_FLAGS "${g2o_CXX_FLAGS} -Wall -W")
@@ -209,6 +232,7 @@ SET(G2O_OPENGL_FOUND ${OPENGL_FOUND})
 SET(G2O_HAVE_CHOLMOD ${CHOLMOD_FOUND})
 SET(G2O_HAVE_CSPARSE ${CSPARSE_FOUND})
 SET(G2O_SHARED_LIBS ${BUILD_SHARED_LIBS})
+SET(G2O_LGPL_SHARED_LIBS ${BUILD_LGPL_SHARED_LIBS})
 SET(G2O_CXX_COMPILER "${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER}")
 configure_file(config.h.in ${PROJECT_BINARY_DIR}/g2o/config.h)
 include_directories(${PROJECT_BINARY_DIR})

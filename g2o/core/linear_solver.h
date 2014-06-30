@@ -27,6 +27,7 @@
 #ifndef G2O_LINEAR_SOLVER_H
 #define G2O_LINEAR_SOLVER_H
 #include "sparse_block_matrix.h"
+#include "sparse_block_matrix_ccs.h"
 
 namespace g2o {
 
@@ -49,8 +50,9 @@ class LinearSolver
     virtual bool init() = 0;
 
     /**
-     * Assumes that A has the same non-zero pattern over several calls.
-     * If the pattern changes call init() before.
+     * Assumes that A is the same matrix for several calls.
+     * Among other assumptions, the non-zero pattern does not change!
+     * If the matrix changes call init() before.
      * solve system Ax = b, x and b have to allocated beforehand!!
      */
     virtual bool solve(const SparseBlockMatrix<MatrixType>& A, double* x, double* b) = 0;
@@ -76,6 +78,30 @@ class LinearSolver
     //! write a debug dump of the system matrix if it is not PSD in solve
     virtual bool writeDebug() const { return false;}
     virtual void setWriteDebug(bool) {}
+};
+
+/**
+ * \brief Solver with faster iterating structure for the linear matrix
+ */
+template <typename MatrixType>
+class LinearSolverCCS : public LinearSolver<MatrixType>
+{
+  public:
+    LinearSolverCCS() : LinearSolver<MatrixType>(), _ccsMatrix(0) {}
+    ~LinearSolverCCS()
+    {
+      delete _ccsMatrix;
+    }
+
+  protected:
+    SparseBlockMatrixCCS<MatrixType>* _ccsMatrix;
+
+    void initMatrixStructure(const SparseBlockMatrix<MatrixType>& A)
+    {
+      delete _ccsMatrix;
+      _ccsMatrix = new SparseBlockMatrixCCS<MatrixType>(A.rowBlockIndices(), A.colBlockIndices());
+      A.fillSparseBlockMatrixCCS(*_ccsMatrix);
+    }
 };
 
 } // end namespace
