@@ -33,6 +33,7 @@
 namespace g2o {
 
   using namespace std;
+  using namespace Eigen;
 
   G2O_REGISTER_TYPE_GROUP(sba);
 

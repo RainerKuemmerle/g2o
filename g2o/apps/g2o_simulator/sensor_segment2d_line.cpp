@@ -27,6 +27,7 @@
 #include "sensor_segment2d_line.h"
 #include "g2o/apps/g2o_simulator/simutils.h"
 using namespace std;
+using namespace Eigen;
 
 namespace g2o{
 

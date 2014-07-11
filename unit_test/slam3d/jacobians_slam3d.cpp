@@ -1,5 +1,5 @@
 // g2o - General Graph Optimization
-// Copyright (C) 2014 R. Kuemmerle, G. Grisetti, W. Burgard
+// Copyright (C) 2011 R. Kuemmerle, G. Grisetti, W. Burgard
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -35,6 +35,7 @@
 
 using namespace std;
 using namespace g2o;
+using namespace Eigen;
 
 static Eigen::Isometry3d randomIsometry3d()
 {

@@ -35,8 +35,6 @@
 
 namespace g2o {
 
-  using namespace Eigen;
-
 /**
  * \brief 3D pose Vertex, represented as an Isometry3d
  *
@@ -59,20 +57,20 @@ namespace g2o {
       VertexSE3();
 
       virtual void setToOriginImpl() {
-        _estimate = Isometry3d::Identity();
+        _estimate = Eigen::Isometry3d::Identity();
       }
 
       virtual bool read(std::istream& is);
       virtual bool write(std::ostream& os) const;
 
       virtual bool setEstimateDataImpl(const double* est){
-        Map<const Vector7d> v(est);
+        Eigen::Map<const Vector7d> v(est);
         _estimate=internal::fromVectorQT(v);
         return true;
       }
 
       virtual bool getEstimateData(double* est) const{
-        Map<Vector7d> v(est);
+        Eigen::Map<Vector7d> v(est);
         v=internal::toVectorQT(_estimate);
         return true;
       }
@@ -82,13 +80,13 @@ namespace g2o {
       }
 
       virtual bool setMinimalEstimateDataImpl(const double* est){
-        Map<const Vector6d> v(est);
+        Eigen::Map<const Vector6d> v(est);
         _estimate = internal::fromVectorMQT(v);
         return true;
       }
 
       virtual bool getMinimalEstimateData(double* est) const{
-        Map<Vector6d> v(est);
+        Eigen::Map<Vector6d> v(est);
         v = internal::toVectorMQT(_estimate);
         return true;
       }
@@ -106,7 +104,7 @@ namespace g2o {
        */
       virtual void oplusImpl(const double* update)
       {
-        Map<const Vector6d> v(update);
+        Eigen::Map<const Vector6d> v(update);
         Eigen::Isometry3d increment = internal::fromVectorMQT(v);
         _estimate = _estimate * increment;
         if (++_numOplusCalls > orthogonalizeAfter) {

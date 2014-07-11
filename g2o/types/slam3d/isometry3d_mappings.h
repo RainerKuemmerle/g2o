@@ -33,10 +33,9 @@
 #include <Eigen/Geometry>
 
 namespace g2o {
-  using namespace Eigen;
 
-  typedef Matrix<double, 6, 1> Vector6d;
-  typedef Matrix<double, 7, 1> Vector7d;
+  typedef Eigen::Matrix<double, 6, 1> Vector6d;
+  typedef Eigen::Matrix<double, 7, 1> Vector7d;
 
   /**
    * internal functions used inside g2o.
@@ -70,7 +69,7 @@ namespace g2o {
     template <typename Derived>
     void nearestOrthogonalMatrix(const Eigen::MatrixBase<Derived>& R)
     {
-      JacobiSVD<Eigen::Matrix3d> svd(R, ComputeFullU | ComputeFullV);
+      Eigen::JacobiSVD<Eigen::Matrix3d> svd(R, Eigen::ComputeFullU | Eigen::ComputeFullV);
       double det = (svd.matrixU() * svd.matrixV().adjoint()).determinant();
       Eigen::Matrix3d scaledU(svd.matrixU());
       scaledU.col(0) /= det;
@@ -93,66 +92,66 @@ namespace g2o {
     /**
      * normalize the quaternion, such that ||q|| == 1 and q.w() > 0
      */
-    G2O_TYPES_SLAM3D_API Quaterniond normalized(const Quaterniond& q);
+    G2O_TYPES_SLAM3D_API Eigen::Quaterniond normalized(const Eigen::Quaterniond& q);
     /**
      * as above, but in-place
      */
-    G2O_TYPES_SLAM3D_API Quaterniond& normalize(Quaterniond& q);
+    G2O_TYPES_SLAM3D_API Eigen::Quaterniond& normalize(Eigen::Quaterniond& q);
 
     // functions to handle the rotation part
     /**
      * Rotation matrix -> Euler angles (roll, pitch, yaw)
      */
-    G2O_TYPES_SLAM3D_API Vector3d toEuler(const Eigen::Matrix3d& R);
+    G2O_TYPES_SLAM3D_API Eigen::Vector3d toEuler(const Eigen::Matrix3d& R);
     /**
      * Euler angles (roll, pitch, yaw) -> Rotation matrix
      */
-    G2O_TYPES_SLAM3D_API Matrix3d fromEuler(const Vector3d& v);
+    G2O_TYPES_SLAM3D_API Eigen::Matrix3d fromEuler(const Eigen::Vector3d& v);
     /**
      * Rotation matrix -> (qx qy, qz)
      */
-    G2O_TYPES_SLAM3D_API Vector3d toCompactQuaternion(const Eigen::Matrix3d& R);
+    G2O_TYPES_SLAM3D_API Eigen::Vector3d toCompactQuaternion(const Eigen::Matrix3d& R);
     /**
      * (qx qy, qz) -> Rotation matrix, whereas (qx, qy, qz) are assumed to be
      * part of a quaternion which was normalized with the function above.
      */
-    G2O_TYPES_SLAM3D_API Matrix3d fromCompactQuaternion(const Vector3d& v);
+    G2O_TYPES_SLAM3D_API Eigen::Matrix3d fromCompactQuaternion(const Eigen::Vector3d& v);
 
     // functions to handle the toVector of the whole transformations
     /**
      * Isometry3d -> (x, y, z, qx, qy, qz)
      */
-    G2O_TYPES_SLAM3D_API Vector6d toVectorMQT(const Isometry3d& t);
+    G2O_TYPES_SLAM3D_API Vector6d toVectorMQT(const Eigen::Isometry3d& t);
     /**
      * Isometry3d -> (x, y, z, roll, pitch, yaw)
      */
-    G2O_TYPES_SLAM3D_API Vector6d toVectorET(const Isometry3d& t);
+    G2O_TYPES_SLAM3D_API Vector6d toVectorET(const Eigen::Isometry3d& t);
     /**
      * Isometry3d -> (x, y, z, qx, qy, qz, qw)
      */
-    G2O_TYPES_SLAM3D_API Vector7d toVectorQT(const Isometry3d& t);
+    G2O_TYPES_SLAM3D_API Vector7d toVectorQT(const Eigen::Isometry3d& t);
 
     /**
      * (x, y, z, qx, qy, qz) -> Isometry3d
      */
-    G2O_TYPES_SLAM3D_API Isometry3d fromVectorMQT(const Vector6d& v);
+    G2O_TYPES_SLAM3D_API Eigen::Isometry3d fromVectorMQT(const Vector6d& v);
     /**
      * (x, y, z, roll, pitch, yaw) -> Isometry3d
      */
-    G2O_TYPES_SLAM3D_API Isometry3d fromVectorET(const Vector6d& v);
+    G2O_TYPES_SLAM3D_API Eigen::Isometry3d fromVectorET(const Vector6d& v);
     /**
      * (x, y, z, qx, qy, qz, qw) -> Isometry3d
      */
-    G2O_TYPES_SLAM3D_API Isometry3d fromVectorQT(const Vector7d& v);
+    G2O_TYPES_SLAM3D_API Eigen::Isometry3d fromVectorQT(const Vector7d& v);
 
     /**
      * convert an Isometry3d to the old SE3Quat class
      */
-    G2O_TYPES_SLAM3D_API SE3Quat toSE3Quat(const Isometry3d& t);
+    G2O_TYPES_SLAM3D_API SE3Quat toSE3Quat(const Eigen::Isometry3d& t);
     /**
      * convert from an old SE3Quat into Isometry3d
      */
-    G2O_TYPES_SLAM3D_API Isometry3d fromSE3Quat(const SE3Quat& t);
+    G2O_TYPES_SLAM3D_API Eigen::Isometry3d fromSE3Quat(const SE3Quat& t);
 
   } // end namespace internal
 } // end namespace g2o

@@ -151,10 +151,10 @@ void MarginalCovarianceCholesky::computeCovariance(double** covBlocks, const std
 }
 
 
-void MarginalCovarianceCholesky::computeCovariance(SparseBlockMatrix<MatrixXd>& spinv, const std::vector<int>& rowBlockIndices, const std::vector< std::pair<int, int> >& blockIndices)
+void MarginalCovarianceCholesky::computeCovariance(SparseBlockMatrix<Eigen::MatrixXd>& spinv, const std::vector<int>& rowBlockIndices, const std::vector< std::pair<int, int> >& blockIndices)
 {
   // allocate the sparse
-  spinv = SparseBlockMatrix<MatrixXd>(&rowBlockIndices[0], 
+  spinv = SparseBlockMatrix<Eigen::MatrixXd>(&rowBlockIndices[0], 
               &rowBlockIndices[0], 
               rowBlockIndices.size(),
               rowBlockIndices.size(), true);
@@ -171,12 +171,12 @@ void MarginalCovarianceCholesky::computeCovariance(SparseBlockMatrix<MatrixXd>& 
     int rowBase=spinv.rowBaseOfBlock(blockRow);
     int colBase=spinv.colBaseOfBlock(blockCol);
     
-    MatrixXd *block=spinv.block(blockRow, blockCol, true);
+    Eigen::MatrixXd *block=spinv.block(blockRow, blockCol, true);
     assert(block);
     for (int iRow=0; iRow<block->rows(); ++iRow)
       for (int iCol=0; iCol<block->cols(); ++iCol){
-  int rr=rowBase+iRow;
-  int cc=colBase+iCol;
+        int rr=rowBase+iRow;
+        int cc=colBase+iCol;
         int r = _perm ? _perm[rr] : rr; // apply permutation
         int c = _perm ? _perm[cc] : cc;
         if (r > c)
@@ -201,12 +201,12 @@ void MarginalCovarianceCholesky::computeCovariance(SparseBlockMatrix<MatrixXd>& 
     int rowBase=spinv.rowBaseOfBlock(blockRow);
     int colBase=spinv.colBaseOfBlock(blockCol);
     
-    MatrixXd *block=spinv.block(blockRow, blockCol);
+    Eigen::MatrixXd *block=spinv.block(blockRow, blockCol);
     assert(block);
     for (int iRow=0; iRow<block->rows(); ++iRow)
       for (int iCol=0; iCol<block->cols(); ++iCol){
-  int rr=rowBase+iRow;
-  int cc=colBase+iCol;
+        int rr=rowBase+iRow;
+        int cc=colBase+iCol;
         int r = _perm ? _perm[rr] : rr; // apply permutation
         int c = _perm ? _perm[cc] : cc;
         if (r > c)
@@ -214,7 +214,7 @@ void MarginalCovarianceCholesky::computeCovariance(SparseBlockMatrix<MatrixXd>& 
         int idx = computeIndex(r, c);
         LookupMap::const_iterator foundIt = _map.find(idx);
         assert(foundIt != _map.end());
-  (*block)(iRow, iCol) = foundIt->second;
+        (*block)(iRow, iCol) = foundIt->second;
       }
   }
 }

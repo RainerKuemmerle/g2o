@@ -102,8 +102,8 @@ namespace g2o {
       Eigen::Isometry2d _w2n; ///< world to sensor transform
       Eigen::Isometry2d _w2l; ///< world to local
       Eigen::Isometry2d _n2w; ///< sensor to world
-      Matrix2d _RpInverse_RInverse;
-      Matrix2d _RpInverse_RInversePrime;
+      Eigen::Matrix2d _RpInverse_RInverse;
+      Eigen::Matrix2d _RpInverse_RInversePrime;
       
     protected:
       virtual bool resolveDependancies();

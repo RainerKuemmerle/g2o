@@ -32,262 +32,246 @@
 
 namespace g2o
 {
-  using namespace Eigen;
-
-  typedef  Matrix <double, 7, 1> Vector7d;
-  typedef  Matrix <double, 7, 7> Matrix7d;
-  
+  typedef  Eigen::Matrix <double, 7, 1> Vector7d;
+  typedef  Eigen::Matrix <double, 7, 7> Matrix7d;
 
   struct Sim3
   {
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
-  protected:
-    Quaterniond r;
-    Vector3d t;
-    double s;
+    protected:
+      Eigen::Quaterniond r;
+      Eigen::Vector3d t;
+      double s;
 
-
-public:
-    Sim3()
-    {
-      r.setIdentity();
-      t.fill(0.);
-      s=1.;
-    }
-
-    Sim3(const Quaterniond & r, const Vector3d & t, double s)
-      : r(r),t(t),s(s)
-    {
-    }
-
-    Sim3(const Matrix3d & R, const Vector3d & t, double s)
-      : r(Quaterniond(R)),t(t),s(s)
-    {
-    }
-
-
-    Sim3(const Vector7d & update)
-    {
-
-      Vector3d omega;
-      for (int i=0; i<3; i++)
-        omega[i]=update[i];
-
-      Vector3d upsilon;
-      for (int i=0; i<3; i++)
-        upsilon[i]=update[i+3];
-
-      double sigma = update[6];
-      double theta = omega.norm();
-      Matrix3d Omega = skew(omega);
-      s = std::exp(sigma);
-      Matrix3d Omega2 = Omega*Omega;
-      Matrix3d I;
-      I.setIdentity();
-      Matrix3d R;
-
-      double eps = 0.00001;
-      double A,B,C;
-      if (fabs(sigma)<eps)
+    public:
+      Sim3()
       {
-        C = 1;
-        if (theta<eps)
+        r.setIdentity();
+        t.fill(0.);
+        s=1.;
+      }
+
+      Sim3(const Eigen::Quaterniond & r, const Eigen::Vector3d & t, double s)
+        : r(r),t(t),s(s)
+      {
+      }
+
+      Sim3(const Eigen::Matrix3d & R, const Eigen::Vector3d & t, double s)
+        : r(Eigen::Quaterniond(R)),t(t),s(s)
+      {
+      }
+
+
+      Sim3(const Vector7d & update)
+      {
+
+        Eigen::Vector3d omega;
+        for (int i=0; i<3; i++)
+          omega[i]=update[i];
+
+        Eigen::Vector3d upsilon;
+        for (int i=0; i<3; i++)
+          upsilon[i]=update[i+3];
+
+        double sigma = update[6];
+        double theta = omega.norm();
+        Eigen::Matrix3d Omega = skew(omega);
+        s = std::exp(sigma);
+        Eigen::Matrix3d Omega2 = Omega*Omega;
+        Eigen::Matrix3d I;
+        I.setIdentity();
+        Eigen::Matrix3d R;
+
+        double eps = 0.00001;
+        double A,B,C;
+        if (fabs(sigma)<eps)
         {
-          A = 1./2.;
-          B = 1./6.;
-          R = (I + Omega + Omega*Omega);
+          C = 1;
+          if (theta<eps)
+          {
+            A = 1./2.;
+            B = 1./6.;
+            R = (I + Omega + Omega*Omega);
+          }
+          else
+          {
+            double theta2= theta*theta;
+            A = (1-cos(theta))/(theta2);
+            B = (theta-sin(theta))/(theta2*theta);
+            R = I + sin(theta)/theta *Omega + (1-cos(theta))/(theta*theta)*Omega2;
+          }
         }
         else
         {
-          double theta2= theta*theta;
-          A = (1-cos(theta))/(theta2);
-          B = (theta-sin(theta))/(theta2*theta);
-          R = I + sin(theta)/theta *Omega + (1-cos(theta))/(theta*theta)*Omega2;
+          C=(s-1)/sigma;
+          if (theta<eps)
+          {
+            double sigma2= sigma*sigma;
+            A = ((sigma-1)*s+1)/sigma2;
+            B= ((0.5*sigma2-sigma+1)*s)/(sigma2*sigma);
+            R = (I + Omega + Omega2);
+          }
+          else
+          {
+            R = I + sin(theta)/theta *Omega + (1-cos(theta))/(theta*theta)*Omega2;
+            double a=s*sin(theta);
+            double b=s*cos(theta);
+            double theta2= theta*theta;
+            double sigma2= sigma*sigma;
+            double c=theta2+sigma2;
+            A = (a*sigma+ (1-b)*theta)/(theta*c);
+            B = (C-((b-1)*sigma+a*theta)/(c))*1./(theta2);
+
+          }
         }
+        r = Eigen::Quaterniond(R);
+
+
+
+        Eigen::Matrix3d W = A*Omega + B*Omega2 + C*I;
+        t = W*upsilon;
       }
-      else
+
+      Eigen::Vector3d map (const Eigen::Vector3d& xyz) const {
+        return s*(r*xyz) + t;
+      }
+
+      Vector7d log() const
       {
-        C=(s-1)/sigma;
-        if (theta<eps)
+        Vector7d res;
+        double sigma = std::log(s);
+
+        Eigen::Vector3d omega;
+        Eigen::Vector3d upsilon;
+
+        Eigen::Matrix3d R = r.toRotationMatrix();
+        double d =  0.5*(R(0,0)+R(1,1)+R(2,2)-1);
+
+        Eigen::Matrix3d Omega;
+
+        double eps = 0.00001;
+        Eigen::Matrix3d I = Eigen::Matrix3d::Identity();
+
+        double A,B,C;
+        if (fabs(sigma)<eps)
         {
-          double sigma2= sigma*sigma;
-          A = ((sigma-1)*s+1)/sigma2;
-          B= ((0.5*sigma2-sigma+1)*s)/(sigma2*sigma);
-          R = (I + Omega + Omega2);
+          C = 1;
+          if (d>1-eps)
+          {
+            omega=0.5*deltaR(R);
+            Omega = skew(omega);
+            A = 1./2.;
+            B = 1./6.;
+          }
+          else
+          {
+            double theta = acos(d);
+            double theta2 = theta*theta;
+            omega = theta/(2*sqrt(1-d*d))*deltaR(R);
+            Omega = skew(omega);
+            A = (1-cos(theta))/(theta2);
+            B = (theta-sin(theta))/(theta2*theta);
+          }
         }
         else
         {
-          R = I + sin(theta)/theta *Omega + (1-cos(theta))/(theta*theta)*Omega2;
-
-
-
-          double a=s*sin(theta);
-          double b=s*cos(theta);
-          double theta2= theta*theta;
-          double sigma2= sigma*sigma;
-
-          double c=theta2+sigma2;
-          A = (a*sigma+ (1-b)*theta)/(theta*c);
-          B = (C-((b-1)*sigma+a*theta)/(c))*1./(theta2);
-
+          C=(s-1)/sigma;
+          if (d>1-eps)
+          {
+            double sigma2 = sigma*sigma;
+            omega=0.5*deltaR(R);
+            Omega = skew(omega);
+            A = ((sigma-1)*s+1)/(sigma2);
+            B = ((0.5*sigma2-sigma+1)*s)/(sigma2*sigma);
+          }
+          else
+          {
+            double theta = acos(d);
+            omega = theta/(2*sqrt(1-d*d))*deltaR(R);
+            Omega = skew(omega);
+            double theta2 = theta*theta;
+            double a=s*sin(theta);
+            double b=s*cos(theta);
+            double c=theta2 + sigma*sigma;
+            A = (a*sigma+ (1-b)*theta)/(theta*c);
+            B = (C-((b-1)*sigma+a*theta)/(c))*1./(theta2);
+          }
         }
+
+        Eigen::Matrix3d W = A*Omega + B*Omega*Omega + C*I;
+
+        upsilon = W.lu().solve(t);
+
+        for (int i=0; i<3; i++)
+          res[i] = omega[i];
+
+        for (int i=0; i<3; i++)
+          res[i+3] = upsilon[i];
+
+        res[6] = sigma;
+
+        return res;
       }
-      r = Quaterniond(R);
 
 
-
-      Matrix3d W = A*Omega + B*Omega2 + C*I;
-      t = W*upsilon;
-    }
-
-     Vector3d map (const Vector3d& xyz) const {
-      return s*(r*xyz) + t;
-    }
-
-    Vector7d log() const
-    {
-      Vector7d res;
-      double sigma = std::log(s);
-
-      
-
-   
-      Vector3d omega;
-      Vector3d upsilon;
-
-
-      Matrix3d R = r.toRotationMatrix();
-      double d =  0.5*(R(0,0)+R(1,1)+R(2,2)-1);
-
-      Matrix3d Omega;
-
-      double eps = 0.00001;
-      Matrix3d I = Matrix3d::Identity();
-
-      double A,B,C;
-      if (fabs(sigma)<eps)
+      Sim3 inverse() const
       {
-        C = 1;
-        if (d>1-eps)
-        {
-          omega=0.5*deltaR(R);
-          Omega = skew(omega);
-          A = 1./2.;
-          B = 1./6.;
-        }
-        else
-        {
-          double theta = acos(d);
-          double theta2 = theta*theta;
-          omega = theta/(2*sqrt(1-d*d))*deltaR(R);
-          Omega = skew(omega);
-          A = (1-cos(theta))/(theta2);
-          B = (theta-sin(theta))/(theta2*theta);
-        }
+        return Sim3(r.conjugate(), r.conjugate()*((-1./s)*t), 1./s);
       }
-      else
+
+      double operator[](int i) const
       {
-        C=(s-1)/sigma;
-        if (d>1-eps)
-        {
+        assert(i<8);
+        if (i<4){
 
-          double sigma2 = sigma*sigma;
-          omega=0.5*deltaR(R);
-          Omega = skew(omega);
-          A = ((sigma-1)*s+1)/(sigma2);
-          B = ((0.5*sigma2-sigma+1)*s)/(sigma2*sigma);
+          return r.coeffs()[i];
         }
-        else
-        {
-          double theta = acos(d);
-          omega = theta/(2*sqrt(1-d*d))*deltaR(R);
-          Omega = skew(omega);
-          double theta2 = theta*theta;
-          double a=s*sin(theta);
-          double b=s*cos(theta);
-          double c=theta2 + sigma*sigma;
-          A = (a*sigma+ (1-b)*theta)/(theta*c);
-          B = (C-((b-1)*sigma+a*theta)/(c))*1./(theta2);
+        if (i<7){
+          return t[i-4];
         }
+        return s;
       }
 
-      Matrix3d W = A*Omega + B*Omega*Omega + C*I;
-
-      upsilon = W.lu().solve(t);
-
-
-      for (int i=0; i<3; i++)
-        res[i] = omega[i];
-
-       for (int i=0; i<3; i++)
-        res[i+3] = upsilon[i];
-
-      res[6] = sigma;
-
-      return res;
-      
-    }
-
-
-    Sim3 inverse() const
-    {
-      return Sim3(r.conjugate(), r.conjugate()*((-1./s)*t), 1./s);
-    }
-    
-
-    double operator[](int i) const
-    {
-      assert(i<8);
-      if (i<4){
-
-        return r.coeffs()[i];
-      }
-      if (i<7){
-        return t[i-4];
-      }
-      return s;
-    }
-
-    double& operator[](int i)
-    {
-      assert(i<8);
-      if (i<4){
-
-        return r.coeffs()[i];
-      }
-      if (i<7)
+      double& operator[](int i)
       {
-        return t[i-4];
+        assert(i<8);
+        if (i<4){
+
+          return r.coeffs()[i];
+        }
+        if (i<7)
+        {
+          return t[i-4];
+        }
+        return s;
       }
-      return s;
-    }
 
-    Sim3 operator *(const Sim3& other) const {
-      Sim3 ret;
-      ret.r = r*other.r;
-      ret.t=s*(r*other.t)+t;
-      ret.s=s*other.s;
-      return ret;
-    }
+      Sim3 operator *(const Sim3& other) const {
+        Sim3 ret;
+        ret.r = r*other.r;
+        ret.t=s*(r*other.t)+t;
+        ret.s=s*other.s;
+        return ret;
+      }
 
-    Sim3& operator *=(const Sim3& other){
-      Sim3 ret=(*this)*other;
-      *this=ret;
-      return *this;
-    }
+      Sim3& operator *=(const Sim3& other){
+        Sim3 ret=(*this)*other;
+        *this=ret;
+        return *this;
+      }
 
-    inline const Vector3d& translation() const {return t;}
+      inline const Eigen::Vector3d& translation() const {return t;}
 
-    inline Vector3d& translation() {return t;}
+      inline Eigen::Vector3d& translation() {return t;}
 
-    inline const Quaterniond& rotation() const {return r;}
+      inline const Eigen::Quaterniond& rotation() const {return r;}
 
-    inline Quaterniond& rotation() {return r;}
+      inline Eigen::Quaterniond& rotation() {return r;}
 
-    inline const double& scale() const {return s;}
+      inline const double& scale() const {return s;}
 
-    inline double& scale() {return s;}
+      inline double& scale() {return s;}
 
   };
 

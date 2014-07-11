@@ -19,18 +19,18 @@ namespace g2o {
       virtual void setToOriginImpl() { _estimate = Line3D(); }
 
       virtual void oplusImpl(const double* update_) {
-	Map<const Vector6d> update(update_);
+        Eigen::Map<const Vector6d> update(update_);
 	_estimate.oplus(update);
       }
 
       virtual bool setEstimateDataImpl(const double* est){
-	Map<const Vector6d> _est(est);
+        Eigen::Map<const Vector6d> _est(est);
 	_estimate=Line3D(_est);
 	return true;
       }
 
       virtual bool getEstimateData(double* est) const{
-	Map<Vector6d> _est(est);
+        Eigen::Map<Vector6d> _est(est);
 	_est = _estimate;
 	return true;
       }

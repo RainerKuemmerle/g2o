@@ -18,6 +18,8 @@
 #include "g2o/core/factory.h"
 #include <iostream>
 
+using namespace Eigen;
+
 namespace g2o
 {
 

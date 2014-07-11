@@ -19,6 +19,8 @@
 
 #include <iostream>
 
+using namespace Eigen;
+
 namespace g2o
 {
 

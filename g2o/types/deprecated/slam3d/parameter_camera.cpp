@@ -92,7 +92,7 @@ namespace deprecated {
 
 #ifdef G2O_HAVE_OPENGL
   static void drawMyPyramid(float height, float side){
-    Vector3f p[6];
+    Eigen::Vector3f p[6];
     p[0] << 0, 0., 0.;
     p[1] << -side, -side, height;
     p[2] << -side,  side, height;
@@ -102,7 +102,7 @@ namespace deprecated {
 
     glBegin(GL_TRIANGLES);
     for (int i = 1; i < 5; ++i) {
-      Vector3f normal = (p[i] - p[0]).cross(p[i+1] - p[0]);
+      Eigen::Vector3f normal = (p[i] - p[0]).cross(p[i+1] - p[0]);
       glNormal3f(normal.x(), normal.y(), normal.z());
       glVertex3f(p[0].x(), p[0].y(), p[0].z());
       glVertex3f(p[i].x(), p[i].y(), p[i].z());

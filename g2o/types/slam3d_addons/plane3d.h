@@ -14,32 +14,32 @@ namespace g2o {
       friend Plane3D operator*(const Eigen::Isometry3d& t, const Plane3D& plane);
 
       Plane3D(){
-        Vector4d v;
+        Eigen::Vector4d v;
         v << 1., 0., 0., -1.;
         fromVector(v);
       }
 
-      Plane3D(const Vector4d& v){
+      Plane3D(const Eigen::Vector4d& v){
         fromVector(v);
       }
 
 
-      inline Vector4d toVector() const {
+      inline Eigen::Vector4d toVector() const {
         return _coeffs;
       }
 
-      inline const Vector4d& coeffs() const {return _coeffs;}
+      inline const Eigen::Vector4d& coeffs() const {return _coeffs;}
 
-      inline void fromVector(const Vector4d& coeffs_) {
+      inline void fromVector(const Eigen::Vector4d& coeffs_) {
         _coeffs=coeffs_;
         normalize(_coeffs);
       }
 
-      static double azimuth(const Vector3d& v) {
+      static double azimuth(const Eigen::Vector3d& v) {
         return atan2(v(1),v(0));
       }
 
-      static  double elevation(const Vector3d& v) {
+      static  double elevation(const Eigen::Vector3d& v) {
         return atan2(v(2), v.head<2>().norm());
       }
 
@@ -47,43 +47,43 @@ namespace g2o {
       return -_coeffs(3);
     }
 
-    Vector3d normal() const {
+    Eigen::Vector3d normal() const {
       return _coeffs.head<3>();
     }
 
     
-    static Matrix3d rotation(const Vector3d& v)  {
+    static Eigen::Matrix3d rotation(const Eigen::Vector3d& v)  {
       double _azimuth = azimuth(v);
       double _elevation = elevation(v); 
-      return (AngleAxisd(_azimuth,  Vector3d::UnitZ())*AngleAxisd(- _elevation, Vector3d::UnitY())).toRotationMatrix();
+      return (Eigen::AngleAxisd(_azimuth,  Eigen::Vector3d::UnitZ())*Eigen::AngleAxisd(- _elevation, Eigen::Vector3d::UnitY())).toRotationMatrix();
     }
 
-    inline void oplus(Vector3d v){
+    inline void oplus(const Eigen::Vector3d& v){
       //construct a normal from azimuth and evelation;
       double _azimuth=v[0];
       double _elevation=v[1];
       double s=sin(_elevation), c=cos(_elevation);
-      Vector3d n (c*cos(_azimuth), c*sin(_azimuth), s) ;
+      Eigen::Vector3d n (c*cos(_azimuth), c*sin(_azimuth), s) ;
       
       // rotate the normal
-      Matrix3d R=rotation(normal());
+      Eigen::Matrix3d R=rotation(normal());
       double d=distance()+v[2];
       _coeffs.head<3>() = R*n;
       _coeffs(3) = -d;
       normalize(_coeffs);
     }
     
-    inline Vector3d ominus(const Plane3D& plane){
+    inline Eigen::Vector3d ominus(const Plane3D& plane){
       //construct the rotation that would bring the plane normal in (1 0 0)
-      Matrix3d R=rotation(normal()).transpose();
-      Vector3d n=R*plane.normal();
+      Eigen::Matrix3d R=rotation(normal()).transpose();
+      Eigen::Vector3d n=R*plane.normal();
       double d=distance()-plane.distance();
-      return Vector3d(azimuth(n), elevation(n), d);
+      return Eigen::Vector3d(azimuth(n), elevation(n), d);
     }
 
     //protected:
 
-    static inline void normalize(Vector4d& coeffs) {
+    static inline void normalize(Eigen::Vector4d& coeffs) {
       double n=coeffs.head<3>().norm();
       coeffs = coeffs * (1./n);
     }
@@ -91,10 +91,10 @@ namespace g2o {
     Eigen::Vector4d _coeffs;
   };
 
-  inline Plane3D operator*(const Isometry3d& t, const Plane3D& plane){
-    Vector4d v=plane._coeffs;
-    Vector4d v2;
-    Matrix3d R=t.rotation();
+  inline Plane3D operator*(const Eigen::Isometry3d& t, const Plane3D& plane){
+    Eigen::Vector4d v=plane._coeffs;
+    Eigen::Vector4d v2;
+    Eigen::Matrix3d R=t.rotation();
     v2.head<3>() = R*v.head<3>();
     v2(3)=v(3) - t.translation().dot(v2.head<3>());
     return Plane3D(v2);

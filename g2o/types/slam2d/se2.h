@@ -33,7 +33,6 @@
 #include <Eigen/Geometry>
 
 namespace g2o {
-  using namespace Eigen;
 
   /**
    * \brief represent SE2
@@ -47,17 +46,17 @@ namespace g2o {
         _R.fromRotationMatrix(iso.linear());
       }
 
-      SE2(const Vector3d& v):_R(v[2]),_t(v[0],v[1]){}
+      SE2(const Eigen::Vector3d& v):_R(v[2]),_t(v[0],v[1]){}
 
       SE2(double x, double y, double theta):_R(theta),_t(x,y){}
 
       //! translational component
-      inline const Vector2d& translation() const {return _t;}
-      void setTranslation(const Vector2d& t_) {_t=t_;}
+      inline const Eigen::Vector2d& translation() const {return _t;}
+      void setTranslation(const Eigen::Vector2d& t_) {_t=t_;}
 
       //! rotational component
-      inline const Rotation2Dd& rotation() const {return _R;}
-      void setRotation(const Rotation2Dd& R_) {_R=R_;}
+      inline const Eigen::Rotation2Dd& rotation() const {return _R;}
+      void setRotation(const Eigen::Rotation2Dd& R_) {_R=R_;}
 
       //! concatenate two SE2 elements (motion composition)
       inline SE2 operator * (const SE2& tr2) const{
@@ -75,7 +74,7 @@ namespace g2o {
       }
 
       //! project a 2D vector
-      inline Vector2d operator * (const Vector2d& v) const {
+      inline Eigen::Vector2d operator * (const Eigen::Vector2d& v) const {
         return _t+_R*v;
       }
 
@@ -85,7 +84,7 @@ namespace g2o {
         ret._R=_R.inverse();
         ret._R.angle()=normalize_theta(ret._R.angle());
 #ifdef _MSC_VER
-        ret._t=ret._R*(Vector2d(_t*-1.));
+        ret._t=ret._R*(Eigen::Vector2d(_t*-1.));
 #else
         ret._t=ret._R*(_t*-1.);
 #endif
@@ -101,13 +100,13 @@ namespace g2o {
 
 
       //! assign from a 3D vector (x, y, theta)
-      inline void fromVector (const Vector3d& v){
+      inline void fromVector (const Eigen::Vector3d& v){
         *this=SE2(v[0], v[1], v[2]);
       }
 
       //! convert to a 3D vector (x, y, theta)
-      inline Vector3d toVector() const {
-        return Vector3d(_t.x(), _t.y(), _R.angle());
+      inline Eigen::Vector3d toVector() const {
+        return Eigen::Vector3d(_t.x(), _t.y(), _R.angle());
       }
 
       inline Eigen::Isometry2d toIsometry() const {
@@ -118,8 +117,8 @@ namespace g2o {
       }
 
     protected:
-      Rotation2Dd _R;
-      Vector2d _t;
+      Eigen::Rotation2Dd _R;
+      Eigen::Vector2d _t;
   };
 
 } // end namespace

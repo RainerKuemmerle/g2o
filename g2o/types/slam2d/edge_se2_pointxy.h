@@ -49,15 +49,15 @@ namespace g2o {
       }
 
       virtual bool setMeasurementData(const double* d){
-  _measurement[0]=d[0];
-  _measurement[1]=d[1];
-  return true;
+        _measurement[0]=d[0];
+        _measurement[1]=d[1];
+        return true;
       }
 
       virtual bool getMeasurementData(double* d) const{
-  d[0] = _measurement[0];
-  d[1] = _measurement[1];
-  return true;
+        d[0] = _measurement[0];
+        d[1] = _measurement[1];
+        return true;
       }
       
       virtual int measurementDimension() const {return 2;}
@@ -65,8 +65,8 @@ namespace g2o {
       virtual bool setMeasurementFromState(){
         const VertexSE2* v1 = static_cast<const VertexSE2*>(_vertices[0]);
         const VertexPointXY* l2 = static_cast<const VertexPointXY*>(_vertices[1]);
-  _measurement = v1->estimate().inverse() * l2->estimate();
-  return true;
+        _measurement = v1->estimate().inverse() * l2->estimate();
+        return true;
       }
 
       virtual bool read(std::istream& is);

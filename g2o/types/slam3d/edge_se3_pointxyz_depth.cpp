@@ -30,7 +30,7 @@ namespace g2o {
   using namespace g2o;
 
   // point to camera projection, monocular
-  EdgeSE3PointXYZDepth::EdgeSE3PointXYZDepth() : BaseBinaryEdge<3, Vector3d, VertexSE3, VertexPointXYZ>() {
+  EdgeSE3PointXYZDepth::EdgeSE3PointXYZDepth() : BaseBinaryEdge<3, Eigen::Vector3d, VertexSE3, VertexPointXYZ>() {
     resizeParameters(1);
     installParameter(params, 0);
     information().setIdentity();
@@ -55,7 +55,7 @@ namespace g2o {
     setParameterId(0,pid);
 
     // measured keypoint
-    Vector3d meas;
+    Eigen::Vector3d meas;
     for (int i=0; i<3; i++) is >> meas[i];
     setMeasurement(meas);
     // don't need this if we don't use it in error calculation (???)
@@ -143,7 +143,7 @@ namespace g2o {
     VertexPointXYZ *point = static_cast<VertexPointXYZ*>(_vertices[1]);
 
     // calculate the projection
-    const Vector3d& pt = point->estimate();
+    const Eigen::Vector3d& pt = point->estimate();
 
     Eigen::Vector3d p = cache->w2i() * pt;
     Eigen::Vector3d perr;

@@ -41,7 +41,7 @@ namespace g2o {
 
   bool EdgeSE2Prior::read(std::istream& is)
   {
-    Vector3d p;
+    Eigen::Vector3d p;
     is >> p[0] >> p[1] >> p[2];
     setMeasurement(p);
     _inverseMeasurement= _measurement.inverse();
@@ -56,7 +56,7 @@ namespace g2o {
 
   bool EdgeSE2Prior::write(std::ostream& os) const
   {
-    Vector3d p = measurement().toVector();
+    Eigen::Vector3d p = measurement().toVector();
     os << p.x() << " " << p.y() << " " << p.z();
     for (int i = 0; i < 3; ++i)
       for (int j = i; j < 3; ++j)

@@ -31,7 +31,7 @@ namespace g2o
 using namespace Eigen;
 
 EdgePlane::EdgePlane() :
-    BaseBinaryEdge<4, Vector4d, VertexPlane, VertexPlane>()
+    BaseBinaryEdge<4, Eigen::Vector4d, VertexPlane, VertexPlane>()
 {
     _information.setIdentity();
     _error.setZero();
@@ -39,7 +39,7 @@ EdgePlane::EdgePlane() :
 
 bool EdgePlane::read(std::istream& is)
 {
-    Vector4d  v;
+  Eigen::Vector4d  v;
     int size=4;
     for (int i = 0; i < size; ++i)
         is >> v[i];

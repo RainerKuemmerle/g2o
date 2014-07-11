@@ -34,9 +34,8 @@
 
 namespace g2o
 {
-using namespace Eigen;
 
-class G2O_TYPES_SLAM3D_ADDONS_API EdgePlane : public BaseBinaryEdge<4, Vector4d, VertexPlane, VertexPlane>
+class G2O_TYPES_SLAM3D_ADDONS_API EdgePlane : public BaseBinaryEdge<4, Eigen::Vector4d, VertexPlane, VertexPlane>
 {
 public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
@@ -51,18 +50,18 @@ public:
     virtual bool read(std::istream& is);
     virtual bool write(std::ostream& os) const;
 
-    virtual void setMeasurement(const Vector4d& m){
+    virtual void setMeasurement(const Eigen::Vector4d& m){
         _measurement = m;
     }
 
     virtual bool setMeasurementData(const double* d){
-        Eigen::Map<const Vector4d> m(d);
+        Eigen::Map<const Eigen::Vector4d> m(d);
         _measurement=m;
         return true;
     }
 
     virtual bool getMeasurementData(double* d) const {
-        Eigen::Map<Vector4d> m(d);
+        Eigen::Map<Eigen::Vector4d> m(d);
         m=_measurement;
         return true;
     }

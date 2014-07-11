@@ -942,7 +942,7 @@ void OptimizableGraph::clearParameters()
 bool OptimizableGraph::verifyInformationMatrices(bool verbose) const
 {
   bool allEdgeOk = true;
-  SelfAdjointEigenSolver<MatrixXd> eigenSolver;
+  Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> eigenSolver;
   for (OptimizableGraph::EdgeSet::const_iterator it = edges().begin(); it != edges().end(); ++it) {
     OptimizableGraph::Edge* e = static_cast<OptimizableGraph::Edge*>(*it);
     Eigen::MatrixXd::MapType information(e->informationData(), e->dimension(), e->dimension());

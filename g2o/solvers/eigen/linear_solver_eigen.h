@@ -49,7 +49,7 @@ template <typename MatrixType>
 class LinearSolverEigen: public LinearSolver<MatrixType>
 {
   public:
-    typedef Eigen::SparseMatrix<double, ColMajor> SparseMatrix;
+    typedef Eigen::SparseMatrix<double, Eigen::ColMajor> SparseMatrix;
     typedef Eigen::Triplet<double> Triplet;
     typedef Eigen::PermutationMatrix<Eigen::Dynamic, Eigen::Dynamic, SparseMatrix::Index> PermutationMatrix;
     /**
@@ -67,7 +67,7 @@ class LinearSolverEigen: public LinearSolver<MatrixType>
           m_P = permutation.inverse();
           int size = a.cols();
           SparseMatrix ap(size, size);
-          ap.selfadjointView<Upper>() = a.selfadjointView<UpLo>().twistedBy(m_P);
+          ap.selfadjointView<Eigen::Upper>() = a.selfadjointView<UpLo>().twistedBy(m_P);
           analyzePattern_preordered(ap, true);
         }
     };

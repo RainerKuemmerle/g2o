@@ -26,6 +26,8 @@
 
 #include "sensor_pose2d.h"
 
+using namespace Eigen;
+
 namespace g2o{
   SensorPose2D::SensorPose2D(const std::string& name_):
     BinarySensor<Robot2D, EdgeSE2, WorldObjectSE2>(name_)

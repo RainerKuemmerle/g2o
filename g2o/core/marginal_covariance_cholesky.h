@@ -67,7 +67,7 @@ namespace g2o {
       /**
        * compute the marginal cov for the given block indices, write the result in spinv).
        */
-      void computeCovariance(SparseBlockMatrix<MatrixXd>& spinv, const std::vector<int>& rowBlockIndices, const std::vector< std::pair<int, int> >& blockIndices);
+      void computeCovariance(SparseBlockMatrix<Eigen::MatrixXd>& spinv, const std::vector<int>& rowBlockIndices, const std::vector< std::pair<int, int> >& blockIndices);
 
 
       /**

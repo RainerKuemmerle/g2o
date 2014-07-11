@@ -39,7 +39,7 @@ namespace g2o {
     setOffset();
   }
 
-  void ParameterSE3Offset::setOffset(const Isometry3d& offset_){
+  void ParameterSE3Offset::setOffset(const Eigen::Isometry3d& offset_){
     _offset = offset_;
     _inverseOffset = _offset.inverse();
   }
@@ -50,7 +50,7 @@ namespace g2o {
       is >> off[i];
     }
     // normalize the quaternion to recover numerical precision lost by storing as human readable text
-    Vector4d::MapType(off.data()+3).normalize();
+    Eigen::Vector4d::MapType(off.data()+3).normalize();
     setOffset(internal::fromVectorQT(off));
     return is.good();
   }

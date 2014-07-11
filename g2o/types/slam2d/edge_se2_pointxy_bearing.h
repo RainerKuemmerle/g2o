@@ -44,7 +44,7 @@ namespace g2o {
       {
         const VertexSE2* v1 = static_cast<const VertexSE2*>(_vertices[0]);
         const VertexPointXY* l2 = static_cast<const VertexPointXY*>(_vertices[1]);
-        Vector2d delta = (v1->estimate().inverse() * l2->estimate());
+        Eigen::Vector2d delta = (v1->estimate().inverse() * l2->estimate());
         double angle = atan2(delta[1], delta[0]);
         _error[0] = normalize_theta(_measurement - angle );
       }
@@ -64,7 +64,7 @@ namespace g2o {
       virtual bool setMeasurementFromState(){
         const VertexSE2* v1 = static_cast<const VertexSE2*>(_vertices[0]);
         const VertexPointXY* l2 = static_cast<const VertexPointXY*>(_vertices[1]);
-        Vector2d delta = (v1->estimate().inverse() * l2->estimate());
+        Eigen::Vector2d delta = (v1->estimate().inverse() * l2->estimate());
   _measurement = atan2(delta[1], delta[0]);
   return true;
       }

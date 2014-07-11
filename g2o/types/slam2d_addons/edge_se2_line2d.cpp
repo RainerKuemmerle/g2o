@@ -68,10 +68,10 @@ namespace g2o {
     VertexLine2D* vj = static_cast<VertexLine2D*>(_vertices[1]);
     if (from.count(vi) > 0 && to == vj) {
       SE2 T=vi->estimate();
-      Vector2d est=_measurement;
+      Eigen::Vector2d est=_measurement;
       est[0] += T.rotation().angle();
       est[0] = normalize_theta(est[0]);
-      Vector2d n(cos(est[0]), sin(est[0]));
+      Eigen::Vector2d n(cos(est[0]), sin(est[0]));
       est[1] += n.dot(T.translation());
       vj->setEstimate(est);
     }

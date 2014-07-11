@@ -28,6 +28,7 @@
 
 namespace g2o {
   using namespace std;
+  using namespace Eigen;
 
   // SensorPointXYZDepth
   SensorPointXYZDepth::SensorPointXYZDepth(const std::string& name_): BinarySensor<Robot3D, EdgeSE3PointXYZDepth, WorldObjectTrackXYZ>(name_) {

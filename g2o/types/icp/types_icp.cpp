@@ -30,6 +30,8 @@
 
 #include <iostream>
 
+using namespace Eigen;
+
 namespace g2o {
 
   G2O_REGISTER_TYPE_GROUP(icp);

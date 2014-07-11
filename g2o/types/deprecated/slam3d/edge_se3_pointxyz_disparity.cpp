@@ -38,7 +38,7 @@ namespace deprecated {
 
 
   // point to camera projection, monocular
-  EdgeSE3PointXYZDisparity::EdgeSE3PointXYZDisparity() : BaseBinaryEdge<3, Vector3d, VertexSE3, VertexPointXYZ>() {
+  EdgeSE3PointXYZDisparity::EdgeSE3PointXYZDisparity() : BaseBinaryEdge<3, Eigen::Vector3d, VertexSE3, VertexPointXYZ>() {
     resizeParameters(1);
     installParameter(params, 0);
     information().setIdentity();
@@ -62,7 +62,7 @@ namespace deprecated {
     is >> pid;
     setParameterId(0,pid);
 
-    Vector3d meas;
+    Eigen::Vector3d meas;
     for (int i=0; i<3; i++) is >> meas[i];
     setMeasurement(meas);
     if (is.bad())
@@ -96,7 +96,7 @@ namespace deprecated {
   void EdgeSE3PointXYZDisparity::computeError() {
     //VertexSE3 *cam = static_cast<VertexSE3*>(_vertices[0]);
     VertexPointXYZ *point = static_cast<VertexPointXYZ*>(_vertices[1]);
-    const Vector3d& pt = point->estimate();
+    const Eigen::Vector3d& pt = point->estimate();
     //Eigen::Vector4d ppt(pt(0),pt(1),pt(2),1.0);
     
     // VertexCameraCache* vcache = (VertexCameraCache*)cam->getCache(_cacheIds[0]);
@@ -172,7 +172,7 @@ namespace deprecated {
   bool EdgeSE3PointXYZDisparity::setMeasurementFromState(){
     //VertexSE3 *cam = static_cast< VertexSE3*>(_vertices[0]);
     VertexPointXYZ *point = static_cast<VertexPointXYZ*>(_vertices[1]);
-    const Vector3d &pt = point->estimate();
+    const Eigen::Vector3d &pt = point->estimate();
 
     // VertexCameraCache* vcache = (VertexCameraCache*) cam->getCache(_cacheIds[0]);
     // if (! vcache){

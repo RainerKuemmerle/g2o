@@ -186,7 +186,7 @@ class LinearSolverCholmod : public LinearSolverCCS<MatrixType>
 
       // invert the permutation
       int* p = (int*)_cholmodFactor->Perm;
-      VectorXi pinv; pinv.resize(_cholmodSparse->ncol);
+      Eigen::VectorXi pinv; pinv.resize(_cholmodSparse->ncol);
       for (size_t i = 0; i < _cholmodSparse->ncol; ++i)
         pinv(p[i]) = i;
 
@@ -204,7 +204,7 @@ class LinearSolverCholmod : public LinearSolverCCS<MatrixType>
       return true;
     }
 
-    virtual bool solvePattern(SparseBlockMatrix<MatrixXd>& spinv, const std::vector<std::pair<int, int> >& blockIndices, const SparseBlockMatrix<MatrixType>& A)
+    virtual bool solvePattern(SparseBlockMatrix<Eigen::MatrixXd>& spinv, const std::vector<std::pair<int, int> >& blockIndices, const SparseBlockMatrix<MatrixType>& A)
     {
       //cerr << __PRETTY_FUNCTION__ << " using cholmod" << endl;
       fillCholmodExt(A, _cholmodFactor != 0); // _cholmodFactor used as bool, if not existing will copy the whole structure, otherwise only the values
@@ -227,7 +227,7 @@ class LinearSolverCholmod : public LinearSolverCCS<MatrixType>
 
       // invert the permutation
       int* p = (int*)_cholmodFactor->Perm;
-      VectorXi pinv; pinv.resize(_cholmodSparse->ncol);
+      Eigen::VectorXi pinv; pinv.resize(_cholmodSparse->ncol);
       for (size_t i = 0; i < _cholmodSparse->ncol; ++i)
         pinv(p[i]) = i;
 
@@ -265,7 +265,7 @@ class LinearSolverCholmod : public LinearSolverCCS<MatrixType>
     cholmod_factor* _cholmodFactor;
     bool _blockOrdering;
     MatrixStructure _matrixStructure;
-    VectorXi _scalarPermutation, _blockPermutation;
+    Eigen::VectorXi _scalarPermutation, _blockPermutation;
     bool _writeDebug;
 
     void computeSymbolicDecomposition(const SparseBlockMatrix<MatrixType>& A)
