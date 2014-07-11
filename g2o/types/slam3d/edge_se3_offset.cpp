@@ -32,6 +32,7 @@
 
 namespace g2o {
   using namespace std;
+  using namespace Eigen;
 
   EdgeSE3Offset::EdgeSE3Offset() : EdgeSE3() {
     information().setIdentity();

@@ -68,7 +68,7 @@ class LinearSolver
      * Inverts the a block pattern of A in spinv
      * @returns false if not defined.
      */
-    virtual bool solvePattern(SparseBlockMatrix<MatrixXd>& spinv, const std::vector<std::pair<int, int> >& blockIndices, const SparseBlockMatrix<MatrixType>& A){
+    virtual bool solvePattern(SparseBlockMatrix<Eigen::MatrixXd>& spinv, const std::vector<std::pair<int, int> >& blockIndices, const SparseBlockMatrix<MatrixType>& A){
       (void) spinv;
       (void) blockIndices;
       (void) A;

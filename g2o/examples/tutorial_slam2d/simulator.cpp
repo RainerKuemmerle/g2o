@@ -36,6 +36,8 @@ using namespace std;
 namespace g2o {
   namespace tutorial {
 
+    using namespace Eigen;
+
 #  ifdef _MSC_VER
     inline double round(double number)
     {
@@ -283,7 +285,7 @@ namespace g2o {
 
     }
 
-    Simulator::GridPose Simulator::generateNewPose(const Simulator::GridPose& prev, const SE2& trueMotion, const Vector2d& transNoise, double rotNoise)
+    Simulator::GridPose Simulator::generateNewPose(const Simulator::GridPose& prev, const SE2& trueMotion, const Eigen::Vector2d& transNoise, double rotNoise)
     {
       Simulator::GridPose nextPose;
       nextPose.id = prev.id + 1;
@@ -306,7 +308,7 @@ namespace g2o {
       }
     }
 
-    SE2 Simulator::sampleTransformation(const SE2& trueMotion_, const Vector2d& transNoise, double rotNoise)
+    SE2 Simulator::sampleTransformation(const SE2& trueMotion_, const Eigen::Vector2d& transNoise, double rotNoise)
     {
       Vector3d trueMotion = trueMotion_.toVector();
       SE2 noiseMotion(

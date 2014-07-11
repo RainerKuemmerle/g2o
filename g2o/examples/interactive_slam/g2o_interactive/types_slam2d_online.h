@@ -48,8 +48,8 @@ namespace g2o {
 
       void oplusUpdatedEstimate(double* update)
       {
-        Vector3d p=_estimate.toVector();
-        p+=Map<Vector3d>(update);
+        Eigen::Vector3d p=_estimate.toVector();
+        p+=Eigen::Map<Eigen::Vector3d>(update);
         p[2]=normalize_theta(p[2]);
         updatedEstimate.fromVector(p);
         //std::cerr << PVAR(updatedEstimate.toVector()) << " " << PVAR(_estimate.toVector()) << std::endl;

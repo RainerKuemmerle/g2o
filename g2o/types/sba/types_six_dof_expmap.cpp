@@ -32,6 +32,7 @@
 namespace g2o {
 
 using namespace std;
+using namespace Eigen;
 
 G2O_REGISTER_TYPE_GROUP(expmap);
 G2O_REGISTER_TYPE(VERTEX_SE3:EXPMAP, VertexSE3Expmap);

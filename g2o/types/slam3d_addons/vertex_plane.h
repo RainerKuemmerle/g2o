@@ -22,18 +22,18 @@ namespace g2o
       virtual void setToOriginImpl() { _estimate = Plane3D(); }
 
       virtual void oplusImpl(const double* update_) {
-	Map<const Vector3d> update(update_);
+        Eigen::Map<const Eigen::Vector3d> update(update_);
 	_estimate.oplus(update);
       }
 
       virtual bool setEstimateDataImpl(const double* est){
-	Map<const Vector4d> _est(est);
+        Eigen::Map<const Eigen::Vector4d> _est(est);
 	_estimate.fromVector(_est);
 	return true;
       }
 
       virtual bool getEstimateData(double* est) const{
-	Map<Vector4d> _est(est);
+        Eigen::Map<Eigen::Vector4d> _est(est);
 	_est = _estimate.toVector();
 	return true;
       }
@@ -42,7 +42,7 @@ namespace g2o
         return 4;
       }
 
-      Vector3d color;
+      Eigen::Vector3d color;
     };
 
 #ifdef G2O_HAVE_OPENGL

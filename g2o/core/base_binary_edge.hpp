@@ -80,10 +80,10 @@ void BaseBinaryEdge<D, E, VertexXiType, VertexXjType>::constructQuadraticForm()
     to->lockQuadraticForm();
 #endif
     const InformationType& omega = _information;
-    Matrix<double, D, 1> omega_r = - omega * _error;
+    Eigen::Matrix<double, D, 1> omega_r = - omega * _error;
     if (this->robustKernel() == 0) {
       if (fromNotFixed) {
-        Matrix<double, VertexXiType::Dimension, D> AtO = A.transpose() * omega;
+        Eigen::Matrix<double, VertexXiType::Dimension, D> AtO = A.transpose() * omega;
         from->b().noalias() += A.transpose() * omega_r;
         from->A().noalias() += AtO*A;
         if (toNotFixed ) {

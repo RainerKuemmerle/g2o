@@ -29,7 +29,7 @@
 namespace g2o {
 
   EdgePointXYZ::EdgePointXYZ() :
-    BaseBinaryEdge<3, Vector3d, VertexPointXYZ, VertexPointXYZ>()
+    BaseBinaryEdge<3, Eigen::Vector3d, VertexPointXYZ, VertexPointXYZ>()
   {
     _information.setIdentity();
     _error.setZero();
@@ -37,7 +37,7 @@ namespace g2o {
 
   bool EdgePointXYZ::read(std::istream& is)
   {
-    Vector3d p;
+    Eigen::Vector3d p;
     is >> p[0] >> p[1] >> p[2];
     setMeasurement(p);
     for (int i = 0; i < 3; ++i)
@@ -51,7 +51,7 @@ namespace g2o {
 
   bool EdgePointXYZ::write(std::ostream& os) const
   {
-    Vector3d p = measurement();
+    Eigen::Vector3d p = measurement();
     os << p.x() << " " << p.y() << " " << p.z();
     for (int i = 0; i < 3; ++i)
       for (int j = i; j < 3; ++j)

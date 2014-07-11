@@ -11,6 +11,7 @@
 namespace g2o{
 
   using namespace std;
+  using namespace Eigen;
 
   double activeVertexChi(const OptimizableGraph::Vertex* v){
     const SparseOptimizer* s = dynamic_cast<const SparseOptimizer*>(v->graph());

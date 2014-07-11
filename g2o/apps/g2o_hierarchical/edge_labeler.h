@@ -37,11 +37,11 @@ protected:
   //! @param spinv:   the output block inverse
   //! @param pattern: the blocks of the inverse covered by the edge
   //! @returns true on successm, false on failure, .
-  bool computePartialInverse(SparseBlockMatrix<MatrixXd>& spinv, const std::set<std::pair<int,int> >& pattern);
+  bool computePartialInverse(SparseBlockMatrix<Eigen::MatrixXd>& spinv, const std::set<std::pair<int,int> >& pattern);
 
   //! helper function that labes a specific edge based on the marginals in the sparse block inverse
   //! @returns true on success, false on failure
-  bool labelEdge( const SparseBlockMatrix<MatrixXd>& spinv, OptimizableGraph::Edge* e);
+  bool labelEdge( const SparseBlockMatrix<Eigen::MatrixXd>& spinv, OptimizableGraph::Edge* e);
    SparseOptimizer* _optimizer;
 };
 

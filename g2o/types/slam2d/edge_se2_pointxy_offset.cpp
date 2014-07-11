@@ -33,7 +33,7 @@ namespace g2o {
 
 
   // point to camera projection, monocular
-  EdgeSE2PointXYOffset::EdgeSE2PointXYOffset() : BaseBinaryEdge<2, Vector2d, VertexSE2, VertexPointXY>() {
+  EdgeSE2PointXYOffset::EdgeSE2PointXYOffset() : BaseBinaryEdge<2, Eigen::Vector2d, VertexSE2, VertexPointXY>() {
     information().setIdentity();
     cache = 0;
     offsetParam = 0;
@@ -54,7 +54,7 @@ namespace g2o {
     is >> pId;
     setParameterId(0, pId);
     // measured keypoint
-    Vector2d meas;
+    Eigen::Vector2d meas;
     for (int i=0; i<2; i++) is >> meas[i];
     setMeasurement(meas);
     // information matrix is the identity for features, could be changed to allow arbitrary covariances    
@@ -63,9 +63,9 @@ namespace g2o {
     }
     for ( int i=0; i<information().rows() && is.good(); i++)
       for (int j=i; j<information().cols() && is.good(); j++){
-  is >> information()(i,j);
-  if (i!=j)
-    information()(j,i)=information()(i,j);
+        is >> information()(i,j);
+        if (i!=j)
+          information()(j,i)=information()(i,j);
       }
     if (is.bad()) {
       //  we overwrite the information matrix
@@ -111,7 +111,7 @@ namespace g2o {
   bool EdgeSE2PointXYOffset::setMeasurementFromState(){
     VertexPointXY *point = static_cast<VertexPointXY*>(_vertices[1]);
 
-    const Vector2d &pt = point->estimate();
+    const Eigen::Vector2d &pt = point->estimate();
 
     Eigen::Vector2d perr = cache->w2lMatrix() * pt;
     _measurement = perr;

@@ -39,8 +39,6 @@
 
 namespace g2o {
 
-  using namespace Eigen;
-
   /**
    * \brief base class to represent an edge connecting an arbitrary number of nodes
    *
@@ -55,22 +53,22 @@ namespace g2o {
        * \brief helper for mapping the Hessian memory of the upper triangular block
        */
       struct HessianHelper {
-        Map<MatrixXd> matrix;     ///< the mapped memory
+        Eigen::Map<Eigen::MatrixXd> matrix;     ///< the mapped memory
         bool transposed;          ///< the block has to be transposed
-      HessianHelper() : matrix(0, 0, 0), transposed(false) {}
+        HessianHelper() : matrix(0, 0, 0), transposed(false) {}
       };
 
     public:
       static const int Dimension = BaseEdge<D,E>::Dimension;
       typedef typename BaseEdge<D,E>::Measurement Measurement;
-      typedef MatrixXd::MapType JacobianType;
+      typedef Eigen::MatrixXd::MapType JacobianType;
       typedef typename BaseEdge<D,E>::ErrorVector ErrorVector;
       typedef typename BaseEdge<D,E>::InformationType InformationType;
-      typedef Map<MatrixXd, MatrixXd::Flags & AlignedBit ? Aligned : Unaligned > HessianBlockType;
+      typedef Eigen::Map<Eigen::MatrixXd, Eigen::MatrixXd::Flags & Eigen::AlignedBit ? Eigen::Aligned : Eigen::Unaligned > HessianBlockType;
 
-    BaseMultiEdge() : BaseEdge<D,E>()
-	{
-	}
+      BaseMultiEdge() : BaseEdge<D,E>()
+      {
+      }
       
       virtual void linearizeOplus(JacobianWorkspace& jacobianWorkspace);
 
@@ -98,13 +96,13 @@ namespace g2o {
       using BaseEdge<D,E>::_dimension;
 
       std::vector<HessianHelper> _hessian;
-      std::vector<JacobianType, aligned_allocator<JacobianType> > _jacobianOplus; ///< jacobians of the edge (w.r.t. oplus)
+      std::vector<JacobianType, Eigen::aligned_allocator<JacobianType> > _jacobianOplus; ///< jacobians of the edge (w.r.t. oplus)
 
       void computeQuadraticForm(const InformationType& omega, const ErrorVector& weightedError);
 
     public:
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-	};
+    };
 
 
 
@@ -117,7 +115,7 @@ namespace g2o {
        * \brief helper for mapping the Hessian memory of the upper triangular block
        */
       struct HessianHelper {
-        Map<MatrixXd> matrix;     ///< the mapped memory
+        Eigen::Map<Eigen::MatrixXd> matrix;     ///< the mapped memory
         bool transposed;          ///< the block has to be transposed
         HessianHelper() : matrix(0, 0, 0), transposed(false) {}
       };
@@ -125,10 +123,10 @@ namespace g2o {
     public:
       static const int Dimension = BaseEdge<-1,E>::Dimension;
       typedef typename BaseEdge<-1,E>::Measurement Measurement;
-      typedef MatrixXd::MapType JacobianType;
+      typedef Eigen::MatrixXd::MapType JacobianType;
       typedef typename BaseEdge<-1,E>::ErrorVector ErrorVector;
       typedef typename BaseEdge<-1,E>::InformationType InformationType;
-      typedef Map<MatrixXd, MatrixXd::Flags & AlignedBit ? Aligned : Unaligned > HessianBlockType;
+      typedef Eigen::Map<Eigen::MatrixXd, Eigen::MatrixXd::Flags & Eigen::AlignedBit ? Eigen::Aligned : Eigen::Unaligned > HessianBlockType;
 
       BaseMultiEdge() : BaseEdge<-1,E>()
     {
@@ -161,7 +159,7 @@ namespace g2o {
       using BaseEdge<-1,E>::_dimension;
 
       std::vector<HessianHelper> _hessian;
-      std::vector<JacobianType, aligned_allocator<JacobianType> > _jacobianOplus; ///< jacobians of the edge (w.r.t. oplus)
+      std::vector<JacobianType, Eigen::aligned_allocator<JacobianType> > _jacobianOplus; ///< jacobians of the edge (w.r.t. oplus)
 
       void computeQuadraticForm(const InformationType& omega, const ErrorVector& weightedError);
 

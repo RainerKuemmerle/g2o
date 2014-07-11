@@ -49,17 +49,17 @@ namespace g2o {
       virtual bool read(std::istream& is);
       virtual bool write(std::ostream& os) const;
 
-      virtual void setMeasurement(const Vector3d& m){
+      virtual void setMeasurement(const Eigen::Vector3d& m){
         _measurement = m;
       }
 
       virtual bool setMeasurementData(const double* d){
-        _measurement=Vector3d(d[0], d[1], d[2]);
+        _measurement=Eigen::Vector3d(d[0], d[1], d[2]);
         return true;
       }
 
       virtual bool getMeasurementData(double* d) const {
-	Eigen::Map<Vector3d> m(d);
+	Eigen::Map<Eigen::Vector3d> m(d);
 	m=_measurement;
         return true;
       }

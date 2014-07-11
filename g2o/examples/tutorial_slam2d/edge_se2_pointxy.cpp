@@ -26,6 +26,8 @@
 
 #include "edge_se2_pointxy.h"
 
+using namespace Eigen;
+
 namespace g2o {
   namespace tutorial {
 

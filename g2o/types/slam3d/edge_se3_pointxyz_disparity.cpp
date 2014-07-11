@@ -39,7 +39,7 @@ namespace g2o {
 
 
   // point to camera projection, monocular
-  EdgeSE3PointXYZDisparity::EdgeSE3PointXYZDisparity() : BaseBinaryEdge<3, Vector3d, VertexSE3, VertexPointXYZ>() {
+  EdgeSE3PointXYZDisparity::EdgeSE3PointXYZDisparity() : BaseBinaryEdge<3, Eigen::Vector3d, VertexSE3, VertexPointXYZ>() {
     resizeParameters(1);
     installParameter(params, 0);
     information().setIdentity();
@@ -63,16 +63,16 @@ namespace g2o {
     is >> pid;
     setParameterId(0,pid);
 
-    Vector3d meas;
+    Eigen::Vector3d meas;
     for (int i=0; i<3; i++) is >> meas[i];
     setMeasurement(meas);
     if (is.bad())
       return false;
     for ( int i=0; i<information().rows() && is.good(); i++)
       for (int j=i; j<information().cols() && is.good(); j++){
-  is >> information()(i,j);
-  if (i!=j)
-    information()(j,i)=information()(i,j);
+        is >> information()(i,j);
+        if (i!=j)
+          information()(j,i)=information()(i,j);
       }
     if (is.bad()) {
       //  we overwrite the information matrix
@@ -97,9 +97,9 @@ namespace g2o {
   void EdgeSE3PointXYZDisparity::computeError() {
     //VertexSE3 *cam = static_cast<VertexSE3*>(_vertices[0]);
     VertexPointXYZ *point = static_cast<VertexPointXYZ*>(_vertices[1]);
-    const Vector3d& pt = point->estimate();
+    const Eigen::Vector3d& pt = point->estimate();
     //Eigen::Vector4d ppt(pt(0),pt(1),pt(2),1.0);
-    
+
     // VertexCameraCache* vcache = (VertexCameraCache*)cam->getCache(_cacheIds[0]);
     // if (! vcache){
     //   cerr << "fatal error in retrieving cache" << endl;
@@ -109,13 +109,13 @@ namespace g2o {
     // if (! vcache){
     //   cerr << "fatal error in retrieving cache" << endl;
     // }
-    
+
     Eigen::Vector3d p = cache->w2i() * pt;
 
     Eigen::Vector3d perr;
     perr.head<2>() = p.head<2>()/p(2);
     perr(2) = 1/p(2);
-    
+
     // error, which is backwards from the normal observed - calculated
     // _measurement is the measured projection
     _error = perr - _measurement;
@@ -173,7 +173,7 @@ namespace g2o {
   bool EdgeSE3PointXYZDisparity::setMeasurementFromState(){
     //VertexSE3 *cam = static_cast< VertexSE3*>(_vertices[0]);
     VertexPointXYZ *point = static_cast<VertexPointXYZ*>(_vertices[1]);
-    const Vector3d &pt = point->estimate();
+    const Eigen::Vector3d &pt = point->estimate();
 
     // VertexCameraCache* vcache = (VertexCameraCache*) cam->getCache(_cacheIds[0]);
     // if (! vcache){

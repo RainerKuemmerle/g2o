@@ -35,7 +35,7 @@
 
 using namespace g2o;
 using namespace std;
-
+using namespace Eigen;
 
 int main(int argc, char** argv) {
   CommandArgs arg;

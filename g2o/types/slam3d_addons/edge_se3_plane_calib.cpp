@@ -8,6 +8,7 @@
 namespace g2o
 {
   using namespace std;
+  using namespace Eigen;
 
   EdgeSE3PlaneSensorCalib::EdgeSE3PlaneSensorCalib() :
     BaseMultiEdge<3, Plane3D>()

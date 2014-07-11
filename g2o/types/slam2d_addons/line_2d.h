@@ -49,7 +49,7 @@ namespace g2o {
     Line2D est = l;
     est[0] += t.rotation().angle();
     est[0] = normalize_theta(est[0]);
-    Vector2d n(cos(est[0]), sin(est[0]));
+    Eigen::Vector2d n(cos(est[0]), sin(est[0]));
     est[1] += n.dot(t.translation());
     return est;
   }

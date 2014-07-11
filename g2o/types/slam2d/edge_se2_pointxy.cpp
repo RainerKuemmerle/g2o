@@ -34,7 +34,7 @@
 namespace g2o {
 
   EdgeSE2PointXY::EdgeSE2PointXY() :
-    BaseBinaryEdge<2, Vector2d, VertexSE2, VertexPointXY>()
+    BaseBinaryEdge<2, Eigen::Vector2d, VertexSE2, VertexPointXY>()
   {
   }
 

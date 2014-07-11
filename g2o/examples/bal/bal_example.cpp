@@ -51,6 +51,7 @@
 
 using namespace g2o;
 using namespace std;
+using namespace Eigen;
 
 /**
  * \brief camera vertex which stores the parameters for a pinhole camera

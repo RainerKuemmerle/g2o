@@ -32,7 +32,6 @@
 #include<Eigen/StdVector>
 
 namespace g2o {
-  using namespace Eigen;
   
   template <class SampleType>
   struct SigmaPoint {
@@ -61,7 +60,7 @@ namespace g2o {
     sigmaPoints[0] = SigmaPoint<SampleType>(mean, 
               lambda/(dim + lambda), 
               lambda/(dim + lambda) + (1.-alpha*alpha+beta) ); 
-    LLT<CovarianceType> cholDecomp;
+    Eigen::LLT<CovarianceType> cholDecomp;
     cholDecomp.compute(covariance*(dim+lambda));
     if (cholDecomp.info()==Eigen::NumericalIssue)
       return false;

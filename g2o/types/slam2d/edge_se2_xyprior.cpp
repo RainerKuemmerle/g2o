@@ -35,7 +35,7 @@ namespace g2o {
 
   bool EdgeSE2XYPrior::read(std::istream& is)
   {
-    Vector2d p;
+    Eigen::Vector2d p;
     is >> p[0] >> p[1];
     setMeasurement(p);    
     for (int i = 0; i < 2; ++i)
@@ -49,7 +49,7 @@ namespace g2o {
 
   bool EdgeSE2XYPrior::write(std::ostream& os) const
   {
-    Vector2d p = measurement();
+    Eigen::Vector2d p = measurement();
     os << p[0] << " " << p[1];
     for (int i = 0; i < 2; ++i)
       for (int j = i; j < 2; ++j)

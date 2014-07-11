@@ -49,7 +49,7 @@ namespace g2o {
     VertexPointXY* l2 = static_cast<VertexPointXY*>(_vertices[1]);
     SE2 t=v1->estimate();
     t.setRotation(t.rotation().angle()+_measurement);
-    Vector2d vr;
+    Eigen::Vector2d vr;
     vr[0]=r; vr[1]=0;
     l2->setEstimate(t*vr);
   }

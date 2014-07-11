@@ -46,11 +46,11 @@ namespace g2o {
       {
         const VertexSE2* v1 = static_cast<const VertexSE2*>(_vertices[0]);
         const VertexLine2D* l2 = static_cast<const VertexLine2D*>(_vertices[1]);
-        Vector2d prediction=l2->estimate();
+        Eigen::Vector2d prediction=l2->estimate();
         SE2 iT=v1->estimate().inverse();
         prediction[0] += iT.rotation().angle();
         prediction[0] = normalize_theta(prediction[0]);
-        Vector2d n(cos(prediction[0]), sin(prediction[0]));
+        Eigen::Vector2d n(cos(prediction[0]), sin(prediction[0]));
         prediction[1] += n.dot(iT.translation());
         _error =  prediction - _measurement;
         _error [0] =  normalize_theta(_error[0]);
@@ -73,11 +73,11 @@ namespace g2o {
       virtual bool setMeasurementFromState(){
         const VertexSE2* v1 = static_cast<const VertexSE2*>(_vertices[0]);
         const VertexLine2D* l2 = static_cast<const VertexLine2D*>(_vertices[1]);
-        Vector2d prediction=l2->estimate();
+        Eigen::Vector2d prediction=l2->estimate();
         SE2 iT=v1->estimate().inverse();
         prediction[0] += iT.rotation().angle();
         prediction[0] = normalize_theta(prediction[0]);
-        Vector2d n(cos(prediction[0]), sin(prediction[0]));
+        Eigen::Vector2d n(cos(prediction[0]), sin(prediction[0]));
         prediction[1] += n.dot(iT.translation());
         _measurement = prediction;
         return true;

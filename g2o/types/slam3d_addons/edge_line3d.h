@@ -34,7 +34,6 @@
 
 namespace g2o
 {
-  using namespace Eigen;
 
   class G2O_TYPES_SLAM3D_ADDONS_API EdgeLine3D : public BaseBinaryEdge<6, Vector6d, VertexLine3D, VertexLine3D>
   {

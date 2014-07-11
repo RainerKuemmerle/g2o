@@ -33,6 +33,7 @@
 using namespace std;
 using namespace g2o;
 using namespace g2o::internal;
+using namespace Eigen;
 
 int main(int , char** ){
 

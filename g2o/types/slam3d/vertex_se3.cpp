@@ -32,6 +32,8 @@
 #include <iostream>
 #include "g2o/core/cache.h"
 
+using namespace Eigen;
+
 namespace g2o {
 
   VertexSE3::VertexSE3() :

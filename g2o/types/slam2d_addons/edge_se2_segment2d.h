@@ -50,8 +50,8 @@ namespace g2o {
       {
         const VertexSE2* v1 = static_cast<const VertexSE2*>(_vertices[0]);
         const VertexSegment2D* l2 = static_cast<const VertexSegment2D*>(_vertices[1]);
-	Map<Vector2d> error1(&_error(0));
-	Map<Vector2d> error2(&_error(2));
+        Eigen::Map<Eigen::Vector2d> error1(&_error(0));
+        Eigen::Map<Eigen::Vector2d> error2(&_error(2));
         SE2 iEst=v1->estimate().inverse();
         error1 = (iEst * l2->estimateP1());
 	error2 = (iEst * l2->estimateP2());
@@ -59,13 +59,13 @@ namespace g2o {
       }
 
       virtual bool setMeasurementData(const double* d){
-	Map<const Vector4d> data(d);
+        Eigen::Map<const Eigen::Vector4d> data(d);
 	_measurement = data;
 	return true;
       }
 
       virtual bool getMeasurementData(double* d) const{
-	Map<Vector4d> data(d);
+        Eigen::Map<Eigen::Vector4d> data(d);
 	data = _measurement;
 	return true;
       }

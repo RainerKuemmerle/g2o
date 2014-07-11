@@ -46,18 +46,18 @@ namespace g2o {
       virtual void setToOriginImpl() { _estimate.fill(0.); }
 
       virtual void oplusImpl(const double* update_) {
-        Map<const Vector3d> update(update_);
+        Eigen::Map<const Eigen::Vector3d> update(update_);
         _estimate += update;
       }
 
       virtual bool setEstimateDataImpl(const double* est){
-        Map<const Vector3d> _est(est);
+        Eigen::Map<const Eigen::Vector3d> _est(est);
         _estimate = _est;
         return true;
       }
 
       virtual bool getEstimateData(double* est) const{
-        Map<Vector3d> _est(est);
+        Eigen::Map<Eigen::Vector3d> _est(est);
         _est = _estimate;
         return true;
       }
@@ -67,12 +67,12 @@ namespace g2o {
       }
 
       virtual bool setMinimalEstimateDataImpl(const double* est){
-        _estimate = Map<const Vector3d>(est);
+        _estimate = Eigen::Map<const Eigen::Vector3d>(est);
         return true;
       }
 
       virtual bool getMinimalEstimateData(double* est) const{
-        Map<Vector3d> v(est);
+        Eigen::Map<Eigen::Vector3d> v(est);
         v = _estimate;
         return true;
       }

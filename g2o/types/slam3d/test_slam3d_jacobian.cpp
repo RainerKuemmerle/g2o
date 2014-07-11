@@ -34,6 +34,7 @@
 
 using namespace std;
 using namespace g2o;
+using namespace Eigen;
 
 Eigen::Isometry3d randomIsometry3d()
 {

@@ -35,6 +35,7 @@
 using namespace std;
 using namespace g2o;
 using namespace g2o::internal;
+using namespace Eigen;
 
 /**
  * \brief Functor used to compute the Jacobian via AD

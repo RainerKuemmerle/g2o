@@ -52,13 +52,13 @@ namespace g2o {
       }
 
       virtual bool setEstimateDataImpl(const double* est){
-	Map<const Eigen::Vector4d> v(est);
+        Eigen::Map<const Eigen::Vector4d> v(est);
 	_estimate = v;
 	return true;
       }
 
       virtual bool getEstimateData(double* est) const{	
-	Map<Vector4d> v(est);
+        Eigen::Map<Eigen::Vector4d> v(est);
 	v = _estimate;
 	return true;
       }
@@ -81,7 +81,7 @@ namespace g2o {
 
       virtual void oplusImpl(const double* update)
       {
-	Map<const Eigen::Vector4d> upd(update);
+        Eigen::Map<const Eigen::Vector4d> upd(update);
         _estimate += upd;
       }
 

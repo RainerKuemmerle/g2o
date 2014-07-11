@@ -54,6 +54,7 @@
 
 using namespace std;
 using namespace g2o;
+using namespace Eigen;
 
 struct LineInfo {
   LineInfo(VertexSegment2D* s) {

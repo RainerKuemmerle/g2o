@@ -34,6 +34,8 @@
 #include <iostream>
 #include "g2o/core/cache.h"
 
+using namespace Eigen;
+
 namespace g2o {
 namespace deprecated {
 

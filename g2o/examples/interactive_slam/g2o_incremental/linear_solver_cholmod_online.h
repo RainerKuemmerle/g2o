@@ -35,7 +35,7 @@ class G2O_INCREMENTAL_API LinearSolverCholmodOnlineInterface
     virtual bool solve(double* x, double* b) = 0;
     virtual cholmod_factor* L() const = 0;
     virtual size_t nonZerosInL() const = 0;
-    VectorXi* cmember;
+    Eigen::VectorXi* cmember;
     int batchEveryN;
 };
 
@@ -167,7 +167,7 @@ class LinearSolverCholmodOnline : public LinearSolver<MatrixType>, public Linear
     cholmod_factor* _cholmodFactor;
     bool _blockOrdering;
     MatrixStructure _matrixStructure;
-    VectorXi _scalarPermutation, _blockPermutation;
+    Eigen::VectorXi _scalarPermutation, _blockPermutation;
 
   public:
     void computeSymbolicDecomposition(const SparseBlockMatrix<MatrixType>& A)
