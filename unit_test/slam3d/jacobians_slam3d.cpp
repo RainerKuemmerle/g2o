@@ -26,6 +26,8 @@
 
 #include "gtest/gtest.h"
 
+#include "unit_test/test_helper/evaluate_jacobian.h"
+
 #include "g2o/core/jacobian_workspace.h"
 #include "g2o/types/slam3d/edge_se3.h"
 #include "g2o/types/slam3d/edge_pointxyz.h"
@@ -45,34 +47,6 @@ static Eigen::Isometry3d randomIsometry3d()
   Eigen::Isometry3d result = (Eigen::Isometry3d)rotation.toRotationMatrix();
   result.translation() = Vector3d::Random();
   return result;
-}
-
-template <typename EdgeType>
-void evaluateJacobian(EdgeType& e, JacobianWorkspace& jacobianWorkspace, JacobianWorkspace& numericJacobianWorkspace)
-{
-    // calling the analytic Jacobian but writing to the numeric workspace
-    e.BaseBinaryEdge<EdgeType::Dimension, typename EdgeType::Measurement,
-      typename EdgeType::VertexXiType, typename EdgeType::VertexXjType>::linearizeOplus(numericJacobianWorkspace);
-    // copy result into analytic workspace
-    jacobianWorkspace = numericJacobianWorkspace;
-
-    // compute the numeric Jacobian into the numericJacobianWorkspace workspace as setup by the previous call
-    e.BaseBinaryEdge<EdgeType::Dimension, typename EdgeType::Measurement,
-      typename EdgeType::VertexXiType, typename EdgeType::VertexXjType>::linearizeOplus();
-
-    // compare the two Jacobians
-    for (int i = 0; i < 2; ++i) {
-      double* n = numericJacobianWorkspace.workspaceForVertex(i);
-      double* a = jacobianWorkspace.workspaceForVertex(i);
-      int numElems = EdgeType::Dimension;
-      if (i == 0)
-        numElems *= EdgeType::VertexXiType::Dimension;
-      else
-        numElems *= EdgeType::VertexXjType::Dimension;
-      for (int j = 0; j < numElems; ++j) {
-        EXPECT_NEAR(n[j], a[j], 1e-6);
-      }
-    }
 }
 
 TEST(Slam3D, EdgeSE3Jacobian)
