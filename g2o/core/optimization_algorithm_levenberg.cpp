@@ -76,7 +76,6 @@ namespace g2o {
     }
 
     double currentChi = _optimizer->activeRobustChi2();
-    double tempChi=currentChi;
 
     _solver->buildSystem();
     if (globalStats) {
@@ -114,7 +113,7 @@ namespace g2o {
       _solver->restoreDiagonal();
 
       _optimizer->computeActiveErrors();
-      tempChi = _optimizer->activeRobustChi2();
+      double tempChi = _optimizer->activeRobustChi2();
 
       if (! ok2)
         tempChi=std::numeric_limits<double>::max();
