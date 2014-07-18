@@ -50,13 +50,13 @@ namespace g2o {
       }
 
       virtual bool setMeasurementData(const double* d) {
-  _measurement=d[0];
-  return true;
+        _measurement=d[0];
+        return true;
       }
 
       virtual bool getMeasurementData(double* d) const {
-  d[0] = _measurement;
-  return true;
+        d[0] = _measurement;
+        return true;
       }
 
       int measurementDimension() const {return 1;}
@@ -65,8 +65,8 @@ namespace g2o {
         const VertexSE2* v1 = static_cast<const VertexSE2*>(_vertices[0]);
         const VertexPointXY* l2 = static_cast<const VertexPointXY*>(_vertices[1]);
         Eigen::Vector2d delta = (v1->estimate().inverse() * l2->estimate());
-  _measurement = atan2(delta[1], delta[0]);
-  return true;
+        _measurement = atan2(delta[1], delta[0]);
+        return true;
       }
       
       virtual bool read(std::istream& is);
