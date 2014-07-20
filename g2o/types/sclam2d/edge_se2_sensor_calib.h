@@ -54,8 +54,8 @@ namespace g2o {
       }
 
       void setMeasurement(const SE2& m){
-  _measurement = m;
-  _inverseMeasurement = m.inverse();
+        _measurement = m;
+        _inverseMeasurement = m.inverse();
       }
 
       virtual double initialEstimatePossible(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to)
