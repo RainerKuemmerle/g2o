@@ -25,8 +25,9 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "edge_se2_sensor_calib.h"
+#ifdef G2O_HAVE_OPENGL
 #include "g2o/stuff/opengl_wrapper.h"
-
+#endif
 namespace g2o {
 
   EdgeSE2SensorCalib::EdgeSE2SensorCalib() :

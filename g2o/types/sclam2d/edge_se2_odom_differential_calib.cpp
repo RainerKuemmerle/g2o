@@ -26,7 +26,9 @@
 
 #include "edge_se2_odom_differential_calib.h"
 
+#ifdef G2O_HAVE_OPENGL
 #include "g2o/stuff/opengl_wrapper.h"
+#endif
 
 namespace g2o {
 
