@@ -208,6 +208,7 @@ IF(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   #SET(g2o_CXX_FLAGS "${g2o_CXX_FLAGS} -Weverything")
   SET(g2o_C_FLAGS "${g2o_C_FLAGS} -Wall")
   SET(g2o_CXX_FLAGS "${g2o_CXX_FLAGS} -Wall")
+  #SET(g2o_CXX_FLAGS "${g2o_CXX_FLAGS} -Wall -stdlib=libc++")
 ENDIF()
 
 
