@@ -26,11 +26,7 @@
 
 #include <Eigen/StdVector>
 
-#ifdef _MSC_VER
 #include <unordered_set>
-#else
-#include <tr1/unordered_set>
-#endif
 
 #include <iostream>
 #include <stdint.h>
@@ -234,8 +230,8 @@ int main(int argc, const char* argv[])
   double sum_diff2 = 0;
 
   cout << endl;
-  tr1::unordered_map<int,int> pointid_2_trueid;
-  tr1::unordered_set<int> inliers;
+  unordered_map<int,int> pointid_2_trueid;
+  unordered_set<int> inliers;
 
   // add point projections to this vertex
   for (size_t i=0; i<true_points.size(); ++i)
@@ -371,7 +367,7 @@ int main(int argc, const char* argv[])
   sum_diff2 = 0;
 
 
-  for (tr1::unordered_map<int,int>::iterator it=pointid_2_trueid.begin();
+  for (unordered_map<int,int>::iterator it=pointid_2_trueid.begin();
        it!=pointid_2_trueid.end(); ++it)
   {
 

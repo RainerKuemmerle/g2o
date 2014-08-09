@@ -288,16 +288,22 @@ namespace g2o {
     return true;
   }
 
-  bool OptimizableGraph::setEdgeVertex(Edge* e, int pos, Vertex* v){
+  bool OptimizableGraph::setEdgeVertex(HyperGraph::Edge* e, int pos, HyperGraph::Vertex* v){
     if (! HyperGraph::setEdgeVertex(e,pos,v)){
       return false;
     }
     if (!e->numUndefinedVertices()){
-      if (! e->resolveParameters()){
+#ifndef NDEBUG
+      OptimizableGraph::Edge* ee = dynamic_cast<OptimizableGraph::Edge*>(e);
+      assert(ee && "Edge is not a OptimizableGraph::Edge");
+#else
+      OptimizableGraph::Edge* ee = static_cast<OptimizableGraph::Edge*>(e);
+#endif
+      if (! ee->resolveParameters()){
 	cerr << __FUNCTION__ << ": FATAL, cannot resolve parameters for edge " << e << endl;
 	return false;
       }
-      if (! e->resolveCaches()){
+      if (! ee->resolveCaches()){
 	cerr << __FUNCTION__ << ": FATAL, cannot resolve caches for edge " << e << endl;
 	return false;
       }

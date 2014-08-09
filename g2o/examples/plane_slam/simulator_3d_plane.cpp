@@ -199,10 +199,10 @@ struct PlaneSensor: public Sensor{
     robot()->graph()->addVertex(_offsetVertex);
   };
 
-  virtual bool isVisible(WorldItem* wi){
+  virtual bool isVisible(const WorldItem* wi) const {
     if (! wi)
       return false;
-    PlaneItem* pi=dynamic_cast<PlaneItem*>(wi);
+    const PlaneItem* pi=dynamic_cast<const PlaneItem*>(wi);
     if (! pi)
       return false;
     return true;

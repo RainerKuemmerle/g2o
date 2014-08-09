@@ -1,0 +1,36 @@
+language: cpp
+
+notifications:
+  email:
+    recipients:
+      - kuemmerl@informatik.uni-freiburg.de
+    on_success: change # default: change
+    on_failure: always # default: always
+
+compiler:
+  - gcc
+  - clang
+
+before_install:
+  - env
+  - sh script/install-deps-linux.sh
+    #- sh script/install-deps-${TRAVIS_OS_NAME}.sh
+
+before_script:
+  - mkdir build
+  - cd build
+  - cmake ..
+  - cat g2o/config.h
+
+matrix:
+  exclude:
+   - os: osx
+     compiler: gcc
+  allow_failures:
+    - os: osx
+
+script: make
+
+os:
+  - linux
+    #- osx

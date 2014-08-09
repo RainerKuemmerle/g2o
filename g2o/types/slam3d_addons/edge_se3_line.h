@@ -30,6 +30,10 @@ namespace g2o {
 
       void computeError();
 
+      virtual void setMeasurement(const Vector7d& m){
+        _measurement = m;
+      }
+
       virtual void setMeasurement(const Line3D& m){
         _measurement.head<6>() = Line3D(m);
 	_measurement(6) = 1;

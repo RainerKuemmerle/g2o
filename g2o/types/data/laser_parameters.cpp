@@ -35,7 +35,6 @@ namespace g2o {
     angularStep    = _angularStep;
     maxRange       = _maxRange;
     laserPose      = SE2(0., 0., 0.);
-    maxRange       = maxRange;
     accuracy       = _accuracy;
     remissionMode  = _remissionMode;
     fov            = angularStep * nbeams;
@@ -48,7 +47,6 @@ namespace g2o {
     angularStep    = _angularStep;
     maxRange       = _maxRange;
     laserPose      = SE2(0., 0., 0.);
-    maxRange       = maxRange;
     accuracy       = 0.1;
     remissionMode  = 0;
     fov            = angularStep * nbeams;

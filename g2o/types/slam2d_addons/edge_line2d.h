@@ -49,6 +49,10 @@ namespace g2o {
       virtual bool read(std::istream& is);
       virtual bool write(std::ostream& os) const;
 
+      virtual void setMeasurement(const Line2D& m){
+        _measurement = m;
+      }
+
       virtual void setMeasurement(const Eigen::Vector2d& m){
         _measurement = m;
       }
