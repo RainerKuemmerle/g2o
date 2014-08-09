@@ -1,6 +1,6 @@
-#!/bin/sh
+#!/bin/bash
 
-set -x
+set -ev
 
 brew update
 brew install cmake

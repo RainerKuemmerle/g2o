@@ -1,4 +1,8 @@
-language: cpp
+language: c
+
+os:
+  - linux
+  - osx
 
 notifications:
   email:
@@ -12,9 +16,11 @@ compiler:
   - clang
 
 before_install:
-  - env
-  - sh script/install-deps-linux.sh
-    #- sh script/install-deps-${TRAVIS_OS_NAME}.sh
+  - env | sort
+
+install:
+  - script/install-deps-linux.sh
+    #- script/install-deps-${TRAVIS_OS_NAME}.sh
 
 before_script:
   - mkdir build
@@ -30,7 +36,3 @@ matrix:
     - os: osx
 
 script: make
-
-os:
-  - linux
-    #- osx
