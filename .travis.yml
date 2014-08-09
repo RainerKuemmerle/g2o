@@ -1,5 +1,9 @@
 language: cpp
 
+os:
+  - linux
+  #- osx
+
 notifications:
   email:
     recipients:
@@ -12,7 +16,9 @@ compiler:
   - clang
 
 before_install:
-  - env
+  - env | sort
+
+install:
   - sh script/install-deps-linux.sh
     #- sh script/install-deps-${TRAVIS_OS_NAME}.sh
 
@@ -22,15 +28,11 @@ before_script:
   - cmake ..
   - cat g2o/config.h
 
+script: make
+
 matrix:
   exclude:
    - os: osx
      compiler: gcc
   allow_failures:
     - os: osx
-
-script: make
-
-os:
-  - linux
-    #- osx
