@@ -19,8 +19,8 @@ before_install:
   - env | sort
 
 install:
-  - script/install-deps-linux.sh
-    #- script/install-deps-${TRAVIS_OS_NAME}.sh
+  #- script/install-deps-linux.sh
+  - script/install-deps-${TRAVIS_OS_NAME}.sh
 
 before_script:
   - mkdir build
@@ -29,9 +29,9 @@ before_script:
   - cat g2o/config.h
 
 matrix:
-  #exclude:
-    #- os: osx
-    #compiler: gcc
+  exclude:
+    - os: osx
+      compiler: gcc
   allow_failures:
     - os: osx
 
