@@ -9,7 +9,7 @@ notifications:
 
 compiler:
   - gcc
-  #- clang    # not working right now
+  - clang
 
 before_install:
   - ./script/install-deps-${TRAVIS_OS_NAME}.sh
@@ -31,4 +31,4 @@ script: make
 
 os:
   - linux
-  #- osx
+  - osx
