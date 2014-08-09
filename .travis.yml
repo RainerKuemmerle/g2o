@@ -12,7 +12,9 @@ compiler:
   - clang
 
 before_install:
-  - sh script/install-deps-${TRAVIS_OS_NAME}.sh
+  - env
+  - sh script/install-deps-linux.sh
+    #- sh script/install-deps-${TRAVIS_OS_NAME}.sh
 
 before_script:
   - mkdir build
@@ -31,4 +33,4 @@ script: make
 
 os:
   - linux
-  - osx
+    #- osx
