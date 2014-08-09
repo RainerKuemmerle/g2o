@@ -1,18 +1,34 @@
 language: cpp
+
 notifications:
   email:
     recipients:
       - kuemmerl@informatik.uni-freiburg.de
-    on_success: never # default: change
+    on_success: change # default: change
     on_failure: always # default: always
+
 compiler:
   - gcc
   #- clang    # not working right now
+
 before_install:
-  - sudo apt-get update -qq
-  - sudo apt-get install -qq libqt4-dev libqt4-opengl-dev libqglviewer-qt4-dev libeigen3-dev libsuitesparse-dev
+  - ./script/install-deps-${TRAVIS_OS_NAME}.sh
+
 before_script:
   - mkdir build
   - cd build
   - cmake ..
+  - cat g2o/config.h
+
+matrix:
+  exclude:
+   - os: osx
+     compiler: gcc
+  allow_failures:
+    - os: osx
+
 script: make
+
+os:
+  - linux
+  #- osx
