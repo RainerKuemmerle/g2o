@@ -29,9 +29,9 @@ before_script:
   - cat g2o/config.h
 
 matrix:
-  exclude:
-   - os: osx
-     compiler: gcc
+  #exclude:
+    #- os: osx
+    #compiler: gcc
   allow_failures:
     - os: osx
 
