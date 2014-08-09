@@ -25,11 +25,7 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <Eigen/StdVector>
-#ifdef _MSC_VER
 #include <random>
-#else
-#include <tr1/random>
-#endif
 #include <iostream>
 #include <stdint.h>
 
@@ -48,8 +44,8 @@ using namespace g2o;
   class Sample
   {
 
-    static tr1::ranlux_base_01 gen_real;
-    static tr1::mt19937 gen_int;
+    static default_random_engine gen_real;
+    static default_random_engine gen_int;
   public:
     static int uniform(int from, int to);
 
@@ -59,26 +55,26 @@ using namespace g2o;
   };
 
 
- tr1::ranlux_base_01 Sample::gen_real;
-  tr1::mt19937 Sample::gen_int;
+  default_random_engine Sample::gen_real;
+  default_random_engine Sample::gen_int;
 
   int Sample::uniform(int from, int to)
   {
-    tr1::uniform_int<int> unif(from, to);
+    uniform_int_distribution<int> unif(from, to);
     int sam = unif(gen_int);
     return  sam;
   }
 
   double Sample::uniform()
   {
-    std::tr1::uniform_real<double> unif(0.0, 1.0);
+    std::uniform_real_distribution<double> unif(0.0, 1.0);
     double sam = unif(gen_real);
     return  sam;
   }
 
   double Sample::gaussian(double sigma)
   {
-    std::tr1::normal_distribution<double> gauss(0.0, sigma);
+    std::normal_distribution<double> gauss(0.0, sigma);
     double sam = gauss(gen_real);
     return  sam;
   }

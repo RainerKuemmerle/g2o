@@ -30,18 +30,18 @@ namespace g2o {
 
   static std::normal_distribution<double> _univariateSampler(0., 1.);
   static std::uniform_real_distribution<double> _uniformReal;
-  static std::ranlux24_base* _gen_real = new std::ranlux24_base;
+  static std::mt19937 _gen_real;
  
-  double sampleUniform(double min, double max, std::ranlux24_base* generator){
+  double sampleUniform(double min, double max, std::mt19937* generator){
     if (generator)
       return _uniformReal(*generator)*(max-min)+min;
-    return _uniformReal(*_gen_real)*(max-min)+min;
+    return _uniformReal(_gen_real)*(max-min)+min;
   }
 
-  double sampleGaussian(std::ranlux24_base* generator){
+  double sampleGaussian(std::mt19937* generator){
     if (generator)
       return _univariateSampler(*generator);
-    return _univariateSampler(*_gen_real);
+    return _univariateSampler(_gen_real);
   }
 
 }

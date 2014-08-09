@@ -12,7 +12,7 @@ compiler:
   - clang
 
 before_install:
-  - ./script/install-deps-${TRAVIS_OS_NAME}.sh
+  - sh script/install-deps-${TRAVIS_OS_NAME}.sh
 
 before_script:
   - mkdir build
