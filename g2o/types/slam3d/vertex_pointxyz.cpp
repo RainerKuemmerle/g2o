@@ -24,11 +24,11 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "g2o/stuff/opengl_primitives.h"
 #include "vertex_pointxyz.h"
 #include <stdio.h>
 
 #ifdef G2O_HAVE_OPENGL
+#include "g2o/stuff/opengl_primitives.h"
 #include "g2o/stuff/opengl_wrapper.h"
 #endif
 

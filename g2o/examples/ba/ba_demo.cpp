@@ -28,11 +28,7 @@
 #include <iostream>
 #include <stdint.h>
 
-#ifdef _MSC_VER
 #include <unordered_set>
-#else
-#include <tr1/unordered_set>
-#endif
 
 #include "g2o/core/sparse_optimizer.h"
 #include "g2o/core/block_solver.h"
@@ -192,8 +188,8 @@ int main(int argc, const char* argv[]){
   double sum_diff2 = 0;
 
   cout << endl;
-  tr1::unordered_map<int,int> pointid_2_trueid;
-  tr1::unordered_set<int> inliers;
+  unordered_map<int,int> pointid_2_trueid;
+  unordered_set<int> inliers;
 
   for (size_t i=0; i<true_points.size(); ++i){
     g2o::VertexSBAPointXYZ * v_p
@@ -276,7 +272,7 @@ int main(int argc, const char* argv[]){
   cout << "Point error before optimisation (inliers only): " << sqrt(sum_diff2/point_num) << endl;
   point_num = 0;
   sum_diff2 = 0;
-  for (tr1::unordered_map<int,int>::iterator it=pointid_2_trueid.begin();
+  for (unordered_map<int,int>::iterator it=pointid_2_trueid.begin();
        it!=pointid_2_trueid.end(); ++it){
     g2o::HyperGraph::VertexIDMap::iterator v_it
         = optimizer.vertices().find(it->first);

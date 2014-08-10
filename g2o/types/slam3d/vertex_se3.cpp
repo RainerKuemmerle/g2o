@@ -26,8 +26,10 @@
 
 #include "vertex_se3.h"
 #include "g2o/core/factory.h"
+#ifdef G2O_HAVE_OPENGL
 #include "g2o/stuff/opengl_wrapper.h"
 #include "g2o/stuff/opengl_primitives.h"
+#endif
 
 #include <iostream>
 #include "g2o/core/cache.h"
