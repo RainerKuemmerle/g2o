@@ -2,7 +2,7 @@ language: cpp
 
 os:
   - linux
-  #- osx
+  - osx
 
 notifications:
   email:
@@ -19,8 +19,8 @@ before_install:
   - env | sort
 
 install:
-  - sh script/install-deps-linux.sh
-    #- sh script/install-deps-${TRAVIS_OS_NAME}.sh
+  #- script/install-deps-linux.sh
+  - script/install-deps-${TRAVIS_OS_NAME}.sh
 
 before_script:
   - mkdir build
@@ -32,7 +32,9 @@ script: make
 
 matrix:
   exclude:
-   - os: osx
-     compiler: gcc
+    - os: osx
+      compiler: gcc
   allow_failures:
     - os: osx
+
+script: make

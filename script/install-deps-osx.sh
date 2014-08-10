@@ -1,7 +1,11 @@
-#!/bin/sh
+#!/bin/bash
 
-set -x
+set -ev
 
 brew update
-brew install cmake
+
+if brew outdated | grep -qx cmake; then
+  brew upgrade cmake;
+fi
+
 brew install eigen
