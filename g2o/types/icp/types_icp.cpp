@@ -72,15 +72,15 @@ namespace g2o {
 
   using namespace std;
   using namespace Eigen;
-  typedef  Matrix<double, 6, 1> Vector6d;
+  typedef Matrix<double, 6, 1, Eigen::ColMajor> Vector6d;
 
-  Matrix3d Edge_V_V_GICP::dRidx; // differential quat matrices
-  Matrix3d Edge_V_V_GICP::dRidy; // differential quat matrices
-  Matrix3d Edge_V_V_GICP::dRidz; // differential quat matrices
-  Matrix3d VertexSCam::dRidx; // differential quat matrices
-  Matrix3d VertexSCam::dRidy; // differential quat matrices
-  Matrix3d VertexSCam::dRidz; // differential quat matrices
-  Matrix3d VertexSCam::Kcam;
+  Matrix3D Edge_V_V_GICP::dRidx; // differential quat matrices
+  Matrix3D Edge_V_V_GICP::dRidy; // differential quat matrices
+  Matrix3D Edge_V_V_GICP::dRidz; // differential quat matrices
+  Matrix3D VertexSCam::dRidx; // differential quat matrices
+  Matrix3D VertexSCam::dRidy; // differential quat matrices
+  Matrix3D VertexSCam::dRidz; // differential quat matrices
+  Matrix3D VertexSCam::Kcam;
   double VertexSCam::baseline;
 
   // global initialization
@@ -145,12 +145,12 @@ namespace g2o {
     // GICP info matrices
 
     // point-plane only
-    Matrix3d prec;
+    Matrix3D prec;
     double v = .01;
     prec << v, 0, 0,
             0, v, 0,
             0, 0, 1;
-    const Matrix3d &R = measurement().R0; // plane of the point in vp0
+    const Matrix3D &R = measurement().R0; // plane of the point in vp0
     information() = R.transpose()*prec*R;
 
     //    information().setIdentity();
@@ -178,15 +178,15 @@ namespace g2o {
     VertexSE3* vp1 = static_cast<VertexSE3*>(_vertices[1]);
 
     // topLeftCorner<3,3>() is the rotation matrix
-    Matrix3d R0T = vp0->estimate().matrix().topLeftCorner<3,3>().transpose();
-    Vector3d p1 = measurement().pos1;
+    Matrix3D R0T = vp0->estimate().matrix().topLeftCorner<3,3>().transpose();
+    Vector3D p1 = measurement().pos1;
 
     // this could be more efficient
     if (!vp0->fixed())
       {
-        Eigen::Isometry3d T01 = vp0->estimate().inverse() *  vp1->estimate();
-        Vector3d p1t = T01 * p1;
-        _jacobianOplusXi.block<3,3>(0,0) = -Matrix3d::Identity();
+        Isometry3D T01 = vp0->estimate().inverse() *  vp1->estimate();
+        Vector3D p1t = T01 * p1;
+        _jacobianOplusXi.block<3,3>(0,0) = -Matrix3D::Identity();
         _jacobianOplusXi.block<3,1>(0,3) = dRidx*p1t;
         _jacobianOplusXi.block<3,1>(0,4) = dRidy*p1t;
         _jacobianOplusXi.block<3,1>(0,5) = dRidz*p1t;
@@ -194,7 +194,7 @@ namespace g2o {
 
     if (!vp1->fixed())
       {
-        Matrix3d R1 = vp1->estimate().matrix().topLeftCorner<3,3>();
+        Matrix3D R1 = vp1->estimate().matrix().topLeftCorner<3,3>();
         R0T = R0T*R1;
         _jacobianOplusXj.block<3,3>(0,0) = R0T;
         _jacobianOplusXj.block<3,1>(0,3) = R0T*dRidx.transpose()*p1;
@@ -246,14 +246,14 @@ namespace g2o {
     VertexSCam *vc = static_cast<VertexSCam *>(_vertices[1]);
 
     VertexSBAPointXYZ *vp = static_cast<VertexSBAPointXYZ *>(_vertices[0]);
-    Vector4d pt, trans;
+    Vector4D pt, trans;
     pt.head<3>() = vp->estimate();
     pt(3) = 1.0;
     trans.head<3>() = vc->estimate().translation();
     trans(3) = 1.0;
 
     // first get the world point in camera coords
-    Eigen::Matrix<double,3,1> pc = vc->w2n * pt;
+    Eigen::Matrix<double,3,1,Eigen::ColMajor> pc = vc->w2n * pt;
 
     // Jacobians wrt camera parameters
     // set d(quat-x) values [ pz*dpx/dx - px*dpz/dx ] / pz^2
@@ -271,13 +271,13 @@ namespace g2o {
     double ipz2fy = ipz2*vc->Kcam(1,1); // Fy
     double b      = vc->baseline; // stereo baseline
 
-    Eigen::Matrix<double,3,1> pwt;
+    Eigen::Matrix<double,3,1,Eigen::ColMajor> pwt;
 
     // check for local vars
     pwt = (pt-trans).head<3>(); // transform translations, use differential rotation
 
     // dx
-    Eigen::Matrix<double,3,1> dp = vc->dRdx * pwt; // dR'/dq * [pw - t]
+    Eigen::Matrix<double,3,1,Eigen::ColMajor> dp = vc->dRdx * pwt; // dR'/dq * [pw - t]
     _jacobianOplusXj(0,3) = (pz*dp(0) - px*dp(2))*ipz2fx;
     _jacobianOplusXj(1,3) = (pz*dp(1) - py*dp(2))*ipz2fy;
     _jacobianOplusXj(2,3) = (pz*dp(0) - (px-b)*dp(2))*ipz2fx; // right image px

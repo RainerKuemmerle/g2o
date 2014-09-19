@@ -33,6 +33,7 @@
 #include <vector>
 #include <cassert>
 
+#include "g2o/config.h"
 #include "g2o_core_api.h"
 #include "hyper_graph.h"
 
@@ -51,7 +52,7 @@ namespace g2o {
   class G2O_CORE_API JacobianWorkspace
   {
     public:
-      typedef std::vector<Eigen::VectorXd, Eigen::aligned_allocator<Eigen::VectorXd> >      WorkspaceVector;
+      typedef std::vector<VectorXD, Eigen::aligned_allocator<VectorXD> >      WorkspaceVector;
 
     public:
       JacobianWorkspace();

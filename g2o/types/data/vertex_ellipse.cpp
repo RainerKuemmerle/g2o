@@ -44,9 +44,9 @@ namespace g2o {
 
   VertexEllipse::VertexEllipse() : RobotData()
   {
-    _covariance = Eigen::Matrix3f::Zero();
-    _U = Eigen::Matrix2f::Zero();
-    _singularValues = Eigen::Vector2f::Zero();
+    _covariance = Matrix3F::Zero();
+    _U = Matrix2F::Zero();
+    _singularValues = Vector2F::Zero();
   }
 
   VertexEllipse::~VertexEllipse()
@@ -54,7 +54,7 @@ namespace g2o {
   }
 
   void VertexEllipse::_updateSVD() const{
-    Eigen::SelfAdjointEigenSolver<Eigen::Matrix2f> eigenSolver(_covariance.block<2,2>(0,0));
+    Eigen::SelfAdjointEigenSolver<Matrix2F> eigenSolver(_covariance.block<2,2>(0,0));
     _U = eigenSolver.eigenvectors();
     _singularValues = eigenSolver.eigenvalues();
 
@@ -153,10 +153,10 @@ namespace g2o {
       glEnd();
     }
 
-    Eigen::Matrix2f rot = that->U();
+    Matrix2F rot = that->U();
     float angle = atan2(rot(1,0), rot(0,0));
     glRotatef(angle*180.0/M_PI, 0., 0., 1.);
-    Eigen::Vector2f sv = that->singularValues();
+    Vector2F sv = that->singularValues();
     glScalef(sqrt(sv(0)), sqrt(sv(1)), 1);
 
     glColor3f(1.f,0.7f,1.f);

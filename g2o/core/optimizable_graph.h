@@ -390,7 +390,7 @@ namespace g2o {
         virtual const double* errorData() const = 0;
         virtual double* errorData() = 0;
 
-        //! returns the memory of the information matrix, usable for example with a Eigen::Map<MatrixXd>
+        //! returns the memory of the information matrix, usable for example with a Eigen::Map<MatrixXD>
         virtual const double* informationData() const = 0;
         virtual double* informationData() = 0;
 

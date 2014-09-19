@@ -34,11 +34,11 @@ BaseVertex<D, T>::BaseVertex() :
 
 template <int D, typename T>
 double BaseVertex<D, T>::solveDirect(double lambda) {
-  Eigen::Matrix <double, D, D> tempA=_hessian + Eigen::Matrix <double, D, D>::Identity()*lambda;
+  Eigen::Matrix<double, D, D, Eigen::ColMajor> tempA=_hessian + Eigen::Matrix<double, D, D, Eigen::ColMajor>::Identity()*lambda;
   double det=tempA.determinant();
   if (g2o_isnan(det) || det < std::numeric_limits<double>::epsilon())
     return det;
-  Eigen::Matrix <double, D, 1> dx=tempA.llt().solve(_b);
+  Eigen::Matrix<double, D, 1, Eigen::ColMajor> dx=tempA.llt().solve(_b);
   oplus(&dx[0]);
   return det;
 }

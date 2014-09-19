@@ -44,11 +44,11 @@ namespace g2o {
   {
     static const int PoseDim = _PoseDim;
     static const int LandmarkDim = _LandmarkDim;
-    typedef Eigen::Matrix<double, PoseDim, PoseDim> PoseMatrixType;
-    typedef Eigen::Matrix<double, LandmarkDim, LandmarkDim> LandmarkMatrixType;
-    typedef Eigen::Matrix<double, PoseDim, LandmarkDim> PoseLandmarkMatrixType;
-    typedef Eigen::Matrix<double, PoseDim, 1> PoseVectorType;
-    typedef Eigen::Matrix<double, LandmarkDim, 1> LandmarkVectorType;
+    typedef Eigen::Matrix<double, PoseDim, PoseDim, Eigen::ColMajor> PoseMatrixType;
+    typedef Eigen::Matrix<double, LandmarkDim, LandmarkDim, Eigen::ColMajor> LandmarkMatrixType;
+    typedef Eigen::Matrix<double, PoseDim, LandmarkDim, Eigen::ColMajor> PoseLandmarkMatrixType;
+    typedef Eigen::Matrix<double, PoseDim, 1, Eigen::ColMajor> PoseVectorType;
+    typedef Eigen::Matrix<double, LandmarkDim, 1, Eigen::ColMajor> LandmarkVectorType;
 
     typedef SparseBlockMatrix<PoseMatrixType> PoseHessianType;
     typedef SparseBlockMatrix<LandmarkMatrixType> LandmarkHessianType;
@@ -64,11 +64,11 @@ namespace g2o {
   {
     static const int PoseDim = Eigen::Dynamic;
     static const int LandmarkDim = Eigen::Dynamic;
-    typedef Eigen::MatrixXd PoseMatrixType;
-    typedef Eigen::MatrixXd LandmarkMatrixType;
-    typedef Eigen::MatrixXd PoseLandmarkMatrixType;
-    typedef Eigen::VectorXd PoseVectorType;
-    typedef Eigen::VectorXd LandmarkVectorType;
+    typedef MatrixXD PoseMatrixType;
+    typedef MatrixXD LandmarkMatrixType;
+    typedef MatrixXD PoseLandmarkMatrixType;
+    typedef VectorXD PoseVectorType;
+    typedef VectorXD LandmarkVectorType;
 
     typedef SparseBlockMatrix<PoseMatrixType> PoseHessianType;
     typedef SparseBlockMatrix<LandmarkMatrixType> LandmarkHessianType;
@@ -124,7 +124,7 @@ namespace g2o {
       virtual bool updateStructure(const std::vector<HyperGraph::Vertex*>& vset, const HyperGraph::EdgeSet& edges);
       virtual bool buildSystem();
       virtual bool solve();
-      virtual bool computeMarginals(SparseBlockMatrix<Eigen::MatrixXd>& spinv, const std::vector<std::pair<int, int> >& blockIndices);
+      virtual bool computeMarginals(SparseBlockMatrix<MatrixXD>& spinv, const std::vector<std::pair<int, int> >& blockIndices);
       virtual bool setLambda(double lambda, bool backup = false);
       virtual void restoreDiagonal();
       virtual bool supportsSchur() {return true;}

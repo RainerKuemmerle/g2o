@@ -45,7 +45,7 @@ namespace g2o {
     for (int i=0; i<7; i++)
       is >> off[i];
     // normalize the quaternion to recover numerical precision lost by storing as human readable text
-    Eigen::Vector4d::MapType(off.data()+3).normalize();
+    Vector4D::MapType(off.data()+3).normalize();
     setOffset(internal::fromVectorQT(off));
     double fx,fy,cx,cy;
     is >> fx >> fy >> cx >> cy;

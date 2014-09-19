@@ -61,7 +61,7 @@ namespace g2o {
       virtual bool setMeasurementData(const double* d);
 
       virtual bool getMeasurementData(double* d) const {
-        Eigen::Map<Eigen::Vector3d> v(d);
+        Eigen::Map<Vector3D> v(d);
         v = _measurement.toVector();
         return true;
       }

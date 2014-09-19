@@ -238,8 +238,8 @@ namespace g2o {
     }
 
     // map the memory by Eigen
-    Eigen::Map<Eigen::VectorXd> destVec(dest, rows());
-    const Eigen::Map<const Eigen::VectorXd> srcVec(src, cols());
+    Eigen::Map<VectorXD> destVec(dest, rows());
+    const Eigen::Map<const VectorXD> srcVec(src, cols());
 
     for (size_t i=0; i<_blockCols.size(); ++i){
       int srcOffset = i ? _colBlockIndices[i-1] : 0;
@@ -262,8 +262,8 @@ namespace g2o {
     }
 
     // map the memory by Eigen
-    Eigen::Map<Eigen::VectorXd> destVec(dest, rows());
-    const Eigen::Map<const Eigen::VectorXd> srcVec(src, cols());
+    Eigen::Map<VectorXD> destVec(dest, rows());
+    const Eigen::Map<const VectorXD> srcVec(src, cols());
 
     for (size_t i=0; i<_blockCols.size(); ++i){
       int srcOffset = colBaseOfBlock(i);
@@ -290,8 +290,8 @@ namespace g2o {
     }
 
     // map the memory by Eigen
-    Eigen::Map<Eigen::VectorXd> destVec(dest, destSize);
-    Eigen::Map<const Eigen::VectorXd> srcVec(src, rows());
+    Eigen::Map<VectorXD> destVec(dest, destSize);
+    Eigen::Map<const VectorXD> srcVec(src, rows());
 
 #   ifdef G2O_OPENMP
 #   pragma omp parallel for default (shared) schedule(dynamic, 10)

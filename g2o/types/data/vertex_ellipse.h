@@ -39,7 +39,7 @@ namespace g2o {
   class G2O_TYPES_DATA_API VertexEllipse : public RobotData
   {
     public:
-      typedef std::vector<Eigen::Vector2f, Eigen::aligned_allocator<Eigen::Vector2f> > myVector2fVector;
+      typedef std::vector<Vector2F, Eigen::aligned_allocator<Vector2F> > myVector2fVector;
     public:
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
       VertexEllipse();
@@ -48,14 +48,14 @@ namespace g2o {
       virtual bool write(std::ostream& os) const;
       virtual bool read(std::istream& is);
 
-      const Eigen::Matrix3f& covariance() {return _covariance;}
-      void setCovariance( Eigen::Matrix3f& c) { _covariance = c; _updateSVD();}
-      const Eigen::Matrix2f& U() {return _U;}
-      const Eigen::Vector2f& singularValues() {return _singularValues;}
+      const Matrix3F& covariance() {return _covariance;}
+      void setCovariance( Matrix3F& c) { _covariance = c; _updateSVD();}
+      const Matrix2F& U() {return _U;}
+      const Vector2F& singularValues() {return _singularValues;}
 
       const myVector2fVector& matchingVertices() {return _matchingVertices;}
       void addMatchingVertex(float x, float y){
-	Eigen::Vector2f v(x,y);
+	Vector2F v(x,y);
 	_matchingVertices.push_back(v);
       }
 
@@ -69,9 +69,9 @@ namespace g2o {
 
   protected:
       void _updateSVD() const;
-      Eigen::Matrix3f _covariance;
-      mutable Eigen::Matrix2f _U;
-      mutable Eigen::Vector2f _singularValues;
+      Matrix3F _covariance;
+      mutable Matrix2F _U;
+      mutable Vector2F _singularValues;
       std::vector<int> _matchingVerticesIDs;
       myVector2fVector _matchingVertices;
   };

@@ -35,7 +35,7 @@ namespace g2o {
   /**
    * \brief Vertex for a tracked point in space
    */
-  class G2O_TYPES_SLAM3D_API VertexPointXYZ : public BaseVertex<3, Eigen::Vector3d>
+  class G2O_TYPES_SLAM3D_API VertexPointXYZ : public BaseVertex<3, Vector3D>
   {
     public:
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
@@ -46,18 +46,18 @@ namespace g2o {
       virtual void setToOriginImpl() { _estimate.fill(0.); }
 
       virtual void oplusImpl(const double* update_) {
-        Eigen::Map<const Eigen::Vector3d> update(update_);
+        Eigen::Map<const Vector3D> update(update_);
         _estimate += update;
       }
 
       virtual bool setEstimateDataImpl(const double* est){
-        Eigen::Map<const Eigen::Vector3d> _est(est);
+        Eigen::Map<const Vector3D> _est(est);
         _estimate = _est;
         return true;
       }
 
       virtual bool getEstimateData(double* est) const{
-        Eigen::Map<Eigen::Vector3d> _est(est);
+        Eigen::Map<Vector3D> _est(est);
         _est = _estimate;
         return true;
       }
@@ -67,12 +67,12 @@ namespace g2o {
       }
 
       virtual bool setMinimalEstimateDataImpl(const double* est){
-        _estimate = Eigen::Map<const Eigen::Vector3d>(est);
+        _estimate = Eigen::Map<const Vector3D>(est);
         return true;
       }
 
       virtual bool getMinimalEstimateData(double* est) const{
-        Eigen::Map<Eigen::Vector3d> v(est);
+        Eigen::Map<Vector3D> v(est);
         v = _estimate;
         return true;
       }

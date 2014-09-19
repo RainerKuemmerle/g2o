@@ -37,9 +37,9 @@ void BaseMultiEdge<D, E>::constructQuadraticForm()
 {
   if (this->robustKernel()) {
     double error = this->chi2();
-    Eigen::Vector3d rho;
+    Vector3D rho;
     this->robustKernel()->robustify(error, rho);
-    Eigen::Matrix<double, D, 1> omega_r = - _information * _error;
+    Eigen::Matrix<double, D, 1, Eigen::ColMajor> omega_r = - _information * _error;
     omega_r *= rho[1];
     computeQuadraticForm(this->robustInformation(rho), omega_r);
   } else {
@@ -177,11 +177,11 @@ void BaseMultiEdge<D, E>::computeQuadraticForm(const InformationType& omega, con
     if (istatus) {
       const JacobianType& A = _jacobianOplus[i];
 
-      Eigen::MatrixXd AtO = A.transpose() * omega;
+      MatrixXD AtO = A.transpose() * omega;
       int fromDim = from->dimension();
       assert(fromDim >= 0);
-      Eigen::Map<Eigen::MatrixXd> fromMap(from->hessianData(), fromDim, fromDim);
-      Eigen::Map<Eigen::VectorXd> fromB(from->bData(), fromDim);
+      Eigen::Map<MatrixXD> fromMap(from->hessianData(), fromDim, fromDim);
+      Eigen::Map<VectorXD> fromB(from->bData(), fromDim);
 
       // ii block in the hessian
 #ifdef G2O_OPENMP
@@ -229,9 +229,9 @@ void BaseMultiEdge<-1, E>::constructQuadraticForm()
 {
   if (this->robustKernel()) {
     double error = this->chi2();
-    Eigen::Vector3d rho;
+    Vector3D rho;
     this->robustKernel()->robustify(error, rho);
-    Eigen::Matrix<double, Eigen::Dynamic, 1> omega_r = - _information * _error;
+    Eigen::Matrix<double, Eigen::Dynamic, 1, Eigen::ColMajor> omega_r = - _information * _error;
     omega_r *= rho[1];
     computeQuadraticForm(this->robustInformation(rho), omega_r);
   } else {
@@ -369,11 +369,11 @@ void BaseMultiEdge<-1, E>::computeQuadraticForm(const InformationType& omega, co
     if (istatus) {
       const JacobianType& A = _jacobianOplus[i];
 
-      Eigen::MatrixXd AtO = A.transpose() * omega;
+      MatrixXD AtO = A.transpose() * omega;
       int fromDim = from->dimension();
       assert(fromDim >= 0);
-      Eigen::Map<Eigen::MatrixXd> fromMap(from->hessianData(), fromDim, fromDim);
-      Eigen::Map<Eigen::VectorXd> fromB(from->bData(), fromDim);
+      Eigen::Map<MatrixXD> fromMap(from->hessianData(), fromDim, fromDim);
+      Eigen::Map<VectorXD> fromB(from->bData(), fromDim);
 
       // ii block in the hessian
 #ifdef G2O_OPENMP

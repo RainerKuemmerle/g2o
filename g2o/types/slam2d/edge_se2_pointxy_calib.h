@@ -37,7 +37,7 @@ namespace g2o {
   /**
    * \brief Landmark measurement that also calibrates an offset for the landmark measurement
    */
-  class G2O_TYPES_SLAM2D_API EdgeSE2PointXYCalib : public BaseMultiEdge<2, Eigen::Vector2d>
+  class G2O_TYPES_SLAM2D_API EdgeSE2PointXYCalib : public BaseMultiEdge<2, Vector2D>
   {
     public:
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW

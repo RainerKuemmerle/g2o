@@ -53,7 +53,7 @@ namespace g2o {
        * \brief helper for mapping the Hessian memory of the upper triangular block
        */
       struct HessianHelper {
-        Eigen::Map<Eigen::MatrixXd> matrix;     ///< the mapped memory
+        Eigen::Map<MatrixXD> matrix;     ///< the mapped memory
         bool transposed;          ///< the block has to be transposed
         HessianHelper() : matrix(0, 0, 0), transposed(false) {}
       };
@@ -61,10 +61,10 @@ namespace g2o {
     public:
       static const int Dimension = BaseEdge<D,E>::Dimension;
       typedef typename BaseEdge<D,E>::Measurement Measurement;
-      typedef Eigen::MatrixXd::MapType JacobianType;
+      typedef MatrixXD::MapType JacobianType;
       typedef typename BaseEdge<D,E>::ErrorVector ErrorVector;
       typedef typename BaseEdge<D,E>::InformationType InformationType;
-      typedef Eigen::Map<Eigen::MatrixXd, Eigen::MatrixXd::Flags & Eigen::AlignedBit ? Eigen::Aligned : Eigen::Unaligned > HessianBlockType;
+      typedef Eigen::Map<MatrixXD, MatrixXD::Flags & Eigen::AlignedBit ? Eigen::Aligned : Eigen::Unaligned > HessianBlockType;
 
       BaseMultiEdge() : BaseEdge<D,E>()
       {
@@ -115,7 +115,7 @@ namespace g2o {
        * \brief helper for mapping the Hessian memory of the upper triangular block
        */
       struct HessianHelper {
-        Eigen::Map<Eigen::MatrixXd> matrix;     ///< the mapped memory
+        Eigen::Map<MatrixXD> matrix;     ///< the mapped memory
         bool transposed;          ///< the block has to be transposed
         HessianHelper() : matrix(0, 0, 0), transposed(false) {}
       };
@@ -123,10 +123,10 @@ namespace g2o {
     public:
       static const int Dimension = BaseEdge<-1,E>::Dimension;
       typedef typename BaseEdge<-1,E>::Measurement Measurement;
-      typedef Eigen::MatrixXd::MapType JacobianType;
+      typedef MatrixXD::MapType JacobianType;
       typedef typename BaseEdge<-1,E>::ErrorVector ErrorVector;
       typedef typename BaseEdge<-1,E>::InformationType InformationType;
-      typedef Eigen::Map<Eigen::MatrixXd, Eigen::MatrixXd::Flags & Eigen::AlignedBit ? Eigen::Aligned : Eigen::Unaligned > HessianBlockType;
+      typedef Eigen::Map<MatrixXD, MatrixXD::Flags & Eigen::AlignedBit ? Eigen::Aligned : Eigen::Unaligned > HessianBlockType;
 
       BaseMultiEdge() : BaseEdge<-1,E>()
     {

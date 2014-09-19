@@ -43,7 +43,7 @@
 
   bool EdgeLine2D::read(std::istream& is)
   {
-    Vector2d  v;
+    Vector2D  v;
     for (int i = 0; i < 2; ++i)
       is >> v[i];
     setMeasurement(v);

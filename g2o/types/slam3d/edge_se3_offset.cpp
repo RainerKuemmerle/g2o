@@ -68,7 +68,7 @@ namespace g2o {
     for (int i=0; i<7; i++)
       is >> meas[i];
     // normalize the quaternion to recover numerical precision lost by storing as human readable text
-    Vector4d::MapType(meas.data()+3).normalize();
+    Vector4D::MapType(meas.data()+3).normalize();
     setMeasurement(internal::fromVectorQT(meas));
 
     if (is.bad()) {
@@ -98,12 +98,12 @@ namespace g2o {
   }
 
   void EdgeSE3Offset::computeError() {
-    Eigen::Isometry3d delta=_inverseMeasurement * _cacheFrom->w2n() * _cacheTo->n2w();
+    Isometry3D delta=_inverseMeasurement * _cacheFrom->w2n() * _cacheTo->n2w();
     _error=internal::toVectorMQT(delta);
   }
 
   bool EdgeSE3Offset::setMeasurementFromState(){
-    Eigen::Isometry3d delta = _cacheFrom->w2n() * _cacheTo->n2w();
+    Isometry3D delta = _cacheFrom->w2n() * _cacheTo->n2w();
     setMeasurement(delta);
     return true;
   }
@@ -113,12 +113,12 @@ namespace g2o {
 
     VertexSE3 *from = static_cast<VertexSE3*>(_vertices[0]);
     VertexSE3 *to   = static_cast<VertexSE3*>(_vertices[1]);
-    Eigen::Isometry3d E;
-    const Eigen::Isometry3d& Xi=from->estimate();
-    const Eigen::Isometry3d& Xj=to->estimate();
-    const Eigen::Isometry3d& Pi=_cacheFrom->offsetParam()->offset();
-    const Eigen::Isometry3d& Pj=_cacheTo->offsetParam()->offset();
-    const Eigen::Isometry3d& Z=_measurement;
+    Isometry3D E;
+    const Isometry3D& Xi=from->estimate();
+    const Isometry3D& Xj=to->estimate();
+    const Isometry3D& Pi=_cacheFrom->offsetParam()->offset();
+    const Isometry3D& Pj=_cacheTo->offsetParam()->offset();
+    const Isometry3D& Z=_measurement;
     // Matrix6d Ji, Jj;
     // computeSE3Gradient(E, Ji , Jj,
     //                    Z, Pi, Xi, Pj, Xj);
@@ -133,7 +133,7 @@ namespace g2o {
     VertexSE3 *from = static_cast<VertexSE3*>(_vertices[0]);
     VertexSE3 *to   = static_cast<VertexSE3*>(_vertices[1]);
 
-    Eigen::Isometry3d virtualMeasurement = _cacheFrom->offsetParam()->offset() * measurement() * _cacheTo->offsetParam()->offset().inverse();
+    Isometry3D virtualMeasurement = _cacheFrom->offsetParam()->offset() * measurement() * _cacheTo->offsetParam()->offset().inverse();
 
     if (from_.count(from) > 0) {
       to->setEstimate(from->estimate() * virtualMeasurement);

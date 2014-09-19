@@ -93,7 +93,7 @@ namespace g2o {
       globalStats->timeQuadraticForm = get_monotonic_time()-t;
     }
 
-    Eigen::VectorXd::ConstMapType b(_solver->b(), _solver->vectorSize());
+    VectorXD::ConstMapType b(_solver->b(), _solver->vectorSize());
 
     // compute alpha
     _auxVector.setZero();
@@ -143,10 +143,10 @@ namespace g2o {
         if (!solverOk) {
           return Fail;
         }
-        hgnNorm = Eigen::VectorXd::ConstMapType(_solver->x(), _solver->vectorSize()).norm();
+        hgnNorm = VectorXD::ConstMapType(_solver->x(), _solver->vectorSize()).norm();
       }
 
-      Eigen::VectorXd::ConstMapType hgn(_solver->x(), _solver->vectorSize());
+      VectorXD::ConstMapType hgn(_solver->x(), _solver->vectorSize());
       assert(hgnNorm >= 0. && "Norm of the GN step is not computed");
 
       if (hgnNorm < _delta) {

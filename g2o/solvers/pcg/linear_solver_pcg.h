@@ -100,9 +100,9 @@ namespace g2o {
       std::vector<std::pair<int, int> > _indices;
       MatrixPtrVector _sparseMat;
 
-      void multDiag(const std::vector<int>& colBlockIndices, MatrixVector& A, const Eigen::VectorXd& src, Eigen::VectorXd& dest);
-      void multDiag(const std::vector<int>& colBlockIndices, MatrixPtrVector& A, const Eigen::VectorXd& src, Eigen::VectorXd& dest);
-      void mult(const std::vector<int>& colBlockIndices, const Eigen::VectorXd& src, Eigen::VectorXd& dest);
+      void multDiag(const std::vector<int>& colBlockIndices, MatrixVector& A, const VectorXD& src, VectorXD& dest);
+      void multDiag(const std::vector<int>& colBlockIndices, MatrixPtrVector& A, const VectorXD& src, VectorXD& dest);
+      void mult(const std::vector<int>& colBlockIndices, const VectorXD& src, VectorXD& dest);
   };
 
 #include "linear_solver_pcg.hpp"

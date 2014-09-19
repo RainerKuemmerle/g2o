@@ -74,9 +74,9 @@ namespace g2o {
       Property<double>* _initialLambda;
       Property<double>* _lamdbaFactor;
 
-      Eigen::VectorXd _hsd;         ///< steepest decent step
-      Eigen::VectorXd _hdl;         ///< final dogleg step
-      Eigen::VectorXd _auxVector;   ///< auxilary vector used to perform multiplications or other stuff
+      VectorXD _hsd;         ///< steepest decent step
+      VectorXD _hdl;         ///< final dogleg step
+      VectorXD _auxVector;   ///< auxilary vector used to perform multiplications or other stuff
 
       double _currentLambda;        ///< the damping factor to force positive definite matrix
       double _delta;                ///< trust region

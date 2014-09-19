@@ -93,7 +93,7 @@ class StructureOnlySolver : public OptimizationAlgorithm
         }
 
         if (v->fixed() == false) {
-          Eigen::Matrix<double, PointDoF, PointDoF> H_pp;
+          Eigen::Matrix<double, PointDoF, PointDoF, Eigen::ColMajor> H_pp;
           H_pp.resize(v->dimension(), v->dimension());
           v->mapHessianMemory(H_pp.data());
           for (int i_g = 0; i_g < num_iters; ++i_g) {
@@ -134,7 +134,7 @@ class StructureOnlySolver : public OptimizationAlgorithm
               }
             }
 
-            Eigen::Map<Eigen::Matrix<double,PointDoF,1> > b(v->bData(), v->dimension());
+            Eigen::Map<Eigen::Matrix<double,PointDoF,1,Eigen::ColMajor> > b(v->bData(), v->dimension());
 
             if (b.norm()<0.001) {
               stop = true;
@@ -143,12 +143,12 @@ class StructureOnlySolver : public OptimizationAlgorithm
 
             int trial=0;
             do {
-              Eigen::Matrix<double,PointDoF,PointDoF> H_pp_mu = H_pp;
+              Eigen::Matrix<double,PointDoF,PointDoF,Eigen::ColMajor> H_pp_mu = H_pp;
               H_pp_mu.diagonal().array() += mu;
-              Eigen::LDLT<Eigen::Matrix<double,PointDoF,PointDoF> > chol_H_pp(H_pp_mu);
+              Eigen::LDLT<Eigen::Matrix<double,PointDoF,PointDoF,Eigen::ColMajor> > chol_H_pp(H_pp_mu);
               bool goodStep = false;
               if (chol_H_pp.isPositive()) {
-                Eigen::Matrix<double,PointDoF,1> delta_p = chol_H_pp.solve(b);
+                Eigen::Matrix<double,PointDoF,1,Eigen::ColMajor> delta_p = chol_H_pp.solve(b);
                 v->push();
                 v->oplus(delta_p.data());
                 double new_chi2 = 0.;
@@ -206,7 +206,7 @@ class StructureOnlySolver : public OptimizationAlgorithm
       return true;
     }
 
-    virtual bool computeMarginals(SparseBlockMatrix<Eigen::MatrixXd>&, const std::vector<std::pair<int, int> >&) { return false;}
+    virtual bool computeMarginals(SparseBlockMatrix<MatrixXD>&, const std::vector<std::pair<int, int> >&) { return false;}
 
     virtual bool updateStructure(const std::vector<HyperGraph::Vertex*>& , const HyperGraph::EdgeSet& ) { return true;}
 

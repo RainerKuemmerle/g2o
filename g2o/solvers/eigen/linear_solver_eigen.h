@@ -109,8 +109,8 @@ class LinearSolverEigen: public LinearSolver<MatrixType>
       }
 
       // Solving the system
-      Eigen::VectorXd::MapType xx(x, _sparseMatrix.cols());
-      Eigen::VectorXd::ConstMapType bb(b, _sparseMatrix.cols());
+      VectorXD::MapType xx(x, _sparseMatrix.cols());
+      VectorXD::ConstMapType bb(b, _sparseMatrix.cols());
       xx = _cholesky.solve(bb);
       G2OBatchStatistics* globalStats = G2OBatchStatistics::globalStats();
       if (globalStats) {

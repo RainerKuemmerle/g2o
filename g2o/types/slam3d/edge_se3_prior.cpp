@@ -32,8 +32,8 @@ namespace g2o {
   using namespace std;
 
   // point to camera projection, monocular
-  EdgeSE3Prior::EdgeSE3Prior() : BaseUnaryEdge<6, Eigen::Isometry3d, VertexSE3>() {
-    setMeasurement(Eigen::Isometry3d::Identity());
+  EdgeSE3Prior::EdgeSE3Prior() : BaseUnaryEdge<6, Isometry3D, VertexSE3>() {
+    setMeasurement(Isometry3D::Identity());
     information().setIdentity();
     _cache = 0;
     _offsetParam = 0;
@@ -92,14 +92,14 @@ namespace g2o {
 
 
   void EdgeSE3Prior::computeError() {
-    Eigen::Isometry3d delta=_inverseMeasurement * _cache->n2w();
+    Isometry3D delta=_inverseMeasurement * _cache->n2w();
     _error = internal::toVectorMQT(delta);
   }
 
   void EdgeSE3Prior::linearizeOplus(){
     VertexSE3 *from = static_cast<VertexSE3*>(_vertices[0]);
-    Eigen::Isometry3d E;
-    Eigen::Isometry3d Z, X, P;
+    Isometry3D E;
+    Isometry3D Z, X, P;
     X=from->estimate();
     P=_cache->offsetParam()->offset();
     Z=_measurement;
@@ -117,7 +117,7 @@ namespace g2o {
     VertexSE3 *v = static_cast<VertexSE3*>(_vertices[0]);
     assert(v && "Vertex for the Prior edge is not set");
 
-    Eigen::Isometry3d newEstimate = _offsetParam->offset().inverse() * measurement();
+    Isometry3D newEstimate = _offsetParam->offset().inverse() * measurement();
     if (_information.block<3,3>(0,0).array().abs().sum() == 0){ // do not set translation, as that part of the information is all zero
       newEstimate.translation()=v->estimate().translation();
     }
