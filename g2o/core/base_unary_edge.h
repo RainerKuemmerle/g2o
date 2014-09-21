@@ -45,7 +45,7 @@ namespace g2o {
       static const int Dimension = BaseEdge<D, E>::Dimension;
       typedef typename BaseEdge<D,E>::Measurement Measurement;
       typedef VertexXi VertexXiType;
-      typedef typename Eigen::Matrix<double, D, VertexXiType::Dimension, Eigen::ColMajor>::AlignedMapType JacobianXiOplusType;
+      typedef typename Eigen::Matrix<double, D, VertexXiType::Dimension, D==1?Eigen::RowMajor:Eigen::ColMajor>::AlignedMapType JacobianXiOplusType;
       typedef typename BaseEdge<D,E>::ErrorVector ErrorVector;
       typedef typename BaseEdge<D,E>::InformationType InformationType;
 
