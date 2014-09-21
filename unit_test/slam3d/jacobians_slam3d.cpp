@@ -111,7 +111,7 @@ struct RotationMatrix2QuaternionManifold
   template<typename T>
   bool operator()(const T* rotMatSerialized, T* quaternion) const
   {
-    typename Eigen::Matrix<T, 3, 3>::ConstMapType R(rotMatSerialized);
+    typename Eigen::Matrix<T, 3, 3, Eigen::ColMajor>::ConstMapType R(rotMatSerialized);
 
     T t = R.trace();
     if (t > T(0)) {
@@ -154,13 +154,13 @@ TEST(Slam3D, dqDRJacobian)
   for (int k = 0; k < 10000; ++k) {
     // create a random rotation matrix by sampling a random 3d vector
     // that will be used in axis-angle representation to create the matrix
-    Eigen::Vector3d rotAxisAngle = Vector3d::Random();
-    rotAxisAngle += Vector3d::Random();
+    Vector3D rotAxisAngle = Vector3D::Random();
+    rotAxisAngle += Vector3D::Random();
     Eigen::AngleAxisd rotation(rotAxisAngle.norm(), rotAxisAngle.normalized());
-    Eigen::Matrix3d Re = rotation.toRotationMatrix();
+    Matrix3D Re = rotation.toRotationMatrix();
 
     // our analytic function which we want to evaluate
-    Eigen::Matrix<double, 3 , 9>  dq_dR;
+    Matrix<double, 3, 9, Eigen::ColMajor>  dq_dR;
     g2o::internal::compute_dq_dR (dq_dR, 
         Re(0,0),Re(1,0),Re(2,0),
         Re(0,1),Re(1,1),Re(2,1),
@@ -168,6 +168,7 @@ TEST(Slam3D, dqDRJacobian)
 
     // compute the Jacobian using AD
     Eigen::Matrix<double, 3 , 9, Eigen::RowMajor> dq_dR_AD;
+    Matrix<double, 3, 9, Eigen::RowMajor> dq_dR_AD;
     typedef ceres::internal::AutoDiff<RotationMatrix2QuaternionManifold, double, 9> AutoDiff_Dq_DR;
     double *parameters[] = { Re.data() };
     double *jacobians[] = { dq_dR_AD.data() };

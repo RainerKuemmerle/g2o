@@ -11,13 +11,13 @@
 
 namespace g2o {
 
-  typedef Eigen::Matrix<double, 7, 1> Vector7d;
+  typedef Eigen::Matrix<double, 7, 1, Eigen::ColMajor> Vector7d;
 
   /**
    * TODO this documentation is totally wrong... copy and paste
    * \brief Edge between two 3D pose vertices
    *
-   * The transformation between the two vertices is given as an Isometry3d.
+   * The transformation between the two vertices is given as an Isometry3D.
    * If z denotes the measurement, then the error function is given as follows:
    * z^-1 * (x_i^-1 * x_j)
    */

@@ -24,7 +24,7 @@ namespace g2o
 {
 
   /** conversion code from Euler angles */
-void jac_quat3_euler3(Eigen::Matrix<double, 6, 6>& J, const Isometry3d& t)
+void jac_quat3_euler3(Eigen::Matrix<double, 6, 6, Eigen::ColMajor>& J, const Isometry3D& t)
 {
   Vector7d t0 = g2o::internal::toVectorQT(t);
 
@@ -49,17 +49,17 @@ void jac_quat3_euler3(Eigen::Matrix<double, 6, 6>& J, const Isometry3d& t)
     Vector6d meas;
     for (int i=0; i<6; i++)
       is  >> meas[i];
-    Isometry3d transf= g2o::internal::fromVectorET(meas);
-    Matrix<double, 6, 6> infMatEuler;
+    Isometry3D transf= g2o::internal::fromVectorET(meas);
+    Matrix<double, 6, 6, Eigen::ColMajor> infMatEuler;
     for (int i=0; i<6; i++)
       for (int j=i; j<6; j++) {
         is >> infMatEuler(i,j);
         if (i!=j)
           infMatEuler(j,i) = infMatEuler(i,j);
       }
-    Matrix<double, 6, 6> J;
+    Matrix<double, 6, 6, Eigen::ColMajor> J;
     jac_quat3_euler3(J, transf);
-    Matrix<double, 6, 6> infMat = J.transpose() * infMatEuler * J;
+    Matrix<double, 6, 6, Eigen::ColMajor> infMat = J.transpose() * infMatEuler * J;
     setMeasurement(transf);
     setInformation(infMat);
     return true;
@@ -71,11 +71,11 @@ void jac_quat3_euler3(Eigen::Matrix<double, 6, 6>& J, const Isometry3d& t)
     for (int i=0; i<6; i++)
       os << meas[i] << " ";
 
-    Matrix<double, 6, 6> J;
+    Matrix<double, 6, 6, Eigen::ColMajor> J;
     jac_quat3_euler3(J, measurement());
     //HACK: invert the jacobian to simulate the inverse derivative
     J=J.inverse();
-    Matrix<double, 6, 6> infMatEuler = J.transpose()*information()*J;
+    Matrix<double, 6, 6, Eigen::ColMajor> infMatEuler = J.transpose()*information()*J;
     for (int i=0; i<6; i++)
       for (int j=i; j<6; j++){
         os << " " <<  infMatEuler(i,j);

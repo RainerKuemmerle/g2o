@@ -151,10 +151,10 @@ void MarginalCovarianceCholesky::computeCovariance(double** covBlocks, const std
 }
 
 
-void MarginalCovarianceCholesky::computeCovariance(SparseBlockMatrix<Eigen::MatrixXd>& spinv, const std::vector<int>& rowBlockIndices, const std::vector< std::pair<int, int> >& blockIndices)
+void MarginalCovarianceCholesky::computeCovariance(SparseBlockMatrix<MatrixXD>& spinv, const std::vector<int>& rowBlockIndices, const std::vector< std::pair<int, int> >& blockIndices)
 {
   // allocate the sparse
-  spinv = SparseBlockMatrix<Eigen::MatrixXd>(&rowBlockIndices[0], 
+  spinv = SparseBlockMatrix<MatrixXD>(&rowBlockIndices[0], 
               &rowBlockIndices[0], 
               rowBlockIndices.size(),
               rowBlockIndices.size(), true);
@@ -171,7 +171,7 @@ void MarginalCovarianceCholesky::computeCovariance(SparseBlockMatrix<Eigen::Matr
     int rowBase=spinv.rowBaseOfBlock(blockRow);
     int colBase=spinv.colBaseOfBlock(blockCol);
     
-    Eigen::MatrixXd *block=spinv.block(blockRow, blockCol, true);
+    MatrixXD *block=spinv.block(blockRow, blockCol, true);
     assert(block);
     for (int iRow=0; iRow<block->rows(); ++iRow)
       for (int iCol=0; iCol<block->cols(); ++iCol){
@@ -201,7 +201,7 @@ void MarginalCovarianceCholesky::computeCovariance(SparseBlockMatrix<Eigen::Matr
     int rowBase=spinv.rowBaseOfBlock(blockRow);
     int colBase=spinv.colBaseOfBlock(blockCol);
     
-    Eigen::MatrixXd *block=spinv.block(blockRow, blockCol);
+    MatrixXD *block=spinv.block(blockRow, blockCol);
     assert(block);
     for (int iRow=0; iRow<block->rows(); ++iRow)
       for (int iCol=0; iCol<block->cols(); ++iCol){

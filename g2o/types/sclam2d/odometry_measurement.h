@@ -51,10 +51,10 @@ namespace g2o {
       double dt() const { return _dt;}
       void setDt(double t) { _dt = t;}
       
-      const Eigen::Vector2d& measurement() const { return _measurement;}
+      const Vector2D& measurement() const { return _measurement;}
 
     protected:
-      Eigen::Vector2d _measurement;
+      Vector2D _measurement;
       double _dt;
   };
 
@@ -67,7 +67,7 @@ namespace g2o {
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
       MotionMeasurement();
       MotionMeasurement(double x, double y, double theta, double dt);
-      MotionMeasurement(const Eigen::Vector3d& m, double dt);
+      MotionMeasurement(const Vector3D& m, double dt);
 
       double x() const { return _measurement(0);}
       void setX(double v) { _measurement(0) = v;}
@@ -81,10 +81,10 @@ namespace g2o {
       double dt() const { return _dt;}
       void setDt(double t) { _dt = t;}
 
-      const Eigen::Vector3d& measurement() const { return _measurement;}
+      const Vector3D& measurement() const { return _measurement;}
 
     protected:
-      Eigen::Vector3d _measurement;
+      Vector3D _measurement;
       double _dt;
   };
 

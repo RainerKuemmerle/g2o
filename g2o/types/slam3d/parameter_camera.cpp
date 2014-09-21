@@ -43,7 +43,7 @@ namespace g2o {
     setOffset();
   }
 
-  void ParameterCamera::setOffset(const Eigen::Isometry3d& offset_){
+  void ParameterCamera::setOffset(const Isometry3D& offset_){
     ParameterSE3Offset::setOffset(offset_);
     _Kcam_inverseOffsetR = _Kcam * inverseOffset().rotation();
   }
@@ -65,7 +65,7 @@ namespace g2o {
     for (int i=0; i<7; i++)
       is >> off[i];
     // normalize the quaternion to recover numerical precision lost by storing as human readable text
-    Eigen::Vector4d::MapType(off.data()+3).normalize();
+    Vector4D::MapType(off.data()+3).normalize();
     setOffset(internal::fromVectorQT(off));
     double fx,fy,cx,cy;
     is >> fx >> fy >> cx >> cy;

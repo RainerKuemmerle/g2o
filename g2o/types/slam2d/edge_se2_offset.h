@@ -59,14 +59,14 @@ namespace g2o {
       }
 
       virtual bool setMeasurementData(const double* d){
-        Eigen::Map<const Eigen::Vector3d> v(d);
+        Eigen::Map<const Vector3D> v(d);
         _measurement.fromVector(v);
         _inverseMeasurement = _measurement.inverse();
         return true;
       }
 
       virtual bool getMeasurementData(double* d) const{
-        Eigen::Map<Eigen::Vector3d> v(d);
+        Eigen::Map<Vector3D> v(d);
         v = _measurement.toVector();
         return true;
       }

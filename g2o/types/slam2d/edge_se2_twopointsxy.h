@@ -9,7 +9,7 @@
 
 namespace g2o{
 
-  class G2O_TYPES_SLAM2D_API EdgeSE2TwoPointsXY : public BaseMultiEdge<4, Eigen::Vector4d>
+  class G2O_TYPES_SLAM2D_API EdgeSE2TwoPointsXY : public BaseMultiEdge<4, Vector4D>
   {
     public:
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW;

@@ -97,7 +97,7 @@ namespace g2o {
       const double& r = _ranges[i];
       if (r < _laserParams.maxRange) {
         double alpha = _laserParams.firstBeamAngle + i * _laserParams.angularStep;
-        points.push_back(Eigen::Vector2d(cos(alpha) * r, sin(alpha) * r));
+        points.push_back(Vector2D(cos(alpha) * r, sin(alpha) * r));
       }
     }
     return points;

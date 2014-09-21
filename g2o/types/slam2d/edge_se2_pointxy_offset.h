@@ -41,7 +41,7 @@ namespace g2o {
    * \brief g2o edge from a track to a point node
    */
   // first two args are the measurement type, second two the connection classes
-  class G2O_TYPES_SLAM2D_API EdgeSE2PointXYOffset : public BaseBinaryEdge<2, Eigen::Vector2d, VertexSE2, VertexPointXY> {
+  class G2O_TYPES_SLAM2D_API EdgeSE2PointXYOffset : public BaseBinaryEdge<2, Vector2D, VertexSE2, VertexPointXY> {
   public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
     EdgeSE2PointXYOffset();
@@ -54,18 +54,18 @@ namespace g2o {
     virtual void linearizeOplus();
     
 
-    virtual void setMeasurement(const Eigen::Vector2d& m){
+    virtual void setMeasurement(const Vector2D& m){
       _measurement = m;
     }
 
     virtual bool setMeasurementData(const double* d){
-      Eigen::Map<const Eigen::Vector2d> v(d);
+      Eigen::Map<const Vector2D> v(d);
       _measurement = v;
       return true;
     }
 
     virtual bool getMeasurementData(double* d) const{
-      Eigen::Map<Eigen::Vector2d> v(d);
+      Eigen::Map<Vector2D> v(d);
       v=_measurement;
       return true;
     }

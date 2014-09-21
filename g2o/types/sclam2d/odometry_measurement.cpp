@@ -51,19 +51,19 @@ namespace g2o {
   {
   }
 
-  MotionMeasurement::MotionMeasurement(const Eigen::Vector3d& m, double dt) :
+  MotionMeasurement::MotionMeasurement(const Vector3D& m, double dt) :
     _measurement(m), _dt(dt)
   {
   }
 
   VelocityMeasurement OdomConvert::convertToVelocity(const MotionMeasurement& m)
   {
-    Eigen::Vector2d px2(0, 10);
+    Vector2D px2(0, 10);
 
     if (fabs(m.theta()) > 1e-7) {
       Eigen::Rotation2Dd rot(m.theta());
-      Eigen::Vector2d px3(m.x(), m.y());
-      Eigen::Vector2d px4(rot * px2 + px3);
+      Vector2D px3(m.x(), m.y());
+      Vector2D px4(rot * px2 + px3);
 
       const double& y2 = px2.y();
       const double& x3 = px3.x();
@@ -101,8 +101,8 @@ namespace g2o {
 
       theta = w * v.dt();
       Eigen::Rotation2Dd rot(theta);
-      Eigen::Vector2d icc(0, R);
-      Eigen::Vector2d motion = (rot * (Eigen::Vector2d(-1.*icc))) + icc;
+      Vector2D icc(0, R);
+      Vector2D motion = (rot * (Vector2D(-1.*icc))) + icc;
       x = motion.x();
       y = motion.y();
     } else {

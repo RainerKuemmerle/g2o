@@ -948,10 +948,10 @@ void OptimizableGraph::clearParameters()
 bool OptimizableGraph::verifyInformationMatrices(bool verbose) const
 {
   bool allEdgeOk = true;
-  Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> eigenSolver;
+  Eigen::SelfAdjointEigenSolver<MatrixXD> eigenSolver;
   for (OptimizableGraph::EdgeSet::const_iterator it = edges().begin(); it != edges().end(); ++it) {
     OptimizableGraph::Edge* e = static_cast<OptimizableGraph::Edge*>(*it);
-    Eigen::MatrixXd::MapType information(e->informationData(), e->dimension(), e->dimension());
+    MatrixXD::MapType information(e->informationData(), e->dimension(), e->dimension());
     // test on symmetry
     bool isSymmetric = information.transpose() == information;
     bool okay = isSymmetric;

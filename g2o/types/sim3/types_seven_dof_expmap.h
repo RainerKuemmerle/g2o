@@ -63,12 +63,12 @@ namespace g2o {
       setEstimate(s*estimate());
     }
 
-    Eigen::Vector2d _principle_point;
-    Eigen::Vector2d _focal_length;
+    Vector2D _principle_point;
+    Vector2D _focal_length;
 
-    Eigen::Vector2d cam_map(const Eigen::Vector2d & v) const
+    Vector2D cam_map(const Vector2D & v) const
     {
-      Eigen::Vector2d res;
+      Vector2D res;
       res[0] = v[0]*_focal_length[0] + _principle_point[0];
       res[1] = v[1]*_focal_length[1] + _principle_point[1];
       return res;
@@ -114,7 +114,7 @@ namespace g2o {
 
 
 /**/
-class EdgeSim3ProjectXYZ : public  BaseBinaryEdge<2, Eigen::Vector2d,  VertexSBAPointXYZ, VertexSim3Expmap>
+class EdgeSim3ProjectXYZ : public  BaseBinaryEdge<2, Vector2D,  VertexSBAPointXYZ, VertexSim3Expmap>
 {
   public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
@@ -127,7 +127,7 @@ class EdgeSim3ProjectXYZ : public  BaseBinaryEdge<2, Eigen::Vector2d,  VertexSBA
       const VertexSim3Expmap* v1 = static_cast<const VertexSim3Expmap*>(_vertices[1]);
       const VertexSBAPointXYZ* v2 = static_cast<const VertexSBAPointXYZ*>(_vertices[0]);
 
-      Eigen::Vector2d obs(_measurement);
+      Vector2D obs(_measurement);
       _error = obs-v1->cam_map(project(v1->estimate().map(v2->estimate())));
     }
 

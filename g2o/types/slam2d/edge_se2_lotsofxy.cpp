@@ -7,7 +7,7 @@
 
 namespace g2o{
 
-  EdgeSE2LotsOfXY::EdgeSE2LotsOfXY() : BaseMultiEdge<-1,Eigen::VectorXd>(){
+  EdgeSE2LotsOfXY::EdgeSE2LotsOfXY() : BaseMultiEdge<-1,VectorXD>(){
     resize(0);
   }
 
@@ -16,7 +16,7 @@ namespace g2o{
 
     for(unsigned int i=0; i<_observedPoints; i++){
       VertexPointXY * xy = static_cast<VertexPointXY *> (_vertices[1+i]);
-      Eigen::Vector2d m = pose->estimate().inverse() * xy->estimate();
+      Vector2D m = pose->estimate().inverse() * xy->estimate();
 
       unsigned int index = 2*i;
       _error[index] = m[0] - _measurement[index];
@@ -81,16 +81,16 @@ namespace g2o{
     double ct = cos(th1) ;
     double st = sin(th1) ;
 
-    Eigen::MatrixXd Ji;
+    MatrixXD Ji;
     unsigned int rows = 2*(_vertices.size()-1);
     Ji.resize(rows, 3);
     Ji.fill(0);
 
-    Eigen::Matrix2d poseRot;	// inverse of the rotation matrix associated to the pose
+    Matrix2D poseRot;	// inverse of the rotation matrix associated to the pose
     poseRot <<   ct , st ,
             -st , ct ;
 
-    Eigen::Matrix2d minusPoseRot = -poseRot;
+    Matrix2D minusPoseRot = -poseRot;
 
 
     for(unsigned int i=1; i<_vertices.size(); i++){
@@ -107,7 +107,7 @@ namespace g2o{
       Ji(index+1,2) = st * (y1-y2) + ct * (x1 - x2);
 
 
-      Eigen::MatrixXd Jj;
+      MatrixXD Jj;
       Jj.resize(rows, 2);
       Jj.fill(0);
       Jj.block<2,2>(index, 0) = poseRot;
@@ -144,7 +144,7 @@ namespace g2o{
     for(unsigned int i=1; i<_vertices.size(); i++){
       if(estimate_this[i-1]){
         unsigned int index = 2*(i-1);
-        Eigen::Vector2d submeas(_measurement[index], _measurement[index+1]);
+        Vector2D submeas(_measurement[index], _measurement[index+1]);
         VertexPointXY * vert = static_cast<VertexPointXY *>(_vertices[i]);
         vert->setEstimate(pose->estimate() * submeas);
       }
@@ -170,7 +170,7 @@ namespace g2o{
 
     for(unsigned int i=0; i<_observedPoints; i++){
       VertexPointXY * xy = static_cast<VertexPointXY *> (_vertices[1+i]);
-      Eigen::Vector2d m = pose->estimate().inverse() * xy->estimate();
+      Vector2D m = pose->estimate().inverse() * xy->estimate();
 
       unsigned int index = 2*i;
       _measurement[index] = m[0];

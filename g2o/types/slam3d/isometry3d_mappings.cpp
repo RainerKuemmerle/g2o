@@ -44,7 +44,7 @@ namespace g2o {
     }
 
     // functions to handle the rotation part
-    Eigen::Vector3d toEuler(const Eigen::Matrix3d& R) {
+    Vector3D toEuler(const Matrix3D& R) {
       Eigen::Quaterniond q(R);
       const double& q0 = q.w();
       const double& q1 = q.x();
@@ -53,10 +53,10 @@ namespace g2o {
       double roll = atan2(2*(q0*q1+q2*q3), 1-2*(q1*q1+q2*q2));
       double pitch = asin(2*(q0*q2-q3*q1));
       double yaw = atan2(2*(q0*q3+q1*q2), 1-2*(q2*q2+q3*q3));
-      return Eigen::Vector3d(roll, pitch, yaw);
+      return Vector3D(roll, pitch, yaw);
     }
 
-    Eigen::Matrix3d fromEuler(const Eigen::Vector3d& v) {
+    Matrix3D fromEuler(const Vector3D& v) {
       //UNOPTIMIZED
       double roll  = v[0];
       double pitch = v[1];
@@ -74,38 +74,38 @@ namespace g2o {
       return Eigen::Quaterniond(w,x,y,z).toRotationMatrix();
     }
 
-    Eigen::Vector3d toCompactQuaternion(const Eigen::Matrix3d& R) {
+    Vector3D toCompactQuaternion(const Matrix3D& R) {
       Eigen::Quaterniond q(R);
       normalize(q);
       // return (x,y,z) of the quaternion
       return q.coeffs().head<3>();
     }
 
-    Eigen::Matrix3d fromCompactQuaternion(const Eigen::Vector3d& v) {
+    Matrix3D fromCompactQuaternion(const Vector3D& v) {
       double w = 1-v.squaredNorm();
       if (w<0)
-        return Eigen::Matrix3d::Identity();
+        return Matrix3D::Identity();
       else
         w=sqrt(w);
       return Eigen::Quaterniond(w, v[0], v[1], v[2]).toRotationMatrix();
     }
 
     // functions to handle the toVector of the whole transformations
-    Vector6d toVectorMQT(const Eigen::Isometry3d& t) {
+    Vector6d toVectorMQT(const Isometry3D& t) {
       Vector6d v;
       v.block<3,1>(3,0) = toCompactQuaternion(extractRotation(t));
       v.block<3,1>(0,0) = t.translation();
       return v;
     }
 
-    Vector6d toVectorET(const Eigen::Isometry3d& t) {
+    Vector6d toVectorET(const Isometry3D& t) {
       Vector6d v;
       v.block<3,1>(3,0)=toEuler(extractRotation(t));
       v.block<3,1>(0,0) = t.translation();
       return v;
     }
 
-    Vector7d toVectorQT(const Eigen::Isometry3d& t){
+    Vector7d toVectorQT(const Isometry3D& t){
       Eigen::Quaterniond q(extractRotation(t));
       q.normalize();
       Vector7d v;
@@ -114,36 +114,36 @@ namespace g2o {
       return v;
     }
 
-    Eigen::Isometry3d fromVectorMQT(const Vector6d& v){
-      Eigen::Isometry3d t;
+    Isometry3D fromVectorMQT(const Vector6d& v){
+      Isometry3D t;
       t = fromCompactQuaternion(v.block<3,1>(3,0));
       t.translation() = v.block<3,1>(0,0);
       return t;
     }
 
-    Eigen::Isometry3d fromVectorET(const Vector6d& v) {
-      Eigen::Isometry3d t;
+    Isometry3D fromVectorET(const Vector6d& v) {
+      Isometry3D t;
       t = fromEuler(v.block<3,1>(3,0));
       t.translation() = v.block<3,1>(0,0);
       return t;
     }
 
-    Eigen::Isometry3d fromVectorQT(const Vector7d& v) {
-      Eigen::Isometry3d t;
+    Isometry3D fromVectorQT(const Vector7d& v) {
+      Isometry3D t;
       t=Eigen::Quaterniond(v[6], v[3], v[4], v[5]).toRotationMatrix();
       t.translation() = v.head<3>();
       return t;
     }
 
-    SE3Quat toSE3Quat(const Eigen::Isometry3d& t)
+    SE3Quat toSE3Quat(const Isometry3D& t)
     {
       SE3Quat result(t.matrix().topLeftCorner<3,3>(), t.translation());
       return result;
     }
 
-    Eigen::Isometry3d fromSE3Quat(const SE3Quat& t)
+    Isometry3D fromSE3Quat(const SE3Quat& t)
     {
-      Eigen::Isometry3d result = (Eigen::Isometry3d) t.rotation();
+      Isometry3D result = (Isometry3D) t.rotation();
       result.translation() = t.translation();
       return result;
     }

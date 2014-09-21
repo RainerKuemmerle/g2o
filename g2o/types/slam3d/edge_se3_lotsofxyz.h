@@ -9,7 +9,7 @@
 
 namespace g2o{
 
-  class G2O_TYPES_SLAM3D_API EdgeSE3LotsOfXYZ : public BaseMultiEdge<-1, Eigen::VectorXd>{
+  class G2O_TYPES_SLAM3D_API EdgeSE3LotsOfXYZ : public BaseMultiEdge<-1, VectorXD>{
 
     protected:
       unsigned int _observedPoints;

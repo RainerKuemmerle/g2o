@@ -67,10 +67,10 @@ namespace g2o {
   //   VertexPointXY* vj = static_cast<VertexPointXY*>(_vertices[1]);
   //   if (from.count(vi) > 0 && to == vj) {
   //     Line2D T=vi->estimate();
-  //     Vector2d est=_measurement;
+  //     Vector2D est=_measurement;
   //     est[0] += T.rotation().angle();
   //     est[0] = normalize_theta(est[0]);
-  //     Vector2d n(cos(est[0]), sin(est[0]));
+  //     Vector2D n(cos(est[0]), sin(est[0]));
   //     est[1] += n.dot(T.translation());
   //     vj->setEstimate(est);
   //   }

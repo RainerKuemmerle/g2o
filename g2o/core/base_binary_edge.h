@@ -49,13 +49,15 @@ namespace g2o {
 
       static const int Dimension = BaseEdge<D, E>::Dimension;
       typedef typename BaseEdge<D,E>::Measurement Measurement;
-      typedef typename Eigen::Matrix<double, D, Di>::AlignedMapType JacobianXiOplusType;
-      typedef typename Eigen::Matrix<double, D, Dj>::AlignedMapType JacobianXjOplusType;
+      typedef typename Eigen::Matrix<double, D, Di, D==1?Eigen::RowMajor:Eigen::ColMajor>::AlignedMapType JacobianXiOplusType;
+      typedef typename Eigen::Matrix<double, D, Dj, D==1?Eigen::RowMajor:Eigen::ColMajor>::AlignedMapType JacobianXjOplusType;
       typedef typename BaseEdge<D,E>::ErrorVector ErrorVector;
       typedef typename BaseEdge<D,E>::InformationType InformationType;
 
-      typedef Eigen::Map<Eigen::Matrix<double, Di, Dj>, Eigen::Matrix<double, Di, Dj>::Flags & Eigen::AlignedBit ? Eigen::Aligned : Eigen::Unaligned > HessianBlockType;
-      typedef Eigen::Map<Eigen::Matrix<double, Dj, Di>, Eigen::Matrix<double, Dj, Di>::Flags & Eigen::AlignedBit ? Eigen::Aligned : Eigen::Unaligned > HessianBlockTransposedType;
+      typedef Eigen::Map<Eigen::Matrix<double, Di, Dj, Di==1?Eigen::RowMajor:Eigen::ColMajor>,
+                         Eigen::Matrix<double, Di, Dj, Di==1?Eigen::RowMajor:Eigen::ColMajor>::Flags & Eigen::AlignedBit ? Eigen::Aligned : Eigen::Unaligned > HessianBlockType;
+      typedef Eigen::Map<Eigen::Matrix<double, Dj, Di, Dj==1?Eigen::RowMajor:Eigen::ColMajor>,
+                         Eigen::Matrix<double, Dj, Di, Dj==1?Eigen::RowMajor:Eigen::ColMajor>::Flags & Eigen::AlignedBit ? Eigen::Aligned : Eigen::Unaligned > HessianBlockTransposedType;
 
       BaseBinaryEdge() : BaseEdge<D,E>(),
       _hessianRowMajor(false),

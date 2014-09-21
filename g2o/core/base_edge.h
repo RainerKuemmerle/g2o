@@ -43,8 +43,8 @@ namespace g2o {
 
       static const int Dimension = D;
       typedef E Measurement;
-      typedef Eigen::Matrix<double, D, 1> ErrorVector;
-      typedef Eigen::Matrix<double, D, D> InformationType;
+      typedef Eigen::Matrix<double, D, 1, Eigen::ColMajor> ErrorVector;
+      typedef Eigen::Matrix<double, D, D, Eigen::ColMajor> InformationType;
 
       BaseEdge() : OptimizableGraph::Edge()
       {
@@ -91,7 +91,7 @@ namespace g2o {
       /**
        * calculate the robust information matrix by updating the information matrix of the error
        */
-      InformationType robustInformation(const Eigen::Vector3d& rho)
+      InformationType robustInformation(const Vector3D& rho)
       {
         InformationType result = rho[1] * _information;
         //ErrorVector weightedErrror = _information * _error;
@@ -111,8 +111,8 @@ namespace g2o {
 
       static const int Dimension = -1;
       typedef E Measurement;
-      typedef Eigen::Matrix<double, Eigen::Dynamic, 1> ErrorVector;
-      typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> InformationType;
+      typedef Eigen::Matrix<double, Eigen::Dynamic, 1, Eigen::ColMajor> ErrorVector;
+      typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::ColMajor> InformationType;
 
       BaseEdge() : OptimizableGraph::Edge(){
 
@@ -158,7 +158,7 @@ namespace g2o {
       /**
        * calculate the robust information matrix by updating the information matrix of the error
        */
-      InformationType robustInformation(const Eigen::Vector3d& rho)
+      InformationType robustInformation(const Vector3D& rho)
       {
         InformationType result = rho[1] * _information;
         //ErrorVector weightedErrror = _information * _error;

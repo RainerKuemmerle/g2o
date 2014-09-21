@@ -29,7 +29,7 @@
 namespace g2o {
 
   EdgeSE3Calib::EdgeSE3Calib() :
-    BaseMultiEdge<6, Eigen::Isometry3d>()
+    BaseMultiEdge<6, Isometry3D>()
   {
     resize(3);
   }
@@ -57,7 +57,7 @@ namespace g2o {
     for (int i=0; i<7; i++)
       is >> meas[i];
     // normalize the quaternion to recover numerical precision lost by storing as human readable text
-    Eigen::Vector4d::MapType(meas.data()+3).normalize();
+    Vector4D::MapType(meas.data()+3).normalize();
     setMeasurement(g2o::internal::fromVectorQT(meas));
 
     if (is.bad()) {

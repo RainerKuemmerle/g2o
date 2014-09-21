@@ -51,12 +51,12 @@ namespace g2o {
       
       const std::string name() const { return _name;} 
       void setName(const std::string& name_) {_name=name_;}
-      const Eigen::Vector3f& position() const {return _position;}
-      void setPosition( const Eigen::Vector3f& p) {_position = p;}
+      const Vector3F& position() const {return _position;}
+      void setPosition( const Vector3F& p) {_position = p;}
     protected:
       std::string _name;
-      Eigen::Vector3f _position;
-      Eigen::Vector3f _odom2d;
+      Vector3F _position;
+      Vector3F _odom2d;
   };
 
  #ifdef G2O_HAVE_OPENGL 

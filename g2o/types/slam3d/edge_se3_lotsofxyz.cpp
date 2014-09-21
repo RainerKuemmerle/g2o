@@ -13,8 +13,8 @@ namespace g2o{
 
     for(unsigned int i=0; i<_observedPoints; i++){
       VertexPointXYZ * xyz = static_cast<VertexPointXYZ *> (_vertices[1+i]);
-      //      const Eigen::Vector3d &pt = xyz->estimate();
-      Eigen::Vector3d m = poseinv * xyz->estimate();
+      //      const Vector3D &pt = xyz->estimate();
+      Vector3D m = poseinv * xyz->estimate();
 
       unsigned int index = 3*i;
       _measurement[index] = m[0];
@@ -29,7 +29,7 @@ namespace g2o{
 
     for(unsigned int i=0; i<_observedPoints; i++){
       VertexPointXYZ * xyz = static_cast<VertexPointXYZ *> (_vertices[1+i]);
-      Eigen::Vector3d m = pose->estimate().inverse() * xyz->estimate();
+      Vector3D m = pose->estimate().inverse() * xyz->estimate();
 
       unsigned int index = 3*i;
       _error[index] = m[0] - _measurement[index];
@@ -42,21 +42,21 @@ namespace g2o{
     g2o::VertexSE3 * pose = (g2o::VertexSE3 *) (_vertices[0]);
 
     // initialize Ji matrix
-    Eigen::MatrixXd Ji;
+    MatrixXD Ji;
     unsigned int rows = 3*(_vertices.size()-1);
     Ji.resize(rows, 6);
     Ji.fill(0);
 
-    Eigen::Matrix3d poseRot = pose->estimate().inverse().rotation();
+    Matrix3D poseRot = pose->estimate().inverse().rotation();
 
     for(unsigned int i=1; i<_vertices.size(); i++){
       g2o::VertexPointXYZ * point = (g2o::VertexPointXYZ *) (_vertices[i]);
-      Eigen::Vector3d Zcam = pose->estimate().inverse() * point->estimate();
+      Vector3D Zcam = pose->estimate().inverse() * point->estimate();
 
       unsigned int index=3*(i-1);
 
       // Ji.block<3,3>(index,0) = -poseRot;
-      Ji.block<3,3>(index,0) = -Eigen::Matrix3d::Identity();
+      Ji.block<3,3>(index,0) = -Matrix3D::Identity();
 
       Ji(index, 3) = -0.0;
       Ji(index, 4) = -2*Zcam(2);
@@ -70,7 +70,7 @@ namespace g2o{
       Ji(index+2, 4) = 2*Zcam(0);
       Ji(index+2, 5) = -0.0;
 
-      Eigen::MatrixXd Jj;
+      MatrixXD Jj;
       Jj.resize(rows, 3);
       Jj.fill(0);
       Jj.block<3,3>(index,0) = poseRot;
@@ -158,7 +158,7 @@ namespace g2o{
     for(unsigned int i=1; i<_vertices.size(); i++){
       if(estimate_this[i-1]){
 	unsigned int index = 3*(i-1);
-	Eigen::Vector3d submeas(_measurement[index], _measurement[index+1], _measurement[index+2]);
+	Vector3D submeas(_measurement[index], _measurement[index+1], _measurement[index+2]);
 	VertexPointXYZ * vert = static_cast<VertexPointXYZ *>(_vertices[i]);
 	vert->setEstimate(pose->estimate() * submeas);
       }

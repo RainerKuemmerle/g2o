@@ -61,15 +61,15 @@ namespace g2o {
       const SE2& offset() const { return _offset;}
 
       //! rotation of the offset as 2x2 rotation matrix
-      const Eigen::Isometry2d& offsetMatrix() const { return _offsetMatrix;}
+      const Isometry2D& offsetMatrix() const { return _offsetMatrix;}
 
       //! rotation of the inverse offset as 2x2 rotation matrix
-      const Eigen::Isometry2d& inverseOffsetMatrix() const { return _inverseOffsetMatrix;}
+      const Isometry2D& inverseOffsetMatrix() const { return _inverseOffsetMatrix;}
 
     protected:
       SE2 _offset;
-      Eigen::Isometry2d _offsetMatrix;
-      Eigen::Isometry2d _inverseOffsetMatrix;
+      Isometry2D _offsetMatrix;
+      Isometry2D _inverseOffsetMatrix;
   };
 
   /**
@@ -87,23 +87,23 @@ namespace g2o {
       const SE2& w2n() const {return _se2_w2n;}
       const SE2& n2w() const {return _se2_n2w;}
 
-      const Eigen::Isometry2d& w2nMatrix() const { return _w2n;}
-      const Eigen::Isometry2d& n2wMatrix() const { return _n2w;}
-      const Eigen::Isometry2d& w2lMatrix() const { return _w2l;}
+      const Isometry2D& w2nMatrix() const { return _w2n;}
+      const Isometry2D& n2wMatrix() const { return _n2w;}
+      const Isometry2D& w2lMatrix() const { return _w2l;}
 
-      const Eigen::Matrix2d RpInverseRInverseMatrix() const { return _RpInverse_RInverse; }
-      const Eigen::Matrix2d RpInverseRInversePrimeMatrix() const { return _RpInverse_RInversePrime; }
+      const Matrix2D RpInverseRInverseMatrix() const { return _RpInverse_RInverse; }
+      const Matrix2D RpInverseRInversePrimeMatrix() const { return _RpInverse_RInversePrime; }
 
     protected:
       ParameterSE2Offset* _offsetParam; ///< the parameter connected to the cache
       SE2 _se2_w2n;
       SE2 _se2_n2w;
 
-      Eigen::Isometry2d _w2n; ///< world to sensor transform
-      Eigen::Isometry2d _w2l; ///< world to local
-      Eigen::Isometry2d _n2w; ///< sensor to world
-      Eigen::Matrix2d _RpInverse_RInverse;
-      Eigen::Matrix2d _RpInverse_RInversePrime;
+      Isometry2D _w2n; ///< world to sensor transform
+      Isometry2D _w2l; ///< world to local
+      Isometry2D _n2w; ///< sensor to world
+      Matrix2D _RpInverse_RInverse;
+      Matrix2D _RpInverse_RInversePrime;
       
     protected:
       virtual bool resolveDependancies();

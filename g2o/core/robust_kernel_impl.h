@@ -54,7 +54,7 @@ namespace g2o {
       //! use another kernel for the underlying operation
       void setKernel(const RobustKernelPtr& ptr);
 
-      void robustify(double error, Eigen::Vector3d& rho) const;
+      void robustify(double error, Vector3D& rho) const;
 
     protected:
       RobustKernelPtr _kernel;
@@ -77,7 +77,7 @@ namespace g2o {
   class G2O_CORE_API RobustKernelHuber : public RobustKernel
   {
     public:
-      virtual void robustify(double e2, Eigen::Vector3d& rho) const;
+      virtual void robustify(double e2, Vector3D& rho) const;
   };
 
   /**
@@ -94,7 +94,7 @@ namespace g2o {
   class G2O_CORE_API RobustKernelPseudoHuber : public RobustKernel
   {
     public:
-      virtual void robustify(double e2, Eigen::Vector3d& rho) const;
+      virtual void robustify(double e2, Vector3D& rho) const;
   };
 
   /**
@@ -108,7 +108,7 @@ namespace g2o {
   class G2O_CORE_API RobustKernelCauchy : public RobustKernel
   {
     public:
-      virtual void robustify(double e2, Eigen::Vector3d& rho) const;
+      virtual void robustify(double e2, Vector3D& rho) const;
   };
 
   /**
@@ -119,7 +119,7 @@ namespace g2o {
   class G2O_CORE_API RobustKernelSaturated : public RobustKernel
   {
     public:
-      virtual void robustify(double e2, Eigen::Vector3d& rho) const;
+      virtual void robustify(double e2, Vector3D& rho) const;
   };
 
   /**
@@ -132,7 +132,7 @@ namespace g2o {
   class G2O_CORE_API RobustKernelDCS : public RobustKernel
   {
     public:
-      virtual void robustify(double e2, Eigen::Vector3d& rho) const;
+      virtual void robustify(double e2, Vector3D& rho) const;
   };
 
 } // end namespace g2o

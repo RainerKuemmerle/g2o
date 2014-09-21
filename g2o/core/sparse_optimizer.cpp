@@ -99,7 +99,7 @@ namespace g2o{
 
   double SparseOptimizer::activeRobustChi2() const
   {
-    Eigen::Vector3d rho;
+    Vector3D rho;
     double chi = 0.0;
     for (EdgeContainer::const_iterator it = _activeEdges.begin(); it != _activeEdges.end(); ++it) {
       const OptimizableGraph::Edge* e = *it;
@@ -245,7 +245,7 @@ namespace g2o{
 #      ifndef NDEBUG
         int estimateDim = v->estimateDimension();
         if (estimateDim > 0) {
-          Eigen::VectorXd estimateData(estimateDim);
+          VectorXD estimateData(estimateDim);
           if (v->getEstimateData(estimateData.data()) == true) {
             int k;
             bool hasNan = arrayHasNaN(estimateData.data(), estimateDim, &k);
@@ -570,7 +570,7 @@ namespace g2o{
       _algorithm->setOptimizer(this);
   }
 
-  bool SparseOptimizer::computeMarginals(SparseBlockMatrix<Eigen::MatrixXd>& spinv, const std::vector<std::pair<int, int> >& blockIndices){
+  bool SparseOptimizer::computeMarginals(SparseBlockMatrix<MatrixXD>& spinv, const std::vector<std::pair<int, int> >& blockIndices){
     return _algorithm->computeMarginals(spinv, blockIndices);
   }
 

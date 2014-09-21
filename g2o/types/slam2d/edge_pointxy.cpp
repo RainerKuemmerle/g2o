@@ -34,7 +34,7 @@
 namespace g2o {
 
   EdgePointXY::EdgePointXY() :
-    BaseBinaryEdge<2, Eigen::Vector2d, VertexPointXY, VertexPointXY>()
+    BaseBinaryEdge<2, Vector2D, VertexPointXY, VertexPointXY>()
   {
     _information.setIdentity();
     _error.setZero();
@@ -42,7 +42,7 @@ namespace g2o {
 
   bool EdgePointXY::read(std::istream& is)
   {
-    Eigen::Vector2d p;
+    Vector2D p;
     is >> p[0] >> p[1];
     setMeasurement(p);
     for (int i = 0; i < 2; ++i)
@@ -56,7 +56,7 @@ namespace g2o {
 
   bool EdgePointXY::write(std::ostream& os) const
   {
-    Eigen::Vector2d p = measurement();
+    Vector2D p = measurement();
     os << p.x() << " " << p.y();
     for (int i = 0; i < 2; ++i)
       for (int j = i; j < 2; ++j)
@@ -68,8 +68,8 @@ namespace g2o {
 #ifndef NUMERIC_JACOBIAN_TWO_D_TYPES
   void EdgePointXY::linearizeOplus()
   {
-    _jacobianOplusXi=-Eigen::Matrix2d::Identity();
-    _jacobianOplusXj= Eigen::Matrix2d::Identity();
+    _jacobianOplusXi=-Matrix2D::Identity();
+    _jacobianOplusXj= Matrix2D::Identity();
   }
 #endif
 

@@ -21,7 +21,7 @@ int main(int , char** )
 {
   Vector6d t;
   t <<  -3, -2, -4, .2, .1, .3;
-  Isometry3d T = fromVectorMQT(t);
+  Isometry3D T = fromVectorMQT(t);
   cout << "transform" << endl;
   cout << T.matrix() << endl;
 
