@@ -14,6 +14,8 @@
 
 #cmakedefine G2O_CXX_COMPILER "@G2O_CXX_COMPILER@"
 
+#ifdef __cplusplus
 #include <g2o/core/eigen_types.h>
+#endif
 
 #endif
