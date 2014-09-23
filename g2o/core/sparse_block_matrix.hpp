@@ -641,7 +641,7 @@ namespace g2o {
       std::sort(sparseRowSorted.begin(), sparseRowSorted.end(), CmpPairFirst<int, MatrixType*>());
       // try to free some memory early
       HashSparseColumn aux;
-      swap(aux, column);
+      std::swap(aux, column);
       // now insert sorted vector to the std::map structure
       IntBlockMap& destColumnMap = blockCols()[i];
       destColumnMap.insert(sparseRowSorted[0]);
