@@ -187,7 +187,7 @@ class LinearSolverCSparse : public LinearSolverCCS<MatrixType>
       return ok != 0;
     }
 
-    virtual bool solvePattern(SparseBlockMatrix<Eigen::MatrixXd>& spinv, const std::vector<std::pair<int, int> >& blockIndices, const SparseBlockMatrix<MatrixType>& A) {
+    virtual bool solvePattern(SparseBlockMatrix<MatrixXD>& spinv, const std::vector<std::pair<int, int> >& blockIndices, const SparseBlockMatrix<MatrixType>& A) {
       fillCSparse(A, _symbolicDecomposition != 0);
       // perform symbolic cholesky once
       if (_symbolicDecomposition == 0) {
@@ -240,7 +240,7 @@ class LinearSolverCSparse : public LinearSolverCCS<MatrixType>
     CSparseExt* _ccsA;
     bool _blockOrdering;
     MatrixStructure _matrixStructure;
-    Eigen::VectorXi _scalarPermutation;
+    VectorXI _scalarPermutation;
     bool _writeDebug;
 
     void computeSymbolicDecomposition(const SparseBlockMatrix<MatrixType>& A)
