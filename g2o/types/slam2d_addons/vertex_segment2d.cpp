@@ -45,7 +45,7 @@
 namespace g2o {
 
   VertexSegment2D::VertexSegment2D() :
-    BaseVertex<4, Vector4d>()
+    BaseVertex<4, Vector4D>()
   {
     _estimate.setZero();
   }

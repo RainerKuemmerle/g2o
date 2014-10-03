@@ -35,7 +35,7 @@
 
 namespace g2o {
 
-  class G2O_TYPES_SLAM2D_ADDONS_API EdgeSE2Segment2DLine : public BaseBinaryEdge<2, Eigen::Vector2d, VertexSE2, VertexSegment2D>
+  class G2O_TYPES_SLAM2D_ADDONS_API EdgeSE2Segment2DLine : public BaseBinaryEdge<2, Vector2D, VertexSE2, VertexSegment2D>
   {
     public:
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW
@@ -53,11 +53,11 @@ namespace g2o {
         const VertexSE2* v1 = static_cast<const VertexSE2*>(_vertices[0]);
         const VertexSegment2D* l2 = static_cast<const VertexSegment2D*>(_vertices[1]);
         SE2 iEst=v1->estimate().inverse();
-	Vector2d predP1 = iEst * l2->estimateP1();
-	Vector2d predP2 = iEst * l2->estimateP2();
-	Vector2d dP = predP2 - predP1;
-	Vector2d normal(dP.y(), -dP.x()); normal.normalize();
-	Vector2d prediction(atan2(normal.y(), normal.x()),
+        Vector2D predP1 = iEst * l2->estimateP1();
+        Vector2D predP2 = iEst * l2->estimateP2();
+        Vector2D dP = predP2 - predP1;
+        Vector2D normal(dP.y(), -dP.x()); normal.normalize();
+        Vector2D prediction(atan2(normal.y(), normal.x()),
 			    predP1.dot(normal)*.5 + predP2.dot(normal)*.5);
 
 	_error=prediction-_measurement;
@@ -65,13 +65,13 @@ namespace g2o {
       }
 
       virtual bool setMeasurementData(const double* d){
-	Map<const Vector2d> data(d);
+        Eigen::Map<const Vector2D> data(d);
 	_measurement = data;
 	return true;
       }
 
       virtual bool getMeasurementData(double* d) const{
-	Map<Vector2d> data(d);
+        Eigen::Map<Vector2D> data(d);
 	data = _measurement;
 	return true;
       }
@@ -82,11 +82,11 @@ namespace g2o {
      const VertexSE2* v1 = static_cast<const VertexSE2*>(_vertices[0]);
         const VertexSegment2D* l2 = static_cast<const VertexSegment2D*>(_vertices[1]);
         SE2 iEst=v1->estimate().inverse();
-	Vector2d predP1 = iEst * l2->estimateP1();
-	Vector2d predP2 = iEst * l2->estimateP2();
-	Vector2d dP = predP2 - predP1;
-	Vector2d normal(dP.y(), -dP.x()); normal.normalize();
-	Vector2d prediction(atan2(normal.y(), normal.x()),
+        Vector2D predP1 = iEst * l2->estimateP1();
+        Vector2D predP2 = iEst * l2->estimateP2();
+        Vector2D dP = predP2 - predP1;
+        Vector2D normal(dP.y(), -dP.x()); normal.normalize();
+        Vector2D prediction(atan2(normal.y(), normal.x()),
 			    predP1.dot(normal)*.5 + predP2.dot(normal)*.5);
 	_measurement = prediction;
 	return true;

@@ -26,16 +26,20 @@
 
 #include "vertex_se3.h"
 #include "g2o/core/factory.h"
+#ifdef G2O_HAVE_OPENGL
 #include "g2o/stuff/opengl_wrapper.h"
 #include "g2o/stuff/opengl_primitives.h"
+#endif
 
 #include <iostream>
 #include "g2o/core/cache.h"
 
+using namespace Eigen;
+
 namespace g2o {
 
   VertexSE3::VertexSE3() :
-    BaseVertex<6, Eigen::Isometry3d>(),
+    BaseVertex<6, Isometry3D>(),
     _numOplusCalls(0)
   {
     setToOriginImpl();
@@ -80,13 +84,13 @@ namespace g2o {
 
 #ifdef G2O_HAVE_OPENGL
   void drawTriangle(float xSize, float ySize){
-    Vector3f p[3];
+    Vector3F p[3];
     glBegin(GL_TRIANGLES);
     p[0] << 0., 0., 0.;
     p[1] << -xSize, ySize, 0.;
     p[2] << -xSize, -ySize, 0.;
     for (int i = 1; i < 2; ++i) {
-      Vector3f normal = (p[i] - p[0]).cross(p[i+1] - p[0]);
+      Vector3F normal = (p[i] - p[0]).cross(p[i+1] - p[0]);
       glNormal3f(normal.x(), normal.y(), normal.z());
       glVertex3f(p[0].x(), p[0].y(), p[0].z());
       glVertex3f(p[i].x(), p[i].y(), p[i].z());

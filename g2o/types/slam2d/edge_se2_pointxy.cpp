@@ -34,7 +34,7 @@
 namespace g2o {
 
   EdgeSE2PointXY::EdgeSE2PointXY() :
-    BaseBinaryEdge<2, Vector2d, VertexSE2, VertexPointXY>()
+    BaseBinaryEdge<2, Vector2D, VertexSE2, VertexPointXY>()
   {
   }
 
@@ -137,7 +137,7 @@ namespace g2o {
     VertexPointXY* toEdge   = static_cast<VertexPointXY*>(e->vertex(1));
     if (! fromEdge)
       return this;
-    Eigen::Vector2d p=e->measurement();
+    Vector2D p=e->measurement();
     glPushAttrib(GL_ENABLE_BIT|GL_LIGHTING|GL_COLOR);
     glDisable(GL_LIGHTING);
     if (!toEdge){

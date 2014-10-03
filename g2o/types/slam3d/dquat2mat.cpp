@@ -39,7 +39,7 @@ namespace g2o {
       }
     }
     
-    void  compute_dq_dR ( Eigen::Matrix<double, 3 , 9 >&  dq_dR , const double&  r11 , const double&  r21 , const double&  r31 , const double&  r12 , const double&  r22 , const double&  r32 , const double&  r13 , const double&  r23 , const double&  r33 ){
+    void  compute_dq_dR ( Eigen::Matrix<double, 3, 9, Eigen::ColMajor>&  dq_dR , const double&  r11 , const double&  r21 , const double&  r31 , const double&  r12 , const double&  r22 , const double&  r32 , const double&  r13 , const double&  r23 , const double&  r33 ){
       double qw;
       double S;
       int whichCase=_q2m( S, qw, r11 ,  r21 ,  r31 ,  r12 ,  r22 ,  r32 ,  r13 ,  r23 ,  r33 );

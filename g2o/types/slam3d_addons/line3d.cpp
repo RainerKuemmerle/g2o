@@ -5,15 +5,15 @@ namespace g2o {
   using namespace std;
   using namespace Eigen;
 
-  inline void _skew(Eigen::Matrix3d& S, const Eigen::Vector3d& t){
+  inline void _skew(Matrix3D& S, const Vector3D& t){
     S <<
       0,  -t.z(),   t.y(),
       t.z(),     0,     -t.x(),
       -t.y()     ,t.x(),   0;
   }
 
-  inline Eigen::Matrix3d _skew(const Eigen::Vector3d& t){
-    Eigen::Matrix3d S;
+  inline Matrix3D _skew(const Vector3D& t){
+    Matrix3D S;
     S <<
       0,  -t.z(),   t.y(),
       t.z(),     0,     -t.x(),
@@ -25,14 +25,14 @@ namespace g2o {
   Vector6d Line3D::toCartesian() const{
     Vector6d cartesian;
     cartesian.tail<3>() = d()/d().norm();
-    Matrix3d W=-_skew(d());
+    Matrix3D W=-_skew(d());
     double damping = 1e-9;
-    Matrix3d A = W.transpose()*W+(Matrix3d::Identity()*damping);
+    Matrix3D A = W.transpose()*W+(Matrix3D::Identity()*damping);
     cartesian.head<3>() = A.ldlt().solve(W.transpose()*w());
     return cartesian;
   }
 
-  void Line3D::jacobian(Matrix7x6d& Jp, Matrix7x6d& Jl, const Eigen::Isometry3d& x, const Line3D& l){
+  void Line3D::jacobian(Matrix7x6d& Jp, Matrix7x6d& Jl, const Isometry3D& x, const Line3D& l){
     Jp.setZero();
     Jl.setZero();
     Matrix6d A=Matrix6d::Zero();
@@ -48,8 +48,8 @@ namespace g2o {
     D.block<3,3>(3,3) = -2*_skew(l.d());
     Jp.block<6,6>(0,0) = A*D;
 
-    Vector3d d = l.d();
-    Vector3d w = l.w();
+    Vector3D d = l.d();
+    Vector3D w = l.w();
     double ln = d.norm();
     double iln = 1./ln;
     double iln3 = std::pow(iln,3);
@@ -65,7 +65,7 @@ namespace g2o {
     Jl.block<1,6>(6,0) << 2*d.x(),2*d.y(),2*d.z();
   }
 
-  Line3D operator*(const Eigen::Isometry3d& t, const Line3D& line){
+  Line3D operator*(const Isometry3D& t, const Line3D& line){
     Matrix6d A=Matrix6d::Zero();
     A.block<3,3>(0,0)=t.linear();
     A.block<3,3>(0,3)= _skew(t.translation())*t.linear();
@@ -79,7 +79,7 @@ namespace g2o {
 
   namespace internal
   {
-    Vector6d transformCartesianLine(const Eigen::Isometry3d& t, const Vector6d& line){
+    Vector6d transformCartesianLine(const Isometry3D& t, const Vector6d& line){
       Vector6d l;
       l.head<3>() = t*line.head<3>();
       l.tail<3>() = t.linear()*line.tail<3>();
@@ -87,8 +87,8 @@ namespace g2o {
     }
 
     Vector6d normalizeCartesianLine(const Vector6d& line) {
-      Eigen::Vector3d p0 = line.head<3>();
-      Eigen::Vector3d d0 = line.tail<3>();
+      Vector3D p0 = line.head<3>();
+      Vector3D d0 = line.tail<3>();
       d0.normalize();
       p0-=d0*(d0.dot(p0));
       Vector6d nl;

@@ -35,9 +35,6 @@
 
 namespace g2o {
 
-using namespace std;
-using namespace Eigen;
-
 template <typename Traits>
 BlockSolver<Traits>::BlockSolver(LinearSolverType* linearSolver) :
   BlockSolverBase(),
@@ -220,7 +217,7 @@ bool BlockSolver<Traits>::buildStructure(bool zeroBlocks)
         ind1 = indexV1Bak;
         bool transposedBlock = ind1 > ind2;
         if (transposedBlock){ // make sure, we allocate the upper triangle block
-          swap(ind1, ind2);
+          std::swap(ind1, ind2);
         }
         if (! v1->marginalized() && !v2->marginalized()){
           PoseMatrixType* m = _Hpp->block(ind1, ind2, true);
@@ -334,7 +331,7 @@ bool BlockSolver<Traits>::updateStructure(const std::vector<HyperGraph::Vertex*>
         ind1 = indexV1Bak;
         bool transposedBlock = ind1 > ind2;
         if (transposedBlock) // make sure, we allocate the upper triangular block
-          swap(ind1, ind2);
+          std::swap(ind1, ind2);
 
         if (! v1->marginalized() && !v2->marginalized()) {
           PoseMatrixType* m = _Hpp->block(ind1, ind2, true);
@@ -487,7 +484,7 @@ bool BlockSolver<Traits>::solve(){
 
 
 template <typename Traits>
-bool BlockSolver<Traits>::computeMarginals(SparseBlockMatrix<MatrixXd>& spinv, const std::vector<std::pair<int, int> >& blockIndices)
+bool BlockSolver<Traits>::computeMarginals(SparseBlockMatrix<MatrixXD>& spinv, const std::vector<std::pair<int, int> >& blockIndices)
 {
   double t = get_monotonic_time();
   bool ok = _linearSolver->solvePattern(spinv, blockIndices, *_Hpp);
@@ -536,7 +533,7 @@ bool BlockSolver<Traits>::buildSystem()
       if (! v->fixed()) {
         bool hasANan = arrayHasNaN(jacobianWorkspace.workspaceForVertex(i), e->dimension() * v->dimension());
         if (hasANan) {
-          cerr << "buildSystem(): NaN within Jacobian for edge " << e << " for vertex " << i << endl;
+          std::cerr << "buildSystem(): NaN within Jacobian for edge " << e << " for vertex " << i << std::endl;
           break;
         }
       }

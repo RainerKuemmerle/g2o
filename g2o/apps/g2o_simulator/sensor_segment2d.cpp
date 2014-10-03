@@ -30,6 +30,7 @@
 
 namespace g2o{
   using namespace std;
+  using namespace Eigen;
 
   SensorSegment2D::SensorSegment2D(const std::string& name_): BinarySensor<Robot2D, EdgeSE2Segment2D, WorldObjectSegment2D>(name_) {
     cerr << "I am the constructor" << endl;

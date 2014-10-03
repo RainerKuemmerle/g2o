@@ -26,6 +26,8 @@
 
 #include "vertex_point_xy.h"
 
+using namespace Eigen;
+
 namespace g2o {
   namespace tutorial {
 

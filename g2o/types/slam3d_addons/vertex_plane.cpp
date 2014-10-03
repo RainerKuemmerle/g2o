@@ -20,7 +20,7 @@ namespace g2o
   }
   
   bool VertexPlane::read(std::istream& is) {
-    Vector4d lv;
+    Vector4D lv;
     for (int i=0; i<4; i++)
       is >> lv[i];
     setEstimate(Plane3D(lv));
@@ -29,7 +29,7 @@ namespace g2o
   }
 
   bool VertexPlane::write(std::ostream& os) const {
-    Vector4d lv=_estimate.toVector();
+    Vector4D lv=_estimate.toVector();
     for (int i=0; i<4; i++){
       os << lv[i] << " ";
     }

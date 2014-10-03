@@ -56,13 +56,13 @@ namespace g2o {
       }
 
       virtual bool setEstimateDataImpl(const double* est){
-        Map<const Vector2d> v(est);
+        Eigen::Map<const Vector2D> v(est);
         _estimate=Line2D(v);
         return true;
       }
 
       virtual bool getEstimateData(double* est) const{
-        Map<Vector2d> v(est);
+        Eigen::Map<Vector2D> v(est);
         v=_estimate;
         return true;
       }
@@ -85,7 +85,7 @@ namespace g2o {
 
       virtual void oplusImpl(const double* update)
       {
-        _estimate += Map<const Vector2d>(update);
+        _estimate += Eigen::Map<const Vector2D>(update);
         _estimate(0) = normalize_theta(_estimate(0));
       }
 

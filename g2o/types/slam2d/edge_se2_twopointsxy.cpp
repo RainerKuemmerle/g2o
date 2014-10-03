@@ -8,7 +8,7 @@
 
 namespace g2o{
 
-  EdgeSE2TwoPointsXY::EdgeSE2TwoPointsXY() : BaseMultiEdge<4,Eigen::Vector4d>(){
+  EdgeSE2TwoPointsXY::EdgeSE2TwoPointsXY() : BaseMultiEdge<4,Vector4D>(){
     resize(3);
   }
 
@@ -18,8 +18,8 @@ namespace g2o{
     VertexPointXY * xy2 = static_cast<VertexPointXY *> (_vertices[2]);
 
 
-    Eigen::Vector2d m1 = pose->estimate().inverse() * xy1->estimate();
-    Eigen::Vector2d m2 = pose->estimate().inverse() * xy2->estimate();
+    Vector2D m1 = pose->estimate().inverse() * xy1->estimate();
+    Vector2D m2 = pose->estimate().inverse() * xy2->estimate();
 
     _error[0] = m1[0] - _measurement[0];
     _error[1] = m1[1] - _measurement[1];
@@ -68,12 +68,12 @@ namespace g2o{
     }
 
     if(estimatev1){
-      Eigen::Vector2d submeas(_measurement[0], _measurement[1]);
+      Vector2D submeas(_measurement[0], _measurement[1]);
       v1->setEstimate(pose->estimate() * submeas);
     }
 
     if(estimatev2){
-      Eigen::Vector2d submeas(_measurement[2], _measurement[3]);
+      Vector2D submeas(_measurement[2], _measurement[3]);
       v2->setEstimate(pose->estimate() * submeas);
     }
   }
@@ -97,8 +97,8 @@ namespace g2o{
     VertexPointXY * xy2 = static_cast<VertexPointXY *> (_vertices[2]);
 
 
-    Eigen::Vector2d m1 = pose->estimate().inverse() * xy1->estimate();
-    Eigen::Vector2d m2 = pose->estimate().inverse() * xy2->estimate();
+    Vector2D m1 = pose->estimate().inverse() * xy1->estimate();
+    Vector2D m2 = pose->estimate().inverse() * xy2->estimate();
 
     _measurement[0] = m1[0];
     _measurement[1] = m1[1];

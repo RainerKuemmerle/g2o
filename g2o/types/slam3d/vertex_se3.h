@@ -35,21 +35,19 @@
 
 namespace g2o {
 
-  using namespace Eigen;
-
 /**
- * \brief 3D pose Vertex, represented as an Isometry3d
+ * \brief 3D pose Vertex, represented as an Isometry3D
  *
- * 3D pose vertex, represented as an Isometry3d, i.e., an affine transformation
+ * 3D pose vertex, represented as an Isometry3D, i.e., an affine transformation
  * which is constructed by only concatenating rotation and translation
  * matrices. Hence, no scaling or projection.  To avoid that the rotational
- * part of the Isometry3d gets numerically unstable we compute the nearest
+ * part of the Isometry3D gets numerically unstable we compute the nearest
  * orthogonal matrix after a large number of calls to the oplus method.
  * 
  * The parameterization for the increments constructed is a 6d vector
  * (x,y,z,qx,qy,qz) (note that we leave out the w part of the quaternion.
  */
-  class G2O_TYPES_SLAM3D_API VertexSE3 : public BaseVertex<6, Eigen::Isometry3d>
+  class G2O_TYPES_SLAM3D_API VertexSE3 : public BaseVertex<6, Isometry3D>
   {
     public:
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
@@ -59,20 +57,20 @@ namespace g2o {
       VertexSE3();
 
       virtual void setToOriginImpl() {
-        _estimate = Isometry3d::Identity();
+        _estimate = Isometry3D::Identity();
       }
 
       virtual bool read(std::istream& is);
       virtual bool write(std::ostream& os) const;
 
       virtual bool setEstimateDataImpl(const double* est){
-        Map<const Vector7d> v(est);
+        Eigen::Map<const Vector7d> v(est);
         _estimate=internal::fromVectorQT(v);
         return true;
       }
 
       virtual bool getEstimateData(double* est) const{
-        Map<Vector7d> v(est);
+        Eigen::Map<Vector7d> v(est);
         v=internal::toVectorQT(_estimate);
         return true;
       }
@@ -82,13 +80,13 @@ namespace g2o {
       }
 
       virtual bool setMinimalEstimateDataImpl(const double* est){
-        Map<const Vector6d> v(est);
+        Eigen::Map<const Vector6d> v(est);
         _estimate = internal::fromVectorMQT(v);
         return true;
       }
 
       virtual bool getMinimalEstimateData(double* est) const{
-        Map<Vector6d> v(est);
+        Eigen::Map<Vector6d> v(est);
         v = internal::toVectorMQT(_estimate);
         return true;
       }
@@ -106,8 +104,8 @@ namespace g2o {
        */
       virtual void oplusImpl(const double* update)
       {
-        Map<const Vector6d> v(update);
-        Eigen::Isometry3d increment = internal::fromVectorMQT(v);
+        Eigen::Map<const Vector6d> v(update);
+        Isometry3D increment = internal::fromVectorMQT(v);
         _estimate = _estimate * increment;
         if (++_numOplusCalls > orthogonalizeAfter) {
           _numOplusCalls = 0;

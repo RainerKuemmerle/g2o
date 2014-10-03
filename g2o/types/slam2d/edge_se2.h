@@ -65,7 +65,7 @@ namespace g2o {
       }
 
       virtual bool getMeasurementData(double* d) const {
-        Vector3d v=_measurement.toVector();
+        Vector3D v=_measurement.toVector();
         d[0] = v[0];
         d[1] = v[1];
         d[2] = v[2];

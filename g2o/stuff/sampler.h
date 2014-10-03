@@ -35,18 +35,14 @@
 #include <cmath>
 #include <ctime>
 
-#ifdef _MSC_VER
 #include <random>
-#else
-#include <tr1/random>
-#endif
 
 #include "g2o_stuff_api.h"
 
 namespace g2o {
 
-  double G2O_STUFF_API sampleUniform(double min=0, double max=1, std::tr1::ranlux_base_01* generator=0);
-  double G2O_STUFF_API sampleGaussian(std::tr1::ranlux_base_01* generator = 0);
+  double G2O_STUFF_API sampleUniform(double min=0, double max=1, std::mt19937* generator=0);
+  double G2O_STUFF_API sampleGaussian(std::mt19937* generator = 0);
 
   template <class SampleType, class CovarianceType>
   class GaussianSampler {
@@ -54,7 +50,7 @@ namespace g2o {
     GaussianSampler(bool hasGenerator=true){
       _generator = 0;
       if (hasGenerator){
-        _generator = new std::tr1::ranlux_base_01;
+        _generator = new std::mt19937;
       }
     }
     ~GaussianSampler() {
@@ -65,7 +61,7 @@ namespace g2o {
       Eigen::LLT<CovarianceType> cholDecomp;
       cholDecomp.compute(cov);
       if (cholDecomp.info()==Eigen::NumericalIssue)
-  return;
+        return;
       _cholesky=cholDecomp.matrixL();
     }
     SampleType generateSample() {
@@ -77,7 +73,7 @@ namespace g2o {
     }
   protected:
     CovarianceType _cholesky;
-    std::tr1::ranlux_base_01* _generator;
+    std::mt19937* _generator;
   };
 
   class G2O_STUFF_API Sampler

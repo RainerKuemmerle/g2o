@@ -24,11 +24,11 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "g2o/stuff/opengl_primitives.h"
 #include "vertex_pointxyz.h"
 #include <stdio.h>
 
 #ifdef G2O_HAVE_OPENGL
+#include "g2o/stuff/opengl_primitives.h"
 #include "g2o/stuff/opengl_wrapper.h"
 #endif
 
@@ -37,7 +37,7 @@
 namespace g2o {
 
   bool VertexPointXYZ::read(std::istream& is) {
-    Vector3d lv;
+    Vector3D lv;
     for (int i=0; i<3; i++)
       is >> lv[i];
     setEstimate(lv);
@@ -45,7 +45,7 @@ namespace g2o {
   }
 
   bool VertexPointXYZ::write(std::ostream& os) const {
-    Vector3d lv=estimate();
+    Vector3D lv=estimate();
     for (int i=0; i<3; i++){
       os << lv[i] << " ";
     }

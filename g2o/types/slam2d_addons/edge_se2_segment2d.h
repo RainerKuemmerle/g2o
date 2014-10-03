@@ -35,23 +35,23 @@
 
 namespace g2o {
 
-  class G2O_TYPES_SLAM2D_ADDONS_API EdgeSE2Segment2D : public BaseBinaryEdge<4, Eigen::Vector4d, VertexSE2, VertexSegment2D>
+  class G2O_TYPES_SLAM2D_ADDONS_API EdgeSE2Segment2D : public BaseBinaryEdge<4, Vector4D, VertexSE2, VertexSegment2D>
   {
     public:
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW
       EdgeSE2Segment2D();
 
-      Eigen::Vector2d measurementP1(){ return Eigen::Map<const Eigen::Vector2d>(&(_measurement[0])); }
-      Eigen::Vector2d measurementP2(){ return Eigen::Map<const Eigen::Vector2d>(&(_measurement[2])); }
-      void  setMeasurementP1(const Eigen::Vector2d& p1){ Eigen::Map<Eigen::Vector2d> v(&_measurement[0]); v=p1; }
-      void  setMeasurementP2(const Eigen::Vector2d& p2){ Eigen::Map<Eigen::Vector2d> v(&_measurement[2]); v=p2; }
+      Vector2D measurementP1(){ return Eigen::Map<const Vector2D>(&(_measurement[0])); }
+      Vector2D measurementP2(){ return Eigen::Map<const Vector2D>(&(_measurement[2])); }
+      void  setMeasurementP1(const Vector2D& p1){ Eigen::Map<Vector2D> v(&_measurement[0]); v=p1; }
+      void  setMeasurementP2(const Vector2D& p2){ Eigen::Map<Vector2D> v(&_measurement[2]); v=p2; }
 
       void computeError()
       {
         const VertexSE2* v1 = static_cast<const VertexSE2*>(_vertices[0]);
         const VertexSegment2D* l2 = static_cast<const VertexSegment2D*>(_vertices[1]);
-	Map<Vector2d> error1(&_error(0));
-	Map<Vector2d> error2(&_error(2));
+        Eigen::Map<Vector2D> error1(&_error(0));
+        Eigen::Map<Vector2D> error2(&_error(2));
         SE2 iEst=v1->estimate().inverse();
         error1 = (iEst * l2->estimateP1());
 	error2 = (iEst * l2->estimateP2());
@@ -59,13 +59,13 @@ namespace g2o {
       }
 
       virtual bool setMeasurementData(const double* d){
-	Map<const Vector4d> data(d);
+        Eigen::Map<const Vector4D> data(d);
 	_measurement = data;
 	return true;
       }
 
       virtual bool getMeasurementData(double* d) const{
-	Map<Vector4d> data(d);
+        Eigen::Map<Vector4D> data(d);
 	data = _measurement;
 	return true;
       }

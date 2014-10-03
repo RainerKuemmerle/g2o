@@ -138,7 +138,7 @@ namespace g2o {
   /**Sim3ProjectXYZ*/
 
   EdgeSim3ProjectXYZ::EdgeSim3ProjectXYZ() :
-  BaseBinaryEdge<2, Vector2d, VertexSBAPointXYZ, VertexSim3Expmap>()
+  BaseBinaryEdge<2, Vector2D, VertexSBAPointXYZ, VertexSim3Expmap>()
   {
   }
 
@@ -177,15 +177,15 @@ namespace g2o {
 //    Sim3 T = vj->estimate();
 
 //    VertexPointXYZ* vi = static_cast<VertexPointXYZ*>(_vertices[0]);
-//    Vector3d xyz = vi->estimate();
-//    Vector3d xyz_trans = T.map(xyz);
+//    Vector3D xyz = vi->estimate();
+//    Vector3D xyz_trans = T.map(xyz);
 
 //    double x = xyz_trans[0];
 //    double y = xyz_trans[1];
 //    double z = xyz_trans[2];
 //    double z_2 = z*z;
 
-//    Matrix<double,2,3> tmp;
+//    Matrix<double,2,3,Eigen::ColMajor> tmp;
 //    tmp(0,0) = _focal_length(0);
 //    tmp(0,1) = 0;
 //    tmp(0,2) = -x/z*_focal_length(0);

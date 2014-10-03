@@ -19,6 +19,8 @@
 
 #include <iostream>
 
+using namespace Eigen;
+
 namespace g2o
 {
 
@@ -28,7 +30,7 @@ namespace g2o
     Vector6d est;
     for (int i=0; i<6; i++)
       is  >> est[i];
-    Isometry3d transf= g2o::internal::fromVectorET(est);
+    Isometry3D transf= g2o::internal::fromVectorET(est);
     setEstimate(transf);
     updateCache();
     return true;

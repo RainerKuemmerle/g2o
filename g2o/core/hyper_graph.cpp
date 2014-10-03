@@ -185,7 +185,7 @@ namespace g2o {
     if (detach){
       bool result = detachVertex(v);
       if (! result) {
-	assert (0 && __PRETTY_FUNCTION__ && "inconsistency in detaching vertex, ");
+	assert (0 && "inconsistency in detaching vertex, ");
       }
     }
     VertexIDMap::iterator it=_vertices.find(v->id());
@@ -196,7 +196,7 @@ namespace g2o {
     EdgeSet tmp(v->edges());
     for (EdgeSet::iterator it=tmp.begin(); it!=tmp.end(); ++it){
       if (!removeEdge(*it)){
-        assert(0 && __PRETTY_FUNCTION__ && "error in erasing vertex");
+        assert(0 && "error in erasing vertex");
       }
     }
     _vertices.erase(it);

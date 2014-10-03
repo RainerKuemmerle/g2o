@@ -97,7 +97,7 @@ namespace g2o {
       os << " " << _remissions[i];
 
     // odometry pose
-    Eigen::Vector3d p = (_odomPose * _laserParams.laserPose).toVector();
+    Vector3D p = (_odomPose * _laserParams.laserPose).toVector();
     os << " " << p.x() << " " << p.y() << " " << p.z();
     p = _odomPose.toVector();
     os << " " << p.x() << " " << p.y() << " " << p.z();

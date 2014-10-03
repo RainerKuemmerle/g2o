@@ -35,7 +35,7 @@ namespace deprecated {
 
 
   // point to camera projection, monocular
-  EdgeSE3PointXYZ::EdgeSE3PointXYZ() : BaseBinaryEdge<3, Vector3d, VertexSE3, VertexPointXYZ>() {
+  EdgeSE3PointXYZ::EdgeSE3PointXYZ() : BaseBinaryEdge<3, Eigen::Vector3d, VertexSE3, VertexPointXYZ>() {
     information().setIdentity();
     J.fill(0);
     J.block<3,3>(0,0) = -Eigen::Matrix3d::Identity();
@@ -58,7 +58,7 @@ namespace deprecated {
     is >> pId;
     setParameterId(0, pId);
     // measured keypoint
-    Vector3d meas;
+    Eigen::Vector3d meas;
     for (int i=0; i<3; i++) is >> meas[i];
     setMeasurement(meas);
     // information matrix is the identity for features, could be changed to allow arbitrary covariances    
@@ -134,7 +134,7 @@ namespace deprecated {
     VertexPointXYZ *point = static_cast<VertexPointXYZ*>(_vertices[1]);
 
     // calculate the projection
-    const Vector3d &pt = point->estimate();
+    const Eigen::Vector3d &pt = point->estimate();
     // SE3OffsetCache* vcache = (SE3OffsetCache*) cam->getCache(_cacheIds[0]);
     // if (! vcache){
     //   cerr << "fatal error in retrieving cache" << endl;

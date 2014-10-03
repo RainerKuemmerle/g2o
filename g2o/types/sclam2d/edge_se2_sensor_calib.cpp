@@ -25,8 +25,9 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "edge_se2_sensor_calib.h"
+#ifdef G2O_HAVE_OPENGL
 #include "g2o/stuff/opengl_wrapper.h"
-
+#endif
 namespace g2o {
 
   EdgeSE2SensorCalib::EdgeSE2SensorCalib() :
@@ -52,7 +53,7 @@ namespace g2o {
 
   bool EdgeSE2SensorCalib::read(std::istream& is)
   {
-    Vector3d p;
+    Vector3D p;
     is >> p(0) >> p(1) >> p(2);
     _measurement.fromVector(p);
     _inverseMeasurement=measurement().inverse();
@@ -67,7 +68,7 @@ namespace g2o {
 
   bool EdgeSE2SensorCalib::write(std::ostream& os) const
   {
-    Vector3d p = measurement().toVector();
+    Vector3D p = measurement().toVector();
     os << p(0) << " " << p(1) << " " << p(2);
     for (int i = 0; i < information().rows(); ++i)
       for (int j = i; j < information().cols(); ++j)

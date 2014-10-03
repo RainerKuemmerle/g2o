@@ -64,7 +64,7 @@ void BaseUnaryEdge<D, E, VertexXiType>::constructQuadraticForm()
 #endif
     if (this->robustKernel()) {
       double error = this->chi2();
-      Eigen::Vector3d rho;
+      Vector3D rho;
       this->robustKernel()->robustify(error, rho);
       InformationType weightedOmega = this->robustInformation(rho);
 

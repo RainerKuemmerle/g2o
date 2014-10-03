@@ -32,44 +32,44 @@ namespace internal {
   // MSVC does not like the template specialization, seems like MSVC applies type conversion
   // which results in calling a fixed size method (segment<int>) on the dynamically sized matrices
   template<typename MatrixType>
-  void pcg_axy(const MatrixType& A, const Eigen::VectorXd& x, int xoff, Eigen::VectorXd& y, int yoff)
+  void pcg_axy(const MatrixType& A, const VectorXD& x, int xoff, VectorXD& y, int yoff)
   {
     y.segment(yoff, A.rows()) = A * x.segment(xoff, A.cols());
   }
 #else
   template<typename MatrixType>
-  inline void pcg_axy(const MatrixType& A, const Eigen::VectorXd& x, int xoff, Eigen::VectorXd& y, int yoff)
+  inline void pcg_axy(const MatrixType& A, const VectorXD& x, int xoff, VectorXD& y, int yoff)
   {
     y.segment<MatrixType::RowsAtCompileTime>(yoff) = A * x.segment<MatrixType::ColsAtCompileTime>(xoff);
   }
   
   template<>
-  inline void pcg_axy(const Eigen::MatrixXd& A, const Eigen::VectorXd& x, int xoff, Eigen::VectorXd& y, int yoff)
+  inline void pcg_axy(const MatrixXD& A, const VectorXD& x, int xoff, VectorXD& y, int yoff)
   {
     y.segment(yoff, A.rows()) = A * x.segment(xoff, A.cols());
   }
 #endif
 
   template<typename MatrixType>
-  inline void pcg_axpy(const MatrixType& A, const Eigen::VectorXd& x, int xoff, Eigen::VectorXd& y, int yoff)
+  inline void pcg_axpy(const MatrixType& A, const VectorXD& x, int xoff, VectorXD& y, int yoff)
   {
     y.segment<MatrixType::RowsAtCompileTime>(yoff) += A * x.segment<MatrixType::ColsAtCompileTime>(xoff);
   }
 
   template<>
-  inline void pcg_axpy(const Eigen::MatrixXd& A, const Eigen::VectorXd& x, int xoff, Eigen::VectorXd& y, int yoff)
+  inline void pcg_axpy(const MatrixXD& A, const VectorXD& x, int xoff, VectorXD& y, int yoff)
   {
     y.segment(yoff, A.rows()) += A * x.segment(xoff, A.cols());
   }
 
   template<typename MatrixType>
-  inline void pcg_atxpy(const MatrixType& A, const Eigen::VectorXd& x, int xoff, Eigen::VectorXd& y, int yoff)
+  inline void pcg_atxpy(const MatrixType& A, const VectorXD& x, int xoff, VectorXD& y, int yoff)
   {
     y.segment<MatrixType::ColsAtCompileTime>(yoff) += A.transpose() * x.segment<MatrixType::RowsAtCompileTime>(xoff);
   }
 
   template<>
-  inline void pcg_atxpy(const Eigen::MatrixXd& A, const Eigen::VectorXd& x, int xoff, Eigen::VectorXd& y, int yoff)
+  inline void pcg_atxpy(const MatrixXD& A, const VectorXD& x, int xoff, VectorXD& y, int yoff)
   {
     y.segment(yoff, A.cols()) += A.transpose() * x.segment(xoff, A.rows());
   }
@@ -107,11 +107,11 @@ bool LinearSolverPCG<MatrixType>::solve(const SparseBlockMatrix<MatrixType>& A, 
 
   int n = A.rows();
   assert(n > 0 && "Hessian has 0 rows/cols");
-  Eigen::Map<Eigen::VectorXd> xvec(x, A.cols());
-  const Eigen::Map<Eigen::VectorXd> bvec(b, n);
+  Eigen::Map<VectorXD> xvec(x, A.cols());
+  const Eigen::Map<VectorXD> bvec(b, n);
   xvec.setZero();
 
-  Eigen::VectorXd r, d, q, s;
+  VectorXD r, d, q, s;
   d.setZero(n);
   q.setZero(n);
   s.setZero(n);
@@ -156,7 +156,7 @@ bool LinearSolverPCG<MatrixType>::solve(const SparseBlockMatrix<MatrixType>& A, 
 }
 
 template <typename MatrixType>
-void LinearSolverPCG<MatrixType>::multDiag(const std::vector<int>& colBlockIndices, MatrixVector& A, const Eigen::VectorXd& src, Eigen::VectorXd& dest)
+void LinearSolverPCG<MatrixType>::multDiag(const std::vector<int>& colBlockIndices, MatrixVector& A, const VectorXD& src, VectorXD& dest)
 {
   int row = 0;
   for (size_t i = 0; i < A.size(); ++i) {
@@ -166,7 +166,7 @@ void LinearSolverPCG<MatrixType>::multDiag(const std::vector<int>& colBlockIndic
 }
 
 template <typename MatrixType>
-void LinearSolverPCG<MatrixType>::multDiag(const std::vector<int>& colBlockIndices, MatrixPtrVector& A, const Eigen::VectorXd& src, Eigen::VectorXd& dest)
+void LinearSolverPCG<MatrixType>::multDiag(const std::vector<int>& colBlockIndices, MatrixPtrVector& A, const VectorXD& src, VectorXD& dest)
 {
   int row = 0;
   for (size_t i = 0; i < A.size(); ++i) {
@@ -176,7 +176,7 @@ void LinearSolverPCG<MatrixType>::multDiag(const std::vector<int>& colBlockIndic
 }
 
 template <typename MatrixType>
-void LinearSolverPCG<MatrixType>::mult(const std::vector<int>& colBlockIndices, const Eigen::VectorXd& src, Eigen::VectorXd& dest)
+void LinearSolverPCG<MatrixType>::mult(const std::vector<int>& colBlockIndices, const VectorXD& src, VectorXD& dest)
 {
   // first multiply with the diagonal
   multDiag(colBlockIndices, _diag, src, dest);

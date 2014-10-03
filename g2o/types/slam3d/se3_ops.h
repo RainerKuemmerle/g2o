@@ -33,16 +33,15 @@
 #include "g2o_types_slam3d_api.h"
 
 namespace g2o {
-  using namespace Eigen;
 
-  inline G2O_TYPES_SLAM3D_API Matrix3d skew(const Vector3d&v);
-  inline G2O_TYPES_SLAM3D_API Vector3d deltaR(const Matrix3d& R);
-  inline G2O_TYPES_SLAM3D_API Vector2d project(const Vector3d&);
-  inline G2O_TYPES_SLAM3D_API Vector3d project(const Vector4d&);
-  inline G2O_TYPES_SLAM3D_API Vector3d unproject(const Vector2d&);
-  inline G2O_TYPES_SLAM3D_API Vector4d unproject(const Vector3d&);
+  inline G2O_TYPES_SLAM3D_API Matrix3D skew(const Vector3D&v);
+  inline G2O_TYPES_SLAM3D_API Vector3D deltaR(const Matrix3D& R);
+  inline G2O_TYPES_SLAM3D_API Vector2D project(const Vector3D&);
+  inline G2O_TYPES_SLAM3D_API Vector3D project(const Vector4D&);
+  inline G2O_TYPES_SLAM3D_API Vector3D unproject(const Vector2D&);
+  inline G2O_TYPES_SLAM3D_API Vector4D unproject(const Vector3D&);
 
-#include "se3_ops.hpp"
+  #include "se3_ops.hpp"
 
 }
 

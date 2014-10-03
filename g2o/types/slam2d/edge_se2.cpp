@@ -40,7 +40,7 @@ namespace g2o {
 
   bool EdgeSE2::read(std::istream& is)
   {
-    Vector3d p;
+    Vector3D p;
     is >> p[0] >> p[1] >> p[2];
     setMeasurement(SE2(p));
     _inverseMeasurement = measurement().inverse();
@@ -55,7 +55,7 @@ namespace g2o {
 
   bool EdgeSE2::write(std::ostream& os) const
   {
-    Vector3d p = measurement().toVector();
+    Vector3D p = measurement().toVector();
     os << p.x() << " " << p.y() << " " << p.z();
     for (int i = 0; i < 3; ++i)
       for (int j = i; j < 3; ++j)
@@ -80,7 +80,7 @@ namespace g2o {
     const VertexSE2* vj = static_cast<const VertexSE2*>(_vertices[1]);
     double thetai = vi->estimate().rotation().angle();
 
-    Vector2d dt = vj->estimate().translation() - vi->estimate().translation();
+    Vector2D dt = vj->estimate().translation() - vi->estimate().translation();
     double si=sin(thetai), ci=cos(thetai);
 
     _jacobianOplusXi(0, 0) = -ci; _jacobianOplusXi(0, 1) = -si; _jacobianOplusXi(0, 2) = -si*dt.x()+ci*dt.y();
@@ -92,7 +92,7 @@ namespace g2o {
     _jacobianOplusXj(2, 0) = 0;  _jacobianOplusXj(2, 1)= 0;  _jacobianOplusXj(2, 2)= 1;
 
     const SE2& rmean = _inverseMeasurement;
-    Matrix3d z = Matrix3d::Zero();
+    Matrix3D z = Matrix3D::Zero();
     z.block<2, 2>(0, 0) = rmean.rotation().toRotationMatrix();
     z(2, 2) = 1.;
     _jacobianOplusXi = z * _jacobianOplusXi;

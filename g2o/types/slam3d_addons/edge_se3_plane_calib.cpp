@@ -8,6 +8,7 @@
 namespace g2o
 {
   using namespace std;
+  using namespace Eigen;
 
   EdgeSE3PlaneSensorCalib::EdgeSE3PlaneSensorCalib() :
     BaseMultiEdge<3, Plane3D>()
@@ -18,7 +19,7 @@ namespace g2o
 
   bool EdgeSE3PlaneSensorCalib::read(std::istream& is)
   {
-    Vector4d v;
+    Vector4D v;
     is >> v(0) >> v(1) >> v(2) >> v(3);
     setMeasurement(Plane3D(v));
     is >> color(0) >> color(1) >> color(2);
@@ -33,7 +34,7 @@ namespace g2o
 
   bool EdgeSE3PlaneSensorCalib::write(std::ostream& os) const
   {
-    Vector4d v = _measurement.toVector();
+    Vector4D v = _measurement.toVector();
     os << v(0) << " " << v(1) << " " << v(2) << " " << v(3) << " ";
     os << color(0) << " " << color(1) << " " << color(2) << " ";
     for (int i = 0; i < information().rows(); ++i)
@@ -98,7 +99,7 @@ namespace g2o
 
     glColor3f(that->color(0), that->color(1), that->color(2));
     glPushMatrix();
-    Eigen::Isometry3d robotAndSensor = robot->estimate() * sensor->estimate();
+    Isometry3D robotAndSensor = robot->estimate() * sensor->estimate();
     glMultMatrixd(robotAndSensor.matrix().data());
 
     glRotatef(RAD2DEG(azimuth),0.,0.,1.);

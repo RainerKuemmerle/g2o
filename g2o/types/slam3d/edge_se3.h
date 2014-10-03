@@ -11,11 +11,11 @@ namespace g2o {
   /**
    * \brief Edge between two 3D pose vertices
    *
-   * The transformation between the two vertices is given as an Isometry3d.
+   * The transformation between the two vertices is given as an Isometry3D.
    * If z denotes the measurement, then the error function is given as follows:
    * z^-1 * (x_i^-1 * x_j)
    */
-  class G2O_TYPES_SLAM3D_API EdgeSE3 : public BaseBinaryEdge<6, Eigen::Isometry3d, VertexSE3, VertexSE3> {
+  class G2O_TYPES_SLAM3D_API EdgeSE3 : public BaseBinaryEdge<6, Isometry3D, VertexSE3, VertexSE3> {
     public:
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
       EdgeSE3();
@@ -24,19 +24,19 @@ namespace g2o {
 
       void computeError();
 
-      virtual void setMeasurement(const Eigen::Isometry3d& m){
+      virtual void setMeasurement(const Isometry3D& m){
         _measurement = m;
         _inverseMeasurement = m.inverse();
       }
 
       virtual bool setMeasurementData(const double* d){
-        Map<const Vector7d> v(d);
+        Eigen::Map<const Vector7d> v(d);
         setMeasurement(internal::fromVectorQT(v));
         return true;
       }
 
       virtual bool getMeasurementData(double* d) const{
-        Map<Vector7d> v(d);
+        Eigen::Map<Vector7d> v(d);
         v = internal::toVectorQT(_measurement);
         return true;
       }
@@ -55,7 +55,7 @@ namespace g2o {
       virtual void initialEstimate(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to);
 
     protected:
-      Eigen::Isometry3d _inverseMeasurement;
+      Isometry3D _inverseMeasurement;
   };
 
   /**

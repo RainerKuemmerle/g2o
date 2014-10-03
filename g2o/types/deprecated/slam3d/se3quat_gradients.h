@@ -32,10 +32,8 @@
 namespace g2o {
 namespace deprecated {
 
-using namespace Eigen;
-
 template <typename Derived>
-void jacobian_3d_qman ( MatrixBase<Derived> &  Ji , MatrixBase<Derived> &  Jj,
+void jacobian_3d_qman ( Eigen::MatrixBase<Derived> &  Ji , Eigen::MatrixBase<Derived> &  Jj,
     const double&  z11 , const double&  z12 , const double&  z13 , const double&  z14 ,
   const double&  z21 , const double&  z22 , const double&  z23 , const double&  z24 ,
   const double&  z31 , const double&  z32 , const double&  z33 , const double&  z34 ,

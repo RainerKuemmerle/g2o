@@ -41,7 +41,7 @@
 namespace g2o {
 
   EdgeSE2Segment2D::EdgeSE2Segment2D() :
-    BaseBinaryEdge<4, Vector4d, VertexSE2, VertexSegment2D>()
+    BaseBinaryEdge<4, Vector4D, VertexSE2, VertexSegment2D>()
   {
   }
 

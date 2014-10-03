@@ -46,7 +46,7 @@ namespace g2o {
       {
         const VertexLine2D* l = static_cast<const VertexLine2D*>(_vertices[0]);
         const VertexPointXY* p = static_cast<const VertexPointXY*>(_vertices[1]);
-        Vector2d n(cos(l->theta()), sin(l->theta()));
+        Vector2D n(cos(l->theta()), sin(l->theta()));
         double prediction=n.dot(p->estimate())-l->rho();
         _error[0] =  prediction - _measurement;
       }
@@ -66,7 +66,7 @@ namespace g2o {
       virtual bool setMeasurementFromState(){
         const VertexLine2D* l = static_cast<const VertexLine2D*>(_vertices[0]);
         const VertexPointXY* p = static_cast<const VertexPointXY*>(_vertices[1]);
-        Vector2d n(cos(l->theta()), sin(l->theta()));
+        Vector2D n(cos(l->theta()), sin(l->theta()));
         double prediction=n.dot(p->estimate())-l->rho();
 	_measurement = prediction;
         return true;

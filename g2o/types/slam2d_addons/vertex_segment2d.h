@@ -36,29 +36,29 @@
 
 namespace g2o {
 
-  class G2O_TYPES_SLAM2D_ADDONS_API VertexSegment2D : public BaseVertex<4, Eigen::Vector4d>
+  class G2O_TYPES_SLAM2D_ADDONS_API VertexSegment2D : public BaseVertex<4, Vector4D>
   {
     public:
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
       VertexSegment2D();
 
-      Eigen::Vector2d estimateP1() const { return Eigen::Map<const Eigen::Vector2d>(&(_estimate[0])); }
-      Eigen::Vector2d estimateP2() const { return Eigen::Map<const Eigen::Vector2d>(&(_estimate[2])); }
-      void  setEstimateP1(const Eigen::Vector2d& p1){ Eigen::Map<Eigen::Vector2d> v(&_estimate[0]); v=p1; }
-      void  setEstimateP2(const Eigen::Vector2d& p2){ Eigen::Map<Eigen::Vector2d> v(&_estimate[2]); v=p2; }
+      Vector2D estimateP1() const { return Eigen::Map<const Vector2D>(&(_estimate[0])); }
+      Vector2D estimateP2() const { return Eigen::Map<const Vector2D>(&(_estimate[2])); }
+      void  setEstimateP1(const Vector2D& p1){ Eigen::Map<Vector2D> v(&_estimate[0]); v=p1; }
+      void  setEstimateP2(const Vector2D& p2){ Eigen::Map<Vector2D> v(&_estimate[2]); v=p2; }
 
       virtual void setToOriginImpl() {
         _estimate.setZero();
       }
 
       virtual bool setEstimateDataImpl(const double* est){
-	Map<const Eigen::Vector4d> v(est);
+        Eigen::Map<const Vector4D> v(est);
 	_estimate = v;
 	return true;
       }
 
       virtual bool getEstimateData(double* est) const{	
-	Map<Vector4d> v(est);
+        Eigen::Map<Vector4D> v(est);
 	v = _estimate;
 	return true;
       }
@@ -81,7 +81,7 @@ namespace g2o {
 
       virtual void oplusImpl(const double* update)
       {
-	Map<const Eigen::Vector4d> upd(update);
+        Eigen::Map<const Vector4D> upd(update);
         _estimate += upd;
       }
 

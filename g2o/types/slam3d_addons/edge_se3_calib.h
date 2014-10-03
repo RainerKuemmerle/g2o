@@ -38,7 +38,7 @@ namespace g2o
   /**
    * \brief Landmark measurement that also calibrates an offset for the landmark measurement
    */
-  class G2O_TYPES_SLAM3D_ADDONS_API EdgeSE3Calib : public BaseMultiEdge<6, Eigen::Isometry3d>
+  class G2O_TYPES_SLAM3D_ADDONS_API EdgeSE3Calib : public BaseMultiEdge<6, Isometry3D>
   {
     public:
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW

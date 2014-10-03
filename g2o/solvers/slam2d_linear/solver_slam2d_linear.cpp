@@ -38,6 +38,7 @@
 #include "g2o/stuff/scoped_pointer.h"
 
 #include "g2o/solvers/csparse/linear_solver_csparse.h"
+
 using namespace std;
 
 namespace g2o {
@@ -93,11 +94,11 @@ namespace g2o {
   {
     assert(_optimizer->indexMapping().size() + 1 == _optimizer->vertices().size() && "Needs to operate on full graph");
     assert(_optimizer->vertex(0)->fixed() && "Graph is not fixed by vertex 0");
-    Eigen::VectorXd b, x; // will be used for theta and x/y update
+    VectorXD b, x; // will be used for theta and x/y update
     b.setZero(_optimizer->indexMapping().size());
     x.setZero(_optimizer->indexMapping().size());
 
-    typedef Eigen::Matrix<double, 1, 1> ScalarMatrix;
+    typedef Eigen::Matrix<double, 1, 1, Eigen::ColMajor> ScalarMatrix;
 
     ScopedArray<int> blockIndeces(new int[_optimizer->indexMapping().size()]);
     for (size_t i = 0; i < _optimizer->indexMapping().size(); ++i)
@@ -146,7 +147,7 @@ namespace g2o {
     // walk along the Minimal Spanning Tree to compute the guess for the robot orientation
     assert(fixedSet.size() == 1);
     VertexSE2* root = static_cast<VertexSE2*>(*fixedSet.begin());
-    VectorXd thetaGuess;
+    VectorXD thetaGuess;
     thetaGuess.setZero(_optimizer->indexMapping().size());
     UniformCostFunction uniformCost;
     HyperDijkstra hyperDijkstra(_optimizer);

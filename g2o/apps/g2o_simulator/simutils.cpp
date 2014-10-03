@@ -8,10 +8,10 @@ namespace g2o {
   // 3: all clipped
   using namespace Eigen;
 
-  int clipSegmentCircle(Vector2d& p1, Vector2d& p2, double r) {
+  int clipSegmentCircle(Eigen::Vector2d& p1, Eigen::Vector2d& p2, double r) {
     double r2=r*r;
-    Vector2d pBase=p1;
-    Vector2d dp=p2-p1;
+    Eigen::Vector2d pBase=p1;
+    Eigen::Vector2d dp=p2-p1;
     double length=dp.norm();
     dp.normalize();
     double p=2*dp.dot(p1);
@@ -51,7 +51,7 @@ namespace g2o {
   // 1: p2clipped
   // 2: inside
 
-  int clipSegmentLine(Vector2d& p1, Vector2d& p2, double a, double b, double c ){
+  int clipSegmentLine(Eigen::Vector2d& p1, Eigen::Vector2d& p2, double a, double b, double c ){
     bool p1inside = true;
     bool p2inside = true;
     if (a*p1.x()+b*p1.y()+c < 0){
@@ -65,7 +65,7 @@ namespace g2o {
     if (!p1inside && !p2inside)
       return -1;
 
-    Vector2d dp=p2-p1;
+    Eigen::Vector2d dp=p2-p1;
     double den=a*dp.x()+b*dp.y();
     if (den==0)
       return -1;
@@ -79,7 +79,7 @@ namespace g2o {
     return 0;
   }
 
-  int clipSegmentFov(Vector2d& p1, Vector2d& p2, double min, double max){
+  int clipSegmentFov(Eigen::Vector2d& p1, Eigen::Vector2d& p2, double min, double max){
     bool clip1 = false, clip2 = false;
     // normal to the first line
     double amin =  sin(min), bmin = -cos(min);
@@ -117,11 +117,11 @@ namespace g2o {
     return 2;
   }
 
-  Vector2d computeLineParameters(const Vector2d& p1, const Vector2d& p2){
-    Vector2d lp;
-    Vector2d dp=p2-p1;
+  Eigen::Vector2d computeLineParameters(const Eigen::Vector2d& p1, const Eigen::Vector2d& p2){
+    Eigen::Vector2d lp;
+    Eigen::Vector2d dp=p2-p1;
     lp[0]=atan2(-dp.x(), dp.y());
-    Vector2d n(cos(lp[0]), sin(lp[0]));
+    Eigen::Vector2d n(cos(lp[0]), sin(lp[0]));
     lp[1]=n.dot(p1+p2)*.5;
     return lp;
   } 
