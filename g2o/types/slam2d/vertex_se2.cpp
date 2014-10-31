@@ -42,7 +42,7 @@ namespace g2o {
   bool VertexSE2::read(std::istream& is)
   {
     Vector3D p;
-    is >> p[0] >> p[1] >> p[2];
+    is >> p[0] >> p[1] >> p[2] >> timestamp >> agentID;
     setEstimate(p);
     return true;
   }
@@ -50,7 +50,7 @@ namespace g2o {
   bool VertexSE2::write(std::ostream& os) const
   {
     Vector3D p = estimate().toVector();
-    os << p[0] << " " << p[1] << " " << p[2];
+    os << p[0] << " " << p[1] << " " << p[2]<< " " << timestamp<< " " <<agentID;
     return os.good();
   }
 
@@ -104,6 +104,15 @@ namespace g2o {
       return this;
 
     VertexSE2* that = static_cast<VertexSE2*>(element);
+    
+    if(that->agentID == 4) // OMNI4 1st robot
+        glColor3f(0.5f,0.5f,0.8f);
+    if(that->agentID == 3) // OMNI3 2nd robot
+        glColor3f(0.0f,0.5f,0.0f);
+    if(that->agentID == 1) // OMNI1 3rd robot
+        glColor3f(0.7f,0.7f,0.0f);
+    if(that->agentID == 5) // OMNI5 4th robot
+        glColor3f(0.5f,0.0f,0.0f);    
 
     glColor3f(POSE_VERTEX_COLOR);
     glPushMatrix();

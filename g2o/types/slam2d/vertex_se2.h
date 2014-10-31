@@ -82,6 +82,9 @@ namespace g2o {
 
       virtual bool read(std::istream& is);
       virtual bool write(std::ostream& os) const;
+      
+      unsigned long long timestamp;
+      int agentID;
 
   };
 

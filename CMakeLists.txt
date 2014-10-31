@@ -34,7 +34,7 @@ ELSEIF(CMAKE_BUILD_TYPE MATCHES MinSizeRel)
 ENDIF(CMAKE_BUILD_TYPE MATCHES Release)
 
 # Allow the developer to select if Dynamic or Static libraries are built
-OPTION (BUILD_SHARED_LIBS "Build Shared Libraries (preferred and required for the g2o plugin system)" OFF)
+OPTION (BUILD_SHARED_LIBS "Build Shared Libraries (preferred and required for the g2o plugin system)" ON)
 SET (G2O_LIB_TYPE STATIC)
 IF (BUILD_SHARED_LIBS)
   SET (G2O_LIB_TYPE SHARED)
