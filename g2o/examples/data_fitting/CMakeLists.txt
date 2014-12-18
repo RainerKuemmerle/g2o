@@ -1,13 +1,11 @@
 INCLUDE_DIRECTORIES(${CSPARSE_INCLUDE_DIR})
 
-ADD_EXECUTABLE(circle_fit
-  circle_fit.cpp
-)
-SET_TARGET_PROPERTIES(circle_fit PROPERTIES OUTPUT_NAME circle_fit${EXE_POSTFIX})
-TARGET_LINK_LIBRARIES(circle_fit core solver_csparse)
+IF(CSPARSE_INCLUDE_DIR)
+  ADD_EXECUTABLE(circle_fit circle_fit.cpp)
+  SET_TARGET_PROPERTIES(circle_fit PROPERTIES OUTPUT_NAME circle_fit${EXE_POSTFIX})
+  TARGET_LINK_LIBRARIES(circle_fit core solver_csparse)
+ENDIF()
 
-ADD_EXECUTABLE(curve_fit
-  curve_fit.cpp
-)
+ADD_EXECUTABLE(curve_fit curve_fit.cpp)
 SET_TARGET_PROPERTIES(curve_fit PROPERTIES OUTPUT_NAME curve_fit${EXE_POSTFIX})
 TARGET_LINK_LIBRARIES(curve_fit core)
