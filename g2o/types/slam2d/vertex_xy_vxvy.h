@@ -113,6 +113,7 @@ namespace g2o
     
       unsigned long long timestamp;
       double ballZCoordinate;
+      bool isOptimizedAtLeastOnce;
 
   };
 

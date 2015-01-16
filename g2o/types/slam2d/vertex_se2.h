@@ -85,6 +85,8 @@ namespace g2o {
       
       unsigned long long timestamp;
       int agentID;
+      Eigen::Isometry2d odometryReading; //odometryReading at this vertex, meaning this odometry belongs to the edge from a previous node to this current node.
+      bool isOptimizedAtLeastOnce;
 
   };
 
