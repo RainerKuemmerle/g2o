@@ -112,6 +112,67 @@ namespace g2o {
   };
 
   /**
+   * \brief Geman-McClure cost function
+   *
+   * See http://research.microsoft.com/en-us/um/people/zhang/Papers/ZhangIVC-97-01.pdf
+   * and http://www2.informatik.uni-freiburg.de/~agarwal/resources/agarwal-thesis.pdf
+   *    e2
+   *  -----
+   *  e2 + 1
+   */
+  class G2O_CORE_API RobustKernelGemanMcClure : public RobustKernel
+  {
+    public:
+      virtual void robustify(double e2, Vector3D& rho) const;
+  };
+
+  /**
+   * \brief Welsch cost function
+   *
+   * See http://research.microsoft.com/en-us/um/people/zhang/Papers/ZhangIVC-97-01.pdf
+   *
+   * d^2 [1 - exp(- e2/d^2)]
+   *
+   */
+  class G2O_CORE_API RobustKernelWelsch : public RobustKernel
+  {
+    public:
+      virtual void robustify(double e2, Vector3D& rho) const;
+  };
+
+  /**
+   * \brief Fair cost function
+   *
+   * See http://research.microsoft.com/en-us/um/people/zhang/Papers/ZhangIVC-97-01.pdf
+   *
+   * 2 * d^2 [e2 / d - log (1 + e2 / d)]
+   *
+   */
+  class G2O_CORE_API RobustKernelFair : public RobustKernel
+  {
+    public:
+      virtual void robustify(double e2, Vector3D& rho) const;
+  };
+
+  /**
+   * \brief Tukey Cost Function
+   *
+   * See http://research.microsoft.com/en-us/um/people/zhang/Papers/ZhangIVC-97-01.pdf
+   *
+   * If e2^(1/2) <= d
+   * rho(e) = d^2 * (1 - ( 1 - e2 / d^2)^3) / 3
+   *
+   * else
+   *
+   * rho(e) = d^2 / 3
+   */
+  class G2O_CORE_API RobustKernelTukey : public RobustKernel
+  {
+    public:
+      virtual void robustify(double e2, Vector3D& rho) const;
+  };
+
+  /**
    * \brief Saturated cost function.
    *
    * The error is at most delta^2
@@ -124,7 +185,7 @@ namespace g2o {
 
   /**
    * \brief Dynamic covariance scaling - DCS
-   *  
+   *
    * See paper Robust Map Optimization from Agarwal et al.  ICRA 2013
    *
    * delta is used as $phi$
@@ -134,7 +195,6 @@ namespace g2o {
     public:
       virtual void robustify(double e2, Vector3D& rho) const;
   };
-
 } // end namespace g2o
 
 #endif
