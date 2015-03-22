@@ -39,10 +39,10 @@ namespace g2o {
   };
 
 #ifdef G2O_HAVE_OPENGL
-  class G2O_TYPES_SLAM3D_ADDONS_API EdgeSE3PlaneSensorCalibDrawAction: public DrawAction{
+  class EdgeSE3PlaneSensorCalibDrawAction: public DrawAction{
   public:
-    EdgeSE3PlaneSensorCalibDrawAction();
-    virtual HyperGraphElementAction* operator()(HyperGraph::HyperGraphElement* element,
+    G2O_TYPES_SLAM3D_ADDONS_API EdgeSE3PlaneSensorCalibDrawAction();
+    G2O_TYPES_SLAM3D_ADDONS_API virtual HyperGraphElementAction* operator()(HyperGraph::HyperGraphElement* element,
             HyperGraphElementAction::Parameters* params_ );
   protected:
     virtual bool refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_);

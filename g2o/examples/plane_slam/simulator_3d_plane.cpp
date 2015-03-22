@@ -17,7 +17,7 @@ using namespace Eigen;
 
 G2O_USE_OPTIMIZATION_LIBRARY(csparse)
 
-typedef Eigen::Matrix<double, 6,6> Matrix6d;
+//typedef Eigen::Matrix<double, 6,6> Matrix6d; //Avoid ambiguous symbol
 
 double uniform_rand(double lowerBndr, double upperBndr)
 {
