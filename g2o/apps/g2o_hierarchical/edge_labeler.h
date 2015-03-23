@@ -4,6 +4,8 @@
 #include "g2o/core/sparse_optimizer.h"
 #include <Eigen/Core>
 
+#include "g2o_hierarchical_api.h"
+
 namespace g2o {
   /**
    * This class implements the functions to label an edge (measurement) based
@@ -15,7 +17,7 @@ namespace g2o {
    * <li> projecting the sigma points in the error space, and thus computing the information matrix of the labeled edge
    * </ul>
    */
-struct EdgeLabeler{
+struct G2O_HIERARCHICAL_API EdgeLabeler{
   //! constructs an edge labeler that operates on the optimizer passed as argument
   //! @param optimizer: the optimizer
   EdgeLabeler(SparseOptimizer* optimizer);
