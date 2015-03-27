@@ -64,7 +64,7 @@ namespace g2o {
 	return  Line3D((Vector6d)(*this)*(1./d().norm()));
       }
 
-      G2O_TYPES_SLAM3D_ADDONS_API inline void oplus(Vector6d v){
+      G2O_TYPES_SLAM3D_ADDONS_API inline void oplus(const Vector6d& v){
 	*this+=v;
 	normalize();
       }
