@@ -9,11 +9,12 @@
 #include "edge_creator.h"
 #include "edge_labeler.h"
 
+#include "g2o_hierarchical_api.h"
 
 namespace g2o {
 
 
-  void constructEdgeStarMap(EdgeStarMap& esmap, StarSet& stars, bool low=true);
+  G2O_HIERARCHICAL_API void constructEdgeStarMap(EdgeStarMap& esmap, StarSet& stars, bool low=true);
 
   size_t vertexEdgesInStar(HyperGraph::EdgeSet& eset, HyperGraph::Vertex* v, Star* s, EdgeStarMap& esmap);
 
@@ -21,9 +22,9 @@ namespace g2o {
 
   void assignHierarchicalEdges(StarSet& stars, EdgeStarMap& esmap, EdgeLabeler* labeler, EdgeCreator* creator, SparseOptimizer* optimizer, int minNumEdges, int maxIterations);
 
-  void computeBorder(StarSet& stars, EdgeStarMap& hesmap);
+  G2O_HIERARCHICAL_API void computeBorder(StarSet& stars, EdgeStarMap& hesmap);
 
-  void computeSimpleStars(StarSet& stars,
+  G2O_HIERARCHICAL_API void computeSimpleStars(StarSet& stars,
                           SparseOptimizer* optimizer,
                           EdgeLabeler* labeler,
                           EdgeCreator* creator,
