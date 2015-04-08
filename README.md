@@ -1,4 +1,7 @@
 g2o - General Graph Optimization
+================================
+
+[![Build Status](https://travis-ci.org/RainerKuemmerle/g2o.svg?branch=master)](https://travis-ci.org/RainerKuemmerle/g2o)
 
 g2o is an open-source C++ framework for optimizing graph-based nonlinear error
 functions. g2o has been designed to be easily extensible to a wide range of
@@ -19,23 +22,24 @@ to several variants of SLAM and BA. g2o offers a performance comparable to
 implementations of state-of-the-art approaches for the specific problems
 (02/2011).
 
-Papers Describing the Approach:
+### Papers Describing the Approach:
 Rainer Kuemmerle, Giorgio Grisetti, Hauke Strasdat,
 Kurt Konolige, and Wolfram Burgard
 g2o: A General Framework for Graph Optimization
 IEEE International Conference on Robotics and Automation (ICRA), 2011
 http://ais.informatik.uni-freiburg.de/publications/papers/kuemmerle11icra.pdf
 
+### License
 g2o is licensed under the BSD License. However, some libraries are available
 under different license terms. See below.
 
 The following parts are licensed under LGPL3+:
-- csparse_extension
+- csparse\_extension
 
 The following parts are licensed under GPL3+:
-- g2o_viewer
-- g2o_incremental
-- slam2d_g2o (example for 2D SLAM with a QGLviewer GUI)
+- g2o\_viewer
+- g2o\_incremental
+- slam2d\_g2o (example for 2D SLAM with a QGLviewer GUI)
 
 Please note that some features of CHOLMOD (which may be used by g2o, see
 libsuitesparse below) are licensed under the GPL. To avoid that your binary has
@@ -61,7 +65,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 licenses for more details.
 
 
-Requirements:
+### Requirements
 g2o requires cmake and Eigen3 to build. The other requirements are optional.
   * cmake             http://www.cmake.org/
   * Eigen3            http://eigen.tuxfamily.org
@@ -78,33 +82,30 @@ g2o requires cmake and Eigen3 to build. The other requirements are optional.
     - qt4-qmake
     - libqglviewer-qt4-dev
 
-
-Compilation:
+### Compilation
 Our primary development platform is Linux. Experimental support for
 Mac OS X and Windows (MinGW or MSVC).
 We recommend a so-called out of source build which can be achieved
 by the following command sequence.
 
-- mkdir build
-- cd build
-- cmake ../
-- make
+- `mkdir build`
+- `cd build`
+- `cmake ../`
+- `make`
 
 The binaries will be placed in bin and the libraries in lib which
 are both located in the top-level folder.
 If you are compiling on Windows, please download Eigen3 and extract it.
-Within cmake-gui set the variable G2O_EIGEN3_INCLUDE to that directory.
+Within cmake-gui set the variable G2O\_EIGEN3\_INCLUDE to that directory.
 
-
-
-Acknowledgments:
+### Acknowledgments
 We thank the following contributors for providing patches:
 - Simon J. Julier: patches to achieve compatibility with Mac OS X and others.
 - Michael A. Eriksen for submitting patches to compile with MSVC.
 - Mark Pupilli for submitting patches to compile with MSVC.
 
 
-Contact information:
+### Contact information
 Rainer Kuemmerle <kuemmerl@informatik.uni-freiburg.de>
 Giorgio Grisetti <grisetti@dis.uniroma1.it>
 Hauke Strasdat <strasdat@gmail.com>
