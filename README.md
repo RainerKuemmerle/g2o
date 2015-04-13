@@ -106,8 +106,8 @@ We thank the following contributors for providing patches:
 
 
 ### Contact information
-Rainer Kuemmerle <kuemmerl@informatik.uni-freiburg.de>
-Giorgio Grisetti <grisetti@dis.uniroma1.it>
-Hauke Strasdat <strasdat@gmail.com>
-Kurt Konolige <konolige@willowgarage.com>
-Wolfram Burgard <burgard@informatik.uni-freiburg.de>
+Rainer Kuemmerle <kuemmerl@informatik.uni-freiburg.de>   
+Giorgio Grisetti <grisetti@dis.uniroma1.it>   
+Hauke Strasdat <strasdat@gmail.com>   
+Kurt Konolige <konolige@willowgarage.com>   
+Wolfram Burgard <burgard@informatik.uni-freiburg.de>   
