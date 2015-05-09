@@ -6,6 +6,13 @@ ADD_LIBRARY(g2o_hierarchical_library ${G2O_LIB_TYPE}
   backbone_tree_action.cpp
   simple_star_ops.cpp
   g2o_hierarchical_test_functions.cpp
+  edge_labeler.h
+  edge_creator.h
+  star.h
+  edge_types_cost_function.h
+  backbone_tree_action.h
+  simple_star_ops.h
+  g2o_hierarchical_api.h
 )
 
 

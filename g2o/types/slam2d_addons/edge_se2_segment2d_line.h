@@ -35,20 +35,20 @@
 
 namespace g2o {
 
-  class G2O_TYPES_SLAM2D_ADDONS_API EdgeSE2Segment2DLine : public BaseBinaryEdge<2, Vector2D, VertexSE2, VertexSegment2D>
+  class EdgeSE2Segment2DLine : public BaseBinaryEdge<2, Vector2D, VertexSE2, VertexSegment2D> //Avoid redefinition of BaseEdge in MSVC
   {
     public:
-      EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-      EdgeSE2Segment2DLine();
+      G2O_TYPES_SLAM2D_ADDONS_API EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+      G2O_TYPES_SLAM2D_ADDONS_API EdgeSE2Segment2DLine();
 
-      double theta() const {return _measurement[0];}
-      double rho()   const {return _measurement[1];}
+      G2O_TYPES_SLAM2D_ADDONS_API double theta() const {return _measurement[0];}
+      G2O_TYPES_SLAM2D_ADDONS_API double rho()   const {return _measurement[1];}
 
-      void   setTheta( double t)  {_measurement[0] = t;}
-      void   setRho( double r)    {_measurement[1] = r;}
+      G2O_TYPES_SLAM2D_ADDONS_API void   setTheta( double t)  {_measurement[0] = t;}
+      G2O_TYPES_SLAM2D_ADDONS_API void   setRho( double r)    {_measurement[1] = r;}
 
 
-      void computeError()
+      G2O_TYPES_SLAM2D_ADDONS_API void computeError()
       {
         const VertexSE2* v1 = static_cast<const VertexSE2*>(_vertices[0]);
         const VertexSegment2D* l2 = static_cast<const VertexSegment2D*>(_vertices[1]);
@@ -64,21 +64,21 @@ namespace g2o {
         _error[0]=normalize_theta(_error[0]);
       }
 
-      virtual bool setMeasurementData(const double* d){
+      G2O_TYPES_SLAM2D_ADDONS_API virtual bool setMeasurementData(const double* d){
         Eigen::Map<const Vector2D> data(d);
 	_measurement = data;
 	return true;
       }
 
-      virtual bool getMeasurementData(double* d) const{
+      G2O_TYPES_SLAM2D_ADDONS_API virtual bool getMeasurementData(double* d) const{
         Eigen::Map<Vector2D> data(d);
 	data = _measurement;
 	return true;
       }
 
-      virtual int measurementDimension() const {return 2;}
+      G2O_TYPES_SLAM2D_ADDONS_API virtual int measurementDimension() const {return 2;}
 
-      virtual bool setMeasurementFromState(){
+      G2O_TYPES_SLAM2D_ADDONS_API virtual bool setMeasurementFromState(){
      const VertexSE2* v1 = static_cast<const VertexSE2*>(_vertices[0]);
         const VertexSegment2D* l2 = static_cast<const VertexSegment2D*>(_vertices[1]);
         SE2 iEst=v1->estimate().inverse();
@@ -92,8 +92,8 @@ namespace g2o {
 	return true;
       }
 
-      virtual bool read(std::istream& is);
-      virtual bool write(std::ostream& os) const;
+      G2O_TYPES_SLAM2D_ADDONS_API virtual bool read(std::istream& is);
+      G2O_TYPES_SLAM2D_ADDONS_API virtual bool write(std::ostream& os) const;
 
 
 /* #ifndef NUMERIC_JACOBIAN_TWO_D_TYPES */

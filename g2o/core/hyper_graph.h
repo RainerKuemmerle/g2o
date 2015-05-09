@@ -121,7 +121,7 @@ namespace g2o {
       class G2O_CORE_API DataContainer {
         public:
           DataContainer() {_userData = 0;}
-          virtual ~DataContainer() {Data* d=_userData; while (d) {Data* dNext = d->next(); delete d; d=dNext;} }
+          virtual ~DataContainer() { delete _userData;}
           //! the user data associated with this vertex
           const Data* userData() const { return _userData; }
           Data* userData() { return _userData; }

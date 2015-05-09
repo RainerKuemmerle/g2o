@@ -48,8 +48,6 @@ using namespace g2o::tutorial;
 
 int main()
 {
-  init_tutorial_slam2d_types();
-
   // TODO simulate different sensor offset
   // simulate a robot observing landmarks while travelling on a grid
   SE2 sensorOffsetTransf(0.2, 0.1, -0.1);

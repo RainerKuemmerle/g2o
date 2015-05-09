@@ -35,18 +35,18 @@
 
 namespace g2o {
 
-  class G2O_TYPES_SLAM2D_ADDONS_API EdgeSE2Segment2D : public BaseBinaryEdge<4, Vector4D, VertexSE2, VertexSegment2D>
+  class EdgeSE2Segment2D : public BaseBinaryEdge<4, Vector4D, VertexSE2, VertexSegment2D> //Avoid redefinition of BaseEdge in MSVC
   {
     public:
-      EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-      EdgeSE2Segment2D();
+      G2O_TYPES_SLAM2D_ADDONS_API EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+      G2O_TYPES_SLAM2D_ADDONS_API EdgeSE2Segment2D();
 
-      Vector2D measurementP1(){ return Eigen::Map<const Vector2D>(&(_measurement[0])); }
-      Vector2D measurementP2(){ return Eigen::Map<const Vector2D>(&(_measurement[2])); }
-      void  setMeasurementP1(const Vector2D& p1){ Eigen::Map<Vector2D> v(&_measurement[0]); v=p1; }
-      void  setMeasurementP2(const Vector2D& p2){ Eigen::Map<Vector2D> v(&_measurement[2]); v=p2; }
+      G2O_TYPES_SLAM2D_ADDONS_API Vector2D measurementP1(){ return Eigen::Map<const Vector2D>(&(_measurement[0])); }
+      G2O_TYPES_SLAM2D_ADDONS_API Vector2D measurementP2(){ return Eigen::Map<const Vector2D>(&(_measurement[2])); }
+      G2O_TYPES_SLAM2D_ADDONS_API void  setMeasurementP1(const Vector2D& p1){ Eigen::Map<Vector2D> v(&_measurement[0]); v=p1; }
+      G2O_TYPES_SLAM2D_ADDONS_API void  setMeasurementP2(const Vector2D& p2){ Eigen::Map<Vector2D> v(&_measurement[2]); v=p2; }
 
-      void computeError()
+      G2O_TYPES_SLAM2D_ADDONS_API void computeError()
       {
         const VertexSE2* v1 = static_cast<const VertexSE2*>(_vertices[0]);
         const VertexSegment2D* l2 = static_cast<const VertexSegment2D*>(_vertices[1]);
@@ -58,21 +58,21 @@ namespace g2o {
 	_error = _error - _measurement;
       }
 
-      virtual bool setMeasurementData(const double* d){
+      G2O_TYPES_SLAM2D_ADDONS_API virtual bool setMeasurementData(const double* d){
         Eigen::Map<const Vector4D> data(d);
 	_measurement = data;
 	return true;
       }
 
-      virtual bool getMeasurementData(double* d) const{
+      G2O_TYPES_SLAM2D_ADDONS_API virtual bool getMeasurementData(double* d) const{
         Eigen::Map<Vector4D> data(d);
 	data = _measurement;
 	return true;
       }
 
-      virtual int measurementDimension() const {return 4;}
+      G2O_TYPES_SLAM2D_ADDONS_API virtual int measurementDimension() const {return 4;}
 
-      virtual bool setMeasurementFromState(){
+      G2O_TYPES_SLAM2D_ADDONS_API virtual bool setMeasurementFromState(){
         const VertexSE2* v1 = static_cast<const VertexSE2*>(_vertices[0]);
         const VertexSegment2D* l2 = static_cast<const VertexSegment2D*>(_vertices[1]);
         SE2 iEst=v1->estimate().inverse();
@@ -81,11 +81,11 @@ namespace g2o {
 	return true;
       }
 
-      virtual bool read(std::istream& is);
-      virtual bool write(std::ostream& os) const;
+      G2O_TYPES_SLAM2D_ADDONS_API virtual bool read(std::istream& is);
+      G2O_TYPES_SLAM2D_ADDONS_API virtual bool write(std::ostream& os) const;
 
-      virtual void initialEstimate(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to);
-      virtual double initialEstimatePossible(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to) { (void) to; return (from.count(_vertices[0]) == 1 ? 1.0 : -1.0);}
+      G2O_TYPES_SLAM2D_ADDONS_API virtual void initialEstimate(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to);
+      G2O_TYPES_SLAM2D_ADDONS_API virtual double initialEstimatePossible(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to) { (void) to; return (from.count(_vertices[0]) == 1 ? 1.0 : -1.0);}
 /* #ifndef NUMERIC_JACOBIAN_TWO_D_TYPES */
 /*       virtual void linearizeOplus(); */
 /* #endif */

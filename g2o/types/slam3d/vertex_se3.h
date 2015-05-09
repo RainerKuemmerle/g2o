@@ -136,7 +136,7 @@ namespace g2o {
   /**
    * \brief visualize the 3D pose vertex
    */
-  class VertexSE3DrawAction: public DrawAction{
+  class G2O_TYPES_SLAM3D_API VertexSE3DrawAction: public DrawAction{
     public:
       VertexSE3DrawAction();
       virtual HyperGraphElementAction* operator()(HyperGraph::HyperGraphElement* element, HyperGraphElementAction::Parameters* params_);

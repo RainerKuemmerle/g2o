@@ -5,6 +5,8 @@
 #include <Eigen/Core>
 #include <vector>
 
+#include "g2o_hierarchical_api.h"
+
 namespace g2o {
 
   /**
@@ -15,7 +17,7 @@ namespace g2o {
    * matters.  This class is heavily based on the Factory, and utilizes strings
    * to identify the edge types.
    */
-struct EdgeCreator{
+struct G2O_HIERARCHICAL_API EdgeCreator{
   struct EdgeCreatorEntry {
     EdgeCreatorEntry(const std::string& edgeTypeName, const std::vector<int>& parameterIds)
     :_edgeTypeName(edgeTypeName), _parameterIds(parameterIds) {}

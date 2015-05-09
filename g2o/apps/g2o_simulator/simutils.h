@@ -38,13 +38,13 @@ namespace g2o {
   // 2: inside
   // 3: all clipped
 
-  int clipSegmentCircle(Eigen::Vector2d& p1, Eigen::Vector2d& p2, double r);
+  G2O_SIMULATOR_API int clipSegmentCircle(Eigen::Vector2d& p1, Eigen::Vector2d& p2, double r);
 
   // -1: outside
   // 0: p1Clipped
   // 1: p2clipped
   // 2: inside
-  int clipSegmentLine(Eigen::Vector2d& p1, Eigen::Vector2d& p2, double a, double b, double c );
+  G2O_SIMULATOR_API int clipSegmentLine(Eigen::Vector2d& p1, Eigen::Vector2d& p2, double a, double b, double c );
   
 
   // -1: outside
@@ -52,10 +52,10 @@ namespace g2o {
   // 1: p2clipped
   // 2: inside
   // 3: all clipped
-  int clipSegmentFov(Eigen::Vector2d& p1, Eigen::Vector2d& p2, double min, double max);
+  G2O_SIMULATOR_API int clipSegmentFov(Eigen::Vector2d& p1, Eigen::Vector2d& p2, double min, double max);
 
   
-  Eigen::Vector2d computeLineParameters(const Eigen::Vector2d& p1, const Eigen::Vector2d& p2);
+  G2O_SIMULATOR_API Eigen::Vector2d computeLineParameters(const Eigen::Vector2d& p1, const Eigen::Vector2d& p2);
 }
 
 #endif

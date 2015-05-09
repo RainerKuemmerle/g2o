@@ -32,22 +32,18 @@
 #include <iostream>
 
 namespace g2o {
-  using namespace std;
+  namespace tutorial {
 
-  bool init_tutorial_slam2d_types()
-  {
-    cerr << __PRETTY_FUNCTION__ << " called" << endl;
-    Factory* factory = Factory::instance();
-    factory->registerType("TUTORIAL_VERTEX_SE2", new HyperGraphElementCreator<tutorial::VertexSE2>);
-    factory->registerType("TUTORIAL_VERTEX_POINT_XY", new HyperGraphElementCreator<tutorial::VertexPointXY>);
+  G2O_REGISTER_TYPE_GROUP(tutorial_slam2d);
 
-    factory->registerType("TUTORIAL_PARAMS_SE2_OFFSET", new HyperGraphElementCreator<tutorial::ParameterSE2Offset>);
+  G2O_REGISTER_TYPE(TUTORIAL_VERTEX_SE2, VertexSE2);
+  G2O_REGISTER_TYPE(TUTORIAL_VERTEX_POINT_XY, VertexPointXY);
 
-    factory->registerType("TUTORIAL_CACHE_SE2_OFFSET", new HyperGraphElementCreator<tutorial::CacheSE2Offset>);
+  G2O_REGISTER_TYPE(TUTORIAL_PARAMS_SE2_OFFSET, ParameterSE2Offset);
 
-    factory->registerType("TUTORIAL_EDGE_SE2", new HyperGraphElementCreator<tutorial::EdgeSE2>);
-    factory->registerType("TUTORIAL_EDGE_SE2_POINT_XY", new HyperGraphElementCreator<tutorial::EdgeSE2PointXY>);
-    return true;
+  G2O_REGISTER_TYPE(TUTORIAL_CACHE_SE2_OFFSET, CacheSE2Offset);
+
+  G2O_REGISTER_TYPE(TUTORIAL_EDGE_SE2, EdgeSE2);
+  G2O_REGISTER_TYPE(TUTORIAL_EDGE_SE2_POINT_XY, EdgeSE2PointXY);
   }
-
 } // end namespace

@@ -36,13 +36,13 @@
 
 namespace g2o {
 
-  class G2O_TYPES_SLAM2D_ADDONS_API EdgeLine2DPointXY : public BaseBinaryEdge<1, double, VertexLine2D, VertexPointXY>
+  class EdgeLine2DPointXY : public BaseBinaryEdge<1, double, VertexLine2D, VertexPointXY> //Avoid redefinition of BaseEdge in MSVC
   {
     public:
-      EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-      EdgeLine2DPointXY();
+      G2O_TYPES_SLAM2D_ADDONS_API EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+      G2O_TYPES_SLAM2D_ADDONS_API EdgeLine2DPointXY();
 
-      void computeError()
+      G2O_TYPES_SLAM2D_ADDONS_API void computeError()
       {
         const VertexLine2D* l = static_cast<const VertexLine2D*>(_vertices[0]);
         const VertexPointXY* p = static_cast<const VertexPointXY*>(_vertices[1]);
@@ -51,19 +51,19 @@ namespace g2o {
         _error[0] =  prediction - _measurement;
       }
 
-      virtual bool setMeasurementData(const double* d){
+      G2O_TYPES_SLAM2D_ADDONS_API virtual bool setMeasurementData(const double* d){
 	_measurement = *d;
         return true;
       }
 
-      virtual bool getMeasurementData(double* d) const{
+      G2O_TYPES_SLAM2D_ADDONS_API virtual bool getMeasurementData(double* d) const{
         *d = _measurement;
         return true;
       }
 
-      virtual int measurementDimension() const {return 1;}
+      G2O_TYPES_SLAM2D_ADDONS_API virtual int measurementDimension() const {return 1;}
 
-      virtual bool setMeasurementFromState(){
+      G2O_TYPES_SLAM2D_ADDONS_API virtual bool setMeasurementFromState(){
         const VertexLine2D* l = static_cast<const VertexLine2D*>(_vertices[0]);
         const VertexPointXY* p = static_cast<const VertexPointXY*>(_vertices[1]);
         Vector2D n(cos(l->theta()), sin(l->theta()));
@@ -72,8 +72,8 @@ namespace g2o {
         return true;
       }
 
-      virtual bool read(std::istream& is);
-      virtual bool write(std::ostream& os) const;
+      G2O_TYPES_SLAM2D_ADDONS_API virtual bool read(std::istream& is);
+      G2O_TYPES_SLAM2D_ADDONS_API virtual bool write(std::ostream& os) const;
 
       /* virtual void initialEstimate(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to); */
       /* virtual double initialEstimatePossible(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to) { (void) to; return (from.count(_vertices[0]) == 1 ? 1.0 : -1.0);} */
