@@ -74,7 +74,7 @@ inline void solveAndPrint(G2oSlamInterface& slamInterface, bool verbose)
         cout << "."; //<< flush;
         break;
       case G2oSlamInterface::SOLVED_BATCH:
-        cout << "b " << optimizer.vertices().size() << endl;
+        cout << "b " << slamInterface.optimizer()->vertices().size() << endl;
         break;
       default:
         break;
