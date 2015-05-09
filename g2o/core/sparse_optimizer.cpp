@@ -208,6 +208,7 @@ namespace g2o{
       cerr << __PRETTY_FUNCTION__ << ": Attempt to initialize an empty graph" << endl;
       return false;
     }
+    preIteration(-1);
     bool workspaceAllocated = _jacobianWorkspace.allocate(); (void) workspaceAllocated;
     assert(workspaceAllocated && "Error while allocating memory for the Jacobians");
     clearIndexMapping();
@@ -263,10 +264,13 @@ namespace g2o{
       _activeEdges.push_back(*it);
 
     sortVectorContainers();
-    return buildIndexMapping(_activeVertices);
+    bool indexMappingStatus = buildIndexMapping(_activeVertices);
+    postIteration(-1);
+    return indexMappingStatus;
   }
 
   bool SparseOptimizer::initializeOptimization(HyperGraph::EdgeSet& eset){
+    preIteration(-1);
     bool workspaceAllocated = _jacobianWorkspace.allocate(); (void) workspaceAllocated;
     assert(workspaceAllocated && "Error while allocating memory for the Jacobians");
     clearIndexMapping();
@@ -289,7 +293,9 @@ namespace g2o{
       _activeVertices.push_back(*it);
 
     sortVectorContainers();
-    return buildIndexMapping(_activeVertices);
+    bool indexMappingStatus = buildIndexMapping(_activeVertices);
+    postIteration(-1);
+    return indexMappingStatus;
   }
 
   void SparseOptimizer::setToOrigin(){

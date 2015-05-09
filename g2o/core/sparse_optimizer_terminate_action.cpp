@@ -27,9 +27,18 @@ namespace g2o {
     HyperGraphAction::ParametersIteration* params = static_cast<HyperGraphAction::ParametersIteration*>(parameters);
 
     const_cast<SparseOptimizer*>(optimizer)->computeActiveErrors();
-    if (params->iteration == 0) {
+    if (params->iteration < 0)
+    {
+      // let the optimizer run for at least one iteration
+      // Hence, we reset the stop flag
+      setOptimizerStopFlag(optimizer, false);
+    } else if (params->iteration == 0) {
+      // first iteration, just store the chi2 value
       _lastChi = optimizer->activeRobustChi2();
     } else {
+      // compute the gain and stop the optimizer in case the
+      // gain is below the threshold or we reached the max
+      // number of iterations
       bool stopOptimizer = false;
       if (params->iteration < _maxIterations) {
         double currentChi = optimizer->activeRobustChi2();
@@ -41,12 +50,7 @@ namespace g2o {
         stopOptimizer = true;
       }
       if (stopOptimizer) { // tell the optimizer to stop
-        if (optimizer->forceStopFlag()) {
-          *(optimizer->forceStopFlag()) = true;
-        } else {
-          _auxTerminateFlag = true;
-          const_cast<SparseOptimizer*>(optimizer)->setForceStopFlag(&_auxTerminateFlag);
-        }
+        setOptimizerStopFlag(optimizer, true);
       }
     }
     return this;
@@ -55,6 +59,16 @@ namespace g2o {
   void SparseOptimizerTerminateAction::setMaxIterations(int maxit)
   {
     _maxIterations = maxit;
+  }
+
+  void SparseOptimizerTerminateAction::setOptimizerStopFlag(const SparseOptimizer* optimizer, bool stop)
+  {
+    if (optimizer->forceStopFlag()) {
+      *(optimizer->forceStopFlag()) = stop;
+    } else {
+      _auxTerminateFlag = stop;
+      const_cast<SparseOptimizer*>(optimizer)->setForceStopFlag(&_auxTerminateFlag);
+    }
   }
 
 } // end namespace
