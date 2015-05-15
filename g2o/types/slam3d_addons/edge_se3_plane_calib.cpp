@@ -1,9 +1,7 @@
 #include <iostream>
 #include "edge_se3_plane_calib.h"
 
-#ifdef G2O_HAVE_OPENGL
 #include "g2o/stuff/opengl_wrapper.h"
-#endif
 
 namespace g2o
 {
@@ -63,11 +61,10 @@ namespace g2o
   }
 
   HyperGraphElementAction* EdgeSE3PlaneSensorCalibDrawAction::operator()(HyperGraph::HyperGraphElement* element,
-                 HyperGraphElementAction::Parameters* params_){
-
+                 HyperGraphElementAction::Parameters* params_)
+  {
     if (typeid(*element).name()!=_typeName)
       return 0;
-
 
     refreshPropertyPtrs(params_);
     if (! _previousParams)
@@ -76,16 +73,13 @@ namespace g2o
     if (_show && !_show->value())
       return this;
 
-
     EdgeSE3PlaneSensorCalib* that = dynamic_cast<EdgeSE3PlaneSensorCalib*>(element);
 
     if (! that)
       return this;
 
-    const VertexSE3* robot       = dynamic_cast<const VertexSE3*>(that->vertex(0));
+    const VertexSE3* robot  = dynamic_cast<const VertexSE3*>(that->vertex(0));
     const VertexSE3* sensor = dynamic_cast<const VertexSE3*>(that->vertex(2));
-
-    //cout << "that->vertex(0): " << that->vertex(0) << " that->vertex(2): " << that->vertex(2) << endl;
 
     if (! robot|| ! sensor)
       return 0;
@@ -93,21 +87,18 @@ namespace g2o
     double d=that->measurement().distance();
     double azimuth=Plane3D::azimuth(that->measurement().normal());
     double elevation=Plane3D::elevation(that->measurement().normal());
-    // std::cerr << "D=" << d << std::endl;
-    // std::cerr << "azimuth=" << azimuth << std::endl;
-    // std::cerr << "elevation=" << azimuth << std::endl;
 
-    glColor3f(that->color(0), that->color(1), that->color(2));
+    glColor3f(float(that->color(0)), float(that->color(1)), float(that->color(2)));
     glPushMatrix();
     Isometry3D robotAndSensor = robot->estimate() * sensor->estimate();
     glMultMatrixd(robotAndSensor.matrix().data());
 
-    glRotatef(RAD2DEG(azimuth),0.,0.,1.);
-    glRotatef(RAD2DEG(elevation),0.,-1.,0.);
-    glTranslatef(d,0.,0.);
+    glRotatef(float(RAD2DEG(azimuth)), 0.f, 0.f, 1.f);
+    glRotatef(float(RAD2DEG(elevation)), 0.f, -1.f, 0.f);
+    glTranslatef(float(d), 0.f, 0.f);
 
-    float planeWidth = 0.5;
-    float planeHeight = 0.5;
+    float planeWidth = 0.5f;
+    float planeHeight = 0.5f;
     if (0) {
       planeWidth = _planeWidth->value();
       planeHeight = _planeHeight->value();
