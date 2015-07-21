@@ -14,7 +14,10 @@ ADD_LIBRARY(types_slam2d_addons ${G2O_LIB_TYPE}
 
 SET_TARGET_PROPERTIES(types_slam2d_addons PROPERTIES OUTPUT_NAME ${LIB_PREFIX}types_slam2d_addons)
 
-TARGET_LINK_LIBRARIES(types_slam2d_addons types_slam2d core ${OPENGL_gl_LIBRARY})
+TARGET_LINK_LIBRARIES(types_slam2d_addons types_slam2d core)
+IF(G2O_HAVE_OPENGL)
+  TARGET_LINK_LIBRARIES(types_slam2d_addons ${OPENGL_gl_LIBRARY})
+ENDIF()
 
 INSTALL(TARGETS types_slam2d_addons
   RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/bin

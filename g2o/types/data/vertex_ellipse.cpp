@@ -45,7 +45,7 @@ namespace g2o {
   VertexEllipse::VertexEllipse() : RobotData()
   {
     _covariance = Matrix3F::Zero();
-    _U = Matrix2F::Zero();
+    _UMatrix = Matrix2F::Zero();
     _singularValues = Vector2F::Zero();
   }
 
@@ -55,7 +55,7 @@ namespace g2o {
 
   void VertexEllipse::_updateSVD() const{
     Eigen::SelfAdjointEigenSolver<Matrix2F> eigenSolver(_covariance.block<2,2>(0,0));
-    _U = eigenSolver.eigenvectors();
+    _UMatrix = eigenSolver.eigenvectors();
     _singularValues = eigenSolver.eigenvalues();
 
   }

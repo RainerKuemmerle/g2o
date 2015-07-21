@@ -20,7 +20,10 @@ ADD_LIBRARY(types_slam3d_addons ${G2O_LIB_TYPE}
 
 SET_TARGET_PROPERTIES(types_slam3d_addons PROPERTIES OUTPUT_NAME ${LIB_PREFIX}types_slam3d_addons)
 
-TARGET_LINK_LIBRARIES(types_slam3d_addons ${OPENGL_gl_LIBRARY} types_slam3d core)
+TARGET_LINK_LIBRARIES(types_slam3d_addons types_slam3d core)
+IF(G2O_HAVE_OPENGL)
+  TARGET_LINK_LIBRARIES(types_slam3d_addons ${OPENGL_gl_LIBRARY} )
+ENDIF()
 
 ADD_EXECUTABLE(test_line3d line3d_test.cpp)
 TARGET_LINK_LIBRARIES(test_line3d types_slam3d_addons types_slam3d)
