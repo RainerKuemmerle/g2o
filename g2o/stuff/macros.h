@@ -47,11 +47,9 @@
 #  define G2O_ATTRIBUTE_WARNING(func) func __attribute__((warning))
 #  define G2O_ATTRIBUTE_DEPRECATED(func) func __attribute__((deprecated))
 
-#ifdef ANDROID
-# define g2o_isnan(x)     std::isnan(x)
-# define g2o_isinf(x)     std::isinf(x)
-# define g2o_isfinite(x)  std::isfinite(x)
-#endif
+#  define g2o_isnan(x)     std::isnan(x)
+#  define g2o_isinf(x)     std::isinf(x)
+#  define g2o_isfinite(x)  std::isfinite(x)
 
 // MSVC on Windows
 #elif defined _MSC_VER
