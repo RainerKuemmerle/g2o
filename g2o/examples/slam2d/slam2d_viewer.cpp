@@ -179,8 +179,8 @@ void Slam2DViewer::init()
   setStateFileName(QString::null);
 
   // mouse bindings
-  setMouseBinding(Qt::RightButton, CAMERA, ZOOM);
-  setMouseBinding(Qt::MidButton, CAMERA, TRANSLATE);
+  setMouseBinding(Qt::NoModifier, Qt::RightButton, CAMERA, ZOOM);
+  setMouseBinding(Qt::NoModifier, Qt::MidButton, CAMERA, TRANSLATE);
 
   // keyboard shortcuts
   setShortcut(CAMERA_MODE, 0);
