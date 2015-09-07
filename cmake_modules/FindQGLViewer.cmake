@@ -1,6 +1,13 @@
 # Need to find both Qt4 and QGLViewer if the QQL support is to be built
 #FIND_PACKAGE(Qt4 COMPONENTS QtCore QtXml QtOpenGL QtGui)
-FIND_PACKAGE(Qt5 COMPONENTS Core Xml OpenGL Gui Widgets)
+FIND_PACKAGE(Qt5 QUIET COMPONENTS Core Xml OpenGL Gui Widgets)
+
+IF(NOT Qt5_FOUND)
+	MESSAGE("Qt5 not found. Install it and set Qt5_DIR accordingly")
+	IF (WIN32)
+		MESSAGE("  In Windows, Qt5_DIR should be something like C:/Qt/5.4/msvc2013_64_opengl/lib/cmake/Qt5")
+	ENDIF()
+ENDIF()
 
 FIND_PATH(QGLVIEWER_INCLUDE_DIR qglviewer.h
     /usr/include/QGLViewer
