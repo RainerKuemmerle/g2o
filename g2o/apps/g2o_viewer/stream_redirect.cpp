@@ -40,7 +40,7 @@ std::char_traits<char>::int_type StreamRedirect::overflow(int_type v)
 {
   _mutex.lock();
   if (v == '\n') {
-    _te->appendPlainText(QString::fromAscii(_buffer.c_str(), _buffer.size()));
+    _te->appendPlainText(QString::fromLatin1(_buffer.c_str(), _buffer.size()));
     _buffer.clear();
   }
   else
@@ -59,7 +59,7 @@ std::streamsize StreamRedirect::xsputn(const char *p, std::streamsize n)
   while (1) {
     pos = _buffer.find('\n');
     if (pos != std::string::npos) {
-      _te->appendPlainText(QString::fromAscii(_buffer.c_str(), pos));
+      _te->appendPlainText(QString::fromLatin1(_buffer.c_str(), pos));
       _buffer.erase(_buffer.begin(), _buffer.begin() + pos + 1);
     } else
       break;

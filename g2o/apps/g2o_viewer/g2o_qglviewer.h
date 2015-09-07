@@ -33,7 +33,7 @@ namespace g2o {
   class G2O_VIEWER_API G2oQGLViewer : public QGLViewer
   {
     public:
-      G2oQGLViewer(QWidget* parent=NULL, const QGLWidget* shareWidget=0, Qt::WFlags flags=0);
+      G2oQGLViewer(QWidget* parent=NULL, const QGLWidget* shareWidget=0, Qt::WindowFlags flags=0);
       ~G2oQGLViewer();
       void draw();
       void init();
