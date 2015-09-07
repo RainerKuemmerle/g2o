@@ -79,10 +79,17 @@ IF(WIN32)
     ADD_DEFINITIONS(-DNOMINMAX)
     ADD_DEFINITIONS(-D_USE_MATH_DEFINES)
     # SSE2 optimizations
-    ADD_DEFINITIONS("/arch:SSE2")
+	if(NOT CMAKE_SIZEOF_VOID_P EQUAL 8)  # No need to specify if building for x64 (actually, it generates an annoying warning)
+		ADD_DEFINITIONS("/arch:SSE2")
+	endif()
     IF (BUILD_SHARED_LIBS)
       # disable warning on missing DLL interfaces
       ADD_DEFINITIONS("/wd4251")
+      add_definitions(-D_CRT_SECURE_NO_WARNINGS=1)  # Avoid deprecated fprintf(), etc.
+      add_definitions("/nologo")
+      add_definitions("/wd4244") # Conversion from double -> int
+      add_definitions("/wd4267") # Conversion during return
+      add_definitions("/wd4522") # Duplicated operator=() in Eigen headers
     ENDIF()
   ENDIF(MSVC)
 ELSEIF(CYGWIN)
