@@ -91,6 +91,9 @@ IF(WIN32)
       add_definitions("/wd4267") # Conversion during return
       add_definitions("/wd4522") # Duplicated operator=() in Eigen headers
     ENDIF()
+	# Fix issue: https://github.com/RainerKuemmerle/g2o/issues/66
+	#            Link error LNK2005 due to duplicated symbols
+	add_definitions("/Ob2")	
   ENDIF(MSVC)
 ELSEIF(CYGWIN)
   MESSAGE(STATUS "Compiling on Cygwin")
