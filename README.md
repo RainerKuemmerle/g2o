@@ -70,7 +70,7 @@ g2o requires cmake and Eigen3 to build. The other requirements are optional.
   * cmake             http://www.cmake.org/
   * Eigen3            http://eigen.tuxfamily.org
   * suitesparse       http://www.cise.ufl.edu/research/sparse/SuiteSparse/
-  * Qt4               http://qt-project.org
+  * Qt5               http://qt-project.org
   * libQGLViewer      http://www.libqglviewer.com/
 
   On Ubuntu / Debian these dependencies are resolved by installing the
@@ -78,9 +78,8 @@ g2o requires cmake and Eigen3 to build. The other requirements are optional.
     - cmake
     - libeigen3-dev
     - libsuitesparse-dev
-    - libqt4-dev
-    - qt4-qmake
-    - libqglviewer-qt4-dev
+    - Qt4: `libqt4-dev`, `qt4-qmake`, `libqglviewer-dev` (Or `libqglviewer-qt4-dev` in modern distributions)
+    - Qt5: `libqt5-dev`, `qt5-qmake`, `libqglviewer-dev`
 
 ### Compilation
 Our primary development platform is Linux. Experimental support for
