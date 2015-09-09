@@ -13,7 +13,7 @@ ADD_LIBRARY(types_data ${G2O_LIB_TYPE}
 SET_TARGET_PROPERTIES(types_data PROPERTIES OUTPUT_NAME ${LIB_PREFIX}types_data)
 
 TARGET_LINK_LIBRARIES(types_data core types_slam2d)
-IF(OPENGL_FOUND)
+IF(G2O_HAVE_OPENGL)
   TARGET_LINK_LIBRARIES(types_data freeglut_minimal opengl_helper)
 ENDIF()
 

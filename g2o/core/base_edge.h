@@ -64,15 +64,15 @@ namespace g2o {
       ErrorVector& error() { return _error;}
 
       //! information matrix of the constraint
-      const InformationType& information() const { return _information;}
-      InformationType& information() { return _information;}
-      void setInformation(const InformationType& information) { _information = information;}
+      EIGEN_STRONG_INLINE const InformationType& information() const { return _information;}
+      EIGEN_STRONG_INLINE InformationType& information() { return _information;}
+      EIGEN_STRONG_INLINE void setInformation(const InformationType& information) { _information = information;}
 
       virtual const double* informationData() const { return _information.data();}
       virtual double* informationData() { return _information.data();}
 
       //! accessor functions for the measurement represented by the edge
-      const Measurement& measurement() const { return _measurement;}
+      EIGEN_STRONG_INLINE const Measurement& measurement() const { return _measurement;}
       virtual void setMeasurement(const Measurement& m) { _measurement = m;}
 
       virtual int rank() const {return _dimension;}

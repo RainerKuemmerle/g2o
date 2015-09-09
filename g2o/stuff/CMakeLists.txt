@@ -19,7 +19,7 @@ INSTALL(TARGETS stuff
 )
 
 # build our OpenGL helper library
-IF(OPENGL_FOUND)
+IF(OPENGL_FOUND AND G2O_HAVE_OPENGL)
   ADD_LIBRARY(opengl_helper ${G2O_LIB_TYPE}
     opengl_primitives.cpp opengl_primitives.h
   )

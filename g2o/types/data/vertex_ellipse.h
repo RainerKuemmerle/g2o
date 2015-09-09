@@ -50,7 +50,7 @@ namespace g2o {
 
       const Matrix3F& covariance() {return _covariance;}
       void setCovariance( Matrix3F& c) { _covariance = c; _updateSVD();}
-      const Matrix2F& U() {return _U;}
+      const Matrix2F& U() {return _UMatrix;}
       const Vector2F& singularValues() {return _singularValues;}
 
       const myVector2fVector& matchingVertices() {return _matchingVertices;}
@@ -70,7 +70,7 @@ namespace g2o {
   protected:
       void _updateSVD() const;
       Matrix3F _covariance;
-      mutable Matrix2F _U;
+      mutable Matrix2F _UMatrix;
       mutable Vector2F _singularValues;
       std::vector<int> _matchingVerticesIDs;
       myVector2fVector _matchingVertices;

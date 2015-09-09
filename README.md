@@ -70,7 +70,7 @@ g2o requires cmake and Eigen3 to build. The other requirements are optional.
   * cmake             http://www.cmake.org/
   * Eigen3            http://eigen.tuxfamily.org
   * suitesparse       http://www.cise.ufl.edu/research/sparse/SuiteSparse/
-  * Qt4               http://qt-project.org
+  * Qt5               http://qt-project.org
   * libQGLViewer      http://www.libqglviewer.com/
 
   On Ubuntu / Debian these dependencies are resolved by installing the
@@ -78,13 +78,12 @@ g2o requires cmake and Eigen3 to build. The other requirements are optional.
     - cmake
     - libeigen3-dev
     - libsuitesparse-dev
-    - libqt4-dev
-    - qt4-qmake
-    - libqglviewer-qt4-dev
+    - Qt4: `libqt4-dev`, `qt4-qmake`, `libqglviewer-dev` (Or `libqglviewer-qt4-dev` in modern distributions)
+    - Qt5: `libqt5-dev`, `qt5-qmake`, `libqglviewer-dev`
 
 ### Compilation
 Our primary development platform is Linux. Experimental support for
-Mac OS X and Windows (MinGW or MSVC).
+Mac OS X, Android and Windows (MinGW or MSVC).
 We recommend a so-called out of source build which can be achieved
 by the following command sequence.
 
@@ -97,6 +96,13 @@ The binaries will be placed in bin and the libraries in lib which
 are both located in the top-level folder.
 If you are compiling on Windows, please download Eigen3 and extract it.
 Within cmake-gui set the variable G2O\_EIGEN3\_INCLUDE to that directory.
+
+### Cross-Compiling for Android
+
+- `mkdir build`
+- `cd build`
+- `cmake -DCMAKE_TOOLCHAIN_FILE=../script/android.toolchain.cmake -DANDROID_NDK=<YOUR_PATH_TO_ANDROID_NDK_r10d+> -DCMAKE_BUILD_TYPE=Release -DANDROID_ABI="armeabi-v7a with NEON" -DEIGEN3_INCLUDE_DIR="<YOUR_PATH_TO_EIGEN>" -DEIGEN3_VERSION_OK=ON .. && cmake --build .`
+
 
 ### Acknowledgments
 We thank the following contributors for providing patches:
