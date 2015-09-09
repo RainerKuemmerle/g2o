@@ -65,6 +65,7 @@ TEST(General, GraphAddVertex)
   g2o::VertexSE2* v1 = new g2o::VertexSE2();
   v1->setId(0);
   ASSERT_TRUE(optimizer->addVertex(v1));
+  ASSERT_EQ(optimizer, v1->graph());
   ASSERT_EQ(size_t(1), optimizer->vertices().size());
   ASSERT_FALSE(optimizer->addVertex(v1));
   ASSERT_EQ(size_t(1), optimizer->vertices().size());
@@ -74,8 +75,41 @@ TEST(General, GraphAddVertex)
     v2->setId(0);
     ASSERT_FALSE(optimizer->addVertex(v2));
     ASSERT_EQ(size_t(1), optimizer->vertices().size());
+    ASSERT_EQ(NULL, v2->graph());
     delete v2;
   }
+
+  delete optimizer;
+}
+
+TEST(General, GraphAddEdge)
+{
+  g2o::SparseOptimizer* optimizer = createOptimizer();
+
+  g2o::VertexSE2* v1 = new g2o::VertexSE2();
+  v1->setId(0);
+  g2o::VertexSE2* v2 = new g2o::VertexSE2();
+  v2->setId(1);
+
+  ASSERT_TRUE(optimizer->addVertex(v1));
+  ASSERT_TRUE(optimizer->addVertex(v2));
+
+  g2o::EdgeSE2* e1 = new g2o::EdgeSE2();
+  e1->setVertex(0, v1);
+  e1->setVertex(1, v2);
+  ASSERT_TRUE(optimizer->addEdge(e1));
+  ASSERT_EQ(optimizer, e1->graph());
+  ASSERT_FALSE(optimizer->addEdge(e1));
+  ASSERT_EQ(size_t(1), optimizer->edges().size());
+  ASSERT_EQ(size_t(1), v1->edges().size());
+  ASSERT_EQ(size_t(1), v1->edges().size());
+  ASSERT_EQ(size_t(1), v1->edges().count(e1));
+  ASSERT_EQ(size_t(1), v2->edges().count(e1));
+
+  g2o::EdgeSE2* e2 = new g2o::EdgeSE2();
+  ASSERT_FALSE(optimizer->addEdge(e2)) << "Adding edge with unset vertices was possible";
+  ASSERT_EQ(size_t(1), optimizer->edges().size());
+  ASSERT_EQ(NULL, e2->graph());
 
   delete optimizer;
 }
