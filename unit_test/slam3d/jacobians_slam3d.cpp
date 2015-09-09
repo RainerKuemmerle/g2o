@@ -167,7 +167,6 @@ TEST(Slam3D, dqDRJacobian)
         Re(0,2),Re(1,2),Re(2,2));
 
     // compute the Jacobian using AD
-    Eigen::Matrix<double, 3 , 9, Eigen::RowMajor> dq_dR_AD;
     Matrix<double, 3, 9, Eigen::RowMajor> dq_dR_AD;
     typedef ceres::internal::AutoDiff<RotationMatrix2QuaternionManifold, double, 9> AutoDiff_Dq_DR;
     double *parameters[] = { Re.data() };
