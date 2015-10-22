@@ -27,6 +27,15 @@
 #include <iostream>
 using namespace std;
 
+// some macro helpers for identifying the version number of QGLViewer
+// QGLViewer changed some parts of its API in version 2.6.
+// The following preprocessor hack accounts for this. THIS SUCKS!!!
+#if (((QGLVIEWER_VERSION & 0xff0000) >> 16) >= 2 && ((QGLVIEWER_VERSION & 0x00ff00) >> 8) >= 6)
+#define qglv_real qreal
+#else
+#define qglv_real float
+#endif
+
 // Again, some API changes in QGLViewer which produce annoying text in the console
 // if the old API is used.
 #if (((QGLVIEWER_VERSION & 0xff0000) >> 16) >= 2 && ((QGLVIEWER_VERSION & 0x00ff00) >> 8) >= 5)
@@ -45,14 +54,14 @@ namespace {
     public:
       StandardCamera() : _standard(true) {};
 
-      float zNear() const {
+      qglv_real zNear() const {
         if (_standard) 
           return 0.001f; 
         else 
           return Camera::zNear(); 
       }
 
-      float zFar() const
+      qglv_real zFar() const
       {  
         if (_standard) 
           return 1000.0f; 
