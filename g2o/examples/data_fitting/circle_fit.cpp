@@ -139,12 +139,14 @@ int main(int argc, char** argv)
   arg.parseArgs(argc, argv);
 
   // generate random data
-  Eigen::Vector2d center(4, 2);
-  double radius = 2.;
+  Eigen::Vector2d center(4.0, 2.0);
+  double radius = 2.0;
   Eigen::Vector2d* points = new Eigen::Vector2d[numPoints];
+
+  g2o::Sampler::seedRand();
   for (int i = 0; i < numPoints; ++i) {
-    double r = g2o::Sampler::uniformRand(radius-0.1, radius+0.1);
-    double angle = g2o::Sampler::uniformRand(0., 2. * M_PI);
+    double r = g2o::Sampler::gaussRand(radius, 0.05);
+    double angle = g2o::Sampler::uniformRand(0.0, 2.0 * M_PI);
     points[i].x() = center.x() + r * cos(angle);
     points[i].y() = center.y() + r * sin(angle);
   }
@@ -166,7 +168,7 @@ int main(int argc, char** argv)
   // 1. add the circle vertex
   VertexCircle* circle = new VertexCircle();
   circle->setId(0);
-  circle->setEstimate(Eigen::Vector3d(3,3,3)); // some initial value for the circle
+  circle->setEstimate(Eigen::Vector3d(3.0, 3.0, 3.0)); // some initial value for the circle
   optimizer.addVertex(circle);
   // 2. add the points we measured
   for (int i = 0; i < numPoints; ++i) {
