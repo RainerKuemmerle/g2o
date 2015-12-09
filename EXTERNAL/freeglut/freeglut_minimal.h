@@ -41,6 +41,7 @@
 #else
 #  define G2O_FGAPI
 #endif
+#else
 // Not Microsoft compiler so set empty definition:
 #  define G2O_FGAPI
 #endif
