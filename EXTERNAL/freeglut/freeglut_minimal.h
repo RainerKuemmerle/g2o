@@ -32,12 +32,16 @@
 
 #ifdef _MSC_VER
 // We are using a Microsoft compiler:
+#ifdef G2O_SHARED_LIBS
 #  ifdef freeglut_minimal_EXPORTS
 #    define G2O_FGAPI __declspec(dllexport)
 #  else
 #    define G2O_FGAPI __declspec(dllimport)
 #  endif
 #else
+#  define G2O_FGAPI
+#endif
+// Not Microsoft compiler so set empty definition:
 #  define G2O_FGAPI
 #endif
 
