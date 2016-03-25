@@ -73,10 +73,8 @@ namespace g2o {
 
   OptimizableGraph::Vertex::~Vertex()
   {
-    if (_cacheContainer)
-      delete (_cacheContainer);
-    if (_userData)
-      delete _userData;
+    delete _cacheContainer;
+    delete _userData;
   }
 
   OptimizableGraph::Vertex* OptimizableGraph::Vertex::clone() const
