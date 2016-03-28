@@ -5,4 +5,4 @@ add_executable(unittest_slam3d
   orthogonal_matrix.cpp
 )
 target_link_libraries(unittest_slam3d types_slam3d)
-target_link_libraries(unittest_slam3d ${GTEST_LIBRARIES})
+create_test(unittest_slam3d)

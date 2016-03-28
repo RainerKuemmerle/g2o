@@ -5,4 +5,4 @@ add_executable(unittest_slam2d
   odom_convert_sclam2d.cpp
 )
 target_link_libraries(unittest_slam2d types_slam2d types_sclam2d)
-target_link_libraries(unittest_slam2d ${GTEST_LIBRARIES})
+create_test(unittest_slam2d)
