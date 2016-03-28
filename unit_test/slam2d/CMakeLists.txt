@@ -1,7 +1,8 @@
 add_executable(unittest_slam2d
+  ../test_helper/test_main.cpp
   mappings_se2.cpp
   jacobians_slam2d.cpp
   odom_convert_sclam2d.cpp
 )
 target_link_libraries(unittest_slam2d types_slam2d types_sclam2d)
-target_link_libraries(unittest_slam2d gtest gtest_main)
+target_link_libraries(unittest_slam2d ${GTEST_LIBRARIES})

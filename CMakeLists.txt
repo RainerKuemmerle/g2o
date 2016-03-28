@@ -268,9 +268,7 @@ INSTALL(FILES ${PROJECT_BINARY_DIR}/g2o/config.h DESTINATION ${CMAKE_INSTALL_PRE
 # building unit test framework and our tests
 OPTION(BUILD_UNITTESTS "build unit test framework and the tests" OFF)
 IF(BUILD_UNITTESTS)
-  ADD_SUBDIRECTORY(EXTERNAL/gtest-1.7.0)
   enable_testing()
-  include_directories(${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR})
   ADD_SUBDIRECTORY(unit_test)
 ENDIF()
 
