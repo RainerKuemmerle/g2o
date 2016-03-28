@@ -77,7 +77,8 @@ namespace g2o {
 
       Vector2d bound(boundArea, boundArea);
 
-      VectorXd probLimits(MO_NUM_ELEMS);
+      VectorXd probLimits;
+      probLimits.resize(MO_NUM_ELEMS);
       for (int i = 0; i < probLimits.size(); ++i)
         probLimits[i] = (i + 1) / (double) MO_NUM_ELEMS;
 

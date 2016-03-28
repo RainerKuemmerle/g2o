@@ -1,3 +1,5 @@
+sudo: required
+dist: trusty
 language: cpp
 
 os:
@@ -7,7 +9,7 @@ os:
 notifications:
   email:
     recipients:
-      - kuemmerl@informatik.uni-freiburg.de
+      - rainer.kuemmerle@gmail.com
     on_success: change # default: change
     on_failure: always # default: always
 
@@ -41,5 +43,3 @@ matrix:
       compiler: gcc
   allow_failures:
     - os: osx
-
-script: make

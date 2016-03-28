@@ -88,6 +88,8 @@ namespace g2o {
   }
 
   bool EdgeSE3Offset::write(std::ostream& os) const {
+    os << parameter(0)->id() << " ";
+    os << parameter(1)->id() << " ";
     Vector7d meas=internal::toVectorQT(_measurement);
     for (int i=0; i<7; i++) os  << meas[i] << " ";
     for (int i=0; i<information().rows(); i++)

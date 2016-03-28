@@ -37,8 +37,7 @@ namespace g2o {
   }
 
   HyperGraph::Data::~Data() {
-    if(_next)
-      delete _next;
+    delete _next;
   }
 
   HyperGraph::Vertex::Vertex(int id) : _id(id)
