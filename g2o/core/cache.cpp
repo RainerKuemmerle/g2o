@@ -51,6 +51,8 @@ namespace g2o {
   bool Cache::CacheKey::operator<(const Cache::CacheKey& c) const{
     if (_type < c._type)
       return true;
+    else if (c._type < _type)
+      return false;
     return std::lexicographical_compare (_parameters.begin( ), _parameters.end( ),
            c._parameters.begin( ), c._parameters.end( ) );
   }
