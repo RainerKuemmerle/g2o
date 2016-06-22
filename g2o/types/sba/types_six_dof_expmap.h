@@ -195,6 +195,7 @@ class G2O_TYPES_SBA_API EdgeProjectXYZ2UVU : public  BaseBinaryEdge<3, Vector3D,
       _error = obs-cam->stereocam_uvu_map(v1->estimate().map(v2->estimate()));
     }
     //  virtual void linearizeOplus();
+    CameraParameters * _cam;
 };
 
 } // end namespace
