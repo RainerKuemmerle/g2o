@@ -81,6 +81,13 @@ g2o requires cmake and Eigen3 to build. The other requirements are optional.
     - Qt4: `libqt4-dev`, `qt4-qmake`, `libqglviewer-dev` (Or `libqglviewer-qt4-dev` in modern distributions)
     - Qt5: `libqt5-dev`, `qt5-qmake`, `libqglviewer-dev`
 
+#### Mac OS X
+If using [Homebrew](http://brew.sh/), then
+
+`brew install homebrew/science/g2o`
+
+will install g2o together with its required dependencies. In this case no manual compilation is necessary.
+
 ### Compilation
 Our primary development platform is Linux. Experimental support for
 Mac OS X, Android and Windows (MinGW or MSVC).
