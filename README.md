@@ -29,6 +29,10 @@ g2o: A General Framework for Graph Optimization
 IEEE International Conference on Robotics and Automation (ICRA), 2011
 http://ais.informatik.uni-freiburg.de/publications/papers/kuemmerle11icra.pdf
 
+### Documentation
+A detailed description of how the library is structured and how to use and extend it can be found in /doc/g2o.pdf
+The API documentation can be generated as described in doc/doxygen/readme.txt
+
 ### License
 g2o is licensed under the BSD License. However, some libraries are available
 under different license terms. See below.
