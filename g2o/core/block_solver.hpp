@@ -232,8 +232,10 @@ bool BlockSolver<Traits>::buildStructure(bool zeroBlocks)
     }
   }
 
-  if (! _doSchur)
+  if (! _doSchur) {
+    delete schurMatrixLookup;
     return true;
+  }
 
   _DInvSchur->diagonal().resize(landmarkIdx);
   _Hpl->fillSparseBlockMatrixCCS(*_HplCCS);
