@@ -75,7 +75,7 @@ class SparseBlockMatrix {
      * constructs a sparse block matrix having a specific layout
      * @param rbi: array of int containing the row layout of the blocks. 
      * the component i of the array should contain the index of the first row of the block i+1.
-     * @param rbi: array of int containing the column layout of the blocks. 
+     * @param cbi: array of int containing the column layout of the blocks. 
      *  the component i of the array should contain the index of the first col of the block i+1.
      * @param rb: number of row blocks
      * @param cb: number of col blocks
