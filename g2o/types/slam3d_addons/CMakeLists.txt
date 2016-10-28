@@ -25,9 +25,6 @@ IF(G2O_HAVE_OPENGL)
   TARGET_LINK_LIBRARIES(types_slam3d_addons ${OPENGL_gl_LIBRARY} )
 ENDIF()
 
-ADD_EXECUTABLE(test_line3d line3d_test.cpp)
-TARGET_LINK_LIBRARIES(test_line3d types_slam3d_addons types_slam3d)
-
 INSTALL(TARGETS types_slam3d_addons
   RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/bin
   LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX}/lib

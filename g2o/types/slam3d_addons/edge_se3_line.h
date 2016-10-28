@@ -35,13 +35,12 @@
 #include "g2o/types/slam3d/vertex_se3.h"
 #include "g2o/types/slam3d/parameter_se3_offset.h"
 
+// TODO Jacopo
+
 namespace g2o {
 
   typedef Eigen::Matrix<double, 7, 1, Eigen::ColMajor> Vector7d;
 
-  /**
-   * TODO
-   */
   class G2O_TYPES_SLAM3D_ADDONS_API EdgeSE3Line3D : public BaseBinaryEdge<7, Vector7d, VertexSE3, VertexLine3D> {
     public:
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW;

@@ -32,6 +32,8 @@
 #include "g2o/config.h"
 #include "g2o/core/base_binary_edge.h"
 
+// TODO Jacopo
+
 namespace g2o
 {
 

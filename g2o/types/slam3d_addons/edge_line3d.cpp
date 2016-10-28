@@ -65,8 +65,8 @@ namespace g2o
 #ifndef NUMERIC_JACOBIAN_TWO_D_TYPES
   void EdgeLine3D::linearizeOplus()
   {
-    _jacobianOplusXi=-Matrix6d::Identity();
-    _jacobianOplusXj= Matrix6d::Identity();
+    _jacobianOplusXi=-Matrix6x4d::Identity();
+    _jacobianOplusXj= Matrix6x4d::Identity();
   }
 #endif
 
