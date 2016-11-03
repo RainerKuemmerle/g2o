@@ -48,8 +48,10 @@ namespace g2o {
 
 #ifdef G2O_HAVE_OPENGL
   G2O_REGISTER_ACTION(CacheCameraDrawAction);
-  G2O_REGISTER_ACTION(VertexPlaneDrawAction);
+  G2O_REGISTER_ACTION(VertexPlaneDrawAction);  
   G2O_REGISTER_ACTION(EdgeSE3PlaneSensorCalibDrawAction);
+  G2O_REGISTER_ACTION(VertexLine3DDrawAction);
+  G2O_REGISTER_ACTION(EdgeSE3Line3DDrawAction);
 #endif
 
   G2O_ATTRIBUTE_CONSTRUCTOR(init_slam3d_addons_types)

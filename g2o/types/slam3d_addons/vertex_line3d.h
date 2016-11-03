@@ -27,7 +27,9 @@
 #ifndef G2O_VERTEX_LINE3D_H_
 #define G2O_VERTEX_LINE3D_H_
 
+#include "g2o/config.h"
 #include "g2o/core/base_vertex.h"
+#include "g2o/core/hyper_graph_action.h"
 
 #include "g2o_types_slam3d_addons_api.h"
 #include "line3d.h"
@@ -38,7 +40,7 @@ namespace g2o {
   public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
 
-    VertexLine3D() {}
+    VertexLine3D();
     virtual bool read(std::istream& is);
     virtual bool write(std::ostream& os) const;
 
@@ -65,8 +67,21 @@ namespace g2o {
       return 6;
     }
 
+    Eigen::Vector3d color;
   };
 
-}
+#ifdef G2O_HAVE_OPENGL
+  class VertexLine3DDrawAction : public DrawAction {
+  public:
+    VertexLine3DDrawAction();
+    virtual HyperGraphElementAction* operator()(HyperGraph::HyperGraphElement* element, 
+						HyperGraphElementAction::Parameters* params_);
+  protected:
+    virtual bool refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_);
+    FloatProperty* _lineLength, *_lineWidth;
 
+  };
+#endif
+
+}
 #endif
