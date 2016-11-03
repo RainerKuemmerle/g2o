@@ -31,7 +31,7 @@
 namespace g2o {
 
   VertexLine3D::VertexLine3D() {
-    color << 0.2, 0.2, 0.2;
+    color << 1.0, 0.5, 0.0;
   }
   
   bool VertexLine3D::read(std::istream& is) {
@@ -59,8 +59,8 @@ namespace g2o {
       return false;
     }
     if(_previousParams) {
-      _lineLength = _previousParams->makeProperty<FloatProperty>(_typeName + "::LINE_LENGTH", 30);
-      _lineWidth = _previousParams->makeProperty<FloatProperty>(_typeName + "::LINE_WIDTH", 10);
+      _lineLength = _previousParams->makeProperty<FloatProperty>(_typeName + "::LINE_LENGTH", 15);
+      _lineWidth = _previousParams->makeProperty<FloatProperty>(_typeName + "::LINE_WIDTH", 5);
     }
     else {
       _lineLength = 0;

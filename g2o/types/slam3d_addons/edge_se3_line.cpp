@@ -93,8 +93,8 @@ namespace g2o {
       return false;
     }
     if(_previousParams) {
-      _lineLength = _previousParams->makeProperty<FloatProperty>(_typeName + "::LINE_LENGTH", 5.0f);
-      _lineWidth = _previousParams->makeProperty<FloatProperty>(_typeName + "::LINE_WIDTH", 2.5f);
+      _lineLength = _previousParams->makeProperty<FloatProperty>(_typeName + "::LINE_LENGTH", 4.0f);
+      _lineWidth = _previousParams->makeProperty<FloatProperty>(_typeName + "::LINE_WIDTH", 2.0f);
     }
     else {
       _lineLength = 0;

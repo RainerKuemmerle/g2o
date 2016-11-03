@@ -40,7 +40,6 @@
 
 #include "vertex_line3d.h"
 #include "edge_se3_line.h"
-#include "edge_line3d.h"
 #include "edge_plane.h"
 #include "edge_se3_calib.h"
 

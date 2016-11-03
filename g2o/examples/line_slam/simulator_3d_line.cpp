@@ -250,18 +250,16 @@ struct LineSensor : public Sensor {
 };
 
 int main (int argc, char** argv) {
-  bool verbose, robustKernel, fixLines, fixFirstPose, fixTrajectory, planarMotion, listSolvers;
+  bool verbose, robustKernel, fixLines, planarMotion, listSolvers;
   int maxIterations;
   double lambdaInit;
   string strSolver;
   CommandArgs arg;
-  arg.param("i", maxIterations, 5, "perform n iterations");
+  arg.param("i", maxIterations, 10, "perform n iterations");
   arg.param("v", verbose, false, "verbose output of the optimization process");
   arg.param("solver", strSolver, "lm_var", "select one specific solver");
   arg.param("lambdaInit", lambdaInit, 0, "user specified lambda init for levenberg");
   arg.param("robustKernel", robustKernel, false, "use robust error functions");
-  arg.param("fixTrajectory", fixTrajectory, false, "fix the trajectory");
-  arg.param("fixFirstPose", fixFirstPose, false, "fix the first robot pose");
   arg.param("fixLines", fixLines, false, "fix the lines (do localization only)");
   arg.param("planarMotion", planarMotion, false, "robot moves on a plane");
   arg.param("listSolvers", listSolvers, false, "list the solvers");
@@ -298,8 +296,7 @@ int main (int argc, char** argv) {
   std::cout << "Creating line sensor" << std::endl;
   Isometry3d sensorPose = Isometry3d::Identity();
   LineSensor* ls = new LineSensor(r, 0, sensorPose);
-  ls->_nline << 0.03, 0.03, 0.03, 0.005;
-  ls->_nline << 1e-9, 1e-9, 1e-9, 1e-9;
+  ls->_nline << 0.001, 0.001, 0.001, 0.0005;
   r->_sensors.push_back(ls);
   sim->_robots.push_back(r);
 
@@ -307,7 +304,7 @@ int main (int argc, char** argv) {
   std::cout << "Creating landmark line 1" << std::endl;
   LineItem* li = new LineItem(g, 1);
   Vector6d liv;
-  liv << 0.0, 0.0, 5.0, 1.0, 1.0, 1.0;
+  liv << 0.0, 0.0, 5.0, 0.0, 1.0, 0.0;
   line = Line3D::fromCartesian(liv);
   static_cast<VertexLine3D*>(li->vertex())->setEstimate(line);
   li->vertex()->setFixed(fixLines);
@@ -322,7 +319,7 @@ int main (int argc, char** argv) {
   sim->_world.insert(li);
 
   std::cout << "Creating landmark line 3" << std::endl;
-  liv << 0.0, 5.0, 0.0, 1.0, 0.0, 1.0;
+  liv << 0.0, 5.0, 0.0, 1.0, 0.0, 0.0;
   line = Line3D::fromCartesian(liv);
   li = new LineItem(g, 3);
   static_cast<VertexLine3D*>(li->vertex())->setEstimate(line);
@@ -387,7 +384,7 @@ int main (int argc, char** argv) {
     for(int a = 0; a < 2; ++a) {
       for(int i = 0; i < k; ++i) {
         std::cout << "m";
-        if(a==0) {
+        if(a == 0) {
           sim->relativeMove(0, delta);
 	}
         else {
@@ -400,16 +397,11 @@ int main (int argc, char** argv) {
   }
   std::cout << std::endl;
 
-  ofstream os("test_gt.g2o");
-  g->save(os);
-
   ls->_offsetVertex->setFixed(true);
-  if(fixFirstPose) {
-    OptimizableGraph::Vertex* gauge = g->vertex(4);
-    if(gauge) {
-      gauge->setFixed(true);
-    }
-  } 
+  OptimizableGraph::Vertex* gauge = g->vertex(4);
+  if(gauge) {
+    gauge->setFixed(true);
+  }
 
   ofstream osp("test_preopt.g2o");
   g->save(osp);
