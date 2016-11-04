@@ -296,7 +296,8 @@ int main (int argc, char** argv) {
   std::cout << "Creating line sensor" << std::endl;
   Isometry3d sensorPose = Isometry3d::Identity();
   LineSensor* ls = new LineSensor(r, 0, sensorPose);
-  ls->_nline << 0.001, 0.001, 0.001, 0.0005;
+  ls->_nline << 0.001, 0.001, 0.001, 0.0001;
+  // ls->_nline << 1e-9, 1e-9, 1e-9, 1e-9;
   r->_sensors.push_back(ls);
   sim->_robots.push_back(r);
 
@@ -356,12 +357,12 @@ int main (int argc, char** argv) {
     if(j == l-1) {
       delta.matrix().block<3, 3>(0, 0) = Matrix3d::Identity();
     }
-    delta.translation() =tr * (delta_t * j);
+    delta.translation() = tr * (delta_t * j);
     Isometry3d iDelta = delta.inverse();
     for(int a = 0; a < 2; ++a) {
       for(int i = 0; i < k; ++i) {
         std::cout << "m";
-        if(a==0) {
+        if(a == 0) {
           sim->relativeMove(0, delta);
 	}
 	else {
@@ -372,7 +373,6 @@ int main (int argc, char** argv) {
       }
     }
   }
-
   for(int j = 0; j < l; ++j) {
     Vector3d tr(1.0, 0.0, 0.0);
     delta.matrix().block<3, 3>(0, 0) = iq.toRotationMatrix();
@@ -386,10 +386,10 @@ int main (int argc, char** argv) {
         std::cout << "m";
         if(a == 0) {
           sim->relativeMove(0, delta);
-	}
+  	}
         else {
           sim->relativeMove(0, iDelta);
-	}
+  	}
         std::cout << "s";
         sim->sense(0);
       }
@@ -427,8 +427,6 @@ int main (int argc, char** argv) {
   //   std::cout << "Translation determinant: " << m.block<3, 3>(3, 3).determinant() << std::endl;
   //   std::cout << std::endl;
   // }
-  ofstream os1("test_postOpt.g2o");
-  g->save(os1);
 
   return 0;
 }
