@@ -403,8 +403,9 @@ int main (int argc, char** argv) {
     gauge->setFixed(true);
   }
 
-  ofstream osp("test_preopt.g2o");
+  ofstream osp("line3d.g2o");
   g->save(osp);
+  std::cout << "Saved graph on file line3d.g2o, use g2o_viewer to work with it." << std::endl;
 
   return 0;
 }
