@@ -36,7 +36,7 @@ namespace g2o {
     offsetParam = 0;
     resizeParameters(1);
     installParameter(offsetParam, 0);
-    color << 0.1, 0.1, 0.1;
+    color << 0.0, 0.5, 1.0;
   }
 
   bool EdgeSE3Line3D::read(std::istream& is) {
@@ -142,7 +142,7 @@ namespace g2o {
     if(_lineLength && _lineWidth) {
       glLineWidth(float(_lineWidth->value())); 
       glBegin(GL_LINES);
-      glNormal3f(-1.0f, 0.0f, 0.0f);
+      glNormal3f(float(npoint.x()), float(npoint.y()), float(npoint.z()));
       glVertex3f(float(npoint.x() - direction.x() * _lineLength->value()/2),
 		 float(npoint.y() - direction.y() * _lineLength->value()/2),
 		 float(npoint.z() - direction.z() * _lineLength->value()/2));

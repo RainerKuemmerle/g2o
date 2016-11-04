@@ -94,7 +94,7 @@ namespace g2o {
     if(_lineLength && _lineWidth) {
       glLineWidth(float(_lineWidth->value())); 
       glBegin(GL_LINES);
-      glNormal3f(-1.0f, 0.0f, 0.0f);
+      glNormal3f(float(npoint.x()), float(npoint.y()), float(npoint.z()));
       glVertex3f(float(npoint.x() - direction.x() * _lineLength->value()/2),
 		 float(npoint.y() - direction.y() * _lineLength->value()/2),
 		 float(npoint.z() - direction.z() * _lineLength->value()/2));

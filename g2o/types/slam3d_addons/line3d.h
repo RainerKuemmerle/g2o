@@ -165,7 +165,7 @@ namespace g2o {
       this->normalize();
     }
 
-    G2O_TYPES_SLAM3D_ADDONS_API inline Eigen::Vector4d ominus(const Line3D& line){
+    G2O_TYPES_SLAM3D_ADDONS_API inline Eigen::Vector4d ominus(const Line3D& line) {
       OrthonormalLine3D ortho_estimate = toOrthonormal(*this);
       OrthonormalLine3D ortho_line = toOrthonormal(line);
 

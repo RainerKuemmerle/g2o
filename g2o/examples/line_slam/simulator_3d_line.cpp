@@ -405,28 +405,6 @@ int main (int argc, char** argv) {
 
   ofstream osp("test_preopt.g2o");
   g->save(osp);
-  // g->setMethod(SparseOptimizer::LevenbergMarquardt);
-  g->initializeOptimization();
-  g->setVerbose(verbose);
-  g->optimize(maxIterations);
-  SparseBlockMatrix<MatrixXd> spinv;
-  std::pair<int, int> indexParams;
-  indexParams.first = ls->_offsetVertex->hessianIndex();
-  indexParams.second = ls->_offsetVertex->hessianIndex();
-  std::vector<std::pair <int, int> > blockIndices;
-  blockIndices.push_back(indexParams);
-  // if(!g->computeMarginals(spinv,  blockIndices)) {
-  //   std::cout << "error in computing the covariance" << std::endl;
-  // }
-  // else {
-  //   MatrixXd m = *spinv.block(ls->_offsetVertex->hessianIndex(), ls->_offsetVertex->hessianIndex());
-  //   std::cout << "Param covariance: " << std::endl;
-  //   std::cout << m << std::endl;
-  //   std::cout << std::endl;
-  //   std::cout << "Rotation determinant: " << m.block<3, 3>(0, 0).determinant() << std::endl;
-  //   std::cout << "Translation determinant: " << m.block<3, 3>(3, 3).determinant() << std::endl;
-  //   std::cout << std::endl;
-  // }
 
   return 0;
 }
