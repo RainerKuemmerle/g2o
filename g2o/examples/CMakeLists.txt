@@ -17,6 +17,7 @@ IF(CSPARSE_FOUND)
   ADD_SUBDIRECTORY(calibration_odom_laser)
   ADD_SUBDIRECTORY(simple_optimize)
   ADD_SUBDIRECTORY(plane_slam)
+  ADD_SUBDIRECTORY(line_slam)
 ENDIF()
 
 IF(CSPARSE_FOUND OR CHOLMOD_FOUND)

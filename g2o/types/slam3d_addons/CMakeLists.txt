@@ -10,7 +10,6 @@ ADD_LIBRARY(types_slam3d_addons ${G2O_LIB_TYPE}
   line3d.cpp line3d.h
   vertex_line3d.cpp vertex_line3d.h
   edge_se3_line.cpp edge_se3_line.h
-  edge_line3d.cpp edge_line3d.h
   edge_plane.cpp edge_plane.h
   edge_se3_calib.cpp edge_se3_calib.h
   types_slam3d_addons.cpp
@@ -24,9 +23,6 @@ TARGET_LINK_LIBRARIES(types_slam3d_addons types_slam3d core)
 IF(G2O_HAVE_OPENGL)
   TARGET_LINK_LIBRARIES(types_slam3d_addons ${OPENGL_gl_LIBRARY} )
 ENDIF()
-
-ADD_EXECUTABLE(test_line3d line3d_test.cpp)
-TARGET_LINK_LIBRARIES(test_line3d types_slam3d_addons types_slam3d)
 
 INSTALL(TARGETS types_slam3d_addons
   RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/bin
