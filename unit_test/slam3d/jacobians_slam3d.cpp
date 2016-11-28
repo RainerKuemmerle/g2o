@@ -31,7 +31,10 @@
 #include "g2o/core/jacobian_workspace.h"
 #include "g2o/types/slam3d/edge_se3.h"
 #include "g2o/types/slam3d/edge_pointxyz.h"
+#include "g2o/types/slam3d/edge_se3_pointxyz.h"
 #include "g2o/types/slam3d/dquat2mat.h"
+
+#include "g2o/core/optimizable_graph.h"
 
 #include "EXTERNAL/ceres/autodiff.h"
 
@@ -73,6 +76,44 @@ TEST(Slam3D, EdgeSE3Jacobian)
     e.setMeasurement(randomIsometry3d());
 
     evaluateJacobian(e, jacobianWorkspace, numericJacobianWorkspace);
+  }
+}
+
+TEST(Slam3D, EdgeSE3PointXYZJacobian)
+{
+  OptimizableGraph graph;
+
+  VertexSE3* v1 = new VertexSE3;
+  v1->setId(0); 
+  graph.addVertex(v1);
+
+  VertexPointXYZ* v2 = new VertexPointXYZ;
+  v2->setId(1); 
+  graph.addVertex(v2);
+
+  ParameterSE3Offset* paramOffset = new ParameterSE3Offset;
+  paramOffset->setId(0);
+  graph.addParameter(paramOffset);
+
+  EdgeSE3PointXYZ* e = new EdgeSE3PointXYZ;
+  e->setVertex(0, v1);
+  e->setVertex(1, v2);
+  e->setInformation(EdgePointXYZ::InformationType::Identity());
+  e->setParameterId(0, paramOffset->id());
+  graph.addEdge(e);
+
+  JacobianWorkspace jacobianWorkspace;
+  JacobianWorkspace numericJacobianWorkspace;
+  numericJacobianWorkspace.updateSize(e);
+  numericJacobianWorkspace.allocate();
+
+  for (int k = 0; k < 10000; ++k) {
+    paramOffset->setOffset(randomIsometry3d());
+    v1->setEstimate(randomIsometry3d());
+    v2->setEstimate(Eigen::Vector3d::Random());
+    e->setMeasurement(Eigen::Vector3d::Random());
+
+    evaluateJacobian(*e, jacobianWorkspace, numericJacobianWorkspace);
   }
 }
 
@@ -168,7 +209,6 @@ TEST(Slam3D, dqDRJacobian)
 
     // compute the Jacobian using AD
     Eigen::Matrix<double, 3 , 9, Eigen::RowMajor> dq_dR_AD;
-    Matrix<double, 3, 9, Eigen::RowMajor> dq_dR_AD;
     typedef ceres::internal::AutoDiff<RotationMatrix2QuaternionManifold, double, 9> AutoDiff_Dq_DR;
     double *parameters[] = { Re.data() };
     double *jacobians[] = { dq_dR_AD.data() };
