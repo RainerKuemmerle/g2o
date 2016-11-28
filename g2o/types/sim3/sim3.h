@@ -55,11 +55,13 @@ namespace g2o
       Sim3(const Eigen::Quaterniond & r, const Eigen::Vector3d & t, double s)
         : r(r),t(t),s(s)
       {
+			normalizeRotation();
       }
 
       Sim3(const Eigen::Matrix3d & R, const Eigen::Vector3d & t, double s)
         : r(Eigen::Quaterniond(R)),t(t),s(s)
       {
+			normalizeRotation();
       }
 
 
@@ -260,7 +262,12 @@ namespace g2o
         *this=ret;
         return *this;
       }
-
+    void normalizeRotation(){
+        if (r.w()<0){
+          r.coeffs() *= -1;
+        }
+        r.normalize();
+    }
       inline const Eigen::Vector3d& translation() const {return t;}
 
       inline Eigen::Vector3d& translation() {return t;}

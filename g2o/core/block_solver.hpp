@@ -91,42 +91,24 @@ void BlockSolver<Traits>::resize(int* blockPoseIndices, int numPoseBlocks,
 template <typename Traits>
 void BlockSolver<Traits>::deallocate()
 {
-  if (_Hpp){
-    delete _Hpp;
-    _Hpp=0;
-  }
-  if (_Hll){
-    delete _Hll;
-    _Hll=0;
-  }
-  if (_Hpl){
-    delete _Hpl;
-    _Hpl = 0;
-  }
-  if (_Hschur){
-    delete _Hschur;
-    _Hschur=0;
-  }
-  if (_DInvSchur){
-    delete _DInvSchur;
-    _DInvSchur=0;
-  }
-  if (_coefficients) {
-    delete[] _coefficients;
-    _coefficients = 0;
-  }
-  if (_bschur) {
-    delete[] _bschur;
-    _bschur = 0;
-  }
-  if (_HplCCS) {
-    delete _HplCCS;
-    _HplCCS = 0;
-  }
-  if (_HschurTransposedCCS) {
-    delete _HschurTransposedCCS;
-    _HschurTransposedCCS = 0;
-  }
+  delete _Hpp;
+  _Hpp=0;
+  delete _Hll;
+  _Hll=0;
+  delete _Hpl;
+  _Hpl = 0;
+  delete _Hschur;
+  _Hschur=0;
+  delete _DInvSchur;
+  _DInvSchur=0;
+  delete[] _coefficients;
+  _coefficients = 0;
+  delete[] _bschur;
+  _bschur = 0;
+  delete _HplCCS;
+  _HplCCS = 0;
+  delete _HschurTransposedCCS;
+  _HschurTransposedCCS = 0;
 }
 
 template <typename Traits>
@@ -250,8 +232,10 @@ bool BlockSolver<Traits>::buildStructure(bool zeroBlocks)
     }
   }
 
-  if (! _doSchur)
+  if (! _doSchur) {
+    delete schurMatrixLookup;
     return true;
+  }
 
   _DInvSchur->diagonal().resize(landmarkIdx);
   _Hpl->fillSparseBlockMatrixCCS(*_HplCCS);

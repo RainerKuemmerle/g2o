@@ -34,10 +34,10 @@ int main()
   SparseOptimizer optimizer;
   optimizer.setVerbose(false);
 
-  typedef BlockSolver< BlockSolverTraits<3, 3> > BlockSolver_3_3;
-  BlockSolver_3_3::LinearSolverType * linearSolver
-      = new LinearSolverCholmod<BlockSolver_3_3::PoseMatrixType>();
-  BlockSolver_3_3 * blockSolver = new BlockSolver_3_3(linearSolver);
+  typedef BlockSolver< BlockSolverTraits<6, 6> > BlockSolver;
+  BlockSolver::LinearSolverType * linearSolver
+      = new LinearSolverCholmod<BlockSolver::PoseMatrixType>();
+  BlockSolver* blockSolver = new BlockSolver(linearSolver);
   OptimizationAlgorithm* optimizationAlgorithm = new OptimizationAlgorithmGaussNewton(blockSolver);
   optimizer.setAlgorithm(optimizationAlgorithm);
 

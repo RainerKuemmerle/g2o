@@ -47,15 +47,15 @@ namespace g2o {
   template <class SampleType, class CovarianceType>
   class GaussianSampler {
   public:
-    GaussianSampler(bool hasGenerator=true){
-      _generator = 0;
+    GaussianSampler(bool hasGenerator=true) :
+      _generator(0)
+    {
       if (hasGenerator){
         _generator = new std::mt19937;
       }
     }
     ~GaussianSampler() {
-      if (_generator)
-        delete _generator;
+      delete _generator;
     }
     void setDistribution(const CovarianceType& cov){
       Eigen::LLT<CovarianceType> cholDecomp;
@@ -70,6 +70,13 @@ namespace g2o {
         s(i) = (_generator) ? sampleGaussian(_generator) : sampleGaussian();
       }
       return _cholesky*s;
+    }
+    bool seed(int s)
+    {
+      if (!_generator)
+        return false;
+      _generator->seed(s);
+      return true;
     }
   protected:
     CovarianceType _cholesky;

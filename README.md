@@ -29,6 +29,10 @@ g2o: A General Framework for Graph Optimization
 IEEE International Conference on Robotics and Automation (ICRA), 2011
 http://ais.informatik.uni-freiburg.de/publications/papers/kuemmerle11icra.pdf
 
+### Documentation
+A detailed description of how the library is structured and how to use and extend it can be found in /doc/g2o.pdf
+The API documentation can be generated as described in doc/doxygen/readme.txt
+
 ### License
 g2o is licensed under the BSD License. However, some libraries are available
 under different license terms. See below.
@@ -70,7 +74,7 @@ g2o requires cmake and Eigen3 to build. The other requirements are optional.
   * cmake             http://www.cmake.org/
   * Eigen3            http://eigen.tuxfamily.org
   * suitesparse       http://www.cise.ufl.edu/research/sparse/SuiteSparse/
-  * Qt4               http://qt-project.org
+  * Qt5               http://qt-project.org
   * libQGLViewer      http://www.libqglviewer.com/
 
   On Ubuntu / Debian these dependencies are resolved by installing the
@@ -78,13 +82,19 @@ g2o requires cmake and Eigen3 to build. The other requirements are optional.
     - cmake
     - libeigen3-dev
     - libsuitesparse-dev
-    - libqt4-dev
-    - qt4-qmake
-    - libqglviewer-qt4-dev
+    - Qt4: `libqt4-dev`, `qt4-qmake`, `libqglviewer-dev` (Or `libqglviewer-qt4-dev` in modern distributions)
+    - Qt5: `libqt5-dev`, `qt5-qmake`, `libqglviewer-dev`
+
+#### Mac OS X
+If using [Homebrew](http://brew.sh/), then
+
+`brew install homebrew/science/g2o`
+
+will install g2o together with its required dependencies. In this case no manual compilation is necessary.
 
 ### Compilation
 Our primary development platform is Linux. Experimental support for
-Mac OS X and Windows (MinGW or MSVC).
+Mac OS X, Android and Windows (MinGW or MSVC).
 We recommend a so-called out of source build which can be achieved
 by the following command sequence.
 
@@ -97,6 +107,13 @@ The binaries will be placed in bin and the libraries in lib which
 are both located in the top-level folder.
 If you are compiling on Windows, please download Eigen3 and extract it.
 Within cmake-gui set the variable G2O\_EIGEN3\_INCLUDE to that directory.
+
+### Cross-Compiling for Android
+
+- `mkdir build`
+- `cd build`
+- `cmake -DCMAKE_TOOLCHAIN_FILE=../script/android.toolchain.cmake -DANDROID_NDK=<YOUR_PATH_TO_ANDROID_NDK_r10d+> -DCMAKE_BUILD_TYPE=Release -DANDROID_ABI="armeabi-v7a with NEON" -DEIGEN3_INCLUDE_DIR="<YOUR_PATH_TO_EIGEN>" -DEIGEN3_VERSION_OK=ON .. && cmake --build .`
+
 
 ### Acknowledgments
 We thank the following contributors for providing patches:

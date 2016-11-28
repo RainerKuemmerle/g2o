@@ -30,6 +30,12 @@
 #define qglv_real float
 #endif
 
+// Again, some API changes in QGLViewer which produce annoying text in the console
+// if the old API is used.
+#if (((QGLVIEWER_VERSION & 0xff0000) >> 16) >= 2 && ((QGLVIEWER_VERSION & 0x00ff00) >> 8) >= 5)
+#define QGLVIEWER_DEPRECATED_MOUSEBINDING
+#endif
+
 #ifdef __APPLE__
 #include <OpenGL/gl.h>
 #else
@@ -76,7 +82,7 @@ namespace {
 
 } // end anonymous namespace
 
-G2oQGLViewer::G2oQGLViewer(QWidget* parent, const QGLWidget* shareWidget, Qt::WFlags flags) :
+G2oQGLViewer::G2oQGLViewer(QWidget* parent, const QGLWidget* shareWidget, Qt::WindowFlags flags) :
   QGLViewer(parent, shareWidget, flags),
   graph(0), _drawActions(0), _drawList(0)
 {
@@ -136,8 +142,13 @@ void G2oQGLViewer::init()
   setStateFileName(QString::null);
 
   // mouse bindings
+#ifdef QGLVIEWER_DEPRECATED_MOUSEBINDING
+  setMouseBinding(Qt::NoModifier, Qt::RightButton, CAMERA, ZOOM);
+  setMouseBinding(Qt::NoModifier, Qt::MidButton, CAMERA, TRANSLATE);
+#else
   setMouseBinding(Qt::RightButton, CAMERA, ZOOM);
   setMouseBinding(Qt::MidButton, CAMERA, TRANSLATE);
+#endif
 
   // keyboard shortcuts
   setShortcut(CAMERA_MODE, 0);

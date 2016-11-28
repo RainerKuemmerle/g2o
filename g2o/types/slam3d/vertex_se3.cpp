@@ -134,7 +134,7 @@ namespace g2o {
     glColor3f(POSE_VERTEX_COLOR);
     glPushMatrix();
     glMultMatrixd(that->estimate().matrix().data());
-    opengl::drawArrow2D(_triangleX->value(), _triangleY->value(), _triangleX->value()*.3);
+    opengl::drawArrow2D(_triangleX->value(), _triangleY->value(), _triangleX->value()*.3f);
     drawCache(that->cacheContainer(), params_);
     drawUserData(that->userData(), params_);
     glPopMatrix();

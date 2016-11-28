@@ -236,6 +236,9 @@ void EdgeProjectPSI2UV::linearizeOplus(){
 
 EdgeProjectXYZ2UVU::EdgeProjectXYZ2UVU() : BaseBinaryEdge<3, Vector3D, VertexSBAPointXYZ, VertexSE3Expmap>()
 {
+  _cam = 0;
+  resizeParameters(1);
+  installParameter(_cam, 0);
 }
 
 bool EdgeProjectXYZ2UV::read(std::istream& is){

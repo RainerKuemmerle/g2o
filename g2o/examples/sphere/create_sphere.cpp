@@ -46,6 +46,7 @@ int main (int argc, char** argv)
   // command line parsing
   int nodesPerLevel;
   int numLaps;
+  bool randomSeed;
   double radius;
   std::vector<double> noiseTranslation;
   std::vector<double> noiseRotation;
@@ -57,6 +58,7 @@ int main (int argc, char** argv)
   arg.param("radius", radius, 100., "radius of the sphere");
   arg.param("noiseTranslation", noiseTranslation, std::vector<double>(), "set the noise level for the translation, separated by semicolons without spaces e.g: \"0.1;0.1;0.1\"");
   arg.param("noiseRotation", noiseRotation, std::vector<double>(), "set the noise level for the rotation, separated by semicolons without spaces e.g: \"0.001;0.001;0.001\"");
+  arg.param("randomSeed", randomSeed, false, "use a randomized seed for generating the sphere");
   arg.parseArgs(argc, argv);
 
   if (noiseTranslation.size() == 0) {
@@ -150,6 +152,19 @@ int main (int argc, char** argv)
   transSampler.setDistribution(transNoise);
   GaussianSampler<Eigen::Vector3d, Eigen::Matrix3d> rotSampler;
   rotSampler.setDistribution(rotNoise);
+
+  if (randomSeed) {
+    std::random_device r;
+    std::seed_seq seedSeq{r(), r(), r(), r(), r()};
+    vector<int> seeds(2);
+    seedSeq.generate(seeds.begin(), seeds.end());
+    cerr << "using seeds:";
+    for (size_t i = 0; i < seeds.size(); ++i)
+      cerr << " " << seeds[i];
+    cerr << endl;
+    transSampler.seed(seeds[0]);
+    rotSampler.seed(seeds[1]);
+  }
 
   // noise for all the edges
   for (size_t i = 0; i < edges.size(); ++i) {
