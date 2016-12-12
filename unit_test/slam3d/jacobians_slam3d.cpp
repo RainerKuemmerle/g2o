@@ -192,6 +192,9 @@ struct RotationMatrix2QuaternionManifold
 
 TEST(Slam3D, dqDRJacobian)
 {
+  Matrix<double, 3, 9, Eigen::ColMajor>  dq_dR;
+  Matrix<double, 3, 9, Eigen::RowMajor> dq_dR_AD;
+  dq_dR_AD.setZero(); // avoid warning about uninitialized memory
   for (int k = 0; k < 10000; ++k) {
     // create a random rotation matrix by sampling a random 3d vector
     // that will be used in axis-angle representation to create the matrix
@@ -201,14 +204,12 @@ TEST(Slam3D, dqDRJacobian)
     Matrix3D Re = rotation.toRotationMatrix();
 
     // our analytic function which we want to evaluate
-    Matrix<double, 3, 9, Eigen::ColMajor>  dq_dR;
     g2o::internal::compute_dq_dR (dq_dR, 
         Re(0,0),Re(1,0),Re(2,0),
         Re(0,1),Re(1,1),Re(2,1),
         Re(0,2),Re(1,2),Re(2,2));
 
     // compute the Jacobian using AD
-    Eigen::Matrix<double, 3 , 9, Eigen::RowMajor> dq_dR_AD;
     typedef ceres::internal::AutoDiff<RotationMatrix2QuaternionManifold, double, 9> AutoDiff_Dq_DR;
     double *parameters[] = { Re.data() };
     double *jacobians[] = { dq_dR_AD.data() };

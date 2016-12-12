@@ -116,13 +116,16 @@ namespace g2o {
 
   bool HyperGraph::addEdge(Edge* e)
   {
+    for (std::vector<Vertex*>::iterator it = e->vertices().begin(); it != e->vertices().end(); ++it) {
+      if (*it == NULL)
+        return false;
+    }
     std::pair<EdgeSet::iterator, bool> result = _edges.insert(e);
     if (! result.second)
       return false;
     for (std::vector<Vertex*>::iterator it = e->vertices().begin(); it != e->vertices().end(); ++it) {
       Vertex* v = *it;
-      if (v)
-	v->edges().insert(e);
+      v->edges().insert(e);
     }
     return true;
   }
