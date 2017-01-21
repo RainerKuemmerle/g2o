@@ -86,7 +86,7 @@ licenses for more details.
   On Ubuntu / Debian these dependencies are resolved by installing the
   following packages.
     - libsuitesparse-dev
-    - libqt5-dev
+    - qtdeclarative5-dev
     - qt5-qmake
     - libqglviewer-dev
 
