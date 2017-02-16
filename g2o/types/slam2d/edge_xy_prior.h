@@ -24,24 +24,61 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef G2O_TYPES_SLAM2D_
-#define G2O_TYPES_SLAM2D_
+#ifndef G2O_EDGE_XY_PRIOR_H
+#define G2O_EDGE_XY_PRIOR_H
 
-#include "g2o/config.h"
-#include "vertex_se2.h"
 #include "vertex_point_xy.h"
-#include "parameter_se2_offset.h"
-#include "edge_se2_prior.h"
-#include "edge_se2_xyprior.h"
-#include "edge_se2.h"
-#include "edge_se2_pointxy.h"
-#include "edge_se2_pointxy_bearing.h"
-#include "edge_se2_pointxy_calib.h"
-#include "edge_se2_offset.h"
-#include "edge_se2_pointxy_offset.h"
-#include "edge_pointxy.h"
-#include "edge_se2_twopointsxy.h"
-#include "edge_se2_lotsofxy.h"
-#include "edge_xy_prior.h"
+#include "g2o/config.h"
+#include "g2o/core/base_unary_edge.h"
+#include "g2o_types_slam2d_api.h"
+
+namespace g2o {
+
+  class G2O_TYPES_SLAM2D_API EdgeXYPrior : public BaseUnaryEdge<2, Vector2D, VertexPointXY>
+  {
+    public:
+      EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+        EdgeXYPrior();
+
+      void computeError()
+      {
+        const VertexPointXY* v = static_cast<const VertexPointXY*>(_vertices[0]);
+        _error = v->estimate()-_measurement;
+      }
+      virtual bool read(std::istream& is);
+      virtual bool write(std::ostream& os) const;
+
+      virtual void setMeasurement(const Vector2D& m){
+        _measurement = m;
+      }
+
+      virtual bool setMeasurementData(const double* d){
+        _measurement=Vector2D(d[0], d[1]);
+        return true;
+      }
+
+      virtual bool getMeasurementData(double* d) const {
+	Eigen::Map<Vector2D> m(d);
+	m=_measurement;
+        return true;
+      }
+
+      virtual int measurementDimension() const {return 2;}
+
+      virtual bool setMeasurementFromState() {
+        const VertexPointXY* v = static_cast<const VertexPointXY*>(_vertices[0]);
+        _measurement = v->estimate();
+        return true;
+      }
+
+
+      virtual double initialEstimatePossible(const OptimizableGraph::VertexSet& , OptimizableGraph::Vertex* ) { return 0.;}
+#ifndef NUMERIC_JACOBIAN_TWO_D_TYPES
+      virtual void linearizeOplus();
+#endif
+  };
+
+
+} // end namespace
 
 #endif
