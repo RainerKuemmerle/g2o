@@ -843,7 +843,7 @@ allows to optimize graphs stored in files and save the result back to a
 file. This allows a fast prototyping of optimization problems, as it is
 only required to implement the new types or solvers. The \gopt\
 distribution includes a data folder which comprises some data files on
-which \verb+g2o_cli+ can be applied.
+which \verb+g2o+ can be applied.
 
 \subsection{\gopt\ Viewer}
 
@@ -900,7 +900,7 @@ G2O_REGISTER_OPTIMIZATION_ALGORITHM(gn_pcg3_2, new PCGSolverCreator(Optimization
 Both tools support the loading of types and optimization algorithms at
 run-time from dynamic libraries. This is realized as follows. The tools
 load from the libs folder all libraries matching ``*\_types\_*'' and
-``\_solver\_*'' to register types and optimization algorithms,
+``*\_solver\_*'' to register types and optimization algorithms,
 respectively. We assume that by loading the libraries the types and the
 algorithms register via their respective constructors to the system.
 Listing~\ref{lst:inittypes} shows how to register types to the system
@@ -914,7 +914,7 @@ different methods:
     and \verb+-solverlib+ to load a specific library.
   \item You may specify the environment variables \verb+G2O_TYPES_DIR+
     and \verb+G2O_SOLVER_DIR+ which are scanned at start and libraries
-    matching ``*\_types\_*'' and ``\_solver\_*'' are automatically
+    matching ``*\_types\_*'' and ``*\_solver\_*'' are automatically
     loaded.
 \end{itemize}
 
