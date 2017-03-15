@@ -128,7 +128,7 @@ namespace {
 
 } // end anonymous namespace
 
-Slam2DViewer::Slam2DViewer(QWidget* parent, const QGLWidget* shareWidget, Qt::WFlags flags) :
+Slam2DViewer::Slam2DViewer(QWidget* parent, const QGLWidget* shareWidget, Qt::WindowFlags flags) :
   QGLViewer(parent, shareWidget, flags),
   graph(0), drawCovariance(false)
 {
