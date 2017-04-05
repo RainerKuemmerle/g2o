@@ -1,7 +1,8 @@
 g2o - General Graph Optimization
 ================================
 
-[![Build Status](https://travis-ci.org/RainerKuemmerle/g2o.svg?branch=master)](https://travis-ci.org/RainerKuemmerle/g2o)
+Linux: [![Build Status](https://travis-ci.org/RainerKuemmerle/g2o.svg?branch=master)](https://travis-ci.org/RainerKuemmerle/g2o)
+Windows: [![Build status](https://ci.appveyor.com/api/projects/status/9w0cpb9krc6t4nt7/branch/master?svg=true)](https://ci.appveyor.com/project/RainerKuemmerle/g2o/branch/master)
 
 g2o is an open-source C++ framework for optimizing graph-based nonlinear error
 functions. g2o has been designed to be easily extensible to a wide range of

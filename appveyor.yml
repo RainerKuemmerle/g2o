@@ -13,6 +13,8 @@ build:
   project: c:\projects\g2o\build\g2o.sln 
 
 install:
+  - set QTDIR=C:\Qt\5.8\msvc2015_64
+  - set PATH=%PATH%;%QTDIR%\bin
   - ps: wget http://bitbucket.org/eigen/eigen/get/3.3.3.zip -outfile eigen3.zip
   - cmd: 7z x eigen3.zip -o"C:\projects" -y > nul
   
