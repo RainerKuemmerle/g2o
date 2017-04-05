@@ -3,17 +3,7 @@ if(POLICY CMP0020)
   cmake_policy(SET CMP0020 OLD)
 endif()
 
-# Qt{4,5} have been find_package'd() by FindQGLViewer.cmake
-if(Qt4_FOUND)
-  INCLUDE(${QT_USE_FILE})
-
-  QT4_WRAP_UI(UI_HEADERS base_main_window.ui base_properties_widget.ui)
-  QT4_WRAP_CPP(UI_SOURCES main_window.h properties_widget.h)
-
-  INCLUDE_DIRECTORIES(${QT_INCLUDES})
-  SET(MY_QT_LIBRARIES ${QT_LIBRARIES})
-endif()
-
+# Qt5 was been find_package'd() by FindQGLViewer.cmake
 if(Qt5_FOUND)
   QT5_WRAP_UI(UI_HEADERS base_main_window.ui base_properties_widget.ui)
   QT5_WRAP_CPP(UI_SOURCES main_window.h properties_widget.h)
