@@ -52,6 +52,8 @@ class SleepThread : public QThread
 int RunG2OViewer::run(int argc, char** argv, CommandArgs& arg)
 {
   std::string inputFilename;
+  std::string loadLookup;
+  arg.param("renameTypes", loadLookup, "", "create a lookup for loading types into other types,\n\t TAG_IN_FILE=INTERNAL_TAG_FOR_TYPE,TAG2=INTERNAL2\n\t e.g., VERTEX_CAM=VERTEX_SE3:EXPMAP");
   arg.paramLeftOver("graph-input", inputFilename, "", "graph file which will be processed", true);
   arg.parseArgs(argc, argv);
 
@@ -65,6 +67,10 @@ int RunG2OViewer::run(int argc, char** argv, CommandArgs& arg)
 
   // setting up the optimizer
   SparseOptimizer* optimizer = new SparseOptimizer();
+  // Loading the input data
+  if (loadLookup.size() > 0) {
+    optimizer->setRenamedTypesFromString(loadLookup);
+  }
   mw.viewer->graph = optimizer;
 
   // set up the GUI action
