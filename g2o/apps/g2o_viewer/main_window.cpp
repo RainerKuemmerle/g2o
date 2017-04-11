@@ -228,11 +228,17 @@ void MainWindow::updateDisplayedSolvers()
 
 bool MainWindow::load(const QString& filename)
 {
-  ifstream ifs(filename.toStdString().c_str());
-  if (! ifs)
-    return false;
   viewer->graph->clear();
-  bool loadStatus = viewer->graph->load(ifs);
+  bool loadStatus = false;
+  if (filename == "-") {
+    cerr << "reading stdin" << endl;
+    loadStatus = viewer->graph->load(cin);
+  } else {
+    ifstream ifs(filename.toStdString().c_str());
+    if (! ifs)
+      return false;
+    loadStatus = viewer->graph->load(ifs);
+  }
   if (! loadStatus)
     return false;
   _lastSolver = -1;

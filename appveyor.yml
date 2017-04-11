@@ -1,0 +1,25 @@
+branches:
+  only:
+    - master
+
+os: Visual Studio 2015
+
+clone_folder: c:\projects\g2o
+
+platform: x64
+configuration: Release
+
+build:
+  project: c:\projects\g2o\build\g2o.sln 
+
+install:
+  - set QTDIR=C:\Qt\5.8\msvc2015_64
+  - set PATH=%PATH%;%QTDIR%\bin
+  - ps: wget http://bitbucket.org/eigen/eigen/get/3.3.3.zip -outfile eigen3.zip
+  - cmd: 7z x eigen3.zip -o"C:\projects" -y > nul
+  
+before_build:
+  - cd c:\projects\g2o
+  - mkdir build
+  - cd build
+  - cmake -G "Visual Studio 14 2015 Win64" -D EIGEN3_INCLUDE_DIR=C:\projects\eigen-eigen-67e894c6cd8f ..

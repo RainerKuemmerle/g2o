@@ -28,7 +28,7 @@ namespace g2o {
   class Slam2DViewer : public QGLViewer
   {
     public:
-      Slam2DViewer(QWidget* parent=NULL, const QGLWidget* shareWidget=0, Qt::WFlags flags=0);
+      Slam2DViewer(QWidget* parent=NULL, const QGLWidget* shareWidget=0, Qt::WindowFlags flags=0);
       ~Slam2DViewer();
       virtual void draw();
       void init();

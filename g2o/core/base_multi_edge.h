@@ -64,7 +64,7 @@ namespace g2o {
       typedef MatrixXD::MapType JacobianType;
       typedef typename BaseEdge<D,E>::ErrorVector ErrorVector;
       typedef typename BaseEdge<D,E>::InformationType InformationType;
-      typedef Eigen::Map<MatrixXD, MatrixXD::Flags & Eigen::AlignedBit ? Eigen::Aligned : Eigen::Unaligned > HessianBlockType;
+      typedef Eigen::Map<MatrixXD, MatrixXD::Flags & Eigen::PacketAccessBit ? Eigen::Aligned : Eigen::Unaligned > HessianBlockType;
 
       BaseMultiEdge() : BaseEdge<D,E>()
       {
@@ -126,7 +126,7 @@ namespace g2o {
       typedef MatrixXD::MapType JacobianType;
       typedef typename BaseEdge<-1,E>::ErrorVector ErrorVector;
       typedef typename BaseEdge<-1,E>::InformationType InformationType;
-      typedef Eigen::Map<MatrixXD, MatrixXD::Flags & Eigen::AlignedBit ? Eigen::Aligned : Eigen::Unaligned > HessianBlockType;
+      typedef Eigen::Map<MatrixXD, MatrixXD::Flags & Eigen::PacketAccessBit ? Eigen::Aligned : Eigen::Unaligned > HessianBlockType;
 
       BaseMultiEdge() : BaseEdge<-1,E>()
     {

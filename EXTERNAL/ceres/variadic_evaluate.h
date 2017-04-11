@@ -1,6 +1,6 @@
 // Ceres Solver - A fast non-linear least squares minimizer
-// Copyright 2013 Google Inc. All rights reserved.
-// http://code.google.com/p/ceres-solver/
+// Copyright 2015 Google Inc. All rights reserved.
+// http://ceres-solver.org/
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
@@ -39,6 +39,21 @@
 #include "fixed_array.h"
 
 namespace ceres {
+
+// It is a near impossibility that user code generates this exact
+// value in normal operation, thus we will use it to fill arrays
+// before passing them to user code. If on return an element of the
+// array still contains this value, we will assume that the user code
+// did not write to that memory location.
+const double kImpossibleValue = 1e302;
+
+// For SizedCostFunction and AutoDiffCostFunction, DYNAMIC can be
+// specified for the number of residuals. If specified, then the
+// number of residuas for that cost function can vary at runtime.
+enum DimensionType {
+  DYNAMIC = -1
+};
+
 namespace internal {
 
 // This block of quasi-repeated code calls the user-supplied functor, which may
@@ -172,6 +187,17 @@ struct VariadicEvaluate<Functor, T, N0, 0, 0, 0, 0, 0, 0, 0, 0, 0> {
   static bool Call(const Functor& functor, T const *const *input, T* output) {
     return functor(input[0],
                    output);
+  }
+};
+
+// Template instantiation for dynamically-sized functors.
+template<typename Functor, typename T>
+struct VariadicEvaluate<Functor, T, ceres::DYNAMIC, ceres::DYNAMIC,
+                        ceres::DYNAMIC, ceres::DYNAMIC, ceres::DYNAMIC,
+                        ceres::DYNAMIC, ceres::DYNAMIC, ceres::DYNAMIC,
+                        ceres::DYNAMIC, ceres::DYNAMIC> {
+  static bool Call(const Functor& functor, T const *const *input, T* output) {
+    return functor(input, output);
   }
 };
 

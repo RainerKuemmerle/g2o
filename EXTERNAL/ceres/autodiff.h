@@ -1,6 +1,6 @@
 // Ceres Solver - A fast non-linear least squares minimizer
-// Copyright 2010, 2011, 2012 Google Inc. All rights reserved.
-// http://code.google.com/p/ceres-solver/
+// Copyright 2015 Google Inc. All rights reserved.
+// http://ceres-solver.org/
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
@@ -169,7 +169,7 @@ inline void Make1stOrderPerturbation(int offset, const T* src, JetT* dst) {
   for (int j = 0; j < N; ++j) {
     dst[j].a = src[j];
     dst[j].v.setZero();
-    dst[j].v[offset + j] = 1.0;
+    dst[j].v[offset + j] = T(1.0);
   }
 }
 
@@ -235,6 +235,13 @@ struct AutoDiff {
     };
 
     JetT* output = x.get() + N0 + N1 + N2 + N3 + N4 + N5 + N6 + N7 + N8 + N9;
+
+    // Invalidate the output Jets, so that we can detect if the user
+    // did not assign values to all of them.
+    for (int i = 0; i < num_outputs; ++i) {
+      output[i].a = kImpossibleValue;
+      output[i].v.setConstant(kImpossibleValue);
+    }
 
 #define CERES_MAKE_1ST_ORDER_PERTURBATION(i)                            \
     if (N ## i) {                                                       \

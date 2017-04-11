@@ -361,7 +361,7 @@ void OptimizableGraph::discardTop(HyperGraph::VertexSet& vset)
   }
 }
 
-  void OptimizableGraph::setFixed(HyperGraph::VertexSet& vset, bool fixed)
+void OptimizableGraph::setFixed(HyperGraph::VertexSet& vset, bool fixed)
 {
   for (HyperGraph::VertexSet::iterator it=vset.begin(); it!=vset.end(); ++it) {
     OptimizableGraph::Vertex* v = static_cast<OptimizableGraph::Vertex*>(*it);
@@ -369,17 +369,8 @@ void OptimizableGraph::discardTop(HyperGraph::VertexSet& vset)
   }
 }
 
-
 bool OptimizableGraph::load(istream& is, bool createEdges)
 {
-  // scna for the paramers in the whole file
-  if (!_parameters.read(is,&_renamedTypesLookup))
-    return false;
-#ifndef NDEBUG
-  cerr << "Loaded " << _parameters.size() << " parameters" << endl;
-#endif
-  is.clear();
-  is.seekg(ios_base::beg);
   set<string> warnedUnknownTypes;
   stringstream currentLine;
   string token;
@@ -389,7 +380,10 @@ bool OptimizableGraph::load(istream& is, bool createEdges)
   elemBitset[HyperGraph::HGET_PARAMETER] = 1;
   elemBitset.flip();
 
-  HyperGraph::DataContainer*  previousDataContainer = 0;
+  HyperGraph::GraphElemBitset elemParamBitset;
+  elemParamBitset[HyperGraph::HGET_PARAMETER] = 1;
+
+  HyperGraph::DataContainer* previousDataContainer = 0;
   Data* previousData = 0;
 
   int lineNumber = 0;
@@ -437,6 +431,26 @@ bool OptimizableGraph::load(istream& is, bool createEdges)
       if (warnedUnknownTypes.count(token) != 1) {
         warnedUnknownTypes.insert(token);
         cerr << CL_RED(__PRETTY_FUNCTION__ << " unknown type: " << token) << endl;
+      }
+      continue;
+    }
+
+    // first handle the parameters
+    HyperGraph::HyperGraphElement* pelement = factory->construct(token, elemParamBitset);
+    if (pelement) { // not a parameter or otherwise unknown tag
+      assert(pelement->elementType() == HyperGraph::HGET_PARAMETER && "Should be a param");
+      Parameter* p = static_cast<Parameter*>(pelement);
+      int pid;
+      currentLine >> pid;
+      p->setId(pid);
+      bool r = p->read(currentLine);
+      if (! r) {
+        cerr << __PRETTY_FUNCTION__ << ": Error reading data " << token << " for parameter " << pid << endl;
+        delete p;
+      } else {
+        if (! _parameters.addParameter(p) ){
+          cerr << __PRETTY_FUNCTION__ << ": Parameter of type:" << token << " id:" << pid << " already defined" << endl;
+        }
       }
       continue;
     }
@@ -614,6 +628,10 @@ bool OptimizableGraph::load(istream& is, bool createEdges)
     }
   } // while read line
 
+#ifndef NDEBUG
+  cerr << "Loaded " << _parameters.size() << " parameters" << endl;
+#endif
+
   return true;
 }
 
@@ -637,6 +655,7 @@ bool OptimizableGraph::save(const char* filename, int level) const
 
 bool OptimizableGraph::save(ostream& os, int level) const
 {
+  // write the parameters to the top of the file
   if (! _parameters.write(os))
     return false;
   set<Vertex*, VertexIDCompare> verticesToSave;

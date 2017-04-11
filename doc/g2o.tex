@@ -307,7 +307,7 @@ space of parameters $\bx$ is Euclidean, which is not valid for several
 problems like SLAM or bundle adjustment. This may lead to sub-optimal
 solutions. In the remainder of this section we discuss first the
 general solution when the space of the parameters is Euclidean, and
-subsequently we extend this solution to more general non-euclidean
+subsequently we extend this solution to more general non-Euclidean
 spaces.
 
 \section{Considerations about the Structure of the Linearized System}
@@ -843,7 +843,7 @@ allows to optimize graphs stored in files and save the result back to a
 file. This allows a fast prototyping of optimization problems, as it is
 only required to implement the new types or solvers. The \gopt\
 distribution includes a data folder which comprises some data files on
-which \verb+g2o_cli+ can be applied.
+which \verb+g2o+ can be applied.
 
 \subsection{\gopt\ Viewer}
 
@@ -900,7 +900,7 @@ G2O_REGISTER_OPTIMIZATION_ALGORITHM(gn_pcg3_2, new PCGSolverCreator(Optimization
 Both tools support the loading of types and optimization algorithms at
 run-time from dynamic libraries. This is realized as follows. The tools
 load from the libs folder all libraries matching ``*\_types\_*'' and
-``\_solver\_*'' to register types and optimization algorithms,
+``*\_solver\_*'' to register types and optimization algorithms,
 respectively. We assume that by loading the libraries the types and the
 algorithms register via their respective constructors to the system.
 Listing~\ref{lst:inittypes} shows how to register types to the system
@@ -914,7 +914,7 @@ different methods:
     and \verb+-solverlib+ to load a specific library.
   \item You may specify the environment variables \verb+G2O_TYPES_DIR+
     and \verb+G2O_SOLVER_DIR+ which are scanned at start and libraries
-    matching ``*\_types\_*'' and ``\_solver\_*'' are automatically
+    matching ``*\_types\_*'' and ``*\_solver\_*'' are automatically
     loaded.
 \end{itemize}
 
@@ -994,7 +994,7 @@ landmarks are denoted by the nodes $\bx^\mathrm{l}_i$. We assume that
 our landmark sensor is able to detect only the 2D pose of a landmark,
 but not its orientation.  In other words the landmarks ``live'' in
 $\Re^2$.  Conversely, the robot poses are parameterized by the robot
-location $x-y$ on the plane and its orientation $\theta$, thus they
+location $(x,y)$ on the plane and its orientation $\theta$, thus they
 belong to the group of 2D transformations $SE(2)$.  More
 formally, the nodes of a 2D SLAM graph are of two types
 \begin{itemize}
@@ -1037,8 +1037,8 @@ represent the relative motion that brings the robot from
 $\bx^\mathrm{s}_t$ to $\bx^\mathrm{s}_{t+1}$ \emph{measured} by the
 odometry. This measurement will be typically slightly different from
 the \emph{real} transformation between the two pose because of the
-noise affecting the sensors.  Being an odometry measurement an
-euclidean transformation it is also a member of $SE(2)$ group.
+noise affecting the sensors.  Being an odometry measurement, an
+Euclidean transformation, it is also a member of $SE(2)$ group.
 Assuming the noise affecting the measurement being white and Gaussian,
 it can be modeled by an $3 \times 3$ symmetric positive definite
 information matrix.  In real applications the entries of this matrix
@@ -1057,7 +1057,7 @@ $\bx^\mathrm{s}_{t+1}$ consists of these two entities:
 If the robot senses a landmark $\bx^\mathrm{l}_i$ from the location
 $\bx^\mathrm{s}_t$, the corresponding measurement will be modeled by
 an edge going from the robot pose to the landmark. A measurement about
-the landmark consists in a point in the $x-y$ plane, perceived in the
+the landmark consists in a point in the $x$-$y$ plane, perceived in the
 robot frame. Thus a landmark measurement lives in $\Re^2$ as the
 landmarks do. Again, under white Gaussian noise assumption, the
 noise can be modeled by its inverse covariance. Accordingly, an edge between
@@ -1085,7 +1085,7 @@ an Euclidean space. Thus the increments $\bTDeltax^\mathrm{l}_i$ can live in the
   \bx^\mathrm{l}_i \boxplus \bTDeltax^\mathrm{l}_i   & \doteq & \bx^\mathrm{l}_i + \bTDeltax^\mathrm{l}_i
 \end{eqnarray}
 
-The poses, conversely, live in the non euclidean space $SE(2)$.
+The poses, conversely, live in the non-Euclidean space $SE(2)$.
 This space admits many parameterizations. Examples include:
 rotation matrix $\bR(\theta)$ and translation vector $(x \; y)^T$ or
 angle $\theta$ and translation vector $(x \; y)^T$.
@@ -1097,14 +1097,16 @@ pose and a pose increment.  One possible choice would be to treat the
 three scalar parameters $x$, $y$ and $\theta$ of a pose as if they
 were a vector, and define the $\boxplus$ as the vector sum.  There are
 many reasons why this is a poor choice. One of them is that the angles
-are not euclidean, and one would need to re-normalize them after every
+are not Euclidean, and one would need to re-normalize them after every
 addition.
 
 A better choice is to define the $\boxplus$ between a pose and a pose
 increment as the motion composition operator. Namely, given a robot
 pose $\bx^{s}_t = (x\; y\; \theta)^T$ and an increment $\bTDeltax^{s}_t
-= (\Delta x\; \Delta y\; \Delta \theta)^T$, the operator can be defined as
-follows:
+= (\Delta x\; \Delta y\; \Delta \theta)^T$, where $\Delta x$ is the
+longitudinal displacement (i.e. in direction of the heading of the robot),
+$\Delta y$ the lateral displacement and $\Delta \theta$ the rotational
+change, the operator can be defined as follows:
 \begin{eqnarray}
     \bx^\mathrm{s}_t \boxplus \bTDeltax^\mathrm{s}_t   & \doteq & 
     \left( 
@@ -1133,7 +1135,7 @@ and is defined as follows:
 
 \subsection{Design of the Error Functions}
 The last step in formalizing the problem is to design error functions
-$\be(bx_k)$ that are ``reasonable''. A common way do is to define a
+$\be(\bx_k)$ that are ``reasonable''. A common way to do this to define a
 so-called \emph{measurement} function $\bh_k(\bx_k)$ that ``predicts''
 a measurement $\hat \bz_k$, given the knowledge of the vertices in the
 set $\bx_k$. Defining this function is usually rather easy, and can be
@@ -1141,7 +1143,7 @@ done by directly implementing the error model. Subsequently, the error
 vector can be computed as the vector difference between the prediction
 $\hat \bz_k$ and the real measurement.  This is a general approach to
 construct error functions and it works when the space of the errors is
-locally euclidean around the origin of the measurement. If this is not
+locally Euclidean around the origin of the measurement. If this is not
 the case one might want to replace the vector difference with some
 other operator which is more ``regular''.
 
@@ -1151,17 +1153,20 @@ first step is to construct a measurement prediction
 $\bh^\mathrm{l}_{t,i}(\bx^\mathrm{s}_t, \bx^\mathrm{l}_i)$ that computes
 a ``virtual measurement''. This virtual measurement is the position of
 the landmark $\bx^\mathrm{l}_i$, seen from the robot position
-$\bx^\mathrm{s}_t$. The equation for $\bh^\mathrm{l}_{t,i}(\cdot)$is the
+$\bx^\mathrm{s}_t$. The equation for $\bh^\mathrm{l}_{t,i}(\cdot)$ is the
 following:
 \begin{eqnarray}
-    \bh^\mathrm{l}_{t,i}(\bx^\mathrm{s}_t, \bx^\mathrm{l}_i)   & \doteq & 
-    \left( 
+    \bh^\mathrm{l}_{t,i}(\bx^\mathrm{s}_t, \bx^\mathrm{l}_i)   & \doteq &
+    \left(
     \begin{array}{c}
         (x^\mathrm{s}_t - x_i)  \cos \theta^\mathrm{s}_t + (y^\mathrm{s}_t - y_i) \sin \theta^\mathrm{s}_t \\
-      - (x^\mathrm{s}_t - x_i)  \sin \theta^\mathrm{s}_t + (y^\mathrm{s}_t - y_i) \cos \theta^\mathrm{s}_t 
+      - (x^\mathrm{s}_t - x_i)  \sin \theta^\mathrm{s}_t + (y^\mathrm{s}_t - y_i) \cos \theta^\mathrm{s}_t
     \end{array}
     \right)
 \end{eqnarray}
+which converts the position of the landmark into the coordinate system of
+the robot.
+
 Since the landmarks live in an Euclidean space, it is reasonable to
 compute the error function as the normal vector difference.  This
 leads to the following definition for the error functions of the
@@ -1182,7 +1187,7 @@ In short this function returns the motion that brings the robot from
 $\bx^\mathrm{s}_t$ to $\bx^\mathrm{s}_{t+1}$, that is the ``ideal''
 odometry.  Once again the error can be obtained as a difference
 between the measurement and the prediction. However, since our measurements
-do not live in an euclidean space we can use the $\ominus$ instead of the vector difference.
+do not live in an Euclidean space we can use $\ominus$ instead of the vector difference.
 
 \begin{eqnarray}
     \be^\mathrm{s}_{t,t+1}(\bx^\mathrm{s}_t, \bx^\mathrm{s}_{t+1})   & \doteq & \bz_{t,t+1} \ominus \bh^\mathrm{s}_{t,t+1}(\bx^\mathrm{s}_t, \bx^\mathrm{s}_{t+1}).
@@ -1219,14 +1224,14 @@ representation, via the types defined in \verb+Eigen::Geometry+.  Thus
 we define an \verb+operator*(...)+ that implements the motion composition
 operator $\oplus$, and an \verb+inverse()+ function that returns the inverse of
 a transformation. For convenience we also implement an
-\verb+operator *+ that transforms 2D points. To convert the elements
-from and to a minimal representation that utilizes an $Eigen::Vector3d$
+\verb+operator*+ that transforms 2D points. To convert the elements
+from and to a minimal representation that utilizes an \verb+Eigen::Vector3d+
 we define the methods \verb+fromVector(...)+ and \verb+toVector(...)+.
 The constructor initializes this class as a point in the origin
 oriented at 0 degrees.  Note that having a separate class for a group
 is not mandatory in \gopt, but makes the code much more readable and
 reusable. The corresponding C++ class is reported in
-Listing~\ref{lst:se2}
+Listing~\ref{lst:se2}.
 \begin{lstlisting}[float,label=lst:se2,caption=\text{Helper class to represent $SE(2)$}.]
 class SE2 {
   public:
@@ -1279,7 +1284,8 @@ Once we defined our nice $SE(2)$ group we are ready to implement the
 vertices.  To this end we extend the \verb+BaseVertex<>+ class, and we
 derive the classes \verb+VertexSE2+ to represent a robot pose and
 \verb+VertexPointXY+ to represent a point landmark in the plane.
-The class definition is reported in Listing~\ref{lst:vertexse2}
+The class definition for robot pose vertices is reported in
+Listing~\ref{lst:vertexse2}.
 The pose-vertex extends a template specialization of
 \verb+BaseVertex<>+.  We should say to \gopt{} that the internal type
 has dimension 3 and that the estimate is of type \verb+SE2+. This
@@ -1293,7 +1299,7 @@ current estimate.  To do this, we first convert the vector passed as
 argument into an \verb+SE(2)+, then we multiply this increment at the
 right of the previous estimate.  After that we should implement the
 read and write functions to a stream, but this is straight-forward and
-you can look it up yourself in the code. 
+you can look it up yourself in the code.
 
 \begin{lstlisting}[float,label=lst:vertexse2,caption=Vertex representing
   a 2D robot pose]
