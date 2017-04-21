@@ -82,6 +82,11 @@ namespace g2o {
 
       virtual bool read(std::istream& is);
       virtual bool write(std::ostream& os) const;
+      
+      unsigned long long timestamp;
+      int agentID;
+      Eigen::Isometry2d odometryReading; //odometryReading at this vertex, meaning this odometry belongs to the edge from a previous node to this current node.
+      bool isOptimizedAtLeastOnce;
 
   };
 

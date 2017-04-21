@@ -14,6 +14,9 @@ ADD_LIBRARY(types_slam2d ${G2O_LIB_TYPE}
   edge_se2_twopointsxy.cpp	edge_se2_twopointsxy.h
   edge_se2_lotsofxy.cpp		edge_se2_lotsofxy.h
   g2o_types_slam2d_api.h
+  vertex_xy_vxvy.cpp	vertex_point_xy.cpp
+  edge_xy_vxvy.h		  edge_xy_vxvy.cpp	
+  edge_se2_xy_vxvy.h	edge_se2_xy_vxvy.cpp
 )
 
 SET_TARGET_PROPERTIES(types_slam2d PROPERTIES OUTPUT_NAME ${LIB_PREFIX}types_slam2d)
