@@ -36,6 +36,7 @@
 #include "base_edge.h"
 #include "robust_kernel.h"
 #include "g2o/config.h"
+#include "dynamic_aligned_buffer.hpp"
 
 namespace g2o {
 

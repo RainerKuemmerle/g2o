@@ -74,6 +74,8 @@ void BaseMultiEdge<D, E>::linearizeOplus()
   ErrorVector errorBak;
   ErrorVector errorBeforeNumeric = _error;
 
+  dynamic_aligned_buffer<double> buffer{ 12 };
+
   for (size_t i = 0; i < _vertices.size(); ++i) {
     //Xi - estimate the jacobian numerically
     OptimizableGraph::Vertex* vi = static_cast<OptimizableGraph::Vertex*>(_vertices[i]);
@@ -83,11 +85,9 @@ void BaseMultiEdge<D, E>::linearizeOplus()
 
     const int vi_dim = vi->dimension();
     assert(vi_dim >= 0);
-#ifdef _MSC_VER
-    double* add_vi = new double[vi_dim];
-#else
-    double add_vi[vi_dim];
-#endif
+
+    double* add_vi = buffer.request(vi_dim);
+
     std::fill(add_vi, add_vi + vi_dim, 0.0);
     assert(_dimension >= 0);
     assert(_jacobianOplus[i].rows() == _dimension && _jacobianOplus[i].cols() == vi_dim && "jacobian cache dimension does not match");
@@ -110,9 +110,6 @@ void BaseMultiEdge<D, E>::linearizeOplus()
 
       _jacobianOplus[i].col(d) = scalar * errorBak;
     } // end dimension
-#ifdef _MSC_VER
-    delete[] add_vi;
-#endif
   }
   _error = errorBeforeNumeric;
 
@@ -266,6 +263,8 @@ void BaseMultiEdge<-1, E>::linearizeOplus()
   ErrorVector errorBak;
   ErrorVector errorBeforeNumeric = _error;
 
+  dynamic_aligned_buffer<double> buffer{ 12 };
+
   for (size_t i = 0; i < _vertices.size(); ++i) {
     //Xi - estimate the jacobian numerically
     OptimizableGraph::Vertex* vi = static_cast<OptimizableGraph::Vertex*>(_vertices[i]);
@@ -275,11 +274,9 @@ void BaseMultiEdge<-1, E>::linearizeOplus()
 
     const int vi_dim = vi->dimension();
     assert(vi_dim >= 0);
-#ifdef _MSC_VER
-    double* add_vi = new double[vi_dim];
-#else
-    double add_vi[vi_dim];
-#endif
+
+    double* add_vi = buffer.request(vi_dim);
+
     std::fill(add_vi, add_vi + vi_dim, 0.0);
     assert(_dimension >= 0);
     assert(_jacobianOplus[i].rows() == _dimension && _jacobianOplus[i].cols() == vi_dim && "jacobian cache dimension does not match");
@@ -302,9 +299,6 @@ void BaseMultiEdge<-1, E>::linearizeOplus()
 
       _jacobianOplus[i].col(d) = scalar * errorBak;
     } // end dimension
-#ifdef _MSC_VER
-    delete[] add_vi;
-#endif
   }
   _error = errorBeforeNumeric;
 
