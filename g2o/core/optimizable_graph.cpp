@@ -228,30 +228,65 @@ namespace g2o {
     clearParameters();
   }
 
-  bool OptimizableGraph::addVertex(HyperGraph::Vertex* v, Data* userData)
+  bool OptimizableGraph::addVertex(OptimizableGraph::Vertex* ov, Data* userData)
   {
-    if (v->id() <0){
-      cerr << __FUNCTION__ << ": FATAL, a vertex with (negative) ID " << v->id() << " cannot be inserted in the graph" << endl;
+    if (ov->id() <0){
+      cerr << __FUNCTION__ << ": FATAL, a vertex with (negative) ID " << ov->id() << " cannot be inserted in the graph" << endl;
       assert(0 && "Invalid vertex id");
       return false;
     }
-    Vertex* inserted = vertex(v->id());
+    Vertex* inserted = vertex(ov->id());
     if (inserted) {
-      cerr << __FUNCTION__ << ": FATAL, a vertex with ID " << v->id() << " has already been registered with this graph" << endl;
+      cerr << __FUNCTION__ << ": FATAL, a vertex with ID " << ov->id() << " has already been registered with this graph" << endl;
       assert(0 && "Vertex with this ID already contained in the graph");
       return false;
     }
-    OptimizableGraph::Vertex* ov=dynamic_cast<OptimizableGraph::Vertex*>(v);
-    assert(ov && "Vertex does not inherit from OptimizableGraph::Vertex");
     if (ov->_graph != 0 && ov->_graph != this) {
-      cerr << __FUNCTION__ << ": FATAL, vertex with ID " << v->id() << " has already registered with another graph " << ov->_graph << endl;
+      cerr << __FUNCTION__ << ": FATAL, vertex with ID " << ov->id() << " has already registered with another graph " << ov->_graph << endl;
       assert(0 && "Vertex already registered with another graph");
       return false;
     }
     if (userData)
       ov->setUserData(userData);
     ov->_graph=this;
-    return HyperGraph::addVertex(v);
+    return HyperGraph::addVertex(ov);
+  }
+
+  bool OptimizableGraph::addVertex(HyperGraph::Vertex* v, Data* userData)
+  {
+      OptimizableGraph::Vertex* ov = dynamic_cast<OptimizableGraph::Vertex*>(v);
+      assert(ov && "Vertex does not inherit from OptimizableGraph::Vertex");
+      if (!ov)
+          return false;
+
+      return addVertex(ov, userData);
+  }
+
+  bool OptimizableGraph::addEdge(OptimizableGraph::Edge* e)
+  {
+      bool eresult = HyperGraph::addEdge(e);
+      if (!eresult)
+          return false;
+      //    std::cerr << "called HyperGraph::addEdge" << std::endl;
+      e->_internalId = _nextEdgeId++;
+      if (e->numUndefinedVertices())
+          return true;
+      //    std::cerr << "internalId set" << std::endl;
+      if (!e->resolveParameters()) {
+          cerr << __FUNCTION__ << ": FATAL, cannot resolve parameters for edge " << e << endl;
+          return false;
+      }
+      //    std::cerr << "parameters set" << std::endl;
+      if (!e->resolveCaches()) {
+          cerr << __FUNCTION__ << ": FATAL, cannot resolve caches for edge " << e << endl;
+          return false;
+      }
+      //    std::cerr << "updating jacobian size" << std::endl;
+      _jacobianWorkspace.updateSize(e);
+
+      //    std::cerr << "about to return true" << std::endl;
+
+      return true;
   }
 
   bool OptimizableGraph::addEdge(HyperGraph::Edge* e_)
@@ -259,31 +294,10 @@ namespace g2o {
     OptimizableGraph::Edge* e = dynamic_cast<OptimizableGraph::Edge*>(e_);
     assert(e && "Edge does not inherit from OptimizableGraph::Edge");
     //    std::cerr << "subclass of OptimizableGraph::Edge confirmed";
-    if (! e)
+    if (!e)
       return false;
-    bool eresult = HyperGraph::addEdge(e);
-    if (! eresult)
-      return false;
-    //    std::cerr << "called HyperGraph::addEdge" << std::endl;
-    e->_internalId = _nextEdgeId++;
-    if (e->numUndefinedVertices())
-      return true;
-    //    std::cerr << "internalId set" << std::endl;
-    if (! e->resolveParameters()){
-      cerr << __FUNCTION__ << ": FATAL, cannot resolve parameters for edge " << e << endl;
-      return false;
-    }
-    //    std::cerr << "parameters set" << std::endl;
-    if (! e->resolveCaches()){
-      cerr << __FUNCTION__ << ": FATAL, cannot resolve caches for edge " << e << endl;
-      return false;
-    }
-    //    std::cerr << "updating jacobian size" << std::endl;
-    _jacobianWorkspace.updateSize(e);
-
-    //    std::cerr << "about to return true" << std::endl;
-
-    return true;
+    
+    return addEdge(e);
   }
 
   bool OptimizableGraph::setEdgeVertex(HyperGraph::Edge* e, int pos, HyperGraph::Vertex* v){
