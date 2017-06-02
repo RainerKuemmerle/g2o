@@ -105,8 +105,8 @@ void BaseUnaryEdge<D, E, VertexXiType>::linearizeOplus()
   ErrorVector error1;
   ErrorVector errorBeforeNumeric = _error;
 
-  number_t add_vi[VertexXiType::Dimension];
-  std::fill(add_vi, add_vi + VertexXiType::Dimension, 0.0);
+  number_t add_vi[VertexXiType::Dimension] = {};
+
   // add small step along the unit vector in each dimension
   for (int d = 0; d < VertexXiType::Dimension; ++d) {
     vi->push();

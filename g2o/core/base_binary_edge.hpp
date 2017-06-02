@@ -160,7 +160,7 @@ void BaseBinaryEdge<D, E, VertexXiType, VertexXjType>::linearizeOplus()
 
   if (iNotFixed) {
     //Xi - estimate the jacobian numerically
-    number_t add_vi[VertexXiType::Dimension] = { 0 };
+    number_t add_vi[VertexXiType::Dimension] = {};
 
     // add small step along the unit vector in each dimension
     for (int d = 0; d < VertexXiType::Dimension; ++d) {
@@ -184,7 +184,7 @@ void BaseBinaryEdge<D, E, VertexXiType, VertexXjType>::linearizeOplus()
 
   if (jNotFixed) {
     //Xj - estimate the jacobian numerically
-    number_t add_vj[VertexXjType::Dimension] = { 0 };
+    number_t add_vj[VertexXjType::Dimension] = {};
 
     // add small step along the unit vector in each dimension
     for (int d = 0; d < VertexXjType::Dimension; ++d) {
