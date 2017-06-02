@@ -25,6 +25,7 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "isometry3d_mappings.h"
+#include "g2o/stuff/misc.h"
 
 namespace g2o {
   namespace internal {
