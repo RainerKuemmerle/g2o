@@ -76,7 +76,8 @@ class G2O_VIEWER_API MainWindow : public QMainWindow, public Ui::BaseMainWindow
     void on_btnSetZero_clicked();
     void on_btnForceStop_clicked();
     void on_btnOptimizerParamaters_clicked();
-
+    void on_btnReload_clicked();
+ 
   protected:
     void fixGraph();
     bool allocateSolver(bool& allocatedNewSolver);
@@ -92,6 +93,7 @@ class G2O_VIEWER_API MainWindow : public QMainWindow, public Ui::BaseMainWindow
 
     ViewerPropertiesWidget* _viewerPropertiesWidget;
     PropertiesWidget* _optimizerPropertiesWidget;
+    std::string _filename;
 };
 
 
