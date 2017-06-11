@@ -40,15 +40,14 @@ using namespace g2o;
 
 MainWindow::MainWindow(QWidget * parent, Qt::WindowFlags flags) :
   QMainWindow(parent, flags),
-  _lastSolver(-1), _currentSolver(0), _viewerPropertiesWidget(0), _optimizerPropertiesWidget(0)
+  _lastSolver(-1), _currentSolver(0), _viewerPropertiesWidget(0), _optimizerPropertiesWidget(0),
+  _filename("")
 {
   setupUi(this);
   leKernelWidth->setValidator(new QDoubleValidator(-numeric_limits<double>::max(), numeric_limits<double>::max(), 7, this));
   plainTextEdit->setMaximumBlockCount(1000);
   btnForceStop->hide();
   QObject::connect(cbDrawAxis, SIGNAL(toggled(bool)), viewer, SLOT(setAxisIsDrawn(bool)));
-  QObject::connect(reloadButton, SIGNAL(pressed()), this, SLOT(on_btnReload_clicked(void)));
-  _filename = "";
 }
 
 MainWindow::~MainWindow()
@@ -151,8 +150,8 @@ void MainWindow::on_btnSetZero_clicked()
 
 void MainWindow::on_btnReload_clicked()
 {
-  cout << "reload" << endl;
   if (_filename.length()>0){
+    cerr << "reloading " << _filename << endl;
     viewer->graph->clear();
     viewer->graph->load(_filename.c_str());
     viewer->setUpdateDisplay(true);

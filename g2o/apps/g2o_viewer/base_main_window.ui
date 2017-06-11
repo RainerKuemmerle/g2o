@@ -174,6 +174,13 @@
         </widget>
        </item>
        <item>
+        <widget class="QPushButton" name="btnReload">
+         <property name="text">
+          <string>Reload</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QPushButton" name="btnSetZero">
          <property name="text">
           <string>SetZero</string>
@@ -198,13 +205,6 @@
         <widget class="QPushButton" name="btnQuit">
          <property name="text">
           <string>Quit</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="reloadButton">
-         <property name="text">
-          <string>Reload</string>
          </property>
         </widget>
        </item>
@@ -264,7 +264,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>23</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
