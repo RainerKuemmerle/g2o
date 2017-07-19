@@ -35,50 +35,58 @@
 namespace g2o {
 
 
-  /**
+/**
  * \brief Sim3 Vertex, (x,y,z,qw,qx,qy,qz)
  * the parameterization for the increments constructed is a 7d vector
  * (x,y,z,qx,qy,qz) (note that we leave out the w part of the quaternion.
- */
-  class VertexSim3Expmap : public BaseVertex<7, Sim3>
+ *
+ * Will represent relative transformation between two cameras
+*/
+class VertexSim3Expmap : public BaseVertex<7, Sim3> 
+{
+ public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
+  VertexSim3Expmap();
+  virtual bool read(std::istream& is);
+  virtual bool write(std::ostream& os) const;
+
+  virtual void setToOriginImpl() {
+    _estimate = Sim3();
+  }
+
+  virtual void oplusImpl(const double* update_) 
   {
-  public:
-    EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
-    VertexSim3Expmap();
-    virtual bool read(std::istream& is);
-    virtual bool write(std::ostream& os) const;
+    Eigen::Map<Vector7d> update(const_cast<double*>(update_));
 
-    virtual void setToOriginImpl() {
-      _estimate = Sim3();
-    }
+    if (_fix_scale)
+      update[6] = 0;
 
-    virtual void oplusImpl(const double* update_)
-    {
-      Eigen::Map<Vector7d> update(const_cast<double*>(update_));
+    Sim3 s(update);
+    setEstimate(s*estimate());
+  }
 
-      if (_fix_scale)
-        update[6] = 0;
+  Vector2D _principle_point1, _principle_point2;
+  Vector2D _focal_length1, _focal_length2;
 
-      Sim3 s(update);
-      setEstimate(s*estimate());
-    }
+  Vector2D cam_map1(const Vector2D &v) const {
+    Vector2D res;
+    res[0] = v[0] * _focal_length1[0] + _principle_point1[0];
+    res[1] = v[1] * _focal_length1[1] + _principle_point1[1];
+    return res;
+  }
 
-    Vector2D _principle_point;
-    Vector2D _focal_length;
+  Vector2D cam_map2(const Vector2D &v) const {
+    Vector2D res;
+    res[0] = v[0] * _focal_length2[0] + _principle_point2[0];
+    res[1] = v[1] * _focal_length2[1] + _principle_point2[1];
+    return res;
+  }
 
-    Vector2D cam_map(const Vector2D & v) const
-    {
-      Vector2D res;
-      res[0] = v[0]*_focal_length[0] + _principle_point[0];
-      res[1] = v[1]*_focal_length[1] + _principle_point[1];
-      return res;
-    }
-
-    bool _fix_scale;
+  bool _fix_scale;
 
 
-  protected:
-  };
+ protected:
+};
 
   /**
  * \brief 7D edge between two Vertex7
@@ -128,10 +136,30 @@ class EdgeSim3ProjectXYZ : public  BaseBinaryEdge<2, Vector2D,  VertexSBAPointXY
       const VertexSBAPointXYZ* v2 = static_cast<const VertexSBAPointXYZ*>(_vertices[0]);
 
       Vector2D obs(_measurement);
-      _error = obs-v1->cam_map(project(v1->estimate().map(v2->estimate())));
+      _error = obs-v1->cam_map1(project(v1->estimate().map(v2->estimate())));
     }
 
    // virtual void linearizeOplus();
+
+};
+
+/**/
+class EdgeInverseSim3ProjectXYZ : public BaseBinaryEdge<2, Vector2D, VertexSBAPointXYZ, VertexSim3Expmap> {
+ public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+  EdgeInverseSim3ProjectXYZ();
+  virtual bool read(std::istream &is);
+  virtual bool write(std::ostream &os) const;
+
+  void computeError() {
+    const VertexSim3Expmap *v1 = static_cast<const VertexSim3Expmap *>(_vertices[1]);
+    const VertexSBAPointXYZ *v2 = static_cast<const VertexSBAPointXYZ *>(_vertices[0]);
+
+    Vector2D obs(_measurement);
+    _error = obs - v1->cam_map2(project(v1->estimate().inverse().map(v2->estimate())));
+  }
+
+  // virtual void linearizeOplus();
 
 };
 
