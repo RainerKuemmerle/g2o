@@ -40,7 +40,8 @@ using namespace g2o;
 
 MainWindow::MainWindow(QWidget * parent, Qt::WindowFlags flags) :
   QMainWindow(parent, flags),
-  _lastSolver(-1), _currentSolver(0), _viewerPropertiesWidget(0), _optimizerPropertiesWidget(0)
+  _lastSolver(-1), _currentSolver(0), _viewerPropertiesWidget(0), _optimizerPropertiesWidget(0),
+  _filename("")
 {
   setupUi(this);
   leKernelWidth->setValidator(new QDoubleValidator(-numeric_limits<double>::max(), numeric_limits<double>::max(), 7, this));
@@ -145,6 +146,17 @@ void MainWindow::on_btnSetZero_clicked()
   viewer->graph->setToOrigin();
   viewer->setUpdateDisplay(true);
   viewer->updateGL();
+}
+
+void MainWindow::on_btnReload_clicked()
+{
+  if (_filename.length()>0){
+    cerr << "reloading " << _filename << endl;
+    viewer->graph->clear();
+    viewer->graph->load(_filename.c_str());
+    viewer->setUpdateDisplay(true);
+    viewer->updateGL();
+  }
 }
 
 void MainWindow::fixGraph()
@@ -359,6 +371,9 @@ bool MainWindow::loadFromFile(const QString& filename)
 {
   viewer->graph->clear();
   bool loadStatus = load(filename);
+  if (loadStatus){
+    _filename = filename.toStdString();
+  }
   cerr << "loaded " << filename.toStdString() << " with " << viewer->graph->vertices().size()
     << " vertices and " << viewer->graph->edges().size() << " measurements" << endl;
   viewer->updateGL();
