@@ -137,11 +137,13 @@ namespace g2o {
         _currentLambda*=_ni;
         _ni*=2;
         _optimizer->pop(); // restore the last state before trying to optimize
+        if (!g2o_isfinite(_currentLambda))
+          break;
       }
       qmax++;
     } while (rho<0 && qmax < _maxTrialsAfterFailure->value() && ! _optimizer->terminate());
 
-    if (qmax == _maxTrialsAfterFailure->value() || rho==0)
+    if (qmax == _maxTrialsAfterFailure->value() || rho==0 || !g2o_isfinite(_currentLambda))
       return Terminate;
     return OK;
   }
