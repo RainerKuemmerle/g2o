@@ -29,6 +29,7 @@
 
 #include "g2o/core/base_vertex.h"
 #include "g2o/core/base_binary_edge.h"
+#include "g2o/core/base_unary_edge.h"
 #include "g2o/types/slam3d/se3_ops.h"
 #include "types_sba.h"
 #include <Eigen/Geometry>
@@ -198,6 +199,129 @@ class G2O_TYPES_SBA_API EdgeProjectXYZ2UVU : public  BaseBinaryEdge<3, Vector3D,
     CameraParameters * _cam;
 };
 
+// Projection using focal_length in x and y directions
+class EdgeSE3ProjectXYZ : public BaseBinaryEdge<2, Vector2D, VertexSBAPointXYZ, VertexSE3Expmap> {
+ public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
+  EdgeSE3ProjectXYZ();
+
+  bool read(std::istream &is);
+
+  bool write(std::ostream &os) const;
+
+  void computeError() {
+    const VertexSE3Expmap *v1 = static_cast<const VertexSE3Expmap *>(_vertices[1]);
+    const VertexSBAPointXYZ *v2 = static_cast<const VertexSBAPointXYZ *>(_vertices[0]);
+    Vector2D obs(_measurement);
+    _error = obs - cam_project(v1->estimate().map(v2->estimate()));
+  }
+
+  bool isDepthPositive() {
+    const VertexSE3Expmap *v1 = static_cast<const VertexSE3Expmap *>(_vertices[1]);
+    const VertexSBAPointXYZ *v2 = static_cast<const VertexSBAPointXYZ *>(_vertices[0]);
+    return (v1->estimate().map(v2->estimate()))(2) > 0.0;
+  }
+
+  virtual void linearizeOplus();
+
+  Vector2D cam_project(const Vector3D &trans_xyz) const;
+
+  double fx, fy, cx, cy;
+};
+
+// Edge to optimize only the camera pose
+class EdgeSE3ProjectXYZOnlyPose : public BaseUnaryEdge<2, Vector2D, VertexSE3Expmap> {
+ public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
+  EdgeSE3ProjectXYZOnlyPose() {}
+
+  bool read(std::istream &is);
+
+  bool write(std::ostream &os) const;
+
+  void computeError() {
+    const VertexSE3Expmap *v1 = static_cast<const VertexSE3Expmap *>(_vertices[0]);
+    Vector2D obs(_measurement);
+    _error = obs - cam_project(v1->estimate().map(Xw));
+  }
+
+  bool isDepthPositive() {
+    const VertexSE3Expmap *v1 = static_cast<const VertexSE3Expmap *>(_vertices[0]);
+    return (v1->estimate().map(Xw))(2) > 0.0;
+  }
+
+  virtual void linearizeOplus();
+
+  Vector2D cam_project(const Vector3D &trans_xyz) const;
+
+  Vector3D Xw;
+  double fx, fy, cx, cy;
+};
+
+// Projection using focal_length in x and y directions stereo
+class EdgeStereoSE3ProjectXYZ : public BaseBinaryEdge<3, Vector3D, VertexSBAPointXYZ, VertexSE3Expmap> {
+ public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
+  EdgeStereoSE3ProjectXYZ();
+
+  bool read(std::istream &is);
+
+  bool write(std::ostream &os) const;
+
+  void computeError() {
+    const VertexSE3Expmap *v1 = static_cast<const VertexSE3Expmap *>(_vertices[1]);
+    const VertexSBAPointXYZ *v2 = static_cast<const VertexSBAPointXYZ *>(_vertices[0]);
+    Vector3D obs(_measurement);
+    _error = obs - cam_project(v1->estimate().map(v2->estimate()), bf);
+  }
+
+  bool isDepthPositive() {
+    const VertexSE3Expmap *v1 = static_cast<const VertexSE3Expmap *>(_vertices[1]);
+    const VertexSBAPointXYZ *v2 = static_cast<const VertexSBAPointXYZ *>(_vertices[0]);
+    return (v1->estimate().map(v2->estimate()))(2) > 0.0;
+  }
+
+  virtual void linearizeOplus();
+
+  Vector3D cam_project(const Vector3D &trans_xyz, const float &bf) const;
+
+  double fx, fy, cx, cy, bf;
+};
+
+// Edge to optimize only the camera pose stereo
+class EdgeStereoSE3ProjectXYZOnlyPose : public BaseUnaryEdge<3, Vector3D, VertexSE3Expmap> {
+ public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
+  EdgeStereoSE3ProjectXYZOnlyPose() {}
+
+  bool read(std::istream &is);
+
+  bool write(std::ostream &os) const;
+
+  void computeError() {
+    const VertexSE3Expmap *v1 = static_cast<const VertexSE3Expmap *>(_vertices[0]);
+    Vector3D obs(_measurement);
+    _error = obs - cam_project(v1->estimate().map(Xw));
+  }
+
+  bool isDepthPositive() {
+    const VertexSE3Expmap *v1 = static_cast<const VertexSE3Expmap *>(_vertices[0]);
+    return (v1->estimate().map(Xw))(2) > 0.0;
+  }
+
+  virtual void linearizeOplus();
+
+  Vector3D cam_project(const Vector3D &trans_xyz) const;
+
+  Vector3D Xw;
+  double fx, fy, cx, cy, bf;
+};
+
 } // end namespace
 
 #endif
+
