@@ -78,10 +78,15 @@ IF(WIN32)
     MESSAGE(STATUS "Compiling with MSVC")
     ADD_DEFINITIONS(-DNOMINMAX)
     ADD_DEFINITIONS(-D_USE_MATH_DEFINES)
+
+    # exception handling
+    add_definitions("/EHsc")
+
     # SSE2 optimizations
     if(NOT CMAKE_SIZEOF_VOID_P EQUAL 8)  # No need to specify if building for x64 (actually, it generates an annoying warning)
         ADD_DEFINITIONS("/arch:SSE2")
     endif()
+    
     IF (BUILD_SHARED_LIBS)
       # disable warning on missing DLL interfaces
       ADD_DEFINITIONS("/wd4251")
@@ -89,7 +94,7 @@ IF(WIN32)
     # Fix issue: https://github.com/RainerKuemmerle/g2o/issues/66
     #            Link error LNK2005 due to duplicated symbols
     add_definitions("/Ob2")	
-	# Fix other stupid warnings:
+    # Fix other stupid warnings:
     add_definitions(-D_CRT_SECURE_NO_WARNINGS=1)  # Avoid deprecated fprintf(), etc.
     add_definitions("/nologo")
     add_definitions("/wd4244") # Conversion from double -> int
