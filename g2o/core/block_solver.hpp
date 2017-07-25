@@ -25,6 +25,8 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "sparse_optimizer.h"
+#include "dynamic_aligned_buffer.hpp"
+
 #include <Eigen/LU>
 #include <fstream>
 #include <iomanip>
@@ -70,8 +72,8 @@ void BlockSolver<Traits>::resize(int* blockPoseIndices, int numPoseBlocks,
   if (_doSchur) {
     // the following two are only used in schur
     assert(_sizePoses > 0 && "allocating with wrong size");
-    _coefficients = new double [s];
-    _bschur = new double[_sizePoses];
+    _coefficients = allocate_aligned<double>(s);
+    _bschur = allocate_aligned<double>(_sizePoses);
   }
 
   _Hpp=new PoseHessianType(blockPoseIndices, blockPoseIndices, numPoseBlocks, numPoseBlocks);
@@ -101,9 +103,9 @@ void BlockSolver<Traits>::deallocate()
   _Hschur=0;
   delete _DInvSchur;
   _DInvSchur=0;
-  delete[] _coefficients;
+  free_aligned(_coefficients);
   _coefficients = 0;
-  delete[] _bschur;
+  free_aligned(_bschur);
   _bschur = 0;
   delete _HplCCS;
   _HplCCS = 0;

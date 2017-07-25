@@ -1,4 +1,5 @@
 ADD_LIBRARY(core ${G2O_LIB_TYPE}
+dynamic_aligned_buffer.hpp
 base_edge.h
 base_binary_edge.h          hyper_graph_action.cpp
 base_binary_edge.hpp        hyper_graph_action.h
