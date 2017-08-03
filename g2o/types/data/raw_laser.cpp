@@ -95,7 +95,7 @@ namespace g2o {
     Point2DVector points;
     for (size_t i = 0; i < _ranges.size(); ++i) {
       const double& r = _ranges[i];
-      if (r < _laserParams.maxRange) {
+      if (r < _laserParams.maxRange && r > _laserParams.minRange) {
         double alpha = _laserParams.firstBeamAngle + i * _laserParams.angularStep;
         points.push_back(Vector2D(cos(alpha) * r, sin(alpha) * r));
       }
