@@ -38,8 +38,8 @@ namespace g2o {
   struct G2O_TYPES_DATA_API LaserParameters
   {
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
-    LaserParameters(int type, int beams, double firstBeamAngle, double angularStep, double maxRange, double accuracy, int remissionMode);
-    LaserParameters(int beams, double firstBeamAngle, double angularStep, double maxRange);
+    LaserParameters(int type, int beams, double firstBeamAngle, double angularStep, double maxRange, double accuracy, int remissionMode, double minRange = 0.0);
+    LaserParameters(int beams, double firstBeamAngle, double angularStep, double maxRange, double minRange = 0.0);
     SE2 laserPose;
     int type;
     double firstBeamAngle;
@@ -48,6 +48,7 @@ namespace g2o {
     double accuracy;
     int remissionMode;
     double maxRange;
+    double minRange;
   };
 
 }
