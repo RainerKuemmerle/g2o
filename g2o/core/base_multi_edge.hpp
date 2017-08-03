@@ -54,7 +54,7 @@ void BaseMultiEdge<D, E>::linearizeOplus(JacobianWorkspace& jacobianWorkspace)
   for (size_t i = 0; i < _vertices.size(); ++i) {
     OptimizableGraph::Vertex* v = static_cast<OptimizableGraph::Vertex*>(_vertices[i]);
     assert(v->dimension() >= 0);
-    new (&_jacobianOplus[i]) JacobianType(jacobianWorkspace.workspaceForVertex(i), D, v->dimension());
+    new (&_jacobianOplus[i]) JacobianType(jacobianWorkspace.workspaceForVertex(i), D < 0 ? _dimension : D, v->dimension());
   }
   linearizeOplus();
 }
