@@ -72,10 +72,6 @@ namespace g2o {
         if (i!=j)
           information()(j,i)=information()(i,j);
       }
-    if (is.bad()) {
-      //  we overwrite the information matrix
-      information().setIdentity();
-    } 
     return true;
   }
 
