@@ -1,5 +1,5 @@
 
-#include <g2o\config.h>
+#include <g2o/config.h>
 
 namespace g2o
 {
