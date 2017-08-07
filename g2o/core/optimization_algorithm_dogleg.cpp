@@ -38,8 +38,9 @@ using namespace std;
 
 namespace g2o {
 
-  OptimizationAlgorithmDogleg::OptimizationAlgorithmDogleg(BlockSolverBase* solver) :
-    OptimizationAlgorithmWithHessian(solver)
+  OptimizationAlgorithmDogleg::OptimizationAlgorithmDogleg(std::unique_ptr<BlockSolverBase> solver)
+      : OptimizationAlgorithmWithHessian(*solver.get()),
+        m_solver{ std::move(solver) }
   {
     _userDeltaInit = _properties.makeProperty<Property<double> >("initialDelta", 1e4);
     _maxTrialsAfterFailure = _properties.makeProperty<Property<int> >("maxTrialsAfterFailure", 100);
@@ -51,28 +52,27 @@ namespace g2o {
   }
 
   OptimizationAlgorithmDogleg::~OptimizationAlgorithmDogleg()
-  {
-  }
+  {}
 
   OptimizationAlgorithm::SolverResult OptimizationAlgorithmDogleg::solve(int iteration, bool online)
   {
     assert(_optimizer && "_optimizer not set");
-    assert(_solver->optimizer() == _optimizer && "underlying linear solver operates on different graph");
-    assert(dynamic_cast<BlockSolverBase*>(_solver) && "underlying linear solver is not a block solver");
+    assert(_solver.optimizer() == _optimizer && "underlying linear solver operates on different graph");
 
-    BlockSolverBase* blockSolver = static_cast<BlockSolverBase*>(_solver);
+    BlockSolverBase& blockSolver = static_cast<BlockSolverBase&>(_solver);
 
-    if (iteration == 0 && !online) { // built up the CCS structure, here due to easy time measure
-      bool ok = _solver->buildStructure();
+    if (iteration == 0 && !online)
+    { // built up the CCS structure, here due to easy time measure
+      bool ok = _solver.buildStructure();
       if (! ok) {
         cerr << __PRETTY_FUNCTION__ << ": Failure while building CCS structure" << endl;
         return OptimizationAlgorithm::Fail;
       }
 
       // init some members to the current size of the problem
-      _hsd.resize(_solver->vectorSize());
-      _hdl.resize(_solver->vectorSize());
-      _auxVector.resize(_solver->vectorSize());
+      _hsd.resize(_solver.vectorSize());
+      _hdl.resize(_solver.vectorSize());
+      _auxVector.resize(_solver.vectorSize());
       _delta = _userDeltaInit->value();
       _currentLambda = _initialLambda->value();
       _wasPDInAllIterations = true;
@@ -88,16 +88,16 @@ namespace g2o {
 
     double currentChi = _optimizer->activeRobustChi2();
 
-    _solver->buildSystem();
+    _solver.buildSystem();
     if (globalStats) {
       globalStats->timeQuadraticForm = get_monotonic_time()-t;
     }
 
-    VectorXD::ConstMapType b(_solver->b(), _solver->vectorSize());
+    VectorXD::ConstMapType b(_solver.b(), _solver.vectorSize());
 
     // compute alpha
     _auxVector.setZero();
-    blockSolver->multiplyHessian(_auxVector.data(), _solver->b());
+    blockSolver.multiplyHessian(_auxVector.data(), _solver.b());
     double bNormSquared = b.squaredNorm();
     double alpha = bNormSquared / _auxVector.dot(b);
 
@@ -120,12 +120,13 @@ namespace g2o {
         // to be not positive definite in at least one iteration before.
         // We apply a damping factor to obtain a PD matrix.
         bool solverOk = false;
-        while(!solverOk) {
+        while(!solverOk)
+        {
           if (! _wasPDInAllIterations)
-            _solver->setLambda(_currentLambda, true);   // add _currentLambda to the diagonal
-          solverOk = _solver->solve();
+            _solver.setLambda(_currentLambda, true);   // add _currentLambda to the diagonal
+          solverOk = _solver.solve();
           if (! _wasPDInAllIterations)
-            _solver->restoreDiagonal();
+            _solver.restoreDiagonal();
           _wasPDInAllIterations = _wasPDInAllIterations && solverOk;
           if (! _wasPDInAllIterations) {
             // simple strategy to control the damping factor
@@ -143,10 +144,10 @@ namespace g2o {
         if (!solverOk) {
           return Fail;
         }
-        hgnNorm = VectorXD::ConstMapType(_solver->x(), _solver->vectorSize()).norm();
+        hgnNorm = VectorXD::ConstMapType(_solver.x(), _solver.vectorSize()).norm();
       }
 
-      VectorXD::ConstMapType hgn(_solver->x(), _solver->vectorSize());
+      VectorXD::ConstMapType hgn(_solver.x(), _solver.vectorSize());
       assert(hgnNorm >= 0. && "Norm of the GN step is not computed");
 
       if (hgnNorm < _delta) {
@@ -175,7 +176,7 @@ namespace g2o {
 
       // compute the linear gain
       _auxVector.setZero();
-      blockSolver->multiplyHessian(_auxVector.data(), _hdl.data());
+      blockSolver.multiplyHessian(_auxVector.data(), _hdl.data());
       double linearGain = -1 * (_auxVector.dot(_hdl)) + 2 * (b.dot(_hdl));
 
       // apply the update and see what happens

@@ -32,9 +32,6 @@
 
 namespace g2o {
 
-  class SparseOptimizer;
-  class Solver;
-
   /**
    * \brief Implementation of a linear approximation for 2D pose graph SLAM
    *
@@ -57,7 +54,7 @@ namespace g2o {
        * the rotations are solved and afterwards standard non-linear Gauss Newton
        * is carried out.
        */
-      explicit SolverSLAM2DLinear(Solver* solver);
+      explicit SolverSLAM2DLinear(std::unique_ptr<Solver> solver);
       virtual ~SolverSLAM2DLinear();
 
       virtual OptimizationAlgorithm::SolverResult solve(int iteration, bool online = false);

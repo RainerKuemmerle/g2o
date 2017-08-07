@@ -30,6 +30,8 @@
 #include "optimization_algorithm_with_hessian.h"
 #include "g2o_core_api.h"
 
+#include <memory>
+
 namespace g2o {
 
   class BlockSolverBase;
@@ -51,7 +53,7 @@ namespace g2o {
        * construct the Dogleg algorithm, which will use the given Solver for solving the
        * linearized system.
        */
-      explicit OptimizationAlgorithmDogleg(BlockSolverBase* solver);
+      explicit OptimizationAlgorithmDogleg(std::unique_ptr<BlockSolverBase> solver);
       virtual ~OptimizationAlgorithmDogleg();
 
       virtual SolverResult solve(int iteration, bool online = false);
@@ -83,6 +85,9 @@ namespace g2o {
       int _lastStep;                ///< type of the step taken by the algorithm
       bool _wasPDInAllIterations;   ///< the matrix we solve was positive definite in all iterations -> if not apply damping
       int _lastNumTries;
+
+  private:
+      std::unique_ptr<BlockSolverBase> m_solver;
   };
 
 } // end namespace

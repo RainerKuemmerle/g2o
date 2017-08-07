@@ -152,9 +152,11 @@ int main(int argc, char** argv)
   // setup the solver
   g2o::SparseOptimizer optimizer;
   optimizer.setVerbose(false);
-  MyLinearSolver* linearSolver = new MyLinearSolver();
-  MyBlockSolver* solver_ptr = new MyBlockSolver(linearSolver);
-  g2o::OptimizationAlgorithmLevenberg* solver = new g2o::OptimizationAlgorithmLevenberg(solver_ptr);
+
+  g2o::OptimizationAlgorithmLevenberg* solver = new g2o::OptimizationAlgorithmLevenberg(
+      std::make_unique<MyBlockSolver>(
+          std::make_unique<MyLinearSolver>()));
+
   optimizer.setAlgorithm(solver);
 
   // build the optimization problem given the points

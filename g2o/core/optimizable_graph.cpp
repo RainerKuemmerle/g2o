@@ -40,6 +40,7 @@
 #include "hyper_graph_action.h"
 #include "cache.h"
 #include "robust_kernel.h"
+#include "ownership.h"
 
 #include "g2o/stuff/macros.h"
 #include "g2o/stuff/color_macros.h"
@@ -119,13 +120,13 @@ namespace g2o {
 
   OptimizableGraph::Edge::Edge() :
     HyperGraph::Edge(),
-    _dimension(-1), _level(0), _robustKernel(0)
+    _dimension(-1), _level(0), _robustKernel(nullptr)
   {
   }
 
   OptimizableGraph::Edge::~Edge()
   {
-    delete _robustKernel;
+    release(_robustKernel);
   }
 
   OptimizableGraph* OptimizableGraph::Edge::graph(){
@@ -181,7 +182,8 @@ namespace g2o {
   void OptimizableGraph::Edge::setRobustKernel(RobustKernel* ptr)
   {
     if (_robustKernel)
-      delete _robustKernel;
+      release(_robustKernel);
+
     _robustKernel = ptr;
   }
 

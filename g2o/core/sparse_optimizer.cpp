@@ -43,18 +43,20 @@
 #include "g2o/stuff/misc.h"
 #include "g2o/config.h"
 
+#include "g2o/core/ownership.h"
+
 namespace g2o{
   using namespace std;
 
-
   SparseOptimizer::SparseOptimizer() :
-    _forceStopFlag(0), _verbose(false), _algorithm(0), _computeBatchStatistics(false)
+    _forceStopFlag(0), _verbose(false), _algorithm(nullptr), _computeBatchStatistics(false)
   {
     _graphActions.resize(AT_NUM_ELEMENTS);
   }
 
-  SparseOptimizer::~SparseOptimizer(){
-    delete _algorithm;
+  SparseOptimizer::~SparseOptimizer()
+  {
+    release(_algorithm);
     G2OBatchStatistics::setGlobalStats(0);
   }
 
@@ -570,8 +572,10 @@ namespace g2o{
   void SparseOptimizer::setAlgorithm(OptimizationAlgorithm* algorithm)
   {
     if (_algorithm) // reset the optimizer for the formerly used solver
-      _algorithm->setOptimizer(0);
+      _algorithm->setOptimizer(nullptr);
+
     _algorithm = algorithm;
+
     if (_algorithm)
       _algorithm->setOptimizer(this);
   }
