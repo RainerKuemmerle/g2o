@@ -69,14 +69,14 @@ void BlockSolver<Traits>::resize(int* blockPoseIndices, int numPoseBlocks,
     _bschur.reset(allocate_aligned<double>(_sizePoses));
   }
 
-  _Hpp= std::make_unique<PoseHessianType>(blockPoseIndices, blockPoseIndices, numPoseBlocks, numPoseBlocks);
+  _Hpp= std::unique_ptr<PoseHessianType>(new PoseHessianType(blockPoseIndices, blockPoseIndices, numPoseBlocks, numPoseBlocks));
   if (_doSchur) {
-    _Hschur = std::make_unique<PoseHessianType>(blockPoseIndices, blockPoseIndices, numPoseBlocks, numPoseBlocks);
-    _Hll = std::make_unique<LandmarkHessianType>(blockLandmarkIndices, blockLandmarkIndices, numLandmarkBlocks, numLandmarkBlocks);
-    _DInvSchur = std::make_unique<SparseBlockMatrixDiagonal<LandmarkMatrixType>>(_Hll->colBlockIndices());
-    _Hpl = std::make_unique<PoseLandmarkHessianType>(blockPoseIndices, blockLandmarkIndices, numPoseBlocks, numLandmarkBlocks);
-    _HplCCS = std::make_unique<SparseBlockMatrixCCS<PoseLandmarkMatrixType>>(_Hpl->rowBlockIndices(), _Hpl->colBlockIndices());
-    _HschurTransposedCCS = std::make_unique<SparseBlockMatrixCCS<PoseMatrixType>>(_Hschur->colBlockIndices(), _Hschur->rowBlockIndices());
+    _Hschur = std::unique_ptr<PoseHessianType>(new PoseHessianType(blockPoseIndices, blockPoseIndices, numPoseBlocks, numPoseBlocks));
+    _Hll = std::unique_ptr<LandmarkHessianType>(new LandmarkHessianType(blockLandmarkIndices, blockLandmarkIndices, numLandmarkBlocks, numLandmarkBlocks));
+    _DInvSchur = std::unique_ptr<SparseBlockMatrixDiagonal<LandmarkMatrixType>>(new SparseBlockMatrixDiagonal<LandmarkMatrixType>(_Hll->colBlockIndices()));
+    _Hpl = std::unique_ptr<PoseLandmarkHessianType>(new PoseLandmarkHessianType(blockPoseIndices, blockLandmarkIndices, numPoseBlocks, numLandmarkBlocks));
+    _HplCCS = std::unique_ptr<SparseBlockMatrixCCS<PoseLandmarkMatrixType>>(new SparseBlockMatrixCCS<PoseLandmarkMatrixType>(_Hpl->rowBlockIndices(), _Hpl->colBlockIndices()));
+    _HschurTransposedCCS = std::unique_ptr<SparseBlockMatrixCCS<PoseMatrixType>>(new SparseBlockMatrixCCS<PoseMatrixType>(_Hschur->colBlockIndices(), _Hschur->rowBlockIndices()));
 #ifdef G2O_OPENMP
     _coefficientsMutex.resize(numPoseBlocks);
 #endif

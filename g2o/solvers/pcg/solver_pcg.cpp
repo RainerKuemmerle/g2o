@@ -45,8 +45,9 @@ namespace g2o
     {
       std::cerr << "# Using PCG poseDim " << p << " landMarkDim " << l << std::endl;
 
-      return std::make_unique<BlockSolverPL<p, l>>(
-        std::make_unique<LinearSolverPCG<BlockSolverPL<p, l>::PoseMatrixType>>());
+      return std::unique_ptr<BlockSolverPL<p, l>>(new BlockSolverPL<p, l>(
+        std::unique_ptr<LinearSolverPCG<typename BlockSolverPL<p, l>::PoseMatrixType>>(
+            new LinearSolverPCG<typename BlockSolverPL<p, l>::PoseMatrixType>())));
     }
   }
 

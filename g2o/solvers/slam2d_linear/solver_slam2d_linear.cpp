@@ -39,7 +39,7 @@
 
 #include "g2o/solvers/csparse/linear_solver_csparse.h"
 
-#include "g2o\core\solver.h"
+#include "g2o/core/solver.h"
 
 using namespace std;
 

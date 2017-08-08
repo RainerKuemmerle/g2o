@@ -58,10 +58,10 @@ int main(int argc, char** argv)
   arg.parseArgs(argc, argv);
 
   // create the linear solver
-  auto linearSolver = std::make_unique<LinearSolverCSparse<BlockSolverX::PoseMatrixType>>();
+  auto linearSolver = std::unique_ptr<LinearSolverCSparse<BlockSolverX::PoseMatrixType>>(new LinearSolverCSparse<BlockSolverX::PoseMatrixType>());
 
   // create the block solver on top of the linear solver
-  auto blockSolver = std::make_unique<BlockSolverX>(std::move(linearSolver));
+  auto blockSolver = std::unique_ptr<BlockSolverX>(new BlockSolverX(std::move(linearSolver)));
 
   // create the algorithm to carry out the optimization
   //OptimizationAlgorithmGaussNewton* optimizationAlgorithm = new OptimizationAlgorithmGaussNewton(blockSolver);

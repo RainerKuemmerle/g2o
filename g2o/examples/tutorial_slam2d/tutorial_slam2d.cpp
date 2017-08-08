@@ -64,10 +64,10 @@ int main()
 
   // allocating the optimizer
   SparseOptimizer optimizer;
-  auto linearSolver = std::make_unique<SlamLinearSolver>();
+  auto linearSolver = std::unique_ptr<SlamLinearSolver>(new SlamLinearSolver());
   linearSolver->setBlockOrdering(false);
   OptimizationAlgorithmGaussNewton* solver = new OptimizationAlgorithmGaussNewton(
-      std::make_unique<SlamBlockSolver>(std::move(linearSolver)));
+      std::unique_ptr<SlamBlockSolver>(new SlamBlockSolver(std::move(linearSolver))));
 
   optimizer.setAlgorithm(solver);
 

@@ -154,8 +154,8 @@ int main(int argc, char** argv)
   optimizer.setVerbose(false);
 
   g2o::OptimizationAlgorithmLevenberg* solver = new g2o::OptimizationAlgorithmLevenberg(
-      std::make_unique<MyBlockSolver>(
-          std::make_unique<MyLinearSolver>()));
+      std::unique_ptr<MyBlockSolver>(new MyBlockSolver(
+          std::unique_ptr<MyLinearSolver>(new MyLinearSolver()))));
 
   optimizer.setAlgorithm(solver);
 

@@ -44,8 +44,9 @@ namespace g2o
     std::unique_ptr<g2o::Solver> AllocateSolver()
     {
         std::cerr << "# Using DENSE poseDim " << p << " landMarkDim " << l << std::endl;
-        return std::make_unique<BlockSolverPL<p, l>>(
-          std::make_unique<LinearSolverDense<BlockSolverPL<p, l>::PoseMatrixType>>());
+        return std::unique_ptr<BlockSolverPL<p, l>>(new BlockSolverPL<p, l>(
+          std::unique_ptr<LinearSolverDense<typename BlockSolverPL<p, l>::PoseMatrixType>>(
+              new LinearSolverDense<typename BlockSolverPL<p, l>::PoseMatrixType>())));
     }
   }
 
