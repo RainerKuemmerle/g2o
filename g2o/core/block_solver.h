@@ -171,8 +171,8 @@ namespace g2o {
 
       bool _doSchur;
 
-      std::unique_ptr<double[], void(*)(double*)> _coefficients;
-      std::unique_ptr<double[], void(*)(double*)> _bschur;
+      std::unique_ptr<double[], aligned_deleter<double>> _coefficients;
+      std::unique_ptr<double[], aligned_deleter<double>> _bschur;
 
       int _numPoses, _numLandmarks;
       int _sizePoses, _sizeLandmarks;

@@ -39,10 +39,7 @@ namespace g2o {
 template <typename Traits>
 BlockSolver<Traits>::BlockSolver(std::unique_ptr<LinearSolverType> linearSolver)
     :   BlockSolverBase(),
-        _linearSolver(std::move(linearSolver)),
-        _coefficients(nullptr, &free_aligned<double>),
-        _bschur(nullptr, &free_aligned<double>)
-
+        _linearSolver(std::move(linearSolver))
 {
   // workspace
   _xSize=0;

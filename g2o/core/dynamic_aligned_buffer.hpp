@@ -22,7 +22,6 @@ namespace g2o
     template<typename Type>
     void free_aligned(Type* block)
     {
-        
         Eigen::internal::aligned_free(block);
     }
 
@@ -71,5 +70,14 @@ namespace g2o
 
         std::size_t m_size;
         Type* m_ptr;
+    };
+
+    template<typename T>
+    struct aligned_deleter
+    {
+        void operator()(T* block)
+        {
+            free_aligned(block);
+        }
     };
 }
