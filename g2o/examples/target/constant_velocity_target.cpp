@@ -35,10 +35,12 @@ int main()
   optimizer.setVerbose(false);
 
   typedef BlockSolver< BlockSolverTraits<6, 6> > BlockSolver;
-  BlockSolver::LinearSolverType * linearSolver
-      = new LinearSolverCholmod<BlockSolver::PoseMatrixType>();
-  BlockSolver* blockSolver = new BlockSolver(linearSolver);
-  OptimizationAlgorithm* optimizationAlgorithm = new OptimizationAlgorithmGaussNewton(blockSolver);
+
+  OptimizationAlgorithm* optimizationAlgorithm = new OptimizationAlgorithmGaussNewton(
+    std::unique_ptr<BlockSolver>(new BlockSolver(
+      std::unique_ptr<LinearSolverCholmod<BlockSolver::PoseMatrixType>>(
+        new LinearSolverCholmod<BlockSolver::PoseMatrixType>()))));
+
   optimizer.setAlgorithm(optimizationAlgorithm);
 
   // Sample the start location of the target

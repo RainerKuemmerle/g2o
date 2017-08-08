@@ -28,12 +28,11 @@ int main()
   // Create the block solver - the dimensions are specified because
   // 3D observations marginalise to a 3D estimate
   typedef BlockSolver<BlockSolverTraits<3, 3> > BlockSolver_3_3;
-  BlockSolver_3_3::LinearSolverType* linearSolver
-      = new LinearSolverCholmod<BlockSolver_3_3::PoseMatrixType>();
-  BlockSolver_3_3* blockSolver
-      = new BlockSolver_3_3(linearSolver);
-  OptimizationAlgorithmGaussNewton* solver
-    = new OptimizationAlgorithmGaussNewton(blockSolver);
+  OptimizationAlgorithmGaussNewton* solver = new OptimizationAlgorithmGaussNewton(
+    std::unique_ptr<BlockSolver_3_3>(new BlockSolver_3_3(
+      std::unique_ptr<LinearSolverCholmod<BlockSolver_3_3::PoseMatrixType>>(
+        new LinearSolverCholmod<BlockSolver_3_3::PoseMatrixType>()))));
+
   optimizer.setAlgorithm(solver);
 
   // Sample the actual location of the target

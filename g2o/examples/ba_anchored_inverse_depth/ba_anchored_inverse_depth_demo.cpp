@@ -138,24 +138,24 @@ int main(int argc, const char* argv[]){
 
   g2o::SparseOptimizer optimizer;
   optimizer.setVerbose(false);
+  
   g2o::OptimizationAlgorithmLevenberg * solver;
   if (SCHUR_TRICK){
-    g2o::BlockSolver_6_3::LinearSolverType * linearSolver;
-
-    linearSolver
-        = new g2o::LinearSolverCholmod<g2o
-        ::BlockSolver_6_3::PoseMatrixType>();
-    g2o::BlockSolver_6_3 * solver_ptr
-        = new g2o::BlockSolver_6_3(linearSolver);
-    solver = new g2o::OptimizationAlgorithmLevenberg(solver_ptr);
+    solver = new g2o::OptimizationAlgorithmLevenberg(
+      std::unique_ptr<g2o::BlockSolver_6_3>(new g2o::BlockSolver_6_3(
+        std::unique_ptr<g2o::LinearSolverCholmod<g2o::BlockSolver_6_3::PoseMatrixType>>(
+          new g2o::LinearSolverCholmod<g2o::BlockSolver_6_3::PoseMatrixType>()
+        )
+      ))
+    );
   } else {
-    g2o::BlockSolverX::LinearSolverType * linearSolver;
-    linearSolver
-        = new g2o::LinearSolverCholmod<g2o
-        ::BlockSolverX::PoseMatrixType>();
-    g2o::BlockSolverX * solver_ptr
-        = new g2o::BlockSolverX(linearSolver);
-    solver = new g2o::OptimizationAlgorithmLevenberg(solver_ptr);
+    solver = new g2o::OptimizationAlgorithmLevenberg(
+      std::unique_ptr<g2o::BlockSolverX>(new g2o::BlockSolverX(
+        std::unique_ptr<g2o::LinearSolverCholmod<g2o::BlockSolverX::PoseMatrixType>>(
+          new g2o::LinearSolverCholmod<g2o::BlockSolverX::PoseMatrixType>()
+        )
+      ))
+    );
   }
 
   optimizer.setAlgorithm(solver);
