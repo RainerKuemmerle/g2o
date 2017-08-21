@@ -54,10 +54,9 @@ namespace g2o {
     {
       std::cerr << "# Using PCG online poseDim " << p << " landMarkDim " << l << " blockordering 1" << std::endl;
 
-      auto linearSolver = std::unique_ptr<LinearSolverPCG<typename BlockSolverPL<p, l>::PoseMatrixType>>(
-            new LinearSolverPCG<typename BlockSolverPL<p, l>::PoseMatrixType>());
+      auto linearSolver = g2o::make_unique<LinearSolverPCG<typename BlockSolverPL<p, l>::PoseMatrixType>>();
       linearSolver->setMaxIterations(6);
-      return std::unique_ptr<BlockSolverPL<p, l>>(new BlockSolverPL<p, l>(std::move(linearSolver)));
+      return g2o::make_unique<BlockSolverPL<p, l>>(std::move(linearSolver));
     }
   }
 

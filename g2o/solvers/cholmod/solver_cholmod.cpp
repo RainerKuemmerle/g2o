@@ -47,9 +47,9 @@ namespace g2o {
     std::unique_ptr<BlockSolverBase> AllocateSolver()
     {
       std::cerr << "# Using CHOLMOD poseDim " << p << " landMarkDim " << l << " blockordering " << blockorder << std::endl;
-      auto linearSolver = std::unique_ptr<LinearSolverCholmod<typename BlockSolverPL<p, l>::PoseMatrixType>>(new LinearSolverCholmod<typename BlockSolverPL<p, l>::PoseMatrixType>());
+      auto linearSolver = g2o::make_unique<LinearSolverCholmod<typename BlockSolverPL<p, l>::PoseMatrixType>>();
       linearSolver->setBlockOrdering(blockorder);
-      return std::unique_ptr<BlockSolverPL<p, l>>(new BlockSolverPL<p, l>(std::move(linearSolver)));
+      return g2o::make_unique<BlockSolverPL<p, l>>(std::move(linearSolver));
     }
   }
 

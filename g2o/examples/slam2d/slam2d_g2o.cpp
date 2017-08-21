@@ -46,20 +46,20 @@ int main(int argc, char** argv)
   typedef LinearSolverCSparse<SlamBlockSolver::PoseMatrixType> SlamLinearSolver;
 
   {
-    auto linearSolver = std::unique_ptr<SlamLinearSolver>(new SlamLinearSolver());
+    auto linearSolver = g2o::make_unique<SlamLinearSolver>();
     linearSolver->setBlockOrdering(false);
 
     mw.solverGaussNewton  = new OptimizationAlgorithmGaussNewton(
-      std::unique_ptr<SlamBlockSolver>(new SlamBlockSolver(std::move(linearSolver)))
+      g2o::make_unique<SlamBlockSolver>(std::move(linearSolver))
     );
   }
   
   {
-    auto linearSolver = std::unique_ptr<SlamLinearSolver>(new SlamLinearSolver());
+    auto linearSolver = g2o::make_unique<SlamLinearSolver>();
     linearSolver->setBlockOrdering(false);
 
     mw.solverLevenberg  = new OptimizationAlgorithmLevenberg(
-      std::unique_ptr<SlamBlockSolver>(new SlamBlockSolver(std::move(linearSolver)))
+      g2o::make_unique<SlamBlockSolver>(std::move(linearSolver))
     );
   }
 

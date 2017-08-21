@@ -29,9 +29,8 @@ int main()
   // 3D observations marginalise to a 3D estimate
   typedef BlockSolver<BlockSolverTraits<3, 3> > BlockSolver_3_3;
   OptimizationAlgorithmGaussNewton* solver = new OptimizationAlgorithmGaussNewton(
-    std::unique_ptr<BlockSolver_3_3>(new BlockSolver_3_3(
-      std::unique_ptr<LinearSolverCholmod<BlockSolver_3_3::PoseMatrixType>>(
-        new LinearSolverCholmod<BlockSolver_3_3::PoseMatrixType>()))));
+    g2o::make_unique<BlockSolver_3_3>(
+      g2o::make_unique<LinearSolverCholmod<BlockSolver_3_3::PoseMatrixType>>()));
 
   optimizer.setAlgorithm(solver);
 

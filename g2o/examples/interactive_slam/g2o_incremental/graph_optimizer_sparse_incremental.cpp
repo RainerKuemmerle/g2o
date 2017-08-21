@@ -36,9 +36,8 @@ namespace g2o {
     {
       std::cerr << "# Using CHOLMOD online poseDim " << p << " landMarkDim " << l << " blockordering 1" << std::endl;
 
-      return std::unique_ptr<BlockSolverPL<p, l>>(new BlockSolverPL<p, l>(
-        std::unique_ptr<LinearSolverCholmodOnline<typename BlockSolverPL<p, l>::PoseMatrixType>>(
-            new LinearSolverCholmodOnline<typename BlockSolverPL<p, l>::PoseMatrixType>())));
+      return g2o::make_unique<BlockSolverPL<p, l>>(
+        g2o::make_unique<LinearSolverCholmodOnline<typename BlockSolverPL<p, l>::PoseMatrixType>>());
     }
 
     /**

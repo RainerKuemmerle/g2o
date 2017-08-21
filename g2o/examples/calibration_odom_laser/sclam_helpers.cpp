@@ -110,13 +110,13 @@ namespace g2o {
     typedef BlockSolver< BlockSolverTraits<-1, -1> >  SclamBlockSolver;
     typedef LinearSolverCSparse<SclamBlockSolver::PoseMatrixType> SclamLinearSolver;
 
-    std::unique_ptr<SclamLinearSolver> linearSolver = std::unique_ptr<SclamLinearSolver>(new SclamLinearSolver());
+    std::unique_ptr<SclamLinearSolver> linearSolver = g2o::make_unique<SclamLinearSolver>();
     linearSolver->setBlockOrdering(false);
     OptimizationAlgorithm* solver = 0;
     if (levenberg) {
-      solver = new OptimizationAlgorithmLevenberg(std::unique_ptr<SclamBlockSolver>(new SclamBlockSolver(std::move(linearSolver))));
+      solver = new OptimizationAlgorithmLevenberg(g2o::make_unique<SclamBlockSolver>(std::move(linearSolver)));
     } else {
-      solver = new OptimizationAlgorithmGaussNewton(std::unique_ptr<SclamBlockSolver>(new SclamBlockSolver(std::move(linearSolver))));
+      solver = new OptimizationAlgorithmGaussNewton(g2o::make_unique<SclamBlockSolver>(std::move(linearSolver)));
     }
     optimizer.setAlgorithm(solver);
   }

@@ -142,20 +142,12 @@ int main(int argc, const char* argv[]){
   g2o::OptimizationAlgorithmLevenberg * solver;
   if (SCHUR_TRICK){
     solver = new g2o::OptimizationAlgorithmLevenberg(
-      std::unique_ptr<g2o::BlockSolver_6_3>(new g2o::BlockSolver_6_3(
-        std::unique_ptr<g2o::LinearSolverCholmod<g2o::BlockSolver_6_3::PoseMatrixType>>(
-          new g2o::LinearSolverCholmod<g2o::BlockSolver_6_3::PoseMatrixType>()
-        )
-      ))
-    );
+      g2o::make_unique<g2o::BlockSolver_6_3>(
+        g2o::make_unique<g2o::LinearSolverCholmod<g2o::BlockSolver_6_3::PoseMatrixType>>()));
   } else {
     solver = new g2o::OptimizationAlgorithmLevenberg(
-      std::unique_ptr<g2o::BlockSolverX>(new g2o::BlockSolverX(
-        std::unique_ptr<g2o::LinearSolverCholmod<g2o::BlockSolverX::PoseMatrixType>>(
-          new g2o::LinearSolverCholmod<g2o::BlockSolverX::PoseMatrixType>()
-        )
-      ))
-    );
+      g2o::make_unique<g2o::BlockSolverX>(
+        g2o::make_unique<g2o::LinearSolverCholmod<g2o::BlockSolverX::PoseMatrixType>>()));
   }
 
   optimizer.setAlgorithm(solver);
