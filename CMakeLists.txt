@@ -162,7 +162,8 @@ IF(G2O_BUILD_EXAMPLES)
   MESSAGE(STATUS "Compiling g2o examples")
 ENDIF(G2O_BUILD_EXAMPLES)
 
-SET(G2O_FAST_MATH OFF CACHE BOOL "Enable fast math operations")
+OPTION(G2O_FAST_MATH "Enable fast math operations" OFF)
+OPTION(G2O_NO_IMPLICIT_OWNERSHIP_OF_OBJECTS "Disables memory management in the graph types, this requires the callers to manager the memory of edges and nodes" OFF)
 
 # Compiler specific options for gcc
 IF(CMAKE_COMPILER_IS_GNUCXX)
