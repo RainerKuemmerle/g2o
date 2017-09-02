@@ -1,4 +1,4 @@
-CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.1)
 SET(CMAKE_LEGACY_CYGWIN_WIN32 0)
 
 PROJECT(g2o)
@@ -74,33 +74,6 @@ LIST(APPEND CMAKE_MODULE_PATH ${g2o_SOURCE_DIR}/cmake_modules)
 IF(WIN32)
   ADD_DEFINITIONS(-DWINDOWS)
   MESSAGE(STATUS "Compiling on Windows")
-  IF(MSVC)
-    MESSAGE(STATUS "Compiling with MSVC")
-    ADD_DEFINITIONS(-DNOMINMAX)
-    ADD_DEFINITIONS(-D_USE_MATH_DEFINES)
-
-    # exception handling
-    add_definitions("/EHsc")
-
-    # SSE2 optimizations
-    if(NOT CMAKE_SIZEOF_VOID_P EQUAL 8)  # No need to specify if building for x64 (actually, it generates an annoying warning)
-        ADD_DEFINITIONS("/arch:SSE2")
-    endif()
-    
-    IF (BUILD_SHARED_LIBS)
-      # disable warning on missing DLL interfaces
-      ADD_DEFINITIONS("/wd4251")
-    ENDIF()
-    # Fix issue: https://github.com/RainerKuemmerle/g2o/issues/66
-    #            Link error LNK2005 due to duplicated symbols
-    add_definitions("/Ob2")	
-    # Fix other stupid warnings:
-    add_definitions(-D_CRT_SECURE_NO_WARNINGS=1)  # Avoid deprecated fprintf(), etc.
-    add_definitions("/nologo")
-    add_definitions("/wd4244") # Conversion from double -> int
-    add_definitions("/wd4267") # Conversion during return
-    add_definitions("/wd4522") # Duplicated operator=() in Eigen headers
-  ENDIF(MSVC)
 ELSEIF(CYGWIN)
   MESSAGE(STATUS "Compiling on Cygwin")
   ADD_DEFINITIONS(-DCYGWIN)
@@ -189,6 +162,9 @@ IF(G2O_BUILD_EXAMPLES)
   MESSAGE(STATUS "Compiling g2o examples")
 ENDIF(G2O_BUILD_EXAMPLES)
 
+OPTION(G2O_FAST_MATH "Enable fast math operations" OFF)
+OPTION(G2O_NO_IMPLICIT_OWNERSHIP_OF_OBJECTS "Disables memory management in the graph types, this requires the callers to manager the memory of edges and nodes" OFF)
+
 # Compiler specific options for gcc
 IF(CMAKE_COMPILER_IS_GNUCXX)
   OPTION (BUILD_WITH_MARCH_NATIVE "Build with \"-march native\"" ON)
@@ -199,6 +175,11 @@ IF(CMAKE_COMPILER_IS_GNUCXX)
     SET(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -msse4.2")
     SET(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -O3 -msse4.2")
   ENDIF()
+
+  IF(G2O_FAST_MATH)
+    SET(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -ffast-math")
+  ENDIF()
+
   # switch off optimization for debug builds
   SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0")
   SET(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -O0")
@@ -229,19 +210,58 @@ IF(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   #SET(g2o_CXX_FLAGS "${g2o_CXX_FLAGS} -Wall -stdlib=libc++")
 ENDIF()
 
-# C++11 support
-IF(NOT MSVC)
-  include(CheckCXXCompilerFlag)
-  CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
-  CHECK_CXX_COMPILER_FLAG("-std=c++0x" COMPILER_SUPPORTS_CXX0X)
-  if(COMPILER_SUPPORTS_CXX11)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-  elseif(COMPILER_SUPPORTS_CXX0X)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
-  else()
-    message(STATUS "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a different C++ compiler.")
+IF(MSVC)
+  MESSAGE(STATUS "Compiling with MSVC")
+
+  IF (CMAKE_GENERATOR MATCHES "ARM(64)?$")
+    SET(MSVC_ARM ON)
+  ENDIF()
+
+  ADD_DEFINITIONS(-DNOMINMAX)
+  ADD_DEFINITIONS(-D_USE_MATH_DEFINES)
+
+  # exception handling
+  ADD_DEFINITIONS("/EHsc")
+  
+  IF (G2O_FAST_MATH)
+    SET(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /fp:fast")
+  ENDIF()
+  
+  SET(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /Ox /Oi")
+  SET(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} /Ox /Oi")
+  
+  SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0")
+  SET(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -O0")
+
+  # SSE2 optimizations
+  # No need to specify if building for x64 (actually, it generates an annoying warning)
+  if (NOT MSVC_ARM)
+    if(NOT CMAKE_SIZEOF_VOID_P EQUAL 8)
+        ADD_DEFINITIONS("/arch:SSE2")
+    endif()
   endif()
-endif()
+  
+  IF (BUILD_SHARED_LIBS)
+    # disable warning on missing DLL interfaces
+    ADD_DEFINITIONS("/wd4251")
+  ENDIF()
+
+  # Fix issue: https://github.com/RainerKuemmerle/g2o/issues/66
+  #            Link error LNK2005 due to duplicated symbols
+  add_definitions("/Ob2")
+  # Fix other stupid warnings:
+  add_definitions(-D_CRT_SECURE_NO_WARNINGS=1)  # Avoid deprecated fprintf(), etc.
+  add_definitions("/nologo")
+  # TODO not sure this should be a thing
+  add_definitions("/wd4244") # Conversion from number_t -> int
+  add_definitions("/wd4267") # Conversion during return
+  add_definitions("/wd4522") # Duplicated operator=() in Eigen headers
+
+ENDIF(MSVC)
+
+# C++11 support
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # specifying compiler flags
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${g2o_CXX_FLAGS}")

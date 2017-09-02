@@ -35,10 +35,11 @@ int main()
   optimizer.setVerbose(false);
 
   typedef BlockSolver< BlockSolverTraits<6, 6> > BlockSolver;
-  BlockSolver::LinearSolverType * linearSolver
-      = new LinearSolverCholmod<BlockSolver::PoseMatrixType>();
-  BlockSolver* blockSolver = new BlockSolver(linearSolver);
-  OptimizationAlgorithm* optimizationAlgorithm = new OptimizationAlgorithmGaussNewton(blockSolver);
+
+  OptimizationAlgorithm* optimizationAlgorithm = new OptimizationAlgorithmGaussNewton(
+    g2o::make_unique<BlockSolver>(
+      g2o::make_unique<LinearSolverCholmod<BlockSolver::PoseMatrixType>>()));
+
   optimizer.setAlgorithm(optimizationAlgorithm);
 
   // Sample the start location of the target

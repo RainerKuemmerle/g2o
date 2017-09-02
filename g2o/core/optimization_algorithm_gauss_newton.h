@@ -29,6 +29,7 @@
 
 #include "g2o_core_api.h"
 #include "optimization_algorithm_with_hessian.h"
+#include <memory>
 
 namespace g2o {
 
@@ -42,12 +43,15 @@ namespace g2o {
        * construct the Gauss Newton algorithm, which use the given Solver for solving the
        * linearized system.
        */
-      explicit OptimizationAlgorithmGaussNewton(Solver* solver);
+      explicit OptimizationAlgorithmGaussNewton(std::unique_ptr<Solver> solver);
       virtual ~OptimizationAlgorithmGaussNewton();
 
       virtual SolverResult solve(int iteration, bool online = false);
 
       virtual void printVerbose(std::ostream& os) const;
+
+  private:
+    std::unique_ptr<Solver> m_solver;
   };
 
 } // end namespace

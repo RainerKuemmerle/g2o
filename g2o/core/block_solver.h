@@ -26,6 +26,7 @@
 
 #ifndef G2O_BLOCK_SOLVER_H
 #define G2O_BLOCK_SOLVER_H
+
 #include <Eigen/Core>
 #include "solver.h"
 #include "linear_solver.h"
@@ -33,6 +34,9 @@
 #include "sparse_block_matrix_diagonal.h"
 #include "openmp_mutex.h"
 #include "g2o/config.h"
+#include "dynamic_aligned_buffer.hpp"
+
+#include <memory>
 
 namespace g2o {
 
@@ -93,9 +97,9 @@ namespace g2o {
    * \brief Implementation of a solver operating on the blocks of the Hessian
    */
   template <typename Traits>
-  class BlockSolver: public BlockSolverBase {
+  class BlockSolver: public BlockSolverBase
+  {
     public:
-
       static const int PoseDim = Traits::PoseDim;
       static const int LandmarkDim = Traits::LandmarkDim;
       typedef typename Traits::PoseMatrixType PoseMatrixType;
@@ -116,7 +120,7 @@ namespace g2o {
        * NOTE: The BlockSolver assumes exclusive access to the linear solver and will therefore free the pointer
        * in its destructor.
        */
-      BlockSolver(LinearSolverType* linearSolver);
+      BlockSolver(std::unique_ptr<LinearSolverType> linearSolver);
       ~BlockSolver();
 
       virtual bool init(SparseOptimizer* optmizer, bool online = false);
@@ -131,7 +135,7 @@ namespace g2o {
       virtual bool schur() { return _doSchur;}
       virtual void setSchur(bool s) { _doSchur = s;}
 
-      LinearSolver<PoseMatrixType>* linearSolver() const { return _linearSolver;}
+      LinearSolver<PoseMatrixType>& linearSolver() const { return *_linearSolver;}
 
       virtual void setWriteDebug(bool writeDebug);
       virtual bool writeDebug() const {return _linearSolver->writeDebug();}
@@ -146,17 +150,17 @@ namespace g2o {
 
       void deallocate();
 
-      SparseBlockMatrix<PoseMatrixType>* _Hpp;
-      SparseBlockMatrix<LandmarkMatrixType>* _Hll;
-      SparseBlockMatrix<PoseLandmarkMatrixType>* _Hpl;
+      std::unique_ptr<SparseBlockMatrix<PoseMatrixType>> _Hpp;
+      std::unique_ptr<SparseBlockMatrix<LandmarkMatrixType>> _Hll;
+      std::unique_ptr<SparseBlockMatrix<PoseLandmarkMatrixType>> _Hpl;
 
-      SparseBlockMatrix<PoseMatrixType>* _Hschur;
-      SparseBlockMatrixDiagonal<LandmarkMatrixType>* _DInvSchur;
+      std::unique_ptr<SparseBlockMatrix<PoseMatrixType>> _Hschur;
+      std::unique_ptr<SparseBlockMatrixDiagonal<LandmarkMatrixType>> _DInvSchur;
 
-      SparseBlockMatrixCCS<PoseLandmarkMatrixType>* _HplCCS;
-      SparseBlockMatrixCCS<PoseMatrixType>* _HschurTransposedCCS;
+      std::unique_ptr<SparseBlockMatrixCCS<PoseLandmarkMatrixType>> _HplCCS;
+      std::unique_ptr<SparseBlockMatrixCCS<PoseMatrixType>> _HschurTransposedCCS;
 
-      LinearSolver<PoseMatrixType>* _linearSolver;
+      std::unique_ptr<LinearSolverType> _linearSolver;
 
       std::vector<PoseVectorType, Eigen::aligned_allocator<PoseVectorType> > _diagonalBackupPose;
       std::vector<LandmarkVectorType, Eigen::aligned_allocator<LandmarkVectorType> > _diagonalBackupLandmark;
@@ -167,22 +171,28 @@ namespace g2o {
 
       bool _doSchur;
 
-      double* _coefficients;
-      double* _bschur;
+      std::unique_ptr<double[], aligned_deleter<double>> _coefficients;
+      std::unique_ptr<double[], aligned_deleter<double>> _bschur;
 
       int _numPoses, _numLandmarks;
       int _sizePoses, _sizeLandmarks;
   };
 
 
+  template<int p, int l>
+  using BlockSolverPL = BlockSolver< BlockSolverTraits<p, l> >;
+
   //variable size solver
-  typedef BlockSolver< BlockSolverTraits<Eigen::Dynamic, Eigen::Dynamic> > BlockSolverX;
+  using BlockSolverX = BlockSolverPL<Eigen::Dynamic, Eigen::Dynamic>;
+
   // solver for BA/3D SLAM
-  typedef BlockSolver< BlockSolverTraits<6, 3> > BlockSolver_6_3;  
+  using BlockSolver_6_3 = BlockSolverPL<6, 3>;
+
   // solver fo BA with scale
-  typedef BlockSolver< BlockSolverTraits<7, 3> > BlockSolver_7_3;  
+  using BlockSolver_7_3 = BlockSolverPL<7, 3>;
+
   // 2Dof landmarks 3Dof poses
-  typedef BlockSolver< BlockSolverTraits<3, 2> > BlockSolver_3_2;
+  using BlockSolver_3_2 = BlockSolverPL<3, 2>;
 
 } // end namespace
 

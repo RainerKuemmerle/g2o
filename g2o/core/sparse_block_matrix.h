@@ -34,11 +34,13 @@
 #include <iomanip>
 #include <cassert>
 #include <Eigen/Core>
+#include <memory>
 
 #include "sparse_block_matrix_ccs.h"
 #include "matrix_structure.h"
 #include "matrix_operations.h"
 #include "g2o/config.h"
+#include "g2o/stuff/misc.h"
 
 namespace g2o {
 /**
@@ -129,10 +131,14 @@ class SparseBlockMatrix {
 
     //! transposes a block matrix, The transposed type should match the argument false on failure
     template <class MatrixTransposedType>
-    bool transpose(SparseBlockMatrix<MatrixTransposedType>*& dest) const;
+    bool transpose(SparseBlockMatrix<MatrixTransposedType>& dest) const;
+
+    template <class MatrixTransposedType>
+    std::unique_ptr<SparseBlockMatrix<MatrixTransposedType>> transposed() const;
 
     //! adds the current matrix to the destination
-    bool add(SparseBlockMatrix<MatrixType>*& dest) const ;
+    bool add(SparseBlockMatrix<MatrixType>& dest) const;
+    std::unique_ptr<SparseBlockMatrix<MatrixType>> added() const;
 
     //! dest = (*this) *  M
     template <class MatrixResultType, class MatrixFactorType>
@@ -216,6 +222,12 @@ class SparseBlockMatrix {
     //! and the block column is stored as a map row_block -> matrix_block_ptr.
     std::vector <IntBlockMap> _blockCols;
     bool _hasStorage;
+
+  private:
+    template <class MatrixTransposedType>
+    void transpose_internal(SparseBlockMatrix<MatrixTransposedType>& dest) const;
+
+    void add_internal(SparseBlockMatrix<MatrixType>& dest) const;
 };
 
 template < class  MatrixType >

@@ -39,6 +39,8 @@
 
 #include "g2o/solvers/csparse/linear_solver_csparse.h"
 
+#include "g2o/core/solver.h"
+
 using namespace std;
 
 namespace g2o {
@@ -70,14 +72,12 @@ namespace g2o {
       double* _thetaGuess;
   };
 
-  SolverSLAM2DLinear::SolverSLAM2DLinear(Solver* solver) :
-    OptimizationAlgorithmGaussNewton(solver)
-  {
-  }
+  SolverSLAM2DLinear::SolverSLAM2DLinear(std::unique_ptr<Solver> solver)
+    : OptimizationAlgorithmGaussNewton(std::move(solver))
+  {}
 
   SolverSLAM2DLinear::~SolverSLAM2DLinear()
-  {
-  }
+  {}
 
   OptimizationAlgorithm::SolverResult SolverSLAM2DLinear::solve(int iteration, bool online)
   {

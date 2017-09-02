@@ -37,8 +37,9 @@ using namespace std;
 
 namespace g2o {
 
-  OptimizationAlgorithmLevenberg::OptimizationAlgorithmLevenberg(Solver* solver) :
-    OptimizationAlgorithmWithHessian(solver)
+  OptimizationAlgorithmLevenberg::OptimizationAlgorithmLevenberg(std::unique_ptr<Solver> solver)
+      : OptimizationAlgorithmWithHessian(*solver.get()),
+        m_solver{ std::move(solver) }
   {
     _currentLambda = -1.;
     _tau = 1e-5;
@@ -57,10 +58,10 @@ namespace g2o {
   OptimizationAlgorithm::SolverResult OptimizationAlgorithmLevenberg::solve(int iteration, bool online)
   {
     assert(_optimizer && "_optimizer not set");
-    assert(_solver->optimizer() == _optimizer && "underlying linear solver operates on different graph");
+    assert(_solver.optimizer() == _optimizer && "underlying linear solver operates on different graph");
 
     if (iteration == 0 && !online) { // built up the CCS structure, here due to easy time measure
-      bool ok = _solver->buildStructure();
+      bool ok = _solver.buildStructure();
       if (! ok) {
         cerr << __PRETTY_FUNCTION__ << ": Failure while building CCS structure" << endl;
         return OptimizationAlgorithm::Fail;
@@ -78,7 +79,7 @@ namespace g2o {
     double currentChi = _optimizer->activeRobustChi2();
     double tempChi=currentChi;
 
-    _solver->buildSystem();
+    _solver.buildSystem();
     if (globalStats) {
       globalStats->timeQuadraticForm = get_monotonic_time()-t;
     }
@@ -99,19 +100,19 @@ namespace g2o {
         t=get_monotonic_time();
       }
       // update the diagonal of the system matrix
-      _solver->setLambda(_currentLambda, true);
-      bool ok2 = _solver->solve();
+      _solver.setLambda(_currentLambda, true);
+      bool ok2 = _solver.solve();
       if (globalStats) {
         globalStats->timeLinearSolution+=get_monotonic_time()-t;
         t=get_monotonic_time();
       }
-      _optimizer->update(_solver->x());
+      _optimizer->update(_solver.x());
       if (globalStats) {
         globalStats->timeUpdate = get_monotonic_time()-t;
       }
 
       // restore the diagonal
-      _solver->restoreDiagonal();
+      _solver.restoreDiagonal();
 
       _optimizer->computeActiveErrors();
       tempChi = _optimizer->activeRobustChi2();
@@ -167,8 +168,8 @@ namespace g2o {
   double OptimizationAlgorithmLevenberg::computeScale() const
   {
     double scale = 0.;
-    for (size_t j=0; j < _solver->vectorSize(); j++){
-      scale += _solver->x()[j] * (_currentLambda * _solver->x()[j] + _solver->b()[j]);
+    for (size_t j=0; j < _solver.vectorSize(); j++){
+      scale += _solver.x()[j] * (_currentLambda * _solver.x()[j] + _solver.b()[j]);
     }
     return scale;
   }
@@ -186,7 +187,7 @@ namespace g2o {
   void OptimizationAlgorithmLevenberg::printVerbose(std::ostream& os) const
   {
     os
-      << "\t schur= " << _solver->schur()
+      << "\t schur= " << _solver.schur()
       << "\t lambda= " << FIXED(_currentLambda)
       << "\t levenbergIter= " << _levenbergIterations;
   }

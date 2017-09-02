@@ -34,48 +34,47 @@
 #include "g2o/core/optimization_algorithm_gauss_newton.h"
 #include "g2o/core/optimization_algorithm_levenberg.h"
 
-#define DIM_TO_SOLVER(p, l) BlockSolver< BlockSolverTraits<p, l> >
-
-#define ALLOC_DENSE(s, p, l) \
-  if (1) { \
-      std::cerr << "# Using DENSE poseDim " << p << " landMarkDim " << l << std::endl; \
-      DIM_TO_SOLVER(p, l)::LinearSolverType* linearSolver = new LinearSolverDense<DIM_TO_SOLVER(p, l)::PoseMatrixType>(); \
-      s = new DIM_TO_SOLVER(p, l)(linearSolver); \
-  } else (void)0
-
 using namespace std;
 
-namespace g2o {
+namespace g2o
+{
+  namespace
+  {
+    template<int p, int l>
+    std::unique_ptr<g2o::Solver> AllocateSolver()
+    {
+        std::cerr << "# Using DENSE poseDim " << p << " landMarkDim " << l << std::endl;
+        return g2o::make_unique<BlockSolverPL<p, l>>(
+          g2o::make_unique<LinearSolverDense<typename BlockSolverPL<p, l>::PoseMatrixType>>());
+    }
+  }
 
   static OptimizationAlgorithm* createSolver(const std::string& fullSolverName)
   {
-    g2o::Solver* s = 0;
+    static const std::map<std::string, std::function<std::unique_ptr<g2o::Solver>()>> solver_factories{
+      { "pcg", &AllocateSolver<-1, -1> },
+      { "pcg3_2", &AllocateSolver<3, 2> },
+      { "pcg6_3", &AllocateSolver<6, 3> },
+      { "pcg7_3", &AllocateSolver<7, 3> },
+    };
+
+    string solverName = fullSolverName.substr(3);
+    auto solverf = solver_factories.find(solverName);
+    if (solverf == solver_factories.end())
+      return nullptr;
 
     string methodName = fullSolverName.substr(0, 2);
-    string solverName = fullSolverName.substr(3);
 
-    if (solverName == "dense") {
-      ALLOC_DENSE(s, -1, -1);
+    if (methodName == "gn")
+    {
+      return new OptimizationAlgorithmGaussNewton(solverf->second());
     }
-    else if (solverName == "dense3_2") {
-      ALLOC_DENSE(s, 3, 2);
-    }
-    else if (solverName == "dense6_3") {
-      ALLOC_DENSE(s, 6, 3);
-    }
-    else if (solverName == "dense7_3") {
-      ALLOC_DENSE(s, 7, 3);
+    else if (methodName == "lm")
+    {
+      return new OptimizationAlgorithmLevenberg(solverf->second());
     }
 
-    OptimizationAlgorithm* snl = 0;
-    if (methodName == "gn") {
-      snl = new OptimizationAlgorithmGaussNewton(s);
-    }
-    else if (methodName == "lm") {
-      snl = new OptimizationAlgorithmLevenberg(s);
-    }
-
-    return snl;
+    return nullptr;
   }
 
   class DenseSolverCreator : public AbstractOptimizationAlgorithmCreator

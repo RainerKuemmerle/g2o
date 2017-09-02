@@ -131,67 +131,100 @@ namespace g2o {
     return ret;
   }
 
-
   template <class MatrixType>
   template <class MatrixTransposedType>
-  bool SparseBlockMatrix<MatrixType>::transpose(SparseBlockMatrix<MatrixTransposedType>*& dest) const {
-    if (! dest){
-      dest=new SparseBlockMatrix<MatrixTransposedType>(&_colBlockIndices[0], &_rowBlockIndices[0], _colBlockIndices.size(), _rowBlockIndices.size());
-    } else {
-      if (! dest->_hasStorage)
-        return false;
-      if(_rowBlockIndices.size()!=dest->_colBlockIndices.size())
-        return false;
-      if (_colBlockIndices.size()!=dest->_rowBlockIndices.size())
-        return  false;
-      for (size_t i=0; i<_rowBlockIndices.size(); ++i){
-        if(_rowBlockIndices[i]!=dest->_colBlockIndices[i])
-          return false;
-      }
-      for (size_t i=0; i<_colBlockIndices.size(); ++i){
-        if(_colBlockIndices[i]!=dest->_rowBlockIndices[i])
-          return false;
-      }
-    }
-
-    for (size_t i=0; i<_blockCols.size(); ++i){
-      for (typename SparseBlockMatrix<MatrixType>::IntBlockMap::const_iterator it=_blockCols[i].begin(); it!=_blockCols[i].end(); ++it){
-        typename SparseBlockMatrix<MatrixType>::SparseMatrixBlock* s=it->second;
-        typename SparseBlockMatrix<MatrixTransposedType>::SparseMatrixBlock* d=dest->block(i,it->first,true);
+  void SparseBlockMatrix<MatrixType>::transpose_internal(SparseBlockMatrix<MatrixTransposedType>& dest) const
+  {
+    for (size_t i = 0; i<_blockCols.size(); ++i)
+    {
+      for (typename SparseBlockMatrix<MatrixType>::IntBlockMap::const_iterator it = _blockCols[i].begin(); it != _blockCols[i].end(); ++it)
+      {
+        typename SparseBlockMatrix<MatrixType>::SparseMatrixBlock* s = it->second;
+        typename SparseBlockMatrix<MatrixTransposedType>::SparseMatrixBlock* d = dest.block(i, it->first, true);
         *d = s->transpose();
       }
     }
+  }
+
+  template <class MatrixType>
+  template <class MatrixTransposedType>
+  bool SparseBlockMatrix<MatrixType>::transpose(SparseBlockMatrix<MatrixTransposedType>& dest) const
+  {
+    if (!dest._hasStorage)
+      return false;
+    if (_rowBlockIndices.size() != dest._colBlockIndices.size())
+      return false;
+    if (_colBlockIndices.size() != dest._rowBlockIndices.size())
+      return  false;
+    for (size_t i = 0; i<_rowBlockIndices.size(); ++i)
+    {
+      if (_rowBlockIndices[i] != dest._colBlockIndices[i])
+        return false;
+    }
+    for (size_t i = 0; i<_colBlockIndices.size(); ++i)
+    {
+      if (_colBlockIndices[i] != dest._rowBlockIndices[i])
+        return false;
+    }
+
+    transpose_internal(dest);
     return true;
   }
 
   template <class MatrixType>
-  bool SparseBlockMatrix<MatrixType>::add(SparseBlockMatrix*& dest) const {
-    if (! dest){
-      dest=new SparseBlockMatrix(&_rowBlockIndices[0], &_colBlockIndices[0], _rowBlockIndices.size(), _colBlockIndices.size());
-    } else {
-      if (! dest->_hasStorage)
-        return false;
-      if(_rowBlockIndices.size()!=dest->_rowBlockIndices.size())
-        return false;
-      if (_colBlockIndices.size()!=dest->_colBlockIndices.size())
-        return  false;
-      for (size_t i=0; i<_rowBlockIndices.size(); ++i){
-        if(_rowBlockIndices[i]!=dest->_rowBlockIndices[i])
-          return false;
-      }
-      for (size_t i=0; i<_colBlockIndices.size(); ++i){
-        if(_colBlockIndices[i]!=dest->_colBlockIndices[i])
-          return false;
-      }
-    }
-    for (size_t i=0; i<_blockCols.size(); ++i){
-      for (typename SparseBlockMatrix<MatrixType>::IntBlockMap::const_iterator it=_blockCols[i].begin(); it!=_blockCols[i].end(); ++it){
-        typename SparseBlockMatrix<MatrixType>::SparseMatrixBlock* s=it->second;
-        typename SparseBlockMatrix<MatrixType>::SparseMatrixBlock* d=dest->block(it->first,i,true);
-        (*d)+=*s;
+  template <class MatrixTransposedType>
+  std::unique_ptr<SparseBlockMatrix<MatrixTransposedType>> SparseBlockMatrix<MatrixType>::transposed() const
+  {
+    auto dest = g2o::make_unique<SparseBlockMatrix<MatrixTransposedType>>(
+        &_colBlockIndices[0], &_rowBlockIndices[0], _colBlockIndices.size(), _rowBlockIndices.size());
+    transpose_internal(*dest);
+    return std::move(dest);
+  }
+
+  template <class MatrixType>
+  void SparseBlockMatrix<MatrixType>::add_internal(SparseBlockMatrix<MatrixType>& dest) const
+  {
+    for (size_t i = 0; i<_blockCols.size(); ++i)
+    {
+      for (typename SparseBlockMatrix<MatrixType>::IntBlockMap::const_iterator it = _blockCols[i].begin(); it != _blockCols[i].end(); ++it)
+      {
+        typename SparseBlockMatrix<MatrixType>::SparseMatrixBlock* s = it->second;
+        typename SparseBlockMatrix<MatrixType>::SparseMatrixBlock* d = dest.block(it->first, i, true);
+        (*d) += *s;
       }
     }
+  }
+
+  template <class MatrixType>
+  bool SparseBlockMatrix<MatrixType>::add(SparseBlockMatrix<MatrixType>& dest) const
+  {
+    if (!dest._hasStorage)
+      return false;
+    if (_rowBlockIndices.size() != dest._rowBlockIndices.size())
+      return false;
+    if (_colBlockIndices.size() != dest._colBlockIndices.size())
+      return  false;
+    for (size_t i = 0; i<_rowBlockIndices.size(); ++i)
+    {
+      if (_rowBlockIndices[i] != dest._rowBlockIndices[i])
+        return false;
+    }
+    for (size_t i = 0; i<_colBlockIndices.size(); ++i)
+    {
+      if (_colBlockIndices[i] != dest._colBlockIndices[i])
+        return false;
+    }
+
+    add_internal(dest);
     return true;
+  }
+
+  template <class MatrixType>
+  std::unique_ptr<SparseBlockMatrix<MatrixType>> SparseBlockMatrix<MatrixType>::added() const
+  {
+    auto a = g2o::make_unique<SparseBlockMatrix>(&_rowBlockIndices[0], &_colBlockIndices[0], _rowBlockIndices.size(), _colBlockIndices.size());
+    add_internal(*a);
+    return std::move(a);
   }
 
   template <class MatrixType>

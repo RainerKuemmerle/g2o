@@ -29,6 +29,7 @@
 
 #include "macros.h"
 #include <cmath>
+#include <memory>
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
@@ -44,6 +45,15 @@
  **/
 
 namespace g2o {
+
+/**
+ * helper function for creating an object in a unique_ptr.
+ */
+template<typename T, typename ...ArgTs>
+std::unique_ptr<T> make_unique(ArgTs&& ...args)
+{
+  return std::unique_ptr<T>(new T(std::forward<ArgTs>(args)...));
+};
 
 /**
  * return the square value

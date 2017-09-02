@@ -58,14 +58,14 @@ int main(int argc, char** argv)
   arg.parseArgs(argc, argv);
 
   // create the linear solver
-  BlockSolverX::LinearSolverType * linearSolver = new LinearSolverCSparse<BlockSolverX::PoseMatrixType>();
+  auto linearSolver = g2o::make_unique<LinearSolverCSparse<BlockSolverX::PoseMatrixType>>();
 
   // create the block solver on top of the linear solver
-  BlockSolverX* blockSolver = new BlockSolverX(linearSolver);
+  auto blockSolver = g2o::make_unique<BlockSolverX>(std::move(linearSolver));
 
   // create the algorithm to carry out the optimization
   //OptimizationAlgorithmGaussNewton* optimizationAlgorithm = new OptimizationAlgorithmGaussNewton(blockSolver);
-  OptimizationAlgorithmLevenberg* optimizationAlgorithm = new OptimizationAlgorithmLevenberg(blockSolver);
+  OptimizationAlgorithmLevenberg* optimizationAlgorithm = new OptimizationAlgorithmLevenberg(std::move(blockSolver));
 
   // NOTE: We skip to fix a variable here, either this is stored in the file
   // itself or Levenberg will handle it.
