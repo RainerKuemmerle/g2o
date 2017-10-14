@@ -52,6 +52,7 @@ ADD_EXECUTABLE(test_slam3d_jacobian test_slam3d_jacobian.cpp)
 TARGET_LINK_LIBRARIES(test_slam3d_jacobian types_slam3d)
 
 INSTALL(TARGETS types_slam3d
+  EXPORT ${targets_export_name}
   RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/bin
   LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX}/lib
   ARCHIVE DESTINATION ${CMAKE_INSTALL_PREFIX}/lib

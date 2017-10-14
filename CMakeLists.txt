@@ -284,6 +284,32 @@ configure_file(config.h.in ${PROJECT_BINARY_DIR}/g2o/config.h)
 include_directories(${PROJECT_BINARY_DIR})
 INSTALL(FILES ${PROJECT_BINARY_DIR}/g2o/config.h DESTINATION ${CMAKE_INSTALL_PREFIX}/include/g2o)
 
+# Generate cmake installation scripts
+set(generated_dir "${CMAKE_CURRENT_BINARY_DIR}/generated")
+set(version_config "${generated_dir}/${PROJECT_NAME}ConfigVersion.cmake")
+set(project_config "${generated_dir}/${PROJECT_NAME}Config.cmake")
+set(targets_export_name "${PROJECT_NAME}Targets")
+set(config_install_dir "lib/cmake/${PROJECT_NAME}")
+set(namespace "${PROJECT_NAME}::")
+set(G2O_VERSION 1.0.0)
+
+include(CMakePackageConfigHelpers)
+write_basic_package_version_file(
+    "${version_config}" VERSION ${G2O_VERSION} COMPATIBILITY SameMajorVersion
+)
+
+configure_file("${g2o_SOURCE_DIR}/cmake_modules/Config.cmake.in" "${project_config}" @ONLY)
+
+
+install(
+    FILES "${project_config}" "${version_config}"
+    DESTINATION "${config_install_dir}")
+
+install(
+    EXPORT "${targets_export_name}"
+    NAMESPACE "${namespace}"
+    DESTINATION "${config_install_dir}")
+
 # Include the subdirectories
 ADD_SUBDIRECTORY(EXTERNAL)
 ADD_SUBDIRECTORY(g2o)
