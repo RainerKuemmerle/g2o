@@ -38,6 +38,7 @@ TARGET_LINK_LIBRARIES(viewer_library core opengl_helper)
 TARGET_LINK_LIBRARIES(g2o_viewer viewer_library)
 
 INSTALL(TARGETS g2o_viewer viewer_library
+  EXPORT ${targets_export_name}
   RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/bin
   LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX}/lib
   ARCHIVE DESTINATION ${CMAKE_INSTALL_PREFIX}/lib
