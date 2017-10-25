@@ -55,10 +55,11 @@ SET_TARGET_PROPERTIES(g2o_anonymize_observations_application PROPERTIES OUTPUT_N
 
 INSTALL(TARGETS g2o_simulator_library g2o_simulator2d_application g2o_simulator3d_application g2o_anonymize_observations_application
   EXPORT ${targets_export_name}
-  RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/bin
-  LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX}/lib
-  ARCHIVE DESTINATION ${CMAKE_INSTALL_PREFIX}/lib
+  RUNTIME DESTINATION ${runtime_destination}
+  LIBRARY DESTINATION ${library_destination}
+  ARCHIVE DESTINATION ${archive_destination}
+  INCLUDES DESTINATION ${includes_destination}
 )
 
 FILE(GLOB headers "${CMAKE_CURRENT_SOURCE_DIR}/*.h" "${CMAKE_CURRENT_SOURCE_DIR}/*.hpp")
-INSTALL(FILES ${headers} DESTINATION ${CMAKE_INSTALL_PREFIX}/include/g2o/apps/g2o_simulator)
+INSTALL(FILES ${headers} DESTINATION ${includes_destination}/g2o/apps/g2o_simulator)

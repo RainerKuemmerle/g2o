@@ -28,13 +28,15 @@ SET_PROPERTY(TARGET g2o_cli_library APPEND PROPERTY COMPILE_DEFINITIONS_MINSIZER
 
 SET_TARGET_PROPERTIES(g2o_cli_application PROPERTIES OUTPUT_NAME g2o${EXE_POSTFIX})
 
+SET(include_install_dir ${CMAKE_INSTALL_PREFIX}/include)
 
 INSTALL(TARGETS g2o_cli_library g2o_cli_application
   EXPORT ${targets_export_name}
-  RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/bin
-  LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX}/lib
-  ARCHIVE DESTINATION ${CMAKE_INSTALL_PREFIX}/lib
+  RUNTIME DESTINATION ${runtime_destination}
+  LIBRARY DESTINATION ${library_destination}
+  ARCHIVE DESTINATION ${archive_destination}
+  INCLUDES DESTINATION ${includes_destination}
 )
 
 FILE(GLOB headers "${CMAKE_CURRENT_SOURCE_DIR}/*.h" "${CMAKE_CURRENT_SOURCE_DIR}/*.hpp")
-INSTALL(FILES ${headers} DESTINATION ${CMAKE_INSTALL_PREFIX}/include/g2o/apps/g2o_cli)
+INSTALL(FILES ${headers} DESTINATION ${includes_destination}/g2o/apps/g2o_cli)

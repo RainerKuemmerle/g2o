@@ -12,9 +12,9 @@ TARGET_LINK_LIBRARIES(test_slam_interface example_library)
 SET_TARGET_PROPERTIES(test_slam_interface PROPERTIES OUTPUT_NAME test_slam_interface${EXE_POSTFIX})
 
 #INSTALL(TARGETS example_library
-  #RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/bin
-  #LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX}/lib
-  #ARCHIVE DESTINATION ${CMAKE_INSTALL_PREFIX}/lib
+  #RUNTIME DESTINATION ${runtime_destination}
+  #LIBRARY DESTINATION ${library_destination}
+  #ARCHIVE DESTINATION ${archive_destination}
 #)
 
 #FILE(GLOB headers "${CMAKE_CURRENT_SOURCE_DIR}/*.h")
