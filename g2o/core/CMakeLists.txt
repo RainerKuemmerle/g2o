@@ -41,7 +41,7 @@ g2o_core_api.h
 
 SET_TARGET_PROPERTIES(core PROPERTIES OUTPUT_NAME ${LIB_PREFIX}core)
 
-TARGET_LINK_LIBRARIES(core stuff)
+TARGET_LINK_LIBRARIES(core stuff Eigen3::Eigen)
 
 INSTALL(TARGETS core
   EXPORT ${targets_export_name}
