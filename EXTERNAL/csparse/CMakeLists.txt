@@ -66,13 +66,14 @@ ENDIF()
 
 INSTALL(TARGETS csparse
   EXPORT ${targets_export_name}
-  RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/bin
-  LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX}/lib
-  ARCHIVE DESTINATION ${CMAKE_INSTALL_PREFIX}/lib
+  RUNTIME DESTINATION ${runtime_destination}
+  LIBRARY DESTINATION ${library_destination}
+  ARCHIVE DESTINATION ${archive_destination}
+  INCLUDES DESTINATION ${includes_destination}
 )
 
 FILE(GLOB headers "${CMAKE_CURRENT_SOURCE_DIR}/*.h" "${CMAKE_CURRENT_SOURCE_DIR}/*.hpp")
-INSTALL(FILES ${headers} DESTINATION ${CMAKE_INSTALL_PREFIX}/include/EXTERNAL/csparse)
+INSTALL(FILES ${headers} DESTINATION ${includes_destination}/EXTERNAL/csparse)
 
 # Set up the variables
 SET(CSPARSE_LIBRARY "$<TARGET_FILE:csparse>")

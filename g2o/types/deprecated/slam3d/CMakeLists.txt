@@ -30,10 +30,11 @@ SET_TARGET_PROPERTIES(deprecated_types_slam3d PROPERTIES OUTPUT_NAME ${LIB_PREFI
 TARGET_LINK_LIBRARIES(deprecated_types_slam3d ${OPENGL_gl_LIBRARY} core types_slam3d)
 
 INSTALL(TARGETS deprecated_types_slam3d
-  RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/bin
-  LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX}/lib
-  ARCHIVE DESTINATION ${CMAKE_INSTALL_PREFIX}/lib
-)
+  RUNTIME DESTINATION ${runtime_destination}
+  LIBRARY DESTINATION ${library_destination}
+  ARCHIVE DESTINATION ${archive_destination}
+  INCLUDES DESTINATION ${includes_destination}
+  )
 
 FILE(GLOB headers "${CMAKE_CURRENT_SOURCE_DIR}/*.h" "${CMAKE_CURRENT_SOURCE_DIR}/*.hpp")
-INSTALL(FILES ${headers} DESTINATION ${CMAKE_INSTALL_PREFIX}/include/g2o/types/deprecated/slam3d)
+INSTALL(FILES ${headers} DESTINATION ${includes_destination}/g2o/types/deprecated/slam3d)

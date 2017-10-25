@@ -12,6 +12,7 @@ ELSE()
   TARGET_LINK_LIBRARIES(csparse_extension ${CSPARSE_LIBRARY})
 ENDIF()
 
+SET(include_install_dir ${CMAKE_INSTALL_PREFIX}/include)
 
 ADD_LIBRARY(solver_csparse ${G2O_LIB_TYPE}
   solver_csparse.cpp
@@ -25,9 +26,10 @@ TARGET_LINK_LIBRARIES(solver_csparse csparse_extension core)
 
 INSTALL(TARGETS solver_csparse csparse_extension
   EXPORT ${targets_export_name}
-  RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/bin
-  LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX}/lib
-  ARCHIVE DESTINATION ${CMAKE_INSTALL_PREFIX}/lib
+  RUNTIME DESTINATION ${runtime_destination}
+  LIBRARY DESTINATION ${library_destination}
+  ARCHIVE DESTINATION ${archive_destination}
+  INCLUDES DESTINATION ${includes_destination}
 )
 FILE(GLOB headers "${CMAKE_CURRENT_SOURCE_DIR}/*.h" "${CMAKE_CURRENT_SOURCE_DIR}/*.hpp")
-INSTALL(FILES ${headers} DESTINATION ${CMAKE_INSTALL_PREFIX}/include/g2o/solvers/csparse)
+INSTALL(FILES ${headers} DESTINATION ${includes_destination}/g2o/solvers/csparse)

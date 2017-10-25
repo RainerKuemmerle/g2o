@@ -66,6 +66,12 @@ SET(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${g2o_LIBRARY_OUTPUT_DIRECTORY})
 SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${g2o_LIBRARY_OUTPUT_DIRECTORY})
 SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${g2o_RUNTIME_OUTPUT_DIRECTORY})
 
+# Set standard installation directories
+SET(runtime_destination ${CMAKE_INSTALL_PREFIX}/bin)
+SET(library_destination ${CMAKE_INSTALL_PREFIX}/lib)
+SET(archive_destination ${CMAKE_INSTALL_PREFIX}/lib)
+SET(includes_destination ${CMAKE_INSTALL_PREFIX}/include)
+
 # Set search directory for looking for our custom CMake scripts to
 # look for SuiteSparse, QGLViewer, and Eigen3.
 LIST(APPEND CMAKE_MODULE_PATH ${g2o_SOURCE_DIR}/cmake_modules)

@@ -12,11 +12,14 @@ ADD_LIBRARY(stuff ${G2O_LIB_TYPE}
 
 SET_TARGET_PROPERTIES(stuff PROPERTIES OUTPUT_NAME ${LIB_PREFIX}stuff)
 
+SET(include_install_dir ${CMAKE_INSTALL_PREFIX}/include)
+
 INSTALL(TARGETS stuff
   EXPORT ${targets_export_name}
-  RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/bin
-  LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX}/lib
-  ARCHIVE DESTINATION ${CMAKE_INSTALL_PREFIX}/lib
+  RUNTIME DESTINATION ${runtime_destination}
+  LIBRARY DESTINATION ${library_destination}
+  ARCHIVE DESTINATION ${archive_destination}
+  INCLUDES DESTINATION ${includes_destination}
 )
 
 # build our OpenGL helper library
@@ -26,10 +29,12 @@ IF(OPENGL_FOUND AND G2O_HAVE_OPENGL)
   )
   INSTALL(TARGETS opengl_helper
     EXPORT ${targets_export_name}
-    RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/bin
-    LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX}/lib
-    ARCHIVE DESTINATION ${CMAKE_INSTALL_PREFIX}/lib
-  )
+    RUNTIME DESTINATION ${runtime_destination}
+    LIBRARY DESTINATION ${library_destination}
+    ARCHIVE DESTINATION ${archive_destination}
+    INCLUDES DESTINATION ${includes_destination}
+    )
+
   TARGET_LINK_LIBRARIES(opengl_helper ${OPENGL_LIBRARIES})
   SET_TARGET_PROPERTIES(opengl_helper PROPERTIES OUTPUT_NAME ${LIB_PREFIX}opengl_helper)
 ENDIF()
@@ -40,4 +45,4 @@ ENDIF()
 
 FILE(GLOB headers "${CMAKE_CURRENT_SOURCE_DIR}/*.h" "${CMAKE_CURRENT_SOURCE_DIR}/*.hpp")
 
-INSTALL(FILES ${headers} DESTINATION ${CMAKE_INSTALL_PREFIX}/include/g2o/stuff)
+INSTALL(FILES ${headers} DESTINATION ${includes_destination}/g2o/stuff)

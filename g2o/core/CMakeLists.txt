@@ -43,13 +43,16 @@ SET_TARGET_PROPERTIES(core PROPERTIES OUTPUT_NAME ${LIB_PREFIX}core)
 
 TARGET_LINK_LIBRARIES(core stuff Eigen3::Eigen)
 
+SET(include_install_dir ${CMAKE_INSTALL_PREFIX}/include)
+
 INSTALL(TARGETS core
   EXPORT ${targets_export_name}
-  RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/bin
-  LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX}/lib
-  ARCHIVE DESTINATION ${CMAKE_INSTALL_PREFIX}/lib
+  RUNTIME DESTINATION ${runtime_destination}
+  LIBRARY DESTINATION ${library_destination}
+  ARCHIVE DESTINATION ${archive_destination}
+  INCLUDES DESTINATION ${includes_destination}
 )
 
 FILE(GLOB headers "${CMAKE_CURRENT_SOURCE_DIR}/*.h" "${CMAKE_CURRENT_SOURCE_DIR}/*.hpp")
 
-INSTALL(FILES ${headers} DESTINATION ${CMAKE_INSTALL_PREFIX}/include/g2o/core)
+INSTALL(FILES ${headers} DESTINATION ${includes_destination}/g2o/core)
