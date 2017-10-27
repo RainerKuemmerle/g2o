@@ -274,7 +274,15 @@ SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${g2o_CXX_FLAGS}")
 SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${g2o_C_FLAGS}")
 
 # Find Eigen3
-FIND_PACKAGE(Eigen3 REQUIRED)
+FIND_PACKAGE(Eigen3 REQUIRED NO_MODULE)
+
+# Check if the target was set up (this is not available in all cases)
+if (TARGET Eigen3::Eigen)
+  set(G2O_USE_EIGEN3_EIGEN_TARGET TRUE)
+else(TARGET Eigen3::Eigen)
+  set(G2O_USE_EIGEN3_EIGEN_TARGET FALSE)
+  INCLUDE_DIRECTORIES(${EIGEN3_INCLUDE_DIR})
+endif (TARGET Eigen3::Eigen)
 
 # Set up the top-level include directories
 INCLUDE_DIRECTORIES(${g2o_SOURCE_DIR} ${EIGEN3_INCLUDE_DIR})
