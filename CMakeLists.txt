@@ -51,7 +51,7 @@ endif(MSVC90)
 # avoid the problem of loading both the built and installed versions
 # of the shared targets
 IF(APPLE)
-  SET(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE) 
+  SET(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
   SET(CMAKE_INSTALL_RPATH "")
 ENDIF(APPLE)
 
@@ -165,16 +165,74 @@ ENDIF(G2O_BUILD_EXAMPLES)
 OPTION(G2O_FAST_MATH "Enable fast math operations" OFF)
 OPTION(G2O_NO_IMPLICIT_OWNERSHIP_OF_OBJECTS "Disables memory management in the graph types, this requires the callers to manager the memory of edges and nodes" OFF)
 
+# Start of SSE* autodetect code
+# (borrowed from MRPT CMake scripts, BSD)
+OPTION(DO_SSE_AUTODETECT "Enable autodetection of SSE* CPU sets and enable their use in optimized code" ON)
+IF(NOT EXISTS "/proc/cpuinfo")
+	SET(DO_SSE_AUTODETECT OFF)
+ENDIF()
+IF (DO_SSE_AUTODETECT)
+  FILE(READ "/proc/cpuinfo" G2O_CPU_INFO)
+ENDIF()
+
+# Macro for each SSE* var: Invoke with name in uppercase:
+macro(DEFINE_SSE_VAR  _setname)
+	string(TOLOWER ${_setname} _set)
+	IF (DO_SSE_AUTODETECT)
+		# Automatic detection:
+		SET(CMAKE_G2O_HAS_${_setname} 0)
+		IF (${G2O_CPU_INFO} MATCHES ".*${_set}.*")
+			SET(CMAKE_G2O_HAS_${_setname} 1)
+		ENDIF()
+	ELSE (DO_SSE_AUTODETECT)
+		# Manual:
+		SET("DISABLE_${_setname}" OFF CACHE BOOL "Forces compilation WITHOUT ${_setname} extensions")
+		MARK_AS_ADVANCED("DISABLE_${_setname}")
+		SET(CMAKE_G2O_HAS_${_setname} 0)
+		IF (NOT DISABLE_${_setname})
+			SET(CMAKE_G2O_HAS_${_setname} 1)
+		ENDIF (NOT DISABLE_${_setname})
+	ENDIF (DO_SSE_AUTODETECT)
+endmacro(DEFINE_SSE_VAR)
+
+# SSE optimizations:
+DEFINE_SSE_VAR(SSE2)
+DEFINE_SSE_VAR(SSE3)
+DEFINE_SSE_VAR(SSE4_1)
+DEFINE_SSE_VAR(SSE4_2)
+DEFINE_SSE_VAR(SSE4_A)
+
+# Add build flags for clang AND GCC
+if (${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang" OR CMAKE_COMPILER_IS_GNUCXX)
+  # SSE2?
+  IF (CMAKE_G2O_HAS_SSE2)
+    add_compile_options(-msse2)
+  ENDIF()
+  # SSE3?
+  IF (CMAKE_G2O_HAS_SSE3)
+    add_compile_options(-msse3 -mssse3)
+  ENDIF()
+  # SSE4*?
+  IF (CMAKE_G2O_HAS_SSE4_1)
+    add_compile_options(-msse4.1)
+  ENDIF()
+  IF (CMAKE_G2O_HAS_SSE4_2)
+    add_compile_options(-msse4.2)
+  ENDIF()
+  IF (CMAKE_G2O_HAS_SSE4_A)
+    add_compile_options(-msse4a)
+  ENDIF()
+endif()
+# End of of SSE* autodetect code -------
+
 # Compiler specific options for gcc
 IF(CMAKE_COMPILER_IS_GNUCXX)
   OPTION (BUILD_WITH_MARCH_NATIVE "Build with \"-march native\"" ON)
   MESSAGE(STATUS "Compiling with GCC")
-  
-  IF(NOT "${ARCH}" MATCHES "arm")
-    # Generic settings for optimisation
-    SET(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -msse4.2")
-    SET(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -O3 -msse4.2")
-  ENDIF()
+
+  # Generic settings for optimisation
+  SET(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3")
+  SET(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -O3")
 
   IF(G2O_FAST_MATH)
     SET(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -ffast-math")
@@ -186,8 +244,8 @@ IF(CMAKE_COMPILER_IS_GNUCXX)
 
   # OS X
   #IF(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-    #SET(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}") 
-    #SET(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE}") 
+    #SET(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")
+    #SET(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE}")
   #ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
   # Linux
   IF(BUILD_WITH_MARCH_NATIVE AND NOT "${ARCH}" MATCHES "arm" AND "${CMAKE_SYSTEM_NAME}" MATCHES "Linux")
@@ -222,14 +280,14 @@ IF(MSVC)
 
   # exception handling
   ADD_DEFINITIONS("/EHsc")
-  
+
   IF (G2O_FAST_MATH)
     SET(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /fp:fast")
   ENDIF()
-  
+
   SET(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /Ox /Oi")
   SET(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} /Ox /Oi")
-  
+
   SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0")
   SET(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -O0")
 
@@ -240,7 +298,7 @@ IF(MSVC)
         ADD_DEFINITIONS("/arch:SSE2")
     endif()
   endif()
-  
+
   IF (BUILD_SHARED_LIBS)
     # disable warning on missing DLL interfaces
     ADD_DEFINITIONS("/wd4251")
