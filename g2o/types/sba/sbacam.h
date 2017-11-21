@@ -74,7 +74,6 @@ namespace g2o {
       // initialize an object
       SBACam()
       {
-        SE3Quat();
         setKcam(1,1,0.5,0.5,0);  // unit image projection
       }
 
