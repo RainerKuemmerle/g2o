@@ -46,7 +46,7 @@ namespace deprecated {
   }
 
   bool ParameterSE3Offset::read(std::istream& is) {
-    Vector7d off;
+    Vector7 off;
     for (int i=0; i<7; i++) {
       is >> off[i];
       std::cerr << off[i] << " " ;
@@ -57,7 +57,7 @@ namespace deprecated {
   }
   
   bool ParameterSE3Offset::write(std::ostream& os) const {
-    Vector7d off = _offset.toVector();
+    Vector7 off = _offset.toVector();
     for (int i=0; i<7; i++)
       os << off[i] << " ";
     return os.good();
@@ -126,8 +126,8 @@ namespace deprecated {
       return this;
 
     glPushMatrix();
-    const Vector3d& offsetT=that->offsetParam()->offset().translation();
-    AngleAxisd aa(that->offsetParam()->offset().rotation());
+    const Vector3& offsetT=that->offsetParam()->offset().translation();
+    AngleAxis aa(that->offsetParam()->offset().rotation());
     glTranslatef((float)offsetT.x(), (float)offsetT.y(), (float)offsetT.z());
     glRotatef((float)RAD2DEG(aa.angle()),(float)aa.axis().x(),(float)aa.axis().y(),(float)aa.axis().z());
     // if (_cubeSide)

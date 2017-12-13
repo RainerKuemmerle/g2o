@@ -33,12 +33,12 @@ namespace g2o {
 namespace csparse_extension {
 
   struct SparseMatrixEntry{
-    SparseMatrixEntry(int r=-1, int c=-1, double x=0.) :
+    SparseMatrixEntry(int r=-1, int c=-1, number_t x=0) :
       _r(r), _c(c), _x(x)
     {
     }
     int _r,_c;
-    double _x;
+    number_t _x;
   };
 
   struct SparseMatrixEntryColSort
@@ -53,7 +53,7 @@ namespace csparse_extension {
    * Originally from CSparse, avoid memory re-allocations by giving workspace pointers
    * CSparse: Copyright (c) 2006-2011, Timothy A. Davis.
    */
-  int cs_cholsolsymb(const cs *A, double *b, const css* S, double* x, int* work)
+  int cs_cholsolsymb(const cs *A, number_t *b, const css* S, number_t* x, int* work)
   {
     csn *N ;
     int n, ok ;
@@ -85,9 +85,9 @@ namespace csparse_extension {
    * CSparse: Copyright (c) 2006-2011, Timothy A. Davis.
    */
   /* L = chol (A, [pinv parent cp]), pinv is optional */
-  csn* cs_chol_workspace (const cs *A, const css *S, int* cin, double* xin)
+  csn* cs_chol_workspace (const cs *A, const css *S, int* cin, number_t* xin)
   {
-    double d, lki, *Lx, *x, *Cx ;
+    number_t d, lki, *Lx, *x, *Cx ;
     int top, i, p, k, n, *Li, *Lp, *cp, *pinv, *s, *c, *parent, *Cp, *Ci ;
     cs *L, *C, *E ;
     csn *N ;
@@ -95,7 +95,7 @@ namespace csparse_extension {
     n = A->n ;
     N = (csn*) cs_calloc (1, sizeof (csn)) ;       /* allocate result */
     c = cin ;     /* get int workspace */
-    x = xin ;    /* get double workspace */
+    x = xin ;    /* get number_t workspace */
     cp = S->cp ; pinv = S->pinv ; parent = S->parent ;
     C = pinv ? cs_symperm (A, pinv, 1) : ((cs *) A) ;
     E = pinv ? C : NULL ;           /* E is alias for A, or a copy E=A(p,p) */
@@ -156,7 +156,7 @@ namespace csparse_extension {
     if (A->nz == -1) { // CCS matrix
       const int* Ap = A->p;
       const int* Ai = A->i;
-      const double* Ax = A->x;
+      const number_t* Ax = A->x;
       for (int i=0; i < cols; i++) {
         const int& rbeg = Ap[i];
         const int& rend = Ap[i+1];
@@ -170,7 +170,7 @@ namespace csparse_extension {
       entries.reserve(A->nz);
       int *Aj = A->p;             // column indeces
       int *Ai = A->i;             // row indices
-      double *Ax = A->x;          // values;
+      number_t *Ax = A->x;          // values;
       for (int i = 0; i < A->nz; ++i) {
         entries.push_back(SparseMatrixEntry(Ai[i], Aj[i], Ax[i]));
         if (upperTriangular && Ai[i] != Aj[i])

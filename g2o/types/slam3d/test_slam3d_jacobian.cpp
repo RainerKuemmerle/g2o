@@ -29,20 +29,20 @@
 
 #include "g2o/core/jacobian_workspace.h"
 #include "g2o/stuff/macros.h"
+#include "g2o/stuff/misc.h"
 #include "edge_se3.h"
 #include "edge_se3_prior.h"
 
 using namespace std;
 using namespace g2o;
-using namespace Eigen;
 
-Isometry3D randomIsometry3d()
+Isometry3 randomIsometry3d()
 {
-  Vector3D rotAxisAngle = Vector3D::Random();
-  rotAxisAngle += Vector3D::Random();
-  Eigen::AngleAxisd rotation(rotAxisAngle.norm(), rotAxisAngle.normalized());
-  Isometry3D result = (Isometry3D)rotation.toRotationMatrix();
-  result.translation() = Vector3D::Random();
+  Vector3 rotAxisAngle = Vector3::Random();
+  rotAxisAngle += Vector3::Random();
+  AngleAxis rotation(rotAxisAngle.norm(), rotAxisAngle.normalized());
+  Isometry3 result = (Isometry3)rotation.toRotationMatrix();
+  result.translation() = Vector3::Random();
   return result;
 }
 
@@ -54,7 +54,7 @@ int main(int , char** )
     offsetParam->setId(0);
     graph.addParameter(offsetParam);
 
-    Isometry3D zeroPose = Isometry3D::Identity();
+    Isometry3 zeroPose = Isometry3::Identity();
     VertexSE3* v1 = new VertexSE3;
     v1->setId(0);
     graph.addVertex(v1);
@@ -66,7 +66,7 @@ int main(int , char** )
     cout << PVAR(priorEdge->measurement().matrix()) << endl;
     graph.addEdge(priorEdge);
 
-    Eigen::Matrix<double,6,6,Eigen::ColMajor> information = Eigen::Matrix<double,6,6,Eigen::ColMajor>::Identity();
+    Eigen::Matrix<number_t,6,6,Eigen::ColMajor> information = Eigen::Matrix<number_t,6,6,Eigen::ColMajor>::Identity();
 
     cout << "Full information" << endl;
     v1->setEstimate(zeroPose);
@@ -78,8 +78,8 @@ int main(int , char** )
 
     cout << "Only translation" << endl;
     v1->setEstimate(zeroPose);
-    information.block<3,3>(0,0) = Matrix3D::Identity();
-    information.block<3,3>(3,3) = Matrix3D::Zero();
+    information.block<3,3>(0,0) = Matrix3::Identity();
+    information.block<3,3>(3,3) = Matrix3::Zero();
     priorEdge->setInformation(information);
     priorEdge->initialEstimate(auxSet, 0);
     cout << PVAR(priorEdge->chi2()) << endl;
@@ -88,8 +88,8 @@ int main(int , char** )
 
     cout << "Only rotation" << endl;
     v1->setEstimate(zeroPose);
-    information.block<3,3>(0,0) = Matrix3D::Zero();
-    information.block<3,3>(3,3) = Matrix3D::Identity();
+    information.block<3,3>(0,0) = Matrix3::Zero();
+    information.block<3,3>(3,3) = Matrix3::Identity();
     priorEdge->setInformation(information);
     priorEdge->initialEstimate(auxSet, 0);
     cout << PVAR(priorEdge->chi2()) << endl;
@@ -107,7 +107,7 @@ int main(int , char** )
   EdgeSE3 e;
   e.setVertex(0, &v1);
   e.setVertex(1, &v2);
-  e.setInformation(Eigen::Matrix<double,6,6,Eigen::ColMajor>::Identity());
+  e.setInformation(Eigen::Matrix<number_t,6,6,Eigen::ColMajor>::Identity());
 
   JacobianWorkspace jacobianWorkspace;
   JacobianWorkspace numericJacobianWorkspace;
@@ -121,20 +121,20 @@ int main(int , char** )
     e.setMeasurement(randomIsometry3d());
 
     // calling the analytic Jacobian but writing to the numeric workspace
-    e.BaseBinaryEdge<6, Isometry3D, VertexSE3, VertexSE3>::linearizeOplus(numericJacobianWorkspace);
+    e.BaseBinaryEdge<6, Isometry3, VertexSE3, VertexSE3>::linearizeOplus(numericJacobianWorkspace);
     // copy result into analytic workspace
     jacobianWorkspace = numericJacobianWorkspace;
 
     // compute the numeric Jacobian into the numericJacobianWorkspace workspace as setup by the previous call
-    e.BaseBinaryEdge<6, Isometry3D, VertexSE3, VertexSE3>::linearizeOplus();
+    e.BaseBinaryEdge<6, Isometry3, VertexSE3, VertexSE3>::linearizeOplus();
 
     // compare the two Jacobians
-    const double allowedDifference = 1e-6;
+    const number_t allowedDifference = cst(1e-6);
     for (int i = 0; i < 2; ++i) {
-      double* n = numericJacobianWorkspace.workspaceForVertex(i);
-      double* a = jacobianWorkspace.workspaceForVertex(i);
+      number_t* n = numericJacobianWorkspace.workspaceForVertex(i);
+      number_t* a = jacobianWorkspace.workspaceForVertex(i);
       for (int j = 0; j < 6*6; ++j) {
-        double d = fabs(n[j] - a[j]);
+        number_t d = fabs(n[j] - a[j]);
         if (d > allowedDifference) {
           cerr << "\ndetected difference in the Jacobians " << d << endl;
           cerr << PVAR(v1.estimate().matrix()) << endl << endl;

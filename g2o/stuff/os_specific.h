@@ -34,7 +34,7 @@
 #ifndef _WINDOWS
 #include <sys/time.h>
 #endif
-#define drand48() ((double) rand()/(double)RAND_MAX)
+#define drand48() ((number_t) rand()/(number_t)RAND_MAX)
 
 #ifdef __cplusplus
 extern "C" {

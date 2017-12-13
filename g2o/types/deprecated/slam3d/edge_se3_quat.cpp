@@ -35,7 +35,6 @@
 #include <iostream>
 
 using namespace std;
-using namespace Eigen;
 
 namespace g2o {
 namespace deprecated {
@@ -57,7 +56,7 @@ namespace deprecated {
 
   bool EdgeSE3::read(std::istream& is)
   {
-    Vector7d meas;
+    Vector7 meas;
     for (int i=0; i<7; i++)
       is >> meas[i];
     setMeasurement(SE3Quat(meas));
@@ -97,12 +96,12 @@ namespace deprecated {
     VertexSE3* from = static_cast<VertexSE3*>(_vertices[0]);
     VertexSE3* to = static_cast<VertexSE3*>(_vertices[1]);
     
-    Matrix3d izR        = _inverseMeasurement.rotation().toRotationMatrix();
-    const Vector3d& izt = _inverseMeasurement.translation();
+    Matrix3 izR        = _inverseMeasurement.rotation().toRotationMatrix();
+    const Vector3& izt = _inverseMeasurement.translation();
     
     SE3Quat iXiXj         = from->estimate().inverse() * to->estimate();
-    Matrix3d iRiRj        = iXiXj.rotation().toRotationMatrix();
-    const Vector3d& ititj = iXiXj.translation();
+    Matrix3 iRiRj        = iXiXj.rotation().toRotationMatrix();
+    const Vector3& ititj = iXiXj.translation();
 
     jacobian_3d_qman ( _jacobianOplusXi , _jacobianOplusXj,
            izR(0,0), izR(0,1), izR(0,2), izt(0),

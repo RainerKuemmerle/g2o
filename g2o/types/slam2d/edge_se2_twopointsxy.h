@@ -35,7 +35,7 @@
 
 namespace g2o{
 
-  class G2O_TYPES_SLAM2D_API EdgeSE2TwoPointsXY : public BaseMultiEdge<4, Vector4D>
+  class G2O_TYPES_SLAM2D_API EdgeSE2TwoPointsXY : public BaseMultiEdge<4, Vector4>
   {
     public:
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
@@ -49,7 +49,7 @@ namespace g2o{
       virtual bool setMeasurementFromState();
 
       virtual void initialEstimate(const OptimizableGraph::VertexSet&, OptimizableGraph::Vertex*);
-      virtual double initialEstimatePossible(const OptimizableGraph::VertexSet&, OptimizableGraph::Vertex*);
+      virtual number_t initialEstimatePossible(const OptimizableGraph::VertexSet&, OptimizableGraph::Vertex*);
   };
 }
 #endif	// G2O_EDGE_SE2_TWOPOINTS_XY_H

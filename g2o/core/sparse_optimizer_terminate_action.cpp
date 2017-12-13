@@ -34,12 +34,12 @@ namespace g2o {
 
   SparseOptimizerTerminateAction::SparseOptimizerTerminateAction() :
     HyperGraphAction(),
-    _gainThreshold(1e-6), _lastChi(0.), _auxTerminateFlag(false),
+    _gainThreshold(cst(1e-6)), _lastChi(0), _auxTerminateFlag(false),
     _maxIterations(std::numeric_limits<int>::max())
   {
   }
 
-  void SparseOptimizerTerminateAction::setGainThreshold(double gainThreshold)
+  void SparseOptimizerTerminateAction::setGainThreshold(number_t gainThreshold)
   {
     _gainThreshold = gainThreshold;
   }
@@ -67,8 +67,8 @@ namespace g2o {
       // number of iterations
       bool stopOptimizer = false;
       if (params->iteration < _maxIterations) {
-        double currentChi = optimizer->activeRobustChi2();
-        double gain = (_lastChi - currentChi) / currentChi;
+        number_t currentChi = optimizer->activeRobustChi2();
+        number_t gain = (_lastChi - currentChi) / currentChi;
         _lastChi = currentChi;
         if (gain >= 0 && gain < _gainThreshold)
           stopOptimizer = true;

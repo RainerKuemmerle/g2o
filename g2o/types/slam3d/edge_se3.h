@@ -37,11 +37,11 @@ namespace g2o {
   /**
    * \brief Edge between two 3D pose vertices
    *
-   * The transformation between the two vertices is given as an Isometry3D.
+   * The transformation between the two vertices is given as an Isometry3.
    * If z denotes the measurement, then the error function is given as follows:
    * z^-1 * (x_i^-1 * x_j)
    */
-  class G2O_TYPES_SLAM3D_API EdgeSE3 : public BaseBinaryEdge<6, Isometry3D, VertexSE3, VertexSE3> {
+  class G2O_TYPES_SLAM3D_API EdgeSE3 : public BaseBinaryEdge<6, Isometry3, VertexSE3, VertexSE3> {
     public:
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
       EdgeSE3();
@@ -50,19 +50,19 @@ namespace g2o {
 
       void computeError();
 
-      virtual void setMeasurement(const Isometry3D& m){
+      virtual void setMeasurement(const Isometry3& m){
         _measurement = m;
         _inverseMeasurement = m.inverse();
       }
 
-      virtual bool setMeasurementData(const double* d){
-        Eigen::Map<const Vector7d> v(d);
+      virtual bool setMeasurementData(const number_t* d){
+        Eigen::Map<const Vector7> v(d);
         setMeasurement(internal::fromVectorQT(v));
         return true;
       }
 
-      virtual bool getMeasurementData(double* d) const{
-        Eigen::Map<Vector7d> v(d);
+      virtual bool getMeasurementData(number_t* d) const{
+        Eigen::Map<Vector7> v(d);
         v = internal::toVectorQT(_measurement);
         return true;
       }
@@ -73,7 +73,7 @@ namespace g2o {
 
       virtual bool setMeasurementFromState() ;
 
-      virtual double initialEstimatePossible(const OptimizableGraph::VertexSet& /*from*/, 
+      virtual number_t initialEstimatePossible(const OptimizableGraph::VertexSet& /*from*/, 
           OptimizableGraph::Vertex* /*to*/) { 
         return 1.;
       }
@@ -81,7 +81,7 @@ namespace g2o {
       virtual void initialEstimate(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to);
 
     protected:
-      Isometry3D _inverseMeasurement;
+      Isometry3 _inverseMeasurement;
   };
 
   /**

@@ -110,7 +110,7 @@ ScopeTime::~ScopeTime() {
   std::cerr << _title<<" took "<<1000*(get_monotonic_time()-_startTime)<<"ms.\n";
 }
 
-double get_monotonic_time()
+number_t get_monotonic_time()
 {
 #if (defined(_POSIX_TIMERS) && (_POSIX_TIMERS+0 >= 0) && defined(_POSIX_MONOTONIC_CLOCK))
   struct timespec ts;

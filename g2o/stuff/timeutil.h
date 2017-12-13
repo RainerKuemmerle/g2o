@@ -49,8 +49,8 @@
 #ifndef DO_EVERY_TS
 #define DO_EVERY_TS(secs, currentTime, code) \
 if (1) {\
-  static double s_lastDone_ = (currentTime); \
-  double s_now_ = (currentTime); \
+  static number_t s_lastDone_ = (currentTime); \
+  number_t s_now_ = (currentTime); \
   if (s_lastDone_ > s_now_) \
     s_lastDone_ = s_now_; \
   if (s_now_ - s_lastDone_ > (secs)) { \
@@ -69,7 +69,7 @@ if (1) {\
 #ifndef MEASURE_TIME
 #define MEASURE_TIME(text, code) \
   if(1) { \
-    double _start_time_ = g2o::get_time(); \
+    number_t _start_time_ = g2o::get_time(); \
     code; \
     fprintf(stderr, "%s took %f sec\n", text, g2o::get_time() - _start_time_); \
   } else \
@@ -89,7 +89,7 @@ G2O_STUFF_API int gettimeofday(struct timeval *tv, struct timezone *tz);
 /**
  * return the current time in seconds since 1. Jan 1970
  */
-inline double get_time() 
+inline number_t get_time() 
 {
   struct timeval ts;
   gettimeofday(&ts,0);
@@ -104,7 +104,7 @@ inline double get_time()
  * On Linux we call clock_gettime() on other systems we currently
  * call get_time().
  */
-G2O_STUFF_API double get_monotonic_time();
+G2O_STUFF_API number_t get_monotonic_time();
 
 /**
  * \brief Class to measure the time spent in a scope
@@ -118,7 +118,7 @@ class G2O_STUFF_API ScopeTime {
     ~ScopeTime();
   private:
     std::string _title;
-    double _startTime;
+    number_t _startTime;
 };
 
 } // end namespace

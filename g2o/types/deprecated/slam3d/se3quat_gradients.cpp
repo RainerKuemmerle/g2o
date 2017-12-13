@@ -30,7 +30,7 @@ namespace g2o {
 namespace deprecated {
 
   /** conversion code from Euler angles */
-Eigen::Quaterniond euler_to_quat(double yaw, double pitch, double roll)
+Quaternion euler_to_quat(double yaw, double pitch, double roll)
 {
   double sy = sin(yaw*0.5);
   double cy = cos(yaw*0.5);
@@ -42,10 +42,10 @@ Eigen::Quaterniond euler_to_quat(double yaw, double pitch, double roll)
   double x = sr*cp*cy - cr*sp*sy;
   double y = cr*sp*cy + sr*cp*sy;
   double z = cr*cp*sy - sr*sp*cy;
-  return Eigen::Quaterniond(w,x,y,z);
+  return Quaternion(w,x,y,z);
 }
 
-void quat_to_euler(const Eigen::Quaterniond& q, double& yaw, double& pitch, double& roll)
+void quat_to_euler(const Quaternion& q, double& yaw, double& pitch, double& roll)
 {
   const double& q0 = q.w();
   const double& q1 = q.x();
@@ -56,10 +56,10 @@ void quat_to_euler(const Eigen::Quaterniond& q, double& yaw, double& pitch, doub
   yaw = atan2(2*(q0*q3+q1*q2), 1-2*(q2*q2+q3*q3));
 }
 
-void jac_quat3_euler3(Eigen::Matrix<double, 6, 6>& J, const SE3Quat& t)
+void jac_quat3_euler3(Eigen::Matrix<number_t, 6, 6>& J, const SE3Quat& t)
 {
-  const Eigen::Vector3d& tr0 = t.translation();
-  const Eigen::Quaterniond& q0 = t.rotation();
+  const Vector3& tr0 = t.translation();
+  const Quaternion& q0 = t.rotation();
 
   double delta=1e-6;
   double idelta= 1. / (2. * delta);
@@ -67,15 +67,15 @@ void jac_quat3_euler3(Eigen::Matrix<double, 6, 6>& J, const SE3Quat& t)
   for (int i=0; i<6; i++){
     SE3Quat ta, tb;
     if (i<3){
-      Eigen::Vector3d tra=tr0;
-      Eigen::Vector3d trb=tr0;
+      Vector3 tra=tr0;
+      Vector3 trb=tr0;
       tra[i] -= delta;
       trb[i] += delta;
       ta = SE3Quat(q0, tra); 
       tb = SE3Quat(q0, trb); 
     } else {
-      Eigen::Quaterniond qa=q0;
-      Eigen::Quaterniond qb=q0;
+      Quaternion qa=q0;
+      Quaternion qb=q0;
       if (i == 3) {
         qa.x() -= delta;
         qb.x() += delta;
@@ -94,11 +94,11 @@ void jac_quat3_euler3(Eigen::Matrix<double, 6, 6>& J, const SE3Quat& t)
       tb = SE3Quat(qb, tr0); 
     }
 
-    Eigen::Vector3d dtr = (tb.translation() - ta.translation())*idelta;
-    Eigen::Vector3d taAngles, tbAngles;
+    Vector3 dtr = (tb.translation() - ta.translation())*idelta;
+    Vector3 taAngles, tbAngles;
     quat_to_euler(ta.rotation(), taAngles(2), taAngles(1), taAngles(0));
     quat_to_euler(tb.rotation(), tbAngles(2), tbAngles(1), tbAngles(0));
-    Eigen::Vector3d da = (tbAngles - taAngles) * idelta; //TODO wraparounds not handled
+    Vector3 da = (tbAngles - taAngles) * idelta; //TODO wraparounds not handled
 
     for (int j=0; j<6; j++){
       if (j<3){

@@ -58,7 +58,7 @@ namespace g2o {
   _inverseMeasurement = m.inverse();
       }
 
-      virtual double initialEstimatePossible(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to)
+      virtual number_t initialEstimatePossible(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to)
       {
         if (   from.count(_vertices[2]) == 1 // need the laser offset
             && ((from.count(_vertices[0]) == 1 && to == _vertices[1]) || ((from.count(_vertices[1]) == 1 && to == _vertices[0])))) {

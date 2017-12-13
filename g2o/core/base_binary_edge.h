@@ -33,6 +33,7 @@
 #include "base_edge.h"
 #include "robust_kernel.h"
 #include "g2o/config.h"
+#include "g2o/stuff/misc.h"
 
 namespace g2o {
 
@@ -49,15 +50,15 @@ namespace g2o {
 
       static const int Dimension = BaseEdge<D, E>::Dimension;
       typedef typename BaseEdge<D,E>::Measurement Measurement;
-      typedef typename Eigen::Matrix<double, D, Di, D==1?Eigen::RowMajor:Eigen::ColMajor>::AlignedMapType JacobianXiOplusType;
-      typedef typename Eigen::Matrix<double, D, Dj, D==1?Eigen::RowMajor:Eigen::ColMajor>::AlignedMapType JacobianXjOplusType;
+      typedef typename Eigen::Matrix<number_t, D, Di, D==1?Eigen::RowMajor:Eigen::ColMajor>::AlignedMapType JacobianXiOplusType;
+      typedef typename Eigen::Matrix<number_t, D, Dj, D==1?Eigen::RowMajor:Eigen::ColMajor>::AlignedMapType JacobianXjOplusType;
       typedef typename BaseEdge<D,E>::ErrorVector ErrorVector;
       typedef typename BaseEdge<D,E>::InformationType InformationType;
 
-      typedef Eigen::Map<Eigen::Matrix<double, Di, Dj, Di==1?Eigen::RowMajor:Eigen::ColMajor>,
-                         Eigen::Matrix<double, Di, Dj, Di==1?Eigen::RowMajor:Eigen::ColMajor>::Flags & Eigen::PacketAccessBit ? Eigen::Aligned : Eigen::Unaligned > HessianBlockType;
-      typedef Eigen::Map<Eigen::Matrix<double, Dj, Di, Dj==1?Eigen::RowMajor:Eigen::ColMajor>,
-                         Eigen::Matrix<double, Dj, Di, Dj==1?Eigen::RowMajor:Eigen::ColMajor>::Flags & Eigen::PacketAccessBit ? Eigen::Aligned : Eigen::Unaligned > HessianBlockTransposedType;
+      typedef Eigen::Map<Eigen::Matrix<number_t, Di, Dj, Di==1?Eigen::RowMajor:Eigen::ColMajor>,
+                         Eigen::Matrix<number_t, Di, Dj, Di==1?Eigen::RowMajor:Eigen::ColMajor>::Flags & Eigen::PacketAccessBit ? Eigen::Aligned : Eigen::Unaligned > HessianBlockType;
+      typedef Eigen::Map<Eigen::Matrix<number_t, Dj, Di, Dj==1?Eigen::RowMajor:Eigen::ColMajor>,
+                         Eigen::Matrix<number_t, Dj, Di, Dj==1?Eigen::RowMajor:Eigen::ColMajor>::Flags & Eigen::PacketAccessBit ? Eigen::Aligned : Eigen::Unaligned > HessianBlockTransposedType;
 
       BaseBinaryEdge() : BaseEdge<D,E>(),
       _hessianRowMajor(false),
@@ -91,7 +92,7 @@ namespace g2o {
 
       virtual void constructQuadraticForm() ;
 
-      virtual void mapHessianMemory(double* d, int i, int j, bool rowMajor);
+      virtual void mapHessianMemory(number_t* d, int i, int j, bool rowMajor);
 
       using BaseEdge<D,E>::resize;
       using BaseEdge<D,E>::computeError;

@@ -48,33 +48,33 @@ namespace g2o {
         _estimate = SE2();
       }
 
-      virtual void oplusImpl(const double* update)
+      virtual void oplusImpl(const number_t* update)
       {
-        Vector2D t=_estimate.translation();
-        t+=Eigen::Map<const Vector2D>(update);
-        double angle=normalize_theta(_estimate.rotation().angle() + update[2]);
+        Vector2 t=_estimate.translation();
+        t+=Eigen::Map<const Vector2>(update);
+        number_t angle=normalize_theta(_estimate.rotation().angle() + update[2]);
         _estimate.setTranslation(t);
-        _estimate.setRotation(Eigen::Rotation2Dd(angle));
+        _estimate.setRotation(Rotation2D(angle));
       }
 
-      virtual bool setEstimateDataImpl(const double* est){
+      virtual bool setEstimateDataImpl(const number_t* est){
         _estimate=SE2(est[0], est[1], est[2]);
         return true;
       }
 
-      virtual bool getEstimateData(double* est) const {
-        Eigen::Map<Vector3D> v(est);
+      virtual bool getEstimateData(number_t* est) const {
+        Eigen::Map<Vector3> v(est);
         v = _estimate.toVector();
         return true;
       }
       
       virtual int estimateDimension() const { return 3; }
 
-      virtual bool setMinimalEstimateDataImpl(const double* est){
+      virtual bool setMinimalEstimateDataImpl(const number_t* est){
         return setEstimateData(est);
       }
 
-      virtual bool getMinimalEstimateData(double* est) const {
+      virtual bool getMinimalEstimateData(number_t* est) const {
         return getEstimateData(est);
       }
       

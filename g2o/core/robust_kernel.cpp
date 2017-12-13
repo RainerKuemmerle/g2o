@@ -33,12 +33,12 @@ RobustKernel::RobustKernel() :
 {
 }
 
-RobustKernel::RobustKernel(double delta) :
+RobustKernel::RobustKernel(number_t delta) :
   _delta(delta)
 {
 }
 
-void RobustKernel::setDelta(double delta)
+void RobustKernel::setDelta(number_t delta)
 {
   _delta = delta;
 }

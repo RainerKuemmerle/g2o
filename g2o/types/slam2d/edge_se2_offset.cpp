@@ -63,7 +63,7 @@ namespace g2o {
     if (! setParameterId(1,pidTo))
       return false;
 
-    Vector3D meas;
+    Vector3 meas;
     for (int i=0; i<3; i++)
       is >> meas[i];
     setMeasurement(SE2(meas));

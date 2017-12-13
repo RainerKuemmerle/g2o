@@ -39,20 +39,20 @@ namespace g2o {
     public:
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
       ParameterCamera();
-      void setKcam(double fx, double fy, double cx, double cy);
-      void setOffset(const Isometry3D& offset_ = Isometry3D::Identity());
+      void setKcam(number_t fx, number_t fy, number_t cx, number_t cy);
+      void setOffset(const Isometry3& offset_ = Isometry3::Identity());
 
       virtual bool read(std::istream& is);
       virtual bool write(std::ostream& os) const;
 
-      const Matrix3D& Kcam() const { return _Kcam;}
-      const Matrix3D& invKcam() const { return _invKcam;}
-      const Matrix3D& Kcam_inverseOffsetR() const { return _Kcam_inverseOffsetR;}
+      const Matrix3& Kcam() const { return _Kcam;}
+      const Matrix3& invKcam() const { return _invKcam;}
+      const Matrix3& Kcam_inverseOffsetR() const { return _Kcam_inverseOffsetR;}
 
     protected:
-      Matrix3D _Kcam;
-      Matrix3D _invKcam;
-      Matrix3D _Kcam_inverseOffsetR;
+      Matrix3 _Kcam;
+      Matrix3 _invKcam;
+      Matrix3 _Kcam_inverseOffsetR;
   };
 
   class G2O_TYPES_SLAM3D_API CacheCamera: public CacheSE3Offset {
@@ -61,12 +61,12 @@ namespace g2o {
     //! parameters of the camera
     const ParameterCamera* camParams() const {return params;}
     //! return the world to image transform
-    const Affine3D& w2i() const {return _w2i;}
+    const Affine3& w2i() const {return _w2i;}
 
   protected:
     virtual void updateImpl();
     virtual bool resolveDependancies();
-    Affine3D _w2i; ///< world to image transform
+    Affine3 _w2i; ///< world to image transform
     ParameterCamera* params;
   };
 

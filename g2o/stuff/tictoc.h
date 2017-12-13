@@ -49,7 +49,7 @@ namespace g2o {
    * If the environment variable G2O_ENABLE_TICTOC is defined, the timing will
    * be performed.
    */
-   G2O_STUFF_API double tictoc(const char* algorithmPart);
+   G2O_STUFF_API number_t tictoc(const char* algorithmPart);
 
    /**
     * \brief Simplify calls to tictoc() for a whole scope

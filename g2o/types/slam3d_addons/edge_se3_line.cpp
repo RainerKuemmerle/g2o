@@ -133,8 +133,8 @@ namespace g2o {
 
     Line3D line = that->measurement();
     line.normalize();
-    Eigen::Vector3d direction = line.d();
-    Eigen::Vector3d npoint = line.d().cross(line.w());
+    Vector3 direction = line.d();
+    Vector3 npoint = line.d().cross(line.w());
     
     glPushMatrix();
     glMultMatrixd(robot->estimate().matrix().data());

@@ -63,7 +63,7 @@ namespace g2o {
       //! return the type of the last step taken by the algorithm
       int lastStep() const { return _lastStep;}
       //! return the diameter of the trust region
-      double trustRegion() const { return _delta;}
+      number_t trustRegion() const { return _delta;}
 
       //! convert the type into an integer
       static const char* stepType2Str(int stepType);
@@ -71,17 +71,17 @@ namespace g2o {
     protected:
       // parameters
       Property<int>* _maxTrialsAfterFailure;
-      Property<double>* _userDeltaInit;
+      Property<number_t>* _userDeltaInit;
       // damping to enforce positive definite matrix
-      Property<double>* _initialLambda;
-      Property<double>* _lamdbaFactor;
+      Property<number_t>* _initialLambda;
+      Property<number_t>* _lamdbaFactor;
 
-      VectorXD _hsd;         ///< steepest decent step
-      VectorXD _hdl;         ///< final dogleg step
-      VectorXD _auxVector;   ///< auxilary vector used to perform multiplications or other stuff
+      VectorX _hsd;         ///< steepest decent step
+      VectorX _hdl;         ///< final dogleg step
+      VectorX _auxVector;   ///< auxilary vector used to perform multiplications or other stuff
 
-      double _currentLambda;        ///< the damping factor to force positive definite matrix
-      double _delta;                ///< trust region
+      number_t _currentLambda;        ///< the damping factor to force positive definite matrix
+      number_t _delta;                ///< trust region
       int _lastStep;                ///< type of the step taken by the algorithm
       bool _wasPDInAllIterations;   ///< the matrix we solve was positive definite in all iterations -> if not apply damping
       int _lastNumTries;

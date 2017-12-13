@@ -32,17 +32,14 @@
 
 namespace g2o
 {
-  typedef  Eigen::Matrix <double, 7, 1> Vector7d;
-  typedef  Eigen::Matrix <double, 7, 7> Matrix7d;
-
   struct Sim3
   {
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
     protected:
-      Eigen::Quaterniond r;
-      Eigen::Vector3d t;
-      double s;
+      Quaternion r;
+      Vector3 t;
+      number_t s;
 
     public:
       Sim3()
@@ -52,53 +49,53 @@ namespace g2o
         s=1.;
       }
 
-      Sim3(const Eigen::Quaterniond & r, const Eigen::Vector3d & t, double s)
+      Sim3(const Quaternion & r, const Vector3 & t, number_t s)
         : r(r),t(t),s(s)
       {
 			normalizeRotation();
       }
 
-      Sim3(const Eigen::Matrix3d & R, const Eigen::Vector3d & t, double s)
-        : r(Eigen::Quaterniond(R)),t(t),s(s)
+      Sim3(const Matrix3 & R, const Vector3 & t, number_t s)
+        : r(Quaternion(R)),t(t),s(s)
       {
 			normalizeRotation();
       }
 
 
-      Sim3(const Vector7d & update)
+      Sim3(const Vector7 & update)
       {
 
-        Eigen::Vector3d omega;
+        Vector3 omega;
         for (int i=0; i<3; i++)
           omega[i]=update[i];
 
-        Eigen::Vector3d upsilon;
+        Vector3 upsilon;
         for (int i=0; i<3; i++)
           upsilon[i]=update[i+3];
 
-        double sigma = update[6];
-        double theta = omega.norm();
-        Eigen::Matrix3d Omega = skew(omega);
+        number_t sigma = update[6];
+        number_t theta = omega.norm();
+        Matrix3 Omega = skew(omega);
         s = std::exp(sigma);
-        Eigen::Matrix3d Omega2 = Omega*Omega;
-        Eigen::Matrix3d I;
+        Matrix3 Omega2 = Omega*Omega;
+        Matrix3 I;
         I.setIdentity();
-        Eigen::Matrix3d R;
+        Matrix3 R;
 
-        double eps = 0.00001;
-        double A,B,C;
+        number_t eps = cst(0.00001);
+        number_t A,B,C;
         if (fabs(sigma)<eps)
         {
           C = 1;
           if (theta<eps)
           {
-            A = 1./2.;
-            B = 1./6.;
+            A = cst(1./2.);
+            B = cst(1./6.);
             R = (I + Omega + Omega*Omega);
           }
           else
           {
-            double theta2= theta*theta;
+            number_t theta2= theta*theta;
             A = (1-cos(theta))/(theta2);
             B = (theta-sin(theta))/(theta2*theta);
             R = I + sin(theta)/theta *Omega + (1-cos(theta))/(theta*theta)*Omega2;
@@ -109,53 +106,53 @@ namespace g2o
           C=(s-1)/sigma;
           if (theta<eps)
           {
-            double sigma2= sigma*sigma;
+            number_t sigma2= sigma*sigma;
             A = ((sigma-1)*s+1)/sigma2;
-            B= ((0.5*sigma2-sigma+1)*s)/(sigma2*sigma);
+            B= ((cst(0.5)*sigma2-sigma+1)*s)/(sigma2*sigma);
             R = (I + Omega + Omega2);
           }
           else
           {
             R = I + sin(theta)/theta *Omega + (1-cos(theta))/(theta*theta)*Omega2;
-            double a=s*sin(theta);
-            double b=s*cos(theta);
-            double theta2= theta*theta;
-            double sigma2= sigma*sigma;
-            double c=theta2+sigma2;
+            number_t a=s*sin(theta);
+            number_t b=s*cos(theta);
+            number_t theta2= theta*theta;
+            number_t sigma2= sigma*sigma;
+            number_t c=theta2+sigma2;
             A = (a*sigma+ (1-b)*theta)/(theta*c);
             B = (C-((b-1)*sigma+a*theta)/(c))*1./(theta2);
 
           }
         }
-        r = Eigen::Quaterniond(R);
+        r = Quaternion(R);
 
 
 
-        Eigen::Matrix3d W = A*Omega + B*Omega2 + C*I;
+        Matrix3 W = A*Omega + B*Omega2 + C*I;
         t = W*upsilon;
       }
 
-      Eigen::Vector3d map (const Eigen::Vector3d& xyz) const {
+      Vector3 map (const Vector3& xyz) const {
         return s*(r*xyz) + t;
       }
 
-      Vector7d log() const
+      Vector7 log() const
       {
-        Vector7d res;
-        double sigma = std::log(s);
+        Vector7 res;
+        number_t sigma = std::log(s);
 
-        Eigen::Vector3d omega;
-        Eigen::Vector3d upsilon;
+        Vector3 omega;
+        Vector3 upsilon;
 
-        Eigen::Matrix3d R = r.toRotationMatrix();
-        double d =  0.5*(R(0,0)+R(1,1)+R(2,2)-1);
+        Matrix3 R = r.toRotationMatrix();
+        number_t d =  0.5*(R(0,0)+R(1,1)+R(2,2)-1);
 
-        Eigen::Matrix3d Omega;
+        Matrix3 Omega;
 
-        double eps = 0.00001;
-        Eigen::Matrix3d I = Eigen::Matrix3d::Identity();
+        number_t eps = cst(0.00001);
+        Matrix3 I = Matrix3::Identity();
 
-        double A,B,C;
+        number_t A,B,C;
         if (fabs(sigma)<eps)
         {
           C = 1;
@@ -163,13 +160,13 @@ namespace g2o
           {
             omega=0.5*deltaR(R);
             Omega = skew(omega);
-            A = 1./2.;
-            B = 1./6.;
+            A = cst(1./2.);
+            B = cst(1./6.);
           }
           else
           {
-            double theta = acos(d);
-            double theta2 = theta*theta;
+            number_t theta = acos(d);
+            number_t theta2 = theta*theta;
             omega = theta/(2*sqrt(1-d*d))*deltaR(R);
             Omega = skew(omega);
             A = (1-cos(theta))/(theta2);
@@ -181,7 +178,7 @@ namespace g2o
           C=(s-1)/sigma;
           if (d>1-eps)
           {
-            double sigma2 = sigma*sigma;
+            number_t sigma2 = sigma*sigma;
             omega=0.5*deltaR(R);
             Omega = skew(omega);
             A = ((sigma-1)*s+1)/(sigma2);
@@ -189,19 +186,19 @@ namespace g2o
           }
           else
           {
-            double theta = acos(d);
+            number_t theta = acos(d);
             omega = theta/(2*sqrt(1-d*d))*deltaR(R);
             Omega = skew(omega);
-            double theta2 = theta*theta;
-            double a=s*sin(theta);
-            double b=s*cos(theta);
-            double c=theta2 + sigma*sigma;
+            number_t theta2 = theta*theta;
+            number_t a=s*sin(theta);
+            number_t b=s*cos(theta);
+            number_t c=theta2 + sigma*sigma;
             A = (a*sigma+ (1-b)*theta)/(theta*c);
             B = (C-((b-1)*sigma+a*theta)/(c))*1./(theta2);
           }
         }
 
-        Eigen::Matrix3d W = A*Omega + B*Omega*Omega + C*I;
+        Matrix3 W = A*Omega + B*Omega*Omega + C*I;
 
         upsilon = W.lu().solve(t);
 
@@ -222,7 +219,7 @@ namespace g2o
         return Sim3(r.conjugate(), r.conjugate()*((-1./s)*t), 1./s);
       }
 
-      double operator[](int i) const
+      number_t operator[](int i) const
       {
         assert(i<8);
         if (i<4){
@@ -235,7 +232,7 @@ namespace g2o
         return s;
       }
 
-      double& operator[](int i)
+      number_t& operator[](int i)
       {
         assert(i<8);
         if (i<4){
@@ -268,17 +265,17 @@ namespace g2o
         }
         r.normalize();
     }
-      inline const Eigen::Vector3d& translation() const {return t;}
+      inline const Vector3& translation() const {return t;}
 
-      inline Eigen::Vector3d& translation() {return t;}
+      inline Vector3& translation() {return t;}
 
-      inline const Eigen::Quaterniond& rotation() const {return r;}
+      inline const Quaternion& rotation() const {return r;}
 
-      inline Eigen::Quaterniond& rotation() {return r;}
+      inline Quaternion& rotation() {return r;}
 
-      inline const double& scale() const {return s;}
+      inline const number_t& scale() const {return s;}
 
-      inline double& scale() {return s;}
+      inline number_t& scale() {return s;}
 
   };
 

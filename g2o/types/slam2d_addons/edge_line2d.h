@@ -53,18 +53,18 @@ namespace g2o {
         _measurement = m;
       }
 
-      virtual void setMeasurement(const Vector2D& m){
+      virtual void setMeasurement(const Vector2& m){
         _measurement = m;
       }
 
-      virtual bool setMeasurementData(const double* d){
-	Eigen::Map<const Vector2D> m(d);
+      virtual bool setMeasurementData(const number_t* d){
+	Eigen::Map<const Vector2> m(d);
         _measurement=Line2D(m);
         return true;
       }
 
-      virtual bool getMeasurementData(double* d) const {
-	Eigen::Map<Vector2D> m(d);
+      virtual bool getMeasurementData(number_t* d) const {
+	Eigen::Map<Vector2> m(d);
 	m=_measurement;
         return true;
       }
@@ -74,12 +74,12 @@ namespace g2o {
       virtual bool setMeasurementFromState() {
         const VertexLine2D* v1 = static_cast<const VertexLine2D*>(_vertices[0]);
         const VertexLine2D* v2 = static_cast<const VertexLine2D*>(_vertices[1]);
-        _measurement = Line2D((Vector2D)(v2->estimate())-(Vector2D)v1->estimate());
+        _measurement = Line2D((Vector2)(v2->estimate())-(Vector2)v1->estimate());
         return true;
       }
 
 
-      virtual double initialEstimatePossible(const OptimizableGraph::VertexSet& , OptimizableGraph::Vertex* ) { return 0.;}
+      virtual number_t initialEstimatePossible(const OptimizableGraph::VertexSet& , OptimizableGraph::Vertex* ) { return 0.;}
 #ifndef NUMERIC_JACOBIAN_THREE_D_TYPES
       virtual void linearizeOplus();
 #endif

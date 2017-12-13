@@ -34,7 +34,7 @@
 
 namespace g2o {
 
-  class G2O_TYPES_SLAM3D_API EdgePointXYZ : public BaseBinaryEdge<3, Vector3D, VertexPointXYZ, VertexPointXYZ>
+  class G2O_TYPES_SLAM3D_API EdgePointXYZ : public BaseBinaryEdge<3, Vector3, VertexPointXYZ, VertexPointXYZ>
   {
     public:
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW
@@ -49,17 +49,17 @@ namespace g2o {
       virtual bool read(std::istream& is);
       virtual bool write(std::ostream& os) const;
 
-      virtual void setMeasurement(const Vector3D& m){
+      virtual void setMeasurement(const Vector3& m){
         _measurement = m;
       }
 
-      virtual bool setMeasurementData(const double* d){
-        _measurement=Vector3D(d[0], d[1], d[2]);
+      virtual bool setMeasurementData(const number_t* d){
+        _measurement=Vector3(d[0], d[1], d[2]);
         return true;
       }
 
-      virtual bool getMeasurementData(double* d) const {
-	Eigen::Map<Vector3D> m(d);
+      virtual bool getMeasurementData(number_t* d) const {
+	Eigen::Map<Vector3> m(d);
 	m=_measurement;
         return true;
       }
@@ -74,7 +74,7 @@ namespace g2o {
       }
 
 
-      virtual double initialEstimatePossible(const OptimizableGraph::VertexSet& , OptimizableGraph::Vertex* ) { return 0.;}
+      virtual number_t initialEstimatePossible(const OptimizableGraph::VertexSet& , OptimizableGraph::Vertex* ) { return 0.;}
 #ifndef NUMERIC_JACOBIAN_THREE_D_TYPES
       virtual void linearizeOplus();
 #endif

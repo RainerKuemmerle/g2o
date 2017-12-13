@@ -45,9 +45,6 @@ namespace g2o {
   namespace types_icp {
     void init();
   }
-
-  typedef  Eigen::Matrix<double, 6, 1, Eigen::ColMajor> Vector6d;
-
 //
 // GICP-type edges
 // Each measurement is between two rigid points on each 6DOF vertex
@@ -63,13 +60,13 @@ namespace g2o {
 
    public:
     // point positions
-    Vector3D pos0, pos1;
+    Vector3 pos0, pos1;
 
     // unit normals
-    Vector3D normal0, normal1;
+    Vector3 normal0, normal1;
 
     // rotation matrix for normal
-    Matrix3D R0,R1;
+    Matrix3 R0,R1;
 
     // initialize an object
     EdgeGICP()
@@ -86,7 +83,7 @@ namespace g2o {
     // set up rotation matrix for pos0
     void makeRot0() 
     {
-      Vector3D y;
+      Vector3 y;
       y << 0, 1, 0;
       R0.row(2) = normal0;
       y = y - normal0(1)*normal0;
@@ -101,7 +98,7 @@ namespace g2o {
     // set up rotation matrix for pos1
     void makeRot1()
     {
-      Vector3D y;
+      Vector3 y;
       y << 0, 1, 0;
       R1.row(2) = normal1;
       y = y - normal1(1)*normal1;
@@ -111,10 +108,10 @@ namespace g2o {
     }
 
     // returns a precision matrix for point-plane
-    Matrix3D prec0(double e)
+    Matrix3 prec0(number_t e)
     {
       makeRot0();
-      Matrix3D prec;
+      Matrix3 prec;
       prec << e, 0, 0,
               0, e, 0,
               0, 0, 1;
@@ -122,10 +119,10 @@ namespace g2o {
     }
     
     // returns a precision matrix for point-plane
-    Matrix3D prec1(double e)
+    Matrix3 prec1(number_t e)
     {
       makeRot1();
-      Matrix3D prec;
+      Matrix3 prec;
       prec << e, 0, 0,
               0, e, 0,
               0, 0, 1;
@@ -133,10 +130,10 @@ namespace g2o {
     }
     
     // return a covariance matrix for plane-plane
-    Matrix3D cov0(double e)
+    Matrix3 cov0(number_t e)
     {
       makeRot0();
-      Matrix3D cov;
+      Matrix3 cov;
       cov  << 1, 0, 0,
               0, 1, 0,
               0, 0, e;
@@ -144,10 +141,10 @@ namespace g2o {
     }
     
     // return a covariance matrix for plane-plane
-    Matrix3D cov1(double e)
+    Matrix3 cov1(number_t e)
     {
       makeRot1();
-      Matrix3D cov;
+      Matrix3 cov;
       cov  << 1, 0, 0,
               0, 1, 0,
               0, 0, e;
@@ -170,7 +167,7 @@ namespace g2o {
 
     // switch to go between point-plane and plane-plane
     bool pl_pl;
-    Matrix3D cov0, cov1;
+    Matrix3 cov0, cov1;
 
     // I/O functions
     virtual bool read(std::istream& is);
@@ -185,7 +182,7 @@ namespace g2o {
 
       // get vp1 point into vp0 frame
       // could be more efficient if we computed this transform just once
-      Vector3D p1;
+      Vector3 p1;
 
 #if 0
       if (_cnum >= 0 && 0)      // using global cache
@@ -224,7 +221,7 @@ namespace g2o {
 
       // re-define the information matrix
       // topLeftCorner<3,3>() is the rotation()
-      const Matrix3D transform = ( vp0->estimate().inverse() *  vp1->estimate() ).matrix().topLeftCorner<3,3>();
+      const Matrix3 transform = ( vp0->estimate().inverse() *  vp1->estimate() ).matrix().topLeftCorner<3,3>();
       information() = ( cov0 + transform * cov1 * transform.transpose() ).inverse();
 
     }
@@ -235,9 +232,9 @@ namespace g2o {
 #endif
 
     // global derivative matrices
-    static Matrix3D dRidx;
-	static Matrix3D dRidy;
-	static Matrix3D dRidz; // differential quat matrices
+    static Matrix3 dRidx;
+	static Matrix3 dRidy;
+	static Matrix3 dRidz; // differential quat matrices
   };
 
 
@@ -259,47 +256,47 @@ namespace g2o {
       virtual bool write(std::ostream& os) const;
 
       // capture the update function to reset aux transforms
-      virtual void oplusImpl(const double* update)
+      virtual void oplusImpl(const number_t* update)
       {
         VertexSE3::oplusImpl(update);
         setAll();
       }
 
       // camera matrix and stereo baseline
-      static Matrix3D Kcam;
-      static double baseline;
+      static Matrix3 Kcam;
+      static number_t baseline;
 
       // transformations
-      Eigen::Matrix<double,3,4,Eigen::ColMajor> w2n; // transform from world to node coordinates
-      Eigen::Matrix<double,3,4,Eigen::ColMajor> w2i; // transform from world to image coordinates
+      Eigen::Matrix<number_t,3,4,Eigen::ColMajor> w2n; // transform from world to node coordinates
+      Eigen::Matrix<number_t,3,4,Eigen::ColMajor> w2i; // transform from world to image coordinates
 
       // Derivatives of the rotation matrix transpose wrt quaternion xyz, used for
       // calculating Jacobian wrt pose of a projection.
-      Matrix3D dRdx, dRdy, dRdz;
+      Matrix3 dRdx, dRdy, dRdz;
 
       // transforms
-      static void transformW2F(Eigen::Matrix<double,3,4,Eigen::ColMajor> &m,
-                               const Vector3D &trans,
-                               const Eigen::Quaterniond &qrot)
+      static void transformW2F(Eigen::Matrix<number_t,3,4,Eigen::ColMajor> &m,
+                               const Vector3 &trans,
+                               const Quaternion &qrot)
         {
           m.block<3,3>(0,0) = qrot.toRotationMatrix().transpose();
           m.col(3).setZero();         // make sure there's no translation
-          Vector4D tt;
+          Vector4 tt;
           tt.head(3) = trans;
           tt[3] = 1.0;
           m.col(3) = -m*tt;
         }
 
-      static void transformF2W(Eigen::Matrix<double,3,4,Eigen::ColMajor> &m,
-                               const Vector3D &trans,
-                               const Eigen::Quaterniond &qrot)
+      static void transformF2W(Eigen::Matrix<number_t,3,4,Eigen::ColMajor> &m,
+                               const Vector3 &trans,
+                               const Quaternion &qrot)
         {
           m.block<3,3>(0,0) = qrot.toRotationMatrix();
           m.col(3) = trans;
         }
 
       // set up camera matrix
-      static void setKcam(double fx, double fy, double cx, double cy, double tx)
+      static void setKcam(number_t fx, number_t fy, number_t cx, number_t cy, number_t tx)
       {
         Kcam.setZero();
         Kcam(0,0) = fx;
@@ -340,16 +337,16 @@ namespace g2o {
       }
 
       // calculate stereo projection
-      void mapPoint(Vector3D &res, const Vector3D &pt3)
+      void mapPoint(Vector3 &res, const Vector3 &pt3)
       {
-        Vector4D pt;
+        Vector4 pt;
         pt.head<3>() = pt3;
-        pt(3) = 1.0;
-        Vector3D p1 = w2i * pt;
-        Vector3D p2 = w2n * pt;
-        Vector3D pb(baseline,0,0);
+        pt(3) = cst(1.0);
+        Vector3 p1 = w2i * pt;
+        Vector3 p2 = w2n * pt;
+        Vector3 pb(baseline,0,0);
 
-        double invp1 = 1.0/p1(2);
+        number_t invp1 = cst(1.0)/p1(2);
         res.head<2>() = p1.head<2>()*invp1;
 
         // right camera px
@@ -357,9 +354,9 @@ namespace g2o {
         res(2) = p2(0)/p2(2);
       }
 
-      static Matrix3D dRidx;
-	  static Matrix3D dRidy;
-	  static Matrix3D dRidz;
+      static Matrix3 dRidx;
+	  static Matrix3 dRidy;
+	  static Matrix3 dRidz;
     };
 
 
@@ -370,7 +367,7 @@ namespace g2o {
 
 // stereo projection
 // first two args are the measurement type, second two the connection classes
-  class G2O_TYPES_ICP_API Edge_XYZ_VSC : public  BaseBinaryEdge<3, Vector3D, VertexSBAPointXYZ, VertexSCam>
+  class G2O_TYPES_ICP_API Edge_XYZ_VSC : public  BaseBinaryEdge<3, Vector3, VertexSBAPointXYZ, VertexSCam>
 {
   public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
@@ -389,7 +386,7 @@ namespace g2o {
       //cam->setAll();
 
       // calculate the projection
-      Vector3D kp;
+      Vector3 kp;
       cam->mapPoint(kp,point->estimate());
 
       // std::cout << std::endl << "CAM   " << cam->estimate() << std::endl;

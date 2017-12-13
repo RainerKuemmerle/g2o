@@ -36,20 +36,20 @@ namespace g2o {
   /**
    * \brief Prior for a two D pose with constraints only in xy direction (like gps)
    */
-  class G2O_TYPES_SLAM2D_API EdgeSE2XYPrior : public BaseUnaryEdge<2, Vector2D, VertexSE2>
+  class G2O_TYPES_SLAM2D_API EdgeSE2XYPrior : public BaseUnaryEdge<2, Vector2, VertexSE2>
   {
   public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
     EdgeSE2XYPrior();
 
-    virtual bool setMeasurementData(const double* d)
+    virtual bool setMeasurementData(const number_t* d)
     {
       _measurement[0]=d[0];
       _measurement[1]=d[1];
       return true;
     }
 
-    virtual bool getMeasurementData(double* d) const
+    virtual bool getMeasurementData(number_t* d) const
     {
       d[0] = _measurement[0];
       d[1] = _measurement[1];

@@ -31,9 +31,10 @@
 #include <cassert>
 #include <limits>
 
+#include "g2o/config.h"
+#include "g2o/stuff/misc.h"
 #include "base_edge.h"
 #include "robust_kernel.h"
-#include "g2o/config.h"
 
 namespace g2o {
 
@@ -45,7 +46,7 @@ namespace g2o {
       static const int Dimension = BaseEdge<D, E>::Dimension;
       typedef typename BaseEdge<D,E>::Measurement Measurement;
       typedef VertexXi VertexXiType;
-      typedef typename Eigen::Matrix<double, D, VertexXiType::Dimension, D==1?Eigen::RowMajor:Eigen::ColMajor>::AlignedMapType JacobianXiOplusType;
+      typedef typename Eigen::Matrix<number_t, D, VertexXiType::Dimension, D==1?Eigen::RowMajor:Eigen::ColMajor>::AlignedMapType JacobianXiOplusType;
       typedef typename BaseEdge<D,E>::ErrorVector ErrorVector;
       typedef typename BaseEdge<D,E>::InformationType InformationType;
 
@@ -76,7 +77,7 @@ namespace g2o {
 
       virtual void initialEstimate(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to);
 
-      virtual void mapHessianMemory(double*, int, int, bool) {assert(0 && "BaseUnaryEdge does not map memory of the Hessian");}
+      virtual void mapHessianMemory(number_t*, int, int, bool) {assert(0 && "BaseUnaryEdge does not map memory of the Hessian");}
 
       using BaseEdge<D,E>::resize;
       using BaseEdge<D,E>::computeError;

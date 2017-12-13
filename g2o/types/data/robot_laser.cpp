@@ -50,7 +50,7 @@ namespace g2o {
   bool RobotLaser::read(std::istream& is)
   {
     int type;
-    double angle, fov, res, maxrange, acc;
+    number_t angle, fov, res, maxrange, acc;
     int remission_mode;
     is >> type >> angle >> fov >> res >> maxrange >> acc >> remission_mode;
 
@@ -67,7 +67,7 @@ namespace g2o {
       is >> _remissions[i];
 
     // special robot laser stuff
-    double x,y,theta;
+    number_t x,y,theta;
     is >> x >> y >> theta;
     SE2 lp(x,y,theta);
     //cerr << "x: " << x << " y:" << y << " th:" << theta << " ";
@@ -97,7 +97,7 @@ namespace g2o {
       os << " " << _remissions[i];
 
     // odometry pose
-    Vector3D p = (_odomPose * _laserParams.laserPose).toVector();
+    Vector3 p = (_odomPose * _laserParams.laserPose).toVector();
     os << " " << p.x() << " " << p.y() << " " << p.z();
     p = _odomPose.toVector();
     os << " " << p.x() << " " << p.y() << " " << p.z();
@@ -158,8 +158,8 @@ namespace g2o {
       float r2=_maxRange->value();
       r2 *= r2;
       for (size_t i=0; i<points.size(); i++){
-	double x = points[i].x();
-	double y = points[i].y();
+	number_t x = points[i].x();
+	number_t y = points[i].y();
 	if (x*x + y*y < r2)
 	  npoints[k++] = points[i];
       }

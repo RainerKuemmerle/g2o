@@ -35,7 +35,7 @@
 
 namespace g2o {
 
-  class G2O_TYPES_SLAM2D_API EdgeSE2LotsOfXY : public BaseMultiEdge<-1,VectorXD>
+  class G2O_TYPES_SLAM2D_API EdgeSE2LotsOfXY : public BaseMultiEdge<-1,VectorX>
   {
     protected:
       unsigned int _observedPoints;
@@ -67,7 +67,7 @@ namespace g2o {
       virtual bool setMeasurementFromState();
 
       virtual void initialEstimate(const OptimizableGraph::VertexSet&, OptimizableGraph::Vertex*);
-      virtual double initialEstimatePossible(const OptimizableGraph::VertexSet&, OptimizableGraph::Vertex*);
+      virtual number_t initialEstimatePossible(const OptimizableGraph::VertexSet&, OptimizableGraph::Vertex*);
 
       virtual void linearizeOplus();
   };

@@ -28,14 +28,14 @@
 
 namespace g2o {
 
-  EdgeSE2XYPrior::EdgeSE2XYPrior() : BaseUnaryEdge< 2, Vector2D, g2o::VertexSE2 >()
+  EdgeSE2XYPrior::EdgeSE2XYPrior() : BaseUnaryEdge< 2, Vector2, g2o::VertexSE2 >()
   {
     
   }
 
   bool EdgeSE2XYPrior::read(std::istream& is)
   {
-    Vector2D p;
+    Vector2 p;
     is >> p[0] >> p[1];
     setMeasurement(p);    
     for (int i = 0; i < 2; ++i)
@@ -49,7 +49,7 @@ namespace g2o {
 
   bool EdgeSE2XYPrior::write(std::ostream& os) const
   {
-    Vector2D p = measurement();
+    Vector2 p = measurement();
     os << p[0] << " " << p[1];
     for (int i = 0; i < 2; ++i)
       for (int j = i; j < 2; ++j)
