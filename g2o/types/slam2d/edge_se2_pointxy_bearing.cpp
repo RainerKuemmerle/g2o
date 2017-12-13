@@ -109,7 +109,7 @@ namespace g2o {
       return this;
     number_t guessRange=5;
     number_t theta = e->measurement();
-    Vector2 p(cos(theta)*guessRange, sin(theta)*guessRange);
+    Vector2 p(std::cos(theta)*guessRange, std::sin(theta)*guessRange);
     glPushAttrib(GL_ENABLE_BIT|GL_LIGHTING|GL_COLOR);
     glDisable(GL_LIGHTING);
     if (!to){

@@ -178,7 +178,7 @@ namespace g2o {
       delta[0] = q.x();
       delta[1] = q.y();
       delta[2] = q.z();
-      delta[3] = atan2(W_delta(1, 0), W_delta(0, 0));
+      delta[3] = std::atan2(W_delta(1, 0), W_delta(0, 0));
      
       return delta;
     }
@@ -194,15 +194,15 @@ namespace g2o {
     G2O_TYPES_SLAM3D_ADDONS_API Vector6 normalizeCartesianLine(const Vector6& line);
 
     static inline number_t mline_elevation(const number_t v[3]) {
-      return atan2(v[2], sqrt(v[0]*v[0] + v[1]*v[1]));
+      return std::atan2(v[2], sqrt(v[0]*v[0] + v[1]*v[1]));
     }
     
     G2O_TYPES_SLAM3D_ADDONS_API inline number_t getAzimuth(const Vector3& direction) {
-      return atan2(direction.y(), direction.x());
+      return std::atan2(direction.y(), direction.x());
     }
 
     G2O_TYPES_SLAM3D_ADDONS_API inline number_t getElevation(const Vector3& direction) {
-      return atan2(direction.z(), direction.head<2>().norm());
+      return std::atan2(direction.z(), direction.head<2>().norm());
     }
     
   }

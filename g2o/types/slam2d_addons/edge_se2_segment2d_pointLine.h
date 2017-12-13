@@ -60,7 +60,7 @@ namespace g2o {
         Vector2 dP = predP2 - predP1;
         Vector2 normal(dP.y(), -dP.x()); normal.normalize();
         Vector3 prediction;
-        prediction [2] = atan2(normal.y(), normal.x());
+        prediction [2] = std::atan2(normal.y(), normal.x());
         Eigen::Map<Vector2> pt(&prediction[0]);
         pt = (_pointNum==0) ? predP1 : predP2;
 	_error=prediction-_measurement;
@@ -90,7 +90,7 @@ namespace g2o {
         Vector2 dP = predP2 - predP1;
         Vector2 normal(dP.y(), -dP.x()); normal.normalize();
         Vector3 prediction;
-        prediction [2] = atan2(normal.y(), normal.x());
+        prediction [2] = std::atan2(normal.y(), normal.x());
         Eigen::Map<Vector2> pt(&prediction[0]);
         pt = (_pointNum==0)?predP1:predP2;
         setMeasurement(prediction);

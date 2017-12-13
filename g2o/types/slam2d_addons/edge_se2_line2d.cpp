@@ -71,7 +71,7 @@ namespace g2o {
       Vector2 est=_measurement;
       est[0] += T.rotation().angle();
       est[0] = normalize_theta(est[0]);
-      Vector2 n(cos(est[0]), sin(est[0]));
+      Vector2 n(std::cos(est[0]), std::sin(est[0]));
       est[1] += n.dot(T.translation());
       vj->setEstimate(est);
     }

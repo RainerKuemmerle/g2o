@@ -97,7 +97,7 @@ namespace g2o {
       const double& r = _ranges[i];
       if (r < _laserParams.maxRange && r > _laserParams.minRange) {
         number_t alpha = _laserParams.firstBeamAngle + i * _laserParams.angularStep;
-        points.push_back(Vector2(cos(alpha) * r, sin(alpha) * r));
+        points.push_back(Vector2(std::cos(alpha) * r, std::sin(alpha) * r));
       }
     }
     return points;

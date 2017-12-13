@@ -189,11 +189,11 @@ namespace g2o {
         }
         else
         {
-          number_t theta = acos(d);
+          number_t theta = std::acos(d);
           omega = theta/(2*sqrt(1-d*d))*dR;
           Matrix3 Omega = skew(omega);
           V_inv = ( Matrix3::Identity() - 0.5*Omega
-              + ( 1-theta/(2*tan(theta/2)))/(theta*theta)*(Omega*Omega) );
+              + ( 1-theta/(2*std::tan(theta/2)))/(theta*theta)*(Omega*Omega) );
         }
 
         upsilon = V_inv*_t;
@@ -240,12 +240,12 @@ namespace g2o {
           Matrix3 Omega2 = Omega*Omega;
 
           R = (Matrix3::Identity()
-              + sin(theta)/theta *Omega
-              + (1-cos(theta))/(theta*theta)*Omega2);
+              + std::sin(theta)/theta *Omega
+              + (1-std::cos(theta))/(theta*theta)*Omega2);
 
           V = (Matrix3::Identity()
-              + (1-cos(theta))/(theta*theta)*Omega
-              + (theta-sin(theta))/(pow(theta,3))*Omega2);
+              + (1-std::cos(theta))/(theta*theta)*Omega
+              + (theta-std::sin(theta))/(std::pow(theta,3))*Omega2);
         }
         return SE3Quat(Quaternion(R),V*upsilon);
       }

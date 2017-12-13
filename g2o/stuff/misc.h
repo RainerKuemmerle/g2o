@@ -80,7 +80,7 @@ inline T square(T x)
 template <typename T>
 inline T hypot(T x, T y)
 {
-  return (T) (sqrt(x*x + y*y));
+  return (T) (std::sqrt(x*x + y*y));
 }
 
 /**
@@ -116,7 +116,7 @@ inline number_t normalize_theta(number_t theta)
   if (theta >= -const_pi() && theta < const_pi())
     return theta;
   
-  number_t multiplier = floor(theta / (2*const_pi()));
+  number_t multiplier = std::floor(theta / (2*const_pi()));
   theta = theta - multiplier*2*const_pi();
   if (theta >= const_pi())
     theta -= 2*const_pi();
@@ -141,8 +141,8 @@ inline number_t average_angle(number_t theta1, number_t theta2)
 {
   number_t x, y;
 
-  x = cos(theta1) + cos(theta2);
-  y = sin(theta1) + sin(theta2);
+  x = std::cos(theta1) + std::cos(theta2);
+  y = std::sin(theta1) + std::sin(theta2);
   if(x == 0 && y == 0)
     return 0;
   else

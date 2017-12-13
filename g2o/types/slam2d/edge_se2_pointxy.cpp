@@ -75,9 +75,9 @@ namespace g2o {
     const number_t& x2        = vj->estimate()[0];
     const number_t& y2        = vj->estimate()[1];
 
-    number_t aux_1 = cos(th1) ;
+    number_t aux_1 = std::cos(th1) ;
     number_t aux_2 = -aux_1 ;
-    number_t aux_3 = sin(th1) ;
+    number_t aux_3 = std::sin(th1) ;
 
     _jacobianOplusXi( 0 , 0 ) = aux_2 ;
     _jacobianOplusXi( 0 , 1 ) = -aux_3 ;

@@ -155,7 +155,7 @@ namespace g2o {
     }
 
     Matrix2F rot = that->U();
-    float angle = atan2(rot(1,0), rot(0,0));
+    float angle = std::atan2(rot(1,0), rot(0,0));
     glRotatef(angle*180.0/const_pi(), 0., 0., 1.);
     Vector2F sv = that->singularValues();
     glScalef(sqrt(sv(0)), sqrt(sv(1)), 1);
@@ -164,8 +164,8 @@ namespace g2o {
     glBegin(GL_LINE_LOOP);
     for(int i=0; i<36; i++){
       float rad = i*const_pi() /18.0;
-      glVertex2f(cos(rad),
-		 sin(rad));
+      glVertex2f(std::cos(rad),
+		 std::sin(rad));
     }
     glEnd();
 

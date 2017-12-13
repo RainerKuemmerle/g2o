@@ -96,9 +96,9 @@ namespace g2o
           else
           {
             number_t theta2= theta*theta;
-            A = (1-cos(theta))/(theta2);
-            B = (theta-sin(theta))/(theta2*theta);
-            R = I + sin(theta)/theta *Omega + (1-cos(theta))/(theta*theta)*Omega2;
+            A = (1-std::cos(theta))/(theta2);
+            B = (theta-std::sin(theta))/(theta2*theta);
+            R = I + std::sin(theta)/theta *Omega + (1-std::cos(theta))/(theta*theta)*Omega2;
           }
         }
         else
@@ -113,9 +113,9 @@ namespace g2o
           }
           else
           {
-            R = I + sin(theta)/theta *Omega + (1-cos(theta))/(theta*theta)*Omega2;
-            number_t a=s*sin(theta);
-            number_t b=s*cos(theta);
+            R = I + std::sin(theta)/theta *Omega + (1-std::cos(theta))/(theta*theta)*Omega2;
+            number_t a=s*std::sin(theta);
+            number_t b=s*std::cos(theta);
             number_t theta2= theta*theta;
             number_t sigma2= sigma*sigma;
             number_t c=theta2+sigma2;
@@ -165,12 +165,12 @@ namespace g2o
           }
           else
           {
-            number_t theta = acos(d);
+            number_t theta = std::acos(d);
             number_t theta2 = theta*theta;
-            omega = theta/(2*sqrt(1-d*d))*deltaR(R);
+            omega = theta/(2*std::sqrt(1-d*d))*deltaR(R);
             Omega = skew(omega);
-            A = (1-cos(theta))/(theta2);
-            B = (theta-sin(theta))/(theta2*theta);
+            A = (1-std::cos(theta))/(theta2);
+            B = (theta-std::sin(theta))/(theta2*theta);
           }
         }
         else
@@ -186,12 +186,12 @@ namespace g2o
           }
           else
           {
-            number_t theta = acos(d);
-            omega = theta/(2*sqrt(1-d*d))*deltaR(R);
+            number_t theta = std::acos(d);
+            omega = theta/(2*std::sqrt(1-d*d))*deltaR(R);
             Omega = skew(omega);
             number_t theta2 = theta*theta;
-            number_t a=s*sin(theta);
-            number_t b=s*cos(theta);
+            number_t a=s*std::sin(theta);
+            number_t b=s*std::cos(theta);
             number_t c=theta2 + sigma*sigma;
             A = (a*sigma+ (1-b)*theta)/(theta*c);
             B = (C-((b-1)*sigma+a*theta)/(c))*1./(theta2);

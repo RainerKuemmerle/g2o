@@ -89,7 +89,7 @@ namespace g2o {
     _w2l.translation() = w2l.translation();
 
     number_t alpha=v->estimate().rotation().angle();
-    number_t c=cos(alpha), s=sin(alpha);
+    number_t c=std::cos(alpha), s=std::sin(alpha);
     Matrix2 RInversePrime;
     RInversePrime << -s, c, -c, -s;
     _RpInverse_RInversePrime = _offsetParam->offset().rotation().toRotationMatrix().transpose()*RInversePrime;

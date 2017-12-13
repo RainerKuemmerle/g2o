@@ -104,8 +104,8 @@ namespace g2o{
     const number_t& y1        = vi->estimate().translation()[1];
     const number_t& th1       = vi->estimate().rotation().angle();
 
-    number_t ct = cos(th1) ;
-    number_t st = sin(th1) ;
+    number_t ct = std::cos(th1) ;
+    number_t st = std::sin(th1) ;
 
     MatrixX Ji;
     unsigned int rows = 2*(_vertices.size()-1);

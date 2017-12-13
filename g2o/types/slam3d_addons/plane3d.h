@@ -63,11 +63,11 @@ namespace g2o {
       }
 
       static double azimuth(const Vector3& v) {
-        return atan2(v(1),v(0));
+        return std::atan2(v(1),v(0));
       }
 
       static  double elevation(const Vector3& v) {
-        return atan2(v(2), v.head<2>().norm());
+        return std::atan2(v(2), v.head<2>().norm());
       }
 
     double distance() const {
@@ -89,8 +89,8 @@ namespace g2o {
       //construct a normal from azimuth and evelation;
       double _azimuth=v[0];
       double _elevation=v[1];
-      double s=sin(_elevation), c=cos(_elevation);
-      Vector3 n (c*cos(_azimuth), c*sin(_azimuth), s) ;
+      double s=std::sin(_elevation), c=std::cos(_elevation);
+      Vector3 n (c*std::cos(_azimuth), c*std::sin(_azimuth), s) ;
       
       // rotate the normal
       Matrix3 R=rotation(normal());

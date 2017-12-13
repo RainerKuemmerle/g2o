@@ -45,7 +45,7 @@ namespace g2o {
         const VertexSE2* v1 = static_cast<const VertexSE2*>(_vertices[0]);
         const VertexPointXY* l2 = static_cast<const VertexPointXY*>(_vertices[1]);
         Vector2 delta = (v1->estimate().inverse() * l2->estimate());
-        number_t angle = atan2(delta[1], delta[0]);
+        number_t angle = std::atan2(delta[1], delta[0]);
         _error[0] = normalize_theta(_measurement - angle );
       }
 
@@ -65,7 +65,7 @@ namespace g2o {
         const VertexSE2* v1 = static_cast<const VertexSE2*>(_vertices[0]);
         const VertexPointXY* l2 = static_cast<const VertexPointXY*>(_vertices[1]);
         Vector2 delta = (v1->estimate().inverse() * l2->estimate());
-  _measurement = atan2(delta[1], delta[0]);
+  _measurement = std::atan2(delta[1], delta[0]);
   return true;
       }
       

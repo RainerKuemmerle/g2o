@@ -57,7 +57,7 @@ namespace g2o {
         Vector2 predP2 = iEst * l2->estimateP2();
         Vector2 dP = predP2 - predP1;
         Vector2 normal(dP.y(), -dP.x()); normal.normalize();
-        Vector2 prediction(atan2(normal.y(), normal.x()),
+        Vector2 prediction(std::atan2(normal.y(), normal.x()),
 			    predP1.dot(normal)*.5 + predP2.dot(normal)*.5);
 
 	_error=prediction-_measurement;
@@ -86,7 +86,7 @@ namespace g2o {
         Vector2 predP2 = iEst * l2->estimateP2();
         Vector2 dP = predP2 - predP1;
         Vector2 normal(dP.y(), -dP.x()); normal.normalize();
-        Vector2 prediction(atan2(normal.y(), normal.x()),
+        Vector2 prediction(std::atan2(normal.y(), normal.x()),
 			    predP1.dot(normal)*.5 + predP2.dot(normal)*.5);
 	_measurement = prediction;
 	return true;

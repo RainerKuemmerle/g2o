@@ -50,7 +50,7 @@ namespace g2o {
         SE2 iT=v1->estimate().inverse();
         prediction[0] += iT.rotation().angle();
         prediction[0] = normalize_theta(prediction[0]);
-        Vector2 n(cos(prediction[0]), sin(prediction[0]));
+        Vector2 n(std::cos(prediction[0]), std::sin(prediction[0]));
         prediction[1] += n.dot(iT.translation());
         _error =  prediction - _measurement;
         _error [0] =  normalize_theta(_error[0]);
@@ -77,7 +77,7 @@ namespace g2o {
         SE2 iT=v1->estimate().inverse();
         prediction[0] += iT.rotation().angle();
         prediction[0] = normalize_theta(prediction[0]);
-        Vector2 n(cos(prediction[0]), sin(prediction[0]));
+        Vector2 n(std::cos(prediction[0]), std::sin(prediction[0]));
         prediction[1] += n.dot(iT.translation());
         _measurement = prediction;
         return true;

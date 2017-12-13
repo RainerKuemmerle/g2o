@@ -81,7 +81,7 @@ namespace g2o {
     number_t thetai = vi->estimate().rotation().angle();
 
     Vector2 dt = vj->estimate().translation() - vi->estimate().translation();
-    number_t si=sin(thetai), ci=cos(thetai);
+    number_t si=std::sin(thetai), ci=std::cos(thetai);
 
     _jacobianOplusXi(0, 0) = -ci; _jacobianOplusXi(0, 1) = -si; _jacobianOplusXi(0, 2) = -si*dt.x()+ci*dt.y();
     _jacobianOplusXi(1, 0) =  si; _jacobianOplusXi(1, 1) = -ci; _jacobianOplusXi(1, 2) = -ci*dt.x()-si*dt.y();

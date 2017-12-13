@@ -50,9 +50,9 @@ namespace g2o {
       const number_t& q1 = q.x();
       const number_t& q2 = q.y();
       const number_t& q3 = q.z();
-      number_t roll = atan2(2*(q0*q1+q2*q3), 1-2*(q1*q1+q2*q2));
-      number_t pitch = asin(2*(q0*q2-q3*q1));
-      number_t yaw = atan2(2*(q0*q3+q1*q2), 1-2*(q2*q2+q3*q3));
+      number_t roll = std::atan2(2*(q0*q1+q2*q3), 1-2*(q1*q1+q2*q2));
+      number_t pitch = std::asin(2*(q0*q2-q3*q1));
+      number_t yaw = std::atan2(2*(q0*q3+q1*q2), 1-2*(q2*q2+q3*q3));
       return Vector3(roll, pitch, yaw);
     }
 
@@ -61,12 +61,12 @@ namespace g2o {
       number_t roll  = v[0];
       number_t pitch = v[1];
       number_t yaw   = v[2];
-      number_t sy = sin(yaw*0.5);
-      number_t cy = cos(yaw*0.5);
-      number_t sp = sin(pitch*0.5);
-      number_t cp = cos(pitch*0.5);
-      number_t sr = sin(roll*0.5);
-      number_t cr = cos(roll*0.5);
+      number_t sy = std::sin(yaw*cst(0.5));
+      number_t cy = std::cos(yaw*cst(0.5));
+      number_t sp = std::sin(pitch*cst(0.5));
+      number_t cp = std::cos(pitch*cst(0.5));
+      number_t sr = std::sin(roll*cst(0.5));
+      number_t cr = std::cos(roll*cst(0.5));
       number_t w = cr*cp*cy + sr*sp*sy;
       number_t x = sr*cp*cy - cr*sp*sy;
       number_t y = cr*sp*cy + sr*cp*sy;

@@ -109,7 +109,7 @@ namespace g2o {
     if (_pointSize) {
       glPointSize(_pointSize->value());
     }
-    Vector2 n(cos(that->theta()), sin(that->theta()));
+    Vector2 n(std::cos(that->theta()), std::sin(that->theta()));
     Vector2 pmiddle=n*that->rho();
     Vector2 t(-n.y(), n.x());
     number_t l1{},l2 = 10;
