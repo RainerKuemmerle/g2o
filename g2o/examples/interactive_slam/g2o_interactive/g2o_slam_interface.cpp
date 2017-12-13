@@ -218,11 +218,11 @@ bool G2oSlamInterface::addEdge(const std::string& tag, int id, int dimension, in
     Matrix<double, 6, 6> infMat;
 
     if (measurement.size() == 7) { // measurement is a Quaternion
-      Vector7d meas;
+      Vector7 meas;
       for (int i=0; i<7; ++i) 
         meas(i) = measurement[i];
       // normalize the quaternion to recover numerical precision lost by storing as human readable text
-      Vector4d::MapType(meas.data()+3).normalize();
+      Vector4::MapType(meas.data()+3).normalize();
       transf = internal::fromVectorQT(meas);
 
       for (int i = 0, idx = 0; i < infMat.rows(); ++i)
@@ -232,7 +232,7 @@ bool G2oSlamInterface::addEdge(const std::string& tag, int id, int dimension, in
             infMat(j,i)=infMat(i,j);
         }
     } else { // measurement consists of Euler angles
-      Vector6d aux;
+      Vector6 aux;
       aux << measurement[0], measurement[1], measurement[2],measurement[3], measurement[4], measurement[5];
       transf = internal::fromVectorET(aux);
       Matrix<double, 6, 6> infMatEuler;
