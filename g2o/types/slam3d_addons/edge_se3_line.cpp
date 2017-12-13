@@ -137,7 +137,7 @@ namespace g2o {
     Vector3 npoint = line.d().cross(line.w());
     
     glPushMatrix();
-    glMultMatrixd(robot->estimate().matrix().data());
+    glMultMatrixd(robot->estimate().matrix().cast<double>().eval().data());
     glColor3f(float(that->color(0)), float(that->color(1)), float(that->color(2)));
     if(_lineLength && _lineWidth) {
       glLineWidth(float(_lineWidth->value())); 

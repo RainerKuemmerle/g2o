@@ -118,7 +118,7 @@ namespace g2o {
     glPushAttrib(GL_COLOR);
     glColor3f(POSE_PARAMETER_COLOR);
     glPushMatrix();
-    glMultMatrixd(that->offsetParam()->offset().data());
+    glMultMatrixd(that->offsetParam()->offset().cast<double>().data());
     opengl::drawBox(cs,cs,cs);
     glPopMatrix();
     glPopAttrib();

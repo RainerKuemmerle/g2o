@@ -117,7 +117,7 @@ namespace g2o
     glColor3f(float(that->color(0)), float(that->color(1)), float(that->color(2)));
     glPushMatrix();
     Isometry3 robotAndSensor = robot->estimate() * sensor->estimate();
-    glMultMatrixd(robotAndSensor.matrix().data());
+    glMultMatrixd(robotAndSensor.matrix().cast<double>().eval().data());
 
     glRotatef(float(RAD2DEG(azimuth)), 0.f, 0.f, 1.f);
     glRotatef(float(RAD2DEG(elevation)), 0.f, -1.f, 0.f);

@@ -112,7 +112,7 @@ namespace g2o {
     Vector2 n(cos(that->theta()), sin(that->theta()));
     Vector2 pmiddle=n*that->rho();
     Vector2 t(-n.y(), n.x());
-    number_t l1,l2 = 10;
+    number_t l1{},l2 = 10;
     VertexPointXY *vp1=0, *vp2=0;
     vp1=dynamic_cast<VertexPointXY*> (that->graph()->vertex(that->p1Id));
     vp2=dynamic_cast<VertexPointXY*> (that->graph()->vertex(that->p2Id));

@@ -133,7 +133,7 @@ namespace g2o {
     glPushAttrib(GL_COLOR);
     glColor3f(POSE_PARAMETER_COLOR);
     glPushMatrix();
-    glMultMatrixd(that->camParams()->offset().data());
+    glMultMatrixd(that->camParams()->offset().cast<double>().data());
     glRotatef(180.0f, 0.0f, 1.0f, 0.0f);
     opengl::drawPyramid(_cameraSide->value(), _cameraZ->value());
     glPopMatrix();

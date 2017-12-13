@@ -83,7 +83,7 @@ class StructureOnlySolver : public OptimizationAlgorithm
         assert(track.size()>=2);
         number_t chi2 = 0;
         // TODO make these parameters
-        number_t mu = (number_t)0.01;
+        number_t mu = cst(0.01);
         number_t nu = 2;
 
         for (g2o::HyperGraph::EdgeSet::iterator it_t=track.begin(); it_t!=track.end(); ++it_t) {
@@ -151,7 +151,7 @@ class StructureOnlySolver : public OptimizationAlgorithm
                 Eigen::Matrix<number_t,PointDoF,1,Eigen::ColMajor> delta_p = chol_H_pp.solve(b);
                 v->push();
                 v->oplus(delta_p.data());
-                number_t new_chi2 = 0.;
+                number_t new_chi2 = 0;
                 for (g2o::HyperGraph::EdgeSet::iterator it_t=track.begin(); it_t!=track.end(); ++it_t) {
                   g2o::OptimizableGraph::Edge* e = dynamic_cast<g2o::OptimizableGraph::Edge *>(*it_t);
                   e->computeError();
@@ -171,7 +171,7 @@ class StructureOnlySolver : public OptimizationAlgorithm
 
               // update the damping factor based on the result of the last increment
               if (goodStep) {
-                mu *= (number_t)(1./3.);
+                mu *= cst(1./3.);
                 nu = 2.;
                 trial=0;
                 break;
