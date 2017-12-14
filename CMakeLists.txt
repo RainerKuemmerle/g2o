@@ -261,11 +261,11 @@ IF(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   MESSAGE(STATUS "Compiling with Clang")
 
   # activate all warnings
-  #SET(g2o_C_FLAGS "${g2o_C_FLAGS} -Weverything")
-  #SET(g2o_CXX_FLAGS "${g2o_CXX_FLAGS} -Weverything")
   SET(g2o_C_FLAGS "${g2o_C_FLAGS} -Wall")
   SET(g2o_CXX_FLAGS "${g2o_CXX_FLAGS} -Wall")
-  #SET(g2o_CXX_FLAGS "${g2o_CXX_FLAGS} -Wall -stdlib=libc++")
+
+  # disable some external Eigen C++17 deprecated warnings
+  SET(g2o_CXX_FLAGS "${g2o_CXX_FLAGS} -Wno-deprecated-register -Wno-deprecated-declarations")
 ENDIF()
 
 IF(MSVC)
