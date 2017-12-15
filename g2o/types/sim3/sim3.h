@@ -91,7 +91,7 @@ namespace g2o
           {
             A = cst(1./2.);
             B = cst(1./6.);
-            R = (I + Omega + Omega*Omega);
+            R = (I + Omega + Omega*Omega/2);//R=I+(1-cos(theta))*a^a^+sin(theta)*a^~=(omit O(theta^3))=I+theta^2/2*a^a^+theta*a^
           }
           else
           {
@@ -108,8 +108,9 @@ namespace g2o
           {
             number_t sigma2= sigma*sigma;
             A = ((sigma-1)*s+1)/sigma2;
-            B= ((cst(0.5)*sigma2-sigma+1)*s)/(sigma2*sigma);
-            R = (I + Omega + Omega2);
+            B= ((cst(0.5)*sigma2-sigma+1)*s-1)/(sigma2*sigma);//B=[C-((s*cos(theta)-1)*sigma+s*sin(theta)*theta)/(sigma^2+theta^2)]/theta^2~=(omit O(theta^2))=
+	    //(1/2*s*sigma-s)/(sigma^2)+[C-(s-1)*sigma/(sigma^2+theta^2)]/theta^2~=(0.5*sigma^2*s-s*sigma)/sigma^3+[s-1]/sigma^3=[s*(0.5*sigma^2-sigma+1)-1]/sigma^3  
+            R = (I + Omega + Omega2/2);//R=I+(1-cos(theta))*a^a^+sin(theta)*a^~=I+theta^2/2*a^a^+theta*a^
           }
           else
           {
@@ -179,10 +180,14 @@ namespace g2o
           if (d>1-eps)
           {
             number_t sigma2 = sigma*sigma;
-            omega=0.5*deltaR(R);
+            omega=cst(0.5)*deltaR(R);
             Omega = skew(omega);
             A = ((sigma-1)*s+1)/(sigma2);
-            B = ((0.5*sigma2-sigma+1)*s)/(sigma2*sigma);
+            B = ((cst(0.5)*sigma2-sigma+1)*s-1)/(sigma2*sigma);//B=[C-((s*cos(theta)-1)*sigma+s*sin(theta)*theta)/(sigma^2+theta^2)]/theta^2
+	    //use limit(theta->0)(B)=limit(theta->0){[(sigma2+theta2)*(s*sigma*sin(theta)-s*sin(theta)-s*theta*cos(theta))+(s*cos(theta)*sigma-sigma+s*sin(theta)*theta)*2*theta]/(2*theta)}=
+	    //=limit(theta->0)(s*sigma-s)*sin(theta)/(2*(sigma2+theta2)*theta)+limit(theta->0)[-s*cos(theta)/(2*(sigma2+theta2))+(s*cos(theta)*sigma-sigma+s*sin(theta)*theta)/(sigma2+theta2)^2]=
+	    //=limit(theta->0)(s*sigma-s)*cos(theta)/(2*(sigma2+3*theta2))+-s/(2*sigma2)+(s-1)/sigma^3=
+	    //=(s*sigma-s)/2/sigma2-s/2/sigma2+(s-1)/sigma^3=[(0.5*sigma2-sigma+1)*s-1]/sigma^3
           }
           else
           {
