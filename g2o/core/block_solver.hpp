@@ -221,8 +221,7 @@ bool BlockSolver<Traits>::buildStructure(bool zeroBlocks)
   _DInvSchur->diagonal().resize(landmarkIdx);
   _Hpl->fillSparseBlockMatrixCCS(*_HplCCS);
 
-  for (size_t i = 0; i < _optimizer->indexMapping().size(); ++i) {
-    OptimizableGraph::Vertex* v = _optimizer->indexMapping()[i];
+  for (OptimizableGraph::Vertex* v : _optimizer->indexMapping()) {
     if (v->marginalized()){
       const HyperGraph::EdgeSet& vedges=v->edges();
       for (HyperGraph::EdgeSet::const_iterator it1=vedges.begin(); it1!=vedges.end(); ++it1){

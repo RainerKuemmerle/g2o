@@ -72,7 +72,7 @@ namespace g2o {
       // initialize an object
       SBACam()
       {
-        setKcam(1,1,0.5,0.5,0);  // unit image projection
+        setKcam(1,1, cst(0.5), cst(0.5),0);  // unit image projection
       }
 
 
@@ -100,7 +100,7 @@ namespace g2o {
         // small quaternion update
         Quaternion qr;
         qr.vec() = update.segment<3>(3); 
-        qr.w() = sqrt(1.0 - qr.vec().squaredNorm()); // should always be positive
+        qr.w() = sqrt(cst(1.0) - qr.vec().squaredNorm()); // should always be positive
         _r *= qr;                 // post-multiply
         _r.normalize();    
         setTransform();
@@ -139,7 +139,7 @@ namespace g2o {
         Kcam(1,1) = fy;
         Kcam(0,2) = cx;
         Kcam(1,2) = cy;
-        Kcam(2,2) = 1.0;
+        Kcam(2,2) = cst(1.0);
         baseline = tx;
         setProjection();
         setDr();
@@ -158,15 +158,15 @@ namespace g2o {
         // inefficient, just for testing
         // use simple multiplications and additions for production code in calculating dRdx,y,z
         Matrix3 dRidx, dRidy, dRidz;
-        dRidx << 0.0,0.0,0.0,  
-              0.0,0.0,2.0,
-              0.0,-2.0,0.0;
-        dRidy  << 0.0,0.0,-2.0,
-               0.0,0.0,0.0,
-               2.0,0.0,0.0;
-        dRidz  << 0.0,2.0,0.0,  
-               -2.0,0.0,0.0,
-               0.0,0.0,0.0;
+        dRidx << cst(0.0), cst(0.0), cst(0.0),
+            cst(0.0), cst(0.0), cst(2.0),
+            cst(0.0), cst(-2.0), cst(0.0);
+        dRidy  << cst(0.0), cst(0.0), cst(-2.0),
+            cst(0.0), cst(0.0), cst(0.0),
+            cst(2.0), cst(0.0), cst(0.0);
+        dRidz  << cst(0.0), cst(2.0), cst(0.0),
+            cst(-2.0), cst(0.0), cst(0.0),
+            cst(0.0), cst(0.0), cst(0.0);
 
         // for dS'*R', with dS the incremental change
         dRdx = dRidx * w2n.block<3,3>(0,0);

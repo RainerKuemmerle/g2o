@@ -69,30 +69,30 @@ namespace g2o {
         _vertices.resize(2);
       }
 
-      virtual OptimizableGraph::Vertex* createFrom();
-      virtual OptimizableGraph::Vertex* createTo();
-      virtual OptimizableGraph::Vertex* createVertex(int i);
+      inline virtual OptimizableGraph::Vertex* createFrom();
+      inline virtual OptimizableGraph::Vertex* createTo();
+      inline virtual OptimizableGraph::Vertex* createVertex(int i);
 
-      virtual void resize(size_t size);
+      inline virtual void resize(size_t size);
 
-      virtual bool allVerticesFixed() const;
+      inline virtual bool allVerticesFixed() const;
 
-      virtual void linearizeOplus(JacobianWorkspace& jacobianWorkspace);
+      inline virtual void linearizeOplus(JacobianWorkspace& jacobianWorkspace);
 
       /**
        * Linearizes the oplus operator in the vertex, and stores
        * the result in temporary variables _jacobianOplusXi and _jacobianOplusXj
        */
-      virtual void linearizeOplus();
+      inline virtual void linearizeOplus();
 
       //! returns the result of the linearization in the manifold space for the node xi
       const JacobianXiOplusType& jacobianOplusXi() const { return _jacobianOplusXi;}
       //! returns the result of the linearization in the manifold space for the node xj
       const JacobianXjOplusType& jacobianOplusXj() const { return _jacobianOplusXj;}
 
-      virtual void constructQuadraticForm() ;
+      inline virtual void constructQuadraticForm() ;
 
-      virtual void mapHessianMemory(number_t* d, int i, int j, bool rowMajor);
+      inline virtual void mapHessianMemory(number_t* d, int i, int j, bool rowMajor);
 
       using BaseEdge<D,E>::resize;
       using BaseEdge<D,E>::computeError;

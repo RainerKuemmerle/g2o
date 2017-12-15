@@ -66,7 +66,7 @@ namespace g2o {
     virtual number_t hessianDeterminant() const {return _hessian.determinant();}
     virtual number_t* hessianData() { return const_cast<number_t*>(_hessian.data());}
 
-    virtual void mapHessianMemory(number_t* d);
+    inline virtual void mapHessianMemory(number_t* d);
 
     virtual int copyB(number_t* b_) const {
       memcpy(b_, _b.data(), Dimension * sizeof(number_t));
@@ -77,11 +77,11 @@ namespace g2o {
     virtual number_t& b(int i) { assert(i < D); return _b(i);}
     virtual number_t* bData() { return _b.data();}
 
-    virtual void clearQuadraticForm();
+    inline virtual void clearQuadraticForm();
 
     //! updates the current vertex with the direct solution x += H_ii\b_ii
     //! @returns the determinant of the inverted hessian
-    virtual number_t solveDirect(number_t lambda=0);
+    inline virtual number_t solveDirect(number_t lambda=0);
 
     //! return right hand side b of the constructed linear system
     Eigen::Matrix<number_t, D, 1, Eigen::ColMajor>& b() { return _b;}

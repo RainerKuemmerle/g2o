@@ -143,7 +143,7 @@ class G2O_TYPES_SBA_API VertexIntrinsics : public BaseVertex<4, Eigen::Matrix<nu
     virtual bool write(std::ostream& os) const;
 
     virtual void setToOriginImpl() {
-      _estimate.fill(0.);
+      _estimate.fill(0);
     }
 
     virtual void oplusImpl(const number_t* update)
@@ -173,7 +173,7 @@ class G2O_TYPES_SBA_API VertexIntrinsics : public BaseVertex<4, Eigen::Matrix<nu
 
       // calculate the projection
       const Vector3 &pt = point->estimate();
-      Vector4 ppt(pt(0),pt(1),pt(2),1.0);
+      Vector4 ppt(pt(0),pt(1),pt(2),1);
       Vector3 p = cam->estimate().w2i * ppt;
       Vector2 perr;
       perr = p.head<2>()/p(2);
@@ -214,7 +214,7 @@ class G2O_TYPES_SBA_API VertexIntrinsics : public BaseVertex<4, Eigen::Matrix<nu
       Vector3 kp;
       Vector4 pt;
       pt.head<3>() = point->estimate();
-      pt(3) = 1.0;
+      pt(3) = 1;
       const SBACam& nd = cam->estimate();
       // these should be already ok
       /* nd.setTransform(); */
@@ -225,7 +225,7 @@ class G2O_TYPES_SBA_API VertexIntrinsics : public BaseVertex<4, Eigen::Matrix<nu
       Vector3 p2 = nd.w2n * pt; 
       Vector3 pb(nd.baseline,0,0);
 
-      number_t invp1 = 1.0/p1(2);
+      number_t invp1 = cst(1.0)/p1(2);
       kp.head<2>() = p1.head<2>()*invp1;
 
       // right camera px
@@ -267,7 +267,7 @@ class G2O_TYPES_SBA_API VertexIntrinsics : public BaseVertex<4, Eigen::Matrix<nu
       VertexCam *cam = static_cast<VertexCam*>(_vertices[1]);
       // calculate the projection
       const Vector3 &pt = point->estimate();
-      Vector4 ppt(pt(0),pt(1),pt(2),1.0);
+      Vector4 ppt(pt(0),pt(1),pt(2),cst(1.0));
       Vector3 p = cam->estimate().w2i * ppt;
       Vector2 perr = p.head<2>()/p(2);
       _error = perr - _measurement;
@@ -307,7 +307,7 @@ class G2O_TYPES_SBA_API VertexIntrinsics : public BaseVertex<4, Eigen::Matrix<nu
       _inverseMeasurement=meas.inverse();
     }
 
-    virtual number_t initialEstimatePossible(const OptimizableGraph::VertexSet& , OptimizableGraph::Vertex* ) { return 1.;}
+    virtual number_t initialEstimatePossible(const OptimizableGraph::VertexSet& , OptimizableGraph::Vertex* ) { return cst(1.);}
     virtual void initialEstimate(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to);
 
     virtual bool setMeasurementData(const number_t* d){
@@ -352,7 +352,7 @@ class G2O_TYPES_SBA_API VertexIntrinsics : public BaseVertex<4, Eigen::Matrix<nu
     virtual void setMeasurement(const number_t& m){
       _measurement = m;
     }
-    virtual number_t initialEstimatePossible(const OptimizableGraph::VertexSet& , OptimizableGraph::Vertex* ) { return 1.;}
+    virtual number_t initialEstimatePossible(const OptimizableGraph::VertexSet& , OptimizableGraph::Vertex* ) { return cst(1.);}
     virtual void initialEstimate(const OptimizableGraph::VertexSet& from_, OptimizableGraph::Vertex* to_);
 };
 

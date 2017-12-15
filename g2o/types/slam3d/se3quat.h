@@ -28,6 +28,7 @@
 #define G2O_SE3QUAT_H_
 
 #include "se3_ops.h"
+#include "g2o/stuff/misc.h"
 
 #include <Eigen/Core>
 #include <Eigen/Geometry>
@@ -73,8 +74,8 @@ namespace g2o {
             if (_r.norm()>1.){
               _r.normalize();
             } else {
-              number_t w2=1.-_r.squaredNorm();
-              _r.w()= (w2<0.) ? 0. : sqrt(w2);
+              number_t w2= cst(1.)-_r.squaredNorm();
+              _r.w()= (w2<cst(0.)) ? cst(0.) : sqrt(w2);
             }
           }
           else if (v.size() == 7) {
@@ -117,7 +118,7 @@ namespace g2o {
       inline SE3Quat inverse() const{
         SE3Quat ret;
         ret._r=_r.conjugate();
-        ret._t=ret._r*(_t*-1.);
+        ret._t=ret._r*(_t*-cst(1.));
         return ret;
       }
 
@@ -158,7 +159,7 @@ namespace g2o {
       }
 
       inline void fromMinimalVector(const Vector6& v){
-        number_t w = 1.-v[3]*v[3]-v[4]*v[4]-v[5]*v[5];
+        number_t w = cst(1.)-v[3]*v[3]-v[4]*v[4]-v[5]*v[5];
         if (w>0){
           _r=Quaternion(sqrt(w), v[3], v[4], v[5]);
         } else {
@@ -172,7 +173,7 @@ namespace g2o {
       Vector6 log() const {
         Vector6 res;
         Matrix3 _R = _r.toRotationMatrix();
-        number_t d =  0.5*(_R(0,0)+_R(1,1)+_R(2,2)-1);
+        number_t d = cst(0.5)*(_R(0,0)+_R(1,1)+_R(2,2)-1);
         Vector3 omega;
         Vector3 upsilon;
 
@@ -180,19 +181,19 @@ namespace g2o {
         Vector3 dR = deltaR(_R);
         Matrix3 V_inv;
 
-        if (d>0.99999)
+        if (d>cst(0.99999))
         {
 
           omega=0.5*dR;
           Matrix3 Omega = skew(omega);
-          V_inv = Matrix3::Identity()- 0.5*Omega + (1./12.)*(Omega*Omega);
+          V_inv = Matrix3::Identity()- cst(0.5)*Omega + (cst(1.)/ cst(12.))*(Omega*Omega);
         }
         else
         {
           number_t theta = std::acos(d);
           omega = theta/(2*sqrt(1-d*d))*dR;
           Matrix3 Omega = skew(omega);
-          V_inv = ( Matrix3::Identity() - 0.5*Omega
+          V_inv = ( Matrix3::Identity() - cst(0.5)*Omega
               + ( 1-theta/(2*std::tan(theta/2)))/(theta*theta)*(Omega*Omega) );
         }
 
@@ -228,7 +229,7 @@ namespace g2o {
 
         Matrix3 R;
         Matrix3 V;
-        if (theta<0.00001)
+        if (theta<cst(0.00001))
         {
           //TODO: CHECK WHETHER THIS IS CORRECT!!!
           R = (Matrix3::Identity() + Omega + Omega*Omega);
