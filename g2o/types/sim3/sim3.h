@@ -28,6 +28,7 @@
 #define G2O_SIM_3
 
 #include "g2o/types/slam3d/se3_ops.h"
+#include "g2o/stuff/misc.h"
 #include <Eigen/Geometry>
 
 namespace g2o
@@ -121,7 +122,7 @@ namespace g2o
             number_t sigma2= sigma*sigma;
             number_t c=theta2+sigma2;
             A = (a*sigma+ (1-b)*theta)/(theta*c);
-            B = (C-((b-1)*sigma+a*theta)/(c))*1./(theta2);
+            B = (C-((b-1)*sigma+a*theta)/(c))*1/(theta2);
 
           }
         }
@@ -146,7 +147,7 @@ namespace g2o
         Vector3 upsilon;
 
         Matrix3 R = r.toRotationMatrix();
-        number_t d =  0.5*(R(0,0)+R(1,1)+R(2,2)-1);
+        number_t d =  cst(0.5)*(R(0,0)+R(1,1)+R(2,2)-1);
 
         Matrix3 Omega;
 
@@ -199,7 +200,7 @@ namespace g2o
             number_t b=s*std::cos(theta);
             number_t c=theta2 + sigma*sigma;
             A = (a*sigma+ (1-b)*theta)/(theta*c);
-            B = (C-((b-1)*sigma+a*theta)/(c))*1./(theta2);
+            B = (C-((b-1)*sigma+a*theta)/(c))*1/(theta2);
           }
         }
 
@@ -221,7 +222,7 @@ namespace g2o
 
       Sim3 inverse() const
       {
-        return Sim3(r.conjugate(), r.conjugate()*((-1./s)*t), 1./s);
+        return Sim3(r.conjugate(), r.conjugate()*((-1/s)*t), 1/s);
       }
 
       number_t operator[](int i) const
