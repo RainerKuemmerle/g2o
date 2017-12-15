@@ -62,15 +62,15 @@ namespace g2o {
         normalize(_coeffs);
       }
 
-      static double azimuth(const Vector3& v) {
+      static number_t azimuth(const Vector3& v) {
         return std::atan2(v(1),v(0));
       }
 
-      static  double elevation(const Vector3& v) {
+      static  number_t elevation(const Vector3& v) {
         return std::atan2(v(2), v.head<2>().norm());
       }
 
-    double distance() const {
+    number_t distance() const {
       return -_coeffs(3);
     }
 
@@ -80,16 +80,16 @@ namespace g2o {
 
     
     static Matrix3 rotation(const Vector3& v)  {
-      double _azimuth = azimuth(v);
-      double _elevation = elevation(v); 
+      number_t _azimuth = azimuth(v);
+      number_t _elevation = elevation(v); 
       return (AngleAxis(_azimuth,  Vector3::UnitZ())* AngleAxis(- _elevation, Vector3::UnitY())).toRotationMatrix();
     }
 
     inline void oplus(const Vector3& v){
       //construct a normal from azimuth and evelation;
-      double _azimuth=v[0];
-      double _elevation=v[1];
-      double s=std::sin(_elevation), c=std::cos(_elevation);
+      number_t _azimuth=v[0];
+      number_t _elevation=v[1];
+      number_t s=std::sin(_elevation), c=std::cos(_elevation);
       Vector3 n (c*std::cos(_azimuth), c*std::sin(_azimuth), s) ;
       
       // rotate the normal
@@ -104,14 +104,14 @@ namespace g2o {
       //construct the rotation that would bring the plane normal in (1 0 0)
       Matrix3 R=rotation(normal()).transpose();
       Vector3 n=R*plane.normal();
-      double d=distance()-plane.distance();
+      number_t d=distance()-plane.distance();
       return Vector3(azimuth(n), elevation(n), d);
     }
 
     //protected:
 
     static inline void normalize(Vector4& coeffs) {
-      double n=coeffs.head<3>().norm();
+      number_t n=coeffs.head<3>().norm();
       coeffs = coeffs * (1./n);
     }
 
