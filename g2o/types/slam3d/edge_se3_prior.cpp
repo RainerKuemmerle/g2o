@@ -63,16 +63,15 @@ namespace g2o {
     setMeasurement(internal::fromVectorQT(meas));
     // don't need this if we don't use it in error calculation (???)
     // information matrix is the identity for features, could be changed to allow arbitrary covariances    
-    if (is.bad()) {
-      return false;
+    if (is.good()) {
+      for ( int i=0; i<information().rows(); i++)
+        for (int j=i; j<information().cols(); j++){
+          is >> information()(i,j);
+          if (i!=j)
+            information()(j,i)=information()(i,j);
+        }
     }
-    for ( int i=0; i<information().rows() && is.good(); i++)
-      for (int j=i; j<information().cols() && is.good(); j++){
-        is >> information()(i,j);
-        if (i!=j)
-          information()(j,i)=information()(i,j);
-      }
-    return true;
+    return !is.fail();
   }
 
   bool EdgeSE3Prior::write(std::ostream& os) const {
