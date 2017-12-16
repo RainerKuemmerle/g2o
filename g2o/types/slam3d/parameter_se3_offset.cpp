@@ -52,7 +52,7 @@ namespace g2o {
     // normalize the quaternion to recover numerical precision lost by storing as human readable text
     Vector4D::MapType(off.data()+3).normalize();
     setOffset(internal::fromVectorQT(off));
-    return true;
+    return !is.fail();
   }
   
   bool ParameterSE3Offset::write(std::ostream& os) const {
