@@ -27,13 +27,8 @@
 #ifndef G2O_TIMEUTIL_H
 #define G2O_TIMEUTIL_H
 
-#ifdef _WINDOWS
-#include <time.h>
-#else
-#include <sys/time.h>
-#endif
-
 #include <string>
+#include <chrono>
 
 #include "g2o_stuff_api.h"
 
@@ -78,22 +73,14 @@ if (1) {\
 
 namespace g2o {
 
-#ifdef _WINDOWS
-typedef struct timeval {
-  long tv_sec;
-  long tv_usec;
-} timeval;
-G2O_STUFF_API int gettimeofday(struct timeval *tv, struct timezone *tz);
-#endif
+using seconds = std::chrono::duration<double>;
 
 /**
  * return the current time in seconds since 1. Jan 1970
  */
 inline double get_time() 
 {
-  struct timeval ts;
-  gettimeofday(&ts,0);
-  return ts.tv_sec + ts.tv_usec*1e-6;
+  return seconds{std::chrono::system_clock::now().time_since_epoch()}.count();
 }
 
 /**
