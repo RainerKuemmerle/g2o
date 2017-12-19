@@ -1,3 +1,7 @@
+IF (NOT G2O_USE_CHOLMOD)
+  RETURN()
+ENDIF()
+
 ADD_LIBRARY(solver_cholmod ${G2O_LIB_TYPE}
   solver_cholmod.cpp
   linear_solver_cholmod.h
