@@ -34,7 +34,7 @@
 
 namespace g2o {
 
-  class G2O_TYPES_SLAM2D_API EdgeXYPrior : public BaseUnaryEdge<2, Vector2D, VertexPointXY>
+  class G2O_TYPES_SLAM2D_API EdgeXYPrior : public BaseUnaryEdge<2, Vector2, VertexPointXY>
   {
     public:
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW
@@ -48,17 +48,17 @@ namespace g2o {
       virtual bool read(std::istream& is);
       virtual bool write(std::ostream& os) const;
 
-      virtual void setMeasurement(const Vector2D& m){
+      virtual void setMeasurement(const Vector2& m){
         _measurement = m;
       }
 
       virtual bool setMeasurementData(const double* d){
-        _measurement=Vector2D(d[0], d[1]);
+        _measurement=Vector2(d[0], d[1]);
         return true;
       }
 
       virtual bool getMeasurementData(double* d) const {
-	Eigen::Map<Vector2D> m(d);
+	Eigen::Map<Vector2> m(d);
 	m=_measurement;
         return true;
       }
