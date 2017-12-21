@@ -26,18 +26,9 @@
 
 #include "line3d.h"
 
-#include <iostream>
-
 namespace g2o {
 
   using namespace std;
-
-  static inline void _skew(Matrix3& S, const Vector3& t) {
-    S <<
-           0, -t.z(),  t.y(),
-       t.z(),      0, -t.x(),
-      -t.y(),  t.x(),      0;
-  }
 
   static inline Matrix3 _skew(const Vector3& t) {
     Matrix3 S;
