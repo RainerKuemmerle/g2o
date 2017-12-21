@@ -31,11 +31,11 @@
 namespace g2o {
 
   VertexLine3D::VertexLine3D() {
-    color << 1.0, 0.5, 0.0;
+    color << cst(1.0), cst(0.5), cst(0.0);
   }
   
   bool VertexLine3D::read(std::istream& is) {
-    Vector6d lv;
+    Vector6 lv;
     for(int i = 0; i < 6; ++i) {
       is >> lv[i];
     }
@@ -44,7 +44,7 @@ namespace g2o {
   }
 
   bool VertexLine3D::write(std::ostream& os) const {
-    Vector6d lv = _estimate;
+    Vector6 lv = _estimate;
     for(int i = 0; i < 6; ++i) {
       os << lv[i] << " ";
     }
@@ -87,8 +87,8 @@ namespace g2o {
     VertexLine3D* that = static_cast<VertexLine3D*>(element);
     Line3D line = that->estimate();
     line.normalize();
-    Eigen::Vector3d direction = line.d();
-    Eigen::Vector3d npoint = line.d().cross(line.w());
+    Vector3 direction = line.d();
+    Vector3 npoint = line.d().cross(line.w());
     glPushMatrix();
     glColor3f(float(that->color(0)), float(that->color(1)), float(that->color(2)));
     if(_lineLength && _lineWidth) {

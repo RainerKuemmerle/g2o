@@ -34,12 +34,12 @@
 
 namespace g2o {
 
-  inline G2O_TYPES_SLAM3D_API Matrix3D skew(const Vector3D&v);
-  inline G2O_TYPES_SLAM3D_API Vector3D deltaR(const Matrix3D& R);
-  inline G2O_TYPES_SLAM3D_API Vector2D project(const Vector3D&);
-  inline G2O_TYPES_SLAM3D_API Vector3D project(const Vector4D&);
-  inline G2O_TYPES_SLAM3D_API Vector3D unproject(const Vector2D&);
-  inline G2O_TYPES_SLAM3D_API Vector4D unproject(const Vector3D&);
+  inline G2O_TYPES_SLAM3D_API Matrix3 skew(const Vector3&v);
+  inline G2O_TYPES_SLAM3D_API Vector3 deltaR(const Matrix3& R);
+  inline G2O_TYPES_SLAM3D_API Vector2 project(const Vector3&);
+  inline G2O_TYPES_SLAM3D_API Vector3 project(const Vector4&);
+  inline G2O_TYPES_SLAM3D_API Vector3 unproject(const Vector2&);
+  inline G2O_TYPES_SLAM3D_API Vector4 unproject(const Vector3&);
 
   #include "se3_ops.hpp"
 

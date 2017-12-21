@@ -52,19 +52,19 @@ void Solver::resizeVector(size_t sx)
   if (_maxXSize < sx) {
     _maxXSize = 2*sx;
     free_aligned(_x);
-    _x = allocate_aligned<double>(_maxXSize);
+    _x = allocate_aligned<number_t>(_maxXSize);
 #ifndef NDEBUG
-    memset(_x, 0, _maxXSize * sizeof(double));
+    memset(_x, 0, _maxXSize * sizeof(number_t));
 #endif
     if (_b) { // backup the former b, might still be needed for online processing
-      memcpy(_x, _b, oldSize * sizeof(double));
+      memcpy(_x, _b, oldSize * sizeof(number_t));
       free_aligned(_b);
-      _b = allocate_aligned<double>(_maxXSize);
+      _b = allocate_aligned<number_t>(_maxXSize);
       std::swap(_b, _x);
     } else {
-      _b = allocate_aligned<double>(_maxXSize);
+      _b = allocate_aligned<number_t>(_maxXSize);
 #ifndef NDEBUG
-      memset(_b, 0, _maxXSize * sizeof(double));
+      memset(_b, 0, _maxXSize * sizeof(number_t));
 #endif
     }
   }

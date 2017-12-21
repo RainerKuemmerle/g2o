@@ -48,7 +48,7 @@ namespace deprecated {
   bool VertexSE3::read(std::istream& is)
   {
 
-    Vector7d est;
+    Vector7 est;
     for (int i=0; i<7; i++)
       is  >> est[i];
     setEstimate(SE3Quat(est));
@@ -138,7 +138,7 @@ namespace deprecated {
     glColor3f(0.5f,0.5f,0.8f);
     glPushMatrix();
     glTranslatef((float)that->estimate().translation().x(),(float)that->estimate().translation().y(),(float)that->estimate().translation().z());
-    AngleAxisd aa(that->estimate().rotation());
+    AngleAxis aa(that->estimate().rotation());
     glRotatef((float)RAD2DEG(aa.angle()),(float)aa.axis().x(),(float)aa.axis().y(),(float)aa.axis().z());
     if (_triangleX && _triangleY){
       drawTriangle(_triangleX->value(), _triangleY->value());

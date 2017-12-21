@@ -44,12 +44,12 @@ namespace g2o {
 
     if (from.count(_vertices[0]) != 1)
       return;
-    double r=2.;
+    number_t r=2.;
     const VertexSE2* v1 = static_cast<const VertexSE2*>(_vertices[0]);
     VertexPointXY* l2 = static_cast<VertexPointXY*>(_vertices[1]);
     SE2 t=v1->estimate();
-    t.setRotation(t.rotation()*Eigen::Rotation2Dd(_measurement));
-    Vector2D vr(r, 0.);
+    t.setRotation(t.rotation()*Rotation2D(_measurement));
+    Vector2 vr(r, 0.);
     l2->setEstimate(t*vr);
   }
 
@@ -107,9 +107,9 @@ namespace g2o {
     VertexPointXY* to   = static_cast<VertexPointXY*>(e->vertex(1));
     if (! from)
       return this;
-    double guessRange=5;
-    double theta = e->measurement();
-    Vector2D p(cos(theta)*guessRange, sin(theta)*guessRange);
+    number_t guessRange=5;
+    number_t theta = e->measurement();
+    Vector2 p(std::cos(theta)*guessRange, std::sin(theta)*guessRange);
     glPushAttrib(GL_ENABLE_BIT|GL_LIGHTING|GL_COLOR);
     glDisable(GL_LIGHTING);
     if (!to){

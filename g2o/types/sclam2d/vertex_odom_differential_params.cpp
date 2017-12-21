@@ -29,7 +29,7 @@
 namespace g2o {
 
   VertexOdomDifferentialParams::VertexOdomDifferentialParams() :
-    BaseVertex <3, Vector3D>()
+    BaseVertex <3, Vector3>()
   {
   }
 

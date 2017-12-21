@@ -40,8 +40,8 @@ namespace g2o {
     struct TripletEntry
     {
       int r, c;
-      double x;
-      TripletEntry(int r_, int c_, double x_) : r(r_), c(c_), x(x_) {}
+      number_t x;
+      TripletEntry(int r_, int c_, number_t x_) : r(r_), c(c_), x(x_) {}
     };
     struct TripletColSort
     {
@@ -52,7 +52,7 @@ namespace g2o {
     };
   }
 
-  bool writeVector(const string& filename, const double*v, int n)
+  bool writeVector(const string& filename, const number_t*v, int n)
   {
     ofstream os(filename.c_str());
     os << fixed;
@@ -61,7 +61,7 @@ namespace g2o {
     return os.good();
   }
 
-  bool writeCCSMatrix(const string& filename, int rows, int cols, const int* Ap, const int* Ai, const double* Ax, bool upperTriangleSymmetric)
+  bool writeCCSMatrix(const string& filename, int rows, int cols, const int* Ap, const int* Ai, const number_t* Ax, bool upperTriangleSymmetric)
   {
     vector<TripletEntry> entries;
     entries.reserve((size_t)Ap[cols]);

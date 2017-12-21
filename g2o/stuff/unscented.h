@@ -36,12 +36,12 @@ namespace g2o {
   template <class SampleType>
   struct SigmaPoint {
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
-    SigmaPoint(const SampleType& sample, double wi, double wp):
+    SigmaPoint(const SampleType& sample, number_t wi, number_t wp):
       _sample(sample), _wi(wi), _wp(wp){}
     SigmaPoint(): _wi(0), _wp(0) {}
     SampleType _sample;
-    double _wi;
-    double _wp;
+    number_t _wi;
+    number_t _wp;
   };
   
   
@@ -51,10 +51,10 @@ namespace g2o {
     const int dim = mean.size();
     const int numPoints = 2 * dim + 1;
     assert (covariance.rows() == covariance.cols() && covariance.cols() == mean.size() && "Dimension Mismatch");
-    const double alpha = 1e-3;
-    const double beta  = 2.;
-    const double lambda = alpha * alpha * dim;
-    const double wi = 1./(2. * (dim + lambda) );
+    const number_t alpha = cst(1e-3);
+    const number_t beta  = 2;
+    const number_t lambda = alpha * alpha * dim;
+    const number_t wi = cst(1) / (2 * (dim + lambda) );
     
     sigmaPoints.resize(numPoints);
     sigmaPoints[0] = SigmaPoint<SampleType>(mean, 

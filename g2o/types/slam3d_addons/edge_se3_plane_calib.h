@@ -41,7 +41,7 @@ namespace g2o {
     public:
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
       EdgeSE3PlaneSensorCalib();
-      Vector3D color;
+      Vector3 color;
 
       void computeError()
       {
@@ -50,7 +50,7 @@ namespace g2o {
         const VertexSE3* offset        = static_cast<const VertexSE3*>(_vertices[2]);
         const Plane3D& plane           = planeVertex->estimate();
 	// measurement function: remap the plane in global coordinates
-        Isometry3D w2n=(v1->estimate()*offset->estimate()).inverse();
+        Isometry3 w2n=(v1->estimate()*offset->estimate()).inverse();
 	Plane3D localPlane=w2n*plane;
 	_error = localPlane.ominus(_measurement);
       }

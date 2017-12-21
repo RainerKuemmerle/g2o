@@ -33,7 +33,7 @@ namespace g2o {
 
 
   // point to camera projection, monocular
-  EdgeSE2PointXYOffset::EdgeSE2PointXYOffset() : BaseBinaryEdge<2, Vector2D, VertexSE2, VertexPointXY>() {
+  EdgeSE2PointXYOffset::EdgeSE2PointXYOffset() : BaseBinaryEdge<2, Vector2, VertexSE2, VertexPointXY>() {
     information().setIdentity();
     cache = 0;
     offsetParam = 0;
@@ -54,7 +54,7 @@ namespace g2o {
     is >> pId;
     setParameterId(0, pId);
     // measured keypoint
-    Vector2D meas;
+    Vector2 meas;
     for (int i=0; i<2; i++) is >> meas[i];
     setMeasurement(meas);
     // information matrix is the identity for features, could be changed to allow arbitrary covariances    
@@ -91,7 +91,7 @@ namespace g2o {
     // VertexSE2 *rob = static_cast<VertexSE2*>(_vertices[0]);
     VertexPointXY *point = static_cast<VertexPointXY*>(_vertices[1]);
 
-    Vector2D perr = cache->w2lMatrix() * point->estimate();
+    Vector2 perr = cache->w2lMatrix() * point->estimate();
 
     // error, which is backwards from the normal observed - calculated
     // _measurement is the measured projection
@@ -111,9 +111,9 @@ namespace g2o {
   bool EdgeSE2PointXYOffset::setMeasurementFromState(){
     VertexPointXY *point = static_cast<VertexPointXY*>(_vertices[1]);
 
-    const Vector2D &pt = point->estimate();
+    const Vector2 &pt = point->estimate();
 
-    Vector2D perr = cache->w2lMatrix() * pt;
+    Vector2 perr = cache->w2lMatrix() * pt;
     _measurement = perr;
     return true;
   }
@@ -131,7 +131,7 @@ namespace g2o {
     //   cerr << "fatal error in retrieving cache" << endl;
     // }
     // SE2OffsetParameters* params=vcache->params;
-    Vector2D p=_measurement;
+    Vector2 p=_measurement;
     point->setEstimate(cam->estimate() * (offsetParam->offsetMatrix() * p));
   }
 

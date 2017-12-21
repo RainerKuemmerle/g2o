@@ -35,17 +35,17 @@
 
 namespace g2o {
 
-  class G2O_TYPES_SLAM2D_ADDONS_API EdgeSE2Segment2DPointLine : public BaseBinaryEdge<3, Vector3D, VertexSE2, VertexSegment2D>
+  class G2O_TYPES_SLAM2D_ADDONS_API EdgeSE2Segment2DPointLine : public BaseBinaryEdge<3, Vector3, VertexSE2, VertexSegment2D>
   {
     public:
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW
       EdgeSE2Segment2DPointLine();
 
-      double   theta() const {return _measurement[2];}
-      Vector2D point()   const {Eigen::Map<const Vector2D> p(&_measurement[0]); return p;}
+      number_t   theta() const {return _measurement[2];}
+      Vector2 point()   const {Eigen::Map<const Vector2> p(&_measurement[0]); return p;}
 
-      void   setTheta(double t)  {_measurement[2] = t;}
-      void   setPoint(const Vector2D& p_)  {Eigen::Map<Vector2D> p(&_measurement[0]); p=p_; }
+      void   setTheta(number_t t)  {_measurement[2] = t;}
+      void   setPoint(const Vector2& p_)  {Eigen::Map<Vector2> p(&_measurement[0]); p=p_; }
 
       int pointNum() const {return _pointNum;}
       void setPointNum(int pn) {_pointNum = pn;}
@@ -55,26 +55,26 @@ namespace g2o {
         const VertexSE2* v1 = static_cast<const VertexSE2*>(_vertices[0]);
         const VertexSegment2D* l2 = static_cast<const VertexSegment2D*>(_vertices[1]);
         SE2 iEst=v1->estimate().inverse();
-        Vector2D predP1 = iEst * l2->estimateP1();
-        Vector2D predP2 = iEst * l2->estimateP2();
-        Vector2D dP = predP2 - predP1;
-        Vector2D normal(dP.y(), -dP.x()); normal.normalize();
-        Vector3D prediction;
-        prediction [2] = atan2(normal.y(), normal.x());
-        Eigen::Map<Vector2D> pt(&prediction[0]);
+        Vector2 predP1 = iEst * l2->estimateP1();
+        Vector2 predP2 = iEst * l2->estimateP2();
+        Vector2 dP = predP2 - predP1;
+        Vector2 normal(dP.y(), -dP.x()); normal.normalize();
+        Vector3 prediction;
+        prediction [2] = std::atan2(normal.y(), normal.x());
+        Eigen::Map<Vector2> pt(&prediction[0]);
         pt = (_pointNum==0) ? predP1 : predP2;
 	_error=prediction-_measurement;
         _error[2]=normalize_theta(_error[2]);
       }
 
-      virtual bool setMeasurementData(const double* d){
-        Eigen::Map<const Vector3D> data(d);
+      virtual bool setMeasurementData(const number_t* d){
+        Eigen::Map<const Vector3> data(d);
 	_measurement = data;
 	return true;
       }
 
-      virtual bool getMeasurementData(double* d) const{
-        Eigen::Map<Vector3D> data(d);
+      virtual bool getMeasurementData(number_t* d) const{
+        Eigen::Map<Vector3> data(d);
 	data = _measurement;
 	return true;
       }
@@ -85,13 +85,13 @@ namespace g2o {
         const VertexSE2* v1 = static_cast<const VertexSE2*>(_vertices[0]);
         const VertexSegment2D* l2 = static_cast<const VertexSegment2D*>(_vertices[1]);
         SE2 iEst=v1->estimate().inverse();
-        Vector2D predP1 = iEst * l2->estimateP1();
-        Vector2D predP2 = iEst * l2->estimateP2();
-        Vector2D dP = predP2 - predP1;
-        Vector2D normal(dP.y(), -dP.x()); normal.normalize();
-        Vector3D prediction;
-        prediction [2] = atan2(normal.y(), normal.x());
-        Eigen::Map<Vector2D> pt(&prediction[0]);
+        Vector2 predP1 = iEst * l2->estimateP1();
+        Vector2 predP2 = iEst * l2->estimateP2();
+        Vector2 dP = predP2 - predP1;
+        Vector2 normal(dP.y(), -dP.x()); normal.normalize();
+        Vector3 prediction;
+        prediction [2] = std::atan2(normal.y(), normal.x());
+        Eigen::Map<Vector2> pt(&prediction[0]);
         pt = (_pointNum==0)?predP1:predP2;
         setMeasurement(prediction);
         return true;

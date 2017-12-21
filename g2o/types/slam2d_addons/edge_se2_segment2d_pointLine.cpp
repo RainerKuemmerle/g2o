@@ -41,7 +41,7 @@
 namespace g2o {
 
   EdgeSE2Segment2DPointLine::EdgeSE2Segment2DPointLine() :
-    BaseBinaryEdge<3, Vector3D, VertexSE2, VertexSegment2D>()
+    BaseBinaryEdge<3, Vector3, VertexSE2, VertexSegment2D>()
   {
     _pointNum = 0;
   }

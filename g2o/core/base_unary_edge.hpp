@@ -63,8 +63,8 @@ void BaseUnaryEdge<D, E, VertexXiType>::constructQuadraticForm()
     from->lockQuadraticForm();
 #endif
     if (this->robustKernel()) {
-      double error = this->chi2();
-      Vector3D rho;
+      number_t error = this->chi2();
+      Vector3 rho;
       this->robustKernel()->robustify(error, rho);
       InformationType weightedOmega = this->robustInformation(rho);
 
@@ -100,13 +100,13 @@ void BaseUnaryEdge<D, E, VertexXiType>::linearizeOplus()
   vi->lockQuadraticForm();
 #endif
 
-  const double delta = 1e-9;
-  const double scalar = 1.0 / (2*delta);
+  const number_t delta = cst(1e-9);
+  const number_t scalar = 1 / (2*delta);
   ErrorVector error1;
   ErrorVector errorBeforeNumeric = _error;
 
-  double add_vi[VertexXiType::Dimension];
-  std::fill(add_vi, add_vi + VertexXiType::Dimension, 0.0);
+  number_t add_vi[VertexXiType::Dimension] = {};
+
   // add small step along the unit vector in each dimension
   for (int d = 0; d < VertexXiType::Dimension; ++d) {
     vi->push();

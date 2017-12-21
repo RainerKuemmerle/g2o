@@ -43,7 +43,7 @@ namespace deprecated {
    * the disparity measurement is normalized: disparity / (focal_x * baseline)
    */
   // first two args are the measurement type, second two the connection classes
-  class G2O_DEPRECATED_TYPES_SLAM3D_API EdgeSE3PointXYZDisparity : public BaseBinaryEdge<3, Eigen::Vector3d, VertexSE3, VertexPointXYZ> {
+  class G2O_DEPRECATED_TYPES_SLAM3D_API EdgeSE3PointXYZDisparity : public BaseBinaryEdge<3, Vector3, VertexSE3, VertexPointXYZ> {
   public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
     EdgeSE3PointXYZDisparity();
@@ -57,18 +57,18 @@ namespace deprecated {
     virtual void linearizeOplus();
 #endif
 
-    virtual void setMeasurement(const Eigen::Vector3d& m){
+    virtual void setMeasurement(const Vector3& m){
       _measurement = m;
     }
 
     virtual bool setMeasurementData(const double* d){
-      Eigen::Map<const Eigen::Vector3d> v(d);
+      Eigen::Map<const Vector3> v(d);
       _measurement = v;
       return true;
     }
 
     virtual bool getMeasurementData(double* d) const{
-      Eigen::Map<Eigen::Vector3d> v(d);
+      Eigen::Map<Vector3> v(d);
       v=_measurement;
       return true;
     }

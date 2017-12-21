@@ -32,7 +32,7 @@
 
 namespace g2o {
 
-  class G2O_TYPES_SCLAM2D_API VertexOdomDifferentialParams: public BaseVertex <3, Vector3D> {
+  class G2O_TYPES_SCLAM2D_API VertexOdomDifferentialParams: public BaseVertex <3, Vector3> {
     public:
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
       VertexOdomDifferentialParams();
@@ -40,7 +40,7 @@ namespace g2o {
         _estimate << 1. , 1., 1.;
       }
 
-      virtual void oplusImpl(const double* v) {
+      virtual void oplusImpl(const number_t* v) {
         for (int i=0; i<3; i++)
           _estimate(i) += v[i];
       }

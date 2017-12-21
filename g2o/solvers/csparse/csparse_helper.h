@@ -34,8 +34,8 @@ namespace g2o {
 G2O_CSPARSE_EXTENSION_API bool writeCs2Octave(const char* filename, const cs* A, bool upperTriangular = true);
 
 // our extensions to csparse
-G2O_CSPARSE_EXTENSION_API csn* cs_chol_workspace (const cs *A, const css *S, int* cin, double* xin);
-G2O_CSPARSE_EXTENSION_API int cs_cholsolsymb(const cs *A, double *b, const css* S, double* workspace, int* work);
+G2O_CSPARSE_EXTENSION_API csn* cs_chol_workspace (const cs *A, const css *S, int* cin, number_t* xin);
+G2O_CSPARSE_EXTENSION_API int cs_cholsolsymb(const cs *A, number_t *b, const css* S, number_t* workspace, int* work);
 
 } // end namespace
 } // end namespace

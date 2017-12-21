@@ -37,7 +37,7 @@
 namespace g2o {
 
   bool VertexPointXYZ::read(std::istream& is) {
-    Vector3D lv;
+    Vector3 lv;
     for (int i=0; i<3; i++)
       is >> lv[i];
     setEstimate(lv);
@@ -45,7 +45,7 @@ namespace g2o {
   }
 
   bool VertexPointXYZ::write(std::ostream& os) const {
-    Vector3D lv=estimate();
+    Vector3 lv=estimate();
     for (int i=0; i<3; i++){
       os << lv[i] << " ";
     }

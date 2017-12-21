@@ -80,10 +80,10 @@ void BaseBinaryEdge<D, E, VertexXiType, VertexXjType>::constructQuadraticForm()
     to->lockQuadraticForm();
 #endif
     const InformationType& omega = _information;
-    Eigen::Matrix<double, D, 1, Eigen::ColMajor> omega_r = - omega * _error;
+    Eigen::Matrix<number_t, D, 1, Eigen::ColMajor> omega_r = - omega * _error;
     if (this->robustKernel() == 0) {
       if (fromNotFixed) {
-        Eigen::Matrix<double, VertexXiType::Dimension, D, Eigen::ColMajor> AtO = A.transpose() * omega;
+        Eigen::Matrix<number_t, VertexXiType::Dimension, D, Eigen::ColMajor> AtO = A.transpose() * omega;
         from->b().noalias() += A.transpose() * omega_r;
         from->A().noalias() += AtO*A;
         if (toNotFixed ) {
@@ -98,8 +98,8 @@ void BaseBinaryEdge<D, E, VertexXiType, VertexXjType>::constructQuadraticForm()
         to->A().noalias() += B.transpose() * omega * B;
       }
     } else { // robust (weighted) error according to some kernel
-      double error = this->chi2();
-      Vector3D rho;
+      number_t error = this->chi2();
+      Vector3 rho;
       this->robustKernel()->robustify(error, rho);
       InformationType weightedOmega = this->robustInformation(rho);
       //std::cout << PVAR(rho.transpose()) << std::endl;
@@ -153,15 +153,15 @@ void BaseBinaryEdge<D, E, VertexXiType, VertexXjType>::linearizeOplus()
   vj->lockQuadraticForm();
 #endif
 
-  const double delta = 1e-9;
-  const double scalar = 1.0 / (2*delta);
+  const number_t delta = cst(1e-9);
+  const number_t scalar = 1 / (2*delta);
   ErrorVector errorBak;
   ErrorVector errorBeforeNumeric = _error;
 
   if (iNotFixed) {
     //Xi - estimate the jacobian numerically
-    double add_vi[VertexXiType::Dimension];
-    std::fill(add_vi, add_vi + VertexXiType::Dimension, 0.0);
+    number_t add_vi[VertexXiType::Dimension] = {};
+
     // add small step along the unit vector in each dimension
     for (int d = 0; d < VertexXiType::Dimension; ++d) {
       vi->push();
@@ -184,8 +184,8 @@ void BaseBinaryEdge<D, E, VertexXiType, VertexXjType>::linearizeOplus()
 
   if (jNotFixed) {
     //Xj - estimate the jacobian numerically
-    double add_vj[VertexXjType::Dimension];
-    std::fill(add_vj, add_vj + VertexXjType::Dimension, 0.0);
+    number_t add_vj[VertexXjType::Dimension] = {};
+
     // add small step along the unit vector in each dimension
     for (int d = 0; d < VertexXjType::Dimension; ++d) {
       vj->push();
@@ -214,7 +214,7 @@ void BaseBinaryEdge<D, E, VertexXiType, VertexXjType>::linearizeOplus()
 }
 
 template <int D, typename E, typename VertexXiType, typename VertexXjType>
-void BaseBinaryEdge<D, E, VertexXiType, VertexXjType>::mapHessianMemory(double* d, int i, int j, bool rowMajor)
+void BaseBinaryEdge<D, E, VertexXiType, VertexXjType>::mapHessianMemory(number_t* d, int i, int j, bool rowMajor)
 {
   (void) i; (void) j;
   //assert(i == 0 && j == 1);

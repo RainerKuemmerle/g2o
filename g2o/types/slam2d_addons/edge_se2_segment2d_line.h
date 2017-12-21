@@ -35,17 +35,17 @@
 
 namespace g2o {
 
-  class EdgeSE2Segment2DLine : public BaseBinaryEdge<2, Vector2D, VertexSE2, VertexSegment2D> //Avoid redefinition of BaseEdge in MSVC
+  class EdgeSE2Segment2DLine : public BaseBinaryEdge<2, Vector2, VertexSE2, VertexSegment2D> //Avoid redefinition of BaseEdge in MSVC
   {
     public:
       G2O_TYPES_SLAM2D_ADDONS_API EIGEN_MAKE_ALIGNED_OPERATOR_NEW
       G2O_TYPES_SLAM2D_ADDONS_API EdgeSE2Segment2DLine();
 
-      G2O_TYPES_SLAM2D_ADDONS_API double theta() const {return _measurement[0];}
-      G2O_TYPES_SLAM2D_ADDONS_API double rho()   const {return _measurement[1];}
+      G2O_TYPES_SLAM2D_ADDONS_API number_t theta() const {return _measurement[0];}
+      G2O_TYPES_SLAM2D_ADDONS_API number_t rho()   const {return _measurement[1];}
 
-      G2O_TYPES_SLAM2D_ADDONS_API void   setTheta( double t)  {_measurement[0] = t;}
-      G2O_TYPES_SLAM2D_ADDONS_API void   setRho( double r)    {_measurement[1] = r;}
+      G2O_TYPES_SLAM2D_ADDONS_API void   setTheta( number_t t)  {_measurement[0] = t;}
+      G2O_TYPES_SLAM2D_ADDONS_API void   setRho( number_t r)    {_measurement[1] = r;}
 
 
       G2O_TYPES_SLAM2D_ADDONS_API void computeError()
@@ -53,25 +53,25 @@ namespace g2o {
         const VertexSE2* v1 = static_cast<const VertexSE2*>(_vertices[0]);
         const VertexSegment2D* l2 = static_cast<const VertexSegment2D*>(_vertices[1]);
         SE2 iEst=v1->estimate().inverse();
-        Vector2D predP1 = iEst * l2->estimateP1();
-        Vector2D predP2 = iEst * l2->estimateP2();
-        Vector2D dP = predP2 - predP1;
-        Vector2D normal(dP.y(), -dP.x()); normal.normalize();
-        Vector2D prediction(atan2(normal.y(), normal.x()),
+        Vector2 predP1 = iEst * l2->estimateP1();
+        Vector2 predP2 = iEst * l2->estimateP2();
+        Vector2 dP = predP2 - predP1;
+        Vector2 normal(dP.y(), -dP.x()); normal.normalize();
+        Vector2 prediction(std::atan2(normal.y(), normal.x()),
 			    predP1.dot(normal)*.5 + predP2.dot(normal)*.5);
 
 	_error=prediction-_measurement;
         _error[0]=normalize_theta(_error[0]);
       }
 
-      G2O_TYPES_SLAM2D_ADDONS_API virtual bool setMeasurementData(const double* d){
-        Eigen::Map<const Vector2D> data(d);
+      G2O_TYPES_SLAM2D_ADDONS_API virtual bool setMeasurementData(const number_t* d){
+        Eigen::Map<const Vector2> data(d);
 	_measurement = data;
 	return true;
       }
 
-      G2O_TYPES_SLAM2D_ADDONS_API virtual bool getMeasurementData(double* d) const{
-        Eigen::Map<Vector2D> data(d);
+      G2O_TYPES_SLAM2D_ADDONS_API virtual bool getMeasurementData(number_t* d) const{
+        Eigen::Map<Vector2> data(d);
 	data = _measurement;
 	return true;
       }
@@ -82,11 +82,11 @@ namespace g2o {
      const VertexSE2* v1 = static_cast<const VertexSE2*>(_vertices[0]);
         const VertexSegment2D* l2 = static_cast<const VertexSegment2D*>(_vertices[1]);
         SE2 iEst=v1->estimate().inverse();
-        Vector2D predP1 = iEst * l2->estimateP1();
-        Vector2D predP2 = iEst * l2->estimateP2();
-        Vector2D dP = predP2 - predP1;
-        Vector2D normal(dP.y(), -dP.x()); normal.normalize();
-        Vector2D prediction(atan2(normal.y(), normal.x()),
+        Vector2 predP1 = iEst * l2->estimateP1();
+        Vector2 predP2 = iEst * l2->estimateP2();
+        Vector2 dP = predP2 - predP1;
+        Vector2 normal(dP.y(), -dP.x()); normal.normalize();
+        Vector2 prediction(std::atan2(normal.y(), normal.x()),
 			    predP1.dot(normal)*.5 + predP2.dot(normal)*.5);
 	_measurement = prediction;
 	return true;

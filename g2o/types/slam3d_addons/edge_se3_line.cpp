@@ -133,11 +133,11 @@ namespace g2o {
 
     Line3D line = that->measurement();
     line.normalize();
-    Eigen::Vector3d direction = line.d();
-    Eigen::Vector3d npoint = line.d().cross(line.w());
+    Vector3 direction = line.d();
+    Vector3 npoint = line.d().cross(line.w());
     
     glPushMatrix();
-    glMultMatrixd(robot->estimate().matrix().data());
+    glMultMatrixd(robot->estimate().matrix().cast<double>().eval().data());
     glColor3f(float(that->color(0)), float(that->color(1)), float(that->color(2)));
     if(_lineLength && _lineWidth) {
       glLineWidth(float(_lineWidth->value())); 

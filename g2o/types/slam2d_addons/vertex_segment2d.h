@@ -36,29 +36,29 @@
 
 namespace g2o {
 
-  class G2O_TYPES_SLAM2D_ADDONS_API VertexSegment2D : public BaseVertex<4, Vector4D>
+  class G2O_TYPES_SLAM2D_ADDONS_API VertexSegment2D : public BaseVertex<4, Vector4>
   {
     public:
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
       VertexSegment2D();
 
-      Vector2D estimateP1() const { return Eigen::Map<const Vector2D>(&(_estimate[0])); }
-      Vector2D estimateP2() const { return Eigen::Map<const Vector2D>(&(_estimate[2])); }
-      void  setEstimateP1(const Vector2D& p1){ Eigen::Map<Vector2D> v(&_estimate[0]); v=p1; }
-      void  setEstimateP2(const Vector2D& p2){ Eigen::Map<Vector2D> v(&_estimate[2]); v=p2; }
+      Vector2 estimateP1() const { return Eigen::Map<const Vector2>(&(_estimate[0])); }
+      Vector2 estimateP2() const { return Eigen::Map<const Vector2>(&(_estimate[2])); }
+      void  setEstimateP1(const Vector2& p1){ Eigen::Map<Vector2> v(&_estimate[0]); v=p1; }
+      void  setEstimateP2(const Vector2& p2){ Eigen::Map<Vector2> v(&_estimate[2]); v=p2; }
 
       virtual void setToOriginImpl() {
         _estimate.setZero();
       }
 
-      virtual bool setEstimateDataImpl(const double* est){
-        Eigen::Map<const Vector4D> v(est);
+      virtual bool setEstimateDataImpl(const number_t* est){
+        Eigen::Map<const Vector4> v(est);
 	_estimate = v;
 	return true;
       }
 
-      virtual bool getEstimateData(double* est) const{	
-        Eigen::Map<Vector4D> v(est);
+      virtual bool getEstimateData(number_t* est) const{	
+        Eigen::Map<Vector4> v(est);
 	v = _estimate;
 	return true;
       }
@@ -67,11 +67,11 @@ namespace g2o {
 	return 4;
       }
 
-      virtual bool setMinimalEstimateDataImpl(const double* est){
+      virtual bool setMinimalEstimateDataImpl(const number_t* est){
 	return setEstimateData(est);
       }
 
-      virtual bool getMinimalEstimateData(double* est) const{
+      virtual bool getMinimalEstimateData(number_t* est) const{
 	return getEstimateData(est);
       }
 
@@ -79,9 +79,9 @@ namespace g2o {
 	return 4;
       }
 
-      virtual void oplusImpl(const double* update)
+      virtual void oplusImpl(const number_t* update)
       {
-        Eigen::Map<const Vector4D> upd(update);
+        Eigen::Map<const Vector4> upd(update);
         _estimate += upd;
       }
 

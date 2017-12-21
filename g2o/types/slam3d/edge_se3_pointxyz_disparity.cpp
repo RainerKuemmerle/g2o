@@ -39,13 +39,13 @@ namespace g2o {
 
 
   // point to camera projection, monocular
-  EdgeSE3PointXYZDisparity::EdgeSE3PointXYZDisparity() : BaseBinaryEdge<3, Vector3D, VertexSE3, VertexPointXYZ>() {
+  EdgeSE3PointXYZDisparity::EdgeSE3PointXYZDisparity() : BaseBinaryEdge<3, Vector3, VertexSE3, VertexPointXYZ>() {
     resizeParameters(1);
     installParameter(params, 0);
     information().setIdentity();
     information()(2,2)=1000.;
     J.fill(0);
-    J.block<3,3>(0,0) = -Matrix3D::Identity();
+    J.block<3,3>(0,0) = -Matrix3::Identity();
   }
 
 
@@ -63,7 +63,7 @@ namespace g2o {
     is >> pid;
     setParameterId(0,pid);
 
-    Vector3D meas;
+    Vector3 meas;
     for (int i=0; i<3; i++) is >> meas[i];
     setMeasurement(meas);
     if (is.bad())
@@ -97,8 +97,8 @@ namespace g2o {
   void EdgeSE3PointXYZDisparity::computeError() {
     //VertexSE3 *cam = static_cast<VertexSE3*>(_vertices[0]);
     VertexPointXYZ *point = static_cast<VertexPointXYZ*>(_vertices[1]);
-    const Vector3D& pt = point->estimate();
-    //Vector4D ppt(pt(0),pt(1),pt(2),1.0);
+    const Vector3& pt = point->estimate();
+    //Vector4 ppt(pt(0),pt(1),pt(2),1.0);
 
     // VertexCameraCache* vcache = (VertexCameraCache*)cam->getCache(_cacheIds[0]);
     // if (! vcache){
@@ -110,9 +110,9 @@ namespace g2o {
     //   cerr << "fatal error in retrieving cache" << endl;
     // }
 
-    Vector3D p = cache->w2i() * pt;
+    Vector3 p = cache->w2i() * pt;
 
-    Vector3D perr;
+    Vector3 perr;
     perr.head<2>() = p.head<2>()/p(2);
     perr(2) = 1/p(2);
 
@@ -138,9 +138,9 @@ namespace g2o {
     // }
 
 
-    const Vector3D& pt = vp->estimate();
+    const Vector3& pt = vp->estimate();
 
-    Vector3D Zcam = cache->w2l() * vp->estimate();
+    Vector3 Zcam = cache->w2l() * vp->estimate();
 
     //  J(0,3) = -0.0;
     J(0,4) = -2*Zcam(2);
@@ -156,10 +156,10 @@ namespace g2o {
 
     J.block<3,3>(0,6) = cache->w2l().rotation();
 
-    //Eigen::Matrix<double,3,9,Eigen::ColMajor> Jprime = vcache->params->Kcam_inverseOffsetR  * J;
-    Eigen::Matrix<double,3,9,Eigen::ColMajor> Jprime = params->Kcam_inverseOffsetR()  * J;
-    Eigen::Matrix<double,3,9,Eigen::ColMajor> Jhom;
-    Vector3D Zprime = cache->w2i() * pt;
+    //Eigen::Matrix<number_t,3,9,Eigen::ColMajor> Jprime = vcache->params->Kcam_inverseOffsetR  * J;
+    Eigen::Matrix<number_t,3,9,Eigen::ColMajor> Jprime = params->Kcam_inverseOffsetR()  * J;
+    Eigen::Matrix<number_t,3,9,Eigen::ColMajor> Jhom;
+    Vector3 Zprime = cache->w2i() * pt;
 
     Jhom.block<2,9>(0,0) = 1/(Zprime(2)*Zprime(2)) * (Jprime.block<2,9>(0,0)*Zprime(2) - Zprime.head<2>() * Jprime.block<1,9>(2,0));
     Jhom.block<1,9>(2,0) = - 1/(Zprime(2)*Zprime(2)) * Jprime.block<1,9>(2,0);
@@ -173,16 +173,16 @@ namespace g2o {
   bool EdgeSE3PointXYZDisparity::setMeasurementFromState(){
     //VertexSE3 *cam = static_cast< VertexSE3*>(_vertices[0]);
     VertexPointXYZ *point = static_cast<VertexPointXYZ*>(_vertices[1]);
-    const Vector3D &pt = point->estimate();
+    const Vector3 &pt = point->estimate();
 
     // VertexCameraCache* vcache = (VertexCameraCache*) cam->getCache(_cacheIds[0]);
     // if (! vcache){
     //   cerr << "fatal error in retrieving cache" << endl;
     // }
 
-    Vector3D p = cache->w2i() * pt;
+    Vector3 p = cache->w2i() * pt;
 
-    Vector3D perr;
+    Vector3 perr;
     perr.head<2>() = p.head<2>()/p(2);
     perr(2) = 1/p(2);
 
@@ -204,9 +204,9 @@ namespace g2o {
     //   cerr << "fatal error in retrieving cache" << endl;
     // }
     //ParameterCamera* params=vcache->params;
-    const Eigen::Matrix<double, 3, 3, Eigen::ColMajor>& invKcam = params->invKcam();
-    Vector3D p;
-    double w=1./_measurement(2);
+    const Eigen::Matrix<number_t, 3, 3, Eigen::ColMajor>& invKcam = params->invKcam();
+    Vector3 p;
+    number_t w=1./_measurement(2);
     p.head<2>() = _measurement.head<2>()*w;
     p(2) = w;
     p = invKcam * p;
@@ -233,7 +233,7 @@ namespace g2o {
     VertexPointXYZ* toEdge   = static_cast<VertexPointXYZ*>(e->vertices()[1]);
     if (! fromEdge || ! toEdge)
       return this;
-    Isometry3D fromTransform=fromEdge->estimate() * e->cameraParameter()->offset();
+    Isometry3 fromTransform=fromEdge->estimate() * e->cameraParameter()->offset();
     glColor3f(LANDMARK_EDGE_COLOR);
     glPushAttrib(GL_ENABLE_BIT);
     glDisable(GL_LIGHTING);

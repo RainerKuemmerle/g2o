@@ -35,10 +35,10 @@ namespace deprecated {
 
 
   // point to camera projection, monocular
-  EdgeSE3PointXYZ::EdgeSE3PointXYZ() : BaseBinaryEdge<3, Eigen::Vector3d, VertexSE3, VertexPointXYZ>() {
+  EdgeSE3PointXYZ::EdgeSE3PointXYZ() : BaseBinaryEdge<3, Vector3, VertexSE3, VertexPointXYZ>() {
     information().setIdentity();
     J.fill(0);
-    J.block<3,3>(0,0) = -Eigen::Matrix3d::Identity();
+    J.block<3,3>(0,0) = -Matrix3::Identity();
     cache = 0;
     offsetParam = 0;
     resizeParameters(1);
@@ -58,7 +58,7 @@ namespace deprecated {
     is >> pId;
     setParameterId(0, pId);
     // measured keypoint
-    Eigen::Vector3d meas;
+    Vector3 meas;
     for (int i=0; i<3; i++) is >> meas[i];
     setMeasurement(meas);
     // information matrix is the identity for features, could be changed to allow arbitrary covariances    
@@ -94,7 +94,7 @@ namespace deprecated {
     //VertexSE3 *cam = static_cast<VertexSE3*>(_vertices[0]);
     VertexPointXYZ *point = static_cast<VertexPointXYZ*>(_vertices[1]);
 
-    Eigen::Vector3d perr = cache->w2nMatrix() * point->estimate();
+    Vector3 perr = cache->w2nMatrix() * point->estimate();
 
     // error, which is backwards from the normal observed - calculated
     // _measurement is the measured projection
@@ -106,7 +106,7 @@ namespace deprecated {
     //VertexSE3 *cam = static_cast<VertexSE3 *>(_vertices[0]);
     VertexPointXYZ *vp = static_cast<VertexPointXYZ *>(_vertices[1]);
 
-    Eigen::Vector3d Zcam = cache->w2lMatrix() * vp->estimate();
+    Vector3 Zcam = cache->w2lMatrix() * vp->estimate();
 
     //  J(0,3) = -0.0;
     J(0,4) = -2*Zcam(2);
@@ -122,7 +122,7 @@ namespace deprecated {
 
     J.block<3,3>(0,6) = cache->w2lMatrix().rotation();
 
-    Eigen::Matrix<double,3,9> Jhom = offsetParam->inverseOffsetMatrix().rotation() * J;
+    Eigen::Matrix<number_t,3,9> Jhom = offsetParam->inverseOffsetMatrix().rotation() * J;
 
     _jacobianOplusXi = Jhom.block<3,6>(0,0);
     _jacobianOplusXj = Jhom.block<3,3>(0,6);
@@ -134,13 +134,13 @@ namespace deprecated {
     VertexPointXYZ *point = static_cast<VertexPointXYZ*>(_vertices[1]);
 
     // calculate the projection
-    const Eigen::Vector3d &pt = point->estimate();
+    const Vector3 &pt = point->estimate();
     // SE3OffsetCache* vcache = (SE3OffsetCache*) cam->getCache(_cacheIds[0]);
     // if (! vcache){
     //   cerr << "fatal error in retrieving cache" << endl;
     // }
 
-    Eigen::Vector3d perr = cache->w2nMatrix() * pt;
+    Vector3 perr = cache->w2nMatrix() * pt;
     _measurement = perr;
     return true;
   }
@@ -158,7 +158,7 @@ namespace deprecated {
     //   cerr << "fatal error in retrieving cache" << endl;
     // }
     // SE3OffsetParameters* params=vcache->params;
-    const Eigen::Vector3d& p=_measurement;
+    const Vector3& p=_measurement;
     point->setEstimate(cam->estimate() * (offsetParam->offsetMatrix() * p));
   }
 

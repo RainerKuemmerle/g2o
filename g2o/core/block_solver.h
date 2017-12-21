@@ -48,11 +48,11 @@ namespace g2o {
   {
     static const int PoseDim = _PoseDim;
     static const int LandmarkDim = _LandmarkDim;
-    typedef Eigen::Matrix<double, PoseDim, PoseDim, Eigen::ColMajor> PoseMatrixType;
-    typedef Eigen::Matrix<double, LandmarkDim, LandmarkDim, Eigen::ColMajor> LandmarkMatrixType;
-    typedef Eigen::Matrix<double, PoseDim, LandmarkDim, Eigen::ColMajor> PoseLandmarkMatrixType;
-    typedef Eigen::Matrix<double, PoseDim, 1, Eigen::ColMajor> PoseVectorType;
-    typedef Eigen::Matrix<double, LandmarkDim, 1, Eigen::ColMajor> LandmarkVectorType;
+    typedef Eigen::Matrix<number_t, PoseDim, PoseDim, Eigen::ColMajor> PoseMatrixType;
+    typedef Eigen::Matrix<number_t, LandmarkDim, LandmarkDim, Eigen::ColMajor> LandmarkMatrixType;
+    typedef Eigen::Matrix<number_t, PoseDim, LandmarkDim, Eigen::ColMajor> PoseLandmarkMatrixType;
+    typedef Eigen::Matrix<number_t, PoseDim, 1, Eigen::ColMajor> PoseVectorType;
+    typedef Eigen::Matrix<number_t, LandmarkDim, 1, Eigen::ColMajor> LandmarkVectorType;
 
     typedef SparseBlockMatrix<PoseMatrixType> PoseHessianType;
     typedef SparseBlockMatrix<LandmarkMatrixType> LandmarkHessianType;
@@ -68,11 +68,11 @@ namespace g2o {
   {
     static const int PoseDim = Eigen::Dynamic;
     static const int LandmarkDim = Eigen::Dynamic;
-    typedef MatrixXD PoseMatrixType;
-    typedef MatrixXD LandmarkMatrixType;
-    typedef MatrixXD PoseLandmarkMatrixType;
-    typedef VectorXD PoseVectorType;
-    typedef VectorXD LandmarkVectorType;
+    typedef MatrixX PoseMatrixType;
+    typedef MatrixX LandmarkMatrixType;
+    typedef MatrixX PoseLandmarkMatrixType;
+    typedef VectorX PoseVectorType;
+    typedef VectorX LandmarkVectorType;
 
     typedef SparseBlockMatrix<PoseMatrixType> PoseHessianType;
     typedef SparseBlockMatrix<LandmarkMatrixType> LandmarkHessianType;
@@ -90,7 +90,7 @@ namespace g2o {
       /**
        * compute dest = H * src
        */
-      virtual void multiplyHessian(double* dest, const double* src) const = 0;
+      virtual void multiplyHessian(number_t* dest, const number_t* src) const = 0;
   };
 
   /**
@@ -128,8 +128,8 @@ namespace g2o {
       virtual bool updateStructure(const std::vector<HyperGraph::Vertex*>& vset, const HyperGraph::EdgeSet& edges);
       virtual bool buildSystem();
       virtual bool solve();
-      virtual bool computeMarginals(SparseBlockMatrix<MatrixXD>& spinv, const std::vector<std::pair<int, int> >& blockIndices);
-      virtual bool setLambda(double lambda, bool backup = false);
+      virtual bool computeMarginals(SparseBlockMatrix<MatrixX>& spinv, const std::vector<std::pair<int, int> >& blockIndices);
+      virtual bool setLambda(number_t lambda, bool backup = false);
       virtual void restoreDiagonal();
       virtual bool supportsSchur() {return true;}
       virtual bool schur() { return _doSchur;}
@@ -142,7 +142,7 @@ namespace g2o {
 
       virtual bool saveHessian(const std::string& fileName) const;
 
-      virtual void multiplyHessian(double* dest, const double* src) const { _Hpp->multiplySymmetricUpperTriangle(dest, src);}
+      virtual void multiplyHessian(number_t* dest, const number_t* src) const { _Hpp->multiplySymmetricUpperTriangle(dest, src);}
 
     protected:
       void resize(int* blockPoseIndices, int numPoseBlocks, 
@@ -171,8 +171,8 @@ namespace g2o {
 
       bool _doSchur;
 
-      std::unique_ptr<double[], aligned_deleter<double>> _coefficients;
-      std::unique_ptr<double[], aligned_deleter<double>> _bschur;
+      std::unique_ptr<number_t[], aligned_deleter<number_t>> _coefficients;
+      std::unique_ptr<number_t[], aligned_deleter<number_t>> _bschur;
 
       int _numPoses, _numLandmarks;
       int _sizePoses, _sizeLandmarks;

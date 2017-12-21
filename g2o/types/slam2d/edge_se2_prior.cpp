@@ -41,7 +41,7 @@ namespace g2o {
 
   bool EdgeSE2Prior::read(std::istream& is)
   {
-    Vector3D p;
+    Vector3 p;
     is >> p[0] >> p[1] >> p[2];
     setMeasurement(p);
     _inverseMeasurement= _measurement.inverse();
@@ -56,7 +56,7 @@ namespace g2o {
 
   bool EdgeSE2Prior::write(std::ostream& os) const
   {
-    Vector3D p = measurement().toVector();
+    Vector3 p = measurement().toVector();
     os << p.x() << " " << p.y() << " " << p.z();
     for (int i = 0; i < 3; ++i)
       for (int j = i; j < 3; ++j)
@@ -70,7 +70,7 @@ namespace g2o {
     _inverseMeasurement = m.inverse();
   }
 
-  bool EdgeSE2Prior::setMeasurementData(const double* d) {
+  bool EdgeSE2Prior::setMeasurementData(const number_t* d) {
     _measurement=SE2(d[0], d[1], d[2]);
     _inverseMeasurement = _measurement.inverse();
     return true;

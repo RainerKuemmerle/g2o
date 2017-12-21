@@ -31,7 +31,7 @@ double gauss_rand(double sigma) {
   return sigma * y * std::sqrt(-2.0 * log(r2) / r2);
 }
 
-Eigen::Isometry3d sample_noise_from_se3(const Vector6d& cov ) { 
+Eigen::Isometry3d sample_noise_from_se3(const Vector6& cov ) { 
   double nx = gauss_rand(cov(0));
   double ny = gauss_rand(cov(1));
   double nz = gauss_rand(cov(2));
@@ -103,7 +103,7 @@ struct Robot: public WorldItem {
     if(_planarMotion) {
       // add a singleton constraint that locks the position of the robot on the plane
       EdgeSE3Prior* planeConstraint=new EdgeSE3Prior();
-      Matrix6d pinfo = Matrix6d::Zero();
+      Matrix6 pinfo = Matrix6::Zero();
       pinfo(2, 2) = 1e9;
       planeConstraint->setInformation(pinfo);
       planeConstraint->setMeasurement(Isometry3d::Identity());
@@ -116,7 +116,7 @@ struct Robot: public WorldItem {
       EdgeSE3* e = new EdgeSE3();
       Isometry3d noise = sample_noise_from_se3(_nmovecov);
       e->setMeasurement(delta * noise);
-      Matrix6d m = Matrix6d::Identity();
+      Matrix6 m = Matrix6::Identity();
       for(int i = 0; i < 6; ++i) {
 	m(i, i) = 1.0 / (_nmovecov(i));
       }
@@ -146,7 +146,7 @@ struct Robot: public WorldItem {
 
   Isometry3d _position;
   SensorVector _sensors;
-  Vector6d _nmovecov;
+  Vector6 _nmovecov;
   bool _planarMotion;
 };
 
@@ -304,7 +304,7 @@ int main (int argc, char** argv) {
   Line3D line;
   std::cout << "Creating landmark line 1" << std::endl;
   LineItem* li = new LineItem(g, 1);
-  Vector6d liv;
+  Vector6 liv;
   liv << 0.0, 0.0, 5.0, 0.0, 1.0, 0.0;
   line = Line3D::fromCartesian(liv);
   static_cast<VertexLine3D*>(li->vertex())->setEstimate(line);

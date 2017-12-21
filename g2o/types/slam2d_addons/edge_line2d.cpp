@@ -43,7 +43,7 @@
 
   bool EdgeLine2D::read(std::istream& is)
   {
-    Vector2D  v;
+    Vector2  v;
     for (int i = 0; i < 2; ++i)
       is >> v[i];
     setMeasurement(v);
@@ -70,8 +70,8 @@
 #ifndef NUMERIC_JACOBIAN_TWO_D_TYPES
   void EdgeLine2D::linearizeOplus()
   {
-    _jacobianOplusXi=-Matrix2d::Identity();
-    _jacobianOplusXj= Matrix2d::Identity();
+    _jacobianOplusXi=-Matrix2::Identity();
+    _jacobianOplusXj= Matrix2::Identity();
   }
 #endif
 

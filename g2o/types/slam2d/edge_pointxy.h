@@ -34,7 +34,7 @@
 
 namespace g2o {
 
-  class G2O_TYPES_SLAM2D_API EdgePointXY : public BaseBinaryEdge<2, Vector2D, VertexPointXY, VertexPointXY>
+  class G2O_TYPES_SLAM2D_API EdgePointXY : public BaseBinaryEdge<2, Vector2, VertexPointXY, VertexPointXY>
   {
     public:
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW
@@ -49,17 +49,17 @@ namespace g2o {
       virtual bool read(std::istream& is);
       virtual bool write(std::ostream& os) const;
 
-      virtual void setMeasurement(const Vector2D& m){
+      virtual void setMeasurement(const Vector2& m){
         _measurement = m;
       }
 
-      virtual bool setMeasurementData(const double* d){
-        _measurement=Vector2D(d[0], d[1]);
+      virtual bool setMeasurementData(const number_t* d){
+        _measurement=Vector2(d[0], d[1]);
         return true;
       }
 
-      virtual bool getMeasurementData(double* d) const {
-	Eigen::Map<Vector2D> m(d);
+      virtual bool getMeasurementData(number_t* d) const {
+	Eigen::Map<Vector2> m(d);
 	m=_measurement;
         return true;
       }
@@ -74,7 +74,7 @@ namespace g2o {
       }
 
 
-      virtual double initialEstimatePossible(const OptimizableGraph::VertexSet& , OptimizableGraph::Vertex* ) { return 0.;}
+      virtual number_t initialEstimatePossible(const OptimizableGraph::VertexSet& , OptimizableGraph::Vertex* ) { return 0.;}
 #ifndef NUMERIC_JACOBIAN_TWO_D_TYPES
       virtual void linearizeOplus();
 #endif

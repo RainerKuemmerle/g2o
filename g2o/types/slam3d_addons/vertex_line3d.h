@@ -46,19 +46,19 @@ namespace g2o {
 
     virtual void setToOriginImpl() { _estimate = Line3D(); }
 
-    virtual void oplusImpl(const double* update_) {
-      Eigen::Map<const Eigen::Vector4d> update(update_);
+    virtual void oplusImpl(const number_t* update_) {
+      Eigen::Map<const Vector4> update(update_);
       _estimate.oplus(update);
     }
 
-    virtual bool setEstimateDataImpl(const double* est) {
-      Eigen::Map<const Vector6d> _est(est);
+    virtual bool setEstimateDataImpl(const number_t* est) {
+      Eigen::Map<const Vector6> _est(est);
       _estimate = Line3D(_est);
       return true;
     }
 
-    virtual bool getEstimateData(double* est) const {
-      Eigen::Map<Vector6d> _est(est);
+    virtual bool getEstimateData(number_t* est) const {
+      Eigen::Map<Vector6> _est(est);
       _est = _estimate;
       return true;
     }
@@ -67,7 +67,7 @@ namespace g2o {
       return 6;
     }
 
-    Eigen::Vector3d color;
+    Vector3 color;
   };
 
 #ifdef G2O_HAVE_OPENGL

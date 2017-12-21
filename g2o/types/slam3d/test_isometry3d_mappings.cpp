@@ -27,20 +27,20 @@
 #include <iostream>
 #include "isometry3d_mappings.h"
 #include "g2o/stuff/macros.h"
+#include "g2o/stuff/misc.h"
 
 #include <cstdio>
 
 using namespace std;
 using namespace g2o;
 using namespace g2o::internal;
-using namespace Eigen;
 
 int main(int , char** ){
 
-Matrix3D I;
-  Matrix3D R = Matrix3D::Identity();
-  Matrix3D rot = (Matrix3D)AngleAxisd(0.01, Vector3D::UnitZ());
-  rot = rot * (Matrix3D)AngleAxisd(0.01, Vector3D::UnitX());
+Matrix3 I;
+  Matrix3 R = Matrix3::Identity();
+  Matrix3 rot = (Matrix3)AngleAxis(cst(0.01), Vector3::UnitZ());
+  rot = rot * (Matrix3)AngleAxis(cst(0.01), Vector3::UnitX());
   
   cerr << "Initial rotation matrix accuracy" << endl;
   I = R * R.transpose();
@@ -65,7 +65,7 @@ Matrix3D I;
   cerr << PVAR(R) << endl;
   printf("det %.30f\n", R.determinant());
   printf("\nUsing nearest orthogonal matrix\n");
-  Matrix3D approxSolution = R;
+  Matrix3 approxSolution = R;
   approximateNearestOrthogonalMatrix(approxSolution);
   nearestOrthogonalMatrix(R);
   cerr << PVAR(R) << endl;
@@ -97,62 +97,62 @@ Matrix3D I;
   cerr << endl;
   return 0;
 
-  Vector3D eulerAngles(.1,.2,.3);
-  Matrix3D m1=fromEuler(eulerAngles);
+  Vector3 eulerAngles(cst(.1),cst(.2),cst(.3));
+  Matrix3 m1=fromEuler(eulerAngles);
   cerr << "m1=fromEuler(eulerAngles)" << endl;
   cerr << "eulerAngles:" << endl;
   cerr << eulerAngles << endl;
   cerr << "m1:" << endl;
   cerr << m1 << endl;
 
-  Vector3D eulerAngles1 =  toEuler(m1);
+  Vector3 eulerAngles1 =  toEuler(m1);
   cerr << "eulerAngles1 =  toEuler(m1) " << endl;
   cerr << "eulerAngles1:" << endl;
   cerr << eulerAngles1 << endl;
 
-  Vector3D q=toCompactQuaternion(m1);
+  Vector3 q=toCompactQuaternion(m1);
   cerr << "q=toCompactQuaternion(m1)" << endl;
   cerr << "q:" << endl;
   cerr <<  q << endl;
 
-  Matrix3D m2=fromCompactQuaternion(q);
+  Matrix3 m2=fromCompactQuaternion(q);
   cerr << "m2=fromCompactQuaternion(q);" << endl;
   cerr << "m2:" << endl;
   cerr << m2 << endl;
 
-  Vector6d et;
-  Vector3D t(1.,2.,3.);
+  Vector6 et;
+  Vector3 t(1.,2.,3.);
   et.block<3,1>(0,0)=eulerAngles;
   et.block<3,1>(3,0)=t;
-  Isometry3D i1 = fromVectorET(et);
+  Isometry3 i1 = fromVectorET(et);
   cerr << "i1 = fromVectorET(et);" << endl;
   cerr << "et:" << endl;
   cerr << et << endl;
   cerr << "i1" << endl;
   cerr << i1.rotation() << endl;
   cerr << i1.translation() << endl;
-  Vector6d et2=toVectorET(i1);
+  Vector6 et2=toVectorET(i1);
   cerr << "et2=toVectorET(i1);" << endl;
   cerr << "et2" << endl;
   cerr << et2 << endl;
 
-  Vector6d qt1=toVectorMQT(i1);
+  Vector6 qt1=toVectorMQT(i1);
   cerr << "qt1=toVectorMQT(i1)" << endl;
   cerr << "qt1:" << endl;
   cerr << qt1 << endl;
 
-  Isometry3D i2 = fromVectorMQT(qt1);
+  Isometry3 i2 = fromVectorMQT(qt1);
   cerr << "i2 = fromVectorMQT(qt1)" << endl;
   cerr << "i2" << endl;
   cerr << i2.rotation() << endl;
   cerr << i2.translation() << endl;
 
-  Vector7d qt2=toVectorQT(i1);
+  Vector7 qt2=toVectorQT(i1);
   cerr << "qt2=toVectorQT(i1)" << endl;
   cerr << "qt2:" << endl;
   cerr << qt2 << endl;
 
-  Isometry3D i3 = fromVectorQT(qt2);
+  Isometry3 i3 = fromVectorQT(qt2);
   cerr << "i3 = fromVectorQT(qt2)" << endl;
   cerr << "i3" << endl;
   cerr << i3.rotation() << endl;

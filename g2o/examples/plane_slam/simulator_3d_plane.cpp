@@ -43,8 +43,6 @@ using namespace Eigen;
 
 G2O_USE_OPTIMIZATION_LIBRARY(csparse)
 
-//typedef Eigen::Matrix<double, 6,6> Matrix6d; //Avoid ambiguous symbol
-
 double uniform_rand(double lowerBndr, double upperBndr)
 {
   return lowerBndr + ((double) std::rand() / (RAND_MAX + 1.0)) * (upperBndr - lowerBndr);
@@ -61,7 +59,7 @@ double gauss_rand(double sigma)
   return sigma * y * std::sqrt(-2.0 * log(r2) / r2);
 }
 
-Eigen::Isometry3d sample_noise_from_se3(const Vector6d& cov ){
+Eigen::Isometry3d sample_noise_from_se3(const Vector6& cov ){
   double nx=gauss_rand(cov(0));
   double ny=gauss_rand(cov(1));
   double nz=gauss_rand(cov(2));
@@ -135,7 +133,7 @@ struct Robot: public WorldItem {
     if (_planarMotion){
       // add a singleton constraint that locks the position of the robot on the plane
       EdgeSE3Prior* planeConstraint=new EdgeSE3Prior();
-      Matrix6d pinfo = Matrix6d::Zero();
+      Matrix6 pinfo = Matrix6::Zero();
       pinfo(2,2)=1e9;
       planeConstraint->setInformation(pinfo);
       planeConstraint->setMeasurement(Isometry3d::Identity());
@@ -148,7 +146,7 @@ struct Robot: public WorldItem {
       EdgeSE3* e=new EdgeSE3();
       Isometry3d noise=sample_noise_from_se3(_nmovecov);
       e->setMeasurement(delta*noise);
-      Matrix6d m=Matrix6d::Identity();
+      Matrix6 m=Matrix6::Identity();
       for (int i=0; i<6; i++){
 	m(i,i)=1./(_nmovecov(i));
       }
@@ -177,7 +175,7 @@ struct Robot: public WorldItem {
 
   Isometry3d _position;
   SensorVector _sensors;
-  Vector6d _nmovecov;
+  Vector6 _nmovecov;
   bool _planarMotion;
 };
 
@@ -442,7 +440,7 @@ int main (int argc  , char ** argv){
   if (fixSensor) {
     ps->_offsetVertex->setFixed(true);
   } else {
-    Vector6d noffcov;
+    Vector6 noffcov;
     noffcov << 0.1,0.1,0.1,0.5, 0.5, 0.5;
     ps->_offsetVertex->setEstimate(ps->_offsetVertex->estimate() * sample_noise_from_se3(noffcov));
     ps->_offsetVertex->setFixed(false);

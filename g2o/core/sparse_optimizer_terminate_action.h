@@ -48,15 +48,15 @@ namespace g2o {
       SparseOptimizerTerminateAction();
       virtual HyperGraphAction* operator()(const HyperGraph* graph, Parameters* parameters = 0);
 
-      double gainThreshold() const { return _gainThreshold;}
-      void setGainThreshold(double gainThreshold);
+      number_t gainThreshold() const { return _gainThreshold;}
+      void setGainThreshold(number_t gainThreshold);
 
       int maxIterations() const { return _maxIterations;}
       void setMaxIterations(int maxit);
 
     protected:
-      double _gainThreshold;
-      double _lastChi;
+      number_t _gainThreshold;
+      number_t _lastChi;
       bool _auxTerminateFlag;
       int _maxIterations;
 
