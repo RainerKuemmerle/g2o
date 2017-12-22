@@ -52,14 +52,14 @@ namespace g2o {
         _measurement = m;
       }
 
-      virtual bool setMeasurementData(const double* d){
+      virtual bool setMeasurementData(const number_t* d){
         _measurement=Vector2(d[0], d[1]);
         return true;
       }
 
-      virtual bool getMeasurementData(double* d) const {
-	Eigen::Map<Vector2> m(d);
-	m=_measurement;
+      virtual bool getMeasurementData(number_t* d) const {
+        Eigen::Map<Vector2> m(d);
+        m=_measurement;
         return true;
       }
 
@@ -72,7 +72,7 @@ namespace g2o {
       }
 
 
-      virtual double initialEstimatePossible(const OptimizableGraph::VertexSet& , OptimizableGraph::Vertex* ) { return 0.;}
+      virtual number_t initialEstimatePossible(const OptimizableGraph::VertexSet& , OptimizableGraph::Vertex* ) { return 0;}
 #ifndef NUMERIC_JACOBIAN_TWO_D_TYPES
       virtual void linearizeOplus();
 #endif
