@@ -71,25 +71,25 @@ licenses for more details.
 
 
 ### Requirements
-  * cmake             http://www.cmake.org/
-  * Eigen3            http://eigen.tuxfamily.org
+* cmake             http://www.cmake.org/
+* Eigen3            http://eigen.tuxfamily.org
 
-  On Ubuntu / Debian these dependencies are resolved by installing the
-  following packages.
-    - cmake
-    - libeigen3-dev
+On Ubuntu / Debian these dependencies are resolved by installing the
+following packages.
+  - cmake
+  - libeigen3-dev
 
 #### Optional requirements
-  * suitesparse       http://www.cise.ufl.edu/research/sparse/SuiteSparse/
-  * Qt5               http://qt-project.org
-  * libQGLViewer      http://www.libqglviewer.com/
+* suitesparse       http://www.cise.ufl.edu/research/sparse/SuiteSparse/
+* Qt5               http://qt-project.org
+* libQGLViewer      http://www.libqglviewer.com/
 
-  On Ubuntu / Debian these dependencies are resolved by installing the
-  following packages.
-    - libsuitesparse-dev
-    - qtdeclarative5-dev
-    - qt5-qmake
-    - libqglviewer-dev
+On Ubuntu / Debian these dependencies are resolved by installing the
+following packages.
+- libsuitesparse-dev
+- qtdeclarative5-dev
+- qt5-qmake
+- libqglviewer-dev
 
 #### Mac OS X
 If using [Homebrew](http://brew.sh/), then
@@ -127,6 +127,8 @@ We thank the following contributors for providing patches:
 - Michael A. Eriksen for submitting patches to compile with MSVC.
 - Mark Pupilli for submitting patches to compile with MSVC.
 
+### Projects using g2o
+- [.Net wrapper](https://github.com/fugro/g2o)
 
 ### Contact information
 Rainer Kuemmerle <kuemmerl@informatik.uni-freiburg.de>   
