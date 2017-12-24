@@ -75,7 +75,7 @@ namespace g2o {
               _r.normalize();
             } else {
               number_t w2= cst(1.)-_r.squaredNorm();
-              _r.w()= (w2<cst(0.)) ? cst(0.) : sqrt(w2);
+              _r.w()= (w2<cst(0.)) ? cst(0.) : std::sqrt(w2);
             }
           }
           else if (v.size() == 7) {
@@ -161,7 +161,7 @@ namespace g2o {
       inline void fromMinimalVector(const Vector6& v){
         number_t w = cst(1.)-v[3]*v[3]-v[4]*v[4]-v[5]*v[5];
         if (w>0){
-          _r=Quaternion(sqrt(w), v[3], v[4], v[5]);
+          _r=Quaternion(std::sqrt(w), v[3], v[4], v[5]);
         } else {
           _r=Quaternion(0, -v[3], -v[4], -v[5]);
         }
@@ -191,7 +191,7 @@ namespace g2o {
         else
         {
           number_t theta = std::acos(d);
-          omega = theta/(2*sqrt(1-d*d))*dR;
+          omega = theta/(2*std::sqrt(1-d*d))*dR;
           Matrix3 Omega = skew(omega);
           V_inv = ( Matrix3::Identity() - cst(0.5)*Omega
               + ( 1-theta/(2*std::tan(theta/2)))/(theta*theta)*(Omega*Omega) );
@@ -231,10 +231,15 @@ namespace g2o {
         Matrix3 V;
         if (theta<cst(0.00001))
         {
-          //TODO: CHECK WHETHER THIS IS CORRECT!!!
-          R = (Matrix3::Identity() + Omega + Omega*Omega);
+          Matrix3 Omega2 = Omega*Omega;
 
-          V = R;
+          R = (Matrix3::Identity()
+              + Omega
+              + cst(0.5) * Omega2);
+
+          V = (Matrix3::Identity()
+              + cst(0.5) * Omega
+              + cst(1.) / cst(6.) * Omega2);
         }
         else
         {
