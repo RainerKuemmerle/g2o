@@ -1,8 +1,3 @@
-# CMake: Do not link against qtmain.lib in Windows automatically
-if(POLICY CMP0020)
-  cmake_policy(SET CMP0020 OLD)
-endif()
-
 # Qt5 was been find_package'd() by FindQGLViewer.cmake
 if(Qt5_FOUND)
   QT5_WRAP_UI(UI_HEADERS base_main_window.ui base_properties_widget.ui)
