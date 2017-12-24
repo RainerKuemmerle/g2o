@@ -47,9 +47,7 @@ OptimizableGraph::Vertex* BaseBinaryEdge<D, E, VertexXiType, VertexXjType>::crea
 template <int D, typename E, typename VertexXiType, typename VertexXjType>
 void BaseBinaryEdge<D, E, VertexXiType, VertexXjType>::resize(size_t size)
 {
-  if (size != 2) {
-    std::cerr << "WARNING, attempting to resize binary edge " << BaseEdge<D, E>::id() << " to " << size << std::endl;
-  }
+  assert(size == 2 && "attempting to resize a binary edge");
   BaseEdge<D, E>::resize(size);
 }
 

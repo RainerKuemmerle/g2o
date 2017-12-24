@@ -53,7 +53,7 @@ namespace g2o {
       BaseUnaryEdge() : BaseEdge<D,E>(),
         _jacobianOplusXi(0, D, VertexXiType::Dimension)
       {
-        _vertices.resize(1);
+        _vertices.resize(1, nullptr);
       }
 
       virtual void resize(size_t size);

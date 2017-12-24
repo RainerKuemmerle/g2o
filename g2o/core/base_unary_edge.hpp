@@ -27,10 +27,7 @@
 template <int D, typename E, typename VertexXiType>
 void BaseUnaryEdge<D, E, VertexXiType>::resize(size_t size)
 {
-  if (size != 1) {
-    std::cerr << "WARNING, attempting to resize unary edge " << BaseEdge<D, E>::id() << " to " << size << std::endl;
-    assert(0 && "error resizing unary edge where size != 1");
-  }
+  assert(size == 1 && "error resizing unary edge where size != 1");
   BaseEdge<D, E>::resize(size);
 }
 
