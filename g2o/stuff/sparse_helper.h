@@ -28,6 +28,7 @@
 #define G2O_SPARSE_HELPER_H
 
 #include "g2o_stuff_api.h"
+#include "g2o/config.h"
 
 #include <string>
 
