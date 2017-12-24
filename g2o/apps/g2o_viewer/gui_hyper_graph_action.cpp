@@ -39,7 +39,7 @@ HyperGraphAction* GuiHyperGraphAction::operator()(const HyperGraph* graph, Param
   (void) graph;
   if (viewer) {
     viewer->setUpdateDisplay(true);
-    viewer->updateGL();
+    viewer->update();
 
     if (dumpScreenshots) {
       ParametersIteration* p = dynamic_cast<ParametersIteration*>(parameters);
