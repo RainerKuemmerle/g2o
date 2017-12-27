@@ -33,7 +33,6 @@
 namespace g2o {
 
   using namespace std;
-  using namespace Eigen;
 
   G2O_REGISTER_TYPE_GROUP(sba);
 
@@ -50,7 +49,7 @@ namespace g2o {
   // constructor
   VertexIntrinsics::VertexIntrinsics() 
   {
-    _estimate << 1. , 1. , .5 , .5 , .1;
+    _estimate << cst(1.), cst(1.), cst(.5), cst(.5), cst(.1);
   }
 
   bool VertexIntrinsics::read(std::istream& is)
@@ -75,15 +74,15 @@ namespace g2o {
   bool VertexCam::read(std::istream& is)
   {
     // first the position and orientation (vector3 and quaternion)
-    Vector3D t;
+    Vector3 t;
     for (int i=0; i<3; i++){
       is >> t[i];
     }
-    Vector4D rc;
+    Vector4 rc;
     for (int i=0; i<4; i++) {
       is >> rc[i];
     }
-    Quaterniond r;
+    Quaternion r;
     r.coeffs() = rc;
     r.normalize();
 
@@ -92,7 +91,7 @@ namespace g2o {
     SBACam cam(r,t);
 
     // now fx, fy, cx, cy, baseline
-    double fx, fy, cx, cy, tx;
+    number_t fx, fy, cx, cy, tx;
 
     // try to read one value
     is >>  fx;
@@ -102,7 +101,7 @@ namespace g2o {
     } else{
       is.clear();
       std::cerr << "cam not defined, using defaults" << std::endl;
-      cam.setKcam(300,300,320,320,0.1);
+      cam.setKcam(300,300,320,320,cst(0.1));
     }
 
     // set the object
@@ -138,7 +137,7 @@ namespace g2o {
 
   bool EdgeSBACam::read(std::istream& is)
   {
-    Vector7d meas;
+    Vector7 meas;
     for (int i=0; i<7; i++)
       is >> meas[i];
     setMeasurement(SE3Quat(meas));
@@ -174,13 +173,13 @@ namespace g2o {
   }
 
 
-  VertexSBAPointXYZ::VertexSBAPointXYZ() : BaseVertex<3, Vector3D>()
+  VertexSBAPointXYZ::VertexSBAPointXYZ() : BaseVertex<3, Vector3>()
   {
   }
 
   bool VertexSBAPointXYZ::read(std::istream& is)
   {
-    Vector3D lv;
+    Vector3 lv;
     for (int i=0; i<3; i++)
       is >> _estimate[i];
     return true;
@@ -188,7 +187,7 @@ namespace g2o {
 
   bool VertexSBAPointXYZ::write(std::ostream& os) const
   {
-    Vector3D lv=estimate();
+    Vector3 lv=estimate();
     for (int i=0; i<3; i++){
       os << lv[i] << " ";
     }
@@ -197,7 +196,7 @@ namespace g2o {
 
   // point to camera projection, monocular
   EdgeProjectP2MC::EdgeProjectP2MC() :
-  BaseBinaryEdge<2, Vector2D, VertexSBAPointXYZ, VertexCam>()
+  BaseBinaryEdge<2, Vector2, VertexSBAPointXYZ, VertexCam>()
   {
     information().setIdentity();
   }
@@ -222,13 +221,13 @@ namespace g2o {
 
   // point to camera projection, stereo
   EdgeProjectP2SC::EdgeProjectP2SC() :
-    BaseBinaryEdge<3, Vector3D, VertexSBAPointXYZ, VertexCam>()
+    BaseBinaryEdge<3, Vector3, VertexSBAPointXYZ, VertexCam>()
   {
   }
 
   bool EdgeProjectP2SC::read(std::istream& is)
   {
-    Vector3D meas;
+    Vector3 meas;
     for (int i=0; i<3; i++)
       is >> meas[i];
     setMeasurement(meas);
@@ -253,37 +252,37 @@ namespace g2o {
     const SBACam &cam = vc->estimate();
 
     VertexSBAPointXYZ *vp = static_cast<VertexSBAPointXYZ *>(_vertices[0]);
-    Vector4D pt, trans;
+    Vector4 pt, trans;
     pt.head<3>() = vp->estimate();
     pt(3) = 1.0;
     trans.head<3>() = cam.translation();
     trans(3) = 1.0;
 
     // first get the world point in camera coords
-    Eigen::Matrix<double,3,1,Eigen::ColMajor> pc = cam.w2n * pt;
+    Eigen::Matrix<number_t,3,1,Eigen::ColMajor> pc = cam.w2n * pt;
 
     // Jacobians wrt camera parameters
     // set d(quat-x) values [ pz*dpx/dx - px*dpz/dx ] / pz^2
-    double px = pc(0);
-    double py = pc(1);
-    double pz = pc(2);
-    double ipz2 = 1.0/(pz*pz);
+    number_t px = pc(0);
+    number_t py = pc(1);
+    number_t pz = pc(2);
+    number_t ipz2 = 1.0/(pz*pz);
     if (g2o_isnan(ipz2) ) {
       std::cout << "[SetJac] infinite jac" << std::endl;
       abort();
     }
 
-    double ipz2fx = ipz2*cam.Kcam(0,0); // Fx
-    double ipz2fy = ipz2*cam.Kcam(1,1); // Fy
-    double b      = cam.baseline; // stereo baseline
+    number_t ipz2fx = ipz2*cam.Kcam(0,0); // Fx
+    number_t ipz2fy = ipz2*cam.Kcam(1,1); // Fy
+    number_t b      = cam.baseline; // stereo baseline
 
-    Eigen::Matrix<double,3,1,Eigen::ColMajor> pwt;
+    Eigen::Matrix<number_t,3,1,Eigen::ColMajor> pwt;
 
     // check for local vars
     pwt = (pt-trans).head<3>(); // transform translations, use differential rotation
 
     // dx
-    Eigen::Matrix<double,3,1,Eigen::ColMajor> dp = cam.dRdx * pwt; // dR'/dq * [pw - t]
+    Eigen::Matrix<number_t,3,1,Eigen::ColMajor> dp = cam.dRdx * pwt; // dR'/dq * [pw - t]
     _jacobianOplusXj(0,3) = (pz*dp(0) - px*dp(2))*ipz2fx;
     _jacobianOplusXj(1,3) = (pz*dp(1) - py*dp(2))*ipz2fy;
     _jacobianOplusXj(2,3) = (pz*dp(0) - (px-b)*dp(2))*ipz2fx; // right image px
@@ -338,36 +337,36 @@ namespace g2o {
     const SBACam &cam = vc->estimate();
 
     VertexSBAPointXYZ *vp = static_cast<VertexSBAPointXYZ *>(_vertices[0]);
-    Vector4D pt, trans;
+    Vector4 pt, trans;
     pt.head<3>() = vp->estimate();
     pt(3) = 1.0;
     trans.head<3>() = cam.translation();
     trans(3) = 1.0;
 
     // first get the world point in camera coords
-    Eigen::Matrix<double,3,1,Eigen::ColMajor> pc = cam.w2n * pt;
+    Eigen::Matrix<number_t,3,1,Eigen::ColMajor> pc = cam.w2n * pt;
 
     // Jacobians wrt camera parameters
     // set d(quat-x) values [ pz*dpx/dx - px*dpz/dx ] / pz^2
-    double px = pc(0);
-    double py = pc(1);
-    double pz = pc(2);
-    double ipz2 = 1.0/(pz*pz);
+    number_t px = pc(0);
+    number_t py = pc(1);
+    number_t pz = pc(2);
+    number_t ipz2 = 1.0/(pz*pz);
     if (g2o_isnan(ipz2) ) {
       std::cout << "[SetJac] infinite jac" << std::endl;
       abort();
     }
 
-    double ipz2fx = ipz2*cam.Kcam(0,0); // Fx
-    double ipz2fy = ipz2*cam.Kcam(1,1); // Fy
+    number_t ipz2fx = ipz2*cam.Kcam(0,0); // Fx
+    number_t ipz2fy = ipz2*cam.Kcam(1,1); // Fy
 
-    Eigen::Matrix<double,3,1,Eigen::ColMajor> pwt;
+    Eigen::Matrix<number_t,3,1,Eigen::ColMajor> pwt;
 
     // check for local vars
     pwt = (pt-trans).head<3>(); // transform translations, use differential rotation
 
     // dx
-    Eigen::Matrix<double,3,1,Eigen::ColMajor> dp = cam.dRdx * pwt; // dR'/dq * [pw - t]
+    Eigen::Matrix<number_t,3,1,Eigen::ColMajor> dp = cam.dRdx * pwt; // dR'/dq * [pw - t]
     _jacobianOplusXj(0,3) = (pz*dp(0) - px*dp(2))*ipz2fx;
     _jacobianOplusXj(1,3) = (pz*dp(1) - py*dp(2))*ipz2fy;
     // dy
@@ -407,7 +406,7 @@ namespace g2o {
 
   // point to camera projection, monocular
   EdgeProjectP2MC_Intrinsics::EdgeProjectP2MC_Intrinsics() :
-    BaseMultiEdge<2, Vector2D>()
+    BaseMultiEdge<2, Vector2>()
   {
     information().setIdentity();
     resize(3);
@@ -428,36 +427,36 @@ namespace g2o {
 
     //VertexIntrinsics *intr = static_cast<VertexIntrinsics *>(_vertices[2]);
 
-    Vector4D pt, trans;
+    Vector4 pt, trans;
     pt.head<3>() = vp->estimate();
     pt(3) = 1.0;
     trans.head<3>() = cam.translation();
     trans(3) = 1.0;
 
     // first get the world point in camera coords
-    Eigen::Matrix<double,3,1,Eigen::ColMajor> pc = cam.w2n * pt;
+    Eigen::Matrix<number_t,3,1,Eigen::ColMajor> pc = cam.w2n * pt;
 
     // Jacobians wrt camera parameters
     // set d(quat-x) values [ pz*dpx/dx - px*dpz/dx ] / pz^2
-    double px = pc(0);
-    double py = pc(1);
-    double pz = pc(2);
-    double ipz2 = 1.0/(pz*pz);
+    number_t px = pc(0);
+    number_t py = pc(1);
+    number_t pz = pc(2);
+    number_t ipz2 = 1.0/(pz*pz);
     if (g2o_isnan(ipz2) ) {
       std::cout << "[SetJac] infinite jac" << std::endl;
       abort();
     }
 
-    double ipz2fx = ipz2*cam.Kcam(0,0); // Fx
-    double ipz2fy = ipz2*cam.Kcam(1,1); // Fy
+    number_t ipz2fx = ipz2*cam.Kcam(0,0); // Fx
+    number_t ipz2fy = ipz2*cam.Kcam(1,1); // Fy
 
-    Eigen::Matrix<double,3,1,Eigen::ColMajor> pwt;
+    Eigen::Matrix<number_t,3,1,Eigen::ColMajor> pwt;
 
     // check for local vars
     pwt = (pt-trans).head<3>(); // transform translations, use differential rotation
 
     // dx
-    Eigen::Matrix<double,3,1,Eigen::ColMajor> dp = cam.dRdx * pwt; // dR'/dq * [pw - t]
+    Eigen::Matrix<number_t,3,1,Eigen::ColMajor> dp = cam.dRdx * pwt; // dR'/dq * [pw - t]
     _jacobianOplus[1](0,3) = (pz*dp(0) - px*dp(2))*ipz2fx;
     _jacobianOplus[1](1,3) = (pz*dp(1) - py*dp(2))*ipz2fy;
     // dy
@@ -503,7 +502,7 @@ namespace g2o {
   bool EdgeProjectP2MC_Intrinsics::read(std::istream& is)
   {
     // measured keypoint
-    Vector2D meas;
+    Vector2 meas;
     for (int i=0; i<2; i++)
       is >> meas[i];
     setMeasurement(meas);
@@ -522,13 +521,13 @@ namespace g2o {
 
   // point to camera projection, stereo
   EdgeSBAScale::EdgeSBAScale() :
-    BaseBinaryEdge<1, double, VertexCam, VertexCam>()
+    BaseBinaryEdge<1, number_t, VertexCam, VertexCam>()
   {
   }
   
   bool EdgeSBAScale::read(std::istream& is)
   {
-    double meas;
+    number_t meas;
     is >> meas;
     setMeasurement(meas);
     information().setIdentity();
@@ -549,14 +548,14 @@ namespace g2o {
     //compute the translation vector of v1 w.r.t v2
     if (from_.count(v1) == 1){
       SE3Quat delta = (v1->estimate().inverse()*v2->estimate());
-      double norm =  delta.translation().norm();
-      double alpha = _measurement/norm;
+      number_t norm =  delta.translation().norm();
+      number_t alpha = _measurement/norm;
       delta.setTranslation(delta.translation()*alpha);
       v2->setEstimate(v1->estimate()*delta);
     } else {
       SE3Quat delta = (v2->estimate().inverse()*v1->estimate());
-      double norm =  delta.translation().norm();
-      double alpha = _measurement/norm;
+      number_t norm =  delta.translation().norm();
+      number_t alpha = _measurement/norm;
       delta.setTranslation(delta.translation()*alpha);
       v1->setEstimate(v2->estimate()*delta);
     }

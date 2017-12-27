@@ -24,65 +24,61 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "solver.h"
-#include "dynamic_aligned_buffer.hpp"
+#ifndef G2O_EDGE_XY_PRIOR_H
+#define G2O_EDGE_XY_PRIOR_H
 
-#include <cstring>
-#include <algorithm>
+#include "vertex_point_xy.h"
+#include "g2o/config.h"
+#include "g2o/core/base_unary_edge.h"
+#include "g2o_types_slam2d_api.h"
 
 namespace g2o {
 
-Solver::Solver() :
-  _optimizer(0), _x(0), _b(0), _xSize(0), _maxXSize(0),
-  _isLevenberg(false), _additionalVectorSpace(0)
-{
-}
+  class G2O_TYPES_SLAM2D_API EdgeXYPrior : public BaseUnaryEdge<2, Vector2, VertexPointXY>
+  {
+    public:
+      EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+        EdgeXYPrior();
 
-Solver::~Solver()
-{
-  free_aligned(_x);
-  free_aligned(_b);
-}
+      void computeError()
+      {
+        const VertexPointXY* v = static_cast<const VertexPointXY*>(_vertices[0]);
+        _error = v->estimate()-_measurement;
+      }
+      virtual bool read(std::istream& is);
+      virtual bool write(std::ostream& os) const;
 
-void Solver::resizeVector(size_t sx)
-{
-  size_t oldSize = _xSize;
-  _xSize = sx;
-  sx += _additionalVectorSpace; // allocate some additional space if requested
-  if (_maxXSize < sx) {
-    _maxXSize = 2*sx;
-    free_aligned(_x);
-    _x = allocate_aligned<number_t>(_maxXSize);
-#ifndef NDEBUG
-    memset(_x, 0, _maxXSize * sizeof(number_t));
+      virtual void setMeasurement(const Vector2& m){
+        _measurement = m;
+      }
+
+      virtual bool setMeasurementData(const number_t* d){
+        _measurement=Vector2(d[0], d[1]);
+        return true;
+      }
+
+      virtual bool getMeasurementData(number_t* d) const {
+        Eigen::Map<Vector2> m(d);
+        m=_measurement;
+        return true;
+      }
+
+      virtual int measurementDimension() const {return 2;}
+
+      virtual bool setMeasurementFromState() {
+        const VertexPointXY* v = static_cast<const VertexPointXY*>(_vertices[0]);
+        _measurement = v->estimate();
+        return true;
+      }
+
+
+      virtual number_t initialEstimatePossible(const OptimizableGraph::VertexSet& , OptimizableGraph::Vertex* ) { return 0;}
+#ifndef NUMERIC_JACOBIAN_TWO_D_TYPES
+      virtual void linearizeOplus();
 #endif
-    if (_b) { // backup the former b, might still be needed for online processing
-      memcpy(_x, _b, oldSize * sizeof(number_t));
-      free_aligned(_b);
-      _b = allocate_aligned<number_t>(_maxXSize);
-      std::swap(_b, _x);
-    } else {
-      _b = allocate_aligned<number_t>(_maxXSize);
-#ifndef NDEBUG
-      memset(_b, 0, _maxXSize * sizeof(number_t));
-#endif
-    }
-  }
-}
+  };
 
-void Solver::setOptimizer(SparseOptimizer* optimizer)
-{
-  _optimizer = optimizer;
-}
-
-void Solver::setLevenberg(bool levenberg)
-{
-  _isLevenberg = levenberg;
-}
-
-void Solver::setAdditionalVectorSpace(size_t s)
-{
-  _additionalVectorSpace = s;
-}
 
 } // end namespace
+
+#endif

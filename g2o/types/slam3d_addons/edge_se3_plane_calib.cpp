@@ -38,12 +38,12 @@ namespace g2o
     BaseMultiEdge<3, Plane3D>()
   {
     resize(3);
-    color << 0.1, 0.1, 0.1;
+    color << cst(0.1), cst(0.1), cst(0.1);
   }
 
   bool EdgeSE3PlaneSensorCalib::read(std::istream& is)
   {
-    Vector4D v;
+    Vector4 v;
     is >> v(0) >> v(1) >> v(2) >> v(3);
     setMeasurement(Plane3D(v));
     is >> color(0) >> color(1) >> color(2);
@@ -58,7 +58,7 @@ namespace g2o
 
   bool EdgeSE3PlaneSensorCalib::write(std::ostream& os) const
   {
-    Vector4D v = _measurement.toVector();
+    Vector4 v = _measurement.toVector();
     os << v(0) << " " << v(1) << " " << v(2) << " " << v(3) << " ";
     os << color(0) << " " << color(1) << " " << color(2) << " ";
     for (int i = 0; i < information().rows(); ++i)
@@ -110,14 +110,14 @@ namespace g2o
     if (! robot|| ! sensor)
       return 0;
 
-    double d=that->measurement().distance();
-    double azimuth=Plane3D::azimuth(that->measurement().normal());
-    double elevation=Plane3D::elevation(that->measurement().normal());
+    number_t d=that->measurement().distance();
+    number_t azimuth=Plane3D::azimuth(that->measurement().normal());
+    number_t elevation=Plane3D::elevation(that->measurement().normal());
 
     glColor3f(float(that->color(0)), float(that->color(1)), float(that->color(2)));
     glPushMatrix();
-    Isometry3D robotAndSensor = robot->estimate() * sensor->estimate();
-    glMultMatrixd(robotAndSensor.matrix().data());
+    Isometry3 robotAndSensor = robot->estimate() * sensor->estimate();
+    glMultMatrixd(robotAndSensor.matrix().cast<double>().eval().data());
 
     glRotatef(float(RAD2DEG(azimuth)), 0.f, 0.f, 1.f);
     glRotatef(float(RAD2DEG(elevation)), 0.f, -1.f, 0.f);

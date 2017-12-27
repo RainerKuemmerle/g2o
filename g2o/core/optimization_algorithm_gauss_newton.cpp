@@ -53,7 +53,7 @@ namespace g2o {
     bool ok = true;
     
     //here so that correct component for max-mixtures can be computed before the build structure
-    double t=get_monotonic_time();
+    number_t t=get_monotonic_time();
     _optimizer->computeActiveErrors();
     G2OBatchStatistics* globalStats = G2OBatchStatistics::globalStats();
     if (globalStats) {

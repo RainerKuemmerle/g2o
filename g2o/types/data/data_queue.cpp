@@ -38,7 +38,7 @@ namespace g2o {
   {
   }
 
-  RobotData* DataQueue::findClosestData(double timestamp) const
+  RobotData* DataQueue::findClosestData(number_t timestamp) const
   {
     if (_buffer.rbegin()->first < timestamp)
       return _buffer.rbegin()->second;
@@ -54,7 +54,7 @@ namespace g2o {
       return ub->second;
   }
 
-  RobotData* DataQueue::before(double timestamp) const
+  RobotData* DataQueue::before(number_t timestamp) const
   {
     if (_buffer.size() == 0 || _buffer.begin()->first > timestamp)
       return 0;
@@ -63,7 +63,7 @@ namespace g2o {
     return lb->second;
   }
 
-  RobotData* DataQueue::after(double timestamp) const
+  RobotData* DataQueue::after(number_t timestamp) const
   {
     if (_buffer.size() == 0 || _buffer.rbegin()->first < timestamp)
       return 0;

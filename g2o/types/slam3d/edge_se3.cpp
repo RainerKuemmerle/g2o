@@ -35,18 +35,17 @@
 
 namespace g2o {
   using namespace std;
-  using namespace Eigen;
 
-  EdgeSE3::EdgeSE3() : BaseBinaryEdge<6, Isometry3D, VertexSE3, VertexSE3>() {
+  EdgeSE3::EdgeSE3() : BaseBinaryEdge<6, Isometry3, VertexSE3, VertexSE3>() {
     information().setIdentity();
   }
 
   bool EdgeSE3::read(std::istream& is) {
-    Vector7d meas;
+    Vector7 meas;
     for (int i=0; i<7; i++) 
       is >> meas[i];
     // normalize the quaternion to recover numerical precision lost by storing as human readable text
-    Vector4D::MapType(meas.data()+3).normalize();
+    Vector4::MapType(meas.data()+3).normalize();
     setMeasurement(internal::fromVectorQT(meas));
 
     if (is.bad()) {
@@ -66,7 +65,7 @@ namespace g2o {
   }
 
   bool EdgeSE3::write(std::ostream& os) const {
-    Vector7d meas=internal::toVectorQT(_measurement);
+    Vector7 meas=internal::toVectorQT(_measurement);
     for (int i=0; i<7; i++) os  << meas[i] << " ";
     for (int i=0; i<information().rows(); i++)
       for (int j=i; j<information().cols(); j++) {
@@ -78,29 +77,29 @@ namespace g2o {
   void EdgeSE3::computeError() {
     VertexSE3 *from = static_cast<VertexSE3*>(_vertices[0]);
     VertexSE3 *to   = static_cast<VertexSE3*>(_vertices[1]);
-    Isometry3D delta=_inverseMeasurement * from->estimate().inverse() * to->estimate();
+    Isometry3 delta=_inverseMeasurement * from->estimate().inverse() * to->estimate();
     _error=internal::toVectorMQT(delta);
   }
 
   bool EdgeSE3::setMeasurementFromState(){
     VertexSE3 *from = static_cast<VertexSE3*>(_vertices[0]);
     VertexSE3 *to   = static_cast<VertexSE3*>(_vertices[1]);
-    Isometry3D delta = from->estimate().inverse() * to->estimate();
+    Isometry3 delta = from->estimate().inverse() * to->estimate();
     setMeasurement(delta);
     return true;
   }
   
   void EdgeSE3::linearizeOplus(){
     
-    // BaseBinaryEdge<6, Isometry3D, VertexSE3, VertexSE3>::linearizeOplus();
+    // BaseBinaryEdge<6, Isometry3, VertexSE3, VertexSE3>::linearizeOplus();
     // return;
 
     VertexSE3 *from = static_cast<VertexSE3*>(_vertices[0]);
     VertexSE3 *to   = static_cast<VertexSE3*>(_vertices[1]);
-    Isometry3D E;
-    const Isometry3D& Xi=from->estimate();
-    const Isometry3D& Xj=to->estimate();
-    const Isometry3D& Z=_measurement;
+    Isometry3 E;
+    const Isometry3& Xi=from->estimate();
+    const Isometry3& Xj=to->estimate();
+    const Isometry3& Z=_measurement;
     internal::computeEdgeSE3Gradient(E, _jacobianOplusXi , _jacobianOplusXj, Z, Xi, Xj);
   }
 
@@ -129,7 +128,7 @@ namespace g2o {
     EdgeSE3* e =  static_cast<EdgeSE3*>(element);
     VertexSE3* fromEdge = static_cast<VertexSE3*>(e->vertices()[0]);
     VertexSE3* toEdge   = static_cast<VertexSE3*>(e->vertices()[1]);
-    Vector6d fromV, toV;
+    Vector6 fromV, toV;
     fromV=internal::toVectorMQT(fromEdge->estimate());
     toV=internal::toVectorMQT(toEdge->estimate());
     for (int i=0; i<6; i++){

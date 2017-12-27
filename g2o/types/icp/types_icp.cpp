@@ -71,17 +71,15 @@ namespace g2o {
   }
 
   using namespace std;
-  using namespace Eigen;
-  typedef Matrix<double, 6, 1, Eigen::ColMajor> Vector6d;
 
-  Matrix3D Edge_V_V_GICP::dRidx; // differential quat matrices
-  Matrix3D Edge_V_V_GICP::dRidy; // differential quat matrices
-  Matrix3D Edge_V_V_GICP::dRidz; // differential quat matrices
-  Matrix3D VertexSCam::dRidx; // differential quat matrices
-  Matrix3D VertexSCam::dRidy; // differential quat matrices
-  Matrix3D VertexSCam::dRidz; // differential quat matrices
-  Matrix3D VertexSCam::Kcam;
-  double VertexSCam::baseline;
+  Matrix3 Edge_V_V_GICP::dRidx; // differential quat matrices
+  Matrix3 Edge_V_V_GICP::dRidy; // differential quat matrices
+  Matrix3 Edge_V_V_GICP::dRidz; // differential quat matrices
+  Matrix3 VertexSCam::dRidx; // differential quat matrices
+  Matrix3 VertexSCam::dRidy; // differential quat matrices
+  Matrix3 VertexSCam::dRidz; // differential quat matrices
+  Matrix3 VertexSCam::Kcam;
+  number_t VertexSCam::baseline;
 
   // global initialization
   G2O_ATTRIBUTE_CONSTRUCTOR(init_icp_types)
@@ -145,12 +143,12 @@ namespace g2o {
     // GICP info matrices
 
     // point-plane only
-    Matrix3D prec;
-    double v = .01;
+    Matrix3 prec;
+    number_t v = cst(.01);
     prec << v, 0, 0,
             0, v, 0,
             0, 0, 1;
-    const Matrix3D &R = measurement().R0; // plane of the point in vp0
+    const Matrix3 &R = measurement().R0; // plane of the point in vp0
     information() = R.transpose()*prec*R;
 
     //    information().setIdentity();
@@ -178,15 +176,15 @@ namespace g2o {
     VertexSE3* vp1 = static_cast<VertexSE3*>(_vertices[1]);
 
     // topLeftCorner<3,3>() is the rotation matrix
-    Matrix3D R0T = vp0->estimate().matrix().topLeftCorner<3,3>().transpose();
-    Vector3D p1 = measurement().pos1;
+    Matrix3 R0T = vp0->estimate().matrix().topLeftCorner<3,3>().transpose();
+    Vector3 p1 = measurement().pos1;
 
     // this could be more efficient
     if (!vp0->fixed())
       {
-        Isometry3D T01 = vp0->estimate().inverse() *  vp1->estimate();
-        Vector3D p1t = T01 * p1;
-        _jacobianOplusXi.block<3,3>(0,0) = -Matrix3D::Identity();
+        Isometry3 T01 = vp0->estimate().inverse() *  vp1->estimate();
+        Vector3 p1t = T01 * p1;
+        _jacobianOplusXi.block<3,3>(0,0) = -Matrix3::Identity();
         _jacobianOplusXi.block<3,1>(0,3) = dRidx*p1t;
         _jacobianOplusXi.block<3,1>(0,4) = dRidy*p1t;
         _jacobianOplusXi.block<3,1>(0,5) = dRidz*p1t;
@@ -194,7 +192,7 @@ namespace g2o {
 
     if (!vp1->fixed())
       {
-        Matrix3D R1 = vp1->estimate().matrix().topLeftCorner<3,3>();
+        Matrix3 R1 = vp1->estimate().matrix().topLeftCorner<3,3>();
         R0T = R0T*R1;
         _jacobianOplusXj.block<3,3>(0,0) = R0T;
         _jacobianOplusXj.block<3,1>(0,3) = R0T*dRidx.transpose()*p1;
@@ -246,38 +244,38 @@ namespace g2o {
     VertexSCam *vc = static_cast<VertexSCam *>(_vertices[1]);
 
     VertexSBAPointXYZ *vp = static_cast<VertexSBAPointXYZ *>(_vertices[0]);
-    Vector4D pt, trans;
+    Vector4 pt, trans;
     pt.head<3>() = vp->estimate();
     pt(3) = 1.0;
     trans.head<3>() = vc->estimate().translation();
     trans(3) = 1.0;
 
     // first get the world point in camera coords
-    Eigen::Matrix<double,3,1,Eigen::ColMajor> pc = vc->w2n * pt;
+    Eigen::Matrix<number_t,3,1,Eigen::ColMajor> pc = vc->w2n * pt;
 
     // Jacobians wrt camera parameters
     // set d(quat-x) values [ pz*dpx/dx - px*dpz/dx ] / pz^2
-    double px = pc(0);
-    double py = pc(1);
-    double pz = pc(2);
-    double ipz2 = 1.0/(pz*pz);
+    number_t px = pc(0);
+    number_t py = pc(1);
+    number_t pz = pc(2);
+    number_t ipz2 = 1.0/(pz*pz);
     if (isnan(ipz2) )
       {
   std::cout << "[SetJac] infinite jac" << std::endl;
   *(int *)0x0 = 0;
       }
 
-    double ipz2fx = ipz2*vc->Kcam(0,0); // Fx
-    double ipz2fy = ipz2*vc->Kcam(1,1); // Fy
-    double b      = vc->baseline; // stereo baseline
+    number_t ipz2fx = ipz2*vc->Kcam(0,0); // Fx
+    number_t ipz2fy = ipz2*vc->Kcam(1,1); // Fy
+    number_t b      = vc->baseline; // stereo baseline
 
-    Eigen::Matrix<double,3,1,Eigen::ColMajor> pwt;
+    Eigen::Matrix<number_t,3,1,Eigen::ColMajor> pwt;
 
     // check for local vars
     pwt = (pt-trans).head<3>(); // transform translations, use differential rotation
 
     // dx
-    Eigen::Matrix<double,3,1,Eigen::ColMajor> dp = vc->dRdx * pwt; // dR'/dq * [pw - t]
+    Eigen::Matrix<number_t,3,1,Eigen::ColMajor> dp = vc->dRdx * pwt; // dR'/dq * [pw - t]
     _jacobianOplusXj(0,3) = (pz*dp(0) - px*dp(2))*ipz2fx;
     _jacobianOplusXj(1,3) = (pz*dp(1) - py*dp(2))*ipz2fy;
     _jacobianOplusXj(2,3) = (pz*dp(0) - (px-b)*dp(2))*ipz2fx; // right image px

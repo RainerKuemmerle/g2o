@@ -41,7 +41,7 @@
 namespace g2o {
 
   EdgeLine2DPointXY::EdgeLine2DPointXY() :
-    BaseBinaryEdge<1, double, VertexLine2D, VertexPointXY>()
+    BaseBinaryEdge<1, number_t, VertexLine2D, VertexPointXY>()
   {
   }
 
@@ -67,10 +67,10 @@ namespace g2o {
   //   VertexPointXY* vj = static_cast<VertexPointXY*>(_vertices[1]);
   //   if (from.count(vi) > 0 && to == vj) {
   //     Line2D T=vi->estimate();
-  //     Vector2D est=_measurement;
+  //     Vector2 est=_measurement;
   //     est[0] += T.rotation().angle();
   //     est[0] = normalize_theta(est[0]);
-  //     Vector2D n(cos(est[0]), sin(est[0]));
+  //     Vector2 n(cos(est[0]), sin(est[0]));
   //     est[1] += n.dot(T.translation());
   //     vj->setEstimate(est);
   //   }
@@ -81,15 +81,15 @@ namespace g2o {
 //   {
 //     const VertexLine2D* vi     = static_cast<const VertexLine2D*>(_vertices[0]);
 //     const VertexPointXY* vj = static_cast<const VertexPointXY*>(_vertices[1]);
-//     const double& x1        = vi->estimate().translation()[0];
-//     const double& y1        = vi->estimate().translation()[1];
-//     const double& th1       = vi->estimate().rotation().angle();
-//     const double& x2        = vj->estimate()[0];
-//     const double& y2        = vj->estimate()[1];
+//     const number_t& x1        = vi->estimate().translation()[0];
+//     const number_t& y1        = vi->estimate().translation()[1];
+//     const number_t& th1       = vi->estimate().rotation().angle();
+//     const number_t& x2        = vj->estimate()[0];
+//     const number_t& y2        = vj->estimate()[1];
 
-//     double aux_1 = cos(th1) ;
-//     double aux_2 = -aux_1 ;
-//     double aux_3 = sin(th1) ;
+//     number_t aux_1 = cos(th1) ;
+//     number_t aux_2 = -aux_1 ;
+//     number_t aux_3 = sin(th1) ;
 
 //     _jacobianOplusXi( 0 , 0 ) = aux_2 ;
 //     _jacobianOplusXi( 0 , 1 ) = -aux_3 ;

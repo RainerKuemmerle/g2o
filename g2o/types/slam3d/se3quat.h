@@ -28,14 +28,12 @@
 #define G2O_SE3QUAT_H_
 
 #include "se3_ops.h"
+#include "g2o/stuff/misc.h"
 
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 
 namespace g2o {
-
-  typedef Eigen::Matrix<double, 6, 1, Eigen::ColMajor> Vector6d;
-  typedef Eigen::Matrix<double, 7, 1, Eigen::ColMajor> Vector7d;
 
   class G2O_TYPES_SLAM3D_API SE3Quat {
     public:
@@ -43,8 +41,8 @@ namespace g2o {
 
     protected:
 
-      Eigen::Quaterniond _r;
-      Vector3D _t;
+      Quaternion _r;
+      Vector3 _t;
 
     public:
       SE3Quat(){
@@ -52,16 +50,16 @@ namespace g2o {
         _t.setZero();
       }
 
-      SE3Quat(const Matrix3D& R, const Vector3D& t):_r(Eigen::Quaterniond(R)),_t(t){ 
+      SE3Quat(const Matrix3& R, const Vector3& t):_r(Quaternion(R)),_t(t){ 
         normalizeRotation();
       }
 
-      SE3Quat(const Eigen::Quaterniond& q, const Vector3D& t):_r(q),_t(t){
+      SE3Quat(const Quaternion& q, const Vector3& t):_r(q),_t(t){
         normalizeRotation();
       }
 
       /**
-       * templaized constructor which allows v to be an arbitrary Eigen Vector type, e.g., Vector6d or Map<Vector6d>
+       * templaized constructor which allows v to be an arbitrary Eigen Vector type, e.g., Vector6 or Map<Vector6>
        */
       template <typename Derived>
         explicit SE3Quat(const Eigen::MatrixBase<Derived>& v)
@@ -76,8 +74,8 @@ namespace g2o {
             if (_r.norm()>1.){
               _r.normalize();
             } else {
-              double w2=1.-_r.squaredNorm();
-              _r.w()= (w2<0.) ? 0. : sqrt(w2);
+              number_t w2= cst(1.)-_r.squaredNorm();
+              _r.w()= (w2<cst(0.)) ? cst(0.) : std::sqrt(w2);
             }
           }
           else if (v.size() == 7) {
@@ -90,13 +88,13 @@ namespace g2o {
           }
         }
 
-      inline const Vector3D& translation() const {return _t;}
+      inline const Vector3& translation() const {return _t;}
 
-      inline void setTranslation(const Vector3D& t_) {_t = t_;}
+      inline void setTranslation(const Vector3& t_) {_t = t_;}
 
-      inline const Eigen::Quaterniond& rotation() const {return _r;}
+      inline const Quaternion& rotation() const {return _r;}
 
-      void setRotation(const Eigen::Quaterniond& r_) {_r=r_;}
+      void setRotation(const Quaternion& r_) {_r=r_;}
 
       inline SE3Quat operator* (const SE3Quat& tr2) const{
         SE3Quat result(*this);
@@ -113,18 +111,18 @@ namespace g2o {
         return *this;
       }
 
-      inline Vector3D operator* (const Vector3D& v) const {
+      inline Vector3 operator* (const Vector3& v) const {
         return _t+_r*v;
       }
 
       inline SE3Quat inverse() const{
         SE3Quat ret;
         ret._r=_r.conjugate();
-        ret._t=ret._r*(_t*-1.);
+        ret._t=ret._r*(_t*-cst(1.));
         return ret;
       }
 
-      inline double operator [](int i) const {
+      inline number_t operator [](int i) const {
         assert(i<7);
         if (i<3)
           return _t[i];
@@ -132,8 +130,8 @@ namespace g2o {
       }
 
 
-      inline Vector7d toVector() const{
-        Vector7d v;
+      inline Vector7 toVector() const{
+        Vector7 v;
         v[0]=_t(0);
         v[1]=_t(1);
         v[2]=_t(2);
@@ -144,13 +142,13 @@ namespace g2o {
         return v;
       }
 
-      inline void fromVector(const Vector7d& v){
-        _r=Eigen::Quaterniond(v[6], v[3], v[4], v[5]);
-        _t=Vector3D(v[0], v[1], v[2]);
+      inline void fromVector(const Vector7& v){
+        _r=Quaternion(v[6], v[3], v[4], v[5]);
+        _t=Vector3(v[0], v[1], v[2]);
       }
 
-      inline Vector6d toMinimalVector() const{
-        Vector6d v;
+      inline Vector6 toMinimalVector() const{
+        Vector6 v;
         v[0]=_t(0);
         v[1]=_t(1);
         v[2]=_t(2);
@@ -160,43 +158,43 @@ namespace g2o {
         return v;
       }
 
-      inline void fromMinimalVector(const Vector6d& v){
-        double w = 1.-v[3]*v[3]-v[4]*v[4]-v[5]*v[5];
+      inline void fromMinimalVector(const Vector6& v){
+        number_t w = cst(1.)-v[3]*v[3]-v[4]*v[4]-v[5]*v[5];
         if (w>0){
-          _r=Eigen::Quaterniond(sqrt(w), v[3], v[4], v[5]);
+          _r=Quaternion(std::sqrt(w), v[3], v[4], v[5]);
         } else {
-          _r=Eigen::Quaterniond(0, -v[3], -v[4], -v[5]);
+          _r=Quaternion(0, -v[3], -v[4], -v[5]);
         }
-        _t=Vector3D(v[0], v[1], v[2]);
+        _t=Vector3(v[0], v[1], v[2]);
       }
 
 
 
-      Vector6d log() const {
-        Vector6d res;
-        Matrix3D _R = _r.toRotationMatrix();
-        double d =  0.5*(_R(0,0)+_R(1,1)+_R(2,2)-1);
-        Vector3D omega;
-        Vector3D upsilon;
+      Vector6 log() const {
+        Vector6 res;
+        Matrix3 _R = _r.toRotationMatrix();
+        number_t d = cst(0.5)*(_R(0,0)+_R(1,1)+_R(2,2)-1);
+        Vector3 omega;
+        Vector3 upsilon;
 
 
-        Vector3D dR = deltaR(_R);
-        Matrix3D V_inv;
+        Vector3 dR = deltaR(_R);
+        Matrix3 V_inv;
 
-        if (d>0.99999)
+        if (d>cst(0.99999))
         {
 
           omega=0.5*dR;
-          Matrix3D Omega = skew(omega);
-          V_inv = Matrix3D::Identity()- 0.5*Omega + (1./12.)*(Omega*Omega);
+          Matrix3 Omega = skew(omega);
+          V_inv = Matrix3::Identity()- cst(0.5)*Omega + (cst(1.)/ cst(12.))*(Omega*Omega);
         }
         else
         {
-          double theta = acos(d);
-          omega = theta/(2*sqrt(1-d*d))*dR;
-          Matrix3D Omega = skew(omega);
-          V_inv = ( Matrix3D::Identity() - 0.5*Omega
-              + ( 1-theta/(2*tan(theta/2)))/(theta*theta)*(Omega*Omega) );
+          number_t theta = std::acos(d);
+          omega = theta/(2*std::sqrt(1-d*d))*dR;
+          Matrix3 Omega = skew(omega);
+          V_inv = ( Matrix3::Identity() - cst(0.5)*Omega
+              + ( 1-theta/(2*std::tan(theta/2)))/(theta*theta)*(Omega*Omega) );
         }
 
         upsilon = V_inv*_t;
@@ -211,62 +209,67 @@ namespace g2o {
 
       }
 
-      Vector3D map(const Vector3D & xyz) const
+      Vector3 map(const Vector3 & xyz) const
       {
         return _r*xyz + _t;
       }
 
 
-      static SE3Quat exp(const Vector6d & update)
+      static SE3Quat exp(const Vector6 & update)
       {
-        Vector3D omega;
+        Vector3 omega;
         for (int i=0; i<3; i++)
           omega[i]=update[i];
-        Vector3D upsilon;
+        Vector3 upsilon;
         for (int i=0; i<3; i++)
           upsilon[i]=update[i+3];
 
-        double theta = omega.norm();
-        Matrix3D Omega = skew(omega);
+        number_t theta = omega.norm();
+        Matrix3 Omega = skew(omega);
 
-        Matrix3D R;
-        Matrix3D V;
-        if (theta<0.00001)
+        Matrix3 R;
+        Matrix3 V;
+        if (theta<cst(0.00001))
         {
-          //TODO: CHECK WHETHER THIS IS CORRECT!!!
-          R = (Matrix3D::Identity() + Omega + Omega*Omega);
+          Matrix3 Omega2 = Omega*Omega;
 
-          V = R;
+          R = (Matrix3::Identity()
+              + Omega
+              + cst(0.5) * Omega2);
+
+          V = (Matrix3::Identity()
+              + cst(0.5) * Omega
+              + cst(1.) / cst(6.) * Omega2);
         }
         else
         {
-          Matrix3D Omega2 = Omega*Omega;
+          Matrix3 Omega2 = Omega*Omega;
 
-          R = (Matrix3D::Identity()
-              + sin(theta)/theta *Omega
-              + (1-cos(theta))/(theta*theta)*Omega2);
+          R = (Matrix3::Identity()
+              + std::sin(theta)/theta *Omega
+              + (1-std::cos(theta))/(theta*theta)*Omega2);
 
-          V = (Matrix3D::Identity()
-              + (1-cos(theta))/(theta*theta)*Omega
-              + (theta-sin(theta))/(pow(theta,3))*Omega2);
+          V = (Matrix3::Identity()
+              + (1-std::cos(theta))/(theta*theta)*Omega
+              + (theta-std::sin(theta))/(std::pow(theta,3))*Omega2);
         }
-        return SE3Quat(Eigen::Quaterniond(R),V*upsilon);
+        return SE3Quat(Quaternion(R),V*upsilon);
       }
 
-      Eigen::Matrix<double, 6, 6, Eigen::ColMajor> adj() const
+      Eigen::Matrix<number_t, 6, 6, Eigen::ColMajor> adj() const
       {
-        Matrix3D R = _r.toRotationMatrix();
-        Eigen::Matrix<double, 6, 6, Eigen::ColMajor> res;
+        Matrix3 R = _r.toRotationMatrix();
+        Eigen::Matrix<number_t, 6, 6, Eigen::ColMajor> res;
         res.block(0,0,3,3) = R;
         res.block(3,3,3,3) = R;
         res.block(3,0,3,3) = skew(_t)*R;
-        res.block(0,3,3,3) = Matrix3D::Zero(3,3);
+        res.block(0,3,3,3) = Matrix3::Zero(3,3);
         return res;
       }
 
-      Eigen::Matrix<double,4,4,Eigen::ColMajor> to_homogeneous_matrix() const
+      Eigen::Matrix<number_t,4,4,Eigen::ColMajor> to_homogeneous_matrix() const
       {
-        Eigen::Matrix<double,4,4,Eigen::ColMajor> homogeneous_matrix;
+        Eigen::Matrix<number_t,4,4,Eigen::ColMajor> homogeneous_matrix;
         homogeneous_matrix.setIdentity();
         homogeneous_matrix.block(0,0,3,3) = _r.toRotationMatrix();
         homogeneous_matrix.col(3).head(3) = translation();
@@ -282,11 +285,11 @@ namespace g2o {
       }
 
       /**
-       * cast SE3Quat into an Isometry3D
+       * cast SE3Quat into an Isometry3
        */
-      operator Isometry3D() const
+      operator Isometry3() const
       {
-        Isometry3D result = (Isometry3D) rotation();
+        Isometry3 result = (Isometry3) rotation();
         result.translation() = translation();
         return result;
       }
@@ -298,9 +301,9 @@ namespace g2o {
     return out_str;
   }
 
-  //G2O_TYPES_SLAM3D_API Eigen::Quaterniond euler_to_quat(double yaw, double pitch, double roll);
-  //G2O_TYPES_SLAM3D_API void quat_to_euler(const Eigen::Quaterniond& q, double& yaw, double& pitch, double& roll);
-  //G2O_TYPES_SLAM3D_API void jac_quat3_euler3(Eigen::Matrix<double, 6, 6, Eigen::ColMajor>& J, const SE3Quat& t);
+  //G2O_TYPES_SLAM3D_API Quaternion euler_to_quat(number_t yaw, number_t pitch, number_t roll);
+  //G2O_TYPES_SLAM3D_API void quat_to_euler(const Quaternion& q, number_t& yaw, number_t& pitch, number_t& roll);
+  //G2O_TYPES_SLAM3D_API void jac_quat3_euler3(Eigen::Matrix<number_t, 6, 6, Eigen::ColMajor>& J, const SE3Quat& t);
 
 } // end namespace
 

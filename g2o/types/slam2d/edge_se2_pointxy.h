@@ -35,7 +35,7 @@
 
 namespace g2o {
 
-  class G2O_TYPES_SLAM2D_API EdgeSE2PointXY : public BaseBinaryEdge<2, Vector2D, VertexSE2, VertexPointXY>
+  class G2O_TYPES_SLAM2D_API EdgeSE2PointXY : public BaseBinaryEdge<2, Vector2, VertexSE2, VertexPointXY>
   {
     public:
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW
@@ -48,13 +48,13 @@ namespace g2o {
         _error = (v1->estimate().inverse() * l2->estimate()) - _measurement;
       }
 
-      virtual bool setMeasurementData(const double* d){
+      virtual bool setMeasurementData(const number_t* d){
         _measurement[0]=d[0];
         _measurement[1]=d[1];
         return true;
       }
 
-      virtual bool getMeasurementData(double* d) const{
+      virtual bool getMeasurementData(number_t* d) const{
         d[0] = _measurement[0];
         d[1] = _measurement[1];
         return true;
@@ -73,7 +73,7 @@ namespace g2o {
       virtual bool write(std::ostream& os) const;
 
       virtual void initialEstimate(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to);
-      virtual double initialEstimatePossible(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to) { (void) to; return (from.count(_vertices[0]) == 1 ? 1.0 : -1.0);}
+      virtual number_t initialEstimatePossible(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to) { (void) to; return (from.count(_vertices[0]) == 1 ? 1.0 : -1.0);}
 #ifndef NUMERIC_JACOBIAN_TWO_D_TYPES
       virtual void linearizeOplus();
 #endif

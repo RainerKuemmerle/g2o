@@ -36,9 +36,9 @@ namespace g2o {
    * \brief prior for an SE3 element
    *
    * Provides a prior for a 3d pose vertex. Again the measurement is represented by an
-   * Isometry3D matrix.
+   * Isometry3 matrix.
    */
-  class G2O_TYPES_SLAM3D_API EdgeSE3Prior : public BaseUnaryEdge<6, Isometry3D, VertexSE3> {
+  class G2O_TYPES_SLAM3D_API EdgeSE3Prior : public BaseUnaryEdge<6, Isometry3, VertexSE3> {
   public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
     EdgeSE3Prior();
@@ -51,20 +51,20 @@ namespace g2o {
     // jacobian
     virtual void linearizeOplus();
 
-    virtual void setMeasurement(const Isometry3D& m){
+    virtual void setMeasurement(const Isometry3& m){
       _measurement = m;
       _inverseMeasurement = m.inverse();
     }
 
-    virtual bool setMeasurementData(const double* d){
-      Eigen::Map<const Vector7d> v(d);
+    virtual bool setMeasurementData(const number_t* d){
+      Eigen::Map<const Vector7> v(d);
       _measurement = internal::fromVectorQT(v);
       _inverseMeasurement = _measurement.inverse();
       return true;
     }
 
-    virtual bool getMeasurementData(double* d) const{
-      Eigen::Map<Vector7d> v(d);
+    virtual bool getMeasurementData(number_t* d) const{
+      Eigen::Map<Vector7> v(d);
       v = internal::toVectorQT(_measurement);
       return true;
     }
@@ -73,14 +73,14 @@ namespace g2o {
 
     virtual bool setMeasurementFromState() ;
 
-    virtual double initialEstimatePossible(const OptimizableGraph::VertexSet& /*from*/, 
+    virtual number_t initialEstimatePossible(const OptimizableGraph::VertexSet& /*from*/, 
              OptimizableGraph::Vertex* /*to*/) { 
       return 1.;
     }
 
     virtual void initialEstimate(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to);
   protected:
-    Isometry3D _inverseMeasurement;
+    Isometry3 _inverseMeasurement;
     virtual bool resolveCaches();
     ParameterSE3Offset* _offsetParam;
     CacheSE3Offset* _cache;

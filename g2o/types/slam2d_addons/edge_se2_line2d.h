@@ -46,23 +46,23 @@ namespace g2o {
       {
         const VertexSE2* v1 = static_cast<const VertexSE2*>(_vertices[0]);
         const VertexLine2D* l2 = static_cast<const VertexLine2D*>(_vertices[1]);
-        Vector2D prediction=l2->estimate();
+        Vector2 prediction=l2->estimate();
         SE2 iT=v1->estimate().inverse();
         prediction[0] += iT.rotation().angle();
         prediction[0] = normalize_theta(prediction[0]);
-        Vector2D n(cos(prediction[0]), sin(prediction[0]));
+        Vector2 n(std::cos(prediction[0]), std::sin(prediction[0]));
         prediction[1] += n.dot(iT.translation());
         _error =  prediction - _measurement;
         _error [0] =  normalize_theta(_error[0]);
       }
 
-      virtual bool setMeasurementData(const double* d){
+      virtual bool setMeasurementData(const number_t* d){
         _measurement[0]=d[0];
         _measurement[1]=d[1];
         return true;
       }
 
-      virtual bool getMeasurementData(double* d) const{
+      virtual bool getMeasurementData(number_t* d) const{
         d[0] = _measurement[0];
         d[1] = _measurement[1];
         return true;
@@ -73,11 +73,11 @@ namespace g2o {
       virtual bool setMeasurementFromState(){
         const VertexSE2* v1 = static_cast<const VertexSE2*>(_vertices[0]);
         const VertexLine2D* l2 = static_cast<const VertexLine2D*>(_vertices[1]);
-        Vector2D prediction=l2->estimate();
+        Vector2 prediction=l2->estimate();
         SE2 iT=v1->estimate().inverse();
         prediction[0] += iT.rotation().angle();
         prediction[0] = normalize_theta(prediction[0]);
-        Vector2D n(cos(prediction[0]), sin(prediction[0]));
+        Vector2 n(std::cos(prediction[0]), std::sin(prediction[0]));
         prediction[1] += n.dot(iT.translation());
         _measurement = prediction;
         return true;
@@ -87,7 +87,7 @@ namespace g2o {
       virtual bool write(std::ostream& os) const;
 
       virtual void initialEstimate(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to);
-      virtual double initialEstimatePossible(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to) { (void) to; return (from.count(_vertices[0]) == 1 ? 1.0 : -1.0);}
+      virtual number_t initialEstimatePossible(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to) { (void) to; return (from.count(_vertices[0]) == 1 ? 1.0 : -1.0);}
 /* #ifndef NUMERIC_JACOBIAN_TWO_D_TYPES */
 /*       virtual void linearizeOplus(); */
 /* #endif */

@@ -24,65 +24,53 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "solver.h"
-#include "dynamic_aligned_buffer.hpp"
+#include "edge_xy_prior.h"
 
-#include <cstring>
-#include <algorithm>
+#ifdef G2O_HAVE_OPENGL
+#include "g2o/stuff/opengl_wrapper.h"
+#include "g2o/stuff/opengl_primitives.h"
+#endif
 
 namespace g2o {
 
-Solver::Solver() :
-  _optimizer(0), _x(0), _b(0), _xSize(0), _maxXSize(0),
-  _isLevenberg(false), _additionalVectorSpace(0)
-{
-}
-
-Solver::~Solver()
-{
-  free_aligned(_x);
-  free_aligned(_b);
-}
-
-void Solver::resizeVector(size_t sx)
-{
-  size_t oldSize = _xSize;
-  _xSize = sx;
-  sx += _additionalVectorSpace; // allocate some additional space if requested
-  if (_maxXSize < sx) {
-    _maxXSize = 2*sx;
-    free_aligned(_x);
-    _x = allocate_aligned<number_t>(_maxXSize);
-#ifndef NDEBUG
-    memset(_x, 0, _maxXSize * sizeof(number_t));
-#endif
-    if (_b) { // backup the former b, might still be needed for online processing
-      memcpy(_x, _b, oldSize * sizeof(number_t));
-      free_aligned(_b);
-      _b = allocate_aligned<number_t>(_maxXSize);
-      std::swap(_b, _x);
-    } else {
-      _b = allocate_aligned<number_t>(_maxXSize);
-#ifndef NDEBUG
-      memset(_b, 0, _maxXSize * sizeof(number_t));
-#endif
-    }
+  EdgeXYPrior::EdgeXYPrior() :
+    BaseUnaryEdge<2, Vector2, VertexPointXY>()
+  {
+    _information.setIdentity();
+    _error.setZero();
   }
-}
 
-void Solver::setOptimizer(SparseOptimizer* optimizer)
-{
-  _optimizer = optimizer;
-}
+  bool EdgeXYPrior::read(std::istream& is)
+  {
+    Vector2 p;
+    is >> p[0] >> p[1];
+    setMeasurement(p);
+    for (int i = 0; i < 2; ++i)
+      for (int j = i; j < 2; ++j) {
+        is >> information()(i, j);
+        if (i != j)
+          information()(j, i) = information()(i, j);
+      }
+    return true;
+  }
 
-void Solver::setLevenberg(bool levenberg)
-{
-  _isLevenberg = levenberg;
-}
+  bool EdgeXYPrior::write(std::ostream& os) const
+  {
+    Vector2 p = measurement();
+    os << p.x() << " " << p.y();
+    for (int i = 0; i < 2; ++i)
+      for (int j = i; j < 2; ++j)
+        os << " " << information()(i, j);
+    return os.good();
+  }
 
-void Solver::setAdditionalVectorSpace(size_t s)
-{
-  _additionalVectorSpace = s;
-}
+
+#ifndef NUMERIC_JACOBIAN_TWO_D_TYPES
+  void EdgeXYPrior::linearizeOplus()
+  {
+    _jacobianOplusXi=Matrix2::Identity();
+  }
+#endif
+
 
 } // end namespace

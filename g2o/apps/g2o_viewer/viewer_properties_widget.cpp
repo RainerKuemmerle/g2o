@@ -82,7 +82,7 @@ void ViewerPropertiesWidget::applyProperties()
 
   // draw with the new properties
   _viewer->setUpdateDisplay(true);
-  _viewer->updateGL();
+  _viewer->update();
 }
 
 void ViewerPropertiesWidget::setViewer(g2o::G2oQGLViewer* viewer)

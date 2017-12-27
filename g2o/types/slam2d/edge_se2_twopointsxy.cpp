@@ -34,7 +34,7 @@
 
 namespace g2o{
 
-  EdgeSE2TwoPointsXY::EdgeSE2TwoPointsXY() : BaseMultiEdge<4,Vector4D>(){
+  EdgeSE2TwoPointsXY::EdgeSE2TwoPointsXY() : BaseMultiEdge<4,Vector4>(){
     resize(3);
   }
 
@@ -44,8 +44,8 @@ namespace g2o{
     VertexPointXY * xy2 = static_cast<VertexPointXY *> (_vertices[2]);
 
 
-    Vector2D m1 = pose->estimate().inverse() * xy1->estimate();
-    Vector2D m2 = pose->estimate().inverse() * xy2->estimate();
+    Vector2 m1 = pose->estimate().inverse() * xy1->estimate();
+    Vector2 m2 = pose->estimate().inverse() * xy2->estimate();
 
     _error[0] = m1[0] - _measurement[0];
     _error[1] = m1[1] - _measurement[1];
@@ -94,18 +94,18 @@ namespace g2o{
     }
 
     if(estimatev1){
-      Vector2D submeas(_measurement[0], _measurement[1]);
+      Vector2 submeas(_measurement[0], _measurement[1]);
       v1->setEstimate(pose->estimate() * submeas);
     }
 
     if(estimatev2){
-      Vector2D submeas(_measurement[2], _measurement[3]);
+      Vector2 submeas(_measurement[2], _measurement[3]);
       v2->setEstimate(pose->estimate() * submeas);
     }
   }
 
 
-  double EdgeSE2TwoPointsXY::initialEstimatePossible(const OptimizableGraph::VertexSet& fixed, OptimizableGraph::Vertex* toEstimate){
+  number_t EdgeSE2TwoPointsXY::initialEstimatePossible(const OptimizableGraph::VertexSet& fixed, OptimizableGraph::Vertex* toEstimate){
     (void) toEstimate;
 
     for(std::set<HyperGraph::Vertex *>::iterator it=fixed.begin(); it!=fixed.end(); it++){
@@ -123,8 +123,8 @@ namespace g2o{
     VertexPointXY * xy2 = static_cast<VertexPointXY *> (_vertices[2]);
 
 
-    Vector2D m1 = pose->estimate().inverse() * xy1->estimate();
-    Vector2D m2 = pose->estimate().inverse() * xy2->estimate();
+    Vector2 m1 = pose->estimate().inverse() * xy1->estimate();
+    Vector2 m2 = pose->estimate().inverse() * xy2->estimate();
 
     _measurement[0] = m1[0];
     _measurement[1] = m1[1];

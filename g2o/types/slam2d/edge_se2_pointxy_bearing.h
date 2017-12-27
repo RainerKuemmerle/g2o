@@ -35,7 +35,7 @@
 
 namespace g2o {
 
-  class G2O_TYPES_SLAM2D_API EdgeSE2PointXYBearing: public BaseBinaryEdge<1, double, VertexSE2, VertexPointXY>
+  class G2O_TYPES_SLAM2D_API EdgeSE2PointXYBearing: public BaseBinaryEdge<1, number_t, VertexSE2, VertexPointXY>
   {
     public:
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW
@@ -44,17 +44,17 @@ namespace g2o {
       {
         const VertexSE2* v1 = static_cast<const VertexSE2*>(_vertices[0]);
         const VertexPointXY* l2 = static_cast<const VertexPointXY*>(_vertices[1]);
-        Vector2D delta = (v1->estimate().inverse() * l2->estimate());
-        double angle = atan2(delta[1], delta[0]);
+        Vector2 delta = (v1->estimate().inverse() * l2->estimate());
+        number_t angle = std::atan2(delta[1], delta[0]);
         _error[0] = normalize_theta(_measurement - angle );
       }
 
-      virtual bool setMeasurementData(const double* d) {
+      virtual bool setMeasurementData(const number_t* d) {
   _measurement=d[0];
   return true;
       }
 
-      virtual bool getMeasurementData(double* d) const {
+      virtual bool getMeasurementData(number_t* d) const {
   d[0] = _measurement;
   return true;
       }
@@ -64,15 +64,15 @@ namespace g2o {
       virtual bool setMeasurementFromState(){
         const VertexSE2* v1 = static_cast<const VertexSE2*>(_vertices[0]);
         const VertexPointXY* l2 = static_cast<const VertexPointXY*>(_vertices[1]);
-        Vector2D delta = (v1->estimate().inverse() * l2->estimate());
-  _measurement = atan2(delta[1], delta[0]);
+        Vector2 delta = (v1->estimate().inverse() * l2->estimate());
+  _measurement = std::atan2(delta[1], delta[0]);
   return true;
       }
       
       virtual bool read(std::istream& is);
       virtual bool write(std::ostream& os) const;
 
-      virtual double initialEstimatePossible(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex*) { return (from.count(_vertices[0]) == 1 ? 1.0 : -1.0);}
+      virtual number_t initialEstimatePossible(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex*) { return (from.count(_vertices[0]) == 1 ? 1.0 : -1.0);}
       virtual void initialEstimate(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to);
   };
 

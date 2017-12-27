@@ -45,7 +45,7 @@ namespace g2o {
 
       virtual bool init(bool online = false);
 
-      virtual bool computeMarginals(SparseBlockMatrix<MatrixXD>& spinv, const std::vector<std::pair<int, int> >& blockIndices);
+      virtual bool computeMarginals(SparseBlockMatrix<MatrixX>& spinv, const std::vector<std::pair<int, int> >& blockIndices);
 
       virtual bool buildLinearStructure();
 

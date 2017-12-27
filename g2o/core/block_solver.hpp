@@ -62,8 +62,8 @@ void BlockSolver<Traits>::resize(int* blockPoseIndices, int numPoseBlocks,
   if (_doSchur) {
     // the following two are only used in schur
     assert(_sizePoses > 0 && "allocating with wrong size");
-    _coefficients.reset(allocate_aligned<double>(s));
-    _bschur.reset(allocate_aligned<double>(_sizePoses));
+    _coefficients.reset(allocate_aligned<number_t>(s));
+    _bschur.reset(allocate_aligned<number_t>(_sizePoses));
   }
 
   _Hpp= g2o::make_unique<PoseHessianType>(blockPoseIndices, blockPoseIndices, numPoseBlocks, numPoseBlocks);
@@ -221,8 +221,7 @@ bool BlockSolver<Traits>::buildStructure(bool zeroBlocks)
   _DInvSchur->diagonal().resize(landmarkIdx);
   _Hpl->fillSparseBlockMatrixCCS(*_HplCCS);
 
-  for (size_t i = 0; i < _optimizer->indexMapping().size(); ++i) {
-    OptimizableGraph::Vertex* v = _optimizer->indexMapping()[i];
+  for (OptimizableGraph::Vertex* v : _optimizer->indexMapping()) {
     if (v->marginalized()){
       const HyperGraph::EdgeSet& vedges=v->edges();
       for (HyperGraph::EdgeSet::const_iterator it1=vedges.begin(); it1!=vedges.end(); ++it1){
@@ -316,7 +315,7 @@ template <typename Traits>
 bool BlockSolver<Traits>::solve(){
   //cerr << __PRETTY_FUNCTION__ << endl;
   if (! _doSchur){
-    double t=get_monotonic_time();
+    number_t t=get_monotonic_time();
     bool ok = _linearSolver->solve(*_Hpp, _x, _b);
     G2OBatchStatistics* globalStats = G2OBatchStatistics::globalStats();
     if (globalStats) {
@@ -329,14 +328,14 @@ bool BlockSolver<Traits>::solve(){
   // schur thing
 
   // backup the coefficient matrix
-  double t=get_monotonic_time();
+  number_t t=get_monotonic_time();
 
   // _Hschur = _Hpp, but keeping the pattern of _Hschur
   _Hschur->clear();
   _Hpp->add(*_Hschur);
 
   //_DInvSchur->clear();
-  memset (_coefficients.get(), 0, _sizePoses*sizeof(double));
+  memset(_coefficients.get(), 0, _sizePoses*sizeof(number_t));
 # ifdef G2O_OPENMP
 # pragma omp parallel for default (shared) schedule(dynamic, 10)
 # endif
@@ -395,7 +394,7 @@ bool BlockSolver<Traits>::solve(){
   //cerr << "Solve [marginalize] = " <<  get_monotonic_time()-t << endl;
 
   // _bschur = _b for calling solver, and not touching _b
-  memcpy(_bschur.get(), _b, _sizePoses * sizeof(double));
+  memcpy(_bschur.get(), _b, _sizePoses * sizeof(number_t));
   for (int i=0; i<_sizePoses; ++i){
     _bschur[i]-=_coefficients[i];
   }
@@ -420,26 +419,26 @@ bool BlockSolver<Traits>::solve(){
 
   // _x contains the solution for the poses, now applying it to the landmarks to get the new part of the
   // solution;
-  double* xp = _x;
-  double* cp = _coefficients.get();
+  number_t* xp = _x;
+  number_t* cp = _coefficients.get();
 
-  double* xl=_x+_sizePoses;
-  double* cl= _coefficients.get() + _sizePoses;
-  double* bl=_b+_sizePoses;
+  number_t* xl=_x+_sizePoses;
+  number_t* cl=_coefficients.get() + _sizePoses;
+  number_t* bl=_b+_sizePoses;
 
   // cp = -xp
   for (int i=0; i<_sizePoses; ++i)
     cp[i]=-xp[i];
 
   // cl = bl
-  memcpy(cl,bl,_sizeLandmarks*sizeof(double));
+  memcpy(cl,bl,_sizeLandmarks*sizeof(number_t));
 
   // cl = bl - Bt * xp
   //Bt->multiply(cl, cp);
   _HplCCS->rightMultiply(cl, cp);
 
   // xl = Dinv * cl
-  memset(xl,0, _sizeLandmarks*sizeof(double));
+  memset(xl,0, _sizeLandmarks*sizeof(number_t));
   _DInvSchur->multiply(xl,cl);
   //_DInvSchur->rightMultiply(xl,cl);
   //cerr << "Solve [landmark delta] = " <<  get_monotonic_time()-t << endl;
@@ -449,9 +448,9 @@ bool BlockSolver<Traits>::solve(){
 
 
 template <typename Traits>
-bool BlockSolver<Traits>::computeMarginals(SparseBlockMatrix<MatrixXD>& spinv, const std::vector<std::pair<int, int> >& blockIndices)
+bool BlockSolver<Traits>::computeMarginals(SparseBlockMatrix<MatrixX>& spinv, const std::vector<std::pair<int, int> >& blockIndices)
 {
-  double t = get_monotonic_time();
+  number_t t = get_monotonic_time();
   bool ok = _linearSolver->solvePattern(spinv, blockIndices, *_Hpp);
   G2OBatchStatistics* globalStats = G2OBatchStatistics::globalStats();
   if (globalStats) {
@@ -523,7 +522,7 @@ bool BlockSolver<Traits>::buildSystem()
 
 
 template <typename Traits>
-bool BlockSolver<Traits>::setLambda(double lambda, bool backup)
+bool BlockSolver<Traits>::setLambda(number_t lambda, bool backup)
 {
   if (backup) {
     _diagonalBackupPose.resize(_numPoses);

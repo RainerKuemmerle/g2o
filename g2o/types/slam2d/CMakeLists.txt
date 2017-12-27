@@ -13,6 +13,7 @@ ADD_LIBRARY(types_slam2d ${G2O_LIB_TYPE}
   edge_pointxy.cpp             edge_pointxy.h
   edge_se2_twopointsxy.cpp	edge_se2_twopointsxy.h
   edge_se2_lotsofxy.cpp		edge_se2_lotsofxy.h
+  edge_xy_prior.cpp		edge_xy_prior.h
   g2o_types_slam2d_api.h
 )
 

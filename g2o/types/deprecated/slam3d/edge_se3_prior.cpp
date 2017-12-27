@@ -60,7 +60,7 @@ namespace deprecated {
     if (!setParameterId(0, pid))
       return false;
     // measured keypoint
-    Vector7d meas;
+    Vector7 meas;
     for (int i=0; i<7; i++) is >> meas[i];
     setMeasurement(SE3Quat(meas));
     // don't need this if we don't use it in error calculation (???)
@@ -105,8 +105,8 @@ namespace deprecated {
 
   void EdgeSE3Prior::linearizeOplus(){
     VertexSE3 *from = static_cast<VertexSE3*>(_vertices[0]);
-    Eigen::Isometry3d E;
-    Eigen::Isometry3d Z, X, P;
+    Isometry3 E;
+    Isometry3 Z, X, P;
     X=from->estimate().rotation().toRotationMatrix();
     X.translation()=from->estimate().translation();
     P=_cache->offsetParam()->offset().rotation().toRotationMatrix();

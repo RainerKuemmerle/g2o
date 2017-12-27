@@ -108,7 +108,7 @@ void MainWindow::on_btnOptimize_clicked()
   btnForceStop->hide();
 
   viewer->setUpdateDisplay(true);
-  viewer->updateGL();
+  viewer->update();
   _forceStopFlag = false;
 }
 
@@ -135,7 +135,7 @@ void MainWindow::on_btnInitialGuess_clicked()
   }
 
   viewer->setUpdateDisplay(true);
-  viewer->updateGL();
+  viewer->update();
 }
 
 void MainWindow::on_btnSetZero_clicked()
@@ -145,7 +145,7 @@ void MainWindow::on_btnSetZero_clicked()
 
   viewer->graph->setToOrigin();
   viewer->setUpdateDisplay(true);
-  viewer->updateGL();
+  viewer->update();
 }
 
 void MainWindow::on_btnReload_clicked()
@@ -155,7 +155,7 @@ void MainWindow::on_btnReload_clicked()
     viewer->graph->clear();
     viewer->graph->load(_filename.c_str());
     viewer->setUpdateDisplay(true);
-    viewer->updateGL();
+    viewer->update();
   }
 }
 
@@ -376,7 +376,7 @@ bool MainWindow::loadFromFile(const QString& filename)
   }
   cerr << "loaded " << filename.toStdString() << " with " << viewer->graph->vertices().size()
     << " vertices and " << viewer->graph->edges().size() << " measurements" << endl;
-  viewer->updateGL();
+  viewer->update();
   fixGraph();
   return loadStatus;
 }
@@ -384,13 +384,13 @@ bool MainWindow::loadFromFile(const QString& filename)
 void MainWindow::on_actionWhite_Background_triggered(bool)
 {
   viewer->setBackgroundColor(QColor::fromRgb(255, 255, 255));
-  viewer->updateGL();
+  viewer->update();
 }
 
 void MainWindow::on_actionDefault_Background_triggered(bool)
 {
   viewer->setBackgroundColor(QColor::fromRgb(51, 51, 51));
-  viewer->updateGL();
+  viewer->update();
 }
 
 void MainWindow::on_actionProperties_triggered(bool)
@@ -455,7 +455,7 @@ void MainWindow::on_actionLoad_Viewer_State_triggered(bool)
     viewer->setStateFileName(filename);
     viewer->restoreStateFromFile();
     viewer->setStateFileName(QString::null);
-    viewer->updateGL();
+    viewer->update();
     cerr << "Loaded state from " << filename.toStdString() << endl;
   }
 }

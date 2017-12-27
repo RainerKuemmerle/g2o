@@ -40,22 +40,22 @@ namespace g2o {
     public:
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
       VelocityMeasurement();
-      VelocityMeasurement(double vl, double vr, double dt);
+      VelocityMeasurement(number_t vl, number_t vr, number_t dt);
 
-      double vl() const { return _measurement(0);}
-      void setVl(double v) { _measurement(0) = v;}
+      number_t vl() const { return _measurement(0);}
+      void setVl(number_t v) { _measurement(0) = v;}
 
-      double vr() const { return _measurement(1);}
-      void setVr(double v) { _measurement(1) = v;}
+      number_t vr() const { return _measurement(1);}
+      void setVr(number_t v) { _measurement(1) = v;}
 
-      double dt() const { return _dt;}
-      void setDt(double t) { _dt = t;}
+      number_t dt() const { return _dt;}
+      void setDt(number_t t) { _dt = t;}
       
-      const Vector2D& measurement() const { return _measurement;}
+      const Vector2& measurement() const { return _measurement;}
 
     protected:
-      Vector2D _measurement;
-      double _dt;
+      Vector2 _measurement;
+      number_t _dt;
   };
 
   /**
@@ -66,26 +66,26 @@ namespace g2o {
     public:
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
       MotionMeasurement();
-      MotionMeasurement(double x, double y, double theta, double dt);
-      MotionMeasurement(const Vector3D& m, double dt);
+      MotionMeasurement(number_t x, number_t y, number_t theta, number_t dt);
+      MotionMeasurement(const Vector3& m, number_t dt);
 
-      double x() const { return _measurement(0);}
-      void setX(double v) { _measurement(0) = v;}
+      number_t x() const { return _measurement(0);}
+      void setX(number_t v) { _measurement(0) = v;}
 
-      double y() const { return _measurement(1);}
-      void setY(double v) { _measurement(1) = v;}
+      number_t y() const { return _measurement(1);}
+      void setY(number_t v) { _measurement(1) = v;}
 
-      double theta() const { return _measurement(2);}
-      void setTheta(double v) { _measurement(2) = v;}
+      number_t theta() const { return _measurement(2);}
+      void setTheta(number_t v) { _measurement(2) = v;}
 
-      double dt() const { return _dt;}
-      void setDt(double t) { _dt = t;}
+      number_t dt() const { return _dt;}
+      void setDt(number_t t) { _dt = t;}
 
-      const Vector3D& measurement() const { return _measurement;}
+      const Vector3& measurement() const { return _measurement;}
 
     protected:
-      Vector3D _measurement;
-      double _dt;
+      Vector3 _measurement;
+      number_t _dt;
   };
 
   /**
@@ -95,7 +95,7 @@ namespace g2o {
   {
     public:
       static VelocityMeasurement convertToVelocity(const MotionMeasurement& m);
-      static MotionMeasurement convertToMotion(const VelocityMeasurement& vi, double l = 1.0);
+      static MotionMeasurement convertToMotion(const VelocityMeasurement& vi, number_t l = 1.0);
   };
 
 } // end namespace

@@ -109,10 +109,10 @@ namespace g2o {
     if (_pointSize) {
       glPointSize(_pointSize->value());
     }
-    Vector2D n(cos(that->theta()), sin(that->theta()));
-    Vector2D pmiddle=n*that->rho();
-    Vector2D t(-n.y(), n.x());
-    double l1,l2 = 10;
+    Vector2 n(std::cos(that->theta()), std::sin(that->theta()));
+    Vector2 pmiddle=n*that->rho();
+    Vector2 t(-n.y(), n.x());
+    number_t l1{},l2 = 10;
     VertexPointXY *vp1=0, *vp2=0;
     vp1=dynamic_cast<VertexPointXY*> (that->graph()->vertex(that->p1Id));
     vp2=dynamic_cast<VertexPointXY*> (that->graph()->vertex(that->p2Id));
@@ -132,8 +132,8 @@ namespace g2o {
       glColor4f(0.8f,0.5f,0.3f,0.7f);
       l2 = t.dot(vp2->estimate()-pmiddle);
     }
-    Vector2D p1=pmiddle+t*l1;
-    Vector2D p2=pmiddle+t*l2;
+    Vector2 p1=pmiddle+t*l1;
+    Vector2 p2=pmiddle+t*l2;
     glBegin(GL_LINES);
     glVertex3f((float)p1.x(),p1.y(),0.f);
     glVertex3f((float)p2.x(),p2.y(),0.f);

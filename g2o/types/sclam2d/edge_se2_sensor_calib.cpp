@@ -53,7 +53,7 @@ namespace g2o {
 
   bool EdgeSE2SensorCalib::read(std::istream& is)
   {
-    Vector3D p;
+    Vector3 p;
     is >> p(0) >> p(1) >> p(2);
     _measurement.fromVector(p);
     _inverseMeasurement=measurement().inverse();
@@ -68,7 +68,7 @@ namespace g2o {
 
   bool EdgeSE2SensorCalib::write(std::ostream& os) const
   {
-    Vector3D p = measurement().toVector();
+    Vector3 p = measurement().toVector();
     os << p(0) << " " << p(1) << " " << p(2);
     for (int i = 0; i < information().rows(); ++i)
       for (int j = i; j < information().cols(); ++j)
