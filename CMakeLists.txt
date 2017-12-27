@@ -343,7 +343,7 @@ else(TARGET Eigen3::Eigen)
 endif (TARGET Eigen3::Eigen)
 
 # Set up the top-level include directories
-INCLUDE_DIRECTORIES(${g2o_SOURCE_DIR} ${EIGEN3_INCLUDE_DIR})
+INCLUDE_DIRECTORIES(${g2o_SOURCE_DIR})
 
 # Generate config.h
 SET(G2O_OPENGL_FOUND ${OPENGL_FOUND})
