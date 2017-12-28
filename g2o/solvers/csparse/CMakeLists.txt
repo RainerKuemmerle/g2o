@@ -16,6 +16,8 @@ ELSE()
   TARGET_LINK_LIBRARIES(csparse_extension ${CSPARSE_LIBRARY})
 ENDIF()
 
+TARGET_LINK_LIBRARIES(csparse_extension ${G2O_EIGEN3_EIGEN_TARGET})
+
 SET(include_install_dir ${CMAKE_INSTALL_PREFIX}/include)
 
 ADD_LIBRARY(solver_csparse ${G2O_LIB_TYPE}
