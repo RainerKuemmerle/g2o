@@ -47,8 +47,8 @@ if(MSVC90)
   message(STATUS "Disabling memory alignment for MSVC8")
 endif(MSVC90)
 
-# On the Mac platform, configure the RPATH as per the install, to
-# avoid the problem of loading both the built and installed versions
+# On the Mac platform, configure the RPATH as per the INSTALL, to
+# avoid the problem of loading both the built and INSTALLed versions
 # of the shared targets
 IF(APPLE)
   SET(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
@@ -67,10 +67,10 @@ SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${g2o_LIBRARY_OUTPUT_DIRECTORY})
 SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${g2o_RUNTIME_OUTPUT_DIRECTORY})
 
 # Set standard installation directories
-SET(runtime_destination ${CMAKE_INSTALL_PREFIX}/bin)
-SET(library_destination ${CMAKE_INSTALL_PREFIX}/lib)
-SET(archive_destination ${CMAKE_INSTALL_PREFIX}/lib)
-SET(includes_destination ${CMAKE_INSTALL_PREFIX}/include)
+SET(RUNTIME_DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
+SET(LIBRARY_DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
+SET(ARCHIVE_DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
+SET(INCLUDES_DESTINATION ${CMAKE_INSTALL_PREFIX}/include)
 
 # Set search directory for looking for our custom CMake scripts to
 # look for SuiteSparse, QGLViewer, and Eigen3.
@@ -334,8 +334,8 @@ IF(MSVC)
 ENDIF(MSVC)
 
 # C++11 support
-set(CMAKE_CXX_STANDARD 11)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
+SET(CMAKE_CXX_STANDARD 11)
+SET(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # specifying compiler flags
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${g2o_CXX_FLAGS}")
@@ -346,11 +346,11 @@ FIND_PACKAGE(Eigen3 REQUIRED NO_MODULE)
 
 # Use the Eigen3 target if it was declared. If not, include
 # the include directory.
-if (TARGET Eigen3::Eigen)
-  set(G2O_EIGEN3_EIGEN_TARGET Eigen3::Eigen)
-else(TARGET Eigen3::Eigen)
+IF (TARGET Eigen3::Eigen)
+  SET(G2O_EIGEN3_EIGEN_TARGET Eigen3::Eigen)
+ELSE(TARGET Eigen3::Eigen)
   INCLUDE_DIRECTORIES(${EIGEN3_INCLUDE_DIR})
-endif (TARGET Eigen3::Eigen)
+ENDIF (TARGET Eigen3::Eigen)
 
 # Set up the top-level include directories
 INCLUDE_DIRECTORIES(${g2o_SOURCE_DIR})
@@ -362,35 +362,35 @@ SET(G2O_HAVE_CSPARSE ${CSPARSE_FOUND})
 SET(G2O_SHARED_LIBS ${BUILD_SHARED_LIBS})
 SET(G2O_LGPL_SHARED_LIBS ${BUILD_LGPL_SHARED_LIBS})
 SET(G2O_CXX_COMPILER "${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER}")
-configure_file(config.h.in ${PROJECT_BINARY_DIR}/g2o/config.h)
-include_directories(BEFORE ${PROJECT_BINARY_DIR})
+CONFIGURE_FILE(config.h.in ${PROJECT_BINARY_DIR}/g2o/config.h)
+INCLUDE_DIRECTORIES(BEFORE ${PROJECT_BINARY_DIR})
 INSTALL(FILES ${PROJECT_BINARY_DIR}/g2o/config.h DESTINATION ${CMAKE_INSTALL_PREFIX}/include/g2o)
 
-# Generate cmake installation scripts
-set(generated_dir "${CMAKE_CURRENT_BINARY_DIR}/generated")
-set(version_config "${generated_dir}/${PROJECT_NAME}ConfigVersion.cmake")
-set(project_config "${generated_dir}/${PROJECT_NAME}Config.cmake")
-set(targets_export_name "${PROJECT_NAME}Targets")
-set(config_install_dir "lib/cmake/${PROJECT_NAME}")
-set(namespace "${PROJECT_NAME}::")
-set(G2O_VERSION 1.0.0)
+# Generate cmake INSTALLation scripts
+SET(G2O_GENERATED_DIR "${CMAKE_CURRENT_BINARY_DIR}/generated")
+SET(G2O_VERSION_CONFIG "${G2O_GENERATED_DIR}/${PROJECT_NAME}ConfigVersion.cmake")
+SET(G2O_PROJECT_CONFIG "${G2O_GENERATED_DIR}/${PROJECT_NAME}Config.cmake")
+SET(G2O_TARGETS_EXPORT_NAME "${PROJECT_NAME}Targets")
+SET(G2O_CONFIG_INSTALL_DIR "lib/cmake/${PROJECT_NAME}")
+SET(G2O_NAMESPACE "${PROJECT_NAME}::")
+SET(G2O_VERSION 1.0.0)
 
-include(CMakePackageConfigHelpers)
-write_basic_package_version_file(
-    "${version_config}" VERSION ${G2O_VERSION} COMPATIBILITY SameMajorVersion
+INCLUDE(CMakePackageConfigHelpers)
+WRITE_BASIC_PACKAGE_VERSION_FILE(
+    "${G2O_VERSION_CONFIG}" VERSION ${G2O_VERSION} COMPATIBILITY SameMajorVersion
 )
 
-configure_file("${g2o_SOURCE_DIR}/cmake_modules/Config.cmake.in" "${project_config}" @ONLY)
+CONFIGURE_FILE("${g2o_SOURCE_DIR}/cmake_modules/Config.cmake.in" "${G2O_PROJECT_CONFIG}" @ONLY)
 
 
-install(
-    FILES "${project_config}" "${version_config}"
-    DESTINATION "${config_install_dir}")
+INSTALL(
+    FILES "${G2O_PROJECT_CONFIG}" "${G2O_VERSION_CONFIG}"
+    DESTINATION "${G2O_CONFIG_INSTALL_DIR}")
 
-install(
-    EXPORT "${targets_export_name}"
-    NAMESPACE "${namespace}"
-    DESTINATION "${config_install_dir}")
+INSTALL(
+    EXPORT "${G2O_TARGETS_EXPORT_NAME}"
+    NAMESPACE "${G2O_NAMESPACE}"
+    DESTINATION "${G2O_CONFIG_INSTALL_DIR}")
 
 # Include the subdirectories
 ADD_SUBDIRECTORY(EXTERNAL)
