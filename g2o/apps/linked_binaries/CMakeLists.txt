@@ -16,10 +16,10 @@ ENDIF()
 TARGET_LINK_LIBRARIES(g2o_cli_application_linked types_slam2d types_slam3d types_sba types_sclam2d)
 
 INSTALL(TARGETS g2o_cli_application_linked
-  RUNTIME DESTINATION ${runtime_destination}
-  LIBRARY DESTINATION ${library_destination}
-  ARCHIVE DESTINATION ${archive_destination}
-  INCLUDES DESTINATION ${includes_destination}
+  RUNTIME DESTINATION ${RUNTIME_DESTINATION}
+  LIBRARY DESTINATION ${LIBRARY_DESTINATION}
+  ARCHIVE DESTINATION ${ARCHIVE_DESTINATION}
+  INCLUDES DESTINATION ${INCLUDES_DESTINATION}
 )
 
 
@@ -43,10 +43,10 @@ IF(QT4_FOUND AND QGLVIEWER_FOUND)
   TARGET_LINK_LIBRARIES(g2o_viewer_linked types_slam2d types_slam3d types_sba types_sclam2d)
 
   INSTALL(TARGETS g2o_viewer_linked
-    RUNTIME DESTINATION ${runtime_destination}
-    LIBRARY DESTINATION ${library_destination}
-    ARCHIVE DESTINATION ${archive_destination}
-    INCLUDES DESTINATION ${includes_destination} ${QT_INCLUDES}
+    RUNTIME DESTINATION ${RUNTIME_DESTINATION}
+    LIBRARY DESTINATION ${LIBRARY_DESTINATION}
+    ARCHIVE DESTINATION ${ARCHIVE_DESTINATION}
+    INCLUDES DESTINATION ${INCLUDES_DESTINATION} ${QT_INCLUDES}
   )
 ENDIF()
 

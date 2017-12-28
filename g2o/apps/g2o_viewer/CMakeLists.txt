@@ -3,7 +3,7 @@ if(POLICY CMP0020)
   cmake_policy(SET CMP0020 OLD)
 endif()
 
-set(qt5_includes_dirs "")
+SET(qt5_includes_dirs "")
 
 # Qt5 was been find_package'd() by FindQGLViewer.cmake
 if(Qt5_FOUND)
@@ -41,11 +41,11 @@ TARGET_LINK_LIBRARIES(viewer_library core opengl_helper)
 TARGET_LINK_LIBRARIES(g2o_viewer viewer_library)
 
 INSTALL(TARGETS g2o_viewer viewer_library
-  EXPORT ${targets_export_name}
-  RUNTIME DESTINATION ${runtime_destination}
-  LIBRARY DESTINATION ${library_destination}
-  ARCHIVE DESTINATION ${archive_destination}
-  INCLUDES DESTINATION ${includes_destination} ${qt5_includes_dirs} ${QGLVIEWER_INCLUDE_DIR}
+  EXPORT ${G2O_TARGETS_EXPORT_NAME}
+  RUNTIME DESTINATION ${RUNTIME_DESTINATION}
+  LIBRARY DESTINATION ${LIBRARY_DESTINATION}
+  ARCHIVE DESTINATION ${ARCHIVE_DESTINATION}
+  INCLUDES DESTINATION ${INCLUDES_DESTINATION} ${qt5_includes_dirs} ${QGLVIEWER_INCLUDE_DIR}
 )
 
 FILE(GLOB headers "${CMAKE_CURRENT_SOURCE_DIR}/*.h" "${CMAKE_CURRENT_SOURCE_DIR}/*.hpp")

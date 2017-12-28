@@ -28,10 +28,10 @@ TARGET_LINK_LIBRARIES(g2o_hierarchical_application g2o_hierarchical_library g2o_
 SET_TARGET_PROPERTIES(g2o_hierarchical_application PROPERTIES OUTPUT_NAME g2o_hierarchical${EXE_POSTFIX})
 
 # INSTALL(TARGETS g2o_hierarchical_library g2o_cli_application
-#   EXPORT ${targets_export_name}
-#   RUNTIME DESTINATION ${runtime_destination}
-#   LIBRARY DESTINATION ${library_destination}
-#   ARCHIVE DESTINATION ${archive_destination}
+#   EXPORT ${G2O_TARGETS_EXPORT_NAME}
+#   RUNTIME DESTINATION ${RUNTIME_DESTINATION}
+#   LIBRARY DESTINATION ${LIBRARY_DESTINATION}
+#   ARCHIVE DESTINATION ${ARCHIVE_DESTINATION}
 # )
 
 FILE(GLOB headers "${CMAKE_CURRENT_SOURCE_DIR}/*.h" "${CMAKE_CURRENT_SOURCE_DIR}/*.hpp")
