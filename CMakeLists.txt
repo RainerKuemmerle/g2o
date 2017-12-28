@@ -344,11 +344,11 @@ SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${g2o_C_FLAGS}")
 # Find Eigen3
 FIND_PACKAGE(Eigen3 REQUIRED NO_MODULE)
 
-# Check if the target was set up (this is not available in all cases)
+# Use the Eigen3 target if it was declared. If not, include
+# the include directory.
 if (TARGET Eigen3::Eigen)
-  set(G2O_USE_EIGEN3_EIGEN_TARGET TRUE)
+  set(G2O_EIGEN3_EIGEN_TARGET Eigen3::Eigen)
 else(TARGET Eigen3::Eigen)
-  set(G2O_USE_EIGEN3_EIGEN_TARGET FALSE)
   INCLUDE_DIRECTORIES(${EIGEN3_INCLUDE_DIR})
 endif (TARGET Eigen3::Eigen)
 
