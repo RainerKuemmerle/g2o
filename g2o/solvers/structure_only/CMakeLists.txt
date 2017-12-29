@@ -5,7 +5,6 @@ ADD_LIBRARY(solver_structure_only ${G2O_LIB_TYPE}
 
 SET_TARGET_PROPERTIES(solver_structure_only PROPERTIES OUTPUT_NAME ${LIB_PREFIX}solver_structure_only)
 TARGET_LINK_LIBRARIES(solver_structure_only core)
-SET(include_INSTALL_dir ${CMAKE_INSTALL_PREFIX}/include)
 
 INSTALL(TARGETS solver_structure_only
   EXPORT ${G2O_TARGETS_EXPORT_NAME}
@@ -16,4 +15,5 @@ INSTALL(TARGETS solver_structure_only
 )
 
 FILE(GLOB headers "${CMAKE_CURRENT_SOURCE_DIR}/*.h" "${CMAKE_CURRENT_SOURCE_DIR}/*.hpp")
-INSTALL(FILES ${headers} DESTINATION ${INCLUDES_DESTINATION}/g2o/solvers/structure_only)
+
+INSTALL(FILES ${headers} DESTINATION ${INCLUDES_DESTINATION}/solvers/structure_only)
