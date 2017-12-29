@@ -62,4 +62,5 @@ INSTALL(TARGETS g2o_simulator_library g2o_simulator2d_application g2o_simulator3
 )
 
 FILE(GLOB headers "${CMAKE_CURRENT_SOURCE_DIR}/*.h" "${CMAKE_CURRENT_SOURCE_DIR}/*.hpp")
-INSTALL(FILES ${headers} DESTINATION ${INCLUDES_DESTINATION}/g2o/apps/g2o_simulator)
+
+INSTALL(FILES ${headers} DESTINATION ${INCLUDES_DESTINATION}/apps/g2o_simulator)
