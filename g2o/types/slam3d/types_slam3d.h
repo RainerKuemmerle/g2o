@@ -39,6 +39,7 @@
 #include "edge_se3_prior.h"
 
 #include "edge_pointxyz.h"
+#include "edge_xyz_prior.h"
 
 #include "edge_se3_lotsofxyz.h"
 #endif
