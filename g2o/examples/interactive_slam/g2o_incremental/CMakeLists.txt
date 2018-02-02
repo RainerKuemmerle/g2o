@@ -13,10 +13,10 @@ TARGET_LINK_LIBRARIES(g2o_incremental_application g2o_incremental_library)
 SET_TARGET_PROPERTIES(g2o_incremental_application PROPERTIES OUTPUT_NAME g2o_incremental${EXE_POSTFIX})
 
 INSTALL(TARGETS g2o_incremental_library g2o_incremental_application
-  RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/bin
-  LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX}/lib
-  ARCHIVE DESTINATION ${CMAKE_INSTALL_PREFIX}/lib
+  RUNTIME DESTINATION bin
+  LIBRARY DESTINATION lib
+  ARCHIVE DESTINATION lib
 )
 
 FILE(GLOB headers "${CMAKE_CURRENT_SOURCE_DIR}/*.h" "${CMAKE_CURRENT_SOURCE_DIR}/*.hpp")
-INSTALL(FILES ${headers} DESTINATION ${CMAKE_INSTALL_PREFIX}/include/g2o/examples/interactive_slam/g2o_incremental)
+INSTALL(FILES ${headers} DESTINATION include/g2o/examples/interactive_slam/g2o_incremental)
