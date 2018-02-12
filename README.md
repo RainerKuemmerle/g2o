@@ -128,6 +128,7 @@ We thank the following contributors for providing patches:
 - Mark Pupilli for submitting patches to compile with MSVC.
 
 ### Projects using g2o
+- [g2opy](https://github.com/uoip/g2opy): Python binding
 - [.Net wrapper](https://github.com/fugro/g2o)
 
 ### Contact information
