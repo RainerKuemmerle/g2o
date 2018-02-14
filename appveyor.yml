@@ -2,7 +2,7 @@ branches:
   only:
     - master
 
-os: Visual Studio 2017
+os: Visual Studio 2015
 
 clone_folder: c:\projects\g2o
 
@@ -12,20 +12,14 @@ configuration: Release
 build:
   project: c:\projects\g2o\build\g2o.sln 
 
-environment:
-  VCPKG_ROOT_DIR: C:\tools\vcpkg
-  VCPKG_DEFAULT_TRIPLET: x64-windows
-
 install:
-  - set QTDIR=C:\Qt\5.10.0\msvc2017_64
+  - set QTDIR=C:\Qt\5.8\msvc2015_64
   - set PATH=%PATH%;%QTDIR%\bin
-  - C:\projects\g2o\script\install-deps-windows.bat
-
-cache: 
-  - C:\tools\vcpkg\installed -> C:\projects\g2o\script\install-deps-windows.bat
-    
+  - ps: wget http://bitbucket.org/eigen/eigen/get/3.3.4.zip -outfile eigen3.zip
+  - cmd: 7z x eigen3.zip -o"C:\projects" -y > nul
+  
 before_build:
-  - cd C:\projects\g2o
+  - cd c:\projects\g2o
   - mkdir build
   - cd build
-  - cmake -G "Visual Studio 14 2017 Win64" -DG2O_BUILD_APPS=ON -DG2O_BUILD_EXAMPLES=ON -DVCPKG_TARGET_TRIPLET="%VCPKG_DEFAULT_TRIPLET%" -DCMAKE_TOOLCHAIN_FILE="%VCPKG_ROOT_DIR%\scripts\buildsystems\vcpkg.cmake" ..
+  - cmake -G "Visual Studio 14 2015 Win64" -D EIGEN3_INCLUDE_DIR=C:\projects\eigen-eigen-5a0156e40feb ..
