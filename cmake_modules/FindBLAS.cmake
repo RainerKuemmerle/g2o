@@ -152,6 +152,20 @@ else()
     # If Unix, search for BLAS function in possible libraries
     #
 
+    # BLAS in OpenBLAS? (http://www.openblas.net)
+    if(NOT BLAS_LIBRARIES)
+        check_fortran_libraries(
+            BLAS_DEFINITIONS
+            BLAS_LIBRARIES
+            BLAS
+            sgemm
+            ""
+            "openblas"
+            ""
+            ""
+        )
+    endif()
+
     # BLAS in ATLAS library? (http://math-atlas.sourceforge.net/)
     if(NOT BLAS_LIBRARIES)
       check_fortran_libraries(
