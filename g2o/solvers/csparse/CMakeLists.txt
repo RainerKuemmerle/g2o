@@ -9,6 +9,7 @@ ADD_LIBRARY(csparse_extension ${G2O_LGPL_LIB_TYPE}
   g2o_csparse_extension_api.h
 )
 SET_TARGET_PROPERTIES(csparse_extension PROPERTIES OUTPUT_NAME ${LIB_PREFIX}csparse_extension)
+TARGET_LINK_LIBRARIES(csparse_extension PUBLIC "${LIB_PREFIX}config")
 
 IF(BUILD_CSPARSE)
   TARGET_LINK_LIBRARIES(csparse_extension csparse)
