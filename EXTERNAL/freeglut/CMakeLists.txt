@@ -4,7 +4,8 @@ ADD_LIBRARY(freeglut_minimal ${G2O_LIB_TYPE}
   freeglut_stroke_roman.cpp
 )
 
-TARGET_LINK_LIBRARIES(freeglut_minimal ${OPENGL_gl_LIBRARY})
+TARGET_LINK_LIBRARIES(freeglut_minimal PUBLIC "${OPENGL_gl_LIBRARY}")
+TARGET_LINK_LIBRARIES(freeglut_minimal PUBLIC "${LIB_PREFIX}config")
 
 SET_TARGET_PROPERTIES(freeglut_minimal PROPERTIES OUTPUT_NAME ${LIB_PREFIX}ext_freeglut_minimal)
 

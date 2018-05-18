@@ -11,9 +11,10 @@ ADD_LIBRARY(csparse_extension ${G2O_LGPL_LIB_TYPE}
 SET_TARGET_PROPERTIES(csparse_extension PROPERTIES OUTPUT_NAME ${LIB_PREFIX}csparse_extension)
 
 IF(BUILD_CSPARSE)
-  TARGET_LINK_LIBRARIES(csparse_extension csparse)
+  TARGET_LINK_LIBRARIES(csparse_extension PUBLIC csparse)
 ELSE()
-  TARGET_LINK_LIBRARIES(csparse_extension ${CSPARSE_LIBRARY})
+  TARGET_LINK_LIBRARIES(csparse_extension PUBLIC ${CSPARSE_LIBRARY})
+  TARGET_LINK_LIBRARIES(csparse_extension PUBLIC "${LIB_PREFIX}config")
 ENDIF()
 
 
@@ -24,7 +25,9 @@ ADD_LIBRARY(solver_csparse ${G2O_LIB_TYPE}
 )
 SET_TARGET_PROPERTIES(solver_csparse PROPERTIES OUTPUT_NAME ${LIB_PREFIX}solver_csparse)
 
-TARGET_LINK_LIBRARIES(solver_csparse csparse_extension core)
+TARGET_LINK_LIBRARIES(solver_csparse
+  PUBLIC csparse_extension
+  PUBLIC core)
 
 
 INSTALL(TARGETS solver_csparse csparse_extension
