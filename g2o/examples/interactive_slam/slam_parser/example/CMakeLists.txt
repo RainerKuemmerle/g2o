@@ -18,4 +18,4 @@ SET_TARGET_PROPERTIES(test_slam_interface PROPERTIES OUTPUT_NAME test_slam_inter
 #)
 
 #FILE(GLOB headers "${CMAKE_CURRENT_SOURCE_DIR}/*.h")
-#INSTALL(FILES ${headers} DESTINATION ${CMAKE_INSTALL_PREFIX}/include/slam_parser/example)
+#INSTALL(FILES ${headers} DESTINATION include/slam_parser/example)

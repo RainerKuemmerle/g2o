@@ -34,4 +34,4 @@ INSTALL(TARGETS parser_library
 )
 
 FILE(GLOB headers "${CMAKE_CURRENT_SOURCE_DIR}/*.h" "${CMAKE_CURRENT_SOURCE_DIR}/*.hh")
-INSTALL(FILES ${headers} DESTINATION ${CMAKE_INSTALL_PREFIX}/include/slam_parser/parser)
+INSTALL(FILES ${headers} DESTINATION ${INCLUDES_DESTINATION}/slam_parser/parser)

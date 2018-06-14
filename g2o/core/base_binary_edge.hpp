@@ -24,6 +24,27 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+namespace {
+
+struct QuadraticFormLock {
+  QuadraticFormLock(OptimizableGraph::Vertex& vertex) : _vertex(vertex) {
+#ifdef G2O_OPENMP
+    _vertex.lockQuadraticForm();
+#endif
+  }
+
+  ~QuadraticFormLock() {
+#ifdef G2O_OPENMP
+    _vertex.unlockQuadraticForm();
+#endif
+  }
+
+private:
+  OptimizableGraph::Vertex& _vertex;
+};
+
+} // anonymous namespace
+
 template <int D, typename E, typename VertexXiType, typename VertexXjType>
 OptimizableGraph::Vertex* BaseBinaryEdge<D, E, VertexXiType, VertexXjType>::createFrom(){
   return createVertex(0);
@@ -73,25 +94,29 @@ void BaseBinaryEdge<D, E, VertexXiType, VertexXjType>::constructQuadraticForm()
   bool toNotFixed = !(to->fixed());
 
   if (fromNotFixed || toNotFixed) {
-#ifdef G2O_OPENMP
-    from->lockQuadraticForm();
-    to->lockQuadraticForm();
-#endif
     const InformationType& omega = _information;
     Eigen::Matrix<number_t, D, 1, Eigen::ColMajor> omega_r = - omega * _error;
     if (this->robustKernel() == 0) {
       if (fromNotFixed) {
         Eigen::Matrix<number_t, VertexXiType::Dimension, D, Eigen::ColMajor> AtO = A.transpose() * omega;
-        from->b().noalias() += A.transpose() * omega_r;
-        from->A().noalias() += AtO*A;
+
+        {
+          QuadraticFormLock lck(*from);
+
+          from->b().noalias() += A.transpose() * omega_r;
+          from->A().noalias() += AtO*A;
+        }
+
         if (toNotFixed ) {
           if (_hessianRowMajor) // we have to write to the block as transposed
             _hessianTransposed.noalias() += B.transpose() * AtO.transpose();
           else
             _hessian.noalias() += AtO * B;
         }
-      } 
+      }
       if (toNotFixed) {
+        QuadraticFormLock lck(*to);
+
         to->b().noalias() += B.transpose() * omega_r;
         to->A().noalias() += B.transpose() * omega * B;
       }
@@ -105,24 +130,27 @@ void BaseBinaryEdge<D, E, VertexXiType, VertexXjType>::constructQuadraticForm()
 
       omega_r *= rho[1];
       if (fromNotFixed) {
-        from->b().noalias() += A.transpose() * omega_r;
-        from->A().noalias() += A.transpose() * weightedOmega * A;
+        {
+          QuadraticFormLock lck(*from);
+
+          from->b().noalias() += A.transpose() * omega_r;
+          from->A().noalias() += A.transpose() * weightedOmega * A;
+        }
+
         if (toNotFixed ) {
           if (_hessianRowMajor) // we have to write to the block as transposed
             _hessianTransposed.noalias() += B.transpose() * weightedOmega * A;
           else
             _hessian.noalias() += A.transpose() * weightedOmega * B;
         }
-      } 
+      }
       if (toNotFixed) {
+        QuadraticFormLock lck(*to);
+
         to->b().noalias() += B.transpose() * omega_r;
         to->A().noalias() += B.transpose() * weightedOmega * B;
       }
     }
-#ifdef G2O_OPENMP
-    to->unlockQuadraticForm();
-    from->unlockQuadraticForm();
-#endif
   }
 }
 
@@ -146,17 +174,13 @@ void BaseBinaryEdge<D, E, VertexXiType, VertexXjType>::linearizeOplus()
   if (!iNotFixed && !jNotFixed)
     return;
 
-#ifdef G2O_OPENMP
-  vi->lockQuadraticForm();
-  vj->lockQuadraticForm();
-#endif
-
   const number_t delta = cst(1e-9);
   const number_t scalar = 1 / (2*delta);
   ErrorVector errorBak;
   ErrorVector errorBeforeNumeric = _error;
 
   if (iNotFixed) {
+    QuadraticFormLock lck(*vi);
     //Xi - estimate the jacobian numerically
     number_t add_vi[VertexXiType::Dimension] = {};
 
@@ -181,6 +205,7 @@ void BaseBinaryEdge<D, E, VertexXiType, VertexXjType>::linearizeOplus()
   }
 
   if (jNotFixed) {
+    QuadraticFormLock lck(*vj);
     //Xj - estimate the jacobian numerically
     number_t add_vj[VertexXjType::Dimension] = {};
 
@@ -205,10 +230,6 @@ void BaseBinaryEdge<D, E, VertexXiType, VertexXjType>::linearizeOplus()
   } // end dimension
 
   _error = errorBeforeNumeric;
-#ifdef G2O_OPENMP
-  vj->unlockQuadraticForm();
-  vi->unlockQuadraticForm();
-#endif
 }
 
 template <int D, typename E, typename VertexXiType, typename VertexXjType>

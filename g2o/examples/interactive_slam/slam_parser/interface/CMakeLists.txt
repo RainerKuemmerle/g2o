@@ -28,4 +28,4 @@ INSTALL(TARGETS interface_library
 )
 
 FILE(GLOB headers "${CMAKE_CURRENT_SOURCE_DIR}/*.h")
-INSTALL(FILES ${headers} DESTINATION ${CMAKE_INSTALL_PREFIX}/include/slam_parser/interface)
+INSTALL(FILES ${headers} DESTINATION ${INCLUDES_DESTINATION}/slam_parser/interface)

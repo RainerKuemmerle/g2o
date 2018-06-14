@@ -24,40 +24,57 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef G2O_STREAM_REDIRECT_H
-#define G2O_STREAM_REDIRECT_H
+#ifndef G2O_EDGE_XYZ_PRIOR_H_
+#define G2O_EDGE_XYZ_PRIOR_H_
 
-#include <iostream>
-#include <streambuf>
-#include <string>
-#include <QMutex>
+#include "g2o/core/base_unary_edge.h"
+#include "g2o_types_slam3d_api.h"
+#include "vertex_pointxyz.h"
 
-#include "g2o_viewer_api.h"
-
-class QPlainTextEdit;
-
-/**
- * \brief redirect a stream to a QPlainTextEdit
- */
-class G2O_VIEWER_API StreamRedirect : public std::basic_streambuf<char>
-{
+namespace g2o {
+  /**
+   * \brief prior for an XYZ vertex (VertexPointXYZ)
+   *
+   * Provides a prior for a 3d point vertex. The measurement is represented by a
+   * Vector3 with a corresponding 3x3 upper triangle covariance matrix (upper triangle only).
+   */
+  class G2O_TYPES_SLAM3D_API EdgeXYZPrior : public BaseUnaryEdge<3, Vector3, VertexPointXYZ> {
   public:
-    typedef std::char_traits<char>::int_type int_type;
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+    EdgeXYZPrior();
+    virtual bool read(std::istream& is);
+    virtual bool write(std::ostream& os) const;
 
-  public:
-    StreamRedirect(std::ostream &stream, QPlainTextEdit* te);
-    ~StreamRedirect();
+    void computeError();
+    
+    // jacobian
+    virtual void linearizeOplus();
 
-  protected:
-    virtual std::char_traits<char>::int_type overflow(int_type v);
-    virtual std::streamsize xsputn(const char *p, std::streamsize n); 
+    virtual void setMeasurement(const Vector3& m){
+      _measurement = m;
+    }
 
-  private:
-    std::ostream& _stream;
-    std::streambuf* _old_buf;
-    std::string _buffer;
-    QPlainTextEdit* _te;
-    QMutex _mutex;
-};
+    virtual bool setMeasurementData(const number_t* d){
+        Eigen::Map<const Vector3> v(d);
+        _measurement = v;
+        return true;
+    }
 
+    virtual bool getMeasurementData(number_t* d) const{
+        Eigen::Map<Vector3> v(d);
+        v = _measurement;
+        return true;
+    }
+
+    virtual int measurementDimension() const { return 3; }
+
+    virtual bool setMeasurementFromState() ;
+
+    virtual number_t initialEstimatePossible(const OptimizableGraph::VertexSet& /*from*/, 
+             OptimizableGraph::Vertex* /*to*/) { 
+      return 0.;
+    }
+  };
+
+}
 #endif

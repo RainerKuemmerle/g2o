@@ -198,7 +198,7 @@ class G2O_TYPES_SBA_API EdgeProjectXYZ2UVU : public  BaseBinaryEdge<3, Vector3, 
 };
 
 // Projection using focal_length in x and y directions
-class EdgeSE3ProjectXYZ : public BaseBinaryEdge<2, Vector2, VertexSBAPointXYZ, VertexSE3Expmap> {
+class G2O_TYPES_SBA_API EdgeSE3ProjectXYZ : public BaseBinaryEdge<2, Vector2, VertexSBAPointXYZ, VertexSE3Expmap> {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
@@ -229,7 +229,7 @@ class EdgeSE3ProjectXYZ : public BaseBinaryEdge<2, Vector2, VertexSBAPointXYZ, V
 };
 
 // Edge to optimize only the camera pose
-class EdgeSE3ProjectXYZOnlyPose : public BaseUnaryEdge<2, Vector2, VertexSE3Expmap> {
+class G2O_TYPES_SBA_API EdgeSE3ProjectXYZOnlyPose : public BaseUnaryEdge<2, Vector2, VertexSE3Expmap> {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
@@ -259,7 +259,7 @@ class EdgeSE3ProjectXYZOnlyPose : public BaseUnaryEdge<2, Vector2, VertexSE3Expm
 };
 
 // Projection using focal_length in x and y directions stereo
-class EdgeStereoSE3ProjectXYZ : public BaseBinaryEdge<3, Vector3, VertexSBAPointXYZ, VertexSE3Expmap> {
+class G2O_TYPES_SBA_API EdgeStereoSE3ProjectXYZ : public BaseBinaryEdge<3, Vector3, VertexSBAPointXYZ, VertexSE3Expmap> {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
@@ -290,7 +290,7 @@ class EdgeStereoSE3ProjectXYZ : public BaseBinaryEdge<3, Vector3, VertexSBAPoint
 };
 
 // Edge to optimize only the camera pose stereo
-class EdgeStereoSE3ProjectXYZOnlyPose : public BaseUnaryEdge<3, Vector3, VertexSE3Expmap> {
+class G2O_TYPES_SBA_API EdgeStereoSE3ProjectXYZOnlyPose : public BaseUnaryEdge<3, Vector3, VertexSE3Expmap> {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 

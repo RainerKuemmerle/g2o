@@ -98,7 +98,16 @@ If using [Homebrew](http://brew.sh/), then
 
 will install g2o together with its required dependencies. In this case no manual compilation is necessary.
 
+#### Windows
+
+If using [vcpkg](https://github.com/Microsoft/vcpkg), then
+
+`scripts\install-deps-windows.bat`
+
+will build and install the required dependencies. The location of `vcpkg` and required triplet are determined by the environment variables `VCPKG_ROOT_DIR` and `VCPKG_DEFAULT_TRIPLET`.
+
 ### Compilation
+
 Our primary development platform is Linux. Experimental support for
 Mac OS X, Android and Windows (MinGW or MSVC).
 We recommend a so-called out of source build which can be achieved
@@ -111,7 +120,14 @@ by the following command sequence.
 
 The binaries will be placed in bin and the libraries in lib which
 are both located in the top-level folder.
-If you are compiling on Windows, please download Eigen3 and extract it.
+
+On Windows with `vcpkg` the following two commands will generate build scripts for Visual Studio 2017 MSVC 14 tool set:
+
+- `mkdir build`
+- `cd build`
+- `cmake -G "Visual Studio 14 2017 Win64" -DG2O_BUILD_APPS=ON -DG2O_BUILD_EXAMPLES=ON -DVCPKG_TARGET_TRIPLET="%VCPKG_DEFAULT_TRIPLET%" -DCMAKE_TOOLCHAIN_FILE="%VCPKG_ROOT_DIR%\scripts\buildsystems\vcpkg.cmake" ..`
+
+If you are compiling on Windows and you are for some reasons **not** using `vcpkg` please download Eigen3 and extract it.
 Within cmake-gui set the variable G2O\_EIGEN3\_INCLUDE to that directory.
 
 ### Cross-Compiling for Android
@@ -128,6 +144,7 @@ We thank the following contributors for providing patches:
 - Mark Pupilli for submitting patches to compile with MSVC.
 
 ### Projects using g2o
+- [g2opy](https://github.com/uoip/g2opy): Python binding
 - [.Net wrapper](https://github.com/fugro/g2o)
 
 ### Contact information

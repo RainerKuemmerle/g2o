@@ -24,40 +24,54 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef G2O_STREAM_REDIRECT_H
-#define G2O_STREAM_REDIRECT_H
-
+#include "edge_xyz_prior.h"
 #include <iostream>
-#include <streambuf>
-#include <string>
-#include <QMutex>
 
-#include "g2o_viewer_api.h"
+namespace g2o {
+  using namespace std;
 
-class QPlainTextEdit;
+  EdgeXYZPrior::EdgeXYZPrior() : BaseUnaryEdge<3, Vector3, VertexPointXYZ>() {
+    information().setIdentity();
+  }
 
-/**
- * \brief redirect a stream to a QPlainTextEdit
- */
-class G2O_VIEWER_API StreamRedirect : public std::basic_streambuf<char>
-{
-  public:
-    typedef std::char_traits<char>::int_type int_type;
+  bool EdgeXYZPrior::read(std::istream& is) {
+    // read measurement
+    Vector3 meas;
+    for (int i=0; i<3; i++) is >> meas[i];
+    setMeasurement(meas);
+    // read covariance matrix (upper triangle)
+    if (is.good()) {
+      for ( int i=0; i<information().rows(); i++)
+        for (int j=i; j<information().cols(); j++){
+          is >> information()(i,j);
+          if (i!=j)
+            information()(j,i)=information()(i,j);
+        }
+    }
+    return !is.fail();
+  }
 
-  public:
-    StreamRedirect(std::ostream &stream, QPlainTextEdit* te);
-    ~StreamRedirect();
+  bool EdgeXYZPrior::write(std::ostream& os) const {
+    for (int i = 0; i<3; i++) os << measurement()[i] << " ";
+    for (int i=0; i<information().rows(); i++)
+      for (int j=i; j<information().cols(); j++) {
+        os << information()(i,j) << " ";
+      }
+    return os.good();
+  }
 
-  protected:
-    virtual std::char_traits<char>::int_type overflow(int_type v);
-    virtual std::streamsize xsputn(const char *p, std::streamsize n); 
+  void EdgeXYZPrior::computeError() {
+    const VertexPointXYZ* v = static_cast<const VertexPointXYZ*>(_vertices[0]);
+    _error = v->estimate() - _measurement;
+  }
 
-  private:
-    std::ostream& _stream;
-    std::streambuf* _old_buf;
-    std::string _buffer;
-    QPlainTextEdit* _te;
-    QMutex _mutex;
-};
+  void EdgeXYZPrior::linearizeOplus(){
+      _jacobianOplusXi = Matrix3::Identity();
+  }
 
-#endif
+  bool EdgeXYZPrior::setMeasurementFromState(){
+      const VertexPointXYZ* v = static_cast<const VertexPointXYZ*>(_vertices[0]);
+      _measurement = v->estimate();
+      return true;
+  }
+}
