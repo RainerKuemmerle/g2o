@@ -23,4 +23,4 @@ INSTALL(TARGETS solver_slam2d_linear
 
 FILE(GLOB headers "${CMAKE_CURRENT_SOURCE_DIR}/*.h" "${CMAKE_CURRENT_SOURCE_DIR}/*.hpp")
 
-INSTALL(FILES ${headers} DESTINATION ${INCLUDES_DESTINATION}/solvers/slam2d_linear)
+INSTALL(FILES ${headers} DESTINATION ${INCLUDES_INSTALL_DIR}/solvers/slam2d_linear)

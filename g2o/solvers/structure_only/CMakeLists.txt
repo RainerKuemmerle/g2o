@@ -16,4 +16,4 @@ INSTALL(TARGETS solver_structure_only
 
 FILE(GLOB headers "${CMAKE_CURRENT_SOURCE_DIR}/*.h" "${CMAKE_CURRENT_SOURCE_DIR}/*.hpp")
 
-INSTALL(FILES ${headers} DESTINATION ${INCLUDES_DESTINATION}/solvers/structure_only)
+INSTALL(FILES ${headers} DESTINATION ${INCLUDES_INSTALL_DIR}/solvers/structure_only)

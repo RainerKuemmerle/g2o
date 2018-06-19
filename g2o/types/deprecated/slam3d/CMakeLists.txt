@@ -37,4 +37,4 @@ INSTALL(TARGETS deprecated_types_slam3d
   )
 
 FILE(GLOB headers "${CMAKE_CURRENT_SOURCE_DIR}/*.h" "${CMAKE_CURRENT_SOURCE_DIR}/*.hpp")
-INSTALL(FILES ${headers} DESTINATION ${INCLUDES_DESTINATION}/g2o/types/deprecated/slam3d)
+INSTALL(FILES ${headers} DESTINATION ${INCLUDES_INSTALL_DIR}/types/deprecated/slam3d)

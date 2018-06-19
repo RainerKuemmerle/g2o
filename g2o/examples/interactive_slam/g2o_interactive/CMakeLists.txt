@@ -25,4 +25,4 @@ INSTALL(TARGETS g2o_interactive_library g2o_online_application
 )
 
 FILE(GLOB headers "${CMAKE_CURRENT_SOURCE_DIR}/*.h" "${CMAKE_CURRENT_SOURCE_DIR}/*.hpp")
-INSTALL(FILES ${headers} DESTINATION ${INCLUDES_DESTINATION}/examples/interactive_slam/g2o_interactive)
+INSTALL(FILES ${headers} DESTINATION ${INCLUDES_INSTALL_DIR}/examples/interactive_slam/g2o_interactive)

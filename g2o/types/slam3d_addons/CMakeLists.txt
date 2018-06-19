@@ -33,4 +33,4 @@ INSTALL(TARGETS types_slam3d_addons
 )
 
 FILE(GLOB headers "${CMAKE_CURRENT_SOURCE_DIR}/*.h" "${CMAKE_CURRENT_SOURCE_DIR}/*.hpp")
-INSTALL(FILES ${headers} DESTINATION ${INCLUDES_DESTINATION}/g2o/types/slam3d_addons)
+INSTALL(FILES ${headers} DESTINATION ${INCLUDES_INSTALL_DIR}/types/slam3d_addons)

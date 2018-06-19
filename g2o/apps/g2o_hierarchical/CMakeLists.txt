@@ -38,4 +38,4 @@ INSTALL(TARGETS g2o_hierarchical_library
 FILE(GLOB headers "${CMAKE_CURRENT_SOURCE_DIR}/*.h" "${CMAKE_CURRENT_SOURCE_DIR}/*.hpp")
 INSTALL(FILES
   ${headers}
-  DESTINATION ${INCLUDES_DESTINATION}/apps/g2o_hierarchical)
+  DESTINATION ${INCLUDES_INSTALL_DIR}/apps/g2o_hierarchical)
