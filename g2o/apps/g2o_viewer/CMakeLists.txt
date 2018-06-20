@@ -21,6 +21,9 @@ ADD_LIBRARY(viewer_library ${G2O_LIB_TYPE}
   ${UI_HEADERS} ${UI_SOURCES}
 )
 SET_TARGET_PROPERTIES(viewer_library PROPERTIES OUTPUT_NAME ${LIB_PREFIX}viewer)
+if (APPLE)
+  set_target_properties(viewer_library PROPERTIES INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib")
+endif()
 
 ADD_EXECUTABLE(g2o_viewer
   g2o_viewer.cpp

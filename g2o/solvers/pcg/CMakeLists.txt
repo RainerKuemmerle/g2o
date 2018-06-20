@@ -5,6 +5,9 @@ ADD_LIBRARY(solver_pcg ${G2O_LIB_TYPE}
 )
 
 SET_TARGET_PROPERTIES(solver_pcg PROPERTIES OUTPUT_NAME ${LIB_PREFIX}solver_pcg)
+if (APPLE)
+  set_target_properties(solver_pcg PROPERTIES INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib")
+endif()
 
 TARGET_LINK_LIBRARIES(solver_pcg core)
 

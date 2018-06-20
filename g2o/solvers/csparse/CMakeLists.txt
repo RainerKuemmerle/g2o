@@ -9,6 +9,9 @@ ADD_LIBRARY(csparse_extension ${G2O_LGPL_LIB_TYPE}
   g2o_csparse_extension_api.h
 )
 SET_TARGET_PROPERTIES(csparse_extension PROPERTIES OUTPUT_NAME ${LIB_PREFIX}csparse_extension)
+if (APPLE)
+  set_target_properties(csparse_extension PROPERTIES INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib")
+endif()
 
 IF(BUILD_CSPARSE)
   TARGET_LINK_LIBRARIES(csparse_extension PUBLIC csparse)
@@ -24,6 +27,9 @@ ADD_LIBRARY(solver_csparse ${G2O_LIB_TYPE}
   g2o_csparse_api.h
 )
 SET_TARGET_PROPERTIES(solver_csparse PROPERTIES OUTPUT_NAME ${LIB_PREFIX}solver_csparse)
+if (APPLE)
+  set_target_properties(solver_csparse PROPERTIES INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib")
+endif()
 
 TARGET_LINK_LIBRARIES(solver_csparse
   PUBLIC csparse_extension

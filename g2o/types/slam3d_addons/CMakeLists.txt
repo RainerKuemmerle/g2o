@@ -18,7 +18,9 @@ ADD_LIBRARY(types_slam3d_addons ${G2O_LIB_TYPE}
 
 
 SET_TARGET_PROPERTIES(types_slam3d_addons PROPERTIES OUTPUT_NAME ${LIB_PREFIX}types_slam3d_addons)
-
+if (APPLE)
+  set_target_properties(types_slam3d_addons PROPERTIES INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib")
+endif()
 TARGET_LINK_LIBRARIES(types_slam3d_addons types_slam3d core)
 IF(G2O_HAVE_OPENGL)
   TARGET_LINK_LIBRARIES(types_slam3d_addons ${OPENGL_gl_LIBRARY} )

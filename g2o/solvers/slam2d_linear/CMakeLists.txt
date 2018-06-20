@@ -11,6 +11,10 @@ ADD_LIBRARY(solver_slam2d_linear ${G2O_LIB_TYPE}
 INCLUDE_DIRECTORIES(${CSPARSE_INCLUDE_DIR})
 
 SET_TARGET_PROPERTIES(solver_slam2d_linear PROPERTIES OUTPUT_NAME ${LIB_PREFIX}solver_slam2d_linear)
+if (APPLE)
+  set_target_properties(solver_slam2d_linear PROPERTIES INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib")
+endif()
+
 TARGET_LINK_LIBRARIES(solver_slam2d_linear solver_csparse types_slam2d)
 
 INSTALL(TARGETS solver_slam2d_linear

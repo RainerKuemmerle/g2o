@@ -8,6 +8,9 @@ TARGET_LINK_LIBRARIES(freeglut_minimal PUBLIC "${OPENGL_gl_LIBRARY}")
 TARGET_LINK_LIBRARIES(freeglut_minimal PUBLIC "${LIB_PREFIX}config")
 
 SET_TARGET_PROPERTIES(freeglut_minimal PROPERTIES OUTPUT_NAME ${LIB_PREFIX}ext_freeglut_minimal)
+if (APPLE)
+  set_target_properties(freeglut_minimal PROPERTIES INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib")
+endif()
 
 INSTALL(TARGETS freeglut_minimal
   RUNTIME DESTINATION bin
