@@ -18,7 +18,9 @@ ADD_LIBRARY(types_slam2d ${G2O_LIB_TYPE}
 )
 
 SET_TARGET_PROPERTIES(types_slam2d PROPERTIES OUTPUT_NAME ${LIB_PREFIX}types_slam2d)
-
+if (APPLE)
+  set_target_properties(types_slam2d PROPERTIES INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib")
+endif()
 TARGET_LINK_LIBRARIES(types_slam2d core)
 IF(G2O_HAVE_OPENGL)
   TARGET_LINK_LIBRARIES(types_slam2d opengl_helper ${OPENGL_gl_LIBRARY} )

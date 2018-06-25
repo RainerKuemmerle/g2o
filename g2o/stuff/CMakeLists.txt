@@ -11,6 +11,10 @@ ADD_LIBRARY(stuff ${G2O_LIB_TYPE}
 )
 
 SET_TARGET_PROPERTIES(stuff PROPERTIES OUTPUT_NAME ${LIB_PREFIX}stuff)
+if (APPLE)
+  set_target_properties(stuff PROPERTIES INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib")
+endif()
+
 TARGET_LINK_LIBRARIES(stuff PUBLIC "${LIB_PREFIX}config")
 
 INSTALL(TARGETS stuff
@@ -23,7 +27,10 @@ INSTALL(TARGETS stuff
 IF(OPENGL_FOUND AND G2O_HAVE_OPENGL)
   ADD_LIBRARY(opengl_helper ${G2O_LIB_TYPE}
     opengl_primitives.cpp opengl_primitives.h
-  )
+    )
+  if (APPLE)
+  set_target_properties(opengl_helper PROPERTIES INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib")
+endif()
   INSTALL(TARGETS opengl_helper
     RUNTIME DESTINATION bin
     LIBRARY DESTINATION lib

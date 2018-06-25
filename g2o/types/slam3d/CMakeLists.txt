@@ -39,6 +39,9 @@ ADD_LIBRARY(types_slam3d ${G2O_LIB_TYPE}
 
 
 SET_TARGET_PROPERTIES(types_slam3d PROPERTIES OUTPUT_NAME ${LIB_PREFIX}types_slam3d)
+if (APPLE)
+  set_target_properties(types_slam3d PROPERTIES INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib")
+endif()
 TARGET_LINK_LIBRARIES(types_slam3d core)
 IF(G2O_HAVE_OPENGL)
   TARGET_LINK_LIBRARIES(types_slam3d opengl_helper ${OPENGL_gl_LIBRARY} )
