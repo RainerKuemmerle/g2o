@@ -5,7 +5,9 @@ ADD_LIBRARY(types_sba ${G2O_LIB_TYPE}
 )
 
 SET_TARGET_PROPERTIES(types_sba PROPERTIES OUTPUT_NAME ${LIB_PREFIX}types_sba)
-
+if (APPLE)
+  set_target_properties(types_sba PROPERTIES INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib")
+endif()
 TARGET_LINK_LIBRARIES(types_sba core types_slam3d)
 
 INSTALL(TARGETS types_sba
