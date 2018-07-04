@@ -155,8 +155,16 @@ ENDIF(G2O_USE_OPENMP)
 # OpenGL is used in the draw actions for the different types, as well
 # as for creating the GUI itself
 FIND_PACKAGE(OpenGL)
+
+# If OpenGL was found, use the import target if available. If not, use old-style includes
 SET(G2O_USE_OPENGL ON CACHE BOOL "Build g2o with OpenGL support for visualization")
 IF (OPENGL_FOUND AND G2O_USE_OPENGL)
+  IF (TARGET OpenGL::GL)
+    SET(G2O_OPENGL_TARGET OpenGL::GL)
+  ELSE()
+    SET(G2O_OPENGL_TARGET "${OPENGL_LIBRARIES}")
+    INCLUDE_DIRECTORIES(${OPENGL_INCLUDE_DIR})
+  ENDIF()
   SET (G2O_HAVE_OPENGL 1)
   MESSAGE(STATUS "Compiling with OpenGL support")
 ENDIF()
@@ -350,9 +358,9 @@ FIND_PACKAGE(Eigen3 NO_MODULE)
 # the include directory.
 IF (TARGET Eigen3::Eigen)
   SET(G2O_EIGEN3_EIGEN_TARGET Eigen3::Eigen)
- ELSE(TARGET Eigen3::Eigen)
+ ELSE()
   INCLUDE_DIRECTORIES(${EIGEN3_INCLUDE_DIR})
-ENDIF (TARGET Eigen3::Eigen)
+ENDIF ()
 
 # Set up the top-level include directories
 INCLUDE_DIRECTORIES(${g2o_SOURCE_DIR} ${PROJECT_BINARY_DIR})
