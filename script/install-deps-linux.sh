@@ -11,7 +11,7 @@ wget -O eigen3.zip http://bitbucket.org/eigen/eigen/get/3.3.4.zip
 unzip -q eigen3.zip
 ls -l eigen*
 mkdir eigen-eigen-5a0156e40feb-build
-pushd eigen-eigen-5a0156e40feb-build > /dev/null
+cd eigen-eigen-5a0156e40feb-build
 cmake ../eigen-eigen-5a0156e40feb -DBUILD_TESTING=OFF -DCMAKE_INSTALL_PREFIX=/usr/include
 sudo make install
-popd > /dev/null
+cd ..
