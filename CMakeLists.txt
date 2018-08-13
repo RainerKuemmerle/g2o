@@ -351,14 +351,16 @@ SET(CMAKE_CXX_STANDARD_REQUIRED ON)
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${g2o_CXX_FLAGS}")
 SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${g2o_C_FLAGS}")
 
-# Find Eigen3. See https://eigen.tuxfamily.org/dox/TopicCMakeGuide.html for details
-FIND_PACKAGE(Eigen3 NO_MODULE)
+# Find Eigen3. First try to find it using the configuration file form
+# because this is our target of choice. If this fails, fall back to the
+# using the module form.
+# See https://eigen.tuxfamily.org/dox/TopicCMakeGuide.html for details
 
-# Use the Eigen3 target if it was declared. If not, include
-# the include directory.
+FIND_PACKAGE(Eigen3 NO_MODULE)
 IF (TARGET Eigen3::Eigen)
   SET(G2O_EIGEN3_EIGEN_TARGET Eigen3::Eigen)
- ELSE()
+ELSE()
+  FIND_PACKAGE(Eigen3 REQUIRED)
   INCLUDE_DIRECTORIES(${EIGEN3_INCLUDE_DIR})
 ENDIF ()
 
