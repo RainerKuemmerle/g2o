@@ -517,7 +517,7 @@ bool BlockSolver<Traits>::buildSystem()
     v->copyB(_b+iBase);
   }
 
-  return 0;
+  return false;
 }
 
 

@@ -83,7 +83,7 @@ RobustKernel* RobustKernelFactory::construct(const std::string& tag) const
   if (foundIt != _creator.end()) {
     return foundIt->second->construct();
   }
-  return 0;
+  return nullptr;
 }
 
 AbstractRobustKernelCreator* RobustKernelFactory::creator(const std::string& tag) const
@@ -92,7 +92,7 @@ AbstractRobustKernelCreator* RobustKernelFactory::creator(const std::string& tag
   if (foundIt != _creator.end()) {
     return foundIt->second;
   }
-  return 0;
+  return nullptr;
 }
 
 void RobustKernelFactory::fillKnownKernels(std::vector<std::string>& types) const

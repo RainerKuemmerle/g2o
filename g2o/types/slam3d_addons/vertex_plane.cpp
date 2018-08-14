@@ -77,7 +77,7 @@ namespace g2o
                  HyperGraphElementAction::Parameters* params_)
   {
     if (typeid(*element).name()!=_typeName)
-      return 0;
+      return nullptr;
 
     refreshPropertyPtrs(params_);
     if (! _previousParams)

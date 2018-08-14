@@ -106,7 +106,7 @@ namespace g2o {
   HyperGraphElementAction* CacheSE3OffsetDrawAction::operator()(HyperGraph::HyperGraphElement* element, 
                 HyperGraphElementAction::Parameters* params_){
     if (typeid(*element).name()!=_typeName)
-      return 0;
+      return nullptr;
     CacheSE3Offset* that = static_cast<CacheSE3Offset*>(element);
     refreshPropertyPtrs(params_);
     if (! _previousParams)

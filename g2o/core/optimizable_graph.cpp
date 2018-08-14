@@ -80,7 +80,7 @@ namespace g2o {
 
   OptimizableGraph::Vertex* OptimizableGraph::Vertex::clone() const
   {
-    return 0;
+    return nullptr;
   }
 
   bool OptimizableGraph::Vertex::setEstimateData(const number_t* v)
@@ -131,19 +131,19 @@ namespace g2o {
 
   OptimizableGraph* OptimizableGraph::Edge::graph(){
     if (! _vertices.size())
-      return 0;
+      return nullptr;
     OptimizableGraph::Vertex* v=(OptimizableGraph::Vertex*)_vertices[0];
     if (!v)
-      return 0;
+      return nullptr;
     return v->graph();
   }
 
   const OptimizableGraph* OptimizableGraph::Edge::graph() const{
     if (! _vertices.size())
-      return 0;
+      return nullptr;
     const OptimizableGraph::Vertex* v=(const OptimizableGraph::Vertex*) _vertices[0];
     if (!v)
-      return 0;
+      return nullptr;
     return v->graph();
   }
 
@@ -214,7 +214,7 @@ namespace g2o {
   OptimizableGraph::Edge* OptimizableGraph::Edge::clone() const
   {
     // TODO
-    return 0;
+    return nullptr;
   }
 
 

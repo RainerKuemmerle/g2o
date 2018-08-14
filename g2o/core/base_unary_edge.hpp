@@ -41,7 +41,7 @@ template <int D, typename E, typename VertexXiType>
 OptimizableGraph::Vertex* BaseUnaryEdge<D, E, VertexXiType>::createVertex(int i)
 {
   if (i!=0)
-    return 0;
+    return nullptr;
   return new VertexXiType();
 }
 
