@@ -11,7 +11,7 @@ sudo apt-get update -qq
 sudo apt-get install -qq qtdeclarative5-dev qt5-qmake libqglviewer-dev libsuitesparse-dev
 
 # install new gcc
-if [[ "$CC" == "gcc" ]]; then
+if [ "$CC" = "gcc" ]; then
   sudo apt-get install -qq gcc-7 g++-7
 fi
 
