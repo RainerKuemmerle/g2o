@@ -27,10 +27,16 @@ install:
 before_script:
   - mkdir build
   - cd build
+  - if [[ "$CC" == "gcc" && "$TRAVIS_OS_NAME" == "linux" ]]; then
+      export CC=gcc-7 ;
+      export CXX=g++-7 ;
+    fi
+  - cmake --version
   - cmake ..
   - cat g2o/config.h
 
-script: make
+script:
+  - make
 
 # right now only build the master branch
 branches:
