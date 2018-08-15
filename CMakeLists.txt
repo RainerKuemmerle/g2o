@@ -49,8 +49,8 @@ if(MSVC90)
   message(STATUS "Disabling memory alignment for MSVC8")
 endif(MSVC90)
 
-# On the Mac platform, configure the RPATH as per the install, to
-# avoid the problem of loading both the built and installed versions
+# On the Mac platform, configure the RPATH as per the INSTALL, to
+# avoid the problem of loading both the built and INSTALLed versions
 # of the shared targets
 IF(APPLE)
   SET(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
@@ -67,6 +67,13 @@ ENDIF(WIN32)
 SET(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${g2o_LIBRARY_OUTPUT_DIRECTORY})
 SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${g2o_LIBRARY_OUTPUT_DIRECTORY})
 SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${g2o_RUNTIME_OUTPUT_DIRECTORY})
+
+# Set standard installation directories
+SET(RUNTIME_DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
+SET(LIBRARY_DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
+SET(ARCHIVE_DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
+SET(INCLUDES_DESTINATION ${CMAKE_INSTALL_PREFIX}/include)
+SET(INCLUDES_INSTALL_DIR ${INCLUDES_DESTINATION}/g2o)
 
 # Set search directory for looking for our custom CMake scripts to
 # look for SuiteSparse, QGLViewer, and Eigen3.
@@ -148,11 +155,19 @@ ENDIF(G2O_USE_OPENMP)
 # OpenGL is used in the draw actions for the different types, as well
 # as for creating the GUI itself
 FIND_PACKAGE(OpenGL)
+
+# If OpenGL was found, use the import target if available. If not, use old-style includes
 SET(G2O_USE_OPENGL ON CACHE BOOL "Build g2o with OpenGL support for visualization")
 IF (OPENGL_FOUND AND G2O_USE_OPENGL)
+  IF (TARGET OpenGL::GL)
+    SET(G2O_OPENGL_TARGET "OpenGL::GL;OpenGL::GLU")
+  ELSE()
+    SET(G2O_OPENGL_TARGET "${OPENGL_LIBRARIES}")
+    INCLUDE_DIRECTORIES(${OPENGL_INCLUDE_DIR})
+  ENDIF()
   SET (G2O_HAVE_OPENGL 1)
-  INCLUDE_DIRECTORIES(${OPENGL_INCLUDE_DIR})
   MESSAGE(STATUS "Compiling with OpenGL support")
+  MESSAGE(WARNING G2O_OPENGL_TARGET=${G2O_OPENGL_TARGET})
 ENDIF()
 
 # For building the GUI
@@ -330,18 +345,28 @@ IF(MSVC)
 ENDIF(MSVC)
 
 # C++11 support
-set(CMAKE_CXX_STANDARD 11)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
+SET(CMAKE_CXX_STANDARD 11)
+SET(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # specifying compiler flags
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${g2o_CXX_FLAGS}")
 SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${g2o_C_FLAGS}")
 
-# Find Eigen3
-FIND_PACKAGE(Eigen3 REQUIRED)
+# Find Eigen3. First try to find it using the configuration file form
+# because this is our target of choice. If this fails, fall back to the
+# using the module form.
+# See https://eigen.tuxfamily.org/dox/TopicCMakeGuide.html for details
+
+FIND_PACKAGE(Eigen3 NO_MODULE)
+IF (TARGET Eigen3::Eigen)
+  SET(G2O_EIGEN3_EIGEN_TARGET Eigen3::Eigen)
+ELSE()
+  FIND_PACKAGE(Eigen3 REQUIRED)
+  INCLUDE_DIRECTORIES(${EIGEN3_INCLUDE_DIR})
+ENDIF ()
 
 # Set up the top-level include directories
-INCLUDE_DIRECTORIES(${g2o_SOURCE_DIR} ${EIGEN3_INCLUDE_DIR})
+INCLUDE_DIRECTORIES(${g2o_SOURCE_DIR} ${PROJECT_BINARY_DIR})
 
 # Generate config.h
 SET(G2O_OPENGL_FOUND ${OPENGL_FOUND})
@@ -350,10 +375,36 @@ SET(G2O_HAVE_CSPARSE ${CSPARSE_FOUND})
 SET(G2O_SHARED_LIBS ${BUILD_SHARED_LIBS})
 SET(G2O_LGPL_SHARED_LIBS ${BUILD_LGPL_SHARED_LIBS})
 SET(G2O_CXX_COMPILER "${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER}")
+
 configure_file(config.h.in "${PROJECT_BINARY_DIR}/g2o/config.h")
-add_library("${LIB_PREFIX}config" INTERFACE)
-TARGET_INCLUDE_DIRECTORIES("${LIB_PREFIX}config" INTERFACE "${PROJECT_BINARY_DIR}")
-INSTALL(FILES ${PROJECT_BINARY_DIR}/g2o/config.h DESTINATION include/g2o)
+INSTALL(FILES ${PROJECT_BINARY_DIR}/g2o/config.h DESTINATION ${INCLUDES_DESTINATION}/g2o)
+
+
+# Generate cmake configuration scripts
+SET(G2O_GENERATED_DIR "${CMAKE_CURRENT_BINARY_DIR}/generated")
+SET(G2O_VERSION_CONFIG "${G2O_GENERATED_DIR}/${PROJECT_NAME}ConfigVersion.cmake")
+SET(G2O_PROJECT_CONFIG "${G2O_GENERATED_DIR}/${PROJECT_NAME}Config.cmake")
+SET(G2O_TARGETS_EXPORT_NAME "${PROJECT_NAME}Targets")
+SET(G2O_CONFIG_INSTALL_DIR "lib/cmake/${PROJECT_NAME}")
+SET(G2O_NAMESPACE "${PROJECT_NAME}::")
+SET(G2O_VERSION 1.0.0)
+
+INCLUDE(CMakePackageConfigHelpers)
+WRITE_BASIC_PACKAGE_VERSION_FILE(
+    "${G2O_VERSION_CONFIG}" VERSION ${G2O_VERSION} COMPATIBILITY SameMajorVersion
+)
+
+CONFIGURE_FILE("${g2o_SOURCE_DIR}/cmake_modules/Config.cmake.in" "${G2O_PROJECT_CONFIG}" @ONLY)
+
+
+INSTALL(
+    FILES "${G2O_PROJECT_CONFIG}" "${G2O_VERSION_CONFIG}"
+    DESTINATION "${G2O_CONFIG_INSTALL_DIR}")
+
+INSTALL(
+    EXPORT "${G2O_TARGETS_EXPORT_NAME}"
+    NAMESPACE "${G2O_NAMESPACE}"
+    DESTINATION "${G2O_CONFIG_INSTALL_DIR}")
 
 # Include the subdirectories
 ADD_SUBDIRECTORY(EXTERNAL)
