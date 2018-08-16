@@ -45,6 +45,11 @@ private:
 
 } // anonymous namespace
 
+
+#define VERTEX_I_DIM ((VertexXiType::Dimension < 0) ? _vertices[0]->dimension() : VertexXiType::Dimension)
+#define VERTEX_J_DIM ((VertexXjType::Dimension < 0) ? _vertices[1]->dimension() : VertexXjType::Dimension)
+
+
 template <int D, typename E, typename VertexXiType, typename VertexXjType>
 OptimizableGraph::Vertex* BaseBinaryEdge<D, E, VertexXiType, VertexXjType>::createFrom(){
   return createVertex(0);
@@ -60,6 +65,26 @@ OptimizableGraph::Vertex* BaseBinaryEdge<D, E, VertexXiType, VertexXjType>::crea
   switch(i) {
   case 0: return new VertexXiType();
   case 1: return new VertexXjType();
+  default: return 0;
+  }
+}
+
+
+template <int D, typename E, typename VertexXiType, typename VertexXjType>
+OptimizableGraph::Vertex* BaseBinaryEdge<D, E, VertexXiType, VertexXjType>::createFrom(int dimension){
+  return createVertex(0, dimension);
+}
+
+template <int D, typename E, typename VertexXiType, typename VertexXjType>
+OptimizableGraph::Vertex* BaseBinaryEdge<D, E, VertexXiType, VertexXjType>::createTo(int dimension){
+  return createVertex(1, dimension);
+}
+
+template <int D, typename E, typename VertexXiType, typename VertexXjType>
+OptimizableGraph::Vertex* BaseBinaryEdge<D, E, VertexXiType, VertexXjType>::createVertex(int i, int dimension){
+  switch(i) {
+  case 0: return new VertexXiType(dimension);
+  case 1: return new VertexXjType(dimension);
   default: return 0;
   }
 }
@@ -157,8 +182,8 @@ void BaseBinaryEdge<D, E, VertexXiType, VertexXjType>::constructQuadraticForm()
 template <int D, typename E, typename VertexXiType, typename VertexXjType>
 void BaseBinaryEdge<D, E, VertexXiType, VertexXjType>::linearizeOplus(JacobianWorkspace& jacobianWorkspace)
 {
-  new (&_jacobianOplusXi) JacobianXiOplusType(jacobianWorkspace.workspaceForVertex(0), D < 0 ? _dimension : D, Di);
-  new (&_jacobianOplusXj) JacobianXjOplusType(jacobianWorkspace.workspaceForVertex(1), D < 0 ? _dimension : D, Dj);
+  new (&_jacobianOplusXi) JacobianXiOplusType(jacobianWorkspace.workspaceForVertex(0), D < 0 ? _dimension : D, VERTEX_I_DIM);
+  new (&_jacobianOplusXj) JacobianXjOplusType(jacobianWorkspace.workspaceForVertex(1), D < 0 ? _dimension : D, VERTEX_J_DIM);
   linearizeOplus();
 }
 
@@ -185,7 +210,7 @@ void BaseBinaryEdge<D, E, VertexXiType, VertexXjType>::linearizeOplus()
     number_t add_vi[VertexXiType::Dimension] = {};
 
     // add small step along the unit vector in each dimension
-    for (int d = 0; d < VertexXiType::Dimension; ++d) {
+    for (int d = 0; d < VERTEX_I_DIM; ++d) {
       vi->push();
       add_vi[d] = delta;
       vi->oplus(add_vi);
@@ -210,7 +235,7 @@ void BaseBinaryEdge<D, E, VertexXiType, VertexXjType>::linearizeOplus()
     number_t add_vj[VertexXjType::Dimension] = {};
 
     // add small step along the unit vector in each dimension
-    for (int d = 0; d < VertexXjType::Dimension; ++d) {
+    for (int d = 0; d < VERTEX_J_DIM; ++d) {
       vj->push();
       add_vj[d] = delta;
       vj->oplus(add_vj);
@@ -238,9 +263,13 @@ void BaseBinaryEdge<D, E, VertexXiType, VertexXjType>::mapHessianMemory(number_t
   (void) i; (void) j;
   //assert(i == 0 && j == 1);
   if (rowMajor) {
-    new (&_hessianTransposed) HessianBlockTransposedType(d, VertexXjType::Dimension, VertexXiType::Dimension);
+    new (&_hessianTransposed) HessianBlockTransposedType(d, VERTEX_I_DIM, VERTEX_J_DIM);
   } else {
-    new (&_hessian) HessianBlockType(d, VertexXiType::Dimension, VertexXjType::Dimension);
+    new (&_hessian) HessianBlockType(d, VERTEX_I_DIM, VERTEX_J_DIM);
   }
   _hessianRowMajor = rowMajor;
 }
+
+#undef VERTEX_I_DIM
+#undef VERTEX_J_DIM
+

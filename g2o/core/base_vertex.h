@@ -38,8 +38,8 @@
 #include <stack>
 
 namespace g2o {
-
-/**
+#define VERTEX_DIM ((D < 0) ? _dimension : D)
+  /**
  * \brief Templatized BaseVertex
  *
  * Templatized BaseVertex
@@ -59,10 +59,10 @@ namespace g2o {
     typedef Eigen::Map<Eigen::Matrix<number_t, D, D, Eigen::ColMajor>, Eigen::Matrix<number_t, D, D, Eigen::ColMajor>::Flags & Eigen::PacketAccessBit ? Eigen::Aligned : Eigen::Unaligned >  HessianBlockType;
 
   public:
-    BaseVertex();
+    BaseVertex(int dimension);
 
-    virtual const number_t& hessian(int i, int j) const { assert(i<D && j<D); return _hessian(i,j);}
-    virtual number_t& hessian(int i, int j)  { assert(i<D && j<D); return _hessian(i,j);}
+    virtual const number_t& hessian(int i, int j) const { assert(i<VERTEX_DIM && j<VERTEX_DIM); return _hessian(i,j);}
+    virtual number_t& hessian(int i, int j)  { assert(i<VERTEX_DIM && j<VERTEX_DIM); return _hessian(i,j);}
     virtual number_t hessianDeterminant() const {return _hessian.determinant();}
     virtual number_t* hessianData() { return const_cast<number_t*>(_hessian.data());}
 
@@ -70,11 +70,11 @@ namespace g2o {
 
     virtual int copyB(number_t* b_) const {
       memcpy(b_, _b.data(), Dimension * sizeof(number_t));
-      return Dimension; 
+      return VERTEX_DIM; 
     }
 
     virtual const number_t& b(int i) const { assert(i < D); return _b(i);}
-    virtual number_t& b(int i) { assert(i < D); return _b(i);}
+    virtual number_t& b(int i) { assert(i < VERTEX_DIM); return _b(i);}
     virtual number_t* bData() { return _b.data();}
 
     inline virtual void clearQuadraticForm();
@@ -110,6 +110,8 @@ namespace g2o {
 };
 
 #include "base_vertex.hpp"
+
+#undef VERTEX_DIM
 
 } // end namespace g2o
 

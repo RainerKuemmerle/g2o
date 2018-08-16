@@ -24,6 +24,8 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+#define VERTEX_I_DIM ((VertexXiType::Dimension < 0) ? _vertices[0]->dimension() : VertexXiType::Dimension)
+
 template <int D, typename E, typename VertexXiType>
 void BaseUnaryEdge<D, E, VertexXiType>::resize(size_t size)
 {
@@ -44,6 +46,16 @@ OptimizableGraph::Vertex* BaseUnaryEdge<D, E, VertexXiType>::createVertex(int i)
     return 0;
   return new VertexXiType();
 }
+
+
+template <int D, typename E, typename VertexXiType>
+OptimizableGraph::Vertex* BaseUnaryEdge<D, E, VertexXiType>::createVertex(int i, int dimension)
+{
+  if (i!=0)
+    return 0;
+  return new VertexXiType(dimension);
+}
+
 
 template <int D, typename E, typename VertexXiType>
 void BaseUnaryEdge<D, E, VertexXiType>::constructQuadraticForm()
@@ -80,7 +92,7 @@ void BaseUnaryEdge<D, E, VertexXiType>::constructQuadraticForm()
 template <int D, typename E, typename VertexXiType>
 void BaseUnaryEdge<D, E, VertexXiType>::linearizeOplus(JacobianWorkspace& jacobianWorkspace)
 {
-  new (&_jacobianOplusXi) JacobianXiOplusType(jacobianWorkspace.workspaceForVertex(0), D < 0 ? _dimension : D, VertexXiType::Dimension);
+  new (&_jacobianOplusXi) JacobianXiOplusType(jacobianWorkspace.workspaceForVertex(0), D < 0 ? _dimension : D, VERTEX_I_DIM);
   linearizeOplus();
 }
 
@@ -102,19 +114,19 @@ void BaseUnaryEdge<D, E, VertexXiType>::linearizeOplus()
   ErrorVector error1;
   ErrorVector errorBeforeNumeric = _error;
 
-  number_t add_vi[VertexXiType::Dimension] = {};
+  Eigen::Matrix<number_t, VertexXiType::Dimension, 1> add_vi(VERTEX_I_DIM);
 
   // add small step along the unit vector in each dimension
-  for (int d = 0; d < VertexXiType::Dimension; ++d) {
+  for (int d = 0; d < VERTEX_I_DIM; ++d) {
     vi->push();
     add_vi[d] = delta;
-    vi->oplus(add_vi);
+    vi->oplus(add_vi.data());
     computeError();
     error1 = _error;
     vi->pop();
     vi->push();
     add_vi[d] = -delta;
-    vi->oplus(add_vi);
+    vi->oplus(add_vi.data());
     computeError();
     vi->pop();
     add_vi[d] = 0.0;
@@ -133,3 +145,5 @@ void BaseUnaryEdge<D, E, VertexXiType>::initialEstimate(const OptimizableGraph::
 {
   std::cerr << __PRETTY_FUNCTION__ << " is not implemented, please give implementation in your derived class" << std::endl;
 }
+
+#undef VERTEX_I_DIM

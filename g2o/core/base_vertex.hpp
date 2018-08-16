@@ -24,12 +24,22 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+// Use this to allocate - this ensures that, in release mode, the
+// dimensions are guaranteed to be correct for a fixed sized vertex
+// even if the incorrect dimensions were fed in.
+
+#define INIT_VERTEX_DIM ((D < 0) ? dimension : D)
+
 template <int D, typename T>
-BaseVertex<D, T>::BaseVertex() :
+BaseVertex<D, T>::BaseVertex(int dimension) :
   OptimizableGraph::Vertex(),
-  _hessian(0, D, D)
+  _hessian(0, INIT_VERTEX_DIM, INIT_VERTEX_DIM)
 {
-  _dimension = D;
+  if (D > 0)
+    assert(dimension == Dimension);
+  else
+    assert(dimension > 0);
+  _dimension = dimension;
 }
 
 template <int D, typename T>
@@ -51,5 +61,7 @@ void BaseVertex<D, T>::clearQuadraticForm() {
 template <int D, typename T>
 void BaseVertex<D, T>::mapHessianMemory(number_t* d)
 {
-  new (&_hessian) HessianBlockType(d, D, D);
+  new (&_hessian) HessianBlockType(d, VERTEX_DIM, VERTEX_DIM);
 }
+
+#undef INIT_VERTEX_DIM
