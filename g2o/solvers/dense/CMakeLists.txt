@@ -1,15 +1,15 @@
-ADD_LIBRARY(solver_dense ${G2O_LIB_TYPE}
+add_library(solver_dense ${G2O_LIB_TYPE}
   solver_dense.cpp linear_solver_dense.h
 )
 
-SET_TARGET_PROPERTIES(solver_dense PROPERTIES OUTPUT_NAME ${LIB_PREFIX}solver_dense)
+set_target_properties(solver_dense PROPERTIES OUTPUT_NAME ${LIB_PREFIX}solver_dense)
 if (APPLE)
   set_target_properties(solver_dense PROPERTIES INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib")
 endif()
 
-TARGET_LINK_LIBRARIES(solver_dense core)
+target_link_libraries(solver_dense core)
 
-INSTALL(TARGETS solver_dense
+install(TARGETS solver_dense
   EXPORT ${G2O_TARGETS_EXPORT_NAME}
   RUNTIME DESTINATION ${RUNTIME_DESTINATION}
   LIBRARY DESTINATION ${LIBRARY_DESTINATION}
@@ -17,6 +17,6 @@ INSTALL(TARGETS solver_dense
   INCLUDES DESTINATION ${INCLUDES_DESTINATION}
 )
 
-FILE(GLOB headers "${CMAKE_CURRENT_SOURCE_DIR}/*.h" "${CMAKE_CURRENT_SOURCE_DIR}/*.hpp")
+file(GLOB headers "${CMAKE_CURRENT_SOURCE_DIR}/*.h" "${CMAKE_CURRENT_SOURCE_DIR}/*.hpp")
 
-INSTALL(FILES ${headers} DESTINATION ${INCLUDES_INSTALL_DIR}/solvers/dense)
+install(FILES ${headers} DESTINATION ${INCLUDES_INSTALL_DIR}/solvers/dense)

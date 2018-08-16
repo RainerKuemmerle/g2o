@@ -1,28 +1,28 @@
-CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
+cmake_minimum_required(VERSION 2.6)
 
-ADD_SUBDIRECTORY(stuff)
-ADD_SUBDIRECTORY(core)
+add_subdirectory(stuff)
+add_subdirectory(core)
 
-IF(G2O_BUILD_APPS)
-  ADD_SUBDIRECTORY(apps)
-ENDIF(G2O_BUILD_APPS)
+if(G2O_BUILD_APPS)
+  add_subdirectory(apps)
+endif(G2O_BUILD_APPS)
 
 # Pre-canned types
-ADD_SUBDIRECTORY(types)
+add_subdirectory(types)
 
 # Solvers
-ADD_SUBDIRECTORY(solvers)
+add_subdirectory(solvers)
 
 # Examples
-IF(G2O_BUILD_EXAMPLES)
-  ADD_SUBDIRECTORY(examples)
-ENDIF(G2O_BUILD_EXAMPLES)
+if(G2O_BUILD_EXAMPLES)
+  add_subdirectory(examples)
+endif(G2O_BUILD_EXAMPLES)
 
-IF(IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/playground")
+if(IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/playground")
   # Playground
-  OPTION (G2O_BUILD_PLAYGROUND "Build g2o playground" ON)
-  IF (G2O_BUILD_PLAYGROUND)
-    MESSAGE(STATUS "building playground")
-    ADD_SUBDIRECTORY(playground)
-  ENDIF()
-ENDIF()
+  option (G2O_BUILD_PLAYGROUND "Build g2o playground" ON)
+  if (G2O_BUILD_PLAYGROUND)
+    message(STATUS "building playground")
+    add_subdirectory(playground)
+  endif()
+endif()

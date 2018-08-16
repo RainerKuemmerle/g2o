@@ -1,3 +1,3 @@
-ADD_SUBDIRECTORY(parser)
-ADD_SUBDIRECTORY(interface)
-#ADD_SUBDIRECTORY(example)
+add_subdirectory(parser)
+add_subdirectory(interface)
+#add_subdirectory(example)
