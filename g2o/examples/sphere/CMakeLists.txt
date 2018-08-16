@@ -1,6 +1,6 @@
-ADD_EXECUTABLE(create_sphere
+add_executable(create_sphere
   create_sphere.cpp
 )
 
-SET_TARGET_PROPERTIES(create_sphere PROPERTIES OUTPUT_NAME create_sphere${EXE_POSTFIX})
-TARGET_LINK_LIBRARIES(create_sphere core types_slam3d)
+set_target_properties(create_sphere PROPERTIES OUTPUT_NAME create_sphere${EXE_POSTFIX})
+target_link_libraries(create_sphere core types_slam3d)

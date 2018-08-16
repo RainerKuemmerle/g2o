@@ -1,11 +1,11 @@
-INCLUDE_DIRECTORIES(${CSPARSE_INCLUDE_DIR})
+include_directories(${CSPARSE_INCLUDE_DIR})
 
-ADD_EXECUTABLE(simple_optimize
+add_executable(simple_optimize
   simple_optimize.cpp
 )
 
-SET_TARGET_PROPERTIES(simple_optimize PROPERTIES OUTPUT_NAME simple_optimize${EXE_POSTFIX})
+set_target_properties(simple_optimize PROPERTIES OUTPUT_NAME simple_optimize${EXE_POSTFIX})
 
-TARGET_LINK_LIBRARIES(simple_optimize core solver_csparse)
-TARGET_LINK_LIBRARIES(simple_optimize types_slam2d)
-TARGET_LINK_LIBRARIES(simple_optimize types_slam3d)
+target_link_libraries(simple_optimize core solver_csparse)
+target_link_libraries(simple_optimize types_slam2d)
+target_link_libraries(simple_optimize types_slam3d)

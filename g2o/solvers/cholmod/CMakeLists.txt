@@ -1,23 +1,23 @@
-IF (NOT G2O_USE_CHOLMOD)
-  RETURN()
-ENDIF()
+if (NOT G2O_USE_CHOLMOD)
+  return()
+endif()
 
-ADD_LIBRARY(solver_cholmod ${G2O_LIB_TYPE}
+add_library(solver_cholmod ${G2O_LIB_TYPE}
   solver_cholmod.cpp
   linear_solver_cholmod.h
 )
 
-INCLUDE_DIRECTORIES(${CHOLMOD_INCLUDE_DIR})
+include_directories(${CHOLMOD_INCLUDE_DIR})
 
-SET_TARGET_PROPERTIES(solver_cholmod PROPERTIES OUTPUT_NAME ${LIB_PREFIX}solver_cholmod)
+set_target_properties(solver_cholmod PROPERTIES OUTPUT_NAME ${LIB_PREFIX}solver_cholmod)
 if (APPLE)
   set_target_properties(solver_cholmod PROPERTIES INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib")
 endif()
 
-ADD_DEFINITIONS(${BLAS_DEFINITIONS} ${LAPACK_DEFINITIONS})
-TARGET_LINK_LIBRARIES(solver_cholmod ${CHOLMOD_LIBRARIES} ${BLAS_LIBRARIES} ${LAPACK_LIBRARIES} core)
+add_definitions(${BLAS_DEFINITIONS} ${LAPACK_DEFINITIONS})
+target_link_libraries(solver_cholmod ${CHOLMOD_LIBRARIES} ${BLAS_LIBRARIES} ${LAPACK_LIBRARIES} core)
 
-INSTALL(TARGETS solver_cholmod
+install(TARGETS solver_cholmod
   EXPORT ${G2O_TARGETS_EXPORT_NAME}
   RUNTIME DESTINATION ${RUNTIME_DESTINATION}
   LIBRARY DESTINATION ${LIBRARY_DESTINATION}
@@ -25,6 +25,6 @@ INSTALL(TARGETS solver_cholmod
   INCLUDES DESTINATION ${INCLUDES_DESTINATION} ${CHOLMOD_INCLUDE_DIR}
 )
 
-FILE(GLOB headers "${CMAKE_CURRENT_SOURCE_DIR}/*.h" "${CMAKE_CURRENT_SOURCE_DIR}/*.hpp")
+file(GLOB headers "${CMAKE_CURRENT_SOURCE_DIR}/*.h" "${CMAKE_CURRENT_SOURCE_DIR}/*.hpp")
 
-INSTALL(FILES ${headers} DESTINATION ${INCLUDES_INSTALL_DIR}/solvers/cholmod)
+install(FILES ${headers} DESTINATION ${INCLUDES_INSTALL_DIR}/solvers/cholmod)

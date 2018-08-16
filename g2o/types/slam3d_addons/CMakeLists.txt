@@ -1,4 +1,4 @@
-ADD_LIBRARY(types_slam3d_addons ${G2O_LIB_TYPE}
+add_library(types_slam3d_addons ${G2O_LIB_TYPE}
   vertex_se3_euler.cpp
   vertex_se3_euler.h
   edge_se3_euler.cpp
@@ -17,16 +17,16 @@ ADD_LIBRARY(types_slam3d_addons ${G2O_LIB_TYPE}
 )
 
 
-SET_TARGET_PROPERTIES(types_slam3d_addons PROPERTIES OUTPUT_NAME ${LIB_PREFIX}types_slam3d_addons)
+set_target_properties(types_slam3d_addons PROPERTIES OUTPUT_NAME ${LIB_PREFIX}types_slam3d_addons)
 if (APPLE)
   set_target_properties(types_slam3d_addons PROPERTIES INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib")
 endif()
-TARGET_LINK_LIBRARIES(types_slam3d_addons types_slam3d core)
-IF(G2O_HAVE_OPENGL)
-  TARGET_LINK_LIBRARIES(types_slam3d_addons ${OPENGL_gl_LIBRARY} )
-ENDIF()
+target_link_libraries(types_slam3d_addons types_slam3d core)
+if(G2O_HAVE_OPENGL)
+  target_link_libraries(types_slam3d_addons ${OPENGL_gl_LIBRARY} )
+endif()
 
-INSTALL(TARGETS types_slam3d_addons
+install(TARGETS types_slam3d_addons
   EXPORT ${G2O_TARGETS_EXPORT_NAME}
   RUNTIME DESTINATION ${RUNTIME_DESTINATION}
   LIBRARY DESTINATION ${LIBRARY_DESTINATION}
@@ -34,5 +34,5 @@ INSTALL(TARGETS types_slam3d_addons
   INCLUDES DESTINATION ${INCLUDES_DESTINATION}
 )
 
-FILE(GLOB headers "${CMAKE_CURRENT_SOURCE_DIR}/*.h" "${CMAKE_CURRENT_SOURCE_DIR}/*.hpp")
-INSTALL(FILES ${headers} DESTINATION ${INCLUDES_INSTALL_DIR}/types/slam3d_addons)
+file(GLOB headers "${CMAKE_CURRENT_SOURCE_DIR}/*.h" "${CMAKE_CURRENT_SOURCE_DIR}/*.hpp")
+install(FILES ${headers} DESTINATION ${INCLUDES_INSTALL_DIR}/types/slam3d_addons)
