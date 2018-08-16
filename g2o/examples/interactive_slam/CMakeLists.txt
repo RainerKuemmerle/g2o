@@ -1,6 +1,6 @@
-ADD_SUBDIRECTORY(slam_parser)
+add_subdirectory(slam_parser)
 
-IF(CHOLMOD_FOUND)
-  ADD_SUBDIRECTORY(g2o_interactive)
-  ADD_SUBDIRECTORY(g2o_incremental)
-ENDIF(CHOLMOD_FOUND)
+if(CHOLMOD_FOUND)
+  add_subdirectory(g2o_interactive)
+  add_subdirectory(g2o_incremental)
+endif(CHOLMOD_FOUND)

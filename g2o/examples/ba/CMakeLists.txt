@@ -1,9 +1,9 @@
-ADD_EXECUTABLE(ba_demo
+add_executable(ba_demo
   ba_demo.cpp
 )
 
-INCLUDE_DIRECTORIES(${CHOLMOD_INCLUDE_DIR})
+include_directories(${CHOLMOD_INCLUDE_DIR})
 
-TARGET_LINK_LIBRARIES(ba_demo core solver_cholmod types_sba)
+target_link_libraries(ba_demo core solver_cholmod types_sba)
 
 
