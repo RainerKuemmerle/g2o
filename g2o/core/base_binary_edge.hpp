@@ -26,28 +26,41 @@
 
 namespace {
 
-struct QuadraticFormLock {
-  QuadraticFormLock(OptimizableGraph::Vertex& vertex) : _vertex(vertex) {
 #ifdef G2O_OPENMP
+
+  class QuadraticFormLock {
+  public:
+  QuadraticFormLock(OptimizableGraph::Vertex& vertex) : _vertex(vertex) {
     _vertex.lockQuadraticForm();
-#endif
   }
 
   ~QuadraticFormLock() {
-#ifdef G2O_OPENMP
     _vertex.unlockQuadraticForm();
-#endif
   }
 
 private:
   OptimizableGraph::Vertex& _vertex;
 };
 
+#else
+
+class QuadraticFormLock {
+public:
+  QuadraticFormLock(OptimizableGraph::Vertex& /*vertex*/) {
+  }
+
+  ~QuadraticFormLock() {
+  }
+};
+
+#endif
+
+  
 } // anonymous namespace
 
 
-#define VERTEX_I_DIM ((VertexXiType::Dimension < 0) ? _vertices[0]->dimension() : VertexXiType::Dimension)
-#define VERTEX_J_DIM ((VertexXjType::Dimension < 0) ? _vertices[1]->dimension() : VertexXjType::Dimension)
+#define VERTEX_I_DIM ((VertexXiType::Dimension < 0) ? static_cast<VertexXiType*> (_vertices[0])->dimension() : VertexXiType::Dimension)
+#define VERTEX_J_DIM ((VertexXjType::Dimension < 0) ? static_cast<VertexXjType*> (_vertices[1])->dimension() : VertexXjType::Dimension)
 
 
 template <int D, typename E, typename VertexXiType, typename VertexXjType>
@@ -68,27 +81,6 @@ OptimizableGraph::Vertex* BaseBinaryEdge<D, E, VertexXiType, VertexXjType>::crea
   default: return 0;
   }
 }
-
-
-template <int D, typename E, typename VertexXiType, typename VertexXjType>
-OptimizableGraph::Vertex* BaseBinaryEdge<D, E, VertexXiType, VertexXjType>::createFrom(int dimension){
-  return createVertex(0, dimension);
-}
-
-template <int D, typename E, typename VertexXiType, typename VertexXjType>
-OptimizableGraph::Vertex* BaseBinaryEdge<D, E, VertexXiType, VertexXjType>::createTo(int dimension){
-  return createVertex(1, dimension);
-}
-
-template <int D, typename E, typename VertexXiType, typename VertexXjType>
-OptimizableGraph::Vertex* BaseBinaryEdge<D, E, VertexXiType, VertexXjType>::createVertex(int i, int dimension){
-  switch(i) {
-  case 0: return new VertexXiType(dimension);
-  case 1: return new VertexXjType(dimension);
-  default: return 0;
-  }
-}
-
 
 template <int D, typename E, typename VertexXiType, typename VertexXjType>
 void BaseBinaryEdge<D, E, VertexXiType, VertexXjType>::resize(size_t size)
@@ -207,19 +199,20 @@ void BaseBinaryEdge<D, E, VertexXiType, VertexXjType>::linearizeOplus()
   if (iNotFixed) {
     QuadraticFormLock lck(*vi);
     //Xi - estimate the jacobian numerically
-    number_t add_vi[VertexXiType::Dimension] = {};
+    Eigen::Matrix<number_t, VertexXiType::Dimension, 1> add_vi(VERTEX_I_DIM);
+    add_vi.Zero();
 
     // add small step along the unit vector in each dimension
     for (int d = 0; d < VERTEX_I_DIM; ++d) {
       vi->push();
       add_vi[d] = delta;
-      vi->oplus(add_vi);
+      vi->oplus(add_vi.data());
       computeError();
       errorBak = _error;
       vi->pop();
       vi->push();
       add_vi[d] = -delta;
-      vi->oplus(add_vi);
+      vi->oplus(add_vi.data());
       computeError();
       errorBak -= _error;
       vi->pop();
@@ -232,19 +225,20 @@ void BaseBinaryEdge<D, E, VertexXiType, VertexXjType>::linearizeOplus()
   if (jNotFixed) {
     QuadraticFormLock lck(*vj);
     //Xj - estimate the jacobian numerically
-    number_t add_vj[VertexXjType::Dimension] = {};
+    Eigen::Matrix<number_t, VertexXjType::Dimension, 1> add_vj(VERTEX_J_DIM);
+    add_vj.Zero();
 
     // add small step along the unit vector in each dimension
     for (int d = 0; d < VERTEX_J_DIM; ++d) {
       vj->push();
       add_vj[d] = delta;
-      vj->oplus(add_vj);
+      vj->oplus(add_vj.data());
       computeError();
       errorBak = _error;
       vj->pop();
       vj->push();
       add_vj[d] = -delta;
-      vj->oplus(add_vj);
+      vj->oplus(add_vj.data());
       computeError();
       errorBak -= _error;
       vj->pop();
@@ -263,7 +257,7 @@ void BaseBinaryEdge<D, E, VertexXiType, VertexXjType>::mapHessianMemory(number_t
   (void) i; (void) j;
   //assert(i == 0 && j == 1);
   if (rowMajor) {
-    new (&_hessianTransposed) HessianBlockTransposedType(d, VERTEX_I_DIM, VERTEX_J_DIM);
+    new (&_hessianTransposed) HessianBlockTransposedType(d, VERTEX_J_DIM, VERTEX_I_DIM);
   } else {
     new (&_hessian) HessianBlockType(d, VERTEX_I_DIM, VERTEX_J_DIM);
   }

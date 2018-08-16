@@ -73,11 +73,6 @@ namespace g2o {
       inline virtual OptimizableGraph::Vertex* createTo();
       inline virtual OptimizableGraph::Vertex* createVertex(int i);
 
-      
-      inline virtual OptimizableGraph::Vertex* createFrom(int dimension = Di);
-      inline virtual OptimizableGraph::Vertex* createTo(int dimension = Dj);
-      inline virtual OptimizableGraph::Vertex* createVertex(int i, int dimension);
-
       inline virtual void resize(size_t size);
 
       inline virtual bool allVerticesFixed() const;

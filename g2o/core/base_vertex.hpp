@@ -35,11 +35,28 @@ BaseVertex<D, T>::BaseVertex(int dimension) :
   OptimizableGraph::Vertex(),
   _hessian(0, INIT_VERTEX_DIM, INIT_VERTEX_DIM)
 {
-  if (D > 0)
-    assert(dimension == Dimension);
+  if (D >= 0)
+    assert(dimension == D && "error constructing vertex with fixed compile time dimension where runtime dimension != compile time dimension");
   else
-    assert(dimension > 0);
+    assert(dimension >= 0 && "error constructing vertex with unknown compile time dimension where runtime dimension < 0");
   _dimension = dimension;
+}
+
+template <int D, typename T>
+void BaseVertex<D, T>::resize(int dimension) {
+  if (D > 0)
+    {
+      assert(dimension == D && "error resizing vertex with fixed compile time dimension where runtime dimension != compile time dimension");
+      return;
+    }
+
+  assert(dimension >= 0 && "error resizing vertex vertex with unknown compile time dimension where runtime dimension < 0");
+  
+  if (dimension != _dimension)
+    {
+      new (&_hessian) HessianBlockType(0, dimension, dimension);
+      _dimension = dimension;
+    }
 }
 
 template <int D, typename T>

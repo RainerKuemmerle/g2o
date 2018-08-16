@@ -24,7 +24,7 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#define VERTEX_I_DIM ((VertexXiType::Dimension < 0) ? _vertices[0]->dimension() : VertexXiType::Dimension)
+#define VERTEX_I_DIM ((VertexXiType::Dimension < 0) ? static_cast<VertexXiType*> (_vertices[0])->dimension() : VertexXiType::Dimension)
 
 template <int D, typename E, typename VertexXiType>
 void BaseUnaryEdge<D, E, VertexXiType>::resize(size_t size)
@@ -46,16 +46,6 @@ OptimizableGraph::Vertex* BaseUnaryEdge<D, E, VertexXiType>::createVertex(int i)
     return 0;
   return new VertexXiType();
 }
-
-
-template <int D, typename E, typename VertexXiType>
-OptimizableGraph::Vertex* BaseUnaryEdge<D, E, VertexXiType>::createVertex(int i, int dimension)
-{
-  if (i!=0)
-    return 0;
-  return new VertexXiType(dimension);
-}
-
 
 template <int D, typename E, typename VertexXiType>
 void BaseUnaryEdge<D, E, VertexXiType>::constructQuadraticForm()
@@ -115,6 +105,7 @@ void BaseUnaryEdge<D, E, VertexXiType>::linearizeOplus()
   ErrorVector errorBeforeNumeric = _error;
 
   Eigen::Matrix<number_t, VertexXiType::Dimension, 1> add_vi(VERTEX_I_DIM);
+  add_vi.Zero();
 
   // add small step along the unit vector in each dimension
   for (int d = 0; d < VERTEX_I_DIM; ++d) {

@@ -63,9 +63,7 @@ namespace g2o {
       virtual void linearizeOplus(JacobianWorkspace& jacobianWorkspace);
 
       virtual OptimizableGraph::Vertex* createVertex(int i);
-
-      virtual OptimizableGraph::Vertex* createVertex(int i, int dimension);
-
+      
       /**
        * Linearizes the oplus operator in the vertex, and stores
        * the result in temporary variables _jacobianOplusXi and _jacobianOplusXj
