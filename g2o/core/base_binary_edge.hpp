@@ -196,58 +196,119 @@ void BaseBinaryEdge<D, E, VertexXiType, VertexXjType>::linearizeOplus()
   ErrorVector errorBak;
   ErrorVector errorBeforeNumeric = _error;
 
+  // A statically allocated array is far and away the most efficient
+  // way to construct the perturbation vector for the Jacobian. If the
+  // dimension is known at compile time, use directly. If the
+  // dimension is known at run time and is less than 20, use an
+  // allocated array of up to 20. Otherwise, use a fallback of a
+  // dynamically allocated array. Experiments show that the allocated
+  // array using a pointer-type iterator rather than an array accessor
+  // is much more efficient.
+  
   if (iNotFixed) {
     QuadraticFormLock lck(*vi);
     //Xi - estimate the jacobian numerically
-    Eigen::Matrix<number_t, VertexXiType::Dimension, 1> add_vi(VERTEX_I_DIM);
-    add_vi.Zero();
 
-    // add small step along the unit vector in each dimension
-    for (int d = 0; d < VERTEX_I_DIM; ++d) {
-      vi->push();
-      add_vi[d] = delta;
-      vi->oplus(add_vi.data());
-      computeError();
-      errorBak = _error;
-      vi->pop();
-      vi->push();
-      add_vi[d] = -delta;
-      vi->oplus(add_vi.data());
-      computeError();
-      errorBak -= _error;
-      vi->pop();
-      add_vi[d] = 0.0;
-
-      _jacobianOplusXi.col(d) = scalar * errorBak;
-    } // end dimension
+    if ((VertexXiType::Dimension >= 0) || (vi->dimension() < 20))
+      {
+        number_t add_vi[(VertexXiType::Dimension >= 0) ? VertexXiType::Dimension : 20] = {};
+        
+        // add small step along the unit vector in each dimension
+        for (int d = 0; d < (VertexXiType::Dimension >= 0) ? VertexXiType::Dimension : vi->dimension(); ++d) {
+          vi->push();
+          add_vi[d] = delta;
+          vi->oplus(add_vi);
+          computeError();
+          errorBak = _error;
+          vi->pop();
+          vi->push();
+          add_vi[d] = -delta;
+          vi->oplus(add_vi);
+          computeError();
+          errorBak -= _error;
+          vi->pop();
+          add_vi[d] = 0.0;
+          
+          _jacobianOplusXi.col(d) = scalar * errorBak;
+        } // end dimension
+      }
+    else
+      {
+        Eigen::Matrix<number_t, VertexXiType::Dimension, 1> add_vi(vi->dimension());
+        add_vi.setZero();
+        number_t* v = add_vi.data();
+        
+        // add small step along the unit vector in each dimension
+        for (int d = 0; d < vi->dimension(); ++d) {
+          vi->push();
+          *v = delta;
+          vi->oplus(v);
+          computeError();
+          errorBak = _error;
+          vi->pop();
+          vi->push();
+          *v = - delta;
+          vi->oplus(v);
+          computeError();
+          errorBak -= _error;
+          vi->pop();
+          *(v++) = 0.0;
+          _jacobianOplusXi.col(d) = scalar * errorBak;
+        } // end dimension
+      }
   }
 
   if (jNotFixed) {
     QuadraticFormLock lck(*vj);
     //Xj - estimate the jacobian numerically
-    Eigen::Matrix<number_t, VertexXjType::Dimension, 1> add_vj(VERTEX_J_DIM);
-    add_vj.Zero();
-
-    // add small step along the unit vector in each dimension
-    for (int d = 0; d < VERTEX_J_DIM; ++d) {
-      vj->push();
-      add_vj[d] = delta;
-      vj->oplus(add_vj.data());
-      computeError();
-      errorBak = _error;
-      vj->pop();
-      vj->push();
-      add_vj[d] = -delta;
-      vj->oplus(add_vj.data());
-      computeError();
-      errorBak -= _error;
-      vj->pop();
-      add_vj[d] = 0.0;
-
-      _jacobianOplusXj.col(d) = scalar * errorBak;
-    }
-  } // end dimension
-
+    if ((VertexXjType::Dimension >= 0) || (vj->dimension() < 20))
+      {
+        number_t add_vj[(VertexXjType::Dimension >= 0) ? VertexXjType::Dimension : 20] = {};
+        
+        // add small step along the unit vector in each dimension
+        for (int d = 0; d < (VertexXjType::Dimension >= 0) ? VertexXjType::Dimension : vj->dimension(); ++d) {
+          vj->push();
+          add_vj[d] = delta;
+          vj->oplus(add_vj);
+          computeError();
+          errorBak = _error;
+          vj->pop();
+          vj->push();
+          add_vj[d] = -delta;
+          vj->oplus(add_vj);
+          computeError();
+          errorBak -= _error;
+          vj->pop();
+          add_vj[d] = 0.0;
+          
+          _jacobianOplusXj.col(d) = scalar * errorBak;
+        } // end dimension
+      }
+    else
+      {
+        Eigen::Matrix<number_t, VertexXjType::Dimension, 1> add_vj(vj->dimension());
+        add_vj.setZero();
+        number_t* v = add_vj.data();
+        
+        // add small step along the unit vector in each dimension
+        for (int d = 0; d < vj->dimension(); ++d) {
+          vj->push();
+          *v = delta;
+          vj->oplus(v);
+          computeError();
+          errorBak = _error;
+          vj->pop();
+          vj->push();
+          *v = - delta;
+          vj->oplus(v);
+          computeError();
+          errorBak -= _error;
+          vj->pop();
+          *(v++) = 0;
+          _jacobianOplusXj.col(d) = scalar * errorBak;
+        } // end dimension
+      }
+  }
   _error = errorBeforeNumeric;
 }
 

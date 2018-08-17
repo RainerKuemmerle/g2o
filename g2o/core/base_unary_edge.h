@@ -94,7 +94,7 @@ namespace g2o {
     public:
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   };
-
+  
 #include "base_unary_edge.hpp"
 
 } // end namespace g2o

@@ -104,27 +104,61 @@ void BaseUnaryEdge<D, E, VertexXiType>::linearizeOplus()
   ErrorVector error1;
   ErrorVector errorBeforeNumeric = _error;
 
-  Eigen::Matrix<number_t, VertexXiType::Dimension, 1> add_vi(VERTEX_I_DIM);
-  add_vi.Zero();
+  // A statically allocated array is far and away the most efficient
+  // way to construct the perturbation vector for the Jacobian. If the
+  // dimension is known at compile time, use directly. If the
+  // dimension is known at run time and is less than 20, use an
+  // allocated array of up to 20. Otherwise, use a fallback of a
+  // dynamically allocated array. Experiments show that the allocated
+  // array using a pointer-type iterator rather than an array accessor
+  // is much more efficient.
+  
+  if ((VertexXiType::Dimension >= 0) || (vi->dimension() < 20))
+    {
+      number_t add_vi[(VertexXiType::Dimension >= 0) ? VertexXiType::Dimension : 20] = {};
+      
+      // add small step along the unit vector in each dimension
+      for (int d = 0; d < (VertexXiType::Dimension >= 0) ? VertexXiType::Dimension : vi->dimension(); ++d) {
+        vi->push();
+        add_vi[d] = delta;
+        vi->oplus(add_vi);
+        computeError();
+        error1 = _error;
+        vi->pop();
+        vi->push();
+        add_vi[d] = -delta;
+        vi->oplus(add_vi);
+        computeError();
+        vi->pop();
+        add_vi[d] = 0.0;
+        
+        _jacobianOplusXi.col(d) = scalar * (error1 - _error);
+      } // end dimension
+    }
+  else
+    {
+      Eigen::Matrix<number_t, VertexXiType::Dimension, 1> add_vi(vi->dimension());
+      add_vi.setZero();
+      number_t* v = add_vi.data();
 
-  // add small step along the unit vector in each dimension
-  for (int d = 0; d < VERTEX_I_DIM; ++d) {
-    vi->push();
-    add_vi[d] = delta;
-    vi->oplus(add_vi.data());
-    computeError();
-    error1 = _error;
-    vi->pop();
-    vi->push();
-    add_vi[d] = -delta;
-    vi->oplus(add_vi.data());
-    computeError();
-    vi->pop();
-    add_vi[d] = 0.0;
-
-    _jacobianOplusXi.col(d) = scalar * (error1 - _error);
-  } // end dimension
-
+      // add small step along the unit vector in each dimension
+      for (int d = 0; d < vi->dimension(); ++d) {
+        vi->push();
+        *v = delta;
+        vi->oplus(v);
+        computeError();
+        error1 = _error;
+        vi->pop();
+        vi->push();
+        *v = - delta;
+        vi->oplus(v);
+        computeError();
+        vi->pop();
+        *(v++) = 0;
+        _jacobianOplusXi.col(d) = scalar * (error1 - _error);
+      } // end dimension
+    }
+  
   _error = errorBeforeNumeric;
 #ifdef G2O_OPENMP
   vi->unlockQuadraticForm();
