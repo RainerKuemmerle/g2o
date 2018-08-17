@@ -43,7 +43,7 @@ namespace g2o {
  * \brief Templatized BaseVertex
  *
  * Templatized BaseVertex
- * D  : minimal dimension of the vertex, e.g., 3 for rotation in 3D
+ * D  : minimal dimension of the vertex, e.g., 3 for rotation in 3D. -1 means dynamically assigned at runtime.
  * T  : internal type to represent the estimate, e.g., Quaternion for rotation in 3D
  */
   template <int D, typename T>
@@ -68,7 +68,7 @@ namespace g2o {
 
     inline virtual void mapHessianMemory(number_t* d);
 
-    inline virtual void resize(int dimension);
+    inline virtual void resizeDimension(int dimension);
     
     virtual int copyB(number_t* b_) const {
       memcpy(b_, _b.data(), Dimension * sizeof(number_t));

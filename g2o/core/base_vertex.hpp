@@ -26,14 +26,14 @@
 
 // Use this to allocate - this ensures that, in release mode, the
 // dimensions are guaranteed to be correct for a fixed sized vertex
-// even if the incorrect dimensions were fed in.
+// even if the incorrect dimensions were fed in to the constructor.
 
 #define INIT_VERTEX_DIM ((D < 0) ? dimension : D)
 
 template <int D, typename T>
 BaseVertex<D, T>::BaseVertex(int dimension) :
   OptimizableGraph::Vertex(),
-  _hessian(0, INIT_VERTEX_DIM, INIT_VERTEX_DIM)
+  _hessian(nullptr, INIT_VERTEX_DIM, INIT_VERTEX_DIM)
 {
   if (D >= 0)
     assert(dimension == D && "error constructing vertex with fixed compile time dimension where runtime dimension != compile time dimension");
@@ -43,7 +43,7 @@ BaseVertex<D, T>::BaseVertex(int dimension) :
 }
 
 template <int D, typename T>
-void BaseVertex<D, T>::resize(int dimension) {
+void BaseVertex<D, T>::resizeDimension(int dimension) {
   if (D > 0)
     {
       assert(dimension == D && "error resizing vertex with fixed compile time dimension where runtime dimension != compile time dimension");
@@ -54,8 +54,8 @@ void BaseVertex<D, T>::resize(int dimension) {
   
   if (dimension != _dimension)
     {
-      new (&_hessian) HessianBlockType(0, dimension, dimension);
       _dimension = dimension;
+      mapHessianMemory(nullptr);
     }
 }
 
