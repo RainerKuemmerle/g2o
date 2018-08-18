@@ -209,12 +209,13 @@ void BaseBinaryEdge<D, E, VertexXiType, VertexXjType>::linearizeOplus()
     QuadraticFormLock lck(*vi);
     //Xi - estimate the jacobian numerically
 
-    if ((VertexXiType::Dimension >= 0) || (vi->dimension() < 20))
+    if ((VertexXiType::Dimension >= 0) || (vi->dimension() <= 12))
       {
-        number_t add_vi[(VertexXiType::Dimension >= 0) ? VertexXiType::Dimension : 20] = {};
+        const int vi_dim = (VertexXiType::Dimension >= 0) ? VertexXiType::Dimension : vi->dimension();
+        number_t add_vi[(VertexXiType::Dimension >= 0) ? VertexXiType::Dimension : 12] = {};
         
         // add small step along the unit vector in each dimension
-        for (int d = 0; d < (VertexXiType::Dimension >= 0) ? VertexXiType::Dimension : vi->dimension(); ++d) {
+        for (int d = 0; d < vi_dim; ++d) {
           vi->push();
           add_vi[d] = delta;
           vi->oplus(add_vi);
@@ -227,32 +228,32 @@ void BaseBinaryEdge<D, E, VertexXiType, VertexXjType>::linearizeOplus()
           computeError();
           errorBak -= _error;
           vi->pop();
-          add_vi[d] = 0.0;
-          
+          add_vi[d] = 0.0;          
           _jacobianOplusXi.col(d) = scalar * errorBak;
         } // end dimension
       }
     else
       {
-        Eigen::Matrix<number_t, VertexXiType::Dimension, 1> add_vi(vi->dimension());
-        add_vi.setZero();
-        number_t* v = add_vi.data();
-        
+        const int vi_dim = vi->dimension();
+        dynamic_aligned_buffer<number_t> buffer{ size_t(vi_dim) };
+        number_t* add_vi = buffer.request(vi_dim);
+        std::fill(add_vi, add_vi + vi_dim, cst(0.0));
+
         // add small step along the unit vector in each dimension
-        for (int d = 0; d < vi->dimension(); ++d) {
+        for (int d = 0; d < vi_dim; ++d) {
           vi->push();
-          *v = delta;
-          vi->oplus(v);
+          add_vi[d] = delta;
+          vi->oplus(add_vi);
           computeError();
           errorBak = _error;
           vi->pop();
           vi->push();
-          *v = - delta;
-          vi->oplus(v);
+          add_vi[d] = - delta;
+          vi->oplus(add_vi);
           computeError();
           errorBak -= _error;
           vi->pop();
-          *(v++) = 0.0;
+          add_vi[d] = 0;
           _jacobianOplusXi.col(d) = scalar * errorBak;
         } // end dimension
       }
@@ -261,12 +262,13 @@ void BaseBinaryEdge<D, E, VertexXiType, VertexXjType>::linearizeOplus()
   if (jNotFixed) {
     QuadraticFormLock lck(*vj);
     //Xj - estimate the jacobian numerically
-    if ((VertexXjType::Dimension >= 0) || (vj->dimension() < 20))
+    if ((VertexXjType::Dimension >= 0) || (vj->dimension() <= 12))
       {
-        number_t add_vj[(VertexXjType::Dimension >= 0) ? VertexXjType::Dimension : 20] = {};
-        
+        const int vj_dim = (VertexXjType::Dimension >= 0) ? VertexXjType::Dimension : vj->dimension();
+        number_t add_vj[(VertexXjType::Dimension >= 0) ? VertexXjType::Dimension : 12] = {};
+
         // add small step along the unit vector in each dimension
-        for (int d = 0; d < (VertexXjType::Dimension >= 0) ? VertexXjType::Dimension : vj->dimension(); ++d) {
+        for (int d = 0; d < vj_dim; ++d) {
           vj->push();
           add_vj[d] = delta;
           vj->oplus(add_vj);
@@ -286,25 +288,26 @@ void BaseBinaryEdge<D, E, VertexXiType, VertexXjType>::linearizeOplus()
       }
     else
       {
-        Eigen::Matrix<number_t, VertexXjType::Dimension, 1> add_vj(vj->dimension());
-        add_vj.setZero();
-        number_t* v = add_vj.data();
+        const int vj_dim = vj->dimension();
+        dynamic_aligned_buffer<number_t> buffer{ size_t(vj_dim) };
+        number_t* add_vj = buffer.request(vj_dim);
+        std::fill(add_vj, add_vj + vj_dim, cst(0.0));
         
         // add small step along the unit vector in each dimension
-        for (int d = 0; d < vj->dimension(); ++d) {
+        for (int d = 0; d < vj_dim; ++d) {
           vj->push();
-          *v = delta;
-          vj->oplus(v);
+          add_vj[d] = delta;
+          vj->oplus(add_vj);
           computeError();
           errorBak = _error;
           vj->pop();
           vj->push();
-          *v = - delta;
-          vj->oplus(v);
+          add_vj[d] = - delta;
+          vj->oplus(add_vj);
           computeError();
           errorBak -= _error;
           vj->pop();
-          *(v++) = 0;
+          add_vj[d] = 0;
           _jacobianOplusXj.col(d) = scalar * errorBak;
         } // end dimension
       }

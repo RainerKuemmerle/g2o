@@ -101,61 +101,62 @@ void BaseUnaryEdge<D, E, VertexXiType>::linearizeOplus()
 
   const number_t delta = cst(1e-9);
   const number_t scalar = 1 / (2*delta);
-  ErrorVector error1;
+  ErrorVector errorBak;
   ErrorVector errorBeforeNumeric = _error;
 
   // A statically allocated array is far and away the most efficient
   // way to construct the perturbation vector for the Jacobian. If the
   // dimension is known at compile time, use directly. If the
-  // dimension is known at run time and is less than 20, use an
-  // allocated array of up to 20. Otherwise, use a fallback of a
-  // dynamically allocated array. Experiments show that the allocated
-  // array using a pointer-type iterator rather than an array accessor
-  // is much more efficient.
-  
-  if ((VertexXiType::Dimension >= 0) || (vi->dimension() < 20))
+  // dimension is known at run time and is less than 12, use an
+  // allocated array of up to 12. Otherwise, use a fallback of a
+  // dynamically allocated array.
+
+  if ((VertexXiType::Dimension >= 0) || (vi->dimension() <= 12))
     {
-      number_t add_vi[(VertexXiType::Dimension >= 0) ? VertexXiType::Dimension : 20] = {};
+      const int vi_dim = (VertexXiType::Dimension >= 0) ? VertexXiType::Dimension : vi->dimension();
+      number_t add_vi[(VertexXiType::Dimension >= 0) ? VertexXiType::Dimension : 12] = {};
       
       // add small step along the unit vector in each dimension
-      for (int d = 0; d < (VertexXiType::Dimension >= 0) ? VertexXiType::Dimension : vi->dimension(); ++d) {
+      for (int d = 0; d < vi_dim; ++d) {
         vi->push();
         add_vi[d] = delta;
         vi->oplus(add_vi);
         computeError();
-        error1 = _error;
+        errorBak = _error;
         vi->pop();
         vi->push();
         add_vi[d] = -delta;
         vi->oplus(add_vi);
         computeError();
+        errorBak -= _error;
         vi->pop();
         add_vi[d] = 0.0;
-        
-        _jacobianOplusXi.col(d) = scalar * (error1 - _error);
+        _jacobianOplusXi.col(d) = scalar * errorBak;
       } // end dimension
     }
   else
     {
-      Eigen::Matrix<number_t, VertexXiType::Dimension, 1> add_vi(vi->dimension());
-      add_vi.setZero();
-      number_t* v = add_vi.data();
-
+      const int vi_dim = vi->dimension();
+      dynamic_aligned_buffer<number_t> buffer{ size_t(vi_dim) };
+      number_t* add_vi = buffer.request(vi_dim);
+      std::fill(add_vi, add_vi + vi_dim, cst(0.0));
+      
       // add small step along the unit vector in each dimension
-      for (int d = 0; d < vi->dimension(); ++d) {
+      for (int d = 0; d < vi_dim; ++d) {
         vi->push();
-        *v = delta;
-        vi->oplus(v);
+        add_vi[d] = delta;
+        vi->oplus(add_vi);
         computeError();
-        error1 = _error;
+        errorBak = _error;
         vi->pop();
         vi->push();
-        *v = - delta;
-        vi->oplus(v);
+        add_vi[d] = - delta;
+        vi->oplus(add_vi);
         computeError();
+        errorBak -= _error;
         vi->pop();
-        *(v++) = 0;
-        _jacobianOplusXi.col(d) = scalar * (error1 - _error);
+        add_vi[d] = 0;
+        _jacobianOplusXi.col(d) = scalar * errorBak;
       } // end dimension
     }
   
