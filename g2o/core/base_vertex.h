@@ -59,7 +59,7 @@ namespace g2o {
     typedef Eigen::Map<Eigen::Matrix<number_t, D, D, Eigen::ColMajor>, Eigen::Matrix<number_t, D, D, Eigen::ColMajor>::Flags & Eigen::PacketAccessBit ? Eigen::Aligned : Eigen::Unaligned >  HessianBlockType;
 
   public:
-    BaseVertex(int dimension = Dimension);
+    BaseVertex();
 
     virtual const number_t& hessian(int i, int j) const { assert(i<VERTEX_DIM && j<VERTEX_DIM); return _hessian(i,j);}
     virtual number_t& hessian(int i, int j)  { assert(i<VERTEX_DIM && j<VERTEX_DIM); return _hessian(i,j);}
@@ -68,8 +68,10 @@ namespace g2o {
 
     inline virtual void mapHessianMemory(number_t* d);
 
-    inline virtual void resizeDimension(int dimension);
-    
+    inline virtual void resizeDimension(int newDimension);
+
+    virtual void resizeDimensionImpl(int newDimension) { };
+
     virtual int copyB(number_t* b_) const {
       memcpy(b_, _b.data(), Dimension * sizeof(number_t));
       return VERTEX_DIM; 

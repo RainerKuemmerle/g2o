@@ -24,22 +24,21 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-// Use this to allocate - this ensures that, in release mode, the
-// dimensions are guaranteed to be correct for a fixed sized vertex
-// even if the incorrect dimensions were fed in to the constructor.
+// Use this to allocate the initial dimensions. If the dimensions are
+// known at compile time, then INIT_VERTEX_DIM=D. This guarantees the
+// dimensions are correct, even if the constructor were fed the wrong
+// dimension. If not known at compile time, then
+// INIT_VERTEX_DIM=max(0, dimension). This means that a dynamic vertex
+// can be constructed with a suitable default value.
 
-#define INIT_VERTEX_DIM ((D < 0) ? dimension : D)
+#define INIT_VERTEX_DIM ((D < 0) ? ((dimension >= 0) ? dimension : 0) : D)
 
 template <int D, typename T>
-BaseVertex<D, T>::BaseVertex(int dimension) :
+BaseVertex<D, T>::BaseVertex() :
   OptimizableGraph::Vertex(),
-  _hessian(nullptr, INIT_VERTEX_DIM, INIT_VERTEX_DIM)
+  _hessian(nullptr, D, D)
 {
-  if (D >= 0)
-    assert(dimension == D && "error constructing vertex with fixed compile time dimension where runtime dimension != compile time dimension");
-  else
-    assert(dimension >= 0 && "error constructing vertex with unknown compile time dimension where runtime dimension < 0");
-  _dimension = dimension;
+  _dimension = D;
 }
 
 template <int D, typename T>
@@ -51,17 +50,21 @@ void BaseVertex<D, T>::resizeDimension(int dimension) {
     }
 
   assert(dimension >= 0 && "error resizing vertex vertex with unknown compile time dimension where runtime dimension < 0");
+
+  std::cout << __PRETTY_FUNCTION__ << ": dimension=" << dimension << "; _dimension=" << _dimension << std::endl;
   
   if (dimension != _dimension)
     {
+      resizeDimensionImpl(dimension);
       _dimension = dimension;
       mapHessianMemory(nullptr);
+      updateCache();
     }
 }
 
 template <int D, typename T>
 number_t BaseVertex<D, T>::solveDirect(number_t lambda) {
-  Eigen::Matrix<number_t, D, D, Eigen::ColMajor> tempA=_hessian + Eigen::Matrix<number_t, D, D, Eigen::ColMajor>::Identity()*lambda;
+  Eigen::Matrix<number_t, D, D, Eigen::ColMajor> tempA=_hessian + Eigen::Matrix<number_t, D, D, Eigen::ColMajor>::Identity(VERTEX_DIM, VERTEX_DIM)*lambda;
   number_t det=tempA.determinant();
   if (g2o_isnan(det) || det < std::numeric_limits<number_t>::epsilon())
     return det;
@@ -80,5 +83,3 @@ void BaseVertex<D, T>::mapHessianMemory(number_t* d)
 {
   new (&_hessian) HessianBlockType(d, VERTEX_DIM, VERTEX_DIM);
 }
-
-#undef INIT_VERTEX_DIM
