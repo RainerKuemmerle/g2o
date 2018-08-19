@@ -24,15 +24,6 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-// Use this to allocate the initial dimensions. If the dimensions are
-// known at compile time, then INIT_VERTEX_DIM=D. This guarantees the
-// dimensions are correct, even if the constructor were fed the wrong
-// dimension. If not known at compile time, then
-// INIT_VERTEX_DIM=max(0, dimension). This means that a dynamic vertex
-// can be constructed with a suitable default value.
-
-#define INIT_VERTEX_DIM ((D < 0) ? ((dimension >= 0) ? dimension : 0) : D)
-
 template <int D, typename T>
 BaseVertex<D, T>::BaseVertex() :
   OptimizableGraph::Vertex(),
@@ -42,21 +33,19 @@ BaseVertex<D, T>::BaseVertex() :
 }
 
 template <int D, typename T>
-void BaseVertex<D, T>::resizeDimension(int dimension) {
+void BaseVertex<D, T>::resizeDimension(int newDimension) {
   if (D > 0)
     {
-      assert(dimension == D && "error resizing vertex with fixed compile time dimension where runtime dimension != compile time dimension");
+      assert(newDimension == D && "error resizing vertex with fixed compile time dimension where runtime dimension != compile time dimension");
       return;
     }
 
-  assert(dimension >= 0 && "error resizing vertex vertex with unknown compile time dimension where runtime dimension < 0");
+  assert(newDimension >= 0 && "error resizing vertex vertex with unknown compile time dimension where runtime dimension < 0");
 
-  std::cout << __PRETTY_FUNCTION__ << ": dimension=" << dimension << "; _dimension=" << _dimension << std::endl;
-  
-  if (dimension != _dimension)
+  if (newDimension != _dimension)
     {
-      resizeDimensionImpl(dimension);
-      _dimension = dimension;
+      resizeDimensionImpl(newDimension);
+      _dimension = newDimension;
       mapHessianMemory(nullptr);
       updateCache();
     }
