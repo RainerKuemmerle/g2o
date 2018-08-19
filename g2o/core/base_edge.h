@@ -73,7 +73,7 @@ namespace g2o {
 
       //! accessor functions for the measurement represented by the edge
       EIGEN_STRONG_INLINE const Measurement& measurement() const { return _measurement;}
-      virtual void setMeasurement(const Measurement& m) { _measurement = m;}
+      virtual void setMeasurement(const Measurement& m) { _measurement = m; }
 
       virtual int rank() const {return _dimension;}
 
@@ -133,7 +133,11 @@ namespace g2o {
       //! information matrix of the constraint
       const InformationType& information() const { return _information;}
       InformationType& information() { return _information;}
-      void setInformation(const InformationType& information) { _information = information;}
+      void setInformation(const InformationType& information) {
+        assert(information.rows() == information.cols() && "Information matrix not square");
+        _information = information;
+        _dimension = information.rows();
+      }
 
       virtual const number_t* informationData() const { return _information.data();}
       virtual number_t* informationData() { return _information.data();}
