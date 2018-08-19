@@ -1,3 +1,3 @@
 add_executable(dynamic_vertex dynamic_vertex.cpp)
 set_target_properties(dynamic_vertex PROPERTIES OUTPUT_NAME dynamic_vertex${EXE_POSTFIX})
-target_link_libraries(dynamic_vertex core)
+target_link_libraries(dynamic_vertex core solver_csparse)
