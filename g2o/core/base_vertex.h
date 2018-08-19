@@ -70,10 +70,21 @@ namespace g2o {
 
     inline virtual void resizeDimension(int newDimension);
 
-    virtual void resizeDimensionImpl(int newDimension) { };
+    virtual void resizeDimensionImpl(int newDimension)
+    {
+      if (D < 0)
+        {
+          std::cerr << __PRETTY_FUNCTION__ << ": not implemented" << std::endl;
+        }
+      else
+        {
+          std::cerr << __PRETTY_FUNCTION__ << ": should not be called for vertices with known compile time dimension" << std::endl;
+        }
+      
+    };
 
     virtual int copyB(number_t* b_) const {
-      memcpy(b_, _b.data(), Dimension * sizeof(number_t));
+      memcpy(b_, _b.data(), VERTEX_DIM * sizeof(number_t));
       return VERTEX_DIM; 
     }
 
