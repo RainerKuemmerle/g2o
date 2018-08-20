@@ -253,6 +253,7 @@ void testReizeUnaryEdge(int dim1, int dim2)
   cout << v0->estimate().transpose() << endl;
 
   // Now resize everything
+  
   v0->resizeDimension(dim2);
   v0->setToOrigin();
 
@@ -263,19 +264,14 @@ void testReizeUnaryEdge(int dim1, int dim2)
   information.resize(dim2, dim2);
   information.setIdentity();
   
-  
   due->setMeasurement(measurement);
   due->setInformation(information);
-  cout << due->rank() << endl;
 
   optimizer->initializeOptimization();
-  optimizer->computeInitialGuess();
-  
   optimizer->optimize(10);
-  /*
 
   cout << v0->estimate().transpose() << endl;
-  */
+
   delete optimizer;
 }
 
