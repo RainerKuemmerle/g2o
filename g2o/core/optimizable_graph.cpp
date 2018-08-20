@@ -243,7 +243,7 @@ namespace g2o {
       assert(0 && "Vertex with this ID already contained in the graph");
       return false;
     }
-    if (ov->_graph != 0 && ov->_graph != this) {
+    if (ov->_graph != nullptr && ov->_graph != this) {
       cerr << __FUNCTION__ << ": FATAL, vertex with ID " << ov->id() << " has already registered with another graph " << ov->_graph << endl;
       assert(0 && "Vertex already registered with another graph");
       return false;
@@ -266,10 +266,19 @@ namespace g2o {
 
   bool OptimizableGraph::addEdge(OptimizableGraph::Edge* e)
   {
+    OptimizableGraph* g = e->graph();
+    
+      if (g != nullptr && g != this) {
+        cerr << __FUNCTION__ << ": FATAL, edge with ID " << e->id() << " has already registered with another graph " << g << endl;
+        assert(0 && "Edge already registered with another graph");
+        return false;
+      }
+
       bool eresult = HyperGraph::addEdge(e);
       if (!eresult)
           return false;
       //    std::cerr << "called HyperGraph::addEdge" << std::endl;
+      
       e->_internalId = _nextEdgeId++;
       if (e->numUndefinedVertices())
           return true;
@@ -283,6 +292,7 @@ namespace g2o {
           cerr << __FUNCTION__ << ": FATAL, cannot resolve caches for edge " << e << endl;
           return false;
       }
+
       //    std::cerr << "updating jacobian size" << std::endl;
       _jacobianWorkspace.updateSize(e);
 
