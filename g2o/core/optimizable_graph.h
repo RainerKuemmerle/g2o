@@ -534,6 +534,13 @@ namespace g2o {
     //! return the maximum dimension of all vertices in the graph
     int maxDimension() const;
 
+    //! Recompute the size of the Jacobian workspace from all the
+    //! edges in the graph.
+    void recomputeJacobianWorkspaceSize() 
+    {
+      _jacobianWorkspace.updateSize(*this, true);
+    }
+    
     /**
      * iterates over all vertices and returns a set of all the vertex dimensions in the graph
      */

@@ -55,9 +55,15 @@ bool JacobianWorkspace::allocate()
   }
   return true;
 }
-
-void JacobianWorkspace::updateSize(const HyperGraph::Edge* e_)
-{
+  
+  void JacobianWorkspace::updateSize(const HyperGraph::Edge* e_, bool reset)
+  {
+  if (reset == true)
+    {
+      _maxNumVertices = -1;
+      _maxDimension = -1;
+    }
+      
   const OptimizableGraph::Edge* e = static_cast<const OptimizableGraph::Edge*>(e_);
   int errorDimension = e->dimension();
   int numVertices = e->vertices().size();
@@ -72,16 +78,26 @@ void JacobianWorkspace::updateSize(const HyperGraph::Edge* e_)
   //cerr << __PRETTY_FUNCTION__ << " " << PVAR(this) << " " << PVAR(_maxNumVertices) << " " << PVAR(_maxDimension) << endl;
 }
 
-void JacobianWorkspace::updateSize(const OptimizableGraph& graph)
+  void JacobianWorkspace::updateSize(const OptimizableGraph& graph, bool reset)
 {
+  if (reset == true)
+    {
+      _maxNumVertices = -1;
+      _maxDimension = -1;
+    }
   for (OptimizableGraph::EdgeSet::const_iterator it = graph.edges().begin(); it != graph.edges().end(); ++it) {
     const OptimizableGraph::Edge* e = static_cast<const OptimizableGraph::Edge*>(*it);
     updateSize(e);
   }
 }
 
-void JacobianWorkspace::updateSize(int numVertices, int dimension)
+  void JacobianWorkspace::updateSize(int numVertices, int dimension, bool reset)
 {
+  if (reset == true)
+    {
+      _maxNumVertices = -1;
+      _maxDimension = -1;
+    }
   _maxNumVertices = max(numVertices, _maxNumVertices);
   _maxDimension = max(dimension, _maxDimension);
 }
