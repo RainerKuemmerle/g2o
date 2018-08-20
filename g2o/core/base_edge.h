@@ -132,10 +132,20 @@ namespace g2o {
 
       //! information matrix of the constraint
       const InformationType& information() const { return _information;}
+
+      // Set the new information matrix. If necessary, update the dimensions
       InformationType& information() { return _information;}
       void setInformation(const InformationType& information) {
         assert(information.rows() == information.cols() && "Information matrix not square");
         _information = information;
+        if (information.rows() > _dimension)
+          {
+            OptimizableGraph* g = graph();
+            if (g != nullptr)
+              {
+                g->jacobianWorkspace().updateSize(this);
+              }
+          }
         _dimension = information.rows();
       }
 
