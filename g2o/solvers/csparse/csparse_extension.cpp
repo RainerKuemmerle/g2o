@@ -20,6 +20,8 @@
 
 #include "csparse_extension.h"
 
+#include "g2o/stuff/macros.h"
+
 namespace g2o {
 namespace csparse_extension {
 

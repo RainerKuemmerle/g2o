@@ -27,10 +27,7 @@
 #ifndef G2O_CSPARSE_HELPER_H
 #define G2O_CSPARSE_HELPER_H
 
-#ifndef NCOMPLEX
-#define NCOMPLEX
-#endif
-#include <cs.h>
+#include "csparse_extension.h"
 
 #include "g2o_csparse_extension_api.h"
 
