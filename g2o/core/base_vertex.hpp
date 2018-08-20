@@ -34,6 +34,8 @@ BaseVertex<D, T>::BaseVertex() :
 
 template <int D, typename T>
 void BaseVertex<D, T>::resizeDimension(int newDimension) {
+
+  // If the dimension is known at compile time, check the dimension is unchanged and always return
   if (D > 0)
     {
       assert(newDimension == D && "error resizing vertex with fixed compile time dimension where runtime dimension != compile time dimension");
@@ -42,15 +44,26 @@ void BaseVertex<D, T>::resizeDimension(int newDimension) {
 
   assert(newDimension >= 0 && "error resizing vertex vertex with unknown compile time dimension where runtime dimension < 0");
 
-  if (newDimension != _dimension)
+  if (newDimension == _dimension)
+    return;
+
+  // Reset the internal state
+  resizeDimensionImpl(newDimension);
+  setHessianIndex(-1);
+  mapHessianMemory(nullptr);
+  _b.resize(newDimension);
+  updateCache();
+
+  // If we the dimension is being increased and this vertex is in a
+  // graph, update the size of the Jacobian workspace
+  if ((newDimension > _dimension) && (_graph != nullptr))
     {
-      resizeDimensionImpl(newDimension);
-      setHessianIndex(-1);
-      mapHessianMemory(nullptr);
-      _dimension = newDimension;
-      _b.resize(newDimension);
-      updateCache();
+      JacobianWorkspace& jacobianWorkspace = _graph->jacobianWorkspace();
+      for (auto e : _edges)
+        jacobianWorkspace.updateSize(e);
     }
+
+  _dimension = newDimension;
 }
 
 template <int D, typename T>
