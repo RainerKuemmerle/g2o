@@ -6,6 +6,7 @@ include_directories(${CSPARSE_INCLUDE_DIR})
 
 add_library(csparse_extension ${G2O_LGPL_LIB_TYPE}
   csparse_helper.cpp csparse_helper.h
+  csparse_extension.cpp csparse_extension.h
   g2o_csparse_extension_api.h
 )
 set_target_properties(csparse_extension PROPERTIES OUTPUT_NAME ${LIB_PREFIX}csparse_extension)
