@@ -70,6 +70,10 @@ void BaseUnaryEdge<D, E, VertexXiType>::constructQuadraticForm()
       from->b().noalias() -= rho[1] * A.transpose() * omega * _error;
       from->A().noalias() += A.transpose() * weightedOmega * A;
     } else {
+      //std::cout << "from->b()=" << from->b().transpose() << std::endl;
+      //std::cout << "A.transpose()=" << A.transpose() << std::endl;
+      //std::cout << "omega=" << omega << std::endl;
+      //std::cout << "_error=" << _error.transpose() << std::endl;
       from->b().noalias() -= A.transpose() * omega * _error;
       from->A().noalias() += A.transpose() * omega * A;
     }
@@ -108,7 +112,7 @@ void BaseUnaryEdge<D, E, VertexXiType>::linearizeOplus()
   // way to construct the perturbation vector for the Jacobian. If the
   // dimension is known at compile time, use directly. If the
   // dimension is known at run time and is less than 12, use an
-  // allocated array of up to 12. Otherwise, use a fallback of a
+  // allocated array of up to 12. Otherwise, use a fallback of the
   // dynamically allocated array.
 
   if ((VertexXiType::Dimension >= 0) || (vi->dimension() <= 12))
