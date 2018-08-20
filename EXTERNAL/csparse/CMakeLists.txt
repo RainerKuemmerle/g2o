@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.6)
 
 project(csparse)
 
-set(CMAKE_C_FLAGS_RELEASE "-O3 -DNDEBUG")
+#set(CMAKE_C_FLAGS_RELEASE "-O3 -DNDEBUG")
 
 add_library(csparse ${G2O_LGPL_LIB_TYPE}
   cs_add.c

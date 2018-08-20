@@ -26,6 +26,8 @@
 #ifndef G2O_CSPARSE_API_H
 #define G2O_CSPARSE_API_H
 
+#include "g2o/config.h"
+
 #ifdef _MSC_VER
  
 // We are using a Microsoft compiler:
