@@ -45,8 +45,9 @@ void BaseVertex<D, T>::resizeDimension(int newDimension) {
   if (newDimension != _dimension)
     {
       resizeDimensionImpl(newDimension);
-      _dimension = newDimension;
+      setHessianIndex(-1);
       mapHessianMemory(nullptr);
+      _dimension = newDimension;
       _b.resize(newDimension);
       updateCache();
     }
