@@ -1,5 +1,5 @@
 #include <benchmark/benchmark.h>
-#include "/usr/local/include/eigen3/Eigen/Core"
+#include <Eigen/Core>
 
 // Test several different ways of evaluating Jacobians to see the impact of different ways of implementing stuff.
 

@@ -18,6 +18,11 @@ if(G2O_BUILD_EXAMPLES)
   add_subdirectory(examples)
 endif(G2O_BUILD_EXAMPLES)
 
+# Benchmarks
+if(G2O_BUILD_BENCHMARKS)
+  add_subdirectory(benchmarks)
+endif(G2O_BUILD_BENCHMARKS)
+
 if(IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/playground")
   # Playground
   option (G2O_BUILD_PLAYGROUND "Build g2o playground" ON)
