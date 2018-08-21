@@ -68,9 +68,9 @@ namespace g2o {
 
     inline virtual void mapHessianMemory(number_t* d);
 
-    inline virtual void resizeDimension(int newDimension);
+    inline virtual bool resizeDimension(int newDimension);
 
-    virtual void resizeDimensionImpl(int newDimension)
+    virtual bool resizeDimensionImpl(int newDimension)
     {
       if (D < 0)
         {
@@ -80,7 +80,7 @@ namespace g2o {
         {
           std::cerr << __PRETTY_FUNCTION__ << ": should not be called for vertices with known compile time dimension" << std::endl;
         }
-      
+      return false;
     };
 
     virtual int copyB(number_t* b_) const {

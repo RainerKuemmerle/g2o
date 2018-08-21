@@ -33,22 +33,26 @@ BaseVertex<D, T>::BaseVertex() :
 }
 
 template <int D, typename T>
-void BaseVertex<D, T>::resizeDimension(int newDimension) {
+bool BaseVertex<D, T>::resizeDimension(int newDimension) {
 
   // If the dimension is known at compile time, check the dimension is unchanged and always return
   if (D > 0)
     {
       assert(newDimension == D && "error resizing vertex with fixed compile time dimension where runtime dimension != compile time dimension");
-      return;
+      return(newDimension == D);
     }
 
   assert(newDimension >= 0 && "error resizing vertex vertex with unknown compile time dimension where runtime dimension < 0");
+  if (newDimension < 0)
+    return false;
 
   if (newDimension == _dimension)
-    return;
+    return true;
 
   // Reset the internal state
-  resizeDimensionImpl(newDimension);
+  if (resizeDimensionImpl(newDimension) == false)
+    return false;
+  
   setHessianIndex(-1);
   mapHessianMemory(nullptr);
   _b.resize(newDimension);
@@ -64,6 +68,7 @@ void BaseVertex<D, T>::resizeDimension(int newDimension) {
     }
 
   _dimension = newDimension;
+  return true;
 }
 
 template <int D, typename T>
