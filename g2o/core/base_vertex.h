@@ -70,7 +70,7 @@ namespace g2o {
 
     inline virtual bool resizeDimension(int newDimension);
 
-    virtual bool resizeDimensionImpl(int newDimension)
+    virtual bool resizeDimensionImpl(int /*newDimension*/)
     {
       if (D < 0)
         {

@@ -133,16 +133,26 @@ namespace g2o {
       //! information matrix of the constraint
       const InformationType& information() const { return _information;}
 
-      // Set the new information matrix.
       InformationType& information() { return _information;}
+
+      // Set the new information matrix.
       void setInformation(const InformationType& information) {
+	
+	// Check the information matrix is square (this isn't guaranteed for dynamic matrices)
         assert(information.rows() == information.cols() && "Information matrix not square");
-        _information = information;
-        const int oldDimension = _dimension;
+
+	// Set the information
+	_information = information;
+
+	// Change the dimension. If the dimension is being increased
+	// and this edge is in a graph, update the size of the
+	// Jacobian workspace just in case it needs to grow. Note that
+	// _dimension has to be set to its new value first if this is
+	// to work properly.
+	
+        const int lastDimension = _dimension;
         _dimension = information.rows();
-        // If the dimension has increased, we might need to increase
-        // the size of the Jacobian workspace for the graph.
-        if (_dimension > oldDimension)
+        if (_dimension > lastDimension)
           {
             OptimizableGraph* g = graph();
             if (g != nullptr)

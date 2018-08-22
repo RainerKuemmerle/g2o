@@ -42,10 +42,12 @@ bool BaseVertex<D, T>::resizeDimension(int newDimension) {
       return(newDimension == D);
     }
 
+  // Check the dimension is non-negative.
   assert(newDimension >= 0 && "error resizing vertex vertex with unknown compile time dimension where runtime dimension < 0");
   if (newDimension < 0)
     return false;
 
+  // Nothing to do if the dimension is unchanged.
   if (newDimension == _dimension)
     return true;
 
@@ -58,8 +60,9 @@ bool BaseVertex<D, T>::resizeDimension(int newDimension) {
   _b.resize(newDimension);
   updateCache();
 
-  // If we the dimension is being increased and this vertex is in a
-  // graph, update the size of the Jacobian workspace
+  // If the dimension is being increased and this vertex is in a
+  // graph, update the size of the Jacobian workspace just in case it
+  // needs to grow.
   if ((newDimension > _dimension) && (_graph != nullptr))
     {
       JacobianWorkspace& jacobianWorkspace = _graph->jacobianWorkspace();
