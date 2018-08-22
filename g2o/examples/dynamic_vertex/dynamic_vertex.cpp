@@ -7,18 +7,6 @@
 #include "g2o/core/base_binary_edge.h"
 #include "g2o/solvers/csparse/linear_solver_csparse.h"
 
-/*
-#include <g2o/core/block_solver.h>
-#include <g2o/core/optimization_algorithm_gauss_newton.h>
-#include <g2o/core/optimization_algorithm_levenberg.h>
-#include <g2o/core/optimization_algorithm_dogleg.h>
-#include <g2o/solvers/dense/linear_solver_dense.h>
-#include <g2o/solvers/cholmod/linear_solver_cholmod.h>
-#include <g2o/solvers/csparse/linear_solver_csparse.h>
-#include <g2o/solvers/pcg/linear_solver_pcg.h>
-#include <Eigen/Eigenvalues>
-*/
-
 using namespace ::std;
 using namespace ::Eigen;
 
@@ -30,10 +18,9 @@ class DynamicVertex : public g2o::BaseVertex<Eigen::Dynamic, Eigen::VectorXd>
   public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
   
-  DynamicVertex()
+  DynamicVertex(int startingDimension = Eigen::Dynamic)
   {
-    cout << __PRETTY_FUNCTION__ << endl;
-    
+    resizeDimension(startingDimension);
   }
   
   virtual bool read(std::istream& /*is*/)
@@ -59,12 +46,15 @@ class DynamicVertex : public g2o::BaseVertex<Eigen::Dynamic, Eigen::VectorXd>
       _estimate += v;
   }
 
-  virtual void resizeDimensionImpl(int newDimension)
+  virtual bool resizeDimensionImpl(int newDimension)
   {
      _estimate.resize(newDimension);
      _estimate.setZero();
+     return true;
    }
 };
+
+// A static vertex is one of the standard, known types.
 
 class StaticVertex : public g2o::BaseVertex<3, Eigen::Vector3d>
 {
@@ -123,7 +113,6 @@ public:
   
 };
 
-
 class DynamicBinaryEdge : public g2o::BaseBinaryEdge<Eigen::Dynamic, Eigen::VectorXd, DynamicVertex, DynamicVertex>
 {
 public:
@@ -147,6 +136,31 @@ public:
   }
   
 };
+
+
+class StaticDynamicBinaryEdge : public g2o::BaseBinaryEdge<Eigen::Dynamic, Eigen::VectorXd, StaticVertex, DynamicVertex>
+{
+public:
+
+  
+  virtual bool read(std::istream& /*is*/)
+  {
+    cerr << __PRETTY_FUNCTION__ << " not implemented yet" << endl;
+    return false;
+  }
+  
+  virtual bool write(std::ostream& /*os*/) const
+  {
+    cerr << __PRETTY_FUNCTION__ << " not implemented yet" << endl;
+    return false;
+  }
+  
+  virtual void computeError()
+  {
+    _error = static_cast<StaticVertex*>(_vertices[0])->estimate().head(_dimension) - static_cast<DynamicVertex*>(_vertices[1])->estimate().head(_dimension) - _measurement.head(_dimension);
+  }
+};
+
 
 g2o::SparseOptimizer* buildOptimizer()
 {
@@ -178,10 +192,8 @@ void testUnaryEdge(int dimension)
 
   // Create the vertex, set the dimensions and clear the state to set
   // it to a known value
-  DynamicVertex* v0 = new DynamicVertex();
+  DynamicVertex* v0 = new DynamicVertex(dimension);
   v0->setId(0);
-  
-  v0->resizeDimension(dimension);
   v0->setToOrigin();
 
   optimizer->addVertex(v0);
@@ -221,10 +233,8 @@ void testReizeUnaryEdge(int dim1, int dim2)
 
   // Create the vertex, set the dimensions and clear the state to set
   // it to a known value
-  DynamicVertex* v0 = new DynamicVertex();
+  DynamicVertex* v0 = new DynamicVertex(dim1);
   v0->setId(0);
-  
-  v0->resizeDimension(dim1);
   v0->setToOrigin();
 
   optimizer->addVertex(v0);
@@ -282,15 +292,13 @@ void testBinaryEdgeDD(int dimV0, int dimV1, int dimM)
 
   // Create the vertex, set the dimensions and clear the state to set
   // it to a known value
-  DynamicVertex* v0 = new DynamicVertex();
-  v0->setId(0);
+  DynamicVertex* v0 = new DynamicVertex(dimV0);
   v0->resizeDimension(dimV0);
   v0->setToOrigin();
   optimizer->addVertex(v0);
 
-  DynamicVertex* v1 = new DynamicVertex();
+  DynamicVertex* v1 = new DynamicVertex(dimV1);
   v1->setId(1);
-  v1->resizeDimension(dimV1);
   v1->setToOrigin();
 
   optimizer->addVertex(v1);
@@ -323,6 +331,54 @@ void testBinaryEdgeDD(int dimV0, int dimV1, int dimM)
   delete optimizer;
 }
 
+
+void testBinaryEdgeSD(int dimV1, int dimM)
+{
+  // Create the optimizer
+  g2o::SparseOptimizer* optimizer = buildOptimizer();
+
+  // Create the static vertex
+  StaticVertex* v0 = new StaticVertex();
+  v0->setId(0);
+  //  v0->resizeDimension(dimV1);
+  v0->setToOrigin();
+  optimizer->addVertex(v0);
+
+  DynamicVertex* v1 = new DynamicVertex(dimV1);
+  v1->setId(1);
+  v1->setToOrigin();
+
+  optimizer->addVertex(v1);
+
+    // Create a measurement
+  VectorXd measurement(dimM);
+  for (int d = 0; d < dimM; ++ d)
+    measurement[d] = d;
+
+  MatrixXd information(dimM, dimM);
+  information.setIdentity();
+
+  // Create the edge
+  StaticDynamicBinaryEdge* dbe = new StaticDynamicBinaryEdge();
+  dbe->setVertex(0, v0);
+  dbe->setVertex(1, v1);
+  
+  dbe->setMeasurement(measurement);
+  dbe->setInformation(information);
+
+  optimizer->addEdge(dbe);
+
+  optimizer->initializeOptimization();
+  
+  optimizer->optimize(10);
+
+  cout << v0->estimate().transpose() << endl;
+  cout << v1->estimate().transpose() << endl;
+
+  delete optimizer;
+}
+
+
 int main(int argc, const char* argv[])
 {
   // First create a dynamic vertex
@@ -330,38 +386,18 @@ int main(int argc, const char* argv[])
   //StaticVertex* s2 = new StaticVertex();
   //cout << s2->dimension() << endl;
 
-  //testUnaryEdge(1);
-  // testUnaryEdge(2);
-  //testUnaryEdge(20);
+  testUnaryEdge(1);
+  testUnaryEdge(2);
+  testUnaryEdge(20);
 
   testReizeUnaryEdge(1, 2);
+  testReizeUnaryEdge(2, 1);
   
     
     
-    //testBinaryEdgeDD(5, 5, 5);
-    //testBinaryEdgeDD(10, 5, 5);
-    //testBinaryEdgeDD(5, 10, 5);
-    
-  /*
-  
-  
+  testBinaryEdgeSD(3, 3);
+  testBinaryEdgeSD(2, 2);
 
-  cout << "due->rank()=" << due->rank() << endl;
-  
-  
-  due->computeError();
-
-  cout << due->error().transpose() << endl;
-  cout << "due->rank()=" << due->rank() << endl;
-
-  v0->resizeDimension(12);
-  measurement.resize(12);
-  measurement.setZero();
-
-  due->setMeasurement(measurement);
-  
-  due->computeError();
-
-  cout << due->error().transpose() << endl;
-  */ 
+  //testBinaryEdgeSD(10, 5, 5);
+  //testBinaryEdgeSD(5, 10, 5);
 }
