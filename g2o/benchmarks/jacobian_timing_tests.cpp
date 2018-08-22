@@ -237,8 +237,8 @@ void BM_DynamicAlignedBuffer(benchmark::State& state)
   
   while (state.KeepRunning())
     {
-      const size_t d = state.range(0);
-      static dynamic_aligned_buffer<number_t> buffer{ d };
+      const int d = state.range(0);
+      static dynamic_aligned_buffer<number_t> buffer{ size_t(d)};
       number_t* add_vi = buffer.request(d);
       std::fill(add_vi, add_vi + d, number_t(0.0));
       for (int i = 0; i < d; ++i)
@@ -257,8 +257,8 @@ void BM_DynamicAlignedBufferPointer(benchmark::State& state)
   
   while (state.KeepRunning())
     {
-      const size_t d = state.range(0);
-      static dynamic_aligned_buffer<number_t> buffer{ d };
+      const int d = state.range(0);
+      static dynamic_aligned_buffer<number_t> buffer{ size_t(d) };
       number_t* add_vi = buffer.request(d);
       std::fill(add_vi, add_vi + d, number_t(0.0));
       number_t* v= add_vi;
@@ -277,7 +277,7 @@ void BM_StaticDynamicDynamicAlignedBufferHybrid(benchmark::State& state)
 {
   while (state.KeepRunning())
     {
-      const size_t d = state.range(0);
+      const int d = state.range(0);
       if (d <= 10)
         {
           number_t add_vi[10] = 
