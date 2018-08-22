@@ -18,7 +18,7 @@ class DynamicVertex : public g2o::BaseVertex<Eigen::Dynamic, Eigen::VectorXd>
   public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
   
-  DynamicVertex(int startingDimension = Eigen::Dynamic)
+  DynamicVertex(int startingDimension = 0)
   {
     resizeDimension(startingDimension);
   }
@@ -43,7 +43,7 @@ class DynamicVertex : public g2o::BaseVertex<Eigen::Dynamic, Eigen::VectorXd>
   virtual void oplusImpl(const double* update)
   {
     Eigen::VectorXd::ConstMapType v(update, _dimension);
-      _estimate += v;
+    _estimate += v;
   }
 
   virtual bool resizeDimensionImpl(int newDimension)
