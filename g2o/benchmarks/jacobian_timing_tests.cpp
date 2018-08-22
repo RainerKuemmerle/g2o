@@ -1,83 +1,82 @@
 #include <benchmark/benchmark.h>
-#include "/usr/local/include/eigen3/Eigen/Core"
+#include <Eigen/Core>
 
 // Test several different ways of evaluating Jacobians to see the impact of different ways of implementing stuff.
 
-    // 16 byte aligned allocation functions
-    template<typename Type>
-    Type* allocate_aligned(size_t n)
-    {
-        return (Type*)Eigen::internal::aligned_malloc(n * sizeof(Type));
-    }
+// 16 byte aligned allocation functions
+template<typename Type>
+Type* allocate_aligned(size_t n)
+{
+  return (Type*)Eigen::internal::aligned_malloc(n * sizeof(Type));
+}
 
-    template<typename Type>
-    Type* reallocate_aligned(Type* ptr, size_t newSize, size_t oldSize)
-    {
-        return (Type*)Eigen::internal::aligned_realloc(ptr, newSize * sizeof(Type), oldSize * sizeof(Type));
-    }
+template<typename Type>
+Type* reallocate_aligned(Type* ptr, size_t newSize, size_t oldSize)
+{
+  return (Type*)Eigen::internal::aligned_realloc(ptr, newSize * sizeof(Type), oldSize * sizeof(Type));
+}
 
-    template<typename Type>
-    void free_aligned(Type* block)
-    {
-        Eigen::internal::aligned_free(block);
-    }
+template<typename Type>
+void free_aligned(Type* block)
+{
+  Eigen::internal::aligned_free(block);
+}
 
-    template<typename Type>
-    struct dynamic_aligned_buffer
-    {
-        dynamic_aligned_buffer(size_t size)
-            : m_size{ 0 }, m_ptr{ nullptr }
-        {
-            allocate(size);
-        }
+template<typename Type>
+struct dynamic_aligned_buffer
+{
+  dynamic_aligned_buffer(size_t size)
+    : m_size{ 0 }, m_ptr{ nullptr }
+  {
+    allocate(size);
+  }
 
-        ~dynamic_aligned_buffer()
-        {
-            free();
-        }
+  ~dynamic_aligned_buffer()
+  {
+    free();
+  }
 
-        Type* request(size_t n)
-        {
-            if (n <= m_size)
-                return m_ptr;
+  Type* request(size_t n)
+  {
+    if (n <= m_size)
+      return m_ptr;
 
-            m_ptr = reallocate_aligned<Type>(m_ptr, n, m_size);
-            m_size = m_ptr ? n : 0;
+    m_ptr = reallocate_aligned<Type>(m_ptr, n, m_size);
+    m_size = m_ptr ? n : 0;
 
-            return m_ptr;
-        }
+    return m_ptr;
+  }
 
-    private:
-        void allocate(size_t size)
-        {
-            m_ptr = allocate_aligned<Type>(size);
-            if (m_ptr != nullptr)
-                m_size = size;
-        }
+private:
+  void allocate(size_t size)
+  {
+    m_ptr = allocate_aligned<Type>(size);
+    if (m_ptr != nullptr)
+      m_size = size;
+  }
 
-        void free()
-        {
-            if (m_ptr != nullptr)
-            {
-                free_aligned<Type>(m_ptr);
-                m_size = 0;
-                m_ptr = nullptr;
-            }
-        }
+  void free()
+  {
+    if (m_ptr != nullptr)
+      {
+        free_aligned<Type>(m_ptr);
+        m_size = 0;
+        m_ptr = nullptr;
+      }
+  }
 
-        std::size_t m_size;
-        Type* m_ptr;
-    };
+  std::size_t m_size;
+  Type* m_ptr;
+};
 
-    template<typename T>
-    struct aligned_deleter
-    {
-        void operator()(T* block)
-        {
-            free_aligned(block);
-        }
-    };
-
+template<typename T>
+struct aligned_deleter
+{
+  void operator()(T* block)
+  {
+    free_aligned(block);
+  }
+};
 
 template<typename number_t, int D>
 void BM_FixedArray(benchmark::State& state)
@@ -88,15 +87,18 @@ void BM_FixedArray(benchmark::State& state)
         {
         }
         ;
-      number_t* v  = &add_vi[0];
       for (int i = 0; i < D; ++i)
-        add_vi[i]++;
+        {
+          benchmark::DoNotOptimize(add_vi[i]=1);
+          benchmark::DoNotOptimize(add_vi[i]=-1);
+          benchmark::DoNotOptimize(add_vi[i]=0);
+        }
     }
 }
 
 
 template<typename number_t, int D>
-void BM_FixedPointerArray(benchmark::State& state)
+void BM_FixedArrayPointer(benchmark::State& state)
 {
   while (state.KeepRunning())
     {
@@ -106,7 +108,59 @@ void BM_FixedPointerArray(benchmark::State& state)
         ;
       number_t* v  = &add_vi[0];
       for (int i = 0; i < D; ++i)
-        (*v++)++;
+        {
+          benchmark::DoNotOptimize((*v)=1);
+          benchmark::DoNotOptimize((*v)=-1);
+          benchmark::DoNotOptimize((*v++)=0);
+        }
+    }
+}
+
+
+
+template<typename number_t>
+void BM_VariableArray(benchmark::State& state)
+{
+  while (state.KeepRunning())
+    {
+      const int d = state.range(0);
+      
+      number_t add_vi[d];
+      //std::fill(add_vi, add_vi + d, number_t(0.0));
+
+      for (int i = 0; i < d; ++i)
+        {
+          benchmark::DoNotOptimize(add_vi[i]=0);
+        }
+
+      for (int i = 0; i < d; ++i)
+        {
+          benchmark::DoNotOptimize(add_vi[i]=1);
+          benchmark::DoNotOptimize(add_vi[i]=-1);
+          benchmark::DoNotOptimize(add_vi[i]=0);
+        }
+    }
+}
+
+
+template<typename number_t>
+void BM_VariableArrayPointer(benchmark::State& state)
+{
+  while (state.KeepRunning())
+    {
+      const int d = state.range(0);
+      number_t add_vi[d];
+      
+      std::fill(add_vi, add_vi + d, number_t(0.0));
+
+      number_t* v  = &add_vi[0];
+
+      for (int i = 0; i < d; ++i)
+        {
+          benchmark::DoNotOptimize((*v)=1);
+          benchmark::DoNotOptimize((*v)=-1);
+          benchmark::DoNotOptimize((*v++)=0);
+        }
     }
 }
 
@@ -117,19 +171,27 @@ void BM_StaticEigenMatrix(benchmark::State& state)
     {
       Eigen::Matrix<number_t, D, 1> add_vi = Eigen::Matrix<number_t, D, 1>::Zero();
       for (int i = 0; i < D; ++i)
-        add_vi[i]++;
+        {
+          benchmark::DoNotOptimize(add_vi[i]=1);
+          benchmark::DoNotOptimize(add_vi[i]=-1);
+          benchmark::DoNotOptimize(add_vi[i]=0);
+        }
     }
 }
 
 template<typename number_t, int D>
-void BM_StaticEigenPointerMatrix(benchmark::State& state)
+void BM_StaticEigenMatrixPointer(benchmark::State& state)
 {
   while (state.KeepRunning())
     {
       Eigen::Matrix<number_t, D, 1> add_vi = Eigen::Matrix<number_t, D, 1>::Zero();
       number_t* v  = add_vi.data();
       for (int i = 0; i < D; ++i)
-        (*v++)++;
+        {
+          benchmark::DoNotOptimize((*v)=1);
+          benchmark::DoNotOptimize((*v)=-1);
+          benchmark::DoNotOptimize((*v++)=0);
+        }
     }
 }
 
@@ -139,99 +201,212 @@ void BM_DynamicEigenMatrix(benchmark::State& state)
 {
   while (state.KeepRunning())
     {
-      Eigen::Matrix<number_t, Eigen::Dynamic, 1> add_vi(state.range(0));
+      const int d = state.range(0);
+      Eigen::Matrix<number_t, Eigen::Dynamic, 1> add_vi(d);
       add_vi.setZero();
-       for (int i = 0; i < state.range(0); ++i)
-        add_vi[i]++;
+      for (int i = 0; i < d; ++i)
+         {
+          benchmark::DoNotOptimize(add_vi[i]=1);
+          benchmark::DoNotOptimize(add_vi[i]=-1);
+          benchmark::DoNotOptimize(add_vi[i]=0);
+        }
     }
-
 }
 
 template<typename number_t>
-void BM_DynamicEigenPointerMatrix(benchmark::State& state)
+void BM_DynamicEigenMatrixPointer(benchmark::State& state)
 {
   while (state.KeepRunning())
     {
-      Eigen::Matrix<number_t, Eigen::Dynamic, 1> add_vi(state.range(0));
+      const int d = state.range(0);
+      Eigen::Matrix<number_t, Eigen::Dynamic, 1> add_vi(d);
       add_vi.setZero();
       number_t* v  = add_vi.data();
-      for (int i = 0; i < state.range(0); ++i)
-        (*v++)++;
+      for (int i = 0; i < d; ++i)
+        {
+          benchmark::DoNotOptimize((*v)=1);
+          benchmark::DoNotOptimize((*v)=-1);
+          benchmark::DoNotOptimize((*v++)=0);
+        }
     }
 }
 
-template<typename number_t, int D>
+template<typename number_t>
 void BM_DynamicAlignedBuffer(benchmark::State& state)
 {
   
   while (state.KeepRunning())
     {
-      dynamic_aligned_buffer<number_t> buffer{ 12 };
-      number_t* add_vi = buffer.request(D);
-      for (int i = 0; i < D; ++i)
-        add_vi[i]++;
+      const size_t d = state.range(0);
+      static dynamic_aligned_buffer<number_t> buffer{ d };
+      number_t* add_vi = buffer.request(d);
+      std::fill(add_vi, add_vi + d, number_t(0.0));
+      for (int i = 0; i < d; ++i)
+        {
+          benchmark::DoNotOptimize(add_vi[i]=1);
+          benchmark::DoNotOptimize(add_vi[i]=-1);
+          benchmark::DoNotOptimize(add_vi[i]=0);
+        }
     }
 }
 
 
-template<typename number_t, int D>
-void BM_DynamicAlignedPointerBuffer(benchmark::State& state)
+template<typename number_t>
+void BM_DynamicAlignedBufferPointer(benchmark::State& state)
 {
   
   while (state.KeepRunning())
     {
-      dynamic_aligned_buffer<number_t> buffer{ 12 };
-      number_t* add_vi = buffer.request(D);
+      const size_t d = state.range(0);
+      static dynamic_aligned_buffer<number_t> buffer{ d };
+      number_t* add_vi = buffer.request(d);
+      std::fill(add_vi, add_vi + d, number_t(0.0));
       number_t* v= add_vi;
       
-       v= add_vi;
-      for (int i = 0; i < D; ++i)
-        (*v++)++;
+      for (int i = 0; i < d; ++i)
+        {
+          benchmark::DoNotOptimize((*v)=1);
+          benchmark::DoNotOptimize((*v)=-1);
+          benchmark::DoNotOptimize((*v++)=0);
+        }
     }
 }
 
 template<typename number_t>
-void BM_StaticDynamicPointerHybrid(benchmark::State& state)
+void BM_StaticDynamicDynamicAlignedBufferHybrid(benchmark::State& state)
 {
   while (state.KeepRunning())
     {
-      if (state.range(0) < 20)
+      const size_t d = state.range(0);
+      if (d <= 10)
         {
-          number_t add_vi[20] = 
+          number_t add_vi[10] = 
             {
             }
             ;
-          number_t* v  = &add_vi[0];
-          for (int i = 0; i < state.range(0); ++i)
-            add_vi[i]++;
+          for (int i = 0; i < d; ++i)
+            {
+              benchmark::DoNotOptimize(add_vi[i]=1);
+              benchmark::DoNotOptimize(add_vi[i]=-1);
+              benchmark::DoNotOptimize(add_vi[i]=0);
+            }
         }
       else
         {
-          Eigen::Matrix<number_t, Eigen::Dynamic, 1> add_vi(state.range(0));
-          add_vi.setZero();
-          number_t* v  = add_vi.data();
-          for (int i = 0; i < state.range(0); ++i)
-            (*v++)++;
+          static dynamic_aligned_buffer<number_t> buffer{ d };
+          number_t* add_vi = buffer.request(d);
+          std::fill(add_vi, add_vi + d, number_t(0.0));
+          for (int i = 0; i < d; ++i)
+            {
+              benchmark::DoNotOptimize(add_vi[i]=1);
+              benchmark::DoNotOptimize(add_vi[i]=-1);
+              benchmark::DoNotOptimize(add_vi[i]=0);
+            }
         }
     }
 }
+#define DECLARE_TESTS(N, D)                                     \
+  BENCHMARK_TEMPLATE2(BM_FixedArray, N, D);                     \
+  BENCHMARK_TEMPLATE2(BM_FixedArrayPointer, N, D);              \
+  BENCHMARK_TEMPLATE(BM_VariableArray, N)->Arg(D);                     \
+  BENCHMARK_TEMPLATE(BM_VariableArrayPointer, N)->Arg(D);         \
+  BENCHMARK_TEMPLATE2(BM_StaticEigenMatrix, N, D);              \
+  BENCHMARK_TEMPLATE2(BM_StaticEigenMatrixPointer, N, D);       \
+  BENCHMARK_TEMPLATE(BM_DynamicEigenMatrix, N)->Arg(D);         \
+  BENCHMARK_TEMPLATE(BM_DynamicEigenMatrixPointer, N)->Arg(D);  \
+  BENCHMARK_TEMPLATE2(BM_DynamicAlignedBuffer, N, D);           \
+  BENCHMARK_TEMPLATE2(BM_DynamicAlignedPointerBuffer, N, D);    \
+  BENCHMARK_TEMPLATE(BM_StaticDynamicPointerHybrid, N)->Arg(D);
+/*
 
-#define DECLARE_TESTS(N, D) \
-BENCHMARK_TEMPLATE2(BM_FixedArray, N, D);\
-BENCHMARK_TEMPLATE2(BM_FixedPointerArray, N, D);\
-BENCHMARK_TEMPLATE2(BM_StaticEigenMatrix, N, D);\
-BENCHMARK_TEMPLATE2(BM_StaticEigenPointerMatrix, N, D);\
- BENCHMARK_TEMPLATE(BM_DynamicEigenMatrix, N)->Arg(D);      \
- BENCHMARK_TEMPLATE(BM_DynamicEigenPointerMatrix, N)->Arg(D);  \
-BENCHMARK_TEMPLATE2(BM_DynamicAlignedBuffer, N, D);\
-BENCHMARK_TEMPLATE2(BM_DynamicAlignedPointerBuffer, N, D); \
- BENCHMARK_TEMPLATE(BM_StaticDynamicPointerHybrid, N)->Arg(D);  \
- 
-
-DECLARE_TESTS(double, 15)
+DECLARE_TESTS(double, 1)
+DECLARE_TESTS(double, 2)
+DECLARE_TESTS(double, 3)
+DECLARE_TESTS(double, 4)
+DECLARE_TESTS(double, 5)
+DECLARE_TESTS(double, 6)
+DECLARE_TESTS(double, 7)
+DECLARE_TESTS(double, 8)
+DECLARE_TESTS(double, 9)
+DECLARE_TESTS(double, 10)
 DECLARE_TESTS(double, 200)
 
-DECLARE_TESTS(float, 3)
-DECLARE_TESTS(float, 200)
+*/
+
+#define BENCHMARK_FIXED_DIMENSION(M, F) \
+BENCHMARK_TEMPLATE2(M, F, 1);   \
+BENCHMARK_TEMPLATE2(M, F, 2);   \
+BENCHMARK_TEMPLATE2(M, F, 3);   \
+BENCHMARK_TEMPLATE2(M, F, 4);   \
+BENCHMARK_TEMPLATE2(M, F, 5);   \
+BENCHMARK_TEMPLATE2(M, F, 6);   \
+BENCHMARK_TEMPLATE2(M, F, 7);   \
+BENCHMARK_TEMPLATE2(M, F, 8);   \
+BENCHMARK_TEMPLATE2(M, F, 9);   \
+ BENCHMARK_TEMPLATE2(M, F, 10);\
+BENCHMARK_TEMPLATE2(M, F, 20);\
+BENCHMARK_TEMPLATE2(M, F, 30);\
+BENCHMARK_TEMPLATE2(M, F, 40);\
+BENCHMARK_TEMPLATE2(M, F, 50);\
+BENCHMARK_TEMPLATE2(M, F, 100);
+
+#define BENCHMARK_VARIABLE_DIMENSION(M, F) \
+  BENCHMARK_TEMPLATE(M, F)->Arg(1);       \
+BENCHMARK_TEMPLATE(M, F)->Arg(2);   \
+BENCHMARK_TEMPLATE(M, F)->Arg(3);   \
+BENCHMARK_TEMPLATE(M, F)->Arg(4);   \
+BENCHMARK_TEMPLATE(M, F)->Arg(5);   \
+BENCHMARK_TEMPLATE(M, F)->Arg(6);   \
+BENCHMARK_TEMPLATE(M, F)->Arg(7);   \
+BENCHMARK_TEMPLATE(M, F)->Arg(8);   \
+BENCHMARK_TEMPLATE(M, F)->Arg(9);   \
+BENCHMARK_TEMPLATE(M, F)->Arg(10);\
+BENCHMARK_TEMPLATE(M, F)->Arg(20);\
+BENCHMARK_TEMPLATE(M, F)->Arg(30);\
+BENCHMARK_TEMPLATE(M, F)->Arg(40);\
+BENCHMARK_TEMPLATE(M, F)->Arg(50);\
+BENCHMARK_TEMPLATE(M, F)->Arg(100);
+
+BENCHMARK_FIXED_DIMENSION(BM_FixedArray, double)
+BENCHMARK_FIXED_DIMENSION(BM_FixedArrayPointer, double)
+
+BENCHMARK_FIXED_DIMENSION(BM_StaticEigenMatrix, double)
+BENCHMARK_FIXED_DIMENSION(BM_StaticEigenMatrixPointer, double)
+
+BENCHMARK_VARIABLE_DIMENSION(BM_VariableArray, double)
+BENCHMARK_VARIABLE_DIMENSION(BM_VariableArrayPointer, double)
+
+BENCHMARK_VARIABLE_DIMENSION(BM_DynamicEigenMatrix, double)
+BENCHMARK_VARIABLE_DIMENSION(BM_DynamicEigenMatrixPointer, double)
+
+BENCHMARK_VARIABLE_DIMENSION(BM_DynamicAlignedBuffer, double)
+BENCHMARK_VARIABLE_DIMENSION(BM_DynamicAlignedBufferPointer, double)
+
+BENCHMARK_VARIABLE_DIMENSION(BM_StaticDynamicDynamicAlignedBufferHybrid, double)
+
+/*
+
+BENCHMARK_TEMPLATE(BM_VariableArray, double)->Arg(1);   
+BENCHMARK_TEMPLATE(BM_VariableArray, double)->Arg(2);   
+BENCHMARK_TEMPLATE(BM_VariableArray, double)->Arg(3);   
+BENCHMARK_TEMPLATE(BM_VariableArray, double)->Arg(4);   
+BENCHMARK_TEMPLATE(BM_VariableArray, double)->Arg(5);   
+BENCHMARK_TEMPLATE(BM_VariableArray, double)->Arg(6);   
+BENCHMARK_TEMPLATE(BM_VariableArray, double)->Arg(7);   
+BENCHMARK_TEMPLATE(BM_VariableArray, double)->Arg(8);   
+BENCHMARK_TEMPLATE(BM_VariableArray, double)->Arg(9);   
+BENCHMARK_TEMPLATE(BM_VariableArray, double)->Arg(10);   
+
+BENCHMARK_TEMPLATE2(BM_FixedArray, double, 1);   
+BENCHMARK_TEMPLATE2(BM_FixedArray, double, 2);   
+BENCHMARK_TEMPLATE2(BM_FixedArray, double, 3);   
+BENCHMARK_TEMPLATE2(BM_FixedArray, double, 4);   
+BENCHMARK_TEMPLATE2(BM_FixedArray, double, 5);   
+BENCHMARK_TEMPLATE2(BM_FixedArray, double, 6);   
+BENCHMARK_TEMPLATE2(BM_FixedArray, double, 7);   
+BENCHMARK_TEMPLATE2(BM_FixedArray, double, 8);   
+BENCHMARK_TEMPLATE2(BM_FixedArray, double, 9);   
+BENCHMARK_TEMPLATE2(BM_FixedArray, double, 10); 
+*/
 
 BENCHMARK_MAIN();
