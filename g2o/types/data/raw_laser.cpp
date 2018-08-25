@@ -34,7 +34,7 @@ namespace g2o {
 
   RawLaser::RawLaser() :
     RobotData(),
-    _laserParams(0, 180, -M_PI/2, M_PI/180., 50.,0.1, 0)
+    _laserParams(0, 180, -const_pi()/2, const_pi()/180, 50, cst(0.1), 0)
   {
   }
 
@@ -52,7 +52,7 @@ namespace g2o {
   bool RawLaser::read(std::istream& is)
   {
     int type;
-    double angle, fov, res, maxrange, acc;
+    number_t angle, fov, res, maxrange, acc;
     int remission_mode;
     is >> type >> angle >> fov >> res >> maxrange >> acc >> remission_mode;
 
@@ -75,12 +75,12 @@ namespace g2o {
     return true;
   }
 
-  void RawLaser::setRanges(const vector<double>& ranges)
+  void RawLaser::setRanges(const vector<number_t>& ranges)
   {
     _ranges = ranges;
   }
 
-  void RawLaser::setRemissions(const std::vector<double>& remissions)
+  void RawLaser::setRemissions(const std::vector<number_t>& remissions)
   {
     _remissions = remissions;
   }
@@ -94,10 +94,10 @@ namespace g2o {
   {
     Point2DVector points;
     for (size_t i = 0; i < _ranges.size(); ++i) {
-      const double& r = _ranges[i];
-      if (r < _laserParams.maxRange) {
-        double alpha = _laserParams.firstBeamAngle + i * _laserParams.angularStep;
-        points.push_back(Vector2D(cos(alpha) * r, sin(alpha) * r));
+      const number_t& r = _ranges[i];
+      if (r < _laserParams.maxRange && r > _laserParams.minRange) {
+        number_t alpha = _laserParams.firstBeamAngle + i * _laserParams.angularStep;
+        points.push_back(Vector2(std::cos(alpha) * r, std::sin(alpha) * r));
       }
     }
     return points;

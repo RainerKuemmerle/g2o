@@ -43,18 +43,20 @@
 #include "g2o/stuff/misc.h"
 #include "g2o/config.h"
 
+#include "g2o/core/ownership.h"
+
 namespace g2o{
   using namespace std;
 
-
   SparseOptimizer::SparseOptimizer() :
-    _forceStopFlag(0), _verbose(false), _algorithm(0), _computeBatchStatistics(false)
+    _forceStopFlag(0), _verbose(false), _algorithm(nullptr), _computeBatchStatistics(false)
   {
     _graphActions.resize(AT_NUM_ELEMENTS);
   }
 
-  SparseOptimizer::~SparseOptimizer(){
-    delete _algorithm;
+  SparseOptimizer::~SparseOptimizer()
+  {
+    release(_algorithm);
     G2OBatchStatistics::setGlobalStats(0);
   }
 
@@ -87,9 +89,9 @@ namespace g2o{
 
   }
 
-  double SparseOptimizer::activeChi2( ) const
+  number_t SparseOptimizer::activeChi2( ) const
   {
-    double chi = 0.0;
+    number_t chi = 0.0;
     for (EdgeContainer::const_iterator it = _activeEdges.begin(); it != _activeEdges.end(); ++it) {
       const OptimizableGraph::Edge* e = *it;
       chi += e->chi2();
@@ -97,10 +99,10 @@ namespace g2o{
     return chi;
   }
 
-  double SparseOptimizer::activeRobustChi2() const
+  number_t SparseOptimizer::activeRobustChi2() const
   {
-    Vector3D rho;
-    double chi = 0.0;
+    Vector3 rho;
+    number_t chi = 0.0;
     for (EdgeContainer::const_iterator it = _activeEdges.begin(); it != _activeEdges.end(); ++it) {
       const OptimizableGraph::Edge* e = *it;
       if (e->robustKernel()) {
@@ -246,7 +248,7 @@ namespace g2o{
 #      ifndef NDEBUG
         int estimateDim = v->estimateDimension();
         if (estimateDim > 0) {
-          VectorXD estimateData(estimateDim);
+          VectorX estimateData(estimateDim);
           if (v->getEstimateData(estimateData.data()) == true) {
             int k;
             bool hasNan = arrayHasNaN(estimateData.data(), estimateDim, &k);
@@ -369,7 +371,7 @@ namespace g2o{
     }
 
     int cjIterations=0;
-    double cumTime=0;
+    number_t cumTime=0;
     bool ok=true;
 
     ok = _algorithm->init(online);
@@ -394,7 +396,7 @@ namespace g2o{
         cstat.numVertices = _activeVertices.size();
       }
       
-      double ts = get_monotonic_time();
+      number_t ts = get_monotonic_time();
       result = _algorithm->solve(i, online);
       ok = ( result == OptimizationAlgorithm::OK );
 
@@ -407,7 +409,7 @@ namespace g2o{
       }
 
       if (verbose()){
-        double dts = get_monotonic_time()-ts;
+        number_t dts = get_monotonic_time()-ts;
         cumTime += dts;
         if (! errorComputed)
           computeActiveErrors();
@@ -428,7 +430,7 @@ namespace g2o{
     return cjIterations;
   }
 
-  void SparseOptimizer::update(const double* update)
+  void SparseOptimizer::update(const number_t* update)
   {
     // update the graph by calling oplus on the vertices
     for (size_t i=0; i < _ivMap.size(); ++i) {
@@ -570,13 +572,15 @@ namespace g2o{
   void SparseOptimizer::setAlgorithm(OptimizationAlgorithm* algorithm)
   {
     if (_algorithm) // reset the optimizer for the formerly used solver
-      _algorithm->setOptimizer(0);
+      _algorithm->setOptimizer(nullptr);
+
     _algorithm = algorithm;
+
     if (_algorithm)
       _algorithm->setOptimizer(this);
   }
 
-  bool SparseOptimizer::computeMarginals(SparseBlockMatrix<MatrixXD>& spinv, const std::vector<std::pair<int, int> >& blockIndices){
+  bool SparseOptimizer::computeMarginals(SparseBlockMatrix<MatrixX>& spinv, const std::vector<std::pair<int, int> >& blockIndices){
     return _algorithm->computeMarginals(spinv, blockIndices);
   }
 

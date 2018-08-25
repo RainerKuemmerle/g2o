@@ -39,6 +39,8 @@
 
 #include "g2o/solvers/csparse/linear_solver_csparse.h"
 
+#include "g2o/core/solver.h"
+
 using namespace std;
 
 namespace g2o {
@@ -49,8 +51,8 @@ namespace g2o {
   class ThetaTreeAction : public HyperDijkstra::TreeAction
   {
     public:
-      ThetaTreeAction(double* theta) : HyperDijkstra::TreeAction(), _thetaGuess(theta) {}
-      virtual double perform(HyperGraph::Vertex* v, HyperGraph::Vertex* vParent, HyperGraph::Edge* e)
+      ThetaTreeAction(number_t* theta) : HyperDijkstra::TreeAction(), _thetaGuess(theta) {}
+      virtual number_t perform(HyperGraph::Vertex* v, HyperGraph::Vertex* vParent, HyperGraph::Edge* e)
       {
         if (! vParent)
           return 0.;
@@ -58,7 +60,7 @@ namespace g2o {
         VertexSE2* from  = static_cast<VertexSE2*>(vParent);
         VertexSE2* to    = static_cast<VertexSE2*>(v);
         assert(to->hessianIndex() >= 0);
-        double fromTheta = from->hessianIndex() < 0 ? 0. : _thetaGuess[from->hessianIndex()];
+        number_t fromTheta = from->hessianIndex() < 0 ? 0. : _thetaGuess[from->hessianIndex()];
         bool direct      = odom->vertices()[0] == from;
         if (direct) 
           _thetaGuess[to->hessianIndex()] = fromTheta + odom->measurement().rotation().angle();
@@ -67,17 +69,15 @@ namespace g2o {
         return 1.;
       }
     protected:
-      double* _thetaGuess;
+      number_t* _thetaGuess;
   };
 
-  SolverSLAM2DLinear::SolverSLAM2DLinear(Solver* solver) :
-    OptimizationAlgorithmGaussNewton(solver)
-  {
-  }
+  SolverSLAM2DLinear::SolverSLAM2DLinear(std::unique_ptr<Solver> solver)
+    : OptimizationAlgorithmGaussNewton(std::move(solver))
+  {}
 
   SolverSLAM2DLinear::~SolverSLAM2DLinear()
-  {
-  }
+  {}
 
   OptimizationAlgorithm::SolverResult SolverSLAM2DLinear::solve(int iteration, bool online)
   {
@@ -94,11 +94,11 @@ namespace g2o {
   {
     assert(_optimizer->indexMapping().size() + 1 == _optimizer->vertices().size() && "Needs to operate on full graph");
     assert(_optimizer->vertex(0)->fixed() && "Graph is not fixed by vertex 0");
-    VectorXD b, x; // will be used for theta and x/y update
+    VectorX b, x; // will be used for theta and x/y update
     b.setZero(_optimizer->indexMapping().size());
     x.setZero(_optimizer->indexMapping().size());
 
-    typedef Eigen::Matrix<double, 1, 1, Eigen::ColMajor> ScalarMatrix;
+    typedef Eigen::Matrix<number_t, 1, 1, Eigen::ColMajor> ScalarMatrix;
 
     ScopedArray<int> blockIndeces(new int[_optimizer->indexMapping().size()]);
     for (size_t i = 0; i < _optimizer->indexMapping().size(); ++i)
@@ -147,7 +147,7 @@ namespace g2o {
     // walk along the Minimal Spanning Tree to compute the guess for the robot orientation
     assert(fixedSet.size() == 1);
     VertexSE2* root = static_cast<VertexSE2*>(*fixedSet.begin());
-    VectorXD thetaGuess;
+    VectorX thetaGuess;
     thetaGuess.setZero(_optimizer->indexMapping().size());
     UniformCostFunction uniformCost;
     HyperDijkstra hyperDijkstra(_optimizer);
@@ -163,17 +163,17 @@ namespace g2o {
       VertexSE2* from = static_cast<VertexSE2*>(e->vertices()[0]);
       VertexSE2* to   = static_cast<VertexSE2*>(e->vertices()[1]);
 
-      double omega = e->information()(2,2);
+      number_t omega = e->information()(2,2);
 
-      double fromThetaGuess = from->hessianIndex() < 0 ? 0. : thetaGuess[from->hessianIndex()];
-      double toThetaGuess   = to->hessianIndex() < 0 ? 0. : thetaGuess[to->hessianIndex()];
-      double error          = normalize_theta(-e->measurement().rotation().angle() + toThetaGuess - fromThetaGuess);
+      number_t fromThetaGuess = from->hessianIndex() < 0 ? 0. : thetaGuess[from->hessianIndex()];
+      number_t toThetaGuess   = to->hessianIndex() < 0 ? 0. : thetaGuess[to->hessianIndex()];
+      number_t error          = normalize_theta(-e->measurement().rotation().angle() + toThetaGuess - fromThetaGuess);
 
       bool fromNotFixed = !(from->fixed());
       bool toNotFixed   = !(to->fixed());
 
       if (fromNotFixed || toNotFixed) {
-        double omega_r = - omega * error;
+        number_t omega_r = - omega * error;
         if (fromNotFixed) {
           b(from->hessianIndex()) -= omega_r;
           (*H.block(from->hessianIndex(), from->hessianIndex()))(0,0) += omega;

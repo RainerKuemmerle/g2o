@@ -48,7 +48,7 @@ namespace g2o {
 
       void computeError();
 
-      virtual void setMeasurement(const Vector6d& m) {
+      virtual void setMeasurement(const Vector6& m) {
         _measurement = m;
       }
 
@@ -56,14 +56,14 @@ namespace g2o {
         _measurement = Line3D(m);
       }
 
-      virtual bool setMeasurementData(const double* d) {
-        Eigen::Map<const Vector6d> v(d);	
-	_measurement = Line3D(v);
+      virtual bool setMeasurementData(const number_t* d) {
+        Eigen::Map<const Vector6> v(d);	
+        _measurement = Line3D(v);
         return true;
       }
 
-      virtual bool getMeasurementData(double* d) const {
-        Eigen::Map<Vector6d> v(d);
+      virtual bool getMeasurementData(number_t* d) const {
+        Eigen::Map<Vector6> v(d);
         v = _measurement;
         return true;
       }
@@ -72,7 +72,7 @@ namespace g2o {
 	return 6;
       }
 
-      Eigen::Vector3d color;
+      Vector3 color;
       
   private:
     ParameterSE3Offset* offsetParam;

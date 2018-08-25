@@ -1,4 +1,4 @@
-ADD_LIBRARY(g2o_simulator_library ${G2O_LIB_TYPE}
+add_library(g2o_simulator_library ${G2O_LIB_TYPE}
    simulator.cpp simulator.h
    pointsensorparameters.cpp  pointsensorparameters.h
    simulator2d_base.h simulator2d.h
@@ -25,39 +25,44 @@ ADD_LIBRARY(g2o_simulator_library ${G2O_LIB_TYPE}
    g2o_simulator_api.h
 )
 
-SET_TARGET_PROPERTIES(g2o_simulator_library PROPERTIES OUTPUT_NAME ${LIB_PREFIX}simulator)
+set_target_properties(g2o_simulator_library PROPERTIES OUTPUT_NAME ${LIB_PREFIX}simulator)
+if (APPLE)
+  set_target_properties(g2o_simulator_library PROPERTIES INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib")
+endif()
 
-TARGET_LINK_LIBRARIES(g2o_simulator_library types_slam3d_addons types_slam3d types_slam2d_addons types_slam2d  core)
+target_link_libraries(g2o_simulator_library types_slam3d_addons types_slam3d types_slam2d_addons types_slam2d  core)
 
-ADD_EXECUTABLE(g2o_simulator2d_application
+add_executable(g2o_simulator2d_application
   test_simulator2d.cpp
 )
-TARGET_LINK_LIBRARIES(g2o_simulator2d_application g2o_simulator_library types_slam2d_addons types_slam2d core)
-SET_TARGET_PROPERTIES(g2o_simulator2d_application PROPERTIES OUTPUT_NAME g2o_simulator2d${EXE_POSTFIX})
+target_link_libraries(g2o_simulator2d_application g2o_simulator_library types_slam2d_addons types_slam2d core)
+set_target_properties(g2o_simulator2d_application PROPERTIES OUTPUT_NAME g2o_simulator2d${EXE_POSTFIX})
 
-ADD_EXECUTABLE(convertSegmentLine_application convertSegmentLine.cpp)
+add_executable(convertSegmentLine_application convertSegmentLine.cpp)
 
-TARGET_LINK_LIBRARIES(convertSegmentLine_application g2o_simulator_library types_slam2d_addons types_slam3d types_slam2d core)
-SET_TARGET_PROPERTIES(convertSegmentLine_application PROPERTIES OUTPUT_NAME convertSegmentLine${EXE_POSTFIX})
+target_link_libraries(convertSegmentLine_application g2o_simulator_library types_slam2d_addons types_slam3d types_slam2d core)
+set_target_properties(convertSegmentLine_application PROPERTIES OUTPUT_NAME convertSegmentLine${EXE_POSTFIX})
 
 
-ADD_EXECUTABLE(g2o_simulator3d_application
+add_executable(g2o_simulator3d_application
   test_simulator3d.cpp
 )
-TARGET_LINK_LIBRARIES(g2o_simulator3d_application g2o_simulator_library types_slam3d_addons types_slam3d types_slam2d_addons types_slam2d core)
-SET_TARGET_PROPERTIES(g2o_simulator3d_application PROPERTIES OUTPUT_NAME g2o_simulator3d${EXE_POSTFIX})
+target_link_libraries(g2o_simulator3d_application g2o_simulator_library types_slam3d_addons types_slam3d types_slam2d_addons types_slam2d core)
+set_target_properties(g2o_simulator3d_application PROPERTIES OUTPUT_NAME g2o_simulator3d${EXE_POSTFIX})
 
-ADD_EXECUTABLE(g2o_anonymize_observations_application
+add_executable(g2o_anonymize_observations_application
   g2o_anonymize_observations.cpp
 )
-TARGET_LINK_LIBRARIES(g2o_anonymize_observations_application types_slam3d types_slam2d core)
-SET_TARGET_PROPERTIES(g2o_anonymize_observations_application PROPERTIES OUTPUT_NAME g2o_anonymize_observations${EXE_POSTFIX})
+target_link_libraries(g2o_anonymize_observations_application types_slam3d types_slam2d core)
+set_target_properties(g2o_anonymize_observations_application PROPERTIES OUTPUT_NAME g2o_anonymize_observations${EXE_POSTFIX})
 
-INSTALL(TARGETS g2o_simulator_library g2o_simulator2d_application g2o_simulator3d_application g2o_anonymize_observations_application
-  RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/bin
-  LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX}/lib
-  ARCHIVE DESTINATION ${CMAKE_INSTALL_PREFIX}/lib
+install(TARGETS g2o_simulator_library g2o_simulator2d_application g2o_simulator3d_application g2o_anonymize_observations_application
+  EXPORT ${G2O_TARGETS_EXPORT_NAME}
+  RUNTIME DESTINATION ${RUNTIME_DESTINATION}
+  LIBRARY DESTINATION ${LIBRARY_DESTINATION}
+  ARCHIVE DESTINATION ${ARCHIVE_DESTINATION}
+  INCLUDES DESTINATION ${INCLUDES_DESTINATION}
 )
 
-FILE(GLOB headers "${CMAKE_CURRENT_SOURCE_DIR}/*.h" "${CMAKE_CURRENT_SOURCE_DIR}/*.hpp")
-INSTALL(FILES ${headers} DESTINATION ${CMAKE_INSTALL_PREFIX}/include/g2o/apps/g2o_simulator)
+file(GLOB headers "${CMAKE_CURRENT_SOURCE_DIR}/*.h" "${CMAKE_CURRENT_SOURCE_DIR}/*.hpp")
+install(FILES ${headers} DESTINATION ${INCLUDES_INSTALL_DIR}/apps/g2o_simulator)

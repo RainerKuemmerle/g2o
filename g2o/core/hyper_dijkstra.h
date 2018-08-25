@@ -37,13 +37,13 @@ namespace g2o{
 
   struct G2O_CORE_API HyperDijkstra{
     struct G2O_CORE_API CostFunction {
-      virtual double operator() (HyperGraph::Edge* e, HyperGraph::Vertex* from, HyperGraph::Vertex* to)=0;
+      virtual number_t operator() (HyperGraph::Edge* e, HyperGraph::Vertex* from, HyperGraph::Vertex* to)=0;
       virtual ~CostFunction() { }
     };
 
     struct G2O_CORE_API TreeAction {
-      virtual double perform(HyperGraph::Vertex* v, HyperGraph::Vertex* vParent, HyperGraph::Edge* e);
-      virtual double perform(HyperGraph::Vertex* v, HyperGraph::Vertex* vParent, HyperGraph::Edge* e, double distance);
+      virtual number_t perform(HyperGraph::Vertex* v, HyperGraph::Vertex* vParent, HyperGraph::Edge* e);
+      virtual number_t perform(HyperGraph::Vertex* v, HyperGraph::Vertex* vParent, HyperGraph::Edge* e, number_t distance);
     };
 
     
@@ -52,18 +52,18 @@ namespace g2o{
       AdjacencyMapEntry(HyperGraph::Vertex* _child=0, 
           HyperGraph::Vertex* _parent=0, 
           HyperGraph::Edge* _edge=0, 
-          double _distance=std::numeric_limits<double>::max());
+          number_t _distance=std::numeric_limits<number_t>::max());
       HyperGraph::Vertex* child() const {return _child;}
       HyperGraph::Vertex* parent() const {return _parent;}
       HyperGraph::Edge* edge() const {return _edge;}
-      double distance() const {return _distance;}
+      number_t distance() const {return _distance;}
       HyperGraph::VertexSet& children() {return _children;}
       const HyperGraph::VertexSet& children() const {return _children;}
       protected:
       HyperGraph::Vertex* _child;
       HyperGraph::Vertex* _parent;
       HyperGraph::Edge* _edge;
-      double _distance;
+      number_t _distance;
       HyperGraph::VertexSet _children;
     };
 
@@ -75,17 +75,17 @@ namespace g2o{
 
     void shortestPaths(HyperGraph::Vertex* v, 
            HyperDijkstra::CostFunction* cost, 
-           double maxDistance=std::numeric_limits< double >::max(), 
-           double comparisonConditioner=1e-3, 
+           number_t maxDistance=std::numeric_limits< number_t >::max(), 
+           number_t comparisonConditioner=1e-3, 
            bool directed=false,
-           double maxEdgeCost=std::numeric_limits< double >::max());
+           number_t maxEdgeCost=std::numeric_limits< number_t >::max());
 
     void shortestPaths(HyperGraph::VertexSet& vset, 
            HyperDijkstra::CostFunction* cost, 
-           double maxDistance=std::numeric_limits< double >::max(), 
-           double comparisonConditioner=1e-3, 
+           number_t maxDistance=std::numeric_limits< number_t >::max(), 
+           number_t comparisonConditioner=1e-3, 
            bool directed=false,
-           double maxEdgeCost=std::numeric_limits< double >::max());
+           number_t maxEdgeCost=std::numeric_limits< number_t >::max());
 
 
     static void computeTree(AdjacencyMap& amap);
@@ -93,8 +93,8 @@ namespace g2o{
     static void connectedSubset(HyperGraph::VertexSet& connected, HyperGraph::VertexSet& visited, 
            HyperGraph::VertexSet& startingSet, 
            HyperGraph* g, HyperGraph::Vertex* v,
-           HyperDijkstra::CostFunction* cost, double distance, double comparisonConditioner,
-           double maxEdgeCost=std::numeric_limits< double >::max() );
+           HyperDijkstra::CostFunction* cost, number_t distance, number_t comparisonConditioner,
+           number_t maxEdgeCost=std::numeric_limits< number_t >::max() );
 
   protected:
     void reset();
@@ -105,7 +105,7 @@ namespace g2o{
   };
 
   struct G2O_CORE_API UniformCostFunction: public HyperDijkstra::CostFunction {
-    virtual double operator ()(HyperGraph::Edge* edge, HyperGraph::Vertex* from, HyperGraph::Vertex* to);
+    virtual number_t operator ()(HyperGraph::Edge* edge, HyperGraph::Vertex* from, HyperGraph::Vertex* to);
   };
 
 }

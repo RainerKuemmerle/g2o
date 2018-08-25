@@ -1,18 +1,28 @@
 // g2o - General Graph Optimization
 // Copyright (C) 2011 R. Kuemmerle, G. Grisetti, W. Burgard
-// 
-// g2o is free software: you can redistribute it and/or modify
-// it under the terms of the GNU Lesser General Public License as published
-// by the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-// 
-// g2o is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU Lesser General Public License for more details.
-// 
-// You should have received a copy of the GNU Lesser General Public License
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+// All rights reserved.
+//
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted provided that the following conditions are
+// met:
+//
+// * Redistributions of source code must retain the above copyright notice,
+//   this list of conditions and the following disclaimer.
+// * Redistributions in binary form must reproduce the above copyright
+//   notice, this list of conditions and the following disclaimer in the
+//   documentation and/or other materials provided with the distribution.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS
+// IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+// TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+// PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+// HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+// SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
+// TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+// PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+// LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+// NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+// SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "linear_solver_eigen.h"
 
@@ -27,67 +37,58 @@
 
 #include "g2o/stuff/macros.h"
 
-#define DIM_TO_SOLVER(p, l) BlockSolver< BlockSolverTraits<p, l> >
-
-#define ALLOC_EIGEN_SPARSE_CHOLESKY(s, p, l, blockorder) \
-  if (1) { \
-    std::cerr << "# Using EigenSparseCholesky poseDim " << p << " landMarkDim " << l << " blockordering " << blockorder << std::endl; \
-    LinearSolverEigen< DIM_TO_SOLVER(p, l)::PoseMatrixType >* linearSolver = new LinearSolverEigen<DIM_TO_SOLVER(p, l)::PoseMatrixType>(); \
-    linearSolver->setBlockOrdering(blockorder); \
-    s = new DIM_TO_SOLVER(p, l)(linearSolver); \
-  } else (void)0
-
 using namespace std;
 
 namespace g2o {
+
+  namespace
+  {
+    template<int p, int l, bool blockorder>
+    std::unique_ptr<BlockSolverBase> AllocateSolver()
+    {
+      std::cerr << "# Using EigenSparseCholesky poseDim " << p << " landMarkDim " << l << " blockordering " << blockorder << std::endl;
+      auto linearSolver = g2o::make_unique<LinearSolverEigen<typename BlockSolverPL<p, l>::PoseMatrixType>>();
+      linearSolver->setBlockOrdering(blockorder);
+      return g2o::make_unique<BlockSolverPL<p, l>>(std::move(linearSolver));
+    }
+  }
 
   /**
    * helper function for allocating
    */
   static OptimizationAlgorithm* createSolver(const std::string& fullSolverName)
   {
-    g2o::Solver* s = 0;
+    static const std::map<std::string, std::function<std::unique_ptr<BlockSolverBase>()>> solver_factories{
+      { "var_eigen", &AllocateSolver<-1, -1, true> },
+      { "fix3_2_eigen", &AllocateSolver<3, 2, true> },
+      { "fix6_3_eigen", &AllocateSolver<6, 3, true> },
+      { "fix7_3_eigen", &AllocateSolver<7, 3, true> },
+      { "fix3_2_scalar_eigen", &AllocateSolver<3, 2, false> },
+      { "fix6_3_scalar_eigen", &AllocateSolver<6, 3, false> },
+      { "fix7_3_scalar_eigen", &AllocateSolver<7, 3, false> },
+    };
+
+    string solverName = fullSolverName.substr(3);
+    auto solverf = solver_factories.find(solverName);
+    if (solverf == solver_factories.end())
+      return nullptr;
 
     string methodName = fullSolverName.substr(0, 2);
-    string solverName = fullSolverName.substr(3);
 
-    if (solverName == "var_eigen") {
-      ALLOC_EIGEN_SPARSE_CHOLESKY(s, -1, -1, true);
+    if (methodName == "gn")
+    {
+      return new OptimizationAlgorithmGaussNewton(solverf->second());
     }
-#if 0
-    else if (solverName == "fix3_2_eigen") {
-      ALLOC_EIGEN_SPARSE_CHOLESKY(s, 3, 2, true);
+    else if (methodName == "lm")
+    {
+      return new OptimizationAlgorithmLevenberg(solverf->second());
     }
-    else if (solverName == "fix6_3_eigen") {
-      ALLOC_EIGEN_SPARSE_CHOLESKY(s, 6, 3, true);
-    }
-    else if (solverName == "fix7_3_eigen") {
-      ALLOC_EIGEN_SPARSE_CHOLESKY(s, 7, 3, true);
-    }
-    else if (solverName == "fix3_2_scalar_eigen") {
-      ALLOC_EIGEN_SPARSE_CHOLESKY(s, 3, 2, false);
-    }
-    else if (solverName == "fix6_3_scalar_eigen") {
-      ALLOC_EIGEN_SPARSE_CHOLESKY(s, 6, 3, false);
-    }
-    else if (solverName == "fix7_3_scalar_eigen") {
-      ALLOC_EIGEN_SPARSE_CHOLESKY(s, 7, 3, false);
-    }
-#endif
-
-    OptimizationAlgorithm* snl = 0;
-    if (methodName == "gn") {
-      snl = new OptimizationAlgorithmGaussNewton(s);
-    }
-    else if (methodName == "lm") {
-      snl = new OptimizationAlgorithmLevenberg(s);
-    }
-    else if (methodName == "dl") {
-      BlockSolverBase* blockSolver = dynamic_cast<BlockSolverBase*>(s);
-      snl = new OptimizationAlgorithmDogleg(blockSolver);
+    else if (methodName == "dl")
+    {
+      return new OptimizationAlgorithmDogleg(solverf->second());
     }
 
-    return snl;
+    return nullptr;
   }
 
   class EigenSolverCreator : public AbstractOptimizationAlgorithmCreator

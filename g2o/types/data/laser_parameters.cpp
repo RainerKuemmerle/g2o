@@ -28,26 +28,28 @@
 
 namespace g2o {
 
-  LaserParameters::LaserParameters(int t, int nbeams, double _firstBeamAngle, double _angularStep, double _maxRange, double _accuracy, int _remissionMode)
+  LaserParameters::LaserParameters(int t, int nbeams, number_t _firstBeamAngle, number_t _angularStep, number_t _maxRange, number_t _accuracy, int _remissionMode, number_t _minRange)
   {
     type           = t;
     firstBeamAngle = _firstBeamAngle;
     angularStep    = _angularStep;
     maxRange       = _maxRange;
+    minRange       = _minRange;
     laserPose      = SE2(0., 0., 0.);
     accuracy       = _accuracy;
     remissionMode  = _remissionMode;
     fov            = angularStep * nbeams;
   }
 
-  LaserParameters::LaserParameters(int nbeams, double _firstBeamAngle, double _angularStep, double _maxRange)
+  LaserParameters::LaserParameters(int nbeams, number_t _firstBeamAngle, number_t _angularStep, number_t _maxRange, number_t _minRange)
   {
     type           = 0;
     firstBeamAngle = _firstBeamAngle;
     angularStep    = _angularStep;
     maxRange       = _maxRange;
+    minRange       = _minRange;
     laserPose      = SE2(0., 0., 0.);
-    accuracy       = 0.1;
+    accuracy       = cst(0.1);
     remissionMode  = 0;
     fov            = angularStep * nbeams;
   }

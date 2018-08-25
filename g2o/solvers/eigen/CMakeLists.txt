@@ -1,14 +1,21 @@
-ADD_LIBRARY(solver_eigen ${G2O_LIB_TYPE}
+add_library(solver_eigen ${G2O_LIB_TYPE}
   solver_eigen.cpp
   linear_solver_eigen.h
 )
-SET_TARGET_PROPERTIES(solver_eigen PROPERTIES OUTPUT_NAME ${LIB_PREFIX}solver_eigen)
-TARGET_LINK_LIBRARIES(solver_eigen core)
+set_target_properties(solver_eigen PROPERTIES OUTPUT_NAME ${LIB_PREFIX}solver_eigen)
+if (APPLE)
+  set_target_properties(solver_eigen PROPERTIES INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib")
+endif()
+target_link_libraries(solver_eigen core)
 
-INSTALL(TARGETS solver_eigen
-  RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/bin
-  LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX}/lib
-  ARCHIVE DESTINATION ${CMAKE_INSTALL_PREFIX}/lib
+install(TARGETS solver_eigen
+  EXPORT ${G2O_TARGETS_EXPORT_NAME}
+  RUNTIME DESTINATION ${RUNTIME_DESTINATION}
+  LIBRARY DESTINATION ${LIBRARY_DESTINATION}
+  ARCHIVE DESTINATION ${ARCHIVE_DESTINATION}
+  INCLUDES DESTINATION ${INCLUDES_DESTINATION}
 )
-FILE(GLOB headers "${CMAKE_CURRENT_SOURCE_DIR}/*.h" "${CMAKE_CURRENT_SOURCE_DIR}/*.hpp")
-INSTALL(FILES ${headers} DESTINATION ${CMAKE_INSTALL_PREFIX}/include/g2o/solvers/eigen)
+
+file(GLOB headers "${CMAKE_CURRENT_SOURCE_DIR}/*.h" "${CMAKE_CURRENT_SOURCE_DIR}/*.hpp")
+install(FILES ${headers} DESTINATION ${INCLUDES_INSTALL_DIR}/solvers/eigen)
+

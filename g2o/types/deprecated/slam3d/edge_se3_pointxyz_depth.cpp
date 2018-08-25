@@ -33,13 +33,13 @@ namespace deprecated {
 
 
   // point to camera projection, monocular
-  EdgeSE3PointXYZDepth::EdgeSE3PointXYZDepth() : BaseBinaryEdge<3, Eigen::Vector3d, VertexSE3, VertexPointXYZ>() {
+  EdgeSE3PointXYZDepth::EdgeSE3PointXYZDepth() : BaseBinaryEdge<3, Vector3, VertexSE3, VertexPointXYZ>() {
     resizeParameters(1);
     installParameter(params, 0);
     information().setIdentity();
     information()(2,2)=100;
     J.fill(0);
-    J.block<3,3>(0,0) = -Eigen::Matrix3d::Identity();
+    J.block<3,3>(0,0) = -Matrix3::Identity();
   }
 
   bool EdgeSE3PointXYZDepth::resolveCaches(){
@@ -55,7 +55,7 @@ namespace deprecated {
     setParameterId(0,pid);
 
     // measured keypoint
-    Eigen::Vector3d meas;
+    Vector3 meas;
     for (int i=0; i<3; i++) is >> meas[i];
     setMeasurement(meas);
     // don't need this if we don't use it in error calculation (???)
@@ -93,8 +93,8 @@ namespace deprecated {
     //VertexSE3 *cam = static_cast<VertexSE3*>(_vertices[0]);
     VertexPointXYZ *point = static_cast<VertexPointXYZ*>(_vertices[1]);
 
-    Eigen::Vector3d p = cache->w2i() * point->estimate();
-    Eigen::Vector3d perr;
+    Vector3 p = cache->w2i() * point->estimate();
+    Vector3 perr;
     perr.head<2>() = p.head<2>()/p(2);
     perr(2) = p(2);
 
@@ -108,9 +108,9 @@ namespace deprecated {
     //VertexSE3 *cam = static_cast<VertexSE3 *>(_vertices[0]);
     VertexPointXYZ *vp = static_cast<VertexPointXYZ *>(_vertices[1]);
 
-    const Eigen::Vector3d& pt = vp->estimate();
+    const Vector3& pt = vp->estimate();
 
-    Eigen::Vector3d Zcam = cache->w2lMatrix() * pt;
+    Vector3 Zcam = cache->w2lMatrix() * pt;
 
     //  J(0,3) = -0.0;
     J(0,4) = -2*Zcam(2);
@@ -126,10 +126,10 @@ namespace deprecated {
 
     J.block<3,3>(0,6) = cache->w2lMatrix().rotation();
 
-    Eigen::Matrix<double,3,9> Jprime = params->Kcam_inverseOffsetR()  * J;
-    Eigen::Vector3d Zprime = cache->w2i() * pt;
+    Matrix<number_t,3,9> Jprime = params->Kcam_inverseOffsetR()  * J;
+    Vector3 Zprime = cache->w2i() * pt;
 
-    Eigen::Matrix<double, 3, 9> Jhom;
+    Matrix<number_t, 3, 9> Jhom;
     Jhom.block<2,9>(0,0) = 1/(Zprime(2)*Zprime(2)) * (Jprime.block<2,9>(0,0)*Zprime(2) - Zprime.head<2>() * Jprime.block<1,9>(2,0));
     Jhom.block<1,9>(2,0) = Jprime.block<1,9>(2,0);
 
@@ -143,10 +143,10 @@ namespace deprecated {
     VertexPointXYZ *point = static_cast<VertexPointXYZ*>(_vertices[1]);
 
     // calculate the projection
-    const Eigen::Vector3d& pt = point->estimate();
+    const Vector3& pt = point->estimate();
 
-    Eigen::Vector3d p = cache->w2i() * pt;
-    Eigen::Vector3d perr;
+    Vector3 p = cache->w2i() * pt;
+    Vector3 perr;
     perr.head<2>() = p.head<2>()/p(2);
     perr(2) = p(2);
     _measurement = perr;
@@ -161,8 +161,8 @@ namespace deprecated {
 
     VertexSE3 *cam = dynamic_cast<VertexSE3*>(_vertices[0]);
     VertexPointXYZ *point = dynamic_cast<VertexPointXYZ*>(_vertices[1]);
-    const Eigen::Matrix<double, 3, 3>& invKcam = params->invKcam();
-    Eigen::Vector3d p;
+    const Matrix<number_t, 3, 3>& invKcam = params->invKcam();
+    Vector3 p;
     p(2) = _measurement(2);
     p.head<2>() = _measurement.head<2>()*p(2);
     p=invKcam*p;

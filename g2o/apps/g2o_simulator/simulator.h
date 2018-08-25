@@ -91,6 +91,25 @@ class G2O_SIMULATOR_API BaseRobot {
     std::string _name;
 };
 
+class G2O_SIMULATOR_API World
+{
+  public:
+    World(OptimizableGraph* graph_) {_graph = graph_; _runningId=0; _paramId=0;}
+    OptimizableGraph* graph() {return _graph;}
+    bool addRobot(BaseRobot* robot);
+    bool addWorldObject(BaseWorldObject* worldObject);
+    bool addParameter(Parameter* p);
+
+    std::set<BaseWorldObject*>& objects() {return _objects;}
+    std::set<BaseRobot*>&  robots() {return _robots; }
+  protected:
+    std::set<BaseWorldObject*> _objects;
+    std::set<BaseRobot*> _robots;
+    OptimizableGraph* _graph;
+    int _runningId;
+    int _paramId;
+};
+
 template <class RobotPoseObject>
 class Robot: public BaseRobot{
   public:
@@ -270,25 +289,6 @@ class BinarySensor: public BaseSensor {
     }
     GaussianSampler<typename EdgeType::ErrorVector, InformationType> _sampler;
     virtual void addNoise(EdgeType*){};
-};
-
-class G2O_SIMULATOR_API World
-{
-  public:
-    World(OptimizableGraph* graph_) {_graph = graph_; _runningId=0; _paramId=0;}
-    OptimizableGraph* graph() {return _graph;}
-    bool addRobot(BaseRobot* robot);
-    bool addWorldObject(BaseWorldObject* worldObject);
-    bool addParameter(Parameter* p);
-
-    std::set<BaseWorldObject*>& objects() {return _objects;}
-    std::set<BaseRobot*>&  robots() {return _robots; }
-  protected:
-    std::set<BaseWorldObject*> _objects;
-    std::set<BaseRobot*> _robots;
-    OptimizableGraph* _graph;
-    int _runningId;
-    int _paramId;
 };
 
 } // end namespace

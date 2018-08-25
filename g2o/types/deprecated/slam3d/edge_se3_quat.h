@@ -69,14 +69,14 @@ namespace deprecated {
     }
 
     virtual bool setMeasurementData(const double* d){
-      Eigen::Map<const Vector7d> v(d);
+      Eigen::Map<const Vector7> v(d);
       _measurement.fromVector(v);
       _inverseMeasurement = _measurement.inverse();
       return true;
     }
 
     virtual bool getMeasurementData(double* d) const{
-      Eigen::Map<Vector7d> v(d);
+      Eigen::Map<Vector7> v(d);
       v = _measurement.toVector();
       return true;
     }

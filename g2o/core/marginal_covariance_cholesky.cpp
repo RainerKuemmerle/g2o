@@ -51,7 +51,7 @@ MarginalCovarianceCholesky::~MarginalCovarianceCholesky()
 {
 }
 
-void MarginalCovarianceCholesky::setCholeskyFactor(int n, int* Lp, int* Li, double* Lx, int* permInv)
+void MarginalCovarianceCholesky::setCholeskyFactor(int n, int* Lp, int* Li, number_t* Lx, int* permInv)
 {
   _n = n;
   _Ap = Lp;
@@ -68,7 +68,7 @@ void MarginalCovarianceCholesky::setCholeskyFactor(int n, int* Lp, int* Li, doub
   }
 }
 
-double MarginalCovarianceCholesky::computeEntry(int r, int c)
+number_t MarginalCovarianceCholesky::computeEntry(int r, int c)
 {
   assert(r <= c);
   int idx = computeIndex(r, c);
@@ -79,18 +79,18 @@ double MarginalCovarianceCholesky::computeEntry(int r, int c)
   }
 
   // compute the summation over column r
-  double s = 0.;
+  number_t s = 0.;
   const int& sc = _Ap[r];
   const int& ec = _Ap[r+1];
   for (int j = sc+1; j < ec; ++j) { // sum over row r while skipping the element on the diagonal
     const int& rr = _Ai[j];
-    double val = rr < c ? computeEntry(rr, c) : computeEntry(c, rr);
+    number_t val = rr < c ? computeEntry(rr, c) : computeEntry(c, rr);
     s += val * _Ax[j];
   }
 
-  double result;
+  number_t result;
   if (r == c) {
-    const double& diagElem = _diag[r];
+    const number_t& diagElem = _diag[r];
     result = diagElem * (diagElem - s);
   } else {
     result = -s * _diag[r];
@@ -99,7 +99,7 @@ double MarginalCovarianceCholesky::computeEntry(int r, int c)
   return result;
 }
 
-void MarginalCovarianceCholesky::computeCovariance(double** covBlocks, const std::vector<int>& blockIndices)
+void MarginalCovarianceCholesky::computeCovariance(number_t** covBlocks, const std::vector<int>& blockIndices)
 {
   _map.clear();
   int base = 0;
@@ -132,7 +132,7 @@ void MarginalCovarianceCholesky::computeCovariance(double** covBlocks, const std
   for (size_t i = 0; i < blockIndices.size(); ++i) {
     int nbase = blockIndices[i];
     int vdim = nbase - base;
-    double* cov = covBlocks[i];
+    number_t* cov = covBlocks[i];
     for (int rr = 0; rr < vdim; ++rr)
       for (int cc = rr; cc < vdim; ++cc) {
         int r = _perm ? _perm[rr + base] : rr + base; // apply permutation
@@ -151,10 +151,10 @@ void MarginalCovarianceCholesky::computeCovariance(double** covBlocks, const std
 }
 
 
-void MarginalCovarianceCholesky::computeCovariance(SparseBlockMatrix<MatrixXD>& spinv, const std::vector<int>& rowBlockIndices, const std::vector< std::pair<int, int> >& blockIndices)
+void MarginalCovarianceCholesky::computeCovariance(SparseBlockMatrix<MatrixX>& spinv, const std::vector<int>& rowBlockIndices, const std::vector< std::pair<int, int> >& blockIndices)
 {
   // allocate the sparse
-  spinv = SparseBlockMatrix<MatrixXD>(&rowBlockIndices[0], 
+  spinv = SparseBlockMatrix<MatrixX>(&rowBlockIndices[0], 
               &rowBlockIndices[0], 
               rowBlockIndices.size(),
               rowBlockIndices.size(), true);
@@ -171,7 +171,7 @@ void MarginalCovarianceCholesky::computeCovariance(SparseBlockMatrix<MatrixXD>& 
     int rowBase=spinv.rowBaseOfBlock(blockRow);
     int colBase=spinv.colBaseOfBlock(blockCol);
     
-    MatrixXD *block=spinv.block(blockRow, blockCol, true);
+    MatrixX *block=spinv.block(blockRow, blockCol, true);
     assert(block);
     for (int iRow=0; iRow<block->rows(); ++iRow)
       for (int iCol=0; iCol<block->cols(); ++iCol){
@@ -201,7 +201,7 @@ void MarginalCovarianceCholesky::computeCovariance(SparseBlockMatrix<MatrixXD>& 
     int rowBase=spinv.rowBaseOfBlock(blockRow);
     int colBase=spinv.colBaseOfBlock(blockCol);
     
-    MatrixXD *block=spinv.block(blockRow, blockCol);
+    MatrixX *block=spinv.block(blockRow, blockCol);
     assert(block);
     for (int iRow=0; iRow<block->rows(); ++iRow)
       for (int iCol=0; iCol<block->cols(); ++iCol){

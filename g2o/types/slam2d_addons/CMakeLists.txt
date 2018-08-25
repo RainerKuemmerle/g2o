@@ -1,4 +1,4 @@
-ADD_LIBRARY(types_slam2d_addons ${G2O_LIB_TYPE}
+add_library(types_slam2d_addons ${G2O_LIB_TYPE}
   line_2d.h
   types_slam2d_addons.cpp types_slam2d_addons.h
   vertex_segment2d.cpp         vertex_segment2d.h
@@ -12,18 +12,22 @@ ADD_LIBRARY(types_slam2d_addons ${G2O_LIB_TYPE}
   g2o_types_slam2d_addons_api.h
 )
 
-SET_TARGET_PROPERTIES(types_slam2d_addons PROPERTIES OUTPUT_NAME ${LIB_PREFIX}types_slam2d_addons)
+set_target_properties(types_slam2d_addons PROPERTIES OUTPUT_NAME ${LIB_PREFIX}types_slam2d_addons)
+if (APPLE)
+  set_target_properties(types_slam2d_addons PROPERTIES INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib")
+endif()
+target_link_libraries(types_slam2d_addons types_slam2d core)
+if(G2O_HAVE_OPENGL)
+  target_link_libraries(types_slam2d_addons ${OPENGL_gl_LIBRARY})
+endif()
 
-TARGET_LINK_LIBRARIES(types_slam2d_addons types_slam2d core)
-IF(G2O_HAVE_OPENGL)
-  TARGET_LINK_LIBRARIES(types_slam2d_addons ${OPENGL_gl_LIBRARY})
-ENDIF()
-
-INSTALL(TARGETS types_slam2d_addons
-  RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/bin
-  LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX}/lib
-  ARCHIVE DESTINATION ${CMAKE_INSTALL_PREFIX}/lib
+install(TARGETS types_slam2d_addons
+  EXPORT ${G2O_TARGETS_EXPORT_NAME}
+  RUNTIME DESTINATION ${RUNTIME_DESTINATION}
+  LIBRARY DESTINATION ${LIBRARY_DESTINATION}
+  ARCHIVE DESTINATION ${ARCHIVE_DESTINATION}
+  INCLUDES DESTINATION ${INCLUDES_DESTINATION}
 )
 
-FILE(GLOB headers "${CMAKE_CURRENT_SOURCE_DIR}/*.h" "${CMAKE_CURRENT_SOURCE_DIR}/*.hpp")
-INSTALL(FILES ${headers} DESTINATION ${CMAKE_INSTALL_PREFIX}/include/g2o/types/slam2d_addons)
+file(GLOB headers "${CMAKE_CURRENT_SOURCE_DIR}/*.h" "${CMAKE_CURRENT_SOURCE_DIR}/*.hpp")
+install(FILES ${headers} DESTINATION ${INCLUDES_INSTALL_DIR}/types/slam2d_addons)

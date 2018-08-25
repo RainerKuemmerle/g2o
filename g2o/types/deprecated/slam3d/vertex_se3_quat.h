@@ -57,13 +57,13 @@ class G2O_DEPRECATED_TYPES_SLAM3D_API VertexSE3 : public BaseVertex<6, SE3Quat>
 
 
     virtual bool setEstimateDataImpl(const double* est){
-      Eigen::Map<const Vector7d> v(est);
+      Eigen::Map<const Vector7> v(est);
       _estimate.fromVector(v);
       return true;
     }
 
     virtual bool getEstimateData(double* est) const{
-      Eigen::Map<Vector7d> v(est);
+      Eigen::Map<Vector7> v(est);
       v=_estimate.toVector();
       return true;
     }
@@ -73,13 +73,13 @@ class G2O_DEPRECATED_TYPES_SLAM3D_API VertexSE3 : public BaseVertex<6, SE3Quat>
     }
 
     virtual bool setMinimalEstimateDataImpl(const double* est){
-      Eigen::Map<const Vector6d> v(est);
+      Eigen::Map<const Vector6> v(est);
       _estimate.fromMinimalVector(v);
       return true;
     }
 
     virtual bool getMinimalEstimateData(double* est) const{
-      Eigen::Map<Vector6d> v(est);
+      Eigen::Map<Vector6> v(est);
       v = _estimate.toMinimalVector();
       return true;
     }
@@ -90,7 +90,7 @@ class G2O_DEPRECATED_TYPES_SLAM3D_API VertexSE3 : public BaseVertex<6, SE3Quat>
 
     virtual void oplusImpl(const double* update)
     {
-      Eigen::Map<const Vector6d> v(update);
+      Eigen::Map<const Vector6> v(update);
       SE3Quat increment(v);
       _estimate *= increment;
     }

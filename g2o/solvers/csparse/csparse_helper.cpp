@@ -1,18 +1,28 @@
 // g2o - General Graph Optimization
 // Copyright (C) 2011 R. Kuemmerle, G. Grisetti, W. Burgard
-// 
-// g2o is free software: you can redistribute it and/or modify
-// it under the terms of the GNU Lesser General Public License as published
-// by the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-// 
-// g2o is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU Lesser General Public License for more details.
-// 
-// You should have received a copy of the GNU Lesser General Public License
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+// All rights reserved.
+//
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted provided that the following conditions are
+// met:
+//
+// * Redistributions of source code must retain the above copyright notice,
+//   this list of conditions and the following disclaimer.
+// * Redistributions in binary form must reproduce the above copyright
+//   notice, this list of conditions and the following disclaimer in the
+//   documentation and/or other materials provided with the distribution.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS
+// IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+// TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+// PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+// HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+// SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
+// TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+// PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+// LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+// NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+// SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "csparse_helper.h"
 
@@ -33,12 +43,12 @@ namespace g2o {
 namespace csparse_extension {
 
   struct SparseMatrixEntry{
-    SparseMatrixEntry(int r=-1, int c=-1, double x=0.) :
+    SparseMatrixEntry(int r=-1, int c=-1, number_t x=0) :
       _r(r), _c(c), _x(x)
     {
     }
     int _r,_c;
-    double _x;
+    number_t _x;
   };
 
   struct SparseMatrixEntryColSort
@@ -48,99 +58,6 @@ namespace csparse_extension {
       return e1._c < e2._c || (e1._c == e2._c && e1._r < e2._r);
     }
   };
-
-  /**
-   * Originally from CSparse, avoid memory re-allocations by giving workspace pointers
-   * CSparse: Copyright (c) 2006-2011, Timothy A. Davis.
-   */
-  int cs_cholsolsymb(const cs *A, double *b, const css* S, double* x, int* work)
-  {
-    csn *N ;
-    int n, ok ;
-    if (!CS_CSC (A) || !b || ! S || !x) {
-      fprintf(stderr, "%s: No valid input!\n", __PRETTY_FUNCTION__);
-      assert(0); // get a backtrace in debug mode
-      return (0) ;     /* check inputs */
-    }
-    n = A->n ;
-    N = cs_chol_workspace (A, S, work, x) ;                    /* numeric Cholesky factorization */
-    if (!N) {
-      fprintf(stderr, "%s: cholesky failed!\n", __PRETTY_FUNCTION__);
-      /*assert(0);*/
-    }
-    ok = (N != NULL) ;
-    if (ok)
-    {
-      cs_ipvec (S->pinv, b, x, n) ;   /* x = P*b */
-      cs_lsolve (N->L, x) ;           /* x = L\x */
-      cs_ltsolve (N->L, x) ;          /* x = L'\x */
-      cs_pvec (S->pinv, x, b, n) ;    /* b = P'*x */
-    }
-    cs_nfree (N) ;
-    return (ok) ;
-  }
-
-  /**
-   * Originally from CSparse, avoid memory re-allocations by giving workspace pointers
-   * CSparse: Copyright (c) 2006-2011, Timothy A. Davis.
-   */
-  /* L = chol (A, [pinv parent cp]), pinv is optional */
-  csn* cs_chol_workspace (const cs *A, const css *S, int* cin, double* xin)
-  {
-    double d, lki, *Lx, *x, *Cx ;
-    int top, i, p, k, n, *Li, *Lp, *cp, *pinv, *s, *c, *parent, *Cp, *Ci ;
-    cs *L, *C, *E ;
-    csn *N ;
-    if (!CS_CSC (A) || !S || !S->cp || !S->parent) return (NULL) ;
-    n = A->n ;
-    N = (csn*) cs_calloc (1, sizeof (csn)) ;       /* allocate result */
-    c = cin ;     /* get int workspace */
-    x = xin ;    /* get double workspace */
-    cp = S->cp ; pinv = S->pinv ; parent = S->parent ;
-    C = pinv ? cs_symperm (A, pinv, 1) : ((cs *) A) ;
-    E = pinv ? C : NULL ;           /* E is alias for A, or a copy E=A(p,p) */
-    if (!N || !c || !x || !C) return (cs_ndone (N, E, NULL, NULL, 0)) ;
-    s = c + n ;
-    Cp = C->p ; Ci = C->i ; Cx = C->x ;
-    N->L = L = cs_spalloc (n, n, cp [n], 1, 0) ;    /* allocate result */
-    if (!L) return (cs_ndone (N, E, NULL, NULL, 0)) ;
-    Lp = L->p ; Li = L->i ; Lx = L->x ;
-    for (k = 0 ; k < n ; k++) Lp [k] = c [k] = cp [k] ;
-    for (k = 0 ; k < n ; k++)       /* compute L(k,:) for L*L' = C */
-    {
-      /* --- Nonzero pattern of L(k,:) ------------------------------------ */
-      top = cs_ereach (C, k, parent, s, c) ;      /* find pattern of L(k,:) */
-      x [k] = 0 ;                                 /* x (0:k) is now zero */
-      for (p = Cp [k] ; p < Cp [k+1] ; p++)       /* x = full(triu(C(:,k))) */
-      {
-        if (Ci [p] <= k) x [Ci [p]] = Cx [p] ;
-      }
-      d = x [k] ;                     /* d = C(k,k) */
-      x [k] = 0 ;                     /* clear x for k+1st iteration */
-      /* --- Triangular solve --------------------------------------------- */
-      for ( ; top < n ; top++)    /* solve L(0:k-1,0:k-1) * x = C(:,k) */
-      {
-        i = s [top] ;               /* s [top..n-1] is pattern of L(k,:) */
-        lki = x [i] / Lx [Lp [i]] ; /* L(k,i) = x (i) / L(i,i) */
-        x [i] = 0 ;                 /* clear x for k+1st iteration */
-        for (p = Lp [i] + 1 ; p < c [i] ; p++)
-        {
-          x [Li [p]] -= Lx [p] * lki ;
-        }
-        d -= lki * lki ;            /* d = d - L(k,i)*L(k,i) */
-        p = c [i]++ ;
-        Li [p] = k ;                /* store L(k,i) in column i */
-        Lx [p] = lki ;
-      }
-      /* --- Compute L(k,k) ----------------------------------------------- */
-      if (d <= 0) return (cs_ndone (N, E, NULL, NULL, 0)) ; /* not pos def */
-      p = c [k]++ ;
-      Li [p] = k ;                /* store L(k,k) = sqrt (d) in column k */
-      Lx [p] = sqrt (d) ;
-    }
-    Lp [n] = cp [n] ;               /* finalize L */
-    return (cs_ndone (N, E, NULL, NULL, 1)) ; /* success: free E,s,x; return N */
-  }
 
   bool writeCs2Octave(const char* filename, const cs* A, bool upperTriangular)
   {
@@ -156,7 +73,7 @@ namespace csparse_extension {
     if (A->nz == -1) { // CCS matrix
       const int* Ap = A->p;
       const int* Ai = A->i;
-      const double* Ax = A->x;
+      const number_t* Ax = A->x;
       for (int i=0; i < cols; i++) {
         const int& rbeg = Ap[i];
         const int& rend = Ap[i+1];
@@ -170,7 +87,7 @@ namespace csparse_extension {
       entries.reserve(A->nz);
       int *Aj = A->p;             // column indeces
       int *Ai = A->i;             // row indices
-      double *Ax = A->x;          // values;
+      number_t *Ax = A->x;          // values;
       for (int i = 0; i < A->nz; ++i) {
         entries.push_back(SparseMatrixEntry(Ai[i], Aj[i], Ax[i]));
         if (upperTriangular && Ai[i] != Aj[i])

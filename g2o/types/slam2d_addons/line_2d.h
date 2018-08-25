@@ -34,12 +34,12 @@
 
 namespace g2o {
 
-  struct Line2D : public Vector2D{
+  struct Line2D : public Vector2{
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
     Line2D() {
       setZero();
     }
-    Line2D(const Vector2D& v) {
+    Line2D(const Vector2& v) {
       (*this)(0) = v(0);
       (*this)(1) = v(1);
     }
@@ -49,7 +49,7 @@ namespace g2o {
     Line2D est = l;
     est[0] += t.rotation().angle();
     est[0] = normalize_theta(est[0]);
-    Vector2D n(cos(est[0]), sin(est[0]));
+    Vector2 n(std::cos(est[0]), std::sin(est[0]));
     est[1] += n.dot(t.translation());
     return est;
   }

@@ -34,9 +34,6 @@
 
 namespace g2o {
 
-  typedef Eigen::Matrix<double, 6, 1, Eigen::ColMajor> Vector6d;
-  typedef Eigen::Matrix<double, 7, 1, Eigen::ColMajor> Vector7d;
-
   /**
    * internal functions used inside g2o.
    * Those functions may disappear or change their meaning without further
@@ -45,17 +42,17 @@ namespace g2o {
   namespace internal {
 
     /**
-     * extract the rotation matrix from an Isometry3D matrix. Eigen itself
+     * extract the rotation matrix from an Isometry3 matrix. Eigen itself
      * performs an SVD decomposition to recover the nearest orthogonal matrix,
-     * since its rotation() function also handles a scaling matrix.  An Isometry3D does
-     * not have a scaling portion and we assume that the Isometry3D is
+     * since its rotation() function also handles a scaling matrix.  An Isometry3 does
+     * not have a scaling portion and we assume that the Isometry3 is
      * numerically stable while we compute the error and the Jacobians.  Hence,
      * we directly extract the rotation block out of the full matrix.
      *
-     * Note, we could also call .linear() on the Isometry3D. However, I dislike
+     * Note, we could also call .linear() on the Isometry3. However, I dislike
      * the name of that function a bit.
      */
-    inline Isometry3D::ConstLinearPart extractRotation(const Isometry3D& A)
+    inline Isometry3::ConstLinearPart extractRotation(const Isometry3& A)
     {
       return A.matrix().topLeftCorner<3,3>();
     }
@@ -69,9 +66,9 @@ namespace g2o {
     template <typename Derived>
     void nearestOrthogonalMatrix(const Eigen::MatrixBase<Derived>& R)
     {
-      Eigen::JacobiSVD<Matrix3D> svd(R, Eigen::ComputeFullU | Eigen::ComputeFullV);
-      double det = (svd.matrixU() * svd.matrixV().adjoint()).determinant();
-      Matrix3D scaledU(svd.matrixU());
+      Eigen::JacobiSVD<Matrix3> svd(R, Eigen::ComputeFullU | Eigen::ComputeFullV);
+      number_t det = (svd.matrixU() * svd.matrixV().adjoint()).determinant();
+      Matrix3 scaledU(svd.matrixU());
       scaledU.col(0) /= det;
       const_cast<Eigen::MatrixBase<Derived>&>(R) = scaledU * svd.matrixV().transpose();
     }
@@ -84,7 +81,7 @@ namespace g2o {
     template <typename Derived>
     void approximateNearestOrthogonalMatrix(const Eigen::MatrixBase<Derived>& R)
     {
-      Matrix3D E = R.transpose() * R;
+      Matrix3 E = R.transpose() * R;
       E.diagonal().array() -= 1;
       const_cast<Eigen::MatrixBase<Derived>&>(R) -= 0.5 * R * E;
     }
@@ -92,66 +89,66 @@ namespace g2o {
     /**
      * normalize the quaternion, such that ||q|| == 1 and q.w() > 0
      */
-    G2O_TYPES_SLAM3D_API Eigen::Quaterniond normalized(const Eigen::Quaterniond& q);
+    G2O_TYPES_SLAM3D_API Quaternion normalized(const Quaternion& q);
     /**
      * as above, but in-place
      */
-    G2O_TYPES_SLAM3D_API Eigen::Quaterniond& normalize(Eigen::Quaterniond& q);
+    G2O_TYPES_SLAM3D_API Quaternion& normalize(Quaternion& q);
 
     // functions to handle the rotation part
     /**
      * Rotation matrix -> Euler angles (roll, pitch, yaw)
      */
-    G2O_TYPES_SLAM3D_API Vector3D toEuler(const Matrix3D& R);
+    G2O_TYPES_SLAM3D_API Vector3 toEuler(const Matrix3& R);
     /**
      * Euler angles (roll, pitch, yaw) -> Rotation matrix
      */
-    G2O_TYPES_SLAM3D_API Matrix3D fromEuler(const Vector3D& v);
+    G2O_TYPES_SLAM3D_API Matrix3 fromEuler(const Vector3& v);
     /**
      * Rotation matrix -> (qx qy, qz)
      */
-    G2O_TYPES_SLAM3D_API Vector3D toCompactQuaternion(const Matrix3D& R);
+    G2O_TYPES_SLAM3D_API Vector3 toCompactQuaternion(const Matrix3& R);
     /**
      * (qx qy, qz) -> Rotation matrix, whereas (qx, qy, qz) are assumed to be
      * part of a quaternion which was normalized with the function above.
      */
-    G2O_TYPES_SLAM3D_API Matrix3D fromCompactQuaternion(const Vector3D& v);
+    G2O_TYPES_SLAM3D_API Matrix3 fromCompactQuaternion(const Vector3& v);
 
     // functions to handle the toVector of the whole transformations
     /**
-     * Isometry3D -> (x, y, z, qx, qy, qz)
+     * Isometry3 -> (x, y, z, qx, qy, qz)
      */
-    G2O_TYPES_SLAM3D_API Vector6d toVectorMQT(const Isometry3D& t);
+    G2O_TYPES_SLAM3D_API Vector6 toVectorMQT(const Isometry3& t);
     /**
-     * Isometry3D -> (x, y, z, roll, pitch, yaw)
+     * Isometry3 -> (x, y, z, roll, pitch, yaw)
      */
-    G2O_TYPES_SLAM3D_API Vector6d toVectorET(const Isometry3D& t);
+    G2O_TYPES_SLAM3D_API Vector6 toVectorET(const Isometry3& t);
     /**
-     * Isometry3D -> (x, y, z, qx, qy, qz, qw)
+     * Isometry3 -> (x, y, z, qx, qy, qz, qw)
      */
-    G2O_TYPES_SLAM3D_API Vector7d toVectorQT(const Isometry3D& t);
+    G2O_TYPES_SLAM3D_API Vector7 toVectorQT(const Isometry3& t);
 
     /**
-     * (x, y, z, qx, qy, qz) -> Isometry3D
+     * (x, y, z, qx, qy, qz) -> Isometry3
      */
-    G2O_TYPES_SLAM3D_API Isometry3D fromVectorMQT(const Vector6d& v);
+    G2O_TYPES_SLAM3D_API Isometry3 fromVectorMQT(const Vector6& v);
     /**
-     * (x, y, z, roll, pitch, yaw) -> Isometry3D
+     * (x, y, z, roll, pitch, yaw) -> Isometry3
      */
-    G2O_TYPES_SLAM3D_API Isometry3D fromVectorET(const Vector6d& v);
+    G2O_TYPES_SLAM3D_API Isometry3 fromVectorET(const Vector6& v);
     /**
-     * (x, y, z, qx, qy, qz, qw) -> Isometry3D
+     * (x, y, z, qx, qy, qz, qw) -> Isometry3
      */
-    G2O_TYPES_SLAM3D_API Isometry3D fromVectorQT(const Vector7d& v);
+    G2O_TYPES_SLAM3D_API Isometry3 fromVectorQT(const Vector7& v);
 
     /**
-     * convert an Isometry3D to the old SE3Quat class
+     * convert an Isometry3 to the old SE3Quat class
      */
-    G2O_TYPES_SLAM3D_API SE3Quat toSE3Quat(const Isometry3D& t);
+    G2O_TYPES_SLAM3D_API SE3Quat toSE3Quat(const Isometry3& t);
     /**
-     * convert from an old SE3Quat into Isometry3D
+     * convert from an old SE3Quat into Isometry3
      */
-    G2O_TYPES_SLAM3D_API Isometry3D fromSE3Quat(const SE3Quat& t);
+    G2O_TYPES_SLAM3D_API Isometry3 fromSE3Quat(const SE3Quat& t);
 
   } // end namespace internal
 } // end namespace g2o

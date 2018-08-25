@@ -1,1 +1,1 @@
-ADD_SUBDIRECTORY(slam3d)
+add_subdirectory(slam3d)

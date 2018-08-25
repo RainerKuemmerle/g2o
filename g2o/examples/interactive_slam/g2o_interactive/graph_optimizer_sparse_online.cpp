@@ -41,20 +41,24 @@
 #include <iostream>
 #include <iomanip>
 #include <fstream>
+
 using namespace std;
 using namespace Eigen;
 
-#define DIM_TO_SOLVER(p, l) BlockSolver< BlockSolverTraits<p, l> >
-
-#define ALLOC_PCG(s, p, l) \
-  if (1) { \
-    std::cerr << "# Using PCG online poseDim " << p << " landMarkDim " << l << " blockordering 1" << std::endl; \
-    LinearSolverPCG< DIM_TO_SOLVER(p, l)::PoseMatrixType >* linearSolver = new LinearSolverPCG<DIM_TO_SOLVER(p, l)::PoseMatrixType>(); \
-    linearSolver->setMaxIterations(6); \
-    s = new DIM_TO_SOLVER(p, l)(linearSolver); \
-  } else (void)0
-
 namespace g2o {
+
+  namespace
+  {
+    template<int p, int l>
+    std::unique_ptr<g2o::Solver> AllocatePCGSolver()
+    {
+      std::cerr << "# Using PCG online poseDim " << p << " landMarkDim " << l << " blockordering 1" << std::endl;
+
+      auto linearSolver = g2o::make_unique<LinearSolverPCG<typename BlockSolverPL<p, l>::PoseMatrixType>>();
+      linearSolver->setMaxIterations(6);
+      return g2o::make_unique<BlockSolverPL<p, l>>(std::move(linearSolver));
+    }
+  }
 
   // force linking to the cholmod solver
   G2O_USE_OPTIMIZATION_LIBRARY(cholmod);
@@ -191,31 +195,24 @@ bool SparseOptimizerOnline::updateInitialization(HyperGraph::VertexSet& vset, Hy
   return result;
 }
 
-static Solver* createSolver(const std::string& solverName)
-{
-  g2o::Solver* s = 0;
-  if (solverName == "pcg3_2") {
-    ALLOC_PCG(s, 3, 2);
-  }
-  else if (solverName == "pcg6_3") {
-    ALLOC_PCG(s, 6, 3);
-  }
-  return s;
-}
-
 bool SparseOptimizerOnline::initSolver(int dimension, int /*batchEveryN*/)
 {
   slamDimension = dimension;
   OptimizationAlgorithmFactory* solverFactory = OptimizationAlgorithmFactory::instance();
   OptimizationAlgorithmProperty solverProperty;
   if (_usePcg) {
-    Solver* s = 0;
-    if (dimension == 3) {
-      s = createSolver("pcg3_2");
-    } else {
-      s = createSolver("pcg6_3");
+
+    std::unique_ptr<Solver> s;
+    if (dimension == 3)
+    {
+      s = AllocatePCGSolver<3, 2>();
     }
-    OptimizationAlgorithmGaussNewton* gaussNewton = new OptimizationAlgorithmGaussNewton(s);
+    else
+    {
+      s = AllocatePCGSolver<6, 3>();
+    }
+
+    OptimizationAlgorithmGaussNewton* gaussNewton = new OptimizationAlgorithmGaussNewton(std::move(s));
     setAlgorithm(gaussNewton);
   }
   else {
@@ -227,7 +224,7 @@ bool SparseOptimizerOnline::initSolver(int dimension, int /*batchEveryN*/)
   }
 
   OptimizationAlgorithmGaussNewton* gaussNewton = dynamic_cast<OptimizationAlgorithmGaussNewton*>(solver());
-  _underlyingSolver = gaussNewton->solver();
+  _underlyingSolver = &gaussNewton->solver();
 
   if (! solver()) {
     cerr << "Error allocating solver. Allocating CHOLMOD solver failed!" << endl;

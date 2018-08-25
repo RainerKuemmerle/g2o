@@ -71,25 +71,25 @@ licenses for more details.
 
 
 ### Requirements
-  * cmake             http://www.cmake.org/
-  * Eigen3            http://eigen.tuxfamily.org
+* cmake             http://www.cmake.org/
+* Eigen3            http://eigen.tuxfamily.org
 
-  On Ubuntu / Debian these dependencies are resolved by installing the
-  following packages.
-    - cmake
-    - libeigen3-dev
+On Ubuntu / Debian these dependencies are resolved by installing the
+following packages.
+  - cmake
+  - libeigen3-dev
 
 #### Optional requirements
-  * suitesparse       http://www.cise.ufl.edu/research/sparse/SuiteSparse/
-  * Qt5               http://qt-project.org
-  * libQGLViewer      http://www.libqglviewer.com/
+* suitesparse       http://www.cise.ufl.edu/research/sparse/SuiteSparse/
+* Qt5               http://qt-project.org
+* libQGLViewer      http://www.libqglviewer.com/
 
-  On Ubuntu / Debian these dependencies are resolved by installing the
-  following packages.
-    - libsuitesparse-dev
-    - qtdeclarative5-dev
-    - qt5-qmake
-    - libqglviewer-dev
+On Ubuntu / Debian these dependencies are resolved by installing the
+following packages.
+- libsuitesparse-dev
+- qtdeclarative5-dev
+- qt5-qmake
+- libqglviewer-dev
 
 #### Mac OS X
 If using [Homebrew](http://brew.sh/), then
@@ -98,7 +98,16 @@ If using [Homebrew](http://brew.sh/), then
 
 will install g2o together with its required dependencies. In this case no manual compilation is necessary.
 
+#### Windows
+
+If using [vcpkg](https://github.com/Microsoft/vcpkg), then
+
+`scripts\install-deps-windows.bat`
+
+will build and install the required dependencies. The location of `vcpkg` and required triplet are determined by the environment variables `VCPKG_ROOT_DIR` and `VCPKG_DEFAULT_TRIPLET`.
+
 ### Compilation
+
 Our primary development platform is Linux. Experimental support for
 Mac OS X, Android and Windows (MinGW or MSVC).
 We recommend a so-called out of source build which can be achieved
@@ -111,7 +120,14 @@ by the following command sequence.
 
 The binaries will be placed in bin and the libraries in lib which
 are both located in the top-level folder.
-If you are compiling on Windows, please download Eigen3 and extract it.
+
+On Windows with `vcpkg` the following two commands will generate build scripts for Visual Studio 2017 MSVC 14 tool set:
+
+- `mkdir build`
+- `cd build`
+- `cmake -G "Visual Studio 14 2017 Win64" -DG2O_BUILD_APPS=ON -DG2O_BUILD_EXAMPLES=ON -DVCPKG_TARGET_TRIPLET="%VCPKG_DEFAULT_TRIPLET%" -DCMAKE_TOOLCHAIN_FILE="%VCPKG_ROOT_DIR%\scripts\buildsystems\vcpkg.cmake" ..`
+
+If you are compiling on Windows and you are for some reasons **not** using `vcpkg` please download Eigen3 and extract it.
 Within cmake-gui set the variable G2O\_EIGEN3\_INCLUDE to that directory.
 
 ### Cross-Compiling for Android
@@ -127,6 +143,9 @@ We thank the following contributors for providing patches:
 - Michael A. Eriksen for submitting patches to compile with MSVC.
 - Mark Pupilli for submitting patches to compile with MSVC.
 
+### Projects using g2o
+- [g2opy](https://github.com/uoip/g2opy): Python binding
+- [.Net wrapper](https://github.com/fugro/g2o)
 
 ### Contact information
 Rainer Kuemmerle <kuemmerl@informatik.uni-freiburg.de>   

@@ -2,5 +2,22 @@
 
 set -ev
 
+# source for new gcc
+sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
+
 sudo apt-get update -qq
-sudo apt-get install -qq qtdeclarative5-dev qt5-qmake libqglviewer-dev libeigen3-dev libsuitesparse-dev
+
+# dependencies for building g2o
+sudo apt-get install -qq qtdeclarative5-dev qt5-qmake libqglviewer-dev libsuitesparse-dev
+
+# install new gcc
+if [ "$CC" = "gcc" ]; then
+  sudo apt-get install -qq gcc-7 g++-7
+fi
+
+# download eigen3 and unpack it
+cd /tmp
+wget -O eigen3.zip http://bitbucket.org/eigen/eigen/get/3.3.5.zip
+unzip -q eigen3.zip
+ls -l eigen*
+sudo mv /tmp/eigen-eigen-b3f3d4950030 /usr/include/eigen3

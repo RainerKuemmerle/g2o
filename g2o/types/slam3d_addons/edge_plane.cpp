@@ -31,7 +31,7 @@ namespace g2o
 using namespace Eigen;
 
 EdgePlane::EdgePlane() :
-    BaseBinaryEdge<4, Vector4D, VertexPlane, VertexPlane>()
+    BaseBinaryEdge<4, Vector4, VertexPlane, VertexPlane>()
 {
     _information.setIdentity();
     _error.setZero();
@@ -39,7 +39,7 @@ EdgePlane::EdgePlane() :
 
 bool EdgePlane::read(std::istream& is)
 {
-  Vector4D  v;
+  Vector4  v;
     int size=4;
     for (int i = 0; i < size; ++i)
         is >> v[i];
@@ -68,8 +68,8 @@ bool EdgePlane::write(std::ostream& os) const
 #ifndef NUMERIC_JACOBIAN_TWO_D_TYPES
 void EdgePlane::linearizeOplus()
 {
-    _jacobianOplusXi=-Matrix3D::Identity();
-    _jacobianOplusXj= Matrix3D::Identity();
+    _jacobianOplusXi=-Matrix3::Identity();
+    _jacobianOplusXj= Matrix3::Identity();
 }
 #endif
 #endif

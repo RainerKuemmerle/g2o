@@ -45,15 +45,25 @@ int main(int argc, char** argv)
   typedef BlockSolver< BlockSolverTraits<-1, -1> >  SlamBlockSolver;
   typedef LinearSolverCSparse<SlamBlockSolver::PoseMatrixType> SlamLinearSolver;
 
-  SlamLinearSolver* linearSolver = new SlamLinearSolver();
-  linearSolver->setBlockOrdering(false);
-  SlamBlockSolver* blockSolver = new SlamBlockSolver(linearSolver);
+  {
+    auto linearSolver = g2o::make_unique<SlamLinearSolver>();
+    linearSolver->setBlockOrdering(false);
 
-  OptimizationAlgorithmGaussNewton* solverGauss   = new OptimizationAlgorithmGaussNewton(blockSolver);
-  OptimizationAlgorithmLevenberg* solverLevenberg = new OptimizationAlgorithmLevenberg(blockSolver);
-  mw.solverGaussNewton = solverGauss;
-  mw.solverLevenberg = solverLevenberg;
-  mw.viewer->graph->setAlgorithm(solverGauss);
+    mw.solverGaussNewton  = new OptimizationAlgorithmGaussNewton(
+      g2o::make_unique<SlamBlockSolver>(std::move(linearSolver))
+    );
+  }
+  
+  {
+    auto linearSolver = g2o::make_unique<SlamLinearSolver>();
+    linearSolver->setBlockOrdering(false);
+
+    mw.solverLevenberg  = new OptimizationAlgorithmLevenberg(
+      g2o::make_unique<SlamBlockSolver>(std::move(linearSolver))
+    );
+  }
+
+  mw.viewer->graph->setAlgorithm(mw.solverGaussNewton);
 
   return qapp.exec();
 }

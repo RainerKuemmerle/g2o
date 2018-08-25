@@ -36,17 +36,19 @@
 
 #include "g2o/stuff/macros.h"
 
-#define DIM_TO_SOLVER(p, l) BlockSolver< BlockSolverTraits<p, l> >
-
-#define ALLOC_CSPARSE(s, p, l, blockorder) \
-  if (1) { \
-    std::cerr << "# Using CSparse poseDim " << p << " landMarkDim " << l << " blockordering " << blockorder << std::endl; \
-    LinearSolverCSparse< DIM_TO_SOLVER(p, l)::PoseMatrixType >* linearSolver = new LinearSolverCSparse<DIM_TO_SOLVER(p, l)::PoseMatrixType>(); \
-    linearSolver->setBlockOrdering(blockorder); \
-    s = new DIM_TO_SOLVER(p, l)(linearSolver); \
-  } else (void)0
-
 namespace g2o {
+
+  namespace
+  {
+    template<int p, int l, bool blockorder>
+    std::unique_ptr<BlockSolverBase> AllocateSolver()
+    {
+      std::cerr << "# Using CSparse poseDim " << p << " landMarkDim " << l << " blockordering " << blockorder << std::endl;
+      auto linearSolver = g2o::make_unique<LinearSolverCSparse<typename BlockSolverPL<p, l>::PoseMatrixType>>();
+      linearSolver->setBlockOrdering(blockorder);
+      return g2o::make_unique<BlockSolverPL<p, l>>(std::move(linearSolver));
+    }
+  }
 
   /**
    * helper function for allocating
@@ -54,14 +56,9 @@ namespace g2o {
   static OptimizationAlgorithm* createSolver(const std::string& fullSolverName)
   {
     if (fullSolverName != "2dlinear")
-      return 0;
+      return nullptr;
 
-    g2o::Solver* s = 0;
-    ALLOC_CSPARSE(s, 3, 2, true);
-    OptimizationAlgorithm* snl = 0;
-    snl = new SolverSLAM2DLinear(s);
-
-    return snl;
+    return new SolverSLAM2DLinear{ AllocateSolver<3, 2, true>() };
   }
 
   class SLAM2DLinearSolverCreator : public AbstractOptimizationAlgorithmCreator

@@ -1,8 +1,8 @@
 # Only build CSPARSE if we need to
-IF(BUILD_CSPARSE)
-  ADD_SUBDIRECTORY(csparse)
-ENDIF(BUILD_CSPARSE)
+if(BUILD_CSPARSE AND G2O_USE_CSPARSE)
+  add_subdirectory(csparse)
+endif()
 
-IF (G2O_HAVE_OPENGL)
-  ADD_SUBDIRECTORY(freeglut)
-ENDIF()
+if (G2O_HAVE_OPENGL)
+  add_subdirectory(freeglut)
+endif()

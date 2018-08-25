@@ -169,8 +169,8 @@
 #      ANDROID_STANDALONE_TOOLCHAIN - default locations
 #
 #    Make sure to do the following in your scripts:
-#      SET( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${my_cxx_flags}" )
-#      SET( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${my_cxx_flags}" )
+#      set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${my_cxx_flags}" )
+#      set( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${my_cxx_flags}" )
 #    The flags will be prepopulated with critical flags, so don't loose them.
 #    Also be aware that toolchain also sets configuration-specific compiler
 #    flags and linker flags.
@@ -534,8 +534,8 @@ endif()
 macro( __GLOB_NDK_TOOLCHAINS __availableToolchainsVar __availableToolchainsLst __toolchain_subpath )
  foreach( __toolchain ${${__availableToolchainsLst}} )
   if( "${__toolchain}" MATCHES "-clang3[.][0-9]$" AND NOT EXISTS "${ANDROID_NDK_TOOLCHAINS_PATH}/${__toolchain}${__toolchain_subpath}" )
-   SET( __toolchainVersionRegex "^TOOLCHAIN_VERSION[\t ]+:=[\t ]+(.*)$" )
-   FILE( STRINGS "${ANDROID_NDK_TOOLCHAINS_PATH}/${__toolchain}/setup.mk" __toolchainVersionStr REGEX "${__toolchainVersionRegex}" )
+   set( __toolchainVersionRegex "^TOOLCHAIN_VERSION[\t ]+:=[\t ]+(.*)$" )
+   file( STRINGS "${ANDROID_NDK_TOOLCHAINS_PATH}/${__toolchain}/setup.mk" __toolchainVersionStr REGEX "${__toolchainVersionRegex}" )
    if( __toolchainVersionStr )
     string( REGEX REPLACE "${__toolchainVersionRegex}" "\\1" __toolchainVersionStr "${__toolchainVersionStr}" )
     string( REGEX REPLACE "-clang3[.][0-9]$" "-${__toolchainVersionStr}" __gcc_toolchain "${__toolchain}" )
@@ -718,7 +718,7 @@ endif()
 if( CMAKE_BINARY_DIR AND EXISTS "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/CMakeSystem.cmake" )
  # really dirty hack
  # it is not possible to change CMAKE_SYSTEM_PROCESSOR after the first run...
- file( APPEND "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/CMakeSystem.cmake" "SET(CMAKE_SYSTEM_PROCESSOR \"${CMAKE_SYSTEM_PROCESSOR}\")\n" )
+ file( APPEND "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/CMakeSystem.cmake" "set(CMAKE_SYSTEM_PROCESSOR \"${CMAKE_SYSTEM_PROCESSOR}\")\n" )
 endif()
 
 if( ANDROID_ARCH_NAME STREQUAL "arm" AND NOT ARMEABI_V6 )
@@ -1449,7 +1449,7 @@ endif()
 
 # global includes and link directories
 include_directories( SYSTEM "${ANDROID_SYSROOT}/usr/include" ${ANDROID_STL_INCLUDE_DIRS} )
-get_filename_component(__android_install_path "${CMAKE_INSTALL_PREFIX}/libs/${ANDROID_NDK_ABI_NAME}" ABSOLUTE) # avoid CMP0015 policy warning
+get_filename_component(__android_install_path "libs/${ANDROID_NDK_ABI_NAME}" ABSOLUTE) # avoid CMP0015 policy warning
 link_directories( "${__android_install_path}" )
 
 # detect if need link crtbegin_so.o explicitly
@@ -1523,7 +1523,7 @@ set( ANDROID True )
 set( BUILD_ANDROID True )
 
 # where is the target environment
-set( CMAKE_FIND_ROOT_PATH "${ANDROID_TOOLCHAIN_ROOT}/bin" "${ANDROID_TOOLCHAIN_ROOT}/${ANDROID_TOOLCHAIN_MACHINE_NAME}" "${ANDROID_SYSROOT}" "${CMAKE_INSTALL_PREFIX}" "${CMAKE_INSTALL_PREFIX}/share" )
+set( CMAKE_FIND_ROOT_PATH "${ANDROID_TOOLCHAIN_ROOT}/bin" "${ANDROID_TOOLCHAIN_ROOT}/${ANDROID_TOOLCHAIN_MACHINE_NAME}" "${ANDROID_SYSROOT}" "${CMAKE_INSTALL_PREFIX}" "share" )
 
 # only search for libraries and includes in the ndk toolchain
 set( CMAKE_FIND_ROOT_PATH_MODE_PROGRAM ONLY )
@@ -1537,16 +1537,16 @@ macro( find_host_package )
  set( CMAKE_FIND_ROOT_PATH_MODE_LIBRARY NEVER )
  set( CMAKE_FIND_ROOT_PATH_MODE_INCLUDE NEVER )
  if( CMAKE_HOST_WIN32 )
-  SET( WIN32 1 )
-  SET( UNIX )
+  set( WIN32 1 )
+  set( UNIX )
  elseif( CMAKE_HOST_APPLE )
-  SET( APPLE 1 )
-  SET( UNIX )
+  set( APPLE 1 )
+  set( UNIX )
  endif()
  find_package( ${ARGN} )
- SET( WIN32 )
- SET( APPLE )
- SET( UNIX 1 )
+ set( WIN32 )
+ set( APPLE )
+ set( UNIX 1 )
  set( CMAKE_FIND_ROOT_PATH_MODE_PROGRAM ONLY )
  set( CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY )
  set( CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY )
@@ -1559,16 +1559,16 @@ macro( find_host_program )
  set( CMAKE_FIND_ROOT_PATH_MODE_LIBRARY NEVER )
  set( CMAKE_FIND_ROOT_PATH_MODE_INCLUDE NEVER )
  if( CMAKE_HOST_WIN32 )
-  SET( WIN32 1 )
-  SET( UNIX )
+  set( WIN32 1 )
+  set( UNIX )
  elseif( CMAKE_HOST_APPLE )
-  SET( APPLE 1 )
-  SET( UNIX )
+  set( APPLE 1 )
+  set( UNIX )
  endif()
  find_program( ${ARGN} )
- SET( WIN32 )
- SET( APPLE )
- SET( UNIX 1 )
+ set( WIN32 )
+ set( APPLE )
+ set( UNIX 1 )
  set( CMAKE_FIND_ROOT_PATH_MODE_PROGRAM ONLY )
  set( CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY )
  set( CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY )

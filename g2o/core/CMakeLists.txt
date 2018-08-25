@@ -1,4 +1,6 @@
-ADD_LIBRARY(core ${G2O_LIB_TYPE}
+add_library(core ${G2O_LIB_TYPE}
+dynamic_aligned_buffer.hpp
+ownership.h
 base_edge.h
 base_binary_edge.h          hyper_graph_action.cpp
 base_binary_edge.hpp        hyper_graph_action.h
@@ -37,16 +39,21 @@ robust_kernel_factory.cpp robust_kernel_factory.h
 g2o_core_api.h
 )
 
-SET_TARGET_PROPERTIES(core PROPERTIES OUTPUT_NAME ${LIB_PREFIX}core)
+set_target_properties(core PROPERTIES OUTPUT_NAME ${LIB_PREFIX}core)
+target_link_libraries(core PUBLIC stuff ${G2O_EIGEN3_EIGEN_TARGET})
 
-TARGET_LINK_LIBRARIES(core stuff)
+if (APPLE)
+  set_target_properties(core PROPERTIES INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib")
+endif()
 
-INSTALL(TARGETS core
-  RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/bin
-  LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX}/lib
-  ARCHIVE DESTINATION ${CMAKE_INSTALL_PREFIX}/lib
+install(TARGETS core
+  EXPORT ${G2O_TARGETS_EXPORT_NAME}
+  RUNTIME DESTINATION ${RUNTIME_DESTINATION}
+  LIBRARY DESTINATION ${LIBRARY_DESTINATION}
+  ARCHIVE DESTINATION ${ARCHIVE_DESTINATION}
+  INCLUDES DESTINATION ${INCLUDES_DESTINATION}
 )
 
-FILE(GLOB headers "${CMAKE_CURRENT_SOURCE_DIR}/*.h" "${CMAKE_CURRENT_SOURCE_DIR}/*.hpp")
+file(GLOB headers "${CMAKE_CURRENT_SOURCE_DIR}/*.h" "${CMAKE_CURRENT_SOURCE_DIR}/*.hpp")
 
-INSTALL(FILES ${headers} DESTINATION ${CMAKE_INSTALL_PREFIX}/include/g2o/core)
+install(FILES ${headers} DESTINATION ${INCLUDES_INSTALL_DIR}/core)

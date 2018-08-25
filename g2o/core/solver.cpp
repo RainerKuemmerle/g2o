@@ -25,6 +25,7 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "solver.h"
+#include "dynamic_aligned_buffer.hpp"
 
 #include <cstring>
 #include <algorithm>
@@ -39,8 +40,8 @@ Solver::Solver() :
 
 Solver::~Solver()
 {
-  delete[] _x;
-  delete[] _b;
+  free_aligned(_x);
+  free_aligned(_b);
 }
 
 void Solver::resizeVector(size_t sx)
@@ -50,20 +51,20 @@ void Solver::resizeVector(size_t sx)
   sx += _additionalVectorSpace; // allocate some additional space if requested
   if (_maxXSize < sx) {
     _maxXSize = 2*sx;
-    delete[] _x;
-    _x = new double[_maxXSize];
+    free_aligned(_x);
+    _x = allocate_aligned<number_t>(_maxXSize);
 #ifndef NDEBUG
-    memset(_x, 0, _maxXSize * sizeof(double));
+    memset(_x, 0, _maxXSize * sizeof(number_t));
 #endif
     if (_b) { // backup the former b, might still be needed for online processing
-      memcpy(_x, _b, oldSize * sizeof(double));
-      delete[] _b;
-      _b = new double[_maxXSize];
+      memcpy(_x, _b, oldSize * sizeof(number_t));
+      free_aligned(_b);
+      _b = allocate_aligned<number_t>(_maxXSize);
       std::swap(_b, _x);
     } else {
-      _b = new double[_maxXSize];
+      _b = allocate_aligned<number_t>(_maxXSize);
 #ifndef NDEBUG
-      memset(_b, 0, _maxXSize * sizeof(double));
+      memset(_b, 0, _maxXSize * sizeof(number_t));
 #endif
     }
   }

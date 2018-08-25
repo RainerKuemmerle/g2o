@@ -41,7 +41,7 @@ class G2O_CORE_API MatrixStructure
     ~MatrixStructure();
     /**
      * allocate space for the Matrix Structure. You may call this on an already allocated struct, it will
-     * then reallocate the memory + additional space (double the required space).
+     * then reallocate the memory + additional space (number_t the required space).
      */
     void alloc(int n_, int nz);
 

@@ -1,16 +1,23 @@
-ADD_LIBRARY(solver_structure_only ${G2O_LIB_TYPE}
+add_library(solver_structure_only ${G2O_LIB_TYPE}
   structure_only.cpp
   structure_only_solver.h
 )
 
-SET_TARGET_PROPERTIES(solver_structure_only PROPERTIES OUTPUT_NAME ${LIB_PREFIX}solver_structure_only)
-TARGET_LINK_LIBRARIES(solver_structure_only core)
+set_target_properties(solver_structure_only PROPERTIES OUTPUT_NAME ${LIB_PREFIX}solver_structure_only)
+if (APPLE)
+  set_target_properties(solver_structure_only PROPERTIES INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib")
+endif()
 
-INSTALL(TARGETS solver_structure_only
-  RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/bin
-  LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX}/lib
-  ARCHIVE DESTINATION ${CMAKE_INSTALL_PREFIX}/lib
+target_link_libraries(solver_structure_only core)
+
+install(TARGETS solver_structure_only
+  EXPORT ${G2O_TARGETS_EXPORT_NAME}
+  RUNTIME DESTINATION ${RUNTIME_DESTINATION}
+  LIBRARY DESTINATION ${LIBRARY_DESTINATION}
+  ARCHIVE DESTINATION ${ARCHIVE_DESTINATION}
+  INCLUDES DESTINATION ${INCLUDES_DESTINATION}
 )
 
-FILE(GLOB headers "${CMAKE_CURRENT_SOURCE_DIR}/*.h" "${CMAKE_CURRENT_SOURCE_DIR}/*.hpp")
-INSTALL(FILES ${headers} DESTINATION ${CMAKE_INSTALL_PREFIX}/include/g2o/solvers/structure_only)
+file(GLOB headers "${CMAKE_CURRENT_SOURCE_DIR}/*.h" "${CMAKE_CURRENT_SOURCE_DIR}/*.hpp")
+
+install(FILES ${headers} DESTINATION ${INCLUDES_INSTALL_DIR}/solvers/structure_only)

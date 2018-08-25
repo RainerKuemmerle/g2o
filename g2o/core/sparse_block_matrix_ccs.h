@@ -96,18 +96,18 @@ namespace g2o {
       //! indices of the column blocks
       const std::vector<int>& colBlockIndices() const { return _colBlockIndices;}
 
-      void rightMultiply(double*& dest, const double* src) const
+      void rightMultiply(number_t*& dest, const number_t* src) const
       {
         int destSize=cols();
 
         if (! dest){
-          dest=new double [ destSize ];
-          memset(dest,0, destSize*sizeof(double));
+          dest=new number_t[ destSize ];
+          memset(dest,0, destSize*sizeof(number_t));
         }
 
         // map the memory by Eigen
-        Eigen::Map<Eigen::VectorXd> destVec(dest, destSize);
-        Eigen::Map<const Eigen::VectorXd> srcVec(src, rows());
+        Eigen::Map<VectorX> destVec(dest, destSize);
+        Eigen::Map<const VectorX> srcVec(src, rows());
 
 #      ifdef G2O_OPENMP
 #      pragma omp parallel for default (shared) schedule(dynamic, 10)
@@ -136,7 +136,7 @@ namespace g2o {
       /**
        * fill the CCS arrays of a matrix, arrays have to be allocated beforehand
        */
-      int fillCCS(int* Cp, int* Ci, double* Cx, bool upperTriangle = false) const
+      int fillCCS(int* Cp, int* Ci, number_t* Cx, bool upperTriangle = false) const
       {
         assert(Cp && Ci && Cx && "Target destination is NULL");
         int nz=0;
@@ -169,10 +169,10 @@ namespace g2o {
        * fill the CCS arrays of a matrix, arrays have to be allocated beforehand. This function only writes
        * the values and assumes that column and row structures have already been written.
        */
-      int fillCCS(double* Cx, bool upperTriangle = false) const
+      int fillCCS(number_t* Cx, bool upperTriangle = false) const
       {
         assert(Cx && "Target destination is NULL");
-        double* CxStart = Cx;
+        number_t* CxStart = Cx;
         int cstart = 0;
         for (size_t i=0; i<_blockCols.size(); ++i){
           int csize = _colBlockIndices[i] - cstart;
@@ -184,7 +184,7 @@ namespace g2o {
               int elemsToCopy = b->rows();
               if (upperTriangle && rstart == cstart)
                 elemsToCopy = c + 1;
-              memcpy(Cx, b->data() + c*b->rows(), elemsToCopy * sizeof(double));
+              memcpy(Cx, b->data() + c*b->rows(), elemsToCopy * sizeof(number_t));
               Cx += elemsToCopy;
 
             }

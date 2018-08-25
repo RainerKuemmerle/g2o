@@ -58,7 +58,7 @@ namespace g2o {
     _child = 0;
     _parent.clear();
     _edge = 0;
-    _distance = numeric_limits<double>::max();
+    _distance = numeric_limits<number_t>::max();
     _frontierLevel = -1;
     inQueue = false;
   }
@@ -86,8 +86,8 @@ namespace g2o {
   void EstimatePropagator::propagate(OptimizableGraph::Vertex* v, 
       const EstimatePropagator::PropagateCost& cost, 
        const EstimatePropagator::PropagateAction& action,
-       double maxDistance, 
-       double maxEdgeCost)
+       number_t maxDistance, 
+       number_t maxEdgeCost)
   {
     OptimizableGraph::VertexSet vset;
     vset.insert(v);
@@ -97,8 +97,8 @@ namespace g2o {
   void EstimatePropagator::propagate(OptimizableGraph::VertexSet& vset, 
       const EstimatePropagator::PropagateCost& cost, 
        const EstimatePropagator::PropagateAction& action,
-       double maxDistance, 
-       double maxEdgeCost)
+       number_t maxDistance, 
+       number_t maxEdgeCost)
   {
     reset();
 
@@ -116,7 +116,7 @@ namespace g2o {
     while(! frontier.empty()){
       AdjacencyMapEntry* entry = frontier.pop();
       OptimizableGraph::Vertex* u = entry->child();
-      double uDistance = entry->distance();
+      number_t uDistance = entry->distance();
       //cerr << "uDistance " << uDistance << endl;
 
       // initialize the vertex
@@ -137,7 +137,7 @@ namespace g2o {
 	  if (! z)
 	    continue;
           AdjacencyMap::iterator ot = _adjacencyMap.find(z);
-          if (ot->second._distance != numeric_limits<double>::max()) {
+          if (ot->second._distance != numeric_limits<number_t>::max()) {
             initializedVertices.insert(z);
             maxFrontier = (max)(maxFrontier, ot->second._frontierLevel);
           }
@@ -152,9 +152,9 @@ namespace g2o {
             continue;
           size_t wasInitialized = initializedVertices.erase(z);
 
-          double edgeDistance = cost(edge, initializedVertices, z);
-          if (edgeDistance > 0. && edgeDistance != std::numeric_limits<double>::max() && edgeDistance < maxEdgeCost) {
-            double zDistance = uDistance + edgeDistance;
+          number_t edgeDistance = cost(edge, initializedVertices, z);
+          if (edgeDistance > 0. && edgeDistance != std::numeric_limits<number_t>::max() && edgeDistance < maxEdgeCost) {
+            number_t zDistance = uDistance + edgeDistance;
             //cerr << z->id() << " " << zDistance << endl;
 
             AdjacencyMap::iterator ot = _adjacencyMap.find(z);
@@ -239,13 +239,13 @@ namespace g2o {
   {
   }
 
-  double EstimatePropagatorCost::operator()(OptimizableGraph::Edge* edge, const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to_) const
+  number_t EstimatePropagatorCost::operator()(OptimizableGraph::Edge* edge, const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to_) const
   {
     OptimizableGraph::Edge* e = dynamic_cast<OptimizableGraph::Edge*>(edge);
     OptimizableGraph::Vertex* to = dynamic_cast<OptimizableGraph::Vertex*>(to_);
     SparseOptimizer::EdgeContainer::const_iterator it = _graph->findActiveEdge(e);
     if (it == _graph->activeEdges().end()) // it has to be an active edge
-      return std::numeric_limits<double>::max();
+      return std::numeric_limits<number_t>::max();
     return e->initialEstimatePossible(from, to);
   }
 
@@ -254,16 +254,16 @@ namespace g2o {
   {
   }
 
-  double EstimatePropagatorCostOdometry::operator()(OptimizableGraph::Edge* edge, const OptimizableGraph::VertexSet& from_, OptimizableGraph::Vertex* to_) const
+  number_t EstimatePropagatorCostOdometry::operator()(OptimizableGraph::Edge* edge, const OptimizableGraph::VertexSet& from_, OptimizableGraph::Vertex* to_) const
   {
     OptimizableGraph::Edge* e = dynamic_cast<OptimizableGraph::Edge*>(edge);
     OptimizableGraph::Vertex* from = dynamic_cast<OptimizableGraph::Vertex*>(*from_.begin());
     OptimizableGraph::Vertex* to = dynamic_cast<OptimizableGraph::Vertex*>(to_);
     if (std::abs(from->id() - to->id()) != 1) // simple method to identify odometry edges in a pose graph
-      return std::numeric_limits<double>::max();
+      return std::numeric_limits<number_t>::max();
     SparseOptimizer::EdgeContainer::const_iterator it = _graph->findActiveEdge(e);
     if (it == _graph->activeEdges().end()) // it has to be an active edge
-      return std::numeric_limits<double>::max();
+      return std::numeric_limits<number_t>::max();
     return e->initialEstimatePossible(from_, to);
   }
 

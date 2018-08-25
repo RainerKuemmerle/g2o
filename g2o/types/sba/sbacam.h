@@ -52,35 +52,32 @@
 
 namespace g2o {
 
-  typedef  Eigen::Matrix<double, 6, 1> Vector6d;
-  
   class G2O_TYPES_SBA_API SBACam: public SE3Quat
   {
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
     public:
       // camera matrix and stereo baseline
-      Eigen::Matrix3d Kcam; 
-      double baseline;
+      Matrix3 Kcam; 
+      number_t baseline;
 
       // transformations
-      Eigen::Matrix<double,3,4> w2n; // transform from world to node coordinates
-      Eigen::Matrix<double,3,4> w2i; // transform from world to image coordinates
+      Eigen::Matrix<number_t,3,4> w2n; // transform from world to node coordinates
+      Eigen::Matrix<number_t,3,4> w2i; // transform from world to image coordinates
 
       // Derivatives of the rotation matrix transpose wrt quaternion xyz, used for
       // calculating Jacobian wrt pose of a projection.
-      Eigen::Matrix3d dRdx, dRdy, dRdz;
+      Matrix3 dRdx, dRdy, dRdz;
 
       // initialize an object
       SBACam()
       {
-        SE3Quat();
-        setKcam(1,1,0.5,0.5,0);  // unit image projection
+        setKcam(1,1, cst(0.5), cst(0.5),0);  // unit image projection
       }
 
 
       // set the object pose
-      SBACam(const Eigen::Quaterniond&  r_, const Eigen::Vector3d& t_) : SE3Quat(r_, t_)
+      SBACam(const Quaternion&  r_, const Vector3& t_) : SE3Quat(r_, t_)
     {
       setTransform();
       setProjection();
@@ -95,15 +92,15 @@ namespace g2o {
 
       // update from the linear solution
       //defined in se3quat
-      void update(const Vector6d& update)
+      void update(const Vector6& update)
       {
         //      std::cout << "UPDATE " << update.transpose() << std::endl;
         // position update
         _t += update.head(3);
         // small quaternion update
-        Eigen::Quaterniond qr;
+        Quaternion qr;
         qr.vec() = update.segment<3>(3); 
-        qr.w() = sqrt(1.0 - qr.vec().squaredNorm()); // should always be positive
+        qr.w() = sqrt(cst(1.0) - qr.vec().squaredNorm()); // should always be positive
         _r *= qr;                 // post-multiply
         _r.normalize();    
         setTransform();
@@ -114,35 +111,35 @@ namespace g2o {
       }
 
       // transforms
-      static void transformW2F(Eigen::Matrix<double,3,4> &m, 
-          const Eigen::Vector3d &trans, 
-          const Eigen::Quaterniond &qrot)
+      static void transformW2F(Eigen::Matrix<number_t,3,4> &m, 
+          const Vector3 &trans, 
+          const Quaternion &qrot)
       {
         m.block<3,3>(0,0) = qrot.toRotationMatrix().transpose();
         m.col(3).setZero();         // make sure there's no translation
-        Eigen::Vector4d tt;
+        Vector4 tt;
         tt.head(3) = trans;
         tt[3] = 1.0;
         m.col(3) = -m*tt;
       }
 
-      static void transformF2W(Eigen::Matrix<double,3,4> &m, 
-          const Eigen::Vector3d &trans, 
-          const Eigen::Quaterniond &qrot)
+      static void transformF2W(Eigen::Matrix<number_t,3,4> &m, 
+          const Vector3 &trans, 
+          const Quaternion &qrot)
       {
         m.block<3,3>(0,0) = qrot.toRotationMatrix();
         m.col(3) = trans;
       }
 
       // set up camera matrix
-      void setKcam(double fx, double fy, double cx, double cy, double tx)
+      void setKcam(number_t fx, number_t fy, number_t cx, number_t cy, number_t tx)
       { 
         Kcam.setZero();
         Kcam(0,0) = fx;
         Kcam(1,1) = fy;
         Kcam(0,2) = cx;
         Kcam(1,2) = cy;
-        Kcam(2,2) = 1.0;
+        Kcam(2,2) = cst(1.0);
         baseline = tx;
         setProjection();
         setDr();
@@ -160,16 +157,16 @@ namespace g2o {
       {
         // inefficient, just for testing
         // use simple multiplications and additions for production code in calculating dRdx,y,z
-        Eigen::Matrix3d dRidx, dRidy, dRidz;
-        dRidx << 0.0,0.0,0.0,  
-              0.0,0.0,2.0,
-              0.0,-2.0,0.0;
-        dRidy  << 0.0,0.0,-2.0,
-               0.0,0.0,0.0,
-               2.0,0.0,0.0;
-        dRidz  << 0.0,2.0,0.0,  
-               -2.0,0.0,0.0,
-               0.0,0.0,0.0;
+        Matrix3 dRidx, dRidy, dRidz;
+        dRidx << cst(0.0), cst(0.0), cst(0.0),
+            cst(0.0), cst(0.0), cst(2.0),
+            cst(0.0), cst(-2.0), cst(0.0);
+        dRidy  << cst(0.0), cst(0.0), cst(-2.0),
+            cst(0.0), cst(0.0), cst(0.0),
+            cst(2.0), cst(0.0), cst(0.0);
+        dRidz  << cst(0.0), cst(2.0), cst(0.0),
+            cst(-2.0), cst(0.0), cst(0.0),
+            cst(0.0), cst(0.0), cst(0.0);
 
         // for dS'*R', with dS the incremental change
         dRdx = dRidx * w2n.block<3,3>(0,0);
@@ -204,13 +201,13 @@ namespace g2o {
 
     public:
       // point position
-      Eigen::Vector3d pos;
+      Vector3 pos;
 
       // unit normal
-      Eigen::Vector3d normal;
+      Vector3 normal;
 
       // rotation matrix for normal
-      Eigen::Matrix3d R; 
+      Matrix3 R; 
 
       // initialize an object
       EdgeNormal()
@@ -223,7 +220,7 @@ namespace g2o {
       // set up rotation matrix
       void makeRot()
       {
-        Eigen::Vector3d y;
+        Vector3 y;
         y << 0, 1, 0;
         R.row(2) = normal;
         y = y - normal(1)*normal;

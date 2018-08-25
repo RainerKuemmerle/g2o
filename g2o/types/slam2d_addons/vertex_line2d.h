@@ -45,24 +45,24 @@ namespace g2o {
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
       VertexLine2D();
 
-      double theta() const {return _estimate[0]; }
-      void setTheta(double t) { _estimate[0] = t; }
+      number_t theta() const {return _estimate[0]; }
+      void setTheta(number_t t) { _estimate[0] = t; }
 
-      double rho() const {return _estimate[1]; }
-      void setRho(double r) { _estimate[1] = r; }
+      number_t rho() const {return _estimate[1]; }
+      void setRho(number_t r) { _estimate[1] = r; }
 
       virtual void setToOriginImpl() {
         _estimate.setZero();
       }
 
-      virtual bool setEstimateDataImpl(const double* est){
-        Eigen::Map<const Vector2D> v(est);
+      virtual bool setEstimateDataImpl(const number_t* est){
+        Eigen::Map<const Vector2> v(est);
         _estimate=Line2D(v);
         return true;
       }
 
-      virtual bool getEstimateData(double* est) const{
-        Eigen::Map<Vector2D> v(est);
+      virtual bool getEstimateData(number_t* est) const{
+        Eigen::Map<Vector2> v(est);
         v=_estimate;
         return true;
       }
@@ -71,11 +71,11 @@ namespace g2o {
         return 2;
       }
 
-      virtual bool setMinimalEstimateDataImpl(const double* est){
+      virtual bool setMinimalEstimateDataImpl(const number_t* est){
         return setEstimateData(est);
       }
 
-      virtual bool getMinimalEstimateData(double* est) const{
+      virtual bool getMinimalEstimateData(number_t* est) const{
         return getEstimateData(est);
       }
 
@@ -83,9 +83,9 @@ namespace g2o {
         return 2;
       }
 
-      virtual void oplusImpl(const double* update)
+      virtual void oplusImpl(const number_t* update)
       {
-        _estimate += Eigen::Map<const Vector2D>(update);
+        _estimate += Eigen::Map<const Vector2>(update);
         _estimate(0) = normalize_theta(_estimate(0));
       }
 

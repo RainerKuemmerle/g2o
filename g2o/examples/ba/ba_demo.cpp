@@ -127,20 +127,16 @@ int main(int argc, const char* argv[]){
 
   g2o::SparseOptimizer optimizer;
   optimizer.setVerbose(false);
-  g2o::BlockSolver_6_3::LinearSolverType * linearSolver;
+  std::unique_ptr<g2o::BlockSolver_6_3::LinearSolverType> linearSolver;
   if (DENSE) {
-    linearSolver= new g2o::LinearSolverDense<g2o
-        ::BlockSolver_6_3::PoseMatrixType>();
+    linearSolver = g2o::make_unique<g2o::LinearSolverDense<g2o::BlockSolver_6_3::PoseMatrixType>>();
   } else {
-    linearSolver
-        = new g2o::LinearSolverCholmod<g2o
-        ::BlockSolver_6_3::PoseMatrixType>();
+    linearSolver = g2o::make_unique<g2o::LinearSolverCholmod<g2o::BlockSolver_6_3::PoseMatrixType>>();
   }
 
-
-  g2o::BlockSolver_6_3 * solver_ptr
-      = new g2o::BlockSolver_6_3(linearSolver);
-  g2o::OptimizationAlgorithmLevenberg* solver = new g2o::OptimizationAlgorithmLevenberg(solver_ptr);
+  g2o::OptimizationAlgorithmLevenberg* solver = new g2o::OptimizationAlgorithmLevenberg(
+    g2o::make_unique<g2o::BlockSolver_6_3>(std::move(linearSolver))
+  );
   optimizer.setAlgorithm(solver);
 
 

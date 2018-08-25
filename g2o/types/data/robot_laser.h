@@ -56,7 +56,7 @@ namespace g2o {
     protected:
       SE2 _odomPose;
       //! velocities and safety distances of the robot.
-      double _laserTv, _laserRv, _forwardSafetyDist, _sideSaftyDist, _turnAxis;
+      number_t _laserTv, _laserRv, _forwardSafetyDist, _sideSaftyDist, _turnAxis;
   };
 
 #ifdef G2O_HAVE_OPENGL

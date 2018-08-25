@@ -39,24 +39,24 @@ namespace g2o {
     setOffset();
   }
 
-  void ParameterSE3Offset::setOffset(const Isometry3D& offset_){
+  void ParameterSE3Offset::setOffset(const Isometry3& offset_){
     _offset = offset_;
     _inverseOffset = _offset.inverse();
   }
 
   bool ParameterSE3Offset::read(std::istream& is) {
-    Vector7d off;
+    Vector7 off;
     for (int i=0; i<7; i++) {
       is >> off[i];
     }
     // normalize the quaternion to recover numerical precision lost by storing as human readable text
-    Vector4D::MapType(off.data()+3).normalize();
+    Vector4::MapType(off.data()+3).normalize();
     setOffset(internal::fromVectorQT(off));
-    return is.good();
+    return !is.fail();
   }
   
   bool ParameterSE3Offset::write(std::ostream& os) const {
-    Vector7d off =internal::toVectorQT(_offset);
+    Vector7 off =internal::toVectorQT(_offset);
     for (int i=0; i<7; i++)
       os << off[i] << " ";
     return os.good();
@@ -118,7 +118,7 @@ namespace g2o {
     glPushAttrib(GL_COLOR);
     glColor3f(POSE_PARAMETER_COLOR);
     glPushMatrix();
-    glMultMatrixd(that->offsetParam()->offset().data());
+    glMultMatrixd(that->offsetParam()->offset().cast<double>().data());
     opengl::drawBox(cs,cs,cs);
     glPopMatrix();
     glPopAttrib();

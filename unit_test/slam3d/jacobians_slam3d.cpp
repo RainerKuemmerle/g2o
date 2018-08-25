@@ -34,13 +34,14 @@
 #include "g2o/types/slam3d/edge_se3_pointxyz.h"
 #include "g2o/types/slam3d/dquat2mat.h"
 
+
 #include "g2o/core/optimizable_graph.h"
 
 #include "EXTERNAL/ceres/autodiff.h"
 
 using namespace std;
 using namespace g2o;
-using namespace Eigen;
+using namespace g2o::internal;
 
 static Eigen::Isometry3d randomIsometry3d()
 {
@@ -180,7 +181,7 @@ struct RotationMatrix2QuaternionManifold
       quaternion[k] = (R(k,i) + R(i,k)) * t;
       T w = (R(k,j) - R(j,k)) * t;
       // normalize to our manifold, such that w is positive
-      if (w < 0.) {
+      if (w < cst(0)) {
         //cerr << "  normalizing w > 0  ";
         for (int l = 0; l < 3; ++l)
           quaternion[l] *= T(-1);
@@ -198,13 +199,14 @@ TEST(Slam3D, dqDRJacobian)
   for (int k = 0; k < 10000; ++k) {
     // create a random rotation matrix by sampling a random 3d vector
     // that will be used in axis-angle representation to create the matrix
-    Vector3D rotAxisAngle = Vector3D::Random();
-    rotAxisAngle += Vector3D::Random();
-    Eigen::AngleAxisd rotation(rotAxisAngle.norm(), rotAxisAngle.normalized());
-    Matrix3D Re = rotation.toRotationMatrix();
+    Vector3 rotAxisAngle = Vector3::Random();
+    rotAxisAngle += Vector3::Random();
+    AngleAxis rotation(rotAxisAngle.norm(), rotAxisAngle.normalized());
+    Matrix3 Re = rotation.toRotationMatrix();
 
     // our analytic function which we want to evaluate
-    g2o::internal::compute_dq_dR (dq_dR, 
+    Eigen::Matrix<number_t, 3, 9, Eigen::ColMajor>  dq_dR;
+    compute_dq_dR (dq_dR, 
         Re(0,0),Re(1,0),Re(2,0),
         Re(0,1),Re(1,1),Re(2,1),
         Re(0,2),Re(1,2),Re(2,2));

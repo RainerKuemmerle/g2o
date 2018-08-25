@@ -27,15 +27,11 @@
 #ifndef G2O_TIMEUTIL_H
 #define G2O_TIMEUTIL_H
 
-#ifdef _WINDOWS
-#include <time.h>
-#else
-#include <sys/time.h>
-#endif
-
 #include <string>
+#include <chrono>
 
 #include "g2o_stuff_api.h"
+#include "g2o/stuff/misc.h"
 
 /** @addtogroup utils **/
 // @{
@@ -49,8 +45,8 @@
 #ifndef DO_EVERY_TS
 #define DO_EVERY_TS(secs, currentTime, code) \
 if (1) {\
-  static double s_lastDone_ = (currentTime); \
-  double s_now_ = (currentTime); \
+  static number_t s_lastDone_ = (currentTime); \
+  number_t s_now_ = (currentTime); \
   if (s_lastDone_ > s_now_) \
     s_lastDone_ = s_now_; \
   if (s_now_ - s_lastDone_ > (secs)) { \
@@ -69,7 +65,7 @@ if (1) {\
 #ifndef MEASURE_TIME
 #define MEASURE_TIME(text, code) \
   if(1) { \
-    double _start_time_ = g2o::get_time(); \
+    number_t _start_time_ = g2o::get_time(); \
     code; \
     fprintf(stderr, "%s took %f sec\n", text, g2o::get_time() - _start_time_); \
   } else \
@@ -78,33 +74,22 @@ if (1) {\
 
 namespace g2o {
 
-#ifdef _WINDOWS
-typedef struct timeval {
-  long tv_sec;
-  long tv_usec;
-} timeval;
-G2O_STUFF_API int gettimeofday(struct timeval *tv, struct timezone *tz);
-#endif
+using seconds = std::chrono::duration<number_t>;
 
 /**
  * return the current time in seconds since 1. Jan 1970
  */
-inline double get_time() 
+inline number_t get_time() 
 {
-  struct timeval ts;
-  gettimeofday(&ts,0);
-  return ts.tv_sec + ts.tv_usec*1e-6;
+  return seconds{ std::chrono::system_clock::now().time_since_epoch() }.count();
 }
 
 /**
  * return a monotonic increasing time which basically does not need to
  * have a reference point. Consider this for measuring how long some
  * code fragments required to execute.
- *
- * On Linux we call clock_gettime() on other systems we currently
- * call get_time().
  */
-G2O_STUFF_API double get_monotonic_time();
+G2O_STUFF_API number_t get_monotonic_time();
 
 /**
  * \brief Class to measure the time spent in a scope
@@ -118,7 +103,7 @@ class G2O_STUFF_API ScopeTime {
     ~ScopeTime();
   private:
     std::string _title;
-    double _startTime;
+    number_t _startTime;
 };
 
 } // end namespace
