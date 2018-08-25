@@ -356,7 +356,6 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${g2o_C_FLAGS}")
 # because this is our target of choice. If this fails, fall back to the
 # using the module form.
 # See https://eigen.tuxfamily.org/dox/TopicCMakeGuide.html for details
-
 find_package(Eigen3 NO_MODULE)
 if (TARGET Eigen3::Eigen)
   set(G2O_EIGEN3_EIGEN_TARGET Eigen3::Eigen)
@@ -407,11 +406,11 @@ install(
     DESTINATION "${G2O_CONFIG_INSTALL_DIR}")
 
 # building unit test framework and our tests
-OPTION(BUILD_UNITTESTS "build unit test framework and the tests" OFF)
-IF(BUILD_UNITTESTS)
+option(BUILD_UNITTESTS "build unit test framework and the tests" OFF)
+if(BUILD_UNITTESTS)
   enable_testing()
-  ADD_SUBDIRECTORY(unit_test)
-ENDIF()
+  add_subdirectory(unit_test)
+endif()
 
 # Include the subdirectories
 add_subdirectory(EXTERNAL)

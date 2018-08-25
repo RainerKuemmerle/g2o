@@ -37,6 +37,7 @@ before_script:
 
 script:
   - make
+  - ctest
 
 # right now only build the master branch
 branches:
