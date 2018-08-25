@@ -45,11 +45,11 @@ using namespace g2o::internal;
 
 static Eigen::Isometry3d randomIsometry3d()
 {
-  Eigen::Vector3d rotAxisAngle = Vector3d::Random();
-  rotAxisAngle += Vector3d::Random();
+  Eigen::Vector3d rotAxisAngle = Eigen::Vector3d::Random();
+  rotAxisAngle += Eigen::Vector3d::Random();
   Eigen::AngleAxisd rotation(rotAxisAngle.norm(), rotAxisAngle.normalized());
   Eigen::Isometry3d result = (Eigen::Isometry3d)rotation.toRotationMatrix();
-  result.translation() = Vector3d::Random();
+  result.translation() = Eigen::Vector3d::Random();
   return result;
 }
 
@@ -193,8 +193,8 @@ struct RotationMatrix2QuaternionManifold
 
 TEST(Slam3D, dqDRJacobian)
 {
-  Matrix<double, 3, 9, Eigen::ColMajor>  dq_dR;
-  Matrix<double, 3, 9, Eigen::RowMajor> dq_dR_AD;
+  Eigen::Matrix<number_t, 3, 9, Eigen::ColMajor>  dq_dR;
+  Eigen::Matrix<number_t, 3, 9, Eigen::RowMajor> dq_dR_AD;
   dq_dR_AD.setZero(); // avoid warning about uninitialized memory
   for (int k = 0; k < 10000; ++k) {
     // create a random rotation matrix by sampling a random 3d vector
@@ -212,14 +212,14 @@ TEST(Slam3D, dqDRJacobian)
         Re(0,2),Re(1,2),Re(2,2));
 
     // compute the Jacobian using AD
-    typedef ceres::internal::AutoDiff<RotationMatrix2QuaternionManifold, double, 9> AutoDiff_Dq_DR;
-    double *parameters[] = { Re.data() };
-    double *jacobians[] = { dq_dR_AD.data() };
-    double value[3];
+    typedef ceres::internal::AutoDiff<RotationMatrix2QuaternionManifold, number_t, 9> AutoDiff_Dq_DR;
+    number_t *parameters[] = { Re.data() };
+    number_t *jacobians[] = { dq_dR_AD.data() };
+    number_t value[3];
     RotationMatrix2QuaternionManifold rot2quat;
     AutoDiff_Dq_DR::Differentiate(rot2quat, parameters, 3, value, jacobians);
 
-    double maxDifference = (dq_dR - dq_dR_AD).array().abs().maxCoeff();
+    number_t maxDifference = (dq_dR - dq_dR_AD).array().abs().maxCoeff();
     EXPECT_NEAR(0., maxDifference, 1e-7);
   }
 }

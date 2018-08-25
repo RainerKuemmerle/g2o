@@ -39,10 +39,10 @@ TEST(General, ClearAndRedo)
 {   
   // Initialize the SparseOptimizer
   g2o::SparseOptimizer mOptimizer;
-  SlamLinearSolver* linearSolver = new SlamLinearSolver();
+  auto linearSolver = g2o::make_unique<SlamLinearSolver>();
   linearSolver->setBlockOrdering(false);
-  SlamBlockSolver* blockSolver = new SlamBlockSolver(linearSolver);
-  mOptimizer.setAlgorithm(new g2o::OptimizationAlgorithmGaussNewton(blockSolver));
+  auto blockSolver = g2o::make_unique<SlamBlockSolver>(std::move(linearSolver));
+  mOptimizer.setAlgorithm(new g2o::OptimizationAlgorithmGaussNewton(std::move(blockSolver)));
 
   // Set the default terminate action
   g2o::SparseOptimizerTerminateAction* terminateAction = new g2o::SparseOptimizerTerminateAction;

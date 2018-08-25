@@ -40,10 +40,10 @@ static g2o::SparseOptimizer* createOptimizer()
 {
   // Initialize the SparseOptimizer
   g2o::SparseOptimizer* mOptimizer = new g2o::SparseOptimizer();
-  SlamLinearSolver* linearSolver = new SlamLinearSolver();
+  auto linearSolver = g2o::make_unique<SlamLinearSolver>();
   linearSolver->setBlockOrdering(false);
-  SlamBlockSolver* blockSolver = new SlamBlockSolver(linearSolver);
-  mOptimizer->setAlgorithm(new g2o::OptimizationAlgorithmGaussNewton(blockSolver));
+  auto blockSolver = g2o::make_unique<SlamBlockSolver>(std::move(linearSolver));
+  mOptimizer->setAlgorithm(new g2o::OptimizationAlgorithmGaussNewton(std::move(blockSolver)));
   return mOptimizer;
 }
 
