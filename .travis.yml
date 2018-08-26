@@ -37,7 +37,9 @@ before_script:
 
 script:
   - make
-  - ctest --extra-verbose
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
+      ctest --extra-verbose ;
+    fi
 
 # right now only build the master branch
 branches:
