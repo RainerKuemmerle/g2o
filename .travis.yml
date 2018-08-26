@@ -32,7 +32,7 @@ before_script:
       export CXX=g++-7 ;
     fi
   - cmake --version
-  - cmake ..
+  - cmake -DBUILD_UNITTESTS=ON ..
   - cat g2o/config.h
 
 script:
