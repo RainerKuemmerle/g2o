@@ -375,7 +375,8 @@ void computeBorder(StarSet& stars, EdgeStarMap& hesmap){
 
         s->optimizer()->computeActiveErrors();
         // cerr << "system" << endl;
-        solverWithHessian->updateLinearSystem();
+        if (solverWithHessian)
+          solverWithHessian->updateLinearSystem();
         HyperGraph::EdgeSet prunedStarEdges = backboneEdges;
         HyperGraph::VertexSet prunedStarVertices = backboneVertices;
         for (HyperGraph::VertexSet::iterator vit=otherVertices.begin(); vit!=otherVertices.end(); vit++){
