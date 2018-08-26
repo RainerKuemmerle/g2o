@@ -32,31 +32,31 @@ using namespace std;
 
 TEST(Slam3D, OrthogonalMatrix)
 {
-  Eigen::Matrix3d shouldBeIdentity;
-  Eigen::Matrix3d R = Eigen::Matrix3d::Identity();
-  Eigen::Matrix3d rot = (Eigen::Matrix3d)Eigen::AngleAxisd(0.01, Eigen::Vector3d::UnitZ());
-  rot = rot * (Eigen::Matrix3d)Eigen::AngleAxisd(0.01, Eigen::Vector3d::UnitX());
+  g2o::Matrix3 shouldBeIdentity;
+  g2o::Matrix3 R = g2o::Matrix3::Identity();
+  g2o::Matrix3 rot = (g2o::Matrix3)g2o::AngleAxis(0.01, g2o::Vector3::UnitZ());
+  rot = rot * (g2o::Matrix3)g2o::AngleAxis(0.01, g2o::Vector3::UnitX());
   
   shouldBeIdentity = R * R.transpose();
-  double initialDifference = (shouldBeIdentity - Eigen::Matrix3d::Identity()).array().abs().maxCoeff();
+  number_t initialDifference = (shouldBeIdentity - g2o::Matrix3::Identity()).array().abs().maxCoeff();
   EXPECT_DOUBLE_EQ(0., initialDifference);
 
   //introduce numerical inaccuracies
   for (int i = 0; i < 10000; ++i)
     R = R * rot;
   shouldBeIdentity = R * R.transpose();
-  double afterMultDifference = (shouldBeIdentity - Eigen::Matrix3d::Identity()).array().abs().maxCoeff();
+  number_t afterMultDifference = (shouldBeIdentity - g2o::Matrix3::Identity()).array().abs().maxCoeff();
   EXPECT_GE(afterMultDifference, initialDifference);
 
-  double inaccurateDet = R.determinant();
-  Eigen::Matrix3d approxSolution = R;
+  number_t inaccurateDet = R.determinant();
+  g2o::Matrix3 approxSolution = R;
   g2o::internal::approximateNearestOrthogonalMatrix(approxSolution);
   g2o::internal::nearestOrthogonalMatrix(R);
 
   EXPECT_LE(std::abs(R.determinant() - 1.), std::abs(inaccurateDet - 1.));
   EXPECT_NEAR(1.0, R.determinant(), 1e-7);
   shouldBeIdentity = R * R.transpose();
-  double nearestDifference = (shouldBeIdentity - Eigen::Matrix3d::Identity()).array().abs().maxCoeff();
+  number_t nearestDifference = (shouldBeIdentity - g2o::Matrix3::Identity()).array().abs().maxCoeff();
   EXPECT_NEAR(0., nearestDifference, 1e-7);
 
   // norm of the comluns
@@ -64,7 +64,7 @@ TEST(Slam3D, OrthogonalMatrix)
     EXPECT_NEAR(1.0, R.col(i).norm(), 1e-7);
 
   shouldBeIdentity = approxSolution * approxSolution.transpose();
-  double approxNearestDifference = (shouldBeIdentity - Eigen::Matrix3d::Identity()).array().abs().maxCoeff();
+  number_t approxNearestDifference = (shouldBeIdentity - Eigen::Matrix3d::Identity()).array().abs().maxCoeff();
   EXPECT_NEAR(0., approxNearestDifference, 1e-6);
   EXPECT_LE(std::abs(R.determinant() - 1.), std::abs(approxSolution.determinant() - 1.));
   EXPECT_NEAR(1.0, approxSolution.determinant(), 1e-6);

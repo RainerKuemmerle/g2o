@@ -1,5 +1,4 @@
 add_executable(unittest_slam2d
-  ../test_helper/test_main.cpp
   mappings_se2.cpp
   jacobians_slam2d.cpp
   odom_convert_sclam2d.cpp

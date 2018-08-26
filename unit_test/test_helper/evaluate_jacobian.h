@@ -50,8 +50,8 @@ void evaluateJacobianUnary(EdgeType& e, JacobianWorkspace& jacobianWorkspace, Ja
     typename EdgeType::VertexXiType>::linearizeOplus();
 
   // compare the Jacobians
-  double* n = numericJacobianWorkspace.workspaceForVertex(0);
-  double* a = jacobianWorkspace.workspaceForVertex(0);
+  number_t* n = numericJacobianWorkspace.workspaceForVertex(0);
+  number_t* a = jacobianWorkspace.workspaceForVertex(0);
   int numElems = EdgeType::Dimension;
   numElems *= EdgeType::VertexXiType::Dimension;
   for (int j = 0; j < numElems; ++j) {
@@ -74,8 +74,8 @@ void evaluateJacobian(EdgeType& e, JacobianWorkspace& jacobianWorkspace, Jacobia
 
     // compare the two Jacobians
     for (int i = 0; i < 2; ++i) {
-      double* n = numericJacobianWorkspace.workspaceForVertex(i);
-      double* a = jacobianWorkspace.workspaceForVertex(i);
+      number_t* n = numericJacobianWorkspace.workspaceForVertex(i);
+      number_t* a = jacobianWorkspace.workspaceForVertex(i);
       int numElems = EdgeType::Dimension;
       if (i == 0)
         numElems *= EdgeType::VertexXiType::Dimension;
