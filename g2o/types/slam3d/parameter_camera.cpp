@@ -121,7 +121,7 @@ namespace g2o {
   HyperGraphElementAction* CacheCameraDrawAction::operator()(HyperGraph::HyperGraphElement* element, 
                  HyperGraphElementAction::Parameters* params){
     if (typeid(*element).name()!=_typeName)
-      return 0;
+      return nullptr;
     CacheCamera* that = static_cast<CacheCamera*>(element);
     refreshPropertyPtrs(params);
     if (! _previousParams)

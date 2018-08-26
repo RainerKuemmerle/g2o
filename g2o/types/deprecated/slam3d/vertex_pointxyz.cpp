@@ -73,7 +73,7 @@ namespace deprecated {
                      HyperGraphElementAction::Parameters* params ){
 
     if (typeid(*element).name()!=_typeName)
-      return 0;
+      return nullptr;
 
     refreshPropertyPtrs(params);
     if (! _previousParams)
@@ -106,11 +106,11 @@ namespace deprecated {
   HyperGraphElementAction* VertexPointXYZWriteGnuplotAction::operator()(HyperGraph::HyperGraphElement* element, HyperGraphElementAction::Parameters* params_ )
   {
     if (typeid(*element).name()!=_typeName)
-      return 0;
+      return nullptr;
     WriteGnuplotAction::Parameters* params=static_cast<WriteGnuplotAction::Parameters*>(params_);
     if (!params->os){
       std::cerr << __PRETTY_FUNCTION__ << ": warning, no valid os specified" << std::endl;
-      return 0;
+      return nullptr;
     }
 
     VertexPointXYZ* v = static_cast<VertexPointXYZ*>(element);

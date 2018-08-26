@@ -90,7 +90,7 @@ namespace g2o
                  HyperGraphElementAction::Parameters* params_)
   {
     if (typeid(*element).name()!=_typeName)
-      return 0;
+      return nullptr;
 
     refreshPropertyPtrs(params_);
     if (! _previousParams)
@@ -108,7 +108,7 @@ namespace g2o
     const VertexSE3* sensor = dynamic_cast<const VertexSE3*>(that->vertex(2));
 
     if (! robot|| ! sensor)
-      return 0;
+      return nullptr;
 
     number_t d=that->measurement().distance();
     number_t azimuth=Plane3D::azimuth(that->measurement().normal());

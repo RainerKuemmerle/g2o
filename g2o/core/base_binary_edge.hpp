@@ -60,7 +60,7 @@ OptimizableGraph::Vertex* BaseBinaryEdge<D, E, VertexXiType, VertexXjType>::crea
   switch(i) {
   case 0: return new VertexXiType();
   case 1: return new VertexXjType();
-  default: return 0;
+  default: return nullptr;
   }
 }
 

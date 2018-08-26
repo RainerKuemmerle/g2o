@@ -57,7 +57,7 @@ namespace g2o {
   RobotData* DataQueue::before(number_t timestamp) const
   {
     if (_buffer.size() == 0 || _buffer.begin()->first > timestamp)
-      return 0;
+      return nullptr;
     Buffer::const_iterator lb = _buffer.upper_bound(timestamp);
     --lb; // now it's the lower bound
     return lb->second;
@@ -66,10 +66,10 @@ namespace g2o {
   RobotData* DataQueue::after(number_t timestamp) const
   {
     if (_buffer.size() == 0 || _buffer.rbegin()->first < timestamp)
-      return 0;
+      return nullptr;
     Buffer::const_iterator ub = _buffer.upper_bound(timestamp);
     if (ub == _buffer.end())
-      return 0;
+      return nullptr;
     return ub->second;
   }
 

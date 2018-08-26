@@ -151,7 +151,7 @@ HyperGraph::HyperGraphElement* Factory::construct(const std::string& tag) const
     //cerr << "tag " << tag << " -> " << (void*) foundIt->second->creator << " " << foundIt->second->creator->name() << endl;
     return foundIt->second->creator->construct();
   }
-  return 0;
+  return nullptr;
 }
 
 const std::string& Factory::tag(const HyperGraph::HyperGraphElement* e) const
@@ -210,7 +210,7 @@ HyperGraph::HyperGraphElement* Factory::construct(const std::string& tag, const 
   if (foundIt != _creator.end() && foundIt->second->elementTypeBit >= 0 && elemsToConstruct.test(foundIt->second->elementTypeBit)) {
     return foundIt->second->creator->construct();
   }
-  return 0;
+  return nullptr;
 }
 
 } // end namespace
