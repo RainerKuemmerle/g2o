@@ -70,7 +70,7 @@ TEST(Slam2D, EdgeSE2Jacobian)
   }
 }
 
-TEST(Slam2D, EdgeSE2Prior)
+TEST(Slam2D, EdgeSE2PriorJacobian)
 {
   VertexSE2 v1;
   v1.setId(0); 
@@ -92,7 +92,7 @@ TEST(Slam2D, EdgeSE2Prior)
   }
 }
 
-TEST(Slam2D, EdgePointXY)
+TEST(Slam2D, EdgePointXYJacobian)
 {
   VertexPointXY v1;
   v1.setId(0); 
@@ -119,7 +119,7 @@ TEST(Slam2D, EdgePointXY)
   }
 }
 
-TEST(Slam2D, EdgeSE2PointXY)
+TEST(Slam2D, EdgeSE2PointXYJacobian)
 {
   VertexSE2 v1;
   v1.setId(0); 
@@ -146,7 +146,7 @@ TEST(Slam2D, EdgeSE2PointXY)
   }
 }
 
-TEST(Slam2D, EdgeSE2PointXYBearing)
+TEST(Slam2D, EdgeSE2PointXYBearingJacobian)
 {
   VertexSE2 v1;
   v1.setId(0); 

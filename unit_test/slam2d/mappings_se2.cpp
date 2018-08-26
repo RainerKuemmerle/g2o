@@ -52,5 +52,5 @@ TEST(MappingsSlam2D, SE2)
   SE2 s3 = SE2(Isometry2(rot3));
   EXPECT_DOUBLE_EQ(0., s3.translation()(0));
   EXPECT_DOUBLE_EQ(0., s3.translation()(1));
-  EXPECT_DOUBLE_EQ(0.1, s3.rotation().angle());
+  EXPECT_DOUBLE_EQ(1., s3.rotation().angle());
 }
