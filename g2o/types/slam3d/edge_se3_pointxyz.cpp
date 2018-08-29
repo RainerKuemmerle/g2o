@@ -157,8 +157,9 @@ namespace g2o {
   }
 
 
-  void EdgeSE3PointXYZ::initialEstimate(const OptimizableGraph::VertexSet& /*from*/, OptimizableGraph::Vertex* /*to_*/)
+  void EdgeSE3PointXYZ::initialEstimate(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to)
   {
+    (void) from; (void) to;
     assert(from.size() == 1 && from.count(_vertices[0]) == 1 && "Can not initialize VertexDepthCam position by VertexTrackXYZ");
 
     VertexSE3 *cam = dynamic_cast<VertexSE3*>(_vertices[0]);
