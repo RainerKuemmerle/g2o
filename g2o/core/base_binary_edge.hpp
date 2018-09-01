@@ -26,22 +26,22 @@
 
 namespace {
 
+#ifdef G2O_OPENMP
 struct QuadraticFormLock {
-  QuadraticFormLock(OptimizableGraph::Vertex& vertex) : _vertex(vertex) {
-#ifdef G2O_OPENMP
+  explicit QuadraticFormLock(OptimizableGraph::Vertex& vertex) : _vertex(vertex) {
     _vertex.lockQuadraticForm();
-#endif
   }
-
   ~QuadraticFormLock() {
-#ifdef G2O_OPENMP
     _vertex.unlockQuadraticForm();
-#endif
   }
-
 private:
   OptimizableGraph::Vertex& _vertex;
 };
+#else
+struct QuadraticFormLock {
+  explicit QuadraticFormLock(OptimizableGraph::Vertex& ) { }
+};
+#endif
 
 } // anonymous namespace
 

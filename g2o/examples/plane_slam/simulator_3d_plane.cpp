@@ -218,6 +218,8 @@ struct PlaneItem: public WorldItem{
 };
 
 struct PlaneSensor: public Sensor{
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
+
   PlaneSensor(Robot* r, int offsetId, const Isometry3d& offset_): Sensor(r){
     _offsetVertex = new VertexSE3();
     _offsetVertex->setId(offsetId);
