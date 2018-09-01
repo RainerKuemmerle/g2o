@@ -88,6 +88,8 @@ protected:
 typedef std::vector<Sensor*> SensorVector;
 
 struct Robot: public WorldItem {
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
+
   Robot(OptimizableGraph* graph_) : WorldItem(graph_) {
     _planarMotion = false;
     _position = Isometry3d::Identity();
