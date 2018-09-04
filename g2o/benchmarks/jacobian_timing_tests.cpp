@@ -293,7 +293,7 @@ void BM_StaticDynamicDynamicAlignedBufferHybrid(benchmark::State& state)
         }
       else
         {
-          static dynamic_aligned_buffer<number_t> buffer{ d };
+          static dynamic_aligned_buffer<number_t> buffer{ size_t(d) };
           number_t* add_vi = buffer.request(d);
           std::fill(add_vi, add_vi + d, number_t(0.0));
           for (int i = 0; i < d; ++i)
