@@ -71,11 +71,11 @@ namespace g2o {
   HyperGraphElementAction* EdgeSE2PointXYBearingWriteGnuplotAction::operator()(HyperGraph::HyperGraphElement* element,
                          HyperGraphElementAction::Parameters* params_){
     if (typeid(*element).name()!=_typeName)
-      return 0;
+      return nullptr;
     WriteGnuplotAction::Parameters* params=static_cast<WriteGnuplotAction::Parameters*>(params_);
     if (!params->os){
       std::cerr << __PRETTY_FUNCTION__ << ": warning, on valid os specified" << std::endl;
-      return 0;
+      return nullptr;
     }
 
     EdgeSE2PointXYBearing* e =  static_cast<EdgeSE2PointXYBearing*>(element);
@@ -93,7 +93,7 @@ namespace g2o {
 
   HyperGraphElementAction* EdgeSE2PointXYBearingDrawAction::operator()(HyperGraph::HyperGraphElement* element,  HyperGraphElementAction::Parameters* params_){
     if (typeid(*element).name()!=_typeName)
-      return 0;
+      return nullptr;
 
     refreshPropertyPtrs(params_);
     if (! _previousParams)

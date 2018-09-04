@@ -157,9 +157,9 @@ namespace g2o {
   }
 
 
-  void EdgeSE3PointXYZ::initialEstimate(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* /*to_*/)
+  void EdgeSE3PointXYZ::initialEstimate(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to)
   {
-    (void) from;
+    (void) from; (void) to;
     assert(from.size() == 1 && from.count(_vertices[0]) == 1 && "Can not initialize VertexDepthCam position by VertexTrackXYZ");
 
     VertexSE3 *cam = dynamic_cast<VertexSE3*>(_vertices[0]);
@@ -179,7 +179,7 @@ namespace g2o {
   HyperGraphElementAction* EdgeSE3PointXYZDrawAction::operator()(HyperGraph::HyperGraphElement* element,
                HyperGraphElementAction::Parameters* params_){
     if (typeid(*element).name()!=_typeName)
-      return 0;
+      return nullptr;
     refreshPropertyPtrs(params_);
     if (! _previousParams)
       return this;

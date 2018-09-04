@@ -72,7 +72,7 @@ namespace g2o {
   HyperGraphElementAction* VertexLine3DDrawAction::operator()(HyperGraph::HyperGraphElement* element,
 							     HyperGraphElementAction::Parameters* params_) {
     if(typeid(*element).name() != _typeName) {
-      return 0;
+      return nullptr;
     }
 
     refreshPropertyPtrs(params_);

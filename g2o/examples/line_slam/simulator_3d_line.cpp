@@ -88,6 +88,8 @@ protected:
 typedef std::vector<Sensor*> SensorVector;
 
 struct Robot: public WorldItem {
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
+
   Robot(OptimizableGraph* graph_) : WorldItem(graph_) {
     _planarMotion = false;
     _position = Isometry3d::Identity();
@@ -118,7 +120,7 @@ struct Robot: public WorldItem {
       e->setMeasurement(delta * noise);
       Matrix6 m = Matrix6::Identity();
       for(int i = 0; i < 6; ++i) {
-	m(i, i) = 1.0 / (_nmovecov(i));
+	      m(i, i) = 1.0 / (_nmovecov(i));
       }
       e->setInformation(m);
       e->vertices()[0] = vertex();
@@ -187,6 +189,8 @@ struct LineItem : public WorldItem {
 };
 
 struct LineSensor : public Sensor {
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
+
   LineSensor(Robot* r, int offsetId, const Isometry3d& offset_) : Sensor(r) {
     _offsetVertex = new VertexSE3();
     _offsetVertex->setId(offsetId);

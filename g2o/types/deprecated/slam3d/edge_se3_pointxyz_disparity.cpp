@@ -219,9 +219,9 @@ namespace deprecated {
 
   HyperGraphElementAction* EdgeProjectDisparityDrawAction::operator()(HyperGraph::HyperGraphElement* element, 
                 HyperGraphElementAction::Parameters* /* params_ */){
-    return 0;
+    return nullptr;
     if (typeid(*element).name()!=_typeName)
-      return 0;
+      return nullptr;
     EdgeSE3PointXYZDisparity* e =  static_cast<EdgeSE3PointXYZDisparity*>(element);
     VertexSE3* fromEdge = static_cast<VertexSE3*>(e->vertex(0));
     VertexPointXYZ* toEdge   = static_cast<VertexPointXYZ*>(e->vertex(1));

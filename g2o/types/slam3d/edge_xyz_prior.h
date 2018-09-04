@@ -72,7 +72,7 @@ namespace g2o {
 
     virtual number_t initialEstimatePossible(const OptimizableGraph::VertexSet& /*from*/, 
              OptimizableGraph::Vertex* /*to*/) { 
-      return 0.;
+      return 0;
     }
   };
 

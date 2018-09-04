@@ -78,7 +78,7 @@ public:
     }
 
 
-    virtual number_t initialEstimatePossible(const OptimizableGraph::VertexSet& , OptimizableGraph::Vertex* ) { return 0.;}
+    virtual number_t initialEstimatePossible(const OptimizableGraph::VertexSet& , OptimizableGraph::Vertex* ) { return 0;}
 #if 0
 #ifndef NUMERIC_JACOBIAN_THREE_D_TYPES
     virtual void linearizeOplus();

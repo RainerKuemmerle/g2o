@@ -87,7 +87,7 @@ namespace g2o {
          * returns the type of the graph element, see HyperGraphElementType
          */
         virtual HyperGraphElementType elementType() const = 0;
-	HyperGraphElement* clone() const { return 0; }
+	HyperGraphElement* clone() const { return nullptr; }
       };
 
       /**

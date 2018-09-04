@@ -27,35 +27,22 @@
 namespace {
 
 #ifdef G2O_OPENMP
-
-  class QuadraticFormLock {
-  public:
-  QuadraticFormLock(OptimizableGraph::Vertex& vertex) : _vertex(vertex) {
+struct QuadraticFormLock {
+  explicit QuadraticFormLock(OptimizableGraph::Vertex& vertex) : _vertex(vertex) {
     _vertex.lockQuadraticForm();
   }
-
   ~QuadraticFormLock() {
     _vertex.unlockQuadraticForm();
   }
-
 private:
   OptimizableGraph::Vertex& _vertex;
 };
-
 #else
-
-class QuadraticFormLock {
-public:
-  QuadraticFormLock(OptimizableGraph::Vertex& /*vertex*/) {
-  }
-
-  ~QuadraticFormLock() {
-  }
+struct QuadraticFormLock {
+  explicit QuadraticFormLock(OptimizableGraph::Vertex& ) { }
 };
-
 #endif
 
-  
 } // anonymous namespace
 
 
@@ -78,7 +65,7 @@ OptimizableGraph::Vertex* BaseBinaryEdge<D, E, VertexXiType, VertexXjType>::crea
   switch(i) {
   case 0: return new VertexXiType();
   case 1: return new VertexXjType();
-  default: return 0;
+  default: return nullptr;
   }
 }
 

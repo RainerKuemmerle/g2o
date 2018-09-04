@@ -100,7 +100,7 @@ namespace g2o {
       {
         PropertyMapIterator it=find(name_);
         if (it==end())
-          return 0;
+          return nullptr;
         return dynamic_cast<P*>(it->second);
       }
       template <typename P> 
@@ -108,7 +108,7 @@ namespace g2o {
       {
         PropertyMapConstIterator it=find(name_);
         if (it==end())
-          return 0;
+          return nullptr;
         return dynamic_cast<P*>(it->second);
       }
 

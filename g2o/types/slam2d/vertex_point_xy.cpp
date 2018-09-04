@@ -59,12 +59,12 @@ namespace g2o {
 
   HyperGraphElementAction* VertexPointXYWriteGnuplotAction::operator()(HyperGraph::HyperGraphElement* element, HyperGraphElementAction::Parameters* params_){
     if (typeid(*element).name()!=_typeName)
-      return 0;
+      return nullptr;
 
     WriteGnuplotAction::Parameters* params=static_cast<WriteGnuplotAction::Parameters*>(params_);
     if (!params->os){
       std::cerr << __PRETTY_FUNCTION__ << ": warning, on valid os specified" << std::endl;
-      return 0;
+      return nullptr;
     }
          
     VertexPointXY* v =  static_cast<VertexPointXY*>(element);
@@ -90,7 +90,7 @@ namespace g2o {
                      HyperGraphElementAction::Parameters* params ){
 
     if (typeid(*element).name()!=_typeName)
-      return 0;
+      return nullptr;
     initializeDrawActionsCache();
     refreshPropertyPtrs(params);
     if (! _previousParams)

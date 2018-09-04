@@ -106,7 +106,7 @@ namespace g2o {
   HyperGraphElementAction* EdgeSE3Line3DDrawAction::operator()(HyperGraph::HyperGraphElement* element,
 							       HyperGraphElementAction::Parameters* params_) {
     if(typeid(*element).name() != _typeName) {
-      return 0;
+      return nullptr;
     }
 
     refreshPropertyPtrs(params_);
@@ -128,7 +128,7 @@ namespace g2o {
     const VertexLine3D* landmark = dynamic_cast<const VertexLine3D*>(that->vertex(1));
 
     if(!robot || !landmark) {
-      return 0;
+      return nullptr;
     }
 
     Line3D line = that->measurement();
