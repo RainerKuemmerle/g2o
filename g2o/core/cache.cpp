@@ -61,13 +61,13 @@ namespace g2o {
   OptimizableGraph::Vertex* Cache::vertex() { 
     if (container() ) 
       return container()->vertex(); 
-    return 0; 
+    return nullptr; 
   }
 
   OptimizableGraph* Cache::graph() {
     if (container())
       return container()->graph();
-    return 0;
+    return nullptr;
   }
 
   CacheContainer* Cache::container() {
@@ -98,12 +98,12 @@ namespace g2o {
     ParameterVector pv(parameterIndices.size());
     for (size_t i=0; i<parameterIndices.size(); i++){
       if (parameterIndices[i]<0 || parameterIndices[i] >=(int)_parameters.size())
-  return 0;
+  return nullptr;
       pv[i]=_parameters[ parameterIndices[i] ];
     }
     CacheKey k(type_, pv);
     if (!container())
-      return 0;
+      return nullptr;
     Cache* c=container()->findCache(k);
     if (!c) {
       c = container()->createCache(k);
@@ -124,7 +124,7 @@ namespace g2o {
   Cache* CacheContainer::findCache(const Cache::CacheKey& key) {
     iterator it=find(key);
     if (it==end())
-      return 0;
+      return nullptr;
     return it->second;
   }
   
@@ -134,13 +134,13 @@ namespace g2o {
     if (!e) {
       cerr << __PRETTY_FUNCTION__ << endl;
       cerr << "fatal error in creating cache of type " << key.type() << endl;
-      return 0;
+      return nullptr;
     }
     Cache* c = dynamic_cast<Cache*>(e);
     if (! c){
       cerr << __PRETTY_FUNCTION__ << endl;
       cerr << "fatal error in creating cache of type " << key.type() << endl;
-      return 0;
+      return nullptr;
     }
     c->_container = this;
     c->_parameters = key._parameters;
@@ -149,7 +149,7 @@ namespace g2o {
       c->update();
       return c;
     } 
-    return 0;
+    return nullptr;
   }
   
   OptimizableGraph::Vertex* CacheContainer::vertex() {
@@ -159,7 +159,7 @@ namespace g2o {
   OptimizableGraph* CacheContainer::graph(){
     if (_vertex)
       return _vertex->graph();
-    return 0;
+    return nullptr;
   }
 
   void CacheContainer::update() {

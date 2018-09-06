@@ -83,18 +83,21 @@ namespace g2o {
     Vector2 dt = vj->estimate().translation() - vi->estimate().translation();
     number_t si=std::sin(thetai), ci=std::cos(thetai);
 
-    _jacobianOplusXi(0, 0) = -ci; _jacobianOplusXi(0, 1) = -si; _jacobianOplusXi(0, 2) = -si*dt.x()+ci*dt.y();
-    _jacobianOplusXi(1, 0) =  si; _jacobianOplusXi(1, 1) = -ci; _jacobianOplusXi(1, 2) = -ci*dt.x()-si*dt.y();
-    _jacobianOplusXi(2, 0) =  0;  _jacobianOplusXi(2, 1) = 0;   _jacobianOplusXi(2, 2) = -1;
+    _jacobianOplusXi <<
+        -ci, -si, -si*dt.x()+ci*dt.y(),
+         si, -ci, -ci*dt.x()-si*dt.y(),
+         0,  0,   -1;
 
-    _jacobianOplusXj(0, 0) = ci; _jacobianOplusXj(0, 1)= si; _jacobianOplusXj(0, 2)= 0;
-    _jacobianOplusXj(1, 0) =-si; _jacobianOplusXj(1, 1)= ci; _jacobianOplusXj(1, 2)= 0;
-    _jacobianOplusXj(2, 0) = 0;  _jacobianOplusXj(2, 1)= 0;  _jacobianOplusXj(2, 2)= 1;
+    _jacobianOplusXj <<
+         ci, si, 0,
+        -si, ci, 0,
+         0,  0,  1;
 
     const SE2& rmean = _inverseMeasurement;
-    Matrix3 z = Matrix3::Zero();
+    Matrix3 z;
     z.block<2, 2>(0, 0) = rmean.rotation().toRotationMatrix();
-    z(2, 2) = 1.;
+    z.col(2) << cst(0.), cst(0.), cst(1.);
+    z.row(2).head<2>() << cst(0.), cst(0.);
     _jacobianOplusXi = z * _jacobianOplusXi;
     _jacobianOplusXj = z * _jacobianOplusXj;
   }
@@ -104,11 +107,11 @@ namespace g2o {
 
   HyperGraphElementAction* EdgeSE2WriteGnuplotAction::operator()(HyperGraph::HyperGraphElement* element, HyperGraphElementAction::Parameters* params_){
     if (typeid(*element).name()!=_typeName)
-      return 0;
+      return nullptr;
     WriteGnuplotAction::Parameters* params=static_cast<WriteGnuplotAction::Parameters*>(params_);
     if (!params->os){
       std::cerr << __PRETTY_FUNCTION__ << ": warning, on valid os specified" << std::endl;
-      return 0;
+      return nullptr;
     }
 
     EdgeSE2* e =  static_cast<EdgeSE2*>(element);
@@ -141,7 +144,7 @@ namespace g2o {
   HyperGraphElementAction* EdgeSE2DrawAction::operator()(HyperGraph::HyperGraphElement* element, 
                HyperGraphElementAction::Parameters* params_){
     if (typeid(*element).name()!=_typeName)
-      return 0;
+      return nullptr;
 
     refreshPropertyPtrs(params_);
     if (! _previousParams)

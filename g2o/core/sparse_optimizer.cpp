@@ -117,7 +117,7 @@ namespace g2o{
 
   OptimizableGraph::Vertex* SparseOptimizer::findGauge(){
     if (vertices().empty())
-      return 0;
+      return nullptr;
 
     int maxDim=0;
     for (HyperGraph::VertexIDMap::iterator it=vertices().begin(); it!=vertices().end(); ++it){

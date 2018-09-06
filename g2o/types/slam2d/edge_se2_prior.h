@@ -49,13 +49,11 @@ namespace g2o {
         _error = delta.toVector();
       }
 
-#if    0 // this is untested
       virtual void linearizeOplus() {
         _jacobianOplusXi.setZero();
         _jacobianOplusXi.block<2,2>(0,0)=_inverseMeasurement.rotation().toRotationMatrix();
         _jacobianOplusXi(2,2)=1.;
       }
-#endif
 
       virtual void setMeasurement(const SE2& m);
       virtual bool setMeasurementData(const number_t* d);

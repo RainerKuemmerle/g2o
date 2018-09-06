@@ -15,11 +15,11 @@ build:
 install:
   - set QTDIR=C:\Qt\5.10.1\msvc2017_64
   - set PATH=%PATH%;%QTDIR%\bin
-  - ps: wget http://bitbucket.org/eigen/eigen/get/3.3.4.zip -outfile eigen3.zip
+  - ps: wget http://bitbucket.org/eigen/eigen/get/3.3.5.zip -outfile eigen3.zip
   - cmd: 7z x eigen3.zip -o"C:\projects" -y > nul
   
 before_build:
   - cd c:\projects\g2o
   - mkdir build
   - cd build
-  - cmake -G "Visual Studio 15 2017 Win64" -D EIGEN3_INCLUDE_DIR=C:\projects\eigen-eigen-5a0156e40feb ..
+  - cmake -G "Visual Studio 15 2017 Win64" -D EIGEN3_INCLUDE_DIR=C:\projects\eigen-eigen-b3f3d4950030 ..

@@ -110,17 +110,20 @@ namespace g2o {
   }
 
   bool HyperGraph::addEdge(Edge* e)
-  {
+  { 
+    for (Vertex* v : e->vertices())
+    { // be sure that all vertices are set
+      if (!v)
+        return false;
+    }
+
     std::pair<EdgeSet::iterator, bool> result = _edges.insert(e);
     if (!result.second)
       return false;
 
     for (Vertex* v : e->vertices())
-    {
-      if (v)
-      {
-        v->edges().insert(e);
-      }
+    { // connect the vertices to this edge
+      v->edges().insert(e);
     }
 
     return true;

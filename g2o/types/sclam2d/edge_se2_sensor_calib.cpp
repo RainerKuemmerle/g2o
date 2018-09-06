@@ -85,7 +85,7 @@ namespace g2o {
   HyperGraphElementAction* EdgeSE2SensorCalibDrawAction::operator()(HyperGraph::HyperGraphElement* element, HyperGraphElementAction::Parameters* )
   {
     if (typeid(*element).name()!=_typeName)
-      return 0;
+      return nullptr;
     EdgeSE2SensorCalib* e = static_cast<EdgeSE2SensorCalib*>(element);
     VertexSE2* fromEdge = static_cast<VertexSE2*>(e->vertex(0));
     VertexSE2* toEdge   = static_cast<VertexSE2*>(e->vertex(1));

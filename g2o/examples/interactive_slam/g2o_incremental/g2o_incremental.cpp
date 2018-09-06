@@ -65,6 +65,23 @@ struct IncrementalEdgesCompare
   }
 };
 
+inline void solveAndPrint(G2oSlamInterface& slamInterface, bool verbose)
+{
+  G2oSlamInterface::SolveResult solverState = slamInterface.solve();
+  if (!verbose) {
+    switch (solverState) {
+      case G2oSlamInterface::SOLVED:
+        cout << "."; //<< flush;
+        break;
+      case G2oSlamInterface::SOLVED_BATCH:
+        cout << "b " << slamInterface.optimizer()->vertices().size() << endl;
+        break;
+      default:
+        break;
+    }
+  }
+}
+
 void sigquit_handler(int sig)
 {
   if (sig == SIGINT) {
@@ -161,7 +178,6 @@ int main(int argc, char** argv)
 
     // adding edges to the graph. Add all edges connecting a node and then call optimize
     tictoc("inc_optimize");
-    bool freshlySolved = false;
     int lastNode = 2;
     slamInterface.addNode("", 0, graphDimension, vector<double>());
     for (vector<EdgeInformation>::const_iterator it = edgesFromGraph.begin(); it != edgesFromGraph.end(); ++it) {
@@ -170,40 +186,12 @@ int main(int argc, char** argv)
       if (minNodeId > lastNode) {
         //cerr << "try to solve" << endl;
         lastNode = minNodeId;
-        freshlySolved = true;
-        G2oSlamInterface::SolveResult solverState = slamInterface.solve();
-        if (!verbose) {
-          switch (solverState) {
-            case G2oSlamInterface::SOLVED:
-              cout << "."; //<< flush;
-              break;
-            case G2oSlamInterface::SOLVED_BATCH:
-              cout << "b " << optimizer.vertices().size() << endl;
-              break;
-            default:
-              break;
-          }
-        }
+        solveAndPrint(slamInterface, verbose);
       }
       //cerr << "adding " << e.fromId << " " << e.toId << endl;
       slamInterface.addEdge("", 0, graphDimension, e.fromId, e.toId, e.measurement, e.information);
-      freshlySolved = false;
     }
-    if (! freshlySolved) {
-      G2oSlamInterface::SolveResult solverState = slamInterface.solve();
-      if (!verbose) {
-        switch (solverState) {
-          case G2oSlamInterface::SOLVED:
-            cout << "." << endl;
-            break;
-          case G2oSlamInterface::SOLVED_BATCH:
-            cout << "b " << optimizer.vertices().size() << endl;
-            break;
-          default:
-            break;
-        }
-      }
-    }
+    solveAndPrint(slamInterface, verbose);
     tictoc("inc_optimize");
   } else {
     // Reading the protocol via stdin

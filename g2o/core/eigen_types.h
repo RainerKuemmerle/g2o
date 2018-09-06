@@ -63,10 +63,12 @@ namespace g2o {
   typedef Eigen::Matrix<float,4,4,Eigen::ColMajor>                                Matrix4F;
   typedef Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::ColMajor>      MatrixXF;
 
-  typedef Eigen::Matrix<number_t,2,2,Eigen::ColMajor>                             Matrix2;
-  typedef Eigen::Matrix<number_t,3,3,Eigen::ColMajor>                             Matrix3;
-  typedef Eigen::Matrix<number_t,4,4,Eigen::ColMajor>                             Matrix4;
-  typedef Eigen::Matrix<number_t,Eigen::Dynamic,Eigen::Dynamic,Eigen::ColMajor>   MatrixX;
+  template<int N>
+  using MatrixN = Eigen::Matrix<number_t, N, N, Eigen::ColMajor>;
+  using Matrix2 = MatrixN<2>;
+  using Matrix3 = MatrixN<3>;
+  using Matrix4 = MatrixN<4>;
+  using MatrixX = MatrixN<Eigen::Dynamic>;
 
   typedef Eigen::Transform<number_t,2,Eigen::Isometry,Eigen::ColMajor>            Isometry2;
   typedef Eigen::Transform<number_t,3,Eigen::Isometry,Eigen::ColMajor>            Isometry3;
