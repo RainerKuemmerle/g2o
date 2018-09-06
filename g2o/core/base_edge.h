@@ -152,6 +152,7 @@ namespace g2o {
 	
         const int lastDimension = _dimension;
         _dimension = information.rows();
+        _error.resize(_dimension);
         if (_dimension > lastDimension)
           {
             OptimizableGraph* g = graph();
