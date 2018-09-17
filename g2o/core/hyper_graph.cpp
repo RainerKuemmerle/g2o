@@ -31,6 +31,7 @@
 #include <assert.h>
 #include <queue>
 #include <unordered_set>
+#include <iterator>
 
 namespace g2o {
 
