@@ -36,6 +36,7 @@ macro(create_test target)
   add_test (NAME ${target} COMMAND $<TARGET_FILE:${target}>)
 endmacro(create_test)
 
+ADD_SUBDIRECTORY(stuff)
 ADD_SUBDIRECTORY(slam2d)
 ADD_SUBDIRECTORY(slam3d)
 ADD_SUBDIRECTORY(general)
