@@ -259,7 +259,7 @@ namespace g2o {
 
   HyperGraph::~HyperGraph()
   {
-    clear();
+    HyperGraph::clear();
   }
 
 } // end namespace

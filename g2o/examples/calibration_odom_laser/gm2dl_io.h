@@ -24,6 +24,9 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+#ifndef G2O_GM2DLIO_H
+#define G2O_GM2DLIO_H
+
 #include <string>
 
 #include "g2o_calibration_odom_laser_api.h"
@@ -56,3 +59,5 @@ namespace g2o {
   };
 
 }
+
+#endif
