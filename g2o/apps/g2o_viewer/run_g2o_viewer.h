@@ -24,6 +24,9 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+#ifndef RUN_G2O_VIEWER_H
+#define RUN_G2O_VIEWER_H
+
 #include "g2o_viewer_api.h"
 
 namespace g2o {
@@ -40,3 +43,5 @@ namespace g2o {
   };
 
 } // end namespace
+
+#endif

@@ -30,6 +30,8 @@
 
 #include <assert.h>
 #include <queue>
+#include <unordered_set>
+#include <iterator>
 
 namespace g2o {
 
@@ -117,6 +119,22 @@ namespace g2o {
         return false;
     }
 
+    // check for duplicates in the vertices and do not add this edge
+    if (e->vertices().size() == 2) {
+      if (e->vertices()[0] == e->vertices()[1])
+        return false;
+    } else if (e->vertices().size() == 3) {
+      if (e->vertices()[0] == e->vertices()[1]
+       || e->vertices()[0] == e->vertices()[2]
+       || e->vertices()[1] == e->vertices()[2])
+        return false;
+    } else if (e->vertices().size() > 3) {
+      std::unordered_set<Vertex*> vertexPointer;
+      std::copy(e->vertices().begin(), e->vertices().end(), std::inserter(vertexPointer, vertexPointer.begin()));
+      if (vertexPointer.size() != e->vertices().size())
+        return false;
+    }
+
     std::pair<EdgeSet::iterator, bool> result = _edges.insert(e);
     if (!result.second)
       return false;
@@ -174,8 +192,8 @@ namespace g2o {
     for (EdgeSet::iterator it=tmp.begin(); it!=tmp.end(); ++it){
       HyperGraph::Edge* e = *it;
       for (size_t i = 0 ; i<e->vertices().size(); i++){
-	if (v == e->vertex(i))
-	  setEdgeVertex(e,i,0);
+        if (v == e->vertex(i))
+          setEdgeVertex(e,i,0);
       }
     }
     return true;
@@ -186,7 +204,7 @@ namespace g2o {
     if (detach){
       bool result = detachVertex(v);
       if (! result) {
-	assert (0 && "inconsistency in detaching vertex, ");
+        assert (0 && "inconsistency in detaching vertex, ");
       }
     }
     VertexIDMap::iterator it=_vertices.find(v->id());
@@ -214,7 +232,7 @@ namespace g2o {
     for (std::vector<Vertex*>::iterator vit = e->vertices().begin(); vit != e->vertices().end(); ++vit) {
       Vertex* v = *vit;
       if (!v)
-	continue;
+        continue;
       it = v->edges().find(e);
       assert(it!=v->edges().end());
       v->edges().erase(it);
@@ -242,7 +260,7 @@ namespace g2o {
 
   HyperGraph::~HyperGraph()
   {
-    clear();
+    HyperGraph::clear();
   }
 
 } // end namespace

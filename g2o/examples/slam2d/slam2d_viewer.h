@@ -16,8 +16,8 @@
 // You should have received a copy of the GNU General Public License
 // along with g2o.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef G2O_QGL_GRAPH_VIEWER_H
-#define G2O_QGL_GRAPH_VIEWER_H
+#ifndef SLAM2D_VIEWER_H
+#define SLAM2D_VIEWER_H
 
 #include "qglviewer.h"
 
