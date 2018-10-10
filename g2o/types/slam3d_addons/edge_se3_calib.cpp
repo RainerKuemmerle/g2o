@@ -26,6 +26,8 @@
 
 #include "edge_se3_calib.h"
 
+#include "g2o/types/slam3d/vertex_se3.h"
+
 namespace g2o {
 
   EdgeSE3Calib::EdgeSE3Calib() :

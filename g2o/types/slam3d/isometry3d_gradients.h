@@ -27,12 +27,10 @@
 #ifndef G2O_ISOMETRY3D_GRADIENTS_H_
 #define G2O_ISOMETRY3D_GRADIENTS_H_
 
-#include "g2o_types_slam3d_api.h"
 #include "isometry3d_mappings.h"
 #include "dquat2mat.h"
 
 #include <Eigen/Core>
-#include <Eigen/Geometry>
 
 namespace g2o {
   namespace internal {

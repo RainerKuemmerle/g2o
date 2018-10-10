@@ -30,7 +30,6 @@
 #include "g2o_types_slam3d_api.h"
 #include "se3quat.h"
 #include <Eigen/Core>
-#include <Eigen/Geometry>
 
 namespace g2o {
 
