@@ -344,8 +344,9 @@ if(MSVC)
 
 endif(MSVC)
 
-# C++11 support
-set(CMAKE_CXX_STANDARD 11)
+# C++17 support
+#set(CMAKE_CXX_STANDARD 17) // CMAKE version >= 3.8
+set(CMAKE_CXX_FLAGS "-std=c++17")
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # specifying compiler flags
