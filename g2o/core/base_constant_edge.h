@@ -63,33 +63,6 @@ namespace g2o {
       return std::tuple<Ts2...>{Ts2{value}...};
     }
 
-    template<int I>
-    struct Tuple_apply_i
-    {
-      template<typename F, typename T>
-      void operator()(F&& f, T& t, int i)
-      {
-        if(i == I - 1)
-          return f(std::get<I - 1>(t));
-        else
-          return Tuple_apply_i<I - 1>()(f, t, i);
-      }
-    };
-
-    template<>
-    struct Tuple_apply_i<0>
-    {
-      template<typename F, typename T>
-      void operator()(F&&, T&, int) { }
-    };
-
-    template<typename F, typename T>
-    void tuple_apply_i(F&& f, T& t, int i)
-    {
-      Tuple_apply_i<std::tuple_size<T>::value>()(f, t, i);
-    }
-
-
     template<int EdgeDimension, int VertexDimension>
     using JacobianType = typename Eigen::Matrix<number_t, EdgeDimension, VertexDimension, EdgeDimension==1?Eigen::RowMajor:Eigen::ColMajor>::AlignedMapType;
   }
