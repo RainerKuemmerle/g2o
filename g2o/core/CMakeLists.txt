@@ -2,12 +2,12 @@ add_library(core ${G2O_LIB_TYPE}
 dynamic_aligned_buffer.hpp
 ownership.h
 base_edge.h
-base_binary_edge.h          hyper_graph_action.cpp
-base_binary_edge.hpp        hyper_graph_action.h
+base_constant_edge.h        hyper_graph_action.cpp
+base_constant_edge.hpp      hyper_graph_action.h
 base_multi_edge.h           hyper_graph.cpp
 base_multi_edge.hpp         hyper_graph.h
 base_unary_edge.h           linear_solver.h
-base_unary_edge.hpp         marginal_covariance_cholesky.cpp
+base_binary_edge.h          marginal_covariance_cholesky.cpp
 base_vertex.h               marginal_covariance_cholesky.h
 base_vertex.hpp             matrix_structure.cpp
 batch_stats.cpp             matrix_structure.h
