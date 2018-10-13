@@ -69,15 +69,15 @@ namespace g2o {
       template<typename F, typename T>
       void operator()(F&& f, T& t, int i)
       {
-        if(i == I)
-          return f(std::get<I>(t));
+        if(i == I - 1)
+          return f(std::get<I - 1>(t));
         else
           return Tuple_apply_i<I - 1>()(f, t, i);
       }
     };
 
     template<>
-    struct Tuple_apply_i<-1>
+    struct Tuple_apply_i<0>
     {
       template<typename F, typename T>
       void operator()(F&&, T&, int) { }
@@ -86,7 +86,7 @@ namespace g2o {
     template<typename F, typename T>
     void tuple_apply_i(F&& f, T& t, int i)
     {
-      Tuple_apply_i<std::tuple_size<T>::value -1>()(f, t, i);
+      Tuple_apply_i<std::tuple_size<T>::value>()(f, t, i);
     }
 
 
