@@ -113,7 +113,7 @@ template <int D, typename E, typename... VertexTypes>
 template<int K>
 void BaseConstantEdge<D, E, VertexTypes...>::constructQuadraticFormK()
 {
-  constexpr auto NM = index_to_pair(K);
+  constexpr auto NM = internal::index_to_pair(K);
 
   auto from = vertexXn<NM.first>();
   auto to = vertexXn<NM.second>();
@@ -263,9 +263,9 @@ void BaseConstantEdge<D, E, VertexTypes...>::mapHessianMemory(number_t* d, int i
 {
   auto f = [d](auto& hessian){ new (&hessian) std::remove_reference_t<decltype(hessian)>(d); };
   if(rowMajor)
-    tuple_apply_i(f, _hessianTupleTransposed, pair_to_index(i, j));
+    tuple_apply_i(f, _hessianTupleTransposed, internal::pair_to_index(i, j));
   else
-    tuple_apply_i(f, _hessianTuple, pair_to_index(i, j));
+    tuple_apply_i(f, _hessianTuple, internal::pair_to_index(i, j));
 
   _hessianRowMajor = rowMajor;
 }
