@@ -47,9 +47,30 @@ namespace g2o {
     {
       return j * (j - 1) / 2 + i;
     }
+
+    // adapted from https://stackoverflow.com/a/27709195
+    template <typename T>
+    constexpr T sqrt_helper(T x, T lo, T hi)
+    {
+      if (lo == hi)
+        return lo;
+
+      const T mid = (lo + hi + 1) / 2;
+
+      if (x / mid < mid)
+        return sqrt_helper<T>(x, lo, mid - 1);
+      else
+        return sqrt_helper(x, mid, hi);
+    }
+    template <typename T>
+    constexpr T ct_sqrt(T x)
+    {
+      return sqrt_helper<T>(x, 0, x / 2 + 1);
+    }
+
     constexpr std::pair<int, int> index_to_pair(const int k)
     {
-      const int j = std::sqrt(2*(k+1))+.5;
+      const int j = ct_sqrt(2*(k+1))+.5;
       const int i = k - j * (j - 1) / 2;
       return {i, j};
     }
