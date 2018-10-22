@@ -38,6 +38,7 @@
 #include "robust_kernel.h"
 #include "g2o/config.h"
 #include "g2o/stuff/misc.h"
+#include "g2o/stuff/tuple_tools.h"
 
 namespace g2o {
 
@@ -53,12 +54,6 @@ namespace g2o {
       const int j = ct_sqrt(2*(k+1))+.5;
       const int i = k - j * (j - 1) / 2;
       return {i, j};
-    }
-
-    template<typename Value, typename... Ts2>
-    auto tuple_init(const Value& value, const std::tuple<Ts2...>)
-    {
-      return std::tuple<Ts2...>{Ts2{value}...};
     }
   }
 
@@ -113,8 +108,8 @@ namespace g2o {
 
       BaseConstantEdge() : BaseEdge<D,E>(),
       _hessianRowMajor(false),
-      _hessianTuple(internal::tuple_init(nullptr, _hessianTuple)),
-      _hessianTupleTransposed(internal::tuple_init(nullptr, _hessianTupleTransposed)),
+      _hessianTuple(tuple_init(nullptr, _hessianTuple)),
+      _hessianTupleTransposed(tuple_init(nullptr, _hessianTupleTransposed)),
       _jacobianOplus({nullptr, D, VertexTypes::Dimension}...)
       {
         _vertices.resize(_nr_of_vertices, nullptr);
