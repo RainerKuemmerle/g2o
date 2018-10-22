@@ -29,7 +29,7 @@
 
 #pragma once
 
-namespace {
+namespace internal {
 
 struct QuadraticFormLock {
   QuadraticFormLock(OptimizableGraph::Vertex& vertex) : _vertex(vertex) {
@@ -107,7 +107,7 @@ void BaseConstantEdge<D, E, VertexTypes...>::constructQuadraticFormK()
         auto AtO = A.transpose() * omega;
 
         {
-          QuadraticFormLock lck(*from);
+          internal::QuadraticFormLock lck(*from);
 
           from->b().noalias() += A.transpose() * omega_r;
           from->A().noalias() += AtO*A;
@@ -121,7 +121,7 @@ void BaseConstantEdge<D, E, VertexTypes...>::constructQuadraticFormK()
         }
       }
       if (toNotFixed) {
-        QuadraticFormLock lck(*to);
+        internal::QuadraticFormLock lck(*to);
 
         to->b().noalias() += B.transpose() * omega_r;
         to->A().noalias() += B.transpose() * omega * B;
@@ -137,7 +137,7 @@ void BaseConstantEdge<D, E, VertexTypes...>::constructQuadraticFormK()
       omega_r *= rho[1];
       if (fromNotFixed) {
         {
-          QuadraticFormLock lck(*from);
+          internal::QuadraticFormLock lck(*from);
 
           from->b().noalias() += A.transpose() * omega_r;
           from->A().noalias() += A.transpose() * weightedOmega * A;
@@ -151,7 +151,7 @@ void BaseConstantEdge<D, E, VertexTypes...>::constructQuadraticFormK()
         }
       }
       if (toNotFixed) {
-        QuadraticFormLock lck(*to);
+        internal::QuadraticFormLock lck(*to);
 
         to->b().noalias() += B.transpose() * omega_r;
         to->A().noalias() += B.transpose() * weightedOmega * B;
@@ -186,7 +186,7 @@ void BaseConstantEdge<D, E, VertexTypes...>::linearizeOplusN()
 
   bool iNotFixed = !(vertex->fixed());
   if (iNotFixed) {
-    QuadraticFormLock lck(*vertex);
+    internal::QuadraticFormLock lck(*vertex);
     // estimate the jacobian numerically
     number_t add_vertex[VertexDimension<N>()] = {};
 
