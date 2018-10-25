@@ -59,28 +59,30 @@ void BaseConstantEdge<D, E, VertexTypes...>::resize(size_t size)
 
 template <int D, typename E, typename... VertexTypes>
 template<std::size_t... Ints >
-bool BaseConstantEdge<D, E, VertexTypes...>::allVerticesFixedNs(std::integer_sequence<std::size_t, Ints...>) const
+bool BaseConstantEdge<D, E, VertexTypes...>::allVerticesFixedNs(index_sequence<Ints...>) const
 {
-  return ( ... && vertexXn<Ints>()->fixed());
+  bool fixed[] = { vertexXn<Ints>()->fixed()... };
+  return std::all_of(std::begin(fixed), std::end(fixed), [](bool value){ return value; });
 }
 
 template <int D, typename E, typename... VertexTypes>
 bool BaseConstantEdge<D, E, VertexTypes...>::allVerticesFixed() const
 {
-  return allVerticesFixedNs(std::make_index_sequence<_nr_of_vertices>());
+  return allVerticesFixedNs(make_index_sequence<_nr_of_vertices>());
 }
 
 template <int D, typename E, typename... VertexTypes>
 void BaseConstantEdge<D, E, VertexTypes...>::constructQuadraticForm()
 {
-  constructQuadraticFormKs(std::make_integer_sequence<int, _nr_of_vertex_pairs>());
+  constructQuadraticFormKs(make_index_sequence<_nr_of_vertex_pairs>());
 }
 
 template <int D, typename E, typename... VertexTypes>
-template<int... Ints>
-void BaseConstantEdge<D, E, VertexTypes...>::constructQuadraticFormKs(std::integer_sequence<int, Ints...>)
+template<std::size_t... Ints>
+void BaseConstantEdge<D, E, VertexTypes...>::constructQuadraticFormKs(index_sequence<Ints...>)
 {
-  ( void(constructQuadraticFormK<Ints>()), ...);
+  int unused[] = { (constructQuadraticFormK<Ints>(), 0) ... };
+  (void)unused;
 }
 
 template <int D, typename E, typename... VertexTypes>
@@ -163,15 +165,18 @@ void BaseConstantEdge<D, E, VertexTypes...>::constructQuadraticFormK()
 template <int D, typename E, typename... VertexTypes>
 void BaseConstantEdge<D, E, VertexTypes...>::linearizeOplus(JacobianWorkspace& jacobianWorkspace)
 {
-  linearizeOplus_allocate(jacobianWorkspace, std::make_integer_sequence<int, _nr_of_vertices>());
+  linearizeOplus_allocate(jacobianWorkspace, make_index_sequence<_nr_of_vertices>());
   linearizeOplus();
 }
 
 template <int D, typename E, typename... VertexTypes>
-template<int... Ints>
-void BaseConstantEdge<D, E, VertexTypes...>::linearizeOplus_allocate(JacobianWorkspace& jacobianWorkspace, std::integer_sequence<int, Ints...>)
+template<std::size_t... Ints>
+void BaseConstantEdge<D, E, VertexTypes...>::linearizeOplus_allocate(JacobianWorkspace& jacobianWorkspace, index_sequence<Ints...>)
 {
-  ( new (&std::get<Ints>(_jacobianOplus)) JacobianType<D, VertexDimension<Ints>()>(jacobianWorkspace.workspaceForVertex(Ints), D < 0 ? _dimension : D, VertexDimension<Ints>()) , ...);
+  int unused[] = {
+  ( new (&std::get<Ints>(_jacobianOplus)) JacobianType<D, VertexDimension<Ints>()>(jacobianWorkspace.workspaceForVertex(Ints), D < 0 ? _dimension : D, VertexDimension<Ints>()) , 0 )
+  ... };
+  (void)unused;
 }
 
 template <int D, typename E, typename... VertexTypes>
@@ -212,10 +217,11 @@ void BaseConstantEdge<D, E, VertexTypes...>::linearizeOplusN()
 };
 
 template <int D, typename E, typename... VertexTypes>
-template <int... Ints>
-void BaseConstantEdge<D, E, VertexTypes...>::linearizeOplusNs(std::integer_sequence<int, Ints...>)
+template <std::size_t... Ints>
+void BaseConstantEdge<D, E, VertexTypes...>::linearizeOplusNs(index_sequence<Ints...>)
 {
-  ( void(linearizeOplusN<Ints>()), ...);
+  int unused[] = { (linearizeOplusN<Ints>(), 0) ... };
+  (void)unused;
 }
 
 template <int D, typename E, typename... VertexTypes>
@@ -227,19 +233,28 @@ void BaseConstantEdge<D, E, VertexTypes...>::linearizeOplus()
 
   ErrorVector errorBeforeNumeric = _error;
 
-  linearizeOplusNs(std::make_integer_sequence<int, _nr_of_vertices>());
+  linearizeOplusNs(make_index_sequence<_nr_of_vertices>());
 
   _error = errorBeforeNumeric;
 }
 
+struct MapHessianMemoryK
+{
+  number_t* d;
+  template<typename HessianT>
+  void operator()(HessianT& hessian)
+  {
+    new (&hessian) typename std::remove_reference<decltype(hessian)>::type(d);
+  }
+};
+
 template <int D, typename E, typename... VertexTypes>
 void BaseConstantEdge<D, E, VertexTypes...>::mapHessianMemory(number_t* d, int i, int j, bool rowMajor)
 {
-  auto f = [d](auto& hessian){ new (&hessian) std::remove_reference_t<decltype(hessian)>(d); };
   if(rowMajor)
-    tuple_apply_i(f, _hessianTupleTransposed, internal::pair_to_index(i, j));
+    tuple_apply_i(MapHessianMemoryK{d}, _hessianTupleTransposed, internal::pair_to_index(i, j));
   else
-    tuple_apply_i(f, _hessianTuple, internal::pair_to_index(i, j));
+    tuple_apply_i(MapHessianMemoryK{d}, _hessianTuple, internal::pair_to_index(i, j));
 
   _hessianRowMajor = rowMajor;
 }
