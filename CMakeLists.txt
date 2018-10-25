@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.8)
+cmake_minimum_required(VERSION 3.1)
 set(CMAKE_LEGACY_CYGWIN_WIN32 0)
 
 project(g2o)
@@ -344,8 +344,8 @@ if(MSVC)
 
 endif(MSVC)
 
-# C++17 support
-set(CMAKE_CXX_STANDARD 17)
+# C++11 support
+set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # specifying compiler flags
