@@ -265,7 +265,7 @@ int main(int argc, const char* argv[]){
   cout << "Performing full BA:" << endl;
   optimizer.optimize(10);
   cout << endl;
-  cout << "Point error before optimisation (inliers only): " << sqrt(sum_diff2/point_num) << endl;
+  cout << "Point error before optimisation (inliers only): " << sqrt(sum_diff2/inliers.size()) << endl;
   point_num = 0;
   sum_diff2 = 0;
   for (unordered_map<int,int>::iterator it=pointid_2_trueid.begin();
@@ -288,6 +288,6 @@ int main(int argc, const char* argv[]){
     sum_diff2 += diff.dot(diff);
     ++point_num;
   }
-  cout << "Point error after optimisation (inliers only): " << sqrt(sum_diff2/point_num) << endl;
+  cout << "Point error after optimisation (inliers only): " << sqrt(sum_diff2/inliers.size()) << endl;
   cout << endl;
 }
