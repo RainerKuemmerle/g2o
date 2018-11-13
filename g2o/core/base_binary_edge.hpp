@@ -24,27 +24,6 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-namespace {
-
-#ifdef G2O_OPENMP
-struct QuadraticFormLock {
-  explicit QuadraticFormLock(OptimizableGraph::Vertex& vertex) : _vertex(vertex) {
-    _vertex.lockQuadraticForm();
-  }
-  ~QuadraticFormLock() {
-    _vertex.unlockQuadraticForm();
-  }
-private:
-  OptimizableGraph::Vertex& _vertex;
-};
-#else
-struct QuadraticFormLock {
-  explicit QuadraticFormLock(OptimizableGraph::Vertex& ) { }
-};
-#endif
-
-} // anonymous namespace
-
 template <int D, typename E, typename VertexXiType, typename VertexXjType>
 OptimizableGraph::Vertex* BaseBinaryEdge<D, E, VertexXiType, VertexXjType>::createFrom(){
   return createVertex(0);
