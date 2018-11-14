@@ -71,15 +71,14 @@ class Edge3Dynamic : public g2o::BaseMultiEdge<2, g2o::Vector2>
 
 TEST(General, ConstantEdgeConstructor)
 {
+  ASSERT_EQ(typeid(Edge3Dynamic::ErrorVector), typeid(Edge3Constant::ErrorVector));
+  ASSERT_EQ(typeid(Edge3Dynamic::InformationType), typeid(Edge3Constant::InformationType));
+
   Edge3Constant e_constant;
   Edge3Dynamic e_dynamic;
   ASSERT_EQ(e_dynamic.vertices()[0], e_constant.vertices()[0]);
   ASSERT_EQ(e_dynamic.vertices()[1], e_constant.vertices()[1]);
   ASSERT_EQ(e_dynamic.vertices()[2], e_constant.vertices()[2]);
-  // todo, check type:
-  //ASSERT_EQ(e_dynamic.ErrorVector, e_constant.ErrorVector);
-  //ASSERT_EQ(e_dynamic.InformationType, e_constant.InformationType);
-  //ASSERT_EQ(e_dynamic.allVerticesFixed(), e_constant.allVerticesFixed());
 }
 
 TEST(General, ConstantEdgeJacobians)
@@ -101,7 +100,6 @@ TEST(General, ConstantEdgeJacobians)
   e_constant.setVertex(0, v1);
   e_constant.setVertex(1, v2);
   e_constant.setVertex(2, v2);
-  ASSERT_EQ(e_dynamic.allVerticesFixed(), e_constant.allVerticesFixed());
 
   {
     g2o::JacobianWorkspace jacobianWorkspace_dynamic;
@@ -121,5 +119,17 @@ TEST(General, ConstantEdgeJacobians)
     ASSERT_DOUBLE_EQ(0.0, (Eigen::Map<g2o::MatrixX>(jacobianWorkspace_dynamic.workspaceForVertex(2), 2, 2)
                          - Eigen::Map<g2o::MatrixX>(jacobianWorkspace_constant.workspaceForVertex(2), 2, 2)).norm());
   }
-}
+  {
+    ASSERT_EQ(e_dynamic.allVerticesFixed(), e_constant.allVerticesFixed());
+    ASSERT_FALSE(e_constant.allVerticesFixed());
+    v1->setFixed(true);
+    v2->setFixed(true);
+    v3->setFixed(true);
+    ASSERT_EQ(e_dynamic.allVerticesFixed(), e_constant.allVerticesFixed());
+    ASSERT_TRUE(e_constant.allVerticesFixed());
+    v3->setFixed(false);
+    v2->setFixed(false);
+    v1->setFixed(false);
+  }
+  }
 
