@@ -102,5 +102,24 @@ TEST(General, ConstantEdgeJacobians)
   e_constant.setVertex(1, v2);
   e_constant.setVertex(2, v2);
   ASSERT_EQ(e_dynamic.allVerticesFixed(), e_constant.allVerticesFixed());
+
+  {
+    g2o::JacobianWorkspace jacobianWorkspace_dynamic;
+    jacobianWorkspace_dynamic.updateSize(&e_dynamic);
+    jacobianWorkspace_dynamic.allocate();
+    e_dynamic.linearizeOplus(jacobianWorkspace_dynamic);
+
+    g2o::JacobianWorkspace jacobianWorkspace_constant;
+    jacobianWorkspace_constant.updateSize(&e_constant);
+    jacobianWorkspace_constant.allocate();
+    e_constant.linearizeOplus(jacobianWorkspace_constant);
+
+    ASSERT_DOUBLE_EQ(0.0, (Eigen::Map<g2o::MatrixX>(jacobianWorkspace_dynamic.workspaceForVertex(0), 2, 3)
+                         - Eigen::Map<g2o::MatrixX>(jacobianWorkspace_constant.workspaceForVertex(0), 2, 3)).norm());
+    ASSERT_DOUBLE_EQ(0.0, (Eigen::Map<g2o::MatrixX>(jacobianWorkspace_dynamic.workspaceForVertex(1), 2, 3)
+                         - Eigen::Map<g2o::MatrixX>(jacobianWorkspace_constant.workspaceForVertex(1), 2, 3)).norm());
+    ASSERT_DOUBLE_EQ(0.0, (Eigen::Map<g2o::MatrixX>(jacobianWorkspace_dynamic.workspaceForVertex(2), 2, 2)
+                         - Eigen::Map<g2o::MatrixX>(jacobianWorkspace_constant.workspaceForVertex(2), 2, 2)).norm());
+  }
 }
 
