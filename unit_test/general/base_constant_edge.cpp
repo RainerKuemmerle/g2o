@@ -84,7 +84,11 @@ TEST(General, ConstantEdgeConstructor)
 TEST(General, ConstantEdgeJacobians)
 {
   Edge3Constant e_constant;
+  e_constant.setMeasurement(g2o::Vector2{.3, .4});
+  e_constant.setInformation(g2o::Matrix2::Identity());
   Edge3Dynamic e_dynamic;
+  e_dynamic.setMeasurement(g2o::Vector2{.3, .4});
+  e_dynamic.setInformation(g2o::Matrix2::Identity());
   auto* v1 = new g2o::VertexSE2();
   v1->setId(0);
   v1->setEstimate(g2o::SE2(.1, .2, .3));
@@ -101,35 +105,73 @@ TEST(General, ConstantEdgeJacobians)
   e_constant.setVertex(1, v2);
   e_constant.setVertex(2, v2);
 
-  {
-    g2o::JacobianWorkspace jacobianWorkspace_dynamic;
-    jacobianWorkspace_dynamic.updateSize(&e_dynamic);
-    jacobianWorkspace_dynamic.allocate();
-    e_dynamic.linearizeOplus(jacobianWorkspace_dynamic);
+  e_dynamic.computeError();
+  e_constant.computeError();
+  ASSERT_DOUBLE_EQ(0.0, (e_dynamic.error() - e_constant.error()).norm());
 
-    g2o::JacobianWorkspace jacobianWorkspace_constant;
-    jacobianWorkspace_constant.updateSize(&e_constant);
-    jacobianWorkspace_constant.allocate();
-    e_constant.linearizeOplus(jacobianWorkspace_constant);
+  g2o::JacobianWorkspace jacobianWorkspace_dynamic;
+  jacobianWorkspace_dynamic.updateSize(&e_dynamic);
+  jacobianWorkspace_dynamic.allocate();
+  e_dynamic.linearizeOplus(jacobianWorkspace_dynamic);
 
-    ASSERT_DOUBLE_EQ(0.0, (Eigen::Map<g2o::MatrixX>(jacobianWorkspace_dynamic.workspaceForVertex(0), 2, 3)
-                         - Eigen::Map<g2o::MatrixX>(jacobianWorkspace_constant.workspaceForVertex(0), 2, 3)).norm());
-    ASSERT_DOUBLE_EQ(0.0, (Eigen::Map<g2o::MatrixX>(jacobianWorkspace_dynamic.workspaceForVertex(1), 2, 3)
-                         - Eigen::Map<g2o::MatrixX>(jacobianWorkspace_constant.workspaceForVertex(1), 2, 3)).norm());
-    ASSERT_DOUBLE_EQ(0.0, (Eigen::Map<g2o::MatrixX>(jacobianWorkspace_dynamic.workspaceForVertex(2), 2, 2)
-                         - Eigen::Map<g2o::MatrixX>(jacobianWorkspace_constant.workspaceForVertex(2), 2, 2)).norm());
-  }
-  {
-    ASSERT_EQ(e_dynamic.allVerticesFixed(), e_constant.allVerticesFixed());
-    ASSERT_FALSE(e_constant.allVerticesFixed());
-    v1->setFixed(true);
-    v2->setFixed(true);
-    v3->setFixed(true);
-    ASSERT_EQ(e_dynamic.allVerticesFixed(), e_constant.allVerticesFixed());
-    ASSERT_TRUE(e_constant.allVerticesFixed());
-    v3->setFixed(false);
-    v2->setFixed(false);
-    v1->setFixed(false);
-  }
-  }
+  g2o::JacobianWorkspace jacobianWorkspace_constant;
+  jacobianWorkspace_constant.updateSize(&e_constant);
+  jacobianWorkspace_constant.allocate();
+  e_constant.linearizeOplus(jacobianWorkspace_constant);
+
+  ASSERT_DOUBLE_EQ(0.0, (Eigen::Map<g2o::MatrixX>(jacobianWorkspace_dynamic.workspaceForVertex(0), 2, 3)
+                       - Eigen::Map<g2o::MatrixX>(jacobianWorkspace_constant.workspaceForVertex(0), 2, 3)).norm());
+  ASSERT_DOUBLE_EQ(0.0, (Eigen::Map<g2o::MatrixX>(jacobianWorkspace_dynamic.workspaceForVertex(1), 2, 3)
+                       - Eigen::Map<g2o::MatrixX>(jacobianWorkspace_constant.workspaceForVertex(1), 2, 3)).norm());
+  ASSERT_DOUBLE_EQ(0.0, (Eigen::Map<g2o::MatrixX>(jacobianWorkspace_dynamic.workspaceForVertex(2), 2, 2)
+                       - Eigen::Map<g2o::MatrixX>(jacobianWorkspace_constant.workspaceForVertex(2), 2, 2)).norm());
+
+
+  ASSERT_EQ(e_dynamic.allVerticesFixed(), e_constant.allVerticesFixed());
+  ASSERT_FALSE(e_constant.allVerticesFixed());
+  v1->setFixed(true);
+  v2->setFixed(true);
+  v3->setFixed(true);
+  ASSERT_EQ(e_dynamic.allVerticesFixed(), e_constant.allVerticesFixed());
+  ASSERT_TRUE(e_constant.allVerticesFixed());
+  v3->setFixed(false);
+  v2->setFixed(false);
+  v1->setFixed(false);
+
+  Eigen::Matrix<number_t, 3, 3> hessian01_dynamic = Eigen::Matrix<number_t, 3, 3>::Zero();
+  Eigen::Matrix<number_t, 3, 2> hessian02_dynamic = Eigen::Matrix<number_t, 3, 2>::Zero();
+  Eigen::Matrix<number_t, 3, 2> hessian12_dynamic = Eigen::Matrix<number_t, 3, 2>::Zero();
+  e_dynamic.mapHessianMemory(hessian01_dynamic.data(), 0, 1, false);
+  e_dynamic.mapHessianMemory(hessian02_dynamic.data(), 0, 2, false);
+  e_dynamic.mapHessianMemory(hessian12_dynamic.data(), 1, 2, false);
+
+  Eigen::Matrix<number_t, 3, 3> hessian00_dynamic = Eigen::Matrix<number_t, 3, 3>::Zero();
+  Eigen::Matrix<number_t, 3, 3> hessian11_dynamic = Eigen::Matrix<number_t, 3, 3>::Zero();
+  Eigen::Matrix<number_t, 2, 2> hessian22_dynamic = Eigen::Matrix<number_t, 2, 2>::Zero();
+  v1->mapHessianMemory(hessian00_dynamic.data());
+  v2->mapHessianMemory(hessian11_dynamic.data());
+  v3->mapHessianMemory(hessian22_dynamic.data());
+
+  e_dynamic.constructQuadraticForm();
+
+  Eigen::Matrix<number_t, 3, 3> hessian01_constant = Eigen::Matrix<number_t, 3, 3>::Zero();
+  Eigen::Matrix<number_t, 3, 2> hessian02_constant = Eigen::Matrix<number_t, 3, 2>::Zero();
+  Eigen::Matrix<number_t, 3, 2> hessian12_constant = Eigen::Matrix<number_t, 3, 2>::Zero();
+  e_constant.mapHessianMemory(hessian01_constant.data(), 0, 1, false);
+  e_constant.mapHessianMemory(hessian02_constant.data(), 0, 2, false);
+  e_constant.mapHessianMemory(hessian12_constant.data(), 1, 2, false);
+
+  Eigen::Matrix<number_t, 3, 3> hessian00_constant = Eigen::Matrix<number_t, 3, 3>::Zero();
+  Eigen::Matrix<number_t, 3, 3> hessian11_constant = Eigen::Matrix<number_t, 3, 3>::Zero();
+  Eigen::Matrix<number_t, 2, 2> hessian22_constant = Eigen::Matrix<number_t, 2, 2>::Zero();
+  v1->mapHessianMemory(hessian00_constant.data());
+  v2->mapHessianMemory(hessian11_constant.data());
+  v3->mapHessianMemory(hessian22_constant.data());
+
+  e_constant.constructQuadraticForm();
+
+  ASSERT_DOUBLE_EQ(0.0, (hessian00_dynamic - hessian00_constant).norm());
+
+  // check rowMajor
+}
 
