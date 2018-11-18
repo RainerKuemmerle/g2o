@@ -51,7 +51,7 @@ namespace g2o {
 
     constexpr std::pair<int, int> index_to_pair(const int k)
     {
-      return {k - (ct_sqrt(2*(k+1))+.5) * (ct_sqrt(2*(k+1))+.5 - 1) / 2, ct_sqrt(2*(k+1))+.5};
+      return {k - static_cast<int>(ct_sqrt(2*(k+1))+.5) * (static_cast<int>(ct_sqrt(2*(k+1))+.5) - 1) / 2, ct_sqrt(2*(k+1))+.5};
     }
   }
 
