@@ -193,6 +193,9 @@ TEST(General, ConstantEdgeJacobians)
   e_constant.constructQuadraticForm();
 
   ASSERT_DOUBLE_EQ(0.0, (hessian00_dynamic - hessian00_constant).norm());
+  ASSERT_DOUBLE_EQ(0.0, (hessian11_dynamic - hessian11_constant).norm());
+  ASSERT_DOUBLE_EQ(0.0, (hessian22_dynamic - hessian22_constant).norm());
+  ASSERT_DOUBLE_EQ(0.0, (hessian01_dynamic - hessian01_constant).norm());
 
   // check rowMajor
 }
