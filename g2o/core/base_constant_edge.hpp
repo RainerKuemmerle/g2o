@@ -74,91 +74,68 @@ bool BaseConstantEdge<D, E, VertexTypes...>::allVerticesFixed() const
 template <int D, typename E, typename... VertexTypes>
 void BaseConstantEdge<D, E, VertexTypes...>::constructQuadraticForm()
 {
-  constructQuadraticFormKs(make_index_sequence<_nr_of_vertex_pairs>());
+  constructQuadraticFormNs(make_index_sequence<_nr_of_vertices>());
 }
 
 template <int D, typename E, typename... VertexTypes>
 template<std::size_t... Ints>
-void BaseConstantEdge<D, E, VertexTypes...>::constructQuadraticFormKs(index_sequence<Ints...>)
+void BaseConstantEdge<D, E, VertexTypes...>::constructQuadraticFormNs(index_sequence<Ints...>)
 {
-  int unused[] = { (constructQuadraticFormK<Ints>(), 0) ... };
+  int unused[] = { (constructQuadraticFormN<Ints>(), 0) ... };
   (void)unused;
 }
 
 template <int D, typename E, typename... VertexTypes>
-template<int K>
-void BaseConstantEdge<D, E, VertexTypes...>::constructQuadraticFormK()
+template<int N, std::size_t... Ints>
+void BaseConstantEdge<D, E, VertexTypes...>::constructOffDiagonalQuadraticFormMs(index_sequence<Ints...>)
 {
-  constexpr auto NM = internal::index_to_pair(K);
+  int unused[] = { (constructOffDiagonalQuadraticFormM<N, Ints>(), 0) ... };
+  (void)unused;
+}
 
-  auto from = vertexXn<NM.first>();
-  auto to = vertexXn<NM.second>();
-  auto& A = std::get<NM.first>(_jacobianOplus);
-  auto& B = std::get<NM.second>(_jacobianOplus);
+template <int D, typename E, typename... VertexTypes>
+template<int N, int M>
+void BaseConstantEdge<D, E, VertexTypes...>::constructOffDiagonalQuadraticFormM()
+{
+  auto& A = std::get<N>(_jacobianOplus);
+  const auto& omega = this->information();
+  auto AtO = A.transpose() * omega;
+
+  // shouldn't vertices be locked to prevent writing in jacobians while reading them?
+  constexpr auto K = internal::pair_to_index(M, N);
   auto& hessian = std::get<K>(_hessianTuple);
   auto& hessianTransposed = std::get<K>(_hessianTupleTransposed);
+  auto to = vertexXn<M>();
+  if (!(to->fixed())) {
+    auto& B = std::get<M>(_jacobianOplus);
+    if (_hessianRowMajor) // we have to write to the block as transposed
+      hessianTransposed.noalias()+= AtO * B;
+    else
+      hessian.noalias()  += B.transpose() * AtO.transpose();
+  }
+}
 
-  bool fromNotFixed = !(from->fixed());
-  bool toNotFixed = !(to->fixed());
+template <int D, typename E, typename... VertexTypes>
+template<int N>
+void BaseConstantEdge<D, E, VertexTypes...>::constructQuadraticFormN()
+{
+  auto from = vertexXn<N>();
+  auto& A = std::get<N>(_jacobianOplus);
 
-  if (fromNotFixed || toNotFixed) {
-    const auto& omega = this->information();
-    auto omega_r = (- omega * this->error()).eval();
+  if (!(from->fixed())) {
     if (this->robustKernel() == 0) {
-      if (fromNotFixed) {
-        auto AtO = A.transpose() * omega;
 
-        {
-          internal::QuadraticFormLock lck(*from);
-
-          from->b().noalias() += A.transpose() * omega_r;
-          from->A().noalias() += AtO*A;
-        }
-
-        if (toNotFixed ) {
-          if (_hessianRowMajor) // we have to write to the block as transposed
-            hessianTransposed.noalias() += B.transpose() * AtO.transpose();
-          else
-            hessian.noalias() += AtO * B;
-        }
+      const auto& omega = this->information();
+      auto AtO = A.transpose() * omega;
+      auto omega_r = (- omega * this->error()).eval();
+      {
+        internal::QuadraticFormLock lck(*from);
+        from->b().noalias() += A.transpose() * omega_r;
+        from->A().noalias() += AtO*A;
       }
-      if (toNotFixed) {
-        internal::QuadraticFormLock lck(*to);
-
-        to->b().noalias() += B.transpose() * omega_r;
-        to->A().noalias() += B.transpose() * omega * B;
-      }
-    } else { // robust (weighted) error according to some kernel
-      number_t error = this->chi2();
-      Vector3 rho;
-      this->robustKernel()->robustify(error, rho);
-      auto weightedOmega = rho[1] * omega; // this->robustInformation(rho);
-      //std::cout << PVAR(rho.transpose()) << std::endl;
-      //std::cout << PVAR(weightedOmega) << std::endl;
-
-      omega_r *= rho[1];
-      if (fromNotFixed) {
-        {
-          internal::QuadraticFormLock lck(*from);
-
-          from->b().noalias() += A.transpose() * omega_r;
-          from->A().noalias() += A.transpose() * weightedOmega * A;
-        }
-
-        if (toNotFixed ) {
-          if (_hessianRowMajor) // we have to write to the block as transposed
-            hessianTransposed.noalias() += B.transpose() * weightedOmega * A;
-          else
-            hessian.noalias() += A.transpose() * weightedOmega * B;
-        }
-      }
-      if (toNotFixed) {
-        internal::QuadraticFormLock lck(*to);
-
-        to->b().noalias() += B.transpose() * omega_r;
-        to->A().noalias() += B.transpose() * weightedOmega * B;
-      }
-    }
+      constructOffDiagonalQuadraticFormMs<N>(make_index_sequence<N>());
+    } 
+    else { std::cout << "Not implemented ... " << std::endl; }
   }
 };
 
