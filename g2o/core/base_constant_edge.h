@@ -146,9 +146,13 @@ namespace g2o {
 
       inline virtual void constructQuadraticForm() ;
       template<std::size_t... Ints>
-      void constructQuadraticFormKs(index_sequence<Ints...>);
-      template<int K>
-      void constructQuadraticFormK();
+      void constructQuadraticFormNs(index_sequence<Ints...>);
+      template<int N>
+      void constructQuadraticFormN();
+      template<int N, std::size_t... Ints>
+      void constructOffDiagonalQuadraticFormMs(index_sequence<Ints...>);
+      template<int N, int M>
+      void constructOffDiagonalQuadraticFormM();
 
       inline virtual void mapHessianMemory(number_t* d, int i, int j, bool rowMajor);
 
