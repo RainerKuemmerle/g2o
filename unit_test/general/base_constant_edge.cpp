@@ -122,10 +122,10 @@ TEST(General, ConstantEdgeJacobians)
   v3->setEstimate(g2o::Vector2(-.3, .5));
   e_dynamic.setVertex(0, v1);
   e_dynamic.setVertex(1, v2);
-  e_dynamic.setVertex(2, v2);
+  e_dynamic.setVertex(2, v3);
   e_constant.setVertex(0, v1);
   e_constant.setVertex(1, v2);
-  e_constant.setVertex(2, v2);
+  e_constant.setVertex(2, v3);
 
   e_dynamic.computeError();
   e_constant.computeError();
@@ -196,6 +196,7 @@ TEST(General, ConstantEdgeJacobians)
   ASSERT_DOUBLE_EQ(0.0, (hessian11_dynamic - hessian11_constant).norm());
   ASSERT_DOUBLE_EQ(0.0, (hessian22_dynamic - hessian22_constant).norm());
   ASSERT_DOUBLE_EQ(0.0, (hessian01_dynamic - hessian01_constant).norm());
+
 
   // check rowMajor
 }
