@@ -144,15 +144,15 @@ namespace g2o {
       const typename std::tuple_element<N, std::tuple<JacobianType<D, VertexTypes::Dimension>...>>::type&
         jacobianOplusXn() const { return std::get<N>(_jacobianOplus);}
 
-      inline virtual void constructQuadraticForm() ;
+      inline virtual void constructQuadraticForm();
       template<std::size_t... Ints>
       void constructQuadraticFormNs(index_sequence<Ints...>);
       template<int N>
       void constructQuadraticFormN();
-      template<int N, std::size_t... Ints>
-      void constructOffDiagonalQuadraticFormMs(index_sequence<Ints...>);
-      template<int N, int M>
-      void constructOffDiagonalQuadraticFormM();
+      template<int N, std::size_t... Ints, typename AtOType>
+      void constructOffDiagonalQuadraticFormMs(const AtOType& AtO, index_sequence<Ints...>);
+      template<int N, int M, typename AtOType>
+      void constructOffDiagonalQuadraticFormM(const AtOType& AtO);
 
       inline virtual void mapHessianMemory(number_t* d, int i, int j, bool rowMajor);
 

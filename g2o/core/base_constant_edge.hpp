@@ -86,32 +86,31 @@ void BaseConstantEdge<D, E, VertexTypes...>::constructQuadraticFormNs(index_sequ
 }
 
 template <int D, typename E, typename... VertexTypes>
-template<int N, std::size_t... Ints>
-void BaseConstantEdge<D, E, VertexTypes...>::constructOffDiagonalQuadraticFormMs(index_sequence<Ints...>)
+template<int N, std::size_t... Ints, typename AtOType>
+void BaseConstantEdge<D, E, VertexTypes...>::constructOffDiagonalQuadraticFormMs(const AtOType& AtO, index_sequence<Ints...>)
 {
-  int unused[] = { (constructOffDiagonalQuadraticFormM<N, Ints>(), 0) ... };
+  int unused[] = { (constructOffDiagonalQuadraticFormM<N, Ints, AtOType>(AtO), 0) ... };
   (void)unused;
 }
 
 template <int D, typename E, typename... VertexTypes>
-template<int N, int M>
-void BaseConstantEdge<D, E, VertexTypes...>::constructOffDiagonalQuadraticFormM()
+template<int N, int M, typename AtOType>
+void BaseConstantEdge<D, E, VertexTypes...>::constructOffDiagonalQuadraticFormM(const AtOType& AtO)
 {
-  auto& A = std::get<N>(_jacobianOplus);
-  const auto& omega = this->information();
-  auto AtO = A.transpose() * omega;
+  constexpr auto fromId = N;
+  constexpr auto toId = N + M + 1;
+  if (!(vertexXn<toId>()->fixed())) {
+    const auto& B = std::get<toId>(_jacobianOplus);
 
-  // shouldn't vertices be locked to prevent writing in jacobians while reading them?
-  constexpr auto K = internal::pair_to_index(M, N);
-  auto& hessian = std::get<K>(_hessianTuple);
-  auto& hessianTransposed = std::get<K>(_hessianTupleTransposed);
-  auto to = vertexXn<M>();
-  if (!(to->fixed())) {
-    auto& B = std::get<M>(_jacobianOplus);
-    if (_hessianRowMajor) // we have to write to the block as transposed
-      hessianTransposed.noalias()+= AtO * B;
-    else
-      hessian.noalias()  += B.transpose() * AtO.transpose();
+    // shouldn't vertices be locked to prevent writing in jacobians while reading them?
+    constexpr auto K = internal::pair_to_index(fromId, toId);
+    if (_hessianRowMajor) { // we have to write to the block as transposed
+      auto& hessianTransposed = std::get<K>(_hessianTupleTransposed);
+      hessianTransposed.noalias() += B.transpose() * AtO.transpose();
+    } else {
+      auto& hessian = std::get<K>(_hessianTuple);
+      hessian.noalias() +=  AtO * B;
+    }
   }
 }
 
@@ -120,20 +119,20 @@ template<int N>
 void BaseConstantEdge<D, E, VertexTypes...>::constructQuadraticFormN()
 {
   auto from = vertexXn<N>();
-  auto& A = std::get<N>(_jacobianOplus);
+  const auto& A = std::get<N>(_jacobianOplus);
 
   if (!(from->fixed())) {
     if (this->robustKernel() == 0) {
 
       const auto& omega = this->information();
-      auto AtO = A.transpose() * omega;
-      auto omega_r = (- omega * this->error()).eval();
+      const auto AtO = A.transpose() * omega;
+      const auto omega_r = - omega * this->error().eval();
       {
         internal::QuadraticFormLock lck(*from);
         from->b().noalias() += A.transpose() * omega_r;
         from->A().noalias() += AtO*A;
       }
-      constructOffDiagonalQuadraticFormMs<N>(make_index_sequence<N>());
+      constructOffDiagonalQuadraticFormMs<N>(AtO, make_index_sequence<_nr_of_vertices - N - 1>());
     } 
     else { std::cout << "Not implemented ... " << std::endl; }
   }
