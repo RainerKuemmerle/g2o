@@ -196,6 +196,8 @@ TEST(General, ConstantEdgeJacobians)
   ASSERT_DOUBLE_EQ(0.0, (hessian11_dynamic - hessian11_constant).norm());
   ASSERT_DOUBLE_EQ(0.0, (hessian22_dynamic - hessian22_constant).norm());
   ASSERT_DOUBLE_EQ(0.0, (hessian01_dynamic - hessian01_constant).norm());
+  ASSERT_DOUBLE_EQ(0.0, (hessian02_dynamic - hessian02_constant).norm());
+  ASSERT_DOUBLE_EQ(0.0, (hessian12_dynamic - hessian12_constant).norm());
 
 
   // check rowMajor
