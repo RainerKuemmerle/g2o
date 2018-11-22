@@ -146,9 +146,9 @@ namespace g2o {
 
       inline virtual void constructQuadraticForm();
       template<std::size_t... Ints>
-      void constructQuadraticFormNs(index_sequence<Ints...>);
+      void constructQuadraticFormNs(const InformationType& omega, const ErrorVector& weightedError, index_sequence<Ints...>);
       template<int N>
-      void constructQuadraticFormN();
+      void constructQuadraticFormN(const InformationType& omega, const ErrorVector& weightedError);
       template<int N, std::size_t... Ints, typename AtOType>
       void constructOffDiagonalQuadraticFormMs(const AtOType& AtO, index_sequence<Ints...>);
       template<int N, int M, typename AtOType>
