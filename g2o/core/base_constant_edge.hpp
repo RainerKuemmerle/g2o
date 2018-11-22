@@ -74,14 +74,23 @@ bool BaseConstantEdge<D, E, VertexTypes...>::allVerticesFixed() const
 template <int D, typename E, typename... VertexTypes>
 void BaseConstantEdge<D, E, VertexTypes...>::constructQuadraticForm()
 {
-  constructQuadraticFormNs(make_index_sequence<_nr_of_vertices>());
+  if (this->robustKernel()) {
+    number_t error = this->chi2();
+    Vector3 rho;
+    this->robustKernel()->robustify(error, rho);
+    Eigen::Matrix<number_t, D, 1, Eigen::ColMajor> omega_r = - _information * _error;
+    omega_r *= rho[1];
+    constructQuadraticFormNs(this->robustInformation(rho), omega_r, make_index_sequence<_nr_of_vertices>());
+  } else {
+    constructQuadraticFormNs(_information, - _information * _error, make_index_sequence<_nr_of_vertices>());
+  }
 }
 
 template <int D, typename E, typename... VertexTypes>
 template<std::size_t... Ints>
-void BaseConstantEdge<D, E, VertexTypes...>::constructQuadraticFormNs(index_sequence<Ints...>)
+void BaseConstantEdge<D, E, VertexTypes...>::constructQuadraticFormNs(const InformationType& omega, const ErrorVector& weightedError, index_sequence<Ints...>)
 {
-  int unused[] = { (constructQuadraticFormN<Ints>(), 0) ... };
+  int unused[] = { (constructQuadraticFormN<Ints>(omega, weightedError), 0) ... };
   (void)unused;
 }
 
@@ -116,25 +125,19 @@ void BaseConstantEdge<D, E, VertexTypes...>::constructOffDiagonalQuadraticFormM(
 
 template <int D, typename E, typename... VertexTypes>
 template<int N>
-void BaseConstantEdge<D, E, VertexTypes...>::constructQuadraticFormN()
+void BaseConstantEdge<D, E, VertexTypes...>::constructQuadraticFormN(const InformationType& omega, const ErrorVector& weightedError)
 {
   auto from = vertexXn<N>();
   const auto& A = std::get<N>(_jacobianOplus);
 
   if (!(from->fixed())) {
-    if (this->robustKernel() == 0) {
-
-      const auto& omega = this->information();
-      const auto AtO = A.transpose() * omega;
-      const auto omega_r = - omega * this->error().eval();
-      {
-        internal::QuadraticFormLock lck(*from);
-        from->b().noalias() += A.transpose() * omega_r;
-        from->A().noalias() += AtO*A;
-      }
-      constructOffDiagonalQuadraticFormMs<N>(AtO, make_index_sequence<_nr_of_vertices - N - 1>());
-    } 
-    else { std::cout << "Not implemented ... " << std::endl; }
+    const auto AtO = A.transpose() * omega;
+    {
+      internal::QuadraticFormLock lck(*from);
+      from->b().noalias() += A.transpose() * weightedError;
+      from->A().noalias() += AtO*A;
+    }
+    constructOffDiagonalQuadraticFormMs<N>(AtO, make_index_sequence<_nr_of_vertices - N - 1>());
   }
 };
 
