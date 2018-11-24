@@ -30,6 +30,7 @@
 #include "g2o/core/base_multi_edge.h"
 #include "g2o/types/slam2d/vertex_se2.h"
 #include "g2o/types/slam2d/vertex_point_xy.h"
+#include "g2o/core/robust_kernel_impl.h"
 
 // create 2 classes with 3 vertices, one based on multi and one based on constant edge class
 // try out all members
@@ -199,6 +200,35 @@ TEST(General, ConstantEdgeJacobians)
   ASSERT_DOUBLE_EQ(0.0, (hessian02_dynamic - hessian02_constant).norm());
   ASSERT_DOUBLE_EQ(0.0, (hessian12_dynamic - hessian12_constant).norm());
 
+  // check robustness
+  e_dynamic.setMeasurement(g2o::Vector2{.3, 3.4});
+  e_constant.setMeasurement(g2o::Vector2{.3, 3.4});
+
+  g2o::RobustKernelHuber* rk_dynamic = new g2o::RobustKernelHuber;
+  e_dynamic.setRobustKernel(rk_dynamic);
+  e_dynamic.computeError();
+  e_dynamic.linearizeOplus(jacobianWorkspace_dynamic);
+  v1->mapHessianMemory(hessian00_dynamic.data());
+  v2->mapHessianMemory(hessian11_dynamic.data());
+  v3->mapHessianMemory(hessian22_dynamic.data());
+  e_dynamic.constructQuadraticForm();
+  g2o::RobustKernelHuber* rk_constant = new g2o::RobustKernelHuber;
+  e_constant.setRobustKernel(rk_constant);
+  e_constant.computeError();
+  e_constant.linearizeOplus(jacobianWorkspace_constant);
+  v1->mapHessianMemory(hessian00_constant.data());
+  v2->mapHessianMemory(hessian11_constant.data());
+  v3->mapHessianMemory(hessian22_constant.data());
+  e_constant.constructQuadraticForm();
+  ASSERT_EQ(true, (e_dynamic.error() - e_constant.error()).norm() < 1e-7);
+  ASSERT_DOUBLE_EQ(0.0, (Eigen::Map<g2o::MatrixX>(jacobianWorkspace_dynamic.workspaceForVertex(0), 2, 3)
+                       - Eigen::Map<g2o::MatrixX>(jacobianWorkspace_constant.workspaceForVertex(0), 2, 3)).norm());
+  ASSERT_DOUBLE_EQ(0.0, (hessian00_dynamic - hessian00_constant).norm());
+  ASSERT_DOUBLE_EQ(0.0, (hessian11_dynamic - hessian11_constant).norm());
+  ASSERT_DOUBLE_EQ(0.0, (hessian22_dynamic - hessian22_constant).norm());
+  ASSERT_DOUBLE_EQ(0.0, (hessian01_dynamic - hessian01_constant).norm());
+  ASSERT_DOUBLE_EQ(0.0, (hessian02_dynamic - hessian02_constant).norm());
+  ASSERT_DOUBLE_EQ(0.0, (hessian12_dynamic - hessian12_constant).norm());
 
   // check rowMajor
 }
