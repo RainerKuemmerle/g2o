@@ -104,180 +104,149 @@ TEST(General, ConstantEdgeConstructor)
   ASSERT_EQ(e_dynamic.vertices()[2], e_constant.vertices()[2]);
 }
 
-class ConstantEdgeTest : public ::testing::Test
+template<typename EdgeType>
+class EdgeTester
 {
- protected:
-  void SetUp() override 
+ public:
+  EdgeTester()
   {
-    e_dynamic = new Edge3Dynamic;
-    e_dynamic->setMeasurement(g2o::Vector2{.3, .4});
-    e_dynamic->setInformation(g2o::Matrix2::Identity());
+    edge.setMeasurement(g2o::Vector2{.3, .4});
+    edge.setInformation(g2o::Matrix2::Identity());
 
-    v1_dynamic.setId(0);
-    v1_dynamic.setEstimate(g2o::SE2(.1, .2, .3));
-    v2_dynamic.setId(1);
-    v2_dynamic.setEstimate(g2o::SE2(.3, .1, .2));
-    v3_dynamic.setId(2);
-    v3_dynamic.setEstimate(g2o::Vector2(-.3, .5));
-    e_dynamic->setVertex(0, &v1_dynamic);
-    e_dynamic->setVertex(1, &v2_dynamic);
-    e_dynamic->setVertex(2, &v3_dynamic);
+    v1.setId(0);
+    v1.setEstimate(g2o::SE2(.1, .2, .3));
+    v2.setId(1);
+    v2.setEstimate(g2o::SE2(.3, .1, .2));
+    v3.setId(2);
+    v3.setEstimate(g2o::Vector2(-.3, .5));
+    edge.setVertex(0, &v1);
+    edge.setVertex(1, &v2);
+    edge.setVertex(2, &v3);
 
-    jacobianWorkspace_dynamic.updateSize(e_dynamic);
-    jacobianWorkspace_dynamic.allocate();
+    jacobianWorkspace.updateSize(&edge);
+    jacobianWorkspace.allocate();
 
-    hessian01_dynamic.setZero();
-    hessian02_dynamic.setZero();
-    hessian12_dynamic.setZero();
-    hessian00_dynamic.setZero();
-    hessian11_dynamic.setZero();
-    hessian22_dynamic.setZero();
-    e_dynamic->mapHessianMemory(hessian01_dynamic.data(), 0, 1, false);
-    e_dynamic->mapHessianMemory(hessian02_dynamic.data(), 0, 2, false);
-    e_dynamic->mapHessianMemory(hessian12_dynamic.data(), 1, 2, false);
-    v1_dynamic.mapHessianMemory(hessian00_dynamic.data());
-    v2_dynamic.mapHessianMemory(hessian11_dynamic.data());
-    v3_dynamic.mapHessianMemory(hessian22_dynamic.data());
-
-    e_constant = new Edge3Constant;
-    e_constant->setMeasurement(g2o::Vector2{.3, .4});
-    e_constant->setInformation(g2o::Matrix2::Identity());
-
-    v1_constant.setId(0);
-    v1_constant.setEstimate(g2o::SE2(.1, .2, .3));
-    v2_constant.setId(1);
-    v2_constant.setEstimate(g2o::SE2(.3, .1, .2));
-    v3_constant.setId(2);
-    v3_constant.setEstimate(g2o::Vector2(-.3, .5));
-    e_constant->setVertex(0, &v1_constant);
-    e_constant->setVertex(1, &v2_constant);
-    e_constant->setVertex(2, &v3_constant);
-
-    jacobianWorkspace_constant.updateSize(e_constant);
-    jacobianWorkspace_constant.allocate();
-
-    hessian01_constant.setZero();
-    hessian02_constant.setZero();
-    hessian12_constant.setZero();
-    hessian00_constant.setZero();
-    hessian11_constant.setZero();
-    hessian22_constant.setZero();
-    e_constant->mapHessianMemory(hessian01_constant.data(), 0, 1, false);
-    e_constant->mapHessianMemory(hessian02_constant.data(), 0, 2, false);
-    e_constant->mapHessianMemory(hessian12_constant.data(), 1, 2, false);
-    v1_constant.mapHessianMemory(hessian00_constant.data());
-    v2_constant.mapHessianMemory(hessian11_constant.data());
-    v3_constant.mapHessianMemory(hessian22_constant.data());
+    hessian01.setZero();
+    hessian02.setZero();
+    hessian12.setZero();
+    hessian00.setZero();
+    hessian11.setZero();
+    hessian22.setZero();
+    edge.mapHessianMemory(hessian01.data(), 0, 1, false);
+    edge.mapHessianMemory(hessian02.data(), 0, 2, false);
+    edge.mapHessianMemory(hessian12.data(), 1, 2, false);
+    v1.mapHessianMemory(hessian00.data());
+    v2.mapHessianMemory(hessian11.data());
+    v3.mapHessianMemory(hessian22.data());
   }
 
-  g2o::VertexSE2 v1_dynamic;
-  g2o::VertexSE2 v2_dynamic;
-  g2o::VertexPointXY v3_dynamic;
+  EdgeType edge;
 
-  g2o::VertexSE2 v1_constant;
-  g2o::VertexSE2 v2_constant;
-  g2o::VertexPointXY v3_constant;
+  g2o::VertexSE2 v1;
+  g2o::VertexSE2 v2;
+  g2o::VertexPointXY v3;
 
-  // using objects instead of pointers somehow results in segfaults...
-  Edge3Dynamic* e_dynamic;
-  Edge3Constant* e_constant;
+  g2o::JacobianWorkspace jacobianWorkspace;
 
-  g2o::JacobianWorkspace jacobianWorkspace_dynamic;
-  g2o::JacobianWorkspace jacobianWorkspace_constant;
+  Eigen::Matrix<number_t, 3, 3> hessian01;
+  Eigen::Matrix<number_t, 3, 2> hessian02;
+  Eigen::Matrix<number_t, 3, 2> hessian12;
+  Eigen::Matrix<number_t, 3, 3> hessian00;
+  Eigen::Matrix<number_t, 3, 3> hessian11;
+  Eigen::Matrix<number_t, 2, 2> hessian22;
 
-  Eigen::Matrix<number_t, 3, 3> hessian01_dynamic;
-  Eigen::Matrix<number_t, 3, 2> hessian02_dynamic;
-  Eigen::Matrix<number_t, 3, 2> hessian12_dynamic;
-  Eigen::Matrix<number_t, 3, 3> hessian00_dynamic;
-  Eigen::Matrix<number_t, 3, 3> hessian11_dynamic;
-  Eigen::Matrix<number_t, 2, 2> hessian22_dynamic;
-
-  Eigen::Matrix<number_t, 3, 3> hessian01_constant;
-  Eigen::Matrix<number_t, 3, 2> hessian02_constant;
-  Eigen::Matrix<number_t, 3, 2> hessian12_constant;
-  Eigen::Matrix<number_t, 3, 3> hessian00_constant;
-  Eigen::Matrix<number_t, 3, 3> hessian11_constant;
-  Eigen::Matrix<number_t, 2, 2> hessian22_constant;
 };
 
-TEST_F(ConstantEdgeTest, ConstantEdge_allVerticesFixed)
+
+TEST(ConstantEdgeTest, ConstantEdge_allVerticesFixed)
 {
-  ASSERT_EQ(e_dynamic->allVerticesFixed(), e_constant->allVerticesFixed());
-  ASSERT_FALSE(e_constant->allVerticesFixed());
-  v1_constant.setFixed(true);
-  v2_constant.setFixed(true);
-  v3_constant.setFixed(true);
-  v1_dynamic.setFixed(true);
-  v2_dynamic.setFixed(true);
-  v3_dynamic.setFixed(true);
-  ASSERT_EQ(e_dynamic->allVerticesFixed(), e_constant->allVerticesFixed());
-  ASSERT_TRUE(e_constant->allVerticesFixed());
+  EdgeTester<Edge3Dynamic> dynamic;
+  EdgeTester<Edge3Constant> constant;
+  ASSERT_EQ(dynamic.edge.allVerticesFixed(), constant.edge.allVerticesFixed());
+  ASSERT_FALSE(constant.edge.allVerticesFixed());
+  dynamic.v1.setFixed(true);
+  dynamic.v2.setFixed(true);
+  dynamic.v3.setFixed(true);
+  constant.v1.setFixed(true);
+  constant.v2.setFixed(true);
+  constant.v3.setFixed(true);
+  ASSERT_EQ(dynamic.edge.allVerticesFixed(), constant.edge.allVerticesFixed());
+  ASSERT_TRUE(constant.edge.allVerticesFixed());
 }
 
-TEST_F(ConstantEdgeTest, ConstantEdge_computeError)
+TEST(ConstantEdgeTest, ConstantEdge_computeError)
 {
-  e_dynamic->computeError();
-  e_constant->computeError();
-  ASSERT_DOUBLE_EQ(0.0, (e_dynamic->error() - e_constant->error()).norm());
+  EdgeTester<Edge3Dynamic> dynamic;
+  EdgeTester<Edge3Constant> constant;
+  dynamic.edge.computeError();
+  constant.edge.computeError();
+  ASSERT_DOUBLE_EQ(0.0, (dynamic.edge.error() - constant.edge.error()).norm());
 }
 
-TEST_F(ConstantEdgeTest, ConstantEdge_linearizeOplus)
+TEST(ConstantEdgeTest, ConstantEdge_linearizeOplus)
 {
-  e_dynamic->computeError();
-  e_constant->computeError();
-  e_dynamic->linearizeOplus(jacobianWorkspace_dynamic);
-  e_constant->linearizeOplus(jacobianWorkspace_constant);
-  ASSERT_DOUBLE_EQ(0.0, (Eigen::Map<g2o::MatrixX>(jacobianWorkspace_dynamic.workspaceForVertex(0), 2, 3)
-                       - Eigen::Map<g2o::MatrixX>(jacobianWorkspace_constant.workspaceForVertex(0), 2, 3)).norm());
-  ASSERT_DOUBLE_EQ(0.0, (Eigen::Map<g2o::MatrixX>(jacobianWorkspace_dynamic.workspaceForVertex(1), 2, 3)
-                       - Eigen::Map<g2o::MatrixX>(jacobianWorkspace_constant.workspaceForVertex(1), 2, 3)).norm());
-  ASSERT_DOUBLE_EQ(0.0, (Eigen::Map<g2o::MatrixX>(jacobianWorkspace_dynamic.workspaceForVertex(2), 2, 2)
-                       - Eigen::Map<g2o::MatrixX>(jacobianWorkspace_constant.workspaceForVertex(2), 2, 2)).norm());
-}
-TEST_F(ConstantEdgeTest, ConstantEdge_constructQuadraticForm)
-{
-  e_dynamic->computeError();
-  e_constant->computeError();
-  e_dynamic->linearizeOplus(jacobianWorkspace_dynamic);
-  e_constant->linearizeOplus(jacobianWorkspace_constant);
-
-  e_dynamic->constructQuadraticForm();
-  e_constant->constructQuadraticForm();
-
-  ASSERT_DOUBLE_EQ(0.0, (hessian00_dynamic - hessian00_constant).norm());
-  ASSERT_DOUBLE_EQ(0.0, (hessian11_dynamic - hessian11_constant).norm());
-  ASSERT_DOUBLE_EQ(0.0, (hessian22_dynamic - hessian22_constant).norm());
-  ASSERT_DOUBLE_EQ(0.0, (hessian01_dynamic - hessian01_constant).norm());
-  ASSERT_DOUBLE_EQ(0.0, (hessian02_dynamic - hessian02_constant).norm());
-  ASSERT_DOUBLE_EQ(0.0, (hessian12_dynamic - hessian12_constant).norm());
+  EdgeTester<Edge3Dynamic> dynamic;
+  EdgeTester<Edge3Constant> constant;
+  dynamic.edge.computeError();
+  constant.edge.computeError();
+  dynamic.edge.linearizeOplus(dynamic.jacobianWorkspace);
+  constant.edge.linearizeOplus(constant.jacobianWorkspace);
+  ASSERT_DOUBLE_EQ(0.0, (Eigen::Map<g2o::MatrixX>(dynamic.jacobianWorkspace.workspaceForVertex(0), 2, 3)
+                       - Eigen::Map<g2o::MatrixX>(constant.jacobianWorkspace.workspaceForVertex(0), 2, 3)).norm());
+  ASSERT_DOUBLE_EQ(0.0, (Eigen::Map<g2o::MatrixX>(dynamic.jacobianWorkspace.workspaceForVertex(1), 2, 3)
+                       - Eigen::Map<g2o::MatrixX>(constant.jacobianWorkspace.workspaceForVertex(1), 2, 3)).norm());
+  ASSERT_DOUBLE_EQ(0.0, (Eigen::Map<g2o::MatrixX>(dynamic.jacobianWorkspace.workspaceForVertex(2), 2, 2)
+                       - Eigen::Map<g2o::MatrixX>(constant.jacobianWorkspace.workspaceForVertex(2), 2, 2)).norm());
 }
 
-TEST_F(ConstantEdgeTest, ConstantEdge_constructQuadraticForm_robust)
+TEST(ConstantEdgeTest, ConstantEdge_constructQuadraticForm)
 {
-  // check robustness
-  e_dynamic->setMeasurement(g2o::Vector2{.3, 3.4});
-  e_constant->setMeasurement(g2o::Vector2{.3, 3.4});
+  EdgeTester<Edge3Dynamic> dynamic;
+  EdgeTester<Edge3Constant> constant;
+  dynamic.edge.computeError();
+  constant.edge.computeError();
+  dynamic.edge.linearizeOplus(dynamic.jacobianWorkspace);
+  constant.edge.linearizeOplus(constant.jacobianWorkspace);
+
+  dynamic.edge.constructQuadraticForm();
+  constant.edge.constructQuadraticForm();
+
+  ASSERT_DOUBLE_EQ(0.0, (dynamic.hessian00 - constant.hessian00).norm());
+  ASSERT_DOUBLE_EQ(0.0, (dynamic.hessian11 - constant.hessian11).norm());
+  ASSERT_DOUBLE_EQ(0.0, (dynamic.hessian22 - constant.hessian22).norm());
+  ASSERT_DOUBLE_EQ(0.0, (dynamic.hessian01 - constant.hessian01).norm());
+  ASSERT_DOUBLE_EQ(0.0, (dynamic.hessian02 - constant.hessian02).norm());
+  ASSERT_DOUBLE_EQ(0.0, (dynamic.hessian12 - constant.hessian12).norm());
+}
+
+TEST(ConstantEdgeTest, ConstantEdge_constructQuadraticForm_robust)
+{
+  EdgeTester<Edge3Dynamic> dynamic;
+  EdgeTester<Edge3Constant> constant;
+
+  dynamic.edge.setMeasurement(g2o::Vector2{.3, 3.4});
+  constant.edge.setMeasurement(g2o::Vector2{.3, 3.4});
 
   g2o::RobustKernelHuber* rk_dynamic = new g2o::RobustKernelHuber;
-  e_dynamic->setRobustKernel(rk_dynamic);
-  e_dynamic->computeError();
-  e_dynamic->linearizeOplus(jacobianWorkspace_dynamic);
-  e_dynamic->constructQuadraticForm();
+  dynamic.edge.setRobustKernel(rk_dynamic);
+  dynamic.edge.computeError();
+  dynamic.edge.linearizeOplus(dynamic.jacobianWorkspace);
+  dynamic.edge.constructQuadraticForm();
 
   g2o::RobustKernelHuber* rk_constant = new g2o::RobustKernelHuber;
-  e_constant->setRobustKernel(rk_constant);
-  e_constant->computeError();
-  e_constant->linearizeOplus(jacobianWorkspace_constant);
-  e_constant->constructQuadraticForm();
-  ASSERT_EQ(true, (e_dynamic->error() - e_constant->error()).norm() < 1e-7);
-  ASSERT_DOUBLE_EQ(0.0, (Eigen::Map<g2o::MatrixX>(jacobianWorkspace_dynamic.workspaceForVertex(0), 2, 3)
-                       - Eigen::Map<g2o::MatrixX>(jacobianWorkspace_constant.workspaceForVertex(0), 2, 3)).norm());
-  ASSERT_DOUBLE_EQ(0.0, (hessian00_dynamic - hessian00_constant).norm());
-  ASSERT_DOUBLE_EQ(0.0, (hessian11_dynamic - hessian11_constant).norm());
-  ASSERT_DOUBLE_EQ(0.0, (hessian22_dynamic - hessian22_constant).norm());
-  ASSERT_DOUBLE_EQ(0.0, (hessian01_dynamic - hessian01_constant).norm());
-  ASSERT_DOUBLE_EQ(0.0, (hessian02_dynamic - hessian02_constant).norm());
-  ASSERT_DOUBLE_EQ(0.0, (hessian12_dynamic - hessian12_constant).norm());
+  constant.edge.setRobustKernel(rk_constant);
+  constant.edge.computeError();
+  constant.edge.linearizeOplus(constant.jacobianWorkspace);
+  constant.edge.constructQuadraticForm();
+  ASSERT_EQ(true, (dynamic.edge.error() - constant.edge.error()).norm() < 1e-7);
+  ASSERT_DOUBLE_EQ(0.0, (Eigen::Map<g2o::MatrixX>(dynamic.jacobianWorkspace.workspaceForVertex(0), 2, 3)
+                       - Eigen::Map<g2o::MatrixX>(constant.jacobianWorkspace.workspaceForVertex(0), 2, 3)).norm());
+  ASSERT_DOUBLE_EQ(0.0, (dynamic.hessian00 - constant.hessian00).norm());
+  ASSERT_DOUBLE_EQ(0.0, (dynamic.hessian11 - constant.hessian11).norm());
+  ASSERT_DOUBLE_EQ(0.0, (dynamic.hessian22 - constant.hessian22).norm());
+  ASSERT_DOUBLE_EQ(0.0, (dynamic.hessian01 - constant.hessian01).norm());
+  ASSERT_DOUBLE_EQ(0.0, (dynamic.hessian02 - constant.hessian02).norm());
+  ASSERT_DOUBLE_EQ(0.0, (dynamic.hessian12 - constant.hessian12).norm());
 }
 
 // check rowMajor
