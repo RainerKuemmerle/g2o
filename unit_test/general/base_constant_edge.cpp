@@ -33,7 +33,6 @@
 #include "g2o/core/robust_kernel_impl.h"
 
 // create 2 classes with 3 vertices, one based on multi and one based on constant edge class
-// try out all members
 
 class Edge3Constant : public g2o::BaseConstantEdge<2, g2o::Vector2, g2o::VertexSE2, g2o::VertexSE2, g2o::VertexPointXY>
 {
@@ -98,6 +97,9 @@ TEST(General, ConstantEdgeConstructor)
   ASSERT_EQ(typeid(Edge3Dynamic::InformationType), typeid(Edge3Constant::InformationType));
 
   Edge3Constant e_constant;
+  ASSERT_EQ(e_constant.vertices()[0], nullptr);
+  ASSERT_EQ(e_constant.vertices()[1], nullptr);
+  ASSERT_EQ(e_constant.vertices()[2], nullptr);
   Edge3Dynamic e_dynamic;
   ASSERT_EQ(e_dynamic.vertices()[0], e_constant.vertices()[0]);
   ASSERT_EQ(e_dynamic.vertices()[1], e_constant.vertices()[1]);
