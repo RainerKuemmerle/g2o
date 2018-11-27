@@ -252,4 +252,46 @@ TEST(ConstantEdgeTest, ConstantEdge_constructQuadraticForm_robust)
   ASSERT_DOUBLE_EQ(0.0, (dynamic.hessian12 - constant.hessian12).norm());
 }
 
-// check rowMajor
+TEST(ConstantEdgeTest, ConstantEdge_constructQuadraticForm_rowMajor)
+{
+  EdgeTester<Edge3Dynamic> dynamic;
+  EdgeTester<Edge3Constant> constant;
+  dynamic.edge.mapHessianMemory(dynamic.hessian01.data(), 0, 1, true);
+  Eigen::Matrix<number_t, 2, 3> hessian20_dynamic;
+  Eigen::Matrix<number_t, 2, 3> hessian21_dynamic;
+  hessian20_dynamic.setZero();
+  hessian21_dynamic.setZero();
+  dynamic.edge.mapHessianMemory(hessian20_dynamic.data(), 0, 2, true);
+  dynamic.edge.mapHessianMemory(hessian21_dynamic.data(), 1, 2, true);
+
+  constant.edge.mapHessianMemory(constant.hessian01.data(), 0, 1, true);
+  Eigen::Matrix<number_t, 2, 3> hessian20_constant;
+  Eigen::Matrix<number_t, 2, 3> hessian21_constant;
+  hessian20_constant.setZero();
+  hessian21_constant.setZero();
+  constant.edge.mapHessianMemory(hessian20_constant.data(), 0, 2, true);
+  constant.edge.mapHessianMemory(hessian21_constant.data(), 1, 2, true);
+
+  dynamic.edge.computeError();
+  constant.edge.computeError();
+  dynamic.edge.linearizeOplus(dynamic.jacobianWorkspace);
+  constant.edge.linearizeOplus(constant.jacobianWorkspace);
+
+  dynamic.edge.constructQuadraticForm();
+  constant.edge.constructQuadraticForm();
+
+  ASSERT_DOUBLE_EQ(0.0, (dynamic.hessian00 - constant.hessian00).norm());
+  ASSERT_DOUBLE_EQ(0.0, (dynamic.hessian11 - constant.hessian11).norm());
+  ASSERT_DOUBLE_EQ(0.0, (dynamic.hessian22 - constant.hessian22).norm());
+  ASSERT_DOUBLE_EQ(0.0, (dynamic.hessian01 - constant.hessian01).norm());
+  ASSERT_DOUBLE_EQ(0.0, (hessian20_dynamic - hessian20_constant).norm());
+  ASSERT_DOUBLE_EQ(0.0, (hessian21_dynamic - hessian21_constant).norm());
+
+  EdgeTester<Edge3Constant> constant_colMajor;
+  constant_colMajor.edge.computeError();
+  constant_colMajor.edge.linearizeOplus(constant_colMajor.jacobianWorkspace);
+  constant_colMajor.edge.constructQuadraticForm();
+  ASSERT_DOUBLE_EQ(0.0, (constant_colMajor.hessian01 - constant.hessian01.transpose()).norm());
+  ASSERT_DOUBLE_EQ(0.0, (constant_colMajor.hessian02 - hessian20_constant.transpose()).norm());
+  ASSERT_DOUBLE_EQ(0.0, (constant_colMajor.hessian12 - hessian21_constant.transpose()).norm());
+}
