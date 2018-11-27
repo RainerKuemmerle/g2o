@@ -24,39 +24,29 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include <tuple>
-namespace g2o {
+#include "gtest/gtest.h"
 
-template<int I>
-struct Tuple_apply_i
-{
-  template<typename F, typename T>
-  void operator()(F&& f, T& t, int i)
-  {
-    if(i == I - 1)
-      f(std::get<I - 1>(t));
-    else
-      Tuple_apply_i<I - 1>()(f, t, i);
-  }
-};
+#include "g2o/stuff/tuple_tools.h"
 
-template<>
-struct Tuple_apply_i<0>
-{
-  template<typename F, typename T>
-  void operator()(F&&, T&, int) { }
-};
-
-template<typename F, typename T>
-void tuple_apply_i(F&& f, T& t, int i)
-{
-  Tuple_apply_i<std::tuple_size<T>::value>()(f, t, i);
+TEST(Stuff, Tuple_init)
+{ 
+  std::tuple<int, int, int> not_initialized;
+  auto initialized = g2o::tuple_init(1, not_initialized);
+  ASSERT_EQ(1, std::get<0>(initialized));
+  ASSERT_EQ(1, std::get<1>(initialized));
+  ASSERT_EQ(1, std::get<2>(initialized));
 }
 
-template<typename Value, typename... Ts2>
-std::tuple<Ts2...> tuple_init(const Value& value, const std::tuple<Ts2...>)
-{
-  return std::tuple<Ts2...>{Ts2{value}...};
+TEST(Stuff, Tuple_apply)
+{ 
+  auto t = std::make_tuple(1, 2, 3);
+  ASSERT_EQ(1, std::get<0>(t));
+  ASSERT_EQ(2, std::get<1>(t));
+  ASSERT_EQ(3, std::get<2>(t));
+  auto plus_one = [](int& i){++i;};
+  g2o::tuple_apply_i(plus_one, t, 1);
+  ASSERT_EQ(1, std::get<0>(t));
+  ASSERT_EQ(3, std::get<1>(t));
+  ASSERT_EQ(3, std::get<2>(t));
 }
 
-} // end namespace
