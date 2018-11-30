@@ -110,8 +110,6 @@ void BaseConstantEdge<D, E, VertexTypes...>::constructOffDiagonalQuadraticFormM(
   constexpr auto toId = N + M + 1;
   if (!(vertexXn<toId>()->fixed())) {
     const auto& B = std::get<toId>(_jacobianOplus);
-
-    // shouldn't vertices be locked to prevent writing in jacobians while reading them?
     constexpr auto K = internal::pair_to_index(fromId, toId);
     if (_hessianRowMajor) { // we have to write to the block as transposed
       auto& hessianTransposed = std::get<K>(_hessianTupleTransposed);
