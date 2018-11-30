@@ -54,7 +54,7 @@ void tuple_apply_i(F&& f, T& t, int i)
 }
 
 template<typename Value, typename... Ts2>
-std::tuple<Ts2...> tuple_init(const Value& value, const std::tuple<Ts2...>)
+std::tuple<Ts2...> tuple_init(const Value& value, const std::tuple<Ts2...>&)
 {
   return std::tuple<Ts2...>{Ts2{value}...};
 }
