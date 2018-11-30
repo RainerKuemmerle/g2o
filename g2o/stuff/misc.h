@@ -222,15 +222,10 @@ namespace internal {
   template <typename T>
   constexpr T sqrt_helper(T x, T lo, T hi)
   {
-    if (lo == hi)
-      return lo;
-
-    const T mid = (lo + hi + 1) / 2;
-
-    if (x / mid < mid)
-      return sqrt_helper<T>(x, lo, mid - 1);
-    else
-      return sqrt_helper(x, mid, hi);
+    return lo == hi ? lo :
+    ((x / ((lo + hi + 1) / 2) < ((lo + hi + 1) / 2))
+    ? sqrt_helper<T>(x, lo, ((lo + hi + 1) / 2)- 1)
+    : sqrt_helper(x, ((lo + hi + 1) / 2), hi));
   }
 }
 
@@ -243,6 +238,16 @@ constexpr T ct_sqrt(T x)
 {
   return internal::sqrt_helper<T>(x, 0, x / 2 + 1);
 }
+
+template<std::size_t... S>
+struct index_sequence
+{};
+
+template<int N, int ...S> struct Make_index_sequence : Make_index_sequence<N-1, N-1, S...> {};
+template<int ...S> struct Make_index_sequence<0, S...>{ using type = index_sequence<S...>; };
+
+template<int N>
+using make_index_sequence = typename Make_index_sequence<N>::type;
 
 } // end namespace
 

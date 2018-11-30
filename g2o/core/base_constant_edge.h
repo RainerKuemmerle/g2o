@@ -51,9 +51,7 @@ namespace g2o {
 
     constexpr std::pair<int, int> index_to_pair(const int k)
     {
-      const int j = ct_sqrt(2*(k+1))+.5;
-      const int i = k - j * (j - 1) / 2;
-      return {i, j};
+      return {k - static_cast<int>(ct_sqrt(2*(k+1))+.5) * (static_cast<int>(ct_sqrt(2*(k+1))+.5) - 1) / 2, ct_sqrt(2*(k+1))+.5};
     }
   }
 
@@ -68,12 +66,12 @@ namespace g2o {
       template<int VertexN>
       static constexpr int VertexDimension() { return VertexXnType<VertexN>::Dimension; };
       template<int VertexN>
-      const auto vertexXn() const
+      const VertexXnType<VertexN>* vertexXn() const
       {
         return static_cast<const VertexXnType<VertexN>*>(_vertices[VertexN]);
       }
       template<int VertexN>
-      auto vertexXn()
+      VertexXnType<VertexN>* vertexXn()
       {
         return static_cast<VertexXnType<VertexN>*>(_vertices[VertexN]);
       }
@@ -96,15 +94,15 @@ namespace g2o {
       using HessianBlockTypeKTransposed = HessianBlockType<VertexDimension<internal::index_to_pair(K).second>(), VertexDimension<internal::index_to_pair(K).first>()>;
       template<typename> struct HessianTupleType;
       template<std::size_t... Ints >
-      struct HessianTupleType<std::integer_sequence<std::size_t, Ints...>>
+      struct HessianTupleType<index_sequence<Ints...>>
       {
         using type = std::tuple<HessianBlockTypeK<Ints>...>;
         using typeTransposed = std::tuple<HessianBlockTypeKTransposed<Ints>...>;
       };
-      static const auto _nr_of_vertices = sizeof...(VertexTypes);
-      static const auto _nr_of_vertex_pairs = internal::pair_to_index(0, _nr_of_vertices);
-      using HessianTuple = typename HessianTupleType<std::make_index_sequence<_nr_of_vertex_pairs>>::type;
-      using HessianTupleTransposed = typename HessianTupleType<std::make_index_sequence<_nr_of_vertex_pairs>>::typeTransposed;
+      static const std::size_t _nr_of_vertices = sizeof...(VertexTypes);
+      static const std::size_t _nr_of_vertex_pairs = internal::pair_to_index(0, _nr_of_vertices);
+      using HessianTuple = typename HessianTupleType<make_index_sequence<_nr_of_vertex_pairs>>::type;
+      using HessianTupleTransposed = typename HessianTupleType<make_index_sequence<_nr_of_vertex_pairs>>::typeTransposed;
 
       BaseConstantEdge() : BaseEdge<D,E>(),
       _hessianRowMajor(false),
@@ -124,32 +122,37 @@ namespace g2o {
       inline virtual void resize(size_t size);
 
       template<std::size_t... Ints >
-      bool allVerticesFixedNs(std::integer_sequence<std::size_t, Ints...>) const;
+      bool allVerticesFixedNs(index_sequence<Ints...>) const;
       inline virtual bool allVerticesFixed() const;
 
       inline virtual void linearizeOplus(JacobianWorkspace& jacobianWorkspace);
-      template<int... Ints>
-      void linearizeOplus_allocate(JacobianWorkspace& jacobianWorkspace, std::integer_sequence<int, Ints...>);
+      template<std::size_t... Ints>
+      void linearizeOplus_allocate(JacobianWorkspace& jacobianWorkspace, index_sequence<Ints...>);
 
       /**
        * Linearizes the oplus operator in the vertex, and stores
        * the result in temporary variables _jacobianOplus
        */
       inline virtual void linearizeOplus();
-      template<int... Ints>
-      void linearizeOplusNs(std::integer_sequence<int, Ints...>);
+      template<std::size_t... Ints>
+      void linearizeOplusNs(index_sequence<Ints...>);
       template<int N>
       void linearizeOplusN();
 
       //! returns the result of the linearization in the manifold space for the nodes xn
       template<int N>
-      const auto& jacobianOplusXn() const { return std::get<N>(_jacobianOplus);}
+      const typename std::tuple_element<N, std::tuple<JacobianType<D, VertexTypes::Dimension>...>>::type&
+        jacobianOplusXn() const { return std::get<N>(_jacobianOplus);}
 
-      inline virtual void constructQuadraticForm() ;
-      template<int... Ints>
-      void constructQuadraticFormKs(std::integer_sequence<int, Ints...>);
-      template<int K>
-      void constructQuadraticFormK();
+      inline virtual void constructQuadraticForm();
+      template<std::size_t... Ints>
+      void constructQuadraticFormNs(const InformationType& omega, const ErrorVector& weightedError, index_sequence<Ints...>);
+      template<int N>
+      void constructQuadraticFormN(const InformationType& omega, const ErrorVector& weightedError);
+      template<int N, std::size_t... Ints, typename AtOType>
+      void constructOffDiagonalQuadraticFormMs(const AtOType& AtO, index_sequence<Ints...>);
+      template<int N, int M, typename AtOType>
+      void constructOffDiagonalQuadraticFormM(const AtOType& AtO);
 
       inline virtual void mapHessianMemory(number_t* d, int i, int j, bool rowMajor);
 

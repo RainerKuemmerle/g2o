@@ -1,5 +1,5 @@
 // g2o - General Graph Optimization
-// Copyright (C) 2011 R. Kuemmerle, G. Grisetti, H. Strasdat, W. Burgard
+// Copyright (C) 2011 R. Kuemmerle, G. Grisetti, W. Burgard
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -24,26 +24,29 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef G2O_BASE_BINARY_EDGE_H
-#define G2O_BASE_BINARY_EDGE_H
+#include "gtest/gtest.h"
 
-#include "base_constant_edge.h"
+#include "g2o/stuff/tuple_tools.h"
 
-namespace g2o {
-
-	// This could be a simple using statement, but in multiple places
-	// _jacobianOplusXi and _jacobianOplusYi are used.
-  template <int D, typename E, typename VertexXi, typename VertexXj>
-  class BaseBinaryEdge : public BaseConstantEdge<D, E, VertexXi, VertexXj>
-  {
-  public:
-      using VertexXiType = VertexXi;
-      using VertexXjType = VertexXj;
-      BaseBinaryEdge() : BaseConstantEdge<D,E, VertexXi, VertexXj>() {};
-      typename BaseConstantEdge<D, E, VertexXi, VertexXj>::template JacobianType<D, VertexXi::Dimension>& _jacobianOplusXi = std::get<0>(this->_jacobianOplus);
-      typename BaseConstantEdge<D, E, VertexXi, VertexXj>::template JacobianType<D, VertexXj::Dimension>& _jacobianOplusXj = std::get<1>(this->_jacobianOplus);
-  };
-
+TEST(Stuff, Tuple_init)
+{ 
+  std::tuple<int, int, int> not_initialized;
+  auto initialized = g2o::tuple_init(1, not_initialized);
+  ASSERT_EQ(1, std::get<0>(initialized));
+  ASSERT_EQ(1, std::get<1>(initialized));
+  ASSERT_EQ(1, std::get<2>(initialized));
 }
 
-#endif
+TEST(Stuff, Tuple_apply)
+{ 
+  auto t = std::make_tuple(1, 2, 3);
+  ASSERT_EQ(1, std::get<0>(t));
+  ASSERT_EQ(2, std::get<1>(t));
+  ASSERT_EQ(3, std::get<2>(t));
+  auto plus_one = [](int& i){++i;};
+  g2o::tuple_apply_i(plus_one, t, 1);
+  ASSERT_EQ(1, std::get<0>(t));
+  ASSERT_EQ(3, std::get<1>(t));
+  ASSERT_EQ(3, std::get<2>(t));
+}
+

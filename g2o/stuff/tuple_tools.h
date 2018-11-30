@@ -34,9 +34,9 @@ struct Tuple_apply_i
   void operator()(F&& f, T& t, int i)
   {
     if(i == I - 1)
-      return f(std::get<I - 1>(t));
+      f(std::get<I - 1>(t));
     else
-      return Tuple_apply_i<I - 1>()(f, t, i);
+      Tuple_apply_i<I - 1>()(f, t, i);
   }
 };
 
@@ -54,7 +54,7 @@ void tuple_apply_i(F&& f, T& t, int i)
 }
 
 template<typename Value, typename... Ts2>
-auto tuple_init(const Value& value, const std::tuple<Ts2...>)
+std::tuple<Ts2...> tuple_init(const Value& value, const std::tuple<Ts2...>)
 {
   return std::tuple<Ts2...>{Ts2{value}...};
 }

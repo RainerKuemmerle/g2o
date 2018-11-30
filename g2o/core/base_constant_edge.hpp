@@ -48,7 +48,7 @@ private:
   OptimizableGraph::Vertex& _vertex;
 };
 
-} // anonymous namespace
+} // namespace internal
 
 template <int D, typename E, typename... VertexTypes>
 void BaseConstantEdge<D, E, VertexTypes...>::resize(size_t size)
@@ -59,133 +59,116 @@ void BaseConstantEdge<D, E, VertexTypes...>::resize(size_t size)
 
 template <int D, typename E, typename... VertexTypes>
 template<std::size_t... Ints >
-bool BaseConstantEdge<D, E, VertexTypes...>::allVerticesFixedNs(std::integer_sequence<std::size_t, Ints...>) const
+bool BaseConstantEdge<D, E, VertexTypes...>::allVerticesFixedNs(index_sequence<Ints...>) const
 {
-  return ( ... && vertexXn<Ints>()->fixed());
+  bool fixed[] = { vertexXn<Ints>()->fixed()... };
+  return std::all_of(std::begin(fixed), std::end(fixed), [](bool value){ return value; });
 }
 
 template <int D, typename E, typename... VertexTypes>
 bool BaseConstantEdge<D, E, VertexTypes...>::allVerticesFixed() const
 {
-  return allVerticesFixedNs(std::make_index_sequence<_nr_of_vertices>());
+  return allVerticesFixedNs(make_index_sequence<_nr_of_vertices>());
 }
 
 template <int D, typename E, typename... VertexTypes>
 void BaseConstantEdge<D, E, VertexTypes...>::constructQuadraticForm()
 {
-  constructQuadraticFormKs(std::make_integer_sequence<int, _nr_of_vertex_pairs>());
+  if (this->robustKernel()) {
+    number_t error = this->chi2();
+    Vector3 rho;
+    this->robustKernel()->robustify(error, rho);
+    Eigen::Matrix<number_t, D, 1, Eigen::ColMajor> omega_r = - _information * _error;
+    omega_r *= rho[1];
+    constructQuadraticFormNs(this->robustInformation(rho), omega_r, make_index_sequence<_nr_of_vertices>());
+  } else {
+    constructQuadraticFormNs(_information, - _information * _error, make_index_sequence<_nr_of_vertices>());
+  }
 }
 
 template <int D, typename E, typename... VertexTypes>
-template<int... Ints>
-void BaseConstantEdge<D, E, VertexTypes...>::constructQuadraticFormKs(std::integer_sequence<int, Ints...>)
+template<std::size_t... Ints>
+void BaseConstantEdge<D, E, VertexTypes...>::constructQuadraticFormNs(const InformationType& omega, const ErrorVector& weightedError, index_sequence<Ints...>)
 {
-  ( void(constructQuadraticFormK<Ints>()), ...);
+  int unused[] = { (constructQuadraticFormN<Ints>(omega, weightedError), 0) ... };
+  (void)unused;
 }
 
 template <int D, typename E, typename... VertexTypes>
-template<int K>
-void BaseConstantEdge<D, E, VertexTypes...>::constructQuadraticFormK()
+template<int N, std::size_t... Ints, typename AtOType>
+void BaseConstantEdge<D, E, VertexTypes...>::constructOffDiagonalQuadraticFormMs(const AtOType& AtO, index_sequence<Ints...>)
 {
-  constexpr auto NM = internal::index_to_pair(K);
+  int unused[] = { (constructOffDiagonalQuadraticFormM<N, Ints, AtOType>(AtO), 0) ... };
+  (void)unused;
+}
 
-  auto from = vertexXn<NM.first>();
-  auto to = vertexXn<NM.second>();
-  auto& A = std::get<NM.first>(_jacobianOplus);
-  auto& B = std::get<NM.second>(_jacobianOplus);
-  auto& hessian = std::get<K>(_hessianTuple);
-  auto& hessianTransposed = std::get<K>(_hessianTupleTransposed);
-
-  bool fromNotFixed = !(from->fixed());
-  bool toNotFixed = !(to->fixed());
-
-  if (fromNotFixed || toNotFixed) {
-    const auto& omega = this->information();
-    auto omega_r = (- omega * this->error()).eval();
-    if (this->robustKernel() == 0) {
-      if (fromNotFixed) {
-        auto AtO = A.transpose() * omega;
-
-        {
-          internal::QuadraticFormLock lck(*from);
-
-          from->b().noalias() += A.transpose() * omega_r;
-          from->A().noalias() += AtO*A;
-        }
-
-        if (toNotFixed ) {
-          if (_hessianRowMajor) // we have to write to the block as transposed
-            hessianTransposed.noalias() += B.transpose() * AtO.transpose();
-          else
-            hessian.noalias() += AtO * B;
-        }
-      }
-      if (toNotFixed) {
-        internal::QuadraticFormLock lck(*to);
-
-        to->b().noalias() += B.transpose() * omega_r;
-        to->A().noalias() += B.transpose() * omega * B;
-      }
-    } else { // robust (weighted) error according to some kernel
-      number_t error = this->chi2();
-      Vector3 rho;
-      this->robustKernel()->robustify(error, rho);
-      auto weightedOmega = rho[1] * omega; // this->robustInformation(rho);
-      //std::cout << PVAR(rho.transpose()) << std::endl;
-      //std::cout << PVAR(weightedOmega) << std::endl;
-
-      omega_r *= rho[1];
-      if (fromNotFixed) {
-        {
-          internal::QuadraticFormLock lck(*from);
-
-          from->b().noalias() += A.transpose() * omega_r;
-          from->A().noalias() += A.transpose() * weightedOmega * A;
-        }
-
-        if (toNotFixed ) {
-          if (_hessianRowMajor) // we have to write to the block as transposed
-            hessianTransposed.noalias() += B.transpose() * weightedOmega * A;
-          else
-            hessian.noalias() += A.transpose() * weightedOmega * B;
-        }
-      }
-      if (toNotFixed) {
-        internal::QuadraticFormLock lck(*to);
-
-        to->b().noalias() += B.transpose() * omega_r;
-        to->A().noalias() += B.transpose() * weightedOmega * B;
-      }
+template <int D, typename E, typename... VertexTypes>
+template<int N, int M, typename AtOType>
+void BaseConstantEdge<D, E, VertexTypes...>::constructOffDiagonalQuadraticFormM(const AtOType& AtO)
+{
+  constexpr auto fromId = N;
+  constexpr auto toId = N + M + 1;
+  if (!(vertexXn<toId>()->fixed())) {
+    const auto& B = std::get<toId>(_jacobianOplus);
+    constexpr auto K = internal::pair_to_index(fromId, toId);
+    if (_hessianRowMajor) { // we have to write to the block as transposed
+      auto& hessianTransposed = std::get<K>(_hessianTupleTransposed);
+      hessianTransposed.noalias() += B.transpose() * AtO.transpose();
+    } else {
+      auto& hessian = std::get<K>(_hessianTuple);
+      hessian.noalias() +=  AtO * B;
     }
+  }
+}
+
+template <int D, typename E, typename... VertexTypes>
+template<int N>
+void BaseConstantEdge<D, E, VertexTypes...>::constructQuadraticFormN(const InformationType& omega, const ErrorVector& weightedError)
+{
+  auto from = vertexXn<N>();
+  const auto& A = std::get<N>(_jacobianOplus);
+
+  if (!(from->fixed())) {
+    const auto AtO = A.transpose() * omega;
+    {
+      internal::QuadraticFormLock lck(*from);
+      from->b().noalias() += A.transpose() * weightedError;
+      from->A().noalias() += AtO*A;
+    }
+    constructOffDiagonalQuadraticFormMs<N>(AtO, make_index_sequence<_nr_of_vertices - N - 1>());
   }
 };
 
 template <int D, typename E, typename... VertexTypes>
 void BaseConstantEdge<D, E, VertexTypes...>::linearizeOplus(JacobianWorkspace& jacobianWorkspace)
 {
-  linearizeOplus_allocate(jacobianWorkspace, std::make_integer_sequence<int, _nr_of_vertices>());
+  linearizeOplus_allocate(jacobianWorkspace, make_index_sequence<_nr_of_vertices>());
   linearizeOplus();
 }
 
 template <int D, typename E, typename... VertexTypes>
-template<int... Ints>
-void BaseConstantEdge<D, E, VertexTypes...>::linearizeOplus_allocate(JacobianWorkspace& jacobianWorkspace, std::integer_sequence<int, Ints...>)
+template<std::size_t... Ints>
+void BaseConstantEdge<D, E, VertexTypes...>::linearizeOplus_allocate(JacobianWorkspace& jacobianWorkspace, index_sequence<Ints...>)
 {
-  ( new (&std::get<Ints>(_jacobianOplus)) JacobianType<D, VertexDimension<Ints>()>(jacobianWorkspace.workspaceForVertex(Ints), D < 0 ? _dimension : D, VertexDimension<Ints>()) , ...);
+  int unused[] = {
+  ( new (&std::get<Ints>(_jacobianOplus)) JacobianType<D, VertexDimension<Ints>()>(jacobianWorkspace.workspaceForVertex(Ints), D < 0 ? _dimension : D, VertexDimension<Ints>()) , 0 )
+  ... };
+  (void)unused;
 }
 
 template <int D, typename E, typename... VertexTypes>
 template<int N>
 void BaseConstantEdge<D, E, VertexTypes...>::linearizeOplusN()
 {
-  auto& jacobianOplus = std::get<N>(_jacobianOplus);
   auto vertex = vertexXn<N>();
-
-  const number_t delta = cst(1e-9);
-  const number_t scalar = 1 / (2*delta);
-
   bool iNotFixed = !(vertex->fixed());
+
   if (iNotFixed) {
+    auto& jacobianOplus = std::get<N>(_jacobianOplus);
+
+    const number_t delta = cst(1e-9);
+    const number_t scalar = 1 / (2*delta);
+
     internal::QuadraticFormLock lck(*vertex);
     // estimate the jacobian numerically
     number_t add_vertex[VertexDimension<N>()] = {};
@@ -212,34 +195,43 @@ void BaseConstantEdge<D, E, VertexTypes...>::linearizeOplusN()
 };
 
 template <int D, typename E, typename... VertexTypes>
-template <int... Ints>
-void BaseConstantEdge<D, E, VertexTypes...>::linearizeOplusNs(std::integer_sequence<int, Ints...>)
+template <std::size_t... Ints>
+void BaseConstantEdge<D, E, VertexTypes...>::linearizeOplusNs(index_sequence<Ints...>)
 {
-  ( void(linearizeOplusN<Ints>()), ...);
+  int unused[] = { (linearizeOplusN<Ints>(), 0) ... };
+  (void)unused;
 }
 
 template <int D, typename E, typename... VertexTypes>
 void BaseConstantEdge<D, E, VertexTypes...>::linearizeOplus()
 {
-  // todo:
-  //if (!iNotFixed && !jNotFixed)
-  //  return;
+  if(allVerticesFixed())
+    return;
 
   ErrorVector errorBeforeNumeric = _error;
 
-  linearizeOplusNs(std::make_integer_sequence<int, _nr_of_vertices>());
+  linearizeOplusNs(make_index_sequence<_nr_of_vertices>());
 
   _error = errorBeforeNumeric;
 }
 
+struct MapHessianMemoryK
+{
+  number_t* d;
+  template<typename HessianT>
+  void operator()(HessianT& hessian)
+  {
+    new (&hessian) typename std::remove_reference<decltype(hessian)>::type(d);
+  }
+};
+
 template <int D, typename E, typename... VertexTypes>
 void BaseConstantEdge<D, E, VertexTypes...>::mapHessianMemory(number_t* d, int i, int j, bool rowMajor)
 {
-  auto f = [d](auto& hessian){ new (&hessian) std::remove_reference_t<decltype(hessian)>(d); };
   if(rowMajor)
-    tuple_apply_i(f, _hessianTupleTransposed, internal::pair_to_index(i, j));
+    tuple_apply_i(MapHessianMemoryK{d}, _hessianTupleTransposed, internal::pair_to_index(i, j));
   else
-    tuple_apply_i(f, _hessianTuple, internal::pair_to_index(i, j));
+    tuple_apply_i(MapHessianMemoryK{d}, _hessianTuple, internal::pair_to_index(i, j));
 
   _hessianRowMajor = rowMajor;
 }

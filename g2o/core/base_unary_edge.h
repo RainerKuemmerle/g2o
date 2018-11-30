@@ -37,6 +37,7 @@ namespace g2o {
   class BaseUnaryEdge : public BaseConstantEdge<D, E, VertexXi>
   {
   public:
+      using VertexXiType = VertexXi;
       BaseUnaryEdge() : BaseConstantEdge<D,E, VertexXi>() {};
       typename BaseConstantEdge<D, E, VertexXi>::template JacobianType<D, VertexXi::Dimension>& _jacobianOplusXi = std::get<0>(this->_jacobianOplus);
   };
