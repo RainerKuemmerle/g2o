@@ -32,8 +32,6 @@
 #include "g2o/types/slam2d/vertex_point_xy.h"
 #include "g2o/core/robust_kernel_impl.h"
 
-// create 2 classes with 3 vertices, one based on multi and one based on constant edge class
-
 class Edge3Constant : public g2o::BaseConstantEdge<2, g2o::Vector2, g2o::VertexSE2, g2o::VertexSE2, g2o::VertexPointXY>
 {
   public:

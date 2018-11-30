@@ -48,7 +48,7 @@ private:
   OptimizableGraph::Vertex& _vertex;
 };
 
-} // anonymous namespace
+} // namespace internal
 
 template <int D, typename E, typename... VertexTypes>
 void BaseConstantEdge<D, E, VertexTypes...>::resize(size_t size)
@@ -162,14 +162,15 @@ template <int D, typename E, typename... VertexTypes>
 template<int N>
 void BaseConstantEdge<D, E, VertexTypes...>::linearizeOplusN()
 {
-  auto& jacobianOplus = std::get<N>(_jacobianOplus);
   auto vertex = vertexXn<N>();
-
-  const number_t delta = cst(1e-9);
-  const number_t scalar = 1 / (2*delta);
-
   bool iNotFixed = !(vertex->fixed());
+
   if (iNotFixed) {
+    auto& jacobianOplus = std::get<N>(_jacobianOplus);
+
+    const number_t delta = cst(1e-9);
+    const number_t scalar = 1 / (2*delta);
+
     internal::QuadraticFormLock lck(*vertex);
     // estimate the jacobian numerically
     number_t add_vertex[VertexDimension<N>()] = {};
@@ -206,9 +207,8 @@ void BaseConstantEdge<D, E, VertexTypes...>::linearizeOplusNs(index_sequence<Int
 template <int D, typename E, typename... VertexTypes>
 void BaseConstantEdge<D, E, VertexTypes...>::linearizeOplus()
 {
-  // todo:
-  //if (!iNotFixed && !jNotFixed)
-  //  return;
+  if(allVerticesFixed())
+    return;
 
   ErrorVector errorBeforeNumeric = _error;
 
