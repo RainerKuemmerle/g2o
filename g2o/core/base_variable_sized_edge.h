@@ -170,7 +170,7 @@ namespace g2o {
     };
 
 
-#include "base_multi_edge.hpp"
+#include "base_variable_sized_edge.hpp"
 
 } // end namespace g2o
 

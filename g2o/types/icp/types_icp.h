@@ -32,7 +32,7 @@
 
 #include "g2o/core/base_vertex.h"
 #include "g2o/core/base_binary_edge.h"
-#include "g2o/core/base_multi_edge.h"
+#include "g2o/core/base_variable_sized_edge.h"
 #include "g2o/types/sba/types_sba.h"
 #include "g2o/types/slam3d/types_slam3d.h"
 #include "g2o_types_icp_api.h"

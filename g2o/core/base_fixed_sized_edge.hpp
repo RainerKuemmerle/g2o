@@ -1,5 +1,5 @@
 // This code is based on g2o/core/base_binary_edge.hpp and
-// g2o/core/base_multi_edge.hpp
+// g2o/core/base_variable_sized_edge.hpp
 //
 // g2o - General Graph Optimization
 // Copyright (C) 2011 R. Kuemmerle, G. Grisetti, H. Strasdat, W. Burgard
