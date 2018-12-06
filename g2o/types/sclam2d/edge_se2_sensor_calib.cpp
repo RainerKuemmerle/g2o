@@ -31,7 +31,7 @@
 namespace g2o {
 
   EdgeSE2SensorCalib::EdgeSE2SensorCalib() :
-    BaseConstantEdge<3, SE2, VertexSE2, VertexSE2, VertexSE2>()
+    BaseFixedSizedEdge<3, SE2, VertexSE2, VertexSE2, VertexSE2>()
   {
   }
 

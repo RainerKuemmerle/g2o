@@ -32,11 +32,11 @@
 #include "g2o/types/slam2d/vertex_point_xy.h"
 #include "g2o/core/robust_kernel_impl.h"
 
-class Edge3Constant : public g2o::BaseConstantEdge<2, g2o::Vector2, g2o::VertexSE2, g2o::VertexSE2, g2o::VertexPointXY>
+class Edge3Constant : public g2o::BaseFixedSizedEdge<2, g2o::Vector2, g2o::VertexSE2, g2o::VertexSE2, g2o::VertexPointXY>
 {
   public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
-    Edge3Constant() : g2o::BaseConstantEdge<2, g2o::Vector2, g2o::VertexSE2, g2o::VertexSE2, g2o::VertexPointXY>() {};
+    Edge3Constant() : g2o::BaseFixedSizedEdge<2, g2o::Vector2, g2o::VertexSE2, g2o::VertexSE2, g2o::VertexPointXY>() {};
     void computeError()
     {
       const auto a = static_cast<const g2o::VertexSE2*>(_vertices[0])->estimate();

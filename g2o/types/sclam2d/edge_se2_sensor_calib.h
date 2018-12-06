@@ -36,7 +36,7 @@ namespace g2o {
   /**
    * \brief scanmatch measurement that also calibrates an offset for the laser
    */
-  class G2O_TYPES_SCLAM2D_API EdgeSE2SensorCalib : public BaseConstantEdge<3, SE2, VertexSE2, VertexSE2, VertexSE2>
+  class G2O_TYPES_SCLAM2D_API EdgeSE2SensorCalib : public BaseFixedSizedEdge<3, SE2, VertexSE2, VertexSE2, VertexSE2>
   {
     public:
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
