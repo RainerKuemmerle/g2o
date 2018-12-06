@@ -29,7 +29,7 @@
 namespace g2o {
 
   EdgeSE3Calib::EdgeSE3Calib() :
-    BaseMultiEdge<6, Isometry3>()
+    BaseVariableSizedEdge<6, Isometry3>()
   {
     resize(3);
   }

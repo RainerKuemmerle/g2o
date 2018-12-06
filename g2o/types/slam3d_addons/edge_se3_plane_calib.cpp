@@ -35,7 +35,7 @@ namespace g2o
   using namespace Eigen;
 
   EdgeSE3PlaneSensorCalib::EdgeSE3PlaneSensorCalib() :
-    BaseMultiEdge<3, Plane3D>()
+    BaseVariableSizedEdge<3, Plane3D>()
   {
     resize(3);
     color << cst(0.1), cst(0.1), cst(0.1);

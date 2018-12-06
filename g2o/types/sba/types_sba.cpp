@@ -406,7 +406,7 @@ namespace g2o {
 
   // point to camera projection, monocular
   EdgeProjectP2MC_Intrinsics::EdgeProjectP2MC_Intrinsics() :
-    BaseMultiEdge<2, Vector2>()
+    BaseVariableSizedEdge<2, Vector2>()
   {
     information().setIdentity();
     resize(3);

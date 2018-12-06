@@ -33,7 +33,7 @@
 
 namespace g2o{
 
-  EdgeSE2LotsOfXY::EdgeSE2LotsOfXY() : BaseMultiEdge<-1,VectorX>(){
+  EdgeSE2LotsOfXY::EdgeSE2LotsOfXY() : BaseVariableSizedEdge<-1,VectorX>(){
     resize(0);
   }
 

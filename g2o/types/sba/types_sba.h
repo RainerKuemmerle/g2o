@@ -251,7 +251,7 @@ class G2O_TYPES_SBA_API VertexIntrinsics : public BaseVertex<4, Eigen::Matrix<nu
 
 // monocular projection with parameter calibration
 // first two args are the measurement type, second two the connection classes
- class G2O_TYPES_SBA_API EdgeProjectP2MC_Intrinsics : public  BaseMultiEdge<2, Vector2> 
+ class G2O_TYPES_SBA_API EdgeProjectP2MC_Intrinsics : public  BaseVariableSizedEdge<2, Vector2> 
 {
   public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW

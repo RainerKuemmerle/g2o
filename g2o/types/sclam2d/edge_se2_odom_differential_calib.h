@@ -36,7 +36,7 @@
 
 namespace g2o {
 
-  class G2O_TYPES_SCLAM2D_API EdgeSE2OdomDifferentialCalib : public BaseMultiEdge<3, VelocityMeasurement>
+  class G2O_TYPES_SCLAM2D_API EdgeSE2OdomDifferentialCalib : public BaseVariableSizedEdge<3, VelocityMeasurement>
   {
     public:
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW;

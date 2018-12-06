@@ -36,7 +36,7 @@ namespace g2o {
   /**
    * \brief plane measurement that also calibrates an offset for the sensor
    */
-  class G2O_TYPES_SLAM3D_ADDONS_API EdgeSE3PlaneSensorCalib : public BaseMultiEdge<3, Plane3D>
+  class G2O_TYPES_SLAM3D_ADDONS_API EdgeSE3PlaneSensorCalib : public BaseVariableSizedEdge<3, Plane3D>
   {
     public:
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW;

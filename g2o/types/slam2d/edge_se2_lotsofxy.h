@@ -35,7 +35,7 @@
 
 namespace g2o {
 
-  class G2O_TYPES_SLAM2D_API EdgeSE2LotsOfXY : public BaseMultiEdge<-1,VectorX>
+  class G2O_TYPES_SLAM2D_API EdgeSE2LotsOfXY : public BaseVariableSizedEdge<-1,VectorX>
   {
     protected:
       unsigned int _observedPoints;

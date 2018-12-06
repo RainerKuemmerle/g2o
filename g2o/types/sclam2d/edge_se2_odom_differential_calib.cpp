@@ -33,7 +33,7 @@
 namespace g2o {
 
   EdgeSE2OdomDifferentialCalib::EdgeSE2OdomDifferentialCalib() :
-    BaseMultiEdge<3, VelocityMeasurement>()
+    BaseVariableSizedEdge<3, VelocityMeasurement>()
   {
     resize(3);
   }

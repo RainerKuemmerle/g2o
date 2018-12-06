@@ -34,7 +34,7 @@
 
 namespace g2o{
 
-  EdgeSE2TwoPointsXY::EdgeSE2TwoPointsXY() : BaseMultiEdge<4,Vector4>(){
+  EdgeSE2TwoPointsXY::EdgeSE2TwoPointsXY() : BaseVariableSizedEdge<4,Vector4>(){
     resize(3);
   }
 

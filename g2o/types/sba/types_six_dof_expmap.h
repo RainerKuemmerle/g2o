@@ -152,7 +152,7 @@ class G2O_TYPES_SBA_API EdgeProjectXYZ2UV : public  BaseBinaryEdge<2, Vector2, V
 };
 
 
-class G2O_TYPES_SBA_API EdgeProjectPSI2UV : public  g2o::BaseMultiEdge<2, Vector2>
+class G2O_TYPES_SBA_API EdgeProjectPSI2UV : public  g2o::BaseVariableSizedEdge<2, Vector2>
 {
 public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW

@@ -48,11 +48,11 @@ class Edge3Constant : public g2o::BaseFixedSizedEdge<2, g2o::Vector2, g2o::Verte
     virtual bool write(std::ostream&) const {return false;};
 };
 
-class Edge3Dynamic : public g2o::BaseMultiEdge<2, g2o::Vector2>
+class Edge3Dynamic : public g2o::BaseVariableSizedEdge<2, g2o::Vector2>
 {
   public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
-    Edge3Dynamic() : g2o::BaseMultiEdge<2, g2o::Vector2>()
+    Edge3Dynamic() : g2o::BaseVariableSizedEdge<2, g2o::Vector2>()
     {
       resize(3);
     };
