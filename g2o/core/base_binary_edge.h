@@ -27,7 +27,7 @@
 #ifndef G2O_BASE_BINARY_EDGE_H
 #define G2O_BASE_BINARY_EDGE_H
 
-#include "base_constant_edge.h"
+#include "base_fixed_sized_edge.h"
 
 namespace g2o {
 

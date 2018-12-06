@@ -1,5 +1,5 @@
 // This code is based on g2o/core/base_binary_edge.h and
-// g2o/core/base_multi_edge.h
+// g2o/core/base_variable_sized_edge.h
 //
 // g2o - General Graph Optimization
 // Copyright (C) 2011 R. Kuemmerle, G. Grisetti, H. Strasdat, W. Burgard
@@ -175,7 +175,7 @@ namespace g2o {
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   };
 
-#include "base_constant_edge.hpp"
+#include "base_fixed_sized_edge.hpp"
 
 } // end namespace g2o
 

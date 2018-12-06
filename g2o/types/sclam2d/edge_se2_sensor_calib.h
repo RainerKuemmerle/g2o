@@ -28,7 +28,7 @@
 #define G2O_EDGE_SE2_SENSOR_CALIB_H
 
 #include "g2o_types_sclam2d_api.h"
-#include "g2o/core/base_constant_edge.h"
+#include "g2o/core/base_fixed_sized_edge.h"
 #include "g2o/types/slam2d/vertex_se2.h"
 
 namespace g2o {

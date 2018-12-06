@@ -32,7 +32,7 @@
 #include "vertex_odom_differential_params.h"
 
 #include "g2o/types/slam2d/vertex_se2.h"
-#include "g2o/core/base_multi_edge.h"
+#include "g2o/core/base_variable_sized_edge.h"
 
 namespace g2o {
 
