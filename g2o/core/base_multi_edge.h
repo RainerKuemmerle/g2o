@@ -46,7 +46,7 @@ namespace g2o {
    * E - type to represent the measurement
    */
   template <int D, typename E>
-    class BaseMultiEdge : public BaseEdge<D,E>
+    class BaseVariableSizedEdge : public BaseEdge<D,E>
     {
     public:
       /**
@@ -66,7 +66,7 @@ namespace g2o {
       typedef typename BaseEdge<D,E>::InformationType InformationType;
       typedef Eigen::Map<MatrixX, MatrixX::Flags & Eigen::PacketAccessBit ? Eigen::Aligned : Eigen::Unaligned > HessianBlockType;
 
-      BaseMultiEdge() : BaseEdge<D,E>()
+      BaseVariableSizedEdge() : BaseEdge<D,E>()
       {
       }
       
@@ -108,7 +108,7 @@ namespace g2o {
 
   // PARTIAL TEMPLATE SPECIALIZATION
   template <typename E>
-  class BaseMultiEdge<-1,E> : public BaseEdge<-1,E>
+  class BaseVariableSizedEdge<-1,E> : public BaseEdge<-1,E>
   {
     public:
       /**
@@ -128,7 +128,7 @@ namespace g2o {
       typedef typename BaseEdge<-1,E>::InformationType InformationType;
       typedef Eigen::Map<MatrixX, MatrixX::Flags & Eigen::PacketAccessBit ? Eigen::Aligned : Eigen::Unaligned > HessianBlockType;
 
-      BaseMultiEdge() : BaseEdge<-1,E>()
+      BaseVariableSizedEdge() : BaseEdge<-1,E>()
     {
       // this->_variableSize = true;
     }

@@ -33,7 +33,7 @@ namespace internal {
 }
 
 template <int D, typename E>
-void BaseMultiEdge<D, E>::constructQuadraticForm()
+void BaseVariableSizedEdge<D, E>::constructQuadraticForm()
 {
   if (this->robustKernel()) {
     number_t error = this->chi2();
@@ -49,7 +49,7 @@ void BaseMultiEdge<D, E>::constructQuadraticForm()
 
 
 template <int D, typename E>
-void BaseMultiEdge<D, E>::linearizeOplus(JacobianWorkspace& jacobianWorkspace)
+void BaseVariableSizedEdge<D, E>::linearizeOplus(JacobianWorkspace& jacobianWorkspace)
 {
   for (size_t i = 0; i < _vertices.size(); ++i) {
     OptimizableGraph::Vertex* v = static_cast<OptimizableGraph::Vertex*>(_vertices[i]);
@@ -60,7 +60,7 @@ void BaseMultiEdge<D, E>::linearizeOplus(JacobianWorkspace& jacobianWorkspace)
 }
 
 template <int D, typename E>
-void BaseMultiEdge<D, E>::linearizeOplus()
+void BaseVariableSizedEdge<D, E>::linearizeOplus()
 {
   const number_t delta = cst(1e-9);
   const number_t scalar = 1 / (2*delta);
@@ -110,7 +110,7 @@ void BaseMultiEdge<D, E>::linearizeOplus()
 }
 
 template <int D, typename E>
-void BaseMultiEdge<D, E>::mapHessianMemory(number_t* d, int i, int j, bool rowMajor)
+void BaseVariableSizedEdge<D, E>::mapHessianMemory(number_t* d, int i, int j, bool rowMajor)
 {
   int idx = internal::computeUpperTriangleIndex(i, j);
   assert(idx < (int)_hessian.size());
@@ -130,7 +130,7 @@ void BaseMultiEdge<D, E>::mapHessianMemory(number_t* d, int i, int j, bool rowMa
 }
 
 template <int D, typename E>
-void BaseMultiEdge<D, E>::resize(size_t size)
+void BaseVariableSizedEdge<D, E>::resize(size_t size)
 {
   BaseEdge<D,E>::resize(size);
   int n = (int)_vertices.size();
@@ -141,7 +141,7 @@ void BaseMultiEdge<D, E>::resize(size_t size)
 }
 
 template <int D, typename E>
-bool BaseMultiEdge<D, E>::allVerticesFixed() const
+bool BaseVariableSizedEdge<D, E>::allVerticesFixed() const
 {
   for (size_t i = 0; i < _vertices.size(); ++i) {
     if (!static_cast<const OptimizableGraph::Vertex*> (_vertices[i])->fixed()) {
@@ -152,7 +152,7 @@ bool BaseMultiEdge<D, E>::allVerticesFixed() const
 }
 
 template <int D, typename E>
-void BaseMultiEdge<D, E>::computeQuadraticForm(const InformationType& omega, const ErrorVector& weightedError)
+void BaseVariableSizedEdge<D, E>::computeQuadraticForm(const InformationType& omega, const ErrorVector& weightedError)
 {
   for (size_t i = 0; i < _vertices.size(); ++i) {
     OptimizableGraph::Vertex* from = static_cast<OptimizableGraph::Vertex*>(_vertices[i]);
@@ -200,7 +200,7 @@ void BaseMultiEdge<D, E>::computeQuadraticForm(const InformationType& omega, con
 // PARTIAL TEMPLATE SPECIALIZATION
 
 template <typename E>
-void BaseMultiEdge<-1, E>::constructQuadraticForm()
+void BaseVariableSizedEdge<-1, E>::constructQuadraticForm()
 {
   if (this->robustKernel()) {
     number_t error = this->chi2();
@@ -216,7 +216,7 @@ void BaseMultiEdge<-1, E>::constructQuadraticForm()
 
 
 template <typename E>
-void BaseMultiEdge<-1, E>::linearizeOplus(JacobianWorkspace& jacobianWorkspace)
+void BaseVariableSizedEdge<-1, E>::linearizeOplus(JacobianWorkspace& jacobianWorkspace)
 {
   for (size_t i = 0; i < _vertices.size(); ++i) {
     OptimizableGraph::Vertex* v = static_cast<OptimizableGraph::Vertex*>(_vertices[i]);
@@ -227,7 +227,7 @@ void BaseMultiEdge<-1, E>::linearizeOplus(JacobianWorkspace& jacobianWorkspace)
 }
 
 template <typename E>
-void BaseMultiEdge<-1, E>::linearizeOplus()
+void BaseVariableSizedEdge<-1, E>::linearizeOplus()
 {
   const number_t delta = cst(1e-9);
   const number_t scalar = 1 / (2*delta);
@@ -277,7 +277,7 @@ void BaseMultiEdge<-1, E>::linearizeOplus()
 }
 
 template <typename E>
-void BaseMultiEdge<-1, E>::mapHessianMemory(number_t* d, int i, int j, bool rowMajor)
+void BaseVariableSizedEdge<-1, E>::mapHessianMemory(number_t* d, int i, int j, bool rowMajor)
 {
   int idx = internal::computeUpperTriangleIndex(i, j);
   assert(idx < (int)_hessian.size());
@@ -297,7 +297,7 @@ void BaseMultiEdge<-1, E>::mapHessianMemory(number_t* d, int i, int j, bool rowM
 }
 
 template <typename E>
-void BaseMultiEdge<-1, E>::resize(size_t size)
+void BaseVariableSizedEdge<-1, E>::resize(size_t size)
 {
   BaseEdge<-1,E>::resize(size);
   int n = (int)_vertices.size();
@@ -308,7 +308,7 @@ void BaseMultiEdge<-1, E>::resize(size_t size)
 }
 
 template <typename E>
-bool BaseMultiEdge<-1, E>::allVerticesFixed() const
+bool BaseVariableSizedEdge<-1, E>::allVerticesFixed() const
 {
   for (size_t i = 0; i < _vertices.size(); ++i) {
     if (!static_cast<const OptimizableGraph::Vertex*> (_vertices[i])->fixed()) {
@@ -319,7 +319,7 @@ bool BaseMultiEdge<-1, E>::allVerticesFixed() const
 }
 
 template <typename E>
-void BaseMultiEdge<-1, E>::computeQuadraticForm(const InformationType& omega, const ErrorVector& weightedError)
+void BaseVariableSizedEdge<-1, E>::computeQuadraticForm(const InformationType& omega, const ErrorVector& weightedError)
 {
   for (size_t i = 0; i < _vertices.size(); ++i) {
     OptimizableGraph::Vertex* from = static_cast<OptimizableGraph::Vertex*>(_vertices[i]);

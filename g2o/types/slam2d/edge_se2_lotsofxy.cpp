@@ -33,7 +33,7 @@
 
 namespace g2o {
 
-EdgeSE2LotsOfXY::EdgeSE2LotsOfXY() : BaseMultiEdge<-1, VectorX>(), _observedPoints(0) { resize(0); }
+EdgeSE2LotsOfXY::EdgeSE2LotsOfXY() : BaseVariableSizedEdge<-1, VectorX>(), _observedPoints(0) { resize(0); }
 
 void EdgeSE2LotsOfXY::computeError() {
   VertexSE2* pose = static_cast<VertexSE2*>(_vertices[0]);
