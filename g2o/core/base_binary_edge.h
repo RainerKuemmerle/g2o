@@ -34,14 +34,14 @@ namespace g2o {
 	// This could be a simple using statement, but in multiple places
 	// _jacobianOplusXi and _jacobianOplusYi are used.
   template <int D, typename E, typename VertexXi, typename VertexXj>
-  class BaseBinaryEdge : public BaseConstantEdge<D, E, VertexXi, VertexXj>
+  class BaseBinaryEdge : public BaseFixedSizedEdge<D, E, VertexXi, VertexXj>
   {
   public:
       using VertexXiType = VertexXi;
       using VertexXjType = VertexXj;
-      BaseBinaryEdge() : BaseConstantEdge<D,E, VertexXi, VertexXj>() {};
-      typename BaseConstantEdge<D, E, VertexXi, VertexXj>::template JacobianType<D, VertexXi::Dimension>& _jacobianOplusXi = std::get<0>(this->_jacobianOplus);
-      typename BaseConstantEdge<D, E, VertexXi, VertexXj>::template JacobianType<D, VertexXj::Dimension>& _jacobianOplusXj = std::get<1>(this->_jacobianOplus);
+      BaseBinaryEdge() : BaseFixedSizedEdge<D,E, VertexXi, VertexXj>() {};
+      typename BaseFixedSizedEdge<D, E, VertexXi, VertexXj>::template JacobianType<D, VertexXi::Dimension>& _jacobianOplusXi = std::get<0>(this->_jacobianOplus);
+      typename BaseFixedSizedEdge<D, E, VertexXi, VertexXj>::template JacobianType<D, VertexXj::Dimension>& _jacobianOplusXj = std::get<1>(this->_jacobianOplus);
   };
 
 }

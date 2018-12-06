@@ -51,7 +51,7 @@ private:
 } // namespace internal
 
 template <int D, typename E, typename... VertexTypes>
-void BaseConstantEdge<D, E, VertexTypes...>::resize(size_t size)
+void BaseFixedSizedEdge<D, E, VertexTypes...>::resize(size_t size)
 {
   assert(size == _nr_of_vertices && "attempting to resize a constant size edge");
   BaseEdge<D, E>::resize(size);
@@ -59,20 +59,20 @@ void BaseConstantEdge<D, E, VertexTypes...>::resize(size_t size)
 
 template <int D, typename E, typename... VertexTypes>
 template<std::size_t... Ints >
-bool BaseConstantEdge<D, E, VertexTypes...>::allVerticesFixedNs(index_sequence<Ints...>) const
+bool BaseFixedSizedEdge<D, E, VertexTypes...>::allVerticesFixedNs(index_sequence<Ints...>) const
 {
   bool fixed[] = { vertexXn<Ints>()->fixed()... };
   return std::all_of(std::begin(fixed), std::end(fixed), [](bool value){ return value; });
 }
 
 template <int D, typename E, typename... VertexTypes>
-bool BaseConstantEdge<D, E, VertexTypes...>::allVerticesFixed() const
+bool BaseFixedSizedEdge<D, E, VertexTypes...>::allVerticesFixed() const
 {
   return allVerticesFixedNs(make_index_sequence<_nr_of_vertices>());
 }
 
 template <int D, typename E, typename... VertexTypes>
-void BaseConstantEdge<D, E, VertexTypes...>::constructQuadraticForm()
+void BaseFixedSizedEdge<D, E, VertexTypes...>::constructQuadraticForm()
 {
   if (this->robustKernel()) {
     number_t error = this->chi2();
@@ -88,7 +88,7 @@ void BaseConstantEdge<D, E, VertexTypes...>::constructQuadraticForm()
 
 template <int D, typename E, typename... VertexTypes>
 template<std::size_t... Ints>
-void BaseConstantEdge<D, E, VertexTypes...>::constructQuadraticFormNs(const InformationType& omega, const ErrorVector& weightedError, index_sequence<Ints...>)
+void BaseFixedSizedEdge<D, E, VertexTypes...>::constructQuadraticFormNs(const InformationType& omega, const ErrorVector& weightedError, index_sequence<Ints...>)
 {
   int unused[] = { (constructQuadraticFormN<Ints>(omega, weightedError), 0) ... };
   (void)unused;
@@ -96,7 +96,7 @@ void BaseConstantEdge<D, E, VertexTypes...>::constructQuadraticFormNs(const Info
 
 template <int D, typename E, typename... VertexTypes>
 template<int N, std::size_t... Ints, typename AtOType>
-void BaseConstantEdge<D, E, VertexTypes...>::constructOffDiagonalQuadraticFormMs(const AtOType& AtO, index_sequence<Ints...>)
+void BaseFixedSizedEdge<D, E, VertexTypes...>::constructOffDiagonalQuadraticFormMs(const AtOType& AtO, index_sequence<Ints...>)
 {
   int unused[] = { (constructOffDiagonalQuadraticFormM<N, Ints, AtOType>(AtO), 0) ... };
   (void)unused;
@@ -104,7 +104,7 @@ void BaseConstantEdge<D, E, VertexTypes...>::constructOffDiagonalQuadraticFormMs
 
 template <int D, typename E, typename... VertexTypes>
 template<int N, int M, typename AtOType>
-void BaseConstantEdge<D, E, VertexTypes...>::constructOffDiagonalQuadraticFormM(const AtOType& AtO)
+void BaseFixedSizedEdge<D, E, VertexTypes...>::constructOffDiagonalQuadraticFormM(const AtOType& AtO)
 {
   constexpr auto fromId = N;
   constexpr auto toId = N + M + 1;
@@ -123,7 +123,7 @@ void BaseConstantEdge<D, E, VertexTypes...>::constructOffDiagonalQuadraticFormM(
 
 template <int D, typename E, typename... VertexTypes>
 template<int N>
-void BaseConstantEdge<D, E, VertexTypes...>::constructQuadraticFormN(const InformationType& omega, const ErrorVector& weightedError)
+void BaseFixedSizedEdge<D, E, VertexTypes...>::constructQuadraticFormN(const InformationType& omega, const ErrorVector& weightedError)
 {
   auto from = vertexXn<N>();
   const auto& A = std::get<N>(_jacobianOplus);
@@ -140,7 +140,7 @@ void BaseConstantEdge<D, E, VertexTypes...>::constructQuadraticFormN(const Infor
 };
 
 template <int D, typename E, typename... VertexTypes>
-void BaseConstantEdge<D, E, VertexTypes...>::linearizeOplus(JacobianWorkspace& jacobianWorkspace)
+void BaseFixedSizedEdge<D, E, VertexTypes...>::linearizeOplus(JacobianWorkspace& jacobianWorkspace)
 {
   linearizeOplus_allocate(jacobianWorkspace, make_index_sequence<_nr_of_vertices>());
   linearizeOplus();
@@ -148,7 +148,7 @@ void BaseConstantEdge<D, E, VertexTypes...>::linearizeOplus(JacobianWorkspace& j
 
 template <int D, typename E, typename... VertexTypes>
 template<std::size_t... Ints>
-void BaseConstantEdge<D, E, VertexTypes...>::linearizeOplus_allocate(JacobianWorkspace& jacobianWorkspace, index_sequence<Ints...>)
+void BaseFixedSizedEdge<D, E, VertexTypes...>::linearizeOplus_allocate(JacobianWorkspace& jacobianWorkspace, index_sequence<Ints...>)
 {
   int unused[] = {
   ( new (&std::get<Ints>(_jacobianOplus)) JacobianType<D, VertexDimension<Ints>()>(jacobianWorkspace.workspaceForVertex(Ints), D < 0 ? _dimension : D, VertexDimension<Ints>()) , 0 )
@@ -158,7 +158,7 @@ void BaseConstantEdge<D, E, VertexTypes...>::linearizeOplus_allocate(JacobianWor
 
 template <int D, typename E, typename... VertexTypes>
 template<int N>
-void BaseConstantEdge<D, E, VertexTypes...>::linearizeOplusN()
+void BaseFixedSizedEdge<D, E, VertexTypes...>::linearizeOplusN()
 {
   auto vertex = vertexXn<N>();
   bool iNotFixed = !(vertex->fixed());
@@ -196,14 +196,14 @@ void BaseConstantEdge<D, E, VertexTypes...>::linearizeOplusN()
 
 template <int D, typename E, typename... VertexTypes>
 template <std::size_t... Ints>
-void BaseConstantEdge<D, E, VertexTypes...>::linearizeOplusNs(index_sequence<Ints...>)
+void BaseFixedSizedEdge<D, E, VertexTypes...>::linearizeOplusNs(index_sequence<Ints...>)
 {
   int unused[] = { (linearizeOplusN<Ints>(), 0) ... };
   (void)unused;
 }
 
 template <int D, typename E, typename... VertexTypes>
-void BaseConstantEdge<D, E, VertexTypes...>::linearizeOplus()
+void BaseFixedSizedEdge<D, E, VertexTypes...>::linearizeOplus()
 {
   if(allVerticesFixed())
     return;
@@ -226,7 +226,7 @@ struct MapHessianMemoryK
 };
 
 template <int D, typename E, typename... VertexTypes>
-void BaseConstantEdge<D, E, VertexTypes...>::mapHessianMemory(number_t* d, int i, int j, bool rowMajor)
+void BaseFixedSizedEdge<D, E, VertexTypes...>::mapHessianMemory(number_t* d, int i, int j, bool rowMajor)
 {
   if(rowMajor)
     tuple_apply_i(MapHessianMemoryK{d}, _hessianTupleTransposed, internal::pair_to_index(i, j));

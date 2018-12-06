@@ -56,7 +56,7 @@ namespace g2o {
   }
 
   template <int D, typename E, typename... VertexTypes>
-  class BaseConstantEdge : public BaseEdge<D, E>
+  class BaseFixedSizedEdge : public BaseEdge<D, E>
   {
     public:
       template<int N, typename... Types>
@@ -104,7 +104,7 @@ namespace g2o {
       using HessianTuple = typename HessianTupleType<make_index_sequence<_nr_of_vertex_pairs>>::type;
       using HessianTupleTransposed = typename HessianTupleType<make_index_sequence<_nr_of_vertex_pairs>>::typeTransposed;
 
-      BaseConstantEdge() : BaseEdge<D,E>(),
+      BaseFixedSizedEdge() : BaseEdge<D,E>(),
       _hessianRowMajor(false),
       _hessianTuple(tuple_init(nullptr, _hessianTuple)),
       _hessianTupleTransposed(tuple_init(nullptr, _hessianTupleTransposed)),
@@ -115,7 +115,7 @@ namespace g2o {
 
       inline virtual OptimizableGraph::Vertex* createVertex(int)
       {
-        assert(false && "createVertex is not implemented for BaseConstantEdge");
+        assert(false && "createVertex is not implemented for BaseFixedSizedEdge");
         return nullptr;
       };
 
