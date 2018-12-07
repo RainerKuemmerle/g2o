@@ -49,9 +49,9 @@ namespace g2o {
       return j * (j - 1) / 2 + i;
     }
 
-    constexpr std::pair<int, int> index_to_pair(const int k)
+    constexpr std::pair<int, int> index_to_pair(const int k, const int j = 0)
     {
-      return {k - static_cast<int>(ct_sqrt(2*(k+1))+.5) * (static_cast<int>(ct_sqrt(2*(k+1))+.5) - 1) / 2, ct_sqrt(2*(k+1))+.5};
+      return k - j < 0 ? std::pair<int, int>{k, j} : index_to_pair(k - j, j + 1);
     }
   }
 

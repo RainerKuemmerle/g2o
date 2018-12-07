@@ -218,27 +218,6 @@ struct ForceLinker
     ForceLinker(ForceLinkFunction function) { (function)(); }
 };
 
-namespace internal {
-  template <typename T>
-  constexpr T sqrt_helper(T x, T lo, T hi)
-  {
-    return lo == hi ? lo :
-    ((x / ((lo + hi + 1) / 2) < ((lo + hi + 1) / 2))
-    ? sqrt_helper<T>(x, lo, ((lo + hi + 1) / 2)- 1)
-    : sqrt_helper(x, ((lo + hi + 1) / 2), hi));
-  }
-}
-
-/**
- * a constexpr integer sqrt function
- * adapted from https://stackoverflow.com/a/27709195
- */
-template <typename T>
-constexpr T ct_sqrt(T x)
-{
-  return internal::sqrt_helper<T>(x, 0, x / 2 + 1);
-}
-
 template<std::size_t... S>
 struct index_sequence
 {};
