@@ -80,13 +80,11 @@ TEST(General, IndexToPairToIndex)
   ASSERT_EQ(pair_to_index(0, 1), 0);
   ASSERT_EQ(pair_to_index(0, 2), 1);
   ASSERT_EQ(pair_to_index(1, 2), 2);
-  ASSERT_EQ(pair_to_index(index_to_pair(0).first, index_to_pair(0).second), 0);
-  ASSERT_EQ(pair_to_index(index_to_pair(1).first, index_to_pair(1).second), 1);
-  ASSERT_EQ(pair_to_index(index_to_pair(2).first, index_to_pair(2).second), 2);
-  ASSERT_EQ(pair_to_index(index_to_pair(10).first, index_to_pair(10).second), 10);
-  ASSERT_EQ(index_to_pair(pair_to_index(0, 1)), std::make_pair(0, 1));
-  ASSERT_EQ(index_to_pair(pair_to_index(0, 2)), std::make_pair(0, 2));
-  ASSERT_EQ(index_to_pair(pair_to_index(1, 2)), std::make_pair(1, 2));
+  for(int j = 0; j < 32; ++j)
+    for(int i = 0; i < j; ++i)
+      ASSERT_EQ(index_to_pair(pair_to_index(i, j)), std::make_pair(i, j));
+  for(int k = 0; k < 1024; ++k)
+    ASSERT_EQ(pair_to_index(index_to_pair(k).first, index_to_pair(k).second), k);
 }
 
 TEST(General, ConstantEdgeConstructor)
