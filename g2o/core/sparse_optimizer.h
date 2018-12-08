@@ -34,12 +34,10 @@
 #include "g2o_core_api.h"
 #include "batch_stats.h"
 
-#include <map>
 
 namespace g2o {
 
   // forward declaration
-  class ActivePathCostFunction;
   class OptimizationAlgorithm;
   class EstimatePropagatorCost;
 

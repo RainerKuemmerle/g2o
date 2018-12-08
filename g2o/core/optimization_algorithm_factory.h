@@ -28,12 +28,10 @@
 #define G2O_OPTMIZATION_ALGORITHM_PROPERTY_H
 
 #include "g2o/config.h"
-#include "g2o/stuff/misc.h"
 #include "optimization_algorithm_property.h"
 
 #include <list>
 #include <iostream>
-#include <typeinfo>
 
 #include "g2o_core_api.h"
 
@@ -44,7 +42,6 @@ namespace g2o {
 
   // forward decl
   class G2O_CORE_API OptimizationAlgorithm;
-  class G2O_CORE_API SparseOptimizer;
 
   /**
    * \brief base for allocating an optimization algorithm

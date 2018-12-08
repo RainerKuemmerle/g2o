@@ -27,13 +27,10 @@
 #ifndef G2O_LINE3D_H_
 #define G2O_LINE3D_H_
 
-#include <math.h>
 
 #include <Eigen/Core>
-#include <Eigen/Geometry>
 
 #include "g2o_types_slam3d_addons_api.h"
-#include "g2o/stuff/misc.h"
 
 namespace g2o {
   

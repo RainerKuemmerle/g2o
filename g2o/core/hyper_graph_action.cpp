@@ -31,6 +31,7 @@
 
 
 #include <iostream>
+#include <list>
 
 namespace g2o {
   using namespace std;

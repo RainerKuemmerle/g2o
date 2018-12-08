@@ -28,7 +28,6 @@
 #define G2O_SOLVER_H
 
 #include "hyper_graph.h"
-#include "batch_stats.h"
 #include "sparse_block_matrix.h"
 #include "g2o_core_api.h"
 #include <cstddef>
