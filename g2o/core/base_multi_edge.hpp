@@ -76,7 +76,7 @@ void BaseMultiEdge<D, E>::linearizeOplus()
     if (vi->fixed()) {
       continue;
     } else {
-      QuadraticFormLock lck(*vi);
+      internal::QuadraticFormLock lck(*vi);
       const int vi_dim = vi->dimension();
       assert(vi_dim >= 0);
 
@@ -169,7 +169,7 @@ void BaseMultiEdge<D, E>::computeQuadraticForm(const InformationType& omega, con
 
       // ii block in the hessian
       {
-        QuadraticFormLock lck(*from);
+        internal::QuadraticFormLock lck(*from);
         fromMap.noalias() += AtO * A;
         fromB.noalias() += A.transpose() * weightedError;
       }
@@ -180,7 +180,7 @@ void BaseMultiEdge<D, E>::computeQuadraticForm(const InformationType& omega, con
 
         bool jstatus = !(to->fixed());
         if (jstatus) {
-          QuadraticFormLock lck(*to);
+          internal::QuadraticFormLock lck(*to);
           const JacobianType& B = _jacobianOplus[j];
           int idx = internal::computeUpperTriangleIndex(i, j);
           assert(idx < (int)_hessian.size());
@@ -243,7 +243,7 @@ void BaseMultiEdge<-1, E>::linearizeOplus()
     if (vi->fixed()) {
       continue;
     } else {
-      QuadraticFormLock lck(*vi);
+      internal::QuadraticFormLock lck(*vi);
       const int vi_dim = vi->dimension();
       assert(vi_dim >= 0);
 
@@ -336,7 +336,7 @@ void BaseMultiEdge<-1, E>::computeQuadraticForm(const InformationType& omega, co
 
       // ii block in the hessian
       {
-        QuadraticFormLock lck(*from);
+        internal::QuadraticFormLock lck(*from);
         fromMap.noalias() += AtO * A;
         fromB.noalias() += A.transpose() * weightedError;
       }
@@ -346,7 +346,7 @@ void BaseMultiEdge<-1, E>::computeQuadraticForm(const InformationType& omega, co
         OptimizableGraph::Vertex* to = static_cast<OptimizableGraph::Vertex*>(_vertices[j]);
         bool jstatus = !(to->fixed());
         if (jstatus) {
-          QuadraticFormLock lck(*to);
+          internal::QuadraticFormLock lck(*to);
           const JacobianType& B = _jacobianOplus[j];
           int idx = internal::computeUpperTriangleIndex(i, j);
           assert(idx < (int)_hessian.size());
