@@ -28,7 +28,6 @@
 #define G2O_FACTORY_H
 
 #include "g2o/config.h"
-#include "g2o/stuff/misc.h"
 #include "hyper_graph.h"
 #include "creators.h"
 
@@ -41,7 +40,6 @@
 
 namespace g2o {
 
-  class AbstractHyperGraphElementCreator;
   
   /**
    * \brief create vertices and edges based on TAGs in, for example, a file

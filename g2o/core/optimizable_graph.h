@@ -29,9 +29,6 @@
 
 #include <set>
 #include <iostream>
-#include <list>
-#include <limits>
-#include <cmath>
 #include <typeinfo>
 
 #include "openmp_mutex.h"
@@ -47,7 +44,6 @@ namespace g2o {
 
   class HyperGraphAction;
   struct OptimizationAlgorithmProperty;
-  class Cache;
   class CacheContainer;
   class RobustKernel;
 

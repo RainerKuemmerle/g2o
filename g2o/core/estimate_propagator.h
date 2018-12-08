@@ -32,7 +32,6 @@
 #include "g2o_core_api.h"
 
 #include <map>
-#include <set>
 #include <limits>
 
 #include <unordered_map>

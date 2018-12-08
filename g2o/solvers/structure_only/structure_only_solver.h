@@ -89,7 +89,16 @@ class StructureOnlySolver : public OptimizationAlgorithm
         for (g2o::HyperGraph::EdgeSet::iterator it_t=track.begin(); it_t!=track.end(); ++it_t) {
           g2o::OptimizableGraph::Edge* e = dynamic_cast<g2o::OptimizableGraph::Edge *>(*it_t);
           e->computeError();
-          chi2 += e->chi2();
+          if (e->robustKernel())
+          {
+            Vector3 rho;
+            e->robustKernel()->robustify(e->chi2(), rho);
+            chi2 += rho[0];
+          }
+          else
+          {
+            chi2 += e->chi2();
+          }
         }
 
         if (v->fixed() == false) {
@@ -155,7 +164,16 @@ class StructureOnlySolver : public OptimizationAlgorithm
                 for (g2o::HyperGraph::EdgeSet::iterator it_t=track.begin(); it_t!=track.end(); ++it_t) {
                   g2o::OptimizableGraph::Edge* e = dynamic_cast<g2o::OptimizableGraph::Edge *>(*it_t);
                   e->computeError();
-                  new_chi2 += e->chi2();
+                  if (e->robustKernel())
+                  {
+                    Vector3 rho;
+                    e->robustKernel()->robustify(e->chi2(), rho);
+                    new_chi2 += rho[0];
+                  }
+                  else
+                  {
+                    new_chi2 += e->chi2();
+                  }
                 }
                 assert(g2o_isnan(new_chi2)==false && "Chi is NaN");
                 number_t rho = (chi2 - new_chi2);

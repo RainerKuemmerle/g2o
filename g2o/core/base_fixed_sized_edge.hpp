@@ -27,27 +27,6 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-namespace internal {
-
-struct QuadraticFormLock {
-  QuadraticFormLock(OptimizableGraph::Vertex& vertex) : _vertex(vertex) {
-#ifdef G2O_OPENMP
-    _vertex.lockQuadraticForm();
-#endif
-  }
-
-  ~QuadraticFormLock() {
-#ifdef G2O_OPENMP
-    _vertex.unlockQuadraticForm();
-#endif
-  }
-
-private:
-  OptimizableGraph::Vertex& _vertex;
-};
-
-} // namespace internal
-
 template <int D, typename E, typename... VertexTypes>
 void BaseFixedSizedEdge<D, E, VertexTypes...>::resize(size_t size)
 {

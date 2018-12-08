@@ -28,8 +28,8 @@
 #define G2O_EDGE_TYPES_COST_FUNCTION_
 
 #include <string>
-#include "g2o/core/sparse_optimizer.h"
 #include "g2o/core/hyper_dijkstra.h"
+#include "g2o/core/optimizable_graph.h"
 
 namespace g2o {
 
