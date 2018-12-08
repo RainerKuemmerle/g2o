@@ -89,9 +89,9 @@ namespace g2o {
       using HessianBlockType = Eigen::Map<Eigen::Matrix<number_t, DN, DM, DN==1?Eigen::RowMajor:Eigen::ColMajor>,
                                           Eigen::Matrix<number_t, DN, DM, DN==1?Eigen::RowMajor:Eigen::ColMajor>::Flags & Eigen::PacketAccessBit ? Eigen::Aligned : Eigen::Unaligned >;
       template<int K>
-      using HessianBlockTypeK = HessianBlockType<VertexDimension<internal::index_to_pair(K).first>(), VertexDimension<internal::index_to_pair(K).second>()>;
+      using HessianBlockTypeK = HessianBlockType<VertexXnType<internal::index_to_pair(K).first>::Dimension, VertexXnType<internal::index_to_pair(K).second>::Dimension>;
       template<int K>
-      using HessianBlockTypeKTransposed = HessianBlockType<VertexDimension<internal::index_to_pair(K).second>(), VertexDimension<internal::index_to_pair(K).first>()>;
+      using HessianBlockTypeKTransposed = HessianBlockType<VertexXnType<internal::index_to_pair(K).second>::Dimension, VertexXnType<internal::index_to_pair(K).first>::Dimension>;
       template<typename> struct HessianTupleType;
       template<std::size_t... Ints >
       struct HessianTupleType<index_sequence<Ints...>>
