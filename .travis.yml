@@ -32,8 +32,8 @@ before_script:
   - mkdir build
   - cd build
   - if [[ "$CC" == "gcc" && "$TRAVIS_OS_NAME" == "linux" ]]; then
-      export CC=gcc-7 ;
-      export CXX=g++-7 ;
+      export CC=gcc-8 ;
+      export CXX=g++-8 ;
     fi
   - cmake --version
   - cmake -DBUILD_UNITTESTS=ON ..
