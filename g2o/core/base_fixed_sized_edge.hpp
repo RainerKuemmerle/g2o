@@ -72,6 +72,11 @@ void BaseFixedSizedEdge<D, E, VertexTypes...>::constructQuadraticFormNs(const In
 }
 
 template <int D, typename E, typename... VertexTypes>
+template<int N, typename AtOType>
+void BaseFixedSizedEdge<D, E, VertexTypes...>::constructOffDiagonalQuadraticFormMs(const AtOType&, index_sequence<>)
+{ } // overloading constructOffDiagonalQuadraticFormMs to prevent MSVC error when index_sequence is empty
+
+template <int D, typename E, typename... VertexTypes>
 template<int N, std::size_t... Ints, typename AtOType>
 void BaseFixedSizedEdge<D, E, VertexTypes...>::constructOffDiagonalQuadraticFormMs(const AtOType& AtO, index_sequence<Ints...>)
 {
