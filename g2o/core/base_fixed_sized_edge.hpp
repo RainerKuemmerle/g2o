@@ -114,6 +114,7 @@ void BaseFixedSizedEdge<D, E, VertexTypes...>::constructQuadraticFormN(const Inf
     const auto AtO = A.transpose() * omega;
     {
       internal::QuadraticFormLock lck(*from);
+      (void)lck;
       from->b().noalias() += A.transpose() * weightedError;
       from->A().noalias() += AtO*A;
     }
@@ -152,6 +153,7 @@ void BaseFixedSizedEdge<D, E, VertexTypes...>::linearizeOplusN()
     const number_t scalar = 1 / (2*delta);
 
     internal::QuadraticFormLock lck(*vertex);
+    (void)lck;
     // estimate the jacobian numerically
     number_t add_vertex[VertexDimension<N>()] = {};
 
