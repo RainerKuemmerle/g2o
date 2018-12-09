@@ -149,6 +149,10 @@ namespace g2o {
       void constructQuadraticFormNs(const InformationType& omega, const ErrorVector& weightedError, index_sequence<Ints...>);
       template<int N>
       void constructQuadraticFormN(const InformationType& omega, const ErrorVector& weightedError);
+
+      template<int N, typename AtOType>
+      void constructOffDiagonalQuadraticFormMs(const AtOType&, index_sequence<>);
+
       template<int N, std::size_t... Ints, typename AtOType>
       void constructOffDiagonalQuadraticFormMs(const AtOType& AtO, index_sequence<Ints...>);
       template<int N, int M, typename AtOType>
