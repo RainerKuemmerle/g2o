@@ -53,6 +53,7 @@ namespace g2o {
   #else
     struct QuadraticFormLock {
       explicit QuadraticFormLock(OptimizableGraph::Vertex& ) { }
+      ~QuadraticFormLock() { }
     };
   #endif
 
