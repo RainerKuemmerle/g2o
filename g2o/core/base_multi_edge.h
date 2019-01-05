@@ -32,10 +32,7 @@
 namespace g2o {
 
   template <int D, typename E>
-  using BaseMultiEdgeBaseMulti = BaseVariableSizedEdge<D, E>;
-  template <typename E>
-  using BaseMultiEdgeBaseMulti = BaseVariableSizedEdge<E>;
-
+  using BaseMultiEdge = BaseVariableSizedEdge<D, E>;
 
 } // end namespace g2o
 
