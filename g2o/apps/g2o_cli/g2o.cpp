@@ -33,9 +33,9 @@
 #include <algorithm>
 #include <cassert>
 
-#include "dl_wrapper.h"
-#include "output_helper.h"
-#include "g2o_common.h"
+#include "g2o/apps/g2o_cli/dl_wrapper.h"
+#include "g2o/apps/g2o_cli/output_helper.h"
+#include "g2o/apps/g2o_cli/g2o_common.h"
 
 #include "g2o/config.h"
 #include "g2o/core/estimate_propagator.h"
@@ -56,6 +56,25 @@
 #include "g2o/stuff/filesys_tools.h"
 #include "g2o/stuff/string_tools.h"
 #include "g2o/stuff/timeutil.h"
+
+// include dependencies into the g2o cli
+#ifdef G2O_STATIC_LINK_LIBRARIES
+G2O_USE_TYPE_GROUP(slam2d);
+G2O_USE_TYPE_GROUP(slam2d_segment);
+G2O_USE_TYPE_GROUP(slam3d);
+G2O_USE_TYPE_GROUP(slam3d_addons);
+G2O_USE_TYPE_GROUP(sba);
+
+// static linking of cholmod does not work due to OpenMP
+G2O_USE_OPTIMIZATION_LIBRARY(eigen);
+G2O_USE_OPTIMIZATION_LIBRARY(csparse);
+G2O_USE_OPTIMIZATION_LIBRARY(pcg);
+G2O_USE_OPTIMIZATION_LIBRARY(dense);
+G2O_USE_OPTIMIZATION_LIBRARY(slam2d_linear);
+G2O_USE_OPTIMIZATION_LIBRARY(structure_only);
+
+G2O_USE_ROBUST_KERNEL(RobustKernelHuber);
+#endif // G2O_STATIC_LINK_LIBRARIES
 
 static bool hasToStop=false;
 
@@ -188,6 +207,7 @@ int main(int argc, char** argv)
 
   OptimizationAlgorithmFactory* solverFactory = OptimizationAlgorithmFactory::instance();
   if (listSolvers) {
+    cout << "Listing solvers" << endl;
     solverFactory->listSolvers(cout);
   }
 

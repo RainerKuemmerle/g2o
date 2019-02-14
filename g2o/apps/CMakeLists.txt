@@ -11,4 +11,5 @@ endif()
 
 if(G2O_BUILD_LINKED_APPS)
   add_subdirectory(linked_binaries)
+  add_subdirectory(g2o_cli_static)
 endif()
