@@ -1,3 +1,39 @@
+# g2o - static
+### Static executable
+This fork adds cmake build targets to compile a static version of the g2o command line 
+executable (cli). The static binary can be useful in situations where a installation/compilation
+is not possible on a target system. The static binary includes all dependencies and therefore does 
+not require any dynamic libraries at runtime.
+
+### Dynamic library without dependencies
+Furthermore we provide a dynamic g2o library that mimics the command line client interface. 
+Dependencies are also linked into the library to provide a maximum of encapsulation.
+
+### Building
+Setting up cmake
+```
+mkdir build
+cd build
+cmake -DG2O_BUILD_LINKED_APPS=ON \
+        -DBUILD_CSPARSE=ON \
+        -DG2O_USE_OPENGL=OFF \
+        -DG2O_USE_OPENMP=OFF \
+        -DBUILD_SHARED_LIBS=OFF \
+        -DBUILD_LGPL_SHARED_LIBS=OFF \
+        -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
+        ..
+```
+To build the library run
+
+`make g2o_lib`
+
+To build the static g2o cli executable
+
+`make g2o_cli_application_static`
+
+The static executable should then be in `bin/g2o_static` while the library is located in `lib/libg2o_lib.so` 
+
+***************************************
 g2o - General Graph Optimization
 ================================
 
