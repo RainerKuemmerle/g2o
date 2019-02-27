@@ -7,7 +7,7 @@ os: Visual Studio 2017
 clone_folder: c:\projects\g2o
 
 platform: x64
-configuration: Release
+configuration: Debug
 
 build:
   project: c:\projects\g2o\build\g2o.sln 
