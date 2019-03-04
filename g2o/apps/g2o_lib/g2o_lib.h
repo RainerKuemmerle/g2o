@@ -1,22 +1,24 @@
-#include "stream_interceptor.h"
 #include "g2o_lib_api.h"
 
 typedef void(*StringCallbackFuncType)(const char *message);
 
 extern "C" {
 /**
- * Set the callback function for the stdout interceptor
- *
- * @param callbackFunc Callback function
+ * Return codes of g2o optimization
  */
-G2O_DLL_API void setCoutListener(StringCallbackFuncType callbackFunc);
-
-/**
- * Set the callback function for the stderr interceptor
- *
- * @param callbackFunc Callback function
- */
-G2O_DLL_API void setCerrListener(StringCallbackFuncType callbackFunc);
+G2O_DLL_API enum G2OResult {
+    Ok = 0,
+    ErrorLoadingGraph = -1,
+    ErrorOpeningFile = -2,
+    ErrorAllocatingSolver = -3,
+    ErrorGraphContainsNoVertices = -4,
+    ErrorSolverCannotOptimizeGraph = -5,
+    ErrorVertexNotFound = -6,
+    ErrorGraphIsFixedByNode = -7,
+    ErrorAddingVertex = -8,
+    ErrorInitializationFailed = -9,
+    ErrorCholeskyFailed = -10
+};
 
 /**
  * Optimize a factor graph with g2o

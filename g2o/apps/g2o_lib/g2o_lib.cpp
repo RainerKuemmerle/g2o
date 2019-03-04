@@ -117,34 +117,6 @@ void sigquit_handler(int sig)
   }
 }
 
-
-StringCallbackFuncType cerrCallback = NULL;
-StringCallbackFuncType coutCallback = NULL;
-
-void setCerrListener(StringCallbackFuncType callbackFunc) {
-  cerrCallback = callbackFunc;
-}
-
-void setCoutListener(StringCallbackFuncType callbackFunc) {
-  coutCallback = callbackFunc;
-}
-
-void cerrCallbackFunc(const char *msg) {
-  if (cerrCallback != NULL) {
-    cerrCallback(msg);
-  }
-}
-
-void coutCallbackFunc(const char *msg) {
-  if (coutCallback != NULL) {
-    coutCallback(msg);
-  }
-}
-
-static StreamInterceptor cerrInterceptor(std::cerr, cerrCallbackFunc);
-static StreamInterceptor coutInterceptor(std::cout, coutCallbackFunc);
-
-
 int optimize(int argc, char **argv, const char *inputFactorGraph, char **outputFactorGraphReference) {
   OptimizableGraph::initMultiThreading();
   int maxIterations;
@@ -215,6 +187,12 @@ int optimize(int argc, char **argv, const char *inputFactorGraph, char **outputF
 
   arg.parseArgs(argc, argv);
 
+  // silence std i/o streams
+  if (!verbose) {
+    std::cout.setstate(std::ios_base::failbit);
+    std::cerr.setstate(std::ios_base::failbit);
+  }
+
   if (verbose) {
     cout << "# Used Compiler: " << G2O_CXX_COMPILER << endl;
   }
@@ -269,7 +247,7 @@ int optimize(int argc, char **argv, const char *inputFactorGraph, char **outputF
   optimizer.setAlgorithm(solverFactory->construct(strSolver, solverProperty));
   if (! optimizer.solver()) {
     cerr << "Error allocating solver. Allocating \"" << strSolver << "\" failed!" << endl;
-    return 0;
+    return G2OResult::ErrorAllocatingSolver;
   }
 
   if (solverProperties.size() > 0) {
@@ -291,24 +269,24 @@ int optimize(int argc, char **argv, const char *inputFactorGraph, char **outputF
      std::istringstream inputBuffer(inputFactorGraph);
      if (!optimizer.load(inputBuffer)) {
        cerr << "Error loading graph" << endl;
-       return 2;
+       return G2OResult::ErrorLoadingGraph;
      }
   } else if (inputFilename == "-") {
     cerr << "Read input from stdin" << endl;
     if (!optimizer.load(cin)) {
       cerr << "Error loading graph" << endl;
-      return 2;
+      return G2OResult::ErrorLoadingGraph;
     }
   } else {
     cerr << "Read input from " << inputFilename << endl;
     ifstream ifs(inputFilename.c_str());
     if (!ifs) {
       cerr << "Failed to open file" << endl;
-      return 1;
+      return G2OResult::ErrorOpeningFile;
     }
     if (!optimizer.load(ifs)) {
       cerr << "Error loading graph" << endl;
-      return 2;
+      return G2OResult::ErrorLoadingGraph;
     }
   }
   cerr << "Loaded " << optimizer.vertices().size() << " vertices" << endl;
@@ -316,13 +294,13 @@ int optimize(int argc, char **argv, const char *inputFactorGraph, char **outputF
 
   if (optimizer.vertices().size() == 0) {
     cerr << "Graph contains no vertices" << endl;
-    return 1;
+    return G2OResult::ErrorGraphContainsNoVertices;
   }
 
   set<int> vertexDimensions = optimizer.dimensions();
   if (! optimizer.isSolverSuitable(solverProperty, vertexDimensions)) {
     cerr << "The selected solver is not suitable for optimizing the given graph" << endl;
-    return 3;
+    return G2OResult::ErrorSolverCannotOptimizeGraph;
   }
   assert (optimizer.solver());
   //optimizer.setMethod(str2method(strMethod));
@@ -339,7 +317,7 @@ int optimize(int argc, char **argv, const char *inputFactorGraph, char **outputF
       OptimizableGraph::Vertex* v=optimizer.vertex(id);
       if (!v){
         cerr << "fatal, not found the vertex of id " << id << " in the gaugeList. Aborting";
-        return -1;
+        return G2OResult::ErrorVertexNotFound;
       } else {
         if (i==0)
           gauge = v;
@@ -355,10 +333,11 @@ int optimize(int argc, char **argv, const char *inputFactorGraph, char **outputF
   if (gaugeFreedom) {
     if (! gauge) {
       cerr <<  "# cannot find a vertex to fix in this thing" << endl;
-      return 2;
+      return G2OResult::ErrorGraphIsFixedByNode;
     } else {
       cerr << "# graph is fixed by node " << gauge->id() << endl;
       gauge->setFixed(true);
+      return G2OResult::ErrorGraphIsFixedByNode;
     }
   } else {
     cerr << "# graph is fixed by priors or already fixed vertex" << endl;
@@ -472,8 +451,10 @@ int optimize(int argc, char **argv, const char *inputFactorGraph, char **outputF
         bool v1Added = optimizer.addVertex(v);
         //cerr << "adding" << v->id() << "(" << v->dimension() << ")" << endl;
         assert(v1Added);
-        if (! v1Added)
+        if (! v1Added) {
           cerr << "Error adding vertex " << v->id() << endl;
+          return G2OResult::ErrorAddingVertex;
+        }
         else
           verticesAdded.insert(v);
         doInit = 1;
@@ -486,8 +467,10 @@ int optimize(int argc, char **argv, const char *inputFactorGraph, char **outputF
         bool v2Added = optimizer.addVertex(v);
         //cerr << "adding" << v->id() << "(" << v->dimension() << ")" << endl;
         assert(v2Added);
-        if (! v2Added)
+        if (! v2Added) {
           cerr << "Error adding vertex " << v->id() << endl;
+          return G2OResult::ErrorAddingVertex;
+        }
         else
           verticesAdded.insert(v);
         doInit = 2;
@@ -550,12 +533,12 @@ int optimize(int argc, char **argv, const char *inputFactorGraph, char **outputF
           if (firstRound) {
             if (!optimizer.initializeOptimization()){
               cerr << "initialization failed" << endl;
-              return 0;
+              return G2OResult::ErrorInitializationFailed;
             }
           } else {
             if (! optimizer.updateInitialization(verticesAdded, edgesAdded)) {
               cerr << "updating initialization failed" << endl;
-              return 0;
+              return G2OResult::ErrorInitializationFailed;
             }
           }
           verticesAdded.clear();
@@ -628,6 +611,7 @@ int optimize(int argc, char **argv, const char *inputFactorGraph, char **outputF
     int result=optimizer.optimize(maxIterations);
     if (maxIterations > 0 && result==OptimizationAlgorithm::Fail){
       cerr << "Cholesky failed, result might be invalid" << endl;
+      return G2OResult::ErrorCholeskyFailed;
     } else if (computeMarginals){
       std::vector<std::pair<int, int> > blockIndices;
       for (size_t i=0; i<optimizer.activeVertices().size(); i++){
@@ -747,7 +731,7 @@ int optimize(int argc, char **argv, const char *inputFactorGraph, char **outputF
   //OptimizationAlgorithmFactory::destroy();
   //HyperGraphActionLibrary::destroy();
 
-  return 0;
+  return G2OResult::Ok;
 }
 
 void cleanup(char *outputFactorGraphReference) {

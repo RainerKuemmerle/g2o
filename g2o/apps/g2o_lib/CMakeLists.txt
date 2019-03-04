@@ -15,8 +15,7 @@ if (NOT (G2O_USE_OPENGL OR BUILD_LGPL_SHARED_LIBS OR BUILD_SHARED_LIBS OR NOT CM
     # g2o library without dependencies
     add_library(g2o_lib SHARED
             g2o_lib.cpp
-            stream_interceptor.cpp
-            stream_interceptor.h)
+            )
 
     include_directories(${CSPARSE_INCLUDE_DIR})
 
