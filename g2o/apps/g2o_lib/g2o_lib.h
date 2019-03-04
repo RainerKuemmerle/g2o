@@ -6,7 +6,7 @@ extern "C" {
 /**
  * Return codes of g2o optimization
  */
-G2O_DLL_API enum G2OResult {
+enum G2OResult {
     Ok = 0,
     ErrorLoadingGraph = -1,
     ErrorOpeningFile = -2,
