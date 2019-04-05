@@ -96,7 +96,7 @@ following packages.
 #### Mac OS X
 If using [Homebrew](http://brew.sh/), then
 
-`brew install homebrew/science/g2o`
+`brew install brewsci/science/g2o`
 
 will install g2o together with its required dependencies. In this case no manual compilation is necessary.
 
