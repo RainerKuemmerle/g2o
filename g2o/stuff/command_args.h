@@ -30,7 +30,6 @@
 #include <string>
 #include <vector>
 #include <iostream>
-#include <sstream>
 
 #include "g2o_stuff_api.h"
 

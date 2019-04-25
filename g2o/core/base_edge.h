@@ -36,6 +36,29 @@
 
 namespace g2o {
 
+  namespace internal {
+
+  #ifdef G2O_OPENMP
+    struct QuadraticFormLock {
+      explicit QuadraticFormLock(OptimizableGraph::Vertex& vertex)
+        :_vertex(vertex) {
+          _vertex.lockQuadraticForm();
+        }
+      ~QuadraticFormLock() {
+        _vertex.unlockQuadraticForm();
+      }
+      private:
+      OptimizableGraph::Vertex& _vertex;
+    };
+  #else
+    struct QuadraticFormLock {
+      explicit QuadraticFormLock(OptimizableGraph::Vertex& ) { }
+      ~QuadraticFormLock() { }
+    };
+  #endif
+
+  } // internal namespace
+
   template <int D, typename E>
   class BaseEdge : public OptimizableGraph::Edge
   {

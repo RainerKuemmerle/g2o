@@ -58,9 +58,7 @@ void BaseUnaryEdge<D, E, VertexXiType>::constructQuadraticForm()
 
   bool istatus = !from->fixed();
   if (istatus) {
-#ifdef G2O_OPENMP
-    from->lockQuadraticForm();
-#endif
+    internal::QuadraticFormLock lck(*from);
     if (this->robustKernel()) {
       number_t error = this->chi2();
       Vector3 rho;
@@ -77,9 +75,6 @@ void BaseUnaryEdge<D, E, VertexXiType>::constructQuadraticForm()
       from->b().noalias() -= A.transpose() * omega * _error;
       from->A().noalias() += A.transpose() * omega * A;
     }
-#ifdef G2O_OPENMP
-    from->unlockQuadraticForm();
-#endif
   }
 }
 
@@ -99,9 +94,7 @@ void BaseUnaryEdge<D, E, VertexXiType>::linearizeOplus()
   if (vi->fixed())
     return;
 
-#ifdef G2O_OPENMP
-  vi->lockQuadraticForm();
-#endif
+  internal::QuadraticFormLock lck(*vi);
 
   const number_t delta = cst(1e-9);
   const number_t scalar = 1 / (2*delta);
@@ -165,9 +158,6 @@ void BaseUnaryEdge<D, E, VertexXiType>::linearizeOplus()
     }
   
   _error = errorBeforeNumeric;
-#ifdef G2O_OPENMP
-  vi->unlockQuadraticForm();
-#endif
 }
 
 template <int D, typename E, typename VertexXiType>

@@ -28,7 +28,6 @@
 #define G2O_ROBUST_KERNEL_H
 
 #include <memory>
-#include <Eigen/Core>
 
 #include "g2o_core_api.h"
 

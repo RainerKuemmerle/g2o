@@ -67,7 +67,7 @@ if (1) {\
   if(1) { \
     number_t _start_time_ = g2o::get_time(); \
     code; \
-    fprintf(stderr, "%s took %f sec\n", text, g2o::get_time() - _start_time_); \
+    std::cerr << text << " took " << g2o::get_time() - _start_time_ << " sec" << std::endl; \
   } else \
     (void) 0
 #endif

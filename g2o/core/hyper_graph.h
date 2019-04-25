@@ -27,12 +27,10 @@
 #ifndef G2O_AIS_HYPER_GRAPH_HH
 #define G2O_AIS_HYPER_GRAPH_HH
 
-#include <map>
 #include <set>
 #include <bitset>
 #include <cassert>
 #include <vector>
-#include <limits>
 #include <cstddef>
 
 #include <unordered_map>

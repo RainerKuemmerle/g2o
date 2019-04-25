@@ -18,9 +18,12 @@
 // License along with this Module; if not, write to the Free Software
 // Foundation, Inc., 50 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
+#include <iostream>
 #include "csparse_extension.h"
 
 #include "g2o/stuff/macros.h"
+
+using namespace std;
 
 namespace g2o {
 namespace csparse_extension {
@@ -34,14 +37,14 @@ namespace csparse_extension {
     csn *N ;
     int n, ok ;
     if (!CS_CSC (A) || !b || ! S || !x) {
-      fprintf(stderr, "%s: No valid input!\n", __PRETTY_FUNCTION__);
+      cerr << __PRETTY_FUNCTION__ << ": No valid input!" << endl;
       assert(0); // get a backtrace in debug mode
       return (0) ;     /* check inputs */
     }
     n = A->n ;
     N = cs_chol_workspace (A, S, work, x) ;                    /* numeric Cholesky factorization */
     if (!N) {
-      fprintf(stderr, "%s: cholesky failed!\n", __PRETTY_FUNCTION__);
+      cerr << __PRETTY_FUNCTION__ << ": cholesky failed!" << endl;
       /*assert(0);*/
     }
     ok = (N != NULL) ;

@@ -31,7 +31,6 @@
 
 #include "vertex_se2.h"
 #include "vertex_point_xy.h"
-#include "parameter_se2_offset.h"
 #include "g2o_types_slam2d_api.h"
 
 namespace g2o {

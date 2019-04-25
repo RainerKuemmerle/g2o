@@ -24,31 +24,8 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-namespace {
-
-#ifdef G2O_OPENMP
-struct QuadraticFormLock {
-  explicit QuadraticFormLock(OptimizableGraph::Vertex& vertex) : _vertex(vertex) {
-    _vertex.lockQuadraticForm();
-  }
-  ~QuadraticFormLock() {
-    _vertex.unlockQuadraticForm();
-  }
-private:
-  OptimizableGraph::Vertex& _vertex;
-};
-#else
-struct QuadraticFormLock {
-  explicit QuadraticFormLock(OptimizableGraph::Vertex& ) { }
-};
-#endif
-
-} // anonymous namespace
-
-
 #define VERTEX_I_DIM ((VertexXiType::Dimension < 0) ? static_cast<VertexXiType*> (_vertices[0])->dimension() : VertexXiType::Dimension)
 #define VERTEX_J_DIM ((VertexXjType::Dimension < 0) ? static_cast<VertexXjType*> (_vertices[1])->dimension() : VertexXjType::Dimension)
-
 
 template <int D, typename E, typename VertexXiType, typename VertexXjType>
 OptimizableGraph::Vertex* BaseBinaryEdge<D, E, VertexXiType, VertexXjType>::createFrom(){
@@ -105,7 +82,7 @@ void BaseBinaryEdge<D, E, VertexXiType, VertexXjType>::constructQuadraticForm()
         Eigen::Matrix<number_t, VertexXiType::Dimension, D, Eigen::ColMajor> AtO = A.transpose() * omega;
 
         {
-          QuadraticFormLock lck(*from);
+          internal::QuadraticFormLock lck(*from);
 
           from->b().noalias() += A.transpose() * omega_r;
           from->A().noalias() += AtO*A;
@@ -119,7 +96,7 @@ void BaseBinaryEdge<D, E, VertexXiType, VertexXjType>::constructQuadraticForm()
         }
       }
       if (toNotFixed) {
-        QuadraticFormLock lck(*to);
+        internal::QuadraticFormLock lck(*to);
 
         to->b().noalias() += B.transpose() * omega_r;
         to->A().noalias() += B.transpose() * omega * B;
@@ -135,7 +112,7 @@ void BaseBinaryEdge<D, E, VertexXiType, VertexXjType>::constructQuadraticForm()
       omega_r *= rho[1];
       if (fromNotFixed) {
         {
-          QuadraticFormLock lck(*from);
+          internal::QuadraticFormLock lck(*from);
 
           from->b().noalias() += A.transpose() * omega_r;
           from->A().noalias() += A.transpose() * weightedOmega * A;
@@ -149,7 +126,7 @@ void BaseBinaryEdge<D, E, VertexXiType, VertexXjType>::constructQuadraticForm()
         }
       }
       if (toNotFixed) {
-        QuadraticFormLock lck(*to);
+        internal::QuadraticFormLock lck(*to);
 
         to->b().noalias() += B.transpose() * omega_r;
         to->A().noalias() += B.transpose() * weightedOmega * B;
@@ -186,14 +163,12 @@ void BaseBinaryEdge<D, E, VertexXiType, VertexXjType>::linearizeOplus()
   // A statically allocated array is far and away the most efficient
   // way to construct the perturbation vector for the Jacobian. If the
   // dimension is known at compile time, use directly. If the
-  // dimension is known at run time and is less than 20, use an
-  // allocated array of up to 20. Otherwise, use a fallback of a
-  // dynamically allocated array. Experiments show that the allocated
-  // array using a pointer-type iterator rather than an array accessor
-  // is much more efficient.
+  // dimension is known at run time and is less than 12, use an
+  // allocated array of up to 12. Otherwise, use a fallback of a
+  // dynamically allocated array.
   
   if (iNotFixed) {
-    QuadraticFormLock lck(*vi);
+    internal::QuadraticFormLock lck(*vi);
     //Xi - estimate the jacobian numerically
 
     if ((VertexXiType::Dimension >= 0) || (vi->dimension() <= 12))
@@ -247,7 +222,7 @@ void BaseBinaryEdge<D, E, VertexXiType, VertexXjType>::linearizeOplus()
   }
 
   if (jNotFixed) {
-    QuadraticFormLock lck(*vj);
+    internal::QuadraticFormLock lck(*vj);
     //Xj - estimate the jacobian numerically
     if ((VertexXjType::Dimension >= 0) || (vj->dimension() <= 12))
       {

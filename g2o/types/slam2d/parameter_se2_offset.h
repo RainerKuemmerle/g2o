@@ -27,14 +27,11 @@
 #ifndef G2O_VERTEX_SE2_OFFSET_PARAMETERS_H_
 #define G2O_VERTEX_SE2_OFFSET_PARAMETERS_H_
 
-#include "g2o/core/optimizable_graph.h"
 
 #include "se2.h"
 #include "g2o_types_slam2d_api.h"
-#include "g2o/core/hyper_graph_action.h"
 #include "g2o/core/cache.h"
 
-#include <Eigen/Geometry>
 
 namespace g2o {
 

@@ -357,7 +357,7 @@ int main(int argc, const char* argv[])
   optimizer.optimize(10);
 
   cout << endl;
-  cout << "Point error before optimisation (inliers only): " << sqrt(sum_diff2/point_num) << endl;
+  cout << "Point error before optimisation (inliers only): " << sqrt(sum_diff2/inliers.size()) << endl;
 
 
   point_num = 0;
@@ -396,7 +396,7 @@ int main(int argc, const char* argv[])
     ++point_num;
   }
 
-  cout << "Point error after optimisation (inliers only): " << sqrt(sum_diff2/point_num) << endl;
+  cout << "Point error after optimisation (inliers only): " << sqrt(sum_diff2/inliers.size()) << endl;
   cout << endl;
 
 }

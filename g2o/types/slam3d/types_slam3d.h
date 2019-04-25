@@ -47,6 +47,7 @@
 #include "edge_se3_pointxyz_disparity.h"
 #include "edge_se3_pointxyz_depth.h"
 #include "edge_se3_prior.h"
+#include "edge_se3_xyzprior.h"
 
 #include "edge_pointxyz.h"
 #include "edge_xyz_prior.h"

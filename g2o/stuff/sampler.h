@@ -28,7 +28,6 @@
 #define G2O_GAUSSIAN_SAMPLER_
 
 #include <Eigen/Core>
-#include <Eigen/Cholesky>
 #include <Eigen/StdVector>
 
 #include <cstdlib>
