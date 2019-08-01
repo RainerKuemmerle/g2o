@@ -266,7 +266,7 @@ namespace g2o {
                                    const Eigen::MatrixBase<Derived>& JConstRef, 
                                    const Isometry3& Z, 
                                    const Isometry3& X,
-                                   const Isometry3& P=Isometry3())
+                                   const Isometry3& P=Isometry3::Identity())
   {
     Eigen::MatrixBase<Derived>& J = const_cast<Eigen::MatrixBase<Derived>&>(JConstRef);
     J.derived().resize(6,6);
