@@ -82,7 +82,7 @@ following packages.
   - libeigen3-dev
 
 #### Optional requirements
-* suitesparse       http://www.cise.ufl.edu/research/sparse/SuiteSparse/
+* suitesparse       http://faculty.cse.tamu.edu/davis/suitesparse.html
 * Qt5               http://qt-project.org
 * libQGLViewer      http://www.libqglviewer.com/
 
