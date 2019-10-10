@@ -181,7 +181,7 @@ namespace g2o {
         Vector3 dR = deltaR(_R);
         Matrix3 V_inv;
 
-        if (d>cst(0.99999))
+        if (std::abs(d)>cst(0.99999))
         {
 
           omega=0.5*dR;
