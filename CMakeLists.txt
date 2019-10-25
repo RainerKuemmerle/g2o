@@ -58,11 +58,11 @@ if(APPLE)
 endif(APPLE)
 
 # Set the output directory for the build executables and libraries
-set(g2o_RUNTIME_OUTPUT_DIRECTORY ${g2o_SOURCE_DIR}/bin CACHE PATH "Target for the binaries")
+set(g2o_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin CACHE PATH "Target for the binaries")
 if(WIN32)
-  set(g2o_LIBRARY_OUTPUT_DIRECTORY ${g2o_SOURCE_DIR}/bin CACHE PATH "Target for the libraries")
+  set(g2o_LIBRARY_OUTPUT_DIRECTORY $${CMAKE_CURRENT_BINARY_DIR}/bin CACHE PATH "Target for the libraries")
 else(WIN32)
-  set(g2o_LIBRARY_OUTPUT_DIRECTORY ${g2o_SOURCE_DIR}/lib CACHE PATH "Target for the libraries")
+  set(g2o_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/lib CACHE PATH "Target for the libraries")
 endif(WIN32)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${g2o_LIBRARY_OUTPUT_DIRECTORY})
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${g2o_LIBRARY_OUTPUT_DIRECTORY})
@@ -355,7 +355,7 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${g2o_C_FLAGS}")
 # Find Eigen3. If it defines the target, this is used. If not,
 # fall back to the using the module form.
 # See https://eigen.tuxfamily.org/dox/TopicCMakeGuide.html for details
-find_package(Eigen3 REQUIRED)
+find_package(Eigen3 REQUIRED NO_MODULE)
 if (TARGET Eigen3::Eigen)
   set(G2O_EIGEN3_EIGEN_TARGET Eigen3::Eigen)
 else()

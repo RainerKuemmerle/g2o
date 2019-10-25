@@ -67,16 +67,20 @@ if (UNIX)
   target_link_libraries(csparse PUBLIC m)
 endif()
 
+# Make it relocatable.
+target_include_directories(csparse INTERFACE
+  $<INSTALL_INTERFACE:include/g2o/csparse>
+)
+
 install(TARGETS csparse
   EXPORT ${G2O_TARGETS_EXPORT_NAME}
   RUNTIME DESTINATION ${RUNTIME_DESTINATION}
   LIBRARY DESTINATION ${LIBRARY_DESTINATION}
   ARCHIVE DESTINATION ${ARCHIVE_DESTINATION}
-  INCLUDES DESTINATION ${INCLUDES_DESTINATION}
 )
 
 file(GLOB headers "${CMAKE_CURRENT_SOURCE_DIR}/*.h" "${CMAKE_CURRENT_SOURCE_DIR}/*.hpp")
-install(FILES ${headers} DESTINATION ${INCLUDES_INSTALL_DIR}/EXTERNAL/csparse)
+install(FILES ${headers} DESTINATION ${INCLUDES_INSTALL_DIR}/csparse)
 
 # Set up the variables
 set(CSPARSE_LIBRARY "$<TARGET_FILE:csparse>")

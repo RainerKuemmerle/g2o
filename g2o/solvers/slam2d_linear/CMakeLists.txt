@@ -17,12 +17,15 @@ endif()
 
 target_link_libraries(solver_slam2d_linear solver_csparse types_slam2d)
 
+target_include_directories(solver_slam2d_linear PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+    $<INSTALL_INTERFACE:include>)
+
 install(TARGETS solver_slam2d_linear
   EXPORT ${G2O_TARGETS_EXPORT_NAME}
   RUNTIME DESTINATION ${RUNTIME_DESTINATION}
   LIBRARY DESTINATION ${LIBRARY_DESTINATION}
   ARCHIVE DESTINATION ${ARCHIVE_DESTINATION}
-  INCLUDES DESTINATION ${INCLUDES_DESTINATION}
 )
 
 file(GLOB headers "${CMAKE_CURRENT_SOURCE_DIR}/*.h" "${CMAKE_CURRENT_SOURCE_DIR}/*.hpp")
