@@ -36,6 +36,7 @@
 #include "g2o/apps/g2o_cli/dl_wrapper.h"
 #include "g2o/apps/g2o_cli/output_helper.h"
 #include "g2o/apps/g2o_cli/g2o_common.h"
+#include "g2o/apps/g2o_lib/g2o_lib.h"
 
 #include "g2o/config.h"
 #include "g2o/core/estimate_propagator.h"
@@ -58,7 +59,6 @@
 #include "g2o/stuff/timeutil.h"
 
 // include dependencies into the g2o cli
-#ifdef G2O_STATIC_LINK_LIBRARIES
 G2O_USE_TYPE_GROUP(slam2d);
 G2O_USE_TYPE_GROUP(slam2d_segment);
 G2O_USE_TYPE_GROUP(slam3d);
@@ -74,7 +74,6 @@ G2O_USE_OPTIMIZATION_LIBRARY(slam2d_linear);
 G2O_USE_OPTIMIZATION_LIBRARY(structure_only);
 
 G2O_USE_ROBUST_KERNEL(RobustKernelHuber);
-#endif // G2O_STATIC_LINK_LIBRARIES
 
 static bool hasToStop=false;
 
@@ -118,8 +117,7 @@ void sigquit_handler(int sig)
   }
 }
 
-int main(int argc, char** argv)
-{
+int optimize(int argc, char **argv, const char *inputFactorGraph, char **outputFactorGraphReference) {
   OptimizableGraph::initMultiThreading();
   int maxIterations;
   bool verbose;
@@ -183,11 +181,17 @@ int main(int argc, char** argv)
   arg.param("renameTypes", loadLookup, "", "create a lookup for loading types into other types,\n\t TAG_IN_FILE=INTERNAL_TAG_FOR_TYPE,TAG2=INTERNAL2\n\t e.g., VERTEX_CAM=VERTEX_SE3:EXPMAP");
   arg.param("gaugeList", gaugeList, std::vector<int>(), "set the list of gauges separated by commas without spaces \n  e.g: 1,2,3,4,5 ");
   arg.param("summary", summaryFile, "", "append a summary of this optimization run to the summary file passed as argument");
-  arg.paramLeftOver("graph-input", inputFilename, "", "graph file which will be processed", true);
+  arg.param("input", inputFilename, "", "graph file which will be processed");
   arg.param("nonSequential", nonSequential, false, "apply the robust kernel only on loop closures and not odometries");
-  
+
 
   arg.parseArgs(argc, argv);
+
+  // silence std i/o streams
+  if (!verbose) {
+    std::cout.setstate(std::ios_base::failbit);
+    std::cerr.setstate(std::ios_base::failbit);
+  }
 
   if (verbose) {
     cout << "# Used Compiler: " << G2O_CXX_COMPILER << endl;
@@ -243,9 +247,9 @@ int main(int argc, char** argv)
   optimizer.setAlgorithm(solverFactory->construct(strSolver, solverProperty));
   if (! optimizer.solver()) {
     cerr << "Error allocating solver. Allocating \"" << strSolver << "\" failed!" << endl;
-    return 0;
+    return G2OResult::ErrorAllocatingSolver;
   }
-  
+
   if (solverProperties.size() > 0) {
     bool updateStatus = optimizer.solver()->updatePropertiesFromString(solverProperties);
     if (! updateStatus) {
@@ -261,24 +265,28 @@ int main(int argc, char** argv)
     optimizer.setRenamedTypesFromString(loadLookup);
   }
   if (inputFilename.size() == 0) {
-    cerr << "No input data specified" << endl;
-    return 0;
+     // reading graph from method parameter
+     std::istringstream inputBuffer(inputFactorGraph);
+     if (!optimizer.load(inputBuffer)) {
+       cerr << "Error loading graph" << endl;
+       return G2OResult::ErrorLoadingGraph;
+     }
   } else if (inputFilename == "-") {
     cerr << "Read input from stdin" << endl;
     if (!optimizer.load(cin)) {
       cerr << "Error loading graph" << endl;
-      return 2;
+      return G2OResult::ErrorLoadingGraph;
     }
   } else {
     cerr << "Read input from " << inputFilename << endl;
     ifstream ifs(inputFilename.c_str());
     if (!ifs) {
       cerr << "Failed to open file" << endl;
-      return 1;
+      return G2OResult::ErrorOpeningFile;
     }
     if (!optimizer.load(ifs)) {
       cerr << "Error loading graph" << endl;
-      return 2;
+      return G2OResult::ErrorLoadingGraph;
     }
   }
   cerr << "Loaded " << optimizer.vertices().size() << " vertices" << endl;
@@ -286,19 +294,19 @@ int main(int argc, char** argv)
 
   if (optimizer.vertices().size() == 0) {
     cerr << "Graph contains no vertices" << endl;
-    return 1;
+    return G2OResult::ErrorGraphContainsNoVertices;
   }
 
   set<int> vertexDimensions = optimizer.dimensions();
   if (! optimizer.isSolverSuitable(solverProperty, vertexDimensions)) {
     cerr << "The selected solver is not suitable for optimizing the given graph" << endl;
-    return 3;
+    return G2OResult::ErrorSolverCannotOptimizeGraph;
   }
   assert (optimizer.solver());
   //optimizer.setMethod(str2method(strMethod));
   //optimizer.setUserLambdaInit(lambdaInit);
 
- 
+
   // check for vertices to fix to remove DoF
   bool gaugeFreedom = optimizer.gaugeFreedom();
   OptimizableGraph::Vertex* gauge=0;
@@ -309,7 +317,7 @@ int main(int argc, char** argv)
       OptimizableGraph::Vertex* v=optimizer.vertex(id);
       if (!v){
         cerr << "fatal, not found the vertex of id " << id << " in the gaugeList. Aborting";
-        return -1;
+        return G2OResult::ErrorVertexNotFound;
       } else {
         if (i==0)
           gauge = v;
@@ -325,10 +333,11 @@ int main(int argc, char** argv)
   if (gaugeFreedom) {
     if (! gauge) {
       cerr <<  "# cannot find a vertex to fix in this thing" << endl;
-      return 2;
+      return G2OResult::ErrorGraphIsFixedByNode;
     } else {
       cerr << "# graph is fixed by node " << gauge->id() << endl;
       gauge->setFixed(true);
+      return G2OResult::ErrorGraphIsFixedByNode;
     }
   } else {
     cerr << "# graph is fixed by priors or already fixed vertex" << endl;
@@ -421,7 +430,7 @@ int main(int argc, char** argv)
 
     // sort the edges in a way that inserting them makes sense
     sort(edges.begin(), edges.end(), IncrementalEdgesCompare());
-    
+
     double cumTime = 0.;
     int vertexCount=0;
     int lastOptimizedVertexCount = 0;
@@ -442,8 +451,10 @@ int main(int argc, char** argv)
         bool v1Added = optimizer.addVertex(v);
         //cerr << "adding" << v->id() << "(" << v->dimension() << ")" << endl;
         assert(v1Added);
-        if (! v1Added)
+        if (! v1Added) {
           cerr << "Error adding vertex " << v->id() << endl;
+          return G2OResult::ErrorAddingVertex;
+        }
         else
           verticesAdded.insert(v);
         doInit = 1;
@@ -456,8 +467,10 @@ int main(int argc, char** argv)
         bool v2Added = optimizer.addVertex(v);
         //cerr << "adding" << v->id() << "(" << v->dimension() << ")" << endl;
         assert(v2Added);
-        if (! v2Added)
+        if (! v2Added) {
           cerr << "Error adding vertex " << v->id() << endl;
+          return G2OResult::ErrorAddingVertex;
+        }
         else
           verticesAdded.insert(v);
         doInit = 2;
@@ -483,8 +496,8 @@ int main(int argc, char** argv)
                 HyperGraph::VertexSet toSet;
                 toSet.insert(to);
                 if (e->initialEstimatePossible(toSet, from) > 0.) {
-                  //cerr << "init: " 
-                    //<< to->id() << "(" << to->dimension() << ") -> " 
+                  //cerr << "init: "
+                    //<< to->id() << "(" << to->dimension() << ") -> "
                     //<< from->id() << "(" << from->dimension() << ") " << endl;
                    e->initialEstimate(toSet, from);
                 } else {
@@ -492,21 +505,21 @@ int main(int argc, char** argv)
                 }
                 break;
               }
-            case 2: 
+            case 2:
               {
                 HyperGraph::VertexSet fromSet;
                 fromSet.insert(from);
                 if (e->initialEstimatePossible(fromSet, to) > 0.) {
-                  //cerr << "init: " 
-                    //<< from->id() << "(" << from->dimension() << ") -> " 
+                  //cerr << "init: "
+                    //<< from->id() << "(" << from->dimension() << ") -> "
                     //<< to->id() << "(" << to->dimension() << ") " << endl;
-                  e->initialEstimate(fromSet, to);  
+                  e->initialEstimate(fromSet, to);
                 } else {
                   assert(0 && "Added unitialized variable to the graph");
                 }
                 break;
               }
-            default: cerr << "doInit wrong value\n"; 
+            default: cerr << "doInit wrong value\n";
           }
 
         }
@@ -520,12 +533,12 @@ int main(int argc, char** argv)
           if (firstRound) {
             if (!optimizer.initializeOptimization()){
               cerr << "initialization failed" << endl;
-              return 0;
+              return G2OResult::ErrorInitializationFailed;
             }
           } else {
             if (! optimizer.updateInitialization(verticesAdded, edgesAdded)) {
               cerr << "updating initialization failed" << endl;
-              return 0;
+              return G2OResult::ErrorInitializationFailed;
             }
           }
           verticesAdded.clear();
@@ -556,7 +569,7 @@ int main(int argc, char** argv)
         if (! verbose)
           cerr << ".";
       }
-      
+
     } // for all edges
 
     if (! freshlyOptimized) {
@@ -598,6 +611,7 @@ int main(int argc, char** argv)
     int result=optimizer.optimize(maxIterations);
     if (maxIterations > 0 && result==OptimizationAlgorithm::Fail){
       cerr << "Cholesky failed, result might be invalid" << endl;
+      return G2OResult::ErrorCholeskyFailed;
     } else if (computeMarginals){
       std::vector<std::pair<int, int> > blockIndices;
       for (size_t i=0; i<optimizer.activeVertices().size(); i++){
@@ -627,7 +641,7 @@ int main(int argc, char** argv)
         }
       }
     }
-    
+
     optimizer.computeActiveErrors();
     double finalChi=optimizer.chi2();
 
@@ -636,7 +650,7 @@ int main(int argc, char** argv)
       summary.makeProperty<StringProperty>("filename", inputFilename);
       summary.makeProperty<IntProperty>("n_vertices", optimizer.vertices().size());
       summary.makeProperty<IntProperty>("n_edges", optimizer.edges().size());
-      
+
       int nLandmarks=0;
       int nPoses=0;
       int maxDim = *vertexDimensions.rbegin();
@@ -670,13 +684,13 @@ int main(int argc, char** argv)
       os.open(summaryFile.c_str(), ios::app);
       summary.writeToCSV(os);
     }
-    
+
 
     if (statsFile!=""){
       cerr << "writing stats to file \"" << statsFile << "\" ... ";
       ofstream os(statsFile.c_str());
       const BatchStatisticsContainer& bsc = optimizer.batchStatistics();
-      
+
       for (int i=0; i<maxIterations; i++) {
         os << bsc[i] << endl;
       }
@@ -701,13 +715,25 @@ int main(int argc, char** argv)
       cerr << "saving " << outputfilename << " ... ";
       optimizer.save(outputfilename.c_str());
     }
-    cerr << "done." << endl;
+
+  } else {
+    cerr << "saving to buffer" << endl;
+    ostringstream outputBuffer;
+    optimizer.save(outputBuffer);
+    string outputString = outputBuffer.str();
+    *outputFactorGraphReference = new char[outputString.size() + 1];
+    strcpy(*outputFactorGraphReference, outputString.c_str());
   }
+  cerr << "done. " << endl;
 
   // destroy all the singletons
   //Factory::destroy();
   //OptimizationAlgorithmFactory::destroy();
   //HyperGraphActionLibrary::destroy();
 
-  return 0;
+  return G2OResult::Ok;
+}
+
+void cleanup(char *outputFactorGraphReference) {
+  delete[] outputFactorGraphReference;
 }
