@@ -30,7 +30,6 @@
 #include <cmath>
 
 #include <Eigen/Core>
-#include <Eigen/StdVector>
 
 #include "g2o/types/slam3d/vertex_se3.h"
 #include "g2o/types/slam3d/edge_se3.h"

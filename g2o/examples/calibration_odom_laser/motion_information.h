@@ -28,7 +28,6 @@
 #define G2O_MOTION_INFORMATION_H
 
 #include <vector>
-#include <Eigen/StdVector>
 
 #include "g2o/types/slam2d/se2.h"
 #include "g2o_calibration_odom_laser_api.h"
