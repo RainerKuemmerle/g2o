@@ -49,7 +49,7 @@ static void jac_quat3_euler3(Eigen::Matrix<number_t, 6, 6, Eigen::ColMajor>& J, 
     tb[i]+=delta;
     Vector6 ea = g2o::internal::toVectorET(g2o::internal::fromVectorQT(ta));
     Vector6 eb = g2o::internal::toVectorET(g2o::internal::fromVectorQT(tb));
-    J.col(3)=(eb-ea)*idelta;
+    J.col(i)=(eb-ea)*idelta;
   }
 }
 
