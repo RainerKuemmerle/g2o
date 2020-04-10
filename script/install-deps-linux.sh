@@ -13,7 +13,7 @@ sudo apt-get install -qq qtdeclarative5-dev qt5-qmake libqglviewer-dev-qt5 libsu
 # install new gcc
 if [ "$CC" = "gcc" ]; then
   apt-cache search -n "^gcc-[0-9]+$"
-  sudo apt-get install -qq gcc-9 g++-9
+  sudo apt-get install -qq gcc-8 g++-8
 fi
 
 # download eigen3 and unpack it
