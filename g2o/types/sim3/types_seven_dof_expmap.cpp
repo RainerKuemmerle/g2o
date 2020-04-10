@@ -136,6 +136,7 @@ bool EdgeSim3::read(std::istream& is)
     return os.good();
   }
 
+#if G2O_SIM3_JACOBIAN
 void EdgeSim3::linearizeOplus() {
     VertexSim3Expmap *v1 = static_cast<VertexSim3Expmap *>(_vertices[0]);
     VertexSim3Expmap *v2 = static_cast<VertexSim3Expmap *>(_vertices[1]);
@@ -181,6 +182,7 @@ void EdgeSim3::linearizeOplus() {
 
     _jacobianOplusXj = -(I7 + 0.5 * jacobi_j);
 }
+#endif
     
   /**Sim3ProjectXYZ*/
 

@@ -134,7 +134,9 @@ class G2O_TYPES_SIM3_API VertexSim3Expmap : public BaseVertex<7, Sim3>
       else
         v1->setEstimate(measurement().inverse()*v2->estimate());
     }
+    #if G2O_SIM3_JACOBIAN
     virtual void linearizeOplus();
+    #endif
   };
 
 
