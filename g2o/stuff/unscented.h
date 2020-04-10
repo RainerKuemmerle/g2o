@@ -29,7 +29,6 @@
 
 #include <Eigen/Core>
 #include <Eigen/Cholesky>
-#include<Eigen/StdVector>
 
 namespace g2o {
   

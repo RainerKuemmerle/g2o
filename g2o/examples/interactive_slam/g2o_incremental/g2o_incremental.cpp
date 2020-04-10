@@ -129,7 +129,7 @@ int main(int argc, char** argv)
     vector<EdgeInformation> edgesFromGraph;
 
     // HACK force tictoc statistics
-#ifdef _MSC_VER
+#if defined _MSC_VER || defined __MINGW32__
     _putenv_s("G2O_ENABLE_TICTOC", "1");
 #else
     setenv("G2O_ENABLE_TICTOC", "1", 1);

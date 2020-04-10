@@ -28,7 +28,6 @@
 // moves under piecewise constant velocity in 3D. Its position is
 // measured by an idealised GPS receiver.
 
-#include <Eigen/StdVector>
 #include <iostream>
 
 #include <stdint.h>

@@ -33,10 +33,6 @@
 #include <vector>
 #include <utility>
 #include<Eigen/Core>
-//#ifndef EIGEN_USE_NEW_STDVECTOR
-//#define EIGEN_USE_NEW_STDVECTOR
-//#endif
-#include<Eigen/StdVector>
 
 namespace g2o {
 

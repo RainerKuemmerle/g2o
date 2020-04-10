@@ -28,7 +28,6 @@
 // place and does not move; in effect it has a "GPS" which measures
 // its position
 
-#include <Eigen/StdVector>
 #include <iostream>
 #include <stdint.h>
  
