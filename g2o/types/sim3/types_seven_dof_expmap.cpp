@@ -136,6 +136,52 @@ bool EdgeSim3::read(std::istream& is)
     return os.good();
   }
 
+void EdgeSim3::linearizeOplus() {
+    VertexSim3Expmap *v1 = static_cast<VertexSim3Expmap *>(_vertices[0]);
+    VertexSim3Expmap *v2 = static_cast<VertexSim3Expmap *>(_vertices[1]);
+    const Sim3 Si(v1->estimate());//Siw
+    const Sim3 Sj(v2->estimate());
+
+    const Sim3& Sji = _measurement;
+
+    // error in Lie Algebra
+    const Eigen::Matrix<double, 7, 1> error = (Sji * Si * Sj.inverse()).log();
+    const Eigen::Vector3d phi = error.block<3, 1>(0, 0); // rotation
+    const Eigen::Vector3d tau = error.block<3, 1>(3, 0); // translation
+    const double s = error(6);                           // scale
+
+    const Eigen::Matrix<double, 7, 7> I7 = Eigen::Matrix<double, 7, 7>::Identity();
+    const Eigen::Matrix<double, 3, 3> I3 = Eigen::Matrix<double, 3, 3>::Identity();
+
+    // Jacobi Matrix of Si 
+    // note: because the order of rotation and translation is different, 
+    //       so it is slightly different from the formula.
+    Eigen::Matrix<double, 7, 7> jacobi_i = Eigen::Matrix<double, 7, 7>::Zero();
+    jacobi_i.block<3, 3>(0, 0) = -skew(phi);
+    jacobi_i.block<3, 3>(3, 3) = -(skew(phi) + s * I3);
+    jacobi_i.block<3, 3>(3, 0) = -skew(tau);
+    jacobi_i.block<3, 1>(3, 6) = tau;
+
+    // Adjoint matrix of Sji
+    Eigen::Matrix<double, 7, 7> adj_Sji = I7;
+    adj_Sji.block<3, 3>(0, 0) = Sji.rotation().toRotationMatrix();
+    adj_Sji.block<3, 3>(3, 3) = Sji.scale() * Sji.rotation().toRotationMatrix();
+    adj_Sji.block<3, 3>(3, 0) =
+        skew(Sji.translation()) * Sji.rotation().toRotationMatrix();
+    adj_Sji.block<3, 1>(3, 6) = -Sji.translation();
+
+    _jacobianOplusXi = (I7 + 0.5 * jacobi_i) * adj_Sji;
+
+    // Jacobi Matrix of Sj 
+    Eigen::Matrix<double, 7, 7> jacobi_j = Eigen::Matrix<double, 7, 7>::Zero();
+    jacobi_j.block<3, 3>(0, 0) = skew(phi);
+    jacobi_j.block<3, 3>(3, 3) = skew(phi) + s * I3;
+    jacobi_j.block<3, 3>(3, 0) = skew(tau);
+    jacobi_j.block<3, 1>(3, 6) = -tau;
+
+    _jacobianOplusXj = -(I7 + 0.5 * jacobi_j);
+}
+    
   /**Sim3ProjectXYZ*/
 
   EdgeSim3ProjectXYZ::EdgeSim3ProjectXYZ() :
