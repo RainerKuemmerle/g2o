@@ -13,12 +13,12 @@ sudo apt-get install -qq qtdeclarative5-dev qt5-qmake libqglviewer-dev libsuites
 # install new gcc
 if [ "$CC" = "gcc" ]; then
   apt-cache search -n "^gcc-[0-9]+$"
-  sudo apt-get install -qq gcc-8 g++-8
+  sudo apt-get install -qq gcc-9 g++-9
 fi
 
 # download eigen3 and unpack it
 cd /tmp
-wget -O eigen3.zip http://bitbucket.org/eigen/eigen/get/3.3.5.zip
+wget -O eigen3.zip http://bitbucket.org/eigen/eigen/get/3.3.7.zip
 unzip -q eigen3.zip
 ls -l eigen*
-sudo mv /tmp/eigen-eigen-b3f3d4950030 /usr/include/eigen3
+sudo mv /tmp/eigen-eigen-323c052e1731 /usr/include/eigen3

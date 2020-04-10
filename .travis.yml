@@ -1,5 +1,5 @@
 sudo: required
-dist: trusty
+dist: bionic
 language: cpp
 
 os:
@@ -25,15 +25,14 @@ before_install:
   - env | sort
 
 install:
-  #- script/install-deps-linux.sh
   - script/install-deps-${TRAVIS_OS_NAME}.sh
 
 before_script:
   - mkdir build
   - cd build
   - if [[ "$CC" == "gcc" && "$TRAVIS_OS_NAME" == "linux" ]]; then
-      export CC=gcc-8 ;
-      export CXX=g++-8 ;
+      export CC=gcc-9 ;
+      export CXX=g++-9 ;
     fi
   - cmake --version
   - cmake -DBUILD_UNITTESTS=ON ..
