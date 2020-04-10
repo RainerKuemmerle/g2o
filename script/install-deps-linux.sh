@@ -8,7 +8,7 @@ sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
 sudo apt-get update -qq
 
 # dependencies for building g2o
-sudo apt-get install -qq qtdeclarative5-dev qt5-qmake libqglviewer-dev libsuitesparse-dev
+sudo apt-get install -qq qtdeclarative5-dev qt5-qmake libqglviewer-dev-qt5 libsuitesparse-dev
 
 # install new gcc
 if [ "$CC" = "gcc" ]; then
