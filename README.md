@@ -1,6 +1,7 @@
 g2o - General Graph Optimization
 ================================
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/e87df92948b747d58591372dd425fc59)](https://app.codacy.com/manual/rainer.kuemmerle/g2o?utm_source=github.com&utm_medium=referral&utm_content=RainerKuemmerle/g2o&utm_campaign=Badge_Grade_Dashboard)
 Linux: [![Build Status](https://travis-ci.org/RainerKuemmerle/g2o.svg?branch=master)](https://travis-ci.org/RainerKuemmerle/g2o)
 Windows: [![Build status](https://ci.appveyor.com/api/projects/status/9w0cpb9krc6t4nt7/branch/master?svg=true)](https://ci.appveyor.com/project/RainerKuemmerle/g2o/branch/master)
 [![Code Quality: Cpp](https://img.shields.io/lgtm/grade/cpp/g/RainerKuemmerle/g2o.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/RainerKuemmerle/g2o/context:cpp)
