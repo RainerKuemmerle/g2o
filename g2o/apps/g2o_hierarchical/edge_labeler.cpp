@@ -225,8 +225,8 @@ namespace g2o {
     MatrixXd errorCov(e->dimension(), e->dimension());
     VectorXd errorMean(e->dimension());
     reconstructGaussian(errorMean, errorCov, errorPoints);
-    info=errorCov.inverse();
 
+    //info=errorCov.inverse();
     // cerr << "remapped information matrix" << endl;
     // cerr << info << endl;
     return true;
