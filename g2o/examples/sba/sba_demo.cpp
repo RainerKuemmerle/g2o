@@ -38,6 +38,7 @@
 #include "g2o/solvers/dense/linear_solver_dense.h"
 #include "g2o/types/icp/types_icp.h"
 #include "g2o/solvers/structure_only/structure_only_solver.h"
+#include "g2o/stuff/sampler.h"
 
 #if defined G2O_HAVE_CHOLMOD
 #include "g2o/solvers/cholmod/linear_solver_cholmod.h"
@@ -48,45 +49,10 @@
 using namespace Eigen;
 using namespace std;
 
-
-class Sample
-{
-public:
-  static int uniform(int from, int to);
-  static double uniform();
-  static double gaussian(double sigma);
+class Sample {
+ public:
+  static int uniform(int from, int to) { return static_cast<int>(g2o::Sampler::uniformRand(from, to)); }
 };
-
-static double uniform_rand(double lowerBndr, double upperBndr)
-{
-  return lowerBndr + ((double) std::rand() / (RAND_MAX + 1.0)) * (upperBndr - lowerBndr);
-}
-
-static double gauss_rand(double mean, double sigma)
-{
-  double x, y, r2;
-  do {
-    x = -1.0 + 2.0 * uniform_rand(0.0, 1.0);
-    y = -1.0 + 2.0 * uniform_rand(0.0, 1.0);
-    r2 = x * x + y * y;
-  } while (r2 > 1.0 || r2 == 0.0);
-  return mean + sigma * y * std::sqrt(-2.0 * log(r2) / r2);
-}
-
-int Sample::uniform(int from, int to)
-{
-  return static_cast<int>(uniform_rand(from, to));
-}
-
-double Sample::uniform()
-{
-  return uniform_rand(0., 1.);
-}
-
-double Sample::gaussian(double sigma)
-{
-  return gauss_rand(0., sigma);
-}
 
 int main(int argc, const char* argv[])
 {
@@ -171,9 +137,9 @@ int main(int argc, const char* argv[])
   vector<Vector3d> true_points;
   for (size_t i=0;i<500; ++i)
   {
-    true_points.push_back(Vector3d((Sample::uniform()-0.5)*3,
-                                   Sample::uniform()-0.5,
-                                   Sample::uniform()+10));
+    true_points.push_back(Vector3d((g2o::Sampler::uniformRand(0., 1.)-0.5)*3,
+                                   g2o::Sampler::uniformRand(0., 1.)-0.5,
+                                   g2o::Sampler::uniformRand(0., 1.)+10));
   }
 
 
@@ -189,7 +155,7 @@ int main(int argc, const char* argv[])
   g2o::VertexSCam::setKcam(focal_length[0],focal_length[1],
                            principal_point[0],principal_point[1],
                            baseline);
-  
+
   // set up 5 vertices, first 2 fixed
   int vertex_id = 0;
   for (size_t i=0; i<5; ++i)
@@ -214,7 +180,7 @@ int main(int argc, const char* argv[])
 
     if (i<2)
       v_se3->setFixed(true);
-    
+
     optimizer.addVertex(v_se3);
     true_poses.push_back(pose);
     vertex_id++;
@@ -238,9 +204,9 @@ int main(int argc, const char* argv[])
     v_p->setId(point_id);
     v_p->setMarginalized(true);
     v_p->setEstimate(true_points.at(i)
-        + Vector3d(Sample::gaussian(1),
-                   Sample::gaussian(1),
-                   Sample::gaussian(1)));
+        + Vector3d(g2o::Sampler::gaussRand(0., 1),
+                   g2o::Sampler::gaussRand(0., 1),
+                   g2o::Sampler::gaussRand(0., 1)));
 
     int num_obs = 0;
 
@@ -271,7 +237,7 @@ int main(int argc, const char* argv[])
 
         if (z[0]>=0 && z[1]>=0 && z[0]<640 && z[1]<480)
         {
-          double sam = Sample::uniform();
+          double sam = g2o::Sampler::uniformRand(0., 1.);
           if (sam<OUTLIER_RATIO)
           {
             z = Vector3d(Sample::uniform(64,640),
@@ -282,9 +248,9 @@ int main(int argc, const char* argv[])
             inlier= false;
           }
 
-          z += Vector3d(Sample::gaussian(PIXEL_NOISE),
-                        Sample::gaussian(PIXEL_NOISE),
-                        Sample::gaussian(PIXEL_NOISE/16.0));
+          z += Vector3d(g2o::Sampler::gaussRand(0., PIXEL_NOISE),
+                        g2o::Sampler::gaussRand(0., PIXEL_NOISE),
+                        g2o::Sampler::gaussRand(0., PIXEL_NOISE/16.0));
 
           g2o::Edge_XYZ_VSC * e
               = new g2o::Edge_XYZ_VSC();
