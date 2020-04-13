@@ -36,7 +36,7 @@ using namespace std;
 
 namespace g2o {
 
-  BaseProperty::BaseProperty(const std::string name_) :_name(name_){
+  BaseProperty::BaseProperty(const std::string& name_) :_name(name_){
   }
 
   BaseProperty::~BaseProperty(){}

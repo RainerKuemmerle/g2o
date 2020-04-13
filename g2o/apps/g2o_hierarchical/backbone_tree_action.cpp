@@ -32,7 +32,7 @@ namespace g2o {
 
   using namespace std;
 
-  BackBoneTreeAction::BackBoneTreeAction(SparseOptimizer* optimizer, std::string vertexTag, int level, int step):
+  BackBoneTreeAction::BackBoneTreeAction(SparseOptimizer* optimizer, const std::string& vertexTag, int level, int step):
     _optimizer(optimizer),
     _vertexTag(vertexTag),
     _level(level),

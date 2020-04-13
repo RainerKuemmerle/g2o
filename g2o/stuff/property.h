@@ -38,7 +38,7 @@ namespace g2o {
 
   class G2O_STUFF_API BaseProperty {
     public:
-      BaseProperty(const std::string name_);
+      BaseProperty(const std::string& name_);
       virtual ~BaseProperty();
       const std::string& name() {return _name;}
       virtual std::string toString() const = 0;
