@@ -166,7 +166,7 @@ int main(int argc, char** argv)
   arg.param("summary", summaryFile, "", "append a summary of this optimization run to the summary file passed as argument");
   arg.paramLeftOver("graph-input", inputFilename, "", "graph file which will be processed", true);
   arg.param("nonSequential", nonSequential, false, "apply the robust kernel only on loop closures and not odometries");
-  
+
 
   arg.parseArgs(argc, argv);
 
@@ -208,11 +208,10 @@ int main(int argc, char** argv)
   optimizer.setVerbose(verbose);
   optimizer.setForceStopFlag(&hasToStop);
 
-  SparseOptimizerTerminateAction* terminateAction = 0;
   if (maxIterations < 0) {
     cerr << "# setup termination criterion based on the gain of the iteration" << endl;
     maxIterations = maxIterationsWithGain;
-    terminateAction = new SparseOptimizerTerminateAction;
+    SparseOptimizerTerminateAction* terminateAction = new SparseOptimizerTerminateAction;
     terminateAction->setGainThreshold(gain);
     terminateAction->setMaxIterations(maxIterationsWithGain);
     optimizer.addPostIterationAction(terminateAction);
@@ -225,7 +224,7 @@ int main(int argc, char** argv)
     cerr << "Error allocating solver. Allocating \"" << strSolver << "\" failed!" << endl;
     return 0;
   }
-  
+
   if (solverProperties.size() > 0) {
     bool updateStatus = optimizer.solver()->updatePropertiesFromString(solverProperties);
     if (! updateStatus) {
@@ -278,7 +277,7 @@ int main(int argc, char** argv)
   //optimizer.setMethod(str2method(strMethod));
   //optimizer.setUserLambdaInit(lambdaInit);
 
- 
+
   // check for vertices to fix to remove DoF
   bool gaugeFreedom = optimizer.gaugeFreedom();
   OptimizableGraph::Vertex* gauge=0;
@@ -401,7 +400,7 @@ int main(int argc, char** argv)
 
     // sort the edges in a way that inserting them makes sense
     sort(edges.begin(), edges.end(), IncrementalEdgesCompare());
-    
+
     double cumTime = 0.;
     int vertexCount=0;
     int lastOptimizedVertexCount = 0;
@@ -463,8 +462,8 @@ int main(int argc, char** argv)
                 HyperGraph::VertexSet toSet;
                 toSet.insert(to);
                 if (e->initialEstimatePossible(toSet, from) > 0.) {
-                  //cerr << "init: " 
-                    //<< to->id() << "(" << to->dimension() << ") -> " 
+                  //cerr << "init: "
+                    //<< to->id() << "(" << to->dimension() << ") -> "
                     //<< from->id() << "(" << from->dimension() << ") " << endl;
                    e->initialEstimate(toSet, from);
                 } else {
@@ -472,21 +471,21 @@ int main(int argc, char** argv)
                 }
                 break;
               }
-            case 2: 
+            case 2:
               {
                 HyperGraph::VertexSet fromSet;
                 fromSet.insert(from);
                 if (e->initialEstimatePossible(fromSet, to) > 0.) {
-                  //cerr << "init: " 
-                    //<< from->id() << "(" << from->dimension() << ") -> " 
+                  //cerr << "init: "
+                    //<< from->id() << "(" << from->dimension() << ") -> "
                     //<< to->id() << "(" << to->dimension() << ") " << endl;
-                  e->initialEstimate(fromSet, to);  
+                  e->initialEstimate(fromSet, to);
                 } else {
                   assert(0 && "Added unitialized variable to the graph");
                 }
                 break;
               }
-            default: cerr << "doInit wrong value\n"; 
+            default: cerr << "doInit wrong value\n";
           }
 
         }
@@ -536,7 +535,7 @@ int main(int argc, char** argv)
         if (! verbose)
           cerr << ".";
       }
-      
+
     } // for all edges
 
     if (! freshlyOptimized) {
@@ -607,7 +606,7 @@ int main(int argc, char** argv)
         }
       }
     }
-    
+
     optimizer.computeActiveErrors();
     double finalChi=optimizer.chi2();
 
@@ -616,7 +615,7 @@ int main(int argc, char** argv)
       summary.makeProperty<StringProperty>("filename", inputFilename);
       summary.makeProperty<IntProperty>("n_vertices", optimizer.vertices().size());
       summary.makeProperty<IntProperty>("n_edges", optimizer.edges().size());
-      
+
       int nLandmarks=0;
       int nPoses=0;
       int maxDim = *vertexDimensions.rbegin();
@@ -650,13 +649,13 @@ int main(int argc, char** argv)
       os.open(summaryFile.c_str(), ios::app);
       summary.writeToCSV(os);
     }
-    
+
 
     if (statsFile!=""){
       cerr << "writing stats to file \"" << statsFile << "\" ... ";
       ofstream os(statsFile.c_str());
       const BatchStatisticsContainer& bsc = optimizer.batchStatistics();
-      
+
       for (int i=0; i<maxIterations; i++) {
         os << bsc[i] << endl;
       }

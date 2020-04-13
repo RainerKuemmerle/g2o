@@ -299,7 +299,7 @@ namespace g2o {
     //    std::cerr << "subclass of OptimizableGraph::Edge confirmed";
     if (!e)
       return false;
-    
+
     return addEdge(e);
   }
 
@@ -591,16 +591,15 @@ bool OptimizableGraph::load(istream& is, bool createEdges)
 	}
         bool vertsOkay = true;
         for (int l = 0; l < numV; ++l) {
-	  int vertexId=ids[l];
-	  HyperGraph::Vertex* v=0;
-	  if (vertexId != HyperGraph::UnassignedId){
-	    v = vertex(vertexId);
-	    e->setVertex(l,v);
-	    if (!v) {
-	      vertsOkay = false;
-	      break;
-	    }
-	  }
+          int vertexId = ids[l];
+          if (vertexId != HyperGraph::UnassignedId) {
+            HyperGraph::Vertex* v = vertex(vertexId);
+            e->setVertex(l, v);
+            if (!v) {
+              vertsOkay = false;
+              break;
+            }
+          }
         }
         if (! vertsOkay) {
           cerr << __PRETTY_FUNCTION__ << ": Unable to find vertices for edge " << token;
