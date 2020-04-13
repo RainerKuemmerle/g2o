@@ -1,5 +1,4 @@
-g2o - General Graph Optimization
-================================
+# g2o - General Graph Optimization
 
 Linux: [![Build Status](https://travis-ci.org/RainerKuemmerle/g2o.svg?branch=master)](https://travis-ci.org/RainerKuemmerle/g2o)
 Windows: [![Build status](https://ci.appveyor.com/api/projects/status/9w0cpb9krc6t4nt7/branch/master?svg=true)](https://ci.appveyor.com/project/RainerKuemmerle/g2o/branch/master)
@@ -41,12 +40,12 @@ g2o is licensed under the BSD License. However, some libraries are available
 under different license terms. See below.
 
 The following parts are licensed under LGPL3+:
-- csparse\_extension
+  - csparse\_extension
 
 The following parts are licensed under GPL3+:
-- g2o\_viewer
-- g2o\_incremental
-- slam2d\_g2o (example for 2D SLAM with a QGLviewer GUI)
+  - g2o\_viewer
+  - g2o\_incremental
+  - slam2d\_g2o (example for 2D SLAM with a QGLviewer GUI)
 
 Please note that some features of CHOLMOD (which may be used by g2o, see
 libsuitesparse below) are licensed under the GPL. To avoid the GPL, you may
@@ -74,8 +73,8 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 licenses for more details.
 
 ## Requirements
-* cmake             <http://www.cmake.org>
-* Eigen3            <http://eigen.tuxfamily.org>
+- cmake             <http://www.cmake.org>
+- Eigen3            <http://eigen.tuxfamily.org>
 
 On Ubuntu / Debian these dependencies are resolved by installing the
 following packages.
@@ -83,9 +82,9 @@ following packages.
 - libeigen3-dev
 
 ### Optional requirements
-* suitesparse       <http://faculty.cse.tamu.edu/davis/suitesparse.html>
-* Qt5               <http://qt-project.org>
-* libQGLViewer      <http://www.libqglviewer.com>
+- suitesparse       <http://faculty.cse.tamu.edu/davis/suitesparse.html>
+- Qt5               <http://qt-project.org>
+- libQGLViewer      <http://www.libqglviewer.com>
 
 On Ubuntu / Debian these dependencies are resolved by installing the
 following packages.
