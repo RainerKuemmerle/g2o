@@ -49,14 +49,9 @@ namespace g2o{
     return std::numeric_limits<number_t>::max();
   }
 
-  HyperDijkstra::AdjacencyMapEntry::AdjacencyMapEntry(HyperGraph::Vertex* child_, HyperGraph::Vertex* parent_, 
-      HyperGraph::Edge* edge_, number_t distance_)
-  {
-    _child=child_;
-    _parent=parent_;
-    _edge=edge_;
-    _distance=distance_;
-  }
+  HyperDijkstra::AdjacencyMapEntry::AdjacencyMapEntry(HyperGraph::Vertex* child_, HyperGraph::Vertex* parent_,
+                                                      HyperGraph::Edge* edge_, number_t distance_)
+      : _child(child_), _parent(parent_), _edge(edge_), _distance(distance_) {}
 
   HyperDijkstra::HyperDijkstra(HyperGraph* g): _graph(g)
   {
@@ -83,7 +78,7 @@ namespace g2o{
   }
 
 
-  void HyperDijkstra::shortestPaths(HyperGraph::VertexSet& vset, HyperDijkstra::CostFunction* cost, 
+  void HyperDijkstra::shortestPaths(HyperGraph::VertexSet& vset, HyperDijkstra::CostFunction* cost,
       number_t maxDistance, number_t comparisonConditioner, bool directed, number_t maxEdgeCost)
   {
     reset();
@@ -146,7 +141,7 @@ namespace g2o{
     }
   }
 
-  void HyperDijkstra::shortestPaths(HyperGraph::Vertex* v, HyperDijkstra::CostFunction* cost, number_t maxDistance, 
+  void HyperDijkstra::shortestPaths(HyperGraph::Vertex* v, HyperDijkstra::CostFunction* cost, number_t maxDistance,
       number_t comparisonConditioner, bool directed, number_t maxEdgeCost)
   {
     HyperGraph::VertexSet vset;
@@ -178,7 +173,7 @@ namespace g2o{
 
   void HyperDijkstra::visitAdjacencyMap(AdjacencyMap& amap, TreeAction* action, bool useDistance)
   {
-    
+
     typedef std::deque<HyperGraph::Vertex*> Deque;
     Deque q;
     // scans for the vertices without the parent (whcih are the roots of the trees) and applies the action to them.
@@ -207,7 +202,7 @@ namespace g2o{
         //cerr << child->id();
         AdjacencyMap::iterator adjacencyIt=amap.find(child);
         assert (adjacencyIt!=amap.end());
-        HyperGraph::Edge* edge=adjacencyIt->second.edge();  
+        HyperGraph::Edge* edge=adjacencyIt->second.edge();
 
         assert(adjacencyIt->first==child);
         assert(adjacencyIt->second.child()==child);
@@ -224,10 +219,10 @@ namespace g2o{
 
   }
 
-  void HyperDijkstra::connectedSubset(HyperGraph::VertexSet& connected, HyperGraph::VertexSet& visited, 
-      HyperGraph::VertexSet& startingSet, 
+  void HyperDijkstra::connectedSubset(HyperGraph::VertexSet& connected, HyperGraph::VertexSet& visited,
+      HyperGraph::VertexSet& startingSet,
       HyperGraph* g, HyperGraph::Vertex* v,
-      HyperDijkstra::CostFunction* cost, number_t distance, 
+      HyperDijkstra::CostFunction* cost, number_t distance,
       number_t comparisonConditioner, number_t maxEdgeCost)
   {
     typedef std::queue<HyperGraph::Vertex*> VertexDeque;

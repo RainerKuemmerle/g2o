@@ -294,7 +294,7 @@ int main(int argc, char** argv)
         doInit = 2;
         if (v->dimension() == maxDim)
           vertexCount++;
-        
+
         if (v->dimension() == 3) {
           cout << "ADD VERTEX_XYT " << v->id() << ";" << endl;
         }
@@ -306,7 +306,7 @@ int main(int argc, char** argv)
       if (addNextEdge){
 
         static int edgeCnt = 0;
-       
+
         if (e->dimension() == 3) {
           double* information = e->informationData();
           double meas[3];
@@ -332,7 +332,7 @@ int main(int argc, char** argv)
         //cerr << " adding edge " << e->vertices()[0]->id() <<  " " << e->vertices()[1]->id() << endl;
         if (! optimizer.addEdge(e)) {
           cerr << "Unable to add edge " << e->vertices()[0]->id() << " -> " << e->vertices()[1]->id() << endl;
-        } 
+        }
       }
 
       freshlyOptimized=false;
@@ -346,7 +346,7 @@ int main(int argc, char** argv)
 
         addNextEdge=true;
         freshlyOptimized=true;
-        it--;
+        --it;
       }
 
     } // for all edges

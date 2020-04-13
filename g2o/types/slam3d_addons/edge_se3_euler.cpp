@@ -41,8 +41,8 @@ static void jac_quat3_euler3(Eigen::Matrix<number_t, 6, 6, Eigen::ColMajor>& J, 
   number_t delta= cst(1e-6);
   number_t idelta= 1 / (2 * delta);
 
-  Vector7 ta = t0;
-  Vector7 tb = t0;
+  Vector7 ta;
+  Vector7 tb;
   for (int i=0; i<6; i++){
     ta=tb=t0;
     ta[i]-=delta;

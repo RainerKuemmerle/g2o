@@ -43,21 +43,15 @@ using namespace std;
 
 namespace g2o {
 
-  VertexEllipse::VertexEllipse() : RobotData()
-  {
-    _covariance = Matrix3F::Zero();
-    _UMatrix = Matrix2F::Zero();
-    _singularValues = Vector2F::Zero();
-  }
+VertexEllipse::VertexEllipse()
+    : RobotData(), _covariance(Matrix3F::Zero()), _UMatrix(Matrix2F::Zero()), _singularValues(Vector2F::Zero()) {}
 
-  VertexEllipse::~VertexEllipse()
-  {
-  }
+VertexEllipse::~VertexEllipse() {}
 
-  void VertexEllipse::_updateSVD() const{
-    Eigen::SelfAdjointEigenSolver<Matrix2F> eigenSolver(_covariance.block<2,2>(0,0));
-    _UMatrix = eigenSolver.eigenvectors();
-    _singularValues = eigenSolver.eigenvalues();
+void VertexEllipse::_updateSVD() const {
+  Eigen::SelfAdjointEigenSolver<Matrix2F> eigenSolver(_covariance.block<2, 2>(0, 0));
+  _UMatrix = eigenSolver.eigenvectors();
+  _singularValues = eigenSolver.eigenvalues();
 
   }
 

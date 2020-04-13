@@ -90,9 +90,9 @@ namespace g2o {
        */
       static number_t gaussRand(number_t mean, number_t sigma)
       {
-        number_t x, y, r2;
+        number_t y, r2;
         do {
-          x = -1.0 + 2.0 * uniformRand(0.0, 1.0);
+          number_t x = -1.0 + 2.0 * uniformRand(0.0, 1.0);
           y = -1.0 + 2.0 * uniformRand(0.0, 1.0);
           r2 = x * x + y * y;
         } while (r2 > 1.0 || r2 == 0.0);

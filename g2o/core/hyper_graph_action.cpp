@@ -61,10 +61,7 @@ namespace g2o {
   {
   }
 
-  HyperGraphElementAction::HyperGraphElementAction(const std::string& typeName_)
-  {
-    _typeName = typeName_;
-  }
+  HyperGraphElementAction::HyperGraphElementAction(const std::string& typeName_) : _typeName(typeName_) {}
 
   void HyperGraphElementAction::setTypeName(const std::string& typeName_)
   {
@@ -76,12 +73,12 @@ namespace g2o {
   {
     return nullptr;
   }
-  
+
   HyperGraphElementAction* HyperGraphElementAction::operator()(const HyperGraph::HyperGraphElement* , HyperGraphElementAction::Parameters* )
   {
     return nullptr;
   }
-  
+
   HyperGraphElementAction::~HyperGraphElementAction()
   {
   }
@@ -139,7 +136,7 @@ namespace g2o {
     }
     return false;
   }
-  
+
   HyperGraphActionLibrary::HyperGraphActionLibrary()
   {
   }
@@ -165,7 +162,7 @@ namespace g2o {
       //delete it->second;
     //}
   }
-  
+
   HyperGraphElementAction* HyperGraphActionLibrary::actionByName(const std::string& name)
   {
     HyperGraphElementAction::ActionMap::iterator it=_actionMap.find(name);
@@ -194,7 +191,7 @@ namespace g2o {
     }
     return collection->registerAction(action);
   }
-  
+
   bool HyperGraphActionLibrary::unregisterAction(HyperGraphElementAction* action)
   {
     list<HyperGraphElementActionCollection*> collectionDeleteList;
@@ -229,7 +226,7 @@ namespace g2o {
   DrawAction::Parameters::Parameters(){
   }
 
-  DrawAction::DrawAction(const std::string& typeName_) 
+  DrawAction::DrawAction(const std::string& typeName_)
     : HyperGraphElementAction(typeName_)
   {
     _name="draw";
@@ -278,14 +275,14 @@ namespace g2o {
 
   void applyAction(HyperGraph* graph, HyperGraphElementAction* action, HyperGraphElementAction::Parameters* params, const std::string& typeName)
   {
-    for (HyperGraph::VertexIDMap::iterator it=graph->vertices().begin(); 
+    for (HyperGraph::VertexIDMap::iterator it=graph->vertices().begin();
         it!=graph->vertices().end(); ++it){
       auto& aux = *it->second;
       if ( typeName.empty() || typeid(aux).name()==typeName){
         (*action)(it->second, params);
       }
     }
-    for (HyperGraph::EdgeSet::iterator it=graph->edges().begin(); 
+    for (HyperGraph::EdgeSet::iterator it=graph->edges().begin();
         it!=graph->edges().end(); ++it){
       auto& aux = **it;
       if ( typeName.empty() || typeid(aux).name()==typeName)
