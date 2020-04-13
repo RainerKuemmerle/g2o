@@ -320,7 +320,7 @@ int main(int argc, char** argv)
     int minDim = *vertexDimensions.begin();
     if (maxDim != minDim) {
       cerr << "# Preparing Marginalization of the Landmarks ... ";
-      for (HyperGraph::VertexIDMap::iterator it=optimizer.vertices().begin(); it!=optimizer.vertices().end(); it++){
+      for (HyperGraph::VertexIDMap::iterator it=optimizer.vertices().begin(); it!=optimizer.vertices().end(); ++it){
         OptimizableGraph::Vertex* v=static_cast<OptimizableGraph::Vertex*>(it->second);
         if (v->dimension() != maxDim) {
           v->setMarginalized(true);
@@ -620,7 +620,7 @@ int main(int argc, char** argv)
       int nLandmarks=0;
       int nPoses=0;
       int maxDim = *vertexDimensions.rbegin();
-      for (HyperGraph::VertexIDMap::iterator it=optimizer.vertices().begin(); it!=optimizer.vertices().end(); it++){
+      for (HyperGraph::VertexIDMap::iterator it=optimizer.vertices().begin(); it!=optimizer.vertices().end(); ++it){
 	OptimizableGraph::Vertex* v=static_cast<OptimizableGraph::Vertex*>(it->second);
 	if (v->dimension() != maxDim) {
 	  nLandmarks++;
@@ -628,11 +628,11 @@ int main(int argc, char** argv)
 	  nPoses++;
       }
       set<string> edgeTypes;
-      for (HyperGraph::EdgeSet::iterator it=optimizer.edges().begin(); it!=optimizer.edges().end(); it++){
+      for (HyperGraph::EdgeSet::iterator it=optimizer.edges().begin(); it!=optimizer.edges().end(); ++it){
 	edgeTypes.insert(Factory::instance()->tag(*it));
       }
       stringstream edgeTypesString;
-      for (std::set<string>::iterator it=edgeTypes.begin(); it!=edgeTypes.end(); it++){
+      for (std::set<string>::iterator it=edgeTypes.begin(); it!=edgeTypes.end(); ++it){
 	edgeTypesString << *it << " ";
       }
 

@@ -41,14 +41,14 @@ ostream& operator << (ostream& os, const Plane3D& p){
 typedef std::list<Plane3D*> PlaneList;
 
 void transform(PlaneList& l, const SE3Quat& t){
-  for (PlaneList::iterator it=l.begin(); it!=l.end(); it++){
+  for (PlaneList::iterator it=l.begin(); it!=l.end(); ++it){
     Plane3D *p = *it;
     *p = t*(*p);
   }
 }
 
 ostream& operator << (ostream& os, const PlaneList& l){
-  for (PlaneList::const_iterator it=l.begin(); it!=l.end(); it++){
+  for (PlaneList::const_iterator it=l.begin(); it!=l.end(); ++it){
     const Plane3D *p = *it;
     os << *p << endl;
   }

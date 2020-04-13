@@ -109,10 +109,10 @@ namespace g2o{
     while (it!=r->trajectory().rend() && count < 1){
       if (!_robotPoseObject)
         _robotPoseObject = *it;
-      it++;
+      ++it;
       count++;
     }
-    for (std::set<BaseWorldObject*>::iterator it=world()->objects().begin(); it!=world()->objects().end(); it++){
+    for (std::set<BaseWorldObject*>::iterator it=world()->objects().begin(); it!=world()->objects().end(); ++it){
       WorldObjectType* o=dynamic_cast<WorldObjectType*>(*it);
       if (o && isVisible(o)){
         EdgeType* e=mkEdge(o);

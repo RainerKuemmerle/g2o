@@ -722,7 +722,7 @@ bool OptimizableGraph::saveSubset(ostream& os, HyperGraph::VertexSet& vset, int 
   if (! _parameters.write(os))
     return false;
 
-  for (HyperGraph::VertexSet::const_iterator it=vset.begin(); it!=vset.end(); it++){
+  for (HyperGraph::VertexSet::const_iterator it=vset.begin(); it!=vset.end(); ++it){
     OptimizableGraph::Vertex* v = dynamic_cast<OptimizableGraph::Vertex*>(*it);
     saveVertex(os, v);
   }

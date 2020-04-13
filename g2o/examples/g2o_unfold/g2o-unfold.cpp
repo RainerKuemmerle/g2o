@@ -436,11 +436,11 @@ int main(int argc, char** argv)
     {
       cerr << "Preparing Marginalization of the Landmarks ... ";
       int maxDim = -1;
-      for (HyperGraph::VertexIDMap::iterator it=optimizer.vertices().begin(); it!=optimizer.vertices().end(); it++){
+      for (HyperGraph::VertexIDMap::iterator it=optimizer.vertices().begin(); it!=optimizer.vertices().end(); ++it){
   OptimizableGraph::Vertex* v=static_cast<OptimizableGraph::Vertex*>(it->second);
   maxDim = (max)(v->dimension(), maxDim);
       }
-      for (HyperGraph::VertexIDMap::iterator it=optimizer.vertices().begin(); it!=optimizer.vertices().end(); it++){
+      for (HyperGraph::VertexIDMap::iterator it=optimizer.vertices().begin(); it!=optimizer.vertices().end(); ++it){
   OptimizableGraph::Vertex* v=static_cast<OptimizableGraph::Vertex*>(it->second);
   if (v->dimension() != maxDim) {
     //cerr << "m";

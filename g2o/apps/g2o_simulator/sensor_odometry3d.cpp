@@ -62,11 +62,11 @@ namespace g2o {
     std::list<PoseObject*>::reverse_iterator it=r->trajectory().rbegin();
     if (it!=r->trajectory().rend()){
       pcurr = *it; 
-      it++;
+      ++it;
     }
     if (it!=r->trajectory().rend()){
       pprev = *it; 
-      it++;
+      ++it;
     }
     if (!(pcurr&&pprev)) {
       cerr << __PRETTY_FUNCTION__ << ": fatal, trajectory empty" << endl;

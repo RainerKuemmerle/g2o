@@ -187,7 +187,7 @@ struct Simulator: public SimulatorItem {
   Simulator(OptimizableGraph* graph_): SimulatorItem(graph_), _lastVertexId(0){}
   void sense(int robotIndex){
     Robot* r=_robots[robotIndex];
-    for (WorldItemSet::iterator it=_world.begin(); it!=_world.end(); it++){
+    for (WorldItemSet::iterator it=_world.begin(); it!=_world.end(); ++it){
       WorldItem* item=*it;
       r->sense(item);
     }

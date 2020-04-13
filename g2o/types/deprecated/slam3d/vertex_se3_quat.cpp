@@ -145,7 +145,7 @@ namespace deprecated {
     }
     CacheContainer* caches=that->cacheContainer();
     if (caches){
-      for (CacheContainer::iterator it=caches->begin(); it!=caches->end(); it++){
+      for (CacheContainer::iterator it=caches->begin(); it!=caches->end(); ++it){
         Cache* c = it->second;
         (*_cacheDrawActions)(c, params_);
       }

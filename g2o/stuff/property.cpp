@@ -56,7 +56,7 @@ namespace g2o {
   }
 
   PropertyMap::~PropertyMap() {
-    for (PropertyMapIterator it=begin(); it!=end(); it++){
+    for (PropertyMapIterator it=begin(); it!=end(); ++it){
       if (it->second)
         delete it->second;
     }
@@ -73,12 +73,12 @@ namespace g2o {
 
   void PropertyMap::writeToCSV(std::ostream& os) const
   {
-    for (PropertyMapConstIterator it=begin(); it!=end(); it++){
+    for (PropertyMapConstIterator it=begin(); it!=end(); ++it){
       BaseProperty* p =it->second;
       os << p->name() << ", ";
     }
     os << std::endl;
-    for (PropertyMapConstIterator it=begin(); it!=end(); it++){
+    for (PropertyMapConstIterator it=begin(); it!=end(); ++it){
       BaseProperty* p =it->second;
       os << p->toString() << ", ";
     }

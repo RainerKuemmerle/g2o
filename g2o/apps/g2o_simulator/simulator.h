@@ -262,7 +262,7 @@ class BinarySensor: public BaseSensor {
         return;
 
       // naive search. just for initial testing
-      for(std::set<BaseWorldObject*>::iterator it=world()->objects().begin(); it!=world()->objects().end(); it++){
+      for(std::set<BaseWorldObject*>::iterator it=world()->objects().begin(); it!=world()->objects().end(); ++it){
         WorldObjectType * wo = dynamic_cast<WorldObjectType*>(*it);
         if (wo){
           EdgeType* e=mkEdge(wo);

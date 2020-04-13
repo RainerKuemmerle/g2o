@@ -153,7 +153,7 @@ int main(int argc, char** argv)
   OptimizableGraph outGraph();
   // insert all lines in the infomap
   int currentId = 0;
-  for (OptimizableGraph::VertexIDMap::iterator it=optimizer.vertices().begin(); it!=optimizer->vertices().end(); it++){
+  for (OptimizableGraph::VertexIDMap::iterator it=optimizer.vertices().begin(); it!=optimizer->vertices().end(); ++it){
     VertexSE2 *p=dynamic_cast<VertexSegment2D*> (it->second());
     if (p){
       VertexSE2 *np=p->clone();
@@ -167,7 +167,7 @@ int main(int argc, char** argv)
     currentId = it->first;
   }
   currentId++;
-  for (OptimizableGraph::EdgeSet::iterator it=optimizer.edges().begin(); it!=optimizer->edges().end(); it++){
+  for (OptimizableGraph::EdgeSet::iterator it=optimizer.edges().begin(); it!=optimizer->edges().end(); ++it){
     EdgeSE2* ods=dynamic_cast<EdgeSE2*> (*it);
     if (ods){
       EdgeSE2* ods2=new EdgeSE2();
