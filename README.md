@@ -26,13 +26,13 @@ to several variants of SLAM and BA. g2o offers a performance comparable to
 implementations of state-of-the-art approaches for the specific problems
 (02/2011).
 
-# Papers Describing the Approach
+## Papers Describing the Approach
 Rainer Kuemmerle, Giorgio Grisetti, Hauke Strasdat,
 Kurt Konolige, and Wolfram Burgard
 [g2o: A General Framework for Graph Optimization](http://ais.informatik.uni-freiburg.de/publications/papers/kuemmerle11icra.pdf)
 IEEE International Conference on Robotics and Automation (ICRA), 2011
 
-# Documentation
+## Documentation
 A detailed description of how the library is structured and how to use and extend it can be found in /doc/g2o.pdf
 The API documentation can be generated as described in doc/doxygen/readme.txt
 
@@ -49,11 +49,11 @@ The following parts are licensed under GPL3+:
 - slam2d\_g2o (example for 2D SLAM with a QGLviewer GUI)
 
 Please note that some features of CHOLMOD (which may be used by g2o, see
-libsuitesparse below) are licensed under the GPL. To avoid that your binary has
-to be licensed under the GPL, you may have to re-compile CHOLMOD without
-including its GPL features. The CHOLMOD library distributed with, for example,
-Ubuntu or Debian includes the GPL features. The supernodal factorization is
-considered by g2o, if it is available.
+libsuitesparse below) are licensed under the GPL. To avoid the GPL, you may
+have to re-compile CHOLMOD without including its GPL features. The CHOLMOD
+library distributed with, for example, Ubuntu or Debian includes the GPL
+features. The supernodal factorization is considered by g2o, if it is
+available.
 
 Within the folder EXTERNAL we include software not written by us to
 guarantee easy compilation.
@@ -109,7 +109,7 @@ If using [vcpkg](https://github.com/Microsoft/vcpkg), then
 
 will build and install the required dependencies. The location of `vcpkg` and required triplet are determined by the environment variables `VCPKG_ROOT_DIR` and `VCPKG_DEFAULT_TRIPLET`.
 
-# Compilation
+## Compilation
 
 Our primary development platform is Linux. Experimental support for
 Mac OS X, Android and Windows (MinGW or MSVC).
@@ -139,7 +139,7 @@ Within cmake-gui set the variable G2O\_EIGEN3\_INCLUDE to that directory.
 - `cd build`
 - `cmake -DCMAKE_TOOLCHAIN_FILE=../script/android.toolchain.cmake -DANDROID_NDK=<YOUR_PATH_TO_ANDROID_NDK_r10d+> -DCMAKE_BUILD_TYPE=Release -DANDROID_ABI="armeabi-v7a with NEON" -DEIGEN3_INCLUDE_DIR="<YOUR_PATH_TO_EIGEN>" -DEIGEN3_VERSION_OK=ON .. && cmake --build .`
 
-# Acknowledgments
+## Acknowledgments
 We thank the following contributors for providing patches:
 - Simon J. Julier: patches to achieve compatibility with Mac OS X and others.
 - Michael A. Eriksen for submitting patches to compile with MSVC.
