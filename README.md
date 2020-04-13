@@ -92,7 +92,7 @@ following packages.
 - libsuitesparse-dev
 - qtdeclarative5-dev
 - qt5-qmake
-- libqglviewer-dev
+- libqglviewer-dev-qt5
 
 #### Mac OS X
 If using [Homebrew](http://brew.sh/), then
