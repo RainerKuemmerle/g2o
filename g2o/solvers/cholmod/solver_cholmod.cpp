@@ -90,14 +90,10 @@ namespace g2o {
     return nullptr;
   }
 
-  class CholmodSolverCreator : public AbstractOptimizationAlgorithmCreator
-  {
-    public:
-      CholmodSolverCreator(const OptimizationAlgorithmProperty& p) : AbstractOptimizationAlgorithmCreator(p) {}
-      virtual OptimizationAlgorithm* construct()
-      {
-        return createSolver(property().name);
-      }
+  class CholmodSolverCreator : public AbstractOptimizationAlgorithmCreator {
+   public:
+    explicit CholmodSolverCreator(const OptimizationAlgorithmProperty& p) : AbstractOptimizationAlgorithmCreator(p) {}
+    virtual OptimizationAlgorithm* construct() { return createSolver(property().name); }
   };
 
   G2O_REGISTER_OPTIMIZATION_LIBRARY(cholmod);
