@@ -110,11 +110,9 @@ void assignHierarchicalEdges(StarSet& stars, EdgeStarMap& esmap, EdgeLabeler* la
   // now construct the hierarchical edges for all the stars
   int starNum=0;
   for (StarSet::iterator it=stars.begin(); it!=stars.end(); ++it){
-    cerr << "STAR# " << starNum << endl;
     Star* s=*it;
     std::vector<OptimizableGraph::Vertex*> vertices(2);
     vertices[0]= (OptimizableGraph::Vertex*) *s->_gauge.begin();
-    cerr << "eIs"  << endl;
     HyperGraph::VertexSet vNew =s->lowLevelVertices();
     for (HyperGraph::VertexSet::iterator vit=s->_lowLevelVertices.begin(); vit!=s->_lowLevelVertices.end(); ++vit){
       OptimizableGraph::Vertex* v=(OptimizableGraph::Vertex*)*vit;
@@ -130,14 +128,9 @@ void assignHierarchicalEdges(StarSet& stars, EdgeStarMap& esmap, EdgeLabeler* la
           e->setLevel(1);
           optimizer->addEdge(e);
           s->_starEdges.insert(e);
-        } else {
-          cerr << "THERE" << endl;
-          cerr << "FATAL, cannot create edge" << endl;
         }
       } else {
         vNew.erase(v);
-        // cerr << numEdges << " ";
-        // cerr << "r " <<  v-> id() << endl;
         // remove from the star all edges that are not sufficiently connected
         for (HyperGraph::EdgeSet::iterator it=eInSt.begin(); it!=eInSt.end(); ++it){
           HyperGraph::Edge* e=*it;
@@ -146,35 +139,14 @@ void assignHierarchicalEdges(StarSet& stars, EdgeStarMap& esmap, EdgeLabeler* la
       }
     }
     s->lowLevelVertices()=vNew;
-    //cerr << endl;
-    cerr <<  "gauge: " << (*s->_gauge.begin())->id()
-      << " edges:" << s->_lowLevelEdges.size()
-      << " hedges" << s->_starEdges.size() << endl;
 
-    const bool debug = false;
-    if (debug){
-      char starLowName[100];
-      sprintf(starLowName, "star-%04d-low.g2o", starNum);
-      ofstream starLowStream(starLowName);
-      optimizer->saveSubset(starLowStream, s->_lowLevelEdges);
-    }
-    bool labelOk=s->labelStarEdges(maxIterations, labeler);
-    if (labelOk) {
-      if (debug) {
-        char starHighName[100];
-        sprintf(starHighName, "star-%04d-high.g2o", starNum);
-        ofstream starHighStream(starHighName);
-        optimizer->saveSubset(starHighStream, s->_starEdges);
-      }
-    } else {
-      cerr << "FAILURE" << endl;
-    }
+    bool labelOk = s->labelStarEdges(maxIterations, labeler);
+    (void) labelOk;
     starNum++;
   }
 }
 
 void computeBorder(StarSet& stars, EdgeStarMap& hesmap){
-  cerr << "computing edges on the border" << endl;
   for (StarSet::iterator it=stars.begin(); it!=stars.end(); ++it){
     Star* s=*it;
     for (HyperGraph::EdgeSet::iterator iit=s->_starEdges.begin(); iit!=s->_starEdges.end(); ++iit){
@@ -188,7 +160,6 @@ void computeBorder(StarSet& stars, EdgeStarMap& hesmap){
     }
   }
 }
-
 
   void computeSimpleStars(StarSet& stars,
 			  SparseOptimizer* optimizer,
