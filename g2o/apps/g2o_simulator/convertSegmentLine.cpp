@@ -57,7 +57,7 @@ using namespace g2o;
 using namespace Eigen;
 
 struct LineInfo {
-  LineInfo(VertexSegment2D* s) {
+  explicit LineInfo(VertexSegment2D* s) {
     line=new VertexLine2D();
     line->setId(s->id());
     line->setEstimate(computeLineParameters(s->estimateP1(), s->estimateP2()));

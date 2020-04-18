@@ -30,7 +30,8 @@ namespace g2o {
   using namespace g2o;
 
   // point to camera projection, monocular
-  EdgeSE3PointXYZDepth::EdgeSE3PointXYZDepth() : BaseBinaryEdge<3, Vector3, VertexSE3, VertexPointXYZ>() {
+  EdgeSE3PointXYZDepth::EdgeSE3PointXYZDepth()
+      : BaseBinaryEdge<3, Vector3, VertexSE3, VertexPointXYZ>(), cache(nullptr) {
     resizeParameters(1);
     installParameter(params, 0);
     information().setIdentity();
@@ -46,9 +47,6 @@ namespace g2o {
     return cache != 0;
   }
 
-
-
-
   bool EdgeSE3PointXYZDepth::read(std::istream& is) {
     int pid;
     is >> pid;
@@ -56,37 +54,26 @@ namespace g2o {
 
     // measured keypoint
     Vector3 meas;
-    for (int i=0; i<3; i++) is >> meas[i];
+    internal::readVector(is, meas);
     setMeasurement(meas);
-    // don't need this if we don't use it in error calculation (???)
-    // information matrix is the identity for features, could be changed to allow arbitrary covariances    
     if (is.bad()) {
       return false;
     }
-    for ( int i=0; i<information().rows() && is.good(); i++)
-      for (int j=i; j<information().cols() && is.good(); j++){
-  is >> information()(i,j);
-  if (i!=j)
-    information()(j,i)=information()(i,j);
-      }
+    readInformationMatrix(is);
     if (is.bad()) {
       //  we overwrite the information matrix
       information().setIdentity();
       information()(2,2)=10/_measurement(2); // scale the info by the inverse of the measured depth
-    } 
+    }
     return true;
   }
 
   bool EdgeSE3PointXYZDepth::write(std::ostream& os) const {
     os << params->id() << " ";
-    for (int i=0; i<3; i++) os  << measurement()[i] << " ";
-    for (int i=0; i<information().rows(); i++)
-      for (int j=i; j<information().cols(); j++) {
-        os <<  information()(i,j) << " ";
-      }
+    internal::writeVector(os, measurement());
+    return writeInformationMatrix(os);
     return os.good();
   }
-
 
   void EdgeSE3PointXYZDepth::computeError() {
     // from cam to point (track)
@@ -101,7 +88,6 @@ namespace g2o {
     // error, which is backwards from the normal observed - calculated
     // _measurement is the measured projection
     _error = perr - _measurement;
-    //    std::cout << _error << std::endl << std::endl;
   }
 
   void EdgeSE3PointXYZDepth::linearizeOplus() {

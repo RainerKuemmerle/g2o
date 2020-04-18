@@ -71,7 +71,7 @@ namespace g2o {
   }
 
 #ifdef G2O_HAVE_OPENGL
-  VertexPointXYDrawAction::VertexPointXYDrawAction(): DrawAction(typeid(VertexPointXY).name()){}
+  VertexPointXYDrawAction::VertexPointXYDrawAction() : DrawAction(typeid(VertexPointXY).name()), _pointSize(nullptr) {}
 
   bool VertexPointXYDrawAction::refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_){
     if (! DrawAction::refreshPropertyPtrs(params_))
@@ -85,8 +85,7 @@ namespace g2o {
   }
 
   HyperGraphElementAction* VertexPointXYDrawAction::operator()(HyperGraph::HyperGraphElement* element,
-                     HyperGraphElementAction::Parameters* params ){
-
+                                                               HyperGraphElementAction::Parameters* params) {
     if (typeid(*element).name()!=_typeName)
       return nullptr;
     initializeDrawActionsCache();

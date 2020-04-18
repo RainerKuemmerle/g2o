@@ -46,12 +46,14 @@ namespace SlamParser {
       /**
        * construct a parser and use the given AbstractSlamInterface to communicate with the SLAM algorithm.
        */
-      ParserInterface(AbstractSlamInterface* slamInterface);
+      explicit ParserInterface(AbstractSlamInterface* slamInterface);
+      ParserInterface & operator=(const ParserInterface&) = delete;
+      ParserInterface(const ParserInterface&) = delete;
       virtual ~ParserInterface();
 
       /**
        * parse a single command and forward to the SLAM engine
-       */ 
+       */
       bool parseCommand(std::istream& input);
 
     protected:
