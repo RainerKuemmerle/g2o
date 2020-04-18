@@ -47,17 +47,15 @@ namespace g2o {
 
   bool EdgeSE2PointXYCalib::read(std::istream& is)
   {
-    is >> _measurement[0] >> _measurement[1];
-    is >> information()(0,0) >> information()(0,1) >> information()(1,1);
-    information()(1,0) = information()(0,1);
+    internal::readVector(is, _measurement);
+    readInformationMatrix(is);
     return true;
   }
 
   bool EdgeSE2PointXYCalib::write(std::ostream& os) const
   {
-    os << measurement()[0] << " " << measurement()[1] << " ";
-    os << information()(0,0) << " " << information()(0,1) << " " << information()(1,1);
-    return os.good();
+    internal::writeVector(os, measurement());
+    return writeInformationMatrix(os);
   }
 
 } // end namespace

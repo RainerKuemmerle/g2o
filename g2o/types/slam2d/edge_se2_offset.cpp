@@ -64,33 +64,21 @@ namespace g2o {
       return false;
 
     Vector3 meas;
-    for (int i=0; i<3; i++)
-      is >> meas[i];
+    internal::readVector(is, meas);
     setMeasurement(SE2(meas));
-    if (is.bad()) {
-      return false;
-    }
-    for ( int i=0; i<information().rows() && is.good(); i++)
-      for (int j=i; j<information().cols() && is.good(); j++){
-        is >> information()(i,j);
-        if (i!=j)
-          information()(j,i)=information()(i,j);
-      }
+    if (is.bad()) return false;
+    readInformationMatrix(is);
     if (is.bad()) {
       //  we overwrite the information matrix with the Identity
       information().setIdentity();
-    } 
+    }
     return true;
   }
 
   bool EdgeSE2Offset::write(std::ostream& os) const {
     os << _offsetFrom->id() << " " << _offsetTo->id() << " ";
-    for (int i=0; i<3; i++) os  << measurement()[i] << " ";
-    for (int i=0; i<information().rows(); i++)
-      for (int j=i; j<information().cols(); j++) {
-        os <<  information()(i,j) << " ";
-      }
-    return os.good();
+    internal::writeVector(os, measurement().toVector());
+    return writeInformationMatrix(os);
   }
 
   void EdgeSE2Offset::computeError() {
@@ -110,7 +98,7 @@ namespace g2o {
     VertexSE2 *to   = static_cast<VertexSE2*>(_vertices[1]);
 
     SE2 virtualMeasurement = _cacheFrom->offsetParam()->offset() * measurement() * _cacheTo->offsetParam()->offset().inverse();
-    
+
     if (from_.count(from) > 0) {
       to->setEstimate(from->estimate() * virtualMeasurement);
     } else

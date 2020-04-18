@@ -42,28 +42,16 @@ namespace g2o {
 
   bool EdgeXYPrior::read(std::istream& is)
   {
-    Vector2 p;
-    is >> p[0] >> p[1];
-    setMeasurement(p);
-    for (int i = 0; i < 2; ++i)
-      for (int j = i; j < 2; ++j) {
-        is >> information()(i, j);
-        if (i != j)
-          information()(j, i) = information()(i, j);
-      }
+    internal::readVector(is, _measurement);
+    readInformationMatrix(is);
     return true;
   }
 
   bool EdgeXYPrior::write(std::ostream& os) const
   {
-    Vector2 p = measurement();
-    os << p.x() << " " << p.y();
-    for (int i = 0; i < 2; ++i)
-      for (int j = i; j < 2; ++j)
-        os << " " << information()(i, j);
-    return os.good();
+    internal::writeVector(os, measurement());
+    return writeInformationMatrix(os);
   }
-
 
 #ifndef NUMERIC_JACOBIAN_TWO_D_TYPES
   void EdgeXYPrior::linearizeOplus()
@@ -71,6 +59,5 @@ namespace g2o {
     _jacobianOplusXi=Matrix2::Identity();
   }
 #endif
-
 
 } // end namespace

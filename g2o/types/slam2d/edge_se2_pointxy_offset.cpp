@@ -54,37 +54,19 @@ namespace g2o {
     is >> pId;
     setParameterId(0, pId);
     // measured keypoint
-    Vector2 meas;
-    for (int i=0; i<2; i++) is >> meas[i];
-    setMeasurement(meas);
-    // information matrix is the identity for features, could be changed to allow arbitrary covariances    
-    if (is.bad()) {
-      return false;
-    }
-    for ( int i=0; i<information().rows() && is.good(); i++)
-      for (int j=i; j<information().cols() && is.good(); j++){
-        is >> information()(i,j);
-        if (i!=j)
-          information()(j,i)=information()(i,j);
-      }
-    if (is.bad()) {
-      //  we overwrite the information matrix
-      information().setIdentity();
-    } 
+    internal::readVector(is, _measurement);
+    if (is.bad()) return false;
+    readInformationMatrix(is);
+    //  we overwrite the information matrix in case of read errors
+    if (is.bad()) information().setIdentity();
     return true;
   }
 
   bool EdgeSE2PointXYOffset::write(std::ostream& os) const {
-    cerr <<"W";
     os << offsetParam->id() << " ";
-    for (int i=0; i<2; i++) os  << measurement()[i] << " ";
-    for (int i=0; i<information().rows(); i++)
-      for (int j=i; j<information().cols(); j++) {
-        os <<  information()(i,j) << " ";
-      }
-    return os.good();
+    internal::writeVector(os, measurement());
+    return writeInformationMatrix(os);
   }
-
 
   void EdgeSE2PointXYOffset::computeError() {
     // from cam to point (track)
@@ -96,14 +78,13 @@ namespace g2o {
     // error, which is backwards from the normal observed - calculated
     // _measurement is the measured projection
     _error = perr - _measurement;
-    //    std::cout << _error << std::endl << std::endl;
   }
 
   void EdgeSE2PointXYOffset::linearizeOplus() {
     VertexSE2 *rob = static_cast<VertexSE2*>(_vertices[0]);
     VertexPointXY *point = static_cast<VertexPointXY*>(_vertices[1]);
     _jacobianOplusXi.block<2,2>(0,0) = - cache->RpInverseRInverseMatrix();
-    _jacobianOplusXi.block<2,1>(0,2) = cache->RpInverseRInversePrimeMatrix()*(point->estimate()-rob->estimate().translation()); 
+    _jacobianOplusXi.block<2,1>(0,2) = cache->RpInverseRInversePrimeMatrix()*(point->estimate()-rob->estimate().translation());
     _jacobianOplusXj = cache->RpInverseRInverseMatrix();
   }
 
@@ -111,10 +92,7 @@ namespace g2o {
   bool EdgeSE2PointXYOffset::setMeasurementFromState(){
     VertexPointXY *point = static_cast<VertexPointXY*>(_vertices[1]);
 
-    const Vector2 &pt = point->estimate();
-
-    Vector2 perr = cache->w2lMatrix() * pt;
-    _measurement = perr;
+    _measurement = cache->w2lMatrix() * point->estimate();
     return true;
   }
 

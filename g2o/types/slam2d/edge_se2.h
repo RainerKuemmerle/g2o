@@ -95,7 +95,7 @@ namespace g2o {
   class G2O_TYPES_SLAM2D_API EdgeSE2WriteGnuplotAction: public WriteGnuplotAction {
   public:
     EdgeSE2WriteGnuplotAction();
-    virtual HyperGraphElementAction* operator()(HyperGraph::HyperGraphElement* element, 
+    virtual HyperGraphElementAction* operator()(HyperGraph::HyperGraphElement* element,
             HyperGraphElementAction::Parameters* params_);
   };
 
@@ -103,12 +103,11 @@ namespace g2o {
   class G2O_TYPES_SLAM2D_API EdgeSE2DrawAction: public DrawAction{
   public:
     EdgeSE2DrawAction();
-    virtual HyperGraphElementAction* operator()(HyperGraph::HyperGraphElement* element, 
+    virtual HyperGraphElementAction* operator()(HyperGraph::HyperGraphElement* element,
             HyperGraphElementAction::Parameters* params_);
   protected:
     virtual bool refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_);
-    FloatProperty* _triangleX, *_triangleY;
-
+    FloatProperty *_triangleX, *_triangleY;
   };
 #endif
 

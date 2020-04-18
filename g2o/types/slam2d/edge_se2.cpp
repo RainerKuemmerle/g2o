@@ -41,26 +41,17 @@ namespace g2o {
   bool EdgeSE2::read(std::istream& is)
   {
     Vector3 p;
-    is >> p[0] >> p[1] >> p[2];
+    internal::readVector(is, p);
     setMeasurement(SE2(p));
     _inverseMeasurement = measurement().inverse();
-    for (int i = 0; i < 3; ++i)
-      for (int j = i; j < 3; ++j) {
-        is >> information()(i, j);
-        if (i != j)
-          information()(j, i) = information()(i, j);
-      }
+    readInformationMatrix(is);
     return true;
   }
 
   bool EdgeSE2::write(std::ostream& os) const
   {
-    Vector3 p = measurement().toVector();
-    os << p.x() << " " << p.y() << " " << p.z();
-    for (int i = 0; i < 3; ++i)
-      for (int j = i; j < 3; ++j)
-        os << " " << information()(i, j);
-    return os.good();
+    internal::writeVector(os, measurement().toVector());
+    return writeInformationMatrix(os);
   }
 
   void EdgeSE2::initialEstimate(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* /* to */)
@@ -126,7 +117,8 @@ namespace g2o {
   }
 
 #ifdef G2O_HAVE_OPENGL
-  EdgeSE2DrawAction::EdgeSE2DrawAction(): DrawAction(typeid(EdgeSE2).name()){}
+  EdgeSE2DrawAction::EdgeSE2DrawAction()
+      : DrawAction(typeid(EdgeSE2).name()), _triangleX(nullptr), _triangleY(nullptr) {}
 
   bool EdgeSE2DrawAction::refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_){
     if (!DrawAction::refreshPropertyPtrs(params_))
@@ -141,7 +133,7 @@ namespace g2o {
     return true;
   }
 
-  HyperGraphElementAction* EdgeSE2DrawAction::operator()(HyperGraph::HyperGraphElement* element, 
+  HyperGraphElementAction* EdgeSE2DrawAction::operator()(HyperGraph::HyperGraphElement* element,
                HyperGraphElementAction::Parameters* params_){
     if (typeid(*element).name()!=_typeName)
       return nullptr;
@@ -149,7 +141,7 @@ namespace g2o {
     refreshPropertyPtrs(params_);
     if (! _previousParams)
       return this;
-    
+
     if (_show && !_show->value())
       return this;
 

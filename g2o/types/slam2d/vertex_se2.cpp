@@ -42,16 +42,14 @@ namespace g2o {
   bool VertexSE2::read(std::istream& is)
   {
     Vector3 p;
-    is >> p[0] >> p[1] >> p[2];
+    bool state = internal::readVector(is, p);
     setEstimate(p);
-    return true;
+    return state;
   }
 
   bool VertexSE2::write(std::ostream& os) const
   {
-    Vector3 p = estimate().toVector();
-    os << p[0] << " " << p[1] << " " << p[2];
-    return os.good();
+    return internal::writeVector(os, estimate().toVector());
   }
 
   VertexSE2WriteGnuplotAction::VertexSE2WriteGnuplotAction(): WriteGnuplotAction(typeid(VertexSE2).name()){}

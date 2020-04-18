@@ -40,17 +40,15 @@ namespace g2o {
 
   bool EdgeSE2PointXY::read(std::istream& is)
   {
-    is >> _measurement[0] >> _measurement[1];
-    is >> information()(0,0) >> information()(0,1) >> information()(1,1);
-    information()(1,0) = information()(0,1);
+    internal::readVector(is, _measurement);
+    readInformationMatrix(is);
     return true;
   }
 
   bool EdgeSE2PointXY::write(std::ostream& os) const
   {
-    os << measurement()[0] << " " << measurement()[1] << " ";
-    os << information()(0,0) << " " << information()(0,1) << " " << information()(1,1);
-    return os.good();
+    internal::writeVector(os, measurement());
+    return writeInformationMatrix(os);
   }
 
   void EdgeSE2PointXY::initialEstimate(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to)
@@ -119,7 +117,7 @@ namespace g2o {
 #ifdef G2O_HAVE_OPENGL
   EdgeSE2PointXYDrawAction::EdgeSE2PointXYDrawAction(): DrawAction(typeid(EdgeSE2PointXY).name()){}
 
-  HyperGraphElementAction* EdgeSE2PointXYDrawAction::operator()(HyperGraph::HyperGraphElement* element, 
+  HyperGraphElementAction* EdgeSE2PointXYDrawAction::operator()(HyperGraph::HyperGraphElement* element,
                 HyperGraphElementAction::Parameters*  params_){
     if (typeid(*element).name()!=_typeName)
       return nullptr;
@@ -127,7 +125,7 @@ namespace g2o {
     refreshPropertyPtrs(params_);
     if (! _previousParams)
       return this;
-    
+
     if (_show && !_show->value())
       return this;
 
