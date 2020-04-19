@@ -94,7 +94,7 @@ namespace g2o {
   class EigenSolverCreator : public AbstractOptimizationAlgorithmCreator
   {
     public:
-      EigenSolverCreator(const OptimizationAlgorithmProperty& p) : AbstractOptimizationAlgorithmCreator(p) {}
+      explicit EigenSolverCreator(const OptimizationAlgorithmProperty& p) : AbstractOptimizationAlgorithmCreator(p) {}
       virtual OptimizationAlgorithm* construct()
       {
         return createSolver(property().name);
