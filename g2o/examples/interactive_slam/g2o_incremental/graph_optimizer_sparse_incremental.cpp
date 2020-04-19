@@ -94,7 +94,6 @@ namespace g2o {
     OptimizationAlgorithm* solver = _algorithm;
     solver->init(online);
 
-    int cjIterations=0;
     bool ok=true;
 
     if (! online || batchStep) {
@@ -169,12 +168,7 @@ namespace g2o {
       _solverInterface->solve(_underlyingSolver->x(), _underlyingSolver->b());
     }
 
-    // print statistics for the non-zeros
-    //static ofstream debugNonZeros("non-zeros.txt");
-    //debugNonZeros << _solverInterface->nonZerosInL() << endl;
-
     update(_underlyingSolver->x());
-    ++cjIterations;
 
     if (verbose()){
       computeActiveErrors();

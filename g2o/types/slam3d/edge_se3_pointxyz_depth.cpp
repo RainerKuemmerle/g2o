@@ -27,7 +27,6 @@
 #include "edge_se3_pointxyz_depth.h"
 
 namespace g2o {
-  using namespace g2o;
 
   // point to camera projection, monocular
   EdgeSE3PointXYZDepth::EdgeSE3PointXYZDepth()
@@ -72,7 +71,6 @@ namespace g2o {
     os << params->id() << " ";
     internal::writeVector(os, measurement());
     return writeInformationMatrix(os);
-    return os.good();
   }
 
   void EdgeSE3PointXYZDepth::computeError() {

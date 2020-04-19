@@ -120,7 +120,7 @@ void RobustKernelFair::robustify(number_t e2, Vector3& rho) const
 {
   const number_t sqrte = sqrt(e2);
   const number_t aux = sqrte / _delta;
-  rho[0] = 2. *  _delta * _delta * (aux - log(1. + aux));
+  rho[0] = 2. *  _delta * _delta * (aux - log1p(aux));
   rho[1] = 1. / (1. + aux);
   rho[2] = - 0.5 / (sqrte * (1. + aux));
 }

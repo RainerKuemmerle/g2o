@@ -86,7 +86,7 @@ TEST(IoSlam2d, ReadWriteEdgeSE2PointXY) {
 
 TEST(IoSlam2d, ReadWriteEdgeXYPrior) {
   EdgeXYPrior outputEdge;
-  outputEdge.setMeasurement(Vector2(2., 1.));
+  outputEdge.setMeasurement(Vector2(3., 2.));
   randomizeInformationMatrix(outputEdge.information());
   EdgeXYPrior inputEdge;
   readWriteGraphElement(outputEdge, &inputEdge);
