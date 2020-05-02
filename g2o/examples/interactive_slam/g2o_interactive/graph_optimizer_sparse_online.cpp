@@ -88,7 +88,6 @@ int SparseOptimizerOnline::optimize(int iterations, bool online)
   (void) iterations; // we only do one iteration anyhow
   OptimizationAlgorithm* solver = _algorithm;
 
-  int cjIterations=0;
   bool ok=true;
 
   solver->init(online);
@@ -146,8 +145,6 @@ int SparseOptimizerOnline::optimize(int iterations, bool online)
   }
   ok = _underlyingSolver->solve();
   update(_underlyingSolver->x());
-
-  ++cjIterations;
 
   if (verbose()){
     computeActiveErrors();
@@ -271,8 +268,8 @@ void SparseOptimizerOnline::gnuplotVisualization()
     fprintf(_gnuplot, "splot \"-\" w l\n");
     for (EdgeSet::iterator it = edges().begin(); it != edges().end(); ++it) {
       OnlineEdgeSE3* e = (OnlineEdgeSE3*) *it;
-      OnlineVertexSE3* v1 = (OnlineVertexSE3*) e->vertices()[0];
-      OnlineVertexSE3* v2 = (OnlineVertexSE3*) e->vertices()[1];
+      OnlineVertexSE3* v1 = static_cast<OnlineVertexSE3*>(e->vertices()[0]);
+      OnlineVertexSE3* v2 = static_cast<OnlineVertexSE3*>(e->vertices()[1]);
       fprintf(_gnuplot, "%f %f %f\n", v1->updatedEstimate.translation().x(), v1->updatedEstimate.translation().y(), v1->updatedEstimate.translation().z());
       fprintf(_gnuplot, "%f %f %f \n\n\n", v2->updatedEstimate.translation().x(), v2->updatedEstimate.translation().y(), v2->updatedEstimate.translation().z());
     }

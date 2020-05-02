@@ -143,9 +143,6 @@ namespace g2o {
             }
           }
         }
-        if (!solverOk) {
-          return Fail;
-        }
         hgnNorm = VectorX::ConstMapType(_solver.x(), _solver.vectorSize()).norm();
       }
 
