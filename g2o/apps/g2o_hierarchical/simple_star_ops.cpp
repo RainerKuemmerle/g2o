@@ -303,7 +303,6 @@ void computeSimpleStars(StarSet& stars, SparseOptimizer* optimizer, EdgeLabeler*
     int starOptResult = s->optimizer()->optimize(starIterations);
     // cerr << starOptResult << "(" << starIterations << ")  " << endl;
 
-    int vKept = 0, vDropped = 0;
     if (!starIterations || starOptResult > 0) {
       optimizer->computeActiveErrors();
 
@@ -344,10 +343,6 @@ void computeSimpleStars(StarSet& stars, SparseOptimizer* optimizer, EdgeLabeler*
             if (otherEdges.find(e) != otherEdges.end()) prunedStarEdges.insert(e);
           }
           // cerr << "K( " << v->id() << "," << d << ")" ;
-          vKept++;
-        } else {
-          vDropped++;
-          // cerr << "R( " << v->id() << "," << d << ")" ;
         }
       }
       s->_lowLevelEdges = prunedStarEdges;
