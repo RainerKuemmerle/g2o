@@ -67,11 +67,10 @@ int main(int argc, char** argv)
   arg.param("pcg", pcg, false, "use PCG instead of Cholesky");
   arg.param("v", verbose, false, "verbose output of the optimization process");
   arg.param("g", vis, false, "gnuplot visualization");
-  
+
   arg.parseArgs(argc, argv);
 
   SparseOptimizerOnline optimizer(pcg);
-  //SparseOptimizer optimizer;
   optimizer.setVerbose(verbose);
   optimizer.setForceStopFlag(&hasToStop);
   optimizer.vizWithGnuplot = vis;
