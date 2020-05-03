@@ -57,7 +57,7 @@ namespace g2o {
   template <typename Derived>
   bool readVector(std::istream& is, Eigen::DenseBase<Derived>& b) {
     for (int i = 0; i < b.size() && is.good(); i++) is >> b(i);
-    return is.good();
+    return true;
   }
   }  // namespace internal
 
@@ -449,9 +449,9 @@ namespace g2o {
         //! returns the dimensions of the error function
         int dimension() const { return _dimension;}
 
-        G2O_ATTRIBUTE_DEPRECATED(virtual Vertex* createFrom()) {return nullptr;}
-	G2O_ATTRIBUTE_DEPRECATED(virtual Vertex* createTo())   {return nullptr;}
-	virtual Vertex* createVertex(int) {return nullptr;}
+        G2O_ATTRIBUTE_DEPRECATED(virtual Vertex* createFrom()) { return nullptr; }
+        G2O_ATTRIBUTE_DEPRECATED(virtual Vertex* createTo()) { return nullptr; }
+        virtual Vertex* createVertex(int) { return nullptr; }
 
         //! read the vertex from a stream, i.e., the internal state of the vertex
         virtual bool read(std::istream& is) = 0;
@@ -674,6 +674,8 @@ namespace g2o {
 
     ParameterContainer _parameters;
     JacobianWorkspace _jacobianWorkspace;
+
+    void performActions(int iter, HyperGraphActionSet& actions);
   };
 
   /**

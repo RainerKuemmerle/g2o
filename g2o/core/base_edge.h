@@ -134,7 +134,7 @@ namespace g2o {
             is >> information()(i, j);
             if (i != j) information()(j, i) = information()(i, j);
           }
-        return is.good();
+        return true;
       }
 
     public:
