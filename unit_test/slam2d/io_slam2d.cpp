@@ -30,6 +30,7 @@
 #include "g2o/types/slam2d/edge_se2_pointxy.h"
 #include "g2o/types/slam2d/edge_se2_prior.h"
 #include "g2o/types/slam2d/edge_xy_prior.h"
+#include "g2o/types/slam2d/parameter_se2_offset.h"
 #include "g2o/types/slam2d/vertex_point_xy.h"
 #include "g2o/types/slam2d/vertex_se2.h"
 #include "gtest/gtest.h"
@@ -52,6 +53,14 @@ TEST(IoSlam2d, ReadWriteVertexPointXY) {
   VertexPointXY inputVertex;
   readWriteGraphElement(outputVertex, &inputVertex);
   ASSERT_TRUE(outputVertex.estimate().isApprox(inputVertex.estimate()));
+}
+
+TEST(IoSlam2d, ReadWriteParameterSE2Offset) {
+  ParameterSE2Offset outputParam;
+  outputParam.setOffset(SE2(1., 2., 0.3));
+  ParameterSE2Offset inputParam;
+  readWriteGraphElement(outputParam, &inputParam);
+  ASSERT_TRUE(outputParam.offset().toVector().isApprox(inputParam.offset().toVector()));
 }
 
 TEST(IoSlam2d, ReadWriteEdgeSE2) {

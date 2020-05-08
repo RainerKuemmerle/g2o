@@ -45,7 +45,7 @@ namespace g2o {
     setMeasurement(SE2(p));
     _inverseMeasurement = measurement().inverse();
     readInformationMatrix(is);
-    return true;
+    return is.good() || is.eof();
   }
 
   bool EdgeSE2::write(std::ostream& os) const

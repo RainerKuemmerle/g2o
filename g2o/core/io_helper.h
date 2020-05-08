@@ -24,28 +24,25 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef TESTHELPER_IO_H
-#define TESTHELPER_IO_H
+#ifndef G2O_CORE_IO_HELPER_H
+#define G2O_CORE_IO_HELPER_H
 
-#include <Eigen/Core>
-#include <sstream>
+#include <iosfwd>
 
 namespace g2o {
-
-template <typename T>
-void readWriteGraphElement(const T& output, T* input) {
-  std::stringstream data;
-  EXPECT_TRUE(output.write(data));
-  EXPECT_TRUE(input->read(data));
+namespace internal {
+template <typename Derived>
+bool writeVector(std::ostream& os, const Eigen::DenseBase<Derived>& b) {
+  for (int i = 0; i < b.size(); i++) os << b(i) << " ";
+  return os.good();
 }
 
 template <typename Derived>
-void randomizeInformationMatrix(Eigen::MatrixBase<Derived>& m) {
-  m = Derived::Random(m.rows(), m.cols());
-  m = m * m.transpose();
-  m += m.rows() * Derived::Identity();
+bool readVector(std::istream& is, Eigen::DenseBase<Derived>& b) {
+  for (int i = 0; i < b.size() && is.good(); i++) is >> b(i);
+  return is.good() || is.eof();
 }
-
+}  // namespace internal
 }  // namespace g2o
 
 #endif
