@@ -1,5 +1,5 @@
 sudo: required
-dist: trusty
+dist: bionic
 language: cpp
 
 os:
@@ -25,7 +25,6 @@ before_install:
   - env | sort
 
 install:
-  #- script/install-deps-linux.sh
   - script/install-deps-${TRAVIS_OS_NAME}.sh
 
 before_script:

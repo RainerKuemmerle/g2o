@@ -39,16 +39,15 @@ namespace g2o {
 
   OptimizationAlgorithmLevenberg::OptimizationAlgorithmLevenberg(std::unique_ptr<Solver> solver)
       : OptimizationAlgorithmWithHessian(*solver.get()),
-        m_solver{ std::move(solver) }
-  {
-    _currentLambda = -1.;
-    _tau = cst(1e-5);
-    _goodStepUpperScale = cst(2./3.);
-    _goodStepLowerScale = cst(1./3.);
+        _currentLambda(cst(-1.)),
+        _tau(cst(1e-5)),
+        _goodStepLowerScale(cst(1. / 3.)),
+        _goodStepUpperScale(cst(2. / 3.)),
+        _ni(cst(2.)),
+        _levenbergIterations(0),
+        m_solver{std::move(solver)} {
     _userLambdaInit = _properties.makeProperty<Property<number_t> >("initialLambda", 0.);
     _maxTrialsAfterFailure = _properties.makeProperty<Property<int> >("maxTrialsAfterFailure", 10);
-    _ni=2.;
-    _levenbergIterations = 0;
   }
 
   OptimizationAlgorithmLevenberg::~OptimizationAlgorithmLevenberg()
@@ -77,7 +76,6 @@ namespace g2o {
     }
 
     number_t currentChi = _optimizer->activeRobustChi2();
-    number_t tempChi=currentChi;
 
     _solver.buildSystem();
     if (globalStats) {
@@ -115,7 +113,7 @@ namespace g2o {
       _solver.restoreDiagonal();
 
       _optimizer->computeActiveErrors();
-      tempChi = _optimizer->activeRobustChi2();
+      number_t tempChi = _optimizer->activeRobustChi2();
 
       if (! ok2)
         tempChi=std::numeric_limits<number_t>::max();

@@ -32,7 +32,7 @@ namespace g2o {
 
   using namespace std;
 
-  BackBoneTreeAction::BackBoneTreeAction(SparseOptimizer* optimizer, std::string vertexTag, int level, int step):
+  BackBoneTreeAction::BackBoneTreeAction(SparseOptimizer* optimizer, const std::string& vertexTag, int level, int step):
     _optimizer(optimizer),
     _vertexTag(vertexTag),
     _level(level),
@@ -45,7 +45,7 @@ namespace g2o {
     _vsMap.clear();
     _vsMmap.clear();
     _freeEdges.clear();
-    for (HyperGraph::EdgeSet::iterator it=_optimizer->edges().begin(); it!=_optimizer->edges().end(); it++){
+    for (HyperGraph::EdgeSet::iterator it=_optimizer->edges().begin(); it!=_optimizer->edges().end(); ++it){
       OptimizableGraph::Edge* e = (OptimizableGraph::Edge*)(*it);
       if (e->level()==_level) {
   _freeEdges.insert(e);

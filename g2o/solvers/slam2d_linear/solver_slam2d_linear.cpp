@@ -51,7 +51,7 @@ namespace g2o {
   class ThetaTreeAction : public HyperDijkstra::TreeAction
   {
     public:
-      ThetaTreeAction(number_t* theta) : HyperDijkstra::TreeAction(), _thetaGuess(theta) {}
+      explicit ThetaTreeAction(number_t* theta) : HyperDijkstra::TreeAction(), _thetaGuess(theta) {}
       virtual number_t perform(HyperGraph::Vertex* v, HyperGraph::Vertex* vParent, HyperGraph::Edge* e)
       {
         if (! vParent)
@@ -62,7 +62,7 @@ namespace g2o {
         assert(to->hessianIndex() >= 0);
         number_t fromTheta = from->hessianIndex() < 0 ? 0. : _thetaGuess[from->hessianIndex()];
         bool direct      = odom->vertices()[0] == from;
-        if (direct) 
+        if (direct)
           _thetaGuess[to->hessianIndex()] = fromTheta + odom->measurement().rotation().angle();
         else
           _thetaGuess[to->hessianIndex()] = fromTheta - odom->measurement().rotation().angle();
@@ -183,7 +183,7 @@ namespace g2o {
             else
               (*H.block(from->hessianIndex(), to->hessianIndex()))(0,0) -= omega;
           }
-        } 
+        }
         if (toNotFixed ) {
           b(to->hessianIndex()) += omega_r;
           (*H.block(to->hessianIndex(), to->hessianIndex()))(0,0) += omega;

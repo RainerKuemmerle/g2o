@@ -28,7 +28,7 @@ namespace g2o
     template<typename Type>
     struct dynamic_aligned_buffer
     {
-        dynamic_aligned_buffer(size_t size)
+        explicit dynamic_aligned_buffer(size_t size)
             : m_size{ 0 }, m_ptr{ nullptr }
         {
             allocate(size);

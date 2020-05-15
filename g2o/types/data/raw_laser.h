@@ -34,7 +34,6 @@
 #include <vector>
 
 #include<Eigen/Core>
-#include<Eigen/StdVector>
 
 namespace g2o {
 

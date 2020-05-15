@@ -43,25 +43,16 @@ namespace g2o {
   bool EdgePointXY::read(std::istream& is)
   {
     Vector2 p;
-    is >> p[0] >> p[1];
+    internal::readVector(is, p);
     setMeasurement(p);
-    for (int i = 0; i < 2; ++i)
-      for (int j = i; j < 2; ++j) {
-        is >> information()(i, j);
-        if (i != j)
-          information()(j, i) = information()(i, j);
-      }
+    readInformationMatrix(is);
     return true;
   }
 
   bool EdgePointXY::write(std::ostream& os) const
   {
-    Vector2 p = measurement();
-    os << p.x() << " " << p.y();
-    for (int i = 0; i < 2; ++i)
-      for (int j = i; j < 2; ++j)
-        os << " " << information()(i, j);
-    return os.good();
+    internal::writeVector(os, measurement());
+    return writeInformationMatrix(os);
   }
 
 

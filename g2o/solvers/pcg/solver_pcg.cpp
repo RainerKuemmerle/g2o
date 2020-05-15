@@ -79,7 +79,7 @@ namespace g2o
   class PCGSolverCreator : public AbstractOptimizationAlgorithmCreator
   {
     public:
-      PCGSolverCreator(const OptimizationAlgorithmProperty& p) : AbstractOptimizationAlgorithmCreator(p) {}
+      explicit PCGSolverCreator(const OptimizationAlgorithmProperty& p) : AbstractOptimizationAlgorithmCreator(p) {}
       virtual OptimizationAlgorithm* construct()
       {
         return createSolver(property().name);

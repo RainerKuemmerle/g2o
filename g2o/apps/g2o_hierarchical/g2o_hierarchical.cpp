@@ -412,25 +412,25 @@ int main(int argc, char** argv)
   OptimizableGraph::EdgeSet   heset;
   OptimizableGraph::VertexSet hvset;
   HyperGraph::VertexSet hgauge;
-  for (StarSet::iterator it=stars.begin(); it!=stars.end(); it++) {
+  for (StarSet::iterator it=stars.begin(); it!=stars.end(); ++it) {
 
     Star* s=*it;
     if (hgauge.empty())
       hgauge=s->gauge();
 
     for (HyperGraph::VertexSet::iterator git=s->gauge().begin();
-	 git != s->gauge().end(); git++) {
+	 git != s->gauge().end(); ++git) {
       hvset.insert(*git);
     }
 
-    for (HyperGraph::EdgeSet::iterator iit=s->_starEdges.begin(); iit!=s->_starEdges.end(); iit++){
+    for (HyperGraph::EdgeSet::iterator iit=s->_starEdges.begin(); iit!=s->_starEdges.end(); ++iit){
       OptimizableGraph::Edge* e= (OptimizableGraph::Edge*) *iit;
       eset.insert(e);
       for (size_t i=0; i<e->vertices().size(); i++){
         vset.insert(e->vertices()[i]);
       }
     }
-    for (HyperGraph::EdgeSet::iterator iit=s->starFrontierEdges().begin(); iit!=s->starFrontierEdges().end(); iit++){
+    for (HyperGraph::EdgeSet::iterator iit=s->starFrontierEdges().begin(); iit!=s->starFrontierEdges().end(); ++iit){
       OptimizableGraph::Edge* e= (OptimizableGraph::Edge*) *iit;
       heset.insert(e);
     }
@@ -449,7 +449,7 @@ int main(int argc, char** argv)
   cerr << "stars done!" << endl;
 
   cerr << "optimizing the high layer" << endl;
-  for (HyperGraph::VertexSet::iterator it = hgauge.begin(); it!=hgauge.end(); it++){
+  for (HyperGraph::VertexSet::iterator it = hgauge.begin(); it!=hgauge.end(); ++it){
     OptimizableGraph::Vertex* g=dynamic_cast<OptimizableGraph::Vertex*>(*it);
     g->setFixed(true);
   }
@@ -482,7 +482,7 @@ int main(int argc, char** argv)
   }
 
   cerr << "fixing the hstructure, and optimizing the floating nodes" << endl;
-  for (OptimizableGraph::VertexSet::iterator it = hvset.begin(); it!=hvset.end(); it++){
+  for (OptimizableGraph::VertexSet::iterator it = hvset.begin(); it!=hvset.end(); ++it){
     OptimizableGraph::Vertex* g=dynamic_cast<OptimizableGraph::Vertex*>(*it);
     g->setFixed(true);
   }
@@ -497,11 +497,11 @@ int main(int argc, char** argv)
 
 
   cerr << "adding the original constraints, locking hierarchical solution and optimizing the free variables" << endl;
-  for (OptimizableGraph::VertexSet::iterator it = vset.begin(); it!=vset.end(); it++){
+  for (OptimizableGraph::VertexSet::iterator it = vset.begin(); it!=vset.end(); ++it){
     OptimizableGraph::Vertex* g=dynamic_cast<OptimizableGraph::Vertex*>(*it);
     g->setFixed(true);
   }
-  for (HyperGraph::VertexSet::iterator it = hgauge.begin(); it!=hgauge.end(); it++){
+  for (HyperGraph::VertexSet::iterator it = hgauge.begin(); it!=hgauge.end(); ++it){
     OptimizableGraph::Vertex* g=dynamic_cast<OptimizableGraph::Vertex*>(*it);
     g->setFixed(true);
   }
@@ -512,11 +512,11 @@ int main(int argc, char** argv)
 
 
   cerr << "relaxing the full problem" << endl;
-  for (OptimizableGraph::VertexSet::iterator it = vset.begin(); it!=vset.end(); it++){
+  for (OptimizableGraph::VertexSet::iterator it = vset.begin(); it!=vset.end(); ++it){
     OptimizableGraph::Vertex* g=dynamic_cast<OptimizableGraph::Vertex*>(*it);
     g->setFixed(false);
   }
-  for (HyperGraph::VertexSet::iterator it = hgauge.begin(); it!=hgauge.end(); it++){
+  for (HyperGraph::VertexSet::iterator it = hgauge.begin(); it!=hgauge.end(); ++it){
     OptimizableGraph::Vertex* g=dynamic_cast<OptimizableGraph::Vertex*>(*it);
     g->setFixed(true);
   }
@@ -537,7 +537,7 @@ int main(int argc, char** argv)
     int nLandmarks=0;
     int nPoses=0;
     int maxDim = *vertexDimensions.rbegin();
-    for (HyperGraph::VertexIDMap::iterator it=optimizer.vertices().begin(); it!=optimizer.vertices().end(); it++){
+    for (HyperGraph::VertexIDMap::iterator it=optimizer.vertices().begin(); it!=optimizer.vertices().end(); ++it){
       OptimizableGraph::Vertex* v=static_cast<OptimizableGraph::Vertex*>(it->second);
       if (v->dimension() != maxDim) {
 	nLandmarks++;
@@ -547,7 +547,7 @@ int main(int argc, char** argv)
 
     int nEdges=0;
     set<string> edgeTypes;
-    for (HyperGraph::EdgeSet::iterator it=optimizer.edges().begin(); it!=optimizer.edges().end(); it++){
+    for (HyperGraph::EdgeSet::iterator it=optimizer.edges().begin(); it!=optimizer.edges().end(); ++it){
       OptimizableGraph::Edge* e = dynamic_cast<OptimizableGraph::Edge*> (*it);
       if (e->level()==0) {
 	edgeTypes.insert(Factory::instance()->tag(e));
@@ -555,7 +555,7 @@ int main(int argc, char** argv)
       }
     }
     stringstream edgeTypesString;
-    for (std::set<string>::iterator it=edgeTypes.begin(); it!=edgeTypes.end(); it++){
+    for (std::set<string>::iterator it=edgeTypes.begin(); it!=edgeTypes.end(); ++it){
       edgeTypesString << *it << " ";
     }
 

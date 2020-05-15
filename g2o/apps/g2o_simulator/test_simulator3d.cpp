@@ -65,7 +65,7 @@ int main(int argc, char** argv) {
   arg.param("hasCompass",     hasCompass, false, "the robot has a compass");
   arg.param("hasGPS",         hasGPS, false, "the robot has a GPS");
   arg.paramLeftOver("graph-output", outputFilename, "simulator_out.g2o", "graph file which will be written", true);
- 
+
   arg.parseArgs(argc, argv);
 
   std::mt19937 generator;
@@ -108,7 +108,7 @@ int main(int argc, char** argv) {
     pointSensor->offsetParam()->setOffset(cameraPose);
     ss << "-pointXYZ";
   }
-  
+
   if (hasPointDisparitySensor){
     SensorPointXYZDisparity* disparitySensor = new SensorPointXYZDisparity("disparitySensor");
     disparitySensor->setFov(M_PI/4);
@@ -118,7 +118,7 @@ int main(int argc, char** argv) {
     Eigen::Isometry3d cameraPose;
     Eigen::Matrix3d R;
     R  << 0,  0,  1,
-         -1,  0,  0, 
+         -1,  0,  0,
           0, -1,  0;
     cameraPose = R;
     cameraPose.translation() = Vector3d(0.,0.,0.3);
@@ -135,7 +135,7 @@ int main(int argc, char** argv) {
     Eigen::Isometry3d cameraPose;
     Eigen::Matrix3d R;
     R  << 0,  0,  1,
-         -1,  0,  0, 
+         -1,  0,  0,
           0, -1,  0;
     cameraPose = R;
     cameraPose.translation() = Vector3d(0.,0.,0.3);
@@ -150,7 +150,7 @@ int main(int argc, char** argv) {
     ss << "-pose";
   }
 
-#ifdef _POSE_PRIOR_SENSOR  
+#ifdef _POSE_PRIOR_SENSOR
   SensorSE3Prior posePriorSensor("posePriorSensor");
   robot.addSensor(&posePriorSensor);
   {
@@ -175,14 +175,14 @@ int main(int argc, char** argv) {
     Eigen::Isometry3d cameraPose;
     Eigen::Matrix3d R;
     R  << 0,  0,  1,
-         -1,  0,  0, 
+         -1,  0,  0,
           0, -1,  0;
     cameraPose = R;
     cameraPose.translation() = Vector3d(0.,0.,0.3);
     poseSensor.offsetParam1()->setOffset(cameraPose);
     poseSensor.offsetParam2()->setOffset(cameraPose);
   }
-#endif  
+#endif
 
 
   robot.move(Eigen::Isometry3d::Identity());
@@ -192,7 +192,7 @@ int main(int argc, char** argv) {
   Eigen::Isometry3d moveLeft = Eigen::Isometry3d::Identity(); moveLeft = AngleAxisd(M_PI/2, Vector3d::UnitZ());
   //double pRight=0.15;
   Eigen::Isometry3d moveRight = Eigen::Isometry3d::Identity(); moveRight = AngleAxisd(-M_PI/2,Vector3d::UnitZ());
-  
+
   Eigen::Matrix3d dtheta = Eigen::Matrix3d::Identity();
   for (int i=0; i<simSteps; i++){
     bool boundariesReached = true;
@@ -210,7 +210,7 @@ int main(int argc, char** argv) {
     } else {
       boundariesReached=false;
     }
-    
+
     Eigen::Isometry3d move = Eigen::Isometry3d::Identity();
     if (boundariesReached){
       Eigen::Matrix3d mTheta = pose.rotation().inverse() * dtheta;
@@ -228,7 +228,7 @@ int main(int argc, char** argv) {
       else
         move=moveRight;
     }
-    
+
 
     // select a random move of the robot
     robot.relativeMove(move);
@@ -236,9 +236,9 @@ int main(int argc, char** argv) {
     cerr << "s";
     robot.sense();
   }
-  string fname=outputFilename + ss.str() + ".g2o";
+  //string fname=outputFilename + ss.str() + ".g2o";
   //ofstream testStream(fname.c_str());
   ofstream testStream(outputFilename.c_str());
   graph.save(testStream);
- 
+
 }

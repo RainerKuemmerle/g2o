@@ -43,7 +43,7 @@ namespace g2o {
     // assume the system is "solved"
     // compute the sparse pattern of the inverse
     std::set<std::pair<int, int> > pattern;
-    for (std::set<OptimizableGraph::Edge*>::iterator it=edges.begin(); it!=edges.end(); it++){
+    for (std::set<OptimizableGraph::Edge*>::iterator it=edges.begin(); it!=edges.end(); ++it){
       augmentSparsePattern(pattern, *it);
     }
 
@@ -58,7 +58,7 @@ namespace g2o {
       return -1;
     }
     int count=0;
-    for (std::set<OptimizableGraph::Edge*>::iterator it=edges.begin(); it!=edges.end(); it++){
+    for (std::set<OptimizableGraph::Edge*>::iterator it=edges.begin(); it!=edges.end(); ++it){
       count += labelEdge(spInv, *it) ? 1 : 0;
     }
     return count;
@@ -88,7 +88,7 @@ namespace g2o {
     //std::copy(pattern.begin(),pattern.end(),blockIndices.begin());
 
     int k=0;
-    for(std::set<std::pair<int, int> >::const_iterator it= pattern.begin(); it!=pattern.end(); it++){
+    for(std::set<std::pair<int, int> >::const_iterator it= pattern.begin(); it!=pattern.end(); ++it){
       blockIndices[k++]=*it;
     }
 
@@ -225,8 +225,8 @@ namespace g2o {
     MatrixXd errorCov(e->dimension(), e->dimension());
     VectorXd errorMean(e->dimension());
     reconstructGaussian(errorMean, errorCov, errorPoints);
-    info=errorCov.inverse();
 
+    //info=errorCov.inverse();
     // cerr << "remapped information matrix" << endl;
     // cerr << info << endl;
     return true;

@@ -87,7 +87,7 @@ namespace g2o {
   void Cache::update(){
     if (! _updateNeeded)
       return;
-    for(std::vector<Cache*>::iterator it=_parentCaches.begin(); it!=_parentCaches.end(); it++){
+    for(std::vector<Cache*>::iterator it=_parentCaches.begin(); it!=_parentCaches.end(); ++it){
       (*it)->update();
     }
     updateImpl();
@@ -163,7 +163,7 @@ namespace g2o {
   }
 
   void CacheContainer::update() {
-    for (iterator it=begin(); it!=end(); it++){
+    for (iterator it=begin(); it!=end(); ++it){
       (it->second)->update();
     }
     _updateNeeded=false;

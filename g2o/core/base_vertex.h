@@ -34,7 +34,6 @@
 #include <Eigen/Core>
 #include <Eigen/Dense>
 #include <Eigen/Cholesky>
-#include <Eigen/StdVector>
 #include <stack>
 
 namespace g2o {

@@ -30,7 +30,7 @@
 
 namespace g2o {
 
-  EdgeTypesCostFunction::EdgeTypesCostFunction(std::string edgeTag, std::string vertexTag, int level):
+  EdgeTypesCostFunction::EdgeTypesCostFunction(const std::string& edgeTag, const std::string& vertexTag, int level):
     _edgeTag(edgeTag),
     _vertexTag(vertexTag),
     _factory(Factory::instance()),

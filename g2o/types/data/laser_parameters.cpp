@@ -28,30 +28,28 @@
 
 namespace g2o {
 
-  LaserParameters::LaserParameters(int t, int nbeams, number_t _firstBeamAngle, number_t _angularStep, number_t _maxRange, number_t _accuracy, int _remissionMode, number_t _minRange)
-  {
-    type           = t;
-    firstBeamAngle = _firstBeamAngle;
-    angularStep    = _angularStep;
-    maxRange       = _maxRange;
-    minRange       = _minRange;
-    laserPose      = SE2(0., 0., 0.);
-    accuracy       = _accuracy;
-    remissionMode  = _remissionMode;
-    fov            = angularStep * nbeams;
-  }
+LaserParameters::LaserParameters(int t, int nbeams, number_t _firstBeamAngle, number_t _angularStep, number_t _maxRange,
+                                 number_t _accuracy, int _remissionMode, number_t _minRange)
+    : laserPose(SE2(0., 0., 0.)),
+      type(t),
+      firstBeamAngle(_firstBeamAngle),
+      fov(angularStep * nbeams),
+      angularStep(_angularStep),
+      accuracy(_accuracy),
+      remissionMode(_remissionMode),
+      maxRange(_maxRange),
+      minRange(_minRange) {}
 
-  LaserParameters::LaserParameters(int nbeams, number_t _firstBeamAngle, number_t _angularStep, number_t _maxRange, number_t _minRange)
-  {
-    type           = 0;
-    firstBeamAngle = _firstBeamAngle;
-    angularStep    = _angularStep;
-    maxRange       = _maxRange;
-    minRange       = _minRange;
-    laserPose      = SE2(0., 0., 0.);
-    accuracy       = cst(0.1);
-    remissionMode  = 0;
-    fov            = angularStep * nbeams;
-  }
+LaserParameters::LaserParameters(int nbeams, number_t _firstBeamAngle, number_t _angularStep, number_t _maxRange,
+                                 number_t _minRange)
+    : laserPose(SE2(0., 0., 0.)),
+      type(0),
+      firstBeamAngle(_firstBeamAngle),
+      fov(angularStep * nbeams),
+      angularStep(_angularStep),
+      accuracy(0.1),
+      remissionMode(0),
+      maxRange(_maxRange),
+      minRange(_minRange) {}
 
-} // end namespace
+}  // namespace g2o

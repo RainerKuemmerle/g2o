@@ -70,8 +70,8 @@ namespace g2o
 
 #ifdef G2O_HAVE_OPENGL
 
-  EdgeSE3PlaneSensorCalibDrawAction::EdgeSE3PlaneSensorCalibDrawAction(): DrawAction(typeid(EdgeSE3PlaneSensorCalib).name()){
-  }
+  EdgeSE3PlaneSensorCalibDrawAction::EdgeSE3PlaneSensorCalibDrawAction()
+      : DrawAction(typeid(EdgeSE3PlaneSensorCalib).name()), _planeWidth(nullptr), _planeHeight(nullptr) {}
 
   bool EdgeSE3PlaneSensorCalibDrawAction::refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_){
     if (!DrawAction::refreshPropertyPtrs(params_))

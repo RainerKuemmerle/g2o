@@ -53,18 +53,16 @@ namespace g2o {
       const Matrix2F& U() {return _UMatrix;}
       const Vector2F& singularValues() {return _singularValues;}
 
-      const myVector2fVector& matchingVertices() {return _matchingVertices;}
-      void addMatchingVertex(float x, float y){
-	Vector2F v(x,y);
-	_matchingVertices.push_back(v);
+      const myVector2fVector& matchingVertices() { return _matchingVertices; }
+      void addMatchingVertex(float x, float y) {
+        Vector2F v(x, y);
+        _matchingVertices.push_back(v);
       }
 
-      void clearMatchingVertices(){_matchingVertices.clear();}
+      void clearMatchingVertices() { _matchingVertices.clear(); }
 
-      const std::vector<int>& matchingVerticesIDs() {return _matchingVerticesIDs;}
-      void addMatchingVertexID(int id){
-	_matchingVerticesIDs.push_back(id);
-      }
+      const std::vector<int>& matchingVerticesIDs() { return _matchingVerticesIDs; }
+      void addMatchingVertexID(int id) { _matchingVerticesIDs.push_back(id); }
       void clearMatchingVerticesIDs(){_matchingVerticesIDs.clear();}
 
   protected:
@@ -77,12 +75,13 @@ namespace g2o {
   };
 
 #ifdef G2O_HAVE_OPENGL
-  class G2O_TYPES_DATA_API VertexEllipseDrawAction: public DrawAction{
-  public:
+  class G2O_TYPES_DATA_API VertexEllipseDrawAction : public DrawAction {
+   public:
     VertexEllipseDrawAction();
     virtual HyperGraphElementAction* operator()(HyperGraph::HyperGraphElement* element,
-            HyperGraphElementAction::Parameters* params_ );
-  protected:
+                                                HyperGraphElementAction::Parameters* params_);
+
+   protected:
     virtual bool refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_);
     DoubleProperty* _scaleFactor;
   };

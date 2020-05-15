@@ -77,14 +77,10 @@ namespace g2o
     return nullptr;
   }
 
-  class DenseSolverCreator : public AbstractOptimizationAlgorithmCreator
-  {
-    public:
-      DenseSolverCreator(const OptimizationAlgorithmProperty& p) : AbstractOptimizationAlgorithmCreator(p) {}
-      virtual OptimizationAlgorithm* construct()
-      {
-        return createSolver(property().name);
-      }
+  class DenseSolverCreator : public AbstractOptimizationAlgorithmCreator {
+   public:
+    explicit DenseSolverCreator(const OptimizationAlgorithmProperty& p) : AbstractOptimizationAlgorithmCreator(p) {}
+    virtual OptimizationAlgorithm* construct() { return createSolver(property().name); }
   };
 
   G2O_REGISTER_OPTIMIZATION_LIBRARY(dense);

@@ -25,7 +25,6 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <Eigen/Core>
-#include <Eigen/StdVector>
 #include <Eigen/Geometry>
 #include <iostream>
 

@@ -49,6 +49,8 @@ namespace g2o {
     _delta = _userDeltaInit->value();
     _lastStep = STEP_UNDEFINED;
     _wasPDInAllIterations = true;
+    _lastNumTries = 0;
+    _currentLambda = 0.;
   }
 
   OptimizationAlgorithmDogleg::~OptimizationAlgorithmDogleg()
@@ -140,9 +142,6 @@ namespace g2o {
               }
             }
           }
-        }
-        if (!solverOk) {
-          return Fail;
         }
         hgnNorm = VectorX::ConstMapType(_solver.x(), _solver.vectorSize()).norm();
       }

@@ -59,7 +59,7 @@ namespace g2o{
   }
 
   void BaseRobot::sense() {
-    for (std::set<BaseSensor*>::iterator it=_sensors.begin(); it!=_sensors.end(); it++){
+    for (std::set<BaseSensor*>::iterator it=_sensors.begin(); it!=_sensors.end(); ++it){
       BaseSensor* s=*it;
       s->sense();
     }

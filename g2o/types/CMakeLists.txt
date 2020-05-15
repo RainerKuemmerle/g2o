@@ -9,8 +9,3 @@ add_subdirectory(sclam2d)
 
 add_subdirectory(slam2d_addons)
 add_subdirectory(slam3d_addons)
-
-option(G2O_BUILD_DEPRECATED_TYPES "Compile the deprecated types" OFF)
-if(G2O_BUILD_DEPRECATED_TYPES)
-  add_subdirectory(deprecated)
-endif()

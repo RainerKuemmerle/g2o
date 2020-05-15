@@ -65,9 +65,8 @@ std::streamsize StreamRedirect::xsputn(const char *p, std::streamsize n)
   _mutex.lock();
   _buffer.append(p, p + n);
 
-  std::string::size_type pos = 0;
   while (1) {
-    pos = _buffer.find('\n');
+    std::string::size_type pos = _buffer.find('\n');
     if (pos != std::string::npos) {
       _te->appendPlainText(QString::fromLatin1(_buffer.c_str(), pos));
       _buffer.erase(_buffer.begin(), _buffer.begin() + pos + 1);

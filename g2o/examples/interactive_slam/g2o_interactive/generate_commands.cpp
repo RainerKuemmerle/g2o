@@ -31,16 +31,9 @@
 #include <fstream>
 #include <sstream>
 #include <algorithm>
-#include <cassert>
 
-#include "g2o/apps/g2o_cli/dl_wrapper.h"
-#include "g2o/apps/g2o_cli/g2o_common.h"
-
-#include "g2o/core/estimate_propagator.h"
 #include "g2o/core/sparse_optimizer.h"
 #include "g2o/core/factory.h"
-#include "g2o/core/optimization_algorithm_factory.h"
-#include "g2o/core/hyper_dijkstra.h"
 
 #include "g2o/stuff/macros.h"
 #include "g2o/stuff/color_macros.h"
@@ -80,20 +73,6 @@ struct IncrementalEdgesCompare {
   }
 };
 
-SparseOptimizer::Method str2method(const std::string& strMethod_){
-  string strMethod = strToLower(strMethod_);
-  if (strMethod=="gauss") {
-    cerr << "# Doing Gauss" << endl;
-    return SparseOptimizer::GaussNewton;
-  }
-  if (strMethod=="levenberg") {
-    cerr << "# Doing Levenberg-Marquardt" << endl;
-    return SparseOptimizer::LevenbergMarquardt;
-  }
-  cerr << "# Unknown optimization method: " << strMethod << ", setting  default to Levenberg"  << endl;
-  return SparseOptimizer::LevenbergMarquardt;
-}
-
 void sigquit_handler(int sig)
 {
   if (sig == SIGINT) {
@@ -108,70 +87,25 @@ void sigquit_handler(int sig)
 
 int main(int argc, char** argv)
 {
-  int maxIterations;
-  bool verbose;
   string inputFilename;
-  string gnudump;
-  string outputfilename;
-  string strMethod;
-  string strSolver;
   string loadLookup;
-  bool initialGuess;
-  bool marginalize;
   bool listTypes;
-  bool listSolvers;
-  bool incremental;
-  bool guiOut;
-  bool robustKernel;
-  double huberWidth;
-  double lambdaInit;
   int updateGraphEachN = 10;
-  string statsFile;
   string dummy;
   // command line parsing
   CommandArgs arg;
-  arg.param("i", maxIterations, 5, "perform n iterations");
-  arg.param("v", verbose, false, "verbose output of the optimization process");
-  arg.param("guess", initialGuess, false, "initial guess based on spanning tree");
-  arg.param("inc", incremental, false, "run incremetally");
   arg.param("update", updateGraphEachN, 10, "updates after x odometry nodes, (default: 10)");
-  arg.param("guiout", guiOut, false, "gui output while running incrementally");
-  arg.param("lambdaInit", lambdaInit, 0, "user specified lambda init for levenberg");
-  arg.param("marginalize", marginalize, false, "on or off");
-  arg.param("method", strMethod, "Gauss", "Gauss or Levenberg");
-  arg.param("gnudump", gnudump, "", "dump to gnuplot data file");
-  arg.param("robustKernel", robustKernel, false, "use robust error functions");
-  arg.param("huberWidth", huberWidth, -1., "width for the robust Huber Kernel (only if robustKernel)");
-  arg.param("o", outputfilename, "", "output final version of the graph");
-  arg.param("solver", strSolver, "var", "specify which solver to use underneat\n\t {var, fix3_2, fix6_3, fix_7_3}");
-  arg.param("solverlib", dummy, "", "specify a solver library which will be loaded");
-  arg.param("typeslib", dummy, "", "specify a types library which will be loaded");
-  arg.param("stats", statsFile, "", "specify a file for the statistics");
   arg.param("listTypes", listTypes, false, "list the registered types");
-  arg.param("listSolvers", listSolvers, false, "list the available solvers");
   arg.param("renameTypes", loadLookup, "", "create a lookup for loading types into other types,\n\t TAG_IN_FILE=INTERNAL_TAG_FOR_TYPE,TAG2=INTERNAL2\n\t e.g., VERTEX_CAM=VERTEX_SE3:EXPMAP");
   arg.paramLeftOver("graph-input", inputFilename, "", "graph file which will be processed", true);
 
   arg.parseArgs(argc, argv);
-
-  // registering all the types from the libraries
-  DlWrapper dlTypesWrapper;
-  loadStandardTypes(dlTypesWrapper, argc, argv);
-
-  // register all the solvers
-  //OptimizationAlgorithmFactory* solverFactory = OptimizationAlgorithmFactory::instance();
-  //DlWrapper dlSolverWrapper;
-  //loadStandardSolver(dlSolverWrapper, argc, argv);
-  //if (listSolvers)
-    //solverFactory->listSolvers(cerr);
 
   if (listTypes) {
     Factory::instance()->printRegisteredTypes(cout, true);
   }
 
   SparseOptimizer optimizer;
-  //optimizer.setVerbose(verbose);
-  //optimizer.setForceStopFlag(&hasToStop);
 
   // Loading the input data
   if (loadLookup.size() > 0) {
@@ -207,12 +141,10 @@ int main(int argc, char** argv)
   }
 
   if (1) {
-    int incIterations = maxIterations;
     int maxDim = 0;
 
     cerr << "# incremental setttings" << endl;
     cerr << "#\t solve every " << updateGraphEachN << endl;
-    cerr << "#\t iterations  " << incIterations << endl;
 
     SparseOptimizer::VertexIDMap vertices = optimizer.vertices();
     for (SparseOptimizer::VertexIDMap::const_iterator it = vertices.begin(); it != vertices.end(); ++it) {
@@ -253,7 +185,6 @@ int main(int argc, char** argv)
         }
       }
 
-      int doInit = 0;
       SparseOptimizer::Vertex* v1 = optimizer.vertex(e->vertices()[0]->id());
       SparseOptimizer::Vertex* v2 = optimizer.vertex(e->vertices()[1]->id());
       if (! v1 && addNextEdge) {
@@ -261,13 +192,12 @@ int main(int argc, char** argv)
         SparseOptimizer::Vertex* v = dynamic_cast<SparseOptimizer::Vertex*>(e->vertices()[0]);
         bool v1Added = optimizer.addVertex(v);
         maxInGraph = (max)(maxInGraph, v->id());
-  //cerr << "adding" << v->id() << "(" << v->dimension() << ")" << endl;
+        // cerr << "adding" << v->id() << "(" << v->dimension() << ")" << endl;
         assert(v1Added);
         if (! v1Added)
           cerr << "Error adding vertex " << v->id() << endl;
         else
           verticesAdded.insert(v);
-        doInit = 1;
         if (v->dimension() == maxDim)
           vertexCount++;
 
@@ -285,16 +215,15 @@ int main(int argc, char** argv)
         //cerr << " adding vertex " << v->id() << endl;
         bool v2Added = optimizer.addVertex(v);
         maxInGraph = (max)(maxInGraph, v->id());
-  //cerr << "adding" << v->id() << "(" << v->dimension() << ")" << endl;
+        // cerr << "adding" << v->id() << "(" << v->dimension() << ")" << endl;
         assert(v2Added);
         if (! v2Added)
           cerr << "Error adding vertex " << v->id() << endl;
         else
           verticesAdded.insert(v);
-        doInit = 2;
         if (v->dimension() == maxDim)
           vertexCount++;
-        
+
         if (v->dimension() == 3) {
           cout << "ADD VERTEX_XYT " << v->id() << ";" << endl;
         }
@@ -304,10 +233,8 @@ int main(int argc, char** argv)
       }
 
       if (addNextEdge){
-
-        static int edgeCnt = 0;
-       
         if (e->dimension() == 3) {
+          static int edgeCnt = 0;
           double* information = e->informationData();
           double meas[3];
           e->getMeasurementData(meas);
@@ -332,7 +259,7 @@ int main(int argc, char** argv)
         //cerr << " adding edge " << e->vertices()[0]->id() <<  " " << e->vertices()[1]->id() << endl;
         if (! optimizer.addEdge(e)) {
           cerr << "Unable to add edge " << e->vertices()[0]->id() << " -> " << e->vertices()[1]->id() << endl;
-        } 
+        }
       }
 
       freshlyOptimized=false;
@@ -346,7 +273,7 @@ int main(int argc, char** argv)
 
         addNextEdge=true;
         freshlyOptimized=true;
-        it--;
+        --it;
       }
 
     } // for all edges

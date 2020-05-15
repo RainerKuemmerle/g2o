@@ -76,17 +76,18 @@ namespace g2o {
       Property<number_t>* _initialLambda;
       Property<number_t>* _lamdbaFactor;
 
-      VectorX _hsd;         ///< steepest decent step
-      VectorX _hdl;         ///< final dogleg step
-      VectorX _auxVector;   ///< auxilary vector used to perform multiplications or other stuff
+      VectorX _hsd;        ///< steepest decent step
+      VectorX _hdl;        ///< final dogleg step
+      VectorX _auxVector;  ///< auxilary vector used to perform multiplications or other stuff
 
-      number_t _currentLambda;        ///< the damping factor to force positive definite matrix
-      number_t _delta;                ///< trust region
-      int _lastStep;                ///< type of the step taken by the algorithm
-      bool _wasPDInAllIterations;   ///< the matrix we solve was positive definite in all iterations -> if not apply damping
+      number_t _currentLambda;     ///< the damping factor to force positive definite matrix
+      number_t _delta;             ///< trust region
+      int _lastStep;               ///< type of the step taken by the algorithm
+      bool _wasPDInAllIterations;  ///< the matrix we solve was positive definite in all iterations -> if not apply
+                                   ///< damping
       int _lastNumTries;
 
-  private:
+     private:
       std::unique_ptr<BlockSolverBase> m_solver;
   };
 

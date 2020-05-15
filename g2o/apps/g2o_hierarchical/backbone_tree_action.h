@@ -51,7 +51,7 @@ namespace g2o {
      * @param level: the level of the lowLevelEdges of the stars in the backbone
      * @param step:  depth in tree after which a new star is initialized
      */
-    BackBoneTreeAction(SparseOptimizer* optimizer, std::string vertexTag, int level, int step);
+    BackBoneTreeAction(SparseOptimizer* optimizer, const std::string& vertexTag, int level, int step);
 
     //! initializes the visit and clears the internal structures
     void init();

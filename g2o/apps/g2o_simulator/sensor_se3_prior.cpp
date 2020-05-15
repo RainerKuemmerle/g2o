@@ -64,7 +64,7 @@ namespace g2o {
     while (it!=r->trajectory().rend() && count < 1){
       if (!_robotPoseObject)
   _robotPoseObject = *it;
-      it++;
+      ++it;
       count++;
     }
     if (!_robotPoseObject)

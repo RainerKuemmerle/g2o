@@ -57,7 +57,7 @@ using namespace g2o;
 using namespace Eigen;
 
 struct LineInfo {
-  LineInfo(VertexSegment2D* s) {
+  explicit LineInfo(VertexSegment2D* s) {
     line=new VertexLine2D();
     line->setId(s->id());
     line->setEstimate(computeLineParameters(s->estimateP1(), s->estimateP2()));
@@ -115,7 +115,7 @@ int main(int argc, char** argv)
   // insert all lines in the infomap
   int currentId = -1000;
   bool firstVertexFound =false;
-  for (OptimizableGraph::VertexIDMap::iterator it=inGraph.vertices().begin(); it!=inGraph.vertices().end(); it++){
+  for (OptimizableGraph::VertexIDMap::iterator it=inGraph.vertices().begin(); it!=inGraph.vertices().end(); ++it){
     currentId = currentId > it->first ?  currentId : it->first;
 
     VertexSE2 *pose=dynamic_cast<VertexSE2*> (it->second);
@@ -141,7 +141,7 @@ int main(int argc, char** argv)
   currentId++;
 
   cerr << "filling in edges and odoms" << endl;
-  for (OptimizableGraph::EdgeSet::iterator it=inGraph.edges().begin(); it!=inGraph.edges().end(); it++){
+  for (OptimizableGraph::EdgeSet::iterator it=inGraph.edges().begin(); it!=inGraph.edges().end(); ++it){
     EdgeSE2* ods=dynamic_cast<EdgeSE2*> (*it);
     if (ods){
       EdgeSE2* ods2=new EdgeSE2();

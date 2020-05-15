@@ -45,14 +45,12 @@ namespace g2o {
 
   bool VertexPointXY::read(std::istream& is)
   {
-    is >> _estimate[0] >> _estimate[1];
-    return true;
+    return internal::readVector(is, _estimate);
   }
 
   bool VertexPointXY::write(std::ostream& os) const
   {
-    os << estimate()(0) << " " << estimate()(1);
-    return os.good();
+    return internal::writeVector(os, estimate());
   }
 
   VertexPointXYWriteGnuplotAction::VertexPointXYWriteGnuplotAction(): WriteGnuplotAction(typeid(VertexPointXY).name()){}
@@ -66,14 +64,14 @@ namespace g2o {
       std::cerr << __PRETTY_FUNCTION__ << ": warning, on valid os specified" << std::endl;
       return nullptr;
     }
-         
+
     VertexPointXY* v =  static_cast<VertexPointXY*>(element);
     *(params->os) << v->estimate().x() << " " << v->estimate().y() << std::endl;
     return this;
   }
 
 #ifdef G2O_HAVE_OPENGL
-  VertexPointXYDrawAction::VertexPointXYDrawAction(): DrawAction(typeid(VertexPointXY).name()){}
+  VertexPointXYDrawAction::VertexPointXYDrawAction() : DrawAction(typeid(VertexPointXY).name()), _pointSize(nullptr) {}
 
   bool VertexPointXYDrawAction::refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_){
     if (! DrawAction::refreshPropertyPtrs(params_))
@@ -86,9 +84,8 @@ namespace g2o {
     return true;
   }
 
-  HyperGraphElementAction* VertexPointXYDrawAction::operator()(HyperGraph::HyperGraphElement* element, 
-                     HyperGraphElementAction::Parameters* params ){
-
+  HyperGraphElementAction* VertexPointXYDrawAction::operator()(HyperGraph::HyperGraphElement* element,
+                                                               HyperGraphElementAction::Parameters* params) {
     if (typeid(*element).name()!=_typeName)
       return nullptr;
     initializeDrawActionsCache();

@@ -98,7 +98,7 @@ int main(int argc, char** argv) {
     }
   }
 
-  for (HyperGraph::EdgeSet::iterator it = graph.edges().begin(); it!=graph.edges().end(); it++){
+  for (HyperGraph::EdgeSet::iterator it = graph.edges().begin(); it!=graph.edges().end(); ++it){
     HyperGraph::Edge* e = *it;
     if (anonymizeLandmarkEdge<EdgeSE2PointXY>(e, graph)) continue;
     if (anonymizeLandmarkEdge<EdgeSE2PointXYOffset>(e, graph)) continue;

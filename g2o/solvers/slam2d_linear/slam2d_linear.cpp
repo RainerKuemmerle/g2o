@@ -64,7 +64,7 @@ namespace g2o {
   class SLAM2DLinearSolverCreator : public AbstractOptimizationAlgorithmCreator
   {
     public:
-      SLAM2DLinearSolverCreator(const OptimizationAlgorithmProperty& p) : AbstractOptimizationAlgorithmCreator(p) {}
+      explicit SLAM2DLinearSolverCreator(const OptimizationAlgorithmProperty& p) : AbstractOptimizationAlgorithmCreator(p) {}
       virtual OptimizationAlgorithm* construct()
       {
         return createSolver(property().name);

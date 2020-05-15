@@ -70,8 +70,7 @@ namespace g2o {
 
 
 #ifdef G2O_HAVE_OPENGL
-  VertexTagDrawAction::VertexTagDrawAction(): DrawAction(typeid(VertexTag).name()){
-  }
+  VertexTagDrawAction::VertexTagDrawAction() : DrawAction(typeid(VertexTag).name()), _textSize(nullptr) {}
 
   bool VertexTagDrawAction::refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_){
     if (!DrawAction::refreshPropertyPtrs(params_))
@@ -84,7 +83,7 @@ namespace g2o {
     return true;
   }
 
-  HyperGraphElementAction* VertexTagDrawAction::operator()(HyperGraph::HyperGraphElement* element, 
+  HyperGraphElementAction* VertexTagDrawAction::operator()(HyperGraph::HyperGraphElement* element,
                  HyperGraphElementAction::Parameters* params_){
     if (typeid(*element).name()!=_typeName)
       return nullptr;

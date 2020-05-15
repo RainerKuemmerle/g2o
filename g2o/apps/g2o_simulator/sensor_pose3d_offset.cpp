@@ -98,11 +98,11 @@ namespace g2o {
       if (!_robotPoseObject)
   _robotPoseObject = *it;
       _posesToIgnore.insert(*it);
-      it++;
+      ++it;
       count++;
     }
     for (std::set<BaseWorldObject*>::iterator it=world()->objects().begin();
-   it!=world()->objects().end(); it++){
+   it!=world()->objects().end(); ++it){
       WorldObjectType* o=dynamic_cast<WorldObjectType*>(*it);
       if (o && isVisible(o)){
   EdgeType* e=mkEdge(o);  

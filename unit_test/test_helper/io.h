@@ -1,5 +1,5 @@
 // g2o - General Graph Optimization
-// Copyright (C) 2011 R. Kuemmerle, G. Grisetti, W. Burgard
+// Copyright (C) 2014 R. Kuemmerle, G. Grisetti, W. Burgard
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -24,27 +24,28 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef G2O_DEPRECATED_TYPES_SLAM3D_
-#define G2O_DEPRECATED_TYPES_SLAM3D_
+#ifndef TESTHELPER_IO_H
+#define TESTHELPER_IO_H
 
-#include "g2o/config.h"
-#include "g2o/core/base_vertex.h"
-#include "g2o/core/base_binary_edge.h"
-#include "g2o/core/hyper_graph_action.h"
+#include <Eigen/Core>
+#include <sstream>
 
-#define THREE_D_TYPES_ANALYTIC_JACOBIAN
+namespace g2o {
 
-#include "vertex_se3_quat.h"
-#include "edge_se3_quat.h"
-#include "vertex_pointxyz.h"
+template <typename T>
+void readWriteGraphElement(const T& output, T* input) {
+  std::stringstream data;
+  EXPECT_TRUE(output.write(data));
+  EXPECT_TRUE(input->read(data));
+}
 
-#include "parameter_se3_offset.h"
-#include "edge_se3_pointxyz.h"
-#include "edge_se3_offset.h"
+template <typename Derived>
+void randomizeInformationMatrix(Eigen::MatrixBase<Derived>& m) {
+  m = Derived::Random(m.rows(), m.cols());
+  m = m * m.transpose();
+  m += m.rows() * Derived::Identity();
+}
 
-#include "parameter_camera.h"
-#include "edge_se3_pointxyz_disparity.h"
-#include "edge_se3_pointxyz_depth.h"
-#include "edge_se3_prior.h"
+}  // namespace g2o
 
 #endif

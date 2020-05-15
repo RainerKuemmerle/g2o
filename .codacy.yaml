@@ -1,0 +1,5 @@
+exclude_paths:
+  - 'EXTERNAL/**'
+  - g2o/examples/interactive_slam/slam_parser/parser/bison_parser.cpp
+  - g2o/examples/interactive_slam/slam_parser/parser/flex_scanner.cpp
+  - g2o/examples/interactive_slam/slam_parser/parser/FlexLexer.h

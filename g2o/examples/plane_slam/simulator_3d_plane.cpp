@@ -34,6 +34,7 @@
 #include "g2o/types/slam3d_addons/types_slam3d_addons.h"
 #include "g2o/stuff/macros.h"
 #include "g2o/stuff/command_args.h"
+#include "g2o/stuff/sampler.h"
 
 #include <iostream>
 
@@ -43,30 +44,14 @@ using namespace Eigen;
 
 G2O_USE_OPTIMIZATION_LIBRARY(csparse)
 
-double uniform_rand(double lowerBndr, double upperBndr)
-{
-  return lowerBndr + ((double) std::rand() / (RAND_MAX + 1.0)) * (upperBndr - lowerBndr);
-}
-
-double gauss_rand(double sigma)
-{
-  double x, y, r2;
-  do {
-    x = -1.0 + 2.0 * uniform_rand(0.0, 1.0);
-    y = -1.0 + 2.0 * uniform_rand(0.0, 1.0);
-    r2 = x * x + y * y;
-  } while (r2 > 1.0 || r2 == 0.0);
-  return sigma * y * std::sqrt(-2.0 * log(r2) / r2);
-}
-
 Eigen::Isometry3d sample_noise_from_se3(const Vector6& cov ){
-  double nx=gauss_rand(cov(0));
-  double ny=gauss_rand(cov(1));
-  double nz=gauss_rand(cov(2));
+  double nx=g2o::Sampler::gaussRand(0., cov(0));
+  double ny=g2o::Sampler::gaussRand(0., cov(1));
+  double nz=g2o::Sampler::gaussRand(0., cov(2));
 
-  double nroll=gauss_rand(cov(3));
-  double npitch=gauss_rand(cov(4));
-  double nyaw=gauss_rand(cov(5));
+  double nroll=g2o::Sampler::gaussRand(0., cov(3));
+  double npitch=g2o::Sampler::gaussRand(0., cov(4));
+  double nyaw=g2o::Sampler::gaussRand(0., cov(5));
 
   AngleAxisd aa(AngleAxisd(nyaw, Vector3d::UnitZ())*
     AngleAxisd(nroll, Vector3d::UnitX())*
@@ -79,7 +64,7 @@ Eigen::Isometry3d sample_noise_from_se3(const Vector6& cov ){
 }
 
 Vector3d sample_noise_from_plane(const Vector3d& cov ){
-  return Vector3d(gauss_rand(cov(0)), gauss_rand(cov(1)), gauss_rand(cov(2)));
+  return Vector3d(g2o::Sampler::gaussRand(0., cov(0)), g2o::Sampler::gaussRand(0., cov(1)), g2o::Sampler::gaussRand(0., cov(2)));
 }
 
 struct SimulatorItem {
@@ -187,7 +172,7 @@ struct Simulator: public SimulatorItem {
   Simulator(OptimizableGraph* graph_): SimulatorItem(graph_), _lastVertexId(0){}
   void sense(int robotIndex){
     Robot* r=_robots[robotIndex];
-    for (WorldItemSet::iterator it=_world.begin(); it!=_world.end(); it++){
+    for (WorldItemSet::iterator it=_world.begin(); it!=_world.end(); ++it){
       WorldItem* item=*it;
       r->sense(item);
     }

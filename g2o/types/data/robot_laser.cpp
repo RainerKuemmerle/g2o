@@ -56,7 +56,7 @@ namespace g2o {
 
     int beams;
     is >> beams;
-    _laserParams = LaserParameters(type, beams, angle, res, maxrange, acc, remission_mode);      
+    _laserParams = LaserParameters(type, beams, angle, res, maxrange, acc, remission_mode);
     _ranges.resize(beams);
     for (int i=0; i<beams; i++)
       is >> _ranges[i];
@@ -119,8 +119,8 @@ namespace g2o {
 
 
 #ifdef G2O_HAVE_OPENGL
-  RobotLaserDrawAction::RobotLaserDrawAction(): DrawAction(typeid(RobotLaser).name()){
-  }
+  RobotLaserDrawAction::RobotLaserDrawAction()
+      : DrawAction(typeid(RobotLaser).name()), _beamsDownsampling(nullptr), _pointSize(nullptr), _maxRange(nullptr) {}
 
   bool RobotLaserDrawAction::refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_){
     if (!DrawAction::refreshPropertyPtrs(params_))
@@ -137,7 +137,7 @@ namespace g2o {
     return true;
   }
 
-  HyperGraphElementAction* RobotLaserDrawAction::operator()(HyperGraph::HyperGraphElement* element, 
+  HyperGraphElementAction* RobotLaserDrawAction::operator()(HyperGraph::HyperGraphElement* element,
                  HyperGraphElementAction::Parameters* params_){
     if (typeid(*element).name()!=_typeName)
       return nullptr;
@@ -155,18 +155,14 @@ namespace g2o {
       // prune the cartesian points;
       RawLaser::Point2DVector npoints(points.size());
       int k = 0;
-      float r2=_maxRange->value();
-      r2 *= r2;
-      for (size_t i=0; i<points.size(); i++){
-	number_t x = points[i].x();
-	number_t y = points[i].y();
-	if (x*x + y*y < r2)
-	  npoints[k++] = points[i];
+      auto r2 = std::pow(_maxRange->value(), 2);
+      for (size_t i = 0; i < points.size(); i++) {
+        if (points[i].squaredNorm() < r2) npoints[k++] = points[i];
       }
       points = npoints;
       npoints.resize(k);
     }
-    
+
     glPushMatrix();
     const SE2& laserPose = that->laserParams().laserPose;
     glTranslatef((float)laserPose.translation().x(), (float)laserPose.translation().y(), 0.f);

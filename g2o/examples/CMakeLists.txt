@@ -31,4 +31,5 @@ endif()
 
 add_subdirectory(data_convert)
 add_subdirectory(interactive_slam)
+add_subdirectory(sim3)
 add_subdirectory(dynamic_vertex)

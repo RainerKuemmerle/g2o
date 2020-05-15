@@ -31,8 +31,6 @@
 #include <iomanip>
 #include <limits>
 
-#include <Eigen/StdVector>
-
 #include "base_edge.h"
 #include "robust_kernel.h"
 #include "g2o/config.h"

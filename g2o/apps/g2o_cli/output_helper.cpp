@@ -53,7 +53,7 @@ bool edgeAllVertsSameDim(OptimizableGraph::Edge* e, int dim)
 bool saveGnuplot(const std::string& gnudump, const OptimizableGraph& optimizer)
 {
   HyperGraph::VertexSet vset;
-  for (HyperGraph::VertexIDMap::const_iterator it=optimizer.vertices().begin(); it!=optimizer.vertices().end(); it++){
+  for (HyperGraph::VertexIDMap::const_iterator it=optimizer.vertices().begin(); it!=optimizer.vertices().end(); ++it){
     vset.insert(it->second);
   }
   return saveGnuplot(gnudump, vset, optimizer.edges());

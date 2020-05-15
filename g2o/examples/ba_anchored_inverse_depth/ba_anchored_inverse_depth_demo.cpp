@@ -24,7 +24,6 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include <Eigen/StdVector>
 #include <iostream>
 #include <stdint.h>
 
@@ -40,43 +39,15 @@
 #include "g2o/types/sba/types_six_dof_expmap.h"
 //#include "g2o/math_groups/se3quat.h"
 #include "g2o/solvers/structure_only/structure_only_solver.h"
+#include "g2o/stuff/sampler.h"
 
 using namespace Eigen;
 using namespace std;
 
-
-class Sample{
-public:
-  static int uniform(int from, int to);
-  static double uniform();
-  static double gaussian(double sigma);
+class Sample {
+ public:
+  static int uniform(int from, int to) { return static_cast<int>(g2o::Sampler::uniformRand(from, to)); }
 };
-
-static double uniform_rand(double lowerBndr, double upperBndr){
-  return lowerBndr + ((double) std::rand() / (RAND_MAX + 1.0)) * (upperBndr - lowerBndr);
-}
-
-static double gauss_rand(double mean, double sigma){
-  double x, y, r2;
-  do {
-    x = -1.0 + 2.0 * uniform_rand(0.0, 1.0);
-    y = -1.0 + 2.0 * uniform_rand(0.0, 1.0);
-    r2 = x * x + y * y;
-  } while (r2 > 1.0 || r2 == 0.0);
-  return mean + sigma * y * std::sqrt(-2.0 * log(r2) / r2);
-}
-
-int Sample::uniform(int from, int to){
-  return static_cast<int>(uniform_rand(from, to));
-}
-
-double Sample::uniform(){
-  return uniform_rand(0., 1.);
-}
-
-double Sample::gaussian(double sigma){
-  return gauss_rand(0., sigma);
-}
 
 Vector2d project2d(const Vector3d& v){
   Vector2d res;
@@ -138,7 +109,7 @@ int main(int argc, const char* argv[]){
 
   g2o::SparseOptimizer optimizer;
   optimizer.setVerbose(false);
-  
+
   g2o::OptimizationAlgorithmLevenberg * solver;
   if (SCHUR_TRICK){
     solver = new g2o::OptimizationAlgorithmLevenberg(
@@ -154,9 +125,9 @@ int main(int argc, const char* argv[]){
 
   vector<Vector3d> true_points;
   for (size_t i=0;i<500; ++i){
-    true_points.push_back(Vector3d((Sample::uniform()-0.5)*3,
-                                   Sample::uniform()-0.5,
-                                   Sample::uniform()+3));
+    true_points.push_back(Vector3d((g2o::Sampler::uniformRand(0., 1.)-0.5)*3,
+                                   g2o::Sampler::uniformRand(0., 1.)-0.5,
+                                   g2o::Sampler::uniformRand(0., 1.)+3));
   }
 
   double focal_length= 1000.;
@@ -229,23 +200,23 @@ int main(int argc, const char* argv[]){
               v_p->setMarginalized(true);
             }
             Vector3d point_w = true_points.at(i)
-                + Vector3d(Sample::gaussian(1),
-                           Sample::gaussian(1),
-                           Sample::gaussian(1));
+                + Vector3d(g2o::Sampler::gaussRand(0., 1),
+                           g2o::Sampler::gaussRand(0., 1),
+                           g2o::Sampler::gaussRand(0., 1));
 
             Vector3d point_anchor = T_anchor_from_world*point_w;
             v_p->setEstimate(invert_depth(point_anchor));
             optimizer.addVertex(v_p);
           }
 
-          double sam = Sample::uniform();
+          double sam = g2o::Sampler::uniformRand(0., 1.);
           if (sam<OUTLIER_RATIO){
             z = Vector2d(Sample::uniform(0,640),
                          Sample::uniform(0,480));
             inlier= false;
           }
-          z += Vector2d(Sample::gaussian(PIXEL_NOISE),
-                        Sample::gaussian(PIXEL_NOISE));
+          z += Vector2d(g2o::Sampler::gaussRand(0., PIXEL_NOISE),
+                        g2o::Sampler::gaussRand(0., PIXEL_NOISE));
           g2o::EdgeProjectPSI2UV * e
               = new g2o::EdgeProjectPSI2UV();
 

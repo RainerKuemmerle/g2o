@@ -1,16 +1,16 @@
 // g2o - General Graph Optimization
 // Copyright (C) 2011 R. Kuemmerle, G. Grisetti, W. Burgard
-// 
+//
 // g2o is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published
 // by the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // g2o is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
@@ -94,7 +94,6 @@ namespace g2o {
     OptimizationAlgorithm* solver = _algorithm;
     solver->init(online);
 
-    int cjIterations=0;
     bool ok=true;
 
     if (! online || batchStep) {
@@ -169,12 +168,7 @@ namespace g2o {
       _solverInterface->solve(_underlyingSolver->x(), _underlyingSolver->b());
     }
 
-    // print statistics for the non-zeros
-    //static ofstream debugNonZeros("non-zeros.txt");
-    //debugNonZeros << _solverInterface->nonZerosInL() << endl;
-
     update(_underlyingSolver->x());
-    ++cjIterations; 
 
     if (verbose()){
       computeActiveErrors();
@@ -237,7 +231,7 @@ namespace g2o {
           newVertices.push_back(v);
           _activeVertices.push_back(v);
           next++;
-        } 
+        }
         else // not supported right now
           abort();
       }
@@ -370,7 +364,7 @@ namespace g2o {
           int rr = r / slamDimension;
           int roff = r % slamDimension;
           const int& rbase = backupIdx[rr].vertex->colInHessian();
-          
+
           int row = _perm(rbase + roff);
           int col = ccol;
           if (col > row) // lower triangular entry
@@ -548,7 +542,7 @@ namespace g2o {
       w[Tj [k]]++;
 
     /* column pointers */
-    int n = _permutedUpdate->ncol;
+    const int n = _permutedUpdate->ncol;
     int nz = 0;
     for (int i = 0 ; i < n ; i++) {
       Cp[i] = nz;
@@ -558,9 +552,8 @@ namespace g2o {
     Cp[n] = nz;
     assert((size_t)nz == _permutedUpdate->nnz);
 
-    int p;
     for (size_t k = 0 ; k < _permutedUpdate->nnz ; ++k) {
-      p = w[Tj[k]]++;
+      int p = w[Tj[k]]++;
       Ci[p] = Ti[k] ;    /* A(i,j) is the pth entry in C */
       Cx[p] = Tx[k] ;
     }

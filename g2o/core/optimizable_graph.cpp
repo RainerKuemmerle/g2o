@@ -168,8 +168,9 @@ namespace g2o {
     for (size_t i=0; i<_parameters.size(); i++){
       int index = _parameterIds[i];
       *_parameters[i] = graph()->parameter(index);
-      if (typeid(**_parameters[i]).name()!=_parameterTypes[i]){
-        cerr << __PRETTY_FUNCTION__ << ": FATAL, parameter type mismatch - encountered " << typeid(**_parameters[i]).name() << "; should be " << _parameterTypes[i] << endl;
+      auto& aux = **_parameters[i];
+      if (typeid(aux).name()!=_parameterTypes[i]){
+        cerr << __PRETTY_FUNCTION__ << ": FATAL, parameter type mismatch - encountered " << typeid(aux).name() << "; should be " << _parameterTypes[i] << endl;
       }
       if (!*_parameters[i]) {
         cerr << __PRETTY_FUNCTION__ << ": FATAL, *_parameters[i] == 0" << endl;
@@ -308,7 +309,7 @@ namespace g2o {
     //    std::cerr << "subclass of OptimizableGraph::Edge confirmed";
     if (!e)
       return false;
-    
+
     return addEdge(e);
   }
 
@@ -600,16 +601,15 @@ bool OptimizableGraph::load(istream& is, bool createEdges)
 	}
         bool vertsOkay = true;
         for (int l = 0; l < numV; ++l) {
-	  int vertexId=ids[l];
-	  HyperGraph::Vertex* v=0;
-	  if (vertexId != HyperGraph::UnassignedId){
-	    v = vertex(vertexId);
-	    e->setVertex(l,v);
-	    if (!v) {
-	      vertsOkay = false;
-	      break;
-	    }
-	  }
+          int vertexId = ids[l];
+          if (vertexId != HyperGraph::UnassignedId) {
+            HyperGraph::Vertex* v = vertex(vertexId);
+            e->setVertex(l, v);
+            if (!v) {
+              vertsOkay = false;
+              break;
+            }
+          }
         }
         if (! vertsOkay) {
           cerr << __PRETTY_FUNCTION__ << ": Unable to find vertices for edge " << token;
@@ -725,20 +725,16 @@ bool OptimizableGraph::save(ostream& os, int level) const
   return os.good();
 }
 
+bool OptimizableGraph::saveSubset(ostream& os, HyperGraph::VertexSet& vset, int level) {
+  if (!_parameters.write(os)) return false;
 
-bool OptimizableGraph::saveSubset(ostream& os, HyperGraph::VertexSet& vset, int level)
-{
-  if (! _parameters.write(os))
-    return false;
-
-  for (HyperGraph::VertexSet::const_iterator it=vset.begin(); it!=vset.end(); it++){
+  for (HyperGraph::VertexSet::const_iterator it = vset.begin(); it != vset.end(); ++it) {
     OptimizableGraph::Vertex* v = dynamic_cast<OptimizableGraph::Vertex*>(*it);
     saveVertex(os, v);
   }
   for (HyperGraph::EdgeSet::const_iterator it = edges().begin(); it != edges().end(); ++it) {
-    OptimizableGraph::Edge* e = dynamic_cast< OptimizableGraph::Edge*>(*it);
-    if (e->level() != level)
-      continue;
+    OptimizableGraph::Edge* e = dynamic_cast<OptimizableGraph::Edge*>(*it);
+    if (e->level() != level) continue;
 
     bool verticesInEdge = true;
     for (vector<HyperGraph::Vertex*>::const_iterator it = e->vertices().begin(); it != e->vertices().end(); ++it) {
@@ -747,8 +743,7 @@ bool OptimizableGraph::saveSubset(ostream& os, HyperGraph::VertexSet& vset, int 
         break;
       }
     }
-    if (! verticesInEdge)
-      continue;
+    if (!verticesInEdge) continue;
 
     saveEdge(os, e);
   }
@@ -756,27 +751,24 @@ bool OptimizableGraph::saveSubset(ostream& os, HyperGraph::VertexSet& vset, int 
   return os.good();
 }
 
-bool OptimizableGraph::saveSubset(ostream& os, HyperGraph::EdgeSet& eset)
-{
-  if (!_parameters.write(os))
-    return false;
+bool OptimizableGraph::saveSubset(ostream& os, HyperGraph::EdgeSet& eset) {
+  if (!_parameters.write(os)) return false;
   std::set<OptimizableGraph::Vertex*> vset;
   for (HyperGraph::EdgeSet::const_iterator it = eset.begin(); it != eset.end(); ++it) {
     HyperGraph::Edge* e = *it;
     for (vector<HyperGraph::Vertex*>::const_iterator it = e->vertices().begin(); it != e->vertices().end(); ++it) {
       OptimizableGraph::Vertex* v = static_cast<OptimizableGraph::Vertex*>(*it);
-      if (v)
-	vset.insert(v);
+      if (v) vset.insert(v);
     }
   }
 
-  for (std::set<OptimizableGraph::Vertex*>::const_iterator it=vset.begin(); it!=vset.end(); ++it){
+  for (std::set<OptimizableGraph::Vertex*>::const_iterator it = vset.begin(); it != vset.end(); ++it) {
     OptimizableGraph::Vertex* v = dynamic_cast<OptimizableGraph::Vertex*>(*it);
     saveVertex(os, v);
   }
 
   for (HyperGraph::EdgeSet::const_iterator it = eset.begin(); it != eset.end(); ++it) {
-    OptimizableGraph::Edge* e = dynamic_cast< OptimizableGraph::Edge*>(*it);
+    OptimizableGraph::Edge* e = dynamic_cast<OptimizableGraph::Edge*>(*it);
     saveEdge(os, e);
   }
 
@@ -875,9 +867,8 @@ std::set<int> OptimizableGraph::dimensions() const
   return auxDims;
 }
 
-void OptimizableGraph::preIteration(int iter)
+void OptimizableGraph::performActions(int iter, HyperGraphActionSet& actions)
 {
-  HyperGraphActionSet& actions = _graphActions[AT_PREITERATION];
   if (actions.size() > 0) {
     HyperGraphAction::ParametersIteration params(iter);
     for (HyperGraphActionSet::iterator it = actions.begin(); it != actions.end(); ++it) {
@@ -886,15 +877,14 @@ void OptimizableGraph::preIteration(int iter)
   }
 }
 
+void OptimizableGraph::preIteration(int iter)
+{
+  performActions(iter, _graphActions[AT_PREITERATION]);
+}
+
 void OptimizableGraph::postIteration(int iter)
 {
-  HyperGraphActionSet& actions = _graphActions[AT_POSTITERATION];
-  if (actions.size() > 0) {
-    HyperGraphAction::ParametersIteration params(iter);
-    for (HyperGraphActionSet::iterator it = actions.begin(); it != actions.end(); ++it) {
-      (*(*it))(this, &params);
-    }
-  }
+  performActions(iter, _graphActions[AT_POSTITERATION]);
 }
 
 bool OptimizableGraph::addPostIterationAction(HyperGraphAction* action)
@@ -921,14 +911,14 @@ bool OptimizableGraph::removePostIterationAction(HyperGraphAction* action)
 
 bool OptimizableGraph::saveUserData(std::ostream& os, HyperGraph::Data* d) const {
   Factory* factory = Factory::instance();
-  while (d) { // write the data packet for the vertex
+  while (d) {  // write the data packet for the vertex
     string tag = factory->tag(d);
     if (tag.size() > 0) {
       os << tag << " ";
       d->write(os);
       os << endl;
     }
-	d=d->next();
+    d = d->next();
   }
   return os.good();
 }

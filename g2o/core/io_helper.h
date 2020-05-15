@@ -1,5 +1,5 @@
 // g2o - General Graph Optimization
-// Copyright (C) 2011 R. Kuemmerle, G. Grisetti, H. Strasdat, W. Burgard
+// Copyright (C) 2014 R. Kuemmerle, G. Grisetti, W. Burgard
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -24,35 +24,25 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-/***************************************************************************
- *  Description: import/export macros for creating DLLS with Microsoft
- *	compiler. Any exported function needs to be declared with the
- *  appropriate G2O_XXXX_API macro. Also, there must be separate macros
- *  for each DLL (arrrrrgh!!!)
- *
- *  17 Jan 2012
- *  Email: pupilli@cs.bris.ac.uk
- ****************************************************************************/
-#ifndef G2O_DEPRECATED_TYPES_SLAM3D_API_H
-#define G2O_DEPRECATED_TYPES_SLAM3D_API_H
+#ifndef G2O_CORE_IO_HELPER_H
+#define G2O_CORE_IO_HELPER_H
 
-#include "g2o/config.h"
+#include <iosfwd>
 
-#ifdef _MSC_VER
-// We are using a Microsoft compiler:
-#ifdef G2O_SHARED_LIBS
-#ifdef deprecated_types_slam3d_EXPORTS
-#define G2O_DEPRECATED_TYPES_SLAM3D_API __declspec(dllexport)
-#else
-#define G2O_DEPRECATED_TYPES_SLAM3D_API __declspec(dllimport)
+namespace g2o {
+namespace internal {
+template <typename Derived>
+bool writeVector(std::ostream& os, const Eigen::DenseBase<Derived>& b) {
+  for (int i = 0; i < b.size(); i++) os << b(i) << " ";
+  return os.good();
+}
+
+template <typename Derived>
+bool readVector(std::istream& is, Eigen::DenseBase<Derived>& b) {
+  for (int i = 0; i < b.size() && is.good(); i++) is >> b(i);
+  return is.good() || is.eof();
+}
+}  // namespace internal
+}  // namespace g2o
+
 #endif
-#else
-#define G2O_DEPRECATED_TYPES_SLAM3D_API
-#endif
-
-#else
-// Not Microsoft compiler so set empty definition:
-#define G2O_DEPRECATED_TYPES_SLAM3D_API
-#endif
-
-#endif // G2O_DEPRECATED_TYPES_SLAM3D_API_H

@@ -26,7 +26,7 @@
 
 #include "simulator.h"
 
-#include "rand.h"
+#include "g2o/stuff/sampler.h"
 
 #include <map>
 #include <iostream>
@@ -50,7 +50,7 @@ namespace g2o {
     Simulator::Simulator()
     {
       time_t seed = time(0);
-      Rand::seed_rand(static_cast<unsigned int>(seed));
+      Sampler::seedRand(static_cast<unsigned int>(seed));
     }
 
     Simulator::~Simulator()
@@ -110,7 +110,7 @@ namespace g2o {
           break;
 
         // sample a new motion direction
-        double sampleMove = Rand::uniform_rand(0., 1.);
+        double sampleMove = Sampler::uniformRand(0., 1.);
         int motionDirection = 0;
         while (probLimits[motionDirection] < sampleMove && motionDirection+1 < MO_NUM_ELEMS) {
           motionDirection++;
@@ -153,8 +153,8 @@ namespace g2o {
                 Landmark* l = new Landmark();
                 double offx, offy;
                 do {
-                  offx = Rand::uniform_rand(-0.5*stepLen, 0.5*stepLen);
-                  offy = Rand::uniform_rand(-0.5*stepLen, 0.5*stepLen);
+                  offx = Sampler::uniformRand(-0.5*stepLen, 0.5*stepLen);
+                  offy = Sampler::uniformRand(-0.5*stepLen, 0.5*stepLen);
                 } while (hypot_sqr(offx, offy) < 0.25*0.25);
                 l->truePose[0] = cx + offx;
                 l->truePose[1] = cy + offy;
@@ -187,7 +187,7 @@ namespace g2o {
               double dSqr = hypot_sqr(pv.truePose.translation().x() - l->truePose.x(), pv.truePose.translation().y() - l->truePose.y());
               if (dSqr > maxSensorSqr)
                 continue;
-              double obs = Rand::uniform_rand(0.0, 1.0);
+              double obs = Sampler::uniformRand(0.0, 1.0);
               if (obs > observationProb) // we do not see this one...
                 continue;
               if (l->id < 0)
@@ -195,8 +195,8 @@ namespace g2o {
               if (l->seenBy.size() == 0) {
                 Vector2d trueObservation = trueInv * l->truePose;
                 Vector2d observation = trueObservation;
-                observation[0] += Rand::gauss_rand(0., landmarkNoise[0]);
-                observation[1] += Rand::gauss_rand(0., landmarkNoise[1]);
+                observation[0] += Sampler::gaussRand(0., landmarkNoise[0]);
+                observation[1] += Sampler::gaussRand(0., landmarkNoise[1]);
                 l->simulatedPose = pv.simulatorPose * observation;
               }
               l->seenBy.push_back(pv.id);
@@ -257,8 +257,8 @@ namespace g2o {
               observation = (p.simulatorPose * sensorOffset).inverse() * l->simulatedPose;
             } else {
               // create observation for the LANDMARK using the true positions
-              observation[0] += Rand::gauss_rand(0., landmarkNoise[0]);
-              observation[1] += Rand::gauss_rand(0., landmarkNoise[1]);
+              observation[0] += Sampler::gaussRand(0., landmarkNoise[0]);
+              observation[1] += Sampler::gaussRand(0., landmarkNoise[1]);
             }
 
             _landmarkObservations.push_back(LandmarkEdge());
@@ -313,9 +313,9 @@ namespace g2o {
     {
       Vector3d trueMotion = trueMotion_.toVector();
       SE2 noiseMotion(
-          trueMotion[0] + Rand::gauss_rand(0.0, transNoise[0]),
-          trueMotion[1] + Rand::gauss_rand(0.0, transNoise[1]),
-          trueMotion[2] + Rand::gauss_rand(0.0, rotNoise));
+          trueMotion[0] + Sampler::gaussRand(0.0, transNoise[0]),
+          trueMotion[1] + Sampler::gaussRand(0.0, transNoise[1]),
+          trueMotion[2] + Sampler::gaussRand(0.0, rotNoise));
       return noiseMotion;
     }
 

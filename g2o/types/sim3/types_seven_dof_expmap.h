@@ -130,10 +130,13 @@ class G2O_TYPES_SIM3_API VertexSim3Expmap : public BaseVertex<7, Sim3>
       VertexSim3Expmap* v1 = static_cast<VertexSim3Expmap*>(_vertices[0]);
       VertexSim3Expmap* v2 = static_cast<VertexSim3Expmap*>(_vertices[1]);
       if (from.count(v1) > 0)
-  v2->setEstimate(measurement()*v1->estimate());
+        v2->setEstimate(measurement()*v1->estimate());
       else
-  v1->setEstimate(measurement().inverse()*v2->estimate());
+        v1->setEstimate(measurement().inverse()*v2->estimate());
     }
+    #if G2O_SIM3_JACOBIAN
+    virtual void linearizeOplus();
+    #endif
   };
 
 
