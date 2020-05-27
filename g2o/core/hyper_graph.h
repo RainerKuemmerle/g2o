@@ -43,7 +43,7 @@ namespace g2o {
 
   /**
      Class that models a directed  Hyper-Graph. An hyper graph is a graph where an edge
-     can connect one or more nodes. Both Vertices and Edges of an hyoper graph
+     can connect one or more nodes. Both Vertices and Edges of an hyper graph
      derive from the same class HyperGraphElement, thus one can implement generic algorithms
      that operate transparently on edges or vertices (see HyperGraphAction).
 
