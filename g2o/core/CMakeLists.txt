@@ -12,14 +12,14 @@ base_vertex.h               marginal_covariance_cholesky.h
 base_vertex.hpp             matrix_structure.cpp
 batch_stats.cpp             matrix_structure.h
 batch_stats.h               openmp_mutex.h
-block_solver.h              block_solver.hpp            
-parameter.cpp               parameter.h                 
+block_solver.h              block_solver.hpp
+parameter.cpp               parameter.h
 cache.cpp                   cache.h
-optimizable_graph.cpp       optimizable_graph.h         
+optimizable_graph.cpp       optimizable_graph.h
 solver.cpp                  solver.h
 creators.h                  optimization_algorithm_factory.cpp
 estimate_propagator.cpp     optimization_algorithm_factory.h
-estimate_propagator.h       
+estimate_propagator.h
 factory.cpp                 optimization_algorithm_property.h
 factory.h                   sparse_block_matrix.h
 sparse_optimizer.cpp  sparse_block_matrix.hpp
@@ -36,6 +36,7 @@ jacobian_workspace.cpp jacobian_workspace.h
 robust_kernel.cpp robust_kernel.h
 robust_kernel_impl.cpp robust_kernel_impl.h
 robust_kernel_factory.cpp robust_kernel_factory.h
+io_helper.h
 g2o_core_api.h
 )
 
