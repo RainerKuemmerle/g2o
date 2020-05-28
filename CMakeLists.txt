@@ -154,7 +154,6 @@ endif(G2O_USE_OPENMP)
 
 # OpenGL is used in the draw actions for the different types, as well
 # as for creating the GUI itself
-set(OpenGL_GL_PREFERENCE "GLVND")
 find_package(OpenGL)
 
 # If OpenGL was found, use the import target if available. If not, use old-style includes
@@ -224,11 +223,13 @@ macro(DEFINE_SSE_VAR  _setname)
 endmacro(DEFINE_SSE_VAR)
 
 # SSE optimizations:
-DEFINE_SSE_VAR(SSE2)
-DEFINE_SSE_VAR(SSE3)
-DEFINE_SSE_VAR(SSE4_1)
-DEFINE_SSE_VAR(SSE4_2)
-DEFINE_SSE_VAR(SSE4_A)
+IF (NOT CMAKE_SYSTEM_PROCESSOR MATCHES "arm")
+  DEFINE_SSE_VAR(SSE2)
+  DEFINE_SSE_VAR(SSE3)
+  DEFINE_SSE_VAR(SSE4_1)
+  DEFINE_SSE_VAR(SSE4_2)
+  DEFINE_SSE_VAR(SSE4_A)
+ENDIF()
 
 # Add build flags for clang AND GCC
 if (${CMAKE_CXX_COMPILER_ID} MATCHES "Clang" OR CMAKE_COMPILER_IS_GNUCXX)
