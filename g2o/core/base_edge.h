@@ -27,202 +27,191 @@
 #ifndef G2O_BASE_EDGE_H
 #define G2O_BASE_EDGE_H
 
+#include <Eigen/Core>
 #include <iostream>
 #include <limits>
-
-#include <Eigen/Core>
 
 #include "optimizable_graph.h"
 
 namespace g2o {
 
-  namespace internal {
+namespace internal {
 
-  #ifdef G2O_OPENMP
-    struct QuadraticFormLock {
-      explicit QuadraticFormLock(OptimizableGraph::Vertex& vertex)
-        :_vertex(vertex) {
-          _vertex.lockQuadraticForm();
-        }
-      ~QuadraticFormLock() {
-        _vertex.unlockQuadraticForm();
+#ifdef G2O_OPENMP
+struct QuadraticFormLock {
+  explicit QuadraticFormLock(OptimizableGraph::Vertex& vertex) : _vertex(vertex) { _vertex.lockQuadraticForm(); }
+  ~QuadraticFormLock() { _vertex.unlockQuadraticForm(); }
+
+ private:
+  OptimizableGraph::Vertex& _vertex;
+};
+#else
+struct QuadraticFormLock {
+  explicit QuadraticFormLock(OptimizableGraph::Vertex&) {}
+  ~QuadraticFormLock() {}
+};
+#endif
+
+}  // namespace internal
+
+template <int D, typename E>
+class BaseEdge : public OptimizableGraph::Edge {
+ public:
+  static const int Dimension = D;
+  typedef E Measurement;
+  typedef Eigen::Matrix<number_t, D, 1, Eigen::ColMajor> ErrorVector;
+  typedef Eigen::Matrix<number_t, D, D, Eigen::ColMajor> InformationType;
+
+  BaseEdge() : OptimizableGraph::Edge() { _dimension = D; }
+
+  virtual ~BaseEdge() {}
+
+  virtual number_t chi2() const { return _error.dot(information() * _error); }
+
+  virtual const number_t* errorData() const { return _error.data(); }
+  virtual number_t* errorData() { return _error.data(); }
+  const ErrorVector& error() const { return _error; }
+  ErrorVector& error() { return _error; }
+
+  //! information matrix of the constraint
+  EIGEN_STRONG_INLINE const InformationType& information() const { return _information; }
+  EIGEN_STRONG_INLINE InformationType& information() { return _information; }
+  EIGEN_STRONG_INLINE void setInformation(const InformationType& information) { _information = information; }
+
+  virtual const number_t* informationData() const { return _information.data(); }
+  virtual number_t* informationData() { return _information.data(); }
+
+  //! accessor functions for the measurement represented by the edge
+  EIGEN_STRONG_INLINE const Measurement& measurement() const { return _measurement; }
+  virtual void setMeasurement(const Measurement& m) { _measurement = m; }
+
+  virtual int rank() const { return _dimension; }
+
+  virtual void initialEstimate(const OptimizableGraph::VertexSet&, OptimizableGraph::Vertex*) {
+    std::cerr << "inititialEstimate() is not implemented, please give implementation in your derived class"
+              << std::endl;
+  }
+
+ protected:
+  Measurement _measurement;
+  InformationType _information;
+  ErrorVector _error;
+
+  /**
+   * calculate the robust information matrix by updating the information matrix of the error
+   */
+  InformationType robustInformation(const Vector3& rho) const {
+    InformationType result = rho[1] * _information;
+    // ErrorVector weightedErrror = _information * _error;
+    // result.noalias() += 2 * rho[2] * (weightedErrror * weightedErrror.transpose());
+    return result;
+  }
+
+  bool writeInformationMatrix(std::ostream& os) const {
+    for (int i = 0; i < information().rows(); ++i)
+      for (int j = i; j < information().cols(); ++j) os << information()(i, j) << " ";
+    return os.good();
+  }
+
+  bool readInformationMatrix(std::istream& is) {
+    for (int i = 0; i < information().rows() && is.good(); ++i)
+      for (int j = i; j < information().cols() && is.good(); ++j) {
+        is >> information()(i, j);
+        if (i != j) information()(j, i) = information()(i, j);
       }
-      private:
-      OptimizableGraph::Vertex& _vertex;
-    };
-  #else
-    struct QuadraticFormLock {
-      explicit QuadraticFormLock(OptimizableGraph::Vertex& ) { }
-      ~QuadraticFormLock() { }
-    };
-  #endif
+    return is.good() || is.eof();
+  }
 
-  } // internal namespace
+  bool writeParamIds(std::ostream& os) const {
+    for (auto id : _parameterIds) os << id << " ";
+    return os.good();
+  }
 
-  template <int D, typename E>
-  class BaseEdge : public OptimizableGraph::Edge
-  {
-    public:
+  bool readParamIds(std::istream& is) {
+    for (size_t i = 0; i < numParameters(); ++i) {
+      int paramId;
+      is >> paramId;
+      setParameterId(i, paramId);
+    }
+    return is.good() || is.eof();
+  }
 
-      static const int Dimension = D;
-      typedef E Measurement;
-      typedef Eigen::Matrix<number_t, D, 1, Eigen::ColMajor> ErrorVector;
-      typedef Eigen::Matrix<number_t, D, D, Eigen::ColMajor> InformationType;
+ public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+};
 
-      BaseEdge() : OptimizableGraph::Edge()
-      {
-        _dimension = D;
+template <typename E>
+class BaseEdge<-1, E> : public OptimizableGraph::Edge {
+ public:
+  static const int Dimension = -1;
+  typedef E Measurement;
+  typedef Eigen::Matrix<number_t, Eigen::Dynamic, 1, Eigen::ColMajor> ErrorVector;
+  typedef Eigen::Matrix<number_t, Eigen::Dynamic, Eigen::Dynamic, Eigen::ColMajor> InformationType;
+
+  BaseEdge() : OptimizableGraph::Edge() {}
+
+  virtual ~BaseEdge() {}
+
+  virtual number_t chi2() const { return _error.dot(information() * _error); }
+
+  virtual const number_t* errorData() const { return _error.data(); }
+  virtual number_t* errorData() { return _error.data(); }
+  const ErrorVector& error() const { return _error; }
+  ErrorVector& error() { return _error; }
+
+  //! information matrix of the constraint
+  const InformationType& information() const { return _information; }
+  InformationType& information() { return _information; }
+  void setInformation(const InformationType& information) { _information = information; }
+
+  virtual const number_t* informationData() const { return _information.data(); }
+  virtual number_t* informationData() { return _information.data(); }
+
+  //! accessor functions for the measurement represented by the edge
+  const Measurement& measurement() const { return _measurement; }
+  virtual void setMeasurement(const Measurement& m) { _measurement = m; }
+
+  virtual int rank() const { return _dimension; }
+
+  virtual void initialEstimate(const OptimizableGraph::VertexSet&, OptimizableGraph::Vertex*) {
+    std::cerr << "inititialEstimate() is not implemented, please give implementation in your derived class"
+              << std::endl;
+  }
+
+ protected:
+  Measurement _measurement;
+  InformationType _information;
+  ErrorVector _error;
+
+  /**
+   * calculate the robust information matrix by updating the information matrix of the error
+   */
+  InformationType robustInformation(const Vector3& rho) {
+    InformationType result = rho[1] * _information;
+    // ErrorVector weightedErrror = _information * _error;
+    // result.noalias() += 2 * rho[2] * (weightedErrror * weightedErrror.transpose());
+    return result;
+  }
+
+  bool writeInformationMatrix(std::ostream& os) const {
+    for (int i = 0; i < information().rows(); ++i)
+      for (int j = i; j < information().cols(); ++j) os << " " << information()(i, j);
+    return os.good();
+  }
+
+  bool readInformationMatrix(std::istream& is) {
+    for (int i = 0; i < information().rows() && is.good(); ++i)
+      for (int j = i; j < information().cols() && is.good(); ++j) {
+        is >> information()(i, j);
+        if (i != j) information()(j, i) = information()(i, j);
       }
+    return true;
+  }
 
-      virtual ~BaseEdge() {}
+ public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+};
 
-      virtual number_t chi2() const
-      {
-        return _error.dot(information()*_error);
-      }
-
-      virtual const number_t* errorData() const { return _error.data();}
-      virtual number_t* errorData() { return _error.data();}
-      const ErrorVector& error() const { return _error;}
-      ErrorVector& error() { return _error;}
-
-      //! information matrix of the constraint
-      EIGEN_STRONG_INLINE const InformationType& information() const { return _information;}
-      EIGEN_STRONG_INLINE InformationType& information() { return _information;}
-      EIGEN_STRONG_INLINE void setInformation(const InformationType& information) { _information = information;}
-
-      virtual const number_t* informationData() const { return _information.data();}
-      virtual number_t* informationData() { return _information.data();}
-
-      //! accessor functions for the measurement represented by the edge
-      EIGEN_STRONG_INLINE const Measurement& measurement() const { return _measurement;}
-      virtual void setMeasurement(const Measurement& m) { _measurement = m;}
-
-      virtual int rank() const {return _dimension;}
-
-      virtual void initialEstimate(const OptimizableGraph::VertexSet&, OptimizableGraph::Vertex*)
-      {
-        std::cerr << "inititialEstimate() is not implemented, please give implementation in your derived class" << std::endl;
-      }
-
-    protected:
-
-      Measurement _measurement;
-      InformationType _information;
-      ErrorVector _error;
-
-      /**
-       * calculate the robust information matrix by updating the information matrix of the error
-       */
-      InformationType robustInformation(const Vector3& rho) const
-      {
-        InformationType result = rho[1] * _information;
-        //ErrorVector weightedErrror = _information * _error;
-        //result.noalias() += 2 * rho[2] * (weightedErrror * weightedErrror.transpose());
-        return result;
-      }
-
-      bool writeInformationMatrix(std::ostream& os) const {
-        for (int i = 0; i < information().rows(); ++i)
-          for (int j = i; j < information().cols(); ++j) os << information()(i, j) << " ";
-        return os.good();
-      }
-
-      bool readInformationMatrix(std::istream& is) {
-        for (int i = 0; i < information().rows() && is.good(); ++i)
-          for (int j = i; j < information().cols() && is.good(); ++j) {
-            is >> information()(i, j);
-            if (i != j) information()(j, i) = information()(i, j);
-          }
-        return is.good() || is.eof();
-      }
-
-      bool writeParamIds(std::ostream& os) const {
-        for (auto id : _parameterIds) os << id << " ";
-        return os.good();
-      }
-
-      bool readParamIds(std::istream& is) {
-        for (size_t i = 0; i < numParameters(); ++i) {
-          int paramId;
-          is >> paramId;
-          setParameterId(i, paramId);
-        }
-        return is.good() || is.eof();
-      }
-
-    public:
-      EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-  };
-
-
-  template<typename E>
-  class BaseEdge<-1,E> : public OptimizableGraph::Edge
-  {
-    public:
-
-      static const int Dimension = -1;
-      typedef E Measurement;
-      typedef Eigen::Matrix<number_t, Eigen::Dynamic, 1, Eigen::ColMajor> ErrorVector;
-      typedef Eigen::Matrix<number_t, Eigen::Dynamic, Eigen::Dynamic, Eigen::ColMajor> InformationType;
-
-      BaseEdge() : OptimizableGraph::Edge(){
-
-      }
-
-      virtual ~BaseEdge() {}
-
-      virtual number_t chi2() const
-      {
-        return _error.dot(information()*_error);
-      }
-
-      virtual const number_t* errorData() const { return _error.data();}
-      virtual number_t* errorData() { return _error.data();}
-      const ErrorVector& error() const { return _error;}
-      ErrorVector& error() { return _error;}
-
-      //! information matrix of the constraint
-      const InformationType& information() const { return _information;}
-      InformationType& information() { return _information;}
-      void setInformation(const InformationType& information) { _information = information;}
-
-      virtual const number_t* informationData() const { return _information.data();}
-      virtual number_t* informationData() { return _information.data();}
-
-      //! accessor functions for the measurement represented by the edge
-      const Measurement& measurement() const { return _measurement;}
-      virtual void setMeasurement(const Measurement& m) { _measurement = m;}
-
-      virtual int rank() const {return _dimension;}
-
-      virtual void initialEstimate(const OptimizableGraph::VertexSet&, OptimizableGraph::Vertex*)
-      {
-        std::cerr << "inititialEstimate() is not implemented, please give implementation in your derived class" << std::endl;
-      }
-
-    protected:
-
-      Measurement _measurement;
-      InformationType _information;
-      ErrorVector _error;
-
-      /**
-       * calculate the robust information matrix by updating the information matrix of the error
-       */
-      InformationType robustInformation(const Vector3& rho)
-      {
-        InformationType result = rho[1] * _information;
-        //ErrorVector weightedErrror = _information * _error;
-        //result.noalias() += 2 * rho[2] * (weightedErrror * weightedErrror.transpose());
-        return result;
-      }
-
-    public:
-      EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-  };
-
-
-} // end namespace g2o
+}  // end namespace g2o
 
 #endif
