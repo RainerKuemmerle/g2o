@@ -36,22 +36,9 @@
 
 namespace g2o {
 
-  bool VertexPointXYZ::read(std::istream& is) {
-    Vector3 lv;
-    for (int i=0; i<3; i++)
-      is >> lv[i];
-    setEstimate(lv);
-    return true;
-  }
+bool VertexPointXYZ::read(std::istream& is) { return internal::readVector(is, _estimate); }
 
-  bool VertexPointXYZ::write(std::ostream& os) const {
-    Vector3 lv=estimate();
-    for (int i=0; i<3; i++){
-      os << lv[i] << " ";
-    }
-    return os.good();
-  }
-
+bool VertexPointXYZ::write(std::ostream& os) const { return internal::writeVector(os, estimate()); }
 
 #ifdef G2O_HAVE_OPENGL
   VertexPointXYZDrawAction::VertexPointXYZDrawAction(): DrawAction(typeid(VertexPointXYZ).name()){
@@ -69,7 +56,7 @@ namespace g2o {
   }
 
 
-  HyperGraphElementAction* VertexPointXYZDrawAction::operator()(HyperGraph::HyperGraphElement* element, 
+  HyperGraphElementAction* VertexPointXYZDrawAction::operator()(HyperGraph::HyperGraphElement* element,
                      HyperGraphElementAction::Parameters* params ){
 
     if (typeid(*element).name()!=_typeName)
@@ -78,11 +65,11 @@ namespace g2o {
     refreshPropertyPtrs(params);
     if (! _previousParams)
       return this;
-    
+
     if (_show && !_show->value())
       return this;
     VertexPointXYZ* that = static_cast<VertexPointXYZ*>(element);
-    
+
 
     glPushMatrix();
     glPushAttrib(GL_ENABLE_BIT | GL_POINT_BIT);

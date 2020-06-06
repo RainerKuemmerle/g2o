@@ -51,19 +51,19 @@ namespace g2o {
       }
 
       virtual bool setEstimateDataImpl(const number_t* est){
-        Eigen::Map<const Vector3> _est(est);
-        _estimate = _est;
+        Eigen::Map<const Vector3> estMap(est);
+        _estimate = estMap;
         return true;
       }
 
       virtual bool getEstimateData(number_t* est) const{
-        Eigen::Map<Vector3> _est(est);
-        _est = _estimate;
+        Eigen::Map<Vector3> estMap(est);
+        estMap = _estimate;
         return true;
       }
 
       virtual int estimateDimension() const {
-        return 3;
+        return Dimension;
       }
 
       virtual bool setMinimalEstimateDataImpl(const number_t* est){
@@ -78,7 +78,7 @@ namespace g2o {
       }
 
       virtual int minimalEstimateDimension() const {
-        return 3;
+        return Dimension;
       }
 
   };
@@ -97,7 +97,7 @@ namespace g2o {
   class VertexPointXYZDrawAction: public DrawAction{
     public:
       VertexPointXYZDrawAction();
-      virtual HyperGraphElementAction* operator()(HyperGraph::HyperGraphElement* element, 
+      virtual HyperGraphElementAction* operator()(HyperGraph::HyperGraphElement* element,
           HyperGraphElementAction::Parameters* params_);
 
 

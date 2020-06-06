@@ -51,7 +51,7 @@ namespace g2o {
     void computeError();
     // jacobian
     virtual void linearizeOplus();
-    
+
 
     virtual void setMeasurement(const Vector3& m){
       _measurement = m;
@@ -68,14 +68,14 @@ namespace g2o {
       v=_measurement;
       return true;
     }
-    
+
     virtual int measurementDimension() const {return 3;}
 
     virtual bool setMeasurementFromState() ;
 
-    virtual number_t initialEstimatePossible(const OptimizableGraph::VertexSet& from, 
-             OptimizableGraph::Vertex* to) { 
-      (void) to; 
+    virtual number_t initialEstimatePossible(const OptimizableGraph::VertexSet& from,
+             OptimizableGraph::Vertex* to) {
+      (void) to;
       return (from.count(_vertices[0]) == 1 ? 1.0 : -1.0);
     }
 
