@@ -154,6 +154,7 @@ endif(G2O_USE_OPENMP)
 
 # OpenGL is used in the draw actions for the different types, as well
 # as for creating the GUI itself
+set(OpenGL_GL_PREFERENCE "GLVND")
 find_package(OpenGL)
 
 # If OpenGL was found, use the import target if available. If not, use old-style includes
