@@ -30,6 +30,7 @@
 #include "g2o/types/slam3d/edge_se3.h"
 #include "g2o/types/slam3d/edge_se3_offset.h"
 #include "g2o/types/slam3d/edge_se3_pointxyz.h"
+#include "g2o/types/slam3d/edge_se3_prior.h"
 #include "g2o/types/slam3d/vertex_pointxyz.h"
 #include "g2o/types/slam3d/vertex_se3.h"
 #include "gtest/gtest.h"
@@ -38,9 +39,26 @@
 using namespace std;
 using namespace g2o;
 
+static Isometry3 randomSE3()
+{
+  Isometry3 result = static_cast<Isometry3>(AngleAxis(1., Vector3::Random().normalized()));
+  result.translation() = Vector3::Random();
+  return result;
+}
+
+static std::shared_ptr<g2o::OptimizableGraph> createGraphWithPoseOffsetParam()
+{
+  std::shared_ptr<g2o::OptimizableGraph> graph(new g2o::OptimizableGraph);
+
+  ParameterSE3Offset* paramOffset = new ParameterSE3Offset();
+  paramOffset->setId(42);
+  graph->addParameter(paramOffset);
+
+  return graph;
+}
 /*
  * VERTEX Tests
-*/
+ */
 TEST(IoSlam3d, ReadWriteVertexSE3) {
   Isometry3 estimate = static_cast<Isometry3>(AngleAxis(1., Vector3(0.1, 0.2, 0.3).normalized()));
   estimate.translation() = Vector3(3, 2, 1);
@@ -59,10 +77,9 @@ TEST(IoSlam3d, ReadWriteVertexPointXYZ) {
   ASSERT_TRUE(outputVertex.estimate().isApprox(inputVertex.estimate(), 1e-5));
 }
 
-
 /*
  * EDGE Tests
-*/
+ */
 TEST(IoSlam3d, ReadWriteEdgeSE3) {
   Isometry3 measurement = static_cast<Isometry3>(AngleAxis(1., Vector3(0.2, 0.3, 0.4).normalized()));
   measurement.translation() = Vector3(1, 2, 3);
@@ -86,36 +103,29 @@ TEST(IoSlam3d, ReadWriteEdgePointXYZ) {
 }
 
 TEST(IoSlam3d, ReadWriteEdgeSE3Offset) {
-  // set up an empty graph for adding the edge and its param
-  g2o::OptimizableGraph graph;
-
-  ParameterSE3Offset* paramOffset1 = new ParameterSE3Offset();
-  paramOffset1->setId(42);
-  graph.addParameter(paramOffset1);
+  // set up an empty graph for adding the edge
+  auto graph = createGraphWithPoseOffsetParam();
 
   ParameterSE3Offset* paramOffset2 = new ParameterSE3Offset();
   paramOffset2->setId(1337);
-  graph.addParameter(paramOffset2);
+  graph->addParameter(paramOffset2);
 
   // setting up some vertices
   VertexSE3* p1 = new VertexSE3;
   p1->setId(0);
-  graph.addVertex(p1);
+  graph->addVertex(p1);
   VertexSE3* p2 = new VertexSE3;
   p2->setId(1);
-  graph.addVertex(p2);
-
-  Isometry3 measurement = static_cast<Isometry3>(AngleAxis(1., Vector3::Random().normalized()));
-  measurement.translation() = Vector3::Random();
+  graph->addVertex(p2);
 
   // setting up the edge for output
   EdgeSE3Offset* outputEdge = new EdgeSE3Offset();
-  outputEdge->setMeasurement(measurement);
-  outputEdge->setParameterId(0, paramOffset1->id());
-  outputEdge->setParameterId(1, paramOffset1->id());
+  outputEdge->setMeasurement(randomSE3());
+  outputEdge->setParameterId(0, 42);
+  outputEdge->setParameterId(1, paramOffset2->id());
   outputEdge->setVertex(0, p1);
   outputEdge->setVertex(1, p2);
-  graph.addEdge(outputEdge);
+  graph->addEdge(outputEdge);
 
   randomizeInformationMatrix(outputEdge->information());
   EdgeSE3Offset inputEdge;
@@ -125,31 +135,50 @@ TEST(IoSlam3d, ReadWriteEdgeSE3Offset) {
 }
 
 TEST(IoSlam3d, ReadWriteEdgeSE3PointXYZ) {
-  // set up an empty graph for adding the edge and its param
-  g2o::OptimizableGraph graph;
-
-  ParameterSE3Offset* paramOffset = new ParameterSE3Offset();
-  paramOffset->setId(42);
-  graph.addParameter(paramOffset);
+  // set up an empty graph for adding the edge
+  auto graph = createGraphWithPoseOffsetParam();
 
   // setting up some vertices
   VertexSE3* pose = new VertexSE3;
   pose->setId(0);
-  graph.addVertex(pose);
+  graph->addVertex(pose);
   VertexPointXYZ* point = new VertexPointXYZ;
   point->setId(1);
-  graph.addVertex(point);
+  graph->addVertex(point);
 
   // setting up the edge for output
   EdgeSE3PointXYZ* outputEdge = new EdgeSE3PointXYZ();
   outputEdge->setMeasurement(Vector3::Random());
-  outputEdge->setParameterId(0, paramOffset->id());
+  outputEdge->setParameterId(0, 42);
   outputEdge->setVertex(0, pose);
   outputEdge->setVertex(1, point);
-  graph.addEdge(outputEdge);
+  graph->addEdge(outputEdge);
 
   randomizeInformationMatrix(outputEdge->information());
   EdgeSE3PointXYZ inputEdge;
+  readWriteGraphElement(*outputEdge, &inputEdge);
+  ASSERT_TRUE(outputEdge->measurement().isApprox(inputEdge.measurement(), 1e-5));
+  ASSERT_TRUE(outputEdge->information().isApprox(inputEdge.information(), 1e-5));
+}
+
+TEST(IoSlam3d, ReadWriteEdgeSE3Prior) {
+  // set up an empty graph for adding the edge
+  auto graph = createGraphWithPoseOffsetParam();
+
+  // setting up some vertices
+  VertexSE3* pose = new VertexSE3;
+  pose->setId(0);
+  graph->addVertex(pose);
+
+    // setting up the edge for output
+  EdgeSE3Prior* outputEdge = new EdgeSE3Prior();
+  outputEdge->setMeasurement(randomSE3());
+  outputEdge->setParameterId(0, 42);
+  outputEdge->setVertex(0, pose);
+  graph->addEdge(outputEdge);
+
+  randomizeInformationMatrix(outputEdge->information());
+  EdgeSE3Prior inputEdge;
   readWriteGraphElement(*outputEdge, &inputEdge);
   ASSERT_TRUE(outputEdge->measurement().isApprox(inputEdge.measurement(), 1e-5));
   ASSERT_TRUE(outputEdge->information().isApprox(inputEdge.information(), 1e-5));
