@@ -29,6 +29,8 @@
 #include "g2o/core/factory.h"
 #include "g2o/stuff/macros.h"
 
+#include "g2o/types/slam3d/se3_ops.h"
+
 namespace g2o {
 
 using namespace std;
@@ -52,27 +54,13 @@ CameraParameters
     baseline(0.5)  {
 }
 
-Vector2 project2d(const Vector3& v)  {
-  Vector2 res;
-  res(0) = v(0)/v(2);
-  res(1) = v(1)/v(2);
-  return res;
-}
-
-Vector3 unproject2d(const Vector2& v)  {
-  Vector3 res;
-  res(0) = v(0);
-  res(1) = v(1);
-  res(2) = 1;
-  return res;
-}
-
 inline Vector3 invert_depth(const Vector3 & x){
-  return unproject2d(x.head<2>())/x[2];
+  Vector2 aux = x.head<2>();
+  return unproject(aux)/x[2];
 }
 
 Vector2  CameraParameters::cam_map(const Vector3 & trans_xyz) const {
-  Vector2 proj = project2d(trans_xyz);
+  Vector2 proj = project(trans_xyz);
   Vector2 res;
   res[0] = proj[0]*focal_length + principle_point[0];
   res[1] = proj[1]*focal_length + principle_point[1];
@@ -425,7 +413,7 @@ void EdgeSE3ProjectXYZ::linearizeOplus() {
 }
 
 Vector2 EdgeSE3ProjectXYZ::cam_project(const Vector3 &trans_xyz) const {
-  Vector2 proj = project2d(trans_xyz);
+  Vector2 proj = project(trans_xyz);
   Vector2 res;
   res[0] = proj[0] * fx + cx;
   res[1] = proj[1] * fy + cy;
@@ -569,7 +557,7 @@ void EdgeSE3ProjectXYZOnlyPose::linearizeOplus() {
 }
 
 Vector2 EdgeSE3ProjectXYZOnlyPose::cam_project(const Vector3 &trans_xyz) const {
-  Vector2 proj = project2d(trans_xyz);
+  Vector2 proj = project(trans_xyz);
   Vector2 res;
   res[0] = proj[0] * fx + cx;
   res[1] = proj[1] * fy + cy;
