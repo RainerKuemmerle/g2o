@@ -27,6 +27,7 @@
 #include "gtest/gtest.h"
 
 #include "unit_test/test_helper/evaluate_jacobian.h"
+#include "unit_test/test_helper/random_state.h"
 
 #include "g2o/core/jacobian_workspace.h"
 #include "g2o/types/slam3d/edge_se3.h"
@@ -42,16 +43,6 @@
 using namespace std;
 using namespace g2o;
 using namespace g2o::internal;
-
-static Eigen::Isometry3d randomIsometry3d()
-{
-  Eigen::Vector3d rotAxisAngle = Eigen::Vector3d::Random();
-  rotAxisAngle += Eigen::Vector3d::Random();
-  Eigen::AngleAxisd rotation(rotAxisAngle.norm(), rotAxisAngle.normalized());
-  Eigen::Isometry3d result = (Eigen::Isometry3d)rotation.toRotationMatrix();
-  result.translation() = Eigen::Vector3d::Random();
-  return result;
-}
 
 TEST(Slam3D, EdgeSE3Jacobian)
 {
@@ -72,9 +63,9 @@ TEST(Slam3D, EdgeSE3Jacobian)
   numericJacobianWorkspace.allocate();
 
   for (int k = 0; k < 10000; ++k) {
-    v1.setEstimate(randomIsometry3d());
-    v2.setEstimate(randomIsometry3d());
-    e.setMeasurement(randomIsometry3d());
+    v1.setEstimate(internal::randomIsometry3());
+    v2.setEstimate(internal::randomIsometry3());
+    e.setMeasurement(internal::randomIsometry3());
 
     evaluateJacobian(e, jacobianWorkspace, numericJacobianWorkspace);
   }
@@ -109,8 +100,8 @@ TEST(Slam3D, EdgeSE3PointXYZJacobian)
   numericJacobianWorkspace.allocate();
 
   for (int k = 0; k < 10000; ++k) {
-    paramOffset->setOffset(randomIsometry3d());
-    v1->setEstimate(randomIsometry3d());
+    paramOffset->setOffset(internal::randomIsometry3());
+    v1->setEstimate(internal::randomIsometry3());
     v2->setEstimate(Eigen::Vector3d::Random());
     e->setMeasurement(Eigen::Vector3d::Random());
 

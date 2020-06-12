@@ -1,5 +1,5 @@
 // g2o - General Graph Optimization
-// Copyright (C) 2011 R. Kuemmerle, G. Grisetti, W. Burgard
+// Copyright (C) 2014 R. Kuemmerle, G. Grisetti, W. Burgard
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -24,14 +24,18 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "g2o/types/sim3/types_seven_dof_expmap.h"
+#include "g2o/core/eigen_types.h"
 
-#include "gtest/gtest.h"
-
-TEST(Sim3, VertexSE3ExpmapCtor)
+namespace g2o {
+namespace internal {
+inline Isometry3 randomIsometry3()
 {
-  auto* v = new g2o::VertexSE3Expmap();
-  ASSERT_NE(nullptr, v);
-  delete v;
-  SUCCEED();
+  Eigen::Vector3d rotAxisAngle = Eigen::Vector3d::Random();
+  rotAxisAngle += Eigen::Vector3d::Random();
+  Eigen::AngleAxisd rotation(rotAxisAngle.norm(), rotAxisAngle.normalized());
+  Eigen::Isometry3d result = (Eigen::Isometry3d)rotation.toRotationMatrix();
+  result.translation() = Eigen::Vector3d::Random();
+  return result;
 }
+}
+}  // namespace g2o

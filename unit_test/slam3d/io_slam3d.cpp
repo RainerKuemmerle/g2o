@@ -35,16 +35,10 @@
 #include "g2o/types/slam3d/vertex_se3.h"
 #include "gtest/gtest.h"
 #include "unit_test/test_helper/io.h"
+#include "unit_test/test_helper/random_state.h"
 
 using namespace std;
 using namespace g2o;
-
-static Isometry3 randomSE3()
-{
-  Isometry3 result = static_cast<Isometry3>(AngleAxis(1., Vector3::Random().normalized()));
-  result.translation() = Vector3::Random();
-  return result;
-}
 
 static std::shared_ptr<g2o::OptimizableGraph> createGraphWithPoseOffsetParam()
 {
@@ -120,7 +114,7 @@ TEST(IoSlam3d, ReadWriteEdgeSE3Offset) {
 
   // setting up the edge for output
   EdgeSE3Offset* outputEdge = new EdgeSE3Offset();
-  outputEdge->setMeasurement(randomSE3());
+  outputEdge->setMeasurement(internal::randomIsometry3());
   outputEdge->setParameterId(0, 42);
   outputEdge->setParameterId(1, paramOffset2->id());
   outputEdge->setVertex(0, p1);
@@ -172,7 +166,7 @@ TEST(IoSlam3d, ReadWriteEdgeSE3Prior) {
 
     // setting up the edge for output
   EdgeSE3Prior* outputEdge = new EdgeSE3Prior();
-  outputEdge->setMeasurement(randomSE3());
+  outputEdge->setMeasurement(internal::randomIsometry3());
   outputEdge->setParameterId(0, 42);
   outputEdge->setVertex(0, pose);
   graph->addEdge(outputEdge);
