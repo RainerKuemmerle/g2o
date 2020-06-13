@@ -123,8 +123,7 @@ namespace g2o {
   bool EdgeSBACam::write(std::ostream& os) const
   {
     internal::writeVector(os, measurement().toVector());
-    writeInformationMatrix(os);
-    return os.good();
+    return writeInformationMatrix(os);
   }
 
   void EdgeSBACam::initialEstimate(const OptimizableGraph::VertexSet& from_, OptimizableGraph::Vertex* /*to_*/)

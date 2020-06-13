@@ -71,12 +71,14 @@ class G2O_TYPES_SBA_API SBACam : public SE3Quat {
 
   // set the object pose
   SBACam(const Quaternion& r_, const Vector3& t_) : SE3Quat(r_, t_) {
+    Kcam.setZero();
     setTransform();
     setProjection();
     setDr();
   }
 
   SBACam(const SE3Quat& p) : SE3Quat(p) {
+    Kcam.setZero();
     setTransform();
     setProjection();
     setDr();

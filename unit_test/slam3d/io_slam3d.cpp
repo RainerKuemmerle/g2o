@@ -54,46 +54,22 @@ static std::shared_ptr<g2o::OptimizableGraph> createGraphWithPoseOffsetParam()
  * VERTEX Tests
  */
 TEST(IoSlam3d, ReadWriteVertexSE3) {
-  Isometry3 estimate = static_cast<Isometry3>(AngleAxis(1., Vector3(0.1, 0.2, 0.3).normalized()));
-  estimate.translation() = Vector3(3, 2, 1);
-  VertexSE3 outputVertex;
-  outputVertex.setEstimate(estimate);
-  VertexSE3 inputVertex;
-  readWriteGraphElement(outputVertex, &inputVertex);
-  ASSERT_TRUE(outputVertex.estimate().isApprox(inputVertex.estimate(), 1e-5));
+  readWriteVectorBasedVertex<VertexSE3, internal::RandomIsometry3>();
 }
 
 TEST(IoSlam3d, ReadWriteVertexPointXYZ) {
-  VertexPointXYZ outputVertex;
-  outputVertex.setEstimate(Vector3::Random());
-  VertexPointXYZ inputVertex;
-  readWriteGraphElement(outputVertex, &inputVertex);
-  ASSERT_TRUE(outputVertex.estimate().isApprox(inputVertex.estimate(), 1e-5));
+  readWriteVectorBasedVertex<VertexPointXYZ>();
 }
 
 /*
  * EDGE Tests
  */
 TEST(IoSlam3d, ReadWriteEdgeSE3) {
-  Isometry3 measurement = static_cast<Isometry3>(AngleAxis(1., Vector3(0.2, 0.3, 0.4).normalized()));
-  measurement.translation() = Vector3(1, 2, 3);
-  EdgeSE3 outputEdge;
-  outputEdge.setMeasurement(measurement);
-  randomizeInformationMatrix(outputEdge.information());
-  EdgeSE3 inputEdge;
-  readWriteGraphElement(outputEdge, &inputEdge);
-  ASSERT_TRUE(outputEdge.measurement().isApprox(inputEdge.measurement(), 1e-5));
-  ASSERT_TRUE(outputEdge.information().isApprox(inputEdge.information(), 1e-5));
+  readWriteVectorBasedEdge<EdgeSE3, internal::RandomIsometry3>();
 }
 
 TEST(IoSlam3d, ReadWriteEdgePointXYZ) {
-  EdgePointXYZ outputEdge;
-  outputEdge.setMeasurement(Vector3::Random());
-  randomizeInformationMatrix(outputEdge.information());
-  EdgePointXYZ inputEdge;
-  readWriteGraphElement(outputEdge, &inputEdge);
-  ASSERT_TRUE(outputEdge.measurement().isApprox(inputEdge.measurement(), 1e-5));
-  ASSERT_TRUE(outputEdge.information().isApprox(inputEdge.information(), 1e-5));
+  readWriteVectorBasedEdge<EdgePointXYZ>();
 }
 
 TEST(IoSlam3d, ReadWriteEdgeSE3Offset) {
@@ -114,18 +90,13 @@ TEST(IoSlam3d, ReadWriteEdgeSE3Offset) {
 
   // setting up the edge for output
   EdgeSE3Offset* outputEdge = new EdgeSE3Offset();
-  outputEdge->setMeasurement(internal::randomIsometry3());
   outputEdge->setParameterId(0, 42);
   outputEdge->setParameterId(1, paramOffset2->id());
   outputEdge->setVertex(0, p1);
   outputEdge->setVertex(1, p2);
   graph->addEdge(outputEdge);
 
-  randomizeInformationMatrix(outputEdge->information());
-  EdgeSE3Offset inputEdge;
-  readWriteGraphElement(*outputEdge, &inputEdge);
-  ASSERT_TRUE(outputEdge->measurement().isApprox(inputEdge.measurement(), 1e-5));
-  ASSERT_TRUE(outputEdge->information().isApprox(inputEdge.information(), 1e-5));
+  readWriteVectorBasedEdge<EdgeSE3Offset, internal::RandomIsometry3>(outputEdge);
 }
 
 TEST(IoSlam3d, ReadWriteEdgeSE3PointXYZ) {
@@ -142,17 +113,12 @@ TEST(IoSlam3d, ReadWriteEdgeSE3PointXYZ) {
 
   // setting up the edge for output
   EdgeSE3PointXYZ* outputEdge = new EdgeSE3PointXYZ();
-  outputEdge->setMeasurement(Vector3::Random());
   outputEdge->setParameterId(0, 42);
   outputEdge->setVertex(0, pose);
   outputEdge->setVertex(1, point);
   graph->addEdge(outputEdge);
 
-  randomizeInformationMatrix(outputEdge->information());
-  EdgeSE3PointXYZ inputEdge;
-  readWriteGraphElement(*outputEdge, &inputEdge);
-  ASSERT_TRUE(outputEdge->measurement().isApprox(inputEdge.measurement(), 1e-5));
-  ASSERT_TRUE(outputEdge->information().isApprox(inputEdge.information(), 1e-5));
+  readWriteVectorBasedEdge<EdgeSE3PointXYZ>(outputEdge);
 }
 
 TEST(IoSlam3d, ReadWriteEdgeSE3Prior) {
@@ -166,14 +132,9 @@ TEST(IoSlam3d, ReadWriteEdgeSE3Prior) {
 
     // setting up the edge for output
   EdgeSE3Prior* outputEdge = new EdgeSE3Prior();
-  outputEdge->setMeasurement(internal::randomIsometry3());
   outputEdge->setParameterId(0, 42);
   outputEdge->setVertex(0, pose);
   graph->addEdge(outputEdge);
 
-  randomizeInformationMatrix(outputEdge->information());
-  EdgeSE3Prior inputEdge;
-  readWriteGraphElement(*outputEdge, &inputEdge);
-  ASSERT_TRUE(outputEdge->measurement().isApprox(inputEdge.measurement(), 1e-5));
-  ASSERT_TRUE(outputEdge->information().isApprox(inputEdge.information(), 1e-5));
+  readWriteVectorBasedEdge<EdgeSE3Prior, internal::RandomIsometry3>(outputEdge);
 }

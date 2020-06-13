@@ -26,7 +26,7 @@
 
 #include <sstream>
 
-#include "g2o/types/sba/types_sba.h"
+#include "g2o/types/sba/types_six_dof_expmap.h"
 #include "gtest/gtest.h"
 #include "unit_test/test_helper/io.h"
 #include "unit_test/test_helper/random_state.h"
@@ -34,43 +34,36 @@
 using namespace std;
 using namespace g2o;
 
-struct RandomSBACam {
-  static SBACam create() { return SBACam(); } // TODO Randomize
-  static bool isApprox(const SBACam& a, const SBACam& b) {
-    return a.toVector().isApprox(b.toVector(), 1e-5) && a.Kcam.isApprox(b.Kcam, 1e-5);
-  }
-};
-
 /*
  * VERTEX Tests
  */
-TEST(IoSba, ReadWriteVertexIntrinsics) {
-  readWriteVectorBasedVertex<VertexIntrinsics>();
-}
-
-TEST(IoSba, ReadWriteVertexCam) {
-  readWriteVectorBasedVertex<VertexCam, RandomSBACam>();
-}
-
-TEST(IoSba, ReadWriteVertexSBAPointXYZ) {
-  readWriteVectorBasedVertex<VertexSBAPointXYZ>();
+TEST(IoSixDofExpmap, ReadWriteVertexSE3Expmap) {
+  readWriteVectorBasedVertex<VertexSE3Expmap, internal::RandomSE3Quat>();
 }
 
 /*
  * EDGE Tests
  */
-TEST(IoSba, ReadWriteEdgeProjectP2MC) {
-  readWriteVectorBasedEdge<EdgeProjectP2MC>();
+TEST(IoSixDofExpmap, ReadWriteEdgeSE3Expmap) {
+  readWriteVectorBasedEdge<EdgeSE3Expmap, internal::RandomSE3Quat>();
 }
 
-TEST(IoSba, ReadWriteEdgeProjectP2SC) {
-  readWriteVectorBasedEdge<EdgeProjectP2SC>();
+TEST(IoSixDofExpmap, ReadWriteEdgeProjectXYZ2UVU) {
+  readWriteVectorBasedEdge<EdgeProjectXYZ2UVU>();
 }
 
-TEST(IoSba, ReadWriteEdgeSBACam) {
-  readWriteVectorBasedEdge<EdgeSBACam, RandomSBACam>();
+TEST(IoSixDofExpmap, ReadWriteEdgeSE3ProjectXYZ) {
+  readWriteVectorBasedEdge<EdgeSE3ProjectXYZ>();
 }
 
-TEST(IoSba, ReadWriteEdgeSBAScale) {
-  readWriteVectorBasedEdge<EdgeSBAScale, internal::RandomDouble>();
+TEST(IoSixDofExpmap, ReadWriteEdgeStereoSE3ProjectXYZ) {
+  readWriteVectorBasedEdge<EdgeStereoSE3ProjectXYZ>();
+}
+
+TEST(IoSixDofExpmap, ReadWriteEdgeSE3ProjectXYZOnlyPose) {
+  readWriteVectorBasedEdge<EdgeSE3ProjectXYZOnlyPose>();
+}
+
+TEST(IoSixDofExpmap, ReadWriteEdgeStereoSE3ProjectXYZOnlyPose) {
+  readWriteVectorBasedEdge<EdgeStereoSE3ProjectXYZOnlyPose>();
 }

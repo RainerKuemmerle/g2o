@@ -39,20 +39,21 @@
 using namespace std;
 using namespace g2o;
 
+struct RandomSE2 {
+  static SE2 create() {
+    Vector2 randomPosition = Vector2::Random();
+    Vector2 randomOrientation = Vector2::Random();
+    return SE2(randomPosition.x(), randomPosition.y(), std::atan2(randomOrientation.y(), randomOrientation.x()));
+  }
+  static bool isApprox(const SE2& a, const SE2& b) { return a.toVector().isApprox(b.toVector(), 1e-5); }
+};
+
 TEST(IoSlam2d, ReadWriteVertexSE2) {
-  VertexSE2 outputVertex;
-  outputVertex.setEstimate(SE2(1, 2, 0.3));
-  VertexSE2 inputVertex;
-  readWriteGraphElement(outputVertex, &inputVertex);
-  ASSERT_TRUE(outputVertex.estimate().toVector().isApprox(inputVertex.estimate().toVector()));
+  readWriteVectorBasedVertex<VertexSE2, RandomSE2>();
 }
 
 TEST(IoSlam2d, ReadWriteVertexPointXY) {
-  VertexPointXY outputVertex;
-  outputVertex.setEstimate(Vector2(1, 2));
-  VertexPointXY inputVertex;
-  readWriteGraphElement(outputVertex, &inputVertex);
-  ASSERT_TRUE(outputVertex.estimate().isApprox(inputVertex.estimate()));
+  readWriteVectorBasedVertex<VertexPointXY>();
 }
 
 TEST(IoSlam2d, ReadWriteParameterSE2Offset) {
@@ -64,41 +65,17 @@ TEST(IoSlam2d, ReadWriteParameterSE2Offset) {
 }
 
 TEST(IoSlam2d, ReadWriteEdgeSE2) {
-  EdgeSE2 outputEdge;
-  outputEdge.setMeasurement(SE2(2, 1, 0.5));
-  randomizeInformationMatrix(outputEdge.information());
-  EdgeSE2 inputEdge;
-  readWriteGraphElement(outputEdge, &inputEdge);
-  ASSERT_TRUE(outputEdge.measurement().toVector().isApprox(inputEdge.measurement().toVector()));
-  ASSERT_TRUE(outputEdge.information().isApprox(inputEdge.information(), 1e-5));
+  readWriteVectorBasedEdge<EdgeSE2, RandomSE2>();
 }
 
 TEST(IoSlam2d, ReadWriteEdgeSE2Prior) {
-  EdgeSE2Prior outputEdge;
-  outputEdge.setMeasurement(SE2(1, 2, -0.5));
-  randomizeInformationMatrix(outputEdge.information());
-  EdgeSE2Prior inputEdge;
-  readWriteGraphElement(outputEdge, &inputEdge);
-  ASSERT_TRUE(outputEdge.measurement().toVector().isApprox(inputEdge.measurement().toVector()));
-  ASSERT_TRUE(outputEdge.information().isApprox(inputEdge.information(), 1e-5));
+  readWriteVectorBasedEdge<EdgeSE2Prior, RandomSE2>();
 }
 
 TEST(IoSlam2d, ReadWriteEdgeSE2PointXY) {
-  EdgeSE2PointXY outputEdge;
-  outputEdge.setMeasurement(Vector2(2., 1.));
-  randomizeInformationMatrix(outputEdge.information());
-  EdgeSE2PointXY inputEdge;
-  readWriteGraphElement(outputEdge, &inputEdge);
-  ASSERT_TRUE(outputEdge.measurement().isApprox(inputEdge.measurement()));
-  ASSERT_TRUE(outputEdge.information().isApprox(inputEdge.information(), 1e-5));
+  readWriteVectorBasedEdge<EdgeSE2PointXY>();
 }
 
 TEST(IoSlam2d, ReadWriteEdgeXYPrior) {
-  EdgeXYPrior outputEdge;
-  outputEdge.setMeasurement(Vector2(3., 2.));
-  randomizeInformationMatrix(outputEdge.information());
-  EdgeXYPrior inputEdge;
-  readWriteGraphElement(outputEdge, &inputEdge);
-  ASSERT_TRUE(outputEdge.measurement().isApprox(inputEdge.measurement()));
-  ASSERT_TRUE(outputEdge.information().isApprox(inputEdge.information(), 1e-5));
+  readWriteVectorBasedEdge<EdgeXYPrior>();
 }
