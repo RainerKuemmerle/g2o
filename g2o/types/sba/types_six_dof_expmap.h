@@ -140,10 +140,8 @@ class G2O_TYPES_SBA_API EdgeProjectXYZ2UV : public  BaseBinaryEdge<2, Vector2, V
     void computeError()  {
       const VertexSE3Expmap* v1 = static_cast<const VertexSE3Expmap*>(_vertices[1]);
       const VertexSBAPointXYZ* v2 = static_cast<const VertexSBAPointXYZ*>(_vertices[0]);
-      const CameraParameters * cam
-        = static_cast<const CameraParameters *>(parameter(0));
-      Vector2 obs(_measurement);
-      _error = obs-cam->cam_map(v1->estimate().map(v2->estimate()));
+      const CameraParameters * cam = static_cast<const CameraParameters *>(parameter(0));
+      _error = measurement() - cam->cam_map(v1->estimate().map(v2->estimate()));
     }
 
     virtual void linearizeOplus();
@@ -158,6 +156,7 @@ public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
   EdgeProjectPSI2UV()  {
+    resize(3);
     resizeParameters(1);
     installParameter(_cam, 0);
   }
@@ -188,10 +187,8 @@ class G2O_TYPES_SBA_API EdgeProjectXYZ2UVU : public  BaseBinaryEdge<3, Vector3, 
     void computeError(){
       const VertexSE3Expmap* v1 = static_cast<const VertexSE3Expmap*>(_vertices[1]);
       const VertexSBAPointXYZ* v2 = static_cast<const VertexSBAPointXYZ*>(_vertices[0]);
-      const CameraParameters * cam
-        = static_cast<const CameraParameters *>(parameter(0));
-      Vector3 obs(_measurement);
-      _error = obs-cam->stereocam_uvu_map(v1->estimate().map(v2->estimate()));
+      const CameraParameters* cam = static_cast<const CameraParameters *>(parameter(0));
+      _error = measurement() - cam->stereocam_uvu_map(v1->estimate().map(v2->estimate()));
     }
     //  virtual void linearizeOplus();
     CameraParameters * _cam;

@@ -47,28 +47,13 @@ namespace g2o {
   }
 
   bool EdgeSE3PointXYZDepth::read(std::istream& is) {
-    int pid;
-    is >> pid;
-    setParameterId(0,pid);
-
-    // measured keypoint
-    Vector3 meas;
-    internal::readVector(is, meas);
-    setMeasurement(meas);
-    if (is.bad()) {
-      return false;
-    }
-    readInformationMatrix(is);
-    if (is.bad()) {
-      //  we overwrite the information matrix
-      information().setIdentity();
-      information()(2,2)=10/_measurement(2); // scale the info by the inverse of the measured depth
-    }
-    return true;
+    readParamIds(is);
+    internal::readVector(is, _measurement); // measured keypoint
+    return readInformationMatrix(is);
   }
 
   bool EdgeSE3PointXYZDepth::write(std::ostream& os) const {
-    os << params->id() << " ";
+    writeParamIds(os);
     internal::writeVector(os, measurement());
     return writeInformationMatrix(os);
   }

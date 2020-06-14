@@ -30,6 +30,8 @@
 #include "g2o/types/slam3d/edge_se3.h"
 #include "g2o/types/slam3d/edge_se3_offset.h"
 #include "g2o/types/slam3d/edge_se3_pointxyz.h"
+#include "g2o/types/slam3d/edge_se3_pointxyz_depth.h"
+#include "g2o/types/slam3d/edge_se3_pointxyz_disparity.h"
 #include "g2o/types/slam3d/edge_se3_prior.h"
 #include "g2o/types/slam3d/vertex_pointxyz.h"
 #include "g2o/types/slam3d/vertex_se3.h"
@@ -40,101 +42,116 @@
 using namespace std;
 using namespace g2o;
 
-static std::shared_ptr<g2o::OptimizableGraph> createGraphWithPoseOffsetParam()
-{
-  std::shared_ptr<g2o::OptimizableGraph> graph(new g2o::OptimizableGraph);
+class IoSlam3dParam : public ::testing::Test {
+ protected:
+  void SetUp() override {
+    graph.reset(new g2o::OptimizableGraph);
 
-  ParameterSE3Offset* paramOffset = new ParameterSE3Offset();
-  paramOffset->setId(42);
-  graph->addParameter(paramOffset);
+    // setting up parameters for tests
+    paramOffset = new ParameterSE3Offset();
+    paramOffset->setId(paramId++);
+    graph->addParameter(paramOffset);
 
-  return graph;
-}
+    paramCamera = new ParameterCamera;
+    paramCamera->setId(paramId++);
+    graph->addParameter(paramCamera);
+
+    // setting up some vertices
+    for (int i = 0; i < 2; ++i) {
+      VertexSE3* p = new VertexSE3;
+      p->setId(numVertices++);
+      graph->addVertex(p);
+      poses.at(i) = p;
+    }
+    point = new VertexPointXYZ;
+    point->setId(numVertices++);
+    graph->addVertex(point);
+  }
+
+  bool preparePosePoseEdge(OptimizableGraph::Edge* e) {
+    e->setParameterId(0, paramOffset->id());
+    for (int i = 0; i < 2; ++i) e->setVertex(i, poses.at(i));
+    return graph->addEdge(e);
+  }
+
+  bool preparePosePointEdge(OptimizableGraph::Edge* e) {
+    e->setParameterId(0, paramOffset->id());
+    e->setVertex(0, poses.at(0));
+    e->setVertex(1, point);
+    return graph->addEdge(e);
+  }
+
+  bool preparePoseEdge(OptimizableGraph::Edge* e) {
+    e->setParameterId(0, paramOffset->id());
+    e->setVertex(0, poses.at(0));
+    return graph->addEdge(e);
+  }
+
+  bool prepareCamPointEdge(OptimizableGraph::Edge* e) {
+    e->setParameterId(0, paramCamera->id());
+    e->setVertex(0, poses.at(0));
+    e->setVertex(1, point);
+    return graph->addEdge(e);
+  }
+
+  std::shared_ptr<g2o::OptimizableGraph> graph;
+  VertexPointXYZ* point = nullptr;
+  ParameterSE3Offset* paramOffset = nullptr;
+  ParameterCamera* paramCamera = nullptr;
+  std::vector<VertexSE3*> poses = {nullptr, nullptr};
+  int numVertices = 0;
+  int paramId = 42;
+};
+
 /*
  * VERTEX Tests
  */
-TEST(IoSlam3d, ReadWriteVertexSE3) {
-  readWriteVectorBasedVertex<VertexSE3, internal::RandomIsometry3>();
-}
+TEST(IoSlam3d, ReadWriteVertexSE3) { readWriteVectorBasedVertex<VertexSE3, internal::RandomIsometry3>(); }
 
-TEST(IoSlam3d, ReadWriteVertexPointXYZ) {
-  readWriteVectorBasedVertex<VertexPointXYZ>();
-}
+TEST(IoSlam3d, ReadWriteVertexPointXYZ) { readWriteVectorBasedVertex<VertexPointXYZ>(); }
 
 /*
  * EDGE Tests
  */
-TEST(IoSlam3d, ReadWriteEdgeSE3) {
-  readWriteVectorBasedEdge<EdgeSE3, internal::RandomIsometry3>();
-}
+TEST(IoSlam3d, ReadWriteEdgeSE3) { readWriteVectorBasedEdge<EdgeSE3, internal::RandomIsometry3>(); }
 
-TEST(IoSlam3d, ReadWriteEdgePointXYZ) {
-  readWriteVectorBasedEdge<EdgePointXYZ>();
-}
+TEST(IoSlam3d, ReadWriteEdgePointXYZ) { readWriteVectorBasedEdge<EdgePointXYZ>(); }
 
-TEST(IoSlam3d, ReadWriteEdgeSE3Offset) {
-  // set up an empty graph for adding the edge
-  auto graph = createGraphWithPoseOffsetParam();
-
+TEST_F(IoSlam3dParam, ReadWriteEdgeSE3Offset) {
+  // additional graph structures
   ParameterSE3Offset* paramOffset2 = new ParameterSE3Offset();
-  paramOffset2->setId(1337);
+  paramOffset2->setId(paramId++);
   graph->addParameter(paramOffset2);
-
-  // setting up some vertices
-  VertexSE3* p1 = new VertexSE3;
-  p1->setId(0);
-  graph->addVertex(p1);
-  VertexSE3* p2 = new VertexSE3;
-  p2->setId(1);
-  graph->addVertex(p2);
 
   // setting up the edge for output
   EdgeSE3Offset* outputEdge = new EdgeSE3Offset();
-  outputEdge->setParameterId(0, 42);
   outputEdge->setParameterId(1, paramOffset2->id());
-  outputEdge->setVertex(0, p1);
-  outputEdge->setVertex(1, p2);
-  graph->addEdge(outputEdge);
+  ASSERT_TRUE(preparePosePoseEdge(outputEdge));
 
+  // Test IO
   readWriteVectorBasedEdge<EdgeSE3Offset, internal::RandomIsometry3>(outputEdge);
 }
 
-TEST(IoSlam3d, ReadWriteEdgeSE3PointXYZ) {
-  // set up an empty graph for adding the edge
-  auto graph = createGraphWithPoseOffsetParam();
-
-  // setting up some vertices
-  VertexSE3* pose = new VertexSE3;
-  pose->setId(0);
-  graph->addVertex(pose);
-  VertexPointXYZ* point = new VertexPointXYZ;
-  point->setId(1);
-  graph->addVertex(point);
-
-  // setting up the edge for output
+TEST_F(IoSlam3dParam, ReadWriteEdgeSE3PointXYZ) {
   EdgeSE3PointXYZ* outputEdge = new EdgeSE3PointXYZ();
-  outputEdge->setParameterId(0, 42);
-  outputEdge->setVertex(0, pose);
-  outputEdge->setVertex(1, point);
-  graph->addEdge(outputEdge);
-
+  ASSERT_TRUE(preparePosePointEdge(outputEdge));
   readWriteVectorBasedEdge<EdgeSE3PointXYZ>(outputEdge);
 }
 
-TEST(IoSlam3d, ReadWriteEdgeSE3Prior) {
-  // set up an empty graph for adding the edge
-  auto graph = createGraphWithPoseOffsetParam();
-
-  // setting up some vertices
-  VertexSE3* pose = new VertexSE3;
-  pose->setId(0);
-  graph->addVertex(pose);
-
-    // setting up the edge for output
+TEST_F(IoSlam3dParam, ReadWriteEdgeSE3Prior) {
   EdgeSE3Prior* outputEdge = new EdgeSE3Prior();
-  outputEdge->setParameterId(0, 42);
-  outputEdge->setVertex(0, pose);
-  graph->addEdge(outputEdge);
-
+  ASSERT_TRUE(preparePoseEdge(outputEdge));
   readWriteVectorBasedEdge<EdgeSE3Prior, internal::RandomIsometry3>(outputEdge);
+}
+
+TEST_F(IoSlam3dParam, ReadWriteEdgeSE3PointXYZDepth) {
+  EdgeSE3PointXYZDepth* outputEdge = new EdgeSE3PointXYZDepth();
+  ASSERT_TRUE(prepareCamPointEdge(outputEdge));
+  readWriteVectorBasedEdge<EdgeSE3PointXYZDepth>(outputEdge);
+}
+
+TEST_F(IoSlam3dParam, ReadWriteEdgeSE3PointXYZDisparity) {
+  EdgeSE3PointXYZDisparity* outputEdge = new EdgeSE3PointXYZDisparity();
+  ASSERT_TRUE(prepareCamPointEdge(outputEdge));
+  readWriteVectorBasedEdge<EdgeSE3PointXYZDisparity>(outputEdge);
 }

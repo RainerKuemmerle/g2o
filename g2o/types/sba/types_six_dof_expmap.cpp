@@ -112,33 +112,15 @@ EdgeProjectXYZ2UV::EdgeProjectXYZ2UV() : BaseBinaryEdge<2, Vector2, VertexSBAPoi
 }
 
 bool EdgeProjectPSI2UV::write(std::ostream& os) const  {
-  os << _cam->id() << " ";
-  for (int i=0; i<2; i++){
-    os << measurement()[i] << " ";
-  }
-
-  for (int i=0; i<2; i++)
-    for (int j=i; j<2; j++){
-      os << " " <<  information()(i,j);
-    }
-  return os.good();
+  writeParamIds(os);
+  internal::writeVector(os, measurement());
+  return writeInformationMatrix(os);
 }
 
 bool EdgeProjectPSI2UV::read(std::istream& is) {
-  int paramId;
-  is >> paramId;
-  setParameterId(0, paramId);
-
-  for (int i=0; i<2; i++){
-    is >> _measurement[i];
-  }
-  for (int i=0; i<2; i++)
-    for (int j=i; j<2; j++) {
-      is >> information()(i,j);
-      if (i!=j)
-        information()(j,i)=information()(i,j);
-    }
-  return true;
+  readParamIds(is);
+  internal::readVector(is, _measurement);
+  return readInformationMatrix(is);
 }
 
 void EdgeProjectPSI2UV::computeError(){
@@ -212,33 +194,15 @@ EdgeProjectXYZ2UVU::EdgeProjectXYZ2UVU() : BaseBinaryEdge<3, Vector3, VertexSBAP
 }
 
 bool EdgeProjectXYZ2UV::read(std::istream& is){
-  int paramId;
-  is >> paramId;
-  setParameterId(0, paramId);
-
-  for (int i=0; i<2; i++){
-    is >> _measurement[i];
-  }
-  for (int i=0; i<2; i++)
-    for (int j=i; j<2; j++) {
-      is >> information()(i,j);
-      if (i!=j)
-        information()(j,i)=information()(i,j);
-    }
-  return true;
+  readParamIds(is);
+  internal::readVector(is, _measurement);
+  return readInformationMatrix(is);
 }
 
 bool EdgeProjectXYZ2UV::write(std::ostream& os) const {
-  os << _cam->id() << " ";
-  for (int i=0; i<2; i++){
-    os << measurement()[i] << " ";
-  }
-
-  for (int i=0; i<2; i++)
-    for (int j=i; j<2; j++){
-      os << " " <<  information()(i,j);
-    }
-  return os.good();
+  writeParamIds(os);
+  internal::writeVector(os, measurement());
+  return writeInformationMatrix(os);
 }
 
 void EdgeSE3Expmap::linearizeOplus() {
@@ -299,11 +263,13 @@ void EdgeProjectXYZ2UV::linearizeOplus() {
 }
 
 bool EdgeProjectXYZ2UVU::read(std::istream &is) {
+  readParamIds(is);
   internal::readVector(is, _measurement);
   return readInformationMatrix(is);
 }
 
 bool EdgeProjectXYZ2UVU::write(std::ostream &os) const {
+  writeParamIds(os);
   internal::writeVector(os, measurement());
   return writeInformationMatrix(os);
 }

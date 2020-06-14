@@ -39,15 +39,15 @@ namespace g2o {
 
 
   // point to camera projection, monocular
-  EdgeSE3PointXYZDisparity::EdgeSE3PointXYZDisparity() : BaseBinaryEdge<3, Vector3, VertexSE3, VertexPointXYZ>() {
+  EdgeSE3PointXYZDisparity::EdgeSE3PointXYZDisparity()
+      : BaseBinaryEdge<3, Vector3, VertexSE3, VertexPointXYZ>(), params(nullptr), cache(nullptr) {
     resizeParameters(1);
     installParameter(params, 0);
     information().setIdentity();
-    information()(2,2)=1000.;
+    information()(2, 2) = 1000.;
     J.fill(0);
-    J.block<3,3>(0,0) = -Matrix3::Identity();
+    J.block<3, 3>(0, 0) = -Matrix3::Identity();
   }
-
 
   bool EdgeSE3PointXYZDisparity::resolveCaches(){
     ParameterVector pv(1);
@@ -58,57 +58,21 @@ namespace g2o {
 
 
   bool EdgeSE3PointXYZDisparity::read(std::istream& is) {
-    // measured keypoint
-    int pid;
-    is >> pid;
-    setParameterId(0,pid);
-
-    Vector3 meas;
-    for (int i=0; i<3; i++) is >> meas[i];
-    setMeasurement(meas);
-    if (is.bad())
-      return false;
-    for ( int i=0; i<information().rows() && is.good(); i++)
-      for (int j=i; j<information().cols() && is.good(); j++){
-        is >> information()(i,j);
-        if (i!=j)
-          information()(j,i)=information()(i,j);
-      }
-    if (is.bad()) {
-      //  we overwrite the information matrix
-      information().setIdentity();
-      information()(2,2)=1000.;
-    }
-    //_cacheIds[0] = _paramId;
-    return true;
+    readParamIds(is);
+    internal::readVector(is, _measurement);
+    return readInformationMatrix(is);
   }
 
   bool EdgeSE3PointXYZDisparity::write(std::ostream& os) const {
-    os << params->id() << " ";
-    for (int i=0; i<3; i++) os  << measurement()[i] << " ";
-    for (int i=0; i<information().rows(); i++)
-      for (int j=i; j<information().cols(); j++) {
-        os <<  information()(i,j) << " ";
-      }
-    return os.good();
+    writeParamIds(os);
+    internal::writeVector(os, measurement());
+    return writeInformationMatrix(os);
   }
-
 
   void EdgeSE3PointXYZDisparity::computeError() {
     //VertexSE3 *cam = static_cast<VertexSE3*>(_vertices[0]);
     VertexPointXYZ *point = static_cast<VertexPointXYZ*>(_vertices[1]);
     const Vector3& pt = point->estimate();
-    //Vector4 ppt(pt(0),pt(1),pt(2),1.0);
-
-    // VertexCameraCache* vcache = (VertexCameraCache*)cam->getCache(_cacheIds[0]);
-    // if (! vcache){
-    //   cerr << "fatal error in retrieving cache" << endl;
-    // }
-
-    // CacheCamera* vcache = cache;
-    // if (! vcache){
-    //   cerr << "fatal error in retrieving cache" << endl;
-    // }
 
     Vector3 p = cache->w2i() * pt;
 
@@ -126,17 +90,6 @@ namespace g2o {
   void EdgeSE3PointXYZDisparity::linearizeOplus() {
     //VertexSE3 *cam = static_cast<VertexSE3 *>(_vertices[0]);
     VertexPointXYZ *vp = static_cast<VertexPointXYZ *>(_vertices[1]);
-
-    // VertexCameraCache* vcache = (VertexCameraCache*)cam->getCache(_cacheIds[0]);
-    // if (! vcache){
-    //   cerr << "fatal error in retrieving cache" << endl;
-    // }
-
-    // CacheCamera* vcache = cache;
-    // if (! vcache){
-    //   cerr << "fatal error in retrieving cache" << endl;
-    // }
-
 
     const Vector3& pt = vp->estimate();
 
@@ -218,7 +171,7 @@ namespace g2o {
 #ifdef G2O_HAVE_OPENGL
   EdgeProjectDisparityDrawAction::EdgeProjectDisparityDrawAction(): DrawAction(typeid(EdgeSE3PointXYZDisparity).name()){}
 
-  HyperGraphElementAction* EdgeProjectDisparityDrawAction::operator()(HyperGraph::HyperGraphElement* element, 
+  HyperGraphElementAction* EdgeProjectDisparityDrawAction::operator()(HyperGraph::HyperGraphElement* element,
                 HyperGraphElementAction::Parameters*  params_ ){
   if (typeid(*element).name()!=_typeName)
       return nullptr;

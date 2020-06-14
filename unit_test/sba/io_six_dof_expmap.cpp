@@ -44,26 +44,69 @@ TEST(IoSixDofExpmap, ReadWriteVertexSE3Expmap) {
 /*
  * EDGE Tests
  */
-TEST(IoSixDofExpmap, ReadWriteEdgeSE3Expmap) {
-  readWriteVectorBasedEdge<EdgeSE3Expmap, internal::RandomSE3Quat>();
-}
+TEST(IoSixDofExpmap, ReadWriteEdgeSE3Expmap) { readWriteVectorBasedEdge<EdgeSE3Expmap, internal::RandomSE3Quat>(); }
 
-TEST(IoSixDofExpmap, ReadWriteEdgeProjectXYZ2UVU) {
-  readWriteVectorBasedEdge<EdgeProjectXYZ2UVU>();
-}
+TEST(IoSixDofExpmap, ReadWriteEdgeSE3ProjectXYZ) { readWriteVectorBasedEdge<EdgeSE3ProjectXYZ>(); }
 
-TEST(IoSixDofExpmap, ReadWriteEdgeSE3ProjectXYZ) {
-  readWriteVectorBasedEdge<EdgeSE3ProjectXYZ>();
-}
+TEST(IoSixDofExpmap, ReadWriteEdgeStereoSE3ProjectXYZ) { readWriteVectorBasedEdge<EdgeStereoSE3ProjectXYZ>(); }
 
-TEST(IoSixDofExpmap, ReadWriteEdgeStereoSE3ProjectXYZ) {
-  readWriteVectorBasedEdge<EdgeStereoSE3ProjectXYZ>();
-}
-
-TEST(IoSixDofExpmap, ReadWriteEdgeSE3ProjectXYZOnlyPose) {
-  readWriteVectorBasedEdge<EdgeSE3ProjectXYZOnlyPose>();
-}
+TEST(IoSixDofExpmap, ReadWriteEdgeSE3ProjectXYZOnlyPose) { readWriteVectorBasedEdge<EdgeSE3ProjectXYZOnlyPose>(); }
 
 TEST(IoSixDofExpmap, ReadWriteEdgeStereoSE3ProjectXYZOnlyPose) {
   readWriteVectorBasedEdge<EdgeStereoSE3ProjectXYZOnlyPose>();
+}
+
+/*
+ * EDGE Tests inlcuding a Camera Parameter
+ */
+class IoSixDofExpmapParam : public ::testing::Test {
+ protected:
+  void SetUp() override {
+    graph.reset(new g2o::OptimizableGraph);
+
+    CameraParameters* paramCam = new CameraParameters();
+    paramCam->setId(42);
+    graph->addParameter(paramCam);
+
+    // setting up some vertices
+    point = new VertexSBAPointXYZ;
+    point->setId(0);
+    graph->addVertex(point);
+    pose = new VertexSE3Expmap;
+    pose->setId(1);
+    graph->addVertex(pose);
+  }
+
+  void prepareEdge(OptimizableGraph::Edge* e) {
+    e->setParameterId(0, 42);
+    e->setVertex(0, point);
+    e->setVertex(1, pose);
+    graph->addEdge(e);
+  }
+
+  std::shared_ptr<g2o::OptimizableGraph> graph;
+  VertexSBAPointXYZ* point = nullptr;
+  VertexSE3Expmap* pose = nullptr;
+};
+
+TEST_F(IoSixDofExpmapParam, ReadWriteEdgeProjectXYZ2UV) {
+  EdgeProjectXYZ2UV* outputEdge = new EdgeProjectXYZ2UV;
+  prepareEdge(outputEdge);
+  readWriteVectorBasedEdge<EdgeProjectXYZ2UV>(outputEdge);
+}
+
+TEST_F(IoSixDofExpmapParam, ReadWriteEdgeProjectPSI2UV) {
+  VertexSE3Expmap* p2 = new VertexSE3Expmap;
+  p2->setId(2);
+  graph->addVertex(p2);
+  EdgeProjectPSI2UV* outputEdge = new EdgeProjectPSI2UV;
+  outputEdge->setVertex(2, p2);
+  prepareEdge(outputEdge);
+  readWriteVectorBasedEdge<EdgeProjectPSI2UV>(outputEdge);
+}
+
+TEST_F(IoSixDofExpmapParam, ReadWriteEdgeProjectXYZ2UVU) {
+  EdgeProjectXYZ2UVU* outputEdge = new EdgeProjectXYZ2UVU;
+  prepareEdge(outputEdge);
+  readWriteVectorBasedEdge<EdgeProjectXYZ2UVU>(outputEdge);
 }
