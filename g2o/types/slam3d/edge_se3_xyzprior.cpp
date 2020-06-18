@@ -48,38 +48,15 @@ namespace g2o {
 
   bool EdgeSE3XYZPrior::read(std::istream& is)
   {
-    int pid;
-    is >> pid;
-    if (!setParameterId(0, pid))
-      return false;
-
-    // measured keypoint
-    Vector3 meas;
-    for (int i = 0; i < 3; i++) is >> meas[i];
-    setMeasurement(meas);
-
-    // read covariance matrix (upper triangle)
-    if (is.good()) {
-      for (int i = 0; i < 3; i++) {
-        for (int j = i; j < 3; j++) {
-          is >> information()(i,j);
-          if (i != j)
-            information()(j,i) = information()(i,j);
-        }
-      }
-    }
-    return !is.fail();
+    readParamIds(is);
+    internal::readVector(is, _measurement);
+    return readInformationMatrix(is);
   }
 
   bool EdgeSE3XYZPrior::write(std::ostream& os) const {
-    os << _offsetParam->id() <<  " ";
-    for (int i = 0; i < 3; i++) os << measurement()[i] << " ";
-    for (int i = 0; i < 3; i++) {
-      for (int j = i; j < 3; j++) {
-        os << information()(i,j) << " ";
-      }
-    }
-    return os.good();
+    writeParamIds(os);
+    internal::writeVector(os, measurement());
+    return writeInformationMatrix(os);
   }
 
   void EdgeSE3XYZPrior::computeError() {

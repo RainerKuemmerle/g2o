@@ -33,6 +33,9 @@
 #include "g2o/types/slam3d/edge_se3_pointxyz_depth.h"
 #include "g2o/types/slam3d/edge_se3_pointxyz_disparity.h"
 #include "g2o/types/slam3d/edge_se3_prior.h"
+#include "g2o/types/slam3d/edge_se3_xyzprior.h"
+#include "g2o/types/slam3d/edge_xyz_prior.h"
+#include "g2o/types/slam3d/parameter_stereo_camera.h"
 #include "g2o/types/slam3d/vertex_pointxyz.h"
 #include "g2o/types/slam3d/vertex_se3.h"
 #include "gtest/gtest.h"
@@ -70,7 +73,7 @@ class IoSlam3dParam : public ::testing::Test {
 
   bool preparePosePoseEdge(OptimizableGraph::Edge* e) {
     e->setParameterId(0, paramOffset->id());
-    for (int i = 0; i < 2; ++i) e->setVertex(i, poses.at(i));
+    for (size_t i = 0; i < e->vertices().size(); ++i) e->setVertex(i, poses.at(i));
     return graph->addEdge(e);
   }
 
@@ -78,12 +81,6 @@ class IoSlam3dParam : public ::testing::Test {
     e->setParameterId(0, paramOffset->id());
     e->setVertex(0, poses.at(0));
     e->setVertex(1, point);
-    return graph->addEdge(e);
-  }
-
-  bool preparePoseEdge(OptimizableGraph::Edge* e) {
-    e->setParameterId(0, paramOffset->id());
-    e->setVertex(0, poses.at(0));
     return graph->addEdge(e);
   }
 
@@ -117,6 +114,8 @@ TEST(IoSlam3d, ReadWriteEdgeSE3) { readWriteVectorBasedEdge<EdgeSE3, internal::R
 
 TEST(IoSlam3d, ReadWriteEdgePointXYZ) { readWriteVectorBasedEdge<EdgePointXYZ>(); }
 
+TEST(IoSlam3d, ReadWriteEdgeXYZPrior) { readWriteVectorBasedEdge<EdgeXYZPrior>(); }
+
 TEST_F(IoSlam3dParam, ReadWriteEdgeSE3Offset) {
   // additional graph structures
   ParameterSE3Offset* paramOffset2 = new ParameterSE3Offset();
@@ -140,7 +139,7 @@ TEST_F(IoSlam3dParam, ReadWriteEdgeSE3PointXYZ) {
 
 TEST_F(IoSlam3dParam, ReadWriteEdgeSE3Prior) {
   EdgeSE3Prior* outputEdge = new EdgeSE3Prior();
-  ASSERT_TRUE(preparePoseEdge(outputEdge));
+  ASSERT_TRUE(preparePosePoseEdge(outputEdge));
   readWriteVectorBasedEdge<EdgeSE3Prior, internal::RandomIsometry3>(outputEdge);
 }
 
@@ -154,4 +153,41 @@ TEST_F(IoSlam3dParam, ReadWriteEdgeSE3PointXYZDisparity) {
   EdgeSE3PointXYZDisparity* outputEdge = new EdgeSE3PointXYZDisparity();
   ASSERT_TRUE(prepareCamPointEdge(outputEdge));
   readWriteVectorBasedEdge<EdgeSE3PointXYZDisparity>(outputEdge);
+}
+
+TEST_F(IoSlam3dParam, ReadWriteEdgeSE3XYZPrior) {
+  EdgeSE3XYZPrior* outputEdge = new EdgeSE3XYZPrior();
+  ASSERT_TRUE(preparePosePoseEdge(outputEdge));
+  readWriteVectorBasedEdge<EdgeSE3XYZPrior>(outputEdge);
+}
+
+// Parameter tests
+TEST(IoSlam3d, ReadWriteParameterCamera) {
+  ParameterCamera outputParam;
+  outputParam.setOffset(internal::RandomIsometry3::create());
+  outputParam.setKcam(1, 2, 3, 4);  // just some test values for read/write
+  ParameterCamera inputParam;
+  readWriteGraphElement(outputParam, &inputParam);
+  ASSERT_TRUE(internal::RandomIsometry3::isApprox(outputParam.offset(), inputParam.offset()));
+  ASSERT_TRUE(outputParam.Kcam().isApprox(inputParam.Kcam(), 1e-5));
+}
+
+TEST(IoSlam3d, ReadWriteParameterStereoCamera) {
+  ParameterStereoCamera outputParam;
+  outputParam.setOffset(internal::RandomIsometry3::create());
+  outputParam.setBaseline(0.1);
+  outputParam.setKcam(1, 2, 3, 4);  // just some test values for read/write
+  ParameterStereoCamera inputParam;
+  readWriteGraphElement(outputParam, &inputParam);
+  ASSERT_DOUBLE_EQ(outputParam.baseline(), inputParam.baseline());
+  ASSERT_TRUE(internal::RandomIsometry3::isApprox(outputParam.offset(), inputParam.offset()));
+  ASSERT_TRUE(outputParam.Kcam().isApprox(inputParam.Kcam(), 1e-5));
+}
+
+TEST(IoSlam3d, ReadWriteParameterSE3Offset) {
+  ParameterSE3Offset outputParam;
+  outputParam.setOffset(internal::RandomIsometry3::create());
+  ParameterSE3Offset inputParam;
+  readWriteGraphElement(outputParam, &inputParam);
+  ASSERT_TRUE(internal::RandomIsometry3::isApprox(outputParam.offset(), inputParam.offset()));
 }
