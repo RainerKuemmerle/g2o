@@ -40,19 +40,24 @@ io_helper.h
 g2o_core_api.h
 )
 
+
+target_link_libraries(core PUBLIC stuff ${G2O_EIGEN3_EIGEN_TARGET} )
+
 set_target_properties(core PROPERTIES OUTPUT_NAME ${LIB_PREFIX}core)
-target_link_libraries(core PUBLIC stuff ${G2O_EIGEN3_EIGEN_TARGET})
 
 if (APPLE)
   set_target_properties(core PROPERTIES INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib")
 endif()
+
+target_include_directories(core INTERFACE
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+    $<INSTALL_INTERFACE:include>)
 
 install(TARGETS core
   EXPORT ${G2O_TARGETS_EXPORT_NAME}
   RUNTIME DESTINATION ${RUNTIME_DESTINATION}
   LIBRARY DESTINATION ${LIBRARY_DESTINATION}
   ARCHIVE DESTINATION ${ARCHIVE_DESTINATION}
-  INCLUDES DESTINATION ${INCLUDES_DESTINATION}
 )
 
 file(GLOB headers "${CMAKE_CURRENT_SOURCE_DIR}/*.h" "${CMAKE_CURRENT_SOURCE_DIR}/*.hpp")

@@ -13,6 +13,10 @@ add_library(stuff ${G2O_LIB_TYPE}
 set_target_properties(stuff PROPERTIES OUTPUT_NAME ${LIB_PREFIX}stuff)
 target_link_libraries(stuff PUBLIC ${G2O_EIGEN3_EIGEN_TARGET})
 
+target_include_directories(stuff PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+    $<INSTALL_INTERFACE:include>)
+
 if (APPLE)
   set_target_properties(stuff PROPERTIES INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib")
 endif()
@@ -22,7 +26,6 @@ install(TARGETS stuff
   RUNTIME DESTINATION ${RUNTIME_DESTINATION}
   LIBRARY DESTINATION ${LIBRARY_DESTINATION}
   ARCHIVE DESTINATION ${ARCHIVE_DESTINATION}
-  INCLUDES DESTINATION ${INCLUDES_DESTINATION}
 )
 
 # build our OpenGL helper library
@@ -38,11 +41,14 @@ endif()
     RUNTIME DESTINATION ${RUNTIME_DESTINATION}
     LIBRARY DESTINATION ${LIBRARY_DESTINATION}
     ARCHIVE DESTINATION ${ARCHIVE_DESTINATION}
-    INCLUDES DESTINATION ${INCLUDES_DESTINATION}
     )
 
   target_link_libraries(opengl_helper PUBLIC ${G2O_OPENGL_TARGET} ${G2O_EIGEN3_EIGEN_TARGET})
   set_target_properties(opengl_helper PROPERTIES OUTPUT_NAME "${LIB_PREFIX}opengl_helper")
+
+  target_include_directories(opengl_helper PUBLIC
+      $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+      $<INSTALL_INTERFACE:include>)
 endif()
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Linux" AND NOT ANDROID)
