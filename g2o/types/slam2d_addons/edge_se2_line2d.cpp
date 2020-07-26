@@ -26,18 +26,6 @@
 
 #include "edge_se2_line2d.h"
 
-#ifdef WINDOWS
-#include <windows.h>
-#endif
-
-#ifdef G2O_HAVE_OPENGL
-#ifdef __APPLE__
-#include <OpenGL/gl.h>
-#else
-#include <GL/gl.h>
-#endif
-#endif
-
 namespace g2o {
 
   EdgeSE2Line2D::EdgeSE2Line2D() :
@@ -47,17 +35,14 @@ namespace g2o {
 
   bool EdgeSE2Line2D::read(std::istream& is)
   {
-    is >> _measurement[0] >> _measurement[1];
-    is >> information()(0,0) >> information()(0,1) >> information()(1,1);
-    information()(1,0) = information()(0,1);
-    return true;
+    internal::readVector(is, _measurement);
+    return readInformationMatrix(is);
   }
 
   bool EdgeSE2Line2D::write(std::ostream& os) const
   {
-    os << measurement()[0] << " " << measurement()[1] << " ";
-    os << information()(0,0) << " " << information()(0,1) << " " << information()(1,1);
-    return os.good();
+    internal::writeVector(os, measurement());
+    return writeInformationMatrix(os);
   }
 
   void EdgeSE2Line2D::initialEstimate(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to)

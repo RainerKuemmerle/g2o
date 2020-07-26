@@ -26,18 +26,6 @@
 
 #include "edge_se2_segment2d.h"
 
-#ifdef WINDOWS
-#include <windows.h>
-#endif
-
-#ifdef G2O_HAVE_OPENGL
-#ifdef __APPLE__
-#include <OpenGL/gl.h>
-#else
-#include <GL/gl.h>
-#endif
-#endif
-
 namespace g2o {
 
   EdgeSE2Segment2D::EdgeSE2Segment2D() :
@@ -47,25 +35,14 @@ namespace g2o {
 
   bool EdgeSE2Segment2D::read(std::istream& is)
   {
-    for (size_t i = 0; i < 4 ; i++)
-      is >> _measurement[i];
-    for (size_t i = 0; i < 4 ; i++)
-      for (size_t j = i; j < 4 ; j++) {
-        is >> _information (i,j);
-        _information (j,i) = _information (i,j);
-      }
-    return true;
+    internal::readVector(is, _measurement);
+    return readInformationMatrix(is);
   }
 
   bool EdgeSE2Segment2D::write(std::ostream& os) const
   {
-    for (size_t i = 0; i < 4 ; i++)
-      os << _measurement[i] << " ";
-    for (size_t i = 0; i < 4 ; i++)
-      for (size_t j = i; j < 4 ; j++) {
-        os << _information (i,j) << " ";
-      }
-    return os.good();
+    internal::writeVector(os, measurement());
+    return writeInformationMatrix(os);
   }
 
   void EdgeSE2Segment2D::initialEstimate(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to)

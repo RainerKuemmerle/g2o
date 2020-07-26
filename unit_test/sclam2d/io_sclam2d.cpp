@@ -26,10 +26,9 @@
 
 #include <sstream>
 
-
-#include "g2o/types/sclam2d/vertex_odom_differential_params.h"
-#include "g2o/types/sclam2d/edge_se2_sensor_calib.h"
 #include "g2o/types/sclam2d/edge_se2_odom_differential_calib.h"
+#include "g2o/types/sclam2d/edge_se2_sensor_calib.h"
+#include "g2o/types/sclam2d/vertex_odom_differential_params.h"
 #include "gtest/gtest.h"
 #include "unit_test/test_helper/io.h"
 
@@ -57,13 +56,9 @@ struct RandomVelocityMeasurement {
 };
 }  // namespace
 
-TEST(IoSclam2d, ReadWriteVertexOdomDifferentialParams) {
-  readWriteVectorBasedVertex<VertexOdomDifferentialParams>();
-}
+TEST(IoSclam2d, ReadWriteVertexOdomDifferentialParams) { readWriteVectorBasedVertex<VertexOdomDifferentialParams>(); }
 
-TEST(IoSclam2d, ReadWriteEdgeSE2SensorCalib) {
-  readWriteVectorBasedEdge<EdgeSE2SensorCalib, RandomSE2>();
-}
+TEST(IoSclam2d, ReadWriteEdgeSE2SensorCalib) { readWriteVectorBasedEdge<EdgeSE2SensorCalib, RandomSE2>(); }
 
 TEST(IoSclam2d, ReadWriteEdgeSE2OdomDifferentialCalib) {
   readWriteVectorBasedEdge<EdgeSE2OdomDifferentialCalib, RandomVelocityMeasurement>();

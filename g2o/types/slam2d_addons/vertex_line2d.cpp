@@ -41,10 +41,9 @@
 namespace g2o {
 
   VertexLine2D::VertexLine2D() :
-    BaseVertex<2, Line2D>()
+    BaseVertex<2, Line2D>(), p1Id(-1), p2Id(-1)
   {
     _estimate.setZero();
-    p1Id=p2Id=-1;
   }
 
   bool VertexLine2D::read(std::istream& is)

@@ -48,16 +48,12 @@ namespace g2o {
 
   bool VertexSegment2D::read(std::istream& is)
   {
-    for (size_t i=0; i<4; i++)
-      is >> _estimate[i];
-    return true;
+    return internal::readVector(is, _estimate);
   }
 
   bool VertexSegment2D::write(std::ostream& os) const
   {
-    for (size_t i=0; i<4; i++)
-      os << _estimate[i] << " ";
-    return os.good();
+    return internal::writeVector(os, estimate());
   }
 
   VertexSegment2DWriteGnuplotAction::VertexSegment2DWriteGnuplotAction(): WriteGnuplotAction(typeid(VertexSegment2D).name()){}

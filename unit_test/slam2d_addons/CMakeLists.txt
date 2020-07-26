@@ -1,0 +1,5 @@
+add_executable(unittest_slam2d_addons
+  io_slam2d_addons.cpp
+)
+target_link_libraries(unittest_slam2d_addons types_slam2d_addons)
+create_test(unittest_slam2d_addons)
