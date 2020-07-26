@@ -28,34 +28,29 @@
 
 namespace g2o {
 
-  EdgeSE2Segment2D::EdgeSE2Segment2D() :
-    BaseBinaryEdge<4, Vector4, VertexSE2, VertexSegment2D>()
-  {
-  }
+EdgeSE2Segment2D::EdgeSE2Segment2D() : BaseBinaryEdge<4, Vector4, VertexSE2, VertexSegment2D>() {}
 
-  bool EdgeSE2Segment2D::read(std::istream& is)
-  {
-    internal::readVector(is, _measurement);
-    return readInformationMatrix(is);
-  }
+bool EdgeSE2Segment2D::read(std::istream& is) {
+  internal::readVector(is, _measurement);
+  return readInformationMatrix(is);
+}
 
-  bool EdgeSE2Segment2D::write(std::ostream& os) const
-  {
-    internal::writeVector(os, measurement());
-    return writeInformationMatrix(os);
-  }
+bool EdgeSE2Segment2D::write(std::ostream& os) const {
+  internal::writeVector(os, measurement());
+  return writeInformationMatrix(os);
+}
 
-  void EdgeSE2Segment2D::initialEstimate(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to)
-  {
-    assert(from.size() == 1 && from.count(_vertices[0]) == 1 && "Can not initialize VertexSE2 position by VertexSegment2D. I could if i wanted. Not now");
+void EdgeSE2Segment2D::initialEstimate(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to) {
+  assert(from.size() == 1 && from.count(_vertices[0]) == 1 &&
+         "Can not initialize VertexSE2 position by VertexSegment2D. I could if i wanted. Not now");
 
-    VertexSE2* vi     = static_cast<VertexSE2*>(_vertices[0]);
-    VertexSegment2D* vj = static_cast<VertexSegment2D*>(_vertices[1]);
-    if (from.count(vi) > 0 && to == vj) {
-      vj->setEstimateP1(vi->estimate() * measurementP1());
-      vj->setEstimateP2(vi->estimate() * measurementP2());
-    }
+  VertexSE2* vi = static_cast<VertexSE2*>(_vertices[0]);
+  VertexSegment2D* vj = static_cast<VertexSegment2D*>(_vertices[1]);
+  if (from.count(vi) > 0 && to == vj) {
+    vj->setEstimateP1(vi->estimate() * measurementP1());
+    vj->setEstimateP2(vi->estimate() * measurementP2());
   }
+}
 
 // #ifndef NUMERIC_JACOBIAN_TWO_D_TYPES
 //   void EdgeSE2Segment2D::linearizeOplus()
@@ -86,9 +81,11 @@ namespace g2o {
 //   }
 // #endif
 
-//   EdgeSE2Segment2DWriteGnuplotAction::EdgeSE2Segment2DWriteGnuplotAction(): WriteGnuplotAction(typeid(EdgeSE2Segment2D).name()){}
+//   EdgeSE2Segment2DWriteGnuplotAction::EdgeSE2Segment2DWriteGnuplotAction():
+//   WriteGnuplotAction(typeid(EdgeSE2Segment2D).name()){}
 
-//   HyperGraphElementAction* EdgeSE2Segment2DWriteGnuplotAction::operator()(HyperGraph::HyperGraphElement* element, HyperGraphElementAction::Parameters* params_){
+//   HyperGraphElementAction* EdgeSE2Segment2DWriteGnuplotAction::operator()(HyperGraph::HyperGraphElement* element,
+//   HyperGraphElementAction::Parameters* params_){
 //     if (typeid(*element).name()!=_typeName)
 //       return nullptr;
 //     WriteGnuplotAction::Parameters* params=static_cast<WriteGnuplotAction::Parameters*>(params_);
@@ -122,7 +119,6 @@ namespace g2o {
 //     if (_show && !_show->value())
 //       return this;
 
-
 //     EdgeSE2Segment2D* e =  static_cast<EdgeSE2Segment2D*>(element);
 //     VertexSE2* fromEdge = static_cast<VertexSE2*>(e->vertex(0));
 //     VertexSegment2D* toEdge   = static_cast<VertexSegment2D*>(e->vertex(1));
@@ -138,4 +134,4 @@ namespace g2o {
 //   }
 // #endif
 
-} // end namespace
+}  // namespace g2o
