@@ -34,7 +34,7 @@ namespace g2o
   VertexPlane::VertexPlane(){
     color << cst(.2), cst(.2), cst(.2);
   }
-  
+
   bool VertexPlane::read(std::istream& is) {
     Vector4 lv;
     for (int i=0; i<4; i++)
@@ -55,9 +55,8 @@ namespace g2o
 
 #ifdef G2O_HAVE_OPENGL
 
-  VertexPlaneDrawAction::VertexPlaneDrawAction(): DrawAction(typeid(VertexPlane).name())
-  {
-  }
+  VertexPlaneDrawAction::VertexPlaneDrawAction()
+      : DrawAction(typeid(VertexPlane).name()), _planeWidth(nullptr), _planeHeight(nullptr) {}
 
   bool VertexPlaneDrawAction::refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_)
   {
@@ -73,7 +72,7 @@ namespace g2o
     return true;
   }
 
-  HyperGraphElementAction* VertexPlaneDrawAction::operator()(HyperGraph::HyperGraphElement* element, 
+  HyperGraphElementAction* VertexPlaneDrawAction::operator()(HyperGraph::HyperGraphElement* element,
                  HyperGraphElementAction::Parameters* params_)
   {
     if (typeid(*element).name()!=_typeName)
@@ -82,7 +81,7 @@ namespace g2o
     refreshPropertyPtrs(params_);
     if (! _previousParams)
       return this;
-    
+
     if (_show && !_show->value())
       return this;
 
@@ -95,7 +94,7 @@ namespace g2o
     glRotatef(float(RAD2DEG(azimuth)), 0.f, 0.f, 1.f);
     glRotatef(float(RAD2DEG(elevation)), 0.f, -1.f, 0.f);
     glTranslatef(float(d), 0.f ,0.f);
-    
+
     if (_planeWidth && _planeHeight){
       glBegin(GL_QUADS);
       glNormal3f(-1.f, 0.f, 0.f);

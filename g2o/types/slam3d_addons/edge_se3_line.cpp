@@ -75,7 +75,7 @@ namespace g2o {
     const VertexLine3D* lineVertex = static_cast<const VertexLine3D*>(_vertices[1]);
     const Line3D& line = lineVertex->estimate();
     Line3D localLine = se3Vertex->estimate().inverse() * line;
-    _error = localLine.ominus(_measurement);    
+    _error = localLine.ominus(_measurement);
   }
 
   bool EdgeSE3Line3D::resolveCaches() {
@@ -86,7 +86,8 @@ namespace g2o {
   }
 
 #ifdef G2O_HAVE_OPENGL
-  EdgeSE3Line3DDrawAction::EdgeSE3Line3DDrawAction() : DrawAction(typeid(EdgeSE3Line3D).name()) {}
+  EdgeSE3Line3DDrawAction::EdgeSE3Line3DDrawAction()
+      : DrawAction(typeid(EdgeSE3Line3D).name()), _lineLength(nullptr), _lineWidth(nullptr) {}
 
   bool EdgeSE3Line3DDrawAction::refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_) {
     if(!DrawAction::refreshPropertyPtrs(params_)) {
@@ -113,17 +114,17 @@ namespace g2o {
     if(!_previousParams) {
       return this;
     }
-    
+
     if(_show && !_show->value()) {
       return this;
     }
-    
+
     EdgeSE3Line3D* that = dynamic_cast<EdgeSE3Line3D*>(element);
 
     if(!that) {
       return this;
     }
-    
+
     const VertexSE3* robot  = dynamic_cast<const VertexSE3*>(that->vertex(0));
     const VertexLine3D* landmark = dynamic_cast<const VertexLine3D*>(that->vertex(1));
 
@@ -135,12 +136,12 @@ namespace g2o {
     line.normalize();
     Vector3 direction = line.d();
     Vector3 npoint = line.d().cross(line.w());
-    
+
     glPushMatrix();
     glMultMatrixd(robot->estimate().matrix().cast<double>().eval().data());
     glColor3f(float(that->color(0)), float(that->color(1)), float(that->color(2)));
     if(_lineLength && _lineWidth) {
-      glLineWidth(float(_lineWidth->value())); 
+      glLineWidth(float(_lineWidth->value()));
       glBegin(GL_LINES);
       glNormal3f(float(npoint.x()), float(npoint.y()), float(npoint.z()));
       glVertex3f(float(npoint.x() - direction.x() * _lineLength->value()/2),
@@ -150,11 +151,11 @@ namespace g2o {
 		 float(npoint.y() + direction.y() * _lineLength->value()/2),
 		 float(npoint.z() + direction.z() * _lineLength->value()/2));
       glEnd();
-    }    
+    }
     glPopMatrix();
 
     return this;
   }
 #endif
-  
+
 }

@@ -77,7 +77,7 @@ namespace g2o {
 //   }
 
 #ifdef G2O_HAVE_OPENGL
-  VertexLine2DDrawAction::VertexLine2DDrawAction(): DrawAction(typeid(VertexLine2D).name()){}
+  VertexLine2DDrawAction::VertexLine2DDrawAction() : DrawAction(typeid(VertexLine2D).name()), _pointSize(nullptr) {}
 
   bool VertexLine2DDrawAction::refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_){
     if (! DrawAction::refreshPropertyPtrs(params_))
@@ -102,7 +102,6 @@ namespace g2o {
 
     if (_show && !_show->value())
       return this;
-
 
     VertexLine2D* that = static_cast<VertexLine2D*>(element);
     glPushAttrib(GL_CURRENT_BIT | GL_BLEND);

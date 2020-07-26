@@ -68,7 +68,7 @@ namespace g2o {
 
     WriteGnuplotAction::Parameters* params=static_cast<WriteGnuplotAction::Parameters*>(params_);
     if (!params->os){
-      std::cerr << __PRETTY_FUNCTION__ << ": warning, on valid os specified" << std::endl;
+      std::cerr << __PRETTY_FUNCTION__ << ": warning, no valid os specified" << std::endl;
       return nullptr;
     }
 
@@ -80,7 +80,8 @@ namespace g2o {
   }
 
 #ifdef G2O_HAVE_OPENGL
-  VertexSegment2DDrawAction::VertexSegment2DDrawAction(): DrawAction(typeid(VertexSegment2D).name()){}
+  VertexSegment2DDrawAction::VertexSegment2DDrawAction()
+      : DrawAction(typeid(VertexSegment2D).name()), _pointSize(nullptr) {}
 
   bool VertexSegment2DDrawAction::refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_){
     if (! DrawAction::refreshPropertyPtrs(params_))
@@ -105,7 +106,6 @@ namespace g2o {
 
     if (_show && !_show->value())
       return this;
-
 
     VertexSegment2D* that = static_cast<VertexSegment2D*>(element);
     glColor3f(0.8f,0.5f,0.3f);
