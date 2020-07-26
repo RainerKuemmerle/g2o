@@ -54,30 +54,20 @@ namespace g2o {
   bool EdgeSE2SensorCalib::read(std::istream& is)
   {
     Vector3 p;
-    is >> p(0) >> p(1) >> p(2);
+    internal::readVector(is, p);
     _measurement.fromVector(p);
     _inverseMeasurement=measurement().inverse();
-    for (int i = 0; i < information().rows(); ++i)
-      for (int j = i; j < information().cols(); ++j) {
-        is >> information()(i, j);
-        if (i != j)
-          information()(j, i) = information()(i, j);
-      }
-    return true;
+    return readInformationMatrix(is);
   }
 
   bool EdgeSE2SensorCalib::write(std::ostream& os) const
   {
-    Vector3 p = measurement().toVector();
-    os << p(0) << " " << p(1) << " " << p(2);
-    for (int i = 0; i < information().rows(); ++i)
-      for (int j = i; j < information().cols(); ++j)
-        os << " " << information()(i, j);
-    return os.good();
+    internal::writeVector(os, measurement().toVector());
+    return writeInformationMatrix(os);
   }
 
 #ifdef G2O_HAVE_OPENGL
-  EdgeSE2SensorCalibDrawAction::EdgeSE2SensorCalibDrawAction() : 
+  EdgeSE2SensorCalibDrawAction::EdgeSE2SensorCalibDrawAction() :
     DrawAction(typeid(EdgeSE2SensorCalib).name())
   {
   }

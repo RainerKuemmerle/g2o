@@ -44,22 +44,13 @@ namespace g2o {
     is >> vl >> vr >> dt;
     VelocityMeasurement vm(vl, vr, dt);
     setMeasurement(vm);
-    for (int i = 0; i < information().rows(); ++i)
-      for (int j = i; j < information().cols(); ++j) {
-        is >> information()(i, j);
-        if (i != j)
-          information()(j, i) = information()(i, j);
-      }
-    return true;
+    return readInformationMatrix(is);
   }
 
   bool EdgeSE2OdomDifferentialCalib::write(std::ostream& os) const
   {
-    os << measurement().vl() << " " << measurement().vr() << " " << measurement().dt();
-    for (int i = 0; i < information().rows(); ++i)
-      for (int j = i; j < information().cols(); ++j)
-        os << " " << information()(i, j);
-    return os.good();
+    os << measurement().vl() << " " << measurement().vr() << " " << measurement().dt() << " ";
+    return writeInformationMatrix(os);
   }
 
 #ifdef G2O_HAVE_OPENGL
