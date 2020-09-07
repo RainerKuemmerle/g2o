@@ -31,25 +31,18 @@
 
 namespace g2o {
 
-  VertexLine3D::VertexLine3D() {
-    color << cst(1.0), cst(0.5), cst(0.0);
+  VertexLine3D::VertexLine3D() : BaseVertex<4, Line3D>(), color(1., 0.5, 0.) {
   }
 
   bool VertexLine3D::read(std::istream& is) {
     Vector6 lv;
-    for(int i = 0; i < 6; ++i) {
-      is >> lv[i];
-    }
+    bool state = internal::readVector(is, lv);
     setEstimate(Line3D(lv));
-    return true;
+    return state;
   }
 
   bool VertexLine3D::write(std::ostream& os) const {
-    Vector6 lv = _estimate;
-    for(int i = 0; i < 6; ++i) {
-      os << lv[i] << " ";
-    }
-    return os.good();
+    return internal::writeVector(os, _estimate);
   }
 
 #ifdef G2O_HAVE_OPENGL
@@ -97,12 +90,12 @@ namespace g2o {
       glLineWidth(float(_lineWidth->value()));
       glBegin(GL_LINES);
       glNormal3f(float(npoint.x()), float(npoint.y()), float(npoint.z()));
-      glVertex3f(float(npoint.x() - direction.x() * _lineLength->value()/2),
-		 float(npoint.y() - direction.y() * _lineLength->value()/2),
-		 float(npoint.z() - direction.z() * _lineLength->value()/2));
-      glVertex3f(float(npoint.x() + direction.x() * _lineLength->value()/2),
-		 float(npoint.y() + direction.y() * _lineLength->value()/2),
-		 float(npoint.z() + direction.z() * _lineLength->value()/2));
+      glVertex3f(float(npoint.x() - direction.x() * _lineLength->value() / 2),
+                 float(npoint.y() - direction.y() * _lineLength->value() / 2),
+                 float(npoint.z() - direction.z() * _lineLength->value() / 2));
+      glVertex3f(float(npoint.x() + direction.x() * _lineLength->value() / 2),
+                 float(npoint.y() + direction.y() * _lineLength->value() / 2),
+                 float(npoint.z() + direction.z() * _lineLength->value() / 2));
       glEnd();
     }
     glPopMatrix();
