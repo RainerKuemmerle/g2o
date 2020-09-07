@@ -35,7 +35,7 @@
 
 namespace g2o {
 
-struct G2O_TYPES_SLAM2D_ADDONS_API Line2D : public Vector2 {
+struct Line2D : public Vector2 {
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   Line2D() { setZero(); }
   Line2D(const Vector2& v) {
