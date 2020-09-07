@@ -41,20 +41,17 @@ bool VertexPointXYZ::read(std::istream& is) { return internal::readVector(is, _e
 bool VertexPointXYZ::write(std::ostream& os) const { return internal::writeVector(os, estimate()); }
 
 #ifdef G2O_HAVE_OPENGL
-  VertexPointXYZDrawAction::VertexPointXYZDrawAction(): DrawAction(typeid(VertexPointXYZ).name()){
-  }
+VertexPointXYZDrawAction::VertexPointXYZDrawAction() : DrawAction(typeid(VertexPointXYZ).name()), _pointSize(nullptr) {}
 
-  bool VertexPointXYZDrawAction::refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_){
-    if (! DrawAction::refreshPropertyPtrs(params_))
-      return false;
-    if (_previousParams){
-      _pointSize = _previousParams->makeProperty<FloatProperty>(_typeName + "::POINT_SIZE", 1.);
-    } else {
-      _pointSize = 0;
-    }
-    return true;
+bool VertexPointXYZDrawAction::refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_) {
+  if (!DrawAction::refreshPropertyPtrs(params_)) return false;
+  if (_previousParams) {
+    _pointSize = _previousParams->makeProperty<FloatProperty>(_typeName + "::POINT_SIZE", 1.);
+  } else {
+    _pointSize = nullptr;
   }
-
+  return true;
+}
 
   HyperGraphElementAction* VertexPointXYZDrawAction::operator()(HyperGraph::HyperGraphElement* element,
                      HyperGraphElementAction::Parameters* params ){
