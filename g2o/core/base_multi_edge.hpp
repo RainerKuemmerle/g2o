@@ -67,6 +67,13 @@ void BaseMultiEdge<D, E>::linearizeOplus()
   ErrorVector errorBak;
   ErrorVector errorBeforeNumeric = _error;
 
+  // A statically allocated array is far and away the most efficient
+  // way to construct the perturbation vector for the Jacobian. If the
+  // dimension is less than 12, use a statically allocated
+  // buffer. Otherwise, a fallback of the dynamically allocated
+  // array. The value of 12 is used because most vertices have a
+  // dimension significantly smaller than this.
+  
   dynamic_aligned_buffer<number_t> buffer{ 12 };
   
   for (size_t i = 0; i < _vertices.size(); ++i) {

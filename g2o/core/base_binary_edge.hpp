@@ -24,8 +24,8 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#define VERTEX_I_DIM ((VertexXiType::Dimension < 0) ? static_cast<VertexXiType*> (_vertices[0])->dimension() : VertexXiType::Dimension)
-#define VERTEX_J_DIM ((VertexXjType::Dimension < 0) ? static_cast<VertexXjType*> (_vertices[1])->dimension() : VertexXjType::Dimension)
+#define VERTEX_I_DIM ((VertexXiType::Dimension < 0) ? static_cast<const VertexXiType*> (_vertices[0])->dimension() : VertexXiType::Dimension)
+#define VERTEX_J_DIM ((VertexXjType::Dimension < 0) ? static_cast<const VertexXjType*> (_vertices[1])->dimension() : VertexXjType::Dimension)
 
 template <int D, typename E, typename VertexXiType, typename VertexXjType>
 OptimizableGraph::Vertex* BaseBinaryEdge<D, E, VertexXiType, VertexXjType>::createFrom(){
@@ -165,16 +165,17 @@ void BaseBinaryEdge<D, E, VertexXiType, VertexXjType>::linearizeOplus()
   // dimension is known at compile time, use directly. If the
   // dimension is known at run time and is less than 12, use an
   // allocated array of up to 12. Otherwise, use a fallback of a
-  // dynamically allocated array.
+  // dynamically allocated array. The value of 12 is used because
+  // most vertices have a dimension significantly smaller than this.
   
   if (iNotFixed) {
     internal::QuadraticFormLock lck(*vi);
     //Xi - estimate the jacobian numerically
 
-    if ((VertexXiType::Dimension >= 0) || (vi->dimension() <= 12))
-      {
-        const int vi_dim = (VertexXiType::Dimension >= 0) ? VertexXiType::Dimension : vi->dimension();
-        number_t add_vi[(VertexXiType::Dimension >= 0) ? VertexXiType::Dimension : 12] = {};
+    const int vi_dim = VERTEX_I_DIM;
+    
+    if ((VertexXiType::Dimension >= 0) || (vi_dim <= 12)) {
+	number_t add_vi[(VertexXiType::Dimension >= 0) ? VertexXiType::Dimension : 12] = {};
         
         // add small step along the unit vector in each dimension
         for (int d = 0; d < vi_dim; ++d) {
@@ -194,10 +195,8 @@ void BaseBinaryEdge<D, E, VertexXiType, VertexXjType>::linearizeOplus()
           _jacobianOplusXi.col(d) = scalar * errorBak;
         } // end dimension
       }
-    else
-      {
-        const int vi_dim = vi->dimension();
-        dynamic_aligned_buffer<number_t> buffer{ size_t(vi_dim) };
+    else {
+	dynamic_aligned_buffer<number_t> buffer{ size_t(vi_dim) };
         number_t* add_vi = buffer.request(vi_dim);
         std::fill(add_vi, add_vi + vi_dim, cst(0.0));
 
@@ -224,9 +223,10 @@ void BaseBinaryEdge<D, E, VertexXiType, VertexXjType>::linearizeOplus()
   if (jNotFixed) {
     internal::QuadraticFormLock lck(*vj);
     //Xj - estimate the jacobian numerically
-    if ((VertexXjType::Dimension >= 0) || (vj->dimension() <= 12))
-      {
-        const int vj_dim = (VertexXjType::Dimension >= 0) ? VertexXjType::Dimension : vj->dimension();
+    
+    const int vj_dim = VERTEX_J_DIM;
+    
+    if ((VertexXjType::Dimension >= 0) || (vj_dim <= 12)) {
         number_t add_vj[(VertexXjType::Dimension >= 0) ? VertexXjType::Dimension : 12] = {};
 
         // add small step along the unit vector in each dimension
@@ -248,8 +248,7 @@ void BaseBinaryEdge<D, E, VertexXiType, VertexXjType>::linearizeOplus()
           _jacobianOplusXj.col(d) = scalar * errorBak;
         } // end dimension
       }
-    else
-      {
+    else {
         const int vj_dim = vj->dimension();
         dynamic_aligned_buffer<number_t> buffer{ size_t(vj_dim) };
         number_t* add_vj = buffer.request(vj_dim);

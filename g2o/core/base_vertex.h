@@ -69,19 +69,6 @@ namespace g2o {
 
     inline virtual bool resizeDimension(int newDimension);
 
-    virtual bool resizeDimensionImpl(int /*newDimension*/)
-    {
-      if (D < 0)
-        {
-          std::cerr << __PRETTY_FUNCTION__ << ": not implemented" << std::endl;
-        }
-      else
-        {
-          std::cerr << __PRETTY_FUNCTION__ << ": should not be called for vertices with known compile time dimension" << std::endl;
-        }
-      return false;
-    };
-
     virtual int copyB(number_t* b_) const {
       memcpy(b_, _b.data(), VERTEX_DIM * sizeof(number_t));
       return VERTEX_DIM; 
@@ -114,6 +101,18 @@ namespace g2o {
     //! set the estimate for the vertex also calls updateCache()
     void setEstimate(const EstimateType& et) { _estimate = et; updateCache();}
 
+  protected:
+    
+    virtual bool resizeDimensionImpl(int /*newDimension*/) {
+      if (D < 0) {
+          std::cerr << __PRETTY_FUNCTION__ << ": not implemented" << std::endl;
+        }
+      else {
+          std::cerr << __PRETTY_FUNCTION__ << ": should not be called for vertices with known compile time dimension" << std::endl;
+        }
+      return false;
+    };
+    
   protected:
     HessianBlockType _hessian;
     Eigen::Matrix<number_t, D, 1, Eigen::ColMajor> _b;

@@ -24,7 +24,7 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#define VERTEX_I_DIM ((VertexXiType::Dimension < 0) ? static_cast<VertexXiType*> (_vertices[0])->dimension() : VertexXiType::Dimension)
+#define VERTEX_I_DIM ((VertexXiType::Dimension < 0) ? static_cast<const VertexXiType*> (_vertices[0])->dimension() : VertexXiType::Dimension)
 
 template <int D, typename E, typename VertexXiType>
 void BaseUnaryEdge<D, E, VertexXiType>::resize(size_t size)
@@ -106,13 +106,15 @@ void BaseUnaryEdge<D, E, VertexXiType>::linearizeOplus()
   // dimension is known at compile time, use directly. If the
   // dimension is known at run time and is less than 12, use an
   // allocated array of up to 12. Otherwise, use a fallback of the
-  // dynamically allocated array.
+  // dynamically allocated array. The value of 12 is used because
+  // most vertices have a dimension significantly smaller than this.
 
-  if ((VertexXiType::Dimension >= 0) || (vi->dimension() <= 12))
+  const int vi_dim = VERTEX_I_DIM;
+
+  if ((VertexXiType::Dimension >= 0) || (vi_dim <= 12))
     {
-      const int vi_dim = (VertexXiType::Dimension >= 0) ? VertexXiType::Dimension : vi->dimension();
       number_t add_vi[(VertexXiType::Dimension >= 0) ? VertexXiType::Dimension : 12] = {};
-      
+
       // add small step along the unit vector in each dimension
       for (int d = 0; d < vi_dim; ++d) {
         vi->push();
@@ -133,7 +135,6 @@ void BaseUnaryEdge<D, E, VertexXiType>::linearizeOplus()
     }
   else
     {
-      const int vi_dim = vi->dimension();
       dynamic_aligned_buffer<number_t> buffer{ size_t(vi_dim) };
       number_t* add_vi = buffer.request(vi_dim);
       std::fill(add_vi, add_vi + vi_dim, cst(0.0));
