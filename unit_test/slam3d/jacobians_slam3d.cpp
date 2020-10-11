@@ -27,6 +27,7 @@
 #include "gtest/gtest.h"
 
 #include "unit_test/test_helper/evaluate_jacobian.h"
+#include "unit_test/test_helper/random_state.h"
 
 #include "g2o/core/jacobian_workspace.h"
 #include "g2o/types/slam3d/edge_se3.h"
@@ -43,23 +44,13 @@ using namespace std;
 using namespace g2o;
 using namespace g2o::internal;
 
-static Eigen::Isometry3d randomIsometry3d()
-{
-  Eigen::Vector3d rotAxisAngle = Eigen::Vector3d::Random();
-  rotAxisAngle += Eigen::Vector3d::Random();
-  Eigen::AngleAxisd rotation(rotAxisAngle.norm(), rotAxisAngle.normalized());
-  Eigen::Isometry3d result = (Eigen::Isometry3d)rotation.toRotationMatrix();
-  result.translation() = Eigen::Vector3d::Random();
-  return result;
-}
-
 TEST(Slam3D, EdgeSE3Jacobian)
 {
   VertexSE3 v1;
-  v1.setId(0); 
+  v1.setId(0);
 
   VertexSE3 v2;
-  v2.setId(1); 
+  v2.setId(1);
 
   EdgeSE3 e;
   e.setVertex(0, &v1);
@@ -72,9 +63,9 @@ TEST(Slam3D, EdgeSE3Jacobian)
   numericJacobianWorkspace.allocate();
 
   for (int k = 0; k < 10000; ++k) {
-    v1.setEstimate(randomIsometry3d());
-    v2.setEstimate(randomIsometry3d());
-    e.setMeasurement(randomIsometry3d());
+    v1.setEstimate(internal::randomIsometry3());
+    v2.setEstimate(internal::randomIsometry3());
+    e.setMeasurement(internal::randomIsometry3());
 
     evaluateJacobian(e, jacobianWorkspace, numericJacobianWorkspace);
   }
@@ -85,11 +76,11 @@ TEST(Slam3D, EdgeSE3PointXYZJacobian)
   OptimizableGraph graph;
 
   VertexSE3* v1 = new VertexSE3;
-  v1->setId(0); 
+  v1->setId(0);
   graph.addVertex(v1);
 
   VertexPointXYZ* v2 = new VertexPointXYZ;
-  v2->setId(1); 
+  v2->setId(1);
   graph.addVertex(v2);
 
   ParameterSE3Offset* paramOffset = new ParameterSE3Offset;
@@ -109,8 +100,8 @@ TEST(Slam3D, EdgeSE3PointXYZJacobian)
   numericJacobianWorkspace.allocate();
 
   for (int k = 0; k < 10000; ++k) {
-    paramOffset->setOffset(randomIsometry3d());
-    v1->setEstimate(randomIsometry3d());
+    paramOffset->setOffset(internal::randomIsometry3());
+    v1->setEstimate(internal::randomIsometry3());
     v2->setEstimate(Eigen::Vector3d::Random());
     e->setMeasurement(Eigen::Vector3d::Random());
 
@@ -121,10 +112,10 @@ TEST(Slam3D, EdgeSE3PointXYZJacobian)
 TEST(Slam3D, EdgePointXYZJacobian)
 {
   VertexPointXYZ v1;
-  v1.setId(0); 
+  v1.setId(0);
 
   VertexPointXYZ v2;
-  v2.setId(1); 
+  v2.setId(1);
 
   EdgePointXYZ e;
   e.setVertex(0, &v1);
@@ -206,18 +197,19 @@ TEST(Slam3D, dqDRJacobian)
 
     // our analytic function which we want to evaluate
     Eigen::Matrix<number_t, 3, 9, Eigen::ColMajor>  dq_dR;
-    compute_dq_dR (dq_dR, 
+    compute_dq_dR (dq_dR,
         Re(0,0),Re(1,0),Re(2,0),
         Re(0,1),Re(1,1),Re(2,1),
         Re(0,2),Re(1,2),Re(2,2));
 
     // compute the Jacobian using AD
-    typedef ceres::internal::AutoDiff<RotationMatrix2QuaternionManifold, number_t, 9> AutoDiff_Dq_DR;
     number_t *parameters[] = { Re.data() };
     number_t *jacobians[] = { dq_dR_AD.data() };
     number_t value[3];
     RotationMatrix2QuaternionManifold rot2quat;
-    AutoDiff_Dq_DR::Differentiate(rot2quat, parameters, 3, value, jacobians);
+    using RotationMatrix2QuaternionManifoldDims = ceres::internal::StaticParameterDims<9>;
+    ceres::internal::AutoDifferentiate<3, RotationMatrix2QuaternionManifoldDims, RotationMatrix2QuaternionManifold,
+                                       number_t>(rot2quat, parameters, 3, value, jacobians);
 
     number_t maxDifference = (dq_dR - dq_dR_AD).array().abs().maxCoeff();
     EXPECT_NEAR(0., maxDifference, 1e-7);

@@ -57,45 +57,22 @@ namespace g2o {
   }
 
   bool EdgeSE3Offset::read(std::istream& is) {
-    int pidFrom, pidTo;
-    is >> pidFrom >> pidTo   ;
-    if (! setParameterId(0,pidFrom))
-      return false;
-    if (! setParameterId(1,pidTo))
-      return false;
+    bool state = readParamIds(is);
 
     Vector7 meas;
-    for (int i=0; i<7; i++)
-      is >> meas[i];
+    state &= internal::readVector(is, meas);
     // normalize the quaternion to recover numerical precision lost by storing as human readable text
-    Vector4::MapType(meas.data()+3).normalize();
+    Vector4::MapType(meas.data() + 3).normalize();
     setMeasurement(internal::fromVectorQT(meas));
 
-    if (is.bad()) {
-      return false;
-    }
-    for ( int i=0; i<information().rows() && is.good(); i++)
-      for (int j=i; j<information().cols() && is.good(); j++){
-  is >> information()(i,j);
-  if (i!=j)
-    information()(j,i)=information()(i,j);
-      }
-    if (is.bad()) {
-      //  we overwrite the information matrix with the Identity
-      information().setIdentity();
-    }
-    return true;
+    state &= readInformationMatrix(is);
+    return state;
   }
 
   bool EdgeSE3Offset::write(std::ostream& os) const {
-    os << parameter(0)->id() << " ";
-    os << parameter(1)->id() << " ";
-    Vector7 meas=internal::toVectorQT(_measurement);
-    for (int i=0; i<7; i++) os  << meas[i] << " ";
-    for (int i=0; i<information().rows(); i++)
-      for (int j=i; j<information().cols(); j++) {
-        os <<  information()(i,j) << " ";
-      }
+    writeParamIds(os);
+    internal::writeVector(os, internal::toVectorQT(_measurement));
+    writeInformationMatrix(os);
     return os.good();
   }
 
@@ -110,25 +87,18 @@ namespace g2o {
     return true;
   }
 
-  void EdgeSE3Offset::linearizeOplus(){
-    //BaseBinaryEdge<6, SE3Quat, VertexSE3, VertexSE3>::linearizeOplus();
+  void EdgeSE3Offset::linearizeOplus() {
+    // BaseBinaryEdge<6, SE3Quat, VertexSE3, VertexSE3>::linearizeOplus();
 
-    VertexSE3 *from = static_cast<VertexSE3*>(_vertices[0]);
-    VertexSE3 *to   = static_cast<VertexSE3*>(_vertices[1]);
+    VertexSE3* from = static_cast<VertexSE3*>(_vertices[0]);
+    VertexSE3* to = static_cast<VertexSE3*>(_vertices[1]);
     Isometry3 E;
-    const Isometry3& Xi=from->estimate();
-    const Isometry3& Xj=to->estimate();
-    const Isometry3& Pi=_cacheFrom->offsetParam()->offset();
-    const Isometry3& Pj=_cacheTo->offsetParam()->offset();
-    const Isometry3& Z=_measurement;
-    // Matrix6 Ji, Jj;
-    // computeSE3Gradient(E, Ji , Jj,
-    //                    Z, Pi, Xi, Pj, Xj);
-    // cerr  << "Ji:" << endl;
-    // cerr << Ji-_jacobianOplusXi << endl;
-    // cerr  << "Jj:" << endl;
-    // cerr << Jj-_jacobianOplusXj << endl;
-    internal::computeEdgeSE3Gradient(E, _jacobianOplusXi , _jacobianOplusXj, Z, Xi, Xj, Pi, Pj);
+    const Isometry3& Xi = from->estimate();
+    const Isometry3& Xj = to->estimate();
+    const Isometry3& Pi = _cacheFrom->offsetParam()->offset();
+    const Isometry3& Pj = _cacheTo->offsetParam()->offset();
+    const Isometry3& Z = _measurement;
+    internal::computeEdgeSE3Gradient(E, _jacobianOplusXi, _jacobianOplusXj, Z, Xi, Xj, Pi, Pj);
   }
 
   void EdgeSE3Offset::initialEstimate(const OptimizableGraph::VertexSet& from_, OptimizableGraph::Vertex* /*to_*/) {

@@ -24,70 +24,27 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include <random>
-#include <iostream>
 #include <stdint.h>
 
-#include "g2o/core/sparse_optimizer.h"
+#include <iostream>
+#include <random>
+
 #include "g2o/core/block_solver.h"
-#include "g2o/core/solver.h"
 #include "g2o/core/optimization_algorithm_levenberg.h"
+#include "g2o/core/solver.h"
+#include "g2o/core/sparse_optimizer.h"
 #include "g2o/solvers/dense/linear_solver_dense.h"
+#include "g2o/stuff/sampler.h"
 #include "g2o/types/icp/types_icp.h"
 
 using namespace Eigen;
 using namespace std;
 using namespace g2o;
 
-// sampling distributions
-  class Sample
-  {
-
-    static default_random_engine gen_real;
-    static default_random_engine gen_int;
-  public:
-    static int uniform(int from, int to);
-
-    static double uniform();
-
-    static double gaussian(double sigma);
-  };
-
-
-  default_random_engine Sample::gen_real;
-  default_random_engine Sample::gen_int;
-
-  int Sample::uniform(int from, int to)
-  {
-    uniform_int_distribution<int> unif(from, to);
-    int sam = unif(gen_int);
-    return  sam;
-  }
-
-  double Sample::uniform()
-  {
-    std::uniform_real_distribution<double> unif(0.0, 1.0);
-    double sam = unif(gen_real);
-    return  sam;
-  }
-
-  double Sample::gaussian(double sigma)
-  {
-    std::normal_distribution<double> gauss(0.0, sigma);
-    double sam = gauss(gen_real);
-    return  sam;
-  }
-
-
-//
-// set up simulated system with noise, optimize it
-//
-
 int main()
 {
   double euc_noise = 0.01;       // noise in position, m
   //  double outlier_ratio = 0.1;
-
 
   SparseOptimizer optimizer;
   optimizer.setVerbose(false);
@@ -101,9 +58,9 @@ int main()
   vector<Vector3d> true_points;
   for (size_t i=0;i<1000; ++i)
   {
-    true_points.push_back(Vector3d((Sample::uniform()-0.5)*3,
-                                   Sample::uniform()-0.5,
-                                   Sample::uniform()+10));
+    true_points.push_back(Vector3d((g2o::Sampler::uniformRand(0., 1.)-0.5)*3,
+                                   g2o::Sampler::uniformRand(0., 1.)-0.5,
+                                   g2o::Sampler::uniformRand(0., 1.)+10));
   }
 
 
@@ -135,16 +92,16 @@ int main()
     // add to optimizer
     optimizer.addVertex(vc);
 
-    vertex_id++;                
+    vertex_id++;
   }
 
   // set up point matches
   for (size_t i=0; i<true_points.size(); ++i)
   {
     // get two poses
-    VertexSE3* vp0 = 
+    VertexSE3* vp0 =
       dynamic_cast<VertexSE3*>(optimizer.vertices().find(0)->second);
-    VertexSE3* vp1 = 
+    VertexSE3* vp1 =
       dynamic_cast<VertexSE3*>(optimizer.vertices().find(1)->second);
 
     // calculate the relative 3D position of the point
@@ -153,13 +110,13 @@ int main()
     pt1 = vp1->estimate().inverse() * true_points[i];
 
     // add in noise
-    pt0 += Vector3d(Sample::gaussian(euc_noise ),
-                    Sample::gaussian(euc_noise ),
-                    Sample::gaussian(euc_noise ));
+    pt0 += Vector3d(g2o::Sampler::gaussRand(0., euc_noise),
+                    g2o::Sampler::gaussRand(0., euc_noise),
+                    g2o::Sampler::gaussRand(0., euc_noise));
 
-    pt1 += Vector3d(Sample::gaussian(euc_noise ),
-                    Sample::gaussian(euc_noise ),
-                    Sample::gaussian(euc_noise ));
+    pt1 += Vector3d(g2o::Sampler::gaussRand(0., euc_noise),
+                    g2o::Sampler::gaussRand(0., euc_noise),
+                    g2o::Sampler::gaussRand(0., euc_noise));
 
     // form edge, with normals in varioius positions
     Vector3d nm0, nm1;
@@ -169,10 +126,9 @@ int main()
     nm1.normalize();
 
     Edge_V_V_GICP * e           // new edge with correct cohort for caching
-        = new Edge_V_V_GICP(); 
+        = new Edge_V_V_GICP();
 
     e->setVertex(0, vp0);      // first viewpoint
-
     e->setVertex(1, vp1);      // second viewpoint
 
     EdgeGICP meas;
@@ -183,12 +139,12 @@ int main()
 
     e->setMeasurement(meas);
     //        e->inverseMeasurement().pos() = -kp;
-    
+
     meas = e->measurement();
     // use this for point-plane
     e->information() = meas.prec0(0.01);
 
-    // use this for point-point 
+    // use this for point-point
     //    e->information().setIdentity();
 
     //    e->setRobustKernel(true);
@@ -198,7 +154,7 @@ int main()
   }
 
   // move second cam off of its true position
-  VertexSE3* vc = 
+  VertexSE3* vc =
     dynamic_cast<VertexSE3*>(optimizer.vertices().find(1)->second);
   Eigen::Isometry3d cam = vc->estimate();
   cam.translation() = Vector3d(0,0,0.2);

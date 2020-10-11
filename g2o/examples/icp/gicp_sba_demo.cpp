@@ -24,64 +24,22 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include <random>
-#include <iostream>
 #include <stdint.h>
 
-#include "g2o/core/sparse_optimizer.h"
+#include <iostream>
+#include <random>
+
 #include "g2o/core/block_solver.h"
-#include "g2o/core/solver.h"
 #include "g2o/core/optimization_algorithm_levenberg.h"
+#include "g2o/core/solver.h"
+#include "g2o/core/sparse_optimizer.h"
 #include "g2o/solvers/csparse/linear_solver_csparse.h"
+#include "g2o/stuff/sampler.h"
 #include "g2o/types/icp/types_icp.h"
 
 using namespace Eigen;
 using namespace std;
 using namespace g2o;
-
-// sampling distributions
-  class Sample
-  {
-
-    static default_random_engine gen_real;
-    static default_random_engine gen_int;
-  public:
-    static int uniform(int from, int to);
-
-    static double uniform();
-
-    static double gaussian(double sigma);
-  };
-
-
-  default_random_engine Sample::gen_real;
-  default_random_engine Sample::gen_int;
-
-  int Sample::uniform(int from, int to)
-  {
-    uniform_int_distribution<int> unif(from, to);
-    int sam = unif(gen_int);
-    return  sam;
-  }
-
-  double Sample::uniform()
-  {
-    std::uniform_real_distribution<double> unif(0.0, 1.0);
-    double sam = unif(gen_real);
-    return  sam;
-  }
-
-  double Sample::gaussian(double sigma)
-  {
-    std::normal_distribution<double> gauss(0.0, sigma);
-    double sam = gauss(gen_real);
-    return  sam;
-  }
-
-
-//
-// set up simulated system with noise, optimize it
-//
 
 int main(int argc, char **argv)
 {
@@ -108,9 +66,9 @@ int main(int argc, char **argv)
   vector<Vector3d> true_points;
   for (size_t i=0;i<1000; ++i)
   {
-    true_points.push_back(Vector3d((Sample::uniform()-0.5)*3,
-                                   Sample::uniform()-0.5,
-                                   Sample::uniform()+10));
+    true_points.push_back(Vector3d((g2o::Sampler::uniformRand(0., 1.)-0.5)*3,
+                                   g2o::Sampler::uniformRand(0., 1.)-0.5,
+                                   g2o::Sampler::uniformRand(0., 1.)+10));
   }
 
 
@@ -155,16 +113,16 @@ int main(int argc, char **argv)
     // add to optimizer
     optimizer.addVertex(vc);
 
-    vertex_id++;                
+    vertex_id++;
   }
 
   // set up point matches for GICP
   for (size_t i=0; i<true_points.size(); ++i)
   {
     // get two poses
-    VertexSE3* vp0 = 
+    VertexSE3* vp0 =
       dynamic_cast<VertexSE3*>(optimizer.vertices().find(0)->second);
-    VertexSE3* vp1 = 
+    VertexSE3* vp1 =
       dynamic_cast<VertexSE3*>(optimizer.vertices().find(1)->second);
 
     // calculate the relative 3D position of the point
@@ -173,13 +131,13 @@ int main(int argc, char **argv)
     pt1 = vp1->estimate().inverse() * true_points[i];
 
     // add in noise
-    pt0 += Vector3d(Sample::gaussian(euc_noise ),
-                    Sample::gaussian(euc_noise ),
-                    Sample::gaussian(euc_noise ));
+    pt0 += Vector3d(g2o::Sampler::gaussRand(0., euc_noise),
+                    g2o::Sampler::gaussRand(0., euc_noise),
+                    g2o::Sampler::gaussRand(0., euc_noise));
 
-    pt1 += Vector3d(Sample::gaussian(euc_noise ),
-                    Sample::gaussian(euc_noise ),
-                    Sample::gaussian(euc_noise ));
+    pt1 += Vector3d(g2o::Sampler::gaussRand(0., euc_noise),
+                    g2o::Sampler::gaussRand(0., euc_noise),
+                    g2o::Sampler::gaussRand(0., euc_noise));
 
     // form edge, with normals in varioius positions
     Vector3d nm0, nm1;
@@ -189,7 +147,7 @@ int main(int argc, char **argv)
     nm1.normalize();
 
     Edge_V_V_GICP * e           // new edge with correct cohort for caching
-        = new Edge_V_V_GICP(); 
+        = new Edge_V_V_GICP();
 
     e->vertices()[0]            // first viewpoint
       = dynamic_cast<OptimizableGraph::Vertex*>(vp0);
@@ -210,7 +168,7 @@ int main(int argc, char **argv)
     // use this for point-plane
     e->information() = meas.prec0(0.01);
 
-    // use this for point-point 
+    // use this for point-point
     //    e->information().setIdentity();
 
     //    e->setRobustKernel(true);
@@ -224,9 +182,9 @@ int main(int argc, char **argv)
   true_points.clear();
   for (int i=0;i<num_points; ++i)
   {
-    true_points.push_back(Vector3d((Sample::uniform()-0.5)*3,
-                                   Sample::uniform()-0.5,
-                                   Sample::uniform()+10));
+    true_points.push_back(Vector3d((g2o::Sampler::uniformRand(0., 1.)-0.5)*3,
+                                   g2o::Sampler::uniformRand(0., 1.)-0.5,
+                                   g2o::Sampler::uniformRand(0., 1.)+10));
   }
 
 
@@ -240,9 +198,9 @@ int main(int argc, char **argv)
     v_p->setId(vertex_id++);
     v_p->setMarginalized(true);
     v_p->setEstimate(true_points.at(i)
-        + Vector3d(Sample::gaussian(1),
-                   Sample::gaussian(1),
-                   Sample::gaussian(1)));
+        + Vector3d(g2o::Sampler::gaussRand(0., 1),
+                   g2o::Sampler::gaussRand(0., 1),
+                   g2o::Sampler::gaussRand(0., 1)));
 
     optimizer.addVertex(v_p);
 
@@ -255,9 +213,9 @@ int main(int argc, char **argv)
 
         if (z[0]>=0 && z[1]>=0 && z[0]<640 && z[1]<480)
         {
-          z += Vector3d(Sample::gaussian(pix_noise),
-                        Sample::gaussian(pix_noise),
-                        Sample::gaussian(pix_noise/16.0));
+          z += Vector3d(g2o::Sampler::gaussRand(0., pix_noise),
+                        g2o::Sampler::gaussRand(0., pix_noise),
+                        g2o::Sampler::gaussRand(0., pix_noise/16.0));
 
           g2o::Edge_XYZ_VSC * e
               = new g2o::Edge_XYZ_VSC();
@@ -282,10 +240,8 @@ int main(int argc, char **argv)
       }
   } // done with adding projection points
 
-
-
   // move second cam off of its true position
-  VertexSE3* vc = 
+  VertexSE3* vc =
     dynamic_cast<VertexSE3*>(optimizer.vertices().find(1)->second);
   Eigen::Isometry3d cam = vc->estimate();
   cam.translation() = Vector3d(-0.1,0.1,0.2);

@@ -58,10 +58,10 @@ namespace g2o {
   }
 
 
-  OptimizableGraph::Vertex* Cache::vertex() { 
-    if (container() ) 
-      return container()->vertex(); 
-    return nullptr; 
+  OptimizableGraph::Vertex* Cache::vertex() {
+    if (container() )
+      return container()->vertex();
+    return nullptr;
   }
 
   OptimizableGraph* Cache::graph() {
@@ -77,13 +77,13 @@ namespace g2o {
   ParameterVector& Cache::parameters() {
     return _parameters;
   }
-  
+
   Cache::CacheKey Cache::key() const {
     Factory* factory=Factory::instance();
     return CacheKey(factory->tag(this), _parameters);
   };
 
-  
+
   void Cache::update(){
     if (! _updateNeeded)
       return;
@@ -112,14 +112,12 @@ namespace g2o {
       _parentCaches.push_back(c);
     return c;
   }
-  
+
   bool Cache::resolveDependancies(){
     return true;
   }
 
-  CacheContainer::CacheContainer(OptimizableGraph::Vertex* vertex_) {
-    _vertex = vertex_;
-  }
+  CacheContainer::CacheContainer(OptimizableGraph::Vertex* vertex_) : _updateNeeded(true) { _vertex = vertex_; }
 
   Cache* CacheContainer::findCache(const Cache::CacheKey& key) {
     iterator it=find(key);
@@ -127,7 +125,7 @@ namespace g2o {
       return nullptr;
     return it->second;
   }
-  
+
   Cache* CacheContainer::createCache(const Cache::CacheKey& key){
     Factory* f = Factory::instance();
     HyperGraph::HyperGraphElement* e = f->construct(key.type());
@@ -148,10 +146,10 @@ namespace g2o {
       insert(make_pair(key,c));
       c->update();
       return c;
-    } 
+    }
     return nullptr;
   }
-  
+
   OptimizableGraph::Vertex* CacheContainer::vertex() {
     return _vertex;
   }

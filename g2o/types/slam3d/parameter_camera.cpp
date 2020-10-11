@@ -62,8 +62,7 @@ namespace g2o {
 
   bool ParameterCamera::read(std::istream& is) {
     Vector7 off;
-    for (int i=0; i<7; i++)
-      is >> off[i];
+    internal::readVector(is, off);
     // normalize the quaternion to recover numerical precision lost by storing as human readable text
     Vector4::MapType(off.data()+3).normalize();
     setOffset(internal::fromVectorQT(off));
@@ -72,11 +71,9 @@ namespace g2o {
     setKcam(fx,fy,cx,cy);
     return is.good();
   }
-  
+
   bool ParameterCamera::write(std::ostream& os) const {
-    Vector7 off = internal::toVectorQT(_offset);
-    for (int i=0; i<7; i++)
-      os << off[i] << " ";
+    internal::writeVector(os, internal::toVectorQT(_offset));
     os << _Kcam(0,0) << " ";
     os << _Kcam(1,1) << " ";
     os << _Kcam(0,2) << " ";
@@ -110,7 +107,7 @@ namespace g2o {
     if (_previousParams){
       _cameraZ = _previousParams->makeProperty<FloatProperty>(_typeName + "::CAMERA_Z", .05f);
       _cameraSide = _previousParams->makeProperty<FloatProperty>(_typeName + "::CAMERA_SIDE", .05f);
-      
+
     } else {
       _cameraZ = 0;
       _cameraSide = 0;
@@ -118,7 +115,7 @@ namespace g2o {
     return true;
   }
 
-  HyperGraphElementAction* CacheCameraDrawAction::operator()(HyperGraph::HyperGraphElement* element, 
+  HyperGraphElementAction* CacheCameraDrawAction::operator()(HyperGraph::HyperGraphElement* element,
                  HyperGraphElementAction::Parameters* params){
     if (typeid(*element).name()!=_typeName)
       return nullptr;
@@ -126,7 +123,7 @@ namespace g2o {
     refreshPropertyPtrs(params);
     if (! _previousParams)
       return this;
-    
+
     if (_show && !_show->value())
       return this;
 

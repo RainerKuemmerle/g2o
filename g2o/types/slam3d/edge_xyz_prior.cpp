@@ -35,29 +35,13 @@ namespace g2o {
   }
 
   bool EdgeXYZPrior::read(std::istream& is) {
-    // read measurement
-    Vector3 meas;
-    for (int i=0; i<3; i++) is >> meas[i];
-    setMeasurement(meas);
-    // read covariance matrix (upper triangle)
-    if (is.good()) {
-      for ( int i=0; i<information().rows(); i++)
-        for (int j=i; j<information().cols(); j++){
-          is >> information()(i,j);
-          if (i!=j)
-            information()(j,i)=information()(i,j);
-        }
-    }
-    return !is.fail();
+    internal::readVector(is, _measurement);
+    return readInformationMatrix(is);
   }
 
   bool EdgeXYZPrior::write(std::ostream& os) const {
-    for (int i = 0; i<3; i++) os << measurement()[i] << " ";
-    for (int i=0; i<information().rows(); i++)
-      for (int j=i; j<information().cols(); j++) {
-        os << information()(i,j) << " ";
-      }
-    return os.good();
+    internal::writeVector(os, measurement());
+    return writeInformationMatrix(os);
   }
 
   void EdgeXYZPrior::computeError() {

@@ -42,36 +42,18 @@ namespace g2o {
 
   bool EdgeSE3::read(std::istream& is) {
     Vector7 meas;
-    for (int i=0; i<7; i++) 
-      is >> meas[i];
+    internal::readVector(is, meas);
     // normalize the quaternion to recover numerical precision lost by storing as human readable text
-    Vector4::MapType(meas.data()+3).normalize();
+    Vector4::MapType(meas.data() + 3).normalize();
     setMeasurement(internal::fromVectorQT(meas));
-
-    if (is.bad()) {
-      return false;
-    }
-    for ( int i=0; i<information().rows() && is.good(); i++)
-      for (int j=i; j<information().cols() && is.good(); j++){
-        is >> information()(i,j);
-        if (i!=j)
-          information()(j,i)=information()(i,j);
-      }
-    if (is.bad()) {
-      //  we overwrite the information matrix with the Identity
-      information().setIdentity();
-    } 
-    return true;
+    if (is.bad()) return false;
+    readInformationMatrix(is);
+    return is.good() || is.eof();
   }
 
   bool EdgeSE3::write(std::ostream& os) const {
-    Vector7 meas=internal::toVectorQT(_measurement);
-    for (int i=0; i<7; i++) os  << meas[i] << " ";
-    for (int i=0; i<information().rows(); i++)
-      for (int j=i; j<information().cols(); j++) {
-        os <<  information()(i,j) << " ";
-      }
-    return os.good();
+    internal::writeVector(os, internal::toVectorQT(measurement()));
+    return writeInformationMatrix(os);
   }
 
   void EdgeSE3::computeError() {
@@ -88,9 +70,8 @@ namespace g2o {
     setMeasurement(delta);
     return true;
   }
-  
+
   void EdgeSE3::linearizeOplus(){
-    
     // BaseBinaryEdge<6, Isometry3, VertexSE3, VertexSE3>::linearizeOplus();
     // return;
 
@@ -144,17 +125,17 @@ namespace g2o {
 #ifdef G2O_HAVE_OPENGL
   EdgeSE3DrawAction::EdgeSE3DrawAction(): DrawAction(typeid(EdgeSE3).name()){}
 
-  HyperGraphElementAction* EdgeSE3DrawAction::operator()(HyperGraph::HyperGraphElement* element, 
+  HyperGraphElementAction* EdgeSE3DrawAction::operator()(HyperGraph::HyperGraphElement* element,
                HyperGraphElementAction::Parameters* params_){
     if (typeid(*element).name()!=_typeName)
       return nullptr;
     refreshPropertyPtrs(params_);
     if (! _previousParams)
       return this;
-    
+
     if (_show && !_show->value())
       return this;
-    
+
     EdgeSE3* e =  static_cast<EdgeSE3*>(element);
     VertexSE3* fromEdge = static_cast<VertexSE3*>(e->vertices()[0]);
     VertexSE3* toEdge   = static_cast<VertexSE3*>(e->vertices()[1]);

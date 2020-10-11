@@ -73,35 +73,31 @@ namespace g2o {
   }
 
   void SensorPointXYZDisparity::sense() {
-    if (! _offsetParam){
+    if (!_offsetParam) {
       return;
     }
-    _robotPoseObject=0;
-    RobotType* r= dynamic_cast<RobotType*>(robot());
-    std::list<PoseObject*>::reverse_iterator it=r->trajectory().rbegin();
+    _robotPoseObject = 0;
+    RobotType* r = dynamic_cast<RobotType*>(robot());
+    std::list<PoseObject*>::reverse_iterator it = r->trajectory().rbegin();
     int count = 0;
-    while (it!=r->trajectory().rend() && count < 1){
-      if (!_robotPoseObject)
-  _robotPoseObject = *it;
+    while (it != r->trajectory().rend() && count < 1) {
+      if (!_robotPoseObject) _robotPoseObject = *it;
       ++it;
       count++;
     }
-    if (!_robotPoseObject)
-      return;
-    _sensorPose = _robotPoseObject->vertex()->estimate()*_offsetParam->offset();
-    for (std::set<BaseWorldObject*>::iterator it=world()->objects().begin();
-   it!=world()->objects().end(); ++it){
-      WorldObjectType* o=dynamic_cast<WorldObjectType*>(*it);
-      if (o && isVisible(o)){
-  EdgeType* e=mkEdge(o);
-  e->setParameterId(0,_offsetParam->id());
-  if (e && graph()) {
-    graph()->addEdge(e);
-    e->setMeasurementFromState();
+    if (!_robotPoseObject) return;
+    _sensorPose = _robotPoseObject->vertex()->estimate() * _offsetParam->offset();
+    for (std::set<BaseWorldObject*>::iterator it = world()->objects().begin(); it != world()->objects().end(); ++it) {
+      WorldObjectType* o = dynamic_cast<WorldObjectType*>(*it);
+      if (o && isVisible(o)) {
+        EdgeType* e = mkEdge(o);
+        if (e && graph()) {
+          e->setParameterId(0, _offsetParam->id());
+          graph()->addEdge(e);
+          e->setMeasurementFromState();
           addNoise(e);
-  }
+        }
       }
     }
   }
-
 }

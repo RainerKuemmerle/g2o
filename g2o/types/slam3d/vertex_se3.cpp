@@ -49,18 +49,14 @@ namespace g2o {
   bool VertexSE3::read(std::istream& is)
   {
     Vector7 est;
-    for (int i=0; i<7; i++)
-      is  >> est[i];
+    bool state = internal::readVector(is, est);
     setEstimate(internal::fromVectorQT(est));
-    return true;
+    return state;
   }
 
   bool VertexSE3::write(std::ostream& os) const
   {
-    Vector7 est=internal::toVectorQT(_estimate);
-    for (int i=0; i<7; i++)
-      os << est[i] << " ";
-    return os.good();
+    return internal::writeVector(os, internal::toVectorQT(estimate()));
   }
 
   VertexSE3WriteGnuplotAction::VertexSE3WriteGnuplotAction(): WriteGnuplotAction(typeid(VertexSE3).name()){}

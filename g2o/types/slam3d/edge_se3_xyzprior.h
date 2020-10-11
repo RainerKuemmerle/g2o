@@ -42,10 +42,6 @@ namespace g2o {
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
     EdgeSE3XYZPrior();
 
-    virtual void setMeasurement(const Vector3& m) {
-      _measurement = m;
-    }
-
     virtual bool setMeasurementData(const number_t* d) {
       Eigen::Map<const Vector3> v(d);
       _measurement = v;
@@ -58,7 +54,7 @@ namespace g2o {
       return true;
     }
 
-    virtual int measurementDimension() const {return 3;}
+    virtual int measurementDimension() const {return Dimension;}
 
     virtual bool read(std::istream& is);
     virtual bool write(std::ostream& os) const;

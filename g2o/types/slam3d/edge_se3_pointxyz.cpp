@@ -59,42 +59,21 @@ namespace g2o {
     return cache != 0;
   }
 
-
   bool EdgeSE3PointXYZ::read(std::istream& is) {
-    int pId;
-    is >> pId;
-    setParameterId(0, pId);
-    // measured keypoint
+    readParamIds(is);
     Vector3 meas;
-    for (int i=0; i<3; i++) is >> meas[i];
+    internal::readVector(is, meas);
     setMeasurement(meas);
-    // information matrix is the identity for features, could be changed to allow arbitrary covariances    
-    if (is.bad()) {
-      return false;
-    }
-    for ( int i=0; i<information().rows() && is.good(); i++)
-      for (int j=i; j<information().cols() && is.good(); j++){
-  is >> information()(i,j);
-  if (i!=j)
-    information()(j,i)=information()(i,j);
-      }
-    if (is.bad()) {
-      //  we overwrite the information matrix
-      information().setIdentity();
-    } 
-    return true;
+    readInformationMatrix(is);
+    return is.good() || is.eof();
   }
 
   bool EdgeSE3PointXYZ::write(std::ostream& os) const {
-    os << offsetParam->id() << " ";
-    for (int i=0; i<3; i++) os  << measurement()[i] << " ";
-    for (int i=0; i<information().rows(); i++)
-      for (int j=i; j<information().cols(); j++) {
-        os <<  information()(i,j) << " ";
-      }
-    return os.good();
+    bool state = writeParamIds(os);
+    state &= internal::writeVector(os, measurement());
+    state &= writeInformationMatrix(os);
+    return state;
   }
-
 
   void EdgeSE3PointXYZ::computeError() {
     // from cam to point (track)
@@ -112,13 +91,13 @@ namespace g2o {
   void EdgeSE3PointXYZ::linearizeOplus() {
     //VertexSE3 *cam = static_cast<VertexSE3 *>(_vertices[0]);
     VertexPointXYZ *vp = static_cast<VertexPointXYZ *>(_vertices[1]);
-    
+
     Vector3 Zcam = cache->w2l() * vp->estimate();
-    
+
     //  J(0,3) = -0.0;
     J(0,4) = -2*Zcam(2);
     J(0,5) = 2*Zcam(1);
-    
+
     J(1,3) = 2*Zcam(2);
     //  J(1,4) = -0.0;
     J(1,5) = -2*Zcam(0);
@@ -133,7 +112,7 @@ namespace g2o {
 
     _jacobianOplusXi = Jhom.block<3,6>(0,0);
     _jacobianOplusXj = Jhom.block<3,3>(0,6);
-    
+
     // std::cerr << "just linearized." << std::endl;
     // std::cerr << "_jacobianOplusXi:" << std::endl << _jacobianOplusXi << std::endl;
     // std::cerr << "_jacobianOplusXj:" << std::endl << _jacobianOplusXj << std::endl;

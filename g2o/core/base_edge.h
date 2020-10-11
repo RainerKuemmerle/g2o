@@ -124,7 +124,7 @@ namespace g2o {
 
       bool writeInformationMatrix(std::ostream& os) const {
         for (int i = 0; i < information().rows(); ++i)
-          for (int j = i; j < information().cols(); ++j) os << " " << information()(i, j);
+          for (int j = i; j < information().cols(); ++j) os << information()(i, j) << " ";
         return os.good();
       }
 
@@ -134,7 +134,21 @@ namespace g2o {
             is >> information()(i, j);
             if (i != j) information()(j, i) = information()(i, j);
           }
-        return true;
+        return is.good() || is.eof();
+      }
+
+      bool writeParamIds(std::ostream& os) const {
+        for (auto id : _parameterIds) os << id << " ";
+        return os.good();
+      }
+
+      bool readParamIds(std::istream& is) {
+        for (size_t i = 0; i < numParameters(); ++i) {
+          int paramId;
+          is >> paramId;
+          setParameterId(i, paramId);
+        }
+        return is.good() || is.eof();
       }
 
     public:

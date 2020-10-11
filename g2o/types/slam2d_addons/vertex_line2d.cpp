@@ -34,17 +34,12 @@
 #include "g2o/stuff/opengl_wrapper.h"
 #endif
 
-#include <typeinfo>
-
-#include "g2o/stuff/macros.h"
-
 namespace g2o {
 
   VertexLine2D::VertexLine2D() :
-    BaseVertex<2, Line2D>()
+    BaseVertex<2, Line2D>(), p1Id(-1), p2Id(-1)
   {
     _estimate.setZero();
-    p1Id=p2Id=-1;
   }
 
   bool VertexLine2D::read(std::istream& is)
@@ -59,25 +54,8 @@ namespace g2o {
     return os.good();
   }
 
-//   VertexLine2DWriteGnuplotAction::VertexLine2DWriteGnuplotAction(): WriteGnuplotAction(typeid(VertexLine2D).name()){}
-
-//   HyperGraphElementAction* VertexLine2DWriteGnuplotAction::operator()(HyperGraph::HyperGraphElement* element, HyperGraphElementAction::Parameters* params_){
-//     if (typeid(*element).name()!=_typeName)
-//       return nullptr;
-
-//     WriteGnuplotAction::Parameters* params=static_cast<WriteGnuplotAction::Parameters*>(params_);
-//     if (!params->os){
-//       std::cerr << __PRETTY_FUNCTION__ << ": warning, on valid os specified" << std::endl;
-//       return false;
-//     }
-
-//     VertexLine2D* v =  static_cast<VertexLine2D*>(element);
-//     *(params->os) << v->estimate().x() << " " << v->estimate().y() << std::endl;
-//     return this;
-//   }
-
 #ifdef G2O_HAVE_OPENGL
-  VertexLine2DDrawAction::VertexLine2DDrawAction(): DrawAction(typeid(VertexLine2D).name()){}
+  VertexLine2DDrawAction::VertexLine2DDrawAction() : DrawAction(typeid(VertexLine2D).name()), _pointSize(nullptr) {}
 
   bool VertexLine2DDrawAction::refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_){
     if (! DrawAction::refreshPropertyPtrs(params_))
@@ -102,7 +80,6 @@ namespace g2o {
 
     if (_show && !_show->value())
       return this;
-
 
     VertexLine2D* that = static_cast<VertexLine2D*>(element);
     glPushAttrib(GL_CURRENT_BIT | GL_BLEND);

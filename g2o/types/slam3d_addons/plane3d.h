@@ -33,7 +33,7 @@
 #include <Eigen/Geometry>
 
 namespace g2o {
-  
+
   class G2O_TYPES_SLAM3D_ADDONS_API Plane3D {
     public:
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
@@ -41,15 +41,12 @@ namespace g2o {
       friend Plane3D operator*(const Isometry3& t, const Plane3D& plane);
 
       Plane3D(){
-        Vector4 v;
-        v << 1., 0., 0., -1.;
-        fromVector(v);
+        fromVector(Vector4(1., 0., 0., -1.));
       }
 
       Plane3D(const Vector4& v){
         fromVector(v);
       }
-
 
       inline Vector4 toVector() const {
         return _coeffs;
@@ -78,10 +75,10 @@ namespace g2o {
       return _coeffs.head<3>();
     }
 
-    
+
     static Matrix3 rotation(const Vector3& v)  {
       number_t _azimuth = azimuth(v);
-      number_t _elevation = elevation(v); 
+      number_t _elevation = elevation(v);
       return (AngleAxis(_azimuth,  Vector3::UnitZ())* AngleAxis(- _elevation, Vector3::UnitY())).toRotationMatrix();
     }
 
@@ -91,7 +88,7 @@ namespace g2o {
       number_t _elevation=v[1];
       number_t s=std::sin(_elevation), c=std::cos(_elevation);
       Vector3 n (c*std::cos(_azimuth), c*std::sin(_azimuth), s) ;
-      
+
       // rotate the normal
       Matrix3 R=rotation(normal());
       number_t d=distance()+v[2];
@@ -99,7 +96,7 @@ namespace g2o {
       _coeffs(3) = -d;
       normalize(_coeffs);
     }
-    
+
     inline Vector3 ominus(const Plane3D& plane){
       //construct the rotation that would bring the plane normal in (1 0 0)
       Matrix3 R=rotation(normal()).transpose();
@@ -108,7 +105,7 @@ namespace g2o {
       return Vector3(azimuth(n), elevation(n), d);
     }
 
-    //protected:
+    protected:
 
     static inline void normalize(Vector4& coeffs) {
       number_t n=coeffs.head<3>().norm();

@@ -110,7 +110,7 @@ int main(int argc, const char* argv[]){
   g2o::SparseOptimizer optimizer;
   optimizer.setVerbose(false);
 
-  g2o::OptimizationAlgorithmLevenberg * solver;
+  g2o::OptimizationAlgorithmLevenberg* solver;
   if (SCHUR_TRICK){
     solver = new g2o::OptimizationAlgorithmLevenberg(
       g2o::make_unique<g2o::BlockSolver_6_3>(
@@ -133,11 +133,9 @@ int main(int argc, const char* argv[]){
   double focal_length= 1000.;
   Vector2d principal_point(320., 240.);
 
-  vector<g2o::SE3Quat,
-      aligned_allocator<g2o::SE3Quat> > true_poses;
+  vector<g2o::SE3Quat, aligned_allocator<g2o::SE3Quat>> true_poses;
 
-  g2o::CameraParameters * cam_params
-      = new g2o::CameraParameters (focal_length, principal_point, 0.);
+  g2o::CameraParameters* cam_params = new g2o::CameraParameters(focal_length, principal_point, 0.);
   cam_params->setId(0);
 
   if (!optimizer.addParameter(cam_params)){
@@ -150,8 +148,7 @@ int main(int argc, const char* argv[]){
     Eigen:: Quaterniond q;
     q.setIdentity();
     g2o::SE3Quat T_me_from_world(q,trans);
-    g2o::VertexSE3Expmap * v_se3
-        = new g2o::VertexSE3Expmap();
+    g2o::VertexSE3Expmap* v_se3 = new g2o::VertexSE3Expmap();
     v_se3->setId(vertex_id);
     v_se3->setEstimate(T_me_from_world);
 
@@ -178,14 +175,13 @@ int main(int argc, const char* argv[]){
     int num_obs = 0;
     for (size_t j=0; j<true_poses.size(); ++j)    {
       Vector2d z = cam_params->cam_map(true_poses.at(j).map(true_points.at(i)));
-
-      if (z[0]>=0 && z[1]>=0 && z[0]<640 && z[1]<480)      {
+      if (z[0] >= 0 && z[1] >= 0 && z[0] < 640 && z[1] < 480) {
         ++num_obs;
       }
     }
 
-    int anchor_frame_id = -1;
     if (num_obs>=2){
+      int anchor_frame_id = -1;
       bool inlier = true;
       for (size_t j=0; j<true_poses.size(); ++j){
         Vector2d z = cam_params->cam_map(true_poses.at(j).map(true_points.at(i)));
@@ -217,8 +213,7 @@ int main(int argc, const char* argv[]){
           }
           z += Vector2d(g2o::Sampler::gaussRand(0., PIXEL_NOISE),
                         g2o::Sampler::gaussRand(0., PIXEL_NOISE));
-          g2o::EdgeProjectPSI2UV * e
-              = new g2o::EdgeProjectPSI2UV();
+          g2o::EdgeProjectPSI2UV* e = new g2o::EdgeProjectPSI2UV();
 
           e->resize(3);
           e->setVertex(0, dynamic_cast<g2o::OptimizableGraph::Vertex*>(v_p));
@@ -241,9 +236,7 @@ int main(int argc, const char* argv[]){
       }
       if (inlier){
         inliers.insert(point_id);
-        Vector3d diff = true_poses[anchor_frame_id].inverse()*invert_depth(v_p->estimate())
-            - true_points[i];
-
+        Vector3d diff = true_poses[anchor_frame_id].inverse() * invert_depth(v_p->estimate()) - true_points[i];
         sum_diff2 += diff.dot(diff);
       }
       pointid_2_trueid.insert(make_pair(point_id,i));
@@ -271,8 +264,7 @@ int main(int argc, const char* argv[]){
       cerr << "Vertex " << it->first << " not in graph!" << endl;
       exit(-1);
     }
-    g2o::VertexSBAPointXYZ * v_p
-        = dynamic_cast< g2o::VertexSBAPointXYZ * > (v_it->second);
+    g2o::VertexSBAPointXYZ* v_p = dynamic_cast<g2o::VertexSBAPointXYZ*>(v_it->second);
     if (v_p==0){
       cerr << "Vertex " << it->first << "is not a PointXYZ!" << endl;
       exit(-1);
@@ -284,8 +276,7 @@ int main(int argc, const char* argv[]){
       cerr << "Vertex " << it->first << " not in graph!" << endl;
       exit(-1);
     }
-    g2o::VertexSE3Expmap * v_anchor
-        = dynamic_cast< g2o::VertexSE3Expmap * > (v_it->second);
+    g2o::VertexSE3Expmap* v_anchor = dynamic_cast<g2o::VertexSE3Expmap*>(v_it->second);
     if (v_p==0){
       cerr << "Vertex " << it->first << "is not a SE3Expmap!" << endl;
       exit(-1);

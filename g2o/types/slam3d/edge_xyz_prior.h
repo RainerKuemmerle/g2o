@@ -46,13 +46,9 @@ namespace g2o {
     virtual bool write(std::ostream& os) const;
 
     void computeError();
-    
+
     // jacobian
     virtual void linearizeOplus();
-
-    virtual void setMeasurement(const Vector3& m){
-      _measurement = m;
-    }
 
     virtual bool setMeasurementData(const number_t* d){
         Eigen::Map<const Vector3> v(d);
@@ -70,8 +66,8 @@ namespace g2o {
 
     virtual bool setMeasurementFromState() ;
 
-    virtual number_t initialEstimatePossible(const OptimizableGraph::VertexSet& /*from*/, 
-             OptimizableGraph::Vertex* /*to*/) { 
+    virtual number_t initialEstimatePossible(const OptimizableGraph::VertexSet& /*from*/,
+             OptimizableGraph::Vertex* /*to*/) {
       return 0;
     }
   };

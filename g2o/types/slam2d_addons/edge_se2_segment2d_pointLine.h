@@ -63,20 +63,20 @@ namespace g2o {
         prediction [2] = std::atan2(normal.y(), normal.x());
         Eigen::Map<Vector2> pt(&prediction[0]);
         pt = (_pointNum==0) ? predP1 : predP2;
-	_error=prediction-_measurement;
+        _error = prediction - _measurement;
         _error[2]=normalize_theta(_error[2]);
       }
 
-      virtual bool setMeasurementData(const number_t* d){
+      virtual bool setMeasurementData(const number_t* d) {
         Eigen::Map<const Vector3> data(d);
-	_measurement = data;
-	return true;
+        _measurement = data;
+        return true;
       }
 
-      virtual bool getMeasurementData(number_t* d) const{
+      virtual bool getMeasurementData(number_t* d) const {
         Eigen::Map<Vector3> data(d);
-	data = _measurement;
-	return true;
+        data = _measurement;
+        return true;
       }
 
       virtual int measurementDimension() const {return 3;}

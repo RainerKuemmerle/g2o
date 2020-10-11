@@ -37,6 +37,7 @@ namespace SlamParser {
   Driver::Driver(class SlamContext& slamContext_) :
     trace_scanning(false),
     trace_parsing(false),
+    lexer(nullptr),
     slamContext(slamContext_)
   {
   }

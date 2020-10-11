@@ -27,6 +27,7 @@
 #include "gtest/gtest.h"
 
 #include "unit_test/test_helper/evaluate_jacobian.h"
+#include "unit_test/test_helper/random_state.h"
 
 #include "g2o/core/jacobian_workspace.h"
 #include "g2o/types/sim3/types_seven_dof_expmap.h"
@@ -38,34 +39,21 @@ using namespace g2o;
 using namespace g2o::internal;
 
 namespace {
-
-static Eigen::Isometry3d randomIsometry3d()
-{
-  Eigen::Vector3d rotAxisAngle = Eigen::Vector3d::Random();
-  rotAxisAngle += Eigen::Vector3d::Random();
-  Eigen::AngleAxisd rotation(rotAxisAngle.norm(), rotAxisAngle.normalized());
-  Eigen::Isometry3d result = (Eigen::Isometry3d)rotation.toRotationMatrix();
-  result.translation() = Eigen::Vector3d::Random();
-  return result;
-}
-
-static Sim3 randomSim3()
-{
-  Eigen::Isometry3d se3 = randomIsometry3d();
-  Eigen::Matrix3d r = se3.rotation();
-  Eigen::Vector3d t = se3.translation();
+static Sim3 randomSim3() {
+  Isometry3 se3 = internal::randomIsometry3();
+  Matrix3 r = se3.rotation();
+  Vector3 t = se3.translation();
   return Sim3(r, t, 1.0);
 }
-
-} // end anonymous namespace
+}  // namespace
 
 TEST(Sim3, EdgeSim3Jacobian)
 {
   VertexSim3Expmap v1;
-  v1.setId(0); 
+  v1.setId(0);
 
   VertexSim3Expmap v2;
-  v2.setId(1); 
+  v2.setId(1);
 
   EdgeSim3 e;
   e.setVertex(0, &v1);

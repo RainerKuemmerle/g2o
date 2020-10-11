@@ -48,16 +48,12 @@ namespace g2o {
 
   bool VertexSegment2D::read(std::istream& is)
   {
-    for (size_t i=0; i<4; i++)
-      is >> _estimate[i];
-    return true;
+    return internal::readVector(is, _estimate);
   }
 
   bool VertexSegment2D::write(std::ostream& os) const
   {
-    for (size_t i=0; i<4; i++)
-      os << _estimate[i] << " ";
-    return os.good();
+    return internal::writeVector(os, estimate());
   }
 
   VertexSegment2DWriteGnuplotAction::VertexSegment2DWriteGnuplotAction(): WriteGnuplotAction(typeid(VertexSegment2D).name()){}
@@ -68,7 +64,7 @@ namespace g2o {
 
     WriteGnuplotAction::Parameters* params=static_cast<WriteGnuplotAction::Parameters*>(params_);
     if (!params->os){
-      std::cerr << __PRETTY_FUNCTION__ << ": warning, on valid os specified" << std::endl;
+      std::cerr << __PRETTY_FUNCTION__ << ": warning, no valid os specified" << std::endl;
       return nullptr;
     }
 
@@ -80,7 +76,8 @@ namespace g2o {
   }
 
 #ifdef G2O_HAVE_OPENGL
-  VertexSegment2DDrawAction::VertexSegment2DDrawAction(): DrawAction(typeid(VertexSegment2D).name()){}
+  VertexSegment2DDrawAction::VertexSegment2DDrawAction()
+      : DrawAction(typeid(VertexSegment2D).name()), _pointSize(nullptr) {}
 
   bool VertexSegment2DDrawAction::refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_){
     if (! DrawAction::refreshPropertyPtrs(params_))
@@ -105,7 +102,6 @@ namespace g2o {
 
     if (_show && !_show->value())
       return this;
-
 
     VertexSegment2D* that = static_cast<VertexSegment2D*>(element);
     glColor3f(0.8f,0.5f,0.3f);

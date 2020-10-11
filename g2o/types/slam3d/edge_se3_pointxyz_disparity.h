@@ -56,10 +56,6 @@ namespace g2o {
     virtual void linearizeOplus();
 #endif
 
-    virtual void setMeasurement(const Vector3& m){
-      _measurement = m;
-    }
-
     virtual bool setMeasurementData(const number_t* d){
       Eigen::Map<const Vector3> v(d);
       _measurement = v;
@@ -71,14 +67,14 @@ namespace g2o {
       v=_measurement;
       return true;
     }
-    
+
     virtual int measurementDimension() const {return 3;}
 
-    virtual bool setMeasurementFromState() ;
-    
-    virtual number_t initialEstimatePossible(const OptimizableGraph::VertexSet& from, 
-             OptimizableGraph::Vertex* to) { 
-      (void) to; 
+    virtual bool setMeasurementFromState();
+
+    virtual number_t initialEstimatePossible(const OptimizableGraph::VertexSet& from,
+             OptimizableGraph::Vertex* to) {
+      (void) to;
       return (from.count(_vertices[0]) == 1 ? 1.0 : -1.0);
     }
 
@@ -97,7 +93,7 @@ namespace g2o {
   class G2O_TYPES_SLAM3D_API EdgeProjectDisparityDrawAction: public DrawAction{
   public:
     EdgeProjectDisparityDrawAction();
-    virtual HyperGraphElementAction* operator()(HyperGraph::HyperGraphElement* element, 
+    virtual HyperGraphElementAction* operator()(HyperGraph::HyperGraphElement* element,
             HyperGraphElementAction::Parameters* params_);
   };
 #endif

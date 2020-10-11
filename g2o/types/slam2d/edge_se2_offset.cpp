@@ -99,9 +99,9 @@ namespace g2o {
 
     SE2 virtualMeasurement = _cacheFrom->offsetParam()->offset() * measurement() * _cacheTo->offsetParam()->offset().inverse();
 
-    if (from_.count(from) > 0) {
+    if (from_.count(from) > 0)
       to->setEstimate(from->estimate() * virtualMeasurement);
-    } else
+    else
       from->setEstimate(to->estimate() * virtualMeasurement.inverse());
   }
 

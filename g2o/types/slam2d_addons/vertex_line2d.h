@@ -35,8 +35,6 @@
 #include "g2o/types/slam2d/vertex_point_xy.h"
 #include "line_2d.h"
 
-#include <Eigen/Core>
-
 namespace g2o {
 
   class G2O_TYPES_SLAM2D_ADDONS_API VertexLine2D : public BaseVertex<2, Line2D>
@@ -93,13 +91,6 @@ namespace g2o {
       virtual bool write(std::ostream& os) const;
       int p1Id, p2Id;
   };
-
-  /* class G2O_TYPES_SLAM2D_ADDONS_API VertexLine2DWriteGnuplotAction: public WriteGnuplotAction { */
-  /* public: */
-  /*   VertexLine2DWriteGnuplotAction(); */
-  /*   virtual HyperGraphElementAction* operator()(HyperGraph::HyperGraphElement* element,  */
-  /*           HyperGraphElementAction::Parameters* params_); */
-  /* }; */
 
 #ifdef G2O_HAVE_OPENGL
   class G2O_TYPES_SLAM2D_ADDONS_API VertexLine2DDrawAction: public DrawAction{

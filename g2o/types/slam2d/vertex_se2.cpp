@@ -70,9 +70,8 @@ namespace g2o {
   }
 
 #ifdef G2O_HAVE_OPENGL
-  VertexSE2DrawAction::VertexSE2DrawAction(): DrawAction(typeid(VertexSE2).name()){
-    _drawActions = 0;
-  }
+  VertexSE2DrawAction::VertexSE2DrawAction()
+      : DrawAction(typeid(VertexSE2).name()), _drawActions(nullptr), _triangleX(nullptr), _triangleY(nullptr) {}
 
   bool VertexSE2DrawAction::refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_){
     if (!DrawAction::refreshPropertyPtrs(params_))

@@ -75,8 +75,8 @@ namespace g2o {
 
       virtual bool setMeasurementFromState() ;
 
-      virtual number_t initialEstimatePossible(const OptimizableGraph::VertexSet& /*from*/, 
-          OptimizableGraph::Vertex* /*to*/) { 
+      virtual number_t initialEstimatePossible(const OptimizableGraph::VertexSet& /*from*/,
+                                               OptimizableGraph::Vertex* /*to*/) {
         return 1.;
       }
 

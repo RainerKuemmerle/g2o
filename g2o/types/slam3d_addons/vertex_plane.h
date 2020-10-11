@@ -49,19 +49,19 @@ namespace g2o
 
       virtual void oplusImpl(const number_t* update_) {
         Eigen::Map<const Vector3> update(update_);
-	_estimate.oplus(update);
+        _estimate.oplus(update);
       }
 
-      virtual bool setEstimateDataImpl(const number_t* est){
+      virtual bool setEstimateDataImpl(const number_t* est) {
         Eigen::Map<const Vector4> _est(est);
-	_estimate.fromVector(_est);
-	return true;
+        _estimate.fromVector(_est);
+        return true;
       }
 
-      virtual bool getEstimateData(number_t* est) const{
+      virtual bool getEstimateData(number_t* est) const {
         Eigen::Map<Vector4> _est(est);
-	_est = _estimate.toVector();
-	return true;
+        _est = _estimate.toVector();
+        return true;
       }
 
       virtual int estimateDimension() const {
@@ -76,7 +76,7 @@ namespace g2o
   {
     public:
       VertexPlaneDrawAction();
-      virtual HyperGraphElementAction* operator()(HyperGraph::HyperGraphElement* element, 
+      virtual HyperGraphElementAction* operator()(HyperGraph::HyperGraphElement* element,
           HyperGraphElementAction::Parameters* params_ );
     protected:
       virtual bool refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_);

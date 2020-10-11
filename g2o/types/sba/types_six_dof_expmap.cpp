@@ -29,6 +29,8 @@
 #include "g2o/core/factory.h"
 #include "g2o/stuff/macros.h"
 
+#include "g2o/types/slam3d/se3_ops.h"
+
 namespace g2o {
 
 using namespace std;
@@ -52,27 +54,13 @@ CameraParameters
     baseline(0.5)  {
 }
 
-Vector2 project2d(const Vector3& v)  {
-  Vector2 res;
-  res(0) = v(0)/v(2);
-  res(1) = v(1)/v(2);
-  return res;
-}
-
-Vector3 unproject2d(const Vector2& v)  {
-  Vector3 res;
-  res(0) = v(0);
-  res(1) = v(1);
-  res(2) = 1;
-  return res;
-}
-
 inline Vector3 invert_depth(const Vector3 & x){
-  return unproject2d(x.head<2>())/x[2];
+  Vector2 aux = x.head<2>();
+  return unproject(aux)/x[2];
 }
 
 Vector2  CameraParameters::cam_map(const Vector3 & trans_xyz) const {
-  Vector2 proj = project2d(trans_xyz);
+  Vector2 proj = project(trans_xyz);
   Vector2 res;
   res[0] = proj[0]*focal_length + principle_point[0];
   res[1] = proj[1]*focal_length + principle_point[1];
@@ -92,19 +80,13 @@ VertexSE3Expmap::VertexSE3Expmap() : BaseVertex<6, SE3Quat>() {
 
 bool VertexSE3Expmap::read(std::istream& is) {
   Vector7 est;
-  for (int i=0; i<7; i++)
-    is  >> est[i];
-  SE3Quat cam2world;
-  cam2world.fromVector(est);
-  setEstimate(cam2world.inverse());
+  internal::readVector(is, est);
+  setEstimate(SE3Quat(est).inverse());
   return true;
 }
 
 bool VertexSE3Expmap::write(std::ostream& os) const {
-  SE3Quat cam2world(estimate().inverse());
-  for (int i=0; i<7; i++)
-    os << cam2world[i] << " ";
-  return os.good();
+  return internal::writeVector(os, estimate().inverse().toVector());
 }
 
 EdgeSE3Expmap::EdgeSE3Expmap() :
@@ -113,30 +95,14 @@ EdgeSE3Expmap::EdgeSE3Expmap() :
 
 bool EdgeSE3Expmap::read(std::istream& is)  {
   Vector7 meas;
-  for (int i=0; i<7; i++)
-    is >> meas[i];
-  SE3Quat cam2world;
-  cam2world.fromVector(meas);
-  setMeasurement(cam2world.inverse());
-  //TODO: Convert information matrix!!
-  for (int i=0; i<6; i++)
-    for (int j=i; j<6; j++) {
-      is >> information()(i,j);
-      if (i!=j)
-        information()(j,i)=information()(i,j);
-    }
-  return true;
+  internal::readVector(is, meas);
+  setMeasurement(SE3Quat(meas).inverse());
+  return readInformationMatrix(is);
 }
 
 bool EdgeSE3Expmap::write(std::ostream& os) const {
-  SE3Quat cam2world(measurement().inverse());
-  for (int i=0; i<7; i++)
-    os << cam2world[i] << " ";
-  for (int i=0; i<6; i++)
-    for (int j=i; j<6; j++){
-      os << " " <<  information()(i,j);
-    }
-  return os.good();
+  internal::writeVector(os, measurement().inverse().toVector());
+  return writeInformationMatrix(os);
 }
 
 EdgeProjectXYZ2UV::EdgeProjectXYZ2UV() : BaseBinaryEdge<2, Vector2, VertexSBAPointXYZ, VertexSE3Expmap>() {
@@ -146,33 +112,15 @@ EdgeProjectXYZ2UV::EdgeProjectXYZ2UV() : BaseBinaryEdge<2, Vector2, VertexSBAPoi
 }
 
 bool EdgeProjectPSI2UV::write(std::ostream& os) const  {
-  os << _cam->id() << " ";
-  for (int i=0; i<2; i++){
-    os << measurement()[i] << " ";
-  }
-
-  for (int i=0; i<2; i++)
-    for (int j=i; j<2; j++){
-      os << " " <<  information()(i,j);
-    }
-  return os.good();
+  writeParamIds(os);
+  internal::writeVector(os, measurement());
+  return writeInformationMatrix(os);
 }
 
 bool EdgeProjectPSI2UV::read(std::istream& is) {
-  int paramId;
-  is >> paramId;
-  setParameterId(0, paramId);
-
-  for (int i=0; i<2; i++){
-    is >> _measurement[i];
-  }
-  for (int i=0; i<2; i++)
-    for (int j=i; j<2; j++) {
-      is >> information()(i,j);
-      if (i!=j)
-        information()(j,i)=information()(i,j);
-    }
-  return true;
+  readParamIds(is);
+  internal::readVector(is, _measurement);
+  return readInformationMatrix(is);
 }
 
 void EdgeProjectPSI2UV::computeError(){
@@ -246,33 +194,15 @@ EdgeProjectXYZ2UVU::EdgeProjectXYZ2UVU() : BaseBinaryEdge<3, Vector3, VertexSBAP
 }
 
 bool EdgeProjectXYZ2UV::read(std::istream& is){
-  int paramId;
-  is >> paramId;
-  setParameterId(0, paramId);
-
-  for (int i=0; i<2; i++){
-    is >> _measurement[i];
-  }
-  for (int i=0; i<2; i++)
-    for (int j=i; j<2; j++) {
-      is >> information()(i,j);
-      if (i!=j)
-        information()(j,i)=information()(i,j);
-    }
-  return true;
+  readParamIds(is);
+  internal::readVector(is, _measurement);
+  return readInformationMatrix(is);
 }
 
 bool EdgeProjectXYZ2UV::write(std::ostream& os) const {
-  os << _cam->id() << " ";
-  for (int i=0; i<2; i++){
-    os << measurement()[i] << " ";
-  }
-
-  for (int i=0; i<2; i++)
-    for (int j=i; j<2; j++){
-      os << " " <<  information()(i,j);
-    }
-  return os.good();
+  writeParamIds(os);
+  internal::writeVector(os, measurement());
+  return writeInformationMatrix(os);
 }
 
 void EdgeSE3Expmap::linearizeOplus() {
@@ -332,58 +262,28 @@ void EdgeProjectXYZ2UV::linearizeOplus() {
   _jacobianOplusXj(1,5) = y/z_2 *cam->focal_length;
 }
 
-bool EdgeProjectXYZ2UVU::read(std::istream& is){
-  for (int i=0; i<3; i++){
-    is  >> _measurement[i];
-  }
-  for (int i=0; i<3; i++)
-    for (int j=i; j<3; j++) {
-      is >> information()(i,j);
-      if (i!=j)
-        information()(j,i)=information()(i,j);
-    }
-  return true;
+bool EdgeProjectXYZ2UVU::read(std::istream &is) {
+  readParamIds(is);
+  internal::readVector(is, _measurement);
+  return readInformationMatrix(is);
 }
 
-bool EdgeProjectXYZ2UVU::write(std::ostream& os) const {
-  for (int i=0; i<3; i++){
-    os  << measurement()[i] << " ";
-  }
-
-  for (int i=0; i<3; i++)
-    for (int j=i; j<3; j++){
-      os << " " << information()(i,j);
-    }
-  return os.good();
+bool EdgeProjectXYZ2UVU::write(std::ostream &os) const {
+  writeParamIds(os);
+  internal::writeVector(os, measurement());
+  return writeInformationMatrix(os);
 }
 
-EdgeSE3ProjectXYZ::EdgeSE3ProjectXYZ() : BaseBinaryEdge<2, Vector2, VertexSBAPointXYZ, VertexSE3Expmap>() {
-}
+EdgeSE3ProjectXYZ::EdgeSE3ProjectXYZ() : BaseBinaryEdge<2, Vector2, VertexSBAPointXYZ, VertexSE3Expmap>() {}
 
 bool EdgeSE3ProjectXYZ::read(std::istream &is) {
-  for (int i = 0; i < 2; i++) {
-    is >> _measurement[i];
-  }
-  for (int i = 0; i < 2; i++)
-    for (int j = i; j < 2; j++) {
-      is >> information()(i, j);
-      if (i != j)
-        information()(j, i) = information()(i, j);
-    }
-  return true;
+  internal::readVector(is, _measurement);
+  return readInformationMatrix(is);
 }
 
 bool EdgeSE3ProjectXYZ::write(std::ostream &os) const {
-
-  for (int i = 0; i < 2; i++) {
-    os << measurement()[i] << " ";
-  }
-
-  for (int i = 0; i < 2; i++)
-    for (int j = i; j < 2; j++) {
-      os << " " << information()(i, j);
-    }
-  return os.good();
+  internal::writeVector(os, measurement());
+  return writeInformationMatrix(os);
 }
 
 void EdgeSE3ProjectXYZ::linearizeOplus() {
@@ -425,7 +325,7 @@ void EdgeSE3ProjectXYZ::linearizeOplus() {
 }
 
 Vector2 EdgeSE3ProjectXYZ::cam_project(const Vector3 &trans_xyz) const {
-  Vector2 proj = project2d(trans_xyz);
+  Vector2 proj = project(trans_xyz);
   Vector2 res;
   res[0] = proj[0] * fx + cx;
   res[1] = proj[1] * fy + cy;
@@ -445,29 +345,13 @@ EdgeStereoSE3ProjectXYZ::EdgeStereoSE3ProjectXYZ() : BaseBinaryEdge<3, Vector3, 
 }
 
 bool EdgeStereoSE3ProjectXYZ::read(std::istream &is) {
-  for (int i = 0; i <= 3; i++) {
-    is >> _measurement[i];
-  }
-  for (int i = 0; i <= 2; i++)
-    for (int j = i; j <= 2; j++) {
-      is >> information()(i, j);
-      if (i != j)
-        information()(j, i) = information()(i, j);
-    }
-  return true;
+  internal::readVector(is, _measurement);
+  return readInformationMatrix(is);
 }
 
 bool EdgeStereoSE3ProjectXYZ::write(std::ostream &os) const {
-
-  for (int i = 0; i <= 3; i++) {
-    os << measurement()[i] << " ";
-  }
-
-  for (int i = 0; i <= 2; i++)
-    for (int j = i; j <= 2; j++) {
-      os << " " << information()(i, j);
-    }
-  return os.good();
+  internal::writeVector(os, measurement());
+  return writeInformationMatrix(os);
 }
 
 void EdgeStereoSE3ProjectXYZ::linearizeOplus() {
@@ -519,29 +403,13 @@ void EdgeStereoSE3ProjectXYZ::linearizeOplus() {
 }
 
 bool EdgeSE3ProjectXYZOnlyPose::read(std::istream &is) {
-  for (int i = 0; i < 2; i++) {
-    is >> _measurement[i];
-  }
-  for (int i = 0; i < 2; i++)
-    for (int j = i; j < 2; j++) {
-      is >> information()(i, j);
-      if (i != j)
-        information()(j, i) = information()(i, j);
-    }
-  return true;
+  internal::readVector(is, _measurement);
+  return readInformationMatrix(is);
 }
 
 bool EdgeSE3ProjectXYZOnlyPose::write(std::ostream &os) const {
-
-  for (int i = 0; i < 2; i++) {
-    os << measurement()[i] << " ";
-  }
-
-  for (int i = 0; i < 2; i++)
-    for (int j = i; j < 2; j++) {
-      os << " " << information()(i, j);
-    }
-  return os.good();
+  internal::writeVector(os, measurement());
+  return writeInformationMatrix(os);
 }
 
 void EdgeSE3ProjectXYZOnlyPose::linearizeOplus() {
@@ -569,7 +437,7 @@ void EdgeSE3ProjectXYZOnlyPose::linearizeOplus() {
 }
 
 Vector2 EdgeSE3ProjectXYZOnlyPose::cam_project(const Vector3 &trans_xyz) const {
-  Vector2 proj = project2d(trans_xyz);
+  Vector2 proj = project(trans_xyz);
   Vector2 res;
   res[0] = proj[0] * fx + cx;
   res[1] = proj[1] * fy + cy;
@@ -586,29 +454,13 @@ Vector3 EdgeStereoSE3ProjectXYZOnlyPose::cam_project(const Vector3 &trans_xyz) c
 }
 
 bool EdgeStereoSE3ProjectXYZOnlyPose::read(std::istream &is) {
-  for (int i = 0; i <= 3; i++) {
-    is >> _measurement[i];
-  }
-  for (int i = 0; i <= 2; i++)
-    for (int j = i; j <= 2; j++) {
-      is >> information()(i, j);
-      if (i != j)
-        information()(j, i) = information()(i, j);
-    }
-  return true;
+  internal::readVector(is, _measurement);
+  return readInformationMatrix(is);
 }
 
 bool EdgeStereoSE3ProjectXYZOnlyPose::write(std::ostream &os) const {
-
-  for (int i = 0; i <= 3; i++) {
-    os << measurement()[i] << " ";
-  }
-
-  for (int i = 0; i <= 2; i++)
-    for (int j = i; j <= 2; j++) {
-      os << " " << information()(i, j);
-    }
-  return os.good();
+  internal::writeVector(os, measurement());
+  return writeInformationMatrix(os);
 }
 
 void EdgeStereoSE3ProjectXYZOnlyPose::linearizeOplus() {

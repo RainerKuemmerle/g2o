@@ -46,20 +46,15 @@ namespace g2o {
 
   bool ParameterSE3Offset::read(std::istream& is) {
     Vector7 off;
-    for (int i=0; i<7; i++) {
-      is >> off[i];
-    }
+    bool state = internal::readVector(is, off);
     // normalize the quaternion to recover numerical precision lost by storing as human readable text
     Vector4::MapType(off.data()+3).normalize();
     setOffset(internal::fromVectorQT(off));
-    return !is.fail();
+    return state;
   }
-  
+
   bool ParameterSE3Offset::write(std::ostream& os) const {
-    Vector7 off =internal::toVectorQT(_offset);
-    for (int i=0; i<7; i++)
-      os << off[i] << " ";
-    return os.good();
+    return internal::writeVector(os, internal::toVectorQT(_offset));
   }
 
   CacheSE3Offset::CacheSE3Offset() :
@@ -78,7 +73,7 @@ namespace g2o {
     _n2w = v->estimate() * _offsetParam->offset();
     _w2n = _n2w.inverse();
     _w2l = v->estimate().inverse();
-  }  
+  }
 
   void CacheSE3Offset::setOffsetParam(ParameterSE3Offset* offsetParam)
   {
@@ -103,7 +98,7 @@ namespace g2o {
     return true;
   }
 
-  HyperGraphElementAction* CacheSE3OffsetDrawAction::operator()(HyperGraph::HyperGraphElement* element, 
+  HyperGraphElementAction* CacheSE3OffsetDrawAction::operator()(HyperGraph::HyperGraphElement* element,
                 HyperGraphElementAction::Parameters* params_){
     if (typeid(*element).name()!=_typeName)
       return nullptr;
@@ -111,7 +106,7 @@ namespace g2o {
     refreshPropertyPtrs(params_);
     if (! _previousParams)
       return this;
-    
+
     if (_show && !_show->value())
       return this;
     float cs = _cubeSide ? _cubeSide->value() : 1.0f;

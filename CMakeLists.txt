@@ -224,11 +224,13 @@ macro(DEFINE_SSE_VAR  _setname)
 endmacro(DEFINE_SSE_VAR)
 
 # SSE optimizations:
-DEFINE_SSE_VAR(SSE2)
-DEFINE_SSE_VAR(SSE3)
-DEFINE_SSE_VAR(SSE4_1)
-DEFINE_SSE_VAR(SSE4_2)
-DEFINE_SSE_VAR(SSE4_A)
+IF (NOT CMAKE_SYSTEM_PROCESSOR MATCHES "arm")
+  DEFINE_SSE_VAR(SSE2)
+  DEFINE_SSE_VAR(SSE3)
+  DEFINE_SSE_VAR(SSE4_1)
+  DEFINE_SSE_VAR(SSE4_2)
+  DEFINE_SSE_VAR(SSE4_A)
+ENDIF()
 
 # Add build flags for clang AND GCC
 if (${CMAKE_CXX_COMPILER_ID} MATCHES "Clang" OR CMAKE_COMPILER_IS_GNUCXX)
@@ -343,6 +345,13 @@ if(MSVC)
   add_definitions("/wd4267") # Conversion during return
   add_definitions("/wd4522") # Duplicated operator=() in Eigen headers
 
+  # Bessel  include(CheckIfUnderscorePrefixedBesselFunctionsExist)
+  include(CheckIfUnderscorePrefixedBesselFunctionsExist)
+  check_if_underscore_prefixed_bessel_functions_exist(HAVE_UNDERSCORE_PREFIXED_BESSEL_FUNCTIONS)
+  if (HAVE_UNDERSCORE_PREFIXED_BESSEL_FUNCTIONS)
+    add_definitions(-DCERES_MSVC_USE_UNDERSCORE_PREFIXED_BESSEL_FUNCTIONS)
+  endif()
+
 endif(MSVC)
 
 # C++11 support
@@ -356,7 +365,7 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${g2o_C_FLAGS}")
 # Find Eigen3. If it defines the target, this is used. If not,
 # fall back to the using the module form.
 # See https://eigen.tuxfamily.org/dox/TopicCMakeGuide.html for details
-find_package(Eigen3 REQUIRED)
+find_package(Eigen3 3.3 REQUIRED)
 if (TARGET Eigen3::Eigen)
   set(G2O_EIGEN3_EIGEN_TARGET Eigen3::Eigen)
 else()
