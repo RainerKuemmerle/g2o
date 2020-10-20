@@ -4,6 +4,7 @@ set(CMAKE_LEGACY_CYGWIN_WIN32 0)
 project(g2o)
 
 include(CPack)
+include(GNUInstallDirs)
 
 # The library prefix
 set(LIB_PREFIX g2o_)
@@ -69,11 +70,11 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${g2o_LIBRARY_OUTPUT_DIRECTORY})
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${g2o_RUNTIME_OUTPUT_DIRECTORY})
 
 # Set standard installation directories
-set(RUNTIME_DESTINATION bin)
-set(LIBRARY_DESTINATION lib)
-set(ARCHIVE_DESTINATION lib)
-set(INCLUDES_DESTINATION include)
-set(INCLUDES_INSTALL_DIR include/g2o)
+set(RUNTIME_DESTINATION ${CMAKE_INSTALL_BINDIR})
+set(LIBRARY_DESTINATION ${CMAKE_INSTALL_LIBDIR})
+set(ARCHIVE_DESTINATION ${CMAKE_INSTALL_LIBDIR})
+set(INCLUDES_DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+set(INCLUDES_INSTALL_DIR ${INCLUDES_DESTINATION}/g2o)
 
 # Set search directory for looking for our custom CMake scripts to
 # look for SuiteSparse, QGLViewer, and Eigen3.

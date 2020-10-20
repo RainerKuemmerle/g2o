@@ -61,7 +61,7 @@ add_library(csparse ${G2O_LGPL_LIB_TYPE}
 
 set_target_properties(csparse PROPERTIES OUTPUT_NAME ${LIB_PREFIX}ext_csparse)
 if (APPLE)
-  set_target_properties(csparse PROPERTIES INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib")
+  set_target_properties(csparse PROPERTIES INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
 endif()
 if (UNIX)
   target_link_libraries(csparse PUBLIC m)
