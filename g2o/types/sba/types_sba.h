@@ -246,36 +246,6 @@ class G2O_TYPES_SBA_API VertexIntrinsics : public BaseVertex<4, Eigen::Matrix<nu
 
 };
 
-// monocular projection with parameter calibration
-// first two args are the measurement type, second two the connection classes
- class G2O_TYPES_SBA_API EdgeProjectP2MC_Intrinsics : public  BaseVariableSizedEdge<2, Vector2>
-{
-  public:
-    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-    EdgeProjectP2MC_Intrinsics();
-    virtual bool read(std::istream& is);
-    virtual bool write(std::ostream& os) const;
-
-    // return the error estimate as a 2-vector
-    void computeError()
-    {
-      // from <Point> to <Cam>, the intrinsics in KCam should be already set!
-      const VertexSBAPointXYZ *point = static_cast<const VertexSBAPointXYZ*>(_vertices[0]);
-      VertexCam *cam = static_cast<VertexCam*>(_vertices[1]);
-      // calculate the projection
-      const Vector3 &pt = point->estimate();
-      Vector4 ppt(pt(0),pt(1),pt(2),cst(1.0));
-      Vector3 p = cam->estimate().w2i * ppt;
-      Vector2 perr = p.head<2>()/p(2);
-      _error = perr - _measurement;
-    }
-
-    // jacobian
-    virtual void linearizeOplus();
-
-};
-
-
 /**
  * \brief 3D edge between two SBAcam
  */

@@ -28,7 +28,7 @@
 
 namespace g2o {
 
-EdgeSE3LotsOfXYZ::EdgeSE3LotsOfXYZ() : BaseMultiEdge<-1, VectorX>(), _observedPoints(0) { resize(0); }
+EdgeSE3LotsOfXYZ::EdgeSE3LotsOfXYZ() : BaseVariableSizedEdge<-1, VectorX>(), _observedPoints(0) { resize(0); }
 
 bool EdgeSE3LotsOfXYZ::setMeasurementFromState() {
   VertexSE3 *pose = static_cast<VertexSE3 *>(_vertices[0]);
