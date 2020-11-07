@@ -20,8 +20,8 @@ set "VcPkgLibs=eigen3 suitesparse clapack openblas ceres"
 echo vcpkg found at %VcPkgDir%...
 echo installing %VcPkgLibs% for triplet %VcPkgTriplet%...
 
-call vcpkg upgrade %VcPkgLibs% --no-dry-run --triplet %VcPkgTriplet%
-call vcpkg install %VcPkgLibs% --triplet %VcPkgTriplet%
+call %VcPkgDir% upgrade %VcPkgLibs% --no-dry-run --triplet %VcPkgTriplet%
+call %VcPkgDir% install %VcPkgLibs% --triplet %VcPkgTriplet%
 
 popd
 
