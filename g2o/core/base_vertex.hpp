@@ -33,7 +33,7 @@ BaseVertex<D, T>::BaseVertex() :
 }
 
 template <int D, typename T>
-bool BaseVertex<D, T>::resizeDimension(int newDimension) {
+bool BaseVertex<D, T>::setEstimateDimension(int newDimension) {
 
   // If the dimension is known at compile time, check the dimension is unchanged and always return
   if (D > 0) {
@@ -51,25 +51,28 @@ bool BaseVertex<D, T>::resizeDimension(int newDimension) {
     return true;
 
   // Reset the internal state
-  if (resizeDimensionImpl(newDimension) == false)
+  if (setEstimateDimensionImpl(newDimension) == false)
     return false;
+
+  // Store the old dimension and assign the new
+  int oldDimension = _dimension;
+  _dimension = newDimension;
 
   // Clear the cache associated with this vertex
   setHessianIndex(-1);
   mapHessianMemory(nullptr);
-  _b.resize(newDimension);
+  _b.resize(_dimension);
   updateCache();
 
   // If the dimension is being increased and this vertex is in a
   // graph, update the size of the Jacobian workspace just in case it
   // needs to grow.
-  if ((newDimension > _dimension) && (_graph != nullptr)) {
+  if ((newDimension > oldDimension) && (_graph != nullptr)) {
       JacobianWorkspace& jacobianWorkspace = _graph->jacobianWorkspace();
       for (auto e : _edges)
         jacobianWorkspace.updateSize(e);
     }
 
-  _dimension = newDimension;
   return true;
 }
 

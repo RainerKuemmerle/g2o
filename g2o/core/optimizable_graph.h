@@ -114,7 +114,7 @@ namespace g2o {
 
         //! sets the node to the origin (used in the multilevel stuff)
         void setToOrigin() { setToOriginImpl(); updateCache();}
-
+	
         //! get the element from the hessian matrix
         virtual const number_t& hessian(int i, int j) const = 0;
         virtual number_t& hessian(int i, int j) = 0;
@@ -147,13 +147,24 @@ namespace g2o {
          */
         virtual number_t solveDirect(number_t lambda=0) = 0;
 
+	
+        /**
+         * sets the dimension of the state in the vertex; this can be used
+	 * on vertices which can be dynamically resized otherwise just confirms
+	 * dimension is consistent and acts as a no-op.
+         * Calls setEstimateDimension(); default implementation in 
+	 * BaseVertex creates a new zero vector of the right size
+         * @return true on success
+         */
+	virtual bool setEstimateDimension(int newDimension) = 0;
+
         /**
          * sets the initial estimate from an array of number_t
          * Implement setEstimateDataImpl()
          * @return true on success
          */
         bool setEstimateData(const number_t* estimate);
-
+	
         /**
          * sets the initial estimate from an array of number_t
          * Implement setEstimateDataImpl()
@@ -164,6 +175,7 @@ namespace g2o {
           int dim = estimateDimension();
           assert((dim == -1) || (estimate.size() == std::size_t(dim)));
 #endif
+	  setEstimateDimension(estimate.size());
           return setEstimateData(&estimate[0]);
         };
 
