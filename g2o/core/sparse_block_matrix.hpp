@@ -26,40 +26,17 @@
 
 namespace g2o {
 
-  namespace {
-    struct TripletEntry
-    {
-      int r, c;
-      number_t x;
-      TripletEntry(int r_, int c_, number_t x_) : r(r_), c(c_), x(x_) {}
-    };
-    struct TripletColSort
-    {
-      bool operator()(const TripletEntry& e1, const TripletEntry& e2) const
-      {
-        return e1.c < e2.c || (e1.c == e2.c && e1.r < e2.r);
-      }
-    };
-    /** Helper class to sort pair based on first elem */
-    template<class T1, class T2, class Pred = std::less<T1> >
-    struct CmpPairFirst {
-      bool operator()(const std::pair<T1,T2>& left, const std::pair<T1,T2>& right) {
-        return Pred()(left.first, right.first);
-      }
-    };
-  }
-
   template <class MatrixType>
   SparseBlockMatrix<MatrixType>::SparseBlockMatrix( const int * rbi, const int* cbi, int rb, int cb, bool hasStorage):
     _rowBlockIndices(rbi,rbi+rb),
     _colBlockIndices(cbi,cbi+cb),
-    _blockCols(cb), _hasStorage(hasStorage) 
+    _blockCols(cb), _hasStorage(hasStorage)
   {
   }
 
   template <class MatrixType>
   SparseBlockMatrix<MatrixType>::SparseBlockMatrix( ):
-    _blockCols(0), _hasStorage(true) 
+    _blockCols(0), _hasStorage(true)
   {
   }
 
@@ -331,8 +308,8 @@ namespace g2o {
 #   endif
     for (int i=0; i < static_cast<int>(_blockCols.size()); ++i){
       int destOffset = colBaseOfBlock(i);
-      for (typename SparseBlockMatrix<MatrixType>::IntBlockMap::const_iterator it=_blockCols[i].begin(); 
-          it!=_blockCols[i].end(); 
+      for (typename SparseBlockMatrix<MatrixType>::IntBlockMap::const_iterator it=_blockCols[i].begin();
+          it!=_blockCols[i].end();
           ++it){
         const typename SparseBlockMatrix<MatrixType>::SparseMatrixBlock* a=it->second;
         int srcOffset = rowBaseOfBlock(it->first);
@@ -340,7 +317,7 @@ namespace g2o {
         internal::template atxpy<typename SparseBlockMatrix<MatrixType>::SparseMatrixBlock>(*a, srcVec, srcOffset, destVec, destOffset);
       }
     }
-    
+
   }
 
   template <class MatrixType>
@@ -466,7 +443,7 @@ namespace g2o {
     for (size_t i=0; i<n; ++i){
       //cerr << PVAR(i) <<  " ";
       int pi=pinv[i];
-      for (typename SparseBlockMatrix<MatrixType>::IntBlockMap::const_iterator it=_blockCols[i].begin(); 
+      for (typename SparseBlockMatrix<MatrixType>::IntBlockMap::const_iterator it=_blockCols[i].begin();
           it!=_blockCols[i].end(); ++it){
         int pj=pinv[it->first];
 
@@ -487,10 +464,10 @@ namespace g2o {
         }
       }
       //cerr << endl;
-      // within each row, 
+      // within each row,
     }
     return true;
-    
+
   }
 
   template <class MatrixType>
@@ -581,7 +558,7 @@ namespace g2o {
   {
     std::string name = filename;
     std::string::size_type lastDot = name.find_last_of('.');
-    if (lastDot != std::string::npos) 
+    if (lastDot != std::string::npos)
       name = name.substr(0, lastDot);
 
     std::vector<TripletEntry> entries;

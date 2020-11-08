@@ -41,6 +41,7 @@
 #include "matrix_operations.h"
 #include "g2o/config.h"
 #include "g2o/stuff/misc.h"
+#include "g2o/stuff/sparse_helper.h"
 
 namespace g2o {
 /**
@@ -57,7 +58,7 @@ namespace g2o {
  * the same size, and the size of the block is specified by the
  * template argument.  If this is not the case, and you have different
  * block sizes than you have to use a dynamic-block matrix (default
- * template argument).  
+ * template argument).
  */
 template <class MatrixType = MatrixX >
 class SparseBlockMatrix {
@@ -75,9 +76,9 @@ class SparseBlockMatrix {
 
     /**
      * constructs a sparse block matrix having a specific layout
-     * @param rbi: array of int containing the row layout of the blocks. 
+     * @param rbi: array of int containing the row layout of the blocks.
      * the component i of the array should contain the index of the first row of the block i+1.
-     * @param cbi: array of int containing the column layout of the blocks. 
+     * @param cbi: array of int containing the column layout of the blocks.
      *  the component i of the array should contain the index of the first col of the block i+1.
      * @param rb: number of row blocks
      * @param cb: number of col blocks
@@ -90,7 +91,7 @@ class SparseBlockMatrix {
 
     ~SparseBlockMatrix();
 
-    
+
     //! this zeroes all the blocks. If dealloc=true the blocks are removed from memory
     void clear(bool dealloc=false) ;
 
@@ -112,9 +113,9 @@ class SparseBlockMatrix {
     inline int colBaseOfBlock(int c) const { return c ? _colBlockIndices[c-1] : 0 ; }
 
     //! number of non-zero elements
-    size_t nonZeros() const; 
+    size_t nonZeros() const;
     //! number of allocated blocks
-    size_t nonZeroBlocks() const; 
+    size_t nonZeroBlocks() const;
 
     //! deep copy of a sparse-block-matrix;
     SparseBlockMatrix* clone() const ;
@@ -233,7 +234,7 @@ class SparseBlockMatrix {
 template < class  MatrixType >
 std::ostream& operator << (std::ostream&, const SparseBlockMatrix<MatrixType>& m);
 
-  typedef SparseBlockMatrix<MatrixX> SparseBlockMatrixX;   
+  typedef SparseBlockMatrix<MatrixX> SparseBlockMatrixX;
 
 } //end namespace
 

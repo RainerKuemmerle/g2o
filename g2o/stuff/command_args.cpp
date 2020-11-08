@@ -32,7 +32,9 @@
 #include <algorithm>
 #include <functional>
 
+#include "misc.h"
 #include "os_specific.h"
+#include "string_tools.h"
 using namespace std;
 
 namespace g2o {
@@ -75,34 +77,10 @@ std::ostream& operator<<(std::ostream& os, const std::vector<int>& v){
   return os;
 }
 
-/**
- * convert a string into an other type.
- */
-template<typename T>
-bool convertString(const std::string& s, T& x)
-{
-  std::istringstream i(s);
-  if (! (i >> x))
-    return false;
-  return true;
-}
-
-/** Helper class to sort pair based on first elem */
-template<class T1, class T2, class Pred = std::less<T1> >
-struct CmpPairFirst {
-  bool operator()(const std::pair<T1,T2>& left, const std::pair<T1,T2>& right) {
-    return Pred()(left.first, right.first);
-  }
-};
-
 enum CommandArgumentType
 {
   CAT_DOUBLE, CAT_FLOAT, CAT_INT, CAT_STRING, CAT_BOOL, CAT_VECTOR_INT, CAT_VECTOR_DOUBLE
 };
-
-CommandArgs::CommandArgs()
-{
-}
 
 CommandArgs::~CommandArgs()
 {
@@ -501,18 +479,6 @@ std::string CommandArgs::arg2str(const CommandArgument& ca) const
   }
   return "";
 }
-
-std::string CommandArgs::trim(const std::string& s) const
-{
-  if(s.length() == 0)
-    return s;
-  string::size_type b = s.find_first_not_of(" \t\n");
-  string::size_type e = s.find_last_not_of(" \t\n");
-  if(b == string::npos)
-    return "";
-  return std::string(s, b, e - b + 1);
-}
-
 
 std::istream& operator>>(std::istream& is, std::vector<double>& v){
   string s;
