@@ -31,110 +31,63 @@
 
 namespace g2o {
 
-  G2O_USE_TYPE_GROUP(sba);
-  
-  G2O_REGISTER_TYPE_GROUP(sim3);
+G2O_USE_TYPE_GROUP(sba);
+G2O_REGISTER_TYPE_GROUP(sim3);
 
-  G2O_REGISTER_TYPE(VERTEX_SIM3:EXPMAP, VertexSim3Expmap);
-  G2O_REGISTER_TYPE(EDGE_SIM3:EXPMAP, EdgeSim3);
-  G2O_REGISTER_TYPE(EDGE_PROJECT_SIM3_XYZ:EXPMAP, EdgeSim3ProjectXYZ);
-  G2O_REGISTER_TYPE(EDGE_PROJECT_INVERSE_SIM3_XYZ:EXPMAP, EdgeInverseSim3ProjectXYZ);
-  
-    VertexSim3Expmap::VertexSim3Expmap() : BaseVertex<7, Sim3>()
-    {
-        _marginalized=false;
-        _fix_scale = false;
-        
-        _principle_point1[0] = 0;
-        _principle_point1[1] = 0;
-        _focal_length1[0] = 1;
-        _focal_length1[1] = 1;
-        
-        _principle_point2[0] = 0;
-        _principle_point2[1] = 0;
-        _focal_length2[0] = 1;
-        _focal_length2[1] = 1;
-    }
-    
-    
-    EdgeSim3::EdgeSim3() :
-    BaseBinaryEdge<7, Sim3, VertexSim3Expmap, VertexSim3Expmap>()
-    {
-    }
-    
-    
-    bool VertexSim3Expmap::read(std::istream &is) {
-        Vector7 cam2world;
-        for (int i = 0; i < 6; i++) {
-            is >> cam2world[i];
-        }
-        is >> cam2world[6];
-        //    if (! is) {
-        //      // if the scale is not specified we set it to 1;
-        //      std::cerr << "!s";
-        //      cam2world[6]=0.;
-        //    }
-        
-        for (int i = 0; i < 2; i++) {
-            is >> _focal_length1[i];
-        }
-        for (int i = 0; i < 2; i++) {
-            is >> _principle_point1[i];
-        }
-        
-        setEstimate(Sim3(cam2world).inverse());
-        return true;
-    }
-    
-    bool VertexSim3Expmap::write(std::ostream &os) const {
-        Sim3 cam2world(estimate().inverse());
-        Vector7 lv = cam2world.log();
-        for (int i = 0; i < 7; i++) {
-            os << lv[i] << " ";
-        }
-        for (int i = 0; i < 2; i++) {
-            os << _focal_length1[i] << " ";
-        }
-        for (int i = 0; i < 2; i++) {
-            os << _principle_point1[i] << " ";
-        }
-        return os.good();
-    }
-    
-bool EdgeSim3::read(std::istream& is)
-  {
-    Vector7 v7;
-    for (int i=0; i<7; i++){
-      is >> v7[i];
-    }
+G2O_REGISTER_TYPE(VERTEX_SIM3:EXPMAP, VertexSim3Expmap);
+G2O_REGISTER_TYPE(EDGE_SIM3:EXPMAP, EdgeSim3);
+G2O_REGISTER_TYPE(EDGE_PROJECT_SIM3_XYZ:EXPMAP, EdgeSim3ProjectXYZ);
+G2O_REGISTER_TYPE(EDGE_PROJECT_INVERSE_SIM3_XYZ:EXPMAP, EdgeInverseSim3ProjectXYZ);
 
-    Sim3 cam2world(v7);
-    setMeasurement(cam2world.inverse());
+VertexSim3Expmap::VertexSim3Expmap() : BaseVertex<7, Sim3>() {
+  _marginalized = false;
+  _fix_scale = false;
 
-    for (int i=0; i<7; i++)
-      for (int j=i; j<7; j++)
-      {
-        is >> information()(i,j);
-        if (i!=j)
-          information()(j,i)=information()(i,j);
-      }
-    return true;
-  }
+  _principle_point1[0] = 0;
+  _principle_point1[1] = 0;
+  _focal_length1[0] = 1;
+  _focal_length1[1] = 1;
 
-  bool EdgeSim3::write(std::ostream& os) const
-  {
-    Sim3 cam2world(measurement().inverse());
-    Vector7 v7 = cam2world.log();
-    for (int i=0; i<7; i++)
-    {
-      os  << v7[i] << " ";
-    }
-    for (int i=0; i<7; i++)
-      for (int j=i; j<7; j++){
-        os << " " <<  information()(i,j);
-    }
-    return os.good();
-  }
+  _principle_point2[0] = 0;
+  _principle_point2[1] = 0;
+  _focal_length2[0] = 1;
+  _focal_length2[1] = 1;
+}
+
+EdgeSim3::EdgeSim3() : BaseBinaryEdge<7, Sim3, VertexSim3Expmap, VertexSim3Expmap>() {}
+
+bool VertexSim3Expmap::read(std::istream &is) {
+  Vector7 cam2world;
+  bool state = true;
+  state &= internal::readVector(is, cam2world);
+  state &= internal::readVector(is, _focal_length1);
+  state &= internal::readVector(is, _principle_point1);
+  setEstimate(Sim3(cam2world).inverse());
+  return state;
+}
+
+bool VertexSim3Expmap::write(std::ostream &os) const {
+  Sim3 cam2world(estimate().inverse());
+  Vector7 lv = cam2world.log();
+  internal::writeVector(os, lv);
+  internal::writeVector(os, _focal_length1);
+  internal::writeVector(os, _principle_point1);
+  return os.good();
+}
+
+bool EdgeSim3::read(std::istream &is) {
+  Vector7 v7;
+  internal::readVector(is, v7);
+  Sim3 cam2world(v7);
+  setMeasurement(cam2world.inverse());
+  return readInformationMatrix(is);
+}
+
+bool EdgeSim3::write(std::ostream &os) const {
+  Sim3 cam2world(measurement().inverse());
+  internal::writeVector(os, cam2world.log());
+  return writeInformationMatrix(os);
+}
 
 #if G2O_SIM3_JACOBIAN
 void EdgeSim3::linearizeOplus() {
@@ -154,8 +107,8 @@ void EdgeSim3::linearizeOplus() {
     const Eigen::Matrix<double, 7, 7> I7 = Eigen::Matrix<double, 7, 7>::Identity();
     const Eigen::Matrix<double, 3, 3> I3 = Eigen::Matrix<double, 3, 3>::Identity();
 
-    // Jacobi Matrix of Si 
-    // note: because the order of rotation and translation is different, 
+    // Jacobi Matrix of Si
+    // note: because the order of rotation and translation is different,
     //       so it is slightly different from the formula.
     Eigen::Matrix<double, 7, 7> jacobi_i = Eigen::Matrix<double, 7, 7>::Zero();
     jacobi_i.block<3, 3>(0, 0) = -skew(phi);
@@ -173,7 +126,7 @@ void EdgeSim3::linearizeOplus() {
 
     _jacobianOplusXi = (I7 + 0.5 * jacobi_i) * adj_Sji;
 
-    // Jacobi Matrix of Sj 
+    // Jacobi Matrix of Sj
     Eigen::Matrix<double, 7, 7> jacobi_j = Eigen::Matrix<double, 7, 7>::Zero();
     jacobi_j.block<3, 3>(0, 0) = skew(phi);
     jacobi_j.block<3, 3>(3, 3) = skew(phi) + s * I3;
@@ -183,71 +136,33 @@ void EdgeSim3::linearizeOplus() {
     _jacobianOplusXj = -(I7 + 0.5 * jacobi_j);
 }
 #endif
-    
+
   /**Sim3ProjectXYZ*/
 
-  EdgeSim3ProjectXYZ::EdgeSim3ProjectXYZ() :
-  BaseBinaryEdge<2, Vector2, VertexSBAPointXYZ, VertexSim3Expmap>()
-  {
-  }
+EdgeSim3ProjectXYZ::EdgeSim3ProjectXYZ() : BaseBinaryEdge<2, Vector2, VertexSBAPointXYZ, VertexSim3Expmap>() {}
 
-  bool EdgeSim3ProjectXYZ::read(std::istream& is)
-  {
-    for (int i=0; i<2; i++)
-    {
-      is >> _measurement[i];
-    }
+bool EdgeSim3ProjectXYZ::read(std::istream &is) {
+  internal::readVector(is, _measurement);
+  return readInformationMatrix(is);
+}
 
-    for (int i=0; i<2; i++)
-      for (int j=i; j<2; j++) {
-  is >> information()(i,j);
-      if (i!=j)
-        information()(j,i)=information()(i,j);
-    }
-    return true;
-  }
-
-  bool EdgeSim3ProjectXYZ::write(std::ostream& os) const
-  {
-    for (int i=0; i<2; i++){
-      os  << _measurement[i] << " ";
-    }
-
-    for (int i=0; i<2; i++)
-      for (int j=i; j<2; j++){
-  os << " " <<  information()(i,j);
-    }
-    return os.good();
-  }
+bool EdgeSim3ProjectXYZ::write(std::ostream &os) const {
+  internal::writeVector(os, _measurement);
+  return writeInformationMatrix(os);
+}
 
 EdgeInverseSim3ProjectXYZ::EdgeInverseSim3ProjectXYZ() :
     BaseBinaryEdge<2, Vector2, VertexSBAPointXYZ, VertexSim3Expmap>() {
 }
 
 bool EdgeInverseSim3ProjectXYZ::read(std::istream &is) {
-  for (int i = 0; i < 2; i++) {
-    is >> _measurement[i];
-  }
-
-  for (int i = 0; i < 2; i++)
-    for (int j = i; j < 2; j++) {
-      is >> information()(i, j);
-      if (i != j)
-        information()(j, i) = information()(i, j);
-    }
-  return true;
+  internal::readVector(is, _measurement);
+  return readInformationMatrix(is);
 }
 
 bool EdgeInverseSim3ProjectXYZ::write(std::ostream &os) const {
-  for (int i = 0; i < 2; i++) {
-    os << _measurement[i] << " ";
-  }
-
-  for (int i = 0; i < 2; i++)
-    for (int j = i; j < 2; j++) {
-      os << " " << information()(i, j);
-    }
-  return os.good();
+  internal::writeVector(os, _measurement);
+  return writeInformationMatrix(os);
 }
 
 //  void EdgeSim3ProjectXYZ::linearizeOplus()
