@@ -189,7 +189,7 @@ int main(int argc, char** argv) {
     robot.addSensor(segmentSensorPointLine);
     Matrix3d m3=segmentSensorPointLine->information();
     m3=m3*1000;
-    m3(3,3)*=10;
+    m3(2,2)*=10;
     segmentSensorPointLine->setInformation(m3);
 
     ss << "-segment2d";
