@@ -26,7 +26,7 @@ public:
 
   // Create the vertex and assign the starting dimension
   PolynomialCoefficientVertex(int startingDimension = 0) {
-    resizeDimension(startingDimension);
+    setEstimateDimension(startingDimension);
   }
 
   // Read the vertex
@@ -41,7 +41,7 @@ public:
 
     // Resize; call the resize method because this ensures that the Jacobian
     // workspace is properly updated
-    resizeDimension(dimension);
+    setEstimateDimension(dimension);
 
     // Read the state
     return g2o::internal::readVector(is, _estimate);
@@ -62,19 +62,32 @@ public:
   // Direct linear add
   virtual void oplusImpl(const double* update) {
     Eigen::VectorXd::ConstMapType v(update, _dimension);
+    //std::cout << v << std::endl;
     _estimate += v;
   }
 
   // Resize the vertex state. This uses Eigen's conservative resize.
   // Note we do not zero out the vector to keep what coefficients can be
   // kept which changing size.
-  virtual bool resizeDimensionImpl(int newDimension)
+  virtual bool setEstimateDimensionImpl(int newDimension)
   {
-    int oldDimension = _estimate.size();
+    int oldDimension = estimateDimension();
 
-    // This attempts to keep as much of the state as possible
+    // Handle the special case this is the first time
+    //if (_dimension == Eigen::Dynamic) {
+      std::cout << "*" << std::endl;
+      _estimate.resize(newDimension);
+      _estimate.setZero();
+      return true;
+      //}
+
     _estimate.conservativeResize(newDimension);
-    
+
+    // If the state has expanded, set the new values to zero
+    std::cout << oldDimension << ":" << newDimension << std::endl;
+    if (oldDimension < newDimension)
+      _estimate.tail(newDimension-oldDimension).setZero();
+
     return true;
   }
 };
@@ -123,30 +136,89 @@ private:
 
 int main(int argc, const char* argv[]) {
 
-  // Quick test
+  // Set ground truth dimensions
+  int polynomialDimension = 4;
+  if (argc > 1) {
+    polynomialDimension = atoi(argv[1]);
+  }
 
-  Eigen::VectorXd p(3);
+  // Create the coefficients for the polynomial (all drawn randomly)
+  Eigen::VectorXd p(polynomialDimension);
+  for (int i = 0; i < polynomialDimension; ++i) {
+    p[i] = g2o::sampleUniform(-1, 1);
+  }
 
-  p[0] = 1;
-  p[1] = 1;
-  p[2] = 0;
+  std::cout << "Ground truth vector=" << p.transpose() << std::endl;
+
+  // Set number of observations
+  int obs = 6;
+  if (argc > 2) {
+    obs = atoi(argv[2]);
+  }  
+
+  // Sample the observations
+  double sigmaZ = 0.1;
+  Eigen::VectorXd x(obs);
+  Eigen::VectorXd z(obs);
+
+  for (int i = 0; i < obs; ++i) {
+    x[i] = g2o::sampleUniform(-5, 5);
+    z[i] = Eigen::poly_eval(p, x[i]) + sigmaZ * g2o::sampleGaussian();
+   }
+
+  // Construct the graph and set up the solver and optimiser
+  std::unique_ptr<g2o::BlockSolverX::LinearSolverType> linearSolver = g2o::make_unique<
+    g2o::LinearSolverCSparse<g2o::BlockSolverX::PoseMatrixType>>();
+
+  // Set up the solver
+  std::unique_ptr<g2o::BlockSolverX> blockSolver = g2o::make_unique<g2o::BlockSolverX>(
+      move(linearSolver));
+
+  // Set up the optimisation algorithm
+  g2o::OptimizationAlgorithm* optimisationAlgorithm =
+    new g2o::OptimizationAlgorithmLevenberg(move(blockSolver));
+
+  // Create the graph and configure it
+  std::unique_ptr<g2o::SparseOptimizer> optimizer = g2o::make_unique<g2o::SparseOptimizer>();
+  optimizer->setVerbose(true);
+  optimizer->setAlgorithm(optimisationAlgorithm);
 
 
+  // Create the vertex; note its dimension is currently is undefined
+  PolynomialCoefficientVertex* pv = new PolynomialCoefficientVertex();
+  pv->setId(0);
+  optimizer->addVertex(pv);
+
+  // Create the information matrix
+  PolynomialSingleValueEdge::InformationType omega = PolynomialSingleValueEdge::InformationType::Zero();
+  omega(0, 0) = 1 / (sigmaZ * sigmaZ);
+  
+  // Create the edges
+  PolynomialSingleValueEdge* pe;
+  for (int i = 0; i < obs; ++i)
+    {
+      pe = new PolynomialSingleValueEdge(x[i], z[i], omega);
+      pe->setVertex(0, pv);
+      optimizer->addEdge(pe);
+    }
+
+  // Iterate over different vertex sizes from 1 to the number of dimensions
+  for (int testDimension = 1; testDimension <= polynomialDimension; ++testDimension) {
+    pv->setEstimateDimension(testDimension);
+    optimizer->initializeOptimization();
+    optimizer->optimize(10);
+    std::cout << "Computed parameters = " << pv->estimate().transpose() << std::endl;
+  }
+  
+  /*
   Eigen::VectorXd x(5);
   x[0] = -2;
   x[1] = -1;
   x[2] = 0;
   x[3] = 1;
-  x[4] = 1;
+  x[4] = 2;
 
   for (int i = 0; i < 5; ++i) {
-    std::cout << Eigen::poly_eval(p, x[i]) << std::endl;
-  }
-  PolynomialCoefficientVertex* pv = new PolynomialCoefficientVertex();
-
-  std::cout << pv->estimate() << std::endl;
-
-  pv->resizeDimension(2);
-  std::cout << pv->estimate() << std::endl;
-  
+    std::cout << x[i] << ":" << Eigen::poly_eval(p, x[i]) << std::endl;
+    }*/
 }
