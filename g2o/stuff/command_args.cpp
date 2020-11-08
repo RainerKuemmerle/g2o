@@ -39,21 +39,12 @@ using namespace std;
 
 namespace g2o {
 
-// forward declarations
-std::istream& operator>>(std::istream& is, std::vector<int>& v);
-std::ostream& operator<<(std::ostream& os, const std::vector<int>& v);
-std::istream& operator>>(std::istream& is, std::vector<double>& v);
-std::ostream& operator<<(std::ostream& os, const std::vector<double>& v);
-
-std::istream& operator>>(std::istream& is, std::vector<int>& v){
-  string s;
-  if (! (is >> s) )
-    return is;
+static void readVector(const std::string& s, std::vector<int>& v){
+  v.clear();
 
   const char* c = s.c_str();
   char* caux = const_cast<char*>(c);
 
-  v.clear();
   bool hasNextValue=true;
   while(hasNextValue){
     int i = static_cast<int>(strtol(c,&caux,10));
@@ -64,16 +55,42 @@ std::istream& operator>>(std::istream& is, std::vector<int>& v){
     } else
       hasNextValue = false;
   }
-  return is;
 }
 
-std::ostream& operator<<(std::ostream& os, const std::vector<int>& v){
+static std::ostream& writeVector(std::ostream& os, const std::vector<int>& v){
   if (v.size()){
     os << v[0];
   }
   for (size_t i=1; i<v.size(); i++){
     os << "," << v[i];
   }
+  return os;
+}
+
+static void readVector(const std::string& s, std::vector<double>& v){
+  v.clear();
+
+  const char* c = s.c_str();
+  char* caux = const_cast<char*>(c);
+
+  bool hasNextValue=true;
+  while(hasNextValue){
+    double i=strtod(c,&caux);
+    if (c!=caux){
+      c=caux;
+      c++;
+      v.push_back(i);
+    } else
+      hasNextValue = false;
+  }
+}
+
+static std::ostream& writeVector(std::ostream& os, const std::vector<double>& v)
+{
+  if (v.size())
+    os << v[0];
+  for (size_t i=1; i<v.size(); i++)
+    os << ";" << v[i];
   return os;
 }
 
@@ -147,9 +164,7 @@ bool CommandArgs::parseArgs(int argc, char** argv, bool exitOnError)
           exit(1);
         return false;
       }
-
     }
-
   } // for argv[i]
 
   if ((int)_leftOvers.size() > argc - i) {
@@ -311,7 +326,6 @@ void CommandArgs::printHelp(std::ostream& os)
   }
 }
 
-
 void CommandArgs::setBanner(const std::string& banner)
 {
   _banner = banner;
@@ -406,7 +420,8 @@ void CommandArgs::str2arg(const std::string& input, CommandArgument& ca) const
     case CAT_VECTOR_INT:
       {
         std::vector<int> aux;
-        bool convertStatus = convertString(input, aux);
+        readVector(input, aux);
+        bool convertStatus = aux.size() > 0;
         if (convertStatus) {
           std::vector<int>* data = static_cast< std::vector<int>* >(ca.data);
           *data = aux;
@@ -416,7 +431,8 @@ void CommandArgs::str2arg(const std::string& input, CommandArgument& ca) const
     case CAT_VECTOR_DOUBLE:
       {
         std::vector<double> aux;
-        bool convertStatus = convertString(input, aux);
+        readVector(input, aux);
+        bool convertStatus = aux.size() > 0;
         if (convertStatus) {
           std::vector<double>* data = static_cast< std::vector<double>* >(ca.data);
           *data = aux;
@@ -466,49 +482,18 @@ std::string CommandArgs::arg2str(const CommandArgument& ca) const
       {
         std::vector<int> * data = static_cast< std::vector<int> * >(ca.data);
         stringstream auxStream;
-        auxStream << (*data);
+        writeVector(auxStream, (*data));
         return auxStream.str();
       }
     case CAT_VECTOR_DOUBLE:
       {
         std::vector<double> * data = static_cast< std::vector<double> * >(ca.data);
         stringstream auxStream;
-        auxStream << (*data);
+        writeVector(auxStream, (*data));
         return auxStream.str();
       }
   }
   return "";
-}
-
-std::istream& operator>>(std::istream& is, std::vector<double>& v){
-  string s;
-  if (! (is >> s) )
-    return is;
-
-  const char* c = s.c_str();
-  char* caux = const_cast<char*>(c);
-
-  v.clear();
-  bool hasNextValue=true;
-  while(hasNextValue){
-    double i=strtod(c,&caux);
-    if (c!=caux){
-      c=caux;
-      c++;
-      v.push_back(i);
-    } else
-      hasNextValue = false;
-  }
-  return is;
-}
-
-std::ostream& operator<<(std::ostream& os, const std::vector<double>& v)
-{
-  if (v.size())
-    os << v[0];
-  for (size_t i=1; i<v.size(); i++)
-    os << ";" << v[i];
-  return os;
 }
 
 bool CommandArgs::parsedParam(const std::string& param) const
