@@ -20,7 +20,7 @@ class DynamicVertex : public g2o::BaseVertex<Eigen::Dynamic, Eigen::VectorXd>
   
   DynamicVertex(int startingDimension = 0)
   {
-    resizeDimension(startingDimension);
+    setEstimateDimension(startingDimension);
   }
   
   virtual bool read(std::istream& /*is*/)
@@ -46,7 +46,7 @@ class DynamicVertex : public g2o::BaseVertex<Eigen::Dynamic, Eigen::VectorXd>
     _estimate += v;
   }
 
-  virtual bool resizeDimensionImpl(int newDimension)
+  virtual bool setEstimateDimensionImpl(int newDimension)
   {
      _estimate.resize(newDimension);
      _estimate.setZero();
@@ -226,7 +226,7 @@ void testUnaryEdge(int dimension)
 
 
 // Test what happens if we resize a vertex with a unary edge
-void testReizeUnaryEdge(int dim1, int dim2)
+void testResizeUnaryEdge(int dim1, int dim2)
 {
   // Create the optimizer
   g2o::SparseOptimizer* optimizer = buildOptimizer();
@@ -264,7 +264,7 @@ void testReizeUnaryEdge(int dim1, int dim2)
 
   // Now resize everything
   
-  v0->resizeDimension(dim2);
+  v0->setEstimateDimension(dim2);
   v0->setToOrigin();
 
   measurement.resize(dim2);
@@ -293,7 +293,7 @@ void testBinaryEdgeDD(int dimV0, int dimV1, int dimM)
   // Create the vertex, set the dimensions and clear the state to set
   // it to a known value
   DynamicVertex* v0 = new DynamicVertex(dimV0);
-  v0->resizeDimension(dimV0);
+  v0->setEstimateDimension(dimV0);
   v0->setToOrigin();
   optimizer->addVertex(v0);
 
@@ -390,8 +390,8 @@ int main(int argc, const char* argv[])
   testUnaryEdge(2);
   testUnaryEdge(20);
 
-  testReizeUnaryEdge(1, 2);
-  testReizeUnaryEdge(2, 1);
+  testResizeUnaryEdge(1, 2);
+  testResizeUnaryEdge(2, 1);
   
     
     
