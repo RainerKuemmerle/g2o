@@ -58,34 +58,20 @@ namespace g2o {
 
   VelocityMeasurement OdomConvert::convertToVelocity(const MotionMeasurement& m)
   {
-    Vector2 px2(0, 10);
-
     if (fabs(m.theta()) > 1e-7) {
-      Rotation2D rot(m.theta());
-      Vector2 px3(m.x(), m.y());
-      Vector2 px4(rot * px2 + px3);
+      const number_t translation = std::hypot(m.x(), m.y());
+      const number_t R = translation / (2 * sin(m.theta() / 2));
+      number_t w = 0.;
+      if (fabs(m.dt()) > 1e-7) w = m.theta() / m.dt();
 
-      const number_t& y2 = px2.y();
-      const number_t& x3 = px3.x();
-      const number_t& y3 = px3.y();
-      const number_t& x4 = px4.x();
-      const number_t& y4 = px4.y();
-
-      number_t R = (y2 * (x3*y4 - y3*x4)) / (y2 * (x3 - x4));
-      number_t w;
-      if (fabs(m.dt()) > 1e-7)
-        w = m.theta() / m.dt();
-      else
-        w = 0.;
-
-      number_t vl = (2.*R*w - w) / 2.;
-      number_t vr = w + vl;
+      const number_t vl = (2.*R*w - w) / 2.;
+      const number_t vr = w + vl;
 
       return VelocityMeasurement(vl, vr, m.dt());
     } else {
       number_t vl, vr;
       if (fabs(m.dt()) > 1e-7)
-        vl = vr = hypot(m.x(), m.y()) / m.dt();
+        vl = vr = std::hypot(m.x(), m.y()) / m.dt();
       else
         vl = vr = 0.;
       return VelocityMeasurement(vl, vr, m.dt());
@@ -113,7 +99,6 @@ namespace g2o {
     }
 
     return MotionMeasurement(x, y, theta, v.dt());
-
   }
 
 } // end namespace

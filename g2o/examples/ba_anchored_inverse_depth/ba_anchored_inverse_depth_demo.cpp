@@ -277,8 +277,8 @@ int main(int argc, const char* argv[]){
       exit(-1);
     }
     g2o::VertexSE3Expmap* v_anchor = dynamic_cast<g2o::VertexSE3Expmap*>(v_it->second);
-    if (v_p==0){
-      cerr << "Vertex " << it->first << "is not a SE3Expmap!" << endl;
+    if (v_anchor==0){
+      cerr << "Vertex " << it->second << "is not a SE3Expmap!" << endl;
       exit(-1);
     }
     Vector3d diff = v_anchor->estimate().inverse()*invert_depth(v_p->estimate())-true_points[it->second];

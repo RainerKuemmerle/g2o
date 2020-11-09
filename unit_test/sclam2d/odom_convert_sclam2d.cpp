@@ -45,6 +45,7 @@ TEST(Sclam2D, MotionMeasurementCtor)
   ASSERT_DOUBLE_EQ(0.3, m2.theta());
   ASSERT_DOUBLE_EQ(0.5, m2.dt());
 }
+
 TEST(Sclam2D, VelocityMeasurementCtor)
 {
   VelocityMeasurement v1(0.1, 0.2, 0.7);

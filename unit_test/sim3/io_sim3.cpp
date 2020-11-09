@@ -1,5 +1,5 @@
 // g2o - General Graph Optimization
-// Copyright (C) 2011 R. Kuemmerle, G. Grisetti, W. Burgard
+// Copyright (C) 2014 R. Kuemmerle, G. Grisetti, W. Burgard
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -24,32 +24,39 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "laser_parameters.h"
+#include <sstream>
 
-namespace g2o {
+#include "g2o/types/sim3/types_seven_dof_expmap.h"
+#include "gtest/gtest.h"
+#include "unit_test/test_helper/io.h"
 
-LaserParameters::LaserParameters(int t, int nbeams, number_t _firstBeamAngle, number_t _angularStep, number_t _maxRange,
-                                 number_t _accuracy, int _remissionMode, number_t _minRange)
-    : laserPose(SE2(0., 0., 0.)),
-      type(t),
-      firstBeamAngle(_firstBeamAngle),
-      fov(_angularStep * nbeams),
-      angularStep(_angularStep),
-      accuracy(_accuracy),
-      remissionMode(_remissionMode),
-      maxRange(_maxRange),
-      minRange(_minRange) {}
+using namespace std;
+using namespace g2o;
 
-LaserParameters::LaserParameters(int nbeams, number_t _firstBeamAngle, number_t _angularStep, number_t _maxRange,
-                                 number_t _minRange)
-    : laserPose(SE2(0., 0., 0.)),
-      type(0),
-      firstBeamAngle(_firstBeamAngle),
-      fov(_angularStep * nbeams),
-      angularStep(_angularStep),
-      accuracy(0.1),
-      remissionMode(0),
-      maxRange(_maxRange),
-      minRange(_minRange) {}
+struct RandomSim3 {
+  static Sim3 create() {
+    Vector3 randomPosition = Vector3::Random();
+    Quaternion randomOrientation(Vector4::Random().normalized());
+    return Sim3(randomOrientation, randomPosition, 1.0);
+  }
+  static bool isApprox(const Sim3& a, const Sim3& b) {
+    return a.translation().isApprox(b.translation(), 1e-5) && a.rotation().isApprox(b.rotation(), 1e-5) &&
+           fabs(a.scale() - b.scale()) < 1e-5;
+  }
+};
 
-}  // namespace g2o
+TEST(IoSim3, ReadWriteVertexSim3Expmap) {
+  readWriteVectorBasedVertex<VertexSim3Expmap, RandomSim3>();
+}
+
+TEST(IoSim3, ReadWriteEdgeSim3) {
+  readWriteVectorBasedEdge<EdgeSim3, RandomSim3>();
+}
+
+TEST(IoSim3, ReadWriteEdgeSim3ProjectXYZ) {
+  readWriteVectorBasedEdge<EdgeSim3ProjectXYZ>();
+}
+
+TEST(IoSim3, ReadWriteEdgeInverseSim3ProjectXYZ) {
+  readWriteVectorBasedEdge<EdgeInverseSim3ProjectXYZ>();
+}
