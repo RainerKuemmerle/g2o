@@ -124,6 +124,7 @@ class G2O_TYPES_SBA_API SBACam : public SE3Quat {
     Kcam(1, 2) = cy;
     Kcam(2, 2) = cst(1.0);
     baseline = tx;
+    setTransform();
     setProjection();
     setDr();
   }

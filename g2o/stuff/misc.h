@@ -45,6 +45,14 @@
 
 namespace g2o {
 
+/** Helper class to sort pair based on first elem */
+template <class T1, class T2, class Pred = std::less<T1> >
+struct CmpPairFirst {
+  bool operator()(const std::pair<T1, T2>& left, const std::pair<T1, T2>& right) {
+    return Pred()(left.first, right.first);
+  }
+};
+
 /**
  * helper function for creating an object in a unique_ptr.
  */
@@ -115,7 +123,7 @@ inline number_t normalize_theta(number_t theta)
 {
   if (theta >= -const_pi() && theta < const_pi())
     return theta;
-  
+
   number_t multiplier = std::floor(theta / (2*const_pi()));
   theta = theta - multiplier*2*const_pi();
   if (theta >= const_pi())
@@ -168,7 +176,7 @@ inline int sign(T x)
  * clamp x to the interval [l, u]
  */
 template <typename T>
-inline T clamp(T l, T x, T u) 
+inline T clamp(T l, T x, T u)
 {
   if (x < l)
     return l;
@@ -181,7 +189,7 @@ inline T clamp(T l, T x, T u)
  * wrap x to be in the interval [l, u]
  */
 template <typename T>
-inline T wrap(T l, T x, T u) 
+inline T wrap(T l, T x, T u)
 {
   T intervalWidth = u - l;
   while (x < l)
