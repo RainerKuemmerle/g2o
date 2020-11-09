@@ -125,8 +125,9 @@ namespace g2o {
 #endif
     
   protected:
-    
-    virtual bool setEstimateDimensionImpl(int /*newDimension*/) {
+
+    // This method is responsible for actually changing the dimension of the state
+    virtual bool changeEstimateDimensionImpl(int /*newDimension*/) {
       if (D < 0) {
           std::cerr << __PRETTY_FUNCTION__ << ": not implemented" << std::endl;
         }

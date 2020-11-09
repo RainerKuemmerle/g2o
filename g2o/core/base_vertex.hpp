@@ -51,7 +51,7 @@ bool BaseVertex<D, T>::setEstimateDimension(int newDimension) {
     return true;
 
   // Reset the internal state
-  if (setEstimateDimensionImpl(newDimension) == false)
+  if (changeEstimateDimensionImpl(newDimension) == false)
     return false;
 
   // Store the old dimension and assign the new

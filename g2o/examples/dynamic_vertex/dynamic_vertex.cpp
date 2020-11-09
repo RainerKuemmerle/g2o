@@ -46,7 +46,7 @@ class DynamicVertex : public g2o::BaseVertex<Eigen::Dynamic, Eigen::VectorXd>
     _estimate += v;
   }
 
-  virtual bool setEstimateDimensionImpl(int newDimension)
+  virtual bool changeEstimateDimensionImpl(int newDimension)
   {
      _estimate.resize(newDimension);
      _estimate.setZero();
