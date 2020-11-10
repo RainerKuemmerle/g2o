@@ -78,7 +78,7 @@ bool BaseVertex<D, T>::setEstimateDimension(int newDimension) {
 
 template <int D, typename T>
 number_t BaseVertex<D, T>::solveDirect(number_t lambda) {
-  Eigen::Matrix<number_t, D, D, Eigen::ColMajor> tempA=_hessian + Eigen::Matrix<number_t, D, D, Eigen::ColMajor>::Identity(VERTEX_DIM, VERTEX_DIM)*lambda;
+  Eigen::Matrix<number_t, D, D, Eigen::ColMajor> tempA=_hessian + Eigen::Matrix<number_t, D, D, Eigen::ColMajor>::Identity(G2O_VERTEX_DIM, G2O_VERTEX_DIM)*lambda;
   number_t det=tempA.determinant();
   if (g2o_isnan(det) || det < std::numeric_limits<number_t>::epsilon())
     return det;
@@ -95,5 +95,16 @@ void BaseVertex<D, T>::clearQuadraticForm() {
 template <int D, typename T>
 void BaseVertex<D, T>::mapHessianMemory(number_t* d)
 {
-  new (&_hessian) HessianBlockType(d, VERTEX_DIM, VERTEX_DIM);
+  new (&_hessian) HessianBlockType(d, G2O_VERTEX_DIM, G2O_VERTEX_DIM);
 }
+
+template <int D, typename T>
+bool BaseVertex<D, T>::changeEstimateDimensionImpl(int /*newDimension*/) {
+  if (D < 0) {
+    std::cerr << __PRETTY_FUNCTION__ << ": not implemented" << std::endl;
+  }
+  else {
+    std::cerr << __PRETTY_FUNCTION__ << ": should not be called for vertices with known compile time dimension" << std::endl;
+  }
+  return false;
+};

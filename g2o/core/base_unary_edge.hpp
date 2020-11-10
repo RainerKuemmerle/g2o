@@ -24,7 +24,7 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#define VERTEX_I_DIM ((VertexXiType::Dimension < 0) ? static_cast<const VertexXiType*> (_vertices[0])->dimension() : VertexXiType::Dimension)
+#define G2O_VERTEX_I_DIM ((VertexXiType::Dimension < 0) ? static_cast<const VertexXiType*> (_vertices[0])->dimension() : VertexXiType::Dimension)
 
 template <int D, typename E, typename VertexXiType>
 void BaseUnaryEdge<D, E, VertexXiType>::resize(size_t size)
@@ -81,7 +81,7 @@ void BaseUnaryEdge<D, E, VertexXiType>::constructQuadraticForm()
 template <int D, typename E, typename VertexXiType>
 void BaseUnaryEdge<D, E, VertexXiType>::linearizeOplus(JacobianWorkspace& jacobianWorkspace)
 {
-  new (&_jacobianOplusXi) JacobianXiOplusType(jacobianWorkspace.workspaceForVertex(0), D < 0 ? _dimension : D, VERTEX_I_DIM);
+  new (&_jacobianOplusXi) JacobianXiOplusType(jacobianWorkspace.workspaceForVertex(0), D < 0 ? _dimension : D, G2O_VERTEX_I_DIM);
   linearizeOplus();
 }
 
@@ -109,7 +109,7 @@ void BaseUnaryEdge<D, E, VertexXiType>::linearizeOplus()
   // dynamically allocated array. The value of 12 is used because
   // most vertices have a dimension significantly smaller than this.
 
-  const int vi_dim = VERTEX_I_DIM;
+  const int vi_dim = G2O_VERTEX_I_DIM;
 
   if ((VertexXiType::Dimension >= 0) || (vi_dim <= 12))
     {
@@ -167,4 +167,4 @@ void BaseUnaryEdge<D, E, VertexXiType>::initialEstimate(const OptimizableGraph::
   std::cerr << __PRETTY_FUNCTION__ << " is not implemented, please give implementation in your derived class" << std::endl;
 }
 
-#undef VERTEX_I_DIM
+#undef G2O_VERTEX_I_DIM

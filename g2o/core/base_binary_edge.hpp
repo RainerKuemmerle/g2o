@@ -24,8 +24,8 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#define VERTEX_I_DIM ((VertexXiType::Dimension < 0) ? static_cast<const VertexXiType*> (_vertices[0])->dimension() : VertexXiType::Dimension)
-#define VERTEX_J_DIM ((VertexXjType::Dimension < 0) ? static_cast<const VertexXjType*> (_vertices[1])->dimension() : VertexXjType::Dimension)
+#define G2O_VERTEX_I_DIM ((VertexXiType::Dimension < 0) ? static_cast<const VertexXiType*> (_vertices[0])->dimension() : VertexXiType::Dimension)
+#define G2O_VERTEX_J_DIM ((VertexXjType::Dimension < 0) ? static_cast<const VertexXjType*> (_vertices[1])->dimension() : VertexXjType::Dimension)
 
 template <int D, typename E, typename VertexXiType, typename VertexXjType>
 OptimizableGraph::Vertex* BaseBinaryEdge<D, E, VertexXiType, VertexXjType>::createFrom(){
@@ -138,8 +138,8 @@ void BaseBinaryEdge<D, E, VertexXiType, VertexXjType>::constructQuadraticForm()
 template <int D, typename E, typename VertexXiType, typename VertexXjType>
 void BaseBinaryEdge<D, E, VertexXiType, VertexXjType>::linearizeOplus(JacobianWorkspace& jacobianWorkspace)
 {
-  new (&_jacobianOplusXi) JacobianXiOplusType(jacobianWorkspace.workspaceForVertex(0), D < 0 ? _dimension : D, VERTEX_I_DIM);
-  new (&_jacobianOplusXj) JacobianXjOplusType(jacobianWorkspace.workspaceForVertex(1), D < 0 ? _dimension : D, VERTEX_J_DIM);
+  new (&_jacobianOplusXi) JacobianXiOplusType(jacobianWorkspace.workspaceForVertex(0), D < 0 ? _dimension : D, G2O_VERTEX_I_DIM);
+  new (&_jacobianOplusXj) JacobianXjOplusType(jacobianWorkspace.workspaceForVertex(1), D < 0 ? _dimension : D, G2O_VERTEX_J_DIM);
   linearizeOplus();
 }
 
@@ -172,7 +172,7 @@ void BaseBinaryEdge<D, E, VertexXiType, VertexXjType>::linearizeOplus()
     internal::QuadraticFormLock lck(*vi);
     //Xi - estimate the jacobian numerically
 
-    const int vi_dim = VERTEX_I_DIM;
+    const int vi_dim = G2O_VERTEX_I_DIM;
     
     if ((VertexXiType::Dimension >= 0) || (vi_dim <= 12)) {
 	number_t add_vi[(VertexXiType::Dimension >= 0) ? VertexXiType::Dimension : 12] = {};
@@ -224,7 +224,7 @@ void BaseBinaryEdge<D, E, VertexXiType, VertexXjType>::linearizeOplus()
     internal::QuadraticFormLock lck(*vj);
     //Xj - estimate the jacobian numerically
     
-    const int vj_dim = VERTEX_J_DIM;
+    const int vj_dim = G2O_VERTEX_J_DIM;
     
     if ((VertexXjType::Dimension >= 0) || (vj_dim <= 12)) {
         number_t add_vj[(VertexXjType::Dimension >= 0) ? VertexXjType::Dimension : 12] = {};
@@ -282,13 +282,13 @@ void BaseBinaryEdge<D, E, VertexXiType, VertexXjType>::mapHessianMemory(number_t
   (void) i; (void) j;
   //assert(i == 0 && j == 1);
   if (rowMajor) {
-    new (&_hessianTransposed) HessianBlockTransposedType(d, VERTEX_J_DIM, VERTEX_I_DIM);
+    new (&_hessianTransposed) HessianBlockTransposedType(d, G2O_VERTEX_J_DIM, G2O_VERTEX_I_DIM);
   } else {
-    new (&_hessian) HessianBlockType(d, VERTEX_I_DIM, VERTEX_J_DIM);
+    new (&_hessian) HessianBlockType(d, G2O_VERTEX_I_DIM, G2O_VERTEX_J_DIM);
   }
   _hessianRowMajor = rowMajor;
 }
 
-#undef VERTEX_I_DIM
-#undef VERTEX_J_DIM
+#undef G2O_VERTEX_I_DIM
+#undef G2O_VERTEX_J_DIM
 

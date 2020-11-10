@@ -37,7 +37,7 @@
 #include <stack>
 
 namespace g2o {
-#define VERTEX_DIM ((D < 0) ? _dimension : D)
+#define G2O_VERTEX_DIM ((D == Eigen::Dynamic) ? _dimension : D)
   /**
  * \brief Templatized BaseVertex
  *
@@ -60,8 +60,8 @@ namespace g2o {
   public:
     BaseVertex();
 
-    virtual const number_t& hessian(int i, int j) const { assert(i<VERTEX_DIM && j<VERTEX_DIM); return _hessian(i,j);}
-    virtual number_t& hessian(int i, int j)  { assert(i<VERTEX_DIM && j<VERTEX_DIM); return _hessian(i,j);}
+    virtual const number_t& hessian(int i, int j) const { assert(i<G2O_VERTEX_DIM && j<G2O_VERTEX_DIM); return _hessian(i,j);}
+    virtual number_t& hessian(int i, int j)  { assert(i<G2O_VERTEX_DIM && j<G2O_VERTEX_DIM); return _hessian(i,j);}
     virtual number_t hessianDeterminant() const {return _hessian.determinant();}
     virtual number_t* hessianData() { return const_cast<number_t*>(_hessian.data());}
 
@@ -70,12 +70,12 @@ namespace g2o {
     inline virtual bool setEstimateDimension(int newDimension);
 
     virtual int copyB(number_t* b_) const {
-      memcpy(b_, _b.data(), VERTEX_DIM * sizeof(number_t));
-      return VERTEX_DIM; 
+      memcpy(b_, _b.data(), G2O_VERTEX_DIM * sizeof(number_t));
+      return G2O_VERTEX_DIM; 
     }
 
     virtual const number_t& b(int i) const { assert(i < D); return _b(i);}
-    virtual number_t& b(int i) { assert(i < VERTEX_DIM); return _b(i);}
+    virtual number_t& b(int i) { assert(i < G2O_VERTEX_DIM); return _b(i);}
     virtual number_t* bData() { return _b.data();}
 
     inline virtual void clearQuadraticForm();
@@ -108,13 +108,13 @@ namespace g2o {
     }
 #else
     virtual void setEstimate(const EstimateType& et, bool changeEstimateDimensionIfNeeded = true) {
-      if (VERTEX_DIM == et.size()) {
+      if (G2O_VERTEX_DIM == et.size()) {
 	_estimate = et;
 	updateCache();
       }
       else {
 	if (changeEstimateDimensionIfNeeded == false) {
-	  assert((VERTEX_DIM != et.size()) && (changeEstimateDimensionIfNeeded == false));
+	  assert((G2O_VERTEX_DIM != et.size()) && (changeEstimateDimensionIfNeeded == false));
 	  std::cerr << __PRETTY_FUNCTION__ << ": the supplied estimate does not have the same dimension as the vertex, and resize is disabled" << std::endl;
 	  return;
 	}
@@ -127,15 +127,7 @@ namespace g2o {
   protected:
 
     // This method is responsible for actually changing the dimension of the state
-    virtual bool changeEstimateDimensionImpl(int /*newDimension*/) {
-      if (D < 0) {
-          std::cerr << __PRETTY_FUNCTION__ << ": not implemented" << std::endl;
-        }
-      else {
-          std::cerr << __PRETTY_FUNCTION__ << ": should not be called for vertices with known compile time dimension" << std::endl;
-        }
-      return false;
-    };
+    virtual bool changeEstimateDimensionImpl(int /*newDimension*/);
     
   protected:
     HessianBlockType _hessian;
@@ -148,7 +140,7 @@ namespace g2o {
 
 #include "base_vertex.hpp"
 
-#undef VERTEX_DIM
+#undef G2O_VERTEX_DIM
 
 } // end namespace g2o
 
