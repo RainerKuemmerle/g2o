@@ -19,8 +19,7 @@
 // This vertex stores the coefficients of the polynomial. It is dynamic because
 // we can change it at runtime.
 
-class PolynomialCoefficientVertex : public g2o::BaseVertex<Eigen::Dynamic, Eigen::VectorXd>
-{
+class PolynomialCoefficientVertex : public g2o::BaseVertex<Eigen::Dynamic, Eigen::VectorXd> {
 public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
 
@@ -94,13 +93,12 @@ public:
 
 // Note that x is not a measurement so it has to be stored separately.
 
-class PolynomialSingleValueEdge : public g2o::BaseUnaryEdge<1, double, PolynomialCoefficientVertex>
-{
+class PolynomialSingleValueEdge : public g2o::BaseUnaryEdge<1, double, PolynomialCoefficientVertex> {
+
 public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
 
-  PolynomialSingleValueEdge(double x, double z, const PolynomialSingleValueEdge::InformationType& omega)
-  {
+  PolynomialSingleValueEdge(double x, double z, const PolynomialSingleValueEdge::InformationType& omega) {
     _x = x;
     setMeasurement(z);
     setInformation(omega);
