@@ -152,8 +152,6 @@ namespace g2o {
          * sets the dimension of the state in the vertex; this can be used
 	 * on vertices which can be dynamically resized otherwise just confirms
 	 * dimension is consistent and acts as a no-op.
-         * Calls setEstimateDimension(); default implementation in 
-	 * BaseVertex creates a new zero vector of the right size
          * @return true on success
          */
 	virtual bool setEstimateDimension(int newDimension) = 0;
@@ -175,7 +173,6 @@ namespace g2o {
           int dim = estimateDimension();
           assert((dim == -1) || (estimate.size() == std::size_t(dim)));
 #endif
-	  setEstimateDimension(estimate.size());
           return setEstimateData(&estimate[0]);
         };
 
