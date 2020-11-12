@@ -1,7 +1,11 @@
 // This example illustrates how to use a dynamic vertex in a graph.
 
-// The goal is to fit a polynomial y=p(x) to a set of data. The degree of the
-// polynomial is user-defined. The amount of samples is user defined as well
+// The goal is to fit a polynomial y(x)=p(x) to a set of data. The degree of the
+// polynomial is user-defined. The amount of samples is user defined as well.
+
+// Each observation consists of the pair Z_i=(x_i,z_i) where
+// z_i=y(x_i)+w_i, where w_i is additive white noise with information
+// matrix Omega.
 
 #include <unsupported/Eigen/Polynomials>
 
@@ -68,7 +72,7 @@ public:
   // at the end if the state dimension has increased.
   virtual bool changeEstimateDimensionImpl(int newDimension)
   {
-    int oldDimension = estimateDimension();
+    int oldDimension = dimension();
 
     // Handle the special case this is the first time
     if (oldDimension == Eigen::Dynamic) {
@@ -150,7 +154,8 @@ int main(int argc, const char* argv[]) {
     obs = atoi(argv[2]);
   }  
 
-  // Sample the observations
+  // Sample the observations; we don't do anything with them here, but
+  // they could be plotted
   double sigmaZ = 0.1;
   Eigen::VectorXd x(obs);
   Eigen::VectorXd z(obs);
@@ -186,11 +191,10 @@ int main(int argc, const char* argv[]) {
   PolynomialSingleValueEdge::InformationType omega = PolynomialSingleValueEdge::InformationType::Zero();
   omega(0, 0) = 1 / (sigmaZ * sigmaZ);
   
-  // Create the edges
-  PolynomialSingleValueEdge* pe;
+  // Create the observations and the edges
   for (int i = 0; i < obs; ++i)
     {
-      pe = new PolynomialSingleValueEdge(x[i], z[i], omega);
+      PolynomialSingleValueEdge* pe = new PolynomialSingleValueEdge(x[i], z[i], omega);
       pe->setVertex(0, pv);
       optimizer->addEdge(pe);
     }
