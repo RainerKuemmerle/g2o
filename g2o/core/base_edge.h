@@ -29,6 +29,7 @@
 
 #include <iostream>
 #include <limits>
+#include <type_traits>
 
 #include <Eigen/Core>
 
@@ -57,6 +58,20 @@ namespace g2o {
     };
   #endif
 
+    template <int D>
+    struct BaseEdgeTraits {
+      static constexpr int Dimension = D;
+      typedef Eigen::Matrix<number_t, D, 1, Eigen::ColMajor> ErrorVector;
+      typedef Eigen::Matrix<number_t, D, D, Eigen::ColMajor> InformationType;
+    };
+
+    template <>
+    struct BaseEdgeTraits<-1> {
+      static constexpr int Dimension = -1;
+      typedef Eigen::Matrix<number_t, Eigen::Dynamic, 1, Eigen::ColMajor> ErrorVector;
+      typedef Eigen::Matrix<number_t, Eigen::Dynamic, Eigen::Dynamic, Eigen::ColMajor> InformationType;
+    };
+
   } // internal namespace
 
   template <int D, typename E>
@@ -64,10 +79,10 @@ namespace g2o {
   {
     public:
 
-      static const int Dimension = D;
+      static constexpr int Dimension = internal::BaseEdgeTraits<D>::Dimension;
       typedef E Measurement;
-      typedef Eigen::Matrix<number_t, D, 1, Eigen::ColMajor> ErrorVector;
-      typedef Eigen::Matrix<number_t, D, D, Eigen::ColMajor> InformationType;
+      typedef typename internal::BaseEdgeTraits<D>::ErrorVector ErrorVector;
+      typedef typename internal::BaseEdgeTraits<D>::InformationType InformationType;
 
       BaseEdge() : OptimizableGraph::Edge()
       {
@@ -96,13 +111,25 @@ namespace g2o {
 
       //! accessor functions for the measurement represented by the edge
       EIGEN_STRONG_INLINE const Measurement& measurement() const { return _measurement;}
-      virtual void setMeasurement(const Measurement& m) { _measurement = m; }
+      virtual void setMeasurement(const Measurement& m) { _measurement = m;}
 
       virtual int rank() const {return _dimension;}
 
       virtual void initialEstimate(const OptimizableGraph::VertexSet&, OptimizableGraph::Vertex*)
       {
         std::cerr << "inititialEstimate() is not implemented, please give implementation in your derived class" << std::endl;
+      }
+
+      /**
+       * set the dimension for a dynamically sizeable error function.
+       * The member will not be declared for edges having a fixed size at compile time.
+       */
+      template <int Dim = D>
+      typename std::enable_if<Dim == -1, void>::type setDimension(int dim) {
+        _dimension = dim;
+        _information.resize(dim, dim);
+        _error.resize(dim, 1);
+        _measurement.resize(dim, 1);
       }
 
     protected:
@@ -154,102 +181,6 @@ namespace g2o {
     public:
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   };
-
-
-  template<typename E>
-  class BaseEdge<-1,E> : public OptimizableGraph::Edge
-  {
-    public:
-
-      static const int Dimension = -1;
-      typedef E Measurement;
-      typedef Eigen::Matrix<number_t, Eigen::Dynamic, 1, Eigen::ColMajor> ErrorVector;
-      typedef Eigen::Matrix<number_t, Eigen::Dynamic, Eigen::Dynamic, Eigen::ColMajor> InformationType;
-
-      BaseEdge() : OptimizableGraph::Edge(){
-
-      }
-
-      virtual ~BaseEdge() {}
-
-      virtual number_t chi2() const
-      {
-        return _error.dot(information()*_error);
-      }
-
-      virtual const number_t* errorData() const { return _error.data();}
-      virtual number_t* errorData() { return _error.data();}
-      const ErrorVector& error() const { return _error;}
-      ErrorVector& error() { return _error;}
-
-      //! information matrix of the constraint
-      const InformationType& information() const { return _information;}
-
-      InformationType& information() { return _information;}
-
-      // Set the new information matrix.
-      void setInformation(const InformationType& information) {
-	
-	// Check the information matrix is square (this isn't guaranteed for dynamic matrices)
-        assert(information.rows() == information.cols() && "Information matrix not square");
-
-	// Set the information
-	_information = information;
-
-	// Change the dimension. If the dimension is being increased
-	// and this edge is in a graph, update the size of the
-	// Jacobian workspace just in case it needs to grow. Note that
-	// _dimension has to be set to its new value first if this is
-	// to work properly.
-	
-        const int lastDimension = _dimension;
-        _dimension = information.rows();
-        _error.resize(_dimension);
-        if (_dimension > lastDimension)
-          {
-            OptimizableGraph* g = graph();
-            if (g != nullptr)
-              {
-                g->jacobianWorkspace().updateSize(this);
-              }
-          }
-      }
-
-      virtual const number_t* informationData() const { return _information.data();}
-      virtual number_t* informationData() { return _information.data();}
-
-      //! accessor functions for the measurement represented by the edge
-      const Measurement& measurement() const { return _measurement;}
-      virtual void setMeasurement(const Measurement& m) { _measurement = m;}
-
-      virtual int rank() const {return _dimension;}
-
-      virtual void initialEstimate(const OptimizableGraph::VertexSet&, OptimizableGraph::Vertex*)
-      {
-        std::cerr << "inititialEstimate() is not implemented, please give implementation in your derived class" << std::endl;
-      }
-
-    protected:
-
-      Measurement _measurement;
-      InformationType _information;
-      ErrorVector _error;
-
-      /**
-       * calculate the robust information matrix by updating the information matrix of the error
-       */
-      InformationType robustInformation(const Vector3& rho)
-      {
-        InformationType result = rho[1] * _information;
-        //ErrorVector weightedErrror = _information * _error;
-        //result.noalias() += 2 * rho[2] * (weightedErrror * weightedErrror.transpose());
-        return result;
-      }
-
-    public:
-      EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-  };
-
 
 } // end namespace g2o
 
