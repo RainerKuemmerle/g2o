@@ -1,6 +1,6 @@
 // This example illustrates how to mix static and dynamic vertices in a graph.
 
-// The goal is to fit a function of the form y(x) = f(x) * cos(p(x))
+// The goal is to fit a function of the form y(x) = f(x) + p(x)
 // to a set of data:
 // * f(x) is a quadratic
 // * p(x) is a polynomial which dimensions are established at runtime.
@@ -36,6 +36,7 @@ public:
 
   // Create the vertex
   FPolynomialCoefficientVertex() {
+    setToOrigin();
   }
 
   // Read the vertex
@@ -110,31 +111,17 @@ public:
     _estimate += v;
   }
 
-  // Resize the vertex state. In this case, we want to preserve as much of the
-  // state as we can. Therefore, we use conservativeResize and pad with zeros
-  // at the end if the state dimension has increased.
+  // Resize the vertex state. In this case, we simply trash whatever
+  // was there before.
   virtual bool changeEstimateDimensionImpl(int newDimension)
   {
-    int oldDimension = dimension();
-
-    // Handle the special case this is the first time
-    if (oldDimension == Eigen::Dynamic) {
-      _estimate.resize(newDimension);
-      _estimate.setZero();
-      return true;
-    }
-
-    _estimate.conservativeResize(newDimension);
-
-    // If the state has expanded, pad with zeros
-    if (oldDimension < newDimension)
-      _estimate.tail(newDimension-oldDimension).setZero();
-
+    _estimate.resize(newDimension);
+    _estimate.setZero();
     return true;
   }
 };
 
-// The edge which encodes the observations
+// Helper structure
 
 struct FunctionObservation
 {
@@ -142,8 +129,10 @@ struct FunctionObservation
   Eigen::VectorXd z;
 };
 
-class MultipleValueEdge : public g2o::BaseBinaryEdge<Eigen::Dynamic, Eigen::VectorXd, FPolynomialCoefficientVertex, PPolynomialCoefficientVertex> {
+// The edge which encodes the observations
 
+class MultipleValueEdge : public g2o::BaseBinaryEdge<Eigen::Dynamic, Eigen::VectorXd, FPolynomialCoefficientVertex, PPolynomialCoefficientVertex> {
+  
 public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
 
@@ -159,22 +148,26 @@ public:
     g2o::internal::readVector(is, _x);
     g2o::internal::readVector(is, z);
     setMeasurement(z);
+
+    // Don't know why but it is claimed this does not exist and I can't be bothered to find out why.
     return false;//readInformationMatrix(is);
   }
   
   virtual bool write(std::ostream& os) const {
     g2o::internal::writeVector(os, _x);
     g2o::internal::writeVector(os, _measurement);
-    return false;//writeInformationMatrix(os);
+
+    // Don't know why but it is claimed this does not exist and I can't be bothered to find out why.
+    return false;// return writeInformationMatrix(os);
   }
 
   // Compute the measurement from the eigen polynomial module
   virtual void computeError() {
-    const FPolynomialCoefficientVertex* fvertex = static_cast<const FPolynomialCoefficientVertex*> (_vertices[0]);
-    const PPolynomialCoefficientVertex* pvertex = static_cast<const PPolynomialCoefficientVertex*> (_vertices[0]);
+    const FPolynomialCoefficientVertex* fvertex = dynamic_cast<const FPolynomialCoefficientVertex*> (_vertices[0]);
+    const PPolynomialCoefficientVertex* pvertex = dynamic_cast<const PPolynomialCoefficientVertex*> (_vertices[1]);
     for (int i = 0; i < _measurement.size(); ++i)
       {
-	_error[i] = _measurement[i] - Eigen::poly_eval(fvertex->estimate(), _x[i]) * cos(Eigen::poly_eval(pvertex->estimate(), _x[i]));
+	_error[i] = _measurement[i] - Eigen::poly_eval(fvertex->estimate(), _x[i])  - (Eigen::poly_eval(pvertex->estimate(), _x[i]));
       }	
   }
 
@@ -221,20 +214,19 @@ int main(int argc, const char* argv[]) {
   // Sample the observations. This is a set of function
   // observations. The cardinality of each observation set is random.
   double sigmaZ = 0.1;
-  std::vector<FunctionObservation> observations;
+  std::vector<FunctionObservation> observations(obs);
   std::uniform_int_distribution<int> cardinalitySampler(1, 5);
   
   for (int i = 0; i < obs; ++i) {
-    FunctionObservation fo = new ;
+    FunctionObservation& fo = observations[i];
     int numObs = cardinalitySampler(generator);
     fo.x.resize(numObs);
     fo.z.resize(numObs);
     for (int o = 0; o < numObs; ++ o)
       {
 	fo.x[o] = g2o::sampleUniform(-5, 5);
-	fo.z[o] = Eigen::poly_eval(f, fo.x[o]) * cos(Eigen::poly_eval(p, fo.x[o])) + sigmaZ * g2o::sampleGaussian();
+	fo.z[o] = Eigen::poly_eval(f, fo.x[o]) + (Eigen::poly_eval(p, fo.x[o])) + sigmaZ * g2o::sampleGaussian();
       }
-    observations[i] = fo;
   }
 
   // Construct the graph and set up the solver and optimiser
@@ -286,12 +278,12 @@ int main(int argc, const char* argv[]) {
     pv->setEstimateDimension(testDimension);
     optimizer->initializeOptimization();
     optimizer->optimize(10);
-    std::cout << "Computed parameters = " << pv->estimate().transpose() << std::endl;
+    std::cout << "Computed parameters: f=" << pf->estimate().transpose() << "; p=" << pv->estimate().transpose() << std::endl;
   }
   for (int testDimension = polynomialDimension - 1; testDimension >= 1; --testDimension) {
     pv->setEstimateDimension(testDimension);
     optimizer->initializeOptimization();
     optimizer->optimize(10);
-    std::cout << "Computed parameters = " << pv->estimate().transpose() << std::endl;
+    std::cout << "Computed parameters: f= " << pf->estimate().transpose() << "; p=" << pv->estimate().transpose() << std::endl;
   }
 }
