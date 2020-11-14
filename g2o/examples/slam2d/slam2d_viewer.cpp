@@ -2,17 +2,17 @@
 // Copyright (C) 2011 R. Kuemmerle, G. Grisetti, W. Burgard
 //
 // This file is part of g2o.
-// 
+//
 // g2o is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // g2o is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with g2o.  If not, see <http://www.gnu.org/licenses/>.
 
@@ -55,17 +55,17 @@ namespace {
       StandardCamera() : _standard(true) {};
 
       qglv_real zNear() const {
-        if (_standard) 
-          return 0.001f; 
-        else 
-          return Camera::zNear(); 
+        if (_standard)
+          return 0.001f;
+        else
+          return Camera::zNear();
       }
 
       qglv_real zFar() const
-      {  
-        if (_standard) 
-          return 1000.0f; 
-        else 
+      {
+        if (_standard)
+          return 1000.0f;
+        else
           return Camera::zFar();
       }
 
@@ -101,8 +101,8 @@ namespace {
     glPushMatrix();
     glTranslatef(p.x(), p.y(), 0.f);
 
-    const typename Derived::Scalar& a = cov(0, 0); 
-    const typename Derived::Scalar& b = cov(0, 1); 
+    const typename Derived::Scalar& a = cov(0, 0);
+    const typename Derived::Scalar& b = cov(0, 1);
     const typename Derived::Scalar& d = cov(1, 1);
 
     /* get eigen-values */
@@ -183,7 +183,7 @@ void Slam2DViewer::init()
 
   // some default settings i like
   glEnable(GL_LINE_SMOOTH);
-  glEnable(GL_BLEND); 
+  glEnable(GL_BLEND);
   glEnable(GL_DEPTH_TEST);
   glShadeModel(GL_SMOOTH);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -191,7 +191,7 @@ void Slam2DViewer::init()
   setAxisIsDrawn();
 
   // don't save state
-  setStateFileName(QString::null);
+  setStateFileName(QString());
 
   // mouse bindings
 #ifdef QGLVIEWER_DEPRECATED_MOUSEBINDING

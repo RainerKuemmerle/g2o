@@ -2,17 +2,17 @@
 // Copyright (C) 2011 R. Kuemmerle, G. Grisetti, W. Burgard
 //
 // This file is part of g2o.
-// 
+//
 // g2o is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // g2o is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with g2o.  If not, see <http://www.gnu.org/licenses/>.
 
@@ -222,7 +222,7 @@ void MainWindow::updateDisplayedSolvers()
     const OptimizationAlgorithmProperty& sp = (*it)->property();
     if (varFound && varType == sp.type)
       continue;
-    solverLookUp[sp.type].push_back(sp); 
+    solverLookUp[sp.type].push_back(sp);
   }
 
   for (map<string, vector<OptimizationAlgorithmProperty> >::iterator it = solverLookUp.begin(); it != solverLookUp.end(); ++it) {
@@ -330,9 +330,9 @@ void MainWindow::setRobustKernel()
 {
   SparseOptimizer* optimizer = viewer->graph;
   bool robustKernel = cbRobustKernel->isChecked();
-  double huberWidth = leKernelWidth->text().toDouble();  
+  double huberWidth = leKernelWidth->text().toDouble();
   //odometry edges are those whose node ids differ by 1
-  
+
   bool onlyLoop = cbOnlyLoop->isChecked();
 
   if (robustKernel) {
@@ -353,7 +353,7 @@ void MainWindow::setRobustKernel()
         e->setRobustKernel(creator->construct());
         e->robustKernel()->setDelta(huberWidth);
       }
-    }    
+    }
   } else {
     for (SparseOptimizer::EdgeSet::const_iterator it = optimizer->edges().begin(); it != optimizer->edges().end(); ++it) {
       OptimizableGraph::Edge* e = static_cast<OptimizableGraph::Edge*>(*it);
@@ -454,7 +454,7 @@ void MainWindow::on_actionLoad_Viewer_State_triggered(bool)
   if (!filename.isEmpty()) {
     viewer->setStateFileName(filename);
     viewer->restoreStateFromFile();
-    viewer->setStateFileName(QString::null);
+    viewer->setStateFileName(QString());
     viewer->update();
     cerr << "Loaded state from " << filename.toStdString() << endl;
   }
@@ -466,7 +466,7 @@ void MainWindow::on_actionSave_Viewer_State_triggered(bool)
   if (!filename.isEmpty()) {
     viewer->setStateFileName(filename);
     viewer->saveStateToFile();
-    viewer->setStateFileName(QString::null);
+    viewer->setStateFileName(QString());
     cerr << "Saved state to " << filename.toStdString() << endl;
   }
 }
