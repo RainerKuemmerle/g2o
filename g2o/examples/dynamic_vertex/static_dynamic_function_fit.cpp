@@ -149,15 +149,15 @@ public:
     g2o::internal::readVector(is, z);
     setMeasurement(z);
 
-    // Don't know why but it is claimed this does not exist and I can't be bothered to find out why.
+    // Definition apparently does not exist; don't know why
     return false;//readInformationMatrix(is);
   }
   
   virtual bool write(std::ostream& os) const {
     g2o::internal::writeVector(os, _x);
     g2o::internal::writeVector(os, _measurement);
-
-    // Don't know why but it is claimed this does not exist and I can't be bothered to find out why.
+ 
+    // Definition apparently does not exist; don't know why
     return false;// return writeInformationMatrix(os);
   }
 
