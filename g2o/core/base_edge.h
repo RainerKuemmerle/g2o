@@ -29,6 +29,7 @@
 
 #include <iostream>
 #include <limits>
+#include <type_traits>
 
 #include <Eigen/Core>
 
@@ -117,6 +118,18 @@ namespace g2o {
       virtual void initialEstimate(const OptimizableGraph::VertexSet&, OptimizableGraph::Vertex*)
       {
         std::cerr << "inititialEstimate() is not implemented, please give implementation in your derived class" << std::endl;
+      }
+
+      /**
+       * set the dimension for a dynamically sizeable error function.
+       * The member will not be declared for edges having a fixed size at compile time.
+       */
+      template <int Dim = D>
+      typename std::enable_if<Dim == -1, void>::type setDimension(int dim) {
+        _dimension = dim;
+        _information.resize(dim, dim);
+        _error.resize(dim, 1);
+        _measurement.resize(dim, 1);
       }
 
     protected:
