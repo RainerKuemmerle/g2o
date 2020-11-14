@@ -37,58 +37,58 @@ namespace g2o {
     // forward declaration
     /* void G2O_TYPES_SLAM3D_API compute_dq_dR (Eigen::Matrix<number_t, 3 , 9, Eigen::ColMajor>&  dq_dR , const number_t&  r11 , const number_t&  r21 , const number_t&  r31 , const number_t&  r12 , const number_t&  r22 , const number_t&  r32 , const number_t&  r13 , const number_t&  r23 , const number_t&  r33 );  */
 
-    template <typename Derived, typename DerivedOther>
+    template <typename Derived, typename DerivedOther, bool transposed = false>
     inline void skew(Eigen::MatrixBase<Derived>& s, const Eigen::MatrixBase<DerivedOther>& v){
       const number_t x=2*v(0);
       const number_t y=2*v(1);
       const number_t z=2*v(2);
-      s <<  0.,  z, -y, -z,  0,  x,  y, -x,  0;
+      if (transposed)
+        s << 0., -z, y, z, 0, -x, -y, x, 0;
+      else
+        s << 0., z, -y, -z, 0, x, y, -x, 0;
     }
 
     template <typename Derived, typename DerivedOther>
     inline void skewT(Eigen::MatrixBase<Derived>& s, const Eigen::MatrixBase<DerivedOther>& v){
-      const number_t x=2*v(0);
-      const number_t y=2*v(1);
-      const number_t z=2*v(2);
-      s <<  0., -z,  y,  z,  0, -x,  -y,  x,  0;
+      skew<Derived, DerivedOther, true>(s, v);
     }
 
-    template <typename Derived, typename DerivedOther>
-    void skew(Eigen::MatrixBase<Derived>& Sx, 
-        Eigen::MatrixBase<Derived>& Sy, 
-        Eigen::MatrixBase<Derived>& Sz, 
-        const Eigen::MatrixBase<DerivedOther>& R){
-      const number_t 
-        r11=2*R(0,0), r12=2*R(0,1), r13=2*R(0,2),
-        r21=2*R(1,0), r22=2*R(1,1), r23=2*R(1,2),
-        r31=2*R(2,0), r32=2*R(2,1), r33=2*R(2,2);
-      Sx <<    0,    0,    0,  -r31, -r32, -r33,   r21,   r22,  r23;
-      Sy <<  r31,  r32,  r33,     0,    0,    0,  -r11,  -r12, -r13;
-      Sz << -r21, -r22, -r23,   r11,   r12, r13,     0,    0,    0;
-    }
-
-    template <typename Derived, typename DerivedOther>
-    inline void skewT(Eigen::MatrixBase<Derived>& Sx, 
-        Eigen::MatrixBase<Derived>& Sy, 
-        Eigen::MatrixBase<Derived>& Sz, 
+    template <typename Derived, typename DerivedOther, bool transposed = false>
+    void skew(Eigen::MatrixBase<Derived>& Sx,
+        Eigen::MatrixBase<Derived>& Sy,
+        Eigen::MatrixBase<Derived>& Sz,
         const Eigen::MatrixBase<DerivedOther>& R){
       const number_t
         r11=2*R(0,0), r12=2*R(0,1), r13=2*R(0,2),
-	r21=2*R(1,0), r22=2*R(1,1), r23=2*R(1,2),
-	r31=2*R(2,0), r32=2*R(2,1), r33=2*R(2,2);
-      Sx <<    0,    0,    0,   r31,  r32,   r33,  -r21,  -r22, -r23;
-      Sy << -r31, -r32, -r33,     0,    0,     0,   r11,   r12,  r13;
-      Sz <<  r21,  r22,  r23,  -r11,  -r12, -r13,     0,    0,    0;
+        r21=2*R(1,0), r22=2*R(1,1), r23=2*R(1,2),
+        r31=2*R(2,0), r32=2*R(2,1), r33=2*R(2,2);
+      if (transposed) {
+        Sx << 0, 0, 0, r31, r32, r33, -r21, -r22, -r23;
+        Sy << -r31, -r32, -r33, 0, 0, 0, r11, r12, r13;
+        Sz << r21, r22, r23, -r11, -r12, -r13, 0, 0, 0;
+      } else {
+        Sx << 0, 0, 0, -r31, -r32, -r33, r21, r22, r23;
+        Sy << r31, r32, r33, 0, 0, 0, -r11, -r12, -r13;
+        Sz << -r21, -r22, -r23, r11, r12, r13, 0, 0, 0;
+      }
+    }
+
+    template <typename Derived, typename DerivedOther>
+    inline void skewT(Eigen::MatrixBase<Derived>& Sx,
+        Eigen::MatrixBase<Derived>& Sy,
+        Eigen::MatrixBase<Derived>& Sz,
+        const Eigen::MatrixBase<DerivedOther>& R){
+      skew<Derived, DerivedOther, true>(Sx, Sy, Sz, R);
     }
 
   template <typename Derived>
   void computeEdgeSE3Gradient(Isometry3& E,
-                              Eigen::MatrixBase<Derived> const & JiConstRef, 
+                              Eigen::MatrixBase<Derived> const & JiConstRef,
                               Eigen::MatrixBase<Derived> const & JjConstRef,
-                              const Isometry3& Z, 
+                              const Isometry3& Z,
                               const Isometry3& Xi,
                               const Isometry3& Xj,
-                              const Isometry3& Pi/*=Isometry3()*/, 
+                              const Isometry3& Pi/*=Isometry3()*/,
                               const Isometry3& Pj/*=Isometry3()*/)
   {
     Eigen::MatrixBase<Derived>& Ji = const_cast<Eigen::MatrixBase<Derived>&>(JiConstRef);
@@ -100,7 +100,7 @@ namespace g2o {
     const Isometry3 B=Xi.inverse()*Xj;
     const Isometry3& C=Pj;
 
-    const Isometry3 AB=A*B;  
+    const Isometry3 AB=A*B;
     const Isometry3 BC=B*C;
     E=AB*C;
 
@@ -111,11 +111,11 @@ namespace g2o {
     Isometry3::ConstTranslationPart tc = C.translation();
     //Isometry3::ConstTranslationParttab=AB.translation();
     Isometry3::ConstLinearPart Rab = extractRotation(AB);
-    Isometry3::ConstTranslationPart tbc = BC.translation();  
+    Isometry3::ConstTranslationPart tbc = BC.translation();
     Isometry3::ConstLinearPart Rbc = extractRotation(BC);
 
     Eigen::Matrix<number_t, 3 , 9, Eigen::ColMajor>  dq_dR;
-    compute_dq_dR (dq_dR, 
+    compute_dq_dR (dq_dR,
         Re(0,0),Re(1,0),Re(2,0),
         Re(0,1),Re(1,1),Re(2,1),
         Re(0,2),Re(1,2),Re(2,2));
@@ -190,9 +190,9 @@ namespace g2o {
 
   template <typename Derived>
   void computeEdgeSE3Gradient(Isometry3& E,
-                              Eigen::MatrixBase<Derived> const & JiConstRef, 
+                              Eigen::MatrixBase<Derived> const & JiConstRef,
                               Eigen::MatrixBase<Derived> const & JjConstRef,
-                              const Isometry3& Z, 
+                              const Isometry3& Z,
                               const Isometry3& Xi,
                               const Isometry3& Xj)
   {
@@ -209,10 +209,10 @@ namespace g2o {
     Isometry3::ConstLinearPart Re = extractRotation(E);
     Isometry3::ConstLinearPart Ra = extractRotation(A);
     Isometry3::ConstLinearPart Rb = extractRotation(B);
-    Isometry3::ConstTranslationPart tb = B.translation();  
+    Isometry3::ConstTranslationPart tb = B.translation();
 
     Eigen::Matrix<number_t, 3, 9, Eigen::ColMajor>  dq_dR;
-    compute_dq_dR (dq_dR, 
+    compute_dq_dR (dq_dR,
         Re(0,0),Re(1,0),Re(2,0),
         Re(0,1),Re(1,1),Re(2,1),
         Re(0,2),Re(1,2),Re(2,2));
@@ -263,8 +263,8 @@ namespace g2o {
 
   template <typename Derived>
   void computeEdgeSE3PriorGradient(Isometry3& E,
-                                   const Eigen::MatrixBase<Derived>& JConstRef, 
-                                   const Isometry3& Z, 
+                                   const Eigen::MatrixBase<Derived>& JConstRef,
+                                   const Isometry3& Z,
                                    const Isometry3& X,
                                    const Isometry3& P=Isometry3::Identity())
   {
@@ -280,7 +280,7 @@ namespace g2o {
     Isometry3::ConstLinearPart Re = extractRotation(E);
 
     Eigen::Matrix<number_t, 3, 9, Eigen::ColMajor> dq_dR;
-    compute_dq_dR (dq_dR, 
+    compute_dq_dR (dq_dR,
         Re(0,0),Re(1,0),Re(2,0),
         Re(0,1),Re(1,1),Re(2,1),
         Re(0,2),Re(1,2),Re(2,2));
