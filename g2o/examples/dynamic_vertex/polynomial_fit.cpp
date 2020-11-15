@@ -192,12 +192,11 @@ int main(int argc, const char* argv[]) {
   omega(0, 0) = 1 / (sigmaZ * sigmaZ);
   
   // Create the observations and the edges
-  for (int i = 0; i < obs; ++i)
-    {
-      PolynomialSingleValueEdge* pe = new PolynomialSingleValueEdge(x[i], z[i], omega);
-      pe->setVertex(0, pv);
-      optimizer->addEdge(pe);
-    }
+  for (int i = 0; i < obs; ++i) {
+    PolynomialSingleValueEdge* pe = new PolynomialSingleValueEdge(x[i], z[i], omega);
+    pe->setVertex(0, pv);
+    optimizer->addEdge(pe);
+  }
 
   // Now run the same optimization problem for different choices of
   // dimension of the polynomial vertex. This shows how we can
