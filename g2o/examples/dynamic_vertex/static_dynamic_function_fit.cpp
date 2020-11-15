@@ -1,15 +1,16 @@
-// This example illustrates how to mix static and dynamic vertices in a graph.
+// This example illustrates how to mix static and dynamic vertices in
+// a graph.
 
-// The goal is to fit a function of the form y(x) = f(x) + p(x)
+// The goal is to fit a function of the form y(x) = f(x) + x^3 * p(x)
 // to a set of data:
 // * f(x) is a quadratic
-// * p(x) is a polynomial which dimensions are established at runtime.
+// * p(x) is a polynomial whose dimensions are established at runtime.
 
 // The ith observation consists of m_i pairs of values
 // Z_i={(x_1,z_1),(x_2,z_2),(x_m_i,z_m_i)}, where z_i=y(x_i)+w_i, where
 // w_i is additive white noise with information matrix Omega.
 
-// In this example both the measurement edges and one vertex can be
+// In this example both the measurement edges and one vertex can
 // changed dynamically.
 
 #include <random>
@@ -29,7 +30,7 @@
 // Declare the custom types used in the graph
 
 // This vertex stores the coefficients of the f(x) polynomial. This is
-// quaratic, and always has a degree of three.
+// quadratic, and always has a degree of three.
 
 class FPolynomialCoefficientVertex : public g2o::BaseVertex<3, Eigen::Vector3d> {
 public:
@@ -88,7 +89,7 @@ public:
 
     // Set the dimension; we call the method here to ensure stuff like
     // cache and the workspace is setup
-    setEstimateDimension(dimension);
+    setDimension(dimension);
 
     // Read the state
     return g2o::internal::readVector(is, _estimate);
@@ -114,7 +115,7 @@ public:
 
   // Resize the vertex state. In this case, we simply trash whatever
   // was there before.
-  virtual bool changeEstimateDimensionImpl(int newDimension)
+  virtual bool setDimensionImpl(int newDimension)
   {
     _estimate.resize(newDimension);
     _estimate.setZero();
@@ -139,6 +140,7 @@ public:
 
   MultipleValueEdge(const FunctionObservation& obs, double omega) {
     _x = obs.x;
+    setDimension(obs.z.size());
     setMeasurement(obs.z);
     InformationType I = Eigen::MatrixXd::Identity(_x.size(), _x.size()) * omega;
     setInformation(I);
@@ -165,7 +167,9 @@ public:
     const PPolynomialCoefficientVertex* pvertex = dynamic_cast<const PPolynomialCoefficientVertex*> (_vertices[1]);
     for (int i = 0; i < _measurement.size(); ++i)
       {
-	_error[i] = _measurement[i] - Eigen::poly_eval(fvertex->estimate(), _x[i])  - (Eigen::poly_eval(pvertex->estimate(), _x[i]));
+	double x3 = pow(_x[i], 3);
+	_error[i] = _measurement[i] - Eigen::poly_eval(fvertex->estimate(), _x[i])
+	  - x3 * (Eigen::poly_eval(pvertex->estimate(), _x[i]));
       }	
   }
 
@@ -223,7 +227,9 @@ int main(int argc, const char* argv[]) {
     for (int o = 0; o < numObs; ++ o)
       {
 	fo.x[o] = g2o::sampleUniform(-5, 5);
-	fo.z[o] = Eigen::poly_eval(f, fo.x[o]) + (Eigen::poly_eval(p, fo.x[o])) + sigmaZ * g2o::sampleGaussian();
+	double x3 = pow(fo.x[o], 3);
+	fo.z[o] = Eigen::poly_eval(f, fo.x[o]) + x3 * (Eigen::poly_eval(p, fo.x[o]))
+	  + sigmaZ * g2o::sampleGaussian();
       }
   }
 
@@ -273,13 +279,13 @@ int main(int argc, const char* argv[]) {
   // constructed graph. Note that you must call initializeOptimization
   // before you can optimize after a state dimension has changed.
   for (int testDimension = 1; testDimension <= polynomialDimension; ++testDimension) {
-    pv->setEstimateDimension(testDimension);
+    pv->setDimension(testDimension);
     optimizer->initializeOptimization();
     optimizer->optimize(10);
     std::cout << "Computed parameters: f=" << pf->estimate().transpose() << "; p=" << pv->estimate().transpose() << std::endl;
   }
   for (int testDimension = polynomialDimension - 1; testDimension >= 1; --testDimension) {
-    pv->setEstimateDimension(testDimension);
+    pv->setDimension(testDimension);
     optimizer->initializeOptimization();
     optimizer->optimize(10);
     std::cout << "Computed parameters: f= " << pf->estimate().transpose() << "; p=" << pv->estimate().transpose() << std::endl;
