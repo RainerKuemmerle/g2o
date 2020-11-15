@@ -67,11 +67,11 @@ namespace g2o {
 
     inline virtual void mapHessianMemory(number_t* d);
 
-    inline virtual bool setEstimateDimension(int newDimension);
 
     virtual int copyB(number_t* b_) const {
-      memcpy(b_, _b.data(), G2O_VERTEX_DIM * sizeof(number_t));
-      return G2O_VERTEX_DIM; 
+      const int vertexDim = G2O_VERTEX_DIM;
+      memcpy(b_, _b.data(), vertexDim * sizeof(number_t));
+      return vertexDim; 
     }
 
     virtual const number_t& b(int i) const { assert(i < D); return _b(i);}
@@ -98,36 +98,8 @@ namespace g2o {
 
     //! return the current estimate of the vertex
     const EstimateType& estimate() const { return _estimate;}
-    //! set the estimate for the vertex; resizes if necessary and ensures the cach is updated
-
-#if 1
-    virtual void setEstimate(const EstimateType& et, bool changeEstimateDimensionIfNeeded = true) {
-      (void)changeEstimateDimensionIfNeeded;
-	_estimate = et;
-	updateCache();
-    }
-#else
-    virtual void setEstimate(const EstimateType& et, bool changeEstimateDimensionIfNeeded = true) {
-      if (G2O_VERTEX_DIM == et.size()) {
-	_estimate = et;
-	updateCache();
-      }
-      else {
-	if (changeEstimateDimensionIfNeeded == false) {
-	  assert((G2O_VERTEX_DIM != et.size()) && (changeEstimateDimensionIfNeeded == false));
-	  std::cerr << __PRETTY_FUNCTION__ << ": the supplied estimate does not have the same dimension as the vertex, and resize is disabled" << std::endl;
-	  return;
-	}
-	setEstimateDimension(et.size());
-	_estimate = et;
-      }
-    }
-#endif
-    
-  protected:
-
-    // This method is responsible for actually changing the dimension of the state
-    virtual bool changeEstimateDimensionImpl(int /*newDimension*/);
+    //! set the estimate for the vertex also calls updateCache()
+    void setEstimate(const EstimateType& et) { _estimate = et; updateCache();}
     
   protected:
     HessianBlockType _hessian;

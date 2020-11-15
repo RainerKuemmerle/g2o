@@ -21,6 +21,7 @@
 #include "g2o/core/block_solver.h"
 #include "g2o/core/optimization_algorithm_levenberg.h"
 #include "g2o/core/base_vertex.h"
+#include "g2o/core/base_dynamic_vertex.h"
 #include "g2o/core/base_unary_edge.h"
 #include "g2o/core/base_binary_edge.h"
 #include "g2o/solvers/csparse/linear_solver_csparse.h"
@@ -67,7 +68,7 @@ public:
 // This vertex stores the coefficients of the p(x) polynomial. It is dynamic because
 // we can change it at runtime.
 
-class PPolynomialCoefficientVertex : public g2o::BaseVertex<Eigen::Dynamic, Eigen::VectorXd> {
+class PPolynomialCoefficientVertex : public g2o::BaseDynamicVertex<Eigen::VectorXd> {
 public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
 
@@ -149,16 +150,13 @@ public:
     g2o::internal::readVector(is, z);
     setMeasurement(z);
 
-    // Definition apparently does not exist; don't know why
-    return false;//readInformationMatrix(is);
+    return readInformationMatrix(is);
   }
   
   virtual bool write(std::ostream& os) const {
     g2o::internal::writeVector(os, _x);
-    g2o::internal::writeVector(os, _measurement);
- 
-    // Definition apparently does not exist; don't know why
-    return false;// return writeInformationMatrix(os);
+    g2o::internal::writeVector(os, _measurement); 
+    return writeInformationMatrix(os);
   }
 
   // Compute the measurement from the eigen polynomial module

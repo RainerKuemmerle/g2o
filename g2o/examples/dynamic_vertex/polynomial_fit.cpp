@@ -13,7 +13,7 @@
 #include "g2o/core/sparse_optimizer.h"
 #include "g2o/core/block_solver.h"
 #include "g2o/core/optimization_algorithm_levenberg.h"
-#include "g2o/core/base_vertex.h"
+#include "g2o/core/base_dynamic_vertex.h"
 #include "g2o/core/base_unary_edge.h"
 #include "g2o/core/base_binary_edge.h"
 #include "g2o/solvers/csparse/linear_solver_csparse.h"
@@ -23,7 +23,7 @@
 // This vertex stores the coefficients of the polynomial. It is dynamic because
 // we can change it at runtime.
 
-class PolynomialCoefficientVertex : public g2o::BaseVertex<Eigen::Dynamic, Eigen::VectorXd> {
+class PolynomialCoefficientVertex : public g2o::BaseDynamicVertex<Eigen::VectorXd> {
 public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
 

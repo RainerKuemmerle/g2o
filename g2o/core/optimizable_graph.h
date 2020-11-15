@@ -147,15 +147,6 @@ namespace g2o {
          */
         virtual number_t solveDirect(number_t lambda=0) = 0;
 
-	
-        /**
-         * sets the dimension of the state in the vertex; this can be used
-	 * on vertices which can be dynamically resized otherwise just confirms
-	 * dimension is consistent and acts as a no-op.
-         * @return true on success
-         */
-	virtual bool setEstimateDimension(int newDimension) = 0;
-
         /**
          * sets the initial estimate from an array of number_t
          * Implement setEstimateDataImpl()

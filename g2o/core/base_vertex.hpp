@@ -33,50 +33,6 @@ BaseVertex<D, T>::BaseVertex() :
 }
 
 template <int D, typename T>
-bool BaseVertex<D, T>::setEstimateDimension(int newDimension) {
-
-  // If the dimension is known at compile time, check the dimension is unchanged and always return
-  if (D > 0) {
-      assert(newDimension == D && "error resizing vertex with fixed compile time dimension where runtime dimension != compile time dimension");
-      return(newDimension == D);
-    }
-
-  // Check the dimension is non-negative.
-  assert(newDimension >= 0 && "error resizing vertex vertex with unknown compile time dimension where runtime dimension < 0");
-  if (newDimension < 0)
-    return false;
-
-  // Nothing to do if the dimension is unchanged.
-  if (newDimension == _dimension)
-    return true;
-
-  // Reset the internal state
-  if (changeEstimateDimensionImpl(newDimension) == false)
-    return false;
-
-  // Store the old dimension and assign the new
-  int oldDimension = _dimension;
-  _dimension = newDimension;
-
-  // Clear the cache associated with this vertex
-  setHessianIndex(-1);
-  mapHessianMemory(nullptr);
-  _b.resize(_dimension);
-  updateCache();
-
-  // If the dimension is being increased and this vertex is in a
-  // graph, update the size of the Jacobian workspace just in case it
-  // needs to grow.
-  if ((newDimension > oldDimension) && (_graph != nullptr)) {
-      JacobianWorkspace& jacobianWorkspace = _graph->jacobianWorkspace();
-      for (auto e : _edges)
-        jacobianWorkspace.updateSize(e);
-    }
-
-  return true;
-}
-
-template <int D, typename T>
 number_t BaseVertex<D, T>::solveDirect(number_t lambda) {
   Eigen::Matrix<number_t, D, D, Eigen::ColMajor> tempA=_hessian + Eigen::Matrix<number_t, D, D, Eigen::ColMajor>::Identity(G2O_VERTEX_DIM, G2O_VERTEX_DIM)*lambda;
   number_t det=tempA.determinant();
@@ -95,16 +51,6 @@ void BaseVertex<D, T>::clearQuadraticForm() {
 template <int D, typename T>
 void BaseVertex<D, T>::mapHessianMemory(number_t* d)
 {
-  new (&_hessian) HessianBlockType(d, G2O_VERTEX_DIM, G2O_VERTEX_DIM);
+  const int vertexDim = G2O_VERTEX_DIM;
+  new (&_hessian) HessianBlockType(d, vertexDim, vertexDim);
 }
-
-template <int D, typename T>
-bool BaseVertex<D, T>::changeEstimateDimensionImpl(int /*newDimension*/) {
-  if (D < 0) {
-    std::cerr << __PRETTY_FUNCTION__ << ": not implemented" << std::endl;
-  }
-  else {
-    std::cerr << __PRETTY_FUNCTION__ << ": should not be called for vertices with known compile time dimension" << std::endl;
-  }
-  return false;
-};
