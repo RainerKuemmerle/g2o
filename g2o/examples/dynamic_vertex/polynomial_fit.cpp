@@ -43,7 +43,7 @@ public:
 
     // Set the dimension; we call the method here to ensure stuff like
     // cache and the workspace is setup
-    setEstimateDimension(dimension);
+    setDimension(dimension);
 
     // Read the state
     return g2o::internal::readVector(is, _estimate);
@@ -70,7 +70,7 @@ public:
   // Resize the vertex state. In this case, we want to preserve as much of the
   // state as we can. Therefore, we use conservativeResize and pad with zeros
   // at the end if the state dimension has increased.
-  virtual bool changeEstimateDimensionImpl(int newDimension)
+  virtual bool setDimensionImpl(int newDimension)
   {
     int oldDimension = dimension();
 
@@ -205,13 +205,13 @@ int main(int argc, const char* argv[]) {
   // constructed graph. Note that you must call initializeOptimization
   // before you can optimize after a state dimension has changed.
   for (int testDimension = 1; testDimension <= polynomialDimension; ++testDimension) {
-    pv->setEstimateDimension(testDimension);
+    pv->setDimension(testDimension);
     optimizer->initializeOptimization();
     optimizer->optimize(10);
     std::cout << "Computed parameters = " << pv->estimate().transpose() << std::endl;
   }
   for (int testDimension = polynomialDimension - 1; testDimension >= 1; --testDimension) {
-    pv->setEstimateDimension(testDimension);
+    pv->setDimension(testDimension);
     optimizer->initializeOptimization();
     optimizer->optimize(10);
     std::cout << "Computed parameters = " << pv->estimate().transpose() << std::endl;
