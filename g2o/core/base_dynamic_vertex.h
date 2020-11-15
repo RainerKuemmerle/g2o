@@ -35,12 +35,12 @@ namespace g2o {
     {
     public:
       
-      inline virtual bool setEstimateDimension(int newDimension);
+      inline virtual bool setDimension(int newDimension);
     
     protected:
       
       // This method is responsible for actually changing the dimension of the state
-      virtual bool changeEstimateDimensionImpl(int newDimension) = 0;
+      virtual bool setDimensionImpl(int newDimension) = 0;
 
       using BaseVertex<-1, T>::_graph;
       using BaseVertex<-1, T>::_dimension;
@@ -53,7 +53,7 @@ namespace g2o {
     };
 
   template <typename T>
-    bool BaseDynamicVertex<T>::setEstimateDimension(int newDimension) {
+    bool BaseDynamicVertex<T>::setDimension(int newDimension) {
   // Check the dimension is non-negative.
   assert(newDimension >= 0);
   if (newDimension < 0)
@@ -63,15 +63,15 @@ namespace g2o {
   if (newDimension == _dimension)
     return true;
 
-  // Reset the internal state
-  if (changeEstimateDimensionImpl(newDimension) == false)
+  // Change the state to the requested dimension
+  if (setDimensionImpl(newDimension) == false)
     return false;
 
   // Store the old dimension and assign the new
   int oldDimension = _dimension;
   _dimension = newDimension;
 
-  // Clear the cache associated with this vertex
+  // Reset the allocation associated with this vertex and update the cache
   setHessianIndex(-1);
   mapHessianMemory(nullptr);
   _b.resize(_dimension);
