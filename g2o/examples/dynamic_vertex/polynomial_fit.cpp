@@ -32,8 +32,7 @@ public:
   }
 
   // Read the vertex
-  virtual bool read(std::istream& is)
-  {
+  virtual bool read(std::istream& is) {
     // Read the dimension
     int dimension;
     is >> dimension;
@@ -47,11 +46,10 @@ public:
 
     // Read the state
     return g2o::internal::readVector(is, _estimate);
-   }
+  }
 
   // Write the vertex
-  virtual bool write(std::ostream& os) const
-  {
+  virtual bool write(std::ostream& os) const {
     os << _estimate.size() << " ";
     return g2o::internal::writeVector(os, _estimate);
   }
@@ -102,8 +100,7 @@ class PolynomialSingleValueEdge : public g2o::BaseUnaryEdge<1, double, Polynomia
 public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
 
-  PolynomialSingleValueEdge(double x, double z, const PolynomialSingleValueEdge::InformationType& omega) : _x(x)
-  {
+  PolynomialSingleValueEdge(double x, double z, const PolynomialSingleValueEdge::InformationType& omega) : _x(x) {
     _x = x;
     setMeasurement(z);
     setInformation(omega);
@@ -164,7 +161,7 @@ int main(int argc, const char* argv[]) {
   for (int i = 0; i < obs; ++i) {
     x[i] = g2o::sampleUniform(-5, 5);
     z[i] = Eigen::poly_eval(p, x[i]) + sigmaZ * g2o::sampleGaussian();
-   }
+  }
 
   // Construct the graph and set up the solver and optimiser
   std::unique_ptr<g2o::BlockSolverX::LinearSolverType> linearSolver = g2o::make_unique<
@@ -172,7 +169,7 @@ int main(int argc, const char* argv[]) {
 
   // Set up the solver
   std::unique_ptr<g2o::BlockSolverX> blockSolver = g2o::make_unique<g2o::BlockSolverX>(
-      move(linearSolver));
+										       move(linearSolver));
 
   // Set up the optimisation algorithm
   g2o::OptimizationAlgorithm* optimisationAlgorithm =

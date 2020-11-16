@@ -42,15 +42,13 @@ public:
   }
 
   // Read the vertex
-  virtual bool read(std::istream& is)
-  {
+  virtual bool read(std::istream& is) {
     // Read the state
     return g2o::internal::readVector(is, _estimate);
-   }
+  }
 
   // Write the vertex
-  virtual bool write(std::ostream& os) const
-  {
+  virtual bool write(std::ostream& os) const {
     return g2o::internal::writeVector(os, _estimate);
   }
 
@@ -70,6 +68,7 @@ public:
 // we can change it at runtime.
 
 class PPolynomialCoefficientVertex : public g2o::BaseDynamicVertex<Eigen::VectorXd> {
+  
 public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
 
@@ -78,8 +77,7 @@ public:
   }
 
   // Read the vertex
-  virtual bool read(std::istream& is)
-  {
+  virtual bool read(std::istream& is) {
     // Read the dimension
     int dimension;
     is >> dimension;
@@ -93,11 +91,10 @@ public:
 
     // Read the state
     return g2o::internal::readVector(is, _estimate);
-   }
+  }
 
   // Write the vertex
-  virtual bool write(std::ostream& os) const
-  {
+  virtual bool write(std::ostream& os) const {
     os << _estimate.size() << " ";
     return g2o::internal::writeVector(os, _estimate);
   }
@@ -115,8 +112,7 @@ public:
 
   // Resize the vertex state. In this case, we simply trash whatever
   // was there before.
-  virtual bool setDimensionImpl(int newDimension)
-  {
+  virtual bool setDimensionImpl(int newDimension) {
     _estimate.resize(newDimension);
     _estimate.setZero();
     return true;
@@ -133,7 +129,8 @@ struct FunctionObservation
 
 // The edge which encodes the observations
 
-class MultipleValueEdge : public g2o::BaseBinaryEdge<Eigen::Dynamic, Eigen::VectorXd, FPolynomialCoefficientVertex, PPolynomialCoefficientVertex> {
+class MultipleValueEdge : public g2o::BaseBinaryEdge<Eigen::Dynamic, Eigen::VectorXd, FPolynomialCoefficientVertex,
+						     PPolynomialCoefficientVertex> {
   
 public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
@@ -164,12 +161,11 @@ public:
   virtual void computeError() {
     const FPolynomialCoefficientVertex* fvertex = dynamic_cast<const FPolynomialCoefficientVertex*> (_vertices[0]);
     const PPolynomialCoefficientVertex* pvertex = dynamic_cast<const PPolynomialCoefficientVertex*> (_vertices[1]);
-    for (int i = 0; i < _measurement.size(); ++i)
-      {
-	double x3 = pow(_x[i], 3);
-	_error[i] = _measurement[i] - Eigen::poly_eval(fvertex->estimate(), _x[i])
-	  - x3 * (Eigen::poly_eval(pvertex->estimate(), _x[i]));
-      }	
+    for (int i = 0; i < _measurement.size(); ++i) {
+      double x3 = pow(_x[i], 3);
+      _error[i] = _measurement[i] - Eigen::poly_eval(fvertex->estimate(), _x[i])
+	- x3 * (Eigen::poly_eval(pvertex->estimate(), _x[i]));
+    }	
   }
 
 private:
@@ -223,13 +219,12 @@ int main(int argc, const char* argv[]) {
     int numObs = cardinalitySampler(generator);
     fo.x.resize(numObs);
     fo.z.resize(numObs);
-    for (int o = 0; o < numObs; ++ o)
-      {
-	fo.x[o] = g2o::sampleUniform(-5, 5);
-	double x3 = pow(fo.x[o], 3);
-	fo.z[o] = Eigen::poly_eval(f, fo.x[o]) + x3 * (Eigen::poly_eval(p, fo.x[o]))
-	  + sigmaZ * g2o::sampleGaussian();
-      }
+    for (int o = 0; o < numObs; ++ o) {
+      fo.x[o] = g2o::sampleUniform(-5, 5);
+      double x3 = pow(fo.x[o], 3);
+      fo.z[o] = Eigen::poly_eval(f, fo.x[o]) + x3 * (Eigen::poly_eval(p, fo.x[o]))
+	+ sigmaZ * g2o::sampleGaussian();
+    }
   }
 
   // Construct the graph and set up the solver and optimiser
@@ -238,7 +233,7 @@ int main(int argc, const char* argv[]) {
 
   // Set up the solver
   std::unique_ptr<g2o::BlockSolverX> blockSolver = g2o::make_unique<g2o::BlockSolverX>(
-      move(linearSolver));
+										       move(linearSolver));
 
   // Set up the optimisation algorithm
   g2o::OptimizationAlgorithm* optimisationAlgorithm =
@@ -263,14 +258,12 @@ int main(int argc, const char* argv[]) {
   double omega = 1 / (sigmaZ * sigmaZ);
   
   // Create the edges
-  MultipleValueEdge* mve;
-  for (int i = 0; i < obs; ++i)
-    {
-      mve = new MultipleValueEdge(observations[i], omega);
-      mve->setVertex(0, pf);
-      mve->setVertex(1, pv);
-      optimizer->addEdge(mve);
-    }
+  for (int i = 0; i < obs; ++i) {
+    MultipleValueEdge* mve = new MultipleValueEdge(observations[i], omega);
+    mve->setVertex(0, pf);
+    mve->setVertex(1, pv);
+    optimizer->addEdge(mve);
+  }
 
   // Now run the same optimization problem for different choices of
   // dimension of the polynomial vertex. This shows how we can
