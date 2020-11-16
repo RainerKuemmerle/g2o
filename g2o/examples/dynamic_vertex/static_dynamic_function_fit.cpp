@@ -138,8 +138,7 @@ class MultipleValueEdge : public g2o::BaseBinaryEdge<Eigen::Dynamic, Eigen::Vect
 public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
 
-  MultipleValueEdge(const FunctionObservation& obs, double omega) {
-    _x = obs.x;
+  MultipleValueEdge(const FunctionObservation& obs, double omega) : _x(obs.x) {
     setDimension(obs.z.size());
     setMeasurement(obs.z);
     InformationType I = Eigen::MatrixXd::Identity(_x.size(), _x.size()) * omega;

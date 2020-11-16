@@ -102,7 +102,8 @@ class PolynomialSingleValueEdge : public g2o::BaseUnaryEdge<1, double, Polynomia
 public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
 
-  PolynomialSingleValueEdge(double x, double z, const PolynomialSingleValueEdge::InformationType& omega) {
+  PolynomialSingleValueEdge(double x, double z, const PolynomialSingleValueEdge::InformationType& omega) : _x(x)
+  {
     _x = x;
     setMeasurement(z);
     setInformation(omega);
