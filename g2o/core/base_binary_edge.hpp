@@ -24,6 +24,9 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+#define G2O_VERTEX_I_DIM ((VertexXiType::Dimension < 0) ? static_cast<const VertexXiType*> (_vertices[0])->dimension() : VertexXiType::Dimension)
+#define G2O_VERTEX_J_DIM ((VertexXjType::Dimension < 0) ? static_cast<const VertexXjType*> (_vertices[1])->dimension() : VertexXjType::Dimension)
+
 template <int D, typename E, typename VertexXiType, typename VertexXjType>
 OptimizableGraph::Vertex* BaseBinaryEdge<D, E, VertexXiType, VertexXjType>::createFrom(){
   return createVertex(0);
@@ -42,7 +45,6 @@ OptimizableGraph::Vertex* BaseBinaryEdge<D, E, VertexXiType, VertexXjType>::crea
   default: return nullptr;
   }
 }
-
 
 template <int D, typename E, typename VertexXiType, typename VertexXjType>
 void BaseBinaryEdge<D, E, VertexXiType, VertexXjType>::resize(size_t size)
@@ -136,8 +138,8 @@ void BaseBinaryEdge<D, E, VertexXiType, VertexXjType>::constructQuadraticForm()
 template <int D, typename E, typename VertexXiType, typename VertexXjType>
 void BaseBinaryEdge<D, E, VertexXiType, VertexXjType>::linearizeOplus(JacobianWorkspace& jacobianWorkspace)
 {
-  new (&_jacobianOplusXi) JacobianXiOplusType(jacobianWorkspace.workspaceForVertex(0), D < 0 ? _dimension : D, Di);
-  new (&_jacobianOplusXj) JacobianXjOplusType(jacobianWorkspace.workspaceForVertex(1), D < 0 ? _dimension : D, Dj);
+  new (&_jacobianOplusXi) JacobianXiOplusType(jacobianWorkspace.workspaceForVertex(0), D < 0 ? _dimension : D, G2O_VERTEX_I_DIM);
+  new (&_jacobianOplusXj) JacobianXjOplusType(jacobianWorkspace.workspaceForVertex(1), D < 0 ? _dimension : D, G2O_VERTEX_J_DIM);
   linearizeOplus();
 }
 
@@ -158,56 +160,119 @@ void BaseBinaryEdge<D, E, VertexXiType, VertexXjType>::linearizeOplus()
   ErrorVector errorBak;
   ErrorVector errorBeforeNumeric = _error;
 
+  // A statically allocated array is far and away the most efficient
+  // way to construct the perturbation vector for the Jacobian. If the
+  // dimension is known at compile time, use directly. If the
+  // dimension is known at run time and is less than 12, use an
+  // allocated array of up to 12. Otherwise, use a fallback of a
+  // dynamically allocated array. The value of 12 is used because
+  // most vertices have a dimension significantly smaller than this.
+  
   if (iNotFixed) {
     internal::QuadraticFormLock lck(*vi);
     //Xi - estimate the jacobian numerically
-    number_t add_vi[VertexXiType::Dimension] = {};
 
-    // add small step along the unit vector in each dimension
-    for (int d = 0; d < VertexXiType::Dimension; ++d) {
-      vi->push();
-      add_vi[d] = delta;
-      vi->oplus(add_vi);
-      computeError();
-      errorBak = _error;
-      vi->pop();
-      vi->push();
-      add_vi[d] = -delta;
-      vi->oplus(add_vi);
-      computeError();
-      errorBak -= _error;
-      vi->pop();
-      add_vi[d] = 0.0;
+    const int vi_dim = G2O_VERTEX_I_DIM;
+    
+    if ((VertexXiType::Dimension >= 0) || (vi_dim <= 12)) {
+	number_t add_vi[(VertexXiType::Dimension >= 0) ? VertexXiType::Dimension : 12] = {};
+        
+        // add small step along the unit vector in each dimension
+        for (int d = 0; d < vi_dim; ++d) {
+          vi->push();
+          add_vi[d] = delta;
+          vi->oplus(add_vi);
+          computeError();
+          errorBak = _error;
+          vi->pop();
+          vi->push();
+          add_vi[d] = -delta;
+          vi->oplus(add_vi);
+          computeError();
+          errorBak -= _error;
+          vi->pop();
+          add_vi[d] = 0.0;          
+          _jacobianOplusXi.col(d) = scalar * errorBak;
+        } // end dimension
+      }
+    else {
+	dynamic_aligned_buffer<number_t> buffer{ size_t(vi_dim) };
+        number_t* add_vi = buffer.request(vi_dim);
+        std::fill(add_vi, add_vi + vi_dim, cst(0.0));
 
-      _jacobianOplusXi.col(d) = scalar * errorBak;
-    } // end dimension
+        // add small step along the unit vector in each dimension
+        for (int d = 0; d < vi_dim; ++d) {
+          vi->push();
+          add_vi[d] = delta;
+          vi->oplus(add_vi);
+          computeError();
+          errorBak = _error;
+          vi->pop();
+          vi->push();
+          add_vi[d] = - delta;
+          vi->oplus(add_vi);
+          computeError();
+          errorBak -= _error;
+          vi->pop();
+          add_vi[d] = 0;
+          _jacobianOplusXi.col(d) = scalar * errorBak;
+        } // end dimension
+      }
   }
 
   if (jNotFixed) {
     internal::QuadraticFormLock lck(*vj);
     //Xj - estimate the jacobian numerically
-    number_t add_vj[VertexXjType::Dimension] = {};
+    
+    const int vj_dim = G2O_VERTEX_J_DIM;
+    
+    if ((VertexXjType::Dimension >= 0) || (vj_dim <= 12)) {
+        number_t add_vj[(VertexXjType::Dimension >= 0) ? VertexXjType::Dimension : 12] = {};
 
-    // add small step along the unit vector in each dimension
-    for (int d = 0; d < VertexXjType::Dimension; ++d) {
-      vj->push();
-      add_vj[d] = delta;
-      vj->oplus(add_vj);
-      computeError();
-      errorBak = _error;
-      vj->pop();
-      vj->push();
-      add_vj[d] = -delta;
-      vj->oplus(add_vj);
-      computeError();
-      errorBak -= _error;
-      vj->pop();
-      add_vj[d] = 0.0;
-
-      _jacobianOplusXj.col(d) = scalar * errorBak;
-    }
-  } // end dimension
-
+        // add small step along the unit vector in each dimension
+        for (int d = 0; d < vj_dim; ++d) {
+          vj->push();
+          add_vj[d] = delta;
+          vj->oplus(add_vj);
+          computeError();
+          errorBak = _error;
+          vj->pop();
+          vj->push();
+          add_vj[d] = -delta;
+          vj->oplus(add_vj);
+          computeError();
+          errorBak -= _error;
+          vj->pop();
+          add_vj[d] = 0.0;
+          
+          _jacobianOplusXj.col(d) = scalar * errorBak;
+        } // end dimension
+      }
+    else {
+        const int vj_dim = vj->dimension();
+        dynamic_aligned_buffer<number_t> buffer{ size_t(vj_dim) };
+        number_t* add_vj = buffer.request(vj_dim);
+        std::fill(add_vj, add_vj + vj_dim, cst(0.0));
+        
+        // add small step along the unit vector in each dimension
+        for (int d = 0; d < vj_dim; ++d) {
+          vj->push();
+          add_vj[d] = delta;
+          vj->oplus(add_vj);
+          computeError();
+          errorBak = _error;
+          vj->pop();
+          vj->push();
+          add_vj[d] = - delta;
+          vj->oplus(add_vj);
+          computeError();
+          errorBak -= _error;
+          vj->pop();
+          add_vj[d] = 0;
+          _jacobianOplusXj.col(d) = scalar * errorBak;
+        } // end dimension
+      }
+  }
   _error = errorBeforeNumeric;
 }
 
@@ -217,9 +282,13 @@ void BaseBinaryEdge<D, E, VertexXiType, VertexXjType>::mapHessianMemory(number_t
   (void) i; (void) j;
   //assert(i == 0 && j == 1);
   if (rowMajor) {
-    new (&_hessianTransposed) HessianBlockTransposedType(d, VertexXjType::Dimension, VertexXiType::Dimension);
+    new (&_hessianTransposed) HessianBlockTransposedType(d, G2O_VERTEX_J_DIM, G2O_VERTEX_I_DIM);
   } else {
-    new (&_hessian) HessianBlockType(d, VertexXiType::Dimension, VertexXjType::Dimension);
+    new (&_hessian) HessianBlockType(d, G2O_VERTEX_I_DIM, G2O_VERTEX_J_DIM);
   }
   _hessianRowMajor = rowMajor;
 }
+
+#undef G2O_VERTEX_I_DIM
+#undef G2O_VERTEX_J_DIM
+

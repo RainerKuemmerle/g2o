@@ -37,12 +37,12 @@
 #include <stack>
 
 namespace g2o {
-
-/**
+#define G2O_VERTEX_DIM ((D == Eigen::Dynamic) ? _dimension : D)
+  /**
  * \brief Templatized BaseVertex
  *
  * Templatized BaseVertex
- * D  : minimal dimension of the vertex, e.g., 3 for rotation in 3D
+ * D  : minimal dimension of the vertex, e.g., 3 for rotation in 3D. -1 means dynamically assigned at runtime.
  * T  : internal type to represent the estimate, e.g., Quaternion for rotation in 3D
  */
   template <int D, typename T>
@@ -60,20 +60,22 @@ namespace g2o {
   public:
     BaseVertex();
 
-    virtual const number_t& hessian(int i, int j) const { assert(i<D && j<D); return _hessian(i,j);}
-    virtual number_t& hessian(int i, int j)  { assert(i<D && j<D); return _hessian(i,j);}
+    virtual const number_t& hessian(int i, int j) const { assert(i<G2O_VERTEX_DIM && j<G2O_VERTEX_DIM); return _hessian(i,j);}
+    virtual number_t& hessian(int i, int j)  { assert(i<G2O_VERTEX_DIM && j<G2O_VERTEX_DIM); return _hessian(i,j);}
     virtual number_t hessianDeterminant() const {return _hessian.determinant();}
     virtual number_t* hessianData() { return const_cast<number_t*>(_hessian.data());}
 
     inline virtual void mapHessianMemory(number_t* d);
 
+
     virtual int copyB(number_t* b_) const {
-      memcpy(b_, _b.data(), Dimension * sizeof(number_t));
-      return Dimension; 
+      const int vertexDim = G2O_VERTEX_DIM;
+      memcpy(b_, _b.data(), vertexDim * sizeof(number_t));
+      return vertexDim; 
     }
 
     virtual const number_t& b(int i) const { assert(i < D); return _b(i);}
-    virtual number_t& b(int i) { assert(i < D); return _b(i);}
+    virtual number_t& b(int i) { assert(i < G2O_VERTEX_DIM); return _b(i);}
     virtual number_t* bData() { return _b.data();}
 
     inline virtual void clearQuadraticForm();
@@ -98,7 +100,7 @@ namespace g2o {
     const EstimateType& estimate() const { return _estimate;}
     //! set the estimate for the vertex also calls updateCache()
     void setEstimate(const EstimateType& et) { _estimate = et; updateCache();}
-
+    
   protected:
     HessianBlockType _hessian;
     Eigen::Matrix<number_t, D, 1, Eigen::ColMajor> _b;
@@ -109,6 +111,8 @@ namespace g2o {
 };
 
 #include "base_vertex.hpp"
+
+#undef G2O_VERTEX_DIM
 
 } // end namespace g2o
 

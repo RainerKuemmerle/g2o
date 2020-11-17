@@ -47,6 +47,9 @@ namespace g2o {
    * for computing the Jacobian of the error functions.
    * Before calling linearizeOplus on an edge, the workspace needs to be allocated
    * by calling allocate().
+   *
+   * By default, the sizes are updated incrementally with each call. If the reset flag is set to true,
+   * the counts are set back to 
    */
   class G2O_CORE_API JacobianWorkspace
   {
@@ -65,17 +68,17 @@ namespace g2o {
       /**
        * update the maximum required workspace needed by taking into account this edge
        */
-      void updateSize(const HyperGraph::Edge* e);
+      void updateSize(const HyperGraph::Edge* e, bool reset = false);
 
       /**
        * update the required workspace by looking at a full graph
        */
-      void updateSize(const OptimizableGraph& graph);
+      void updateSize(const OptimizableGraph& graph, bool reset = false);
 
       /**
        * manually update with the given parameters
        */
-      void updateSize(int numVertices, int dimension);
+      void updateSize(int numVertices, int dimension, bool reset = false);
 
       /**
        * return the workspace for a vertex in an edge

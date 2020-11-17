@@ -24,6 +24,8 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+#define G2O_VERTEX_I_DIM ((VertexXiType::Dimension < 0) ? static_cast<const VertexXiType*> (_vertices[0])->dimension() : VertexXiType::Dimension)
+
 template <int D, typename E, typename VertexXiType>
 void BaseUnaryEdge<D, E, VertexXiType>::resize(size_t size)
 {
@@ -56,9 +58,7 @@ void BaseUnaryEdge<D, E, VertexXiType>::constructQuadraticForm()
 
   bool istatus = !from->fixed();
   if (istatus) {
-#ifdef G2O_OPENMP
-    from->lockQuadraticForm();
-#endif
+    internal::QuadraticFormLock lck(*from);
     if (this->robustKernel()) {
       number_t error = this->chi2();
       Vector3 rho;
@@ -68,19 +68,20 @@ void BaseUnaryEdge<D, E, VertexXiType>::constructQuadraticForm()
       from->b().noalias() -= rho[1] * A.transpose() * omega * _error;
       from->A().noalias() += A.transpose() * weightedOmega * A;
     } else {
+      //std::cout << "from->b()=" << from->b().transpose() << std::endl;
+      //std::cout << "A.transpose()=" << A.transpose() << std::endl;
+      //std::cout << "omega=" << omega << std::endl;
+      //std::cout << "_error=" << _error.transpose() << std::endl;
       from->b().noalias() -= A.transpose() * omega * _error;
       from->A().noalias() += A.transpose() * omega * A;
     }
-#ifdef G2O_OPENMP
-    from->unlockQuadraticForm();
-#endif
   }
 }
 
 template <int D, typename E, typename VertexXiType>
 void BaseUnaryEdge<D, E, VertexXiType>::linearizeOplus(JacobianWorkspace& jacobianWorkspace)
 {
-  new (&_jacobianOplusXi) JacobianXiOplusType(jacobianWorkspace.workspaceForVertex(0), D < 0 ? _dimension : D, VertexXiType::Dimension);
+  new (&_jacobianOplusXi) JacobianXiOplusType(jacobianWorkspace.workspaceForVertex(0), D < 0 ? _dimension : D, G2O_VERTEX_I_DIM);
   linearizeOplus();
 }
 
@@ -93,39 +94,71 @@ void BaseUnaryEdge<D, E, VertexXiType>::linearizeOplus()
   if (vi->fixed())
     return;
 
-#ifdef G2O_OPENMP
-  vi->lockQuadraticForm();
-#endif
+  internal::QuadraticFormLock lck(*vi);
 
   const number_t delta = cst(1e-9);
   const number_t scalar = 1 / (2*delta);
-  ErrorVector error1;
+  ErrorVector errorBak;
   ErrorVector errorBeforeNumeric = _error;
 
-  number_t add_vi[VertexXiType::Dimension] = {};
+  // A statically allocated array is far and away the most efficient
+  // way to construct the perturbation vector for the Jacobian. If the
+  // dimension is known at compile time, use directly. If the
+  // dimension is known at run time and is less than 12, use an
+  // allocated array of up to 12. Otherwise, use a fallback of the
+  // dynamically allocated array. The value of 12 is used because
+  // most vertices have a dimension significantly smaller than this.
 
-  // add small step along the unit vector in each dimension
-  for (int d = 0; d < VertexXiType::Dimension; ++d) {
-    vi->push();
-    add_vi[d] = delta;
-    vi->oplus(add_vi);
-    computeError();
-    error1 = _error;
-    vi->pop();
-    vi->push();
-    add_vi[d] = -delta;
-    vi->oplus(add_vi);
-    computeError();
-    vi->pop();
-    add_vi[d] = 0.0;
+  const int vi_dim = G2O_VERTEX_I_DIM;
 
-    _jacobianOplusXi.col(d) = scalar * (error1 - _error);
-  } // end dimension
+  if ((VertexXiType::Dimension >= 0) || (vi_dim <= 12))
+    {
+      number_t add_vi[(VertexXiType::Dimension >= 0) ? VertexXiType::Dimension : 12] = {};
 
+      // add small step along the unit vector in each dimension
+      for (int d = 0; d < vi_dim; ++d) {
+        vi->push();
+        add_vi[d] = delta;
+        vi->oplus(add_vi);
+        computeError();
+        errorBak = _error;
+        vi->pop();
+        vi->push();
+        add_vi[d] = -delta;
+        vi->oplus(add_vi);
+        computeError();
+        errorBak -= _error;
+        vi->pop();
+        add_vi[d] = 0.0;
+        _jacobianOplusXi.col(d) = scalar * errorBak;
+      } // end dimension
+    }
+  else
+    {
+      dynamic_aligned_buffer<number_t> buffer{ size_t(vi_dim) };
+      number_t* add_vi = buffer.request(vi_dim);
+      std::fill(add_vi, add_vi + vi_dim, cst(0.0));
+      
+      // add small step along the unit vector in each dimension
+      for (int d = 0; d < vi_dim; ++d) {
+        vi->push();
+        add_vi[d] = delta;
+        vi->oplus(add_vi);
+        computeError();
+        errorBak = _error;
+        vi->pop();
+        vi->push();
+        add_vi[d] = - delta;
+        vi->oplus(add_vi);
+        computeError();
+        errorBak -= _error;
+        vi->pop();
+        add_vi[d] = 0;
+        _jacobianOplusXi.col(d) = scalar * errorBak;
+      } // end dimension
+    }
+  
   _error = errorBeforeNumeric;
-#ifdef G2O_OPENMP
-  vi->unlockQuadraticForm();
-#endif
 }
 
 template <int D, typename E, typename VertexXiType>
@@ -133,3 +166,5 @@ void BaseUnaryEdge<D, E, VertexXiType>::initialEstimate(const OptimizableGraph::
 {
   std::cerr << __PRETTY_FUNCTION__ << " is not implemented, please give implementation in your derived class" << std::endl;
 }
+
+#undef G2O_VERTEX_I_DIM

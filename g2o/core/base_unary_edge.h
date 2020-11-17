@@ -35,6 +35,7 @@
 #include "g2o/stuff/misc.h"
 #include "base_edge.h"
 #include "robust_kernel.h"
+#include "dynamic_aligned_buffer.hpp"
 
 namespace g2o {
 
@@ -63,7 +64,7 @@ namespace g2o {
       virtual void linearizeOplus(JacobianWorkspace& jacobianWorkspace);
 
       virtual OptimizableGraph::Vertex* createVertex(int i);
-
+      
       /**
        * Linearizes the oplus operator in the vertex, and stores
        * the result in temporary variables _jacobianOplusXi and _jacobianOplusXj
@@ -94,7 +95,7 @@ namespace g2o {
     public:
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   };
-
+  
 #include "base_unary_edge.hpp"
 
 } // end namespace g2o

@@ -34,6 +34,7 @@
 #include "robust_kernel.h"
 #include "g2o/config.h"
 #include "g2o/stuff/misc.h"
+#include "dynamic_aligned_buffer.hpp"
 
 namespace g2o {
 
