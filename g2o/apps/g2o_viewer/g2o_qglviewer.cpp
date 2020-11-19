@@ -139,7 +139,7 @@ void G2oQGLViewer::init()
   setAxisIsDrawn();
 
   // don't save state
-  setStateFileName(QString::null);
+  setStateFileName(QString());
 
   // mouse bindings
 #ifdef QGLVIEWER_DEPRECATED_MOUSEBINDING

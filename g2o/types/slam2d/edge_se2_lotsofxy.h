@@ -44,14 +44,6 @@ namespace g2o {
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
       EdgeSE2LotsOfXY();
 
-      void setDimension(int dimension_)
-      {
-        _dimension = dimension_;
-        _information.resize(dimension_, dimension_);
-        _error.resize(dimension_, 1);
-        _measurement.resize(dimension_, 1);
-      }
-
       void setSize(int vertices)
       {
         resize(vertices);

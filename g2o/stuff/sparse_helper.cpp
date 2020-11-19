@@ -36,22 +36,6 @@ using namespace std;
 
 namespace g2o {
 
-  namespace {
-    struct TripletEntry
-    {
-      int r, c;
-      number_t x;
-      TripletEntry(int r_, int c_, number_t x_) : r(r_), c(c_), x(x_) {}
-    };
-    struct TripletColSort
-    {
-      bool operator()(const TripletEntry& e1, const TripletEntry& e2) const
-      {
-        return e1.c < e2.c || (e1.c == e2.c && e1.r < e2.r);
-      }
-    };
-  }
-
   bool writeVector(const string& filename, const number_t*v, int n)
   {
     ofstream os(filename.c_str());
@@ -78,7 +62,7 @@ namespace g2o {
 
     string name = filename;
     std::string::size_type lastDot = name.find_last_of('.');
-    if (lastDot != std::string::npos) 
+    if (lastDot != std::string::npos)
       name = name.substr(0, lastDot);
 
     std::ofstream fout(filename.c_str());

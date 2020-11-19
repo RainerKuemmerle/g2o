@@ -151,6 +151,8 @@ void BaseFixedSizedEdge<D, E, VertexTypes...>::linearizeOplusN() {
     // estimate the jacobian numerically
     number_t add_vertex[VertexDimension<N>()] = {};
 
+    // TODO for a dynamically sized vertex
+
     // add small step along the unit vector in each dimension
     for (int d = 0; d < VertexDimension<N>(); ++d) {
       vertex->push();

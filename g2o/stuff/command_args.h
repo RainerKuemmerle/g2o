@@ -57,7 +57,6 @@ class G2O_STUFF_API CommandArgs
       {}
     };
   public:
-    CommandArgs();
     virtual ~CommandArgs();
 
     /**
@@ -115,8 +114,6 @@ class G2O_STUFF_API CommandArgs
     const char* type2str(int t) const;
     void str2arg(const std::string& input, CommandArgument& ca) const;
     std::string arg2str(const CommandArgument& ca) const;
-
-    std::string trim(const std::string& s) const;
 };
 
 } // end namespace

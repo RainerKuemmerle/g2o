@@ -114,7 +114,7 @@ namespace g2o {
 
         //! sets the node to the origin (used in the multilevel stuff)
         void setToOrigin() { setToOriginImpl(); updateCache();}
-
+	
         //! get the element from the hessian matrix
         virtual const number_t& hessian(int i, int j) const = 0;
         virtual number_t& hessian(int i, int j) = 0;
@@ -153,7 +153,7 @@ namespace g2o {
          * @return true on success
          */
         bool setEstimateData(const number_t* estimate);
-
+	
         /**
          * sets the initial estimate from an array of number_t
          * Implement setEstimateDataImpl()
@@ -531,6 +531,13 @@ namespace g2o {
     //! return the maximum dimension of all vertices in the graph
     int maxDimension() const;
 
+    //! Recompute the size of the Jacobian workspace from all the
+    //! edges in the graph.
+    void recomputeJacobianWorkspaceSize() 
+    {
+      _jacobianWorkspace.updateSize(*this, true);
+    }
+    
     /**
      * iterates over all vertices and returns a set of all the vertex dimensions in the graph
      */

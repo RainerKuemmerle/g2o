@@ -1,14 +1,14 @@
 # qt components used (also by qglviewer): Core Gui Xml OpenGL Widgets
-
-include_directories(${CSPARSE_INCLUDE_DIR}
+include_directories(SYSTEM
     ${QGLVIEWER_INCLUDE_DIR}
     ${Qt5Core_INCLUDE_DIRS}
     ${Qt5Gui_INCLUDE_DIRS}
     ${Qt5Xml_INCLUDE_DIRS}
     ${Qt5Widgets_INCLUDE_DIRS}
     ${Qt5OpenGL_INCLUDE_DIRS}
-    ${CMAKE_BINARY_DIR} ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR}
-    )
+    ${CSPARSE_INCLUDE_DIR}
+)
+include_directories(${CMAKE_BINARY_DIR} ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
 
 QT5_WRAP_UI(UI_HEADERS base_main_window.ui)
 QT5_WRAP_CPP(UI_SOURCES main_window.h)
@@ -33,9 +33,6 @@ if(Qt5_POSITION_INDEPENDENT_CODE)
     #       does not seem to work: This generates some libraries with -fPIE which is not enough for Qt...
 endif()
 
-
-
-
 target_link_libraries(slam2d_g2o core solver_csparse types_slam2d
     ${QGLVIEWER_LIBRARY}
     ${Qt5Core_LIBRARIES}
@@ -45,4 +42,3 @@ target_link_libraries(slam2d_g2o core solver_csparse types_slam2d
     ${Qt5OpenGL_LIBRARIES}
     ${OPENGL_gl_LIBRARY} ${OPENGL_glu_LIBRARY}
 )
-

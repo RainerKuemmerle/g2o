@@ -27,23 +27,35 @@
 #ifndef G2O_SPARSE_HELPER_H
 #define G2O_SPARSE_HELPER_H
 
-#include "g2o_stuff_api.h"
-#include "g2o/config.h"
-
 #include <string>
+
+#include "g2o/config.h"
+#include "g2o_stuff_api.h"
 
 namespace g2o {
 
-  /**
-   * write an array to a file, debugging
-   */
-  G2O_STUFF_API bool writeVector(const std::string& filename, const number_t*v, int n);
+struct TripletEntry {
+  int r, c;
+  number_t x;
+  TripletEntry(int r_, int c_, number_t x_) : r(r_), c(c_), x(x_) {}
+};
+struct TripletColSort {
+  bool operator()(const TripletEntry& e1, const TripletEntry& e2) const {
+    return e1.c < e2.c || (e1.c == e2.c && e1.r < e2.r);
+  }
+};
 
-  /**
-   * write a CCS matrix given by pointer to column, row, and values
-   */
-  G2O_STUFF_API bool writeCCSMatrix(const std::string& filename, int rows, int cols, const int* p, const int* i, const number_t* v, bool upperTriangleSymmetric = true);
+/**
+ * write an array to a file, debugging
+ */
+G2O_STUFF_API bool writeVector(const std::string& filename, const number_t* v, int n);
 
-} // end namespace
+/**
+ * write a CCS matrix given by pointer to column, row, and values
+ */
+G2O_STUFF_API bool writeCCSMatrix(const std::string& filename, int rows, int cols, const int* p, const int* i,
+                                  const number_t* v, bool upperTriangleSymmetric = true);
+
+}  // namespace g2o
 
 #endif

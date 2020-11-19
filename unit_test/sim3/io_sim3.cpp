@@ -1,5 +1,5 @@
 // g2o - General Graph Optimization
-// Copyright (C) 2011 R. Kuemmerle, G. Grisetti, W. Burgard
+// Copyright (C) 2014 R. Kuemmerle, G. Grisetti, W. Burgard
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -24,33 +24,39 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-template <int D, typename T>
-BaseVertex<D, T>::BaseVertex() :
-  OptimizableGraph::Vertex(),
-  _hessian(nullptr, D, D)
-{
-  _dimension = D;
+#include <sstream>
+
+#include "g2o/types/sim3/types_seven_dof_expmap.h"
+#include "gtest/gtest.h"
+#include "unit_test/test_helper/io.h"
+
+using namespace std;
+using namespace g2o;
+
+struct RandomSim3 {
+  static Sim3 create() {
+    Vector3 randomPosition = Vector3::Random();
+    Quaternion randomOrientation(Vector4::Random().normalized());
+    return Sim3(randomOrientation, randomPosition, 1.0);
+  }
+  static bool isApprox(const Sim3& a, const Sim3& b) {
+    return a.translation().isApprox(b.translation(), 1e-5) && a.rotation().isApprox(b.rotation(), 1e-5) &&
+           fabs(a.scale() - b.scale()) < 1e-5;
+  }
+};
+
+TEST(IoSim3, ReadWriteVertexSim3Expmap) {
+  readWriteVectorBasedVertex<VertexSim3Expmap, RandomSim3>();
 }
 
-template <int D, typename T>
-number_t BaseVertex<D, T>::solveDirect(number_t lambda) {
-  Eigen::Matrix<number_t, D, D, Eigen::ColMajor> tempA=_hessian + Eigen::Matrix<number_t, D, D, Eigen::ColMajor>::Identity(G2O_VERTEX_DIM, G2O_VERTEX_DIM)*lambda;
-  number_t det=tempA.determinant();
-  if (g2o_isnan(det) || det < std::numeric_limits<number_t>::epsilon())
-    return det;
-  Eigen::Matrix<number_t, D, 1, Eigen::ColMajor> dx=tempA.llt().solve(_b);
-  oplus(&dx[0]);
-  return det;
+TEST(IoSim3, ReadWriteEdgeSim3) {
+  readWriteVectorBasedEdge<EdgeSim3, RandomSim3>();
 }
 
-template <int D, typename T>
-void BaseVertex<D, T>::clearQuadraticForm() {
-  _b.setZero();
+TEST(IoSim3, ReadWriteEdgeSim3ProjectXYZ) {
+  readWriteVectorBasedEdge<EdgeSim3ProjectXYZ>();
 }
 
-template <int D, typename T>
-void BaseVertex<D, T>::mapHessianMemory(number_t* d)
-{
-  const int vertexDim = G2O_VERTEX_DIM;
-  new (&_hessian) HessianBlockType(d, vertexDim, vertexDim);
+TEST(IoSim3, ReadWriteEdgeInverseSim3ProjectXYZ) {
+  readWriteVectorBasedEdge<EdgeInverseSim3ProjectXYZ>();
 }

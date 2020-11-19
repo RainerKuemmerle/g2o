@@ -1,4 +1,5 @@
 add_executable(unittest_stuff
+  command_args_tests.cpp
   string_tools_tests.cpp
   tuple_tools_tests.cpp
 )
