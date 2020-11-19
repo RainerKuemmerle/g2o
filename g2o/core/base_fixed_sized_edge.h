@@ -1,6 +1,3 @@
-// This code is based on g2o/core/base_binary_edge.h and
-// g2o/core/base_variable_sized_edge.h
-//
 // g2o - General Graph Optimization
 // Copyright (C) 2011 R. Kuemmerle, G. Grisetti, H. Strasdat, W. Burgard
 // All rights reserved.
@@ -34,10 +31,12 @@
 #include <limits>
 
 #include "base_edge.h"
+#include "dynamic_aligned_buffer.hpp"
+#include "robust_kernel.h"
+
 #include "g2o/config.h"
 #include "g2o/stuff/misc.h"
 #include "g2o/stuff/tuple_tools.h"
-#include "robust_kernel.h"
 
 namespace g2o {
 

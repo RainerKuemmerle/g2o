@@ -1,6 +1,3 @@
-// This code is based on g2o/core/base_binary_edge.hpp and
-// g2o/core/base_variable_sized_edge.hpp
-//
 // g2o - General Graph Optimization
 // Copyright (C) 2011 R. Kuemmerle, G. Grisetti, H. Strasdat, W. Burgard
 // All rights reserved.
@@ -129,7 +126,9 @@ template <std::size_t... Ints>
 void BaseFixedSizedEdge<D, E, VertexTypes...>::linearizeOplus_allocate(JacobianWorkspace& jacobianWorkspace,
                                                                        index_sequence<Ints...>) {
   int unused[] = {(new (&std::get<Ints>(_jacobianOplus)) JacobianType<D, VertexDimension<Ints>()>(
-                       jacobianWorkspace.workspaceForVertex(Ints), D < 0 ? _dimension : D, VertexDimension<Ints>()),
+                       jacobianWorkspace.workspaceForVertex(Ints),
+                       D < 0 ? _dimension : D,
+                       VertexDimension<Ints>() < 0 ? vertexXn<Ints>()->dimension() : VertexDimension<Ints>()),
                    0)...};
   (void)unused;
 }
@@ -138,23 +137,48 @@ template <int D, typename E, typename... VertexTypes>
 template <int N>
 void BaseFixedSizedEdge<D, E, VertexTypes...>::linearizeOplusN() {
   auto vertex = vertexXn<N>();
-  bool iNotFixed = !(vertex->fixed());
 
-  if (iNotFixed) {
-    auto& jacobianOplus = std::get<N>(_jacobianOplus);
+  if (vertex->fixed()) return;
 
-    const number_t delta = cst(1e-9);
-    const number_t scalar = 1 / (2 * delta);
+  auto& jacobianOplus = std::get<N>(_jacobianOplus);
 
-    internal::QuadraticFormLock lck(*vertex);
-    (void)lck;
-    // estimate the jacobian numerically
-    number_t add_vertex[VertexDimension<N>()] = {};
+  const number_t delta = cst(1e-9);
+  const number_t scalar = 1 / (2 * delta);
 
-    // TODO for a dynamically sized vertex
+  internal::QuadraticFormLock lck(*vertex);
+  (void)lck;
+
+  // estimate the jacobian numerically
+  if (VertexDimension<N>() > 0) {
+    number_t add_vertex[VertexDimension<N>() > 0 ? VertexDimension<N>() : 0] = {};
 
     // add small step along the unit vector in each dimension
     for (int d = 0; d < VertexDimension<N>(); ++d) {
+      vertex->push();
+      add_vertex[d] = delta;
+      vertex->oplus(add_vertex);
+      computeError();
+      auto errorBak = this->error();
+      vertex->pop();
+      vertex->push();
+      add_vertex[d] = -delta;
+      vertex->oplus(add_vertex);
+      computeError();
+      errorBak -= this->error();
+      vertex->pop();
+      add_vertex[d] = 0.0;
+
+      jacobianOplus.col(d) = scalar * errorBak;
+    }  // end dimension
+  } else {
+    assert(vertex->dimension() > 0 && "Vertex with illegal dimension");
+    dynamic_aligned_buffer<number_t> buffer{ static_cast<size_t>(vertex->dimension()) };
+    number_t* add_vertex = buffer.request(vertex->dimension());
+
+    jacobianOplus.resize(_dimension, vertex->dimension());
+
+    // add small step along the unit vector in each dimension
+    for (int d = 0; d < vertex->dimension(); ++d) {
       vertex->push();
       add_vertex[d] = delta;
       vertex->oplus(add_vertex);

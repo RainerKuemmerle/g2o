@@ -58,7 +58,7 @@ class BaseVariableSizedEdge : public BaseEdge<D, E> {
   };
 
  public:
-  static const int Dimension = BaseEdge<D, E>::Dimension;
+  static constexpr int Dimension = BaseEdge<D, E>::Dimension;
   typedef typename BaseEdge<D, E>::Measurement Measurement;
   typedef MatrixX::MapType JacobianType;
   typedef typename BaseEdge<D, E>::ErrorVector ErrorVector;
