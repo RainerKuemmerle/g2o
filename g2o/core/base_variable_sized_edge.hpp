@@ -63,14 +63,6 @@ void BaseVariableSizedEdge<D, E>::linearizeOplus() {
   ErrorVector errorBak;
   ErrorVector errorBeforeNumeric = _error;
 
-  // A statically allocated array is far and away the most efficient
-  // way to construct the perturbation vector for the Jacobian. If the
-  // dimension is less than 12, use a statically allocated
-  // buffer. Otherwise, a fallback of the dynamically allocated
-  // array. The value of 12 is used because most vertices have a
-  // dimension significantly smaller than this.
-  dynamic_aligned_buffer<number_t> buffer{ 12 };
-
   for (size_t i = 0; i < _vertices.size(); ++i) {
     // Xi - estimate the jacobian numerically
     OptimizableGraph::Vertex* vi = static_cast<OptimizableGraph::Vertex*>(_vertices[i]);
@@ -88,46 +80,25 @@ void BaseVariableSizedEdge<D, E>::linearizeOplus() {
            "jacobian cache dimension does not match");
     _jacobianOplus[i].resize(_dimension, vi_dim);
     // add small step along the unit vector in each dimension
-    if (vi_dim <= 12) {
-      number_t add_vi[12] = {};
-      for (int d = 0; d < vi_dim; ++d) {
-        vi->push();
-        add_vi[d] = delta;
-        vi->oplus(add_vi);
-        computeError();
-        errorBak = _error;
-        vi->pop();
-        vi->push();
-        add_vi[d] = -delta;
-        vi->oplus(add_vi);
-        computeError();
-        errorBak -= _error;
-        vi->pop();
-        add_vi[d] = 0.0;
+    ceres::internal::FixedArray<number_t> add_vi(vi_dim);
+    add_vi.fill(0.);
+    for (int d = 0; d < vi_dim; ++d) {
+      vi->push();
+      add_vi[d] = delta;
+      vi->oplus(add_vi.data());
+      computeError();
+      errorBak = _error;
+      vi->pop();
+      vi->push();
+      add_vi[d] = -delta;
+      vi->oplus(add_vi.data());
+      computeError();
+      errorBak -= _error;
+      vi->pop();
+      add_vi[d] = 0.0;
 
-        _jacobianOplus[i].col(d) = scalar * errorBak;
-      }  // end dimension
-    } else {
-      number_t* add_vi = buffer.request(vi_dim);
-      std::fill(add_vi, add_vi + vi_dim, cst(0.0));
-      for (int d = 0; d < vi_dim; ++d) {
-        vi->push();
-        add_vi[d] = delta;
-        vi->oplus(add_vi);
-        computeError();
-        errorBak = _error;
-        vi->pop();
-        vi->push();
-        add_vi[d] = -delta;
-        vi->oplus(add_vi);
-        computeError();
-        errorBak -= _error;
-        vi->pop();
-        add_vi[d] = 0.0;
-
-        _jacobianOplus[i].col(d) = scalar * errorBak;
-      }  // end dimension
-    }
+      _jacobianOplus[i].col(d) = scalar * errorBak;
+    }  // end dimension
     _error = errorBeforeNumeric;
   }
 }
@@ -197,188 +168,6 @@ void BaseVariableSizedEdge<D, E>::computeQuadraticForm(const InformationType& om
       for (size_t j = i + 1; j < _vertices.size(); ++j) {
         OptimizableGraph::Vertex* to = static_cast<OptimizableGraph::Vertex*>(_vertices[j]);
 
-        bool jstatus = !(to->fixed());
-        if (jstatus) {
-          internal::QuadraticFormLock lck(*to);
-          const JacobianType& B = _jacobianOplus[j];
-          int idx = internal::computeUpperTriangleIndex(i, j);
-          assert(idx < (int)_hessian.size());
-          HessianHelper& hhelper = _hessian[idx];
-          if (hhelper.transposed) {  // we have to write to the block as transposed
-            hhelper.matrix.noalias() += B.transpose() * AtO.transpose();
-          } else {
-            hhelper.matrix.noalias() += AtO * B;
-          }
-        }
-      }
-    }
-  }
-}
-
-// PARTIAL TEMPLATE SPECIALIZATION
-
-template <typename E>
-void BaseVariableSizedEdge<-1, E>::constructQuadraticForm() {
-  if (this->robustKernel()) {
-    number_t error = this->chi2();
-    Vector3 rho;
-    this->robustKernel()->robustify(error, rho);
-    Eigen::Matrix<number_t, Eigen::Dynamic, 1, Eigen::ColMajor> omega_r = -_information * _error;
-    omega_r *= rho[1];
-    computeQuadraticForm(this->robustInformation(rho), omega_r);
-  } else {
-    computeQuadraticForm(_information, -_information * _error);
-  }
-}
-
-template <typename E>
-void BaseVariableSizedEdge<-1, E>::linearizeOplus(JacobianWorkspace& jacobianWorkspace) {
-  for (size_t i = 0; i < _vertices.size(); ++i) {
-    OptimizableGraph::Vertex* v = static_cast<OptimizableGraph::Vertex*>(_vertices[i]);
-    assert(v->dimension() >= 0);
-    new (&_jacobianOplus[i]) JacobianType(jacobianWorkspace.workspaceForVertex(i), _dimension, v->dimension());
-  }
-  linearizeOplus();
-}
-
-template <typename E>
-void BaseVariableSizedEdge<-1, E>::linearizeOplus() {
-  const number_t delta = cst(1e-9);
-  const number_t scalar = 1 / (2 * delta);
-  ErrorVector errorBak;
-  ErrorVector errorBeforeNumeric = _error;
-
-  for (size_t i = 0; i < _vertices.size(); ++i) {
-    // Xi - estimate the jacobian numerically
-    OptimizableGraph::Vertex* vi = static_cast<OptimizableGraph::Vertex*>(_vertices[i]);
-
-    if (vi->fixed()) {
-      continue;
-    }
-
-    internal::QuadraticFormLock lck(*vi);
-    const int vi_dim = vi->dimension();
-    assert(vi_dim >= 0);
-
-    assert(_jacobianOplus[i].rows() == _dimension && _jacobianOplus[i].cols() == vi_dim && "jacobian cache dimension does not match");
-    _jacobianOplus[i].resize(_dimension, vi_dim);
-
-    if (vi_dim < 20) {
-      number_t add_vi[20] = {};
-
-      // add small step along the unit vector in each dimension
-      for (int d = 0; d < vi_dim; ++d) {
-        vi->push();
-        add_vi[d] = delta;
-        vi->oplus(add_vi);
-        computeError();
-        errorBak = _error;
-        vi->pop();
-        vi->push();
-        add_vi[d] = -delta;
-        vi->oplus(add_vi);
-        computeError();
-        errorBak -= _error;
-        vi->pop();
-        add_vi[d] = 0.0;
-
-        _jacobianOplus[i].col(d) = scalar * errorBak;
-      }  // end dimension
-    } else {
-      Eigen::Matrix<number_t, Eigen::Dynamic, 1> add_vi(vi_dim);
-      add_vi.setZero();
-      number_t* v = add_vi.data();
-
-      // add small step along the unit vector in each dimension
-      for (int d = 0; d < vi_dim; ++d) {
-        vi->push();
-        *v = delta;
-        vi->oplus(v);
-        computeError();
-        errorBak = _error;
-        vi->pop();
-        vi->push();
-        *v = -delta;
-        vi->oplus(v);
-        computeError();
-        errorBak -= _error;
-        vi->pop();
-        *(v++) = 0;
-        _jacobianOplus[i].col(d) = scalar * errorBak;
-      }  // end dimension
-    }
-
-    _error = errorBeforeNumeric;
-
-  }
-}
-
-
-template <typename E>
-void BaseVariableSizedEdge<-1, E>::mapHessianMemory(number_t* d, int i, int j, bool rowMajor) {
-  int idx = internal::computeUpperTriangleIndex(i, j);
-  assert(idx < (int)_hessian.size());
-  OptimizableGraph::Vertex* vi = static_cast<OptimizableGraph::Vertex*>(HyperGraph::Edge::vertex(i));
-  OptimizableGraph::Vertex* vj = static_cast<OptimizableGraph::Vertex*>(HyperGraph::Edge::vertex(j));
-  assert(vi->dimension() >= 0);
-  assert(vj->dimension() >= 0);
-  HessianHelper& h = _hessian[idx];
-  if (rowMajor) {
-    if (h.matrix.data() != d || h.transposed != rowMajor)
-      new (&h.matrix) HessianBlockType(d, vj->dimension(), vi->dimension());
-  } else {
-    if (h.matrix.data() != d || h.transposed != rowMajor)
-      new (&h.matrix) HessianBlockType(d, vi->dimension(), vj->dimension());
-  }
-  h.transposed = rowMajor;
-}
-
-template <typename E>
-void BaseVariableSizedEdge<-1, E>::resize(size_t size) {
-  BaseEdge<-1, E>::resize(size);
-  int n = (int)_vertices.size();
-  int maxIdx = (n * (n - 1)) / 2;
-  assert(maxIdx >= 0);
-  _hessian.resize(maxIdx);
-  _jacobianOplus.resize(size, JacobianType(0, 0, 0));
-}
-
-template <typename E>
-bool BaseVariableSizedEdge<-1, E>::allVerticesFixed() const {
-  for (size_t i = 0; i < _vertices.size(); ++i) {
-    if (!static_cast<const OptimizableGraph::Vertex*>(_vertices[i])->fixed()) {
-      return false;
-    }
-  }
-  return true;
-}
-
-template <typename E>
-void BaseVariableSizedEdge<-1, E>::computeQuadraticForm(const InformationType& omega,
-                                                        const ErrorVector& weightedError) {
-  for (size_t i = 0; i < _vertices.size(); ++i) {
-    OptimizableGraph::Vertex* from = static_cast<OptimizableGraph::Vertex*>(_vertices[i]);
-    bool istatus = !(from->fixed());
-
-    if (istatus) {
-      const JacobianType& A = _jacobianOplus[i];
-
-      MatrixX AtO = A.transpose() * omega;
-      int fromDim = from->dimension();
-      assert(fromDim >= 0);
-      Eigen::Map<MatrixX> fromMap(from->hessianData(), fromDim, fromDim);
-      Eigen::Map<VectorX> fromB(from->bData(), fromDim);
-
-      // ii block in the hessian
-      {
-        internal::QuadraticFormLock lck(*from);
-        fromMap.noalias() += AtO * A;
-        fromB.noalias() += A.transpose() * weightedError;
-      }
-
-      // compute the off-diagonal blocks ij for all j
-      for (size_t j = i + 1; j < _vertices.size(); ++j) {
-        OptimizableGraph::Vertex* to = static_cast<OptimizableGraph::Vertex*>(_vertices[j]);
         bool jstatus = !(to->fixed());
         if (jstatus) {
           internal::QuadraticFormLock lck(*to);

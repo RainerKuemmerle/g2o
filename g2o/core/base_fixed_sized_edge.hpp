@@ -148,55 +148,32 @@ void BaseFixedSizedEdge<D, E, VertexTypes...>::linearizeOplusN() {
   internal::QuadraticFormLock lck(*vertex);
   (void)lck;
 
+  typedef typename std::conditional<VertexXnType<N>::Dimension == -1,
+    ceres::internal::FixedArray<number_t>,
+    ceres::internal::FixedArray<number_t, static_cast<size_t>(VertexXnType<N>::Dimension)> >::type FixedArray;
+  FixedArray add_vertex(vertexDimension<N>());
+  add_vertex.fill(0.);
+
   // estimate the jacobian numerically
-  if (VertexDimension<N>() > 0) {
-    number_t add_vertex[VertexDimension<N>() > 0 ? VertexDimension<N>() : 0] = {};
+  // add small step along the unit vector in each dimension
+  for (int d = 0; d < (VertexDimension<N>() < 0 ? vertexDimension<N>() : VertexDimension<N>()); ++d) {
+    vertex->push();
+    add_vertex[d] = delta;
+    vertex->oplus(add_vertex.data());
+    computeError();
+    auto errorBak = this->error();
+    vertex->pop();
+    vertex->push();
+    add_vertex[d] = -delta;
+    vertex->oplus(add_vertex.data());
+    computeError();
+    errorBak -= this->error();
+    vertex->pop();
+    add_vertex[d] = 0.0;
 
-    // add small step along the unit vector in each dimension
-    for (int d = 0; d < VertexDimension<N>(); ++d) {
-      vertex->push();
-      add_vertex[d] = delta;
-      vertex->oplus(add_vertex);
-      computeError();
-      auto errorBak = this->error();
-      vertex->pop();
-      vertex->push();
-      add_vertex[d] = -delta;
-      vertex->oplus(add_vertex);
-      computeError();
-      errorBak -= this->error();
-      vertex->pop();
-      add_vertex[d] = 0.0;
-
-      jacobianOplus.col(d) = scalar * errorBak;
-    }  // end dimension
-  } else {
-    assert(vertex->dimension() > 0 && "Vertex with illegal dimension");
-    dynamic_aligned_buffer<number_t> buffer{ static_cast<size_t>(vertex->dimension()) };
-    number_t* add_vertex = buffer.request(vertex->dimension());
-
-    jacobianOplus.resize(_dimension, vertex->dimension());
-
-    // add small step along the unit vector in each dimension
-    for (int d = 0; d < vertex->dimension(); ++d) {
-      vertex->push();
-      add_vertex[d] = delta;
-      vertex->oplus(add_vertex);
-      computeError();
-      auto errorBak = this->error();
-      vertex->pop();
-      vertex->push();
-      add_vertex[d] = -delta;
-      vertex->oplus(add_vertex);
-      computeError();
-      errorBak -= this->error();
-      vertex->pop();
-      add_vertex[d] = 0.0;
-
-      jacobianOplus.col(d) = scalar * errorBak;
-    }  // end dimension
-  }
-};
+    jacobianOplus.col(d) = scalar * errorBak;
+  }  // end dimension
+}
 
 template <int D, typename E, typename... VertexTypes>
 template <std::size_t... Ints>

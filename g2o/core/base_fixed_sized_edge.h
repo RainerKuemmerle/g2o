@@ -31,12 +31,13 @@
 #include <limits>
 
 #include "base_edge.h"
-#include "dynamic_aligned_buffer.hpp"
 #include "robust_kernel.h"
 
 #include "g2o/config.h"
 #include "g2o/stuff/misc.h"
 #include "g2o/stuff/tuple_tools.h"
+
+#include "EXTERNAL/ceres/fixed_array.h"
 
 namespace g2o {
 
@@ -61,6 +62,18 @@ class BaseFixedSizedEdge : public BaseEdge<D, E> {
   static constexpr int VertexDimension() {
     return VertexXnType<VertexN>::Dimension;
   };
+
+  template <int VertexN>
+  typename std::enable_if<VertexXnType<VertexN>::Dimension != -1, int>::type
+  vertexDimension() const {
+    return VertexXnType<VertexN>::Dimension;
+  };
+  template <int VertexN>
+  typename std::enable_if<VertexXnType<VertexN>::Dimension == -1, int>::type
+  vertexDimension() const {
+    return vertexXn<VertexN>()->dimension();
+  };
+
   template <int VertexN>
   const VertexXnType<VertexN>* vertexXn() const {
     return static_cast<const VertexXnType<VertexN>*>(_vertices[VertexN]);
