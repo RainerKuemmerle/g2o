@@ -37,7 +37,7 @@
 #include "g2o/stuff/misc.h"
 #include "g2o/stuff/tuple_tools.h"
 
-#include "EXTERNAL/ceres/fixed_array.h"
+  #include "EXTERNAL/ceres/fixed_array.h"
 
 namespace g2o {
 
@@ -49,6 +49,21 @@ constexpr int pair_to_index(const int i, const int j) { return j * (j - 1) / 2 +
 constexpr std::pair<int, int> index_to_pair(const int k, const int j = 0) {
   return k - j < 0 ? std::pair<int, int>{k, j} : index_to_pair(k - j, j + 1);
 }
+
+//! helper function to call the c'tor of Eigen::Map
+template <typename T>
+T createHessianMapK() {
+  // if the size is known at compile time, we have to call the c'tor of Eigen::Map with corresponding values
+  constexpr int r = T::RowsAtCompileTime == Eigen::Dynamic ? 0 : T::RowsAtCompileTime;
+  constexpr int c = T::ColsAtCompileTime == Eigen::Dynamic ? 0 : T::ColsAtCompileTime;
+  return T(nullptr, r, c);
+}
+//! helper function for creating a tuple of Eigen::Map
+template <typename... Args>
+std::tuple<Args...> createHessianMaps(const std::tuple<Args...>&) {
+  return std::tuple<Args...>{createHessianMapK<Args>()...};
+}
+
 }  // namespace internal
 
 template <int D, typename E, typename... VertexTypes>
@@ -56,13 +71,19 @@ class BaseFixedSizedEdge : public BaseEdge<D, E> {
  public:
   template <int N, typename... Types>
   using NthType = typename std::tuple_element<N, std::tuple<Types...>>::type;
+  //! The type of the N-th vertex
   template <int VertexN>
   using VertexXnType = NthType<VertexN, VertexTypes...>;
+  //! Size of the N-th vertex at compile time
   template <int VertexN>
   static constexpr int VertexDimension() {
     return VertexXnType<VertexN>::Dimension;
   };
-
+  /**
+   * Get the size of a given Vertex.
+   * If the vertex dimension is static and by this known at compile time, we return this.
+   * Otherwise we get the size at runtime.
+   */
   template <int VertexN>
   typename std::enable_if<VertexXnType<VertexN>::Dimension != -1, int>::type
   vertexDimension() const {
@@ -73,7 +94,9 @@ class BaseFixedSizedEdge : public BaseEdge<D, E> {
   vertexDimension() const {
     return vertexXn<VertexN>()->dimension();
   };
-
+  /**
+   * Return a pointer to the N-th vertex, directly casted to the correct type
+   */
   template <int VertexN>
   const VertexXnType<VertexN>* vertexXn() const {
     return static_cast<const VertexXnType<VertexN>*>(_vertices[VertexN]);
@@ -91,6 +114,7 @@ class BaseFixedSizedEdge : public BaseEdge<D, E> {
   template <int EdgeDimension, int VertexDimension>
   using JacobianType = typename Eigen::Matrix<number_t, EdgeDimension, VertexDimension,
                                               EdgeDimension == 1 ? Eigen::RowMajor : Eigen::ColMajor>::AlignedMapType;
+
   //! it requires quite some ugly code to get the type of hessians...
   template <int DN, int DM>
   using HessianBlockType =
@@ -120,8 +144,8 @@ class BaseFixedSizedEdge : public BaseEdge<D, E> {
   BaseFixedSizedEdge()
       : BaseEdge<D, E>(),
         _hessianRowMajor(false),
-        _hessianTuple(tuple_init(nullptr, _hessianTuple)),
-        _hessianTupleTransposed(tuple_init(nullptr, _hessianTupleTransposed)),
+        _hessianTuple(internal::createHessianMaps(_hessianTuple)),
+        _hessianTupleTransposed(internal::createHessianMaps(_hessianTupleTransposed)),
         _jacobianOplus({nullptr, D, VertexTypes::Dimension}...) {
     _vertices.resize(_nr_of_vertices, nullptr);
   }

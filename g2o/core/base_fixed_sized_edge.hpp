@@ -193,20 +193,28 @@ void BaseFixedSizedEdge<D, E, VertexTypes...>::linearizeOplus() {
   _error = errorBeforeNumeric;
 }
 
+/**
+ * Helper functor class to construct the Hessian Eigen::Map object.
+ * We have to pass the size at runtime to allow dynamically sized verices.
+ */
 struct MapHessianMemoryK {
   number_t* d;
+  int rows;
+  int cols;
   template <typename HessianT>
   void operator()(HessianT& hessian) {
-    new (&hessian) typename std::remove_reference<decltype(hessian)>::type(d);
+    new (&hessian) typename std::remove_reference<decltype(hessian)>::type(d, rows, cols);
   }
 };
 
 template <int D, typename E, typename... VertexTypes>
 void BaseFixedSizedEdge<D, E, VertexTypes...>::mapHessianMemory(number_t* d, int i, int j, bool rowMajor) {
-  if (rowMajor)
-    tuple_apply_i(MapHessianMemoryK{d}, _hessianTupleTransposed, internal::pair_to_index(i, j));
-  else
-    tuple_apply_i(MapHessianMemoryK{d}, _hessianTuple, internal::pair_to_index(i, j));
-
+  // get the size of the vertices
+  int vi_dim = static_cast<OptimizableGraph::Vertex*>(HyperGraph::Edge::vertex(i))->dimension();
+  int vj_dim = static_cast<OptimizableGraph::Vertex*>(HyperGraph::Edge::vertex(j))->dimension();
   _hessianRowMajor = rowMajor;
+  if (rowMajor)
+    tuple_apply_i(MapHessianMemoryK{d, vj_dim, vi_dim}, _hessianTupleTransposed, internal::pair_to_index(i, j));
+  else
+    tuple_apply_i(MapHessianMemoryK{d, vi_dim, vj_dim}, _hessianTuple, internal::pair_to_index(i, j));
 }
