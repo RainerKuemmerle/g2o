@@ -64,6 +64,18 @@ std::tuple<Args...> createHessianMaps(const std::tuple<Args...>&) {
   return std::tuple<Args...>{createHessianMapK<Args>()...};
 }
 
+template <std::size_t I, typename... Tp>
+typename std::enable_if<I == sizeof...(Tp), OptimizableGraph::Vertex*>::type createNthVertexType(size_t) {
+  return nullptr; // end of recursion, return null
+}
+template <std::size_t I, typename... Tp>
+typename std::enable_if<I<sizeof...(Tp), OptimizableGraph::Vertex*>::type createNthVertexType(size_t i) {
+  if (i == I) {
+    using VertexType = typename std::tuple_element<I, std::tuple<Tp...>>::type;
+    return new VertexType();
+  } else
+    return createNthVertexType<I + 1, Tp...>(i);
+}
 }  // namespace internal
 
 template <int D, typename E, typename... VertexTypes>
@@ -150,9 +162,10 @@ class BaseFixedSizedEdge : public BaseEdge<D, E> {
     _vertices.resize(_nr_of_vertices, nullptr);
   }
 
-  inline virtual OptimizableGraph::Vertex* createVertex(int) {
-    assert(false && "createVertex is not implemented for BaseFixedSizedEdge");
-    return nullptr;
+  //! create an instance of the Nth VertexType
+  virtual OptimizableGraph::Vertex* createVertex(int i) {
+    if (i < 0) return nullptr;
+    return internal::createNthVertexType<0, VertexTypes...>(static_cast<size_t>(i));
   };
 
   inline virtual void resize(size_t size);

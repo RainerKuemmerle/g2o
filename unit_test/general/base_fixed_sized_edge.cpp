@@ -102,6 +102,24 @@ TEST(General, ConstantEdgeConstructor)
   ASSERT_EQ(e_dynamic.vertices()[2], e_constant.vertices()[2]);
 }
 
+TEST(General, FixedEdgeCreateVertex)
+{
+  Edge3Constant e;
+
+  auto v1 = e.createVertex(0);
+  auto v2 = e.createVertex(1);
+  auto v3 = e.createVertex(2);
+  ASSERT_EQ(typeid(*v1), typeid(g2o::VertexSE2));
+  ASSERT_EQ(typeid(*v2), typeid(g2o::VertexSE2));
+  ASSERT_EQ(typeid(*v3), typeid(g2o::VertexPointXY));
+  delete v3;
+  delete v2;
+  delete v1;
+
+  ASSERT_EQ(nullptr, e.createVertex(-1));
+  ASSERT_EQ(nullptr, e.createVertex(3));
+}
+
 template<typename EdgeType>
 class EdgeTester
 {
