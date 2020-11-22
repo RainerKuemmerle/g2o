@@ -37,7 +37,7 @@
 #include "g2o/stuff/misc.h"
 #include "g2o/stuff/tuple_tools.h"
 
-  #include "EXTERNAL/ceres/fixed_array.h"
+#include "EXTERNAL/ceres/fixed_array.h"
 
 namespace g2o {
 
