@@ -1,9 +1,4 @@
-dist: focal
 language: cpp
-
-os:
-  - linux
-  - osx
 
 notifications:
   email:
@@ -12,9 +7,19 @@ notifications:
     on_success: change # default: change
     on_failure: always # default: always
 
-compiler:
-  - gcc
-  - clang
+# where do we want to build
+matrix:
+  include:
+    - os: linux
+      compiler: gcc
+      dist: focal
+    - os: linux
+      compiler: clang
+      dist: focal
+    - os: osx
+      osx_image: xcode12.2
+  allow_failures:
+    - os: osx
 
 before_install:
   - env | sort
@@ -45,7 +50,6 @@ addons:
       - libqglviewer-dev-qt5
       - libsuitesparse-dev
   homebrew: # mac os
-    update: true # workaorund outdated homebrew in the OSX image
     packages:
       - cmake
       - eigen
@@ -54,10 +58,3 @@ addons:
 branches:
   only:
     - master
-
-matrix:
-  exclude:
-    - os: osx
-      compiler: gcc
-  allow_failures:
-    - os: osx
