@@ -11,15 +11,16 @@ notifications:
 matrix:
   include:
     - os: linux
+      arch: amd64
       compiler: gcc
       dist: focal
     - os: linux
+      arch: amd64
       compiler: clang
       dist: focal
     - os: osx
+      arch: amd64
       osx_image: xcode12.2
-  allow_failures:
-    - os: osx
 
 before_install:
   - env | sort
@@ -36,9 +37,7 @@ before_script:
 
 script:
   - make -j $(nproc)
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
-      ctest --extra-verbose ;
-    fi
+  - ctest --extra-verbose
 
 # installing dependencies
 addons:
