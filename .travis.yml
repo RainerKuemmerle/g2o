@@ -45,6 +45,7 @@ addons:
       - libqglviewer-dev-qt5
       - libsuitesparse-dev
   homebrew: # mac os
+    update: true # workaorund outdated homebrew in the OSX image
     packages:
       - cmake
       - eigen
