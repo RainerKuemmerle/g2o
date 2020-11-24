@@ -1,14 +1,9 @@
-sudo: required
 dist: focal
 language: cpp
 
 os:
   - linux
   - osx
-
-env:
-  global:
-    - MAKEFLAGS="-j 2"
 
 notifications:
   email:
@@ -24,8 +19,8 @@ compiler:
 before_install:
   - env | sort
 
-install:
-  - script/install-deps-${TRAVIS_OS_NAME}.sh
+# install:
+#   - script/install-deps-${TRAVIS_OS_NAME}.sh
 
 before_script:
   - mkdir build
@@ -35,10 +30,24 @@ before_script:
   - cat g2o/config.h
 
 script:
-  - make
+  - make -j $(nproc)
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
       ctest --extra-verbose ;
     fi
+
+# installing dependencies
+addons:
+  apt: # linux
+    packages:
+      - libeigen3-dev
+      - qtdeclarative5-dev
+      - qt5-qmake
+      - libqglviewer-dev-qt5
+      - libsuitesparse-dev
+  homebrew: # mac os
+    packages:
+      - cmake
+      - eigen
 
 # right now only build the master branch
 branches:
