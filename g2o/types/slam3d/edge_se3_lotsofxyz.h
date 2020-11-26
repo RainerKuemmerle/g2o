@@ -47,6 +47,7 @@ namespace g2o{
       void setSize(int vertices){
         resize(vertices);
         _observedPoints = vertices-1;
+        _measurement.resize(_observedPoints*3, 1);
         setDimension(_observedPoints*3);
       }
 

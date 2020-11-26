@@ -48,6 +48,7 @@ namespace g2o {
       {
         resize(vertices);
         _observedPoints = vertices-1;
+        _measurement.resize(_observedPoints*2, 1);
         setDimension(_observedPoints*2);
       }
 
