@@ -11,6 +11,10 @@ endif()
 
 target_link_libraries(solver_pcg core)
 
+target_include_directories(solver_pcg PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+  $<INSTALL_INTERFACE:include/g2o/solvers/pcg>)
+
 install(TARGETS solver_pcg
   EXPORT ${G2O_TARGETS_EXPORT_NAME}
   RUNTIME DESTINATION ${RUNTIME_DESTINATION}

@@ -1,5 +1,3 @@
-include_directories(${CSPARSE_INCLUDE_DIR})
-
 add_executable(simulator_3d_plane
   simulator_3d_plane.cpp
 )

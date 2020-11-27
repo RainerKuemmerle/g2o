@@ -1,5 +1,3 @@
-include_directories(${CSPARSE_INCLUDE_DIR})
-
 add_executable(simple_optimize
   simple_optimize.cpp
 )

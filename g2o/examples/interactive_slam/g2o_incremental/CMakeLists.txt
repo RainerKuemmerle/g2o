@@ -2,7 +2,6 @@ add_library(g2o_incremental_library ${G2O_LIB_TYPE}
   graph_optimizer_sparse_incremental.cpp graph_optimizer_sparse_incremental.h
 )
 
-include_directories(${CHOLMOD_INCLUDE_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../)
 
 set_target_properties(g2o_incremental_library PROPERTIES OUTPUT_NAME ${LIB_PREFIX}incremental)

@@ -1,5 +1,3 @@
-include_directories(${CSPARSE_INCLUDE_DIR})
-
 add_library(calibration_odom_laser_library ${G2O_LIB_TYPE}
   gm2dl_io.cpp gm2dl_io.h
   sclam_helpers.cpp sclam_helpers.h

@@ -6,7 +6,6 @@ include_directories(SYSTEM
     ${Qt5Xml_INCLUDE_DIRS}
     ${Qt5Widgets_INCLUDE_DIRS}
     ${Qt5OpenGL_INCLUDE_DIRS}
-    ${CSPARSE_INCLUDE_DIR}
 )
 include_directories(${CMAKE_BINARY_DIR} ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
 

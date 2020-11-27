@@ -1,5 +1,3 @@
-include_directories(${CSPARSE_INCLUDE_DIR})
-
 # add_executable(line_test line_test.cpp)
 # target_link_libraries(line_test types_slam3d_addons types_slam3d)
 # set_target_properties(line_test PROPERTIES OUTPUT_NAME line_test${EXE_POSTFIX})

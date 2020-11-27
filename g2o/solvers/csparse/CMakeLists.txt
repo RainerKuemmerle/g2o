@@ -41,6 +41,14 @@ install(TARGETS solver_csparse csparse_extension
   LIBRARY DESTINATION ${LIBRARY_DESTINATION}
   ARCHIVE DESTINATION ${ARCHIVE_DESTINATION}
   INCLUDES DESTINATION ${INCLUDES_DESTINATION}
-)
+  )
+
+
+target_include_directories(solver_csparse PUBLIC
+  ${CSPARSE_INCLUDE_DIR}
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+  $<INSTALL_INTERFACE:include/g2o/solvers/csparse>)
+
+
 file(GLOB headers "${CMAKE_CURRENT_SOURCE_DIR}/*.h" "${CMAKE_CURRENT_SOURCE_DIR}/*.hpp")
 install(FILES ${headers} DESTINATION ${INCLUDES_INSTALL_DIR}/solvers/csparse)

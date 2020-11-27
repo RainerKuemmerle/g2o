@@ -1,6 +1,4 @@
-include_directories(${CSPARSE_INCLUDE_DIR})
-
-if(CSPARSE_INCLUDE_DIR)
+if(CSPARSE_FOUND)
   add_executable(circle_fit circle_fit.cpp)
   set_target_properties(circle_fit PROPERTIES OUTPUT_NAME circle_fit${EXE_POSTFIX})
   target_link_libraries(circle_fit core solver_csparse)
