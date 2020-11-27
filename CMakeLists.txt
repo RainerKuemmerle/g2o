@@ -55,6 +55,8 @@ endif(MSVC90)
 if(APPLE)
   set(CMAKE_INSTALL_RPATH "")
   set(CMAKE_MACOSX_RPATH TRUE)
+  # ignore deprecated GL
+  add_definitions(-DGL_SILENCE_DEPRECATION)
 endif(APPLE)
 
 # Set the output directory for the build executables and libraries
@@ -318,8 +320,8 @@ if(MSVC)
   set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /Ox /Oi")
   set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} /Ox /Oi")
 
-  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0")
-  set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -O0")
+  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /O0")
+  set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} /O0")
 
   # SSE2 optimizations
   # No need to specify if building for x64 (actually, it generates an annoying warning)
