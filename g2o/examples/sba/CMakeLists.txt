@@ -4,7 +4,6 @@ set_target_properties(sba_demo PROPERTIES OUTPUT_NAME sba_demo${EXE_POSTFIX})
 
 # Link CHOLMOD if available, CSparse otherwise
 if(CHOLMOD_FOUND)
-  include_directories(${CHOLMOD_INCLUDE_DIR})
   target_link_libraries(sba_demo solver_cholmod)
 else()
   target_link_libraries(sba_demo solver_eigen)

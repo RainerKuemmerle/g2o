@@ -5,7 +5,6 @@ add_library(g2o_interactive_library ${G2O_LIB_TYPE}
 )
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../)
-include_directories(${CHOLMOD_INCLUDE_DIR})
 
 set_target_properties(g2o_interactive_library PROPERTIES OUTPUT_NAME ${LIB_PREFIX}interactive)
 target_link_libraries(g2o_interactive_library core types_slam2d types_slam3d solver_cholmod parser_library interface_library)
