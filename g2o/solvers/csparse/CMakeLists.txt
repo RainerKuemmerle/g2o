@@ -2,6 +2,7 @@ if(NOT G2O_USE_CSPARSE)
   return()
 endif()
 
+# Not sure why this is needed if we have a system-installed version of csparse
 include_directories(${CSPARSE_INCLUDE_DIR})
 
 add_library(csparse_extension ${G2O_LGPL_LIB_TYPE}
@@ -34,7 +35,6 @@ target_link_libraries(solver_csparse
   PUBLIC csparse_extension
   PUBLIC core)
 
-
 install(TARGETS solver_csparse csparse_extension
   EXPORT ${G2O_TARGETS_EXPORT_NAME}
   RUNTIME DESTINATION ${RUNTIME_DESTINATION}
@@ -44,6 +44,7 @@ install(TARGETS solver_csparse csparse_extension
   )
 
 target_include_directories(solver_csparse PUBLIC
+  $<BUILD_INTERFACE:${CSPARSE_INCLUDE_DIR}>
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
   $<INSTALL_INTERFACE:include/g2o/solvers/csparse>)
 
