@@ -67,6 +67,10 @@ if (UNIX)
   target_link_libraries(csparse PUBLIC m)
 endif()
 
+target_include_directories(csparse PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+  $<INSTALL_INTERFACE:include/g2o/EXTERNAL/csparse>)
+
 install(TARGETS csparse
   EXPORT ${G2O_TARGETS_EXPORT_NAME}
   RUNTIME DESTINATION ${RUNTIME_DESTINATION}
@@ -80,5 +84,5 @@ install(FILES ${headers} DESTINATION ${INCLUDES_INSTALL_DIR}/EXTERNAL/csparse)
 
 # Set up the variables
 set(CSPARSE_LIBRARY "$<TARGET_FILE:csparse>")
-set(CSPARSE_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR} CACHE PATH "Include directory for CSparse" FORCE)
-set(CSPARSE_LIBRARY     ${CSPARSE_LIBRARY} CACHE FILEPATH "CSparse library" FORCE)
+#set(CSPARSE_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR} CACHE PATH "Include directory for CSparse" FORCE)
+#set(CSPARSE_LIBRARY     ${CSPARSE_LIBRARY} CACHE FILEPATH "CSparse library" FORCE)
