@@ -18,7 +18,7 @@ add_library(g2o_hierarchical_library ${G2O_LIB_TYPE}
 
 set_target_properties(g2o_hierarchical_library PROPERTIES OUTPUT_NAME ${LIB_PREFIX}hierarchical)
 if (APPLE)
-  set_target_properties(g2o_hierarchical_library PROPERTIES INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib")
+  set_target_properties(g2o_hierarchical_library PROPERTIES INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
 endif()
 
 target_link_libraries(g2o_hierarchical_library core)

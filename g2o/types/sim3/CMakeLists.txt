@@ -5,7 +5,7 @@ add_library(types_sim3 ${G2O_LIB_TYPE}
 
 set_target_properties(types_sim3 PROPERTIES OUTPUT_NAME ${LIB_PREFIX}types_sim3)
 if (APPLE)
-  set_target_properties(types_sim3 PROPERTIES INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib")
+  set_target_properties(types_sim3 PROPERTIES INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
 endif()
 target_link_libraries(types_sim3 PUBLIC types_sba)
 

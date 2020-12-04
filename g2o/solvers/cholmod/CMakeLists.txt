@@ -11,7 +11,7 @@ include_directories(${CHOLMOD_INCLUDE_DIR})
 
 set_target_properties(solver_cholmod PROPERTIES OUTPUT_NAME ${LIB_PREFIX}solver_cholmod)
 if (APPLE)
-  set_target_properties(solver_cholmod PROPERTIES INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib")
+  set_target_properties(solver_cholmod PROPERTIES INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
 endif()
 
 add_definitions(${BLAS_DEFINITIONS} ${LAPACK_DEFINITIONS})
