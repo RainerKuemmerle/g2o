@@ -1,3 +1,5 @@
+add_subdirectory(ba)
+add_subdirectory(ba_anchored_inverse_depth)
 add_subdirectory(bal)
 add_subdirectory(calibration_odom_laser)
 add_subdirectory(data_convert)
@@ -11,15 +13,8 @@ add_subdirectory(sba)
 add_subdirectory(sim3)
 add_subdirectory(simple_optimize)
 add_subdirectory(sphere)
+add_subdirectory(target)
 add_subdirectory(tutorial_slam2d)
-
-# The condition on cholmod is required here because the cholmod solver
-# is explicitly used in these examples.
-if(CHOLMOD_FOUND)
-  add_subdirectory(ba)
-  add_subdirectory(ba_anchored_inverse_depth)
-  add_subdirectory(target)
-endif()
 
 if(Qt5_FOUND AND QGLVIEWER_FOUND)
   add_subdirectory(slam2d)
