@@ -37,7 +37,7 @@
 #include "g2o/core/optimization_algorithm_gauss_newton.h"
 #include "g2o/core/base_vertex.h"
 #include "g2o/core/base_unary_edge.h"
-#include "g2o/solvers/csparse/linear_solver_csparse.h"
+#include "g2o/solvers/eigen/linear_solver_eigen.h"
 
 using namespace std;
 
@@ -152,7 +152,7 @@ int main(int argc, char** argv)
 
   // some handy typedefs
   typedef g2o::BlockSolver< g2o::BlockSolverTraits<Eigen::Dynamic, Eigen::Dynamic> >  MyBlockSolver;
-  typedef g2o::LinearSolverCSparse<MyBlockSolver::PoseMatrixType> MyLinearSolver;
+  typedef g2o::LinearSolverEigen<MyBlockSolver::PoseMatrixType> MyLinearSolver;
 
   // setup the solver
   g2o::SparseOptimizer optimizer;

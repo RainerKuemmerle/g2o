@@ -26,9 +26,6 @@
 
 #include <fstream>
 #include "g2o/core/sparse_optimizer.h"
-#include "g2o/solvers/pcg/linear_solver_pcg.h"
-#include "g2o/core/block_solver.h"
-#include "g2o/core/linear_solver.h"
 #include "g2o/core/optimization_algorithm_factory.h"
 #include "g2o/types/slam3d/types_slam3d.h"
 #include "g2o/types/slam3d_addons/types_slam3d_addons.h"
@@ -42,7 +39,7 @@ using namespace g2o;
 using namespace std;
 using namespace Eigen;
 
-G2O_USE_OPTIMIZATION_LIBRARY(csparse)
+G2O_USE_OPTIMIZATION_LIBRARY(eigen)
 
 Eigen::Isometry3d sample_noise_from_se3(const Vector6& cov ){
   double nx=g2o::Sampler::gaussRand(0., cov(0));
@@ -134,8 +131,8 @@ struct Robot: public WorldItem {
       Isometry3d noise=sample_noise_from_se3(_nmovecov);
       e->setMeasurement(delta*noise);
       Matrix6 m=Matrix6::Identity();
-      for (int i=0; i<6; i++){
-	m(i,i)=1./(_nmovecov(i));
+      for (int i = 0; i < 6; i++) {
+        m(i, i) = 1. / (_nmovecov(i));
       }
       e->setInformation(m);
       e->vertices()[0]=vertex();

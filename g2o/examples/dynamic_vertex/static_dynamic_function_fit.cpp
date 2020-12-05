@@ -25,7 +25,7 @@
 #include "g2o/core/base_dynamic_vertex.h"
 #include "g2o/core/base_unary_edge.h"
 #include "g2o/core/base_binary_edge.h"
-#include "g2o/solvers/csparse/linear_solver_csparse.h"
+#include "g2o/solvers/eigen/linear_solver_eigen.h"
 
 // Declare the custom types used in the graph
 
@@ -68,7 +68,7 @@ public:
 // we can change it at runtime.
 
 class PPolynomialCoefficientVertex : public g2o::BaseDynamicVertex<Eigen::VectorXd> {
-  
+
 public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
 
@@ -131,7 +131,7 @@ struct FunctionObservation
 
 class MultipleValueEdge : public g2o::BaseBinaryEdge<Eigen::Dynamic, Eigen::VectorXd, FPolynomialCoefficientVertex,
 						     PPolynomialCoefficientVertex> {
-  
+
 public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
 
@@ -141,7 +141,7 @@ public:
     InformationType I = Eigen::MatrixXd::Identity(_x.size(), _x.size()) * omega;
     setInformation(I);
   }
-  
+
   virtual bool read(std::istream& is) {
     Eigen::VectorXd z;
     g2o::internal::readVector(is, _x);
@@ -150,10 +150,10 @@ public:
 
     return readInformationMatrix(is);
   }
-  
+
   virtual bool write(std::ostream& os) const {
     g2o::internal::writeVector(os, _x);
-    g2o::internal::writeVector(os, _measurement); 
+    g2o::internal::writeVector(os, _measurement);
     return writeInformationMatrix(os);
   }
 
@@ -165,7 +165,7 @@ public:
       double x3 = pow(_x[i], 3);
       _error[i] = _measurement[i] - Eigen::poly_eval(fvertex->estimate(), _x[i])
 	- x3 * (Eigen::poly_eval(pvertex->estimate(), _x[i]));
-    }	
+    }
   }
 
 private:
@@ -178,14 +178,14 @@ int main(int argc, const char* argv[]) {
 
   // Random number generator
   std::default_random_engine generator;
-  
-  
+
+
   // Create the coefficients for the f-polynomial (all drawn randomly)
   Eigen::Vector3d f;
   for (int i = 0; i < 3; ++i) {
     f[i] = g2o::sampleUniform(-1, 1);
   }
-  
+
   // Number of dimensions of the polynomial; the default is 4
   int polynomialDimension = 4;
   if (argc > 1) {
@@ -213,27 +213,27 @@ int main(int argc, const char* argv[]) {
   double sigmaZ = 0.1;
   std::vector<FunctionObservation> observations(obs);
   std::uniform_int_distribution<int> cardinalitySampler(1, 5);
-  
+
   for (int i = 0; i < obs; ++i) {
     FunctionObservation& fo = observations[i];
     int numObs = cardinalitySampler(generator);
     fo.x.resize(numObs);
     fo.z.resize(numObs);
-    for (int o = 0; o < numObs; ++ o) {
+    for (int o = 0; o < numObs; ++o) {
       fo.x[o] = g2o::sampleUniform(-5, 5);
       double x3 = pow(fo.x[o], 3);
-      fo.z[o] = Eigen::poly_eval(f, fo.x[o]) + x3 * (Eigen::poly_eval(p, fo.x[o]))
-	+ sigmaZ * g2o::sampleGaussian();
+      fo.z[o] = Eigen::poly_eval(f, fo.x[o]) + x3 * (Eigen::poly_eval(p, fo.x[o])) +
+                sigmaZ * g2o::sampleGaussian();
     }
   }
 
   // Construct the graph and set up the solver and optimiser
-  std::unique_ptr<g2o::BlockSolverX::LinearSolverType> linearSolver = g2o::make_unique<
-    g2o::LinearSolverCSparse<g2o::BlockSolverX::PoseMatrixType>>();
+  std::unique_ptr<g2o::BlockSolverX::LinearSolverType> linearSolver =
+      g2o::make_unique<g2o::LinearSolverEigen<g2o::BlockSolverX::PoseMatrixType>>();
 
   // Set up the solver
-  std::unique_ptr<g2o::BlockSolverX> blockSolver = g2o::make_unique<g2o::BlockSolverX>(
-										       move(linearSolver));
+  std::unique_ptr<g2o::BlockSolverX> blockSolver =
+      g2o::make_unique<g2o::BlockSolverX>(move(linearSolver));
 
   // Set up the optimisation algorithm
   g2o::OptimizationAlgorithm* optimisationAlgorithm =
@@ -247,8 +247,8 @@ int main(int argc, const char* argv[]) {
   // Create the f vertex; its dimensions are known
   FPolynomialCoefficientVertex* pf = new FPolynomialCoefficientVertex();
   pf->setId(0);
-  optimizer->addVertex(pf);  
-  
+  optimizer->addVertex(pf);
+
   // Create the vertex; note its dimension is currently is undefined
   PPolynomialCoefficientVertex* pv = new PPolynomialCoefficientVertex();
   pv->setId(1);
@@ -256,7 +256,7 @@ int main(int argc, const char* argv[]) {
 
   // Create the information matrix
   double omega = 1 / (sigmaZ * sigmaZ);
-  
+
   // Create the edges
   for (int i = 0; i < obs; ++i) {
     MultipleValueEdge* mve = new MultipleValueEdge(observations[i], omega);
