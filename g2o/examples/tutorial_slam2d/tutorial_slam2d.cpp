@@ -40,7 +40,7 @@
 #include "g2o/core/factory.h"
 #include "g2o/core/optimization_algorithm_factory.h"
 #include "g2o/core/optimization_algorithm_gauss_newton.h"
-#include "g2o/solvers/csparse/linear_solver_csparse.h"
+#include "g2o/solvers/eigen/linear_solver_eigen.h"
 
 using namespace std;
 using namespace g2o;
@@ -60,7 +60,7 @@ int main()
    ********************************************************************************/
 
   typedef BlockSolver< BlockSolverTraits<-1, -1> >  SlamBlockSolver;
-  typedef LinearSolverCSparse<SlamBlockSolver::PoseMatrixType> SlamLinearSolver;
+  typedef LinearSolverEigen<SlamBlockSolver::PoseMatrixType> SlamLinearSolver;
 
   // allocating the optimizer
   SparseOptimizer optimizer;
@@ -82,7 +82,7 @@ int main()
   cerr << "Optimization: Adding robot poses ... ";
   for (size_t i = 0; i < simulator.poses().size(); ++i) {
     const Simulator::GridPose& p = simulator.poses()[i];
-    const SE2& t = p.simulatorPose; 
+    const SE2& t = p.simulatorPose;
     VertexSE2* robot =  new VertexSE2;
     robot->setId(p.id);
     robot->setEstimate(t);

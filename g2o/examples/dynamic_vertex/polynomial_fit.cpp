@@ -16,7 +16,7 @@
 #include "g2o/core/base_dynamic_vertex.h"
 #include "g2o/core/base_unary_edge.h"
 #include "g2o/core/base_binary_edge.h"
-#include "g2o/solvers/csparse/linear_solver_csparse.h"
+#include "g2o/solvers/eigen/linear_solver_eigen.h"
 
 // Declare the custom types used in the graph
 
@@ -105,14 +105,14 @@ public:
     setMeasurement(z);
     setInformation(omega);
   }
-  
+
   virtual bool read(std::istream& is) {
     double z;
     is >> _x >> z;
     setMeasurement(z);
     return readInformationMatrix(is);
   }
-  
+
   virtual bool write(std::ostream& os) const {
     os << _x << " " << _measurement;
     return writeInformationMatrix(os);
@@ -150,7 +150,7 @@ int main(int argc, const char* argv[]) {
   int obs = 6;
   if (argc > 2) {
     obs = atoi(argv[2]);
-  }  
+  }
 
   // Sample the observations; we don't do anything with them here, but
   // they could be plotted
@@ -164,12 +164,12 @@ int main(int argc, const char* argv[]) {
   }
 
   // Construct the graph and set up the solver and optimiser
-  std::unique_ptr<g2o::BlockSolverX::LinearSolverType> linearSolver = g2o::make_unique<
-    g2o::LinearSolverCSparse<g2o::BlockSolverX::PoseMatrixType>>();
+  std::unique_ptr<g2o::BlockSolverX::LinearSolverType> linearSolver =
+      g2o::make_unique<g2o::LinearSolverEigen<g2o::BlockSolverX::PoseMatrixType>>();
 
   // Set up the solver
-  std::unique_ptr<g2o::BlockSolverX> blockSolver = g2o::make_unique<g2o::BlockSolverX>(
-										       move(linearSolver));
+  std::unique_ptr<g2o::BlockSolverX> blockSolver =
+      g2o::make_unique<g2o::BlockSolverX>(move(linearSolver));
 
   // Set up the optimisation algorithm
   g2o::OptimizationAlgorithm* optimisationAlgorithm =
@@ -188,7 +188,7 @@ int main(int argc, const char* argv[]) {
   // Create the information matrix
   PolynomialSingleValueEdge::InformationType omega = PolynomialSingleValueEdge::InformationType::Zero();
   omega(0, 0) = 1 / (sigmaZ * sigmaZ);
-  
+
   // Create the observations and the edges
   for (int i = 0; i < obs; ++i) {
     PolynomialSingleValueEdge* pe = new PolynomialSingleValueEdge(x[i], z[i], omega);

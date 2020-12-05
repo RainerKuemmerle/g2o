@@ -33,7 +33,7 @@
 #include "g2o/core/optimization_algorithm_levenberg.h"
 #include "g2o/core/solver.h"
 #include "g2o/core/sparse_optimizer.h"
-#include "g2o/solvers/csparse/linear_solver_csparse.h"
+#include "g2o/solvers/eigen/linear_solver_eigen.h"
 #include "g2o/stuff/sampler.h"
 #include "g2o/types/icp/types_icp.h"
 
@@ -59,7 +59,7 @@ int main(int argc, char **argv)
 
   // variable-size block solver
   g2o::OptimizationAlgorithmLevenberg* solver = new g2o::OptimizationAlgorithmLevenberg(
-    g2o::make_unique<BlockSolverX>(g2o::make_unique<LinearSolverCSparse<g2o::BlockSolverX::PoseMatrixType>>()));
+    g2o::make_unique<BlockSolverX>(g2o::make_unique<LinearSolverEigen<g2o::BlockSolverX::PoseMatrixType>>()));
 
   optimizer.setAlgorithm(solver);
 

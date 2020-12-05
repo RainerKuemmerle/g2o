@@ -13,7 +13,7 @@ build:
   project: c:\projects\g2o\build\g2o.sln
 
 install:
-  - set QTDIR=C:\Qt\5.10.1\msvc2017_64
+  - set QTDIR=C:\Qt\5.15.1\msvc2019_64
   - set PATH=%PATH%;%QTDIR%\bin
   - ps: wget https://gitlab.com/libeigen/eigen/-/archive/3.3.7/eigen-3.3.7.zip -outfile eigen3.zip
   - cmd: 7z x eigen3.zip -o"C:\projects" -y > nul

@@ -121,6 +121,9 @@ class LinearSolverEigen: public LinearSolver<MatrixType>
       return true;
     }
 
+    // TODO implement solveBlocks
+    // TODO implement solvePattern
+
     //! do the AMD ordering on the blocks or on the scalar matrix
     bool blockOrdering() const { return _blockOrdering;}
     void setBlockOrdering(bool blockOrdering) { _blockOrdering = blockOrdering;}

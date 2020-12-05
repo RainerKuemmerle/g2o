@@ -39,7 +39,7 @@
 #include "g2o/core/block_solver.h"
 #include "g2o/core/optimization_algorithm_gauss_newton.h"
 #include "g2o/core/optimization_algorithm_levenberg.h"
-#include "g2o/solvers/csparse/linear_solver_csparse.h"
+#include "g2o/solvers/eigen/linear_solver_eigen.h"
 
 #include <iostream>
 using namespace std;
@@ -108,7 +108,7 @@ namespace g2o {
   void allocateSolverForSclam(SparseOptimizer& optimizer, bool levenberg)
   {
     typedef BlockSolver< BlockSolverTraits<-1, -1> >  SclamBlockSolver;
-    typedef LinearSolverCSparse<SclamBlockSolver::PoseMatrixType> SclamLinearSolver;
+    typedef LinearSolverEigen<SclamBlockSolver::PoseMatrixType> SclamLinearSolver;
 
     std::unique_ptr<SclamLinearSolver> linearSolver = g2o::make_unique<SclamLinearSolver>();
     linearSolver->setBlockOrdering(false);
@@ -120,5 +120,5 @@ namespace g2o {
     }
     optimizer.setAlgorithm(solver);
   }
-      
+
 } // end namespace

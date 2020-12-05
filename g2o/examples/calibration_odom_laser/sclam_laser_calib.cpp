@@ -50,7 +50,7 @@ using namespace g2o;
 
 static bool hasToStop = false;
 
-G2O_USE_OPTIMIZATION_LIBRARY(csparse);
+G2O_USE_OPTIMIZATION_LIBRARY(eigen);
 G2O_USE_TYPE_GROUP(slam2d);
 
 void sigquit_handler(int sig)
