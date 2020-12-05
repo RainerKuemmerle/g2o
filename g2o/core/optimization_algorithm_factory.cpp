@@ -110,7 +110,7 @@ namespace g2o {
       os << sp.name;
       for (size_t i = sp.name.size(); i < solverNameColumnLength; ++i)
         os << ' ';
-      os << sp.desc << endl;
+      os << sp.type << " \t" << sp.desc << endl;
     }
   }
 
