@@ -2,9 +2,6 @@ if(NOT G2O_USE_CSPARSE)
   return()
 endif()
 
-# Not sure why this is needed if we have a system-installed version of csparse
-include_directories(${CSPARSE_INCLUDE_DIR})
-
 add_library(csparse_extension ${G2O_LGPL_LIB_TYPE}
   csparse_helper.cpp csparse_helper.h
   csparse_extension.cpp csparse_extension.h
@@ -15,11 +12,11 @@ if (APPLE)
   set_target_properties(csparse_extension PROPERTIES INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
 endif()
 
-if(BUILD_CSPARSE)
-  target_link_libraries(csparse_extension PUBLIC csparse ${G2O_EIGEN3_EIGEN_TARGET})
-else()
-  target_link_libraries(csparse_extension PUBLIC ${CSPARSE_LIBRARY} ${G2O_EIGEN3_EIGEN_TARGET})
-endif()
+target_include_directories(csparse_extension PUBLIC
+  $<BUILD_INTERFACE:${CSPARSE_INCLUDE_DIR}>
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+  $<INSTALL_INTERFACE:include/g2o/solvers/csparse>)
+target_link_libraries(csparse_extension PUBLIC ${CSPARSE_LIBRARY} ${G2O_EIGEN3_EIGEN_TARGET})
 
 add_library(solver_csparse ${G2O_LIB_TYPE}
   solver_csparse.cpp
@@ -31,6 +28,10 @@ if (APPLE)
   set_target_properties(solver_csparse PROPERTIES INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
 endif()
 
+target_include_directories(solver_csparse PUBLIC
+  $<BUILD_INTERFACE:${CSPARSE_INCLUDE_DIR}>
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+  $<INSTALL_INTERFACE:include/g2o/solvers/csparse>)
 target_link_libraries(solver_csparse
   PUBLIC csparse_extension
   PUBLIC core)
@@ -42,11 +43,6 @@ install(TARGETS solver_csparse csparse_extension
   ARCHIVE DESTINATION ${ARCHIVE_DESTINATION}
   INCLUDES DESTINATION ${INCLUDES_DESTINATION}
   )
-
-target_include_directories(solver_csparse PUBLIC
-  $<BUILD_INTERFACE:${CSPARSE_INCLUDE_DIR}>
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
-  $<INSTALL_INTERFACE:include/g2o/solvers/csparse>)
 
 file(GLOB headers "${CMAKE_CURRENT_SOURCE_DIR}/*.h" "${CMAKE_CURRENT_SOURCE_DIR}/*.hpp")
 install(FILES ${headers} DESTINATION ${INCLUDES_INSTALL_DIR}/solvers/csparse)
