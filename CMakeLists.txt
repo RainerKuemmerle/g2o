@@ -104,35 +104,26 @@ if(ANDROID)
   message(STATUS "Cross compiling for Android")
 endif()
 
-# For building the CHOLMOD / CSPARSE solvers
-option (G2O_USE_CHOLMOD "Build g2o with CHOLMOD support" ON)
-
+# For building the CHOLMOD based solvers
+option(G2O_USE_CHOLMOD "Build g2o with CHOLMOD support" ON)
 find_package(Cholmod)
 find_package(BLAS)
 find_package(LAPACK)
-
-if(G2O_USE_CHOLMOD AND CHOLMOD_FOUND AND BLAS_FOUND AND LAPACK_FOUND)
+if (G2O_USE_CHOLMOD AND CHOLMOD_FOUND AND BLAS_FOUND AND LAPACK_FOUND)
   message(STATUS "Found CHOLMOD and its dependencies")
   set(CHOLMOD_FOUND TRUE)
 else()
   set(CHOLMOD_FOUND FALSE)
 endif()
 
-option (G2O_USE_CSPARSE "Build g2o with CSParse support" ON)
-
+# For building the CSparse based solvers
+option(G2O_USE_CSPARSE "Build g2o with CSParse support" ON)
 find_package(CSparse)
-if (G2O_USE_CSPARSE)
-  if(CSPARSE_FOUND)
-    set(BUILD_CSPARSE OFF CACHE BOOL "Build local CSparse library")
-  else(CSPARSE_FOUND)
-    set(BUILD_CSPARSE ON CACHE BOOL "Build local CSparse library")
-    if(BUILD_CSPARSE)
-      set(CSPARSE_FOUND TRUE)
-    endif()
-  endif(CSPARSE_FOUND)
-else(G2O_USE_CSPARSE)
-  set(BUILD_CSPARSE OFF "Build local CSparse library")
-endif(G2O_USE_CSPARSE)
+if (G2O_USE_CSPARSE AND CSPARSE_FOUND)
+  message(STATUS "Found CSparse")
+else()
+  set(CSPARSE_FOUND FALSE)
+endif()
 
 option(BUILD_LGPL_SHARED_LIBS "Build LGPL Code as Shared Libraries (LGPL Code)" ON)
 set (G2O_LGPL_LIB_TYPE STATIC)
