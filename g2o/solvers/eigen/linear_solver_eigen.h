@@ -121,7 +121,10 @@ class LinearSolverEigen: public LinearSolver<MatrixType>
       return true;
     }
 
-    // TODO implement solveBlocks
+    // TODO implement solveBlocks,
+    // _cholesky.matrixL().nestedExpression().outerIndexPtr();
+    // _cholesky.matrixL().nestedExpression().innerIndexPtr();
+    // _cholesky.matrixL().nestedExpression().innerNonZeroPtr();
     // TODO implement solvePattern
 
     //! do the AMD ordering on the blocks or on the scalar matrix
