@@ -7,7 +7,10 @@ add_library(solver_cholmod ${G2O_LIB_TYPE}
   linear_solver_cholmod.h
 )
 
-include_directories(${CHOLMOD_INCLUDE_DIR})
+target_include_directories(solver_cholmod PUBLIC
+  $<BUILD_INTERFACE:${CHOLMOD_INCLUDES}>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+    $<INSTALL_INTERFACE:include/g2o/solvers/cholmod>)
 
 set_target_properties(solver_cholmod PROPERTIES OUTPUT_NAME ${LIB_PREFIX}solver_cholmod)
 if (APPLE)
