@@ -85,9 +85,25 @@ TYPED_TEST_P(LS, SolvePattern) {
   for (int i = 0; i < static_cast<int>(this->sparse_matrix.rowBlockIndices().size()); ++i)
     blockIndices.emplace_back(std::make_pair(i, i));
 
-  this->linearsolver->solvePattern(spinv, blockIndices, this->sparse_matrix);
+  bool state = this->linearsolver->solvePattern(spinv, blockIndices, this->sparse_matrix);
+  ASSERT_TRUE(!state || spinv.rowBlockIndices().size() == blockIndices.size());
+  if (!state) {  // solver does not implement solving for a pattern return in this case
+    SUCCEED();
+    return;
+  }
 
-  // TODO compare solved pattern with the expected inverse
+  for (const auto& idx : blockIndices) {
+    int rr = spinv.rowBaseOfBlock(idx.first);
+    int cc = spinv.colBaseOfBlock(idx.second);
+    int numRows = spinv.rowsOfBlock(idx.first);
+    int numCols = spinv.colsOfBlock(idx.second);
+
+    g2o::MatrixX expected = this->matrix_inverse.block(rr, cc, numRows, numCols);
+    g2o::MatrixX actual = *spinv.block(idx.first, idx.second);
+
+    EXPECT_TRUE(actual.isApprox(expected, 1e-6))
+        << "block " << idx.first << " " << idx.second << " differs";
+  }
 }
 
 REGISTER_TYPED_TEST_SUITE_P(LS, Solve, SolvePattern);
