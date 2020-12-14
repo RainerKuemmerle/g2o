@@ -35,6 +35,11 @@ namespace internal {
 g2o::SparseBlockMatrixX createTestMatrix();
 
 /**
+ * return the inverse of A that is returned as sparse matrix by createTestMatrix
+ */
+g2o::MatrixX createTestMatrixInverse();
+
+/**
  * Create a dense x-vector of a system A*x = b
  */
 g2o::VectorX createTestVectorX();
