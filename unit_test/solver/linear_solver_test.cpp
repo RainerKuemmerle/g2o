@@ -109,7 +109,33 @@ TYPED_TEST_P(LS, SolvePattern) {
   }
 }
 
-REGISTER_TYPED_TEST_SUITE_P(LS, Solve, SolvePattern);
+TYPED_TEST_P(LS, SolveBlocks) {
+  this->linearsolver->setBlockOrdering(TypeParam::second_type::blockOrdering);
+
+  number_t** blocks = nullptr;
+  bool state = this->linearsolver->solveBlocks(blocks, this->sparse_matrix);
+  ASSERT_TRUE(!state || blocks != nullptr);
+  if (!state) {  // solver does not implement solving for a pattern return in this case
+    SUCCEED();
+    return;
+  }
+
+  for (size_t i = 0; i < this->sparse_matrix.rowBlockIndices().size(); ++i) {
+    int rr = this->sparse_matrix.rowBaseOfBlock(i);
+    int cc = this->sparse_matrix.colBaseOfBlock(i);
+    int numRows = this->sparse_matrix.rowsOfBlock(i);
+    int numCols = this->sparse_matrix.colsOfBlock(i);
+
+    g2o::MatrixX expected = this->matrix_inverse.block(rr, cc, numRows, numCols);
+    g2o::MatrixX::MapType actual(blocks[i], numRows, numCols);
+
+    EXPECT_TRUE(actual.isApprox(expected, 1e-6)) << "block " << i << " " << i << " differs";
+  }
+  TypeParam::first_type::deallocateBlocks(this->sparse_matrix, blocks);
+}
+
+// registering the test suite and all the types to be tested
+REGISTER_TYPED_TEST_SUITE_P(LS, Solve, SolvePattern, SolveBlocks);
 
 using LinearSolverTypes = ::testing::Types<
 #ifdef G2O_HAVE_CSPARSE
