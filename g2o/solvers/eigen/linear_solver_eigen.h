@@ -186,15 +186,7 @@ class LinearSolverEigen: public LinearSolver<MatrixType>
         // Adapt the block permutation to the scalar matrix
         PermutationMatrix scalarP;
         scalarP.resize(rows);
-        int scalarIdx = 0;
-        for (int i = 0; i < blockP.size(); ++i) {
-          const int& p = blockP.indices()(i);
-          int base  = A.colBaseOfBlock(p);
-          int nCols = A.colsOfBlock(p);
-          for (int j = 0; j < nCols; ++j)
-            scalarP.indices()(scalarIdx++) = base++;
-        }
-        assert(scalarIdx == rows && "did not completely fill the permutation matrix");
+        this->blockToScalarPermutation(A, blockP.indices(), scalarP.indices());
         // analyze with the scalar permutation
         _cholesky.analyzePatternWithPermutation(_sparseMatrix, scalarP);
 

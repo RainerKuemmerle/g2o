@@ -299,19 +299,7 @@ class LinearSolverCholmod : public LinearSolverCCS<MatrixType>
         }
 
         // blow up the permutation to the scalar matrix
-        if (_scalarPermutation.size() == 0)
-          _scalarPermutation.resize(_cholmodSparse->ncol);
-        if (_scalarPermutation.size() < (int)_cholmodSparse->ncol)
-          _scalarPermutation.resize(2*_cholmodSparse->ncol);
-        size_t scalarIdx = 0;
-        for (int i = 0; i < _matrixStructure.n; ++i) {
-          const int& p = _blockPermutation(i);
-          int base  = A.colBaseOfBlock(p);
-          int nCols = A.colsOfBlock(p);
-          for (int j = 0; j < nCols; ++j)
-            _scalarPermutation(scalarIdx++) = base++;
-        }
-        assert(scalarIdx == _cholmodSparse->ncol);
+        this->blockToScalarPermutation(A, _blockPermutation, _scalarPermutation);
 
         // apply the ordering
         _cholmodCommon.nmethods = 1 ;
