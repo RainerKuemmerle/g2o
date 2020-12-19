@@ -124,15 +124,7 @@ class LinearSolverCSparse : public LinearSolverCCS<MatrixType> {
   bool solveBlocks(number_t**& blocks, const SparseBlockMatrix<MatrixType>& A) {
     prepareSolve(A);
 
-    if (!blocks) {
-      blocks = new number_t*[A.rows()];
-      number_t** block = blocks;
-      for (size_t i = 0; i < A.rowBlockIndices().size(); ++i) {
-        int dim = A.rowsOfBlock(i) * A.colsOfBlock(i);
-        *block = new number_t[dim];
-        block++;
-      }
-    }
+    if (!blocks) LinearSolverCCS<MatrixType>::allocateBlocks(A, blocks);
 
     bool ok = true;
     csn* numericCholesky = csparse_extension::cs_chol_workspace(&_ccsA, _symbolicDecomposition,
