@@ -232,17 +232,9 @@ class LinearSolverCSparse : public LinearSolverCCS<MatrixType> {
       int* P = cs_amd(1, &auxBlock);
 
       // blow up the permutation to the scalar matrix
-      if (_scalarPermutation.size() == 0) _scalarPermutation.resize(n);
-      if (_scalarPermutation.size() < n) _scalarPermutation.resize(2 * n);
-      size_t scalarIdx = 0;
-      for (int i = 0; i < _matrixStructure.n; ++i) {
-        const int& p = P[i];
-        int base = A.colBaseOfBlock(p);
-        int nCols = A.colsOfBlock(p);
-        for (int j = 0; j < nCols; ++j) _scalarPermutation(scalarIdx++) = base++;
-      }
-      assert((int)scalarIdx == n);
-      cs_free(P);
+      VectorXI::MapType blockPermutation(P, _matrixStructure.n);
+      this->blockToScalarPermutation(A, blockPermutation, _scalarPermutation);
+      cs_free(P); // clean the memory
 
       // apply the scalar permutation to finish symbolic decomposition
       _symbolicDecomposition = (css*)cs_calloc(1, sizeof(css)); /* allocate result S */

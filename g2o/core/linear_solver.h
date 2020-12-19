@@ -79,7 +79,8 @@ class LinearSolver
     virtual bool writeDebug() const { return false;}
     virtual void setWriteDebug(bool) {}
 
-    static void allocateBlocks(const SparseBlockMatrix<MatrixType>& A, double**& blocks) {
+    //! allocate block memory structure
+    static void allocateBlocks(const SparseBlockMatrix<MatrixType>& A, number_t**& blocks) {
       blocks = new number_t*[A.rows()];
       number_t** block = blocks;
       for (size_t i = 0; i < A.rowBlockIndices().size(); ++i) {
@@ -89,12 +90,36 @@ class LinearSolver
       }
     }
 
-    static void deallocateBlocks(const SparseBlockMatrix<MatrixType>& A, double**& blocks) {
+    //! de-allocate the block structure
+    static void deallocateBlocks(const SparseBlockMatrix<MatrixType>& A, number_t**& blocks) {
       for (size_t i = 0; i < A.rowBlockIndices().size(); ++i) {
         delete[] blocks[i];
       }
       delete[] blocks;
       blocks = nullptr;
+    }
+
+    /**
+     * Convert a block permutation matrix to a scalar permutation
+     */
+    template <typename BlockDerived, typename ScalarDerived>
+    static void blockToScalarPermutation(
+        const SparseBlockMatrix<MatrixType>& A, const Eigen::MatrixBase<BlockDerived>& p,
+        const Eigen::MatrixBase<ScalarDerived>& scalar /* output */) {
+      int n = A.cols();
+      Eigen::MatrixBase<ScalarDerived>& scalarPermutation =
+          const_cast<Eigen::MatrixBase<ScalarDerived>&>(scalar);
+      if (scalarPermutation.size() == 0) scalarPermutation.derived().resize(n);
+      if (scalarPermutation.size() < n) scalarPermutation.derived().resize(2 * n);
+      size_t scalarIdx = 0;
+      for (size_t i = 0; i < A.colBlockIndices().size(); ++i) {
+        int base = A.colBaseOfBlock(p(i));
+        int nCols = A.colsOfBlock(p(i));
+        for (int j = 0; j < nCols; ++j) {
+          scalarPermutation(scalarIdx++) = base++;
+        }
+      }
+      assert((int)scalarIdx == n);
     }
 };
 
