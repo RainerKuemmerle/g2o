@@ -71,10 +71,13 @@ TYPED_TEST_P(LS, Solve) {
   this->linearsolver->setBlockOrdering(TypeParam::second_type::blockOrdering);
 
   g2o::VectorX solver_solution;
-  solver_solution.setZero(this->b_vector.size());
-  this->linearsolver->solve(this->sparse_matrix, solver_solution.data(), this->b_vector.data());
+  for (int solve_iter = 0; solve_iter < 2; ++solve_iter) {
+    solver_solution.setZero(this->b_vector.size());
+    this->linearsolver->solve(this->sparse_matrix, solver_solution.data(), this->b_vector.data());
 
-  ASSERT_TRUE(solver_solution.isApprox(this->x_vector, 1e-6));
+    ASSERT_TRUE(solver_solution.isApprox(this->x_vector, 1e-6))
+        << "Solution differs on iteration " << solve_iter;
+  }
 }
 
 TYPED_TEST_P(LS, SolvePattern) {
