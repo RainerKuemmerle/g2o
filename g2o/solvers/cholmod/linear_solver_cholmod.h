@@ -47,11 +47,11 @@ struct CholmodExt : public cholmod_sparse
     nzmax = 0;
     nrow  = 0;
     ncol  = 0;
-    p     = 0;
-    i     = 0;
-    nz    = 0;
-    x     = 0;
-    z     = 0;
+    p     = nullptr;
+    i     = nullptr;
+    nz    = nullptr;
+    x     = nullptr;
+    z     = nullptr;
     stype = 1; // upper triangular block only
     itype = CHOLMOD_INT;
     xtype = CHOLMOD_REAL;
@@ -62,9 +62,9 @@ struct CholmodExt : public cholmod_sparse
   }
   ~CholmodExt()
   {
-    delete[] (int*)p; p = 0;
-    delete[] (double*)x; x = 0;
-    delete[] (int*)i; i = 0;
+    delete[] (int*)p; p = nullptr;
+    delete[] (double*)x; x = nullptr;
+    delete[] (int*)i; i = nullptr;
   }
   size_t columnsAllocated;
 };
@@ -153,7 +153,7 @@ class LinearSolverCholmod : public LinearSolverCCS<MatrixType>
       return true;
     }
 
-    bool solveBlocks(double**& blocks, const SparseBlockMatrix<MatrixType>& A)
+    bool solveBlocks(number_t**& blocks, const SparseBlockMatrix<MatrixType>& A)
     {
       //cerr << __PRETTY_FUNCTION__ << " using cholmod" << endl;
       fillCholmodExt(A, _cholmodFactor != 0); // _cholmodFactor used as bool, if not existing will copy the whole structure, otherwise only the values
@@ -163,15 +163,7 @@ class LinearSolverCholmod : public LinearSolverCCS<MatrixType>
         assert(_cholmodFactor && "Symbolic cholesky failed");
       }
 
-      if (! blocks){
-        blocks=new double*[A.rows()];
-        double **block=blocks;
-        for (size_t i = 0; i < A.rowBlockIndices().size(); ++i){
-          int dim=A.rowsOfBlock(i)*A.colsOfBlock(i);
-          *block = new double [dim];
-          block++;
-        }
-      }
+      if (!blocks) LinearSolverCCS<MatrixType>::allocateBlocks(A, blocks);
 
       cholmod_factorize(_cholmodSparse, _cholmodFactor, &_cholmodCommon);
       if (_cholmodCommon.status == CHOLMOD_NOT_POSDEF)
@@ -285,7 +277,7 @@ class LinearSolverCholmod : public LinearSolverCCS<MatrixType>
           _blockPermutation.resize(_matrixStructure.n);
         if (_blockPermutation.size() < _matrixStructure.n) // double space if resizing
           _blockPermutation.resize(2*_matrixStructure.n);
- 
+
         // prepare AMD call via CHOLMOD
         cholmod_sparse auxCholmodSparse;
         auxCholmodSparse.nzmax = _matrixStructure.nzMax();
