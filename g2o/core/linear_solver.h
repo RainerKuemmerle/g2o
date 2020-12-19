@@ -78,6 +78,24 @@ class LinearSolver
     //! write a debug dump of the system matrix if it is not PSD in solve
     virtual bool writeDebug() const { return false;}
     virtual void setWriteDebug(bool) {}
+
+    static void allocateBlocks(const SparseBlockMatrix<MatrixType>& A, double**& blocks) {
+      blocks = new number_t*[A.rows()];
+      number_t** block = blocks;
+      for (size_t i = 0; i < A.rowBlockIndices().size(); ++i) {
+        int dim = A.rowsOfBlock(i) * A.colsOfBlock(i);
+        *block = new number_t[dim];
+        block++;
+      }
+    }
+
+    static void deallocateBlocks(const SparseBlockMatrix<MatrixType>& A, double**& blocks) {
+      for (size_t i = 0; i < A.rowBlockIndices().size(); ++i) {
+        delete[] blocks[i];
+      }
+      delete[] blocks;
+      blocks = nullptr;
+    }
 };
 
 /**
