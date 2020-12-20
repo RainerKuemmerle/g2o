@@ -52,8 +52,3 @@ addons:
     packages:
       - cmake
       - eigen
-
-# right now only build the master branch
-branches:
-  only:
-    - master
