@@ -270,8 +270,8 @@ class LinearSolverCSparse : public LinearSolverCCS<MatrixType> {
     assert(m > 0 && n > 0 && "Hessian has 0 rows/cols");
 
     if (_ccsA.columnsAllocated < n) {
-      _ccsA.columnsAllocated =
-          _ccsA.columnsAllocated == 0 ? n : 2 * n;  // pre-allocate more space if re-allocating
+      // pre-allocate more space if re-allocating
+      _ccsA.columnsAllocated = _ccsA.columnsAllocated == 0 ? n : 2 * n;
       delete[] _ccsA.p;
       _ccsA.p = new int[_ccsA.columnsAllocated + 1];
     }
@@ -279,8 +279,8 @@ class LinearSolverCSparse : public LinearSolverCCS<MatrixType> {
     if (!onlyValues) {
       int nzmax = A.nonZeros();
       if (_ccsA.nzmax < nzmax) {
-        _ccsA.nzmax =
-            _ccsA.nzmax == 0 ? nzmax : 2 * nzmax;  // pre-allocate more space if re-allocating
+        // pre-allocate more space if re-allocating
+        _ccsA.nzmax = _ccsA.nzmax == 0 ? nzmax : 2 * nzmax;
         delete[] _ccsA.x;
         delete[] _ccsA.i;
         _ccsA.i = new int[_ccsA.nzmax];
