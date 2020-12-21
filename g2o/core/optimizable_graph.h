@@ -27,19 +27,19 @@
 #ifndef G2O_AIS_OPTIMIZABLE_GRAPH_HH_
 #define G2O_AIS_OPTIMIZABLE_GRAPH_HH_
 
-#include <set>
+#include <functional>
 #include <iostream>
+#include <set>
 #include <typeinfo>
-
-#include "openmp_mutex.h"
-#include "hyper_graph.h"
-#include "parameter.h"
-#include "parameter_container.h"
-#include "jacobian_workspace.h"
 
 #include "g2o/stuff/macros.h"
 #include "g2o_core_api.h"
+#include "hyper_graph.h"
 #include "io_helper.h"
+#include "jacobian_workspace.h"
+#include "openmp_mutex.h"
+#include "parameter.h"
+#include "parameter_container.h"
 
 namespace g2o {
 
@@ -114,7 +114,7 @@ namespace g2o {
 
         //! sets the node to the origin (used in the multilevel stuff)
         void setToOrigin() { setToOriginImpl(); updateCache();}
-	
+
         //! get the element from the hessian matrix
         virtual const number_t& hessian(int i, int j) const = 0;
         virtual number_t& hessian(int i, int j) = 0;
@@ -153,7 +153,7 @@ namespace g2o {
          * @return true on success
          */
         bool setEstimateData(const number_t* estimate);
-	
+
         /**
          * sets the initial estimate from an array of number_t
          * Implement setEstimateDataImpl()
@@ -460,33 +460,31 @@ namespace g2o {
           _parameterTypes.resize(newSize, typeid(void*).name());
         }
       protected:
-	int _dimension;
-        int _level;
-        RobustKernel* _robustKernel;
-        long long _internalId;
-        std::vector<int> _cacheIds;
+       int _dimension;
+       int _level;
+       RobustKernel* _robustKernel;
+       long long _internalId;
+       std::vector<int> _cacheIds;
 
-        template <typename ParameterType>
-          bool installParameter(ParameterType*& p, size_t argNo, int paramId=-1){
-            if (argNo>=_parameters.size())
-              return false;
-            _parameterIds[argNo] = paramId;
-            _parameters[argNo] = (Parameter**)&p;
-            _parameterTypes[argNo] = typeid(ParameterType).name();
-            return true;
-          }
+       template <typename ParameterType>
+       bool installParameter(ParameterType*& p, size_t argNo, int paramId = -1) {
+         if (argNo >= _parameters.size()) return false;
+         _parameterIds[argNo] = paramId;
+         _parameters[argNo] = (Parameter**)&p;
+         _parameterTypes[argNo] = typeid(ParameterType).name();
+         return true;
+       }
 
-        template <typename CacheType>
-          void resolveCache(CacheType*& cache, OptimizableGraph::Vertex*,
-              const std::string& _type,
-              const ParameterVector& parameters);
+       template <typename CacheType>
+       void resolveCache(CacheType*& cache, OptimizableGraph::Vertex*, const std::string& _type,
+                         const ParameterVector& parameters);
 
-        bool resolveParameters();
-        virtual bool resolveCaches();
+       bool resolveParameters();
+       virtual bool resolveCaches();
 
-        std::vector<std::string> _parameterTypes;
-        std::vector<Parameter**> _parameters;
-        std::vector<int> _parameterIds;
+       std::vector<std::string> _parameterTypes;
+       std::vector<Parameter**> _parameters;
+       std::vector<int> _parameterIds;
     };
 
     //! returns the vertex number <i>id</i> appropriately casted
@@ -533,11 +531,11 @@ namespace g2o {
 
     //! Recompute the size of the Jacobian workspace from all the
     //! edges in the graph.
-    void recomputeJacobianWorkspaceSize() 
+    void recomputeJacobianWorkspaceSize()
     {
       _jacobianWorkspace.updateSize(*this, true);
     }
-    
+
     /**
      * iterates over all vertices and returns a set of all the vertex dimensions in the graph
      */
@@ -570,6 +568,8 @@ namespace g2o {
     virtual void pop();
     //! discard the last backup of the estimate for all variables by removing it from the stack
     virtual void discardTop();
+
+
 
     //! load the graph from a stream. Uses the Factory singleton for creating the vertices and edges.
     virtual bool load(std::istream& is, bool createEdges=true);
@@ -657,6 +657,11 @@ namespace g2o {
 
     inline ParameterContainer& parameters() {return _parameters;}
     inline const ParameterContainer& parameters() const {return _parameters;}
+
+    //! apply a unary function to all vertices
+    void forEachVertex(std::function<void(OptimizableGraph::Vertex*)> fn);
+    //! apply a unary function to the vertices in vset
+    void forEachVertex(HyperGraph::VertexSet& vset, std::function<void(OptimizableGraph::Vertex*)> fn);
 
   protected:
     std::map<std::string, std::string> _renamedTypesLookup;

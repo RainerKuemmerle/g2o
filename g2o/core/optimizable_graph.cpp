@@ -268,7 +268,7 @@ namespace g2o {
   bool OptimizableGraph::addEdge(OptimizableGraph::Edge* e)
   {
     OptimizableGraph* g = e->graph();
-    
+
       if (g != nullptr && g != this) {
         cerr << __FUNCTION__ << ": FATAL, edge with ID " << e->id() << " has already registered with another graph " << g << endl;
         assert(0 && "Edge already registered with another graph");
@@ -279,7 +279,7 @@ namespace g2o {
       if (!eresult)
           return false;
       //    std::cerr << "called HyperGraph::addEdge" << std::endl;
-      
+
       e->_internalId = _nextEdgeId++;
       if (e->numUndefinedVertices())
           return true;
@@ -349,59 +349,46 @@ number_t OptimizableGraph::chi2() const
   return chi;
 }
 
-void OptimizableGraph::push()
-{
-  for (OptimizableGraph::VertexIDMap::iterator it=_vertices.begin(); it!=_vertices.end(); ++it) {
+void OptimizableGraph::push() {
+  forEachVertex([](OptimizableGraph::Vertex* v) { v->push(); });
+}
+
+void OptimizableGraph::pop() {
+  forEachVertex([](OptimizableGraph::Vertex* v) { v->pop(); });
+}
+
+void OptimizableGraph::discardTop() {
+  forEachVertex([](OptimizableGraph::Vertex* v) { v->discardTop(); });
+}
+
+void OptimizableGraph::push(HyperGraph::VertexSet& vset) {
+  forEachVertex(vset, [](OptimizableGraph::Vertex* v) { v->push(); });
+}
+
+void OptimizableGraph::pop(HyperGraph::VertexSet& vset) {
+  forEachVertex(vset, [](OptimizableGraph::Vertex* v) { v->pop(); });
+}
+
+void OptimizableGraph::discardTop(HyperGraph::VertexSet& vset) {
+  forEachVertex(vset, [](OptimizableGraph::Vertex* v) { v->discardTop(); });
+}
+
+void OptimizableGraph::setFixed(HyperGraph::VertexSet& vset, bool fixed) {
+  forEachVertex(vset, [fixed](OptimizableGraph::Vertex* v) { v->setFixed(fixed); });
+}
+
+void OptimizableGraph::forEachVertex(std::function<void(OptimizableGraph::Vertex*)> fn) {
+  for (auto it = _vertices.begin(); it != _vertices.end(); ++it) {
     OptimizableGraph::Vertex* v = static_cast<OptimizableGraph::Vertex*>(it->second);
-    v->push();
+    fn(v);
   }
 }
 
-void OptimizableGraph::pop()
-{
-  for (OptimizableGraph::VertexIDMap::iterator it=_vertices.begin(); it!=_vertices.end(); ++it) {
-    OptimizableGraph::Vertex* v= static_cast<OptimizableGraph::Vertex*>(it->second);
-    v->pop();
-  }
-}
-
-void OptimizableGraph::discardTop()
-{
-  for (OptimizableGraph::VertexIDMap::iterator it=_vertices.begin(); it!=_vertices.end(); ++it) {
-    OptimizableGraph::Vertex* v= static_cast<OptimizableGraph::Vertex*>(it->second);
-    v->discardTop();
-  }
-}
-
-void OptimizableGraph::push(HyperGraph::VertexSet& vset)
-{
-  for (HyperGraph::VertexSet::iterator it=vset.begin(); it!=vset.end(); ++it) {
+void OptimizableGraph::forEachVertex(HyperGraph::VertexSet& vset,
+                                     std::function<void(OptimizableGraph::Vertex*)> fn) {
+  for (auto it = vset.begin(); it != vset.end(); ++it) {
     OptimizableGraph::Vertex* v = static_cast<OptimizableGraph::Vertex*>(*it);
-    v->push();
-  }
-}
-
-void OptimizableGraph::pop(HyperGraph::VertexSet& vset)
-{
-  for (HyperGraph::VertexSet::iterator it=vset.begin(); it!=vset.end(); ++it) {
-    OptimizableGraph::Vertex* v = static_cast<OptimizableGraph::Vertex*>(*it);
-    v->pop();
-  }
-}
-
-void OptimizableGraph::discardTop(HyperGraph::VertexSet& vset)
-{
-  for (HyperGraph::VertexSet::iterator it=vset.begin(); it!=vset.end(); ++it) {
-    OptimizableGraph::Vertex* v = static_cast<OptimizableGraph::Vertex*>(*it);
-    v->discardTop();
-  }
-}
-
-void OptimizableGraph::setFixed(HyperGraph::VertexSet& vset, bool fixed)
-{
-  for (HyperGraph::VertexSet::iterator it=vset.begin(); it!=vset.end(); ++it) {
-    OptimizableGraph::Vertex* v = static_cast<OptimizableGraph::Vertex*>(*it);
-    v->setFixed(fixed);
+    fn(v);
   }
 }
 
@@ -691,15 +678,14 @@ bool OptimizableGraph::save(const char* filename, int level) const
 bool OptimizableGraph::save(ostream& os, int level) const
 {
   // write the parameters to the top of the file
-  if (! _parameters.write(os))
-    return false;
+  if (!_parameters.write(os)) return false;
   set<Vertex*, VertexIDCompare> verticesToSave;
   for (HyperGraph::EdgeSet::const_iterator it = edges().begin(); it != edges().end(); ++it) {
     OptimizableGraph::Edge* e = static_cast<OptimizableGraph::Edge*>(*it);
     if (e->level() == level) {
-      for (vector<HyperGraph::Vertex*>::const_iterator it = e->vertices().begin(); it != e->vertices().end(); ++it) {
-	if (*it)
-	  verticesToSave.insert(static_cast<OptimizableGraph::Vertex*>(*it));
+      for (vector<HyperGraph::Vertex*>::const_iterator it = e->vertices().begin();
+           it != e->vertices().end(); ++it) {
+        if (*it) verticesToSave.insert(static_cast<OptimizableGraph::Vertex*>(*it));
       }
     }
   }
