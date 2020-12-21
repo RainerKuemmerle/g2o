@@ -29,8 +29,6 @@
 
 #include <cholmod.h>
 
-#include <functional>
-
 #include "g2o/core/batch_stats.h"
 #include "g2o/core/linear_solver.h"
 #include "g2o/core/marginal_covariance_cholesky.h"
@@ -77,11 +75,7 @@ struct CholmodExt : public cholmod_sparse {
 template <typename MatrixType>
 class LinearSolverCholmod : public LinearSolverCCS<MatrixType> {
  public:
-  LinearSolverCholmod()
-      : LinearSolverCCS<MatrixType>(),
-        _cholmodFactor(nullptr),
-        _blockOrdering(true),
-        _writeDebug(false) {
+  LinearSolverCholmod() : LinearSolverCCS<MatrixType>(), _cholmodFactor(nullptr) {
     cholmod_start(&_cholmodCommon);
 
     // setup ordering strategy
@@ -130,31 +124,6 @@ class LinearSolverCholmod : public LinearSolverCCS<MatrixType> {
     return true;
   }
 
-  bool solveBlocks(number_t**& blocks, const SparseBlockMatrix<MatrixType>& A) {
-    auto compute = [&](MarginalCovarianceCholesky& mcc) {
-      if (!blocks) LinearSolverCCS<MatrixType>::allocateBlocks(A, blocks);
-      mcc.computeCovariance(blocks, A.rowBlockIndices());
-    };
-    return solveBlocksCholmod_impl(A, compute);
-  }
-
-  virtual bool solvePattern(SparseBlockMatrix<MatrixX>& spinv,
-                            const std::vector<std::pair<int, int> >& blockIndices,
-                            const SparseBlockMatrix<MatrixType>& A) {
-    auto compute = [&](MarginalCovarianceCholesky& mcc) {
-      mcc.computeCovariance(spinv, A.rowBlockIndices(), blockIndices);
-    };
-    return solveBlocksCholmod_impl(A, compute);
-  }
-
-  //! do the AMD ordering on the blocks or on the scalar matrix
-  bool blockOrdering() const { return _blockOrdering; }
-  void setBlockOrdering(bool blockOrdering) { _blockOrdering = blockOrdering; }
-
-  //! write a debug dump of the system matrix if it is not SPD in solve
-  virtual bool writeDebug() const { return _writeDebug; }
-  virtual void setWriteDebug(bool b) { _writeDebug = b; }
-
   virtual bool saveMatrix(const std::string& fileName) {
     writeCCSMatrix(fileName, _cholmodSparse.nrow, _cholmodSparse.ncol, (int*)_cholmodSparse.p,
                    (int*)_cholmodSparse.i, (double*)_cholmodSparse.x, true);
@@ -166,14 +135,12 @@ class LinearSolverCholmod : public LinearSolverCCS<MatrixType> {
   cholmod_common _cholmodCommon;
   CholmodExt _cholmodSparse;
   cholmod_factor* _cholmodFactor;
-  bool _blockOrdering;
   MatrixStructure _matrixStructure;
   VectorXI _scalarPermutation, _blockPermutation;
-  bool _writeDebug;
 
   void computeSymbolicDecomposition(const SparseBlockMatrix<MatrixType>& A) {
     double t = get_monotonic_time();
-    if (!_blockOrdering) {
+    if (!this->blockOrdering()) {
       // setup ordering strategy
       _cholmodCommon.nmethods = 1;
       _cholmodCommon.method[0].ordering = CHOLMOD_AMD;                     // CHOLMOD_COLAMD
@@ -265,7 +232,7 @@ class LinearSolverCholmod : public LinearSolverCCS<MatrixType> {
 
     cholmod_factorize(&_cholmodSparse, _cholmodFactor, &_cholmodCommon);
     if (_cholmodCommon.status == CHOLMOD_NOT_POSDEF) {
-      if (_writeDebug) {
+      if (this->writeDebug()) {
         std::cerr << "Cholesky failure, writing debug.txt (Hessian loadable by Octave)"
                   << std::endl;
         saveMatrix("debug.txt");
@@ -275,8 +242,8 @@ class LinearSolverCholmod : public LinearSolverCCS<MatrixType> {
     return true;
   }
 
-  bool solveBlocksCholmod_impl(const SparseBlockMatrix<MatrixType>& A,
-                               std::function<void(MarginalCovarianceCholesky&)> compute) {
+  bool solveBlocks_impl(const SparseBlockMatrix<MatrixType>& A,
+                        std::function<void(MarginalCovarianceCholesky&)> compute) {
     double t;
     bool cholState = computeCholmodFactor(A, t);
     if (!cholState) return false;

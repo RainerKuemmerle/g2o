@@ -29,7 +29,6 @@
 
 #include <Eigen/Sparse>
 #include <Eigen/SparseCholesky>
-#include <functional>
 #include <iostream>
 #include <vector>
 
@@ -78,7 +77,7 @@ class LinearSolverEigen : public LinearSolverCCS<MatrixType> {
 
  public:
   LinearSolverEigen()
-      : LinearSolverCCS<MatrixType>(), _init(true), _blockOrdering(false), _writeDebug(false) {}
+      : LinearSolverCCS<MatrixType>(), _init(true) {}
 
   virtual bool init() {
     _init = true;
@@ -102,35 +101,8 @@ class LinearSolverEigen : public LinearSolverCCS<MatrixType> {
     return true;
   }
 
-  virtual bool solvePattern(SparseBlockMatrix<MatrixX>& spinv,
-                            const std::vector<std::pair<int, int> >& blockIndices,
-                            const SparseBlockMatrix<MatrixType>& A) {
-    auto compute = [&](MarginalCovarianceCholesky& mcc) {
-      mcc.computeCovariance(spinv, A.rowBlockIndices(), blockIndices);
-    };
-    return solveBlocksEigen_impl(A, compute);
-  }
-
-  bool solveBlocks(number_t**& blocks, const SparseBlockMatrix<MatrixType>& A) {
-    auto compute = [&](MarginalCovarianceCholesky& mcc) {
-      if (!blocks) LinearSolverCCS<MatrixType>::allocateBlocks(A, blocks);
-      mcc.computeCovariance(blocks, A.rowBlockIndices());
-    };
-    return solveBlocksEigen_impl(A, compute);
-  }
-
-  //! do the AMD ordering on the blocks or on the scalar matrix
-  bool blockOrdering() const { return _blockOrdering; }
-  void setBlockOrdering(bool blockOrdering) { _blockOrdering = blockOrdering; }
-
-  //! write a debug dump of the system matrix if it is not SPD in solve
-  virtual bool writeDebug() const { return _writeDebug; }
-  virtual void setWriteDebug(bool b) { _writeDebug = b; }
-
  protected:
   bool _init;
-  bool _blockOrdering;
-  bool _writeDebug;
   SparseMatrix _sparseMatrix;
   CholeskyDecomposition _cholesky;
 
@@ -145,7 +117,7 @@ class LinearSolverEigen : public LinearSolverCCS<MatrixType> {
     t = get_monotonic_time();
     _cholesky.factorize(_sparseMatrix);
     if (_cholesky.info() != Eigen::Success) {  // the matrix is not positive definite
-      if (_writeDebug) {
+      if (this->writeDebug()) {
         std::cerr << "Cholesky failure, writing debug.txt (Hessian loadable by Octave)"
                   << std::endl;
         A.writeOctave("debug.txt");
@@ -163,7 +135,7 @@ class LinearSolverEigen : public LinearSolverCCS<MatrixType> {
    */
   void computeSymbolicDecomposition(const SparseBlockMatrix<MatrixType>& A) {
     number_t t = get_monotonic_time();
-    if (!_blockOrdering) {
+    if (!this->blockOrdering()) {
       _cholesky.analyzePattern(_sparseMatrix);
     } else {
       assert(A.rows() == A.cols() && "Matrix A is not square");
@@ -207,8 +179,8 @@ class LinearSolverEigen : public LinearSolverCCS<MatrixType> {
    * Implementation of the general parts for computing the inverse blocks of the linear system
    * matrix. Here we call a function to do the underlying computation.
    */
-  bool solveBlocksEigen_impl(const SparseBlockMatrix<MatrixType>& A,
-                             std::function<void(MarginalCovarianceCholesky&)> compute) {
+  bool solveBlocks_impl(const SparseBlockMatrix<MatrixType>& A,
+                        std::function<void(MarginalCovarianceCholesky&)> compute) {
     // compute the cholesky factor
     double t;
     bool cholState = computeCholesky(A, t);

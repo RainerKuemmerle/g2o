@@ -28,7 +28,6 @@
 #define G2O_LINEAR_SOLVERCSPARSE_H
 
 #include <iostream>
-#include <functional>
 
 #include "csparse_helper.h"
 #include "g2o/core/batch_stats.h"
@@ -74,9 +73,7 @@ class LinearSolverCSparse : public LinearSolverCCS<MatrixType> {
         _symbolicDecomposition(nullptr),
         _csWorkspaceSize(-1),
         _csWorkspace(nullptr),
-        _csIntWorkspace(nullptr),
-        _blockOrdering(true),
-        _writeDebug(true) {}
+        _csIntWorkspace(nullptr) {}
 
   LinearSolverCSparse(LinearSolverCSparse<MatrixType> const&) = delete;
   LinearSolverCSparse& operator=(LinearSolverCSparse<MatrixType> const&) = delete;
@@ -108,7 +105,7 @@ class LinearSolverCSparse : public LinearSolverCCS<MatrixType> {
     if (x != b) memcpy(x, b, _ccsA.n * sizeof(number_t));
     int ok = csparse_extension::cs_cholsolsymb(&_ccsA, x, _symbolicDecomposition, _csWorkspace,
                                                _csIntWorkspace);
-    if (!ok && _writeDebug) {
+    if (!ok && this->writeDebug()) {
       std::cerr << "Cholesky failure, writing debug.txt (Hessian loadable by Octave)" << std::endl;
       csparse_extension::writeCs2Octave("debug.txt", &_ccsA, true);
     }
@@ -122,41 +119,14 @@ class LinearSolverCSparse : public LinearSolverCCS<MatrixType> {
     return ok != 0;
   }
 
-  bool solveBlocks(number_t**& blocks, const SparseBlockMatrix<MatrixType>& A) {
-    auto compute = [&](MarginalCovarianceCholesky& mcc) {
-      if (!blocks) LinearSolverCCS<MatrixType>::allocateBlocks(A, blocks);
-      mcc.computeCovariance(blocks, A.rowBlockIndices());
-    };
-    return solveBlocksCSparse_impl(A, compute);
-  }
-
-  virtual bool solvePattern(SparseBlockMatrix<MatrixX>& spinv,
-                            const std::vector<std::pair<int, int> >& blockIndices,
-                            const SparseBlockMatrix<MatrixType>& A) {
-    auto compute = [&](MarginalCovarianceCholesky& mcc) {
-      mcc.computeCovariance(spinv, A.rowBlockIndices(), blockIndices);
-    };
-    return solveBlocksCSparse_impl(A, compute);
-  }
-
-  //! do the AMD ordering on the blocks or on the scalar matrix
-  bool blockOrdering() const { return _blockOrdering; }
-  void setBlockOrdering(bool blockOrdering) { _blockOrdering = blockOrdering; }
-
-  //! write a debug dump of the system matrix if it is not SPD in solve
-  virtual bool writeDebug() const { return _writeDebug; }
-  virtual void setWriteDebug(bool b) { _writeDebug = b; }
-
  protected:
   css* _symbolicDecomposition;
   int _csWorkspaceSize;
   number_t* _csWorkspace;
   int* _csIntWorkspace;
   CSparseExt _ccsA;
-  bool _blockOrdering;
   MatrixStructure _matrixStructure;
   VectorXI _scalarPermutation;
-  bool _writeDebug;
 
   void prepareSolve(const SparseBlockMatrix<MatrixType>& A) {
     fillCSparse(A, _symbolicDecomposition != 0);
@@ -177,7 +147,7 @@ class LinearSolverCSparse : public LinearSolverCCS<MatrixType> {
 
   void computeSymbolicDecomposition(const SparseBlockMatrix<MatrixType>& A) {
     number_t t = get_monotonic_time();
-    if (!_blockOrdering) {
+    if (!this->blockOrdering()) {
       _symbolicDecomposition = cs_schol(1, &_ccsA);
     } else {
       A.fillBlockStructure(_matrixStructure);
@@ -198,7 +168,7 @@ class LinearSolverCSparse : public LinearSolverCCS<MatrixType> {
       // blow up the permutation to the scalar matrix
       VectorXI::MapType blockPermutation(P, _matrixStructure.n);
       this->blockToScalarPermutation(A, blockPermutation, _scalarPermutation);
-      cs_free(P); // clean the memory
+      cs_free(P);  // clean the memory
 
       // apply the scalar permutation to finish symbolic decomposition
       _symbolicDecomposition = (css*)cs_calloc(1, sizeof(css)); /* allocate result S */
@@ -268,8 +238,8 @@ class LinearSolverCSparse : public LinearSolverCCS<MatrixType> {
    * Implementation of the general parts for computing the inverse blocks of the linear system
    * matrix. Here we call a function to do the underlying computation.
    */
-  bool solveBlocksCSparse_impl(const SparseBlockMatrix<MatrixType>& A,
-                               std::function<void(MarginalCovarianceCholesky&)> compute) {
+  bool solveBlocks_impl(const SparseBlockMatrix<MatrixType>& A,
+                        std::function<void(MarginalCovarianceCholesky&)> compute) {
     prepareSolve(A);
     bool ok = true;
     csn* numericCholesky = csparse_extension::cs_chol_workspace(&_ccsA, _symbolicDecomposition,
