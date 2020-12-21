@@ -153,88 +153,21 @@ class LinearSolverCholmod : public LinearSolverCCS<MatrixType>
       return true;
     }
 
-    bool solveBlocks(number_t**& blocks, const SparseBlockMatrix<MatrixType>& A)
-    {
-      //cerr << __PRETTY_FUNCTION__ << " using cholmod" << endl;
-      fillCholmodExt(A, _cholmodFactor != 0); // _cholmodFactor used as bool, if not existing will copy the whole structure, otherwise only the values
-
-      if (_cholmodFactor == 0) {
-        computeSymbolicDecomposition(A);
-        assert(_cholmodFactor && "Symbolic cholesky failed");
-      }
-
-      if (!blocks) LinearSolverCCS<MatrixType>::allocateBlocks(A, blocks);
-
-      cholmod_factorize(_cholmodSparse, _cholmodFactor, &_cholmodCommon);
-      if (_cholmodCommon.status == CHOLMOD_NOT_POSDEF)
-        return false;
-
-      // convert the factorization to LL, simplical, packed, monotonic
-      int change_status = cholmod_change_factor(CHOLMOD_REAL, 1, 0, 1, 1, _cholmodFactor, &_cholmodCommon);
-      if (! change_status) {
-        return false;
-      }
-      assert(_cholmodFactor->is_ll && !_cholmodFactor->is_super && _cholmodFactor->is_monotonic && "Cholesky factor has wrong format");
-
-      // invert the permutation
-      int* p = (int*)_cholmodFactor->Perm;
-      VectorXI pinv; pinv.resize(_cholmodSparse->ncol);
-      for (size_t i = 0; i < _cholmodSparse->ncol; ++i)
-        pinv(p[i]) = i;
-
-      // compute the marginal covariance
-      MarginalCovarianceCholesky mcc;
-      mcc.setCholeskyFactor(_cholmodSparse->ncol, (int*)_cholmodFactor->p, (int*)_cholmodFactor->i,
-          (double*)_cholmodFactor->x, pinv.data());
-      mcc.computeCovariance(blocks, A.rowBlockIndices());
-
-      G2OBatchStatistics* globalStats = G2OBatchStatistics::globalStats();
-      if (globalStats) {
-        globalStats->choleskyNNZ = static_cast<size_t>(_cholmodCommon.method[_cholmodCommon.selected].lnz);
-      }
-
-      return true;
+    bool solveBlocks(number_t**& blocks, const SparseBlockMatrix<MatrixType>& A) {
+      auto compute = [&](MarginalCovarianceCholesky& mcc) {
+        if (!blocks) LinearSolverCCS<MatrixType>::allocateBlocks(A, blocks);
+        mcc.computeCovariance(blocks, A.rowBlockIndices());
+      };
+      return solveBlocksCholmod_impl(A, compute);
     }
 
-    virtual bool solvePattern(SparseBlockMatrix<MatrixX>& spinv, const std::vector<std::pair<int, int> >& blockIndices, const SparseBlockMatrix<MatrixType>& A)
-    {
-      //cerr << __PRETTY_FUNCTION__ << " using cholmod" << endl;
-      fillCholmodExt(A, _cholmodFactor != 0); // _cholmodFactor used as bool, if not existing will copy the whole structure, otherwise only the values
-
-      if (_cholmodFactor == 0) {
-        computeSymbolicDecomposition(A);
-        assert(_cholmodFactor && "Symbolic cholesky failed");
-      }
-
-      cholmod_factorize(_cholmodSparse, _cholmodFactor, &_cholmodCommon);
-      if (_cholmodCommon.status == CHOLMOD_NOT_POSDEF)
-        return false;
-
-      // convert the factorization to LL, simplical, packed, monotonic
-      int change_status = cholmod_change_factor(CHOLMOD_REAL, 1, 0, 1, 1, _cholmodFactor, &_cholmodCommon);
-      if (! change_status) {
-        return false;
-      }
-      assert(_cholmodFactor->is_ll && !_cholmodFactor->is_super && _cholmodFactor->is_monotonic && "Cholesky factor has wrong format");
-
-      // invert the permutation
-      int* p = (int*)_cholmodFactor->Perm;
-      VectorXI pinv; pinv.resize(_cholmodSparse->ncol);
-      for (size_t i = 0; i < _cholmodSparse->ncol; ++i)
-        pinv(p[i]) = i;
-
-      // compute the marginal covariance
-      MarginalCovarianceCholesky mcc;
-      mcc.setCholeskyFactor(_cholmodSparse->ncol, (int*)_cholmodFactor->p, (int*)_cholmodFactor->i,
-          (double*)_cholmodFactor->x, pinv.data());
-      mcc.computeCovariance(spinv, A.rowBlockIndices(), blockIndices);
-
-      G2OBatchStatistics* globalStats = G2OBatchStatistics::globalStats();
-      if (globalStats) {
-        globalStats->choleskyNNZ = static_cast<size_t>(_cholmodCommon.method[_cholmodCommon.selected].lnz);
-      }
-
-      return true;
+    virtual bool solvePattern(SparseBlockMatrix<MatrixX>& spinv,
+                              const std::vector<std::pair<int, int> >& blockIndices,
+                              const SparseBlockMatrix<MatrixType>& A) {
+      auto compute = [&](MarginalCovarianceCholesky& mcc) {
+        mcc.computeCovariance(spinv, A.rowBlockIndices(), blockIndices);
+      };
+      return solveBlocksCholmod_impl(A, compute);
     }
 
     //! do the AMD ordering on the blocks or on the scalar matrix
@@ -351,6 +284,47 @@ class LinearSolverCholmod : public LinearSolverCCS<MatrixType>
         this->_ccsMatrix->fillCCS((int*)_cholmodSparse->p, (int*)_cholmodSparse->i, (double*)_cholmodSparse->x, true);
     }
 
+    bool solveBlocksCholmod_impl(const SparseBlockMatrix<MatrixType>& A,
+                                 std::function<void(MarginalCovarianceCholesky&)> compute) {
+      // _cholmodFactor used as bool, if existing copy only values
+      fillCholmodExt(A, _cholmodFactor != 0);
+
+      if (_cholmodFactor == 0) {
+        computeSymbolicDecomposition(A);
+        assert(_cholmodFactor && "Symbolic cholesky failed");
+      }
+
+      cholmod_factorize(_cholmodSparse, _cholmodFactor, &_cholmodCommon);
+      if (_cholmodCommon.status == CHOLMOD_NOT_POSDEF) return false;
+
+      // convert the factorization to LL, simplical, packed, monotonic
+      int change_status =
+          cholmod_change_factor(CHOLMOD_REAL, 1, 0, 1, 1, _cholmodFactor, &_cholmodCommon);
+      if (!change_status) {
+        return false;
+      }
+      assert(_cholmodFactor->is_ll && !_cholmodFactor->is_super && _cholmodFactor->is_monotonic &&
+             "Cholesky factor has wrong format");
+
+      // invert the permutation
+      int* p = (int*)_cholmodFactor->Perm;
+      VectorXI pinv;
+      pinv.resize(_cholmodSparse->ncol);
+      for (size_t i = 0; i < _cholmodSparse->ncol; ++i) pinv(p[i]) = i;
+
+      // compute the marginal covariance
+      MarginalCovarianceCholesky mcc;
+      mcc.setCholeskyFactor(_cholmodSparse->ncol, (int*)_cholmodFactor->p, (int*)_cholmodFactor->i,
+                            (double*)_cholmodFactor->x, pinv.data());
+      compute(mcc);
+
+      G2OBatchStatistics* globalStats = G2OBatchStatistics::globalStats();
+      if (globalStats) {
+        globalStats->choleskyNNZ =
+            static_cast<size_t>(_cholmodCommon.method[_cholmodCommon.selected].lnz);
+      }
+      return true;
+    }
 };
 
 } // end namespace
