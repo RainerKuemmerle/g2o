@@ -26,7 +26,7 @@
 
 #include "solver_slam2d_linear.h"
 
-#include "g2o/solvers/csparse/linear_solver_csparse.h"
+#include "g2o/solvers/eigen/linear_solver_eigen.h"
 
 #include "g2o/core/block_solver.h"
 #include "g2o/core/solver.h"
@@ -44,7 +44,7 @@ namespace g2o {
     std::unique_ptr<BlockSolverBase> AllocateSolver()
     {
       std::cerr << "# Using CSparse poseDim " << p << " landMarkDim " << l << " blockordering " << blockorder << std::endl;
-      auto linearSolver = g2o::make_unique<LinearSolverCSparse<typename BlockSolverPL<p, l>::PoseMatrixType>>();
+      auto linearSolver = g2o::make_unique<LinearSolverEigen<typename BlockSolverPL<p, l>::PoseMatrixType>>();
       linearSolver->setBlockOrdering(blockorder);
       return g2o::make_unique<BlockSolverPL<p, l>>(std::move(linearSolver));
     }
@@ -73,6 +73,6 @@ namespace g2o {
 
   G2O_REGISTER_OPTIMIZATION_LIBRARY(slam2d_linear);
 
-  G2O_REGISTER_OPTIMIZATION_ALGORITHM(2dlinear, new SLAM2DLinearSolverCreator(OptimizationAlgorithmProperty("2dlinear", "Solve Orientation + Gauss-Newton: Works only on 2D pose graphs!!", "CSparse", false, 3, 3)));
+  G2O_REGISTER_OPTIMIZATION_ALGORITHM(2dlinear, new SLAM2DLinearSolverCreator(OptimizationAlgorithmProperty("2dlinear", "Solve Orientation + Gauss-Newton: Works only on 2D pose graphs!!", "Eigen", false, 3, 3)));
 
 } // end namespace
