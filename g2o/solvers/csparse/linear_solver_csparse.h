@@ -28,6 +28,7 @@
 #define G2O_LINEAR_SOLVERCSPARSE_H
 
 #include <iostream>
+#include <functional>
 
 #include "csparse_helper.h"
 #include "g2o/core/batch_stats.h"
@@ -122,57 +123,20 @@ class LinearSolverCSparse : public LinearSolverCCS<MatrixType> {
   }
 
   bool solveBlocks(number_t**& blocks, const SparseBlockMatrix<MatrixType>& A) {
-    prepareSolve(A);
-
-    if (!blocks) LinearSolverCCS<MatrixType>::allocateBlocks(A, blocks);
-
-    bool ok = true;
-    csn* numericCholesky = csparse_extension::cs_chol_workspace(&_ccsA, _symbolicDecomposition,
-                                                                _csIntWorkspace, _csWorkspace);
-    if (numericCholesky) {
-      MarginalCovarianceCholesky mcc;
-      mcc.setCholeskyFactor(_ccsA.n, numericCholesky->L->p, numericCholesky->L->i,
-                            numericCholesky->L->x, _symbolicDecomposition->pinv);
+    auto compute = [&](MarginalCovarianceCholesky& mcc) {
+      if (!blocks) LinearSolverCCS<MatrixType>::allocateBlocks(A, blocks);
       mcc.computeCovariance(blocks, A.rowBlockIndices());
-      cs_nfree(numericCholesky);
-    } else {
-      ok = false;
-      std::cerr << "inverse fail (numeric decomposition)" << std::endl;
-    }
-
-    G2OBatchStatistics* globalStats = G2OBatchStatistics::globalStats();
-    if (globalStats) {
-      globalStats->choleskyNNZ = static_cast<size_t>(_symbolicDecomposition->lnz);
-    }
-
-    return ok;
+    };
+    return solveBlocksCSparse_impl(A, compute);
   }
 
   virtual bool solvePattern(SparseBlockMatrix<MatrixX>& spinv,
                             const std::vector<std::pair<int, int> >& blockIndices,
                             const SparseBlockMatrix<MatrixType>& A) {
-    prepareSolve(A);
-
-    int ok = 1;
-    csn* numericCholesky = csparse_extension::cs_chol_workspace(&_ccsA, _symbolicDecomposition,
-                                                                _csIntWorkspace, _csWorkspace);
-    if (numericCholesky) {
-      MarginalCovarianceCholesky mcc;
-      mcc.setCholeskyFactor(_ccsA.n, numericCholesky->L->p, numericCholesky->L->i,
-                            numericCholesky->L->x, _symbolicDecomposition->pinv);
+    auto compute = [&](MarginalCovarianceCholesky& mcc) {
       mcc.computeCovariance(spinv, A.rowBlockIndices(), blockIndices);
-      cs_nfree(numericCholesky);
-    } else {
-      ok = 0;
-      std::cerr << "inverse fail (numeric decomposition)" << std::endl;
-    }
-
-    G2OBatchStatistics* globalStats = G2OBatchStatistics::globalStats();
-    if (globalStats) {
-      globalStats->choleskyNNZ = static_cast<size_t>(_symbolicDecomposition->lnz);
-    }
-
-    return ok != 0;
+    };
+    return solveBlocksCSparse_impl(A, compute);
   }
 
   //! do the AMD ordering on the blocks or on the scalar matrix
@@ -298,6 +262,33 @@ class LinearSolverCSparse : public LinearSolverCCS<MatrixType> {
       assert(nz <= _ccsA.nzmax);
     }
     _ccsA.nz = -1;  // tag as CCS formatted matrix
+  }
+
+  /**
+   * Implementation of the general parts for computing the inverse blocks of the linear system
+   * matrix. Here we call a function to do the underlying computation.
+   */
+  bool solveBlocksCSparse_impl(const SparseBlockMatrix<MatrixType>& A,
+                               std::function<void(MarginalCovarianceCholesky&)> compute) {
+    prepareSolve(A);
+    bool ok = true;
+    csn* numericCholesky = csparse_extension::cs_chol_workspace(&_ccsA, _symbolicDecomposition,
+                                                                _csIntWorkspace, _csWorkspace);
+    if (numericCholesky) {
+      MarginalCovarianceCholesky mcc;
+      mcc.setCholeskyFactor(_ccsA.n, numericCholesky->L->p, numericCholesky->L->i,
+                            numericCholesky->L->x, _symbolicDecomposition->pinv);
+      compute(mcc);
+      cs_nfree(numericCholesky);
+    } else {
+      ok = false;
+      std::cerr << "inverse fail (numeric decomposition)" << std::endl;
+    }
+    G2OBatchStatistics* globalStats = G2OBatchStatistics::globalStats();
+    if (globalStats) {
+      globalStats->choleskyNNZ = static_cast<size_t>(_symbolicDecomposition->lnz);
+    }
+    return ok;
   }
 };
 
