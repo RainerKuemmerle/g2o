@@ -76,7 +76,7 @@ bool EdgeSE2LotsOfXY::read(std::istream& is) {
 
 bool EdgeSE2LotsOfXY::write(std::ostream& os) const {
   // write number of observed points
-  os << _observedPoints;
+  os << "|| " << _observedPoints;
 
   // write measurements
   for (unsigned int i = 0; i < _observedPoints; i++) {

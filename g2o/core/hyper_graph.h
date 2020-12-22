@@ -48,7 +48,7 @@ namespace g2o {
      that operate transparently on edges or vertices (see HyperGraphAction).
 
      The vertices are uniquely identified by an int id, while the edges are
-     identfied by their pointers. 
+     identfied by their pointers.
    */
   class G2O_CORE_API HyperGraph
   {
@@ -75,7 +75,7 @@ namespace g2o {
       class G2O_CORE_API DataContainer;
       class G2O_CORE_API Vertex;
       class G2O_CORE_API Edge;
-      
+
       /**
        * base hyper graph element, specialized in vertex and edge
        */
@@ -85,7 +85,6 @@ namespace g2o {
          * returns the type of the graph element, see HyperGraphElementType
          */
         virtual HyperGraphElementType elementType() const = 0;
-	HyperGraphElement* clone() const { return nullptr; }
       };
 
       /**
@@ -144,7 +143,7 @@ namespace g2o {
           virtual ~Vertex();
           //! returns the id
           int id() const {return _id;}
-	  virtual void setId( int newId) { _id=newId; }
+          virtual void setId(int newId) { _id = newId; }
           //! returns the set of hyper-edges that are leaving/entering in this vertex
           const EdgeSet& edges() const {return _edges;}
           //! returns the set of hyper-edges that are leaving/entering in this vertex
@@ -156,7 +155,7 @@ namespace g2o {
       };
 
 
-      /** 
+      /**
        * Abstract Edge class. Your nice edge classes should inherit from that one.
        * An hyper-edge has pointers to the vertices it connects and stores them in a vector.
        */
@@ -195,10 +194,11 @@ namespace g2o {
           void setId(int id);
           virtual HyperGraphElementType elementType() const { return HGET_EDGE;}
 
-	  int numUndefinedVertices() const;
-        protected:
+          int numUndefinedVertices() const;
+
+         protected:
           VertexContainer _vertices;
-          int _id; ///< unique id
+          int _id;  ///< unique id
       };
 
     public:
