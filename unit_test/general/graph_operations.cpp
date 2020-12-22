@@ -242,6 +242,15 @@ TEST_F(GeneralGraphLoadSave, SavingGraph) {
   EXPECT_THAT(edgeIds, testing::ElementsAreArray(expectedEdgeIds()));
 }
 
+namespace internal {
+using KeyIntVector = std::vector<decltype(testing::Key(42))>;
+static KeyIntVector VectorIntToKeys(const std::vector<int>& keys) {
+  KeyIntVector matchers;
+  for (const auto& val : keys) matchers.push_back(testing::Key(val));
+  return matchers;
+}
+}  // namespace internal
+
 TEST_F(GeneralGraphLoadSave, LoadingGraph) {
   std::stringstream graphData;
   optimizer->save(graphData);
@@ -257,7 +266,7 @@ TEST_F(GeneralGraphLoadSave, LoadingGraph) {
   ASSERT_THAT(optimizer->edges(), testing::SizeIs(numVertices));
 
   ASSERT_THAT(optimizer->vertices(),
-              testing::Contains(testing::Key(testing::AnyOfArray(expectedIds()))));
+              testing::UnorderedElementsAreArray(internal::VectorIntToKeys(expectedIds())));
   ASSERT_THAT(optimizer->edges(), testing::Each(testing::Property(
                                       &g2o::OptimizableGraph::Edge::vertices, testing::SizeIs(2))));
   ASSERT_THAT(optimizer->edges(), testing::Each(testing::ResultOf(
