@@ -29,10 +29,11 @@ add_subdirectory(${CMAKE_BINARY_DIR}/googletest-src
 # later. Otherwise we have to add them here ourselves.
 if (CMAKE_VERSION VERSION_LESS 2.8.11)
   include_directories("${gtest_SOURCE_DIR}/include")
+  include_directories("${gmock_SOURCE_DIR}/include")
 endif()
 
 macro(create_test target)
-  target_link_libraries(${target} gtest_main)
+  target_link_libraries(${target} gtest_main gmock)
   add_test (NAME ${target} COMMAND $<TARGET_FILE:${target}>)
 endmacro(create_test)
 

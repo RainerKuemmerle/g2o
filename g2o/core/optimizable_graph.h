@@ -91,6 +91,10 @@ namespace g2o {
       {
         return e1->internalId() < e2->internalId();
       }
+      bool operator() (const HyperGraph::Edge* e1, const HyperGraph::Edge* e2) const
+      {
+        return operator()(static_cast<const Edge*>(e1), static_cast<const Edge*>(e2));
+      }
     };
 
     //! vector container for vertices
@@ -106,10 +110,6 @@ namespace g2o {
         friend struct OptimizableGraph;
       public:
         Vertex();
-
-        //! returns a deep copy of the current vertex
-        virtual Vertex* clone() const ;
-
         virtual ~Vertex();
 
         //! sets the node to the origin (used in the multilevel stuff)
@@ -350,7 +350,6 @@ namespace g2o {
     public:
         Edge();
         virtual ~Edge();
-        virtual Edge* clone() const;
 
         // indicates if all vertices are fixed
         virtual bool allVerticesFixed() const = 0;
@@ -497,9 +496,6 @@ namespace g2o {
     OptimizableGraph();
     virtual ~OptimizableGraph();
 
-    //! adds all edges and vertices of the graph <i>g</i> to this graph.
-    void addGraph(OptimizableGraph* g);
-
     /**
      * adds a new vertex. The new vertex is then "taken".
      * @return false if a vertex with the same id as v is already in the graph, true otherwise.
@@ -572,8 +568,8 @@ namespace g2o {
 
 
     //! load the graph from a stream. Uses the Factory singleton for creating the vertices and edges.
-    virtual bool load(std::istream& is, bool createEdges=true);
-    bool load(const char* filename, bool createEdges=true);
+    virtual bool load(std::istream& is);
+    bool load(const char* filename);
     //! save the graph to a stream. Again uses the Factory system.
     virtual bool save(std::ostream& os, int level = 0) const;
     //! function provided for convenience, see save() above
@@ -667,9 +663,6 @@ namespace g2o {
     std::map<std::string, std::string> _renamedTypesLookup;
     long long _nextEdgeId;
     std::vector<HyperGraphActionSet> _graphActions;
-
-    // do not watch this. To be removed soon, or integrated in a nice way
-    bool _edge_has_id;
 
     ParameterContainer _parameters;
     JacobianWorkspace _jacobianWorkspace;
