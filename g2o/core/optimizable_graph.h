@@ -27,19 +27,19 @@
 #ifndef G2O_AIS_OPTIMIZABLE_GRAPH_HH_
 #define G2O_AIS_OPTIMIZABLE_GRAPH_HH_
 
-#include <set>
+#include <functional>
 #include <iostream>
+#include <set>
 #include <typeinfo>
-
-#include "openmp_mutex.h"
-#include "hyper_graph.h"
-#include "parameter.h"
-#include "parameter_container.h"
-#include "jacobian_workspace.h"
 
 #include "g2o/stuff/macros.h"
 #include "g2o_core_api.h"
+#include "hyper_graph.h"
 #include "io_helper.h"
+#include "jacobian_workspace.h"
+#include "openmp_mutex.h"
+#include "parameter.h"
+#include "parameter_container.h"
 
 namespace g2o {
 
@@ -91,6 +91,10 @@ namespace g2o {
       {
         return e1->internalId() < e2->internalId();
       }
+      bool operator() (const HyperGraph::Edge* e1, const HyperGraph::Edge* e2) const
+      {
+        return operator()(static_cast<const Edge*>(e1), static_cast<const Edge*>(e2));
+      }
     };
 
     //! vector container for vertices
@@ -106,15 +110,11 @@ namespace g2o {
         friend struct OptimizableGraph;
       public:
         Vertex();
-
-        //! returns a deep copy of the current vertex
-        virtual Vertex* clone() const ;
-
         virtual ~Vertex();
 
         //! sets the node to the origin (used in the multilevel stuff)
         void setToOrigin() { setToOriginImpl(); updateCache();}
-	
+
         //! get the element from the hessian matrix
         virtual const number_t& hessian(int i, int j) const = 0;
         virtual number_t& hessian(int i, int j) = 0;
@@ -153,7 +153,7 @@ namespace g2o {
          * @return true on success
          */
         bool setEstimateData(const number_t* estimate);
-	
+
         /**
          * sets the initial estimate from an array of number_t
          * Implement setEstimateDataImpl()
@@ -350,7 +350,6 @@ namespace g2o {
     public:
         Edge();
         virtual ~Edge();
-        virtual Edge* clone() const;
 
         // indicates if all vertices are fixed
         virtual bool allVerticesFixed() const = 0;
@@ -460,33 +459,31 @@ namespace g2o {
           _parameterTypes.resize(newSize, typeid(void*).name());
         }
       protected:
-	int _dimension;
-        int _level;
-        RobustKernel* _robustKernel;
-        long long _internalId;
-        std::vector<int> _cacheIds;
+       int _dimension;
+       int _level;
+       RobustKernel* _robustKernel;
+       long long _internalId;
+       std::vector<int> _cacheIds;
 
-        template <typename ParameterType>
-          bool installParameter(ParameterType*& p, size_t argNo, int paramId=-1){
-            if (argNo>=_parameters.size())
-              return false;
-            _parameterIds[argNo] = paramId;
-            _parameters[argNo] = (Parameter**)&p;
-            _parameterTypes[argNo] = typeid(ParameterType).name();
-            return true;
-          }
+       template <typename ParameterType>
+       bool installParameter(ParameterType*& p, size_t argNo, int paramId = -1) {
+         if (argNo >= _parameters.size()) return false;
+         _parameterIds[argNo] = paramId;
+         _parameters[argNo] = (Parameter**)&p;
+         _parameterTypes[argNo] = typeid(ParameterType).name();
+         return true;
+       }
 
-        template <typename CacheType>
-          void resolveCache(CacheType*& cache, OptimizableGraph::Vertex*,
-              const std::string& _type,
-              const ParameterVector& parameters);
+       template <typename CacheType>
+       void resolveCache(CacheType*& cache, OptimizableGraph::Vertex*, const std::string& _type,
+                         const ParameterVector& parameters);
 
-        bool resolveParameters();
-        virtual bool resolveCaches();
+       bool resolveParameters();
+       virtual bool resolveCaches();
 
-        std::vector<std::string> _parameterTypes;
-        std::vector<Parameter**> _parameters;
-        std::vector<int> _parameterIds;
+       std::vector<std::string> _parameterTypes;
+       std::vector<Parameter**> _parameters;
+       std::vector<int> _parameterIds;
     };
 
     //! returns the vertex number <i>id</i> appropriately casted
@@ -498,9 +495,6 @@ namespace g2o {
     //! empty constructor
     OptimizableGraph();
     virtual ~OptimizableGraph();
-
-    //! adds all edges and vertices of the graph <i>g</i> to this graph.
-    void addGraph(OptimizableGraph* g);
 
     /**
      * adds a new vertex. The new vertex is then "taken".
@@ -533,11 +527,11 @@ namespace g2o {
 
     //! Recompute the size of the Jacobian workspace from all the
     //! edges in the graph.
-    void recomputeJacobianWorkspaceSize() 
+    void recomputeJacobianWorkspaceSize()
     {
       _jacobianWorkspace.updateSize(*this, true);
     }
-    
+
     /**
      * iterates over all vertices and returns a set of all the vertex dimensions in the graph
      */
@@ -571,9 +565,11 @@ namespace g2o {
     //! discard the last backup of the estimate for all variables by removing it from the stack
     virtual void discardTop();
 
+
+
     //! load the graph from a stream. Uses the Factory singleton for creating the vertices and edges.
-    virtual bool load(std::istream& is, bool createEdges=true);
-    bool load(const char* filename, bool createEdges=true);
+    virtual bool load(std::istream& is);
+    bool load(const char* filename);
     //! save the graph to a stream. Again uses the Factory system.
     virtual bool save(std::ostream& os, int level = 0) const;
     //! function provided for convenience, see save() above
@@ -658,13 +654,15 @@ namespace g2o {
     inline ParameterContainer& parameters() {return _parameters;}
     inline const ParameterContainer& parameters() const {return _parameters;}
 
+    //! apply a unary function to all vertices
+    void forEachVertex(std::function<void(OptimizableGraph::Vertex*)> fn);
+    //! apply a unary function to the vertices in vset
+    void forEachVertex(HyperGraph::VertexSet& vset, std::function<void(OptimizableGraph::Vertex*)> fn);
+
   protected:
     std::map<std::string, std::string> _renamedTypesLookup;
     long long _nextEdgeId;
     std::vector<HyperGraphActionSet> _graphActions;
-
-    // do not watch this. To be removed soon, or integrated in a nice way
-    bool _edge_has_id;
 
     ParameterContainer _parameters;
     JacobianWorkspace _jacobianWorkspace;

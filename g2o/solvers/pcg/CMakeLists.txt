@@ -6,10 +6,14 @@ add_library(solver_pcg ${G2O_LIB_TYPE}
 
 set_target_properties(solver_pcg PROPERTIES OUTPUT_NAME ${LIB_PREFIX}solver_pcg)
 if (APPLE)
-  set_target_properties(solver_pcg PROPERTIES INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib")
+  set_target_properties(solver_pcg PROPERTIES INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
 endif()
 
 target_link_libraries(solver_pcg core)
+
+target_include_directories(solver_pcg PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+  $<INSTALL_INTERFACE:include/g2o/solvers/pcg>)
 
 install(TARGETS solver_pcg
   EXPORT ${G2O_TARGETS_EXPORT_NAME}

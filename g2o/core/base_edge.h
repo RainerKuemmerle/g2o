@@ -128,7 +128,6 @@ namespace g2o {
         _dimension = dim;
         _information.resize(dim, dim);
         _error.resize(dim, 1);
-        _measurement.resize(dim, 1);
       }
 
     protected:

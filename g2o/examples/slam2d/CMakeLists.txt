@@ -6,7 +6,6 @@ include_directories(SYSTEM
     ${Qt5Xml_INCLUDE_DIRS}
     ${Qt5Widgets_INCLUDE_DIRS}
     ${Qt5OpenGL_INCLUDE_DIRS}
-    ${CSPARSE_INCLUDE_DIR}
 )
 include_directories(${CMAKE_BINARY_DIR} ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
 
@@ -33,7 +32,7 @@ if(Qt5_POSITION_INDEPENDENT_CODE)
     #       does not seem to work: This generates some libraries with -fPIE which is not enough for Qt...
 endif()
 
-target_link_libraries(slam2d_g2o core solver_csparse types_slam2d
+target_link_libraries(slam2d_g2o core solver_eigen types_slam2d
     ${QGLVIEWER_LIBRARY}
     ${Qt5Core_LIBRARIES}
     ${Qt5Gui_LIBRARIES}

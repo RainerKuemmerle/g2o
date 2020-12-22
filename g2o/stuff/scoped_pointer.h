@@ -31,117 +31,107 @@
 
 namespace g2o {
 
-  namespace {
-    struct ScopedPointerDeleter
-    {
-      template<typename T>
-      void operator()(T* t) { delete t;}
-    };
+namespace {
+struct ScopedPointerDeleter {
+  template <typename T>
+  void operator()(T* t) {
+    delete t;
+  }
+};
+}  // namespace
+
+/**
+ * \brief a scoped pointer for an objectarray, i.e., object will be deleted on leaving the scope
+ */
+template <typename T, typename Del = ScopedPointerDeleter>
+class ScopedPointer {
+ public:
+  ScopedPointer(T* t = 0) : _pointer(t) {}
+
+  ~ScopedPointer() {
+    Del deleter;
+    deleter(_pointer);
+  }
+
+  //! dereference the pointer
+  T& operator*() const { return *_pointer; }
+  //! access the pointer via ->
+  T* operator->() const { return _pointer; }
+  //! return the pointer
+  T* get() const { return _pointer; }
+
+  /**
+   * store another pointer inside
+   */
+  void reset(T* p) {
+    assert((p == 0 || p != _pointer) && "ScopedPointer should not reset with itself");
+    ScopedPointer aux(p);
+    swap(aux);
   }
 
   /**
-   * \brief a scoped pointer for an objectarray, i.e., object will be deleted on leaving the scope
+   * swap with another pointer
    */
-  template <typename T, typename Del = ScopedPointerDeleter>
-  class ScopedPointer 
-  {
-    public:
-      ScopedPointer(T* t = 0) : _pointer(t) {}
+  void swap(ScopedPointer& b) {
+    T* aux = b._pointer;
+    b._pointer = _pointer;
+    _pointer = aux;
+  }
 
-      ~ScopedPointer()
-      {
-        Del deleter;
-        deleter(_pointer);
-      }
+ protected:
+  T* _pointer;
 
-      //! dereference the pointer
-      T& operator*() const { return *_pointer;}
-      //! access the pointer via ->
-      T* operator->() const { return _pointer;}
-      //! return the pointer
-      T* get() const { return _pointer;}
+  // do not allow to copy the object
+ private:
+  ScopedPointer(const ScopedPointer&);
+  const ScopedPointer& operator=(const ScopedPointer&);
+};
 
-      /**
-       * store another pointer inside
-       */
-      void reset(T* p)
-      {
-        assert((p == 0 || p != _pointer) && "ScopedPointer should not reset with itself");
-        ScopedPointer aux(p);
-        swap(aux);
-      }
+/**
+ * \brief a scoped pointer for an array, i.e., array will be deleted on leaving the scope
+ */
+template <typename T>
+class ScopedArray {
+ public:
+  ScopedArray(T* t = 0) : _pointer(t) {}
 
-      /**
-       * swap with another pointer
-       */
-      void swap(ScopedPointer& b)
-      {
-        T* aux = b._pointer;
-        b._pointer = _pointer;
-        _pointer = aux;
-      }
+  ~ScopedArray() { delete[] _pointer; }
 
-    protected:
-      T* _pointer;
+  T& operator[](std::ptrdiff_t i) const {
+    assert(_pointer != 0 && i >= 0);
+    return _pointer[i];
+  }
 
-      // do not allow to copy the object
-    private:
-      ScopedPointer(const ScopedPointer&);
-      const ScopedPointer& operator=(const ScopedPointer&);
-  };
+  //! return the pointer
+  T* get() const { return _pointer; }
 
   /**
-   * \brief a scoped pointer for an array, i.e., array will be deleted on leaving the scope
+   * store another array pointer inside
    */
-  template <typename T>
-  class ScopedArray
-  {
-    public:
-      ScopedArray(T* t = 0) : _pointer(t) {}
+  void reset(T* p) {
+    assert((p == 0 || p != _pointer) && "ScopedArray should not reset with itself");
+    ScopedArray aux(p);
+    swap(aux);
+  }
 
-      ~ScopedArray()
-      {
-        delete[] _pointer;
-      }
+  /**
+   * swap with another pointer
+   */
+  void swap(ScopedArray& b) {
+    T* aux = b._pointer;
+    b._pointer = _pointer;
+    _pointer = aux;
+  }
 
-      T & operator[](std::ptrdiff_t i) const
-      {
-        assert(_pointer != 0 && i >= 0);
-        return _pointer[i];
-      }
+ protected:
+  T* _pointer;
 
-      //! return the pointer
-      T* get() const { return _pointer;}
+  // do not allow to copy the object
+ private:
+  ScopedArray(const ScopedArray&);
+  const ScopedArray& operator=(const ScopedArray&);
+};
 
-      /**
-       * store another array pointer inside
-       */
-      void reset(T* p)
-      {
-        assert((p == 0 || p != _pointer) && "ScopedPointer should not reset with itself");
-        ScopedArray aux(p);
-        swap(aux);
-      }
-
-      /**
-       * swap with another pointer
-       */
-      void swap(ScopedArray & b)
-      {
-        T* aux = b._pointer;
-        b._pointer = _pointer;
-        _pointer = aux;
-      }
-
-    protected:
-      T* _pointer;
-
-      // do not allow to copy the object
-    private:
-      ScopedArray(const ScopedArray&);
-      const ScopedArray& operator=(const ScopedArray&);
-  };
-
-} // end namespace
+}  // namespace g2o
 
 #endif

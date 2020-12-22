@@ -4,6 +4,7 @@ set(CMAKE_LEGACY_CYGWIN_WIN32 0)
 project(g2o)
 
 include(CPack)
+include(GNUInstallDirs)
 
 # The library prefix
 set(LIB_PREFIX g2o_)
@@ -55,6 +56,8 @@ endif(MSVC90)
 if(APPLE)
   set(CMAKE_INSTALL_RPATH "")
   set(CMAKE_MACOSX_RPATH TRUE)
+  # ignore deprecated GL
+  add_definitions(-DGL_SILENCE_DEPRECATION)
 endif(APPLE)
 
 # Set the output directory for the build executables and libraries
@@ -69,10 +72,10 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${g2o_LIBRARY_OUTPUT_DIRECTORY})
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${g2o_RUNTIME_OUTPUT_DIRECTORY})
 
 # Set standard installation directories
-set(RUNTIME_DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
-set(LIBRARY_DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
-set(ARCHIVE_DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
-set(INCLUDES_DESTINATION ${CMAKE_INSTALL_PREFIX}/include)
+set(RUNTIME_DESTINATION ${CMAKE_INSTALL_BINDIR})
+set(LIBRARY_DESTINATION ${CMAKE_INSTALL_LIBDIR})
+set(ARCHIVE_DESTINATION ${CMAKE_INSTALL_LIBDIR})
+set(INCLUDES_DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 set(INCLUDES_INSTALL_DIR ${INCLUDES_DESTINATION}/g2o)
 
 # Set search directory for looking for our custom CMake scripts to
@@ -101,35 +104,28 @@ if(ANDROID)
   message(STATUS "Cross compiling for Android")
 endif()
 
-# For building the CHOLMOD / CSPARSE solvers
-option (G2O_USE_CHOLMOD "Build g2o with CHOLMOD support" ON)
-
+# For building the CHOLMOD based solvers
+option(G2O_USE_CHOLMOD "Build g2o with CHOLMOD support" ON)
 find_package(Cholmod)
 find_package(BLAS)
 find_package(LAPACK)
-
-if(G2O_USE_CHOLMOD AND CHOLMOD_FOUND AND BLAS_FOUND AND LAPACK_FOUND)
-  message(STATUS "Found CHOLMOD and its dependencies")
+if (G2O_USE_CHOLMOD AND CHOLMOD_FOUND AND BLAS_FOUND AND LAPACK_FOUND)
+  message(STATUS "Enable support for Cholmod")
   set(CHOLMOD_FOUND TRUE)
 else()
+  message(STATUS "Disable support for Cholmod")
   set(CHOLMOD_FOUND FALSE)
 endif()
 
-option (G2O_USE_CSPARSE "Build g2o with CSParse support" ON)
-
+# For building the CSparse based solvers
+option(G2O_USE_CSPARSE "Build g2o with CSParse support" ON)
 find_package(CSparse)
-if (G2O_USE_CSPARSE)
-  if(CSPARSE_FOUND)
-    set(BUILD_CSPARSE OFF CACHE BOOL "Build local CSparse library")
-  else(CSPARSE_FOUND)
-    set(BUILD_CSPARSE ON CACHE BOOL "Build local CSparse library")
-    if(BUILD_CSPARSE)
-      set(CSPARSE_FOUND TRUE)
-    endif()
-  endif(CSPARSE_FOUND)
-else(G2O_USE_CSPARSE)
-  set(BUILD_CSPARSE OFF "Build local CSparse library")
-endif(G2O_USE_CSPARSE)
+if (G2O_USE_CSPARSE AND CSPARSE_FOUND)
+  message(STATUS "Enable support for CSparse")
+else()
+  message(STATUS "Disable support for CSparse")
+  set(CSPARSE_FOUND FALSE)
+endif()
 
 option(BUILD_LGPL_SHARED_LIBS "Build LGPL Code as Shared Libraries (LGPL Code)" ON)
 set (G2O_LGPL_LIB_TYPE STATIC)
@@ -318,8 +314,8 @@ if(MSVC)
   set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /Ox /Oi")
   set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} /Ox /Oi")
 
-  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0")
-  set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -O0")
+  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /Od")
+  set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} /Od")
 
   # SSE2 optimizations
   # No need to specify if building for x64 (actually, it generates an annoying warning)

@@ -1,9 +1,10 @@
-find_package(Qt5 COMPONENTS Core Xml OpenGL Gui Widgets)
+find_package(Qt5 COMPONENTS Core Xml OpenGL Gui Widgets QUIET)
 if(NOT Qt5_FOUND)
   message("Qt5 not found. Install it and set Qt5_DIR accordingly")
   if (WIN32)
     message("  In Windows, Qt5_DIR should be something like C:/Qt/5.4/msvc2013_64_opengl/lib/cmake/Qt5")
   endif()
+  return()
 endif()
 
 find_path(QGLVIEWER_INCLUDE_DIR qglviewer.h
@@ -46,5 +47,5 @@ if(QGLVIEWER_LIBRARY_RELEASE)
 endif()
 
 include(FindPackageHandleStandardArgs)
-find_package_handle_standard_args(QGLVIEWER DEFAULT_MSG
+find_package_handle_standard_args(QGLViewer DEFAULT_MSG
   QGLVIEWER_INCLUDE_DIR QGLVIEWER_LIBRARY)

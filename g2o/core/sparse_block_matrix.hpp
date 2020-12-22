@@ -528,19 +528,17 @@ namespace g2o {
   template <class MatrixType>
   void SparseBlockMatrix<MatrixType>::fillBlockStructure(MatrixStructure& ms) const
   {
-    int n     = _colBlockIndices.size();
-    int nzMax = (int)nonZeroBlocks();
-
-    ms.alloc(n, nzMax);
+    ms.alloc(_colBlockIndices.size(), nonZeroBlocks());
     ms.m = _rowBlockIndices.size();
+    fillBlockStructure(ms.Ap, ms.Aii);
+  }
 
+  template <class MatrixType>
+  void SparseBlockMatrix<MatrixType>::fillBlockStructure(int* Cp, int* Ci) const {
     int nz = 0;
-    int* Cp = ms.Ap;
-    int* Ci = ms.Aii;
-    for (int i = 0; i < static_cast<int>(_blockCols.size()); ++i){
+    for (int c = 0; c < static_cast<int>(_blockCols.size()); ++c) {
       *Cp = nz;
-      const int& c = i;
-      for (typename SparseBlockMatrix<MatrixType>::IntBlockMap::const_iterator it=_blockCols[i].begin(); it!=_blockCols[i].end(); ++it) {
+      for (auto it = _blockCols[c].begin(); it != _blockCols[c].end(); ++it) {
         const int& r = it->first;
         if (r <= c) {
           *Ci++ = r;
@@ -549,8 +547,8 @@ namespace g2o {
       }
       Cp++;
     }
-    *Cp=nz;
-    assert(nz <= nzMax);
+    *Cp = nz;
+    assert(nz <= static_cast<int>(nonZeroBlocks()));
   }
 
   template <class MatrixType>

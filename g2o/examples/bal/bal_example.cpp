@@ -44,8 +44,8 @@
 
 #if defined G2O_HAVE_CHOLMOD
 #include "g2o/solvers/cholmod/linear_solver_cholmod.h"
-#elif defined G2O_HAVE_CSPARSE
-#include "g2o/solvers/csparse/linear_solver_csparse.h"
+#else
+#include "g2o/solvers/eigen/linear_solver_eigen.h"
 #endif
 
 using namespace g2o;
@@ -306,11 +306,9 @@ int main(int argc, char** argv)
 #ifdef G2O_HAVE_CHOLMOD
   string choleskySolverName = "CHOLMOD";
   typedef g2o::LinearSolverCholmod<BalBlockSolver::PoseMatrixType> BalLinearSolver;
-#elif defined G2O_HAVE_CSPARSE
-  string choleskySolverName = "CSparse";
-  typedef g2o::LinearSolverCSparse<BalBlockSolver::PoseMatrixType> BalLinearSolver;
 #else
-#error neither CSparse nor CHOLMOD are available
+  string choleskySolverName = "Eigen";
+  typedef g2o::LinearSolverEigen<BalBlockSolver::PoseMatrixType> BalLinearSolver;
 #endif
   typedef g2o::LinearSolverPCG<BalBlockSolver::PoseMatrixType> BalLinearSolverPCG;
 

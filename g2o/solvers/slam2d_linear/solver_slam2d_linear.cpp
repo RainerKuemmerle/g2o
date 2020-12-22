@@ -37,7 +37,7 @@
 #include "g2o/stuff/misc.h"
 #include "g2o/stuff/scoped_pointer.h"
 
-#include "g2o/solvers/csparse/linear_solver_csparse.h"
+#include "g2o/solvers/eigen/linear_solver_eigen.h"
 
 #include "g2o/core/solver.h"
 
@@ -192,7 +192,7 @@ namespace g2o {
     }
 
     // solve orientation
-    typedef LinearSolverCSparse<ScalarMatrix> SystemSolver;
+    typedef LinearSolverEigen<ScalarMatrix> SystemSolver;
     SystemSolver linearSystemSolver;
     linearSystemSolver.init();
     bool ok = linearSystemSolver.solve(H, x.data(), b.data());

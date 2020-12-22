@@ -7,7 +7,6 @@
 #include "g2o/core/optimization_algorithm_factory.h"
 #include "g2o/types/slam3d/types_slam3d.h"
 #include "g2o/types/slam3d_addons/types_slam3d_addons.h"
-#include "g2o/solvers/pcg/linear_solver_pcg.h"
 #include "g2o/stuff/macros.h"
 #include "g2o/stuff/command_args.h"
 #include "g2o/stuff/sampler.h"
@@ -16,7 +15,7 @@ using namespace g2o;
 using namespace std;
 using namespace Eigen;
 
-G2O_USE_OPTIMIZATION_LIBRARY(csparse)
+G2O_USE_OPTIMIZATION_LIBRARY(eigen)
 
 Eigen::Isometry3d sample_noise_from_se3(const Vector6& cov ) {
   double nx = Sampler::gaussRand(0., cov(0));
@@ -356,32 +355,30 @@ int main (int argc, char** argv) {
         std::cout << "m";
         if(a == 0) {
           sim->relativeMove(0, delta);
-	}
-	else {
+        } else {
           sim->relativeMove(0, iDelta);
-	}
-	std::cout << "s";
+        }
+        std::cout << "s";
         sim->sense(0);
       }
     }
   }
-  for(int j = 0; j < l; ++j) {
+  for (int j = 0; j < l; ++j) {
     Vector3d tr(1.0, 0.0, 0.0);
     delta.matrix().block<3, 3>(0, 0) = iq.toRotationMatrix();
-    if(j == l-1) {
+    if (j == l - 1) {
       delta.matrix().block<3, 3>(0, 0) = Matrix3d::Identity();
     }
     delta.translation() = tr * (delta_t * j);
     Isometry3d iDelta = delta.inverse();
-    for(int a = 0; a < 2; ++a) {
-      for(int i = 0; i < k; ++i) {
+    for (int a = 0; a < 2; ++a) {
+      for (int i = 0; i < k; ++i) {
         std::cout << "m";
-        if(a == 0) {
+        if (a == 0) {
           sim->relativeMove(0, delta);
-  	}
-        else {
+        } else {
           sim->relativeMove(0, iDelta);
-  	}
+        }
         std::cout << "s";
         sim->sense(0);
       }

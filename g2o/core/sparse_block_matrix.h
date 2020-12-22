@@ -180,6 +180,9 @@ class SparseBlockMatrix {
     //! exports the non zero blocks in the structure matrix ms
     void fillBlockStructure(MatrixStructure& ms) const;
 
+    //! exports the non zero blocks into a column compressed structure
+    void fillBlockStructure(int* Cp, int* Ci) const;
+
     //! the block matrices per block-column
     const std::vector<IntBlockMap>& blockCols() const { return _blockCols;}
     std::vector<IntBlockMap>& blockCols() { return _blockCols;}

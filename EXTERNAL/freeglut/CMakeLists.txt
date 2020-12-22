@@ -8,7 +8,7 @@ target_link_libraries(freeglut_minimal PUBLIC ${G2O_OPENGL_TARGET} ${G2O_EIGEN3_
 
 set_target_properties(freeglut_minimal PROPERTIES OUTPUT_NAME ${LIB_PREFIX}ext_freeglut_minimal)
 if (APPLE)
-  set_target_properties(freeglut_minimal PROPERTIES INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib")
+  set_target_properties(freeglut_minimal PROPERTIES INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
 endif()
 
 install(TARGETS freeglut_minimal

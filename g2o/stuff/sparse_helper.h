@@ -54,7 +54,21 @@ G2O_STUFF_API bool writeVector(const std::string& filename, const number_t* v, i
  * write a CCS matrix given by pointer to column, row, and values
  */
 G2O_STUFF_API bool writeCCSMatrix(const std::string& filename, int rows, int cols, const int* p, const int* i,
-                                  const number_t* v, bool upperTriangleSymmetric = true);
+                                  const double* v, bool upperTriangleSymmetric = true);
+
+/**
+ * write a triplet matrix given by pointers
+ * @param filename filename to write to
+ * @param nz number of elements
+ * @param rows number of rows of the matrix
+ * @param cols number of colmuns of the matrix
+ * @param Ai pointer to the row index (nz elements)
+ * @param Aj pointer to the column index (nz elements)
+ * @param Ax pointer to the vlaues index (nz elements)
+ */
+G2O_STUFF_API bool writeTripletMatrix(const std::string& filename, int nz, int rows, int cols,
+                                      const int* Ai, const int* Aj, const double* Ax,
+                                      bool upperTriangleSymmetric = true);
 
 }  // namespace g2o
 

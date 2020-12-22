@@ -1,14 +1,4 @@
-sudo: required
-dist: focal
 language: cpp
-
-os:
-  - linux
-  - osx
-
-env:
-  global:
-    - MAKEFLAGS="-j 2"
 
 notifications:
   email:
@@ -17,15 +7,26 @@ notifications:
     on_success: change # default: change
     on_failure: always # default: always
 
-compiler:
-  - gcc
-  - clang
+# where do we want to build
+matrix:
+  include:
+    - os: linux
+      arch: amd64
+      compiler: gcc
+      dist: focal
+    - os: linux
+      arch: amd64
+      compiler: clang
+      dist: focal
+    - os: osx
+      arch: amd64
+      osx_image: xcode12.2
 
 before_install:
   - env | sort
 
-install:
-  - script/install-deps-${TRAVIS_OS_NAME}.sh
+# install:
+#   - script/install-deps-${TRAVIS_OS_NAME}.sh
 
 before_script:
   - mkdir build
@@ -35,19 +36,19 @@ before_script:
   - cat g2o/config.h
 
 script:
-  - make
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
-      ctest --extra-verbose ;
-    fi
+  - make -j $(nproc)
+  - ctest --extra-verbose
 
-# right now only build the master branch
-branches:
-  only:
-    - master
-
-matrix:
-  exclude:
-    - os: osx
-      compiler: gcc
-  allow_failures:
-    - os: osx
+# installing dependencies
+addons:
+  apt: # linux
+    packages:
+      - libeigen3-dev
+      - qtdeclarative5-dev
+      - qt5-qmake
+      - libqglviewer-dev-qt5
+      - libsuitesparse-dev
+  homebrew: # mac os
+    packages:
+      - cmake
+      - eigen

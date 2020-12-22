@@ -45,7 +45,7 @@ set_target_properties(core PROPERTIES OUTPUT_NAME ${LIB_PREFIX}core)
 target_link_libraries(core PUBLIC stuff ${G2O_EIGEN3_EIGEN_TARGET})
 
 if (APPLE)
-  set_target_properties(core PROPERTIES INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib")
+  set_target_properties(core PROPERTIES INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
 endif()
 
 install(TARGETS core

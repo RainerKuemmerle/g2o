@@ -34,12 +34,17 @@
 #include "g2o/core/solver.h"
 #include "g2o/core/robust_kernel_impl.h"
 #include "g2o/core/optimization_algorithm_levenberg.h"
-#include "g2o/solvers/cholmod/linear_solver_cholmod.h"
 #include "g2o/solvers/dense/linear_solver_dense.h"
 #include "g2o/types/sba/types_six_dof_expmap.h"
 //#include "g2o/math_groups/se3quat.h"
 #include "g2o/solvers/structure_only/structure_only_solver.h"
 #include "g2o/stuff/sampler.h"
+
+#if defined G2O_HAVE_CHOLMOD
+#include "g2o/solvers/cholmod/linear_solver_cholmod.h"
+#else
+#include "g2o/solvers/eigen/linear_solver_eigen.h"
+#endif
 
 using namespace Eigen;
 using namespace std;
@@ -112,13 +117,21 @@ int main(int argc, const char* argv[]){
 
   g2o::OptimizationAlgorithmLevenberg* solver;
   if (SCHUR_TRICK){
+#ifdef G2O_HAVE_CHOLMOD
+    using LinearSolver = g2o::LinearSolverCholmod<g2o::BlockSolver_6_3::PoseMatrixType>;
+#else
+    using LinearSolver = g2o::LinearSolverEigen<g2o::BlockSolver_6_3::PoseMatrixType>;
+#endif
     solver = new g2o::OptimizationAlgorithmLevenberg(
-      g2o::make_unique<g2o::BlockSolver_6_3>(
-        g2o::make_unique<g2o::LinearSolverCholmod<g2o::BlockSolver_6_3::PoseMatrixType>>()));
+        g2o::make_unique<g2o::BlockSolver_6_3>(g2o::make_unique<LinearSolver>()));
   } else {
+#ifdef G2O_HAVE_CHOLMOD
+    using LinearSolver = g2o::LinearSolverCholmod<g2o::BlockSolverX::PoseMatrixType>;
+#else
+    using LinearSolver = g2o::LinearSolverEigen<g2o::BlockSolverX::PoseMatrixType>;
+#endif
     solver = new g2o::OptimizationAlgorithmLevenberg(
-      g2o::make_unique<g2o::BlockSolverX>(
-        g2o::make_unique<g2o::LinearSolverCholmod<g2o::BlockSolverX::PoseMatrixType>>()));
+        g2o::make_unique<g2o::BlockSolverX>(g2o::make_unique<LinearSolver>()));
   }
 
   optimizer.setAlgorithm(solver);

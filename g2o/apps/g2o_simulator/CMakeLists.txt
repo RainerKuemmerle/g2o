@@ -26,7 +26,7 @@ add_library(g2o_simulator_library ${G2O_LIB_TYPE}
 
 set_target_properties(g2o_simulator_library PROPERTIES OUTPUT_NAME ${LIB_PREFIX}simulator)
 if (APPLE)
-  set_target_properties(g2o_simulator_library PROPERTIES INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib")
+  set_target_properties(g2o_simulator_library PROPERTIES INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
 endif()
 
 target_link_libraries(g2o_simulator_library types_slam3d_addons types_slam3d types_slam2d_addons types_slam2d  core)
