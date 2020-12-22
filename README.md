@@ -60,9 +60,6 @@ available.
 Within the folder EXTERNAL we include software not written by us to
 guarantee easy compilation.
 
--   csparse: LPGL2.1 (see EXTERNAL/csparse/License.txt)
-    csparse is compiled if it is not provided by the system.
-
 -   ceres: BSD (see EXTERNAL/ceres/LICENSE)
     Headers to perform Automatic Differentiation
 
@@ -162,8 +159,8 @@ We thank the following contributors for providing patches:
 
 ## Contact information
 
-[Rainer Kuemmerle](mailto:kuemmerl@informatik.uni-freiburg.de)
-[Giorgio Grisetti](mailto:grisetti@dis.uniroma1.it)
-[Hauke Strasdat](mailto:strasdat@gmail.com)
-[Kurt Konolige](mailto:konolige@willowgarage.com)
-[Wolfram Burgard](mailto:burgard@informatik.uni-freiburg.de)
+-   [Rainer Kuemmerle](mailto:kuemmerl@informatik.uni-freiburg.de)
+-   [Giorgio Grisetti](mailto:grisetti@dis.uniroma1.it)
+-   [Hauke Strasdat](mailto:strasdat@gmail.com)
+-   [Kurt Konolige](mailto:konolige@willowgarage.com)
+-   [Wolfram Burgard](mailto:burgard@informatik.uni-freiburg.de)
