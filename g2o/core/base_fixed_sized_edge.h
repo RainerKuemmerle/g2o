@@ -46,8 +46,20 @@ namespace internal {
 // duplication of internal::computeUpperTriangleIndex in g2o/core/base_variable_sized_edge.hpp
 constexpr int pair_to_index(const int i, const int j) { return j * (j - 1) / 2 + i; }
 
-constexpr std::pair<int, int> index_to_pair(const int k, const int j = 0) {
-  return k - j < 0 ? std::pair<int, int>{k, j} : index_to_pair(k - j, j + 1);
+struct TrivialPair {
+  int first, second;
+  constexpr TrivialPair(int f, int s) : first(f), second(s) {}
+  bool operator==(const TrivialPair& other) const { return first == other.first && second == other.second; }
+};
+
+template <int k, int j = 0>
+constexpr typename std::enable_if<k < j, TrivialPair >::type index_to_pair() {
+  return TrivialPair{k, j};
+}
+
+template <int k, int j = 0>
+constexpr typename std::enable_if<k >= j, TrivialPair >::type index_to_pair() {
+  return index_to_pair<k - j, j + 1>();
 }
 
 //! helper function to call the c'tor of Eigen::Map
@@ -136,11 +148,11 @@ class BaseFixedSizedEdge : public BaseEdge<D, E> {
                      ? Eigen::Aligned
                      : Eigen::Unaligned>;
   template <int K>
-  using HessianBlockTypeK = HessianBlockType<VertexXnType<internal::index_to_pair(K).first>::Dimension,
-                                             VertexXnType<internal::index_to_pair(K).second>::Dimension>;
+  using HessianBlockTypeK = HessianBlockType<VertexXnType<internal::index_to_pair<K>().first>::Dimension,
+                                             VertexXnType<internal::index_to_pair<K>().second>::Dimension>;
   template <int K>
-  using HessianBlockTypeKTransposed = HessianBlockType<VertexXnType<internal::index_to_pair(K).second>::Dimension,
-                                                       VertexXnType<internal::index_to_pair(K).first>::Dimension>;
+  using HessianBlockTypeKTransposed = HessianBlockType<VertexXnType<internal::index_to_pair<K>().second>::Dimension,
+                                                       VertexXnType<internal::index_to_pair<K>().first>::Dimension>;
   template <typename>
   struct HessianTupleType;
   template <std::size_t... Ints>
