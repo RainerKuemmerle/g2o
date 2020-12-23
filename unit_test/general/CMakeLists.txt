@@ -1,4 +1,5 @@
 add_executable(unittest_general
+  allocate_optimizer.cpp allocate_optimizer.h
   graph_operations.cpp
   clear_and_redo.cpp
 )

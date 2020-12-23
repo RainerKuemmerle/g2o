@@ -26,44 +26,24 @@
 
 #include <numeric>
 
-#include "g2o/core/block_solver.h"
+#include "allocate_optimizer.h"
 #include "g2o/core/factory.h"
-#include "g2o/core/optimization_algorithm_gauss_newton.h"
-#include "g2o/solvers/eigen/linear_solver_eigen.h"
+#include "g2o/core/sparse_optimizer.h"
 #include "g2o/stuff/string_tools.h"
 #include "g2o/types/slam2d/types_slam2d.h"
-#include "g2o/types/slam3d/types_slam3d.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 
-typedef g2o::BlockSolver<g2o::BlockSolverTraits<-1, -1>> SlamBlockSolver;
-typedef g2o::LinearSolverEigen<SlamBlockSolver::PoseMatrixType> SlamLinearSolver;
-
 G2O_USE_TYPE_GROUP(slam2d);
-G2O_USE_TYPE_GROUP(slam3d);
-
-static g2o::SparseOptimizer* createOptimizer() {
-  // Initialize the SparseOptimizer
-  g2o::SparseOptimizer* mOptimizer = new g2o::SparseOptimizer();
-  auto linearSolver = g2o::make_unique<SlamLinearSolver>();
-  linearSolver->setBlockOrdering(false);
-  auto blockSolver = g2o::make_unique<SlamBlockSolver>(std::move(linearSolver));
-  mOptimizer->setAlgorithm(new g2o::OptimizationAlgorithmGaussNewton(std::move(blockSolver)));
-  return mOptimizer;
-}
 
 TEST(General, BinaryEdgeConstructor) {
-  g2o::EdgeSE3 e1;
-  ASSERT_EQ(NULL, e1.vertices()[0]);
-  ASSERT_EQ(NULL, e1.vertices()[1]);
-
   g2o::EdgeSE2 e2;
-  ASSERT_EQ(NULL, e2.vertices()[0]);
-  ASSERT_EQ(NULL, e2.vertices()[1]);
+  ASSERT_EQ(nullptr, e2.vertices()[0]);
+  ASSERT_EQ(nullptr, e2.vertices()[1]);
 }
 
 TEST(General, GraphAddVertex) {
-  g2o::SparseOptimizer* optimizer = createOptimizer();
+  g2o::SparseOptimizer* optimizer = g2o::internal::createOptimizerForTests();
 
   g2o::VertexSE2* v1 = new g2o::VertexSE2();
   v1->setId(0);
@@ -78,7 +58,7 @@ TEST(General, GraphAddVertex) {
     v2->setId(0);
     ASSERT_FALSE(optimizer->addVertex(v2));
     ASSERT_EQ(size_t(1), optimizer->vertices().size());
-    ASSERT_EQ(NULL, v2->graph());
+    ASSERT_EQ(nullptr, v2->graph());
     delete v2;
   }
 
@@ -86,7 +66,7 @@ TEST(General, GraphAddVertex) {
 }
 
 TEST(General, GraphAddEdge) {
-  g2o::SparseOptimizer* optimizer = createOptimizer();
+  g2o::SparseOptimizer* optimizer = g2o::internal::createOptimizerForTests();
 
   g2o::VertexSE2* v1 = new g2o::VertexSE2();
   v1->setId(0);
@@ -129,7 +109,7 @@ TEST(General, GraphAddEdge) {
 class GeneralGraphLoadSave : public ::testing::Test {
  protected:
   void SetUp() override {
-    optimizer.reset(createOptimizer());
+    optimizer.reset(g2o::internal::createOptimizerForTests());
 
     // Add vertices
     for (int i = 0; i < numVertices; ++i) {
