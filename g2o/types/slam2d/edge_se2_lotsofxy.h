@@ -29,13 +29,13 @@
 
 #include "g2o/config.h"
 #include "g2o_types_slam2d_api.h"
-#include "g2o/core/base_multi_edge.h"
+#include "g2o/core/base_variable_sized_edge.h"
 #include "vertex_se2.h"
 #include "vertex_point_xy.h"
 
 namespace g2o {
 
-  class G2O_TYPES_SLAM2D_API EdgeSE2LotsOfXY : public BaseMultiEdge<-1,VectorX>
+  class G2O_TYPES_SLAM2D_API EdgeSE2LotsOfXY : public BaseVariableSizedEdge<-1,VectorX>
   {
     protected:
       unsigned int _observedPoints;

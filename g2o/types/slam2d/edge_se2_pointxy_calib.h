@@ -29,7 +29,7 @@
 
 #include "vertex_se2.h"
 #include "vertex_point_xy.h"
-#include "g2o/core/base_multi_edge.h"
+#include "g2o/core/base_variable_sized_edge.h"
 #include "g2o_types_slam2d_api.h"
 
 namespace g2o {
@@ -37,7 +37,7 @@ namespace g2o {
   /**
    * \brief Landmark measurement that also calibrates an offset for the landmark measurement
    */
-  class G2O_TYPES_SLAM2D_API EdgeSE2PointXYCalib : public BaseMultiEdge<2, Vector2>
+  class G2O_TYPES_SLAM2D_API EdgeSE2PointXYCalib : public BaseVariableSizedEdge<2, Vector2>
   {
     public:
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW

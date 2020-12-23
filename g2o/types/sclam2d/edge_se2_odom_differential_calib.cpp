@@ -32,50 +32,45 @@
 
 namespace g2o {
 
-  EdgeSE2OdomDifferentialCalib::EdgeSE2OdomDifferentialCalib() :
-    BaseMultiEdge<3, VelocityMeasurement>()
-  {
-    resize(3);
-  }
+EdgeSE2OdomDifferentialCalib::EdgeSE2OdomDifferentialCalib()
+    : BaseFixedSizedEdge<3, VelocityMeasurement, VertexSE2, VertexSE2, VertexOdomDifferentialParams>() {
+}
 
-  bool EdgeSE2OdomDifferentialCalib::read(std::istream& is)
-  {
-    number_t vl, vr, dt;
-    is >> vl >> vr >> dt;
-    VelocityMeasurement vm(vl, vr, dt);
-    setMeasurement(vm);
-    return readInformationMatrix(is);
-  }
+bool EdgeSE2OdomDifferentialCalib::read(std::istream& is)
+{
+  number_t vl, vr, dt;
+  is >> vl >> vr >> dt;
+  VelocityMeasurement vm(vl, vr, dt);
+  setMeasurement(vm);
+  return readInformationMatrix(is);
+}
 
-  bool EdgeSE2OdomDifferentialCalib::write(std::ostream& os) const
-  {
-    os << measurement().vl() << " " << measurement().vr() << " " << measurement().dt() << " ";
-    return writeInformationMatrix(os);
-  }
+bool EdgeSE2OdomDifferentialCalib::write(std::ostream& os) const
+{
+  os << measurement().vl() << " " << measurement().vr() << " " << measurement().dt() << " ";
+  return writeInformationMatrix(os);
+}
 
 #ifdef G2O_HAVE_OPENGL
-  EdgeSE2OdomDifferentialCalibDrawAction::EdgeSE2OdomDifferentialCalibDrawAction() :
-    DrawAction(typeid(EdgeSE2OdomDifferentialCalib).name())
-  {
-  }
+EdgeSE2OdomDifferentialCalibDrawAction::EdgeSE2OdomDifferentialCalibDrawAction()
+    : DrawAction(typeid(EdgeSE2OdomDifferentialCalib).name()) {}
 
-  HyperGraphElementAction* EdgeSE2OdomDifferentialCalibDrawAction::operator()(HyperGraph::HyperGraphElement* element, HyperGraphElementAction::Parameters* )
-  {
-    if (typeid(*element).name()!=_typeName)
-      return nullptr;
-    EdgeSE2OdomDifferentialCalib* e = static_cast<EdgeSE2OdomDifferentialCalib*>(element);
-    VertexSE2* fromEdge = static_cast<VertexSE2*>(e->vertex(0));
-    VertexSE2* toEdge   = static_cast<VertexSE2*>(e->vertex(1));
-    glColor3f(0.5f,0.5f,0.5f);
-    glPushAttrib(GL_ENABLE_BIT);
-    glDisable(GL_LIGHTING);
-    glBegin(GL_LINES);
-    glVertex3f((float)fromEdge->estimate().translation().x(),(float)fromEdge->estimate().translation().y(),0.f);
-    glVertex3f((float)toEdge->estimate().translation().x(),(float)toEdge->estimate().translation().y(),0.f);
-    glEnd();
-    glPopAttrib();
-    return this;
-  }
+HyperGraphElementAction* EdgeSE2OdomDifferentialCalibDrawAction::operator()(HyperGraph::HyperGraphElement* element,
+                                                                            HyperGraphElementAction::Parameters*) {
+  if (typeid(*element).name() != _typeName) return nullptr;
+  EdgeSE2OdomDifferentialCalib* e = static_cast<EdgeSE2OdomDifferentialCalib*>(element);
+  VertexSE2* fromEdge = static_cast<VertexSE2*>(e->vertex(0));
+  VertexSE2* toEdge = static_cast<VertexSE2*>(e->vertex(1));
+  glColor3f(0.5f, 0.5f, 0.5f);
+  glPushAttrib(GL_ENABLE_BIT);
+  glDisable(GL_LIGHTING);
+  glBegin(GL_LINES);
+  glVertex3f((float)fromEdge->estimate().translation().x(), (float)fromEdge->estimate().translation().y(), 0.f);
+  glVertex3f((float)toEdge->estimate().translation().x(), (float)toEdge->estimate().translation().y(), 0.f);
+  glEnd();
+  glPopAttrib();
+  return this;
+}
 #endif
 
-} // end namespace
+}  // namespace g2o

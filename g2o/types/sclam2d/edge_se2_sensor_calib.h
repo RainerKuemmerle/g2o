@@ -28,7 +28,7 @@
 #define G2O_EDGE_SE2_SENSOR_CALIB_H
 
 #include "g2o_types_sclam2d_api.h"
-#include "g2o/core/base_multi_edge.h"
+#include "g2o/core/base_fixed_sized_edge.h"
 #include "g2o/types/slam2d/vertex_se2.h"
 
 namespace g2o {
@@ -36,7 +36,7 @@ namespace g2o {
   /**
    * \brief scanmatch measurement that also calibrates an offset for the laser
    */
-  class G2O_TYPES_SCLAM2D_API EdgeSE2SensorCalib : public BaseMultiEdge<3, SE2>
+  class G2O_TYPES_SCLAM2D_API EdgeSE2SensorCalib : public BaseFixedSizedEdge<3, SE2, VertexSE2, VertexSE2, VertexSE2>
   {
     public:
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW;

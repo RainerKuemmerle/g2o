@@ -31,9 +31,8 @@
 namespace g2o {
 
   EdgeSE2SensorCalib::EdgeSE2SensorCalib() :
-    BaseMultiEdge<3, SE2>()
+    BaseFixedSizedEdge<3, SE2, VertexSE2, VertexSE2, VertexSE2>()
   {
-    resize(3);
   }
 
   void EdgeSE2SensorCalib::initialEstimate(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to)

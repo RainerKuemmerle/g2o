@@ -27,11 +27,10 @@
 #ifndef G2O_BASE_EDGE_H
 #define G2O_BASE_EDGE_H
 
+#include <Eigen/Core>
 #include <iostream>
 #include <limits>
 #include <type_traits>
-
-#include <Eigen/Core>
 
 #include "optimizable_graph.h"
 

@@ -30,7 +30,7 @@
 
 namespace g2o {
 
-EdgeSE3Calib::EdgeSE3Calib() : BaseMultiEdge<6, Isometry3>() { resize(3); }
+EdgeSE3Calib::EdgeSE3Calib() : BaseVariableSizedEdge<6, Isometry3>() { resize(3); }
 
 void EdgeSE3Calib::computeError() {
   const VertexSE3* v1 = static_cast<const VertexSE3*>(_vertices[0]);

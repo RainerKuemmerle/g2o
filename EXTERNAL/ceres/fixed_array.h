@@ -213,7 +213,6 @@ class FixedArray {
   // Returns a reference the ith element of the fixed array.
   // REQUIRES: 0 <= i < size()
   reference operator[](size_type i) {
-    DCHECK_LT(i, size());
     return data()[i];
   }
 
@@ -221,7 +220,6 @@ class FixedArray {
   // ith element of the fixed array.
   // REQUIRES: 0 <= i < size()
   const_reference operator[](size_type i) const {
-    DCHECK_LT(i, size());
     return data()[i];
   }
 
