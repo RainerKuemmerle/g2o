@@ -112,7 +112,7 @@ class GeneralGraphLoadSave : public ::testing::Test {
     optimizer.reset(g2o::internal::createOptimizerForTests());
 
     // Add vertices
-    for (int i = 0; i < numVertices; ++i) {
+    for (size_t i = 0; i < numVertices; ++i) {
       g2o::VertexSE2* v = new g2o::VertexSE2;
       v->setEstimate(g2o::SE2());
       v->setId(i);
@@ -121,7 +121,7 @@ class GeneralGraphLoadSave : public ::testing::Test {
     }
 
     // Add edges
-    for (int i = 0; i < numVertices; ++i) {
+    for (size_t i = 0; i < numVertices; ++i) {
       g2o::EdgeSE2* e1 = new g2o::EdgeSE2();
       e1->vertices()[0] = optimizer->vertex((i + 0) % numVertices);
       e1->vertices()[1] = optimizer->vertex((i + 1) % numVertices);
