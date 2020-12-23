@@ -24,20 +24,32 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef G2O_SBA_TYPES
-#define G2O_SBA_TYPES
+#ifndef G2O_SBA_VERTEX_POINTXYZ_H
+#define G2O_SBA_VERTEX_POINTXYZ_H
 
-// clanf-format off
+#include "g2o/core/base_vertex.h"
 #include "g2o_types_sba_api.h"
-// clanf-format on
 
-#include "edge_project_p2mc.h"
-#include "edge_project_p2sc.h"
-#include "edge_sba_cam.h"
-#include "edge_sba_scale.h"
-#include "sbacam.h"
-#include "vertex_cam.h"
-#include "vertex_intrinsics.h"
-#include "vertex_sba_pointxyz.h"
+namespace g2o {
 
-#endif  // SBA_TYPES
+/**
+ * \brief Point vertex, XYZ
+ */
+class G2O_TYPES_SBA_API VertexSBAPointXYZ : public BaseVertex<3, Vector3> {
+ public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+  VertexSBAPointXYZ();
+  virtual bool read(std::istream& is);
+  virtual bool write(std::ostream& os) const;
+
+  virtual void setToOriginImpl() { _estimate.fill(0); }
+
+  virtual void oplusImpl(const number_t* update) {
+    Eigen::Map<const Vector3> v(update);
+    _estimate += v;
+  }
+};
+
+}  // namespace g2o
+
+#endif

@@ -24,20 +24,30 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef G2O_SBA_TYPES
-#define G2O_SBA_TYPES
+#ifndef G2O_SBA_VERTEX_INTRINSICS_H
+#define G2O_SBA_VERTEX_INTRINSICS_H
 
-// clanf-format off
+#include "g2o/core/base_vertex.h"
 #include "g2o_types_sba_api.h"
-// clanf-format on
 
-#include "edge_project_p2mc.h"
-#include "edge_project_p2sc.h"
-#include "edge_sba_cam.h"
-#include "edge_sba_scale.h"
-#include "sbacam.h"
-#include "vertex_cam.h"
-#include "vertex_intrinsics.h"
-#include "vertex_sba_pointxyz.h"
+namespace g2o {
 
-#endif  // SBA_TYPES
+/**
+ * \brief Vertex encoding the intrinsics of the camera fx, fy, cx, xy, baseline;
+ */
+class G2O_TYPES_SBA_API VertexIntrinsics
+    : public BaseVertex<4, Eigen::Matrix<number_t, 5, 1, Eigen::ColMajor> > {
+ public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+  VertexIntrinsics();
+  virtual bool read(std::istream& is);
+  virtual bool write(std::ostream& os) const;
+
+  virtual void setToOriginImpl();
+
+  virtual void oplusImpl(const number_t* update);
+};
+
+}  // namespace g2o
+
+#endif

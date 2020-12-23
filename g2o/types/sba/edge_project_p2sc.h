@@ -24,20 +24,35 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef G2O_SBA_TYPES
-#define G2O_SBA_TYPES
+#ifndef G2O_SBA_EDGEPROJECTP2SC_H
+#define G2O_SBA_EDGEPROJECTP2SC_H
 
-// clanf-format off
+#include "g2o/core/base_binary_edge.h"
 #include "g2o_types_sba_api.h"
-// clanf-format on
-
-#include "edge_project_p2mc.h"
-#include "edge_project_p2sc.h"
-#include "edge_sba_cam.h"
-#include "edge_sba_scale.h"
-#include "sbacam.h"
 #include "vertex_cam.h"
-#include "vertex_intrinsics.h"
 #include "vertex_sba_pointxyz.h"
 
-#endif  // SBA_TYPES
+namespace g2o {
+
+// stereo projection
+// first two args are the measurement type, second two the connection classes
+class G2O_TYPES_SBA_API EdgeProjectP2SC
+    : public BaseBinaryEdge<3, Vector3, VertexSBAPointXYZ, VertexCam> {
+ public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+  EdgeProjectP2SC();
+  virtual bool read(std::istream& is);
+  virtual bool write(std::ostream& os) const;
+
+  //! return the error estimate as a 2-vector
+  void computeError();
+
+  /**
+   * \brief Jacobian for stereo projection
+   */
+  virtual void linearizeOplus();
+};
+
+}  // namespace g2o
+
+#endif

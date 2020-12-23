@@ -30,6 +30,7 @@
 #include "g2o/core/base_vertex.h"
 #include "g2o/core/base_binary_edge.h"
 #include "g2o/core/base_unary_edge.h"
+#include "g2o/core/base_variable_sized_edge.h"
 #include "g2o/types/slam3d/se3_ops.h"
 #include "types_sba.h"
 #include <Eigen/Geometry>

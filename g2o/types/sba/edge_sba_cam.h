@@ -24,20 +24,47 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef G2O_SBA_TYPES
-#define G2O_SBA_TYPES
+#ifndef G2O_SBA_EDGESBACAM_H
+#define G2O_SBA_EDGESBACAM_H
 
-// clanf-format off
+#include "g2o/core/base_binary_edge.h"
 #include "g2o_types_sba_api.h"
-// clanf-format on
-
-#include "edge_project_p2mc.h"
-#include "edge_project_p2sc.h"
-#include "edge_sba_cam.h"
-#include "edge_sba_scale.h"
-#include "sbacam.h"
 #include "vertex_cam.h"
-#include "vertex_intrinsics.h"
-#include "vertex_sba_pointxyz.h"
 
-#endif  // SBA_TYPES
+namespace g2o {
+
+/**
+ * \brief 3D edge between two SBAcam
+ */
+class G2O_TYPES_SBA_API EdgeSBACam : public BaseBinaryEdge<6, SE3Quat, VertexCam, VertexCam> {
+ public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
+  EdgeSBACam();
+  virtual bool read(std::istream& is);
+  virtual bool write(std::ostream& os) const;
+  void computeError();
+
+  virtual void setMeasurement(const SE3Quat& meas);
+
+  virtual number_t initialEstimatePossible(const OptimizableGraph::VertexSet&,
+                                           OptimizableGraph::Vertex*) {
+    return cst(1.);
+  }
+  virtual void initialEstimate(const OptimizableGraph::VertexSet& from,
+                               OptimizableGraph::Vertex* to);
+
+  virtual bool setMeasurementData(const number_t* d);
+
+  virtual bool getMeasurementData(number_t* d) const;
+
+  virtual int measurementDimension() const { return 7; }
+
+  virtual bool setMeasurementFromState();
+
+ protected:
+  SE3Quat _inverseMeasurement;
+};
+
+}  // namespace g2o
+
+#endif

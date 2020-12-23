@@ -24,20 +24,24 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef G2O_SBA_TYPES
-#define G2O_SBA_TYPES
-
-// clanf-format off
-#include "g2o_types_sba_api.h"
-// clanf-format on
-
-#include "edge_project_p2mc.h"
-#include "edge_project_p2sc.h"
-#include "edge_sba_cam.h"
-#include "edge_sba_scale.h"
-#include "sbacam.h"
-#include "vertex_cam.h"
 #include "vertex_intrinsics.h"
-#include "vertex_sba_pointxyz.h"
 
-#endif  // SBA_TYPES
+#include "g2o/stuff/misc.h"
+
+namespace g2o {
+
+VertexIntrinsics::VertexIntrinsics() { _estimate << cst(1.), cst(1.), cst(.5), cst(.5), cst(.1); }
+
+bool VertexIntrinsics::read(std::istream& is) { return internal::readVector(is, _estimate); }
+
+bool VertexIntrinsics::write(std::ostream& os) const {
+  return internal::writeVector(os, estimate());
+}
+
+void VertexIntrinsics::setToOriginImpl() {
+  _estimate << cst(1.), cst(1.), cst(0.5), cst(0.5), cst(0.1);
+}
+
+void VertexIntrinsics::oplusImpl(const number_t* update) { _estimate.head<4>() += Vector4(update); }
+
+}  // namespace g2o

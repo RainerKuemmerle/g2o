@@ -24,20 +24,16 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef G2O_SBA_TYPES
-#define G2O_SBA_TYPES
-
-// clanf-format off
-#include "g2o_types_sba_api.h"
-// clanf-format on
-
-#include "edge_project_p2mc.h"
-#include "edge_project_p2sc.h"
-#include "edge_sba_cam.h"
-#include "edge_sba_scale.h"
-#include "sbacam.h"
-#include "vertex_cam.h"
-#include "vertex_intrinsics.h"
 #include "vertex_sba_pointxyz.h"
 
-#endif  // SBA_TYPES
+namespace g2o {
+
+VertexSBAPointXYZ::VertexSBAPointXYZ() : BaseVertex<3, Vector3>() {}
+
+bool VertexSBAPointXYZ::read(std::istream& is) { return internal::readVector(is, _estimate); }
+
+bool VertexSBAPointXYZ::write(std::ostream& os) const {
+  return internal::writeVector(os, estimate());
+}
+
+}  // namespace g2o

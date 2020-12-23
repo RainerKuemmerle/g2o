@@ -24,20 +24,56 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef G2O_SBA_TYPES
-#define G2O_SBA_TYPES
-
-// clanf-format off
-#include "g2o_types_sba_api.h"
-// clanf-format on
-
-#include "edge_project_p2mc.h"
-#include "edge_project_p2sc.h"
-#include "edge_sba_cam.h"
-#include "edge_sba_scale.h"
-#include "sbacam.h"
 #include "vertex_cam.h"
-#include "vertex_intrinsics.h"
-#include "vertex_sba_pointxyz.h"
 
-#endif  // SBA_TYPES
+namespace g2o {
+
+// constructor
+VertexCam::VertexCam() {}
+
+bool VertexCam::read(std::istream& is) {
+  // first the position and orientation (vector3 and quaternion)
+  Vector3 t;
+  internal::readVector(is, t);
+  Quaternion r;
+  internal::readVector(is, r.coeffs());
+  r.normalize();  // recover nummeric precision
+
+  // form the camera object
+  SBACam cam(r, t);
+
+  // now fx, fy, cx, cy, baseline
+  number_t fx, fy, cx, cy, tx;
+
+  // try to read one value
+  is >> fx;
+  if (is.good()) {
+    is >> fy >> cx >> cy >> tx;
+    cam.setKcam(fx, fy, cx, cy, tx);
+  } else {
+    is.clear();
+    std::cerr << "cam not defined, using defaults" << std::endl;
+    cam.setKcam(300, 300, 320, 320, cst(0.1));
+  }
+
+  setEstimate(cam);
+  return true;
+}
+
+bool VertexCam::write(std::ostream& os) const {
+  const SBACam& cam = estimate();
+
+  // first the position and orientation (vector3 and quaternion)
+  internal::writeVector(os, cam.translation());
+  internal::writeVector(os, cam.rotation().coeffs());
+
+  // now fx, fy, cx, cy, baseline
+  os << cam.Kcam(0, 0) << " ";
+  os << cam.Kcam(1, 1) << " ";
+  os << cam.Kcam(0, 2) << " ";
+  os << cam.Kcam(1, 2) << " ";
+  os << cam.baseline << " ";
+  return os.good();
+}
+
+}  // namespace g2o

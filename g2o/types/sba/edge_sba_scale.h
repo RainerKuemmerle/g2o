@@ -24,20 +24,34 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef G2O_SBA_TYPES
-#define G2O_SBA_TYPES
+#ifndef G2O_SBA_EDGESBASCALE_H
+#define G2O_SBA_EDGESBASCALE_H
 
-// clanf-format off
+#include "g2o/core/base_binary_edge.h"
 #include "g2o_types_sba_api.h"
-// clanf-format on
-
-#include "edge_project_p2mc.h"
-#include "edge_project_p2sc.h"
-#include "edge_sba_cam.h"
-#include "edge_sba_scale.h"
-#include "sbacam.h"
 #include "vertex_cam.h"
-#include "vertex_intrinsics.h"
-#include "vertex_sba_pointxyz.h"
 
-#endif  // SBA_TYPES
+namespace g2o {
+
+/**
+ * \brief edge between two SBAcam that specifies the distance between them
+ */
+class G2O_TYPES_SBA_API EdgeSBAScale : public BaseBinaryEdge<1, number_t, VertexCam, VertexCam> {
+ public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+  EdgeSBAScale();
+  virtual bool read(std::istream& is);
+  virtual bool write(std::ostream& os) const;
+  void computeError();
+  virtual void setMeasurement(const number_t& m) { _measurement = m; }
+  virtual number_t initialEstimatePossible(const OptimizableGraph::VertexSet&,
+                                           OptimizableGraph::Vertex*) {
+    return cst(1.);
+  }
+  virtual void initialEstimate(const OptimizableGraph::VertexSet& from_,
+                               OptimizableGraph::Vertex* to_);
+};
+
+}  // namespace g2o
+
+#endif
