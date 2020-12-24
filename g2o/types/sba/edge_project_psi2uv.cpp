@@ -30,6 +30,11 @@
 
 namespace g2o {
 
+EdgeProjectPSI2UV::EdgeProjectPSI2UV() {
+  resizeParameters(1);
+  installParameter(_cam, 0);
+}
+
 bool EdgeProjectPSI2UV::write(std::ostream &os) const {
   writeParamIds(os);
   internal::writeVector(os, measurement());
@@ -67,9 +72,13 @@ void EdgeProjectPSI2UV::linearizeOplus() {
   Vector3 x_a = internal::invert_depth(psi_a);
   Vector3 y = T_ca * x_a;
   Eigen::Matrix<number_t, 2, 3, Eigen::ColMajor> Jcam = internal::d_proj_d_y(cam->focal_length, y);
-  _jacobianOplus[0] = -Jcam * internal::d_Tinvpsi_d_psi(T_ca, psi_a);
-  _jacobianOplus[1] = -Jcam * internal::d_expy_d_y(y);
-  _jacobianOplus[2] = Jcam * T_ca.rotation().toRotationMatrix() * internal::d_expy_d_y(x_a);
+
+  auto& jacobianOplus0 = std::get<0>(this->_jacobianOplus);
+  auto& jacobianOplus1 = std::get<1>(this->_jacobianOplus);
+  auto& jacobianOplus2 = std::get<2>(this->_jacobianOplus);
+  jacobianOplus0 = -Jcam * internal::d_Tinvpsi_d_psi(T_ca, psi_a);
+  jacobianOplus1 = -Jcam * internal::d_expy_d_y(y);
+  jacobianOplus2 = Jcam * T_ca.rotation().toRotationMatrix() * internal::d_expy_d_y(x_a);
 }
 
 }  // namespace g2o
