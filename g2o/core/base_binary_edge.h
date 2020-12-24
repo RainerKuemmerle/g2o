@@ -39,10 +39,12 @@ class BaseBinaryEdge : public BaseFixedSizedEdge<D, E, VertexXi, VertexXj> {
   using VertexXiType = VertexXi;
   using VertexXjType = VertexXj;
   BaseBinaryEdge() : BaseFixedSizedEdge<D, E, VertexXi, VertexXj>(){};
-  typename BaseFixedSizedEdge<D, E, VertexXi, VertexXj>::template JacobianType<D, VertexXi::Dimension>&
-      _jacobianOplusXi = std::get<0>(this->_jacobianOplus);
-  typename BaseFixedSizedEdge<D, E, VertexXi, VertexXj>::template JacobianType<D, VertexXj::Dimension>&
-      _jacobianOplusXj = std::get<1>(this->_jacobianOplus);
+
+ protected:
+  typename BaseFixedSizedEdge<D, E, VertexXi, VertexXj>::template JacobianType<
+      D, VertexXi::Dimension>& _jacobianOplusXi = std::get<0>(this->_jacobianOplus);
+  typename BaseFixedSizedEdge<D, E, VertexXi, VertexXj>::template JacobianType<
+      D, VertexXj::Dimension>& _jacobianOplusXj = std::get<1>(this->_jacobianOplus);
 };
 
 }  // namespace g2o

@@ -38,8 +38,10 @@ class BaseUnaryEdge : public BaseFixedSizedEdge<D, E, VertexXi> {
  public:
   using VertexXiType = VertexXi;
   BaseUnaryEdge() : BaseFixedSizedEdge<D, E, VertexXi>(){};
-  typename BaseFixedSizedEdge<D, E, VertexXi>::template JacobianType<D, VertexXi::Dimension>& _jacobianOplusXi =
-      std::get<0>(this->_jacobianOplus);
+
+ protected:
+  typename BaseFixedSizedEdge<D, E, VertexXi>::template JacobianType<D, VertexXi::Dimension>&
+      _jacobianOplusXi = std::get<0>(this->_jacobianOplus);
 };
 
 }  // end namespace g2o
