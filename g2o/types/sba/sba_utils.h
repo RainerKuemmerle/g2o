@@ -24,21 +24,51 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "types_six_dof_expmap.h"
+#ifndef G2O_SBA_UTILS_H
+#define G2O_SBA_UTILS_H
 
-#include "g2o/core/factory.h"
+#include "g2o/types/slam3d/se3_ops.h"
+#include "g2o_types_sba_api.h"
 
 namespace g2o {
 
-G2O_REGISTER_TYPE_GROUP(expmap);
-G2O_REGISTER_TYPE(VERTEX_SE3 : EXPMAP, VertexSE3Expmap);
-G2O_REGISTER_TYPE(EDGE_SE3 : EXPMAP, EdgeSE3Expmap);
-G2O_REGISTER_TYPE(EDGE_PROJECT_XYZ2UV : EXPMAP, EdgeProjectXYZ2UV);
-G2O_REGISTER_TYPE(EDGE_PROJECT_XYZ2UVU : EXPMAP, EdgeProjectXYZ2UVU);
-G2O_REGISTER_TYPE(EDGE_SE3_PROJECT_XYZ : EXPMAP, EdgeSE3ProjectXYZ);
-G2O_REGISTER_TYPE(EDGE_SE3_PROJECT_XYZONLYPOSE : EXPMAP, EdgeSE3ProjectXYZOnlyPose);
-G2O_REGISTER_TYPE(EDGE_STEREO_SE3_PROJECT_XYZ : EXPMAP, EdgeStereoSE3ProjectXYZ);
-G2O_REGISTER_TYPE(EDGE_STEREO_SE3_PROJECT_XYZONLYPOSE : EXPMAP, EdgeStereoSE3ProjectXYZOnlyPose);
-G2O_REGISTER_TYPE(PARAMS_CAMERAPARAMETERS, CameraParameters);
+namespace internal {
 
+inline Vector3 invert_depth(const Vector3& x) {
+  Vector2 aux = x.head<2>();
+  return unproject(aux) / x[2];
+}
+
+inline Eigen::Matrix<number_t, 2, 3, Eigen::ColMajor> d_proj_d_y(const number_t& f,
+                                                                 const Vector3& xyz) {
+  number_t z_sq = xyz[2] * xyz[2];
+  Eigen::Matrix<number_t, 2, 3, Eigen::ColMajor> J;
+  J << f / xyz[2], 0, -(f * xyz[0]) / z_sq, 0, f / xyz[2], -(f * xyz[1]) / z_sq;
+  return J;
+}
+
+inline Eigen::Matrix<number_t, 3, 6, Eigen::ColMajor> d_expy_d_y(const Vector3& y) {
+  Eigen::Matrix<number_t, 3, 6, Eigen::ColMajor> J;
+  J.topLeftCorner<3, 3>() = -skew(y);
+  J.bottomRightCorner<3, 3>().setIdentity();
+
+  return J;
+}
+
+inline Matrix3 d_Tinvpsi_d_psi(const SE3Quat& T, const Vector3& psi) {
+  Matrix3 R = T.rotation().toRotationMatrix();
+  Vector3 x = invert_depth(psi);
+  Vector3 r1 = R.col(0);
+  Vector3 r2 = R.col(1);
+  Matrix3 J;
+  J.col(0) = r1;
+  J.col(1) = r2;
+  J.col(2) = -R * x;
+  J *= 1. / psi.z();
+  return J;
+}
+
+}  // namespace internal
 }  // namespace g2o
+
+#endif

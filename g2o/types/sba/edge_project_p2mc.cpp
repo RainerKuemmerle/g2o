@@ -29,7 +29,7 @@
 namespace g2o {
 
 // point to camera projection, monocular
-EdgeProjectP2MC::EdgeProjectP2MC() : BaseBinaryEdge<2, Vector2, VertexSBAPointXYZ, VertexCam>() {
+EdgeProjectP2MC::EdgeProjectP2MC() : BaseBinaryEdge<2, Vector2, VertexPointXYZ, VertexCam>() {
   information().setIdentity();
 }
 
@@ -47,7 +47,7 @@ bool EdgeProjectP2MC::write(std::ostream &os) const {
 
 void EdgeProjectP2MC::computeError() {
   // from <Point> to <Cam>
-  const VertexSBAPointXYZ *point = static_cast<const VertexSBAPointXYZ *>(_vertices[0]);
+  const VertexPointXYZ *point = static_cast<const VertexPointXYZ *>(_vertices[0]);
   const VertexCam *cam = static_cast<const VertexCam *>(_vertices[1]);
 
   // calculate the projection
@@ -72,7 +72,7 @@ void EdgeProjectP2MC::linearizeOplus() {
   VertexCam *vc = static_cast<VertexCam *>(_vertices[1]);
   const SBACam &cam = vc->estimate();
 
-  VertexSBAPointXYZ *vp = static_cast<VertexSBAPointXYZ *>(_vertices[0]);
+  VertexPointXYZ *vp = static_cast<VertexPointXYZ *>(_vertices[0]);
   Vector4 pt, trans;
   pt.head<3>() = vp->estimate();
   pt(3) = 1.0;

@@ -183,8 +183,8 @@ int main(int argc, const char* argv[]){
   unordered_set<int> inliers;
 
   for (size_t i=0; i<true_points.size(); ++i){
-    g2o::VertexSBAPointXYZ * v_p
-        = new g2o::VertexSBAPointXYZ();
+    g2o::VertexPointXYZ * v_p
+        = new g2o::VertexPointXYZ();
     int num_obs = 0;
     for (size_t j=0; j<true_poses.size(); ++j)    {
       Vector2d z = cam_params->cam_map(true_poses.at(j).map(true_points.at(i)));
@@ -277,7 +277,7 @@ int main(int argc, const char* argv[]){
       cerr << "Vertex " << it->first << " not in graph!" << endl;
       exit(-1);
     }
-    g2o::VertexSBAPointXYZ* v_p = dynamic_cast<g2o::VertexSBAPointXYZ*>(v_it->second);
+    g2o::VertexPointXYZ* v_p = dynamic_cast<g2o::VertexPointXYZ*>(v_it->second);
     if (v_p==0){
       cerr << "Vertex " << it->first << "is not a PointXYZ!" << endl;
       exit(-1);

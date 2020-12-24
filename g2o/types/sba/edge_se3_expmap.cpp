@@ -24,21 +24,48 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "types_six_dof_expmap.h"
-
-#include "g2o/core/factory.h"
+#include "edge_se3_expmap.h"
 
 namespace g2o {
 
-G2O_REGISTER_TYPE_GROUP(expmap);
-G2O_REGISTER_TYPE(VERTEX_SE3 : EXPMAP, VertexSE3Expmap);
-G2O_REGISTER_TYPE(EDGE_SE3 : EXPMAP, EdgeSE3Expmap);
-G2O_REGISTER_TYPE(EDGE_PROJECT_XYZ2UV : EXPMAP, EdgeProjectXYZ2UV);
-G2O_REGISTER_TYPE(EDGE_PROJECT_XYZ2UVU : EXPMAP, EdgeProjectXYZ2UVU);
-G2O_REGISTER_TYPE(EDGE_SE3_PROJECT_XYZ : EXPMAP, EdgeSE3ProjectXYZ);
-G2O_REGISTER_TYPE(EDGE_SE3_PROJECT_XYZONLYPOSE : EXPMAP, EdgeSE3ProjectXYZOnlyPose);
-G2O_REGISTER_TYPE(EDGE_STEREO_SE3_PROJECT_XYZ : EXPMAP, EdgeStereoSE3ProjectXYZ);
-G2O_REGISTER_TYPE(EDGE_STEREO_SE3_PROJECT_XYZONLYPOSE : EXPMAP, EdgeStereoSE3ProjectXYZOnlyPose);
-G2O_REGISTER_TYPE(PARAMS_CAMERAPARAMETERS, CameraParameters);
+EdgeSE3Expmap::EdgeSE3Expmap() : BaseBinaryEdge<6, SE3Quat, VertexSE3Expmap, VertexSE3Expmap>() {}
+
+bool EdgeSE3Expmap::read(std::istream& is) {
+  Vector7 meas;
+  internal::readVector(is, meas);
+  setMeasurement(SE3Quat(meas).inverse());
+  return readInformationMatrix(is);
+}
+
+bool EdgeSE3Expmap::write(std::ostream& os) const {
+  internal::writeVector(os, measurement().inverse().toVector());
+  return writeInformationMatrix(os);
+}
+
+void EdgeSE3Expmap::computeError() {
+  const VertexSE3Expmap* v1 = static_cast<const VertexSE3Expmap*>(_vertices[0]);
+  const VertexSE3Expmap* v2 = static_cast<const VertexSE3Expmap*>(_vertices[1]);
+
+  SE3Quat C(_measurement);
+  SE3Quat error_ = v2->estimate().inverse() * C * v1->estimate();
+  _error = error_.log();
+}
+
+void EdgeSE3Expmap::linearizeOplus() {
+  VertexSE3Expmap* vi = static_cast<VertexSE3Expmap*>(_vertices[0]);
+  SE3Quat Ti(vi->estimate());
+
+  VertexSE3Expmap* vj = static_cast<VertexSE3Expmap*>(_vertices[1]);
+  SE3Quat Tj(vj->estimate());
+
+  const SE3Quat& Tij = _measurement;
+  SE3Quat invTij = Tij.inverse();
+
+  SE3Quat invTj_Tij = Tj.inverse() * Tij;
+  SE3Quat infTi_invTij = Ti.inverse() * invTij;
+
+  _jacobianOplusXi = invTj_Tij.adj();
+  _jacobianOplusXj = -infTi_invTij.adj();
+}
 
 }  // namespace g2o

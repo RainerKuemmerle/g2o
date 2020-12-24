@@ -1,5 +1,5 @@
 // g2o - General Graph Optimization
-// Copyright (C) 2011 Kurt Konolige
+// Copyright (C) 2011 H. Strasdat
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -24,32 +24,48 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef G2O_SBA_VERTEX_POINTXYZ_H
-#define G2O_SBA_VERTEX_POINTXYZ_H
+#include "parameter_cameraparameters.h"
 
-#include "g2o/core/base_vertex.h"
-#include "g2o_types_sba_api.h"
+#include "g2o/types/slam3d/se3_ops.h"
 
 namespace g2o {
 
-/**
- * \brief Point vertex, XYZ
- */
-class G2O_TYPES_SBA_API VertexSBAPointXYZ : public BaseVertex<3, Vector3> {
- public:
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-  VertexSBAPointXYZ();
-  virtual bool read(std::istream& is);
-  virtual bool write(std::ostream& os) const;
+CameraParameters::CameraParameters()
+    : focal_length(1.), principle_point(Vector2(0., 0.)), baseline(0.5) {}
 
-  virtual void setToOriginImpl() { _estimate.fill(0); }
+CameraParameters::CameraParameters(number_t focal_length, const Vector2 &principle_point,
+                                   number_t baseline)
+    : focal_length(focal_length), principle_point(principle_point), baseline(baseline) {}
 
-  virtual void oplusImpl(const number_t* update) {
-    Eigen::Map<const Vector3> v(update);
-    _estimate += v;
-  }
-};
+bool CameraParameters::read(std::istream &is) {
+  is >> focal_length;
+  is >> principle_point[0];
+  is >> principle_point[1];
+  is >> baseline;
+  return true;
+}
+
+bool CameraParameters::write(std::ostream &os) const {
+  os << focal_length << " ";
+  os << principle_point.x() << " ";
+  os << principle_point.y() << " ";
+  os << baseline << " ";
+  return true;
+}
+
+Vector2 CameraParameters::cam_map(const Vector3 &trans_xyz) const {
+  Vector2 proj = project(trans_xyz);
+  Vector2 res;
+  res[0] = proj[0] * focal_length + principle_point[0];
+  res[1] = proj[1] * focal_length + principle_point[1];
+  return res;
+}
+
+Vector3 CameraParameters::stereocam_uvu_map(const Vector3 &trans_xyz) const {
+  Vector2 uv_left = cam_map(trans_xyz);
+  number_t proj_x_right = (trans_xyz[0] - baseline) / trans_xyz[2];
+  number_t u_right = proj_x_right * focal_length + principle_point[0];
+  return Vector3(uv_left[0], uv_left[1], u_right);
+}
 
 }  // namespace g2o
-
-#endif

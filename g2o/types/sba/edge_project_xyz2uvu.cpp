@@ -1,5 +1,5 @@
 // g2o - General Graph Optimization
-// Copyright (C) 2011 Kurt Konolige
+// Copyright (C) 2011 H. Strasdat
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -24,16 +24,34 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "vertex_sba_pointxyz.h"
+#include "edge_project_xyz2uvu.h"
 
 namespace g2o {
 
-VertexSBAPointXYZ::VertexSBAPointXYZ() : BaseVertex<3, Vector3>() {}
+EdgeProjectXYZ2UVU::EdgeProjectXYZ2UVU()
+    : BaseBinaryEdge<3, Vector3, VertexPointXYZ, VertexSE3Expmap>() {
+  _cam = nullptr;
+  resizeParameters(1);
+  installParameter(_cam, 0);
+}
 
-bool VertexSBAPointXYZ::read(std::istream& is) { return internal::readVector(is, _estimate); }
+void EdgeProjectXYZ2UVU::computeError() {
+  const VertexSE3Expmap* v1 = static_cast<const VertexSE3Expmap*>(_vertices[1]);
+  const VertexPointXYZ* v2 = static_cast<const VertexPointXYZ*>(_vertices[0]);
+  const CameraParameters* cam = static_cast<const CameraParameters*>(parameter(0));
+  _error = measurement() - cam->stereocam_uvu_map(v1->estimate().map(v2->estimate()));
+}
 
-bool VertexSBAPointXYZ::write(std::ostream& os) const {
-  return internal::writeVector(os, estimate());
+bool EdgeProjectXYZ2UVU::read(std::istream& is) {
+  readParamIds(is);
+  internal::readVector(is, _measurement);
+  return readInformationMatrix(is);
+}
+
+bool EdgeProjectXYZ2UVU::write(std::ostream& os) const {
+  writeParamIds(os);
+  internal::writeVector(os, measurement());
+  return writeInformationMatrix(os);
 }
 
 }  // namespace g2o

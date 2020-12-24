@@ -24,21 +24,35 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "types_six_dof_expmap.h"
+#ifndef G2O_SBA_EDGEPROJECTXYZ2UVU_H
+#define G2O_SBA_EDGEPROJECTXYZ2UVU_H
 
-#include "g2o/core/factory.h"
+#include "g2o/core/base_binary_edge.h"
+#include "g2o/types/slam3d/vertex_pointxyz.h"
+#include "g2o_types_sba_api.h"
+#include "parameter_cameraparameters.h"
+#include "vertex_se3_expmap.h"
 
 namespace g2o {
 
-G2O_REGISTER_TYPE_GROUP(expmap);
-G2O_REGISTER_TYPE(VERTEX_SE3 : EXPMAP, VertexSE3Expmap);
-G2O_REGISTER_TYPE(EDGE_SE3 : EXPMAP, EdgeSE3Expmap);
-G2O_REGISTER_TYPE(EDGE_PROJECT_XYZ2UV : EXPMAP, EdgeProjectXYZ2UV);
-G2O_REGISTER_TYPE(EDGE_PROJECT_XYZ2UVU : EXPMAP, EdgeProjectXYZ2UVU);
-G2O_REGISTER_TYPE(EDGE_SE3_PROJECT_XYZ : EXPMAP, EdgeSE3ProjectXYZ);
-G2O_REGISTER_TYPE(EDGE_SE3_PROJECT_XYZONLYPOSE : EXPMAP, EdgeSE3ProjectXYZOnlyPose);
-G2O_REGISTER_TYPE(EDGE_STEREO_SE3_PROJECT_XYZ : EXPMAP, EdgeStereoSE3ProjectXYZ);
-G2O_REGISTER_TYPE(EDGE_STEREO_SE3_PROJECT_XYZONLYPOSE : EXPMAP, EdgeStereoSE3ProjectXYZOnlyPose);
-G2O_REGISTER_TYPE(PARAMS_CAMERAPARAMETERS, CameraParameters);
+// Stereo Observations
+// U: left u
+// V: left v
+// U: right u
+class G2O_TYPES_SBA_API EdgeProjectXYZ2UVU
+    : public BaseBinaryEdge<3, Vector3, VertexPointXYZ, VertexSE3Expmap> {
+ public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
+
+  EdgeProjectXYZ2UVU();
+  bool read(std::istream& is);
+  bool write(std::ostream& os) const;
+  void computeError();
+  //  virtual void linearizeOplus();
+ protected:
+  CameraParameters* _cam;
+};
 
 }  // namespace g2o
+
+#endif

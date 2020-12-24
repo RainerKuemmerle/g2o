@@ -191,8 +191,8 @@ int main(int argc, char **argv)
   // add point projections to this vertex
   for (size_t i=0; i<true_points.size(); ++i)
   {
-    g2o::VertexSBAPointXYZ * v_p
-        = new g2o::VertexSBAPointXYZ();
+    g2o::VertexPointXYZ * v_p
+        = new g2o::VertexPointXYZ();
 
 
     v_p->setId(vertex_id++);

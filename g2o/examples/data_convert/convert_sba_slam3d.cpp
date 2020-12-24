@@ -87,8 +87,8 @@ int main(int argc, char** argv)
         assert(0 && "Failure adding camera vertex");
       }
     }
-    else if (dynamic_cast<VertexSBAPointXYZ*>(it->second)) {
-      VertexSBAPointXYZ* v = static_cast<VertexSBAPointXYZ*>(it->second);
+    else if (dynamic_cast<VertexPointXYZ*>(it->second)) {
+      VertexPointXYZ* v = static_cast<VertexPointXYZ*>(it->second);
 
       VertexPointXYZ* ov = new VertexPointXYZ;
       ov->setId(v->id());

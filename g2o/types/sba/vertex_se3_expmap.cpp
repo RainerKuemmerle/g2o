@@ -24,21 +24,30 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "types_six_dof_expmap.h"
+#include "vertex_se3_expmap.h"
 
-#include "g2o/core/factory.h"
+#include "g2o/stuff/misc.h"
 
 namespace g2o {
 
-G2O_REGISTER_TYPE_GROUP(expmap);
-G2O_REGISTER_TYPE(VERTEX_SE3 : EXPMAP, VertexSE3Expmap);
-G2O_REGISTER_TYPE(EDGE_SE3 : EXPMAP, EdgeSE3Expmap);
-G2O_REGISTER_TYPE(EDGE_PROJECT_XYZ2UV : EXPMAP, EdgeProjectXYZ2UV);
-G2O_REGISTER_TYPE(EDGE_PROJECT_XYZ2UVU : EXPMAP, EdgeProjectXYZ2UVU);
-G2O_REGISTER_TYPE(EDGE_SE3_PROJECT_XYZ : EXPMAP, EdgeSE3ProjectXYZ);
-G2O_REGISTER_TYPE(EDGE_SE3_PROJECT_XYZONLYPOSE : EXPMAP, EdgeSE3ProjectXYZOnlyPose);
-G2O_REGISTER_TYPE(EDGE_STEREO_SE3_PROJECT_XYZ : EXPMAP, EdgeStereoSE3ProjectXYZ);
-G2O_REGISTER_TYPE(EDGE_STEREO_SE3_PROJECT_XYZONLYPOSE : EXPMAP, EdgeStereoSE3ProjectXYZOnlyPose);
-G2O_REGISTER_TYPE(PARAMS_CAMERAPARAMETERS, CameraParameters);
+VertexSE3Expmap::VertexSE3Expmap() : BaseVertex<6, SE3Quat>() {}
+
+bool VertexSE3Expmap::read(std::istream& is) {
+  Vector7 est;
+  internal::readVector(is, est);
+  setEstimate(SE3Quat(est).inverse());
+  return true;
+}
+
+bool VertexSE3Expmap::write(std::ostream& os) const {
+  return internal::writeVector(os, estimate().inverse().toVector());
+}
+
+void VertexSE3Expmap::setToOriginImpl() { _estimate = SE3Quat(); }
+
+void VertexSE3Expmap::oplusImpl(const number_t* update_) {
+  Eigen::Map<const Vector6> update(update_);
+  setEstimate(SE3Quat::exp(update) * estimate());
+}
 
 }  // namespace g2o

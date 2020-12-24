@@ -139,7 +139,7 @@ void EdgeSim3::linearizeOplus() {
 
   /**Sim3ProjectXYZ*/
 
-EdgeSim3ProjectXYZ::EdgeSim3ProjectXYZ() : BaseBinaryEdge<2, Vector2, VertexSBAPointXYZ, VertexSim3Expmap>() {}
+EdgeSim3ProjectXYZ::EdgeSim3ProjectXYZ() : BaseBinaryEdge<2, Vector2, VertexPointXYZ, VertexSim3Expmap>() {}
 
 bool EdgeSim3ProjectXYZ::read(std::istream &is) {
   internal::readVector(is, _measurement);
@@ -152,7 +152,7 @@ bool EdgeSim3ProjectXYZ::write(std::ostream &os) const {
 }
 
 EdgeInverseSim3ProjectXYZ::EdgeInverseSim3ProjectXYZ() :
-    BaseBinaryEdge<2, Vector2, VertexSBAPointXYZ, VertexSim3Expmap>() {
+    BaseBinaryEdge<2, Vector2, VertexPointXYZ, VertexSim3Expmap>() {
 }
 
 bool EdgeInverseSim3ProjectXYZ::read(std::istream &is) {

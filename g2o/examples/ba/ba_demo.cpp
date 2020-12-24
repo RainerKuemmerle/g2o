@@ -165,8 +165,8 @@ int main(int argc, const char* argv[]){
   unordered_set<int> inliers;
 
   for (size_t i=0; i<true_points.size(); ++i){
-    g2o::VertexSBAPointXYZ * v_p
-        = new g2o::VertexSBAPointXYZ();
+    g2o::VertexPointXYZ * v_p
+        = new g2o::VertexPointXYZ();
     v_p->setId(point_id);
     v_p->setMarginalized(true);
     v_p->setEstimate(true_points.at(i)
@@ -253,8 +253,8 @@ int main(int argc, const char* argv[]){
       cerr << "Vertex " << it->first << " not in graph!" << endl;
       exit(-1);
     }
-    g2o::VertexSBAPointXYZ * v_p
-        = dynamic_cast< g2o::VertexSBAPointXYZ * > (v_it->second);
+    g2o::VertexPointXYZ * v_p
+        = dynamic_cast< g2o::VertexPointXYZ * > (v_it->second);
     if (v_p==0){
       cerr << "Vertex " << it->first << "is not a PointXYZ!" << endl;
       exit(-1);

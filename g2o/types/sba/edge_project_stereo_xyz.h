@@ -24,21 +24,47 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "types_six_dof_expmap.h"
+#ifndef G2O_SBA_EDGEPROJECTSTEREOXYZ_H
+#define G2O_SBA_EDGEPROJECTSTEREOXYZ_H
 
-#include "g2o/core/factory.h"
+#include "g2o/core/base_binary_edge.h"
+#include "g2o/types/slam3d/vertex_pointxyz.h"
+#include "g2o_types_sba_api.h"
+#include "vertex_se3_expmap.h"
 
 namespace g2o {
 
-G2O_REGISTER_TYPE_GROUP(expmap);
-G2O_REGISTER_TYPE(VERTEX_SE3 : EXPMAP, VertexSE3Expmap);
-G2O_REGISTER_TYPE(EDGE_SE3 : EXPMAP, EdgeSE3Expmap);
-G2O_REGISTER_TYPE(EDGE_PROJECT_XYZ2UV : EXPMAP, EdgeProjectXYZ2UV);
-G2O_REGISTER_TYPE(EDGE_PROJECT_XYZ2UVU : EXPMAP, EdgeProjectXYZ2UVU);
-G2O_REGISTER_TYPE(EDGE_SE3_PROJECT_XYZ : EXPMAP, EdgeSE3ProjectXYZ);
-G2O_REGISTER_TYPE(EDGE_SE3_PROJECT_XYZONLYPOSE : EXPMAP, EdgeSE3ProjectXYZOnlyPose);
-G2O_REGISTER_TYPE(EDGE_STEREO_SE3_PROJECT_XYZ : EXPMAP, EdgeStereoSE3ProjectXYZ);
-G2O_REGISTER_TYPE(EDGE_STEREO_SE3_PROJECT_XYZONLYPOSE : EXPMAP, EdgeStereoSE3ProjectXYZOnlyPose);
-G2O_REGISTER_TYPE(PARAMS_CAMERAPARAMETERS, CameraParameters);
+// Projection using focal_length in x and y directions stereo
+class G2O_TYPES_SBA_API EdgeStereoSE3ProjectXYZ : public BaseBinaryEdge<3, Vector3, VertexPointXYZ, VertexSE3Expmap> {
+ public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
+  EdgeStereoSE3ProjectXYZ();
+
+  bool read(std::istream &is);
+
+  bool write(std::ostream &os) const;
+
+  void computeError() {
+    const VertexSE3Expmap *v1 = static_cast<const VertexSE3Expmap *>(_vertices[1]);
+    const VertexPointXYZ *v2 = static_cast<const VertexPointXYZ *>(_vertices[0]);
+    Vector3 obs(_measurement);
+    _error = obs - cam_project(v1->estimate().map(v2->estimate()), bf);
+  }
+
+  bool isDepthPositive() {
+    const VertexSE3Expmap *v1 = static_cast<const VertexSE3Expmap *>(_vertices[1]);
+    const VertexPointXYZ *v2 = static_cast<const VertexPointXYZ *>(_vertices[0]);
+    return (v1->estimate().map(v2->estimate()))(2) > 0;
+  }
+
+  virtual void linearizeOplus();
+
+  Vector3 cam_project(const Vector3 &trans_xyz, const float &bf) const;
+
+  number_t fx, fy, cx, cy, bf;
+};
 
 }  // namespace g2o
+
+#endif

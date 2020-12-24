@@ -24,21 +24,31 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "types_six_dof_expmap.h"
+#ifndef G2O_SBA_VERTEXSE3EXPMAP_H
+#define G2O_SBA_VERTEXSE3EXPMAP_H
 
-#include "g2o/core/factory.h"
+#include "g2o/types/slam3d/se3quat.h"
+#include "g2o/core/base_vertex.h"
+#include "g2o_types_sba_api.h"
 
 namespace g2o {
 
-G2O_REGISTER_TYPE_GROUP(expmap);
-G2O_REGISTER_TYPE(VERTEX_SE3 : EXPMAP, VertexSE3Expmap);
-G2O_REGISTER_TYPE(EDGE_SE3 : EXPMAP, EdgeSE3Expmap);
-G2O_REGISTER_TYPE(EDGE_PROJECT_XYZ2UV : EXPMAP, EdgeProjectXYZ2UV);
-G2O_REGISTER_TYPE(EDGE_PROJECT_XYZ2UVU : EXPMAP, EdgeProjectXYZ2UVU);
-G2O_REGISTER_TYPE(EDGE_SE3_PROJECT_XYZ : EXPMAP, EdgeSE3ProjectXYZ);
-G2O_REGISTER_TYPE(EDGE_SE3_PROJECT_XYZONLYPOSE : EXPMAP, EdgeSE3ProjectXYZOnlyPose);
-G2O_REGISTER_TYPE(EDGE_STEREO_SE3_PROJECT_XYZ : EXPMAP, EdgeStereoSE3ProjectXYZ);
-G2O_REGISTER_TYPE(EDGE_STEREO_SE3_PROJECT_XYZONLYPOSE : EXPMAP, EdgeStereoSE3ProjectXYZOnlyPose);
-G2O_REGISTER_TYPE(PARAMS_CAMERAPARAMETERS, CameraParameters);
+/**
+ * \brief SE3 Vertex parameterized internally with a transformation matrix
+ * and externally with its exponential map
+ */
+class G2O_TYPES_SBA_API VertexSE3Expmap : public BaseVertex<6, SE3Quat> {
+ public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
+  VertexSE3Expmap();
+
+  bool read(std::istream& is);
+  bool write(std::ostream& os) const;
+  void setToOriginImpl();
+  void oplusImpl(const number_t* update_);
+};
 
 }  // namespace g2o
+
+#endif

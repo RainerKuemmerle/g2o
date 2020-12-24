@@ -69,7 +69,7 @@ class IoSixDofExpmapParam : public ::testing::Test {
     graph->addParameter(paramCam);
 
     // setting up some vertices
-    point = new VertexSBAPointXYZ;
+    point = new VertexPointXYZ;
     point->setId(0);
     graph->addVertex(point);
     pose = new VertexSE3Expmap;
@@ -85,7 +85,7 @@ class IoSixDofExpmapParam : public ::testing::Test {
   }
 
   std::shared_ptr<g2o::OptimizableGraph> graph;
-  VertexSBAPointXYZ* point = nullptr;
+  VertexPointXYZ* point = nullptr;
   VertexSE3Expmap* pose = nullptr;
 };
 

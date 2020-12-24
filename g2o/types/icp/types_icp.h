@@ -367,7 +367,7 @@ namespace g2o {
 
 // stereo projection
 // first two args are the measurement type, second two the connection classes
-  class G2O_TYPES_ICP_API Edge_XYZ_VSC : public  BaseBinaryEdge<3, Vector3, VertexSBAPointXYZ, VertexSCam>
+  class G2O_TYPES_ICP_API Edge_XYZ_VSC : public  BaseBinaryEdge<3, Vector3, VertexPointXYZ, VertexSCam>
 {
   public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
@@ -381,7 +381,7 @@ namespace g2o {
     void computeError()
     {
       // from <Point> to <Cam>
-      const VertexSBAPointXYZ *point = static_cast<const VertexSBAPointXYZ*>(_vertices[0]);
+      const VertexPointXYZ *point = static_cast<const VertexPointXYZ*>(_vertices[0]);
       VertexSCam *cam = static_cast<VertexSCam*>(_vertices[1]);
       //cam->setAll();
 

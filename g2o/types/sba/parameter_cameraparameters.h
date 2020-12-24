@@ -24,21 +24,31 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "types_six_dof_expmap.h"
+#ifndef G2O_SBA_CAMERAPARAMETERS_H
+#define G2O_SBA_CAMERAPARAMETERS_H
 
-#include "g2o/core/factory.h"
+#include <g2o/core/parameter.h>
+
+#include "g2o_types_sba_api.h"
 
 namespace g2o {
 
-G2O_REGISTER_TYPE_GROUP(expmap);
-G2O_REGISTER_TYPE(VERTEX_SE3 : EXPMAP, VertexSE3Expmap);
-G2O_REGISTER_TYPE(EDGE_SE3 : EXPMAP, EdgeSE3Expmap);
-G2O_REGISTER_TYPE(EDGE_PROJECT_XYZ2UV : EXPMAP, EdgeProjectXYZ2UV);
-G2O_REGISTER_TYPE(EDGE_PROJECT_XYZ2UVU : EXPMAP, EdgeProjectXYZ2UVU);
-G2O_REGISTER_TYPE(EDGE_SE3_PROJECT_XYZ : EXPMAP, EdgeSE3ProjectXYZ);
-G2O_REGISTER_TYPE(EDGE_SE3_PROJECT_XYZONLYPOSE : EXPMAP, EdgeSE3ProjectXYZOnlyPose);
-G2O_REGISTER_TYPE(EDGE_STEREO_SE3_PROJECT_XYZ : EXPMAP, EdgeStereoSE3ProjectXYZ);
-G2O_REGISTER_TYPE(EDGE_STEREO_SE3_PROJECT_XYZONLYPOSE : EXPMAP, EdgeStereoSE3ProjectXYZOnlyPose);
-G2O_REGISTER_TYPE(PARAMS_CAMERAPARAMETERS, CameraParameters);
+class G2O_TYPES_SBA_API CameraParameters : public g2o::Parameter {
+ public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
+  CameraParameters();
+  CameraParameters(number_t focal_length, const Vector2 &principle_point, number_t baseline);
+
+  Vector2 cam_map(const Vector3 &trans_xyz) const;
+  Vector3 stereocam_uvu_map(const Vector3 &trans_xyz) const;
+  bool read(std::istream &is);
+  bool write(std::ostream &os) const;
+
+  number_t focal_length;
+  Vector2 principle_point;
+  number_t baseline;
+};
 
 }  // namespace g2o
+
+#endif
