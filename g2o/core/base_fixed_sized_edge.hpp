@@ -50,37 +50,41 @@ void BaseFixedSizedEdge<D, E, VertexTypes...>::constructQuadraticForm() {
     this->robustKernel()->robustify(error, rho);
     Eigen::Matrix<number_t, D, 1, Eigen::ColMajor> omega_r = -_information * _error;
     omega_r *= rho[1];
-    constructQuadraticFormNs(this->robustInformation(rho), omega_r, make_index_sequence<_nr_of_vertices>());
+    constructQuadraticFormNs(this->robustInformation(rho), omega_r,
+                             make_index_sequence<_nr_of_vertices>());
   } else {
-    constructQuadraticFormNs(_information, -_information * _error, make_index_sequence<_nr_of_vertices>());
+    constructQuadraticFormNs(_information, -_information * _error,
+                             make_index_sequence<_nr_of_vertices>());
   }
 }
 
 template <int D, typename E, typename... VertexTypes>
 template <std::size_t... Ints>
-void BaseFixedSizedEdge<D, E, VertexTypes...>::constructQuadraticFormNs(const InformationType& omega,
-                                                                        const ErrorVector& weightedError,
-                                                                        index_sequence<Ints...>) {
+void BaseFixedSizedEdge<D, E, VertexTypes...>::constructQuadraticFormNs(
+    const InformationType& omega, const ErrorVector& weightedError, index_sequence<Ints...>) {
   int unused[] = {(constructQuadraticFormN<Ints>(omega, weightedError), 0)...};
   (void)unused;
 }
 
+// overloading constructOffDiagonalQuadraticFormMs to
+// prevent MSVC error when index_sequence is empty
 template <int D, typename E, typename... VertexTypes>
 template <int N, typename AtOType>
-void BaseFixedSizedEdge<D, E, VertexTypes...>::constructOffDiagonalQuadraticFormMs(const AtOType&, index_sequence<>) {
-}  // overloading constructOffDiagonalQuadraticFormMs to prevent MSVC error when index_sequence is empty
+void BaseFixedSizedEdge<D, E, VertexTypes...>::constructOffDiagonalQuadraticFormMs(
+    const AtOType&, index_sequence<>) {}
 
 template <int D, typename E, typename... VertexTypes>
 template <int N, std::size_t... Ints, typename AtOType>
-void BaseFixedSizedEdge<D, E, VertexTypes...>::constructOffDiagonalQuadraticFormMs(const AtOType& AtO,
-                                                                                   index_sequence<Ints...>) {
+void BaseFixedSizedEdge<D, E, VertexTypes...>::constructOffDiagonalQuadraticFormMs(
+    const AtOType& AtO, index_sequence<Ints...>) {
   int unused[] = {(constructOffDiagonalQuadraticFormM<N, Ints, AtOType>(AtO), 0)...};
   (void)unused;
 }
 
 template <int D, typename E, typename... VertexTypes>
 template <int N, int M, typename AtOType>
-void BaseFixedSizedEdge<D, E, VertexTypes...>::constructOffDiagonalQuadraticFormM(const AtOType& AtO) {
+void BaseFixedSizedEdge<D, E, VertexTypes...>::constructOffDiagonalQuadraticFormM(
+    const AtOType& AtO) {
   constexpr auto fromId = N;
   constexpr auto toId = N + M + 1;
   if (!(vertexXn<toId>()->fixed())) {
@@ -98,8 +102,8 @@ void BaseFixedSizedEdge<D, E, VertexTypes...>::constructOffDiagonalQuadraticForm
 
 template <int D, typename E, typename... VertexTypes>
 template <int N>
-void BaseFixedSizedEdge<D, E, VertexTypes...>::constructQuadraticFormN(const InformationType& omega,
-                                                                       const ErrorVector& weightedError) {
+void BaseFixedSizedEdge<D, E, VertexTypes...>::constructQuadraticFormN(
+    const InformationType& omega, const ErrorVector& weightedError) {
   auto from = vertexXn<N>();
   const auto& A = std::get<N>(_jacobianOplus);
 
@@ -116,20 +120,21 @@ void BaseFixedSizedEdge<D, E, VertexTypes...>::constructQuadraticFormN(const Inf
 };
 
 template <int D, typename E, typename... VertexTypes>
-void BaseFixedSizedEdge<D, E, VertexTypes...>::linearizeOplus(JacobianWorkspace& jacobianWorkspace) {
+void BaseFixedSizedEdge<D, E, VertexTypes...>::linearizeOplus(
+    JacobianWorkspace& jacobianWorkspace) {
   linearizeOplus_allocate(jacobianWorkspace, make_index_sequence<_nr_of_vertices>());
   linearizeOplus();
 }
 
 template <int D, typename E, typename... VertexTypes>
 template <std::size_t... Ints>
-void BaseFixedSizedEdge<D, E, VertexTypes...>::linearizeOplus_allocate(JacobianWorkspace& jacobianWorkspace,
-                                                                       index_sequence<Ints...>) {
-  int unused[] = {(new (&std::get<Ints>(_jacobianOplus)) JacobianType<D, VertexDimension<Ints>()>(
-                       jacobianWorkspace.workspaceForVertex(Ints),
-                       D < 0 ? _dimension : D,
-                       VertexDimension<Ints>() < 0 ? vertexXn<Ints>()->dimension() : VertexDimension<Ints>()),
-                   0)...};
+void BaseFixedSizedEdge<D, E, VertexTypes...>::linearizeOplus_allocate(
+    JacobianWorkspace& jacobianWorkspace, index_sequence<Ints...>) {
+  int unused[] = {
+      (new (&std::get<Ints>(_jacobianOplus)) JacobianType<D, VertexDimension<Ints>()>(
+           jacobianWorkspace.workspaceForVertex(Ints), D < 0 ? _dimension : D,
+           VertexDimension<Ints>() < 0 ? vertexXn<Ints>()->dimension() : VertexDimension<Ints>()),
+       0)...};
   (void)unused;
 }
 
@@ -142,21 +147,22 @@ void BaseFixedSizedEdge<D, E, VertexTypes...>::linearizeOplusN() {
 
   auto& jacobianOplus = std::get<N>(_jacobianOplus);
 
-  const number_t delta = cst(1e-9);
-  const number_t scalar = 1 / (2 * delta);
+  constexpr number_t delta = cst(1e-9);
+  constexpr number_t scalar = 1 / (2 * delta);
 
   internal::QuadraticFormLock lck(*vertex);
   (void)lck;
 
-  typedef typename std::conditional<VertexXnType<N>::Dimension == -1,
-    ceres::internal::FixedArray<number_t>,
-    ceres::internal::FixedArray<number_t, static_cast<size_t>(VertexXnType<N>::Dimension)> >::type FixedArray;
+  typedef typename std::conditional<
+      VertexXnType<N>::Dimension == -1, ceres::internal::FixedArray<number_t>,
+      ceres::internal::FixedArray<number_t, static_cast<size_t>(VertexXnType<N>::Dimension)> >::type
+      FixedArray;
   FixedArray add_vertex(vertexDimension<N>());
   add_vertex.fill(0.);
 
   // estimate the jacobian numerically
   // add small step along the unit vector in each dimension
-  for (int d = 0; d < (VertexDimension<N>() < 0 ? vertexDimension<N>() : VertexDimension<N>()); ++d) {
+  for (int d = 0; d < vertexDimension<N>(); ++d) {
     vertex->push();
     add_vertex[d] = delta;
     vertex->oplus(add_vertex.data());
@@ -185,11 +191,8 @@ void BaseFixedSizedEdge<D, E, VertexTypes...>::linearizeOplusNs(index_sequence<I
 template <int D, typename E, typename... VertexTypes>
 void BaseFixedSizedEdge<D, E, VertexTypes...>::linearizeOplus() {
   if (allVerticesFixed()) return;
-
   ErrorVector errorBeforeNumeric = _error;
-
   linearizeOplusNs(make_index_sequence<_nr_of_vertices>());
-
   _error = errorBeforeNumeric;
 }
 
@@ -208,13 +211,16 @@ struct MapHessianMemoryK {
 };
 
 template <int D, typename E, typename... VertexTypes>
-void BaseFixedSizedEdge<D, E, VertexTypes...>::mapHessianMemory(number_t* d, int i, int j, bool rowMajor) {
+void BaseFixedSizedEdge<D, E, VertexTypes...>::mapHessianMemory(number_t* d, int i, int j,
+                                                                bool rowMajor) {
   // get the size of the vertices
   int vi_dim = static_cast<OptimizableGraph::Vertex*>(HyperGraph::Edge::vertex(i))->dimension();
   int vj_dim = static_cast<OptimizableGraph::Vertex*>(HyperGraph::Edge::vertex(j))->dimension();
   _hessianRowMajor = rowMajor;
   if (rowMajor)
-    tuple_apply_i(MapHessianMemoryK{d, vj_dim, vi_dim}, _hessianTupleTransposed, internal::pair_to_index(i, j));
+    tuple_apply_i(MapHessianMemoryK{d, vj_dim, vi_dim}, _hessianTupleTransposed,
+                  internal::pair_to_index(i, j));
   else
-    tuple_apply_i(MapHessianMemoryK{d, vi_dim, vj_dim}, _hessianTuple, internal::pair_to_index(i, j));
+    tuple_apply_i(MapHessianMemoryK{d, vi_dim, vj_dim}, _hessianTuple,
+                  internal::pair_to_index(i, j));
 }

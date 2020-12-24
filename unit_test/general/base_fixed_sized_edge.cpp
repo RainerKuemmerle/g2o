@@ -64,7 +64,6 @@ class Edge3Dynamic : public g2o::BaseVariableSizedEdge<2, g2o::Vector2> {
 };
 
 TEST(General, IndexToPairToIndex) {
-//#define TEST_ALL_PAIRS
   using g2o::internal::index_to_pair;
   using g2o::internal::pair_to_index;
   using g2o::internal::TrivialPair;
