@@ -87,9 +87,12 @@ void BaseFixedSizedEdge<D, E, VertexTypes...>::constructOffDiagonalQuadraticForm
     const AtOType& AtO) {
   constexpr auto fromId = N;
   constexpr auto toId = N + M + 1;
-  if (!(vertexXn<toId>()->fixed())) {
+  auto to = vertexXn<toId>();
+  if (!to->fixed()) {
     const auto& B = std::get<toId>(_jacobianOplus);
     constexpr auto K = internal::pair_to_index(fromId, toId);
+    internal::QuadraticFormLock lck(*to);
+    (void)lck;
     if (_hessianRowMajor) {  // we have to write to the block as transposed
       auto& hessianTransposed = std::get<K>(_hessianTupleTransposed);
       hessianTransposed.noalias() += B.transpose() * AtO.transpose();
