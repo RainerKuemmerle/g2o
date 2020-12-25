@@ -222,6 +222,12 @@ class BaseFixedSizedEdge : public BaseEdge<D, E> {
   jacobianOplusXn() const {
     return std::get<N>(_jacobianOplus);
   }
+  //! returns the result of the linearization in the manifold space for the nodes xn
+  template <int N>
+  typename std::tuple_element<N, std::tuple<JacobianType<D, VertexTypes::Dimension>...>>::type&
+  jacobianOplusXn() {
+    return std::get<N>(_jacobianOplus);
+  }
 
   /**
    * computes the (block) elements of the Hessian matrix of the linearized least squares.
