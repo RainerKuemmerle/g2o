@@ -36,6 +36,36 @@
 
 namespace g2o {
 
+/**
+ * \brief Implementation of Automatic Differentiation for edges in g2o
+ *
+ * This class implements an interface to Automatic Differentiation, see, for example,
+ * https://en.wikipedia.org/wiki/Automatic_differentiation for the idea behind it.
+ * To use automatic differentiation on your own edge you need to implement the following steps:
+ * 1. Implement an operator() that computes your error function:
+ *    The function is required to have the following declaration
+ *    template <typename T>
+ *    bool operator()(const T* v1Estimate, const T* v2Estimate, T* error) const {}
+ *    The example above assumes a binary edge. If your edge has more or less vertices, the number
+ *    of vEstimate parameters differs.
+ *    Let's assume that your edge connects N vertices, then your operator() will consume N+1
+ *    pointers. Whereas the last pointer is the output of your error function.
+ *    Note the template on the operator(). This is required to be able to evaluate your error
+ *    function with double pointer, i.e., to purely evaluate the error. But also we will pass
+ *    a more complex class to it during the numerical computation of the Jacobian.
+ * 2. Integrate the operator():
+ *    To this end, we provide the macro "G20_MAKE_AUTO_AD_FUNCTIONS" which you can include
+ *    into the public section of your edge class. See below for the macro.
+ *    If you use the macro, you do not need to implement computeError() and linearizeOPlus()
+ *    in your edge. Both methods will be ready for integration into the g2o framework.
+ *
+ * Example integration: g2o/examples/bal/bal_example.cpp
+ * This provides a self-contained example for integration of AD into an optimization problem.
+ *
+ * Further documentation on the underlying implementation:
+ * Jet: EXTERNAL/ceres/jet.h
+ * AutoDiff: EXTERNAL/ceres/autodiff.h
+ */
 template <typename Edge>
 class AutoDifferentiation {
  public:
@@ -69,32 +99,39 @@ class AutoDifferentiation {
    */
   template <std::size_t... Ints>
   void linearizeOplusNs(Edge* that, index_sequence<Ints...>) {
+    // all vertices are fixed, no need to compute anything here
+    if (that->allVerticesFixed()) return;
+
     // tuple containing the Jacobians
     std::tuple<ADJacobianType<Edge::Dimension, Edge::template VertexXnType<Ints>::Dimension>...>
         ad_jacobians;
 
     // setting up the pointer to the parameters and the Jacobians for calling AD.
-    // Calls the automatic differentiation for evaluation of the Jacobians.
     number_t* parameters[] = {
         const_cast<number_t*>(that->template vertexXn<Ints>()->estimate().data())...};
-    number_t* jacobians[] = {const_cast<number_t*>(std::get<Ints>(ad_jacobians).data())...};
-    number_t value[Edge::Dimension];
+    // pointers to the Jacobians, set to NULL if vertex is fixed
+    number_t* jacobians[] = {that->template vertexXn<Ints>()->fixed()
+                                 ? nullptr
+                                 : const_cast<number_t*>(std::get<Ints>(ad_jacobians).data())...};
+    // Calls the automatic differentiation for evaluation of the Jacobians.
+    number_t errorValue[Edge::Dimension];
     using AutoDiffDims =
         ceres::internal::StaticParameterDims<Edge::template VertexXnType<Ints>::Dimension...>;
     bool diffState =
         ceres::internal::AutoDifferentiate<Edge::Dimension, AutoDiffDims, Edge, number_t>(
-            *that, parameters, Edge::Dimension, value, jacobians);
+            *that, parameters, Edge::Dimension, errorValue, jacobians);
 
-    // something went wrong during AD
-    if (!diffState) {
+    assert(diffState && "Error during Automatic Differentiation");
+    if (!diffState) {  // something went wrong during AD
       int unused[] = {(std::get<Ints>(ad_jacobians).setZero(), 0)...};
       (void)unused;
       return;
     }
-    assert(diffState && "Error during Automatic Differentiation");
-    // copy over the Jacobians (convert row-major -> column-major)
+    // copy over the Jacobians (convert row-major -> column-major) for non-fixed vertices
     int unused[] = {
-        (assign(that->template jacobianOplusXn<Ints>(), std::get<Ints>(ad_jacobians)), 0)...};
+        that->template vertexXn<Ints>()->fixed()
+            ? (that->template jacobianOplusXn<Ints>().setZero(), 0)
+            : (assign(that->template jacobianOplusXn<Ints>(), std::get<Ints>(ad_jacobians)), 0)...};
     (void)unused;
   }
 

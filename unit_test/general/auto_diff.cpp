@@ -44,12 +44,17 @@ class VertexFlatSE2 : public g2o::BaseVertex<3, g2o::Vector3> {
   virtual bool write(std::ostream&) const { return false; }
 };
 
+/**
+ * A test case edge connecting three vertices.
+ * Here we project a point along two poses and compare it against a measurement
+ */
 class Edge3ADTester : public g2o::BaseFixedSizedEdge<2, g2o::Vector2, VertexFlatSE2, VertexFlatSE2,
                                                      g2o::VertexPointXY> {
  public:
   using g2o::BaseFixedSizedEdge<2, g2o::Vector2, VertexFlatSE2, VertexFlatSE2,
                                 g2o::VertexPointXY>::linearizeOplus;
 
+  //! apply the SE2 pose on a point
   template <typename T>
   void project(const T* pose, const T* point, T* result) const {
     T cth = cos(pose[2]);
@@ -59,6 +64,7 @@ class Edge3ADTester : public g2o::BaseFixedSizedEdge<2, g2o::Vector2, VertexFlat
     result[1] = pose[1] + sth * point[0] + cth * point[1];
   }
 
+  //! implementation of the templetazed error function
   template <typename T>
   bool operator()(const T* p1, const T* p2, const T* point, T* error) const {
     T aux[2];
@@ -70,31 +76,41 @@ class Edge3ADTester : public g2o::BaseFixedSizedEdge<2, g2o::Vector2, VertexFlat
     return true;
   }
 
+  // add the AD interface
   G20_MAKE_AUTO_AD_FUNCTIONS
 
+  // NOOPs
   virtual bool read(std::istream&) { return false; };
   virtual bool write(std::ostream&) const { return false; };
 };
 
-TEST(AutoDifferentiation, ComputesSomething) {
+/**
+ * Test ficture for performing the AD tests.
+ * We setup three vertices and the edge to perform the tests
+ */
+class AutoDifferentiation : public ::testing::Test {
+ protected:
+  void SetUp() override {
+    v1.setEstimate(g2o::Vector3(0, 0, 0));
+    v2.setEstimate(g2o::Vector3(1, 1, 1));
+    point.setEstimate(g2o::Vector2(2, 2));
+
+    testEdge.setMeasurement(g2o::Vector2(0, 0));
+    testEdge.setVertex(0, &v1);
+    testEdge.setVertex(1, &v2);
+    testEdge.setVertex(2, &point);
+
+    jacobianWorkspace.updateSize(&testEdge);
+    jacobianWorkspace.allocate();
+  }
   VertexFlatSE2 v1;
   VertexFlatSE2 v2;
   g2o::VertexPointXY point;
-
-  v1.setEstimate(g2o::Vector3(0, 0, 0));
-  v2.setEstimate(g2o::Vector3(1, 1, 1));
-  point.setEstimate(g2o::Vector2(2, 2));
-
   Edge3ADTester testEdge;
-  testEdge.setMeasurement(g2o::Vector2(0, 0));
-  testEdge.setVertex(0, &v1);
-  testEdge.setVertex(1, &v2);
-  testEdge.setVertex(2, &point);
-
   g2o::JacobianWorkspace jacobianWorkspace;
-  jacobianWorkspace.updateSize(&testEdge);
-  jacobianWorkspace.allocate();
+};
 
+TEST_F(AutoDifferentiation, ComputesSomething) {
   testEdge.linearizeOplus(jacobianWorkspace);
 
 #if 0
@@ -113,5 +129,15 @@ TEST(AutoDifferentiation, ComputesSomething) {
 
   ASSERT_LE(0, testEdge.jacobianOplusXn<0>().array().abs().maxCoeff()) << "Jacobian is zero";
   ASSERT_LE(0, testEdge.jacobianOplusXn<1>().array().abs().maxCoeff()) << "Jacobian is zero";
+  ASSERT_LE(0, testEdge.jacobianOplusXn<2>().array().abs().maxCoeff()) << "Jacobian is zero";
+}
+
+TEST_F(AutoDifferentiation, ComputesNothingForFixed) {
+  v2.setFixed(true);
+
+  testEdge.linearizeOplus(jacobianWorkspace);
+
+  ASSERT_LE(0, testEdge.jacobianOplusXn<0>().array().abs().maxCoeff()) << "Jacobian is zero";
+  ASSERT_DOUBLE_EQ(0, testEdge.jacobianOplusXn<1>().array().abs().maxCoeff()) << "Jacobian is non-zero";
   ASSERT_LE(0, testEdge.jacobianOplusXn<2>().array().abs().maxCoeff()) << "Jacobian is zero";
 }
