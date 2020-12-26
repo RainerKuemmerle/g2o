@@ -2,7 +2,7 @@ add_executable(ba_demo
   ba_demo.cpp
 )
 
-target_link_libraries(ba_demo core types_sba)
+target_link_libraries(ba_demo core types_sba solver_dense)
 if(CHOLMOD_FOUND)
   target_link_libraries(ba_demo solver_cholmod)
 else()
