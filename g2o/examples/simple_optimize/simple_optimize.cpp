@@ -26,12 +26,9 @@
 
 #include <iostream>
 
-#include "g2o/core/block_solver.h"
 #include "g2o/core/factory.h"
-#include "g2o/core/optimization_algorithm_gauss_newton.h"
-#include "g2o/core/optimization_algorithm_levenberg.h"
+#include "g2o/core/optimization_algorithm_factory.h"
 #include "g2o/core/sparse_optimizer.h"
-#include "g2o/solvers/eigen/linear_solver_eigen.h"
 #include "g2o/stuff/command_args.h"
 
 using namespace std;
@@ -40,6 +37,7 @@ using namespace g2o;
 // we use the 2D and 3D SLAM types here
 G2O_USE_TYPE_GROUP(slam2d);
 G2O_USE_TYPE_GROUP(slam3d);
+G2O_USE_OPTIMIZATION_LIBRARY(eigen);
 
 int main(int argc, char** argv) {
   // Command line parsing
@@ -52,25 +50,17 @@ int main(int argc, char** argv) {
   arg.paramLeftOver("graph-input", inputFilename, "", "graph file which will be processed");
   arg.parseArgs(argc, argv);
 
-  // create the linear solver
-  auto linearSolver = g2o::make_unique<LinearSolverEigen<BlockSolverX::PoseMatrixType>>();
-
-  // create the block solver on top of the linear solver
-  auto blockSolver = g2o::make_unique<BlockSolverX>(std::move(linearSolver));
-
-  // create the algorithm to carry out the optimization
-  // OptimizationAlgorithmGaussNewton* optimizationAlgorithm = new
-  // OptimizationAlgorithmGaussNewton(blockSolver);
-  OptimizationAlgorithmLevenberg* optimizationAlgorithm =
-      new OptimizationAlgorithmLevenberg(std::move(blockSolver));
-
   // NOTE: We skip to fix a vertex here, either this is stored in the file
   // itself or Levenberg will handle it.
 
   // create the optimizer to load the data and carry out the optimization
   SparseOptimizer optimizer;
   optimizer.setVerbose(true);
-  optimizer.setAlgorithm(optimizationAlgorithm);
+
+  // allocate the solver
+  g2o::OptimizationAlgorithmProperty solverProperty;
+  optimizer.setAlgorithm(
+      g2o::OptimizationAlgorithmFactory::instance()->construct("lm_var", solverProperty));
 
   ifstream ifs(inputFilename.c_str());
   if (!ifs) {
