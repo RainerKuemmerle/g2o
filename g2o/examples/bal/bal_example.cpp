@@ -151,75 +151,50 @@ class EdgeObservationBAL : public BaseBinaryEdge<2, Vector2, VertexCameraBAL, Ve
     return false;
   }
 
-  template <typename T>
-  inline void cross(const T x[3], const T y[3], T result[3]) const {
-    result[0] = x[1] * y[2] - x[2] * y[1];
-    result[1] = x[2] * y[0] - x[0] * y[2];
-    result[2] = x[0] * y[1] - x[1] * y[0];
-  }
-
-  template <typename T>
-  inline T dot(const T x[3], const T y[3]) const {
-    return (x[0] * y[0] + x[1] * y[1] + x[2] * y[2]);
-  }
-
-  template <typename T>
-  inline T squaredNorm(const T x[3]) const {
-    return dot<T>(x, x);
-  }
-
   /**
    * templatized function to compute the error as described in the comment above
    */
   template <typename T>
-  bool operator()(const T* camera, const T* point, T* error) const {
+  bool operator()(const T* p_camera, const T* p_point, T* p_error) const {
+    typename g2o::VectorN<9, T>::ConstMapType camera(p_camera);
+    typename g2o::VectorN<3, T>::ConstMapType point(p_point);
+
+    typename g2o::VectorN<3, T> p;
+
     // Rodrigues' formula for the rotation
-    T p[3];
-    T theta = sqrt(squaredNorm(camera));
+    T theta = camera.template head<3>().norm();
     if (theta > T(0)) {
-      T v[3];
-      v[0] = camera[0] / theta;
-      v[1] = camera[1] / theta;
-      v[2] = camera[2] / theta;
+      g2o::VectorN<3, T> v = camera.template head<3>() / theta;
       T cth = cos(theta);
       T sth = sin(theta);
 
-      T vXp[3];
-      cross(v, point, vXp);
-      T vDotp = dot(v, point);
+      g2o::VectorN<3, T> vXp = v.cross(point);
+      T vDotp = v.dot(point);
       T oneMinusCth = T(1) - cth;
 
-      for (int i = 0; i < 3; ++i) p[i] = point[i] * cth + vXp[i] * sth + v[i] * vDotp * oneMinusCth;
+      p = point * cth + vXp * sth + v * vDotp * oneMinusCth;
     } else {
       // taylor expansion for theta close to zero
-      T aux[3];
-      cross(camera, point, aux);
-      for (int i = 0; i < 3; ++i) p[i] = point[i] + aux[i];
+      p = point + camera.template head<3>().cross(point);
     }
 
     // translation of the camera
-    p[0] += camera[3];
-    p[1] += camera[4];
-    p[2] += camera[5];
+    p += camera.template segment<3>(3);
 
     // perspective division
-    T projectedPoint[2];
-    projectedPoint[0] = -p[0] / p[2];
-    projectedPoint[1] = -p[1] / p[2];
+    g2o::VectorN<2, T> projectedPoint = -p.template head<2>() / p(2);
 
     // conversion to pixel coordinates
-    T radiusSqr = projectedPoint[0] * projectedPoint[0] + projectedPoint[1] * projectedPoint[1];
-    T f = T(camera[6]);
-    T k1 = T(camera[7]);
-    T k2 = T(camera[8]);
+    T radiusSqr = projectedPoint.squaredNorm();
+    const T& f = camera(6);
+    const T& k1 = camera(7);
+    const T& k2 = camera(8);
     T r_p = T(1) + k1 * radiusSqr + k2 * radiusSqr * radiusSqr;
-    T prediction[2];
-    prediction[0] = f * r_p * projectedPoint[0];
-    prediction[1] = f * r_p * projectedPoint[1];
+    g2o::VectorN<2, T> prediction = f * r_p * projectedPoint;
 
-    error[0] = prediction[0] - T(measurement()(0));
-    error[1] = prediction[1] - T(measurement()(1));
-
+    // compute the error
+    typename g2o::VectorN<2, T>::MapType error(p_error);
+    error = prediction - measurement().cast<T>();
     return true;
   }
 
