@@ -114,7 +114,7 @@ class AutoDifferentiation {
 
   //! helper for computing the error based on the functor in the edge
   void computeError(Edge* that) {
-    computeErrorNs(that, make_index_sequence<Edge::_nr_of_vertices>());
+    computeErrorNs(that, std::make_index_sequence<Edge::_nr_of_vertices>());
   }
 
   /**
@@ -125,13 +125,13 @@ class AutoDifferentiation {
    * evaluation of the Jacobian.
    */
   void linearize(Edge* that) {
-    linearizeOplusNs(that, make_index_sequence<Edge::_nr_of_vertices>());
+    linearizeOplusNs(that, std::make_index_sequence<Edge::_nr_of_vertices>());
   }
 
  protected:
   //! packed version to call the functor that evaluates the error function
   template <std::size_t... Ints>
-  void computeErrorNs(Edge* that, index_sequence<Ints...>) {
+  void computeErrorNs(Edge* that, std::index_sequence<Ints...>) {
     EstimateAccess estimateAccess;
     (*that)(estimateAccess.template data<Ints>(that)..., that->errorData());
   }
@@ -140,7 +140,7 @@ class AutoDifferentiation {
    * packed version of the code to linearize using AD
    */
   template <std::size_t... Ints>
-  void linearizeOplusNs(Edge* that, index_sequence<Ints...>) {
+  void linearizeOplusNs(Edge* that, std::index_sequence<Ints...>) {
     // all vertices are fixed, no need to compute anything here
     if (that->allVerticesFixed()) {
       int unused[] = {(that->template jacobianOplusXn<Ints>().setZero(), 0)...};
