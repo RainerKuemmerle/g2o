@@ -223,7 +223,7 @@ class EdgeObservationBAL : public BaseBinaryEdge<2, Vector2, VertexCameraBAL, Ve
     return true;
   }
 
-  G20_MAKE_AUTO_AD_FUNCTIONS
+  G2O_MAKE_AUTO_AD_FUNCTIONS
 };
 
 int main(int argc, char** argv) {

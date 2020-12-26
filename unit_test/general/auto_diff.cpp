@@ -64,7 +64,7 @@ class Edge3ADTester : public g2o::BaseFixedSizedEdge<2, g2o::Vector2, VertexFlat
     result[1] = pose[1] + sth * point[0] + cth * point[1];
   }
 
-  //! implementation of the templetazed error function
+  //! implementation of the templatized error function
   template <typename T>
   bool operator()(const T* p1, const T* p2, const T* point, T* error) const {
     T aux[2];
@@ -77,7 +77,7 @@ class Edge3ADTester : public g2o::BaseFixedSizedEdge<2, g2o::Vector2, VertexFlat
   }
 
   // add the AD interface
-  G20_MAKE_AUTO_AD_FUNCTIONS
+  G2O_MAKE_AUTO_AD_FUNCTIONS
 
   // NOOPs
   virtual bool read(std::istream&) { return false; };

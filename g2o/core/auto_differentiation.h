@@ -37,10 +37,46 @@
 namespace g2o {
 
 /**
+ * functor object to access the estimate data of an edge.
+ * Here, we call estimate().data() on each vertex to obtain the raw pointer.
+ */
+template <typename Edge>
+struct EstimateAccessor {
+  template <int k>
+  EIGEN_STRONG_INLINE number_t* data(Edge* that) {
+    return const_cast<number_t*>(that->template vertexXn<k>()->estimate().data());
+  }
+};
+
+/**
  * \brief Implementation of Automatic Differentiation for edges in g2o
  *
  * This class implements an interface to Automatic Differentiation, see, for example,
  * https://en.wikipedia.org/wiki/Automatic_differentiation for the idea behind it.
+ *
+ * Pre-condition:
+ * Your estimate type in your vertices provides a method called data() which returns a raw pointer
+ * to the data representing the estimate. This can, for example, be achieved by using Eigen's
+ * vector underneath as the container for the data. An SE2 vertex might look as follows
+ *
+ * class VertexFlatSE2 : public g2o::BaseVertex<3, g2o::Vector3> {
+ *  public:
+ *   virtual void setToOriginImpl() { _estimate.setZero(); }
+ *   virtual void oplusImpl(const number_t* update) {
+ *    _estimate += Eigen::Map<const g2o::Vector3>(update);
+ *    _estimate(2) = g2o::normalize_theta(_estimate(2));
+ *   }
+ *   virtual bool read(std::istream&) { return false; }
+ *   virtual bool write(std::ostream&) const { return false; }
+ * };
+ *
+ * If this is not the case for your edge, then you can provide a functor object as second template
+ * argument which does this conversion for you. See EstimateAccessor above.
+ * Such a functor has to provide a templatized function data(Edge*) that returns the raw-pointer to
+ * the underlying data. The raw-pointer should point to memory that is either owned by the functor
+ * itself or is owned by the edge, the vertex, or sth else. It has to to be valid throughout the
+ * lifetime of the functor object.
+ *
  * To use automatic differentiation on your own edge you need to implement the following steps:
  * 1. Implement an operator() that computes your error function:
  *    The function is required to have the following declaration
@@ -54,10 +90,12 @@ namespace g2o {
  *    function with double pointer, i.e., to purely evaluate the error. But also we will pass
  *    a more complex class to it during the numerical computation of the Jacobian.
  * 2. Integrate the operator():
- *    To this end, we provide the macro "G20_MAKE_AUTO_AD_FUNCTIONS" which you can include
+ *    To this end, we provide the macro "G2O_MAKE_AUTO_AD_FUNCTIONS" which you can include
  *    into the public section of your edge class. See below for the macro.
  *    If you use the macro, you do not need to implement computeError() and linearizeOPlus()
  *    in your edge. Both methods will be ready for integration into the g2o framework.
+ *    You may, however, decide agains the macro and provide the implementation on your own if this
+ *    suits your edge class better.
  *
  * Example integration: g2o/examples/bal/bal_example.cpp
  * This provides a self-contained example for integration of AD into an optimization problem.
@@ -66,7 +104,7 @@ namespace g2o {
  * Jet: EXTERNAL/ceres/jet.h
  * AutoDiff: EXTERNAL/ceres/autodiff.h
  */
-template <typename Edge>
+template <typename Edge, typename EstimateAccess = EstimateAccessor<Edge> >
 class AutoDifferentiation {
  public:
   //! type for the Jacobians during AD
@@ -82,6 +120,9 @@ class AutoDifferentiation {
   /**
    * Linearize (compute the Jacobians) for the given edge.
    * Stores the Jacobians in the members of the edge.
+   * A vertex that is fixed will obtain a Jacobian with all elements set to zero.
+   * In the particular case that all vertices are fixed, we terminate early and do not start
+   * evaluation of the Jacobian.
    */
   void linearize(Edge* that) {
     linearizeOplusNs(that, make_index_sequence<Edge::_nr_of_vertices>());
@@ -91,7 +132,8 @@ class AutoDifferentiation {
   //! packed version to call the functor that evaluates the error function
   template <std::size_t... Ints>
   void computeErrorNs(Edge* that, index_sequence<Ints...>) {
-    (*that)(that->template vertexXn<Ints>()->estimate().data()..., that->error().data());
+    EstimateAccess estimateAccess;
+    (*that)(estimateAccess.template data<Ints>(that)..., that->errorData());
   }
 
   /**
@@ -100,16 +142,23 @@ class AutoDifferentiation {
   template <std::size_t... Ints>
   void linearizeOplusNs(Edge* that, index_sequence<Ints...>) {
     // all vertices are fixed, no need to compute anything here
-    if (that->allVerticesFixed()) return;
+    if (that->allVerticesFixed()) {
+      int unused[] = {(that->template jacobianOplusXn<Ints>().setZero(), 0)...};
+      (void)unused;
+      return;
+    }
 
     // tuple containing the Jacobians
     std::tuple<ADJacobianType<Edge::Dimension, Edge::template VertexXnType<Ints>::Dimension>...>
         ad_jacobians;
 
     // setting up the pointer to the parameters and the Jacobians for calling AD.
-    number_t* parameters[] = {
-        const_cast<number_t*>(that->template vertexXn<Ints>()->estimate().data())...};
-    // pointers to the Jacobians, set to NULL if vertex is fixed
+    EstimateAccess estimateAccess;
+    number_t* parameters[] = {estimateAccess.template data<Ints>(that)...};
+    // number_t* parameters[] = { /* trivial case would be */
+    //     const_cast<number_t*>(that->template vertexXn<Ints>()->estimate().data())...};
+
+    // pointers to the Jacobians, set to NULL if vertex is fixed to skip computation
     number_t* jacobians[] = {that->template vertexXn<Ints>()->fixed()
                                  ? nullptr
                                  : const_cast<number_t*>(std::get<Ints>(ad_jacobians).data())...};
@@ -145,15 +194,21 @@ class AutoDifferentiation {
 
 }  // namespace g2o
 
+// helper macros for fine-grained integration into own types
+#define G2O_MAKE_AUTO_AD_COMPUTEERROR                                                            \
+  void computeError() {                                                                          \
+    g2o::AutoDifferentiation<std::remove_reference<decltype(*this)>::type>().computeError(this); \
+  }
+#define G2O_MAKE_AUTO_AD_LINEARIZEOPLUS                                                       \
+  void linearizeOplus() {                                                                     \
+    g2o::AutoDifferentiation<std::remove_reference<decltype(*this)>::type>().linearize(this); \
+  }
+
 /**
  * Helper macro for easy integration into own types
  */
-#define G20_MAKE_AUTO_AD_FUNCTIONS                                                               \
-  void computeError() {                                                                          \
-    g2o::AutoDifferentiation<std::remove_reference<decltype(*this)>::type>().computeError(this); \
-  }                                                                                              \
-  void linearizeOplus() {                                                                        \
-    g2o::AutoDifferentiation<std::remove_reference<decltype(*this)>::type>().linearize(this);    \
-  }
+#define G2O_MAKE_AUTO_AD_FUNCTIONS \
+  G2O_MAKE_AUTO_AD_COMPUTEERROR    \
+  G2O_MAKE_AUTO_AD_LINEARIZEOPLUS
 
 #endif
