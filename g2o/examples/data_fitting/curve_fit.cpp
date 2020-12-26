@@ -30,15 +30,14 @@
 #include "g2o/core/auto_differentiation.h"
 #include "g2o/core/base_unary_edge.h"
 #include "g2o/core/base_vertex.h"
-#include "g2o/core/block_solver.h"
-#include "g2o/core/optimization_algorithm_levenberg.h"
-#include "g2o/core/solver.h"
+#include "g2o/core/optimization_algorithm_factory.h"
 #include "g2o/core/sparse_optimizer.h"
-#include "g2o/solvers/dense/linear_solver_dense.h"
 #include "g2o/stuff/command_args.h"
 #include "g2o/stuff/sampler.h"
 
 using namespace std;
+
+G2O_USE_OPTIMIZATION_LIBRARY(dense);
 
 /**
  * \brief the params, a, b, and lambda for a * exp(-lambda * t) + b
@@ -97,7 +96,6 @@ int main(int argc, char** argv) {
   int numPoints;
   int maxIterations;
   bool verbose;
-  std::vector<int> gaugeList;
   string dumpFilename;
   g2o::CommandArgs arg;
   arg.param("dump", dumpFilename, "", "dump the points into a file");
@@ -127,18 +125,14 @@ int main(int argc, char** argv) {
     for (int i = 0; i < numPoints; ++i) fout << points[i].transpose() << endl;
   }
 
-  // some handy typedefs
-  typedef g2o::BlockSolver<g2o::BlockSolverTraits<Eigen::Dynamic, Eigen::Dynamic> > MyBlockSolver;
-  typedef g2o::LinearSolverDense<MyBlockSolver::PoseMatrixType> MyLinearSolver;
-
   // setup the solver
   g2o::SparseOptimizer optimizer;
   optimizer.setVerbose(false);
 
-  g2o::OptimizationAlgorithmLevenberg* solver = new g2o::OptimizationAlgorithmLevenberg(
-      g2o::make_unique<MyBlockSolver>(g2o::make_unique<MyLinearSolver>()));
-
-  optimizer.setAlgorithm(solver);
+  // allocate the solver
+  g2o::OptimizationAlgorithmProperty solverProperty;
+  optimizer.setAlgorithm(
+      g2o::OptimizationAlgorithmFactory::instance()->construct("lm_dense", solverProperty));
 
   // build the optimization problem given the points
   // 1. add the parameter vertex

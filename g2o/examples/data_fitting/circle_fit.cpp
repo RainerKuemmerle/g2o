@@ -31,16 +31,14 @@
 #include "g2o/core/auto_differentiation.h"
 #include "g2o/core/base_unary_edge.h"
 #include "g2o/core/base_vertex.h"
-#include "g2o/core/block_solver.h"
-#include "g2o/core/optimization_algorithm_gauss_newton.h"
-#include "g2o/core/optimization_algorithm_levenberg.h"
-#include "g2o/core/solver.h"
+#include "g2o/core/optimization_algorithm_factory.h"
 #include "g2o/core/sparse_optimizer.h"
-#include "g2o/solvers/dense/linear_solver_dense.h"
 #include "g2o/stuff/command_args.h"
 #include "g2o/stuff/sampler.h"
 
 using namespace std;
+
+G2O_USE_OPTIMIZATION_LIBRARY(dense);
 
 double errorOfSolution(int numPoints, Eigen::Vector2d* points, const Eigen::Vector3d& circle) {
   Eigen::Vector2d center = circle.head<2>();
@@ -122,16 +120,14 @@ int main(int argc, char** argv) {
     points[i].y() = center.y() + r * sin(angle);
   }
 
-  // some handy typedefs
-  typedef g2o::BlockSolver<g2o::BlockSolverTraits<Eigen::Dynamic, Eigen::Dynamic> > MyBlockSolver;
-  typedef g2o::LinearSolverDense<MyBlockSolver::PoseMatrixType> MyLinearSolver;
-
   // setup the solver
   g2o::SparseOptimizer optimizer;
   optimizer.setVerbose(false);
-  g2o::OptimizationAlgorithmLevenberg* solver = new g2o::OptimizationAlgorithmLevenberg(
-      g2o::make_unique<MyBlockSolver>(g2o::make_unique<MyLinearSolver>()));
-  optimizer.setAlgorithm(solver);
+
+  // allocate the solver
+  g2o::OptimizationAlgorithmProperty solverProperty;
+  optimizer.setAlgorithm(
+      g2o::OptimizationAlgorithmFactory::instance()->construct("lm_dense", solverProperty));
 
   // build the optimization problem given the points
   // 1. add the circle vertex
