@@ -195,6 +195,7 @@ class EdgeObservationBAL : public BaseBinaryEdge<2, Vector2, VertexCameraBAL, Ve
     // compute the error
     typename g2o::VectorN<2, T>::MapType error(p_error);
     error = prediction - measurement().cast<T>();
+    (void) error;
     return true;
   }
 
