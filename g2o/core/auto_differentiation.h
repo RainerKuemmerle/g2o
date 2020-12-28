@@ -111,6 +111,9 @@ class EstimateAccessorGet {
  * the underlying data. The raw-pointer should point to memory that is either owned by the functor
  * itself or is owned by the edge, the vertex, or sth else. It has to to be valid throughout the
  * lifetime of the functor object.
+ * See, for example, the functor EstimateAccessorGet which uses the potentially implemented
+ * method getEstimateData() on vertices to obtain the estimate in a raw array. This array is then
+ * buffered and passed on to compute the error or its Jacobian.
  *
  * To use automatic differentiation on your own edge you need to implement the following steps:
  * 1. Implement an operator() that computes your error function:
