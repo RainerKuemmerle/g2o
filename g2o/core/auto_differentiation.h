@@ -27,6 +27,7 @@
 #ifndef G2O_AUTO_DIFFERENTIATION_H
 #define G2O_AUTO_DIFFERENTIATION_H
 
+#include <cassert>
 #include <type_traits>
 
 #include "eigen_types.h"
@@ -46,6 +47,40 @@ struct EstimateAccessor {
   EIGEN_STRONG_INLINE number_t* data(Edge* that) {
     return const_cast<number_t*>(that->template vertexXn<k>()->estimate().data());
   }
+};
+
+/**
+ * functor to access the estimate pointer by the getEstimateData() function
+ * that can be implemented in vertex types. Downside is that we have to
+ * buffer the data.
+ * In such a case, Edge::computeError is most likely implemented on own types
+ * and Edge::operator() has to be re-implemented consuming pointers to obtain
+ * the error for linearizing.
+ * See the implementation of EdgeSE2AD in unit_test/general/auto_diff.cpp
+ */
+template <typename Edge>
+class EstimateAccessorGet {
+ public:
+  template <int k>
+  EIGEN_STRONG_INLINE number_t* data(Edge* that) {
+    auto& buffer = std::get<k>(_estimateBuffer);
+    buffer.resize(that->template vertexDimension<k>());
+    number_t* rawBuffer = const_cast<number_t*>(buffer.data());
+    bool gotData = that->template vertexXn<k>()->getEstimateData(rawBuffer);
+    assert(gotData && "Called getEstimateData, but seems unimplmented");
+    return gotData ? rawBuffer : nullptr;
+  }
+
+ protected:
+  template <typename>
+  struct BufferType;
+  template <std::size_t... Ints>
+  struct BufferType<std::index_sequence<Ints...>> {
+    using type = std::tuple<VectorN<Edge::template VertexXnType<Ints>::Dimension>...>;
+  };
+
+  using Buffer = typename BufferType<std::make_index_sequence<Edge::_nr_of_vertices>>::type;
+  Buffer _estimateBuffer;
 };
 
 /**
@@ -104,7 +139,7 @@ struct EstimateAccessor {
  * Jet: EXTERNAL/ceres/jet.h
  * AutoDiff: EXTERNAL/ceres/autodiff.h
  */
-template <typename Edge, typename EstimateAccess = EstimateAccessor<Edge> >
+template <typename Edge, typename EstimateAccess = EstimateAccessor<Edge>>
 class AutoDifferentiation {
  public:
   //! type for the Jacobians during AD
@@ -113,7 +148,7 @@ class AutoDifferentiation {
       typename Eigen::Matrix<number_t, EdgeDimension, VertexDimension, Eigen::RowMajor>;
 
   //! helper for computing the error based on the functor in the edge
-  void computeError(Edge* that) {
+  static void computeError(Edge* that) {
     computeErrorNs(that, std::make_index_sequence<Edge::_nr_of_vertices>());
   }
 
@@ -124,14 +159,14 @@ class AutoDifferentiation {
    * In the particular case that all vertices are fixed, we terminate early and do not start
    * evaluation of the Jacobian.
    */
-  void linearize(Edge* that) {
+  static void linearize(Edge* that) {
     linearizeOplusNs(that, std::make_index_sequence<Edge::_nr_of_vertices>());
   }
 
  protected:
   //! packed version to call the functor that evaluates the error function
   template <std::size_t... Ints>
-  void computeErrorNs(Edge* that, std::index_sequence<Ints...>) {
+  static void computeErrorNs(Edge* that, std::index_sequence<Ints...>) {
     EstimateAccess estimateAccess;
     (*that)(estimateAccess.template data<Ints>(that)..., that->errorData());
   }
@@ -140,7 +175,7 @@ class AutoDifferentiation {
    * packed version of the code to linearize using AD
    */
   template <std::size_t... Ints>
-  void linearizeOplusNs(Edge* that, std::index_sequence<Ints...>) {
+  static void linearizeOplusNs(Edge* that, std::index_sequence<Ints...>) {
     // all vertices are fixed, no need to compute anything here
     if (that->allVerticesFixed()) {
       int unused[] = {(that->template jacobianOplusXn<Ints>().setZero(), 0)...};
@@ -186,7 +221,8 @@ class AutoDifferentiation {
 
   //! helper function to perform a = b
   template <typename A, typename B>
-  EIGEN_STRONG_INLINE void assign(const Eigen::MatrixBase<A>& a, const Eigen::MatrixBase<B>& b) {
+  static EIGEN_STRONG_INLINE void assign(const Eigen::MatrixBase<A>& a,
+                                         const Eigen::MatrixBase<B>& b) {
     Eigen::MatrixBase<A>& aux = const_cast<Eigen::MatrixBase<A>&>(a);
     aux = b;
   }
@@ -195,13 +231,13 @@ class AutoDifferentiation {
 }  // namespace g2o
 
 // helper macros for fine-grained integration into own types
-#define G2O_MAKE_AUTO_AD_COMPUTEERROR                                                            \
-  void computeError() {                                                                          \
-    g2o::AutoDifferentiation<std::remove_reference<decltype(*this)>::type>().computeError(this); \
+#define G2O_MAKE_AUTO_AD_COMPUTEERROR                                                           \
+  void computeError() {                                                                         \
+    g2o::AutoDifferentiation<std::remove_reference<decltype(*this)>::type>::computeError(this); \
   }
-#define G2O_MAKE_AUTO_AD_LINEARIZEOPLUS                                                       \
-  void linearizeOplus() {                                                                     \
-    g2o::AutoDifferentiation<std::remove_reference<decltype(*this)>::type>().linearize(this); \
+#define G2O_MAKE_AUTO_AD_LINEARIZEOPLUS                                                      \
+  void linearizeOplus() {                                                                    \
+    g2o::AutoDifferentiation<std::remove_reference<decltype(*this)>::type>::linearize(this); \
   }
 
 /**
@@ -210,5 +246,25 @@ class AutoDifferentiation {
 #define G2O_MAKE_AUTO_AD_FUNCTIONS \
   G2O_MAKE_AUTO_AD_COMPUTEERROR    \
   G2O_MAKE_AUTO_AD_LINEARIZEOPLUS
+
+// helper macros for fine-grained integration into own types using EstimateAccessorGet
+#define G2O_MAKE_AUTO_AD_COMPUTEERROR_BY_GET                                                    \
+  void computeError() {                                                                         \
+    using EdgeType = std::remove_reference<decltype(*this)>::type;                              \
+    g2o::AutoDifferentiation<EdgeType, g2o::EstimateAccessorGet<EdgeType>>::computeError(this); \
+  }
+
+#define G2O_MAKE_AUTO_AD_LINEARIZEOPLUS_BY_GET                                               \
+  void linearizeOplus() {                                                                    \
+    using EdgeType = std::remove_reference<decltype(*this)>::type;                           \
+    g2o::AutoDifferentiation<EdgeType, g2o::EstimateAccessorGet<EdgeType>>::linearize(this); \
+  }
+
+/**
+ * Helper macro for easy integration into own types
+ */
+#define G2O_MAKE_AUTO_AD_FUNCTIONS_BY_GET \
+  G2O_MAKE_AUTO_AD_COMPUTEERROR_BY_GET    \
+  G2O_MAKE_AUTO_AD_LINEARIZEOPLUS_BY_GET
 
 #endif
