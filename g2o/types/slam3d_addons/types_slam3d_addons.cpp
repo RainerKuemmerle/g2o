@@ -47,7 +47,7 @@ namespace g2o {
 
 #ifdef G2O_HAVE_OPENGL
   G2O_REGISTER_ACTION(CacheCameraDrawAction);
-  G2O_REGISTER_ACTION(VertexPlaneDrawAction);  
+  G2O_REGISTER_ACTION(VertexPlaneDrawAction);
   G2O_REGISTER_ACTION(EdgeSE3PlaneSensorCalibDrawAction);
   G2O_REGISTER_ACTION(VertexLine3DDrawAction);
   G2O_REGISTER_ACTION(EdgeSE3Line3DDrawAction);
@@ -62,11 +62,11 @@ namespace g2o {
 
 #ifdef G2O_HAVE_OPENGL
     HyperGraphActionLibrary* actionLib = HyperGraphActionLibrary::instance();
-    HyperGraphElementAction* vertexse3eulerdraw=new g2o::VertexSE3DrawAction;
+    HyperGraphElementAction::HyperGraphElementActionPtr vertexse3eulerdraw(new g2o::VertexSE3DrawAction);
     vertexse3eulerdraw->setTypeName(typeid(VertexSE3Euler).name());
     actionLib->registerAction(vertexse3eulerdraw);
 
-    HyperGraphElementAction* edgese3eulerdraw=new g2o::EdgeSE3DrawAction;
+    HyperGraphElementAction::HyperGraphElementActionPtr edgese3eulerdraw(new g2o::EdgeSE3DrawAction);
     edgese3eulerdraw->setTypeName(typeid(EdgeSE3Euler).name());
     actionLib->registerAction(edgese3eulerdraw);
 #endif
