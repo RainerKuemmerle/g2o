@@ -238,12 +238,10 @@ namespace g2o {
     Vertex* inserted = vertex(ov->id());
     if (inserted) {
       cerr << __FUNCTION__ << ": FATAL, a vertex with ID " << ov->id() << " has already been registered with this graph" << endl;
-      assert(0 && "Vertex with this ID already contained in the graph");
       return false;
     }
     if (ov->_graph != nullptr && ov->_graph != this) {
       cerr << __FUNCTION__ << ": FATAL, vertex with ID " << ov->id() << " has already registered with another graph " << ov->_graph << endl;
-      assert(0 && "Vertex already registered with another graph");
       return false;
     }
     if (userData)
@@ -266,7 +264,6 @@ namespace g2o {
     if (g != nullptr && g != this) {
       cerr << __FUNCTION__ << ": FATAL, edge with ID " << e->id()
            << " has already registered with another graph " << g << endl;
-      assert(0 && "Edge already registered with another graph");
       return false;
     }
 

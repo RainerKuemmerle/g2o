@@ -76,8 +76,8 @@ class LinearSolverEigen : public LinearSolverCCS<MatrixType> {
   };
 
  public:
-  LinearSolverEigen()
-      : LinearSolverCCS<MatrixType>(), _init(true) {}
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
+  LinearSolverEigen() : LinearSolverCCS<MatrixType>(), _init(true) {}
 
   virtual bool init() {
     _init = true;

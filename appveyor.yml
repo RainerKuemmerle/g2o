@@ -4,8 +4,10 @@ clone_folder: c:\projects\g2o
 
 platform: x64
 configuration: Debug
+clone_depth: 50
 
 build:
+  parallel: true
   project: c:\projects\g2o\build\g2o.sln
 
 install:
@@ -18,4 +20,9 @@ before_build:
   - cd c:\projects\g2o
   - mkdir build
   - cd build
-  - cmake -G "Visual Studio 16 2019" -A x64 -D EIGEN3_INCLUDE_DIR=C:\projects\eigen-3.3.9 ..
+  - cmake -G "Visual Studio 16 2019" -A x64 -DBUILD_UNITTESTS=ON -D EIGEN3_INCLUDE_DIR=C:\projects\eigen-3.3.9 ..
+
+test_script:
+  - set PATH=%PATH%;C:\projects\g2o\bin\Debug;C:\projects\g2o\lib\Debug;C:\projects\g2o\build\bin\Debug;C:\projects\g2o\build\lib\Debug
+  - cd c:\projects\g2o\build
+  - ctest -C Debug --extra-verbose
