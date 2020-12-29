@@ -184,12 +184,6 @@ bool HyperGraphActionLibrary::unregisterAction(
   return true;
 }
 
-bool HyperGraphActionLibrary::safeUnregisterAction(
-    const HyperGraphElementAction::HyperGraphElementActionPtr& action) {
-  if (actionLibInstance == 0) return true;
-  return instance()->unregisterAction(action);
-}
-
 WriteGnuplotAction::WriteGnuplotAction(const std::string& typeName_)
     : HyperGraphElementAction(typeName_) {
   _name = "writeGnuplot";

@@ -93,8 +93,6 @@ class G2O_CORE_API OptimizationAlgorithmFactory {
    */
   void unregisterSolver(const std::shared_ptr<AbstractOptimizationAlgorithmCreator>& c);
 
-  static void safeUnregisterSolver(const std::shared_ptr<AbstractOptimizationAlgorithmCreator>& c);
-
   /**
    * construct a solver based on its name, e.g., var, fix3_2_cholmod
    */
@@ -128,13 +126,6 @@ class RegisterOptimizationAlgorithmProxy {
               << typeid(*_creator).name() << std::endl;
 #endif
     OptimizationAlgorithmFactory::instance()->registerSolver(_creator);
-  }
-
-  ~RegisterOptimizationAlgorithmProxy() {
-#ifdef G2O_DEBUG_OPTIMIZATION_ALGORITHM_FACTORY
-    std::cout << __FUNCTION__ << ": Unregistering " << _creator->property().name << std::endl;
-#endif
-    OptimizationAlgorithmFactory::safeUnregisterSolver(_creator);
   }
 
  private:

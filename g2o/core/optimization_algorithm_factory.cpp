@@ -68,12 +68,6 @@ void OptimizationAlgorithmFactory::unregisterSolver(
   }
 }
 
-void OptimizationAlgorithmFactory::safeUnregisterSolver(
-    const std::shared_ptr<AbstractOptimizationAlgorithmCreator>& c) {
-  if (factoryInstance == nullptr) return;
-  instance()->unregisterSolver(c);
-}
-
 OptimizationAlgorithm* OptimizationAlgorithmFactory::construct(
     const std::string& name, OptimizationAlgorithmProperty& solverProperty) const {
   CreatorList::const_iterator foundIt = findSolver(name);

@@ -60,12 +60,6 @@ void RobustKernelFactory::unregisterType(const std::string& tag) {
   }
 }
 
-void RobustKernelFactory::safeUnregisterType(const std::string& tag)
-{
-  if (factoryInstance == nullptr) return;
-  instance()->unregisterType(tag);
-}
-
 RobustKernel* RobustKernelFactory::construct(const std::string& tag) const {
   CreatorMap::const_iterator foundIt = _creator.find(tag);
   if (foundIt != _creator.end()) {

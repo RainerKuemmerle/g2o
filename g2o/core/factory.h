@@ -67,8 +67,6 @@ class G2O_CORE_API Factory {
    */
   void unregisterType(const std::string& tag);
 
-  static void safeUnregisterType(const std::string& tag);
-
   /**
    * construct a graph element based on its tag
    */
@@ -128,14 +126,6 @@ class RegisterTypeProxy {
 #endif
     _creator.reset(new HyperGraphElementCreator<T>());
     Factory::instance()->registerType(_name, _creator);
-  }
-
-  ~RegisterTypeProxy() {
-#ifdef G2O_DEBUG_FACTORY
-    std::cout << __FUNCTION__ << ": Unregistering " << _name << " of type " << typeid(T).name()
-              << std::endl;
-#endif
-    Factory::safeUnregisterType(_name);
   }
 
  private:

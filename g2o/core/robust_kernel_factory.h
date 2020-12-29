@@ -87,11 +87,6 @@ class G2O_CORE_API RobustKernelFactory {
   void unregisterType(const std::string& tag);
 
   /**
-   * unregister a tag for a specific creator
-   */
-  static void safeUnregisterType(const std::string& tag);
-
-  /**
    * construct a robust kernel based on its tag
    */
   RobustKernel* construct(const std::string& tag) const;
@@ -123,8 +118,6 @@ class RegisterRobustKernelProxy {
     RobustKernelFactory::instance()->registerRobustKernel(
         _name, AbstractRobustKernelCreator::Ptr(new RobustKernelCreator<T>()));
   }
-
-  ~RegisterRobustKernelProxy() { RobustKernelFactory::safeUnregisterType(_name); }
 
  private:
   std::string _name;

@@ -154,8 +154,6 @@ class G2O_CORE_API HyperGraphActionLibrary {
   // registers a basic action in the pool. If necessary a container is created
   bool registerAction(const HyperGraphElementAction::HyperGraphElementActionPtr& action);
   bool unregisterAction(const HyperGraphElementAction::HyperGraphElementActionPtr& action);
-  static bool safeUnregisterAction(
-      const HyperGraphElementAction::HyperGraphElementActionPtr& action);
 
   inline HyperGraphElementAction::ActionMap& actionMap() { return _actionMap; }
 
@@ -217,13 +215,6 @@ class RegisterActionProxy {
 #endif
     _action.reset(new T());
     HyperGraphActionLibrary::instance()->registerAction(_action);
-  }
-
-  ~RegisterActionProxy() {
-#ifdef G2O_DEBUG_ACTIONLIB
-    std::cout << __FUNCTION__ << ": Unregistering action of type " << typeid(T).name() << std::endl;
-#endif
-    HyperGraphActionLibrary::safeUnregisterAction(_action);
   }
 
  private:

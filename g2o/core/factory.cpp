@@ -124,11 +124,6 @@ void Factory::unregisterType(const std::string& tag) {
   }
 }
 
-void Factory::safeUnregisterType(const std::string& tag) {
-  if (factoryInstance.get() == nullptr) return;
-  instance()->unregisterType(tag);
-}
-
 HyperGraph::HyperGraphElement* Factory::construct(const std::string& tag) const {
   CreatorMap::const_iterator foundIt = _creator.find(tag);
   if (foundIt != _creator.end()) {
