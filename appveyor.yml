@@ -6,6 +6,13 @@ platform: x64
 configuration: Debug
 clone_depth: 50
 
+# Enable connection via RDP to debug build issues
+# environment:
+#   APPVEYOR_RDP_PASSWORD: 4#V3W3e,vB&K@XCSYm
+
+# init:
+#   - ps: iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
+
 build:
   parallel: true
   project: c:\projects\g2o\build\g2o.sln

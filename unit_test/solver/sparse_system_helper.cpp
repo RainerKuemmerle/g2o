@@ -34,7 +34,7 @@
 namespace g2o {
 namespace internal {
 
-std::vector<int> readIndeces(const std::string& indeces) {
+static std::vector<int> readIndices(const std::string& indeces) {
   std::stringstream tokens(indeces);
 
   int numElems = 0;
@@ -193,22 +193,25 @@ std::string denseInverseMatrixString() {
   return aux.str();
 }
 
-g2o::SparseBlockMatrixX createTestMatrix() {
+void fillTestMatrix(g2o::SparseBlockMatrixX& A) {
   std::stringstream input(sparseMatrixString());
   std::string token;
 
   // reading RBI
   input >> token >> token;
   std::getline(input, token);
-  std::vector<int> rowBlockIndeces = readIndeces(token);
+  std::vector<int> rowBlockIndices = readIndices(token);
   // reading CBI
   input >> token >> token;
   std::getline(input, token);
-  std::vector<int> colBlockIndeces = readIndeces(token);
+  std::vector<int> colBlockIndices = readIndices(token);
 
   // allocating the matrix and read the elements of the matrix
-  g2o::SparseBlockMatrixX result(rowBlockIndeces.data(), colBlockIndeces.data(),
-                                 rowBlockIndeces.size(), colBlockIndeces.size());
+  A.clear(true);
+  A.rowBlockIndices() = rowBlockIndices;
+  A.colBlockIndices() = colBlockIndices;
+  A.blockCols().resize(colBlockIndices.size());
+
   while (input >> token) {
     if (token != "BLOCK") {
       throw std::logic_error("Expected BLOCK as token");
@@ -216,8 +219,8 @@ g2o::SparseBlockMatrixX createTestMatrix() {
     input >> token;
     int ri, ci;
     input >> ri >> ci;
-    auto sparseBlock = result.block(ri, ci, true);
-    sparseBlock->resize(result.rowsOfBlock(ri), result.colsOfBlock(ci));
+    auto sparseBlock = A.block(ri, ci, true);
+    sparseBlock->resize(A.rowsOfBlock(ri), A.colsOfBlock(ci));
     for (int rr = 0; rr < sparseBlock->rows(); rr++) {
       for (int cc = 0; cc < sparseBlock->cols(); cc++) {
         double value;
@@ -226,7 +229,6 @@ g2o::SparseBlockMatrixX createTestMatrix() {
       }
     }
   }
-  return result;
 }
 
 g2o::MatrixX createTestMatrixInverse() {

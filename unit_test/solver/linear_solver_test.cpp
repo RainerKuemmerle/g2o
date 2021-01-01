@@ -56,11 +56,13 @@ class LS : public testing::Test {
   using LinearSolverType = typename T::first_type;
   using OrderingType = typename T::second_type;
 
-  LS() : linearsolver(g2o::make_unique<LinearSolverType>()) {}
+  LS() : linearsolver(g2o::make_unique<LinearSolverType>()) {
+    g2o::internal::fillTestMatrix(sparse_matrix);
+  }
 
  protected:
   std::unique_ptr<LinearSolverType> linearsolver;
-  g2o::SparseBlockMatrixX sparse_matrix = g2o::internal::createTestMatrix();
+  g2o::SparseBlockMatrixX sparse_matrix;
   g2o::MatrixX matrix_inverse = g2o::internal::createTestMatrixInverse();
   g2o::VectorX x_vector = g2o::internal::createTestVectorX();
   g2o::VectorX b_vector = g2o::internal::createTestVectorB();
