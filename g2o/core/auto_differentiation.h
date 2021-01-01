@@ -27,6 +27,7 @@
 #ifndef G2O_AUTO_DIFFERENTIATION_H
 #define G2O_AUTO_DIFFERENTIATION_H
 
+#include <algorithm>
 #include <cassert>
 #include <type_traits>
 
@@ -152,6 +153,7 @@ class AutoDifferentiation {
 
   //! helper for computing the error based on the functor in the edge
   static void computeError(Edge* that) {
+    static_assert(Edge::Dimension > 0, "Dynamically sized edges are not supported");
     computeErrorNs(that, std::make_index_sequence<Edge::_nr_of_vertices>());
   }
 
@@ -163,6 +165,7 @@ class AutoDifferentiation {
    * evaluation of the Jacobian.
    */
   static void linearize(Edge* that) {
+    static_assert(Edge::Dimension > 0, "Dynamically sized edges are not supported");
     linearizeOplusNs(that, std::make_index_sequence<Edge::_nr_of_vertices>());
   }
 
@@ -170,6 +173,8 @@ class AutoDifferentiation {
   //! packed version to call the functor that evaluates the error function
   template <std::size_t... Ints>
   static void computeErrorNs(Edge* that, std::index_sequence<Ints...>) {
+    static_assert(std::min({Edge::template VertexXnType<Ints>::Dimension...}) > 0,
+                  "Dynamically sized vertices are not supported");
     EstimateAccess estimateAccess;
     (*that)(estimateAccess.template data<Ints>(that)..., that->errorData());
   }
@@ -179,6 +184,8 @@ class AutoDifferentiation {
    */
   template <std::size_t... Ints>
   static void linearizeOplusNs(Edge* that, std::index_sequence<Ints...>) {
+    static_assert(std::min({Edge::template VertexXnType<Ints>::Dimension...}) > 0,
+                  "Dynamically sized vertices are not supported");
     // all vertices are fixed, no need to compute anything here
     if (that->allVerticesFixed()) {
       int unused[] = {(that->template jacobianOplusXn<Ints>().setZero(), 0)...};
