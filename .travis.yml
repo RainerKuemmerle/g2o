@@ -7,6 +7,10 @@ notifications:
     on_success: change # default: change
     on_failure: always # default: always
 
+env:
+  global:
+    - DO_COVERAGE=OFF
+
 # where do we want to build
 matrix:
   include:
@@ -14,6 +18,7 @@ matrix:
       arch: amd64
       compiler: gcc
       dist: focal
+      env: DO_COVERAGE=ON
     - os: linux
       arch: amd64
       compiler: clang
@@ -32,12 +37,17 @@ before_script:
   - mkdir build
   - cd build
   - cmake --version
-  - cmake -DBUILD_UNITTESTS=ON ..
+  - cmake -DBUILD_UNITTESTS=ON -DBUILD_CODE_COVERAGE=$DO_COVERAGE -DCMAKE_BUILD_TYPE=Debug ..
   - cat g2o/config.h
 
 script:
   - make -j $(nproc)
-  - ctest --extra-verbose
+  - ctest --extra-verbose --output-on-failure
+
+after_success:
+  - if [[ $TRAVIS_BRANCH == "master" ]]; then
+      script/codecov.sh
+    fi
 
 # installing dependencies
 addons:
@@ -48,6 +58,7 @@ addons:
       - qt5-qmake
       - libqglviewer-dev-qt5
       - libsuitesparse-dev
+      - lcov
   homebrew: # mac os
     packages:
       - cmake
