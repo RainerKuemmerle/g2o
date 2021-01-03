@@ -167,6 +167,20 @@ namespace g2o {
           return setEstimateData(&estimate[0]);
         };
 
+	/**
+         * sets the initial estimate from an eigen type of number_t
+         * Implement setEstimateDataImpl()
+         * @return true on success
+         */
+        template<typename Derived>
+        bool setEstimateData(const Eigen::MatrixBase<Derived>& estimate) {
+#ifndef NDEBUG
+          int dim = estimateDimension();
+          assert((dim == -1) || (estimate.size() == std::size_t(dim)));
+#endif
+          return setEstimateData(estimate.derived().data());
+        };
+
         /**
          * writes the estimater to an array of number_t
          * @returns true on success
@@ -185,6 +199,28 @@ namespace g2o {
           return getEstimateData(&estimate[0]);
         };
 
+        /**
+         * writes the estimater to an eigen type of number_t
+         * @returns true on success
+         */
+        template<typename Derived>
+        bool getEstimateData(Eigen::MatrixBase<Derived>& estimate) const {
+          int dim = estimateDimension();
+          // If dim is -ve, getEstimateData is not implemented and fails
+          if (dim < 0)
+            return false;
+
+          // If the vector isn't the right size to store the estimate, try to resize it.
+          // This only works if the vector is dynamic. If it is static, fail.
+          if (estimate.size() != dim) {
+             if ((estimate.RowsAtCompileTime == Eigen::Dynamic) || (estimate.ColsAtCompileTime == Eigen::Dynamic))
+                estimate.derived().resize(dim);
+             else
+                return false;
+          }
+          return getEstimateData(estimate.derived().data());
+        };
+	
         /**
          * returns the dimension of the extended representation used by get/setEstimate(number_t*)
          * -1 if it is not supported
@@ -212,6 +248,21 @@ namespace g2o {
         };
 
         /**
+         * sets the initial estimate from an eigen type of number_t.
+         * Implement setMinimalEstimateDataImpl()
+         * @return true on success
+         */
+        template<typename Derived>
+        bool setMinimalEstimateData(const Eigen::MatrixBase<Derived>& estimate) {
+#ifndef NDEBUG
+          int dim = minimalEstimateDimension();
+          assert((dim == -1) || (estimate.size() == std::size_t(dim)));
+#endif
+          return setMinimalEstimateData(estimate.data());
+        };
+
+	
+        /**
          * writes the estimate to an array of number_t
          * @returns true on success
          */
@@ -223,13 +274,35 @@ namespace g2o {
          */
         virtual bool getMinimalEstimateData(std::vector<number_t>& estimate) const {
           int dim = minimalEstimateDimension();
-          if (dim < 0)
+         if (dim < 0)
             return false;
           estimate.resize(dim);
           return getMinimalEstimateData(&estimate[0]);
         };
 
         /**
+         * writes the estimate to an eigen type of number_t
+         * @returns true on success
+         */
+        template<typename Derived>
+        bool getMinimalEstimateData(Eigen::MatrixBase<Derived>& estimate) const {
+          int dim = minimalEstimateDimension();
+          // If dim is -ve, getMinimalEstimateData is not implemented and fails
+          if (dim < 0)
+            return false;
+
+          // If the vector isn't the right size to store the estimate, try to resize it.
+          // This only works if the vector is dynamic. If it is static, fail.
+          if (estimate.size() != dim) {
+             if ((estimate.RowsAtCompileTime == Eigen::Dynamic) || (estimate.ColsAtCompileTime == Eigen::Dynamic))
+                estimate.derived().resize(dim);
+             else
+                return false;
+          }
+          return getMinimalEstimateData(estimate.derived().data());
+        };
+
+	/**
          * returns the dimension of the extended representation used by get/setEstimate(number_t*)
          * -1 if it is not supported
          */
