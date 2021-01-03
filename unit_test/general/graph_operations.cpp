@@ -106,7 +106,7 @@ TEST(General, GraphAddEdge) {
  * Here, we will have a simple graph with N nodes and N edges.
  * We use for saving and loading.
  */
-class GeneralGraphLoadSave : public ::testing::Test {
+class GeneralGraphOperations : public ::testing::Test {
  protected:
   void SetUp() override {
     optimizer.reset(g2o::internal::createOptimizerForTests());
@@ -125,7 +125,7 @@ class GeneralGraphLoadSave : public ::testing::Test {
       g2o::EdgeSE2* e1 = new g2o::EdgeSE2();
       e1->vertices()[0] = optimizer->vertex((i + 0) % numVertices);
       e1->vertices()[1] = optimizer->vertex((i + 1) % numVertices);
-      e1->setMeasurement(g2o::SE2());
+      e1->setMeasurement(g2o::SE2(1., 0., 0.));
       e1->setInformation(g2o::EdgeSE2::InformationType::Identity());
       optimizer->addEdge(e1);
     }
@@ -201,11 +201,20 @@ class GeneralGraphLoadSave : public ::testing::Test {
     return result;
   }
 
+  std::map<int, g2o::Vector3> vertexEstimates() const {
+    std::map<int, g2o::Vector3> result;
+    for (const auto& idV : optimizer->vertices()) {
+      g2o::VertexSE2* v = dynamic_cast<g2o::VertexSE2*>(idV.second);
+      result[idV.first] = v->estimate().toVector();
+    }
+    return result;
+  }
+
   std::unique_ptr<g2o::SparseOptimizer> optimizer;
   size_t numVertices = 3;
 };
 
-TEST_F(GeneralGraphLoadSave, SavingGraph) {
+TEST_F(GeneralGraphOperations, SavingGraph) {
   std::stringstream graphData;
   optimizer->save(graphData);
 
@@ -231,7 +240,7 @@ static KeyIntVector VectorIntToKeys(const std::vector<int>& keys) {
 }
 }  // namespace internal
 
-TEST_F(GeneralGraphLoadSave, LoadingGraph) {
+TEST_F(GeneralGraphOperations, LoadingGraph) {
   std::stringstream graphData;
   optimizer->save(graphData);
 
@@ -244,6 +253,7 @@ TEST_F(GeneralGraphLoadSave, LoadingGraph) {
   optimizer->load(graphData);
   ASSERT_THAT(optimizer->vertices(), testing::SizeIs(numVertices));
   ASSERT_THAT(optimizer->edges(), testing::SizeIs(numVertices));
+  ASSERT_THAT(optimizer->dimensions(), testing::ElementsAre(3));
 
   ASSERT_THAT(optimizer->vertices(),
               testing::UnorderedElementsAreArray(internal::VectorIntToKeys(expectedIds())));
@@ -255,4 +265,114 @@ TEST_F(GeneralGraphLoadSave, LoadingGraph) {
                                                               e->vertex(1)->id());
                                       },
                                       testing::AnyOfArray(expectedEdgeIds()))));
+}
+
+TEST_F(GeneralGraphOperations, PushPopActiveVertices) {
+  optimizer->initializeOptimization();
+  std::map<int, g2o::Vector3> originalEstimates = vertexEstimates();
+
+  // push and apply some transformation
+  optimizer->push();
+  for (const auto& idV : optimizer->vertices()) {
+    g2o::VertexSE2* v = dynamic_cast<g2o::VertexSE2*>(idV.second);
+    v->setEstimate(v->estimate() * g2o::SE2(idV.first, 0, 0));
+    ASSERT_THAT(v->stackSize(), testing::Eq(1));
+  }
+  // the estimates should differ now
+  std::map<int, g2o::Vector3> changedEstimates = vertexEstimates();
+  ASSERT_THAT(originalEstimates, testing::Ne(changedEstimates));
+  // recover
+  optimizer->pop();
+  std::map<int, g2o::Vector3> recoveredEstimates = vertexEstimates();
+  ASSERT_THAT(originalEstimates, testing::Eq(recoveredEstimates));
+  for (const auto& idV : optimizer->vertices()) {
+    g2o::VertexSE2* v = dynamic_cast<g2o::VertexSE2*>(idV.second);
+    ASSERT_THAT(v->stackSize(), testing::Eq(0));
+  }
+}
+
+TEST_F(GeneralGraphOperations, PushDiscardActiveVertices) {
+  optimizer->initializeOptimization();
+  std::map<int, g2o::Vector3> originalEstimates = vertexEstimates();
+
+  // push and apply some transformation
+  optimizer->push();
+  for (const auto& idV : optimizer->vertices()) {
+    g2o::VertexSE2* v = dynamic_cast<g2o::VertexSE2*>(idV.second);
+    v->setEstimate(v->estimate() * g2o::SE2(idV.first, 0, 0));
+    ASSERT_THAT(v->stackSize(), testing::Eq(1));
+  }
+  // the estimates should differ now
+  std::map<int, g2o::Vector3> changedEstimates = vertexEstimates();
+  ASSERT_THAT(originalEstimates, testing::Ne(changedEstimates));
+  // recover
+  optimizer->discardTop();
+  std::map<int, g2o::Vector3> recoveredEstimates = vertexEstimates();
+  ASSERT_THAT(originalEstimates, testing::Ne(recoveredEstimates));
+  ASSERT_THAT(changedEstimates, testing::Eq(recoveredEstimates));
+  for (const auto& idV : optimizer->vertices()) {
+    g2o::VertexSE2* v = dynamic_cast<g2o::VertexSE2*>(idV.second);
+    ASSERT_THAT(v->stackSize(), testing::Eq(0));
+  }
+}
+
+TEST_F(GeneralGraphOperations, PushPopOptimizableGraph) {
+  std::map<int, g2o::Vector3> originalEstimates = vertexEstimates();
+
+  // push and apply some transformation
+  optimizer->OptimizableGraph::push();
+  for (const auto& idV : optimizer->vertices()) {
+    g2o::VertexSE2* v = dynamic_cast<g2o::VertexSE2*>(idV.second);
+    v->setEstimate(v->estimate() * g2o::SE2(idV.first*2, 0, 0));
+    ASSERT_THAT(v->stackSize(), testing::Eq(1));
+  }
+  // the estimates should differ now
+  std::map<int, g2o::Vector3> changedEstimates = vertexEstimates();
+  ASSERT_THAT(originalEstimates, testing::Ne(changedEstimates));
+  // recover
+  optimizer->OptimizableGraph::pop();
+  std::map<int, g2o::Vector3> recoveredEstimates = vertexEstimates();
+  ASSERT_THAT(originalEstimates, testing::Eq(recoveredEstimates));
+  for (const auto& idV : optimizer->vertices()) {
+    g2o::VertexSE2* v = dynamic_cast<g2o::VertexSE2*>(idV.second);
+    ASSERT_THAT(v->stackSize(), testing::Eq(0));
+  }
+}
+
+TEST_F(GeneralGraphOperations, PushDiscardOptimizableGraph) {
+  optimizer->initializeOptimization();
+  std::map<int, g2o::Vector3> originalEstimates = vertexEstimates();
+
+  // push and apply some transformation
+  optimizer->OptimizableGraph::push();
+  for (const auto& idV : optimizer->vertices()) {
+    g2o::VertexSE2* v = dynamic_cast<g2o::VertexSE2*>(idV.second);
+    v->setEstimate(v->estimate() * g2o::SE2(idV.first*3, 0, 0));
+    ASSERT_THAT(v->stackSize(), testing::Eq(1));
+  }
+  // the estimates should differ now
+  std::map<int, g2o::Vector3> changedEstimates = vertexEstimates();
+  ASSERT_THAT(originalEstimates, testing::Ne(changedEstimates));
+  // recover
+  optimizer->OptimizableGraph::discardTop();
+  std::map<int, g2o::Vector3> recoveredEstimates = vertexEstimates();
+  ASSERT_THAT(originalEstimates, testing::Ne(recoveredEstimates));
+  ASSERT_THAT(changedEstimates, testing::Eq(recoveredEstimates));
+  for (const auto& idV : optimizer->vertices()) {
+    g2o::VertexSE2* v = dynamic_cast<g2o::VertexSE2*>(idV.second);
+    ASSERT_THAT(v->stackSize(), testing::Eq(0));
+  }
+}
+
+TEST_F(GeneralGraphOperations, TrivialInit) {
+  optimizer->initializeOptimization();
+
+  ASSERT_THAT(optimizer->activeVertices(), testing::SizeIs(numVertices));
+  ASSERT_TRUE(optimizer->verifyInformationMatrices());
+
+  std::map<int, g2o::Vector3> estimates = vertexEstimates();
+  for (size_t i = 1; i < numVertices; ++i) ASSERT_DOUBLE_EQ(0, estimates[i].norm());
+  optimizer->computeInitialGuess();
+  estimates = vertexEstimates();
+  for (size_t i = 1; i < numVertices; ++i) ASSERT_LT(0, estimates[i].norm());
 }

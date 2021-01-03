@@ -24,12 +24,10 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+#include "g2o/stuff/string_tools.h"
 #include "gtest/gtest.h"
 
-#include "g2o/stuff/string_tools.h"
-
-TEST(Stuff, Trim)
-{ 
+TEST(Stuff, Trim) {
   ASSERT_EQ("abc", g2o::trim("abc   "));
   ASSERT_EQ("abc", g2o::trim("   abc"));
   ASSERT_EQ("abc", g2o::trim("   abc   "));
@@ -45,4 +43,54 @@ TEST(Stuff, Trim)
   ASSERT_EQ("   abc", g2o::trimRight("   abc   "));
   ASSERT_EQ("abc", g2o::trimRight("abc"));
   ASSERT_EQ("", g2o::trimRight("    "));
+}
+
+TEST(Stuff, StrToLower) {
+  ASSERT_EQ("abc", g2o::strToLower("abc"));
+  ASSERT_EQ("abc", g2o::strToLower("Abc"));
+  ASSERT_EQ("abc", g2o::strToLower("AbC"));
+  ASSERT_EQ("abc", g2o::strToLower("ABC"));
+  ASSERT_EQ("abc !!$", g2o::strToLower("ABC !!$"));
+}
+
+TEST(Stuff, StrToUpper) {
+  ASSERT_EQ("ABC", g2o::strToUpper("abc"));
+  ASSERT_EQ("ABC", g2o::strToUpper("Abc"));
+  ASSERT_EQ("ABC", g2o::strToUpper("AbC"));
+  ASSERT_EQ("ABC", g2o::strToUpper("ABC"));
+  ASSERT_EQ("ABC !!$", g2o::strToUpper("ABC !!$"));
+}
+
+TEST(Stuff, FormatString) {
+  ASSERT_EQ("42", g2o::formatString("%d", 42));
+  ASSERT_EQ("3.1415", g2o::formatString("%g", 3.1415));
+  ASSERT_EQ("3.141500", g2o::formatString("%f", 3.1415));
+  ASSERT_EQ("3.142", g2o::formatString("%.3f", 3.1415));
+  ASSERT_EQ("Hello 42 World", g2o::formatString("Hello %d World", 42));
+}
+
+TEST(Stuff, StrSplit) {
+  std::vector<std::string> tokens;
+  tokens = g2o::strSplit("", ",");
+  ASSERT_EQ(0, tokens.size());
+  tokens = g2o::strSplit("42", ",");
+  ASSERT_EQ(1, tokens.size());
+  ASSERT_EQ("42", tokens[0]);
+  tokens = g2o::strSplit("1,2;3:4", ";,:");
+  ASSERT_EQ(4, tokens.size());
+  for (size_t i = 0; i < tokens.size(); ++i) ASSERT_EQ(g2o::formatString("%d", int(i+1)), tokens[i]);
+}
+
+TEST(Stuff, StrStartsWith) {
+  ASSERT_FALSE(g2o::strStartsWith("Hello World!", "World!"));
+  ASSERT_TRUE(g2o::strStartsWith("Hello World!", "Hello"));
+  ASSERT_TRUE(g2o::strStartsWith("Hello World!", "Hello World!"));
+  ASSERT_FALSE(g2o::strStartsWith("Hello World!", "Hello World!!!"));
+}
+
+TEST(Stuff, StrEndsWith) {
+  ASSERT_TRUE(g2o::strEndsWith("Hello World!", "World!"));
+  ASSERT_FALSE(g2o::strEndsWith("Hello World!", "Hello"));
+  ASSERT_TRUE(g2o::strEndsWith("Hello World!", "Hello World!"));
+  ASSERT_FALSE(g2o::strEndsWith("Hello World!", "!!Hello World!"));
 }

@@ -143,6 +143,7 @@ std::string strExpandFilename(const std::string& filename)
 std::vector<std::string> strSplit(const std::string& str, const std::string& delimiters)
 {
   std::vector<std::string> tokens;
+  if (str.empty()) return tokens;
   string::size_type lastPos = 0;
   string::size_type pos     = 0;
 
