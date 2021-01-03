@@ -254,6 +254,7 @@ endif()
 # code coverage
 option(BUILD_CODE_COVERAGE "Enable coverage reporting" OFF)
 if(BUILD_CODE_COVERAGE AND CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+  message(STATUS "Enabling coverage compiler flags")
   set(g2o_C_FLAGS "${g2o_C_FLAGS} --coverage")
   set(g2o_CXX_FLAGS "${g2o_CXX_FLAGS} --coverage")
 endif()
