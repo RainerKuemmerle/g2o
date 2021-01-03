@@ -28,6 +28,12 @@ matrix:
       osx_image: xcode12.2
 
 before_install:
+  - if [ "$TRAVIS_BRANCH" = "master" ] && [ "$DO_COVERAGE" = "ON" ]; then
+      echo "Activating code coverage build";
+      export DO_COVERAGE_BUILD=ON;
+    else
+      export DO_COVERAGE_BUILD=OFF;
+    fi
   - env | sort
 
 # install:
@@ -37,7 +43,7 @@ before_script:
   - mkdir build
   - cd build
   - cmake --version
-  - cmake -DBUILD_UNITTESTS=ON -DBUILD_CODE_COVERAGE=$DO_COVERAGE -DCMAKE_BUILD_TYPE=Debug ..
+  - cmake -DBUILD_UNITTESTS=ON -DBUILD_CODE_COVERAGE=$DO_COVERAGE_BUILD -DCMAKE_BUILD_TYPE=Debug ..
   - cat g2o/config.h
 
 script:
@@ -45,8 +51,8 @@ script:
   - ctest --extra-verbose --output-on-failure
 
 after_success:
-  - if [[ $TRAVIS_BRANCH == "master" ]]; then
-      script/codecov.sh
+  - if [ "$DO_COVERAGE_BUILD" = "ON" ]; then
+      bash script/codecov.sh
     fi
 
 # installing dependencies

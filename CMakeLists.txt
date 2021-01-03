@@ -397,6 +397,7 @@ set(G2O_PROJECT_CONFIG "${G2O_GENERATED_DIR}/${PROJECT_NAME}Config.cmake")
 set(G2O_TARGETS_EXPORT_NAME "${PROJECT_NAME}Targets")
 set(G2O_CONFIG_INSTALL_DIR "lib/cmake/${PROJECT_NAME}")
 set(G2O_NAMESPACE "${PROJECT_NAME}::")
+set(G2O_SRC_DIR "${PROJECT_SOURCE_DIR}")
 set(G2O_VERSION 1.0.0)
 
 include(CMakePackageConfigHelpers)
@@ -405,7 +406,7 @@ WRITE_BASIC_PACKAGE_VERSION_FILE(
 )
 
 configure_file("${g2o_SOURCE_DIR}/cmake_modules/Config.cmake.in" "${G2O_PROJECT_CONFIG}" @ONLY)
-
+configure_file("${g2o_SOURCE_DIR}/script/codecov.sh.in" "${g2o_RUNTIME_OUTPUT_DIRECTORY}/codecov.sh" @ONLY)
 
 install(
     FILES "${G2O_PROJECT_CONFIG}" "${G2O_VERSION_CONFIG}"
