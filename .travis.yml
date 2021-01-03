@@ -52,7 +52,8 @@ script:
 
 after_success:
   - if [ "$DO_COVERAGE_BUILD" = "ON" ]; then
-      bash script/codecov.sh
+      echo "Uploading to codecov";
+      bash bin/codecov.sh;
     fi
 
 # installing dependencies
