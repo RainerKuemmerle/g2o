@@ -40,7 +40,7 @@
 #include "g2o/solvers/structure_only/structure_only_solver.h"
 #include "g2o/solvers/pcg/linear_solver_pcg.h"
 
-#include "EXTERNAL/ceres/autodiff.h"
+#include "g2o/EXTERNAL/ceres/autodiff.h"
 
 #if defined G2O_HAVE_CHOLMOD
 #include "g2o/solvers/cholmod/linear_solver_cholmod.h"

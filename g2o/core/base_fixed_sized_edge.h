@@ -30,7 +30,7 @@
 #include <iostream>
 #include <limits>
 
-#include "EXTERNAL/ceres/fixed_array.h"
+#include "g2o/EXTERNAL/ceres/fixed_array.h"
 #include "base_edge.h"
 #include "g2o/config.h"
 #include "g2o/stuff/misc.h"

@@ -36,7 +36,7 @@
 #include "g2o/stuff/misc.h"
 #include "robust_kernel.h"
 
-#include "EXTERNAL/ceres/fixed_array.h"
+#include "g2o/EXTERNAL/ceres/fixed_array.h"
 
 namespace g2o {
 

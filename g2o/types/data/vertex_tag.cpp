@@ -31,7 +31,7 @@
 #ifdef G2O_HAVE_OPENGL
 #include "g2o/stuff/opengl_wrapper.h"
 #include "g2o/stuff/opengl_primitives.h"
-#include "EXTERNAL/freeglut/freeglut_minimal.h"
+#include "g2o/EXTERNAL/freeglut/freeglut_minimal.h"
 #endif
 
 #include <iomanip>

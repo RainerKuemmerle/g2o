@@ -437,5 +437,4 @@ if(G2O_BUILD_BENCHMARKS)
 endif()
 
 # Include the subdirectories
-add_subdirectory(EXTERNAL)
 add_subdirectory(g2o)

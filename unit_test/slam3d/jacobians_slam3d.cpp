@@ -38,7 +38,7 @@
 
 #include "g2o/core/optimizable_graph.h"
 
-#include "EXTERNAL/ceres/autodiff.h"
+#include "g2o/EXTERNAL/ceres/autodiff.h"
 
 using namespace std;
 using namespace g2o;

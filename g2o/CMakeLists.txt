@@ -1,3 +1,4 @@
+add_subdirectory(EXTERNAL)
 add_subdirectory(stuff)
 add_subdirectory(core)
 
