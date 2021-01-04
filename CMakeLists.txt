@@ -251,6 +251,14 @@ if (${CMAKE_CXX_COMPILER_ID} MATCHES "Clang" OR CMAKE_COMPILER_IS_GNUCXX)
 endif()
 # End of of SSE* autodetect code -------
 
+# code coverage
+option(BUILD_CODE_COVERAGE "Enable coverage reporting" OFF)
+if(BUILD_CODE_COVERAGE AND CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+  message(STATUS "Enabling coverage compiler flags")
+  set(g2o_C_FLAGS "${g2o_C_FLAGS} --coverage")
+  set(g2o_CXX_FLAGS "${g2o_CXX_FLAGS} --coverage")
+endif()
+
 # Compiler specific options for gcc
 if(CMAKE_COMPILER_IS_GNUCXX)
   option (BUILD_WITH_MARCH_NATIVE "Build with \"-march native\"" OFF)
@@ -390,6 +398,7 @@ set(G2O_PROJECT_CONFIG "${G2O_GENERATED_DIR}/${PROJECT_NAME}Config.cmake")
 set(G2O_TARGETS_EXPORT_NAME "${PROJECT_NAME}Targets")
 set(G2O_CONFIG_INSTALL_DIR "lib/cmake/${PROJECT_NAME}")
 set(G2O_NAMESPACE "${PROJECT_NAME}::")
+set(G2O_SRC_DIR "${PROJECT_SOURCE_DIR}")
 set(G2O_VERSION 1.0.0)
 
 include(CMakePackageConfigHelpers)
@@ -398,7 +407,7 @@ WRITE_BASIC_PACKAGE_VERSION_FILE(
 )
 
 configure_file("${g2o_SOURCE_DIR}/cmake_modules/Config.cmake.in" "${G2O_PROJECT_CONFIG}" @ONLY)
-
+configure_file("${g2o_SOURCE_DIR}/script/codecov.sh.in" "${CMAKE_CURRENT_BINARY_DIR}/codecov.sh" @ONLY)
 
 install(
     FILES "${G2O_PROJECT_CONFIG}" "${G2O_VERSION_CONFIG}"

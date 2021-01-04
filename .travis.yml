@@ -7,6 +7,10 @@ notifications:
     on_success: change # default: change
     on_failure: always # default: always
 
+env:
+  global:
+    - DO_COVERAGE=OFF
+
 # where do we want to build
 matrix:
   include:
@@ -14,6 +18,7 @@ matrix:
       arch: amd64
       compiler: gcc
       dist: focal
+      env: DO_COVERAGE=ON
     - os: linux
       arch: amd64
       compiler: clang
@@ -23,6 +28,12 @@ matrix:
       osx_image: xcode12.2
 
 before_install:
+  - if [ "$TRAVIS_BRANCH" = "master" ] && [ "$DO_COVERAGE" = "ON" ]; then
+      echo "Activating code coverage build";
+      export DO_COVERAGE_BUILD=ON;
+    else
+      export DO_COVERAGE_BUILD=OFF;
+    fi
   - env | sort
 
 # install:
@@ -32,12 +43,18 @@ before_script:
   - mkdir build
   - cd build
   - cmake --version
-  - cmake -DBUILD_UNITTESTS=ON ..
+  - cmake -DBUILD_UNITTESTS=ON -DBUILD_CODE_COVERAGE=$DO_COVERAGE_BUILD -DCMAKE_BUILD_TYPE=Debug ..
   - cat g2o/config.h
 
 script:
   - make -j $(nproc)
-  - ctest --extra-verbose
+  - ctest --extra-verbose --output-on-failure
+
+after_success:
+  - if [ "$DO_COVERAGE_BUILD" = "ON" ]; then
+      echo "Uploading to codecov";
+      bash $TRAVIS_BUILD_DIR/build/codecov.sh;
+    fi
 
 # installing dependencies
 addons:
@@ -48,6 +65,7 @@ addons:
       - qt5-qmake
       - libqglviewer-dev-qt5
       - libsuitesparse-dev
+      - lcov
   homebrew: # mac os
     packages:
       - cmake
