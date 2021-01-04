@@ -407,7 +407,7 @@ WRITE_BASIC_PACKAGE_VERSION_FILE(
 )
 
 configure_file("${g2o_SOURCE_DIR}/cmake_modules/Config.cmake.in" "${G2O_PROJECT_CONFIG}" @ONLY)
-configure_file("${g2o_SOURCE_DIR}/script/codecov.sh.in" "${g2o_RUNTIME_OUTPUT_DIRECTORY}/codecov.sh" @ONLY)
+configure_file("${g2o_SOURCE_DIR}/script/codecov.sh.in" "${CMAKE_CURRENT_BINARY_DIR}/codecov.sh" @ONLY)
 
 install(
     FILES "${G2O_PROJECT_CONFIG}" "${G2O_VERSION_CONFIG}"
