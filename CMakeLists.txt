@@ -387,10 +387,6 @@ set(G2O_SHARED_LIBS ${BUILD_SHARED_LIBS})
 set(G2O_LGPL_SHARED_LIBS ${BUILD_LGPL_SHARED_LIBS})
 set(G2O_CXX_COMPILER "${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER}")
 
-configure_file(config.h.in "${PROJECT_BINARY_DIR}/g2o/config.h")
-install(FILES ${PROJECT_BINARY_DIR}/g2o/config.h DESTINATION ${INCLUDES_DESTINATION}/g2o)
-
-
 # Generate cmake configuration scripts
 set(G2O_GENERATED_DIR "${CMAKE_CURRENT_BINARY_DIR}/generated")
 set(G2O_VERSION_CONFIG "${G2O_GENERATED_DIR}/${PROJECT_NAME}ConfigVersion.cmake")
@@ -405,6 +401,9 @@ include(CMakePackageConfigHelpers)
 WRITE_BASIC_PACKAGE_VERSION_FILE(
     "${G2O_VERSION_CONFIG}" VERSION ${G2O_VERSION} COMPATIBILITY SameMajorVersion
 )
+
+configure_file(config.h.in "${PROJECT_BINARY_DIR}/g2o/config.h")
+install(FILES ${PROJECT_BINARY_DIR}/g2o/config.h DESTINATION ${INCLUDES_DESTINATION}/g2o)
 
 configure_file("${g2o_SOURCE_DIR}/cmake_modules/Config.cmake.in" "${G2O_PROJECT_CONFIG}" @ONLY)
 configure_file("${g2o_SOURCE_DIR}/script/codecov.sh.in" "${CMAKE_CURRENT_BINARY_DIR}/codecov.sh" @ONLY)

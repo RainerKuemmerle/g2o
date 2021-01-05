@@ -24,6 +24,8 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+#include <cstdlib>
+
 #include "g2o/stuff/string_tools.h"
 #include "gtest/gtest.h"
 
@@ -94,3 +96,17 @@ TEST(Stuff, StrEndsWith) {
   ASSERT_TRUE(g2o::strEndsWith("Hello World!", "Hello World!"));
   ASSERT_FALSE(g2o::strEndsWith("Hello World!", "!!Hello World!"));
 }
+
+#if defined (UNIX) && !defined(ANDROID)
+TEST(Stuff, StrExpand) {
+  char* envVar = getenv("HOME");
+  if (envVar == nullptr) {
+    std::cerr << "HOME not defined" << std::endl;
+    SUCCEED();
+    return;
+  }
+  std::string expanded = g2o::strExpandFilename("$HOME/filename.txt");
+  std::string expected = g2o::formatString("%s/filename.txt", envVar);
+  EXPECT_EQ(expanded, expected);
+}
+#endif

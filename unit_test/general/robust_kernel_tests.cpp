@@ -84,6 +84,9 @@ class RobustKernelTests : public Test {
   Kernel kernel_;
   std::vector<double> error_values_;
 
+  /**
+   * Estimate the first order derivative numerically
+   */
   number_t estimateDerivative(number_t x) {
     constexpr number_t delta = g2o::cst(1e-9);
 
