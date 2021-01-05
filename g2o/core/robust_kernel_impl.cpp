@@ -161,12 +161,16 @@ void RobustKernelDCS::robustify(number_t e2, Vector3& rho) const
 {
   const number_t& phi = _delta;
   number_t scale = (2.0*phi)/(phi+e2);
-  if(scale>=1.0)
-    scale = 1.0;
-
-  rho[0] = scale*e2*scale;
-  rho[1] = (scale*scale);
-  rho[2] = 0;
+  if (scale >= 1.0) {  // limit scale to max of 1 and return this
+    rho[0] = e2;
+    rho[1] = 1.;
+    rho[2] = 0;
+  } else {
+    number_t phi_sqr = phi * phi;
+    rho[0] = scale * e2 * scale;
+    rho[1] = (4 * phi_sqr * (phi - e2)) / std::pow(phi + e2, 3);
+    rho[2] = -(8 * phi_sqr * (2 * phi - e2)) / std::pow(phi + e2, 4);
+  }
 }
 
 // register the kernel to their factory

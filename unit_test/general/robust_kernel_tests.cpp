@@ -27,6 +27,7 @@
 #include "allocate_optimizer.h"
 #include "g2o/core/robust_kernel_factory.h"
 #include "g2o/core/robust_kernel_impl.h"
+#include "g2o/stuff/misc.h"
 #include "gmock/gmock.h"
 
 using namespace testing;
@@ -75,13 +76,25 @@ class RobustKernelTests : public Test {
 
   RobustKernelTests() : Test() {
     error_values_.push_back(0.5 * kernel_.delta());
-    error_values_.push_back(1.0 * kernel_.delta());
+    error_values_.push_back(0.99 * kernel_.delta());
     error_values_.push_back(1.5 * kernel_.delta());
   }
 
  protected:
   Kernel kernel_;
   std::vector<double> error_values_;
+
+  number_t estimateDerivative(number_t x) {
+    constexpr number_t delta = g2o::cst(1e-9);
+
+    g2o::Vector3 first;
+    g2o::Vector3 second;
+    this->kernel_.robustify(x + delta, first);
+    this->kernel_.robustify(x - delta, second);
+
+    number_t result = (1 / (2 * delta)) * (first(0) - second(0));
+    return result;
+  }
 };
 TYPED_TEST_SUITE_P(RobustKernelTests);
 
@@ -93,8 +106,17 @@ TYPED_TEST_P(RobustKernelTests, Values) {
   }
 }
 
+TYPED_TEST_P(RobustKernelTests, Derivative) {
+  for (auto e : this->error_values_) {
+    g2o::Vector3 val = g2o::Vector3::Zero();
+    this->kernel_.robustify(e, val);
+    number_t estimatedJac = this->estimateDerivative(e);
+    ASSERT_THAT(val(1), DoubleNear(estimatedJac, 1e-5));
+  }
+}
+
 // clang-format off
-REGISTER_TYPED_TEST_SUITE_P(RobustKernelTests, Values);
+REGISTER_TYPED_TEST_SUITE_P(RobustKernelTests, Values, Derivative);
 using RobustKernelTypes = ::testing::Types<
   g2o::RobustKernelHuber,
   g2o::RobustKernelPseudoHuber,
