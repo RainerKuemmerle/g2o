@@ -27,8 +27,10 @@
 #ifndef G2O_AUTO_DIFFERENTIATION_H
 #define G2O_AUTO_DIFFERENTIATION_H
 
-#include "g2o/EXTERNAL/ceres/autodiff.h"
+#include <type_traits>
+
 #include "eigen_types.h"
+#include "g2o/EXTERNAL/ceres/autodiff.h"
 #include "g2o/stuff/misc.h"
 #include "g2o_core_api.h"
 
@@ -37,11 +39,15 @@ namespace g2o {
 template <typename Edge>
 class AutoDifferentiation {
  public:
-
   //! type for the Jacobians during AD
   template <int EdgeDimension, int VertexDimension>
   using ADJacobianType =
       typename Eigen::Matrix<number_t, EdgeDimension, VertexDimension, Eigen::RowMajor>;
+
+  //! helper for computing the error based on the functor in the edge
+  void computeError(Edge* that) {
+    computeErrorNs(that, make_index_sequence<Edge::_nr_of_vertices>());
+  }
 
   /**
    * Linearize (compute the Jacobians) for the given edge.
@@ -49,6 +55,13 @@ class AutoDifferentiation {
    */
   void linearize(Edge* that) {
     linearizeOplusNs(that, make_index_sequence<Edge::_nr_of_vertices>());
+  }
+
+ protected:
+  //! packed version to call the functor that evaluates the error function
+  template <std::size_t... Ints>
+  void computeErrorNs(Edge* that, index_sequence<Ints...>) {
+    (*that)(that->template vertexXn<Ints>()->estimate().data()..., that->error().data());
   }
 
   /**
@@ -85,7 +98,6 @@ class AutoDifferentiation {
     (void)unused;
   }
 
- protected:
   //! helper function to perform a = b
   template <typename A, typename B>
   EIGEN_STRONG_INLINE void assign(const Eigen::MatrixBase<A>& a, const Eigen::MatrixBase<B>& b) {
@@ -95,5 +107,16 @@ class AutoDifferentiation {
 };
 
 }  // namespace g2o
+
+/**
+ * Helper macro for easy integration into own types
+ */
+#define G20_MAKE_AUTO_AD_FUNCTIONS                                                               \
+  void computeError() {                                                                          \
+    g2o::AutoDifferentiation<std::remove_reference<decltype(*this)>::type>().computeError(this); \
+  }                                                                                              \
+  void linearizeOplus() {                                                                        \
+    g2o::AutoDifferentiation<std::remove_reference<decltype(*this)>::type>().linearize(this);    \
+  }
 
 #endif

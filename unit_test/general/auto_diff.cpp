@@ -70,17 +70,7 @@ class Edge3ADTester : public g2o::BaseFixedSizedEdge<2, g2o::Vector2, VertexFlat
     return true;
   }
 
-  void computeError() {
-    const auto& a = vertexXn<0>()->estimate();
-    const auto& b = vertexXn<1>()->estimate();
-    const auto& c = vertexXn<2>()->estimate();
-    (*this)(a.data(), b.data(), c.data(), _error.data());
-  }
-
-  void linearizeOplus() {
-    g2o::AutoDifferentiation<Edge3ADTester> ad;
-    ad.linearize(this);
-  }
+  G20_MAKE_AUTO_AD_FUNCTIONS
 
   virtual bool read(std::istream&) { return false; };
   virtual bool write(std::ostream&) const { return false; };
@@ -107,6 +97,12 @@ TEST(AutoDifferentiation, ComputesSomething) {
 
   testEdge.linearizeOplus(jacobianWorkspace);
 
+#if 0
+  std::cerr << PVAR(testEdge.jacobianOplusXn<0>()) << std::endl;
+  std::cerr << PVAR(testEdge.jacobianOplusXn<1>()) << std::endl;
+  std::cerr << PVAR(testEdge.jacobianOplusXn<2>()) << std::endl;
+#endif
+
   ASSERT_FALSE(testEdge.jacobianOplusXn<0>().array().isNaN().any()) << "Jacobian contains NaN";
   ASSERT_FALSE(testEdge.jacobianOplusXn<1>().array().isNaN().any()) << "Jacobian contains NaN";
   ASSERT_FALSE(testEdge.jacobianOplusXn<2>().array().isNaN().any()) << "Jacobian contains NaN";
@@ -115,7 +111,7 @@ TEST(AutoDifferentiation, ComputesSomething) {
   ASSERT_FALSE(testEdge.jacobianOplusXn<1>().array().isInf().any()) << "Jacobian not finite";
   ASSERT_FALSE(testEdge.jacobianOplusXn<2>().array().isInf().any()) << "Jacobian not finite";
 
-  ASSERT_LE(0, testEdge.jacobianOplusXn<0>().array().abs().maxCoeff());
-  ASSERT_LE(0, testEdge.jacobianOplusXn<1>().array().abs().maxCoeff());
-  ASSERT_LE(0, testEdge.jacobianOplusXn<2>().array().abs().maxCoeff());
+  ASSERT_LE(0, testEdge.jacobianOplusXn<0>().array().abs().maxCoeff()) << "Jacobian is zero";
+  ASSERT_LE(0, testEdge.jacobianOplusXn<1>().array().abs().maxCoeff()) << "Jacobian is zero";
+  ASSERT_LE(0, testEdge.jacobianOplusXn<2>().array().abs().maxCoeff()) << "Jacobian is zero";
 }
