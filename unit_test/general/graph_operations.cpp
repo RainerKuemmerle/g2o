@@ -91,17 +91,16 @@ TEST(General, GraphAddEdge) {
   g2o::EdgeSE2* e2 = new g2o::EdgeSE2();
   ASSERT_FALSE(optimizer->addEdge(e2)) << "Adding edge with unset vertices was possible";
   ASSERT_EQ(size_t(1), optimizer->edges().size());
-  ASSERT_EQ(NULL, e2->graph());
-  delete e2;
-  e2 = nullptr;
+  ASSERT_EQ(nullptr, e2->graph());
 
   g2o::EdgeSE2* e3 = new g2o::EdgeSE2();
   e3->setVertex(0, v1);
   e3->setVertex(1, v1);
   ASSERT_FALSE(optimizer->addEdge(e3)) << "Adding binary edge with same vertices was possible";
-  delete e3;
-  e3 = nullptr;
+  ASSERT_EQ(size_t(1), optimizer->edges().size());
 
+  delete e2;
+  delete e3;
   delete optimizer;
 }
 
