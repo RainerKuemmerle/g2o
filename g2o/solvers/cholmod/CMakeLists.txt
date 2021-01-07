@@ -8,7 +8,7 @@ add_library(solver_cholmod ${G2O_LIB_TYPE}
 )
 
 target_include_directories(solver_cholmod PUBLIC
-  $<BUILD_INTERFACE:${CHOLMOD_INCLUDES}>
+  ${CHOLMOD_INCLUDES}
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
     $<INSTALL_INTERFACE:include/g2o/solvers/cholmod>)
 
