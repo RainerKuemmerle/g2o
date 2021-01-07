@@ -49,7 +49,7 @@ namespace ceres {
 // delete on it upon completion.
 enum Ownership {
   DO_NOT_TAKE_OWNERSHIP,
-  TAKE_OWNERSHIP
+  TAKE_OWNERSHIP,
 };
 
 // TODO(keir): Considerably expand the explanations of each solver type.
@@ -184,19 +184,19 @@ enum SparseLinearAlgebraLibraryType {
 
 enum DenseLinearAlgebraLibraryType {
   EIGEN,
-  LAPACK
+  LAPACK,
 };
 
 // Logging options
 // The options get progressively noisier.
 enum LoggingType {
   SILENT,
-  PER_MINIMIZER_ITERATION
+  PER_MINIMIZER_ITERATION,
 };
 
 enum MinimizerType {
   LINE_SEARCH,
-  TRUST_REGION
+  TRUST_REGION,
 };
 
 enum LineSearchDirectionType {
@@ -411,7 +411,7 @@ enum DumpFormatType {
 // specified for the number of residuals. If specified, then the
 // number of residuas for that cost function can vary at runtime.
 enum DimensionType {
-  DYNAMIC = -1
+  DYNAMIC = -1,
 };
 
 // The differentiation method used to compute numerical derivatives in
@@ -432,7 +432,7 @@ enum NumericDiffMethodType {
 enum LineSearchInterpolationType {
   BISECTION,
   QUADRATIC,
-  CUBIC
+  CUBIC,
 };
 
 enum CovarianceAlgorithmType {

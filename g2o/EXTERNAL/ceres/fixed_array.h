@@ -30,6 +30,7 @@
 #ifndef CERES_PUBLIC_INTERNAL_FIXED_ARRAY_H_
 #define CERES_PUBLIC_INTERNAL_FIXED_ARRAY_H_
 
+#include <Eigen/Core>  // For Eigen::aligned_allocator
 #include <algorithm>
 #include <array>
 #include <cstddef>
@@ -37,9 +38,6 @@
 #include <tuple>
 #include <type_traits>
 
-#include <Eigen/Core> // For Eigen::aligned_allocator
-
-#include "algorithm.h"
 #include "memory.h"
 
 namespace ceres {
@@ -309,7 +307,7 @@ class FixedArray {
   // Relational operators. Equality operators are elementwise using
   // `operator==`, while order operators order FixedArrays lexicographically.
   friend bool operator==(const FixedArray& lhs, const FixedArray& rhs) {
-    return internal::equal(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
+    return std::equal(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
   }
 
   friend bool operator!=(const FixedArray& lhs, const FixedArray& rhs) {
