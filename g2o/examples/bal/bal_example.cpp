@@ -29,6 +29,7 @@
 #include <iostream>
 
 #include "g2o/EXTERNAL/ceres/autodiff.h"
+#include "g2o/core/auto_differentiation.h"
 #include "g2o/core/base_binary_edge.h"
 #include "g2o/core/base_vertex.h"
 #include "g2o/core/batch_stats.h"
@@ -222,43 +223,7 @@ class EdgeObservationBAL : public BaseBinaryEdge<2, Vector2, VertexCameraBAL, Ve
     return true;
   }
 
-  void computeError() {
-    const VertexCameraBAL* cam = vertexXn<0>();
-    const VertexPointBAL* point = vertexXn<1>();
-    (*this)(cam->estimate().data(), point->estimate().data(), _error.data());
-  }
-
-  void linearizeOplus() {
-    // use numeric Jacobians
-    // BaseBinaryEdge<2, Vector2d, VertexCameraBAL, VertexPointBAL>::linearizeOplus();
-    // return;
-
-    const VertexCameraBAL* cam = vertexXn<0>();
-    const VertexPointBAL* point = vertexXn<1>();
-
-    Matrix<number_t, Dimension, VertexCameraBAL::Dimension, Eigen::RowMajor> dError_dCamera;
-    Matrix<number_t, Dimension, VertexPointBAL::Dimension, Eigen::RowMajor> dError_dPoint;
-    number_t* parameters[] = {const_cast<number_t*>(cam->estimate().data()),
-                              const_cast<number_t*>(point->estimate().data())};
-    number_t* jacobians[] = {dError_dCamera.data(), dError_dPoint.data()};
-    number_t value[Dimension];
-    using BalAutoDiffDims =
-        ceres::internal::StaticParameterDims<VertexCameraBAL::Dimension, VertexPointBAL::Dimension>;
-    bool diffState =
-        ceres::internal::AutoDifferentiate<EdgeObservationBAL::Dimension, BalAutoDiffDims,
-                                           EdgeObservationBAL, number_t>(
-            *this, parameters, Dimension, value, jacobians);
-
-    // copy over the Jacobians (convert row-major -> column-major)
-    if (diffState) {
-      _jacobianOplusXi = dError_dCamera;
-      _jacobianOplusXj = dError_dPoint;
-    } else {
-      assert(0 && "Error while differentiating");
-      _jacobianOplusXi.setZero();
-      _jacobianOplusXj.setZero();
-    }
-  }
+  G20_MAKE_AUTO_AD_FUNCTIONS
 };
 
 int main(int argc, char** argv) {
