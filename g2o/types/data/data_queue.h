@@ -43,9 +43,6 @@ namespace g2o {
       typedef std::map<number_t, RobotData*>           Buffer;
 
     public:
-      DataQueue();
-      ~DataQueue();
-
       void add(RobotData* rd);
 
       RobotData* findClosestData(number_t timestamp) const;

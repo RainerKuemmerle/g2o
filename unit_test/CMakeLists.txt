@@ -38,6 +38,7 @@ macro(create_test target)
 endmacro(create_test)
 
 add_subdirectory(general)
+add_subdirectory(data)
 add_subdirectory(stuff)
 add_subdirectory(sclam2d)
 add_subdirectory(slam2d)
