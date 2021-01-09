@@ -160,24 +160,22 @@ namespace g2o {
          * @return true on success
          */
         bool setEstimateData(const std::vector<number_t>& estimate) {
-#ifndef NDEBUG
           int dim = estimateDimension();
-          assert((dim == -1) || (estimate.size() == std::size_t(dim)));
-#endif
+          if ((dim == -1) || (estimate.size() != std::size_t(dim)))
+	    return false;
           return setEstimateData(&estimate[0]);
         };
 
-	/**
-         * sets the initial estimate from an eigen type of number_t
+	        /**
+         * sets the initial estimate from an array of number_t
          * Implement setEstimateDataImpl()
          * @return true on success
          */
         template<typename Derived>
         bool setEstimateData(const Eigen::MatrixBase<Derived>& estimate) {
-#ifndef NDEBUG
           int dim = estimateDimension();
-          assert((dim == -1) || (estimate.size() == std::size_t(dim)));
-#endif
+	  if ((dim == -1) || (estimate.size() != dim))
+	    return false;
           return setEstimateData(estimate.derived().data());
         };
 
@@ -200,7 +198,7 @@ namespace g2o {
         };
 
         /**
-         * writes the estimater to an eigen type of number_t
+         * writes the estimater to an array of number_t
          * @returns true on success
          */
         template<typename Derived>
@@ -240,10 +238,9 @@ namespace g2o {
          * @return true on success
          */
         bool setMinimalEstimateData(const std::vector<number_t>& estimate) {
-#ifndef NDEBUG
           int dim = minimalEstimateDimension();
-          assert((dim == -1) || (estimate.size() == std::size_t(dim)));
-#endif
+          if ((dim == -1) || (estimate.size() != std::size_t(dim)))
+	    return false;
           return setMinimalEstimateData(&estimate[0]);
         };
 
@@ -254,11 +251,10 @@ namespace g2o {
          */
         template<typename Derived>
         bool setMinimalEstimateData(const Eigen::MatrixBase<Derived>& estimate) {
-#ifndef NDEBUG
           int dim = minimalEstimateDimension();
-          assert((dim == -1) || (estimate.size() == std::size_t(dim)));
-#endif
-          return setMinimalEstimateData(estimate.data());
+          if ((dim == -1) || (estimate.size() != dim))
+	    return false;
+          return setMinimalEstimateData(estimate.derived().data());
         };
 
 	
@@ -281,7 +277,7 @@ namespace g2o {
         };
 
         /**
-         * writes the estimate to an eigen type of number_t
+         * writes the estimate to an eigen type number_t
          * @returns true on success
          */
         template<typename Derived>
