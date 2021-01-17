@@ -46,7 +46,7 @@ std::unique_ptr<BlockSolverBase> AllocateSolver() {
 static OptimizationAlgorithm* createSolver(const std::string& fullSolverName) {
   static const std::map<std::string, std::function<std::unique_ptr<BlockSolverBase>()>>
       solver_factories{
-          {"var_csparse", &AllocateSolver<-1, -1, false>},
+          {"var_csparse", &AllocateSolver<-1, -1, true>},
           {"fix3_2_csparse", &AllocateSolver<3, 2, true>},
           {"fix6_3_csparse", &AllocateSolver<6, 3, true>},
           {"fix7_3_csparse", &AllocateSolver<7, 3, true>},

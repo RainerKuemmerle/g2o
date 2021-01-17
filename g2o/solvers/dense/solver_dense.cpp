@@ -52,10 +52,10 @@ namespace g2o
   static OptimizationAlgorithm* createSolver(const std::string& fullSolverName)
   {
     static const std::map<std::string, std::function<std::unique_ptr<g2o::Solver>()>> solver_factories{
-      { "pcg", &AllocateSolver<-1, -1> },
-      { "pcg3_2", &AllocateSolver<3, 2> },
-      { "pcg6_3", &AllocateSolver<6, 3> },
-      { "pcg7_3", &AllocateSolver<7, 3> },
+      { "dense", &AllocateSolver<-1, -1> },
+      { "dense3_2", &AllocateSolver<3, 2> },
+      { "dense6_3", &AllocateSolver<6, 3> },
+      { "dense7_3", &AllocateSolver<7, 3> },
     };
 
     string solverName = fullSolverName.substr(3);

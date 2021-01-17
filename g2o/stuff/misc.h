@@ -226,16 +226,6 @@ struct ForceLinker
     ForceLinker(ForceLinkFunction function) { (function)(); }
 };
 
-template<std::size_t... S>
-struct index_sequence
-{};
-
-template<int N, int ...S> struct Make_index_sequence : Make_index_sequence<N-1, N-1, S...> {};
-template<int ...S> struct Make_index_sequence<0, S...>{ using type = index_sequence<S...>; };
-
-template<int N>
-using make_index_sequence = typename Make_index_sequence<N>::type;
-
 } // end namespace
 
 // @}

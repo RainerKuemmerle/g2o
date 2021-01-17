@@ -29,6 +29,7 @@
 
 #include <iostream>
 #include <limits>
+#include <utility>
 
 #include "g2o/EXTERNAL/ceres/fixed_array.h"
 #include "base_edge.h"
@@ -170,15 +171,16 @@ class BaseFixedSizedEdge : public BaseEdge<D, E> {
   template <typename>
   struct HessianTupleType;
   template <std::size_t... Ints>
-  struct HessianTupleType<index_sequence<Ints...>> {
+  struct HessianTupleType<std::index_sequence<Ints...>> {
     using type = std::tuple<HessianBlockTypeK<Ints>...>;
     using typeTransposed = std::tuple<HessianBlockTypeKTransposed<Ints>...>;
   };
   static const std::size_t _nr_of_vertices = sizeof...(VertexTypes);
   static const std::size_t _nr_of_vertex_pairs = internal::pair_to_index(0, _nr_of_vertices);
-  using HessianTuple = typename HessianTupleType<make_index_sequence<_nr_of_vertex_pairs>>::type;
+  using HessianTuple =
+      typename HessianTupleType<std::make_index_sequence<_nr_of_vertex_pairs>>::type;
   using HessianTupleTransposed =
-      typename HessianTupleType<make_index_sequence<_nr_of_vertex_pairs>>::typeTransposed;
+      typename HessianTupleType<std::make_index_sequence<_nr_of_vertex_pairs>>::typeTransposed;
 
   BaseFixedSizedEdge()
       : BaseEdge<D, E>(),
@@ -198,12 +200,12 @@ class BaseFixedSizedEdge : public BaseEdge<D, E> {
   virtual void resize(size_t size);
 
   template <std::size_t... Ints>
-  bool allVerticesFixedNs(index_sequence<Ints...>) const;
+  bool allVerticesFixedNs(std::index_sequence<Ints...>) const;
   virtual bool allVerticesFixed() const;
 
   virtual void linearizeOplus(JacobianWorkspace& jacobianWorkspace);
   template <std::size_t... Ints>
-  void linearizeOplus_allocate(JacobianWorkspace& jacobianWorkspace, index_sequence<Ints...>);
+  void linearizeOplus_allocate(JacobianWorkspace& jacobianWorkspace, std::index_sequence<Ints...>);
 
   /**
    * Linearizes the oplus operator in the vertex, and stores
@@ -211,7 +213,7 @@ class BaseFixedSizedEdge : public BaseEdge<D, E> {
    */
   virtual void linearizeOplus();
   template <std::size_t... Ints>
-  void linearizeOplusNs(index_sequence<Ints...>);
+  void linearizeOplusNs(std::index_sequence<Ints...>);
   template <int N>
   void linearizeOplusN();
 
@@ -222,6 +224,12 @@ class BaseFixedSizedEdge : public BaseEdge<D, E> {
   jacobianOplusXn() const {
     return std::get<N>(_jacobianOplus);
   }
+  //! returns the result of the linearization in the manifold space for the nodes xn
+  template <int N>
+  typename std::tuple_element<N, std::tuple<JacobianType<D, VertexTypes::Dimension>...>>::type&
+  jacobianOplusXn() {
+    return std::get<N>(_jacobianOplus);
+  }
 
   /**
    * computes the (block) elements of the Hessian matrix of the linearized least squares.
@@ -229,15 +237,15 @@ class BaseFixedSizedEdge : public BaseEdge<D, E> {
   virtual void constructQuadraticForm();
   template <std::size_t... Ints>
   void constructQuadraticFormNs(const InformationType& omega, const ErrorVector& weightedError,
-                                index_sequence<Ints...>);
+                                std::index_sequence<Ints...>);
   template <int N>
   void constructQuadraticFormN(const InformationType& omega, const ErrorVector& weightedError);
 
   template <int N, typename AtOType>
-  void constructOffDiagonalQuadraticFormMs(const AtOType&, index_sequence<>);
+  void constructOffDiagonalQuadraticFormMs(const AtOType&, std::index_sequence<>);
 
   template <int N, std::size_t... Ints, typename AtOType>
-  void constructOffDiagonalQuadraticFormMs(const AtOType& AtO, index_sequence<Ints...>);
+  void constructOffDiagonalQuadraticFormMs(const AtOType& AtO, std::index_sequence<Ints...>);
   template <int N, int M, typename AtOType>
   void constructOffDiagonalQuadraticFormM(const AtOType& AtO);
 

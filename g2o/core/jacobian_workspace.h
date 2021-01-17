@@ -49,7 +49,7 @@ namespace g2o {
    * by calling allocate().
    *
    * By default, the sizes are updated incrementally with each call. If the reset flag is set to true,
-   * the counts are set back to 
+   * the counts are set back to
    */
   class G2O_CORE_API JacobianWorkspace
   {
@@ -79,6 +79,11 @@ namespace g2o {
        * manually update with the given parameters
        */
       void updateSize(int numVertices, int dimension, bool reset = false);
+
+      /**
+       * set the full workspace to zero
+       */
+      void setZero();
 
       /**
        * return the workspace for a vertex in an edge

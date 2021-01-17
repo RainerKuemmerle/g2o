@@ -55,19 +55,23 @@ namespace g2o {
     }
     return true;
   }
-  
+
+  void JacobianWorkspace::setZero() {
+    for (auto& wp : _workspace) wp.setZero();
+  }
+
   void JacobianWorkspace::updateSize(const HyperGraph::Edge* e_, bool reset)
   {
     if (reset) {
       _maxNumVertices = -1;
       _maxDimension = -1;
     }
-      
+
     const OptimizableGraph::Edge* e = static_cast<const OptimizableGraph::Edge*>(e_);
     int errorDimension = e->dimension();
     int numVertices = e->vertices().size();
     int maxDimensionForEdge = -1;
-    
+
     for (int i = 0; i < numVertices; ++i) {
       const OptimizableGraph::Vertex* v = static_cast<const OptimizableGraph::Vertex*>(e->vertex(i));
       assert(v && "Edge has no vertex assigned");
@@ -84,7 +88,7 @@ namespace g2o {
       _maxNumVertices = -1;
       _maxDimension = -1;
     }
-    
+
     for (OptimizableGraph::EdgeSet::const_iterator it = graph.edges().begin(); it != graph.edges().end(); ++it) {
       const OptimizableGraph::Edge* e = static_cast<const OptimizableGraph::Edge*>(*it);
       updateSize(e);
@@ -97,7 +101,7 @@ namespace g2o {
       _maxNumVertices = -1;
       _maxDimension = -1;
     }
-    
+
     _maxNumVertices = max(numVertices, _maxNumVertices);
     _maxDimension = max(dimension, _maxDimension);
   }

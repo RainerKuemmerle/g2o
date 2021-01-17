@@ -43,7 +43,7 @@ namespace g2o {
     template<int p, int l, bool blockorder>
     std::unique_ptr<BlockSolverBase> AllocateSolver()
     {
-      std::cerr << "# Using CSparse poseDim " << p << " landMarkDim " << l << " blockordering " << blockorder << std::endl;
+      std::cerr << "# Using 2dlinear poseDim " << p << " landMarkDim " << l << " blockordering " << blockorder << std::endl;
       auto linearSolver = g2o::make_unique<LinearSolverEigen<typename BlockSolverPL<p, l>::PoseMatrixType>>();
       linearSolver->setBlockOrdering(blockorder);
       return g2o::make_unique<BlockSolverPL<p, l>>(std::move(linearSolver));
