@@ -430,8 +430,9 @@ TEST_F(GeneralGraphOperations, FixSubset) {
 TEST_F(GeneralGraphOperations, TrivialInit) {
   optimizer->initializeOptimization();
 
+  optimizer->computeActiveErrors();
   ASSERT_THAT(optimizer->activeVertices(), testing::SizeIs(numVertices));
-  ASSERT_THAT(optimizer->activeChi2(), testing::DoubleEq(0.));
+  ASSERT_THAT(optimizer->activeChi2(), testing::Gt(0.));
   ASSERT_TRUE(optimizer->verifyInformationMatrices());
 
   ASSERT_THAT(
