@@ -30,7 +30,7 @@
 
 #include "g2o/core/optimization_algorithm_factory.h"
 #include "g2o/core/optimization_algorithm.h"
-#include "gtest/gtest.h"
+#include "gmock/gmock.h"
 
 #if defined G2O_HAVE_CHOLMOD
 G2O_USE_OPTIMIZATION_LIBRARY(cholmod);
@@ -56,10 +56,7 @@ TEST(AlgorithmFactory, ContainsBasicSolvers) {
   }
 
   std::vector<std::string> basicSolvers = {"gn_var", "lm_var", "dl_var"};
-  for (const auto& name : basicSolvers) {
-    ASSERT_EQ(1, names.count(name))
-        << "solver with name \"" << name << "\" not in the set of known solvers";
-  }
+  ASSERT_THAT(names, testing::IsSupersetOf(basicSolvers));
 }
 
 TEST(AlgorithmFactory, AllocatingSolver) {
@@ -73,4 +70,53 @@ TEST(AlgorithmFactory, AllocatingSolver) {
     ASSERT_NE(nullptr, algo) << "Cannot allocate solver " << name;
     delete algo;
   }
+}
+
+TEST(AlgorithmFactory, AllocatingInvalidReturnsNull) {
+  g2o::OptimizationAlgorithmFactory* factory = g2o::OptimizationAlgorithmFactory::instance();
+
+  const std::string name("xyz_supper_solver");
+  g2o::OptimizationAlgorithmProperty solverProperty;
+  g2o::OptimizationAlgorithm* algo = factory->construct(name, solverProperty);
+  ASSERT_EQ(nullptr, algo) << "Allocated a solver " << name;
+  delete algo;
+}
+
+TEST(AlgorithmFactory, PrintSolverProperties) {
+  g2o::OptimizationAlgorithmFactory* factory = g2o::OptimizationAlgorithmFactory::instance();
+
+  const std::string name("gn_var");
+  g2o::OptimizationAlgorithmProperty solverProperty;
+  g2o::OptimizationAlgorithm* algo = factory->construct(name, solverProperty);
+  ASSERT_NE(nullptr, algo) << "Did not manager to allocate solver " << name;
+
+  std::stringstream solverPropertyStream;
+  algo->printProperties(solverPropertyStream);
+  ASSERT_FALSE(solverPropertyStream.str().empty());
+
+  delete algo;
+}
+
+TEST(AlgorithmFactory, ListsAllSolvers) {
+  g2o::OptimizationAlgorithmFactory* factory = g2o::OptimizationAlgorithmFactory::instance();
+
+  // collect all names
+  std::set<std::string> names;
+  for (auto& creator : factory->creatorList()) {
+    g2o::OptimizationAlgorithmProperty solverProperty;
+    names.insert(creator->property().name);
+  }
+
+  std::stringstream listSolverOutput;
+  factory->listSolvers(listSolverOutput);
+
+  // read back the output
+  std::set<std::string> solversOnOutput;
+  std::stringstream line;
+  while (g2o::readLine(listSolverOutput, line) != -1) {
+    std::string token;
+    line >> token;
+    if (!token.empty()) solversOnOutput.insert(token);
+  }
+  ASSERT_THAT(solversOnOutput, testing::ElementsAreArray(names));
 }

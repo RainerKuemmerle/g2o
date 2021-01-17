@@ -28,6 +28,7 @@
 
 #include "allocate_optimizer.h"
 #include "g2o/core/factory.h"
+#include "g2o/core/optimization_algorithm_property.h"
 #include "g2o/core/sparse_optimizer.h"
 #include "g2o/stuff/string_tools.h"
 #include "g2o/types/slam2d/types_slam2d.h"
@@ -213,6 +214,16 @@ class GeneralGraphOperations : public ::testing::Test {
     return result;
   }
 
+  //! returns the expected Vertex IDs of the fixture
+  std::vector<int> fixedIds() const {
+    std::vector<int> result;
+    for (const auto& idV : optimizer->vertices()) {
+      g2o::OptimizableGraph::Vertex* v = dynamic_cast<g2o::OptimizableGraph::Vertex*>(idV.second);
+      if (v->fixed()) result.push_back(v->id());
+    }
+    return result;
+  }
+
   std::unique_ptr<g2o::SparseOptimizer> optimizer;
   size_t numVertices = 3;
 };
@@ -262,6 +273,12 @@ TEST_F(GeneralGraphOperations, LoadingGraph) {
               testing::UnorderedElementsAreArray(internal::VectorIntToKeys(expectedIds())));
   ASSERT_THAT(optimizer->edges(), testing::Each(testing::Property(
                                       &g2o::OptimizableGraph::Edge::vertices, testing::SizeIs(2))));
+  ASSERT_THAT(optimizer->edges(),
+              testing::Each(testing::ResultOf(
+                  [](g2o::HyperGraph::Edge* e) {
+                    return static_cast<g2o::OptimizableGraph::Edge*>(e)->graph();
+                  },
+                  testing::Eq(static_cast<g2o::OptimizableGraph*>(optimizer.get())))));
   ASSERT_THAT(optimizer->edges(), testing::Each(testing::ResultOf(
                                       [](g2o::HyperGraph::Edge* e) {
                                         return std::make_pair(e->vertex(0)->id(),
@@ -326,7 +343,7 @@ TEST_F(GeneralGraphOperations, PushPopOptimizableGraph) {
   optimizer->OptimizableGraph::push();
   for (const auto& idV : optimizer->vertices()) {
     g2o::VertexSE2* v = dynamic_cast<g2o::VertexSE2*>(idV.second);
-    v->setEstimate(v->estimate() * g2o::SE2(idV.first*2, 0, 0));
+    v->setEstimate(v->estimate() * g2o::SE2(idV.first * 2, 0, 0));
     ASSERT_THAT(v->stackSize(), testing::Eq(1));
   }
   // the estimates should differ now
@@ -350,7 +367,7 @@ TEST_F(GeneralGraphOperations, PushDiscardOptimizableGraph) {
   optimizer->OptimizableGraph::push();
   for (const auto& idV : optimizer->vertices()) {
     g2o::VertexSE2* v = dynamic_cast<g2o::VertexSE2*>(idV.second);
-    v->setEstimate(v->estimate() * g2o::SE2(idV.first*3, 0, 0));
+    v->setEstimate(v->estimate() * g2o::SE2(idV.first * 3, 0, 0));
     ASSERT_THAT(v->stackSize(), testing::Eq(1));
   }
   // the estimates should differ now
@@ -367,15 +384,162 @@ TEST_F(GeneralGraphOperations, PushDiscardOptimizableGraph) {
   }
 }
 
+TEST_F(GeneralGraphOperations, PushPopDiscardSubset) {
+  g2o::HyperGraph::VertexSet pushingSet = {optimizer->vertex(0), optimizer->vertex(2)};
+  g2o::HyperGraph::VertexSet notPushedSet;
+  for (const auto& idV : optimizer->vertices()) {
+    if (pushingSet.count(idV.second) == 0) notPushedSet.insert(idV.second);
+  }
+
+  for (int operation = 0; operation < 2; ++operation) {
+    // push
+    optimizer->push(pushingSet);
+    for (const auto& elem : pushingSet) {
+      g2o::OptimizableGraph::Vertex* v = dynamic_cast<g2o::OptimizableGraph::Vertex*>(elem);
+      ASSERT_THAT(v->stackSize(), testing::Eq(1));
+    }
+    for (const auto& elem : notPushedSet) {
+      g2o::OptimizableGraph::Vertex* v = dynamic_cast<g2o::OptimizableGraph::Vertex*>(elem);
+      ASSERT_THAT(v->stackSize(), testing::Eq(0));
+    }
+    // pop or discard
+    if (operation == 0)
+      optimizer->pop(pushingSet);
+    else
+      optimizer->discardTop(pushingSet);
+    for (const auto& idV : optimizer->vertices()) {
+      g2o::VertexSE2* v = dynamic_cast<g2o::VertexSE2*>(idV.second);
+      ASSERT_THAT(v->stackSize(), testing::Eq(0));
+    }
+  }
+}
+
+TEST_F(GeneralGraphOperations, FixSubset) {
+  EXPECT_THAT(fixedIds(), testing::ElementsAre(0));  // just vertex with ID zero is fixed
+
+  g2o::HyperGraph::VertexSet fixingSet;
+  fixingSet.insert(optimizer->vertex(1));
+
+  optimizer->setFixed(fixingSet, true);
+  EXPECT_THAT(fixedIds(), testing::WhenSorted(testing::ElementsAre(0, 1)));
+
+  optimizer->setFixed(fixingSet, false);
+  EXPECT_THAT(fixedIds(), testing::ElementsAre(0));
+}
+
 TEST_F(GeneralGraphOperations, TrivialInit) {
   optimizer->initializeOptimization();
 
   ASSERT_THAT(optimizer->activeVertices(), testing::SizeIs(numVertices));
+  ASSERT_THAT(optimizer->activeChi2(), testing::DoubleEq(0.));
   ASSERT_TRUE(optimizer->verifyInformationMatrices());
+
+  ASSERT_THAT(
+      optimizer->activeVertices(),
+      testing::Each(testing::ResultOf(
+          [this](g2o::OptimizableGraph::Vertex* v) { return optimizer->findActiveVertex(v); },
+          testing::Not(testing::Eq(optimizer->activeVertices().end())))));
 
   std::map<int, g2o::Vector3> estimates = vertexEstimates();
   for (size_t i = 1; i < numVertices; ++i) ASSERT_DOUBLE_EQ(0, estimates[i].norm());
   optimizer->computeInitialGuess();
   estimates = vertexEstimates();
   for (size_t i = 1; i < numVertices; ++i) ASSERT_LT(0, estimates[i].norm());
+}
+
+TEST_F(GeneralGraphOperations, EdgeInit) {
+  g2o::OptimizableGraph::Edge* e =
+      dynamic_cast<g2o::OptimizableGraph::Edge*>(*optimizer->edges().begin());
+  g2o::OptimizableGraph::Edge* e2 =
+      dynamic_cast<g2o::OptimizableGraph::Edge*>(*std::next(optimizer->edges().begin()));
+  g2o::HyperGraph::EdgeSet eset = {e};
+
+  optimizer->initializeOptimization(eset);
+
+  EXPECT_THAT(optimizer->activeVertices(), testing::SizeIs(2));
+  EXPECT_THAT(optimizer->activeEdges(), testing::SizeIs(1));
+  EXPECT_THAT(optimizer->findActiveEdge(e),
+              testing::Not(testing::Eq(optimizer->activeEdges().end())));
+  EXPECT_THAT(optimizer->findActiveEdge(e2), testing::Eq(optimizer->activeEdges().end()));
+}
+
+TEST_F(GeneralGraphOperations, Gauge) {
+  optimizer->initializeOptimization();
+
+  EXPECT_THAT(optimizer->gaugeFreedom(), testing::IsFalse());
+  EXPECT_THAT(optimizer->findGauge(), testing::NotNull());
+
+  optimizer->vertex(0)->setFixed(false);
+  EXPECT_THAT(optimizer->gaugeFreedom(), testing::IsTrue());
+  EXPECT_THAT(optimizer->findGauge(), testing::NotNull());
+}
+
+TEST_F(GeneralGraphOperations, Dimensions) {
+  optimizer->initializeOptimization();
+
+  EXPECT_EQ(optimizer->maxDimension(), 3);
+  EXPECT_THAT(optimizer->dimensions(), testing::ElementsAre(3));
+
+  g2o::VertexPointXY* point = new g2o::VertexPointXY;
+  point->setId(numVertices + 1);
+  optimizer->addVertex(point);
+
+  EXPECT_EQ(optimizer->maxDimension(), 3);
+  EXPECT_THAT(optimizer->dimensions(), testing::ElementsAre(2, 3));
+}
+
+TEST_F(GeneralGraphOperations, VerifyInformationMatrices) {
+  optimizer->initializeOptimization();
+
+  ASSERT_TRUE(optimizer->verifyInformationMatrices());
+
+  g2o::EdgeSE2* e1 = new g2o::EdgeSE2();
+  e1->vertices()[0] = optimizer->vertex(0);
+  e1->vertices()[1] = optimizer->vertex(1);
+  e1->setMeasurement(g2o::SE2(2., 0., 0.));
+  e1->setInformation(-1 * g2o::EdgeSE2::InformationType::Identity());
+  optimizer->addEdge(e1);
+
+  g2o::EdgeSE2* e2 = new g2o::EdgeSE2();
+  e2->vertices()[0] = optimizer->vertex(1);
+  e2->vertices()[1] = optimizer->vertex(2);
+  e2->setMeasurement(g2o::SE2(1., 2., 0.));
+  g2o::EdgeSE2::InformationType infoMat = g2o::EdgeSE2::InformationType::Identity();
+  infoMat(1, 2) = 1;
+  e2->setInformation(infoMat);
+  optimizer->addEdge(e2);
+
+  ASSERT_FALSE(optimizer->verifyInformationMatrices(true));
+}
+
+TEST_F(GeneralGraphOperations, SolverSuitable) {
+  g2o::OptimizationAlgorithmProperty solverPropertyVar;
+  solverPropertyVar.requiresMarginalize = false;
+  solverPropertyVar.poseDim = -1;
+  solverPropertyVar.landmarkDim = -1;
+
+  g2o::OptimizationAlgorithmProperty solverPropertyFix32;
+  solverPropertyFix32.requiresMarginalize = true;
+  solverPropertyFix32.poseDim = 3;
+  solverPropertyFix32.landmarkDim = 2;
+
+  g2o::OptimizationAlgorithmProperty solverPropertyFix63;
+  solverPropertyFix63.requiresMarginalize = true;
+  solverPropertyFix63.poseDim = 6;
+  solverPropertyFix63.landmarkDim = 3;
+
+  std::set<int> vertexDims = {2, 3};
+  std::set<int> vertexDimsNoMatch = {1, 5};
+
+  EXPECT_TRUE(optimizer->isSolverSuitable(solverPropertyVar));
+  EXPECT_TRUE(optimizer->isSolverSuitable(solverPropertyVar, vertexDims));
+  EXPECT_TRUE(optimizer->isSolverSuitable(solverPropertyVar, vertexDimsNoMatch));
+
+  EXPECT_TRUE(optimizer->isSolverSuitable(solverPropertyFix32));
+  EXPECT_TRUE(optimizer->isSolverSuitable(solverPropertyFix32, vertexDims));
+  EXPECT_FALSE(optimizer->isSolverSuitable(solverPropertyFix32, vertexDimsNoMatch));
+
+  EXPECT_FALSE(optimizer->isSolverSuitable(solverPropertyFix63));
+  EXPECT_FALSE(optimizer->isSolverSuitable(solverPropertyFix63, vertexDims));
+  EXPECT_FALSE(optimizer->isSolverSuitable(solverPropertyFix63, vertexDimsNoMatch));
 }
