@@ -24,12 +24,11 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include <g2o/core/block_solver.h>
-#include <g2o/core/optimization_algorithm_dogleg.h>
-#include <g2o/core/optimization_algorithm_gauss_newton.h>
-#include <g2o/core/optimization_algorithm_levenberg.h>
-#include <g2o/solvers/eigen/linear_solver_eigen.h>
-
+#include "g2o/core/block_solver.h"
+#include "g2o/core/optimization_algorithm_dogleg.h"
+#include "g2o/core/optimization_algorithm_gauss_newton.h"
+#include "g2o/core/optimization_algorithm_levenberg.h"
+#include "g2o/solvers/eigen/linear_solver_eigen.h"
 #include "g2o/types/slam3d/edge_se3.h"
 #include "gtest/gtest.h"
 
@@ -47,14 +46,13 @@ class Slam3DOptimization : public testing::Test {
     auto linearSolver = g2o::make_unique<SlamLinearSolver>();
     linearSolver->setBlockOrdering(false);
     auto blockSolver = g2o::make_unique<g2o::BlockSolverX>(std::move(linearSolver));
-    algorithm = new OptimizationAlgo(std::move(blockSolver));
+    OptimizationAlgo *algorithm = new OptimizationAlgo(std::move(blockSolver));
 
     optimizer.setAlgorithm(algorithm);
   }
 
  protected:
   g2o::SparseOptimizer optimizer;
-  OptimizationAlgo *algorithm;
 };
 TYPED_TEST_SUITE_P(Slam3DOptimization);
 
