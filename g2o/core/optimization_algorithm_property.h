@@ -43,7 +43,7 @@ struct G2O_CORE_API OptimizationAlgorithmProperty
   std::string type;           ///< type of solver, e.g., "CSparse Cholesky", "PCG"
   bool requiresMarginalize;   ///< whether the solver requires marginalization of landmarks
   int poseDim;                ///< dimension of the pose vertices (-1 if variable)
-  int landmarkDim;            ///< dimension of the landmar vertices (-1 if variable)
+  int landmarkDim;            ///< dimension of the landmark vertices (-1 if variable)
   OptimizationAlgorithmProperty() :
     name(), desc(), type(), requiresMarginalize(false), poseDim(-1), landmarkDim(-1)
   {
