@@ -43,6 +43,7 @@ g2o_core_api.h
 
 set_target_properties(core PROPERTIES OUTPUT_NAME ${LIB_PREFIX}core)
 target_link_libraries(core PUBLIC g2o_ceres_ad stuff ${G2O_EIGEN3_EIGEN_TARGET})
+target_compile_features(core PUBLIC cxx_std_14)
 
 if (APPLE)
   set_target_properties(core PROPERTIES INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
