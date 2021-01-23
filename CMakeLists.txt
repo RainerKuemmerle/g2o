@@ -435,5 +435,12 @@ if(G2O_BUILD_BENCHMARKS)
   endif()
 endif()
 
+# Python wrapper
+set(G2O_BUILD_PYTHON ON CACHE BOOL "Build python wrapper")
+if(G2O_BUILD_PYTHON)
+  message(STATUS "Compiling g2o's python wrapper")
+  add_subdirectory(python)
+endif(G2O_BUILD_PYTHON)
+
 # Include the subdirectories
 add_subdirectory(g2o)

@@ -66,8 +66,7 @@ namespace g2o {
         HGET_NUM_ELEMS // keep as last elem
       };
 
-      static const int UnassignedId = -1;
-      static const int InvalidId = -2;
+      enum G2O_CORE_API HyperGraphDefaultIds { UnassignedId = -1, InvalidId = -2 };
 
       typedef std::bitset<HyperGraph::HGET_NUM_ELEMS> GraphElemBitset;
 
