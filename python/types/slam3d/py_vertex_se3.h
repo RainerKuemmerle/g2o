@@ -20,20 +20,6 @@ void declareVertexSE3(py::module& m) {
       .def("get_minimal_estimate_data", &VertexSE3::getMinimalEstimateData)
       .def("minimal_estimate_dimension", &VertexSE3::minimalEstimateDimension)
       .def("oplus_impl", &VertexSE3::oplusImpl);
-
-  /*
-  py::class_<VertexSE3WriteGnuplotAction, WriteGnuplotAction>(m, "VertexSE3WriteGnuplotAction")
-      .def(py::init<>())
-      .def("__call__", &VertexSE3WriteGnuplotAction::operator())
-  ;
-
-  // #ifdef G2O_HAVE_OPENGL
-  py::class_<VertexSE3DrawAction, DrawAction>(m, "VertexSE3DrawAction")
-      .def(py::init<>())
-      .def("__call__", &VertexSE3DrawAction::operator())
-  ;
-  // #endif
-  */
 }
 
 }  // end namespace g2o

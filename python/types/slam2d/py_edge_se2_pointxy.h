@@ -49,7 +49,7 @@ void declareEdgeSE2PointXY(py::module& m) {
   // class G2O_TYPES_SLAM2D_API EdgeSE2PointXYBearingWriteGnuplotAction: public WriteGnuplotAction
   // class G2O_TYPES_SLAM2D_API EdgeSE2PointXYBearingDrawAction: public DrawAction
 
-  py::class_<EdgeSE2PointXYCalib, BaseMultiEdge<2, Vector2>>(m, "EdgeSE2PointXYCalib")
+  py::class_<EdgeSE2PointXYCalib, BaseVariableSizedEdge<2, Vector2>>(m, "EdgeSE2PointXYCalib")
       .def(py::init<>())
       .def("compute_error", &EdgeSE2PointXYCalib::computeError)
       .def("initial_estimate_possible", &EdgeSE2PointXYCalib::initialEstimatePossible)

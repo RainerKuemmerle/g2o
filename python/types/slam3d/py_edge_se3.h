@@ -5,6 +5,8 @@
 #include "g2o/types/slam3d/edge_se3_lotsofxyz.h"
 #include "g2o/types/slam3d/edge_se3_offset.h"
 #include "g2o/types/slam3d/edge_se3_prior.h"
+#include "python/core/py_base_binary_edge.h"
+#include "python/core/py_base_unary_edge.h"
 
 namespace py = pybind11;
 using namespace pybind11::literals;
@@ -30,7 +32,7 @@ void declareEdgeSE3(py::module& m) {
   // class G2O_TYPES_SLAM3D_API EdgeSE3WriteGnuplotAction: public WriteGnuplotAction
   // class G2O_TYPES_SLAM3D_API EdgeSE3DrawAction: public DrawAction
 
-  py::class_<EdgeSE3LotsOfXYZ, BaseMultiEdge<-1, VectorX>>(m, "EdgeSE3LotsOfXYZ")
+  py::class_<EdgeSE3LotsOfXYZ, BaseVariableSizedEdge<-1, VectorX>>(m, "EdgeSE3LotsOfXYZ")
       .def(py::init<>())
 
       .def("set_dimension", &EdgeSE3LotsOfXYZ::setDimension<-1>)

@@ -35,7 +35,7 @@ void declareSE2(py::module& m) {
 
   templatedBaseVertex<3, SE2>(m, "_3_SE2");
   templatedBaseEdge<3, SE2>(m, "_3_SE2");
-  templatedBaseMultiEdge<3, SE2>(m, "_3_SE2");
+  templatedBaseVariableSizedEdge<3, SE2>(m, "_3_SE2");
 }
 
 }  // namespace g2o

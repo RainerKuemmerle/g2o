@@ -5,7 +5,7 @@
 #include "g2o/types/slam3d/se3quat.h"
 #include "python/core/py_base_binary_edge.h"
 #include "python/core/py_base_fixed_sized_edge.h"
-#include "python/core/py_base_multi_edge.h"
+#include "python/core/py_base_variable_sized_edge.h"
 #include "python/core/py_base_unary_edge.h"
 
 namespace py = pybind11;

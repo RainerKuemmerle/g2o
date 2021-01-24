@@ -4,6 +4,7 @@
 
 #include "g2o/types/slam3d/se3quat.h"
 #include "python/core/py_base_edge.h"
+#include "python/core/py_base_variable_sized_edge.h"
 #include "python/core/py_base_vertex.h"
 
 namespace py = pybind11;
@@ -58,7 +59,7 @@ void declareSE3Quat(py::module& m) {
 
   templatedBaseVertex<6, SE3Quat>(m, "_6_SE3Quat");
   templatedBaseEdge<6, SE3Quat>(m, "_6_SE3Quat");
-  templatedBaseMultiEdge<6, SE3Quat>(m, "_6_SE3Quat");
+  templatedBaseVariableSizedEdge<6, SE3Quat>(m, "_6_SE3Quat");
 }
 
 }  // end namespace g2o

@@ -34,7 +34,7 @@ void declareEdgeSE2(py::module& m) {
   // class G2O_TYPES_SLAM2D_API EdgeSE2WriteGnuplotAction: public WriteGnuplotAction
   // class G2O_TYPES_SLAM2D_API EdgeSE2DrawAction: public DrawAction
 
-  py::class_<EdgeSE2LotsOfXY, BaseMultiEdge<-1, VectorX>>(m, "EdgeSE2LotsOfXY")
+  py::class_<EdgeSE2LotsOfXY, BaseVariableSizedEdge<-1, VectorX>>(m, "EdgeSE2LotsOfXY")
       .def(py::init<>())
       .def("set_dimension", &EdgeSE2LotsOfXY::setDimension<-1>)
       .def("set_size", &EdgeSE2LotsOfXY::setSize)
@@ -67,7 +67,7 @@ void declareEdgeSE2(py::module& m) {
       .def("initial_estimate_possible", &EdgeSE2Prior::initialEstimatePossible)
       .def("initial_estimate", &EdgeSE2Prior::initialEstimate);
 
-  py::class_<EdgeSE2TwoPointsXY, BaseMultiEdge<4, Vector4>>(m, "EdgeSE2TwoPointsXY")
+  py::class_<EdgeSE2TwoPointsXY, BaseVariableSizedEdge<4, Vector4>>(m, "EdgeSE2TwoPointsXY")
       .def(py::init<>())
       .def("compute_error", &EdgeSE2TwoPointsXY::computeError)
       .def("set_measurement_from_state", &EdgeSE2TwoPointsXY::setMeasurementFromState)

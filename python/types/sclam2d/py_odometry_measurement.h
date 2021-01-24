@@ -43,7 +43,7 @@ void declareOdometryMeasurement(py::module& m) {
       ;
 
   templatedBaseEdge<3, VelocityMeasurement>(m, "_3_VelocityMeasurement");
-  templatedBaseMultiEdge<3, VelocityMeasurement>(m, "_3_VelocityMeasurement");
+  templatedBaseVariableSizedEdge<3, VelocityMeasurement>(m, "_3_VelocityMeasurement");
 }
 
 }  // namespace g2o

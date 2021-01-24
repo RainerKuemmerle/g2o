@@ -2,6 +2,7 @@
 #include <pybind11/pybind11.h>
 
 #include "g2o/types/slam3d/edge_pointxyz.h"
+#include "python/core/py_base_binary_edge.h"
 
 namespace py = pybind11;
 using namespace pybind11::literals;

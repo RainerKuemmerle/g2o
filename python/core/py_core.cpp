@@ -2,8 +2,8 @@
 
 #include "py_base_binary_edge.h"
 #include "py_base_edge.h"
-#include "py_base_multi_edge.h"
 #include "py_base_unary_edge.h"
+#include "py_base_variable_sized_edge.h"
 #include "py_base_vertex.h"
 #include "py_batch_stats.h"
 #include "py_block_solver.h"
@@ -42,7 +42,7 @@ void declareCore(pybind11::module& m) {
   declareJacobianWorkspace(m);
   declareBaseVertex(m);
   declareBaseEdge(m);
-  declareBaseMultiEdge(m);
+  declareBaseVariableSizedEdge(m);
 
   declareRobustKernel(m);
   declareSolver(m);
