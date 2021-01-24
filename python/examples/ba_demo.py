@@ -1,7 +1,7 @@
 # https://github.com/RainerKuemmerle/g2o/blob/master/g2o/examples/ba/ba_demo.cpp
 
 import numpy as np
-import g2o 
+import g2opy as g2o
 
 from collections import defaultdict
 import argparse
@@ -19,26 +19,33 @@ args = parser.parse_args()
 
 
 def main():    
+    print("BA demo")
     optimizer = g2o.SparseOptimizer()
     solver = g2o.BlockSolverSE3(g2o.LinearSolverCholmodSE3())
     solver = g2o.OptimizationAlgorithmLevenberg(solver)
     optimizer.set_algorithm(solver)
+    print("Init done")
 
     focal_length = 1000
     principal_point = (320, 240)
+    print("creating cam param")
     cam = g2o.CameraParameters(focal_length, principal_point, 0)
     cam.set_id(0)
     optimizer.add_parameter(cam)
+
+    print("param done")
 
     true_points = np.hstack([
         np.random.random((500, 1)) * 3 - 1.5,
         np.random.random((500, 1)) - 0.5,
         np.random.random((500, 1)) + 3])
 
+    print("creating poses")
 
     true_poses = []
     num_pose = 15
     for i in range(num_pose):
+        print("   {}".format(i))
         # pose here means transform points from world coordinates to camera coordinates
         pose = g2o.SE3Quat(np.identity(3), [i*0.04-1, 0, 0])
         true_poses.append(pose)
@@ -50,6 +57,7 @@ def main():
             v_se3.set_fixed(True)
         optimizer.add_vertex(v_se3)
 
+    print("Poses done")
 
     point_id = num_pose
     inliers = dict()

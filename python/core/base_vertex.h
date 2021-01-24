@@ -1,22 +1,21 @@
 #pragma once
 
-#include <g2o/core/base_vertex.h>
 #include <pybind11/pybind11.h>
 
-namespace py = pybind11;
-using namespace pybind11::literals;
+#include "g2o/core/base_vertex.h"
 
 namespace g2o {
 
 template <int D, typename T>
-void templatedBaseVertex(py::module& m, const std::string& suffix) {
+void templatedBaseVertex(pybind11::module& m, const std::string& suffix) {
+  using namespace pybind11::literals;
   using CLS = BaseVertex<D, T>;
 
-  py::class_<CLS, OptimizableGraph::Vertex>(m, ("BaseVertex" + suffix).c_str())
+  pybind11::class_<CLS, OptimizableGraph::Vertex>(m, ("BaseVertex" + suffix).c_str())
 
-      //.def(py::init<>())
+      //.def(pybind11::init<>())
       //.def_readonly_static("dimension", &BaseVertex<D, T>::Dimension)   // lead to undefined
-      //symbol error
+      // symbol error
       .def("hessian", (double& (BaseVertex<D, T>::*)(int, int)) & BaseVertex<D, T>::hessian, "i"_a,
            "j"_a)
       .def("hessian_determinant", &CLS::hessianDeterminant)
@@ -30,31 +29,20 @@ void templatedBaseVertex(py::module& m, const std::string& suffix) {
       .def("clear_quadratic_form", &CLS::clearQuadraticForm)
       .def("solve_direct", &CLS::solveDirect)
       .def("b", (Eigen::Matrix<double, D, 1, Eigen::ColMajor> & (CLS::*)()) & CLS::b,
-           py::return_value_policy::reference)
+           pybind11::return_value_policy::reference)
       //.def("A", (HessianBlockType& (CLS::*) ()) &CLS::A,
-      //        py::return_value_policy::reference)
+      //        pybind11::return_value_policy::reference)
 
       .def("push", &CLS::push)
       .def("pop", &CLS::pop)
       .def("discard_top", &CLS::discardTop)
       .def("stack_size", &CLS::stackSize)  // -> int
 
-      .def("estimate", &CLS::estimate,
-           py::return_value_policy::reference)  // -> T&
-      .def("set_estimate", &CLS::setEstimate,
-           "et"_a)  // T& -> void
-
+      .def("estimate", &CLS::estimate, pybind11::return_value_policy::reference)  // -> T&
+      .def("set_estimate", &CLS::setEstimate, "et"_a)                             // T& -> void
       ;
 }
 
-void declareBaseVertex(py::module& m) {
-  // common types
-  templatedBaseVertex<1, double>(m, "_1_double");
-  templatedBaseVertex<2, Vector2>(m, "_2_Vector2");
-  templatedBaseVertex<3, Vector3>(m, "_3_Vector3");
-  templatedBaseVertex<4, Eigen::Matrix<double, 5, 1, Eigen::ColMajor>>(m, "_4_Vector5");  // sba
-
-  templatedBaseVertex<6, Isometry3>(m, "_6_Isometry3");  // slam3d
-}
+void declareBaseVertex(pybind11::module& m);
 
 }  // end namespace g2o

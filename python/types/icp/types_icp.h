@@ -4,6 +4,7 @@
 
 #include "python/core/base_binary_edge.h"
 #include "python/core/base_vertex.h"
+#include "python/core/base_edge.h"
 
 namespace py = pybind11;
 using namespace pybind11::literals;
