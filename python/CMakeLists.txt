@@ -2,13 +2,13 @@ find_package(pybind11 REQUIRED)
 
 pybind11_add_module(g2opy
     # core
-    core/base_edge.cpp
-core/base_multi_edge.cpp
-core/base_vertex.cpp
-core/batch_stats.cpp
-core/block_solver.cpp
-core/py_core.cpp
-core/eigen_types.cpp
+    core/py_base_edge.cpp
+    core/py_base_multi_edge.cpp
+    core/py_base_vertex.cpp
+    core/py_batch_stats.cpp
+    core/py_block_solver.cpp
+    core/py_core.cpp
+    core/py_eigen_types.cpp
     # module main
     g2opy.cpp)
 

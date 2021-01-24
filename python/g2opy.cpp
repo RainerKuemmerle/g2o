@@ -1,9 +1,7 @@
 #include <pybind11/pybind11.h>
 
 #include "python/core/py_core.h"
-#include "python/types/types.h"
-
-namespace py = pybind11;
+#include "python/types/py_types.h"
 
 namespace g2o {
 
