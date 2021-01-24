@@ -8,6 +8,7 @@
 #include "g2o/types/slam2d/edge_se2_twopointsxy.h"
 #include "g2o/types/slam2d/edge_se2_xyprior.h"
 #include "python/core/py_base_binary_edge.h"
+#include "python/core/py_base_unary_edge.h"
 
 namespace py = pybind11;
 using namespace pybind11::literals;

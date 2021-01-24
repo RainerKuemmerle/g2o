@@ -4,6 +4,7 @@
 
 #include "g2o/types/slam2d/se2.h"
 #include "python/core/py_base_edge.h"
+#include "python/core/py_base_variable_sized_edge.h"
 #include "python/core/py_base_vertex.h"
 
 namespace py = pybind11;
