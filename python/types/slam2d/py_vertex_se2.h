@@ -1,10 +1,7 @@
-#include <pybind11/eigen.h>
-#include <pybind11/pybind11.h>
+#pragma once
 
 #include "g2o/types/slam2d/vertex_se2.h"
-
-namespace py = pybind11;
-using namespace pybind11::literals;
+#include "g2opy.h"
 
 namespace g2o {
 

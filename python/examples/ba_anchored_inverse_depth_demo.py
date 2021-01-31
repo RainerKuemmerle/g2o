@@ -1,15 +1,15 @@
 # https://github.com/RainerKuemmerle/g2o/blob/master/g2o/examples/ba_anchored_inverse_depth/ba_anchored_inverse_depth_demo.cpp
 
 import numpy as np
-import g2o 
+import g2opy as g2o
 
 from collections import defaultdict
 import argparse
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--noise', dest='pixel_noise', type=float, default=1., 
+parser.add_argument('--noise', dest='pixel_noise', type=float, default=1.,
     help='noise in image pixel space (default: 1.0)')
-parser.add_argument('--outlier', dest='outlier_ratio', type=float, default=0., 
+parser.add_argument('--outlier', dest='outlier_ratio', type=float, default=0.,
     help='probability of spuroius observation  (default: 0.0)')
 parser.add_argument('--robust', dest='robust_kernel', action='store_true', help='use robust kernel')
 parser.add_argument('--no-schur', dest='schur_trick', action='store_false', help='not use Schur-complement trick')
@@ -37,7 +37,7 @@ def main():
         np.random.random((500, 1)) - 0.5,
         np.random.random((500, 1)) + 3])
 
-    
+
     focal_length = 1000.
     principal_point = (320, 240)
     cam = g2o.CameraParameters(focal_length, principal_point, 0)
@@ -106,7 +106,7 @@ def main():
 
         if inlier:
             inliers[point_id] = (i, anchor)
-            error = (true_poses[anchor].inverse() * invert_depth(v_p.estimate()) - 
+            error = (true_poses[anchor].inverse() * invert_depth(v_p.estimate()) -
                 true_points[i])
             sse[0] += np.sum(error**2)
         point_id += 1
@@ -120,7 +120,7 @@ def main():
     for i in inliers:
         v_p = optimizer.vertex(i)
         v_anchor = optimizer.vertex(inliers[i][1])
-        error = (v_anchor.estimate().inverse() * invert_depth(v_p.estimate()) - 
+        error = (v_anchor.estimate().inverse() * invert_depth(v_p.estimate()) -
             true_points[inliers[i][0]])
         sse[1] += np.sum(error**2)
 

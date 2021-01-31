@@ -1,4 +1,6 @@
-#include <pybind11/pybind11.h>
+#pragma once
+
+#include "g2opy.h"
 
 #include "py_edge_se2_odom_differential_calib.h"
 #include "py_edge_se2_sensor_calib.h"

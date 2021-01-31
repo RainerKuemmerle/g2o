@@ -1,8 +1,7 @@
 #pragma once
 
-#include <pybind11/pybind11.h>
-
 #include "g2o/core/base_unary_edge.h"
+#include "g2opy.h"
 
 namespace g2o {
 

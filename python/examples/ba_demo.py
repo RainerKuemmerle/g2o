@@ -18,34 +18,27 @@ args = parser.parse_args()
 
 
 
-def main():    
+def main():
     print("BA demo")
     optimizer = g2o.SparseOptimizer()
     solver = g2o.BlockSolverSE3(g2o.LinearSolverCholmodSE3())
     solver = g2o.OptimizationAlgorithmLevenberg(solver)
     optimizer.set_algorithm(solver)
-    print("Init done")
 
     focal_length = 1000
     principal_point = (320, 240)
-    print("creating cam param")
     cam = g2o.CameraParameters(focal_length, principal_point, 0)
     cam.set_id(0)
     optimizer.add_parameter(cam)
-
-    print("param done")
 
     true_points = np.hstack([
         np.random.random((500, 1)) * 3 - 1.5,
         np.random.random((500, 1)) - 0.5,
         np.random.random((500, 1)) + 3])
 
-    print("creating poses")
-
     true_poses = []
     num_pose = 15
     for i in range(num_pose):
-        print("   {}".format(i))
         # pose here means transform points from world coordinates to camera coordinates
         pose = g2o.SE3Quat(np.identity(3), [i*0.04-1, 0, 0])
         true_poses.append(pose)
@@ -72,7 +65,7 @@ def main():
         if len(visible) < 2:
             continue
 
-        vp = g2o.VertexSBAPointXYZ()
+        vp = g2o.VertexPointXYZ()
         vp.set_id(point_id)
         vp.set_marginalized(True)
         vp.set_estimate(point + np.random.randn(3))
@@ -119,7 +112,7 @@ def main():
     print('\nRMSE (inliers only):')
     print('before optimization:', np.sqrt(sse[0] / len(inliers)))
     print('after  optimization:', np.sqrt(sse[1] / len(inliers)))
-                    
+
 
 
 if __name__ == '__main__':

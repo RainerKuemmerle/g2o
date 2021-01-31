@@ -1,8 +1,7 @@
 #pragma once
 
-#include <pybind11/pybind11.h>
-
 #include "g2o/core/base_vertex.h"
+#include "g2opy.h"
 
 namespace g2o {
 

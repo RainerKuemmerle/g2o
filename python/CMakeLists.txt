@@ -21,7 +21,7 @@ add_subdirectory(${CMAKE_BINARY_DIR}/pybind11-src
 ###################################################
 # python wrapper library
 pybind11_add_module(g2opy
-    # core
+    # # core
     core/py_base_edge.cpp
     core/py_base_variable_sized_edge.cpp
     core/py_base_vertex.cpp
@@ -56,3 +56,4 @@ target_link_libraries(g2opy PRIVATE
     types_slam3d
     types_slam3d_addons
 )
+target_include_directories(g2opy PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})

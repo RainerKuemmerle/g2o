@@ -1,11 +1,8 @@
-#include <pybind11/eigen.h>
-#include <pybind11/pybind11.h>
+#pragma once
 
 #include "g2o/types/sim3/types_seven_dof_expmap.h"
+#include "g2opy.h"
 #include "python/core/py_base_binary_edge.h"
-
-namespace py = pybind11;
-using namespace pybind11::literals;
 
 namespace g2o {
 

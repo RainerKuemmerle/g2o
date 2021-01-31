@@ -1,4 +1,4 @@
-#include <pybind11/pybind11.h>
+#include "g2opy.h"
 
 #include "python/core/py_core.h"
 #include "python/types/py_types.h"

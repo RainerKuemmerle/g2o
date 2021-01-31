@@ -1,6 +1,7 @@
-#include <pybind11/pybind11.h>
+#pragma once
 
-namespace py = pybind11;
+#include "g2opy.h"
+
 namespace g2o {
 
 void declareG2OBatchStatistics(py::module& m);

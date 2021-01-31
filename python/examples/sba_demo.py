@@ -1,7 +1,7 @@
 # https://github.com/RainerKuemmerle/g2o/blob/master/g2o/examples/sba/sba_demo.cpp
 
 import numpy as np
-import g2o 
+import g2opy as g2o
 
 from collections import defaultdict
 import argparse
@@ -18,7 +18,7 @@ args = parser.parse_args()
 
 
 
-def main():    
+def main():
     optimizer = g2o.SparseOptimizer()
     solver = g2o.BlockSolverSE3(g2o.LinearSolverCSparseSE3())
     solver = g2o.OptimizationAlgorithmLevenberg(solver)
@@ -114,7 +114,7 @@ def main():
     print('\nRMSE (inliers only):')
     print('before optimization:', np.sqrt(sse[0] / len(inliers)))
     print('after  optimization:', np.sqrt(sse[1] / len(inliers)))
-                    
+
 
 
 if __name__ == '__main__':

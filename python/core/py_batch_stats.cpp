@@ -2,9 +2,6 @@
 
 #include "g2o/core/batch_stats.h"
 
-namespace py = pybind11;
-using namespace pybind11::literals;
-
 namespace g2o {
 
 void declareG2OBatchStatistics(py::module& m) {

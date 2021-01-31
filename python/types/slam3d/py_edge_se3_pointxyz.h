@@ -1,12 +1,9 @@
-#include <pybind11/eigen.h>
-#include <pybind11/pybind11.h>
+#pragma once
 
 #include "g2o/types/slam3d/edge_se3_pointxyz.h"
 #include "g2o/types/slam3d/edge_se3_pointxyz_depth.h"
 #include "g2o/types/slam3d/edge_se3_pointxyz_disparity.h"
-
-namespace py = pybind11;
-using namespace pybind11::literals;
+#include "g2opy.h"
 
 namespace g2o {
 

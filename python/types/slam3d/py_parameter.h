@@ -1,12 +1,11 @@
-#include <pybind11/eigen.h>
-#include <pybind11/pybind11.h>
+#pragma once
+
+#include "g2opy.h"
+
 
 #include "g2o/types/slam3d/parameter_camera.h"
 #include "g2o/types/slam3d/parameter_se3_offset.h"
 #include "g2o/types/slam3d/parameter_stereo_camera.h"
-
-namespace py = pybind11;
-using namespace pybind11::literals;
 
 namespace g2o {
 

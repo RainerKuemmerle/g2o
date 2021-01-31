@@ -1,4 +1,4 @@
-#include <pybind11/pybind11.h>
+#include "py_types_slam3d.h"
 
 #include "py_edge_pointxyz.h"
 #include "py_edge_se3.h"

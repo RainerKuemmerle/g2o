@@ -1,7 +1,5 @@
 #include "py_block_solver.h"
 
-#include <pybind11/eigen.h>
-
 #include "g2o/config.h"
 #include "g2o/core/solver.h"
 #include "g2o/solvers/cholmod/linear_solver_cholmod.h"
@@ -9,9 +7,6 @@
 #include "g2o/solvers/dense/linear_solver_dense.h"
 #include "g2o/solvers/eigen/linear_solver_eigen.h"
 #include "g2o/solvers/pcg/linear_solver_pcg.h"
-
-namespace py = pybind11;
-using namespace pybind11::literals;
 
 namespace g2o {
 

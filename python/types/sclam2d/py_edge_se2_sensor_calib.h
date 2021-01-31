@@ -1,10 +1,8 @@
-#include <pybind11/pybind11.h>
+#pragma once
 
 #include "g2o/types/sclam2d/edge_se2_sensor_calib.h"
+#include "g2opy.h"
 #include "python/core/py_base_fixed_sized_edge.h"
-
-namespace py = pybind11;
-using namespace pybind11::literals;
 
 namespace g2o {
 

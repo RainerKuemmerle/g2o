@@ -1,26 +1,24 @@
-#include <pybind11/eigen.h>
-#include <pybind11/pybind11.h>
+#pragma once
 
 #include "g2o/types/sba/types_six_dof_expmap.h"
 #include "g2o/types/slam3d/se3quat.h"
+#include "g2opy.h"
 #include "python/core/py_base_binary_edge.h"
 #include "python/core/py_base_fixed_sized_edge.h"
-#include "python/core/py_base_variable_sized_edge.h"
 #include "python/core/py_base_unary_edge.h"
-
-namespace py = pybind11;
-using namespace pybind11::literals;
+#include "python/core/py_base_variable_sized_edge.h"
 
 namespace g2o {
 
-void declareTypesSixDofExpmap(py::module &m) {
+void declareTypesSixDofExpmap(py::module& m) {
   py::class_<CameraParameters, Parameter>(m, "CameraParameters")
       .def(py::init<>())
-      .def(py::init<double, const Vector2 &, double>(), "focal_length"_a, "principle_point"_a,
-           "baseline"_a)
+      .def(py::init([](double f, const Eigen::Ref<const Vector2>& p, double b) {
+        return CameraParameters(f, p, b);
+      }))
 
-      .def("cam_map", &CameraParameters::cam_map, "trans_xyz")
-      .def("stereocam_uvu_map", &CameraParameters::stereocam_uvu_map, "trans_xyz")
+      .def("cam_map", &CameraParameters::cam_map, "trans_xyz"_a)
+      .def("stereocam_uvu_map", &CameraParameters::stereocam_uvu_map, "trans_xyz"_a)
       .def_readwrite("focal_length", &CameraParameters::focal_length)
       .def_readwrite("principal_point", &CameraParameters::principle_point)
       .def_readwrite("principle_point", &CameraParameters::principle_point)

@@ -1,13 +1,11 @@
+#pragma once
+
+#include "g2opy.h"
 #include <g2o/types/icp/types_icp.h>
-#include <pybind11/eigen.h>
-#include <pybind11/pybind11.h>
 
 #include "python/core/py_base_binary_edge.h"
 #include "python/core/py_base_edge.h"
 #include "python/core/py_base_vertex.h"
-
-namespace py = pybind11;
-using namespace pybind11::literals;
 
 namespace g2o {
 

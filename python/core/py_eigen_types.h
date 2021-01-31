@@ -1,11 +1,8 @@
 #pragma once
 
 #include <g2o/core/eigen_types.h>
-#include <pybind11/eigen.h>
-#include <pybind11/operators.h>
-#include <pybind11/pybind11.h>
 
-namespace py = pybind11;
+#include "g2opy.h"
 
 namespace g2o {
 namespace {

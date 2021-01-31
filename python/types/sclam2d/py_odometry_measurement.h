@@ -1,8 +1,7 @@
-#include <g2o/types/sclam2d/odometry_measurement.h>
-#include <pybind11/pybind11.h>
+#pragma once
 
-namespace py = pybind11;
-using namespace pybind11::literals;
+#include <g2o/types/sclam2d/odometry_measurement.h>
+#include "g2opy.h"
 
 namespace g2o {
 

@@ -1,5 +1,3 @@
-# https://github.com/RainerKuemmerle/g2o/blob/master/g2o/examples/simple_optimize/simple_optimize.cpp
-
 import numpy as np
 import g2opy
 import os

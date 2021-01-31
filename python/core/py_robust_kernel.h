@@ -1,10 +1,9 @@
+#pragma once
+
 #include <g2o/core/robust_kernel.h>
 #include <g2o/core/robust_kernel_impl.h>
-#include <pybind11/eigen.h>
-#include <pybind11/pybind11.h>
 
-namespace py = pybind11;
-using namespace pybind11::literals;
+#include "g2opy.h"
 
 namespace g2o {
 

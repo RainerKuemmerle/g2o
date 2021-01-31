@@ -1,3 +1,5 @@
+#pragma once
+
 #include <g2o/core/estimate_propagator.h>
 #include <g2o/core/hyper_graph_action.h>
 #include <g2o/core/optimization_algorithm.h>
@@ -7,11 +9,8 @@
 #include <g2o/core/optimization_algorithm_levenberg.h>
 #include <g2o/core/optimization_algorithm_with_hessian.h>
 #include <g2o/core/sparse_optimizer.h>
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
 
-namespace py = pybind11;
-using namespace pybind11::literals;
+#include "g2opy.h"
 
 namespace g2o {
 

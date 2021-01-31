@@ -1,8 +1,6 @@
 #pragma once
-
-#include <pybind11/pybind11.h>
-
 #include "g2o/core/base_binary_edge.h"
+#include "g2opy.h"
 #include "python/core/py_base_fixed_sized_edge.h"
 
 namespace g2o {

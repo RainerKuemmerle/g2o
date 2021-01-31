@@ -1,5 +1,3 @@
-#include <pybind11/pybind11.h>
-
 #include "g2o/core/optimization_algorithm.h"
 #include "g2o/core/optimization_algorithm_dogleg.h"
 #include "g2o/core/optimization_algorithm_factory.h"
@@ -7,10 +5,8 @@
 #include "g2o/core/optimization_algorithm_levenberg.h"
 #include "g2o/core/optimization_algorithm_property.h"
 #include "g2o/core/optimization_algorithm_with_hessian.h"
+#include "g2opy.h"
 #include "py_block_solver.h"
-
-namespace py = pybind11;
-using namespace pybind11::literals;
 
 namespace g2o {
 

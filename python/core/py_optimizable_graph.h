@@ -1,3 +1,5 @@
+#pragma once
+
 #include <g2o/core/hyper_graph_action.h>
 #include <g2o/core/jacobian_workspace.h>
 #include <g2o/core/robust_kernel.h>
@@ -6,8 +8,7 @@
 //#include <g2o/core/parameter_container.h>
 #include <g2o/core/optimizable_graph.h>
 
-namespace py = pybind11;
-using namespace pybind11::literals;
+#include "g2opy.h"
 
 namespace g2o {
 

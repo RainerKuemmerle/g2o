@@ -1,14 +1,11 @@
-#include <pybind11/eigen.h>
-#include <pybind11/pybind11.h>
+#pragma once
 
 #include "g2o/types/slam2d/edge_se2_pointxy.h"
 #include "g2o/types/slam2d/edge_se2_pointxy_bearing.h"
 #include "g2o/types/slam2d/edge_se2_pointxy_calib.h"
 #include "g2o/types/slam2d/edge_se2_pointxy_offset.h"
+#include "g2opy.h"
 #include "python/core/py_base_binary_edge.h"
-
-namespace py = pybind11;
-using namespace pybind11::literals;
 
 namespace g2o {
 

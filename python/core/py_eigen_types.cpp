@@ -1,7 +1,5 @@
 #include "py_eigen_types.h"
 
-using namespace pybind11::literals;
-
 namespace g2o {
 
 void declareEigenTypes(py::module& m) {

@@ -1,7 +1,7 @@
 # https://github.com/RainerKuemmerle/g2o/blob/master/g2o/examples/icp/gicp_demo.cpp
 
 import numpy as np
-import g2o
+import g2opy as g2o
 
 import argparse
 

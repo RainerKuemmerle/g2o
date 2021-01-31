@@ -1,4 +1,6 @@
-#include <pybind11/pybind11.h>
+#pragma once
+
+#include "g2opy.h"
 
 namespace g2o {
 

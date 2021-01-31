@@ -1,15 +1,12 @@
-#include <pybind11/eigen.h>
-#include <pybind11/pybind11.h>
+#pragma once
 
 #include "g2o/types/slam3d/edge_se3.h"
 #include "g2o/types/slam3d/edge_se3_lotsofxyz.h"
 #include "g2o/types/slam3d/edge_se3_offset.h"
 #include "g2o/types/slam3d/edge_se3_prior.h"
+#include "g2opy.h"
 #include "python/core/py_base_binary_edge.h"
 #include "python/core/py_base_unary_edge.h"
-
-namespace py = pybind11;
-using namespace pybind11::literals;
 
 namespace g2o {
 

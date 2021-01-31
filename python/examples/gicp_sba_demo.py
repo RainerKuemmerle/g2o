@@ -1,7 +1,7 @@
 # https://github.com/RainerKuemmerle/g2o/blob/master/g2o/examples/icp/gicp_sba_demo.cpp
 
-import numpy as np 
-import g2o
+import numpy as np
+import g2opy as g2o
 
 import argparse
 
@@ -25,7 +25,7 @@ def main():
         np.random.random((1000, 1)) - 0.5,
         np.random.random((1000, 1)) + 10])
 
-    
+
     focal_length = (500, 500)
     principal_point = (320, 240)
     baseline = 0.075
@@ -132,7 +132,7 @@ def main():
                  100:   [ 0.05319327  0.37413272  0.01637925]
                 1000:   [ 0.01652139  0.19501433  0.00502872]
                10000:   [ 0.00901297  0.04055765  0.00130791]   ->  1/3 : 1 : 1/16
-    
+
     '''
 
 

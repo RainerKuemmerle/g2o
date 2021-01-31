@@ -1,8 +1,6 @@
 #include "py_types_slam2d.h"
 
-#include <pybind11/pybind11.h>
-
-#include "g2o/types/slam2d/types_slam2d.h"
+#include "g2opy.h"
 #include "py_edge_pointxy.h"
 #include "py_edge_se2.h"
 #include "py_edge_se2_pointxy.h"

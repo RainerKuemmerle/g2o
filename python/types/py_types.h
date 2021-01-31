@@ -1,4 +1,6 @@
-#include <pybind11/pybind11.h>
+#pragma once
+
+#include "g2opy.h"
 
 #include "icp/py_types_icp.h"
 #include "sba/py_sbacam.h"
@@ -9,9 +11,6 @@
 #include "sim3/py_types_seven_dof_expmap.h"
 #include "slam2d/py_types_slam2d.h"
 #include "slam3d/py_types_slam3d.h"
-
-namespace py = pybind11;
-using namespace pybind11::literals;
 
 namespace g2o {
 

@@ -1,8 +1,5 @@
 #include "py_base_variable_sized_edge.h"
 
-namespace py = pybind11;
-using namespace pybind11::literals;
-
 namespace g2o {
 
 void declareBaseVariableSizedEdge(py::module& m) {

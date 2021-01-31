@@ -1,8 +1,8 @@
-#include <g2o/core/sparse_optimizer_terminate_action.h>
-#include <pybind11/pybind11.h>
+#pragma once
 
-namespace py = pybind11;
-using namespace pybind11::literals;
+#include <g2o/core/sparse_optimizer_terminate_action.h>
+#include "g2opy.h"
+
 
 namespace g2o {
 

@@ -1,13 +1,9 @@
-#include <pybind11/eigen.h>
-#include <pybind11/operators.h>
-#include <pybind11/pybind11.h>
+#pragma once
 
 #include "g2o/types/sim3/sim3.h"
+#include "g2opy.h"
 #include "python/core/py_base_edge.h"
 #include "python/core/py_base_vertex.h"
-
-namespace py = pybind11;
-using namespace pybind11::literals;
 
 namespace g2o {
 
