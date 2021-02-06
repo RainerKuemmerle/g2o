@@ -25,8 +25,4 @@ void templatedLinearSolverCCS(py::module& m, const std::string& suffix) {
       ;
 }
 
-void declareLinearSolver(py::module& m) {
-  // common types
-}
-
 }  // namespace g2o

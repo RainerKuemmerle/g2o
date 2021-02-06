@@ -4,6 +4,6 @@
 
 namespace g2o {
 
-void declareTypesSlam2d(pybind11::module& m);
+void declareTypesSlam2d(py::module& m);
 
 }  // namespace g2o

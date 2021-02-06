@@ -2,7 +2,7 @@
 
 namespace g2o {
 
-void declareBaseEdge(pybind11::module& m) {
+void declareBaseEdge(py::module& m) {
   // common types
   templatedBaseEdge<1, double>(m, "_1_double");
   templatedBaseEdge<2, Vector2>(m, "_2_Vector2");

@@ -24,13 +24,8 @@ void declareEdgeSE2(py::module& m) {
       .def("set_measurement_from_state", &EdgeSE2::setMeasurementFromState)
       .def("initial_estimate_possible", &EdgeSE2::initialEstimatePossible)
       .def("initial_estimate", &EdgeSE2::initialEstimate)
-#ifndef NUMERIC_JACOBIAN_TWO_D_TYPES
       .def("linearize_oplus", &EdgeSE2::linearizeOplus)
-#endif
       ;
-
-  // class G2O_TYPES_SLAM2D_API EdgeSE2WriteGnuplotAction: public WriteGnuplotAction
-  // class G2O_TYPES_SLAM2D_API EdgeSE2DrawAction: public DrawAction
 
   py::class_<EdgeSE2LotsOfXY, BaseVariableSizedEdge<-1, VectorX>>(m, "EdgeSE2LotsOfXY")
       .def(py::init<>())

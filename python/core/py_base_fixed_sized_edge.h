@@ -6,11 +6,10 @@
 namespace g2o {
 
 template <int D, typename E, typename... VertexTypes>
-void templatedBaseFixedSizedEdge(pybind11::module& m, const std::string& suffix) {
-  using namespace pybind11::literals;
+void templatedBaseFixedSizedEdge(py::module& m, const std::string& suffix) {
   using CLS = BaseFixedSizedEdge<D, E, VertexTypes...>;
 
-  pybind11::class_<CLS, BaseEdge<D, E>>(m, ("BaseFixedSizedEdge" + suffix).c_str())
+  py::class_<CLS, BaseEdge<D, E>>(m, ("BaseFixedSizedEdge" + suffix).c_str())
       //.def(py::init<>())    // lead to "error: invalid new-expression of abstract class type ..."
       .def("create_vertex", &CLS::createVertex, "i"_a)  // -> OptimizableGraph::Vertex*
       .def("resize", &CLS::resize)

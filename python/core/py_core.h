@@ -5,7 +5,7 @@
 #include "g2opy.h"
 
 namespace g2o {
-void declareCore(pybind11::module& m);
+void declareCore(py::module& m);
 }
 
 #endif

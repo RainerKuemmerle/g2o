@@ -29,6 +29,14 @@ pybind11_add_module(g2opy
     core/py_block_solver.cpp
     core/py_core.cpp
     core/py_eigen_types.cpp
+    core/py_estimate_propagator.cpp
+    core/py_hyper_dijkstra.cpp
+    core/py_hyper_graph.cpp
+    core/py_jacobian_workspace.cpp
+    core/py_optimizable_graph.cpp
+    core/py_optimization_algorithm.cpp
+    core/py_robust_kernel.cpp
+    core/py_sparse_optimizer.cpp
     # types
     types/slam2d/py_types_slam2d.cpp
     types/slam3d/py_types_slam3d.cpp

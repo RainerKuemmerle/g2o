@@ -25,7 +25,7 @@
 
 namespace g2o {
 
-void declareCore(pybind11::module& m) {
+void declareCore(py::module& m) {
   declareHyperGraph(m);
   declareOptimizableGraph(m);
   declareSparseOptimizer(m);
@@ -46,7 +46,6 @@ void declareCore(pybind11::module& m) {
 
   declareRobustKernel(m);
   declareSolver(m);
-  declareLinearSolver(m);
   declareBlockSolver(m);
 
   declareOptimizationAlgorithm(m);

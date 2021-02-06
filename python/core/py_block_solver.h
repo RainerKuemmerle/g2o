@@ -15,9 +15,6 @@
 #include <g2o/solvers/csparse/linear_solver_csparse.h>
 #endif
 
-namespace py = pybind11;
-using namespace pybind11::literals;
-
 namespace g2o {
 
 // helper class

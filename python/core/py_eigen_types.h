@@ -9,7 +9,6 @@ namespace {
 
 template <typename _Scalar, int _Dim, int _Mode, int _Options = Eigen::AutoAlign>
 void templatedEigenIsometry(py::module& m, const std::string& name) {
-  using namespace pybind11::literals;
   using CLS = Eigen::Transform<_Scalar, _Dim, _Mode, _Options>;
 
   typedef typename Eigen::Matrix<_Scalar, CLS::Rows, CLS::HDim, CLS::Options> MatrixType;
