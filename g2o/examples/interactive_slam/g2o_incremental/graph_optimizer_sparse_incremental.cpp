@@ -91,8 +91,7 @@ namespace g2o {
   int SparseOptimizerIncremental::optimize(int iterations, bool online)
   {
     (void) iterations; // we only do one iteration anyhow
-    OptimizationAlgorithm* solver = _algorithm;
-    solver->init(online);
+    _algorithm->init(online);
 
     bool ok=true;
 
@@ -451,7 +450,7 @@ namespace g2o {
     return true;
   }
 
-  static OptimizationAlgorithm* createSolver(const std::string& solverName)
+  static std::unique_ptr<OptimizationAlgorithm> createSolver(const std::string& solverName)
   {
     std::unique_ptr<g2o::Solver> s;
 
@@ -462,7 +461,7 @@ namespace g2o {
       s = AllocateCholmodSolver<6, 3>();
     }
 
-    OptimizationAlgorithmGaussNewton* gaussNewton = new OptimizationAlgorithmGaussNewton(std::move(s));
+    std::unique_ptr<OptimizationAlgorithm> gaussNewton(new OptimizationAlgorithmGaussNewton(std::move(s)));
     return gaussNewton;
   }
 
@@ -472,7 +471,7 @@ namespace g2o {
     slamDimension = dimension;
     if (dimension == 3) {
       setAlgorithm(createSolver("fix3_2_cholmod"));
-      OptimizationAlgorithmGaussNewton* gaussNewton = dynamic_cast<OptimizationAlgorithmGaussNewton*>(solver());
+      OptimizationAlgorithmGaussNewton* gaussNewton = dynamic_cast<OptimizationAlgorithmGaussNewton*>(solver().get());
       assert(gaussNewton);
       BlockSolver<BlockSolverTraits<3, 2> >* bs = dynamic_cast<BlockSolver<BlockSolverTraits<3, 2> >*>(&gaussNewton->solver());
       assert(bs && "Unable to get internal block solver");
@@ -483,7 +482,7 @@ namespace g2o {
       _underlyingSolver = bs;
     } else {
       setAlgorithm(createSolver("fix6_3_cholmod"));
-      OptimizationAlgorithmGaussNewton* gaussNewton = dynamic_cast<OptimizationAlgorithmGaussNewton*>(solver());
+      OptimizationAlgorithmGaussNewton* gaussNewton = dynamic_cast<OptimizationAlgorithmGaussNewton*>(solver().get());
       assert(gaussNewton);
       BlockSolver<BlockSolverTraits<6, 3> >* bs = dynamic_cast<BlockSolver<BlockSolverTraits<6, 3> >*>(&gaussNewton->solver());
       assert(bs && "Unable to get internal block solver");

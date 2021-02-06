@@ -36,6 +36,8 @@
 
 #include "g2o/stuff/macros.h"
 
+#include <memory>
+
 namespace g2o {
 
   namespace
@@ -65,9 +67,9 @@ namespace g2o {
   {
     public:
       explicit SLAM2DLinearSolverCreator(const OptimizationAlgorithmProperty& p) : AbstractOptimizationAlgorithmCreator(p) {}
-      virtual OptimizationAlgorithm* construct()
+      virtual std::unique_ptr<OptimizationAlgorithm> construct()
       {
-        return createSolver(property().name);
+        return std::unique_ptr<OptimizationAlgorithm>(createSolver(property().name));
       }
   };
 

@@ -126,10 +126,10 @@ int main(int argc, const char* argv[])
 #endif
   }
 
-  g2o::OptimizationAlgorithmLevenberg* solver = new g2o::OptimizationAlgorithmLevenberg(
-    g2o::make_unique<g2o::BlockSolver_6_3>(std::move(linearSolver)));
+  std::unique_ptr<g2o::OptimizationAlgorithm> solver(new g2o::OptimizationAlgorithmLevenberg(
+      g2o::make_unique<g2o::BlockSolver_6_3>(std::move(linearSolver))));
 
-  optimizer.setAlgorithm(solver);
+  optimizer.setAlgorithm(std::move(solver));
 
   // set up 500 points
   vector<Vector3d> true_points;

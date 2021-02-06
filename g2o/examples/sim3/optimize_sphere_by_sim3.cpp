@@ -108,11 +108,11 @@ int main(int argc, char** argv) {
   typedef g2o::BlockSolver<g2o::BlockSolverTraits<7, 7>> BlockSolverType;
   typedef g2o::LinearSolverEigen<BlockSolverType::PoseMatrixType>
       LinearSolverType;
-  auto solver = new g2o::OptimizationAlgorithmLevenberg(
-      g2o::make_unique<BlockSolverType>(g2o::make_unique<LinearSolverType>()));
+  std::unique_ptr<g2o::OptimizationAlgorithm> solver(new g2o::OptimizationAlgorithmLevenberg(
+      g2o::make_unique<BlockSolverType>(g2o::make_unique<LinearSolverType>())));
 
   g2o::SparseOptimizer optimizer;
-  optimizer.setAlgorithm(solver);
+  optimizer.setAlgorithm(std::move(solver));
   optimizer.setVerbose(true);
 
   // Load and Save in SE3

@@ -56,8 +56,7 @@ namespace g2o{
 
   SparseOptimizer::~SparseOptimizer()
   {
-    release(_algorithm);
-    G2OBatchStatistics::setGlobalStats(0);
+    G2OBatchStatistics::setGlobalStats(nullptr);
   }
 
   void SparseOptimizer::computeActiveErrors()
@@ -567,12 +566,12 @@ namespace g2o{
     _verbose = verbose;
   }
 
-  void SparseOptimizer::setAlgorithm(OptimizationAlgorithm* algorithm)
+  void SparseOptimizer::setAlgorithm(std::unique_ptr<OptimizationAlgorithm> algorithm)
   {
     if (_algorithm) // reset the optimizer for the formerly used solver
       _algorithm->setOptimizer(nullptr);
 
-    _algorithm = algorithm;
+    _algorithm = std::move(algorithm);
 
     if (_algorithm)
       _algorithm->setOptimizer(this);

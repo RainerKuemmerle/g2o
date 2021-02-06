@@ -66,9 +66,8 @@ TEST(AlgorithmFactory, AllocatingSolver) {
     g2o::OptimizationAlgorithmProperty solverProperty;
     std::string name = creator->property().name;
 
-    g2o::OptimizationAlgorithm* algo = factory->construct(name, solverProperty);
+    auto algo = factory->construct(name, solverProperty);
     ASSERT_NE(nullptr, algo) << "Cannot allocate solver " << name;
-    delete algo;
   }
 }
 
@@ -77,9 +76,8 @@ TEST(AlgorithmFactory, AllocatingInvalidReturnsNull) {
 
   const std::string name("xyz_supper_solver");
   g2o::OptimizationAlgorithmProperty solverProperty;
-  g2o::OptimizationAlgorithm* algo = factory->construct(name, solverProperty);
+  auto algo = factory->construct(name, solverProperty);
   ASSERT_EQ(nullptr, algo) << "Allocated a solver " << name;
-  delete algo;
 }
 
 TEST(AlgorithmFactory, PrintSolverProperties) {
@@ -87,14 +85,12 @@ TEST(AlgorithmFactory, PrintSolverProperties) {
 
   const std::string name("gn_var");
   g2o::OptimizationAlgorithmProperty solverProperty;
-  g2o::OptimizationAlgorithm* algo = factory->construct(name, solverProperty);
+  auto algo = factory->construct(name, solverProperty);
   ASSERT_NE(nullptr, algo) << "Did not manager to allocate solver " << name;
 
   std::stringstream solverPropertyStream;
   algo->printProperties(solverPropertyStream);
   ASSERT_FALSE(solverPropertyStream.str().empty());
-
-  delete algo;
 }
 
 TEST(AlgorithmFactory, ListsAllSolvers) {

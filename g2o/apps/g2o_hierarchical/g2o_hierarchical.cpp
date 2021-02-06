@@ -265,8 +265,8 @@ int main(int argc, char** argv)
 
   // allocating the desired solver + testing whether the solver is okay
   OptimizationAlgorithmProperty solverProperty, hsolverProperty;
-  OptimizationAlgorithm* solver = solverFactory->construct(strSolver, solverProperty);
-  OptimizationAlgorithm* hsolver = solverFactory->construct(strHSolver, hsolverProperty);
+  auto solver = solverFactory->construct(strSolver, solverProperty);
+  auto hsolver = solverFactory->construct(strHSolver, hsolverProperty);
   if (! solver) {
     cerr << "Error allocating solver. Allocating \"" << strSolver << "\" failed!" << endl;
     return 0;
@@ -286,7 +286,7 @@ int main(int argc, char** argv)
     return 3;
   }
 
-  optimizer.setAlgorithm(solver);
+  optimizer.setAlgorithm(std::move(solver));
 
   int poseDim=*vertexDimensions.rbegin();
   string backboneVertexType;
@@ -453,7 +453,8 @@ int main(int argc, char** argv)
     OptimizableGraph::Vertex* g=dynamic_cast<OptimizableGraph::Vertex*>(*it);
     g->setFixed(true);
   }
-  optimizer.setAlgorithm(hsolver);
+  solver = std::move(optimizer.solver());
+  optimizer.setAlgorithm(std::move(hsolver));
   optimizer.initializeOptimization(heset);
   optimizer.setVerbose(true);
   if (initialGuess)
@@ -505,7 +506,8 @@ int main(int argc, char** argv)
     OptimizableGraph::Vertex* g=dynamic_cast<OptimizableGraph::Vertex*>(*it);
     g->setFixed(true);
   }
-  optimizer.setAlgorithm(solver);
+  hsolver = std::move(optimizer.solver());
+  optimizer.setAlgorithm(std::move(solver));
   optimizer.initializeOptimization(0);
   optimizer.computeInitialGuess();
   optimizer.optimize(lowIterations);
@@ -520,7 +522,6 @@ int main(int argc, char** argv)
     OptimizableGraph::Vertex* g=dynamic_cast<OptimizableGraph::Vertex*>(*it);
     g->setFixed(true);
   }
-  optimizer.setAlgorithm(solver);
   optimizer.initializeOptimization(0);
   int result = optimizer.optimize(lowIterations);
   if (result <0)

@@ -240,11 +240,11 @@ int main(int argc, char** argv) {
     cholesky->setBlockOrdering(true);
     linearSolver = std::move(cholesky);
   }
-  g2o::OptimizationAlgorithmLevenberg* solver = new g2o::OptimizationAlgorithmLevenberg(
+  auto solver = g2o::make_unique<g2o::OptimizationAlgorithmLevenberg>(
       g2o::make_unique<BalBlockSolver>(std::move(linearSolver)));
 
   // solver->setUserLambdaInit(1);
-  optimizer.setAlgorithm(solver);
+  optimizer.setAlgorithm(std::unique_ptr<g2o::OptimizationAlgorithm>(solver.release()));
   if (statsFilename.size() > 0) {
     optimizer.setComputeBatchStatistics(true);
   }

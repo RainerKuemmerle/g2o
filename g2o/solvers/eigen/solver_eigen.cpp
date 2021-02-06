@@ -24,6 +24,8 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+#include <memory>
+
 #include "g2o/core/block_solver.h"
 #include "g2o/core/optimization_algorithm_dogleg.h"
 #include "g2o/core/optimization_algorithm_factory.h"
@@ -86,7 +88,9 @@ class EigenSolverCreator : public AbstractOptimizationAlgorithmCreator {
  public:
   explicit EigenSolverCreator(const OptimizationAlgorithmProperty& p)
       : AbstractOptimizationAlgorithmCreator(p) {}
-  virtual OptimizationAlgorithm* construct() { return createSolver(property().name); }
+  virtual std::unique_ptr<OptimizationAlgorithm> construct() {
+    return std::unique_ptr<OptimizationAlgorithm>(createSolver(property().name));
+  }
 };
 
 // clang-format off

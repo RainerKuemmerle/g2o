@@ -58,10 +58,10 @@ int main(int argc, char **argv)
   optimizer.setVerbose(false);
 
   // variable-size block solver
-  g2o::OptimizationAlgorithmLevenberg* solver = new g2o::OptimizationAlgorithmLevenberg(
+  g2o::OptimizationAlgorithm* solver = new g2o::OptimizationAlgorithmLevenberg(
     g2o::make_unique<BlockSolverX>(g2o::make_unique<LinearSolverEigen<g2o::BlockSolverX::PoseMatrixType>>()));
 
-  optimizer.setAlgorithm(solver);
+  optimizer.setAlgorithm(std::unique_ptr<OptimizationAlgorithm>(solver));
 
   vector<Vector3d> true_points;
   for (size_t i=0;i<1000; ++i)

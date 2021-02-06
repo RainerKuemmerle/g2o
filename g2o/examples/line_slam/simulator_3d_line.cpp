@@ -2,9 +2,6 @@
 #include <fstream>
 
 #include "g2o/core/sparse_optimizer.h"
-#include "g2o/core/block_solver.h"
-#include "g2o/core/linear_solver.h"
-#include "g2o/core/optimization_algorithm_factory.h"
 #include "g2o/types/slam3d/types_slam3d.h"
 #include "g2o/types/slam3d_addons/types_slam3d_addons.h"
 #include "g2o/stuff/macros.h"
@@ -14,8 +11,6 @@
 using namespace g2o;
 using namespace std;
 using namespace Eigen;
-
-G2O_USE_OPTIMIZATION_LIBRARY(eigen)
 
 Eigen::Isometry3d sample_noise_from_se3(const Vector6& cov ) {
   double nx = Sampler::gaussRand(0., cov(0));
@@ -241,42 +236,16 @@ struct LineSensor : public Sensor {
 };
 
 int main (int argc, char** argv) {
-  bool verbose, robustKernel, fixLines, planarMotion, listSolvers;
-  int maxIterations;
-  double lambdaInit;
-  string strSolver;
+  bool fixLines, planarMotion;
   CommandArgs arg;
-  arg.param("i", maxIterations, 10, "perform n iterations");
-  arg.param("v", verbose, false, "verbose output of the optimization process");
-  arg.param("solver", strSolver, "lm_var", "select one specific solver");
-  arg.param("lambdaInit", lambdaInit, 0, "user specified lambda init for levenberg");
-  arg.param("robustKernel", robustKernel, false, "use robust error functions");
   arg.param("fixLines", fixLines, false, "fix the lines (do localization only)");
   arg.param("planarMotion", planarMotion, false, "robot moves on a plane");
-  arg.param("listSolvers", listSolvers, false, "list the solvers");
   arg.parseArgs(argc, argv);
 
   SparseOptimizer* g = new SparseOptimizer();
   ParameterSE3Offset* odomOffset = new ParameterSE3Offset();
   odomOffset->setId(0);
   g->addParameter(odomOffset);
-
-  OptimizationAlgorithmFactory* solverFactory = OptimizationAlgorithmFactory::instance();
-  OptimizationAlgorithmProperty solverProperty;
-  OptimizationAlgorithm* solver = solverFactory->construct(strSolver, solverProperty);
-  g->setAlgorithm(solver);
-  if(listSolvers) {
-    solverFactory->listSolvers(std::cout);
-    return 0;
-  }
-
-  if(!g->solver()) {
-    std::cout << "Error allocating solver. Allocating \"" << strSolver << "\" failed!" << std::endl;
-    std::cout << "Available solvers: " << std::endl;
-    solverFactory->listSolvers(std::cout);
-    std::cout << "--------------" << std::endl;
-    return 0;
-  }
 
   std::cout << "Creating simulator" << std::endl;
   Simulator* sim = new Simulator(g);

@@ -118,7 +118,7 @@ namespace g2o {
     } else {
       solver = new OptimizationAlgorithmGaussNewton(g2o::make_unique<SclamBlockSolver>(std::move(linearSolver)));
     }
-    optimizer.setAlgorithm(solver);
+    optimizer.setAlgorithm(std::unique_ptr<OptimizationAlgorithm>(solver));
   }
 
 } // end namespace

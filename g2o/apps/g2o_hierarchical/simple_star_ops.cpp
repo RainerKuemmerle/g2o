@@ -252,7 +252,7 @@ void computeSimpleStars(StarSet& stars, SparseOptimizer* optimizer, EdgeLabeler*
 
     // RAINER TODO maybe need a better solution than dynamic casting here??
     OptimizationAlgorithmWithHessian* solverWithHessian =
-        dynamic_cast<OptimizationAlgorithmWithHessian*>(s->optimizer()->solver());
+        dynamic_cast<OptimizationAlgorithmWithHessian*>(s->optimizer()->solver().get());
     if (solverWithHessian) {
       s->optimizer()->push(otherVertices);
       // cerr << "optimizing vertices out of bbone" << endl;

@@ -14,6 +14,8 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+#include <memory>
+
 #include "g2o/core/block_solver.h"
 #include "g2o/core/optimization_algorithm_dogleg.h"
 #include "g2o/core/optimization_algorithm_factory.h"
@@ -76,7 +78,9 @@ class CSparseSolverCreator : public AbstractOptimizationAlgorithmCreator {
  public:
   explicit CSparseSolverCreator(const OptimizationAlgorithmProperty& p)
       : AbstractOptimizationAlgorithmCreator(p) {}
-  virtual OptimizationAlgorithm* construct() { return createSolver(property().name); }
+  virtual std::unique_ptr<OptimizationAlgorithm> construct() {
+    return std::unique_ptr<OptimizationAlgorithm>(createSolver(property().name));
+  }
 };
 
 // clang-format off

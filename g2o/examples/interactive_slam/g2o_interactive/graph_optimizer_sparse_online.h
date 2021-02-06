@@ -57,7 +57,7 @@ namespace g2o {
       bool vizWithGnuplot;
 
       virtual void gnuplotVisualization();
-      
+
     protected:
       FILE* _gnuplot;
       bool _usePcg;

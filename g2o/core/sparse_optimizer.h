@@ -34,6 +34,7 @@
 #include "g2o_core_api.h"
 #include "batch_stats.h"
 
+#include <memory>
 
 namespace g2o {
 
@@ -60,7 +61,7 @@ namespace g2o {
     // the old functions will be dropped
     /**
      * Initializes the structures for optimizing a portion of the graph specified by a subset of edges.
-     * Before calling it be sure to invoke marginalized() and fixed() to the vertices you want to include in the 
+     * Before calling it be sure to invoke marginalized() and fixed() to the vertices you want to include in the
      * schur complement or to set as fixed during the optimization.
      * @param eset: the subgraph to be optimized.
      * @returns false if somethings goes wrong
@@ -69,7 +70,7 @@ namespace g2o {
 
     /**
      * Initializes the structures for optimizing a portion of the graph specified by a subset of vertices.
-     * Before calling it be sure to invoke marginalized() and fixed() to the vertices you want to include in the 
+     * Before calling it be sure to invoke marginalized() and fixed() to the vertices you want to include in the
      * schur complement or to set as fixed during the optimization.
      * @param vset: the subgraph to be optimized.
      * @param level: is the level (in multilevel optimization)
@@ -79,7 +80,7 @@ namespace g2o {
 
     /**
      * Initializes the structures for optimizing the whole graph.
-     * Before calling it be sure to invoke marginalized() and fixed() to the vertices you want to include in the 
+     * Before calling it be sure to invoke marginalized() and fixed() to the vertices you want to include in the
      * schur complement or to set as fixed during the optimization.
      * @param level: is the level (in multilevel optimization)
      * @returns false if somethings goes wrong
@@ -90,7 +91,7 @@ namespace g2o {
      * HACK updating the internal structures for online processing
      */
     virtual bool updateInitialization(HyperGraph::VertexSet& vset, HyperGraph::EdgeSet& eset);
-  
+
     /**
      * Propagates an initial guess from the vertex specified as origin.
      * It should be called after initializeOptimization(...), as it relies on the _activeVertices/_edges structures.
@@ -113,7 +114,7 @@ namespace g2o {
 
 
     /**
-     * starts one optimization run given the current configuration of the graph, 
+     * starts one optimization run given the current configuration of the graph,
      * and the current settings stored in the class instance.
      * It can be called only after initializeOptimization
      */
@@ -213,9 +214,9 @@ namespace g2o {
     EdgeContainer::const_iterator findActiveEdge(const OptimizableGraph::Edge* e) const;
 
     //! the solver used by the optimizer
-    const OptimizationAlgorithm* algorithm() const { return _algorithm;}
-    OptimizationAlgorithm* solver() { return _algorithm;}
-    void setAlgorithm(OptimizationAlgorithm* algorithm);
+    const std::unique_ptr<OptimizationAlgorithm>& algorithm() const { return _algorithm;}
+    std::unique_ptr<OptimizationAlgorithm>& solver() { return _algorithm;}
+    void setAlgorithm(std::unique_ptr<OptimizationAlgorithm> algorithm);
 
     //! push the estimate of a subset of the variables onto a stack
     void push(SparseOptimizer::VertexContainer& vlist);
@@ -258,7 +259,7 @@ namespace g2o {
     }
 
     /**
-     * update the estimate of the active vertices 
+     * update the estimate of the active vertices
      * @param update: the number_t vector containing the stacked
      * elements of the increments on the vertices.
      */
@@ -272,9 +273,9 @@ namespace g2o {
        returns the set of batch statistics about the optimisation
     */
     BatchStatisticsContainer& batchStatistics() { return _batchStatistics;}
-    
+
     void setComputeBatchStatistics(bool computeBatchStatistics);
-    
+
     bool computeBatchStatistics() const { return _computeBatchStatistics;}
 
     /**** callbacks ****/
@@ -283,7 +284,7 @@ namespace g2o {
     //! remove an action that should no longer be execured before computing the error vectors
     bool removeComputeErrorAction(HyperGraphAction* action);
 
-    
+
 
     protected:
     bool* _forceStopFlag;
@@ -294,8 +295,8 @@ namespace g2o {
     EdgeContainer _activeEdges;        ///< sorted according to EdgeIDCompare
 
     void sortVectorContainers();
- 
-    OptimizationAlgorithm* _algorithm;
+
+    std::unique_ptr<OptimizationAlgorithm> _algorithm;
 
     /**
      * builds the mapping of the active vertices to the (block) row / column in the Hessian

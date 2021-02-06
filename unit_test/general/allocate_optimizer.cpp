@@ -28,7 +28,6 @@
 #include "g2o/core/optimization_algorithm_gauss_newton.h"
 #include "g2o/solvers/eigen/linear_solver_eigen.h"
 
-
 namespace g2o {
 namespace internal {
 
@@ -41,7 +40,8 @@ g2o::SparseOptimizer* createOptimizerForTests() {
   auto linearSolver = g2o::make_unique<SlamLinearSolver>();
   linearSolver->setBlockOrdering(false);
   auto blockSolver = g2o::make_unique<SlamBlockSolver>(std::move(linearSolver));
-  mOptimizer->setAlgorithm(new g2o::OptimizationAlgorithmGaussNewton(std::move(blockSolver)));
+  mOptimizer->setAlgorithm(std::unique_ptr<g2o::OptimizationAlgorithm>(
+      new g2o::OptimizationAlgorithmGaussNewton(std::move(blockSolver))));
   return mOptimizer;
 }
 

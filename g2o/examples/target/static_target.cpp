@@ -51,11 +51,11 @@ int main() {
   // Create the block solver - the dimensions are specified because
   // 3D observations marginalise to a 3D estimate
   typedef BlockSolver<BlockSolverTraits<3, 3>> BlockSolver_3_3;
-  OptimizationAlgorithmGaussNewton* solver =
+  std::unique_ptr<OptimizationAlgorithm> solver(
       new OptimizationAlgorithmGaussNewton(g2o::make_unique<BlockSolver_3_3>(
-          g2o::make_unique<LinearSolverEigen<BlockSolver_3_3::PoseMatrixType>>()));
+          g2o::make_unique<LinearSolverEigen<BlockSolver_3_3::PoseMatrixType>>())));
 
-  optimizer.setAlgorithm(solver);
+  optimizer.setAlgorithm(std::move(solver));
 
   // Sample the actual location of the target
   Vector3d truePoint(sampleUniform(-500, 500), sampleUniform(-500, 500), sampleUniform(-500, 500));

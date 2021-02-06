@@ -68,7 +68,7 @@ void OptimizationAlgorithmFactory::unregisterSolver(
   }
 }
 
-OptimizationAlgorithm* OptimizationAlgorithmFactory::construct(
+std::unique_ptr<OptimizationAlgorithm> OptimizationAlgorithmFactory::construct(
     const std::string& name, OptimizationAlgorithmProperty& solverProperty) const {
   CreatorList::const_iterator foundIt = findSolver(name);
   if (foundIt != _creator.end()) {
@@ -76,7 +76,7 @@ OptimizationAlgorithm* OptimizationAlgorithmFactory::construct(
     return (*foundIt)->construct();
   }
   cerr << "SOLVER FACTORY WARNING: Unable to create solver " << name << endl;
-  return nullptr;
+  return std::unique_ptr<OptimizationAlgorithm>();
 }
 
 void OptimizationAlgorithmFactory::destroy() {

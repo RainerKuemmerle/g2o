@@ -34,15 +34,13 @@
 #include "g2o/config.h"
 #include "g2o/stuff/misc.h"  // ForceLinker for the macros
 #include "g2o_core_api.h"
+#include "optimization_algorithm.h"
 #include "optimization_algorithm_property.h"
 
 // define to get some verbose output
 //#define G2O_DEBUG_OPTIMIZATION_ALGORITHM_FACTORY
 
 namespace g2o {
-
-// forward decl
-class G2O_CORE_API OptimizationAlgorithm;
 
 /**
  * \brief base for allocating an optimization algorithm
@@ -55,7 +53,7 @@ class G2O_CORE_API AbstractOptimizationAlgorithmCreator {
   AbstractOptimizationAlgorithmCreator(const OptimizationAlgorithmProperty& p);
   virtual ~AbstractOptimizationAlgorithmCreator() {}
   //! allocate a solver operating on optimizer, re-implement for your creator
-  virtual OptimizationAlgorithm* construct() = 0;
+  virtual std::unique_ptr<OptimizationAlgorithm> construct() = 0;
   //! return the properties of the solver
   const OptimizationAlgorithmProperty& property() const { return _property; }
 
@@ -96,8 +94,8 @@ class G2O_CORE_API OptimizationAlgorithmFactory {
   /**
    * construct a solver based on its name, e.g., var, fix3_2_cholmod
    */
-  OptimizationAlgorithm* construct(const std::string& tag,
-                                   OptimizationAlgorithmProperty& solverProperty) const;
+  std::unique_ptr<OptimizationAlgorithm> construct(
+      const std::string& tag, OptimizationAlgorithmProperty& solverProperty) const;
 
   //! list the known solvers into a stream
   void listSolvers(std::ostream& os) const;

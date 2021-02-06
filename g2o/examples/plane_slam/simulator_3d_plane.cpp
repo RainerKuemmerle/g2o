@@ -26,7 +26,6 @@
 
 #include <fstream>
 #include "g2o/core/sparse_optimizer.h"
-#include "g2o/core/optimization_algorithm_factory.h"
 #include "g2o/types/slam3d/types_slam3d.h"
 #include "g2o/types/slam3d_addons/types_slam3d_addons.h"
 #include "g2o/stuff/macros.h"
@@ -38,8 +37,6 @@
 using namespace g2o;
 using namespace std;
 using namespace Eigen;
-
-G2O_USE_OPTIMIZATION_LIBRARY(eigen)
 
 Eigen::Isometry3d sample_noise_from_se3(const Vector6& cov ){
   double nx=g2o::Sampler::gaussRand(0., cov(0));
@@ -260,55 +257,24 @@ struct PlaneSensor: public Sensor{
 };
 
 int main (int argc  , char ** argv){
-  int maxIterations;
-  bool verbose;
-  bool robustKernel;
-  double lambdaInit;
   CommandArgs arg;
   bool fixSensor;
   bool fixPlanes;
   bool fixFirstPose;
   bool fixTrajectory;
   bool planarMotion;
-  bool listSolvers;
-  string strSolver;
   cerr << "graph" << endl;
-  arg.param("i", maxIterations, 5, "perform n iterations");
-  arg.param("v", verbose, false, "verbose output of the optimization process");
-  arg.param("solver", strSolver, "lm_var", "select one specific solver");
-  arg.param("lambdaInit", lambdaInit, 0, "user specified lambda init for levenberg");
-  arg.param("robustKernel", robustKernel, false, "use robust error functions");
   arg.param("fixSensor", fixSensor, false, "fix the sensor position on the robot");
   arg.param("fixTrajectory", fixTrajectory, false, "fix the trajectory");
   arg.param("fixFirstPose", fixFirstPose, false, "fix the first robot pose");
   arg.param("fixPlanes", fixPlanes, false, "fix the planes (do localization only)");
   arg.param("planarMotion", planarMotion, false, "robot moves on a plane");
-  arg.param("listSolvers", listSolvers, false, "list the solvers");
   arg.parseArgs(argc, argv);
-
-
 
   SparseOptimizer* g=new SparseOptimizer();
   ParameterSE3Offset* odomOffset=new ParameterSE3Offset();
   odomOffset->setId(0);
   g->addParameter(odomOffset);
-
-  OptimizationAlgorithmFactory* solverFactory = OptimizationAlgorithmFactory::instance();
-  OptimizationAlgorithmProperty solverProperty;
-  OptimizationAlgorithm* solver = solverFactory->construct(strSolver, solverProperty);
-  g->setAlgorithm(solver);
-  if (listSolvers){
-    solverFactory->listSolvers(cerr);
-    return 0;
-  }
-
-  if (! g->solver()){
-    cerr << "Error allocating solver. Allocating \"" << strSolver << "\" failed!" << endl;
-    cerr << "available solvers: " << endl;
-    solverFactory->listSolvers(cerr);
-    cerr << "--------------" << endl;
-    return 0;
-  }
 
   cerr << "sim" << endl;
   Simulator* sim = new Simulator(g);
@@ -453,34 +419,6 @@ int main (int argc  , char ** argv){
 
   ofstream osp("test_preopt.g2o");
   g->save(osp);
-  //g->setMethod(SparseOptimizer::LevenbergMarquardt);
-  g->initializeOptimization();
-  g->setVerbose(verbose);
-  g->optimize(maxIterations);
-  if (! fixSensor ){
-    SparseBlockMatrix<MatrixXd> spinv;
-    std::pair<int, int> indexParams;
-    indexParams.first = ps->_offsetVertex->hessianIndex();
-    indexParams.second = ps->_offsetVertex->hessianIndex();
-    std::vector<std::pair <int, int> > blockIndices;
-    blockIndices.push_back(indexParams);
-    if (!g->computeMarginals(spinv,  blockIndices)){
-      cerr << "error in computing the covariance" << endl;
-    } else {
 
-      MatrixXd m = *spinv.block(ps->_offsetVertex->hessianIndex(), ps->_offsetVertex->hessianIndex());
-
-      cerr << "Param covariance" << endl;
-      cerr << m << endl;
-      cerr << "OffsetVertex: " << endl;
-      ps->_offsetVertex->write(cerr);
-      cerr <<  endl;
-      cerr << "rotationDeterminant: " << m.block<3,3>(0,0).determinant() << endl;
-      cerr << "translationDeterminant: " << m.block<3,3>(3,3).determinant()  << endl;
-      cerr << endl;
-    }
-  }
-  ofstream os1("test_postOpt.g2o");
-  g->save(os1);
-
+  return 0;
 }

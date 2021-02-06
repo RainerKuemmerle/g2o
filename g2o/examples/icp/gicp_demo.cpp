@@ -50,10 +50,11 @@ int main()
   optimizer.setVerbose(false);
 
   // variable-size block solver
-  g2o::OptimizationAlgorithmLevenberg* solver = new g2o::OptimizationAlgorithmLevenberg(
-    g2o::make_unique<BlockSolverX>(g2o::make_unique<LinearSolverDense<g2o::BlockSolverX::PoseMatrixType>>()));
+  std::unique_ptr<g2o::OptimizationAlgorithm> solver(
+      new g2o::OptimizationAlgorithmLevenberg(g2o::make_unique<BlockSolverX>(
+          g2o::make_unique<LinearSolverDense<g2o::BlockSolverX::PoseMatrixType>>())));
 
-  optimizer.setAlgorithm(solver);
+  optimizer.setAlgorithm(std::move(solver));
 
   vector<Vector3d> true_points;
   for (size_t i=0;i<1000; ++i)

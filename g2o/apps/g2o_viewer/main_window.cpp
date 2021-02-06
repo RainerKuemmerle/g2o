@@ -40,7 +40,7 @@ using namespace g2o;
 
 MainWindow::MainWindow(QWidget * parent, Qt::WindowFlags flags) :
   QMainWindow(parent, flags),
-  _lastSolver(-1), _currentSolver(0), _viewerPropertiesWidget(0), _optimizerPropertiesWidget(0),
+  _lastSolver(-1), _viewerPropertiesWidget(0), _optimizerPropertiesWidget(0),
   _filename("")
 {
   setupUi(this);
@@ -290,15 +290,9 @@ bool MainWindow::allocateSolver(bool& allocatedNewSolver)
   allocatedNewSolver = true;
   QString strSolver = coOptimizer->currentText();
 
-  // delete the old optimization algorithm
-  OptimizationAlgorithm* algorithmPointer = const_cast<OptimizationAlgorithm*>(viewer->graph->algorithm());
-  viewer->graph->setAlgorithm(0);
-  delete algorithmPointer;
-
   // create the new algorithm
   OptimizationAlgorithmFactory* solverFactory = OptimizationAlgorithmFactory::instance();
-  _currentSolver = solverFactory->construct(strSolver.toStdString(), _currentOptimizationAlgorithmProperty);
-  viewer->graph->setAlgorithm(_currentSolver);
+  viewer->graph->setAlgorithm(solverFactory->construct(strSolver.toStdString(), _currentOptimizationAlgorithmProperty));
 
   _lastSolver = currentIndex;
   return true;
@@ -417,8 +411,8 @@ void MainWindow::on_btnOptimizerParamaters_clicked()
   }
   if (allocatedNewSolver)
     prepare();
-  if (_currentSolver) {
-    _optimizerPropertiesWidget->setProperties(const_cast<g2o::PropertyMap*>(&_currentSolver->properties()));
+  if (viewer->graph->solver()) {
+    _optimizerPropertiesWidget->setProperties(const_cast<g2o::PropertyMap*>(&viewer->graph->solver()->properties()));
   } else {
     _optimizerPropertiesWidget->setProperties(0);
   }

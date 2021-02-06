@@ -60,11 +60,11 @@ int main() {
 
   typedef BlockSolver<BlockSolverTraits<6, 6>> BlockSolver;
 
-  OptimizationAlgorithm* optimizationAlgorithm =
+  std::unique_ptr<OptimizationAlgorithm> optimizationAlgorithm(
       new OptimizationAlgorithmGaussNewton(g2o::make_unique<BlockSolver>(
-          g2o::make_unique<LinearSolverEigen<BlockSolver::PoseMatrixType>>()));
+          g2o::make_unique<LinearSolverEigen<BlockSolver::PoseMatrixType>>())));
 
-  optimizer.setAlgorithm(optimizationAlgorithm);
+  optimizer.setAlgorithm(std::move(optimizationAlgorithm));
 
   // Sample the start location of the target
   Vector6d state;

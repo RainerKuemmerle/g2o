@@ -115,14 +115,14 @@ int main(int argc, const char* argv[]){
   g2o::SparseOptimizer optimizer;
   optimizer.setVerbose(false);
 
-  g2o::OptimizationAlgorithmLevenberg* solver;
+  std::unique_ptr<g2o::OptimizationAlgorithmLevenberg> solver;
   if (SCHUR_TRICK){
 #ifdef G2O_HAVE_CHOLMOD
     using LinearSolver = g2o::LinearSolverCholmod<g2o::BlockSolver_6_3::PoseMatrixType>;
 #else
     using LinearSolver = g2o::LinearSolverEigen<g2o::BlockSolver_6_3::PoseMatrixType>;
 #endif
-    solver = new g2o::OptimizationAlgorithmLevenberg(
+    solver = g2o::make_unique<g2o::OptimizationAlgorithmLevenberg>(
         g2o::make_unique<g2o::BlockSolver_6_3>(g2o::make_unique<LinearSolver>()));
   } else {
 #ifdef G2O_HAVE_CHOLMOD
@@ -130,11 +130,11 @@ int main(int argc, const char* argv[]){
 #else
     using LinearSolver = g2o::LinearSolverEigen<g2o::BlockSolverX::PoseMatrixType>;
 #endif
-    solver = new g2o::OptimizationAlgorithmLevenberg(
+    solver = g2o::make_unique<g2o::OptimizationAlgorithmLevenberg>(
         g2o::make_unique<g2o::BlockSolverX>(g2o::make_unique<LinearSolver>()));
   }
 
-  optimizer.setAlgorithm(solver);
+  optimizer.setAlgorithm(std::unique_ptr<g2o::OptimizationAlgorithm>(solver.release()));
 
   vector<Vector3d> true_points;
   for (size_t i=0;i<500; ++i){

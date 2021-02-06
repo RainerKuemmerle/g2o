@@ -236,13 +236,13 @@ int main(int argc, const char* argv[]) {
       g2o::make_unique<g2o::BlockSolverX>(move(linearSolver));
 
   // Set up the optimisation algorithm
-  g2o::OptimizationAlgorithm* optimisationAlgorithm =
-    new g2o::OptimizationAlgorithmLevenberg(move(blockSolver));
+  std::unique_ptr<g2o::OptimizationAlgorithm> optimisationAlgorithm(
+    new g2o::OptimizationAlgorithmLevenberg(move(blockSolver)));
 
   // Create the graph and configure it
   std::unique_ptr<g2o::SparseOptimizer> optimizer = g2o::make_unique<g2o::SparseOptimizer>();
   optimizer->setVerbose(true);
-  optimizer->setAlgorithm(optimisationAlgorithm);
+  optimizer->setAlgorithm(std::move(optimisationAlgorithm));
 
   // Create the f vertex; its dimensions are known
   FPolynomialCoefficientVertex* pf = new FPolynomialCoefficientVertex();

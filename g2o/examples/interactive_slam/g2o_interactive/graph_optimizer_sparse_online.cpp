@@ -86,11 +86,10 @@ int SparseOptimizerOnline::optimize(int iterations, bool online)
   //return SparseOptimizer::optimize(iterations, online);
 
   (void) iterations; // we only do one iteration anyhow
-  OptimizationAlgorithm* solver = _algorithm;
 
   bool ok=true;
 
-  solver->init(online);
+  _algorithm->init(online);
   if (!online) {
     ok = _underlyingSolver->buildStructure();
     if (! ok) {
@@ -210,7 +209,7 @@ bool SparseOptimizerOnline::initSolver(int dimension, int /*batchEveryN*/)
     }
 
     OptimizationAlgorithmGaussNewton* gaussNewton = new OptimizationAlgorithmGaussNewton(std::move(s));
-    setAlgorithm(gaussNewton);
+    setAlgorithm(std::unique_ptr<OptimizationAlgorithm>(gaussNewton));
   }
   else {
     if (dimension == 3) {
@@ -220,7 +219,7 @@ bool SparseOptimizerOnline::initSolver(int dimension, int /*batchEveryN*/)
     }
   }
 
-  OptimizationAlgorithmGaussNewton* gaussNewton = dynamic_cast<OptimizationAlgorithmGaussNewton*>(solver());
+  OptimizationAlgorithmGaussNewton* gaussNewton = dynamic_cast<OptimizationAlgorithmGaussNewton*>(solver().get());
   _underlyingSolver = &gaussNewton->solver();
 
   if (! solver()) {

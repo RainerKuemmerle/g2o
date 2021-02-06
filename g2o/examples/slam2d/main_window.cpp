@@ -19,43 +19,44 @@
 #include "main_window.h"
 //#include "moc_main_window.cpp"
 
-#include "g2o/core/sparse_optimizer.h"
-#include "g2o/core/estimate_propagator.h"
-
 #include <QFileDialog>
-
 #include <fstream>
 #include <iostream>
+
+#include "g2o/core/block_solver.h"
+#include "g2o/core/estimate_propagator.h"
+#include "g2o/core/optimization_algorithm_gauss_newton.h"
+#include "g2o/core/optimization_algorithm_levenberg.h"
+#include "g2o/core/sparse_optimizer.h"
+#include "g2o/solvers/eigen/linear_solver_eigen.h"
 using namespace std;
 
-MainWindow::MainWindow(QWidget * parent, Qt::WindowFlags flags) :
-  QMainWindow(parent, flags)
-{
+using SlamBlockSolver = g2o::BlockSolver<g2o::BlockSolverTraits<-1, -1> >;
+using SlamLinearSolver = g2o::LinearSolverEigen<SlamBlockSolver::PoseMatrixType>;
+
+MainWindow::MainWindow(QWidget* parent, Qt::WindowFlags flags) : QMainWindow(parent, flags) {
   setupUi(this);
 }
 
-MainWindow::~MainWindow()
-{
-}
+MainWindow::~MainWindow() {}
 
-void MainWindow::on_actionLoad_triggered(bool)
-{
+void MainWindow::on_actionLoad_triggered(bool) {
   viewer->graph->clear();
-  QString filename = QFileDialog::getOpenFileName(this, "Load g2o file", "", "g2o files (*.g2o);;All Files (*)");
-  if (! filename.isNull()) {
+  QString filename =
+      QFileDialog::getOpenFileName(this, "Load g2o file", "", "g2o files (*.g2o);;All Files (*)");
+  if (!filename.isNull()) {
     ifstream ifs(filename.toStdString().c_str());
     viewer->graph->load(ifs);
     cerr << "Graph loaded with " << viewer->graph->vertices().size() << " vertices and "
-      << viewer->graph->edges().size() << " measurments" << endl;
+         << viewer->graph->edges().size() << " measurments" << endl;
   }
   viewer->update();
   fixGraph();
 }
 
-void MainWindow::on_actionSave_triggered(bool)
-{
+void MainWindow::on_actionSave_triggered(bool) {
   QString filename = QFileDialog::getSaveFileName(this, "Save g2o file", "", "g2o files (*.g2o)");
-  if (! filename.isNull()) {
+  if (!filename.isNull()) {
     ofstream fout(filename.toStdString().c_str());
     viewer->graph->save(fout);
     if (fout.good())
@@ -65,13 +66,9 @@ void MainWindow::on_actionSave_triggered(bool)
   }
 }
 
-void MainWindow::on_actionQuit_triggered(bool)
-{
-  close();
-}
+void MainWindow::on_actionQuit_triggered(bool) { close(); }
 
-void MainWindow::on_btnOptimize_clicked()
-{
+void MainWindow::on_btnOptimize_clicked() {
   if (viewer->graph->vertices().size() == 0 || viewer->graph->edges().size() == 0) {
     cerr << "Graph has no vertices / egdes" << endl;
     return;
@@ -79,37 +76,39 @@ void MainWindow::on_btnOptimize_clicked()
 
   viewer->graph->initializeOptimization();
 
-  if (rbGauss->isChecked())
-    viewer->graph->setAlgorithm(solverGaussNewton);
-  else if (rbLevenberg->isChecked())
-    viewer->graph->setAlgorithm(solverLevenberg);
-  else
-    viewer->graph->setAlgorithm(solverGaussNewton);
+  if (rbGauss->isChecked()) {
+    if (!dynamic_cast<g2o::OptimizationAlgorithmGaussNewton*>(viewer->graph->solver().get()))
+      viewer->graph->setAlgorithm(createGaussNewton());
+  } else if (rbLevenberg->isChecked()) {
+    if (!dynamic_cast<g2o::OptimizationAlgorithmLevenberg*>(viewer->graph->solver().get()))
+      viewer->graph->setAlgorithm(createLevenberg());
+  } else {
+    if (!dynamic_cast<g2o::OptimizationAlgorithmGaussNewton*>(viewer->graph->solver().get()))
+      viewer->graph->setAlgorithm(createGaussNewton());
+  }
 
   int maxIterations = spIterations->value();
   int iter = viewer->graph->optimize(maxIterations);
-  if (maxIterations > 0 && !iter){
+  if (maxIterations > 0 && !iter) {
     cerr << "Optimization failed, result might be invalid" << endl;
   }
 
   if (cbCovariances->isChecked()) {
     // TODO implementation of covariance estimates
-    //viewer->graph->solver()->computeMarginals();
+    // viewer->graph->solver()->computeMarginals();
   }
   viewer->drawCovariance = cbCovariances->isChecked();
 
   viewer->update();
 }
 
-void MainWindow::on_btnInitialGuess_clicked()
-{
+void MainWindow::on_btnInitialGuess_clicked() {
   viewer->graph->computeInitialGuess();
   viewer->drawCovariance = false;
   viewer->update();
 }
 
-void MainWindow::fixGraph()
-{
+void MainWindow::fixGraph() {
   if (viewer->graph->vertices().size() == 0 || viewer->graph->edges().size() == 0) {
     return;
   }
@@ -118,8 +117,8 @@ void MainWindow::fixGraph()
   bool gaugeFreedom = viewer->graph->gaugeFreedom();
   g2o::OptimizableGraph::Vertex* gauge = viewer->graph->findGauge();
   if (gaugeFreedom) {
-    if (! gauge) {
-      cerr <<  "cannot find a vertex to fix in this thing" << endl;
+    if (!gauge) {
+      cerr << "cannot find a vertex to fix in this thing" << endl;
       return;
     } else {
       cerr << "graph is fixed by node " << gauge->id() << endl;
@@ -131,4 +130,19 @@ void MainWindow::fixGraph()
 
   viewer->graph->setVerbose(true);
   viewer->graph->computeActiveErrors();
+}
+
+std::unique_ptr<g2o::OptimizationAlgorithm> MainWindow::createGaussNewton() {
+  auto linearSolverGN = g2o::make_unique<SlamLinearSolver>();
+  linearSolverGN->setBlockOrdering(false);
+  return std::unique_ptr<g2o::OptimizationAlgorithm>(new g2o::OptimizationAlgorithmGaussNewton(
+      g2o::make_unique<SlamBlockSolver>(std::move(linearSolverGN))));
+}
+
+std::unique_ptr<g2o::OptimizationAlgorithm> MainWindow::createLevenberg() {
+  // Levenberg
+  auto linearSolverLM = g2o::make_unique<SlamLinearSolver>();
+  linearSolverLM->setBlockOrdering(false);
+  return std::unique_ptr<g2o::OptimizationAlgorithm>(new g2o::OptimizationAlgorithmLevenberg(
+      g2o::make_unique<SlamBlockSolver>(std::move(linearSolverLM))));
 }

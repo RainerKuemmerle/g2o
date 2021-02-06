@@ -84,7 +84,7 @@ namespace g2o {
       // cerr << "solver init" << endl;
       optimizer()->solver()->init();
       // cerr << "structure" << endl;
-      OptimizationAlgorithmWithHessian* solverWithHessian = dynamic_cast<OptimizationAlgorithmWithHessian*> (optimizer()->solver());
+      OptimizationAlgorithmWithHessian* solverWithHessian = dynamic_cast<OptimizationAlgorithmWithHessian*> (optimizer()->solver().get());
       if (!solverWithHessian->buildLinearStructure())
         cerr << "FATAL: failure while building linear structure" << endl;
       // cerr << "errors" << endl;
