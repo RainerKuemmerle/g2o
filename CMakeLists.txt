@@ -220,33 +220,40 @@ macro(DEFINE_SSE_VAR  _setname)
 endmacro(DEFINE_SSE_VAR)
 
 # SSE optimizations:
-IF (NOT CMAKE_SYSTEM_PROCESSOR MATCHES "arm")
-  DEFINE_SSE_VAR(SSE2)
-  DEFINE_SSE_VAR(SSE3)
-  DEFINE_SSE_VAR(SSE4_1)
-  DEFINE_SSE_VAR(SSE4_2)
-  DEFINE_SSE_VAR(SSE4_A)
-ENDIF()
+DEFINE_SSE_VAR(SSE2)
+DEFINE_SSE_VAR(SSE3)
+DEFINE_SSE_VAR(SSE4_1)
+DEFINE_SSE_VAR(SSE4_2)
+DEFINE_SSE_VAR(SSE4_A)
+
+include(CheckCXXCompilerFlag)
+
+macro(CHECK_AND_ADD_COMPILE_OPTION _option)
+check_cxx_compiler_flag(${_option} OPTION_AVAILABLE)
+  IF(${OPTION_AVAILABLE})
+    add_compile_options(${_option})
+  ENDIF(${OPTION_AVAILABLE})
+endmacro(CHECK_AND_ADD_COMPILE_OPTION)
 
 # Add build flags for clang AND GCC
 if (${CMAKE_CXX_COMPILER_ID} MATCHES "Clang" OR CMAKE_COMPILER_IS_GNUCXX)
   # SSE2?
   if (CMAKE_G2O_HAS_SSE2)
-    add_compile_options(-msse2)
+    CHECK_AND_ADD_COMPILE_OPTION(-msse2)
   endif()
   # SSE3?
   if (CMAKE_G2O_HAS_SSE3)
-    add_compile_options(-msse3 -mssse3)
+    CHECK_AND_ADD_COMPILE_OPTION(-msse3 -mssse3)
   endif()
   # SSE4*?
   if (CMAKE_G2O_HAS_SSE4_1)
-    add_compile_options(-msse4.1)
+    CHECK_AND_ADD_COMPILE_OPTION(-msse4.1)
   endif()
   if (CMAKE_G2O_HAS_SSE4_2)
-    add_compile_options(-msse4.2)
+    CHECK_AND_ADD_COMPILE_OPTION(-msse4.2)
   endif()
   if (CMAKE_G2O_HAS_SSE4_A)
-    add_compile_options(-msse4a)
+    CHECK_AND_ADD_COMPILE_OPTION(-msse4a)
   endif()
 endif()
 # End of of SSE* autodetect code -------
