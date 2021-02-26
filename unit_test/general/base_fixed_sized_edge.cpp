@@ -192,7 +192,7 @@ TEST(ConstantEdgeTest, ConstantEdge_computeError) {
   EdgeTester<Edge3Constant> constant;
   dynamic.edge.computeError();
   constant.edge.computeError();
-  ASSERT_DOUBLE_EQ(0.0, (dynamic.edge.error() - constant.edge.error()).norm());
+  EXPECT_DOUBLE_EQ(0.0, (dynamic.edge.error() - constant.edge.error()).norm());
 }
 
 TEST(ConstantEdgeTest, ConstantEdge_linearizeOplus) {
@@ -202,15 +202,15 @@ TEST(ConstantEdgeTest, ConstantEdge_linearizeOplus) {
   constant.edge.computeError();
   dynamic.edge.linearizeOplus(dynamic.jacobianWorkspace);
   constant.edge.linearizeOplus(constant.jacobianWorkspace);
-  ASSERT_DOUBLE_EQ(
+  EXPECT_DOUBLE_EQ(
       0.0, (Eigen::Map<g2o::MatrixX>(dynamic.jacobianWorkspace.workspaceForVertex(0), 2, 3) -
             Eigen::Map<g2o::MatrixX>(constant.jacobianWorkspace.workspaceForVertex(0), 2, 3))
                .norm());
-  ASSERT_DOUBLE_EQ(
+  EXPECT_DOUBLE_EQ(
       0.0, (Eigen::Map<g2o::MatrixX>(dynamic.jacobianWorkspace.workspaceForVertex(1), 2, 3) -
             Eigen::Map<g2o::MatrixX>(constant.jacobianWorkspace.workspaceForVertex(1), 2, 3))
                .norm());
-  ASSERT_DOUBLE_EQ(
+  EXPECT_DOUBLE_EQ(
       0.0, (Eigen::Map<g2o::MatrixX>(dynamic.jacobianWorkspace.workspaceForVertex(2), 2, 2) -
             Eigen::Map<g2o::MatrixX>(constant.jacobianWorkspace.workspaceForVertex(2), 2, 2))
                .norm());
@@ -227,12 +227,12 @@ TEST(ConstantEdgeTest, ConstantEdge_constructQuadraticForm) {
   dynamic.edge.constructQuadraticForm();
   constant.edge.constructQuadraticForm();
 
-  ASSERT_DOUBLE_EQ(0.0, (dynamic.hessian00 - constant.hessian00).norm());
-  ASSERT_DOUBLE_EQ(0.0, (dynamic.hessian11 - constant.hessian11).norm());
-  ASSERT_DOUBLE_EQ(0.0, (dynamic.hessian22 - constant.hessian22).norm());
-  ASSERT_DOUBLE_EQ(0.0, (dynamic.hessian01 - constant.hessian01).norm());
-  ASSERT_DOUBLE_EQ(0.0, (dynamic.hessian02 - constant.hessian02).norm());
-  ASSERT_DOUBLE_EQ(0.0, (dynamic.hessian12 - constant.hessian12).norm());
+  EXPECT_NEAR(0.0, (dynamic.hessian00 - constant.hessian00).norm(), 1e-7);
+  EXPECT_NEAR(0.0, (dynamic.hessian11 - constant.hessian11).norm(), 1e-7);
+  EXPECT_NEAR(0.0, (dynamic.hessian22 - constant.hessian22).norm(), 1e-7);
+  EXPECT_NEAR(0.0, (dynamic.hessian01 - constant.hessian01).norm(), 1e-7);
+  EXPECT_NEAR(0.0, (dynamic.hessian02 - constant.hessian02).norm(), 1e-7);
+  EXPECT_NEAR(0.0, (dynamic.hessian12 - constant.hessian12).norm(), 1e-7);
 }
 
 TEST(ConstantEdgeTest, ConstantEdge_constructQuadraticForm_robust) {
@@ -254,17 +254,17 @@ TEST(ConstantEdgeTest, ConstantEdge_constructQuadraticForm_robust) {
   constant.edge.computeError();
   constant.edge.linearizeOplus(constant.jacobianWorkspace);
   constant.edge.constructQuadraticForm();
-  ASSERT_EQ(true, (dynamic.edge.error() - constant.edge.error()).norm() < 1e-7);
-  ASSERT_DOUBLE_EQ(
+  EXPECT_NEAR(0, (dynamic.edge.error() - constant.edge.error()).norm(), 1e-7);
+  EXPECT_DOUBLE_EQ(
       0.0, (Eigen::Map<g2o::MatrixX>(dynamic.jacobianWorkspace.workspaceForVertex(0), 2, 3) -
             Eigen::Map<g2o::MatrixX>(constant.jacobianWorkspace.workspaceForVertex(0), 2, 3))
                .norm());
-  ASSERT_DOUBLE_EQ(0.0, (dynamic.hessian00 - constant.hessian00).norm());
-  ASSERT_DOUBLE_EQ(0.0, (dynamic.hessian11 - constant.hessian11).norm());
-  ASSERT_DOUBLE_EQ(0.0, (dynamic.hessian22 - constant.hessian22).norm());
-  ASSERT_DOUBLE_EQ(0.0, (dynamic.hessian01 - constant.hessian01).norm());
-  ASSERT_DOUBLE_EQ(0.0, (dynamic.hessian02 - constant.hessian02).norm());
-  ASSERT_DOUBLE_EQ(0.0, (dynamic.hessian12 - constant.hessian12).norm());
+  EXPECT_NEAR(0.0, (dynamic.hessian00 - constant.hessian00).norm(), 1e-7);
+  EXPECT_NEAR(0.0, (dynamic.hessian11 - constant.hessian11).norm(), 1e-7);
+  EXPECT_NEAR(0.0, (dynamic.hessian22 - constant.hessian22).norm(), 1e-7);
+  EXPECT_NEAR(0.0, (dynamic.hessian01 - constant.hessian01).norm(), 1e-7);
+  EXPECT_NEAR(0.0, (dynamic.hessian02 - constant.hessian02).norm(), 1e-7);
+  EXPECT_NEAR(0.0, (dynamic.hessian12 - constant.hessian12).norm(), 1e-7);
 }
 
 TEST(ConstantEdgeTest, ConstantEdge_constructQuadraticForm_rowMajor) {
@@ -294,18 +294,18 @@ TEST(ConstantEdgeTest, ConstantEdge_constructQuadraticForm_rowMajor) {
   dynamic.edge.constructQuadraticForm();
   constant.edge.constructQuadraticForm();
 
-  ASSERT_DOUBLE_EQ(0.0, (dynamic.hessian00 - constant.hessian00).norm());
-  ASSERT_DOUBLE_EQ(0.0, (dynamic.hessian11 - constant.hessian11).norm());
-  ASSERT_DOUBLE_EQ(0.0, (dynamic.hessian22 - constant.hessian22).norm());
-  ASSERT_DOUBLE_EQ(0.0, (dynamic.hessian01 - constant.hessian01).norm());
-  ASSERT_DOUBLE_EQ(0.0, (hessian20_dynamic - hessian20_constant).norm());
-  ASSERT_DOUBLE_EQ(0.0, (hessian21_dynamic - hessian21_constant).norm());
+  EXPECT_NEAR(0.0, (dynamic.hessian00 - constant.hessian00).norm(), 1e-7);
+  EXPECT_NEAR(0.0, (dynamic.hessian11 - constant.hessian11).norm(), 1e-7);
+  EXPECT_NEAR(0.0, (dynamic.hessian22 - constant.hessian22).norm(), 1e-7);
+  EXPECT_NEAR(0.0, (dynamic.hessian01 - constant.hessian01).norm(), 1e-7);
+  EXPECT_NEAR(0.0, (hessian20_dynamic - hessian20_constant).norm(), 1e-7);
+  EXPECT_NEAR(0.0, (hessian21_dynamic - hessian21_constant).norm(), 1e-7);
 
   EdgeTester<Edge3Constant> constant_colMajor;
   constant_colMajor.edge.computeError();
   constant_colMajor.edge.linearizeOplus(constant_colMajor.jacobianWorkspace);
   constant_colMajor.edge.constructQuadraticForm();
-  ASSERT_DOUBLE_EQ(0.0, (constant_colMajor.hessian01 - constant.hessian01.transpose()).norm());
-  ASSERT_DOUBLE_EQ(0.0, (constant_colMajor.hessian02 - hessian20_constant.transpose()).norm());
-  ASSERT_DOUBLE_EQ(0.0, (constant_colMajor.hessian12 - hessian21_constant.transpose()).norm());
+  EXPECT_NEAR(0.0, (constant_colMajor.hessian01 - constant.hessian01.transpose()).norm(), 1e-7);
+  EXPECT_NEAR(0.0, (constant_colMajor.hessian02 - hessian20_constant.transpose()).norm(), 1e-7);
+  EXPECT_NEAR(0.0, (constant_colMajor.hessian12 - hessian21_constant.transpose()).norm(), 1e-7);
 }
