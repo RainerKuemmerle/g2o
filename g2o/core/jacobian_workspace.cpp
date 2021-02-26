@@ -73,7 +73,7 @@ namespace g2o {
     int maxDimensionForEdge = -1;
 
     for (int i = 0; i < numVertices; ++i) {
-      const OptimizableGraph::Vertex* v = static_cast<const OptimizableGraph::Vertex*>(e->vertex(i));
+      const OptimizableGraph::Vertex* v = static_cast<const OptimizableGraph::Vertex*>(e->vertex(i).get());
       assert(v && "Edge has no vertex assigned");
       maxDimensionForEdge = max(v->dimension() * errorDimension, maxDimensionForEdge);
     }
@@ -90,7 +90,7 @@ namespace g2o {
     }
 
     for (OptimizableGraph::EdgeSet::const_iterator it = graph.edges().begin(); it != graph.edges().end(); ++it) {
-      const OptimizableGraph::Edge* e = static_cast<const OptimizableGraph::Edge*>(*it);
+      const OptimizableGraph::Edge* e = static_cast<const OptimizableGraph::Edge*>(it->get());
       updateSize(e);
     }
   }

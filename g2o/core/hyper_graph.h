@@ -30,6 +30,7 @@
 #include <bitset>
 #include <cassert>
 #include <cstddef>
+#include <memory>
 #include <set>
 #include <unordered_map>
 #include <vector>
@@ -96,16 +97,16 @@ class G2O_CORE_API HyperGraph {
     //! write the data to a stream
     virtual bool write(std::ostream& os) const = 0;
     virtual HyperGraph::HyperGraphElementType elementType() const { return HyperGraph::HGET_DATA; }
-    inline const Data* next() const { return _next; }
-    inline Data* next() { return _next; }
-    inline void setNext(Data* next_) { _next = next_; }
-    inline DataContainer* dataContainer() { return _dataContainer; }
-    inline const DataContainer* dataContainer() const { return _dataContainer; }
-    inline void setDataContainer(DataContainer* dataContainer_) { _dataContainer = dataContainer_; }
+    std::shared_ptr<const Data> next() const { return _next; }
+    std::shared_ptr<Data> next() { return _next; }
+    void setNext(std::shared_ptr<Data> next_) { _next = next_; }
+    std::shared_ptr<DataContainer> dataContainer() { return _dataContainer; }
+    std::shared_ptr<const DataContainer> dataContainer() const { return _dataContainer; }
+    void setDataContainer(std::shared_ptr<DataContainer> dataContainer_) { _dataContainer = dataContainer_; }
 
    protected:
-    Data* _next;  // linked list of multiple data;
-    DataContainer* _dataContainer;
+    std::shared_ptr<Data> _next;  // linked list of multiple data;
+    std::shared_ptr<DataContainer> _dataContainer;
   };
 
   /**
@@ -114,13 +115,11 @@ class G2O_CORE_API HyperGraph {
    */
   class G2O_CORE_API DataContainer {
    public:
-    DataContainer() { _userData = 0; }
-    virtual ~DataContainer() { delete _userData; }
     //! the user data associated with this vertex
-    const Data* userData() const { return _userData; }
-    Data* userData() { return _userData; }
-    void setUserData(Data* obs) { _userData = obs; }
-    void addUserData(Data* obs) {
+    std::shared_ptr<const Data> userData() const { return _userData; }
+    std::shared_ptr<Data> userData() { return _userData; }
+    void setUserData(std::shared_ptr<Data>& obs) { _userData = obs; }
+    void addUserData(std::shared_ptr<Data>& obs) {
       if (obs) {
         obs->setNext(_userData);
         _userData = obs;
@@ -128,14 +127,17 @@ class G2O_CORE_API HyperGraph {
     }
 
    protected:
-    Data* _userData;
+    std::shared_ptr<Data> _userData;
   };
 
-  typedef std::set<Edge*> EdgeSet;
-  typedef std::set<Vertex*> VertexSet;
+  using EdgeSet = std::set<std::shared_ptr<Edge>>;
+  using EdgeSetWeak = std::set<std::weak_ptr<Edge>, std::owner_less<std::weak_ptr<Edge>>>;
+  using VertexSet = std::set<std::shared_ptr<Vertex>>;
+  using VertexSetWeak = std::set<std::weak_ptr<Vertex>, std::owner_less<std::weak_ptr<Vertex>>>;
 
-  typedef std::unordered_map<int, Vertex*> VertexIDMap;
-  typedef std::vector<Vertex*> VertexContainer;
+  using VertexIDMap = std::unordered_map<int, std::shared_ptr<Vertex>>;
+  using VertexContainer = std::vector<std::shared_ptr<Vertex>>;
+  using VertexContainerWeak = std::vector<std::weak_ptr<Vertex>>;
 
   //! abstract Vertex, your types must derive from that one
   class G2O_CORE_API Vertex : public HyperGraphElement {
@@ -147,14 +149,14 @@ class G2O_CORE_API HyperGraph {
     int id() const { return _id; }
     virtual void setId(int newId) { _id = newId; }
     //! returns the set of hyper-edges that are leaving/entering in this vertex
-    const EdgeSet& edges() const { return _edges; }
+    const EdgeSetWeak& edges() const { return _edges; }
     //! returns the set of hyper-edges that are leaving/entering in this vertex
-    EdgeSet& edges() { return _edges; }
+    EdgeSetWeak& edges() { return _edges; }
     virtual HyperGraphElementType elementType() const { return HGET_VERTEX; }
 
    protected:
     int _id;
-    EdgeSet _edges;
+    EdgeSetWeak _edges;
   };
 
   /**
@@ -182,21 +184,21 @@ class G2O_CORE_API HyperGraph {
     /**
       returns the pointer to the ith vertex connected to the hyper-edge.
       */
-    const Vertex* vertex(size_t i) const {
+    std::shared_ptr<const Vertex> vertex(size_t i) const {
       assert(i < _vertices.size() && "index out of bounds");
       return _vertices[i];
     }
     /**
       returns the pointer to the ith vertex connected to the hyper-edge.
       */
-    Vertex* vertex(size_t i) {
+    std::shared_ptr<Vertex> vertex(size_t i) {
       assert(i < _vertices.size() && "index out of bounds");
       return _vertices[i];
     }
     /**
       set the ith vertex on the hyper-edge to the pointer supplied
       */
-    void setVertex(size_t i, Vertex* v) {
+    void setVertex(size_t i, const std::shared_ptr<Vertex>& v) {
       assert(i < _vertices.size() && "index out of bounds");
       _vertices[i] = v;
     }
@@ -219,14 +221,14 @@ class G2O_CORE_API HyperGraph {
   virtual ~HyperGraph();
 
   //! returns a vertex <i>id</i> in the hyper-graph, or 0 if the vertex id is not present
-  Vertex* vertex(int id);
+  std::shared_ptr<Vertex> vertex(int id);
   //! returns a vertex <i>id</i> in the hyper-graph, or 0 if the vertex id is not present
-  const Vertex* vertex(int id) const;
+  std::shared_ptr<const Vertex> vertex(int id) const;
 
   //! removes a vertex from the graph. Returns true on success (vertex was present)
-  virtual bool removeVertex(Vertex* v, bool detach = false);
+  virtual bool removeVertex(const std::shared_ptr<Vertex>& v, bool detach = false);
   //! removes a vertex from the graph. Returns true on success (edge was present)
-  virtual bool removeEdge(Edge* e);
+  virtual bool removeEdge(const std::shared_ptr<Edge>& e);
   //! clears the graph and empties all structures.
   virtual void clear();
 
@@ -246,37 +248,37 @@ class G2O_CORE_API HyperGraph {
    * with the same id is already in the graph.
    * returns true, on success, or false on failure.
    */
-  virtual bool addVertex(Vertex* v);
+  virtual bool addVertex(std::shared_ptr<Vertex>& v);
 
   /**
    * Adds an edge to the graph. If the edge is already in the graph, it
    * does nothing and returns false. Otherwise it returns true.
    */
-  virtual bool addEdge(Edge* e);
+  virtual bool addEdge(std::shared_ptr<Edge>& e);
 
   /**
    * Sets the vertex in position "pos" within the edge and keeps the bookkeeping consistent.
    * If v ==0, the vertex is set to "invalid"
    */
-  virtual bool setEdgeVertex(Edge* e, int pos, Vertex* v);
+  virtual bool setEdgeVertex(std::shared_ptr<Edge>& e, int pos, std::shared_ptr<Vertex>& v);
 
   /**
    * merges two (valid) vertices, adjusts the bookkeeping and relabels all edges.
    * the observations of vSmall are retargeted to vBig. If erase = true, vSmall is deleted from the
    * graph repeatedly calls setEdgeVertex(...)
    */
-  virtual bool mergeVertices(Vertex* vBig, Vertex* vSmall, bool erase);
+  virtual bool mergeVertices(std::shared_ptr<Vertex>& vBig, std::shared_ptr<Vertex>& vSmall, bool erase);
 
   /**
    * detaches a vertex from all connected edges
    */
-  virtual bool detachVertex(Vertex* v);
+  virtual bool detachVertex(const std::shared_ptr<Vertex>& v);
 
   /**
    * changes the id of a vertex already in the graph, and updates the bookkeeping
    @ returns false if the vertex is not in the graph;
    */
-  virtual bool changeId(Vertex* v, int newId);
+  virtual bool changeId(std::shared_ptr<Vertex>& v, int newId);
 
  protected:
   VertexIDMap _vertices;

@@ -103,7 +103,7 @@ namespace g2o {
       static const int PoseDim = Traits::PoseDim;
       static const int LandmarkDim = Traits::LandmarkDim;
       typedef typename Traits::PoseMatrixType PoseMatrixType;
-      typedef typename Traits::LandmarkMatrixType LandmarkMatrixType; 
+      typedef typename Traits::LandmarkMatrixType LandmarkMatrixType;
       typedef typename Traits::PoseLandmarkMatrixType PoseLandmarkMatrixType;
       typedef typename Traits::PoseVectorType PoseVectorType;
       typedef typename Traits::LandmarkVectorType LandmarkVectorType;
@@ -125,7 +125,7 @@ namespace g2o {
 
       virtual bool init(SparseOptimizer* optmizer, bool online = false);
       virtual bool buildStructure(bool zeroBlocks = false);
-      virtual bool updateStructure(const std::vector<HyperGraph::Vertex*>& vset, const HyperGraph::EdgeSet& edges);
+      virtual bool updateStructure(const HyperGraph::VertexContainer& vset, const HyperGraph::EdgeSet& edges);
       virtual bool buildSystem();
       virtual bool solve();
       virtual bool computeMarginals(SparseBlockMatrix<MatrixX>& spinv, const std::vector<std::pair<int, int> >& blockIndices);
@@ -145,7 +145,7 @@ namespace g2o {
       virtual void multiplyHessian(number_t* dest, const number_t* src) const { _Hpp->multiplySymmetricUpperTriangle(dest, src);}
 
     protected:
-      void resize(int* blockPoseIndices, int numPoseBlocks, 
+      void resize(int* blockPoseIndices, int numPoseBlocks,
           int* blockLandmarkIndices, int numLandmarkBlocks, int totalDim);
 
       void deallocate();

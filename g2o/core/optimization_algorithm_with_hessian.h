@@ -51,7 +51,7 @@ namespace g2o {
 
       virtual void updateLinearSystem();
 
-      virtual bool updateStructure(const std::vector<HyperGraph::Vertex*>& vset, const HyperGraph::EdgeSet& edges);
+      virtual bool updateStructure(const HyperGraph::VertexContainer& vset, const HyperGraph::EdgeSet& edges);
 
       //! return the underlying solver used to solve the linear system
       Solver& solver() { return _solver;}

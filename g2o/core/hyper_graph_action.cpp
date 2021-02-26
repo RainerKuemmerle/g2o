@@ -232,7 +232,7 @@ void DrawAction::drawUserData(HyperGraph::Data* data,
                               HyperGraphElementAction::Parameters* params_) {
   while (data && _cacheDrawActions) {
     (*_cacheDrawActions)(data, params_);
-    data = data->next();
+    data = data->next().get();
   }
 }
 
@@ -242,13 +242,13 @@ void applyAction(HyperGraph* graph, HyperGraphElementAction* action,
        it != graph->vertices().end(); ++it) {
     auto& aux = *it->second;
     if (typeName.empty() || typeid(aux).name() == typeName) {
-      (*action)(it->second, params);
+      (*action)(it->second.get(), params);
     }
   }
   for (HyperGraph::EdgeSet::iterator it = graph->edges().begin(); it != graph->edges().end();
        ++it) {
     auto& aux = **it;
-    if (typeName.empty() || typeid(aux).name() == typeName) (*action)(*it, params);
+    if (typeName.empty() || typeid(aux).name() == typeName) (*action)(it->get(), params);
   }
 }
 

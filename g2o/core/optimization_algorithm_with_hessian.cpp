@@ -51,7 +51,7 @@ namespace g2o {
     _solver.setWriteDebug(_writeDebug->value());
     bool useSchur=false;
     for (OptimizableGraph::VertexContainer::const_iterator it=_optimizer->activeVertices().begin(); it!=_optimizer->activeVertices().end(); ++it) {
-      OptimizableGraph::Vertex* v= *it;
+      const auto& v= *it;
       if (v->marginalized()){
         useSchur=true;
         break;
@@ -87,7 +87,7 @@ namespace g2o {
     _solver.buildSystem();
   }
 
-  bool OptimizationAlgorithmWithHessian::updateStructure(const std::vector<HyperGraph::Vertex*>& vset, const HyperGraph::EdgeSet& edges)
+  bool OptimizationAlgorithmWithHessian::updateStructure(const HyperGraph::VertexContainer& vset, const HyperGraph::EdgeSet& edges)
   {
     return _solver.updateStructure(vset, edges);
   }

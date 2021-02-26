@@ -106,16 +106,16 @@ namespace g2o {
           friend class PriorityQueue;
           AdjacencyMapEntry();
           void reset();
-          OptimizableGraph::Vertex* child() const {return _child;}
+          std::shared_ptr<OptimizableGraph::Vertex> child() const {return _child;}
           const OptimizableGraph::VertexSet& parent() const {return _parent;}
-          OptimizableGraph::Edge* edge() const {return _edge;}
+          std::shared_ptr<OptimizableGraph::Edge> edge() const {return _edge;}
           number_t distance() const {return _distance;}
           int frontierLevel() const { return _frontierLevel;}
 
         protected:
-          OptimizableGraph::Vertex* _child;
+          std::shared_ptr<OptimizableGraph::Vertex> _child;
           OptimizableGraph::VertexSet _parent;
-          OptimizableGraph::Edge* _edge;
+          std::shared_ptr<OptimizableGraph::Edge> _edge;
           number_t _distance;
           int _frontierLevel;
         private: // for PriorityQueue
@@ -127,36 +127,39 @@ namespace g2o {
        * \brief hash function for a vertex
        */
       class VertexIDHashFunction {
-        public:
-          size_t operator ()(const OptimizableGraph::Vertex* v) const { return v->id();}
+       public:
+        size_t operator()(const std::shared_ptr<OptimizableGraph::Vertex>& v) const {
+          return v->id();
+        }
       };
 
-      typedef std::unordered_map<OptimizableGraph::Vertex*, AdjacencyMapEntry, VertexIDHashFunction> AdjacencyMap;
+      using AdjacencyMap = std::unordered_map<std::shared_ptr<OptimizableGraph::Vertex>,
+                                              AdjacencyMapEntry, VertexIDHashFunction>;
 
-    public:
+     public:
       EstimatePropagator(OptimizableGraph* g);
       OptimizableGraph::VertexSet& visited() {return _visited; }
       AdjacencyMap& adjacencyMap() {return _adjacencyMap; }
-      OptimizableGraph* graph() {return _graph;} 
+      OptimizableGraph* graph() {return _graph;}
 
       /**
        * propagate an initial guess starting from v. The function computes a spanning tree
        * whereas the cost for each edge is determined by calling cost() and the action applied to
        * each vertex is action().
        */
-      void propagate(OptimizableGraph::Vertex* v, 
-          const EstimatePropagator::PropagateCost& cost, 
+      void propagate(const std::shared_ptr<OptimizableGraph::Vertex>& v,
+          const EstimatePropagator::PropagateCost& cost,
           const EstimatePropagator::PropagateAction& action = PropagateAction(),
-          number_t maxDistance=std::numeric_limits<number_t>::max(), 
+          number_t maxDistance=std::numeric_limits<number_t>::max(),
           number_t maxEdgeCost=std::numeric_limits<number_t>::max());
 
       /**
        * same as above but starting to propagate from a set of vertices instead of just a single one.
        */
-      void propagate(OptimizableGraph::VertexSet& vset, 
-          const EstimatePropagator::PropagateCost& cost, 
+      void propagate(OptimizableGraph::VertexSet& vset,
+          const EstimatePropagator::PropagateCost& cost,
           const EstimatePropagator::PropagateAction& action = PropagateAction(),
-          number_t maxDistance=std::numeric_limits<number_t>::max(), 
+          number_t maxDistance=std::numeric_limits<number_t>::max(),
           number_t maxEdgeCost=std::numeric_limits<number_t>::max());
 
     protected:

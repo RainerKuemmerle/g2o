@@ -57,26 +57,23 @@ namespace g2o {
   }
 
   void EdgeSE3::computeError() {
-    VertexSE3 *from = static_cast<VertexSE3*>(_vertices[0]);
-    VertexSE3 *to   = static_cast<VertexSE3*>(_vertices[1]);
+    VertexSE3* from = vertexXnRaw<0>();
+    VertexSE3* to = vertexXnRaw<1>();
     Isometry3 delta=_inverseMeasurement * from->estimate().inverse() * to->estimate();
     _error=internal::toVectorMQT(delta);
   }
 
   bool EdgeSE3::setMeasurementFromState(){
-    VertexSE3 *from = static_cast<VertexSE3*>(_vertices[0]);
-    VertexSE3 *to   = static_cast<VertexSE3*>(_vertices[1]);
+    VertexSE3* from = vertexXnRaw<0>();
+    VertexSE3* to = vertexXnRaw<1>();
     Isometry3 delta = from->estimate().inverse() * to->estimate();
     setMeasurement(delta);
     return true;
   }
 
   void EdgeSE3::linearizeOplus(){
-    // BaseBinaryEdge<6, Isometry3, VertexSE3, VertexSE3>::linearizeOplus();
-    // return;
-
-    VertexSE3 *from = static_cast<VertexSE3*>(_vertices[0]);
-    VertexSE3 *to   = static_cast<VertexSE3*>(_vertices[1]);
+    VertexSE3* from = vertexXnRaw<0>();
+    VertexSE3* to = vertexXnRaw<1>();
     Isometry3 E;
     const Isometry3& Xi=from->estimate();
     const Isometry3& Xj=to->estimate();
@@ -85,10 +82,10 @@ namespace g2o {
   }
 
   void EdgeSE3::initialEstimate(const OptimizableGraph::VertexSet& from_, OptimizableGraph::Vertex* /*to_*/) {
-    VertexSE3 *from = static_cast<VertexSE3*>(_vertices[0]);
-    VertexSE3 *to   = static_cast<VertexSE3*>(_vertices[1]);
+    VertexSE3* from = vertexXnRaw<0>();
+    VertexSE3* to = vertexXnRaw<1>();
 
-    if (from_.count(from) > 0) {
+    if (from_.count(vertexXn<0>()) > 0) {
       to->setEstimate(from->estimate() * _measurement);
     } else
       from->setEstimate(to->estimate() * _measurement.inverse());
@@ -107,8 +104,8 @@ namespace g2o {
     }
 
     EdgeSE3* e =  static_cast<EdgeSE3*>(element);
-    VertexSE3* fromEdge = static_cast<VertexSE3*>(e->vertices()[0]);
-    VertexSE3* toEdge   = static_cast<VertexSE3*>(e->vertices()[1]);
+    VertexSE3* fromEdge = static_cast<VertexSE3*>(e->vertices()[0].get());
+    VertexSE3* toEdge   = static_cast<VertexSE3*>(e->vertices()[1].get());
     Vector6 fromV, toV;
     fromV=internal::toVectorMQT(fromEdge->estimate());
     toV=internal::toVectorMQT(toEdge->estimate());
@@ -137,8 +134,8 @@ namespace g2o {
       return this;
 
     EdgeSE3* e =  static_cast<EdgeSE3*>(element);
-    VertexSE3* fromEdge = static_cast<VertexSE3*>(e->vertices()[0]);
-    VertexSE3* toEdge   = static_cast<VertexSE3*>(e->vertices()[1]);
+    VertexSE3* fromEdge = static_cast<VertexSE3*>(e->vertices()[0].get());
+    VertexSE3* toEdge   = static_cast<VertexSE3*>(e->vertices()[1].get());
     if (! fromEdge || ! toEdge)
       return this;
     glColor3f(POSE_EDGE_COLOR);

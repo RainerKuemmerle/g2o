@@ -52,7 +52,7 @@ namespace g2o {
   bool EdgeSE3PointXYZDisparity::resolveCaches(){
     ParameterVector pv(1);
     pv[0]=params;
-    resolveCache(cache, (OptimizableGraph::Vertex*)_vertices[0],"CACHE_CAMERA",pv);
+    resolveCache(cache, (OptimizableGraph::Vertex*)_vertices[0].get(),"CACHE_CAMERA",pv);
     return cache != 0;
   }
 
@@ -71,7 +71,7 @@ namespace g2o {
 
   void EdgeSE3PointXYZDisparity::computeError() {
     //VertexSE3 *cam = static_cast<VertexSE3*>(_vertices[0]);
-    VertexPointXYZ *point = static_cast<VertexPointXYZ*>(_vertices[1]);
+    VertexPointXYZ *point = vertexXnRaw<1>();
     const Vector3& pt = point->estimate();
 
     Vector3 p = cache->w2i() * pt;
@@ -89,7 +89,7 @@ namespace g2o {
 
   void EdgeSE3PointXYZDisparity::linearizeOplus() {
     //VertexSE3 *cam = static_cast<VertexSE3 *>(_vertices[0]);
-    VertexPointXYZ *vp = static_cast<VertexPointXYZ *>(_vertices[1]);
+    VertexPointXYZ *vp = vertexXnRaw<1>();
 
     const Vector3& pt = vp->estimate();
 
@@ -125,7 +125,7 @@ namespace g2o {
 
   bool EdgeSE3PointXYZDisparity::setMeasurementFromState(){
     //VertexSE3 *cam = static_cast< VertexSE3*>(_vertices[0]);
-    VertexPointXYZ *point = static_cast<VertexPointXYZ*>(_vertices[1]);
+    VertexPointXYZ *point = vertexXnRaw<1>();
     const Vector3 &pt = point->estimate();
 
     // VertexCameraCache* vcache = (VertexCameraCache*) cam->getCache(_cacheIds[0]);
@@ -149,8 +149,8 @@ namespace g2o {
   {
     (void) from;
     assert(from.size() == 1 && from.count(_vertices[0]) == 1 && "Can not initialize VertexDepthCam position by VertexTrackXYZ");
-    VertexSE3 *cam = dynamic_cast<VertexSE3*>(_vertices[0]);
-    VertexPointXYZ *point = dynamic_cast<VertexPointXYZ*>(_vertices[1]);
+    VertexSE3 *cam = vertexXnRaw<0>();
+    VertexPointXYZ *point = vertexXnRaw<1>();
 
     // VertexCameraCache* vcache = (VertexCameraCache* ) cam->getCache(_cacheIds[0]);
     // if (! vcache){
@@ -182,8 +182,8 @@ namespace g2o {
     if (_show && !_show->value())
       return this;
     EdgeSE3PointXYZDisparity* e =  static_cast<EdgeSE3PointXYZDisparity*>(element);
-    VertexSE3* fromEdge = static_cast<VertexSE3*>(e->vertices()[0]);
-    VertexPointXYZ* toEdge   = static_cast<VertexPointXYZ*>(e->vertices()[1]);
+    VertexSE3* fromEdge = static_cast<VertexSE3*>(e->vertices()[0].get());
+    VertexPointXYZ* toEdge   = static_cast<VertexPointXYZ*>(e->vertices()[1].get());
     if (! fromEdge || ! toEdge)
       return this;
     Isometry3 fromTransform=fromEdge->estimate() * e->cameraParameter()->offset();

@@ -118,7 +118,7 @@ namespace g2o {
      * and the current settings stored in the class instance.
      * It can be called only after initializeOptimization
      */
-    int optimize(int iterations, bool online = false);
+    int optimize(int iterations, bool online = false) override;
 
     /**
      * computes the blocks of the inverse of the specified pattern.
@@ -161,7 +161,7 @@ namespace g2o {
     //! finds a gauge in the graph to remove the undefined dof.
     // The gauge should be fixed() and then the optimization can work (if no additional dof are in
     // the system. The default implementation returns a node with maximum dimension.
-    virtual Vertex* findGauge();
+    virtual std::shared_ptr<OptimizableGraph::Vertex> findGauge();
 
     bool gaugeFreedom();
 
@@ -188,7 +188,7 @@ namespace g2o {
     bool terminate() {return _forceStopFlag ? (*_forceStopFlag) : false; }
 
     //! the index mapping of the vertices
-    const VertexContainer& indexMapping() const {return _ivMap;}
+    const VertexContainerRaw& indexMapping() const {return _ivMap;}
     //! the vertices active in the current optimization
     const VertexContainer& activeVertices() const { return _activeVertices;}
     //! the edges active in the current optimization
@@ -200,7 +200,7 @@ namespace g2o {
      * mapping is erased. In case you need the index mapping for manipulating the
      * graph, you have to store it in your own copy.
      */
-    virtual bool removeVertex(HyperGraph::Vertex* v, bool detach=false);
+    virtual bool removeVertex(const std::shared_ptr<HyperGraph::Vertex>& v, bool detach = false) override;
 
     /**
      * search for an edge in _activeVertices and return the iterator pointing to it
@@ -221,20 +221,20 @@ namespace g2o {
     //! push the estimate of a subset of the variables onto a stack
     void push(SparseOptimizer::VertexContainer& vlist);
     //! push the estimate of a subset of the variables onto a stack
-    void push(HyperGraph::VertexSet& vlist);
+    void push(HyperGraph::VertexSet& vlist) override;
     //! push all the active vertices onto a stack
-    void push();
+    void push() override;
     //! pop (restore) the estimate a subset of the variables from the stack
     void pop(SparseOptimizer::VertexContainer& vlist);
     //! pop (restore) the estimate a subset of the variables from the stack
-    void pop(HyperGraph::VertexSet& vlist);
+    void pop(HyperGraph::VertexSet& vlist) override;
     //! pop (restore) the estimate of the active vertices from the stack
-    void pop();
+    void pop() override;
 
     //! ignore the latest stored element on the stack, remove it from the stack but do not restore the estimate
     void discardTop(SparseOptimizer::VertexContainer& vlist);
     //! same as above, but for the active vertices
-    void discardTop();
+    void discardTop() override;
     using OptimizableGraph::discardTop;
 
     /**
@@ -242,7 +242,7 @@ namespace g2o {
      * Note that this only removes nodes / edges. Parameters can be removed
      * with clearParameters().
      */
-    virtual void clear();
+    virtual void clear() override;
 
     /**
      * computes the error vectors of all edges in the activeSet, and caches them
@@ -290,7 +290,7 @@ namespace g2o {
     bool* _forceStopFlag;
     bool _verbose;
 
-    VertexContainer _ivMap;
+    VertexContainerRaw _ivMap;
     VertexContainer _activeVertices;   ///< sorted according to VertexIDCompare
     EdgeContainer _activeEdges;        ///< sorted according to EdgeIDCompare
 

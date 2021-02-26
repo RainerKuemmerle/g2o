@@ -59,7 +59,7 @@ namespace g2o {
       /**
        * update the structures for online processing
        */
-      virtual bool updateStructure(const std::vector<HyperGraph::Vertex*>& vset, const HyperGraph::EdgeSet& edges) = 0;
+      virtual bool updateStructure(const HyperGraph::VertexContainer& vset, const HyperGraph::EdgeSet& edges) = 0;
       /**
        * build the current system
        */

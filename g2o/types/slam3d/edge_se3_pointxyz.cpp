@@ -55,7 +55,7 @@ namespace g2o {
   bool EdgeSE3PointXYZ::resolveCaches(){
     ParameterVector pv(1);
     pv[0]=offsetParam;
-    resolveCache(cache, (OptimizableGraph::Vertex*)_vertices[0],"CACHE_SE3_OFFSET",pv);
+    resolveCache(cache, (OptimizableGraph::Vertex*)_vertices[0].get(),"CACHE_SE3_OFFSET",pv);
     return cache != 0;
   }
 
@@ -78,7 +78,7 @@ namespace g2o {
   void EdgeSE3PointXYZ::computeError() {
     // from cam to point (track)
     //VertexSE3 *cam = static_cast<VertexSE3*>(_vertices[0]);
-    VertexPointXYZ *point = static_cast<VertexPointXYZ*>(_vertices[1]);
+    VertexPointXYZ *point = vertexXnRaw<1>();
 
     Vector3 perr = cache->w2n() * point->estimate();
 
@@ -90,7 +90,7 @@ namespace g2o {
 
   void EdgeSE3PointXYZ::linearizeOplus() {
     //VertexSE3 *cam = static_cast<VertexSE3 *>(_vertices[0]);
-    VertexPointXYZ *vp = static_cast<VertexPointXYZ *>(_vertices[1]);
+    VertexPointXYZ *vp = vertexXnRaw<1>();
 
     Vector3 Zcam = cache->w2l() * vp->estimate();
 
@@ -121,7 +121,7 @@ namespace g2o {
 
   bool EdgeSE3PointXYZ::setMeasurementFromState(){
     //VertexSE3 *cam = static_cast<VertexSE3*>(_vertices[0]);
-    VertexPointXYZ *point = static_cast<VertexPointXYZ*>(_vertices[1]);
+    VertexPointXYZ *point = vertexXnRaw<1>();
 
     // calculate the projection
     const Vector3 &pt = point->estimate();
@@ -141,8 +141,8 @@ namespace g2o {
     (void) from; (void) to;
     assert(from.size() == 1 && from.count(_vertices[0]) == 1 && "Can not initialize VertexDepthCam position by VertexTrackXYZ");
 
-    VertexSE3 *cam = dynamic_cast<VertexSE3*>(_vertices[0]);
-    VertexPointXYZ *point = dynamic_cast<VertexPointXYZ*>(_vertices[1]);
+    VertexSE3 *cam = vertexXnRaw<0>();
+    VertexPointXYZ *point = vertexXnRaw<1>();
     // SE3OffsetCache* vcache = (SE3OffsetCache* ) cam->getCache(_cacheIds[0]);
     // if (! vcache){
     //   cerr << "fatal error in retrieving cache" << endl;
@@ -167,8 +167,8 @@ namespace g2o {
       return this;
 
     EdgeSE3PointXYZ* e =  static_cast<EdgeSE3PointXYZ*>(element);
-    VertexSE3* fromEdge = static_cast<VertexSE3*>(e->vertex(0));
-    VertexPointXYZ* toEdge   = static_cast<VertexPointXYZ*>(e->vertex(1));
+    VertexSE3* fromEdge = static_cast<VertexSE3*>(e->vertex(0).get());
+    VertexPointXYZ* toEdge   = static_cast<VertexPointXYZ*>(e->vertex(1).get());
     if (! fromEdge || ! toEdge)
       return this;
     Isometry3 fromTransform=fromEdge->estimate() * e->offsetParameter()->offset();

@@ -218,8 +218,8 @@ template <int D, typename E, typename... VertexTypes>
 void BaseFixedSizedEdge<D, E, VertexTypes...>::mapHessianMemory(number_t* d, int i, int j,
                                                                 bool rowMajor) {
   // get the size of the vertices
-  int vi_dim = static_cast<OptimizableGraph::Vertex*>(HyperGraph::Edge::vertex(i))->dimension();
-  int vj_dim = static_cast<OptimizableGraph::Vertex*>(HyperGraph::Edge::vertex(j))->dimension();
+  int vi_dim = static_cast<OptimizableGraph::Vertex*>(HyperGraph::Edge::vertex(i).get())->dimension();
+  int vj_dim = static_cast<OptimizableGraph::Vertex*>(HyperGraph::Edge::vertex(j).get())->dimension();
   _hessianRowMajor = rowMajor;
   if (rowMajor)
     tuple_apply_i(MapHessianMemoryK{d, vj_dim, vi_dim}, _hessianTupleTransposed,

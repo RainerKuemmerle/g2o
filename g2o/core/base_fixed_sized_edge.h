@@ -134,12 +134,12 @@ class BaseFixedSizedEdge : public BaseEdge<D, E> {
    * Return a pointer to the N-th vertex, directly casted to the correct type
    */
   template <int VertexN>
-  const VertexXnType<VertexN>* vertexXn() const {
-    return static_cast<const VertexXnType<VertexN>*>(_vertices[VertexN]);
+  std::shared_ptr<const VertexXnType<VertexN>> vertexXn() const {
+    return std::static_pointer_cast<const VertexXnType<VertexN>>(_vertices[VertexN]);
   }
   template <int VertexN>
-  VertexXnType<VertexN>* vertexXn() {
-    return static_cast<VertexXnType<VertexN>*>(_vertices[VertexN]);
+  std::shared_ptr<VertexXnType<VertexN>> vertexXn() {
+    return std::static_pointer_cast<VertexXnType<VertexN>>(_vertices[VertexN]);
   }
 
   static const int Dimension = BaseEdge<D, E>::Dimension;
@@ -265,6 +265,11 @@ class BaseFixedSizedEdge : public BaseEdge<D, E> {
   HessianTuple _hessianTuple;
   HessianTupleTransposed _hessianTupleTransposed;
   std::tuple<JacobianType<D, VertexTypes::Dimension>...> _jacobianOplus;
+
+  template <int VertexN>
+  VertexXnType<VertexN>* vertexXnRaw() const {
+    return static_cast<VertexXnType<VertexN>*>(_vertices[VertexN].get());
+  }
 
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
