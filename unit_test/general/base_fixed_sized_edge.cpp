@@ -40,9 +40,9 @@ class Edge3Constant : public g2o::BaseFixedSizedEdge<2, g2o::Vector2, g2o::Verte
       : g2o::BaseFixedSizedEdge<2, g2o::Vector2, g2o::VertexSE2, g2o::VertexSE2,
                                 g2o::VertexPointXY>(){};
   void computeError() {
-    const auto a = static_cast<const g2o::VertexSE2*>(_vertices[0])->estimate();
-    const auto b = static_cast<const g2o::VertexSE2*>(_vertices[1])->estimate();
-    const auto c = static_cast<const g2o::VertexPointXY*>(_vertices[2])->estimate();
+    const auto a = vertexXnRaw<0>()->estimate();
+    const auto b = vertexXnRaw<1>()->estimate();
+    const auto c = vertexXnRaw<2>()->estimate();
     _error = (a * b * c - _measurement).eval();
   }
   virtual bool read(std::istream&) { return false; };
@@ -54,9 +54,9 @@ class Edge3Dynamic : public g2o::BaseVariableSizedEdge<2, g2o::Vector2> {
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
   Edge3Dynamic() : g2o::BaseVariableSizedEdge<2, g2o::Vector2>() { resize(3); };
   void computeError() {
-    const auto a = static_cast<const g2o::VertexSE2*>(_vertices[0])->estimate();
-    const auto b = static_cast<const g2o::VertexSE2*>(_vertices[1])->estimate();
-    const auto c = static_cast<const g2o::VertexPointXY*>(_vertices[2])->estimate();
+    const auto a = static_cast<const g2o::VertexSE2*>(vertexRaw(0))->estimate();
+    const auto b = static_cast<const g2o::VertexSE2*>(vertexRaw(1))->estimate();
+    const auto c = static_cast<const g2o::VertexPointXY*>(vertexRaw(2))->estimate();
     _error = (a * b * c - _measurement).eval();
   }
   virtual bool read(std::istream&) { return false; };
@@ -129,15 +129,15 @@ class EdgeTester {
     edge.setMeasurement(g2o::Vector2{.3, .4});
     edge.setInformation(g2o::Matrix2::Identity());
 
-    v1.setId(0);
-    v1.setEstimate(g2o::SE2(.1, .2, .3));
-    v2.setId(1);
-    v2.setEstimate(g2o::SE2(.3, .1, .2));
-    v3.setId(2);
-    v3.setEstimate(g2o::Vector2(-.3, .5));
-    edge.setVertex(0, &v1);
-    edge.setVertex(1, &v2);
-    edge.setVertex(2, &v3);
+    v1->setId(0);
+    v1->setEstimate(g2o::SE2(.1, .2, .3));
+    v2->setId(1);
+    v2->setEstimate(g2o::SE2(.3, .1, .2));
+    v3->setId(2);
+    v3->setEstimate(g2o::Vector2(-.3, .5));
+    edge.setVertex(0, v1);
+    edge.setVertex(1, v2);
+    edge.setVertex(2, v3);
 
     jacobianWorkspace.updateSize(&edge);
     jacobianWorkspace.allocate();
@@ -151,16 +151,16 @@ class EdgeTester {
     edge.mapHessianMemory(hessian01.data(), 0, 1, false);
     edge.mapHessianMemory(hessian02.data(), 0, 2, false);
     edge.mapHessianMemory(hessian12.data(), 1, 2, false);
-    v1.mapHessianMemory(hessian00.data());
-    v2.mapHessianMemory(hessian11.data());
-    v3.mapHessianMemory(hessian22.data());
+    v1->mapHessianMemory(hessian00.data());
+    v2->mapHessianMemory(hessian11.data());
+    v3->mapHessianMemory(hessian22.data());
   }
 
   EdgeType edge;
 
-  g2o::VertexSE2 v1;
-  g2o::VertexSE2 v2;
-  g2o::VertexPointXY v3;
+  std::shared_ptr<g2o::VertexSE2> v1 = std::make_shared<g2o::VertexSE2>();
+  std::shared_ptr<g2o::VertexSE2> v2 = std::make_shared<g2o::VertexSE2>();
+  std::shared_ptr<g2o::VertexPointXY> v3 = std::make_shared<g2o::VertexPointXY>();
 
   g2o::JacobianWorkspace jacobianWorkspace;
 
@@ -177,12 +177,12 @@ TEST(ConstantEdgeTest, ConstantEdge_allVerticesFixed) {
   EdgeTester<Edge3Constant> constant;
   ASSERT_EQ(dynamic.edge.allVerticesFixed(), constant.edge.allVerticesFixed());
   ASSERT_FALSE(constant.edge.allVerticesFixed());
-  dynamic.v1.setFixed(true);
-  dynamic.v2.setFixed(true);
-  dynamic.v3.setFixed(true);
-  constant.v1.setFixed(true);
-  constant.v2.setFixed(true);
-  constant.v3.setFixed(true);
+  dynamic.v1->setFixed(true);
+  dynamic.v2->setFixed(true);
+  dynamic.v3->setFixed(true);
+  constant.v1->setFixed(true);
+  constant.v2->setFixed(true);
+  constant.v3->setFixed(true);
   ASSERT_EQ(dynamic.edge.allVerticesFixed(), constant.edge.allVerticesFixed());
   ASSERT_TRUE(constant.edge.allVerticesFixed());
 }

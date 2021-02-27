@@ -48,7 +48,7 @@ void BaseVariableSizedEdge<D, E>::constructQuadraticForm() {
 template <int D, typename E>
 void BaseVariableSizedEdge<D, E>::linearizeOplus(JacobianWorkspace& jacobianWorkspace) {
   for (size_t i = 0; i < _vertices.size(); ++i) {
-    OptimizableGraph::Vertex* v = static_cast<OptimizableGraph::Vertex*>(_vertices[i]);
+    OptimizableGraph::Vertex* v = vertexRaw(i);
     assert(v->dimension() >= 0);
     new (&_jacobianOplus[i])
         JacobianType(jacobianWorkspace.workspaceForVertex(i), D < 0 ? _dimension : D, v->dimension());
@@ -65,7 +65,7 @@ void BaseVariableSizedEdge<D, E>::linearizeOplus() {
 
   for (size_t i = 0; i < _vertices.size(); ++i) {
     // Xi - estimate the jacobian numerically
-    OptimizableGraph::Vertex* vi = static_cast<OptimizableGraph::Vertex*>(_vertices[i]);
+    OptimizableGraph::Vertex* vi = vertexRaw(i);
 
     if (vi->fixed()) {
       continue;
@@ -107,8 +107,8 @@ template <int D, typename E>
 void BaseVariableSizedEdge<D, E>::mapHessianMemory(number_t* d, int i, int j, bool rowMajor) {
   int idx = internal::computeUpperTriangleIndex(i, j);
   assert(idx < (int)_hessian.size());
-  OptimizableGraph::Vertex* vi = static_cast<OptimizableGraph::Vertex*>(HyperGraph::Edge::vertex(i));
-  OptimizableGraph::Vertex* vj = static_cast<OptimizableGraph::Vertex*>(HyperGraph::Edge::vertex(j));
+  OptimizableGraph::Vertex* vi = vertexRaw(i);
+  OptimizableGraph::Vertex* vj = vertexRaw(j);
   assert(vi->dimension() >= 0);
   assert(vj->dimension() >= 0);
   HessianHelper& h = _hessian[idx];
@@ -135,7 +135,7 @@ void BaseVariableSizedEdge<D, E>::resize(size_t size) {
 template <int D, typename E>
 bool BaseVariableSizedEdge<D, E>::allVerticesFixed() const {
   for (size_t i = 0; i < _vertices.size(); ++i) {
-    if (!static_cast<const OptimizableGraph::Vertex*>(_vertices[i])->fixed()) {
+    if (!vertexRaw(i)->fixed()) {
       return false;
     }
   }
@@ -145,7 +145,7 @@ bool BaseVariableSizedEdge<D, E>::allVerticesFixed() const {
 template <int D, typename E>
 void BaseVariableSizedEdge<D, E>::computeQuadraticForm(const InformationType& omega, const ErrorVector& weightedError) {
   for (size_t i = 0; i < _vertices.size(); ++i) {
-    OptimizableGraph::Vertex* from = static_cast<OptimizableGraph::Vertex*>(_vertices[i]);
+    OptimizableGraph::Vertex* from = vertexRaw(i);
     bool istatus = !(from->fixed());
 
     if (istatus) {
@@ -166,7 +166,7 @@ void BaseVariableSizedEdge<D, E>::computeQuadraticForm(const InformationType& om
 
       // compute the off-diagonal blocks ij for all j
       for (size_t j = i + 1; j < _vertices.size(); ++j) {
-        OptimizableGraph::Vertex* to = static_cast<OptimizableGraph::Vertex*>(_vertices[j]);
+        OptimizableGraph::Vertex* to = vertexRaw(j);
 
         bool jstatus = !(to->fixed());
         if (jstatus) {

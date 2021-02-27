@@ -43,8 +43,8 @@ namespace g2o {
 
       void computeError()
       {
-        const VertexSE2* v1 = static_cast<const VertexSE2*>(_vertices[0]);
-        const VertexPointXY* l2 = static_cast<const VertexPointXY*>(_vertices[1]);
+        const VertexSE2* v1 = vertexXnRaw<0>();
+        const VertexPointXY* l2 = vertexXnRaw<1>();
         _error = (v1->estimate().inverse() * l2->estimate()) - _measurement;
       }
 
@@ -59,12 +59,12 @@ namespace g2o {
         d[1] = _measurement[1];
         return true;
       }
-      
+
       virtual int measurementDimension() const {return 2;}
 
       virtual bool setMeasurementFromState(){
-        const VertexSE2* v1 = static_cast<const VertexSE2*>(_vertices[0]);
-        const VertexPointXY* l2 = static_cast<const VertexPointXY*>(_vertices[1]);
+        const VertexSE2* v1 = vertexXnRaw<0>();
+        const VertexPointXY* l2 = vertexXnRaw<1>();
         _measurement = v1->estimate().inverse() * l2->estimate();
         return true;
       }
@@ -82,7 +82,7 @@ namespace g2o {
   class G2O_TYPES_SLAM2D_API EdgeSE2PointXYWriteGnuplotAction: public WriteGnuplotAction {
   public:
     EdgeSE2PointXYWriteGnuplotAction();
-    virtual HyperGraphElementAction* operator()(HyperGraph::HyperGraphElement* element, 
+    virtual HyperGraphElementAction* operator()(HyperGraph::HyperGraphElement* element,
             HyperGraphElementAction::Parameters* params_);
   };
 
@@ -90,7 +90,7 @@ namespace g2o {
   class G2O_TYPES_SLAM2D_API EdgeSE2PointXYDrawAction: public DrawAction{
   public:
     EdgeSE2PointXYDrawAction();
-    virtual HyperGraphElementAction* operator()(HyperGraph::HyperGraphElement* element, 
+    virtual HyperGraphElementAction* operator()(HyperGraph::HyperGraphElement* element,
             HyperGraphElementAction::Parameters* params_);
   };
 #endif

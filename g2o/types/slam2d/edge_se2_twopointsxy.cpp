@@ -39,10 +39,9 @@ namespace g2o{
   }
 
   void EdgeSE2TwoPointsXY::computeError(){
-    VertexSE2 * pose = static_cast<VertexSE2 *> (_vertices[0]);
-    VertexPointXY * xy1 = static_cast<VertexPointXY *> (_vertices[1]);
-    VertexPointXY * xy2 = static_cast<VertexPointXY *> (_vertices[2]);
-
+    VertexSE2 *pose = static_cast<VertexSE2 *>(vertexRaw(0));
+    VertexPointXY *xy1 = static_cast<VertexPointXY *>(vertexRaw(1));
+    VertexPointXY *xy2 = static_cast<VertexPointXY *>(vertexRaw(2));
 
     Vector2 m1 = pose->estimate().inverse() * xy1->estimate();
     Vector2 m2 = pose->estimate().inverse() * xy2->estimate();
@@ -55,7 +54,9 @@ namespace g2o{
 
   bool EdgeSE2TwoPointsXY::read(std::istream& is){
     is >> _measurement[0] >> _measurement[1] >> _measurement[2] >> _measurement[3];
-    is >> information()(0,0) >> information()(0,1) >> information()(0,2) >> information()(0,3) >> information()(1,1) >> information()(1,2) >> information()(1,3) >> information()(2,2) >> information()(2,3) >> information()(3,3);
+    is >> information()(0, 0) >> information()(0, 1) >> information()(0, 2) >>
+        information()(0, 3) >> information()(1, 1) >> information()(1, 2) >> information()(1, 3) >>
+        information()(2, 2) >> information()(2, 3) >> information()(3, 3);
     information()(1,0) = information()(0,1);
     information()(2,0) = information()(0,2);
     information()(2,1) = information()(1,2);
@@ -66,8 +67,12 @@ namespace g2o{
   }
 
   bool EdgeSE2TwoPointsXY::write(std::ostream& os) const{
-    os << measurement()[0] << " " << measurement()[1] << " " << measurement()[2] << " "  << measurement()[3] << " ";
-    os << information()(0,0) << " " << information()(0,1) << " " << information()(0,2) << " " << information()(0,3) << " " << information()(1,1) << " " << information()(1,2) << " " << information()(1,3) << " " << information()(2,2) << " " << information()(2,3) << " " << information()(3,3);
+    os << measurement()[0] << " " << measurement()[1] << " " << measurement()[2] << " "
+       << measurement()[3] << " ";
+    os << information()(0, 0) << " " << information()(0, 1) << " " << information()(0, 2) << " "
+       << information()(0, 3) << " " << information()(1, 1) << " " << information()(1, 2) << " "
+       << information()(1, 3) << " " << information()(2, 2) << " " << information()(2, 3) << " "
+       << information()(3, 3);
     return os.good();
   }
 
@@ -77,14 +82,14 @@ namespace g2o{
 
     assert(initialEstimatePossible(fixed, toEstimate) && "Bad vertices specified");
 
-    VertexSE2 * pose = static_cast<VertexSE2 *>(_vertices[0]);
-    VertexPointXY * v1 = static_cast<VertexPointXY *>(_vertices[1]);
-    VertexPointXY * v2 = static_cast<VertexPointXY *>(_vertices[2]);
+    VertexSE2 * pose = static_cast<VertexSE2 *>(vertexRaw(0));
+    VertexPointXY * v1 = static_cast<VertexPointXY *>(vertexRaw(1));
+    VertexPointXY * v2 = static_cast<VertexPointXY *>(vertexRaw(2));
 
     bool estimatev1 = true;
     bool estimatev2 = true;
 
-    for(std::set<HyperGraph::Vertex*>::iterator it=fixed.begin(); it!=fixed.end(); ++it){
+    for (auto it = fixed.begin(); it != fixed.end(); ++it) {
       if(v1->id() == (*it)->id()){
         estimatev1 = false;
       }
@@ -108,7 +113,7 @@ namespace g2o{
   number_t EdgeSE2TwoPointsXY::initialEstimatePossible(const OptimizableGraph::VertexSet& fixed, OptimizableGraph::Vertex* toEstimate){
     (void) toEstimate;
 
-    for(std::set<HyperGraph::Vertex *>::iterator it=fixed.begin(); it!=fixed.end(); ++it){
+    for(auto it=fixed.begin(); it!=fixed.end(); ++it){
       if(_vertices[0]->id() == (*it)->id()){
         return 1.0;
       }
@@ -118,9 +123,9 @@ namespace g2o{
 
 
   bool EdgeSE2TwoPointsXY::setMeasurementFromState(){
-    VertexSE2 * pose = static_cast<VertexSE2 *> (_vertices[0]);
-    VertexPointXY * xy1 = static_cast<VertexPointXY *> (_vertices[1]);
-    VertexPointXY * xy2 = static_cast<VertexPointXY *> (_vertices[2]);
+    VertexSE2 * pose = static_cast<VertexSE2 *> (vertexRaw(0));
+    VertexPointXY * xy1 = static_cast<VertexPointXY *> (vertexRaw(1));
+    VertexPointXY * xy2 = static_cast<VertexPointXY *> (vertexRaw(2));
 
 
     Vector2 m1 = pose->estimate().inverse() * xy1->estimate();

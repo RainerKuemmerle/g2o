@@ -55,9 +55,9 @@ namespace g2o {
   {
     assert(from.size() == 1 && from.count(_vertices[0]) == 1 && "Can not initialize VertexSE2 position by VertexPointXY");
 
-    VertexSE2* vi     = static_cast<VertexSE2*>(_vertices[0]);
-    VertexPointXY* vj = static_cast<VertexPointXY*>(_vertices[1]);
-    if (from.count(vi) > 0 && to == vj) {
+    auto vi = vertexXn<0>();
+    auto vj = vertexXn<1>();
+    if (from.count(vi) > 0 && to == vj.get()) {
       vj->setEstimate(vi->estimate() * _measurement);
     }
   }
@@ -65,8 +65,8 @@ namespace g2o {
 #ifndef NUMERIC_JACOBIAN_TWO_D_TYPES
   void EdgeSE2PointXY::linearizeOplus()
   {
-    const VertexSE2* vi     = static_cast<const VertexSE2*>(_vertices[0]);
-    const VertexPointXY* vj = static_cast<const VertexPointXY*>(_vertices[1]);
+    const VertexSE2* vi     = vertexXnRaw<0>();
+    const VertexPointXY* vj = vertexXnRaw<1>();
     const number_t& x1        = vi->estimate().translation()[0];
     const number_t& y1        = vi->estimate().translation()[1];
     const number_t& th1       = vi->estimate().rotation().angle();
@@ -105,8 +105,8 @@ namespace g2o {
     EdgeSE2PointXY* e =  static_cast<EdgeSE2PointXY*>(element);
     if (e->numUndefinedVertices())
       return this;
-    VertexSE2* fromEdge = static_cast<VertexSE2*>(e->vertex(0));
-    VertexPointXY* toEdge   = static_cast<VertexPointXY*>(e->vertex(1));
+    auto fromEdge = e->vertexXn<0>();
+    auto toEdge   = e->vertexXn<1>();
     *(params->os) << fromEdge->estimate().translation().x() << " " << fromEdge->estimate().translation().y()
       << " " << fromEdge->estimate().rotation().angle() << std::endl;
     *(params->os) << toEdge->estimate().x() << " " << toEdge->estimate().y() << std::endl;
@@ -131,8 +131,8 @@ namespace g2o {
 
 
     EdgeSE2PointXY* e =  static_cast<EdgeSE2PointXY*>(element);
-    VertexSE2* fromEdge = static_cast<VertexSE2*>(e->vertex(0));
-    VertexPointXY* toEdge   = static_cast<VertexPointXY*>(e->vertex(1));
+    auto fromEdge = e->vertexXn<0>();
+    auto toEdge   = e->vertexXn<1>();
     if (! fromEdge)
       return this;
     Vector2 p=e->measurement();

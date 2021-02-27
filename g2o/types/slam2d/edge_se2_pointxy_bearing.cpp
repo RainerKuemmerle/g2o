@@ -45,8 +45,8 @@ namespace g2o {
     if (from.count(_vertices[0]) != 1)
       return;
     number_t r=2.;
-    const VertexSE2* v1 = static_cast<const VertexSE2*>(_vertices[0]);
-    VertexPointXY* l2 = static_cast<VertexPointXY*>(_vertices[1]);
+    const VertexSE2* v1 = vertexXnRaw<0>();
+    VertexPointXY* l2 = vertexXnRaw<1>();
     SE2 t=v1->estimate();
     t.setRotation(t.rotation()*Rotation2D(_measurement));
     Vector2 vr(r, 0.);
@@ -79,10 +79,11 @@ namespace g2o {
     }
 
     EdgeSE2PointXYBearing* e =  static_cast<EdgeSE2PointXYBearing*>(element);
-    VertexSE2* fromEdge = static_cast<VertexSE2*>(e->vertex(0));
-    VertexPointXY* toEdge   = static_cast<VertexPointXY*>(e->vertex(1));
-    *(params->os) << fromEdge->estimate().translation().x() << " " << fromEdge->estimate().translation().y()
-      << " " << fromEdge->estimate().rotation().angle() << std::endl;
+    auto fromEdge = e->vertexXn<0>();
+    auto toEdge   = e->vertexXn<1>();
+    *(params->os) << fromEdge->estimate().translation().x() << " "
+                  << fromEdge->estimate().translation().y() << " "
+                  << fromEdge->estimate().rotation().angle() << std::endl;
     *(params->os) << toEdge->estimate().x() << " " << toEdge->estimate().y() << std::endl;
     *(params->os) << std::endl;
     return this;
@@ -98,13 +99,13 @@ namespace g2o {
     refreshPropertyPtrs(params_);
     if (! _previousParams)
       return this;
-    
+
     if (_show && !_show->value())
       return this;
 
     EdgeSE2PointXYBearing* e =  static_cast<EdgeSE2PointXYBearing*>(element);
-    VertexSE2* from = static_cast<VertexSE2*>(e->vertex(0));
-    VertexPointXY* to   = static_cast<VertexPointXY*>(e->vertex(1));
+    auto from = e->vertexXn<0>();
+    auto to   = e->vertexXn<1>();
     if (! from)
       return this;
     number_t guessRange=5;

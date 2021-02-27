@@ -586,11 +586,32 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
     auto noData = std::shared_ptr<HyperGraph::Data>();
     return addVertex(v, noData);
   }
-  bool addVertex(std::shared_ptr<OptimizableGraph::Vertex>& v,
+  virtual bool addVertex(std::shared_ptr<OptimizableGraph::Vertex>& v,
                  std::shared_ptr<HyperGraph::Data>& userData);
-  bool addVertex(std::shared_ptr<OptimizableGraph::Vertex>& v) {
+  virtual bool addVertex(std::shared_ptr<OptimizableGraph::Vertex>& v) {
     auto noData = std::shared_ptr<HyperGraph::Data>();
     return addVertex(v, noData);
+  }
+
+  template <typename DerivedVertexType, typename DerivedDataType>
+  bool addVertex(typename std::shared_ptr<DerivedVertexType>& v,
+                 typename std::shared_ptr<DerivedDataType>& userData) {
+    std::shared_ptr<OptimizableGraph::Vertex> ov =
+        std::dynamic_pointer_cast<OptimizableGraph::Vertex>(v);
+    std::shared_ptr<HyperGraph::Data> hd = std::dynamic_pointer_cast<HyperGraph::Data>(userData);
+    assert(ov && "Vertex does not inherit from OptimizableGraph::Vertex");
+    assert(hd && "UserData does not inherit from HyperGraph::Data");
+    if (!ov) return false;
+    return addVertex(ov, hd);
+  }
+
+  template <typename DerivedVertexType>
+  bool addVertex(typename std::shared_ptr<DerivedVertexType>& v) {
+    std::shared_ptr<OptimizableGraph::Vertex> ov =
+        std::dynamic_pointer_cast<OptimizableGraph::Vertex>(v);
+    assert(ov && "Vertex does not inherit from OptimizableGraph::Vertex");
+    if (!ov) return false;
+    return addVertex(ov);
   }
 
   /**
@@ -601,6 +622,15 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
    */
   virtual bool addEdge(std::shared_ptr<HyperGraph::Edge>& e);
   bool addEdge(std::shared_ptr<OptimizableGraph::Edge>& e);
+
+  template <typename DerivedEdgeType>
+  bool addEdge(typename std::shared_ptr<DerivedEdgeType>& e) {
+    std::shared_ptr<OptimizableGraph::Edge> oe =
+        std::dynamic_pointer_cast<OptimizableGraph::Edge>(e);
+    assert(oe && "Edge does not inherit from OptimizableGraph::Edge");
+    if (!oe) return false;
+    return addEdge(oe);
+  }
 
   /**
    * overridden from HyperGraph, to mantain the bookkeeping of the caches/parameters and jacobian
@@ -756,6 +786,24 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
 /**
   @}
  */
+
+/**
+ * helper function for creating a vertex in a shared_ptr.
+ */
+template<typename T, typename ...ArgTs>
+std::shared_ptr<g2o::OptimizableGraph::Vertex> make_vertex(ArgTs&& ...args)
+{
+  return std::shared_ptr<g2o::OptimizableGraph::Vertex>(new T(std::forward<ArgTs>(args)...));
+};
+
+/**
+ * helper function for creating an edge in a shared_ptr.
+ */
+template<typename T, typename ...ArgTs>
+std::shared_ptr<g2o::OptimizableGraph::Edge> make_edge(ArgTs&& ...args)
+{
+  return std::shared_ptr<g2o::OptimizableGraph::Edge>(new T(std::forward<ArgTs>(args)...));
+};
 
 }  // namespace g2o
 

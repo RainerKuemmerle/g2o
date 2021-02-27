@@ -108,7 +108,7 @@ namespace g2o {
     glRotatef((float)RAD2DEG(that->estimate().rotation().angle()),0.f,0.f,1.f);
     opengl::drawArrow2D((float)_triangleX->value(), (float)_triangleY->value(), (float)_triangleX->value()*.3f);
     drawCache(that->cacheContainer(), params_);
-    drawUserData(that->userData(), params_);
+    drawUserData(that->userData().get(), params_);
     glPopMatrix();
     return this;
   }

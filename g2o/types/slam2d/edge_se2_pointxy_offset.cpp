@@ -43,8 +43,8 @@ namespace g2o {
 
   bool EdgeSE2PointXYOffset::resolveCaches(){
     ParameterVector pv(1);
-    pv[0]=offsetParam;
-    resolveCache(cache, (OptimizableGraph::Vertex*)_vertices[0],"CACHE_SE2_OFFSET",pv);
+    pv[0] = offsetParam;
+    resolveCache(cache, vertexXnRaw<0>(), "CACHE_SE2_OFFSET", pv);
     return cache != 0;
   }
 
@@ -71,7 +71,7 @@ namespace g2o {
   void EdgeSE2PointXYOffset::computeError() {
     // from cam to point (track)
     // VertexSE2 *rob = static_cast<VertexSE2*>(_vertices[0]);
-    VertexPointXY *point = static_cast<VertexPointXY*>(_vertices[1]);
+    VertexPointXY *point = vertexXnRaw<1>();
 
     Vector2 perr = cache->w2lMatrix() * point->estimate();
 
@@ -81,8 +81,8 @@ namespace g2o {
   }
 
   void EdgeSE2PointXYOffset::linearizeOplus() {
-    VertexSE2 *rob = static_cast<VertexSE2*>(_vertices[0]);
-    VertexPointXY *point = static_cast<VertexPointXY*>(_vertices[1]);
+    VertexSE2 *rob = vertexXnRaw<0>();
+    VertexPointXY *point = vertexXnRaw<1>();
     _jacobianOplusXi.block<2,2>(0,0) = - cache->RpInverseRInverseMatrix();
     _jacobianOplusXi.block<2,1>(0,2) = cache->RpInverseRInversePrimeMatrix()*(point->estimate()-rob->estimate().translation());
     _jacobianOplusXj = cache->RpInverseRInverseMatrix();
@@ -90,7 +90,7 @@ namespace g2o {
 
 
   bool EdgeSE2PointXYOffset::setMeasurementFromState(){
-    VertexPointXY *point = static_cast<VertexPointXY*>(_vertices[1]);
+    VertexPointXY *point = vertexXnRaw<1>();
 
     _measurement = cache->w2lMatrix() * point->estimate();
     return true;
@@ -102,8 +102,8 @@ namespace g2o {
     (void) from;
     assert(from.size() == 1 && from.count(_vertices[0]) == 1 && "Can not initialize VertexDepthCam position by VertexTrackXY");
 
-    VertexSE2 *cam = dynamic_cast<VertexSE2*>(_vertices[0]);
-    VertexPointXY *point = dynamic_cast<VertexPointXY*>(_vertices[1]);
+    VertexSE2 *cam = vertexXnRaw<0>();
+    VertexPointXY *point = vertexXnRaw<1>();
     // SE2OffsetCache* vcache = (SE2OffsetCache* ) cam->getCache(_cacheIds[0]);
     // if (! vcache){
     //   cerr << "fatal error in retrieving cache" << endl;

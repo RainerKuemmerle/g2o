@@ -62,10 +62,10 @@ namespace g2o {
 
     virtual bool read(std::istream& is);
     virtual bool write(std::ostream& os) const;
-      
+
     virtual void computeError()
     {
-      const VertexSE2* v = static_cast<const VertexSE2*>(_vertices[0]);
+      const VertexSE2* v = vertexXnRaw<0>();
       _error = v->estimate().translation() - _measurement;
     }
   };

@@ -106,7 +106,7 @@ namespace g2o {
     opengl::drawPoint(ps);
     glPopAttrib();
     drawCache(that->cacheContainer(), params);
-    drawUserData(that->userData(), params);
+    drawUserData(that->userData().get(), params);
     glPopMatrix();
     return this;
   }

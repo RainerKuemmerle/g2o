@@ -42,7 +42,7 @@ namespace g2o {
   bool EdgeSE3PointXYZDepth::resolveCaches(){
     ParameterVector pv(1);
     pv[0]=params;
-    resolveCache(cache, (OptimizableGraph::Vertex*)_vertices[0],"CACHE_CAMERA",pv);
+    resolveCache(cache, vertexXnRaw<0>(),"CACHE_CAMERA",pv);
     return cache != 0;
   }
 
@@ -61,7 +61,7 @@ namespace g2o {
   void EdgeSE3PointXYZDepth::computeError() {
     // from cam to point (track)
     //VertexSE3 *cam = static_cast<VertexSE3*>(_vertices[0]);
-    VertexPointXYZ *point = static_cast<VertexPointXYZ*>(_vertices[1]);
+    VertexPointXYZ *point = vertexXnRaw<1>();
 
     Vector3 p = cache->w2i() * point->estimate();
     Vector3 perr;
@@ -75,7 +75,7 @@ namespace g2o {
 
   void EdgeSE3PointXYZDepth::linearizeOplus() {
     //VertexSE3 *cam = static_cast<VertexSE3 *>(_vertices[0]);
-    VertexPointXYZ *vp = static_cast<VertexPointXYZ *>(_vertices[1]);
+    VertexPointXYZ *vp = vertexXnRaw<1>();
 
     const Vector3& pt = vp->estimate();
 
@@ -109,7 +109,7 @@ namespace g2o {
 
   bool EdgeSE3PointXYZDepth::setMeasurementFromState(){
     //VertexSE3 *cam = static_cast<VertexSE3*>(_vertices[0]);
-    VertexPointXYZ *point = static_cast<VertexPointXYZ*>(_vertices[1]);
+    VertexPointXYZ *point = vertexXnRaw<1>();
 
     // calculate the projection
     const Vector3& pt = point->estimate();
@@ -126,10 +126,10 @@ namespace g2o {
   void EdgeSE3PointXYZDepth::initialEstimate(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* /*to_*/)
   {
     (void) from;
-    assert(from.size() == 1 && from.count(_vertices[0]) == 1 && "Can not initialize VertexDepthCam position by VertexTrackXYZ");
+    assert(from.size() == 1 && from.count(vertexXn<0>()) == 1 && "Can not initialize VertexDepthCam position by VertexTrackXYZ");
 
-    VertexSE3 *cam = dynamic_cast<VertexSE3*>(_vertices[0]);
-    VertexPointXYZ *point = dynamic_cast<VertexPointXYZ*>(_vertices[1]);
+    VertexSE3 *cam = vertexXnRaw<0>();
+    VertexPointXYZ *point = vertexXnRaw<1>();
     const Eigen::Matrix<number_t, 3, 3, Eigen::ColMajor>& invKcam = params->invKcam();
     Vector3 p;
     p(2) = _measurement(2);

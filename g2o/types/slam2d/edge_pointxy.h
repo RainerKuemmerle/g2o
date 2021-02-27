@@ -42,8 +42,8 @@ namespace g2o {
 
       void computeError()
       {
-        const VertexPointXY* v1 = static_cast<const VertexPointXY*>(_vertices[0]);
-        const VertexPointXY* v2 = static_cast<const VertexPointXY*>(_vertices[1]);
+        const VertexPointXY* v1 = vertexXnRaw<0>();
+        const VertexPointXY* v2 = vertexXnRaw<1>();
         _error = (v2->estimate()-v1->estimate())-_measurement;
       }
       virtual bool read(std::istream& is);
@@ -67,8 +67,8 @@ namespace g2o {
       virtual int measurementDimension() const {return 2;}
 
       virtual bool setMeasurementFromState() {
-        const VertexPointXY* v1 = static_cast<const VertexPointXY*>(_vertices[0]);
-        const VertexPointXY* v2 = static_cast<const VertexPointXY*>(_vertices[1]);
+        const VertexPointXY* v1 = vertexXnRaw<0>();
+        const VertexPointXY* v2 = vertexXnRaw<1>();
         _measurement = v2->estimate()-v1->estimate();
         return true;
       }

@@ -48,10 +48,10 @@ namespace g2o {
     assert(_offsetFrom && _offsetTo);
 
     ParameterVector pv(1);
-    pv[0]=_offsetFrom;
-    resolveCache(_cacheFrom, (OptimizableGraph::Vertex*)_vertices[0],"CACHE_SE2_OFFSET",pv);
-    pv[0]=_offsetTo;
-    resolveCache(_cacheTo, (OptimizableGraph::Vertex*)_vertices[1],"CACHE_SE2_OFFSET",pv);
+    pv[0] = _offsetFrom;
+    resolveCache(_cacheFrom, vertexXnRaw<0>(), "CACHE_SE2_OFFSET", pv);
+    pv[0] = _offsetTo;
+    resolveCache(_cacheTo, vertexXnRaw<1>(), "CACHE_SE2_OFFSET", pv);
     return (_cacheFrom && _cacheTo);
   }
 
@@ -94,8 +94,8 @@ namespace g2o {
   }
 
   void EdgeSE2Offset::initialEstimate(const OptimizableGraph::VertexSet& from_, OptimizableGraph::Vertex* /*to_*/) {
-    VertexSE2 *from = static_cast<VertexSE2*>(_vertices[0]);
-    VertexSE2 *to   = static_cast<VertexSE2*>(_vertices[1]);
+    auto from = vertexXn<0>();
+    auto to   = vertexXn<1>();
 
     SE2 virtualMeasurement = _cacheFrom->offsetParam()->offset() * measurement() * _cacheTo->offsetParam()->offset().inverse();
 

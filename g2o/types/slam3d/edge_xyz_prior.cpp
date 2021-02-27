@@ -45,7 +45,7 @@ namespace g2o {
   }
 
   void EdgeXYZPrior::computeError() {
-    const VertexPointXYZ* v = static_cast<const VertexPointXYZ*>(_vertices[0]);
+    const VertexPointXYZ* v = vertexXnRaw<0>();
     _error = v->estimate() - _measurement;
   }
 
@@ -54,7 +54,7 @@ namespace g2o {
   }
 
   bool EdgeXYZPrior::setMeasurementFromState(){
-      const VertexPointXYZ* v = static_cast<const VertexPointXYZ*>(_vertices[0]);
+      const VertexPointXYZ* v = vertexXnRaw<0>();
       _measurement = v->estimate();
       return true;
   }

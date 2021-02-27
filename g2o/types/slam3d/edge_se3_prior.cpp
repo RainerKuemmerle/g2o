@@ -47,7 +47,7 @@ bool EdgeSE3Prior::resolveCaches() {
   assert(_offsetParam);
   ParameterVector pv(1);
   pv[0] = _offsetParam;
-  resolveCache(_cache, (OptimizableGraph::Vertex*)_vertices[0], "CACHE_SE3_OFFSET", pv);
+  resolveCache(_cache, vertexXnRaw<0>(), "CACHE_SE3_OFFSET", pv);
   return _cache != 0;
 }
 
@@ -73,7 +73,7 @@ void EdgeSE3Prior::computeError() {
 }
 
 void EdgeSE3Prior::linearizeOplus() {
-  VertexSE3* from = static_cast<VertexSE3*>(_vertices[0]);
+  VertexSE3* from = vertexXnRaw<0>();
   Isometry3 E;
   Isometry3 Z, X, P;
   X = from->estimate();
@@ -88,7 +88,7 @@ bool EdgeSE3Prior::setMeasurementFromState() {
 }
 
 void EdgeSE3Prior::initialEstimate(const OptimizableGraph::VertexSet& /*from_*/, OptimizableGraph::Vertex* /*to_*/) {
-  VertexSE3* v = static_cast<VertexSE3*>(_vertices[0]);
+  VertexSE3* v = vertexXnRaw<0>();
   assert(v && "Vertex for the Prior edge is not set");
 
   Isometry3 newEstimate = _offsetParam->offset().inverse() * measurement();

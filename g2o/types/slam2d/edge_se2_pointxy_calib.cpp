@@ -40,8 +40,8 @@ namespace g2o {
 
     if (from.count(_vertices[0]) != 1)
       return;
-    VertexSE2* vi     = static_cast<VertexSE2*>(_vertices[0]);
-    VertexPointXY* vj = static_cast<VertexPointXY*>(_vertices[1]);
+    VertexSE2* vi     = static_cast<VertexSE2*>(vertexRaw(0));
+    VertexPointXY* vj = static_cast<VertexPointXY*>(vertexRaw(1));
     vj->setEstimate(vi->estimate() * _measurement);
   }
 

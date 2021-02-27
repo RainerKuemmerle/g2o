@@ -100,6 +100,11 @@ class BaseVariableSizedEdge : public BaseEdge<D, E> {
 
   void computeQuadraticForm(const InformationType& omega, const ErrorVector& weightedError);
 
+  OptimizableGraph::Vertex* vertexRaw(size_t n) const {
+    assert(n < _vertices.size() && "Index out of bounds");
+    return static_cast<OptimizableGraph::Vertex*>(_vertices[n].get());
+  }
+
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 };

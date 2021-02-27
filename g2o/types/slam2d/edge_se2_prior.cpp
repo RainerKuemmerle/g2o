@@ -35,7 +35,7 @@ namespace g2o {
   void EdgeSE2Prior::initialEstimate(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to)
   {
     assert(from.size() == 0); (void) from; (void) to;
-    VertexSE2* v1 = static_cast<VertexSE2*>(_vertices[0]);
+    VertexSE2* v1 = vertexXnRaw<0>();
     v1->setEstimate(_measurement);
   }
 

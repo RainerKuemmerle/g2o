@@ -44,7 +44,7 @@ namespace g2o {
 
       void computeError()
       {
-        const VertexSE2* v1 = static_cast<const VertexSE2*>(_vertices[0]);
+        const VertexSE2* v1 = vertexXnRaw<0>();
         SE2 delta = _inverseMeasurement * v1->estimate();
         _error = delta.toVector();
       }

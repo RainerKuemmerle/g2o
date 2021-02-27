@@ -56,8 +56,8 @@ namespace g2o {
 
   void EdgeSE2::initialEstimate(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* /* to */)
   {
-    VertexSE2* fromEdge = static_cast<VertexSE2*>(_vertices[0]);
-    VertexSE2* toEdge   = static_cast<VertexSE2*>(_vertices[1]);
+    auto fromEdge = vertexXn<0>();
+    auto toEdge   = vertexXn<1>();
     if (from.count(fromEdge) > 0)
       toEdge->setEstimate(fromEdge->estimate() * _measurement);
     else
@@ -67,8 +67,8 @@ namespace g2o {
 #ifndef NUMERIC_JACOBIAN_TWO_D_TYPES
   void EdgeSE2::linearizeOplus()
   {
-    const VertexSE2* vi = static_cast<const VertexSE2*>(_vertices[0]);
-    const VertexSE2* vj = static_cast<const VertexSE2*>(_vertices[1]);
+    const VertexSE2* vi = vertexXnRaw<0>();
+    const VertexSE2* vj = vertexXnRaw<1>();
     number_t thetai = vi->estimate().rotation().angle();
 
     Vector2 dt = vj->estimate().translation() - vi->estimate().translation();
@@ -105,9 +105,9 @@ namespace g2o {
       return nullptr;
     }
 
-    EdgeSE2* e =  static_cast<EdgeSE2*>(element);
-    VertexSE2* fromEdge = static_cast<VertexSE2*>(e->vertex(0));
-    VertexSE2* toEdge   = static_cast<VertexSE2*>(e->vertex(1));
+    EdgeSE2* e = static_cast<EdgeSE2*>(element);
+    auto fromEdge = e->vertexXn<0>();
+    auto toEdge   = e->vertexXn<1>();
     *(params->os) << fromEdge->estimate().translation().x() << " " << fromEdge->estimate().translation().y()
       << " " << fromEdge->estimate().rotation().angle() << std::endl;
     *(params->os) << toEdge->estimate().translation().x() << " " << toEdge->estimate().translation().y()
@@ -146,8 +146,8 @@ namespace g2o {
       return this;
 
     EdgeSE2* e =  static_cast<EdgeSE2*>(element);
-    VertexSE2* from = static_cast<VertexSE2*>(e->vertex(0));
-    VertexSE2* to   = static_cast<VertexSE2*>(e->vertex(1));
+    auto from = e->vertexXn<0>();
+    auto to   = e->vertexXn<1>();
     if (! from && ! to)
       return this;
     SE2 fromTransform;

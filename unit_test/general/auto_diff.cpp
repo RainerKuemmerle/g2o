@@ -140,21 +140,21 @@ class EdgeSE2AD : public g2o::EdgeSE2 {
 class AutoDifferentiation : public ::testing::Test {
  protected:
   void SetUp() override {
-    v1.setEstimate(g2o::Vector3(0, 0, 0));
-    v2.setEstimate(g2o::Vector3(1, 1, 1));
-    point.setEstimate(g2o::Vector2(2, 2));
+    v1->setEstimate(g2o::Vector3(0, 0, 0));
+    v2->setEstimate(g2o::Vector3(1, 1, 1));
+    point->setEstimate(g2o::Vector2(2, 2));
 
     testEdge.setMeasurement(g2o::Vector2(0, 0));
-    testEdge.setVertex(0, &v1);
-    testEdge.setVertex(1, &v2);
-    testEdge.setVertex(2, &point);
+    testEdge.setVertex(0, v1);
+    testEdge.setVertex(1, v2);
+    testEdge.setVertex(2, point);
 
     jacobianWorkspace.updateSize(&testEdge);
     jacobianWorkspace.allocate();
   }
-  VertexFlatSE2 v1;
-  VertexFlatSE2 v2;
-  g2o::VertexPointXY point;
+  std::shared_ptr<VertexFlatSE2> v1 = std::make_shared<VertexFlatSE2>();
+  std::shared_ptr<VertexFlatSE2> v2 = std::make_shared<VertexFlatSE2>();
+  std::shared_ptr<g2o::VertexPointXY> point = std::make_shared<g2o::VertexPointXY>();
   Edge3ADTester testEdge;
   g2o::JacobianWorkspace jacobianWorkspace;
 };
@@ -182,7 +182,7 @@ TEST_F(AutoDifferentiation, ComputesSomething) {
 }
 
 TEST_F(AutoDifferentiation, ComputesNothingForFixed) {
-  v2.setFixed(true);
+  v2->setFixed(true);
 
   testEdge.linearizeOplus(jacobianWorkspace);
 
@@ -200,25 +200,25 @@ TEST_F(AutoDifferentiation, ComputesNothingForFixed) {
 class AutoDifferentiationEdgeSE2 : public ::testing::Test {
  protected:
   void SetUp() override {
-    v1.setEstimate(g2o::Vector3(0, 0, 0));
-    v2.setEstimate(g2o::Vector3(1, 1, 1));
+    v1->setEstimate(g2o::Vector3(0, 0, 0));
+    v2->setEstimate(g2o::Vector3(1, 1, 1));
 
     g2o::SE2 meas(0.5, 0.5, 0.5);
 
     testEdge.setMeasurement(meas);
-    testEdge.setVertex(0, &v1);
-    testEdge.setVertex(1, &v2);
+    testEdge.setVertex(0, v1);
+    testEdge.setVertex(1, v2);
     jacobianWorkspace.updateSize(&testEdge);
     jacobianWorkspace.allocate();
 
     testEdgeAd.setMeasurement(meas);
-    testEdgeAd.setVertex(0, &v1);
-    testEdgeAd.setVertex(1, &v2);
+    testEdgeAd.setVertex(0, v1);
+    testEdgeAd.setVertex(1, v2);
     jacobianWorkspaceAd.updateSize(&testEdgeAd);
     jacobianWorkspaceAd.allocate();
   }
-  g2o::VertexSE2 v1;
-  g2o::VertexSE2 v2;
+  std::shared_ptr<g2o::VertexSE2> v1 = std::make_shared<g2o::VertexSE2>();
+  std::shared_ptr<g2o::VertexSE2> v2 = std::make_shared<g2o::VertexSE2>();
   g2o::EdgeSE2 testEdge;
   EdgeSE2AD testEdgeAd;
   g2o::JacobianWorkspace jacobianWorkspace;
