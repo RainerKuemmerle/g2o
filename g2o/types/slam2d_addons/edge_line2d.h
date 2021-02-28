@@ -40,8 +40,8 @@ class G2O_TYPES_SLAM2D_ADDONS_API EdgeLine2D : public BaseBinaryEdge<2, Line2D, 
   EdgeLine2D();
 
   void computeError() {
-    const VertexLine2D* v1 = static_cast<const VertexLine2D*>(_vertices[0]);
-    const VertexLine2D* v2 = static_cast<const VertexLine2D*>(_vertices[1]);
+    const VertexLine2D* v1 = vertexXnRaw<0>();
+    const VertexLine2D* v2 = vertexXnRaw<1>();
     _error = (v2->estimate() - v1->estimate()) - _measurement;
   }
   virtual bool read(std::istream& is);
@@ -66,16 +66,14 @@ class G2O_TYPES_SLAM2D_ADDONS_API EdgeLine2D : public BaseBinaryEdge<2, Line2D, 
   virtual int measurementDimension() const { return 2; }
 
   virtual bool setMeasurementFromState() {
-    const VertexLine2D* v1 = static_cast<const VertexLine2D*>(_vertices[0]);
-    const VertexLine2D* v2 = static_cast<const VertexLine2D*>(_vertices[1]);
+    const VertexLine2D* v1 = vertexXnRaw<0>();
+    const VertexLine2D* v2 = vertexXnRaw<1>();
     _measurement = Line2D((Vector2)(v2->estimate()) - (Vector2)v1->estimate());
     return true;
   }
 
   virtual number_t initialEstimatePossible(const OptimizableGraph::VertexSet&, OptimizableGraph::Vertex*) { return 0; }
-#ifndef NUMERIC_JACOBIAN_THREE_D_TYPES
   virtual void linearizeOplus();
-#endif
 };
 
 }  // namespace g2o

@@ -58,13 +58,13 @@ class Slam3DOptimization : public testing::Test {
 TYPED_TEST_SUITE_P(Slam3DOptimization);
 
 TYPED_TEST_P(Slam3DOptimization, Translation) {
-  g2o::VertexSE3 *v = new g2o::VertexSE3();
+  auto v = std::make_shared<g2o::VertexSE3>();
   v->setId(0);
   v->setEstimate(g2o::Isometry3::Identity());
   v->setFixed(true);
   this->optimizer.addVertex(v);
 
-  v = new g2o::VertexSE3();
+  v = std::make_shared<g2o::VertexSE3>();
   v->setId(1);
   // move vertex away from origin
   g2o::Isometry3 p2 = g2o::Isometry3::Identity();
@@ -73,7 +73,7 @@ TYPED_TEST_P(Slam3DOptimization, Translation) {
   v->setFixed(false);
   this->optimizer.addVertex(v);
 
-  g2o::EdgeSE3 *e = new g2o::EdgeSE3();
+  auto e = std::make_shared<g2o::EdgeSE3>();
   e->setInformation(g2o::EdgeSE3::InformationType::Identity());
   e->setMeasurement(g2o::Isometry3::Identity());
   e->vertices()[0] = this->optimizer.vertex(0);
@@ -88,20 +88,20 @@ TYPED_TEST_P(Slam3DOptimization, Translation) {
   ASSERT_GT(1e-6, this->optimizer.chi2());
   ASSERT_GT(1e-6, this->optimizer.activeChi2());
 
-  g2o::VertexSE3 *v2AfterOpti = dynamic_cast<g2o::VertexSE3 *>(this->optimizer.vertex(1));
+  auto v2AfterOpti = dynamic_pointer_cast<g2o::VertexSE3>(this->optimizer.vertex(1));
   ASSERT_DOUBLE_EQ(0., (v2AfterOpti->estimate().translation() - g2o::Vector3::Zero()).norm());
   ASSERT_DOUBLE_EQ(0.,
                    (v2AfterOpti->estimate().rotation().diagonal() - g2o::Vector3::Ones()).norm());
 }
 
 TYPED_TEST_P(Slam3DOptimization, Rotation) {
-  g2o::VertexSE3 *v = new g2o::VertexSE3();
+  auto v = std::make_shared<g2o::VertexSE3>();
   v->setId(0);
   v->setEstimate(g2o::Isometry3::Identity());
   v->setFixed(true);
   this->optimizer.addVertex(v);
 
-  v = new g2o::VertexSE3();
+  v = std::make_shared<g2o::VertexSE3>();
   v->setId(1);
   // rotate vertex a bit
   g2o::Isometry3 p2 = g2o::Isometry3::Identity();
@@ -110,7 +110,7 @@ TYPED_TEST_P(Slam3DOptimization, Rotation) {
   v->setFixed(false);
   this->optimizer.addVertex(v);
 
-  g2o::EdgeSE3 *e = new g2o::EdgeSE3();
+  auto e = std::make_shared<g2o::EdgeSE3>();
   e->setInformation(g2o::EdgeSE3::InformationType::Identity());
   e->setMeasurement(g2o::Isometry3::Identity());
   e->vertices()[0] = this->optimizer.vertex(0);
@@ -125,7 +125,7 @@ TYPED_TEST_P(Slam3DOptimization, Rotation) {
   ASSERT_GT(1e-6, this->optimizer.chi2());
   ASSERT_GT(1e-6, this->optimizer.activeChi2());
 
-  g2o::VertexSE3 *v2AfterOpti = dynamic_cast<g2o::VertexSE3 *>(this->optimizer.vertex(1));
+  auto v2AfterOpti = dynamic_pointer_cast<g2o::VertexSE3>(this->optimizer.vertex(1));
   ASSERT_DOUBLE_EQ(0., (v2AfterOpti->estimate().translation() - g2o::Vector3::Zero()).norm());
   ASSERT_DOUBLE_EQ(0.,
                    (v2AfterOpti->estimate().rotation().diagonal() - g2o::Vector3::Ones()).norm());

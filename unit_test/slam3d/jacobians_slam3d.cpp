@@ -46,15 +46,15 @@ using namespace g2o::internal;
 
 TEST(Slam3D, EdgeSE3Jacobian)
 {
-  VertexSE3 v1;
-  v1.setId(0);
+  auto v1 = std::make_shared<VertexSE3>();
+  v1->setId(0);
 
-  VertexSE3 v2;
-  v2.setId(1);
+  auto v2 = std::make_shared<VertexSE3>();
+  v2->setId(1);
 
   EdgeSE3 e;
-  e.setVertex(0, &v1);
-  e.setVertex(1, &v2);
+  e.setVertex(0, v1);
+  e.setVertex(1, v2);
   e.setInformation(EdgeSE3::InformationType::Identity());
 
   JacobianWorkspace jacobianWorkspace;
@@ -63,8 +63,8 @@ TEST(Slam3D, EdgeSE3Jacobian)
   numericJacobianWorkspace.allocate();
 
   for (int k = 0; k < 10000; ++k) {
-    v1.setEstimate(internal::randomIsometry3());
-    v2.setEstimate(internal::randomIsometry3());
+    v1->setEstimate(internal::randomIsometry3());
+    v2->setEstimate(internal::randomIsometry3());
     e.setMeasurement(internal::randomIsometry3());
 
     evaluateJacobian(e, jacobianWorkspace, numericJacobianWorkspace);
@@ -75,19 +75,19 @@ TEST(Slam3D, EdgeSE3PointXYZJacobian)
 {
   OptimizableGraph graph;
 
-  VertexSE3* v1 = new VertexSE3;
+  auto v1 = std::make_shared<VertexSE3>();
   v1->setId(0);
   graph.addVertex(v1);
 
-  VertexPointXYZ* v2 = new VertexPointXYZ;
+  auto v2 = std::make_shared<VertexPointXYZ>();
   v2->setId(1);
   graph.addVertex(v2);
 
-  ParameterSE3Offset* paramOffset = new ParameterSE3Offset;
+  auto paramOffset = std::make_shared<ParameterSE3Offset>();
   paramOffset->setId(0);
   graph.addParameter(paramOffset);
 
-  EdgeSE3PointXYZ* e = new EdgeSE3PointXYZ;
+  auto e = std::make_shared<EdgeSE3PointXYZ>();
   e->setVertex(0, v1);
   e->setVertex(1, v2);
   e->setInformation(EdgePointXYZ::InformationType::Identity());
@@ -96,7 +96,7 @@ TEST(Slam3D, EdgeSE3PointXYZJacobian)
 
   JacobianWorkspace jacobianWorkspace;
   JacobianWorkspace numericJacobianWorkspace;
-  numericJacobianWorkspace.updateSize(e);
+  numericJacobianWorkspace.updateSize(e.get());
   numericJacobianWorkspace.allocate();
 
   for (int k = 0; k < 10000; ++k) {
@@ -111,15 +111,15 @@ TEST(Slam3D, EdgeSE3PointXYZJacobian)
 
 TEST(Slam3D, EdgePointXYZJacobian)
 {
-  VertexPointXYZ v1;
-  v1.setId(0);
+  auto v1 = std::make_shared<VertexPointXYZ>();
+  v1->setId(0);
 
-  VertexPointXYZ v2;
-  v2.setId(1);
+  auto v2 = std::make_shared<VertexPointXYZ>();
+  v2->setId(1);
 
   EdgePointXYZ e;
-  e.setVertex(0, &v1);
-  e.setVertex(1, &v2);
+  e.setVertex(0, v1);
+  e.setVertex(1, v2);
   e.setInformation(EdgePointXYZ::InformationType::Identity());
 
   JacobianWorkspace jacobianWorkspace;
@@ -128,8 +128,8 @@ TEST(Slam3D, EdgePointXYZJacobian)
   numericJacobianWorkspace.allocate();
 
   for (int k = 0; k < 10000; ++k) {
-    v1.setEstimate(Eigen::Vector3d::Random());
-    v2.setEstimate(Eigen::Vector3d::Random());
+    v1->setEstimate(Eigen::Vector3d::Random());
+    v2->setEstimate(Eigen::Vector3d::Random());
     e.setMeasurement(Eigen::Vector3d::Random());
 
     evaluateJacobian(e, jacobianWorkspace, numericJacobianWorkspace);

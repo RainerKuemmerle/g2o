@@ -49,9 +49,7 @@ bool EdgeLine2D::write(std::ostream& os) const {
   return writeInformationMatrix(os);
 }
 
-#ifndef NUMERIC_JACOBIAN_TWO_D_TYPES
 void EdgeLine2D::linearizeOplus() {
   _jacobianOplusXi = -Matrix2::Identity();
   _jacobianOplusXj = Matrix2::Identity();
 }
-#endif

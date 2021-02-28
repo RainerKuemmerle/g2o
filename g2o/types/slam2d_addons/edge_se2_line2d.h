@@ -44,8 +44,8 @@ namespace g2o {
 
       void computeError()
       {
-        const VertexSE2* v1 = static_cast<const VertexSE2*>(_vertices[0]);
-        const VertexLine2D* l2 = static_cast<const VertexLine2D*>(_vertices[1]);
+        const VertexSE2* v1 = vertexXnRaw<0>();
+        const VertexLine2D* l2 = vertexXnRaw<1>();
         Vector2 prediction=l2->estimate();
         SE2 iT=v1->estimate().inverse();
         prediction[0] += iT.rotation().angle();
@@ -71,8 +71,8 @@ namespace g2o {
       virtual int measurementDimension() const {return 2;}
 
       virtual bool setMeasurementFromState(){
-        const VertexSE2* v1 = static_cast<const VertexSE2*>(_vertices[0]);
-        const VertexLine2D* l2 = static_cast<const VertexLine2D*>(_vertices[1]);
+        const VertexSE2* v1 = vertexXnRaw<0>();
+        const VertexLine2D* l2 = vertexXnRaw<1>();
         Vector2 prediction=l2->estimate();
         SE2 iT=v1->estimate().inverse();
         prediction[0] += iT.rotation().angle();
@@ -88,26 +88,7 @@ namespace g2o {
 
       virtual void initialEstimate(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to);
       virtual number_t initialEstimatePossible(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to) { (void) to; return (from.count(_vertices[0]) == 1 ? 1.0 : -1.0);}
-/* #ifndef NUMERIC_JACOBIAN_TWO_D_TYPES */
-/*       virtual void linearizeOplus(); */
-/* #endif */
   };
-
-/*   class G2O_TYPES_SLAM2D_ADDONS_API EdgeSE2Line2DWriteGnuplotAction: public WriteGnuplotAction { */
-/*   public: */
-/*     EdgeSE2Line2DWriteGnuplotAction(); */
-/*     virtual HyperGraphElementAction* operator()(HyperGraph::HyperGraphElement* element,  */
-/*             HyperGraphElementAction::Parameters* params_); */
-/*   }; */
-
-/* #ifdef G2O_HAVE_OPENGL */
-/*   class G2O_TYPES_SLAM2D_ADDONS_API EdgeSE2Line2DDrawAction: public DrawAction{ */
-/*   public: */
-/*     EdgeSE2Line2DDrawAction(); */
-/*     virtual HyperGraphElementAction* operator()(HyperGraph::HyperGraphElement* element,  */
-/*             HyperGraphElementAction::Parameters* params_); */
-/*   }; */
-/* #endif */
 
 } // end namespace
 

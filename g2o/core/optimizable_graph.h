@@ -564,6 +564,7 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
     virtual bool resolveCaches();
 
     std::vector<std::string> _parameterTypes;
+    // TODO rainer: can we here also use a smart pointer
     std::vector<Parameter**> _parameters;
     std::vector<int> _parameterIds;
   };
@@ -727,9 +728,9 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
    */
   virtual void clearParameters();
 
-  bool addParameter(Parameter* p) { return _parameters.addParameter(p); }
+  bool addParameter(const std::shared_ptr<Parameter>& p) { return _parameters.addParameter(p); }
 
-  Parameter* parameter(int id) { return _parameters.getParameter(id); }
+  std::shared_ptr<Parameter> parameter(int id) { return _parameters.getParameter(id); }
 
   /**
    * verify that all the information of the edges are semi positive definite, i.e.,

@@ -49,8 +49,8 @@ class EdgeSE2Segment2DLine
   G2O_TYPES_SLAM2D_ADDONS_API void setRho(number_t r) { _measurement[1] = r; }
 
   G2O_TYPES_SLAM2D_ADDONS_API void computeError() {
-    const VertexSE2* v1 = static_cast<const VertexSE2*>(_vertices[0]);
-    const VertexSegment2D* l2 = static_cast<const VertexSegment2D*>(_vertices[1]);
+    const VertexSE2* v1 = vertexXnRaw<0>();
+    const VertexSegment2D* l2 = vertexXnRaw<1>();
     SE2 iEst = v1->estimate().inverse();
     Vector2 predP1 = iEst * l2->estimateP1();
     Vector2 predP2 = iEst * l2->estimateP2();
@@ -78,8 +78,8 @@ class EdgeSE2Segment2DLine
   G2O_TYPES_SLAM2D_ADDONS_API virtual int measurementDimension() const { return 2; }
 
   G2O_TYPES_SLAM2D_ADDONS_API virtual bool setMeasurementFromState() {
-    const VertexSE2* v1 = static_cast<const VertexSE2*>(_vertices[0]);
-    const VertexSegment2D* l2 = static_cast<const VertexSegment2D*>(_vertices[1]);
+    const VertexSE2* v1 = vertexXnRaw<0>();
+    const VertexSegment2D* l2 = vertexXnRaw<1>();
     SE2 iEst = v1->estimate().inverse();
     Vector2 predP1 = iEst * l2->estimateP1();
     Vector2 predP2 = iEst * l2->estimateP2();

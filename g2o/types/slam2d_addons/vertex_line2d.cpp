@@ -90,9 +90,8 @@ namespace g2o {
     Vector2 pmiddle=n*that->rho();
     Vector2 t(-n.y(), n.x());
     number_t l1{},l2 = 10;
-    VertexPointXY *vp1=0, *vp2=0;
-    vp1=dynamic_cast<VertexPointXY*> (that->graph()->vertex(that->p1Id));
-    vp2=dynamic_cast<VertexPointXY*> (that->graph()->vertex(that->p2Id));
+    auto vp1 = std::dynamic_pointer_cast<VertexPointXY> (that->graph()->vertex(that->p1Id));
+    auto vp2 = std::dynamic_pointer_cast<VertexPointXY> (that->graph()->vertex(that->p2Id));
 
     glColor4f(0.8f,0.5f,0.3f,0.3f);
     if (vp1 && vp2) {

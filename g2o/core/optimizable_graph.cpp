@@ -146,7 +146,7 @@ bool OptimizableGraph::Edge::resolveParameters() {
   // cerr << __PRETTY_FUNCTION__ << ": encountered " << _parameters.size() << " parameters" << endl;
   for (size_t i = 0; i < _parameters.size(); i++) {
     int index = _parameterIds[i];
-    *_parameters[i] = graph()->parameter(index);
+    *_parameters[i] = graph()->parameter(index).get();
     auto& aux = **_parameters[i];
     if (typeid(aux).name() != _parameterTypes[i]) {
       cerr << __PRETTY_FUNCTION__ << ": FATAL, parameter type mismatch - encountered "
@@ -405,7 +405,7 @@ bool OptimizableGraph::load(istream& is) {
     HyperGraph::HyperGraphElement* pelement = factory->construct(token, elemParamBitset);
     if (pelement) {  // not a parameter or otherwise unknown tag
       assert(pelement->elementType() == HyperGraph::HGET_PARAMETER && "Should be a param");
-      Parameter* p = static_cast<Parameter*>(pelement);
+      auto p = std::shared_ptr<Parameter>(static_cast<Parameter*>(pelement));
       int pid;
       currentLine >> pid;
       p->setId(pid);
@@ -413,7 +413,6 @@ bool OptimizableGraph::load(istream& is) {
       if (!r) {
         cerr << __PRETTY_FUNCTION__ << ": Error reading data " << token << " for parameter " << pid
              << " at line " << lineNumber << endl;
-        delete p;
       } else {
         if (!_parameters.addParameter(p)) {
           cerr << __PRETTY_FUNCTION__ << ": Parameter of type:" << token << " id:" << pid

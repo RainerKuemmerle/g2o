@@ -51,51 +51,54 @@ class IoSlam3dParam : public ::testing::Test {
     graph.reset(new g2o::OptimizableGraph);
 
     // setting up parameters for tests
-    paramOffset = new ParameterSE3Offset();
+    paramOffset.reset(new ParameterSE3Offset());
     paramOffset->setId(paramId++);
     graph->addParameter(paramOffset);
 
-    paramCamera = new ParameterCamera;
+    paramCamera.reset(new ParameterCamera);
     paramCamera->setId(paramId++);
     graph->addParameter(paramCamera);
 
     // setting up some vertices
     for (int i = 0; i < 2; ++i) {
-      VertexSE3* p = new VertexSE3;
+      auto p = std::make_shared<VertexSE3>();
       p->setId(numVertices++);
       graph->addVertex(p);
       poses.at(i) = p;
     }
-    point = new VertexPointXYZ;
+    point.reset(new VertexPointXYZ);
     point->setId(numVertices++);
     graph->addVertex(point);
   }
 
-  bool preparePosePoseEdge(OptimizableGraph::Edge* e) {
+  template <typename T>
+  bool preparePosePoseEdge(T& e) {
     e->setParameterId(0, paramOffset->id());
     for (size_t i = 0; i < e->vertices().size(); ++i) e->setVertex(i, poses.at(i));
     return graph->addEdge(e);
   }
 
-  bool preparePosePointEdge(OptimizableGraph::Edge* e) {
+  template <typename T>
+  bool preparePosePointEdge(T& e) {
     e->setParameterId(0, paramOffset->id());
     e->setVertex(0, poses.at(0));
     e->setVertex(1, point);
     return graph->addEdge(e);
   }
 
-  bool prepareCamPointEdge(OptimizableGraph::Edge* e) {
+  template <typename T>
+  bool prepareCamPointEdge(T& e) {
     e->setParameterId(0, paramCamera->id());
     e->setVertex(0, poses.at(0));
     e->setVertex(1, point);
     return graph->addEdge(e);
   }
 
-  std::shared_ptr<g2o::OptimizableGraph> graph;
-  VertexPointXYZ* point = nullptr;
-  ParameterSE3Offset* paramOffset = nullptr;
-  ParameterCamera* paramCamera = nullptr;
-  std::vector<VertexSE3*> poses = {nullptr, nullptr};
+  std::unique_ptr<g2o::OptimizableGraph> graph;
+  std::shared_ptr<VertexPointXYZ> point;
+  std::shared_ptr<ParameterSE3Offset> paramOffset;
+  std::shared_ptr<ParameterCamera> paramCamera;
+  std::vector<std::shared_ptr<VertexSE3>> poses = {nullptr, nullptr};
   int numVertices = 0;
   int paramId = 42;
 };
@@ -118,47 +121,47 @@ TEST(IoSlam3d, ReadWriteEdgeXYZPrior) { readWriteVectorBasedEdge<EdgeXYZPrior>()
 
 TEST_F(IoSlam3dParam, ReadWriteEdgeSE3Offset) {
   // additional graph structures
-  ParameterSE3Offset* paramOffset2 = new ParameterSE3Offset();
+  auto paramOffset2 = std::make_shared<ParameterSE3Offset>();
   paramOffset2->setId(paramId++);
   graph->addParameter(paramOffset2);
 
   // setting up the edge for output
-  EdgeSE3Offset* outputEdge = new EdgeSE3Offset();
+  auto outputEdge = std::make_shared<EdgeSE3Offset>();
   outputEdge->setParameterId(1, paramOffset2->id());
   ASSERT_TRUE(preparePosePoseEdge(outputEdge));
 
   // Test IO
-  readWriteVectorBasedEdge<EdgeSE3Offset, internal::RandomIsometry3>(outputEdge);
+  readWriteVectorBasedEdge<EdgeSE3Offset, internal::RandomIsometry3>(outputEdge.get());
 }
 
 TEST_F(IoSlam3dParam, ReadWriteEdgeSE3PointXYZ) {
-  EdgeSE3PointXYZ* outputEdge = new EdgeSE3PointXYZ();
+  auto outputEdge = std::make_shared<EdgeSE3PointXYZ>();
   ASSERT_TRUE(preparePosePointEdge(outputEdge));
-  readWriteVectorBasedEdge<EdgeSE3PointXYZ>(outputEdge);
+  readWriteVectorBasedEdge<EdgeSE3PointXYZ>(outputEdge.get());
 }
 
 TEST_F(IoSlam3dParam, ReadWriteEdgeSE3Prior) {
-  EdgeSE3Prior* outputEdge = new EdgeSE3Prior();
+  auto outputEdge = std::make_shared<EdgeSE3Prior>();
   ASSERT_TRUE(preparePosePoseEdge(outputEdge));
-  readWriteVectorBasedEdge<EdgeSE3Prior, internal::RandomIsometry3>(outputEdge);
+  readWriteVectorBasedEdge<EdgeSE3Prior, internal::RandomIsometry3>(outputEdge.get());
 }
 
 TEST_F(IoSlam3dParam, ReadWriteEdgeSE3PointXYZDepth) {
-  EdgeSE3PointXYZDepth* outputEdge = new EdgeSE3PointXYZDepth();
+  auto outputEdge = std::make_shared<EdgeSE3PointXYZDepth>();
   ASSERT_TRUE(prepareCamPointEdge(outputEdge));
-  readWriteVectorBasedEdge<EdgeSE3PointXYZDepth>(outputEdge);
+  readWriteVectorBasedEdge<EdgeSE3PointXYZDepth>(outputEdge.get());
 }
 
 TEST_F(IoSlam3dParam, ReadWriteEdgeSE3PointXYZDisparity) {
-  EdgeSE3PointXYZDisparity* outputEdge = new EdgeSE3PointXYZDisparity();
+  auto outputEdge = std::make_shared<EdgeSE3PointXYZDisparity>();
   ASSERT_TRUE(prepareCamPointEdge(outputEdge));
-  readWriteVectorBasedEdge<EdgeSE3PointXYZDisparity>(outputEdge);
+  readWriteVectorBasedEdge<EdgeSE3PointXYZDisparity>(outputEdge.get());
 }
 
 TEST_F(IoSlam3dParam, ReadWriteEdgeSE3XYZPrior) {
-  EdgeSE3XYZPrior* outputEdge = new EdgeSE3XYZPrior();
+  auto outputEdge = std::make_shared<EdgeSE3XYZPrior>();
   ASSERT_TRUE(preparePosePoseEdge(outputEdge));
-  readWriteVectorBasedEdge<EdgeSE3XYZPrior>(outputEdge);
+  readWriteVectorBasedEdge<EdgeSE3XYZPrior>(outputEdge.get());
 }
 
 // Parameter tests
