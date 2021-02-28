@@ -59,8 +59,9 @@ HyperGraphElementAction* EdgeSE2OdomDifferentialCalibDrawAction::operator()(Hype
                                                                             HyperGraphElementAction::Parameters*) {
   if (typeid(*element).name() != _typeName) return nullptr;
   EdgeSE2OdomDifferentialCalib* e = static_cast<EdgeSE2OdomDifferentialCalib*>(element);
-  VertexSE2* fromEdge = static_cast<VertexSE2*>(e->vertex(0));
-  VertexSE2* toEdge = static_cast<VertexSE2*>(e->vertex(1));
+  auto fromEdge = e->vertexXn<0>();
+  auto toEdge = e->vertexXn<1>();
+  if (!fromEdge || !toEdge) return this;
   glColor3f(0.5f, 0.5f, 0.5f);
   glPushAttrib(GL_ENABLE_BIT);
   glDisable(GL_LIGHTING);

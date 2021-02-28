@@ -54,8 +54,8 @@ class EdgeSE2Segment2D
   }
 
   G2O_TYPES_SLAM2D_ADDONS_API void computeError() {
-    const VertexSE2* v1 = static_cast<const VertexSE2*>(_vertices[0]);
-    const VertexSegment2D* l2 = static_cast<const VertexSegment2D*>(_vertices[1]);
+    const VertexSE2* v1 = vertexXnRaw<0>();
+    const VertexSegment2D* l2 = vertexXnRaw<1>();
     Eigen::Map<Vector2> error1(&_error(0));
     Eigen::Map<Vector2> error2(&_error(2));
     SE2 iEst = v1->estimate().inverse();
@@ -79,8 +79,8 @@ class EdgeSE2Segment2D
   G2O_TYPES_SLAM2D_ADDONS_API virtual int measurementDimension() const { return 4; }
 
   G2O_TYPES_SLAM2D_ADDONS_API virtual bool setMeasurementFromState() {
-    const VertexSE2* v1 = static_cast<const VertexSE2*>(_vertices[0]);
-    const VertexSegment2D* l2 = static_cast<const VertexSegment2D*>(_vertices[1]);
+    const VertexSE2* v1 = vertexXnRaw<0>();
+    const VertexSegment2D* l2 = vertexXnRaw<1>();
     SE2 iEst = v1->estimate().inverse();
     setMeasurementP1(iEst * l2->estimateP1());
     setMeasurementP2(iEst * l2->estimateP2());

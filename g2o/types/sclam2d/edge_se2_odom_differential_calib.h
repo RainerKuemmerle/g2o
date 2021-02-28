@@ -42,9 +42,9 @@ class G2O_TYPES_SCLAM2D_API EdgeSE2OdomDifferentialCalib
   EdgeSE2OdomDifferentialCalib();
 
   void computeError() {
-    const VertexSE2* v1 = static_cast<const VertexSE2*>(_vertices[0]);
-    const VertexSE2* v2 = static_cast<const VertexSE2*>(_vertices[1]);
-    const VertexOdomDifferentialParams* params = static_cast<const VertexOdomDifferentialParams*>(_vertices[2]);
+    const VertexSE2* v1 = vertexXnRaw<0>();
+    const VertexSE2* v2 = vertexXnRaw<1>();
+    const VertexOdomDifferentialParams* params = vertexXnRaw<2>();
     const SE2& x1 = v1->estimate();
     const SE2& x2 = v2->estimate();
 

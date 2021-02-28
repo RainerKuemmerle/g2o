@@ -44,9 +44,9 @@ namespace g2o {
 
       void computeError()
       {
-        const VertexSE2* v1          = static_cast<const VertexSE2*>(_vertices[0]);
-        const VertexSE2* v2          = static_cast<const VertexSE2*>(_vertices[1]);
-        const VertexSE2* laserOffset = static_cast<const VertexSE2*>(_vertices[2]);
+        const VertexSE2* v1          = vertexXnRaw<0>();
+        const VertexSE2* v2          = vertexXnRaw<1>();
+        const VertexSE2* laserOffset = vertexXnRaw<2>();
         const SE2& x1 = v1->estimate();
         const SE2& x2 = v2->estimate();
         SE2 delta = _inverseMeasurement * ((x1 * laserOffset->estimate()).inverse() * x2 * laserOffset->estimate());
@@ -58,10 +58,11 @@ namespace g2o {
         _inverseMeasurement = m.inverse();
       }
 
-      virtual number_t initialEstimatePossible(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to)
-      {
-        if (   from.count(_vertices[2]) == 1 // need the laser offset
-            && ((from.count(_vertices[0]) == 1 && to == _vertices[1]) || ((from.count(_vertices[1]) == 1 && to == _vertices[0])))) {
+      virtual number_t initialEstimatePossible(const OptimizableGraph::VertexSet& from,
+                                               OptimizableGraph::Vertex* to) {
+        if (from.count(_vertices[2]) == 1  // need the laser offset
+            && ((from.count(_vertices[0]) == 1 && to == _vertices[1].get()) ||
+                ((from.count(_vertices[1]) == 1 && to == _vertices[0].get())))) {
           return 1.0;
         }
         return -1.0;
