@@ -42,7 +42,9 @@ using namespace g2o;
 
 struct RandomPlane3D {
   static Plane3D create() { return Plane3D(Vector4::Random()); }
-  static bool isApprox(const Plane3D& a, const Plane3D& b) { return a.coeffs().isApprox(b.coeffs(), 1e-5); }
+  static bool isApprox(const Plane3D& a, const Plane3D& b) {
+    return a.coeffs().isApprox(b.coeffs(), 1e-5);
+  }
 };
 
 struct RandomLine3D {
@@ -56,24 +58,24 @@ class IoSlam3dAddonsParam : public ::testing::Test {
     graph.reset(new g2o::OptimizableGraph);
 
     // setting up parameters for tests
-    paramOffset = new ParameterSE3Offset();
+    paramOffset.reset(new ParameterSE3Offset());
     paramOffset->setId(63);
     graph->addParameter(paramOffset);
 
     // setting up some vertices
     int numVertices = 0;
-    pose = new VertexSE3;
+    pose.reset(new VertexSE3);
     pose->setId(numVertices++);
     graph->addVertex(pose);
-    line = new VertexLine3D;
+    line.reset(new VertexLine3D);
     line->setId(numVertices++);
     graph->addVertex(line);
   }
 
   std::shared_ptr<g2o::OptimizableGraph> graph;
-  ParameterSE3Offset* paramOffset = nullptr;
-  VertexSE3* pose = nullptr;
-  VertexLine3D* line = nullptr;
+  std::shared_ptr<ParameterSE3Offset> paramOffset;
+  std::shared_ptr<VertexSE3> pose;
+  std::shared_ptr<VertexLine3D> line;
 };
 
 TEST(IoSlam3dAddOns, ReadWriteVertexSE3Euler) {
@@ -88,19 +90,25 @@ TEST(IoSlam3dAddOns, ReadWriteVertexPlane) {
   readWriteVectorBasedVertex<VertexPlane, RandomPlane3D>(outputVertex);
 }
 
-TEST(IoSlam3dAddOns, ReadWriteVertexLine3D) { readWriteVectorBasedVertex<VertexLine3D, RandomLine3D>(); }
+TEST(IoSlam3dAddOns, ReadWriteVertexLine3D) {
+  readWriteVectorBasedVertex<VertexLine3D, RandomLine3D>();
+}
 
-TEST(IoSlam3dAddOns, ReadWriteEdgeSE3Calib) { readWriteVectorBasedEdge<EdgeSE3Calib, internal::RandomIsometry3>(); }
+TEST(IoSlam3dAddOns, ReadWriteEdgeSE3Calib) {
+  readWriteVectorBasedEdge<EdgeSE3Calib, internal::RandomIsometry3>();
+}
 
 TEST_F(IoSlam3dAddonsParam, ReadWriteEdgeSE3Line3D) {
   // prepare edge
-  EdgeSE3Line3D* outputEdge = new EdgeSE3Line3D();
+  auto outputEdge = std::make_shared<EdgeSE3Line3D>();
   outputEdge->setParameterId(0, paramOffset->id());
   outputEdge->setVertex(0, pose);
   outputEdge->setVertex(1, line);
   ASSERT_TRUE(graph->addEdge(outputEdge));
   // test IO
-  readWriteVectorBasedEdge<EdgeSE3Line3D, RandomLine3D>(outputEdge);
+  readWriteVectorBasedEdge<EdgeSE3Line3D, RandomLine3D>(outputEdge.get());
 }
 
-TEST(IoSlam3dAddOns, ReadWriteEdgeSE3PlaneSensorCalib) { readWriteVectorBasedEdge<EdgeSE3PlaneSensorCalib, RandomPlane3D>(); }
+TEST(IoSlam3dAddOns, ReadWriteEdgeSE3PlaneSensorCalib) {
+  readWriteVectorBasedEdge<EdgeSE3PlaneSensorCalib, RandomPlane3D>();
+}

@@ -53,8 +53,8 @@ namespace g2o {
   }
 
   void EdgeSE3Line3D::computeError() {
-    const VertexSE3* se3Vertex = static_cast<const VertexSE3*>(_vertices[0]);
-    const VertexLine3D* lineVertex = static_cast<const VertexLine3D*>(_vertices[1]);
+    const VertexSE3* se3Vertex = vertexXnRaw<0>();
+    const VertexLine3D* lineVertex = vertexXnRaw<1>();
     const Line3D& line = lineVertex->estimate();
     Line3D localLine = se3Vertex->estimate().inverse() * line;
     _error = localLine.ominus(_measurement);
@@ -63,7 +63,7 @@ namespace g2o {
   bool EdgeSE3Line3D::resolveCaches() {
     ParameterVector pv(1);
     pv[0] = offsetParam;
-    resolveCache(cache, (OptimizableGraph::Vertex*)_vertices[0], "CACHE_SE3_OFFSET", pv);
+    resolveCache(cache, (OptimizableGraph::Vertex*)_vertices[0].get(), "CACHE_SE3_OFFSET", pv);
     return cache != 0;
   }
 
@@ -106,8 +106,8 @@ namespace g2o {
       return this;
 
 
-    const VertexSE3* robot  = dynamic_cast<const VertexSE3*>(that->vertex(0));
-    const VertexLine3D* landmark = dynamic_cast<const VertexLine3D*>(that->vertex(1));
+    auto robot  = std::dynamic_pointer_cast<VertexSE3>(that->vertex(0));
+    auto landmark = std::dynamic_pointer_cast<VertexLine3D>(that->vertex(1));
 
     if(!robot || !landmark)
       return nullptr;

@@ -33,9 +33,9 @@ namespace g2o {
 EdgeSE3Calib::EdgeSE3Calib() : BaseVariableSizedEdge<6, Isometry3>() { resize(3); }
 
 void EdgeSE3Calib::computeError() {
-  const VertexSE3* v1 = static_cast<const VertexSE3*>(_vertices[0]);
-  const VertexSE3* v2 = static_cast<const VertexSE3*>(_vertices[1]);
-  const VertexSE3* calib = static_cast<const VertexSE3*>(_vertices[2]);
+  const VertexSE3* v1 = static_cast<const VertexSE3*>(vertexRaw(0));
+  const VertexSE3* v2 = static_cast<const VertexSE3*>(vertexRaw(1));
+  const VertexSE3* calib = static_cast<const VertexSE3*>(vertexRaw(2));
   _error = g2o::internal::toVectorMQT(_measurement.inverse() * calib->estimate().inverse() * v1->estimate().inverse() *
                                       v2->estimate() * calib->estimate());
 }

@@ -83,8 +83,8 @@ HyperGraphElementAction* EdgeSE3PlaneSensorCalibDrawAction::operator()(HyperGrap
 
   if (!that) return this;
 
-  const VertexSE3* robot = dynamic_cast<const VertexSE3*>(that->vertex(0));
-  const VertexSE3* sensor = dynamic_cast<const VertexSE3*>(that->vertex(2));
+  const VertexSE3* robot = dynamic_cast<const VertexSE3*>(that->vertex(0).get());
+  const VertexSE3* sensor = dynamic_cast<const VertexSE3*>(that->vertex(2).get());
   if (!robot || !sensor) return nullptr;
 
   if (_planeWidth && _planeHeight) {

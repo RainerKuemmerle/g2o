@@ -40,8 +40,8 @@ class G2O_TYPES_SLAM3D_ADDONS_API EdgePlane : public BaseBinaryEdge<4, Vector4, 
   EdgePlane();
 
   void computeError() {
-    const VertexPlane* v1 = static_cast<const VertexPlane*>(_vertices[0]);
-    const VertexPlane* v2 = static_cast<const VertexPlane*>(_vertices[1]);
+    auto v1 = vertexXnRaw<0>();
+    auto v2 = vertexXnRaw<1>();
     _error = (v2->estimate().toVector() - v1->estimate().toVector()) - _measurement;
   }
   virtual bool read(std::istream& is);
@@ -64,8 +64,8 @@ class G2O_TYPES_SLAM3D_ADDONS_API EdgePlane : public BaseBinaryEdge<4, Vector4, 
   virtual int measurementDimension() const { return 4; }
 
   virtual bool setMeasurementFromState() {
-    const VertexPlane* v1 = static_cast<const VertexPlane*>(_vertices[0]);
-    const VertexPlane* v2 = static_cast<const VertexPlane*>(_vertices[1]);
+    auto v1 = vertexXnRaw<0>();
+    auto v2 = vertexXnRaw<1>();
     _measurement = (v2->estimate().toVector()) - v1->estimate().toVector();
 
     return true;

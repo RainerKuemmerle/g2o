@@ -43,9 +43,9 @@ class G2O_TYPES_SLAM3D_ADDONS_API EdgeSE3PlaneSensorCalib : public BaseVariableS
   Vector3 color;
 
   void computeError() {
-    const VertexSE3* v1 = static_cast<const VertexSE3*>(_vertices[0]);
-    const VertexPlane* planeVertex = static_cast<const VertexPlane*>(_vertices[1]);
-    const VertexSE3* offset = static_cast<const VertexSE3*>(_vertices[2]);
+    const VertexSE3* v1 = static_cast<const VertexSE3*>(vertexRaw(0));
+    const VertexPlane* planeVertex = static_cast<const VertexPlane*>(vertexRaw(1));
+    const VertexSE3* offset = static_cast<const VertexSE3*>(vertexRaw(2));
     const Plane3D& plane = planeVertex->estimate();
     // measurement function: remap the plane in global coordinates
     Isometry3 w2n = (v1->estimate() * offset->estimate()).inverse();

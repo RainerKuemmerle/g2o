@@ -57,7 +57,7 @@ namespace g2o {
       }
 
       virtual bool setMeasurementData(const number_t* d) {
-        Eigen::Map<const Vector6> v(d);	
+        Eigen::Map<const Vector6> v(d);
         _measurement = Line3D(v);
         return true;
       }
@@ -68,12 +68,10 @@ namespace g2o {
         return true;
       }
 
-      virtual int measurementDimension() const {
-	return 6;
-      }
+      virtual int measurementDimension() const { return 6; }
 
       Vector3 color;
-      
+
   private:
     ParameterSE3Offset* offsetParam;
     CacheSE3Offset* cache;
@@ -87,13 +85,13 @@ namespace g2o {
     G2O_TYPES_SLAM3D_ADDONS_API EdgeSE3Line3DDrawAction();
     G2O_TYPES_SLAM3D_ADDONS_API virtual HyperGraphElementAction* operator()(HyperGraph::HyperGraphElement* element,
 									    HyperGraphElementAction::Parameters* params_);
-    
+
   protected:
     virtual bool refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_);
     FloatProperty* _lineLength, *_lineWidth;
-    
+
   };
 #endif
-  
+
 }
 #endif
