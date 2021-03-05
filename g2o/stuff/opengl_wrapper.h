@@ -33,7 +33,7 @@
 #include <windows.h>
 #endif
 
-#ifdef G2O_OPENGL_FOUND
+#ifdef G2O_USE_OPENGL
 # ifdef __APPLE__
 #  include <OpenGL/gl.h>
 # else

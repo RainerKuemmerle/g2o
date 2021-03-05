@@ -40,7 +40,7 @@
 #include "g2o/solvers/structure_only/structure_only_solver.h"
 #include "g2o/stuff/sampler.h"
 
-#if defined G2O_HAVE_CHOLMOD
+#if defined G2O_USE_CHOLMOD
 #include "g2o/solvers/cholmod/linear_solver_cholmod.h"
 #else
 #include "g2o/solvers/eigen/linear_solver_eigen.h"
@@ -117,7 +117,7 @@ int main(int argc, const char* argv[])
   }
   else
   {
-#ifdef G2O_HAVE_CHOLMOD
+#ifdef G2O_USE_CHOLMOD
 	cerr << "Using CHOLMOD" << endl;
     linearSolver = g2o::make_unique<g2o::LinearSolverCholmod<g2o::BlockSolver_6_3::PoseMatrixType>>();
 #else

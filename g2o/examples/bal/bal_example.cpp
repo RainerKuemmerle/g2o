@@ -42,7 +42,7 @@
 
 #include "EXTERNAL/ceres/autodiff.h"
 
-#if defined G2O_HAVE_CHOLMOD
+#if defined G2O_USE_CHOLMOD
 #include "g2o/solvers/cholmod/linear_solver_cholmod.h"
 #else
 #include "g2o/solvers/eigen/linear_solver_eigen.h"
@@ -303,7 +303,7 @@ int main(int argc, char** argv)
   arg.parseArgs(argc, argv);
 
   typedef g2o::BlockSolver< g2o::BlockSolverTraits<9, 3> >  BalBlockSolver;
-#ifdef G2O_HAVE_CHOLMOD
+#ifdef G2O_USE_CHOLMOD
   string choleskySolverName = "CHOLMOD";
   typedef g2o::LinearSolverCholmod<BalBlockSolver::PoseMatrixType> BalLinearSolver;
 #else
