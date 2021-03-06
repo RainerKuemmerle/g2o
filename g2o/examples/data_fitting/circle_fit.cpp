@@ -131,13 +131,13 @@ int main(int argc, char** argv) {
 
   // build the optimization problem given the points
   // 1. add the circle vertex
-  VertexCircle* circle = new VertexCircle();
+  auto circle = std::make_shared<VertexCircle>();
   circle->setId(0);
   circle->setEstimate(Eigen::Vector3d(3.0, 3.0, 3.0));  // some initial value for the circle
   optimizer.addVertex(circle);
   // 2. add the points we measured
   for (int i = 0; i < numPoints; ++i) {
-    EdgePointOnCircle* e = new EdgePointOnCircle;
+    auto e = std::make_shared<EdgePointOnCircle>();
     e->setInformation(Eigen::Matrix<double, 1, 1>::Identity());
     e->setVertex(0, circle);
     e->setMeasurement(points[i]);

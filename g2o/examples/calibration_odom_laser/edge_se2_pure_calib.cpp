@@ -46,8 +46,8 @@ bool EdgeSE2PureCalib::write(std::ostream& os) const
 
 void EdgeSE2PureCalib::computeError()
 {
-  const VertexSE2* laserOffset = static_cast<const VertexSE2*>(_vertices[0]);
-  const VertexOdomDifferentialParams* odomParams = dynamic_cast<const VertexOdomDifferentialParams*>(_vertices[1]);
+  const VertexSE2* laserOffset = vertexXnRaw<0>();
+  const VertexOdomDifferentialParams* odomParams = vertexXnRaw<1>();
 
   // get the calibrated motion given by the odometry
   VelocityMeasurement calibratedVelocityMeasurment(measurement().velocityMeasurement.vl() * odomParams->estimate()(0),

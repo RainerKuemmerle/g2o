@@ -75,8 +75,8 @@ class EdgeCalib : public BaseBinaryEdge<3, OdomAndLaserMotion, VertexSE2, Vertex
 
     void computeError()
     {
-      const VertexSE2* laserOffset = static_cast<const VertexSE2*>(_vertices[0]);
-      const VertexBaseline* odomParams = dynamic_cast<const VertexBaseline*>(_vertices[1]);
+      const VertexSE2* laserOffset = vertexXnRaw<0>();
+      const VertexBaseline* odomParams = vertexXnRaw<1>();
 
       // get the calibrated motion given by the odometry
       double rl = - odomParams->estimate() * linearSolution(0);
@@ -168,11 +168,11 @@ int main(int argc, char** argv)
   }
 
   if (1) {
-    VertexSE2* laserOffset = new VertexSE2;
+    auto laserOffset = std::make_shared<VertexSE2>();
     laserOffset->setId(Gm2dlIO::ID_LASERPOSE);
     laserOffset->setEstimate(initialLaserPose);
     optimizer.addVertex(laserOffset);
-    VertexOdomDifferentialParams* odomParamsVertex = new VertexOdomDifferentialParams;
+    auto odomParamsVertex = std::make_shared<VertexOdomDifferentialParams>();
     odomParamsVertex->setId(Gm2dlIO::ID_ODOMCALIB);
     odomParamsVertex->setEstimate(Eigen::Vector3d(1., 1., 1.));
     optimizer.addVertex(odomParamsVertex);
@@ -185,14 +185,13 @@ int main(int argc, char** argv)
       OdomAndLaserMotion meas;
       meas.velocityMeasurement = OdomConvert::convertToVelocity(mm);
       meas.laserMotion = laserMotion;
-      EdgeSE2PureCalib* calibEdge = new EdgeSE2PureCalib;
+      auto calibEdge = std::make_shared<EdgeSE2PureCalib>();
       calibEdge->setVertex(0, laserOffset);
       calibEdge->setVertex(1, odomParamsVertex);
       calibEdge->setInformation(Eigen::Matrix3d::Identity());
       calibEdge->setMeasurement(meas);
       if (! optimizer.addEdge(calibEdge)) {
         cerr << "Error adding calib edge" << endl;
-        delete calibEdge;
       }
     }
 
@@ -231,11 +230,11 @@ int main(int argc, char** argv)
   }
 
   //constructing non-linear least squares
-  VertexSE2* laserOffset = new VertexSE2;
+  auto laserOffset = std::make_shared<VertexSE2>();
   laserOffset->setId(Gm2dlIO::ID_LASERPOSE);
   laserOffset->setEstimate(initialLaserPose);
   optimizer.addVertex(laserOffset);
-  VertexBaseline* odomParamsVertex = new VertexBaseline;
+  auto odomParamsVertex = std::make_shared<VertexBaseline>();
   odomParamsVertex->setId(Gm2dlIO::ID_ODOMCALIB);
   odomParamsVertex->setEstimate(1.);
   optimizer.addVertex(odomParamsVertex);
@@ -248,14 +247,13 @@ int main(int argc, char** argv)
     OdomAndLaserMotion meas;
     meas.velocityMeasurement = OdomConvert::convertToVelocity(mm);
     meas.laserMotion = laserMotion;
-    EdgeCalib* calibEdge = new EdgeCalib;
+    auto calibEdge = std::make_shared<EdgeCalib>();
     calibEdge->setVertex(0, laserOffset);
     calibEdge->setVertex(1, odomParamsVertex);
     calibEdge->setInformation(Eigen::Matrix3d::Identity());
     calibEdge->setMeasurement(meas);
     if (! optimizer.addEdge(calibEdge)) {
       cerr << "Error adding calib edge" << endl;
-      delete calibEdge;
     }
   }
 

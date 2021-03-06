@@ -51,26 +51,25 @@ namespace g2o {
 
   void addOdometryCalibLinksDifferential(SparseOptimizer& optimizer, const DataQueue& odomData)
   {
-    SparseOptimizer::Vertex* odomParamsVertex = 0;
-    odomParamsVertex = new VertexOdomDifferentialParams;
+    auto odomParamsVertex = std::make_shared<VertexOdomDifferentialParams>();
     odomParamsVertex->setToOrigin();
     odomParamsVertex->setId(Gm2dlIO::ID_ODOMCALIB);
     optimizer.addVertex(odomParamsVertex);
 
     SparseOptimizer::EdgeSet odomCalibEdges;
     for (SparseOptimizer::EdgeSet::const_iterator it = optimizer.edges().begin(); it != optimizer.edges().end(); ++it) {
-      EdgeSE2SensorCalib* scanmatchEdge = dynamic_cast<EdgeSE2SensorCalib*>(*it);
+      EdgeSE2SensorCalib* scanmatchEdge = dynamic_cast<EdgeSE2SensorCalib*>(it->get());
       if (! scanmatchEdge)
         continue;
 
-      VertexSE2* r1 = dynamic_cast<VertexSE2*>(scanmatchEdge->vertices()[0]);
-      VertexSE2* r2 = dynamic_cast<VertexSE2*>(scanmatchEdge->vertices()[1]);
+      auto r1 = std::dynamic_pointer_cast<VertexSE2>(scanmatchEdge->vertices()[0]);
+      auto r2 = std::dynamic_pointer_cast<VertexSE2>(scanmatchEdge->vertices()[1]);
       if (r2->id() - r1->id() != 1) { // ignore non-incremental edges
         continue;
       }
 
-      RobotLaser* rl1 = dynamic_cast<RobotLaser*>(r1->userData());
-      RobotLaser* rl2 = dynamic_cast<RobotLaser*>(r2->userData());
+      auto rl1 = std::dynamic_pointer_cast<RobotLaser>(r1->userData());
+      auto rl2 = std::dynamic_pointer_cast<RobotLaser>(r2->userData());
       RobotLaser* odom1 = dynamic_cast<RobotLaser*>(odomData.findClosestData(rl1->timestamp()));
       RobotLaser* odom2 = dynamic_cast<RobotLaser*>(odomData.findClosestData(rl2->timestamp()));
 
@@ -86,7 +85,7 @@ namespace g2o {
       //cerr << PVAR(odomMotion.toVector().transpose()) << endl;
       //cerr << PVAR(scanmatchEdge->measurement().toVector().transpose()) << endl;
 
-      EdgeSE2OdomDifferentialCalib* e = new EdgeSE2OdomDifferentialCalib;
+      auto e = std::make_shared<EdgeSE2OdomDifferentialCalib>();
       e->vertices()[0] = r1;
       e->vertices()[1] = r2;
       e->vertices()[2] = odomParamsVertex;
@@ -97,11 +96,10 @@ namespace g2o {
 
       e->information() = Matrix3d::Identity() * INFORMATION_SCALING_ODOMETRY;
       odomCalibEdges.insert(e);
-
     }
 
     for (SparseOptimizer::EdgeSet::iterator it = odomCalibEdges.begin(); it != odomCalibEdges.end(); ++it)
-      optimizer.addEdge(dynamic_cast<OptimizableGraph::Edge*>(*it));
+      optimizer.addEdge(*it);
 
   }
 

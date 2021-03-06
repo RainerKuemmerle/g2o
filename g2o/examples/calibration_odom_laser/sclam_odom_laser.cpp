@@ -109,7 +109,7 @@ int main(int argc, char** argv)
 
   bool gaugeFreedom = optimizer.gaugeFreedom();
 
-  OptimizableGraph::Vertex* gauge = optimizer.findGauge();
+  auto gauge = optimizer.findGauge();
   if (gaugeFreedom) {
     if (! gauge) {
       cerr <<  "# cannot find a vertex to fix in this thing" << endl;
@@ -125,7 +125,8 @@ int main(int argc, char** argv)
   addOdometryCalibLinksDifferential(optimizer, robotLaserQueue);
 
   // sanity check
-  HyperDijkstra d(&optimizer);
+  auto dummy = std::shared_ptr<HyperGraph>(&optimizer, [](HyperGraph*){});
+  HyperDijkstra d(dummy);
   UniformCostFunction f;
   d.shortestPaths(gauge, &f);
   //cerr << PVAR(d.visited().size()) << endl;
@@ -136,8 +137,8 @@ int main(int argc, char** argv)
     cerr << "vertices: " << optimizer.vertices().size() << endl;
     if (1)
       for (SparseOptimizer::VertexIDMap::const_iterator it = optimizer.vertices().begin(); it != optimizer.vertices().end(); ++it) {
-        OptimizableGraph::Vertex* v = static_cast<OptimizableGraph::Vertex*>(it->second);
-        if (d.visited().count(v) == 0) {
+        if (d.visited().count(it->second) == 0) {
+          OptimizableGraph::Vertex* v = static_cast<OptimizableGraph::Vertex*>(it->second.get());
           cerr << "\t unvisited vertex " << it->first << " " << (void*)v << endl;
           v->setFixed(true);
         }
@@ -145,14 +146,14 @@ int main(int argc, char** argv)
   }
 
   for (SparseOptimizer::VertexIDMap::const_iterator it = optimizer.vertices().begin(); it != optimizer.vertices().end(); ++it) {
-    OptimizableGraph::Vertex* v = static_cast<OptimizableGraph::Vertex*>(it->second);
+    OptimizableGraph::Vertex* v = static_cast<OptimizableGraph::Vertex*>(it->second.get());
     if (v->fixed()) {
       cerr << "\t fixed vertex " << it->first << endl;
     }
   }
 
-  VertexSE2* laserOffset = dynamic_cast<VertexSE2*>(optimizer.vertex(Gm2dlIO::ID_LASERPOSE));
-  VertexOdomDifferentialParams* odomParamsVertex = dynamic_cast<VertexOdomDifferentialParams*>(optimizer.vertex(Gm2dlIO::ID_ODOMCALIB));
+  auto laserOffset = std::dynamic_pointer_cast<VertexSE2>(optimizer.vertex(Gm2dlIO::ID_LASERPOSE));
+  auto odomParamsVertex = std::dynamic_pointer_cast<VertexOdomDifferentialParams>(optimizer.vertex(Gm2dlIO::ID_ODOMCALIB));
 
   if (fixLaser) {
     cerr << "Fix position of the laser offset" << endl;

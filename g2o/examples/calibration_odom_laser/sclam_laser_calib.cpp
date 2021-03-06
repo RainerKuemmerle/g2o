@@ -98,14 +98,14 @@ int main(int argc, char** argv)
     cerr << "Error while loading gm2dl file" << endl;
   }
 
-  VertexSE2* laserOffset = dynamic_cast<VertexSE2*>(optimizer.vertex(numeric_limits<int>::max()));
+  auto laserOffset = std::dynamic_pointer_cast<VertexSE2>(optimizer.vertex(numeric_limits<int>::max()));
   //laserOffset->setEstimate(SE2()); // set to Identity
   if (laserOffset) {
     cerr << "Initial laser offset " << laserOffset->estimate().toVector().transpose() << endl;
   }
   bool gaugeFreedom = optimizer.gaugeFreedom();
 
-  OptimizableGraph::Vertex* gauge = optimizer.findGauge();
+  auto gauge = optimizer.findGauge();
   if (gaugeFreedom) {
     if (! gauge) {
       cerr <<  "# cannot find a vertex to fix in this thing" << endl;
@@ -119,7 +119,8 @@ int main(int argc, char** argv)
   }
 
   // sanity check
-  HyperDijkstra d(&optimizer);
+  auto pointerWrapper = std::shared_ptr<HyperGraph>(&optimizer, [](HyperGraph*){});
+  HyperDijkstra d(pointerWrapper);
   UniformCostFunction f;
   d.shortestPaths(gauge, &f);
   //cerr << PVAR(d.visited().size()) << endl;
@@ -129,9 +130,9 @@ int main(int argc, char** argv)
     cerr << "visited: " << d.visited().size() << endl;
     cerr << "vertices: " << optimizer.vertices().size() << endl;
     if (1)
-    for (SparseOptimizer::VertexIDMap::const_iterator it = optimizer.vertices().begin(); it != optimizer.vertices().end(); ++it) {
-      OptimizableGraph::Vertex* v = static_cast<OptimizableGraph::Vertex*>(it->second);
-      if (d.visited().count(v) == 0) {
+    for (auto it = optimizer.vertices().begin(); it != optimizer.vertices().end(); ++it) {
+      if (d.visited().count(it->second) == 0) {
+        auto v = static_cast<OptimizableGraph::Vertex*>(it->second.get());
         cerr << "\t unvisited vertex " << it->first << " " << (void*)v << endl;
         v->setFixed(true);
       }
@@ -166,7 +167,7 @@ int main(int argc, char** argv)
   if (gnudump.size() > 0) {
     ofstream fout(gnudump.c_str());
     for (SparseOptimizer::VertexIDMap::const_iterator it = optimizer.vertices().begin(); it != optimizer.vertices().end(); ++it) {
-      VertexSE2* v = dynamic_cast<VertexSE2*>(it->second);
+      VertexSE2* v = dynamic_cast<VertexSE2*>(it->second.get());
       fout << v->estimate().toVector().transpose() << endl;
     }
   }

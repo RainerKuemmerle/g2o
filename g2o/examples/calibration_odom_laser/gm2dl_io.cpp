@@ -53,7 +53,7 @@ namespace g2o {
       return false;
 
     bool laserOffsetInitDone = false;
-    VertexSE2* laserOffset = new VertexSE2;
+    auto laserOffset = std::make_shared<VertexSE2>();
     //laserOffset->fixed() = true;
     laserOffset->setId(ID_LASERPOSE);
     if (! optimizer.addVertex(laserOffset)) {
@@ -63,7 +63,7 @@ namespace g2o {
 
     // parse the GM2DL file an extract the vertices, edges, and the laser data
     stringstream currentLine;
-    VertexSE2* previousVertex = 0;
+    std::shared_ptr<VertexSE2> previousVertex;
     while(1) {
       int bytesRead = readLine(is, currentLine);
       if (bytesRead == -1)
@@ -75,15 +75,14 @@ namespace g2o {
         Eigen::Vector3d p;
         currentLine >> id >> p.x() >> p.y() >> p.z();
         // adding the robot pose
-        VertexSE2* v = new VertexSE2;
+        auto v = std::make_shared<VertexSE2>();
         v->setId(id);
         //cerr << "Read vertex id " << id << endl;
         if (! optimizer.addVertex(v)) {
           cerr << "vertex " << id << " is already in the graph, reassigning "<<  endl;
-          delete v;
-          v = dynamic_cast<VertexSE2*>(optimizer.vertex(id));
+          v = std::dynamic_pointer_cast<VertexSE2>(optimizer.vertex(id));
           assert(v);
-        } 
+        }
         v->setEstimate(p);
         previousVertex = v;
 
@@ -93,7 +92,7 @@ namespace g2o {
           return false;
         }
         int id1, id2;
-        EdgeSE2SensorCalib* e = new EdgeSE2SensorCalib;
+        auto e = std::make_shared<EdgeSE2SensorCalib>();
         Eigen::Vector3d p;
         Eigen::Matrix3d& m = e->information();
         currentLine >> id1 >> id2 >> p.x() >> p.y() >> p.z();
@@ -109,16 +108,14 @@ namespace g2o {
           m(2, 1) = m(1, 2);
         }
         previousVertex = 0;
-        VertexSE2* v1 = dynamic_cast<VertexSE2*>(optimizer.vertex(id1));
-        VertexSE2* v2 = dynamic_cast<VertexSE2*>(optimizer.vertex(id2));
+        auto v1 = std::dynamic_pointer_cast<VertexSE2>(optimizer.vertex(id1));
+        auto v2 = std::dynamic_pointer_cast<VertexSE2>(optimizer.vertex(id2));
         if (! v1) {
-          cerr << "vertex " << id1 << " is not existing, cannot add edge (" << id1 << "," << id2 << ")" << endl; 
-          delete e;
+          cerr << "vertex " << id1 << " is not existing, cannot add edge (" << id1 << "," << id2 << ")" << endl;
           continue;
         }
         if (! v2) {
-          cerr << "vertex " << id2 << " is not existing, cannot add edge (" << id1 << "," << id2 << ")" << endl; 
-          delete e;
+          cerr << "vertex " << id2 << " is not existing, cannot add edge (" << id1 << "," << id2 << ")" << endl;
           continue;
         }
 
@@ -136,14 +133,13 @@ namespace g2o {
         e->setVertex(2, laserOffset);
         if (! optimizer.addEdge(e)){
           cerr << "error in adding edge " << id1 << "," << id2 << endl;
-          delete e;
         }
         //cerr << PVAR(e->inverseMeasurement().toVector().transpose()) << endl;
         //cerr << PVAR(e->information()) << endl;
 
       } else if (tag == "ROBOTLASER1") {
         if (previousVertex) {
-          RobotLaser* rl2 = new RobotLaser;
+          auto rl2 = std::make_shared<RobotLaser>();
           rl2->read(currentLine);
           if (! laserOffsetInitDone) {
             laserOffsetInitDone = true;
@@ -151,7 +147,7 @@ namespace g2o {
             laserOffset->setEstimate(rl2->laserParams().laserPose);
           }
           previousVertex->setUserData(rl2);
-          previousVertex = 0;
+          previousVertex = nullptr;
         }
       }
     }
@@ -168,13 +164,13 @@ namespace g2o {
     Factory* factory = Factory::instance();
 
     for (SparseOptimizer::VertexIDMap::const_iterator it = optimizer.vertices().begin(); it != optimizer.vertices().end(); ++it) {
-      OptimizableGraph::Vertex* v = static_cast<OptimizableGraph::Vertex*>(it->second);
+      OptimizableGraph::Vertex* v = static_cast<OptimizableGraph::Vertex*>(it->second.get());
       fout << "VERTEX2 " << v->id() << " ";
       v->write(fout);
       fout << endl;
-      HyperGraph::Data* data = v->userData();
+      auto data = v->userData();
       if (data) { // writing the data via the factory
-        string tag = factory->tag(data);
+        string tag = factory->tag(data.get());
         if (tag.size() > 0) {
           fout << tag << " ";
           data->write(fout);
@@ -185,14 +181,14 @@ namespace g2o {
 
     OptimizableGraph::EdgeContainer edgesToSave; // sorting edges to have them in the order of insertion again
     for (HyperGraph::EdgeSet::const_iterator it = optimizer.edges().begin(); it != optimizer.edges().end(); ++it) {
-      const OptimizableGraph::Edge* e = static_cast<const OptimizableGraph::Edge*>(*it);
-      edgesToSave.push_back(const_cast<OptimizableGraph::Edge*>(e));
+      auto e = std::static_pointer_cast<OptimizableGraph::Edge>(*it);
+      edgesToSave.push_back(e);
     }
     sort(edgesToSave.begin(), edgesToSave.end(), OptimizableGraph::EdgeIDCompare());
 
     for (OptimizableGraph::EdgeContainer::const_iterator it = edgesToSave.begin(); it != edgesToSave.end(); ++it) {
-      OptimizableGraph::Edge* e = *it;
-      EdgeSE2SensorCalib* calibEdge = dynamic_cast<EdgeSE2SensorCalib*>(e);
+      const auto& e = *it;
+      EdgeSE2SensorCalib* calibEdge = dynamic_cast<EdgeSE2SensorCalib*>(e.get());
       if (calibEdge) {
         // write back in the gm2dl format
         fout << "EDGE2 " << calibEdge->vertex(0)->id() << " " << calibEdge->vertex(1)->id();
@@ -212,19 +208,19 @@ namespace g2o {
 
   bool Gm2dlIO::updateLaserData(SparseOptimizer& optimizer)
   {
-    VertexSE2* laserOffset = dynamic_cast<VertexSE2*>(optimizer.vertex(ID_LASERPOSE));
+    auto laserOffset = std::dynamic_pointer_cast<VertexSE2>(optimizer.vertex(ID_LASERPOSE));
     if (! laserOffset) {
       cerr << "Laser offset not found" << endl;
       return false;
     }
 
     for (SparseOptimizer::VertexIDMap::const_iterator it = optimizer.vertices().begin(); it != optimizer.vertices().end(); ++it) {
-      VertexSE2* v = dynamic_cast<VertexSE2*>(it->second);
+      VertexSE2* v = dynamic_cast<VertexSE2*>(it->second.get());
       if (! v)
         continue;
       if (v->id() == ID_LASERPOSE)
         continue;
-      RobotLaser* robotLaser = dynamic_cast<RobotLaser*>(v->userData());
+      RobotLaser* robotLaser = dynamic_cast<RobotLaser*>(v->userData().get());
       if (robotLaser) { // writing the data via the factory
         robotLaser->setOdomPose(v->estimate());
         LaserParameters params = robotLaser->laserParams();

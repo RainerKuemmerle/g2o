@@ -136,13 +136,13 @@ int main(int argc, char** argv) {
 
   // build the optimization problem given the points
   // 1. add the parameter vertex
-  VertexParams* params = new VertexParams();
+  auto params = std::make_shared<VertexParams>();
   params->setId(0);
   params->setEstimate(Eigen::Vector3d(1, 1, 1));  // some initial value for the params
   optimizer.addVertex(params);
   // 2. add the points we measured to be on the curve
   for (int i = 0; i < numPoints; ++i) {
-    EdgePointOnCurve* e = new EdgePointOnCurve;
+    auto e = std::make_shared<EdgePointOnCurve>();
     e->setInformation(Eigen::Matrix<double, 1, 1>::Identity());
     e->setVertex(0, params);
     e->setMeasurement(points[i]);
