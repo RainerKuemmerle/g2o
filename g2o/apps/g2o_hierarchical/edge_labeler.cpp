@@ -58,26 +58,24 @@ namespace g2o {
       return -1;
     }
     int count=0;
-    for (std::set<OptimizableGraph::Edge*>::iterator it=edges.begin(); it!=edges.end(); ++it){
+    for (auto it=edges.begin(); it!=edges.end(); ++it){
       count += labelEdge(spInv, *it) ? 1 : 0;
     }
     return count;
   }
 
-  void EdgeLabeler::augmentSparsePattern(std::set<std::pair<int, int> >& pattern, OptimizableGraph::Edge* e){
-    for (size_t i=0; i<e->vertices().size(); i++){
-      const OptimizableGraph::Vertex* v=(const OptimizableGraph::Vertex*) e->vertices()[i];
-      int ti=v->hessianIndex();
-      if (ti==-1)
-	continue;
-      for (size_t j=i; j<e->vertices().size(); j++){
-	const OptimizableGraph::Vertex* v=(const OptimizableGraph::Vertex*) e->vertices()[j];
-	int tj = v->hessianIndex();
-	if (tj==-1)
-	  continue;
-	if(tj<ti)
-	  swap(ti,tj);
-	pattern.insert(std::make_pair(ti, tj));
+  void EdgeLabeler::augmentSparsePattern(std::set<std::pair<int, int> >& pattern,
+                                         OptimizableGraph::Edge* e) {
+    for (size_t i = 0; i < e->vertices().size(); i++) {
+      auto v = std::static_pointer_cast<OptimizableGraph::Vertex>(e->vertices()[i]);
+      int ti = v->hessianIndex();
+      if (ti == -1) continue;
+      for (size_t j = i; j < e->vertices().size(); j++) {
+        auto v = std::static_pointer_cast<OptimizableGraph::Vertex>(e->vertices()[j]);
+        int tj = v->hessianIndex();
+        if (tj == -1) continue;
+        if (tj < ti) swap(ti, tj);
+        pattern.insert(std::make_pair(ti, tj));
       }
     }
   }
@@ -104,11 +102,10 @@ namespace g2o {
 
     int maxDim=0;
     for (size_t i=0; i<e->vertices().size(); i++){
-      const OptimizableGraph::Vertex* v=(const OptimizableGraph::Vertex*) e->vertices()[i];
+      auto v = std::static_pointer_cast<OptimizableGraph::Vertex>(e->vertices()[i]);
       int ti=v->hessianIndex();
-      if (ti==-1)
-	continue;
-      maxDim+=v->minimalEstimateDimension();
+      if (ti == -1) continue;
+      maxDim += v->minimalEstimateDimension();
     }
 
 
@@ -116,12 +113,12 @@ namespace g2o {
     MatrixXd cov(maxDim, maxDim);
     int cumRow=0;
     for (size_t i=0; i<e->vertices().size(); i++){
-      const OptimizableGraph::Vertex* vr=(const OptimizableGraph::Vertex*) e->vertices()[i];
+      auto vr = std::static_pointer_cast<OptimizableGraph::Vertex>(e->vertices()[i]);
       int ti=vr->hessianIndex();
       if (ti>-1) {
 	int cumCol=0;
 	for (size_t j=0; j<e->vertices().size(); j++){
-	  const OptimizableGraph::Vertex* vc=(const OptimizableGraph::Vertex*) e->vertices()[j];
+      auto vc = std::static_pointer_cast<OptimizableGraph::Vertex>(e->vertices()[j]);
 	  int tj = vc->hessianIndex();
 	  if (tj>-1){
 	    // cerr << "ti=" << ti << " tj=" << tj
@@ -180,7 +177,7 @@ namespace g2o {
 
       // push all the "active" state variables
       for (size_t j=0; j<e->vertices().size(); j++){
-        OptimizableGraph::Vertex* vr=(OptimizableGraph::Vertex*) e->vertices()[j];
+        auto vr = std::static_pointer_cast<OptimizableGraph::Vertex>(e->vertices()[j]);
         int tj=vr->hessianIndex();
         if (tj==-1)
           continue;
@@ -188,7 +185,7 @@ namespace g2o {
       }
 
       for (size_t j=0; j<e->vertices().size(); j++){
-        OptimizableGraph::Vertex* vr=(OptimizableGraph::Vertex*) e->vertices()[j];
+        auto vr = std::static_pointer_cast<OptimizableGraph::Vertex>(e->vertices()[j]);
         int tj=vr->hessianIndex();
         if (tj==-1)
           continue;
@@ -212,7 +209,7 @@ namespace g2o {
 
       // pop all the "active" state variables
       for (size_t j=0; j<e->vertices().size(); j++){
-        OptimizableGraph::Vertex* vr=(OptimizableGraph::Vertex*) e->vertices()[j];
+        auto vr = std::static_pointer_cast<OptimizableGraph::Vertex>(e->vertices()[j]);
         int tj=vr->hessianIndex();
         if (tj==-1)
           continue;

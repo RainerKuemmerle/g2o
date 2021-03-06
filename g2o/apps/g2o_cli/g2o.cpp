@@ -65,23 +65,21 @@ using namespace Eigen;
 
 // sort according to max id, dimension
 struct IncrementalEdgesCompare {
-  bool operator()(SparseOptimizer::Edge* const & e1, SparseOptimizer::Edge* const & e2)
-  {
-    const SparseOptimizer::Vertex* to1 = static_cast<const SparseOptimizer::Vertex*>(e1->vertices()[1]);
-    const SparseOptimizer::Vertex* to2 = static_cast<const SparseOptimizer::Vertex*>(e2->vertices()[1]);
+  bool operator()(const std::shared_ptr<SparseOptimizer::Edge>& e1,
+                  const std::shared_ptr<SparseOptimizer::Edge>& e2) {
+    auto to1 = std::static_pointer_cast<const SparseOptimizer::Vertex>(e1->vertices()[1]);
+    auto to2 = std::static_pointer_cast<const SparseOptimizer::Vertex>(e2->vertices()[1]);
 
     int i11 = e1->vertices()[0]->id(), i12 = e1->vertices()[1]->id();
-    if (i11 > i12){
+    if (i11 > i12) {
       swap(i11, i12);
     }
     int i21 = e2->vertices()[0]->id(), i22 = e2->vertices()[1]->id();
-    if (i21 > i22){
+    if (i21 > i22) {
       swap(i21, i22);
     }
-    if (i12 < i22)
-      return true;
-    if (i12 > i22)
-      return false;
+    if (i12 < i22) return true;
+    if (i12 > i22) return false;
     // push the odometry to be the first
     return to1->dimension() > to2->dimension();
   }
@@ -280,12 +278,12 @@ int main(int argc, char** argv)
 
   // check for vertices to fix to remove DoF
   bool gaugeFreedom = optimizer.gaugeFreedom();
-  OptimizableGraph::Vertex* gauge=0;
+  std::shared_ptr<OptimizableGraph::Vertex> gauge;
   if (gaugeList.size()){
     cerr << "Fixing gauges: ";
     for (size_t i=0; i<gaugeList.size(); i++){
       int id=gaugeList[i];
-      OptimizableGraph::Vertex* v=optimizer.vertex(id);
+      auto v = optimizer.vertex(id);
       if (!v){
         cerr << "fatal, not found the vertex of id " << id << " in the gaugeList. Aborting";
         return -1;
@@ -320,7 +318,7 @@ int main(int argc, char** argv)
     if (maxDim != minDim) {
       cerr << "# Preparing Marginalization of the Landmarks ... ";
       for (HyperGraph::VertexIDMap::iterator it=optimizer.vertices().begin(); it!=optimizer.vertices().end(); ++it){
-        OptimizableGraph::Vertex* v=static_cast<OptimizableGraph::Vertex*>(it->second);
+        auto v = std::static_pointer_cast<OptimizableGraph::Vertex>(it->second);
         if (v->dimension() != maxDim) {
           v->setMarginalized(true);
         }
@@ -335,7 +333,7 @@ int main(int argc, char** argv)
     if (creator) {
       if (nonSequential) {
         for (SparseOptimizer::EdgeSet::iterator it = optimizer.edges().begin(); it != optimizer.edges().end(); ++it) {
-          SparseOptimizer::Edge* e = dynamic_cast<SparseOptimizer::Edge*>(*it);
+          auto e = std::dynamic_pointer_cast<SparseOptimizer::Edge>(*it);
           if (e->vertices().size() >= 2 && std::abs(e->vertex(0)->id() - e->vertex(1)->id()) != 1) {
             e->setRobustKernel(creator->construct());
             if (huberWidth > 0)
@@ -344,7 +342,7 @@ int main(int argc, char** argv)
         }
       } else {
         for (SparseOptimizer::EdgeSet::iterator it = optimizer.edges().begin(); it != optimizer.edges().end(); ++it) {
-          SparseOptimizer::Edge* e = dynamic_cast<SparseOptimizer::Edge*>(*it);
+          auto e = std::dynamic_pointer_cast<SparseOptimizer::Edge>(*it);
           e->setRobustKernel(creator->construct());
           if (huberWidth > 0)
             e->robustKernel()->setDelta(huberWidth);
@@ -357,7 +355,8 @@ int main(int argc, char** argv)
   }
 
   // sanity check
-  HyperDijkstra d(&optimizer);
+  auto optimizerWrapper = std::shared_ptr<HyperGraph>(&optimizer, [](HyperGraph*){});
+  HyperDijkstra d(optimizerWrapper);
   UniformCostFunction f;
   d.shortestPaths(gauge,&f);
   //cerr << PVAR(d.visited().size()) << endl;
@@ -384,15 +383,14 @@ int main(int argc, char** argv)
     cerr << "#\t iterations  " << incIterations << endl;
 
     SparseOptimizer::VertexIDMap vertices = optimizer.vertices();
-    for (SparseOptimizer::VertexIDMap::const_iterator it = vertices.begin(); it != vertices.end(); ++it) {
-      const SparseOptimizer::Vertex* v = static_cast<const SparseOptimizer::Vertex*>(it->second);
+    for (auto it = vertices.begin(); it != vertices.end(); ++it) {
+      auto v = std::static_pointer_cast<SparseOptimizer::Vertex>(it->second);
       maxDim = max(maxDim, v->dimension());
     }
 
-    vector<SparseOptimizer::Edge*> edges;
-    for (SparseOptimizer::EdgeSet::iterator it = optimizer.edges().begin(); it != optimizer.edges().end(); ++it) {
-      SparseOptimizer::Edge* e = dynamic_cast<SparseOptimizer::Edge*>(*it);
-      edges.push_back(e);
+    SparseOptimizer::EdgeContainer edges;
+    for (auto it = optimizer.edges().begin(); it != optimizer.edges().end(); ++it) {
+      edges.emplace_back(std::dynamic_pointer_cast<SparseOptimizer::Edge>(*it));
     }
     optimizer.edges().clear();
     optimizer.vertices().clear();
@@ -409,15 +407,15 @@ int main(int argc, char** argv)
     bool firstRound = true;
     HyperGraph::VertexSet verticesAdded;
     HyperGraph::EdgeSet edgesAdded;
-    for (vector<SparseOptimizer::Edge*>::iterator it = edges.begin(); it != edges.end(); ++it) {
-      SparseOptimizer::Edge* e = *it;
+    for (auto it = edges.begin(); it != edges.end(); ++it) {
+      const auto& e = *it;
 
       int doInit = 0;
-      SparseOptimizer::Vertex* v1 = optimizer.vertex(e->vertices()[0]->id());
-      SparseOptimizer::Vertex* v2 = optimizer.vertex(e->vertices()[1]->id());
+      auto v1 = optimizer.vertex(e->vertices()[0]->id());
+      auto v2 = optimizer.vertex(e->vertices()[1]->id());
 
       if (! v1) {
-        SparseOptimizer::Vertex* v = v1 = dynamic_cast<SparseOptimizer::Vertex*>(e->vertices()[0]);
+        auto v = v1 = std::dynamic_pointer_cast<SparseOptimizer::Vertex>(e->vertices()[0]);
         bool v1Added = optimizer.addVertex(v);
         //cerr << "adding" << v->id() << "(" << v->dimension() << ")" << endl;
         assert(v1Added);
@@ -431,7 +429,7 @@ int main(int argc, char** argv)
       }
 
       if (! v2) {
-        SparseOptimizer::Vertex* v = v2 = dynamic_cast<SparseOptimizer::Vertex*>(e->vertices()[1]);
+        auto v = v2 = std::dynamic_pointer_cast<SparseOptimizer::Vertex>(e->vertices()[1]);
         bool v2Added = optimizer.addVertex(v);
         //cerr << "adding" << v->id() << "(" << v->dimension() << ")" << endl;
         assert(v2Added);
@@ -448,24 +446,25 @@ int main(int argc, char** argv)
       {
         //cerr << " adding edge " << e->vertices()[0]->id() <<  " " << e->vertices()[1]->id() << endl;
         if (! optimizer.addEdge(e)) {
-          cerr << "Unable to add edge " << e->vertices()[0]->id() << " -> " << e->vertices()[1]->id() << endl;
+          cerr << "Unable to add edge " << e->vertices()[0]->id() << " -> "
+               << e->vertices()[1]->id() << endl;
         } else {
           edgesAdded.insert(e);
         }
 
         if (doInit) {
-          OptimizableGraph::Vertex* from = static_cast<OptimizableGraph::Vertex*>(e->vertices()[0]);
-          OptimizableGraph::Vertex* to   = static_cast<OptimizableGraph::Vertex*>(e->vertices()[1]);
+          auto from = std::static_pointer_cast<OptimizableGraph::Vertex>(e->vertices()[0]);
+          auto to   = std::static_pointer_cast<OptimizableGraph::Vertex>(e->vertices()[1]);
           switch (doInit){
             case 1: // initialize v1 from v2
               {
                 HyperGraph::VertexSet toSet;
                 toSet.insert(to);
-                if (e->initialEstimatePossible(toSet, from) > 0.) {
+                if (e->initialEstimatePossible(toSet, from.get()) > 0.) {
                   //cerr << "init: "
                     //<< to->id() << "(" << to->dimension() << ") -> "
                     //<< from->id() << "(" << from->dimension() << ") " << endl;
-                   e->initialEstimate(toSet, from);
+                   e->initialEstimate(toSet, from.get());
                 } else {
                   assert(0 && "Added unitialized variable to the graph");
                 }
@@ -475,11 +474,11 @@ int main(int argc, char** argv)
               {
                 HyperGraph::VertexSet fromSet;
                 fromSet.insert(from);
-                if (e->initialEstimatePossible(fromSet, to) > 0.) {
+                if (e->initialEstimatePossible(fromSet, to.get()) > 0.) {
                   //cerr << "init: "
                     //<< from->id() << "(" << from->dimension() << ") -> "
                     //<< to->id() << "(" << to->dimension() << ") " << endl;
-                  e->initialEstimate(fromSet, to);
+                  e->initialEstimate(fromSet, to.get());
                 } else {
                   assert(0 && "Added unitialized variable to the graph");
                 }
@@ -517,8 +516,10 @@ int main(int argc, char** argv)
           //optimizer->setOptimizationTime(cumTime);
           if (verbose) {
             double chi2 = optimizer.chi2();
-            cerr << "nodes= " << optimizer.vertices().size() << "\t edges= " << optimizer.edges().size() << "\t chi2= " << chi2
-              << "\t time= " << dts << "\t iterations= " << currentIt <<  "\t cumTime= " << cumTime << endl;
+            cerr << "nodes= " << optimizer.vertices().size()
+                 << "\t edges= " << optimizer.edges().size() << "\t chi2= " << chi2
+                 << "\t time= " << dts << "\t iterations= " << currentIt
+                 << "\t cumTime= " << cumTime << endl;
           }
           lastOptimizedVertexCount = vertexCount;
           freshlyOptimized = true;
@@ -546,10 +547,10 @@ int main(int argc, char** argv)
       //optimizer->setOptimizationTime(cumTime);
       if (verbose) {
         double chi2 = optimizer.chi2();
-        cerr << "nodes= " << optimizer.vertices().size() << "\t edges= " << optimizer.edges().size() << "\t chi2= " << chi2
-          << "\t time= " << dts << "\t iterations= " << currentIt <<  "\t cumTime= " << cumTime << endl;
+        cerr << "nodes= " << optimizer.vertices().size() << "\t edges= " << optimizer.edges().size()
+             << "\t chi2= " << chi2 << "\t time= " << dts << "\t iterations= " << currentIt
+             << "\t cumTime= " << cumTime << endl;
       }
-
     }
 
   } else {
@@ -580,7 +581,7 @@ int main(int argc, char** argv)
     } else if (computeMarginals){
       std::vector<std::pair<int, int> > blockIndices;
       for (size_t i=0; i<optimizer.activeVertices().size(); i++){
-        OptimizableGraph::Vertex* v=optimizer.activeVertices()[i];
+        auto v = optimizer.activeVertices()[i];
         if (v->hessianIndex()>=0){
           blockIndices.push_back(make_pair(v->hessianIndex(), v->hessianIndex()));
         }
@@ -591,7 +592,7 @@ int main(int argc, char** argv)
       SparseBlockMatrix<MatrixXd> spinv;
       if (optimizer.computeMarginals(spinv, blockIndices)) {
         for (size_t i=0; i<optimizer.activeVertices().size(); i++){
-          OptimizableGraph::Vertex* v=optimizer.activeVertices()[i];
+          auto v = optimizer.activeVertices()[i];
           cerr << "Vertex id:" << v->id() << endl;
           if (v->hessianIndex()>=0){
             cerr << "inv block :" << v->hessianIndex() << ", " << v->hessianIndex()<< endl;
@@ -619,20 +620,22 @@ int main(int argc, char** argv)
       int nLandmarks=0;
       int nPoses=0;
       int maxDim = *vertexDimensions.rbegin();
-      for (HyperGraph::VertexIDMap::iterator it=optimizer.vertices().begin(); it!=optimizer.vertices().end(); ++it){
-	OptimizableGraph::Vertex* v=static_cast<OptimizableGraph::Vertex*>(it->second);
-	if (v->dimension() != maxDim) {
-	  nLandmarks++;
-	} else
-	  nPoses++;
+      for (HyperGraph::VertexIDMap::iterator it = optimizer.vertices().begin();
+           it != optimizer.vertices().end(); ++it) {
+        auto v = std::static_pointer_cast<OptimizableGraph::Vertex>(it->second);
+        if (v->dimension() != maxDim) {
+          nLandmarks++;
+        } else
+          nPoses++;
       }
       set<string> edgeTypes;
-      for (HyperGraph::EdgeSet::iterator it=optimizer.edges().begin(); it!=optimizer.edges().end(); ++it){
-	edgeTypes.insert(Factory::instance()->tag(*it));
+      for (HyperGraph::EdgeSet::iterator it = optimizer.edges().begin();
+           it != optimizer.edges().end(); ++it) {
+        edgeTypes.insert(Factory::instance()->tag(it->get()));
       }
       stringstream edgeTypesString;
-      for (std::set<string>::iterator it=edgeTypes.begin(); it!=edgeTypes.end(); ++it){
-	edgeTypesString << *it << " ";
+      for (std::set<string>::iterator it = edgeTypes.begin(); it != edgeTypes.end(); ++it) {
+        edgeTypesString << *it << " ";
       }
 
       summary.makeProperty<IntProperty>("n_poses", nPoses);

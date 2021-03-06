@@ -74,7 +74,7 @@ std::shared_ptr<const HyperGraph::Vertex> HyperGraph::vertex(int id) const {
   return it->second;
 }
 
-bool HyperGraph::addVertex(std::shared_ptr<Vertex>& v) {
+bool HyperGraph::addVertex(const std::shared_ptr<Vertex>& v) {
   auto result = _vertices.insert(std::make_pair(v->id(), v));
   return result.second;
 }
@@ -92,7 +92,7 @@ bool HyperGraph::changeId(std::shared_ptr<Vertex>& v, int newId) {
   return true;
 }
 
-bool HyperGraph::addEdge(std::shared_ptr<Edge>& e) {
+bool HyperGraph::addEdge(const std::shared_ptr<Edge>& e) {
   for (const auto& v : e->vertices()) {  // be sure that all vertices are set
     if (!v) return false;
   }
@@ -120,7 +120,7 @@ bool HyperGraph::addEdge(std::shared_ptr<Edge>& e) {
   return true;
 }
 
-bool HyperGraph::setEdgeVertex(std::shared_ptr<Edge>& e, int pos, std::shared_ptr<Vertex>& v) {
+bool HyperGraph::setEdgeVertex(const std::shared_ptr<Edge>& e, int pos, const std::shared_ptr<Vertex>& v) {
   auto vOld = e->vertex(pos);
   if (vOld) vOld->edges().erase(e);
   e->setVertex(pos, v);

@@ -186,8 +186,8 @@ OptimizableGraph::~OptimizableGraph() {
   clearParameters();
 }
 
-bool OptimizableGraph::addVertex(std::shared_ptr<OptimizableGraph::Vertex>& ov,
-                                 std::shared_ptr<HyperGraph::Data>& userData) {
+bool OptimizableGraph::addVertex(const std::shared_ptr<OptimizableGraph::Vertex>& ov,
+                                 const std::shared_ptr<HyperGraph::Data>& userData) {
   if (ov->id() < 0) {
     cerr << __FUNCTION__ << ": FATAL, a vertex with (negative) ID " << ov->id()
          << " cannot be inserted in the graph" << endl;
@@ -210,15 +210,15 @@ bool OptimizableGraph::addVertex(std::shared_ptr<OptimizableGraph::Vertex>& ov,
   return HyperGraph::addVertex(aux);
 }
 
-bool OptimizableGraph::addVertex(std::shared_ptr<HyperGraph::Vertex>& v,
-                                 std::shared_ptr<HyperGraph::Data>& userData) {
+bool OptimizableGraph::addVertex(const std::shared_ptr<HyperGraph::Vertex>& v,
+                                 const std::shared_ptr<HyperGraph::Data>& userData) {
   std::shared_ptr<HyperGraph::Vertex> ov = dynamic_pointer_cast<OptimizableGraph::Vertex>(v);
   assert(ov && "Vertex does not inherit from OptimizableGraph::Vertex");
   if (!ov) return false;
   return addVertex(ov, userData);
 }
 
-bool OptimizableGraph::addEdge(std::shared_ptr<OptimizableGraph::Edge>& e) {
+bool OptimizableGraph::addEdge(const std::shared_ptr<OptimizableGraph::Edge>& e) {
   OptimizableGraph* g = e->graph();
 
   if (g != nullptr && g != this) {
@@ -255,15 +255,15 @@ std::shared_ptr<const OptimizableGraph::Vertex> OptimizableGraph::vertex(int id)
   return static_pointer_cast<const OptimizableGraph::Vertex>(HyperGraph::vertex(id));
 }
 
-bool OptimizableGraph::addEdge(std::shared_ptr<HyperGraph::Edge>& e_) {
+bool OptimizableGraph::addEdge(const std::shared_ptr<HyperGraph::Edge>& e_) {
   std::shared_ptr<OptimizableGraph::Edge> e = dynamic_pointer_cast<OptimizableGraph::Edge>(e_);
   assert(e && "Edge does not inherit from OptimizableGraph::Edge");
   if (!e) return false;
   return addEdge(e);
 }
 
-bool OptimizableGraph::setEdgeVertex(std::shared_ptr<HyperGraph::Edge>& e, int pos,
-                                     std::shared_ptr<HyperGraph::Vertex>& v) {
+bool OptimizableGraph::setEdgeVertex(const std::shared_ptr<HyperGraph::Edge>& e, int pos,
+                                     const std::shared_ptr<HyperGraph::Vertex>& v) {
   if (!HyperGraph::setEdgeVertex(e, pos, v)) {
     return false;
   }

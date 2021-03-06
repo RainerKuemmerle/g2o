@@ -118,8 +118,8 @@ class G2O_CORE_API HyperGraph {
     //! the user data associated with this vertex
     std::shared_ptr<const Data> userData() const { return _userData; }
     std::shared_ptr<Data> userData() { return _userData; }
-    void setUserData(std::shared_ptr<Data>& obs) { _userData = obs; }
-    void addUserData(std::shared_ptr<Data>& obs) {
+    void setUserData(const std::shared_ptr<Data>& obs) { _userData = obs; }
+    void addUserData(const std::shared_ptr<Data>& obs) {
       if (obs) {
         obs->setNext(_userData);
         _userData = obs;
@@ -248,19 +248,19 @@ class G2O_CORE_API HyperGraph {
    * with the same id is already in the graph.
    * returns true, on success, or false on failure.
    */
-  virtual bool addVertex(std::shared_ptr<Vertex>& v);
+  virtual bool addVertex(const std::shared_ptr<Vertex>& v);
 
   /**
    * Adds an edge to the graph. If the edge is already in the graph, it
    * does nothing and returns false. Otherwise it returns true.
    */
-  virtual bool addEdge(std::shared_ptr<Edge>& e);
+  virtual bool addEdge(const std::shared_ptr<Edge>& e);
 
   /**
    * Sets the vertex in position "pos" within the edge and keeps the bookkeeping consistent.
    * If v ==0, the vertex is set to "invalid"
    */
-  virtual bool setEdgeVertex(std::shared_ptr<Edge>& e, int pos, std::shared_ptr<Vertex>& v);
+  virtual bool setEdgeVertex(const std::shared_ptr<Edge>& e, int pos, const std::shared_ptr<Vertex>& v);
 
   /**
    * merges two (valid) vertices, adjusts the bookkeeping and relabels all edges.

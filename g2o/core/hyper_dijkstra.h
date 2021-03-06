@@ -43,10 +43,13 @@ struct G2O_CORE_API HyperDijkstra {
   };
 
   struct G2O_CORE_API TreeAction {
-    virtual number_t perform(HyperGraph::Vertex* v, HyperGraph::Vertex* vParent,
-                             HyperGraph::Edge* e);
-    virtual number_t perform(HyperGraph::Vertex* v, HyperGraph::Vertex* vParent,
-                             HyperGraph::Edge* e, number_t distance);
+    virtual number_t perform(const std::shared_ptr<HyperGraph::Vertex>& v,
+                             const std::shared_ptr<HyperGraph::Vertex>& vParent,
+                             const std::shared_ptr<HyperGraph::Edge>& e);
+    virtual number_t perform(const std::shared_ptr<HyperGraph::Vertex>& v,
+                             const std::shared_ptr<HyperGraph::Vertex>& vParent,
+                             const std::shared_ptr<HyperGraph::Edge>& e,
+                             number_t distance);
   };
 
   struct G2O_CORE_API AdjacencyMapEntry {

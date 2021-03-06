@@ -54,11 +54,11 @@ namespace g2o {
   }
 
 
-  OptimizableGraph::Edge* EdgeCreator::createEdge(std::vector<OptimizableGraph::Vertex*>& vertices ){
+  std::shared_ptr<OptimizableGraph::Edge> EdgeCreator::createEdge(const OptimizableGraph::VertexContainer& vertices) {
     std::stringstream key;
     Factory* factory=Factory::instance();
     for (size_t i=0; i<vertices.size(); i++){
-      key << factory->tag(vertices[i]) << ";";
+      key << factory->tag(vertices[i].get()) << ";";
     }
     EntryMap::iterator it=_vertexToEdgeMap.find(key.str());
     if (it==_vertexToEdgeMap.end()){
@@ -70,7 +70,7 @@ namespace g2o {
       cerr << "no thing can be created" << endl;
       return 0;
     }
-    OptimizableGraph::Edge* e = dynamic_cast<OptimizableGraph::Edge*>(element);
+    std::shared_ptr<OptimizableGraph::Edge> e(dynamic_cast<OptimizableGraph::Edge*>(element));
     assert(it->second._parameterIds.size() == e->numParameters());
     for (size_t i=0; i<it->second._parameterIds.size(); i++){
       if (! e->setParameterId(i,it->second._parameterIds[i])) {

@@ -39,16 +39,19 @@ namespace g2o {
 
 using namespace std;
 
-number_t HyperDijkstra::TreeAction::perform(HyperGraph::Vertex* v, HyperGraph::Vertex* vParent,
-                                            HyperGraph::Edge* e) {
+number_t HyperDijkstra::TreeAction::perform(const std::shared_ptr<HyperGraph::Vertex>& v,
+                                            const std::shared_ptr<HyperGraph::Vertex>& vParent,
+                                            const std::shared_ptr<HyperGraph::Edge>& e) {
   (void)v;
   (void)vParent;
   (void)e;
   return std::numeric_limits<number_t>::max();
 }
 
-number_t HyperDijkstra::TreeAction::perform(HyperGraph::Vertex* v, HyperGraph::Vertex* vParent,
-                                            HyperGraph::Edge* e, number_t distance) {
+number_t HyperDijkstra::TreeAction::perform(const std::shared_ptr<HyperGraph::Vertex>& v,
+                                            const std::shared_ptr<HyperGraph::Vertex>& vParent,
+                                            const std::shared_ptr<HyperGraph::Edge>& e,
+                                            number_t distance) {
   if (distance == -1) return perform(v, vParent, e);
   return std::numeric_limits<number_t>::max();
 }
@@ -180,7 +183,7 @@ void HyperDijkstra::visitAdjacencyMap(AdjacencyMap& amap, TreeAction* action, bo
   for (AdjacencyMap::iterator it = amap.begin(); it != amap.end(); ++it) {
     AdjacencyMapEntry& entry(it->second);
     if (!entry.parent()) {
-      action->perform(it->first.get(), nullptr, nullptr);
+      action->perform(it->first, nullptr, nullptr);
       q.push_back(it->first);
     }
   }
@@ -209,9 +212,9 @@ void HyperDijkstra::visitAdjacencyMap(AdjacencyMap& amap, TreeAction* action, bo
       assert(adjacencyIt->second.child() == child);
       assert(adjacencyIt->second.parent() == parent);
       if (!useDistance) {
-        action->perform(child.get(), parent.get(), edge.get());
+        action->perform(child, parent, edge);
       } else {
-        action->perform(child.get(), parent.get(), edge.get(), adjacencyIt->second.distance());
+        action->perform(child, parent, edge, adjacencyIt->second.distance());
       }
       q.push_back(child);
     }

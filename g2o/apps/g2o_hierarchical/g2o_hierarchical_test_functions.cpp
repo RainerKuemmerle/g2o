@@ -69,7 +69,7 @@ void testMarginals(SparseOptimizer& optimizer){
   cerr << "Projecting marginals" << endl;
   std::vector<std::pair<int, int> > blockIndices;
   for (size_t i=0; i<optimizer.activeVertices().size(); i++) {
-    OptimizableGraph::Vertex* v=optimizer.activeVertices()[i];
+    const auto& v = optimizer.activeVertices()[i];
     if (v->hessianIndex()>=0){
       blockIndices.push_back(make_pair(v->hessianIndex(), v->hessianIndex()));
     }
@@ -80,7 +80,7 @@ void testMarginals(SparseOptimizer& optimizer){
   SparseBlockMatrix<MatrixXd> spinv;
   if (optimizer.computeMarginals(spinv, blockIndices)) {
     for (size_t i=0; i<optimizer.activeVertices().size(); i++) {
-      OptimizableGraph::Vertex* v=optimizer.activeVertices()[i];
+      const auto& v = optimizer.activeVertices()[i];
       cerr << "Vertex id:" << v->id() << endl;
       if (v->hessianIndex()>=0){
         cerr << "increments block :" << v->hessianIndex() << ", " << v->hessianIndex()<< " covariance:" <<  endl;

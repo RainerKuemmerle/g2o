@@ -242,12 +242,12 @@ int main(int argc, char** argv)
   creator.addAssociation("VERTEX_SE3:QUAT;VERTEX_SE3:QUAT;","EDGE_SE3:QUAT");
   creator.addAssociation("VERTEX_SE3_NEW;VERTEX_SE3_NEW;","EDGE_SE3_NEW");
 
-  Parameter* p0 = optimizer.parameter(0);
+  std::shared_ptr<Parameter> p0 = optimizer.parameter(0);
   if (p0){
-    ParameterSE3Offset* originalParams = dynamic_cast<ParameterSE3Offset*>(p0);
+    ParameterSE3Offset* originalParams = dynamic_cast<ParameterSE3Offset*>(p0.get());
     if (originalParams) {
       cerr << "ORIGINAL PARAMS" << endl;
-      ParameterSE3Offset* se3OffsetParam = new ParameterSE3Offset();
+      auto se3OffsetParam = std::make_shared<ParameterSE3Offset>();
       se3OffsetParam->setId(100);
       optimizer.addParameter(se3OffsetParam);
       std::vector<int> depthCamHParamsIds(1);
@@ -326,10 +326,7 @@ int main(int argc, char** argv)
 
   // check for vertices to fix to remove DoF
   bool gaugeFreedom = optimizer.gaugeFreedom();
-  OptimizableGraph::Vertex* gauge=optimizer.findGauge();
-
-
-
+  std::shared_ptr<OptimizableGraph::Vertex> gauge = optimizer.findGauge();
 
   if (gaugeFreedom) {
     if (! gauge) {
@@ -343,15 +340,11 @@ int main(int argc, char** argv)
     cerr << "# graph is fixed by priors" << endl;
   }
 
-
-
-
-
-
   // sanity check
-  HyperDijkstra d(&optimizer);
+  auto pointerWrapper = std::shared_ptr<HyperGraph>(&optimizer, [](HyperGraph*){});
+  HyperDijkstra d(pointerWrapper);
   UniformCostFunction f;
-  d.shortestPaths(gauge,&f);
+  d.shortestPaths(gauge, &f);
   //cerr << PVAR(d.visited().size()) << endl;
 
   if (d.visited().size()!=optimizer.vertices().size()) {
@@ -380,14 +373,14 @@ int main(int argc, char** argv)
 
   //  if (robustKernel) {
   //cerr << "# Preparing robust error function ... ";
-    for (SparseOptimizer::EdgeSet::iterator it = optimizer.edges().begin(); it != optimizer.edges().end(); ++it) {
-      SparseOptimizer::Edge* e = dynamic_cast<SparseOptimizer::Edge*>(*it);
-      if (kernelCreator) {
-	e->setRobustKernel(kernelCreator->construct());
-	if (huberWidth > 0)
-	  e->robustKernel()->setDelta(huberWidth);
-      }
+  for (SparseOptimizer::EdgeSet::iterator it = optimizer.edges().begin();
+       it != optimizer.edges().end(); ++it) {
+    auto e = std::dynamic_pointer_cast<SparseOptimizer::Edge>(*it);
+    if (kernelCreator) {
+      e->setRobustKernel(kernelCreator->construct());
+      if (huberWidth > 0) e->robustKernel()->setDelta(huberWidth);
     }
+  }
     //cerr << "done." << endl;
     //}
   optimizer.computeActiveErrors();
@@ -413,8 +406,7 @@ int main(int argc, char** argv)
   OptimizableGraph::VertexSet hvset;
   HyperGraph::VertexSet hgauge;
   for (StarSet::iterator it=stars.begin(); it!=stars.end(); ++it) {
-
-    Star* s=*it;
+    const auto& s = *it;
     if (hgauge.empty())
       hgauge=s->gauge();
 
@@ -424,15 +416,14 @@ int main(int argc, char** argv)
     }
 
     for (HyperGraph::EdgeSet::iterator iit=s->_starEdges.begin(); iit!=s->_starEdges.end(); ++iit){
-      OptimizableGraph::Edge* e= (OptimizableGraph::Edge*) *iit;
+      const auto& e= *iit;
       eset.insert(e);
       for (size_t i=0; i<e->vertices().size(); i++){
         vset.insert(e->vertices()[i]);
       }
     }
     for (HyperGraph::EdgeSet::iterator iit=s->starFrontierEdges().begin(); iit!=s->starFrontierEdges().end(); ++iit){
-      OptimizableGraph::Edge* e= (OptimizableGraph::Edge*) *iit;
-      heset.insert(e);
+      heset.insert(*iit);
     }
   }
   cerr << "eset.size()= " << eset.size() << endl;
@@ -450,7 +441,7 @@ int main(int argc, char** argv)
 
   cerr << "optimizing the high layer" << endl;
   for (HyperGraph::VertexSet::iterator it = hgauge.begin(); it!=hgauge.end(); ++it){
-    OptimizableGraph::Vertex* g=dynamic_cast<OptimizableGraph::Vertex*>(*it);
+    OptimizableGraph::Vertex* g=dynamic_cast<OptimizableGraph::Vertex*>(it->get());
     g->setFixed(true);
   }
   solver = std::move(optimizer.solver());
@@ -474,8 +465,8 @@ int main(int argc, char** argv)
   if (! kernelCreator) {
     cerr << "# Robust error function disabled ";
     for (SparseOptimizer::EdgeSet::iterator it = optimizer.edges().begin(); it != optimizer.edges().end(); ++it) {
-      SparseOptimizer::Edge* e = dynamic_cast<SparseOptimizer::Edge*>(*it);
-      e->setRobustKernel(0);
+      SparseOptimizer::Edge* e = dynamic_cast<SparseOptimizer::Edge*>(it->get());
+      e->setRobustKernel(nullptr);
     }
     cerr << "done." << endl;
   } else {
@@ -484,7 +475,7 @@ int main(int argc, char** argv)
 
   cerr << "fixing the hstructure, and optimizing the floating nodes" << endl;
   for (OptimizableGraph::VertexSet::iterator it = hvset.begin(); it!=hvset.end(); ++it){
-    OptimizableGraph::Vertex* g=dynamic_cast<OptimizableGraph::Vertex*>(*it);
+    OptimizableGraph::Vertex* g=dynamic_cast<OptimizableGraph::Vertex*>(it->get());
     g->setFixed(true);
   }
   optimizer.initializeOptimization(eset);
@@ -499,11 +490,11 @@ int main(int argc, char** argv)
 
   cerr << "adding the original constraints, locking hierarchical solution and optimizing the free variables" << endl;
   for (OptimizableGraph::VertexSet::iterator it = vset.begin(); it!=vset.end(); ++it){
-    OptimizableGraph::Vertex* g=dynamic_cast<OptimizableGraph::Vertex*>(*it);
+    OptimizableGraph::Vertex* g=dynamic_cast<OptimizableGraph::Vertex*>(it->get());
     g->setFixed(true);
   }
   for (HyperGraph::VertexSet::iterator it = hgauge.begin(); it!=hgauge.end(); ++it){
-    OptimizableGraph::Vertex* g=dynamic_cast<OptimizableGraph::Vertex*>(*it);
+    OptimizableGraph::Vertex* g=dynamic_cast<OptimizableGraph::Vertex*>(it->get());
     g->setFixed(true);
   }
   hsolver = std::move(optimizer.solver());
@@ -515,11 +506,11 @@ int main(int argc, char** argv)
 
   cerr << "relaxing the full problem" << endl;
   for (OptimizableGraph::VertexSet::iterator it = vset.begin(); it!=vset.end(); ++it){
-    OptimizableGraph::Vertex* g=dynamic_cast<OptimizableGraph::Vertex*>(*it);
+    OptimizableGraph::Vertex* g=dynamic_cast<OptimizableGraph::Vertex*>(it->get());
     g->setFixed(false);
   }
   for (HyperGraph::VertexSet::iterator it = hgauge.begin(); it!=hgauge.end(); ++it){
-    OptimizableGraph::Vertex* g=dynamic_cast<OptimizableGraph::Vertex*>(*it);
+    OptimizableGraph::Vertex* g=dynamic_cast<OptimizableGraph::Vertex*>(it->get());
     g->setFixed(true);
   }
   optimizer.initializeOptimization(0);
@@ -539,20 +530,20 @@ int main(int argc, char** argv)
     int nPoses=0;
     int maxDim = *vertexDimensions.rbegin();
     for (HyperGraph::VertexIDMap::iterator it=optimizer.vertices().begin(); it!=optimizer.vertices().end(); ++it){
-      OptimizableGraph::Vertex* v=static_cast<OptimizableGraph::Vertex*>(it->second);
+      OptimizableGraph::Vertex* v=static_cast<OptimizableGraph::Vertex*>(it->second.get());
       if (v->dimension() != maxDim) {
-	nLandmarks++;
+        nLandmarks++;
       } else
-	nPoses++;
+        nPoses++;
     }
 
     int nEdges=0;
     set<string> edgeTypes;
     for (HyperGraph::EdgeSet::iterator it=optimizer.edges().begin(); it!=optimizer.edges().end(); ++it){
-      OptimizableGraph::Edge* e = dynamic_cast<OptimizableGraph::Edge*> (*it);
+      OptimizableGraph::Edge* e = dynamic_cast<OptimizableGraph::Edge*> (it->get());
       if (e->level()==0) {
-	edgeTypes.insert(Factory::instance()->tag(e));
-	nEdges++;
+        edgeTypes.insert(Factory::instance()->tag(e));
+        nEdges++;
       }
     }
     stringstream edgeTypesString;

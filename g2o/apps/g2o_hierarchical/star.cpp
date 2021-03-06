@@ -35,24 +35,24 @@ namespace g2o {
   bool Star::labelStarEdges(int iterations, EdgeLabeler* labeler){
     // mark all vertices in the lowLevelEdges as floating
     bool ok=true;
-    std::set<OptimizableGraph::Vertex*> vset;
+    OptimizableGraph::VertexSet vset;
     for (HyperGraph::EdgeSet::iterator it=_lowLevelEdges.begin(); it!=_lowLevelEdges.end(); ++it){
-      HyperGraph::Edge* e=*it;
+      HyperGraph::Edge* e = it->get();
       for (size_t i=0; i<e->vertices().size(); i++){
-        OptimizableGraph::Vertex* v=(OptimizableGraph::Vertex*)e->vertices()[i];
+        auto v = std::static_pointer_cast<OptimizableGraph::Vertex>(e->vertices()[i]);
         v->setFixed(false);
         vset.insert(v);
       }
     }
-    for (std::set<OptimizableGraph::Vertex*>::iterator it=vset.begin(); it!=vset.end(); ++it){
-      OptimizableGraph::Vertex* v = *it;
+    for (auto it = vset.begin(); it != vset.end(); ++it) {
+      OptimizableGraph::Vertex* v = static_cast<OptimizableGraph::Vertex*>(it->get());
       v->push();
     }
 
     // fix all vertices in the gauge
     //cerr << "fixing gauge: ";
-    for (HyperGraph::VertexSet::iterator it = _gauge.begin(); it!=_gauge.end(); ++it){
-      OptimizableGraph::Vertex* v=(OptimizableGraph::Vertex*)*it;
+    for (HyperGraph::VertexSet::iterator it = _gauge.begin(); it != _gauge.end(); ++it) {
+      OptimizableGraph::Vertex* v = static_cast<OptimizableGraph::Vertex*>(it->get());
       //cerr << v->id() << " ";
       v->setFixed(true);
     }
@@ -71,7 +71,7 @@ namespace g2o {
         cerr << "star size=" << _lowLevelEdges.size() << endl;
         cerr << "gauge: ";
         for (HyperGraph::VertexSet::iterator it=_gauge.begin(); it!=_gauge.end(); ++it){
-          OptimizableGraph::Vertex* v = (OptimizableGraph::Vertex*)*it;
+          auto v = static_cast<OptimizableGraph::Vertex*>(it->get());
           cerr << "[" << v->id() << " " << v->hessianIndex() << "] ";
         }
         cerr << endl;
@@ -95,7 +95,7 @@ namespace g2o {
 
     std::set<OptimizableGraph::Edge*> star;
     for(HyperGraph::EdgeSet::iterator it=_starEdges.begin(); it!=_starEdges.end(); ++it){
-      star.insert((OptimizableGraph::Edge*)*it);
+      star.insert((OptimizableGraph::Edge*)it->get());
     }
     if (ok) {
       int result = labeler->labelEdges(star);
@@ -103,12 +103,12 @@ namespace g2o {
         ok=false;
     }
     // release all vertices in the gauge
-    for (std::set<OptimizableGraph::Vertex*>::iterator it=vset.begin(); it!=vset.end(); ++it){
-      OptimizableGraph::Vertex* v = *it;
+    for (auto it=vset.begin(); it!=vset.end(); ++it){
+      OptimizableGraph::Vertex* v = static_cast<OptimizableGraph::Vertex*>(it->get());
       v->pop();
     }
     for (HyperGraph::VertexSet::iterator it=_gauge.begin(); it!=_gauge.end(); ++it){
-      OptimizableGraph::Vertex* v=(OptimizableGraph::Vertex*)*it;
+      OptimizableGraph::Vertex* v = static_cast<OptimizableGraph::Vertex*>(it->get());
       v->setFixed(false);
     }
 

@@ -72,12 +72,11 @@ namespace g2o {
      * @param e: the edge between v and its parent
      * @param distance: the depth in the tree
      */
-    virtual double perform(HyperGraph::Vertex* v,
-         HyperGraph::Vertex* vParent,
-         HyperGraph::Edge* e,
-         double distance);
+    virtual double perform(const std::shared_ptr<HyperGraph::Vertex>& v,
+                           const std::shared_ptr<HyperGraph::Vertex>& vParent,
+                           const std::shared_ptr<HyperGraph::Edge>& e, double distance);
 
-  protected:
+   protected:
     /**
      * helper function for adding a vertex to a star. If the vertex is already
      * in _vertexToEdgeMap it replaces the associated star. _vertexStarMultimap
@@ -85,13 +84,13 @@ namespace g2o {
      * @param s: the star
      * @param v: the vertex
      */
-    void  addToMap(Star* s, HyperGraph::Vertex* v);
+    void addToMap(const std::shared_ptr<Star>& s, const std::shared_ptr<OptimizableGraph::Vertex>& v);
     //! helper function to retrieve the most recent star of a vertex.
     //! @param v: the vertex
-    Star* getStar(HyperGraph::Vertex* v);
+    std::shared_ptr<Star> getStar(const std::shared_ptr<OptimizableGraph::Vertex>& v);
 
     //! helper function that adds to a star an edge and all its vertices
-    bool fillStar(Star* s, HyperGraph::Edge* e_);
+    bool fillStar(const std::shared_ptr<Star>& s, const std::shared_ptr<OptimizableGraph::Edge>& e_);
 
     SparseOptimizer* _optimizer;
     std::string _vertexTag;

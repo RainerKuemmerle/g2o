@@ -52,22 +52,24 @@ namespace g2o {
   {
     public:
       explicit ThetaTreeAction(number_t* theta) : HyperDijkstra::TreeAction(), _thetaGuess(theta) {}
-      virtual number_t perform(HyperGraph::Vertex* v, HyperGraph::Vertex* vParent, HyperGraph::Edge* e)
-      {
+      virtual number_t perform(const std::shared_ptr<HyperGraph::Vertex>& v,
+                               const std::shared_ptr<HyperGraph::Vertex>& vParent,
+                               const std::shared_ptr<HyperGraph::Edge>& e) {
         if (! vParent)
           return 0.;
-        EdgeSE2* odom    = static_cast<EdgeSE2*>(e);
-        VertexSE2* from  = static_cast<VertexSE2*>(vParent);
-        VertexSE2* to    = static_cast<VertexSE2*>(v);
+        EdgeSE2* odom    = static_cast<EdgeSE2*>(e.get());
+        VertexSE2* from  = static_cast<VertexSE2*>(vParent.get());
+        VertexSE2* to    = static_cast<VertexSE2*>(v.get());
         assert(to->hessianIndex() >= 0);
         number_t fromTheta = from->hessianIndex() < 0 ? 0. : _thetaGuess[from->hessianIndex()];
-        bool direct      = odom->vertices()[0] == from;
+        bool direct      = odom->vertices()[0].get() == from;
         if (direct)
           _thetaGuess[to->hessianIndex()] = fromTheta + odom->measurement().rotation().angle();
         else
           _thetaGuess[to->hessianIndex()] = fromTheta - odom->measurement().rotation().angle();
         return 1.;
       }
+
     protected:
       number_t* _thetaGuess;
   };
@@ -119,13 +121,13 @@ namespace g2o {
     // off diagonal for each edge
     for (SparseOptimizer::EdgeContainer::const_iterator it = _optimizer->activeEdges().begin(); it != _optimizer->activeEdges().end(); ++it) {
 #    ifndef NDEBUG
-      EdgeSE2* e = dynamic_cast<EdgeSE2*>(*it);
+      EdgeSE2* e = dynamic_cast<EdgeSE2*>(it->get());
       assert(e && "Active edges contain non-odometry edge"); //
 #    else
-      EdgeSE2* e = static_cast<EdgeSE2*>(*it);
+      EdgeSE2* e = static_cast<EdgeSE2*>(it->get());
 #    endif
-      OptimizableGraph::Vertex* from = static_cast<OptimizableGraph::Vertex*>(e->vertices()[0]);
-      OptimizableGraph::Vertex* to   = static_cast<OptimizableGraph::Vertex*>(e->vertices()[1]);
+      auto from = e->vertexXn<0>();
+      auto to   = e->vertexXn<1>();
 
       int ind1 = from->hessianIndex();
       int ind2 = to->hessianIndex();
@@ -146,11 +148,12 @@ namespace g2o {
 
     // walk along the Minimal Spanning Tree to compute the guess for the robot orientation
     assert(fixedSet.size() == 1);
-    VertexSE2* root = static_cast<VertexSE2*>(*fixedSet.begin());
+    auto root = static_pointer_cast<VertexSE2>(*fixedSet.begin());
     VectorX thetaGuess;
     thetaGuess.setZero(_optimizer->indexMapping().size());
     UniformCostFunction uniformCost;
-    HyperDijkstra hyperDijkstra(_optimizer);
+    auto pointerWrapper = std::shared_ptr<HyperGraph>(_optimizer, [](HyperGraph*){});
+    HyperDijkstra hyperDijkstra(pointerWrapper);
     hyperDijkstra.shortestPaths(root, &uniformCost);
 
     HyperDijkstra::computeTree(hyperDijkstra.adjacencyMap());
@@ -159,9 +162,9 @@ namespace g2o {
 
     // construct for the orientation
     for (SparseOptimizer::EdgeContainer::const_iterator it = _optimizer->activeEdges().begin(); it != _optimizer->activeEdges().end(); ++it) {
-      EdgeSE2* e = static_cast<EdgeSE2*>(*it);
-      VertexSE2* from = static_cast<VertexSE2*>(e->vertices()[0]);
-      VertexSE2* to   = static_cast<VertexSE2*>(e->vertices()[1]);
+      EdgeSE2* e = static_cast<EdgeSE2*>(it->get());
+      auto from = e->vertexXn<0>();
+      auto to   = e->vertexXn<1>();
 
       number_t omega = e->information()(2,2);
 

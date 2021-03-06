@@ -92,11 +92,12 @@ struct Star{
   HyperGraph::VertexSet _lowLevelVertices;
 };
 
-  typedef std::multimap<OptimizableGraph::Vertex*, Star*> VertexStarMultimap;
-  typedef std::map<OptimizableGraph::Vertex*, Star*> VertexStarMap;
-  typedef std::set<Star*> StarSet;
-  typedef std::map<HyperGraph::Edge*, Star*> EdgeStarMap;
+// clang-format off
+using VertexStarMultimap = std::multimap<std::shared_ptr<OptimizableGraph::Vertex>, std::shared_ptr<Star>>;
+using VertexStarMap = std::map<std::shared_ptr<OptimizableGraph::Vertex>, std::shared_ptr<Star>>;
+using StarSet = std::set<std::shared_ptr<Star>>;
+using EdgeStarMap = std::map<std::shared_ptr<OptimizableGraph::Edge>, std::shared_ptr<Star>>;
+// clang-format on
 
-
-} // end namespace
+}  // namespace g2o
 #endif

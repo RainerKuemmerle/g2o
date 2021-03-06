@@ -82,7 +82,7 @@ struct G2O_HIERARCHICAL_API EdgeCreator{
   //! The vertices of the newly created edge are set to the parameter
   //! @params vertices: the vertices to be connected by the new edge
   //! @returns the new edge on succes, 0 on failure (no edge association in the map compatible with the vertices in the parameter)
-  OptimizableGraph::Edge* createEdge(std::vector<OptimizableGraph::Vertex*>& vertices );
+  std::shared_ptr<OptimizableGraph::Edge> createEdge(const OptimizableGraph::VertexContainer& vertices);
 
 protected:
   EntryMap _vertexToEdgeMap;

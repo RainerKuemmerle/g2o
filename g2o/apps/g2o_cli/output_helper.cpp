@@ -43,7 +43,7 @@ namespace g2o {
 bool edgeAllVertsSameDim(OptimizableGraph::Edge* e, int dim)
 {
   for (size_t i = 0; i < e->vertices().size(); ++i) {
-    OptimizableGraph::Vertex* v = static_cast<OptimizableGraph::Vertex*>(e->vertices()[i]);
+    auto v = std::static_pointer_cast<OptimizableGraph::Vertex>(e->vertices()[i]);
     if (v->dimension() != dim)
       return false;
   }
@@ -72,7 +72,7 @@ bool saveGnuplot(const std::string& gnudump, const HyperGraph::VertexSet& vertic
   int maxDim = -1;
   int minDim = numeric_limits<int>::max();
   for (HyperGraph::VertexSet::const_iterator it = vertices.begin(); it != vertices.end(); ++it){
-    OptimizableGraph::Vertex* v = static_cast<OptimizableGraph::Vertex*>(*it);
+    auto v = std::static_pointer_cast<OptimizableGraph::Vertex>(*it);
     int vdim = v->dimension();
     maxDim = (std::max)(vdim, maxDim);
     minDim = (std::min)(vdim, minDim);
@@ -87,9 +87,9 @@ bool saveGnuplot(const std::string& gnudump, const HyperGraph::VertexSet& vertic
   bool hasOdomEdge = false;
   bool hasLandmarkEdge = false;
   for (HyperGraph::EdgeSet::const_iterator it = edges.begin(); it != edges.end(); ++it) {
-    OptimizableGraph::Edge* e = static_cast<OptimizableGraph::Edge*>(*it);
+    auto e = std::static_pointer_cast<OptimizableGraph::Edge>(*it);
     if (e->vertices().size() == 2) {
-      if (edgeAllVertsSameDim(e, maxDim))
+      if (edgeAllVertsSameDim(e.get(), maxDim))
         hasOdomEdge = true;
       else
         hasLandmarkEdge = true;
@@ -111,10 +111,10 @@ bool saveGnuplot(const std::string& gnudump, const HyperGraph::VertexSet& vertic
 
     // writing odometry edges
     for (HyperGraph::EdgeSet::const_iterator it = edges.begin(); it != edges.end(); ++it) {
-      OptimizableGraph::Edge* e = static_cast<OptimizableGraph::Edge*>(*it);
-      if (e->vertices().size() != 2 || ! edgeAllVertsSameDim(e, maxDim))
+      auto e = std::static_pointer_cast<OptimizableGraph::Edge>(*it);
+      if (e->vertices().size() != 2 || ! edgeAllVertsSameDim(e.get(), maxDim))
         continue;
-      (*saveGnuplot)(e, &params);
+      (*saveGnuplot)(e.get(), &params);
     }
     cerr << "done." << endl;
   }
@@ -131,10 +131,10 @@ bool saveGnuplot(const std::string& gnudump, const HyperGraph::VertexSet& vertic
 
     // writing landmark edges
     for (HyperGraph::EdgeSet::const_iterator it = edges.begin(); it != edges.end(); ++it) {
-      OptimizableGraph::Edge* e = static_cast<OptimizableGraph::Edge*>(*it);
-      if (e->vertices().size() != 2 || edgeAllVertsSameDim(e, maxDim))
+      auto e = std::static_pointer_cast<OptimizableGraph::Edge>(*it);
+      if (e->vertices().size() != 2 || edgeAllVertsSameDim(e.get(), maxDim))
         continue;
-      (*saveGnuplot)(e, &params);
+      (*saveGnuplot)(e.get(), &params);
     }
     cerr << "done." << endl;
   }
@@ -151,8 +151,8 @@ bool saveGnuplot(const std::string& gnudump, const HyperGraph::VertexSet& vertic
 
     // writing all edges
     for (HyperGraph::EdgeSet::const_iterator it = edges.begin(); it != edges.end(); ++it) {
-      OptimizableGraph::Edge* e = static_cast<OptimizableGraph::Edge*>(*it);
-      (*saveGnuplot)(e, &params);
+      auto e = std::static_pointer_cast<OptimizableGraph::Edge>(*it);
+      (*saveGnuplot)(e.get(), &params);
     }
     cerr << "done." << endl;
   }
@@ -168,8 +168,8 @@ bool saveGnuplot(const std::string& gnudump, const HyperGraph::VertexSet& vertic
     params.os = &fout;
 
     for (HyperGraph::VertexSet::const_iterator it = vertices.begin(); it != vertices.end(); ++it){
-      OptimizableGraph::Vertex* v = static_cast<OptimizableGraph::Vertex*>(*it);
-      (*saveGnuplot)(v, &params);
+      auto v = std::static_pointer_cast<OptimizableGraph::Vertex>(*it);
+      (*saveGnuplot)(v.get(), &params);
     }
     cerr << "done." << endl;
   }
@@ -193,8 +193,8 @@ bool dumpEdges(std::ostream& os, const OptimizableGraph& optimizer)
   os << "set size ratio -1" << endl;
   os << "plot \"-\" w l" << endl;
   for (HyperGraph::EdgeSet::const_iterator it = optimizer.edges().begin(); it != optimizer.edges().end(); ++it) {
-    OptimizableGraph::Edge* e = static_cast<OptimizableGraph::Edge*>(*it);
-    (*saveGnuplot)(e, &params);
+    auto e = std::static_pointer_cast<OptimizableGraph::Edge>(*it);
+    (*saveGnuplot)(e.get(), &params);
   }
   os << "e" << endl;
 
