@@ -47,8 +47,8 @@ bool EdgeProjectP2MC::write(std::ostream &os) const {
 
 void EdgeProjectP2MC::computeError() {
   // from <Point> to <Cam>
-  const VertexPointXYZ *point = static_cast<const VertexPointXYZ *>(_vertices[0]);
-  const VertexCam *cam = static_cast<const VertexCam *>(_vertices[1]);
+  const VertexPointXYZ *point = vertexXnRaw<0>();
+  const VertexCam *cam = vertexXnRaw<1>();
 
   // calculate the projection
   const Vector3 &pt = point->estimate();
@@ -69,10 +69,10 @@ void EdgeProjectP2MC::computeError() {
 }
 
 void EdgeProjectP2MC::linearizeOplus() {
-  VertexCam *vc = static_cast<VertexCam *>(_vertices[1]);
+  VertexCam *vc = vertexXnRaw<1>();
   const SBACam &cam = vc->estimate();
 
-  VertexPointXYZ *vp = static_cast<VertexPointXYZ *>(_vertices[0]);
+  VertexPointXYZ *vp = vertexXnRaw<0>();
   Vector4 pt, trans;
   pt.head<3>() = vp->estimate();
   pt(3) = 1.0;

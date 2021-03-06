@@ -51,9 +51,9 @@ bool EdgeStereoSE3ProjectXYZ::write(std::ostream &os) const {
 }
 
 void EdgeStereoSE3ProjectXYZ::linearizeOplus() {
-  VertexSE3Expmap *vj = static_cast<VertexSE3Expmap *>(_vertices[1]);
+  VertexSE3Expmap *vj = vertexXnRaw<1>();
   SE3Quat T(vj->estimate());
-  VertexPointXYZ *vi = static_cast<VertexPointXYZ *>(_vertices[0]);
+  VertexPointXYZ *vi = vertexXnRaw<0>();
   Vector3 xyz = vi->estimate();
   Vector3 xyz_trans = T.map(xyz);
 

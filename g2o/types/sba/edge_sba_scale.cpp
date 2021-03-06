@@ -47,8 +47,8 @@ bool EdgeSBAScale::write(std::ostream& os) const {
 
 void EdgeSBAScale::initialEstimate(const OptimizableGraph::VertexSet& from_,
                                    OptimizableGraph::Vertex* /*to_*/) {
-  VertexCam* v1 = dynamic_cast<VertexCam*>(_vertices[0]);
-  VertexCam* v2 = dynamic_cast<VertexCam*>(_vertices[1]);
+  auto v1 = vertexXn<0>();
+  auto v2 = vertexXn<1>();
   // compute the translation vector of v1 w.r.t v2
   if (from_.count(v1) == 1) {
     SE3Quat delta = (v1->estimate().inverse() * v2->estimate());
@@ -66,8 +66,8 @@ void EdgeSBAScale::initialEstimate(const OptimizableGraph::VertexSet& from_,
 }
 
 void EdgeSBAScale::computeError() {
-  const VertexCam* v1 = dynamic_cast<const VertexCam*>(_vertices[0]);
-  const VertexCam* v2 = dynamic_cast<const VertexCam*>(_vertices[1]);
+  const VertexCam* v1 = vertexXnRaw<0>();
+  const VertexCam* v2 = vertexXnRaw<1>();
   Vector3 dt = v2->estimate().translation() - v1->estimate().translation();
   _error[0] = _measurement - dt.norm();
 }

@@ -43,8 +43,8 @@ bool EdgeSE3Expmap::write(std::ostream& os) const {
 }
 
 void EdgeSE3Expmap::computeError() {
-  const VertexSE3Expmap* v1 = static_cast<const VertexSE3Expmap*>(_vertices[0]);
-  const VertexSE3Expmap* v2 = static_cast<const VertexSE3Expmap*>(_vertices[1]);
+  const VertexSE3Expmap* v1 = vertexXnRaw<0>();
+  const VertexSE3Expmap* v2 = vertexXnRaw<1>();
 
   SE3Quat C(_measurement);
   SE3Quat error_ = v2->estimate().inverse() * C * v1->estimate();
@@ -52,10 +52,10 @@ void EdgeSE3Expmap::computeError() {
 }
 
 void EdgeSE3Expmap::linearizeOplus() {
-  VertexSE3Expmap* vi = static_cast<VertexSE3Expmap*>(_vertices[0]);
+  VertexSE3Expmap* vi = vertexXnRaw<0>();
   SE3Quat Ti(vi->estimate());
 
-  VertexSE3Expmap* vj = static_cast<VertexSE3Expmap*>(_vertices[1]);
+  VertexSE3Expmap* vj = vertexXnRaw<1>();
   SE3Quat Tj(vj->estimate());
 
   const SE3Quat& Tij = _measurement;

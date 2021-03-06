@@ -39,7 +39,7 @@ bool EdgeStereoSE3ProjectXYZOnlyPose::write(std::ostream &os) const {
 }
 
 void EdgeStereoSE3ProjectXYZOnlyPose::linearizeOplus() {
-  VertexSE3Expmap *vi = static_cast<VertexSE3Expmap *>(_vertices[0]);
+  VertexSE3Expmap *vi = vertexXnRaw<0>();
   Vector3 xyz_trans = vi->estimate().map(Xw);
 
   number_t x = xyz_trans[0];
@@ -70,13 +70,13 @@ void EdgeStereoSE3ProjectXYZOnlyPose::linearizeOplus() {
 }
 
 void EdgeStereoSE3ProjectXYZOnlyPose::computeError() {
-  const VertexSE3Expmap *v1 = static_cast<const VertexSE3Expmap *>(_vertices[0]);
+  const VertexSE3Expmap *v1 = vertexXnRaw<0>();
   Vector3 obs(_measurement);
   _error = obs - cam_project(v1->estimate().map(Xw));
 }
 
 bool EdgeStereoSE3ProjectXYZOnlyPose::isDepthPositive() {
-  const VertexSE3Expmap *v1 = static_cast<const VertexSE3Expmap *>(_vertices[0]);
+  const VertexSE3Expmap *v1 = vertexXnRaw<0>();
   return (v1->estimate().map(Xw))(2) > 0;
 }
 

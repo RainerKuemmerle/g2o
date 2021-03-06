@@ -46,15 +46,15 @@ class G2O_TYPES_SBA_API EdgeStereoSE3ProjectXYZ : public BaseBinaryEdge<3, Vecto
   bool write(std::ostream &os) const;
 
   void computeError() {
-    const VertexSE3Expmap *v1 = static_cast<const VertexSE3Expmap *>(_vertices[1]);
-    const VertexPointXYZ *v2 = static_cast<const VertexPointXYZ *>(_vertices[0]);
+    const VertexSE3Expmap *v1 = vertexXnRaw<1>();
+    const VertexPointXYZ *v2 = vertexXnRaw<0>();
     Vector3 obs(_measurement);
     _error = obs - cam_project(v1->estimate().map(v2->estimate()), bf);
   }
 
   bool isDepthPositive() {
-    const VertexSE3Expmap *v1 = static_cast<const VertexSE3Expmap *>(_vertices[1]);
-    const VertexPointXYZ *v2 = static_cast<const VertexPointXYZ *>(_vertices[0]);
+    const VertexSE3Expmap *v1 = vertexXnRaw<1>();
+    const VertexPointXYZ *v2 = vertexXnRaw<0>();
     return (v1->estimate().map(v2->estimate()))(2) > 0;
   }
 

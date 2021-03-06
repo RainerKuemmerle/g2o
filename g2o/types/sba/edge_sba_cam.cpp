@@ -44,8 +44,8 @@ bool EdgeSBACam::write(std::ostream& os) const {
 
 void EdgeSBACam::initialEstimate(const OptimizableGraph::VertexSet& from_,
                                  OptimizableGraph::Vertex* /*to_*/) {
-  VertexCam* from = static_cast<VertexCam*>(_vertices[0]);
-  VertexCam* to = static_cast<VertexCam*>(_vertices[1]);
+  auto from = vertexXn<0>();
+  auto to = vertexXn<1>();
   if (from_.count(from) > 0)
     to->setEstimate((SE3Quat)from->estimate() * _measurement);
   else
@@ -53,8 +53,8 @@ void EdgeSBACam::initialEstimate(const OptimizableGraph::VertexSet& from_,
 }
 
 bool EdgeSBACam::setMeasurementFromState() {
-  const VertexCam* v1 = dynamic_cast<const VertexCam*>(_vertices[0]);
-  const VertexCam* v2 = dynamic_cast<const VertexCam*>(_vertices[1]);
+  const VertexCam* v1 = vertexXnRaw<0>();
+  const VertexCam* v2 = vertexXnRaw<1>();
   _measurement = (v1->estimate().inverse() * v2->estimate());
   _inverseMeasurement = _measurement.inverse();
   return true;
@@ -79,8 +79,8 @@ bool EdgeSBACam::getMeasurementData(number_t* d) const {
 }
 
 void EdgeSBACam::computeError() {
-  const VertexCam* v1 = dynamic_cast<const VertexCam*>(_vertices[0]);
-  const VertexCam* v2 = dynamic_cast<const VertexCam*>(_vertices[1]);
+  const VertexCam* v1 = vertexXnRaw<0>();
+  const VertexCam* v2 = vertexXnRaw<1>();
   SE3Quat delta = _inverseMeasurement * (v1->estimate().inverse() * v2->estimate());
   _error[0] = delta.translation().x();
   _error[1] = delta.translation().y();

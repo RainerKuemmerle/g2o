@@ -42,22 +42,22 @@ bool EdgeSE3ProjectXYZ::write(std::ostream &os) const {
 }
 
 void EdgeSE3ProjectXYZ::computeError() {
-  const VertexSE3Expmap *v1 = static_cast<const VertexSE3Expmap *>(_vertices[1]);
-  const VertexPointXYZ *v2 = static_cast<const VertexPointXYZ *>(_vertices[0]);
+  const VertexSE3Expmap *v1 = vertexXnRaw<1>();
+  const VertexPointXYZ *v2 = vertexXnRaw<0>();
   Vector2 obs(_measurement);
   _error = obs - cam_project(v1->estimate().map(v2->estimate()));
 }
 
 bool EdgeSE3ProjectXYZ::isDepthPositive() {
-  const VertexSE3Expmap *v1 = static_cast<const VertexSE3Expmap *>(_vertices[1]);
-  const VertexPointXYZ *v2 = static_cast<const VertexPointXYZ *>(_vertices[0]);
+  const VertexSE3Expmap *v1 = vertexXnRaw<1>();
+  const VertexPointXYZ *v2 = vertexXnRaw<0>();
   return (v1->estimate().map(v2->estimate()))(2) > 0.0;
 }
 
 void EdgeSE3ProjectXYZ::linearizeOplus() {
-  VertexSE3Expmap *vj = static_cast<VertexSE3Expmap *>(_vertices[1]);
+  VertexSE3Expmap *vj = vertexXnRaw<1>();
   SE3Quat T(vj->estimate());
-  VertexPointXYZ *vi = static_cast<VertexPointXYZ *>(_vertices[0]);
+  VertexPointXYZ *vi = vertexXnRaw<0>();
   Vector3 xyz = vi->estimate();
   Vector3 xyz_trans = T.map(xyz);
 

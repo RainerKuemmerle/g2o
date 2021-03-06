@@ -48,9 +48,9 @@ bool EdgeProjectPSI2UV::read(std::istream &is) {
 }
 
 void EdgeProjectPSI2UV::computeError() {
-  const VertexPointXYZ *psi = vertexXn<0>();
-  const VertexSE3Expmap *T_p_from_world = vertexXn<1>();
-  const VertexSE3Expmap *T_anchor_from_world = vertexXn<2>();
+  const VertexPointXYZ *psi = vertexXnRaw<0>();
+  const VertexSE3Expmap *T_p_from_world = vertexXnRaw<1>();
+  const VertexSE3Expmap *T_anchor_from_world = vertexXnRaw<2>();
   const CameraParameters *cam = static_cast<const CameraParameters *>(parameter(0));
 
   Vector2 obs(_measurement);
@@ -60,11 +60,11 @@ void EdgeProjectPSI2UV::computeError() {
 }
 
 void EdgeProjectPSI2UV::linearizeOplus() {
-  VertexPointXYZ *vpoint = vertexXn<0>();
+  VertexPointXYZ *vpoint = vertexXnRaw<0>();
   Vector3 psi_a = vpoint->estimate();
-  VertexSE3Expmap *vpose = vertexXn<1>();
+  VertexSE3Expmap *vpose = vertexXnRaw<1>();
   SE3Quat T_cw = vpose->estimate();
-  VertexSE3Expmap *vanchor = vertexXn<2>();
+  VertexSE3Expmap *vanchor = vertexXnRaw<2>();
   const CameraParameters *cam = static_cast<const CameraParameters *>(parameter(0));
 
   SE3Quat A_aw = vanchor->estimate();

@@ -36,8 +36,8 @@ EdgeProjectXYZ2UVU::EdgeProjectXYZ2UVU()
 }
 
 void EdgeProjectXYZ2UVU::computeError() {
-  const VertexSE3Expmap* v1 = static_cast<const VertexSE3Expmap*>(_vertices[1]);
-  const VertexPointXYZ* v2 = static_cast<const VertexPointXYZ*>(_vertices[0]);
+  const VertexSE3Expmap* v1 = vertexXnRaw<1>();
+  const VertexPointXYZ* v2 = vertexXnRaw<0>();
   const CameraParameters* cam = static_cast<const CameraParameters*>(parameter(0));
   _error = measurement() - cam->stereocam_uvu_map(v1->estimate().map(v2->estimate()));
 }
