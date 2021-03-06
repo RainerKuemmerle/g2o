@@ -37,8 +37,8 @@ namespace g2o{
     return 0;
   }
 
-  void BaseWorldObject::setVertex(OptimizableGraph::Vertex* vertex_){ 
-    _vertex= vertex_; 
+  void BaseWorldObject::setVertex(const std::shared_ptr<OptimizableGraph::Vertex>& vertex_){
+    _vertex= vertex_;
   }
 
   // BaseRobot
@@ -86,7 +86,7 @@ namespace g2o{
     }
     return result.second;
   }
-  
+
   bool World::addWorldObject(BaseWorldObject* object){
     std::pair<std::set<BaseWorldObject*>::iterator, bool> result=_objects.insert(object);
     if (result.second){
@@ -99,7 +99,7 @@ namespace g2o{
     return result.second;
   }
 
-  bool World::addParameter(Parameter* param){
+  bool World::addParameter(const std::shared_ptr<Parameter>& param){
     if ( !graph())
       return false;
     param->setId(_paramId);

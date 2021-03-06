@@ -33,7 +33,8 @@ using namespace Eigen;
 namespace g2o {
 
 SensorSegment2DPointLine::SensorSegment2DPointLine(const std::string& name_)
-    : BinarySensor<Robot2D, EdgeSE2Segment2DPointLine, WorldObjectSegment2D>(name_), _visiblePoint(0) {}
+    : BinarySensor<Robot2D, EdgeSE2Segment2DPointLine, WorldObjectSegment2D>(name_),
+      _visiblePoint(0) {}
 
 void SensorSegment2DPointLine::addNoise(EdgeType* e) {
   EdgeType::ErrorVector n = _sampler.generateSample();
@@ -45,7 +46,7 @@ bool SensorSegment2DPointLine::isVisible(SensorSegment2DPointLine::WorldObjectTy
   if (!_robotPoseObject) return false;
 
   assert(to && to->vertex());
-  VertexType* v = to->vertex();
+  VertexType* v = to->vertex().get();
 
   Vector2d p1, p2;
   SE2 iRobot = _robotPoseObject->vertex()->estimate().inverse();
@@ -112,14 +113,15 @@ void SensorSegment2DPointLine::sense() {
     ++it;
     count++;
   }
-  for (std::set<BaseWorldObject*>::iterator it = world()->objects().begin(); it != world()->objects().end(); ++it) {
+  for (std::set<BaseWorldObject*>::iterator it = world()->objects().begin();
+       it != world()->objects().end(); ++it) {
     WorldObjectType* o = dynamic_cast<WorldObjectType*>(*it);
     if (o && isVisible(o)) {
-      EdgeType* e = mkEdge(o);
+      auto e = mkEdge(o);
       if (e && graph()) {
         e->setPointNum(_visiblePoint);
         e->setMeasurementFromState();
-        addNoise(e);
+        addNoise(e.get());
         graph()->addEdge(e);
       }
     }

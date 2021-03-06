@@ -30,7 +30,8 @@ namespace g2o {
 using namespace std;
 
 // SensorSE3Prior
-SensorSE3Prior::SensorSE3Prior(const std::string& name_) : UnarySensor<Robot3D, EdgeSE3Prior>(name_) {
+SensorSE3Prior::SensorSE3Prior(const std::string& name_)
+    : UnarySensor<Robot3D, EdgeSE3Prior>(name_) {
   _offsetParam = 0;
   _information.setIdentity();
   _information *= 1000;
@@ -39,7 +40,7 @@ SensorSE3Prior::SensorSE3Prior(const std::string& name_) : UnarySensor<Robot3D, 
 }
 
 void SensorSE3Prior::addParameters() {
-  if (!_offsetParam) _offsetParam = new ParameterSE3Offset();
+  if (!_offsetParam) _offsetParam = std::make_shared<ParameterSE3Offset>();
   assert(world());
   world()->addParameter(_offsetParam);
 }
@@ -66,12 +67,12 @@ void SensorSE3Prior::sense() {
   }
   if (!_robotPoseObject) return;
   _sensorPose = _robotPoseObject->vertex()->estimate() * _offsetParam->offset();
-  EdgeType* e = mkEdge();
+  auto e = mkEdge();
   if (e && graph()) {
     e->setParameterId(0, _offsetParam->id());
     graph()->addEdge(e);
     e->setMeasurementFromState();
-    addNoise(e);
+    addNoise(e.get());
   }
 }
 

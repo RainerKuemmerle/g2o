@@ -58,15 +58,13 @@ using namespace Eigen;
 
 struct LineInfo {
   explicit LineInfo(VertexSegment2D* s) {
-    line=new VertexLine2D();
+    line=std::make_shared<VertexLine2D>();
     line->setId(s->id());
     line->setEstimate(computeLineParameters(s->estimateP1(), s->estimateP2()));
-    p1=0;
-    p2=0;
   }
-  VertexLine2D* line;
-  VertexPointXY* p1;
-  VertexPointXY* p2;
+  std::shared_ptr<VertexLine2D> line;
+  std::shared_ptr<VertexPointXY> p1;
+  std::shared_ptr<VertexPointXY> p2;
 };
 
 typedef std::map<int, LineInfo> LineInfoMap;
@@ -118,9 +116,9 @@ int main(int argc, char** argv)
   for (OptimizableGraph::VertexIDMap::iterator it=inGraph.vertices().begin(); it!=inGraph.vertices().end(); ++it){
     currentId = currentId > it->first ?  currentId : it->first;
 
-    VertexSE2 *pose=dynamic_cast<VertexSE2*> (it->second);
+    VertexSE2 *pose=dynamic_cast<VertexSE2*> (it->second.get());
     if (pose){
-      VertexSE2 *npose=new VertexSE2();
+      auto npose=std::make_shared<VertexSE2>();
       npose->setEstimate(pose->estimate());
       npose->setId(pose->id());
       outGraph.addVertex(npose);
@@ -130,7 +128,7 @@ int main(int argc, char** argv)
       }
     }
 
-    VertexSegment2D* s=dynamic_cast<VertexSegment2D*> (it->second);
+    VertexSegment2D* s=dynamic_cast<VertexSegment2D*> (it->second.get());
     if (s){
       LineInfo linfo(s);
       outGraph.addVertex(linfo.line);
@@ -142,9 +140,9 @@ int main(int argc, char** argv)
 
   cerr << "filling in edges and odoms" << endl;
   for (OptimizableGraph::EdgeSet::iterator it=inGraph.edges().begin(); it!=inGraph.edges().end(); ++it){
-    EdgeSE2* ods=dynamic_cast<EdgeSE2*> (*it);
+    EdgeSE2* ods=dynamic_cast<EdgeSE2*> (it->get());
     if (ods){
-      EdgeSE2* ods2=new EdgeSE2();
+      auto ods2 = std::make_shared<EdgeSE2>();
       ods2->setMeasurement(ods->measurement());
       ods2->setInformation(ods->information());
       ods2->vertices()[0]=outGraph.vertex(ods->vertices()[0]->id());
@@ -152,24 +150,24 @@ int main(int argc, char** argv)
       outGraph.addEdge(ods2);
     }
 
-    EdgeSE2Segment2D* es=dynamic_cast<EdgeSE2Segment2D*> (*it);
-    EdgeSE2Segment2DLine* el=dynamic_cast<EdgeSE2Segment2DLine*> (*it);
-    EdgeSE2Segment2DPointLine* espl=dynamic_cast<EdgeSE2Segment2DPointLine*> (*it);
+    EdgeSE2Segment2D* es=dynamic_cast<EdgeSE2Segment2D*> (it->get());
+    EdgeSE2Segment2DLine* el=dynamic_cast<EdgeSE2Segment2DLine*> (it->get());
+    EdgeSE2Segment2DPointLine* espl=dynamic_cast<EdgeSE2Segment2DPointLine*> (it->get());
 
     if (es || el || espl){
-      VertexSE2* pose = dynamic_cast<VertexSE2*>((*it)->vertices()[0]);
-      VertexSegment2D* segment = dynamic_cast<VertexSegment2D*>((*it)->vertices()[1]);
+      auto pose = std::dynamic_pointer_cast<VertexSE2>((*it)->vertices()[0]);
+      auto segment = std::dynamic_pointer_cast<VertexSegment2D>((*it)->vertices()[1]);
       if (!pose)
         continue;
-      pose=dynamic_cast<VertexSE2*>(outGraph.vertex(pose->id()));
+      pose = std::dynamic_pointer_cast<VertexSE2>(outGraph.vertex(pose->id()));
       LineInfoMap::iterator lit=lmap.find(segment->id());
       assert (lit!=lmap.end());
       LineInfo& linfo = lit->second;
-      VertexLine2D* line =linfo.line;
-      VertexPointXY* & p1=linfo.p1;
-      VertexPointXY* & p2=linfo.p2;
+      auto line = linfo.line;
+      auto& p1 = linfo.p1;
+      auto& p2 = linfo.p2;
 
-      EdgeSE2Line2D* el2=new EdgeSE2Line2D();
+      auto el2 = std::make_shared<EdgeSE2Line2D>();
       el2->vertices()[0]=pose;
       el2->vertices()[1]=line;
       if (el) {
@@ -185,13 +183,13 @@ int main(int argc, char** argv)
         outGraph.addEdge(el2);
         Matrix4d si=es->information();
         if (!p1){
-          p1=new VertexPointXY();
+          p1 = std::make_shared<VertexPointXY>();
           p1->setEstimate(segment->estimateP1());
           p1->setId(currentId++);
           outGraph.addVertex(p1);
           line->p1Id=p1->id();
 
-          EdgeLine2DPointXY* p1e=new EdgeLine2DPointXY();
+          auto p1e = std::make_shared<EdgeLine2DPointXY>();
           p1e->vertices()[0]=line;
           p1e->vertices()[1]=p1;
           p1e->setMeasurement(0);
@@ -201,13 +199,13 @@ int main(int argc, char** argv)
           outGraph.addEdge(p1e);
         }
         if (!p2){
-          p2=new VertexPointXY();
+          p2 = std::make_shared<VertexPointXY>();
           p2->setEstimate(segment->estimateP2());
           p2->setId(currentId++);
           outGraph.addVertex(p2);
           line->p2Id=p2->id();
 
-          EdgeLine2DPointXY* p2e=new EdgeLine2DPointXY();
+          auto p2e = std::make_shared<EdgeLine2DPointXY>();
           p2e->vertices()[0]=line;
           p2e->vertices()[1]=p2;
           p2e->setMeasurement(0);
@@ -217,7 +215,7 @@ int main(int argc, char** argv)
           outGraph.addEdge(p2e);
         }
 
-        EdgeSE2PointXY* p1e = new EdgeSE2PointXY();
+        auto p1e = std::make_shared<EdgeSE2PointXY>();
         p1e->vertices()[0]=pose;
         p1e->vertices()[1]=p1;
         p1e->setMeasurement(es->measurementP1());
@@ -225,7 +223,7 @@ int main(int argc, char** argv)
         p1e->setInformation(p1i);
         outGraph.addEdge(p1e);
 
-        EdgeSE2PointXY* p2e = new EdgeSE2PointXY();
+        auto p2e = std::make_shared<EdgeSE2PointXY>();
         p2e->vertices()[0]=pose;
         p2e->vertices()[1]=p2;
         p2e->setMeasurement(es->measurementP2());
@@ -247,10 +245,10 @@ int main(int argc, char** argv)
         el2->setInformation(li);
         outGraph.addEdge(el2);
 
-        VertexPointXY*& pX = (espl->pointNum()==0 )? p1:p2;
+        auto& pX = (espl->pointNum()==0 )? p1:p2;
         if (!pX){
           cerr << "mkp: " << line->id() << endl;
-          pX=new VertexPointXY();
+          pX=std::make_shared<VertexPointXY>();
           pX->setId(currentId++);
           outGraph.addVertex(pX);
 
@@ -264,7 +262,7 @@ int main(int argc, char** argv)
           }
           pX->setEstimate(estPx);
 
-          EdgeLine2DPointXY* pXe=new EdgeLine2DPointXY();
+          auto pXe=std::make_shared<EdgeLine2DPointXY>();
           pXe->vertices()[0]=line;
           pXe->vertices()[1]=pX;
           pXe->setMeasurement(0);
@@ -274,7 +272,7 @@ int main(int argc, char** argv)
           outGraph.addEdge(pXe);
         }
 
-        EdgeSE2PointXY* pXe = new EdgeSE2PointXY();
+        auto pXe = std::make_shared<EdgeSE2PointXY>();
         pXe->vertices()[0]=pose;
         pXe->vertices()[1]=pX;
         pXe->setMeasurement(espl->point());

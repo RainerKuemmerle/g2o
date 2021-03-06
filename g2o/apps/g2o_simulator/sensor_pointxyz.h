@@ -39,12 +39,12 @@ namespace g2o {
     SensorPointXYZ(const std::string& name_);
     virtual void sense();
     virtual void addParameters();
-    ParameterSE3Offset* offsetParam() {return _offsetParam;};
+    std::shared_ptr<ParameterSE3Offset> offsetParam() {return _offsetParam;};
     void addNoise(EdgeType* e);
   protected:
     bool isVisible(WorldObjectType* to);
     RobotPoseType _sensorPose;
-    ParameterSE3Offset* _offsetParam;
+    std::shared_ptr<ParameterSE3Offset> _offsetParam;
   };
 
 }

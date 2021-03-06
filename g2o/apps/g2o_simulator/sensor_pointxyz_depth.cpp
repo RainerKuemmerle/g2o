@@ -42,8 +42,7 @@ SensorPointXYZDepth::SensorPointXYZDepth(const std::string& name_)
 bool SensorPointXYZDepth::isVisible(SensorPointXYZDepth::WorldObjectType* to) {
   if (!_robotPoseObject) return false;
   assert(to && to->vertex());
-  VertexType* v = to->vertex();
-  VertexType::EstimateType pose = v->estimate();
+  VertexType::EstimateType pose = to->vertex()->estimate();
   VertexType::EstimateType delta = _sensorPose.inverse() * pose;
   Vector3d translation = delta;
   double range2 = translation.squaredNorm();
@@ -57,7 +56,7 @@ bool SensorPointXYZDepth::isVisible(SensorPointXYZDepth::WorldObjectType* to) {
 }
 
 void SensorPointXYZDepth::addParameters() {
-  if (!_offsetParam) _offsetParam = new ParameterCamera();
+  if (!_offsetParam) _offsetParam = std::make_shared<ParameterCamera>();
   assert(world());
   world()->addParameter(_offsetParam);
 }
@@ -81,15 +80,16 @@ void SensorPointXYZDepth::sense() {
   }
   if (!_robotPoseObject) return;
   _sensorPose = _robotPoseObject->vertex()->estimate() * _offsetParam->offset();
-  for (std::set<BaseWorldObject*>::iterator it = world()->objects().begin(); it != world()->objects().end(); ++it) {
+  for (std::set<BaseWorldObject*>::iterator it = world()->objects().begin();
+       it != world()->objects().end(); ++it) {
     WorldObjectType* o = dynamic_cast<WorldObjectType*>(*it);
     if (o && isVisible(o)) {
-      EdgeType* e = mkEdge(o);
+      auto e = mkEdge(o);
       if (e && graph()) {
         e->setParameterId(0, _offsetParam->id());
         graph()->addEdge(e);
         e->setMeasurementFromState();
-        addNoise(e);
+        addNoise(e.get());
       }
     }
   }

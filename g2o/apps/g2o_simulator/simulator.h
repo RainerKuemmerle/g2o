@@ -47,11 +47,11 @@ class G2O_SIMULATOR_API BaseWorldObject{
     void setWorld(World* world_) {_world = world_;}
     World* world() {return _world;}
     OptimizableGraph* graph();
-    OptimizableGraph::Vertex* vertex() {return _vertex;}
-    virtual void setVertex(OptimizableGraph::Vertex* vertex_);
+    std::shared_ptr<OptimizableGraph::Vertex> vertex() {return _vertex;}
+    virtual void setVertex(const std::shared_ptr<OptimizableGraph::Vertex>& vertex_);
   protected:
     OptimizableGraph* _graph;
-    OptimizableGraph::Vertex* _vertex;
+    std::shared_ptr<OptimizableGraph::Vertex> _vertex;
     World* _world;
 };
 
@@ -62,17 +62,17 @@ class WorldObject: public BaseWorldObject, VertexType_{
     typedef VertexType_ VertexType;
     typedef typename VertexType_::EstimateType EstimateType;
     WorldObject(World* world_=0): BaseWorldObject(world_){
-      _vertex = new VertexType();
+      _vertex = std::make_shared<VertexType>();
     }
-    virtual void setVertex(OptimizableGraph::Vertex* vertex_){
-      if(! dynamic_cast<VertexType*>(vertex_))
+    virtual void setVertex(const std::shared_ptr<OptimizableGraph::Vertex>& vertex_) {
+      if(! dynamic_cast<VertexType*>(vertex_.get()))
         return;
       _vertex = vertex_;
     }
 
-    VertexType* vertex() {
+    std::shared_ptr<VertexType> vertex() {
       if (! _vertex) return 0;
-      return dynamic_cast<VertexType*>(_vertex);
+      return std::dynamic_pointer_cast<VertexType>(_vertex);
     }
 };
 
@@ -99,7 +99,7 @@ class G2O_SIMULATOR_API World
     OptimizableGraph* graph() {return _graph;}
     bool addRobot(BaseRobot* robot);
     bool addWorldObject(BaseWorldObject* worldObject);
-    bool addParameter(Parameter* p);
+    bool addParameter(const std::shared_ptr<Parameter>& p);
 
     std::set<BaseWorldObject*>& objects() {return _objects;}
     std::set<BaseRobot*>&  robots() {return _robots; }
@@ -197,10 +197,10 @@ class UnarySensor: public BaseSensor {
       if (! world() || ! graph())
         return;
 
-      EdgeType* e=mkEdge();
+      auto e=mkEdge();
       if (e) {
         e->setMeasurementFromState();
-        addNoise(e);
+        addNoise(e.get());
         graph()->addEdge(e);
       }
     }
@@ -210,10 +210,9 @@ class UnarySensor: public BaseSensor {
     PoseObject* _robotPoseObject;
     InformationType _information;
 
-    EdgeType* mkEdge(){
-      PoseVertexType* robotVertex = (PoseVertexType*)_robotPoseObject->vertex();
-      EdgeType* e = new EdgeType();
-      e->vertices()[0]=robotVertex;
+    std::shared_ptr<EdgeType> mkEdge() {
+      auto e = std::make_shared<EdgeType>();
+      e->vertices()[0]=_robotPoseObject->vertex();
       e->information().setIdentity();
       return e;
     }
@@ -265,10 +264,10 @@ class BinarySensor: public BaseSensor {
       for(std::set<BaseWorldObject*>::iterator it=world()->objects().begin(); it!=world()->objects().end(); ++it){
         WorldObjectType * wo = dynamic_cast<WorldObjectType*>(*it);
         if (wo){
-          EdgeType* e=mkEdge(wo);
+          auto e = mkEdge(wo);
           if (e) {
             e->setMeasurementFromState();
-            addNoise(e);
+            addNoise(e.get());
             graph()->addEdge(e);
           }
         }
@@ -280,11 +279,10 @@ class BinarySensor: public BaseSensor {
     PoseObject* _robotPoseObject;
     InformationType _information;
 
-    EdgeType* mkEdge(WorldObjectType* object){
-      PoseVertexType* robotVertex = (PoseVertexType*)_robotPoseObject->vertex();
-      EdgeType* e = new EdgeType();
-      e->vertices()[0]=robotVertex;
-      e->vertices()[1]=object->vertex();
+    std::shared_ptr<EdgeType> mkEdge(WorldObjectType* object) {
+      std::shared_ptr<EdgeType> e = std::make_shared<EdgeType>();
+      e->vertices()[0] = _robotPoseObject->vertex();
+      e->vertices()[1] = object->vertex();
       e->information().setIdentity();
       return e;
     }

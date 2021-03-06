@@ -25,40 +25,39 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <cstdlib>
+#include <fstream>
+#include <iostream>
+#include <sstream>
+
 #include "g2o/core/optimizable_graph.h"
 #include "g2o/stuff/command_args.h"
 #include "g2o/types/slam2d/types_slam2d.h"
 #include "g2o/types/slam3d/types_slam3d.h"
-#include <iostream>
-#include <fstream>
-#include <sstream>
 
 using namespace g2o;
 using namespace std;
 
 template <typename T>
-bool anonymizeLandmarkEdge(HyperGraph::Edge* e_, OptimizableGraph& g){
-  T* e= dynamic_cast<T*> (e_);
-  if (!e)
-    return false;
-  g.setEdgeVertex(e,1,0);
+bool anonymizeLandmarkEdge(const std::shared_ptr<HyperGraph::Edge>& e_, OptimizableGraph& g) {
+  auto e = std::dynamic_pointer_cast<T>(e_);
+  if (!e) return false;
+  g.setEdgeVertex(e, 1, nullptr);
   return true;
 }
 
 template <typename T>
-bool anonymizePoseEdge(HyperGraph::Edge* e_, OptimizableGraph& g){
-  T* e= dynamic_cast<T*> (e_);
-  if (!e)
-    return false;
-  HyperGraph::Vertex* from = e->vertex(0);
-  HyperGraph::Vertex* to   = e->vertex(1);
-  if (from && to && from!=to){
+bool anonymizePoseEdge(const std::shared_ptr<HyperGraph::Edge>& e_, OptimizableGraph& g) {
+  auto e = std::dynamic_pointer_cast<T>(e_);
+  if (!e) return false;
+  auto from = e->vertex(0);
+  auto to = e->vertex(1);
+  if (from && to && from != to) {
     int deltaId = abs(from->id() - to->id());
-    if (deltaId>1) {
-      if (from->id()>to->id()){
-	g.setEdgeVertex(e,0,0);
+    if (deltaId > 1) {
+      if (from->id() > to->id()) {
+        g.setEdgeVertex(e, 0, nullptr);
       } else {
-	g.setEdgeVertex(e,1,0);
+        g.setEdgeVertex(e, 1, nullptr);
       }
       return true;
     }
@@ -66,12 +65,11 @@ bool anonymizePoseEdge(HyperGraph::Edge* e_, OptimizableGraph& g){
   return false;
 }
 
-
 int main(int argc, char** argv) {
   CommandArgs arg;
   std::string outputFilename;
   std::string inputFilename;
-  arg.param("o", outputFilename, "anon.g2o", "output file" );
+  arg.param("o", outputFilename, "anon.g2o", "output file");
   arg.paramLeftOver("graph-output", inputFilename, "", "graph file which will be read", true);
   arg.parseArgs(argc, argv);
   OptimizableGraph graph;
@@ -98,8 +96,8 @@ int main(int argc, char** argv) {
     }
   }
 
-  for (HyperGraph::EdgeSet::iterator it = graph.edges().begin(); it!=graph.edges().end(); ++it){
-    HyperGraph::Edge* e = *it;
+  for (HyperGraph::EdgeSet::iterator it = graph.edges().begin(); it != graph.edges().end(); ++it) {
+    const auto& e = *it;
     if (anonymizeLandmarkEdge<EdgeSE2PointXY>(e, graph)) continue;
     if (anonymizeLandmarkEdge<EdgeSE2PointXYOffset>(e, graph)) continue;
     if (anonymizeLandmarkEdge<EdgeSE2PointXYBearing>(e, graph)) continue;
@@ -107,6 +105,6 @@ int main(int argc, char** argv) {
     if (anonymizePoseEdge<EdgeSE2Offset>(e, graph)) continue;
   }
 
-  ofstream os (outputFilename.c_str());
+  ofstream os(outputFilename.c_str());
   graph.save(os);
 }

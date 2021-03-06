@@ -32,8 +32,8 @@
 #include "g2o_simulator_api.h"
 
 namespace g2o {
-  
-  class G2O_SIMULATOR_API SensorPointXYOffset: public PointSensorParameters, public BinarySensor<Robot2D, EdgeSE2PointXYOffset, WorldObjectPointXY>{ 
+
+  class G2O_SIMULATOR_API SensorPointXYOffset: public PointSensorParameters, public BinarySensor<Robot2D, EdgeSE2PointXYOffset, WorldObjectPointXY>{
   public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
     typedef PoseVertexType::EstimateType RobotPoseType;
@@ -43,9 +43,9 @@ namespace g2o {
     virtual void addParameters();
   protected:
     bool isVisible(WorldObjectType* to);
-    ParameterSE2Offset* _offsetParam;
+    std::shared_ptr<ParameterSE2Offset> _offsetParam;
     RobotPoseType _sensorPose;
-  }; 
+  };
 
 }
 

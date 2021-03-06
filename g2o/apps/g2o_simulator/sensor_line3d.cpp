@@ -41,10 +41,9 @@ SensorLine3D::SensorLine3D(const std::string& name_) : BinarySensor<Robot3D, Edg
 bool SensorLine3D::isVisible(SensorLine3D::WorldObjectType* to) {
   if (!_robotPoseObject) return false;
   assert(to && to->vertex());
-  VertexType* v = to->vertex();
-  VertexType::EstimateType pose = v->estimate();
+  VertexType::EstimateType pose = to->vertex()->estimate();
   VertexType::EstimateType delta = _sensorPose.inverse() * pose;
-  Vector3d translation = delta;
+  Vector3 translation = delta.translation();
   double range2 = translation.squaredNorm();
   if (range2 > _maxRange2) return false;
   if (range2 < _minRange2) return false;
@@ -56,7 +55,7 @@ bool SensorLine3D::isVisible(SensorLine3D::WorldObjectType* to) {
 }
 
 void SensorLine3D::addParameters() {
-  if (!_offsetParam) _offsetParam = new ParameterSE3Offset();
+  if (!_offsetParam) _offsetParam = std::make_shared<ParameterSE3Offset>();
   assert(world());
   world()->addParameter(_offsetParam);
 }
@@ -85,12 +84,12 @@ void SensorLine3D::sense() {
   for (std::set<BaseWorldObject*>::iterator it = world()->objects().begin(); it != world()->objects().end(); ++it) {
     WorldObjectType* o = dynamic_cast<WorldObjectType*>(*it);
     if (o && isVisible(o)) {
-      EdgeType* e = mkEdge(o);
+      auto e = mkEdge(o);
       if (e && graph()) {
         e->setParameterId(0, _offsetParam->id());
         graph()->addEdge(e);
         e->setMeasurementFromState();
-        addNoise(e);
+        addNoise(e.get());
       }
     }
   }
