@@ -64,20 +64,21 @@ class IoSixDofExpmapParam : public ::testing::Test {
   void SetUp() override {
     graph.reset(new g2o::OptimizableGraph);
 
-    CameraParameters* paramCam = new CameraParameters();
+    auto paramCam = std::make_shared<CameraParameters>();
     paramCam->setId(42);
     graph->addParameter(paramCam);
 
     // setting up some vertices
-    point = new VertexPointXYZ;
+    point = std::make_shared<VertexPointXYZ>();
     point->setId(0);
     graph->addVertex(point);
-    pose = new VertexSE3Expmap;
+    pose = std::make_shared<VertexSE3Expmap>();
     pose->setId(1);
     graph->addVertex(pose);
   }
 
-  void prepareEdge(OptimizableGraph::Edge* e) {
+  template<typename EdgeType>
+  void prepareEdge(typename std::shared_ptr<EdgeType>& e) {
     e->setParameterId(0, 42);
     e->setVertex(0, point);
     e->setVertex(1, pose);
@@ -85,28 +86,28 @@ class IoSixDofExpmapParam : public ::testing::Test {
   }
 
   std::shared_ptr<g2o::OptimizableGraph> graph;
-  VertexPointXYZ* point = nullptr;
-  VertexSE3Expmap* pose = nullptr;
+  std::shared_ptr<VertexPointXYZ> point;
+  std::shared_ptr<VertexSE3Expmap> pose;
 };
 
 TEST_F(IoSixDofExpmapParam, ReadWriteEdgeProjectXYZ2UV) {
-  EdgeProjectXYZ2UV* outputEdge = new EdgeProjectXYZ2UV;
+  auto outputEdge = std::make_shared<EdgeProjectXYZ2UV>();
   prepareEdge(outputEdge);
-  readWriteVectorBasedEdge<EdgeProjectXYZ2UV>(outputEdge);
+  readWriteVectorBasedEdge<EdgeProjectXYZ2UV>(outputEdge.get());
 }
 
 TEST_F(IoSixDofExpmapParam, ReadWriteEdgeProjectPSI2UV) {
-  VertexSE3Expmap* p2 = new VertexSE3Expmap;
+  auto p2 = std::make_shared<VertexSE3Expmap>();
   p2->setId(2);
   graph->addVertex(p2);
-  EdgeProjectPSI2UV* outputEdge = new EdgeProjectPSI2UV;
+  auto outputEdge = std::make_shared<EdgeProjectPSI2UV>();
   outputEdge->setVertex(2, p2);
   prepareEdge(outputEdge);
-  readWriteVectorBasedEdge<EdgeProjectPSI2UV>(outputEdge);
+  readWriteVectorBasedEdge<EdgeProjectPSI2UV>(outputEdge.get());
 }
 
 TEST_F(IoSixDofExpmapParam, ReadWriteEdgeProjectXYZ2UVU) {
-  EdgeProjectXYZ2UVU* outputEdge = new EdgeProjectXYZ2UVU;
+  auto outputEdge = std::make_shared<EdgeProjectXYZ2UVU>();
   prepareEdge(outputEdge);
-  readWriteVectorBasedEdge<EdgeProjectXYZ2UVU>(outputEdge);
+  readWriteVectorBasedEdge<EdgeProjectXYZ2UVU>(outputEdge.get());
 }

@@ -49,15 +49,15 @@ static Sim3 randomSim3() {
 
 TEST(Sim3, EdgeSim3Jacobian)
 {
-  VertexSim3Expmap v1;
-  v1.setId(0);
+  auto v1 = std::make_shared<VertexSim3Expmap>();
+  v1->setId(0);
 
-  VertexSim3Expmap v2;
-  v2.setId(1);
+  auto v2 = std::make_shared<VertexSim3Expmap>();
+  v2->setId(1);
 
   EdgeSim3 e;
-  e.setVertex(0, &v1);
-  e.setVertex(1, &v2);
+  e.setVertex(0, v1);
+  e.setVertex(1, v2);
   e.setInformation(EdgeSim3::InformationType::Identity());
 
   JacobianWorkspace jacobianWorkspace;
@@ -66,8 +66,8 @@ TEST(Sim3, EdgeSim3Jacobian)
   numericJacobianWorkspace.allocate();
 
   for (int k = 0; k < 1; ++k) {
-    v1.setEstimate(randomSim3());
-    v2.setEstimate(randomSim3());
+    v1->setEstimate(randomSim3());
+    v2->setEstimate(randomSim3());
     e.setMeasurement(randomSim3());
 
     evaluateJacobian(e, jacobianWorkspace, numericJacobianWorkspace);
