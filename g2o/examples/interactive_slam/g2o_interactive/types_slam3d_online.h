@@ -33,7 +33,7 @@
 #include <iostream>
 
 namespace g2o {
-  
+
   class G2O_INTERACTIVE_API OnlineVertexSE3 : public VertexSE3
   {
     public:
@@ -64,8 +64,8 @@ namespace g2o {
 
       void initialEstimate(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* /* to */)
       {
-        OnlineVertexSE3* fromEdge = static_cast<OnlineVertexSE3*>(_vertices[0]);
-        OnlineVertexSE3* toEdge   = static_cast<OnlineVertexSE3*>(_vertices[1]);
+        auto fromEdge = std::static_pointer_cast<OnlineVertexSE3>(vertexXn<0>());
+        auto toEdge   = std::static_pointer_cast<OnlineVertexSE3>(vertexXn<1>());
         if (from.count(fromEdge) > 0) {
           toEdge->updatedEstimate = fromEdge->updatedEstimate * _measurement;
           toEdge->setEstimate(toEdge->updatedEstimate);
@@ -77,8 +77,8 @@ namespace g2o {
 
       double chi2() const
       {
-        OnlineVertexSE3 *from = static_cast<OnlineVertexSE3*>(_vertices[0]);
-        OnlineVertexSE3 *to   = static_cast<OnlineVertexSE3*>(_vertices[1]);
+        OnlineVertexSE3* from = static_cast<OnlineVertexSE3*>(vertexXnRaw<0>());
+        OnlineVertexSE3* to = static_cast<OnlineVertexSE3*>(vertexXnRaw<1>());
         Eigen::Isometry3d delta = _inverseMeasurement * from->estimate().inverse() * to->estimate();
         Vector6 error = internal::toVectorMQT(delta);
         return error.dot(information() * error);

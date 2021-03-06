@@ -79,7 +79,7 @@ namespace g2o {
       HyperGraph::VertexSet _verticesAdded;
       HyperGraph::EdgeSet _edgesAdded;
 
-      OptimizableGraph::Vertex* addVertex(int dimension, int id);
+      std::shared_ptr<OptimizableGraph::Vertex> addVertex(int dimension, int id);
       bool printVertex(OptimizableGraph::Vertex* v);
   };
 

@@ -126,12 +126,12 @@ int SparseOptimizerOnline::optimize(int iterations, bool online)
     //cerr << "UPDATE" << endl;
     // compute the active errors for the required edges
     for (HyperGraph::EdgeSet::iterator it = newEdges->begin(); it != newEdges->end(); ++it) {
-      OptimizableGraph::Edge * e = static_cast<OptimizableGraph::Edge*>(*it);
+      OptimizableGraph::Edge * e = static_cast<OptimizableGraph::Edge*>(it->get());
       e->computeError();
     }
     // linearize the constraints and update the Hessian
     for (HyperGraph::EdgeSet::iterator it = newEdges->begin(); it != newEdges->end(); ++it) {
-      OptimizableGraph::Edge* e = static_cast<OptimizableGraph::Edge*>(*it);
+      OptimizableGraph::Edge* e = static_cast<OptimizableGraph::Edge*>(it->get());
       e->linearizeOplus(jacobianWorkspace());
       e->constructQuadraticForm();
     }
@@ -185,7 +185,7 @@ bool SparseOptimizerOnline::updateInitialization(HyperGraph::VertexSet& vset, Hy
   newEdges = &eset;
   bool result = SparseOptimizer::updateInitialization(vset, eset);
   for (HyperGraph::VertexSet::iterator it = vset.begin(); it != vset.end(); ++it) {
-    OptimizableGraph::Vertex* v = static_cast<OptimizableGraph::Vertex*>(*it);
+    OptimizableGraph::Vertex* v = static_cast<OptimizableGraph::Vertex*>(it->get());
     v->clearQuadraticForm(); // be sure that b is zero for this vertex
   }
   return result;
@@ -245,9 +245,9 @@ void SparseOptimizerOnline::gnuplotVisualization()
     }
     fprintf(_gnuplot, "plot \"-\" w l\n");
     for (EdgeSet::iterator it = edges().begin(); it != edges().end(); ++it) {
-      OnlineEdgeSE2* e = static_cast<OnlineEdgeSE2*>(*it);
-      OnlineVertexSE2* v1 = static_cast<OnlineVertexSE2*>(e->vertices()[0]);
-      OnlineVertexSE2* v2 = static_cast<OnlineVertexSE2*>(e->vertices()[1]);
+      OnlineEdgeSE2* e = static_cast<OnlineEdgeSE2*>(it->get());
+      OnlineVertexSE2* v1 = static_cast<OnlineVertexSE2*>(e->vertices()[0].get());
+      OnlineVertexSE2* v2 = static_cast<OnlineVertexSE2*>(e->vertices()[1].get());
       fprintf(_gnuplot, "%f %f\n", v1->updatedEstimate.translation().x(), v1->updatedEstimate.translation().y());
       fprintf(_gnuplot, "%f %f\n\n", v2->updatedEstimate.translation().x(), v2->updatedEstimate.translation().y());
     }
@@ -266,9 +266,9 @@ void SparseOptimizerOnline::gnuplotVisualization()
     }
     fprintf(_gnuplot, "splot \"-\" w l\n");
     for (EdgeSet::iterator it = edges().begin(); it != edges().end(); ++it) {
-      OnlineEdgeSE3* e = (OnlineEdgeSE3*) *it;
-      OnlineVertexSE3* v1 = static_cast<OnlineVertexSE3*>(e->vertices()[0]);
-      OnlineVertexSE3* v2 = static_cast<OnlineVertexSE3*>(e->vertices()[1]);
+      OnlineEdgeSE3* e = static_cast<OnlineEdgeSE3*>(it->get());
+      OnlineVertexSE3* v1 = static_cast<OnlineVertexSE3*>(e->vertices()[0].get());
+      OnlineVertexSE3* v2 = static_cast<OnlineVertexSE3*>(e->vertices()[1].get());
       fprintf(_gnuplot, "%f %f %f\n", v1->updatedEstimate.translation().x(), v1->updatedEstimate.translation().y(), v1->updatedEstimate.translation().z());
       fprintf(_gnuplot, "%f %f %f \n\n\n", v2->updatedEstimate.translation().x(), v2->updatedEstimate.translation().y(), v2->updatedEstimate.translation().z());
     }

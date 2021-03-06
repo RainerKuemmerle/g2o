@@ -131,11 +131,11 @@ namespace g2o {
       memset(_cmember.data(), 0, numBlocksRequired * sizeof(int));
       if (_ivMap.size() > 100) {
         for (size_t i = _ivMap.size() - 20; i < _ivMap.size(); ++i) {
-          const HyperGraph::EdgeSet& eset = _ivMap[i]->edges();
-          for (HyperGraph::EdgeSet::const_iterator it = eset.begin(); it != eset.end(); ++it) {
-            OptimizableGraph::Edge* e = static_cast<OptimizableGraph::Edge*>(*it);
-            OptimizableGraph::Vertex* v1 = static_cast<OptimizableGraph::Vertex*>(e->vertices()[0]);
-            OptimizableGraph::Vertex* v2 = static_cast<OptimizableGraph::Vertex*>(e->vertices()[1]);
+          const HyperGraph::EdgeSetWeak& eset = _ivMap[i]->edges();
+          for (HyperGraph::EdgeSetWeak::const_iterator it = eset.begin(); it != eset.end(); ++it) {
+            auto e = std::static_pointer_cast<OptimizableGraph::Edge>(it->lock());
+            OptimizableGraph::Vertex* v1 = static_cast<OptimizableGraph::Vertex*>(e->vertices()[0].get());
+            OptimizableGraph::Vertex* v2 = static_cast<OptimizableGraph::Vertex*>(e->vertices()[1].get());
             if (v1->hessianIndex() >= 0)
               _cmember(v1->hessianIndex()) = 1;
             if (v2->hessianIndex() >= 0)
@@ -160,7 +160,7 @@ namespace g2o {
     else {
       // update the b vector
       for (HyperGraph::VertexSet::iterator it = _touchedVertices.begin(); it != _touchedVertices.end(); ++it) {
-        OptimizableGraph::Vertex* v = static_cast<OptimizableGraph::Vertex*>(*it);
+        OptimizableGraph::Vertex* v = static_cast<OptimizableGraph::Vertex*>(it->get());
         int iBase = v->colInHessian();
         v->copyB(_underlyingSolver->b() + iBase);
       }
@@ -193,16 +193,16 @@ namespace g2o {
     }
 
     for (HyperGraph::VertexSet::iterator it = vset.begin(); it != vset.end(); ++it) {
-      OptimizableGraph::Vertex* v = static_cast<OptimizableGraph::Vertex*>(*it);
+      OptimizableGraph::Vertex* v = static_cast<OptimizableGraph::Vertex*>(it->get());
       v->clearQuadraticForm(); // be sure that b is zero for this vertex
     }
 
     // get the touched vertices
     _touchedVertices.clear();
     for (HyperGraph::EdgeSet::iterator it = eset.begin(); it != eset.end(); ++it) {
-      OptimizableGraph::Edge* e = static_cast<OptimizableGraph::Edge*>(*it);
-      OptimizableGraph::Vertex* v1 = static_cast<OptimizableGraph::Vertex*>(e->vertices()[0]);
-      OptimizableGraph::Vertex* v2 = static_cast<OptimizableGraph::Vertex*>(e->vertices()[1]);
+      OptimizableGraph::Edge* e = static_cast<OptimizableGraph::Edge*>(it->get());
+      auto v1 = std::static_pointer_cast<OptimizableGraph::Vertex>(e->vertices()[0]);
+      auto v2 = std::static_pointer_cast<OptimizableGraph::Vertex>(e->vertices()[1]);
       if (! v1->fixed())
         _touchedVertices.insert(v1);
       if (! v2->fixed())
@@ -211,22 +211,22 @@ namespace g2o {
     //cerr << PVAR(_touchedVertices.size()) << endl;
 
     // updating the internal structures
-    std::vector<HyperGraph::Vertex*> newVertices;
+    HyperGraph::VertexContainer newVertices;
     newVertices.reserve(vset.size());
     _activeVertices.reserve(_activeVertices.size() + vset.size());
     _activeEdges.reserve(_activeEdges.size() + eset.size());
     for (HyperGraph::EdgeSet::iterator it = eset.begin(); it != eset.end(); ++it)
-      _activeEdges.push_back(static_cast<OptimizableGraph::Edge*>(*it));
+      _activeEdges.push_back(std::static_pointer_cast<OptimizableGraph::Edge>(*it));
     //cerr << "updating internal done." << endl;
 
     // update the index mapping
     size_t next = _ivMap.size();
     for (HyperGraph::VertexSet::iterator it = vset.begin(); it != vset.end(); ++it) {
-      OptimizableGraph::Vertex* v=static_cast<OptimizableGraph::Vertex*>(*it);
+      auto v = std::static_pointer_cast<OptimizableGraph::Vertex>(*it);
       if (! v->fixed()){
         if (! v->marginalized()){
           v->setHessianIndex(next);
-          _ivMap.push_back(v);
+          _ivMap.push_back(v.get());
           newVertices.push_back(v);
           _activeVertices.push_back(v);
           next++;
@@ -249,7 +249,7 @@ namespace g2o {
     memset(backupIdx, 0, sizeof(VertexBackup) * _touchedVertices.size());
     int idx = 0;
     for (HyperGraph::VertexSet::iterator it = _touchedVertices.begin(); it != _touchedVertices.end(); ++it) {
-      OptimizableGraph::Vertex* v = static_cast<OptimizableGraph::Vertex*>(*it);
+      OptimizableGraph::Vertex* v = static_cast<OptimizableGraph::Vertex*>(it->get());
       backupIdx[idx].hessianIndex = v->hessianIndex();
       backupIdx[idx].vertex = v;
       backupIdx[idx].hessianData = v->hessianData();
@@ -289,9 +289,9 @@ namespace g2o {
 
 
     for (HyperGraph::EdgeSet::const_iterator it = eset.begin(); it != eset.end(); ++it) {
-      OptimizableGraph::Edge* e = static_cast<OptimizableGraph::Edge*>(*it);
-      OptimizableGraph::Vertex* v1 = (OptimizableGraph::Vertex*) e->vertices()[0];
-      OptimizableGraph::Vertex* v2 = (OptimizableGraph::Vertex*) e->vertices()[1];
+      OptimizableGraph::Edge* e = static_cast<OptimizableGraph::Edge*>(it->get());
+      OptimizableGraph::Vertex* v1 = (OptimizableGraph::Vertex*) e->vertices()[0].get();
+      OptimizableGraph::Vertex* v2 = (OptimizableGraph::Vertex*) e->vertices()[1].get();
 
       int ind1 = v1->hessianIndex();
       if (ind1 == -1)
@@ -309,11 +309,11 @@ namespace g2o {
 
     // build the system into _updateMat
     for (HyperGraph::EdgeSet::iterator it = eset.begin(); it != eset.end(); ++it) {
-      OptimizableGraph::Edge * e = static_cast<OptimizableGraph::Edge*>(*it);
+      OptimizableGraph::Edge * e = static_cast<OptimizableGraph::Edge*>(it->get());
       e->computeError();
     }
     for (HyperGraph::EdgeSet::iterator it = eset.begin(); it != eset.end(); ++it) {
-      OptimizableGraph::Edge* e = static_cast<OptimizableGraph::Edge*>(*it);
+      OptimizableGraph::Edge* e = static_cast<OptimizableGraph::Edge*>(it->get());
       e->linearizeOplus(jacobianWorkspace());
       e->constructQuadraticForm();
     }

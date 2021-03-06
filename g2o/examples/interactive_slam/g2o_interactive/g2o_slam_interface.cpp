@@ -67,8 +67,8 @@ namespace g2o {
           Vector3d trb=tr0;
           tra[i] -= delta;
           trb[i] += delta;
-          ta = SE3Quat(q0, tra); 
-          tb = SE3Quat(q0, trb); 
+          ta = SE3Quat(q0, tra);
+          tb = SE3Quat(q0, trb);
         } else {
           Quaterniond qa=q0;
           Quaterniond qb=q0;
@@ -86,8 +86,8 @@ namespace g2o {
           }
           qa.normalize();
           qb.normalize();
-          ta = SE3Quat(qa, tr0); 
-          tb = SE3Quat(qb, tr0); 
+          ta = SE3Quat(qa, tr0);
+          tb = SE3Quat(qb, tr0);
         }
 
         Vector3d dtr = (tb.translation() - ta.translation())*idelta;
@@ -149,17 +149,17 @@ bool G2oSlamInterface::addEdge(const std::string& tag, int id, int dimension, in
     //cerr << PVAR(infMat) << endl;
 
     int doInit = 0;
-    SparseOptimizer::Vertex* v1 = _optimizer->vertex(v1Id);
-    SparseOptimizer::Vertex* v2 = _optimizer->vertex(v2Id);
+    auto v1 = _optimizer->vertex(v1Id);
+    auto v2 = _optimizer->vertex(v2Id);
     if (! v1) {
-      OptimizableGraph::Vertex* v = v1 = addVertex(dimension, v1Id);
+      auto v = v1 = addVertex(dimension, v1Id);
       _verticesAdded.insert(v);
       doInit = 1;
       ++_nodesAdded;
     }
 
     if (! v2) {
-      OptimizableGraph::Vertex* v = v2 = addVertex(dimension, v2Id);
+      auto v = v2 = addVertex(dimension, v2Id);
       _verticesAdded.insert(v);
       doInit = 2;
       ++_nodesAdded;
@@ -177,7 +177,7 @@ bool G2oSlamInterface::addEdge(const std::string& tag, int id, int dimension, in
       }
     }
 
-    OnlineEdgeSE2* e = new OnlineEdgeSE2;
+    auto e = std::make_shared<OnlineEdgeSE2>();
     e->vertices()[0] = v1;
     e->vertices()[1] = v2;
     e->setMeasurement(transf);
@@ -186,28 +186,28 @@ bool G2oSlamInterface::addEdge(const std::string& tag, int id, int dimension, in
     _edgesAdded.insert(e);
 
     if (doInit) {
-      OptimizableGraph::Vertex* from = static_cast<OptimizableGraph::Vertex*>(e->vertices()[0]);
-      OptimizableGraph::Vertex* to   = static_cast<OptimizableGraph::Vertex*>(e->vertices()[1]);
+      auto from = std::static_pointer_cast<OptimizableGraph::Vertex>(e->vertices()[0]);
+      auto to   = std::static_pointer_cast<OptimizableGraph::Vertex>(e->vertices()[1]);
       switch (doInit){
         case 1: // initialize v1 from v2
           {
             HyperGraph::VertexSet toSet;
             toSet.insert(to);
-            if (e->initialEstimatePossible(toSet, from) > 0.) {
-              e->initialEstimate(toSet, from);
+            if (e->initialEstimatePossible(toSet, from.get()) > 0.) {
+              e->initialEstimate(toSet, from.get());
             }
             break;
           }
-        case 2: 
+        case 2:
           {
             HyperGraph::VertexSet fromSet;
             fromSet.insert(from);
-            if (e->initialEstimatePossible(fromSet, to) > 0.) {
-              e->initialEstimate(fromSet, to);  
+            if (e->initialEstimatePossible(fromSet, to.get()) > 0.) {
+              e->initialEstimate(fromSet, to.get());
             }
             break;
           }
-        default: cerr << "doInit wrong value\n"; 
+        default: cerr << "doInit wrong value\n";
       }
     }
 
@@ -219,7 +219,7 @@ bool G2oSlamInterface::addEdge(const std::string& tag, int id, int dimension, in
 
     if (measurement.size() == 7) { // measurement is a Quaternion
       Vector7 meas;
-      for (int i=0; i<7; ++i) 
+      for (int i=0; i<7; ++i)
         meas(i) = measurement[i];
       // normalize the quaternion to recover numerical precision lost by storing as human readable text
       Vector4::MapType(meas.data()+3).normalize();
@@ -252,17 +252,17 @@ bool G2oSlamInterface::addEdge(const std::string& tag, int id, int dimension, in
     }
 
     int doInit = 0;
-    SparseOptimizer::Vertex* v1 = _optimizer->vertex(v1Id);
-    SparseOptimizer::Vertex* v2 = _optimizer->vertex(v2Id);
+    auto v1 = _optimizer->vertex(v1Id);
+    auto v2 = _optimizer->vertex(v2Id);
     if (! v1) {
-      OptimizableGraph::Vertex* v = v1 = addVertex(dimension, v1Id);
+      auto v = v1 = addVertex(dimension, v1Id);
       _verticesAdded.insert(v);
       doInit = 1;
       ++_nodesAdded;
     }
 
     if (! v2) {
-      OptimizableGraph::Vertex* v = v2 = addVertex(dimension, v2Id);
+      auto v = v2 = addVertex(dimension, v2Id);
       _verticesAdded.insert(v);
       doInit = 2;
       ++_nodesAdded;
@@ -280,7 +280,7 @@ bool G2oSlamInterface::addEdge(const std::string& tag, int id, int dimension, in
       }
     }
 
-    OnlineEdgeSE3* e = new OnlineEdgeSE3;
+    auto e = std::make_shared<OnlineEdgeSE3>();
     e->vertices()[0] = v1;
     e->vertices()[1] = v2;
     e->setMeasurement(transf);
@@ -289,28 +289,28 @@ bool G2oSlamInterface::addEdge(const std::string& tag, int id, int dimension, in
     _edgesAdded.insert(e);
 
     if (doInit) {
-      OptimizableGraph::Vertex* from = static_cast<OptimizableGraph::Vertex*>(e->vertices()[0]);
-      OptimizableGraph::Vertex* to   = static_cast<OptimizableGraph::Vertex*>(e->vertices()[1]);
+      auto from = std::static_pointer_cast<OptimizableGraph::Vertex>(e->vertices()[0]);
+      auto to   = std::static_pointer_cast<OptimizableGraph::Vertex>(e->vertices()[1]);
       switch (doInit){
         case 1: // initialize v1 from v2
           {
             HyperGraph::VertexSet toSet;
             toSet.insert(to);
-            if (e->initialEstimatePossible(toSet, from) > 0.) {
-              e->initialEstimate(toSet, from);
+            if (e->initialEstimatePossible(toSet, from.get()) > 0.) {
+              e->initialEstimate(toSet, from.get());
             }
             break;
           }
-        case 2: 
+        case 2:
           {
             HyperGraph::VertexSet fromSet;
             fromSet.insert(from);
-            if (e->initialEstimatePossible(fromSet, to) > 0.) {
-              e->initialEstimate(fromSet, to);  
+            if (e->initialEstimatePossible(fromSet, to.get()) > 0.) {
+              e->initialEstimate(fromSet, to.get());
             }
             break;
           }
-        default: cerr << "doInit wrong value\n"; 
+        default: cerr << "doInit wrong value\n";
       }
     }
 
@@ -330,7 +330,7 @@ bool G2oSlamInterface::addEdge(const std::string& tag, int id, int dimension, in
 bool G2oSlamInterface::fixNode(const std::vector<int>& nodes)
 {
   for (size_t i = 0; i < nodes.size(); ++i) {
-    OptimizableGraph::Vertex* v = _optimizer->vertex(nodes[i]);
+    OptimizableGraph::Vertex* v = _optimizer->vertex(nodes[i]).get();
     if (v)
       v->setFixed(true);
   }
@@ -344,12 +344,12 @@ bool G2oSlamInterface::queryState(const std::vector<int>& nodes)
 #if 1
   if (nodes.size() == 0) {
     for (OptimizableGraph::VertexIDMap::const_iterator it = _optimizer->vertices().begin(); it != _optimizer->vertices().end(); ++it) {
-      OptimizableGraph::Vertex* v = static_cast<OptimizableGraph::Vertex*>(it->second);
+      OptimizableGraph::Vertex* v = static_cast<OptimizableGraph::Vertex*>(it->second.get());
       printVertex(v);
     }
   } else {
     for (size_t i = 0; i < nodes.size(); ++i) {
-      OptimizableGraph::Vertex* v = _optimizer->vertex(nodes[i]);
+      OptimizableGraph::Vertex* v = _optimizer->vertex(nodes[i]).get();
       if (v)
         printVertex(v);
     }
@@ -366,22 +366,22 @@ bool G2oSlamInterface::solveState()
   return state != ERROR;
 }
 
-OptimizableGraph::Vertex* G2oSlamInterface::addVertex(int dimension, int id)
+std::shared_ptr<OptimizableGraph::Vertex> G2oSlamInterface::addVertex(int dimension, int id)
 {
   if (dimension == 3) {
-    OnlineVertexSE2* v =  new OnlineVertexSE2;
+    auto v =  std::make_shared<OnlineVertexSE2>();
     v->setId(id); // estimate will be set later when the edge is added
     _optimizer->addVertex(v);
     return v;
   }
   else if (dimension == 6) {
-    OnlineVertexSE3* v =  new OnlineVertexSE3;
+    auto v = std::make_shared<OnlineVertexSE3>();
     v->setId(id); // estimate will be set later when the edge is added
     _optimizer->addVertex(v);
     return v;
   }
   else {
-    return 0;
+    return nullptr;
   }
 }
 
