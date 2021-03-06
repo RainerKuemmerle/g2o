@@ -55,8 +55,9 @@ void init();
 //
 
 class G2O_TYPES_ICP_API EdgeGICP {
- public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
+
+ public:
   // point positions
   Vector3 pos0, pos1;
 
@@ -156,8 +157,8 @@ class G2O_TYPES_ICP_API Edge_V_V_GICP : public BaseBinaryEdge<3, EdgeGICP, Verte
   // return the error estimate as a 3-vector
   void computeError() {
     // from <ViewPoint> to <Point>
-    const VertexSE3 *vp0 = static_cast<const VertexSE3 *>(_vertices[0]);
-    const VertexSE3 *vp1 = static_cast<const VertexSE3 *>(_vertices[1]);
+    const VertexSE3 *vp0 = vertexXnRaw<0>();
+    const VertexSE3 *vp1 = vertexXnRaw<1>();
 
     // get vp1 point into vp0 frame
     // could be more efficient if we computed this transform just once
@@ -346,8 +347,8 @@ class G2O_TYPES_ICP_API Edge_XYZ_VSC
   // return the error estimate as a 2-vector
   void computeError() {
     // from <Point> to <Cam>
-    const VertexPointXYZ *point = static_cast<const VertexPointXYZ *>(_vertices[0]);
-    VertexSCam *cam = static_cast<VertexSCam *>(_vertices[1]);
+    VertexPointXYZ *point = vertexXnRaw<0>();
+    VertexSCam *cam = vertexXnRaw<1>();
     // cam->setAll();
 
     // calculate the projection

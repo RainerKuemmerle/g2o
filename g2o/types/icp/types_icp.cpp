@@ -93,8 +93,8 @@ namespace g2o {
   {
 
     // Temporary hack - TODO, sort out const-ness properly
-    _vertices[0] = const_cast<HyperGraph::Vertex*> (e->vertex(0));
-    _vertices[1] = const_cast<HyperGraph::Vertex*> (e->vertex(1));
+    _vertices[0] = std::const_pointer_cast<HyperGraph::Vertex>(e->vertex(0));
+    _vertices[1] = std::const_pointer_cast<HyperGraph::Vertex>(e->vertex(1));
 
     _measurement.pos0 = e->measurement().pos0;
     _measurement.pos1 = e->measurement().pos1;
@@ -172,8 +172,8 @@ namespace g2o {
   //    df/dx1 = [R0, T01 * d[dR1]/dq1 * p1]
   void Edge_V_V_GICP::linearizeOplus()
   {
-    VertexSE3* vp0 = static_cast<VertexSE3*>(_vertices[0]);
-    VertexSE3* vp1 = static_cast<VertexSE3*>(_vertices[1]);
+    VertexSE3* vp0 = vertexXnRaw<0>();
+    VertexSE3* vp1 = vertexXnRaw<1>();
 
     // topLeftCorner<3,3>() is the rotation matrix
     Matrix3 R0T = vp0->estimate().matrix().topLeftCorner<3,3>().transpose();
