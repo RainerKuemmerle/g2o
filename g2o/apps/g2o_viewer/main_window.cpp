@@ -167,7 +167,7 @@ void MainWindow::fixGraph()
 
   // check for vertices to fix to remove DoF
   bool gaugeFreedom = viewer->graph->gaugeFreedom();
-  g2o::OptimizableGraph::Vertex* gauge = viewer->graph->findGauge();
+  auto gauge = viewer->graph->findGauge();
   if (gaugeFreedom) {
     if (! gauge) {
       cerr <<  "cannot find a vertex to fix in this thing" << endl;
@@ -304,7 +304,7 @@ bool MainWindow::prepare()
   if (_currentOptimizationAlgorithmProperty.requiresMarginalize) {
     cerr << "Marginalizing Landmarks" << endl;
     for (SparseOptimizer::VertexIDMap::const_iterator it = optimizer->vertices().begin(); it != optimizer->vertices().end(); ++it) {
-      OptimizableGraph::Vertex* v = static_cast<OptimizableGraph::Vertex*>(it->second);
+      OptimizableGraph::Vertex* v = static_cast<OptimizableGraph::Vertex*>(it->second.get());
       int vdim = v->dimension();
       v->setMarginalized((vdim == _currentOptimizationAlgorithmProperty.landmarkDim));
     }
@@ -312,7 +312,7 @@ bool MainWindow::prepare()
   else {
     cerr << "Preparing (no marginalization of Landmarks)" << endl;
     for (SparseOptimizer::VertexIDMap::const_iterator it = optimizer->vertices().begin(); it != optimizer->vertices().end(); ++it) {
-      OptimizableGraph::Vertex* v = static_cast<OptimizableGraph::Vertex*>(it->second);
+      OptimizableGraph::Vertex* v = static_cast<OptimizableGraph::Vertex*>(it->second.get());
       v->setMarginalized(false);
     }
   }
@@ -337,7 +337,7 @@ void MainWindow::setRobustKernel()
       return;
     }
     for (SparseOptimizer::EdgeSet::const_iterator it = optimizer->edges().begin(); it != optimizer->edges().end(); ++it) {
-      OptimizableGraph::Edge* e = static_cast<OptimizableGraph::Edge*>(*it);
+      OptimizableGraph::Edge* e = static_cast<OptimizableGraph::Edge*>(it->get());
       if (onlyLoop) {
         if (e->vertices().size() >= 2 && std::abs(e->vertex(0)->id() - e->vertex(1)->id()) != 1) {
           e->setRobustKernel(creator->construct());
@@ -350,8 +350,8 @@ void MainWindow::setRobustKernel()
     }
   } else {
     for (SparseOptimizer::EdgeSet::const_iterator it = optimizer->edges().begin(); it != optimizer->edges().end(); ++it) {
-      OptimizableGraph::Edge* e = static_cast<OptimizableGraph::Edge*>(*it);
-      e->setRobustKernel(0);
+      OptimizableGraph::Edge* e = static_cast<OptimizableGraph::Edge*>(it->get());
+      e->setRobustKernel(nullptr);
     }
   }
 }
