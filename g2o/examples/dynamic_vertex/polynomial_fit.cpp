@@ -120,7 +120,7 @@ public:
 
   // Compute the measurement from the eigen polynomial module
   virtual void computeError() {
-    const PolynomialCoefficientVertex* vertex = static_cast<const PolynomialCoefficientVertex*> (_vertices[0]);
+    const PolynomialCoefficientVertex* vertex = vertexXnRaw<0>();
     _error[0] = _measurement - Eigen::poly_eval(vertex->estimate(), _x);
   }
 
@@ -181,7 +181,7 @@ int main(int argc, const char* argv[]) {
   optimizer->setAlgorithm(std::move(optimisationAlgorithm));
 
   // Create the vertex; note its dimension is currently is undefined
-  PolynomialCoefficientVertex* pv = new PolynomialCoefficientVertex();
+  auto pv = std::make_shared<PolynomialCoefficientVertex>();
   pv->setId(0);
   optimizer->addVertex(pv);
 
@@ -191,7 +191,7 @@ int main(int argc, const char* argv[]) {
 
   // Create the observations and the edges
   for (int i = 0; i < obs; ++i) {
-    PolynomialSingleValueEdge* pe = new PolynomialSingleValueEdge(x[i], z[i], omega);
+    auto pe = std::make_shared<PolynomialSingleValueEdge>(x[i], z[i], omega);
     pe->setVertex(0, pv);
     optimizer->addEdge(pe);
   }

@@ -14,18 +14,17 @@
 // changed dynamically.
 
 #include <random>
-
 #include <unsupported/Eigen/Polynomials>
 
-#include "g2o/stuff/sampler.h"
-#include "g2o/core/sparse_optimizer.h"
-#include "g2o/core/block_solver.h"
-#include "g2o/core/optimization_algorithm_levenberg.h"
-#include "g2o/core/base_vertex.h"
+#include "g2o/core/base_binary_edge.h"
 #include "g2o/core/base_dynamic_vertex.h"
 #include "g2o/core/base_unary_edge.h"
-#include "g2o/core/base_binary_edge.h"
+#include "g2o/core/base_vertex.h"
+#include "g2o/core/block_solver.h"
+#include "g2o/core/optimization_algorithm_levenberg.h"
+#include "g2o/core/sparse_optimizer.h"
 #include "g2o/solvers/eigen/linear_solver_eigen.h"
+#include "g2o/stuff/sampler.h"
 
 // Declare the custom types used in the graph
 
@@ -33,13 +32,11 @@
 // quadratic, and always has a degree of three.
 
 class FPolynomialCoefficientVertex : public g2o::BaseVertex<3, Eigen::Vector3d> {
-public:
+ public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
 
   // Create the vertex
-  FPolynomialCoefficientVertex() {
-    setToOrigin();
-  }
+  FPolynomialCoefficientVertex() { setToOrigin(); }
 
   // Read the vertex
   virtual bool read(std::istream& is) {
@@ -48,14 +45,10 @@ public:
   }
 
   // Write the vertex
-  virtual bool write(std::ostream& os) const {
-    return g2o::internal::writeVector(os, _estimate);
-  }
+  virtual bool write(std::ostream& os) const { return g2o::internal::writeVector(os, _estimate); }
 
   // Reset to zero
-  virtual void setToOriginImpl() {
-    _estimate.setZero();
-  }
+  virtual void setToOriginImpl() { _estimate.setZero(); }
 
   // Direct linear add
   virtual void oplusImpl(const double* update) {
@@ -68,13 +61,11 @@ public:
 // we can change it at runtime.
 
 class PPolynomialCoefficientVertex : public g2o::BaseDynamicVertex<Eigen::VectorXd> {
-
-public:
+ public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
 
   // Create the vertex
-  PPolynomialCoefficientVertex() {
-  }
+  PPolynomialCoefficientVertex() {}
 
   // Read the vertex
   virtual bool read(std::istream& is) {
@@ -100,9 +91,7 @@ public:
   }
 
   // Reset to zero
-  virtual void setToOriginImpl() {
-    _estimate.setZero();
-  }
+  virtual void setToOriginImpl() { _estimate.setZero(); }
 
   // Direct linear add
   virtual void oplusImpl(const double* update) {
@@ -121,18 +110,17 @@ public:
 
 // Helper structure
 
-struct FunctionObservation
-{
+struct FunctionObservation {
   Eigen::VectorXd x;
   Eigen::VectorXd z;
 };
 
 // The edge which encodes the observations
 
-class MultipleValueEdge : public g2o::BaseBinaryEdge<Eigen::Dynamic, Eigen::VectorXd, FPolynomialCoefficientVertex,
-						     PPolynomialCoefficientVertex> {
-
-public:
+class MultipleValueEdge
+    : public g2o::BaseBinaryEdge<Eigen::Dynamic, Eigen::VectorXd, FPolynomialCoefficientVertex,
+                                 PPolynomialCoefficientVertex> {
+ public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
 
   MultipleValueEdge(const FunctionObservation& obs, double omega) : _x(obs.x) {
@@ -159,26 +147,23 @@ public:
 
   // Compute the measurement from the eigen polynomial module
   virtual void computeError() {
-    const FPolynomialCoefficientVertex* fvertex = dynamic_cast<const FPolynomialCoefficientVertex*> (_vertices[0]);
-    const PPolynomialCoefficientVertex* pvertex = dynamic_cast<const PPolynomialCoefficientVertex*> (_vertices[1]);
+    const FPolynomialCoefficientVertex* fvertex = vertexXnRaw<0>();
+    const PPolynomialCoefficientVertex* pvertex = vertexXnRaw<1>();
     for (int i = 0; i < _measurement.size(); ++i) {
       double x3 = pow(_x[i], 3);
-      _error[i] = _measurement[i] - Eigen::poly_eval(fvertex->estimate(), _x[i])
-	- x3 * (Eigen::poly_eval(pvertex->estimate(), _x[i]));
+      _error[i] = _measurement[i] - Eigen::poly_eval(fvertex->estimate(), _x[i]) -
+                  x3 * (Eigen::poly_eval(pvertex->estimate(), _x[i]));
     }
   }
 
-private:
-
+ private:
   // The points that the polynomial is computed at
   Eigen::VectorXd _x;
 };
 
 int main(int argc, const char* argv[]) {
-
   // Random number generator
   std::default_random_engine generator;
-
 
   // Create the coefficients for the f-polynomial (all drawn randomly)
   Eigen::Vector3d f;
@@ -237,7 +222,7 @@ int main(int argc, const char* argv[]) {
 
   // Set up the optimisation algorithm
   std::unique_ptr<g2o::OptimizationAlgorithm> optimisationAlgorithm(
-    new g2o::OptimizationAlgorithmLevenberg(move(blockSolver)));
+      new g2o::OptimizationAlgorithmLevenberg(move(blockSolver)));
 
   // Create the graph and configure it
   std::unique_ptr<g2o::SparseOptimizer> optimizer = g2o::make_unique<g2o::SparseOptimizer>();
@@ -245,12 +230,12 @@ int main(int argc, const char* argv[]) {
   optimizer->setAlgorithm(std::move(optimisationAlgorithm));
 
   // Create the f vertex; its dimensions are known
-  FPolynomialCoefficientVertex* pf = new FPolynomialCoefficientVertex();
+  auto pf = std::make_shared<FPolynomialCoefficientVertex>();
   pf->setId(0);
   optimizer->addVertex(pf);
 
   // Create the vertex; note its dimension is currently is undefined
-  PPolynomialCoefficientVertex* pv = new PPolynomialCoefficientVertex();
+  auto pv = std::make_shared<PPolynomialCoefficientVertex>();
   pv->setId(1);
   optimizer->addVertex(pv);
 
@@ -259,7 +244,7 @@ int main(int argc, const char* argv[]) {
 
   // Create the edges
   for (int i = 0; i < obs; ++i) {
-    MultipleValueEdge* mve = new MultipleValueEdge(observations[i], omega);
+    auto mve = std::make_shared<MultipleValueEdge>(observations[i], omega);
     mve->setVertex(0, pf);
     mve->setVertex(1, pv);
     optimizer->addEdge(mve);
@@ -274,12 +259,14 @@ int main(int argc, const char* argv[]) {
     pv->setDimension(testDimension);
     optimizer->initializeOptimization();
     optimizer->optimize(10);
-    std::cout << "Computed parameters: f=" << pf->estimate().transpose() << "; p=" << pv->estimate().transpose() << std::endl;
+    std::cout << "Computed parameters: f=" << pf->estimate().transpose()
+              << "; p=" << pv->estimate().transpose() << std::endl;
   }
   for (int testDimension = polynomialDimension - 1; testDimension >= 1; --testDimension) {
     pv->setDimension(testDimension);
     optimizer->initializeOptimization();
     optimizer->optimize(10);
-    std::cout << "Computed parameters: f= " << pf->estimate().transpose() << "; p=" << pv->estimate().transpose() << std::endl;
+    std::cout << "Computed parameters: f= " << pf->estimate().transpose()
+              << "; p=" << pv->estimate().transpose() << std::endl;
   }
 }
