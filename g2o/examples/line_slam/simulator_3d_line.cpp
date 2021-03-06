@@ -45,12 +45,12 @@ protected:
 };
 
 struct WorldItem : public SimulatorItem {
-  WorldItem(OptimizableGraph* graph_, OptimizableGraph::Vertex* vertex_ = 0) :
+  WorldItem(OptimizableGraph* graph_, std::shared_ptr<OptimizableGraph::Vertex> vertex_ = nullptr) :
     SimulatorItem(graph_),_vertex(vertex_) {}
-  OptimizableGraph::Vertex* vertex() { return _vertex; }
-  void  setVertex(OptimizableGraph::Vertex* vertex_) { _vertex = vertex_; }
+  std::shared_ptr<OptimizableGraph::Vertex> vertex() { return _vertex; }
+  void  setVertex(const std::shared_ptr<OptimizableGraph::Vertex>& vertex_) { _vertex = vertex_; }
 protected:
-  OptimizableGraph::Vertex* _vertex;
+  std::shared_ptr<OptimizableGraph::Vertex> _vertex;
 };
 
 typedef std::set<WorldItem*> WorldItemSet;
@@ -80,13 +80,13 @@ struct Robot: public WorldItem {
   void move(const Isometry3d& newPosition, int& id) {
     Isometry3d delta = _position.inverse() * newPosition;
     _position = newPosition;
-    VertexSE3* v = new VertexSE3();
+    auto v = std::make_shared<VertexSE3>();
     v->setId(id);
     id++;
     graph()->addVertex(v);
     if(_planarMotion) {
       // add a singleton constraint that locks the position of the robot on the plane
-      EdgeSE3Prior* planeConstraint=new EdgeSE3Prior();
+      auto planeConstraint = std::make_shared<EdgeSE3Prior>();
       Matrix6 pinfo = Matrix6::Zero();
       pinfo(2, 2) = 1e9;
       planeConstraint->setInformation(pinfo);
@@ -96,8 +96,8 @@ struct Robot: public WorldItem {
       graph()->addEdge(planeConstraint);
     }
     if(vertex()) {
-      VertexSE3* oldV = dynamic_cast<VertexSE3*>(vertex());
-      EdgeSE3* e = new EdgeSE3();
+      auto oldV = std::dynamic_pointer_cast<VertexSE3>(vertex());
+      auto e = std::make_shared<EdgeSE3>();
       Isometry3d noise = sample_noise_from_se3(_nmovecov);
       e->setMeasurement(delta * noise);
       Matrix6 m = Matrix6::Identity();
@@ -163,7 +163,7 @@ struct Simulator : public SimulatorItem {
 
 struct LineItem : public WorldItem {
   LineItem(OptimizableGraph* graph_, int id) : WorldItem(graph_) {
-    VertexLine3D* l = new VertexLine3D();
+    auto l = std::make_shared<VertexLine3D>();
     l->setId(id);
     graph()->addVertex(l);
     setVertex(l);
@@ -174,7 +174,7 @@ struct LineSensor : public Sensor {
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
 
   LineSensor(Robot* r, int offsetId, const Isometry3d& offset_) : Sensor(r) {
-    _offsetVertex = new VertexSE3();
+    _offsetVertex = std::make_shared<VertexSE3>();
     _offsetVertex->setId(offsetId);
     _offsetVertex->setEstimate(offset_);
     robot()->graph()->addVertex(_offsetVertex);
@@ -199,22 +199,22 @@ struct LineSensor : public Sensor {
     if(!li) {
       return false;
     }
-    OptimizableGraph::Vertex* rv = robot()->vertex();
+    auto rv = robot()->vertex();
     if(!rv) {
       return false;
     }
-    VertexSE3* robotVertex = dynamic_cast<VertexSE3*>(rv);
+    auto robotVertex = std::dynamic_pointer_cast<VertexSE3>(rv);
     if(!robotVertex) {
       return false;
     }
     const Isometry3d& robotPose = position;
     Isometry3d sensorPose = robotPose * _offsetVertex->estimate();
-    VertexLine3D* lineVertex = dynamic_cast<VertexLine3D*>(li->vertex());
+    auto lineVertex = std::dynamic_pointer_cast<VertexLine3D>(li->vertex());
     Line3D worldLine = lineVertex->estimate();
 
     Line3D measuredLine = sensorPose.inverse() * worldLine;
 
-    EdgeSE3Line3D* e = new EdgeSE3Line3D();
+    auto e = std::make_shared<EdgeSE3Line3D>();
     e->vertices()[0] = robotVertex;
     e->vertices()[1] = lineVertex;
     Vector4d noise = sample_noise_from_line(_nline);
@@ -231,7 +231,7 @@ struct LineSensor : public Sensor {
     return true;
   }
 
-  VertexSE3* _offsetVertex;
+  std::shared_ptr<VertexSE3> _offsetVertex;
   Vector4d _nline;
 };
 
@@ -243,7 +243,7 @@ int main (int argc, char** argv) {
   arg.parseArgs(argc, argv);
 
   SparseOptimizer* g = new SparseOptimizer();
-  ParameterSE3Offset* odomOffset = new ParameterSE3Offset();
+  auto odomOffset = std::make_shared<ParameterSE3Offset>();
   odomOffset->setId(0);
   g->addParameter(odomOffset);
 
@@ -267,7 +267,7 @@ int main (int argc, char** argv) {
   Vector6 liv;
   liv << 0.0, 0.0, 5.0, 0.0, 1.0, 0.0;
   line = Line3D::fromCartesian(liv);
-  static_cast<VertexLine3D*>(li->vertex())->setEstimate(line);
+  static_cast<VertexLine3D*>(li->vertex().get())->setEstimate(line);
   li->vertex()->setFixed(fixLines);
   sim->_world.insert(li);
 
@@ -275,7 +275,7 @@ int main (int argc, char** argv) {
   liv << 5.0, 0.0, 0.0, 0.0, 0.0, 1.0;
   line = Line3D::fromCartesian(liv);
   li = new LineItem(g, 2);
-  static_cast<VertexLine3D*>(li->vertex())->setEstimate(line);
+  static_cast<VertexLine3D*>(li->vertex().get())->setEstimate(line);
   li->vertex()->setFixed(fixLines);
   sim->_world.insert(li);
 
@@ -283,7 +283,7 @@ int main (int argc, char** argv) {
   liv << 0.0, 5.0, 0.0, 1.0, 0.0, 0.0;
   line = Line3D::fromCartesian(liv);
   li = new LineItem(g, 3);
-  static_cast<VertexLine3D*>(li->vertex())->setEstimate(line);
+  static_cast<VertexLine3D*>(li->vertex().get())->setEstimate(line);
   li->vertex()->setFixed(fixLines);
   sim->_world.insert(li);
 
@@ -356,7 +356,7 @@ int main (int argc, char** argv) {
   std::cout << std::endl;
 
   ls->_offsetVertex->setFixed(true);
-  OptimizableGraph::Vertex* gauge = g->vertex(4);
+  auto gauge = g->vertex(4);
   if(gauge) {
     gauge->setFixed(true);
   }
