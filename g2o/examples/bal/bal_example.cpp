@@ -195,7 +195,7 @@ class EdgeObservationBAL : public BaseBinaryEdge<2, Vector2, VertexCameraBAL, Ve
     // compute the error
     typename g2o::VectorN<2, T>::MapType error(p_error);
     error = prediction - measurement().cast<T>();
-    (void) error;
+    (void)error;
     return true;
   }
 
@@ -249,8 +249,8 @@ int main(int argc, char** argv) {
     optimizer.setComputeBatchStatistics(true);
   }
 
-  vector<VertexPointBAL*> points;
-  vector<VertexCameraBAL*> cameras;
+  vector<std::shared_ptr<VertexPointBAL>> points;
+  vector<std::shared_ptr<VertexCameraBAL>> cameras;
 
   // parse BAL dataset
   cout << "Loading BAL dataset " << inputFilename << endl;
@@ -264,7 +264,7 @@ int main(int argc, char** argv) {
     int id = 0;
     cameras.reserve(numCameras);
     for (int i = 0; i < numCameras; ++i, ++id) {
-      VertexCameraBAL* cam = new VertexCameraBAL;
+      auto cam = std::make_shared<VertexCameraBAL>();
       cam->setId(id);
       optimizer.addVertex(cam);
       cameras.push_back(cam);
@@ -272,7 +272,7 @@ int main(int argc, char** argv) {
 
     points.reserve(numPoints);
     for (int i = 0; i < numPoints; ++i, ++id) {
-      VertexPointBAL* p = new VertexPointBAL;
+      auto p = std::make_shared<VertexPointBAL>();
       p->setId(id);
       p->setMarginalized(true);
       bool addedVertex = optimizer.addVertex(p);
@@ -289,11 +289,11 @@ int main(int argc, char** argv) {
       ifs >> camIndex >> pointIndex >> obsX >> obsY;
 
       assert(camIndex >= 0 && (size_t)camIndex < cameras.size() && "Index out of bounds");
-      VertexCameraBAL* cam = cameras[camIndex];
+      const auto& cam = cameras[camIndex];
       assert(pointIndex >= 0 && (size_t)pointIndex < points.size() && "Index out of bounds");
-      VertexPointBAL* point = points[pointIndex];
+      const auto& point = points[pointIndex];
 
-      EdgeObservationBAL* e = new EdgeObservationBAL;
+      auto e = std::make_shared<EdgeObservationBAL>();
       e->setVertex(0, cam);
       e->setVertex(1, point);
       e->setInformation(Matrix2::Identity());
@@ -308,16 +308,14 @@ int main(int argc, char** argv) {
     for (int i = 0; i < numCameras; ++i) {
       bal::Vector9 cameraParameter;
       for (int j = 0; j < 9; ++j) ifs >> cameraParameter(j);
-      VertexCameraBAL* cam = cameras[i];
-      cam->setEstimate(cameraParameter);
+      cameras[i]->setEstimate(cameraParameter);
     }
 
     // read in the points
     for (int i = 0; i < numPoints; ++i) {
       Vector3 p;
       ifs >> p(0) >> p(1) >> p(2);
-      VertexPointBAL* point = points[i];
-      point->setEstimate(p);
+      points[i]->setEstimate(p);
     }
   }
   cout << "done." << endl;
@@ -355,8 +353,8 @@ int main(int argc, char** argv) {
          << "  geometry PointSet {\n"
          << "    coord Coordinate {\n"
          << "      point [\n";
-    for (vector<VertexPointBAL*>::const_iterator it = points.begin(); it != points.end(); ++it) {
-      fout << (*it)->estimate().transpose() << endl;
+    for (const auto& p : points) {
+      fout << p->estimate().transpose() << endl;
     }
     fout << "    ]\n"
          << "  }\n"

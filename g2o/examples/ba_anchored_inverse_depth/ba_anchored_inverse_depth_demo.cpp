@@ -148,7 +148,7 @@ int main(int argc, const char* argv[]){
 
   vector<g2o::SE3Quat, aligned_allocator<g2o::SE3Quat>> true_poses;
 
-  g2o::CameraParameters* cam_params = new g2o::CameraParameters(focal_length, principal_point, 0.);
+  auto cam_params = std::make_shared<g2o::CameraParameters>(focal_length, principal_point, 0.);
   cam_params->setId(0);
 
   if (!optimizer.addParameter(cam_params)){
@@ -161,7 +161,7 @@ int main(int argc, const char* argv[]){
     Eigen:: Quaterniond q;
     q.setIdentity();
     g2o::SE3Quat T_me_from_world(q,trans);
-    g2o::VertexSE3Expmap* v_se3 = new g2o::VertexSE3Expmap();
+    auto v_se3 = std::make_shared<g2o::VertexSE3Expmap>();
     v_se3->setId(vertex_id);
     v_se3->setEstimate(T_me_from_world);
 
@@ -183,8 +183,7 @@ int main(int argc, const char* argv[]){
   unordered_set<int> inliers;
 
   for (size_t i=0; i<true_points.size(); ++i){
-    g2o::VertexPointXYZ * v_p
-        = new g2o::VertexPointXYZ();
+    auto v_p = std::make_shared<g2o::VertexPointXYZ>();
     int num_obs = 0;
     for (size_t j=0; j<true_poses.size(); ++j)    {
       Vector2d z = cam_params->cam_map(true_poses.at(j).map(true_points.at(i)));
@@ -226,14 +225,12 @@ int main(int argc, const char* argv[]){
           }
           z += Vector2d(g2o::Sampler::gaussRand(0., PIXEL_NOISE),
                         g2o::Sampler::gaussRand(0., PIXEL_NOISE));
-          g2o::EdgeProjectPSI2UV* e = new g2o::EdgeProjectPSI2UV();
+          auto e = std::make_shared<g2o::EdgeProjectPSI2UV>();
 
           e->resize(3);
-          e->setVertex(0, dynamic_cast<g2o::OptimizableGraph::Vertex*>(v_p));
-          e->setVertex(1, dynamic_cast<g2o::OptimizableGraph::Vertex*>
-                       (optimizer.vertices().find(j)->second));
-          e->setVertex(2, dynamic_cast<g2o::OptimizableGraph::Vertex*>
-                       (optimizer.vertices().find(anchor_frame_id)->second));
+          e->setVertex(0, v_p);
+          e->setVertex(1, optimizer.vertices().find(j)->second);
+          e->setVertex(2, optimizer.vertices().find(anchor_frame_id)->second);
 
           e->setMeasurement(z);
           e->information() = Matrix2d::Identity();
@@ -271,25 +268,23 @@ int main(int argc, const char* argv[]){
   sum_diff2 = 0;
   for (unordered_map<int,int>::iterator it=pointid_2_trueid.begin();
        it!=pointid_2_trueid.end(); ++it){
-    g2o::HyperGraph::VertexIDMap::iterator v_it
-        = optimizer.vertices().find(it->first);
+    g2o::HyperGraph::VertexIDMap::iterator v_it = optimizer.vertices().find(it->first);
     if (v_it==optimizer.vertices().end()){
       cerr << "Vertex " << it->first << " not in graph!" << endl;
       exit(-1);
     }
-    g2o::VertexPointXYZ* v_p = dynamic_cast<g2o::VertexPointXYZ*>(v_it->second);
+    g2o::VertexPointXYZ* v_p = dynamic_cast<g2o::VertexPointXYZ*>(v_it->second.get());
     if (v_p==0){
       cerr << "Vertex " << it->first << "is not a PointXYZ!" << endl;
       exit(-1);
     }
     int anchorframe_id = pointid_2_anchorid.find(it->first)->second;
-    v_it
-        = optimizer.vertices().find(anchorframe_id);
+    v_it = optimizer.vertices().find(anchorframe_id);
     if (v_it==optimizer.vertices().end()){
       cerr << "Vertex " << it->first << " not in graph!" << endl;
       exit(-1);
     }
-    g2o::VertexSE3Expmap* v_anchor = dynamic_cast<g2o::VertexSE3Expmap*>(v_it->second);
+    g2o::VertexSE3Expmap* v_anchor = dynamic_cast<g2o::VertexSE3Expmap*>(v_it->second.get());
     if (v_anchor==0){
       cerr << "Vertex " << it->second << "is not a SE3Expmap!" << endl;
       exit(-1);
