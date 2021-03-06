@@ -91,8 +91,8 @@ bool EdgeSim3::write(std::ostream &os) const {
 
 #if G2O_SIM3_JACOBIAN
 void EdgeSim3::linearizeOplus() {
-    VertexSim3Expmap *v1 = static_cast<VertexSim3Expmap *>(_vertices[0]);
-    VertexSim3Expmap *v2 = static_cast<VertexSim3Expmap *>(_vertices[1]);
+    VertexSim3Expmap *v1 = vertexXnRaw<0>();
+    VertexSim3Expmap *v2 = vertexXnRaw<1>();
     const Sim3 Si(v1->estimate());//Siw
     const Sim3 Sj(v2->estimate());
 

@@ -121,8 +121,8 @@ class G2O_TYPES_SIM3_API VertexSim3Expmap : public BaseVertex<7, Sim3>
     virtual bool write(std::ostream& os) const;
     void computeError()
     {
-      const VertexSim3Expmap* v1 = static_cast<const VertexSim3Expmap*>(_vertices[0]);
-      const VertexSim3Expmap* v2 = static_cast<const VertexSim3Expmap*>(_vertices[1]);
+      const VertexSim3Expmap* v1 = vertexXnRaw<0>();
+      const VertexSim3Expmap* v2 = vertexXnRaw<1>();
 
       Sim3 C(_measurement);
       Sim3 error_=C*v1->estimate()*v2->estimate().inverse();
@@ -132,8 +132,8 @@ class G2O_TYPES_SIM3_API VertexSim3Expmap : public BaseVertex<7, Sim3>
     virtual number_t initialEstimatePossible(const OptimizableGraph::VertexSet& , OptimizableGraph::Vertex* ) { return 1.;}
     virtual void initialEstimate(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* /*to*/)
     {
-      VertexSim3Expmap* v1 = static_cast<VertexSim3Expmap*>(_vertices[0]);
-      VertexSim3Expmap* v2 = static_cast<VertexSim3Expmap*>(_vertices[1]);
+      auto v1 = vertexXn<0>();
+      auto v2 = vertexXn<1>();
       if (from.count(v1) > 0)
         v2->setEstimate(measurement()*v1->estimate());
       else
@@ -156,8 +156,8 @@ class G2O_TYPES_SIM3_API EdgeSim3ProjectXYZ : public  BaseBinaryEdge<2, Vector2,
 
     void computeError()
     {
-      const VertexSim3Expmap* v1 = static_cast<const VertexSim3Expmap*>(_vertices[1]);
-      const VertexPointXYZ* v2 = static_cast<const VertexPointXYZ*>(_vertices[0]);
+      const VertexSim3Expmap* v1 = vertexXnRaw<1>();
+      const VertexPointXYZ* v2 = vertexXnRaw<0>();
 
       Vector2 obs(_measurement);
       _error = obs-v1->cam_map1(project(v1->estimate().map(v2->estimate())));
@@ -176,8 +176,8 @@ class G2O_TYPES_SIM3_API EdgeInverseSim3ProjectXYZ : public BaseBinaryEdge<2, Ve
   virtual bool write(std::ostream &os) const;
 
   void computeError() {
-    const VertexSim3Expmap *v1 = static_cast<const VertexSim3Expmap *>(_vertices[1]);
-    const VertexPointXYZ *v2 = static_cast<const VertexPointXYZ *>(_vertices[0]);
+    const VertexSim3Expmap *v1 = vertexXnRaw<1>();
+    const VertexPointXYZ *v2 = vertexXnRaw<0>();
 
     Vector2 obs(_measurement);
     _error = obs - v1->cam_map2(project(v1->estimate().inverse().map(v2->estimate())));
