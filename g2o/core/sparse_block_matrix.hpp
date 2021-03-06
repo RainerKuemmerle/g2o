@@ -42,7 +42,7 @@ namespace g2o {
 
   template <class MatrixType>
   void SparseBlockMatrix<MatrixType>::clear(bool dealloc) {
-#   ifdef G2O_OPENMP
+#   ifdef G2O_USE_OPENMP
 #   pragma omp parallel for default (shared) if (_blockCols.size() > 100)
 #   endif
     for (int i=0; i < static_cast<int>(_blockCols.size()); ++i) {
@@ -303,7 +303,7 @@ namespace g2o {
     Eigen::Map<VectorX> destVec(dest, destSize);
     Eigen::Map<const VectorX> srcVec(src, rows());
 
-#   ifdef G2O_OPENMP
+#   ifdef G2O_USE_OPENMP
 #   pragma omp parallel for default (shared) schedule(dynamic, 10)
 #   endif
     for (int i=0; i < static_cast<int>(_blockCols.size()); ++i){

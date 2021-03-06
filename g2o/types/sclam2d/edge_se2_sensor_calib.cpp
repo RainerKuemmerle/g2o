@@ -25,7 +25,7 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "edge_se2_sensor_calib.h"
-#ifdef G2O_HAVE_OPENGL
+#ifdef G2O_USE_OPENGL
 #include "g2o/stuff/opengl_wrapper.h"
 #endif
 namespace g2o {
@@ -66,7 +66,7 @@ namespace g2o {
     return writeInformationMatrix(os);
   }
 
-#ifdef G2O_HAVE_OPENGL
+#ifdef G2O_USE_OPENGL
   EdgeSE2SensorCalibDrawAction::EdgeSE2SensorCalibDrawAction() :
     DrawAction(typeid(EdgeSE2SensorCalib).name())
   {

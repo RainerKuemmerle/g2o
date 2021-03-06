@@ -28,7 +28,7 @@
 
 #include "g2o/stuff/macros.h"
 
-#ifdef G2O_HAVE_OPENGL
+#ifdef G2O_USE_OPENGL
 #include "g2o/stuff/opengl_wrapper.h"
 #endif
 
@@ -118,7 +118,7 @@ namespace g2o {
 
 
 
-#ifdef G2O_HAVE_OPENGL
+#ifdef G2O_USE_OPENGL
   RobotLaserDrawAction::RobotLaserDrawAction()
       : DrawAction(typeid(RobotLaser).name()), _beamsDownsampling(nullptr), _pointSize(nullptr), _maxRange(nullptr) {}
 

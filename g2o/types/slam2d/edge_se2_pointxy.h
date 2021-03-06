@@ -86,7 +86,7 @@ namespace g2o {
             HyperGraphElementAction::Parameters* params_);
   };
 
-#ifdef G2O_HAVE_OPENGL
+#ifdef G2O_USE_OPENGL
   class G2O_TYPES_SLAM2D_API EdgeSE2PointXYDrawAction: public DrawAction{
   public:
     EdgeSE2PointXYDrawAction();

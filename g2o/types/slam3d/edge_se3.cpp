@@ -28,7 +28,7 @@
 #include "isometry3d_gradients.h"
 #include <iostream>
 
-#ifdef G2O_HAVE_OPENGL
+#ifdef G2O_USE_OPENGL
 #include "g2o/stuff/opengl_wrapper.h"
 #include "g2o/stuff/opengl_primitives.h"
 #endif
@@ -122,7 +122,7 @@ namespace g2o {
     return this;
   }
 
-#ifdef G2O_HAVE_OPENGL
+#ifdef G2O_USE_OPENGL
   EdgeSE3DrawAction::EdgeSE3DrawAction(): DrawAction(typeid(EdgeSE3).name()){}
 
   HyperGraphElementAction* EdgeSE3DrawAction::operator()(HyperGraph::HyperGraphElement* element,

@@ -90,7 +90,7 @@ namespace g2o {
       virtual HyperGraphElementAction* operator()(HyperGraph::HyperGraphElement* element, HyperGraphElementAction::Parameters* params_ );
   };
 
-#ifdef G2O_HAVE_OPENGL
+#ifdef G2O_USE_OPENGL
   /**
    * \brief visualize a 3D point
    */

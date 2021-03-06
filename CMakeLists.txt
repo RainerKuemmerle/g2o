@@ -119,7 +119,7 @@ if (G2O_USE_CHOLMOD)
       find_package(BLAS)
       find_package(LAPACK)
       find_package(Cholmod)
-      if (CHOLMOD_FOUND AND BLAS_FOUND AND LAPACK_FOUND)
+      if (G2O_USE_CHOLMOD AND BLAS_FOUND AND LAPACK_FOUND)
         set(G2O_CHOLMOD_TARGET ${CHOLMOD_LIBRARIES} ${BLAS_LIBRARIES} ${LAPACK_LIBRARIES})
       else()
 	set(G2O_USE_CHOLMOD false)
@@ -138,7 +138,7 @@ option(G2O_USE_CSPARSE "Build g2o with CSParse support" ON)
 
 if(G2O_USE_CSPARSE)
    find_package(CSparse)
-   if (NOT CSPARSE_FOUND)
+   if (NOT G2O_USE_CSPARSE)
       set(G2O_USE_CSPARSE false)
    endif()
 endif()
@@ -153,6 +153,7 @@ option(BUILD_LGPL_SHARED_LIBS "Build LGPL Code as Shared Libraries (LGPL Code)" 
 set (G2O_LGPL_LIB_TYPE STATIC)
 if (BUILD_LGPL_SHARED_LIBS)
   set (G2O_LGPL_LIB_TYPE SHARED)
+  message(STATUS "Building LGPL code as shared library")
 else()
   message(STATUS "Building LGPL code as static library (affects license of the binary)")
 endif()
@@ -163,14 +164,19 @@ set(G2O_USE_OPENMP OFF CACHE BOOL "Build g2o with OpenMP support (EXPERIMENTAL)"
 if (G2O_USE_OPENMP)
   find_package(OpenMP)
   if (OPENMP_FOUND)
-    set (G2O_OPENMP 1)
     set(g2o_C_FLAGS "${g2o_C_FLAGS} ${OpenMP_C_FLAGS}")
     set(g2o_CXX_FLAGS "${g2o_CXX_FLAGS} -DEIGEN_DONT_PARALLELIZE ${OpenMP_CXX_FLAGS}")
-    message(STATUS "Compiling with OpenMP support")
   else()
     set(G2O_USE_OPENMP false)
   endif(OPENMP_FOUND)
 endif(G2O_USE_OPENMP)
+
+if (G2O_USE_OPENMP)
+  message(STATUS "Compiling with OpenMP support")
+else()
+  message(STATUS "Compiling without OpenMP support")
+endif()
+
 
 # OpenGL is used in the draw actions for the different types, as well
 # as for creating the GUI itself
@@ -198,6 +204,17 @@ endif()
 # For building the GUI; enabled if OpenGL is avaiable
 if (G2O_USE_OPENGL)
   find_package(QGLViewer)
+  if (QGLVIEWER_FOUND AND Qt5_FOUND)
+     set(G2O_BUILD_VIEWER 1)
+  else()
+     set(G2O_BUILD_VIEWER 0)
+  endif()
+endif()
+
+if(G2O_BUILD_VIEWER)
+  message(STATUS "Building the OpenGL / Qt5 Viewer")
+else()
+  message(STATUS "Not building the OpenGL / Qt5 Viewer")
 endif()
 
 # shall we build the core apps using the library
@@ -402,11 +419,13 @@ endif ()
 include_directories(${g2o_SOURCE_DIR} ${PROJECT_BINARY_DIR})
 
 # Generate config.h
+set(G2O_USE_OPENMP ${G2O_USE_OPENMP})
+set(G2O_SHARED_LIBS ${BUILD_SHARED_LIBS})
+set(G2O_LGPL_SHARED_LIBS ${BUILD_LGPL_SHARED_LIBS})
+
 set(G2O_USE_OPENGL ${G2O_USE_OPENGL})
 set(G2O_USE_CHOLMOD ${G2O_USE_CHOLMOD})
 set(G2O_USE_CSPARSE ${G2O_USE_CSPARSE})
-set(G2O_SHARED_LIBS ${BUILD_SHARED_LIBS})
-set(G2O_LGPL_SHARED_LIBS ${BUILD_LGPL_SHARED_LIBS})
 set(G2O_CXX_COMPILER "${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER}")
 
 configure_file(config.h.in "${PROJECT_BINARY_DIR}/g2o/config.h")

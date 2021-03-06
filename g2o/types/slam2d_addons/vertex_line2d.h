@@ -92,7 +92,7 @@ namespace g2o {
       int p1Id, p2Id;
   };
 
-#ifdef G2O_HAVE_OPENGL
+#ifdef G2O_USE_OPENGL
   class G2O_TYPES_SLAM2D_ADDONS_API VertexLine2DDrawAction: public DrawAction{
   public:
     VertexLine2DDrawAction();

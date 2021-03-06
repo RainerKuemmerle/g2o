@@ -15,12 +15,12 @@ add_subdirectory(tutorial_slam2d)
 
 # The condition on cholmod is required here because the cholmod solver
 # is explicitly used in these examples.
-if(CHOLMOD_FOUND)
+if(G2O_USE_CHOLMOD)
   add_subdirectory(ba)
   add_subdirectory(ba_anchored_inverse_depth)
   add_subdirectory(target)
 endif()
 
-if(Qt5_FOUND AND QGLVIEWER_FOUND)
+if(G2O_BUILD_VIEWER)
   add_subdirectory(slam2d)
 endif()

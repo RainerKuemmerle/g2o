@@ -53,7 +53,7 @@ bool EdgeSE3PlaneSensorCalib::write(std::ostream& os) const {
   return writeInformationMatrix(os);
 }
 
-#ifdef G2O_HAVE_OPENGL
+#ifdef G2O_USE_OPENGL
 EdgeSE3PlaneSensorCalibDrawAction::EdgeSE3PlaneSensorCalibDrawAction()
     : DrawAction(typeid(EdgeSE3PlaneSensorCalib).name()), _planeWidth(nullptr), _planeHeight(nullptr) {}
 

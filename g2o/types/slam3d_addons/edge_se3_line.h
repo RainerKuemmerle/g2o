@@ -81,7 +81,7 @@ namespace g2o {
 
   };
 
-#ifdef G2O_HAVE_OPENGL
+#ifdef G2O_USE_OPENGL
   class EdgeSE3Line3DDrawAction : public DrawAction {
   public:
     G2O_TYPES_SLAM3D_ADDONS_API EdgeSE3Line3DDrawAction();

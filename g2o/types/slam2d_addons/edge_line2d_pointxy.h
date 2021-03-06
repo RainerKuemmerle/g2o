@@ -89,7 +89,7 @@ namespace g2o {
 /*             HyperGraphElementAction::Parameters* params_); */
 /*   }; */
 
-/* #ifdef G2O_HAVE_OPENGL */
+/* #ifdef G2O_USE_OPENGL */
 /*   class G2O_TYPES_SLAM2D_ADDONS_API EdgeLine2DPointXYDrawAction: public DrawAction{ */
 /*   public: */
 /*     EdgeLine2DPointXYDrawAction(); */

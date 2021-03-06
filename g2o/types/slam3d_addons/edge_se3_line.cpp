@@ -67,7 +67,7 @@ namespace g2o {
     return cache != 0;
   }
 
-#ifdef G2O_HAVE_OPENGL
+#ifdef G2O_USE_OPENGL
   EdgeSE3Line3DDrawAction::EdgeSE3Line3DDrawAction()
       : DrawAction(typeid(EdgeSE3Line3D).name()), _lineLength(nullptr), _lineWidth(nullptr) {}
 

@@ -28,7 +28,7 @@
 #include "isometry3d_gradients.h"
 #include "isometry3d_mappings.h"
 
-#ifdef G2O_HAVE_OPENGL
+#ifdef G2O_USE_OPENGL
 #include "g2o/stuff/opengl_wrapper.h"
 #include "g2o/stuff/opengl_primitives.h"
 #endif
@@ -93,7 +93,7 @@ namespace g2o {
     _w2i.matrix().topLeftCorner<3,4>() = params->Kcam() * w2n().matrix().topLeftCorner<3,4>();
   }
 
-#ifdef G2O_HAVE_OPENGL
+#ifdef G2O_USE_OPENGL
 
   CacheCameraDrawAction::CacheCameraDrawAction(): DrawAction(typeid(CacheCamera).name()){
     _previousParams = (DrawAction::Parameters*)0x42;

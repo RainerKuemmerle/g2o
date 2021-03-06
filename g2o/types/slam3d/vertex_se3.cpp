@@ -26,7 +26,7 @@
 
 #include "vertex_se3.h"
 #include "g2o/core/factory.h"
-#ifdef G2O_HAVE_OPENGL
+#ifdef G2O_USE_OPENGL
 #include "g2o/stuff/opengl_wrapper.h"
 #include "g2o/stuff/opengl_primitives.h"
 #endif
@@ -78,7 +78,7 @@ namespace g2o {
     return this;
   }
 
-#ifdef G2O_HAVE_OPENGL
+#ifdef G2O_USE_OPENGL
   void drawTriangle(float xSize, float ySize){
     Vector3F p[3];
     glBegin(GL_TRIANGLES);

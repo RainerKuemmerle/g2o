@@ -30,7 +30,7 @@
 #include <windows.h>
 #endif
 
-#ifdef G2O_HAVE_OPENGL
+#ifdef G2O_USE_OPENGL
 #include "g2o/stuff/opengl_wrapper.h"
 #endif
 
@@ -75,7 +75,7 @@ namespace g2o {
     return this;
   }
 
-#ifdef G2O_HAVE_OPENGL
+#ifdef G2O_USE_OPENGL
   VertexSegment2DDrawAction::VertexSegment2DDrawAction()
       : DrawAction(typeid(VertexSegment2D).name()), _pointSize(nullptr) {}
 

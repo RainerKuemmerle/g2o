@@ -165,7 +165,7 @@ namespace g2o {
       std::vector<PoseVectorType, Eigen::aligned_allocator<PoseVectorType> > _diagonalBackupPose;
       std::vector<LandmarkVectorType, Eigen::aligned_allocator<LandmarkVectorType> > _diagonalBackupLandmark;
 
-#    ifdef G2O_OPENMP
+#    ifdef G2O_USE_OPENMP
       std::vector<OpenMPMutex> _coefficientsMutex;
 #    endif
 

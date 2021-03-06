@@ -26,7 +26,7 @@
 
 #include "vertex_point_xy.h"
 
-#ifdef G2O_HAVE_OPENGL
+#ifdef G2O_USE_OPENGL
 #include "g2o/stuff/opengl_wrapper.h"
 #include "g2o/stuff/opengl_primitives.h"
 #endif
@@ -70,7 +70,7 @@ namespace g2o {
     return this;
   }
 
-#ifdef G2O_HAVE_OPENGL
+#ifdef G2O_USE_OPENGL
   VertexPointXYDrawAction::VertexPointXYDrawAction() : DrawAction(typeid(VertexPointXY).name()), _pointSize(nullptr) {}
 
   bool VertexPointXYDrawAction::refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_){

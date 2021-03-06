@@ -22,7 +22,7 @@ if (APPLE)
   set_target_properties(types_slam3d_addons PROPERTIES INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
 endif()
 target_link_libraries(types_slam3d_addons types_slam3d core)
-if(G2O_HAVE_OPENGL)
+if(G2O_USE_OPENGL)
   target_link_libraries(types_slam3d_addons ${OPENGL_gl_LIBRARY} )
 endif()
 

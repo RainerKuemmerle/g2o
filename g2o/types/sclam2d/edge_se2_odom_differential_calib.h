@@ -66,7 +66,7 @@ namespace g2o {
       virtual bool write(std::ostream& os) const;
   };
 
-#ifdef G2O_HAVE_OPENGL
+#ifdef G2O_USE_OPENGL
   class G2O_TYPES_SCLAM2D_API EdgeSE2OdomDifferentialCalibDrawAction: public DrawAction {
     public:
       EdgeSE2OdomDifferentialCalibDrawAction();

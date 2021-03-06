@@ -49,7 +49,7 @@ namespace g2o
     return state;
   }
 
-#ifdef G2O_HAVE_OPENGL
+#ifdef G2O_USE_OPENGL
 
   VertexPlaneDrawAction::VertexPlaneDrawAction()
       : DrawAction(typeid(VertexPlane).name()), _planeWidth(nullptr), _planeHeight(nullptr) {}

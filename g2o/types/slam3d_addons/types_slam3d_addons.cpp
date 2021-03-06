@@ -45,7 +45,7 @@ namespace g2o {
   G2O_REGISTER_TYPE(EDGE_PLANE, EdgePlane);
   G2O_REGISTER_TYPE(EDGE_SE3_CALIB, EdgeSE3Calib);
 
-#ifdef G2O_HAVE_OPENGL
+#ifdef G2O_USE_OPENGL
   G2O_REGISTER_ACTION(CacheCameraDrawAction);
   G2O_REGISTER_ACTION(VertexPlaneDrawAction);  
   G2O_REGISTER_ACTION(EdgeSE3PlaneSensorCalibDrawAction);
@@ -60,7 +60,7 @@ namespace g2o {
       return;
     initialized = true;
 
-#ifdef G2O_HAVE_OPENGL
+#ifdef G2O_USE_OPENGL
     HyperGraphActionLibrary* actionLib = HyperGraphActionLibrary::instance();
     HyperGraphElementAction* vertexse3eulerdraw=new g2o::VertexSE3DrawAction;
     vertexse3eulerdraw->setTypeName(typeid(VertexSE3Euler).name());

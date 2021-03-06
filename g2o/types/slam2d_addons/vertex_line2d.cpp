@@ -30,7 +30,7 @@
 #include <windows.h>
 #endif
 
-#ifdef G2O_HAVE_OPENGL
+#ifdef G2O_USE_OPENGL
 #include "g2o/stuff/opengl_wrapper.h"
 #endif
 
@@ -54,7 +54,7 @@ namespace g2o {
     return os.good();
   }
 
-#ifdef G2O_HAVE_OPENGL
+#ifdef G2O_USE_OPENGL
   VertexLine2DDrawAction::VertexLine2DDrawAction() : DrawAction(typeid(VertexLine2D).name()), _pointSize(nullptr) {}
 
   bool VertexLine2DDrawAction::refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_){

@@ -109,7 +109,7 @@ namespace g2o {
         Eigen::Map<VectorX> destVec(dest, destSize);
         Eigen::Map<const VectorX> srcVec(src, rows());
 
-#      ifdef G2O_OPENMP
+#      ifdef G2O_USE_OPENMP
 #      pragma omp parallel for default (shared) schedule(dynamic, 10)
 #      endif
         for (int i=0; i < static_cast<int>(_blockCols.size()); ++i){

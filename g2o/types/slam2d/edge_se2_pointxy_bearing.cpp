@@ -26,7 +26,7 @@
 
 #include "edge_se2_pointxy_bearing.h"
 
-#ifdef G2O_HAVE_OPENGL
+#ifdef G2O_USE_OPENGL
 #include "g2o/stuff/opengl_wrapper.h"
 #include "g2o/stuff/opengl_primitives.h"
 #endif
@@ -88,7 +88,7 @@ namespace g2o {
     return this;
   }
 
-#ifdef G2O_HAVE_OPENGL
+#ifdef G2O_USE_OPENGL
   EdgeSE2PointXYBearingDrawAction::EdgeSE2PointXYBearingDrawAction(): DrawAction(typeid(EdgeSE2PointXYBearing).name()){}
 
   HyperGraphElementAction* EdgeSE2PointXYBearingDrawAction::operator()(HyperGraph::HyperGraphElement* element,  HyperGraphElementAction::Parameters* params_){

@@ -17,7 +17,7 @@ endif()
 
 
 target_link_libraries(types_data core types_slam2d)
-if(G2O_HAVE_OPENGL)
+if(G2O_USE_OPENGL)
   target_link_libraries(types_data freeglut_minimal opengl_helper)
 endif()
 

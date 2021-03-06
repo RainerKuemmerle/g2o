@@ -112,7 +112,7 @@ namespace g2o {
 //     return this;
 //   }
 
-// #ifdef G2O_HAVE_OPENGL
+// #ifdef G2O_USE_OPENGL
 //   EdgeSE2Line2DDrawAction::EdgeSE2Line2DDrawAction(): DrawAction(typeid(EdgeSE2Line2D).name()){}
 
 //   HyperGraphElementAction* EdgeSE2Line2DDrawAction::operator()(HyperGraph::HyperGraphElement* element,

@@ -27,7 +27,7 @@
 #include "vertex_pointxyz.h"
 #include <stdio.h>
 
-#ifdef G2O_HAVE_OPENGL
+#ifdef G2O_USE_OPENGL
 #include "g2o/stuff/opengl_primitives.h"
 #include "g2o/stuff/opengl_wrapper.h"
 #endif
@@ -40,7 +40,7 @@ bool VertexPointXYZ::read(std::istream& is) { return internal::readVector(is, _e
 
 bool VertexPointXYZ::write(std::ostream& os) const { return internal::writeVector(os, estimate()); }
 
-#ifdef G2O_HAVE_OPENGL
+#ifdef G2O_USE_OPENGL
 VertexPointXYZDrawAction::VertexPointXYZDrawAction() : DrawAction(typeid(VertexPointXYZ).name()), _pointSize(nullptr) {}
 
 bool VertexPointXYZDrawAction::refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_) {

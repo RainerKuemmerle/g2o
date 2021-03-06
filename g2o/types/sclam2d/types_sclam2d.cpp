@@ -44,7 +44,7 @@ namespace g2o {
   G2O_REGISTER_TYPE(EDGE_SE2_CALIB, EdgeSE2SensorCalib);
   G2O_REGISTER_TYPE(EDGE_SE2_ODOM_DIFFERENTIAL_CALIB, EdgeSE2OdomDifferentialCalib);
 
-#ifdef G2O_HAVE_OPENGL
+#ifdef G2O_USE_OPENGL
   G2O_REGISTER_ACTION(EdgeSE2SensorCalibDrawAction);
   G2O_REGISTER_ACTION(EdgeSE2OdomDifferentialCalibDrawAction);
 #endif

@@ -2,14 +2,14 @@ add_subdirectory(pcg)
 add_subdirectory(dense)
 add_subdirectory(structure_only)
 
-if(CSPARSE_FOUND)
+if(G2O_USE_CSPARSE)
   add_subdirectory(csparse)
   add_subdirectory(slam2d_linear)
 endif()
 
-if(CHOLMOD_FOUND)
+if(G2O_USE_CHOLMOD)
   add_subdirectory(cholmod)
-endif(CHOLMOD_FOUND)
+endif(G2O_USE_CHOLMOD)
 
 # Sparse Module of Eigen is stable starting from 3.1
 if (DEFINED EIGEN3_VERSION)

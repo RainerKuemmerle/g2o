@@ -90,7 +90,7 @@ class G2O_TYPES_SLAM2D_ADDONS_API VertexSegment2DWriteGnuplotAction : public Wri
                                               HyperGraphElementAction::Parameters* params_);
 };
 
-#ifdef G2O_HAVE_OPENGL
+#ifdef G2O_USE_OPENGL
 class G2O_TYPES_SLAM2D_ADDONS_API VertexSegment2DDrawAction : public DrawAction {
  public:
   VertexSegment2DDrawAction();

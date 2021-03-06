@@ -27,7 +27,7 @@
 #include "vertex_se2.h"
 #include <typeinfo>
 
-#ifdef G2O_HAVE_OPENGL
+#ifdef G2O_USE_OPENGL
 #include "g2o/stuff/opengl_wrapper.h"
 #include "g2o/stuff/opengl_primitives.h"
 #endif
@@ -69,7 +69,7 @@ namespace g2o {
     return this;
   }
 
-#ifdef G2O_HAVE_OPENGL
+#ifdef G2O_USE_OPENGL
   VertexSE2DrawAction::VertexSE2DrawAction()
       : DrawAction(typeid(VertexSE2).name()), _drawActions(nullptr), _triangleX(nullptr), _triangleY(nullptr) {}
 

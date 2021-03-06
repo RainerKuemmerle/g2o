@@ -39,7 +39,7 @@ namespace g2o {
 
   namespace internal {
 
-  #ifdef G2O_OPENMP
+  #ifdef G2O_USE_OPENMP
     struct QuadraticFormLock {
       explicit QuadraticFormLock(OptimizableGraph::Vertex& vertex)
         :_vertex(vertex) {

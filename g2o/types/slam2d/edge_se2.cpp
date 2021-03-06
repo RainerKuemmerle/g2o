@@ -26,7 +26,7 @@
 
 #include "edge_se2.h"
 
-#ifdef G2O_HAVE_OPENGL
+#ifdef G2O_USE_OPENGL
 #include "g2o/stuff/opengl_wrapper.h"
 #include "g2o/stuff/opengl_primitives.h"
 #endif
@@ -116,7 +116,7 @@ namespace g2o {
     return this;
   }
 
-#ifdef G2O_HAVE_OPENGL
+#ifdef G2O_USE_OPENGL
   EdgeSE2DrawAction::EdgeSE2DrawAction()
       : DrawAction(typeid(EdgeSE2).name()), _triangleX(nullptr), _triangleY(nullptr) {}
 

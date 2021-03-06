@@ -30,7 +30,7 @@
 #include <windows.h>
 #endif
 
-#ifdef G2O_HAVE_OPENGL
+#ifdef G2O_USE_OPENGL
 #ifdef __APPLE__
 #include <OpenGL/gl.h>
 #else
@@ -126,7 +126,7 @@ namespace g2o {
 //     return this;
 //   }
 
-// #ifdef G2O_HAVE_OPENGL
+// #ifdef G2O_USE_OPENGL
 //   EdgeLine2DPointXYDrawAction::EdgeLine2DPointXYDrawAction(): DrawAction(typeid(EdgeLine2DPointXY).name()){}
 
 //   HyperGraphElementAction* EdgeLine2DPointXYDrawAction::operator()(HyperGraph::HyperGraphElement* element,

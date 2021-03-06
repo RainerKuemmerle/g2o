@@ -43,7 +43,7 @@ namespace g2o {
   G2O_REGISTER_TYPE(ROBOTLASER1, RobotLaser);
   G2O_REGISTER_TYPE(VERTEX_ELLIPSE, VertexEllipse);
 
-#ifdef G2O_HAVE_OPENGL 
+#ifdef G2O_USE_OPENGL 
   G2O_REGISTER_ACTION(RobotLaserDrawAction);
   G2O_REGISTER_ACTION(VertexTagDrawAction);
   G2O_REGISTER_ACTION(VertexEllipseDrawAction);

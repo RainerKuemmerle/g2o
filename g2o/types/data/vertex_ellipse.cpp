@@ -29,7 +29,7 @@
 #include "g2o/stuff/macros.h"
 #include "g2o/stuff/misc.h"
 
-#ifdef G2O_HAVE_OPENGL
+#ifdef G2O_USE_OPENGL
 #include "g2o/stuff/opengl_wrapper.h"
 #include "g2o/stuff/opengl_primitives.h"
 #include "EXTERNAL/freeglut/freeglut_minimal.h"
@@ -97,7 +97,7 @@ void VertexEllipse::_updateSVD() const {
 
 
 
-#ifdef G2O_HAVE_OPENGL
+#ifdef G2O_USE_OPENGL
   VertexEllipseDrawAction::VertexEllipseDrawAction(): DrawAction(typeid(VertexEllipse).name()){
     _scaleFactor = 0;
   }

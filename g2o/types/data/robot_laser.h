@@ -59,7 +59,7 @@ namespace g2o {
       number_t _laserTv, _laserRv, _forwardSafetyDist, _sideSaftyDist, _turnAxis;
   };
 
-#ifdef G2O_HAVE_OPENGL
+#ifdef G2O_USE_OPENGL
   class G2O_TYPES_DATA_API RobotLaserDrawAction: public DrawAction{
   public:
     RobotLaserDrawAction();

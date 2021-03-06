@@ -132,7 +132,7 @@ namespace g2o {
           HyperGraphElementAction::Parameters* params_ );
   };
 
-#ifdef G2O_HAVE_OPENGL
+#ifdef G2O_USE_OPENGL
   /**
    * \brief visualize the 3D pose vertex
    */

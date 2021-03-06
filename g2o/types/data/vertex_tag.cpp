@@ -28,7 +28,7 @@
 
 #include "g2o/stuff/macros.h"
 
-#ifdef G2O_HAVE_OPENGL
+#ifdef G2O_USE_OPENGL
 #include "g2o/stuff/opengl_wrapper.h"
 #include "g2o/stuff/opengl_primitives.h"
 #include "EXTERNAL/freeglut/freeglut_minimal.h"
@@ -69,7 +69,7 @@ namespace g2o {
 
 
 
-#ifdef G2O_HAVE_OPENGL
+#ifdef G2O_USE_OPENGL
   VertexTagDrawAction::VertexTagDrawAction() : DrawAction(typeid(VertexTag).name()), _textSize(nullptr) {}
 
   bool VertexTagDrawAction::refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_){

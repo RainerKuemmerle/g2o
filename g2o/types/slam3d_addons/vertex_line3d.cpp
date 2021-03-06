@@ -45,7 +45,7 @@ namespace g2o {
     return internal::writeVector(os, _estimate);
   }
 
-#ifdef G2O_HAVE_OPENGL
+#ifdef G2O_USE_OPENGL
   VertexLine3DDrawAction::VertexLine3DDrawAction()
       : DrawAction(typeid(VertexLine3D).name()), _lineLength(nullptr), _lineWidth(nullptr) {}
 

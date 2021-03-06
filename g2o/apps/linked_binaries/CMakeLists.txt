@@ -9,7 +9,7 @@ set_target_properties(g2o_cli_application_linked PROPERTIES OUTPUT_NAME g2o_link
 
 # linking solvers
 target_link_libraries(g2o_cli_application_linked solver_csparse solver_pcg)
-if(CHOLMOD_FOUND)
+if(G2O_USE_CHOLMOD)
   target_link_libraries(g2o_cli_application_linked solver_cholmod)
 endif()
 # linking types
@@ -36,7 +36,7 @@ if(QT4_FOUND AND QGLVIEWER_FOUND)
 
   # linking solvers
   target_link_libraries(g2o_viewer_linked solver_csparse solver_pcg)
-  if(CHOLMOD_FOUND)
+  if(G2O_USE_CHOLMOD)
     target_link_libraries(g2o_viewer_linked solver_cholmod)
   endif()
   # linking types

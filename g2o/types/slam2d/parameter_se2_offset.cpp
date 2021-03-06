@@ -29,7 +29,7 @@
 #include "g2o/core/io_helper.h"
 #include "vertex_se2.h"
 
-#ifdef G2O_HAVE_OPENGL
+#ifdef G2O_USE_OPENGL
 #include "g2o/stuff/opengl_wrapper.h"
 #endif
 

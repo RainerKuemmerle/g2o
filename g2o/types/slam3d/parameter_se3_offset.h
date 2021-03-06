@@ -92,7 +92,7 @@ namespace g2o {
   };
 
 
-#ifdef G2O_HAVE_OPENGL
+#ifdef G2O_USE_OPENGL
   class G2O_TYPES_SLAM3D_API CacheSE3OffsetDrawAction: public DrawAction{
     public:
       CacheSE3OffsetDrawAction();

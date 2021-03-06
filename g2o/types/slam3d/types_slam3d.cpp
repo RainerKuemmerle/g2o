@@ -61,7 +61,7 @@ namespace g2o {
   G2O_REGISTER_ACTION(VertexPointXYZWriteGnuplotAction);
   G2O_REGISTER_ACTION(EdgeSE3WriteGnuplotAction);
 
-#ifdef G2O_HAVE_OPENGL
+#ifdef G2O_USE_OPENGL
   G2O_REGISTER_ACTION(VertexPointXYZDrawAction);
   G2O_REGISTER_ACTION(VertexSE3DrawAction);
   G2O_REGISTER_ACTION(EdgeSE3DrawAction);

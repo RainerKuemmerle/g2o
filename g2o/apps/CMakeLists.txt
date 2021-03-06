@@ -1,11 +1,11 @@
 add_subdirectory(g2o_cli)
 add_subdirectory(g2o_hierarchical)
 
-if (G2O_HAVE_OPENGL)
+if (G2O_USE_OPENGL)
   add_subdirectory(g2o_simulator)
 endif()
 
-if(QGLVIEWER_FOUND AND Qt5_FOUND)
+if(G2O_BUILD_VIEWER)
   add_subdirectory(g2o_viewer)
 endif()
 

@@ -28,7 +28,7 @@
 #include "vertex_se3.h"
 #include "isometry3d_gradients.h"
 
-#ifdef G2O_HAVE_OPENGL
+#ifdef G2O_USE_OPENGL
 #include "g2o/stuff/opengl_wrapper.h"
 #include "g2o/stuff/opengl_primitives.h"
 #endif
@@ -80,7 +80,7 @@ namespace g2o {
     _offsetParam = offsetParam;
   }
 
-#ifdef G2O_HAVE_OPENGL
+#ifdef G2O_USE_OPENGL
   CacheSE3OffsetDrawAction::CacheSE3OffsetDrawAction(): DrawAction(typeid(CacheSE3Offset).name()){
     _previousParams = (DrawAction::Parameters*)0x42;
     refreshPropertyPtrs(0);

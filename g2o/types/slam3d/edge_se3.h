@@ -94,7 +94,7 @@ namespace g2o {
             HyperGraphElementAction::Parameters* params_);
   };
 
-#ifdef G2O_HAVE_OPENGL
+#ifdef G2O_USE_OPENGL
   /**
    * \brief Visualize a 3D pose-pose constraint
    */

@@ -104,7 +104,7 @@ void EdgeSE2Segment2D::initialEstimate(const OptimizableGraph::VertexSet& from, 
 //     return this;
 //   }
 
-// #ifdef G2O_HAVE_OPENGL
+// #ifdef G2O_USE_OPENGL
 //   EdgeSE2Segment2DDrawAction::EdgeSE2Segment2DDrawAction(): DrawAction(typeid(EdgeSE2Segment2D).name()){}
 
 //   HyperGraphElementAction* EdgeSE2Segment2DDrawAction::operator()(HyperGraph::HyperGraphElement* element,
