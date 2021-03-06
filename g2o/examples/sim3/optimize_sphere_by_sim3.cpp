@@ -24,15 +24,15 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+#include <Eigen/Core>
+#include <Eigen/StdVector>
 #include <cmath>
 #include <fstream>
 #include <iostream>
 #include <vector>
 
-#include <Eigen/Core>
-#include <Eigen/StdVector>
-
 #include "g2o/core/block_solver.h"
+#include "g2o/core/factory.h"
 #include "g2o/core/optimization_algorithm_gauss_newton.h"
 #include "g2o/core/optimization_algorithm_levenberg.h"
 #include "g2o/core/robust_kernel_impl.h"
@@ -45,16 +45,13 @@
 #include "g2o/types/slam3d/types_slam3d.h"
 #include "g2o/types/slam3d/vertex_se3.h"
 
-#include "g2o/core/factory.h"
-
 using namespace std;
 using namespace g2o;
 
 extern "C" void G2O_FACTORY_EXPORT g2o_type_VertexSE3(void);
 
 // Convert SE3 Vertex to Sim3 Vertex
-void ToVertexSim3(const g2o::VertexSE3& v_se3,
-                  g2o::VertexSim3Expmap* const v_sim3) {
+void ToVertexSim3(const g2o::VertexSE3& v_se3, g2o::VertexSim3Expmap* const v_sim3) {
   Eigen::Isometry3d se3 = v_se3.estimate().inverse();
   Eigen::Matrix3d r = se3.rotation();
   Eigen::Vector3d t = se3.translation();
@@ -64,8 +61,7 @@ void ToVertexSim3(const g2o::VertexSE3& v_se3,
 }
 
 // Convert Sim3 Vertex to SE3 Vertex
-void ToVertexSE3(const g2o::VertexSim3Expmap& v_sim3,
-                 g2o::VertexSE3* const v_se3) {
+void ToVertexSE3(const g2o::VertexSim3Expmap& v_sim3, g2o::VertexSE3* const v_se3) {
   g2o::Sim3 sim3 = v_sim3.estimate().inverse();
   Eigen::Matrix3d r = sim3.rotation().toRotationMatrix();
   Eigen::Vector3d t = sim3.translation();
@@ -106,8 +102,7 @@ int main(int argc, char** argv) {
 
   //  define the optimizer
   typedef g2o::BlockSolver<g2o::BlockSolverTraits<7, 7>> BlockSolverType;
-  typedef g2o::LinearSolverEigen<BlockSolverType::PoseMatrixType>
-      LinearSolverType;
+  typedef g2o::LinearSolverEigen<BlockSolverType::PoseMatrixType> LinearSolverType;
   std::unique_ptr<g2o::OptimizationAlgorithm> solver(new g2o::OptimizationAlgorithmLevenberg(
       g2o::make_unique<BlockSolverType>(g2o::make_unique<LinearSolverType>())));
 
@@ -122,12 +117,12 @@ int main(int argc, char** argv) {
   // Convert all vertices
   for (auto& tmp : interface.vertices()) {
     const int& id = tmp.first;
-    g2o::VertexSE3* v_se3 = static_cast<g2o::VertexSE3*>(tmp.second);
-    g2o::VertexSim3Expmap* v_sim3 = new g2o::VertexSim3Expmap();
+    auto v_se3 = std::static_pointer_cast<g2o::VertexSE3>(tmp.second);
+    auto v_sim3 = std::make_shared<g2o::VertexSim3Expmap>();
     v_sim3->setId(id);
     v_sim3->setMarginalized(false);
 
-    ToVertexSim3(*v_se3, v_sim3);
+    ToVertexSim3(*v_se3, v_sim3.get());
     optimizer.addVertex(v_sim3);
     if (id == 0) {
       v_sim3->setFixed(true);
@@ -137,12 +132,12 @@ int main(int argc, char** argv) {
   // Convert all edges
   int edge_index = 0;
   for (auto& tmp : interface.edges()) {
-    g2o::EdgeSE3* e_se3 = static_cast<g2o::EdgeSE3*>(tmp);
+    auto e_se3 = std::static_pointer_cast<g2o::EdgeSE3>(tmp);
     int idx0 = e_se3->vertex(0)->id();
     int idx1 = e_se3->vertex(1)->id();
-    g2o::EdgeSim3* e_sim3 = new g2o::EdgeSim3();
+    auto e_sim3 = std::make_shared<g2o::EdgeSim3>();
 
-    ToEdgeSim3(*e_se3, e_sim3);
+    ToEdgeSim3(*e_se3, e_sim3.get());
     e_sim3->setId(edge_index++);
     e_sim3->setVertex(0, optimizer.vertices()[idx0]);
     e_sim3->setVertex(1, optimizer.vertices()[idx1]);
@@ -161,11 +156,10 @@ int main(int argc, char** argv) {
 
   for (auto& tmp : vertices_sim3) {
     const int& id = tmp.first;
-    g2o::VertexSim3Expmap* v_sim3 =
-        static_cast<g2o::VertexSim3Expmap*>(tmp.second);
-    g2o::VertexSE3* v_se3 = static_cast<g2o::VertexSE3*>(vertices_se3[id]);
+    auto v_sim3 = std::static_pointer_cast<g2o::VertexSim3Expmap>(tmp.second);
+    auto v_se3 = std::static_pointer_cast<g2o::VertexSE3>(vertices_se3[id]);
 
-    ToVertexSE3(*v_sim3, v_se3);
+    ToVertexSE3(*v_sim3, v_se3.get());
   }
 
   interface.save("result.g2o");

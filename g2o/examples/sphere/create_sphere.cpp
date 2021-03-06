@@ -24,24 +24,22 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include <iostream>
-#include <fstream>
-#include <vector>
-#include <cmath>
-
 #include <Eigen/Core>
+#include <cmath>
+#include <fstream>
+#include <iostream>
+#include <vector>
 
-#include "g2o/types/slam3d/vertex_se3.h"
-#include "g2o/types/slam3d/edge_se3.h"
-#include "g2o/stuff/sampler.h"
-#include "g2o/stuff/command_args.h"
 #include "g2o/core/factory.h"
+#include "g2o/stuff/command_args.h"
+#include "g2o/stuff/sampler.h"
+#include "g2o/types/slam3d/edge_se3.h"
+#include "g2o/types/slam3d/vertex_se3.h"
 
 using namespace std;
 using namespace g2o;
 
-int main (int argc, char** argv)
-{
+int main(int argc, char** argv) {
   // command line parsing
   int nodesPerLevel;
   int numLaps;
@@ -55,8 +53,12 @@ int main (int argc, char** argv)
   arg.param("nodesPerLevel", nodesPerLevel, 50, "how many nodes per lap on the sphere");
   arg.param("laps", numLaps, 50, "how many times the robot travels around the sphere");
   arg.param("radius", radius, 100., "radius of the sphere");
-  arg.param("noiseTranslation", noiseTranslation, std::vector<double>(), "set the noise level for the translation, separated by semicolons without spaces e.g: \"0.1;0.1;0.1\"");
-  arg.param("noiseRotation", noiseRotation, std::vector<double>(), "set the noise level for the rotation, separated by semicolons without spaces e.g: \"0.001;0.001;0.001\"");
+  arg.param("noiseTranslation", noiseTranslation, std::vector<double>(),
+            "set the noise level for the translation, separated by semicolons without spaces e.g: "
+            "\"0.1;0.1;0.1\"");
+  arg.param("noiseRotation", noiseRotation, std::vector<double>(),
+            "set the noise level for the rotation, separated by semicolons without spaces e.g: "
+            "\"0.001;0.001;0.001\"");
   arg.param("randomSeed", randomSeed, false, "use a randomized seed for generating the sphere");
   arg.parseArgs(argc, argv);
 
@@ -67,8 +69,7 @@ int main (int argc, char** argv)
     noiseTranslation.push_back(0.01);
   }
   cerr << "Noise for the translation:";
-  for (size_t i = 0; i < noiseTranslation.size(); ++i)
-    cerr << " " << noiseTranslation[i];
+  for (size_t i = 0; i < noiseTranslation.size(); ++i) cerr << " " << noiseTranslation[i];
   cerr << endl;
   if (noiseRotation.size() == 0) {
     cerr << "using default noise for the rotation" << endl;
@@ -77,49 +78,47 @@ int main (int argc, char** argv)
     noiseRotation.push_back(0.005);
   }
   cerr << "Noise for the rotation:";
-  for (size_t i = 0; i < noiseRotation.size(); ++i)
-    cerr << " " << noiseRotation[i];
+  for (size_t i = 0; i < noiseRotation.size(); ++i) cerr << " " << noiseRotation[i];
   cerr << endl;
 
   Eigen::Matrix3d transNoise = Eigen::Matrix3d::Zero();
-  for (int i = 0; i < 3; ++i)
-    transNoise(i, i) = std::pow(noiseTranslation[i], 2);
+  for (int i = 0; i < 3; ++i) transNoise(i, i) = std::pow(noiseTranslation[i], 2);
 
   Eigen::Matrix3d rotNoise = Eigen::Matrix3d::Zero();
-  for (int i = 0; i < 3; ++i)
-    rotNoise(i, i) = std::pow(noiseRotation[i], 2);
+  for (int i = 0; i < 3; ++i) rotNoise(i, i) = std::pow(noiseRotation[i], 2);
 
   Eigen::Matrix<double, 6, 6> information = Eigen::Matrix<double, 6, 6>::Zero();
-  information.block<3,3>(0,0) = transNoise.inverse();
-  information.block<3,3>(3,3) = rotNoise.inverse();
+  information.block<3, 3>(0, 0) = transNoise.inverse();
+  information.block<3, 3>(3, 3) = rotNoise.inverse();
 
-  vector<VertexSE3*> vertices;
-  vector<EdgeSE3*> odometryEdges;	
-  vector<EdgeSE3*> edges;	
+  vector<std::shared_ptr<VertexSE3>> vertices;
+  vector<std::shared_ptr<EdgeSE3>> odometryEdges;
+  vector<std::shared_ptr<EdgeSE3>> edges;
   int id = 0;
-  for (int f = 0; f < numLaps; ++f){
+  for (int f = 0; f < numLaps; ++f) {
     for (int n = 0; n < nodesPerLevel; ++n) {
-      VertexSE3* v = new VertexSE3;
+      auto v = std::make_shared<VertexSE3>();
       v->setId(id++);
 
-      Eigen::AngleAxisd rotz(-M_PI + 2*n*M_PI / nodesPerLevel, Eigen::Vector3d::UnitZ());
-      Eigen::AngleAxisd roty(-0.5*M_PI + id*M_PI / (numLaps * nodesPerLevel), Eigen::Vector3d::UnitY());
+      Eigen::AngleAxisd rotz(-M_PI + 2 * n * M_PI / nodesPerLevel, Eigen::Vector3d::UnitZ());
+      Eigen::AngleAxisd roty(-0.5 * M_PI + id * M_PI / (numLaps * nodesPerLevel),
+                             Eigen::Vector3d::UnitY());
       Eigen::Matrix3d rot = (rotz * roty).toRotationMatrix();
 
       Eigen::Isometry3d t;
       t = rot;
       t.translation() = t.linear() * Eigen::Vector3d(radius, 0, 0);
       v->setEstimate(t);
-      vertices.push_back(v);
+      vertices.emplace_back(v);
     }
   }
 
   // generate odometry edges
   for (size_t i = 1; i < vertices.size(); ++i) {
-    VertexSE3* prev = vertices[i-1];
-    VertexSE3* cur  = vertices[i];
+    const auto& prev = vertices[i - 1];
+    const auto& cur = vertices[i];
     Eigen::Isometry3d t = prev->estimate().inverse() * cur->estimate();
-    EdgeSE3* e = new EdgeSE3;
+    auto e = std::make_shared<EdgeSE3>();
     e->setVertex(0, prev);
     e->setVertex(1, cur);
     e->setMeasurement(t);
@@ -131,13 +130,12 @@ int main (int argc, char** argv)
   // generate loop closure edges
   for (int f = 1; f < numLaps; ++f) {
     for (int nn = 0; nn < nodesPerLevel; ++nn) {
-      VertexSE3* from = vertices[(f-1)*nodesPerLevel + nn];
+      auto from = vertices[(f - 1) * nodesPerLevel + nn];
       for (int n = -1; n <= 1; ++n) {
-        if (f == numLaps-1 && n == 1)
-          continue;
-        VertexSE3* to   = vertices[f*nodesPerLevel + nn + n];
+        if (f == numLaps - 1 && n == 1) continue;
+        auto to = vertices[f * nodesPerLevel + nn + n];
         Eigen::Isometry3d t = from->estimate().inverse() * to->estimate();
-        EdgeSE3* e = new EdgeSE3;
+        auto e = std::make_shared<EdgeSE3>();
         e->setVertex(0, from);
         e->setVertex(1, to);
         e->setMeasurement(t);
@@ -158,8 +156,7 @@ int main (int argc, char** argv)
     vector<int> seeds(2);
     seedSeq.generate(seeds.begin(), seeds.end());
     cerr << "using seeds:";
-    for (size_t i = 0; i < seeds.size(); ++i)
-      cerr << " " << seeds[i];
+    for (size_t i = 0; i < seeds.size(); ++i) cerr << " " << seeds[i];
     cerr << endl;
     transSampler.seed(seeds[0]);
     rotSampler.seed(seeds[1]);
@@ -167,7 +164,7 @@ int main (int argc, char** argv)
 
   // noise for all the edges
   for (size_t i = 0; i < edges.size(); ++i) {
-    EdgeSE3* e = edges[i];
+    auto& e = edges[i];
     Eigen::Quaterniond gtQuat = (Eigen::Quaterniond)e->measurement().linear();
     Eigen::Vector3d gtTrans = e->measurement().translation();
 
@@ -183,17 +180,18 @@ int main (int argc, char** argv)
     rot = gtQuat * rot;
     trans = gtTrans + trans;
 
-    Eigen::Isometry3d noisyMeasurement = (Eigen::Isometry3d) rot;
+    Eigen::Isometry3d noisyMeasurement = (Eigen::Isometry3d)rot;
     noisyMeasurement.translation() = trans;
     e->setMeasurement(noisyMeasurement);
   }
 
   // concatenate all the odometry constraints to compute the initial state
-  for (size_t i =0; i < odometryEdges.size(); ++i) {
-    EdgeSE3* e = edges[i];
-    VertexSE3* from = static_cast<VertexSE3*>(e->vertex(0));
-    VertexSE3* to = static_cast<VertexSE3*>(e->vertex(1));
-    HyperGraph::VertexSet aux; aux.insert(from);
+  for (size_t i = 0; i < odometryEdges.size(); ++i) {
+    auto& e = odometryEdges[i];
+    auto from = std::static_pointer_cast<VertexSE3>(e->vertex(0));
+    VertexSE3* to = static_cast<VertexSE3*>(e->vertex(1).get());
+    HyperGraph::VertexSet aux;
+    aux.insert(from);
     e->initialEstimate(aux, to);
   }
 
@@ -206,21 +204,21 @@ int main (int argc, char** argv)
     cerr << "writing to stdout" << endl;
   }
 
-  string vertexTag = Factory::instance()->tag(vertices[0]);
-  string edgeTag = Factory::instance()->tag(edges[0]);
+  string vertexTag = Factory::instance()->tag(vertices[0].get());
+  string edgeTag = Factory::instance()->tag(edges[0].get());
 
   ostream& fout = outFilename != "-" ? fileOutputStream : cout;
   for (size_t i = 0; i < vertices.size(); ++i) {
-    VertexSE3* v = vertices[i];
+    VertexSE3* v = vertices[i].get();
     fout << vertexTag << " " << v->id() << " ";
     v->write(fout);
     fout << endl;
   }
 
   for (size_t i = 0; i < edges.size(); ++i) {
-    EdgeSE3* e = edges[i];
-    VertexSE3* from = static_cast<VertexSE3*>(e->vertex(0));
-    VertexSE3* to = static_cast<VertexSE3*>(e->vertex(1));
+    EdgeSE3* e = edges[i].get();
+    VertexSE3* from = static_cast<VertexSE3*>(e->vertex(0).get());
+    VertexSE3* to = static_cast<VertexSE3*>(e->vertex(1).get());
     fout << edgeTag << " " << from->id() << " " << to->id() << " ";
     e->write(fout);
     fout << endl;
