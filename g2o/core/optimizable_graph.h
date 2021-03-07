@@ -385,7 +385,6 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
 
    protected:
     OptimizableGraph* _graph;
-    Data* _userData;
     int _hessianIndex;
     bool _fixed;
     bool _marginalized;
@@ -787,24 +786,6 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
 /**
   @}
  */
-
-/**
- * helper function for creating a vertex in a shared_ptr.
- */
-template<typename T, typename ...ArgTs>
-std::shared_ptr<g2o::OptimizableGraph::Vertex> make_vertex(ArgTs&& ...args)
-{
-  return std::shared_ptr<g2o::OptimizableGraph::Vertex>(new T(std::forward<ArgTs>(args)...));
-};
-
-/**
- * helper function for creating an edge in a shared_ptr.
- */
-template<typename T, typename ...ArgTs>
-std::shared_ptr<g2o::OptimizableGraph::Edge> make_edge(ArgTs&& ...args)
-{
-  return std::shared_ptr<g2o::OptimizableGraph::Edge>(new T(std::forward<ArgTs>(args)...));
-};
 
 }  // namespace g2o
 

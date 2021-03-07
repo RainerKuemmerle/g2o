@@ -46,7 +46,7 @@ TEST(General, BinaryEdgeConstructor) {
 TEST(General, GraphAddVertex) {
   g2o::SparseOptimizer* optimizer = g2o::internal::createOptimizerForTests();
 
-  auto v1 = g2o::make_vertex<g2o::VertexSE2>();
+  auto v1 = std::make_shared<g2o::VertexSE2>();
   v1->setId(0);
   ASSERT_TRUE(optimizer->addVertex(v1));
   ASSERT_EQ(optimizer, v1->graph());
@@ -55,7 +55,7 @@ TEST(General, GraphAddVertex) {
   ASSERT_EQ(size_t(1), optimizer->vertices().size());
 
   {
-    auto v2 = g2o::make_vertex<g2o::VertexSE2>();
+    auto v2 = std::make_shared<g2o::VertexSE2>();
     v2->setId(0);
     ASSERT_FALSE(optimizer->addVertex(v2));
     ASSERT_EQ(size_t(1), optimizer->vertices().size());
@@ -68,15 +68,15 @@ TEST(General, GraphAddVertex) {
 TEST(General, GraphAddEdge) {
   g2o::SparseOptimizer* optimizer = g2o::internal::createOptimizerForTests();
 
-  auto v1 = g2o::make_vertex<g2o::VertexSE2>();
+  auto v1 = std::make_shared<g2o::VertexSE2>();
   v1->setId(0);
-  auto v2 = g2o::make_vertex<g2o::VertexSE2>();
+  auto v2 = std::make_shared<g2o::VertexSE2>();
   v2->setId(1);
 
   ASSERT_TRUE(optimizer->addVertex(v1));
   ASSERT_TRUE(optimizer->addVertex(v2));
 
-  auto e1 = g2o::make_edge<g2o::EdgeSE2>();
+  auto e1 = std::make_shared<g2o::EdgeSE2>();
   e1->setVertex(0, v1);
   e1->setVertex(1, v2);
   ASSERT_TRUE(optimizer->addEdge(e1));
@@ -88,12 +88,12 @@ TEST(General, GraphAddEdge) {
   ASSERT_EQ(size_t(1), v1->edges().count(e1));
   ASSERT_EQ(size_t(1), v2->edges().count(e1));
 
-  auto e2 = g2o::make_edge<g2o::EdgeSE2>();
+  auto e2 = std::make_shared<g2o::EdgeSE2>();
   ASSERT_FALSE(optimizer->addEdge(e2)) << "Adding edge with unset vertices was possible";
   ASSERT_EQ(size_t(1), optimizer->edges().size());
   ASSERT_EQ(nullptr, e2->graph());
 
-  auto e3 = g2o::make_edge<g2o::EdgeSE2>();
+  auto e3 = std::make_shared<g2o::EdgeSE2>();
   e3->setVertex(0, v1);
   e3->setVertex(1, v1);
   ASSERT_FALSE(optimizer->addEdge(e3)) << "Adding binary edge with same vertices was possible";

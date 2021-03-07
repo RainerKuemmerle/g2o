@@ -266,6 +266,10 @@ class BaseFixedSizedEdge : public BaseEdge<D, E> {
   HessianTupleTransposed _hessianTupleTransposed;
   std::tuple<JacobianType<D, VertexTypes::Dimension>...> _jacobianOplus;
 
+  /**
+   * Only for use internally in sub-classes. It exposes the raw pointer for implementation of, for
+   * example, computeError and other implementation of function in the scope of a sub-class.
+   */
   template <int VertexN>
   VertexXnType<VertexN>* vertexXnRaw() const {
     return static_cast<VertexXnType<VertexN>*>(_vertices[VertexN].get());

@@ -65,7 +65,6 @@ std::ostream& printIdChain(std::ostream& os, const std::vector<int>& ids) {
 OptimizableGraph::Vertex::Vertex()
     : HyperGraph::Vertex(),
       _graph(0),
-      _userData(0),
       _hessianIndex(-1),
       _fixed(false),
       _marginalized(false),
@@ -86,7 +85,6 @@ void OptimizableGraph::Vertex::updateCache() {
 
 OptimizableGraph::Vertex::~Vertex() {
   delete _cacheContainer;
-  delete _userData;
 }
 
 bool OptimizableGraph::Vertex::setEstimateData(const number_t* v) {
@@ -147,11 +145,13 @@ bool OptimizableGraph::Edge::resolveParameters() {
   for (size_t i = 0; i < _parameters.size(); i++) {
     int index = _parameterIds[i];
     *_parameters[i] = graph()->parameter(index).get();
+#ifndef NDEBUG
     auto& aux = **_parameters[i];
     if (typeid(aux).name() != _parameterTypes[i]) {
       cerr << __PRETTY_FUNCTION__ << ": FATAL, parameter type mismatch - encountered "
            << typeid(aux).name() << "; should be " << _parameterTypes[i] << endl;
     }
+#endif
     if (!*_parameters[i]) {
       cerr << __PRETTY_FUNCTION__ << ": FATAL, *_parameters[i] == 0" << endl;
       return false;
