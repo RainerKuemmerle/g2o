@@ -147,7 +147,7 @@ void Slam2DViewer::draw()
   glColor4f(0.00f, 0.67f, 1.00f, 1.f);
   glBegin(GL_TRIANGLES);
   for (SparseOptimizer::VertexIDMap::iterator it = graph->vertices().begin(); it != graph->vertices().end(); ++it) {
-    VertexSE2* v = dynamic_cast<VertexSE2*>(it->second);
+    VertexSE2* v = dynamic_cast<VertexSE2*>(it->second.get());
     if (v) {
       drawSE2(v);
     }
@@ -158,7 +158,7 @@ void Slam2DViewer::draw()
   glPointSize(2.f);
   glBegin(GL_POINTS);
   for (SparseOptimizer::VertexIDMap::iterator it = graph->vertices().begin(); it != graph->vertices().end(); ++it) {
-    VertexPointXY* v = dynamic_cast<VertexPointXY*>(it->second);
+    VertexPointXY* v = dynamic_cast<VertexPointXY*>(it->second.get());
     if (v) {
       glVertex3f(v->estimate()(0), v->estimate()(1), 0.f);
     }
@@ -168,7 +168,7 @@ void Slam2DViewer::draw()
 
   if (drawCovariance) {
     for (SparseOptimizer::VertexIDMap::iterator it = graph->vertices().begin(); it != graph->vertices().end(); ++it) {
-      VertexSE2* v = dynamic_cast<VertexSE2*>(it->second);
+      VertexSE2* v = dynamic_cast<VertexSE2*>(it->second.get());
       if (v) {
         // TODO
         //drawCov(v->estimate().translation(), v->uncertainty());

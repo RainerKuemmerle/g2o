@@ -115,7 +115,7 @@ void MainWindow::fixGraph() {
 
   // check for vertices to fix to remove DoF
   bool gaugeFreedom = viewer->graph->gaugeFreedom();
-  g2o::OptimizableGraph::Vertex* gauge = viewer->graph->findGauge();
+  auto gauge = viewer->graph->findGauge();
   if (gaugeFreedom) {
     if (!gauge) {
       cerr << "cannot find a vertex to fix in this thing" << endl;
