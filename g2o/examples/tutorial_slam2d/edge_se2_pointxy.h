@@ -27,39 +27,38 @@
 #ifndef G2O_TUTORIAL_EDGE_SE2_POINT_XY_H
 #define G2O_TUTORIAL_EDGE_SE2_POINT_XY_H
 
-#include "vertex_se2.h"
-#include "vertex_point_xy.h"
-#include "parameter_se2_offset.h"
-#include "g2o_tutorial_slam2d_api.h"
-
 #include "g2o/core/base_binary_edge.h"
+#include "g2o_tutorial_slam2d_api.h"
+#include "parameter_se2_offset.h"
+#include "vertex_point_xy.h"
+#include "vertex_se2.h"
 
 namespace g2o {
 
-  namespace tutorial {
+namespace tutorial {
 
-    class ParameterSE2Offset;
-    class CacheSE2Offset;
+class ParameterSE2Offset;
+class CacheSE2Offset;
 
-    class G2O_TUTORIAL_SLAM2D_API EdgeSE2PointXY : public BaseBinaryEdge<2, Eigen::Vector2d, VertexSE2, VertexPointXY>
-    {
-      public:
-        EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
-        EdgeSE2PointXY();
+class G2O_TUTORIAL_SLAM2D_API EdgeSE2PointXY
+    : public BaseBinaryEdge<2, Eigen::Vector2d, VertexSE2, VertexPointXY> {
+ public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
+  EdgeSE2PointXY();
 
-        void computeError();
-  
-        virtual bool read(std::istream& is);
-        virtual bool write(std::ostream& os) const;
-      
-      protected:
-        ParameterSE2Offset* _sensorOffset;
-        CacheSE2Offset* _sensorCache;
+  void computeError();
 
-        virtual bool resolveCaches();
-    };
+  virtual bool read(std::istream& is);
+  virtual bool write(std::ostream& os) const;
 
-  } // end namespace
-} // end namespace
+ protected:
+  ParameterSE2Offset* _sensorOffset;
+  CacheSE2Offset* _sensorCache;
+
+  virtual bool resolveCaches();
+};
+
+}  // namespace tutorial
+}  // namespace g2o
 
 #endif

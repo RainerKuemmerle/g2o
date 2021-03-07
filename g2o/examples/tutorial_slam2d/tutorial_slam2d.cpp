@@ -72,7 +72,7 @@ int main()
   optimizer.setAlgorithm(std::move(solver));
 
   // add the parameter representing the sensor offset
-  ParameterSE2Offset* sensorOffset = new ParameterSE2Offset;
+  auto sensorOffset = std::make_shared<ParameterSE2Offset>();
   sensorOffset->setOffset(sensorOffsetTransf);
   sensorOffset->setId(0);
   optimizer.addParameter(sensorOffset);
@@ -83,7 +83,7 @@ int main()
   for (size_t i = 0; i < simulator.poses().size(); ++i) {
     const Simulator::GridPose& p = simulator.poses()[i];
     const SE2& t = p.simulatorPose;
-    VertexSE2* robot =  new VertexSE2;
+    auto robot =  std::make_shared<VertexSE2>();
     robot->setId(p.id);
     robot->setEstimate(t);
     optimizer.addVertex(robot);
@@ -95,7 +95,7 @@ int main()
   for (size_t i = 0; i < simulator.odometry().size(); ++i) {
     const Simulator::GridEdge& simEdge = simulator.odometry()[i];
 
-    EdgeSE2* odometry = new EdgeSE2;
+    auto odometry = std::make_shared<EdgeSE2>();
     odometry->vertices()[0] = optimizer.vertex(simEdge.from);
     odometry->vertices()[1] = optimizer.vertex(simEdge.to);
     odometry->setMeasurement(simEdge.simulatorTransf);
@@ -108,7 +108,7 @@ int main()
   cerr << "Optimization: add landmark vertices ... ";
   for (size_t i = 0; i < simulator.landmarks().size(); ++i) {
     const Simulator::Landmark& l = simulator.landmarks()[i];
-    VertexPointXY* landmark = new VertexPointXY;
+    auto landmark = std::make_shared<VertexPointXY>();
     landmark->setId(l.id);
     landmark->setEstimate(l.simulatedPose);
     optimizer.addVertex(landmark);
@@ -118,7 +118,7 @@ int main()
   cerr << "Optimization: add landmark observations ... ";
   for (size_t i = 0; i < simulator.landmarkObservations().size(); ++i) {
     const Simulator::LandmarkEdge& simEdge = simulator.landmarkObservations()[i];
-    EdgeSE2PointXY* landmarkObservation =  new EdgeSE2PointXY;
+    auto landmarkObservation =  std::make_shared<EdgeSE2PointXY>();
     landmarkObservation->vertices()[0] = optimizer.vertex(simEdge.from);
     landmarkObservation->vertices()[1] = optimizer.vertex(simEdge.to);
     landmarkObservation->setMeasurement(simEdge.simulatorMeas);
@@ -138,7 +138,7 @@ int main()
 
   // prepare and run the optimization
   // fix the first robot pose to account for gauge freedom
-  VertexSE2* firstRobotPose = dynamic_cast<VertexSE2*>(optimizer.vertex(0));
+  auto firstRobotPose = std::dynamic_pointer_cast<VertexSE2>(optimizer.vertex(0));
   firstRobotPose->setFixed(true);
   optimizer.setVerbose(true);
 

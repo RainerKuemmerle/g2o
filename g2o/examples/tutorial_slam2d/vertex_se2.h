@@ -29,37 +29,32 @@
 
 #include "g2o/core/base_vertex.h"
 #include "g2o/core/hyper_graph_action.h"
-#include "se2.h"
 #include "g2o_tutorial_slam2d_api.h"
+#include "se2.h"
 
 namespace g2o {
-  namespace tutorial {
+namespace tutorial {
 
-    /**
-     * \brief 2D pose Vertex, (x,y,theta)
-     */
-    class G2O_TUTORIAL_SLAM2D_API VertexSE2 : public BaseVertex<3, SE2>
-    {
-      public:
-        EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
-        VertexSE2();
+/**
+ * \brief 2D pose Vertex, (x,y,theta)
+ */
+class G2O_TUTORIAL_SLAM2D_API VertexSE2 : public BaseVertex<3, SE2> {
+ public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
+  VertexSE2();
 
-        virtual void setToOriginImpl() {
-          _estimate=SE2();
-        }
+  virtual void setToOriginImpl() { _estimate = SE2(); }
 
-        virtual void oplusImpl(const double* update)
-        {
-          SE2 up(update[0], update[1], update[2]);
-          _estimate *= up;
-        }
+  virtual void oplusImpl(const double* update) {
+    SE2 up(update[0], update[1], update[2]);
+    _estimate *= up;
+  }
 
-        virtual bool read(std::istream& is);
-        virtual bool write(std::ostream& os) const;
+  virtual bool read(std::istream& is);
+  virtual bool write(std::ostream& os) const;
+};
 
-    };
-
-  } // end namespace
-} // end namespace
+}  // namespace tutorial
+}  // namespace g2o
 
 #endif
