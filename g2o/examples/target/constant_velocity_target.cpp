@@ -75,13 +75,13 @@ int main() {
 
   // Construct the first vertex; this corresponds to the initial
   // condition and register it with the optimiser
-  VertexPositionVelocity3D* stateNode = new VertexPositionVelocity3D();
+  auto stateNode = std::make_shared<VertexPositionVelocity3D>();
   stateNode->setEstimate(state);
   stateNode->setId(0);
   optimizer.addVertex(stateNode);
 
   // Set up last estimate
-  VertexPositionVelocity3D* lastStateNode = stateNode;
+  auto lastStateNode = stateNode;
 
   // Iterate over the simulation steps
   for (int k = 1; k <= numberOfTimeSteps; ++k) {
@@ -111,30 +111,27 @@ int main() {
     }
 
     // Construct vertex which corresponds to the current state of the target
-    VertexPositionVelocity3D* stateNode = new VertexPositionVelocity3D();
-
+    auto stateNode = std::make_shared<VertexPositionVelocity3D>();
     stateNode->setId(k);
     stateNode->setMarginalized(false);
     optimizer.addVertex(stateNode);
 
-    TargetOdometry3DEdge* toe = new TargetOdometry3DEdge(dt, accelerometerNoiseSigma);
+    auto toe = std::make_shared<TargetOdometry3DEdge>(dt, accelerometerNoiseSigma);
     toe->setVertex(0, lastStateNode);
     toe->setVertex(1, stateNode);
-    VertexPositionVelocity3D* vPrev = dynamic_cast<VertexPositionVelocity3D*>(lastStateNode);
-    VertexPositionVelocity3D* vCurr = dynamic_cast<VertexPositionVelocity3D*>(stateNode);
     toe->setMeasurement(accelerometerMeasurement);
     optimizer.addEdge(toe);
 
     // compute the initial guess via the odometry
     g2o::OptimizableGraph::VertexSet vPrevSet;
-    vPrevSet.insert(vPrev);
-    toe->initialEstimate(vPrevSet, vCurr);
+    vPrevSet.insert(lastStateNode);
+    toe->initialEstimate(vPrevSet, stateNode.get());
 
     lastStateNode = stateNode;
 
     // Add the GPS observation
-    GPSObservationEdgePositionVelocity3D* goe =
-        new GPSObservationEdgePositionVelocity3D(gpsMeasurement, gpsNoiseSigma);
+    auto goe =
+        std::make_shared<GPSObservationEdgePositionVelocity3D>(gpsMeasurement, gpsNoiseSigma);
     goe->setVertex(0, stateNode);
     optimizer.addEdge(goe);
   }
@@ -159,12 +156,13 @@ int main() {
 #endif
 
   Vector6d v1 = dynamic_cast<VertexPositionVelocity3D*>(
-                    optimizer.vertices().find((std::max)(numberOfTimeSteps - 2, 0))->second)
+                    optimizer.vertices().find((std::max)(numberOfTimeSteps - 2, 0))->second.get())
                     ->estimate();
   Vector6d v2 = dynamic_cast<VertexPositionVelocity3D*>(
-                    optimizer.vertices().find((std::max)(numberOfTimeSteps - 1, 0))->second)
+                    optimizer.vertices().find((std::max)(numberOfTimeSteps - 1, 0))->second.get())
                     ->estimate();
   cout << "v1=\n" << v1 << endl;
   cout << "v2=\n" << v2 << endl;
   cout << "delta state=\n" << v2 - v1 << endl;
+  return 0;
 }

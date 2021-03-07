@@ -61,7 +61,7 @@ int main() {
   Vector3d truePoint(sampleUniform(-500, 500), sampleUniform(-500, 500), sampleUniform(-500, 500));
 
   // Construct vertex which corresponds to the actual point of the target
-  VertexPosition3D* position = new VertexPosition3D();
+  auto position = std::make_shared<VertexPosition3D>();
   position->setId(0);
   optimizer.addVertex(position);
 
@@ -77,7 +77,7 @@ int main() {
     Vector3d measurement = truePoint + Vector3d(sampleUniform(-0.5, 0.5) * noiseLimit,
                                                 sampleUniform(-0.5, 0.5) * noiseLimit,
                                                 sampleUniform(-0.5, 0.5) * noiseLimit);
-    GPSObservationPosition3DEdge* goe = new GPSObservationPosition3DEdge();
+    auto goe = std::make_shared<GPSObservationPosition3DEdge>();
     goe->setVertex(0, position);
     goe->setMeasurement(measurement);
     goe->setInformation(Matrix3d::Identity() / noiseSigma);
@@ -91,12 +91,13 @@ int main() {
 
   cout << "truePoint=\n" << truePoint << endl;
   cerr << "computed estimate=\n"
-       << dynamic_cast<VertexPosition3D*>(optimizer.vertices().find(0)->second)->estimate() << endl;
+       << dynamic_cast<VertexPosition3D*>(optimizer.vertices().find(0)->second.get())->estimate()
+       << endl;
 
   // position->setMarginalized(true);
 
   SparseBlockMatrix<MatrixXd> spinv;
-  bool state = optimizer.computeMarginals(spinv, position);
+  bool state = optimizer.computeMarginals(spinv, position.get());
   if (state) {
     cout << "covariance\n" << spinv << endl;
     cout << spinv.block(0, 0) << endl;
