@@ -97,11 +97,9 @@ class G2O_CORE_API HyperGraph {
     //! write the data to a stream
     virtual bool write(std::ostream& os) const = 0;
     virtual HyperGraph::HyperGraphElementType elementType() const { return HyperGraph::HGET_DATA; }
-    std::shared_ptr<const Data> next() const { return _next; }
-    std::shared_ptr<Data> next() { return _next; }
+    std::shared_ptr<Data> next() const { return _next; }
     void setNext(std::shared_ptr<Data> next_) { _next = next_; }
-    std::shared_ptr<DataContainer> dataContainer() { return _dataContainer; }
-    std::shared_ptr<const DataContainer> dataContainer() const { return _dataContainer; }
+    std::shared_ptr<DataContainer> dataContainer() const { return _dataContainer; }
     void setDataContainer(std::shared_ptr<DataContainer> dataContainer_) { _dataContainer = dataContainer_; }
 
    protected:
@@ -116,8 +114,7 @@ class G2O_CORE_API HyperGraph {
   class G2O_CORE_API DataContainer {
    public:
     //! the user data associated with this vertex
-    std::shared_ptr<const Data> userData() const { return _userData; }
-    std::shared_ptr<Data> userData() { return _userData; }
+    std::shared_ptr<Data> userData() const { return _userData; }
     void setUserData(const std::shared_ptr<Data>& obs) { _userData = obs; }
     void addUserData(const std::shared_ptr<Data>& obs) {
       if (obs) {

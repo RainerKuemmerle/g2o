@@ -45,8 +45,8 @@ void delcareEstimatePropagator(py::module& m) {
 
   py::class_<EstimatePropagator::VertexIDHashFunction>(cls,
                                                        "EstimatePropagatorVertexIDHashFunction")
-      .def("__call__", &EstimatePropagator::VertexIDHashFunction::operator(), "v"_a,
-           py::keep_alive<1, 2>())  // (const OptimizableGraph::Vertex* v) -> size_t
+      .def("__call__", &EstimatePropagator::VertexIDHashFunction::operator(),
+           "v"_a)  // (const VertexPtr v) -> size_t
       ;
 
   cls.def(py::init<OptimizableGraph*>(), "g"_a, py::keep_alive<1, 2>());
@@ -54,14 +54,15 @@ void delcareEstimatePropagator(py::module& m) {
   cls.def("adjacency_map", &EstimatePropagator::adjacencyMap);  // -> AdjacencyMap&
   cls.def("graph", &EstimatePropagator::graph);                 // -> OptimizableGraph*
 
-  cls.def("propagate",
-          (void (EstimatePropagator::*)(
-              OptimizableGraph::Vertex*, const EstimatePropagator::PropagateCost&,
-              const EstimatePropagator::PropagateAction&, double, double)) &
-              EstimatePropagator::propagate,
-          "v"_a, "cost"_a, "action"_a, "maxDistance"_a = std::numeric_limits<double>::max(),
-          "maxEdgeCost"_a = std::numeric_limits<double>::max(), py::keep_alive<1, 2>(),
-          py::keep_alive<1, 3>(), py::keep_alive<1, 4>());
+  cls.def(
+      "propagate",
+      (void (EstimatePropagator::*)(const std::shared_ptr<OptimizableGraph::Vertex>&,
+                                    const EstimatePropagator::PropagateCost&,
+                                    const EstimatePropagator::PropagateAction&, double, double)) &
+          EstimatePropagator::propagate,
+      "v"_a, "cost"_a, "action"_a, "maxDistance"_a = std::numeric_limits<double>::max(),
+      "maxEdgeCost"_a = std::numeric_limits<double>::max(), py::keep_alive<1, 2>(),
+      py::keep_alive<1, 3>(), py::keep_alive<1, 4>());
 
   cls.def("propagate",
           (void (EstimatePropagator::*)(

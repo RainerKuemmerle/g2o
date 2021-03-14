@@ -26,12 +26,9 @@ void declareHyperGraph(py::module& m) {
   py::class_<HyperGraph::Data, HyperGraph::HyperGraphElement>(cls, "Data")
       //.def(py::init<>())   // invalid new-expression of abstract class
       .def("element_type", &HyperGraph::Data::elementType)  // virtual, -> HyperGraphElementType
-      .def("next", (HyperGraph::Data * (HyperGraph::Data::*)()) & HyperGraph::Data::next,
-           py::return_value_policy::reference)
+      .def("next", &HyperGraph::Data::next)
       .def("set_next", &HyperGraph::Data::setNext, "next"_a, py::keep_alive<1, 2>())  // -> void
-      .def("data_container",
-           (HyperGraph::DataContainer * (HyperGraph::Data::*)()) & HyperGraph::Data::dataContainer,
-           py::return_value_policy::reference)
+      .def("data_container", &HyperGraph::Data::dataContainer)
       .def("set_data_container", &HyperGraph::Data::setDataContainer, "data_container"_a,
            py::keep_alive<1, 2>())  // -> void
       ;

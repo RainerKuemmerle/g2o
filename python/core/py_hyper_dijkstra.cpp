@@ -10,22 +10,26 @@ void delcareHyperDijkstra(py::module& m) {
   py::class_<HyperDijkstra::CostFunction>(cls, "HyperDijkstraCostFunction");
 
   py::class_<HyperDijkstra::TreeAction>(cls, "HyperDijkstraTreeAction")
-      .def(py::init<>())
       .def("perform",
-           (double (HyperDijkstra::TreeAction::*)(HyperGraph::Vertex*, HyperGraph::Vertex*,
-                                                  HyperGraph::Edge*)) &
+           (double (HyperDijkstra::TreeAction::*)(const std::shared_ptr<HyperGraph::Vertex>&,
+                                                  const std::shared_ptr<HyperGraph::Vertex>&,
+                                                  const std::shared_ptr<HyperGraph::Edge>&)) &
                HyperDijkstra::TreeAction::perform,
            "v"_a, "vParent"_a, "e"_a, py::keep_alive<1, 2>(), py::keep_alive<1, 3>(),
            py::keep_alive<1, 4>())
       .def("perform",
-           (double (HyperDijkstra::TreeAction::*)(HyperGraph::Vertex*, HyperGraph::Vertex*,
-                                                  HyperGraph::Edge*, double)) &
+           (double (HyperDijkstra::TreeAction::*)(const std::shared_ptr<HyperGraph::Vertex>&,
+                                                  const std::shared_ptr<HyperGraph::Vertex>&,
+                                                  const std::shared_ptr<HyperGraph::Edge>&,
+                                                  double)) &
                HyperDijkstra::TreeAction::perform,
            "v"_a, "vParent"_a, "e"_a, "distance"_a, py::keep_alive<1, 2>(), py::keep_alive<1, 3>(),
            py::keep_alive<1, 4>());
 
   py::class_<HyperDijkstra::AdjacencyMapEntry>(cls, "HyperDijkstraAdjacencyMapEntry")
-      .def(py::init<HyperGraph::Vertex*, HyperGraph::Vertex*, HyperGraph::Edge*, double>(),
+      .def(py::init<const std::shared_ptr<HyperGraph::Vertex>&,
+                    const std::shared_ptr<HyperGraph::Vertex>&,
+                    const std::shared_ptr<HyperGraph::Edge>&, double>(),
            "_child"_a = nullptr, "_parent"_a = nullptr, "_edge"_a = nullptr,
            "_distance"_a = std::numeric_limits<double>::max(), py::keep_alive<1, 2>(),
            py::keep_alive<1, 3>(), py::keep_alive<1, 4>())
@@ -36,14 +40,18 @@ void delcareHyperDijkstra(py::module& m) {
       .def("children", (HyperGraph::VertexSet & (HyperDijkstra::AdjacencyMapEntry::*)()) &
                            HyperDijkstra::AdjacencyMapEntry::children);
 
-  cls.def(py::init<HyperGraph*>(), "g"_a, py::keep_alive<1, 2>());
-  cls.def("visited", &HyperDijkstra::visited);             // -> HyperGraph::VertexSet&
-  cls.def("adjacency_map", &HyperDijkstra::adjacencyMap);  // -> AdjacencyMap&
-  cls.def("graph", &HyperDijkstra::graph);                 // -> HyperGraph*
+  cls.def(py::init<const std::shared_ptr<HyperGraph>&>(), "g"_a, py::keep_alive<1, 2>());
+  cls.def("visited", py::overload_cast<>(&HyperDijkstra::visited));  // -> HyperGraph::VertexSet&
+  cls.def("visited_const", py::overload_cast<>(&HyperDijkstra::visited,
+                                               py::const_));  // -> const HyperGraph::VertexSet&
+  cls.def("adjacency_map", py::overload_cast<>(&HyperDijkstra::adjacencyMap));  // -> AdjacencyMap&
+  cls.def("adjacency_map_const",
+          py::overload_cast<>(&HyperDijkstra::adjacencyMap, py::const_));  // -> const AdjacencyMap&
+  cls.def("graph", &HyperDijkstra::graph);                                 // -> HyperGraph*
 
   cls.def("shortest_paths",
-          (void (HyperDijkstra::*)(HyperGraph::Vertex*, HyperDijkstra::CostFunction*, double,
-                                   double, bool, double)) &
+          (void (HyperDijkstra::*)(const std::shared_ptr<HyperGraph::Vertex>&,
+                                   HyperDijkstra::CostFunction*, double, double, bool, double)) &
               HyperDijkstra::shortestPaths,
           "v"_a, "cost"_a, "maxDistance"_a = std::numeric_limits<double>::max(),
           "comparisonConditioner"_a = 1e-3, "directed"_a = false,
