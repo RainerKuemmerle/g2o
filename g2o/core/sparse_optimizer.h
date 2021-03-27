@@ -214,9 +214,9 @@ namespace g2o {
     EdgeContainer::const_iterator findActiveEdge(const OptimizableGraph::Edge* e) const;
 
     //! the solver used by the optimizer
-    const std::unique_ptr<OptimizationAlgorithm>& algorithm() const { return _algorithm;}
-    std::unique_ptr<OptimizationAlgorithm>& solver() { return _algorithm;}
-    void setAlgorithm(std::unique_ptr<OptimizationAlgorithm> algorithm);
+    std::shared_ptr<OptimizationAlgorithm> algorithm() const { return _algorithm;}
+    std::shared_ptr<OptimizationAlgorithm> solver() { return _algorithm;}
+    void setAlgorithm(const std::shared_ptr<OptimizationAlgorithm>& algorithm);
 
     //! push the estimate of a subset of the variables onto a stack
     void push(SparseOptimizer::VertexContainer& vlist);
@@ -296,7 +296,7 @@ namespace g2o {
 
     void sortVectorContainers();
 
-    std::unique_ptr<OptimizationAlgorithm> _algorithm;
+    std::shared_ptr<OptimizationAlgorithm> _algorithm;
 
     /**
      * builds the mapping of the active vertices to the (block) row / column in the Hessian

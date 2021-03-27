@@ -563,12 +563,12 @@ namespace g2o{
     _verbose = verbose;
   }
 
-  void SparseOptimizer::setAlgorithm(std::unique_ptr<OptimizationAlgorithm> algorithm)
+  void SparseOptimizer::setAlgorithm(const std::shared_ptr<OptimizationAlgorithm>& algorithm)
   {
     if (_algorithm) // reset the optimizer for the formerly used solver
       _algorithm->setOptimizer(nullptr);
 
-    _algorithm = std::move(algorithm);
+    _algorithm = algorithm;
 
     if (_algorithm)
       _algorithm->setOptimizer(this);

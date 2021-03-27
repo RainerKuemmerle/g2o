@@ -99,38 +99,38 @@ void declareSparseOptimizer(py::module& m) {
       .def("find_active_edge", &CLS::findActiveEdge,
            "e"_a)  // -> EdgeContainer::const_iterator, const
 
-      .def("algorithm", &CLS::algorithm)  // -> const OptimizationAlgorithm*, const
-      .def("solver", &CLS::solver)        // -> OptimizationAlgorithm*
+      .def("algorithm", &CLS::algorithm, py::return_value_policy::reference)  // -> const OptimizationAlgorithm&, const
+      .def("solver", &CLS::solver, py::return_value_policy::reference)        // -> OptimizationAlgorithm*
       //.def("set_algorithm", &CLS::setAlgorithm,
       //        "algorithm"_a, py::keep_alive<1, 2>()) // -> void
 
       .def(
           "set_algorithm",
-          [](CLS& optimizer, OptimizationAlgorithm* algorithm) {
+          [](CLS& optimizer, const std::shared_ptr<OptimizationAlgorithm>& algorithm) {
             optimizer.setAlgorithm(algorithm);
           },
           py::keep_alive<1, 2>())
       .def(
           "set_algorithm",
-          [](CLS& optimizer, OptimizationAlgorithmWithHessian* algorithm) {
+          [](CLS& optimizer, const std::shared_ptr<OptimizationAlgorithmWithHessian>& algorithm) {
             optimizer.setAlgorithm(algorithm);
           },
           py::keep_alive<1, 2>())
       .def(
           "set_algorithm",
-          [](CLS& optimizer, OptimizationAlgorithmGaussNewton* algorithm) {
+          [](CLS& optimizer, const std::shared_ptr<OptimizationAlgorithmGaussNewton>& algorithm) {
             optimizer.setAlgorithm(algorithm);
           },
           py::keep_alive<1, 2>())
       .def(
           "set_algorithm",
-          [](CLS& optimizer, OptimizationAlgorithmLevenberg* algorithm) {
+          [](CLS& optimizer, const std::shared_ptr<OptimizationAlgorithmLevenberg>& algorithm) {
             optimizer.setAlgorithm(algorithm);
           },
           py::keep_alive<1, 2>())
       .def(
           "set_algorithm",
-          [](CLS& optimizer, OptimizationAlgorithmDogleg* algorithm) {
+          [](CLS& optimizer, const std::shared_ptr<OptimizationAlgorithmDogleg>& algorithm) {
             optimizer.setAlgorithm(algorithm);
           },
           py::keep_alive<1, 2>())

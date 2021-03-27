@@ -40,7 +40,7 @@ g2o::SparseOptimizer* createOptimizerForTests() {
   auto linearSolver = g2o::make_unique<SlamLinearSolver>();
   linearSolver->setBlockOrdering(false);
   auto blockSolver = g2o::make_unique<SlamBlockSolver>(std::move(linearSolver));
-  mOptimizer->setAlgorithm(std::unique_ptr<g2o::OptimizationAlgorithm>(
+  mOptimizer->setAlgorithm(std::shared_ptr<g2o::OptimizationAlgorithm>(
       new g2o::OptimizationAlgorithmGaussNewton(std::move(blockSolver))));
   return mOptimizer;
 }

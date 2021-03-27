@@ -265,8 +265,10 @@ int main(int argc, char** argv)
 
   // allocating the desired solver + testing whether the solver is okay
   OptimizationAlgorithmProperty solverProperty, hsolverProperty;
-  auto solver = solverFactory->construct(strSolver, solverProperty);
-  auto hsolver = solverFactory->construct(strHSolver, hsolverProperty);
+  std::shared_ptr<OptimizationAlgorithm> solver =
+      solverFactory->construct(strSolver, solverProperty);
+  std::shared_ptr<OptimizationAlgorithm> hsolver =
+      solverFactory->construct(strHSolver, hsolverProperty);
   if (! solver) {
     cerr << "Error allocating solver. Allocating \"" << strSolver << "\" failed!" << endl;
     return 0;
@@ -286,7 +288,7 @@ int main(int argc, char** argv)
     return 3;
   }
 
-  optimizer.setAlgorithm(std::move(solver));
+  optimizer.setAlgorithm(solver);
 
   int poseDim=*vertexDimensions.rbegin();
   string backboneVertexType;
@@ -444,8 +446,7 @@ int main(int argc, char** argv)
     OptimizableGraph::Vertex* g=dynamic_cast<OptimizableGraph::Vertex*>(it->get());
     g->setFixed(true);
   }
-  solver = std::move(optimizer.solver());
-  optimizer.setAlgorithm(std::move(hsolver));
+  optimizer.setAlgorithm(hsolver);
   optimizer.initializeOptimization(heset);
   optimizer.setVerbose(true);
   if (initialGuess)
@@ -497,8 +498,7 @@ int main(int argc, char** argv)
     OptimizableGraph::Vertex* g=dynamic_cast<OptimizableGraph::Vertex*>(it->get());
     g->setFixed(true);
   }
-  hsolver = std::move(optimizer.solver());
-  optimizer.setAlgorithm(std::move(solver));
+  optimizer.setAlgorithm(solver);
   optimizer.initializeOptimization(0);
   optimizer.computeInitialGuess();
   optimizer.optimize(lowIterations);
