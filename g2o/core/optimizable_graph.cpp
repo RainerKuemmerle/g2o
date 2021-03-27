@@ -402,10 +402,10 @@ bool OptimizableGraph::load(istream& is) {
     }
 
     // first handle the parameters
-    HyperGraph::HyperGraphElement* pelement = factory->construct(token, elemParamBitset);
+    std::shared_ptr<HyperGraph::HyperGraphElement> pelement = factory->construct(token, elemParamBitset);
     if (pelement) {  // not a parameter or otherwise unknown tag
       assert(pelement->elementType() == HyperGraph::HGET_PARAMETER && "Should be a param");
-      auto p = std::shared_ptr<Parameter>(static_cast<Parameter*>(pelement));
+      auto p = std::static_pointer_cast<Parameter>(pelement);
       int pid;
       currentLine >> pid;
       p->setId(pid);
@@ -423,10 +423,10 @@ bool OptimizableGraph::load(istream& is) {
       continue;
     }
 
-    HyperGraph::HyperGraphElement* element = factory->construct(token, elemBitset);
-    if (dynamic_cast<Vertex*>(element)) {  // it's a vertex type
+    std::shared_ptr<HyperGraph::HyperGraphElement> element = factory->construct(token, elemBitset);
+    if (dynamic_cast<Vertex*>(element.get())) {  // it's a vertex type
       previousData = 0;
-      auto v = std::shared_ptr<Vertex>(static_cast<Vertex*>(element));
+      auto v = std::static_pointer_cast<Vertex>(element);
       int id;
       currentLine >> id;
       bool r = v->read(currentLine);
@@ -440,10 +440,10 @@ bool OptimizableGraph::load(istream& is) {
       } else {
         previousDataContainer = v;
       }
-    } else if (dynamic_cast<Edge*>(element)) {
+    } else if (dynamic_cast<Edge*>(element.get())) {
       // cerr << "it is an edge" << endl;
       previousData = 0;
-      auto e = std::shared_ptr<Edge>(static_cast<Edge*>(element));
+      auto e = std::static_pointer_cast<Edge>(element);
       int numV = e->vertices().size();
 
       vector<int> ids;
@@ -487,9 +487,9 @@ bool OptimizableGraph::load(istream& is) {
       }
 
       previousDataContainer = e;
-    } else if (dynamic_cast<Data*>(element)) {  // reading in the data packet for the vertex
+    } else if (dynamic_cast<Data*>(element.get())) {  // reading in the data packet for the vertex
       // cerr << "read data packet " << token << " vertex " << previousVertex->id() << endl;
-      auto d = std::shared_ptr<HyperGraph::Data>(static_cast<Data*>(element));
+      auto d = std::static_pointer_cast<Data>(element);
       bool r = d->read(currentLine);
       if (!r) {
         cerr << __PRETTY_FUNCTION__ << ": Error reading data " << token << " at line " << lineNumber

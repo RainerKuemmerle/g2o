@@ -54,7 +54,7 @@ Factory* Factory::instance() {
 }
 
 void Factory::registerType(const std::string& tag,
-                           const std::shared_ptr<AbstractHyperGraphElementCreator>& c) {
+                           std::unique_ptr<AbstractHyperGraphElementCreator> c) {
   CreatorMap::const_iterator foundIt = _creator.find(tag);
   if (foundIt != _creator.end()) {
     cerr << "FACTORY WARNING: Overwriting Vertex tag " << tag << endl;
@@ -66,20 +66,16 @@ void Factory::registerType(const std::string& tag,
     assert(0);
   }
 
-  CreatorInformation* ci = new CreatorInformation();
-  ci->creator = c;
-
 #ifdef G2O_DEBUG_FACTORY
   cerr << "# Factory " << (void*)this << " constructing type " << tag << " ";
 #endif
   // construct an element once to figure out its type
-  HyperGraph::HyperGraphElement* element = c->construct();
-  ci->elementTypeBit = element->elementType();
+  std::unique_ptr<HyperGraph::HyperGraphElement> element = c->construct();
 
 #ifdef G2O_DEBUG_FACTORY
   cerr << "done." << endl;
   cerr << "# Factory " << (void*)this << " registering " << tag;
-  cerr << " " << (void*)c << " ";
+  cerr << " " << (void*)c.get() << " ";
   switch (element->elementType()) {
     case HyperGraph::HGET_VERTEX:
       cerr << " -> Vertex";
@@ -103,9 +99,11 @@ void Factory::registerType(const std::string& tag,
   cerr << endl;
 #endif
 
-  _creator[tag] = std::unique_ptr<CreatorInformation>(ci);
-  _tagLookup[c->name()] = tag;
-  delete element;
+  std::unique_ptr<CreatorInformation> ci = std::make_unique<CreatorInformation>();
+  ci->elementTypeBit = element->elementType();
+  ci->creator = std::move(c);
+  _tagLookup[ci->creator->name()] = tag;
+  _creator[tag] = std::move(ci);
 }
 
 void Factory::unregisterType(const std::string& tag) {
@@ -124,7 +122,7 @@ void Factory::unregisterType(const std::string& tag) {
   }
 }
 
-HyperGraph::HyperGraphElement* Factory::construct(const std::string& tag) const {
+std::unique_ptr<HyperGraph::HyperGraphElement> Factory::construct(const std::string& tag) const {
   CreatorMap::const_iterator foundIt = _creator.find(tag);
   if (foundIt != _creator.end()) {
     // cerr << "tag " << tag << " -> " << (void*) foundIt->second->creator << " " <<
@@ -171,7 +169,7 @@ void Factory::printRegisteredTypes(std::ostream& os, bool comment) const {
   }
 }
 
-HyperGraph::HyperGraphElement* Factory::construct(
+std::unique_ptr<HyperGraph::HyperGraphElement> Factory::construct(
     const std::string& tag, const HyperGraph::GraphElemBitset& elemsToConstruct) const {
   if (elemsToConstruct.none()) {
     return construct(tag);

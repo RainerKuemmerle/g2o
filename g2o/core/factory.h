@@ -59,8 +59,7 @@ class G2O_CORE_API Factory {
   /**
    * register a tag for a specific creator
    */
-  void registerType(const std::string& tag,
-                    const std::shared_ptr<AbstractHyperGraphElementCreator>& c);
+  void registerType(const std::string& tag, std::unique_ptr<AbstractHyperGraphElementCreator> c);
 
   /**
    * unregister a tag for a specific creator
@@ -70,14 +69,14 @@ class G2O_CORE_API Factory {
   /**
    * construct a graph element based on its tag
    */
-  HyperGraph::HyperGraphElement* construct(const std::string& tag) const;
+  std::unique_ptr<HyperGraph::HyperGraphElement> construct(const std::string& tag) const;
 
   /**
    * construct a graph element based on its tag, but only if it's type (a bitmask) matches. A
    * bitmask without any bit set will construct any item. Otherwise a bit has to be set to allow
    * construction of a graph element.
    */
-  HyperGraph::HyperGraphElement* construct(
+  std::unique_ptr<HyperGraph::HyperGraphElement> construct(
       const std::string& tag, const HyperGraph::GraphElemBitset& elemsToConstruct) const;
 
   /**
@@ -101,7 +100,7 @@ class G2O_CORE_API Factory {
  protected:
   class CreatorInformation {
    public:
-    std::shared_ptr<AbstractHyperGraphElementCreator> creator;
+    std::unique_ptr<AbstractHyperGraphElementCreator> creator;
     int elementTypeBit = -1;
   };
 
@@ -119,18 +118,13 @@ class G2O_CORE_API Factory {
 template <typename T>
 class RegisterTypeProxy {
  public:
-  RegisterTypeProxy(const std::string& name) : _name(name) {
+  RegisterTypeProxy(const std::string& name) {
 #ifdef G2O_DEBUG_FACTORY
-    std::cout << __FUNCTION__ << ": Registering " << _name << " of type " << typeid(T).name()
+    std::cout << __FUNCTION__ << ": Registering " << name << " of type " << typeid(T).name()
               << std::endl;
 #endif
-    _creator.reset(new HyperGraphElementCreator<T>());
-    Factory::instance()->registerType(_name, _creator);
+    Factory::instance()->registerType(name, std::make_unique<HyperGraphElementCreator<T>>());
   }
-
- private:
-  std::string _name;
-  std::shared_ptr<AbstractHyperGraphElementCreator> _creator;
 };
 
 }  // namespace g2o

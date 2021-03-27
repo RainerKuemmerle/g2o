@@ -128,7 +128,7 @@ namespace g2o {
 
   Cache* CacheContainer::createCache(const Cache::CacheKey& key){
     Factory* f = Factory::instance();
-    HyperGraph::HyperGraphElement* e = f->construct(key.type());
+    HyperGraph::HyperGraphElement* e = f->construct(key.type()).release();
     if (!e) {
       cerr << __PRETTY_FUNCTION__ << endl;
       cerr << "fatal error in creating cache of type " << key.type() << endl;
