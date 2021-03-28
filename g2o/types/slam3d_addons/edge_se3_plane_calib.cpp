@@ -70,22 +70,22 @@ bool EdgeSE3PlaneSensorCalibDrawAction::refreshPropertyPtrs(HyperGraphElementAct
   return true;
 }
 
-HyperGraphElementAction* EdgeSE3PlaneSensorCalibDrawAction::operator()(HyperGraph::HyperGraphElement* element,
-                                                                       HyperGraphElementAction::Parameters* params_) {
-  if (typeid(*element).name() != _typeName) return nullptr;
+bool EdgeSE3PlaneSensorCalibDrawAction::operator()(HyperGraph::HyperGraphElement* element,
+                                                   HyperGraphElementAction::Parameters* params_) {
+  if (typeid(*element).name() != _typeName) return false;
 
   refreshPropertyPtrs(params_);
-  if (!_previousParams) return this;
+  if (!_previousParams) return true;
 
-  if (_show && !_show->value()) return this;
+  if (_show && !_show->value()) return true;
 
   EdgeSE3PlaneSensorCalib* that = dynamic_cast<EdgeSE3PlaneSensorCalib*>(element);
 
-  if (!that) return this;
+  if (!that) return true;
 
   const VertexSE3* robot = dynamic_cast<const VertexSE3*>(that->vertex(0).get());
   const VertexSE3* sensor = dynamic_cast<const VertexSE3*>(that->vertex(2).get());
-  if (!robot || !sensor) return nullptr;
+  if (!robot || !sensor) return false;
 
   if (_planeWidth && _planeHeight) {
     number_t d = that->measurement().distance();
@@ -113,7 +113,7 @@ HyperGraphElementAction* EdgeSE3PlaneSensorCalibDrawAction::operator()(HyperGrap
     glPopMatrix();
   }
 
-  return this;
+  return true;
 }
 #endif
 

@@ -58,7 +58,7 @@ namespace g2o {
         return true;
       }
 
-      virtual int estimateDimension() const { 
+      virtual int estimateDimension() const {
         return 2;
       }
 
@@ -70,7 +70,7 @@ namespace g2o {
         return getEstimateData(est);
       }
 
-      virtual int minimalEstimateDimension() const { 
+      virtual int minimalEstimateDimension() const {
         return 2;
       }
 
@@ -88,17 +88,18 @@ namespace g2o {
   class G2O_TYPES_SLAM2D_API VertexPointXYWriteGnuplotAction: public WriteGnuplotAction {
   public:
     VertexPointXYWriteGnuplotAction();
-    virtual HyperGraphElementAction* operator()(HyperGraph::HyperGraphElement* element, 
-            HyperGraphElementAction::Parameters* params_);
+    virtual bool operator()(HyperGraph::HyperGraphElement* element,
+                            HyperGraphElementAction::Parameters* params_);
   };
 
 #ifdef G2O_HAVE_OPENGL
   class G2O_TYPES_SLAM2D_API VertexPointXYDrawAction: public DrawAction{
   public:
     VertexPointXYDrawAction();
-    virtual HyperGraphElementAction* operator()(HyperGraph::HyperGraphElement* element, 
-            HyperGraphElementAction::Parameters* params_);
-  protected:
+    virtual bool operator()(HyperGraph::HyperGraphElement* element,
+                            HyperGraphElementAction::Parameters* params_);
+
+   protected:
     FloatProperty *_pointSize;
     virtual bool refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_);
   };

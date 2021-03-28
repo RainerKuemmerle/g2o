@@ -71,10 +71,10 @@ namespace g2o {
   {
   }
 
-  HyperGraphElementAction* EdgeSE2SensorCalibDrawAction::operator()(HyperGraph::HyperGraphElement* element, HyperGraphElementAction::Parameters* )
+  bool EdgeSE2SensorCalibDrawAction::operator()(HyperGraph::HyperGraphElement* element, HyperGraphElementAction::Parameters* )
   {
     if (typeid(*element).name()!=_typeName)
-      return nullptr;
+      return false;
     EdgeSE2SensorCalib* e = static_cast<EdgeSE2SensorCalib*>(element);
     auto fromEdge = e->vertexXn<0>();
     auto toEdge   = e->vertexXn<1>();
@@ -87,7 +87,7 @@ namespace g2o {
     glVertex3f((float)toEdge->estimate().translation().x(),(float)toEdge->estimate().translation().y(),0.f);
     glEnd();
     glPopAttrib();
-    return this;
+    return true;
   }
 #endif
 

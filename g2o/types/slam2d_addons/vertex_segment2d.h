@@ -86,16 +86,16 @@ class G2O_TYPES_SLAM2D_ADDONS_API VertexSegment2D : public BaseVertex<4, Vector4
 class G2O_TYPES_SLAM2D_ADDONS_API VertexSegment2DWriteGnuplotAction : public WriteGnuplotAction {
  public:
   VertexSegment2DWriteGnuplotAction();
-  virtual HyperGraphElementAction* operator()(HyperGraph::HyperGraphElement* element,
-                                              HyperGraphElementAction::Parameters* params_);
+  virtual bool operator()(HyperGraph::HyperGraphElement* element,
+                          HyperGraphElementAction::Parameters* params_);
 };
 
 #ifdef G2O_HAVE_OPENGL
 class G2O_TYPES_SLAM2D_ADDONS_API VertexSegment2DDrawAction : public DrawAction {
  public:
   VertexSegment2DDrawAction();
-  virtual HyperGraphElementAction* operator()(HyperGraph::HyperGraphElement* element,
-                                              HyperGraphElementAction::Parameters* params_);
+  virtual bool operator()(HyperGraph::HyperGraphElement* element,
+                          HyperGraphElementAction::Parameters* params_);
 
  protected:
   FloatProperty* _pointSize;

@@ -86,31 +86,26 @@ namespace g2o {
     return true;
   }
 
-  HyperGraphElementAction* EdgeSE3Line3DDrawAction::operator()(HyperGraph::HyperGraphElement* element,
-							       HyperGraphElementAction::Parameters* params_) {
+  bool EdgeSE3Line3DDrawAction::operator()(HyperGraph::HyperGraphElement* element,
+                                           HyperGraphElementAction::Parameters* params_) {
     if(typeid(*element).name() != _typeName)
-      return nullptr;
+      return false;
 
     refreshPropertyPtrs(params_);
     if(!_previousParams)
-      return this;
-
+      return true;
 
     if(_show && !_show->value())
-      return this;
-
+      return true;
 
     EdgeSE3Line3D* that = dynamic_cast<EdgeSE3Line3D*>(element);
-
     if(!that)
-      return this;
-
-
+      return true;
     auto robot  = std::dynamic_pointer_cast<VertexSE3>(that->vertex(0));
     auto landmark = std::dynamic_pointer_cast<VertexLine3D>(that->vertex(1));
 
     if(!robot || !landmark)
-      return nullptr;
+      return false;
 
     if (_lineLength && _lineWidth) {
       Line3D line = that->measurement();
@@ -134,7 +129,7 @@ namespace g2o {
       glPopMatrix();
     }
 
-    return this;
+    return true;
   }
 #endif
 

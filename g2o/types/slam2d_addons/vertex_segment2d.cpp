@@ -58,21 +58,22 @@ namespace g2o {
 
   VertexSegment2DWriteGnuplotAction::VertexSegment2DWriteGnuplotAction(): WriteGnuplotAction(typeid(VertexSegment2D).name()){}
 
-  HyperGraphElementAction* VertexSegment2DWriteGnuplotAction::operator()(HyperGraph::HyperGraphElement* element, HyperGraphElementAction::Parameters* params_){
+  bool VertexSegment2DWriteGnuplotAction::operator()(HyperGraph::HyperGraphElement* element,
+                                                     HyperGraphElementAction::Parameters* params_) {
     if (typeid(*element).name()!=_typeName)
-      return nullptr;
+      return false;
 
     WriteGnuplotAction::Parameters* params=static_cast<WriteGnuplotAction::Parameters*>(params_);
     if (!params->os){
       std::cerr << __PRETTY_FUNCTION__ << ": warning, no valid os specified" << std::endl;
-      return nullptr;
+      return false;
     }
 
     VertexSegment2D* v =  static_cast<VertexSegment2D*>(element);
     *(params->os) << v->estimateP1().x() << " " << v->estimateP1().y() << std::endl;
     *(params->os) << v->estimateP2().x() << " " << v->estimateP2().y() << std::endl;
     *(params->os) << std::endl;
-    return this;
+    return true;
   }
 
 #ifdef G2O_HAVE_OPENGL
@@ -90,18 +91,17 @@ namespace g2o {
     return true;
   }
 
-  HyperGraphElementAction* VertexSegment2DDrawAction::operator()(HyperGraph::HyperGraphElement* element,
-                     HyperGraphElementAction::Parameters* params_ ){
-
+  bool VertexSegment2DDrawAction::operator()(HyperGraph::HyperGraphElement* element,
+                                             HyperGraphElementAction::Parameters* params_) {
     if (typeid(*element).name()!=_typeName)
-      return nullptr;
+      return false;
 
     refreshPropertyPtrs(params_);
     if (! _previousParams)
-      return this;
+      return true;
 
     if (_show && !_show->value())
-      return this;
+      return true;
 
     VertexSegment2D* that = static_cast<VertexSegment2D*>(element);
     glColor3f(0.8f,0.5f,0.3f);
@@ -112,7 +112,7 @@ namespace g2o {
     glVertex3f((float)that->estimateP1().x(),(float)that->estimateP1().y(),0.f);
     glVertex3f((float)that->estimateP2().x(),(float)that->estimateP2().y(),0.f);
     glEnd();
-    return this;
+    return true;
   }
 #endif
 

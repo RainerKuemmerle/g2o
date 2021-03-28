@@ -113,17 +113,17 @@ void VertexEllipse::_updateSVD() const {
     return true;
   }
 
-  HyperGraphElementAction* VertexEllipseDrawAction::operator()(HyperGraph::HyperGraphElement* element,
-							       HyperGraphElementAction::Parameters* params_){
+  bool VertexEllipseDrawAction::operator()(HyperGraph::HyperGraphElement* element,
+                                           HyperGraphElementAction::Parameters* params_) {
     if (typeid(*element).name()!=_typeName)
-      return nullptr;
+      return false;
 
     refreshPropertyPtrs(params_);
     if (! _previousParams){
-      return this;
+      return true;
     }
     if (_show && !_show->value())
-      return this;
+      return true;
 
     VertexEllipse* that = dynamic_cast<VertexEllipse*>(element);
 
@@ -166,7 +166,7 @@ void VertexEllipse::_updateSVD() const {
 
 
     glPopMatrix();
-    return this;
+    return true;
   }
 #endif
 

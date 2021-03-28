@@ -96,9 +96,10 @@ namespace g2o {
   class G2O_TYPES_SLAM3D_API CacheSE3OffsetDrawAction: public DrawAction{
     public:
       CacheSE3OffsetDrawAction();
-      virtual HyperGraphElementAction* operator()(HyperGraph::HyperGraphElement* element, 
-          HyperGraphElementAction::Parameters* params_ );
-    protected:
+      virtual bool operator()(HyperGraph::HyperGraphElement* element,
+                              HyperGraphElementAction::Parameters* params_);
+
+     protected:
       virtual bool refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_);
       FloatProperty* _cubeSide;
   };

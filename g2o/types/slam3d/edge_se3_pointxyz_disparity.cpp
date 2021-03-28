@@ -171,21 +171,20 @@ namespace g2o {
 #ifdef G2O_HAVE_OPENGL
   EdgeProjectDisparityDrawAction::EdgeProjectDisparityDrawAction(): DrawAction(typeid(EdgeSE3PointXYZDisparity).name()){}
 
-  HyperGraphElementAction* EdgeProjectDisparityDrawAction::operator()(HyperGraph::HyperGraphElement* element,
-                HyperGraphElementAction::Parameters*  params_ ){
-  if (typeid(*element).name()!=_typeName)
-      return nullptr;
+  bool EdgeProjectDisparityDrawAction::operator()(HyperGraph::HyperGraphElement* element,
+                                                  HyperGraphElementAction::Parameters* params_) {
+    if (typeid(*element).name() != _typeName) return false;
     refreshPropertyPtrs(params_);
     if (! _previousParams)
-      return this;
+      return true;
 
     if (_show && !_show->value())
-      return this;
+      return true;
     EdgeSE3PointXYZDisparity* e =  static_cast<EdgeSE3PointXYZDisparity*>(element);
     VertexSE3* fromEdge = static_cast<VertexSE3*>(e->vertices()[0].get());
     VertexPointXYZ* toEdge   = static_cast<VertexPointXYZ*>(e->vertices()[1].get());
     if (! fromEdge || ! toEdge)
-      return this;
+      return true;
     Isometry3 fromTransform=fromEdge->estimate() * e->cameraParameter()->offset();
     glColor3f(LANDMARK_EDGE_COLOR);
     glPushAttrib(GL_ENABLE_BIT);
@@ -195,7 +194,7 @@ namespace g2o {
     glVertex3f((float)toEdge->estimate().x(),(float)toEdge->estimate().y(),(float)toEdge->estimate().z());
     glEnd();
     glPopAttrib();
-    return this;
+    return true;
   }
 #endif
 

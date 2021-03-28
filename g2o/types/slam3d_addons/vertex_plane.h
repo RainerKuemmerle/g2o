@@ -76,9 +76,10 @@ namespace g2o
   {
     public:
       VertexPlaneDrawAction();
-      virtual HyperGraphElementAction* operator()(HyperGraph::HyperGraphElement* element,
-          HyperGraphElementAction::Parameters* params_ );
-    protected:
+      virtual bool operator()(HyperGraph::HyperGraphElement* element,
+                              HyperGraphElementAction::Parameters* params_);
+
+     protected:
       virtual bool refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_);
       FloatProperty* _planeWidth, *_planeHeight;
   };

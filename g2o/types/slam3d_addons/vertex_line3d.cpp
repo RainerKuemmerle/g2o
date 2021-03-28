@@ -64,19 +64,19 @@ namespace g2o {
     return true;
   }
 
-  HyperGraphElementAction* VertexLine3DDrawAction::operator()(HyperGraph::HyperGraphElement* element,
-							     HyperGraphElementAction::Parameters* params_) {
+  bool VertexLine3DDrawAction::operator()(HyperGraph::HyperGraphElement* element,
+                                          HyperGraphElementAction::Parameters* params_) {
     if(typeid(*element).name() != _typeName) {
-      return nullptr;
+      return false;
     }
 
     refreshPropertyPtrs(params_);
     if(!_previousParams) {
-      return this;
+      return true;
     }
 
     if(_show && !_show->value()) {
-      return this;
+      return true;
     }
 
     VertexLine3D* that = static_cast<VertexLine3D*>(element);
@@ -100,7 +100,7 @@ namespace g2o {
     }
     glPopMatrix();
 
-    return this;
+    return true;
   }
 #endif
 

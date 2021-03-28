@@ -46,7 +46,7 @@ namespace g2o {
   {
     public:
       SparseOptimizerTerminateAction();
-      virtual HyperGraphAction* operator()(const HyperGraph* graph, Parameters* parameters = 0);
+      virtual bool operator()(const HyperGraph* graph, Parameters* parameters = 0);
 
       number_t gainThreshold() const { return _gainThreshold;}
       void setGainThreshold(number_t gainThreshold);

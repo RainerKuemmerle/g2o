@@ -93,8 +93,8 @@ namespace g2o {
   class G2O_TYPES_SLAM3D_API EdgeProjectDisparityDrawAction: public DrawAction{
   public:
     EdgeProjectDisparityDrawAction();
-    virtual HyperGraphElementAction* operator()(HyperGraph::HyperGraphElement* element,
-            HyperGraphElementAction::Parameters* params_);
+    virtual bool operator()(HyperGraph::HyperGraphElement* element,
+                            HyperGraphElementAction::Parameters* params_);
   };
 #endif
 

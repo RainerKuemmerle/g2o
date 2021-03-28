@@ -35,7 +35,7 @@ GuiHyperGraphAction::~GuiHyperGraphAction()
 {
 }
 
-HyperGraphAction* GuiHyperGraphAction::operator()(const HyperGraph* graph, Parameters* parameters)
+bool GuiHyperGraphAction::operator()(const HyperGraph* graph, Parameters* parameters)
 {
   (void) graph;
   if (viewer) {
@@ -56,9 +56,9 @@ HyperGraphAction* GuiHyperGraphAction::operator()(const HyperGraph* graph, Param
     }
 
     qApp->processEvents();
-    return this;
+    return true;
   }
-  return 0;
+  return false;
 }
 
 } // end namespace

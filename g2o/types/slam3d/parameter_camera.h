@@ -75,7 +75,7 @@ namespace g2o {
   class G2O_TYPES_SLAM3D_API CacheCameraDrawAction: public DrawAction{
     public:
       CacheCameraDrawAction();
-      virtual HyperGraphElementAction* operator()(HyperGraph::HyperGraphElement* element, HyperGraphElementAction::Parameters* params_ );
+      virtual bool operator()(HyperGraph::HyperGraphElement* element, HyperGraphElementAction::Parameters* params_ );
     protected:
       virtual bool refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_);
       FloatProperty* _cameraZ, *_cameraSide;

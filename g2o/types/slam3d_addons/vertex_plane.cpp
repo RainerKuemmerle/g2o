@@ -68,13 +68,12 @@ namespace g2o
     return true;
   }
 
-  HyperGraphElementAction* VertexPlaneDrawAction::operator()(HyperGraph::HyperGraphElement* element,
-                 HyperGraphElementAction::Parameters* params_)
-  {
-    if (typeid(*element).name() != _typeName) return nullptr;
+  bool VertexPlaneDrawAction::operator()(HyperGraph::HyperGraphElement* element,
+                                         HyperGraphElementAction::Parameters* params_) {
+    if (typeid(*element).name() != _typeName) return false;
     refreshPropertyPtrs(params_);
-    if (!_previousParams) return this;
-    if (_show && !_show->value()) return this;
+    if (!_previousParams) return true;
+    if (_show && !_show->value()) return true;
 
     if (_planeWidth && _planeHeight) {
       VertexPlane* that = static_cast<VertexPlane*>(element);
@@ -97,7 +96,7 @@ namespace g2o
       glPopMatrix();
     }
 
-    return this;
+    return true;
   }
 #endif
 

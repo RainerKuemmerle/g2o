@@ -94,13 +94,13 @@ namespace g2o {
 
   EdgeSE3WriteGnuplotAction::EdgeSE3WriteGnuplotAction(): WriteGnuplotAction(typeid(EdgeSE3).name()){}
 
-  HyperGraphElementAction* EdgeSE3WriteGnuplotAction::operator()(HyperGraph::HyperGraphElement* element, HyperGraphElementAction::Parameters* params_){
+  bool EdgeSE3WriteGnuplotAction::operator()(HyperGraph::HyperGraphElement* element, HyperGraphElementAction::Parameters* params_){
     if (typeid(*element).name()!=_typeName)
-      return nullptr;
+      return false;
     WriteGnuplotAction::Parameters* params=static_cast<WriteGnuplotAction::Parameters*>(params_);
     if (!params->os){
       std::cerr << __PRETTY_FUNCTION__ << ": warning, on valid os specified" << std::endl;
-      return nullptr;
+      return false;
     }
 
     EdgeSE3* e =  static_cast<EdgeSE3*>(element);
@@ -116,28 +116,28 @@ namespace g2o {
       *(params->os) << toV[i] << " ";
     }
     *(params->os) << std::endl;
-    return this;
+    return true;
   }
 
 #ifdef G2O_HAVE_OPENGL
   EdgeSE3DrawAction::EdgeSE3DrawAction(): DrawAction(typeid(EdgeSE3).name()){}
 
-  HyperGraphElementAction* EdgeSE3DrawAction::operator()(HyperGraph::HyperGraphElement* element,
+  bool EdgeSE3DrawAction::operator()(HyperGraph::HyperGraphElement* element,
                HyperGraphElementAction::Parameters* params_){
     if (typeid(*element).name()!=_typeName)
-      return nullptr;
+      return false;
     refreshPropertyPtrs(params_);
     if (! _previousParams)
-      return this;
+      return true;
 
     if (_show && !_show->value())
-      return this;
+      return true;
 
     EdgeSE3* e =  static_cast<EdgeSE3*>(element);
     VertexSE3* fromEdge = static_cast<VertexSE3*>(e->vertices()[0].get());
     VertexSE3* toEdge   = static_cast<VertexSE3*>(e->vertices()[1].get());
     if (! fromEdge || ! toEdge)
-      return this;
+      return true;
     glColor3f(POSE_EDGE_COLOR);
     glPushAttrib(GL_ENABLE_BIT);
     glDisable(GL_LIGHTING);
@@ -146,7 +146,7 @@ namespace g2o {
     glVertex3f((float)toEdge->estimate().translation().x(),(float)toEdge->estimate().translation().y(),(float)toEdge->estimate().translation().z());
     glEnd();
     glPopAttrib();
-    return this;
+    return true;
   }
 #endif
 

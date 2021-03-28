@@ -83,14 +83,14 @@ namespace g2o {
     return true;
   }
 
-  HyperGraphElementAction* VertexTagDrawAction::operator()(HyperGraph::HyperGraphElement* element,
-                 HyperGraphElementAction::Parameters* params_){
+  bool VertexTagDrawAction::operator()(HyperGraph::HyperGraphElement* element,
+                                       HyperGraphElementAction::Parameters* params_) {
     if (typeid(*element).name()!=_typeName)
-      return nullptr;
+      return false;
 
     refreshPropertyPtrs(params_);
     if (! _previousParams){
-      return this;
+      return true;
     }
     VertexTag* that = static_cast<VertexTag*>(element);
 
@@ -105,7 +105,7 @@ namespace g2o {
     glScalef(0.003f*textSize,0.003f*textSize,1.f);
     freeglut_minimal::glutStrokeString(freeglut_minimal::GLUT_STROKE_ROMAN, that->name().c_str());
     glPopMatrix();
-    return this;
+    return true;
   }
 #endif
 

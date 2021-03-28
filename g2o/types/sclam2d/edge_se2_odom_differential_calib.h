@@ -67,8 +67,8 @@ class G2O_TYPES_SCLAM2D_API EdgeSE2OdomDifferentialCalib
 class G2O_TYPES_SCLAM2D_API EdgeSE2OdomDifferentialCalibDrawAction : public DrawAction {
  public:
   EdgeSE2OdomDifferentialCalibDrawAction();
-  virtual HyperGraphElementAction* operator()(HyperGraph::HyperGraphElement* element,
-                                              HyperGraphElementAction::Parameters* params_);
+  virtual bool operator()(HyperGraph::HyperGraphElement* element,
+                          HyperGraphElementAction::Parameters* params_);
 };
 #endif
 

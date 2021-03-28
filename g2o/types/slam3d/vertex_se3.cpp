@@ -61,13 +61,13 @@ namespace g2o {
 
   VertexSE3WriteGnuplotAction::VertexSE3WriteGnuplotAction(): WriteGnuplotAction(typeid(VertexSE3).name()){}
 
-  HyperGraphElementAction* VertexSE3WriteGnuplotAction::operator()(HyperGraph::HyperGraphElement* element, HyperGraphElementAction::Parameters* params_){
+  bool VertexSE3WriteGnuplotAction::operator()(HyperGraph::HyperGraphElement* element, HyperGraphElementAction::Parameters* params_){
     if (typeid(*element).name()!=_typeName)
-      return nullptr;
+      return false;
     WriteGnuplotAction::Parameters* params=static_cast<WriteGnuplotAction::Parameters*>(params_);
     if (!params->os){
       std::cerr << __PRETTY_FUNCTION__ << ": warning, no valid os specified" << std::endl;
-      return nullptr;
+      return false;
     }
 
     VertexSE3* v =  static_cast<VertexSE3*>(element);
@@ -75,7 +75,7 @@ namespace g2o {
     for (int i=0; i<6; i++)
       *(params->os) << est[i] << " ";
     *(params->os) << std::endl;
-    return this;
+    return true;
   }
 
 #ifdef G2O_HAVE_OPENGL
@@ -113,18 +113,18 @@ namespace g2o {
     return true;
   }
 
-  HyperGraphElementAction* VertexSE3DrawAction::operator()(HyperGraph::HyperGraphElement* element,
+  bool VertexSE3DrawAction::operator()(HyperGraph::HyperGraphElement* element,
                  HyperGraphElementAction::Parameters* params_){
     if (typeid(*element).name()!=_typeName)
-      return nullptr;
+      return false;
     initializeDrawActionsCache();
     refreshPropertyPtrs(params_);
 
     if (! _previousParams)
-      return this;
+      return true;
 
     if (_show && !_show->value())
-      return this;
+      return true;
 
     VertexSE3* that = static_cast<VertexSE3*>(element);
 
@@ -135,7 +135,7 @@ namespace g2o {
     drawCache(that->cacheContainer(), params_);
     drawUserData(that->userData().get(), params_);
     glPopMatrix();
-    return this;
+    return true;
   }
 #endif
 

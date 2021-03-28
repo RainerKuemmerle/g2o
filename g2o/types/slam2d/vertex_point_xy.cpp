@@ -55,19 +55,20 @@ namespace g2o {
 
   VertexPointXYWriteGnuplotAction::VertexPointXYWriteGnuplotAction(): WriteGnuplotAction(typeid(VertexPointXY).name()){}
 
-  HyperGraphElementAction* VertexPointXYWriteGnuplotAction::operator()(HyperGraph::HyperGraphElement* element, HyperGraphElementAction::Parameters* params_){
+  bool VertexPointXYWriteGnuplotAction::operator()(HyperGraph::HyperGraphElement* element,
+                                                   HyperGraphElementAction::Parameters* params_) {
     if (typeid(*element).name()!=_typeName)
-      return nullptr;
+      return false;
 
     WriteGnuplotAction::Parameters* params=static_cast<WriteGnuplotAction::Parameters*>(params_);
     if (!params->os){
       std::cerr << __PRETTY_FUNCTION__ << ": warning, on valid os specified" << std::endl;
-      return nullptr;
+      return false;
     }
 
     VertexPointXY* v =  static_cast<VertexPointXY*>(element);
     *(params->os) << v->estimate().x() << " " << v->estimate().y() << std::endl;
-    return this;
+    return true;
   }
 
 #ifdef G2O_HAVE_OPENGL
@@ -84,17 +85,17 @@ namespace g2o {
     return true;
   }
 
-  HyperGraphElementAction* VertexPointXYDrawAction::operator()(HyperGraph::HyperGraphElement* element,
-                                                               HyperGraphElementAction::Parameters* params) {
+  bool VertexPointXYDrawAction::operator()(HyperGraph::HyperGraphElement* element,
+                                           HyperGraphElementAction::Parameters* params) {
     if (typeid(*element).name()!=_typeName)
-      return nullptr;
+      return false;
     initializeDrawActionsCache();
     refreshPropertyPtrs(params);
     if (! _previousParams)
-      return this;
+      return true;
 
     if (_show && !_show->value())
-      return this;
+      return true;
     VertexPointXY* that = static_cast<VertexPointXY*>(element);
 
     glPushMatrix();
@@ -108,7 +109,7 @@ namespace g2o {
     drawCache(that->cacheContainer(), params);
     drawUserData(that->userData().get(), params);
     glPopMatrix();
-    return this;
+    return true;
   }
 #endif
 

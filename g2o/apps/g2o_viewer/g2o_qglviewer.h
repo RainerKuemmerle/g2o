@@ -54,7 +54,7 @@ namespace g2o {
       SparseOptimizer* graph;
 
     protected:
-      HyperGraphElementAction* _drawActions;
+      HyperGraphElementAction::HyperGraphElementActionPtr _drawActions;
       GLuint _drawList;
       bool _updateDisplay;
       DrawAction::Parameters* _drawActionParameters;

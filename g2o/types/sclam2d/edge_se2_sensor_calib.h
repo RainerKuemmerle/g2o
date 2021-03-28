@@ -80,7 +80,8 @@ namespace g2o {
   class EdgeSE2SensorCalibDrawAction: public DrawAction {
   public:
     EdgeSE2SensorCalibDrawAction();
-    virtual HyperGraphElementAction* operator()(HyperGraph::HyperGraphElement* element, HyperGraphElementAction::Parameters* params_);
+    virtual bool operator()(HyperGraph::HyperGraphElement* element,
+                            HyperGraphElementAction::Parameters* params_);
   };
 #endif
 

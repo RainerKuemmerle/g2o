@@ -67,7 +67,7 @@ namespace g2o {
         v = _estimate.toVector();
         return true;
       }
-      
+
       virtual int estimateDimension() const { return 3; }
 
       virtual bool setMinimalEstimateDataImpl(const number_t* est){
@@ -77,7 +77,7 @@ namespace g2o {
       virtual bool getMinimalEstimateData(number_t* est) const {
         return getEstimateData(est);
       }
-      
+
       virtual int minimalEstimateDimension() const { return 3; }
 
       virtual bool read(std::istream& is);
@@ -88,17 +88,18 @@ namespace g2o {
   class G2O_TYPES_SLAM2D_API VertexSE2WriteGnuplotAction: public WriteGnuplotAction {
   public:
     VertexSE2WriteGnuplotAction();
-    virtual HyperGraphElementAction* operator()(HyperGraph::HyperGraphElement* element, 
-            HyperGraphElementAction::Parameters* params_ );
+    virtual bool operator()(HyperGraph::HyperGraphElement* element,
+                            HyperGraphElementAction::Parameters* params_);
   };
 
 #ifdef G2O_HAVE_OPENGL
   class G2O_TYPES_SLAM2D_API VertexSE2DrawAction: public DrawAction{
   public:
     VertexSE2DrawAction();
-    virtual HyperGraphElementAction* operator()(HyperGraph::HyperGraphElement* element, 
-            HyperGraphElementAction::Parameters* params_ );
-  protected:
+    virtual bool operator()(HyperGraph::HyperGraphElement* element,
+                            HyperGraphElementAction::Parameters* params_);
+
+   protected:
     HyperGraphElementAction* _drawActions;
     virtual bool refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_);
     FloatProperty* _triangleX, *_triangleY;

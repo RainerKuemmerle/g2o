@@ -96,13 +96,14 @@ namespace g2o {
 
   EdgeSE2WriteGnuplotAction::EdgeSE2WriteGnuplotAction(): WriteGnuplotAction(typeid(EdgeSE2).name()){}
 
-  HyperGraphElementAction* EdgeSE2WriteGnuplotAction::operator()(HyperGraph::HyperGraphElement* element, HyperGraphElementAction::Parameters* params_){
+  bool EdgeSE2WriteGnuplotAction::operator()(HyperGraph::HyperGraphElement* element,
+                                             HyperGraphElementAction::Parameters* params_) {
     if (typeid(*element).name()!=_typeName)
-      return nullptr;
+      return false;
     WriteGnuplotAction::Parameters* params=static_cast<WriteGnuplotAction::Parameters*>(params_);
     if (!params->os){
       std::cerr << __PRETTY_FUNCTION__ << ": warning, on valid os specified" << std::endl;
-      return nullptr;
+      return false;
     }
 
     EdgeSE2* e = static_cast<EdgeSE2*>(element);
@@ -113,7 +114,7 @@ namespace g2o {
     *(params->os) << toEdge->estimate().translation().x() << " " << toEdge->estimate().translation().y()
       << " " << toEdge->estimate().rotation().angle() << std::endl;
     *(params->os) << std::endl;
-    return this;
+    return true;
   }
 
 #ifdef G2O_HAVE_OPENGL
@@ -133,23 +134,23 @@ namespace g2o {
     return true;
   }
 
-  HyperGraphElementAction* EdgeSE2DrawAction::operator()(HyperGraph::HyperGraphElement* element,
-               HyperGraphElementAction::Parameters* params_){
+  bool EdgeSE2DrawAction::operator()(HyperGraph::HyperGraphElement* element,
+                                     HyperGraphElementAction::Parameters* params_) {
     if (typeid(*element).name()!=_typeName)
-      return nullptr;
+      return false;
 
     refreshPropertyPtrs(params_);
     if (! _previousParams)
-      return this;
+      return true;
 
     if (_show && !_show->value())
-      return this;
+      return true;
 
     EdgeSE2* e =  static_cast<EdgeSE2*>(element);
     auto from = e->vertexXn<0>();
     auto to   = e->vertexXn<1>();
     if (! from && ! to)
-      return this;
+      return true;
     SE2 fromTransform;
     SE2 toTransform;
     glPushAttrib(GL_ENABLE_BIT | GL_LIGHTING | GL_COLOR);
@@ -184,7 +185,7 @@ namespace g2o {
     glVertex3f((float)toTransform.translation().x(),(float)toTransform.translation().y(),0.f);
     glEnd();
     glPopAttrib();
-    return this;
+    return true;
   }
 #endif
 

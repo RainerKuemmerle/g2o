@@ -78,8 +78,8 @@ namespace g2o {
   class G2O_TYPES_DATA_API VertexEllipseDrawAction : public DrawAction {
    public:
     VertexEllipseDrawAction();
-    virtual HyperGraphElementAction* operator()(HyperGraph::HyperGraphElement* element,
-                                                HyperGraphElementAction::Parameters* params_);
+    virtual bool operator()(HyperGraph::HyperGraphElement* element,
+                            HyperGraphElementAction::Parameters* params_);
 
    protected:
     virtual bool refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_);

@@ -53,34 +53,29 @@ bool VertexPointXYZDrawAction::refreshPropertyPtrs(HyperGraphElementAction::Para
   return true;
 }
 
-  HyperGraphElementAction* VertexPointXYZDrawAction::operator()(HyperGraph::HyperGraphElement* element,
-                     HyperGraphElementAction::Parameters* params ){
+bool VertexPointXYZDrawAction::operator()(HyperGraph::HyperGraphElement* element,
+                                          HyperGraphElementAction::Parameters* params) {
+  if (typeid(*element).name() != _typeName) return false;
+  initializeDrawActionsCache();
+  refreshPropertyPtrs(params);
+  if (!_previousParams) return true;
 
-    if (typeid(*element).name()!=_typeName)
-      return nullptr;
-    initializeDrawActionsCache();
-    refreshPropertyPtrs(params);
-    if (! _previousParams)
-      return this;
+  if (_show && !_show->value()) return true;
+  VertexPointXYZ* that = static_cast<VertexPointXYZ*>(element);
 
-    if (_show && !_show->value())
-      return this;
-    VertexPointXYZ* that = static_cast<VertexPointXYZ*>(element);
-
-
-    glPushMatrix();
-    glPushAttrib(GL_ENABLE_BIT | GL_POINT_BIT);
-    glDisable(GL_LIGHTING);
-    glColor3f(LANDMARK_VERTEX_COLOR);
-    float ps = _pointSize ? _pointSize->value() :  1.f;
-    glTranslatef((float)that->estimate()(0),(float)that->estimate()(1),(float)that->estimate()(2));
-    opengl::drawPoint(ps);
-    glPopAttrib();
-    drawCache(that->cacheContainer(), params);
-    drawUserData(that->userData().get(), params);
-    glPopMatrix();
-    return this;
-  }
+  glPushMatrix();
+  glPushAttrib(GL_ENABLE_BIT | GL_POINT_BIT);
+  glDisable(GL_LIGHTING);
+  glColor3f(LANDMARK_VERTEX_COLOR);
+  float ps = _pointSize ? _pointSize->value() : 1.f;
+  glTranslatef((float)that->estimate()(0), (float)that->estimate()(1), (float)that->estimate()(2));
+  opengl::drawPoint(ps);
+  glPopAttrib();
+  drawCache(that->cacheContainer(), params);
+  drawUserData(that->userData().get(), params);
+  glPopMatrix();
+  return true;
+}
 #endif
 
   VertexPointXYZWriteGnuplotAction::VertexPointXYZWriteGnuplotAction() :
@@ -88,19 +83,19 @@ bool VertexPointXYZDrawAction::refreshPropertyPtrs(HyperGraphElementAction::Para
   {
   }
 
-  HyperGraphElementAction* VertexPointXYZWriteGnuplotAction::operator()(HyperGraph::HyperGraphElement* element, HyperGraphElementAction::Parameters* params_ )
+  bool VertexPointXYZWriteGnuplotAction::operator()(HyperGraph::HyperGraphElement* element, HyperGraphElementAction::Parameters* params_ )
   {
     if (typeid(*element).name()!=_typeName)
-      return nullptr;
+      return false;
     WriteGnuplotAction::Parameters* params=static_cast<WriteGnuplotAction::Parameters*>(params_);
     if (!params->os){
       std::cerr << __PRETTY_FUNCTION__ << ": warning, no valid os specified" << std::endl;
-      return nullptr;
+      return false;
     }
 
     VertexPointXYZ* v = static_cast<VertexPointXYZ*>(element);
     *(params->os) << v->estimate().x() << " " << v->estimate().y() << " " << v->estimate().z() << " " << std::endl;
-    return this;
+    return true;
   }
 
 }

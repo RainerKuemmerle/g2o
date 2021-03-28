@@ -80,16 +80,16 @@ namespace g2o {
   class G2O_TYPES_SLAM2D_API EdgeSE2PointXYBearingWriteGnuplotAction: public WriteGnuplotAction {
   public:
     EdgeSE2PointXYBearingWriteGnuplotAction();
-    virtual HyperGraphElementAction* operator()(HyperGraph::HyperGraphElement* element,
-            HyperGraphElementAction::Parameters* params_);
+    virtual bool operator()(HyperGraph::HyperGraphElement* element,
+                            HyperGraphElementAction::Parameters* params_);
   };
 
 #ifdef G2O_HAVE_OPENGL
   class G2O_TYPES_SLAM2D_API EdgeSE2PointXYBearingDrawAction: public DrawAction{
   public:
     EdgeSE2PointXYBearingDrawAction();
-    virtual HyperGraphElementAction* operator()(HyperGraph::HyperGraphElement* element,
-            HyperGraphElementAction::Parameters* params_);
+    virtual bool operator()(HyperGraph::HyperGraphElement* element,
+                            HyperGraphElementAction::Parameters* params_);
   };
 #endif
 

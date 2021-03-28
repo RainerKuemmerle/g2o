@@ -98,17 +98,17 @@ namespace g2o {
     return true;
   }
 
-  HyperGraphElementAction* CacheSE3OffsetDrawAction::operator()(HyperGraph::HyperGraphElement* element,
+  bool CacheSE3OffsetDrawAction::operator()(HyperGraph::HyperGraphElement* element,
                 HyperGraphElementAction::Parameters* params_){
     if (typeid(*element).name()!=_typeName)
-      return nullptr;
+      return false;
     CacheSE3Offset* that = static_cast<CacheSE3Offset*>(element);
     refreshPropertyPtrs(params_);
     if (! _previousParams)
-      return this;
+      return true;
 
     if (_show && !_show->value())
-      return this;
+      return true;
     float cs = _cubeSide ? _cubeSide->value() : 1.0f;
     glPushAttrib(GL_COLOR);
     glColor3f(POSE_PARAMETER_COLOR);
@@ -117,7 +117,7 @@ namespace g2o {
     opengl::drawBox(cs,cs,cs);
     glPopMatrix();
     glPopAttrib();
-    return this;
+    return true;
   }
 #endif
 

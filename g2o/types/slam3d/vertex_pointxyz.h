@@ -87,7 +87,8 @@ namespace g2o {
   {
     public:
       VertexPointXYZWriteGnuplotAction();
-      virtual HyperGraphElementAction* operator()(HyperGraph::HyperGraphElement* element, HyperGraphElementAction::Parameters* params_ );
+      virtual bool operator()(HyperGraph::HyperGraphElement* element,
+                              HyperGraphElementAction::Parameters* params_);
   };
 
 #ifdef G2O_HAVE_OPENGL
@@ -97,11 +98,10 @@ namespace g2o {
   class VertexPointXYZDrawAction: public DrawAction{
     public:
       VertexPointXYZDrawAction();
-      virtual HyperGraphElementAction* operator()(HyperGraph::HyperGraphElement* element,
-          HyperGraphElementAction::Parameters* params_);
+      virtual bool operator()(HyperGraph::HyperGraphElement* element,
+                              HyperGraphElementAction::Parameters* params_);
 
-
-    protected:
+     protected:
       FloatProperty *_pointSize;
       virtual bool refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_);
   };

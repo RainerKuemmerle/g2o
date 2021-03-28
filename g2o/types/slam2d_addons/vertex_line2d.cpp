@@ -68,18 +68,17 @@ namespace g2o {
     return true;
   }
 
-  HyperGraphElementAction* VertexLine2DDrawAction::operator()(HyperGraph::HyperGraphElement* element,
-                     HyperGraphElementAction::Parameters* params_ ){
-
+  bool VertexLine2DDrawAction::operator()(HyperGraph::HyperGraphElement* element,
+                                          HyperGraphElementAction::Parameters* params_) {
     if (typeid(*element).name()!=_typeName)
-      return nullptr;
+      return false;
 
     refreshPropertyPtrs(params_);
     if (! _previousParams)
-      return this;
+      return true;
 
     if (_show && !_show->value())
-      return this;
+      return true;
 
     VertexLine2D* that = static_cast<VertexLine2D*>(element);
     glPushAttrib(GL_CURRENT_BIT | GL_BLEND);
@@ -115,7 +114,7 @@ namespace g2o {
     glVertex3f((float)p2.x(),p2.y(),0.f);
     glEnd();
     glPopAttrib();
-    return this;
+    return true;
   }
 #endif
 

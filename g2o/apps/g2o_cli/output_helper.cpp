@@ -62,7 +62,7 @@ bool saveGnuplot(const std::string& gnudump, const OptimizableGraph& optimizer)
 bool saveGnuplot(const std::string& gnudump, const HyperGraph::VertexSet& vertices, const HyperGraph::EdgeSet& edges)
 {
   // seek for an action whose name is writeGnuplot in the library
-  HyperGraphElementAction* saveGnuplot = HyperGraphActionLibrary::instance()->actionByName("writeGnuplot");
+  auto saveGnuplot = HyperGraphActionLibrary::instance()->actionByName("writeGnuplot");
   if (! saveGnuplot ){
     cerr << __PRETTY_FUNCTION__ << ": no action \"writeGnuplot\" registered" << endl;
     return false;
@@ -180,7 +180,7 @@ bool saveGnuplot(const std::string& gnudump, const HyperGraph::VertexSet& vertic
 bool dumpEdges(std::ostream& os, const OptimizableGraph& optimizer)
 {
   // seek for an action whose name is writeGnuplot in the library
-  HyperGraphElementAction* saveGnuplot = HyperGraphActionLibrary::instance()->actionByName("writeGnuplot");
+  auto saveGnuplot = HyperGraphActionLibrary::instance()->actionByName("writeGnuplot");
   if (! saveGnuplot ){
     cerr << __PRETTY_FUNCTION__ << ": no action \"writeGnuplot\" registered" << endl;
     return false;

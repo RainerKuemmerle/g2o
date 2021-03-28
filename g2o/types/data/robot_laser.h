@@ -49,7 +49,7 @@ namespace g2o {
       virtual bool write(std::ostream& os) const;
       virtual bool read(std::istream& is);
 
-      SE2 laserPose() const { return _odomPose * _laserParams.laserPose;} 
+      SE2 laserPose() const { return _odomPose * _laserParams.laserPose;}
       const SE2& odomPose() const { return _odomPose;}
       void setOdomPose(const SE2& odomPose);
 
@@ -63,9 +63,10 @@ namespace g2o {
   class G2O_TYPES_DATA_API RobotLaserDrawAction: public DrawAction{
   public:
     RobotLaserDrawAction();
-    virtual HyperGraphElementAction* operator()(HyperGraph::HyperGraphElement* element, 
-            HyperGraphElementAction::Parameters* params_ );
-  protected:
+    virtual bool operator()(HyperGraph::HyperGraphElement* element,
+                            HyperGraphElementAction::Parameters* params_);
+
+   protected:
     virtual bool refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_);
     IntProperty* _beamsDownsampling;
     FloatProperty* _pointSize;

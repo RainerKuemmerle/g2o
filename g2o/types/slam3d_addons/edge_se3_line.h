@@ -83,10 +83,10 @@ namespace g2o {
   class EdgeSE3Line3DDrawAction : public DrawAction {
   public:
     G2O_TYPES_SLAM3D_ADDONS_API EdgeSE3Line3DDrawAction();
-    G2O_TYPES_SLAM3D_ADDONS_API virtual HyperGraphElementAction* operator()(HyperGraph::HyperGraphElement* element,
-									    HyperGraphElementAction::Parameters* params_);
+    G2O_TYPES_SLAM3D_ADDONS_API virtual bool operator()(
+        HyperGraph::HyperGraphElement* element, HyperGraphElementAction::Parameters* params_);
 
-  protected:
+   protected:
     virtual bool refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_);
     FloatProperty* _lineLength, *_lineWidth;
 

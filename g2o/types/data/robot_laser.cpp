@@ -137,17 +137,17 @@ namespace g2o {
     return true;
   }
 
-  HyperGraphElementAction* RobotLaserDrawAction::operator()(HyperGraph::HyperGraphElement* element,
-                 HyperGraphElementAction::Parameters* params_){
+  bool RobotLaserDrawAction::operator()(HyperGraph::HyperGraphElement* element,
+                                        HyperGraphElementAction::Parameters* params_) {
     if (typeid(*element).name()!=_typeName)
-      return nullptr;
+      return false;
 
     refreshPropertyPtrs(params_);
     if (! _previousParams){
-      return this;
+      return true;
     }
     if (_show && !_show->value())
-      return this;
+      return true;
     RobotLaser* that = static_cast<RobotLaser*>(element);
 
     RawLaser::Point2DVector points=that->cartesian();
@@ -182,7 +182,7 @@ namespace g2o {
     glEnd();
     glPopMatrix();
 
-    return this;
+    return true;
   }
 #endif
 

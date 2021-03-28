@@ -115,17 +115,17 @@ namespace g2o {
     return true;
   }
 
-  HyperGraphElementAction* CacheCameraDrawAction::operator()(HyperGraph::HyperGraphElement* element,
-                 HyperGraphElementAction::Parameters* params){
+  bool CacheCameraDrawAction::operator()(HyperGraph::HyperGraphElement* element,
+                                         HyperGraphElementAction::Parameters* params) {
     if (typeid(*element).name()!=_typeName)
-      return nullptr;
+      return false;
     CacheCamera* that = static_cast<CacheCamera*>(element);
     refreshPropertyPtrs(params);
     if (! _previousParams)
-      return this;
+      return true;
 
     if (_show && !_show->value())
-      return this;
+      return true;
 
     glPushAttrib(GL_COLOR);
     glColor3f(POSE_PARAMETER_COLOR);
@@ -135,7 +135,7 @@ namespace g2o {
     opengl::drawPyramid(_cameraSide->value(), _cameraZ->value());
     glPopMatrix();
     glPopAttrib();
-    return this;
+    return true;
   }
 #endif
 

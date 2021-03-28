@@ -54,19 +54,20 @@ namespace g2o {
 
   VertexSE2WriteGnuplotAction::VertexSE2WriteGnuplotAction(): WriteGnuplotAction(typeid(VertexSE2).name()){}
 
-  HyperGraphElementAction* VertexSE2WriteGnuplotAction::operator()(HyperGraph::HyperGraphElement* element, HyperGraphElementAction::Parameters* params_){
+  bool VertexSE2WriteGnuplotAction::operator()(HyperGraph::HyperGraphElement* element,
+                                               HyperGraphElementAction::Parameters* params_) {
     if (typeid(*element).name()!=_typeName)
-      return nullptr;
+      return false;
     WriteGnuplotAction::Parameters* params=static_cast<WriteGnuplotAction::Parameters*>(params_);
     if (!params || !params->os){
       std::cerr << __PRETTY_FUNCTION__ << ": warning, no valid output stream specified" << std::endl;
-      return nullptr;
+      return false;
     }
 
     VertexSE2* v =  static_cast<VertexSE2*>(element);
     *(params->os) << v->estimate().translation().x() << " " << v->estimate().translation().y()
       << " " << v->estimate().rotation().angle() << std::endl;
-    return this;
+    return true;
   }
 
 #ifdef G2O_HAVE_OPENGL
@@ -86,19 +87,17 @@ namespace g2o {
     return true;
   }
 
-
-  HyperGraphElementAction* VertexSE2DrawAction::operator()(HyperGraph::HyperGraphElement* element,
-                 HyperGraphElementAction::Parameters* params_){
-   if (typeid(*element).name()!=_typeName)
-      return nullptr;
+  bool VertexSE2DrawAction::operator()(HyperGraph::HyperGraphElement* element,
+                                       HyperGraphElementAction::Parameters* params_) {
+    if (typeid(*element).name() != _typeName) return false;
     initializeDrawActionsCache();
     refreshPropertyPtrs(params_);
 
     if (! _previousParams)
-      return this;
+      return true;
 
     if (_show && !_show->value())
-      return this;
+      return true;
 
     VertexSE2* that = static_cast<VertexSE2*>(element);
 
@@ -110,7 +109,7 @@ namespace g2o {
     drawCache(that->cacheContainer(), params_);
     drawUserData(that->userData().get(), params_);
     glPopMatrix();
-    return this;
+    return true;
   }
 #endif
 

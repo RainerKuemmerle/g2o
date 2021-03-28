@@ -111,7 +111,7 @@ void G2oQGLViewer::draw()
   if (_updateDisplay) {
     _updateDisplay = false;
     glNewList(_drawList, GL_COMPILE_AND_EXECUTE);
-    applyAction(graph, _drawActions, _drawActionParameters);
+    applyAction(graph, _drawActions.get(), _drawActionParameters);
     glEndList();
   } else {
     glCallList(_drawList);

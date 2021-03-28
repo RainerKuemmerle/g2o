@@ -48,8 +48,8 @@ namespace g2o {
 
       virtual bool write(std::ostream& os) const;
       virtual bool read(std::istream& is);
-      
-      const std::string name() const { return _name;} 
+
+      const std::string name() const { return _name;}
       void setName(const std::string& name_) {_name=name_;}
       const Vector3F& position() const {return _position;}
       void setPosition( const Vector3F& p) {_position = p;}
@@ -59,13 +59,14 @@ namespace g2o {
       Vector3F _odom2d;
   };
 
- #ifdef G2O_HAVE_OPENGL 
+ #ifdef G2O_HAVE_OPENGL
   class G2O_TYPES_DATA_API VertexTagDrawAction: public DrawAction{
   public:
     VertexTagDrawAction();
-    virtual HyperGraphElementAction* operator()(HyperGraph::HyperGraphElement* element,
-            HyperGraphElementAction::Parameters* params_ );
-  protected:
+    virtual bool operator()(HyperGraph::HyperGraphElement* element,
+                            HyperGraphElementAction::Parameters* params_);
+
+   protected:
     virtual bool refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_);
     DoubleProperty* _textSize;
   };

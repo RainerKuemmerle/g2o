@@ -44,7 +44,7 @@ namespace g2o {
     _gainThreshold = gainThreshold;
   }
 
-  HyperGraphAction* SparseOptimizerTerminateAction::operator()(const HyperGraph* graph, Parameters* parameters)
+  bool SparseOptimizerTerminateAction::operator()(const HyperGraph* graph, Parameters* parameters)
   {
     assert(dynamic_cast<const SparseOptimizer*>(graph) && "graph is not a SparseOptimizer");
     assert(dynamic_cast<HyperGraphAction::ParametersIteration*>(parameters) && "error casting parameters");
@@ -79,7 +79,7 @@ namespace g2o {
         setOptimizerStopFlag(optimizer, true);
       }
     }
-    return this;
+    return true;
   }
 
   void SparseOptimizerTerminateAction::setMaxIterations(int maxit)

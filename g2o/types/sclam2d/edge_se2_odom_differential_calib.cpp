@@ -55,13 +55,13 @@ bool EdgeSE2OdomDifferentialCalib::write(std::ostream& os) const
 EdgeSE2OdomDifferentialCalibDrawAction::EdgeSE2OdomDifferentialCalibDrawAction()
     : DrawAction(typeid(EdgeSE2OdomDifferentialCalib).name()) {}
 
-HyperGraphElementAction* EdgeSE2OdomDifferentialCalibDrawAction::operator()(HyperGraph::HyperGraphElement* element,
-                                                                            HyperGraphElementAction::Parameters*) {
-  if (typeid(*element).name() != _typeName) return nullptr;
+bool EdgeSE2OdomDifferentialCalibDrawAction::operator()(HyperGraph::HyperGraphElement* element,
+                                                        HyperGraphElementAction::Parameters*) {
+  if (typeid(*element).name() != _typeName) return false;
   EdgeSE2OdomDifferentialCalib* e = static_cast<EdgeSE2OdomDifferentialCalib*>(element);
   auto fromEdge = e->vertexXn<0>();
   auto toEdge = e->vertexXn<1>();
-  if (!fromEdge || !toEdge) return this;
+  if (!fromEdge || !toEdge) return true;
   glColor3f(0.5f, 0.5f, 0.5f);
   glPushAttrib(GL_ENABLE_BIT);
   glDisable(GL_LIGHTING);
@@ -70,7 +70,7 @@ HyperGraphElementAction* EdgeSE2OdomDifferentialCalibDrawAction::operator()(Hype
   glVertex3f((float)toEdge->estimate().translation().x(), (float)toEdge->estimate().translation().y(), 0.f);
   glEnd();
   glPopAttrib();
-  return this;
+  return true;
 }
 #endif
 

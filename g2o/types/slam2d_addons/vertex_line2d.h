@@ -96,9 +96,10 @@ namespace g2o {
   class G2O_TYPES_SLAM2D_ADDONS_API VertexLine2DDrawAction: public DrawAction{
   public:
     VertexLine2DDrawAction();
-    virtual HyperGraphElementAction* operator()(HyperGraph::HyperGraphElement* element,
-            HyperGraphElementAction::Parameters* params_);
-  protected:
+    virtual bool operator()(HyperGraph::HyperGraphElement* element,
+                            HyperGraphElementAction::Parameters* params_);
+
+   protected:
     FloatProperty *_pointSize;
     virtual bool refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_);
   };

@@ -93,8 +93,8 @@ namespace g2o {
   class EdgeSE3PointXYZDrawAction: public DrawAction{
   public:
     EdgeSE3PointXYZDrawAction();
-    virtual HyperGraphElementAction* operator()(HyperGraph::HyperGraphElement* element,
-            HyperGraphElementAction::Parameters* params_);
+    virtual bool operator()(HyperGraph::HyperGraphElement* element,
+                            HyperGraphElementAction::Parameters* params_);
   };
 #endif
 

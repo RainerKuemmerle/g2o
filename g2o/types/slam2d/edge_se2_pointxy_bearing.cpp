@@ -68,14 +68,14 @@ namespace g2o {
 
   EdgeSE2PointXYBearingWriteGnuplotAction::EdgeSE2PointXYBearingWriteGnuplotAction(): WriteGnuplotAction(typeid(EdgeSE2PointXYBearing).name()){}
 
-  HyperGraphElementAction* EdgeSE2PointXYBearingWriteGnuplotAction::operator()(HyperGraph::HyperGraphElement* element,
-                         HyperGraphElementAction::Parameters* params_){
+  bool EdgeSE2PointXYBearingWriteGnuplotAction::operator()(
+      HyperGraph::HyperGraphElement* element, HyperGraphElementAction::Parameters* params_) {
     if (typeid(*element).name()!=_typeName)
-      return nullptr;
+      return false;
     WriteGnuplotAction::Parameters* params=static_cast<WriteGnuplotAction::Parameters*>(params_);
     if (!params->os){
       std::cerr << __PRETTY_FUNCTION__ << ": warning, on valid os specified" << std::endl;
-      return nullptr;
+      return false;
     }
 
     EdgeSE2PointXYBearing* e =  static_cast<EdgeSE2PointXYBearing*>(element);
@@ -86,28 +86,29 @@ namespace g2o {
                   << fromEdge->estimate().rotation().angle() << std::endl;
     *(params->os) << toEdge->estimate().x() << " " << toEdge->estimate().y() << std::endl;
     *(params->os) << std::endl;
-    return this;
+    return true;
   }
 
 #ifdef G2O_HAVE_OPENGL
   EdgeSE2PointXYBearingDrawAction::EdgeSE2PointXYBearingDrawAction(): DrawAction(typeid(EdgeSE2PointXYBearing).name()){}
 
-  HyperGraphElementAction* EdgeSE2PointXYBearingDrawAction::operator()(HyperGraph::HyperGraphElement* element,  HyperGraphElementAction::Parameters* params_){
+  bool EdgeSE2PointXYBearingDrawAction::operator()(HyperGraph::HyperGraphElement* element,
+                                                   HyperGraphElementAction::Parameters* params_) {
     if (typeid(*element).name()!=_typeName)
-      return nullptr;
+      return false;
 
     refreshPropertyPtrs(params_);
     if (! _previousParams)
-      return this;
+      return true;
 
     if (_show && !_show->value())
-      return this;
+      return true;
 
     EdgeSE2PointXYBearing* e =  static_cast<EdgeSE2PointXYBearing*>(element);
     auto from = e->vertexXn<0>();
     auto to   = e->vertexXn<1>();
     if (! from)
-      return this;
+      return true;
     number_t guessRange=5;
     number_t theta = e->measurement();
     Vector2 p(std::cos(theta)*guessRange, std::sin(theta)*guessRange);
@@ -131,7 +132,7 @@ namespace g2o {
     glVertex3f((float)p.x(),(float)p.y(),0.f);
     glEnd();
     glPopAttrib();
-    return this;
+    return true;
   }
 #endif
 

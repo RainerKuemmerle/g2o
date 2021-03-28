@@ -74,9 +74,10 @@ namespace g2o {
   class VertexLine3DDrawAction : public DrawAction {
   public:
     VertexLine3DDrawAction();
-    virtual HyperGraphElementAction* operator()(HyperGraph::HyperGraphElement* element, 
-						HyperGraphElementAction::Parameters* params_);
-  protected:
+    virtual bool operator()(HyperGraph::HyperGraphElement* element,
+                            HyperGraphElementAction::Parameters* params_);
+
+   protected:
     virtual bool refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_);
     FloatProperty* _lineLength, *_lineWidth;
 

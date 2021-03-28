@@ -155,22 +155,22 @@ namespace g2o {
 #ifdef G2O_HAVE_OPENGL
   EdgeSE3PointXYZDrawAction::EdgeSE3PointXYZDrawAction(): DrawAction(typeid(EdgeSE3PointXYZ).name()){}
 
-  HyperGraphElementAction* EdgeSE3PointXYZDrawAction::operator()(HyperGraph::HyperGraphElement* element,
-               HyperGraphElementAction::Parameters* params_){
+  bool EdgeSE3PointXYZDrawAction::operator()(HyperGraph::HyperGraphElement* element,
+                                             HyperGraphElementAction::Parameters* params_) {
     if (typeid(*element).name()!=_typeName)
-      return nullptr;
+      return false;
     refreshPropertyPtrs(params_);
     if (! _previousParams)
-      return this;
+      return true;
 
     if (_show && !_show->value())
-      return this;
+      return true;
 
     EdgeSE3PointXYZ* e =  static_cast<EdgeSE3PointXYZ*>(element);
     VertexSE3* fromEdge = static_cast<VertexSE3*>(e->vertex(0).get());
     VertexPointXYZ* toEdge   = static_cast<VertexPointXYZ*>(e->vertex(1).get());
     if (! fromEdge || ! toEdge)
-      return this;
+      return true;
     Isometry3 fromTransform=fromEdge->estimate() * e->offsetParameter()->offset();
     glColor3f(LANDMARK_EDGE_COLOR);
     glPushAttrib(GL_ENABLE_BIT);
@@ -180,7 +180,7 @@ namespace g2o {
     glVertex3f((float)toEdge->estimate().x(),(float)toEdge->estimate().y(),(float)toEdge->estimate().z());
     glEnd();
     glPopAttrib();
-    return this;
+    return true;
   }
 #endif
 

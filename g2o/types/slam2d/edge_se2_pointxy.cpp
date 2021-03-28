@@ -93,48 +93,48 @@ namespace g2o {
 
   EdgeSE2PointXYWriteGnuplotAction::EdgeSE2PointXYWriteGnuplotAction(): WriteGnuplotAction(typeid(EdgeSE2PointXY).name()){}
 
-  HyperGraphElementAction* EdgeSE2PointXYWriteGnuplotAction::operator()(HyperGraph::HyperGraphElement* element, HyperGraphElementAction::Parameters* params_){
+  bool EdgeSE2PointXYWriteGnuplotAction::operator()(HyperGraph::HyperGraphElement* element, HyperGraphElementAction::Parameters* params_){
     if (typeid(*element).name()!=_typeName)
-      return nullptr;
+      return false;
     WriteGnuplotAction::Parameters* params=static_cast<WriteGnuplotAction::Parameters*>(params_);
     if (!params->os){
       std::cerr << __PRETTY_FUNCTION__ << ": warning, on valid os specified" << std::endl;
-      return nullptr;
+      return false;
     }
 
     EdgeSE2PointXY* e =  static_cast<EdgeSE2PointXY*>(element);
     if (e->numUndefinedVertices())
-      return this;
+      return true;
     auto fromEdge = e->vertexXn<0>();
     auto toEdge   = e->vertexXn<1>();
     *(params->os) << fromEdge->estimate().translation().x() << " " << fromEdge->estimate().translation().y()
       << " " << fromEdge->estimate().rotation().angle() << std::endl;
     *(params->os) << toEdge->estimate().x() << " " << toEdge->estimate().y() << std::endl;
     *(params->os) << std::endl;
-    return this;
+    return true;
   }
 
 #ifdef G2O_HAVE_OPENGL
   EdgeSE2PointXYDrawAction::EdgeSE2PointXYDrawAction(): DrawAction(typeid(EdgeSE2PointXY).name()){}
 
-  HyperGraphElementAction* EdgeSE2PointXYDrawAction::operator()(HyperGraph::HyperGraphElement* element,
+  bool EdgeSE2PointXYDrawAction::operator()(HyperGraph::HyperGraphElement* element,
                 HyperGraphElementAction::Parameters*  params_){
     if (typeid(*element).name()!=_typeName)
-      return nullptr;
+      return false;
 
     refreshPropertyPtrs(params_);
     if (! _previousParams)
-      return this;
+      return true;
 
     if (_show && !_show->value())
-      return this;
+      return true;
 
 
     EdgeSE2PointXY* e =  static_cast<EdgeSE2PointXY*>(element);
     auto fromEdge = e->vertexXn<0>();
     auto toEdge   = e->vertexXn<1>();
     if (! fromEdge)
-      return this;
+      return true;
     Vector2 p=e->measurement();
     glPushAttrib(GL_ENABLE_BIT|GL_LIGHTING|GL_COLOR);
     glDisable(GL_LIGHTING);
@@ -156,7 +156,7 @@ namespace g2o {
     glVertex3f((float)p.x(),(float)p.y(),0.f);
     glEnd();
     glPopAttrib();
-    return this;
+    return true;
   }
 #endif
 

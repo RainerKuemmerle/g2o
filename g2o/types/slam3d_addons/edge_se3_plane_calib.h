@@ -63,8 +63,8 @@ class G2O_TYPES_SLAM3D_ADDONS_API EdgeSE3PlaneSensorCalib : public BaseVariableS
 class EdgeSE3PlaneSensorCalibDrawAction : public DrawAction {
  public:
   G2O_TYPES_SLAM3D_ADDONS_API EdgeSE3PlaneSensorCalibDrawAction();
-  G2O_TYPES_SLAM3D_ADDONS_API virtual HyperGraphElementAction* operator()(HyperGraph::HyperGraphElement* element,
-                                                                          HyperGraphElementAction::Parameters* params_);
+  G2O_TYPES_SLAM3D_ADDONS_API virtual bool operator()(HyperGraph::HyperGraphElement* element,
+                                                      HyperGraphElementAction::Parameters* params_);
 
  protected:
   virtual bool refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_);

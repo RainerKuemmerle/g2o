@@ -73,8 +73,8 @@ namespace g2o {
 
       virtual bool setMeasurementFromState() ;
 
-      virtual number_t initialEstimatePossible(const OptimizableGraph::VertexSet& /*from*/, 
-          OptimizableGraph::Vertex* /*to*/) { 
+      virtual number_t initialEstimatePossible(const OptimizableGraph::VertexSet& /*from*/,
+          OptimizableGraph::Vertex* /*to*/) {
         return 1.;
       }
 
@@ -90,8 +90,8 @@ namespace g2o {
   class G2O_TYPES_SLAM3D_API EdgeSE3WriteGnuplotAction: public WriteGnuplotAction {
   public:
     EdgeSE3WriteGnuplotAction();
-    virtual HyperGraphElementAction* operator()(HyperGraph::HyperGraphElement* element, 
-            HyperGraphElementAction::Parameters* params_);
+    virtual bool operator()(HyperGraph::HyperGraphElement* element,
+                            HyperGraphElementAction::Parameters* params_);
   };
 
 #ifdef G2O_HAVE_OPENGL
@@ -101,8 +101,8 @@ namespace g2o {
   class G2O_TYPES_SLAM3D_API EdgeSE3DrawAction: public DrawAction{
   public:
     EdgeSE3DrawAction();
-    virtual HyperGraphElementAction* operator()(HyperGraph::HyperGraphElement* element, 
-            HyperGraphElementAction::Parameters* params_);
+    virtual bool operator()(HyperGraph::HyperGraphElement* element,
+                            HyperGraphElementAction::Parameters* params_);
   };
 #endif
 
