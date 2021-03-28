@@ -78,7 +78,7 @@ namespace g2o {
       virtual bool operator()(HyperGraph::HyperGraphElement* element, HyperGraphElementAction::Parameters* params_ );
     protected:
       virtual bool refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_);
-      FloatProperty* _cameraZ, *_cameraSide;
+      std::shared_ptr<FloatProperty> _cameraZ, _cameraSide;
   };
 #endif
 

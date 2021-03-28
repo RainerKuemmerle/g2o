@@ -101,7 +101,7 @@ namespace g2o {
 
      protected:
       virtual bool refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_);
-      FloatProperty* _cubeSide;
+      std::shared_ptr<FloatProperty> _cubeSide;
   };
 #endif
 

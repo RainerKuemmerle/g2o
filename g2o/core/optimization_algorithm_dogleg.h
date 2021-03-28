@@ -70,11 +70,11 @@ namespace g2o {
 
     protected:
       // parameters
-      Property<int>* _maxTrialsAfterFailure;
-      Property<number_t>* _userDeltaInit;
+      std::shared_ptr<Property<int>> _maxTrialsAfterFailure;
+      std::shared_ptr<Property<number_t>> _userDeltaInit;
       // damping to enforce positive definite matrix
-      Property<number_t>* _initialLambda;
-      Property<number_t>* _lamdbaFactor;
+      std::shared_ptr<Property<number_t>> _initialLambda;
+      std::shared_ptr<Property<number_t>> _lamdbaFactor;
 
       VectorX _hsd;        ///< steepest decent step
       VectorX _hdl;        ///< final dogleg step

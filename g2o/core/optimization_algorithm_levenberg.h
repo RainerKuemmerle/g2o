@@ -70,8 +70,8 @@ namespace g2o {
 
     protected:
       // Levenberg parameters
-      Property<int>* _maxTrialsAfterFailure;
-      Property<number_t>* _userLambdaInit;
+      std::shared_ptr<Property<int>> _maxTrialsAfterFailure;
+      std::shared_ptr<Property<number_t>> _userLambdaInit;
       number_t _currentLambda;
       number_t _tau;
       number_t _goodStepLowerScale; ///< lower bound for lambda decrease if a good LM step

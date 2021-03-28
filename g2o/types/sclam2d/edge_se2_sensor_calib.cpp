@@ -78,7 +78,7 @@ namespace g2o {
     EdgeSE2SensorCalib* e = static_cast<EdgeSE2SensorCalib*>(element);
     auto fromEdge = e->vertexXn<0>();
     auto toEdge   = e->vertexXn<1>();
-    if (!fromEdge.get() || !toEdge.get()) return this;
+    if (!fromEdge.get() || !toEdge.get()) return true;
     glColor3f(0.5,0.5,1.0);
     glPushAttrib(GL_ENABLE_BIT);
     glDisable(GL_LIGHTING);

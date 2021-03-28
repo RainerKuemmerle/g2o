@@ -64,7 +64,7 @@ namespace g2o {
 
     protected:
       Solver& _solver;
-      Property<bool>* _writeDebug;
+      std::shared_ptr<Property<bool>> _writeDebug;
 
   };
 

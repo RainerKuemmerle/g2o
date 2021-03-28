@@ -107,8 +107,8 @@ namespace g2o {
       _triangleX = _previousParams->makeProperty<FloatProperty>(_typeName + "::TRIANGLE_X", .2f);
       _triangleY = _previousParams->makeProperty<FloatProperty>(_typeName + "::TRIANGLE_Y", .05f);
     } else {
-      _triangleX = 0;
-      _triangleY = 0;
+      _triangleX = nullptr;
+      _triangleY = nullptr;
     }
     return true;
   }

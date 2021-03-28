@@ -88,7 +88,7 @@ namespace g2o {
 
    protected:
     virtual bool refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_);
-    FloatProperty* _lineLength, *_lineWidth;
+    std::shared_ptr<FloatProperty> _lineLength, _lineWidth;
 
   };
 #endif

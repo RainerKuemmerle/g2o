@@ -83,7 +83,7 @@ namespace g2o {
 
    protected:
     virtual bool refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_);
-    DoubleProperty* _scaleFactor;
+    std::shared_ptr<DoubleProperty> _scaleFactor;
   };
 #endif
 

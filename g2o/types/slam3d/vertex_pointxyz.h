@@ -102,7 +102,7 @@ namespace g2o {
                               HyperGraphElementAction::Parameters* params_);
 
      protected:
-      FloatProperty *_pointSize;
+      std::shared_ptr<FloatProperty> _pointSize;
       virtual bool refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_);
   };
 #endif

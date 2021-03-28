@@ -2,17 +2,17 @@
 // Copyright (C) 2011 R. Kuemmerle, G. Grisetti, W. Burgard
 //
 // This file is part of g2o.
-// 
+//
 // g2o is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // g2o is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with g2o.  If not, see <http://www.gnu.org/licenses/>.
 
@@ -68,8 +68,8 @@ void PropertiesWidget::updateDisplayedProperties()
     tableWidget->setItem(r, 0, textItem);
     _propNames.push_back(it->first);
 
-    if (dynamic_cast<Property<bool>*>(it->second)) {
-      Property<bool>* prop = static_cast<Property<bool>*>(it->second);
+    if (dynamic_cast<Property<bool>*>(it->second.get())) {
+      Property<bool>* prop = static_cast<Property<bool>*>(it->second.get());
       QTableWidgetItem* checkItem = new QTableWidgetItem;
       checkItem->setText("enabled");
       checkItem->setFlags(checkItem->flags() | Qt::ItemIsUserCheckable);
@@ -81,13 +81,13 @@ void PropertiesWidget::updateDisplayedProperties()
     } else {
       QLineEdit* editor = new QLineEdit(tableWidget);
       editor->setText(QString::fromStdString(it->second->toString()));
-      if (dynamic_cast<Property<int>*>(it->second)) {
+      if (dynamic_cast<Property<int>*>(it->second.get())) {
         editor->setValidator(new QIntValidator(editor));
       }
-      else if (dynamic_cast<Property<float>*>(it->second)) {
+      else if (dynamic_cast<Property<float>*>(it->second.get())) {
         editor->setValidator(new QDoubleValidator(editor));
       }
-      else if (dynamic_cast<Property<double>*>(it->second)) {
+      else if (dynamic_cast<Property<double>*>(it->second.get())) {
         editor->setValidator(new QDoubleValidator(editor));
       }
       tableWidget->setCellWidget(r, 1, editor);
@@ -103,12 +103,12 @@ void PropertiesWidget::applyProperties()
   PropertyMap* properties = _properties;
   for (int r = 0; r < tableWidget->rowCount(); ++r) {
     const std::string& propName = _propNames[r];
-    BaseProperty* baseProp = properties->getProperty<BaseProperty>(propName);
+    std::shared_ptr<BaseProperty> baseProp = properties->getProperty<BaseProperty>(propName);
     if (! baseProp)
       continue;
 
-    if (dynamic_cast<Property<bool>*>(baseProp)) {
-      Property<bool>* prop = static_cast<Property<bool>*>(baseProp);
+    if (dynamic_cast<Property<bool>*>(baseProp.get())) {
+      Property<bool>* prop = static_cast<Property<bool>*>(baseProp.get());
       QTableWidgetItem* checkItem = tableWidget->item(r, 1);
       prop->setValue(checkItem->checkState() == Qt::Checked);
     } else {

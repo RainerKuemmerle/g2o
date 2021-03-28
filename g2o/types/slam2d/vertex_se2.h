@@ -102,7 +102,7 @@ namespace g2o {
    protected:
     HyperGraphElementAction* _drawActions;
     virtual bool refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_);
-    FloatProperty* _triangleX, *_triangleY;
+    std::shared_ptr<FloatProperty> _triangleX, _triangleY;
 
   };
 #endif

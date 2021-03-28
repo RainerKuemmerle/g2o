@@ -187,8 +187,8 @@ bool DrawAction::refreshPropertyPtrs(HyperGraphElementAction::Parameters* params
   DrawAction::Parameters* p = dynamic_cast<DrawAction::Parameters*>(params_);
   if (!p) {
     _previousParams = 0;
-    _show = 0;
-    _showId = 0;
+    _show = nullptr;
+    _showId = nullptr;
   } else {
     _previousParams = p;
     _show = p->makeProperty<BoolProperty>(_typeName + "::SHOW", true);
