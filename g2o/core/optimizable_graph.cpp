@@ -83,9 +83,7 @@ void OptimizableGraph::Vertex::updateCache() {
   }
 }
 
-OptimizableGraph::Vertex::~Vertex() {
-  delete _cacheContainer;
-}
+OptimizableGraph::Vertex::~Vertex() { delete _cacheContainer; }
 
 bool OptimizableGraph::Vertex::setEstimateData(const number_t* v) {
   bool ret = setEstimateDataImpl(v);
@@ -212,7 +210,7 @@ bool OptimizableGraph::addVertex(const std::shared_ptr<OptimizableGraph::Vertex>
 
 bool OptimizableGraph::addVertex(const std::shared_ptr<HyperGraph::Vertex>& v,
                                  const std::shared_ptr<HyperGraph::Data>& userData) {
-  std::shared_ptr<HyperGraph::Vertex> ov = dynamic_pointer_cast<OptimizableGraph::Vertex>(v);
+  auto ov = dynamic_pointer_cast<OptimizableGraph::Vertex>(v);
   assert(ov && "Vertex does not inherit from OptimizableGraph::Vertex");
   if (!ov) return false;
   return addVertex(ov, userData);
@@ -402,7 +400,8 @@ bool OptimizableGraph::load(istream& is) {
     }
 
     // first handle the parameters
-    std::shared_ptr<HyperGraph::HyperGraphElement> pelement = factory->construct(token, elemParamBitset);
+    std::shared_ptr<HyperGraph::HyperGraphElement> pelement =
+        factory->construct(token, elemParamBitset);
     if (pelement) {  // not a parameter or otherwise unknown tag
       assert(pelement->elementType() == HyperGraph::HGET_PARAMETER && "Should be a param");
       auto p = std::static_pointer_cast<Parameter>(pelement);
