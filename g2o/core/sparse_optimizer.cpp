@@ -43,8 +43,6 @@
 #include "g2o/stuff/misc.h"
 #include "g2o/config.h"
 
-#include "g2o/core/ownership.h"
-
 namespace g2o{
   using namespace std;
 

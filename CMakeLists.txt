@@ -187,7 +187,6 @@ if(G2O_BUILD_EXAMPLES)
 endif(G2O_BUILD_EXAMPLES)
 
 option(G2O_FAST_MATH "Enable fast math operations" OFF)
-option(G2O_NO_IMPLICIT_OWNERSHIP_OF_OBJECTS "Disables memory management in the graph types, this requires the callers to manager the memory of edges and nodes" OFF)
 
 # Start of SSE* autodetect code
 # (borrowed from MRPT CMake scripts, BSD)

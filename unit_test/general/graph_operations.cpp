@@ -543,3 +543,26 @@ TEST_F(GeneralGraphOperations, SolverSuitable) {
   EXPECT_FALSE(optimizer->isSolverSuitable(solverPropertyFix63, vertexDims));
   EXPECT_FALSE(optimizer->isSolverSuitable(solverPropertyFix63, vertexDimsNoMatch));
 }
+
+TEST_F(GeneralGraphOperations, SharedOwnerShip) {
+  using Ptr = std::shared_ptr<g2o::HyperGraph::Vertex>;
+  using IdVertexPair = std::pair<int, Ptr>;
+
+  g2o::HyperGraph::VertexIDMap verticesMap = optimizer->vertices();
+  optimizer->clear();
+
+  // currently vertices are owned by our array and the edges
+  ASSERT_THAT(verticesMap,
+              testing::Each(Field(&IdVertexPair::second,
+                                  testing::Property(&Ptr::use_count, testing::Ge(1)))));
+
+  // clear all edges of each vertex
+  for (auto it = verticesMap.begin(); it != verticesMap.end(); ++it) it->second->edges().clear();
+  ASSERT_THAT(verticesMap,
+              testing::Each(Field(&IdVertexPair::second,
+                                  testing::Property(&Ptr::use_count, testing::Ge(1)))));
+
+  Ptr singleVertex = verticesMap.begin()->second;
+  verticesMap.clear();
+  ASSERT_THAT(singleVertex.use_count(), testing::Eq(1));
+}

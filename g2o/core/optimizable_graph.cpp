@@ -43,7 +43,6 @@
 #include "g2o/stuff/string_tools.h"
 #include "hyper_graph_action.h"
 #include "optimization_algorithm_property.h"
-#include "ownership.h"
 #include "robust_kernel.h"
 
 namespace g2o {

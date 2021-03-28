@@ -26,13 +26,10 @@
 
 #include "hyper_graph.h"
 
-#include <assert.h>
-
+#include <cassert>
 #include <iterator>
 #include <queue>
 #include <unordered_set>
-
-#include "ownership.h"
 
 namespace g2o {
 
