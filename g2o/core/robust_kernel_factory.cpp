@@ -46,8 +46,7 @@ void RobustKernelFactory::registerRobustKernel(const std::string& tag,
                                                const AbstractRobustKernelCreator::Ptr& c) {
   CreatorMap::const_iterator foundIt = _creator.find(tag);
   if (foundIt != _creator.end()) {
-    cerr << "RobustKernelFactory WARNING: Overwriting robust kernel tag " << tag << endl;
-    assert(0);
+    assert(0 && "Overwriting robust kernel tag");
   }
 
   _creator[tag] = c;
@@ -60,7 +59,7 @@ void RobustKernelFactory::unregisterType(const std::string& tag) {
   }
 }
 
-RobustKernel* RobustKernelFactory::construct(const std::string& tag) const {
+std::shared_ptr<RobustKernel> RobustKernelFactory::construct(const std::string& tag) const {
   CreatorMap::const_iterator foundIt = _creator.find(tag);
   if (foundIt != _creator.end()) {
     return foundIt->second->construct();
@@ -68,10 +67,10 @@ RobustKernel* RobustKernelFactory::construct(const std::string& tag) const {
   return nullptr;
 }
 
-AbstractRobustKernelCreator* RobustKernelFactory::creator(const std::string& tag) const {
+AbstractRobustKernelCreator::Ptr RobustKernelFactory::creator(const std::string& tag) const {
   CreatorMap::const_iterator foundIt = _creator.find(tag);
   if (foundIt != _creator.end()) {
-    return foundIt->second.get();
+    return foundIt->second;
   }
   return nullptr;
 }

@@ -449,11 +449,11 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
     virtual bool setMeasurementFromState();
 
     //! if NOT NULL, error of this edge will be robustifed with the kernel
-    RobustKernel* robustKernel() const { return _robustKernel; }
+    std::shared_ptr<RobustKernel> robustKernel() const { return _robustKernel; }
     /**
      * specify the robust kernel to be used in this edge
      */
-    void setRobustKernel(RobustKernel* ptr);
+    void setRobustKernel(const std::shared_ptr<RobustKernel>& ptr);
 
     //! returns the error vector cached after calling the computeError;
     virtual const number_t* errorData() const = 0;
@@ -542,7 +542,7 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
    protected:
     int _dimension;
     int _level;
-    RobustKernel* _robustKernel;
+    std::shared_ptr<RobustKernel> _robustKernel;
     long long _internalId;
     std::vector<int> _cacheIds;
 

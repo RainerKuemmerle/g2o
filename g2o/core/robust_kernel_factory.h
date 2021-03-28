@@ -48,7 +48,7 @@ class G2O_CORE_API AbstractRobustKernelCreator {
   /**
    * create a hyper graph element. Has to implemented in derived class.
    */
-  virtual RobustKernel* construct() = 0;
+  virtual std::shared_ptr<RobustKernel> construct() = 0;
   virtual ~AbstractRobustKernelCreator() {}
   using Ptr = std::shared_ptr<AbstractRobustKernelCreator>;
 };
@@ -59,7 +59,7 @@ class G2O_CORE_API AbstractRobustKernelCreator {
 template <typename T>
 class RobustKernelCreator : public AbstractRobustKernelCreator {
  public:
-  RobustKernel* construct() { return new T; }
+  std::shared_ptr<RobustKernel> construct() { return std::shared_ptr<RobustKernel>(new T()); }
 };
 
 /**
@@ -89,12 +89,12 @@ class G2O_CORE_API RobustKernelFactory {
   /**
    * construct a robust kernel based on its tag
    */
-  RobustKernel* construct(const std::string& tag) const;
+  std::shared_ptr<RobustKernel> construct(const std::string& tag) const;
 
   /**
    * return the creator for a specific tag
    */
-  AbstractRobustKernelCreator* creator(const std::string& tag) const;
+  AbstractRobustKernelCreator::Ptr creator(const std::string& tag) const;
 
   /**
    * get a list of all known robust kernels
@@ -114,13 +114,10 @@ class G2O_CORE_API RobustKernelFactory {
 template <typename T>
 class RegisterRobustKernelProxy {
  public:
-  RegisterRobustKernelProxy(const std::string& name) : _name(name) {
+  RegisterRobustKernelProxy(const std::string& name) {
     RobustKernelFactory::instance()->registerRobustKernel(
-        _name, AbstractRobustKernelCreator::Ptr(new RobustKernelCreator<T>()));
+        name, AbstractRobustKernelCreator::Ptr(new RobustKernelCreator<T>()));
   }
-
- private:
-  std::string _name;
 };
 
 }  // end namespace g2o

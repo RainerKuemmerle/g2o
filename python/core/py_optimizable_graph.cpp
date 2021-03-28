@@ -105,10 +105,8 @@ void declareOptimizableGraph(py::module& m) {
            "m"_a)                                                              // double * -> bool
       .def("measurement_dimension", &CLS::Edge::measurementDimension)          // -> int
       .def("set_measurement_from_state", &CLS::Edge::setMeasurementFromState)  // -> bool
-      .def("robust_kernel", &CLS::Edge::robustKernel,
-           py::return_value_policy::reference)  // -> RobustKernel*
-      .def("set_robust_kernel", &CLS::Edge::setRobustKernel, "ptr"_a,
-           py::keep_alive<1, 2>())  // RobustKernel* -> void
+      .def("robust_kernel", &CLS::Edge::robustKernel)  // -> RobustKernelPtr
+      .def("set_robust_kernel", &CLS::Edge::setRobustKernel, "ptr"_a)  // RobustKernel* -> void
 
       .def("initial_estimate_possible", &CLS::Edge::initialEstimatePossible, "from"_a,
            "to"_a)  // (const OptimizableGraph::VertexSet&, OptimizableGraph::VertexSet&) -> double

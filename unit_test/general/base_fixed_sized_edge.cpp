@@ -242,14 +242,13 @@ TEST(ConstantEdgeTest, ConstantEdge_constructQuadraticForm_robust) {
   dynamic.edge.setMeasurement(g2o::Vector2{.3, 3.4});
   constant.edge.setMeasurement(g2o::Vector2{.3, 3.4});
 
-  // assuming that G2O_NO_IMPLICIT_OWNERSHIP_OF_OBJECTS is false
-  g2o::RobustKernelHuber* rk_dynamic = new g2o::RobustKernelHuber;
+  auto rk_dynamic = std::make_shared<g2o::RobustKernelHuber>();
   dynamic.edge.setRobustKernel(rk_dynamic);
   dynamic.edge.computeError();
   dynamic.edge.linearizeOplus(dynamic.jacobianWorkspace);
   dynamic.edge.constructQuadraticForm();
 
-  g2o::RobustKernelHuber* rk_constant = new g2o::RobustKernelHuber;
+  auto rk_constant = std::make_shared<g2o::RobustKernelHuber>();
   constant.edge.setRobustKernel(rk_constant);
   constant.edge.computeError();
   constant.edge.linearizeOplus(constant.jacobianWorkspace);

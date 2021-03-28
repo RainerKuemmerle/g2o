@@ -236,8 +236,7 @@ int main(int argc, const char* argv[]){
           e->information() = Matrix2d::Identity();
 
           if (ROBUST_KERNEL) {
-            g2o::RobustKernelHuber* rk = new g2o::RobustKernelHuber;
-            e->setRobustKernel(rk);
+            e->setRobustKernel(std::make_shared<g2o::RobustKernelHuber>());
           }
 
           e->setParameterId(0, 0);

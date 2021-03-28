@@ -195,8 +195,7 @@ int main(int argc, const char* argv[]) {
           e->setMeasurement(z);
           e->information() = Matrix2d::Identity();
           if (ROBUST_KERNEL) {
-            g2o::RobustKernelHuber* rk = new g2o::RobustKernelHuber;
-            e->setRobustKernel(rk);
+            e->setRobustKernel(std::make_shared<g2o::RobustKernelHuber>());
           }
           e->setParameterId(0, 0);
           optimizer.addEdge(e);

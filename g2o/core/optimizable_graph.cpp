@@ -108,7 +108,7 @@ int OptimizableGraph::Vertex::minimalEstimateDimension() const { return -1; }
 OptimizableGraph::Edge::Edge()
     : HyperGraph::Edge(), _dimension(-1), _level(0), _robustKernel(nullptr) {}
 
-OptimizableGraph::Edge::~Edge() { release(_robustKernel); }
+OptimizableGraph::Edge::~Edge() {}
 
 OptimizableGraph* OptimizableGraph::Edge::graph() {
   if (!_vertices.size()) return nullptr;
@@ -158,9 +158,7 @@ bool OptimizableGraph::Edge::resolveParameters() {
   return true;
 }
 
-void OptimizableGraph::Edge::setRobustKernel(RobustKernel* ptr) {
-  if (_robustKernel) release(_robustKernel);
-
+void OptimizableGraph::Edge::setRobustKernel(const std::shared_ptr<RobustKernel>& ptr) {
   _robustKernel = ptr;
 }
 

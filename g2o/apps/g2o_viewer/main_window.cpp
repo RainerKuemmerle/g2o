@@ -331,27 +331,28 @@ void MainWindow::setRobustKernel()
 
   if (robustKernel) {
     QString strRobustKernel = coRobustKernel->currentText();
-    AbstractRobustKernelCreator* creator = RobustKernelFactory::instance()->creator(strRobustKernel.toStdString());
+    AbstractRobustKernelCreator::Ptr creator = RobustKernelFactory::instance()->creator(strRobustKernel.toStdString());
     if (! creator) {
       cerr << strRobustKernel.toStdString() << " is not a valid robust kernel" << endl;
       return;
     }
+    g2o::RobustKernelPtr robustKernel = creator->construct();
+    robustKernel->setDelta(huberWidth);
     for (SparseOptimizer::EdgeSet::const_iterator it = optimizer->edges().begin(); it != optimizer->edges().end(); ++it) {
       OptimizableGraph::Edge* e = static_cast<OptimizableGraph::Edge*>(it->get());
       if (onlyLoop) {
         if (e->vertices().size() >= 2 && std::abs(e->vertex(0)->id() - e->vertex(1)->id()) != 1) {
-          e->setRobustKernel(creator->construct());
-          e->robustKernel()->setDelta(huberWidth);
+          e->setRobustKernel(robustKernel);
         }
       } else {
-        e->setRobustKernel(creator->construct());
-        e->robustKernel()->setDelta(huberWidth);
+        e->setRobustKernel(robustKernel);
       }
     }
   } else {
+    g2o::RobustKernelPtr emptyKernel;
     for (SparseOptimizer::EdgeSet::const_iterator it = optimizer->edges().begin(); it != optimizer->edges().end(); ++it) {
       OptimizableGraph::Edge* e = static_cast<OptimizableGraph::Edge*>(it->get());
-      e->setRobustKernel(nullptr);
+      e->setRobustKernel(emptyKernel);
     }
   }
 }

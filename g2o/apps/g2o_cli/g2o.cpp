@@ -328,24 +328,22 @@ int main(int argc, char** argv)
   }
 
   if (robustKernel.size() > 0) {
-    AbstractRobustKernelCreator* creator = RobustKernelFactory::instance()->creator(robustKernel);
+    AbstractRobustKernelCreator::Ptr creator = RobustKernelFactory::instance()->creator(robustKernel);
     cerr << "# Preparing robust error function ... ";
+    RobustKernelPtr robustKernel = creator->construct();
+    if (huberWidth > 0) robustKernel->setDelta(huberWidth);
     if (creator) {
       if (nonSequential) {
         for (SparseOptimizer::EdgeSet::iterator it = optimizer.edges().begin(); it != optimizer.edges().end(); ++it) {
           auto e = std::dynamic_pointer_cast<SparseOptimizer::Edge>(*it);
           if (e->vertices().size() >= 2 && std::abs(e->vertex(0)->id() - e->vertex(1)->id()) != 1) {
-            e->setRobustKernel(creator->construct());
-            if (huberWidth > 0)
-              e->robustKernel()->setDelta(huberWidth);
+            e->setRobustKernel(robustKernel);
           }
         }
       } else {
         for (SparseOptimizer::EdgeSet::iterator it = optimizer.edges().begin(); it != optimizer.edges().end(); ++it) {
           auto e = std::dynamic_pointer_cast<SparseOptimizer::Edge>(*it);
-          e->setRobustKernel(creator->construct());
-          if (huberWidth > 0)
-            e->robustKernel()->setDelta(huberWidth);
+          e->setRobustKernel(robustKernel);
         }
       }
       cerr << "done." << endl;

@@ -44,9 +44,8 @@ TEST(General, RobustKernelFactory) {
     ASSERT_THAT(factory->creator(s), NotNull());
   }
   for (const auto& s : kernels) {
-    g2o::RobustKernel* kernel = factory->construct(s);
+    auto kernel = factory->construct(s);
     ASSERT_THAT(kernel, NotNull());
-    delete kernel;
   }
 
   // remove one kernel

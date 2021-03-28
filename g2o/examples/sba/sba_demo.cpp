@@ -232,8 +232,7 @@ int main(int argc, const char* argv[]) {
           e->information() = Matrix3d::Identity();
 
           if (ROBUST_KERNEL) {
-            g2o::RobustKernelHuber* rk = new g2o::RobustKernelHuber;
-            e->setRobustKernel(rk);
+            e->setRobustKernel(std::make_shared<g2o::RobustKernelHuber>());
           }
 
           optimizer.addEdge(e);

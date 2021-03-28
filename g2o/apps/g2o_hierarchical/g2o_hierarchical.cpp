@@ -188,7 +188,7 @@ int main(int argc, char** argv)
     }
   }
 
-  AbstractRobustKernelCreator* kernelCreator=0;
+  AbstractRobustKernelCreator::Ptr kernelCreator;
   if (robustKernel.size() > 0) {
     kernelCreator = RobustKernelFactory::instance()->creator(robustKernel);
   }
