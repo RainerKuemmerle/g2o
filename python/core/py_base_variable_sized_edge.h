@@ -12,7 +12,8 @@ void templatedBaseVariableSizedEdge(py::module& m, const std::string& suffix) {
   // typedef typename BaseEdge<D,E>::ErrorVector ErrorVector;
   // typedef typename BaseEdge<D,E>::InformationType InformationType;
 
-  py::class_<CLS, BaseEdge<D, E>>(m, ("BaseVariableSizedEdge" + suffix).c_str())
+  py::class_<CLS, BaseEdge<D, E>, std::shared_ptr<CLS>>(m,
+                                                        ("BaseVariableSizedEdge" + suffix).c_str())
       .def("resize", &CLS::resize, "size"_a)              // size_t ->
       .def("all_vertices_fixed", &CLS::allVerticesFixed)  // -> bool
       .def("construct_quadratic_form", &CLS::constructQuadraticForm)
@@ -31,7 +32,8 @@ void templatedDynamicBaseVariableSizedEdge(py::module& m, const std::string& suf
   // typedef typename BaseEdge<-1,E>::ErrorVector ErrorVector;
   // typedef typename BaseEdge<-1,E>::InformationType InformationType;
 
-  py::class_<CLS, BaseEdge<-1, E>>(m, ("DynamicBaseVariableSizedEdge" + suffix).c_str())
+  py::class_<CLS, BaseEdge<-1, E>, std::shared_ptr<CLS>>(
+      m, ("DynamicBaseVariableSizedEdge" + suffix).c_str())
       .def("resize", &CLS::resize, "size"_a)              // size_t ->
       .def("all_vertices_fixed", &CLS::allVerticesFixed)  // -> bool
       .def("construct_quadratic_form", &CLS::constructQuadraticForm)

@@ -11,7 +11,7 @@ void templatedBaseUnaryEdge(py::module& m, const std::string& suffix) {
 
   templatedBaseFixedSizedEdge<D, E, VertexXiType>(m, suffix);
 
-  py::class_<CLS, BaseFixedSizedEdge<D, E, VertexXiType>, BaseEdge<D, E>>(
+  py::class_<CLS, BaseFixedSizedEdge<D, E, VertexXiType>, BaseEdge<D, E>, std::shared_ptr<CLS>>(
       m, ("BaseUnaryEdge" + suffix).c_str())
       /*
       .def_readwrite("jacobian_oplus_xi",

@@ -1,8 +1,7 @@
 #pragma once
 
-#include "g2opy.h"
-
 #include "g2o/types/sclam2d/edge_se2_odom_differential_calib.h"
+#include "g2opy.h"
 #include "python/core/py_base_fixed_sized_edge.h"
 
 namespace g2o {
@@ -14,7 +13,8 @@ void declareEdgeSE2OdomDifferentialCalib(py::module& m) {
 
   py::class_<EdgeSE2OdomDifferentialCalib,
              BaseFixedSizedEdge<3, VelocityMeasurement, VertexSE2, VertexSE2,
-                                VertexOdomDifferentialParams>>(m, "EdgeSE2OdomDifferentialCalib")
+                                VertexOdomDifferentialParams>,
+             std::shared_ptr<EdgeSE2OdomDifferentialCalib>>(m, "EdgeSE2OdomDifferentialCalib")
       .def(py::init<>())
       .def("compute_error", &EdgeSE2OdomDifferentialCalib::computeError);
 

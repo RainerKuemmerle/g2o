@@ -33,8 +33,8 @@ void declareOptimizableGraph(py::module& m) {
   // typedef std::vector<OptimizableGraph::Vertex*>      VertexContainer;
   // typedef std::vector<OptimizableGraph::Edge*>        EdgeContainer;
 
-  py::class_<CLS::Vertex, HyperGraph::Vertex, HyperGraph::DataContainer>(cls,
-                                                                         "OptimizableGraph_Vertex")
+  py::class_<CLS::Vertex, HyperGraph::Vertex, HyperGraph::DataContainer,
+             std::shared_ptr<CLS::Vertex>>(cls, "OptimizableGraph_Vertex")
       //.def(py::init<>())   // invalid new-expression of abstract class
       .def("set_to_origin", &CLS::Vertex::setToOrigin)  // -> void
       .def("set_estimate_data",
@@ -96,7 +96,8 @@ void declareOptimizableGraph(py::module& m) {
       .def("unlock_quadratic_form", &CLS::Vertex::unlockQuadraticForm)
       .def("update_cache", &CLS::Vertex::updateCache);
 
-  py::class_<CLS::Edge, HyperGraph::Edge, HyperGraph::DataContainer>(cls, "OptimizableGraph_Edge")
+  py::class_<CLS::Edge, HyperGraph::Edge, HyperGraph::DataContainer, std::shared_ptr<CLS::Edge>>(
+      cls, "OptimizableGraph_Edge")
       //.def(py::init<>())
       .def("set_measurement_data", &CLS::Edge::setMeasurementData,
            "m"_a)  // const double* -> bool
@@ -131,28 +132,26 @@ void declareOptimizableGraph(py::module& m) {
   cls.def("vertex", (std::shared_ptr<CLS::Vertex>(CLS::*)(int)) & CLS::vertex, "id"_a,
           py::return_value_policy::reference);  // int -> Vertex*
 
-  cls.def("add_vertex",
-          (bool (CLS::*)(const std::shared_ptr<HyperGraph::Vertex>&,
-                         const std::shared_ptr<HyperGraph::Data>&)) &
-              CLS::addVertex,
-          "v"_a, "user_data"_a, py::keep_alive<1, 2>(), py::keep_alive<1, 3>());
-  cls.def("add_vertex",
-          (bool (CLS::*)(const std::shared_ptr<HyperGraph::Vertex>&)) & CLS::addVertex, "v"_a,
-          py::keep_alive<1, 2>());
+  //   cls.def("add_vertex",
+  //           (bool (CLS::*)(const std::shared_ptr<HyperGraph::Vertex>&,
+  //                          const std::shared_ptr<HyperGraph::Data>&)) &
+  //               CLS::addVertex,
+  //           "v"_a, "user_data"_a);
+  //   cls.def("add_vertex",
+  //           (bool (CLS::*)(const std::shared_ptr<HyperGraph::Vertex>&)) & CLS::addVertex, "v"_a);
   cls.def("add_vertex",
           (bool (CLS::*)(const std::shared_ptr<OptimizableGraph::Vertex>&,
                          const std::shared_ptr<HyperGraph::Data>&)) &
               CLS::addVertex,
-          "v"_a, "user_data"_a, py::keep_alive<1, 2>(), py::keep_alive<1, 3>());
+          "v"_a, "user_data"_a);
   cls.def("add_vertex",
-          (bool (CLS::*)(const std::shared_ptr<OptimizableGraph::Vertex>&)) & CLS::addVertex, "v"_a,
-          py::keep_alive<1, 2>());
+          (bool (CLS::*)(const std::shared_ptr<OptimizableGraph::Vertex>&)) & CLS::addVertex,
+          "v"_a);
 
   cls.def("add_edge",
-          (bool (CLS::*)(const std::shared_ptr<OptimizableGraph::Edge>&)) & CLS::addEdge, "e"_a,
-          py::keep_alive<1, 2>());
-  cls.def("add_edge", (bool (CLS::*)(const std::shared_ptr<HyperGraph::Edge>&)) & CLS::addEdge,
-          "e"_a, py::keep_alive<1, 2>());
+          (bool (CLS::*)(const std::shared_ptr<OptimizableGraph::Edge>&)) & CLS::addEdge, "e"_a);
+  //   cls.def("add_edge", (bool (CLS::*)(const std::shared_ptr<HyperGraph::Edge>&)) & CLS::addEdge,
+  //           "e"_a, py::keep_alive<1, 2>());
 
   cls.def("set_edge_vertex", &CLS::setEdgeVertex, "e"_a, "pos"_a, "v"_a, py::keep_alive<1, 2>(),
           py::keep_alive<1, 4>());  // (HyperGraph::Edge*, int, HyperGraph::Vertex*) -> bool

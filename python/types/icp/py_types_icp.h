@@ -1,8 +1,8 @@
 #pragma once
 
-#include "g2opy.h"
 #include <g2o/types/icp/types_icp.h>
 
+#include "g2opy.h"
 #include "python/core/py_base_binary_edge.h"
 #include "python/core/py_base_edge.h"
 #include "python/core/py_base_vertex.h"
@@ -34,7 +34,8 @@ void declareTypesICP(py::module& m) {
 
   templatedBaseEdge<3, EdgeGICP>(m, "_3_EdgeGICP");
   templatedBaseBinaryEdge<3, EdgeGICP, VertexSE3, VertexSE3>(m, "_3_EdgeGICP_VertexSE3_VertexSE3");
-  py::class_<Edge_V_V_GICP, BaseBinaryEdge<3, EdgeGICP, VertexSE3, VertexSE3>>(m, "Edge_V_V_GICP")
+  py::class_<Edge_V_V_GICP, BaseBinaryEdge<3, EdgeGICP, VertexSE3, VertexSE3>,
+             std::shared_ptr<Edge_V_V_GICP>>(m, "Edge_V_V_GICP")
       .def(py::init<>())
       .def(py::init<const Edge_V_V_GICP*>())
 
@@ -51,7 +52,7 @@ void declareTypesICP(py::module& m) {
       .def_readwrite_static("dRidy", &Edge_V_V_GICP::dRidy)
       .def_readwrite_static("dRidz", &Edge_V_V_GICP::dRidz);
 
-  py::class_<VertexSCam, VertexSE3>(m, "VertexSCam")
+  py::class_<VertexSCam, VertexSE3, std::shared_ptr<VertexSCam>>(m, "VertexSCam")
       .def(py::init<>())
 
       .def("oplus_impl", &VertexSCam::oplusImpl)
@@ -109,8 +110,8 @@ void declareTypesICP(py::module& m) {
 
   templatedBaseBinaryEdge<3, Vector3, VertexPointXYZ, VertexSCam>(
       m, "_3_Vector3_VertexSBAPointXYZ_VertexSCam");
-  py::class_<Edge_XYZ_VSC, BaseBinaryEdge<3, Vector3, VertexPointXYZ, VertexSCam>>(m,
-                                                                                   "Edge_XYZ_VSC")
+  py::class_<Edge_XYZ_VSC, BaseBinaryEdge<3, Vector3, VertexPointXYZ, VertexSCam>,
+             std::shared_ptr<Edge_XYZ_VSC>>(m, "Edge_XYZ_VSC")
       .def(py::init<>())
       .def("compute_error", &Edge_XYZ_VSC::computeError)
 

@@ -13,7 +13,8 @@ namespace g2o {
 void declareEdgeSE3(py::module& m) {
   templatedBaseBinaryEdge<6, Isometry3, VertexSE3, VertexSE3>(m,
                                                               "_6_Isometry3_VertexSE3_VertexSE3");
-  py::class_<EdgeSE3, BaseBinaryEdge<6, Isometry3, VertexSE3, VertexSE3>>(m, "EdgeSE3")
+  py::class_<EdgeSE3, BaseBinaryEdge<6, Isometry3, VertexSE3, VertexSE3>, std::shared_ptr<EdgeSE3>>(
+      m, "EdgeSE3")
       .def(py::init<>())
 
       .def("compute_error", &EdgeSE3::computeError)
@@ -29,7 +30,8 @@ void declareEdgeSE3(py::module& m) {
   // class G2O_TYPES_SLAM3D_API EdgeSE3WriteGnuplotAction: public WriteGnuplotAction
   // class G2O_TYPES_SLAM3D_API EdgeSE3DrawAction: public DrawAction
 
-  py::class_<EdgeSE3LotsOfXYZ, BaseVariableSizedEdge<-1, VectorX>>(m, "EdgeSE3LotsOfXYZ")
+  py::class_<EdgeSE3LotsOfXYZ, BaseVariableSizedEdge<-1, VectorX>,
+             std::shared_ptr<EdgeSE3LotsOfXYZ>>(m, "EdgeSE3LotsOfXYZ")
       .def(py::init<>())
 
       .def("set_dimension", &EdgeSE3LotsOfXYZ::setDimension<-1>)
@@ -40,7 +42,7 @@ void declareEdgeSE3(py::module& m) {
       .def("initial_estimate_possible", &EdgeSE3LotsOfXYZ::initialEstimatePossible)
       .def("linearize_oplus", &EdgeSE3LotsOfXYZ::linearizeOplus);
 
-  py::class_<EdgeSE3Offset, EdgeSE3>(m, "EdgeSE3Offset")
+  py::class_<EdgeSE3Offset, EdgeSE3, std::shared_ptr<EdgeSE3Offset>>(m, "EdgeSE3Offset")
       .def(py::init<>())
 
       .def("compute_error", &EdgeSE3Offset::computeError)
@@ -50,7 +52,8 @@ void declareEdgeSE3(py::module& m) {
       .def("linearize_oplus", &EdgeSE3Offset::linearizeOplus);
 
   templatedBaseUnaryEdge<6, Isometry3, VertexSE3>(m, "_6_Isometry3_VertexSE3");
-  py::class_<EdgeSE3Prior, BaseUnaryEdge<6, Isometry3, VertexSE3>>(m, "EdgeSE3Prior")
+  py::class_<EdgeSE3Prior, BaseUnaryEdge<6, Isometry3, VertexSE3>, std::shared_ptr<EdgeSE3Prior>>(
+      m, "EdgeSE3Prior")
       .def(py::init<>())
 
       .def("compute_error", &EdgeSE3Prior::computeError)

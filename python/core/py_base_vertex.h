@@ -9,7 +9,8 @@ template <int D, typename T>
 void templatedBaseVertex(py::module& m, const std::string& suffix) {
   using CLS = BaseVertex<D, T>;
 
-  py::class_<CLS, OptimizableGraph::Vertex>(m, ("BaseVertex" + suffix).c_str())
+  py::class_<CLS, OptimizableGraph::Vertex, std::shared_ptr<CLS>>(m,
+                                                                  ("BaseVertex" + suffix).c_str())
 
       //.def(py::init<>())
       //.def_readonly_static("dimension", &BaseVertex<D, T>::Dimension)   // lead to undefined

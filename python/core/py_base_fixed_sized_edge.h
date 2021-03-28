@@ -9,7 +9,7 @@ template <int D, typename E, typename... VertexTypes>
 void templatedBaseFixedSizedEdge(py::module& m, const std::string& suffix) {
   using CLS = BaseFixedSizedEdge<D, E, VertexTypes...>;
 
-  py::class_<CLS, BaseEdge<D, E>>(m, ("BaseFixedSizedEdge" + suffix).c_str())
+  py::class_<CLS, BaseEdge<D, E>, std::shared_ptr<CLS>>(m, ("BaseFixedSizedEdge" + suffix).c_str())
       //.def(py::init<>())    // lead to "error: invalid new-expression of abstract class type ..."
       .def("create_vertex", &CLS::createVertex, "i"_a)  // -> OptimizableGraph::Vertex*
       .def("resize", &CLS::resize)

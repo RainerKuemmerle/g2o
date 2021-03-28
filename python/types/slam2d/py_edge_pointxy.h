@@ -10,8 +10,8 @@ void declareEdgePointXY(py::module& m) {
   templatedBaseBinaryEdge<2, Vector2, VertexPointXY, VertexPointXY>(
       m, "_2_Vector2_VertexPointXY_VertexPointXY");
 
-  py::class_<EdgePointXY, BaseBinaryEdge<2, Vector2, VertexPointXY, VertexPointXY>>(m,
-                                                                                    "EdgePointXY")
+  py::class_<EdgePointXY, BaseBinaryEdge<2, Vector2, VertexPointXY, VertexPointXY>,
+             std::shared_ptr<EdgePointXY>>(m, "EdgePointXY")
       .def(py::init<>())
       .def("compute_error", &EdgePointXY::computeError)
       .def("set_measurement", &EdgePointXY::setMeasurement)

@@ -12,27 +12,30 @@
 namespace g2o {
 
 void declareOptimizationAlgorithm(py::module& m) {
-  py::class_<OptimizationAlgorithm>(m, "OptimizationAlgorithm");
+  py::class_<OptimizationAlgorithm, std::shared_ptr<OptimizationAlgorithm>>(
+      m, "OptimizationAlgorithm");
 
   py::class_<OptimizationAlgorithmProperty>(m, "OptimizationAlgorithmProperty");
 
-  py::class_<OptimizationAlgorithmWithHessian, OptimizationAlgorithm>(
-      m, "OptimizationAlgorithmWithHessian");
+  py::class_<OptimizationAlgorithmWithHessian, OptimizationAlgorithm,
+             std::shared_ptr<OptimizationAlgorithmWithHessian>>(m,
+                                                                "OptimizationAlgorithmWithHessian");
 
-  py::class_<OptimizationAlgorithmGaussNewton, OptimizationAlgorithmWithHessian>(
-      m, "OptimizationAlgorithmGaussNewton")
+  py::class_<OptimizationAlgorithmGaussNewton, OptimizationAlgorithmWithHessian,
+             std::shared_ptr<OptimizationAlgorithmGaussNewton>>(m,
+                                                                "OptimizationAlgorithmGaussNewton")
       .def(py::init([](PyBlockSolverBase& blockSolver) {
         return new OptimizationAlgorithmGaussNewton(blockSolver.solver());
       }));
 
-  py::class_<OptimizationAlgorithmLevenberg, OptimizationAlgorithmWithHessian>(
-      m, "OptimizationAlgorithmLevenberg")
+  py::class_<OptimizationAlgorithmLevenberg, OptimizationAlgorithmWithHessian,
+             std::shared_ptr<OptimizationAlgorithmLevenberg>>(m, "OptimizationAlgorithmLevenberg")
       .def(py::init([](PyBlockSolverBase& blockSolver) {
         return new OptimizationAlgorithmLevenberg(blockSolver.solver());
       }));
 
-  py::class_<OptimizationAlgorithmDogleg, OptimizationAlgorithmWithHessian>(
-      m, "OptimizationAlgorithmDogleg")
+  py::class_<OptimizationAlgorithmDogleg, OptimizationAlgorithmWithHessian,
+             std::shared_ptr<OptimizationAlgorithmDogleg>>(m, "OptimizationAlgorithmDogleg")
       .def(py::init([](PyBlockSolverBase& blockSolver) {
         return new OptimizationAlgorithmDogleg(blockSolver.base_solver());
       }));

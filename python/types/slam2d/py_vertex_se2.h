@@ -6,7 +6,7 @@
 namespace g2o {
 
 void declareVertexSE2(py::module& m) {
-  py::class_<VertexSE2, BaseVertex<3, SE2>>(m, "VertexSE2")
+  py::class_<VertexSE2, BaseVertex<3, SE2>, std::shared_ptr<VertexSE2>>(m, "VertexSE2")
       .def(py::init<>())
       .def("set_to_origin_impl", &VertexSE2::setToOriginImpl)
       .def("oplus_impl", &VertexSE2::oplusImpl)
