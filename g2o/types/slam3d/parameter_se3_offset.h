@@ -71,10 +71,14 @@ namespace g2o {
   class G2O_TYPES_SLAM3D_API CacheSE3Offset: public Cache {
     public:
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
+      using ParameterType = ParameterSE3Offset;
+
       CacheSE3Offset();
       virtual void updateImpl();
 
-      const ParameterSE3Offset* offsetParam() const { return _offsetParam;}
+      std::shared_ptr<ParameterType> offsetParam() const {
+        return std::static_pointer_cast<ParameterType>(_parameters[0]);
+      }
       void setOffsetParam(ParameterSE3Offset* offsetParam);
 
       const Isometry3& w2n() const { return _w2n;}
@@ -82,13 +86,9 @@ namespace g2o {
       const Isometry3& w2l() const { return _w2l;}
 
     protected:
-      ParameterSE3Offset* _offsetParam; ///< the parameter connected to the cache
       Isometry3 _w2n;
       Isometry3 _n2w;
       Isometry3 _w2l;
-
-    protected:
-      virtual bool resolveDependancies();
   };
 
 

@@ -28,6 +28,7 @@
 #define G2O_GRAPH_PARAMETER_HH_
 
 #include <iosfwd>
+#include <memory>
 
 #include "hyper_graph.h"
 
@@ -49,7 +50,7 @@ namespace g2o {
         int _id;
     };
 
-    typedef std::vector<Parameter*> ParameterVector;
+    using ParameterVector = std::vector<std::shared_ptr<Parameter>>;
 
 } // end namespace
 

@@ -531,13 +531,10 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
     const OptimizableGraph* graph() const;
 
     bool setParameterId(int argNum, int paramId);
-    inline const Parameter* parameter(int argNo) const { return *_parameters.at(argNo); }
-    inline size_t numParameters() const { return _parameters.size(); }
-    inline void resizeParameters(size_t newSize) {
-      _parameters.resize(newSize, 0);
-      _parameterIds.resize(newSize, -1);
-      _parameterTypes.resize(newSize, typeid(void*).name());
-    }
+    std::shared_ptr<Parameter> parameter(int argNo) const { return _parameters.at(argNo); }
+    size_t numParameters() const { return _parameters.size(); }
+
+    const std::vector<int>& parameterIds() const { return _parameterIds; }
 
    protected:
     int _dimension;
@@ -546,25 +543,30 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
     long long _internalId;
     std::vector<int> _cacheIds;
 
+    void resizeParameters(size_t newSize) {
+      _parameters.resize(newSize, 0);
+      _parameterIds.resize(newSize, -1);
+      _parameterTypes.resize(newSize, typeid(void*).name());
+    }
+
     template <typename ParameterType>
-    bool installParameter(ParameterType*& p, size_t argNo, int paramId = -1) {
+    bool installParameter(size_t argNo, int paramId = -1) {
       if (argNo >= _parameters.size()) return false;
       _parameterIds[argNo] = paramId;
-      _parameters[argNo] = (Parameter**)&p;
       _parameterTypes[argNo] = typeid(ParameterType).name();
       return true;
     }
 
     template <typename CacheType>
-    void resolveCache(CacheType*& cache, OptimizableGraph::Vertex*, const std::string& _type,
+    void resolveCache(std::shared_ptr<CacheType>& cache,
+                      const std::shared_ptr<OptimizableGraph::Vertex>& v, const std::string& _type,
                       const ParameterVector& parameters);
 
     bool resolveParameters();
     virtual bool resolveCaches();
 
     std::vector<std::string> _parameterTypes;
-    // TODO rainer: can we here also use a smart pointer
-    std::vector<Parameter**> _parameters;
+    ParameterVector _parameters;
     std::vector<int> _parameterIds;
   };
 

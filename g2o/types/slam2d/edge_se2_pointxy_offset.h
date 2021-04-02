@@ -79,8 +79,7 @@ namespace g2o {
     virtual void initialEstimate(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to);
 
   private:
-    ParameterSE2Offset* offsetParam;
-    CacheSE2Offset* cache;
+    std::shared_ptr<CacheSE2Offset> cache;
     virtual bool resolveCaches();
 
   };

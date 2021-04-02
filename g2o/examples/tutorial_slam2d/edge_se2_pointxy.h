@@ -27,6 +27,8 @@
 #ifndef G2O_TUTORIAL_EDGE_SE2_POINT_XY_H
 #define G2O_TUTORIAL_EDGE_SE2_POINT_XY_H
 
+#include <memory>
+
 #include "g2o/core/base_binary_edge.h"
 #include "g2o_tutorial_slam2d_api.h"
 #include "parameter_se2_offset.h"
@@ -37,7 +39,6 @@ namespace g2o {
 
 namespace tutorial {
 
-class ParameterSE2Offset;
 class CacheSE2Offset;
 
 class G2O_TUTORIAL_SLAM2D_API EdgeSE2PointXY
@@ -52,8 +53,7 @@ class G2O_TUTORIAL_SLAM2D_API EdgeSE2PointXY
   virtual bool write(std::ostream& os) const;
 
  protected:
-  ParameterSE2Offset* _sensorOffset;
-  CacheSE2Offset* _sensorCache;
+  std::shared_ptr<CacheSE2Offset> _sensorCache;
 
   virtual bool resolveCaches();
 };

@@ -57,27 +57,19 @@ namespace g2o {
     return internal::writeVector(os, internal::toVectorQT(_offset));
   }
 
-  CacheSE3Offset::CacheSE3Offset() :
-    Cache(),
-    _offsetParam(0)
-  {
-  }
-
-  bool CacheSE3Offset::resolveDependancies(){
-    _offsetParam = dynamic_cast <ParameterSE3Offset*> (_parameters[0]);
-    return _offsetParam != 0;
-  }
+  CacheSE3Offset::CacheSE3Offset() : Cache() {}
 
   void CacheSE3Offset::updateImpl(){
+#ifndef NDEBUG
+  ParameterSE3Offset* offsetParam = dynamic_cast<ParameterSE3Offset*>(_parameters[0].get());
+#else
+  ParameterSE3Offset* offsetParam = static_cast<ParameterSE3Offset*>(_parameters[0].get());
+#endif
+
     const VertexSE3* v = static_cast<const VertexSE3*>(vertex());
-    _n2w = v->estimate() * _offsetParam->offset();
+    _n2w = v->estimate() * offsetParam->offset();
     _w2n = _n2w.inverse();
     _w2l = v->estimate().inverse();
-  }
-
-  void CacheSE3Offset::setOffsetParam(ParameterSE3Offset* offsetParam)
-  {
-    _offsetParam = offsetParam;
   }
 
 #ifdef G2O_HAVE_OPENGL
@@ -85,7 +77,6 @@ namespace g2o {
     _previousParams = (DrawAction::Parameters*)0x42;
     refreshPropertyPtrs(0);
   }
-
 
   bool CacheSE3OffsetDrawAction::refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_){
     if (! DrawAction::refreshPropertyPtrs(params_))

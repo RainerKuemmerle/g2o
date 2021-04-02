@@ -79,8 +79,7 @@ namespace g2o {
     Eigen::Matrix<number_t,3,9,Eigen::ColMajor> J; // jacobian before projection
 
     virtual bool resolveCaches();
-    ParameterCamera* params;
-    CacheCamera* cache;
+    std::shared_ptr<CacheCamera> cache;
   };
 
 }

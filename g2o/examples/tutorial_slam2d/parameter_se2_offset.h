@@ -55,15 +55,14 @@ class G2O_TUTORIAL_SLAM2D_API ParameterSE2Offset : public Parameter {
 class G2O_TUTORIAL_SLAM2D_API CacheSE2Offset : public Cache {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
+  using ParameterType = ParameterSE2Offset;
 
   const SE2& w2n() const { return _w2n; }
   const SE2& n2w() const { return _n2w; }
 
  protected:
   virtual void updateImpl();
-  virtual bool resolveDependancies();
 
-  ParameterSE2Offset* _offsetParam;
   SE2 _w2n, _n2w;
 };
 

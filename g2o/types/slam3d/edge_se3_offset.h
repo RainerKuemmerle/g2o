@@ -32,7 +32,6 @@
 #include "g2o_types_slam3d_api.h"
 
 namespace g2o {
-  class ParameterSE3Offset;
   class CacheSE3Offset;
 
   /**
@@ -53,8 +52,8 @@ namespace g2o {
 
       virtual bool setMeasurementFromState() ;
 
-      virtual number_t initialEstimatePossible(const OptimizableGraph::VertexSet& /*from*/, 
-          OptimizableGraph::Vertex* /*to*/) { 
+      virtual number_t initialEstimatePossible(const OptimizableGraph::VertexSet& /*from*/,
+          OptimizableGraph::Vertex* /*to*/) {
         return 1.;
       }
 
@@ -62,8 +61,7 @@ namespace g2o {
 
     protected:
       virtual bool resolveCaches();
-      ParameterSE3Offset *_offsetFrom, *_offsetTo;
-      CacheSE3Offset  *_cacheFrom, *_cacheTo;
+      std::shared_ptr<CacheSE3Offset> _cacheFrom, _cacheTo;
   };
 
 } // end namespace

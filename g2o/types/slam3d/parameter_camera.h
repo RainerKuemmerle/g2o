@@ -58,16 +58,19 @@ namespace g2o {
   class G2O_TYPES_SLAM3D_API CacheCamera: public CacheSE3Offset {
   public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
+    using ParameterType = ParameterCamera;
+
     //! parameters of the camera
-    const ParameterCamera* camParams() const {return params;}
+    std::shared_ptr<ParameterType> camParams() const {
+      return std::static_pointer_cast<ParameterType>(_parameters[0]);
+    }
+
     //! return the world to image transform
     const Affine3& w2i() const {return _w2i;}
 
   protected:
     virtual void updateImpl();
-    virtual bool resolveDependancies();
     Affine3 _w2i; ///< world to image transform
-    ParameterCamera* params;
   };
 
 

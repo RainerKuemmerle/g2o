@@ -27,6 +27,8 @@
 #ifndef G2O_EDGE_SE3_PRIOR_XYZ_H
 #define G2O_EDGE_SE3_PRIOR_XYZ_H
 
+#include <memory>
+
 #include "vertex_se3.h"
 #include "g2o/core/base_unary_edge.h"
 #include "parameter_se3_offset.h"
@@ -65,12 +67,9 @@ namespace g2o {
     virtual number_t initialEstimatePossible(const OptimizableGraph::VertexSet& /*from*/, OptimizableGraph::Vertex* /*to*/) {return 1.;}
     virtual void initialEstimate(const OptimizableGraph::VertexSet& /*from_*/, OptimizableGraph::Vertex* /*to_*/);
 
-    const ParameterSE3Offset* offsetParameter() { return _offsetParam; }
-
   protected:
     virtual bool resolveCaches();
-    ParameterSE3Offset* _offsetParam;
-    CacheSE3Offset* _cache;
+    std::shared_ptr<CacheSE3Offset> _cache;
   };
 
 } // end namespace

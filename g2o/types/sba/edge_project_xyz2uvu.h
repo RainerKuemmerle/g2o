@@ -27,6 +27,8 @@
 #ifndef G2O_SBA_EDGEPROJECTXYZ2UVU_H
 #define G2O_SBA_EDGEPROJECTXYZ2UVU_H
 
+#include <memory>
+
 #include "g2o/core/base_binary_edge.h"
 #include "g2o/types/slam3d/vertex_pointxyz.h"
 #include "g2o_types_sba_api.h"
@@ -50,7 +52,7 @@ class G2O_TYPES_SBA_API EdgeProjectXYZ2UVU
   void computeError();
   //  virtual void linearizeOplus();
  protected:
-  CameraParameters* _cam;
+  std::shared_ptr<CameraParameters> _cam;
 };
 
 }  // namespace g2o

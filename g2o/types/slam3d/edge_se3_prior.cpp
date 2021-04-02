@@ -37,17 +37,14 @@ using namespace std;
 EdgeSE3Prior::EdgeSE3Prior() : BaseUnaryEdge<6, Isometry3, VertexSE3>() {
   setMeasurement(Isometry3::Identity());
   information().setIdentity();
-  _cache = 0;
-  _offsetParam = 0;
   resizeParameters(1);
-  installParameter(_offsetParam, 0);
+  installParameter<CacheSE3Offset::ParameterType>(0);
 }
 
 bool EdgeSE3Prior::resolveCaches() {
-  assert(_offsetParam);
   ParameterVector pv(1);
-  pv[0] = _offsetParam;
-  resolveCache(_cache, vertexXnRaw<0>(), "CACHE_SE3_OFFSET", pv);
+  pv[0] = _parameters[0];
+  resolveCache(_cache, vertexXn<0>(), "CACHE_SE3_OFFSET", pv);
   return _cache != 0;
 }
 
@@ -91,7 +88,7 @@ void EdgeSE3Prior::initialEstimate(const OptimizableGraph::VertexSet& /*from_*/,
   VertexSE3* v = vertexXnRaw<0>();
   assert(v && "Vertex for the Prior edge is not set");
 
-  Isometry3 newEstimate = _offsetParam->offset().inverse() * measurement();
+  Isometry3 newEstimate = _cache->offsetParam()->offset().inverse() * measurement();
   // do not set translation, as that part of the information is all zero
   if (_information.block<3, 3>(0, 0).array().abs().sum() == 0) {
     newEstimate.translation() = v->estimate().translation();

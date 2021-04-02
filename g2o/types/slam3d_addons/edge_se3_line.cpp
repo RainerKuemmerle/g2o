@@ -32,10 +32,8 @@ namespace g2o {
 
   EdgeSE3Line3D::EdgeSE3Line3D() {
     information().setIdentity();
-    cache = 0;
-    offsetParam = 0;
     resizeParameters(1);
-    installParameter(offsetParam, 0);
+    installParameter<CacheSE3Offset::ParameterType>(0);
     color << 0.0, 0.5, 1.0;
   }
 
@@ -62,8 +60,8 @@ namespace g2o {
 
   bool EdgeSE3Line3D::resolveCaches() {
     ParameterVector pv(1);
-    pv[0] = offsetParam;
-    resolveCache(cache, (OptimizableGraph::Vertex*)_vertices[0].get(), "CACHE_SE3_OFFSET", pv);
+    pv[0] = _parameters[0];
+    resolveCache(cache, vertexXn<0>(), "CACHE_SE3_OFFSET", pv);
     return cache != 0;
   }
 

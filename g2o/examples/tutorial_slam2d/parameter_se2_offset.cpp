@@ -52,14 +52,14 @@ bool ParameterSE2Offset::write(std::ostream& os) const {
 }
 
 void CacheSE2Offset::updateImpl() {
+#ifndef NDEBUG
+  ParameterSE2Offset* offsetParam = dynamic_cast<ParameterSE2Offset*>(_parameters[0].get());
+#else
+  ParameterSE2Offset* offsetParam = static_cast<ParameterSE2Offset*>(_parameters[0].get());
+#endif
   const VertexSE2* v = static_cast<const VertexSE2*>(vertex());
-  _n2w = v->estimate() * _offsetParam->offset();
+  _n2w = v->estimate() * offsetParam->offset();
   _w2n = _n2w.inverse();
-}
-
-bool CacheSE2Offset::resolveDependancies() {
-  _offsetParam = dynamic_cast<ParameterSE2Offset*>(_parameters[0]);
-  return _offsetParam != 0;
 }
 
 }  // end namespace tutorial

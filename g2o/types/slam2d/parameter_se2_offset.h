@@ -75,11 +75,14 @@ namespace g2o {
   class G2O_TYPES_SLAM2D_API CacheSE2Offset: public Cache {
     public:
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
+      using ParameterType = ParameterSE2Offset;
+
       CacheSE2Offset();
       virtual void updateImpl();
 
-      const ParameterSE2Offset* offsetParam() const { return _offsetParam;}
-      void setOffsetParam(ParameterSE2Offset* offsetParam);
+      std::shared_ptr<ParameterSE2Offset> offsetParam() const {
+        return std::static_pointer_cast<ParameterSE2Offset>(_parameters[0]);
+      }
 
       const SE2& w2n() const {return _se2_w2n;}
       const SE2& n2w() const {return _se2_n2w;}
@@ -92,7 +95,6 @@ namespace g2o {
       const Matrix2 RpInverseRInversePrimeMatrix() const { return _RpInverse_RInversePrime; }
 
     protected:
-      ParameterSE2Offset* _offsetParam; ///< the parameter connected to the cache
       SE2 _se2_w2n;
       SE2 _se2_n2w;
 
@@ -101,10 +103,7 @@ namespace g2o {
       Isometry2 _n2w; ///< sensor to world
       Matrix2 _RpInverse_RInverse;
       Matrix2 _RpInverse_RInversePrime;
-      
-    protected:
-      virtual bool resolveDependancies();
-      
+
   };
 
 }

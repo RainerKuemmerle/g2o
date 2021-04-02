@@ -30,15 +30,14 @@ namespace g2o {
 
 EdgeProjectXYZ2UVU::EdgeProjectXYZ2UVU()
     : BaseBinaryEdge<3, Vector3, VertexPointXYZ, VertexSE3Expmap>() {
-  _cam = nullptr;
   resizeParameters(1);
-  installParameter(_cam, 0);
+  installParameter<CameraParameters>(0);
 }
 
 void EdgeProjectXYZ2UVU::computeError() {
   const VertexSE3Expmap* v1 = vertexXnRaw<1>();
   const VertexPointXYZ* v2 = vertexXnRaw<0>();
-  const CameraParameters* cam = static_cast<const CameraParameters*>(parameter(0));
+  auto cam = std::static_pointer_cast<CameraParameters>(parameter(0));
   _error = measurement() - cam->stereocam_uvu_map(v1->estimate().map(v2->estimate()));
 }
 

@@ -27,6 +27,8 @@
 #ifndef G2O_EDGE_SE3_LINE_H_
 #define G2O_EDGE_SE3_LINE_H_
 
+#include <memory>
+
 #include "g2o/core/base_binary_edge.h"
 #include "g2o/types/slam3d/vertex_se3.h"
 #include "g2o/types/slam3d/parameter_se3_offset.h"
@@ -73,8 +75,7 @@ namespace g2o {
       Vector3 color;
 
   private:
-    ParameterSE3Offset* offsetParam;
-    CacheSE3Offset* cache;
+    std::shared_ptr<CacheSE3Offset> cache;
     virtual bool resolveCaches();
 
   };

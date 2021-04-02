@@ -32,17 +32,14 @@ namespace g2o {
   {
     information().setIdentity();
     setMeasurement(Vector3::Zero());
-    _cache = 0;
-    _offsetParam = 0;
     resizeParameters(1);
-    installParameter(_offsetParam, 0);
+    installParameter<CacheSE3Offset::ParameterType>(0);
   }
 
   bool EdgeSE3XYZPrior::resolveCaches(){
-    assert(_offsetParam);
     ParameterVector pv(1);
-    pv[0] = _offsetParam;
-    resolveCache(_cache, vertexXnRaw<0>(), "CACHE_SE3_OFFSET", pv);
+    pv[0] = _parameters[0];
+    resolveCache(_cache, vertexXn<0>(), "CACHE_SE3_OFFSET", pv);
     return _cache != 0;
   }
 
@@ -78,7 +75,7 @@ namespace g2o {
     VertexSE3 *v = vertexXnRaw<0>();
     assert(v && "Vertex for the Prior edge is not set");
 
-    Isometry3 newEstimate = _offsetParam->offset().inverse() * Eigen::Translation3d(measurement());
+    Isometry3 newEstimate = _cache->offsetParam()->offset().inverse() * Eigen::Translation3d(measurement());
     if (_information.block<3,3>(0,0).array().abs().sum() == 0){ // do not set translation, as that part of the information is all zero
       newEstimate.translation() = v->estimate().translation();
     }

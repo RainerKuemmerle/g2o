@@ -27,6 +27,8 @@
 #ifndef G2O_EDGE_SE3_PRIOR_H_
 #define G2O_EDGE_SE3_PRIOR_H_
 
+#include <memory>
+
 #include "g2o/core/base_unary_edge.h"
 #include "g2o_types_slam3d_api.h"
 #include "parameter_se3_offset.h"
@@ -84,8 +86,7 @@ class G2O_TYPES_SLAM3D_API EdgeSE3Prior : public BaseUnaryEdge<6, Isometry3, Ver
  protected:
   Isometry3 _inverseMeasurement;
   virtual bool resolveCaches();
-  ParameterSE3Offset* _offsetParam;
-  CacheSE3Offset* _cache;
+  std::shared_ptr<CacheSE3Offset> _cache;
 };
 
 }  // namespace g2o

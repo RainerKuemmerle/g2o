@@ -30,9 +30,9 @@ namespace g2o {
 
   // point to camera projection, monocular
   EdgeSE3PointXYZDepth::EdgeSE3PointXYZDepth()
-      : BaseBinaryEdge<3, Vector3, VertexSE3, VertexPointXYZ>(), cache(nullptr) {
+      : BaseBinaryEdge<3, Vector3, VertexSE3, VertexPointXYZ>() {
     resizeParameters(1);
-    installParameter(params, 0);
+    installParameter<CacheCamera::ParameterType>(0);
     information().setIdentity();
     information()(2,2)=100;
     J.fill(0);
@@ -41,8 +41,8 @@ namespace g2o {
 
   bool EdgeSE3PointXYZDepth::resolveCaches(){
     ParameterVector pv(1);
-    pv[0]=params;
-    resolveCache(cache, vertexXnRaw<0>(),"CACHE_CAMERA",pv);
+    pv[0] = _parameters[0];
+    resolveCache(cache, vertexXn<0>(),"CACHE_CAMERA",pv);
     return cache != 0;
   }
 
@@ -95,7 +95,7 @@ namespace g2o {
 
     J.block<3,3>(0,6) = cache->w2l().rotation();
 
-    Eigen::Matrix<number_t,3,9,Eigen::ColMajor> Jprime = params->Kcam_inverseOffsetR()  * J;
+    Eigen::Matrix<number_t,3,9,Eigen::ColMajor> Jprime = cache->camParams()->Kcam_inverseOffsetR()  * J;
     Vector3 Zprime = cache->w2i() * pt;
 
     Eigen::Matrix<number_t,3,9,Eigen::ColMajor> Jhom;
@@ -130,12 +130,12 @@ namespace g2o {
 
     VertexSE3 *cam = vertexXnRaw<0>();
     VertexPointXYZ *point = vertexXnRaw<1>();
-    const Eigen::Matrix<number_t, 3, 3, Eigen::ColMajor>& invKcam = params->invKcam();
+    const Eigen::Matrix<number_t, 3, 3, Eigen::ColMajor>& invKcam = cache->camParams()->invKcam();
     Vector3 p;
     p(2) = _measurement(2);
     p.head<2>() = _measurement.head<2>()*p(2);
     p=invKcam*p;
-    point->setEstimate(cam->estimate() * (params->offset() * p));
+    point->setEstimate(cam->estimate() * (cache->camParams()->offset() * p));
   }
 
 }

@@ -40,9 +40,9 @@ namespace g2o {
 
   // point to camera projection, monocular
   EdgeSE3PointXYZDisparity::EdgeSE3PointXYZDisparity()
-      : BaseBinaryEdge<3, Vector3, VertexSE3, VertexPointXYZ>(), params(nullptr), cache(nullptr) {
+      : BaseBinaryEdge<3, Vector3, VertexSE3, VertexPointXYZ>() {
     resizeParameters(1);
-    installParameter(params, 0);
+    installParameter<CacheCamera::ParameterType>(0);
     information().setIdentity();
     information()(2, 2) = 1000.;
     J.fill(0);
@@ -51,8 +51,8 @@ namespace g2o {
 
   bool EdgeSE3PointXYZDisparity::resolveCaches(){
     ParameterVector pv(1);
-    pv[0]=params;
-    resolveCache(cache, (OptimizableGraph::Vertex*)_vertices[0].get(),"CACHE_CAMERA",pv);
+    pv[0]=_parameters[0];
+    resolveCache(cache, vertexXn<0>(),"CACHE_CAMERA",pv);
     return cache != 0;
   }
 
@@ -110,7 +110,7 @@ namespace g2o {
     J.block<3,3>(0,6) = cache->w2l().rotation();
 
     //Eigen::Matrix<number_t,3,9,Eigen::ColMajor> Jprime = vcache->params->Kcam_inverseOffsetR  * J;
-    Eigen::Matrix<number_t,3,9,Eigen::ColMajor> Jprime = params->Kcam_inverseOffsetR()  * J;
+    Eigen::Matrix<number_t,3,9,Eigen::ColMajor> Jprime = cache->camParams()->Kcam_inverseOffsetR()  * J;
     Eigen::Matrix<number_t,3,9,Eigen::ColMajor> Jhom;
     Vector3 Zprime = cache->w2i() * pt;
 
@@ -157,13 +157,13 @@ namespace g2o {
     //   cerr << "fatal error in retrieving cache" << endl;
     // }
     //ParameterCamera* params=vcache->params;
-    const Eigen::Matrix<number_t, 3, 3, Eigen::ColMajor>& invKcam = params->invKcam();
+    const Eigen::Matrix<number_t, 3, 3, Eigen::ColMajor>& invKcam = cache->camParams()->invKcam();
     Vector3 p;
     number_t w=1./_measurement(2);
     p.head<2>() = _measurement.head<2>()*w;
     p(2) = w;
     p = invKcam * p;
-    p = cam->estimate() * (params->offset() * p);
+    p = cam->estimate() * (cache->camParams()->offset() * p);
     point->setEstimate(p);
   }
 
@@ -185,7 +185,8 @@ namespace g2o {
     VertexPointXYZ* toEdge   = static_cast<VertexPointXYZ*>(e->vertices()[1].get());
     if (! fromEdge || ! toEdge)
       return true;
-    Isometry3 fromTransform=fromEdge->estimate() * e->cameraParameter()->offset();
+    ParameterCamera* camParam = static_cast<ParameterCamera*>(e->parameter(0).get());
+    Isometry3 fromTransform=fromEdge->estimate() * camParam->offset();
     glColor3f(LANDMARK_EDGE_COLOR);
     glPushAttrib(GL_ENABLE_BIT);
     glDisable(GL_LIGHTING);

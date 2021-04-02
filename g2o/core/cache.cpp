@@ -87,54 +87,28 @@ namespace g2o {
   void Cache::update(){
     if (! _updateNeeded)
       return;
-    for(std::vector<Cache*>::iterator it=_parentCaches.begin(); it!=_parentCaches.end(); ++it){
-      (*it)->update();
-    }
     updateImpl();
     _updateNeeded=false;
   }
 
-  Cache* Cache::installDependency(const std::string& type_, const std::vector<int>& parameterIndices){
-    ParameterVector pv(parameterIndices.size());
-    for (size_t i=0; i<parameterIndices.size(); i++){
-      if (parameterIndices[i]<0 || parameterIndices[i] >=(int)_parameters.size())
-  return nullptr;
-      pv[i]=_parameters[ parameterIndices[i] ];
-    }
-    CacheKey k(type_, pv);
-    if (!container())
-      return nullptr;
-    Cache* c=container()->findCache(k);
-    if (!c) {
-      c = container()->createCache(k);
-    }
-    if (c)
-      _parentCaches.push_back(c);
-    return c;
-  }
-
-  bool Cache::resolveDependancies(){
-    return true;
-  }
-
   CacheContainer::CacheContainer(OptimizableGraph::Vertex* vertex_) : _updateNeeded(true) { _vertex = vertex_; }
 
-  Cache* CacheContainer::findCache(const Cache::CacheKey& key) {
+  std::shared_ptr<Cache> CacheContainer::findCache(const Cache::CacheKey& key) {
     iterator it=find(key);
     if (it==end())
       return nullptr;
     return it->second;
   }
 
-  Cache* CacheContainer::createCache(const Cache::CacheKey& key){
+  std::shared_ptr<Cache> CacheContainer::createCache(const Cache::CacheKey& key){
     Factory* f = Factory::instance();
-    HyperGraph::HyperGraphElement* e = f->construct(key.type()).release();
+    std::unique_ptr<HyperGraph::HyperGraphElement> e = f->construct(key.type());
     if (!e) {
       cerr << __PRETTY_FUNCTION__ << endl;
       cerr << "fatal error in creating cache of type " << key.type() << endl;
       return nullptr;
     }
-    Cache* c = dynamic_cast<Cache*>(e);
+    auto c = std::shared_ptr<Cache>(dynamic_cast<Cache*>(e.release()));
     if (! c){
       cerr << __PRETTY_FUNCTION__ << endl;
       cerr << "fatal error in creating cache of type " << key.type() << endl;
@@ -142,12 +116,9 @@ namespace g2o {
     }
     c->_container = this;
     c->_parameters = key._parameters;
-    if (c->resolveDependancies()){
-      insert(make_pair(key,c));
-      c->update();
-      return c;
-    }
-    return nullptr;
+    insert(make_pair(key, c));
+    c->update();
+    return c;
   }
 
   OptimizableGraph::Vertex* CacheContainer::vertex() {
@@ -171,12 +142,6 @@ namespace g2o {
     _updateNeeded=needUpdate;
     for (iterator it=begin(); it!=end(); ++it){
       (it->second)->_updateNeeded = needUpdate;
-    }
-  }
-
-  CacheContainer::~CacheContainer(){
-    for (iterator it=begin(); it!=end(); ++it){
-      delete (it->second);
     }
   }
 

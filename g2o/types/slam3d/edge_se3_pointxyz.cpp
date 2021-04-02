@@ -46,16 +46,14 @@ namespace g2o {
     information().setIdentity();
     J.fill(0);
     J.block<3,3>(0,0) = -Matrix3::Identity();
-    cache = 0;
-    offsetParam = 0;
     resizeParameters(1);
-    installParameter(offsetParam, 0);
+    installParameter<CacheSE3Offset::ParameterType>(0);
   }
 
   bool EdgeSE3PointXYZ::resolveCaches(){
     ParameterVector pv(1);
-    pv[0]=offsetParam;
-    resolveCache(cache, (OptimizableGraph::Vertex*)_vertices[0].get(),"CACHE_SE3_OFFSET",pv);
+    pv[0]=_parameters[0];
+    resolveCache(cache, vertexXn<0>(),"CACHE_SE3_OFFSET",pv);
     return cache != 0;
   }
 
@@ -108,7 +106,7 @@ namespace g2o {
 
     J.block<3,3>(0,6) = cache->w2l().rotation();
 
-    Eigen::Matrix<number_t,3,9,Eigen::ColMajor> Jhom = offsetParam->inverseOffset().rotation() * J;
+    Eigen::Matrix<number_t,3,9,Eigen::ColMajor> Jhom = cache->offsetParam()->inverseOffset().rotation() * J;
 
     _jacobianOplusXi = Jhom.block<3,6>(0,0);
     _jacobianOplusXj = Jhom.block<3,3>(0,6);
@@ -149,7 +147,7 @@ namespace g2o {
     // }
     // SE3OffsetParameters* params=vcache->params;
     Vector3 p=_measurement;
-    point->setEstimate(cam->estimate() * (offsetParam->offset() * p));
+    point->setEstimate(cam->estimate() * (cache->offsetParam()->offset() * p));
   }
 
 #ifdef G2O_HAVE_OPENGL
@@ -171,7 +169,8 @@ namespace g2o {
     VertexPointXYZ* toEdge   = static_cast<VertexPointXYZ*>(e->vertex(1).get());
     if (! fromEdge || ! toEdge)
       return true;
-    Isometry3 fromTransform=fromEdge->estimate() * e->offsetParameter()->offset();
+    ParameterSE3Offset* offsetParam = static_cast<ParameterSE3Offset*>(e->parameter(0).get());
+    Isometry3 fromTransform=fromEdge->estimate() * offsetParam->offset();
     glColor3f(LANDMARK_EDGE_COLOR);
     glPushAttrib(GL_ENABLE_BIT);
     glDisable(GL_LIGHTING);

@@ -27,6 +27,8 @@
 #ifndef G2O_SBA_EDGEPROJECTXYZ2UV_H
 #define G2O_SBA_EDGEPROJECTXYZ2UV_H
 
+#include <memory>
+
 #include "g2o/core/base_binary_edge.h"
 #include "g2o/types/slam3d/vertex_pointxyz.h"
 #include "g2o_types_sba_api.h"
@@ -47,7 +49,7 @@ class G2O_TYPES_SBA_API EdgeProjectXYZ2UV
   virtual void linearizeOplus();
 
  public:
-  CameraParameters* _cam;  // TODO make protected member?
+  std::shared_ptr<CameraParameters> _cam;  // TODO make protected member?
 };
 
 }  // namespace g2o

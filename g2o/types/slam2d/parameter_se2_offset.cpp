@@ -29,10 +29,6 @@
 #include "g2o/core/io_helper.h"
 #include "vertex_se2.h"
 
-#ifdef G2O_HAVE_OPENGL
-#include "g2o/stuff/opengl_wrapper.h"
-#endif
-
 namespace g2o {
 
 ParameterSE2Offset::ParameterSE2Offset() { setOffset(); }
@@ -51,18 +47,21 @@ bool ParameterSE2Offset::read(std::istream& is) {
   return state;
 }
 
-bool ParameterSE2Offset::write(std::ostream& os) const { return internal::writeVector(os, offset().toVector()); }
-
-CacheSE2Offset::CacheSE2Offset() : Cache(), _offsetParam(0) {}
-
-bool CacheSE2Offset::resolveDependancies() {
-  _offsetParam = dynamic_cast<ParameterSE2Offset*>(_parameters[0]);
-  return _offsetParam != 0;
+bool ParameterSE2Offset::write(std::ostream& os) const {
+  return internal::writeVector(os, offset().toVector());
 }
 
+CacheSE2Offset::CacheSE2Offset() : Cache() {}
+
 void CacheSE2Offset::updateImpl() {
+#ifndef NDEBUG
+  ParameterSE2Offset* offsetParam = dynamic_cast<ParameterSE2Offset*>(_parameters[0].get());
+#else
+  ParameterSE2Offset* offsetParam = static_cast<ParameterSE2Offset*>(_parameters[0].get());
+#endif
+
   const VertexSE2* v = static_cast<const VertexSE2*>(vertex());
-  _se2_n2w = v->estimate() * _offsetParam->offset();
+  _se2_n2w = v->estimate() * offsetParam->offset();
 
   _n2w = _se2_n2w.rotation().toRotationMatrix();
   _n2w.translation() = _se2_n2w.translation();
@@ -79,10 +78,9 @@ void CacheSE2Offset::updateImpl() {
   number_t c = std::cos(alpha), s = std::sin(alpha);
   Matrix2 RInversePrime;
   RInversePrime << -s, c, -c, -s;
-  _RpInverse_RInversePrime = _offsetParam->offset().rotation().toRotationMatrix().transpose() * RInversePrime;
+  _RpInverse_RInversePrime =
+      offsetParam->offset().rotation().toRotationMatrix().transpose() * RInversePrime;
   _RpInverse_RInverse = w2l.rotation();
 }
-
-void CacheSE2Offset::setOffsetParam(ParameterSE2Offset* offsetParam) { _offsetParam = offsetParam; }
 
 }  // namespace g2o

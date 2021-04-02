@@ -124,7 +124,7 @@ void declareOptimizableGraph(py::module& m) {
            "param_id"_a)  // (int, int) -> bool
       .def("parameter", &CLS::Edge::parameter)
       .def("num_parameters", &CLS::Edge::numParameters)
-      .def("resize_parameters", &CLS::Edge::resizeParameters);
+      .def("param_ids", &CLS::Edge::parameterIds);
 
   cls.def(py::init<>());
   cls.def("vertex", (std::shared_ptr<CLS::Vertex>(CLS::*)(int)) & CLS::vertex, "id"_a,

@@ -206,7 +206,7 @@ void DrawAction::initializeDrawActionsCache() {
 void DrawAction::drawCache(CacheContainer* caches, HyperGraphElementAction::Parameters* params_) {
   if (caches) {
     for (CacheContainer::iterator it = caches->begin(); it != caches->end(); ++it) {
-      Cache* c = it->second;
+      Cache* c = it->second.get();
       (*_cacheDrawActions)(c, params_);
     }
   }

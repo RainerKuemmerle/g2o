@@ -35,48 +35,32 @@ namespace g2o {
 
   EdgeSE2Offset::EdgeSE2Offset() : BaseBinaryEdge<3, SE2, VertexSE2, VertexSE2>() {
     information().setIdentity();
-    _offsetFrom = 0;
-    _offsetTo = 0;
-    _cacheFrom = 0;
-    _cacheTo = 0;
     resizeParameters(2);
-    installParameter(_offsetFrom, 0);
-    installParameter(_offsetTo, 1);
+    installParameter<CacheSE2Offset::ParameterType>(0);
+    installParameter<CacheSE2Offset::ParameterType>(1);
   }
 
   bool EdgeSE2Offset::resolveCaches(){
-    assert(_offsetFrom && _offsetTo);
-
     ParameterVector pv(1);
-    pv[0] = _offsetFrom;
-    resolveCache(_cacheFrom, vertexXnRaw<0>(), "CACHE_SE2_OFFSET", pv);
-    pv[0] = _offsetTo;
-    resolveCache(_cacheTo, vertexXnRaw<1>(), "CACHE_SE2_OFFSET", pv);
+    pv[0] = _parameters[0];
+    resolveCache(_cacheFrom, vertexXn<0>(), "CACHE_SE2_OFFSET", pv);
+    pv[0] = _parameters[1];
+    resolveCache(_cacheTo, vertexXn<1>(), "CACHE_SE2_OFFSET", pv);
     return (_cacheFrom && _cacheTo);
   }
 
   bool EdgeSE2Offset::read(std::istream& is) {
-    int pidFrom, pidTo;
-    is >> pidFrom >> pidTo;
-    if (! setParameterId(0,pidFrom))
-      return false;
-    if (! setParameterId(1,pidTo))
-      return false;
+    bool state = readParamIds(is);
 
     Vector3 meas;
-    internal::readVector(is, meas);
+    state &= internal::readVector(is, meas);
     setMeasurement(SE2(meas));
-    if (is.bad()) return false;
-    readInformationMatrix(is);
-    if (is.bad()) {
-      //  we overwrite the information matrix with the Identity
-      information().setIdentity();
-    }
-    return true;
+    state &= readInformationMatrix(is);
+    return state;
   }
 
   bool EdgeSE2Offset::write(std::ostream& os) const {
-    os << _offsetFrom->id() << " " << _offsetTo->id() << " ";
+    writeParamIds(os);
     internal::writeVector(os, measurement().toVector());
     return writeInformationMatrix(os);
   }

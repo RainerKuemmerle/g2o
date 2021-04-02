@@ -81,16 +81,9 @@ namespace g2o {
     return os.good();
   }
 
-  bool CacheCamera::resolveDependancies(){
-    if  (!CacheSE3Offset::resolveDependancies())
-      return false;
-    params = dynamic_cast<ParameterCamera*>(_parameters[0]);
-    return params != 0;
-  }
-
   void CacheCamera::updateImpl(){
     CacheSE3Offset::updateImpl();
-    _w2i.matrix().topLeftCorner<3,4>() = params->Kcam() * w2n().matrix().topLeftCorner<3,4>();
+    _w2i.matrix().topLeftCorner<3,4>() = camParams()->Kcam() * w2n().matrix().topLeftCorner<3,4>();
   }
 
 #ifdef G2O_HAVE_OPENGL

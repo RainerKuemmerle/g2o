@@ -30,9 +30,8 @@ namespace g2o {
 
 EdgeProjectXYZ2UV::EdgeProjectXYZ2UV()
     : BaseBinaryEdge<2, Vector2, VertexPointXYZ, VertexSE3Expmap>() {
-  _cam = 0;
   resizeParameters(1);
-  installParameter(_cam, 0);
+  installParameter<CameraParameters>(0);
 }
 
 bool EdgeProjectXYZ2UV::read(std::istream& is) {
@@ -50,7 +49,7 @@ bool EdgeProjectXYZ2UV::write(std::ostream& os) const {
 void EdgeProjectXYZ2UV::computeError() {
   const VertexSE3Expmap* v1 = vertexXnRaw<1>();
   const VertexPointXYZ* v2 = vertexXnRaw<0>();
-  const CameraParameters* cam = static_cast<const CameraParameters*>(parameter(0));
+  auto cam = std::static_pointer_cast<CameraParameters>(parameter(0));
   _error = measurement() - cam->cam_map(v1->estimate().map(v2->estimate()));
 }
 
@@ -66,7 +65,7 @@ void EdgeProjectXYZ2UV::linearizeOplus() {
   number_t z = xyz_trans[2];
   number_t z_2 = z * z;
 
-  const CameraParameters* cam = static_cast<const CameraParameters*>(parameter(0));
+  auto cam = std::static_pointer_cast<CameraParameters>(parameter(0));
 
   Eigen::Matrix<number_t, 2, 3, Eigen::ColMajor> tmp;
   tmp(0, 0) = cam->focal_length;

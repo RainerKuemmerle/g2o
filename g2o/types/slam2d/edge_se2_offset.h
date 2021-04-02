@@ -34,7 +34,6 @@
 
 namespace g2o {
 
-  class ParameterSE2Offset;
   class CacheSE2Offset;
 
   /**
@@ -85,8 +84,7 @@ namespace g2o {
     protected:
       SE2 _inverseMeasurement;
       virtual bool resolveCaches();
-      ParameterSE2Offset *_offsetFrom, *_offsetTo;
-      CacheSE2Offset  *_cacheFrom, *_cacheTo;
+      std::shared_ptr<CacheSE2Offset>  _cacheFrom, _cacheTo;
   };
 
 } // end namespace

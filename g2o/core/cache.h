@@ -57,7 +57,8 @@ namespace g2o {
           ParameterVector _parameters;
       };
 
-      Cache(CacheContainer* container_ = 0, const ParameterVector& parameters_ = ParameterVector());
+      Cache(CacheContainer* container_ = nullptr,
+            const ParameterVector& parameters_ = ParameterVector());
 
       CacheKey key() const;
 
@@ -74,66 +75,43 @@ namespace g2o {
       //! redefine this to do the update
       virtual void updateImpl() = 0;
 
-      /**
-       * this function installs and satisfies a cache
-       * @param type_: the typename of the dependency
-       * @param parameterIndices: a vector containing the indices if the parameters
-       * in _parameters that will be used to assemble the Key of the cache being created
-       * For example if I have a cache of type C2, having parameters "A, B, and C",
-       * and it depends on a cache of type C1 that depends on the parameters A and C,
-       * the parameterIndices should contain "0, 2", since they are the positions in the
-       * parameter vector of C2 of the parameters needed to construct C1.
-       * @returns the newly created cache
-       */
-      Cache* installDependency(const std::string& type_, const std::vector<int>& parameterIndices);
-
-      /**
-       * Function to be called from a cache that has dependencies. It just invokes a
-       * sequence of installDependency().
-       * Although the caches returned are stored in the _parentCache vector,
-       * it is better that you redefine your own cache member variables, for better readability
-       */
-      virtual bool resolveDependancies();
-
       bool _updateNeeded;
       ParameterVector _parameters;
-      std::vector<Cache*> _parentCaches;
       CacheContainer* _container;
   };
 
-  // TODO convert to smart pointer
-  class G2O_CORE_API CacheContainer: public std::map<Cache::CacheKey, Cache*>
+  class G2O_CORE_API CacheContainer: public std::map<Cache::CacheKey, std::shared_ptr<Cache>>
   {
     public:
-      CacheContainer(OptimizableGraph::Vertex* vertex_);
-      virtual ~CacheContainer();
+      friend OptimizableGraph::Edge;
+      explicit CacheContainer(OptimizableGraph::Vertex* vertex_);
       OptimizableGraph::Vertex* vertex();
       OptimizableGraph* graph();
-      Cache* findCache(const Cache::CacheKey& key);
-      Cache* createCache(const Cache::CacheKey& key);
+      std::shared_ptr<Cache> findCache(const Cache::CacheKey& key);
       void setUpdateNeeded(bool needUpdate=true);
       void update();
     protected:
+      std::shared_ptr<Cache> createCache(const Cache::CacheKey& key);
       OptimizableGraph::Vertex* _vertex;
       bool _updateNeeded;
   };
 
 
   template <typename CacheType>
-  void OptimizableGraph::Edge::resolveCache(CacheType*& cache,
-      OptimizableGraph::Vertex* v,
+  void OptimizableGraph::Edge::resolveCache(std::shared_ptr<CacheType>& cache,
+      const std::shared_ptr<OptimizableGraph::Vertex>& v,
       const std::string& type_,
       const ParameterVector& parameters_)
   {
-    cache = 0;
+    cache = nullptr;
     CacheContainer* container= v->cacheContainer();
     Cache::CacheKey key(type_, parameters_);
-    Cache* c = container->findCache(key);
+    std::shared_ptr<Cache> c = container->findCache(key);
     if (!c) {
       c = container->createCache(key);
     }
     if (c) {
-      cache = dynamic_cast<CacheType*>(c);
+      cache = std::dynamic_pointer_cast<CacheType>(c);
     }
   }
 

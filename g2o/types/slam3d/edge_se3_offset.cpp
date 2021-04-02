@@ -36,23 +36,17 @@ namespace g2o {
 
   EdgeSE3Offset::EdgeSE3Offset() : EdgeSE3() {
     information().setIdentity();
-    _offsetFrom = 0;
-    _offsetTo = 0;
-    _cacheFrom = 0;
-    _cacheTo = 0;
     resizeParameters(2);
-    installParameter(_offsetFrom, 0);
-    installParameter(_offsetTo, 1);
+    installParameter<CacheSE3Offset::ParameterType>(0);
+    installParameter<CacheSE3Offset::ParameterType>(1);
   }
 
   bool EdgeSE3Offset::resolveCaches(){
-    assert(_offsetFrom && _offsetTo);
-
-    ParameterVector pv(2);
-    pv[0]=_offsetFrom;
-    resolveCache(_cacheFrom, (OptimizableGraph::Vertex*)_vertices[0].get(),"CACHE_SE3_OFFSET",pv);
-    pv[0]=_offsetTo;
-    resolveCache(_cacheTo, (OptimizableGraph::Vertex*)_vertices[1].get(),"CACHE_SE3_OFFSET",pv);
+    ParameterVector pv(1);
+    pv[0] = _parameters[0];
+    resolveCache(_cacheFrom, vertexXn<0>(), "CACHE_SE3_OFFSET", pv);
+    pv[0] = _parameters[1];
+    resolveCache(_cacheTo, vertexXn<0>(), "CACHE_SE3_OFFSET", pv);
     return (_cacheFrom && _cacheTo);
   }
 

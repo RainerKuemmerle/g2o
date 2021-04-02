@@ -23,7 +23,6 @@ void declareEdgeSE3PointXYZ(py::module& m) {
       .def("set_measurement_from_state", &EdgeSE3PointXYZ::setMeasurementFromState)
       .def("initial_estimate_possible", &EdgeSE3PointXYZ::initialEstimatePossible)
       .def("initial_estimate", &EdgeSE3PointXYZ::initialEstimate)
-      .def("offset_parameter", &EdgeSE3PointXYZ::offsetParameter)  // -> ParameterSE3Offset*
       ;
 
   // class EdgeSE3PointXYZDrawAction: public DrawAction
@@ -57,7 +56,6 @@ void declareEdgeSE3PointXYZ(py::module& m) {
       .def("set_measurement_from_state", &EdgeSE3PointXYZDisparity::setMeasurementFromState)
       .def("initial_estimate_possible", &EdgeSE3PointXYZDisparity::initialEstimatePossible)
       .def("initial_estimate", &EdgeSE3PointXYZDisparity::initialEstimate)
-      .def("camera_parameter", &EdgeSE3PointXYZDisparity::cameraParameter)  // -> ParameterCamera*
       ;
 }
 

@@ -63,12 +63,12 @@ std::ostream& printIdChain(std::ostream& os, const std::vector<int>& ids) {
 
 OptimizableGraph::Vertex::Vertex()
     : HyperGraph::Vertex(),
-      _graph(0),
+      _graph(nullptr),
       _hessianIndex(-1),
       _fixed(false),
       _marginalized(false),
       _colInHessian(-1),
-      _cacheContainer(0) {}
+      _cacheContainer(nullptr) {}
 
 CacheContainer* OptimizableGraph::Vertex::cacheContainer() {
   if (!_cacheContainer) _cacheContainer = new CacheContainer(this);
@@ -126,7 +126,7 @@ const OptimizableGraph* OptimizableGraph::Edge::graph() const {
 bool OptimizableGraph::Edge::setParameterId(int argNum, int paramId) {
   if ((int)_parameters.size() <= argNum) return false;
   if (argNum < 0) return false;
-  *_parameters[argNum] = 0;
+  _parameters[argNum] = nullptr;
   _parameterIds[argNum] = paramId;
   return true;
 }
@@ -141,16 +141,16 @@ bool OptimizableGraph::Edge::resolveParameters() {
   // cerr << __PRETTY_FUNCTION__ << ": encountered " << _parameters.size() << " parameters" << endl;
   for (size_t i = 0; i < _parameters.size(); i++) {
     int index = _parameterIds[i];
-    *_parameters[i] = graph()->parameter(index).get();
+    _parameters[i] = graph()->parameter(index);
 #ifndef NDEBUG
-    auto& aux = **_parameters[i];
+    auto& aux = *_parameters[i];
     if (typeid(aux).name() != _parameterTypes[i]) {
       cerr << __PRETTY_FUNCTION__ << ": FATAL, parameter type mismatch - encountered "
            << typeid(aux).name() << "; should be " << _parameterTypes[i] << endl;
     }
 #endif
-    if (!*_parameters[i]) {
-      cerr << __PRETTY_FUNCTION__ << ": FATAL, *_parameters[i] == 0" << endl;
+    if (!_parameters[i]) {
+      cerr << __PRETTY_FUNCTION__ << ": FATAL, _parameters[i] == nullptr" << endl;
       return false;
     }
   }

@@ -35,16 +35,14 @@ namespace g2o {
   // point to camera projection, monocular
   EdgeSE2PointXYOffset::EdgeSE2PointXYOffset() : BaseBinaryEdge<2, Vector2, VertexSE2, VertexPointXY>() {
     information().setIdentity();
-    cache = 0;
-    offsetParam = 0;
     resizeParameters(1);
-    installParameter(offsetParam, 0);
+    installParameter<CacheSE2Offset::ParameterType>(0);
   }
 
   bool EdgeSE2PointXYOffset::resolveCaches(){
     ParameterVector pv(1);
-    pv[0] = offsetParam;
-    resolveCache(cache, vertexXnRaw<0>(), "CACHE_SE2_OFFSET", pv);
+    pv[0] = _parameters[0];
+    resolveCache(cache, vertexXn<0>(), "CACHE_SE2_OFFSET", pv);
     return cache != 0;
   }
 
@@ -63,7 +61,7 @@ namespace g2o {
   }
 
   bool EdgeSE2PointXYOffset::write(std::ostream& os) const {
-    os << offsetParam->id() << " ";
+    os << _parameters[0]->id() << " ";
     internal::writeVector(os, measurement());
     return writeInformationMatrix(os);
   }
@@ -110,7 +108,7 @@ namespace g2o {
     // }
     // SE2OffsetParameters* params=vcache->params;
     Vector2 p=_measurement;
-    point->setEstimate(cam->estimate() * (offsetParam->offsetMatrix() * p));
+    point->setEstimate(cam->estimate() * (cache->offsetParam()->offsetMatrix() * p));
   }
 
 }
