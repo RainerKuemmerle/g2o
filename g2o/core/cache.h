@@ -28,6 +28,7 @@
 #define G2O_CACHE_HH_
 
 #include <map>
+#include <memory>
 
 #include "optimizable_graph.h"
 #include "g2o_core_api.h"
@@ -62,10 +63,8 @@ namespace g2o {
 
       CacheKey key() const;
 
-      OptimizableGraph::Vertex* vertex();
-      OptimizableGraph* graph();
-      CacheContainer* container();
-      ParameterVector& parameters();
+      OptimizableGraph::Vertex* vertex() const;
+      const ParameterVector& parameters() const;
 
       void update();
 
@@ -85,8 +84,7 @@ namespace g2o {
     public:
       friend OptimizableGraph::Edge;
       explicit CacheContainer(OptimizableGraph::Vertex* vertex_);
-      OptimizableGraph::Vertex* vertex();
-      OptimizableGraph* graph();
+      OptimizableGraph::Vertex* vertex() const;
       std::shared_ptr<Cache> findCache(const Cache::CacheKey& key);
       void setUpdateNeeded(bool needUpdate=true);
       void update();
@@ -103,16 +101,13 @@ namespace g2o {
       const std::string& type_,
       const ParameterVector& parameters_)
   {
-    cache = nullptr;
     CacheContainer* container= v->cacheContainer();
     Cache::CacheKey key(type_, parameters_);
     std::shared_ptr<Cache> c = container->findCache(key);
     if (!c) {
       c = container->createCache(key);
     }
-    if (c) {
-      cache = std::dynamic_pointer_cast<CacheType>(c);
-    }
+    cache = std::dynamic_pointer_cast<CacheType>(c);
   }
 
 } // end namespace

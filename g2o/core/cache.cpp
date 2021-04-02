@@ -44,7 +44,7 @@ namespace g2o {
   }
 
   Cache::Cache(CacheContainer* container_, const ParameterVector& parameters_) :
-    _updateNeeded(true), _parameters(parameters_), _container(container_)
+    _updateNeeded(true), _parameters(parameters_)
   {
   }
 
@@ -53,28 +53,15 @@ namespace g2o {
       return true;
     else if (c._type < _type)
       return false;
-    return std::lexicographical_compare (_parameters.begin( ), _parameters.end( ),
-           c._parameters.begin( ), c._parameters.end( ) );
+    return std::lexicographical_compare(_parameters.begin(), _parameters.end(),
+                                        c._parameters.begin(), c._parameters.end());
   }
 
-
-  OptimizableGraph::Vertex* Cache::vertex() {
-    if (container() )
-      return container()->vertex();
-    return nullptr;
+  OptimizableGraph::Vertex* Cache::vertex() const {
+    return _container ? _container->vertex() : nullptr;
   }
 
-  OptimizableGraph* Cache::graph() {
-    if (container())
-      return container()->graph();
-    return nullptr;
-  }
-
-  CacheContainer* Cache::container() {
-    return _container;
-  }
-
-  ParameterVector& Cache::parameters() {
+  const ParameterVector& Cache::parameters() const {
     return _parameters;
   }
 
@@ -121,14 +108,8 @@ namespace g2o {
     return c;
   }
 
-  OptimizableGraph::Vertex* CacheContainer::vertex() {
+  OptimizableGraph::Vertex* CacheContainer::vertex() const {
     return _vertex;
-  }
-
-  OptimizableGraph* CacheContainer::graph(){
-    if (_vertex)
-      return _vertex->graph();
-    return nullptr;
   }
 
   void CacheContainer::update() {
