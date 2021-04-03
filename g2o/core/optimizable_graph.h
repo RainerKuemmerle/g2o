@@ -690,6 +690,8 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
   bool isSolverSuitable(const OptimizationAlgorithmProperty& solverProperty,
                         const std::set<int>& vertDims = std::set<int>()) const;
 
+  //! remove all edges and vertices
+  virtual void clear();
   /**
    * remove the parameters of the graph
    */

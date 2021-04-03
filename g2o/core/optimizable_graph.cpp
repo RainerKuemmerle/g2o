@@ -756,8 +756,16 @@ bool OptimizableGraph::saveEdge(std::ostream& os, OptimizableGraph::Edge* e) con
   return false;
 }
 
-void OptimizableGraph::clearParameters() {
+void OptimizableGraph::clear() {
+  for (auto& vptr : _vertices) {
+    OptimizableGraph::Vertex* v = dynamic_cast<OptimizableGraph::Vertex*>(vptr.second.get());
+    v->_graph = nullptr;
+  }
   HyperGraph::clear();
+}
+
+void OptimizableGraph::clearParameters() {
+  clear();
   _parameters.clear();
 }
 

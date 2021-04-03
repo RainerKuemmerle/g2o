@@ -103,6 +103,26 @@ TEST(General, GraphAddEdge) {
   ASSERT_EQ(size_t(1), optimizer->edges().size());
 }
 
+TEST(General, GraphAddVertexAndClear) {
+  auto optimizer = g2o::internal::createOptimizerForTests();
+
+  auto v1 = std::make_shared<g2o::VertexSE2>();
+  v1->setId(0);
+  ASSERT_TRUE(optimizer->addVertex(v1));
+  ASSERT_THAT(optimizer->vertices(), testing::SizeIs(1));
+
+  // clearing
+  optimizer->clear();
+  ASSERT_THAT(optimizer->vertices(), testing::SizeIs(0));
+  ASSERT_EQ(nullptr, v1->graph());
+
+  // re-add the same other optimizer again
+  auto otherOptimizer = g2o::internal::createOptimizerForTests();
+  ASSERT_TRUE(otherOptimizer->addVertex(v1));
+  ASSERT_EQ(v1->graph(), otherOptimizer.get());
+  ASSERT_THAT(otherOptimizer->vertices(), testing::SizeIs(1));
+}
+
 /**
  * Fixture to test saving and loading of a graph.
  * Here, we will have a simple graph with N nodes and N edges.
