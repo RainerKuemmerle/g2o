@@ -44,12 +44,12 @@ TEST(General, BinaryEdgeConstructor) {
 }
 
 TEST(General, GraphAddVertex) {
-  g2o::SparseOptimizer* optimizer = g2o::internal::createOptimizerForTests();
+  auto optimizer = g2o::internal::createOptimizerForTests();
 
   auto v1 = std::make_shared<g2o::VertexSE2>();
   v1->setId(0);
   ASSERT_TRUE(optimizer->addVertex(v1));
-  ASSERT_EQ(optimizer, v1->graph());
+  ASSERT_EQ(optimizer.get(), v1->graph());
   ASSERT_EQ(size_t(1), optimizer->vertices().size());
   ASSERT_FALSE(optimizer->addVertex(v1));
   ASSERT_EQ(size_t(1), optimizer->vertices().size());
@@ -62,11 +62,14 @@ TEST(General, GraphAddVertex) {
     ASSERT_EQ(nullptr, v2->graph());
   }
 
-  delete optimizer;
+  // removing vertex
+  ASSERT_TRUE(optimizer->removeVertex(v1));
+  ASSERT_EQ(nullptr, v1->graph());
+  ASSERT_THAT(optimizer->vertices(), testing::SizeIs(0));
 }
 
 TEST(General, GraphAddEdge) {
-  g2o::SparseOptimizer* optimizer = g2o::internal::createOptimizerForTests();
+  auto optimizer = g2o::internal::createOptimizerForTests();
 
   auto v1 = std::make_shared<g2o::VertexSE2>();
   v1->setId(0);
@@ -80,7 +83,7 @@ TEST(General, GraphAddEdge) {
   e1->setVertex(0, v1);
   e1->setVertex(1, v2);
   ASSERT_TRUE(optimizer->addEdge(e1));
-  ASSERT_EQ(optimizer, e1->graph());
+  ASSERT_EQ(optimizer.get(), e1->graph());
   ASSERT_FALSE(optimizer->addEdge(e1));
   ASSERT_EQ(size_t(1), optimizer->edges().size());
   ASSERT_EQ(size_t(1), v1->edges().size());
@@ -98,8 +101,6 @@ TEST(General, GraphAddEdge) {
   e3->setVertex(1, v1);
   ASSERT_FALSE(optimizer->addEdge(e3)) << "Adding binary edge with same vertices was possible";
   ASSERT_EQ(size_t(1), optimizer->edges().size());
-
-  delete optimizer;
 }
 
 /**
@@ -110,7 +111,7 @@ TEST(General, GraphAddEdge) {
 class GeneralGraphOperations : public ::testing::Test {
  protected:
   void SetUp() override {
-    optimizer.reset(g2o::internal::createOptimizerForTests());
+    optimizer = g2o::internal::createOptimizerForTests();
 
     // Add vertices
     for (size_t i = 0; i < numVertices; ++i) {

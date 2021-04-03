@@ -27,13 +27,15 @@
 #ifndef G2O_TEST_ALLOCATE_OPTIMIZER_H
 #define G2O_TEST_ALLOCATE_OPTIMIZER_H
 
+#include <memory>
+
 namespace g2o {
 
 class SparseOptimizer;
 
 namespace internal {
 
-g2o::SparseOptimizer* createOptimizerForTests();
+std::unique_ptr<g2o::SparseOptimizer> createOptimizerForTests();
 
 }  // namespace internal
 }  // namespace g2o

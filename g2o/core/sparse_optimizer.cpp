@@ -588,7 +588,7 @@ namespace g2o{
       clearIndexMapping();
       _ivMap.clear();
     }
-    return HyperGraph::removeVertex(v, detach);
+    return OptimizableGraph::removeVertex(v, detach);
   }
 
   bool SparseOptimizer::addComputeErrorAction(HyperGraphAction* action)

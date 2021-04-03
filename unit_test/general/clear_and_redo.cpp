@@ -32,8 +32,7 @@
 
 TEST(General, ClearAndRedo) {
   // Initialize the SparseOptimizer
-  std::unique_ptr<g2o::SparseOptimizer> mOptimizerPtr;
-  mOptimizerPtr.reset(g2o::internal::createOptimizerForTests());
+  std::unique_ptr<g2o::SparseOptimizer> mOptimizerPtr = g2o::internal::createOptimizerForTests();
   g2o::SparseOptimizer& mOptimizer = *mOptimizerPtr;
 
   // Set the default terminate action

@@ -130,24 +130,19 @@ void declareOptimizableGraph(py::module& m) {
   cls.def("vertex", (std::shared_ptr<CLS::Vertex>(CLS::*)(int)) & CLS::vertex, "id"_a,
           py::return_value_policy::reference);  // int -> Vertex*
 
-  //   cls.def("add_vertex",
-  //           (bool (CLS::*)(const std::shared_ptr<HyperGraph::Vertex>&,
-  //                          const std::shared_ptr<HyperGraph::Data>&)) &
-  //               CLS::addVertex,
-  //           "v"_a, "user_data"_a);
-  //   cls.def("add_vertex",
-  //           (bool (CLS::*)(const std::shared_ptr<HyperGraph::Vertex>&)) & CLS::addVertex, "v"_a);
   cls.def("add_vertex",
-          (bool (CLS::*)(const std::shared_ptr<OptimizableGraph::Vertex>&,
+          (bool (CLS::*)(const std::shared_ptr<HyperGraph::Vertex>&,
                          const std::shared_ptr<HyperGraph::Data>&)) &
               CLS::addVertex,
           "v"_a, "user_data"_a);
   cls.def("add_vertex",
-          (bool (CLS::*)(const std::shared_ptr<OptimizableGraph::Vertex>&)) & CLS::addVertex,
+          (bool (CLS::*)(const std::shared_ptr<HyperGraph::Vertex>&)) & CLS::addVertex,
           "v"_a);
+  cls.def("remove_vertex", &CLS::removeVertex, "v"_a,
+          "detach"_a);  // virtual, (Vertex*, bool) -> bool
 
   cls.def("add_edge",
-          (bool (CLS::*)(const std::shared_ptr<OptimizableGraph::Edge>&)) & CLS::addEdge, "e"_a);
+          (bool (CLS::*)(const std::shared_ptr<HyperGraph::Edge>&)) & CLS::addEdge, "e"_a);
   //   cls.def("add_edge", (bool (CLS::*)(const std::shared_ptr<HyperGraph::Edge>&)) & CLS::addEdge,
   //           "e"_a, py::keep_alive<1, 2>());
 

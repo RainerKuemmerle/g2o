@@ -181,8 +181,10 @@ OptimizableGraph::~OptimizableGraph() {
   clearParameters();
 }
 
-bool OptimizableGraph::addVertex(const std::shared_ptr<OptimizableGraph::Vertex>& ov,
+bool OptimizableGraph::addVertex(const std::shared_ptr<HyperGraph::Vertex>& v,
                                  const std::shared_ptr<HyperGraph::Data>& userData) {
+  auto ov = dynamic_cast<OptimizableGraph::Vertex*>(v.get());
+  if (!ov) return false;
   if (ov->id() < 0) {
     cerr << __FUNCTION__ << ": FATAL, a vertex with (negative) ID " << ov->id()
          << " cannot be inserted in the graph" << endl;
@@ -201,19 +203,19 @@ bool OptimizableGraph::addVertex(const std::shared_ptr<OptimizableGraph::Vertex>
   }
   if (userData) ov->setUserData(userData);
   ov->_graph = this;
-  std::shared_ptr<HyperGraph::Vertex> aux = static_pointer_cast<HyperGraph::Vertex>(ov);
-  return HyperGraph::addVertex(aux);
+  return HyperGraph::addVertex(v);
 }
 
-bool OptimizableGraph::addVertex(const std::shared_ptr<HyperGraph::Vertex>& v,
-                                 const std::shared_ptr<HyperGraph::Data>& userData) {
-  auto ov = dynamic_pointer_cast<OptimizableGraph::Vertex>(v);
-  assert(ov && "Vertex does not inherit from OptimizableGraph::Vertex");
-  if (!ov) return false;
-  return addVertex(ov, userData);
+bool OptimizableGraph::removeVertex(const std::shared_ptr<HyperGraph::Vertex>& v, bool detach)
+{
+  auto ov = dynamic_cast<OptimizableGraph::Vertex*>(v.get());
+  if (ov && ov->_graph == this) ov->_graph = nullptr;
+  return HyperGraph::removeVertex(v, detach);
 }
 
-bool OptimizableGraph::addEdge(const std::shared_ptr<OptimizableGraph::Edge>& e) {
+bool OptimizableGraph::addEdge(const std::shared_ptr<HyperGraph::Edge>& he) {
+  OptimizableGraph::Edge* e = dynamic_cast<OptimizableGraph::Edge*>(he.get());
+  if (!e) return false;
   OptimizableGraph* g = e->graph();
 
   if (g != nullptr && g != this) {
@@ -222,8 +224,7 @@ bool OptimizableGraph::addEdge(const std::shared_ptr<OptimizableGraph::Edge>& e)
     return false;
   }
 
-  auto aux = static_pointer_cast<HyperGraph::Edge>(e);
-  bool eresult = HyperGraph::addEdge(aux);
+  bool eresult = HyperGraph::addEdge(he);
   if (!eresult) return false;
 
   e->_internalId = _nextEdgeId++;
@@ -237,7 +238,7 @@ bool OptimizableGraph::addEdge(const std::shared_ptr<OptimizableGraph::Edge>& e)
     return false;
   }
 
-  _jacobianWorkspace.updateSize(e.get());
+  _jacobianWorkspace.updateSize(e);
 
   return true;
 }
@@ -250,12 +251,12 @@ std::shared_ptr<const OptimizableGraph::Vertex> OptimizableGraph::vertex(int id)
   return static_pointer_cast<const OptimizableGraph::Vertex>(HyperGraph::vertex(id));
 }
 
-bool OptimizableGraph::addEdge(const std::shared_ptr<HyperGraph::Edge>& e_) {
-  std::shared_ptr<OptimizableGraph::Edge> e = dynamic_pointer_cast<OptimizableGraph::Edge>(e_);
-  assert(e && "Edge does not inherit from OptimizableGraph::Edge");
-  if (!e) return false;
-  return addEdge(e);
-}
+// bool OptimizableGraph::addEdge(const std::shared_ptr<HyperGraph::Edge>& e_) {
+//   std::shared_ptr<OptimizableGraph::Edge> e = dynamic_pointer_cast<OptimizableGraph::Edge>(e_);
+//   assert(e && "Edge does not inherit from OptimizableGraph::Edge");
+//   if (!e) return false;
+//   return addEdge(e);
+// }
 
 bool OptimizableGraph::setEdgeVertex(const std::shared_ptr<HyperGraph::Edge>& e, int pos,
                                      const std::shared_ptr<HyperGraph::Vertex>& v) {

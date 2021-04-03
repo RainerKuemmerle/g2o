@@ -34,9 +34,9 @@ namespace internal {
 typedef g2o::BlockSolver<g2o::BlockSolverTraits<-1, -1> > SlamBlockSolver;
 typedef g2o::LinearSolverEigen<SlamBlockSolver::PoseMatrixType> SlamLinearSolver;
 
-g2o::SparseOptimizer* createOptimizerForTests() {
+std::unique_ptr<g2o::SparseOptimizer> createOptimizerForTests() {
   // Initialize the SparseOptimizer
-  g2o::SparseOptimizer* mOptimizer = new g2o::SparseOptimizer();
+  auto mOptimizer = std::make_unique<g2o::SparseOptimizer>();
   auto linearSolver = g2o::make_unique<SlamLinearSolver>();
   linearSolver->setBlockOrdering(false);
   auto blockSolver = g2o::make_unique<SlamBlockSolver>(std::move(linearSolver));

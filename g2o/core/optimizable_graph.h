@@ -541,7 +541,6 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
     int _level;
     std::shared_ptr<RobustKernel> _robustKernel;
     long long _internalId;
-    std::vector<int> _cacheIds;
 
     void resizeParameters(size_t newSize) {
       _parameters.resize(newSize, 0);
@@ -588,33 +587,9 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
     auto noData = std::shared_ptr<HyperGraph::Data>();
     return addVertex(v, noData);
   }
-  virtual bool addVertex(const std::shared_ptr<OptimizableGraph::Vertex>& v,
-                 const std::shared_ptr<HyperGraph::Data>& userData);
-  virtual bool addVertex(const std::shared_ptr<OptimizableGraph::Vertex>& v) {
-    auto noData = std::shared_ptr<HyperGraph::Data>();
-    return addVertex(v, noData);
-  }
 
-  template <typename DerivedVertexType, typename DerivedDataType>
-  bool addVertex(const typename std::shared_ptr<DerivedVertexType>& v,
-                 const typename std::shared_ptr<DerivedDataType>& userData) {
-    std::shared_ptr<OptimizableGraph::Vertex> ov =
-        std::dynamic_pointer_cast<OptimizableGraph::Vertex>(v);
-    std::shared_ptr<HyperGraph::Data> hd = std::dynamic_pointer_cast<HyperGraph::Data>(userData);
-    assert(ov && "Vertex does not inherit from OptimizableGraph::Vertex");
-    assert(hd && "UserData does not inherit from HyperGraph::Data");
-    if (!ov) return false;
-    return addVertex(ov, hd);
-  }
-
-  template <typename DerivedVertexType>
-  bool addVertex(const typename std::shared_ptr<DerivedVertexType>& v) {
-    std::shared_ptr<OptimizableGraph::Vertex> ov =
-        std::dynamic_pointer_cast<OptimizableGraph::Vertex>(v);
-    assert(ov && "Vertex does not inherit from OptimizableGraph::Vertex");
-    if (!ov) return false;
-    return addVertex(ov);
-  }
+  //! removes a vertex from the graph. Returns true on success (vertex was present)
+  virtual bool removeVertex(const std::shared_ptr<HyperGraph::Vertex>& v, bool detach = false);
 
   /**
    * adds a new edge.
@@ -622,17 +597,8 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
    * @return false if the insertion does not work (incompatible types of the vertices/missing
    * vertex). true otherwise.
    */
-  virtual bool addEdge(const std::shared_ptr<HyperGraph::Edge>& e);
-  bool addEdge(const std::shared_ptr<OptimizableGraph::Edge>& e);
-
-  template <typename DerivedEdgeType>
-  bool addEdge(const typename std::shared_ptr<DerivedEdgeType>& e) {
-    std::shared_ptr<OptimizableGraph::Edge> oe =
-        std::dynamic_pointer_cast<OptimizableGraph::Edge>(e);
-    assert(oe && "Edge does not inherit from OptimizableGraph::Edge");
-    if (!oe) return false;
-    return addEdge(oe);
-  }
+  // virtual bool addEdge(const std::shared_ptr<HyperGraph::Edge>& e);
+  bool addEdge(const std::shared_ptr<HyperGraph::Edge>& e);
 
   /**
    * overridden from HyperGraph, to mantain the bookkeeping of the caches/parameters and jacobian
