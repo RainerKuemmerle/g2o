@@ -36,7 +36,7 @@ TEST(General, ClearAndRedo) {
   g2o::SparseOptimizer& mOptimizer = *mOptimizerPtr;
 
   // Set the default terminate action
-  g2o::SparseOptimizerTerminateAction* terminateAction = new g2o::SparseOptimizerTerminateAction;
+  auto terminateAction = std::make_shared<g2o::SparseOptimizerTerminateAction>();
   mOptimizer.addPostIterationAction(terminateAction);
 
   for (int i = 0; i < 2; i++) {
@@ -93,5 +93,4 @@ TEST(General, ClearAndRedo) {
 
     mOptimizer.clear();
   }
-  delete terminateAction;
 }

@@ -2,17 +2,17 @@
 // Copyright (C) 2011 R. Kuemmerle, G. Grisetti, W. Burgard
 //
 // This file is part of g2o.
-// 
+//
 // g2o is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // g2o is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with g2o.  If not, see <http://www.gnu.org/licenses/>.
 
@@ -74,10 +74,10 @@ int RunG2OViewer::run(int argc, char** argv, CommandArgs& arg)
   mw.viewer->graph = optimizer;
 
   // set up the GUI action
-  GuiHyperGraphAction guiHyperGraphAction;
-  guiHyperGraphAction.viewer = mw.viewer;
+  auto guiHyperGraphAction = std::make_shared<GuiHyperGraphAction>();
+  guiHyperGraphAction->viewer = mw.viewer;
   //optimizer->addPostIterationAction(&guiHyperGraphAction);
-  optimizer->addPreIterationAction(&guiHyperGraphAction);
+  optimizer->addPreIterationAction(guiHyperGraphAction);
 
   if (inputFilename.size() > 0) {
     mw.loadFromFile(QString::fromStdString(inputFilename));
@@ -85,7 +85,7 @@ int RunG2OViewer::run(int argc, char** argv, CommandArgs& arg)
 
   QCoreApplication* myapp = QApplication::instance();
   while (mw.isVisible()) {
-    guiHyperGraphAction.dumpScreenshots = mw.actionDump_Images->isChecked();
+    guiHyperGraphAction->dumpScreenshots = mw.actionDump_Images->isChecked();
     if (myapp)
       myapp->processEvents();
     SleepThread::msleep(10);

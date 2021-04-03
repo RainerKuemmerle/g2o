@@ -678,23 +678,23 @@ void OptimizableGraph::postIteration(int iter) {
   performActions(iter, _graphActions[AT_POSTITERATION]);
 }
 
-bool OptimizableGraph::addPostIterationAction(HyperGraphAction* action) {
+bool OptimizableGraph::addPostIterationAction(const std::shared_ptr<HyperGraphAction>& action) {
   std::pair<HyperGraphActionSet::iterator, bool> insertResult =
       _graphActions[AT_POSTITERATION].insert(action);
   return insertResult.second;
 }
 
-bool OptimizableGraph::addPreIterationAction(HyperGraphAction* action) {
+bool OptimizableGraph::addPreIterationAction(const std::shared_ptr<HyperGraphAction>& action) {
   std::pair<HyperGraphActionSet::iterator, bool> insertResult =
       _graphActions[AT_PREITERATION].insert(action);
   return insertResult.second;
 }
 
-bool OptimizableGraph::removePreIterationAction(HyperGraphAction* action) {
+bool OptimizableGraph::removePreIterationAction(const std::shared_ptr<HyperGraphAction>& action) {
   return _graphActions[AT_PREITERATION].erase(action) > 0;
 }
 
-bool OptimizableGraph::removePostIterationAction(HyperGraphAction* action) {
+bool OptimizableGraph::removePostIterationAction(const std::shared_ptr<HyperGraphAction>& action) {
   return _graphActions[AT_POSTITERATION].erase(action) > 0;
 }
 
@@ -758,7 +758,7 @@ bool OptimizableGraph::saveEdge(std::ostream& os, OptimizableGraph::Edge* e) con
 
 void OptimizableGraph::clear() {
   for (auto& vptr : _vertices) {
-    OptimizableGraph::Vertex* v = dynamic_cast<OptimizableGraph::Vertex*>(vptr.second.get());
+    OptimizableGraph::Vertex* v = static_cast<OptimizableGraph::Vertex*>(vptr.second.get());
     v->_graph = nullptr;
   }
   HyperGraph::clear();

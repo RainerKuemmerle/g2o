@@ -175,7 +175,7 @@ namespace g2o {
     number_t activeRobustChi2() const;
 
     //! verbose information during optimization
-    bool verbose()  const {return _verbose;}
+    bool verbose() const {return _verbose;}
     void setVerbose(bool verbose);
 
     /**
@@ -185,7 +185,7 @@ namespace g2o {
     bool* forceStopFlag() const { return _forceStopFlag;};
 
     //! if external stop flag is given, return its state. False otherwise
-    bool terminate() {return _forceStopFlag ? (*_forceStopFlag) : false; }
+    bool terminate() const {return _forceStopFlag ? (*_forceStopFlag) : false; }
 
     //! the index mapping of the vertices
     const VertexContainerRaw& indexMapping() const {return _ivMap;}
@@ -280,9 +280,9 @@ namespace g2o {
 
     /**** callbacks ****/
     //! add an action to be executed before the error vectors are computed
-    bool addComputeErrorAction(HyperGraphAction* action);
+    bool addComputeErrorAction(const std::shared_ptr<HyperGraphAction>& action);
     //! remove an action that should no longer be execured before computing the error vectors
-    bool removeComputeErrorAction(HyperGraphAction* action);
+    bool removeComputeErrorAction(const std::shared_ptr<HyperGraphAction>& action);
 
 
 

@@ -209,7 +209,7 @@ int main(int argc, char** argv)
   if (maxIterations < 0) {
     cerr << "# setup termination criterion based on the gain of the iteration" << endl;
     maxIterations = maxIterationsWithGain;
-    SparseOptimizerTerminateAction* terminateAction = new SparseOptimizerTerminateAction;
+    auto terminateAction = std::make_shared<SparseOptimizerTerminateAction>();
     terminateAction->setGainThreshold(gain);
     terminateAction->setMaxIterations(maxIterationsWithGain);
     optimizer.addPostIterationAction(terminateAction);

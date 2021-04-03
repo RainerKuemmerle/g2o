@@ -66,7 +66,7 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
     AT_NUM_ELEMENTS,  // keep as last element
   };
 
-  typedef std::set<HyperGraphAction*> HyperGraphActionSet;
+  using HyperGraphActionSet = std::set<std::shared_ptr<HyperGraphAction>>;
 
   // forward declarations
   class G2O_CORE_API Vertex;
@@ -634,14 +634,14 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
   virtual void postIteration(int);
 
   //! add an action to be executed before each iteration
-  bool addPreIterationAction(HyperGraphAction* action);
+  bool addPreIterationAction(const std::shared_ptr<HyperGraphAction>& action);
   //! add an action to be executed after each iteration
-  bool addPostIterationAction(HyperGraphAction* action);
+  bool addPostIterationAction(const std::shared_ptr<HyperGraphAction>& action);
 
   //! remove an action that should no longer be execured before each iteration
-  bool removePreIterationAction(HyperGraphAction* action);
+  bool removePreIterationAction(const std::shared_ptr<HyperGraphAction>& action);
   //! remove an action that should no longer be execured after each iteration
-  bool removePostIterationAction(HyperGraphAction* action);
+  bool removePostIterationAction(const std::shared_ptr<HyperGraphAction>& action);
 
   //! push the estimate of all variables onto a stack
   virtual void push();
@@ -709,18 +709,6 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
    */
   bool verifyInformationMatrices(bool verbose = false) const;
 
-  // helper functions to save an individual vertex
-  bool saveVertex(std::ostream& os, Vertex* v) const;
-
-  // helper function to save an individual parameter
-  bool saveParameter(std::ostream& os, Parameter* v) const;
-
-  // helper functions to save an individual edge
-  bool saveEdge(std::ostream& os, Edge* e) const;
-
-  // helper functions to save the data packets
-  bool saveUserData(std::ostream& os, HyperGraph::Data* v) const;
-
   //! the workspace for storing the Jacobians of the graph
   JacobianWorkspace& jacobianWorkspace() { return _jacobianWorkspace; }
   const JacobianWorkspace& jacobianWorkspace() const { return _jacobianWorkspace; }
@@ -733,8 +721,8 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
    */
   static bool initMultiThreading();
 
-  inline ParameterContainer& parameters() { return _parameters; }
-  inline const ParameterContainer& parameters() const { return _parameters; }
+  ParameterContainer& parameters() { return _parameters; }
+  const ParameterContainer& parameters() const { return _parameters; }
 
   //! apply a unary function to all vertices
   void forEachVertex(std::function<void(OptimizableGraph::Vertex*)> fn);
@@ -751,6 +739,18 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
   JacobianWorkspace _jacobianWorkspace;
 
   void performActions(int iter, HyperGraphActionSet& actions);
+
+  // helper functions to save an individual vertex
+  bool saveVertex(std::ostream& os, Vertex* v) const;
+
+  // helper function to save an individual parameter
+  bool saveParameter(std::ostream& os, Parameter* v) const;
+
+  // helper functions to save an individual edge
+  bool saveEdge(std::ostream& os, Edge* e) const;
+
+  // helper functions to save the data packets
+  bool saveUserData(std::ostream& os, HyperGraph::Data* v) const;
 };
 
 /**

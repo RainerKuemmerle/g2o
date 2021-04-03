@@ -591,13 +591,13 @@ namespace g2o{
     return OptimizableGraph::removeVertex(v, detach);
   }
 
-  bool SparseOptimizer::addComputeErrorAction(HyperGraphAction* action)
+  bool SparseOptimizer::addComputeErrorAction(const std::shared_ptr<HyperGraphAction>& action)
   {
     std::pair<HyperGraphActionSet::iterator, bool> insertResult = _graphActions[AT_COMPUTEACTIVERROR].insert(action);
     return insertResult.second;
   }
 
-  bool SparseOptimizer::removeComputeErrorAction(HyperGraphAction* action)
+  bool SparseOptimizer::removeComputeErrorAction(const std::shared_ptr<HyperGraphAction>& action)
   {
     return _graphActions[AT_COMPUTEACTIVERROR].erase(action) > 0;
   }
