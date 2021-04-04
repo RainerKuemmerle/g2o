@@ -6,10 +6,9 @@ import g2opy as g2o
 import argparse
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--noise', type=float, help='noise in position', default=0.02)
-parser.add_argument('--seed', type=int, help='random seed', default=0)
+parser.add_argument("--noise", type=float, help="noise in position", default=0.02)
+parser.add_argument("--seed", type=int, help="random seed", default=0)
 args = parser.parse_args()
-
 
 
 def main():
@@ -18,11 +17,13 @@ def main():
     algorithm = g2o.OptimizationAlgorithmLevenberg(solver)
     optimizer.set_algorithm(algorithm)
 
-    true_points = np.hstack([
-        np.random.random((1000, 1)) * 3 - 1.5,
-        np.random.random((1000, 1)) - 0.5,
-        np.random.random((1000, 1)) + 10])
-
+    true_points = np.hstack(
+        [
+            np.random.random((1000, 1)) * 3 - 1.5,
+            np.random.random((1000, 1)) - 0.5,
+            np.random.random((1000, 1)) + 10,
+        ]
+    )
 
     for i in range(2):
         t = np.array([0, 0, i])
@@ -73,23 +74,21 @@ def main():
     cam = g2o.Isometry3d(vc.estimate().R, np.array([0, 0, 0.2]))
     vc.set_estimate(cam)
 
-
     optimizer.initialize_optimization()
     optimizer.compute_active_errors()
-    print('Initial chi2 =', optimizer.chi2())
+    print("Initial chi2 =", optimizer.chi2())
 
-    optimizer.save('gicp.g2o')
+    optimizer.save("gicp.g2o")
 
     optimizer.set_verbose(True)
     optimizer.optimize(5)
 
-    print('\nSecond vertex should be near [0, 0, 1]')
-    print('before optimization:', cam.t)
-    print('after  optimization:', optimizer.vertex(1).estimate().t)
+    print("\nSecond vertex should be near [0, 0, 1]")
+    print("before optimization:", cam.t)
+    print("after  optimization:", optimizer.vertex(1).estimate().t)
 
 
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     if args.seed > 0:
         np.random.seed(args.seed)
 

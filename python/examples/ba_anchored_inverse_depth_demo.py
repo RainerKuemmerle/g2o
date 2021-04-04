@@ -7,15 +7,31 @@ from collections import defaultdict
 import argparse
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--noise', dest='pixel_noise', type=float, default=1.,
-    help='noise in image pixel space (default: 1.0)')
-parser.add_argument('--outlier', dest='outlier_ratio', type=float, default=0.,
-    help='probability of spuroius observation  (default: 0.0)')
-parser.add_argument('--robust', dest='robust_kernel', action='store_true', help='use robust kernel')
-parser.add_argument('--no-schur', dest='schur_trick', action='store_false', help='not use Schur-complement trick')
-parser.add_argument('--seed', type=int, default=0, help='random seed')
+parser.add_argument(
+    "--noise",
+    dest="pixel_noise",
+    type=float,
+    default=1.0,
+    help="noise in image pixel space (default: 1.0)",
+)
+parser.add_argument(
+    "--outlier",
+    dest="outlier_ratio",
+    type=float,
+    default=0.0,
+    help="probability of spuroius observation  (default: 0.0)",
+)
+parser.add_argument(
+    "--robust", dest="robust_kernel", action="store_true", help="use robust kernel"
+)
+parser.add_argument(
+    "--no-schur",
+    dest="schur_trick",
+    action="store_false",
+    help="not use Schur-complement trick",
+)
+parser.add_argument("--seed", type=int, default=0, help="random seed")
 args = parser.parse_args()
-
 
 
 def invert_depth(x):
@@ -28,17 +44,19 @@ def main():
     if args.schur_trick:
         solver = g2o.BlockSolverSE3(g2o.LinearSolverEigenSE3())
     else:
-        solver = g2o.BlockSolverX(g2o.LinearSolverEigenX())   # slower
+        solver = g2o.BlockSolverX(g2o.LinearSolverEigenX())  # slower
     solver = g2o.OptimizationAlgorithmLevenberg(solver)
     optimizer.set_algorithm(solver)
 
-    true_points = np.hstack([
-        np.random.random((500, 1)) * 3 - 1.5,
-        np.random.random((500, 1)) - 0.5,
-        np.random.random((500, 1)) + 3])
+    true_points = np.hstack(
+        [
+            np.random.random((500, 1)) * 3 - 1.5,
+            np.random.random((500, 1)) - 0.5,
+            np.random.random((500, 1)) + 3,
+        ]
+    )
 
-
-    focal_length = 1000.
+    focal_length = 1000.0
     principal_point = (320, 240)
     cam = g2o.CameraParameters(focal_length, principal_point, 0)
     cam.set_id(0)
@@ -49,7 +67,7 @@ def main():
     num_pose = 15
     for i in range(num_pose):
         # pose here means transform points from world coordinates to camera coordinates
-        pose = g2o.SE3Quat(np.identity(3), [i*0.04-1, 0, 0])
+        pose = g2o.SE3Quat(np.identity(3), [i * 0.04 - 1, 0, 0])
         true_poses.append(pose)
 
         v_se3 = g2o.VertexSE3Expmap()
@@ -58,7 +76,6 @@ def main():
         if i < 2:
             v_se3.set_fixed(True)
         optimizer.add_vertex(v_se3)
-
 
     point_id = num_pose
     inliers = dict()
@@ -106,32 +123,33 @@ def main():
 
         if inlier:
             inliers[point_id] = (i, anchor)
-            error = (true_poses[anchor].inverse() * invert_depth(v_p.estimate()) -
-                true_points[i])
-            sse[0] += np.sum(error**2)
+            error = (
+                true_poses[anchor].inverse() * invert_depth(v_p.estimate())
+                - true_points[i]
+            )
+            sse[0] += np.sum(error ** 2)
         point_id += 1
 
-    print('Performing full BA:')
+    print("Performing full BA:")
     optimizer.initialize_optimization()
     optimizer.set_verbose(True)
     optimizer.optimize(10)
 
-
     for i in inliers:
         v_p = optimizer.vertex(i)
         v_anchor = optimizer.vertex(inliers[i][1])
-        error = (v_anchor.estimate().inverse() * invert_depth(v_p.estimate()) -
-            true_points[inliers[i][0]])
-        sse[1] += np.sum(error**2)
+        error = (
+            v_anchor.estimate().inverse() * invert_depth(v_p.estimate())
+            - true_points[inliers[i][0]]
+        )
+        sse[1] += np.sum(error ** 2)
+
+    print("\nRMSE (inliers only):")
+    print("before optimization:", np.sqrt(sse[0] / len(inliers)))
+    print("after  optimization:", np.sqrt(sse[1] / len(inliers)))
 
 
-    print('\nRMSE (inliers only):')
-    print('before optimization:', np.sqrt(sse[0] / len(inliers)))
-    print('after  optimization:', np.sqrt(sse[1] / len(inliers)))
-
-
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     if args.seed > 0:
         np.random.seed(args.seed)
 

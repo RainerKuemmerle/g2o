@@ -6,12 +6,13 @@ import g2opy as g2o
 import argparse
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--num_points', type=int, help='num of points to use in projection SBA', default=0)
-parser.add_argument('--pos_noise', type=float, help='noise in 3d position', default=0.2)
-parser.add_argument('--pixel_noise', type=float, help='pixel noise', default=0.5)
-parser.add_argument('--seed', type=int, help='random seed', default=0)
+parser.add_argument(
+    "--num_points", type=int, help="num of points to use in projection SBA", default=0
+)
+parser.add_argument("--pos_noise", type=float, help="noise in 3d position", default=0.2)
+parser.add_argument("--pixel_noise", type=float, help="pixel noise", default=0.5)
+parser.add_argument("--seed", type=int, help="random seed", default=0)
 args = parser.parse_args()
-
 
 
 def main():
@@ -20,11 +21,13 @@ def main():
     solver = g2o.OptimizationAlgorithmLevenberg(solver)
     optimizer.set_algorithm(solver)
 
-    true_points = np.hstack([
-        np.random.random((1000, 1)) * 3 - 1.5,
-        np.random.random((1000, 1)) - 0.5,
-        np.random.random((1000, 1)) + 10])
-
+    true_points = np.hstack(
+        [
+            np.random.random((1000, 1)) * 3 - 1.5,
+            np.random.random((1000, 1)) - 0.5,
+            np.random.random((1000, 1)) + 10,
+        ]
+    )
 
     focal_length = (500, 500)
     principal_point = (320, 240)
@@ -42,7 +45,6 @@ def main():
             vc.set_fixed(True)
         vc.set_all()
         optimizer.add_vertex(vc)
-
 
     trans0 = optimizer.vertex(0).estimate().inverse()
     trans1 = optimizer.vertex(1).estimate().inverse()
@@ -75,13 +77,15 @@ def main():
 
         optimizer.add_edge(edge)
 
-
     # set up SBA projections
     if args.num_points > 0:
-        true_points = np.hstack([
-            np.random.random((args.num_points, 1)) * 3 - 1.5,
-            np.random.random((args.num_points, 1)) - 0.5,
-            np.random.random((args.num_points, 1)) + 10])
+        true_points = np.hstack(
+            [
+                np.random.random((args.num_points, 1)) * 3 - 1.5,
+                np.random.random((args.num_points, 1)) - 0.5,
+                np.random.random((args.num_points, 1)) + 10,
+            ]
+        )
 
         cam_num = 2
         for i, point in enumerate(true_points):
@@ -94,7 +98,7 @@ def main():
             for j in range(cam_num):
                 z = optimizer.vertex(j).map_point(point)
                 if 0 <= z[0] < 640 and 0 <= z[1] < 480:
-                    z += np.random.randn(3) * args.pixel_noise * [1, 1, 1/16.]
+                    z += np.random.randn(3) * args.pixel_noise * [1, 1, 1 / 16.0]
 
                     edge = g2o.Edge_XYZ_VSC()
                     edge.set_vertex(0, vp)
@@ -105,27 +109,24 @@ def main():
 
                     optimizer.add_edge(edge)
 
-
     # move second cam off of its true position
     vc = optimizer.vertex(1)
     cam = g2o.Isometry3d(vc.estimate().R, np.array([-0.1, -0.1, 0.2]))
     vc.set_estimate(cam)
 
-
     optimizer.initialize_optimization()
     optimizer.compute_active_errors()
-    print('Initial chi2 =', optimizer.chi2())
+    print("Initial chi2 =", optimizer.chi2())
 
     optimizer.set_verbose(True)
     optimizer.optimize(20)
 
-    print('\nSecond vertex should be near [0, 0, 1]')
-    print('before optimization:', cam.t)
-    print('after  optimization:', optimizer.vertex(1).estimate().t)
-    print('error:', optimizer.vertex(1).estimate().t - [0, 0, 1])
+    print("\nSecond vertex should be near [0, 0, 1]")
+    print("before optimization:", cam.t)
+    print("after  optimization:", optimizer.vertex(1).estimate().t)
+    print("error:", optimizer.vertex(1).estimate().t - [0, 0, 1])
 
-
-    '''
+    """
     Mean squared error (average over 100 loops):
     num_points     0:   [ 0.29733384  0.40814327  0.03907623]
                   10:   [ 0.14172112  0.31366953  0.03670497]
@@ -133,11 +134,10 @@ def main():
                 1000:   [ 0.01652139  0.19501433  0.00502872]
                10000:   [ 0.00901297  0.04055765  0.00130791]   ->  1/3 : 1 : 1/16
 
-    '''
+    """
 
 
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     if args.seed > 0:
         np.random.seed(args.seed)
 
