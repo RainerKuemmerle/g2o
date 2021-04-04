@@ -46,12 +46,6 @@ bool ParameterContainer::addParameter(const std::shared_ptr<Parameter>& p) {
   return true;
 }
 
-std::shared_ptr<Parameter> ParameterContainer::getParameter(int id) {
-  iterator it = find(id);
-  if (it == end()) return nullptr;
-  return it->second;
-}
-
 std::shared_ptr<Parameter> ParameterContainer::getParameter(int id) const {
   const_iterator it = find(id);
   if (it == end()) return nullptr;

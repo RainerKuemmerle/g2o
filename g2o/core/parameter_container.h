@@ -52,8 +52,6 @@ namespace g2o {
       //! add parameter to the container
       bool addParameter(const std::shared_ptr<Parameter>& p);
       //! return a parameter based on its ID
-      std::shared_ptr<Parameter> getParameter(int id);
-      //! return a parameter based on its ID
       std::shared_ptr<Parameter> getParameter(int id) const;
       //! remove a parameter from the container and returns the formerly stored parameter
       std::shared_ptr<Parameter> detachParameter(int id);

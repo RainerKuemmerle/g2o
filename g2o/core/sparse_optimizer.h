@@ -284,8 +284,6 @@ namespace g2o {
     //! remove an action that should no longer be execured before computing the error vectors
     bool removeComputeErrorAction(const std::shared_ptr<HyperGraphAction>& action);
 
-
-
     protected:
     bool* _forceStopFlag;
     bool _verbose;
