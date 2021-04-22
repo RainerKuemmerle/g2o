@@ -1,4 +1,6 @@
 if (G2O_HAVE_OPENGL)
   add_subdirectory(freeglut)
 endif()
-add_subdirectory(ceres)
+if(G2O_USE_VENDORED_CERES)
+  add_subdirectory(ceres)
+endif()
