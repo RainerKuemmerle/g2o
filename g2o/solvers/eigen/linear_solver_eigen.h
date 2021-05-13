@@ -147,7 +147,7 @@ class LinearSolverEigen : public LinearSolverCCS<MatrixType> {
         // fill the CCS structure of the Eigen SparseMatrix
         A.fillBlockStructure(auxBlockMatrix.outerIndexPtr(), auxBlockMatrix.innerIndexPtr());
         // determine ordering by AMD
-        using Ordering = Eigen::AMDOrdering<typename CholeskyDecomposition::StorageIndex>;
+        using Ordering = Eigen::AMDOrdering<SparseMatrix::StorageIndex>;
         Ordering ordering;
         ordering(auxBlockMatrix, blockP);
       }
