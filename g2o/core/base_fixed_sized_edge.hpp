@@ -88,13 +88,14 @@ void BaseFixedSizedEdge<D, E, VertexTypes...>::constructOffDiagonalQuadraticForm
     const AtOType& AtO) {
   constexpr auto fromId = N;
   constexpr auto toId = N + M + 1;
+  assert(fromId < toId && "Index mixed up");
   auto to = vertexXn<toId>();
   if (!to->fixed()) {
     const auto& B = std::get<toId>(_jacobianOplus);
     constexpr auto K = internal::pair_to_index(fromId, toId);
     internal::QuadraticFormLock lck(*to);
     (void)lck;
-    if (_hessianRowMajor) {  // we have to write to the block as transposed
+    if (_hessianRowMajor[K]) {  // we have to write to the block as transposed
       auto& hessianTransposed = std::get<K>(_hessianTupleTransposed);
       hessianTransposed.noalias() += B.transpose() * AtO.transpose();
     } else {
@@ -217,14 +218,14 @@ struct MapHessianMemoryK {
 template <int D, typename E, typename... VertexTypes>
 void BaseFixedSizedEdge<D, E, VertexTypes...>::mapHessianMemory(number_t* d, int i, int j,
                                                                 bool rowMajor) {
+  assert(i < j && "index assumption violated");
   // get the size of the vertices
   int vi_dim = static_cast<OptimizableGraph::Vertex*>(HyperGraph::Edge::vertex(i).get())->dimension();
   int vj_dim = static_cast<OptimizableGraph::Vertex*>(HyperGraph::Edge::vertex(j).get())->dimension();
-  _hessianRowMajor = rowMajor;
+  int k = internal::pair_to_index(i, j);
+  _hessianRowMajor[k] = rowMajor;
   if (rowMajor)
-    tuple_apply_i(MapHessianMemoryK{d, vj_dim, vi_dim}, _hessianTupleTransposed,
-                  internal::pair_to_index(i, j));
+    tuple_apply_i(MapHessianMemoryK{d, vj_dim, vi_dim}, _hessianTupleTransposed, k);
   else
-    tuple_apply_i(MapHessianMemoryK{d, vi_dim, vj_dim}, _hessianTuple,
-                  internal::pair_to_index(i, j));
+    tuple_apply_i(MapHessianMemoryK{d, vi_dim, vj_dim}, _hessianTuple, k);
 }
