@@ -48,7 +48,6 @@
 
 using namespace g2o;
 using namespace std;
-using namespace Eigen;
 
 namespace g2o {
 namespace bal {
@@ -195,7 +194,7 @@ class EdgeObservationBAL : public BaseBinaryEdge<2, Vector2, VertexCameraBAL, Ve
     // compute the error
     typename g2o::VectorN<2, T>::MapType error(p_error);
     error = prediction - measurement().cast<T>();
-    (void) error;
+    (void)error;
     return true;
   }
 
