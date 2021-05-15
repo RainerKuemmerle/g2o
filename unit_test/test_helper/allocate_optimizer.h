@@ -36,6 +36,7 @@ class SparseOptimizer;
 namespace internal {
 
 std::unique_ptr<g2o::SparseOptimizer> createOptimizerForTests();
+std::unique_ptr<g2o::SparseOptimizer> createLmOptimizerForTests();
 
 }  // namespace internal
 }  // namespace g2o
