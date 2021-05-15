@@ -46,9 +46,7 @@
 #include "g2o/solvers/eigen/linear_solver_eigen.h"
 #endif
 
-using namespace g2o;
 using namespace std;
-using namespace Eigen;
 
 namespace g2o {
 namespace bal {
@@ -65,7 +63,7 @@ using Vector9 = VectorN<9>;
  * - f the focal length of the camera
  * - k1, k2 two radial distortion parameters
  */
-class VertexCameraBAL : public BaseVertex<9, bal::Vector9> {
+class VertexCameraBAL : public g2o::BaseVertex<9, g2o::bal::Vector9> {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
   VertexCameraBAL() {}
@@ -83,7 +81,7 @@ class VertexCameraBAL : public BaseVertex<9, bal::Vector9> {
   virtual void setToOriginImpl() { cerr << __PRETTY_FUNCTION__ << " not implemented yet" << endl; }
 
   virtual void oplusImpl(const double* update) {
-    bal::Vector9::ConstMapType v(update, VertexCameraBAL::Dimension);
+    g2o::bal::Vector9::ConstMapType v(update, VertexCameraBAL::Dimension);
     _estimate += v;
   }
 };
@@ -93,7 +91,7 @@ class VertexCameraBAL : public BaseVertex<9, bal::Vector9> {
  *
  * A 3D point feature in the world
  */
-class VertexPointBAL : public BaseVertex<3, Vector3> {
+class VertexPointBAL : public g2o::BaseVertex<3, g2o::Vector3> {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
   VertexPointBAL() {}
@@ -111,7 +109,7 @@ class VertexPointBAL : public BaseVertex<3, Vector3> {
   virtual void setToOriginImpl() { cerr << __PRETTY_FUNCTION__ << " not implemented yet" << endl; }
 
   virtual void oplusImpl(const double* update) {
-    Vector3::ConstMapType v(update);
+    g2o::Vector3::ConstMapType v(update);
     _estimate += v;
   }
 };
@@ -138,7 +136,8 @@ class VertexPointBAL : public BaseVertex<3, Vector3> {
  * z-axis points backwards, so the camera is looking down the negative z-axis,
  * as in OpenGL).
  */
-class EdgeObservationBAL : public BaseBinaryEdge<2, Vector2, VertexCameraBAL, VertexPointBAL> {
+class EdgeObservationBAL
+    : public g2o::BaseBinaryEdge<2, g2o::Vector2, VertexCameraBAL, VertexPointBAL> {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
   EdgeObservationBAL() {}
@@ -195,7 +194,7 @@ class EdgeObservationBAL : public BaseBinaryEdge<2, Vector2, VertexCameraBAL, Ve
     // compute the error
     typename g2o::VectorN<2, T>::MapType error(p_error);
     error = prediction - measurement().cast<T>();
-    (void) error;
+    (void)error;
     return true;
   }
 
@@ -209,7 +208,7 @@ int main(int argc, char** argv) {
   string outputFilename;
   string inputFilename;
   string statsFilename;
-  CommandArgs arg;
+  g2o::CommandArgs arg;
   arg.param("i", maxIterations, 5, "perform n iterations");
   arg.param("o", outputFilename, "", "write points into a vrml file");
   arg.param("pcg", usePCG, false, "use PCG instead of the Cholesky");
@@ -296,8 +295,8 @@ int main(int argc, char** argv) {
       EdgeObservationBAL* e = new EdgeObservationBAL;
       e->setVertex(0, cam);
       e->setVertex(1, point);
-      e->setInformation(Matrix2::Identity());
-      e->setMeasurement(Vector2(obsX, obsY));
+      e->setInformation(g2o::Matrix2::Identity());
+      e->setMeasurement(g2o::Vector2(obsX, obsY));
       bool addedEdge = optimizer.addEdge(e);
       if (!addedEdge) {
         cerr << "error adding edge" << endl;
@@ -306,7 +305,7 @@ int main(int argc, char** argv) {
 
     // read in the camera params
     for (int i = 0; i < numCameras; ++i) {
-      bal::Vector9 cameraParameter;
+      g2o::bal::Vector9 cameraParameter;
       for (int j = 0; j < 9; ++j) ifs >> cameraParameter(j);
       VertexCameraBAL* cam = cameras[i];
       cam->setEstimate(cameraParameter);
@@ -314,7 +313,7 @@ int main(int argc, char** argv) {
 
     // read in the points
     for (int i = 0; i < numPoints; ++i) {
-      Vector3 p;
+      g2o::Vector3 p;
       ifs >> p(0) >> p(1) >> p(2);
       VertexPointBAL* point = points[i];
       point->setEstimate(p);
@@ -332,7 +331,7 @@ int main(int argc, char** argv) {
   if (statsFilename != "") {
     cerr << "writing stats to file \"" << statsFilename << "\" ... ";
     ofstream fout(statsFilename.c_str());
-    const BatchStatisticsContainer& bsc = optimizer.batchStatistics();
+    const g2o::BatchStatisticsContainer& bsc = optimizer.batchStatistics();
     for (size_t i = 0; i < bsc.size(); i++) fout << bsc[i] << endl;
     cerr << "done." << endl;
   }
