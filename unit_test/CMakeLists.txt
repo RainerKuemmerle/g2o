@@ -37,6 +37,7 @@ macro(create_test target)
   add_test (NAME ${target} COMMAND $<TARGET_FILE:${target}>)
 endmacro(create_test)
 
+add_subdirectory(test_helper)
 add_subdirectory(general)
 add_subdirectory(data)
 add_subdirectory(stuff)
