@@ -150,3 +150,90 @@ INSTANTIATE_TEST_SUITE_P(Sclam, SensorCalibration,
                              std::make_tuple(100, g2o::SE2(0.3, 0.2, 0.1))
                              // clang-format on
                              ));
+
+// real world data problem
+static std::string problem() {
+  std::stringstream result;
+  result << "VERTEX_SE2 1 0 0 0" << std::endl;
+  result << "FIX 1" << std::endl;
+  result << "VERTEX_SE2 2 0 0 0" << std::endl;
+  result << "VERTEX_SE2 3 0.9802 0.00128 0.07651" << std::endl;
+  result << "VERTEX_SE2 4 1.94214 0.04612 0.06036" << std::endl;
+  result << "VERTEX_SE2 5 2.89714 0.15208 -0.05234" << std::endl;
+  result << "VERTEX_SE2 6 3.83821 0.11379 -0.0258" << std::endl;
+  result << "VERTEX_SE2 7 4.84846 0.07349 -0.02184" << std::endl;
+  result << "VERTEX_SE2 8 5.90449 0.00628 -0.04111" << std::endl;
+  result << "VERTEX_SE2 9 6.97665 -0.05104 0.08347" << std::endl;
+  result << "VERTEX_SE2 10 7.93156 0.03124 0.08839" << std::endl;
+  result << "VERTEX_SE2 11 8.85674 0.10356 0.07637" << std::endl;
+  result << "VERTEX_SE2 12 9.78573 0.19927 -3.03362" << std::endl;
+  result << "VERTEX_SE2 13 8.81109 0.10037 -2.94964" << std::endl;
+  result << "VERTEX_SE2 14 7.85955 -0.0802 -2.90932" << std::endl;
+  result << "VERTEX_SE2 15 6.89482 -0.35877 -2.98672" << std::endl;
+  result << "VERTEX_SE2 16 5.87089 -0.51041 -3.01956" << std::endl;
+  result << "VERTEX_SE2 17 4.8941 -0.66012 -3.04686" << std::endl;
+  result << "VERTEX_SE2 18 3.86703 -0.81211 -3.11581" << std::endl;
+  result << "VERTEX_SE2 19 2.84514 -0.86475 -3.09083" << std::endl;
+  result << "VERTEX_SE2 20 1.8694 -0.91707 -3.06156" << std::endl;
+  result << "VERTEX_SE2 21 0.89101 -1.04016 -2.99387" << std::endl;
+  result << "VERTEX_SE2 22 -0.08696 -1.22328 0.14418" << std::endl;
+  result << "EDGE_SE2_CALIB 1 3 2 0.9802 0.00128 0.07651 800 0 0 600 0 400" << std::endl;
+  result << "EDGE_SE2_CALIB 3 4 2 0.96255 -0.02883 -0.01616 800 0 0 600 0 400" << std::endl;
+  result << "EDGE_SE2_CALIB 4 5 2 0.95966 0.04817 -0.11269 800 0 0 600 0 400" << std::endl;
+  result << "EDGE_SE2_CALIB 5 6 2 0.94178 0.01099 0.02653 800 0 0 600 0 400" << std::endl;
+  result << "EDGE_SE2_CALIB 6 7 2 1.01095 -0.01422 0.00396 800 0 0 600 0 400" << std::endl;
+  result << "EDGE_SE2_CALIB 7 8 2 1.05725 -0.04413 -0.01927 800 0 0 600 0 400" << std::endl;
+  result << "EDGE_SE2_CALIB 8 9 2 1.0736 -0.01321 0.12459 800 0 0 600 0 400" << std::endl;
+  result << "EDGE_SE2_CALIB 9 10 2 0.95845 0.00237 0.00492 800 0 0 600 0 400" << std::endl;
+  result << "EDGE_SE2_CALIB 10 11 2 0.92795 -0.00964 -0.01203 800 0 0 600 0 400" << std::endl;
+  result << "EDGE_SE2_CALIB 11 12 2 0.93359 0.02456 -3.10998 800 0 0 600 0 400" << std::endl;
+  result << "EDGE_SE2_CALIB 12 13 2 0.97962 -0.00671 0.08397 800 0 0 600 0 400" << std::endl;
+  result << "EDGE_SE2_CALIB 13 14 2 0.96851 -0.00428 0.04032 800 0 0 600 0 400" << std::endl;
+  result << "EDGE_SE2_CALIB 14 15 2 1.00296 0.04903 -0.0774 800 0 0 600 0 400" << std::endl;
+  result << "EDGE_SE2_CALIB 15 16 2 1.03506 -0.00813 -0.03285 800 0 0 600 0 400" << std::endl;
+  result << "EDGE_SE2_CALIB 16 17 2 0.98775 0.02971 -0.02729 800 0 0 600 0 400" << std::endl;
+  result << "EDGE_SE2_CALIB 17 18 2 1.03685 0.05414 -0.06896 800 0 0 600 0 400" << std::endl;
+  result << "EDGE_SE2_CALIB 18 19 2 1.0229 0.02628 0.02498 800 0 0 600 0 400" << std::endl;
+  result << "EDGE_SE2_CALIB 19 20 2 0.97714 0.00275 0.02927 800 0 0 600 0 400" << std::endl;
+  result << "EDGE_SE2_CALIB 20 21 2 0.98509 0.04448 0.06769 800 0 0 600 0 400" << std::endl;
+  result << "EDGE_SE2_CALIB 21 22 2 0.99427 0.03718 3.13805 800 0 0 600 0 400" << std::endl;
+  result << "EDGE_SE2_CALIB 1 22 2 0.00706 0.04984 -0.02723 800 0 0 600 0 400" << std::endl;
+  return result.str();
+}
+
+using SensorCalibrationFromDataParam = std::tuple<std::string, int, g2o::SE2>;
+
+/**
+ * Test fixture for performing the tests from data files
+ */
+class SensorCalibrationFromData : public ::testing::TestWithParam<SensorCalibrationFromDataParam> {
+ protected:
+  void SetUp() override {
+    optimizer = g2o::internal::createLmOptimizerForTests();
+
+    const std::string data = std::get<0>(GetParam());
+    const int sensorOffsetId = std::get<1>(GetParam());
+    const g2o::SE2 expectedSensorOffset = std::get<2>(GetParam());
+
+    std::stringstream input(data);
+    optimizer->load(input);
+    sensorOffsetVertex =
+        std::dynamic_pointer_cast<g2o::VertexSE2>(optimizer->vertex(sensorOffsetId));
+  }
+
+ protected:
+  std::unique_ptr<g2o::SparseOptimizer> optimizer;
+  std::shared_ptr<g2o::VertexSE2> sensorOffsetVertex;
+};
+
+TEST_P(SensorCalibrationFromData, Optimization) {
+  auto before = sensorOffsetVertex->estimate().toVector();
+  optimizer->initializeOptimization();
+  optimizer->optimize(10);
+  auto after = sensorOffsetVertex->estimate().toVector();
+  EXPECT_NE(before, after);
+}
+
+INSTANTIATE_TEST_SUITE_P(
+    Sclam, SensorCalibrationFromData,
+    testing::Values(std::make_tuple(problem(), 2, g2o::SE2(-0.0281218, -0.284067, 0.036455))));
