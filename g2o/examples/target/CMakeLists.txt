@@ -10,6 +10,6 @@ add_executable(constant_velocity_target
 
 set_target_properties(constant_velocity_target PROPERTIES OUTPUT_NAME constant_velocity_target${EXE_POSTFIX})
 
-target_link_libraries(constant_velocity_target core solver_eigen solver_pcg types_slam2d)
+target_link_libraries(constant_velocity_target core solver_eigen solver_pcg)
 
 
