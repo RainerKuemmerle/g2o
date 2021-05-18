@@ -170,6 +170,47 @@ endif()
 # For building the GUI
 find_package(QGLViewer)
 
+# shall we build the types
+
+# 2D types
+set(G2O_BUILD_SLAM2D_TYPES ON CACHE BOOL "Build SLAM2D types")
+set(G2O_BUILD_SLAM2D_ADDON_TYPES ON CACHE BOOL "Build SLAM2D addon types")
+set(G2O_BUILD_DATA_TYPES ON CACHE BOOL "Build SLAM2D data types")
+set(G2O_BUILD_SCLAM2D_TYPES ON CACHE BOOL "Build SCLAM2D types")
+set(G2O_BUILD_SCLAM2D_ORIG_TYPES OFF CACHE BOOL "Build original SCLAM2D types")
+
+# Consistency checks and user feedback
+if(G2O_BUILD_SLAM2D_TYPES)
+  message(STATUS "Compiling SLAM 2D types")
+  if(G2O_BUILD_SCLAM2D_TYPES AND G2O_BUILD_SCLAM2D_ORIG_TYPES)
+    message(WARNING "Both sclam2d and sclam2d_orig types are enabled.")
+  endif()  
+else()
+  message(STATUS "SLAM 2D types disabled; disabling all 2D types")
+  set(G2O_BUILD_SLAM2D_ADDON_TYPES OFF)
+  set(G2O_BUILD_DATA_TYPES OFF)
+  set(G2O_BUILD_SCLAM2D_TYPES OFF)
+  set(G2O_BUILD_SCLAM2D_ORIG_TYPES OFF)
+endif()
+
+# 3D types
+set(G2O_BUILD_SLAM3D_TYPES ON CACHE BOOL "Build SLAM 3D types")
+set(G2O_BUILD_SLAM3D_ADDON_TYPES ON CACHE BOOL "Build SLAM 3D addon types")
+set(G2O_BUILD_SBA_TYPES ON CACHE BOOL "Build SLAM3D SBA types")
+set(G2O_BUILD_ICP_TYPES ON CACHE BOOL "Build SLAM3D ICP types")
+set(G2O_BUILD_SIM3_TYPES ON CACHE BOOL "Build SLAM3D sim3 types")
+
+# Consistency checks and user feedback
+if(G2O_BUILD_SLAM3D_TYPES)
+  message(STATUS "Compiling SLAM 3D types")
+else()
+  message(STATUS "SLAM 3D types disabled; disabling all 3D types")
+  set(G2O_BUILD_SLAM3D_ADDON_TYPES OFF)
+  set(G2O_BUILD_SBA_TYPES OFF)
+  set(G2O_BUILD_ICP_TYPES OFF)
+  set(G2O_BUILD_SIM3_TYPES OFF)
+endif()
+
 # shall we build the core apps using the library
 set(G2O_BUILD_APPS ON CACHE BOOL "Build g2o apps")
 if(G2O_BUILD_APPS)
