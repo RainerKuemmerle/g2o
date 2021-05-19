@@ -178,17 +178,12 @@ set(G2O_BUILD_SLAM2D_TYPES ON CACHE BOOL "Build SLAM2D types")
 set(G2O_BUILD_SLAM2D_ADDON_TYPES ON CACHE BOOL "Build SLAM2D addon types")
 set(G2O_BUILD_DATA_TYPES ON CACHE BOOL "Build SLAM2D data types")
 set(G2O_BUILD_SCLAM2D_TYPES ON CACHE BOOL "Build SCLAM2D types")
-set(G2O_BUILD_SCLAM2D_ORIG_TYPES OFF CACHE BOOL "Build original SCLAM2D types")
 
 # Process the arguments. If G2O_BUILD_SLAM2D_TYPES is disabled, forceably
 # disable all types. Otherwise, update messages on the types enabled.
 if(G2O_BUILD_SLAM2D_TYPES)
   string(APPEND supported_types_message " slam2d")
   # Make sure that we can't activate both types
-  if(G2O_BUILD_SCLAM2D_TYPES AND G2O_BUILD_SCLAM2D_ORIG_TYPES)
-    message(WARNING "Both sclam2d and sclam2d_orig types are enabled; disabling sclam2d_orig types")
-    set(G2O_BUILD_SCLAM2D_ORIG_TYPES OFF)
-  endif()
   if(G2O_BUILD_SLAM2D_ADDON_TYPES)
     string(APPEND supported_types_message " slam2d (addons)")
   endif()
@@ -205,7 +200,6 @@ else()
   set(G2O_BUILD_SLAM2D_ADDON_TYPES OFF)
   set(G2O_BUILD_DATA_TYPES OFF)
   set(G2O_BUILD_SCLAM2D_TYPES OFF)
-  set(G2O_BUILD_SCLAM2D_ORIG_TYPES OFF)
 endif()
 
 # 3D types
