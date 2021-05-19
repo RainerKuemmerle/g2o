@@ -170,6 +170,83 @@ endif()
 # For building the GUI
 find_package(QGLViewer)
 
+# Handle building the built in types. There is a fair degree of
+# granularity and dependency in the types supported.
+
+# 2D types
+set(G2O_BUILD_SLAM2D_TYPES ON CACHE BOOL "Build SLAM2D types")
+set(G2O_BUILD_SLAM2D_ADDON_TYPES ON CACHE BOOL "Build SLAM2D addon types")
+set(G2O_BUILD_DATA_TYPES ON CACHE BOOL "Build SLAM2D data types")
+set(G2O_BUILD_SCLAM2D_TYPES ON CACHE BOOL "Build SCLAM2D types")
+
+# Process the arguments. If G2O_BUILD_SLAM2D_TYPES is disabled, forceably
+# disable all types. Otherwise, update messages on the types enabled.
+if(G2O_BUILD_SLAM2D_TYPES)
+  string(APPEND supported_types_message " slam2d")
+  # Make sure that we can't activate both types
+  if(G2O_BUILD_SLAM2D_ADDON_TYPES)
+    string(APPEND supported_types_message " slam2d (addons)")
+  endif()
+  if(G2O_BUILD_DATA_TYPES)
+    string(APPEND supported_types_message " data")
+  endif()
+  if(G2O_BUILD_SCLAM2D_TYPES)
+    string(APPEND supported_types_message " sclam2d")
+  endif()
+else()
+  set(G2O_BUILD_SLAM2D_ADDON_TYPES OFF)
+  set(G2O_BUILD_DATA_TYPES OFF)
+  set(G2O_BUILD_SCLAM2D_TYPES OFF)
+endif()
+
+# 3D types
+set(G2O_BUILD_SLAM3D_TYPES ON CACHE BOOL "Build SLAM 3D types")
+set(G2O_BUILD_SLAM3D_ADDON_TYPES ON CACHE BOOL "Build SLAM 3D addon types")
+set(G2O_BUILD_SBA_TYPES ON CACHE BOOL "Build SLAM3D SBA types")
+set(G2O_BUILD_ICP_TYPES ON CACHE BOOL "Build SLAM3D ICP types")
+set(G2O_BUILD_SIM3_TYPES ON CACHE BOOL "Build SLAM3D sim3 types")
+
+# Process the arguments. If G2O_BUILD_SLAM3D_TYPES is disabled, forceably
+# disable all the types. Enable SBA if it's not enabled but one of it's
+# dependents is enabled.
+if(G2O_BUILD_SLAM3D_TYPES)
+  string(APPEND supported_types_message " slam3d")
+  message(STATUS "Compiling SLAM 3D types")
+  if (G2O_BUILD_SLAM3D_ADDON_TYPES)
+    string(APPEND supported_types_message " slam3d (addons)")
+  endif()
+  if (G2O_BUILD_SBA_TYPES)
+    string(APPEND supported_types_message " sba")
+  endif()
+  if (G2O_BUILD_ICP_TYPES)
+    if(NOT G2O_BUILD_SBA_TYPES)
+      message(WARNING "ICP types requested but SBA types not enabled; enabling SBA")
+      set(G2O_BUILD_SBA_TYPES ON)
+      string(APPEND supported_types_message " sba")
+    endif()
+    string(APPEND supported_types_message " icp")
+  endif()
+  if (G2O_BUILD_SIM3_TYPES)
+    if(NOT G2O_BUILD_SBA_TYPES)
+      message(WARNING "SIM3 types requested but SBA types not enabled; enabling SBA")
+      set(G2O_BUILD_SBA_TYPES ON)
+      string(APPEND supported_types_message " sba")
+    endif()
+    string(APPEND supported_types_message " sim3")
+  endif()
+else()
+  set(G2O_BUILD_SLAM3D_ADDON_TYPES OFF)
+  set(G2O_BUILD_SBA_TYPES OFF)
+  set(G2O_BUILD_ICP_TYPES OFF)
+  set(G2O_BUILD_SIM3_TYPES OFF)
+endif()
+
+if(DEFINED supported_types_message)
+  message(STATUS "Compiling built in types" ${supported_types_message})
+else()
+  message(STATUS "Compiling with no built in types enabled")
+endif()
+
 # shall we build the core apps using the library
 set(G2O_BUILD_APPS ON CACHE BOOL "Build g2o apps")
 if(G2O_BUILD_APPS)
