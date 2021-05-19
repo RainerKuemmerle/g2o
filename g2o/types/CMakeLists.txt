@@ -12,9 +12,6 @@ if(G2O_BUILD_SLAM2D_TYPES)
   if(G2O_BUILD_SCLAM2D_TYPES)
     add_subdirectory(sclam2d)
   endif()
-  if(G2O_BUILD_SCLAM2D_ORIG_TYPES)
-    add_subdirectory(sclam2d_orig)
-  endif()
 endif()
 
 # 3D types
