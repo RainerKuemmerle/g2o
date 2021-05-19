@@ -2,7 +2,6 @@
 add_subdirectory(data_fitting)
 add_subdirectory(dynamic_vertex)
 add_subdirectory(bal)
-add_subdirectory(simple_optimize)
 add_subdirectory(target)
 add_subdirectory(tutorial_slam2d)
 
@@ -39,6 +38,7 @@ if (G2O_BUILD_SLAM3D_TyPES)
 endif()
 
 if(G2O_BUILD_SLAM2D_TYPES AND G2O_BUILD_SLAM3D_TYPES)
+  add_subdirectory(simple_optimize)
   add_subdirectory(interactive_slam)
 endif()
 

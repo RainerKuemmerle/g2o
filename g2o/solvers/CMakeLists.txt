@@ -1,6 +1,10 @@
 add_subdirectory(pcg)
 add_subdirectory(dense)
-add_subdirectory(slam2d_linear)
+
+if(G2O_BUILD_SLAM2D_TYPES)
+  add_subdirectory(slam2d_linear)
+endif()
+
 add_subdirectory(structure_only)
 
 if(CSPARSE_FOUND)
