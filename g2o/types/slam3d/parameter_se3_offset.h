@@ -31,6 +31,7 @@
 #include "g2o/core/hyper_graph_action.h"
 #include "g2o/core/cache.h"
 #include "g2o_types_slam3d_api.h"
+#include "graph.pb.h"
 
 
 namespace g2o {
@@ -47,6 +48,9 @@ namespace g2o {
 
       virtual bool read(std::istream& is);
       virtual bool write(std::ostream& os) const;
+
+      virtual bool readProto(const g2o::proto::Row& row);
+      virtual bool writeProto(g2o::proto::Row* row) const;
 
       /**
        * update the offset to a new value.

@@ -31,6 +31,7 @@
 
 #include "g2o_types_slam3d_api.h"
 #include "vertex_se3.h"
+#include "graph.pb.h"
 
 namespace g2o {
 
@@ -47,6 +48,9 @@ namespace g2o {
       EdgeSE3();
       virtual bool read(std::istream& is);
       virtual bool write(std::ostream& os) const;
+
+      virtual bool readProto(const g2o::proto::Row& row);
+      virtual bool writeProto(g2o::proto::Row* row) const;
 
       void computeError();
 

@@ -35,6 +35,7 @@
 #include <Eigen/Dense>
 #include <Eigen/Cholesky>
 #include <stack>
+#include "graph.pb.h"
 
 namespace g2o {
 #define G2O_VERTEX_DIM ((D == Eigen::Dynamic) ? _dimension : D)
@@ -100,7 +101,10 @@ namespace g2o {
     const EstimateType& estimate() const { return _estimate;}
     //! set the estimate for the vertex also calls updateCache()
     void setEstimate(const EstimateType& et) { _estimate = et; updateCache();}
-    
+
+    virtual bool readProto(const g2o::proto::Row&) { return false; }
+    virtual bool writeProto(g2o::proto::Row*) const { return false; }
+
   protected:
     HessianBlockType _hessian;
     Eigen::Matrix<number_t, D, 1, Eigen::ColMajor> _b;

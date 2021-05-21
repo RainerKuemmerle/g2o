@@ -466,6 +466,11 @@ else()
   include_directories(${EIGEN3_INCLUDE_DIR})
 endif ()
 
+# Find Protobuf
+find_package(Protobuf REQUIRED)
+protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS g2o/proto/graph.proto)
+add_custom_target(graph_proto_dependency DEPENDS ${PROTO_SRCS} ${PROTO_HDRS})
+
 # Set up the top-level include directories
 include_directories(${g2o_SOURCE_DIR} ${PROJECT_BINARY_DIR})
 

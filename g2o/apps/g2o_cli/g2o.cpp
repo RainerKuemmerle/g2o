@@ -56,6 +56,7 @@
 #include "g2o/stuff/filesys_tools.h"
 #include "g2o/stuff/string_tools.h"
 #include "g2o/stuff/timeutil.h"
+#include "graph.pb.h"
 
 static bool hasToStop=false;
 
@@ -130,6 +131,7 @@ int main(int argc, char** argv)
   string statsFile;
   string summaryFile;
   bool nonSequential;
+  bool protobuf;
   // command line parsing
   std::vector<int> gaugeList;
   CommandArgs arg;
@@ -166,6 +168,7 @@ int main(int argc, char** argv)
   arg.param("summary", summaryFile, "", "append a summary of this optimization run to the summary file passed as argument");
   arg.paramLeftOver("graph-input", inputFilename, "", "graph file which will be processed", true);
   arg.param("nonSequential", nonSequential, false, "apply the robust kernel only on loop closures and not odometries");
+  arg.param("protobuf", protobuf, false, "use protocol buffers as io format");
 
 
   arg.parseArgs(argc, argv);
@@ -235,6 +238,10 @@ int main(int argc, char** argv)
     optimizer.solver()->printProperties(cerr);
   }
 
+  if (protobuf) {
+    GOOGLE_PROTOBUF_VERIFY_VERSION;
+  }
+
   // Loading the input data
   if (loadLookup.size() > 0) {
     optimizer.setRenamedTypesFromString(loadLookup);
@@ -244,9 +251,16 @@ int main(int argc, char** argv)
     return 0;
   } else if (inputFilename == "-") {
     cerr << "Read input from stdin" << endl;
-    if (!optimizer.load(cin)) {
-      cerr << "Error loading graph" << endl;
-      return 2;
+    if (!protobuf) {
+      if (!optimizer.load(cin)) {
+        cerr << "Error loading graph" << endl;
+        return 2;
+      }
+    } else {
+      if (!optimizer.loadProto(&cin)) {
+        cerr << "Error loading protobuf graph" << endl;
+        return 2;
+      }
     }
   } else {
     cerr << "Read input from " << inputFilename << endl;
@@ -255,9 +269,16 @@ int main(int argc, char** argv)
       cerr << "Failed to open file" << endl;
       return 1;
     }
-    if (!optimizer.load(ifs)) {
-      cerr << "Error loading graph" << endl;
-      return 2;
+    if (!protobuf) {
+      if (!optimizer.load(ifs)) {
+        cerr << "Error loading graph" << endl;
+        return 2;
+      }
+    } else {
+      if (!optimizer.loadProto(&ifs)) {
+        cerr << "Error loading protobuf graph" << endl;
+        return 2;
+      }
     }
   }
   cerr << "Loaded " << optimizer.vertices().size() << " vertices" << endl;
@@ -675,12 +696,25 @@ int main(int argc, char** argv)
   if (outputfilename.size() > 0) {
     if (outputfilename == "-") {
       cerr << "saving to stdout";
-      optimizer.save(cout);
+      if (!protobuf) {
+        optimizer.save(cout);
+      } else {
+        optimizer.saveProto(&cout);
+      }
     } else {
       cerr << "saving " << outputfilename << " ... ";
-      optimizer.save(outputfilename.c_str());
+      if (!protobuf) {
+        optimizer.save(outputfilename.c_str());
+      } else {
+        optimizer.saveProto(outputfilename.c_str());
+      }
     }
     cerr << "done." << endl;
+  }
+
+  if (protobuf) {
+    // TODO: also for error returns
+    google::protobuf::ShutdownProtobufLibrary();
   }
 
   // destroy all the singletons

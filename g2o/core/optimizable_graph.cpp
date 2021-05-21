@@ -47,6 +47,7 @@
 #include "g2o/stuff/color_macros.h"
 #include "g2o/stuff/string_tools.h"
 #include "g2o/stuff/misc.h"
+#include "graph.pb.h"
 
 namespace g2o {
 
@@ -860,5 +861,261 @@ bool OptimizableGraph::initMultiThreading()
   return true;
 }
 
-} // end namespace
+bool OptimizableGraph::loadProto(const char* filename)
+{
+  ifstream ifs(filename);
+  if (!ifs) {
+    cerr << __PRETTY_FUNCTION__ << " unable to open file " << filename << endl;
+    return false;
+  }
+  return loadProto(&ifs);
+}
 
+bool OptimizableGraph::loadProto(istream* is) {
+  g2o::proto::Graph graph;
+  if (!graph.ParseFromIstream(is)) {
+    cerr << "Failed to parse protobuf graph" << endl;
+    google::protobuf::ShutdownProtobufLibrary();
+    return false;
+  }
+
+  return loadProto(graph);
+}
+
+bool OptimizableGraph::loadProto(const g2o::proto::Graph& graph) {
+  set<string> warnedUnknownTypes;
+  string token;
+
+  Factory* factory = Factory::instance();
+  HyperGraph::GraphElemBitset elemBitset;
+  elemBitset[HyperGraph::HGET_PARAMETER] = 1;
+  elemBitset.flip();
+
+  HyperGraph::GraphElemBitset elemParamBitset;
+  elemParamBitset[HyperGraph::HGET_PARAMETER] = 1;
+
+  HyperGraph::DataContainer* previousDataContainer = 0;
+  Data* previousData = 0;
+
+  for (int j = 0; j < graph.row_size(); j++) {
+    const g2o::proto::Row& row = graph.row(j);
+    token = factory->enumToStrTag(row.factor_tag());
+
+    if (!factory->knowsTag(token)) {
+      if (warnedUnknownTypes.count(token) != 1) {
+        warnedUnknownTypes.insert(token);
+        cerr << " unknown type: " << token << endl;
+      }
+      continue;
+    }
+
+    // first handle the parameters
+    HyperGraph::HyperGraphElement* pelement = factory->construct(token, elemParamBitset);
+    if (pelement) {  // not a parameter or otherwise unknown tag
+      assert(pelement->elementType() == HyperGraph::HGET_PARAMETER && "Should be a param");
+      Parameter* p = static_cast<Parameter*>(pelement);
+      int pid = (int) row.id();
+      p->setId(pid);
+      bool r = p->readProto(row);
+      if (!r) {
+        cerr << ": Error reading data " << token << " for parameter " << pid << endl;
+        delete p;
+      } else {
+        if (!_parameters.addParameter(p)) {
+          cerr << ": Parameter of type:" << token << " id:" << pid
+               << " already defined" << endl;
+        }
+      }
+      continue;
+    }
+
+    HyperGraph::HyperGraphElement* element = factory->construct(token, elemBitset);
+    if (dynamic_cast<Vertex*>(element)) {  // it's a vertex type
+      previousData = 0;
+      Vertex* v = static_cast<Vertex*>(element);
+      int id = (int) row.id();
+      bool r = v->readProto(row);
+      if (!r) {
+        cerr << ": Error reading vertex " << token << " " << id << endl;
+      }
+      v->setId(id);
+      if (!addVertex(v)) {
+        cerr << ": Failure adding Vertex, " << token << " " << id << endl;
+        delete v;
+      } else {
+        previousDataContainer = v;
+      }
+    } else if (dynamic_cast<Edge*>(element)) {
+      // cerr << "it is an edge" << endl;
+      previousData = 0;
+      Edge* e = static_cast<Edge*>(element);
+      int numV = e->vertices().size();
+
+      vector<int> ids;
+      if (e->vertices().size() != 0) {
+        ids.resize(e->vertices().size());
+        for (int l = 0; l < numV && l < row.var_size(); ++l) {
+          ids[l] = (int) row.var(l);
+        }
+        bool vertsOkay = true;
+        for (size_t l = 0; l < ids.size(); ++l) {
+          int vertexId = ids[l];
+          if (vertexId != HyperGraph::UnassignedId) {
+            HyperGraph::Vertex* v = vertex(vertexId);
+            if (!v) {
+              vertsOkay = false;
+              break;
+            }
+            e->setVertex(l, v);
+          }
+        }
+        if (!vertsOkay) {
+          cerr << ": Unable to find vertices for edge " << token << endl;
+          delete e;
+          e = nullptr;
+        } else {
+          bool r = e->readProto(row);
+          if (!r || !addEdge(e)) {
+            cerr << ": Unable to add edge " << token << endl;
+            delete e;
+            e = nullptr;
+          }
+        }
+      } else {
+        cerr << "Edges with dynamic size are not supported" << endl;
+        delete e;
+        e = nullptr;
+      }
+
+      previousDataContainer = e;
+    } else if (dynamic_cast<Data*>(element)) {  // reading in the data packet for the vertex
+      // cerr << "read data packet " << token << " vertex " << previousVertex->id() << endl;
+      Data* d = static_cast<Data*>(element);
+      bool r = d->readProto(row);
+      if (!r) {
+        cerr << ": Error reading data " << token << endl;
+        delete d;
+        previousData = 0;
+      } else if (previousData) {
+        previousData->setNext(d);
+        d->setDataContainer(previousData->dataContainer());
+        previousData = d;
+      } else if (previousDataContainer) {
+        previousDataContainer->setUserData(d);
+        d->setDataContainer(previousDataContainer);
+        previousData = d;
+        previousDataContainer = 0;
+      } else {
+        cerr << ": got data element, but no data container available"
+             << endl;
+        delete d;
+        previousData = 0;
+      }
+    }
+  }  // while read rows
+
+#ifndef NDEBUG
+  cerr << "Loaded " << _parameters.size() << " parameters" << endl;
+#endif
+
+  return true;
+}
+
+bool OptimizableGraph::saveProto(const char* filename, int level) const
+{
+  ofstream ofs(filename);
+  if (!ofs)
+    return false;
+  return saveProto(&ofs, level);
+}
+
+bool OptimizableGraph::saveProto(ostream* os, int level) const {
+  g2o::proto::Graph ograph;
+  if (!saveProto(ograph, level)) {
+    return false;
+  } else {
+    return ograph.SerializeToOstream(os);
+  }
+}
+
+bool OptimizableGraph::saveProto(g2o::proto::Graph& graph, int level) const
+{
+  // write the parameters to the top of the file
+  if (!_parameters.writeProto(graph)) {
+    return false;
+  }
+  set<Vertex*, VertexIDCompare> verticesToSave; // set sorted by ID
+  for (HyperGraph::EdgeSet::const_iterator it = edges().begin(); it != edges().end(); ++it) {
+    OptimizableGraph::Edge* e = static_cast<OptimizableGraph::Edge*>(*it);
+    if (e->level() == level) {
+      for (auto it = e->vertices().begin(); it != e->vertices().end(); ++it) {
+        if (*it) verticesToSave.insert(static_cast<OptimizableGraph::Vertex*>(*it));
+      }
+    }
+  }
+
+  for (auto v : verticesToSave) {
+    saveVertexProto(graph.add_row(), v);
+  }
+
+  std::vector<HyperGraph::Edge*> edgesToSave;
+  std::copy_if(edges().begin(), edges().end(), std::back_inserter(edgesToSave),
+               [level](const HyperGraph::Edge* ee) {
+                 const OptimizableGraph::Edge* e = dynamic_cast<const OptimizableGraph::Edge*>(ee);
+                 return (e->level() == level);
+               });
+  sort(edgesToSave.begin(), edgesToSave.end(), EdgeIDCompare());
+  for (auto e : edgesToSave) {
+    saveEdgeProto(graph.add_row(), static_cast<Edge*>(e));
+  }
+
+  return true;
+}
+
+bool OptimizableGraph::saveVertexProto(g2o::proto::Row* row, OptimizableGraph::Vertex* v) const
+{
+  Factory* factory = Factory::instance();
+  string tag = factory->tag(v);
+  if (tag.size() > 0) {
+    row->set_factor_tag(factory->strTagToEnum(tag));
+    row->set_id((unsigned int) v->id());
+    v->writeProto(row);
+    //saveUserDataProto(os, v->userData());
+    //if (v->fixed()) {
+    //  os << "FIX " << v->id() << endl;
+    //}
+    return true;
+  }
+  return false;
+}
+
+bool OptimizableGraph::saveParameterProto(g2o::proto::Row* row, Parameter* p) const
+{
+  Factory* factory = Factory::instance();
+  string tag = factory->tag(p);
+  if (tag.size() > 0) {
+    row->set_factor_tag(factory->strTagToEnum(tag));
+    row->set_id((unsigned int) p->id());
+    p->writeProto(row);
+  }
+  return true;
+}
+
+bool OptimizableGraph::saveEdgeProto(g2o::proto::Row* row, OptimizableGraph::Edge* e) const
+{
+  Factory* factory = Factory::instance();
+  string tag = factory->tag(e);
+  if (tag.size() > 0) {
+    row->set_factor_tag(factory->strTagToEnum(tag));
+    for (vector<HyperGraph::Vertex*>::const_iterator it = e->vertices().begin(); it != e->vertices().end(); ++it) {
+      int vertexId = (*it) ? (*it)->id() : HyperGraph::UnassignedId;
+      row->add_var((unsigned int) vertexId);
+    }
+    e->writeProto(row);
+    //saveUserData(os, e->userData());
+    return true;
+  }
+  return false;
+}
+
+} // end namespace

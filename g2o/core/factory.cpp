@@ -35,6 +35,7 @@
 #include "g2o/stuff/color_macros.h"
 #include "optimizable_graph.h"
 #include "parameter.h"
+#include "graph.pb.h"
 
 using namespace std;
 
@@ -160,6 +161,36 @@ bool Factory::knowsTag(const std::string& tag, int* elementType) const {
 void Factory::destroy() {
   std::unique_ptr<Factory> aux;
   factoryInstance.swap(aux);
+}
+
+g2o::proto::FactorTags Factory::strTagToEnum(const std::string& tag) {
+  if (TOKEN_VERTEX_SE3_QUAT.compare(tag) == 0) {
+    return g2o::proto::FactorTags::VERTEX_SE3_QUAT;
+  } else if (TOKEN_EDGE_SE3_PRIOR.compare(tag) == 0) {
+    return g2o::proto::FactorTags::EDGE_SE3_PRIOR;
+  } else if (TOKEN_EDGE_SE3_QUAT.compare(tag) == 0) {
+    return g2o::proto::FactorTags::EDGE_SE3_QUAT;
+  } else if (TOKEN_PARAMS_SE3_OFFSET.compare(tag) == 0) {
+    return g2o::proto::FactorTags::PARAMS_SE3_OFFSET;
+  } else {
+    cerr << "Unknown tag " << tag << endl;
+    return g2o::proto::FactorTags::UNKNOWN;
+  }
+}
+
+const std::string& Factory::enumToStrTag(const g2o::proto::FactorTags tag) {
+  if (g2o::proto::FactorTags::VERTEX_SE3_QUAT == tag) {
+    return TOKEN_VERTEX_SE3_QUAT;
+  } else if (g2o::proto::FactorTags::EDGE_SE3_PRIOR == tag) {
+    return TOKEN_EDGE_SE3_PRIOR;
+  } else if (g2o::proto::FactorTags::EDGE_SE3_QUAT == tag) {
+    return TOKEN_EDGE_SE3_QUAT;
+  } else if (g2o::proto::FactorTags::PARAMS_SE3_OFFSET == tag) {
+    return TOKEN_PARAMS_SE3_OFFSET;
+  } else {
+    cerr << "Unknown tag " << tag << endl;
+    return TOKEN_UNKNOWN;
+  }
 }
 
 void Factory::printRegisteredTypes(std::ostream& os, bool comment) const {

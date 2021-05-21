@@ -33,6 +33,8 @@
 #include "g2o/stuff/opengl_primitives.h"
 #endif
 
+#include "graph.pb.h"
+
 namespace g2o {
 
   ParameterSE3Offset::ParameterSE3Offset(){
@@ -53,8 +55,22 @@ namespace g2o {
     return state;
   }
 
+  bool ParameterSE3Offset::readProto(const g2o::proto::Row& row) {
+    Vector7 off;
+    internal::readVectorProto(0, row, off);
+    // normalize the quaternion to recover numerical precision lost by storing as human readable text
+    // TODO: can we skip that?
+    Vector4::MapType(off.data() + 3).normalize();
+    setOffset(internal::fromVectorQT(off));
+    return true;
+  }
+
   bool ParameterSE3Offset::write(std::ostream& os) const {
     return internal::writeVector(os, internal::toVectorQT(_offset));
+  }
+
+  bool ParameterSE3Offset::writeProto(g2o::proto::Row* row) const {
+    return internal::writeVectorProto(row, internal::toVectorQT(_offset));
   }
 
   CacheSE3Offset::CacheSE3Offset() :

@@ -20,7 +20,8 @@ endif(UNIX)
 add_executable(g2o_cli_application
   g2o.cpp)
 
-target_link_libraries(g2o_cli_application g2o_cli_library)
+add_dependencies(g2o_cli_application graph_proto_dependency)
+target_link_libraries(g2o_cli_application g2o_cli_library graph_proto)
 
 set_property(TARGET g2o_cli_library APPEND PROPERTY COMPILE_DEFINITIONS $<$<CONFIG:Debug>:G2O_LIBRARY_POSTFIX="${CMAKE_DEBUG_POSTFIX}">)
 set_property(TARGET g2o_cli_library APPEND PROPERTY COMPILE_DEFINITIONS $<$<CONFIG:RelWithDebInfo>:G2O_LIBRARY_POSTFIX="${CMAKE_RELWITHDEBINFO_POSTFIX}">)

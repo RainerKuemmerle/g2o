@@ -34,6 +34,8 @@
 
 #include "optimizable_graph.h"
 
+#include "graph.pb.h"
+
 namespace g2o {
 
 namespace internal {
@@ -128,6 +130,9 @@ class BaseEdge : public OptimizableGraph::Edge {
     _error.resize(dim, 1);
   }
 
+  virtual bool readProto(const g2o::proto::Row&) { return false; }
+  virtual bool writeProto(g2o::proto::Row*) const { return false; }
+
  protected:
   Measurement _measurement;      ///< the measurement of the edge
   InformationType _information;  ///< information matrix of the edge. Information = inv(covariance)
@@ -149,6 +154,14 @@ class BaseEdge : public OptimizableGraph::Edge {
       for (int j = i; j < information().cols(); ++j) os << information()(i, j) << " ";
     return os.good();
   }
+  bool writeInformationMatrixProto(g2o::proto::Row* row) const {
+    for (int i = 0; i < information().rows(); ++i) {
+      for (int j = i; j < information().cols(); ++j) {
+        row->add_value(information()(i, j));
+      }
+    }
+    return true;
+  }
   //! reads the upper triangular part of the matrix and recovers the missing symmetrical elements
   bool readInformationMatrix(std::istream& is) {
     for (int i = 0; i < information().rows() && is.good(); ++i)
@@ -158,11 +171,35 @@ class BaseEdge : public OptimizableGraph::Edge {
       }
     return is.good() || is.eof();
   }
+  bool readInformationMatrixProto(int idx, const g2o::proto::Row& row) {
+    int advance = idx;
+    for (int i = 0; i < information().rows(); ++i) {
+      for (int j = i; j < information().cols(); ++j) {
+        if (advance < row.value_size()) {
+          information()(i, j) = row.value(advance);
+          advance = advance + 1;
+          if (i != j) {
+            information()(j, i) = information()(i, j);
+          }
+        }
+      }
+    }
+    return true;
+  }
+
   //! write the param IDs that are potentially used by the edge
   bool writeParamIds(std::ostream& os) const {
     for (auto id : _parameterIds) os << id << " ";
     return os.good();
   }
+
+  bool writeParamIdsProto(g2o::proto::Row* row) const {
+    for (auto id : _parameterIds) {
+      row->add_param(id);
+    }
+    return true;
+  }
+
   //! reads the param IDs from the stream
   bool readParamIds(std::istream& is) {
     for (size_t i = 0; i < numParameters(); ++i) {
@@ -171,6 +208,14 @@ class BaseEdge : public OptimizableGraph::Edge {
       setParameterId(i, paramId);
     }
     return is.good() || is.eof();
+  }
+
+  bool readParamIdsProto(const g2o::proto::Row& row) {
+    for (size_t i = 0; i < numParameters() && i < ((size_t) row.param_size()); ++i) {
+      int paramId = row.param(i);
+      setParameterId(i, paramId);
+    }
+    return true;
   }
 
  public:

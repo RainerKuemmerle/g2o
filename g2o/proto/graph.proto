@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package g2o.proto;
+
+enum FactorTags {
+  UNKNOWN = 0;
+  PARAMS_SE3_OFFSET = 1;
+  VERTEX_SE3_QUAT = 2;
+  EDGE_SE3_PRIOR = 3;
+  EDGE_SE3_QUAT = 4;
+}
+
+message Graph {
+  repeated Row row = 1;
+}
+
+message Row {
+  FactorTags factor_tag = 1;
+  uint32 id = 2;
+  repeated uint32 var = 3;
+  repeated uint32 param = 4;
+  repeated double value = 5;
+}

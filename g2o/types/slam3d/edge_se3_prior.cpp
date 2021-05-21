@@ -29,6 +29,7 @@
 #include <iostream>
 
 #include "isometry3d_gradients.h"
+#include "graph.pb.h"
 
 namespace g2o {
 using namespace std;
@@ -60,11 +61,27 @@ bool EdgeSE3Prior::read(std::istream& is) {
   return state;
 }
 
+bool EdgeSE3Prior::readProto(const g2o::proto::Row& row) {
+  bool state = readParamIdsProto(row);
+  Vector7 meas;
+  int advance = internal::readVectorProto(0, row, meas);
+  setMeasurement(internal::fromVectorQT(meas));
+  state &= readInformationMatrixProto(advance, row);
+  return state;
+}
+
 bool EdgeSE3Prior::write(std::ostream& os) const {
   writeParamIds(os);
   internal::writeVector(os, internal::toVectorQT(measurement()));
   writeInformationMatrix(os);
   return os.good();
+}
+
+bool EdgeSE3Prior::writeProto(g2o::proto::Row* row) const {
+  writeParamIdsProto(row);
+  internal::writeVectorProto(row, internal::toVectorQT(measurement()));
+  writeInformationMatrixProto(row);
+  return true;
 }
 
 void EdgeSE3Prior::computeError() {

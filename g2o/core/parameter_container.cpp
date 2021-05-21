@@ -34,6 +34,7 @@
 #include "g2o/stuff/macros.h"
 #include "g2o/stuff/color_macros.h"
 #include "g2o/stuff/string_tools.h"
+#include "graph.pb.h"
 
 namespace g2o {
 
@@ -97,6 +98,18 @@ namespace g2o {
       os << it->second->id() << " ";
       it->second->write(os);
       os << endl;
+    }
+    return true;
+  }
+
+  bool ParameterContainer::writeProto(g2o::proto::Graph& graph) const {
+    Factory* factory = Factory::instance();
+    for (const_iterator it = begin(); it != end(); ++it) {
+      g2o::proto::Row* row = graph.add_row();
+      string tag(factory->tag(it->second));
+      row->set_factor_tag(factory->strTagToEnum(tag));
+      row->set_id(it->second->id());
+      it->second->writeProto(row);
     }
     return true;
   }

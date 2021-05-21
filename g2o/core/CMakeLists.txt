@@ -41,8 +41,9 @@ io_helper.h
 g2o_core_api.h
 )
 
+add_dependencies(core graph_proto_dependency)
 set_target_properties(core PROPERTIES OUTPUT_NAME ${LIB_PREFIX}core)
-target_link_libraries(core PUBLIC g2o_ceres_ad stuff ${G2O_EIGEN3_EIGEN_TARGET})
+target_link_libraries(core PUBLIC g2o_ceres_ad stuff ${G2O_EIGEN3_EIGEN_TARGET} graph_proto)
 target_compile_features(core PUBLIC cxx_std_14)
 
 if (APPLE)

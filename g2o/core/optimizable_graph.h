@@ -40,6 +40,7 @@
 #include "openmp_mutex.h"
 #include "parameter.h"
 #include "parameter_container.h"
+#include "graph.pb.h"
 
 namespace g2o {
 
@@ -371,8 +372,10 @@ namespace g2o {
 
         //! read the vertex from a stream, i.e., the internal state of the vertex
         virtual bool read(std::istream& is) = 0;
+        virtual bool readProto(const g2o::proto::Row& row) = 0;
         //! write the vertex to a stream
         virtual bool write(std::ostream& os) const = 0;
+        virtual bool writeProto(g2o::proto::Row* row) const = 0;
 
         virtual void updateCache();
 
@@ -510,8 +513,10 @@ namespace g2o {
 
         //! read the vertex from a stream, i.e., the internal state of the vertex
         virtual bool read(std::istream& is) = 0;
+        virtual bool readProto(const g2o::proto::Row& row) = 0;
         //! write the vertex to a stream
         virtual bool write(std::ostream& os) const = 0;
+        virtual bool writeProto(g2o::proto::Row* row) const = 0;
 
         //! the internal ID of the edge
         long long internalId() const { return _internalId;}
@@ -638,11 +643,17 @@ namespace g2o {
 
     //! load the graph from a stream. Uses the Factory singleton for creating the vertices and edges.
     virtual bool load(std::istream& is);
+    virtual bool loadProto(std::istream* is);
+    virtual bool loadProto(const g2o::proto::Graph& graph);
     bool load(const char* filename);
+    bool loadProto(const char* filename);
     //! save the graph to a stream. Again uses the Factory system.
     virtual bool save(std::ostream& os, int level = 0) const;
+    virtual bool saveProto(std::ostream* os, int level = 0) const;
+    virtual bool saveProto(g2o::proto::Graph& graph, int level = 0) const;
     //! function provided for convenience, see save() above
     bool save(const char* filename, int level = 0) const;
+    bool saveProto(const char* filename, int level = 0) const;
 
 
     //! save a subgraph to a stream. Again uses the Factory system.
@@ -698,12 +709,15 @@ namespace g2o {
 
     // helper functions to save an individual vertex
     bool saveVertex(std::ostream& os, Vertex* v) const;
+    bool saveVertexProto(g2o::proto::Row* row, Vertex* v) const;
 
     // helper function to save an individual parameter
     bool saveParameter(std::ostream& os, Parameter* v) const;
+    bool saveParameterProto(g2o::proto::Row* row, Parameter* v) const;
 
     // helper functions to save an individual edge
     bool saveEdge(std::ostream& os, Edge* e) const;
+    bool saveEdgeProto(g2o::proto::Row* row, Edge* e) const;
 
     // helper functions to save the data packets
     bool saveUserData(std::ostream& os, HyperGraph::Data* v) const;

@@ -30,6 +30,7 @@
 #include <iosfwd>
 
 #include "hyper_graph.h"
+#include "graph.pb.h"
 
 namespace g2o {
 
@@ -40,8 +41,10 @@ namespace g2o {
         virtual ~Parameter() {};
         //! read the data from a stream
         virtual bool read(std::istream& is) = 0;
+        virtual bool readProto(const g2o::proto::Row&) { return false; }
         //! write the data to a stream
         virtual bool write(std::ostream& os) const = 0;
+        virtual bool writeProto(g2o::proto::Row*) const { return false; }
         int id() const {return _id;}
         void setId(int id_);
         virtual HyperGraph::HyperGraphElementType elementType() const { return HyperGraph::HGET_PARAMETER;}
