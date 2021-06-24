@@ -117,23 +117,38 @@ else()
   set(CHOLMOD_FOUND FALSE)
 endif()
 
-# For building the CSparse based solvers
+# Options to control the LGPL libraries
+option(G2O_USE_LGPL_LIBS "Build libraries which use LGPL code" YES)
+
+# If the LGPL libraries are used, check if static or shared libraries are used and
+# show a suitable message
+if (G2O_USE_LGPL_LIBS)
+  if (G2O_LIB_TYPE STREQUAL "STATIC")
+    message(STATUS "Building LGPL code as a static library (affects license of the binary)")
+  else()
+    message(STATUS "Building LGPL code as a shared library")
+  endif()
+endif()
+
+# Adapter for the legacy LGPL flags. Note there is an inconsistency with the old implementation.
+if (BUILD_LGPL_SHARED_LIBS)
+  if (G2O_LIB_TYPE SHARED)
+    set(G2O_USE_LGPL_LIBS YES)
+  else()
+    message(ERROR "BUILD_LGPL_SHARED_LIBS is set to true but G2O_LIB_TYPE is set to STATIC")
+  endif()
+endif()
+
+# For building the CSparse based solvers. Note this depends on an LGPL library.
 option(G2O_USE_CSPARSE "Build g2o with CSParse support" ON)
 find_package(CSparse)
-if (G2O_USE_CSPARSE AND CSPARSE_FOUND)
+if (G2O_USE_CSPARSE AND CSPARSE_FOUND AND G2O_USE_LGPL_LIBS)
   message(STATUS "Enable support for CSparse")
 else()
   message(STATUS "Disable support for CSparse")
   set(CSPARSE_FOUND FALSE)
 endif()
 
-option(BUILD_LGPL_SHARED_LIBS "Build LGPL Code as Shared Libraries (LGPL Code)" ON)
-set (G2O_LGPL_LIB_TYPE STATIC)
-if (BUILD_LGPL_SHARED_LIBS)
-  set (G2O_LGPL_LIB_TYPE SHARED)
-else()
-  message(STATUS "Building LGPL code as static library (affects license of the binary)")
-endif()
 
 # Eigen library parallelise itself, though, presumably due to performance issues
 # OPENMP is experimental. We experienced some slowdown with it
@@ -472,7 +487,7 @@ include_directories(${g2o_SOURCE_DIR} ${PROJECT_BINARY_DIR})
 # Generate config.h
 set(G2O_OPENGL_FOUND ${OPENGL_FOUND})
 set(G2O_HAVE_CHOLMOD ${CHOLMOD_FOUND})
-set(G2O_HAVE_CSPARSE ${CSPARSE_FOUND})
+set(G2O_HAVE_CSPARSE ${CSPARSE_FOUND} AND ${G2O_USE_LGPL_LIBS})
 set(G2O_SHARED_LIBS ${BUILD_SHARED_LIBS})
 set(G2O_LGPL_SHARED_LIBS ${BUILD_LGPL_SHARED_LIBS})
 set(G2O_CXX_COMPILER "${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER}")
