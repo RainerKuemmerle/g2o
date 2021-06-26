@@ -1,0 +1,75 @@
+name: CI
+
+on: 
+  push:
+  pull_request:
+  release:
+
+jobs:
+  build:
+    name: ${{ matrix.config.name }}
+    runs-on: ${{ matrix.config.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        config: 
+        - {
+            name: "Ubuntu Latest GCC",
+            os: ubuntu-latest,
+            build_type: "RelWithDebInfo",
+            cc: "gcc",
+            cxx: "g++",
+          }
+        - {
+            name: "macOS Latest Clang",
+            os: macos-latest,
+            build_type: "Release",
+            cc: "clang",
+            cxx: "clang++",
+          }
+        - {
+            name: "Windows Latest MSVC",
+            os: windows-latest,
+            build_type: "RelWithDebInfo",
+            cc: "cl",
+            cxx: "cl",
+            environment_script: "C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/VC/Auxiliary/Build/vcvars64.bat",
+            generators: "Visual Studio 16 2019"
+          }
+
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Print env
+        run: |
+          echo github.ref: ${{github.ref}}
+          echo github.event.action: ${{github.event.action}}
+          echo github.event_name: ${{github.event_name}}
+
+      - name: Install dependencies
+        uses: jrl-umi3218/github-actions/install-dependencies@master
+        with:
+          compiler: ${{ matrix.config.compiler }}
+          build-type: ${{ matrix.config.build-type }}
+          ubuntu: |
+            apt: libeigen3-dev qtdeclarative5-dev qt5-qmake libqglviewer-dev-qt5 libsuitesparse-dev lcov
+          macos: |
+            brew: cmake eigen
+          windows: |
+            github:
+              - path: eigenteam/eigen-git-mirror
+                ref: 3.3.9
+          
+      - name: Configure CMake
+        shell: bash
+        run: |
+          cmake --version
+          cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{matrix.config.build_type}}
+
+      - name: Build
+        run: cmake --build ${{github.workspace}}/build --config ${{matrix.config.build_type}}
+
+      - name: Test
+        working-directory: ${{github.workspace}}/build
+        run: ctest -C ${{matrix.config.build_type}}
