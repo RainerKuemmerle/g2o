@@ -39,6 +39,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+        with:
+            fetch-depth: 25
 
       - name: Print env
         run: |
