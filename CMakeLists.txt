@@ -118,7 +118,7 @@ else()
 endif()
 
 # Options to control the LGPL libraries
-option(G2O_USE_LGPL_LIBS "Build libraries which use LGPL code" YES)
+option(G2O_USE_LGPL_LIBS "Build libraries which use LGPL code" ON)
 
 # If the LGPL libraries are used, check if static or shared libraries are used and
 # show a suitable message
@@ -133,7 +133,7 @@ endif()
 # Adapter for the legacy LGPL flags. Note there is an inconsistency with the old implementation.
 if (BUILD_LGPL_SHARED_LIBS)
   if (G2O_LIB_TYPE SHARED)
-    set(G2O_USE_LGPL_LIBS YES)
+    set(G2O_USE_LGPL_LIBS TRUE)
   else()
     message(ERROR "BUILD_LGPL_SHARED_LIBS is set to true but G2O_LIB_TYPE is set to STATIC")
   endif()
