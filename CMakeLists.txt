@@ -118,7 +118,7 @@ else()
 endif()
 
 # Options to control the LGPL libraries
-option(G2O_USE_LGPL_LIBS "Build libraries which use LGPL code" ON)
+option(G2O_USE_LGPL_LIBS "Build libraries which use LGPL code" TRUE)
 
 # If the LGPL libraries are used, check if static or shared libraries are used and
 # show a suitable message
@@ -142,11 +142,11 @@ endif()
 # For building the CSparse based solvers. Note this depends on an LGPL library.
 option(G2O_USE_CSPARSE "Build g2o with CSParse support" ON)
 find_package(CSparse)
-if (G2O_USE_CSPARSE AND CSPARSE_FOUND AND G2O_USE_LGPL_LIBS)
+if (${G2O_USE_CSPARSE} AND ${CSPARSE_FOUND} AND ${G2O_USE_LGPL_LIBS})
   message(STATUS "Enable support for CSparse")
 else()
   message(STATUS "Disable support for CSparse")
-  set(CSPARSE_FOUND FALSE)
+  set(G2O_USE_CSPARSE FALSE)
 endif()
 
 
@@ -487,7 +487,10 @@ include_directories(${g2o_SOURCE_DIR} ${PROJECT_BINARY_DIR})
 # Generate config.h
 set(G2O_OPENGL_FOUND ${OPENGL_FOUND})
 set(G2O_HAVE_CHOLMOD ${CHOLMOD_FOUND})
-set(G2O_HAVE_CSPARSE ${CSPARSE_FOUND} AND ${G2O_USE_LGPL_LIBS})
+message(CSPARSE_FOUND=${CSPARSE_FOUND})
+message(G2O_USE_LGPL_LIBS=${G2O_USE_LGPL_LIBS})
+set(G2O_HAVE_CSPARSE ${G2O_USE_CSPARSE})
+message(G2O_HAVE_CSPARSE=${G2O_HAVE_CSPARSE})
 set(G2O_SHARED_LIBS ${BUILD_SHARED_LIBS})
 set(G2O_LGPL_SHARED_LIBS ${BUILD_LGPL_SHARED_LIBS})
 set(G2O_CXX_COMPILER "${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER}")
