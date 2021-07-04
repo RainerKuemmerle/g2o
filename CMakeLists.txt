@@ -132,10 +132,10 @@ endif()
 
 # Adapter for the legacy LGPL flags. Note there is an inconsistency with the old implementation.
 if (BUILD_LGPL_SHARED_LIBS)
-  if (G2O_LIB_TYPE SHARED)
+  if (G2O_LIB_TYPE STREQUAL "SHARED")
     set(G2O_USE_LGPL_LIBS TRUE)
   else()
-    message(ERROR "BUILD_LGPL_SHARED_LIBS is set to true but G2O_LIB_TYPE is set to STATIC")
+    message(FATAL_ERROR "BUILD_LGPL_SHARED_LIBS is set to true but G2O_LIB_TYPE is set to STATIC")
   endif()
 endif()
 
@@ -487,10 +487,7 @@ include_directories(${g2o_SOURCE_DIR} ${PROJECT_BINARY_DIR})
 # Generate config.h
 set(G2O_OPENGL_FOUND ${OPENGL_FOUND})
 set(G2O_HAVE_CHOLMOD ${CHOLMOD_FOUND})
-message(CSPARSE_FOUND=${CSPARSE_FOUND})
-message(G2O_USE_LGPL_LIBS=${G2O_USE_LGPL_LIBS})
 set(G2O_HAVE_CSPARSE ${G2O_USE_CSPARSE})
-message(G2O_HAVE_CSPARSE=${G2O_HAVE_CSPARSE})
 set(G2O_SHARED_LIBS ${BUILD_SHARED_LIBS})
 set(G2O_LGPL_SHARED_LIBS ${BUILD_LGPL_SHARED_LIBS})
 set(G2O_CXX_COMPILER "${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER}")
