@@ -1,6 +1,6 @@
 name: CI
 
-on: 
+on:
   push:
     branches:
       - master
@@ -15,7 +15,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        config: 
+        config:
         - {
             name: "Ubuntu Latest GCC",
             os: ubuntu-latest,
@@ -68,6 +68,14 @@ jobs:
         run: |
           cmake --version
           cmake -B ${{github.workspace}}/build -DBUILD_UNITTESTS=ON -DBUILD_CODE_COVERAGE=${{matrix.config.do_coverage}} -DCMAKE_BUILD_TYPE=${{matrix.config.build_type}}
+
+      - name: Build Introspection
+        shell: bash
+        run: |
+          echo "g2o config.h"
+          cat ${{github.workspace}}/build/g2o/config.h
+          echo "ENV"
+          env | sort
 
       - name: Build
         run: cmake --build ${{github.workspace}}/build --config ${{matrix.config.build_type}} -j 2
