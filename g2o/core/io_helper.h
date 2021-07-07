@@ -28,6 +28,7 @@
 #define G2O_CORE_IO_HELPER_H
 
 #include <iosfwd>
+#include "graph.pb.h"
 
 namespace g2o {
 namespace internal {
@@ -41,6 +42,22 @@ template <typename Derived>
 bool readVector(std::istream& is, Eigen::DenseBase<Derived>& b) {
   for (int i = 0; i < b.size() && is.good(); i++) is >> b(i);
   return is.good() || is.eof();
+}
+template <typename Derived>
+bool writeVectorProto(g2o::proto::Row* row, const Eigen::DenseBase<Derived>& b) {
+  for (int i = 0; i < b.size(); i++) {
+    row->add_value(b(i));
+  }
+  return true;
+}
+template <typename Derived>
+int readVectorProto(int idx, const g2o::proto::Row& row, Eigen::DenseBase<Derived>& b) {
+  int advance = 0;
+  for (int i = 0; i < b.size() && (i + idx) < row.value_size(); i++) {
+    b(i) = row.value(i + idx);
+    advance = advance + 1;
+  }
+  return advance;
 }
 }  // namespace internal
 }  // namespace g2o

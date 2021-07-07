@@ -30,6 +30,7 @@
 #include <iosfwd>
 #include <map>
 #include <string>
+#include "graph.pb.h"
 
 namespace g2o {
     
@@ -61,6 +62,7 @@ namespace g2o {
       virtual bool read(std::istream& is, const std::map<std::string, std::string>* renamedMap =0);
       //! write the data to a stream
       virtual bool write(std::ostream& os) const;
+      virtual bool writeProto(g2o::proto::Graph& graph) const;
       bool isMainStorage() const {return _isMainStorage;}
       void clear();
 

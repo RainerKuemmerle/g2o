@@ -36,11 +36,19 @@
 #include "g2o/config.h"
 #include "g2o/stuff/misc.h"  // ForceLinker for the macros
 #include "hyper_graph.h"
+#include "graph.pb.h"
 
 // define to get some verbose output
 //#define G2O_DEBUG_FACTORY
 
 namespace g2o {
+
+// TODO: integrate better
+std::string const TOKEN_VERTEX_SE3_QUAT = "VERTEX_SE3:QUAT";
+std::string const TOKEN_EDGE_SE3_PRIOR = "EDGE_SE3_PRIOR";
+std::string const TOKEN_EDGE_SE3_QUAT = "EDGE_SE3:QUAT";
+std::string const TOKEN_PARAMS_SE3_OFFSET = "PARAMS_SE3OFFSET";
+std::string const TOKEN_UNKNOWN = "UNKNOWN";
 
 /**
  * \brief create vertices and edges based on TAGs in, for example, a file
@@ -55,6 +63,9 @@ class G2O_CORE_API Factory {
 
   //! free the instance
   static void destroy();
+
+  g2o::proto::FactorTags strTagToEnum(const std::string& tag);
+  const std::string& enumToStrTag(const g2o::proto::FactorTags);
 
   /**
    * register a tag for a specific creator

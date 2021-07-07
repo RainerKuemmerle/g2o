@@ -33,6 +33,7 @@
 
 #include <iostream>
 #include "g2o/core/cache.h"
+#include "graph.pb.h"
 
 using namespace Eigen;
 
@@ -54,9 +55,22 @@ namespace g2o {
     return state;
   }
 
+  bool VertexSE3::readProto(const g2o::proto::Row& row)
+  {
+    Vector7 est;
+    internal::readVectorProto(0, row, est);
+    setEstimate(internal::fromVectorQT(est));
+    return true;
+  }
+
   bool VertexSE3::write(std::ostream& os) const
   {
     return internal::writeVector(os, internal::toVectorQT(estimate()));
+  }
+
+  bool VertexSE3::writeProto(g2o::proto::Row* row) const
+  {
+    return internal::writeVectorProto(row, internal::toVectorQT(estimate()));
   }
 
   VertexSE3WriteGnuplotAction::VertexSE3WriteGnuplotAction(): WriteGnuplotAction(typeid(VertexSE3).name()){}

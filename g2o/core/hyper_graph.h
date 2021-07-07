@@ -36,6 +36,7 @@
 #include <unordered_map>
 
 #include "g2o_core_api.h"
+#include "graph.pb.h"
 
 /** @addtogroup graph */
 //@{
@@ -97,8 +98,10 @@ namespace g2o {
           ~Data();
           //! read the data from a stream
           virtual bool read(std::istream& is) = 0;
+          virtual bool readProto(const g2o::proto::Row&) { return false; }
           //! write the data to a stream
           virtual bool write(std::ostream& os) const = 0;
+          virtual bool writeProto(g2o::proto::Row*) { return false; }
           virtual HyperGraph::HyperGraphElementType elementType() const { return HyperGraph::HGET_DATA;}
           inline const Data* next() const {return _next;}
           inline Data* next() {return _next;}

@@ -31,6 +31,7 @@
 #include "g2o_types_slam3d_api.h"
 #include "parameter_se3_offset.h"
 #include "vertex_se3.h"
+#include "graph.pb.h"
 
 namespace g2o {
 /**
@@ -45,6 +46,9 @@ class G2O_TYPES_SLAM3D_API EdgeSE3Prior : public BaseUnaryEdge<6, Isometry3, Ver
   EdgeSE3Prior();
   virtual bool read(std::istream& is);
   virtual bool write(std::ostream& os) const;
+
+  virtual bool readProto(const g2o::proto::Row& row);
+  virtual bool writeProto(g2o::proto::Row* row) const;
 
   // return the error estimate as a 3-vector
   void computeError();

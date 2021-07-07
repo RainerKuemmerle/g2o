@@ -33,6 +33,8 @@
 #include "g2o/stuff/opengl_primitives.h"
 #endif
 
+#include "graph.pb.h"
+
 namespace g2o {
   using namespace std;
 
@@ -51,9 +53,25 @@ namespace g2o {
     return is.good() || is.eof();
   }
 
+  bool EdgeSE3::readProto(const g2o::proto::Row& row) {
+    Vector7 meas;
+    int advance = internal::readVectorProto(0, row, meas);
+    // normalize the quaternion to recover numerical precision lost by storing as human readable text
+    // TODO: can we skip this?
+    Vector4::MapType(meas.data() + 3).normalize();
+    setMeasurement(internal::fromVectorQT(meas));
+    readInformationMatrixProto(advance, row);
+    return true;
+  }
+
   bool EdgeSE3::write(std::ostream& os) const {
     internal::writeVector(os, internal::toVectorQT(measurement()));
     return writeInformationMatrix(os);
+  }
+
+  bool EdgeSE3::writeProto(g2o::proto::Row* row) const {
+    internal::writeVectorProto(row, internal::toVectorQT(measurement()));
+    return writeInformationMatrixProto(row);
   }
 
   void EdgeSE3::computeError() {
