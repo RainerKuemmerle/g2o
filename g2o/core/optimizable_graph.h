@@ -359,6 +359,11 @@ namespace g2o {
         const OptimizableGraph* graph() const {return _graph;}
         OptimizableGraph* graph() {return _graph;}
 
+        void clearGraph() {
+          _graph = NULL;
+          _edges.clear();
+        }
+
         /**
          * lock for the block of the hessian and the b vector associated with this vertex, to avoid
          * race-conditions if multi-threaded.
