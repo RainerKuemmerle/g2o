@@ -5,10 +5,7 @@ add_executable(unittest_solver
 )
 
 # setting up linking of the test based on the available solvers
-set(SOLVER_LIBRARIES solver_eigen solver_dense solver_pcg solver_structure_only)
-if(G2O_BUILD_SLAM2D_TYPES)
-  list(APPEND SOLVER_LIBRARIES solver_slam2d_linear)
-endif()
+set(SOLVER_LIBRARIES solver_eigen solver_dense solver_pcg solver_slam2d_linear solver_structure_only)
 if(CHOLMOD_FOUND)
   list(APPEND SOLVER_LIBRARIES solver_cholmod)
 endif()

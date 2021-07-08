@@ -1,3 +1,7 @@
+if(NOT G2O_USE_CSPARSE)
+  return()
+endif()
+
 add_library(solver_slam2d_linear ${G2O_LIB_TYPE}
   slam2d_linear.cpp
   solver_slam2d_linear.h solver_slam2d_linear.cpp
