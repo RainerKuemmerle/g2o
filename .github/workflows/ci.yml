@@ -1,0 +1,89 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    types: [ assigned, opened, synchronize, reopened ]
+  release:
+
+jobs:
+  build:
+    name: ${{ matrix.config.name }}
+    runs-on: ${{ matrix.config.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+        - {
+            name: "Ubuntu Latest GCC",
+            os: ubuntu-latest,
+            build_type: "Debug",
+            do_coverage: "ON",
+          }
+        - {
+            name: "macOS Latest Clang",
+            os: macos-latest,
+            build_type: "Debug",
+            do_coverage: "OFF",
+          }
+        #- {
+            #name: "Windows Latest MSVC",
+            #os: windows-latest,
+            #build_type: "Debug",
+            #environment_script: "C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/VC/Auxiliary/Build/vcvars64.bat",
+            #generators: "Visual Studio 16 2019"
+            #do_coverage: "OFF",
+          #}
+
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+            fetch-depth: 25
+
+      - name: Print env
+        run: |
+          echo github.ref: ${{github.ref}}
+          echo github.event.action: ${{github.event.action}}
+          echo github.event_name: ${{github.event_name}}
+          echo runner.os: ${{runner.os}}
+
+      - name: Install dependencies on Ubuntu
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install libeigen3-dev qtdeclarative5-dev qt5-qmake libqglviewer-dev-qt5 libsuitesparse-dev lcov
+
+      - name: Install dependencies on macOS
+        if: runner.os == 'macOS'
+        run: brew install cmake eigen
+
+      #- name: Install dependencies on Windows
+        #if: runner.os == 'Windows'
+        #run: brew install cmake eigen
+
+      - name: Configure CMake
+        run: |
+          cmake --version
+          cmake -B ${{github.workspace}}/build -DBUILD_UNITTESTS=ON -DBUILD_CODE_COVERAGE=${{matrix.config.do_coverage}} -DCMAKE_BUILD_TYPE=${{matrix.config.build_type}}
+
+      - name: Build Introspection
+        shell: bash
+        run: |
+          echo "g2o config.h"
+          cat ${{github.workspace}}/build/g2o/config.h
+          echo "ENV"
+          env | sort
+
+      - name: Build
+        run: cmake --build ${{github.workspace}}/build --config ${{matrix.config.build_type}} -j 2
+
+      - name: Test
+        working-directory: ${{github.workspace}}/build
+        run: ctest -C ${{matrix.config.build_type}} --extra-verbose --output-on-failure
+
+      - name: Coverage
+        if: matrix.config.do_coverage == 'ON'
+        run: bash ${{github.workspace}}/build/codecov.sh

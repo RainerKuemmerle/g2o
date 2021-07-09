@@ -38,7 +38,7 @@ endif(CMAKE_BUILD_TYPE MATCHES Release)
 
 # Allow the developer to select if Dynamic or Static libraries are built
 option (BUILD_SHARED_LIBS "Build Shared Libraries (preferred and required for the g2o plugin system)" ON)
-set (G2O_LIB_TYPE STATIC)
+set (G2O_LIB_TYPE STATIC)>>>>>>> master
 if (BUILD_SHARED_LIBS)
   set (G2O_LIB_TYPE SHARED)
 endif()
@@ -117,23 +117,38 @@ else()
   set(CHOLMOD_FOUND FALSE)
 endif()
 
-# For building the CSparse based solvers
+# Options to control the LGPL libraries
+option(G2O_USE_LGPL_LIBS "Build libraries which use LGPL code" TRUE)
+
+# If the LGPL libraries are used, check if static or shared libraries are used and
+# show a suitable message
+if (G2O_USE_LGPL_LIBS)
+  if (G2O_LIB_TYPE STREQUAL "STATIC")
+    message(STATUS "Building LGPL code as a static library (affects license of the binary)")
+  else()
+    message(STATUS "Building LGPL code as a shared library")
+  endif()
+endif()
+
+# Adapter for the legacy LGPL flags. Note there is an inconsistency with the old implementation.
+if (BUILD_LGPL_SHARED_LIBS)
+  if (G2O_LIB_TYPE STREQUAL "SHARED")
+    set(G2O_USE_LGPL_LIBS TRUE)
+  else()
+    message(FATAL_ERROR "BUILD_LGPL_SHARED_LIBS is set to true but G2O_LIB_TYPE is set to STATIC")
+  endif()
+endif()
+
+# For building the CSparse based solvers. Note this depends on an LGPL library.
 option(G2O_USE_CSPARSE "Build g2o with CSParse support" ON)
 find_package(CSparse)
-if (G2O_USE_CSPARSE AND CSPARSE_FOUND)
+if (${G2O_USE_CSPARSE} AND ${CSPARSE_FOUND} AND ${G2O_USE_LGPL_LIBS})
   message(STATUS "Enable support for CSparse")
 else()
   message(STATUS "Disable support for CSparse")
-  set(CSPARSE_FOUND FALSE)
+  set(G2O_USE_CSPARSE FALSE)
 endif()
 
-option(BUILD_LGPL_SHARED_LIBS "Build LGPL Code as Shared Libraries (LGPL Code)" ON)
-set (G2O_LGPL_LIB_TYPE STATIC)
-if (BUILD_LGPL_SHARED_LIBS)
-  set (G2O_LGPL_LIB_TYPE SHARED)
-else()
-  message(STATUS "Building LGPL code as static library (affects license of the binary)")
-endif()
 
 # Eigen library parallelise itself, though, presumably due to performance issues
 # OPENMP is experimental. We experienced some slowdown with it
@@ -177,6 +192,82 @@ if(G2O_USE_VENDORED_CERES)
   add_definitions(-DG2O_USE_VENDORED_CERES)
 else()
   find_package(Ceres REQUIRED)
+
+# Handle building the built in types. There is a fair degree of
+# granularity and dependency in the types supported.
+
+# 2D types
+set(G2O_BUILD_SLAM2D_TYPES ON CACHE BOOL "Build SLAM2D types")
+set(G2O_BUILD_SLAM2D_ADDON_TYPES ON CACHE BOOL "Build SLAM2D addon types")
+set(G2O_BUILD_DATA_TYPES ON CACHE BOOL "Build SLAM2D data types")
+set(G2O_BUILD_SCLAM2D_TYPES ON CACHE BOOL "Build SCLAM2D types")
+
+# Process the arguments. If G2O_BUILD_SLAM2D_TYPES is disabled, forceably
+# disable all types. Otherwise, update messages on the types enabled.
+if(G2O_BUILD_SLAM2D_TYPES)
+  string(APPEND supported_types_message " slam2d")
+  # Make sure that we can't activate both types
+  if(G2O_BUILD_SLAM2D_ADDON_TYPES)
+    string(APPEND supported_types_message " slam2d (addons)")
+  endif()
+  if(G2O_BUILD_DATA_TYPES)
+    string(APPEND supported_types_message " data")
+  endif()
+  if(G2O_BUILD_SCLAM2D_TYPES)
+    string(APPEND supported_types_message " sclam2d")
+  endif()
+else()
+  set(G2O_BUILD_SLAM2D_ADDON_TYPES OFF)
+  set(G2O_BUILD_DATA_TYPES OFF)
+  set(G2O_BUILD_SCLAM2D_TYPES OFF)
+endif()
+
+# 3D types
+set(G2O_BUILD_SLAM3D_TYPES ON CACHE BOOL "Build SLAM 3D types")
+set(G2O_BUILD_SLAM3D_ADDON_TYPES ON CACHE BOOL "Build SLAM 3D addon types")
+set(G2O_BUILD_SBA_TYPES ON CACHE BOOL "Build SLAM3D SBA types")
+set(G2O_BUILD_ICP_TYPES ON CACHE BOOL "Build SLAM3D ICP types")
+set(G2O_BUILD_SIM3_TYPES ON CACHE BOOL "Build SLAM3D sim3 types")
+
+# Process the arguments. If G2O_BUILD_SLAM3D_TYPES is disabled, forceably
+# disable all the types. Enable SBA if it's not enabled but one of it's
+# dependents is enabled.
+if(G2O_BUILD_SLAM3D_TYPES)
+  string(APPEND supported_types_message " slam3d")
+  message(STATUS "Compiling SLAM 3D types")
+  if (G2O_BUILD_SLAM3D_ADDON_TYPES)
+    string(APPEND supported_types_message " slam3d (addons)")
+  endif()
+  if (G2O_BUILD_SBA_TYPES)
+    string(APPEND supported_types_message " sba")
+  endif()
+  if (G2O_BUILD_ICP_TYPES)
+    if(NOT G2O_BUILD_SBA_TYPES)
+      message(WARNING "ICP types requested but SBA types not enabled; enabling SBA")
+      set(G2O_BUILD_SBA_TYPES ON)
+      string(APPEND supported_types_message " sba")
+    endif()
+    string(APPEND supported_types_message " icp")
+  endif()
+  if (G2O_BUILD_SIM3_TYPES)
+    if(NOT G2O_BUILD_SBA_TYPES)
+      message(WARNING "SIM3 types requested but SBA types not enabled; enabling SBA")
+      set(G2O_BUILD_SBA_TYPES ON)
+      string(APPEND supported_types_message " sba")
+    endif()
+    string(APPEND supported_types_message " sim3")
+  endif()
+else()
+  set(G2O_BUILD_SLAM3D_ADDON_TYPES OFF)
+  set(G2O_BUILD_SBA_TYPES OFF)
+  set(G2O_BUILD_ICP_TYPES OFF)
+  set(G2O_BUILD_SIM3_TYPES OFF)
+endif()
+
+if(DEFINED supported_types_message)
+  message(STATUS "Compiling built in types" ${supported_types_message})
+else()
+  message(STATUS "Compiling with no built in types enabled")
 endif()
 
 # shall we build the core apps using the library
@@ -310,6 +401,12 @@ endif(CMAKE_COMPILER_IS_GNUCXX)
 if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   message(STATUS "Compiling with Clang")
 
+  # OS X
+  if(BUILD_WITH_MARCH_NATIVE AND "${CMAKE_SYSTEM_NAME}" MATCHES "Darwin")
+    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -march=native")
+    set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -march=native")
+  endif()
+
   # activate all warnings
   #set(g2o_C_FLAGS "${g2o_C_FLAGS} -Weverything")
   #set(g2o_CXX_FLAGS "${g2o_CXX_FLAGS} -Weverything")
@@ -398,7 +495,7 @@ include_directories(${g2o_SOURCE_DIR} ${PROJECT_BINARY_DIR})
 # Generate config.h
 set(G2O_OPENGL_FOUND ${OPENGL_FOUND})
 set(G2O_HAVE_CHOLMOD ${CHOLMOD_FOUND})
-set(G2O_HAVE_CSPARSE ${CSPARSE_FOUND})
+set(G2O_HAVE_CSPARSE ${G2O_USE_CSPARSE})
 set(G2O_SHARED_LIBS ${BUILD_SHARED_LIBS})
 set(G2O_LGPL_SHARED_LIBS ${BUILD_LGPL_SHARED_LIBS})
 set(G2O_CXX_COMPILER "${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER}")

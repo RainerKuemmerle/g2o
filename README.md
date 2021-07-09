@@ -1,6 +1,6 @@
 # g2o - General Graph Optimization
 
-Linux: [![Build Status](https://travis-ci.org/RainerKuemmerle/g2o.svg?branch=master)](https://travis-ci.org/RainerKuemmerle/g2o)
+Linux: [![CI](https://github.com/RainerKuemmerle/g2o/actions/workflows/ci.yml/badge.svg?event=push)](https://github.com/RainerKuemmerle/g2o/actions/workflows/ci.yml)
 Windows: [![Build status](https://ci.appveyor.com/api/projects/status/9w0cpb9krc6t4nt7/branch/master?svg=true)](https://ci.appveyor.com/project/RainerKuemmerle/g2o/branch/master)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/e87df92948b747d58591372dd425fc59)](https://app.codacy.com/manual/rainer.kuemmerle/g2o?utm_source=github.com&utm_medium=referral&utm_content=RainerKuemmerle/g2o&utm_campaign=Badge_Grade_Dashboard)
 
