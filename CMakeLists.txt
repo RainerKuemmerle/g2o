@@ -192,6 +192,7 @@ if(G2O_USE_VENDORED_CERES)
   add_definitions(-DG2O_USE_VENDORED_CERES)
 else()
   find_package(Ceres REQUIRED)
+endif()
 
 # Handle building the built in types. There is a fair degree of
 # granularity and dependency in the types supported.
