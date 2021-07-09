@@ -38,7 +38,11 @@
 
 #include "g2o/core/optimizable_graph.h"
 
-#include "g2o/EXTERNAL/ceres/autodiff.h"
+#ifdef G2O_USE_VENDORED_CERES
+  #include "g2o/EXTERNAL/ceres/autodiff.h"
+#else
+  #include <ceres/internal/autodiff.h>
+#endif
 
 using namespace std;
 using namespace g2o;

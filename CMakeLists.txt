@@ -185,6 +185,15 @@ endif()
 # For building the GUI
 find_package(QGLViewer)
 
+# The Ceres package is required for some of the solvers.
+# Ceres is vendored in g2o/EXTERNAL/ceres, or the system's can be used.
+set(G2O_USE_VENDORED_CERES ON CACHE BOOL "Use vendored Ceres from g2o/EXTERNAL/ceres")
+if(G2O_USE_VENDORED_CERES)
+  add_definitions(-DG2O_USE_VENDORED_CERES)
+else()
+  find_package(Ceres REQUIRED)
+endif()
+
 # Handle building the built in types. There is a fair degree of
 # granularity and dependency in the types supported.
 
