@@ -28,8 +28,8 @@
 #include <iostream>
 using namespace std;
 
-MainWindow::MainWindow(QWidget * parent, Qt::WindowFlags flags) :
-  QMainWindow(parent, flags)
+MainWindow::MainWindow(QWidget * parent) :
+  QMainWindow(parent)
 {
   setupUi(this);
 }
