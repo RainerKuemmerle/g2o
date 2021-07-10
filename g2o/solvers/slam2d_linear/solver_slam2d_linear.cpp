@@ -35,7 +35,6 @@
 #include "g2o/types/slam2d/edge_se2.h"
 
 #include "g2o/stuff/misc.h"
-#include "g2o/stuff/scoped_pointer.h"
 
 #include "g2o/solvers/eigen/linear_solver_eigen.h"
 
@@ -100,11 +99,11 @@ namespace g2o {
 
     typedef Eigen::Matrix<number_t, 1, 1, Eigen::ColMajor> ScalarMatrix;
 
-    ScopedArray<int> blockIndeces(new int[_optimizer->indexMapping().size()]);
+    std::vector<int> blockIndeces(_optimizer->indexMapping().size());
     for (size_t i = 0; i < _optimizer->indexMapping().size(); ++i)
       blockIndeces[i] = i+1;
 
-    SparseBlockMatrix<ScalarMatrix> H(blockIndeces.get(), blockIndeces.get(), _optimizer->indexMapping().size(), _optimizer->indexMapping().size());
+    SparseBlockMatrix<ScalarMatrix> H(blockIndeces.data(), blockIndeces.data(), _optimizer->indexMapping().size(), _optimizer->indexMapping().size());
 
     // building the structure, diagonal for each active vertex
     for (size_t i = 0; i < _optimizer->indexMapping().size(); ++i) {
