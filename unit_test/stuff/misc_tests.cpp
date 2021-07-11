@@ -69,7 +69,7 @@ TEST(Stuff, NormalizeThetaCmpBruteForce) {
   }
 }
 
-TEST(Stuff, from_degrees) {
+TEST(Stuff, Deg2Rad) {
   constexpr double epsilon = 1e-9;
   EXPECT_NEAR(0, g2o::deg2rad(0), epsilon);
   EXPECT_NEAR(M_PI / 2, g2o::deg2rad(90), epsilon);
@@ -83,7 +83,7 @@ TEST(Stuff, from_degrees) {
   EXPECT_NEAR(M_PI / 6, g2o::deg2rad(30), epsilon);
 }
 
-TEST(Stuff, to_degrees) {
+TEST(Stuff, Rad2Deg) {
   constexpr double epsilon = 1e-9;
   EXPECT_NEAR(g2o::rad2deg(0), 0, epsilon);
   EXPECT_NEAR(g2o::rad2deg(M_PI / 2), 90, epsilon);
@@ -115,4 +115,20 @@ TEST(Stuff, ArrayHasNaN) {
     data[i] = std::numeric_limits<number_t>::quiet_NaN();
     EXPECT_EQ(std::make_pair(true, i), aux(data, size));
   }
+}
+
+TEST(Stuff, Square) {
+  EXPECT_DOUBLE_EQ(4, g2o::square(2));
+  EXPECT_DOUBLE_EQ(4, g2o::square(-2));
+}
+
+TEST(Stuff, Hypot) {
+  EXPECT_DOUBLE_EQ(hypot(2, 0), 2);
+  EXPECT_DOUBLE_EQ(hypot(-2, 0), 2);
+  EXPECT_DOUBLE_EQ(hypot(0, 2), 2);
+  EXPECT_DOUBLE_EQ(hypot(0, -2), 2);
+  EXPECT_DOUBLE_EQ(hypot(3, 3), sqrt(18));
+  EXPECT_DOUBLE_EQ(hypot(-3, 3), sqrt(18));
+  EXPECT_DOUBLE_EQ(hypot(-3, 3), sqrt(18));
+  EXPECT_DOUBLE_EQ(hypot(3, -3), sqrt(18));
 }
