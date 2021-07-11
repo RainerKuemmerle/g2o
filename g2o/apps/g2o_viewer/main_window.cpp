@@ -38,8 +38,8 @@
 using namespace std;
 using namespace g2o;
 
-MainWindow::MainWindow(QWidget * parent, Qt::WindowFlags flags) :
-  QMainWindow(parent, flags),
+MainWindow::MainWindow(QWidget * parent) :
+  QMainWindow(parent),
   _lastSolver(-1), _currentSolver(0), _viewerPropertiesWidget(0), _optimizerPropertiesWidget(0),
   _filename("")
 {
