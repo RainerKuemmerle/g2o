@@ -237,7 +237,7 @@ namespace g2o {
         }
       }
     }
-    return false;
+    return true;
   }
 
   template <class MatrixType>
