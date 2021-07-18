@@ -29,8 +29,8 @@ using namespace std;
 
 using namespace g2o;
 
-PropertiesWidget::PropertiesWidget(QWidget * parent, Qt::WindowFlags f) :
-  QDialog(parent, f),
+PropertiesWidget::PropertiesWidget(QWidget * parent) :
+  QDialog(parent),
   _properties(0)
 {
   setupUi(this);

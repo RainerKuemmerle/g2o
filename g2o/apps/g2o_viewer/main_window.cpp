@@ -38,11 +38,12 @@
 using namespace std;
 using namespace g2o;
 
-MainWindow::MainWindow(QWidget * parent, Qt::WindowFlags flags) :
-  QMainWindow(parent, flags),
-  _lastSolver(-1), _viewerPropertiesWidget(0), _optimizerPropertiesWidget(0),
-  _filename("")
-{
+MainWindow::MainWindow(QWidget* parent)
+    : QMainWindow(parent),
+      _lastSolver(-1),
+      _viewerPropertiesWidget(0),
+      _optimizerPropertiesWidget(0),
+      _filename("") {
   setupUi(this);
   leKernelWidth->setValidator(new QDoubleValidator(-numeric_limits<double>::max(), numeric_limits<double>::max(), 7, this));
   plainTextEdit->setMaximumBlockCount(1000);

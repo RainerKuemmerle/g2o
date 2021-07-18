@@ -18,7 +18,7 @@
 
 #include "slam2d_viewer.h"
 
-#include "draw_helpers.h"
+#include "g2o/stuff/opengl_primitives.h"
 #include "g2o/types/slam2d/vertex_se2.h"
 #include "g2o/types/slam2d/vertex_point_xy.h"
 #include "g2o/core/sparse_optimizer.h"
@@ -120,16 +120,16 @@ namespace {
     glRotatef(RAD2DEG(theta), 0.f, 0.f, 1.f);
     glScalef(majorAxis * scalingFactor, minorAxis * scalingFactor, 1.f);
     glColor4f(1.0f, 1.f, 0.f, 0.4f);
-    drawDisk(1.f);
+    opengl::drawDisk(1.f);
     glColor4f(0.f, 0.f, 0.f, 1.0f);
-    drawCircle(1.f);
+    opengl::drawCircle(1.f);
     glPopMatrix();
   }
 
 } // end anonymous namespace
 
-Slam2DViewer::Slam2DViewer(QWidget* parent, const QGLWidget* shareWidget, Qt::WindowFlags flags) :
-  QGLViewer(parent, shareWidget, flags),
+Slam2DViewer::Slam2DViewer(QWidget* parent, const QGLWidget* shareWidget) :
+  QGLViewer(parent, shareWidget),
   graph(0), drawCovariance(false)
 {
 }

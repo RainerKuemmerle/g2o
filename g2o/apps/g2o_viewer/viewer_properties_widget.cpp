@@ -67,8 +67,8 @@ static std::string demangleName(const std::string& fullPropName)
 #endif
 }
 
-ViewerPropertiesWidget::ViewerPropertiesWidget(QWidget * parent, Qt::WindowFlags f) :
-  PropertiesWidget(parent, f), _viewer(nullptr)
+ViewerPropertiesWidget::ViewerPropertiesWidget(QWidget * parent) :
+  PropertiesWidget(parent), _viewer(nullptr)
 {
 }
 

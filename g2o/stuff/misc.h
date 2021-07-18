@@ -121,17 +121,9 @@ inline number_t rad2deg(number_t rad)
  */
 inline number_t normalize_theta(number_t theta)
 {
-  if (theta >= -const_pi() && theta < const_pi())
-    return theta;
-
-  number_t multiplier = std::floor(theta / (2*const_pi()));
-  theta = theta - multiplier*2*const_pi();
-  if (theta >= const_pi())
-    theta -= 2*const_pi();
-  if (theta < -const_pi())
-    theta += 2*const_pi();
-
-  return theta;
+  const number_t result = fmod(theta + const_pi(), 2.0 * const_pi());
+  if (result <= 0.0) return result + const_pi();
+  return result - const_pi();
 }
 
 /**

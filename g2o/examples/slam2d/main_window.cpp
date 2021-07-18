@@ -34,9 +34,7 @@ using namespace std;
 using SlamBlockSolver = g2o::BlockSolver<g2o::BlockSolverTraits<-1, -1> >;
 using SlamLinearSolver = g2o::LinearSolverEigen<SlamBlockSolver::PoseMatrixType>;
 
-MainWindow::MainWindow(QWidget* parent, Qt::WindowFlags flags) : QMainWindow(parent, flags) {
-  setupUi(this);
-}
+MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) { setupUi(this); }
 
 MainWindow::~MainWindow() {}
 
