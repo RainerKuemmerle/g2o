@@ -52,20 +52,15 @@ void EdgeSE3Expmap::computeError() {
 }
 
 void EdgeSE3Expmap::linearizeOplus() {
-  VertexSE3Expmap* vi = static_cast<VertexSE3Expmap*>(_vertices[0]);
-  SE3Quat Ti(vi->estimate());
-
   VertexSE3Expmap* vj = static_cast<VertexSE3Expmap*>(_vertices[1]);
   SE3Quat Tj(vj->estimate());
 
   const SE3Quat& Tij = _measurement;
-  SE3Quat invTij = Tij.inverse();
 
   SE3Quat invTj_Tij = Tj.inverse() * Tij;
-  SE3Quat infTi_invTij = Ti.inverse() * invTij;
 
   _jacobianOplusXi = invTj_Tij.adj();
-  _jacobianOplusXj = -infTi_invTij.adj();
+  _jacobianOplusXj = -Tj.inverse().adj();
 }
 
 }  // namespace g2o
