@@ -481,9 +481,8 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${g2o_C_FLAGS}")
 find_package(Eigen3 3.3 REQUIRED)
 if (TARGET Eigen3::Eigen)
   set(G2O_EIGEN3_EIGEN_TARGET Eigen3::Eigen)
-else()
-  include_directories(${EIGEN3_INCLUDE_DIR})
 endif ()
+include_directories(${EIGEN3_INCLUDE_DIR})
 
 # Set up the top-level include directories
 include_directories(${g2o_SOURCE_DIR} ${PROJECT_BINARY_DIR})
