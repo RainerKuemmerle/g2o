@@ -20,14 +20,14 @@ build:
 install:
   - set QTDIR=C:\Qt\5.15.1\msvc2019_64
   - set PATH=%PATH%;%QTDIR%\bin
-  - ps: wget https://gitlab.com/libeigen/eigen/-/archive/3.3.9/eigen-3.3.9.zip -outfile eigen3.zip
+  - ps: wget https://gitlab.com/libeigen/eigen/-/archive/3.4.0/eigen-3.4.0.zip -outfile eigen3.zip
   - cmd: 7z x eigen3.zip -o"C:\projects" -y > nul
 
 before_build:
   - cd c:\projects\g2o
   - mkdir build
   - cd build
-  - cmake -G "Visual Studio 16 2019" -A x64 -DBUILD_UNITTESTS=ON -D EIGEN3_INCLUDE_DIR=C:\projects\eigen-3.3.9 ..
+  - cmake -G "Visual Studio 16 2019" -A x64 -DBUILD_UNITTESTS=ON -D EIGEN3_INCLUDE_DIR=C:\projects\eigen-3.4.0 ..
 
 test_script:
   - set PATH=%PATH%;C:\projects\g2o\bin\Debug;C:\projects\g2o\lib\Debug;C:\projects\g2o\build\bin\Debug;C:\projects\g2o\build\lib\Debug
