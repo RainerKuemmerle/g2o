@@ -28,6 +28,9 @@
 
 #include <algorithm>
 #include <cassert>
+
+#include "g2o/core/eigen_types.h"
+
 using namespace std;
 
 namespace g2o {
@@ -154,14 +157,14 @@ void MarginalCovarianceCholesky::computeCovariance(number_t** covBlocks, const s
 void MarginalCovarianceCholesky::computeCovariance(SparseBlockMatrix<MatrixX>& spinv, const std::vector<int>& rowBlockIndices, const std::vector< std::pair<int, int> >& blockIndices)
 {
   // allocate the sparse
-  spinv = SparseBlockMatrix<MatrixX>(&rowBlockIndices[0], 
-              &rowBlockIndices[0], 
+  spinv = SparseBlockMatrix<MatrixX>(&rowBlockIndices[0],
+              &rowBlockIndices[0],
               rowBlockIndices.size(),
               rowBlockIndices.size(), true);
   _map.clear();
   vector<MatrixElem> elemsToCompute;
   for (size_t i = 0; i < blockIndices.size(); ++i) {
-    int blockRow=blockIndices[i].first;    
+    int blockRow=blockIndices[i].first;
     int blockCol=blockIndices[i].second;
     assert(blockRow>=0);
     assert(blockRow < (int)rowBlockIndices.size());
@@ -170,7 +173,7 @@ void MarginalCovarianceCholesky::computeCovariance(SparseBlockMatrix<MatrixX>& s
 
     int rowBase=spinv.rowBaseOfBlock(blockRow);
     int colBase=spinv.colBaseOfBlock(blockCol);
-    
+
     MatrixX *block=spinv.block(blockRow, blockCol, true);
     assert(block);
     for (int iRow=0; iRow<block->rows(); ++iRow)
@@ -194,13 +197,13 @@ void MarginalCovarianceCholesky::computeCovariance(SparseBlockMatrix<MatrixX>& s
     computeEntry(me.r, me.c);
   }
 
-  // set the marginal covariance 
+  // set the marginal covariance
   for (size_t i = 0; i < blockIndices.size(); ++i) {
-    int blockRow=blockIndices[i].first;    
+    int blockRow=blockIndices[i].first;
     int blockCol=blockIndices[i].second;
     int rowBase=spinv.rowBaseOfBlock(blockRow);
     int colBase=spinv.colBaseOfBlock(blockCol);
-    
+
     MatrixX *block=spinv.block(blockRow, blockCol);
     assert(block);
     for (int iRow=0; iRow<block->rows(); ++iRow)

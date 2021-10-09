@@ -39,7 +39,7 @@ using namespace std;
 using namespace g2o;
 
 struct RandomLine2D {
-  static Line2D create() { return Line2D(Vector2::Random()); }
+  static Line2D create() { return Line2D(g2o::Vector2::Random()); }
   static bool isApprox(const Line2D& a, const Line2D& b) { return a.isApprox(b, 1e-5); }
 };
 

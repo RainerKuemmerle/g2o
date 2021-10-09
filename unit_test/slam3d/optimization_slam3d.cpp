@@ -88,10 +88,9 @@ TYPED_TEST_P(Slam3DOptimization, Translation) {
   ASSERT_GT(1e-6, this->optimizer.chi2());
   ASSERT_GT(1e-6, this->optimizer.activeChi2());
 
-  auto v2AfterOpti = dynamic_pointer_cast<g2o::VertexSE3>(this->optimizer.vertex(1));
-  ASSERT_DOUBLE_EQ(0., (v2AfterOpti->estimate().translation() - g2o::Vector3::Zero()).norm());
-  ASSERT_DOUBLE_EQ(0.,
-                   (v2AfterOpti->estimate().rotation().diagonal() - g2o::Vector3::Ones()).norm());
+  g2o::VertexSE3 *v2AfterOpti = dynamic_cast<g2o::VertexSE3 *>(this->optimizer.vertex(1));
+  ASSERT_TRUE(v2AfterOpti->estimate().translation().isApprox(g2o::Vector3::Zero()));
+  ASSERT_TRUE(v2AfterOpti->estimate().rotation().diagonal().isApprox(g2o::Vector3::Ones()));
 }
 
 TYPED_TEST_P(Slam3DOptimization, Rotation) {
@@ -125,10 +124,9 @@ TYPED_TEST_P(Slam3DOptimization, Rotation) {
   ASSERT_GT(1e-6, this->optimizer.chi2());
   ASSERT_GT(1e-6, this->optimizer.activeChi2());
 
-  auto v2AfterOpti = dynamic_pointer_cast<g2o::VertexSE3>(this->optimizer.vertex(1));
-  ASSERT_DOUBLE_EQ(0., (v2AfterOpti->estimate().translation() - g2o::Vector3::Zero()).norm());
-  ASSERT_DOUBLE_EQ(0.,
-                   (v2AfterOpti->estimate().rotation().diagonal() - g2o::Vector3::Ones()).norm());
+  g2o::VertexSE3 *v2AfterOpti = dynamic_cast<g2o::VertexSE3 *>(this->optimizer.vertex(1));
+  ASSERT_TRUE(v2AfterOpti->estimate().translation().isApprox(g2o::Vector3::Zero()));
+  ASSERT_TRUE(v2AfterOpti->estimate().rotation().diagonal().isApprox(g2o::Vector3::Ones()));
 }
 
 // registering the test suite and all the types to be tested

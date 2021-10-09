@@ -26,6 +26,7 @@
 
 #include "hyper_graph.h"
 
+#include <algorithm>
 #include <cassert>
 #include <iterator>
 #include <queue>

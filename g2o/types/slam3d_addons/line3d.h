@@ -27,17 +27,17 @@
 #ifndef G2O_LINE3D_H_
 #define G2O_LINE3D_H_
 
-
 #include <Eigen/Core>
 
+#include "g2o/core/eigen_types.h"
 #include "g2o_types_slam3d_addons_api.h"
 
 namespace g2o {
-  
+
   typedef Eigen::Matrix<number_t, 6, 1> Vector6;
   typedef Eigen::Matrix<number_t, 6, 6> Matrix6;
   typedef Eigen::Matrix<number_t, 6, 4> Matrix6x4;
-  
+
   struct OrthonormalLine3D {
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
     Matrix2 W;
@@ -49,7 +49,7 @@ namespace g2o {
     }
   };
   typedef struct OrthonormalLine3D OrthonormalLine3D;
-  
+
   class Line3D : public Vector6 {
     public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
@@ -108,7 +108,7 @@ namespace g2o {
       l.setW(w);
       l.setD(d);
       l.normalize();
-      
+
       return l;
     }
 
@@ -168,7 +168,7 @@ namespace g2o {
 
       Matrix2 W_delta = ortho_estimate.W.transpose() * ortho_line.W;
       Matrix3 U_delta = ortho_estimate.U.transpose() * ortho_line.U;
-	
+
       Vector4 delta;
       Quaternion q(U_delta);
       q.normalize();
@@ -176,24 +176,24 @@ namespace g2o {
       delta[1] = q.y();
       delta[2] = q.z();
       delta[3] = std::atan2(W_delta(1, 0), W_delta(0, 0));
-     
+
       return delta;
     }
 
   };
 
   G2O_TYPES_SLAM3D_ADDONS_API Line3D operator*(const Isometry3& t, const Line3D& line);
-  
+
   namespace internal {
 
     G2O_TYPES_SLAM3D_ADDONS_API Vector6 transformCartesianLine(const Isometry3& t, const Vector6& line);
-    
+
     G2O_TYPES_SLAM3D_ADDONS_API Vector6 normalizeCartesianLine(const Vector6& line);
 
     static inline number_t mline_elevation(const number_t v[3]) {
       return std::atan2(v[2], sqrt(v[0]*v[0] + v[1]*v[1]));
     }
-    
+
     G2O_TYPES_SLAM3D_ADDONS_API inline number_t getAzimuth(const Vector3& direction) {
       return std::atan2(direction.y(), direction.x());
     }
@@ -201,7 +201,7 @@ namespace g2o {
     G2O_TYPES_SLAM3D_ADDONS_API inline number_t getElevation(const Vector3& direction) {
       return std::atan2(direction.z(), direction.head<2>().norm());
     }
-    
+
   }
 
 }

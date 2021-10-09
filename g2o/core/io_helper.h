@@ -28,6 +28,7 @@
 #define G2O_CORE_IO_HELPER_H
 
 #include <iosfwd>
+#include <Eigen/Core>
 
 namespace g2o {
 namespace internal {
