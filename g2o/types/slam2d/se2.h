@@ -27,10 +27,12 @@
 #ifndef G2O_SE2_H_
 #define G2O_SE2_H_
 
-#include "g2o/stuff/misc.h"
-#include "g2o_types_slam2d_api.h"
 #include <Eigen/Core>
 #include <Eigen/Geometry>
+
+#include "g2o/core/eigen_types.h"
+#include "g2o/stuff/misc.h"
+#include "g2o_types_slam2d_api.h"
 
 namespace g2o {
 

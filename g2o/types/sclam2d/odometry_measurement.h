@@ -27,8 +27,10 @@
 #ifndef G2O_ODOMETRY_MEASUREMENT_H
 #define G2O_ODOMETRY_MEASUREMENT_H
 
-#include "g2o_types_sclam2d_api.h"
 #include <Eigen/Core>
+
+#include "g2o/core/eigen_types.h"
+#include "g2o_types_sclam2d_api.h"
 
 namespace g2o {
 
@@ -50,7 +52,7 @@ namespace g2o {
 
       number_t dt() const { return _dt;}
       void setDt(number_t t) { _dt = t;}
-      
+
       const Vector2& measurement() const { return _measurement;}
 
     protected:

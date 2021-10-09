@@ -29,6 +29,8 @@
 
 #include <Eigen/Core>
 
+#include "g2o/core/eigen_types.h"
+
 namespace g2o {
   namespace internal {
 

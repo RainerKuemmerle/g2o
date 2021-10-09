@@ -155,7 +155,7 @@ namespace g2o {
     auto dest = g2o::make_unique<SparseBlockMatrix<MatrixTransposedType>>(
         &_colBlockIndices[0], &_rowBlockIndices[0], _colBlockIndices.size(), _rowBlockIndices.size());
     transpose_internal(*dest);
-    return std::move(dest);
+    return dest;
   }
 
   template <class MatrixType>
@@ -201,7 +201,7 @@ namespace g2o {
   {
     auto a = g2o::make_unique<SparseBlockMatrix>(&_rowBlockIndices[0], &_colBlockIndices[0], _rowBlockIndices.size(), _colBlockIndices.size());
     add_internal(*a);
-    return std::move(a);
+    return a;
   }
 
   template <class MatrixType>

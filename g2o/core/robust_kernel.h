@@ -29,6 +29,7 @@
 
 #include <memory>
 
+#include "g2o/core/eigen_types.h"
 #include "g2o_core_api.h"
 
 namespace g2o {
