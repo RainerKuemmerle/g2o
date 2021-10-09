@@ -28,11 +28,10 @@
 #define JACOBIAN_WORKSPACE_H
 
 #include <Eigen/Core>
-
-#include <vector>
 #include <cassert>
+#include <vector>
 
-#include "g2o/config.h"
+#include "g2o/core/eigen_types.h"
 #include "g2o_core_api.h"
 #include "hyper_graph.h"
 

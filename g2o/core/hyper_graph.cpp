@@ -26,12 +26,13 @@
 
 #include "hyper_graph.h"
 
-#include "ownership.h"
-
-#include <assert.h>
+#include <algorithm>
+#include <cassert>
+#include <iterator>
 #include <queue>
 #include <unordered_set>
-#include <iterator>
+
+#include "ownership.h"
 
 namespace g2o {
 
@@ -112,7 +113,7 @@ namespace g2o {
   }
 
   bool HyperGraph::addEdge(Edge* e)
-  { 
+  {
     for (Vertex* v : e->vertices())
     { // be sure that all vertices are set
       if (!v)
