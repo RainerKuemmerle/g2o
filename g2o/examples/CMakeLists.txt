@@ -33,7 +33,7 @@ if (G2O_BUILD_SIM3_TYPES)
 endif()
 
 # slam 3d
-if (G2O_BUILD_SLAM3D_TyPES)
+if (G2O_BUILD_SLAM3D_TYPES)
   add_subdirectory(sphere)
 endif()
 
