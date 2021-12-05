@@ -39,8 +39,8 @@ namespace g2o {
 
 class G2O_STUFF_API BaseProperty {
  public:
-  BaseProperty(const std::string& name_);
-  virtual ~BaseProperty();
+  explicit BaseProperty(std::string name_);
+  virtual ~BaseProperty() = default;
   const std::string& name() { return _name; }
   virtual std::string toString() const = 0;
   virtual bool fromString(const std::string& s) = 0;
@@ -52,17 +52,17 @@ class G2O_STUFF_API BaseProperty {
 template <typename T>
 class Property : public BaseProperty {
  public:
-  typedef T ValueType;
-  Property(const std::string& name_) : BaseProperty(name_) {}
+  using ValueType = T;
+  explicit Property(const std::string& name_) : BaseProperty(name_) {}
   Property(const std::string& name_, const T& v) : BaseProperty(name_), _value(v) {}
   void setValue(const T& v) { _value = v; }
   const T& value() const { return _value; }
-  virtual std::string toString() const {
+  std::string toString() const override {
     std::stringstream sstr;
     sstr << _value;
     return sstr.str();
   }
-  virtual bool fromString(const std::string& s) {
+  bool fromString(const std::string& s) override {
     bool status = convertString(s, _value);
     return status;
   }
@@ -97,13 +97,13 @@ class G2O_STUFF_API PropertyMap : protected std::map<std::string, std::shared_pt
    */
   template <typename P>
   std::shared_ptr<P> getProperty(const std::string& name) {
-    PropertyMapIterator it = find(name);
+    auto it = find(name);
     if (it == end()) return nullptr;
     return std::dynamic_pointer_cast<P>(it->second);
   }
   template <typename P>
   std::shared_ptr<const P> getProperty(const std::string& name) const {
-    PropertyMapConstIterator it = find(name);
+    auto it = find(name);
     if (it == end()) return nullptr;
     return std::dynamic_pointer_cast<const P>(it->second);
   }
@@ -113,13 +113,13 @@ class G2O_STUFF_API PropertyMap : protected std::map<std::string, std::shared_pt
    */
   template <typename P>
   std::shared_ptr<P> makeProperty(const std::string& name_, const typename P::ValueType& v) {
-    PropertyMapIterator it = find(name_);
+    auto it = find(name_);
     if (it == end()) {
       std::shared_ptr<P> p = std::make_shared<P>(name_, v);
       addProperty(p);
       return p;
-    } else
-      return std::dynamic_pointer_cast<P>(it->second);
+    }
+    return std::dynamic_pointer_cast<P>(it->second);
   }
 
   /**
@@ -143,11 +143,11 @@ class G2O_STUFF_API PropertyMap : protected std::map<std::string, std::shared_pt
   using BaseClass::size;
 };
 
-typedef Property<int> IntProperty;
-typedef Property<bool> BoolProperty;
-typedef Property<float> FloatProperty;
-typedef Property<double> DoubleProperty;
-typedef Property<std::string> StringProperty;
+using IntProperty = Property<int>;
+using BoolProperty = Property<bool>;
+using FloatProperty = Property<float>;
+using DoubleProperty = Property<double>;
+using StringProperty = Property<std::string>;
 
 }  // namespace g2o
 #endif

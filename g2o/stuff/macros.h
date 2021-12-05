@@ -106,7 +106,7 @@ Modified by Mark Pupilli from:
 #ifdef __cplusplus
 
 #define G2O_FSKIP_LINE(f) \
-   {char c=' ';while(c != '\n' && f.good() && !(f).eof()) (f).get(c);}
+   {char c=' ';while(c != '\n' && (f).good() && !(f).eof()) (f).get(c);}
 
 #ifndef PVAR
   #define PVAR(s) \
@@ -120,7 +120,7 @@ Modified by Mark Pupilli from:
 
 #ifndef FIXED
 #define FIXED(s) \
-  std::fixed << s << std::resetiosflags(std::ios_base::fixed)
+  std::fixed << (s) << std::resetiosflags(std::ios_base::fixed)
 #endif
 
 #endif // __cplusplus

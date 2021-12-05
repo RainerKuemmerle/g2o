@@ -68,7 +68,7 @@ std::unique_ptr<T> make_unique(ArgTs&& ...args)
 **/
 inline constexpr number_t cst(long double v)
 {
-  return (number_t)v;
+  return static_cast<number_t>(v);
 }
 
 constexpr number_t const_pi() { return cst(3.14159265358979323846); }
@@ -88,7 +88,7 @@ inline T square(T x)
 template <typename T>
 inline T hypot(T x, T y)
 {
-  return (T) (std::sqrt(x*x + y*y));
+  return static_cast<T>(std::sqrt(x*x + y*y));
 }
 
 /**
@@ -139,14 +139,11 @@ inline number_t inverse_theta(number_t th)
  */
 inline number_t average_angle(number_t theta1, number_t theta2)
 {
-  number_t x, y;
-
-  x = std::cos(theta1) + std::cos(theta2);
-  y = std::sin(theta1) + std::sin(theta2);
+  number_t x = std::cos(theta1) + std::cos(theta2);
+  number_t y = std::sin(theta1) + std::sin(theta2);
   if(x == 0 && y == 0)
     return 0;
-  else
-    return std::atan2(y, x);
+  return std::atan2(y, x);
 }
 
 /**
@@ -158,10 +155,9 @@ inline int sign(T x)
 {
   if (x > 0)
     return 1;
-  else if (x < 0)
+  if (x < 0)
     return -1;
-  else
-    return 0;
+  return 0;
 }
 
 /**
@@ -194,7 +190,7 @@ inline T wrap(T l, T x, T u)
 /**
  * tests whether there is a NaN in the array
  */
-inline bool arrayHasNaN(const number_t* array, int size, int* nanIndex = 0)
+inline bool arrayHasNaN(const number_t* array, int size, int* nanIndex = nullptr)
 {
   for (int i = 0; i < size; ++i)
     if (g2o_isnan(array[i])) {
@@ -210,12 +206,12 @@ inline bool arrayHasNaN(const number_t* array, int size, int* nanIndex = 0)
  */
 extern "C"
 {
-    typedef void (* ForceLinkFunction) (void);
+  using ForceLinkFunction = void (*)();
 }
 
 struct ForceLinker
 {
-    ForceLinker(ForceLinkFunction function) { (function)(); }
+  explicit ForceLinker(ForceLinkFunction function) { (function)(); }
 };
 
 } // end namespace

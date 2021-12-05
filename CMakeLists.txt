@@ -361,6 +361,12 @@ if(BUILD_CODE_COVERAGE AND CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
   set(g2o_CXX_FLAGS "${g2o_CXX_FLAGS} --coverage")
 endif()
 
+option(BUILD_WITH_CLANG_TIDY "Enable clang-tidy reporting" OFF)
+if(BUILD_WITH_CLANG_TIDY)
+  find_program(CLANGTIDY clang-tidy)
+  set(CMAKE_CXX_CLANG_TIDY "${CLANGTIDY}")
+endif()
+
 # Compiler specific options for gcc
 if(CMAKE_COMPILER_IS_GNUCXX)
   option (BUILD_WITH_MARCH_NATIVE "Build with \"-march native\"" OFF)

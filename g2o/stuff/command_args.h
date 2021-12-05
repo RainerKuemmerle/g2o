@@ -49,15 +49,14 @@ class G2O_STUFF_API CommandArgs
     {
       std::string name;
       std::string description;
-      int type;
-      void* data;
-      bool parsed;
-      bool optional;
-      CommandArgument() : name(""), description(""), type(0), data(nullptr), parsed(false), optional(false)
-      {}
+      int type = 0;
+      void* data = nullptr;
+      bool parsed = false;
+      bool optional = false;
+      CommandArgument() = default;
     };
-  public:
-    virtual ~CommandArgs();
+
+    virtual ~CommandArgs() = default;
 
     /**
      * parse the command line for the requested parameters.
@@ -111,9 +110,9 @@ class G2O_STUFF_API CommandArgs
     std::string _banner;
     std::string _progName;
 
-    const char* type2str(int t) const;
-    void str2arg(const std::string& input, CommandArgument& ca) const;
-    std::string arg2str(const CommandArgument& ca) const;
+    static const char* type2str(int t);
+    static void str2arg(const std::string& input, CommandArgument& ca);
+    static std::string arg2str(const CommandArgument& ca);
 };
 
 } // end namespace

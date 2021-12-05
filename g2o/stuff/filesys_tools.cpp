@@ -53,8 +53,6 @@
 //#include <thread>
 #endif
 
-using namespace ::std;
-
 namespace g2o {
 
 std::string getFileExtension(const std::string& filename)
@@ -62,8 +60,7 @@ std::string getFileExtension(const std::string& filename)
   std::string::size_type lastDot = filename.find_last_of('.');
   if (lastDot != std::string::npos)
     return filename.substr(lastDot + 1);
-  else
-    return "";
+  return "";
 }
 
 std::string getPureFilename(const std::string& filename)
@@ -71,8 +68,7 @@ std::string getPureFilename(const std::string& filename)
   std::string::size_type lastDot = filename.find_last_of('.');
   if (lastDot != std::string::npos)
     return filename.substr(0, lastDot);
-  else
-    return filename;
+  return filename;
 }
 
 std::string getBasename(const std::string& filename)
@@ -84,8 +80,7 @@ std::string getBasename(const std::string& filename)
 #endif
   if (lastSlash != std::string::npos)
     return filename.substr(lastSlash + 1);
-  else
-    return filename;
+  return filename;
 }
 
 std::string getDirname(const std::string& filename)
@@ -97,20 +92,17 @@ std::string getDirname(const std::string& filename)
 #endif
   if (lastSlash != std::string::npos)
     return filename.substr(0, lastSlash);
-  else
-    return "";
+  return "";
 }
 
 std::string changeFileExtension(const std::string& filename, const std::string& newExt, bool stripDot)
 {
   std::string::size_type lastDot = filename.find_last_of('.');
   if (lastDot != std::string::npos) {
-    if (stripDot)
-      return filename.substr(0, lastDot) + newExt;
-    else
-      return filename.substr(0, lastDot + 1) + newExt;
-  } else
-    return filename;
+    if (!stripDot) ++lastDot;
+    return filename.substr(0, lastDot) + newExt;
+  }
+  return filename;
 }
 
 bool fileExists(const char* filename)
@@ -133,7 +125,7 @@ std::vector<std::string> getFilesByPattern(const char* pattern)
     } while (FindNextFile(hFind, &FData));
     FindClose(hFind);
   }
-  
+
 #elif (defined (UNIX) || defined (CYGWIN)) && !defined(ANDROID)
 
   wordexp_t p;
@@ -152,8 +144,8 @@ std::vector<std::string> getFilesByPattern(const char* pattern)
 
   result.reserve(p.we_wordc);
   for (size_t i = 0; i < p.we_wordc; ++i)
-    result.push_back(p.we_wordv[i]);
-  
+    result.emplace_back(p.we_wordv[i]);
+
   wordfree(&p);
 
 #endif

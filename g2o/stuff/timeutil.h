@@ -67,7 +67,7 @@ if (1) {\
   if(1) { \
     number_t _start_time_ = g2o::get_time(); \
     code; \
-    std::cerr << text << " took " << g2o::get_time() - _start_time_ << " sec" << std::endl; \
+    std::cerr << (text) << " took " << g2o::get_time() - _start_time_ << " sec" << std::endl; \
   } else \
     (void) 0
 #endif
@@ -79,7 +79,7 @@ using seconds = std::chrono::duration<number_t>;
 /**
  * return the current time in seconds since 1. Jan 1970
  */
-inline number_t get_time() 
+inline number_t get_time()
 {
   return seconds{ std::chrono::system_clock::now().time_since_epoch() }.count();
 }
@@ -98,8 +98,8 @@ G2O_STUFF_API number_t get_monotonic_time();
  * just create and instance at the beginning of the function.
  */
 class G2O_STUFF_API ScopeTime {
-  public: 
-    ScopeTime(const char* title);
+  public:
+    explicit ScopeTime(const char* title);
     ~ScopeTime();
   private:
     std::string _title;

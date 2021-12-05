@@ -35,7 +35,6 @@
 #include "misc.h"
 #include "os_specific.h"
 #include "string_tools.h"
-using namespace std;
 
 namespace g2o {
 
@@ -55,7 +54,7 @@ void readVector(const std::string& s, std::vector<T>& v) {
 template <typename T>
 std::string writeVectorAsString(const std::vector<T>& v) {
   std::stringstream os;
-  if (v.size()) os << v[0];
+  if (!v.empty()) os << v[0];
   for (size_t i = 1; i < v.size(); i++) os << "," << v[i];
   return os.str();
 }
@@ -74,9 +73,9 @@ template <typename T>
 void parseVector(const std::string& input, CommandArgs::CommandArgument& ca) {
   std::vector<T> aux;
   readVector(input, aux);
-  bool convertStatus = aux.size() > 0;
+  bool convertStatus = !aux.empty();
   if (convertStatus) {
-    std::vector<T>* data = static_cast<std::vector<T>*>(ca.data);
+    auto data = static_cast<std::vector<T>*>(ca.data);
     *data = aux;
   }
 }
@@ -84,22 +83,20 @@ void parseVector(const std::string& input, CommandArgs::CommandArgument& ca) {
 template <typename T>
 std::string argument2String(const CommandArgs::CommandArgument& ca) {
   T* data = static_cast<T*>(ca.data);
-  stringstream auxStream;
+  std::stringstream auxStream;
   auxStream << *data;
   return auxStream.str();
 }
 
 }  // namespace
 
-enum CommandArgumentType { CAT_DOUBLE, CAT_FLOAT, CAT_INT, CAT_STRING, CAT_BOOL, CAT_VECTOR_INT, CAT_VECTOR_DOUBLE };
-
-CommandArgs::~CommandArgs() {}
+enum CommandArgumentType { kCatDouble, kCatFloat, kCatInt, kCatString, kCatBool, kCatVectorInt, kCatVectorDouble };
 
 bool CommandArgs::parseArgs(int argc, char** argv, bool exitOnError) {
   _progName = argv[0];
   int i;
   for (i = 1; i < argc; i++) {
-    string name = argv[i];
+    std::string name = argv[i];
 
     if (name[0] != '-') {  // each param has to start with at least one dash
       // cerr << "Error: expecting parameter, got " << name << endl;
@@ -115,18 +112,18 @@ bool CommandArgs::parseArgs(int argc, char** argv, bool exitOnError) {
       break;
     }
 
-    string::size_type dashPos = name.find_first_not_of('-');
-    if (dashPos != string::npos) name = name.substr(dashPos);
+    std::string::size_type dashPos = name.find_first_not_of('-');
+    if (dashPos != std::string::npos) name = name.substr(dashPos);
 
     if (name == "help" || name == "h") {
-      printHelp(cout);
+      printHelp(std::cout);
       exit(0);
     } else {
       // command line argument parsing
-      std::vector<CommandArgument>::iterator it = _args.begin();
+      auto it = _args.begin();
       for (; it != _args.end(); ++it) {
         if (it->name == name) {
-          if (it->type == CAT_BOOL) {
+          if (it->type == kCatBool) {
             if (!it->parsed) {
               bool* data = static_cast<bool*>(it->data);
               *data = !(*data);
@@ -134,8 +131,8 @@ bool CommandArgs::parseArgs(int argc, char** argv, bool exitOnError) {
             it->parsed = true;
           } else {
             if (i >= argc - 1) {
-              cerr << "Argument " << name << "needs value.\n";
-              printHelp(cerr);
+              std::cerr << "Argument " << name << "needs value.\n";
+              printHelp(std::cerr);
               if (exitOnError) exit(1);
               return false;
             }
@@ -147,28 +144,28 @@ bool CommandArgs::parseArgs(int argc, char** argv, bool exitOnError) {
         }
       }
       if (it == _args.end()) {
-        cerr << "Error: Unknown Option '" << name << "' (use -help to get list of options).\n";
+        std::cerr << "Error: Unknown Option '" << name << "' (use -help to get list of options).\n";
         if (exitOnError) exit(1);
         return false;
       }
     }
   }  // for argv[i]
 
-  if ((int)_leftOvers.size() > argc - i) {
-    cerr << "Error: program requires parameters" << endl;
-    printHelp(cerr);
+  if (static_cast<int>(_leftOvers.size()) > argc - i) {
+    std::cerr << "Error: program requires parameters" << std::endl;
+    printHelp(std::cerr);
     if (exitOnError) exit(1);
     return false;
   }
   for (size_t j = 0; (i < argc && j < _leftOvers.size()); i++, j++) {
-    string* s = static_cast<string*>(_leftOvers[j].data);
+    auto* s = static_cast<std::string*>(_leftOvers[j].data);
     *s = argv[i];
     _leftOvers[j].parsed = true;
   }
 
   // the optional leftOvers
   for (size_t j = 0; (i < argc && j < _leftOversOptional.size()); i++, j++) {
-    string* s = static_cast<string*>(_leftOversOptional[j].data);
+    auto* s = static_cast<std::string*>(_leftOversOptional[j].data);
     *s = argv[i];
     _leftOversOptional[j].parsed = true;
   }
@@ -180,7 +177,7 @@ void CommandArgs::param(const std::string& name, bool& p, bool defValue, const s
   CommandArgument ca;
   ca.name = name;
   ca.description = desc;
-  ca.type = CAT_BOOL;
+  ca.type = kCatBool;
   ca.data = static_cast<void*>(&p);
   ca.parsed = false;
   p = defValue;
@@ -191,7 +188,7 @@ void CommandArgs::param(const std::string& name, int& p, int defValue, const std
   CommandArgument ca;
   ca.name = name;
   ca.description = desc;
-  ca.type = CAT_INT;
+  ca.type = kCatInt;
   ca.data = static_cast<void*>(&p);
   ca.parsed = false;
   p = defValue;
@@ -202,7 +199,7 @@ void CommandArgs::param(const std::string& name, float& p, float defValue, const
   CommandArgument ca;
   ca.name = name;
   ca.description = desc;
-  ca.type = CAT_FLOAT;
+  ca.type = kCatFloat;
   ca.data = static_cast<void*>(&p);
   ca.parsed = false;
   p = defValue;
@@ -213,7 +210,7 @@ void CommandArgs::param(const std::string& name, double& p, double defValue, con
   CommandArgument ca;
   ca.name = name;
   ca.description = desc;
-  ca.type = CAT_DOUBLE;
+  ca.type = kCatDouble;
   ca.data = static_cast<void*>(&p);
   ca.parsed = false;
   p = defValue;
@@ -224,7 +221,7 @@ void CommandArgs::param(const std::string& name, std::string& p, const std::stri
   CommandArgument ca;
   ca.name = name;
   ca.description = desc;
-  ca.type = CAT_STRING;
+  ca.type = kCatString;
   ca.data = static_cast<void*>(&p);
   ca.parsed = false;
   p = defValue;
@@ -236,7 +233,7 @@ void CommandArgs::param(const std::string& name, std::vector<int>& p, const std:
   CommandArgument ca;
   ca.name = name;
   ca.description = desc;
-  ca.type = CAT_VECTOR_INT;
+  ca.type = kCatVectorInt;
   ca.data = static_cast<void*>(&p);
   ca.parsed = false;
   p = defValue;
@@ -248,7 +245,7 @@ void CommandArgs::param(const std::string& name, std::vector<double>& p, const s
   CommandArgument ca;
   ca.name = name;
   ca.description = desc;
-  ca.type = CAT_VECTOR_DOUBLE;
+  ca.type = kCatVectorDouble;
   ca.data = static_cast<void*>(&p);
   ca.parsed = false;
   p = defValue;
@@ -256,52 +253,50 @@ void CommandArgs::param(const std::string& name, std::vector<double>& p, const s
 }
 
 void CommandArgs::printHelp(std::ostream& os) {
-  if (_banner.size()) os << _banner << endl;
-  os << "Usage: " << _progName << (_args.size() > 0 ? " [options] " : " ");
-  if (_leftOvers.size() > 0) {
-    for (size_t i = 0; i < _leftOvers.size(); ++i) {
-      if (i > 0) os << " ";
-      os << _leftOvers[i].name;
-    }
+  if (!_banner.empty()) os << _banner << std::endl;
+  os << "Usage: " << _progName << (_args.empty() ? " " : " [options] ");
+  for (size_t i = 0; i < _leftOvers.size(); ++i) {
+    if (i > 0) os << " ";
+    os << _leftOvers[i].name;
   }
-  if (_leftOversOptional.size() > 0) {
-    if (_leftOvers.size() > 0) os << " ";
+  if (!_leftOversOptional.empty()) {
+    if (!_leftOvers.empty()) os << " ";
     for (size_t i = 0; i < _leftOversOptional.size(); ++i) {
       if (i > 0) os << " ";
       os << "[" << _leftOversOptional[i].name << "]";
     }
   }
-  os << endl << endl;
-  os << "General options:" << endl;
-  os << "-------------------------------------------" << endl;
-  os << "-help / -h           Displays this help." << endl << endl;
-  if (_args.size() > 0) {
-    os << "Program Options:" << endl;
-    os << "-------------------------------------------" << endl;
+  os << std::endl << std::endl;
+  os << "General options:" << std::endl;
+  os << "-------------------------------------------" << std::endl;
+  os << "-help / -h           Displays this help." << std::endl << std::endl;
+  if (!_args.empty()) {
+    os << "Program Options:" << std::endl;
+    os << "-------------------------------------------" << std::endl;
     // build up option string to print as table
-    vector<pair<string, string> > tableStrings;
+    std::vector<std::pair<std::string, std::string> > tableStrings;
     tableStrings.reserve(_args.size());
     size_t maxArgLen = 0;
-    for (size_t i = 0; i < _args.size(); ++i) {
-      if (_args[i].type != CAT_BOOL) {
-        string defaultValueStr = arg2str(_args[i]);
+    for (const auto& arg : _args) {
+      if (arg.type != kCatBool) {
+        std::string defaultValueStr = arg2str(arg);
         if (!defaultValueStr.empty())
-          tableStrings.push_back(make_pair(_args[i].name + " " + type2str(_args[i].type),
-                                           _args[i].description + " (default: " + defaultValueStr + ")"));
+          tableStrings.emplace_back(arg.name + " " + type2str(arg.type),
+                                    arg.description + " (default: " + defaultValueStr + ")");
         else
-          tableStrings.push_back(make_pair(_args[i].name + " " + type2str(_args[i].type), _args[i].description));
+          tableStrings.emplace_back(arg.name + " " + type2str(arg.type), arg.description);
       } else
-        tableStrings.push_back(make_pair(_args[i].name, _args[i].description));
+        tableStrings.emplace_back(arg.name, arg.description);
       maxArgLen = (std::max)(maxArgLen, tableStrings.back().first.size());
     }
-    sort(tableStrings.begin(), tableStrings.end(), CmpPairFirst<string, string>());
+    sort(tableStrings.begin(), tableStrings.end(), CmpPairFirst<std::string, std::string>());
     maxArgLen += 3;
-    for (size_t i = 0; i < tableStrings.size(); ++i) {
-      os << "-" << tableStrings[i].first;
-      for (size_t l = tableStrings[i].first.size(); l < maxArgLen; ++l) os << " ";
-      os << tableStrings[i].second << endl;
+    for (const auto& tableString : tableStrings) {
+      os << "-" << tableString.first;
+      for (size_t l = tableString.first.size(); l < maxArgLen; ++l) os << " ";
+      os << tableString.second << std::endl;
     }
-    // TODO should output description for leftOver params?
+    //TODO(goki): should output description for leftOver params
   }
 }
 
@@ -312,7 +307,7 @@ void CommandArgs::paramLeftOver(const std::string& name, std::string& p, const s
   CommandArgument ca;
   ca.name = name;
   ca.description = desc;
-  ca.type = CAT_STRING;
+  ca.type = kCatString;
   ca.data = static_cast<void*>(&p);
   ca.parsed = false;
   ca.optional = optional;
@@ -323,73 +318,73 @@ void CommandArgs::paramLeftOver(const std::string& name, std::string& p, const s
     _leftOvers.push_back(ca);
 }
 
-const char* CommandArgs::type2str(int t) const {
+const char* CommandArgs::type2str(int t) {
   switch (t) {
-    case CAT_DOUBLE:
+    case kCatDouble:
       return "<double>";
-    case CAT_FLOAT:
+    case kCatFloat:
       return "<float>";
-    case CAT_INT:
+    case kCatInt:
       return "<int>";
-    case CAT_STRING:
+    case kCatString:
       return "<string>";
-    case CAT_BOOL:
+    case kCatBool:
       return "<bool>";
-    case CAT_VECTOR_INT:
+    case kCatVectorInt:
       return "<vector_int>";
-    case CAT_VECTOR_DOUBLE:
+    case kCatVectorDouble:
       return "<vector_double>";
   }
   return "";
 }
 
-void CommandArgs::str2arg(const std::string& input, CommandArgument& ca) const {
+void CommandArgs::str2arg(const std::string& input, CommandArgument& ca) {
   switch (ca.type) {
-    case CAT_FLOAT:
+    case kCatFloat:
       parseArgument<float>(input, ca);
       break;
-    case CAT_DOUBLE:
+    case kCatDouble:
       parseArgument<double>(input, ca);
       break;
-    case CAT_INT:
+    case kCatInt:
       parseArgument<int>(input, ca);
       break;
-    case CAT_BOOL:
+    case kCatBool:
       parseArgument<bool>(input, ca);
       break;
-    case CAT_STRING: {
-      string* data = static_cast<string*>(ca.data);
+    case kCatString: {
+      auto* data = static_cast<std::string*>(ca.data);
       *data = input;
     } break;
-    case CAT_VECTOR_INT: {
+    case kCatVectorInt: {
       parseVector<int>(input, ca);
     } break;
-    case CAT_VECTOR_DOUBLE: {
+    case kCatVectorDouble: {
       parseVector<double>(input, ca);
     } break;
   }
 }
 
-std::string CommandArgs::arg2str(const CommandArgument& ca) const {
+std::string CommandArgs::arg2str(const CommandArgument& ca) {
   switch (ca.type) {
-    case CAT_FLOAT:
+    case kCatFloat:
       return argument2String<float>(ca);
-    case CAT_DOUBLE:
+    case kCatDouble:
       return argument2String<double>(ca);
-    case CAT_INT:
+    case kCatInt:
       return argument2String<int>(ca);
-    case CAT_BOOL:
+    case kCatBool:
       return argument2String<bool>(ca);
-    case CAT_STRING: {
-      string* data = static_cast<string*>(ca.data);
+    case kCatString: {
+      auto* data = static_cast<std::string*>(ca.data);
       return *data;
     }
-    case CAT_VECTOR_INT: {
-      std::vector<int>* data = static_cast<std::vector<int>*>(ca.data);
+    case kCatVectorInt: {
+      auto* data = static_cast<std::vector<int>*>(ca.data);
       return writeVectorAsString(*data);
     }
-    case CAT_VECTOR_DOUBLE: {
-      std::vector<double>* data = static_cast<std::vector<double>*>(ca.data);
+    case kCatVectorDouble: {
+      auto* data = static_cast<std::vector<double>*>(ca.data);
       return writeVectorAsString(*data);
     }
   }
@@ -397,12 +392,8 @@ std::string CommandArgs::arg2str(const CommandArgument& ca) const {
 }
 
 bool CommandArgs::parsedParam(const std::string& param) const {
-  std::vector<CommandArgument>::const_iterator it = _args.begin();
-  for (; it != _args.end(); ++it) {
-    if (it->name == param) {
-      return it->parsed;
-    }
-  }
+  for (const auto& arg : _args)
+    if (arg.name == param) return arg.parsed;
   return false;
 }
 

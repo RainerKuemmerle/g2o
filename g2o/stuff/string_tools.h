@@ -76,10 +76,10 @@ G2O_STUFF_API std::string strToUpper(const std::string& s);
 template <typename OutputIterator>
 OutputIterator readInts(const char* str, OutputIterator out)
 {
-  char* cl  = (char*)str;
+  char* cl  = const_cast<char*>(str);
   char* cle = cl;
-  while (1) {
-    long int id = strtol(cl, &cle, 10);
+  while (true) {
+    auto id = strtol(cl, &cle, 10);
     if (cl == cle)
       break;
     *out++ = id;
@@ -95,9 +95,9 @@ OutputIterator readInts(const char* str, OutputIterator out)
 template <typename OutputIterator>
 OutputIterator readFloats(const char* str, OutputIterator out)
 {
-  char* cl  = (char*)str;
+  char* cl  = const_cast<char*>(str);
   char* cle = cl;
-  while (1) {
+  while (true) {
     number_t val = strtod(cl, &cle);
     if (cl == cle)
       break;
@@ -126,9 +126,7 @@ bool convertString(const std::string& s, T& x, bool failIfLeftoverChars = true)
 {
   std::istringstream i(s);
   char c;
-  if (!(i >> x) || (failIfLeftoverChars && i.get(c)))
-    return false;
-  return true;
+  return !(!(i >> x) || (failIfLeftoverChars && i.get(c)));
 }
 
 /**
@@ -144,14 +142,14 @@ T stringToType(const std::string& s, bool failIfLeftoverChars = true)
 }
 
 /**
- * return true, if str starts with substr
+ * return true, if str starts with start
  */
-G2O_STUFF_API bool strStartsWith(const std::string & str, const std::string& substr);
+G2O_STUFF_API bool strStartsWith(const std::string & str, const std::string& start);
 
 /**
- * return true, if str ends with substr
+ * return true, if str ends with end
  */
-G2O_STUFF_API bool strEndsWith(const std::string & str, const std::string& substr);
+G2O_STUFF_API bool strEndsWith(const std::string & str, const std::string& end);
 
 /**
  * expand the given filename like a posix shell, e.g., ~ $CARMEN_HOME and other will get expanded.
