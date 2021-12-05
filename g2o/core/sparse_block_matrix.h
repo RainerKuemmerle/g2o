@@ -65,14 +65,14 @@ class SparseBlockMatrix {
 
   public:
     //! this is the type of the elementary block, it is an Eigen::Matrix.
-    typedef MatrixType SparseMatrixBlock;
+    using SparseMatrixBlock = MatrixType;
 
     //! columns of the matrix
     inline int cols() const {return _colBlockIndices.size() ? _colBlockIndices.back() : 0;}
     //! rows of the matrix
     inline int rows() const {return _rowBlockIndices.size() ? _rowBlockIndices.back() : 0;}
 
-    typedef std::map<int, SparseMatrixBlock*> IntBlockMap;
+    using IntBlockMap = std::map<int, SparseMatrixBlock *>;
 
     /**
      * constructs a sparse block matrix having a specific layout
@@ -237,7 +237,7 @@ class SparseBlockMatrix {
 template < class  MatrixType >
 std::ostream& operator << (std::ostream&, const SparseBlockMatrix<MatrixType>& m);
 
-  typedef SparseBlockMatrix<MatrixX> SparseBlockMatrixX;
+  using SparseBlockMatrixX = SparseBlockMatrix<MatrixX>;
 
 } //end namespace
 

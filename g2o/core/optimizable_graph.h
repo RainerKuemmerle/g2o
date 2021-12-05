@@ -121,7 +121,7 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
 
    public:
     Vertex();
-    virtual ~Vertex();
+    ~Vertex() override;
 
     //! sets the node to the origin (used in the multilevel stuff)
     void setToOrigin() {
@@ -354,7 +354,7 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
 
     //! sets the id of the node in the graph be sure that the graph keeps consistent after changing
     //! the id
-    virtual void setId(int id) { _id = id; }
+    void setId(int id) override { _id = id; }
 
     //! set the row of this vertex in the Hessian
     void setColInHessian(int c) { _colInHessian = c; }
@@ -422,7 +422,7 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
 
    public:
     Edge();
-    virtual ~Edge();
+    ~Edge() override;
 
     // indicates if all vertices are fixed
     virtual bool allVerticesFixed() const = 0;
@@ -543,7 +543,7 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
     long long _internalId;
 
     void resizeParameters(size_t newSize) {
-      _parameters.resize(newSize, 0);
+      _parameters.resize(newSize, nullptr);
       _parameterIds.resize(newSize, -1);
       _parameterTypes.resize(newSize, typeid(void*).name());
     }
@@ -575,7 +575,7 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
 
   //! empty constructor
   OptimizableGraph();
-  virtual ~OptimizableGraph();
+  ~OptimizableGraph() override;
 
   /**
    * adds a new vertex.
@@ -583,13 +583,13 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
    */
   virtual bool addVertex(const std::shared_ptr<HyperGraph::Vertex>& v,
                          const std::shared_ptr<HyperGraph::Data>& userData);
-  virtual bool addVertex(const std::shared_ptr<HyperGraph::Vertex>& v) {
+  bool addVertex(const std::shared_ptr<HyperGraph::Vertex>& v) override {
     auto noData = std::shared_ptr<HyperGraph::Data>();
     return addVertex(v, noData);
   }
 
   //! removes a vertex from the graph. Returns true on success (vertex was present)
-  virtual bool removeVertex(const std::shared_ptr<HyperGraph::Vertex>& v, bool detach = false);
+  bool removeVertex(const std::shared_ptr<HyperGraph::Vertex>& v, bool detach = false) override;
 
   /**
    * adds a new edge.
@@ -598,14 +598,14 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
    * vertex). true otherwise.
    */
   // virtual bool addEdge(const std::shared_ptr<HyperGraph::Edge>& e);
-  bool addEdge(const std::shared_ptr<HyperGraph::Edge>& e);
+  bool addEdge(const std::shared_ptr<HyperGraph::Edge>& e) override;
 
   /**
    * overridden from HyperGraph, to mantain the bookkeeping of the caches/parameters and jacobian
    * workspaces consistent upon a change in the veretx.
    * @return false if something goes wrong.
    */
-  virtual bool setEdgeVertex(const std::shared_ptr<HyperGraph::Edge>& e, int pos, const std::shared_ptr<HyperGraph::Vertex>& v);
+  bool setEdgeVertex(const std::shared_ptr<HyperGraph::Edge>& e, int pos, const std::shared_ptr<HyperGraph::Vertex>& v) override;
 
   //! returns the chi2 of the current configuration
   number_t chi2() const;
@@ -691,7 +691,7 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
                         const std::set<int>& vertDims = std::set<int>()) const;
 
   //! remove all edges and vertices
-  virtual void clear();
+  void clear() override;
   /**
    * remove the parameters of the graph
    */

@@ -41,17 +41,17 @@ namespace g2o {
   {
     public:
       explicit OptimizationAlgorithmWithHessian(Solver& solver);
-      virtual ~OptimizationAlgorithmWithHessian();
+      ~OptimizationAlgorithmWithHessian() override;
 
-      virtual bool init(bool online = false);
+      bool init(bool online = false) override;
 
-      virtual bool computeMarginals(SparseBlockMatrix<MatrixX>& spinv, const std::vector<std::pair<int, int> >& blockIndices);
+      bool computeMarginals(SparseBlockMatrix<MatrixX>& spinv, const std::vector<std::pair<int, int> >& blockIndices) override;
 
       virtual bool buildLinearStructure();
 
       virtual void updateLinearSystem();
 
-      virtual bool updateStructure(const HyperGraph::VertexContainer& vset, const HyperGraph::EdgeSet& edges);
+      bool updateStructure(const HyperGraph::VertexContainer& vset, const HyperGraph::EdgeSet& edges) override;
 
       //! return the underlying solver used to solve the linear system
       Solver& solver() { return _solver;}

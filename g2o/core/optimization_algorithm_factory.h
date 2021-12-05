@@ -50,8 +50,8 @@ namespace g2o {
  */
 class G2O_CORE_API AbstractOptimizationAlgorithmCreator {
  public:
-  AbstractOptimizationAlgorithmCreator(const OptimizationAlgorithmProperty& p);
-  virtual ~AbstractOptimizationAlgorithmCreator() {}
+  explicit AbstractOptimizationAlgorithmCreator(const OptimizationAlgorithmProperty& p);
+  virtual ~AbstractOptimizationAlgorithmCreator() = default;
   //! allocate a solver operating on optimizer, re-implement for your creator
   virtual std::unique_ptr<OptimizationAlgorithm> construct() = 0;
   //! return the properties of the solver
@@ -70,7 +70,7 @@ class G2O_CORE_API AbstractOptimizationAlgorithmCreator {
  */
 class G2O_CORE_API OptimizationAlgorithmFactory {
  public:
-  typedef std::list<std::shared_ptr<AbstractOptimizationAlgorithmCreator>> CreatorList;
+  using CreatorList = std::list<std::shared_ptr<AbstractOptimizationAlgorithmCreator>>;
 
   //! return the instance
   static OptimizationAlgorithmFactory* instance();
@@ -117,7 +117,7 @@ class G2O_CORE_API OptimizationAlgorithmFactory {
 
 class RegisterOptimizationAlgorithmProxy {
  public:
-  RegisterOptimizationAlgorithmProxy(AbstractOptimizationAlgorithmCreator* c) {
+  explicit RegisterOptimizationAlgorithmProxy(AbstractOptimizationAlgorithmCreator* c) {
     _creator.reset(c);
 #ifdef G2O_DEBUG_OPTIMIZATION_ALGORITHM_FACTORY
     std::cout << __FUNCTION__ << ": Registering " << _creator->property().name << " of type "

@@ -45,11 +45,11 @@ namespace g2o {
        * linearized system.
        */
       explicit OptimizationAlgorithmLevenberg(std::unique_ptr<Solver> solver);
-      virtual ~OptimizationAlgorithmLevenberg();
+      ~OptimizationAlgorithmLevenberg() override;
 
-      virtual SolverResult solve(int iteration, bool online = false);
+      SolverResult solve(int iteration, bool online = false) override;
 
-      virtual void printVerbose(std::ostream& os) const;
+      void printVerbose(std::ostream& os) const override;
 
       //! return the currently used damping factor
       number_t currentLambda() const { return _currentLambda;}

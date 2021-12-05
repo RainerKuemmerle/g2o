@@ -108,13 +108,13 @@ void Factory::registerType(const std::string& tag,
 
 void Factory::unregisterType(const std::string& tag) {
   // Look for the tag
-  CreatorMap::iterator tagPosition = _creator.find(tag);
+  auto tagPosition = _creator.find(tag);
 
   if (tagPosition != _creator.end()) {
     const auto& c = tagPosition->second->creator;
 
     // If we found it, remove the creator from the tag lookup map
-    TagLookup::iterator classPosition = _tagLookup.find(c->name());
+    auto classPosition = _tagLookup.find(c->name());
     if (classPosition != _tagLookup.end()) {
       _tagLookup.erase(classPosition);
     }
@@ -123,7 +123,7 @@ void Factory::unregisterType(const std::string& tag) {
 }
 
 std::unique_ptr<HyperGraph::HyperGraphElement> Factory::construct(const std::string& tag) const {
-  CreatorMap::const_iterator foundIt = _creator.find(tag);
+  auto foundIt = _creator.find(tag);
   if (foundIt != _creator.end()) {
     // cerr << "tag " << tag << " -> " << (void*) foundIt->second->creator << " " <<
     // foundIt->second->creator->name() << endl;
@@ -134,19 +134,19 @@ std::unique_ptr<HyperGraph::HyperGraphElement> Factory::construct(const std::str
 
 const std::string& Factory::tag(const HyperGraph::HyperGraphElement* e) const {
   static std::string emptyStr("");
-  TagLookup::const_iterator foundIt = _tagLookup.find(typeid(*e).name());
+  auto foundIt = _tagLookup.find(typeid(*e).name());
   if (foundIt != _tagLookup.end()) return foundIt->second;
   return emptyStr;
 }
 
 void Factory::fillKnownTypes(std::vector<std::string>& types) const {
   types.clear();
-  for (CreatorMap::const_iterator it = _creator.begin(); it != _creator.end(); ++it)
-    types.push_back(it->first);
+  for (const auto & it : _creator)
+    types.push_back(it.first);
 }
 
 bool Factory::knowsTag(const std::string& tag, int* elementType) const {
-  CreatorMap::const_iterator foundIt = _creator.find(tag);
+  auto foundIt = _creator.find(tag);
   if (foundIt == _creator.end()) {
     if (elementType) *elementType = -1;
     return false;
@@ -163,9 +163,9 @@ void Factory::destroy() {
 void Factory::printRegisteredTypes(std::ostream& os, bool comment) const {
   if (comment) os << "# ";
   os << "types:" << endl;
-  for (CreatorMap::const_iterator it = _creator.begin(); it != _creator.end(); ++it) {
+  for (const auto & it : _creator) {
     if (comment) os << "#";
-    cerr << "\t" << it->first << endl;
+    cerr << "\t" << it.first << endl;
   }
 }
 
@@ -174,7 +174,7 @@ std::unique_ptr<HyperGraph::HyperGraphElement> Factory::construct(
   if (elemsToConstruct.none()) {
     return construct(tag);
   }
-  CreatorMap::const_iterator foundIt = _creator.find(tag);
+  auto foundIt = _creator.find(tag);
   if (foundIt != _creator.end() && foundIt->second->elementTypeBit >= 0 &&
       elemsToConstruct.test(foundIt->second->elementTypeBit)) {
     return foundIt->second->creator->construct();

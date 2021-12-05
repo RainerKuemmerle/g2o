@@ -51,8 +51,7 @@ namespace g2o {
   }
 
   OptimizationAlgorithmLevenberg::~OptimizationAlgorithmLevenberg()
-  {
-  }
+  = default;
 
   OptimizationAlgorithm::SolverResult OptimizationAlgorithmLevenberg::solve(int iteration, bool online)
   {
@@ -152,8 +151,7 @@ namespace g2o {
     if (_userLambdaInit->value() > 0)
       return _userLambdaInit->value();
     number_t maxDiagonal=0;
-    for (size_t k = 0; k < _optimizer->indexMapping().size(); k++) {
-      OptimizableGraph::Vertex* v = _optimizer->indexMapping()[k];
+    for (auto v : _optimizer->indexMapping()) {
       assert(v);
       int dim = v->dimension();
       for (int j = 0; j < dim; ++j){

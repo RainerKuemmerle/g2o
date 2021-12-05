@@ -81,7 +81,7 @@ namespace g2o {
   CacheContainer::CacheContainer(OptimizableGraph::Vertex* vertex_) : _updateNeeded(true) { _vertex = vertex_; }
 
   std::shared_ptr<Cache> CacheContainer::findCache(const Cache::CacheKey& key) {
-    iterator it=find(key);
+    auto it=find(key);
     if (it==end())
       return nullptr;
     return it->second;
@@ -113,16 +113,16 @@ namespace g2o {
   }
 
   void CacheContainer::update() {
-    for (iterator it=begin(); it!=end(); ++it){
-      (it->second)->update();
+    for (auto & it : *this){
+      (it.second)->update();
     }
     _updateNeeded=false;
   }
 
   void CacheContainer::setUpdateNeeded(bool needUpdate) {
     _updateNeeded=needUpdate;
-    for (iterator it=begin(); it!=end(); ++it){
-      (it->second)->_updateNeeded = needUpdate;
+    for (auto & it : *this){
+      (it.second)->_updateNeeded = needUpdate;
     }
   }
 

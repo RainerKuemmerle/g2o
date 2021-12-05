@@ -55,7 +55,7 @@ namespace g2o {
     // Attention: _solver & _statistics is own by SparseOptimizer and will be
     // deleted in its destructor.
     SparseOptimizer();
-    virtual ~SparseOptimizer();
+    ~SparseOptimizer() override;
 
     // new interface for the optimizer
     // the old functions will be dropped
@@ -152,8 +152,8 @@ namespace g2o {
      */
     bool computeMarginals(SparseBlockMatrix<MatrixX>& spinv, const VertexContainer& vertices) {
       std::vector<std::pair<int, int> > indices;
-      for (VertexContainer::const_iterator it = vertices.begin(); it != vertices.end(); ++it) {
-        indices.push_back(std::pair<int, int>((*it)->hessianIndex(),(*it)->hessianIndex()));
+      for (const auto & vertex : vertices) {
+        indices.push_back(std::pair<int, int>(vertex->hessianIndex(), vertex->hessianIndex()));
       }
       return computeMarginals(spinv, indices);
     }
@@ -200,7 +200,7 @@ namespace g2o {
      * mapping is erased. In case you need the index mapping for manipulating the
      * graph, you have to store it in your own copy.
      */
-    virtual bool removeVertex(const std::shared_ptr<HyperGraph::Vertex>& v, bool detach = false) override;
+    bool removeVertex(const std::shared_ptr<HyperGraph::Vertex>& v, bool detach = false) override;
 
     /**
      * search for an edge in _activeVertices and return the iterator pointing to it
@@ -242,7 +242,7 @@ namespace g2o {
      * Note that this only removes nodes / edges. Parameters can be removed
      * with clearParameters().
      */
-    virtual void clear() override;
+    void clear() override;
 
     /**
      * computes the error vectors of all edges in the activeSet, and caches them

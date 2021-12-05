@@ -63,13 +63,13 @@ namespace g2o {
   {
     public:
 #ifdef NDEBUG
-      OpenMPMutex() {}
+      OpenMPMutex() = default;
 #else
       OpenMPMutex() : _cnt(0) {}
 #endif
       ~OpenMPMutex() { assert(_cnt == 0 && "Freeing locked mutex");}
-      void lock() { assert(++_cnt == 1 && "Locking already locked mutex");}
-      void unlock() { assert(--_cnt == 0 && "Trying to unlock a mutex which is not locked");}
+      void lock() { assert(++_cnt == 1 && "Locking already locked mutex");} // NOLINT
+      void unlock() { assert(--_cnt == 0 && "Trying to unlock a mutex which is not locked");} //NOLINT
     protected:
 #ifndef NDEBUG
       char _cnt;

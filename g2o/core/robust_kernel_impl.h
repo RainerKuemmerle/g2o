@@ -54,7 +54,7 @@ namespace g2o {
       //! use another kernel for the underlying operation
       void setKernel(const RobustKernelPtr& ptr);
 
-      void robustify(number_t error, Vector3& rho) const;
+      void robustify(number_t error, Vector3& rho) const override;
 
     protected:
       RobustKernelPtr _kernel;
@@ -77,7 +77,7 @@ namespace g2o {
   class G2O_CORE_API RobustKernelHuber : public RobustKernel
   {
     public:
-      virtual void robustify(number_t e2, Vector3& rho) const;
+      void robustify(number_t e2, Vector3& rho) const override;
   };
 
   /**
@@ -94,7 +94,7 @@ namespace g2o {
   class G2O_CORE_API RobustKernelPseudoHuber : public RobustKernel
   {
     public:
-      virtual void robustify(number_t e2, Vector3& rho) const;
+      void robustify(number_t e2, Vector3& rho) const override;
   };
 
   /**
@@ -108,7 +108,7 @@ namespace g2o {
   class G2O_CORE_API RobustKernelCauchy : public RobustKernel
   {
     public:
-      virtual void robustify(number_t e2, Vector3& rho) const;
+      void robustify(number_t e2, Vector3& rho) const override;
   };
 
   /**
@@ -123,7 +123,7 @@ namespace g2o {
   class G2O_CORE_API RobustKernelGemanMcClure : public RobustKernel
   {
     public:
-      virtual void robustify(number_t e2, Vector3& rho) const;
+      void robustify(number_t e2, Vector3& rho) const override;
   };
 
   /**
@@ -137,7 +137,7 @@ namespace g2o {
   class G2O_CORE_API RobustKernelWelsch : public RobustKernel
   {
     public:
-      virtual void robustify(number_t e2, Vector3& rho) const;
+      void robustify(number_t e2, Vector3& rho) const override;
   };
 
   /**
@@ -151,7 +151,7 @@ namespace g2o {
   class G2O_CORE_API RobustKernelFair : public RobustKernel
   {
     public:
-      virtual void robustify(number_t e2, Vector3& rho) const;
+      void robustify(number_t e2, Vector3& rho) const override;
   };
 
   /**
@@ -169,7 +169,7 @@ namespace g2o {
   class G2O_CORE_API RobustKernelTukey : public RobustKernel
   {
     public:
-      virtual void robustify(number_t e2, Vector3& rho) const;
+      void robustify(number_t e2, Vector3& rho) const override;
   };
 
   /**
@@ -180,7 +180,7 @@ namespace g2o {
   class G2O_CORE_API RobustKernelSaturated : public RobustKernel
   {
     public:
-      virtual void robustify(number_t e2, Vector3& rho) const;
+      void robustify(number_t e2, Vector3& rho) const override;
   };
 
   /**
@@ -193,7 +193,7 @@ namespace g2o {
   class G2O_CORE_API RobustKernelDCS : public RobustKernel
   {
     public:
-      virtual void robustify(number_t e2, Vector3& rho) const;
+      void robustify(number_t e2, Vector3& rho) const override;
   };
 } // end namespace g2o
 

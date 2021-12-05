@@ -40,20 +40,20 @@ using namespace std;
 
 bool ParameterContainer::addParameter(const std::shared_ptr<Parameter>& p) {
   if (p->id() < 0) return false;
-  iterator it = find(p->id());
+  auto it = find(p->id());
   if (it != end()) return false;
   insert(make_pair(p->id(), p));
   return true;
 }
 
 std::shared_ptr<Parameter> ParameterContainer::getParameter(int id) const {
-  const_iterator it = find(id);
+  auto it = find(id);
   if (it == end()) return nullptr;
   return it->second;
 }
 
 std::shared_ptr<Parameter> ParameterContainer::detachParameter(int id) {
-  iterator it = find(id);
+  auto it = find(id);
   if (it == end()) return nullptr;
   std::shared_ptr<Parameter> p = it->second;
   erase(it);
@@ -62,10 +62,10 @@ std::shared_ptr<Parameter> ParameterContainer::detachParameter(int id) {
 
 bool ParameterContainer::write(std::ostream& os) const {
   Factory* factory = Factory::instance();
-  for (const_iterator it = begin(); it != end(); ++it) {
-    os << factory->tag(it->second.get()) << " ";
-    os << it->second->id() << " ";
-    it->second->write(os);
+  for (const auto & it : *this) {
+    os << factory->tag(it.second.get()) << " ";
+    os << it.second->id() << " ";
+    it.second->write(os);
     os << endl;
   }
   return true;
@@ -86,7 +86,7 @@ bool ParameterContainer::read(std::istream& is,
     currentLine >> token;
     if (bytesRead == 0 || token.size() == 0 || token[0] == '#') continue;
     if (_renamedTypesLookup && _renamedTypesLookup->size() > 0) {
-      map<string, string>::const_iterator foundIt = _renamedTypesLookup->find(token);
+      auto foundIt = _renamedTypesLookup->find(token);
       if (foundIt != _renamedTypesLookup->end()) {
         token = foundIt->second;
       }

@@ -54,11 +54,11 @@ namespace g2o {
        * linearized system.
        */
       explicit OptimizationAlgorithmDogleg(std::unique_ptr<BlockSolverBase> solver);
-      virtual ~OptimizationAlgorithmDogleg();
+      ~OptimizationAlgorithmDogleg() override;
 
-      virtual SolverResult solve(int iteration, bool online = false);
+      SolverResult solve(int iteration, bool online = false) override;
 
-      virtual void printVerbose(std::ostream& os) const;
+      void printVerbose(std::ostream& os) const override;
 
       //! return the type of the last step taken by the algorithm
       int lastStep() const { return _lastStep;}

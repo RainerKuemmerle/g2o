@@ -120,7 +120,7 @@ Modified by Mark Pupilli from:
 
 #ifndef FIXED
 #define FIXED(s) \
-  std::fixed << (s) << std::resetiosflags(std::ios_base::fixed)
+  std::fixed << s << std::resetiosflags(std::ios_base::fixed) // NOLINT
 #endif
 
 #endif // __cplusplus

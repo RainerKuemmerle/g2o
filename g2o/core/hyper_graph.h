@@ -66,7 +66,7 @@ class G2O_CORE_API HyperGraph {
 
   enum G2O_CORE_API HyperGraphDefaultIds { UnassignedId = -1, InvalidId = -2 };
 
-  typedef std::bitset<HyperGraph::HGET_NUM_ELEMS> GraphElemBitset;
+  using GraphElemBitset = std::bitset<HyperGraph::HGET_NUM_ELEMS>;
 
   class G2O_CORE_API Data;
   class G2O_CORE_API DataContainer;
@@ -77,7 +77,7 @@ class G2O_CORE_API HyperGraph {
    * base hyper graph element, specialized in vertex and edge
    */
   struct G2O_CORE_API HyperGraphElement {
-    virtual ~HyperGraphElement() {}
+    virtual ~HyperGraphElement() = default;
     /**
      * returns the type of the graph element, see HyperGraphElementType
      */
@@ -91,12 +91,12 @@ class G2O_CORE_API HyperGraph {
   class G2O_CORE_API Data : public HyperGraph::HyperGraphElement {
    public:
     Data();
-    ~Data();
+    ~Data() override;
     //! read the data from a stream
     virtual bool read(std::istream& is) = 0;
     //! write the data to a stream
     virtual bool write(std::ostream& os) const = 0;
-    virtual HyperGraph::HyperGraphElementType elementType() const { return HyperGraph::HGET_DATA; }
+    HyperGraph::HyperGraphElementType elementType() const override { return HyperGraph::HGET_DATA; }
     std::shared_ptr<Data> next() const { return _next; }
     void setNext(std::shared_ptr<Data> next_) { _next = next_; }
     std::shared_ptr<DataContainer> dataContainer() const { return _dataContainer; }
@@ -141,7 +141,7 @@ class G2O_CORE_API HyperGraph {
    public:
     //! creates a vertex having an ID specified by the argument
     explicit Vertex(int id = InvalidId);
-    virtual ~Vertex();
+    ~Vertex() override;
     //! returns the id
     int id() const { return _id; }
     virtual void setId(int newId) { _id = newId; }
@@ -149,7 +149,7 @@ class G2O_CORE_API HyperGraph {
     const EdgeSetWeak& edges() const { return _edges; }
     //! returns the set of hyper-edges that are leaving/entering in this vertex
     EdgeSetWeak& edges() { return _edges; }
-    virtual HyperGraphElementType elementType() const { return HGET_VERTEX; }
+    HyperGraphElementType elementType() const override { return HGET_VERTEX; }
 
    protected:
     int _id;
@@ -164,7 +164,7 @@ class G2O_CORE_API HyperGraph {
    public:
     //! creates and empty edge with no vertices
     explicit Edge(int id = InvalidId);
-    virtual ~Edge();
+    ~Edge() override;
 
     /**
      * resizes the number of vertices connected by this edge
@@ -202,7 +202,7 @@ class G2O_CORE_API HyperGraph {
 
     int id() const { return _id; }
     void setId(int id);
-    virtual HyperGraphElementType elementType() const { return HGET_EDGE; }
+    HyperGraphElementType elementType() const override { return HGET_EDGE; }
 
     int numUndefinedVertices() const;
 

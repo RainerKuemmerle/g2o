@@ -49,7 +49,7 @@ class G2O_CORE_API AbstractHyperGraphElementCreator {
    */
   virtual const std::string& name() const = 0;
 
-  virtual ~AbstractHyperGraphElementCreator() {}
+  virtual ~AbstractHyperGraphElementCreator() = default;
 };
 
 /**
@@ -63,10 +63,10 @@ class HyperGraphElementCreator : public AbstractHyperGraphElementCreator {
   __attribute__((force_align_arg_pointer))
 #endif
   std::unique_ptr<HyperGraph::HyperGraphElement>
-  construct() {
+  construct() override {
     return std::make_unique<T>();
   }
-  virtual const std::string& name() const { return _name; }
+  const std::string& name() const override { return _name; }
 
  protected:
   std::string _name;

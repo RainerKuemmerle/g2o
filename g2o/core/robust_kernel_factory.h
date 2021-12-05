@@ -49,7 +49,7 @@ class G2O_CORE_API AbstractRobustKernelCreator {
    * create a hyper graph element. Has to implemented in derived class.
    */
   virtual std::shared_ptr<RobustKernel> construct() = 0;
-  virtual ~AbstractRobustKernelCreator() {}
+  virtual ~AbstractRobustKernelCreator() = default;
   using Ptr = std::shared_ptr<AbstractRobustKernelCreator>;
 };
 
@@ -59,7 +59,7 @@ class G2O_CORE_API AbstractRobustKernelCreator {
 template <typename T>
 class RobustKernelCreator : public AbstractRobustKernelCreator {
  public:
-  std::shared_ptr<RobustKernel> construct() { return std::shared_ptr<RobustKernel>(new T()); }
+  std::shared_ptr<RobustKernel> construct() override { return std::shared_ptr<RobustKernel>(new T()); }
 };
 
 /**
@@ -102,7 +102,7 @@ class G2O_CORE_API RobustKernelFactory {
   void fillKnownKernels(std::vector<std::string>& types) const;
 
  protected:
-  typedef std::map<std::string, AbstractRobustKernelCreator::Ptr> CreatorMap;
+  using CreatorMap = std::map<std::string, AbstractRobustKernelCreator::Ptr>;
   RobustKernelFactory() = default;
 
   CreatorMap _creator;  ///< look-up map for the existing creators
@@ -114,7 +114,7 @@ class G2O_CORE_API RobustKernelFactory {
 template <typename T>
 class RegisterRobustKernelProxy {
  public:
-  RegisterRobustKernelProxy(const std::string& name) {
+  explicit RegisterRobustKernelProxy(const std::string& name) {
     RobustKernelFactory::instance()->registerRobustKernel(
         name, AbstractRobustKernelCreator::Ptr(new RobustKernelCreator<T>()));
   }

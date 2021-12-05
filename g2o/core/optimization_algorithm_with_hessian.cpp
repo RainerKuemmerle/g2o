@@ -43,15 +43,14 @@ namespace g2o {
   }
 
   OptimizationAlgorithmWithHessian::~OptimizationAlgorithmWithHessian()
-  {}
+  = default;
 
   bool OptimizationAlgorithmWithHessian::init(bool online)
   {
     assert(_optimizer && "_optimizer not set");
     _solver.setWriteDebug(_writeDebug->value());
     bool useSchur=false;
-    for (OptimizableGraph::VertexContainer::const_iterator it=_optimizer->activeVertices().begin(); it!=_optimizer->activeVertices().end(); ++it) {
-      const auto& v= *it;
+    for (const auto & v : _optimizer->activeVertices()) {
       if (v->marginalized()){
         useSchur=true;
         break;

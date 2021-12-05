@@ -47,16 +47,16 @@ namespace g2o {
   {
     public:
       //! this is the type of the elementary block, it is an Eigen::Matrix.
-      typedef MatrixType SparseMatrixBlock;
+      using SparseMatrixBlock = MatrixType;
 
       //! columns of the matrix
       int cols() const {return _blockIndices.size() ? _blockIndices.back() : 0;}
       //! rows of the matrix
       int rows() const {return _blockIndices.size() ? _blockIndices.back() : 0;}
 
-      typedef std::vector<MatrixType, Eigen::aligned_allocator<MatrixType> >      DiagonalVector;
+      using DiagonalVector = std::vector<MatrixType, Eigen::aligned_allocator<MatrixType>>;
 
-      SparseBlockMatrixDiagonal(const std::vector<int>& blockIndices) :
+      explicit SparseBlockMatrixDiagonal(const std::vector<int>& blockIndices) :
         _blockIndices(blockIndices)
       {}
 

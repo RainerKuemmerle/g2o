@@ -40,8 +40,7 @@ namespace g2o {
   }
 
   JacobianWorkspace::~JacobianWorkspace()
-  {
-  }
+  = default;
 
   bool JacobianWorkspace::allocate()
   {
@@ -49,9 +48,9 @@ namespace g2o {
     if (_maxNumVertices <=0 || _maxDimension <= 0)
       return false;
     _workspace.resize(_maxNumVertices);
-    for (WorkspaceVector::iterator it = _workspace.begin(); it != _workspace.end(); ++it) {
-      it->resize(_maxDimension);
-      it->setZero();
+    for (auto & it : _workspace) {
+      it.resize(_maxDimension);
+      it.setZero();
     }
     return true;
   }
@@ -67,7 +66,7 @@ namespace g2o {
       _maxDimension = -1;
     }
 
-    const OptimizableGraph::Edge* e = static_cast<const OptimizableGraph::Edge*>(e_);
+    const auto* e = static_cast<const OptimizableGraph::Edge*>(e_);
     int errorDimension = e->dimension();
     int numVertices = e->vertices().size();
     int maxDimensionForEdge = -1;
@@ -89,8 +88,8 @@ namespace g2o {
       _maxDimension = -1;
     }
 
-    for (OptimizableGraph::EdgeSet::const_iterator it = graph.edges().begin(); it != graph.edges().end(); ++it) {
-      const OptimizableGraph::Edge* e = static_cast<const OptimizableGraph::Edge*>(it->get());
+    for (const auto & it : graph.edges()) {
+      const auto* e = static_cast<const OptimizableGraph::Edge*>(it.get());
       updateSize(e);
     }
   }

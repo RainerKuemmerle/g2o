@@ -54,14 +54,14 @@ namespace g2o {
   }
 
   OptimizationAlgorithmDogleg::~OptimizationAlgorithmDogleg()
-  {}
+  = default;
 
   OptimizationAlgorithm::SolverResult OptimizationAlgorithmDogleg::solve(int iteration, bool online)
   {
     assert(_optimizer && "_optimizer not set");
     assert(_solver.optimizer() == _optimizer && "underlying linear solver operates on different graph");
 
-    BlockSolverBase& blockSolver = static_cast<BlockSolverBase&>(_solver);
+    auto& blockSolver = static_cast<BlockSolverBase&>(_solver);
 
     if (iteration == 0 && !online)
     { // built up the CCS structure, here due to easy time measure

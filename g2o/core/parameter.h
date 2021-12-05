@@ -38,14 +38,14 @@ namespace g2o {
     {
       public:
         Parameter();
-        virtual ~Parameter() {};
+        ~Parameter() override = default;;
         //! read the data from a stream
         virtual bool read(std::istream& is) = 0;
         //! write the data to a stream
         virtual bool write(std::ostream& os) const = 0;
         int id() const {return _id;}
         void setId(int id_);
-        virtual HyperGraph::HyperGraphElementType elementType() const { return HyperGraph::HGET_PARAMETER;}
+        HyperGraph::HyperGraphElementType elementType() const override { return HyperGraph::HGET_PARAMETER;}
       protected:
         int _id;
     };

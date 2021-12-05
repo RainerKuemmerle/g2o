@@ -55,9 +55,9 @@ namespace g2o {
 
   void EstimatePropagator::AdjacencyMapEntry::reset()
   {
-    _child = 0;
+    _child = nullptr;
     _parent.clear();
-    _edge = 0;
+    _edge = nullptr;
     _distance = numeric_limits<number_t>::max();
     _frontierLevel = -1;
     inQueue = false;
@@ -65,18 +65,18 @@ namespace g2o {
 
   EstimatePropagator::EstimatePropagator(OptimizableGraph* g): _graph(g)
   {
-    for (OptimizableGraph::VertexIDMap::const_iterator it=_graph->vertices().begin(); it!=_graph->vertices().end(); ++it){
+    for (const auto & it : _graph->vertices()){
       AdjacencyMapEntry entry;
-      entry._child = static_pointer_cast<OptimizableGraph::Vertex>(it->second);
+      entry._child = static_pointer_cast<OptimizableGraph::Vertex>(it.second);
       _adjacencyMap.insert(make_pair(entry.child(), entry));
     }
   }
 
   void EstimatePropagator::reset()
   {
-    for (OptimizableGraph::VertexSet::iterator it=_visited.begin(); it!=_visited.end(); ++it){
-      auto v = static_pointer_cast<OptimizableGraph::Vertex>(*it);
-      AdjacencyMap::iterator at = _adjacencyMap.find(v);
+    for (const auto & it : _visited){
+      auto v = static_pointer_cast<OptimizableGraph::Vertex>(it);
+      auto at = _adjacencyMap.find(v);
       assert(at != _adjacencyMap.end());
       at->second.reset();
     }
@@ -103,9 +103,9 @@ namespace g2o {
     reset();
 
     PriorityQueue frontier;
-    for (OptimizableGraph::VertexSet::iterator vit=vset.begin(); vit!=vset.end(); ++vit){
-      auto v = static_pointer_cast<OptimizableGraph::Vertex>(*vit);
-      AdjacencyMap::iterator it = _adjacencyMap.find(v);
+    for (const auto & vit : vset){
+      auto v = static_pointer_cast<OptimizableGraph::Vertex>(vit);
+      auto it = _adjacencyMap.find(v);
       assert(it != _adjacencyMap.end());
       it->second._distance = 0.;
       it->second._parent.clear();
@@ -135,7 +135,7 @@ namespace g2o {
         for (size_t i = 0; i < edge->vertices().size(); ++i) {
           auto z = static_pointer_cast<OptimizableGraph::Vertex>(edge->vertex(i));
           if (!z) continue;
-          AdjacencyMap::iterator ot = _adjacencyMap.find(z);
+          auto ot = _adjacencyMap.find(z);
           if (ot->second._distance != numeric_limits<number_t>::max()) {
             initializedVertices.insert(z);
             maxFrontier = (max)(maxFrontier, ot->second._frontierLevel);
@@ -155,7 +155,7 @@ namespace g2o {
             number_t zDistance = uDistance + edgeDistance;
             // cerr << z->id() << " " << zDistance << endl;
 
-            AdjacencyMap::iterator ot = _adjacencyMap.find(z);
+            auto ot = _adjacencyMap.find(z);
             assert(ot != _adjacencyMap.end());
 
             if (zDistance < ot->second.distance() && zDistance < maxDistance) {
@@ -221,7 +221,7 @@ namespace g2o {
   EstimatePropagator::AdjacencyMapEntry* EstimatePropagator::PriorityQueue::pop()
   {
     assert(!empty());
-    iterator it = begin();
+    auto it = begin();
     AdjacencyMapEntry* entry = it->second;
     erase(it);
 
@@ -238,9 +238,9 @@ namespace g2o {
 
   number_t EstimatePropagatorCost::operator()(OptimizableGraph::Edge* edge, const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to_) const
   {
-    OptimizableGraph::Edge* e = dynamic_cast<OptimizableGraph::Edge*>(edge);
-    OptimizableGraph::Vertex* to = dynamic_cast<OptimizableGraph::Vertex*>(to_);
-    SparseOptimizer::EdgeContainer::const_iterator it = _graph->findActiveEdge(e);
+    auto* e = dynamic_cast<OptimizableGraph::Edge*>(edge);
+    auto* to = dynamic_cast<OptimizableGraph::Vertex*>(to_);
+    auto it = _graph->findActiveEdge(e);
     if (it == _graph->activeEdges().end()) // it has to be an active edge
       return std::numeric_limits<number_t>::max();
     return e->initialEstimatePossible(from, to);
@@ -253,12 +253,12 @@ namespace g2o {
 
   number_t EstimatePropagatorCostOdometry::operator()(OptimizableGraph::Edge* edge, const OptimizableGraph::VertexSet& from_, OptimizableGraph::Vertex* to_) const
   {
-    OptimizableGraph::Edge* e = dynamic_cast<OptimizableGraph::Edge*>(edge);
+    auto* e = dynamic_cast<OptimizableGraph::Edge*>(edge);
     OptimizableGraph::Vertex* from = dynamic_cast<OptimizableGraph::Vertex*>(from_.begin()->get());
-    OptimizableGraph::Vertex* to = dynamic_cast<OptimizableGraph::Vertex*>(to_);
+    auto* to = dynamic_cast<OptimizableGraph::Vertex*>(to_);
     if (std::abs(from->id() - to->id()) != 1) // simple method to identify odometry edges in a pose graph
       return std::numeric_limits<number_t>::max();
-    SparseOptimizer::EdgeContainer::const_iterator it = _graph->findActiveEdge(e);
+    auto it = _graph->findActiveEdge(e);
     if (it == _graph->activeEdges().end()) // it has to be an active edge
       return std::numeric_limits<number_t>::max();
     return e->initialEstimatePossible(from_, to);

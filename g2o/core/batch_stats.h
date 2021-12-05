@@ -78,7 +78,7 @@ namespace g2o {
 
   G2O_CORE_API std::ostream& operator<<(std::ostream&, const G2OBatchStatistics&);
 
-  typedef std::vector<G2OBatchStatistics> BatchStatisticsContainer;
+  using BatchStatisticsContainer = std::vector<G2OBatchStatistics>;
 }
 
 #endif

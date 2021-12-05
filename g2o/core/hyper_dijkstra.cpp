@@ -63,18 +63,17 @@ HyperDijkstra::AdjacencyMapEntry::AdjacencyMapEntry(
     : _child(child), _parent(parent), _edge(edge), _distance(distance) {}
 
 HyperDijkstra::HyperDijkstra(const std::shared_ptr<HyperGraph>& g) : _graph(g) {
-  for (HyperGraph::VertexIDMap::const_iterator it = _graph->vertices().begin();
-       it != _graph->vertices().end(); ++it) {
-    AdjacencyMapEntry entry(it->second, 0, 0, std::numeric_limits<number_t>::max());
+  for (const auto & it : _graph->vertices()) {
+    AdjacencyMapEntry entry(it.second, nullptr, nullptr, std::numeric_limits<number_t>::max());
     _adjacencyMap.insert(make_pair(entry.child(), entry));
   }
 }
 
 void HyperDijkstra::reset() {
-  for (HyperGraph::VertexSet::iterator it = _visited.begin(); it != _visited.end(); ++it) {
-    AdjacencyMap::iterator at = _adjacencyMap.find(*it);
+  for (const auto & it : _visited) {
+    auto at = _adjacencyMap.find(it);
     assert(at != _adjacencyMap.end());
-    at->second = AdjacencyMapEntry(at->first, 0, 0, std::numeric_limits<number_t>::max());
+    at->second = AdjacencyMapEntry(at->first, nullptr, nullptr, std::numeric_limits<number_t>::max());
   }
   _visited.clear();
 }
@@ -89,16 +88,15 @@ void HyperDijkstra::shortestPaths(HyperGraph::VertexSet& vset, HyperDijkstra::Co
                                   bool directed, number_t maxEdgeCost) {
   reset();
   std::priority_queue<AdjacencyMapEntry> frontier;
-  for (HyperGraph::VertexSet::iterator vit = vset.begin(); vit != vset.end(); ++vit) {
-    const auto& v = *vit;
+  for (const auto & v : vset) {
     assert(v != 0);
-    AdjacencyMap::iterator it = _adjacencyMap.find(v);
+    auto it = _adjacencyMap.find(v);
     if (it == _adjacencyMap.end()) {
       cerr << __PRETTY_FUNCTION__ << "Vertex " << v->id() << " is not in the adjacency map" << endl;
     }
     assert(it != _adjacencyMap.end());
     it->second._distance = 0.;
-    it->second._parent = 0;
+    it->second._parent = nullptr;
     frontier.push(it->second);
   }
 
@@ -106,7 +104,7 @@ void HyperDijkstra::shortestPaths(HyperGraph::VertexSet& vset, HyperDijkstra::Co
     AdjacencyMapEntry entry = frontier.top();
     frontier.pop();
     auto u = entry.child();
-    AdjacencyMap::iterator ut = _adjacencyMap.find(u);
+    auto ut = _adjacencyMap.find(u);
     if (ut == _adjacencyMap.end()) {
       cerr << __PRETTY_FUNCTION__ << "Vertex " << u->id() << " is not in the adjacency map" << endl;
     }
@@ -115,7 +113,7 @@ void HyperDijkstra::shortestPaths(HyperGraph::VertexSet& vset, HyperDijkstra::Co
 
     std::pair<HyperGraph::VertexSet::iterator, bool> insertResult = _visited.insert(u);
     (void)insertResult;
-    HyperGraph::EdgeSetWeak::iterator et = u->edges().begin();
+    auto et = u->edges().begin();
     while (et != u->edges().end()) {
       auto edge = et->lock();
       ++et;
@@ -132,7 +130,7 @@ void HyperDijkstra::shortestPaths(HyperGraph::VertexSet& vset, HyperDijkstra::Co
         number_t zDistance = uDistance + edgeDistance;
         // cerr << z->id() << " " << zDistance << endl;
 
-        AdjacencyMap::iterator ot = _adjacencyMap.find(z);
+        auto ot = _adjacencyMap.find(z);
         assert(ot != _adjacencyMap.end());
 
         if (zDistance + comparisonConditioner < ot->second.distance() && zDistance < maxDistance) {
@@ -156,11 +154,11 @@ void HyperDijkstra::shortestPaths(const std::shared_ptr<HyperGraph::Vertex>& v,
 }
 
 void HyperDijkstra::computeTree(AdjacencyMap& amap) {
-  for (AdjacencyMap::iterator it = amap.begin(); it != amap.end(); ++it) {
-    AdjacencyMapEntry& entry(it->second);
+  for (auto & it : amap) {
+    AdjacencyMapEntry& entry(it.second);
     entry._children.clear();
   }
-  for (AdjacencyMap::iterator it = amap.begin(); it != amap.end(); ++it) {
+  for (auto it = amap.begin(); it != amap.end(); ++it) {
     AdjacencyMapEntry& entry(it->second);
     auto parent = entry.parent();
     if (!parent) {
@@ -169,7 +167,7 @@ void HyperDijkstra::computeTree(AdjacencyMap& amap) {
     auto v = entry.child();
     assert(v == it->first);
 
-    AdjacencyMap::iterator pt = amap.find(parent);
+    auto pt = amap.find(parent);
     assert(pt != amap.end());
     pt->second._children.insert(v);
   }
@@ -180,11 +178,11 @@ void HyperDijkstra::visitAdjacencyMap(AdjacencyMap& amap, TreeAction* action, bo
   Deque q;
   // scans for the vertices without the parent (whcih are the roots of the trees) and applies the
   // action to them.
-  for (AdjacencyMap::iterator it = amap.begin(); it != amap.end(); ++it) {
-    AdjacencyMapEntry& entry(it->second);
+  for (auto & it : amap) {
+    AdjacencyMapEntry& entry(it.second);
     if (!entry.parent()) {
-      action->perform(it->first, nullptr, nullptr);
-      q.push_back(it->first);
+      action->perform(it.first, nullptr, nullptr);
+      q.push_back(it.first);
     }
   }
 
@@ -194,17 +192,15 @@ void HyperDijkstra::visitAdjacencyMap(AdjacencyMap& amap, TreeAction* action, bo
     auto parent = q.front();
     q.pop_front();
     ++count;
-    AdjacencyMap::iterator parentIt = amap.find(parent);
+    auto parentIt = amap.find(parent);
     if (parentIt == amap.end()) {
       continue;
     }
     // cerr << "parent= " << parent << " parent id= " << parent->id() << "\t children id =";
     HyperGraph::VertexSet& childs(parentIt->second.children());
-    for (HyperGraph::VertexSet::iterator childsIt = childs.begin(); childsIt != childs.end();
-         ++childsIt) {
-      const auto& child = *childsIt;
+    for (const auto & child : childs) {
       // cerr << child->id();
-      AdjacencyMap::iterator adjacencyIt = amap.find(child);
+      auto adjacencyIt = amap.find(child);
       assert(adjacencyIt != amap.end());
       auto edge = adjacencyIt->second.edge();
 
@@ -240,13 +236,12 @@ void HyperDijkstra::connectedSubset(HyperGraph::VertexSet& connected,
     auto v0 = frontier.front();
     frontier.pop();
     dv.shortestPaths(v0, cost, distance, comparisonConditioner, false, maxEdgeCost);
-    for (HyperGraph::VertexSet::iterator it = dv.visited().begin(); it != dv.visited().end();
-         ++it) {
-      visited.insert(*it);
-      if (startingSet.find(*it) == startingSet.end()) continue;
-      std::pair<HyperGraph::VertexSet::iterator, bool> insertOutcome = connected.insert(*it);
+    for (const auto & it : dv.visited()) {
+      visited.insert(it);
+      if (startingSet.find(it) == startingSet.end()) continue;
+      std::pair<HyperGraph::VertexSet::iterator, bool> insertOutcome = connected.insert(it);
       if (insertOutcome.second) {  // the node was not in the connectedSet;
-        frontier.push(*it);
+        frontier.push(it);
       }
     }
   }

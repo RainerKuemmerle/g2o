@@ -43,7 +43,7 @@ struct ColSort
 };
 
 MatrixStructure::MatrixStructure() :
-  n(0), m(0), Ap(0), Aii(0), maxN(0), maxNz(0)
+  n(0), m(0), Ap(nullptr), Aii(nullptr), maxN(0), maxNz(0)
 {
 }
 
@@ -81,8 +81,8 @@ void MatrixStructure::free()
   m = 0;
   maxN = 0;
   maxNz = 0;
-  delete[] Aii; Aii = 0;
-  delete[] Ap; Ap = 0;
+  delete[] Aii; Aii = nullptr;
+  delete[] Ap; Ap = nullptr;
 }
 
 bool MatrixStructure::write(const char* filename) const
@@ -114,8 +114,7 @@ bool MatrixStructure::write(const char* filename) const
   fout << "# nnz: " << entries.size() << std::endl;
   fout << "# rows: " << rows << std::endl;
   fout << "# columns: " << cols << std::endl;
-  for (vector<pair<int, int> >::const_iterator it = entries.begin(); it != entries.end(); ++it) {
-    const pair<int, int>& entry = *it;
+  for (const auto & entry : entries) {
     fout << entry.first << " " << entry.second << " 0" << std::endl; // write a constant value of 0
   }
 

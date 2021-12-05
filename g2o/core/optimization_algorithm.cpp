@@ -35,13 +35,13 @@ OptimizationAlgorithm::OptimizationAlgorithm()
 {}
 
 OptimizationAlgorithm::~OptimizationAlgorithm()
-{}
+= default;
 
 void OptimizationAlgorithm::printProperties(std::ostream& os) const
 {
   os << "------------- Algorithm Properties -------------"  << endl;
-  for (PropertyMap::const_iterator it = _properties.begin(); it != _properties.end(); ++it) {
-    os << it->first << "\t" << it->second->toString() << endl;
+  for (const auto & _propertie : _properties) {
+    os << _propertie.first << "\t" << _propertie.second->toString() << endl;
   }
   os << "------------------------------------------------" << endl;
 }

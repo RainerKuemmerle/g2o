@@ -82,7 +82,7 @@ class G2O_CORE_API Factory {
   /**
    * return whether the factory knows this tag or not
    */
-  bool knowsTag(const std::string& tag, int* elementType = 0) const;
+  bool knowsTag(const std::string& tag, int* elementType = nullptr) const;
 
   //! return the TAG given a vertex
   const std::string& tag(const HyperGraph::HyperGraphElement* v) const;
@@ -104,8 +104,8 @@ class G2O_CORE_API Factory {
     int elementTypeBit = -1;
   };
 
-  typedef std::map<std::string, std::unique_ptr<CreatorInformation>> CreatorMap;
-  typedef std::map<std::string, std::string> TagLookup;
+  using CreatorMap = std::map<std::string, std::unique_ptr<CreatorInformation>>;
+  using TagLookup = std::map<std::string, std::string>;
   Factory() = default;
 
   CreatorMap _creator;   ///< look-up map for the existing creators
@@ -118,7 +118,7 @@ class G2O_CORE_API Factory {
 template <typename T>
 class RegisterTypeProxy {
  public:
-  RegisterTypeProxy(const std::string& name) {
+  explicit RegisterTypeProxy(const std::string& name) {
 #ifdef G2O_DEBUG_FACTORY
     std::cout << __FUNCTION__ << ": Registering " << name << " of type " << typeid(T).name()
               << std::endl;

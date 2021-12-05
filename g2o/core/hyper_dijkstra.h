@@ -39,7 +39,7 @@ struct G2O_CORE_API HyperDijkstra {
   struct G2O_CORE_API CostFunction {
     virtual number_t operator()(HyperGraph::Edge* e, HyperGraph::Vertex* from,
                                 HyperGraph::Vertex* to) = 0;
-    virtual ~CostFunction() {}
+    virtual ~CostFunction() = default;
   };
 
   struct G2O_CORE_API TreeAction {
@@ -54,7 +54,7 @@ struct G2O_CORE_API HyperDijkstra {
 
   struct G2O_CORE_API AdjacencyMapEntry {
     friend struct HyperDijkstra;
-    AdjacencyMapEntry(const std::shared_ptr<HyperGraph::Vertex>& child = nullptr,
+    explicit AdjacencyMapEntry(const std::shared_ptr<HyperGraph::Vertex>& child = nullptr,
                       const std::shared_ptr<HyperGraph::Vertex>& parent = nullptr,
                       const std::shared_ptr<HyperGraph::Edge>& edge = nullptr,
                       number_t distance = std::numeric_limits<number_t>::max());
@@ -112,8 +112,8 @@ struct G2O_CORE_API HyperDijkstra {
 };
 
 struct G2O_CORE_API UniformCostFunction : public HyperDijkstra::CostFunction {
-  virtual number_t operator()(HyperGraph::Edge* edge, HyperGraph::Vertex* from,
-                              HyperGraph::Vertex* to);
+  number_t operator()(HyperGraph::Edge* edge, HyperGraph::Vertex* from,
+                              HyperGraph::Vertex* to) override;
 };
 
 }  // namespace g2o

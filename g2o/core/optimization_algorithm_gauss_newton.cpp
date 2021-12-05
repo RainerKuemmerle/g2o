@@ -45,7 +45,7 @@ namespace g2o {
   {}
 
   OptimizationAlgorithmGaussNewton::~OptimizationAlgorithmGaussNewton()
-  {}
+  = default;
 
   OptimizationAlgorithm::SolverResult OptimizationAlgorithmGaussNewton::solve(int iteration, bool online)
   {

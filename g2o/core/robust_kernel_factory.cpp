@@ -53,14 +53,14 @@ void RobustKernelFactory::registerRobustKernel(const std::string& tag,
 }
 
 void RobustKernelFactory::unregisterType(const std::string& tag) {
-  CreatorMap::iterator tagPosition = _creator.find(tag);
+  auto tagPosition = _creator.find(tag);
   if (tagPosition != _creator.end()) {
     _creator.erase(tagPosition);
   }
 }
 
 std::shared_ptr<RobustKernel> RobustKernelFactory::construct(const std::string& tag) const {
-  CreatorMap::const_iterator foundIt = _creator.find(tag);
+  auto foundIt = _creator.find(tag);
   if (foundIt != _creator.end()) {
     return foundIt->second->construct();
   }
@@ -68,7 +68,7 @@ std::shared_ptr<RobustKernel> RobustKernelFactory::construct(const std::string& 
 }
 
 AbstractRobustKernelCreator::Ptr RobustKernelFactory::creator(const std::string& tag) const {
-  CreatorMap::const_iterator foundIt = _creator.find(tag);
+  auto foundIt = _creator.find(tag);
   if (foundIt != _creator.end()) {
     return foundIt->second;
   }
@@ -77,8 +77,8 @@ AbstractRobustKernelCreator::Ptr RobustKernelFactory::creator(const std::string&
 
 void RobustKernelFactory::fillKnownKernels(std::vector<std::string>& types) const {
   types.clear();
-  for (CreatorMap::const_iterator it = _creator.begin(); it != _creator.end(); ++it)
-    types.push_back(it->first);
+  for (const auto & it : _creator)
+    types.push_back(it.first);
 }
 
 void RobustKernelFactory::destroy() {

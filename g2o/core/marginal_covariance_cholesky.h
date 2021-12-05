@@ -45,7 +45,7 @@ namespace g2o {
       /**
        * hash struct for storing the matrix elements needed to compute the covariance
        */
-      typedef std::unordered_map<int, number_t>     LookupMap;
+      using LookupMap = std::unordered_map<int, number_t>;
     
     public:
       MarginalCovarianceCholesky();

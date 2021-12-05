@@ -46,13 +46,12 @@ struct MatrixElem
 };
 
 MarginalCovarianceCholesky::MarginalCovarianceCholesky() :
-  _n(0), _Ap(0), _Ai(0), _Ax(0), _perm(0)
+  _n(0), _Ap(nullptr), _Ai(nullptr), _Ax(nullptr), _perm(nullptr)
 {
 }
 
 MarginalCovarianceCholesky::~MarginalCovarianceCholesky()
-{
-}
+= default;
 
 void MarginalCovarianceCholesky::setCholeskyFactor(int n, int* Lp, int* Li, number_t* Lx, int* permInv)
 {
@@ -107,8 +106,7 @@ void MarginalCovarianceCholesky::computeCovariance(number_t** covBlocks, const s
   _map.clear();
   int base = 0;
   vector<MatrixElem> elemsToCompute;
-  for (size_t i = 0; i < blockIndices.size(); ++i) {
-    int nbase = blockIndices[i];
+  for (int nbase : blockIndices) {
     int vdim = nbase - base;
     for (int rr = 0; rr < vdim; ++rr)
       for (int cc = rr; cc < vdim; ++cc) {
@@ -125,8 +123,7 @@ void MarginalCovarianceCholesky::computeCovariance(number_t** covBlocks, const s
   sort(elemsToCompute.begin(), elemsToCompute.end());
 
   // compute the inverse elements we need
-  for (size_t i = 0; i < elemsToCompute.size(); ++i) {
-    const MatrixElem& me = elemsToCompute[i];
+  for (auto & me : elemsToCompute) {
     computeEntry(me.r, me.c);
   }
 
@@ -163,9 +160,9 @@ void MarginalCovarianceCholesky::computeCovariance(SparseBlockMatrix<MatrixX>& s
               rowBlockIndices.size(), true);
   _map.clear();
   vector<MatrixElem> elemsToCompute;
-  for (size_t i = 0; i < blockIndices.size(); ++i) {
-    int blockRow=blockIndices[i].first;
-    int blockCol=blockIndices[i].second;
+  for (const auto & blockIndice : blockIndices) {
+    int blockRow=blockIndice.first;
+    int blockCol=blockIndice.second;
     assert(blockRow>=0);
     assert(blockRow < (int)rowBlockIndices.size());
     assert(blockCol>=0);
@@ -192,15 +189,14 @@ void MarginalCovarianceCholesky::computeCovariance(SparseBlockMatrix<MatrixX>& s
   sort(elemsToCompute.begin(), elemsToCompute.end());
 
   // compute the inverse elements we need
-  for (size_t i = 0; i < elemsToCompute.size(); ++i) {
-    const MatrixElem& me = elemsToCompute[i];
+  for (auto & me : elemsToCompute) {
     computeEntry(me.r, me.c);
   }
 
   // set the marginal covariance
-  for (size_t i = 0; i < blockIndices.size(); ++i) {
-    int blockRow=blockIndices[i].first;
-    int blockCol=blockIndices[i].second;
+  for (const auto & blockIndice : blockIndices) {
+    int blockRow=blockIndice.first;
+    int blockCol=blockIndice.second;
     int rowBase=spinv.rowBaseOfBlock(blockRow);
     int colBase=spinv.colBaseOfBlock(blockCol);
 

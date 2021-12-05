@@ -50,7 +50,7 @@ namespace g2o {
   {
     public:
       //! this is the type of the elementary block, it is an Eigen::Matrix.
-      typedef MatrixType SparseMatrixBlock;
+      using SparseMatrixBlock = MatrixType;
 
       //! columns of the matrix
       int cols() const {return _colBlockIndices.size() ? _colBlockIndices.back() : 0;}
@@ -68,7 +68,7 @@ namespace g2o {
         RowBlock(int r, MatrixType* b) : row(r), block(b) {}
         bool operator<(const RowBlock& other) const { return row < other.row;}
       };
-      typedef std::vector<RowBlock>      SparseColumn;
+      using SparseColumn = std::vector<RowBlock>;
 
       SparseBlockMatrixCCS(const std::vector<int>& rowIndices, const std::vector<int>& colIndices) :
         _rowBlockIndices(rowIndices), _colBlockIndices(colIndices)
@@ -212,14 +212,14 @@ namespace g2o {
   {
     public:
       //! this is the type of the elementary block, it is an Eigen::Matrix.
-      typedef MatrixType SparseMatrixBlock;
+      using SparseMatrixBlock = MatrixType;
 
       //! columns of the matrix
       int cols() const {return _colBlockIndices.size() ? _colBlockIndices.back() : 0;}
       //! rows of the matrix
       int rows() const {return _rowBlockIndices.size() ? _rowBlockIndices.back() : 0;}
 
-      typedef std::unordered_map<int, MatrixType*> SparseColumn;
+      using SparseColumn = std::unordered_map<int, MatrixType *>;
 
       SparseBlockMatrixHashMap(const std::vector<int>& rowIndices, const std::vector<int>& colIndices) :
         _rowBlockIndices(rowIndices), _colBlockIndices(colIndices)
@@ -258,7 +258,7 @@ namespace g2o {
         if (foundIt == sparseColumn.end()) {
           int rb = rowsOfBlock(r);
           int cb = colsOfBlock(c);
-          MatrixType* m = new MatrixType(rb, cb);
+          auto* m = new MatrixType(rb, cb);
           if (zeroBlock)
             m->setZero();
           sparseColumn[r] = m;

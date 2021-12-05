@@ -45,7 +45,7 @@ template <typename MatrixType>
 class LinearSolver {
  public:
   LinearSolver() : _writeDebug(true){};
-  virtual ~LinearSolver() {}
+  virtual ~LinearSolver() = default;
 
   /**
    * init for operating on matrices with a different non-zero pattern like before
@@ -115,7 +115,7 @@ class LinearSolver {
       const SparseBlockMatrix<MatrixType>& A, const Eigen::MatrixBase<BlockDerived>& p,
       const Eigen::MatrixBase<ScalarDerived>& scalar /* output */) {
     int n = A.cols();
-    Eigen::MatrixBase<ScalarDerived>& scalarPermutation =
+    auto& scalarPermutation =
         const_cast<Eigen::MatrixBase<ScalarDerived>&>(scalar);
     if (scalarPermutation.size() == 0) scalarPermutation.derived().resize(n);
     if (scalarPermutation.size() < n) scalarPermutation.derived().resize(2 * n);

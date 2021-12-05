@@ -58,7 +58,7 @@ namespace g2o {
           ParameterVector _parameters;
       };
 
-      Cache(CacheContainer* container_ = nullptr,
+      explicit Cache(CacheContainer* container_ = nullptr,
             const ParameterVector& parameters_ = ParameterVector());
 
       CacheKey key() const;
@@ -68,7 +68,7 @@ namespace g2o {
 
       void update();
 
-      virtual HyperGraph::HyperGraphElementType elementType() const { return HyperGraph::HGET_CACHE;}
+      HyperGraph::HyperGraphElementType elementType() const override { return HyperGraph::HGET_CACHE;}
 
     protected:
       //! redefine this to do the update

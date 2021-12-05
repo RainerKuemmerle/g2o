@@ -64,7 +64,7 @@ class G2O_CORE_API HyperGraphAction {
   /**
    * re-implement to carry out an action given the graph
    */
-  virtual bool operator()(const HyperGraph* graph, Parameters* parameters = 0);
+  virtual bool operator()(const HyperGraph* graph, Parameters* parameters = nullptr);
 };
 
 /**
@@ -114,7 +114,7 @@ class G2O_CORE_API HyperGraphElementActionCollection : public HyperGraphElementA
    * calling functions, they return a pointer to the instance of action in actionMap that was active
    * on element
    */
-  virtual bool operator()(HyperGraph::HyperGraphElement* element, Parameters* parameters);
+  bool operator()(HyperGraph::HyperGraphElement* element, Parameters* parameters) override;
   ActionMap& actionMap() { return _actionMap; }
   //! inserts an action in the pool. The action should have the same name of the container.
   //! returns false on failure (the container has a different name than the action);
@@ -161,7 +161,7 @@ class G2O_CORE_API HyperGraphActionLibrary {
  * apply an action to all the elements of the graph.
  */
 void G2O_CORE_API applyAction(HyperGraph* graph, HyperGraphElementAction* action,
-                              HyperGraphElementAction::Parameters* parameters = 0,
+                              HyperGraphElementAction::Parameters* parameters = nullptr,
                               const std::string& typeName = "");
 
 /**
@@ -172,7 +172,7 @@ class G2O_CORE_API WriteGnuplotAction : public HyperGraphElementAction {
   struct G2O_CORE_API Parameters : public HyperGraphElementAction::Parameters {
     std::ostream* os;
   };
-  WriteGnuplotAction(const std::string& typeName_);
+  explicit WriteGnuplotAction(const std::string& typeName_);
 };
 
 /**
@@ -185,7 +185,7 @@ class G2O_CORE_API DrawAction : public HyperGraphElementAction {
    public:
     Parameters();
   };
-  DrawAction(const std::string& typeName_);
+  explicit DrawAction(const std::string& typeName_);
 
  protected:
   virtual bool refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_);

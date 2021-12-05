@@ -50,7 +50,7 @@ namespace g2o {
     public:
       RobustKernel();
       explicit RobustKernel(number_t delta);
-      virtual ~RobustKernel() {}
+      virtual ~RobustKernel() = default;
       /**
        * compute the scaling factor for a error:
        * The error is e^T Omega e
@@ -71,7 +71,7 @@ namespace g2o {
     protected:
       number_t _delta;
   };
-  typedef std::shared_ptr<RobustKernel> RobustKernelPtr;
+  using RobustKernelPtr = std::shared_ptr<RobustKernel>;
 
 } // end namespace g2o
 

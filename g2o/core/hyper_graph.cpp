@@ -37,37 +37,37 @@ namespace g2o {
 static std::shared_ptr<HyperGraph::Vertex> kNonExistantVertex(nullptr);
 
 HyperGraph::Data::Data() {
-  _next = 0;
-  _dataContainer = 0;
+  _next = nullptr;
+  _dataContainer = nullptr;
 }
 
-HyperGraph::Data::~Data() {}
+HyperGraph::Data::~Data() = default;
 
 HyperGraph::Vertex::Vertex(int id) : _id(id) {}
 
-HyperGraph::Vertex::~Vertex() {}
+HyperGraph::Vertex::~Vertex() = default;
 
 HyperGraph::Edge::Edge(int id) : _id(id) {}
 
-HyperGraph::Edge::~Edge() {}
+HyperGraph::Edge::~Edge() = default;
 
 int HyperGraph::Edge::numUndefinedVertices() const {
   return std::count_if(_vertices.begin(), _vertices.end(),
                        [](const std::shared_ptr<Vertex>& ptr) { return ptr.get() == nullptr; });
 }
 
-void HyperGraph::Edge::resize(size_t size) { _vertices.resize(size, 0); }
+void HyperGraph::Edge::resize(size_t size) { _vertices.resize(size, nullptr); }
 
 void HyperGraph::Edge::setId(int id) { _id = id; }
 
 std::shared_ptr<HyperGraph::Vertex> HyperGraph::vertex(int id) {
-  VertexIDMap::iterator it = _vertices.find(id);
+  auto it = _vertices.find(id);
   if (it == _vertices.end()) return std::shared_ptr<HyperGraph::Vertex>();
   return it->second;
 }
 
 std::shared_ptr<const HyperGraph::Vertex> HyperGraph::vertex(int id) const {
-  VertexIDMap::const_iterator it = _vertices.find(id);
+  auto it = _vertices.find(id);
   if (it == _vertices.end()) return std::shared_ptr<HyperGraph::Vertex>();
   return it->second;
 }
@@ -128,7 +128,7 @@ bool HyperGraph::setEdgeVertex(const std::shared_ptr<Edge>& e, int pos, const st
 
 bool HyperGraph::mergeVertices(std::shared_ptr<Vertex>& vBig, std::shared_ptr<Vertex>& vSmall,
                                bool erase) {
-  VertexIDMap::iterator it = _vertices.find(vBig->id());
+  auto it = _vertices.find(vBig->id());
   if (it == _vertices.end()) return false;
 
   it = _vertices.find(vSmall->id());
@@ -136,8 +136,8 @@ bool HyperGraph::mergeVertices(std::shared_ptr<Vertex>& vBig, std::shared_ptr<Ve
 
   EdgeSetWeak tmp = vSmall->edges();
   bool ok = true;
-  for (EdgeSetWeak::iterator it = tmp.begin(); it != tmp.end(); ++it) {
-    std::shared_ptr<HyperGraph::Edge> e = it->lock();
+  for (const auto & it : tmp) {
+    std::shared_ptr<HyperGraph::Edge> e = it.lock();
     for (size_t i = 0; i < e->vertices().size(); i++) {
       if (e->vertex(i) == vSmall) {
         ok &= setEdgeVertex(e, i, vBig);
@@ -149,12 +149,12 @@ bool HyperGraph::mergeVertices(std::shared_ptr<Vertex>& vBig, std::shared_ptr<Ve
 }
 
 bool HyperGraph::detachVertex(const std::shared_ptr<Vertex>& v) {
-  VertexIDMap::iterator it = _vertices.find(v->id());
+  auto it = _vertices.find(v->id());
   if (it == _vertices.end()) return false;
   assert(it->second == v);
   EdgeSetWeak tmp = v->edges();
-  for (EdgeSetWeak::iterator it = tmp.begin(); it != tmp.end(); ++it) {
-    std::shared_ptr<HyperGraph::Edge> e = it->lock();
+  for (const auto & it : tmp) {
+    std::shared_ptr<HyperGraph::Edge> e = it.lock();
     for (size_t i = 0; i < e->vertices().size(); i++) {
       if (v == e->vertex(i)) setEdgeVertex(e, i, kNonExistantVertex);
     }
@@ -169,13 +169,13 @@ bool HyperGraph::removeVertex(const std::shared_ptr<Vertex>& v, bool detach) {
       assert(0 && "inconsistency in detaching vertex");
     }
   }
-  VertexIDMap::iterator it = _vertices.find(v->id());
+  auto it = _vertices.find(v->id());
   if (it == _vertices.end()) return false;
   assert(it->second == v);
   // remove all edges which are entering or leaving v;
   EdgeSetWeak tmp = v->edges();
-  for (EdgeSetWeak::iterator it = tmp.begin(); it != tmp.end(); ++it) {
-    if (!removeEdge(it->lock())) {
+  for (const auto & it : tmp) {
+    if (!removeEdge(it.lock())) {
       assert(0 && "error in erasing vertex");
     }
   }
@@ -184,20 +184,20 @@ bool HyperGraph::removeVertex(const std::shared_ptr<Vertex>& v, bool detach) {
 }
 
 bool HyperGraph::removeEdge(const std::shared_ptr<Edge>& e) {
-  EdgeSet::iterator it = _edges.find(e);
+  auto it = _edges.find(e);
   if (it == _edges.end()) return false;
   _edges.erase(it);
   for (auto vit = e->vertices().begin(); vit != e->vertices().end(); ++vit) {
     auto& v = *vit;
     if (!v) continue;
-    EdgeSetWeak::iterator foundIt = v->edges().find(e);
+    auto foundIt = v->edges().find(e);
     assert(foundIt != v->edges().end());
     v->edges().erase(foundIt);
   }
   return true;
 }
 
-HyperGraph::HyperGraph() {}
+HyperGraph::HyperGraph() = default;
 
 void HyperGraph::clear() {
   _vertices.clear();

@@ -45,7 +45,7 @@ namespace g2o {
    */
   class G2O_CORE_API EstimatePropagatorCost {
     public:
-      EstimatePropagatorCost (SparseOptimizer* graph);
+      explicit EstimatePropagatorCost (SparseOptimizer* graph);
       virtual number_t operator()(OptimizableGraph::Edge* edge, const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to_) const;
       virtual const char* name() const { return "spanning tree";}
     protected:
@@ -60,9 +60,9 @@ namespace g2o {
    */
   class G2O_CORE_API EstimatePropagatorCostOdometry : public EstimatePropagatorCost {
     public:
-      EstimatePropagatorCostOdometry(SparseOptimizer* graph);
-      virtual number_t operator()(OptimizableGraph::Edge* edge, const OptimizableGraph::VertexSet& from_, OptimizableGraph::Vertex* to_) const;
-      virtual const char* name() const { return "odometry";}
+      explicit EstimatePropagatorCostOdometry(SparseOptimizer* graph);
+      number_t operator()(OptimizableGraph::Edge* edge, const OptimizableGraph::VertexSet& from_, OptimizableGraph::Vertex* to_) const override;
+      const char* name() const override { return "odometry";}
   };
 
   /**
@@ -84,7 +84,7 @@ namespace g2o {
         }
       };
 
-      typedef EstimatePropagatorCost PropagateCost;
+      using PropagateCost = EstimatePropagatorCost;
 
       class AdjacencyMapEntry;
 
@@ -137,7 +137,7 @@ namespace g2o {
                                               AdjacencyMapEntry, VertexIDHashFunction>;
 
      public:
-      EstimatePropagator(OptimizableGraph* g);
+      explicit EstimatePropagator(OptimizableGraph* g);
       OptimizableGraph::VertexSet& visited() {return _visited; }
       AdjacencyMap& adjacencyMap() {return _adjacencyMap; }
       OptimizableGraph* graph() {return _graph;}
