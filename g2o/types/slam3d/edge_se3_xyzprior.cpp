@@ -65,7 +65,9 @@ namespace g2o {
   }
 
   void EdgeSE3XYZPrior::linearizeOplus() {
-    _jacobianOplusXi << Matrix3::Identity();
+    const VertexSE3* v = static_cast<const VertexSE3*>(_vertices[0]);
+    _jacobianOplusXi.block<3, 3>(0, 0) = v->estimate().rotation();
+    _jacobianOplusXi.block<3, 3>(0, 3) = Eigen::Matrix3d::Zero();
   }
 
   bool EdgeSE3XYZPrior::setMeasurementFromState() {
