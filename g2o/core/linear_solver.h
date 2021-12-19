@@ -44,7 +44,7 @@ namespace g2o {
 template <typename MatrixType>
 class LinearSolver {
  public:
-  LinearSolver() : _writeDebug(true){};
+  LinearSolver()  {};
   virtual ~LinearSolver() = default;
 
   /**
@@ -131,7 +131,7 @@ class LinearSolver {
   }
 
   protected:
-   bool _writeDebug;
+   bool _writeDebug{true};
 };
 
 /**
@@ -140,7 +140,7 @@ class LinearSolver {
 template <typename MatrixType>
 class LinearSolverCCS : public LinearSolver<MatrixType> {
  public:
-  LinearSolverCCS() : LinearSolver<MatrixType>(), _ccsMatrix(0), _blockOrdering(true) {}
+  LinearSolverCCS() : LinearSolver<MatrixType>(), _ccsMatrix(0) {}
   ~LinearSolverCCS() { delete _ccsMatrix; }
 
   virtual bool solveBlocks(number_t**& blocks, const SparseBlockMatrix<MatrixType>& A) {
@@ -166,7 +166,7 @@ class LinearSolverCCS : public LinearSolver<MatrixType> {
 
  protected:
   SparseBlockMatrixCCS<MatrixType>* _ccsMatrix;
-  bool _blockOrdering;
+  bool _blockOrdering{true};
 
   void initMatrixStructure(const SparseBlockMatrix<MatrixType>& A) {
     delete _ccsMatrix;

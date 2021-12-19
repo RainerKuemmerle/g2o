@@ -95,8 +95,8 @@ namespace g2o {
 
     protected:
       WorkspaceVector _workspace;   ///< the memory pre-allocated for computing the Jacobians
-      int _maxNumVertices;          ///< the maximum number of vertices connected by a hyper-edge
-      int _maxDimension;            ///< the maximum dimension (number of elements) for a Jacobian
+      int _maxNumVertices{-1};          ///< the maximum number of vertices connected by a hyper-edge
+      int _maxDimension{-1};            ///< the maximum dimension (number of elements) for a Jacobian
   };
 
 } // end namespace

@@ -53,18 +53,18 @@ namespace g2o {
       using SparseMatrixBlock = MatrixType;
 
       //! columns of the matrix
-      int cols() const {return _colBlockIndices.size() ? _colBlockIndices.back() : 0;}
+      int cols() const {return !_colBlockIndices.empty() ? _colBlockIndices.back() : 0;}
       //! rows of the matrix
-      int rows() const {return _rowBlockIndices.size() ? _rowBlockIndices.back() : 0;}
+      int rows() const {return !_rowBlockIndices.empty() ? _rowBlockIndices.back() : 0;}
 
       /**
        * \brief A block within a column
        */
       struct RowBlock
       {
-        int row;              ///< row of the block
+        int row{-1};              ///< row of the block
         MatrixType* block;    ///< matrix pointer for the block
-        RowBlock() : row(-1), block(0) {}
+        RowBlock() :  block(0) {}
         RowBlock(int r, MatrixType* b) : row(r), block(b) {}
         bool operator<(const RowBlock& other) const { return row < other.row;}
       };
@@ -215,9 +215,9 @@ namespace g2o {
       using SparseMatrixBlock = MatrixType;
 
       //! columns of the matrix
-      int cols() const {return _colBlockIndices.size() ? _colBlockIndices.back() : 0;}
+      int cols() const {return !_colBlockIndices.empty() ? _colBlockIndices.back() : 0;}
       //! rows of the matrix
-      int rows() const {return _rowBlockIndices.size() ? _rowBlockIndices.back() : 0;}
+      int rows() const {return !_rowBlockIndices.empty() ? _rowBlockIndices.back() : 0;}
 
       using SparseColumn = std::unordered_map<int, MatrixType *>;
 

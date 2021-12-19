@@ -104,7 +104,7 @@ namespace g2o {
       void printProperties(std::ostream& os) const;
 
     protected:
-      SparseOptimizer* _optimizer;   ///< the optimizer the solver is working on
+      SparseOptimizer* _optimizer{nullptr};   ///< the optimizer the solver is working on
       PropertyMap _properties;       ///< the properties of your solver, use this to store the parameters of your solver
 
     private:

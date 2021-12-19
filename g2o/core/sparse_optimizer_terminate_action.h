@@ -56,8 +56,8 @@ namespace g2o {
 
     protected:
       number_t _gainThreshold;
-      number_t _lastChi;
-      bool _auxTerminateFlag;
+      number_t _lastChi{0};
+      bool _auxTerminateFlag{false};
       int _maxIterations;
 
       void setOptimizerStopFlag(const SparseOptimizer* optimizer, bool stop);

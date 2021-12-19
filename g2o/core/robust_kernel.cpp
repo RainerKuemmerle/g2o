@@ -28,8 +28,8 @@
 
 namespace g2o {
 
-RobustKernel::RobustKernel() :
-  _delta(1.)
+RobustKernel::RobustKernel() 
+  
 {
 }
 

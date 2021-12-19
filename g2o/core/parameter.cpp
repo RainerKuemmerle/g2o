@@ -28,7 +28,7 @@
 
 namespace g2o {
 
-  Parameter::Parameter() : _id(-1)
+  Parameter::Parameter()  
   {
   }
 

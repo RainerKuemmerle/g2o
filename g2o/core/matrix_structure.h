@@ -52,17 +52,17 @@ class G2O_CORE_API MatrixStructure
      */
     bool write(const char* filename) const;
 
-    int n;    ///< A is m-by-n.  n must be >= 0.
-    int m;    ///< A is m-by-n.  m must be >= 0.
-    int* Ap;  ///< column pointers for A, of size n+1
-    int* Aii; ///< row indices of A, of size nz = Ap [n]
+    int n{0};    ///< A is m-by-n.  n must be >= 0.
+    int m{0};    ///< A is m-by-n.  m must be >= 0.
+    int* Ap{nullptr};  ///< column pointers for A, of size n+1
+    int* Aii{nullptr}; ///< row indices of A, of size nz = Ap [n]
 
     //! max number of non-zeros blocks
     int nzMax() const { return maxNz;}
 
   protected:
-    int maxN;     ///< size of the allocated memory
-    int maxNz;    ///< size of the allocated memory
+    int maxN{0};     ///< size of the allocated memory
+    int maxNz{0};    ///< size of the allocated memory
 };
 
 } // end namespace

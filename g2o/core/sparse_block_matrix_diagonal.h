@@ -50,9 +50,9 @@ namespace g2o {
       using SparseMatrixBlock = MatrixType;
 
       //! columns of the matrix
-      int cols() const {return _blockIndices.size() ? _blockIndices.back() : 0;}
+      int cols() const {return !_blockIndices.empty() ? _blockIndices.back() : 0;}
       //! rows of the matrix
-      int rows() const {return _blockIndices.size() ? _blockIndices.back() : 0;}
+      int rows() const {return !_blockIndices.empty() ? _blockIndices.back() : 0;}
 
       using DiagonalVector = std::vector<MatrixType, Eigen::aligned_allocator<MatrixType>>;
 

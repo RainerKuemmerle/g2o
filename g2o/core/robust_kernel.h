@@ -69,7 +69,7 @@ namespace g2o {
       number_t delta() const { return _delta;}
 
     protected:
-      number_t _delta;
+      number_t _delta{1.};
   };
   using RobustKernelPtr = std::shared_ptr<RobustKernel>;
 

@@ -84,8 +84,8 @@ bool ParameterContainer::read(std::istream& is,
     int bytesRead = readLine(is, currentLine);
     if (bytesRead == -1) break;
     currentLine >> token;
-    if (bytesRead == 0 || token.size() == 0 || token[0] == '#') continue;
-    if (_renamedTypesLookup && _renamedTypesLookup->size() > 0) {
+    if (bytesRead == 0 || token.empty() || token[0] == '#') continue;
+    if (_renamedTypesLookup && !_renamedTypesLookup->empty()) {
       auto foundIt = _renamedTypesLookup->find(token);
       if (foundIt != _renamedTypesLookup->end()) {
         token = foundIt->second;

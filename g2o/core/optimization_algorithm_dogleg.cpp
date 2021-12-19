@@ -42,9 +42,9 @@ namespace g2o {
       : OptimizationAlgorithmWithHessian(*solver.get()),
         m_solver{ std::move(solver) }
   {
-    _userDeltaInit = _properties.makeProperty<Property<number_t>>("initialDelta", (number_t)1e4);
+    _userDeltaInit = _properties.makeProperty<Property<number_t>>("initialDelta", static_cast<number_t>(1e4));
     _maxTrialsAfterFailure = _properties.makeProperty<Property<int>>("maxTrialsAfterFailure", 100);
-    _initialLambda = _properties.makeProperty<Property<number_t>>("initialLambda", (number_t)1e-7);
+    _initialLambda = _properties.makeProperty<Property<number_t>>("initialLambda", static_cast<number_t>(1e-7));
     _lamdbaFactor = _properties.makeProperty<Property<number_t>>("lambdaFactor", 10.);
     _delta = _userDeltaInit->value();
     _lastStep = STEP_UNDEFINED;

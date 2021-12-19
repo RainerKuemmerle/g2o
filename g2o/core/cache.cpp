@@ -44,7 +44,7 @@ namespace g2o {
   }
 
   Cache::Cache(CacheContainer* container_, const ParameterVector& parameters_) :
-    _updateNeeded(true), _parameters(parameters_)
+     _parameters(parameters_)
   {
   }
 

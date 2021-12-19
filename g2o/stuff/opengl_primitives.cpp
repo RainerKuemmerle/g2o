@@ -254,12 +254,12 @@ void drawSlice(GLfloat radius, GLfloat height, GLfloat fov, int slices_per_circl
   GLfloat lower_z = -height_half;
   GLfloat upper_z =  height_half;
 
-  GLfloat last_x = float(std::cos(-fov_rad * 0.5f) * radius);
-  GLfloat last_y = float(std::sin(-fov_rad * 0.5f) * radius);
+  auto last_x = float(std::cos(-fov_rad * 0.5f) * radius);
+  auto last_y = float(std::sin(-fov_rad * 0.5f) * radius);
 
   glPushMatrix();
   glBegin(GL_TRIANGLES);
-  glNormal3f((float)std::sin(-fov_rad * 0.5), (float)-std::cos(-fov_rad * 0.5), 0.f);
+  glNormal3f(static_cast<float>(std::sin(-fov_rad * 0.5)), static_cast<float>(-std::cos(-fov_rad * 0.5)), 0.f);
   glVertex3f(0.f, 0.f, upper_z);
   glVertex3f(0.f, 0.f, lower_z);
   glVertex3f(last_x, last_y, upper_z);
@@ -270,10 +270,10 @@ void drawSlice(GLfloat radius, GLfloat height, GLfloat fov, int slices_per_circl
   double start_angle = -0.5*fov_rad + angle_step;
   double angle       = start_angle;
   for (int i = 0; i < num_slices; ++i) {
-    GLfloat x = float(std::cos(angle) * radius);
-    GLfloat y = float(std::sin(angle) * radius);
-    GLfloat front_normal_x = (float)std::cos(angle + angle_step_half);
-    GLfloat front_normal_y = (float)std::sin(angle + angle_step_half);
+    auto x = float(std::cos(angle) * radius);
+    auto y = float(std::sin(angle) * radius);
+    auto front_normal_x = static_cast<float>(std::cos(angle + angle_step_half));
+    auto front_normal_y = static_cast<float>(std::sin(angle + angle_step_half));
 
     // lower triangle
     glNormal3f(0.f, 0.f, -1.f);

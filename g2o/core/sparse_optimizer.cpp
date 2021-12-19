@@ -47,7 +47,7 @@ namespace g2o{
   using namespace std;
 
   SparseOptimizer::SparseOptimizer() :
-    _forceStopFlag(nullptr), _verbose(false), _algorithm(nullptr), _computeBatchStatistics(false)
+     _algorithm(nullptr) 
   {
     _graphActions.resize(AT_NUM_ELEMENTS);
   }
@@ -61,7 +61,7 @@ namespace g2o{
   {
     // call the callbacks in case there is something registered
     HyperGraphActionSet& actions = _graphActions[AT_COMPUTEACTIVERROR];
-    if (actions.size() > 0) {
+    if (!actions.empty()) {
       for (const auto & action : actions)
         (*action)(this);
     }
@@ -163,7 +163,7 @@ namespace g2o{
   }
 
   bool SparseOptimizer::buildIndexMapping(SparseOptimizer::VertexContainer& vlist){
-    if (! vlist.size()){
+    if (vlist.empty()){
       _ivMap.clear();
       return false;
     }
@@ -203,7 +203,7 @@ namespace g2o{
   }
 
   bool SparseOptimizer::initializeOptimization(HyperGraph::VertexSet& vset, int level){
-    if (edges().size() == 0) {
+    if (edges().empty()) {
       cerr << __PRETTY_FUNCTION__ << ": Attempt to initialize an empty graph" << endl;
       return false;
     }
@@ -357,7 +357,7 @@ namespace g2o{
 
   int SparseOptimizer::optimize(int iterations, bool online)
   {
-    if (_ivMap.size() == 0) {
+    if (_ivMap.empty()) {
       cerr << __PRETTY_FUNCTION__ << ": 0 vertices to optimize, maybe forgot to call initializeOptimization()" << endl;
       return -1;
     }

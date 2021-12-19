@@ -285,8 +285,8 @@ namespace g2o {
     bool removeComputeErrorAction(const std::shared_ptr<HyperGraphAction>& action);
 
     protected:
-    bool* _forceStopFlag;
-    bool _verbose;
+    bool* _forceStopFlag{nullptr};
+    bool _verbose{false};
 
     VertexContainerRaw _ivMap;
     VertexContainer _activeVertices;   ///< sorted according to VertexIDCompare
@@ -303,7 +303,7 @@ namespace g2o {
     void clearIndexMapping();
 
     BatchStatisticsContainer _batchStatistics;   ///< global statistics of the optimizer, e.g., timing, num-non-zeros
-    bool _computeBatchStatistics;
+    bool _computeBatchStatistics{false};
   };
 } // end namespace
 

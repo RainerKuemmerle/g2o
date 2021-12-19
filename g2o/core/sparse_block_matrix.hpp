@@ -36,7 +36,7 @@ namespace g2o {
 
   template <class MatrixType>
   SparseBlockMatrix<MatrixType>::SparseBlockMatrix( ):
-    _blockCols(0), _hasStorage(true)
+    _blockCols(0) 
   {
   }
 

@@ -384,15 +384,15 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
     CacheContainer* cacheContainer();
 
    protected:
-    OptimizableGraph* _graph;
-    int _hessianIndex;
-    bool _fixed;
-    bool _marginalized;
+    OptimizableGraph* _graph{nullptr};
+    int _hessianIndex{-1};
+    bool _fixed{false};
+    bool _marginalized{false};
     int _dimension;
-    int _colInHessian;
+    int _colInHessian{-1};
     OpenMPMutex _quadraticFormMutex;
 
-    CacheContainer* _cacheContainer;
+    CacheContainer* _cacheContainer{nullptr};
 
     /**
      * update the position of the node from the parameters in v.
@@ -537,8 +537,8 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
     const std::vector<int>& parameterIds() const { return _parameterIds; }
 
    protected:
-    int _dimension;
-    int _level;
+    int _dimension{-1};
+    int _level{0};
     std::shared_ptr<RobustKernel> _robustKernel;
     long long _internalId;
 

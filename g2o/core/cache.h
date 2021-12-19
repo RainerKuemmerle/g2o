@@ -74,7 +74,7 @@ namespace g2o {
       //! redefine this to do the update
       virtual void updateImpl() = 0;
 
-      bool _updateNeeded;
+      bool _updateNeeded{true};
       ParameterVector _parameters;
       CacheContainer* _container;
   };

@@ -68,9 +68,9 @@ class SparseBlockMatrix {
     using SparseMatrixBlock = MatrixType;
 
     //! columns of the matrix
-    inline int cols() const {return _colBlockIndices.size() ? _colBlockIndices.back() : 0;}
+    inline int cols() const {return !_colBlockIndices.empty() ? _colBlockIndices.back() : 0;}
     //! rows of the matrix
-    inline int rows() const {return _rowBlockIndices.size() ? _rowBlockIndices.back() : 0;}
+    inline int rows() const {return !_rowBlockIndices.empty() ? _rowBlockIndices.back() : 0;}
 
     using IntBlockMap = std::map<int, SparseMatrixBlock *>;
 
@@ -225,7 +225,7 @@ class SparseBlockMatrix {
     //! array of maps of blocks. The index of the array represent a block column of the matrix
     //! and the block column is stored as a map row_block -> matrix_block_ptr.
     std::vector <IntBlockMap> _blockCols;
-    bool _hasStorage;
+    bool _hasStorage{true};
 
   private:
     template <class MatrixTransposedType>

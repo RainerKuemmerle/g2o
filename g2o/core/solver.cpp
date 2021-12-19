@@ -32,9 +32,7 @@
 
 namespace g2o {
 
-Solver::Solver() :
-  _optimizer(nullptr), _x(nullptr), _b(nullptr), _xSize(0), _maxXSize(0),
-  _isLevenberg(false), _additionalVectorSpace(0)
+Solver::Solver()  
 {
 }
 

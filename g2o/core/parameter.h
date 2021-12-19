@@ -47,7 +47,7 @@ namespace g2o {
         void setId(int id_);
         HyperGraph::HyperGraphElementType elementType() const override { return HyperGraph::HGET_PARAMETER;}
       protected:
-        int _id;
+        int _id{-1};
     };
 
     using ParameterVector = std::vector<std::shared_ptr<Parameter>>;

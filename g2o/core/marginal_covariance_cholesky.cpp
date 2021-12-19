@@ -45,8 +45,7 @@ struct MatrixElem
   }
 };
 
-MarginalCovarianceCholesky::MarginalCovarianceCholesky() :
-  _n(0), _Ap(nullptr), _Ai(nullptr), _Ax(nullptr), _perm(nullptr)
+MarginalCovarianceCholesky::MarginalCovarianceCholesky()  
 {
 }
 

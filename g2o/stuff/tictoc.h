@@ -59,7 +59,7 @@ namespace g2o {
    class G2O_STUFF_API ScopedTictoc
    {
      public:
-       ScopedTictoc(const char* algorithmPart);
+       explicit ScopedTictoc(const char* algorithmPart);
        ~ScopedTictoc();
      protected:
        std::string _algorithmPart;

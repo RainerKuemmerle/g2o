@@ -75,11 +75,11 @@ namespace g2o {
 
     protected:
       // information about the cholesky factor (lower triangle)
-      int _n;           ///< L is an n X n matrix
-      int* _Ap;         ///< column pointer of the CCS storage
-      int* _Ai;         ///< row indices of the CCS storage
-      number_t* _Ax;      ///< values of the cholesky factor
-      int* _perm;       ///< permutation of the cholesky factor. Variable re-ordering for better fill-in
+      int _n{0};           ///< L is an n X n matrix
+      int* _Ap{nullptr};         ///< column pointer of the CCS storage
+      int* _Ai{nullptr};         ///< row indices of the CCS storage
+      number_t* _Ax{nullptr};      ///< values of the cholesky factor
+      int* _perm{nullptr};       ///< permutation of the cholesky factor. Variable re-ordering for better fill-in
 
       LookupMap _map;             ///< hash look up table for the already computed entries
       std::vector<number_t> _diag;  ///< cache 1 / H_ii to avoid recalculations

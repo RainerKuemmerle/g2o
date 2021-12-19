@@ -42,8 +42,7 @@ struct ColSort
   }
 };
 
-MatrixStructure::MatrixStructure() :
-  n(0), m(0), Ap(nullptr), Aii(nullptr), maxN(0), maxNz(0)
+MatrixStructure::MatrixStructure()  
 {
 }
 

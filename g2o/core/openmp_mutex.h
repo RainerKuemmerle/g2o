@@ -88,8 +88,8 @@ namespace g2o {
       ~ScopedOpenMPMutex() { _mutex->unlock(); }
     private:
       OpenMPMutex* const _mutex;
-      ScopedOpenMPMutex(const ScopedOpenMPMutex&);
-      void operator=(const ScopedOpenMPMutex&);
+      ScopedOpenMPMutex(const ScopedOpenMPMutex&) = delete;
+      void operator=(const ScopedOpenMPMutex&) = delete;
   };
 
 }

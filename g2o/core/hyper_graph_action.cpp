@@ -152,7 +152,7 @@ bool HyperGraphActionLibrary::unregisterAction(
         dynamic_cast<HyperGraphElementActionCollection*>(it.second.get());
     if (collection != nullptr) {
       collection->unregisterAction(action);
-      if (collection->actionMap().size() == 0) {
+      if (collection->actionMap().empty()) {
         collectionDeleteList.push_back(collection);
       }
     }

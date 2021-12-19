@@ -34,8 +34,7 @@ using namespace std;
 
 namespace g2o {
 
-  JacobianWorkspace::JacobianWorkspace() :
-    _maxNumVertices(-1), _maxDimension(-1)
+  JacobianWorkspace::JacobianWorkspace()  
   {
   }
 

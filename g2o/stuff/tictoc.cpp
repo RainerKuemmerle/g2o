@@ -44,26 +44,23 @@ namespace g2o {
    */
   struct TicTocElement
   {
-    number_t ticTime;                         ///< the time of the last tic
-    number_t totalTime;                       ///< the total time of this part of the algorithm
-    int numCalls;                           ///< the number of calls
+    number_t ticTime = 0.;                         ///< the time of the last tic
+    number_t totalTime = 0.;                       ///< the total time of this part of the algorithm
+    int numCalls = 0;                           ///< the number of calls
     number_t minTime;
-    number_t maxTime;
-    number_t exponentialMovingAverage;        ///< exponential moving average with alpha = 0.01
+    number_t maxTime = 0.;
+    number_t exponentialMovingAverage = 0.;        ///< exponential moving average with alpha = 0.01
     std::string algorithmPart;              ///< name / description of the code block
-    bool clockIsRunning;
+    bool clockIsRunning = true;
     TicTocElement() :
-      ticTime(0.), totalTime(0.), numCalls(0),
-      minTime(std::numeric_limits<number_t>::max()),
-      maxTime(0.), exponentialMovingAverage(0.),
-      clockIsRunning(true)
+      minTime(std::numeric_limits<number_t>::max())
     {}
     bool operator<(const TicTocElement& other) const
     {
       return totalTime < other.totalTime;
     }
   };
-  typedef std::map<std::string, TicTocElement> TicTocMap;
+  using TicTocMap = std::map<std::string, TicTocElement>;
 
   /**
    * \brief helper for printing the struct at the end of the lifetime of the program
@@ -74,7 +71,7 @@ namespace g2o {
     bool enabled;
     TicTocInitializer()
     {
-      enabled = getenv("G2O_ENABLE_TICTOC") != NULL;
+      enabled = getenv("G2O_ENABLE_TICTOC") != nullptr;
     }
     ~TicTocInitializer()
     {
@@ -82,7 +79,7 @@ namespace g2o {
         return;
       }
 
-      if (tictocElements.size() > 0) {
+      if (!tictocElements.empty()) {
         int longestName = 0;
         // sort the elements according to the total time and print a table
         std::vector<TicTocElement> sortedElements;
@@ -90,7 +87,7 @@ namespace g2o {
         for (TicTocMap::const_iterator it = tictocElements.begin(); it != tictocElements.end(); ++it) {
           if (it->second.numCalls == 0)
             continue;
-          longestName = std::max(longestName, (int)it->first.size());
+          longestName = std::max(longestName, static_cast<int>(it->first.size()));
           sortedElements.push_back(it->second);
         }
         std::sort(sortedElements.begin(), sortedElements.end());
@@ -101,13 +98,13 @@ namespace g2o {
         printf("------------------------------------------\n");
         printf("|          TICTOC STATISTICS             |\n");
         printf("------------------------------------------\n");
-        for(std::vector<TicTocElement>::const_iterator it = sortedElements.begin(); it != sortedElements.end(); ++it) {
-          number_t avgTime = it->totalTime / it->numCalls;
-          printf("%s", it->algorithmPart.c_str());
-          for (int i = it->algorithmPart.size(); i < longestName; ++i)
+        for(const auto & sortedElement : sortedElements) {
+          number_t avgTime = sortedElement.totalTime / sortedElement.numCalls;
+          printf("%s", sortedElement.algorithmPart.c_str());
+          for (int i = sortedElement.algorithmPart.size(); i < longestName; ++i)
             putchar(' ');
           printf("numCalls= %d\t total= %.4f\t avg= %.4f\t min= %.4f\t max= %.4f\t ema= %.4f\n",
-              it->numCalls, it->totalTime, avgTime, it->minTime, it->maxTime, it->exponentialMovingAverage);
+              sortedElement.numCalls, sortedElement.totalTime, avgTime, sortedElement.minTime, sortedElement.maxTime, sortedElement.exponentialMovingAverage);
         }
         printf("------------------------------------------\n");
       }
@@ -125,7 +122,7 @@ namespace g2o {
     number_t now = get_monotonic_time();
 
     number_t dt = 0.;
-    TicTocMap::iterator foundIt = tictocElements.find(algorithmPart);
+    auto foundIt = tictocElements.find(algorithmPart);
     if (foundIt == tictocElements.end()) {
       // insert element
       TicTocElement e;
