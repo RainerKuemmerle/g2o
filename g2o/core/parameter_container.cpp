@@ -78,9 +78,9 @@ bool ParameterContainer::read(std::istream& is,
 
   Factory* factory = Factory::instance();
   HyperGraph::GraphElemBitset elemBitset;
-  elemBitset[HyperGraph::HGET_PARAMETER] = 1;
+  elemBitset[HyperGraph::HGET_PARAMETER] = true;
 
-  while (1) {
+  while (true) {
     int bytesRead = readLine(is, currentLine);
     if (bytesRead == -1) break;
     currentLine >> token;

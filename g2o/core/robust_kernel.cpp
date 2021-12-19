@@ -30,8 +30,7 @@ namespace g2o {
 
 RobustKernel::RobustKernel() 
   
-{
-}
+= default;
 
 RobustKernel::RobustKernel(number_t delta) :
   _delta(delta)

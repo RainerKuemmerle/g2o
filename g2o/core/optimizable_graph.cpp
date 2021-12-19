@@ -62,7 +62,7 @@ std::ostream& printIdChain(std::ostream& os, const std::vector<int>& ids) {
 }  // namespace
 
 OptimizableGraph::Vertex::Vertex()
-    : HyperGraph::Vertex()
+     
       {}
 
 CacheContainer* OptimizableGraph::Vertex::cacheContainer() {
@@ -100,7 +100,7 @@ bool OptimizableGraph::Vertex::getMinimalEstimateData(number_t*) const { return 
 int OptimizableGraph::Vertex::minimalEstimateDimension() const { return -1; }
 
 OptimizableGraph::Edge::Edge()
-    : HyperGraph::Edge(),  _robustKernel(nullptr) {}
+    :   _robustKernel(nullptr) {}
 
 OptimizableGraph::Edge::~Edge() = default;
 
@@ -113,7 +113,7 @@ OptimizableGraph* OptimizableGraph::Edge::graph() {
 
 const OptimizableGraph* OptimizableGraph::Edge::graph() const {
   if (_vertices.empty()) return nullptr;
-  auto& v = _vertices[0];
+  const auto& v = _vertices[0];
   if (!v) return nullptr;
   return static_cast<OptimizableGraph::Vertex*>(v.get())->graph();
 }
@@ -178,7 +178,7 @@ OptimizableGraph::~OptimizableGraph() {
 
 bool OptimizableGraph::addVertex(const std::shared_ptr<HyperGraph::Vertex>& v,
                                  const std::shared_ptr<HyperGraph::Data>& userData) {
-  auto ov = dynamic_cast<OptimizableGraph::Vertex*>(v.get());
+  auto *ov = dynamic_cast<OptimizableGraph::Vertex*>(v.get());
   if (!ov) return false;
   if (ov->id() < 0) {
     cerr << __FUNCTION__ << ": FATAL, a vertex with (negative) ID " << ov->id()
@@ -203,7 +203,7 @@ bool OptimizableGraph::addVertex(const std::shared_ptr<HyperGraph::Vertex>& v,
 
 bool OptimizableGraph::removeVertex(const std::shared_ptr<HyperGraph::Vertex>& v, bool detach)
 {
-  auto ov = dynamic_cast<OptimizableGraph::Vertex*>(v.get());
+  auto *ov = dynamic_cast<OptimizableGraph::Vertex*>(v.get());
   if (ov && ov->_graph == this) ov->_graph = nullptr;
   return HyperGraph::removeVertex(v, detach);
 }
@@ -317,7 +317,7 @@ void OptimizableGraph::setFixed(HyperGraph::VertexSet& vset, bool fixed) {
   forEachVertex(vset, [fixed](OptimizableGraph::Vertex* v) { v->setFixed(fixed); });
 }
 
-void OptimizableGraph::forEachVertex(std::function<void(OptimizableGraph::Vertex*)> fn) {
+void OptimizableGraph::forEachVertex(const std::function<void(OptimizableGraph::Vertex*)>& fn) {
   for (auto & vertex : _vertices) {
     auto* v = static_cast<OptimizableGraph::Vertex*>(vertex.second.get());
     fn(v);
@@ -325,7 +325,7 @@ void OptimizableGraph::forEachVertex(std::function<void(OptimizableGraph::Vertex
 }
 
 void OptimizableGraph::forEachVertex(HyperGraph::VertexSet& vset,
-                                     std::function<void(OptimizableGraph::Vertex*)> fn) {
+                                     const std::function<void(OptimizableGraph::Vertex*)>& fn) {
   for (const auto & it : vset) {
     auto* v = static_cast<OptimizableGraph::Vertex*>(it.get());
     fn(v);
@@ -339,17 +339,17 @@ bool OptimizableGraph::load(istream& is) {
 
   Factory* factory = Factory::instance();
   HyperGraph::GraphElemBitset elemBitset;
-  elemBitset[HyperGraph::HGET_PARAMETER] = 1;
+  elemBitset[HyperGraph::HGET_PARAMETER] = true;
   elemBitset.flip();
 
   HyperGraph::GraphElemBitset elemParamBitset;
-  elemParamBitset[HyperGraph::HGET_PARAMETER] = 1;
+  elemParamBitset[HyperGraph::HGET_PARAMETER] = true;
 
   std::shared_ptr<HyperGraph::DataContainer> previousDataContainer;
   Data* previousData = nullptr;
 
   int lineNumber = 0;
-  while (1) {
+  while (true) {
     int bytesRead = readLine(is, currentLine);
     lineNumber++;
     if (bytesRead == -1) break;
@@ -538,7 +538,7 @@ bool OptimizableGraph::save(ostream& os, int level) const {
     }
   }
 
-  for (auto v : verticesToSave) saveVertex(os, v);
+  for (auto *v : verticesToSave) saveVertex(os, v);
 
   std::vector<std::shared_ptr<HyperGraph::Edge>> edgesToSave;
   std::copy_if(edges().begin(), edges().end(), std::back_inserter(edgesToSave),
@@ -547,7 +547,7 @@ bool OptimizableGraph::save(ostream& os, int level) const {
                  return (e->level() == level);
                });
   sort(edgesToSave.begin(), edgesToSave.end(), EdgeIDCompare());
-  for (auto e : edgesToSave) saveEdge(os, static_cast<Edge*>(e.get()));
+  for (const auto& e : edgesToSave) saveEdge(os, static_cast<Edge*>(e.get()));
 
   return os.good();
 }
@@ -555,7 +555,7 @@ bool OptimizableGraph::save(ostream& os, int level) const {
 bool OptimizableGraph::saveSubset(ostream& os, HyperGraph::VertexSet& vset, int level) {
   if (!_parameters.write(os)) return false;
 
-  for (auto v : vset) saveVertex(os, static_cast<Vertex*>(v.get()));
+  for (const auto& v : vset) saveVertex(os, static_cast<Vertex*>(v.get()));
 
   for (const auto & it : edges()) {
     auto* e = dynamic_cast<OptimizableGraph::Edge*>(it.get());
@@ -577,12 +577,12 @@ bool OptimizableGraph::saveSubset(ostream& os, HyperGraph::VertexSet& vset, int 
 bool OptimizableGraph::saveSubset(ostream& os, HyperGraph::EdgeSet& eset) {
   if (!_parameters.write(os)) return false;
   HyperGraph::VertexSet vset;
-  for (auto e : eset)
-    for (auto v : e->vertices())
+  for (const auto& e : eset)
+    for (const auto& v : e->vertices())
       if (v) vset.insert(v);
 
-  for (auto v : vset) saveVertex(os, static_cast<Vertex*>(v.get()));
-  for (auto e : eset) saveEdge(os, static_cast<Edge*>(e.get()));
+  for (const auto& v : vset) saveVertex(os, static_cast<Vertex*>(v.get()));
+  for (const auto& e : eset) saveEdge(os, static_cast<Edge*>(e.get()));
   return os.good();
 }
 

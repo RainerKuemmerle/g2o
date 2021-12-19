@@ -129,8 +129,7 @@ bool HyperGraphActionLibrary::registerAction(
       cerr << __PRETTY_FUNCTION__
            << ": fatal error, a collection is not at the first level in the library" << endl;
       return false;
-    } else
-      return collection->registerAction(action);
+    }       return collection->registerAction(action);
   }
 #ifdef G2O_DEBUG_ACTIONLIB
   cerr << __PRETTY_FUNCTION__ << ": creating collection for \"" << action->name() << "\"" << endl;

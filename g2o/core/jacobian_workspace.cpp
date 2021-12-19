@@ -35,8 +35,7 @@ using namespace std;
 namespace g2o {
 
   JacobianWorkspace::JacobianWorkspace()  
-  {
-  }
+  = default;
 
   JacobianWorkspace::~JacobianWorkspace()
   = default;

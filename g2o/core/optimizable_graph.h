@@ -725,10 +725,10 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
   const ParameterContainer& parameters() const { return _parameters; }
 
   //! apply a unary function to all vertices
-  void forEachVertex(std::function<void(OptimizableGraph::Vertex*)> fn);
+  void forEachVertex(const std::function<void(OptimizableGraph::Vertex*)>& fn);
   //! apply a unary function to the vertices in vset
   void forEachVertex(HyperGraph::VertexSet& vset,
-                     std::function<void(OptimizableGraph::Vertex*)> fn);
+                     const std::function<void(OptimizableGraph::Vertex*)>& fn);
 
  protected:
   std::map<std::string, std::string> _renamedTypesLookup;

@@ -44,8 +44,7 @@ struct G2O_CORE_API OptimizationAlgorithmProperty
   bool requiresMarginalize{false};   ///< whether the solver requires marginalization of landmarks
   int poseDim{-1};                ///< dimension of the pose vertices (-1 if variable)
   int landmarkDim{-1};            ///< dimension of the landmark vertices (-1 if variable)
-  OptimizationAlgorithmProperty() :
-    name(), desc(), type() 
+  OptimizationAlgorithmProperty()  
   {
   }
   OptimizationAlgorithmProperty(const std::string& name_, const std::string& desc_, const std::string& type_, bool requiresMarginalize_, int poseDim_, int landmarkDim_) :

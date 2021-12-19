@@ -32,7 +32,7 @@ namespace g2o {
 
 OptimizationAlgorithm::OptimizationAlgorithm()
    
-{}
+= default;
 
 OptimizationAlgorithm::~OptimizationAlgorithm()
 = default;

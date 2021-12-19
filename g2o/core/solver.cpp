@@ -33,8 +33,7 @@
 namespace g2o {
 
 Solver::Solver()  
-{
-}
+= default;
 
 Solver::~Solver()
 {

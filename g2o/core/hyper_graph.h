@@ -33,6 +33,7 @@
 #include <memory>
 #include <set>
 #include <unordered_map>
+#include <utility>
 #include <vector>
 
 #include "g2o_core_api.h"
@@ -98,9 +99,9 @@ class G2O_CORE_API HyperGraph {
     virtual bool write(std::ostream& os) const = 0;
     HyperGraph::HyperGraphElementType elementType() const override { return HyperGraph::HGET_DATA; }
     std::shared_ptr<Data> next() const { return _next; }
-    void setNext(std::shared_ptr<Data> next_) { _next = next_; }
+    void setNext(std::shared_ptr<Data> next_) { _next = std::move(next_); }
     std::shared_ptr<DataContainer> dataContainer() const { return _dataContainer; }
-    void setDataContainer(std::shared_ptr<DataContainer> dataContainer_) { _dataContainer = dataContainer_; }
+    void setDataContainer(std::shared_ptr<DataContainer> dataContainer_) { _dataContainer = std::move(dataContainer_); }
 
    protected:
     std::shared_ptr<Data> _next;  // linked list of multiple data;

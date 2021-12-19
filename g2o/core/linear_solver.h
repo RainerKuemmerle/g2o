@@ -44,7 +44,7 @@ namespace g2o {
 template <typename MatrixType>
 class LinearSolver {
  public:
-  LinearSolver()  {};
+  LinearSolver()  = default;;
   virtual ~LinearSolver() = default;
 
   /**

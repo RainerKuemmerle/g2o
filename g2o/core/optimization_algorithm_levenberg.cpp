@@ -151,7 +151,7 @@ namespace g2o {
     if (_userLambdaInit->value() > 0)
       return _userLambdaInit->value();
     number_t maxDiagonal=0;
-    for (auto v : _optimizer->indexMapping()) {
+    for (auto *v : _optimizer->indexMapping()) {
       assert(v);
       int dim = v->dimension();
       for (int j = 0; j < dim; ++j){

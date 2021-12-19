@@ -140,7 +140,7 @@ namespace g2o {
           return false;
       }
       std::vector<std::pair<int, int> > index;
-      index.push_back(std::pair<int, int>(vertex->hessianIndex(), vertex->hessianIndex()));
+      index.emplace_back(vertex->hessianIndex(), vertex->hessianIndex());
       return computeMarginals(spinv, index);
     }
 
@@ -153,7 +153,7 @@ namespace g2o {
     bool computeMarginals(SparseBlockMatrix<MatrixX>& spinv, const VertexContainer& vertices) {
       std::vector<std::pair<int, int> > indices;
       for (const auto & vertex : vertices) {
-        indices.push_back(std::pair<int, int>(vertex->hessianIndex(), vertex->hessianIndex()));
+        indices.emplace_back(vertex->hessianIndex(), vertex->hessianIndex());
       }
       return computeMarginals(spinv, indices);
     }

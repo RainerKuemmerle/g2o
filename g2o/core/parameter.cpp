@@ -29,8 +29,7 @@
 namespace g2o {
 
   Parameter::Parameter()  
-  {
-  }
+  = default;
 
   void Parameter::setId(int id_)
   {

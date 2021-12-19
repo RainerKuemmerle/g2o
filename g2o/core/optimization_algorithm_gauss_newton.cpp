@@ -87,8 +87,7 @@ namespace g2o {
     }
     if (ok)
       return OK;
-    else
-      return Fail;
+          return Fail;
   }
 
   void OptimizationAlgorithmGaussNewton::printVerbose(std::ostream& os) const

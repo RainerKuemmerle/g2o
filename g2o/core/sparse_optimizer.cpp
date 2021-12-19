@@ -343,7 +343,7 @@ namespace g2o{
     estimatePropagator.propagate(fixedVertices, costFunction);
 
     // restoring the vertices that should not be initialized
-    for (auto v : backupVertices) {
+    for (auto *v : backupVertices) {
       v->pop();
     }
     if (verbose()) {
@@ -425,7 +425,7 @@ namespace g2o{
   void SparseOptimizer::update(const number_t* update)
   {
     // update the graph by calling oplus on the vertices
-    for (auto v : _ivMap) {
+    for (auto *v : _ivMap) {
       
 #ifndef NDEBUG
       bool hasNan = arrayHasNaN(update, v->dimension());
