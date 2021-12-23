@@ -90,7 +90,7 @@ class G2O_STUFF_API CommandArgs
     void printParams(std::ostream& os);
 
     //! return the banner string
-    const std::string& getBanner() const { return _banner; }
+    const std::string& getBanner() const { return banner_; }
     void setBanner(const std::string& banner);
 
     /**
@@ -104,11 +104,11 @@ class G2O_STUFF_API CommandArgs
     bool parsedParam(const std::string& paramFlag) const;
 
   protected:
-    std::vector<CommandArgument> _args;
-    std::vector<CommandArgument> _leftOvers;
-    std::vector<CommandArgument> _leftOversOptional;
-    std::string _banner;
-    std::string _progName;
+    std::vector<CommandArgument> args_;
+    std::vector<CommandArgument> leftOvers_;
+    std::vector<CommandArgument> leftOversOptional_;
+    std::string banner_;
+    std::string progName_;
 
     static const char* type2str(int t);
     static void str2arg(const std::string& input, CommandArgument& ca);

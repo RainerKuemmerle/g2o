@@ -62,7 +62,7 @@ namespace g2o {
        explicit ScopedTictoc(const char* algorithmPart);
        ~ScopedTictoc();
      protected:
-       std::string _algorithmPart;
+       std::string algorithmPart_;
    };
 
 } // end namespace

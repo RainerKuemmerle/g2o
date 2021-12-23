@@ -58,7 +58,7 @@ class G2O_CORE_API AbstractHyperGraphElementCreator {
 template <typename T>
 class HyperGraphElementCreator : public AbstractHyperGraphElementCreator {
  public:
-  HyperGraphElementCreator() : _name(typeid(T).name()) {}
+  HyperGraphElementCreator() : name_(typeid(T).name()) {}
 #if defined(WINDOWS) && defined(__GNUC__)  // force stack alignment on Windows with GCC
   __attribute__((force_align_arg_pointer))
 #endif
@@ -66,10 +66,10 @@ class HyperGraphElementCreator : public AbstractHyperGraphElementCreator {
   construct() override {
     return std::make_unique<T>();
   }
-  const std::string& name() const override { return _name; }
+  const std::string& name() const override { return name_; }
 
  protected:
-  std::string _name;
+  std::string name_;
 };
 
 }  // namespace g2o

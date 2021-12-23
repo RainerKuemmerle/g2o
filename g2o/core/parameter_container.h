@@ -56,7 +56,7 @@ namespace g2o {
       //! remove a parameter from the container and returns the formerly stored parameter
       std::shared_ptr<Parameter> detachParameter(int id);
       //! read parameters from a stream
-      virtual bool read(std::istream& is, const std::map<std::string, std::string>* renamedMap =nullptr);
+      virtual bool read(std::istream& is, const std::map<std::string, std::string>* renamedTypesLookup = nullptr);
       //! write the data to a stream
       virtual bool write(std::ostream& os) const;
 

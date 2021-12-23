@@ -26,18 +26,16 @@
 
 #include "hyper_dijkstra.h"
 
-#include <assert.h>
-
+#include <cassert>
 #include <deque>
 #include <iostream>
 #include <queue>
+#include <utility>
 #include <vector>
 
 #include "g2o/stuff/macros.h"
 
 namespace g2o {
-
-using namespace std;
 
 number_t HyperDijkstra::TreeAction::perform(const std::shared_ptr<HyperGraph::Vertex>& v,
                                             const std::shared_ptr<HyperGraph::Vertex>& vParent,
@@ -57,25 +55,25 @@ number_t HyperDijkstra::TreeAction::perform(const std::shared_ptr<HyperGraph::Ve
 }
 
 HyperDijkstra::AdjacencyMapEntry::AdjacencyMapEntry(
-    const std::shared_ptr<HyperGraph::Vertex>& child,
-    const std::shared_ptr<HyperGraph::Vertex>& parent,
-    const std::shared_ptr<HyperGraph::Edge>& edge, number_t distance)
-    : _child(child), _parent(parent), _edge(edge), _distance(distance) {}
+    std::shared_ptr<HyperGraph::Vertex>  child,
+    std::shared_ptr<HyperGraph::Vertex>  parent,
+    std::shared_ptr<HyperGraph::Edge>  edge, number_t distance)
+    : child_(std::move(child)), parent_(std::move(parent)), edge_(std::move(edge)), distance_(distance) {}
 
-HyperDijkstra::HyperDijkstra(const std::shared_ptr<HyperGraph>& g) : _graph(g) {
-  for (const auto & it : _graph->vertices()) {
+HyperDijkstra::HyperDijkstra(std::shared_ptr<HyperGraph>  g) : graph_(std::move(g)) {
+  for (const auto & it : graph_->vertices()) {
     AdjacencyMapEntry entry(it.second, nullptr, nullptr, std::numeric_limits<number_t>::max());
-    _adjacencyMap.insert(make_pair(entry.child(), entry));
+    adjacencyMap_.insert(make_pair(entry.child(), entry));
   }
 }
 
 void HyperDijkstra::reset() {
-  for (const auto & it : _visited) {
-    auto at = _adjacencyMap.find(it);
+  for (const auto & it : visited_) {
+    auto at = adjacencyMap_.find(it);
     assert(at != _adjacencyMap.end());
     at->second = AdjacencyMapEntry(at->first, nullptr, nullptr, std::numeric_limits<number_t>::max());
   }
-  _visited.clear();
+  visited_.clear();
 }
 
 bool operator<(const HyperDijkstra::AdjacencyMapEntry& a,
@@ -90,13 +88,13 @@ void HyperDijkstra::shortestPaths(HyperGraph::VertexSet& vset, HyperDijkstra::Co
   std::priority_queue<AdjacencyMapEntry> frontier;
   for (const auto & v : vset) {
     assert(v != 0);
-    auto it = _adjacencyMap.find(v);
-    if (it == _adjacencyMap.end()) {
-      cerr << __PRETTY_FUNCTION__ << "Vertex " << v->id() << " is not in the adjacency map" << endl;
+    auto it = adjacencyMap_.find(v);
+    if (it == adjacencyMap_.end()) {
+      std::cerr << __PRETTY_FUNCTION__ << "Vertex " << v->id() << " is not in the adjacency map" << std::endl;
     }
     assert(it != _adjacencyMap.end());
-    it->second._distance = 0.;
-    it->second._parent = nullptr;
+    it->second.distance_ = 0.;
+    it->second.parent_ = nullptr;
     frontier.push(it->second);
   }
 
@@ -104,14 +102,14 @@ void HyperDijkstra::shortestPaths(HyperGraph::VertexSet& vset, HyperDijkstra::Co
     AdjacencyMapEntry entry = frontier.top();
     frontier.pop();
     auto u = entry.child();
-    auto ut = _adjacencyMap.find(u);
-    if (ut == _adjacencyMap.end()) {
-      cerr << __PRETTY_FUNCTION__ << "Vertex " << u->id() << " is not in the adjacency map" << endl;
+    auto ut = adjacencyMap_.find(u);
+    if (ut == adjacencyMap_.end()) {
+      std::cerr << __PRETTY_FUNCTION__ << "Vertex " << u->id() << " is not in the adjacency map" << std::endl;
     }
     assert(ut != _adjacencyMap.end());
     number_t uDistance = ut->second.distance();
 
-    std::pair<HyperGraph::VertexSet::iterator, bool> insertResult = _visited.insert(u);
+    std::pair<HyperGraph::VertexSet::iterator, bool> insertResult = visited_.insert(u);
     (void)insertResult;
     auto et = u->edges().begin();
     while (et != u->edges().end()) {
@@ -130,13 +128,13 @@ void HyperDijkstra::shortestPaths(HyperGraph::VertexSet& vset, HyperDijkstra::Co
         number_t zDistance = uDistance + edgeDistance;
         // cerr << z->id() << " " << zDistance << endl;
 
-        auto ot = _adjacencyMap.find(z);
+        auto ot = adjacencyMap_.find(z);
         assert(ot != _adjacencyMap.end());
 
         if (zDistance + comparisonConditioner < ot->second.distance() && zDistance < maxDistance) {
-          ot->second._distance = zDistance;
-          ot->second._parent = u;
-          ot->second._edge = edge;
+          ot->second.distance_ = zDistance;
+          ot->second.parent_ = u;
+          ot->second.edge_ = edge;
           frontier.push(ot->second);
         }
       }
@@ -156,7 +154,7 @@ void HyperDijkstra::shortestPaths(const std::shared_ptr<HyperGraph::Vertex>& v,
 void HyperDijkstra::computeTree(AdjacencyMap& amap) {
   for (auto & it : amap) {
     AdjacencyMapEntry& entry(it.second);
-    entry._children.clear();
+    entry.children_.clear();
   }
   for (auto it = amap.begin(); it != amap.end(); ++it) {
     AdjacencyMapEntry& entry(it->second);
@@ -169,7 +167,7 @@ void HyperDijkstra::computeTree(AdjacencyMap& amap) {
 
     auto pt = amap.find(parent);
     assert(pt != amap.end());
-    pt->second._children.insert(v);
+    pt->second.children_.insert(v);
   }
 }
 

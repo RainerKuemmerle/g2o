@@ -34,24 +34,26 @@
 
 namespace g2o {
 
-    class G2O_CORE_API Parameter : public HyperGraph::HyperGraphElement
-    {
-      public:
-        Parameter();
-        ~Parameter() override = default;;
-        //! read the data from a stream
-        virtual bool read(std::istream& is) = 0;
-        //! write the data to a stream
-        virtual bool write(std::ostream& os) const = 0;
-        int id() const {return _id;}
-        void setId(int id_);
-        HyperGraph::HyperGraphElementType elementType() const override { return HyperGraph::HGET_PARAMETER;}
-      protected:
-        int _id{-1};
-    };
+class G2O_CORE_API Parameter : public HyperGraph::HyperGraphElement {
+ public:
+  Parameter() = default;
+  ~Parameter() override = default;
+  //! read the data from a stream
+  virtual bool read(std::istream& is) = 0;
+  //! write the data to a stream
+  virtual bool write(std::ostream& os) const = 0;
+  int id() const { return id_; }
+  void setId(int id_);
+  HyperGraph::HyperGraphElementType elementType() const override {
+    return HyperGraph::kHgetParameter;
+  }
 
-    using ParameterVector = std::vector<std::shared_ptr<Parameter>>;
+ protected:
+  int id_ = -1;
+};
 
-} // end namespace
+using ParameterVector = std::vector<std::shared_ptr<Parameter>>;
+
+}  // namespace g2o
 
 #endif

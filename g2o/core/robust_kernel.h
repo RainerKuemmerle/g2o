@@ -66,10 +66,10 @@ namespace g2o {
        * as outlier in the data.
        */
       virtual void setDelta(number_t delta);
-      number_t delta() const { return _delta;}
+      number_t delta() const { return delta_;}
 
     protected:
-      number_t _delta{1.};
+      number_t delta_{1.};
   };
   using RobustKernelPtr = std::shared_ptr<RobustKernel>;
 

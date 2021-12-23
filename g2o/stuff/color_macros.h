@@ -42,14 +42,14 @@
 #define BG_WHITE     "\033[47m"
 
 // font color
-#define CL_BLACK(s)     "\033[30m" << s << "\033[0m"
-#define CL_RED(s)       "\033[31m" << s << "\033[0m"
-#define CL_GREEN(s)     "\033[32m" << s << "\033[0m"
-#define CL_YELLOW(s)    "\033[33m" << s << "\033[0m"
-#define CL_LIGHTBLUE(s) "\033[34m" << s << "\033[0m"
-#define CL_MAGENTA(s)   "\033[35m" << s << "\033[0m"
-#define CL_BLUE(s)      "\033[36m" << s << "\033[0m"
-#define CL_WHITE(s)     "\033[37m" << s << "\033[0m"
+#define CL_BLACK(s)     "\033[30m" << s << "\033[0m" // NOLINT
+#define CL_RED(s)       "\033[31m" << s << "\033[0m" // NOLINT
+#define CL_GREEN(s)     "\033[32m" << s << "\033[0m" // NOLINT
+#define CL_YELLOW(s)    "\033[33m" << s << "\033[0m" // NOLINT
+#define CL_LIGHTBLUE(s) "\033[34m" << s << "\033[0m" // NOLINT
+#define CL_MAGENTA(s)   "\033[35m" << s << "\033[0m" // NOLINT
+#define CL_BLUE(s)      "\033[36m" << s << "\033[0m" // NOLINT
+#define CL_WHITE(s)     "\033[37m" << s << "\033[0m" // NOLINT
 
 #define FG_BLACK     "\033[30m"
 #define FG_RED       "\033[31m"

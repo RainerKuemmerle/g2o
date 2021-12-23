@@ -85,7 +85,7 @@ class G2O_CORE_API Factory {
   bool knowsTag(const std::string& tag, int* elementType = nullptr) const;
 
   //! return the TAG given a vertex
-  const std::string& tag(const HyperGraph::HyperGraphElement* v) const;
+  const std::string& tag(const HyperGraph::HyperGraphElement* e) const;
 
   /**
    * get a list of all known types
@@ -108,11 +108,11 @@ class G2O_CORE_API Factory {
   using TagLookup = std::map<std::string, std::string>;
   Factory() = default;
 
-  CreatorMap _creator;   ///< look-up map for the existing creators
-  TagLookup _tagLookup;  ///< reverse look-up, class name to tag
+  CreatorMap creator_;   ///< look-up map for the existing creators
+  TagLookup tagLookup_;  ///< reverse look-up, class name to tag
 
  private:
-  static std::unique_ptr<Factory> factoryInstance;
+  static std::unique_ptr<Factory> factoryInstance_;
 };
 
 template <typename T>

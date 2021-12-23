@@ -54,10 +54,8 @@ namespace g2o {
   {
     public:
       using WorkspaceVector = std::vector<VectorX, Eigen::aligned_allocator<VectorX>>;
-
-    public:
-      JacobianWorkspace();
-      ~JacobianWorkspace();
+      JacobianWorkspace() = default;
+      ~JacobianWorkspace() = default;
 
       /**
        * allocate the workspace
@@ -90,13 +88,13 @@ namespace g2o {
       number_t* workspaceForVertex(int vertexIndex)
       {
         assert(vertexIndex >= 0 && (size_t)vertexIndex < _workspace.size() && "Index out of bounds");
-        return _workspace[vertexIndex].data();
+        return workspace_[vertexIndex].data();
       }
 
     protected:
-      WorkspaceVector _workspace;   ///< the memory pre-allocated for computing the Jacobians
-      int _maxNumVertices{-1};          ///< the maximum number of vertices connected by a hyper-edge
-      int _maxDimension{-1};            ///< the maximum dimension (number of elements) for a Jacobian
+      WorkspaceVector workspace_;   ///< the memory pre-allocated for computing the Jacobians
+      int maxNumVertices_{-1};          ///< the maximum number of vertices connected by a hyper-edge
+      int maxDimension_{-1};            ///< the maximum dimension (number of elements) for a Jacobian
   };
 
 } // end namespace

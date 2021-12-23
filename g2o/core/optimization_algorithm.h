@@ -47,9 +47,11 @@ namespace g2o {
   class G2O_CORE_API OptimizationAlgorithm
   {
     public:
-      enum G2O_CORE_API SolverResult {Terminate=2, OK=1, Fail=-1};
-      OptimizationAlgorithm();
-      virtual ~OptimizationAlgorithm();
+      enum G2O_CORE_API SolverResult {kTerminate=2, kOk=1, kFail=-1};
+      OptimizationAlgorithm() = default;
+      virtual ~OptimizationAlgorithm() = default;
+      OptimizationAlgorithm(const OptimizationAlgorithm&) = delete;
+      OptimizationAlgorithm& operator=(const OptimizationAlgorithm&) = delete;
 
       /**
        * initialize the solver, called once before the first call to solve()
@@ -80,10 +82,9 @@ namespace g2o {
        */
       virtual void printVerbose(std::ostream& os) const {(void) os;};
 
-    public:
       //! return the optimizer operating on
-      const SparseOptimizer* optimizer() const { return _optimizer;}
-      SparseOptimizer* optimizer() { return _optimizer;}
+      const SparseOptimizer* optimizer() const { return optimizer_;}
+      SparseOptimizer* optimizer() { return optimizer_;}
 
       /**
        * specify on which optimizer the solver should work on
@@ -91,7 +92,7 @@ namespace g2o {
       void setOptimizer(SparseOptimizer* optimizer);
 
       //! return the properties of the solver
-      const PropertyMap& properties() const { return _properties;}
+      const PropertyMap& properties() const { return properties_;}
 
       /**
        * update the properties from a string, see PropertyMap::updateMapFromString()
@@ -104,13 +105,8 @@ namespace g2o {
       void printProperties(std::ostream& os) const;
 
     protected:
-      SparseOptimizer* _optimizer{nullptr};   ///< the optimizer the solver is working on
-      PropertyMap _properties;       ///< the properties of your solver, use this to store the parameters of your solver
-
-    private:
-      // Disable the copy constructor and assignment operator
-      OptimizationAlgorithm(const OptimizationAlgorithm&) { }
-      OptimizationAlgorithm& operator= (const OptimizationAlgorithm&) { return *this; }
+      SparseOptimizer* optimizer_ = nullptr;   ///< the optimizer the solver is working on
+      PropertyMap properties_;       ///< the properties of your solver, use this to store the parameters of your solver
   };
 
 } // end namespace

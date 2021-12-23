@@ -34,23 +34,22 @@
 #include "sparse_optimizer.h"
 #include "solver.h"
 #include "batch_stats.h"
-using namespace std;
 
 namespace g2o {
 
   OptimizationAlgorithmDogleg::OptimizationAlgorithmDogleg(std::unique_ptr<BlockSolverBase> solver)
-      : OptimizationAlgorithmWithHessian(*solver.get()),
-        m_solver{ std::move(solver) }
+      : OptimizationAlgorithmWithHessian(*solver),
+        m_solver_{ std::move(solver) }
   {
-    _userDeltaInit = _properties.makeProperty<Property<number_t>>("initialDelta", static_cast<number_t>(1e4));
-    _maxTrialsAfterFailure = _properties.makeProperty<Property<int>>("maxTrialsAfterFailure", 100);
-    _initialLambda = _properties.makeProperty<Property<number_t>>("initialLambda", static_cast<number_t>(1e-7));
-    _lamdbaFactor = _properties.makeProperty<Property<number_t>>("lambdaFactor", 10.);
-    _delta = _userDeltaInit->value();
-    _lastStep = STEP_UNDEFINED;
-    _wasPDInAllIterations = true;
-    _lastNumTries = 0;
-    _currentLambda = 0.;
+    userDeltaInit_ = properties_.makeProperty<Property<number_t>>("initialDelta", static_cast<number_t>(1e4));
+    maxTrialsAfterFailure_ = properties_.makeProperty<Property<int>>("maxTrialsAfterFailure", 100);
+    initialLambda_ = properties_.makeProperty<Property<number_t>>("initialLambda", static_cast<number_t>(1e-7));
+    lamdbaFactor_ = properties_.makeProperty<Property<number_t>>("lambdaFactor", 10.);
+    delta_ = userDeltaInit_->value();
+    lastStep_ = kStepUndefined;
+    wasPDInAllIterations_ = true;
+    lastNumTries_ = 0;
+    currentLambda_ = 0.;
   }
 
   OptimizationAlgorithmDogleg::~OptimizationAlgorithmDogleg()
@@ -61,55 +60,55 @@ namespace g2o {
     assert(_optimizer && "_optimizer not set");
     assert(_solver.optimizer() == _optimizer && "underlying linear solver operates on different graph");
 
-    auto& blockSolver = static_cast<BlockSolverBase&>(_solver);
+    auto& blockSolver = static_cast<BlockSolverBase&>(solver_);
 
     if (iteration == 0 && !online)
     { // built up the CCS structure, here due to easy time measure
-      bool ok = _solver.buildStructure();
+      bool ok = solver_.buildStructure();
       if (! ok) {
-        cerr << __PRETTY_FUNCTION__ << ": Failure while building CCS structure" << endl;
-        return OptimizationAlgorithm::Fail;
+        std::cerr << __PRETTY_FUNCTION__ << ": Failure while building CCS structure" << std::endl;
+        return OptimizationAlgorithm::kFail;
       }
 
       // init some members to the current size of the problem
-      _hsd.resize(_solver.vectorSize());
-      _hdl.resize(_solver.vectorSize());
-      _auxVector.resize(_solver.vectorSize());
-      _delta = _userDeltaInit->value();
-      _currentLambda = _initialLambda->value();
-      _wasPDInAllIterations = true;
+      hsd_.resize(solver_.vectorSize());
+      hdl_.resize(solver_.vectorSize());
+      auxVector_.resize(solver_.vectorSize());
+      delta_ = userDeltaInit_->value();
+      currentLambda_ = initialLambda_->value();
+      wasPDInAllIterations_ = true;
     }
 
     number_t t=get_monotonic_time();
-    _optimizer->computeActiveErrors();
+    optimizer_->computeActiveErrors();
     G2OBatchStatistics* globalStats = G2OBatchStatistics::globalStats();
     if (globalStats) {
       globalStats->timeResiduals = get_monotonic_time()-t;
       t=get_monotonic_time();
     }
 
-    number_t currentChi = _optimizer->activeRobustChi2();
+    number_t currentChi = optimizer_->activeRobustChi2();
 
-    _solver.buildSystem();
+    solver_.buildSystem();
     if (globalStats) {
       globalStats->timeQuadraticForm = get_monotonic_time()-t;
     }
 
-    VectorX::ConstMapType b(_solver.b(), _solver.vectorSize());
+    VectorX::ConstMapType b(solver_.b(), solver_.vectorSize());
 
     // compute alpha
-    _auxVector.setZero();
-    blockSolver.multiplyHessian(_auxVector.data(), _solver.b());
+    auxVector_.setZero();
+    blockSolver.multiplyHessian(auxVector_.data(), solver_.b());
     number_t bNormSquared = b.squaredNorm();
-    number_t alpha = bNormSquared / _auxVector.dot(b);
+    number_t alpha = bNormSquared / auxVector_.dot(b);
 
-    _hsd = alpha * b;
-    number_t hsdNorm = _hsd.norm();
+    hsd_ = alpha * b;
+    number_t hsdNorm = hsd_.norm();
     number_t hgnNorm = -1.;
 
     bool solvedGaussNewton = false;
     bool goodStep = false;
-    int& numTries = _lastNumTries;
+    int& numTries = lastNumTries_;
     numTries = 0;
     do {
       ++numTries;
@@ -124,104 +123,104 @@ namespace g2o {
         bool solverOk = false;
         while(!solverOk)
         {
-          if (! _wasPDInAllIterations)
-            _solver.setLambda(_currentLambda, true);   // add _currentLambda to the diagonal
-          solverOk = _solver.solve();
-          if (! _wasPDInAllIterations)
-            _solver.restoreDiagonal();
-          _wasPDInAllIterations = _wasPDInAllIterations && solverOk;
-          if (! _wasPDInAllIterations) {
+          if (! wasPDInAllIterations_)
+            solver_.setLambda(currentLambda_, true);   // add _currentLambda to the diagonal
+          solverOk = solver_.solve();
+          if (! wasPDInAllIterations_)
+            solver_.restoreDiagonal();
+          wasPDInAllIterations_ = wasPDInAllIterations_ && solverOk;
+          if (! wasPDInAllIterations_) {
             // simple strategy to control the damping factor
             if (solverOk) {
-              _currentLambda = std::max(minLambda, _currentLambda / (cst(0.5) * _lamdbaFactor->value()));
+              currentLambda_ = std::max(minLambda, currentLambda_ / (cst(0.5) * lamdbaFactor_->value()));
             } else {
-              _currentLambda *= _lamdbaFactor->value();
-              if (_currentLambda > maxLambda) {
-                _currentLambda = maxLambda;
-                return Fail;
+              currentLambda_ *= lamdbaFactor_->value();
+              if (currentLambda_ > maxLambda) {
+                currentLambda_ = maxLambda;
+                return kFail;
               }
             }
           }
         }
-        hgnNorm = VectorX::ConstMapType(_solver.x(), _solver.vectorSize()).norm();
+        hgnNorm = VectorX::ConstMapType(solver_.x(), solver_.vectorSize()).norm();
       }
 
-      VectorX::ConstMapType hgn(_solver.x(), _solver.vectorSize());
+      VectorX::ConstMapType hgn(solver_.x(), solver_.vectorSize());
       assert(hgnNorm >= 0. && "Norm of the GN step is not computed");
 
-      if (hgnNorm < _delta) {
-        _hdl = hgn;
-        _lastStep = STEP_GN;
+      if (hgnNorm < delta_) {
+        hdl_ = hgn;
+        lastStep_ = kStepGn;
       }
-      else if (hsdNorm > _delta) {
-        _hdl = _delta / hsdNorm * _hsd;
-        _lastStep = STEP_SD;
+      else if (hsdNorm > delta_) {
+        hdl_ = delta_ / hsdNorm * hsd_;
+        lastStep_ = kStepSd;
       } else {
-        _auxVector = hgn - _hsd;  // b - a
-        number_t c = _hsd.dot(_auxVector);
-        number_t bmaSquaredNorm = _auxVector.squaredNorm();
+        auxVector_ = hgn - hsd_;  // b - a
+        number_t c = hsd_.dot(auxVector_);
+        number_t bmaSquaredNorm = auxVector_.squaredNorm();
         number_t beta;
         if (c <= 0.)
-          beta = (-c + sqrt(c*c + bmaSquaredNorm * (_delta*_delta - _hsd.squaredNorm()))) / bmaSquaredNorm;
+          beta = (-c + sqrt(c*c + bmaSquaredNorm * (delta_*delta_ - hsd_.squaredNorm()))) / bmaSquaredNorm;
         else {
-          number_t hsdSqrNorm = _hsd.squaredNorm();
-          beta = (_delta*_delta - hsdSqrNorm) / (c + sqrt(c*c + bmaSquaredNorm * (_delta*_delta - hsdSqrNorm)));
+          number_t hsdSqrNorm = hsd_.squaredNorm();
+          beta = (delta_*delta_ - hsdSqrNorm) / (c + sqrt(c*c + bmaSquaredNorm * (delta_*delta_ - hsdSqrNorm)));
         }
         assert(beta > 0. && beta < 1 && "Error while computing beta");
-        _hdl = _hsd + beta * (hgn - _hsd);
-        _lastStep = STEP_DL;
+        hdl_ = hsd_ + beta * (hgn - hsd_);
+        lastStep_ = kStepDl;
         assert(_hdl.norm() < _delta + 1e-5 && "Computed step does not correspond to the trust region");
       }
 
       // compute the linear gain
-      _auxVector.setZero();
-      blockSolver.multiplyHessian(_auxVector.data(), _hdl.data());
-      number_t linearGain = -1 * (_auxVector.dot(_hdl)) + 2 * (b.dot(_hdl));
+      auxVector_.setZero();
+      blockSolver.multiplyHessian(auxVector_.data(), hdl_.data());
+      number_t linearGain = -1 * (auxVector_.dot(hdl_)) + 2 * (b.dot(hdl_));
 
       // apply the update and see what happens
-      _optimizer->push();
-      _optimizer->update(_hdl.data());
-      _optimizer->computeActiveErrors();
-      number_t newChi = _optimizer-> activeRobustChi2();
+      optimizer_->push();
+      optimizer_->update(hdl_.data());
+      optimizer_->computeActiveErrors();
+      number_t newChi = optimizer_-> activeRobustChi2();
       number_t nonLinearGain = currentChi - newChi;
       if (fabs(linearGain) < 1e-12)
         linearGain = cst(1e-12);
       number_t rho = nonLinearGain / linearGain;
       //cerr << PVAR(nonLinearGain) << " " << PVAR(linearGain) << " " << PVAR(rho) << endl;
       if (rho > 0) { // step is good and will be accepted
-        _optimizer->discardTop();
+        optimizer_->discardTop();
         goodStep = true;
       } else { // recover previous state
-        _optimizer->pop();
+        optimizer_->pop();
       }
 
       // update trust region based on the step quality
       if (rho > 0.75)
-          _delta = std::max<number_t>(_delta, 3 * _hdl.norm());
+          delta_ = std::max<number_t>(delta_, 3 * hdl_.norm());
       else if (rho < 0.25)
-        _delta *= 0.5;
-    } while (!goodStep && numTries < _maxTrialsAfterFailure->value());
-    if (numTries == _maxTrialsAfterFailure->value() || !goodStep)
-      return Terminate;
-    return OK;
+        delta_ *= 0.5;
+    } while (!goodStep && numTries < maxTrialsAfterFailure_->value());
+    if (numTries == maxTrialsAfterFailure_->value() || !goodStep)
+      return kTerminate;
+    return kOk;
   }
 
   void OptimizationAlgorithmDogleg::printVerbose(std::ostream& os) const
   {
     os
-      << "\t Delta= " << _delta
-      << "\t step= " << stepType2Str(_lastStep)
-      << "\t tries= " << _lastNumTries;
-    if (! _wasPDInAllIterations)
-      os << "\t lambda= " << _currentLambda;
+      << "\t Delta= " << delta_
+      << "\t step= " << stepType2Str(lastStep_)
+      << "\t tries= " << lastNumTries_;
+    if (! wasPDInAllIterations_)
+      os << "\t lambda= " << currentLambda_;
   }
 
   const char* OptimizationAlgorithmDogleg::stepType2Str(int stepType)
   {
     switch (stepType) {
-      case STEP_SD: return "Descent";
-      case STEP_GN: return "GN";
-      case STEP_DL: return "Dogleg";
+      case kStepSd: return "Descent";
+      case kStepGn: return "GN";
+      case kStepDl: return "Dogleg";
       default: return "Undefined";
     }
   }

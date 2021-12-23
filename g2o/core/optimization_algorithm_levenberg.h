@@ -45,39 +45,38 @@ namespace g2o {
        * linearized system.
        */
       explicit OptimizationAlgorithmLevenberg(std::unique_ptr<Solver> solver);
-      ~OptimizationAlgorithmLevenberg() override;
 
       SolverResult solve(int iteration, bool online = false) override;
 
       void printVerbose(std::ostream& os) const override;
 
       //! return the currently used damping factor
-      number_t currentLambda() const { return _currentLambda;}
+      number_t currentLambda() const { return currentLambda_;}
 
       //! the number of internal iteration if an update step increases chi^2 within Levenberg-Marquardt
       void setMaxTrialsAfterFailure(int max_trials);
 
       //! get the number of inner iterations for Levenberg-Marquardt
-      int maxTrialsAfterFailure() const { return _maxTrialsAfterFailure->value();}
+      int maxTrialsAfterFailure() const { return maxTrialsAfterFailure_->value();}
 
       //! return the lambda set by the user, if < 0 the SparseOptimizer will compute the initial lambda
-      number_t userLambdaInit() {return _userLambdaInit->value();}
+      number_t userLambdaInit() {return userLambdaInit_->value();}
       //! specify the initial lambda used for the first iteraion, if not given the SparseOptimizer tries to compute a suitable value
       void setUserLambdaInit(number_t lambda);
 
       //! return the number of levenberg iterations performed in the last round
-      int levenbergIteration() { return _levenbergIterations;}
+      int levenbergIteration() const { return levenbergIterations_;}
 
     protected:
       // Levenberg parameters
-      std::shared_ptr<Property<int>> _maxTrialsAfterFailure;
-      std::shared_ptr<Property<number_t>> _userLambdaInit;
-      number_t _currentLambda;
-      number_t _tau;
-      number_t _goodStepLowerScale; ///< lower bound for lambda decrease if a good LM step
-      number_t _goodStepUpperScale; ///< upper bound for lambda decrease if a good LM step
-      number_t _ni;
-      int _levenbergIterations;   ///< the numer of levenberg iterations performed to accept the last step
+      std::shared_ptr<Property<int>> maxTrialsAfterFailure_;
+      std::shared_ptr<Property<number_t>> userLambdaInit_;
+      number_t currentLambda_;
+      number_t tau_;
+      number_t goodStepLowerScale_; ///< lower bound for lambda decrease if a good LM step
+      number_t goodStepUpperScale_; ///< upper bound for lambda decrease if a good LM step
+      number_t ni_;
+      int levenbergIterations_;   ///< the numer of levenberg iterations performed to accept the last step
 
       /**
        * helper for Levenberg, this function computes the initial damping factor, if the user did not
@@ -87,7 +86,7 @@ namespace g2o {
       number_t computeScale() const;
 
   private:
-      std::unique_ptr<Solver> m_solver;
+      std::unique_ptr<Solver> m_solver_;
   };
 
 } // end namespace

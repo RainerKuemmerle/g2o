@@ -84,8 +84,8 @@ class LinearSolver {
   }
 
   //! write a debug dump of the system matrix if it is not PSD in solve
-  bool writeDebug() const { return _writeDebug; }
-  void setWriteDebug(bool b) { _writeDebug = b; }
+  bool writeDebug() const { return writeDebug_; }
+  void setWriteDebug(bool b) { writeDebug_ = b; }
 
   //! allocate block memory structure
   static void allocateBlocks(const SparseBlockMatrix<MatrixType>& A, number_t**& blocks) {
@@ -131,7 +131,7 @@ class LinearSolver {
   }
 
   protected:
-   bool _writeDebug{true};
+   bool writeDebug_ = true;
 };
 
 /**
@@ -140,10 +140,10 @@ class LinearSolver {
 template <typename MatrixType>
 class LinearSolverCCS : public LinearSolver<MatrixType> {
  public:
-  LinearSolverCCS() : LinearSolver<MatrixType>(), _ccsMatrix(0) {}
-  ~LinearSolverCCS() { delete _ccsMatrix; }
+  LinearSolverCCS() : LinearSolver<MatrixType>(), ccsMatrix_(nullptr) {}
+  ~LinearSolverCCS() override { delete ccsMatrix_; }
 
-  virtual bool solveBlocks(number_t**& blocks, const SparseBlockMatrix<MatrixType>& A) {
+  bool solveBlocks(number_t**& blocks, const SparseBlockMatrix<MatrixType>& A) override {
     auto compute = [&](MarginalCovarianceCholesky& mcc) {
       if (!blocks) LinearSolverCCS<MatrixType>::allocateBlocks(A, blocks);
       mcc.computeCovariance(blocks, A.rowBlockIndices());
@@ -151,9 +151,9 @@ class LinearSolverCCS : public LinearSolver<MatrixType> {
     return solveBlocks_impl(A, compute);
   }
 
-  virtual bool solvePattern(SparseBlockMatrix<MatrixX>& spinv,
+  bool solvePattern(SparseBlockMatrix<MatrixX>& spinv,
                             const std::vector<std::pair<int, int> >& blockIndices,
-                            const SparseBlockMatrix<MatrixType>& A) {
+                            const SparseBlockMatrix<MatrixType>& A) override {
     auto compute = [&](MarginalCovarianceCholesky& mcc) {
       mcc.computeCovariance(spinv, A.rowBlockIndices(), blockIndices);
     };
@@ -161,21 +161,21 @@ class LinearSolverCCS : public LinearSolver<MatrixType> {
   }
 
   //! do the AMD ordering on the blocks or on the scalar matrix
-  bool blockOrdering() const { return _blockOrdering; }
-  void setBlockOrdering(bool blockOrdering) { _blockOrdering = blockOrdering; }
+  bool blockOrdering() const { return blockOrdering_; }
+  void setBlockOrdering(bool blockOrdering) { blockOrdering_ = blockOrdering; }
 
  protected:
-  SparseBlockMatrixCCS<MatrixType>* _ccsMatrix;
-  bool _blockOrdering{true};
+  SparseBlockMatrixCCS<MatrixType>* ccsMatrix_;
+  bool blockOrdering_{true};
 
   void initMatrixStructure(const SparseBlockMatrix<MatrixType>& A) {
-    delete _ccsMatrix;
-    _ccsMatrix = new SparseBlockMatrixCCS<MatrixType>(A.rowBlockIndices(), A.colBlockIndices());
-    A.fillSparseBlockMatrixCCS(*_ccsMatrix);
+    delete ccsMatrix_;
+    ccsMatrix_ = new SparseBlockMatrixCCS<MatrixType>(A.rowBlockIndices(), A.colBlockIndices());
+    A.fillSparseBlockMatrixCCS(*ccsMatrix_);
   }
 
   virtual bool solveBlocks_impl(const SparseBlockMatrix<MatrixType>& A,
-                                std::function<void(MarginalCovarianceCholesky&)> compute) = 0;
+                                const std::function<void(MarginalCovarianceCholesky&)>& compute) = 0;
 };
 
 }  // namespace g2o

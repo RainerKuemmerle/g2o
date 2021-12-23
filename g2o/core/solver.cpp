@@ -37,29 +37,29 @@ Solver::Solver()
 
 Solver::~Solver()
 {
-  free_aligned(_x);
-  free_aligned(_b);
+  free_aligned(x_);
+  free_aligned(b_);
 }
 
 void Solver::resizeVector(size_t sx)
 {
-  size_t oldSize = _xSize;
-  _xSize = sx;
-  sx += _additionalVectorSpace; // allocate some additional space if requested
-  if (_maxXSize < sx) {
-    _maxXSize = 2*sx;
-    free_aligned(_x);
-    _x = allocate_aligned<number_t>(_maxXSize);
+  size_t oldSize = xSize_;
+  xSize_ = sx;
+  sx += additionalVectorSpace_; // allocate some additional space if requested
+  if (maxXSize_ < sx) {
+    maxXSize_ = 2*sx;
+    free_aligned(x_);
+    x_ = allocate_aligned<number_t>(maxXSize_);
 #ifndef NDEBUG
     memset(_x, 0, _maxXSize * sizeof(number_t));
 #endif
-    if (_b) { // backup the former b, might still be needed for online processing
-      memcpy(_x, _b, oldSize * sizeof(number_t));
-      free_aligned(_b);
-      _b = allocate_aligned<number_t>(_maxXSize);
-      std::swap(_b, _x);
+    if (b_) { // backup the former b, might still be needed for online processing
+      memcpy(x_, b_, oldSize * sizeof(number_t));
+      free_aligned(b_);
+      b_ = allocate_aligned<number_t>(maxXSize_);
+      std::swap(b_, x_);
     } else {
-      _b = allocate_aligned<number_t>(_maxXSize);
+      b_ = allocate_aligned<number_t>(maxXSize_);
 #ifndef NDEBUG
       memset(_b, 0, _maxXSize * sizeof(number_t));
 #endif
@@ -69,17 +69,17 @@ void Solver::resizeVector(size_t sx)
 
 void Solver::setOptimizer(SparseOptimizer* optimizer)
 {
-  _optimizer = optimizer;
+  optimizer_ = optimizer;
 }
 
 void Solver::setLevenberg(bool levenberg)
 {
-  _isLevenberg = levenberg;
+  isLevenberg_ = levenberg;
 }
 
 void Solver::setAdditionalVectorSpace(size_t s)
 {
-  _additionalVectorSpace = s;
+  additionalVectorSpace_ = s;
 }
 
 } // end namespace

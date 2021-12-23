@@ -37,43 +37,43 @@ namespace g2o {
 static std::shared_ptr<HyperGraph::Vertex> kNonExistantVertex(nullptr);
 
 HyperGraph::Data::Data() {
-  _next = nullptr;
-  _dataContainer = nullptr;
+  next_ = nullptr;
+  dataContainer_ = nullptr;
 }
 
 HyperGraph::Data::~Data() = default;
 
-HyperGraph::Vertex::Vertex(int id) : _id(id) {}
+HyperGraph::Vertex::Vertex(int id) : id_(id) {}
 
 HyperGraph::Vertex::~Vertex() = default;
 
-HyperGraph::Edge::Edge(int id) : _id(id) {}
+HyperGraph::Edge::Edge(int id) : id_(id) {}
 
 HyperGraph::Edge::~Edge() = default;
 
 int HyperGraph::Edge::numUndefinedVertices() const {
-  return std::count_if(_vertices.begin(), _vertices.end(),
-                       [](const std::shared_ptr<Vertex>& ptr) { return ptr.get() == nullptr; });
+  return std::count_if(vertices_.begin(), vertices_.end(),
+                       [](const std::shared_ptr<Vertex>& ptr) { return ptr == nullptr; });
 }
 
-void HyperGraph::Edge::resize(size_t size) { _vertices.resize(size, nullptr); }
+void HyperGraph::Edge::resize(size_t size) { vertices_.resize(size, nullptr); }
 
-void HyperGraph::Edge::setId(int id) { _id = id; }
+void HyperGraph::Edge::setId(int id) { id_ = id; }
 
 std::shared_ptr<HyperGraph::Vertex> HyperGraph::vertex(int id) {
-  auto it = _vertices.find(id);
-  if (it == _vertices.end()) return std::shared_ptr<HyperGraph::Vertex>();
+  auto it = vertices_.find(id);
+  if (it == vertices_.end()) return std::shared_ptr<HyperGraph::Vertex>();
   return it->second;
 }
 
 std::shared_ptr<const HyperGraph::Vertex> HyperGraph::vertex(int id) const {
-  auto it = _vertices.find(id);
-  if (it == _vertices.end()) return std::shared_ptr<HyperGraph::Vertex>();
+  auto it = vertices_.find(id);
+  if (it == vertices_.end()) return std::shared_ptr<HyperGraph::Vertex>();
   return it->second;
 }
 
 bool HyperGraph::addVertex(const std::shared_ptr<Vertex>& v) {
-  auto result = _vertices.insert(std::make_pair(v->id(), v));
+  auto result = vertices_.insert(std::make_pair(v->id(), v));
   return result.second;
 }
 
@@ -84,9 +84,9 @@ bool HyperGraph::addVertex(const std::shared_ptr<Vertex>& v) {
 bool HyperGraph::changeId(std::shared_ptr<Vertex>& v, int newId) {
   auto v2 = vertex(v->id());
   if (v != v2) return false;
-  _vertices.erase(v->id());
+  vertices_.erase(v->id());
   v->setId(newId);
-  _vertices.insert(std::make_pair(v->id(), v));
+  vertices_.insert(std::make_pair(v->id(), v));
   return true;
 }
 
@@ -108,7 +108,7 @@ bool HyperGraph::addEdge(const std::shared_ptr<Edge>& e) {
     if (vertexPointer.size() != e->vertices().size()) return false;
   }
 
-  std::pair<EdgeSet::iterator, bool> result = _edges.insert(e);
+  std::pair<EdgeSet::iterator, bool> result = edges_.insert(e);
   if (!result.second) return false;
 
   for (auto& v : e->vertices()) {  // connect the vertices to this edge
@@ -128,11 +128,11 @@ bool HyperGraph::setEdgeVertex(const std::shared_ptr<Edge>& e, int pos, const st
 
 bool HyperGraph::mergeVertices(std::shared_ptr<Vertex>& vBig, std::shared_ptr<Vertex>& vSmall,
                                bool erase) {
-  auto it = _vertices.find(vBig->id());
-  if (it == _vertices.end()) return false;
+  auto it = vertices_.find(vBig->id());
+  if (it == vertices_.end()) return false;
 
-  it = _vertices.find(vSmall->id());
-  if (it == _vertices.end()) return false;
+  it = vertices_.find(vSmall->id());
+  if (it == vertices_.end()) return false;
 
   EdgeSetWeak tmp = vSmall->edges();
   bool ok = true;
@@ -149,8 +149,8 @@ bool HyperGraph::mergeVertices(std::shared_ptr<Vertex>& vBig, std::shared_ptr<Ve
 }
 
 bool HyperGraph::detachVertex(const std::shared_ptr<Vertex>& v) {
-  auto it = _vertices.find(v->id());
-  if (it == _vertices.end()) return false;
+  auto it = vertices_.find(v->id());
+  if (it == vertices_.end()) return false;
   assert(it->second == v);
   EdgeSetWeak tmp = v->edges();
   for (const auto & it : tmp) {
@@ -169,8 +169,8 @@ bool HyperGraph::removeVertex(const std::shared_ptr<Vertex>& v, bool detach) {
       assert(0 && "inconsistency in detaching vertex");
     }
   }
-  auto it = _vertices.find(v->id());
-  if (it == _vertices.end()) return false;
+  auto it = vertices_.find(v->id());
+  if (it == vertices_.end()) return false;
   assert(it->second == v);
   // remove all edges which are entering or leaving v;
   EdgeSetWeak tmp = v->edges();
@@ -179,14 +179,14 @@ bool HyperGraph::removeVertex(const std::shared_ptr<Vertex>& v, bool detach) {
       assert(0 && "error in erasing vertex");
     }
   }
-  _vertices.erase(it);
+  vertices_.erase(it);
   return true;
 }
 
 bool HyperGraph::removeEdge(const std::shared_ptr<Edge>& e) {
-  auto it = _edges.find(e);
-  if (it == _edges.end()) return false;
-  _edges.erase(it);
+  auto it = edges_.find(e);
+  if (it == edges_.end()) return false;
+  edges_.erase(it);
   for (auto vit = e->vertices().begin(); vit != e->vertices().end(); ++vit) {
     auto& v = *vit;
     if (!v) continue;
@@ -200,8 +200,8 @@ bool HyperGraph::removeEdge(const std::shared_ptr<Edge>& e) {
 HyperGraph::HyperGraph() = default;
 
 void HyperGraph::clear() {
-  _vertices.clear();
-  _edges.clear();
+  vertices_.clear();
+  edges_.clear();
 }
 
 HyperGraph::~HyperGraph() { HyperGraph::clear(); }

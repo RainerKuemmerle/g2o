@@ -28,48 +28,46 @@
 
 #include <cassert>
 
-using namespace std;
-
 namespace g2o {
 
-std::unique_ptr<RobustKernelFactory> RobustKernelFactory::factoryInstance;
+std::unique_ptr<RobustKernelFactory> RobustKernelFactory::factoryInstance_;
 
 RobustKernelFactory* RobustKernelFactory::instance() {
-  if (factoryInstance == nullptr) {
-    factoryInstance.reset(new RobustKernelFactory);
+  if (factoryInstance_ == nullptr) {
+    factoryInstance_.reset(new RobustKernelFactory);
   }
 
-  return factoryInstance.get();
+  return factoryInstance_.get();
 }
 
 void RobustKernelFactory::registerRobustKernel(const std::string& tag,
                                                const AbstractRobustKernelCreator::Ptr& c) {
-  CreatorMap::const_iterator foundIt = _creator.find(tag);
-  if (foundIt != _creator.end()) {
+  CreatorMap::const_iterator foundIt = creator_.find(tag);
+  if (foundIt != creator_.end()) {
     assert(0 && "Overwriting robust kernel tag");
   }
 
-  _creator[tag] = c;
+  creator_[tag] = c;
 }
 
 void RobustKernelFactory::unregisterType(const std::string& tag) {
-  auto tagPosition = _creator.find(tag);
-  if (tagPosition != _creator.end()) {
-    _creator.erase(tagPosition);
+  auto tagPosition = creator_.find(tag);
+  if (tagPosition != creator_.end()) {
+    creator_.erase(tagPosition);
   }
 }
 
 std::shared_ptr<RobustKernel> RobustKernelFactory::construct(const std::string& tag) const {
-  auto foundIt = _creator.find(tag);
-  if (foundIt != _creator.end()) {
+  auto foundIt = creator_.find(tag);
+  if (foundIt != creator_.end()) {
     return foundIt->second->construct();
   }
   return nullptr;
 }
 
 AbstractRobustKernelCreator::Ptr RobustKernelFactory::creator(const std::string& tag) const {
-  auto foundIt = _creator.find(tag);
-  if (foundIt != _creator.end()) {
+  auto foundIt = creator_.find(tag);
+  if (foundIt != creator_.end()) {
     return foundIt->second;
   }
   return nullptr;
@@ -77,13 +75,13 @@ AbstractRobustKernelCreator::Ptr RobustKernelFactory::creator(const std::string&
 
 void RobustKernelFactory::fillKnownKernels(std::vector<std::string>& types) const {
   types.clear();
-  for (const auto & it : _creator)
+  for (const auto & it : creator_)
     types.push_back(it.first);
 }
 
 void RobustKernelFactory::destroy() {
   std::unique_ptr<RobustKernelFactory> aux;
-  factoryInstance.swap(aux);
+  factoryInstance_.swap(aux);
 }
 
 }  // namespace g2o

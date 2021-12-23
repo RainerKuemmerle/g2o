@@ -33,13 +33,13 @@ RobustKernel::RobustKernel()
 = default;
 
 RobustKernel::RobustKernel(number_t delta) :
-  _delta(delta)
+  delta_(delta)
 {
 }
 
 void RobustKernel::setDelta(number_t delta)
 {
-  _delta = delta;
+  delta_ = delta;
 }
 
 } // end namespace g2o

@@ -28,6 +28,7 @@
 #define G2O_OPTIMIZATION_ALGORITHM_PROPERTY_H
 
 #include <string>
+#include <utility>
 
 #include "g2o_core_api.h"
 
@@ -36,23 +37,24 @@ namespace g2o {
 /**
  * \brief describe the properties of a solver
  */
-struct G2O_CORE_API OptimizationAlgorithmProperty
-{
-  std::string name;           ///< name of the solver, e.g., var
-  std::string desc;           ///< short description of the solver
-  std::string type;           ///< type of solver, e.g., "CSparse Cholesky", "PCG"
-  bool requiresMarginalize{false};   ///< whether the solver requires marginalization of landmarks
-  int poseDim{-1};                ///< dimension of the pose vertices (-1 if variable)
-  int landmarkDim{-1};            ///< dimension of the landmark vertices (-1 if variable)
-  OptimizationAlgorithmProperty()  
-  {
-  }
-  OptimizationAlgorithmProperty(const std::string& name_, const std::string& desc_, const std::string& type_, bool requiresMarginalize_, int poseDim_, int landmarkDim_) :
-    name(name_), desc(desc_), type(type_), requiresMarginalize(requiresMarginalize_), poseDim(poseDim_), landmarkDim(landmarkDim_)
-  {
-  }
+struct G2O_CORE_API OptimizationAlgorithmProperty {
+  std::string name;                  ///< name of the solver, e.g., var
+  std::string desc;                  ///< short description of the solver
+  std::string type;                  ///< type of solver, e.g., "CSparse Cholesky", "PCG"
+  bool requiresMarginalize = false;  ///< whether the solver requires marginalization of landmarks
+  int poseDim = -1;                  ///< dimension of the pose vertices (-1 if variable)
+  int landmarkDim = -1;              ///< dimension of the landmark vertices (-1 if variable)
+  OptimizationAlgorithmProperty() = default;
+  OptimizationAlgorithmProperty(std::string name_, std::string desc_, std::string type_,
+                                bool requiresMarginalize_, int poseDim_, int landmarkDim_)
+      : name(std::move(name_)),
+        desc(std::move(desc_)),
+        type(std::move(type_)),
+        requiresMarginalize(requiresMarginalize_),
+        poseDim(poseDim_),
+        landmarkDim(landmarkDim_) {}
 };
 
-} // end namespace
+}  // namespace g2o
 
 #endif

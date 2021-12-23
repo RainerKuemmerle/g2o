@@ -61,9 +61,9 @@ class RobustKernel;
  */
 struct G2O_CORE_API OptimizableGraph : public HyperGraph {
   enum ActionType {
-    AT_PREITERATION,
-    AT_POSTITERATION,
-    AT_NUM_ELEMENTS,  // keep as last element
+    kAtPreiteration,
+    kAtPostiteration,
+    kAtNumElements,  // keep as last element
   };
 
   using HyperGraphActionSet = std::set<std::shared_ptr<HyperGraphAction>>;
@@ -120,7 +120,7 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
     friend struct OptimizableGraph;
 
    public:
-    Vertex();
+    Vertex() = default;
     ~Vertex() override;
 
     //! sets the node to the origin (used in the multilevel stuff)
@@ -335,44 +335,44 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
     }
 
     //! temporary index of this node in the parameter vector obtained from linearization
-    int hessianIndex() const { return _hessianIndex; }
+    int hessianIndex() const { return hessianIndex_; }
     //! set the temporary index of the vertex in the parameter blocks
-    void setHessianIndex(int ti) { _hessianIndex = ti; }
+    void setHessianIndex(int ti) { hessianIndex_ = ti; }
 
     //! true => this node is fixed during the optimization
-    bool fixed() const { return _fixed; }
+    bool fixed() const { return fixed_; }
     //! true => this node should be considered fixed during the optimization
-    void setFixed(bool fixed) { _fixed = fixed; }
+    void setFixed(bool fixed) { fixed_ = fixed; }
 
     //! true => this node is marginalized out during the optimization
-    bool marginalized() const { return _marginalized; }
+    bool marginalized() const { return marginalized_; }
     //! true => this node should be marginalized out during the optimization
-    void setMarginalized(bool marginalized) { _marginalized = marginalized; }
+    void setMarginalized(bool marginalized) { marginalized_ = marginalized; }
 
     //! dimension of the estimated state belonging to this node
-    int dimension() const { return _dimension; }
+    int dimension() const { return dimension_; }
 
     //! sets the id of the node in the graph be sure that the graph keeps consistent after changing
     //! the id
-    void setId(int id) override { _id = id; }
+    void setId(int id) override { id_ = id; }
 
     //! set the row of this vertex in the Hessian
-    void setColInHessian(int c) { _colInHessian = c; }
+    void setColInHessian(int c) { colInHessian_ = c; }
     //! get the row of this vertex in the Hessian
-    int colInHessian() const { return _colInHessian; }
+    int colInHessian() const { return colInHessian_; }
 
-    const OptimizableGraph* graph() const { return _graph; }
-    OptimizableGraph* graph() { return _graph; }
+    const OptimizableGraph* graph() const { return graph_; }
+    OptimizableGraph* graph() { return graph_; }
 
     /**
      * lock for the block of the hessian and the b vector associated with this vertex, to avoid
      * race-conditions if multi-threaded.
      */
-    void lockQuadraticForm() { _quadraticFormMutex.lock(); }
+    void lockQuadraticForm() { quadraticFormMutex_.lock(); }
     /**
      * unlock the block of the hessian and the b vector associated with this vertex
      */
-    void unlockQuadraticForm() { _quadraticFormMutex.unlock(); }
+    void unlockQuadraticForm() { quadraticFormMutex_.unlock(); }
 
     //! read the vertex from a stream, i.e., the internal state of the vertex
     virtual bool read(std::istream& is) = 0;
@@ -384,15 +384,15 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
     CacheContainer* cacheContainer();
 
    protected:
-    OptimizableGraph* _graph{nullptr};
-    int _hessianIndex{-1};
-    bool _fixed{false};
-    bool _marginalized{false};
-    int _dimension;
-    int _colInHessian{-1};
-    OpenMPMutex _quadraticFormMutex;
+    OptimizableGraph* graph_{nullptr};
+    int hessianIndex_{-1};
+    bool fixed_{false};
+    bool marginalized_{false};
+    int dimension_;
+    int colInHessian_{-1};
+    OpenMPMutex quadraticFormMutex_;
 
-    CacheContainer* _cacheContainer{nullptr};
+    CacheContainer* cacheContainer_{nullptr};
 
     /**
      * update the position of the node from the parameters in v.
@@ -449,7 +449,7 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
     virtual bool setMeasurementFromState();
 
     //! if NOT NULL, error of this edge will be robustifed with the kernel
-    std::shared_ptr<RobustKernel> robustKernel() const { return _robustKernel; }
+    std::shared_ptr<RobustKernel> robustKernel() const { return robustKernel_; }
     /**
      * specify the robust kernel to be used in this edge
      */
@@ -510,12 +510,12 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
     }
 
     //! returns the level of the edge
-    int level() const { return _level; }
+    int level() const { return level_; }
     //! sets the level of the edge
-    void setLevel(int l) { _level = l; }
+    void setLevel(int l) { level_ = l; }
 
     //! returns the dimensions of the error function
-    int dimension() const { return _dimension; }
+    int dimension() const { return dimension_; }
 
     virtual Vertex* createVertex(int) { return nullptr; }
 
@@ -525,48 +525,48 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
     virtual bool write(std::ostream& os) const = 0;
 
     //! the internal ID of the edge
-    long long internalId() const { return _internalId; }
+    int64_t internalId() const { return internalId_; }
 
     OptimizableGraph* graph();
     const OptimizableGraph* graph() const;
 
     bool setParameterId(int argNum, int paramId);
-    std::shared_ptr<Parameter> parameter(int argNo) const { return _parameters.at(argNo); }
-    size_t numParameters() const { return _parameters.size(); }
+    std::shared_ptr<Parameter> parameter(int argNo) const { return parameters_.at(argNo); }
+    size_t numParameters() const { return parameters_.size(); }
 
-    const std::vector<int>& parameterIds() const { return _parameterIds; }
+    const std::vector<int>& parameterIds() const { return parameterIds_; }
 
    protected:
-    int _dimension{-1};
-    int _level{0};
-    std::shared_ptr<RobustKernel> _robustKernel;
-    long long _internalId;
+    int dimension_ = -1;
+    int level_ = 0;
+    std::shared_ptr<RobustKernel> robustKernel_;
+    int64_t internalId_;
 
     void resizeParameters(size_t newSize) {
-      _parameters.resize(newSize, nullptr);
-      _parameterIds.resize(newSize, -1);
-      _parameterTypes.resize(newSize, typeid(void*).name());
+      parameters_.resize(newSize, nullptr);
+      parameterIds_.resize(newSize, -1);
+      parameterTypes_.resize(newSize, typeid(void*).name());
     }
 
     template <typename ParameterType>
     bool installParameter(size_t argNo, int paramId = -1) {
-      if (argNo >= _parameters.size()) return false;
-      _parameterIds[argNo] = paramId;
-      _parameterTypes[argNo] = typeid(ParameterType).name();
+      if (argNo >= parameters_.size()) return false;
+      parameterIds_[argNo] = paramId;
+      parameterTypes_[argNo] = typeid(ParameterType).name();
       return true;
     }
 
     template <typename CacheType>
     void resolveCache(std::shared_ptr<CacheType>& cache,
-                      const std::shared_ptr<OptimizableGraph::Vertex>& v, const std::string& _type,
+                      const std::shared_ptr<OptimizableGraph::Vertex>& v, const std::string& type,
                       const ParameterVector& parameters);
 
     bool resolveParameters();
     virtual bool resolveCaches();
 
-    std::vector<std::string> _parameterTypes;
-    ParameterVector _parameters;
-    std::vector<int> _parameterIds;
+    std::vector<std::string> parameterTypes_;
+    ParameterVector parameters_;
+    std::vector<int> parameterIds_;
   };
 
   //! returns the vertex number <i>id</i> appropriately casted
@@ -615,7 +615,7 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
 
   //! Recompute the size of the Jacobian workspace from all the
   //! edges in the graph.
-  void recomputeJacobianWorkspaceSize() { _jacobianWorkspace.updateSize(*this, true); }
+  void recomputeJacobianWorkspaceSize() { jacobianWorkspace_.updateSize(*this, true); }
 
   /**
    * iterates over all vertices and returns a set of all the vertex dimensions in the graph
@@ -697,9 +697,9 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
    */
   virtual void clearParameters();
 
-  bool addParameter(const std::shared_ptr<Parameter>& p) { return _parameters.addParameter(p); }
+  bool addParameter(const std::shared_ptr<Parameter>& p) { return parameters_.addParameter(p); }
 
-  std::shared_ptr<Parameter> parameter(int id) { return _parameters.getParameter(id); }
+  std::shared_ptr<Parameter> parameter(int id) { return parameters_.getParameter(id); }
 
   /**
    * verify that all the information of the edges are semi positive definite, i.e.,
@@ -710,8 +710,8 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
   bool verifyInformationMatrices(bool verbose = false) const;
 
   //! the workspace for storing the Jacobians of the graph
-  JacobianWorkspace& jacobianWorkspace() { return _jacobianWorkspace; }
-  const JacobianWorkspace& jacobianWorkspace() const { return _jacobianWorkspace; }
+  JacobianWorkspace& jacobianWorkspace() { return jacobianWorkspace_; }
+  const JacobianWorkspace& jacobianWorkspace() const { return jacobianWorkspace_; }
 
   /**
    * Eigen starting from version 3.1 requires that we call an initialize
@@ -721,36 +721,36 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
    */
   static bool initMultiThreading();
 
-  ParameterContainer& parameters() { return _parameters; }
-  const ParameterContainer& parameters() const { return _parameters; }
+  ParameterContainer& parameters() { return parameters_; }
+  const ParameterContainer& parameters() const { return parameters_; }
 
   //! apply a unary function to all vertices
   void forEachVertex(const std::function<void(OptimizableGraph::Vertex*)>& fn);
   //! apply a unary function to the vertices in vset
-  void forEachVertex(HyperGraph::VertexSet& vset,
-                     const std::function<void(OptimizableGraph::Vertex*)>& fn);
+  static void forEachVertex(HyperGraph::VertexSet& vset,
+                            const std::function<void(OptimizableGraph::Vertex*)>& fn);
 
  protected:
-  std::map<std::string, std::string> _renamedTypesLookup;
-  long long _nextEdgeId;
-  std::vector<HyperGraphActionSet> _graphActions;
+  std::map<std::string, std::string> renamedTypesLookup_;
+  int64_t nextEdgeId_;
+  std::vector<HyperGraphActionSet> graphActions_;
 
-  ParameterContainer _parameters;
-  JacobianWorkspace _jacobianWorkspace;
+  ParameterContainer parameters_;
+  JacobianWorkspace jacobianWorkspace_;
 
   void performActions(int iter, HyperGraphActionSet& actions);
 
   // helper functions to save an individual vertex
-  bool saveVertex(std::ostream& os, Vertex* v) const;
+  static bool saveVertex(std::ostream& os, Vertex* v);
 
   // helper function to save an individual parameter
-  bool saveParameter(std::ostream& os, Parameter* v) const;
+  static bool saveParameter(std::ostream& os, Parameter* p);
 
   // helper functions to save an individual edge
-  bool saveEdge(std::ostream& os, Edge* e) const;
+  static bool saveEdge(std::ostream& os, Edge* e);
 
   // helper functions to save the data packets
-  bool saveUserData(std::ostream& os, HyperGraph::Data* v) const;
+  static bool saveUserData(std::ostream& os, HyperGraph::Data* d);
 };
 
 /**

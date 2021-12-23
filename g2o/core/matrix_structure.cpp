@@ -30,19 +30,18 @@
 #include <vector>
 #include <fstream>
 #include <algorithm>
-using namespace std;
 
 namespace g2o {
 
 struct ColSort
 {
-  bool operator()(const pair<int, int>& e1, const pair<int, int>& e2) const
+  bool operator()(const std::pair<int, int>& e1, const std::pair<int, int>& e2) const
   {
     return e1.second < e2.second || (e1.second == e2.second && e1.first < e2.first);
   }
 };
 
-MatrixStructure::MatrixStructure()  
+MatrixStructure::MatrixStructure()
 = default;
 
 MatrixStructure::~MatrixStructure()
@@ -53,22 +52,22 @@ MatrixStructure::~MatrixStructure()
 void MatrixStructure::alloc(int n_, int nz)
 {
   if (n == 0) {
-    maxN = n = n_;
-    maxNz = nz;
-    Ap  = new int[maxN + 1];
-    Aii = new int[maxNz];
+    maxN_ = n = n_;
+    maxNz_ = nz;
+    Ap  = new int[maxN_ + 1];
+    Aii = new int[maxNz_];
   }
   else {
     n = n_;
-    if (maxNz < nz) {
-      maxNz = 2 * nz;
+    if (maxNz_ < nz) {
+      maxNz_ = 2 * nz;
       delete[] Aii;
-      Aii = new int[maxNz];
+      Aii = new int[maxNz_];
     }
-    if (maxN < n) {
-      maxN = 2 * n;
+    if (maxN_ < n) {
+      maxN_ = 2 * n;
       delete[] Ap;
-      Ap = new int[maxN + 1];
+      Ap = new int[maxN_ + 1];
     }
   }
 }
@@ -77,8 +76,8 @@ void MatrixStructure::free()
 {
   n = 0;
   m = 0;
-  maxN = 0;
-  maxNz = 0;
+  maxN_ = 0;
+  maxNz_ = 0;
   delete[] Aii; Aii = nullptr;
   delete[] Ap; Ap = nullptr;
 }
@@ -88,12 +87,12 @@ bool MatrixStructure::write(const char* filename) const
   const int& cols = n;
   const int& rows = m;
 
-  string name = filename;
+  std::string name = filename;
   std::string::size_type lastDot = name.find_last_of('.');
-  if (lastDot != std::string::npos) 
+  if (lastDot != std::string::npos)
     name = name.substr(0, lastDot);
 
-  vector<pair<int, int> > entries;
+  std::vector<std::pair<int, int> > entries;
   for (int i=0; i < cols; ++i) {
     const int& rbeg = Ap[i];
     const int& rend = Ap[i+1];

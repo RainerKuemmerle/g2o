@@ -30,38 +30,30 @@
 
 #include "optimizable_graph.h"
 
-using namespace std;
-
 namespace g2o {
-
-  JacobianWorkspace::JacobianWorkspace()  
-  = default;
-
-  JacobianWorkspace::~JacobianWorkspace()
-  = default;
 
   bool JacobianWorkspace::allocate()
   {
     //cerr << __PRETTY_FUNCTION__ << " " << PVAR(this) << " " << PVAR(_maxNumVertices) << " " << PVAR(_maxDimension) << endl;
-    if (_maxNumVertices <=0 || _maxDimension <= 0)
+    if (maxNumVertices_ <=0 || maxDimension_ <= 0)
       return false;
-    _workspace.resize(_maxNumVertices);
-    for (auto & it : _workspace) {
-      it.resize(_maxDimension);
+    workspace_.resize(maxNumVertices_);
+    for (auto & it : workspace_) {
+      it.resize(maxDimension_);
       it.setZero();
     }
     return true;
   }
 
   void JacobianWorkspace::setZero() {
-    for (auto& wp : _workspace) wp.setZero();
+    for (auto& wp : workspace_) wp.setZero();
   }
 
   void JacobianWorkspace::updateSize(const HyperGraph::Edge* e_, bool reset)
   {
     if (reset) {
-      _maxNumVertices = -1;
-      _maxDimension = -1;
+      maxNumVertices_ = -1;
+      maxDimension_ = -1;
     }
 
     const auto* e = static_cast<const OptimizableGraph::Edge*>(e_);
@@ -72,18 +64,18 @@ namespace g2o {
     for (int i = 0; i < numVertices; ++i) {
       const OptimizableGraph::Vertex* v = static_cast<const OptimizableGraph::Vertex*>(e->vertex(i).get());
       assert(v && "Edge has no vertex assigned");
-      maxDimensionForEdge = max(v->dimension() * errorDimension, maxDimensionForEdge);
+      maxDimensionForEdge = std::max(v->dimension() * errorDimension, maxDimensionForEdge);
     }
-    _maxNumVertices = max(numVertices, _maxNumVertices);
-    _maxDimension = max(maxDimensionForEdge, _maxDimension);
+    maxNumVertices_ = std::max(numVertices, maxNumVertices_);
+    maxDimension_ = std::max(maxDimensionForEdge, maxDimension_);
     //cerr << __PRETTY_FUNCTION__ << " " << PVAR(this) << " " << PVAR(_maxNumVertices) << " " << PVAR(_maxDimension) << endl;
   }
 
   void JacobianWorkspace::updateSize(const OptimizableGraph& graph, bool reset)
   {
     if (reset) {
-      _maxNumVertices = -1;
-      _maxDimension = -1;
+      maxNumVertices_ = -1;
+      maxDimension_ = -1;
     }
 
     for (const auto & it : graph.edges()) {
@@ -95,12 +87,12 @@ namespace g2o {
   void JacobianWorkspace::updateSize(int numVertices, int dimension, bool reset)
   {
     if (reset) {
-      _maxNumVertices = -1;
-      _maxDimension = -1;
+      maxNumVertices_ = -1;
+      maxDimension_ = -1;
     }
 
-    _maxNumVertices = max(numVertices, _maxNumVertices);
-    _maxDimension = max(dimension, _maxDimension);
+    maxNumVertices_ = std::max(numVertices, maxNumVertices_);
+    maxDimension_ = std::max(dimension, maxDimension_);
   }
 
 } // end namespace

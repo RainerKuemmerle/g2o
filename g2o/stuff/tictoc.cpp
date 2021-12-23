@@ -149,14 +149,14 @@ namespace g2o {
   }
 
   ScopedTictoc::ScopedTictoc(const char* algorithmPart) :
-    _algorithmPart(algorithmPart)
+    algorithmPart_(algorithmPart)
   {
-    tictoc(_algorithmPart.c_str());
+    tictoc(algorithmPart_.c_str());
   }
 
   ScopedTictoc::~ScopedTictoc()
   {
-    tictoc(_algorithmPart.c_str());
+    tictoc(algorithmPart_.c_str());
   }
 
 } // end namespace

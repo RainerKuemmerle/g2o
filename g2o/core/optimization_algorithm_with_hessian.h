@@ -41,7 +41,6 @@ namespace g2o {
   {
     public:
       explicit OptimizationAlgorithmWithHessian(Solver& solver);
-      ~OptimizationAlgorithmWithHessian() override;
 
       bool init(bool online = false) override;
 
@@ -54,17 +53,17 @@ namespace g2o {
       bool updateStructure(const HyperGraph::VertexContainer& vset, const HyperGraph::EdgeSet& edges) override;
 
       //! return the underlying solver used to solve the linear system
-      Solver& solver() { return _solver;}
+      Solver& solver() { return solver_;}
 
       /**
        * write debug output of the Hessian if system is not positive definite
        */
       virtual void setWriteDebug(bool writeDebug);
-      virtual bool writeDebug() const { return _writeDebug->value();}
+      virtual bool writeDebug() const { return writeDebug_->value();}
 
     protected:
-      Solver& _solver;
-      std::shared_ptr<Property<bool>> _writeDebug;
+      Solver& solver_;
+      std::shared_ptr<Property<bool>> writeDebug_;
 
   };
 

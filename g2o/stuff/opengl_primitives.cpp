@@ -39,21 +39,21 @@ class GLUWrapper
     static GLUquadricObj* getQuadradic()
     {
       static GLUWrapper inst;
-      return inst._quadratic;
+      return inst.quadratic_;
     }
   protected:
     GLUWrapper()
     {
       //std::cerr << __PRETTY_FUNCTION__ << std::endl;
-      _quadratic = gluNewQuadric();              // Create A Pointer To The Quadric Object ( NEW )
-      gluQuadricNormals(_quadratic, GLU_SMOOTH); // Create Smooth Normals ( NEW )
+      quadratic_ = gluNewQuadric();              // Create A Pointer To The Quadric Object ( NEW )
+      gluQuadricNormals(quadratic_, GLU_SMOOTH); // Create Smooth Normals ( NEW )
     }
     ~GLUWrapper()
     {
       //std::cerr << __PRETTY_FUNCTION__ << std::endl;
-      gluDeleteQuadric(_quadratic);
+      gluDeleteQuadric(quadratic_);
     }
-    GLUquadricObj* _quadratic;;
+    GLUquadricObj* quadratic_;;
 };
 
 void drawArrow2D(float len, float head_width, float head_len)

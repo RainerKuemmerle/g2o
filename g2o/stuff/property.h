@@ -41,12 +41,12 @@ class G2O_STUFF_API BaseProperty {
  public:
   explicit BaseProperty(std::string name_);
   virtual ~BaseProperty() = default;
-  const std::string& name() { return _name; }
+  const std::string& name() { return name_; }
   virtual std::string toString() const = 0;
   virtual bool fromString(const std::string& s) = 0;
 
  protected:
-  std::string _name;
+  std::string name_;
 };
 
 template <typename T>
@@ -54,21 +54,21 @@ class Property : public BaseProperty {
  public:
   using ValueType = T;
   explicit Property(const std::string& name_) : BaseProperty(name_) {}
-  Property(const std::string& name_, const T& v) : BaseProperty(name_), _value(v) {}
-  void setValue(const T& v) { _value = v; }
-  const T& value() const { return _value; }
+  Property(const std::string& name_, const T& v) : BaseProperty(name_), value_(v) {}
+  void setValue(const T& v) { value_ = v; }
+  const T& value() const { return value_; }
   std::string toString() const override {
     std::stringstream sstr;
-    sstr << _value;
+    sstr << value_;
     return sstr.str();
   }
   bool fromString(const std::string& s) override {
-    bool status = convertString(s, _value);
+    bool status = convertString(s, value_);
     return status;
   }
 
  protected:
-  T _value;
+  T value_;
 };
 
 /**

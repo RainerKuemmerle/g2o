@@ -53,9 +53,9 @@ namespace g2o {
       using SparseMatrixBlock = MatrixType;
 
       //! columns of the matrix
-      int cols() const {return !_colBlockIndices.empty() ? _colBlockIndices.back() : 0;}
+      int cols() const {return !colBlockIndices_.empty() ? colBlockIndices_.back() : 0;}
       //! rows of the matrix
-      int rows() const {return !_rowBlockIndices.empty() ? _rowBlockIndices.back() : 0;}
+      int rows() const {return !rowBlockIndices_.empty() ? rowBlockIndices_.back() : 0;}
 
       /**
        * \brief A block within a column
@@ -71,30 +71,30 @@ namespace g2o {
       using SparseColumn = std::vector<RowBlock>;
 
       SparseBlockMatrixCCS(const std::vector<int>& rowIndices, const std::vector<int>& colIndices) :
-        _rowBlockIndices(rowIndices), _colBlockIndices(colIndices)
+        rowBlockIndices_(rowIndices), colBlockIndices_(colIndices)
       {}
 
       //! how many rows does the block at block-row r has?
-      int rowsOfBlock(int r) const { return r ? _rowBlockIndices[r] - _rowBlockIndices[r-1] : _rowBlockIndices[0] ; }
+      int rowsOfBlock(int r) const { return r ? rowBlockIndices_[r] - rowBlockIndices_[r-1] : rowBlockIndices_[0] ; }
 
       //! how many cols does the block at block-col c has?
-      int colsOfBlock(int c) const { return c ? _colBlockIndices[c] - _colBlockIndices[c-1] : _colBlockIndices[0]; }
+      int colsOfBlock(int c) const { return c ? colBlockIndices_[c] - colBlockIndices_[c-1] : colBlockIndices_[0]; }
 
       //! where does the row at block-row r start?
-      int rowBaseOfBlock(int r) const { return r ? _rowBlockIndices[r-1] : 0 ; }
+      int rowBaseOfBlock(int r) const { return r ? rowBlockIndices_[r-1] : 0 ; }
 
       //! where does the col at block-col r start?
-      int colBaseOfBlock(int c) const { return c ? _colBlockIndices[c-1] : 0 ; }
+      int colBaseOfBlock(int c) const { return c ? colBlockIndices_[c-1] : 0 ; }
 
       //! the block matrices per block-column
-      const std::vector<SparseColumn>& blockCols() const { return _blockCols;}
-      std::vector<SparseColumn>& blockCols() { return _blockCols;}
+      const std::vector<SparseColumn>& blockCols() const { return blockCols_;}
+      std::vector<SparseColumn>& blockCols() { return blockCols_;}
 
       //! indices of the row blocks
-      const std::vector<int>& rowBlockIndices() const { return _rowBlockIndices;}
+      const std::vector<int>& rowBlockIndices() const { return rowBlockIndices_;}
 
       //! indices of the column blocks
-      const std::vector<int>& colBlockIndices() const { return _colBlockIndices;}
+      const std::vector<int>& colBlockIndices() const { return colBlockIndices_;}
 
       void rightMultiply(number_t*& dest, const number_t* src) const
       {
@@ -112,9 +112,9 @@ namespace g2o {
 #      ifdef G2O_OPENMP
 #      pragma omp parallel for default (shared) schedule(dynamic, 10)
 #      endif
-        for (int i=0; i < static_cast<int>(_blockCols.size()); ++i){
+        for (int i=0; i < static_cast<int>(blockCols_.size()); ++i){
           int destOffset = colBaseOfBlock(i);
-          for (typename SparseColumn::const_iterator it = _blockCols[i].begin(); it!=_blockCols[i].end(); ++it) {
+          for (auto it = blockCols_[i].begin(); it!=blockCols_[i].end(); ++it) {
             const SparseMatrixBlock* a = it->block;
             int srcOffset = rowBaseOfBlock(it->row);
             // destVec += *a.transpose() * srcVec (according to the sub-vector parts)
@@ -128,8 +128,8 @@ namespace g2o {
        */
       void sortColumns()
       {
-        for (int i=0; i < static_cast<int>(_blockCols.size()); ++i){
-          std::sort(_blockCols[i].begin(), _blockCols[i].end());
+        for (int i=0; i < static_cast<int>(blockCols_.size()); ++i){
+          std::sort(blockCols_[i].begin(), blockCols_[i].end());
         }
       }
 
@@ -140,14 +140,14 @@ namespace g2o {
       {
         assert(Cp && Ci && Cx && "Target destination is NULL");
         int nz=0;
-        for (size_t i=0; i<_blockCols.size(); ++i){
-          int cstart=i ? _colBlockIndices[i-1] : 0;
+        for (size_t i=0; i<blockCols_.size(); ++i){
+          int cstart=i ? colBlockIndices_[i-1] : 0;
           int csize=colsOfBlock(i);
           for (int c=0; c<csize; ++c) {
             *Cp=nz;
-            for (typename SparseColumn::const_iterator it = _blockCols[i].begin(); it!=_blockCols[i].end(); ++it) {
+            for (auto it = blockCols_[i].begin(); it!=blockCols_[i].end(); ++it) {
               const SparseMatrixBlock* b=it->block;
-              int rstart=it->row ? _rowBlockIndices[it->row-1] : 0;
+              int rstart=it->row ? rowBlockIndices_[it->row-1] : 0;
 
               int elemsToCopy = b->rows();
               if (upperTriangle && rstart == cstart)
@@ -174,12 +174,12 @@ namespace g2o {
         assert(Cx && "Target destination is NULL");
         number_t* CxStart = Cx;
         int cstart = 0;
-        for (size_t i=0; i<_blockCols.size(); ++i){
-          int csize = _colBlockIndices[i] - cstart;
+        for (size_t i=0; i<blockCols_.size(); ++i){
+          int csize = colBlockIndices_[i] - cstart;
           for (int c=0; c<csize; ++c) {
-            for (typename SparseColumn::const_iterator it = _blockCols[i].begin(); it!=_blockCols[i].end(); ++it) {
+            for (auto it = blockCols_[i].begin(); it!=blockCols_[i].end(); ++it) {
               const SparseMatrixBlock* b = it->block;
-              int rstart = it->row ? _rowBlockIndices[it->row-1] : 0;
+              int rstart = it->row ? rowBlockIndices_[it->row-1] : 0;
 
               int elemsToCopy = b->rows();
               if (upperTriangle && rstart == cstart)
@@ -189,15 +189,15 @@ namespace g2o {
 
             }
           }
-          cstart = _colBlockIndices[i];
+          cstart = colBlockIndices_[i];
         }
         return Cx - CxStart;
       }
 
     protected:
-      const std::vector<int>& _rowBlockIndices; ///< vector of the indices of the blocks along the rows.
-      const std::vector<int>& _colBlockIndices; ///< vector of the indices of the blocks along the cols
-      std::vector<SparseColumn> _blockCols;     ///< the matrices stored in CCS order
+      const std::vector<int>& rowBlockIndices_; ///< vector of the indices of the blocks along the rows.
+      const std::vector<int>& colBlockIndices_; ///< vector of the indices of the blocks along the cols
+      std::vector<SparseColumn> blockCols_;     ///< the matrices stored in CCS order
   };
 
 
@@ -205,7 +205,7 @@ namespace g2o {
   /**
    * \brief Sparse matrix which uses blocks based on hash structures
    *
-   * This class is used to construct the pattern of a sparse block matrix 
+   * This class is used to construct the pattern of a sparse block matrix
    */
   template <class MatrixType>
   class SparseBlockMatrixHashMap
@@ -215,37 +215,37 @@ namespace g2o {
       using SparseMatrixBlock = MatrixType;
 
       //! columns of the matrix
-      int cols() const {return !_colBlockIndices.empty() ? _colBlockIndices.back() : 0;}
+      int cols() const {return !colBlockIndices_.empty() ? colBlockIndices_.back() : 0;}
       //! rows of the matrix
-      int rows() const {return !_rowBlockIndices.empty() ? _rowBlockIndices.back() : 0;}
+      int rows() const {return !rowBlockIndices_.empty() ? rowBlockIndices_.back() : 0;}
 
       using SparseColumn = std::unordered_map<int, MatrixType *>;
 
       SparseBlockMatrixHashMap(const std::vector<int>& rowIndices, const std::vector<int>& colIndices) :
-        _rowBlockIndices(rowIndices), _colBlockIndices(colIndices)
+        rowBlockIndices_(rowIndices), colBlockIndices_(colIndices)
       {}
 
       //! how many rows does the block at block-row r has?
-      int rowsOfBlock(int r) const { return r ? _rowBlockIndices[r] - _rowBlockIndices[r-1] : _rowBlockIndices[0] ; }
+      int rowsOfBlock(int r) const { return r ? rowBlockIndices_[r] - rowBlockIndices_[r-1] : rowBlockIndices_[0] ; }
 
       //! how many cols does the block at block-col c has?
-      int colsOfBlock(int c) const { return c ? _colBlockIndices[c] - _colBlockIndices[c-1] : _colBlockIndices[0]; }
+      int colsOfBlock(int c) const { return c ? colBlockIndices_[c] - colBlockIndices_[c-1] : colBlockIndices_[0]; }
 
       //! where does the row at block-row r start?
-      int rowBaseOfBlock(int r) const { return r ? _rowBlockIndices[r-1] : 0 ; }
+      int rowBaseOfBlock(int r) const { return r ? rowBlockIndices_[r-1] : 0 ; }
 
       //! where does the col at block-col r start?
-      int colBaseOfBlock(int c) const { return c ? _colBlockIndices[c-1] : 0 ; }
+      int colBaseOfBlock(int c) const { return c ? colBlockIndices_[c-1] : 0 ; }
 
       //! the block matrices per block-column
-      const std::vector<SparseColumn>& blockCols() const { return _blockCols;}
-      std::vector<SparseColumn>& blockCols() { return _blockCols;}
+      const std::vector<SparseColumn>& blockCols() const { return blockCols_;}
+      std::vector<SparseColumn>& blockCols() { return blockCols_;}
 
       //! indices of the row blocks
-      const std::vector<int>& rowBlockIndices() const { return _rowBlockIndices;}
+      const std::vector<int>& rowBlockIndices() const { return rowBlockIndices_;}
 
       //! indices of the column blocks
-      const std::vector<int>& colBlockIndices() const { return _colBlockIndices;}
+      const std::vector<int>& colBlockIndices() const { return colBlockIndices_;}
 
       /**
        * add a block to the pattern, return a pointer to the added block
@@ -253,8 +253,8 @@ namespace g2o {
       MatrixType* addBlock(int r, int c, bool zeroBlock = false)
       {
         assert(c <(int)_blockCols.size() && "accessing column which is not available");
-        SparseColumn& sparseColumn = _blockCols[c];
-        typename SparseColumn::iterator foundIt = sparseColumn.find(r);
+        SparseColumn& sparseColumn = blockCols_[c];
+        auto foundIt = sparseColumn.find(r);
         if (foundIt == sparseColumn.end()) {
           int rb = rowsOfBlock(r);
           int cb = colsOfBlock(c);
@@ -268,9 +268,9 @@ namespace g2o {
       }
 
     protected:
-      const std::vector<int>& _rowBlockIndices; ///< vector of the indices of the blocks along the rows.
-      const std::vector<int>& _colBlockIndices; ///< vector of the indices of the blocks along the cols
-      std::vector<SparseColumn> _blockCols;     ///< the matrices stored in CCS order
+      const std::vector<int>& rowBlockIndices_; ///< vector of the indices of the blocks along the rows.
+      const std::vector<int>& colBlockIndices_; ///< vector of the indices of the blocks along the cols
+      std::vector<SparseColumn> blockCols_;     ///< the matrices stored in CCS order
   };
 
 } //end namespace

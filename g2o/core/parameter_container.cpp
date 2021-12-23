@@ -72,22 +72,22 @@ bool ParameterContainer::write(std::ostream& os) const {
 }
 
 bool ParameterContainer::read(std::istream& is,
-                              const std::map<std::string, std::string>* _renamedTypesLookup) {
+                              const std::map<std::string, std::string>* renamedTypesLookup) {
   stringstream currentLine;
   string token;
 
   Factory* factory = Factory::instance();
   HyperGraph::GraphElemBitset elemBitset;
-  elemBitset[HyperGraph::HGET_PARAMETER] = true;
+  elemBitset[HyperGraph::kHgetParameter] = true;
 
   while (true) {
     int bytesRead = readLine(is, currentLine);
     if (bytesRead == -1) break;
     currentLine >> token;
     if (bytesRead == 0 || token.empty() || token[0] == '#') continue;
-    if (_renamedTypesLookup && !_renamedTypesLookup->empty()) {
-      auto foundIt = _renamedTypesLookup->find(token);
-      if (foundIt != _renamedTypesLookup->end()) {
+    if (renamedTypesLookup && !renamedTypesLookup->empty()) {
+      auto foundIt = renamedTypesLookup->find(token);
+      if (foundIt != renamedTypesLookup->end()) {
         token = foundIt->second;
       }
     }

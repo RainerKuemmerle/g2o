@@ -6,6 +6,9 @@
 #  -google-readability-namespace-comments: the *_CLIENT_NS is a macro, and
 #      clang-tidy fails to match it against the initial value.
 #
+#  -google-default-arguments: Heavy in use at the moment and would need refactoring
+#     TODO activate the flag google-default-arguments
+#
 #  -modernize-use-trailing-return-type: clang-tidy recommends using
 #      `auto Foo() -> std::string { return ...; }`, we think the code is less
 #      readable in this form.
@@ -37,6 +40,9 @@
 #  -bugprone-narrowing-conversions: too many false positives around
 #      `std::size_t`  vs. `*::difference_type`.
 #
+#  -bugprone-easily-swappable-parameters: Would require to change API
+#     TODO Take a closer look at the API
+#
 Checks: >
   -*,
   bugprone-*,
@@ -46,6 +52,7 @@ Checks: >
   performance-*,
   portability-*,
   readability-*,
+  -google-default-arguments,
   -google-readability-braces-around-statements,
   -google-readability-namespace-comments,
   -google-runtime-references,
@@ -59,6 +66,7 @@ Checks: >
   -readability-named-parameter,
   -readability-redundant-declaration,
   -readability-function-cognitive-complexity,
+  -bugprone-easily-swappable-parameters,
   -bugprone-narrowing-conversions
 
 # Turn all the warnings from the checks above into errors.
@@ -75,9 +83,9 @@ CheckOptions:
   - { key: readability-identifier-naming.FunctionCase,            value: aNy_CasE   }
 #  - { key: readability-identifier-naming.VariableCase,            value: camelBack  }
   - { key: readability-identifier-naming.ClassMemberCase,         value: camelBack  }
-  - { key: readability-identifier-naming.ClassMemberPrefix,       value: _          }
-  - { key: readability-identifier-naming.PrivateMemberPrefix,     value: _          }
-  - { key: readability-identifier-naming.ProtectedMemberPrefix,   value: _          }
+  - { key: readability-identifier-naming.ClassMemberSuffix,       value: _          }
+  - { key: readability-identifier-naming.PrivateMemberSuffix,     value: _          }
+  - { key: readability-identifier-naming.ProtectedMemberSuffix,   value: _          }
   - { key: readability-identifier-naming.EnumConstantCase,        value: CamelCase  }
   - { key: readability-identifier-naming.EnumConstantPrefix,      value: k          }
   - { key: readability-identifier-naming.ConstexprVariableCase,   value: CamelCase  }

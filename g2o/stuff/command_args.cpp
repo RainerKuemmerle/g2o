@@ -93,7 +93,7 @@ std::string argument2String(const CommandArgs::CommandArgument& ca) {
 enum CommandArgumentType { kCatDouble, kCatFloat, kCatInt, kCatString, kCatBool, kCatVectorInt, kCatVectorDouble };
 
 bool CommandArgs::parseArgs(int argc, char** argv, bool exitOnError) {
-  _progName = argv[0];
+  progName_ = argv[0];
   int i;
   for (i = 1; i < argc; i++) {
     std::string name = argv[i];
@@ -120,8 +120,8 @@ bool CommandArgs::parseArgs(int argc, char** argv, bool exitOnError) {
       exit(0);
     } else {
       // command line argument parsing
-      auto it = _args.begin();
-      for (; it != _args.end(); ++it) {
+      auto it = args_.begin();
+      for (; it != args_.end(); ++it) {
         if (it->name == name) {
           if (it->type == kCatBool) {
             if (!it->parsed) {
@@ -143,7 +143,7 @@ bool CommandArgs::parseArgs(int argc, char** argv, bool exitOnError) {
           break;
         }
       }
-      if (it == _args.end()) {
+      if (it == args_.end()) {
         std::cerr << "Error: Unknown Option '" << name << "' (use -help to get list of options).\n";
         if (exitOnError) exit(1);
         return false;
@@ -151,23 +151,23 @@ bool CommandArgs::parseArgs(int argc, char** argv, bool exitOnError) {
     }
   }  // for argv[i]
 
-  if (static_cast<int>(_leftOvers.size()) > argc - i) {
+  if (static_cast<int>(leftOvers_.size()) > argc - i) {
     std::cerr << "Error: program requires parameters" << std::endl;
     printHelp(std::cerr);
     if (exitOnError) exit(1);
     return false;
   }
-  for (size_t j = 0; (i < argc && j < _leftOvers.size()); i++, j++) {
-    auto* s = static_cast<std::string*>(_leftOvers[j].data);
+  for (size_t j = 0; (i < argc && j < leftOvers_.size()); i++, j++) {
+    auto* s = static_cast<std::string*>(leftOvers_[j].data);
     *s = argv[i];
-    _leftOvers[j].parsed = true;
+    leftOvers_[j].parsed = true;
   }
 
   // the optional leftOvers
-  for (size_t j = 0; (i < argc && j < _leftOversOptional.size()); i++, j++) {
-    auto* s = static_cast<std::string*>(_leftOversOptional[j].data);
+  for (size_t j = 0; (i < argc && j < leftOversOptional_.size()); i++, j++) {
+    auto* s = static_cast<std::string*>(leftOversOptional_[j].data);
     *s = argv[i];
-    _leftOversOptional[j].parsed = true;
+    leftOversOptional_[j].parsed = true;
   }
 
   return true;
@@ -181,7 +181,7 @@ void CommandArgs::param(const std::string& name, bool& p, bool defValue, const s
   ca.data = static_cast<void*>(&p);
   ca.parsed = false;
   p = defValue;
-  _args.push_back(ca);
+  args_.push_back(ca);
 }
 
 void CommandArgs::param(const std::string& name, int& p, int defValue, const std::string& desc) {
@@ -192,7 +192,7 @@ void CommandArgs::param(const std::string& name, int& p, int defValue, const std
   ca.data = static_cast<void*>(&p);
   ca.parsed = false;
   p = defValue;
-  _args.push_back(ca);
+  args_.push_back(ca);
 }
 
 void CommandArgs::param(const std::string& name, float& p, float defValue, const std::string& desc) {
@@ -203,7 +203,7 @@ void CommandArgs::param(const std::string& name, float& p, float defValue, const
   ca.data = static_cast<void*>(&p);
   ca.parsed = false;
   p = defValue;
-  _args.push_back(ca);
+  args_.push_back(ca);
 }
 
 void CommandArgs::param(const std::string& name, double& p, double defValue, const std::string& desc) {
@@ -214,7 +214,7 @@ void CommandArgs::param(const std::string& name, double& p, double defValue, con
   ca.data = static_cast<void*>(&p);
   ca.parsed = false;
   p = defValue;
-  _args.push_back(ca);
+  args_.push_back(ca);
 }
 
 void CommandArgs::param(const std::string& name, std::string& p, const std::string& defValue, const std::string& desc) {
@@ -225,7 +225,7 @@ void CommandArgs::param(const std::string& name, std::string& p, const std::stri
   ca.data = static_cast<void*>(&p);
   ca.parsed = false;
   p = defValue;
-  _args.push_back(ca);
+  args_.push_back(ca);
 }
 
 void CommandArgs::param(const std::string& name, std::vector<int>& p, const std::vector<int>& defValue,
@@ -237,7 +237,7 @@ void CommandArgs::param(const std::string& name, std::vector<int>& p, const std:
   ca.data = static_cast<void*>(&p);
   ca.parsed = false;
   p = defValue;
-  _args.push_back(ca);
+  args_.push_back(ca);
 }
 
 void CommandArgs::param(const std::string& name, std::vector<double>& p, const std::vector<double>& defValue,
@@ -249,35 +249,35 @@ void CommandArgs::param(const std::string& name, std::vector<double>& p, const s
   ca.data = static_cast<void*>(&p);
   ca.parsed = false;
   p = defValue;
-  _args.push_back(ca);
+  args_.push_back(ca);
 }
 
 void CommandArgs::printHelp(std::ostream& os) {
-  if (!_banner.empty()) os << _banner << std::endl;
-  os << "Usage: " << _progName << (_args.empty() ? " " : " [options] ");
-  for (size_t i = 0; i < _leftOvers.size(); ++i) {
+  if (!banner_.empty()) os << banner_ << std::endl;
+  os << "Usage: " << progName_ << (args_.empty() ? " " : " [options] ");
+  for (size_t i = 0; i < leftOvers_.size(); ++i) {
     if (i > 0) os << " ";
-    os << _leftOvers[i].name;
+    os << leftOvers_[i].name;
   }
-  if (!_leftOversOptional.empty()) {
-    if (!_leftOvers.empty()) os << " ";
-    for (size_t i = 0; i < _leftOversOptional.size(); ++i) {
+  if (!leftOversOptional_.empty()) {
+    if (!leftOvers_.empty()) os << " ";
+    for (size_t i = 0; i < leftOversOptional_.size(); ++i) {
       if (i > 0) os << " ";
-      os << "[" << _leftOversOptional[i].name << "]";
+      os << "[" << leftOversOptional_[i].name << "]";
     }
   }
   os << std::endl << std::endl;
   os << "General options:" << std::endl;
   os << "-------------------------------------------" << std::endl;
   os << "-help / -h           Displays this help." << std::endl << std::endl;
-  if (!_args.empty()) {
+  if (!args_.empty()) {
     os << "Program Options:" << std::endl;
     os << "-------------------------------------------" << std::endl;
     // build up option string to print as table
     std::vector<std::pair<std::string, std::string> > tableStrings;
-    tableStrings.reserve(_args.size());
+    tableStrings.reserve(args_.size());
     size_t maxArgLen = 0;
-    for (const auto& arg : _args) {
+    for (const auto& arg : args_) {
       if (arg.type != kCatBool) {
         std::string defaultValueStr = arg2str(arg);
         if (!defaultValueStr.empty())
@@ -300,7 +300,7 @@ void CommandArgs::printHelp(std::ostream& os) {
   }
 }
 
-void CommandArgs::setBanner(const std::string& banner) { _banner = banner; }
+void CommandArgs::setBanner(const std::string& banner) { banner_ = banner; }
 
 void CommandArgs::paramLeftOver(const std::string& name, std::string& p, const std::string& defValue,
                                 const std::string& desc, bool optional) {
@@ -313,9 +313,9 @@ void CommandArgs::paramLeftOver(const std::string& name, std::string& p, const s
   ca.optional = optional;
   p = defValue;
   if (optional)
-    _leftOversOptional.push_back(ca);
+    leftOversOptional_.push_back(ca);
   else
-    _leftOvers.push_back(ca);
+    leftOvers_.push_back(ca);
 }
 
 const char* CommandArgs::type2str(int t) {
@@ -392,7 +392,7 @@ std::string CommandArgs::arg2str(const CommandArgument& ca) {
 }
 
 bool CommandArgs::parsedParam(const std::string& param) const {
-  for (const auto& arg : _args)
+  for (const auto& arg : args_)
     if (arg.name == param) return arg.parsed;
   return false;
 }

@@ -31,8 +31,6 @@
 
 #include "g2o/core/eigen_types.h"
 
-using namespace std;
-
 namespace g2o {
 
 struct MatrixElem
@@ -45,80 +43,74 @@ struct MatrixElem
   }
 };
 
-MarginalCovarianceCholesky::MarginalCovarianceCholesky()  
-= default;
-
-MarginalCovarianceCholesky::~MarginalCovarianceCholesky()
-= default;
-
 void MarginalCovarianceCholesky::setCholeskyFactor(int n, int* Lp, int* Li, number_t* Lx, int* permInv)
 {
-  _n = n;
-  _Ap = Lp;
-  _Ai = Li;
-  _Ax = Lx;
-  _perm = permInv;
+  n_ = n;
+  Ap_ = Lp;
+  Ai_ = Li;
+  Ax_ = Lx;
+  perm_ = permInv;
 
   // pre-compute reciprocal values of the diagonal of L
-  _diag.resize(n);
+  diag_.resize(n);
   for (int r = 0; r < n; ++r) {
-    const int& sc = _Ap[r]; // L is lower triangular, thus the first elem in the column is the diagonal entry
+    const int& sc = Ap_[r]; // L is lower triangular, thus the first elem in the column is the diagonal entry
     assert(r == _Ai[sc] && "Error in CCS storage of L");
-    _diag[r] = 1.0 / _Ax[sc];
+    diag_[r] = 1.0 / Ax_[sc];
   }
 }
 
-number_t MarginalCovarianceCholesky::computeEntry(int r, int c)
+number_t MarginalCovarianceCholesky::computeEntry(int r, int c) // NOLINT
 {
   assert(r <= c);
   int idx = computeIndex(r, c);
 
-  LookupMap::const_iterator foundIt = _map.find(idx);
-  if (foundIt != _map.end()) {
+  LookupMap::const_iterator foundIt = map_.find(idx);
+  if (foundIt != map_.end()) {
     return foundIt->second;
   }
 
   // compute the summation over column r
   number_t s = 0.;
-  const int& sc = _Ap[r];
-  const int& ec = _Ap[r+1];
+  const int& sc = Ap_[r];
+  const int& ec = Ap_[r+1];
   for (int j = sc+1; j < ec; ++j) { // sum over row r while skipping the element on the diagonal
-    const int& rr = _Ai[j];
-    number_t val = rr < c ? computeEntry(rr, c) : computeEntry(c, rr);
-    s += val * _Ax[j];
+    const int& rr = Ai_[j];
+    number_t val = rr < c ? computeEntry(rr, c) : computeEntry(c, rr); // NOLINT
+    s += val * Ax_[j];
   }
 
   number_t result;
   if (r == c) {
-    const number_t& diagElem = _diag[r];
+    const number_t& diagElem = diag_[r];
     result = diagElem * (diagElem - s);
   } else {
-    result = -s * _diag[r];
+    result = -s * diag_[r];
   }
-  _map[idx] = result;
+  map_[idx] = result;
   return result;
 }
 
 void MarginalCovarianceCholesky::computeCovariance(number_t** covBlocks, const std::vector<int>& blockIndices)
 {
-  _map.clear();
+  map_.clear();
   int base = 0;
-  vector<MatrixElem> elemsToCompute;
+  std::vector<MatrixElem> elemsToCompute;
   for (int nbase : blockIndices) {
     int vdim = nbase - base;
     for (int rr = 0; rr < vdim; ++rr)
       for (int cc = rr; cc < vdim; ++cc) {
-        int r = _perm ? _perm[rr + base] : rr + base; // apply permutation
-        int c = _perm ? _perm[cc + base] : cc + base;
+        int r = perm_ ? perm_[rr + base] : rr + base; // apply permutation
+        int c = perm_ ? perm_[cc + base] : cc + base;
         if (r > c) // make sure it's still upper triangular after applying the permutation
-          swap(r, c);
+          std::swap(r, c);
         elemsToCompute.emplace_back(r, c);
       }
     base = nbase;
   }
 
   // sort the elems to reduce the recursive calls
-  sort(elemsToCompute.begin(), elemsToCompute.end());
+  std::sort(elemsToCompute.begin(), elemsToCompute.end());
 
   // compute the inverse elements we need
   for (auto & me : elemsToCompute) {
@@ -133,12 +125,12 @@ void MarginalCovarianceCholesky::computeCovariance(number_t** covBlocks, const s
     number_t* cov = covBlocks[i];
     for (int rr = 0; rr < vdim; ++rr)
       for (int cc = rr; cc < vdim; ++cc) {
-        int r = _perm ? _perm[rr + base] : rr + base; // apply permutation
-        int c = _perm ? _perm[cc + base] : cc + base;
+        int r = perm_ ? perm_[rr + base] : rr + base; // apply permutation
+        int c = perm_ ? perm_[cc + base] : cc + base;
         if (r > c) // upper triangle
-          swap(r, c);
+          std::swap(r, c);
         int idx = computeIndex(r, c);
-        LookupMap::const_iterator foundIt = _map.find(idx);
+        LookupMap::const_iterator foundIt = map_.find(idx);
         assert(foundIt != _map.end());
         cov[rr*vdim + cc] = foundIt->second;
         if (rr != cc)
@@ -156,8 +148,8 @@ void MarginalCovarianceCholesky::computeCovariance(SparseBlockMatrix<MatrixX>& s
               &rowBlockIndices[0],
               rowBlockIndices.size(),
               rowBlockIndices.size(), true);
-  _map.clear();
-  vector<MatrixElem> elemsToCompute;
+  map_.clear();
+  std::vector<MatrixElem> elemsToCompute;
   for (const auto & blockIndice : blockIndices) {
     int blockRow=blockIndice.first;
     int blockCol=blockIndice.second;
@@ -175,10 +167,10 @@ void MarginalCovarianceCholesky::computeCovariance(SparseBlockMatrix<MatrixX>& s
       for (int iCol=0; iCol<block->cols(); ++iCol){
         int rr=rowBase+iRow;
         int cc=colBase+iCol;
-        int r = _perm ? _perm[rr] : rr; // apply permutation
-        int c = _perm ? _perm[cc] : cc;
+        int r = perm_ ? perm_[rr] : rr; // apply permutation
+        int c = perm_ ? perm_[cc] : cc;
         if (r > c)
-          swap(r, c);
+          std::swap(r, c);
         elemsToCompute.emplace_back(r, c);
       }
   }
@@ -204,12 +196,12 @@ void MarginalCovarianceCholesky::computeCovariance(SparseBlockMatrix<MatrixX>& s
       for (int iCol=0; iCol<block->cols(); ++iCol){
         int rr=rowBase+iRow;
         int cc=colBase+iCol;
-        int r = _perm ? _perm[rr] : rr; // apply permutation
-        int c = _perm ? _perm[cc] : cc;
+        int r = perm_ ? perm_[rr] : rr; // apply permutation
+        int c = perm_ ? perm_[cc] : cc;
         if (r > c)
-          swap(r, c);
+          std::swap(r, c);
         int idx = computeIndex(r, c);
-        LookupMap::const_iterator foundIt = _map.find(idx);
+        LookupMap::const_iterator foundIt = map_.find(idx);
         assert(foundIt != _map.end());
         (*block)(iRow, iCol) = foundIt->second;
       }

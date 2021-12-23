@@ -50,28 +50,28 @@ namespace g2o {
       using SparseMatrixBlock = MatrixType;
 
       //! columns of the matrix
-      int cols() const {return !_blockIndices.empty() ? _blockIndices.back() : 0;}
+      int cols() const {return !blockIndices_.empty() ? blockIndices_.back() : 0;}
       //! rows of the matrix
-      int rows() const {return !_blockIndices.empty() ? _blockIndices.back() : 0;}
+      int rows() const {return !blockIndices_.empty() ? blockIndices_.back() : 0;}
 
       using DiagonalVector = std::vector<MatrixType, Eigen::aligned_allocator<MatrixType>>;
 
       explicit SparseBlockMatrixDiagonal(const std::vector<int>& blockIndices) :
-        _blockIndices(blockIndices)
+        blockIndices_(blockIndices)
       {}
 
       //! how many rows/cols does the block at block-row / block-column r has?
-      inline int dimOfBlock(int r) const { return r ? _blockIndices[r] - _blockIndices[r-1] : _blockIndices[0] ; }
+      inline int dimOfBlock(int r) const { return r ? blockIndices_[r] - blockIndices_[r-1] : blockIndices_[0] ; }
 
       //! where does the row /col at block-row / block-column r starts?
-      inline int baseOfBlock(int r) const { return r ? _blockIndices[r-1] : 0 ; }
+      inline int baseOfBlock(int r) const { return r ? blockIndices_[r-1] : 0 ; }
 
       //! the block matrices per block-column
-      const DiagonalVector& diagonal() const { return _diagonal;}
-      DiagonalVector& diagonal() { return _diagonal;}
+      const DiagonalVector& diagonal() const { return diagonal_;}
+      DiagonalVector& diagonal() { return diagonal_;}
 
       //! indices of the row blocks
-      const std::vector<int>& blockIndices() const { return _blockIndices;}
+      const std::vector<int>& blockIndices() const { return blockIndices_;}
 
       void multiply(number_t*& dest, const number_t* src) const
       {
@@ -88,18 +88,18 @@ namespace g2o {
 #      ifdef G2O_OPENMP
 #      pragma omp parallel for default (shared) schedule(dynamic, 10)
 #      endif
-        for (int i=0; i < static_cast<int>(_diagonal.size()); ++i){
+        for (int i=0; i < static_cast<int>(diagonal_.size()); ++i){
           int destOffset = baseOfBlock(i);
           int srcOffset = destOffset;
-          const SparseMatrixBlock& A = _diagonal[i];
+          const SparseMatrixBlock& A = diagonal_[i];
           // destVec += *A.transpose() * srcVec (according to the sub-vector parts)
           internal::template axpy<SparseMatrixBlock>(A, srcVec, srcOffset, destVec, destOffset);
         }
       }
 
     protected:
-      const std::vector<int>& _blockIndices; ///< vector of the indices of the blocks along the diagonal
-      DiagonalVector _diagonal;
+      const std::vector<int>& blockIndices_; ///< vector of the indices of the blocks along the diagonal
+      DiagonalVector diagonal_;
   };
 
 } //end namespace

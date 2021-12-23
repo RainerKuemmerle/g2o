@@ -58,11 +58,11 @@ class G2O_CORE_API MatrixStructure
     int* Aii{nullptr}; ///< row indices of A, of size nz = Ap [n]
 
     //! max number of non-zeros blocks
-    int nzMax() const { return maxNz;}
+    int nzMax() const { return maxNz_;}
 
   protected:
-    int maxN{0};     ///< size of the allocated memory
-    int maxNz{0};    ///< size of the allocated memory
+    int maxN_{0};     ///< size of the allocated memory
+    int maxNz_{0};    ///< size of the allocated memory
 };
 
 } // end namespace

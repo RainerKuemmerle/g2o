@@ -105,10 +105,10 @@ class G2O_CORE_API RobustKernelFactory {
   using CreatorMap = std::map<std::string, AbstractRobustKernelCreator::Ptr>;
   RobustKernelFactory() = default;
 
-  CreatorMap _creator;  ///< look-up map for the existing creators
+  CreatorMap creator_;  ///< look-up map for the existing creators
 
  private:
-  static std::unique_ptr<RobustKernelFactory> factoryInstance;
+  static std::unique_ptr<RobustKernelFactory> factoryInstance_;
 };
 
 template <typename T>

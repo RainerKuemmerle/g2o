@@ -44,11 +44,10 @@ namespace g2o {
     public:
       /** \brief type of the step to take */
       enum {
-        STEP_UNDEFINED,
-        STEP_SD, STEP_GN, STEP_DL
+        kStepUndefined,
+        kStepSd, kStepGn, kStepDl
       };
 
-    public:
       /**
        * construct the Dogleg algorithm, which will use the given Solver for solving the
        * linearized system.
@@ -61,34 +60,34 @@ namespace g2o {
       void printVerbose(std::ostream& os) const override;
 
       //! return the type of the last step taken by the algorithm
-      int lastStep() const { return _lastStep;}
+      int lastStep() const { return lastStep_;}
       //! return the diameter of the trust region
-      number_t trustRegion() const { return _delta;}
+      number_t trustRegion() const { return delta_;}
 
       //! convert the type into an integer
       static const char* stepType2Str(int stepType);
 
     protected:
       // parameters
-      std::shared_ptr<Property<int>> _maxTrialsAfterFailure;
-      std::shared_ptr<Property<number_t>> _userDeltaInit;
+      std::shared_ptr<Property<int>> maxTrialsAfterFailure_;
+      std::shared_ptr<Property<number_t>> userDeltaInit_;
       // damping to enforce positive definite matrix
-      std::shared_ptr<Property<number_t>> _initialLambda;
-      std::shared_ptr<Property<number_t>> _lamdbaFactor;
+      std::shared_ptr<Property<number_t>> initialLambda_;
+      std::shared_ptr<Property<number_t>> lamdbaFactor_;
 
-      VectorX _hsd;        ///< steepest decent step
-      VectorX _hdl;        ///< final dogleg step
-      VectorX _auxVector;  ///< auxilary vector used to perform multiplications or other stuff
+      VectorX hsd_;        ///< steepest decent step
+      VectorX hdl_;        ///< final dogleg step
+      VectorX auxVector_;  ///< auxilary vector used to perform multiplications or other stuff
 
-      number_t _currentLambda;     ///< the damping factor to force positive definite matrix
-      number_t _delta;             ///< trust region
-      int _lastStep;               ///< type of the step taken by the algorithm
-      bool _wasPDInAllIterations;  ///< the matrix we solve was positive definite in all iterations -> if not apply
+      number_t currentLambda_;     ///< the damping factor to force positive definite matrix
+      number_t delta_;             ///< trust region
+      int lastStep_;               ///< type of the step taken by the algorithm
+      bool wasPDInAllIterations_;  ///< the matrix we solve was positive definite in all iterations -> if not apply
                                    ///< damping
-      int _lastNumTries;
+      int lastNumTries_;
 
      private:
-      std::unique_ptr<BlockSolverBase> m_solver;
+      std::unique_ptr<BlockSolverBase> m_solver_;
   };
 
 } // end namespace

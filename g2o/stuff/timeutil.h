@@ -102,8 +102,8 @@ class G2O_STUFF_API ScopeTime {
     explicit ScopeTime(const char* title);
     ~ScopeTime();
   private:
-    std::string _title;
-    number_t _startTime;
+    std::string title_;
+    number_t startTime_;
 };
 
 } // end namespace

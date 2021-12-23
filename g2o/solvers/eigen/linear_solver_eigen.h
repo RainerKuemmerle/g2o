@@ -48,9 +48,9 @@ namespace g2o {
 template <typename MatrixType>
 class LinearSolverEigen : public LinearSolverCCS<MatrixType> {
  public:
-  typedef Eigen::SparseMatrix<number_t, Eigen::ColMajor> SparseMatrix;
-  typedef Eigen::Triplet<number_t> Triplet;
-  typedef Eigen::PermutationMatrix<Eigen::Dynamic, Eigen::Dynamic> PermutationMatrix;
+  using SparseMatrix = Eigen::SparseMatrix<number_t, Eigen::ColMajor>;
+  using Triplet = Eigen::Triplet<number_t>;
+  using PermutationMatrix = Eigen::PermutationMatrix<Eigen::Dynamic, Eigen::Dynamic>;
 
   using CholeskyDecompositionBase = Eigen::SimplicialLLT<SparseMatrix, Eigen::Upper>;
 
@@ -75,48 +75,47 @@ class LinearSolverEigen : public LinearSolverCCS<MatrixType> {
     using CholeskyDecompositionBase::analyzePattern_preordered;
   };
 
- public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
-  LinearSolverEigen() : LinearSolverCCS<MatrixType>(), _init(true) {}
+  LinearSolverEigen() : LinearSolverCCS<MatrixType>() {}
 
-  virtual bool init() {
-    _init = true;
+  bool init() override {
+    init_ = true;
     return true;
   }
 
-  bool solve(const SparseBlockMatrix<MatrixType>& A, number_t* x, number_t* b) {
+  bool solve(const SparseBlockMatrix<MatrixType>& A, number_t* x, number_t* b) override {
     double t;
     bool cholState = computeCholesky(A, t);
     if (!cholState) return false;
 
     // Solving the system
-    VectorX::MapType xx(x, _sparseMatrix.cols());
-    VectorX::ConstMapType bb(b, _sparseMatrix.cols());
-    xx = _cholesky.solve(bb);
+    VectorX::MapType xx(x, sparseMatrix_.cols());
+    VectorX::ConstMapType bb(b, sparseMatrix_.cols());
+    xx = cholesky_.solve(bb);
     G2OBatchStatistics* globalStats = G2OBatchStatistics::globalStats();
     if (globalStats) {
       globalStats->timeNumericDecomposition = get_monotonic_time() - t;
-      globalStats->choleskyNNZ = _cholesky.matrixL().nestedExpression().nonZeros();
+      globalStats->choleskyNNZ = cholesky_.matrixL().nestedExpression().nonZeros();
     }
     return true;
   }
 
  protected:
-  bool _init;
-  SparseMatrix _sparseMatrix;
-  CholeskyDecomposition _cholesky;
+  bool init_ = true;
+  SparseMatrix sparseMatrix_;
+  CholeskyDecomposition cholesky_;
 
   // compute the cholesky factor
   bool computeCholesky(const SparseBlockMatrix<MatrixType>& A, double& t) {
     // perform some operations only once upon init
-    if (_init) _sparseMatrix.resize(A.rows(), A.cols());
-    fillSparseMatrix(A, !_init);
-    if (_init) computeSymbolicDecomposition(A);
-    _init = false;
+    if (init_) sparseMatrix_.resize(A.rows(), A.cols());
+    fillSparseMatrix(A, !init_);
+    if (init_) computeSymbolicDecomposition(A);
+    init_ = false;
 
     t = get_monotonic_time();
-    _cholesky.factorize(_sparseMatrix);
-    if (_cholesky.info() != Eigen::Success) {  // the matrix is not positive definite
+    cholesky_.factorize(sparseMatrix_);
+    if (cholesky_.info() != Eigen::Success) {  // the matrix is not positive definite
       if (this->writeDebug()) {
         std::cerr << "Cholesky failure, writing debug.txt (Hessian loadable by Octave)"
                   << std::endl;
@@ -136,7 +135,7 @@ class LinearSolverEigen : public LinearSolverCCS<MatrixType> {
   void computeSymbolicDecomposition(const SparseBlockMatrix<MatrixType>& A) {
     number_t t = get_monotonic_time();
     if (!this->blockOrdering()) {
-      _cholesky.analyzePattern(_sparseMatrix);
+      cholesky_.analyzePattern(sparseMatrix_);
     } else {
       assert(A.rows() == A.cols() && "Matrix A is not square");
       // block ordering with the Eigen Interface
@@ -156,7 +155,7 @@ class LinearSolverEigen : public LinearSolverCCS<MatrixType> {
       PermutationMatrix scalarP(A.rows());
       this->blockToScalarPermutation(A, blockP.indices(), scalarP.indices());
       // analyze with the scalar permutation
-      _cholesky.analyzePatternWithPermutation(_sparseMatrix, scalarP);
+      cholesky_.analyzePatternWithPermutation(sparseMatrix_, scalarP);
     }
     G2OBatchStatistics* globalStats = G2OBatchStatistics::globalStats();
     if (globalStats) globalStats->timeSymbolicDecomposition = get_monotonic_time() - t;
@@ -164,15 +163,15 @@ class LinearSolverEigen : public LinearSolverCCS<MatrixType> {
 
   void fillSparseMatrix(const SparseBlockMatrix<MatrixType>& A, bool onlyValues) {
     if (onlyValues) {
-      this->_ccsMatrix->fillCCS(_sparseMatrix.valuePtr(), true);
+      this->ccsMatrix_->fillCCS(sparseMatrix_.valuePtr(), true);
       return;
     }
     this->initMatrixStructure(A);
-    _sparseMatrix.resizeNonZeros(A.nonZeros());
-    int nz = this->_ccsMatrix->fillCCS(_sparseMatrix.outerIndexPtr(), _sparseMatrix.innerIndexPtr(),
-                                       _sparseMatrix.valuePtr(), true);
+    sparseMatrix_.resizeNonZeros(A.nonZeros());
+    int nz = this->ccsMatrix_->fillCCS(sparseMatrix_.outerIndexPtr(), sparseMatrix_.innerIndexPtr(),
+                                       sparseMatrix_.valuePtr(), true);
     (void)nz;
-    assert(nz <= static_cast<int>(_sparseMatrix.data().size()));
+    assert(nz <= static_cast<int>(sparseMatrix_.data().size()));
   }
 
   /**
@@ -180,23 +179,23 @@ class LinearSolverEigen : public LinearSolverCCS<MatrixType> {
    * matrix. Here we call a function to do the underlying computation.
    */
   bool solveBlocks_impl(const SparseBlockMatrix<MatrixType>& A,
-                        std::function<void(MarginalCovarianceCholesky&)> compute) {
+                        const std::function<void(MarginalCovarianceCholesky&)>& compute) override {
     // compute the cholesky factor
     double t;
     bool cholState = computeCholesky(A, t);
     if (!cholState) return false;
     // compute the inverse blocks
     MarginalCovarianceCholesky mcc;
-    mcc.setCholeskyFactor(_cholesky.matrixL().rows(),
-                          const_cast<int*>(_cholesky.matrixL().nestedExpression().outerIndexPtr()),
-                          const_cast<int*>(_cholesky.matrixL().nestedExpression().innerIndexPtr()),
-                          const_cast<number_t*>(_cholesky.matrixL().nestedExpression().valuePtr()),
-                          const_cast<int*>(_cholesky.permutationP().indices().data()));
+    mcc.setCholeskyFactor(cholesky_.matrixL().rows(),
+                          const_cast<int*>(cholesky_.matrixL().nestedExpression().outerIndexPtr()),
+                          const_cast<int*>(cholesky_.matrixL().nestedExpression().innerIndexPtr()),
+                          const_cast<number_t*>(cholesky_.matrixL().nestedExpression().valuePtr()),
+                          const_cast<int*>(cholesky_.permutationP().indices().data()));
     compute(mcc);  // call the desired computation on the mcc object
     // book keeping statistics
     G2OBatchStatistics* globalStats = G2OBatchStatistics::globalStats();
     if (globalStats) {
-      globalStats->choleskyNNZ = _cholesky.matrixL().nestedExpression().nonZeros();
+      globalStats->choleskyNNZ = cholesky_.matrixL().nestedExpression().nonZeros();
     }
     return true;
   }

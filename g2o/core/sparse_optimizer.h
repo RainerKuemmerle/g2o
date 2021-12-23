@@ -46,8 +46,8 @@ namespace g2o {
 
     public:
     enum {
-      AT_COMPUTEACTIVERROR = OptimizableGraph::AT_NUM_ELEMENTS,
-      AT_NUM_ELEMENTS, // keep as last element
+      kAtComputeactiverror = OptimizableGraph::kAtNumElements,
+      kAtNumElements, // keep as last element
     };
 
     friend class ActivePathCostFunction;
@@ -175,24 +175,24 @@ namespace g2o {
     number_t activeRobustChi2() const;
 
     //! verbose information during optimization
-    bool verbose() const {return _verbose;}
+    bool verbose() const {return verbose_;}
     void setVerbose(bool verbose);
 
     /**
      * sets a variable checked at every iteration to force a user stop. The iteration exits when the variable is true;
      */
     void setForceStopFlag(bool* flag);
-    bool* forceStopFlag() const { return _forceStopFlag;};
+    bool* forceStopFlag() const { return forceStopFlag_;};
 
     //! if external stop flag is given, return its state. False otherwise
-    bool terminate() const {return _forceStopFlag ? (*_forceStopFlag) : false; }
+    bool terminate() const {return forceStopFlag_ ? (*forceStopFlag_) : false; }
 
     //! the index mapping of the vertices
-    const VertexContainerRaw& indexMapping() const {return _ivMap;}
+    const VertexContainerRaw& indexMapping() const {return ivMap_;}
     //! the vertices active in the current optimization
-    const VertexContainer& activeVertices() const { return _activeVertices;}
+    const VertexContainer& activeVertices() const { return activeVertices_;}
     //! the edges active in the current optimization
-    const EdgeContainer& activeEdges() const { return _activeEdges;}
+    const EdgeContainer& activeEdges() const { return activeEdges_;}
 
     /**
      * Remove a vertex. If the vertex is contained in the currently active set
@@ -214,25 +214,25 @@ namespace g2o {
     EdgeContainer::const_iterator findActiveEdge(const OptimizableGraph::Edge* e) const;
 
     //! the solver used by the optimizer
-    std::shared_ptr<OptimizationAlgorithm> algorithm() const { return _algorithm;}
-    std::shared_ptr<OptimizationAlgorithm> solver() { return _algorithm;}
+    std::shared_ptr<OptimizationAlgorithm> algorithm() const { return algorithm_;}
+    std::shared_ptr<OptimizationAlgorithm> solver() { return algorithm_;}
     void setAlgorithm(const std::shared_ptr<OptimizationAlgorithm>& algorithm);
 
     //! push the estimate of a subset of the variables onto a stack
-    void push(SparseOptimizer::VertexContainer& vlist);
+    virtual void push(SparseOptimizer::VertexContainer& vlist);
     //! push the estimate of a subset of the variables onto a stack
     void push(HyperGraph::VertexSet& vlist) override;
     //! push all the active vertices onto a stack
     void push() override;
     //! pop (restore) the estimate a subset of the variables from the stack
-    void pop(SparseOptimizer::VertexContainer& vlist);
+    virtual void pop(SparseOptimizer::VertexContainer& vlist);
     //! pop (restore) the estimate a subset of the variables from the stack
     void pop(HyperGraph::VertexSet& vlist) override;
     //! pop (restore) the estimate of the active vertices from the stack
     void pop() override;
 
     //! ignore the latest stored element on the stack, remove it from the stack but do not restore the estimate
-    void discardTop(SparseOptimizer::VertexContainer& vlist);
+    virtual void discardTop(SparseOptimizer::VertexContainer& vlist);
     //! same as above, but for the active vertices
     void discardTop() override;
     using OptimizableGraph::discardTop;
@@ -268,15 +268,15 @@ namespace g2o {
     /**
        returns the set of batch statistics about the optimisation
     */
-    const BatchStatisticsContainer& batchStatistics() const { return _batchStatistics;}
+    const BatchStatisticsContainer& batchStatistics() const { return batchStatistics_;}
     /**
        returns the set of batch statistics about the optimisation
     */
-    BatchStatisticsContainer& batchStatistics() { return _batchStatistics;}
+    BatchStatisticsContainer& batchStatistics() { return batchStatistics_;}
 
     void setComputeBatchStatistics(bool computeBatchStatistics);
 
-    bool computeBatchStatistics() const { return _computeBatchStatistics;}
+    bool computeBatchStatistics() const { return computeBatchStatistics_;}
 
     /**** callbacks ****/
     //! add an action to be executed before the error vectors are computed
@@ -285,16 +285,16 @@ namespace g2o {
     bool removeComputeErrorAction(const std::shared_ptr<HyperGraphAction>& action);
 
     protected:
-    bool* _forceStopFlag{nullptr};
-    bool _verbose{false};
+    bool* forceStopFlag_{nullptr};
+    bool verbose_{false};
 
-    VertexContainerRaw _ivMap;
-    VertexContainer _activeVertices;   ///< sorted according to VertexIDCompare
-    EdgeContainer _activeEdges;        ///< sorted according to EdgeIDCompare
+    VertexContainerRaw ivMap_;
+    VertexContainer activeVertices_;   ///< sorted according to VertexIDCompare
+    EdgeContainer activeEdges_;        ///< sorted according to EdgeIDCompare
 
     void sortVectorContainers();
 
-    std::shared_ptr<OptimizationAlgorithm> _algorithm;
+    std::shared_ptr<OptimizationAlgorithm> algorithm_;
 
     /**
      * builds the mapping of the active vertices to the (block) row / column in the Hessian
@@ -302,8 +302,8 @@ namespace g2o {
     bool buildIndexMapping(SparseOptimizer::VertexContainer& vlist);
     void clearIndexMapping();
 
-    BatchStatisticsContainer _batchStatistics;   ///< global statistics of the optimizer, e.g., timing, num-non-zeros
-    bool _computeBatchStatistics{false};
+    BatchStatisticsContainer batchStatistics_;   ///< global statistics of the optimizer, e.g., timing, num-non-zeros
+    bool computeBatchStatistics_{false};
   };
 } // end namespace
 

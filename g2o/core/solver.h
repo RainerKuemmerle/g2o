@@ -45,8 +45,9 @@ namespace g2o {
     public:
       Solver();
       virtual ~Solver();
+      Solver(const Solver&)  = delete;
+      Solver& operator= (const Solver&) = delete;
 
-    public:
       /**
        * initialize the solver, called once before the first iteration
        */
@@ -92,21 +93,21 @@ namespace g2o {
       virtual void restoreDiagonal() = 0;
 
       //! return x, the solution vector
-      number_t* x() { return _x;}
-      const number_t* x() const { return _x;}
+      number_t* x() { return x_;}
+      const number_t* x() const { return x_;}
       //! return b, the right hand side of the system
-      number_t* b() { return _b;}
-      const number_t* b() const { return _b;}
+      number_t* b() { return b_;}
+      const number_t* b() const { return b_;}
 
       //! return the size of the solution vector (x) and b
-      size_t vectorSize() const { return _xSize;}
+      size_t vectorSize() const { return xSize_;}
 
       //! the optimizer (graph) on which the solver works
-      SparseOptimizer* optimizer() const { return _optimizer;}
+      SparseOptimizer* optimizer() const { return optimizer_;}
       void setOptimizer(SparseOptimizer* optimizer);
 
       //! the system is Levenberg-Marquardt
-      bool levenberg() const { return _isLevenberg;}
+      bool levenberg() const { return isLevenberg_;}
       void setLevenberg(bool levenberg);
 
       /**
@@ -119,7 +120,7 @@ namespace g2o {
       virtual bool schur()=0;
       virtual void setSchur(bool s)=0;
 
-      size_t additionalVectorSpace() const { return _additionalVectorSpace;}
+      size_t additionalVectorSpace() const { return additionalVectorSpace_;}
       void setAdditionalVectorSpace(size_t s);
 
       /**
@@ -132,19 +133,15 @@ namespace g2o {
       virtual bool saveHessian(const std::string& /*fileName*/) const = 0;
 
     protected:
-      SparseOptimizer* _optimizer{nullptr};
-      number_t* _x{nullptr};
-      number_t* _b{nullptr};
-      size_t _xSize{0}, _maxXSize{0};
-      bool _isLevenberg{false}; ///< the system we gonna solve is a Levenberg-Marquardt system
-      size_t _additionalVectorSpace{0};
+      SparseOptimizer* optimizer_{nullptr};
+      number_t* x_{nullptr};
+      number_t* b_{nullptr};
+      size_t xSize_{0}, maxXSize_{0};
+      bool isLevenberg_{false}; ///< the system we gonna solve is a Levenberg-Marquardt system
+      size_t additionalVectorSpace_{0};
 
       void resizeVector(size_t sx);
 
-    private:
-      // Disable the copy constructor and assignment operator
-      Solver(const Solver&) { }
-      Solver& operator= (const Solver&) { return *this; }
   };
 } // end namespace
 

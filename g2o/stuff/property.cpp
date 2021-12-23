@@ -34,7 +34,7 @@
 
 namespace g2o {
 
-BaseProperty::BaseProperty(std::string name_) : _name(std::move(name_)) {}
+BaseProperty::BaseProperty(std::string name) : name_(std::move(name)) {}
 
 bool PropertyMap::addProperty(const std::shared_ptr<BaseProperty>& p) {
   std::pair<PropertyMapIterator, bool> result = insert(make_pair(p->name(), p));

@@ -47,7 +47,7 @@ class GaussianSampler {
  public:
   GaussianSampler(GaussianSampler const&) = delete;
   GaussianSampler& operator=(const GaussianSampler&) = delete;
-  explicit GaussianSampler(bool hasGenerator = true) : _generator(hasGenerator ? new std::mt19937 : nullptr) {}
+  explicit GaussianSampler(bool hasGenerator = true) : generator_(hasGenerator ? new std::mt19937 : nullptr) {}
   void setDistribution(const CovarianceType& cov) {
     Eigen::LLT<CovarianceType> cholDecomp;
     cholDecomp.compute(cov);
@@ -55,26 +55,26 @@ class GaussianSampler {
       assert(false && "Cholesky decomposition on the covariance matrix failed");
       return;
     }
-    _cholesky = cholDecomp.matrixL();
+    cholesky_ = cholDecomp.matrixL();
   }
   //! return a sample of the Gaussian distribution
   SampleType generateSample() {
     SampleType s;
     for (int i = 0; i < s.size(); i++) {
-      s(i) = (_generator) ? sampleGaussian(_generator.get()) : sampleGaussian();
+      s(i) = (generator_) ? sampleGaussian(generator_.get()) : sampleGaussian();
     }
-    return _cholesky * s;
+    return cholesky_ * s;
   }
   //! seed the random number generator, returns false if not having an own generator.
   bool seed(int s) {
-    if (!_generator) return false;
-    _generator->seed(s);
+    if (!generator_) return false;
+    generator_->seed(s);
     return true;
   }
 
  protected:
-  CovarianceType _cholesky;
-  std::unique_ptr<std::mt19937> _generator;
+  CovarianceType cholesky_;
+  std::unique_ptr<std::mt19937> generator_;
 };
 
 class G2O_STUFF_API Sampler {

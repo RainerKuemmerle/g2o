@@ -33,25 +33,21 @@
 #include "sparse_optimizer.h"
 #include "solver.h"
 #include "batch_stats.h"
-using namespace std;
 
 namespace g2o {
 
   OptimizationAlgorithmLevenberg::OptimizationAlgorithmLevenberg(std::unique_ptr<Solver> solver)
-      : OptimizationAlgorithmWithHessian(*solver.get()),
-        _currentLambda(cst(-1.)),
-        _tau(cst(1e-5)),
-        _goodStepLowerScale(cst(1. / 3.)),
-        _goodStepUpperScale(cst(2. / 3.)),
-        _ni(cst(2.)),
-        _levenbergIterations(0),
-        m_solver{std::move(solver)} {
-    _userLambdaInit = _properties.makeProperty<Property<number_t> >("initialLambda", 0.);
-    _maxTrialsAfterFailure = _properties.makeProperty<Property<int> >("maxTrialsAfterFailure", 10);
+      : OptimizationAlgorithmWithHessian(*solver),
+        currentLambda_(cst(-1.)),
+        tau_(cst(1e-5)),
+        goodStepLowerScale_(cst(1. / 3.)),
+        goodStepUpperScale_(cst(2. / 3.)),
+        ni_(cst(2.)),
+        levenbergIterations_(0),
+        m_solver_{std::move(solver)} {
+    userLambdaInit_ = properties_.makeProperty<Property<number_t> >("initialLambda", 0.);
+    maxTrialsAfterFailure_ = properties_.makeProperty<Property<int> >("maxTrialsAfterFailure", 10);
   }
-
-  OptimizationAlgorithmLevenberg::~OptimizationAlgorithmLevenberg()
-  = default;
 
   OptimizationAlgorithm::SolverResult OptimizationAlgorithmLevenberg::solve(int iteration, bool online)
   {
@@ -59,60 +55,60 @@ namespace g2o {
     assert(_solver.optimizer() == _optimizer && "underlying linear solver operates on different graph");
 
     if (iteration == 0 && !online) { // built up the CCS structure, here due to easy time measure
-      bool ok = _solver.buildStructure();
+      bool ok = solver_.buildStructure();
       if (! ok) {
-        cerr << __PRETTY_FUNCTION__ << ": Failure while building CCS structure" << endl;
-        return OptimizationAlgorithm::Fail;
+        std::cerr << __PRETTY_FUNCTION__ << ": Failure while building CCS structure" << std::endl;
+        return OptimizationAlgorithm::kFail;
       }
     }
 
     number_t t=get_monotonic_time();
-    _optimizer->computeActiveErrors();
+    optimizer_->computeActiveErrors();
     G2OBatchStatistics* globalStats = G2OBatchStatistics::globalStats();
     if (globalStats) {
       globalStats->timeResiduals = get_monotonic_time()-t;
       t=get_monotonic_time();
     }
 
-    number_t currentChi = _optimizer->activeRobustChi2();
+    number_t currentChi = optimizer_->activeRobustChi2();
 
-    _solver.buildSystem();
+    solver_.buildSystem();
     if (globalStats) {
       globalStats->timeQuadraticForm = get_monotonic_time()-t;
     }
 
     // core part of the Levenbarg algorithm
     if (iteration == 0) {
-      _currentLambda = computeLambdaInit();
-      _ni = 2;
+      currentLambda_ = computeLambdaInit();
+      ni_ = 2;
     }
 
     number_t rho=0;
-    int& qmax = _levenbergIterations;
+    int& qmax = levenbergIterations_;
     qmax = 0;
     do {
-      _optimizer->push();
+      optimizer_->push();
       if (globalStats) {
         globalStats->levenbergIterations++;
         t=get_monotonic_time();
       }
       // update the diagonal of the system matrix
-      _solver.setLambda(_currentLambda, true);
-      bool ok2 = _solver.solve();
+      solver_.setLambda(currentLambda_, true);
+      bool ok2 = solver_.solve();
       if (globalStats) {
         globalStats->timeLinearSolution+=get_monotonic_time()-t;
         t=get_monotonic_time();
       }
-      _optimizer->update(_solver.x());
+      optimizer_->update(solver_.x());
       if (globalStats) {
         globalStats->timeUpdate = get_monotonic_time()-t;
       }
 
       // restore the diagonal
-      _solver.restoreDiagonal();
+      solver_.restoreDiagonal();
 
-      _optimizer->computeActiveErrors();
-      number_t tempChi = _optimizer->activeRobustChi2();
+      optimizer_->computeActiveErrors();
+      number_t tempChi = optimizer_->activeRobustChi2();
 
       if (! ok2)
         tempChi=std::numeric_limits<number_t>::max();
@@ -125,67 +121,67 @@ namespace g2o {
       if (rho>0 && g2o_isfinite(tempChi)){ // last step was good
         number_t alpha = 1.-pow((2*rho-1),3);
         // crop lambda between minimum and maximum factors
-        alpha = (std::min)(alpha, _goodStepUpperScale);
-        number_t scaleFactor = (std::max)(_goodStepLowerScale, alpha);
-        _currentLambda *= scaleFactor;
-        _ni = 2;
+        alpha = (std::min)(alpha, goodStepUpperScale_);
+        number_t scaleFactor = (std::max)(goodStepLowerScale_, alpha);
+        currentLambda_ *= scaleFactor;
+        ni_ = 2;
         currentChi=tempChi;
-        _optimizer->discardTop();
+        optimizer_->discardTop();
       } else {
-        _currentLambda*=_ni;
-        _ni*=2;
-        _optimizer->pop(); // restore the last state before trying to optimize
-        if (!g2o_isfinite(_currentLambda))
+        currentLambda_*=ni_;
+        ni_*=2;
+        optimizer_->pop(); // restore the last state before trying to optimize
+        if (!g2o_isfinite(currentLambda_))
           break;
       }
       qmax++;
-    } while (rho<0 && qmax < _maxTrialsAfterFailure->value() && ! _optimizer->terminate());
+    } while (rho<0 && qmax < maxTrialsAfterFailure_->value() && ! optimizer_->terminate());
 
-    if (qmax == _maxTrialsAfterFailure->value() || rho==0 || !g2o_isfinite(_currentLambda))
-      return Terminate;
-    return OK;
+    if (qmax == maxTrialsAfterFailure_->value() || rho==0 || !g2o_isfinite(currentLambda_))
+      return kTerminate;
+    return kOk;
   }
 
   number_t OptimizationAlgorithmLevenberg::computeLambdaInit() const
   {
-    if (_userLambdaInit->value() > 0)
-      return _userLambdaInit->value();
+    if (userLambdaInit_->value() > 0)
+      return userLambdaInit_->value();
     number_t maxDiagonal=0;
-    for (auto *v : _optimizer->indexMapping()) {
+    for (auto *v : optimizer_->indexMapping()) {
       assert(v);
       int dim = v->dimension();
       for (int j = 0; j < dim; ++j){
         maxDiagonal = std::max(fabs(v->hessian(j,j)),maxDiagonal);
       }
     }
-    return _tau*maxDiagonal;
+    return tau_*maxDiagonal;
   }
 
   number_t OptimizationAlgorithmLevenberg::computeScale() const
   {
     number_t scale = 0;
-    for (size_t j=0; j < _solver.vectorSize(); j++){
-      scale += _solver.x()[j] * (_currentLambda * _solver.x()[j] + _solver.b()[j]);
+    for (size_t j=0; j < solver_.vectorSize(); j++){
+      scale += solver_.x()[j] * (currentLambda_ * solver_.x()[j] + solver_.b()[j]);
     }
     return scale;
   }
 
   void OptimizationAlgorithmLevenberg::setMaxTrialsAfterFailure(int max_trials)
   {
-    _maxTrialsAfterFailure->setValue(max_trials);
+    maxTrialsAfterFailure_->setValue(max_trials);
   }
 
   void OptimizationAlgorithmLevenberg::setUserLambdaInit(number_t lambda)
   {
-    _userLambdaInit->setValue(lambda);
+    userLambdaInit_->setValue(lambda);
   }
 
   void OptimizationAlgorithmLevenberg::printVerbose(std::ostream& os) const
   {
     os
-      << "\t schur= " << _solver.schur()
-      << "\t lambda= " << FIXED(_currentLambda)
-      << "\t levenbergIter= " << _levenbergIterations;
+      << "\t schur= " << solver_.schur()
+      << "\t lambda= " << FIXED(currentLambda_)
+      << "\t levenbergIter= " << levenbergIterations_;
   }
 
 } // end namespace

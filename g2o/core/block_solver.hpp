@@ -39,43 +39,36 @@ namespace g2o {
 template <typename Traits>
 BlockSolver<Traits>::BlockSolver(std::unique_ptr<LinearSolverType> linearSolver)
     :   BlockSolverBase(),
-        _linearSolver(std::move(linearSolver))
+        linearSolver_(std::move(linearSolver))
 {
-  // workspace
-  _xSize=0;
-  _numPoses=0;
-  _numLandmarks=0;
-  _sizePoses=0;
-  _sizeLandmarks=0;
-  _doSchur=true;
 }
 
 template <typename Traits>
 void BlockSolver<Traits>::resize(int* blockPoseIndices, int numPoseBlocks,
               int* blockLandmarkIndices, int numLandmarkBlocks,
-              int s)
+              int totalDim)
 {
   deallocate();
 
-  resizeVector(s);
+  resizeVector(totalDim);
 
-  if (_doSchur) {
+  if (doSchur_) {
     // the following two are only used in schur
     assert(_sizePoses > 0 && "allocating with wrong size");
-    _coefficients.reset(allocate_aligned<number_t>(s));
-    _bschur.reset(allocate_aligned<number_t>(_sizePoses));
+    coefficients_.reset(allocate_aligned<number_t>(totalDim));
+    bschur_.reset(allocate_aligned<number_t>(sizePoses_));
   }
 
-  _Hpp= g2o::make_unique<PoseHessianType>(blockPoseIndices, blockPoseIndices, numPoseBlocks, numPoseBlocks);
-  if (_doSchur) {
-    _Hschur = g2o::make_unique<PoseHessianType>(blockPoseIndices, blockPoseIndices, numPoseBlocks, numPoseBlocks);
-    _Hll = g2o::make_unique<LandmarkHessianType>(blockLandmarkIndices, blockLandmarkIndices, numLandmarkBlocks, numLandmarkBlocks);
-    _DInvSchur = g2o::make_unique<SparseBlockMatrixDiagonal<LandmarkMatrixType>>(_Hll->colBlockIndices());
-    _Hpl = g2o::make_unique<PoseLandmarkHessianType>(blockPoseIndices, blockLandmarkIndices, numPoseBlocks, numLandmarkBlocks);
-    _HplCCS = g2o::make_unique<SparseBlockMatrixCCS<PoseLandmarkMatrixType>>(_Hpl->rowBlockIndices(), _Hpl->colBlockIndices());
-    _HschurTransposedCCS = g2o::make_unique<SparseBlockMatrixCCS<PoseMatrixType>>(_Hschur->colBlockIndices(), _Hschur->rowBlockIndices());
+  Hpp_= g2o::make_unique<PoseHessianType>(blockPoseIndices, blockPoseIndices, numPoseBlocks, numPoseBlocks);
+  if (doSchur_) {
+    Hschur_ = g2o::make_unique<PoseHessianType>(blockPoseIndices, blockPoseIndices, numPoseBlocks, numPoseBlocks);
+    Hll_ = g2o::make_unique<LandmarkHessianType>(blockLandmarkIndices, blockLandmarkIndices, numLandmarkBlocks, numLandmarkBlocks);
+    DInvSchur_ = g2o::make_unique<SparseBlockMatrixDiagonal<LandmarkMatrixType>>(Hll_->colBlockIndices());
+    Hpl_ = g2o::make_unique<PoseLandmarkHessianType>(blockPoseIndices, blockLandmarkIndices, numPoseBlocks, numLandmarkBlocks);
+    HplCCS_ = g2o::make_unique<SparseBlockMatrixCCS<PoseLandmarkMatrixType>>(Hpl_->rowBlockIndices(), Hpl_->colBlockIndices());
+    HschurTransposedCCS_ = g2o::make_unique<SparseBlockMatrixCCS<PoseMatrixType>>(Hschur_->colBlockIndices(), Hschur_->rowBlockIndices());
 #ifdef G2O_OPENMP
-    _coefficientsMutex.resize(numPoseBlocks);
+    coefficientsMutex_.resize(numPoseBlocks);
 #endif
   }
 }
@@ -83,16 +76,16 @@ void BlockSolver<Traits>::resize(int* blockPoseIndices, int numPoseBlocks,
 template <typename Traits>
 void BlockSolver<Traits>::deallocate()
 {
-    _Hpp.reset();
-    _Hll.reset();
-    _Hpl.reset();
-    _Hschur.reset();
-    _DInvSchur.reset();
-    _coefficients.reset();
-    _bschur.reset();
+    Hpp_.reset();
+    Hll_.reset();
+    Hpl_.reset();
+    Hschur_.reset();
+    DInvSchur_.reset();
+    coefficients_.reset();
+    bschur_.reset();
 
-    _HplCCS.reset();
-    _HschurTransposedCCS.reset();
+    HplCCS_.reset();
+    HschurTransposedCCS_.reset();
 }
 
 template <typename Traits>
@@ -105,47 +98,47 @@ bool BlockSolver<Traits>::buildStructure(bool zeroBlocks)
   assert(_optimizer);
 
   size_t sparseDim = 0;
-  _numPoses=0;
-  _numLandmarks=0;
-  _sizePoses=0;
-  _sizeLandmarks=0;
-  int* blockPoseIndices = new int[_optimizer->indexMapping().size()];
-  int* blockLandmarkIndices = new int[_optimizer->indexMapping().size()];
+  numPoses_=0;
+  numLandmarks_=0;
+  sizePoses_=0;
+  sizeLandmarks_=0;
+  int* blockPoseIndices = new int[optimizer_->indexMapping().size()];
+  int* blockLandmarkIndices = new int[optimizer_->indexMapping().size()];
 
-  for (size_t i = 0; i < _optimizer->indexMapping().size(); ++i) {
-    OptimizableGraph::Vertex* v = _optimizer->indexMapping()[i];
+  for (size_t i = 0; i < optimizer_->indexMapping().size(); ++i) {
+    OptimizableGraph::Vertex* v = optimizer_->indexMapping()[i];
     int dim = v->dimension();
     if (! v->marginalized()){
-      v->setColInHessian(_sizePoses);
-      _sizePoses+=dim;
-      blockPoseIndices[_numPoses]=_sizePoses;
-      ++_numPoses;
+      v->setColInHessian(sizePoses_);
+      sizePoses_+=dim;
+      blockPoseIndices[numPoses_]=sizePoses_;
+      ++numPoses_;
     } else {
-      v->setColInHessian(_sizeLandmarks);
-      _sizeLandmarks+=dim;
-      blockLandmarkIndices[_numLandmarks]=_sizeLandmarks;
-      ++_numLandmarks;
+      v->setColInHessian(sizeLandmarks_);
+      sizeLandmarks_+=dim;
+      blockLandmarkIndices[numLandmarks_]=sizeLandmarks_;
+      ++numLandmarks_;
     }
     sparseDim += dim;
   }
-  resize(blockPoseIndices, _numPoses, blockLandmarkIndices, _numLandmarks, sparseDim);
+  resize(blockPoseIndices, numPoses_, blockLandmarkIndices, numLandmarks_, sparseDim);
   delete[] blockLandmarkIndices;
   delete[] blockPoseIndices;
 
   // allocate the diagonal on Hpp and Hll
   int poseIdx = 0;
   int landmarkIdx = 0;
-  for (size_t i = 0; i < _optimizer->indexMapping().size(); ++i) {
-    OptimizableGraph::Vertex* v = _optimizer->indexMapping()[i];
+  for (size_t i = 0; i < optimizer_->indexMapping().size(); ++i) {
+    OptimizableGraph::Vertex* v = optimizer_->indexMapping()[i];
     if (! v->marginalized()){
       //assert(poseIdx == v->hessianIndex());
-      PoseMatrixType* m = _Hpp->block(poseIdx, poseIdx, true);
+      PoseMatrixType* m = Hpp_->block(poseIdx, poseIdx, true);
       if (zeroBlocks)
         m->setZero();
       v->mapHessianMemory(m->data());
       ++poseIdx;
     } else {
-      LandmarkMatrixType* m = _Hll->block(landmarkIdx, landmarkIdx, true);
+      LandmarkMatrixType* m = Hll_->block(landmarkIdx, landmarkIdx, true);
       if (zeroBlocks)
         m->setZero();
       v->mapHessianMemory(m->data());
@@ -156,14 +149,14 @@ bool BlockSolver<Traits>::buildStructure(bool zeroBlocks)
 
   // temporary structures for building the pattern of the Schur complement
   SparseBlockMatrixHashMap<PoseMatrixType>* schurMatrixLookup = 0;
-  if (_doSchur) {
-    schurMatrixLookup = new SparseBlockMatrixHashMap<PoseMatrixType>(_Hschur->rowBlockIndices(), _Hschur->colBlockIndices());
-    schurMatrixLookup->blockCols().resize(_Hschur->blockCols().size());
+  if (doSchur_) {
+    schurMatrixLookup = new SparseBlockMatrixHashMap<PoseMatrixType>(Hschur_->rowBlockIndices(), Hschur_->colBlockIndices());
+    schurMatrixLookup->blockCols().resize(Hschur_->blockCols().size());
   }
 
   // here we assume that the landmark indices start after the pose ones
   // create the structure in Hpp, Hll and in Hpl
-  for (SparseOptimizer::EdgeContainer::const_iterator it=_optimizer->activeEdges().begin(); it!=_optimizer->activeEdges().end(); ++it){
+  for (SparseOptimizer::EdgeContainer::const_iterator it=optimizer_->activeEdges().begin(); it!=optimizer_->activeEdges().end(); ++it){
     const auto& e = *it;
 
     for (size_t viIdx = 0; viIdx < e->vertices().size(); ++viIdx) {
@@ -183,27 +176,27 @@ bool BlockSolver<Traits>::buildStructure(bool zeroBlocks)
           std::swap(ind1, ind2);
         }
         if (! v1->marginalized() && !v2->marginalized()){
-          PoseMatrixType* m = _Hpp->block(ind1, ind2, true);
+          PoseMatrixType* m = Hpp_->block(ind1, ind2, true);
           if (zeroBlocks)
             m->setZero();
           e->mapHessianMemory(m->data(), viIdx, vjIdx, transposedBlock);
-          if (_Hschur) {// assume this is only needed in case we solve with the schur complement
+          if (Hschur_) {// assume this is only needed in case we solve with the schur complement
             schurMatrixLookup->addBlock(ind1, ind2);
           }
         } else if (v1->marginalized() && v2->marginalized()){
           // RAINER hmm.... should we ever reach this here????
-          LandmarkMatrixType* m = _Hll->block(ind1-_numPoses, ind2-_numPoses, true);
+          LandmarkMatrixType* m = Hll_->block(ind1-numPoses_, ind2-numPoses_, true);
           if (zeroBlocks)
             m->setZero();
           e->mapHessianMemory(m->data(), viIdx, vjIdx, false);
         } else {
           if (v1->marginalized()){
-            PoseLandmarkMatrixType* m = _Hpl->block(v2->hessianIndex(),v1->hessianIndex()-_numPoses, true);
+            PoseLandmarkMatrixType* m = Hpl_->block(v2->hessianIndex(),v1->hessianIndex()-numPoses_, true);
             if (zeroBlocks)
               m->setZero();
             e->mapHessianMemory(m->data(), viIdx, vjIdx, true); // transpose the block before writing to it
           } else {
-            PoseLandmarkMatrixType* m = _Hpl->block(v1->hessianIndex(),v2->hessianIndex()-_numPoses, true);
+            PoseLandmarkMatrixType* m = Hpl_->block(v1->hessianIndex(),v2->hessianIndex()-numPoses_, true);
             if (zeroBlocks)
               m->setZero();
             e->mapHessianMemory(m->data(), viIdx, vjIdx, false); // directly the block
@@ -213,15 +206,15 @@ bool BlockSolver<Traits>::buildStructure(bool zeroBlocks)
     }
   }
 
-  if (! _doSchur) {
+  if (! doSchur_) {
     delete schurMatrixLookup;
     return true;
   }
 
-  _DInvSchur->diagonal().resize(landmarkIdx);
-  _Hpl->fillSparseBlockMatrixCCS(*_HplCCS);
+  DInvSchur_->diagonal().resize(landmarkIdx);
+  Hpl_->fillSparseBlockMatrixCCS(*HplCCS_);
 
-  for (OptimizableGraph::Vertex* v : _optimizer->indexMapping()) {
+  for (OptimizableGraph::Vertex* v : optimizer_->indexMapping()) {
     if (v->marginalized()) {
       const HyperGraph::EdgeSetWeak& vedges = v->edges();
       for (auto it1 = vedges.begin(); it1 != vedges.end(); ++it1) {
@@ -246,9 +239,9 @@ bool BlockSolver<Traits>::buildStructure(bool zeroBlocks)
     }
   }
 
-  _Hschur->takePatternFromHash(*schurMatrixLookup);
+  Hschur_->takePatternFromHash(*schurMatrixLookup);
   delete schurMatrixLookup;
-  _Hschur->fillSparseBlockMatrixCCSTransposed(*_HschurTransposedCCS);
+  Hschur_->fillSparseBlockMatrixCCSTransposed(*HschurTransposedCCS_);
 
   return true;
 }
@@ -260,21 +253,21 @@ bool BlockSolver<Traits>::updateStructure(const HyperGraph::VertexContainer& vse
     OptimizableGraph::Vertex* v = static_cast<OptimizableGraph::Vertex*>(vit->get());
     int dim = v->dimension();
     if (! v->marginalized()){
-      v->setColInHessian(_sizePoses);
-      _sizePoses+=dim;
-      _Hpp->rowBlockIndices().push_back(_sizePoses);
-      _Hpp->colBlockIndices().push_back(_sizePoses);
-      _Hpp->blockCols().push_back(typename SparseBlockMatrix<PoseMatrixType>::IntBlockMap());
-      ++_numPoses;
+      v->setColInHessian(sizePoses_);
+      sizePoses_+=dim;
+      Hpp_->rowBlockIndices().push_back(sizePoses_);
+      Hpp_->colBlockIndices().push_back(sizePoses_);
+      Hpp_->blockCols().push_back(typename SparseBlockMatrix<PoseMatrixType>::IntBlockMap());
+      ++numPoses_;
       int ind = v->hessianIndex();
-      PoseMatrixType* m = _Hpp->block(ind, ind, true);
+      PoseMatrixType* m = Hpp_->block(ind, ind, true);
       v->mapHessianMemory(m->data());
     } else {
       std::cerr << "updateStructure(): Schur not supported" << std::endl;
       abort();
     }
   }
-  resizeVector(_sizePoses + _sizeLandmarks);
+  resizeVector(sizePoses_ + sizeLandmarks_);
 
   for (HyperGraph::EdgeSet::const_iterator it = edges.begin(); it != edges.end(); ++it) {
     const auto& e = *it;
@@ -296,7 +289,7 @@ bool BlockSolver<Traits>::updateStructure(const HyperGraph::VertexContainer& vse
           std::swap(ind1, ind2);
 
         if (! v1->marginalized() && !v2->marginalized()) {
-          PoseMatrixType* m = _Hpp->block(ind1, ind2, true);
+          PoseMatrixType* m = Hpp_->block(ind1, ind2, true);
           OptimizableGraph::Edge* ee = static_cast<OptimizableGraph::Edge*>(e.get());
           ee->mapHessianMemory(m->data(), viIdx, vjIdx, transposedBlock);
         } else {
@@ -313,13 +306,13 @@ bool BlockSolver<Traits>::updateStructure(const HyperGraph::VertexContainer& vse
 template <typename Traits>
 bool BlockSolver<Traits>::solve(){
   //cerr << __PRETTY_FUNCTION__ << endl;
-  if (! _doSchur){
+  if (! doSchur_){
     number_t t=get_monotonic_time();
-    bool ok = _linearSolver->solve(*_Hpp, _x, _b);
+    bool ok = linearSolver_->solve(*Hpp_, x_, b_);
     G2OBatchStatistics* globalStats = G2OBatchStatistics::globalStats();
     if (globalStats) {
       globalStats->timeLinearSolver = get_monotonic_time() - t;
-      globalStats->hessianDimension = globalStats->hessianPoseDimension = _Hpp->cols();
+      globalStats->hessianDimension = globalStats->hessianPoseDimension = Hpp_->cols();
     }
     return ok;
   }
@@ -330,32 +323,32 @@ bool BlockSolver<Traits>::solve(){
   number_t t=get_monotonic_time();
 
   // _Hschur = _Hpp, but keeping the pattern of _Hschur
-  _Hschur->clear();
-  _Hpp->add(*_Hschur);
+  Hschur_->clear();
+  Hpp_->add(*Hschur_);
 
   //_DInvSchur->clear();
-  memset(_coefficients.get(), 0, _sizePoses*sizeof(number_t));
+  memset(coefficients_.get(), 0, sizePoses_*sizeof(number_t));
 # ifdef G2O_OPENMP
 # pragma omp parallel for default (shared) schedule(dynamic, 10)
 # endif
-  for (int landmarkIndex = 0; landmarkIndex < static_cast<int>(_Hll->blockCols().size()); ++landmarkIndex) {
-    const typename SparseBlockMatrix<LandmarkMatrixType>::IntBlockMap& marginalizeColumn = _Hll->blockCols()[landmarkIndex];
+  for (int landmarkIndex = 0; landmarkIndex < static_cast<int>(Hll_->blockCols().size()); ++landmarkIndex) {
+    const typename SparseBlockMatrix<LandmarkMatrixType>::IntBlockMap& marginalizeColumn = Hll_->blockCols()[landmarkIndex];
     assert(marginalizeColumn.size() == 1 && "more than one block in _Hll column");
 
     // calculate inverse block for the landmark
     const LandmarkMatrixType * D = marginalizeColumn.begin()->second;
     assert (D && D->rows()==D->cols() && "Error in landmark matrix");
-    LandmarkMatrixType& Dinv = _DInvSchur->diagonal()[landmarkIndex];
+    LandmarkMatrixType& Dinv = DInvSchur_->diagonal()[landmarkIndex];
     Dinv = D->inverse();
 
     LandmarkVectorType  db(D->rows());
     for (int j=0; j<D->rows(); ++j) {
-      db[j]=_b[_Hll->rowBaseOfBlock(landmarkIndex) + _sizePoses + j];
+      db[j]=b_[Hll_->rowBaseOfBlock(landmarkIndex) + sizePoses_ + j];
     }
     db=Dinv*db;
 
     assert((size_t)landmarkIndex < _HplCCS->blockCols().size() && "Index out of bounds");
-    const typename SparseBlockMatrixCCS<PoseLandmarkMatrixType>::SparseColumn& landmarkColumn = _HplCCS->blockCols()[landmarkIndex];
+    const typename SparseBlockMatrixCCS<PoseLandmarkMatrixType>::SparseColumn& landmarkColumn = HplCCS_->blockCols()[landmarkIndex];
 
     for (typename SparseBlockMatrixCCS<PoseLandmarkMatrixType>::SparseColumn::const_iterator it_outer = landmarkColumn.begin();
         it_outer != landmarkColumn.end(); ++it_outer) {
@@ -366,14 +359,14 @@ bool BlockSolver<Traits>::solve(){
 
       PoseLandmarkMatrixType BDinv = (*Bi)*(Dinv);
       assert(_HplCCS->rowBaseOfBlock(i1) < _sizePoses && "Index out of bounds");
-      typename PoseVectorType::MapType Bb(&_coefficients[_HplCCS->rowBaseOfBlock(i1)], Bi->rows());
+      typename PoseVectorType::MapType Bb(&coefficients_[HplCCS_->rowBaseOfBlock(i1)], Bi->rows());
 #    ifdef G2O_OPENMP
-      ScopedOpenMPMutex mutexLock(&_coefficientsMutex[i1]);
+      ScopedOpenMPMutex mutexLock(&coefficientsMutex_[i1]);
 #    endif
       Bb.noalias() += (*Bi)*db;
 
       assert(i1 >= 0 && i1 < static_cast<int>(_HschurTransposedCCS->blockCols().size()) && "Index out of bounds");
-      typename SparseBlockMatrixCCS<PoseMatrixType>::SparseColumn::iterator targetColumnIt = _HschurTransposedCCS->blockCols()[i1].begin();
+      typename SparseBlockMatrixCCS<PoseMatrixType>::SparseColumn::iterator targetColumnIt = HschurTransposedCCS_->blockCols()[i1].begin();
 
       typename SparseBlockMatrixCCS<PoseLandmarkMatrixType>::RowBlock aux(i1, 0);
       typename SparseBlockMatrixCCS<PoseLandmarkMatrixType>::SparseColumn::const_iterator it_inner = lower_bound(landmarkColumn.begin(), landmarkColumn.end(), aux);
@@ -393,9 +386,9 @@ bool BlockSolver<Traits>::solve(){
   //cerr << "Solve [marginalize] = " <<  get_monotonic_time()-t << endl;
 
   // _bschur = _b for calling solver, and not touching _b
-  memcpy(_bschur.get(), _b, _sizePoses * sizeof(number_t));
-  for (int i=0; i<_sizePoses; ++i){
-    _bschur[i]-=_coefficients[i];
+  memcpy(bschur_.get(), b_, sizePoses_ * sizeof(number_t));
+  for (int i=0; i<sizePoses_; ++i){
+    bschur_[i]-=coefficients_[i];
   }
 
   G2OBatchStatistics* globalStats = G2OBatchStatistics::globalStats();
@@ -404,11 +397,11 @@ bool BlockSolver<Traits>::solve(){
   }
 
   t=get_monotonic_time();
-  bool solvedPoses = _linearSolver->solve(*_Hschur, _x, _bschur.get());
+  bool solvedPoses = linearSolver_->solve(*Hschur_, x_, bschur_.get());
   if (globalStats) {
     globalStats->timeLinearSolver = get_monotonic_time() - t;
-    globalStats->hessianPoseDimension = _Hpp->cols();
-    globalStats->hessianLandmarkDimension = _Hll->cols();
+    globalStats->hessianPoseDimension = Hpp_->cols();
+    globalStats->hessianLandmarkDimension = Hll_->cols();
     globalStats->hessianDimension = globalStats->hessianPoseDimension + globalStats->hessianLandmarkDimension;
   }
   //cerr << "Solve [decompose and solve] = " <<  get_monotonic_time()-t << endl;
@@ -418,27 +411,27 @@ bool BlockSolver<Traits>::solve(){
 
   // _x contains the solution for the poses, now applying it to the landmarks to get the new part of the
   // solution;
-  number_t* xp = _x;
-  number_t* cp = _coefficients.get();
+  number_t* xp = x_;
+  number_t* cp = coefficients_.get();
 
-  number_t* xl=_x+_sizePoses;
-  number_t* cl=_coefficients.get() + _sizePoses;
-  number_t* bl=_b+_sizePoses;
+  number_t* xl=x_+sizePoses_;
+  number_t* cl=coefficients_.get() + sizePoses_;
+  number_t* bl=b_+sizePoses_;
 
   // cp = -xp
-  for (int i=0; i<_sizePoses; ++i)
+  for (int i=0; i<sizePoses_; ++i)
     cp[i]=-xp[i];
 
   // cl = bl
-  memcpy(cl,bl,_sizeLandmarks*sizeof(number_t));
+  memcpy(cl,bl,sizeLandmarks_*sizeof(number_t));
 
   // cl = bl - Bt * xp
   //Bt->multiply(cl, cp);
-  _HplCCS->rightMultiply(cl, cp);
+  HplCCS_->rightMultiply(cl, cp);
 
   // xl = Dinv * cl
-  memset(xl,0, _sizeLandmarks*sizeof(number_t));
-  _DInvSchur->multiply(xl,cl);
+  memset(xl,0, sizeLandmarks_*sizeof(number_t));
+  DInvSchur_->multiply(xl,cl);
   //_DInvSchur->rightMultiply(xl,cl);
   //cerr << "Solve [landmark delta] = " <<  get_monotonic_time()-t << endl;
 
@@ -450,7 +443,7 @@ template <typename Traits>
 bool BlockSolver<Traits>::computeMarginals(SparseBlockMatrix<MatrixX>& spinv, const std::vector<std::pair<int, int> >& blockIndices)
 {
   number_t t = get_monotonic_time();
-  bool ok = _linearSolver->solvePattern(spinv, blockIndices, *_Hpp);
+  bool ok = linearSolver_->solvePattern(spinv, blockIndices, *Hpp_);
   G2OBatchStatistics* globalStats = G2OBatchStatistics::globalStats();
   if (globalStats) {
     globalStats->timeMarginals = get_monotonic_time() - t;
@@ -465,29 +458,29 @@ bool BlockSolver<Traits>::buildSystem()
 # ifdef G2O_OPENMP
 # pragma omp parallel for default (shared) if (_optimizer->indexMapping().size() > 1000)
 # endif
-  for (int i = 0; i < static_cast<int>(_optimizer->indexMapping().size()); ++i) {
-    OptimizableGraph::Vertex* v=_optimizer->indexMapping()[i];
+  for (int i = 0; i < static_cast<int>(optimizer_->indexMapping().size()); ++i) {
+    OptimizableGraph::Vertex* v=optimizer_->indexMapping()[i];
     assert(v);
     v->clearQuadraticForm();
   }
-  _Hpp->clear();
-  if (_doSchur) {
-    _Hll->clear();
-    _Hpl->clear();
+  Hpp_->clear();
+  if (doSchur_) {
+    Hll_->clear();
+    Hpl_->clear();
   }
 
   // resetting the terms for the pairwise constraints
   // built up the current system by storing the Hessian blocks in the edges and vertices
 # ifndef G2O_OPENMP
   // no threading, we do not need to copy the workspace
-  JacobianWorkspace& jacobianWorkspace = _optimizer->jacobianWorkspace();
+  JacobianWorkspace& jacobianWorkspace = optimizer_->jacobianWorkspace();
 # else
   // if running with threads need to produce copies of the workspace for each thread
   JacobianWorkspace jacobianWorkspace = _optimizer->jacobianWorkspace();
 # pragma omp parallel for default (shared) firstprivate(jacobianWorkspace) if (_optimizer->activeEdges().size() > 100)
 # endif
-  for (int k = 0; k < static_cast<int>(_optimizer->activeEdges().size()); ++k) {
-    const std::shared_ptr<OptimizableGraph::Edge>& e = _optimizer->activeEdges()[k];
+  for (int k = 0; k < static_cast<int>(optimizer_->activeEdges().size()); ++k) {
+    const std::shared_ptr<OptimizableGraph::Edge>& e = optimizer_->activeEdges()[k];
     e->linearizeOplus(jacobianWorkspace); // jacobian of the nodes' oplus (manifold)
     e->constructQuadraticForm();
 #  ifndef NDEBUG
@@ -508,12 +501,12 @@ bool BlockSolver<Traits>::buildSystem()
 # ifdef G2O_OPENMP
 # pragma omp parallel for default (shared) if (_optimizer->indexMapping().size() > 1000)
 # endif
-  for (int i = 0; i < static_cast<int>(_optimizer->indexMapping().size()); ++i) {
-    OptimizableGraph::Vertex* v=_optimizer->indexMapping()[i];
+  for (int i = 0; i < static_cast<int>(optimizer_->indexMapping().size()); ++i) {
+    OptimizableGraph::Vertex* v=optimizer_->indexMapping()[i];
     int iBase = v->colInHessian();
     if (v->marginalized())
-      iBase+=_sizePoses;
-    v->copyB(_b+iBase);
+      iBase+=sizePoses_;
+    v->copyB(b_+iBase);
   }
 
   return false;
@@ -524,25 +517,25 @@ template <typename Traits>
 bool BlockSolver<Traits>::setLambda(number_t lambda, bool backup)
 {
   if (backup) {
-    _diagonalBackupPose.resize(_numPoses);
-    _diagonalBackupLandmark.resize(_numLandmarks);
+    diagonalBackupPose_.resize(numPoses_);
+    diagonalBackupLandmark_.resize(numLandmarks_);
   }
 # ifdef G2O_OPENMP
 # pragma omp parallel for default (shared) if (_numPoses > 100)
 # endif
-  for (int i = 0; i < _numPoses; ++i) {
-    PoseMatrixType *b=_Hpp->block(i,i);
+  for (int i = 0; i < numPoses_; ++i) {
+    PoseMatrixType *b=Hpp_->block(i,i);
     if (backup)
-      _diagonalBackupPose[i] = b->diagonal();
+      diagonalBackupPose_[i] = b->diagonal();
     b->diagonal().array() += lambda;
   }
 # ifdef G2O_OPENMP
 # pragma omp parallel for default (shared) if (_numLandmarks > 100)
 # endif
-  for (int i = 0; i < _numLandmarks; ++i) {
-    LandmarkMatrixType *b=_Hll->block(i,i);
+  for (int i = 0; i < numLandmarks_; ++i) {
+    LandmarkMatrixType *b=Hll_->block(i,i);
     if (backup)
-      _diagonalBackupLandmark[i] = b->diagonal();
+      diagonalBackupLandmark_[i] = b->diagonal();
     b->diagonal().array() += lambda;
   }
   return true;
@@ -553,42 +546,42 @@ void BlockSolver<Traits>::restoreDiagonal()
 {
   assert((int) _diagonalBackupPose.size() == _numPoses && "Mismatch in dimensions");
   assert((int) _diagonalBackupLandmark.size() == _numLandmarks && "Mismatch in dimensions");
-  for (int i = 0; i < _numPoses; ++i) {
-    PoseMatrixType *b=_Hpp->block(i,i);
-    b->diagonal() = _diagonalBackupPose[i];
+  for (int i = 0; i < numPoses_; ++i) {
+    PoseMatrixType *b=Hpp_->block(i,i);
+    b->diagonal() = diagonalBackupPose_[i];
   }
-  for (int i = 0; i < _numLandmarks; ++i) {
-    LandmarkMatrixType *b=_Hll->block(i,i);
-    b->diagonal() = _diagonalBackupLandmark[i];
+  for (int i = 0; i < numLandmarks_; ++i) {
+    LandmarkMatrixType *b=Hll_->block(i,i);
+    b->diagonal() = diagonalBackupLandmark_[i];
   }
 }
 
 template <typename Traits>
 bool BlockSolver<Traits>::init(SparseOptimizer* optimizer, bool online)
 {
-  _optimizer = optimizer;
+  optimizer_ = optimizer;
   if (! online) {
-    if (_Hpp)
-      _Hpp->clear();
-    if (_Hpl)
-      _Hpl->clear();
-    if (_Hll)
-      _Hll->clear();
+    if (Hpp_)
+      Hpp_->clear();
+    if (Hpl_)
+      Hpl_->clear();
+    if (Hll_)
+      Hll_->clear();
   }
-  _linearSolver->init();
+  linearSolver_->init();
   return true;
 }
 
 template <typename Traits>
 void BlockSolver<Traits>::setWriteDebug(bool writeDebug)
 {
-  _linearSolver->setWriteDebug(writeDebug);
+  linearSolver_->setWriteDebug(writeDebug);
 }
 
 template <typename Traits>
 bool BlockSolver<Traits>::saveHessian(const std::string& fileName) const
 {
-  return _Hpp->writeOctave(fileName.c_str(), true);
+  return Hpp_->writeOctave(fileName.c_str(), true);
 }
 
 } // end namespace

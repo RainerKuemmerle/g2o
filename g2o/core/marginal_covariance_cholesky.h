@@ -46,10 +46,10 @@ namespace g2o {
        * hash struct for storing the matrix elements needed to compute the covariance
        */
       using LookupMap = std::unordered_map<int, number_t>;
-    
+
     public:
-      MarginalCovarianceCholesky();
-      ~MarginalCovarianceCholesky();
+      MarginalCovarianceCholesky() = default;
+      ~MarginalCovarianceCholesky() = default;
 
       /**
        * compute the marginal cov for the given block indices, write the result to the covBlocks memory (which has to
@@ -75,17 +75,17 @@ namespace g2o {
 
     protected:
       // information about the cholesky factor (lower triangle)
-      int _n{0};           ///< L is an n X n matrix
-      int* _Ap{nullptr};         ///< column pointer of the CCS storage
-      int* _Ai{nullptr};         ///< row indices of the CCS storage
-      number_t* _Ax{nullptr};      ///< values of the cholesky factor
-      int* _perm{nullptr};       ///< permutation of the cholesky factor. Variable re-ordering for better fill-in
+      int n_{0};           ///< L is an n X n matrix
+      int* Ap_{nullptr};         ///< column pointer of the CCS storage
+      int* Ai_{nullptr};         ///< row indices of the CCS storage
+      number_t* Ax_{nullptr};      ///< values of the cholesky factor
+      int* perm_{nullptr};       ///< permutation of the cholesky factor. Variable re-ordering for better fill-in
 
-      LookupMap _map;             ///< hash look up table for the already computed entries
-      std::vector<number_t> _diag;  ///< cache 1 / H_ii to avoid recalculations
+      LookupMap map_;             ///< hash look up table for the already computed entries
+      std::vector<number_t> diag_;  ///< cache 1 / H_ii to avoid recalculations
 
       //! compute the index used for hashing
-      int computeIndex(int r, int c) const { /*assert(r <= c);*/ return r*_n + c;}
+      int computeIndex(int r, int c) const { /*assert(r <= c);*/ return r*n_ + c;}
       /**
        * compute one entry in the covariance, r and c are values after applying the permutation, and upper triangular.
        * May issue recursive calls to itself to compute the missing values.

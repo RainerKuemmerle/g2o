@@ -29,91 +29,90 @@
 #include <cassert>
 #include <iostream>
 #include <typeinfo>
-
-using namespace std;
+#include <utility>
 
 namespace g2o {
 
 AbstractOptimizationAlgorithmCreator::AbstractOptimizationAlgorithmCreator(
-    const OptimizationAlgorithmProperty& p)
-    : _property(p) {}
+    OptimizationAlgorithmProperty  p)
+    : property_(std::move(p)) {}
 
-std::unique_ptr<OptimizationAlgorithmFactory> OptimizationAlgorithmFactory::factoryInstance;
+std::unique_ptr<OptimizationAlgorithmFactory> OptimizationAlgorithmFactory::factoryInstance_;
 
 OptimizationAlgorithmFactory* OptimizationAlgorithmFactory::instance() {
-  if (factoryInstance == nullptr) {
-    factoryInstance.reset(new OptimizationAlgorithmFactory);
+  if (factoryInstance_ == nullptr) {
+    factoryInstance_.reset(new OptimizationAlgorithmFactory);
   }
-  return factoryInstance.get();
+  return factoryInstance_.get();
 }
 
 void OptimizationAlgorithmFactory::registerSolver(
     const std::shared_ptr<AbstractOptimizationAlgorithmCreator>& c) {
-  const string& name = c->property().name;
+  const std::string& name = c->property().name;
   auto foundIt = findSolver(name);
-  if (foundIt != _creator.end()) {
-    _creator.erase(foundIt);
-    cerr << "SOLVER FACTORY WARNING: Overwriting Solver creator " << name << endl;
+  if (foundIt != creator_.end()) {
+    creator_.erase(foundIt);
+    std::cerr << "SOLVER FACTORY WARNING: Overwriting Solver creator " << name << std::endl;
     assert(0);
   }
-  _creator.push_back(c);
+  creator_.push_back(c);
 }
 
 void OptimizationAlgorithmFactory::unregisterSolver(
     const std::shared_ptr<AbstractOptimizationAlgorithmCreator>& c) {
-  const string& name = c->property().name;
+  const std::string& name = c->property().name;
   auto foundIt = findSolver(name);
-  if (foundIt != _creator.end()) {
-    _creator.erase(foundIt);
+  if (foundIt != creator_.end()) {
+    creator_.erase(foundIt);
   }
 }
 
 std::unique_ptr<OptimizationAlgorithm> OptimizationAlgorithmFactory::construct(
     const std::string& name, OptimizationAlgorithmProperty& solverProperty) const {
   auto foundIt = findSolver(name);
-  if (foundIt != _creator.end()) {
+  if (foundIt != creator_.end()) {
     solverProperty = (*foundIt)->property();
     return (*foundIt)->construct();
   }
-  cerr << "SOLVER FACTORY WARNING: Unable to create solver " << name << endl;
+  std::cerr << "SOLVER FACTORY WARNING: Unable to create solver " << name << std::endl;
   return std::unique_ptr<OptimizationAlgorithm>();
 }
 
 void OptimizationAlgorithmFactory::destroy() {
   std::unique_ptr<OptimizationAlgorithmFactory> aux;
-  factoryInstance.swap(aux);
+  factoryInstance_.swap(aux);
 }
 
 void OptimizationAlgorithmFactory::listSolvers(std::ostream& os) const {
   size_t solverNameColumnLength = 0;
-  for (const auto & it : _creator)
+  for (const auto & it : creator_)
     solverNameColumnLength = std::max(solverNameColumnLength, it->property().name.size());
   solverNameColumnLength += 4;
 
-  for (const auto & it : _creator) {
+  for (const auto & it : creator_) {
     const OptimizationAlgorithmProperty& sp = it->property();
     os << sp.name;
     for (size_t i = sp.name.size(); i < solverNameColumnLength; ++i) os << ' ';
-    os << sp.type << " \t" << sp.desc << endl;
+    os << sp.type << " \t" << sp.desc << std::endl;
   }
 }
 
 OptimizationAlgorithmFactory::CreatorList::const_iterator OptimizationAlgorithmFactory::findSolver(
     const std::string& name) const {
-  for (auto it = _creator.begin(); it != _creator.end(); ++it) {
+  for (auto it = creator_.begin(); it != creator_.end(); ++it) {
     const OptimizationAlgorithmProperty& sp = (*it)->property();
     if (sp.name == name) return it;
   }
-  return _creator.end();
+  return creator_.end();
 }
 
 OptimizationAlgorithmFactory::CreatorList::iterator OptimizationAlgorithmFactory::findSolver(
     const std::string& name) {
-  for (auto it = _creator.begin(); it != _creator.end(); ++it) {
+  for (auto it = creator_.begin(); it != creator_.end(); ++it) {
     const OptimizationAlgorithmProperty& sp = (*it)->property();
     if (sp.name == name) return it;
   }
-  return _creator.end();
+  return creator_.end();
 }
 
 }  // namespace g2o

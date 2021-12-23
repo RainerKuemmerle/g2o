@@ -34,14 +34,14 @@ namespace g2o {
 
   SparseOptimizerTerminateAction::SparseOptimizerTerminateAction() :
     HyperGraphAction(),
-    _gainThreshold(cst(1e-6)), 
-    _maxIterations(std::numeric_limits<int>::max())
+    gainThreshold_(cst(1e-6)), 
+    maxIterations_(std::numeric_limits<int>::max())
   {
   }
 
   void SparseOptimizerTerminateAction::setGainThreshold(number_t gainThreshold)
   {
-    _gainThreshold = gainThreshold;
+    gainThreshold_ = gainThreshold;
   }
 
   bool SparseOptimizerTerminateAction::operator()(const HyperGraph* graph, Parameters* parameters)
@@ -60,17 +60,17 @@ namespace g2o {
       setOptimizerStopFlag(optimizer, false);
     } else if (params->iteration == 0) {
       // first iteration, just store the chi2 value
-      _lastChi = optimizer->activeRobustChi2();
+      lastChi_ = optimizer->activeRobustChi2();
     } else {
       // compute the gain and stop the optimizer in case the
       // gain is below the threshold or we reached the max
       // number of iterations
       bool stopOptimizer = false;
-      if (params->iteration < _maxIterations) {
+      if (params->iteration < maxIterations_) {
         number_t currentChi = optimizer->activeRobustChi2();
-        number_t gain = (_lastChi - currentChi) / currentChi;
-        _lastChi = currentChi;
-        if (gain >= 0 && gain < _gainThreshold)
+        number_t gain = (lastChi_ - currentChi) / currentChi;
+        lastChi_ = currentChi;
+        if (gain >= 0 && gain < gainThreshold_)
           stopOptimizer = true;
       } else {
         stopOptimizer = true;
@@ -84,7 +84,7 @@ namespace g2o {
 
   void SparseOptimizerTerminateAction::setMaxIterations(int maxit)
   {
-    _maxIterations = maxit;
+    maxIterations_ = maxit;
   }
 
   void SparseOptimizerTerminateAction::setOptimizerStopFlag(const SparseOptimizer* optimizer, bool stop)
@@ -92,8 +92,8 @@ namespace g2o {
     if (optimizer->forceStopFlag()) {
       *(optimizer->forceStopFlag()) = stop;
     } else {
-      _auxTerminateFlag = stop;
-      const_cast<SparseOptimizer*>(optimizer)->setForceStopFlag(&_auxTerminateFlag);
+      auxTerminateFlag_ = stop;
+      const_cast<SparseOptimizer*>(optimizer)->setForceStopFlag(&auxTerminateFlag_);
     }
   }
 

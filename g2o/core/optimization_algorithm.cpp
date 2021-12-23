@@ -26,34 +26,25 @@
 
 #include "optimization_algorithm.h"
 
-using namespace std;
-
 namespace g2o {
-
-OptimizationAlgorithm::OptimizationAlgorithm()
-   
-= default;
-
-OptimizationAlgorithm::~OptimizationAlgorithm()
-= default;
 
 void OptimizationAlgorithm::printProperties(std::ostream& os) const
 {
-  os << "------------- Algorithm Properties -------------"  << endl;
-  for (const auto & _propertie : _properties) {
-    os << _propertie.first << "\t" << _propertie.second->toString() << endl;
+  os << "------------- Algorithm Properties -------------"  << std::endl;
+  for (const auto & property : properties_) {
+    os << property.first << "\t" << property.second->toString() << std::endl;
   }
-  os << "------------------------------------------------" << endl;
+  os << "------------------------------------------------" << std::endl;
 }
 
 bool OptimizationAlgorithm::updatePropertiesFromString(const std::string& propString)
 {
-  return _properties.updateMapFromString(propString);
+  return properties_.updateMapFromString(propString);
 }
 
 void OptimizationAlgorithm::setOptimizer(SparseOptimizer* optimizer)
 {
-  _optimizer = optimizer;
+  optimizer_ = optimizer;
 }
 
 } // end namespace

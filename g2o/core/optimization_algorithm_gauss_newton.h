@@ -44,14 +44,13 @@ namespace g2o {
        * linearized system.
        */
       explicit OptimizationAlgorithmGaussNewton(std::unique_ptr<Solver> solver);
-      ~OptimizationAlgorithmGaussNewton() override;
 
       SolverResult solve(int iteration, bool online = false) override;
 
       void printVerbose(std::ostream& os) const override;
 
   private:
-    std::unique_ptr<Solver> m_solver;
+    std::unique_ptr<Solver> m_solver_;
   };
 
 } // end namespace

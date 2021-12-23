@@ -29,10 +29,10 @@
 
 namespace g2o {
 
-  ScopeTime::ScopeTime(const char* title) : _title(title), _startTime(get_monotonic_time()) {}
+  ScopeTime::ScopeTime(const char* title) : title_(title), startTime_(get_monotonic_time()) {}
 
   ScopeTime::~ScopeTime() {
-    std::cerr << _title<<" took "<<1000*(get_monotonic_time()-_startTime)<<"ms.\n";
+    std::cerr << title_<<" took "<<1000*(get_monotonic_time()-startTime_)<<"ms.\n";
   }
 
   number_t get_monotonic_time()

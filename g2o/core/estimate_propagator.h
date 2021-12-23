@@ -49,7 +49,7 @@ namespace g2o {
       virtual number_t operator()(OptimizableGraph::Edge* edge, const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to_) const;
       virtual const char* name() const { return "spanning tree";}
     protected:
-      SparseOptimizer* _graph;
+      SparseOptimizer* graph_;
   };
 
   /**
@@ -106,21 +106,21 @@ namespace g2o {
           friend class PriorityQueue;
           AdjacencyMapEntry();
           void reset();
-          std::shared_ptr<OptimizableGraph::Vertex> child() const {return _child;}
-          const OptimizableGraph::VertexSet& parent() const {return _parent;}
-          std::shared_ptr<OptimizableGraph::Edge> edge() const {return _edge;}
-          number_t distance() const {return _distance;}
-          int frontierLevel() const { return _frontierLevel;}
+          std::shared_ptr<OptimizableGraph::Vertex> child() const {return child_;}
+          const OptimizableGraph::VertexSet& parent() const {return parent_;}
+          std::shared_ptr<OptimizableGraph::Edge> edge() const {return edge_;}
+          number_t distance() const {return distance_;}
+          int frontierLevel() const { return frontierLevel_;}
 
         protected:
-          std::shared_ptr<OptimizableGraph::Vertex> _child;
-          OptimizableGraph::VertexSet _parent;
-          std::shared_ptr<OptimizableGraph::Edge> _edge;
-          number_t _distance;
-          int _frontierLevel;
+          std::shared_ptr<OptimizableGraph::Vertex> child_;
+          OptimizableGraph::VertexSet parent_;
+          std::shared_ptr<OptimizableGraph::Edge> edge_;
+          number_t distance_;
+          int frontierLevel_;
         private: // for PriorityQueue
-          bool inQueue;
-          PriorityQueue::iterator queueIt;
+          bool inQueue_;
+          PriorityQueue::iterator queueIt_;
       };
 
       /**
@@ -136,11 +136,10 @@ namespace g2o {
       using AdjacencyMap = std::unordered_map<std::shared_ptr<OptimizableGraph::Vertex>,
                                               AdjacencyMapEntry, VertexIDHashFunction>;
 
-     public:
       explicit EstimatePropagator(OptimizableGraph* g);
-      OptimizableGraph::VertexSet& visited() {return _visited; }
-      AdjacencyMap& adjacencyMap() {return _adjacencyMap; }
-      OptimizableGraph* graph() {return _graph;}
+      OptimizableGraph::VertexSet& visited() {return visited_; }
+      AdjacencyMap& adjacencyMap() {return adjacencyMap_; }
+      OptimizableGraph* graph() {return graph_;}
 
       /**
        * propagate an initial guess starting from v. The function computes a spanning tree
@@ -165,9 +164,9 @@ namespace g2o {
     protected:
       void reset();
 
-      AdjacencyMap _adjacencyMap;
-      OptimizableGraph::VertexSet _visited;
-      OptimizableGraph* _graph;
+      AdjacencyMap adjacencyMap_;
+      OptimizableGraph::VertexSet visited_;
+      OptimizableGraph* graph_;
   };
 
 }

@@ -48,17 +48,17 @@ namespace g2o {
       SparseOptimizerTerminateAction();
       bool operator()(const HyperGraph* graph, Parameters* parameters = nullptr) override;
 
-      number_t gainThreshold() const { return _gainThreshold;}
+      number_t gainThreshold() const { return gainThreshold_;}
       void setGainThreshold(number_t gainThreshold);
 
-      int maxIterations() const { return _maxIterations;}
+      int maxIterations() const { return maxIterations_;}
       void setMaxIterations(int maxit);
 
     protected:
-      number_t _gainThreshold;
-      number_t _lastChi{0};
-      bool _auxTerminateFlag{false};
-      int _maxIterations;
+      number_t gainThreshold_;
+      number_t lastChi_{0};
+      bool auxTerminateFlag_{false};
+      int maxIterations_;
 
       void setOptimizerStopFlag(const SparseOptimizer* optimizer, bool stop);
   };
