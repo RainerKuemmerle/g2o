@@ -26,19 +26,17 @@
 #include "g2o/stuff/macros.h"
 #include "linear_solver_csparse.h"
 
-using namespace std;
-
 namespace g2o {
 
 namespace {
-template <int p, int l, bool blockorder>
+template <int P, int L, bool Blockorder>
 std::unique_ptr<BlockSolverBase> AllocateSolver() {
-  std::cerr << "# Using CSparse poseDim " << p << " landMarkDim " << l << " blockordering "
-            << blockorder << std::endl;
+  std::cerr << "# Using CSparse poseDim " << P << " landMarkDim " << L << " blockordering "
+            << Blockorder << std::endl;
   auto linearSolver =
-      g2o::make_unique<LinearSolverCSparse<typename BlockSolverPL<p, l>::PoseMatrixType>>();
-  linearSolver->setBlockOrdering(blockorder);
-  return g2o::make_unique<BlockSolverPL<p, l>>(std::move(linearSolver));
+      g2o::make_unique<LinearSolverCSparse<typename BlockSolverPL<P, L>::PoseMatrixType>>();
+  linearSolver->setBlockOrdering(Blockorder);
+  return g2o::make_unique<BlockSolverPL<P, L>>(std::move(linearSolver));
 }
 }  // namespace
 
@@ -47,7 +45,7 @@ std::unique_ptr<BlockSolverBase> AllocateSolver() {
  */
 static OptimizationAlgorithm* createSolver(const std::string& fullSolverName) {
   static const std::map<std::string, std::function<std::unique_ptr<BlockSolverBase>()>>
-      solver_factories{
+      kSolverFactories{
           {"var_csparse", &AllocateSolver<-1, -1, true>},
           {"fix3_2_csparse", &AllocateSolver<3, 2, true>},
           {"fix6_3_csparse", &AllocateSolver<6, 3, true>},
@@ -57,17 +55,19 @@ static OptimizationAlgorithm* createSolver(const std::string& fullSolverName) {
           {"fix7_3_scalar_csparse", &AllocateSolver<7, 3, false>},
       };
 
-  string solverName = fullSolverName.substr(3);
-  auto solverf = solver_factories.find(solverName);
-  if (solverf == solver_factories.end()) return nullptr;
+  std::string solverName = fullSolverName.substr(3);
+  auto solverf = kSolverFactories.find(solverName);
+  if (solverf == kSolverFactories.end()) return nullptr;
 
-  string methodName = fullSolverName.substr(0, 2);
+  std::string methodName = fullSolverName.substr(0, 2);
 
   if (methodName == "gn") {
     return new OptimizationAlgorithmGaussNewton(solverf->second());
-  } else if (methodName == "lm") {
+  }
+  if (methodName == "lm") {
     return new OptimizationAlgorithmLevenberg(solverf->second());
-  } else if (methodName == "dl") {
+  }
+  if (methodName == "dl") {
     return new OptimizationAlgorithmDogleg(solverf->second());
   }
 
@@ -78,7 +78,7 @@ class CSparseSolverCreator : public AbstractOptimizationAlgorithmCreator {
  public:
   explicit CSparseSolverCreator(const OptimizationAlgorithmProperty& p)
       : AbstractOptimizationAlgorithmCreator(p) {}
-  virtual std::unique_ptr<OptimizationAlgorithm> construct() {
+  std::unique_ptr<OptimizationAlgorithm> construct() override {
     return std::unique_ptr<OptimizationAlgorithm>(createSolver(property().name));
   }
 };

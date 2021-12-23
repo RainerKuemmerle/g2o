@@ -28,8 +28,6 @@
 
 #include "g2o/stuff/sparse_helper.h"
 
-using namespace std;
-
 namespace g2o {
 namespace csparse_extension {
 
@@ -42,12 +40,12 @@ bool writeCs2Octave(const char* filename, const cs* A, bool upperTriangular) {
     const int* Ai = A->i;
     const number_t* Ax = A->x;
     return writeCCSMatrix(filename, rows, cols, Ap, Ai, Ax, upperTriangular);
-  } else {  // Triplet matrix
-    const int* Aj = A->p;
-    const int* Ai = A->i;
-    const number_t* Ax = A->x;
-    return writeTripletMatrix(filename, A->nz, rows, cols, Ai, Aj, Ax, upperTriangular);
   }
+  // Triplet matrix
+  const int* Aj = A->p;
+  const int* Ai = A->i;
+  const number_t* Ax = A->x;
+  return writeTripletMatrix(filename, A->nz, rows, cols, Ai, Aj, Ax, upperTriangular);
 }
 
 }  // namespace csparse_extension
