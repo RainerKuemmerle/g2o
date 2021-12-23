@@ -36,25 +36,24 @@
 #include "linear_solver_cholmod.h"
 
 //#define ADD_SCALAR_ORDERING
-using namespace std;
 
 namespace g2o {
 
 namespace {
-template <int p, int l, bool blockorder>
+template <int P, int L, bool Blockorder>
 std::unique_ptr<BlockSolverBase> AllocateSolver() {
-  std::cerr << "# Using CHOLMOD poseDim " << p << " landMarkDim " << l << " blockordering "
-            << blockorder << std::endl;
+  std::cerr << "# Using CHOLMOD poseDim " << P << " landMarkDim " << L << " blockordering "
+            << Blockorder << std::endl;
   auto linearSolver =
-      g2o::make_unique<LinearSolverCholmod<typename BlockSolverPL<p, l>::PoseMatrixType>>();
-  linearSolver->setBlockOrdering(blockorder);
-  return g2o::make_unique<BlockSolverPL<p, l>>(std::move(linearSolver));
+      g2o::make_unique<LinearSolverCholmod<typename BlockSolverPL<P, L>::PoseMatrixType>>();
+  linearSolver->setBlockOrdering(Blockorder);
+  return g2o::make_unique<BlockSolverPL<P, L>>(std::move(linearSolver));
 }
 }  // namespace
 
 static OptimizationAlgorithm* createSolver(const std::string& fullSolverName) {
   static const std::map<std::string, std::function<std::unique_ptr<BlockSolverBase>()>>
-      solver_factories{
+      kSolverFactories{
           {"var_cholmod", &AllocateSolver<-1, -1, true>},
           {"fix3_2_cholmod", &AllocateSolver<3, 2, true>},
           {"fix6_3_cholmod", &AllocateSolver<6, 3, true>},
@@ -66,17 +65,19 @@ static OptimizationAlgorithm* createSolver(const std::string& fullSolverName) {
 #endif
       };
 
-  string solverName = fullSolverName.substr(3);
-  auto solverf = solver_factories.find(solverName);
-  if (solverf == solver_factories.end()) return nullptr;
+  std::string solverName = fullSolverName.substr(3);
+  auto solverf = kSolverFactories.find(solverName);
+  if (solverf == kSolverFactories.end()) return nullptr;
 
-  string methodName = fullSolverName.substr(0, 2);
+  std::string methodName = fullSolverName.substr(0, 2);
 
   if (methodName == "gn") {
     return new OptimizationAlgorithmGaussNewton(solverf->second());
-  } else if (methodName == "lm") {
+  }
+  if (methodName == "lm") {
     return new OptimizationAlgorithmLevenberg(solverf->second());
-  } else if (methodName == "dl") {
+  }
+  if (methodName == "dl") {
     return new OptimizationAlgorithmDogleg(solverf->second());
   }
 
@@ -87,7 +88,7 @@ class CholmodSolverCreator : public AbstractOptimizationAlgorithmCreator {
  public:
   explicit CholmodSolverCreator(const OptimizationAlgorithmProperty& p)
       : AbstractOptimizationAlgorithmCreator(p) {}
-  virtual std::unique_ptr<OptimizationAlgorithm> construct() {
+  std::unique_ptr<OptimizationAlgorithm> construct() override {
     return std::unique_ptr<OptimizationAlgorithm>(createSolver(property().name));
   }
 };

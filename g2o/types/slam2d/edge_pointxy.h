@@ -44,23 +44,23 @@ namespace g2o {
       {
         const VertexPointXY* v1 = vertexXnRaw<0>();
         const VertexPointXY* v2 = vertexXnRaw<1>();
-        _error = (v2->estimate()-v1->estimate())-_measurement;
+        error_ = (v2->estimate()-v1->estimate())-measurement_;
       }
       virtual bool read(std::istream& is);
       virtual bool write(std::ostream& os) const;
 
       virtual void setMeasurement(const Vector2& m){
-        _measurement = m;
+        measurement_ = m;
       }
 
       virtual bool setMeasurementData(const number_t* d){
-        _measurement=Vector2(d[0], d[1]);
+        measurement_=Vector2(d[0], d[1]);
         return true;
       }
 
       virtual bool getMeasurementData(number_t* d) const {
         Eigen::Map<Vector2> m(d);
-        m = _measurement;
+        m = measurement_;
         return true;
       }
 
@@ -69,7 +69,7 @@ namespace g2o {
       virtual bool setMeasurementFromState() {
         const VertexPointXY* v1 = vertexXnRaw<0>();
         const VertexPointXY* v2 = vertexXnRaw<1>();
-        _measurement = v2->estimate()-v1->estimate();
+        measurement_ = v2->estimate()-v1->estimate();
         return true;
       }
 

@@ -43,8 +43,8 @@ void EdgeSE2LotsOfXY::computeError() {
     Vector2 m = pose->estimate().inverse() * xy->estimate();
 
     unsigned int index = 2 * i;
-    _error[index] = m[0] - _measurement[index];
-    _error[index + 1] = m[1] - _measurement[index + 1];
+    error_[index] = m[0] - measurement_[index];
+    error_[index + 1] = m[1] - measurement_[index + 1];
   }
 }
 
@@ -55,7 +55,7 @@ bool EdgeSE2LotsOfXY::read(std::istream& is) {
   // read the measurements
   for (unsigned int i = 0; i < _observedPoints; i++) {
     unsigned int index = 2 * i;
-    is >> _measurement[index] >> _measurement[index + 1];
+    is >> measurement_[index] >> measurement_[index + 1];
   }
 
   // read the information matrix
@@ -81,7 +81,7 @@ bool EdgeSE2LotsOfXY::write(std::ostream& os) const {
   // write measurements
   for (unsigned int i = 0; i < _observedPoints; i++) {
     unsigned int index = 2 * i;
-    os << " " << _measurement[index] << " " << _measurement[index + 1];
+    os << " " << measurement_[index] << " " << measurement_[index + 1];
   }
 
   // write information matrix
@@ -104,7 +104,7 @@ void EdgeSE2LotsOfXY::linearizeOplus() {
   number_t st = std::sin(th1);
 
   MatrixX Ji;
-  unsigned int rows = 2 * (_vertices.size() - 1);
+  unsigned int rows = 2 * (vertices_.size() - 1);
   Ji.resize(rows, 3);
   Ji.fill(0);
 
@@ -113,7 +113,7 @@ void EdgeSE2LotsOfXY::linearizeOplus() {
 
   Matrix2 minusPoseRot = -poseRot;
 
-  for (unsigned int i = 1; i < _vertices.size(); i++) {
+  for (unsigned int i = 1; i < vertices_.size(); i++) {
     g2o::VertexPointXY* point = (g2o::VertexPointXY*)(vertexRaw(i));
 
     const number_t& x2 = point->estimate()[0];
@@ -131,9 +131,9 @@ void EdgeSE2LotsOfXY::linearizeOplus() {
     Jj.fill(0);
     Jj.block<2, 2>(index, 0) = poseRot;
 
-    _jacobianOplus[i] = Jj;
+    jacobianOplus_[i] = Jj;
   }
-  _jacobianOplus[0] = Ji;
+  jacobianOplus_[0] = Ji;
 }
 
 void EdgeSE2LotsOfXY::initialEstimate(const OptimizableGraph::VertexSet& fixed, OptimizableGraph::Vertex* toEstimate) {
@@ -153,16 +153,16 @@ void EdgeSE2LotsOfXY::initialEstimate(const OptimizableGraph::VertexSet& fixed, 
 #endif
 
   for (auto it = fixed.begin(); it != fixed.end(); ++it) {
-    for (unsigned int i = 1; i < _vertices.size(); i++) {
+    for (unsigned int i = 1; i < vertices_.size(); i++) {
       VertexPointXY* vert = static_cast<VertexPointXY*>(vertexRaw(i));
       if (vert->id() == (*it)->id()) estimate_this[i - 1] = false;
     }
   }
 
-  for (unsigned int i = 1; i < _vertices.size(); i++) {
+  for (unsigned int i = 1; i < vertices_.size(); i++) {
     if (estimate_this[i - 1]) {
       unsigned int index = 2 * (i - 1);
-      Vector2 submeas(_measurement[index], _measurement[index + 1]);
+      Vector2 submeas(measurement_[index], measurement_[index + 1]);
       VertexPointXY* vert = static_cast<VertexPointXY*>(vertexRaw(i));
       vert->setEstimate(pose->estimate() * submeas);
     }
@@ -174,7 +174,7 @@ number_t EdgeSE2LotsOfXY::initialEstimatePossible(const OptimizableGraph::Vertex
   (void)toEstimate;
 
   for (auto it = fixed.begin(); it != fixed.end(); ++it) {
-    if (_vertices[0]->id() == (*it)->id()) {
+    if (vertices_[0]->id() == (*it)->id()) {
       return 1.0;
     }
   }
@@ -190,8 +190,8 @@ bool EdgeSE2LotsOfXY::setMeasurementFromState() {
     Vector2 m = pose->estimate().inverse() * xy->estimate();
 
     unsigned int index = 2 * i;
-    _measurement[index] = m[0];
-    _measurement[index + 1] = m[1];
+    measurement_[index] = m[0];
+    measurement_[index + 1] = m[1];
   }
 
   return true;

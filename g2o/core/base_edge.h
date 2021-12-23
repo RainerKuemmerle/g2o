@@ -51,7 +51,6 @@ struct QuadraticFormLock {
 #else
 struct QuadraticFormLock {
   explicit QuadraticFormLock(OptimizableGraph::Vertex&) {}
-  ~QuadraticFormLock() {}
 };
 #endif
 
@@ -62,18 +61,18 @@ struct QuadraticFormLock {
  */
 template <int D>
 struct BaseEdgeTraits {
-  static constexpr int Dimension = D;
-  typedef Eigen::Matrix<number_t, D, 1, Eigen::ColMajor> ErrorVector;
-  typedef Eigen::Matrix<number_t, D, D, Eigen::ColMajor> InformationType;
+  static constexpr int kDimension = D;
+  using ErrorVector = Eigen::Matrix<number_t, D, 1, Eigen::ColMajor>;
+  using InformationType = Eigen::Matrix<number_t, D, D, Eigen::ColMajor>;
 };
 /**
  * Same as above but for dimension not known at compilation, i.e., dynamically sized edges.
  */
 template <>
 struct BaseEdgeTraits<-1> {
-  static constexpr int Dimension = -1;
-  typedef Eigen::Matrix<number_t, Eigen::Dynamic, 1, Eigen::ColMajor> ErrorVector;
-  typedef Eigen::Matrix<number_t, Eigen::Dynamic, Eigen::Dynamic, Eigen::ColMajor> InformationType;
+  static constexpr int kDimension = -1;
+  using ErrorVector = Eigen::Matrix<number_t, Eigen::Dynamic, 1, Eigen::ColMajor>;
+  using InformationType = Eigen::Matrix<number_t, Eigen::Dynamic, Eigen::Dynamic, Eigen::ColMajor>;
 };
 
 }  // namespace internal
@@ -81,37 +80,35 @@ struct BaseEdgeTraits<-1> {
 template <int D, typename E>
 class BaseEdge : public OptimizableGraph::Edge {
  public:
-  static constexpr int Dimension = internal::BaseEdgeTraits<D>::Dimension;
-  typedef E Measurement;
-  typedef typename internal::BaseEdgeTraits<D>::ErrorVector ErrorVector;
-  typedef typename internal::BaseEdgeTraits<D>::InformationType InformationType;
+  static constexpr int kDimension = internal::BaseEdgeTraits<D>::kDimension;
+  using Measurement = E;
+  using ErrorVector = typename internal::BaseEdgeTraits<D>::ErrorVector;
+  using InformationType = typename internal::BaseEdgeTraits<D>::InformationType;
 
-  BaseEdge() : OptimizableGraph::Edge() { _dimension = D; }
+  BaseEdge() : OptimizableGraph::Edge() { dimension_ = D; }
 
-  virtual ~BaseEdge() {}
+  number_t chi2() const override { return error_.dot(information() * error_); }
 
-  virtual number_t chi2() const { return _error.dot(information() * _error); }
-
-  virtual const number_t* errorData() const { return _error.data(); }
-  virtual number_t* errorData() { return _error.data(); }
-  const ErrorVector& error() const { return _error; }
-  ErrorVector& error() { return _error; }
+  const number_t* errorData() const override { return error_.data(); }
+  number_t* errorData() override { return error_.data(); }
+  const ErrorVector& error() const { return error_; }
+  ErrorVector& error() { return error_; }
 
   //! information matrix of the constraint
-  EIGEN_STRONG_INLINE const InformationType& information() const { return _information; }
-  EIGEN_STRONG_INLINE InformationType& information() { return _information; }
-  void setInformation(const InformationType& information) { _information = information; }
+  EIGEN_STRONG_INLINE const InformationType& information() const { return information_; }
+  EIGEN_STRONG_INLINE InformationType& information() { return information_; }
+  void setInformation(const InformationType& information) { information_ = information; }
 
-  virtual const number_t* informationData() const { return _information.data(); }
-  virtual number_t* informationData() { return _information.data(); }
+  const number_t* informationData() const override { return information_.data(); }
+  number_t* informationData() override { return information_.data(); }
 
   //! accessor functions for the measurement represented by the edge
-  EIGEN_STRONG_INLINE const Measurement& measurement() const { return _measurement; }
-  virtual void setMeasurement(const Measurement& m) { _measurement = m; }
+  EIGEN_STRONG_INLINE const Measurement& measurement() const { return measurement_; }
+  virtual void setMeasurement(const Measurement& m) { measurement_ = m; }
 
-  virtual int rank() const { return _dimension; }
+  virtual int rank() const { return dimension(); }
 
-  virtual void initialEstimate(const OptimizableGraph::VertexSet&, OptimizableGraph::Vertex*) {
+  void initialEstimate(const OptimizableGraph::VertexSet&, OptimizableGraph::Vertex*) override {
     std::cerr << "inititialEstimate() is not implemented, please give implementation in your "
                  "derived class"
               << std::endl;
@@ -123,21 +120,21 @@ class BaseEdge : public OptimizableGraph::Edge {
    */
   template <int Dim = D>
   typename std::enable_if<Dim == -1, void>::type setDimension(int dim) {
-    _dimension = dim;
-    _information.resize(dim, dim);
-    _error.resize(dim, 1);
+    dimension_ = dim;
+    information_.resize(dim, dim);
+    error_.resize(dim, 1);
   }
 
  protected:
-  Measurement _measurement;      ///< the measurement of the edge
-  InformationType _information;  ///< information matrix of the edge. Information = inv(covariance)
-  ErrorVector _error;            ///< error vector, stores the result after computeError() is called
+  Measurement measurement_;      ///< the measurement of the edge
+  InformationType information_;  ///< information matrix of the edge. Information = inv(covariance)
+  ErrorVector error_;            ///< error vector, stores the result after computeError() is called
 
   /**
    * calculate the robust information matrix by updating the information matrix of the error
    */
   InformationType robustInformation(const Vector3& rho) const {
-    InformationType result = rho[1] * _information;
+    InformationType result = rho[1] * information_;
     // ErrorVector weightedErrror = _information * _error;
     // result.noalias() += 2 * rho[2] * (weightedErrror * weightedErrror.transpose());
     return result;
@@ -160,7 +157,7 @@ class BaseEdge : public OptimizableGraph::Edge {
   }
   //! write the param IDs that are potentially used by the edge
   bool writeParamIds(std::ostream& os) const {
-    for (auto id : _parameterIds) os << id << " ";
+    for (auto id : parameterIds_) os << id << " ";
     return os.good();
   }
   //! reads the param IDs from the stream

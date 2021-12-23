@@ -55,9 +55,9 @@ CacheSE2Offset::CacheSE2Offset() : Cache() {}
 
 void CacheSE2Offset::updateImpl() {
 #ifndef NDEBUG
-  ParameterSE2Offset* offsetParam = dynamic_cast<ParameterSE2Offset*>(_parameters[0].get());
+  ParameterSE2Offset* offsetParam = dynamic_cast<ParameterSE2Offset*>(parameters_[0].get());
 #else
-  ParameterSE2Offset* offsetParam = static_cast<ParameterSE2Offset*>(_parameters[0].get());
+  ParameterSE2Offset* offsetParam = static_cast<ParameterSE2Offset*>(parameters_[0].get());
 #endif
 
   const VertexSE2* v = static_cast<const VertexSE2*>(vertex());

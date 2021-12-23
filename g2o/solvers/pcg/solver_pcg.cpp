@@ -34,37 +34,36 @@
 #include "g2o/stuff/macros.h"
 #include "linear_solver_pcg.h"
 
-using namespace std;
-
 namespace g2o {
 namespace {
-template <int p, int l>
+template <int P, int L>
 std::unique_ptr<g2o::Solver> AllocateSolver() {
-  std::cerr << "# Using PCG poseDim " << p << " landMarkDim " << l << std::endl;
+  std::cerr << "# Using PCG poseDim " << P << " landMarkDim " << L << std::endl;
 
-  return g2o::make_unique<BlockSolverPL<p, l>>(
-      g2o::make_unique<LinearSolverPCG<typename BlockSolverPL<p, l>::PoseMatrixType>>());
+  return g2o::make_unique<BlockSolverPL<P, L>>(
+      g2o::make_unique<LinearSolverPCG<typename BlockSolverPL<P, L>::PoseMatrixType>>());
 }
 }  // namespace
 
 static OptimizationAlgorithm* createSolver(const std::string& fullSolverName) {
   static const std::map<std::string, std::function<std::unique_ptr<g2o::Solver>()>>
-      solver_factories{
+      kSolverFactories{
           {"pcg", &AllocateSolver<-1, -1>},
           {"pcg3_2", &AllocateSolver<3, 2>},
           {"pcg6_3", &AllocateSolver<6, 3>},
           {"pcg7_3", &AllocateSolver<7, 3>},
       };
 
-  string solverName = fullSolverName.substr(3);
-  auto solverf = solver_factories.find(solverName);
-  if (solverf == solver_factories.end()) return nullptr;
+  std::string solverName = fullSolverName.substr(3);
+  auto solverf = kSolverFactories.find(solverName);
+  if (solverf == kSolverFactories.end()) return nullptr;
 
-  string methodName = fullSolverName.substr(0, 2);
+  std::string methodName = fullSolverName.substr(0, 2);
 
   if (methodName == "gn") {
     return new OptimizationAlgorithmGaussNewton(solverf->second());
-  } else if (methodName == "lm") {
+  }
+  if (methodName == "lm") {
     return new OptimizationAlgorithmLevenberg(solverf->second());
   }
 
@@ -75,7 +74,7 @@ class PCGSolverCreator : public AbstractOptimizationAlgorithmCreator {
  public:
   explicit PCGSolverCreator(const OptimizationAlgorithmProperty& p)
       : AbstractOptimizationAlgorithmCreator(p) {}
-  virtual std::unique_ptr<OptimizationAlgorithm> construct() {
+  std::unique_ptr<OptimizationAlgorithm> construct() override {
     return std::unique_ptr<OptimizationAlgorithm>(createSolver(property().name));
   }
 };

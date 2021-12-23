@@ -44,15 +44,15 @@ namespace g2o {
 
     virtual bool setMeasurementData(const number_t* d)
     {
-      _measurement[0]=d[0];
-      _measurement[1]=d[1];
+      measurement_[0]=d[0];
+      measurement_[1]=d[1];
       return true;
     }
 
     virtual bool getMeasurementData(number_t* d) const
     {
-      d[0] = _measurement[0];
-      d[1] = _measurement[1];
+      d[0] = measurement_[0];
+      d[1] = measurement_[1];
       return true;
     }
 
@@ -66,7 +66,7 @@ namespace g2o {
     virtual void computeError()
     {
       const VertexSE2* v = vertexXnRaw<0>();
-      _error = v->estimate().translation() - _measurement;
+      error_ = v->estimate().translation() - measurement_;
     }
   };
 

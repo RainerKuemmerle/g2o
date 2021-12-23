@@ -42,13 +42,13 @@ namespace g2o {
 
   namespace
   {
-    template<int p, int l, bool blockorder>
+    template<int P, int L, bool Blockorder>
     std::unique_ptr<BlockSolverBase> AllocateSolver()
     {
-      std::cerr << "# Using 2dlinear poseDim " << p << " landMarkDim " << l << " blockordering " << blockorder << std::endl;
-      auto linearSolver = g2o::make_unique<LinearSolverEigen<typename BlockSolverPL<p, l>::PoseMatrixType>>();
-      linearSolver->setBlockOrdering(blockorder);
-      return g2o::make_unique<BlockSolverPL<p, l>>(std::move(linearSolver));
+      std::cerr << "# Using 2dlinear poseDim " << P << " landMarkDim " << L << " blockordering " << Blockorder << std::endl;
+      auto linearSolver = g2o::make_unique<LinearSolverEigen<typename BlockSolverPL<P, L>::PoseMatrixType>>();
+      linearSolver->setBlockOrdering(Blockorder);
+      return g2o::make_unique<BlockSolverPL<P, L>>(std::move(linearSolver));
     }
   }
 
@@ -67,7 +67,7 @@ namespace g2o {
   {
     public:
       explicit SLAM2DLinearSolverCreator(const OptimizationAlgorithmProperty& p) : AbstractOptimizationAlgorithmCreator(p) {}
-      virtual std::unique_ptr<OptimizationAlgorithm> construct()
+      std::unique_ptr<OptimizationAlgorithm> construct() override
       {
         return std::unique_ptr<OptimizationAlgorithm>(createSolver(property().name));
       }

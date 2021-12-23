@@ -36,13 +36,13 @@ namespace g2o {
   EdgeXYPrior::EdgeXYPrior() :
     BaseUnaryEdge<2, Vector2, VertexPointXY>()
   {
-    _information.setIdentity();
-    _error.setZero();
+    information_.setIdentity();
+    error_.setZero();
   }
 
   bool EdgeXYPrior::read(std::istream& is)
   {
-    internal::readVector(is, _measurement);
+    internal::readVector(is, measurement_);
     readInformationMatrix(is);
     return true;
   }
@@ -56,7 +56,7 @@ namespace g2o {
 #ifndef NUMERIC_JACOBIAN_TWO_D_TYPES
   void EdgeXYPrior::linearizeOplus()
   {
-    _jacobianOplusXi=Matrix2::Identity();
+    jacobianOplusXi_=Matrix2::Identity();
   }
 #endif
 

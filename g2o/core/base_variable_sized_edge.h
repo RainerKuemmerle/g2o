@@ -58,22 +58,22 @@ class BaseVariableSizedEdge : public BaseEdge<D, E> {
    */
   struct HessianHelper {
     Eigen::Map<MatrixX> matrix;  ///< the mapped memory
-    bool transposed;             ///< the block has to be transposed
-    HessianHelper() : matrix(0, 0, 0), transposed(false) {}
+    bool transposed = false;     ///< the block has to be transposed
+    HessianHelper() : matrix(nullptr, 0, 0) {}
   };
 
- public:
-  static constexpr int Dimension = BaseEdge<D, E>::Dimension;
-  typedef typename BaseEdge<D, E>::Measurement Measurement;
-  typedef MatrixX::MapType JacobianType;
-  typedef typename BaseEdge<D, E>::ErrorVector ErrorVector;
-  typedef typename BaseEdge<D, E>::InformationType InformationType;
-  typedef Eigen::Map<MatrixX, MatrixX::Flags & Eigen::PacketAccessBit ? Eigen::Aligned : Eigen::Unaligned>
-      HessianBlockType;
+  static constexpr int kDimension = BaseEdge<D, E>::kDimension;
+  using Measurement = typename BaseEdge<D, E>::Measurement;
+  using JacobianType = MatrixX::MapType;
+  using ErrorVector = typename BaseEdge<D, E>::ErrorVector;
+  using InformationType = typename BaseEdge<D, E>::InformationType;
+  using HessianBlockType =
+      Eigen::Map<MatrixX,
+                 MatrixX::Flags & Eigen::PacketAccessBit ? Eigen::Aligned : Eigen::Unaligned>;
 
   BaseVariableSizedEdge() : BaseEdge<D, E>() {}
 
-  virtual void linearizeOplus(JacobianWorkspace& jacobianWorkspace);
+  void linearizeOplus(JacobianWorkspace& jacobianWorkspace) override;
 
   /**
    * Linearizes the oplus operator in the vertex, and stores
@@ -81,32 +81,32 @@ class BaseVariableSizedEdge : public BaseEdge<D, E> {
    */
   virtual void linearizeOplus();
 
-  virtual void resize(size_t size);
+  void resize(size_t size) override;
 
-  virtual bool allVerticesFixed() const;
+  bool allVerticesFixed() const override;
 
-  virtual void constructQuadraticForm();
+  void constructQuadraticForm() override;
 
-  virtual void mapHessianMemory(number_t* d, int i, int j, bool rowMajor);
+  void mapHessianMemory(number_t* d, int i, int j, bool rowMajor) override;
 
   using BaseEdge<D, E>::computeError;
 
  protected:
-  using BaseEdge<D, E>::_measurement;
-  using BaseEdge<D, E>::_information;
-  using BaseEdge<D, E>::_error;
-  using BaseEdge<D, E>::_vertices;
-  using BaseEdge<D, E>::_dimension;
+  using BaseEdge<D, E>::measurement_;
+  using BaseEdge<D, E>::information_;
+  using BaseEdge<D, E>::error_;
+  using BaseEdge<D, E>::vertices_;
+  using BaseEdge<D, E>::dimension_;
 
-  std::vector<HessianHelper> _hessian;
+  std::vector<HessianHelper> hessian_;
   std::vector<JacobianType, Eigen::aligned_allocator<JacobianType> >
-      _jacobianOplus;  ///< jacobians of the edge (w.r.t. oplus)
+      jacobianOplus_;  ///< jacobians of the edge (w.r.t. oplus)
 
   void computeQuadraticForm(const InformationType& omega, const ErrorVector& weightedError);
 
   OptimizableGraph::Vertex* vertexRaw(size_t n) const {
-    assert(n < _vertices.size() && "Index out of bounds");
-    return static_cast<OptimizableGraph::Vertex*>(_vertices[n].get());
+    assert(n < vertices_.size() && "Index out of bounds");
+    return static_cast<OptimizableGraph::Vertex*>(vertices_[n].get());
   }
 
  public:

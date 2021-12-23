@@ -43,18 +43,18 @@ namespace g2o {
       VertexPointXY();
 
       virtual void setToOriginImpl() {
-        _estimate.setZero();
+        estimate_.setZero();
       }
 
       virtual bool setEstimateDataImpl(const number_t* est){
-        _estimate[0] = est[0];
-        _estimate[1] = est[1];
+        estimate_[0] = est[0];
+        estimate_[1] = est[1];
         return true;
       }
 
       virtual bool getEstimateData(number_t* est) const{
-        est[0] = _estimate[0];
-        est[1] = _estimate[1];
+        est[0] = estimate_[0];
+        est[1] = estimate_[1];
         return true;
       }
 
@@ -76,8 +76,8 @@ namespace g2o {
 
       virtual void oplusImpl(const number_t* update)
       {
-        _estimate[0] += update[0];
-        _estimate[1] += update[1];
+        estimate_[0] += update[0];
+        estimate_[1] += update[1];
       }
 
       virtual bool read(std::istream& is);
@@ -89,7 +89,7 @@ namespace g2o {
   public:
     VertexPointXYWriteGnuplotAction();
     virtual bool operator()(HyperGraph::HyperGraphElement* element,
-                            HyperGraphElementAction::Parameters* params_);
+                            HyperGraphElementAction::Parameters* params);
   };
 
 #ifdef G2O_HAVE_OPENGL
@@ -97,11 +97,11 @@ namespace g2o {
   public:
     VertexPointXYDrawAction();
     virtual bool operator()(HyperGraph::HyperGraphElement* element,
-                            HyperGraphElementAction::Parameters* params_);
+                            HyperGraphElementAction::Parameters* params);
 
    protected:
     std::shared_ptr<FloatProperty> _pointSize;
-    virtual bool refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_);
+    virtual bool refreshPropertyPtrs(HyperGraphElementAction::Parameters* params);
   };
 #endif
 

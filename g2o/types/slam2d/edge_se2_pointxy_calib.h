@@ -48,13 +48,13 @@ namespace g2o {
         const VertexSE2* v1     = static_cast<const VertexSE2*>(vertexRaw(0));
         const VertexPointXY* l2 = static_cast<const VertexPointXY*>(vertexRaw(1));
         const VertexSE2* calib  = static_cast<const VertexSE2*>(vertexRaw(2));
-        _error = ((v1->estimate() * calib->estimate()).inverse() * l2->estimate()) - _measurement;
+        error_ = ((v1->estimate() * calib->estimate()).inverse() * l2->estimate()) - measurement_;
       }
 
       virtual bool read(std::istream& is);
       virtual bool write(std::ostream& os) const;
 
-      virtual number_t initialEstimatePossible(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to) { (void) to; return (from.count(_vertices[0]) == 1 ? 1.0 : -1.0);}
+      virtual number_t initialEstimatePossible(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to) { (void) to; return (from.count(vertices_[0]) == 1 ? 1.0 : -1.0);}
       virtual void initialEstimate(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to);
   };
 

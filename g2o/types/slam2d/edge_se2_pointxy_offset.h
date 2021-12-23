@@ -52,18 +52,18 @@ namespace g2o {
 
 
     virtual void setMeasurement(const Vector2& m){
-      _measurement = m;
+      measurement_ = m;
     }
 
     virtual bool setMeasurementData(const number_t* d){
       Eigen::Map<const Vector2> v(d);
-      _measurement = v;
+      measurement_ = v;
       return true;
     }
 
     virtual bool getMeasurementData(number_t* d) const{
       Eigen::Map<Vector2> v(d);
-      v=_measurement;
+      v=measurement_;
       return true;
     }
 
@@ -73,7 +73,7 @@ namespace g2o {
 
     virtual number_t initialEstimatePossible(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to) {
       (void)to;
-      return (from.count(_vertices[0]) == 1 ? 1.0 : -1.0);
+      return (from.count(vertices_[0]) == 1 ? 1.0 : -1.0);
     }
 
     virtual void initialEstimate(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to);

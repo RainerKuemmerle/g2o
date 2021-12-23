@@ -39,27 +39,27 @@ class G2O_TYPES_SLAM2D_API EdgeXYPrior : public BaseUnaryEdge<2, Vector2, Vertex
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   EdgeXYPrior();
 
-  void computeError() { _error = vertexXnRaw<0>()->estimate() - _measurement; }
+  void computeError() { error_ = vertexXnRaw<0>()->estimate() - measurement_; }
   virtual bool read(std::istream& is);
   virtual bool write(std::ostream& os) const;
 
-  virtual void setMeasurement(const Vector2& m) { _measurement = m; }
+  virtual void setMeasurement(const Vector2& m) { measurement_ = m; }
 
   virtual bool setMeasurementData(const number_t* d) {
-    _measurement = Vector2(d[0], d[1]);
+    measurement_ = Vector2(d[0], d[1]);
     return true;
   }
 
   virtual bool getMeasurementData(number_t* d) const {
     Eigen::Map<Vector2> m(d);
-    m = _measurement;
+    m = measurement_;
     return true;
   }
 
   virtual int measurementDimension() const { return 2; }
 
   virtual bool setMeasurementFromState() {
-    _measurement = vertexXnRaw<0>()->estimate();
+    measurement_ = vertexXnRaw<0>()->estimate();
     return true;
   }
 

@@ -46,14 +46,14 @@ namespace g2o{
     Vector2 m1 = pose->estimate().inverse() * xy1->estimate();
     Vector2 m2 = pose->estimate().inverse() * xy2->estimate();
 
-    _error[0] = m1[0] - _measurement[0];
-    _error[1] = m1[1] - _measurement[1];
-    _error[2] = m2[0] - _measurement[2];
-    _error[3] = m2[1] - _measurement[3];
+    error_[0] = m1[0] - measurement_[0];
+    error_[1] = m1[1] - measurement_[1];
+    error_[2] = m2[0] - measurement_[2];
+    error_[3] = m2[1] - measurement_[3];
   }
 
   bool EdgeSE2TwoPointsXY::read(std::istream& is){
-    is >> _measurement[0] >> _measurement[1] >> _measurement[2] >> _measurement[3];
+    is >> measurement_[0] >> measurement_[1] >> measurement_[2] >> measurement_[3];
     is >> information()(0, 0) >> information()(0, 1) >> information()(0, 2) >>
         information()(0, 3) >> information()(1, 1) >> information()(1, 2) >> information()(1, 3) >>
         information()(2, 2) >> information()(2, 3) >> information()(3, 3);
@@ -99,12 +99,12 @@ namespace g2o{
     }
 
     if(estimatev1){
-      Vector2 submeas(_measurement[0], _measurement[1]);
+      Vector2 submeas(measurement_[0], measurement_[1]);
       v1->setEstimate(pose->estimate() * submeas);
     }
 
     if(estimatev2){
-      Vector2 submeas(_measurement[2], _measurement[3]);
+      Vector2 submeas(measurement_[2], measurement_[3]);
       v2->setEstimate(pose->estimate() * submeas);
     }
   }
@@ -114,7 +114,7 @@ namespace g2o{
     (void) toEstimate;
 
     for(auto it=fixed.begin(); it!=fixed.end(); ++it){
-      if(_vertices[0]->id() == (*it)->id()){
+      if(vertices_[0]->id() == (*it)->id()){
         return 1.0;
       }
     }
@@ -131,10 +131,10 @@ namespace g2o{
     Vector2 m1 = pose->estimate().inverse() * xy1->estimate();
     Vector2 m2 = pose->estimate().inverse() * xy2->estimate();
 
-    _measurement[0] = m1[0];
-    _measurement[1] = m1[1];
-    _measurement[2] = m2[0];
-    _measurement[3] = m2[1];
+    measurement_[0] = m1[0];
+    measurement_[1] = m1[1];
+    measurement_[2] = m2[0];
+    measurement_[3] = m2[1];
     return true;
   }
 

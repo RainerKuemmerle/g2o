@@ -46,17 +46,17 @@ namespace g2o {
         const VertexPointXY* l2 = vertexXnRaw<1>();
         Vector2 delta = (v1->estimate().inverse() * l2->estimate());
         number_t angle = std::atan2(delta[1], delta[0]);
-        _error[0] = normalize_theta(_measurement - angle );
+        error_[0] = normalize_theta(measurement_ - angle );
       }
 
 
       virtual bool setMeasurementData(const number_t* d) {
-        _measurement=d[0];
+        measurement_=d[0];
         return true;
       }
 
       virtual bool getMeasurementData(number_t* d) const {
-        d[0] = _measurement;
+        d[0] = measurement_;
         return true;
       }
 
@@ -66,14 +66,14 @@ namespace g2o {
         const VertexSE2* v1 = vertexXnRaw<0>();
         const VertexPointXY* l2 = vertexXnRaw<1>();
         Vector2 delta = (v1->estimate().inverse() * l2->estimate());
-        _measurement = std::atan2(delta[1], delta[0]);
+        measurement_ = std::atan2(delta[1], delta[0]);
         return true;
       }
 
       virtual bool read(std::istream& is);
       virtual bool write(std::ostream& os) const;
 
-      virtual number_t initialEstimatePossible(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex*) { return (from.count(_vertices[0]) == 1 ? 1.0 : -1.0);}
+      virtual number_t initialEstimatePossible(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex*) { return (from.count(vertices_[0]) == 1 ? 1.0 : -1.0);}
       virtual void initialEstimate(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to);
   };
 

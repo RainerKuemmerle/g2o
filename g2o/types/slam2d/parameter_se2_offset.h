@@ -81,7 +81,7 @@ namespace g2o {
       virtual void updateImpl();
 
       std::shared_ptr<ParameterSE2Offset> offsetParam() const {
-        return std::static_pointer_cast<ParameterSE2Offset>(_parameters[0]);
+        return std::static_pointer_cast<ParameterSE2Offset>(parameters_[0]);
       }
 
       const SE2& w2n() const {return _se2_w2n;}

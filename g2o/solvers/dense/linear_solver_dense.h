@@ -28,14 +28,13 @@
 #ifndef G2O_LINEAR_SOLVER_DENSE_H
 #define G2O_LINEAR_SOLVER_DENSE_H
 
-#include "g2o/core/linear_solver.h"
-#include "g2o/core/batch_stats.h"
-
-#include <vector>
+#include <Eigen/Cholesky>
+#include <Eigen/Core>
 #include <utility>
-#include<Eigen/Core>
-#include<Eigen/Cholesky>
+#include <vector>
 
+#include "g2o/core/batch_stats.h"
+#include "g2o/core/linear_solver.h"
 
 namespace g2o {
 
@@ -47,33 +46,28 @@ namespace g2o {
   {
     public:
       LinearSolverDense() :
-        LinearSolver<MatrixType>(),
-        _reset(true)
+        LinearSolver<MatrixType>()
       {
       }
 
-      virtual ~LinearSolverDense()
+      bool init() override
       {
-      }
-
-      virtual bool init()
-      {
-        _reset = true;
+        reset_ = true;
         return true;
       }
 
-      bool solve(const SparseBlockMatrix<MatrixType>& A, number_t* x, number_t* b)
+      bool solve(const SparseBlockMatrix<MatrixType>& A, number_t* x, number_t* b) override
       {
         int n = A.cols();
         int m = A.cols();
 
-        MatrixX& H = _H;
+        MatrixX& H = H_;
         if (H.cols() != n) {
           H.resize(n, m);
-          _reset = true;
+          reset_ = true;
         }
-        if (_reset) {
-          _reset = false;
+        if (reset_) {
+          reset_ = false;
           H.setZero();
         }
 
@@ -89,7 +83,7 @@ namespace g2o {
             for (it = col.begin(); it != col.end(); ++it) {
               int r_idx = A.rowBaseOfBlock(it->first);
               // only the upper triangular block is processed
-              if (it->first <= (int)i) {
+              if (it->first <= static_cast<int>(i)) {
                 int r_size = A.rowsOfBlock(it->first);
                 H.block(r_idx, c_idx, r_size, c_size) = *(it->second);
                 if (r_idx != c_idx) // write the lower triangular block
@@ -104,18 +98,18 @@ namespace g2o {
         // solving via Cholesky decomposition
         VectorX::MapType xvec(x, m);
         VectorX::ConstMapType bvec(b, n);
-        _cholesky.compute(H);
-        if (_cholesky.isPositive()) {
-          xvec = _cholesky.solve(bvec);
+        cholesky_.compute(H);
+        if (cholesky_.isPositive()) {
+          xvec = cholesky_.solve(bvec);
           return true;
         }
         return false;
       }
 
     protected:
-      bool _reset;
-      MatrixX _H;
-      Eigen::LDLT<MatrixX> _cholesky;
+      bool reset_ = true;
+      MatrixX H_;
+      Eigen::LDLT<MatrixX> cholesky_;
 
   };
 

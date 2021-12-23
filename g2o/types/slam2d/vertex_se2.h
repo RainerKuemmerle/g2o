@@ -44,65 +44,65 @@ namespace g2o {
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW
       VertexSE2();
 
-      virtual void setToOriginImpl() {
-        _estimate = SE2();
+      void setToOriginImpl() override {
+        estimate_ = SE2();
       }
 
-      virtual void oplusImpl(const number_t* update)
+      void oplusImpl(const number_t* update) override
       {
-        Vector2 t=_estimate.translation();
+        Vector2 t=estimate_.translation();
         t+=Eigen::Map<const Vector2>(update);
-        number_t angle=normalize_theta(_estimate.rotation().angle() + update[2]);
-        _estimate.setTranslation(t);
-        _estimate.setRotation(Rotation2D(angle));
+        number_t angle=normalize_theta(estimate_.rotation().angle() + update[2]);
+        estimate_.setTranslation(t);
+        estimate_.setRotation(Rotation2D(angle));
       }
 
-      virtual bool setEstimateDataImpl(const number_t* est){
-        _estimate=SE2(est[0], est[1], est[2]);
+      bool setEstimateDataImpl(const number_t* est) override{
+        estimate_=SE2(est[0], est[1], est[2]);
         return true;
       }
 
-      virtual bool getEstimateData(number_t* est) const {
+      bool getEstimateData(number_t* est) const override {
         Eigen::Map<Vector3> v(est);
-        v = _estimate.toVector();
+        v = estimate_.toVector();
         return true;
       }
 
-      virtual int estimateDimension() const { return 3; }
+      int estimateDimension() const override { return 3; }
 
-      virtual bool setMinimalEstimateDataImpl(const number_t* est){
+      bool setMinimalEstimateDataImpl(const number_t* est) override{
         return setEstimateData(est);
       }
 
-      virtual bool getMinimalEstimateData(number_t* est) const {
+      bool getMinimalEstimateData(number_t* est) const override {
         return getEstimateData(est);
       }
 
-      virtual int minimalEstimateDimension() const { return 3; }
+      int minimalEstimateDimension() const override { return 3; }
 
-      virtual bool read(std::istream& is);
-      virtual bool write(std::ostream& os) const;
+      bool read(std::istream& is) override;
+      bool write(std::ostream& os) const override;
 
   };
 
   class G2O_TYPES_SLAM2D_API VertexSE2WriteGnuplotAction: public WriteGnuplotAction {
   public:
     VertexSE2WriteGnuplotAction();
-    virtual bool operator()(HyperGraph::HyperGraphElement* element,
-                            HyperGraphElementAction::Parameters* params_);
+    bool operator()(HyperGraph::HyperGraphElement* element,
+                            HyperGraphElementAction::Parameters* params_) override;
   };
 
 #ifdef G2O_HAVE_OPENGL
   class G2O_TYPES_SLAM2D_API VertexSE2DrawAction: public DrawAction{
   public:
     VertexSE2DrawAction();
-    virtual bool operator()(HyperGraph::HyperGraphElement* element,
-                            HyperGraphElementAction::Parameters* params_);
+    bool operator()(HyperGraph::HyperGraphElement* element,
+                            HyperGraphElementAction::Parameters* params_) override;
 
    protected:
-    HyperGraphElementAction* _drawActions;
-    virtual bool refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_);
-    std::shared_ptr<FloatProperty> _triangleX, _triangleY;
+    HyperGraphElementAction* drawActions_;
+    bool refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_) override;
+    std::shared_ptr<FloatProperty> triangleX_, triangleY_;
 
   };
 #endif

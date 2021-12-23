@@ -40,7 +40,7 @@ bool BaseFixedSizedEdge<D, E, VertexTypes...>::allVerticesFixedNs(
 
 template <int D, typename E, typename... VertexTypes>
 bool BaseFixedSizedEdge<D, E, VertexTypes...>::allVerticesFixed() const {
-  return allVerticesFixedNs(std::make_index_sequence<_nr_of_vertices>());
+  return allVerticesFixedNs(std::make_index_sequence<kNrOfVertices>());
 }
 
 template <int D, typename E, typename... VertexTypes>
@@ -49,13 +49,13 @@ void BaseFixedSizedEdge<D, E, VertexTypes...>::constructQuadraticForm() {
     number_t error = this->chi2();
     Vector3 rho;
     this->robustKernel()->robustify(error, rho);
-    Eigen::Matrix<number_t, D, 1, Eigen::ColMajor> omega_r = -_information * _error;
+    Eigen::Matrix<number_t, D, 1, Eigen::ColMajor> omega_r = -information_ * error_;
     omega_r *= rho[1];
     constructQuadraticFormNs(this->robustInformation(rho), omega_r,
-                             std::make_index_sequence<_nr_of_vertices>());
+                             std::make_index_sequence<kNrOfVertices>());
   } else {
-    constructQuadraticFormNs(_information, -_information * _error,
-                             std::make_index_sequence<_nr_of_vertices>());
+    constructQuadraticFormNs(information_, -information_ * error_,
+                             std::make_index_sequence<kNrOfVertices>());
   }
 }
 
@@ -91,15 +91,15 @@ void BaseFixedSizedEdge<D, E, VertexTypes...>::constructOffDiagonalQuadraticForm
   assert(fromId < toId && "Index mixed up");
   auto to = vertexXn<toId>();
   if (!to->fixed()) {
-    const auto& B = std::get<toId>(_jacobianOplus);
+    const auto& B = std::get<toId>(jacobianOplus_);
     constexpr auto K = internal::pair_to_index(fromId, toId);
     internal::QuadraticFormLock lck(*to);
     (void)lck;
-    if (_hessianRowMajor[K]) {  // we have to write to the block as transposed
-      auto& hessianTransposed = std::get<K>(_hessianTupleTransposed);
+    if (hessianRowMajor_[K]) {  // we have to write to the block as transposed
+      auto& hessianTransposed = std::get<K>(hessianTupleTransposed_);
       hessianTransposed.noalias() += B.transpose() * AtO.transpose();
     } else {
-      auto& hessian = std::get<K>(_hessianTuple);
+      auto& hessian = std::get<K>(hessianTuple_);
       hessian.noalias() += AtO * B;
     }
   }
@@ -110,7 +110,7 @@ template <int N>
 void BaseFixedSizedEdge<D, E, VertexTypes...>::constructQuadraticFormN(
     const InformationType& omega, const ErrorVector& weightedError) {
   auto from = vertexXn<N>();
-  const auto& A = std::get<N>(_jacobianOplus);
+  const auto& A = std::get<N>(jacobianOplus_);
 
   if (!(from->fixed())) {
     const auto AtO = A.transpose() * omega;
@@ -120,14 +120,14 @@ void BaseFixedSizedEdge<D, E, VertexTypes...>::constructQuadraticFormN(
       from->b().noalias() += A.transpose() * weightedError;
       from->A().noalias() += AtO * A;
     }
-    constructOffDiagonalQuadraticFormMs<N>(AtO, std::make_index_sequence<_nr_of_vertices - N - 1>());
+    constructOffDiagonalQuadraticFormMs<N>(AtO, std::make_index_sequence<kNrOfVertices - N - 1>());
   }
 };
 
 template <int D, typename E, typename... VertexTypes>
 void BaseFixedSizedEdge<D, E, VertexTypes...>::linearizeOplus(
     JacobianWorkspace& jacobianWorkspace) {
-  linearizeOplus_allocate(jacobianWorkspace, std::make_index_sequence<_nr_of_vertices>());
+  linearizeOplus_allocate(jacobianWorkspace, std::make_index_sequence<kNrOfVertices>());
   linearizeOplus();
 }
 
@@ -136,8 +136,8 @@ template <std::size_t... Ints>
 void BaseFixedSizedEdge<D, E, VertexTypes...>::linearizeOplus_allocate(
     JacobianWorkspace& jacobianWorkspace, std::index_sequence<Ints...>) {
   int unused[] = {
-      (new (&std::get<Ints>(_jacobianOplus)) JacobianType<D, VertexDimension<Ints>()>(
-           jacobianWorkspace.workspaceForVertex(Ints), D < 0 ? _dimension : D,
+      (new (&std::get<Ints>(jacobianOplus_)) JacobianType<D, VertexDimension<Ints>()>(
+           jacobianWorkspace.workspaceForVertex(Ints), D < 0 ? dimension_ : D,
            VertexDimension<Ints>() < 0 ? vertexXn<Ints>()->dimension() : VertexDimension<Ints>()),
        0)...};
   (void)unused;
@@ -150,7 +150,7 @@ void BaseFixedSizedEdge<D, E, VertexTypes...>::linearizeOplusN() {
 
   if (vertex->fixed()) return;
 
-  auto& jacobianOplus = std::get<N>(_jacobianOplus);
+  auto& jacobianOplus = std::get<N>(jacobianOplus_);
 
   constexpr number_t delta = cst(1e-9);
   constexpr number_t scalar = 1 / (2 * delta);
@@ -159,8 +159,8 @@ void BaseFixedSizedEdge<D, E, VertexTypes...>::linearizeOplusN() {
   (void)lck;
 
   typedef typename std::conditional<
-      VertexXnType<N>::Dimension == -1, ceres::internal::FixedArray<number_t>,
-      ceres::internal::FixedArray<number_t, static_cast<size_t>(VertexXnType<N>::Dimension)> >::type
+      VertexXnType<N>::kDimension == -1, ceres::internal::FixedArray<number_t>,
+      ceres::internal::FixedArray<number_t, static_cast<size_t>(VertexXnType<N>::kDimension)> >::type
       FixedArray;
   FixedArray add_vertex(vertexDimension<N>());
   add_vertex.fill(0.);
@@ -196,9 +196,9 @@ void BaseFixedSizedEdge<D, E, VertexTypes...>::linearizeOplusNs(std::index_seque
 template <int D, typename E, typename... VertexTypes>
 void BaseFixedSizedEdge<D, E, VertexTypes...>::linearizeOplus() {
   if (allVerticesFixed()) return;
-  ErrorVector errorBeforeNumeric = _error;
-  linearizeOplusNs(std::make_index_sequence<_nr_of_vertices>());
-  _error = errorBeforeNumeric;
+  ErrorVector errorBeforeNumeric = error_;
+  linearizeOplusNs(std::make_index_sequence<kNrOfVertices>());
+  error_ = errorBeforeNumeric;
 }
 
 /**
@@ -223,9 +223,9 @@ void BaseFixedSizedEdge<D, E, VertexTypes...>::mapHessianMemory(number_t* d, int
   int vi_dim = static_cast<OptimizableGraph::Vertex*>(HyperGraph::Edge::vertex(i).get())->dimension();
   int vj_dim = static_cast<OptimizableGraph::Vertex*>(HyperGraph::Edge::vertex(j).get())->dimension();
   int k = internal::pair_to_index(i, j);
-  _hessianRowMajor[k] = rowMajor;
+  hessianRowMajor_[k] = rowMajor;
   if (rowMajor)
-    tuple_apply_i(MapHessianMemoryK{d, vj_dim, vi_dim}, _hessianTupleTransposed, k);
+    tuple_apply_i(MapHessianMemoryK{d, vj_dim, vi_dim}, hessianTupleTransposed_, k);
   else
-    tuple_apply_i(MapHessianMemoryK{d, vi_dim, vj_dim}, _hessianTuple, k);
+    tuple_apply_i(MapHessianMemoryK{d, vi_dim, vj_dim}, hessianTuple_, k);
 }

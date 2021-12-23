@@ -35,7 +35,7 @@ namespace g2o {
 
   bool EdgeSE2XYPrior::read(std::istream& is)
   {
-    internal::readVector(is, _measurement);
+    internal::readVector(is, measurement_);
     readInformationMatrix(is);
     return true;
   }
@@ -48,7 +48,7 @@ namespace g2o {
 
   void EdgeSE2XYPrior::linearizeOplus()
   {
-    _jacobianOplusXi << 1,0,0, 0,1,0;
+    jacobianOplusXi_ << 1,0,0, 0,1,0;
   }
 
 } // end namespace

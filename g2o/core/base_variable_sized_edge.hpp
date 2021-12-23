@@ -37,33 +37,33 @@ void BaseVariableSizedEdge<D, E>::constructQuadraticForm() {
     number_t error = this->chi2();
     Vector3 rho;
     this->robustKernel()->robustify(error, rho);
-    Eigen::Matrix<number_t, D, 1, Eigen::ColMajor> omega_r = -_information * _error;
+    Eigen::Matrix<number_t, D, 1, Eigen::ColMajor> omega_r = -information_ * error_;
     omega_r *= rho[1];
     computeQuadraticForm(this->robustInformation(rho), omega_r);
   } else {
-    computeQuadraticForm(_information, -_information * _error);
+    computeQuadraticForm(information_, -information_ * error_);
   }
 }
 
 template <int D, typename E>
 void BaseVariableSizedEdge<D, E>::linearizeOplus(JacobianWorkspace& jacobianWorkspace) {
-  for (size_t i = 0; i < _vertices.size(); ++i) {
+  for (size_t i = 0; i < vertices_.size(); ++i) {
     OptimizableGraph::Vertex* v = vertexRaw(i);
     assert(v->dimension() >= 0);
-    new (&_jacobianOplus[i])
-        JacobianType(jacobianWorkspace.workspaceForVertex(i), D < 0 ? _dimension : D, v->dimension());
+    new (&jacobianOplus_[i])
+        JacobianType(jacobianWorkspace.workspaceForVertex(i), D < 0 ? dimension_ : D, v->dimension());
   }
   linearizeOplus();
 }
 
 template <int D, typename E>
 void BaseVariableSizedEdge<D, E>::linearizeOplus() {
-  const number_t delta = cst(1e-9);
-  const number_t scalar = 1 / (2 * delta);
+  constexpr number_t delta = cst(1e-9);
+  constexpr number_t scalar = 1 / (2 * delta);
   ErrorVector errorBak;
-  ErrorVector errorBeforeNumeric = _error;
+  ErrorVector errorBeforeNumeric = error_;
 
-  for (size_t i = 0; i < _vertices.size(); ++i) {
+  for (size_t i = 0; i < vertices_.size(); ++i) {
     // Xi - estimate the jacobian numerically
     OptimizableGraph::Vertex* vi = vertexRaw(i);
 
@@ -75,10 +75,10 @@ void BaseVariableSizedEdge<D, E>::linearizeOplus() {
     const int vi_dim = vi->dimension();
     assert(vi_dim >= 0);
 
-    assert(_dimension >= 0);
-    assert(_jacobianOplus[i].rows() == _dimension && _jacobianOplus[i].cols() == vi_dim &&
+    assert(dimension_ >= 0);
+    assert(jacobianOplus_[i].rows() == dimension_ && jacobianOplus_[i].cols() == vi_dim &&
            "jacobian cache dimension does not match");
-    _jacobianOplus[i].resize(_dimension, vi_dim);
+    jacobianOplus_[i].resize(dimension_, vi_dim);
     // add small step along the unit vector in each dimension
     ceres::internal::FixedArray<number_t> add_vi(vi_dim);
     add_vi.fill(0.);
@@ -87,31 +87,31 @@ void BaseVariableSizedEdge<D, E>::linearizeOplus() {
       add_vi[d] = delta;
       vi->oplus(add_vi.data());
       computeError();
-      errorBak = _error;
+      errorBak = error_;
       vi->pop();
       vi->push();
       add_vi[d] = -delta;
       vi->oplus(add_vi.data());
       computeError();
-      errorBak -= _error;
+      errorBak -= error_;
       vi->pop();
       add_vi[d] = 0.0;
 
-      _jacobianOplus[i].col(d) = scalar * errorBak;
+      jacobianOplus_[i].col(d) = scalar * errorBak;
     }  // end dimension
-    _error = errorBeforeNumeric;
+    error_ = errorBeforeNumeric;
   }
 }
 
 template <int D, typename E>
 void BaseVariableSizedEdge<D, E>::mapHessianMemory(number_t* d, int i, int j, bool rowMajor) {
   int idx = internal::computeUpperTriangleIndex(i, j);
-  assert(idx < (int)_hessian.size());
+  assert(idx < (int)hessian_.size());
   OptimizableGraph::Vertex* vi = vertexRaw(i);
   OptimizableGraph::Vertex* vj = vertexRaw(j);
   assert(vi->dimension() >= 0);
   assert(vj->dimension() >= 0);
-  HessianHelper& h = _hessian[idx];
+  HessianHelper& h = hessian_[idx];
   if (rowMajor) {
     if (h.matrix.data() != d || h.transposed != rowMajor)
       new (&h.matrix) HessianBlockType(d, vj->dimension(), vi->dimension());
@@ -125,16 +125,16 @@ void BaseVariableSizedEdge<D, E>::mapHessianMemory(number_t* d, int i, int j, bo
 template <int D, typename E>
 void BaseVariableSizedEdge<D, E>::resize(size_t size) {
   BaseEdge<D, E>::resize(size);
-  int n = (int)_vertices.size();
+  int n = static_cast<int>(vertices_.size());
   int maxIdx = (n * (n - 1)) / 2;
   assert(maxIdx >= 0);
-  _hessian.resize(maxIdx);
-  _jacobianOplus.resize(size, JacobianType(0, 0, 0));
+  hessian_.resize(maxIdx);
+  jacobianOplus_.resize(size, JacobianType(0, 0, 0));
 }
 
 template <int D, typename E>
 bool BaseVariableSizedEdge<D, E>::allVerticesFixed() const {
-  for (size_t i = 0; i < _vertices.size(); ++i) {
+  for (size_t i = 0; i < vertices_.size(); ++i) {
     if (!vertexRaw(i)->fixed()) {
       return false;
     }
@@ -144,12 +144,12 @@ bool BaseVariableSizedEdge<D, E>::allVerticesFixed() const {
 
 template <int D, typename E>
 void BaseVariableSizedEdge<D, E>::computeQuadraticForm(const InformationType& omega, const ErrorVector& weightedError) {
-  for (size_t i = 0; i < _vertices.size(); ++i) {
+  for (size_t i = 0; i < vertices_.size(); ++i) {
     OptimizableGraph::Vertex* from = vertexRaw(i);
     bool istatus = !(from->fixed());
 
     if (istatus) {
-      const JacobianType& A = _jacobianOplus[i];
+      const JacobianType& A = jacobianOplus_[i];
 
       MatrixX AtO = A.transpose() * omega;
       int fromDim = from->dimension();
@@ -165,16 +165,16 @@ void BaseVariableSizedEdge<D, E>::computeQuadraticForm(const InformationType& om
       }
 
       // compute the off-diagonal blocks ij for all j
-      for (size_t j = i + 1; j < _vertices.size(); ++j) {
+      for (size_t j = i + 1; j < vertices_.size(); ++j) {
         OptimizableGraph::Vertex* to = vertexRaw(j);
 
         bool jstatus = !(to->fixed());
         if (jstatus) {
           internal::QuadraticFormLock lck(*to);
-          const JacobianType& B = _jacobianOplus[j];
+          const JacobianType& B = jacobianOplus_[j];
           int idx = internal::computeUpperTriangleIndex(i, j);
-          assert(idx < (int)_hessian.size());
-          HessianHelper& hhelper = _hessian[idx];
+          assert(idx < (int)hessian_.size());
+          HessianHelper& hhelper = hessian_[idx];
           if (hhelper.transposed) {  // we have to write to the block as transposed
             hhelper.matrix.noalias() += B.transpose() * AtO.transpose();
           } else {

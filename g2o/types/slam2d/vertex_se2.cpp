@@ -43,7 +43,7 @@ namespace g2o {
   {
     Vector3 p;
     bool state = internal::readVector(is, p);
-    setEstimate(p);
+    setEstimate(SE2(p));
     return state;
   }
 
@@ -56,7 +56,7 @@ namespace g2o {
 
   bool VertexSE2WriteGnuplotAction::operator()(HyperGraph::HyperGraphElement* element,
                                                HyperGraphElementAction::Parameters* params_) {
-    if (typeid(*element).name()!=_typeName)
+    if (typeid(*element).name()!=typeName_)
       return false;
     WriteGnuplotAction::Parameters* params=static_cast<WriteGnuplotAction::Parameters*>(params_);
     if (!params || !params->os){
@@ -72,31 +72,31 @@ namespace g2o {
 
 #ifdef G2O_HAVE_OPENGL
   VertexSE2DrawAction::VertexSE2DrawAction()
-      : DrawAction(typeid(VertexSE2).name()), _drawActions(nullptr), _triangleX(nullptr), _triangleY(nullptr) {}
+      : DrawAction(typeid(VertexSE2).name()), drawActions_(nullptr), triangleX_(nullptr), triangleY_(nullptr) {}
 
   bool VertexSE2DrawAction::refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_){
     if (!DrawAction::refreshPropertyPtrs(params_))
       return false;
-    if (_previousParams){
-      _triangleX = _previousParams->makeProperty<FloatProperty>(_typeName + "::TRIANGLE_X", .2f);
-      _triangleY = _previousParams->makeProperty<FloatProperty>(_typeName + "::TRIANGLE_Y", .05f);
+    if (previousParams_){
+      triangleX_ = previousParams_->makeProperty<FloatProperty>(typeName_ + "::TRIANGLE_X", .2f);
+      triangleY_ = previousParams_->makeProperty<FloatProperty>(typeName_ + "::TRIANGLE_Y", .05f);
     } else {
-      _triangleX = 0;
-      _triangleY = 0;
+      triangleX_ = 0;
+      triangleY_ = 0;
     }
     return true;
   }
 
   bool VertexSE2DrawAction::operator()(HyperGraph::HyperGraphElement* element,
                                        HyperGraphElementAction::Parameters* params_) {
-    if (typeid(*element).name() != _typeName) return false;
+    if (typeid(*element).name() != typeName_) return false;
     initializeDrawActionsCache();
     refreshPropertyPtrs(params_);
 
-    if (! _previousParams)
+    if (! previousParams_)
       return true;
 
-    if (_show && !_show->value())
+    if (show_ && !show_->value())
       return true;
 
     VertexSE2* that = static_cast<VertexSE2*>(element);
@@ -105,7 +105,7 @@ namespace g2o {
     glPushMatrix();
     glTranslatef((float)that->estimate().translation().x(),(float)that->estimate().translation().y(),0.f);
     glRotatef((float)RAD2DEG(that->estimate().rotation().angle()),0.f,0.f,1.f);
-    opengl::drawArrow2D((float)_triangleX->value(), (float)_triangleY->value(), (float)_triangleX->value()*.3f);
+    opengl::drawArrow2D((float)triangleX_->value(), (float)triangleY_->value(), (float)triangleX_->value()*.3f);
     drawCache(that->cacheContainer(), params_);
     drawUserData(that->userData().get(), params_);
     glPopMatrix();

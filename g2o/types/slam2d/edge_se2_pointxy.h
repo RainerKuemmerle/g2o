@@ -45,18 +45,18 @@ namespace g2o {
       {
         const VertexSE2* v1 = vertexXnRaw<0>();
         const VertexPointXY* l2 = vertexXnRaw<1>();
-        _error = (v1->estimate().inverse() * l2->estimate()) - _measurement;
+        error_ = (v1->estimate().inverse() * l2->estimate()) - measurement_;
       }
 
       virtual bool setMeasurementData(const number_t* d){
-        _measurement[0]=d[0];
-        _measurement[1]=d[1];
+        measurement_[0]=d[0];
+        measurement_[1]=d[1];
         return true;
       }
 
       virtual bool getMeasurementData(number_t* d) const{
-        d[0] = _measurement[0];
-        d[1] = _measurement[1];
+        d[0] = measurement_[0];
+        d[1] = measurement_[1];
         return true;
       }
 
@@ -65,7 +65,7 @@ namespace g2o {
       virtual bool setMeasurementFromState(){
         const VertexSE2* v1 = vertexXnRaw<0>();
         const VertexPointXY* l2 = vertexXnRaw<1>();
-        _measurement = v1->estimate().inverse() * l2->estimate();
+        measurement_ = v1->estimate().inverse() * l2->estimate();
         return true;
       }
 
@@ -73,7 +73,7 @@ namespace g2o {
       virtual bool write(std::ostream& os) const;
 
       virtual void initialEstimate(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to);
-      virtual number_t initialEstimatePossible(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to) { (void) to; return (from.count(_vertices[0]) == 1 ? 1.0 : -1.0);}
+      virtual number_t initialEstimatePossible(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to) { (void) to; return (from.count(vertices_[0]) == 1 ? 1.0 : -1.0);}
 #ifndef NUMERIC_JACOBIAN_TWO_D_TYPES
       virtual void linearizeOplus();
 #endif

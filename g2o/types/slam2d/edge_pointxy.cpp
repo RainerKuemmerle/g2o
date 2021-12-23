@@ -36,8 +36,8 @@ namespace g2o {
   EdgePointXY::EdgePointXY() :
     BaseBinaryEdge<2, Vector2, VertexPointXY, VertexPointXY>()
   {
-    _information.setIdentity();
-    _error.setZero();
+    information_.setIdentity();
+    error_.setZero();
   }
 
   bool EdgePointXY::read(std::istream& is)
@@ -59,8 +59,8 @@ namespace g2o {
 #ifndef NUMERIC_JACOBIAN_TWO_D_TYPES
   void EdgePointXY::linearizeOplus()
   {
-    _jacobianOplusXi=-Matrix2::Identity();
-    _jacobianOplusXj= Matrix2::Identity();
+    jacobianOplusXi_=-Matrix2::Identity();
+    jacobianOplusXj_= Matrix2::Identity();
   }
 #endif
 

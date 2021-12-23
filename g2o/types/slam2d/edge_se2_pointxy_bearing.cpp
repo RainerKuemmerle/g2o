@@ -40,22 +40,22 @@ namespace g2o {
 
   void EdgeSE2PointXYBearing::initialEstimate(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* /*to*/)
   {
-    assert(from.size() == 1 && from.count(_vertices[0]) == 1 && "Can not initialize VertexSE2 position by VertexPointXY");
+    assert(from.size() == 1 && from.count(vertices_[0]) == 1 && "Can not initialize VertexSE2 position by VertexPointXY");
 
-    if (from.count(_vertices[0]) != 1)
+    if (from.count(vertices_[0]) != 1)
       return;
     number_t r=2.;
     const VertexSE2* v1 = vertexXnRaw<0>();
     VertexPointXY* l2 = vertexXnRaw<1>();
     SE2 t=v1->estimate();
-    t.setRotation(t.rotation()*Rotation2D(_measurement));
+    t.setRotation(t.rotation()*Rotation2D(measurement_));
     Vector2 vr(r, 0.);
     l2->setEstimate(t*vr);
   }
 
   bool EdgeSE2PointXYBearing::read(std::istream& is)
   {
-    is >> _measurement >> information()(0,0);
+    is >> measurement_ >> information()(0,0);
     return true;
   }
 
@@ -70,7 +70,7 @@ namespace g2o {
 
   bool EdgeSE2PointXYBearingWriteGnuplotAction::operator()(
       HyperGraph::HyperGraphElement* element, HyperGraphElementAction::Parameters* params_) {
-    if (typeid(*element).name()!=_typeName)
+    if (typeid(*element).name()!=typeName_)
       return false;
     WriteGnuplotAction::Parameters* params=static_cast<WriteGnuplotAction::Parameters*>(params_);
     if (!params->os){
@@ -94,14 +94,14 @@ namespace g2o {
 
   bool EdgeSE2PointXYBearingDrawAction::operator()(HyperGraph::HyperGraphElement* element,
                                                    HyperGraphElementAction::Parameters* params_) {
-    if (typeid(*element).name()!=_typeName)
+    if (typeid(*element).name()!=typeName_)
       return false;
 
     refreshPropertyPtrs(params_);
-    if (! _previousParams)
+    if (! previousParams_)
       return true;
 
-    if (_show && !_show->value())
+    if (show_ && !show_->value())
       return true;
 
     EdgeSE2PointXYBearing* e =  static_cast<EdgeSE2PointXYBearing*>(element);

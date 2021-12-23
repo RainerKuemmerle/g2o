@@ -46,55 +46,46 @@ namespace g2o {
       LinearSolverPCG() :
       LinearSolver<MatrixType>()
       {
-        _tolerance = cst(1e-6);
-        _verbose = false;
-        _absoluteTolerance = true;
-        _residual = -1.0;
-        _maxIter = -1;
       }
 
-      virtual ~LinearSolverPCG()
+      bool init() override
       {
-      }
-
-      virtual bool init()
-      {
-        _residual = -1.0;
-        _indices.clear();
-        _sparseMat.clear();
+        residual_ = -1.0;
+        indices_.clear();
+        sparseMat_.clear();
         return true;
       }
 
-      bool solve(const SparseBlockMatrix<MatrixType>& A, number_t* x, number_t* b);
+      bool solve(const SparseBlockMatrix<MatrixType>& A, number_t* x, number_t* b) override;
 
       //! return the tolerance for terminating PCG before convergence
-      number_t tolerance() const { return _tolerance;}
-      void setTolerance(number_t tolerance) { _tolerance = tolerance;}
+      number_t tolerance() const { return tolerance_;}
+      void setTolerance(number_t tolerance) { tolerance_ = tolerance;}
 
-      int maxIterations() const { return _maxIter;}
-      void setMaxIterations(int maxIter) { _maxIter = maxIter;}
+      int maxIterations() const { return maxIter_;}
+      void setMaxIterations(int maxIter) { maxIter_ = maxIter;}
 
-      bool absoluteTolerance() const { return _absoluteTolerance;}
-      void setAbsoluteTolerance(bool absoluteTolerance) { _absoluteTolerance = absoluteTolerance;}
+      bool absoluteTolerance() const { return absoluteTolerance_;}
+      void setAbsoluteTolerance(bool absoluteTolerance) { absoluteTolerance_ = absoluteTolerance;}
 
-      bool verbose() const { return _verbose;}
-      void setVerbose(bool verbose) { _verbose = verbose;}
+      bool verbose() const { return verbose_;}
+      void setVerbose(bool verbose) { verbose_ = verbose;}
 
     protected:
-      typedef std::vector< MatrixType, Eigen::aligned_allocator<MatrixType> > MatrixVector;
-      typedef std::vector< const MatrixType* > MatrixPtrVector;
+      using MatrixVector = std::vector< MatrixType, Eigen::aligned_allocator<MatrixType> >;
+      using MatrixPtrVector = std::vector<const MatrixType*>;
 
-      number_t _tolerance;
-      number_t _residual;
-      bool _absoluteTolerance;
-      bool _verbose;
-      int _maxIter;
+      number_t tolerance_ = cst(1e-6);
+      number_t residual_ = -1.;
+      bool absoluteTolerance_ = true;
+      bool verbose_ = false;
+      int maxIter_ = -1;
 
-      MatrixPtrVector _diag;
-      MatrixVector _J;
+      MatrixPtrVector diag_;
+      MatrixVector J_;
 
-      std::vector<std::pair<int, int> > _indices;
-      MatrixPtrVector _sparseMat;
+      std::vector<std::pair<int, int> > indices_;
+      MatrixPtrVector sparseMat_;
 
       void multDiag(const std::vector<int>& colBlockIndices, MatrixVector& A, const VectorX& src, VectorX& dest);
       void multDiag(const std::vector<int>& colBlockIndices, MatrixPtrVector& A, const VectorX& src, VectorX& dest);

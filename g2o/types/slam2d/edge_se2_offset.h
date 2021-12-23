@@ -53,20 +53,20 @@ namespace g2o {
       //virtual void linearizeOplus();
 
       virtual void setMeasurement(const SE2& m){
-        _measurement = m;
+        measurement_ = m;
         _inverseMeasurement = m.inverse();
       }
 
       virtual bool setMeasurementData(const number_t* d){
         Eigen::Map<const Vector3> v(d);
-        _measurement.fromVector(v);
-        _inverseMeasurement = _measurement.inverse();
+        measurement_.fromVector(v);
+        _inverseMeasurement = measurement_.inverse();
         return true;
       }
 
       virtual bool getMeasurementData(number_t* d) const{
         Eigen::Map<Vector3> v(d);
-        v = _measurement.toVector();
+        v = measurement_.toVector();
         return true;
       }
 

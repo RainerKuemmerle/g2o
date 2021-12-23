@@ -42,9 +42,9 @@ namespace g2o {
 
   bool EdgeSE2Offset::resolveCaches(){
     ParameterVector pv(1);
-    pv[0] = _parameters[0];
+    pv[0] = parameters_[0];
     resolveCache(_cacheFrom, vertexXn<0>(), "CACHE_SE2_OFFSET", pv);
-    pv[0] = _parameters[1];
+    pv[0] = parameters_[1];
     resolveCache(_cacheTo, vertexXn<1>(), "CACHE_SE2_OFFSET", pv);
     return (_cacheFrom && _cacheTo);
   }
@@ -67,8 +67,8 @@ namespace g2o {
 
   void EdgeSE2Offset::computeError() {
     SE2 delta=_inverseMeasurement * _cacheFrom->w2n() * _cacheTo->n2w();
-    _error.head<2>() = delta.translation();
-    _error(2)=delta.rotation().angle();
+    error_.head<2>() = delta.translation();
+    error_(2)=delta.rotation().angle();
   }
 
   bool EdgeSE2Offset::setMeasurementFromState(){

@@ -55,9 +55,9 @@ namespace g2o {
        * is carried out.
        */
       explicit SolverSLAM2DLinear(std::unique_ptr<Solver> solver);
-      virtual ~SolverSLAM2DLinear();
+      ~SolverSLAM2DLinear() override;
 
-      virtual OptimizationAlgorithm::SolverResult solve(int iteration, bool online = false);
+      OptimizationAlgorithm::SolverResult solve(int iteration, bool online = false) override;
 
     protected:
       bool solveOrientation();

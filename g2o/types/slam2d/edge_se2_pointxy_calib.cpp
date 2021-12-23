@@ -36,18 +36,18 @@ namespace g2o {
 
   void EdgeSE2PointXYCalib::initialEstimate(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* /*to*/)
   {
-    assert(from.size() == 1 && from.count(_vertices[0]) == 1 && "Can not initialize VertexSE2 position by VertexPointXY");
+    assert(from.size() == 1 && from.count(vertices_[0]) == 1 && "Can not initialize VertexSE2 position by VertexPointXY");
 
-    if (from.count(_vertices[0]) != 1)
+    if (from.count(vertices_[0]) != 1)
       return;
     VertexSE2* vi     = static_cast<VertexSE2*>(vertexRaw(0));
     VertexPointXY* vj = static_cast<VertexPointXY*>(vertexRaw(1));
-    vj->setEstimate(vi->estimate() * _measurement);
+    vj->setEstimate(vi->estimate() * measurement_);
   }
 
   bool EdgeSE2PointXYCalib::read(std::istream& is)
   {
-    internal::readVector(is, _measurement);
+    internal::readVector(is, measurement_);
     readInformationMatrix(is);
     return true;
   }

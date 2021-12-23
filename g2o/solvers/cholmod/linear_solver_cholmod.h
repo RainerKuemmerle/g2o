@@ -59,11 +59,11 @@ struct CholmodExt : public cholmod_sparse {
     columnsAllocated = 0;
   }
   ~CholmodExt() {
-    delete[](int*) p;
+    delete[] static_cast<int*>(p);
     p = nullptr;
-    delete[](double*) x;
+    delete[] static_cast<double*>(x);
     x = nullptr;
-    delete[](int*) i;
+    delete[] static_cast<int*>(i);
     i = nullptr;
   }
   size_t columnsAllocated;
@@ -75,93 +75,94 @@ struct CholmodExt : public cholmod_sparse {
 template <typename MatrixType>
 class LinearSolverCholmod : public LinearSolverCCS<MatrixType> {
  public:
-  LinearSolverCholmod() : LinearSolverCCS<MatrixType>(), _cholmodFactor(nullptr) {
-    cholmod_start(&_cholmodCommon);
+  LinearSolverCholmod() : LinearSolverCCS<MatrixType>() {
+    cholmod_start(&cholmodCommon_);
 
     // setup ordering strategy
-    _cholmodCommon.nmethods = 1;
-    _cholmodCommon.method[0].ordering = CHOLMOD_AMD;  // CHOLMOD_COLAMD
+    cholmodCommon_.nmethods = 1;
+    cholmodCommon_.method[0].ordering = CHOLMOD_AMD;  // CHOLMOD_COLAMD
     //_cholmodCommon.postorder = 0;
 
-    _cholmodCommon.supernodal = CHOLMOD_AUTO;  // CHOLMOD_SUPERNODAL; //CHOLMOD_SIMPLICIAL;
+    cholmodCommon_.supernodal = CHOLMOD_AUTO;  // CHOLMOD_SUPERNODAL; //CHOLMOD_SIMPLICIAL;
   }
 
   LinearSolverCholmod(LinearSolverCholmod<MatrixType> const&) = delete;
   LinearSolverCholmod& operator=(LinearSolverCholmod<MatrixType> const&) = delete;
 
-  virtual ~LinearSolverCholmod() {
+  ~LinearSolverCholmod() override {
     freeCholdmodFactor();
-    cholmod_finish(&_cholmodCommon);
+    cholmod_finish(&cholmodCommon_);
   }
 
-  virtual bool init() {
+  bool init() override {
     freeCholdmodFactor();
     return true;
   }
 
-  bool solve(const SparseBlockMatrix<MatrixType>& A, double* x, double* b) {
+  bool solve(const SparseBlockMatrix<MatrixType>& A, double* x, double* b) override {
     double t;
     bool cholState = computeCholmodFactor(A, t);
     if (!cholState) return false;
 
     // setting up b for calling cholmod
     cholmod_dense bcholmod;
-    bcholmod.nrow = bcholmod.d = _cholmodSparse.nrow;
+    bcholmod.nrow = bcholmod.d = cholmodSparse_.nrow;
     bcholmod.ncol = 1;
     bcholmod.x = b;
     bcholmod.xtype = CHOLMOD_REAL;
     bcholmod.dtype = CHOLMOD_DOUBLE;
-    cholmod_dense* xcholmod = cholmod_solve(CHOLMOD_A, _cholmodFactor, &bcholmod, &_cholmodCommon);
+    cholmod_dense* xcholmod = cholmod_solve(CHOLMOD_A, cholmodFactor_, &bcholmod, &cholmodCommon_);
     memcpy(x, xcholmod->x, sizeof(double) * bcholmod.nrow);  // copy back to our array
-    cholmod_free_dense(&xcholmod, &_cholmodCommon);
+    cholmod_free_dense(&xcholmod, &cholmodCommon_);
 
     G2OBatchStatistics* globalStats = G2OBatchStatistics::globalStats();
     if (globalStats) {
       globalStats->timeNumericDecomposition = get_monotonic_time() - t;
-      globalStats->choleskyNNZ = static_cast<size_t>(_cholmodCommon.method[0].lnz);
+      globalStats->choleskyNNZ = static_cast<size_t>(cholmodCommon_.method[0].lnz);
     }
 
     return true;
   }
 
   virtual bool saveMatrix(const std::string& fileName) {
-    writeCCSMatrix(fileName, _cholmodSparse.nrow, _cholmodSparse.ncol, (int*)_cholmodSparse.p,
-                   (int*)_cholmodSparse.i, (double*)_cholmodSparse.x, true);
+    writeCCSMatrix(fileName, cholmodSparse_.nrow, cholmodSparse_.ncol,
+                   static_cast<int*>(cholmodSparse_.p), static_cast<int*>(cholmodSparse_.i),
+                   static_cast<double*>(cholmodSparse_.x), true);
     return true;
   }
 
  protected:
   // temp used for cholesky with cholmod
-  cholmod_common _cholmodCommon;
-  CholmodExt _cholmodSparse;
-  cholmod_factor* _cholmodFactor;
-  MatrixStructure _matrixStructure;
-  VectorXI _scalarPermutation, _blockPermutation;
+  cholmod_common cholmodCommon_;
+  CholmodExt cholmodSparse_;
+  cholmod_factor* cholmodFactor_ = nullptr;
+  MatrixStructure matrixStructure_;
+  VectorXI scalarPermutation_, blockPermutation_;
 
   void computeSymbolicDecomposition(const SparseBlockMatrix<MatrixType>& A) {
     double t = get_monotonic_time();
     if (!this->blockOrdering()) {
       // setup ordering strategy
-      _cholmodCommon.nmethods = 1;
-      _cholmodCommon.method[0].ordering = CHOLMOD_AMD;                     // CHOLMOD_COLAMD
-      _cholmodFactor = cholmod_analyze(&_cholmodSparse, &_cholmodCommon);  // symbolic factorization
+      cholmodCommon_.nmethods = 1;
+      cholmodCommon_.method[0].ordering = CHOLMOD_AMD;                     // CHOLMOD_COLAMD
+      cholmodFactor_ = cholmod_analyze(&cholmodSparse_, &cholmodCommon_);  // symbolic factorization
     } else {
-      A.fillBlockStructure(_matrixStructure);
+      A.fillBlockStructure(matrixStructure_);
 
       // get the ordering for the block matrix
-      if (_blockPermutation.size() == 0) _blockPermutation.resize(_matrixStructure.n);
-      if (_blockPermutation.size() < _matrixStructure.n)  // double space if resizing
-        _blockPermutation.resize(2 * _matrixStructure.n);
+      if (blockPermutation_.size() == 0) blockPermutation_.resize(matrixStructure_.n);
+      if (blockPermutation_.size() < matrixStructure_.n)  // double space if resizing
+        blockPermutation_.resize(2L * matrixStructure_.n);
 
       // prepare AMD call via CHOLMOD
       cholmod_sparse auxCholmodSparse;
-      auxCholmodSparse.nzmax = _matrixStructure.nzMax();
-      auxCholmodSparse.nrow = auxCholmodSparse.ncol = _matrixStructure.n;
-      auxCholmodSparse.p = _matrixStructure.Ap;
-      auxCholmodSparse.i = _matrixStructure.Aii;
-      auxCholmodSparse.nz = 0;
-      auxCholmodSparse.x = 0;
-      auxCholmodSparse.z = 0;
+      auxCholmodSparse.nzmax = matrixStructure_.nzMax();
+      auxCholmodSparse.nrow = auxCholmodSparse.ncol = matrixStructure_.n;
+      auxCholmodSparse.p = matrixStructure_.Ap;
+      auxCholmodSparse.i = matrixStructure_.Aii;
+      auxCholmodSparse.nz = nullptr;
+      auxCholmodSparse.x = nullptr;
+      auxCholmodSparse.z = nullptr;
       auxCholmodSparse.stype = 1;
       auxCholmodSparse.xtype = CHOLMOD_PATTERN;
       auxCholmodSparse.itype = CHOLMOD_INT;
@@ -169,17 +170,17 @@ class LinearSolverCholmod : public LinearSolverCCS<MatrixType> {
       auxCholmodSparse.sorted = 1;
       auxCholmodSparse.packed = 1;
       int amdStatus =
-          cholmod_amd(&auxCholmodSparse, NULL, 0, _blockPermutation.data(), &_cholmodCommon);
+          cholmod_amd(&auxCholmodSparse, nullptr, 0, blockPermutation_.data(), &cholmodCommon_);
       if (!amdStatus) return;
 
       // blow up the permutation to the scalar matrix
-      this->blockToScalarPermutation(A, _blockPermutation, _scalarPermutation);
+      this->blockToScalarPermutation(A, blockPermutation_, scalarPermutation_);
 
       // apply the ordering
-      _cholmodCommon.nmethods = 1;
-      _cholmodCommon.method[0].ordering = CHOLMOD_GIVEN;
-      _cholmodFactor =
-          cholmod_analyze_p(&_cholmodSparse, _scalarPermutation.data(), NULL, 0, &_cholmodCommon);
+      cholmodCommon_.nmethods = 1;
+      cholmodCommon_.method[0].ordering = CHOLMOD_GIVEN;
+      cholmodFactor_ =
+          cholmod_analyze_p(&cholmodSparse_, scalarPermutation_.data(), nullptr, 0, &cholmodCommon_);
     }
     G2OBatchStatistics* globalStats = G2OBatchStatistics::globalStats();
     if (globalStats) globalStats->timeSymbolicDecomposition = get_monotonic_time() - t;
@@ -191,47 +192,48 @@ class LinearSolverCholmod : public LinearSolverCCS<MatrixType> {
     size_t n = A.cols();
     assert(m > 0 && n > 0 && "Hessian has 0 rows/cols");
 
-    if (_cholmodSparse.columnsAllocated < n) {
+    if (cholmodSparse_.columnsAllocated < n) {
       // pre-allocate more space if re-allocating
-      _cholmodSparse.columnsAllocated = _cholmodSparse.columnsAllocated == 0 ? n : 2 * n;
-      delete[](int*) _cholmodSparse.p;
-      _cholmodSparse.p = new int[_cholmodSparse.columnsAllocated + 1];
+      cholmodSparse_.columnsAllocated = cholmodSparse_.columnsAllocated == 0 ? n : 2 * n;
+      delete[] static_cast<int*>(cholmodSparse_.p);
+      cholmodSparse_.p = new int[cholmodSparse_.columnsAllocated + 1];
     }
     if (!onlyValues) {
       size_t nzmax = A.nonZeros();
-      if (_cholmodSparse.nzmax < nzmax) {
+      if (cholmodSparse_.nzmax < nzmax) {
         // pre-allocate more space if re-allocating
-        _cholmodSparse.nzmax = _cholmodSparse.nzmax == 0 ? nzmax : 2 * nzmax;
-        delete[](double*) _cholmodSparse.x;
-        delete[](int*) _cholmodSparse.i;
-        _cholmodSparse.i = new int[_cholmodSparse.nzmax];
-        _cholmodSparse.x = new double[_cholmodSparse.nzmax];
+        cholmodSparse_.nzmax = cholmodSparse_.nzmax == 0 ? nzmax : 2 * nzmax;
+        delete[] static_cast<double*>(cholmodSparse_.x);
+        delete[] static_cast<int*>(cholmodSparse_.i);
+        cholmodSparse_.i = new int[cholmodSparse_.nzmax];
+        cholmodSparse_.x = new double[cholmodSparse_.nzmax];
       }
     }
-    _cholmodSparse.ncol = n;
-    _cholmodSparse.nrow = m;
+    cholmodSparse_.ncol = n;
+    cholmodSparse_.nrow = m;
 
     if (onlyValues)
-      this->_ccsMatrix->fillCCS((double*)_cholmodSparse.x, true);
+      this->ccsMatrix_->fillCCS(static_cast<double*>(cholmodSparse_.x), true);
     else
-      this->_ccsMatrix->fillCCS((int*)_cholmodSparse.p, (int*)_cholmodSparse.i,
-                                (double*)_cholmodSparse.x, true);
+      this->ccsMatrix_->fillCCS(static_cast<int*>(cholmodSparse_.p),
+                                static_cast<int*>(cholmodSparse_.i),
+                                static_cast<double*>(cholmodSparse_.x), true);
   }
 
   //! compute the cholmodFactor for the given matrix A
   bool computeCholmodFactor(const SparseBlockMatrix<MatrixType>& A, double& t) {
     // _cholmodFactor used as bool, if not existing will copy the whole structure, otherwise only
     // the values
-    fillCholmodExt(A, _cholmodFactor != nullptr);
+    fillCholmodExt(A, cholmodFactor_ != nullptr);
 
-    if (_cholmodFactor == 0) {
+    if (cholmodFactor_ == nullptr) {
       computeSymbolicDecomposition(A);
       assert(_cholmodFactor != 0 && "Symbolic cholesky failed");
     }
     t = get_monotonic_time();
 
-    cholmod_factorize(&_cholmodSparse, _cholmodFactor, &_cholmodCommon);
-    if (_cholmodCommon.status == CHOLMOD_NOT_POSDEF) {
+    cholmod_factorize(&cholmodSparse_, cholmodFactor_, &cholmodCommon_);
+    if (cholmodCommon_.status == CHOLMOD_NOT_POSDEF) {
       if (this->writeDebug()) {
         std::cerr << "Cholesky failure, writing debug.txt (Hessian loadable by Octave)"
                   << std::endl;
@@ -243,41 +245,42 @@ class LinearSolverCholmod : public LinearSolverCCS<MatrixType> {
   }
 
   bool solveBlocks_impl(const SparseBlockMatrix<MatrixType>& A,
-                        std::function<void(MarginalCovarianceCholesky&)> compute) {
+                        const std::function<void(MarginalCovarianceCholesky&)>& compute) override {
     double t;
     bool cholState = computeCholmodFactor(A, t);
     if (!cholState) return false;
 
     // convert the factorization to LL, simplical, packed, monotonic
     int change_status =
-        cholmod_change_factor(CHOLMOD_REAL, 1, 0, 1, 1, _cholmodFactor, &_cholmodCommon);
+        cholmod_change_factor(CHOLMOD_REAL, 1, 0, 1, 1, cholmodFactor_, &cholmodCommon_);
     if (!change_status) return false;
     assert(_cholmodFactor->is_ll && !_cholmodFactor->is_super && _cholmodFactor->is_monotonic &&
            "Cholesky factor has wrong format");
 
     // invert the permutation
-    int* p = (int*)_cholmodFactor->Perm;
-    VectorXI pinv(_cholmodSparse.ncol);
-    for (size_t i = 0; i < _cholmodSparse.ncol; ++i) pinv(p[i]) = i;
+    int* p = static_cast<int*>(cholmodFactor_->Perm);
+    VectorXI pinv(cholmodSparse_.ncol);
+    for (size_t i = 0; i < cholmodSparse_.ncol; ++i) pinv(p[i]) = i;
 
     // compute the marginal covariance
     MarginalCovarianceCholesky mcc;
-    mcc.setCholeskyFactor(_cholmodSparse.ncol, (int*)_cholmodFactor->p, (int*)_cholmodFactor->i,
-                          (double*)_cholmodFactor->x, pinv.data());
+    mcc.setCholeskyFactor(cholmodSparse_.ncol, static_cast<int*>(cholmodFactor_->p),
+                          static_cast<int*>(cholmodFactor_->i),
+                          static_cast<double*>(cholmodFactor_->x), pinv.data());
     compute(mcc);
 
     G2OBatchStatistics* globalStats = G2OBatchStatistics::globalStats();
     if (globalStats) {
       globalStats->choleskyNNZ =
-          static_cast<size_t>(_cholmodCommon.method[_cholmodCommon.selected].lnz);
+          static_cast<size_t>(cholmodCommon_.method[cholmodCommon_.selected].lnz);
     }
     return true;
   }
 
   void freeCholdmodFactor() {
-    if (_cholmodFactor != nullptr) {
-      cholmod_free_factor(&_cholmodFactor, &_cholmodCommon);
-      _cholmodFactor = nullptr;
+    if (cholmodFactor_ != nullptr) {
+      cholmod_free_factor(&cholmodFactor_, &cholmodCommon_);
+      cholmodFactor_ = nullptr;
     }
   }
 };

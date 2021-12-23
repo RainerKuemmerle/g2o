@@ -36,15 +36,15 @@ namespace g2o {
   {
     assert(from.size() == 0); (void) from; (void) to;
     VertexSE2* v1 = vertexXnRaw<0>();
-    v1->setEstimate(_measurement);
+    v1->setEstimate(measurement_);
   }
 
   bool EdgeSE2Prior::read(std::istream& is)
   {
     Vector3 p;
     internal::readVector(is, p);
-    setMeasurement(p);
-    _inverseMeasurement= _measurement.inverse();
+    setMeasurement(SE2(p));
+    _inverseMeasurement= measurement_.inverse();
     readInformationMatrix(is);
     return true;
   }
@@ -57,13 +57,13 @@ namespace g2o {
 
   void EdgeSE2Prior::setMeasurement(const SE2& m)
   {
-    _measurement = m;
+    measurement_ = m;
     _inverseMeasurement = m.inverse();
   }
 
   bool EdgeSE2Prior::setMeasurementData(const number_t* d) {
-    _measurement=SE2(d[0], d[1], d[2]);
-    _inverseMeasurement = _measurement.inverse();
+    measurement_=SE2(d[0], d[1], d[2]);
+    _inverseMeasurement = measurement_.inverse();
     return true;
   }
 

@@ -40,7 +40,7 @@ namespace g2o {
 
   bool EdgeSE2PointXY::read(std::istream& is)
   {
-    internal::readVector(is, _measurement);
+    internal::readVector(is, measurement_);
     readInformationMatrix(is);
     return true;
   }
@@ -53,12 +53,12 @@ namespace g2o {
 
   void EdgeSE2PointXY::initialEstimate(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to)
   {
-    assert(from.size() == 1 && from.count(_vertices[0]) == 1 && "Can not initialize VertexSE2 position by VertexPointXY");
+    assert(from.size() == 1 && from.count(vertices_[0]) == 1 && "Can not initialize VertexSE2 position by VertexPointXY");
 
     auto vi = vertexXn<0>();
     auto vj = vertexXn<1>();
     if (from.count(vi) > 0 && to == vj.get()) {
-      vj->setEstimate(vi->estimate() * _measurement);
+      vj->setEstimate(vi->estimate() * measurement_);
     }
   }
 
@@ -77,24 +77,24 @@ namespace g2o {
     number_t aux_2 = -aux_1 ;
     number_t aux_3 = std::sin(th1) ;
 
-    _jacobianOplusXi( 0 , 0 ) = aux_2 ;
-    _jacobianOplusXi( 0 , 1 ) = -aux_3 ;
-    _jacobianOplusXi( 0 , 2 ) = aux_1*y2-aux_1*y1-aux_3*x2+aux_3*x1 ;
-    _jacobianOplusXi( 1 , 0 ) = aux_3 ;
-    _jacobianOplusXi( 1 , 1 ) = aux_2 ;
-    _jacobianOplusXi( 1 , 2 ) = -aux_3*y2+aux_3*y1-aux_1*x2+aux_1*x1 ;
+    jacobianOplusXi_( 0 , 0 ) = aux_2 ;
+    jacobianOplusXi_( 0 , 1 ) = -aux_3 ;
+    jacobianOplusXi_( 0 , 2 ) = aux_1*y2-aux_1*y1-aux_3*x2+aux_3*x1 ;
+    jacobianOplusXi_( 1 , 0 ) = aux_3 ;
+    jacobianOplusXi_( 1 , 1 ) = aux_2 ;
+    jacobianOplusXi_( 1 , 2 ) = -aux_3*y2+aux_3*y1-aux_1*x2+aux_1*x1 ;
 
-    _jacobianOplusXj( 0 , 0 ) = aux_1 ;
-    _jacobianOplusXj( 0 , 1 ) = aux_3 ;
-    _jacobianOplusXj( 1 , 0 ) = -aux_3 ;
-    _jacobianOplusXj( 1 , 1 ) = aux_1 ;
+    jacobianOplusXj_( 0 , 0 ) = aux_1 ;
+    jacobianOplusXj_( 0 , 1 ) = aux_3 ;
+    jacobianOplusXj_( 1 , 0 ) = -aux_3 ;
+    jacobianOplusXj_( 1 , 1 ) = aux_1 ;
   }
 #endif
 
   EdgeSE2PointXYWriteGnuplotAction::EdgeSE2PointXYWriteGnuplotAction(): WriteGnuplotAction(typeid(EdgeSE2PointXY).name()){}
 
   bool EdgeSE2PointXYWriteGnuplotAction::operator()(HyperGraph::HyperGraphElement* element, HyperGraphElementAction::Parameters* params_){
-    if (typeid(*element).name()!=_typeName)
+    if (typeid(*element).name()!=typeName_)
       return false;
     WriteGnuplotAction::Parameters* params=static_cast<WriteGnuplotAction::Parameters*>(params_);
     if (!params->os){
@@ -119,14 +119,14 @@ namespace g2o {
 
   bool EdgeSE2PointXYDrawAction::operator()(HyperGraph::HyperGraphElement* element,
                 HyperGraphElementAction::Parameters*  params_){
-    if (typeid(*element).name()!=_typeName)
+    if (typeid(*element).name()!=typeName_)
       return false;
 
     refreshPropertyPtrs(params_);
-    if (! _previousParams)
+    if (! previousParams_)
       return true;
 
-    if (_show && !_show->value())
+    if (show_ && !show_->value())
       return true;
 
 

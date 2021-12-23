@@ -41,74 +41,74 @@ namespace g2o {
   {
     public:
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-        EdgeSE2();
+      EdgeSE2() = default;
 
-      void computeError()
+      void computeError() override
       {
         const VertexSE2* v1 = vertexXnRaw<0>();
         const VertexSE2* v2 = vertexXnRaw<1>();
-        SE2 delta = _inverseMeasurement * (v1->estimate().inverse()*v2->estimate());
-        _error = delta.toVector();
+        SE2 delta = inverseMeasurement_ * (v1->estimate().inverse()*v2->estimate());
+        error_ = delta.toVector();
       }
-      virtual bool read(std::istream& is);
-      virtual bool write(std::ostream& os) const;
+      bool read(std::istream& is) override;
+      bool write(std::ostream& os) const override;
 
-      virtual void setMeasurement(const SE2& m){
-        _measurement = m;
-        _inverseMeasurement = m.inverse();
+      void setMeasurement(const SE2& m) override {
+        measurement_ = m;
+        inverseMeasurement_ = m.inverse();
       }
 
-      virtual bool setMeasurementData(const number_t* d){
-        _measurement=SE2(d[0], d[1], d[2]);
-        _inverseMeasurement = _measurement.inverse();
+      bool setMeasurementData(const number_t* d) override {
+        measurement_=SE2(d[0], d[1], d[2]);
+        inverseMeasurement_ = measurement_.inverse();
         return true;
       }
 
-      virtual bool getMeasurementData(number_t* d) const {
-        Vector3 v=_measurement.toVector();
+      bool getMeasurementData(number_t* d) const override {
+        Vector3 v=measurement_.toVector();
         d[0] = v[0];
         d[1] = v[1];
         d[2] = v[2];
         return true;
       }
 
-      virtual int measurementDimension() const {return 3;}
+      int measurementDimension() const override {return 3;}
 
-      virtual bool setMeasurementFromState() {
+      bool setMeasurementFromState() override {
         const VertexSE2* v1 = vertexXnRaw<0>();
         const VertexSE2* v2 = vertexXnRaw<1>();
-        _measurement = v1->estimate().inverse()*v2->estimate();
-        _inverseMeasurement = _measurement.inverse();
+        measurement_ = v1->estimate().inverse()*v2->estimate();
+        inverseMeasurement_ = measurement_.inverse();
         return true;
       }
 
 
-      virtual number_t initialEstimatePossible(const OptimizableGraph::VertexSet& , OptimizableGraph::Vertex* ) { return 1.;}
-      virtual void initialEstimate(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to);
+      number_t initialEstimatePossible(const OptimizableGraph::VertexSet& , OptimizableGraph::Vertex* ) override { return 1.;}
+      void initialEstimate(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to) override;
 #ifndef NUMERIC_JACOBIAN_TWO_D_TYPES
-      virtual void linearizeOplus();
+      void linearizeOplus() override;
 #endif
     protected:
-      SE2 _inverseMeasurement;
+      SE2 inverseMeasurement_;
   };
 
   class G2O_TYPES_SLAM2D_API EdgeSE2WriteGnuplotAction: public WriteGnuplotAction {
   public:
     EdgeSE2WriteGnuplotAction();
-    virtual bool operator()(HyperGraph::HyperGraphElement* element,
-                            HyperGraphElementAction::Parameters* params_);
+    bool operator()(HyperGraph::HyperGraphElement* element,
+                    HyperGraphElementAction::Parameters* params_) override;
   };
 
 #ifdef G2O_HAVE_OPENGL
   class G2O_TYPES_SLAM2D_API EdgeSE2DrawAction: public DrawAction{
   public:
     EdgeSE2DrawAction();
-    virtual bool operator()(HyperGraph::HyperGraphElement* element,
-                            HyperGraphElementAction::Parameters* params_);
+    bool operator()(HyperGraph::HyperGraphElement* element,
+                    HyperGraphElementAction::Parameters* params_) override;
 
    protected:
-    virtual bool refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_);
-    std::shared_ptr<FloatProperty> _triangleX, _triangleY;
+    bool refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_) override;
+    std::shared_ptr<FloatProperty> triangleX_, triangleY_;
   };
 #endif
 

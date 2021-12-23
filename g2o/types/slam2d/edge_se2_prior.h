@@ -46,13 +46,13 @@ namespace g2o {
       {
         const VertexSE2* v1 = vertexXnRaw<0>();
         SE2 delta = _inverseMeasurement * v1->estimate();
-        _error = delta.toVector();
+        error_ = delta.toVector();
       }
 
       virtual void linearizeOplus() {
-        _jacobianOplusXi.setZero();
-        _jacobianOplusXi.block<2,2>(0,0)=_inverseMeasurement.rotation().toRotationMatrix();
-        _jacobianOplusXi(2,2)=1.;
+        jacobianOplusXi_.setZero();
+        jacobianOplusXi_.block<2,2>(0,0)=_inverseMeasurement.rotation().toRotationMatrix();
+        jacobianOplusXi_(2,2)=1.;
       }
 
       virtual void setMeasurement(const SE2& m);
@@ -60,7 +60,7 @@ namespace g2o {
 
       virtual bool getMeasurementData(number_t* d) const {
         Eigen::Map<Vector3> v(d);
-        v = _measurement.toVector();
+        v = measurement_.toVector();
         return true;
       }
 

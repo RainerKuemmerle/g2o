@@ -85,8 +85,8 @@ struct TrivialPair {
  *   return TrivialPair(i, j);
  * }
  */
-constexpr TrivialPair index_to_pair(const int k, const int j = 0) {
-  return k < j ? TrivialPair{k, j} : index_to_pair(k - j, j + 1);
+constexpr TrivialPair index_to_pair(const int k, const int j = 0) { // NOLINT
+  return k < j ? TrivialPair{k, j} : index_to_pair(k - j, j + 1); // NOLINT
 }
 
 //! helper function to call the c'tor of Eigen::Map
@@ -94,9 +94,9 @@ template <typename T>
 T createHessianMapK() {
   // if the size is known at compile time, we have to call the c'tor of Eigen::Map with
   // corresponding values
-  constexpr int r = T::RowsAtCompileTime == Eigen::Dynamic ? 0 : T::RowsAtCompileTime;
-  constexpr int c = T::ColsAtCompileTime == Eigen::Dynamic ? 0 : T::ColsAtCompileTime;
-  return T(nullptr, r, c);
+  constexpr int kR = T::RowsAtCompileTime == Eigen::Dynamic ? 0 : T::RowsAtCompileTime;
+  constexpr int kC = T::ColsAtCompileTime == Eigen::Dynamic ? 0 : T::ColsAtCompileTime;
+  return T(nullptr, kR, kC);
 }
 //! helper function for creating a tuple of Eigen::Map
 template <typename... Args>
@@ -114,8 +114,8 @@ typename std::enable_if <I < sizeof...(Tp), OptimizableGraph::Vertex*>::type cre
   if (i == I) {
     using VertexType = typename std::tuple_element<I, std::tuple<Tp...>>::type;
     return new VertexType();
-  } else
-    return createNthVertexType<I + 1, Tp...>(i);
+  }
+  return createNthVertexType<I + 1, Tp...>(i);
 }
 // clang-format on
 }  // namespace internal
@@ -131,7 +131,7 @@ class BaseFixedSizedEdge : public BaseEdge<D, E> {
   //! Size of the N-th vertex at compile time
   template <int VertexN>
   static constexpr int VertexDimension() {
-    return VertexXnType<VertexN>::Dimension;
+    return VertexXnType<VertexN>::kDimension;
   };
   /**
    * Get the size of a given Vertex.
@@ -140,11 +140,11 @@ class BaseFixedSizedEdge : public BaseEdge<D, E> {
    */
   // clang-format off
   template <int VertexN>
-  constexpr typename std::enable_if<VertexXnType<VertexN>::Dimension != -1, int>::type vertexDimension() const {
-    return VertexXnType<VertexN>::Dimension;
+  constexpr typename std::enable_if<VertexXnType<VertexN>::kDimension != -1, int>::type vertexDimension() const {
+    return VertexXnType<VertexN>::kDimension;
   };
   template <int VertexN>
-  typename std::enable_if<VertexXnType<VertexN>::Dimension == -1, int>::type vertexDimension() const {
+  typename std::enable_if<VertexXnType<VertexN>::kDimension == -1, int>::type vertexDimension() const {
     return vertexXn<VertexN>()->dimension();
   };
   // clang-format on
@@ -153,17 +153,17 @@ class BaseFixedSizedEdge : public BaseEdge<D, E> {
    */
   template <int VertexN>
   std::shared_ptr<const VertexXnType<VertexN>> vertexXn() const {
-    return std::static_pointer_cast<const VertexXnType<VertexN>>(_vertices[VertexN]);
+    return std::static_pointer_cast<const VertexXnType<VertexN>>(vertices_[VertexN]);
   }
   template <int VertexN>
   std::shared_ptr<VertexXnType<VertexN>> vertexXn() {
-    return std::static_pointer_cast<VertexXnType<VertexN>>(_vertices[VertexN]);
+    return std::static_pointer_cast<VertexXnType<VertexN>>(vertices_[VertexN]);
   }
 
-  static const int Dimension = BaseEdge<D, E>::Dimension;
-  typedef typename BaseEdge<D, E>::Measurement Measurement;
-  typedef typename BaseEdge<D, E>::ErrorVector ErrorVector;
-  typedef typename BaseEdge<D, E>::InformationType InformationType;
+  static const int kDimension = BaseEdge<D, E>::kDimension;
+  using Measurement = typename BaseEdge<D, E>::Measurement;
+  using ErrorVector = typename BaseEdge<D, E>::ErrorVector;
+  using InformationType = typename BaseEdge<D, E>::InformationType;
 
   template <int EdgeDimension, int VertexDimension>
   using JacobianType = typename Eigen::Matrix<number_t, EdgeDimension, VertexDimension,
@@ -180,12 +180,12 @@ class BaseFixedSizedEdge : public BaseEdge<D, E> {
           : Eigen::Unaligned>;
   template <int K>
   using HessianBlockTypeK =
-      HessianBlockType<VertexXnType<internal::index_to_pair(K).first>::Dimension,
-                       VertexXnType<internal::index_to_pair(K).second>::Dimension>;
+      HessianBlockType<VertexXnType<internal::index_to_pair(K).first>::kDimension,
+                       VertexXnType<internal::index_to_pair(K).second>::kDimension>;
   template <int K>
   using HessianBlockTypeKTransposed =
-      HessianBlockType<VertexXnType<internal::index_to_pair(K).second>::Dimension,
-                       VertexXnType<internal::index_to_pair(K).first>::Dimension>;
+      HessianBlockType<VertexXnType<internal::index_to_pair(K).second>::kDimension,
+                       VertexXnType<internal::index_to_pair(K).first>::kDimension>;
   template <typename>
   struct HessianTupleType;
   template <std::size_t... Ints>
@@ -193,36 +193,36 @@ class BaseFixedSizedEdge : public BaseEdge<D, E> {
     using type = std::tuple<HessianBlockTypeK<Ints>...>;
     using typeTransposed = std::tuple<HessianBlockTypeKTransposed<Ints>...>;
   };
-  static const std::size_t _nr_of_vertices = sizeof...(VertexTypes);
-  static const std::size_t _nr_of_vertex_pairs = internal::pair_to_index(0, _nr_of_vertices);
+  static const std::size_t kNrOfVertices = sizeof...(VertexTypes);
+  static const std::size_t kNrOfVertexPairs = internal::pair_to_index(0, kNrOfVertices);
   using HessianTuple =
-      typename HessianTupleType<std::make_index_sequence<_nr_of_vertex_pairs>>::type;
+      typename HessianTupleType<std::make_index_sequence<kNrOfVertexPairs>>::type;
   using HessianTupleTransposed =
-      typename HessianTupleType<std::make_index_sequence<_nr_of_vertex_pairs>>::typeTransposed;
-  using HessianRowMajorStorage = std::array<bool, _nr_of_vertex_pairs>;
+      typename HessianTupleType<std::make_index_sequence<kNrOfVertexPairs>>::typeTransposed;
+  using HessianRowMajorStorage = std::array<bool, kNrOfVertexPairs>;
 
   BaseFixedSizedEdge()
       : BaseEdge<D, E>(),
-         _hessianRowMajor(internal::createBoolArray<_nr_of_vertex_pairs>()),
-        _hessianTuple(internal::createHessianMaps(_hessianTuple)),
-        _hessianTupleTransposed(internal::createHessianMaps(_hessianTupleTransposed)),
-        _jacobianOplus({nullptr, D, VertexTypes::Dimension}...) {
-    _vertices.resize(_nr_of_vertices, nullptr);
+         hessianRowMajor_(internal::createBoolArray<kNrOfVertexPairs>()),
+        hessianTuple_(internal::createHessianMaps(hessianTuple_)),
+        hessianTupleTransposed_(internal::createHessianMaps(hessianTupleTransposed_)),
+        jacobianOplus_({nullptr, D, VertexTypes::kDimension}...) {
+    vertices_.resize(kNrOfVertices, nullptr);
   }
 
   //! create an instance of the Nth VertexType
-  virtual OptimizableGraph::Vertex* createVertex(int i) {
+  OptimizableGraph::Vertex* createVertex(int i) override {
     if (i < 0) return nullptr;
     return internal::createNthVertexType<0, VertexTypes...>(static_cast<size_t>(i));
   };
 
-  virtual void resize(size_t size);
+  void resize(size_t size) override;
 
   template <std::size_t... Ints>
   bool allVerticesFixedNs(std::index_sequence<Ints...>) const;
-  virtual bool allVerticesFixed() const;
+  bool allVerticesFixed() const override;
 
-  virtual void linearizeOplus(JacobianWorkspace& jacobianWorkspace);
+  void linearizeOplus(JacobianWorkspace& jacobianWorkspace) override;
   template <std::size_t... Ints>
   void linearizeOplus_allocate(JacobianWorkspace& jacobianWorkspace, std::index_sequence<Ints...>);
 
@@ -239,21 +239,21 @@ class BaseFixedSizedEdge : public BaseEdge<D, E> {
   //! returns the result of the linearization in the manifold space for the nodes xn
   template <int N>
   const typename std::tuple_element<N,
-                                    std::tuple<JacobianType<D, VertexTypes::Dimension>...>>::type&
+                                    std::tuple<JacobianType<D, VertexTypes::kDimension>...>>::type&
   jacobianOplusXn() const {
-    return std::get<N>(_jacobianOplus);
+    return std::get<N>(jacobianOplus_);
   }
   //! returns the result of the linearization in the manifold space for the nodes xn
   template <int N>
-  typename std::tuple_element<N, std::tuple<JacobianType<D, VertexTypes::Dimension>...>>::type&
+  typename std::tuple_element<N, std::tuple<JacobianType<D, VertexTypes::kDimension>...>>::type&
   jacobianOplusXn() {
-    return std::get<N>(_jacobianOplus);
+    return std::get<N>(jacobianOplus_);
   }
 
   /**
    * computes the (block) elements of the Hessian matrix of the linearized least squares.
    */
-  virtual void constructQuadraticForm();
+  void constructQuadraticForm() override;
   template <std::size_t... Ints>
   void constructQuadraticFormNs(const InformationType& omega, const ErrorVector& weightedError,
                                 std::index_sequence<Ints...>);
@@ -268,22 +268,22 @@ class BaseFixedSizedEdge : public BaseEdge<D, E> {
   template <int N, int M, typename AtOType>
   void constructOffDiagonalQuadraticFormM(const AtOType& AtO);
 
-  virtual void mapHessianMemory(number_t* d, int i, int j, bool rowMajor);
+  void mapHessianMemory(number_t* d, int i, int j, bool rowMajor) override;
 
   using BaseEdge<D, E>::resize;
   using BaseEdge<D, E>::computeError;
 
  protected:
-  using BaseEdge<D, E>::_measurement;
-  using BaseEdge<D, E>::_information;
-  using BaseEdge<D, E>::_error;
-  using BaseEdge<D, E>::_vertices;
-  using BaseEdge<D, E>::_dimension;
+  using BaseEdge<D, E>::measurement_;
+  using BaseEdge<D, E>::information_;
+  using BaseEdge<D, E>::error_;
+  using BaseEdge<D, E>::vertices_;
+  using BaseEdge<D, E>::dimension_;
 
-  HessianRowMajorStorage _hessianRowMajor;
-  HessianTuple _hessianTuple;
-  HessianTupleTransposed _hessianTupleTransposed;
-  std::tuple<JacobianType<D, VertexTypes::Dimension>...> _jacobianOplus;
+  HessianRowMajorStorage hessianRowMajor_;
+  HessianTuple hessianTuple_;
+  HessianTupleTransposed hessianTupleTransposed_;
+  std::tuple<JacobianType<D, VertexTypes::kDimension>...> jacobianOplus_;
 
   /**
    * Only for use internally in sub-classes. It exposes the raw pointer for implementation of, for
@@ -291,7 +291,7 @@ class BaseFixedSizedEdge : public BaseEdge<D, E> {
    */
   template <int VertexN>
   VertexXnType<VertexN>* vertexXnRaw() const {
-    return static_cast<VertexXnType<VertexN>*>(_vertices[VertexN].get());
+    return static_cast<VertexXnType<VertexN>*>(vertices_[VertexN].get());
   }
 
  public:
