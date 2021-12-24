@@ -29,10 +29,8 @@
 namespace g2o {
 
 // point to camera projection, stereo
-EdgeProjectP2SC::EdgeProjectP2SC() : BaseBinaryEdge<3, Vector3, VertexPointXYZ, VertexCam>() {}
-
 bool EdgeProjectP2SC::read(std::istream &is) {
-  internal::readVector(is, _measurement);
+  internal::readVector(is, measurement_);
   return readInformationMatrix(is);
 }
 
@@ -75,11 +73,11 @@ void EdgeProjectP2SC::computeError() {
   // std::cout << "PROJ  " << p1.transpose() << std::endl;
   // std::cout << "PROJ  " << p2.transpose() << std::endl;
   // std::cout << "CPROJ " << kp.transpose() << std::endl;
-  // std::cout << "MEAS  " << _measurement.transpose() << std::endl;
+  // std::cout << "MEAS  " << measurement_.transpose() << std::endl;
 
   // error, which is backwards from the normal observed - calculated
-  // _measurement is the measured projection
-  _error = kp - _measurement;
+  // measurement_ is the measured projection
+  error_ = kp - measurement_;
 }
 
 void EdgeProjectP2SC::linearizeOplus() {
@@ -87,7 +85,8 @@ void EdgeProjectP2SC::linearizeOplus() {
   const SBACam &cam = vc->estimate();
 
   VertexPointXYZ *vp = vertexXnRaw<0>();
-  Vector4 pt, trans;
+  Vector4 pt;
+  Vector4 trans;
   pt.head<3>() = vp->estimate();
   pt(3) = 1.0;
   trans.head<3>() = cam.translation();
@@ -116,48 +115,48 @@ void EdgeProjectP2SC::linearizeOplus() {
 
   // dx
   Vector3 dp = cam.dRdx * pwt;  // dR'/dq * [pw - t]
-  _jacobianOplusXj(0, 3) = (pz * dp(0) - px * dp(2)) * ipz2fx;
-  _jacobianOplusXj(1, 3) = (pz * dp(1) - py * dp(2)) * ipz2fy;
-  _jacobianOplusXj(2, 3) = (pz * dp(0) - (px - b) * dp(2)) * ipz2fx;  // right image px
+  jacobianOplusXj_(0, 3) = (pz * dp(0) - px * dp(2)) * ipz2fx;
+  jacobianOplusXj_(1, 3) = (pz * dp(1) - py * dp(2)) * ipz2fy;
+  jacobianOplusXj_(2, 3) = (pz * dp(0) - (px - b) * dp(2)) * ipz2fx;  // right image px
   // dy
   dp = cam.dRdy * pwt;  // dR'/dq * [pw - t]
-  _jacobianOplusXj(0, 4) = (pz * dp(0) - px * dp(2)) * ipz2fx;
-  _jacobianOplusXj(1, 4) = (pz * dp(1) - py * dp(2)) * ipz2fy;
-  _jacobianOplusXj(2, 4) = (pz * dp(0) - (px - b) * dp(2)) * ipz2fx;  // right image px
+  jacobianOplusXj_(0, 4) = (pz * dp(0) - px * dp(2)) * ipz2fx;
+  jacobianOplusXj_(1, 4) = (pz * dp(1) - py * dp(2)) * ipz2fy;
+  jacobianOplusXj_(2, 4) = (pz * dp(0) - (px - b) * dp(2)) * ipz2fx;  // right image px
   // dz
   dp = cam.dRdz * pwt;  // dR'/dq * [pw - t]
-  _jacobianOplusXj(0, 5) = (pz * dp(0) - px * dp(2)) * ipz2fx;
-  _jacobianOplusXj(1, 5) = (pz * dp(1) - py * dp(2)) * ipz2fy;
-  _jacobianOplusXj(2, 5) = (pz * dp(0) - (px - b) * dp(2)) * ipz2fx;  // right image px
+  jacobianOplusXj_(0, 5) = (pz * dp(0) - px * dp(2)) * ipz2fx;
+  jacobianOplusXj_(1, 5) = (pz * dp(1) - py * dp(2)) * ipz2fy;
+  jacobianOplusXj_(2, 5) = (pz * dp(0) - (px - b) * dp(2)) * ipz2fx;  // right image px
 
   // set d(t) values [ pz*dpx/dx - px*dpz/dx ] / pz^2
   dp = -cam.w2n.col(0);  // dpc / dx
-  _jacobianOplusXj(0, 0) = (pz * dp(0) - px * dp(2)) * ipz2fx;
-  _jacobianOplusXj(1, 0) = (pz * dp(1) - py * dp(2)) * ipz2fy;
-  _jacobianOplusXj(2, 0) = (pz * dp(0) - (px - b) * dp(2)) * ipz2fx;  // right image px
+  jacobianOplusXj_(0, 0) = (pz * dp(0) - px * dp(2)) * ipz2fx;
+  jacobianOplusXj_(1, 0) = (pz * dp(1) - py * dp(2)) * ipz2fy;
+  jacobianOplusXj_(2, 0) = (pz * dp(0) - (px - b) * dp(2)) * ipz2fx;  // right image px
   dp = -cam.w2n.col(1);                                               // dpc / dy
-  _jacobianOplusXj(0, 1) = (pz * dp(0) - px * dp(2)) * ipz2fx;
-  _jacobianOplusXj(1, 1) = (pz * dp(1) - py * dp(2)) * ipz2fy;
-  _jacobianOplusXj(2, 1) = (pz * dp(0) - (px - b) * dp(2)) * ipz2fx;  // right image px
+  jacobianOplusXj_(0, 1) = (pz * dp(0) - px * dp(2)) * ipz2fx;
+  jacobianOplusXj_(1, 1) = (pz * dp(1) - py * dp(2)) * ipz2fy;
+  jacobianOplusXj_(2, 1) = (pz * dp(0) - (px - b) * dp(2)) * ipz2fx;  // right image px
   dp = -cam.w2n.col(2);                                               // dpc / dz
-  _jacobianOplusXj(0, 2) = (pz * dp(0) - px * dp(2)) * ipz2fx;
-  _jacobianOplusXj(1, 2) = (pz * dp(1) - py * dp(2)) * ipz2fy;
-  _jacobianOplusXj(2, 2) = (pz * dp(0) - (px - b) * dp(2)) * ipz2fx;  // right image px
+  jacobianOplusXj_(0, 2) = (pz * dp(0) - px * dp(2)) * ipz2fx;
+  jacobianOplusXj_(1, 2) = (pz * dp(1) - py * dp(2)) * ipz2fy;
+  jacobianOplusXj_(2, 2) = (pz * dp(0) - (px - b) * dp(2)) * ipz2fx;  // right image px
 
   // Jacobians wrt point parameters
   // set d(t) values [ pz*dpx/dx - px*dpz/dx ] / pz^2
   dp = cam.w2n.col(0);  // dpc / dx
-  _jacobianOplusXi(0, 0) = (pz * dp(0) - px * dp(2)) * ipz2fx;
-  _jacobianOplusXi(1, 0) = (pz * dp(1) - py * dp(2)) * ipz2fy;
-  _jacobianOplusXi(2, 0) = (pz * dp(0) - (px - b) * dp(2)) * ipz2fx;  // right image px
+  jacobianOplusXi_(0, 0) = (pz * dp(0) - px * dp(2)) * ipz2fx;
+  jacobianOplusXi_(1, 0) = (pz * dp(1) - py * dp(2)) * ipz2fy;
+  jacobianOplusXi_(2, 0) = (pz * dp(0) - (px - b) * dp(2)) * ipz2fx;  // right image px
   dp = cam.w2n.col(1);                                                // dpc / dy
-  _jacobianOplusXi(0, 1) = (pz * dp(0) - px * dp(2)) * ipz2fx;
-  _jacobianOplusXi(1, 1) = (pz * dp(1) - py * dp(2)) * ipz2fy;
-  _jacobianOplusXi(2, 1) = (pz * dp(0) - (px - b) * dp(2)) * ipz2fx;  // right image px
+  jacobianOplusXi_(0, 1) = (pz * dp(0) - px * dp(2)) * ipz2fx;
+  jacobianOplusXi_(1, 1) = (pz * dp(1) - py * dp(2)) * ipz2fy;
+  jacobianOplusXi_(2, 1) = (pz * dp(0) - (px - b) * dp(2)) * ipz2fx;  // right image px
   dp = cam.w2n.col(2);                                                // dpc / dz
-  _jacobianOplusXi(0, 2) = (pz * dp(0) - px * dp(2)) * ipz2fx;
-  _jacobianOplusXi(1, 2) = (pz * dp(1) - py * dp(2)) * ipz2fy;
-  _jacobianOplusXi(2, 2) = (pz * dp(0) - (px - b) * dp(2)) * ipz2fx;  // right image px
+  jacobianOplusXi_(0, 2) = (pz * dp(0) - px * dp(2)) * ipz2fx;
+  jacobianOplusXi_(1, 2) = (pz * dp(1) - py * dp(2)) * ipz2fy;
+  jacobianOplusXi_(2, 2) = (pz * dp(0) - (px - b) * dp(2)) * ipz2fx;  // right image px
 }
 
 }  // namespace g2o

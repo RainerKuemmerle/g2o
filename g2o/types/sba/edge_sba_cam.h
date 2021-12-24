@@ -39,30 +39,29 @@ namespace g2o {
 class G2O_TYPES_SBA_API EdgeSBACam : public BaseBinaryEdge<6, SE3Quat, VertexCam, VertexCam> {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
-  EdgeSBACam();
-  virtual bool read(std::istream& is);
-  virtual bool write(std::ostream& os) const;
-  void computeError();
+  bool read(std::istream& is) override;
+  bool write(std::ostream& os) const override;
+  void computeError() override;
 
-  virtual void setMeasurement(const SE3Quat& meas);
+  void setMeasurement(const SE3Quat& meas) override;
 
-  virtual number_t initialEstimatePossible(const OptimizableGraph::VertexSet&,
-                                           OptimizableGraph::Vertex*) {
+  number_t initialEstimatePossible(const OptimizableGraph::VertexSet&,
+                                           OptimizableGraph::Vertex*) override {
     return cst(1.);
   }
-  virtual void initialEstimate(const OptimizableGraph::VertexSet& from,
-                               OptimizableGraph::Vertex* to);
+  void initialEstimate(const OptimizableGraph::VertexSet& from,
+                               OptimizableGraph::Vertex* to) override;
 
-  virtual bool setMeasurementData(const number_t* d);
+  bool setMeasurementData(const number_t* d) override;
 
-  virtual bool getMeasurementData(number_t* d) const;
+  bool getMeasurementData(number_t* d) const override;
 
-  virtual int measurementDimension() const { return 7; }
+  int measurementDimension() const override { return 7; }
 
-  virtual bool setMeasurementFromState();
+  bool setMeasurementFromState() override;
 
  protected:
-  SE3Quat _inverseMeasurement;
+  SE3Quat inverseMeasurement_;
 };
 
 }  // namespace g2o

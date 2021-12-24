@@ -40,7 +40,7 @@ SBACam::SBACam() {
 }
 
 // set the object pose
-SBACam::SBACam(const Quaternion& r_, const Vector3& t_) : SE3Quat(r_, t_) {
+SBACam::SBACam(const Quaternion& r, const Vector3& t) : SE3Quat(r, t) {
   Kcam.setZero();
   setTransform();
   setProjection();
@@ -58,13 +58,13 @@ SBACam::SBACam(const SE3Quat& p) : SE3Quat(p) {
 // defined in se3quat
 void SBACam::update(const Vector6& update) {
   // position update
-  _t += update.head(3);
+  t_ += update.head(3);
   // small quaternion update
   Quaternion qr;
   qr.vec() = update.segment<3>(3);
   qr.w() = sqrt(cst(1.0) - qr.vec().squaredNorm());  // should always be positive
-  _r *= qr;                                          // post-multiply
-  _r.normalize();
+  r_ *= qr;                                          // post-multiply
+  r_.normalize();
   setTransform();
   setProjection();
   setDr();
@@ -105,7 +105,9 @@ void SBACam::setKcam(number_t fx, number_t fy, number_t cx, number_t cy, number_
 void SBACam::setDr() {
   // inefficient, just for testing
   // use simple multiplications and additions for production code in calculating dRdx,y,z
-  Matrix3 dRidx, dRidy, dRidz;
+  Matrix3 dRidx;
+  Matrix3 dRidy;
+  Matrix3 dRidz;
   dRidx << cst(0.0), cst(0.0), cst(0.0), cst(0.0), cst(0.0), cst(2.0), cst(0.0), cst(-2.0),
       cst(0.0);
   dRidy << cst(0.0), cst(0.0), cst(-2.0), cst(0.0), cst(0.0), cst(0.0), cst(2.0), cst(0.0),

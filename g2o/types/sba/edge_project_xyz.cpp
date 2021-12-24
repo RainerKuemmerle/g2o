@@ -28,11 +28,8 @@
 
 namespace g2o {
 
-EdgeSE3ProjectXYZ::EdgeSE3ProjectXYZ()
-    : BaseBinaryEdge<2, Vector2, VertexPointXYZ, VertexSE3Expmap>() {}
-
 bool EdgeSE3ProjectXYZ::read(std::istream &is) {
-  internal::readVector(is, _measurement);
+  internal::readVector(is, measurement_);
   return readInformationMatrix(is);
 }
 
@@ -44,8 +41,8 @@ bool EdgeSE3ProjectXYZ::write(std::ostream &os) const {
 void EdgeSE3ProjectXYZ::computeError() {
   const VertexSE3Expmap *v1 = vertexXnRaw<1>();
   const VertexPointXYZ *v2 = vertexXnRaw<0>();
-  Vector2 obs(_measurement);
-  _error = obs - cam_project(v1->estimate().map(v2->estimate()));
+  Vector2 obs(measurement_);
+  error_ = obs - cam_project(v1->estimate().map(v2->estimate()));
 }
 
 bool EdgeSE3ProjectXYZ::isDepthPositive() {
@@ -75,21 +72,21 @@ void EdgeSE3ProjectXYZ::linearizeOplus() {
   tmp(1, 1) = fy;
   tmp(1, 2) = -y / z * fy;
 
-  _jacobianOplusXi = -1. / z * tmp * T.rotation().toRotationMatrix();
+  jacobianOplusXi_ = -1. / z * tmp * T.rotation().toRotationMatrix();
 
-  _jacobianOplusXj(0, 0) = x * y / z_2 * fx;
-  _jacobianOplusXj(0, 1) = -(1 + (x * x / z_2)) * fx;
-  _jacobianOplusXj(0, 2) = y / z * fx;
-  _jacobianOplusXj(0, 3) = -1. / z * fx;
-  _jacobianOplusXj(0, 4) = 0;
-  _jacobianOplusXj(0, 5) = x / z_2 * fx;
+  jacobianOplusXj_(0, 0) = x * y / z_2 * fx;
+  jacobianOplusXj_(0, 1) = -(1 + (x * x / z_2)) * fx;
+  jacobianOplusXj_(0, 2) = y / z * fx;
+  jacobianOplusXj_(0, 3) = -1. / z * fx;
+  jacobianOplusXj_(0, 4) = 0;
+  jacobianOplusXj_(0, 5) = x / z_2 * fx;
 
-  _jacobianOplusXj(1, 0) = (1 + y * y / z_2) * fy;
-  _jacobianOplusXj(1, 1) = -x * y / z_2 * fy;
-  _jacobianOplusXj(1, 2) = -x / z * fy;
-  _jacobianOplusXj(1, 3) = 0;
-  _jacobianOplusXj(1, 4) = -1. / z * fy;
-  _jacobianOplusXj(1, 5) = y / z_2 * fy;
+  jacobianOplusXj_(1, 0) = (1 + y * y / z_2) * fy;
+  jacobianOplusXj_(1, 1) = -x * y / z_2 * fy;
+  jacobianOplusXj_(1, 2) = -x / z * fy;
+  jacobianOplusXj_(1, 3) = 0;
+  jacobianOplusXj_(1, 4) = -1. / z * fy;
+  jacobianOplusXj_(1, 5) = y / z_2 * fy;
 }
 
 Vector2 EdgeSE3ProjectXYZ::cam_project(const Vector3 &trans_xyz) const {

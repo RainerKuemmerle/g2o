@@ -30,8 +30,6 @@
 
 namespace g2o {
 
-VertexSE3Expmap::VertexSE3Expmap() : BaseVertex<6, SE3Quat>() {}
-
 bool VertexSE3Expmap::read(std::istream& is) {
   Vector7 est;
   internal::readVector(is, est);
@@ -43,7 +41,7 @@ bool VertexSE3Expmap::write(std::ostream& os) const {
   return internal::writeVector(os, estimate().inverse().toVector());
 }
 
-void VertexSE3Expmap::setToOriginImpl() { _estimate = SE3Quat(); }
+void VertexSE3Expmap::setToOriginImpl() { estimate_ = SE3Quat(); }
 
 void VertexSE3Expmap::oplusImpl(const number_t* update_) {
   Eigen::Map<const Vector6> update(update_);

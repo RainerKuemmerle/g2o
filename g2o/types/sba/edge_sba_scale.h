@@ -39,17 +39,16 @@ namespace g2o {
 class G2O_TYPES_SBA_API EdgeSBAScale : public BaseBinaryEdge<1, number_t, VertexCam, VertexCam> {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-  EdgeSBAScale();
-  virtual bool read(std::istream& is);
-  virtual bool write(std::ostream& os) const;
-  void computeError();
-  virtual void setMeasurement(const number_t& m) { _measurement = m; }
-  virtual number_t initialEstimatePossible(const OptimizableGraph::VertexSet&,
-                                           OptimizableGraph::Vertex*) {
+  bool read(std::istream& is) override;
+  bool write(std::ostream& os) const override;
+  void computeError() override;
+  void setMeasurement(const number_t& m) override { measurement_ = m; }
+  number_t initialEstimatePossible(const OptimizableGraph::VertexSet&,
+                                           OptimizableGraph::Vertex*) override {
     return cst(1.);
   }
-  virtual void initialEstimate(const OptimizableGraph::VertexSet& from_,
-                               OptimizableGraph::Vertex* to_);
+  void initialEstimate(const OptimizableGraph::VertexSet& from_,
+                               OptimizableGraph::Vertex* to_) override;
 };
 
 }  // namespace g2o

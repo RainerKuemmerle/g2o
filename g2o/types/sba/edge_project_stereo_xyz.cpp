@@ -28,11 +28,8 @@
 
 namespace g2o {
 
-EdgeStereoSE3ProjectXYZ::EdgeStereoSE3ProjectXYZ()
-    : BaseBinaryEdge<3, Vector3, VertexPointXYZ, VertexSE3Expmap>() {}
-
 Vector3 EdgeStereoSE3ProjectXYZ::cam_project(const Vector3 &trans_xyz, const float &bf) const {
-  const number_t invz = 1.0f / trans_xyz[2];
+  const number_t invz = 1.0F / trans_xyz[2];
   Vector3 res;
   res[0] = trans_xyz[0] * invz * fx + cx;
   res[1] = trans_xyz[1] * invz * fy + cy;
@@ -41,7 +38,7 @@ Vector3 EdgeStereoSE3ProjectXYZ::cam_project(const Vector3 &trans_xyz, const flo
 }
 
 bool EdgeStereoSE3ProjectXYZ::read(std::istream &is) {
-  internal::readVector(is, _measurement);
+  internal::readVector(is, measurement_);
   return readInformationMatrix(is);
 }
 
@@ -64,38 +61,38 @@ void EdgeStereoSE3ProjectXYZ::linearizeOplus() {
   number_t z = xyz_trans[2];
   number_t z_2 = z * z;
 
-  _jacobianOplusXi(0, 0) = -fx * R(0, 0) / z + fx * x * R(2, 0) / z_2;
-  _jacobianOplusXi(0, 1) = -fx * R(0, 1) / z + fx * x * R(2, 1) / z_2;
-  _jacobianOplusXi(0, 2) = -fx * R(0, 2) / z + fx * x * R(2, 2) / z_2;
+  jacobianOplusXi_(0, 0) = -fx * R(0, 0) / z + fx * x * R(2, 0) / z_2;
+  jacobianOplusXi_(0, 1) = -fx * R(0, 1) / z + fx * x * R(2, 1) / z_2;
+  jacobianOplusXi_(0, 2) = -fx * R(0, 2) / z + fx * x * R(2, 2) / z_2;
 
-  _jacobianOplusXi(1, 0) = -fy * R(1, 0) / z + fy * y * R(2, 0) / z_2;
-  _jacobianOplusXi(1, 1) = -fy * R(1, 1) / z + fy * y * R(2, 1) / z_2;
-  _jacobianOplusXi(1, 2) = -fy * R(1, 2) / z + fy * y * R(2, 2) / z_2;
+  jacobianOplusXi_(1, 0) = -fy * R(1, 0) / z + fy * y * R(2, 0) / z_2;
+  jacobianOplusXi_(1, 1) = -fy * R(1, 1) / z + fy * y * R(2, 1) / z_2;
+  jacobianOplusXi_(1, 2) = -fy * R(1, 2) / z + fy * y * R(2, 2) / z_2;
 
-  _jacobianOplusXi(2, 0) = _jacobianOplusXi(0, 0) - bf * R(2, 0) / z_2;
-  _jacobianOplusXi(2, 1) = _jacobianOplusXi(0, 1) - bf * R(2, 1) / z_2;
-  _jacobianOplusXi(2, 2) = _jacobianOplusXi(0, 2) - bf * R(2, 2) / z_2;
+  jacobianOplusXi_(2, 0) = jacobianOplusXi_(0, 0) - bf * R(2, 0) / z_2;
+  jacobianOplusXi_(2, 1) = jacobianOplusXi_(0, 1) - bf * R(2, 1) / z_2;
+  jacobianOplusXi_(2, 2) = jacobianOplusXi_(0, 2) - bf * R(2, 2) / z_2;
 
-  _jacobianOplusXj(0, 0) = x * y / z_2 * fx;
-  _jacobianOplusXj(0, 1) = -(1 + (x * x / z_2)) * fx;
-  _jacobianOplusXj(0, 2) = y / z * fx;
-  _jacobianOplusXj(0, 3) = -1. / z * fx;
-  _jacobianOplusXj(0, 4) = 0;
-  _jacobianOplusXj(0, 5) = x / z_2 * fx;
+  jacobianOplusXj_(0, 0) = x * y / z_2 * fx;
+  jacobianOplusXj_(0, 1) = -(1 + (x * x / z_2)) * fx;
+  jacobianOplusXj_(0, 2) = y / z * fx;
+  jacobianOplusXj_(0, 3) = -1. / z * fx;
+  jacobianOplusXj_(0, 4) = 0;
+  jacobianOplusXj_(0, 5) = x / z_2 * fx;
 
-  _jacobianOplusXj(1, 0) = (1 + y * y / z_2) * fy;
-  _jacobianOplusXj(1, 1) = -x * y / z_2 * fy;
-  _jacobianOplusXj(1, 2) = -x / z * fy;
-  _jacobianOplusXj(1, 3) = 0;
-  _jacobianOplusXj(1, 4) = -1. / z * fy;
-  _jacobianOplusXj(1, 5) = y / z_2 * fy;
+  jacobianOplusXj_(1, 0) = (1 + y * y / z_2) * fy;
+  jacobianOplusXj_(1, 1) = -x * y / z_2 * fy;
+  jacobianOplusXj_(1, 2) = -x / z * fy;
+  jacobianOplusXj_(1, 3) = 0;
+  jacobianOplusXj_(1, 4) = -1. / z * fy;
+  jacobianOplusXj_(1, 5) = y / z_2 * fy;
 
-  _jacobianOplusXj(2, 0) = _jacobianOplusXj(0, 0) - bf * y / z_2;
-  _jacobianOplusXj(2, 1) = _jacobianOplusXj(0, 1) + bf * x / z_2;
-  _jacobianOplusXj(2, 2) = _jacobianOplusXj(0, 2);
-  _jacobianOplusXj(2, 3) = _jacobianOplusXj(0, 3);
-  _jacobianOplusXj(2, 4) = 0;
-  _jacobianOplusXj(2, 5) = _jacobianOplusXj(0, 5) - bf / z_2;
+  jacobianOplusXj_(2, 0) = jacobianOplusXj_(0, 0) - bf * y / z_2;
+  jacobianOplusXj_(2, 1) = jacobianOplusXj_(0, 1) + bf * x / z_2;
+  jacobianOplusXj_(2, 2) = jacobianOplusXj_(0, 2);
+  jacobianOplusXj_(2, 3) = jacobianOplusXj_(0, 3);
+  jacobianOplusXj_(2, 4) = 0;
+  jacobianOplusXj_(2, 5) = jacobianOplusXj_(0, 5) - bf / z_2;
 }
 
 }  // namespace g2o

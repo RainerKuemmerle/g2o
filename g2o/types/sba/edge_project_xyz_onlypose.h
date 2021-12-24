@@ -34,19 +34,19 @@
 namespace g2o {
 
 // Edge to optimize only the camera pose
-// TODO why does this exist? Fix point in optimization instead?
+// TODO(goki): why does this exist? Fix point in optimization instead?
 class G2O_TYPES_SBA_API EdgeSE3ProjectXYZOnlyPose
     : public BaseUnaryEdge<2, Vector2, VertexSE3Expmap> {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
-  bool read(std::istream &is);
-  bool write(std::ostream &os) const;
-  void computeError();
+  bool read(std::istream &is) override;
+  bool write(std::ostream &os) const override;
+  void computeError() override;
   bool isDepthPositive();
-  virtual void linearizeOplus();
+  void linearizeOplus() override;
 
- public:
+ 
   Vector2 cam_project(const Vector3 &trans_xyz) const;
 
   Vector3 Xw;

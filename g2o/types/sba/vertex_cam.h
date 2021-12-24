@@ -43,61 +43,59 @@ namespace g2o {
 {
   public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
-    VertexCam();
 
-    virtual bool read(std::istream& is);
-    virtual bool write(std::ostream& os) const;
+    bool read(std::istream& is) override;
+    bool write(std::ostream& os) const override;
 
-    virtual void setToOriginImpl() {
-      _estimate = SBACam();
+    void setToOriginImpl() override {
+      estimate_ = SBACam();
     }
 
     virtual void setEstimate(const SBACam& cam){
       BaseVertex<6, SBACam>::setEstimate(cam);
-      _estimate.setTransform();
-      _estimate.setProjection();
-      _estimate.setDr();
+      estimate_.setTransform();
+      estimate_.setProjection();
+      estimate_.setDr();
     }
 
-    virtual void oplusImpl(const number_t* update)
+    void oplusImpl(const number_t* update) override
     {
       Eigen::Map<const Vector6> v(update);
-      _estimate.update(v);
-      _estimate.setTransform();
-      _estimate.setProjection();
-      _estimate.setDr();
+      estimate_.update(v);
+      estimate_.setTransform();
+      estimate_.setProjection();
+      estimate_.setDr();
     }
 
-
-    virtual bool setEstimateDataImpl(const number_t* est){
+    bool setEstimateDataImpl(const number_t* est) override{
       Eigen::Map <const Vector7> v(est);
-      _estimate.fromVector(v);
+      estimate_.fromVector(v);
       return true;
     }
 
-    virtual bool getEstimateData(number_t* est) const{
+    bool getEstimateData(number_t* est) const override{
       Eigen::Map <Vector7> v(est);
       v = estimate().toVector();
       return true;
     }
 
-    virtual int estimateDimension() const {
+    int estimateDimension() const override {
       return 7;
     }
 
-    virtual bool setMinimalEstimateDataImpl(const number_t* est){
+    bool setMinimalEstimateDataImpl(const number_t* est) override{
       Eigen::Map<const Vector6> v(est);
-      _estimate.fromMinimalVector(v);
+      estimate_.fromMinimalVector(v);
       return true;
     }
 
-    virtual bool getMinimalEstimateData(number_t* est) const{
+    bool getMinimalEstimateData(number_t* est) const override{
       Eigen::Map<Vector6> v(est);
-      v = _estimate.toMinimalVector();
+      v = estimate_.toMinimalVector();
       return true;
     }
 
-    virtual int minimalEstimateDimension() const {
+    int minimalEstimateDimension() const override {
       return 6;
     }
  };

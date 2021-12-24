@@ -29,14 +29,14 @@
 namespace g2o {
 
 EdgeProjectXYZ2UV::EdgeProjectXYZ2UV()
-    : BaseBinaryEdge<2, Vector2, VertexPointXYZ, VertexSE3Expmap>() {
+     {
   resizeParameters(1);
   installParameter<CameraParameters>(0);
 }
 
 bool EdgeProjectXYZ2UV::read(std::istream& is) {
   readParamIds(is);
-  internal::readVector(is, _measurement);
+  internal::readVector(is, measurement_);
   return readInformationMatrix(is);
 }
 
@@ -50,7 +50,7 @@ void EdgeProjectXYZ2UV::computeError() {
   const VertexSE3Expmap* v1 = vertexXnRaw<1>();
   const VertexPointXYZ* v2 = vertexXnRaw<0>();
   auto cam = std::static_pointer_cast<CameraParameters>(parameter(0));
-  _error = measurement() - cam->cam_map(v1->estimate().map(v2->estimate()));
+  error_ = measurement() - cam->cam_map(v1->estimate().map(v2->estimate()));
 }
 
 void EdgeProjectXYZ2UV::linearizeOplus() {
@@ -76,21 +76,21 @@ void EdgeProjectXYZ2UV::linearizeOplus() {
   tmp(1, 1) = cam->focal_length;
   tmp(1, 2) = -y / z * cam->focal_length;
 
-  _jacobianOplusXi = -1. / z * tmp * T.rotation().toRotationMatrix();
+  jacobianOplusXi_ = -1. / z * tmp * T.rotation().toRotationMatrix();
 
-  _jacobianOplusXj(0, 0) = x * y / z_2 * cam->focal_length;
-  _jacobianOplusXj(0, 1) = -(1 + (x * x / z_2)) * cam->focal_length;
-  _jacobianOplusXj(0, 2) = y / z * cam->focal_length;
-  _jacobianOplusXj(0, 3) = -1. / z * cam->focal_length;
-  _jacobianOplusXj(0, 4) = 0;
-  _jacobianOplusXj(0, 5) = x / z_2 * cam->focal_length;
+  jacobianOplusXj_(0, 0) = x * y / z_2 * cam->focal_length;
+  jacobianOplusXj_(0, 1) = -(1 + (x * x / z_2)) * cam->focal_length;
+  jacobianOplusXj_(0, 2) = y / z * cam->focal_length;
+  jacobianOplusXj_(0, 3) = -1. / z * cam->focal_length;
+  jacobianOplusXj_(0, 4) = 0;
+  jacobianOplusXj_(0, 5) = x / z_2 * cam->focal_length;
 
-  _jacobianOplusXj(1, 0) = (1 + y * y / z_2) * cam->focal_length;
-  _jacobianOplusXj(1, 1) = -x * y / z_2 * cam->focal_length;
-  _jacobianOplusXj(1, 2) = -x / z * cam->focal_length;
-  _jacobianOplusXj(1, 3) = 0;
-  _jacobianOplusXj(1, 4) = -1. / z * cam->focal_length;
-  _jacobianOplusXj(1, 5) = y / z_2 * cam->focal_length;
+  jacobianOplusXj_(1, 0) = (1 + y * y / z_2) * cam->focal_length;
+  jacobianOplusXj_(1, 1) = -x * y / z_2 * cam->focal_length;
+  jacobianOplusXj_(1, 2) = -x / z * cam->focal_length;
+  jacobianOplusXj_(1, 3) = 0;
+  jacobianOplusXj_(1, 4) = -1. / z * cam->focal_length;
+  jacobianOplusXj_(1, 5) = y / z_2 * cam->focal_length;
 }
 
 }  // namespace g2o

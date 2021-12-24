@@ -44,13 +44,13 @@ class G2O_TYPES_SBA_API EdgeProjectPSI2UV
 
   EdgeProjectPSI2UV();
 
-  virtual bool read(std::istream& is);
-  virtual bool write(std::ostream& os) const;
-  void computeError();
-  virtual void linearizeOplus();
+  bool read(std::istream& is) override;
+  bool write(std::ostream& os) const override;
+  void computeError() override;
+  void linearizeOplus() override;
 
  protected:
-  std::shared_ptr<CameraParameters> _cam;
+  std::shared_ptr<CameraParameters> cam_;
 };
 
 }  // namespace g2o

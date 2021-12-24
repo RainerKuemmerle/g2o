@@ -47,12 +47,12 @@ class G2O_TYPES_SBA_API EdgeProjectXYZ2UVU
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
 
   EdgeProjectXYZ2UVU();
-  bool read(std::istream& is);
-  bool write(std::ostream& os) const;
-  void computeError();
+  bool read(std::istream& is) override;
+  bool write(std::ostream& os) const override;
+  void computeError() override;
   //  virtual void linearizeOplus();
  protected:
-  std::shared_ptr<CameraParameters> _cam;
+  std::shared_ptr<CameraParameters> cam_;
 };
 
 }  // namespace g2o

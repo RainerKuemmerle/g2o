@@ -43,7 +43,7 @@ bool EdgeProjectPSI2UV::write(std::ostream &os) const {
 
 bool EdgeProjectPSI2UV::read(std::istream &is) {
   readParamIds(is);
-  internal::readVector(is, _measurement);
+  internal::readVector(is, measurement_);
   return readInformationMatrix(is);
 }
 
@@ -53,8 +53,8 @@ void EdgeProjectPSI2UV::computeError() {
   const VertexSE3Expmap *T_anchor_from_world = vertexXnRaw<2>();
   const CameraParameters *cam = static_cast<const CameraParameters *>(parameter(0).get());
 
-  Vector2 obs(_measurement);
-  _error =
+  Vector2 obs(measurement_);
+  error_ =
       obs - cam->cam_map(T_p_from_world->estimate() * T_anchor_from_world->estimate().inverse() *
                          internal::invert_depth(psi->estimate()));
 }
@@ -73,9 +73,9 @@ void EdgeProjectPSI2UV::linearizeOplus() {
   Vector3 y = T_ca * x_a;
   Eigen::Matrix<number_t, 2, 3, Eigen::ColMajor> Jcam = internal::d_proj_d_y(cam->focal_length, y);
 
-  auto &jacobianOplus0 = std::get<0>(this->_jacobianOplus);
-  auto &jacobianOplus1 = std::get<1>(this->_jacobianOplus);
-  auto &jacobianOplus2 = std::get<2>(this->_jacobianOplus);
+  auto &jacobianOplus0 = std::get<0>(this->jacobianOplus_);
+  auto &jacobianOplus1 = std::get<1>(this->jacobianOplus_);
+  auto &jacobianOplus2 = std::get<2>(this->jacobianOplus_);
   jacobianOplus0 = -Jcam * internal::d_Tinvpsi_d_psi(T_ca, psi_a);
   jacobianOplus1 = -Jcam * internal::d_expy_d_y(y);
   jacobianOplus2 = Jcam * T_ca.rotation().toRotationMatrix() * internal::d_expy_d_y(x_a);

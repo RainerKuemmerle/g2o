@@ -41,12 +41,10 @@ class G2O_TYPES_SBA_API VertexSE3Expmap : public BaseVertex<6, SE3Quat> {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
-  VertexSE3Expmap();
-
-  bool read(std::istream& is);
-  bool write(std::ostream& os) const;
-  void setToOriginImpl();
-  void oplusImpl(const number_t* update_);
+  bool read(std::istream& is) override;
+  bool write(std::ostream& os) const override;
+  void setToOriginImpl() override;
+  void oplusImpl(const number_t* update_) override;
 };
 
 }  // namespace g2o

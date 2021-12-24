@@ -28,8 +28,6 @@
 
 namespace g2o {
 
-EdgeSBACam::EdgeSBACam() : BaseBinaryEdge<6, SE3Quat, VertexCam, VertexCam>() {}
-
 bool EdgeSBACam::read(std::istream& is) {
   Vector7 meas;
   internal::readVector(is, meas);
@@ -47,47 +45,47 @@ void EdgeSBACam::initialEstimate(const OptimizableGraph::VertexSet& from_,
   auto from = vertexXn<0>();
   auto to = vertexXn<1>();
   if (from_.count(from) > 0)
-    to->setEstimate((SE3Quat)from->estimate() * _measurement);
+    to->setEstimate(SBACam(SE3Quat(from->estimate()) * measurement_));
   else
-    from->setEstimate((SE3Quat)to->estimate() * _inverseMeasurement);
+    from->setEstimate(SBACam(SE3Quat(to->estimate()) * inverseMeasurement_));
 }
 
 bool EdgeSBACam::setMeasurementFromState() {
   const VertexCam* v1 = vertexXnRaw<0>();
   const VertexCam* v2 = vertexXnRaw<1>();
-  _measurement = (v1->estimate().inverse() * v2->estimate());
-  _inverseMeasurement = _measurement.inverse();
+  measurement_ = (v1->estimate().inverse() * v2->estimate());
+  inverseMeasurement_ = measurement_.inverse();
   return true;
 }
 
 void EdgeSBACam::setMeasurement(const SE3Quat& meas) {
-  _measurement = meas;
-  _inverseMeasurement = meas.inverse();
+  measurement_ = meas;
+  inverseMeasurement_ = meas.inverse();
 }
 
 bool EdgeSBACam::setMeasurementData(const number_t* d) {
   Eigen::Map<const Vector7> v(d);
-  _measurement.fromVector(v);
-  _inverseMeasurement = _measurement.inverse();
+  measurement_.fromVector(v);
+  inverseMeasurement_ = measurement_.inverse();
   return true;
 }
 
 bool EdgeSBACam::getMeasurementData(number_t* d) const {
   Eigen::Map<Vector7> v(d);
-  v = _measurement.toVector();
+  v = measurement_.toVector();
   return true;
 }
 
 void EdgeSBACam::computeError() {
   const VertexCam* v1 = vertexXnRaw<0>();
   const VertexCam* v2 = vertexXnRaw<1>();
-  SE3Quat delta = _inverseMeasurement * (v1->estimate().inverse() * v2->estimate());
-  _error[0] = delta.translation().x();
-  _error[1] = delta.translation().y();
-  _error[2] = delta.translation().z();
-  _error[3] = delta.rotation().x();
-  _error[4] = delta.rotation().y();
-  _error[5] = delta.rotation().z();
+  SE3Quat delta = inverseMeasurement_ * (v1->estimate().inverse() * v2->estimate());
+  error_[0] = delta.translation().x();
+  error_[1] = delta.translation().y();
+  error_[2] = delta.translation().z();
+  error_[3] = delta.rotation().x();
+  error_[4] = delta.rotation().y();
+  error_[5] = delta.rotation().z();
 }
 
 }  // namespace g2o

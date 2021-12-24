@@ -28,9 +28,6 @@
 
 namespace g2o {
 
-// constructor
-VertexCam::VertexCam() {}
-
 bool VertexCam::read(std::istream& is) {
   // first the position and orientation (vector3 and quaternion)
   Vector3 t;
@@ -43,7 +40,11 @@ bool VertexCam::read(std::istream& is) {
   SBACam cam(r, t);
 
   // now fx, fy, cx, cy, baseline
-  number_t fx, fy, cx, cy, tx;
+  number_t fx;
+  number_t fy;
+  number_t cx;
+  number_t cy;
+  number_t tx;
 
   // try to read one value
   is >> fx;

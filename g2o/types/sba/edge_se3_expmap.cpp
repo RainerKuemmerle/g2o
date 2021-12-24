@@ -28,8 +28,6 @@
 
 namespace g2o {
 
-EdgeSE3Expmap::EdgeSE3Expmap() : BaseBinaryEdge<6, SE3Quat, VertexSE3Expmap, VertexSE3Expmap>() {}
-
 bool EdgeSE3Expmap::read(std::istream& is) {
   Vector7 meas;
   internal::readVector(is, meas);
@@ -46,9 +44,9 @@ void EdgeSE3Expmap::computeError() {
   const VertexSE3Expmap* v1 = vertexXnRaw<0>();
   const VertexSE3Expmap* v2 = vertexXnRaw<1>();
 
-  SE3Quat C(_measurement);
-  SE3Quat error_ = v2->estimate().inverse() * C * v1->estimate();
-  _error = error_.log();
+  SE3Quat C(measurement_);
+  SE3Quat err = v2->estimate().inverse() * C * v1->estimate();
+  error_ = err.log();
 }
 
 void EdgeSE3Expmap::linearizeOplus() {
@@ -58,14 +56,14 @@ void EdgeSE3Expmap::linearizeOplus() {
   VertexSE3Expmap* vj = vertexXnRaw<1>();
   SE3Quat Tj(vj->estimate());
 
-  const SE3Quat& Tij = _measurement;
+  const SE3Quat& Tij = measurement_;
   SE3Quat invTij = Tij.inverse();
 
   SE3Quat invTj_Tij = Tj.inverse() * Tij;
   SE3Quat infTi_invTij = Ti.inverse() * invTij;
 
-  _jacobianOplusXi = invTj_Tij.adj();
-  _jacobianOplusXj = -infTi_invTij.adj();
+  jacobianOplusXi_ = invTj_Tij.adj();
+  jacobianOplusXj_ = -infTi_invTij.adj();
 }
 
 }  // namespace g2o

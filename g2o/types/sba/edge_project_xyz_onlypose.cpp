@@ -29,7 +29,7 @@
 namespace g2o {
 
 bool EdgeSE3ProjectXYZOnlyPose::read(std::istream &is) {
-  internal::readVector(is, _measurement);
+  internal::readVector(is, measurement_);
   return readInformationMatrix(is);
 }
 
@@ -47,19 +47,19 @@ void EdgeSE3ProjectXYZOnlyPose::linearizeOplus() {
   number_t invz = 1.0 / xyz_trans[2];
   number_t invz_2 = invz * invz;
 
-  _jacobianOplusXi(0, 0) = x * y * invz_2 * fx;
-  _jacobianOplusXi(0, 1) = -(1 + (x * x * invz_2)) * fx;
-  _jacobianOplusXi(0, 2) = y * invz * fx;
-  _jacobianOplusXi(0, 3) = -invz * fx;
-  _jacobianOplusXi(0, 4) = 0;
-  _jacobianOplusXi(0, 5) = x * invz_2 * fx;
+  jacobianOplusXi_(0, 0) = x * y * invz_2 * fx;
+  jacobianOplusXi_(0, 1) = -(1 + (x * x * invz_2)) * fx;
+  jacobianOplusXi_(0, 2) = y * invz * fx;
+  jacobianOplusXi_(0, 3) = -invz * fx;
+  jacobianOplusXi_(0, 4) = 0;
+  jacobianOplusXi_(0, 5) = x * invz_2 * fx;
 
-  _jacobianOplusXi(1, 0) = (1 + y * y * invz_2) * fy;
-  _jacobianOplusXi(1, 1) = -x * y * invz_2 * fy;
-  _jacobianOplusXi(1, 2) = -x * invz * fy;
-  _jacobianOplusXi(1, 3) = 0;
-  _jacobianOplusXi(1, 4) = -invz * fy;
-  _jacobianOplusXi(1, 5) = y * invz_2 * fy;
+  jacobianOplusXi_(1, 0) = (1 + y * y * invz_2) * fy;
+  jacobianOplusXi_(1, 1) = -x * y * invz_2 * fy;
+  jacobianOplusXi_(1, 2) = -x * invz * fy;
+  jacobianOplusXi_(1, 3) = 0;
+  jacobianOplusXi_(1, 4) = -invz * fy;
+  jacobianOplusXi_(1, 5) = y * invz_2 * fy;
 }
 
 Vector2 EdgeSE3ProjectXYZOnlyPose::cam_project(const Vector3 &trans_xyz) const {
@@ -72,8 +72,8 @@ Vector2 EdgeSE3ProjectXYZOnlyPose::cam_project(const Vector3 &trans_xyz) const {
 
 void EdgeSE3ProjectXYZOnlyPose::computeError() {
   const VertexSE3Expmap *v1 = vertexXnRaw<0>();
-  Vector2 obs(_measurement);
-  _error = obs - cam_project(v1->estimate().map(Xw));
+  Vector2 obs(measurement_);
+  error_ = obs - cam_project(v1->estimate().map(Xw));
 }
 
 bool EdgeSE3ProjectXYZOnlyPose::isDepthPositive() {

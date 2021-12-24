@@ -62,9 +62,9 @@ class G2O_TYPES_SBA_API SBACam : public SE3Quat {
   SBACam();
 
   // set the object pose
-  SBACam(const Quaternion& r_, const Vector3& t_);
+  SBACam(const Quaternion& r, const Vector3& t);
 
-  SBACam(const SE3Quat& p);
+  explicit SBACam(const SE3Quat& p);
 
   // update from the linear solution
   // defined in se3quat
@@ -81,7 +81,7 @@ class G2O_TYPES_SBA_API SBACam : public SE3Quat {
   void setKcam(number_t fx, number_t fy, number_t cx, number_t cy, number_t tx);
 
   // set transform from world to cam coords
-  void setTransform() { transformW2F(w2n, _t, _r); }
+  void setTransform() { transformW2F(w2n, t_, r_); }
 
   // Set up world-to-image projection matrix (w2i), assumes camera parameters
   // are filled.

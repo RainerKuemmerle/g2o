@@ -32,8 +32,6 @@
 
 namespace g2o {
 
-  using namespace std;
-
   G2O_REGISTER_TYPE_GROUP(sba);
 
   G2O_REGISTER_TYPE(VERTEX_CAM, VertexCam);

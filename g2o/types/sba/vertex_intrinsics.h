@@ -40,12 +40,12 @@ class G2O_TYPES_SBA_API VertexIntrinsics
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   VertexIntrinsics();
-  virtual bool read(std::istream& is);
-  virtual bool write(std::ostream& os) const;
+  bool read(std::istream& is) override;
+  bool write(std::ostream& os) const override;
 
-  virtual void setToOriginImpl();
+  void setToOriginImpl() override;
 
-  virtual void oplusImpl(const number_t* update);
+  void oplusImpl(const number_t* update) override;
 };
 
 }  // namespace g2o

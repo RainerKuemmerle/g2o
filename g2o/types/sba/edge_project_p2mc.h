@@ -41,16 +41,16 @@ class G2O_TYPES_SBA_API EdgeProjectP2MC
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   EdgeProjectP2MC();
-  virtual bool read(std::istream &is);
-  virtual bool write(std::ostream &os) const;
+  bool read(std::istream &is) override;
+  bool write(std::ostream &os) const override;
 
   //! return the error estimate as a 2-vector
-  virtual void computeError();
+  void computeError() override;
 
   /**
    * \brief Jacobian for monocular projection
    */
-  virtual void linearizeOplus();
+  void linearizeOplus() override;
 };
 
 }  // namespace g2o

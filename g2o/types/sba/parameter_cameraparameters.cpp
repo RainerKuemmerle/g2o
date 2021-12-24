@@ -26,16 +26,18 @@
 
 #include "parameter_cameraparameters.h"
 
+#include <utility>
+
 #include "g2o/types/slam3d/se3_ops.h"
 
 namespace g2o {
 
 CameraParameters::CameraParameters()
-    : focal_length(1.), principle_point(Vector2(0., 0.)), baseline(0.5) {}
+    :  principle_point(Vector2(0., 0.)) {}
 
-CameraParameters::CameraParameters(number_t focalLength, const Vector2 &principlePoint,
+CameraParameters::CameraParameters(number_t focalLength, Vector2 principlePoint,
                                    number_t baseLine)
-    : focal_length(focalLength), principle_point(principlePoint), baseline(baseLine) {}
+    : focal_length(focalLength), principle_point(std::move(principlePoint)), baseline(baseLine) {}
 
 bool CameraParameters::read(std::istream &is) {
   is >> focal_length;
