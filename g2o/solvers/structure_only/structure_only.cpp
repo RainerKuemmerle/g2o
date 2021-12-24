@@ -40,18 +40,19 @@ static OptimizationAlgorithm* createSolver(const std::string& fullSolverName) {
   if (fullSolverName == "structure_only_2") {
     OptimizationAlgorithm* optimizationAlgo = new StructureOnlySolver<2>;
     return optimizationAlgo;
-  } else if (fullSolverName == "structure_only_3") {
+  }
+  if (fullSolverName == "structure_only_3") {
     OptimizationAlgorithm* optimizationAlgo = new StructureOnlySolver<3>;
     return optimizationAlgo;
-  } else
-    return nullptr;
+  }
+  return nullptr;
 }
 
 class StructureOnlyCreator : public AbstractOptimizationAlgorithmCreator {
  public:
   explicit StructureOnlyCreator(const OptimizationAlgorithmProperty& p)
       : AbstractOptimizationAlgorithmCreator(p) {}
-  virtual std::unique_ptr<OptimizationAlgorithm> construct() {
+  std::unique_ptr<OptimizationAlgorithm> construct() override {
     return std::unique_ptr<OptimizationAlgorithm>(createSolver(property().name));
   }
 };

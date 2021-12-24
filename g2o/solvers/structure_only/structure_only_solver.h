@@ -55,12 +55,12 @@ namespace g2o {
 template <int PointDoF>
 class StructureOnlySolver : public OptimizationAlgorithm {
  public:
-  StructureOnlySolver() { _verbose = true; }
+  StructureOnlySolver() = default;
 
-  virtual OptimizationAlgorithm::SolverResult solve(int iteration, bool online = false) {
+  OptimizationAlgorithm::SolverResult solve(int iteration, bool online = false) override {
     (void)iteration;
     (void)online;
-    return calc(_points, 1);
+    return calc(points_, 1);
   }
 
   OptimizationAlgorithm::SolverResult calc(OptimizableGraph::VertexContainer& vertices,
@@ -69,20 +69,18 @@ class StructureOnlySolver : public OptimizationAlgorithm {
     auxWorkspace.updateSize(2, 50);
     auxWorkspace.allocate();
 
-    for (OptimizableGraph::VertexContainer::iterator it_v = vertices.begin();
-         it_v != vertices.end(); ++it_v) {
+    for (auto & v : vertices) {
       bool stop = false;
-      const std::shared_ptr<g2o::OptimizableGraph::Vertex>& v = *it_v;
       assert(v->dimension() == PointDoF);
       g2o::HyperGraph::EdgeSetWeak& track = v->edges();
       assert(track.size() >= 2);
       number_t chi2 = 0;
-      // TODO make these parameters
+      // TODO(Rainer): make these parameters
       number_t mu = cst(0.01);
       number_t nu = 2;
 
-      for (auto it_t = track.begin(); it_t != track.end(); ++it_t) {
-        auto e = std::static_pointer_cast<OptimizableGraph::Edge>(it_t->lock());
+      for (const auto & it_t : track) {
+        auto e = std::static_pointer_cast<OptimizableGraph::Edge>(it_t.lock());
         e->computeError();
         if (e->robustKernel()) {
           Vector3 rho;
@@ -93,7 +91,7 @@ class StructureOnlySolver : public OptimizationAlgorithm {
         }
       }
 
-      if (v->fixed() == false) {
+      if (!v->fixed()) {
         Eigen::Matrix<number_t, PointDoF, PointDoF, Eigen::ColMajor> H_pp;
         H_pp.resize(v->dimension(), v->dimension());
         v->mapHessianMemory(H_pp.data());
@@ -104,8 +102,8 @@ class StructureOnlySolver : public OptimizationAlgorithm {
           g2o::HyperGraph::EdgeSetWeak& track = v->edges();
           assert(track.size() >= 1);
 
-          for (auto it_t = track.begin(); it_t != track.end(); ++it_t) {
-            auto e = std::static_pointer_cast<OptimizableGraph::Edge>(it_t->lock());
+          for (const auto & it_t : track) {
+            auto e = std::static_pointer_cast<OptimizableGraph::Edge>(it_t.lock());
 
             // fix all the other vertices and remember their fix value
 #ifdef WINDOWS
@@ -154,8 +152,8 @@ class StructureOnlySolver : public OptimizationAlgorithm {
               v->push();
               v->oplus(delta_p.data());
               number_t new_chi2 = 0;
-              for (auto it_t = track.begin(); it_t != track.end(); ++it_t) {
-                auto e = std::static_pointer_cast<OptimizableGraph::Edge>(it_t->lock());
+              for (const auto & it_t : track) {
+                auto e = std::static_pointer_cast<OptimizableGraph::Edge>(it_t.lock());
                 e->computeError();
                 if (e->robustKernel()) {
                   Vector3 rho;
@@ -182,50 +180,49 @@ class StructureOnlySolver : public OptimizationAlgorithm {
               mu *= cst(1. / 3.);
               nu = 2.;
               trial = 0;
+              break; // TODO(Rainer): Revisit the rule to break here
+            }
+            mu *= nu;
+            nu *= 2.;
+            ++trial;
+            if (trial >= num_max_trials) {
+              stop = true;
               break;
-            } else {
-              mu *= nu;
-              nu *= 2.;
-              ++trial;
-              if (trial >= num_max_trials) {
-                stop = true;
-                break;
-              }
             }
           } while (!stop);
           if (stop) break;
         }
       }
     }
-    return OK;
+    return kOk;
   }
 
-  virtual bool init(bool) {
+  bool init(bool) override {
     // collect the vertices
-    _points.clear();
+    points_.clear();
     for (const auto& v : optimizer()->activeVertices()) {
-      if (v->marginalized()) _points.push_back(v);
+      if (v->marginalized()) points_.push_back(v);
     }
     return true;
   }
 
-  virtual bool computeMarginals(SparseBlockMatrix<MatrixX>&,
-                                const std::vector<std::pair<int, int> >&) {
+  bool computeMarginals(SparseBlockMatrix<MatrixX>&,
+                                const std::vector<std::pair<int, int> >&) override {
     return false;
   }
 
-  virtual bool updateStructure(const HyperGraph::VertexContainer& /*vset*/,
-                               const HyperGraph::EdgeSet& /*edges*/) {
+  bool updateStructure(const HyperGraph::VertexContainer& /*vset*/,
+                               const HyperGraph::EdgeSet& /*edges*/) override {
     return true;
   }
 
   //! return the points of the optimization problem
-  OptimizableGraph::VertexContainer& points() { return _points; }
-  const OptimizableGraph::VertexContainer& points() const { return _points; }
+  OptimizableGraph::VertexContainer& points() { return points_; }
+  const OptimizableGraph::VertexContainer& points() const { return points_; }
 
  protected:
-  bool _verbose;
-  OptimizableGraph::VertexContainer _points;
+  bool verbose_ = true;
+  OptimizableGraph::VertexContainer points_;
 };
 
 }  // namespace g2o
