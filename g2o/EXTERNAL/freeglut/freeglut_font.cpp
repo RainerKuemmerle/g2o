@@ -43,20 +43,21 @@ namespace freeglut_minimal {
  */
 static SFG_StrokeFont* fghStrokeByID(FontID font )
 {
-    if( font == GLUT_STROKE_ROMAN      )
-        return (SFG_StrokeFont*)&fgStrokeRoman;
-    if( font == GLUT_STROKE_MONO_ROMAN )
-        return (SFG_StrokeFont*)&fgStrokeMonoRoman;
+    if( font == kGlutStrokeRoman      )
+        return const_cast<SFG_StrokeFont*>(&kFgStrokeRoman);
+    if( font == kGlutStrokeMonoRoman )
+        return const_cast<SFG_StrokeFont*>(&kFgStrokeMonoRoman);
 
-    std::cerr << "stroke font " << (int)font << " not found" << std::endl;
-    return 0;
+    std::cerr << "stroke font " << static_cast<int>(font) << " not found" << std::endl;
+    return nullptr;
 }
 
 void glutStrokeString(FontID fontID, const char *string_)
 {
-    const unsigned char* string = reinterpret_cast<const unsigned char*>(string_);
+    const auto* string = reinterpret_cast<const unsigned char*>(string_);
     unsigned char c;
-    int i, j;
+    int i;
+    int j;
     float length = 0.0;
     SFG_StrokeFont* font;
     //FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutStrokeString" );
@@ -75,7 +76,7 @@ void glutStrokeString(FontID fontID, const char *string_)
         {
             if( c == '\n' )
             {
-                glTranslatef ( -length, -( float )( font->Height ), 0.0 );
+                glTranslatef ( -length, -static_cast< float>( font->Height ), 0.0 );
                 length = 0.0;
             }
             else  /* Not an EOL, draw the bitmap character */
@@ -96,7 +97,7 @@ void glutStrokeString(FontID fontID, const char *string_)
                     }
 
                     length += schar->Right;
-                    glTranslatef( schar->Right, 0.0f, 0.0f );
+                    glTranslatef( schar->Right, 0.0F, 0.0F );
                 }
             }
         }
@@ -107,7 +108,7 @@ void glutStrokeString(FontID fontID, const char *string_)
  */
 int glutStrokeLength( FontID fontID, const char* string_ )
 {
-    const unsigned char* string = reinterpret_cast<const unsigned char*>(string_);
+    const auto* string = reinterpret_cast<const unsigned char*>(string_);
     unsigned char c;
     float length = 0.0;
     float this_line_length = 0.0;
@@ -136,7 +137,7 @@ int glutStrokeLength( FontID fontID, const char* string_ )
         }
     if( length < this_line_length )
         length = this_line_length;
-    return( int )( length + 0.5 );
+    return static_cast<int>(length + 0.5);
 }
 
 /*
