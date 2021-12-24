@@ -39,42 +39,44 @@
 
 #include <Eigen/Eigenvalues>
 
-using namespace std;
-
 namespace g2o {
 
 VertexEllipse::VertexEllipse()
-    : RobotData(), _covariance(Matrix3F::Zero()), _UMatrix(Matrix2F::Zero()), _singularValues(Vector2F::Zero()) {}
+    :  covariance_(Matrix3F::Zero()), UMatrix_(Matrix2F::Zero()), singularValues_(Vector2F::Zero()) {}
 
-VertexEllipse::~VertexEllipse() {}
-
-void VertexEllipse::_updateSVD() const {
-  Eigen::SelfAdjointEigenSolver<Matrix2F> eigenSolver(_covariance.block<2, 2>(0, 0));
-  _UMatrix = eigenSolver.eigenvectors();
-  _singularValues = eigenSolver.eigenvalues();
+void VertexEllipse::updateSVD() const {
+  Eigen::SelfAdjointEigenSolver<Matrix2F> eigenSolver(covariance_.block<2, 2>(0, 0));
+  UMatrix_ = eigenSolver.eigenvectors();
+  singularValues_ = eigenSolver.eigenvalues();
 
   }
 
   bool VertexEllipse::read(std::istream& is)
   {
-    float cxx, cxy, cxt, cyy, cyt, ctt;
+    float cxx;
+    float cxy;
+    float cxt;
+    float cyy;
+    float cyt;
+    float ctt;
     is >> cxx >> cxy >> cxt >> cyy >> cyt >> ctt;
-    _covariance(0,0) = cxx;
-    _covariance(0,1) = cxy;
-    _covariance(0,2) = cxt;
-    _covariance(1,0) = cxy;
-    _covariance(1,1) = cyy;
-    _covariance(1,2) = cyt;
-    _covariance(2,0) = cxt;
-    _covariance(2,1) = cyt;
-    _covariance(2,2) = ctt;
+    covariance_(0,0) = cxx;
+    covariance_(0,1) = cxy;
+    covariance_(0,2) = cxt;
+    covariance_(1,0) = cxy;
+    covariance_(1,1) = cyy;
+    covariance_(1,2) = cyt;
+    covariance_(2,0) = cxt;
+    covariance_(2,1) = cyt;
+    covariance_(2,2) = ctt;
 
-    _updateSVD();
+    updateSVD();
 
     int size;
     is >> size;
     for (int i =0; i<size; i++){
-      float x, y;
+      float x;
+      float y;
       is >> x >> y;
       addMatchingVertex(x,y);
     }
@@ -84,12 +86,12 @@ void VertexEllipse::_updateSVD() const {
 
   bool VertexEllipse::write(std::ostream& os) const
   {
-    os << _covariance(0,0) << " " << _covariance(0,1) << " " << _covariance(0,2) << " "
-       << _covariance(1,1) << " " << _covariance(1,2) << " " << _covariance(2,2) << " ";
+    os << covariance_(0,0) << " " << covariance_(0,1) << " " << covariance_(0,2) << " "
+       << covariance_(1,1) << " " << covariance_(1,2) << " " << covariance_(2,2) << " ";
 
-    os << _matchingVertices.size() << " " ;
-    for (size_t i=0 ; i< _matchingVertices.size(); i++){
-      os << _matchingVertices[i].x() << " " << _matchingVertices[i].y() << " ";
+    os << matchingVertices_.size() << " " ;
+    for (const auto & matchingVertice : matchingVertices_){
+      os << matchingVertice.x() << " " << matchingVertice.y() << " ";
     }
 
     return os.good();
@@ -99,52 +101,52 @@ void VertexEllipse::_updateSVD() const {
 
 #ifdef G2O_HAVE_OPENGL
   VertexEllipseDrawAction::VertexEllipseDrawAction(): DrawAction(typeid(VertexEllipse).name()){
-    _scaleFactor = 0;
+    scaleFactor_ = nullptr;
   }
 
   bool VertexEllipseDrawAction::refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_){
     if (!DrawAction::refreshPropertyPtrs(params_))
       return false;
-    if (_previousParams){
-      _scaleFactor = _previousParams->makeProperty<DoubleProperty>(_typeName + "::", 1);
+    if (previousParams_){
+      scaleFactor_ = previousParams_->makeProperty<DoubleProperty>(typeName_ + "::", 1);
     } else {
-      _scaleFactor = 0;
+      scaleFactor_ = nullptr;
     }
     return true;
   }
 
   bool VertexEllipseDrawAction::operator()(HyperGraph::HyperGraphElement* element,
                                            HyperGraphElementAction::Parameters* params_) {
-    if (typeid(*element).name()!=_typeName)
+    if (typeid(*element).name()!=typeName_)
       return false;
 
     refreshPropertyPtrs(params_);
-    if (! _previousParams){
+    if (! previousParams_){
       return true;
     }
-    if (_show && !_show->value())
+    if (show_ && !show_->value())
       return true;
 
-    VertexEllipse* that = dynamic_cast<VertexEllipse*>(element);
+    auto* that = dynamic_cast<VertexEllipse*>(element);
 
     glPushMatrix();
 
-    float sigmaTheta = sqrt(that->covariance()(2,2));
-    float x = 0.1f*cosf(sigmaTheta);
-    float y = 0.1f*sinf(sigmaTheta);
+    float sigmaTheta = std::sqrt(that->covariance()(2,2));
+    float x = 0.1F*cosf(sigmaTheta);
+    float y = 0.1F*sinf(sigmaTheta);
 
-    glColor3f(1.f,0.7f,1.f);
+    glColor3f(1.F,0.7F,1.F);
     glBegin(GL_LINE_STRIP);
     glVertex3f(x,y,0);
     glVertex3f(0,0,0);
     glVertex3f(x,-y,0);
     glEnd();
 
-    glColor3f(0.f,1.f,0.f);
-    for (size_t i=0; i< that->matchingVertices().size(); i++){
+    glColor3f(0.F,1.F,0.F);
+    for (const auto & i : that->matchingVertices()){
       glBegin(GL_LINES);
       glVertex3f(0,0,0);
-      glVertex3f(that->matchingVertices()[i].x(),that->matchingVertices()[i].y(),0);
+      glVertex3f(i.x(),i.y(),0);
       glEnd();
     }
 
@@ -154,7 +156,7 @@ void VertexEllipse::_updateSVD() const {
     Vector2F sv = that->singularValues();
     glScalef(sqrt(sv(0)), sqrt(sv(1)), 1);
 
-    glColor3f(1.f,0.7f,1.f);
+    glColor3f(1.F,0.7F,1.F);
     glBegin(GL_LINE_LOOP);
     for(int i=0; i<36; i++){
       float rad = i*const_pi() /18.0;

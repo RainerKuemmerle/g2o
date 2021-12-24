@@ -43,32 +43,30 @@ namespace g2o {
   {
     public:
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
-      VertexTag();
-      ~VertexTag();
 
-      virtual bool write(std::ostream& os) const;
-      virtual bool read(std::istream& is);
+      bool write(std::ostream& os) const override;
+      bool read(std::istream& is) override;
 
-      const std::string name() const { return _name;}
-      void setName(const std::string& name_) {_name=name_;}
-      const Vector3F& position() const {return _position;}
-      void setPosition( const Vector3F& p) {_position = p;}
+      const std::string& name() const { return name_;}
+      void setName(const std::string& name) {name_=name;}
+      const Vector3F& position() const {return position_;}
+      void setPosition( const Vector3F& p) {position_ = p;}
     protected:
-      std::string _name;
-      Vector3F _position;
-      Vector3F _odom2d;
+      std::string name_;
+      Vector3F position_;
+      Vector3F odom2d_;
   };
 
  #ifdef G2O_HAVE_OPENGL
   class G2O_TYPES_DATA_API VertexTagDrawAction: public DrawAction{
   public:
     VertexTagDrawAction();
-    virtual bool operator()(HyperGraph::HyperGraphElement* element,
-                            HyperGraphElementAction::Parameters* params_);
+    bool operator()(HyperGraph::HyperGraphElement* element,
+                            HyperGraphElementAction::Parameters* params_) override;
 
    protected:
-    virtual bool refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_);
-    std::shared_ptr<DoubleProperty> _textSize;
+    bool refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_) override;
+    std::shared_ptr<DoubleProperty> textSize_;
   };
 #endif
 

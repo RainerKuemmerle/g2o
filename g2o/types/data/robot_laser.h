@@ -43,34 +43,32 @@ namespace g2o {
   {
     public:
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
-      RobotLaser();
-      ~RobotLaser();
 
-      virtual bool write(std::ostream& os) const;
-      virtual bool read(std::istream& is);
+      bool write(std::ostream& os) const override;
+      bool read(std::istream& is) override;
 
-      SE2 laserPose() const { return _odomPose * _laserParams.laserPose;}
-      const SE2& odomPose() const { return _odomPose;}
+      SE2 laserPose() const { return odomPose_ * laserParams_.laserPose;}
+      const SE2& odomPose() const { return odomPose_;}
       void setOdomPose(const SE2& odomPose);
 
     protected:
-      SE2 _odomPose;
+      SE2 odomPose_;
       //! velocities and safety distances of the robot.
-      number_t _laserTv, _laserRv, _forwardSafetyDist, _sideSaftyDist, _turnAxis;
+      number_t laserTv_ = 0., laserRv_ = 0., forwardSafetyDist_ = 0., sideSaftyDist_ = 0., turnAxis_ = 0.;
   };
 
 #ifdef G2O_HAVE_OPENGL
   class G2O_TYPES_DATA_API RobotLaserDrawAction: public DrawAction{
   public:
     RobotLaserDrawAction();
-    virtual bool operator()(HyperGraph::HyperGraphElement* element,
-                            HyperGraphElementAction::Parameters* params_);
+    bool operator()(HyperGraph::HyperGraphElement* element,
+                            HyperGraphElementAction::Parameters* params_) override;
 
    protected:
-    virtual bool refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_);
-    std::shared_ptr<IntProperty> _beamsDownsampling;
-    std::shared_ptr<FloatProperty> _pointSize;
-    std::shared_ptr<FloatProperty> _maxRange;
+    bool refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_) override;
+    std::shared_ptr<IntProperty> beamsDownsampling_;
+    std::shared_ptr<FloatProperty> pointSize_;
+    std::shared_ptr<FloatProperty> maxRange_;
   };
 #endif
 

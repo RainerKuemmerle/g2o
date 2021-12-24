@@ -39,51 +39,50 @@ namespace g2o {
   class G2O_TYPES_DATA_API VertexEllipse : public RobotData
   {
     public:
-      typedef std::vector<Vector2F, Eigen::aligned_allocator<Vector2F> > myVector2fVector;
-    public:
+      using myVector2fVector = std::vector<Vector2F, Eigen::aligned_allocator<Vector2F>>;
+
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
       VertexEllipse();
-      ~VertexEllipse();
 
-      virtual bool write(std::ostream& os) const;
-      virtual bool read(std::istream& is);
+      bool write(std::ostream& os) const override;
+      bool read(std::istream& is) override;
 
-      const Matrix3F& covariance() {return _covariance;}
-      void setCovariance( Matrix3F& c) { _covariance = c; _updateSVD();}
-      const Matrix2F& U() {return _UMatrix;}
-      const Vector2F& singularValues() {return _singularValues;}
+      const Matrix3F& covariance() {return covariance_;}
+      void setCovariance( Matrix3F& c) { covariance_ = c; updateSVD();}
+      const Matrix2F& U() {return UMatrix_;}
+      const Vector2F& singularValues() {return singularValues_;}
 
-      const myVector2fVector& matchingVertices() { return _matchingVertices; }
+      const myVector2fVector& matchingVertices() { return matchingVertices_; }
       void addMatchingVertex(float x, float y) {
         Vector2F v(x, y);
-        _matchingVertices.push_back(v);
+        matchingVertices_.push_back(v);
       }
 
-      void clearMatchingVertices() { _matchingVertices.clear(); }
+      void clearMatchingVertices() { matchingVertices_.clear(); }
 
-      const std::vector<int>& matchingVerticesIDs() { return _matchingVerticesIDs; }
-      void addMatchingVertexID(int id) { _matchingVerticesIDs.push_back(id); }
-      void clearMatchingVerticesIDs(){_matchingVerticesIDs.clear();}
+      const std::vector<int>& matchingVerticesIDs() { return matchingVerticesIDs_; }
+      void addMatchingVertexID(int id) { matchingVerticesIDs_.push_back(id); }
+      void clearMatchingVerticesIDs(){matchingVerticesIDs_.clear();}
 
   protected:
-      void _updateSVD() const;
-      Matrix3F _covariance;
-      mutable Matrix2F _UMatrix;
-      mutable Vector2F _singularValues;
-      std::vector<int> _matchingVerticesIDs;
-      myVector2fVector _matchingVertices;
+      void updateSVD() const;
+      Matrix3F covariance_;
+      mutable Matrix2F UMatrix_;
+      mutable Vector2F singularValues_;
+      std::vector<int> matchingVerticesIDs_;
+      myVector2fVector matchingVertices_;
   };
 
 #ifdef G2O_HAVE_OPENGL
   class G2O_TYPES_DATA_API VertexEllipseDrawAction : public DrawAction {
    public:
     VertexEllipseDrawAction();
-    virtual bool operator()(HyperGraph::HyperGraphElement* element,
-                            HyperGraphElementAction::Parameters* params_);
+    bool operator()(HyperGraph::HyperGraphElement* element,
+                            HyperGraphElementAction::Parameters* params_) override;
 
    protected:
-    virtual bool refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_);
-    std::shared_ptr<DoubleProperty> _scaleFactor;
+    bool refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_) override;
+    std::shared_ptr<DoubleProperty> scaleFactor_;
   };
 #endif
 

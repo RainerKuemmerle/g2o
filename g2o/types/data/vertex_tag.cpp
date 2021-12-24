@@ -35,34 +35,25 @@
 #endif
 
 #include <iomanip>
-using namespace std;
 
 namespace g2o {
 
-  VertexTag::VertexTag() : RobotData()
-  {
-  }
-
-  VertexTag::~VertexTag()
-  {
-  }
-
   bool VertexTag::read(std::istream& is)
   {
-    is >> _name;
-    is >> _position.x() >> _position.y() >> _position.z();
-    is >> _odom2d.x() >> _odom2d.y() >> _odom2d.z();
-    is >> _timestamp;
-    is >> _hostname;
-    is >> _loggerTimestamp;
+    is >> name_;
+    is >> position_.x() >> position_.y() >> position_.z();
+    is >> odom2d_.x() >> odom2d_.y() >> odom2d_.z();
+    is >> timestamp_;
+    is >> hostname_;
+    is >> loggerTimestamp_;
     return true;
   }
 
   bool VertexTag::write(std::ostream& os) const
   {
-    os << _name << " ";
-    os << FIXED(_position.x() << " " << _position.y() << " " << _position.z() << " ");
-    os << FIXED(_odom2d.x() << " " << _odom2d.y() << " " << _odom2d.z() << " ");
+    os << name_ << " ";
+    os << FIXED(position_.x() << " " << position_.y() << " " << position_.z() << " ");
+    os << FIXED(odom2d_.x() << " " << odom2d_.y() << " " << odom2d_.z() << " ");
     os << FIXED(" " << timestamp() << " " << hostname() << " " << loggerTimestamp());
     return os.good();
   }
@@ -70,40 +61,40 @@ namespace g2o {
 
 
 #ifdef G2O_HAVE_OPENGL
-  VertexTagDrawAction::VertexTagDrawAction() : DrawAction(typeid(VertexTag).name()), _textSize(nullptr) {}
+  VertexTagDrawAction::VertexTagDrawAction() : DrawAction(typeid(VertexTag).name()), textSize_(nullptr) {}
 
   bool VertexTagDrawAction::refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_){
     if (!DrawAction::refreshPropertyPtrs(params_))
       return false;
-    if (_previousParams){
-      _textSize = _previousParams->makeProperty<DoubleProperty>(_typeName + "::TEXT_SIZE", 1);
+    if (previousParams_){
+      textSize_ = previousParams_->makeProperty<DoubleProperty>(typeName_ + "::TEXT_SIZE", 1);
     } else {
-      _textSize = 0;
+      textSize_ = nullptr;
     }
     return true;
   }
 
   bool VertexTagDrawAction::operator()(HyperGraph::HyperGraphElement* element,
                                        HyperGraphElementAction::Parameters* params_) {
-    if (typeid(*element).name()!=_typeName)
+    if (typeid(*element).name()!=typeName_)
       return false;
 
     refreshPropertyPtrs(params_);
-    if (! _previousParams){
+    if (! previousParams_){
       return true;
     }
-    VertexTag* that = static_cast<VertexTag*>(element);
+    auto* that = static_cast<VertexTag*>(element);
 
     glPushMatrix();
-    glColor3f(1.f,0.2f,1.f);
+    glColor3f(1.F,0.2F,1.F);
     glTranslatef(that->position().x(), that->position().y(), that->position().z());
     float textSize = 1;
-    if (_textSize )
-      textSize = (float)_textSize->value();
-    opengl::drawBox(0.1f*textSize, 0.1f*textSize, 0.1f*textSize);
-    glTranslatef(0.2f*textSize, 0.f, 0.f);
-    glScalef(0.003f*textSize,0.003f*textSize,1.f);
-    freeglut_minimal::glutStrokeString(freeglut_minimal::GLUT_STROKE_ROMAN, that->name().c_str());
+    if (textSize_ )
+      textSize = static_cast<float>(textSize_->value());
+    opengl::drawBox(0.1F*textSize, 0.1F*textSize, 0.1F*textSize);
+    glTranslatef(0.2F*textSize, 0.F, 0.F);
+    glScalef(0.003F*textSize,0.003F*textSize,1.F);
+    freeglut_minimal::glutStrokeString(freeglut_minimal::kGlutStrokeRoman, that->name().c_str());
     glPopMatrix();
     return true;
   }

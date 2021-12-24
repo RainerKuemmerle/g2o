@@ -40,9 +40,9 @@ namespace g2o {
   class G2O_TYPES_DATA_API DataQueue
   {
     public:
-      typedef std::map<number_t, RobotData*>           Buffer;
+      using Buffer = std::map<number_t, RobotData *>;
 
-    public:
+    
       void add(RobotData* rd);
 
       RobotData* findClosestData(number_t timestamp) const;
@@ -50,10 +50,10 @@ namespace g2o {
       RobotData* before(number_t timestamp) const;
       RobotData* after(number_t timestamp) const;
 
-      const Buffer& buffer() const {return _buffer;}
+      const Buffer& buffer() const {return buffer_;}
 
     protected:
-      Buffer _buffer;
+      Buffer buffer_;
   };
 
 } // end namespace

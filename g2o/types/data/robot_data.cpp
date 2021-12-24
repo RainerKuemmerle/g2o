@@ -28,34 +28,24 @@
 
 namespace g2o {
 
-  RobotData::RobotData() :
-    HyperGraph::Data(),
-    _timestamp(-1.), _loggerTimestamp(-1.)
-  {
-  }
-
-  RobotData::~RobotData()
-  {
-  }
-
   void RobotData::setTimestamp(number_t ts)
   {
-    _timestamp = ts;
+    timestamp_ = ts;
   }
 
   void RobotData::setLoggerTimestamp(number_t ts)
   {
-    _loggerTimestamp = ts;
+    loggerTimestamp_ = ts;
   }
 
   void RobotData::setTag(const std::string& tag)
   {
-    _tag = tag;
+    tag_ = tag;
   }
 
   void RobotData::setHostname(const std::string& hostname)
   {
-    _hostname = hostname;
+    hostname_ = hostname;
   }
 
 } // end namespace

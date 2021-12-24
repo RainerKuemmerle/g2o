@@ -32,42 +32,41 @@ namespace g2o {
 
   RobotData* DataQueue::findClosestData(number_t timestamp) const
   {
-    if (_buffer.rbegin()->first < timestamp)
-      return _buffer.rbegin()->second;
-    if (_buffer.begin()->first > timestamp)
-      return _buffer.begin()->second;
+    if (buffer_.rbegin()->first < timestamp)
+      return buffer_.rbegin()->second;
+    if (buffer_.begin()->first > timestamp)
+      return buffer_.begin()->second;
 
-    Buffer::const_iterator ub = _buffer.upper_bound(timestamp);
-    Buffer::const_iterator lb = ub;
+    auto ub = buffer_.upper_bound(timestamp);
+    auto lb = ub;
     --lb;
     if (fabs(lb->first - timestamp) < fabs(ub->first - timestamp))
       return lb->second;
-    else
-      return ub->second;
+          return ub->second;
   }
 
   RobotData* DataQueue::before(number_t timestamp) const
   {
-    if (_buffer.size() == 0 || _buffer.begin()->first >= timestamp)
+    if (buffer_.empty() || buffer_.begin()->first >= timestamp)
       return nullptr;
-    Buffer::const_iterator lb = _buffer.upper_bound(timestamp);
+    auto lb = buffer_.upper_bound(timestamp);
     --lb; // now it's the lower bound
     return lb->second;
   }
 
   RobotData* DataQueue::after(number_t timestamp) const
   {
-    if (_buffer.size() == 0 || _buffer.rbegin()->first < timestamp)
+    if (buffer_.empty() || buffer_.rbegin()->first < timestamp)
       return nullptr;
-    Buffer::const_iterator ub = _buffer.upper_bound(timestamp);
-    if (ub == _buffer.end())
+    auto ub = buffer_.upper_bound(timestamp);
+    if (ub == buffer_.end())
       return nullptr;
     return ub->second;
   }
 
   void DataQueue::add(RobotData* rd)
   {
-    _buffer[rd->timestamp()] = rd;
+    buffer_[rd->timestamp()] = rd;
   }
 
 } // end namespace

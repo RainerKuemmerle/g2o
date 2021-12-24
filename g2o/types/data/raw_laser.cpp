@@ -28,75 +28,73 @@
 
 #include <iostream>
 
-using namespace std;
-
 namespace g2o {
 
   RawLaser::RawLaser() :
-    RobotData(),
-    _laserParams(0, 180, -const_pi()/2, const_pi()/180, 50, cst(0.1), 0)
-  {
-  }
 
-  RawLaser::~RawLaser()
+    laserParams_(0, 180, -const_pi()/2, const_pi()/180, 50, cst(0.1), 0)
   {
   }
 
   bool RawLaser::write(std::ostream& /*os*/) const
   {
-    // TODO
-    cerr << "RawLaser::write() not implemented yet." << endl;
+    // TODO(goki):
+    std::cerr << "RawLaser::write() not implemented yet." << std::endl;
     return false;
   }
 
   bool RawLaser::read(std::istream& is)
   {
     int type;
-    number_t angle, fov, res, maxrange, acc;
+    number_t angle;
+    number_t fov;
+    number_t res;
+    number_t maxrange;
+    number_t acc;
     int remission_mode;
     is >> type >> angle >> fov >> res >> maxrange >> acc >> remission_mode;
 
     int beams;
     is >> beams;
-    _laserParams = LaserParameters(type, beams, angle, res, maxrange, acc, remission_mode);      
-    _ranges.resize(beams);
+    laserParams_ = LaserParameters(type, beams, angle, res, maxrange, acc, remission_mode);
+    ranges_.resize(beams);
     for (int i=0; i<beams; i++)
-      is >> _ranges[i];
+      is >> ranges_[i];
 
     is >> beams;
-    _remissions.resize(beams);
+    remissions_.resize(beams);
     for (int i=0; i < beams; i++)
-      is >> _remissions[i];
+      is >> remissions_[i];
 
     // timestamp + host
-    is >> _timestamp;
-    is >> _hostname;
-    is >> _loggerTimestamp;
+    is >> timestamp_;
+    is >> hostname_;
+    is >> loggerTimestamp_;
     return true;
   }
 
-  void RawLaser::setRanges(const vector<number_t>& ranges)
+  void RawLaser::setRanges(const std::vector<number_t>& ranges)
   {
-    _ranges = ranges;
+    ranges_ = ranges;
   }
 
   void RawLaser::setRemissions(const std::vector<number_t>& remissions)
   {
-    _remissions = remissions;
+    remissions_ = remissions;
   }
 
   void RawLaser::setLaserParams(const LaserParameters& laserParams)
   {
-    _laserParams = laserParams;
+    laserParams_ = laserParams;
   }
 
   RawLaser::Point2DVector RawLaser::cartesian() const
   {
     Point2DVector points;
-    for (size_t i = 0; i < _ranges.size(); ++i) {
-      const number_t& r = _ranges[i];
-      if (r < _laserParams.maxRange && r > _laserParams.minRange) {
-        number_t alpha = _laserParams.firstBeamAngle + i * _laserParams.angularStep;
+    for (size_t i = 0; i < ranges_.size(); ++i) {
+      const number_t& r = ranges_[i];
+      if (r < laserParams_.maxRange && r > laserParams_.minRange) {
+        number_t alpha = laserParams_.firstBeamAngle + i * laserParams_.angularStep;
         points.push_back(Vector2(std::cos(alpha) * r, std::sin(alpha) * r));
       }
     }

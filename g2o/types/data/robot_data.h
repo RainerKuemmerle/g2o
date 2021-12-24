@@ -41,26 +41,23 @@ namespace g2o {
   class G2O_TYPES_DATA_API RobotData : public HyperGraph::Data
   {
     public:
-      RobotData();
-      virtual ~RobotData();
-
-      number_t timestamp() const { return _timestamp;}
+      number_t timestamp() const { return timestamp_;}
       void setTimestamp(number_t ts);
 
-      number_t loggerTimestamp() const { return _loggerTimestamp;}
+      number_t loggerTimestamp() const { return loggerTimestamp_;}
       void setLoggerTimestamp(number_t ts);
 
-      const std::string& tag() const { return _tag;}
+      const std::string& tag() const { return tag_;}
       void setTag(const std::string& tag);
 
-      const std::string& hostname() const { return _hostname;}
+      const std::string& hostname() const { return hostname_;}
       void setHostname(const std::string& hostname);
 
     protected:
-      number_t _timestamp; ///< timestamp when the measurement was generated
-      number_t _loggerTimestamp; ///< timestamp when the measurement was recorded
-      std::string _tag; ///< string tag (FLASER, ROBOTLASER, ODOM..) of the line in the log
-      std::string _hostname; ///< name of the computer/robot generating the data
+      number_t timestamp_ = -1.; ///< timestamp when the measurement was generated
+      number_t loggerTimestamp_ = -1.; ///< timestamp when the measurement was recorded
+      std::string tag_; ///< string tag (FLASER, ROBOTLASER, ODOM..) of the line in the log
+      std::string hostname_; ///< name of the computer/robot generating the data
   };
 
 } // end namespace

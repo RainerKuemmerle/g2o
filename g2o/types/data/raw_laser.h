@@ -44,14 +44,14 @@ namespace g2o {
    */
   class G2O_TYPES_DATA_API RawLaser : public RobotData {
     public:
-      typedef std::vector<Vector2, Eigen::aligned_allocator<Vector2> >      Point2DVector;
+      using Point2DVector = std::vector<Vector2, Eigen::aligned_allocator<Vector2>>;
 
-    public:
+
       RawLaser();
-      ~RawLaser();
+      ~RawLaser() override = default;
 
-      virtual bool write(std::ostream& os) const;
-      virtual bool read(std::istream& is);
+      bool write(std::ostream& os) const override;
+      bool read(std::istream& is) override;
 
       /**
        * computes a cartesian view of the beams (x,y).
@@ -60,21 +60,21 @@ namespace g2o {
       Point2DVector cartesian() const;
 
       //! the range measurements by the laser
-      const std::vector<number_t>& ranges() const { return _ranges;}
+      const std::vector<number_t>& ranges() const { return ranges_;}
       void setRanges(const std::vector<number_t>& ranges);
 
       //! the remission measurements by the laser
-      const std::vector<number_t>& remissions() const { return _remissions;}
+      const std::vector<number_t>& remissions() const { return remissions_;}
       void setRemissions(const std::vector<number_t>& remissions);
 
       //! the parameters of the laser
-      const LaserParameters& laserParams() const { return _laserParams;}
+      const LaserParameters& laserParams() const { return laserParams_;}
       void setLaserParams(const LaserParameters& laserParams);
 
     protected:
-      std::vector<number_t> _ranges;
-      std::vector<number_t> _remissions;
-      LaserParameters _laserParams;
+      std::vector<number_t> ranges_;
+      std::vector<number_t> remissions_;
+      LaserParameters laserParams_;
   };
 
 } // end namespace
