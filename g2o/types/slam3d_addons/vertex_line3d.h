@@ -48,7 +48,7 @@ namespace g2o {
 
     void oplusImpl(const number_t* update_) override {
       Eigen::Map<const Vector4> update(update_);
-      estimate().oplus(update);
+      estimate_.oplus(update);
     }
 
     bool setEstimateDataImpl(const number_t* est) override {

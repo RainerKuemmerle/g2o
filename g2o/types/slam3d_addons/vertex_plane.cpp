@@ -58,7 +58,7 @@ namespace g2o
   {
     if (!DrawAction::refreshPropertyPtrs(params_))
       return false;
-    if (_previousParams){
+    if (previousParams_){
       planeWidth_ = previousParams_->makeProperty<FloatProperty>(typeName_ + "::PLANE_WIDTH", 3);
       planeHeight_ = previousParams_->makeProperty<FloatProperty>(typeName_ + "::PLANE_HEIGHT", 3);
     } else {
@@ -73,7 +73,7 @@ namespace g2o
     if (typeid(*element).name() != typeName_) return false;
     refreshPropertyPtrs(params_);
     if (!previousParams_) return true;
-    if (_show && !show_->value()) return true;
+    if (show_ && !show_->value()) return true;
 
     if (planeWidth_ && planeHeight_) {
       auto* that = static_cast<VertexPlane*>(element);
@@ -82,16 +82,16 @@ namespace g2o
       number_t elevation = Plane3D::elevation(that->estimate().normal());
       glColor3f(float(that->color(0)), float(that->color(1)), float(that->color(2)));
       glPushMatrix();
-      glRotatef(float(RAD2DEG(azimuth)), 0.f, 0.f, 1.f);
-      glRotatef(float(RAD2DEG(elevation)), 0.f, -1.f, 0.f);
-      glTranslatef(float(d), 0.f, 0.f);
+      glRotatef(float(RAD2DEG(azimuth)), 0.F, 0.F, 1.F);
+      glRotatef(float(RAD2DEG(elevation)), 0.F, -1.F, 0.F);
+      glTranslatef(float(d), 0.F, 0.F);
 
       glBegin(GL_QUADS);
-      glNormal3f(-1.f, 0.f, 0.f);
-      glVertex3f(0.f, -planeWidth_->value(), -planeHeight_->value());
-      glVertex3f(0.f, planeWidth_->value(), -planeHeight_->value());
-      glVertex3f(0.f, planeWidth_->value(), planeHeight_->value());
-      glVertex3f(0.f, -planeWidth_->value(), planeHeight_->value());
+      glNormal3f(-1.F, 0.F, 0.F);
+      glVertex3f(0.F, -planeWidth_->value(), -planeHeight_->value());
+      glVertex3f(0.F, planeWidth_->value(), -planeHeight_->value());
+      glVertex3f(0.F, planeWidth_->value(), planeHeight_->value());
+      glVertex3f(0.F, -planeWidth_->value(), planeHeight_->value());
       glEnd();
       glPopMatrix();
     }

@@ -53,7 +53,7 @@ namespace g2o {
     if(!DrawAction::refreshPropertyPtrs(params_)) {
       return false;
     }
-    if(_previousParams) {
+    if(previousParams_) {
       lineLength_ = previousParams_->makeProperty<FloatProperty>(typeName_ + "::LINE_LENGTH", 15);
       lineWidth_ = previousParams_->makeProperty<FloatProperty>(typeName_ + "::LINE_WIDTH", 5);
     }
@@ -75,7 +75,7 @@ namespace g2o {
       return true;
     }
 
-    if(_show && !show_->value()) {
+    if(show_ && !show_->value()) {
       return true;
     }
 

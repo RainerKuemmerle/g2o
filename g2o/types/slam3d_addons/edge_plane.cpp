@@ -27,7 +27,6 @@
 #include "edge_plane.h"
 
 namespace g2o {
-using namespace Eigen;
 
 EdgePlane::EdgePlane()  {
   information().setIdentity();

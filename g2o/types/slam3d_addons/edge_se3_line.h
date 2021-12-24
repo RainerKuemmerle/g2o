@@ -51,7 +51,7 @@ namespace g2o {
       void computeError() override;
 
       virtual void setMeasurement(const Vector6& m) {
-        measurement_ = m;
+        measurement_ = Line3D(m);
       }
 
       void setMeasurement(const Line3D& m) override {

@@ -34,9 +34,9 @@
 
 namespace g2o {
 
-  typedef Eigen::Matrix<number_t, 6, 1> Vector6;
-  typedef Eigen::Matrix<number_t, 6, 6> Matrix6;
-  typedef Eigen::Matrix<number_t, 6, 4> Matrix6x4;
+  using Vector6 = Eigen::Matrix<number_t, 6, 1>;
+  using Matrix6 = Eigen::Matrix<number_t, 6, 6>;
+  using Matrix6x4 = Eigen::Matrix<number_t, 6, 4>;
 
   struct OrthonormalLine3D {
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
@@ -48,7 +48,7 @@ namespace g2o {
       U = Matrix3::Identity();
     }
   };
-  typedef struct OrthonormalLine3D OrthonormalLine3D;
+  using OrthonormalLine3D = struct OrthonormalLine3D;
 
   class Line3D : public Vector6 {
     public:
@@ -61,8 +61,8 @@ namespace g2o {
       *this << 0.0, 0.0, 0.0, 1.0, 0.0, 0.0;
     }
 
-    G2O_TYPES_SLAM3D_ADDONS_API Line3D(const Vector6& v) {
-      (Vector6&)*this = v;
+    G2O_TYPES_SLAM3D_ADDONS_API explicit Line3D(const Vector6& v) {
+      static_cast<Vector6&>(*this) = v;
     }
 
     G2O_TYPES_SLAM3D_ADDONS_API Vector6 toCartesian() const;
@@ -162,7 +162,7 @@ namespace g2o {
       this->normalize();
     }
 
-    G2O_TYPES_SLAM3D_ADDONS_API inline Vector4 ominus(const Line3D& line) {
+    G2O_TYPES_SLAM3D_ADDONS_API inline Vector4 ominus(const Line3D& line) const {
       OrthonormalLine3D ortho_estimate = toOrthonormal(*this);
       OrthonormalLine3D ortho_line = toOrthonormal(line);
 

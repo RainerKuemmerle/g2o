@@ -30,8 +30,6 @@
 
 namespace g2o {
 
-  using namespace std;
-
   static inline Matrix3 skew(const Vector3& t) {
     Matrix3 S;
     S <<
@@ -60,7 +58,7 @@ namespace g2o {
     Vector6 v = Vector6(line);
     return Line3D(A*v);
   }
-  
+
   namespace internal {
     Vector6 transformCartesianLine(const Isometry3& t, const Vector6& line) {
       Vector6 l;
@@ -79,7 +77,7 @@ namespace g2o {
       nl.tail<3>() = d0;
       return nl;
     }
-    
+
   }
 
 }

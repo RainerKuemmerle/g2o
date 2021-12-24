@@ -60,7 +60,7 @@ namespace g2o {
 
   bool EdgeSE3Line3D::resolveCaches() {
     ParameterVector pv(1);
-    pv[0] = _parameters[0];
+    pv[0] = parameters_[0];
     resolveCache(cache_, vertexXn<0>(), "CACHE_SE3_OFFSET", pv);
     return cache_ != nullptr;
   }
@@ -73,9 +73,9 @@ namespace g2o {
     if(!DrawAction::refreshPropertyPtrs(params_)) {
       return false;
     }
-    if(_previousParams) {
-      lineLength_ = previousParams_->makeProperty<FloatProperty>(typeName_ + "::LINE_LENGTH", 4.0f);
-      lineWidth_ = previousParams_->makeProperty<FloatProperty>(typeName_ + "::LINE_WIDTH", 2.0f);
+    if(previousParams_) {
+      lineLength_ = previousParams_->makeProperty<FloatProperty>(typeName_ + "::LINE_LENGTH", 4.0F);
+      lineWidth_ = previousParams_->makeProperty<FloatProperty>(typeName_ + "::LINE_WIDTH", 2.0F);
     }
     else {
       lineLength_ = nullptr;
@@ -93,7 +93,7 @@ namespace g2o {
     if(!previousParams_)
       return true;
 
-    if(_show && !show_->value())
+    if(show_ && !show_->value())
       return true;
 
     auto* that = dynamic_cast<EdgeSE3Line3D*>(element);

@@ -31,8 +31,6 @@
 #include "g2o/stuff/opengl_wrapper.h"
 
 namespace g2o {
-using namespace std;
-using namespace Eigen;
 
 EdgeSE3PlaneSensorCalib::EdgeSE3PlaneSensorCalib() :
    color(cst(0.1), cst(0.1), cst(0.1)) {
@@ -60,9 +58,9 @@ EdgeSE3PlaneSensorCalibDrawAction::EdgeSE3PlaneSensorCalibDrawAction()
 
 bool EdgeSE3PlaneSensorCalibDrawAction::refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_) {
   if (!DrawAction::refreshPropertyPtrs(params_)) return false;
-  if (_previousParams) {
-    planeWidth_ = previousParams_->makeProperty<FloatProperty>(typeName_ + "::PLANE_WIDTH", 0.5f);
-    planeHeight_ = previousParams_->makeProperty<FloatProperty>(typeName_ + "::PLANE_HEIGHT", 0.5f);
+  if (previousParams_) {
+    planeWidth_ = previousParams_->makeProperty<FloatProperty>(typeName_ + "::PLANE_WIDTH", 0.5F);
+    planeHeight_ = previousParams_->makeProperty<FloatProperty>(typeName_ + "::PLANE_HEIGHT", 0.5F);
   } else {
     planeWidth_ = nullptr;
     planeHeight_ = nullptr;
@@ -77,7 +75,7 @@ bool EdgeSE3PlaneSensorCalibDrawAction::operator()(HyperGraph::HyperGraphElement
   refreshPropertyPtrs(params_);
   if (!previousParams_) return true;
 
-  if (_show && !show_->value()) return true;
+  if (show_ && !show_->value()) return true;
 
   auto* that = dynamic_cast<EdgeSE3PlaneSensorCalib*>(element);
 
@@ -97,9 +95,9 @@ bool EdgeSE3PlaneSensorCalibDrawAction::operator()(HyperGraph::HyperGraphElement
     Isometry3 robotAndSensor = robot->estimate() * sensor->estimate();
     glMultMatrixd(robotAndSensor.matrix().cast<double>().eval().data());
 
-    glRotatef(float(RAD2DEG(azimuth)), 0.f, 0.f, 1.f);
-    glRotatef(float(RAD2DEG(elevation)), 0.f, -1.f, 0.f);
-    glTranslatef(float(d), 0.f, 0.f);
+    glRotatef(float(RAD2DEG(azimuth)), 0.F, 0.F, 1.F);
+    glRotatef(float(RAD2DEG(elevation)), 0.F, -1.F, 0.F);
+    glTranslatef(float(d), 0.F, 0.F);
 
     float planeWidth = planeWidth_->value();
     float planeHeight = planeHeight_->value();

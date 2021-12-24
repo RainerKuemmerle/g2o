@@ -28,8 +28,6 @@
 #include "g2o/core/factory.h"
 #include <iostream>
 
-using namespace Eigen;
-
 namespace g2o
 {
 
@@ -60,16 +58,16 @@ static void jac_quat3_euler3(Eigen::Matrix<number_t, 6, 6, Eigen::ColMajor>& J, 
     for (int i=0; i<6; i++)
       is  >> meas[i];
     Isometry3 transf= g2o::internal::fromVectorET(meas);
-    Matrix<number_t, 6, 6, Eigen::ColMajor> infMatEuler;
+    Eigen::Matrix<number_t, 6, 6, Eigen::ColMajor> infMatEuler;
     for (int i=0; i<6; i++)
       for (int j=i; j<6; j++) {
         is >> infMatEuler(i,j);
         if (i!=j)
           infMatEuler(j,i) = infMatEuler(i,j);
       }
-    Matrix<number_t, 6, 6, Eigen::ColMajor> J;
+    Eigen::Matrix<number_t, 6, 6, Eigen::ColMajor> J;
     jac_quat3_euler3(J, transf);
-    Matrix<number_t, 6, 6, Eigen::ColMajor> infMat = J.transpose() * infMatEuler * J;
+    Eigen::Matrix<number_t, 6, 6, Eigen::ColMajor> infMat = J.transpose() * infMatEuler * J;
     setMeasurement(transf);
     setInformation(infMat);
     return true;
@@ -81,11 +79,11 @@ static void jac_quat3_euler3(Eigen::Matrix<number_t, 6, 6, Eigen::ColMajor>& J, 
     for (int i=0; i<6; i++)
       os << meas[i] << " ";
 
-    Matrix<number_t, 6, 6, Eigen::ColMajor> J;
+    Eigen::Matrix<number_t, 6, 6, Eigen::ColMajor> J;
     jac_quat3_euler3(J, measurement());
     //HACK: invert the jacobian to simulate the inverse derivative
     J=J.inverse();
-    Matrix<number_t, 6, 6, Eigen::ColMajor> infMatEuler = J.transpose()*information()*J;
+    Eigen::Matrix<number_t, 6, 6, Eigen::ColMajor> infMatEuler = J.transpose()*information()*J;
     for (int i=0; i<6; i++)
       for (int j=i; j<6; j++){
         os << " " <<  infMatEuler(i,j);

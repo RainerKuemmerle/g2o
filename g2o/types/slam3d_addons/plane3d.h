@@ -44,7 +44,7 @@ namespace g2o {
         fromVector(Vector4(1., 0., 0., -1.));
       }
 
-      Plane3D(const Vector4& v){
+      explicit Plane3D(const Vector4& v){
         fromVector(v);
       }
 
@@ -54,8 +54,8 @@ namespace g2o {
 
       inline const Vector4& coeffs() const {return coeffs_;}
 
-      inline void fromVector(const Vector4& coeffs_) {
-        coeffs_=coeffs_;
+      inline void fromVector(const Vector4& coeffs) {
+        coeffs_=coeffs;
         normalize(coeffs_);
       }
 
@@ -86,7 +86,8 @@ namespace g2o {
       //construct a normal from azimuth and evelation;
       number_t _azimuth=v[0];
       number_t _elevation=v[1];
-      number_t s=std::sin(_elevation), c=std::cos(_elevation);
+      number_t s=std::sin(_elevation);
+      number_t c=std::cos(_elevation);
       Vector3 n (c*std::cos(_azimuth), c*std::sin(_azimuth), s) ;
 
       // rotate the normal
@@ -97,7 +98,7 @@ namespace g2o {
       normalize(coeffs_);
     }
 
-    inline Vector3 ominus(const Plane3D& plane){
+    inline Vector3 ominus(const Plane3D& plane) const{
       //construct the rotation that would bring the plane normal in (1 0 0)
       Matrix3 R=rotation(normal()).transpose();
       Vector3 n=R*plane.normal();
