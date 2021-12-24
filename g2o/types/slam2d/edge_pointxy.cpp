@@ -33,8 +33,8 @@
 
 namespace g2o {
 
-  EdgePointXY::EdgePointXY() :
-    BaseBinaryEdge<2, Vector2, VertexPointXY, VertexPointXY>()
+  EdgePointXY::EdgePointXY() 
+    
   {
     information_.setIdentity();
     error_.setZero();

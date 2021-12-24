@@ -114,7 +114,7 @@ class FixedArray {
   using reverse_iterator = std::reverse_iterator<iterator>;
   using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
-  static constexpr size_type inline_elements =
+  static constexpr size_type kInlineElements =
       (N == kFixedArrayUseDefault ? kInlineBytesDefault / sizeof(value_type)
                                   : static_cast<size_type>(N));
 
@@ -123,7 +123,7 @@ class FixedArray {
       : FixedArray(other.begin(), other.end(), a) {}
 
   FixedArray(FixedArray&& other, const allocator_type& a = allocator_type())
-      : FixedArray(std::make_move_iterator(other.begin()),
+ noexcept       : FixedArray(std::make_move_iterator(other.begin()),
                    std::make_move_iterator(other.end()),
                    a) {}
 
@@ -385,7 +385,7 @@ class FixedArray {
 
    private:
     // ADDRESS_SANITIZER_REDZONE(redzone_begin_);
-    alignas(StorageElement) char buff_[sizeof(StorageElement[inline_elements])];
+    alignas(StorageElement) char buff_[sizeof(StorageElement[kInlineElements])];
     // ADDRESS_SANITIZER_REDZONE(redzone_end_);
   };
 
@@ -397,7 +397,7 @@ class FixedArray {
   };
 
   using InlinedStorage =
-      typename std::conditional<inline_elements == 0,
+      typename std::conditional<kInlineElements == 0,
                                 EmptyInlinedStorage,
                                 NonEmptyInlinedStorage>::type;
 
@@ -429,17 +429,16 @@ class FixedArray {
 
    private:
     static bool UsingInlinedStorage(size_type n) {
-      return n <= inline_elements;
+      return n <= kInlineElements;
     }
 
     StorageElement* InitializeData() {
       if (UsingInlinedStorage(size())) {
         InlinedStorage::AnnotateConstruct(size());
         return InlinedStorage::data();
-      } else {
-        return reinterpret_cast<StorageElement*>(
+      }         return reinterpret_cast<StorageElement*>(
             AllocatorTraits::allocate(alloc(), size()));
-      }
+     
     }
 
     // Using std::tuple and not absl::CompressedTuple, as it has a lot of
@@ -456,7 +455,7 @@ constexpr size_t FixedArray<T, N, A>::kInlineBytesDefault;
 
 template <typename T, size_t N, typename A>
 constexpr typename FixedArray<T, N, A>::size_type
-    FixedArray<T, N, A>::inline_elements;
+    FixedArray<T, N, A>::kInlineElements;
 
 }  // namespace internal
 }  // namespace ceres

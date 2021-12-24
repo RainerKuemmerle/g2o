@@ -44,43 +44,43 @@ namespace g2o {
   public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
     EdgeSE2PointXYOffset();
-    virtual bool read(std::istream& is);
-    virtual bool write(std::ostream& os) const;
+    bool read(std::istream& is) override;
+    bool write(std::ostream& os) const override;
 
-    void computeError();
-    virtual void linearizeOplus();
+    void computeError() override;
+    void linearizeOplus() override;
 
 
-    virtual void setMeasurement(const Vector2& m){
+    void setMeasurement(const Vector2& m) override{
       measurement_ = m;
     }
 
-    virtual bool setMeasurementData(const number_t* d){
+    bool setMeasurementData(const number_t* d) override{
       Eigen::Map<const Vector2> v(d);
       measurement_ = v;
       return true;
     }
 
-    virtual bool getMeasurementData(number_t* d) const{
+    bool getMeasurementData(number_t* d) const override{
       Eigen::Map<Vector2> v(d);
       v=measurement_;
       return true;
     }
 
-    virtual int measurementDimension() const {return 3;}
+    int measurementDimension() const override {return 3;}
 
-    virtual bool setMeasurementFromState() ;
+    bool setMeasurementFromState() override ;
 
-    virtual number_t initialEstimatePossible(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to) {
+    number_t initialEstimatePossible(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to) override {
       (void)to;
       return (from.count(vertices_[0]) == 1 ? 1.0 : -1.0);
     }
 
-    virtual void initialEstimate(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to);
+    void initialEstimate(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to) override;
 
   private:
-    std::shared_ptr<CacheSE2Offset> cache;
-    virtual bool resolveCaches();
+    std::shared_ptr<CacheSE2Offset> cache_;
+    bool resolveCaches() override;
 
   };
 

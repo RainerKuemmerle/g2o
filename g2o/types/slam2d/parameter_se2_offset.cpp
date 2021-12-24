@@ -33,11 +33,11 @@ namespace g2o {
 
 ParameterSE2Offset::ParameterSE2Offset() { setOffset(); }
 
-void ParameterSE2Offset::setOffset(const SE2& offset_) {
-  _offset = offset_;
-  _offsetMatrix = _offset.rotation().toRotationMatrix();
-  _offsetMatrix.translation() = _offset.translation();
-  _inverseOffsetMatrix = _offsetMatrix.inverse();
+void ParameterSE2Offset::setOffset(const SE2& offset) {
+  offset_ = offset;
+  offsetMatrix_ = offset_.rotation().toRotationMatrix();
+  offsetMatrix_.translation() = offset_.translation();
+  inverseOffsetMatrix_ = offsetMatrix_.inverse();
 }
 
 bool ParameterSE2Offset::read(std::istream& is) {
@@ -51,36 +51,34 @@ bool ParameterSE2Offset::write(std::ostream& os) const {
   return internal::writeVector(os, offset().toVector());
 }
 
-CacheSE2Offset::CacheSE2Offset() : Cache() {}
-
 void CacheSE2Offset::updateImpl() {
 #ifndef NDEBUG
-  ParameterSE2Offset* offsetParam = dynamic_cast<ParameterSE2Offset*>(parameters_[0].get());
+  auto* offsetParam = dynamic_cast<ParameterSE2Offset*>(parameters_[0].get());
 #else
-  ParameterSE2Offset* offsetParam = static_cast<ParameterSE2Offset*>(parameters_[0].get());
+  auto* offsetParam = static_cast<ParameterSE2Offset*>(parameters_[0].get());
 #endif
 
-  const VertexSE2* v = static_cast<const VertexSE2*>(vertex());
-  _se2_n2w = v->estimate() * offsetParam->offset();
+  const auto* v = static_cast<const VertexSE2*>(vertex());
+  se2_n2w_ = v->estimate() * offsetParam->offset();
 
-  _n2w = _se2_n2w.rotation().toRotationMatrix();
-  _n2w.translation() = _se2_n2w.translation();
+  n2w_ = se2_n2w_.rotation().toRotationMatrix();
+  n2w_.translation() = se2_n2w_.translation();
 
-  _se2_w2n = _se2_n2w.inverse();
-  _w2n = _se2_w2n.rotation().toRotationMatrix();
-  _w2n.translation() = _se2_w2n.translation();
+  se2_w2n_ = se2_n2w_.inverse();
+  w2n_ = se2_w2n_.rotation().toRotationMatrix();
+  w2n_.translation() = se2_w2n_.translation();
 
   SE2 w2l = v->estimate().inverse();
-  _w2l = w2l.rotation().toRotationMatrix();
-  _w2l.translation() = w2l.translation();
+  w2l_ = w2l.rotation().toRotationMatrix();
+  w2l_.translation() = w2l.translation();
 
   number_t alpha = v->estimate().rotation().angle();
   number_t c = std::cos(alpha), s = std::sin(alpha);
   Matrix2 RInversePrime;
   RInversePrime << -s, c, -c, -s;
-  _RpInverse_RInversePrime =
+  RpInverse_RInversePrime_ =
       offsetParam->offset().rotation().toRotationMatrix().transpose() * RInversePrime;
-  _RpInverse_RInverse = w2l.rotation();
+  RpInverse_RInverse_ = w2l.rotation();
 }
 
 }  // namespace g2o

@@ -33,11 +33,6 @@
 
 namespace g2o {
 
-  EdgeSE2PointXY::EdgeSE2PointXY() :
-    BaseBinaryEdge<2, Vector2, VertexSE2, VertexPointXY>()
-  {
-  }
-
   bool EdgeSE2PointXY::read(std::istream& is)
   {
     internal::readVector(is, measurement_);
@@ -96,13 +91,13 @@ namespace g2o {
   bool EdgeSE2PointXYWriteGnuplotAction::operator()(HyperGraph::HyperGraphElement* element, HyperGraphElementAction::Parameters* params_){
     if (typeid(*element).name()!=typeName_)
       return false;
-    WriteGnuplotAction::Parameters* params=static_cast<WriteGnuplotAction::Parameters*>(params_);
+    auto* params=static_cast<WriteGnuplotAction::Parameters*>(params_);
     if (!params->os){
       std::cerr << __PRETTY_FUNCTION__ << ": warning, on valid os specified" << std::endl;
       return false;
     }
 
-    EdgeSE2PointXY* e =  static_cast<EdgeSE2PointXY*>(element);
+    auto* e =  static_cast<EdgeSE2PointXY*>(element);
     if (e->numUndefinedVertices())
       return true;
     auto fromEdge = e->vertexXn<0>();
@@ -130,7 +125,7 @@ namespace g2o {
       return true;
 
 
-    EdgeSE2PointXY* e =  static_cast<EdgeSE2PointXY*>(element);
+    auto* e =  static_cast<EdgeSE2PointXY*>(element);
     auto fromEdge = e->vertexXn<0>();
     auto toEdge   = e->vertexXn<1>();
     if (! fromEdge)
@@ -144,7 +139,7 @@ namespace g2o {
       glPushAttrib(GL_POINT_SIZE);
       glPointSize(3);
       glBegin(GL_POINTS);
-      glVertex3f((float)p.x(),(float)p.y(),0.f);
+      glVertex3f(static_cast<float>(p.x()),static_cast<float>(p.y()),0.F);
       glEnd();
       glPopAttrib();
     } else {
@@ -152,8 +147,8 @@ namespace g2o {
       glColor3f(LANDMARK_EDGE_COLOR);
     }
     glBegin(GL_LINES);
-    glVertex3f((float)fromEdge->estimate().translation().x(),(float)fromEdge->estimate().translation().y(),0.f);
-    glVertex3f((float)p.x(),(float)p.y(),0.f);
+    glVertex3f(static_cast<float>(fromEdge->estimate().translation().x()),static_cast<float>(fromEdge->estimate().translation().y()),0.F);
+    glVertex3f(static_cast<float>(p.x()),static_cast<float>(p.y()),0.F);
     glEnd();
     glPopAttrib();
     return true;

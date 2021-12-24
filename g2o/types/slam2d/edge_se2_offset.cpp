@@ -31,9 +31,8 @@
 #include <iostream>
 
 namespace g2o {
-  using namespace std;
 
-  EdgeSE2Offset::EdgeSE2Offset() : BaseBinaryEdge<3, SE2, VertexSE2, VertexSE2>() {
+  EdgeSE2Offset::EdgeSE2Offset()  {
     information().setIdentity();
     resizeParameters(2);
     installParameter<CacheSE2Offset::ParameterType>(0);
@@ -43,10 +42,10 @@ namespace g2o {
   bool EdgeSE2Offset::resolveCaches(){
     ParameterVector pv(1);
     pv[0] = parameters_[0];
-    resolveCache(_cacheFrom, vertexXn<0>(), "CACHE_SE2_OFFSET", pv);
+    resolveCache(cacheFrom_, vertexXn<0>(), "CACHE_SE2_OFFSET", pv);
     pv[0] = parameters_[1];
-    resolveCache(_cacheTo, vertexXn<1>(), "CACHE_SE2_OFFSET", pv);
-    return (_cacheFrom && _cacheTo);
+    resolveCache(cacheTo_, vertexXn<1>(), "CACHE_SE2_OFFSET", pv);
+    return (cacheFrom_ && cacheTo_);
   }
 
   bool EdgeSE2Offset::read(std::istream& is) {
@@ -66,13 +65,13 @@ namespace g2o {
   }
 
   void EdgeSE2Offset::computeError() {
-    SE2 delta=_inverseMeasurement * _cacheFrom->w2n() * _cacheTo->n2w();
+    SE2 delta=inverseMeasurement_ * cacheFrom_->w2n() * cacheTo_->n2w();
     error_.head<2>() = delta.translation();
     error_(2)=delta.rotation().angle();
   }
 
   bool EdgeSE2Offset::setMeasurementFromState(){
-    SE2 delta = _cacheFrom->w2n() * _cacheTo->n2w();
+    SE2 delta = cacheFrom_->w2n() * cacheTo_->n2w();
     setMeasurement(delta);
     return true;
   }
@@ -81,7 +80,7 @@ namespace g2o {
     auto from = vertexXn<0>();
     auto to   = vertexXn<1>();
 
-    SE2 virtualMeasurement = _cacheFrom->offsetParam()->offset() * measurement() * _cacheTo->offsetParam()->offset().inverse();
+    SE2 virtualMeasurement = cacheFrom_->offsetParam()->offset() * measurement() * cacheTo_->offsetParam()->offset().inverse();
 
     if (from_.count(from) > 0)
       to->setEstimate(from->estimate() * virtualMeasurement);

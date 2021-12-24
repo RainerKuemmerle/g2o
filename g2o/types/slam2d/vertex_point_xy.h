@@ -42,66 +42,66 @@ namespace g2o {
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
       VertexPointXY();
 
-      virtual void setToOriginImpl() {
+      void setToOriginImpl() override {
         estimate_.setZero();
       }
 
-      virtual bool setEstimateDataImpl(const number_t* est){
+      bool setEstimateDataImpl(const number_t* est) override{
         estimate_[0] = est[0];
         estimate_[1] = est[1];
         return true;
       }
 
-      virtual bool getEstimateData(number_t* est) const{
+      bool getEstimateData(number_t* est) const override{
         est[0] = estimate_[0];
         est[1] = estimate_[1];
         return true;
       }
 
-      virtual int estimateDimension() const {
+      int estimateDimension() const override {
         return 2;
       }
 
-      virtual bool setMinimalEstimateDataImpl(const number_t* est){
+      bool setMinimalEstimateDataImpl(const number_t* est) override{
         return setEstimateData(est);
       }
 
-      virtual bool getMinimalEstimateData(number_t* est) const{
+      bool getMinimalEstimateData(number_t* est) const override{
         return getEstimateData(est);
       }
 
-      virtual int minimalEstimateDimension() const {
+      int minimalEstimateDimension() const override {
         return 2;
       }
 
-      virtual void oplusImpl(const number_t* update)
+      void oplusImpl(const number_t* update) override
       {
         estimate_[0] += update[0];
         estimate_[1] += update[1];
       }
 
-      virtual bool read(std::istream& is);
-      virtual bool write(std::ostream& os) const;
+      bool read(std::istream& is) override;
+      bool write(std::ostream& os) const override;
 
   };
 
   class G2O_TYPES_SLAM2D_API VertexPointXYWriteGnuplotAction: public WriteGnuplotAction {
   public:
     VertexPointXYWriteGnuplotAction();
-    virtual bool operator()(HyperGraph::HyperGraphElement* element,
-                            HyperGraphElementAction::Parameters* params);
+    bool operator()(HyperGraph::HyperGraphElement* element,
+                            HyperGraphElementAction::Parameters* params) override;
   };
 
 #ifdef G2O_HAVE_OPENGL
   class G2O_TYPES_SLAM2D_API VertexPointXYDrawAction: public DrawAction{
   public:
     VertexPointXYDrawAction();
-    virtual bool operator()(HyperGraph::HyperGraphElement* element,
-                            HyperGraphElementAction::Parameters* params);
+    bool operator()(HyperGraph::HyperGraphElement* element,
+                            HyperGraphElementAction::Parameters* params) override;
 
    protected:
-    std::shared_ptr<FloatProperty> _pointSize;
-    virtual bool refreshPropertyPtrs(HyperGraphElementAction::Parameters* params);
+    std::shared_ptr<FloatProperty> pointSize_;
+    bool refreshPropertyPtrs(HyperGraphElementAction::Parameters* params) override;
   };
 #endif
 

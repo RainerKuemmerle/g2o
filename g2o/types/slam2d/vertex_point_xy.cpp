@@ -37,8 +37,8 @@
 
 namespace g2o {
 
-  VertexPointXY::VertexPointXY() :
-    BaseVertex<2, Vector2>()
+  VertexPointXY::VertexPointXY() 
+    
   {
     estimate_.setZero();
   }
@@ -60,27 +60,27 @@ namespace g2o {
     if (typeid(*element).name()!=typeName_)
       return false;
 
-    WriteGnuplotAction::Parameters* gnuplot_params=static_cast<WriteGnuplotAction::Parameters*>(params);
+    auto* gnuplot_params=static_cast<WriteGnuplotAction::Parameters*>(params);
     if (!gnuplot_params->os){
       std::cerr << __PRETTY_FUNCTION__ << ": warning, on valid os specified" << std::endl;
       return false;
     }
 
-    VertexPointXY* v =  static_cast<VertexPointXY*>(element);
+    auto* v =  static_cast<VertexPointXY*>(element);
     *(gnuplot_params->os) << v->estimate().x() << " " << v->estimate().y() << std::endl;
     return true;
   }
 
 #ifdef G2O_HAVE_OPENGL
-  VertexPointXYDrawAction::VertexPointXYDrawAction() : DrawAction(typeid(VertexPointXY).name()), _pointSize(nullptr) {}
+  VertexPointXYDrawAction::VertexPointXYDrawAction() : DrawAction(typeid(VertexPointXY).name()), pointSize_(nullptr) {}
 
   bool VertexPointXYDrawAction::refreshPropertyPtrs(HyperGraphElementAction::Parameters* params){
     if (! DrawAction::refreshPropertyPtrs(params))
       return false;
     if (previousParams_){
-      _pointSize = previousParams_->makeProperty<FloatProperty>(typeName_ + "::POINT_SIZE", 1.);
+      pointSize_ = previousParams_->makeProperty<FloatProperty>(typeName_ + "::POINT_SIZE", 1.);
     } else {
-      _pointSize = 0;
+      pointSize_ = nullptr;
     }
     return true;
   }
@@ -96,14 +96,14 @@ namespace g2o {
 
     if (show_ && !show_->value())
       return true;
-    VertexPointXY* that = static_cast<VertexPointXY*>(element);
+    auto* that = static_cast<VertexPointXY*>(element);
 
     glPushMatrix();
     glPushAttrib(GL_ENABLE_BIT | GL_POINT_BIT);
     glDisable(GL_LIGHTING);
     glColor3f(LANDMARK_VERTEX_COLOR);
-    float ps = _pointSize ? _pointSize->value() :  1.0f;
-    glTranslatef(that->estimate()(0),that->estimate()(1),0.0f);
+    float ps = pointSize_ ? pointSize_->value() :  1.0F;
+    glTranslatef(that->estimate()(0),that->estimate()(1),0.0F);
     opengl::drawPoint(ps);
     glPopAttrib();
     drawCache(that->cacheContainer(), params);

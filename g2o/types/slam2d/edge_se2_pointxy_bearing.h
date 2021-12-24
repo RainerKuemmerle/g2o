@@ -39,8 +39,8 @@ namespace g2o {
   {
     public:
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-      EdgeSE2PointXYBearing();
-      void computeError()
+      EdgeSE2PointXYBearing() = default;
+      void computeError() override
       {
         const VertexSE2* v1 = vertexXnRaw<0>();
         const VertexPointXY* l2 = vertexXnRaw<1>();
@@ -50,19 +50,19 @@ namespace g2o {
       }
 
 
-      virtual bool setMeasurementData(const number_t* d) {
+      bool setMeasurementData(const number_t* d) override {
         measurement_=d[0];
         return true;
       }
 
-      virtual bool getMeasurementData(number_t* d) const {
+      bool getMeasurementData(number_t* d) const override {
         d[0] = measurement_;
         return true;
       }
 
-      int measurementDimension() const {return 1;}
+      int measurementDimension() const override {return 1;}
 
-      virtual bool setMeasurementFromState(){
+      bool setMeasurementFromState() override{
         const VertexSE2* v1 = vertexXnRaw<0>();
         const VertexPointXY* l2 = vertexXnRaw<1>();
         Vector2 delta = (v1->estimate().inverse() * l2->estimate());
@@ -70,26 +70,26 @@ namespace g2o {
         return true;
       }
 
-      virtual bool read(std::istream& is);
-      virtual bool write(std::ostream& os) const;
+      bool read(std::istream& is) override;
+      bool write(std::ostream& os) const override;
 
-      virtual number_t initialEstimatePossible(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex*) { return (from.count(vertices_[0]) == 1 ? 1.0 : -1.0);}
-      virtual void initialEstimate(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to);
+      number_t initialEstimatePossible(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex*) override { return (from.count(vertices_[0]) == 1 ? 1.0 : -1.0);}
+      void initialEstimate(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to) override;
   };
 
   class G2O_TYPES_SLAM2D_API EdgeSE2PointXYBearingWriteGnuplotAction: public WriteGnuplotAction {
   public:
     EdgeSE2PointXYBearingWriteGnuplotAction();
-    virtual bool operator()(HyperGraph::HyperGraphElement* element,
-                            HyperGraphElementAction::Parameters* params_);
+    bool operator()(HyperGraph::HyperGraphElement* element,
+                            HyperGraphElementAction::Parameters* params_) override;
   };
 
 #ifdef G2O_HAVE_OPENGL
   class G2O_TYPES_SLAM2D_API EdgeSE2PointXYBearingDrawAction: public DrawAction{
   public:
     EdgeSE2PointXYBearingDrawAction();
-    virtual bool operator()(HyperGraph::HyperGraphElement* element,
-                            HyperGraphElementAction::Parameters* params_);
+    bool operator()(HyperGraph::HyperGraphElement* element,
+                            HyperGraphElementAction::Parameters* params_) override;
   };
 #endif
 

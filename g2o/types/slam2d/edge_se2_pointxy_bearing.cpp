@@ -33,11 +33,6 @@
 
 namespace g2o {
 
-  EdgeSE2PointXYBearing::EdgeSE2PointXYBearing()
-  {
-  }
-
-
   void EdgeSE2PointXYBearing::initialEstimate(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* /*to*/)
   {
     assert(from.size() == 1 && from.count(vertices_[0]) == 1 && "Can not initialize VertexSE2 position by VertexPointXY");
@@ -72,13 +67,13 @@ namespace g2o {
       HyperGraph::HyperGraphElement* element, HyperGraphElementAction::Parameters* params_) {
     if (typeid(*element).name()!=typeName_)
       return false;
-    WriteGnuplotAction::Parameters* params=static_cast<WriteGnuplotAction::Parameters*>(params_);
+    auto* params=static_cast<WriteGnuplotAction::Parameters*>(params_);
     if (!params->os){
       std::cerr << __PRETTY_FUNCTION__ << ": warning, on valid os specified" << std::endl;
       return false;
     }
 
-    EdgeSE2PointXYBearing* e =  static_cast<EdgeSE2PointXYBearing*>(element);
+    auto* e =  static_cast<EdgeSE2PointXYBearing*>(element);
     auto fromEdge = e->vertexXn<0>();
     auto toEdge   = e->vertexXn<1>();
     *(params->os) << fromEdge->estimate().translation().x() << " "
@@ -104,7 +99,7 @@ namespace g2o {
     if (show_ && !show_->value())
       return true;
 
-    EdgeSE2PointXYBearing* e =  static_cast<EdgeSE2PointXYBearing*>(element);
+    auto* e =  static_cast<EdgeSE2PointXYBearing*>(element);
     auto from = e->vertexXn<0>();
     auto to   = e->vertexXn<1>();
     if (! from)
@@ -120,7 +115,7 @@ namespace g2o {
       glPushAttrib(GL_POINT_SIZE);
       glPointSize(3);
       glBegin(GL_POINTS);
-      glVertex3f((float)p.x(),(float)p.y(),0.f);
+      glVertex3f(static_cast<float>(p.x()),static_cast<float>(p.y()),0.F);
       glEnd();
       glPopAttrib();
     } else {
@@ -128,8 +123,8 @@ namespace g2o {
       glColor3f(LANDMARK_EDGE_COLOR);
     }
     glBegin(GL_LINES);
-    glVertex3f((float)from->estimate().translation().x(),(float)from->estimate().translation().y(),0.f);
-    glVertex3f((float)p.x(),(float)p.y(),0.f);
+    glVertex3f(static_cast<float>(from->estimate().translation().x()),static_cast<float>(from->estimate().translation().y()),0.F);
+    glVertex3f(static_cast<float>(p.x()),static_cast<float>(p.y()),0.F);
     glEnd();
     glPopAttrib();
     return true;

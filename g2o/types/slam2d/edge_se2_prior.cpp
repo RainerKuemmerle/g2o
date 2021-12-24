@@ -28,10 +28,6 @@
 
 namespace g2o {
 
-  EdgeSE2Prior::EdgeSE2Prior() : BaseUnaryEdge<3, SE2, VertexSE2>()
-  {
-  }
-
   void EdgeSE2Prior::initialEstimate(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to)
   {
     assert(from.size() == 0); (void) from; (void) to;
@@ -44,7 +40,7 @@ namespace g2o {
     Vector3 p;
     internal::readVector(is, p);
     setMeasurement(SE2(p));
-    _inverseMeasurement= measurement_.inverse();
+    inverseMeasurement_= measurement_.inverse();
     readInformationMatrix(is);
     return true;
   }
@@ -58,12 +54,12 @@ namespace g2o {
   void EdgeSE2Prior::setMeasurement(const SE2& m)
   {
     measurement_ = m;
-    _inverseMeasurement = m.inverse();
+    inverseMeasurement_ = m.inverse();
   }
 
   bool EdgeSE2Prior::setMeasurementData(const number_t* d) {
     measurement_=SE2(d[0], d[1], d[2]);
-    _inverseMeasurement = measurement_.inverse();
+    inverseMeasurement_ = measurement_.inverse();
     return true;
   }
 

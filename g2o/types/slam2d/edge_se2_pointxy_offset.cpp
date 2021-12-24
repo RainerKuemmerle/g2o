@@ -29,11 +29,9 @@
 #include <iostream>
 
 namespace g2o {
-  using namespace std;
-
 
   // point to camera projection, monocular
-  EdgeSE2PointXYOffset::EdgeSE2PointXYOffset() : BaseBinaryEdge<2, Vector2, VertexSE2, VertexPointXY>() {
+  EdgeSE2PointXYOffset::EdgeSE2PointXYOffset()  {
     information().setIdentity();
     resizeParameters(1);
     installParameter<CacheSE2Offset::ParameterType>(0);
@@ -42,8 +40,8 @@ namespace g2o {
   bool EdgeSE2PointXYOffset::resolveCaches(){
     ParameterVector pv(1);
     pv[0] = parameters_[0];
-    resolveCache(cache, vertexXn<0>(), "CACHE_SE2_OFFSET", pv);
-    return cache != 0;
+    resolveCache(cache_, vertexXn<0>(), "CACHE_SE2_OFFSET", pv);
+    return cache_ != nullptr;
   }
 
 
@@ -71,7 +69,7 @@ namespace g2o {
     // VertexSE2 *rob = static_cast<VertexSE2*>(vertices_[0]);
     VertexPointXY *point = vertexXnRaw<1>();
 
-    Vector2 perr = cache->w2lMatrix() * point->estimate();
+    Vector2 perr = cache_->w2lMatrix() * point->estimate();
 
     // error, which is backwards from the normal observed - calculated
     // measurement_ is the measured projection
@@ -81,16 +79,16 @@ namespace g2o {
   void EdgeSE2PointXYOffset::linearizeOplus() {
     VertexSE2 *rob = vertexXnRaw<0>();
     VertexPointXY *point = vertexXnRaw<1>();
-    jacobianOplusXi_.block<2,2>(0,0) = - cache->RpInverseRInverseMatrix();
-    jacobianOplusXi_.block<2,1>(0,2) = cache->RpInverseRInversePrimeMatrix()*(point->estimate()-rob->estimate().translation());
-    jacobianOplusXj_ = cache->RpInverseRInverseMatrix();
+    jacobianOplusXi_.block<2,2>(0,0) = - cache_->RpInverseRInverseMatrix();
+    jacobianOplusXi_.block<2,1>(0,2) = cache_->RpInverseRInversePrimeMatrix()*(point->estimate()-rob->estimate().translation());
+    jacobianOplusXj_ = cache_->RpInverseRInverseMatrix();
   }
 
 
   bool EdgeSE2PointXYOffset::setMeasurementFromState(){
     VertexPointXY *point = vertexXnRaw<1>();
 
-    measurement_ = cache->w2lMatrix() * point->estimate();
+    measurement_ = cache_->w2lMatrix() * point->estimate();
     return true;
   }
 
@@ -108,7 +106,7 @@ namespace g2o {
     // }
     // SE2OffsetParameters* params=vcache->params;
     Vector2 p=measurement_;
-    point->setEstimate(cam->estimate() * (cache->offsetParam()->offsetMatrix() * p));
+    point->setEstimate(cam->estimate() * (cache_->offsetParam()->offsetMatrix() * p));
   }
 
 }

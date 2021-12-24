@@ -40,8 +40,6 @@
 
 #include "g2o/core/solver.h"
 
-using namespace std;
-
 namespace g2o {
 
   /**
@@ -56,9 +54,9 @@ namespace g2o {
                                const std::shared_ptr<HyperGraph::Edge>& e) override {
         if (! vParent)
           return 0.;
-        EdgeSE2* odom    = static_cast<EdgeSE2*>(e.get());
-        VertexSE2* from  = static_cast<VertexSE2*>(vParent.get());
-        VertexSE2* to    = static_cast<VertexSE2*>(v.get());
+        auto* odom    = static_cast<EdgeSE2*>(e.get());
+        auto* from  = static_cast<VertexSE2*>(vParent.get());
+        auto* to    = static_cast<VertexSE2*>(v.get());
         assert(to->hessianIndex() >= 0);
         number_t fromTheta = from->hessianIndex() < 0 ? 0. : thetaGuess_[from->hessianIndex()];
         bool direct      = odom->vertices()[0].get() == from;
@@ -77,9 +75,6 @@ namespace g2o {
     : OptimizationAlgorithmGaussNewton(std::move(solver))
   {}
 
-  SolverSLAM2DLinear::~SolverSLAM2DLinear()
-  {}
-
   OptimizationAlgorithm::SolverResult SolverSLAM2DLinear::solve(int iteration, bool online)
   {
     if (iteration == 0) {
@@ -93,23 +88,23 @@ namespace g2o {
 
   bool SolverSLAM2DLinear::solveOrientation()
   {
-    assert(_optimizer->indexMapping().size() + 1 == _optimizer->vertices().size() && "Needs to operate on full graph");
-    assert(_optimizer->vertex(0)->fixed() && "Graph is not fixed by vertex 0");
-    VectorX b, x; // will be used for theta and x/y update
+    assert(optimizer_->indexMapping().size() + 1 == optimizer_->vertices().size() && "Needs to operate on full graph");
+    assert(optimizer_->vertex(0)->fixed() && "Graph is not fixed by vertex 0");
+    VectorX b;
+    VectorX x; // will be used for theta and x/y update
     b.setZero(optimizer_->indexMapping().size());
     x.setZero(optimizer_->indexMapping().size());
 
-    using ScalarMatrix = int;
+    using ScalarMatrix = Eigen::Matrix<number_t, 1, 1, Eigen::ColMajor>;
 
-    std::vector<int> blockIndeces(_optimizer->indexMapping().size());
-    for (size_t i = 0; i < _optimizer->indexMapping().size(); ++i)
+    std::vector<int> blockIndeces(optimizer_->indexMapping().size());
+    for (size_t i = 0; i < optimizer_->indexMapping().size(); ++i)
       blockIndeces[i] = i+1;
 
-    SparseBlockMatrix<ScalarMatrix> H(blockIndeces.data(), blockIndeces.data(), _optimizer->indexMapping().size(), _optimizer->indexMapping().size());
+    SparseBlockMatrix<ScalarMatrix> H(blockIndeces.data(), blockIndeces.data(), optimizer_->indexMapping().size(), optimizer_->indexMapping().size());
 
     // building the structure, diagonal for each active vertex
-    for (size_t i = 0; i < _optimizer->indexMapping().size(); ++i) {
-      OptimizableGraph::Vertex* v = optimizer_->indexMapping()[i];
+    for (auto* v : optimizer_->indexMapping()) {
       int poseIdx = v->hessianIndex();
       ScalarMatrix* m = H.block(poseIdx, poseIdx, true);
       m->setZero();
@@ -118,12 +113,12 @@ namespace g2o {
     HyperGraph::VertexSet fixedSet;
 
     // off diagonal for each edge
-    for (SparseOptimizer::EdgeContainer::const_iterator it = optimizer_->activeEdges().begin(); it != optimizer_->activeEdges().end(); ++it) {
+    for (const auto & it : optimizer_->activeEdges()) {
 #    ifndef NDEBUG
-      EdgeSE2* e = dynamic_cast<EdgeSE2*>(it->get());
+      auto* e = dynamic_cast<EdgeSE2*>(it->get());
       assert(e && "Active edges contain non-odometry edge"); //
 #    else
-      EdgeSE2* e = static_cast<EdgeSE2*>(it->get());
+      auto* e = static_cast<EdgeSE2*>(it.get());
 #    endif
       auto from = e->vertexXn<0>();
       auto to   = e->vertexXn<1>();
@@ -147,7 +142,7 @@ namespace g2o {
 
     // walk along the Minimal Spanning Tree to compute the guess for the robot orientation
     assert(fixedSet.size() == 1);
-    auto root = static_pointer_cast<VertexSE2>(*fixedSet.begin());
+    auto root = std::static_pointer_cast<VertexSE2>(*fixedSet.begin());
     VectorX thetaGuess;
     thetaGuess.setZero(optimizer_->indexMapping().size());
     UniformCostFunction uniformCost;
@@ -160,8 +155,8 @@ namespace g2o {
     HyperDijkstra::visitAdjacencyMap(hyperDijkstra.adjacencyMap(), &thetaTreeAction);
 
     // construct for the orientation
-    for (SparseOptimizer::EdgeContainer::const_iterator it = optimizer_->activeEdges().begin(); it != optimizer_->activeEdges().end(); ++it) {
-      EdgeSE2* e = static_cast<EdgeSE2*>(it->get());
+    for (const auto & it : optimizer_->activeEdges()) {
+      auto* e = static_cast<EdgeSE2*>(it.get());
       auto from = e->vertexXn<0>();
       auto to   = e->vertexXn<1>();
 
@@ -199,14 +194,14 @@ namespace g2o {
     linearSystemSolver.init();
     bool ok = linearSystemSolver.solve(H, x.data(), b.data());
     if (!ok) {
-      cerr << __PRETTY_FUNCTION__ << "Failure while solving linear system" << endl;
+      std::cerr << __PRETTY_FUNCTION__ << "Failure while solving linear system" << std::endl;
       return false;
     }
 
     // update the orientation of the 2D poses and set translation to 0, GN shall solve that
     root->setToOrigin();
-    for (size_t i = 0; i < _optimizer->indexMapping().size(); ++i) {
-      VertexSE2* v = static_cast<VertexSE2*>(optimizer_->indexMapping()[i]);
+    for (auto* vv : optimizer_->indexMapping()) {
+      auto* v = static_cast<VertexSE2*>(vv);
       int poseIdx = v->hessianIndex();
       SE2 poseUpdate(0, 0, normalize_theta(thetaGuess(poseIdx) + x(poseIdx)));
       v->setEstimate(poseUpdate);

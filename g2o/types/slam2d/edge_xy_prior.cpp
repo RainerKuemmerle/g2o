@@ -33,8 +33,8 @@
 
 namespace g2o {
 
-  EdgeXYPrior::EdgeXYPrior() :
-    BaseUnaryEdge<2, Vector2, VertexPointXY>()
+  EdgeXYPrior::EdgeXYPrior() 
+    
   {
     information_.setIdentity();
     error_.setZero();

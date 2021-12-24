@@ -42,7 +42,7 @@ namespace g2o {
   {
     public:
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-      VertexSE2();
+      VertexSE2() = default;
 
       void setToOriginImpl() override {
         estimate_ = SE2();
@@ -100,7 +100,7 @@ namespace g2o {
                             HyperGraphElementAction::Parameters* params_) override;
 
    protected:
-    HyperGraphElementAction* drawActions_;
+    HyperGraphElementAction* drawActions_ = nullptr;
     bool refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_) override;
     std::shared_ptr<FloatProperty> triangleX_, triangleY_;
 

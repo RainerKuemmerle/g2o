@@ -46,8 +46,8 @@ namespace g2o {
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
       ParameterSE2Offset();
 
-      virtual bool read(std::istream& is);
-      virtual bool write(std::ostream& os) const;
+      bool read(std::istream& is) override;
+      bool write(std::ostream& os) const override;
 
       /**
        * update the offset to a new value.
@@ -55,18 +55,18 @@ namespace g2o {
        */
       void setOffset(const SE2& offset_ = SE2());
 
-      const SE2& offset() const { return _offset;}
+      const SE2& offset() const { return offset_;}
 
       //! rotation of the offset as 2x2 rotation matrix
-      const Isometry2& offsetMatrix() const { return _offsetMatrix;}
+      const Isometry2& offsetMatrix() const { return offsetMatrix_;}
 
       //! rotation of the inverse offset as 2x2 rotation matrix
-      const Isometry2& inverseOffsetMatrix() const { return _inverseOffsetMatrix;}
+      const Isometry2& inverseOffsetMatrix() const { return inverseOffsetMatrix_;}
 
     protected:
-      SE2 _offset;
-      Isometry2 _offsetMatrix;
-      Isometry2 _inverseOffsetMatrix;
+      SE2 offset_;
+      Isometry2 offsetMatrix_;
+      Isometry2 inverseOffsetMatrix_;
   };
 
   /**
@@ -77,32 +77,32 @@ namespace g2o {
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
       using ParameterType = ParameterSE2Offset;
 
-      CacheSE2Offset();
-      virtual void updateImpl();
+      CacheSE2Offset() = default;
+      void updateImpl() override;
 
       std::shared_ptr<ParameterSE2Offset> offsetParam() const {
         return std::static_pointer_cast<ParameterSE2Offset>(parameters_[0]);
       }
 
-      const SE2& w2n() const {return _se2_w2n;}
-      const SE2& n2w() const {return _se2_n2w;}
+      const SE2& w2n() const {return se2_w2n_;}
+      const SE2& n2w() const {return se2_n2w_;}
 
-      const Isometry2& w2nMatrix() const { return _w2n;}
-      const Isometry2& n2wMatrix() const { return _n2w;}
-      const Isometry2& w2lMatrix() const { return _w2l;}
+      const Isometry2& w2nMatrix() const { return w2n_;}
+      const Isometry2& n2wMatrix() const { return n2w_;}
+      const Isometry2& w2lMatrix() const { return w2l_;}
 
-      const Matrix2 RpInverseRInverseMatrix() const { return _RpInverse_RInverse; }
-      const Matrix2 RpInverseRInversePrimeMatrix() const { return _RpInverse_RInversePrime; }
+      Matrix2 RpInverseRInverseMatrix() const { return RpInverse_RInverse_; }
+      Matrix2 RpInverseRInversePrimeMatrix() const { return RpInverse_RInversePrime_; }
 
     protected:
-      SE2 _se2_w2n;
-      SE2 _se2_n2w;
+      SE2 se2_w2n_;
+      SE2 se2_n2w_;
 
-      Isometry2 _w2n; ///< world to sensor transform
-      Isometry2 _w2l; ///< world to local
-      Isometry2 _n2w; ///< sensor to world
-      Matrix2 _RpInverse_RInverse;
-      Matrix2 _RpInverse_RInversePrime;
+      Isometry2 w2n_; ///< world to sensor transform
+      Isometry2 w2l_; ///< world to local
+      Isometry2 n2w_; ///< sensor to world
+      Matrix2 RpInverse_RInverse_;
+      Matrix2 RpInverse_RInversePrime_;
 
   };
 

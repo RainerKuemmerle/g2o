@@ -39,59 +39,59 @@ namespace g2o {
   {
     public:
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-      EdgeSE2PointXY();
+      EdgeSE2PointXY() = default;
 
-      void computeError()
+      void computeError() override
       {
         const VertexSE2* v1 = vertexXnRaw<0>();
         const VertexPointXY* l2 = vertexXnRaw<1>();
         error_ = (v1->estimate().inverse() * l2->estimate()) - measurement_;
       }
 
-      virtual bool setMeasurementData(const number_t* d){
+      bool setMeasurementData(const number_t* d) override{
         measurement_[0]=d[0];
         measurement_[1]=d[1];
         return true;
       }
 
-      virtual bool getMeasurementData(number_t* d) const{
+      bool getMeasurementData(number_t* d) const override{
         d[0] = measurement_[0];
         d[1] = measurement_[1];
         return true;
       }
 
-      virtual int measurementDimension() const {return 2;}
+      int measurementDimension() const override {return 2;}
 
-      virtual bool setMeasurementFromState(){
+      bool setMeasurementFromState() override{
         const VertexSE2* v1 = vertexXnRaw<0>();
         const VertexPointXY* l2 = vertexXnRaw<1>();
         measurement_ = v1->estimate().inverse() * l2->estimate();
         return true;
       }
 
-      virtual bool read(std::istream& is);
-      virtual bool write(std::ostream& os) const;
+      bool read(std::istream& is) override;
+      bool write(std::ostream& os) const override;
 
-      virtual void initialEstimate(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to);
-      virtual number_t initialEstimatePossible(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to) { (void) to; return (from.count(vertices_[0]) == 1 ? 1.0 : -1.0);}
+      void initialEstimate(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to) override;
+      number_t initialEstimatePossible(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to) override { (void) to; return (from.count(vertices_[0]) == 1 ? 1.0 : -1.0);}
 #ifndef NUMERIC_JACOBIAN_TWO_D_TYPES
-      virtual void linearizeOplus();
+      void linearizeOplus() override;
 #endif
   };
 
   class G2O_TYPES_SLAM2D_API EdgeSE2PointXYWriteGnuplotAction: public WriteGnuplotAction {
   public:
     EdgeSE2PointXYWriteGnuplotAction();
-    virtual bool operator()(HyperGraph::HyperGraphElement* element,
-                            HyperGraphElementAction::Parameters* params_);
+    bool operator()(HyperGraph::HyperGraphElement* element,
+                            HyperGraphElementAction::Parameters* params_) override;
   };
 
 #ifdef G2O_HAVE_OPENGL
   class G2O_TYPES_SLAM2D_API EdgeSE2PointXYDrawAction: public DrawAction{
   public:
     EdgeSE2PointXYDrawAction();
-    virtual bool operator()(HyperGraph::HyperGraphElement* element,
-                            HyperGraphElementAction::Parameters* params_);
+    bool operator()(HyperGraph::HyperGraphElement* element,
+                            HyperGraphElementAction::Parameters* params_) override;
   };
 #endif
 

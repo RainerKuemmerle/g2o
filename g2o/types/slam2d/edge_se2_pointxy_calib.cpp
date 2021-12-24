@@ -28,8 +28,8 @@
 
 namespace g2o {
 
-  EdgeSE2PointXYCalib::EdgeSE2PointXYCalib() :
-    BaseVariableSizedEdge<2, Vector2>()
+  EdgeSE2PointXYCalib::EdgeSE2PointXYCalib() 
+    
   {
     resize(3);
   }
@@ -40,8 +40,8 @@ namespace g2o {
 
     if (from.count(vertices_[0]) != 1)
       return;
-    VertexSE2* vi     = static_cast<VertexSE2*>(vertexRaw(0));
-    VertexPointXY* vj = static_cast<VertexPointXY*>(vertexRaw(1));
+    auto* vi     = static_cast<VertexSE2*>(vertexRaw(0));
+    auto* vj = static_cast<VertexPointXY*>(vertexRaw(1));
     vj->setEstimate(vi->estimate() * measurement_);
   }
 

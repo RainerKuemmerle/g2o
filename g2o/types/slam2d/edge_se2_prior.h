@@ -40,40 +40,40 @@ namespace g2o {
   {
     public:
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
-      EdgeSE2Prior();
+      EdgeSE2Prior() = default;
 
-      void computeError()
+      void computeError() override
       {
         const VertexSE2* v1 = vertexXnRaw<0>();
-        SE2 delta = _inverseMeasurement * v1->estimate();
+        SE2 delta = inverseMeasurement_ * v1->estimate();
         error_ = delta.toVector();
       }
 
-      virtual void linearizeOplus() {
+      void linearizeOplus() override {
         jacobianOplusXi_.setZero();
-        jacobianOplusXi_.block<2,2>(0,0)=_inverseMeasurement.rotation().toRotationMatrix();
+        jacobianOplusXi_.block<2,2>(0,0)=inverseMeasurement_.rotation().toRotationMatrix();
         jacobianOplusXi_(2,2)=1.;
       }
 
-      virtual void setMeasurement(const SE2& m);
-      virtual bool setMeasurementData(const number_t* d);
+      void setMeasurement(const SE2& m) override;
+      bool setMeasurementData(const number_t* d) override;
 
-      virtual bool getMeasurementData(number_t* d) const {
+      bool getMeasurementData(number_t* d) const override {
         Eigen::Map<Vector3> v(d);
         v = measurement_.toVector();
         return true;
       }
 
-      int measurementDimension() const {return 3;}
+      int measurementDimension() const override {return 3;}
 
-      virtual bool read(std::istream& is);
-      virtual bool write(std::ostream& os) const;
+      bool read(std::istream& is) override;
+      bool write(std::ostream& os) const override;
 
-      virtual number_t initialEstimatePossible(const OptimizableGraph::VertexSet& , OptimizableGraph::Vertex* ) { return 1.;}
-      virtual void initialEstimate(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to);
+      number_t initialEstimatePossible(const OptimizableGraph::VertexSet& , OptimizableGraph::Vertex* ) override { return 1.;}
+      void initialEstimate(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to) override;
 
     protected:
-      SE2 _inverseMeasurement;
+      SE2 inverseMeasurement_;
   };
 
 }

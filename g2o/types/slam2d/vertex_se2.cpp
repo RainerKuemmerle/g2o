@@ -34,11 +34,6 @@
 
 namespace g2o {
 
-  VertexSE2::VertexSE2() :
-    BaseVertex<3, SE2>()
-  {
-  }
-
   bool VertexSE2::read(std::istream& is)
   {
     Vector3 p;
@@ -58,13 +53,13 @@ namespace g2o {
                                                HyperGraphElementAction::Parameters* params_) {
     if (typeid(*element).name()!=typeName_)
       return false;
-    WriteGnuplotAction::Parameters* params=static_cast<WriteGnuplotAction::Parameters*>(params_);
+    auto* params=static_cast<WriteGnuplotAction::Parameters*>(params_);
     if (!params || !params->os){
       std::cerr << __PRETTY_FUNCTION__ << ": warning, no valid output stream specified" << std::endl;
       return false;
     }
 
-    VertexSE2* v =  static_cast<VertexSE2*>(element);
+    auto* v =  static_cast<VertexSE2*>(element);
     *(params->os) << v->estimate().translation().x() << " " << v->estimate().translation().y()
       << " " << v->estimate().rotation().angle() << std::endl;
     return true;
@@ -72,17 +67,17 @@ namespace g2o {
 
 #ifdef G2O_HAVE_OPENGL
   VertexSE2DrawAction::VertexSE2DrawAction()
-      : DrawAction(typeid(VertexSE2).name()), drawActions_(nullptr), triangleX_(nullptr), triangleY_(nullptr) {}
+      : DrawAction(typeid(VertexSE2).name()),  triangleX_(nullptr), triangleY_(nullptr) {}
 
   bool VertexSE2DrawAction::refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_){
     if (!DrawAction::refreshPropertyPtrs(params_))
       return false;
     if (previousParams_){
-      triangleX_ = previousParams_->makeProperty<FloatProperty>(typeName_ + "::TRIANGLE_X", .2f);
-      triangleY_ = previousParams_->makeProperty<FloatProperty>(typeName_ + "::TRIANGLE_Y", .05f);
+      triangleX_ = previousParams_->makeProperty<FloatProperty>(typeName_ + "::TRIANGLE_X", .2F);
+      triangleY_ = previousParams_->makeProperty<FloatProperty>(typeName_ + "::TRIANGLE_Y", .05F);
     } else {
-      triangleX_ = 0;
-      triangleY_ = 0;
+      triangleX_ = nullptr;
+      triangleY_ = nullptr;
     }
     return true;
   }
@@ -99,13 +94,13 @@ namespace g2o {
     if (show_ && !show_->value())
       return true;
 
-    VertexSE2* that = static_cast<VertexSE2*>(element);
+    auto* that = static_cast<VertexSE2*>(element);
 
     glColor3f(POSE_VERTEX_COLOR);
     glPushMatrix();
-    glTranslatef((float)that->estimate().translation().x(),(float)that->estimate().translation().y(),0.f);
-    glRotatef((float)RAD2DEG(that->estimate().rotation().angle()),0.f,0.f,1.f);
-    opengl::drawArrow2D((float)triangleX_->value(), (float)triangleY_->value(), (float)triangleX_->value()*.3f);
+    glTranslatef(static_cast<float>(that->estimate().translation().x()),static_cast<float>(that->estimate().translation().y()),0.F);
+    glRotatef(static_cast<float>RAD2DEG(that->estimate().rotation().angle()),0.F,0.F,1.F);
+    opengl::drawArrow2D(static_cast<float>(triangleX_->value()), static_cast<float>(triangleY_->value()), static_cast<float>(triangleX_->value())*.3F);
     drawCache(that->cacheContainer(), params_);
     drawUserData(that->userData().get(), params_);
     glPopMatrix();

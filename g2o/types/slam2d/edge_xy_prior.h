@@ -39,36 +39,36 @@ class G2O_TYPES_SLAM2D_API EdgeXYPrior : public BaseUnaryEdge<2, Vector2, Vertex
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   EdgeXYPrior();
 
-  void computeError() { error_ = vertexXnRaw<0>()->estimate() - measurement_; }
-  virtual bool read(std::istream& is);
-  virtual bool write(std::ostream& os) const;
+  void computeError() override { error_ = vertexXnRaw<0>()->estimate() - measurement_; }
+  bool read(std::istream& is) override;
+  bool write(std::ostream& os) const override;
 
-  virtual void setMeasurement(const Vector2& m) { measurement_ = m; }
+  void setMeasurement(const Vector2& m) override { measurement_ = m; }
 
-  virtual bool setMeasurementData(const number_t* d) {
+  bool setMeasurementData(const number_t* d) override {
     measurement_ = Vector2(d[0], d[1]);
     return true;
   }
 
-  virtual bool getMeasurementData(number_t* d) const {
+  bool getMeasurementData(number_t* d) const override {
     Eigen::Map<Vector2> m(d);
     m = measurement_;
     return true;
   }
 
-  virtual int measurementDimension() const { return 2; }
+  int measurementDimension() const override { return 2; }
 
-  virtual bool setMeasurementFromState() {
+  bool setMeasurementFromState() override {
     measurement_ = vertexXnRaw<0>()->estimate();
     return true;
   }
 
-  virtual number_t initialEstimatePossible(const OptimizableGraph::VertexSet&,
-                                           OptimizableGraph::Vertex*) {
+  number_t initialEstimatePossible(const OptimizableGraph::VertexSet&,
+                                           OptimizableGraph::Vertex*) override {
     return 0.;
   }
 #ifndef NUMERIC_JACOBIAN_TWO_D_TYPES
-  virtual void linearizeOplus();
+  void linearizeOplus() override;
 #endif
 };
 

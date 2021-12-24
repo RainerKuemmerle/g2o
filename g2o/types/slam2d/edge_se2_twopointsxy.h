@@ -41,15 +41,15 @@ namespace g2o{
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
       EdgeSE2TwoPointsXY();
 
-      virtual void computeError();
+      void computeError() override;
 
-      virtual bool read(std::istream& is);
-      virtual bool write(std::ostream& os) const;
+      bool read(std::istream& is) override;
+      bool write(std::ostream& os) const override;
 
-      virtual bool setMeasurementFromState();
+      bool setMeasurementFromState() override;
 
-      virtual void initialEstimate(const OptimizableGraph::VertexSet&, OptimizableGraph::Vertex*);
-      virtual number_t initialEstimatePossible(const OptimizableGraph::VertexSet&, OptimizableGraph::Vertex*);
+      void initialEstimate(const OptimizableGraph::VertexSet&, OptimizableGraph::Vertex*) override;
+      number_t initialEstimatePossible(const OptimizableGraph::VertexSet&, OptimizableGraph::Vertex*) override;
   };
 }
 #endif	// G2O_EDGE_SE2_TWOPOINTS_XY_H

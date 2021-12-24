@@ -28,11 +28,6 @@
 
 namespace g2o {
 
-  EdgeSE2XYPrior::EdgeSE2XYPrior() : BaseUnaryEdge< 2, Vector2, g2o::VertexSE2 >()
-  {
-
-  }
-
   bool EdgeSE2XYPrior::read(std::istream& is)
   {
     internal::readVector(is, measurement_);
