@@ -28,7 +28,7 @@
 
 namespace g2o {
 
-  EdgeSE3XYZPrior::EdgeSE3XYZPrior() : BaseUnaryEdge<3, Vector3, g2o::VertexSE3>()
+  EdgeSE3XYZPrior::EdgeSE3XYZPrior()  
   {
     information().setIdentity();
     setMeasurement(Vector3::Zero());
@@ -38,15 +38,15 @@ namespace g2o {
 
   bool EdgeSE3XYZPrior::resolveCaches(){
     ParameterVector pv(1);
-    pv[0] = _parameters[0];
-    resolveCache(_cache, vertexXn<0>(), "CACHE_SE3_OFFSET", pv);
-    return _cache != 0;
+    pv[0] = parameters_[0];
+    resolveCache(cache_, vertexXn<0>(), "CACHE_SE3_OFFSET", pv);
+    return cache_ != nullptr;
   }
 
   bool EdgeSE3XYZPrior::read(std::istream& is)
   {
     readParamIds(is);
-    internal::readVector(is, _measurement);
+    internal::readVector(is, measurement_);
     return readInformationMatrix(is);
   }
 
@@ -58,18 +58,18 @@ namespace g2o {
 
   void EdgeSE3XYZPrior::computeError() {
     const VertexSE3* v = vertexXnRaw<0>();
-    _error = v->estimate().translation() - _measurement;
+    error_ = v->estimate().translation() - measurement_;
   }
 
   void EdgeSE3XYZPrior::linearizeOplus() {
     const VertexSE3* v = vertexXnRaw<0>();
-    _jacobianOplusXi.block<3, 3>(0, 0) = v->estimate().rotation();
-    _jacobianOplusXi.block<3, 3>(0, 3) = Eigen::Matrix3d::Zero();
+    jacobianOplusXi_.block<3, 3>(0, 0) = v->estimate().rotation();
+    jacobianOplusXi_.block<3, 3>(0, 3) = Eigen::Matrix3d::Zero();
   }
 
   bool EdgeSE3XYZPrior::setMeasurementFromState() {
     const VertexSE3* v = vertexXnRaw<0>();
-    _measurement = v->estimate().translation();
+    measurement_ = v->estimate().translation();
     return true;
   }
 
@@ -77,8 +77,8 @@ namespace g2o {
     VertexSE3 *v = vertexXnRaw<0>();
     assert(v && "Vertex for the Prior edge is not set");
 
-    Isometry3 newEstimate = _cache->offsetParam()->offset().inverse() * Eigen::Translation3d(measurement());
-    if (_information.block<3,3>(0,0).array().abs().sum() == 0){ // do not set translation, as that part of the information is all zero
+    Isometry3 newEstimate = cache_->offsetParam()->offset().inverse() * Eigen::Translation3d(measurement());
+    if (information_.block<3,3>(0,0).array().abs().sum() == 0){ // do not set translation, as that part of the information is all zero
       newEstimate.translation() = v->estimate().translation();
     }
     v->setEstimate(newEstimate);

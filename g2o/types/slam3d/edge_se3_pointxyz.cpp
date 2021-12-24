@@ -39,22 +39,21 @@
 #endif
 
 namespace g2o {
-  using namespace std;
 
   // point to camera projection, monocular
-  EdgeSE3PointXYZ::EdgeSE3PointXYZ() : BaseBinaryEdge<3, Vector3, VertexSE3, VertexPointXYZ>() {
+  EdgeSE3PointXYZ::EdgeSE3PointXYZ()  {
     information().setIdentity();
-    J.fill(0);
-    J.block<3,3>(0,0) = -Matrix3::Identity();
+    J_.fill(0);
+    J_.block<3,3>(0,0) = -Matrix3::Identity();
     resizeParameters(1);
     installParameter<CacheSE3Offset::ParameterType>(0);
   }
 
   bool EdgeSE3PointXYZ::resolveCaches(){
     ParameterVector pv(1);
-    pv[0]=_parameters[0];
-    resolveCache(cache, vertexXn<0>(),"CACHE_SE3_OFFSET",pv);
-    return cache != 0;
+    pv[0]=parameters_[0];
+    resolveCache(cache_, vertexXn<0>(),"CACHE_SE3_OFFSET",pv);
+    return cache_ != nullptr;
   }
 
   bool EdgeSE3PointXYZ::read(std::istream& is) {
@@ -75,50 +74,50 @@ namespace g2o {
 
   void EdgeSE3PointXYZ::computeError() {
     // from cam to point (track)
-    //VertexSE3 *cam = static_cast<VertexSE3*>(_vertices[0]);
+    //VertexSE3 *cam = static_cast<VertexSE3*>(vertices_[0]);
     VertexPointXYZ *point = vertexXnRaw<1>();
 
-    Vector3 perr = cache->w2n() * point->estimate();
+    Vector3 perr = cache_->w2n() * point->estimate();
 
     // error, which is backwards from the normal observed - calculated
-    // _measurement is the measured projection
-    _error = perr - _measurement;
-    //    std::cout << _error << std::endl << std::endl;
+    // measurement_ is the measured projection
+    error_ = perr - measurement_;
+    //    std::cout << error_ << std::endl << std::endl;
   }
 
   void EdgeSE3PointXYZ::linearizeOplus() {
-    //VertexSE3 *cam = static_cast<VertexSE3 *>(_vertices[0]);
+    //VertexSE3 *cam = static_cast<VertexSE3 *>(vertices_[0]);
     VertexPointXYZ *vp = vertexXnRaw<1>();
 
-    Vector3 Zcam = cache->w2l() * vp->estimate();
+    Vector3 Zcam = cache_->w2l() * vp->estimate();
 
     //  J(0,3) = -0.0;
-    J(0,4) = -2*Zcam(2);
-    J(0,5) = 2*Zcam(1);
+    J_(0,4) = -2*Zcam(2);
+    J_(0,5) = 2*Zcam(1);
 
-    J(1,3) = 2*Zcam(2);
+    J_(1,3) = 2*Zcam(2);
     //  J(1,4) = -0.0;
-    J(1,5) = -2*Zcam(0);
+    J_(1,5) = -2*Zcam(0);
 
-    J(2,3) = -2*Zcam(1);
-    J(2,4) = 2*Zcam(0);
+    J_(2,3) = -2*Zcam(1);
+    J_(2,4) = 2*Zcam(0);
     //  J(2,5) = -0.0;
 
-    J.block<3,3>(0,6) = cache->w2l().rotation();
+    J_.block<3,3>(0,6) = cache_->w2l().rotation();
 
-    Eigen::Matrix<number_t,3,9,Eigen::ColMajor> Jhom = cache->offsetParam()->inverseOffset().rotation() * J;
+    Eigen::Matrix<number_t,3,9,Eigen::ColMajor> Jhom = cache_->offsetParam()->inverseOffset().rotation() * J_;
 
-    _jacobianOplusXi = Jhom.block<3,6>(0,0);
-    _jacobianOplusXj = Jhom.block<3,3>(0,6);
+    jacobianOplusXi_ = Jhom.block<3,6>(0,0);
+    jacobianOplusXj_ = Jhom.block<3,3>(0,6);
 
     // std::cerr << "just linearized." << std::endl;
-    // std::cerr << "_jacobianOplusXi:" << std::endl << _jacobianOplusXi << std::endl;
-    // std::cerr << "_jacobianOplusXj:" << std::endl << _jacobianOplusXj << std::endl;
+    // std::cerr << "jacobianOplusXi_:" << std::endl << jacobianOplusXi_ << std::endl;
+    // std::cerr << "jacobianOplusXj_:" << std::endl << jacobianOplusXj_ << std::endl;
   }
 
 
   bool EdgeSE3PointXYZ::setMeasurementFromState(){
-    //VertexSE3 *cam = static_cast<VertexSE3*>(_vertices[0]);
+    //VertexSE3 *cam = static_cast<VertexSE3*>(vertices_[0]);
     VertexPointXYZ *point = vertexXnRaw<1>();
 
     // calculate the projection
@@ -128,8 +127,8 @@ namespace g2o {
     //   cerr << "fatal error in retrieving cache" << endl;
     // }
 
-    Vector3 perr = cache->w2n() * pt;
-    _measurement = perr;
+    Vector3 perr = cache_->w2n() * pt;
+    measurement_ = perr;
     return true;
   }
 
@@ -137,7 +136,7 @@ namespace g2o {
   void EdgeSE3PointXYZ::initialEstimate(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to)
   {
     (void) from; (void) to;
-    assert(from.size() == 1 && from.count(_vertices[0]) == 1 && "Can not initialize VertexDepthCam position by VertexTrackXYZ");
+    assert(from.size() == 1 && from.count(vertices_[0]) == 1 && "Can not initialize VertexDepthCam position by VertexTrackXYZ");
 
     VertexSE3 *cam = vertexXnRaw<0>();
     VertexPointXYZ *point = vertexXnRaw<1>();
@@ -146,8 +145,8 @@ namespace g2o {
     //   cerr << "fatal error in retrieving cache" << endl;
     // }
     // SE3OffsetParameters* params=vcache->params;
-    Vector3 p=_measurement;
-    point->setEstimate(cam->estimate() * (cache->offsetParam()->offset() * p));
+    Vector3 p=measurement_;
+    point->setEstimate(cam->estimate() * (cache_->offsetParam()->offset() * p));
   }
 
 #ifdef G2O_HAVE_OPENGL
@@ -155,16 +154,16 @@ namespace g2o {
 
   bool EdgeSE3PointXYZDrawAction::operator()(HyperGraph::HyperGraphElement* element,
                                              HyperGraphElementAction::Parameters* params_) {
-    if (typeid(*element).name()!=_typeName)
+    if (typeid(*element).name()!=typeName_)
       return false;
     refreshPropertyPtrs(params_);
-    if (! _previousParams)
+    if (! previousParams_)
       return true;
 
-    if (_show && !_show->value())
+    if (show_ && !show_->value())
       return true;
 
-    EdgeSE3PointXYZ* e =  static_cast<EdgeSE3PointXYZ*>(element);
+    auto* e =  static_cast<EdgeSE3PointXYZ*>(element);
     VertexSE3* fromEdge = static_cast<VertexSE3*>(e->vertex(0).get());
     VertexPointXYZ* toEdge   = static_cast<VertexPointXYZ*>(e->vertex(1).get());
     if (! fromEdge || ! toEdge)
@@ -175,8 +174,8 @@ namespace g2o {
     glPushAttrib(GL_ENABLE_BIT);
     glDisable(GL_LIGHTING);
     glBegin(GL_LINES);
-    glVertex3f((float)fromTransform.translation().x(),(float)fromTransform.translation().y(),(float)fromTransform.translation().z());
-    glVertex3f((float)toEdge->estimate().x(),(float)toEdge->estimate().y(),(float)toEdge->estimate().z());
+    glVertex3f(static_cast<float>(fromTransform.translation().x()),static_cast<float>(fromTransform.translation().y()),static_cast<float>(fromTransform.translation().z()));
+    glVertex3f(static_cast<float>(toEdge->estimate().x()),static_cast<float>(toEdge->estimate().y()),static_cast<float>(toEdge->estimate().z()));
     glEnd();
     glPopAttrib();
     return true;

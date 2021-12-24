@@ -38,7 +38,7 @@ namespace g2o{
   class G2O_TYPES_SLAM3D_API EdgeSE3LotsOfXYZ : public BaseVariableSizedEdge<-1, VectorX>{
 
     protected:
-      unsigned int _observedPoints;
+      unsigned int observedPoints_ = 0;
 
     public:
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
@@ -46,22 +46,22 @@ namespace g2o{
 
       void setSize(int vertices){
         resize(vertices);
-        _observedPoints = vertices-1;
-        _measurement.resize(_observedPoints*3, 1);
-        setDimension(_observedPoints*3);
+        observedPoints_ = vertices-1;
+        measurement_.resize(observedPoints_*3L, 1);
+        setDimension(observedPoints_*3);
       }
 
-      virtual void computeError();
+      void computeError() override ;
 
-      virtual bool read(std::istream& is);
-      virtual bool write(std::ostream& os) const;
+      bool read(std::istream& is) override ;
+      bool write(std::ostream& os) const override ;
 
-      virtual bool setMeasurementFromState();
+      bool setMeasurementFromState() override ;
 
-      virtual void initialEstimate(const OptimizableGraph::VertexSet&, OptimizableGraph::Vertex*);
-      virtual number_t initialEstimatePossible(const OptimizableGraph::VertexSet&, OptimizableGraph::Vertex*);
+      void initialEstimate(const OptimizableGraph::VertexSet&, OptimizableGraph::Vertex*) override ;
+      number_t initialEstimatePossible(const OptimizableGraph::VertexSet&, OptimizableGraph::Vertex*) override ;
 
-      virtual void linearizeOplus();
+      void linearizeOplus() override;
 
   };
 

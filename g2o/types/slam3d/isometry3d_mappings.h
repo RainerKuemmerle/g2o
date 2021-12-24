@@ -51,7 +51,7 @@ namespace g2o {
      * Note, we could also call .linear() on the Isometry3. However, I dislike
      * the name of that function a bit.
      */
-    inline Isometry3::ConstLinearPart extractRotation(const Isometry3& A)
+    inline Isometry3::ConstLinearPart extractRotation(const Isometry3& A) // NOLINT
     {
       return A.matrix().topLeftCorner<3,3>();
     }

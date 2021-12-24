@@ -45,38 +45,38 @@ namespace g2o {
 
       EdgeSE3Line3D();
 
-      virtual bool read(std::istream& is);
-      virtual bool write(std::ostream& os) const;
+      bool read(std::istream& is) override;
+      bool write(std::ostream& os) const override;
 
-      void computeError();
+      void computeError() override;
 
       virtual void setMeasurement(const Vector6& m) {
-        _measurement = m;
+        measurement_ = m;
       }
 
-      virtual void setMeasurement(const Line3D& m) {
-        _measurement = Line3D(m);
+      void setMeasurement(const Line3D& m) override {
+        measurement_ = Line3D(m);
       }
 
-      virtual bool setMeasurementData(const number_t* d) {
+      bool setMeasurementData(const number_t* d) override {
         Eigen::Map<const Vector6> v(d);
-        _measurement = Line3D(v);
+        measurement_ = Line3D(v);
         return true;
       }
 
-      virtual bool getMeasurementData(number_t* d) const {
+      bool getMeasurementData(number_t* d) const override {
         Eigen::Map<Vector6> v(d);
-        v = _measurement;
+        v = measurement_;
         return true;
       }
 
-      virtual int measurementDimension() const { return 6; }
+      int measurementDimension() const override { return 6; }
 
       Vector3 color;
 
   private:
-    std::shared_ptr<CacheSE3Offset> cache;
-    virtual bool resolveCaches();
+    std::shared_ptr<CacheSE3Offset> cache_;
+    bool resolveCaches() override;
 
   };
 
@@ -84,12 +84,12 @@ namespace g2o {
   class EdgeSE3Line3DDrawAction : public DrawAction {
   public:
     G2O_TYPES_SLAM3D_ADDONS_API EdgeSE3Line3DDrawAction();
-    G2O_TYPES_SLAM3D_ADDONS_API virtual bool operator()(
-        HyperGraph::HyperGraphElement* element, HyperGraphElementAction::Parameters* params_);
+    G2O_TYPES_SLAM3D_ADDONS_API bool operator()(
+        HyperGraph::HyperGraphElement* element, HyperGraphElementAction::Parameters* params_) override;
 
    protected:
-    virtual bool refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_);
-    std::shared_ptr<FloatProperty> _lineLength, _lineWidth;
+    bool refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_) override;
+    std::shared_ptr<FloatProperty> lineLength_, lineWidth_;
 
   };
 #endif

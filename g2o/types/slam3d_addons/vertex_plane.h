@@ -42,29 +42,29 @@ namespace g2o
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
       VertexPlane();
 
-      virtual bool read(std::istream& is);
-      virtual bool write(std::ostream& os) const;
+      bool read(std::istream& is) override;
+      bool write(std::ostream& os) const override;
 
-      virtual void setToOriginImpl() { _estimate = Plane3D(); }
+      void setToOriginImpl() override { estimate_ = Plane3D(); }
 
-      virtual void oplusImpl(const number_t* update_) {
+      void oplusImpl(const number_t* update_) override {
         Eigen::Map<const Vector3> update(update_);
-        _estimate.oplus(update);
+        estimate().oplus(update);
       }
 
-      virtual bool setEstimateDataImpl(const number_t* est) {
+      bool setEstimateDataImpl(const number_t* est) override {
         Eigen::Map<const Vector4> _est(est);
-        _estimate.fromVector(_est);
+        estimate().fromVector(_est);
         return true;
       }
 
-      virtual bool getEstimateData(number_t* est) const {
+      bool getEstimateData(number_t* est) const override {
         Eigen::Map<Vector4> _est(est);
-        _est = _estimate.toVector();
+        _est = estimate_.toVector();
         return true;
       }
 
-      virtual int estimateDimension() const {
+      int estimateDimension() const override {
         return 4;
       }
 
@@ -76,12 +76,12 @@ namespace g2o
   {
     public:
       VertexPlaneDrawAction();
-      virtual bool operator()(HyperGraph::HyperGraphElement* element,
-                              HyperGraphElementAction::Parameters* params_);
+      bool operator()(HyperGraph::HyperGraphElement* element,
+                              HyperGraphElementAction::Parameters* params_) override;
 
      protected:
-      virtual bool refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_);
-      std::shared_ptr<FloatProperty> _planeWidth, _planeHeight;
+      bool refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_) override;
+      std::shared_ptr<FloatProperty> planeWidth_, planeHeight_;
   };
 #endif
 

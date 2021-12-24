@@ -42,32 +42,32 @@ namespace g2o {
   public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
     EdgeXYZPrior();
-    virtual bool read(std::istream& is);
-    virtual bool write(std::ostream& os) const;
+    bool read(std::istream& is) override ;
+    bool write(std::ostream& os) const override ;
 
-    void computeError();
+    void computeError() override ;
 
     // jacobian
-    virtual void linearizeOplus();
+    void linearizeOplus() override ;
 
-    virtual bool setMeasurementData(const number_t* d){
+    bool setMeasurementData(const number_t* d) override {
         Eigen::Map<const Vector3> v(d);
-        _measurement = v;
+        measurement_ = v;
         return true;
     }
 
-    virtual bool getMeasurementData(number_t* d) const{
+    bool getMeasurementData(number_t* d) const override {
         Eigen::Map<Vector3> v(d);
-        v = _measurement;
+        v = measurement_;
         return true;
     }
 
-    virtual int measurementDimension() const { return 3; }
+    int measurementDimension() const override { return 3; }
 
-    virtual bool setMeasurementFromState() ;
+    bool setMeasurementFromState() override ;
 
-    virtual number_t initialEstimatePossible(const OptimizableGraph::VertexSet& /*from*/,
-             OptimizableGraph::Vertex* /*to*/) {
+    number_t initialEstimatePossible(const OptimizableGraph::VertexSet& /*from*/,
+             OptimizableGraph::Vertex* /*to*/) override {
       return 0;
     }
   };

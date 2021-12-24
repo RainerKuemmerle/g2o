@@ -49,14 +49,14 @@ namespace g2o {
       }
 
       inline Vector4 toVector() const {
-        return _coeffs;
+        return coeffs_;
       }
 
-      inline const Vector4& coeffs() const {return _coeffs;}
+      inline const Vector4& coeffs() const {return coeffs_;}
 
       inline void fromVector(const Vector4& coeffs_) {
-        _coeffs=coeffs_;
-        normalize(_coeffs);
+        coeffs_=coeffs_;
+        normalize(coeffs_);
       }
 
       static number_t azimuth(const Vector3& v) {
@@ -68,11 +68,11 @@ namespace g2o {
       }
 
     number_t distance() const {
-      return -_coeffs(3);
+      return -coeffs_(3);
     }
 
     Vector3 normal() const {
-      return _coeffs.head<3>();
+      return coeffs_.head<3>();
     }
 
 
@@ -92,9 +92,9 @@ namespace g2o {
       // rotate the normal
       Matrix3 R=rotation(normal());
       number_t d=distance()+v[2];
-      _coeffs.head<3>() = R*n;
-      _coeffs(3) = -d;
-      normalize(_coeffs);
+      coeffs_.head<3>() = R*n;
+      coeffs_(3) = -d;
+      normalize(coeffs_);
     }
 
     inline Vector3 ominus(const Plane3D& plane){
@@ -112,11 +112,11 @@ namespace g2o {
       coeffs = coeffs * (1./n);
     }
 
-    Vector4 _coeffs;
+    Vector4 coeffs_;
   };
 
   inline Plane3D operator*(const Isometry3& t, const Plane3D& plane){
-    Vector4 v=plane._coeffs;
+    Vector4 v=plane.coeffs_;
     Vector4 v2;
     Matrix3 R=t.rotation();
     v2.head<3>() = R*v.head<3>();

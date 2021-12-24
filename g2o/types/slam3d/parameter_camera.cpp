@@ -33,8 +33,6 @@
 #include "g2o/stuff/opengl_primitives.h"
 #endif
 
-using namespace std;
-
 namespace g2o {
 
   ParameterCamera::ParameterCamera(){
@@ -45,18 +43,18 @@ namespace g2o {
 
   void ParameterCamera::setOffset(const Isometry3& offset_){
     ParameterSE3Offset::setOffset(offset_);
-    _Kcam_inverseOffsetR = _Kcam * inverseOffset().rotation();
+    Kcam_inverseOffsetR_ = Kcam_ * inverseOffset().rotation();
   }
 
   void ParameterCamera::setKcam(number_t fx, number_t fy, number_t cx, number_t cy){
-    _Kcam.setZero();
-    _Kcam(0,0) = fx;
-    _Kcam(1,1) = fy;
-    _Kcam(0,2) = cx;
-    _Kcam(1,2) = cy;
-    _Kcam(2,2) = 1.0;
-    _invKcam = _Kcam.inverse();
-    _Kcam_inverseOffsetR = _Kcam * inverseOffset().rotation();
+    Kcam_.setZero();
+    Kcam_(0,0) = fx;
+    Kcam_(1,1) = fy;
+    Kcam_(0,2) = cx;
+    Kcam_(1,2) = cy;
+    Kcam_(2,2) = 1.0;
+    invKcam_ = Kcam_.inverse();
+    Kcam_inverseOffsetR_ = Kcam_ * inverseOffset().rotation();
   }
 
 
@@ -66,66 +64,69 @@ namespace g2o {
     // normalize the quaternion to recover numerical precision lost by storing as human readable text
     Vector4::MapType(off.data()+3).normalize();
     setOffset(internal::fromVectorQT(off));
-    number_t fx,fy,cx,cy;
+    number_t fx;
+    number_t fy;
+    number_t cx;
+    number_t cy;
     is >> fx >> fy >> cx >> cy;
     setKcam(fx,fy,cx,cy);
     return is.good();
   }
 
   bool ParameterCamera::write(std::ostream& os) const {
-    internal::writeVector(os, internal::toVectorQT(_offset));
-    os << _Kcam(0,0) << " ";
-    os << _Kcam(1,1) << " ";
-    os << _Kcam(0,2) << " ";
-    os << _Kcam(1,2) << " ";
+    internal::writeVector(os, internal::toVectorQT(offset_));
+    os << Kcam_(0,0) << " ";
+    os << Kcam_(1,1) << " ";
+    os << Kcam_(0,2) << " ";
+    os << Kcam_(1,2) << " ";
     return os.good();
   }
 
   void CacheCamera::updateImpl(){
     CacheSE3Offset::updateImpl();
-    _w2i.matrix().topLeftCorner<3,4>() = camParams()->Kcam() * w2n().matrix().topLeftCorner<3,4>();
+    w2i_.matrix().topLeftCorner<3,4>() = camParams()->Kcam() * w2n().matrix().topLeftCorner<3,4>();
   }
 
 #ifdef G2O_HAVE_OPENGL
 
   CacheCameraDrawAction::CacheCameraDrawAction(): DrawAction(typeid(CacheCamera).name()){
-    _previousParams = (DrawAction::Parameters*)0x42;
-    refreshPropertyPtrs(0);
+    previousParams_ = reinterpret_cast<DrawAction::Parameters*>(0x42);
+    refreshPropertyPtrs(nullptr);
   }
 
 
   bool CacheCameraDrawAction::refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_){
     if (! DrawAction::refreshPropertyPtrs(params_))
       return false;
-    if (_previousParams){
-      _cameraZ = _previousParams->makeProperty<FloatProperty>(_typeName + "::CAMERA_Z", .05f);
-      _cameraSide = _previousParams->makeProperty<FloatProperty>(_typeName + "::CAMERA_SIDE", .05f);
+    if (previousParams_){
+      cameraZ_ = previousParams_->makeProperty<FloatProperty>(typeName_ + "::CAMERA_Z", .05F);
+      cameraSide_ = previousParams_->makeProperty<FloatProperty>(typeName_ + "::CAMERA_SIDE", .05F);
 
     } else {
-      _cameraZ = 0;
-      _cameraSide = 0;
+      cameraZ_ = nullptr;
+      cameraSide_ = nullptr;
     }
     return true;
   }
 
   bool CacheCameraDrawAction::operator()(HyperGraph::HyperGraphElement* element,
                                          HyperGraphElementAction::Parameters* params) {
-    if (typeid(*element).name()!=_typeName)
+    if (typeid(*element).name()!=typeName_)
       return false;
-    CacheCamera* that = static_cast<CacheCamera*>(element);
+    auto* that = static_cast<CacheCamera*>(element);
     refreshPropertyPtrs(params);
-    if (! _previousParams)
+    if (! previousParams_)
       return true;
 
-    if (_show && !_show->value())
+    if (show_ && !show_->value())
       return true;
 
     glPushAttrib(GL_COLOR);
     glColor3f(POSE_PARAMETER_COLOR);
     glPushMatrix();
     glMultMatrixd(that->camParams()->offset().cast<double>().data());
-    glRotatef(180.0f, 0.0f, 1.0f, 0.0f);
-    opengl::drawPyramid(_cameraSide->value(), _cameraZ->value());
+    glRotatef(180.0F, 0.0F, 1.0F, 0.0F);
+    opengl::drawPyramid(cameraSide_->value(), cameraZ_->value());
     glPopMatrix();
     glPopAttrib();
     return true;

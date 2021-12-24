@@ -42,26 +42,26 @@ namespace g2o {
     public:
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
       EdgeSE3Offset();
-      virtual bool read(std::istream& is);
-      virtual bool write(std::ostream& os) const;
+      bool read(std::istream& is) override ;
+      bool write(std::ostream& os) const override ;
 
-      void computeError();
+      void computeError() override ;
 
 
-      void linearizeOplus();
+      void linearizeOplus() override ;
 
-      virtual bool setMeasurementFromState() ;
+      bool setMeasurementFromState() override ;
 
-      virtual number_t initialEstimatePossible(const OptimizableGraph::VertexSet& /*from*/,
-          OptimizableGraph::Vertex* /*to*/) {
+      number_t initialEstimatePossible(const OptimizableGraph::VertexSet& /*from*/,
+          OptimizableGraph::Vertex* /*to*/) override {
         return 1.;
       }
 
-      virtual void initialEstimate(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to);
+      void initialEstimate(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to) override ;
 
     protected:
-      virtual bool resolveCaches();
-      std::shared_ptr<CacheSE3Offset> _cacheFrom, _cacheTo;
+      bool resolveCaches() override ;
+      std::shared_ptr<CacheSE3Offset> cacheFrom_, cacheTo_;
   };
 
 } // end namespace

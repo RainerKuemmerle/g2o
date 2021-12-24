@@ -42,17 +42,17 @@ namespace g2o {
       void setKcam(number_t fx, number_t fy, number_t cx, number_t cy);
       void setOffset(const Isometry3& offset_ = Isometry3::Identity());
 
-      virtual bool read(std::istream& is);
-      virtual bool write(std::ostream& os) const;
+      bool read(std::istream& is) override ;
+      bool write(std::ostream& os) const override ;
 
-      const Matrix3& Kcam() const { return _Kcam;}
-      const Matrix3& invKcam() const { return _invKcam;}
-      const Matrix3& Kcam_inverseOffsetR() const { return _Kcam_inverseOffsetR;}
+      const Matrix3& Kcam() const { return Kcam_;}
+      const Matrix3& invKcam() const { return invKcam_;}
+      const Matrix3& Kcam_inverseOffsetR() const { return Kcam_inverseOffsetR_;}
 
     protected:
-      Matrix3 _Kcam;
-      Matrix3 _invKcam;
-      Matrix3 _Kcam_inverseOffsetR;
+      Matrix3 Kcam_;
+      Matrix3 invKcam_;
+      Matrix3 Kcam_inverseOffsetR_;
   };
 
   class G2O_TYPES_SLAM3D_API CacheCamera: public CacheSE3Offset {
@@ -62,15 +62,15 @@ namespace g2o {
 
     //! parameters of the camera
     std::shared_ptr<ParameterType> camParams() const {
-      return std::static_pointer_cast<ParameterType>(_parameters[0]);
+      return std::static_pointer_cast<ParameterType>(parameters_[0]);
     }
 
     //! return the world to image transform
-    const Affine3& w2i() const {return _w2i;}
+    const Affine3& w2i() const {return w2i_;}
 
   protected:
-    virtual void updateImpl();
-    Affine3 _w2i; ///< world to image transform
+    void updateImpl() override ;
+    Affine3 w2i_; ///< world to image transform
   };
 
 
@@ -78,10 +78,10 @@ namespace g2o {
   class G2O_TYPES_SLAM3D_API CacheCameraDrawAction: public DrawAction{
     public:
       CacheCameraDrawAction();
-      virtual bool operator()(HyperGraph::HyperGraphElement* element, HyperGraphElementAction::Parameters* params_ );
+      bool operator()(HyperGraph::HyperGraphElement* element, HyperGraphElementAction::Parameters* params_ ) override ;
     protected:
-      virtual bool refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_);
-      std::shared_ptr<FloatProperty> _cameraZ, _cameraSide;
+      bool refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_) override ;
+      std::shared_ptr<FloatProperty> cameraZ_, cameraSide_;
   };
 #endif
 

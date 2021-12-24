@@ -40,43 +40,43 @@ namespace g2o {
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW
         EdgePointXYZ();
 
-      void computeError()
+      void computeError() override 
       {
         const VertexPointXYZ* v1 = vertexXnRaw<0>();
         const VertexPointXYZ* v2 = vertexXnRaw<1>();
-        _error = (v2->estimate()-v1->estimate())-_measurement;
+        error_ = (v2->estimate()-v1->estimate())-measurement_;
       }
-      virtual bool read(std::istream& is);
-      virtual bool write(std::ostream& os) const;
+      bool read(std::istream& is) override ;
+      bool write(std::ostream& os) const override ;
 
-      virtual void setMeasurement(const Vector3& m){
-        _measurement = m;
+      void setMeasurement(const Vector3& m) override {
+        measurement_ = m;
       }
 
-      virtual bool setMeasurementData(const number_t* d){
-        _measurement=Vector3(d[0], d[1], d[2]);
+      bool setMeasurementData(const number_t* d) override {
+        measurement_=Vector3(d[0], d[1], d[2]);
         return true;
       }
 
-      virtual bool getMeasurementData(number_t* d) const {
+      bool getMeasurementData(number_t* d) const override {
         Eigen::Map<Vector3> m(d);
-        m = _measurement;
+        m = measurement_;
         return true;
       }
 
-      virtual int measurementDimension() const {return 3;}
+      int measurementDimension() const override {return 3;}
 
-      virtual bool setMeasurementFromState() {
+      bool setMeasurementFromState() override {
         const VertexPointXYZ* v1 = vertexXnRaw<0>();
         const VertexPointXYZ* v2 = vertexXnRaw<1>();
-        _measurement = v2->estimate()-v1->estimate();
+        measurement_ = v2->estimate()-v1->estimate();
         return true;
       }
 
 
-      virtual number_t initialEstimatePossible(const OptimizableGraph::VertexSet& , OptimizableGraph::Vertex* ) { return 0;}
+      number_t initialEstimatePossible(const OptimizableGraph::VertexSet& , OptimizableGraph::Vertex* ) override { return 0;}
 #ifndef NUMERIC_JACOBIAN_THREE_D_TYPES
-      virtual void linearizeOplus();
+      void linearizeOplus() override;
 #endif
   };
 

@@ -44,32 +44,32 @@ namespace g2o {
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
     EdgeSE3XYZPrior();
 
-    virtual bool setMeasurementData(const number_t* d) {
+    bool setMeasurementData(const number_t* d) override {
       Eigen::Map<const Vector3> v(d);
-      _measurement = v;
+      measurement_ = v;
       return true;
     }
 
-    virtual bool getMeasurementData(number_t* d) const {
+    bool getMeasurementData(number_t* d) const override {
       Eigen::Map<Vector3> v(d);
-      v = _measurement;
+      v = measurement_;
       return true;
     }
 
-    virtual int measurementDimension() const {return Dimension;}
+    int measurementDimension() const override {return kDimension;}
 
-    virtual bool read(std::istream& is);
-    virtual bool write(std::ostream& os) const;
-    virtual void computeError();
-    virtual void linearizeOplus();
-    virtual bool setMeasurementFromState();
+    bool read(std::istream& is) override ;
+    bool write(std::ostream& os) const override ;
+    void computeError() override ;
+    void linearizeOplus() override ;
+    bool setMeasurementFromState() override ;
 
-    virtual number_t initialEstimatePossible(const OptimizableGraph::VertexSet& /*from*/, OptimizableGraph::Vertex* /*to*/) {return 1.;}
-    virtual void initialEstimate(const OptimizableGraph::VertexSet& /*from_*/, OptimizableGraph::Vertex* /*to_*/);
+    number_t initialEstimatePossible(const OptimizableGraph::VertexSet& /*from*/, OptimizableGraph::Vertex* /*to*/) override {return 1.;}
+    void initialEstimate(const OptimizableGraph::VertexSet& /*from_*/, OptimizableGraph::Vertex* /*to_*/) override ;
 
   protected:
-    virtual bool resolveCaches();
-    std::shared_ptr<CacheSE3Offset> _cache;
+    bool resolveCaches() override ;
+    std::shared_ptr<CacheSE3Offset> cache_;
   };
 
 } // end namespace

@@ -45,43 +45,43 @@ namespace g2o {
     public:
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
       EdgeSE3();
-      virtual bool read(std::istream& is);
-      virtual bool write(std::ostream& os) const;
+      bool read(std::istream& is) override;
+      bool write(std::ostream& os) const override;
 
-      void computeError();
+      void computeError() override;
 
-      virtual void setMeasurement(const Isometry3& m){
-        _measurement = m;
-        _inverseMeasurement = m.inverse();
+      void setMeasurement(const Isometry3& m) override{
+        measurement_ = m;
+        inverseMeasurement_ = m.inverse();
       }
 
-      virtual bool setMeasurementData(const number_t* d){
+      bool setMeasurementData(const number_t* d) override{
         Eigen::Map<const Vector7> v(d);
         setMeasurement(internal::fromVectorQT(v));
         return true;
       }
 
-      virtual bool getMeasurementData(number_t* d) const{
+      bool getMeasurementData(number_t* d) const override{
         Eigen::Map<Vector7> v(d);
-        v = internal::toVectorQT(_measurement);
+        v = internal::toVectorQT(measurement_);
         return true;
       }
 
-      void linearizeOplus();
+      void linearizeOplus() override;
 
-      virtual int measurementDimension() const {return 7;}
+      int measurementDimension() const override {return 7;}
 
-      virtual bool setMeasurementFromState() ;
+      bool setMeasurementFromState() override ;
 
-      virtual number_t initialEstimatePossible(const OptimizableGraph::VertexSet& /*from*/,
-          OptimizableGraph::Vertex* /*to*/) {
+      number_t initialEstimatePossible(const OptimizableGraph::VertexSet& /*from*/,
+          OptimizableGraph::Vertex* /*to*/) override {
         return 1.;
       }
 
-      virtual void initialEstimate(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to);
+      void initialEstimate(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to) override;
 
     protected:
-      Isometry3 _inverseMeasurement;
+      Isometry3 inverseMeasurement_;
   };
 
   /**
@@ -90,8 +90,8 @@ namespace g2o {
   class G2O_TYPES_SLAM3D_API EdgeSE3WriteGnuplotAction: public WriteGnuplotAction {
   public:
     EdgeSE3WriteGnuplotAction();
-    virtual bool operator()(HyperGraph::HyperGraphElement* element,
-                            HyperGraphElementAction::Parameters* params_);
+    bool operator()(HyperGraph::HyperGraphElement* element,
+                            HyperGraphElementAction::Parameters* params_) override;
   };
 
 #ifdef G2O_HAVE_OPENGL
@@ -101,8 +101,8 @@ namespace g2o {
   class G2O_TYPES_SLAM3D_API EdgeSE3DrawAction: public DrawAction{
   public:
     EdgeSE3DrawAction();
-    virtual bool operator()(HyperGraph::HyperGraphElement* element,
-                            HyperGraphElementAction::Parameters* params_);
+    bool operator()(HyperGraph::HyperGraphElement* element,
+                            HyperGraphElementAction::Parameters* params_) override;
   };
 #endif
 

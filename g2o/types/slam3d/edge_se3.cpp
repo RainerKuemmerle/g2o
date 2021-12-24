@@ -34,9 +34,8 @@
 #endif
 
 namespace g2o {
-  using namespace std;
 
-  EdgeSE3::EdgeSE3() : BaseBinaryEdge<6, Isometry3, VertexSE3, VertexSE3>() {
+  EdgeSE3::EdgeSE3()  {
     information().setIdentity();
   }
 
@@ -59,8 +58,8 @@ namespace g2o {
   void EdgeSE3::computeError() {
     VertexSE3* from = vertexXnRaw<0>();
     VertexSE3* to = vertexXnRaw<1>();
-    Isometry3 delta=_inverseMeasurement * from->estimate().inverse() * to->estimate();
-    _error=internal::toVectorMQT(delta);
+    Isometry3 delta=inverseMeasurement_ * from->estimate().inverse() * to->estimate();
+    error_=internal::toVectorMQT(delta);
   }
 
   bool EdgeSE3::setMeasurementFromState(){
@@ -77,8 +76,8 @@ namespace g2o {
     Isometry3 E;
     const Isometry3& Xi=from->estimate();
     const Isometry3& Xj=to->estimate();
-    const Isometry3& Z=_measurement;
-    internal::computeEdgeSE3Gradient(E, _jacobianOplusXi , _jacobianOplusXj, Z, Xi, Xj);
+    const Isometry3& Z=measurement_;
+    internal::computeEdgeSE3Gradient(E, jacobianOplusXi_ , jacobianOplusXj_, Z, Xi, Xj);
   }
 
   void EdgeSE3::initialEstimate(const OptimizableGraph::VertexSet& from_, OptimizableGraph::Vertex* /*to_*/) {
@@ -86,27 +85,28 @@ namespace g2o {
     VertexSE3* to = vertexXnRaw<1>();
 
     if (from_.count(vertexXn<0>()) > 0) {
-      to->setEstimate(from->estimate() * _measurement);
+      to->setEstimate(from->estimate() * measurement_);
     } else
-      from->setEstimate(to->estimate() * _measurement.inverse());
+      from->setEstimate(to->estimate() * measurement_.inverse());
     //cerr << "IE" << endl;
   }
 
   EdgeSE3WriteGnuplotAction::EdgeSE3WriteGnuplotAction(): WriteGnuplotAction(typeid(EdgeSE3).name()){}
 
   bool EdgeSE3WriteGnuplotAction::operator()(HyperGraph::HyperGraphElement* element, HyperGraphElementAction::Parameters* params_){
-    if (typeid(*element).name()!=_typeName)
+    if (typeid(*element).name()!=typeName_)
       return false;
-    WriteGnuplotAction::Parameters* params=static_cast<WriteGnuplotAction::Parameters*>(params_);
+    auto* params=static_cast<WriteGnuplotAction::Parameters*>(params_);
     if (!params->os){
       std::cerr << __PRETTY_FUNCTION__ << ": warning, on valid os specified" << std::endl;
       return false;
     }
 
-    EdgeSE3* e =  static_cast<EdgeSE3*>(element);
-    VertexSE3* fromEdge = static_cast<VertexSE3*>(e->vertices()[0].get());
-    VertexSE3* toEdge   = static_cast<VertexSE3*>(e->vertices()[1].get());
-    Vector6 fromV, toV;
+    auto* e =  static_cast<EdgeSE3*>(element);
+    auto* fromEdge = static_cast<VertexSE3*>(e->vertices()[0].get());
+    auto* toEdge   = static_cast<VertexSE3*>(e->vertices()[1].get());
+    Vector6 fromV;
+    Vector6 toV;
     fromV=internal::toVectorMQT(fromEdge->estimate());
     toV=internal::toVectorMQT(toEdge->estimate());
     for (int i=0; i<6; i++){
@@ -124,26 +124,26 @@ namespace g2o {
 
   bool EdgeSE3DrawAction::operator()(HyperGraph::HyperGraphElement* element,
                HyperGraphElementAction::Parameters* params_){
-    if (typeid(*element).name()!=_typeName)
+    if (typeid(*element).name()!=typeName_)
       return false;
     refreshPropertyPtrs(params_);
-    if (! _previousParams)
+    if (! previousParams_)
       return true;
 
-    if (_show && !_show->value())
+    if (show_ && !show_->value())
       return true;
 
-    EdgeSE3* e =  static_cast<EdgeSE3*>(element);
-    VertexSE3* fromEdge = static_cast<VertexSE3*>(e->vertices()[0].get());
-    VertexSE3* toEdge   = static_cast<VertexSE3*>(e->vertices()[1].get());
+    auto* e =  static_cast<EdgeSE3*>(element);
+    auto* fromEdge = static_cast<VertexSE3*>(e->vertices()[0].get());
+    auto* toEdge   = static_cast<VertexSE3*>(e->vertices()[1].get());
     if (! fromEdge || ! toEdge)
       return true;
     glColor3f(POSE_EDGE_COLOR);
     glPushAttrib(GL_ENABLE_BIT);
     glDisable(GL_LIGHTING);
     glBegin(GL_LINES);
-    glVertex3f((float)fromEdge->estimate().translation().x(),(float)fromEdge->estimate().translation().y(),(float)fromEdge->estimate().translation().z());
-    glVertex3f((float)toEdge->estimate().translation().x(),(float)toEdge->estimate().translation().y(),(float)toEdge->estimate().translation().z());
+    glVertex3f(static_cast<float>(fromEdge->estimate().translation().x()),static_cast<float>(fromEdge->estimate().translation().y()),static_cast<float>(fromEdge->estimate().translation().z()));
+    glVertex3f(static_cast<float>(toEdge->estimate().translation().x()),static_cast<float>(toEdge->estimate().translation().y()),static_cast<float>(toEdge->estimate().translation().z()));
     glEnd();
     glPopAttrib();
     return true;

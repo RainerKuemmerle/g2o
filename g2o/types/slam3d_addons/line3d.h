@@ -142,7 +142,7 @@ namespace g2o {
     }
 
     G2O_TYPES_SLAM3D_ADDONS_API inline Line3D normalized() const {
-      return Line3D((Vector6)(*this)*(1.0/d().norm()));
+      return Line3D(Vector6(*this)*(1.0/d().norm()));
     }
 
     G2O_TYPES_SLAM3D_ADDONS_API inline void oplus(const Vector4& v){

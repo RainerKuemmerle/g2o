@@ -37,12 +37,12 @@ namespace g2o {
     // forward declaration
     /* void G2O_TYPES_SLAM3D_API compute_dq_dR (Eigen::Matrix<number_t, 3 , 9, Eigen::ColMajor>&  dq_dR , const number_t&  r11 , const number_t&  r21 , const number_t&  r31 , const number_t&  r12 , const number_t&  r22 , const number_t&  r32 , const number_t&  r13 , const number_t&  r23 , const number_t&  r33 );  */
 
-    template <typename Derived, typename DerivedOther, bool transposed = false>
+    template <typename Derived, typename DerivedOther, bool Transposed = false>
     inline void skew(Eigen::MatrixBase<Derived>& s, const Eigen::MatrixBase<DerivedOther>& v){
       const number_t x=2*v(0);
       const number_t y=2*v(1);
       const number_t z=2*v(2);
-      if (transposed)
+      if (Transposed)
         s << 0., -z, y, z, 0, -x, -y, x, 0;
       else
         s << 0., z, -y, -z, 0, x, y, -x, 0;
@@ -53,16 +53,30 @@ namespace g2o {
       skew<Derived, DerivedOther, true>(s, v);
     }
 
-    template <typename Derived, typename DerivedOther, bool transposed = false>
+    template <typename Derived, typename DerivedOther, bool Transposed = false>
     void skew(Eigen::MatrixBase<Derived>& Sx,
         Eigen::MatrixBase<Derived>& Sy,
         Eigen::MatrixBase<Derived>& Sz,
         const Eigen::MatrixBase<DerivedOther>& R){
       const number_t
-        r11=2*R(0,0), r12=2*R(0,1), r13=2*R(0,2),
-        r21=2*R(1,0), r22=2*R(1,1), r23=2*R(1,2),
-        r31=2*R(2,0), r32=2*R(2,1), r33=2*R(2,2);
-      if (transposed) {
+        r11=2*R(0,0);
+      const number_t
+        r12=2*R(0,1);
+      const number_t
+        r13=2*R(0,2);
+      const number_t
+        r21=2*R(1,0);
+      const number_t
+        r22=2*R(1,1);
+      const number_t
+        r23=2*R(1,2);
+      const number_t
+        r31=2*R(2,0);
+      const number_t
+        r32=2*R(2,1);
+      const number_t
+        r33=2*R(2,2);
+      if (Transposed) {
         Sx << 0, 0, 0, r31, r32, r33, -r21, -r22, -r23;
         Sy << -r31, -r32, -r33, 0, 0, 0, r11, r12, r13;
         Sz << r21, r22, r23, -r11, -r12, -r13, 0, 0, 0;
@@ -91,8 +105,8 @@ namespace g2o {
                               const Isometry3& Pi/*=Isometry3()*/,
                               const Isometry3& Pj/*=Isometry3()*/)
   {
-    Eigen::MatrixBase<Derived>& Ji = const_cast<Eigen::MatrixBase<Derived>&>(JiConstRef);
-    Eigen::MatrixBase<Derived>& Jj = const_cast<Eigen::MatrixBase<Derived>&>(JjConstRef);
+    auto& Ji = const_cast<Eigen::MatrixBase<Derived>&>(JiConstRef);
+    auto& Jj = const_cast<Eigen::MatrixBase<Derived>&>(JjConstRef);
     Ji.derived().resize(6,6);
     Jj.derived().resize(6,6);
     // compute the error at the linearization point
@@ -147,7 +161,9 @@ namespace g2o {
     {
       number_t buf[27];
       Eigen::Map<Eigen::Matrix<number_t, 9, 3, Eigen::ColMajor> > M(buf);
-      Matrix3 Sxt,Syt,Szt;
+      Matrix3 Sxt;
+      Matrix3 Syt;
+      Matrix3 Szt;
       internal::skewT(Sxt,Syt,Szt,Rbc);
 #ifdef __clang__
       Matrix3 temp = Rab * Sxt;
@@ -169,7 +185,9 @@ namespace g2o {
     {
       number_t buf[27];
       Eigen::Map <Eigen::Matrix<number_t, 9, 3, Eigen::ColMajor> > M(buf);
-      Matrix3 Sx,Sy,Sz;
+      Matrix3 Sx;
+      Matrix3 Sy;
+      Matrix3 Sz;
       internal::skew(Sx,Sy,Sz,Rc);
 #ifdef __clang__
       Matrix3 temp = Rab * Sx;
@@ -196,8 +214,8 @@ namespace g2o {
                               const Isometry3& Xi,
                               const Isometry3& Xj)
   {
-    Eigen::MatrixBase<Derived>& Ji = const_cast<Eigen::MatrixBase<Derived>&>(JiConstRef);
-    Eigen::MatrixBase<Derived>& Jj = const_cast<Eigen::MatrixBase<Derived>&>(JjConstRef);
+    auto& Ji = const_cast<Eigen::MatrixBase<Derived>&>(JiConstRef);
+    auto& Jj = const_cast<Eigen::MatrixBase<Derived>&>(JjConstRef);
     Ji.derived().resize(6,6);
     Jj.derived().resize(6,6);
     // compute the error at the linearization point
@@ -237,7 +255,9 @@ namespace g2o {
 
     number_t buf[27];
     Eigen::Map<Eigen::Matrix<number_t, 9, 3, Eigen::ColMajor> > M(buf);
-    Matrix3 Sxt,Syt,Szt;
+    Matrix3 Sxt;
+    Matrix3 Syt;
+    Matrix3 Szt;
     // dre/dqi
     {
       skewT(Sxt,Syt,Szt,Rb);
@@ -268,7 +288,7 @@ namespace g2o {
                                    const Isometry3& X,
                                    const Isometry3& P=Isometry3::Identity())
   {
-    Eigen::MatrixBase<Derived>& J = const_cast<Eigen::MatrixBase<Derived>&>(JConstRef);
+    auto& J = const_cast<Eigen::MatrixBase<Derived>&>(JConstRef);
     J.derived().resize(6,6);
     // compute the error at the linearization point
     const Isometry3 A = Z.inverse()*X;
@@ -304,7 +324,9 @@ namespace g2o {
     {
       number_t buf[27];
       Eigen::Map<Eigen::Matrix<number_t, 9, 3, Eigen::ColMajor> > M(buf);
-      Matrix3 Sx,Sy,Sz;
+      Matrix3 Sx;
+      Matrix3 Sy;
+      Matrix3 Sz;
       internal::skew(Sx,Sy,Sz,Rb);
 #ifdef __clang__
       Matrix3 temp = Ra * Sx;

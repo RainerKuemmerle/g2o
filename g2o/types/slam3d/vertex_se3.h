@@ -52,46 +52,46 @@ namespace g2o {
     public:
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
 
-      static const int orthogonalizeAfter = 1000; //< orthogonalize the rotation matrix after N updates
+      static const int kOrthogonalizeAfter = 1000; //< orthogonalize the rotation matrix after N updates
 
       VertexSE3();
 
-      virtual void setToOriginImpl() {
-        _estimate = Isometry3::Identity();
+      void setToOriginImpl() override {
+        estimate_ = Isometry3::Identity();
       }
 
-      virtual bool read(std::istream& is);
-      virtual bool write(std::ostream& os) const;
+      bool read(std::istream& is) override;
+      bool write(std::ostream& os) const override;
 
-      virtual bool setEstimateDataImpl(const number_t* est){
+      bool setEstimateDataImpl(const number_t* est) override{
         Eigen::Map<const Vector7> v(est);
-        _estimate=internal::fromVectorQT(v);
+        estimate_=internal::fromVectorQT(v);
         return true;
       }
 
-      virtual bool getEstimateData(number_t* est) const{
+      bool getEstimateData(number_t* est) const override{
         Eigen::Map<Vector7> v(est);
-        v=internal::toVectorQT(_estimate);
+        v=internal::toVectorQT(estimate_);
         return true;
       }
 
-      virtual int estimateDimension() const {
+      int estimateDimension() const override {
         return 7;
       }
 
-      virtual bool setMinimalEstimateDataImpl(const number_t* est){
+      bool setMinimalEstimateDataImpl(const number_t* est) override{
         Eigen::Map<const Vector6> v(est);
-        _estimate = internal::fromVectorMQT(v);
+        estimate_ = internal::fromVectorMQT(v);
         return true;
       }
 
-      virtual bool getMinimalEstimateData(number_t* est) const{
+      bool getMinimalEstimateData(number_t* est) const override{
         Eigen::Map<Vector6> v(est);
-        v = internal::toVectorMQT(_estimate);
+        v = internal::toVectorMQT(estimate_);
         return true;
       }
 
-      virtual int minimalEstimateDimension() const {
+      int minimalEstimateDimension() const override {
         return 6;
       }
 
@@ -102,14 +102,14 @@ namespace g2o {
        * element qw of the quaternion is recovred by
        * || (qw,qx,qy,qz) || == 1 => qw = sqrt(1 - || (qx,qy,qz) ||
        */
-      virtual void oplusImpl(const number_t* update)
+      void oplusImpl(const number_t* update) override
       {
         Eigen::Map<const Vector6> v(update);
         Isometry3 increment = internal::fromVectorMQT(v);
-        _estimate = _estimate * increment;
-        if (++_numOplusCalls > orthogonalizeAfter) {
-          _numOplusCalls = 0;
-          internal::approximateNearestOrthogonalMatrix(_estimate.matrix().topLeftCorner<3,3>());
+        estimate_ = estimate_ * increment;
+        if (++numOplusCalls_ > kOrthogonalizeAfter) {
+          numOplusCalls_ = 0;
+          internal::approximateNearestOrthogonalMatrix(estimate_.matrix().topLeftCorner<3,3>());
         }
       }
 
@@ -119,7 +119,7 @@ namespace g2o {
       void G2O_ATTRIBUTE_DEPRECATED(setEstimateFromSE3Quat(const SE3Quat& se3)) { setEstimate(internal::fromSE3Quat(se3));}
 
     protected:
-      int _numOplusCalls;     ///< store how often opluse was called to trigger orthogonaliation of the rotation matrix
+      int numOplusCalls_ = 0;     ///< store how often opluse was called to trigger orthogonaliation of the rotation matrix
   };
 
   /**
@@ -128,8 +128,8 @@ namespace g2o {
   class VertexSE3WriteGnuplotAction: public WriteGnuplotAction {
     public:
       VertexSE3WriteGnuplotAction();
-      virtual bool operator()(HyperGraph::HyperGraphElement* element,
-          HyperGraphElementAction::Parameters* params_ );
+      bool operator()(HyperGraph::HyperGraphElement* element,
+          HyperGraphElementAction::Parameters* params_ ) override;
   };
 
 #ifdef G2O_HAVE_OPENGL
@@ -139,10 +139,10 @@ namespace g2o {
   class G2O_TYPES_SLAM3D_API VertexSE3DrawAction: public DrawAction{
     public:
       VertexSE3DrawAction();
-      virtual bool operator()(HyperGraph::HyperGraphElement* element, HyperGraphElementAction::Parameters* params_);
+      bool operator()(HyperGraph::HyperGraphElement* element, HyperGraphElementAction::Parameters* params_) override;
     protected:
-      virtual bool refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_);
-      std::shared_ptr<FloatProperty> _triangleX, _triangleY;
+      bool refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_) override;
+      std::shared_ptr<FloatProperty> triangleX_, triangleY_;
   };
 #endif
 

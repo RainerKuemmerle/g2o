@@ -46,44 +46,44 @@ namespace g2o {
   public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
     EdgeSE3PointXYZDisparity();
-    virtual bool read(std::istream& is);
-    virtual bool write(std::ostream& os) const;
+    bool read(std::istream& is) override ;
+    bool write(std::ostream& os) const override;
 
     // return the error estimate as a 3-vector
-    void computeError();
+    void computeError() override;
 
 #ifdef EDGE_PROJECT_DISPARITY_ANALYTIC_JACOBIAN
-    virtual void linearizeOplus();
+    void linearizeOplus() override;
 #endif
 
-    virtual bool setMeasurementData(const number_t* d){
+    bool setMeasurementData(const number_t* d) override{
       Eigen::Map<const Vector3> v(d);
-      _measurement = v;
+      measurement_ = v;
       return true;
     }
 
-    virtual bool getMeasurementData(number_t* d) const{
+    bool getMeasurementData(number_t* d) const override{
       Eigen::Map<Vector3> v(d);
-      v=_measurement;
+      v=measurement_;
       return true;
     }
 
-    virtual int measurementDimension() const {return 3;}
+    int measurementDimension() const override {return 3;}
 
-    virtual bool setMeasurementFromState();
+    bool setMeasurementFromState() override;
 
-    virtual number_t initialEstimatePossible(const OptimizableGraph::VertexSet& from,
-             OptimizableGraph::Vertex* to) {
+    number_t initialEstimatePossible(const OptimizableGraph::VertexSet& from,
+             OptimizableGraph::Vertex* to) override {
       (void) to;
-      return (from.count(_vertices[0]) == 1 ? 1.0 : -1.0);
+      return (from.count(vertices_[0]) == 1 ? 1.0 : -1.0);
     }
 
-    virtual void initialEstimate(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to);
+    void initialEstimate(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to) override;
 
   private:
-    Eigen::Matrix<number_t,3,9,Eigen::ColMajor> J; // jacobian before projection
-    virtual bool resolveCaches();
-    std::shared_ptr<CacheCamera> cache;
+    Eigen::Matrix<number_t,3,9,Eigen::ColMajor> J_; // jacobian before projection
+    bool resolveCaches() override;
+    std::shared_ptr<CacheCamera> cache_;
   };
 
 
@@ -91,8 +91,8 @@ namespace g2o {
   class G2O_TYPES_SLAM3D_API EdgeProjectDisparityDrawAction: public DrawAction{
   public:
     EdgeProjectDisparityDrawAction();
-    virtual bool operator()(HyperGraph::HyperGraphElement* element,
-                            HyperGraphElementAction::Parameters* params_);
+    bool operator()(HyperGraph::HyperGraphElement* element,
+                            HyperGraphElementAction::Parameters* params_) override;
   };
 #endif
 

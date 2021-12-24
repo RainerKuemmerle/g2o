@@ -34,13 +34,9 @@
 #include <iostream>
 #include "g2o/core/cache.h"
 
-using namespace Eigen;
-
 namespace g2o {
 
-  VertexSE3::VertexSE3() :
-    BaseVertex<6, Isometry3>(),
-    _numOplusCalls(0)
+  VertexSE3::VertexSE3()
   {
     setToOriginImpl();
     updateCache();
@@ -62,15 +58,15 @@ namespace g2o {
   VertexSE3WriteGnuplotAction::VertexSE3WriteGnuplotAction(): WriteGnuplotAction(typeid(VertexSE3).name()){}
 
   bool VertexSE3WriteGnuplotAction::operator()(HyperGraph::HyperGraphElement* element, HyperGraphElementAction::Parameters* params_){
-    if (typeid(*element).name()!=_typeName)
+    if (typeid(*element).name()!=typeName_)
       return false;
-    WriteGnuplotAction::Parameters* params=static_cast<WriteGnuplotAction::Parameters*>(params_);
+    auto* params=static_cast<WriteGnuplotAction::Parameters*>(params_);
     if (!params->os){
       std::cerr << __PRETTY_FUNCTION__ << ": warning, no valid os specified" << std::endl;
       return false;
     }
 
-    VertexSE3* v =  static_cast<VertexSE3*>(element);
+    auto* v =  static_cast<VertexSE3*>(element);
     Vector6 est=internal::toVectorMQT(v->estimate());
     for (int i=0; i<6; i++)
       *(params->os) << est[i] << " ";
@@ -96,42 +92,42 @@ namespace g2o {
   }
 
   VertexSE3DrawAction::VertexSE3DrawAction()
-      : DrawAction(typeid(VertexSE3).name()), _triangleX(nullptr), _triangleY(nullptr) {
-    _cacheDrawActions = 0;
+      : DrawAction(typeid(VertexSE3).name()), triangleX_(nullptr), triangleY_(nullptr) {
+    cacheDrawActions_ = nullptr;
   }
 
   bool VertexSE3DrawAction::refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_){
     if (!DrawAction::refreshPropertyPtrs(params_))
       return false;
-    if (_previousParams){
-      _triangleX = _previousParams->makeProperty<FloatProperty>(_typeName + "::TRIANGLE_X", .2f);
-      _triangleY = _previousParams->makeProperty<FloatProperty>(_typeName + "::TRIANGLE_Y", .05f);
+    if (previousParams_){
+      triangleX_ = previousParams_->makeProperty<FloatProperty>(typeName_ + "::TRIANGLE_X", .2F);
+      triangleY_ = previousParams_->makeProperty<FloatProperty>(typeName_ + "::TRIANGLE_Y", .05F);
     } else {
-      _triangleX = nullptr;
-      _triangleY = nullptr;
+      triangleX_ = nullptr;
+      triangleY_ = nullptr;
     }
     return true;
   }
 
   bool VertexSE3DrawAction::operator()(HyperGraph::HyperGraphElement* element,
                  HyperGraphElementAction::Parameters* params_){
-    if (typeid(*element).name()!=_typeName)
+    if (typeid(*element).name()!=typeName_)
       return false;
     initializeDrawActionsCache();
     refreshPropertyPtrs(params_);
 
-    if (! _previousParams)
+    if (! previousParams_)
       return true;
 
-    if (_show && !_show->value())
+    if (show_ && !show_->value())
       return true;
 
-    VertexSE3* that = static_cast<VertexSE3*>(element);
+    auto* that = static_cast<VertexSE3*>(element);
 
     glColor3f(POSE_VERTEX_COLOR);
     glPushMatrix();
     glMultMatrixd(that->estimate().matrix().cast<double>().eval().data());
-    opengl::drawArrow2D(_triangleX->value(), _triangleY->value(), _triangleX->value()*.3f);
+    opengl::drawArrow2D(triangleX_->value(), triangleY_->value(), triangleX_->value()*.3F);
     drawCache(that->cacheContainer(), params_);
     drawUserData(that->userData().get(), params_);
     glPopMatrix();

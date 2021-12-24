@@ -29,9 +29,9 @@
 namespace g2o {
 using namespace Eigen;
 
-EdgePlane::EdgePlane() : BaseBinaryEdge<4, Vector4, VertexPlane, VertexPlane>() {
-  _information.setIdentity();
-  _error.setZero();
+EdgePlane::EdgePlane()  {
+  information().setIdentity();
+  error_.setZero();
 }
 
 bool EdgePlane::read(std::istream& is) {

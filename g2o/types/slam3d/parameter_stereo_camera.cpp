@@ -30,11 +30,11 @@
 
 namespace g2o {
 
-ParameterStereoCamera::ParameterStereoCamera() : ParameterCamera(), _baseline(cst(0.075)) {}
+ParameterStereoCamera::ParameterStereoCamera() :  baseline_(cst(0.075)) {}
 
 bool ParameterStereoCamera::read(std::istream& is) {
   bool state = ParameterCamera::read(is);
-  is >> _baseline;
+  is >> baseline_;
   return is.good() && state;
 }
 

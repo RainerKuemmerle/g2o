@@ -25,7 +25,6 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vertex_pointxyz.h"
-#include <stdio.h>
 
 #ifdef G2O_HAVE_OPENGL
 #include "g2o/stuff/opengl_primitives.h"
@@ -36,39 +35,39 @@
 
 namespace g2o {
 
-bool VertexPointXYZ::read(std::istream& is) { return internal::readVector(is, _estimate); }
+bool VertexPointXYZ::read(std::istream& is) { return internal::readVector(is, estimate_); }
 
 bool VertexPointXYZ::write(std::ostream& os) const { return internal::writeVector(os, estimate()); }
 
 #ifdef G2O_HAVE_OPENGL
-VertexPointXYZDrawAction::VertexPointXYZDrawAction() : DrawAction(typeid(VertexPointXYZ).name()), _pointSize(nullptr) {}
+VertexPointXYZDrawAction::VertexPointXYZDrawAction() : DrawAction(typeid(VertexPointXYZ).name()), pointSize_(nullptr) {}
 
 bool VertexPointXYZDrawAction::refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_) {
   if (!DrawAction::refreshPropertyPtrs(params_)) return false;
-  if (_previousParams) {
-    _pointSize = _previousParams->makeProperty<FloatProperty>(_typeName + "::POINT_SIZE", 1.);
+  if (previousParams_) {
+    pointSize_ = previousParams_->makeProperty<FloatProperty>(typeName_ + "::POINT_SIZE", 1.);
   } else {
-    _pointSize = nullptr;
+    pointSize_ = nullptr;
   }
   return true;
 }
 
 bool VertexPointXYZDrawAction::operator()(HyperGraph::HyperGraphElement* element,
                                           HyperGraphElementAction::Parameters* params) {
-  if (typeid(*element).name() != _typeName) return false;
+  if (typeid(*element).name() != typeName_) return false;
   initializeDrawActionsCache();
   refreshPropertyPtrs(params);
-  if (!_previousParams) return true;
+  if (!previousParams_) return true;
 
-  if (_show && !_show->value()) return true;
-  VertexPointXYZ* that = static_cast<VertexPointXYZ*>(element);
+  if (show_ && !show_->value()) return true;
+  auto* that = static_cast<VertexPointXYZ*>(element);
 
   glPushMatrix();
   glPushAttrib(GL_ENABLE_BIT | GL_POINT_BIT);
   glDisable(GL_LIGHTING);
   glColor3f(LANDMARK_VERTEX_COLOR);
-  float ps = _pointSize ? _pointSize->value() : 1.f;
-  glTranslatef((float)that->estimate()(0), (float)that->estimate()(1), (float)that->estimate()(2));
+  float ps = pointSize_ ? pointSize_->value() : 1.F;
+  glTranslatef(static_cast<float>(that->estimate()(0)), static_cast<float>(that->estimate()(1)), static_cast<float>(that->estimate()(2)));
   opengl::drawPoint(ps);
   glPopAttrib();
   drawCache(that->cacheContainer(), params);
@@ -85,15 +84,15 @@ bool VertexPointXYZDrawAction::operator()(HyperGraph::HyperGraphElement* element
 
   bool VertexPointXYZWriteGnuplotAction::operator()(HyperGraph::HyperGraphElement* element, HyperGraphElementAction::Parameters* params_ )
   {
-    if (typeid(*element).name()!=_typeName)
+    if (typeid(*element).name()!=typeName_)
       return false;
-    WriteGnuplotAction::Parameters* params=static_cast<WriteGnuplotAction::Parameters*>(params_);
+    auto* params=static_cast<WriteGnuplotAction::Parameters*>(params_);
     if (!params->os){
       std::cerr << __PRETTY_FUNCTION__ << ": warning, no valid os specified" << std::endl;
       return false;
     }
 
-    VertexPointXYZ* v = static_cast<VertexPointXYZ*>(element);
+    auto* v = static_cast<VertexPointXYZ*>(element);
     *(params->os) << v->estimate().x() << " " << v->estimate().y() << " " << v->estimate().z() << " " << std::endl;
     return true;
   }

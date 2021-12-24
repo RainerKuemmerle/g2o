@@ -42,33 +42,33 @@ class G2O_TYPES_SLAM3D_ADDONS_API EdgeSE3PlaneSensorCalib : public BaseVariableS
   EdgeSE3PlaneSensorCalib();
   Vector3 color;
 
-  void computeError() {
-    const VertexSE3* v1 = static_cast<const VertexSE3*>(vertexRaw(0));
-    const VertexPlane* planeVertex = static_cast<const VertexPlane*>(vertexRaw(1));
-    const VertexSE3* offset = static_cast<const VertexSE3*>(vertexRaw(2));
+  void computeError() override {
+    const auto* v1 = static_cast<const VertexSE3*>(vertexRaw(0));
+    const auto* planeVertex = static_cast<const VertexPlane*>(vertexRaw(1));
+    const auto* offset = static_cast<const VertexSE3*>(vertexRaw(2));
     const Plane3D& plane = planeVertex->estimate();
     // measurement function: remap the plane in global coordinates
     Isometry3 w2n = (v1->estimate() * offset->estimate()).inverse();
     Plane3D localPlane = w2n * plane;
-    _error = localPlane.ominus(_measurement);
+    error_ = localPlane.ominus(measurement_);
   }
 
-  void setMeasurement(const Plane3D& m) { _measurement = m; }
+  void setMeasurement(const Plane3D& m) override { measurement_ = m; }
 
-  virtual bool read(std::istream& is);
-  virtual bool write(std::ostream& os) const;
+  bool read(std::istream& is) override;
+  bool write(std::ostream& os) const override;
 };
 
 #ifdef G2O_HAVE_OPENGL
 class EdgeSE3PlaneSensorCalibDrawAction : public DrawAction {
  public:
   G2O_TYPES_SLAM3D_ADDONS_API EdgeSE3PlaneSensorCalibDrawAction();
-  G2O_TYPES_SLAM3D_ADDONS_API virtual bool operator()(HyperGraph::HyperGraphElement* element,
-                                                      HyperGraphElementAction::Parameters* params_);
+  G2O_TYPES_SLAM3D_ADDONS_API bool operator()(HyperGraph::HyperGraphElement* element,
+                                                      HyperGraphElementAction::Parameters* params_) override;
 
  protected:
-  virtual bool refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_);
-  std::shared_ptr<FloatProperty> _planeWidth, _planeHeight;
+  bool refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_) override;
+  std::shared_ptr<FloatProperty> planeWidth_, planeHeight_;
 };
 #endif
 

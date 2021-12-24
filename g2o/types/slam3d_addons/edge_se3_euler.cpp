@@ -77,7 +77,7 @@ static void jac_quat3_euler3(Eigen::Matrix<number_t, 6, 6, Eigen::ColMajor>& J, 
 
   bool EdgeSE3Euler::write(std::ostream& os) const
   {
-    Vector6 meas = g2o::internal::toVectorET(_measurement);
+    Vector6 meas = g2o::internal::toVectorET(measurement_);
     for (int i=0; i<6; i++)
       os << meas[i] << " ";
 

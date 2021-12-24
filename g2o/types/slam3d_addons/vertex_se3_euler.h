@@ -41,8 +41,8 @@ class G2O_TYPES_SLAM3D_ADDONS_API VertexSE3Euler : public VertexSE3
 {
   public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-    virtual bool read(std::istream& is);
-    virtual bool write(std::ostream& os) const;
+    bool read(std::istream& is) override;
+    bool write(std::ostream& os) const override;
 };
 
 } // end namespace

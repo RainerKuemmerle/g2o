@@ -41,29 +41,29 @@ namespace g2o {
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
 
     VertexLine3D();
-    virtual bool read(std::istream& is);
-    virtual bool write(std::ostream& os) const;
+    bool read(std::istream& is) override;
+    bool write(std::ostream& os) const override;
 
-    virtual void setToOriginImpl() { _estimate = Line3D(); }
+    void setToOriginImpl() override { estimate_ = Line3D(); }
 
-    virtual void oplusImpl(const number_t* update_) {
+    void oplusImpl(const number_t* update_) override {
       Eigen::Map<const Vector4> update(update_);
-      _estimate.oplus(update);
+      estimate().oplus(update);
     }
 
-    virtual bool setEstimateDataImpl(const number_t* est) {
+    bool setEstimateDataImpl(const number_t* est) override {
       Eigen::Map<const Vector6> _est(est);
-      _estimate = Line3D(_est);
+      estimate_ = Line3D(_est);
       return true;
     }
 
-    virtual bool getEstimateData(number_t* est) const {
+    bool getEstimateData(number_t* est) const override {
       Eigen::Map<Vector6> _est(est);
-      _est = _estimate;
+      _est = estimate_;
       return true;
     }
 
-    virtual int estimateDimension() const {
+    int estimateDimension() const override {
       return 6;
     }
 
@@ -74,12 +74,12 @@ namespace g2o {
   class VertexLine3DDrawAction : public DrawAction {
   public:
     VertexLine3DDrawAction();
-    virtual bool operator()(HyperGraph::HyperGraphElement* element,
-                            HyperGraphElementAction::Parameters* params_);
+    bool operator()(HyperGraph::HyperGraphElement* element,
+                            HyperGraphElementAction::Parameters* params_) override;
 
    protected:
-    virtual bool refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_);
-    std::shared_ptr<FloatProperty> _lineLength, _lineWidth;
+    bool refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_) override;
+    std::shared_ptr<FloatProperty> lineLength_, lineWidth_;
 
   };
 #endif

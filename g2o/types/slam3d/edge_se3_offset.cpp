@@ -31,10 +31,8 @@
 #include <iostream>
 
 namespace g2o {
-  using namespace std;
-  using namespace Eigen;
 
-  EdgeSE3Offset::EdgeSE3Offset() : EdgeSE3() {
+  EdgeSE3Offset::EdgeSE3Offset()  {
     information().setIdentity();
     resizeParameters(2);
     installParameter<CacheSE3Offset::ParameterType>(0);
@@ -43,11 +41,11 @@ namespace g2o {
 
   bool EdgeSE3Offset::resolveCaches(){
     ParameterVector pv(1);
-    pv[0] = _parameters[0];
-    resolveCache(_cacheFrom, vertexXn<0>(), "CACHE_SE3_OFFSET", pv);
-    pv[0] = _parameters[1];
-    resolveCache(_cacheTo, vertexXn<0>(), "CACHE_SE3_OFFSET", pv);
-    return (_cacheFrom && _cacheTo);
+    pv[0] = parameters_[0];
+    resolveCache(cacheFrom_, vertexXn<0>(), "CACHE_SE3_OFFSET", pv);
+    pv[0] = parameters_[1];
+    resolveCache(cacheTo_, vertexXn<0>(), "CACHE_SE3_OFFSET", pv);
+    return (cacheFrom_ && cacheTo_);
   }
 
   bool EdgeSE3Offset::read(std::istream& is) {
@@ -65,18 +63,18 @@ namespace g2o {
 
   bool EdgeSE3Offset::write(std::ostream& os) const {
     writeParamIds(os);
-    internal::writeVector(os, internal::toVectorQT(_measurement));
+    internal::writeVector(os, internal::toVectorQT(measurement_));
     writeInformationMatrix(os);
     return os.good();
   }
 
   void EdgeSE3Offset::computeError() {
-    Isometry3 delta=_inverseMeasurement * _cacheFrom->w2n() * _cacheTo->n2w();
-    _error=internal::toVectorMQT(delta);
+    Isometry3 delta=inverseMeasurement_ * cacheFrom_->w2n() * cacheTo_->n2w();
+    error_=internal::toVectorMQT(delta);
   }
 
   bool EdgeSE3Offset::setMeasurementFromState(){
-    Isometry3 delta = _cacheFrom->w2n() * _cacheTo->n2w();
+    Isometry3 delta = cacheFrom_->w2n() * cacheTo_->n2w();
     setMeasurement(delta);
     return true;
   }
@@ -89,17 +87,17 @@ namespace g2o {
     Isometry3 E;
     const Isometry3& Xi = from->estimate();
     const Isometry3& Xj = to->estimate();
-    const Isometry3& Pi = _cacheFrom->offsetParam()->offset();
-    const Isometry3& Pj = _cacheTo->offsetParam()->offset();
-    const Isometry3& Z = _measurement;
-    internal::computeEdgeSE3Gradient(E, _jacobianOplusXi, _jacobianOplusXj, Z, Xi, Xj, Pi, Pj);
+    const Isometry3& Pi = cacheFrom_->offsetParam()->offset();
+    const Isometry3& Pj = cacheTo_->offsetParam()->offset();
+    const Isometry3& Z = measurement_;
+    internal::computeEdgeSE3Gradient(E, jacobianOplusXi_, jacobianOplusXj_, Z, Xi, Xj, Pi, Pj);
   }
 
   void EdgeSE3Offset::initialEstimate(const OptimizableGraph::VertexSet& from_, OptimizableGraph::Vertex* /*to_*/) {
     VertexSE3* from = vertexXnRaw<0>();
     VertexSE3* to = vertexXnRaw<1>();
 
-    Isometry3 virtualMeasurement = _cacheFrom->offsetParam()->offset() * measurement() * _cacheTo->offsetParam()->offset().inverse();
+    Isometry3 virtualMeasurement = cacheFrom_->offsetParam()->offset() * measurement() * cacheTo_->offsetParam()->offset().inverse();
 
     if (from_.count(vertexXn<0>()) > 0) {
       to->setEstimate(from->estimate() * virtualMeasurement);

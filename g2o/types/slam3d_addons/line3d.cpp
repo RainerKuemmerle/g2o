@@ -32,7 +32,7 @@ namespace g2o {
 
   using namespace std;
 
-  static inline Matrix3 _skew(const Vector3& t) {
+  static inline Matrix3 skew(const Vector3& t) {
     Matrix3 S;
     S <<
            0, -t.z(),  t.y(),
@@ -45,7 +45,7 @@ namespace g2o {
   Vector6 Line3D::toCartesian() const {
     Vector6 cartesian;
     cartesian.tail<3>() = d()/d().norm();
-    Matrix3 W = -_skew(d());
+    Matrix3 W = -skew(d());
     number_t damping = cst(1e-9);
     Matrix3 A = W.transpose()*W + (Matrix3::Identity()*damping);
     cartesian.head<3>() = A.ldlt().solve(W.transpose()*w());
@@ -55,9 +55,9 @@ namespace g2o {
   Line3D operator*(const Isometry3& t, const Line3D& line){
     Matrix6 A = Matrix6::Zero();
     A.block<3, 3>(0, 0) = t.linear();
-    A.block<3, 3>(0, 3) = _skew(t.translation())*t.linear();
+    A.block<3, 3>(0, 3) = skew(t.translation())*t.linear();
     A.block<3, 3>(3, 3) = t.linear();
-    Vector6 v = (Vector6)line;
+    Vector6 v = Vector6(line);
     return Line3D(A*v);
   }
   

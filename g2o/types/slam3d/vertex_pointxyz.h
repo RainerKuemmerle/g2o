@@ -39,46 +39,46 @@ namespace g2o {
   {
     public:
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
-      VertexPointXYZ() {}
-      virtual bool read(std::istream& is);
-      virtual bool write(std::ostream& os) const;
+      VertexPointXYZ() = default;
+      bool read(std::istream& is) override ;
+      bool write(std::ostream& os) const override ;
 
-      virtual void setToOriginImpl() { _estimate.fill(0.); }
+      void setToOriginImpl() override { estimate_.fill(0.); }
 
-      virtual void oplusImpl(const number_t* update_) {
+      void oplusImpl(const number_t* update_) override {
         Eigen::Map<const Vector3> update(update_);
-        _estimate += update;
+        estimate_ += update;
       }
 
-      virtual bool setEstimateDataImpl(const number_t* est){
+      bool setEstimateDataImpl(const number_t* est) override {
         Eigen::Map<const Vector3> estMap(est);
-        _estimate = estMap;
+        estimate_ = estMap;
         return true;
       }
 
-      virtual bool getEstimateData(number_t* est) const{
+      bool getEstimateData(number_t* est) const override {
         Eigen::Map<Vector3> estMap(est);
-        estMap = _estimate;
+        estMap = estimate_;
         return true;
       }
 
-      virtual int estimateDimension() const {
-        return Dimension;
+      int estimateDimension() const override {
+        return kDimension;
       }
 
-      virtual bool setMinimalEstimateDataImpl(const number_t* est){
-        _estimate = Eigen::Map<const Vector3>(est);
+      bool setMinimalEstimateDataImpl(const number_t* est) override {
+        estimate_ = Eigen::Map<const Vector3>(est);
         return true;
       }
 
-      virtual bool getMinimalEstimateData(number_t* est) const{
+      bool getMinimalEstimateData(number_t* est) const override {
         Eigen::Map<Vector3> v(est);
-        v = _estimate;
+        v = estimate_;
         return true;
       }
 
-      virtual int minimalEstimateDimension() const {
-        return Dimension;
+      int minimalEstimateDimension() const override {
+        return kDimension;
       }
 
   };
@@ -87,8 +87,8 @@ namespace g2o {
   {
     public:
       VertexPointXYZWriteGnuplotAction();
-      virtual bool operator()(HyperGraph::HyperGraphElement* element,
-                              HyperGraphElementAction::Parameters* params_);
+      bool operator()(HyperGraph::HyperGraphElement* element,
+                              HyperGraphElementAction::Parameters* params_) override ;
   };
 
 #ifdef G2O_HAVE_OPENGL
@@ -98,12 +98,12 @@ namespace g2o {
   class VertexPointXYZDrawAction: public DrawAction{
     public:
       VertexPointXYZDrawAction();
-      virtual bool operator()(HyperGraph::HyperGraphElement* element,
-                              HyperGraphElementAction::Parameters* params_);
+      bool operator()(HyperGraph::HyperGraphElement* element,
+                              HyperGraphElementAction::Parameters* params_) override ;
 
      protected:
-      std::shared_ptr<FloatProperty> _pointSize;
-      virtual bool refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_);
+      std::shared_ptr<FloatProperty> pointSize_;
+      bool refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_) override ;
   };
 #endif
 

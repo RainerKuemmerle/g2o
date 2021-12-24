@@ -31,10 +31,9 @@
 #include "isometry3d_gradients.h"
 
 namespace g2o {
-using namespace std;
 
 // point to camera projection, monocular
-EdgeSE3Prior::EdgeSE3Prior() : BaseUnaryEdge<6, Isometry3, VertexSE3>() {
+EdgeSE3Prior::EdgeSE3Prior()  {
   setMeasurement(Isometry3::Identity());
   information().setIdentity();
   resizeParameters(1);
@@ -43,9 +42,9 @@ EdgeSE3Prior::EdgeSE3Prior() : BaseUnaryEdge<6, Isometry3, VertexSE3>() {
 
 bool EdgeSE3Prior::resolveCaches() {
   ParameterVector pv(1);
-  pv[0] = _parameters[0];
-  resolveCache(_cache, vertexXn<0>(), "CACHE_SE3_OFFSET", pv);
-  return _cache != 0;
+  pv[0] = parameters_[0];
+  resolveCache(cache_, vertexXn<0>(), "CACHE_SE3_OFFSET", pv);
+  return cache_ != nullptr;
 }
 
 bool EdgeSE3Prior::read(std::istream& is) {
@@ -65,22 +64,24 @@ bool EdgeSE3Prior::write(std::ostream& os) const {
 }
 
 void EdgeSE3Prior::computeError() {
-  Isometry3 delta = _inverseMeasurement * _cache->n2w();
-  _error = internal::toVectorMQT(delta);
+  Isometry3 delta = inverseMeasurement_ * cache_->n2w();
+  error_ = internal::toVectorMQT(delta);
 }
 
 void EdgeSE3Prior::linearizeOplus() {
   VertexSE3* from = vertexXnRaw<0>();
   Isometry3 E;
-  Isometry3 Z, X, P;
+  Isometry3 Z;
+  Isometry3 X;
+  Isometry3 P;
   X = from->estimate();
-  P = _cache->offsetParam()->offset();
-  Z = _measurement;
-  internal::computeEdgeSE3PriorGradient(E, _jacobianOplusXi, Z, X, P);
+  P = cache_->offsetParam()->offset();
+  Z = measurement_;
+  internal::computeEdgeSE3PriorGradient(E, jacobianOplusXi_, Z, X, P);
 }
 
 bool EdgeSE3Prior::setMeasurementFromState() {
-  setMeasurement(_cache->n2w());
+  setMeasurement(cache_->n2w());
   return true;
 }
 
@@ -88,13 +89,13 @@ void EdgeSE3Prior::initialEstimate(const OptimizableGraph::VertexSet& /*from_*/,
   VertexSE3* v = vertexXnRaw<0>();
   assert(v && "Vertex for the Prior edge is not set");
 
-  Isometry3 newEstimate = _cache->offsetParam()->offset().inverse() * measurement();
+  Isometry3 newEstimate = cache_->offsetParam()->offset().inverse() * measurement();
   // do not set translation, as that part of the information is all zero
-  if (_information.block<3, 3>(0, 0).array().abs().sum() == 0) {
+  if (information_.block<3, 3>(0, 0).array().abs().sum() == 0) {
     newEstimate.translation() = v->estimate().translation();
   }
   // do not set rotation, as that part of the information is all zero
-  if (_information.block<3, 3>(3, 3).array().abs().sum() == 0) {
+  if (information_.block<3, 3>(3, 3).array().abs().sum() == 0) {
     newEstimate.matrix().block<3, 3>(0, 0) = internal::extractRotation(v->estimate());
   }
   v->setEstimate(newEstimate);

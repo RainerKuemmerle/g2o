@@ -31,7 +31,7 @@
 
 namespace g2o {
 
-  VertexLine3D::VertexLine3D() : BaseVertex<4, Line3D>(), color(1., 0.5, 0.) {
+  VertexLine3D::VertexLine3D() :  color(1., 0.5, 0.) {
   }
 
   bool VertexLine3D::read(std::istream& is) {
@@ -42,60 +42,60 @@ namespace g2o {
   }
 
   bool VertexLine3D::write(std::ostream& os) const {
-    return internal::writeVector(os, _estimate);
+    return internal::writeVector(os, estimate_);
   }
 
 #ifdef G2O_HAVE_OPENGL
   VertexLine3DDrawAction::VertexLine3DDrawAction()
-      : DrawAction(typeid(VertexLine3D).name()), _lineLength(nullptr), _lineWidth(nullptr) {}
+      : DrawAction(typeid(VertexLine3D).name()), lineLength_(nullptr), lineWidth_(nullptr) {}
 
   bool VertexLine3DDrawAction::refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_) {
     if(!DrawAction::refreshPropertyPtrs(params_)) {
       return false;
     }
     if(_previousParams) {
-      _lineLength = _previousParams->makeProperty<FloatProperty>(_typeName + "::LINE_LENGTH", 15);
-      _lineWidth = _previousParams->makeProperty<FloatProperty>(_typeName + "::LINE_WIDTH", 5);
+      lineLength_ = previousParams_->makeProperty<FloatProperty>(typeName_ + "::LINE_LENGTH", 15);
+      lineWidth_ = previousParams_->makeProperty<FloatProperty>(typeName_ + "::LINE_WIDTH", 5);
     }
     else {
-      _lineLength = 0;
-      _lineWidth = 0;
+      lineLength_ = nullptr;
+      lineWidth_ = nullptr;
     }
     return true;
   }
 
   bool VertexLine3DDrawAction::operator()(HyperGraph::HyperGraphElement* element,
                                           HyperGraphElementAction::Parameters* params_) {
-    if(typeid(*element).name() != _typeName) {
+    if(typeid(*element).name() != typeName_) {
       return false;
     }
 
     refreshPropertyPtrs(params_);
-    if(!_previousParams) {
+    if(!previousParams_) {
       return true;
     }
 
-    if(_show && !_show->value()) {
+    if(_show && !show_->value()) {
       return true;
     }
 
-    VertexLine3D* that = static_cast<VertexLine3D*>(element);
+    auto* that = static_cast<VertexLine3D*>(element);
     Line3D line = that->estimate();
     line.normalize();
     Vector3 direction = line.d();
     Vector3 npoint = line.d().cross(line.w());
     glPushMatrix();
     glColor3f(float(that->color(0)), float(that->color(1)), float(that->color(2)));
-    if(_lineLength && _lineWidth) {
-      glLineWidth(float(_lineWidth->value()));
+    if(lineLength_ && lineWidth_) {
+      glLineWidth(float(lineWidth_->value()));
       glBegin(GL_LINES);
       glNormal3f(float(npoint.x()), float(npoint.y()), float(npoint.z()));
-      glVertex3f(float(npoint.x() - direction.x() * _lineLength->value() / 2),
-                 float(npoint.y() - direction.y() * _lineLength->value() / 2),
-                 float(npoint.z() - direction.z() * _lineLength->value() / 2));
-      glVertex3f(float(npoint.x() + direction.x() * _lineLength->value() / 2),
-                 float(npoint.y() + direction.y() * _lineLength->value() / 2),
-                 float(npoint.z() + direction.z() * _lineLength->value() / 2));
+      glVertex3f(float(npoint.x() - direction.x() * lineLength_->value() / 2),
+                 float(npoint.y() - direction.y() * lineLength_->value() / 2),
+                 float(npoint.z() - direction.z() * lineLength_->value() / 2));
+      glVertex3f(float(npoint.x() + direction.x() * lineLength_->value() / 2),
+                 float(npoint.y() + direction.y() * lineLength_->value() / 2),
+                 float(npoint.z() + direction.z() * lineLength_->value() / 2));
       glEnd();
     }
     glPopMatrix();

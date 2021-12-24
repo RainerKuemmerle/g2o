@@ -45,8 +45,8 @@ namespace g2o {
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
       ParameterSE3Offset();
 
-      virtual bool read(std::istream& is);
-      virtual bool write(std::ostream& os) const;
+      bool read(std::istream& is) override;
+      bool write(std::ostream& os) const override;
 
       /**
        * update the offset to a new value.
@@ -55,14 +55,14 @@ namespace g2o {
       void setOffset(const Isometry3& offset_=Isometry3::Identity());
 
       //! rotation of the offset as 3x3 rotation matrix
-      const Isometry3& offset() const { return _offset;}
+      const Isometry3& offset() const { return offset_;}
 
       //! rotation of the inverse offset as 3x3 rotation matrix
-      const Isometry3& inverseOffset() const { return _inverseOffset;}
+      const Isometry3& inverseOffset() const { return inverseOffset_;}
 
     protected:
-      Isometry3 _offset;
-      Isometry3 _inverseOffset;
+      Isometry3 offset_;
+      Isometry3 inverseOffset_;
   };
 
   /**
@@ -73,22 +73,21 @@ namespace g2o {
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
       using ParameterType = ParameterSE3Offset;
 
-      CacheSE3Offset();
-      virtual void updateImpl();
+      void updateImpl() override;
 
       std::shared_ptr<ParameterType> offsetParam() const {
-        return std::static_pointer_cast<ParameterType>(_parameters[0]);
+        return std::static_pointer_cast<ParameterType>(parameters_[0]);
       }
       void setOffsetParam(ParameterSE3Offset* offsetParam);
 
-      const Isometry3& w2n() const { return _w2n;}
-      const Isometry3& n2w() const { return _n2w;}
-      const Isometry3& w2l() const { return _w2l;}
+      const Isometry3& w2n() const { return w2n_;}
+      const Isometry3& n2w() const { return n2w_;}
+      const Isometry3& w2l() const { return w2l_;}
 
     protected:
-      Isometry3 _w2n;
-      Isometry3 _n2w;
-      Isometry3 _w2l;
+      Isometry3 w2n_;
+      Isometry3 n2w_;
+      Isometry3 w2l_;
   };
 
 
@@ -96,12 +95,12 @@ namespace g2o {
   class G2O_TYPES_SLAM3D_API CacheSE3OffsetDrawAction: public DrawAction{
     public:
       CacheSE3OffsetDrawAction();
-      virtual bool operator()(HyperGraph::HyperGraphElement* element,
-                              HyperGraphElementAction::Parameters* params_);
+      bool operator()(HyperGraph::HyperGraphElement* element,
+                              HyperGraphElementAction::Parameters* params_) override;
 
      protected:
-      virtual bool refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_);
-      std::shared_ptr<FloatProperty> _cubeSide;
+      bool refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_) override;
+      std::shared_ptr<FloatProperty> cubeSide_;
   };
 #endif
 

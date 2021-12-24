@@ -24,8 +24,8 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef _DQUAT2MAT_H_
-#define _DQUAT2MAT_H_
+#ifndef DQUAT2MAT_H
+#define DQUAT2MAT_H
 #include <Eigen/Core>
 #include "g2o_types_slam3d_api.h"
 

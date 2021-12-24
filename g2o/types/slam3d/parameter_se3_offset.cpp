@@ -39,9 +39,9 @@ namespace g2o {
     setOffset();
   }
 
-  void ParameterSE3Offset::setOffset(const Isometry3& offset_){
-    _offset = offset_;
-    _inverseOffset = _offset.inverse();
+  void ParameterSE3Offset::setOffset(const Isometry3& offset){
+    offset_ = offset;
+    inverseOffset_ = offset_.inverse();
   }
 
   bool ParameterSE3Offset::read(std::istream& is) {
@@ -54,53 +54,51 @@ namespace g2o {
   }
 
   bool ParameterSE3Offset::write(std::ostream& os) const {
-    return internal::writeVector(os, internal::toVectorQT(_offset));
+    return internal::writeVector(os, internal::toVectorQT(offset_));
   }
-
-  CacheSE3Offset::CacheSE3Offset() : Cache() {}
 
   void CacheSE3Offset::updateImpl(){
 #ifndef NDEBUG
-  ParameterSE3Offset* offsetParam = dynamic_cast<ParameterSE3Offset*>(_parameters[0].get());
+  ParameterSE3Offset* offsetParam = dynamic_cast<ParameterSE3Offset*>(parameters_[0].get());
 #else
-  ParameterSE3Offset* offsetParam = static_cast<ParameterSE3Offset*>(_parameters[0].get());
+  auto* offsetParam = static_cast<ParameterSE3Offset*>(parameters_[0].get());
 #endif
 
-    const VertexSE3* v = static_cast<const VertexSE3*>(vertex());
-    _n2w = v->estimate() * offsetParam->offset();
-    _w2n = _n2w.inverse();
-    _w2l = v->estimate().inverse();
+    const auto* v = static_cast<const VertexSE3*>(vertex());
+    n2w_ = v->estimate() * offsetParam->offset();
+    w2n_ = n2w_.inverse();
+    w2l_ = v->estimate().inverse();
   }
 
 #ifdef G2O_HAVE_OPENGL
   CacheSE3OffsetDrawAction::CacheSE3OffsetDrawAction(): DrawAction(typeid(CacheSE3Offset).name()){
-    _previousParams = (DrawAction::Parameters*)0x42;
-    refreshPropertyPtrs(0);
+    previousParams_ = reinterpret_cast<DrawAction::Parameters*>(0x42);
+    refreshPropertyPtrs(nullptr);
   }
 
   bool CacheSE3OffsetDrawAction::refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_){
     if (! DrawAction::refreshPropertyPtrs(params_))
       return false;
-    if (_previousParams){
-      _cubeSide = _previousParams->makeProperty<FloatProperty>(_typeName + "::CUBE_SIDE", .05f);
+    if (previousParams_){
+      cubeSide_ = previousParams_->makeProperty<FloatProperty>(typeName_ + "::CUBE_SIDE", .05F);
     } else {
-      _cubeSide = 0;
+      cubeSide_ = nullptr;
     }
     return true;
   }
 
   bool CacheSE3OffsetDrawAction::operator()(HyperGraph::HyperGraphElement* element,
                 HyperGraphElementAction::Parameters* params_){
-    if (typeid(*element).name()!=_typeName)
+    if (typeid(*element).name()!=typeName_)
       return false;
-    CacheSE3Offset* that = static_cast<CacheSE3Offset*>(element);
+    auto* that = static_cast<CacheSE3Offset*>(element);
     refreshPropertyPtrs(params_);
-    if (! _previousParams)
+    if (! previousParams_)
       return true;
 
-    if (_show && !_show->value())
+    if (show_ && !show_->value())
       return true;
-    float cs = _cubeSide ? _cubeSide->value() : 1.0f;
+    float cs = cubeSide_ ? cubeSide_->value() : 1.0F;
     glPushAttrib(GL_COLOR);
     glColor3f(POSE_PARAMETER_COLOR);
     glPushMatrix();

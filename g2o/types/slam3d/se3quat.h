@@ -27,11 +27,12 @@
 #ifndef G2O_SE3QUAT_H_
 #define G2O_SE3QUAT_H_
 
-#include "se3_ops.h"
-#include "g2o/stuff/misc.h"
-
 #include <Eigen/Core>
 #include <Eigen/Geometry>
+#include <utility>
+
+#include "g2o/stuff/misc.h"
+#include "se3_ops.h"
 
 namespace g2o {
 
@@ -41,20 +42,20 @@ namespace g2o {
 
     protected:
 
-      Quaternion _r;
-      Vector3 _t;
+      Quaternion r_;
+      Vector3 t_;
 
     public:
       SE3Quat(){
-        _r.setIdentity();
-        _t.setZero();
+        r_.setIdentity();
+        t_.setZero();
       }
 
-      SE3Quat(const Matrix3& R, const Vector3& t):_r(Quaternion(R)),_t(t){ 
+      SE3Quat(const Matrix3& R, Vector3  t):r_(Quaternion(R)),t_(std::move(std::move(t))){
         normalizeRotation();
       }
 
-      SE3Quat(const Quaternion& q, const Vector3& t):_r(q),_t(t){
+      SE3Quat(const Quaternion& q, Vector3  t):r_(q),t_(std::move(std::move(t))){
         normalizeRotation();
       }
 
@@ -67,118 +68,118 @@ namespace g2o {
           assert((v.size() == 6 || v.size() == 7) && "Vector dimension does not match");
           if (v.size() == 6) {
             for (int i=0; i<3; i++){
-              _t[i]=v[i];
-              _r.coeffs()(i)=v[i+3];
+              t_[i]=v[i];
+              r_.coeffs()(i)=v[i+3];
             }
-            _r.w() = 0.; // recover the positive w
-            if (_r.norm()>1.){
-              _r.normalize();
+            r_.w() = 0.; // recover the positive w
+            if (r_.norm()>1.){
+              r_.normalize();
             } else {
-              number_t w2= cst(1.)-_r.squaredNorm();
-              _r.w()= (w2<cst(0.)) ? cst(0.) : std::sqrt(w2);
+              number_t w2= cst(1.)-r_.squaredNorm();
+              r_.w()= (w2<cst(0.)) ? cst(0.) : std::sqrt(w2);
             }
           }
           else if (v.size() == 7) {
             int idx = 0;
             for (int i=0; i<3; ++i, ++idx)
-              _t(i) = v(idx);
+              t_(i) = v(idx);
             for (int i=0; i<4; ++i, ++idx)
-              _r.coeffs()(i) = v(idx);
+              r_.coeffs()(i) = v(idx);
             normalizeRotation();
           }
         }
 
-      inline const Vector3& translation() const {return _t;}
+      inline const Vector3& translation() const {return t_;}
 
-      inline void setTranslation(const Vector3& t_) {_t = t_;}
+      inline void setTranslation(const Vector3& t) {t_ = t;}
 
-      inline const Quaternion& rotation() const {return _r;}
+      inline const Quaternion& rotation() const {return r_;}
 
-      void setRotation(const Quaternion& r_) {_r=r_;}
+      void setRotation(const Quaternion& r) {r_=r;}
 
       inline SE3Quat operator* (const SE3Quat& tr2) const{
         SE3Quat result(*this);
-        result._t += _r*tr2._t;
-        result._r*=tr2._r;
+        result.t_ += r_*tr2.t_;
+        result.r_*=tr2.r_;
         result.normalizeRotation();
         return result;
       }
 
       inline SE3Quat& operator*= (const SE3Quat& tr2){
-        _t+=_r*tr2._t;
-        _r*=tr2._r;
+        t_+=r_*tr2.t_;
+        r_*=tr2.r_;
         normalizeRotation();
         return *this;
       }
 
       inline Vector3 operator* (const Vector3& v) const {
-        return _t+_r*v;
+        return t_+r_*v;
       }
 
       inline SE3Quat inverse() const{
         SE3Quat ret;
-        ret._r=_r.conjugate();
-        ret._t=ret._r*(_t*-cst(1.));
+        ret.r_=r_.conjugate();
+        ret.t_=ret.r_*(t_*-cst(1.));
         return ret;
       }
 
       inline number_t operator [](int i) const {
         assert(i<7);
         if (i<3)
-          return _t[i];
-        return _r.coeffs()[i-3];
+          return t_[i];
+        return r_.coeffs()[i-3];
       }
 
 
       inline Vector7 toVector() const{
         Vector7 v;
-        v[0]=_t(0);
-        v[1]=_t(1);
-        v[2]=_t(2);
-        v[3]=_r.x();
-        v[4]=_r.y();
-        v[5]=_r.z();
-        v[6]=_r.w();
+        v[0]=t_(0);
+        v[1]=t_(1);
+        v[2]=t_(2);
+        v[3]=r_.x();
+        v[4]=r_.y();
+        v[5]=r_.z();
+        v[6]=r_.w();
         return v;
       }
 
       inline void fromVector(const Vector7& v){
-        _r=Quaternion(v[6], v[3], v[4], v[5]);
-        _t=Vector3(v[0], v[1], v[2]);
+        r_=Quaternion(v[6], v[3], v[4], v[5]);
+        t_=Vector3(v[0], v[1], v[2]);
       }
 
       inline Vector6 toMinimalVector() const{
         Vector6 v;
-        v[0]=_t(0);
-        v[1]=_t(1);
-        v[2]=_t(2);
-        v[3]=_r.x();
-        v[4]=_r.y();
-        v[5]=_r.z();
+        v[0]=t_(0);
+        v[1]=t_(1);
+        v[2]=t_(2);
+        v[3]=r_.x();
+        v[4]=r_.y();
+        v[5]=r_.z();
         return v;
       }
 
       inline void fromMinimalVector(const Vector6& v){
         number_t w = cst(1.)-v[3]*v[3]-v[4]*v[4]-v[5]*v[5];
         if (w>0){
-          _r=Quaternion(std::sqrt(w), v[3], v[4], v[5]);
+          r_=Quaternion(std::sqrt(w), v[3], v[4], v[5]);
         } else {
-          _r=Quaternion(0, -v[3], -v[4], -v[5]);
+          r_=Quaternion(0, -v[3], -v[4], -v[5]);
         }
-        _t=Vector3(v[0], v[1], v[2]);
+        t_=Vector3(v[0], v[1], v[2]);
       }
 
 
 
       Vector6 log() const {
         Vector6 res;
-        Matrix3 _R = _r.toRotationMatrix();
-        number_t d = cst(0.5)*(_R(0,0)+_R(1,1)+_R(2,2)-1);
+        Matrix3 R = r_.toRotationMatrix();
+        number_t d = cst(0.5)*(R(0,0)+R(1,1)+R(2,2)-1);
         Vector3 omega;
         Vector3 upsilon;
 
 
-        Vector3 dR = deltaR(_R);
+        Vector3 dR = deltaR(R);
         Matrix3 V_inv;
 
         if (std::abs(d)>cst(0.99999))
@@ -197,7 +198,7 @@ namespace g2o {
               + ( 1-theta/(2*std::tan(theta/2)))/(theta*theta)*(Omega*Omega) );
         }
 
-        upsilon = V_inv*_t;
+        upsilon = V_inv*t_;
         for (int i=0; i<3;i++){
           res[i]=omega[i];
         }
@@ -211,7 +212,7 @@ namespace g2o {
 
       Vector3 map(const Vector3 & xyz) const
       {
-        return _r*xyz + _t;
+        return r_*xyz + t_;
       }
 
 
@@ -258,11 +259,11 @@ namespace g2o {
 
       Eigen::Matrix<number_t, 6, 6, Eigen::ColMajor> adj() const
       {
-        Matrix3 R = _r.toRotationMatrix();
+        Matrix3 R = r_.toRotationMatrix();
         Eigen::Matrix<number_t, 6, 6, Eigen::ColMajor> res;
         res.block(0,0,3,3) = R;
         res.block(3,3,3,3) = R;
-        res.block(3,0,3,3) = skew(_t)*R;
+        res.block(3,0,3,3) = skew(t_)*R;
         res.block(0,3,3,3) = Matrix3::Zero(3,3);
         return res;
       }
@@ -271,25 +272,25 @@ namespace g2o {
       {
         Eigen::Matrix<number_t,4,4,Eigen::ColMajor> homogeneous_matrix;
         homogeneous_matrix.setIdentity();
-        homogeneous_matrix.block(0,0,3,3) = _r.toRotationMatrix();
+        homogeneous_matrix.block(0,0,3,3) = r_.toRotationMatrix();
         homogeneous_matrix.col(3).head(3) = translation();
 
         return homogeneous_matrix;
       }
 
       void normalizeRotation(){
-        if (_r.w()<0){
-          _r.coeffs() *= -1;
+        if (r_.w()<0){
+          r_.coeffs() *= -1;
         }
-        _r.normalize();
+        r_.normalize();
       }
 
       /**
        * cast SE3Quat into an Isometry3
        */
-      operator Isometry3() const
+      explicit operator Isometry3() const
       {
-        Isometry3 result = (Isometry3) rotation();
+        Isometry3 result(rotation());
         result.translation() = translation();
         return result;
       }

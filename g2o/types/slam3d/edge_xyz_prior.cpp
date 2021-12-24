@@ -28,14 +28,13 @@
 #include <iostream>
 
 namespace g2o {
-  using namespace std;
 
-  EdgeXYZPrior::EdgeXYZPrior() : BaseUnaryEdge<3, Vector3, VertexPointXYZ>() {
+  EdgeXYZPrior::EdgeXYZPrior()  {
     information().setIdentity();
   }
 
   bool EdgeXYZPrior::read(std::istream& is) {
-    internal::readVector(is, _measurement);
+    internal::readVector(is, measurement_);
     return readInformationMatrix(is);
   }
 
@@ -46,16 +45,16 @@ namespace g2o {
 
   void EdgeXYZPrior::computeError() {
     const VertexPointXYZ* v = vertexXnRaw<0>();
-    _error = v->estimate() - _measurement;
+    error_ = v->estimate() - measurement_;
   }
 
   void EdgeXYZPrior::linearizeOplus(){
-      _jacobianOplusXi = Matrix3::Identity();
+      jacobianOplusXi_ = Matrix3::Identity();
   }
 
   bool EdgeXYZPrior::setMeasurementFromState(){
       const VertexPointXYZ* v = vertexXnRaw<0>();
-      _measurement = v->estimate();
+      measurement_ = v->estimate();
       return true;
   }
 }

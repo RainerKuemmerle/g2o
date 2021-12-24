@@ -39,34 +39,34 @@ class G2O_TYPES_SLAM3D_ADDONS_API EdgePlane : public BaseBinaryEdge<4, Vector4, 
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   EdgePlane();
 
-  void computeError() {
+  void computeError() override {
     auto v1 = vertexXnRaw<0>();
     auto v2 = vertexXnRaw<1>();
-    _error = (v2->estimate().toVector() - v1->estimate().toVector()) - _measurement;
+    error_ = (v2->estimate().toVector() - v1->estimate().toVector()) - measurement_;
   }
-  virtual bool read(std::istream& is);
-  virtual bool write(std::ostream& os) const;
+  bool read(std::istream& is) override;
+  bool write(std::ostream& os) const override;
 
-  virtual void setMeasurement(const Vector4& m) { _measurement = m; }
+  void setMeasurement(const Vector4& m) override { measurement_ = m; }
 
-  virtual bool setMeasurementData(const number_t* d) {
+  bool setMeasurementData(const number_t* d) override {
     Eigen::Map<const Vector4> m(d);
-    _measurement = m;
+    measurement_ = m;
     return true;
   }
 
-  virtual bool getMeasurementData(number_t* d) const {
+  bool getMeasurementData(number_t* d) const override {
     Eigen::Map<Vector4> m(d);
-    m = _measurement;
+    m = measurement_;
     return true;
   }
 
-  virtual int measurementDimension() const { return 4; }
+  int measurementDimension() const override { return 4; }
 
-  virtual bool setMeasurementFromState() {
+  bool setMeasurementFromState() override {
     auto v1 = vertexXnRaw<0>();
     auto v2 = vertexXnRaw<1>();
-    _measurement = (v2->estimate().toVector()) - v1->estimate().toVector();
+    measurement_ = (v2->estimate().toVector()) - v1->estimate().toVector();
 
     return true;
   }

@@ -86,8 +86,7 @@ namespace g2o {
       number_t w = 1-v.squaredNorm();
       if (w<0)
         return Matrix3::Identity();
-      else
-        w=sqrt(w);
+              w=sqrt(w);
       return Quaternion(w, v[0], v[1], v[2]).toRotationMatrix();
     }
 
@@ -144,7 +143,7 @@ namespace g2o {
 
     Isometry3 fromSE3Quat(const SE3Quat& t)
     {
-      Isometry3 result = (Isometry3) t.rotation();
+      Isometry3 result = Isometry3(t.rotation());
       result.translation() = t.translation();
       return result;
     }
