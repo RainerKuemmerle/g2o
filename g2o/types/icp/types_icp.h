@@ -139,22 +139,22 @@ class G2O_TYPES_ICP_API EdgeGICP {
 //    3 values for position wrt frame
 //    3 values for normal wrt frame, not used here
 // first two args are the measurement type, second two the connection classes
-class G2O_TYPES_ICP_API Edge_V_V_GICP : public BaseBinaryEdge<3, EdgeGICP, VertexSE3, VertexSE3> {
+class G2O_TYPES_ICP_API EdgeVVGicp : public BaseBinaryEdge<3, EdgeGICP, VertexSE3, VertexSE3> {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
-  Edge_V_V_GICP() : pl_pl(false) {}
-  Edge_V_V_GICP(const Edge_V_V_GICP *e);
+  EdgeVVGicp()  = default;
+  explicit EdgeVVGicp(const EdgeVVGicp *e);
 
   // switch to go between point-plane and plane-plane
-  bool pl_pl;
+  bool pl_pl = false;
   Matrix3 cov0, cov1;
 
   // I/O functions
-  virtual bool read(std::istream &is);
-  virtual bool write(std::ostream &os) const;
+  bool read(std::istream &is) override;
+  bool write(std::ostream &os) const override;
 
   // return the error estimate as a 3-vector
-  void computeError() {
+  void computeError() override {
     // from <ViewPoint> to <Point>
     const VertexSE3 *vp0 = vertexXnRaw<0>();
     const VertexSE3 *vp1 = vertexXnRaw<1>();
@@ -187,13 +187,13 @@ class G2O_TYPES_ICP_API Edge_V_V_GICP : public BaseBinaryEdge<3, EdgeGICP, Verte
 
     // get their difference
     // this is simple Euclidean distance, for now
-    _error = p1 - measurement().pos0;
+    error_ = p1 - measurement().pos0;
 
 #if 0
       cout << "vp0" << endl << vp0->estimate() << endl;
       cout << "vp1" << endl << vp1->estimate() << endl;
-      cout << "e Jac Xj" << endl <<  _jacobianOplusXj << endl << endl;
-      cout << "e Jac Xi" << endl << _jacobianOplusXi << endl << endl;
+      cout << "e Jac Xj" << endl <<  jacobianOplusXj_ << endl << endl;
+      cout << "e Jac Xi" << endl << jacobianOplusXi_ << endl << endl;
 #endif
 
     if (!pl_pl) return;
@@ -207,13 +207,13 @@ class G2O_TYPES_ICP_API Edge_V_V_GICP : public BaseBinaryEdge<3, EdgeGICP, Verte
 
   // try analytic jacobians
 #ifdef GICP_ANALYTIC_JACOBIANS
-  virtual void linearizeOplus();
+  void linearizeOplus() override;
 #endif
 
   // global derivative matrices
-  static Matrix3 dRidx;
-  static Matrix3 dRidy;
-  static Matrix3 dRidz;  // differential quat matrices
+  static Matrix3 dRidx_;
+  static Matrix3 dRidy_;
+  static Matrix3 dRidz_;  // differential quat matrices
 };
 
 /**
@@ -226,21 +226,19 @@ class G2O_TYPES_ICP_API VertexSCam : public VertexSE3 {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
-  VertexSCam();
-
   // I/O
-  virtual bool read(std::istream &is);
-  virtual bool write(std::ostream &os) const;
+  bool read(std::istream &is) override;
+  bool write(std::ostream &os) const override;
 
   // capture the update function to reset aux transforms
-  virtual void oplusImpl(const number_t *update) {
+  void oplusImpl(const number_t *update) override {
     VertexSE3::oplusImpl(update);
     setAll();
   }
 
   // camera matrix and stereo baseline
-  static Matrix3 Kcam;
-  static number_t baseline;
+  static Matrix3 kcam_;
+  static number_t baseline_;
 
   // transformations
   Eigen::Matrix<number_t, 3, 4, Eigen::ColMajor> w2n;  // transform from world to node coordinates
@@ -269,13 +267,13 @@ class G2O_TYPES_ICP_API VertexSCam : public VertexSE3 {
 
   // set up camera matrix
   static void setKcam(number_t fx, number_t fy, number_t cx, number_t cy, number_t tx) {
-    Kcam.setZero();
-    Kcam(0, 0) = fx;
-    Kcam(1, 1) = fy;
-    Kcam(0, 2) = cx;
-    Kcam(1, 2) = cy;
-    Kcam(2, 2) = 1.0;
-    baseline = tx;
+    kcam_.setZero();
+    kcam_(0, 0) = fx;
+    kcam_(1, 1) = fy;
+    kcam_(0, 2) = cx;
+    kcam_(1, 2) = cy;
+    kcam_(2, 2) = 1.0;
+    baseline_ = tx;
   }
 
   // set transform from world to cam coords
@@ -286,16 +284,16 @@ class G2O_TYPES_ICP_API VertexSCam : public VertexSE3 {
 
   // Set up world-to-image projection matrix (w2i), assumes camera parameters
   // are filled.
-  void setProjection() { w2i = Kcam * w2n; }
+  void setProjection() { w2i = kcam_ * w2n; }
 
   // sets angle derivatives
   void setDr() {
     // inefficient, just for testing
     // use simple multiplications and additions for production code in calculating dRdx,y,z
     // for dS'*R', with dS the incremental change
-    dRdx = dRidx * w2n.block<3, 3>(0, 0);
-    dRdy = dRidy * w2n.block<3, 3>(0, 0);
-    dRdz = dRidz * w2n.block<3, 3>(0, 0);
+    dRdx = dRidx_ * w2n.block<3, 3>(0, 0);
+    dRdy = dRidy_ * w2n.block<3, 3>(0, 0);
+    dRdz = dRidz_ * w2n.block<3, 3>(0, 0);
   }
 
   // set all aux transforms
@@ -312,19 +310,19 @@ class G2O_TYPES_ICP_API VertexSCam : public VertexSE3 {
     pt(3) = cst(1.0);
     Vector3 p1 = w2i * pt;
     Vector3 p2 = w2n * pt;
-    Vector3 pb(baseline, 0, 0);
+    Vector3 pb(baseline_, 0, 0);
 
     number_t invp1 = cst(1.0) / p1(2);
     res.head<2>() = p1.head<2>() * invp1;
 
     // right camera px
-    p2 = Kcam * (p2 - pb);
+    p2 = kcam_ * (p2 - pb);
     res(2) = p2(0) / p2(2);
   }
 
-  static Matrix3 dRidx;
-  static Matrix3 dRidy;
-  static Matrix3 dRidz;
+  static Matrix3 dRidx_;
+  static Matrix3 dRidy_;
+  static Matrix3 dRidz_;
 };
 
 /**
@@ -333,18 +331,16 @@ class G2O_TYPES_ICP_API VertexSCam : public VertexSE3 {
 
 // stereo projection
 // first two args are the measurement type, second two the connection classes
-class G2O_TYPES_ICP_API Edge_XYZ_VSC
+class G2O_TYPES_ICP_API EdgeXyzVsc
     : public BaseBinaryEdge<3, Vector3, VertexPointXYZ, VertexSCam> {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
-  Edge_XYZ_VSC();
-
-  virtual bool read(std::istream &is);
-  virtual bool write(std::ostream &os) const;
+  bool read(std::istream &is) override;
+  bool write(std::ostream &os) const override;
 
   // return the error estimate as a 2-vector
-  void computeError() {
+  void computeError() override {
     // from <Point> to <Cam>
     VertexPointXYZ *point = vertexXnRaw<0>();
     VertexSCam *cam = vertexXnRaw<1>();
@@ -359,11 +355,11 @@ class G2O_TYPES_ICP_API Edge_XYZ_VSC
     // std::cout << "PROJ  " << p1.transpose() << std::endl;
     // std::cout << "PROJ  " << p2.transpose() << std::endl;
     // std::cout << "CPROJ " << kp.transpose() << std::endl;
-    // std::cout << "MEAS  " << _measurement.transpose() << std::endl;
+    // std::cout << "MEAS  " << measurement_.transpose() << std::endl;
 
     // error, which is backwards from the normal observed - calculated
-    // _measurement is the measured projection
-    _error = kp - _measurement;
+    // measurement_ is the measured projection
+    error_ = kp - measurement_;
   }
 #ifdef SCAM_ANALYTIC_JACOBIANS
   // jacobian
