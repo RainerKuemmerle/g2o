@@ -40,48 +40,47 @@ namespace g2o {
   {
     public:
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
-      EdgeSE2SensorCalib();
 
-      void computeError()
+      void computeError() override
       {
         const VertexSE2* v1          = vertexXnRaw<0>();
         const VertexSE2* v2          = vertexXnRaw<1>();
         const VertexSE2* laserOffset = vertexXnRaw<2>();
         const SE2& x1 = v1->estimate();
         const SE2& x2 = v2->estimate();
-        SE2 delta = _inverseMeasurement * ((x1 * laserOffset->estimate()).inverse() * x2 * laserOffset->estimate());
-        _error = delta.toVector();
+        SE2 delta = inverseMeasurement_ * ((x1 * laserOffset->estimate()).inverse() * x2 * laserOffset->estimate());
+        error_ = delta.toVector();
       }
 
-      void setMeasurement(const SE2& m){
-        _measurement = m;
-        _inverseMeasurement = m.inverse();
+      void setMeasurement(const SE2& m) override{
+        measurement_ = m;
+        inverseMeasurement_ = m.inverse();
       }
 
-      virtual number_t initialEstimatePossible(const OptimizableGraph::VertexSet& from,
-                                               OptimizableGraph::Vertex* to) {
-        if (from.count(_vertices[2]) == 1  // need the laser offset
-            && ((from.count(_vertices[0]) == 1 && to == _vertices[1].get()) ||
-                ((from.count(_vertices[1]) == 1 && to == _vertices[0].get())))) {
+      number_t initialEstimatePossible(const OptimizableGraph::VertexSet& from,
+                                               OptimizableGraph::Vertex* to) override {
+        if (from.count(vertices_[2]) == 1  // need the laser offset
+            && ((from.count(vertices_[0]) == 1 && to == vertices_[1].get()) ||
+                ((from.count(vertices_[1]) == 1 && to == vertices_[0].get())))) {
           return 1.0;
         }
         return -1.0;
       }
-      virtual void initialEstimate(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to);
+      void initialEstimate(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to) override;
 
-      virtual bool read(std::istream& is);
-      virtual bool write(std::ostream& os) const;
+      bool read(std::istream& is) override;
+      bool write(std::ostream& os) const override;
 
     protected:
-      SE2 _inverseMeasurement;
+      SE2 inverseMeasurement_;
   };
 
 #ifdef G2O_HAVE_OPENGL
   class EdgeSE2SensorCalibDrawAction: public DrawAction {
   public:
     EdgeSE2SensorCalibDrawAction();
-    virtual bool operator()(HyperGraph::HyperGraphElement* element,
-                            HyperGraphElementAction::Parameters* params_);
+    bool operator()(HyperGraph::HyperGraphElement* element,
+                            HyperGraphElementAction::Parameters* params_) override;
   };
 #endif
 

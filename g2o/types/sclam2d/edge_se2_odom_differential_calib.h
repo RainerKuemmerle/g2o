@@ -39,9 +39,8 @@ class G2O_TYPES_SCLAM2D_API EdgeSE2OdomDifferentialCalib
     : public BaseFixedSizedEdge<3, VelocityMeasurement, VertexSE2, VertexSE2, VertexOdomDifferentialParams> {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
-  EdgeSE2OdomDifferentialCalib();
 
-  void computeError() {
+  void computeError() override {
     const VertexSE2* v1 = vertexXnRaw<0>();
     const VertexSE2* v2 = vertexXnRaw<1>();
     const VertexOdomDifferentialParams* params = vertexXnRaw<2>();
@@ -56,19 +55,19 @@ class G2O_TYPES_SCLAM2D_API EdgeSE2OdomDifferentialCalib
     Ku_ij.fromVector(mm.measurement());
 
     SE2 delta = Ku_ij.inverse() * x1.inverse() * x2;
-    _error = delta.toVector();
+    error_ = delta.toVector();
   }
 
-  virtual bool read(std::istream& is);
-  virtual bool write(std::ostream& os) const;
+  bool read(std::istream& is) override;
+  bool write(std::ostream& os) const override;
 };
 
 #ifdef G2O_HAVE_OPENGL
 class G2O_TYPES_SCLAM2D_API EdgeSE2OdomDifferentialCalibDrawAction : public DrawAction {
  public:
   EdgeSE2OdomDifferentialCalibDrawAction();
-  virtual bool operator()(HyperGraph::HyperGraphElement* element,
-                          HyperGraphElementAction::Parameters* params_);
+  bool operator()(HyperGraph::HyperGraphElement* element,
+                          HyperGraphElementAction::Parameters* params_) override;
 };
 #endif
 

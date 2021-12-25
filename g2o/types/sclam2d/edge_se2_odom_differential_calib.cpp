@@ -32,13 +32,11 @@
 
 namespace g2o {
 
-EdgeSE2OdomDifferentialCalib::EdgeSE2OdomDifferentialCalib()
-    : BaseFixedSizedEdge<3, VelocityMeasurement, VertexSE2, VertexSE2, VertexOdomDifferentialParams>() {
-}
-
 bool EdgeSE2OdomDifferentialCalib::read(std::istream& is)
 {
-  number_t vl, vr, dt;
+  number_t vl;
+  number_t vr;
+  number_t dt;
   is >> vl >> vr >> dt;
   VelocityMeasurement vm(vl, vr, dt);
   setMeasurement(vm);
@@ -57,17 +55,17 @@ EdgeSE2OdomDifferentialCalibDrawAction::EdgeSE2OdomDifferentialCalibDrawAction()
 
 bool EdgeSE2OdomDifferentialCalibDrawAction::operator()(HyperGraph::HyperGraphElement* element,
                                                         HyperGraphElementAction::Parameters*) {
-  if (typeid(*element).name() != _typeName) return false;
-  EdgeSE2OdomDifferentialCalib* e = static_cast<EdgeSE2OdomDifferentialCalib*>(element);
+  if (typeid(*element).name() != typeName_) return false;
+  auto* e = static_cast<EdgeSE2OdomDifferentialCalib*>(element);
   auto fromEdge = e->vertexXn<0>();
   auto toEdge = e->vertexXn<1>();
   if (!fromEdge || !toEdge) return true;
-  glColor3f(0.5f, 0.5f, 0.5f);
+  glColor3f(0.5F, 0.5F, 0.5F);
   glPushAttrib(GL_ENABLE_BIT);
   glDisable(GL_LIGHTING);
   glBegin(GL_LINES);
-  glVertex3f((float)fromEdge->estimate().translation().x(), (float)fromEdge->estimate().translation().y(), 0.f);
-  glVertex3f((float)toEdge->estimate().translation().x(), (float)toEdge->estimate().translation().y(), 0.f);
+  glVertex3f(static_cast<float>(fromEdge->estimate().translation().x()), static_cast<float>(fromEdge->estimate().translation().y()), 0.F);
+  glVertex3f(static_cast<float>(toEdge->estimate().translation().x()), static_cast<float>(toEdge->estimate().translation().y()), 0.F);
   glEnd();
   glPopAttrib();
   return true;

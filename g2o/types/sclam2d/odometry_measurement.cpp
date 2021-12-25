@@ -28,31 +28,32 @@
 
 #include <Eigen/Core>
 #include <Eigen/Geometry>
+#include <utility>
 
 namespace g2o {
 
   VelocityMeasurement::VelocityMeasurement() :
-    _measurement(0., 0.), _dt(0.)
+    measurement_(0., 0.) 
   {
   }
 
   VelocityMeasurement::VelocityMeasurement(number_t vl, number_t vr, number_t dt) :
-    _measurement(vl, vr), _dt(dt)
+    measurement_(vl, vr), dt_(dt)
   {
   }
 
   MotionMeasurement::MotionMeasurement() :
-    _measurement(0., 0., 0.), _dt(0.)
+    measurement_(0., 0., 0.) 
   {
   }
 
   MotionMeasurement::MotionMeasurement(number_t x, number_t y, number_t theta, number_t dt) :
-    _measurement(x, y, theta), _dt(dt)
+    measurement_(x, y, theta), dt_(dt)
   {
   }
 
-  MotionMeasurement::MotionMeasurement(const Vector3& m, number_t dt) :
-    _measurement(m), _dt(dt)
+  MotionMeasurement::MotionMeasurement(Vector3  m, number_t dt) :
+    measurement_(std::move(m)), dt_(dt)
   {
   }
 
@@ -68,19 +69,21 @@ namespace g2o {
       const number_t vr = w + vl;
 
       return VelocityMeasurement(vl, vr, m.dt());
-    } else {
-      number_t vl, vr;
+    }       number_t vl;
+      number_t vr;
       if (fabs(m.dt()) > 1e-7)
         vl = vr = std::hypot(m.x(), m.y()) / m.dt();
       else
         vl = vr = 0.;
       return VelocityMeasurement(vl, vr, m.dt());
-    }
+   
   }
 
   MotionMeasurement OdomConvert::convertToMotion(const VelocityMeasurement& v, number_t l)
   {
-    number_t x, y, theta;
+    number_t x;
+    number_t y;
+    number_t theta;
     if (fabs(v.vr() - v.vl()) > 1e-7) {
       number_t R = l * 0.5 * ((v.vl() + v.vr())  / (v.vr() - v.vl()));
       number_t w = (v.vr() - v.vl()) / l;

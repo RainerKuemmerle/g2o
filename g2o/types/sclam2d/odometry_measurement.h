@@ -44,20 +44,20 @@ namespace g2o {
       VelocityMeasurement();
       VelocityMeasurement(number_t vl, number_t vr, number_t dt);
 
-      number_t vl() const { return _measurement(0);}
-      void setVl(number_t v) { _measurement(0) = v;}
+      number_t vl() const { return measurement_(0);}
+      void setVl(number_t v) { measurement_(0) = v;}
 
-      number_t vr() const { return _measurement(1);}
-      void setVr(number_t v) { _measurement(1) = v;}
+      number_t vr() const { return measurement_(1);}
+      void setVr(number_t v) { measurement_(1) = v;}
 
-      number_t dt() const { return _dt;}
-      void setDt(number_t t) { _dt = t;}
+      number_t dt() const { return dt_;}
+      void setDt(number_t t) { dt_ = t;}
 
-      const Vector2& measurement() const { return _measurement;}
+      const Vector2& measurement() const { return measurement_;}
 
     protected:
-      Vector2 _measurement;
-      number_t _dt;
+      Vector2 measurement_;
+      number_t dt_ = 0.;
   };
 
   /**
@@ -69,25 +69,25 @@ namespace g2o {
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
       MotionMeasurement();
       MotionMeasurement(number_t x, number_t y, number_t theta, number_t dt);
-      MotionMeasurement(const Vector3& m, number_t dt);
+      MotionMeasurement(Vector3  m, number_t dt);
 
-      number_t x() const { return _measurement(0);}
-      void setX(number_t v) { _measurement(0) = v;}
+      number_t x() const { return measurement_(0);}
+      void setX(number_t v) { measurement_(0) = v;}
 
-      number_t y() const { return _measurement(1);}
-      void setY(number_t v) { _measurement(1) = v;}
+      number_t y() const { return measurement_(1);}
+      void setY(number_t v) { measurement_(1) = v;}
 
-      number_t theta() const { return _measurement(2);}
-      void setTheta(number_t v) { _measurement(2) = v;}
+      number_t theta() const { return measurement_(2);}
+      void setTheta(number_t v) { measurement_(2) = v;}
 
-      number_t dt() const { return _dt;}
-      void setDt(number_t t) { _dt = t;}
+      number_t dt() const { return dt_;}
+      void setDt(number_t t) { dt_ = t;}
 
-      const Vector3& measurement() const { return _measurement;}
+      const Vector3& measurement() const { return measurement_;}
 
     protected:
-      Vector3 _measurement;
-      number_t _dt;
+      Vector3 measurement_;
+      number_t dt_ = 0.;
   };
 
   /**

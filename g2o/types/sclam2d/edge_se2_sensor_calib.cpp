@@ -30,11 +30,6 @@
 #endif
 namespace g2o {
 
-  EdgeSE2SensorCalib::EdgeSE2SensorCalib() :
-    BaseFixedSizedEdge<3, SE2, VertexSE2, VertexSE2, VertexSE2>()
-  {
-  }
-
   void EdgeSE2SensorCalib::initialEstimate(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to)
   {
     (void) to;
@@ -46,7 +41,7 @@ namespace g2o {
     if (from.count(vi) == 1) {
       vj->setEstimate(vi->estimate() * l->estimate() * measurement() * l->estimate().inverse());
     } else {
-      vi->setEstimate(vj->estimate() * l->estimate() * _inverseMeasurement * l->estimate().inverse());
+      vi->setEstimate(vj->estimate() * l->estimate() * inverseMeasurement_ * l->estimate().inverse());
     }
   }
 
@@ -54,8 +49,8 @@ namespace g2o {
   {
     Vector3 p;
     internal::readVector(is, p);
-    _measurement.fromVector(p);
-    _inverseMeasurement=measurement().inverse();
+    measurement_.fromVector(p);
+    inverseMeasurement_=measurement().inverse();
     return readInformationMatrix(is);
   }
 
@@ -73,9 +68,9 @@ namespace g2o {
 
   bool EdgeSE2SensorCalibDrawAction::operator()(HyperGraph::HyperGraphElement* element, HyperGraphElementAction::Parameters* )
   {
-    if (typeid(*element).name()!=_typeName)
+    if (typeid(*element).name()!=typeName_)
       return false;
-    EdgeSE2SensorCalib* e = static_cast<EdgeSE2SensorCalib*>(element);
+    auto* e = static_cast<EdgeSE2SensorCalib*>(element);
     auto fromEdge = e->vertexXn<0>();
     auto toEdge   = e->vertexXn<1>();
     if (!fromEdge.get() || !toEdge.get()) return true;
@@ -83,8 +78,8 @@ namespace g2o {
     glPushAttrib(GL_ENABLE_BIT);
     glDisable(GL_LIGHTING);
     glBegin(GL_LINES);
-    glVertex3f((float)fromEdge->estimate().translation().x(),(float)fromEdge->estimate().translation().y(),0.f);
-    glVertex3f((float)toEdge->estimate().translation().x(),(float)toEdge->estimate().translation().y(),0.f);
+    glVertex3f(static_cast<float>(fromEdge->estimate().translation().x()),static_cast<float>(fromEdge->estimate().translation().y()),0.F);
+    glVertex3f(static_cast<float>(toEdge->estimate().translation().x()),static_cast<float>(toEdge->estimate().translation().y()),0.F);
     glEnd();
     glPopAttrib();
     return true;
