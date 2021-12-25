@@ -36,6 +36,7 @@
 
 #include "integer_sequence_algorithm.h"
 
+namespace g2o {
 namespace ceres {
 namespace internal {
 
@@ -120,5 +121,6 @@ using DynamicParameterDims = ParameterDims<true>;
 
 }  // namespace internal
 }  // namespace ceres
+}  // namespace g2o
 
 #endif  // G2O_CERES_PUBLIC_INTERNAL_PARAMETER_DIMS_H_

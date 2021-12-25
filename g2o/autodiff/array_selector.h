@@ -38,6 +38,7 @@
 #include "fixed_array.h"
 #include "types.h"
 
+namespace g2o {
 namespace ceres {
 namespace internal {
 
@@ -56,40 +57,33 @@ namespace internal {
 //   num_elements != DYNAMIC  &&  num_elements >  max_stack_size
 //      -> std::vector<T>(num_elements)
 //
-template <typename T,
-          int num_elements,
-          int max_num_elements_on_stack,
-          bool dynamic = (num_elements == DYNAMIC),
-          bool fits_on_stack = (num_elements <= max_num_elements_on_stack)>
+template <typename T, int NumElements, int MaxNumElementsOnStack,
+          bool Dynamic = (NumElements == kDynamic),
+          bool FitsOnStack = (NumElements <= MaxNumElementsOnStack)>
 struct ArraySelector {};
 
-template <typename T,
-          int num_elements,
-          int max_num_elements_on_stack,
-          bool fits_on_stack>
-struct ArraySelector<T,
-                     num_elements,
-                     max_num_elements_on_stack,
-                     true,
-                     fits_on_stack>
-    : ceres::internal::FixedArray<T, max_num_elements_on_stack> {
-  ArraySelector(int s)
-      : ceres::internal::FixedArray<T, max_num_elements_on_stack>(s) {}
+template <typename T, int NumElements, int MaxNumElementsOnStack,
+          bool FitsOnStack>
+struct ArraySelector<T, NumElements, MaxNumElementsOnStack, true, FitsOnStack>
+    : ceres::internal::FixedArray<T, MaxNumElementsOnStack> {
+  explicit ArraySelector(int s)
+      : ceres::internal::FixedArray<T, MaxNumElementsOnStack>(s) {}
 };
 
-template <typename T, int num_elements, int max_num_elements_on_stack>
-struct ArraySelector<T, num_elements, max_num_elements_on_stack, false, true>
-    : std::array<T, num_elements> {
-  ArraySelector(int /*s*/) {  }
+template <typename T, int NumElements, int MaxNumElementsOnStack>
+struct ArraySelector<T, NumElements, MaxNumElementsOnStack, false, true>
+    : std::array<T, NumElements> {
+  explicit ArraySelector(int /*s*/) {}
 };
 
 template <typename T, int num_elements, int max_num_elements_on_stack>
 struct ArraySelector<T, num_elements, max_num_elements_on_stack, false, false>
     : std::vector<T> {
-  ArraySelector(int s) : std::vector<T>(s) {  }
+  explicit ArraySelector(int s) : std::vector<T>(s) {}
 };
 
 }  // namespace internal
 }  // namespace ceres
+}  // namespace g2o
 
 #endif  // G2O_CERES_PUBLIC_INTERNAL_ARRAY_SELECTOR_H_
