@@ -27,9 +27,11 @@
 #ifndef G2O_SIM_3
 #define G2O_SIM_3
 
-#include "g2o/types/slam3d/se3_ops.h"
-#include "g2o/stuff/misc.h"
 #include <Eigen/Geometry>
+#include <utility>
+
+#include "g2o/stuff/misc.h"
+#include "g2o/types/slam3d/se3_ops.h"
 
 namespace g2o
 {
@@ -38,32 +40,32 @@ namespace g2o
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
     protected:
-      Quaternion r;
-      Vector3 t;
-      number_t s;
+      Quaternion r_;
+      Vector3 t_;
+      number_t s_;
 
     public:
       Sim3()
       {
-        r.setIdentity();
-        t.fill(0.);
-        s=1.;
+        r_.setIdentity();
+        t_.fill(0.);
+        s_=1.;
       }
 
-      Sim3(const Quaternion & r, const Vector3 & t, number_t s)
-        : r(r),t(t),s(s)
+      Sim3(const Quaternion & r, Vector3  t, number_t s)
+        : r_(r),t_(std::move(t)),s_(s)
       {
 			normalizeRotation();
       }
 
-      Sim3(const Matrix3 & R, const Vector3 & t, number_t s)
-        : r(Quaternion(R)),t(t),s(s)
+      Sim3(const Matrix3 & R, Vector3  t, number_t s)
+        : r_(Quaternion(R)),t_(std::move(t)),s_(s)
       {
 			normalizeRotation();
       }
 
 
-      Sim3(const Vector7 & update)
+      explicit Sim3(const Vector7 & update)
       {
 
         Vector3 omega;
@@ -77,14 +79,16 @@ namespace g2o
         number_t sigma = update[6];
         number_t theta = omega.norm();
         Matrix3 Omega = skew(omega);
-        s = std::exp(sigma);
+        s_ = std::exp(sigma);
         Matrix3 Omega2 = Omega*Omega;
         Matrix3 I;
         I.setIdentity();
         Matrix3 R;
 
         number_t eps = cst(0.00001);
-        number_t A,B,C;
+        number_t A;
+        number_t B;
+        number_t C;
         if (fabs(sigma)<eps)
         {
           C = 1;
@@ -104,20 +108,20 @@ namespace g2o
         }
         else
         {
-          C=(s-1)/sigma;
+          C=(s_-1)/sigma;
           if (theta<eps)
           {
             number_t sigma2= sigma*sigma;
-            A = ((sigma-1)*s+1)/sigma2;
-            B= ((cst(0.5)*sigma2-sigma+1)*s-1)/(sigma2*sigma);//B=[C-((s*cos(theta)-1)*sigma+s*sin(theta)*theta)/(sigma^2+theta^2)]/theta^2~=(omit O(theta^2))=
+            A = ((sigma-1)*s_+1)/sigma2;
+            B= ((cst(0.5)*sigma2-sigma+1)*s_-1)/(sigma2*sigma);//B=[C-((s*cos(theta)-1)*sigma+s*sin(theta)*theta)/(sigma^2+theta^2)]/theta^2~=(omit O(theta^2))=
 	    //(1/2*s*sigma-s)/(sigma^2)+[C-(s-1)*sigma/(sigma^2+theta^2)]/theta^2~=(0.5*sigma^2*s-s*sigma)/sigma^3+[s-1]/sigma^3=[s*(0.5*sigma^2-sigma+1)-1]/sigma^3  
             R = (I + Omega + Omega2/2);//R=I+(1-cos(theta))*a^a^+sin(theta)*a^~=I+theta^2/2*a^a^+theta*a^
           }
           else
           {
             R = I + std::sin(theta)/theta *Omega + (1-std::cos(theta))/(theta*theta)*Omega2;
-            number_t a=s*std::sin(theta);
-            number_t b=s*std::cos(theta);
+            number_t a=s_*std::sin(theta);
+            number_t b=s_*std::cos(theta);
             number_t theta2= theta*theta;
             number_t sigma2= sigma*sigma;
             number_t c=theta2+sigma2;
@@ -126,27 +130,27 @@ namespace g2o
 
           }
         }
-        r = Quaternion(R);
+        r_ = Quaternion(R);
 
 
 
         Matrix3 W = A*Omega + B*Omega2 + C*I;
-        t = W*upsilon;
+        t_ = W*upsilon;
       }
 
       Vector3 map (const Vector3& xyz) const {
-        return s*(r*xyz) + t;
+        return s_*(r_*xyz) + t_;
       }
 
       Vector7 log() const
       {
         Vector7 res;
-        number_t sigma = std::log(s);
+        number_t sigma = std::log(s_);
 
         Vector3 omega;
         Vector3 upsilon;
 
-        Matrix3 R = r.toRotationMatrix();
+        Matrix3 R = r_.toRotationMatrix();
         number_t d =  cst(0.5)*(R(0,0)+R(1,1)+R(2,2)-1);
 
         Matrix3 Omega;
@@ -154,7 +158,9 @@ namespace g2o
         number_t eps = cst(0.00001);
         Matrix3 I = Matrix3::Identity();
 
-        number_t A,B,C;
+        number_t A;
+        number_t B;
+        number_t C;
         if (fabs(sigma)<eps)
         {
           C = 1;
@@ -177,14 +183,14 @@ namespace g2o
         }
         else
         {
-          C=(s-1)/sigma;
+          C=(s_-1)/sigma;
           if (d>1-eps)
           {
             number_t sigma2 = sigma*sigma;
             omega=cst(0.5)*deltaR(R);
             Omega = skew(omega);
-            A = ((sigma-1)*s+1)/(sigma2);
-            B = ((cst(0.5)*sigma2-sigma+1)*s-1)/(sigma2*sigma);//B=[C-((s*cos(theta)-1)*sigma+s*sin(theta)*theta)/(sigma^2+theta^2)]/theta^2
+            A = ((sigma-1)*s_+1)/(sigma2);
+            B = ((cst(0.5)*sigma2-sigma+1)*s_-1)/(sigma2*sigma);//B=[C-((s*cos(theta)-1)*sigma+s*sin(theta)*theta)/(sigma^2+theta^2)]/theta^2
 	    //use limit(theta->0)(B)=limit(theta->0){[(sigma2+theta2)*(s*sigma*sin(theta)-s*sin(theta)-s*theta*cos(theta))+(s*cos(theta)*sigma-sigma+s*sin(theta)*theta)*2*theta]/(2*theta)}=
 	    //=limit(theta->0)(s*sigma-s)*sin(theta)/(2*(sigma2+theta2)*theta)+limit(theta->0)[-s*cos(theta)/(2*(sigma2+theta2))+(s*cos(theta)*sigma-sigma+s*sin(theta)*theta)/(sigma2+theta2)^2]=
 	    //=limit(theta->0)(s*sigma-s)*cos(theta)/(2*(sigma2+3*theta2))+-s/(2*sigma2)+(s-1)/sigma^3=
@@ -196,8 +202,8 @@ namespace g2o
             omega = theta/(2*std::sqrt(1-d*d))*deltaR(R);
             Omega = skew(omega);
             number_t theta2 = theta*theta;
-            number_t a=s*std::sin(theta);
-            number_t b=s*std::cos(theta);
+            number_t a=s_*std::sin(theta);
+            number_t b=s_*std::cos(theta);
             number_t c=theta2 + sigma*sigma;
             A = (a*sigma+ (1-b)*theta)/(theta*c);
             B = (C-((b-1)*sigma+a*theta)/(c))*1/(theta2);
@@ -206,7 +212,7 @@ namespace g2o
 
         Matrix3 W = A*Omega + B*Omega*Omega + C*I;
 
-        upsilon = W.lu().solve(t);
+        upsilon = W.lu().solve(t_);
 
         for (int i=0; i<3; i++)
           res[i] = omega[i];
@@ -222,7 +228,7 @@ namespace g2o
 
       Sim3 inverse() const
       {
-        return Sim3(r.conjugate(), r.conjugate()*((-1/s)*t), 1/s);
+        return Sim3(r_.conjugate(), r_.conjugate()*((-1/s_)*t_), 1/s_);
       }
 
       number_t operator[](int i) const
@@ -230,12 +236,12 @@ namespace g2o
         assert(i<8);
         if (i<4){
 
-          return r.coeffs()[i];
+          return r_.coeffs()[i];
         }
         if (i<7){
-          return t[i-4];
+          return t_[i-4];
         }
-        return s;
+        return s_;
       }
 
       number_t& operator[](int i)
@@ -243,20 +249,20 @@ namespace g2o
         assert(i<8);
         if (i<4){
 
-          return r.coeffs()[i];
+          return r_.coeffs()[i];
         }
         if (i<7)
         {
-          return t[i-4];
+          return t_[i-4];
         }
-        return s;
+        return s_;
       }
 
       Sim3 operator *(const Sim3& other) const {
         Sim3 ret;
-        ret.r = r*other.r;
-        ret.t=s*(r*other.t)+t;
-        ret.s=s*other.s;
+        ret.r_ = r_*other.r_;
+        ret.t_=s_*(r_*other.t_)+t_;
+        ret.s_=s_*other.s_;
         return ret;
       }
 
@@ -266,22 +272,22 @@ namespace g2o
         return *this;
       }
     void normalizeRotation(){
-        if (r.w()<0){
-          r.coeffs() *= -1;
+        if (r_.w()<0){
+          r_.coeffs() *= -1;
         }
-        r.normalize();
+        r_.normalize();
     }
-      inline const Vector3& translation() const {return t;}
+      inline const Vector3& translation() const {return t_;}
 
-      inline Vector3& translation() {return t;}
+      inline Vector3& translation() {return t_;}
 
-      inline const Quaternion& rotation() const {return r;}
+      inline const Quaternion& rotation() const {return r_;}
 
-      inline Quaternion& rotation() {return r;}
+      inline Quaternion& rotation() {return r_;}
 
-      inline const number_t& scale() const {return s;}
+      inline const number_t& scale() const {return s_;}
 
-      inline number_t& scale() {return s;}
+      inline number_t& scale() {return s_;}
 
   };
 

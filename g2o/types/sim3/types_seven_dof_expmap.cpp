@@ -39,8 +39,8 @@ G2O_REGISTER_TYPE(EDGE_SIM3:EXPMAP, EdgeSim3);
 G2O_REGISTER_TYPE(EDGE_PROJECT_SIM3_XYZ:EXPMAP, EdgeSim3ProjectXYZ);
 G2O_REGISTER_TYPE(EDGE_PROJECT_INVERSE_SIM3_XYZ:EXPMAP, EdgeInverseSim3ProjectXYZ);
 
-VertexSim3Expmap::VertexSim3Expmap() : BaseVertex<7, Sim3>() {
-  _marginalized = false;
+VertexSim3Expmap::VertexSim3Expmap()  {
+  marginalized_ = false;
   _fix_scale = false;
 
   _principle_point1[0] = 0;
@@ -53,8 +53,6 @@ VertexSim3Expmap::VertexSim3Expmap() : BaseVertex<7, Sim3>() {
   _focal_length2[0] = 1;
   _focal_length2[1] = 1;
 }
-
-EdgeSim3::EdgeSim3() : BaseBinaryEdge<7, Sim3, VertexSim3Expmap, VertexSim3Expmap>() {}
 
 bool VertexSim3Expmap::read(std::istream &is) {
   Vector7 cam2world;
@@ -96,7 +94,7 @@ void EdgeSim3::linearizeOplus() {
     const Sim3 Si(v1->estimate());//Siw
     const Sim3 Sj(v2->estimate());
 
-    const Sim3& Sji = _measurement;
+    const Sim3& Sji = measurement_;
 
     // error in Lie Algebra
     const Eigen::Matrix<double, 7, 1> error = (Sji * Si * Sj.inverse()).log();
@@ -139,29 +137,23 @@ void EdgeSim3::linearizeOplus() {
 
   /**Sim3ProjectXYZ*/
 
-EdgeSim3ProjectXYZ::EdgeSim3ProjectXYZ() : BaseBinaryEdge<2, Vector2, VertexPointXYZ, VertexSim3Expmap>() {}
-
 bool EdgeSim3ProjectXYZ::read(std::istream &is) {
-  internal::readVector(is, _measurement);
+  internal::readVector(is, measurement_);
   return readInformationMatrix(is);
 }
 
 bool EdgeSim3ProjectXYZ::write(std::ostream &os) const {
-  internal::writeVector(os, _measurement);
+  internal::writeVector(os, measurement_);
   return writeInformationMatrix(os);
 }
 
-EdgeInverseSim3ProjectXYZ::EdgeInverseSim3ProjectXYZ() :
-    BaseBinaryEdge<2, Vector2, VertexPointXYZ, VertexSim3Expmap>() {
-}
-
 bool EdgeInverseSim3ProjectXYZ::read(std::istream &is) {
-  internal::readVector(is, _measurement);
+  internal::readVector(is, measurement_);
   return readInformationMatrix(is);
 }
 
 bool EdgeInverseSim3ProjectXYZ::write(std::ostream &os) const {
-  internal::writeVector(os, _measurement);
+  internal::writeVector(os, measurement_);
   return writeInformationMatrix(os);
 }
 
