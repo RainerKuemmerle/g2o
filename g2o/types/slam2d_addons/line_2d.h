@@ -38,7 +38,7 @@ namespace g2o {
 struct Line2D : public Vector2 {
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   Line2D() { setZero(); }
-  Line2D(const Vector2& v) {
+  explicit Line2D(const Vector2& v) {
     (*this)(0) = v(0);
     (*this)(1) = v(1);
   }

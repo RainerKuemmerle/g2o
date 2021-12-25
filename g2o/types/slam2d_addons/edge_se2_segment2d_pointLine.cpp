@@ -28,17 +28,14 @@
 
 namespace g2o {
 
-EdgeSE2Segment2DPointLine::EdgeSE2Segment2DPointLine()
-    : BaseBinaryEdge<3, Vector3, VertexSE2, VertexSegment2D>(), _pointNum(0) {}
-
 bool EdgeSE2Segment2DPointLine::read(std::istream& is) {
-  is >> _pointNum;
-  internal::readVector(is, _measurement);
+  is >> pointNum_;
+  internal::readVector(is, measurement_);
   return readInformationMatrix(is);
 }
 
 bool EdgeSE2Segment2DPointLine::write(std::ostream& os) const {
-  os << _pointNum << " ";
+  os << pointNum_ << " ";
   internal::writeVector(os, measurement());
   return writeInformationMatrix(os);
 }

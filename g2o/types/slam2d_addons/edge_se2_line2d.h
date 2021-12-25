@@ -40,9 +40,7 @@ namespace g2o {
   {
     public:
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-      EdgeSE2Line2D();
-
-      void computeError()
+      void computeError() override
       {
         const VertexSE2* v1 = vertexXnRaw<0>();
         const VertexLine2D* l2 = vertexXnRaw<1>();
@@ -52,25 +50,25 @@ namespace g2o {
         prediction[0] = normalize_theta(prediction[0]);
         Vector2 n(std::cos(prediction[0]), std::sin(prediction[0]));
         prediction[1] += n.dot(iT.translation());
-        _error =  prediction - _measurement;
-        _error [0] =  normalize_theta(_error[0]);
+        error_ =  prediction - measurement_;
+        error_ [0] =  normalize_theta(error_[0]);
       }
 
-      virtual bool setMeasurementData(const number_t* d){
-        _measurement[0]=d[0];
-        _measurement[1]=d[1];
+      bool setMeasurementData(const number_t* d) override{
+        measurement_[0]=d[0];
+        measurement_[1]=d[1];
         return true;
       }
 
-      virtual bool getMeasurementData(number_t* d) const{
-        d[0] = _measurement[0];
-        d[1] = _measurement[1];
+      bool getMeasurementData(number_t* d) const override{
+        d[0] = measurement_[0];
+        d[1] = measurement_[1];
         return true;
       }
 
-      virtual int measurementDimension() const {return 2;}
+      int measurementDimension() const override {return 2;}
 
-      virtual bool setMeasurementFromState(){
+      bool setMeasurementFromState() override{
         const VertexSE2* v1 = vertexXnRaw<0>();
         const VertexLine2D* l2 = vertexXnRaw<1>();
         Vector2 prediction=l2->estimate();
@@ -79,15 +77,15 @@ namespace g2o {
         prediction[0] = normalize_theta(prediction[0]);
         Vector2 n(std::cos(prediction[0]), std::sin(prediction[0]));
         prediction[1] += n.dot(iT.translation());
-        _measurement = prediction;
+        measurement_ = Line2D(prediction);
         return true;
       }
 
-      virtual bool read(std::istream& is);
-      virtual bool write(std::ostream& os) const;
+      bool read(std::istream& is) override;
+      bool write(std::ostream& os) const override;
 
-      virtual void initialEstimate(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to);
-      virtual number_t initialEstimatePossible(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to) { (void) to; return (from.count(_vertices[0]) == 1 ? 1.0 : -1.0);}
+      void initialEstimate(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to) override;
+      number_t initialEstimatePossible(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to) override { (void) to; return (from.count(vertices_[0]) == 1 ? 1.0 : -1.0);}
   };
 
 } // end namespace

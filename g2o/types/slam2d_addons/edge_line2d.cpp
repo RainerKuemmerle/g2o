@@ -31,16 +31,15 @@
 #include "g2o/stuff/opengl_wrapper.h"
 #endif
 
-using namespace g2o;
-using namespace Eigen;
+namespace g2o {
 
-EdgeLine2D::EdgeLine2D() : BaseBinaryEdge<2, Line2D, VertexLine2D, VertexLine2D>() {
-  _information.setIdentity();
-  _error.setZero();
+EdgeLine2D::EdgeLine2D()  {
+  information_.setIdentity();
+  error_.setZero();
 }
 
 bool EdgeLine2D::read(std::istream& is) {
-  internal::readVector(is, _measurement);
+  internal::readVector(is, measurement_);
   return readInformationMatrix(is);
 }
 
@@ -50,6 +49,8 @@ bool EdgeLine2D::write(std::ostream& os) const {
 }
 
 void EdgeLine2D::linearizeOplus() {
-  _jacobianOplusXi = -Matrix2::Identity();
-  _jacobianOplusXj = Matrix2::Identity();
+  jacobianOplusXi_ = -Matrix2::Identity();
+  jacobianOplusXj_ = Matrix2::Identity();
+}
+
 }

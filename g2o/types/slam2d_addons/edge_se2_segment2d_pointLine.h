@@ -39,18 +39,16 @@ namespace g2o {
   {
     public:
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-      EdgeSE2Segment2DPointLine();
+      number_t   theta() const {return measurement_[2];}
+      Vector2 point()   const {Eigen::Map<const Vector2> p(&measurement_[0]); return p;}
 
-      number_t   theta() const {return _measurement[2];}
-      Vector2 point()   const {Eigen::Map<const Vector2> p(&_measurement[0]); return p;}
+      void   setTheta(number_t t)  {measurement_[2] = t;}
+      void   setPoint(const Vector2& p_)  {Eigen::Map<Vector2> p(&measurement_[0]); p=p_; }
 
-      void   setTheta(number_t t)  {_measurement[2] = t;}
-      void   setPoint(const Vector2& p_)  {Eigen::Map<Vector2> p(&_measurement[0]); p=p_; }
+      int pointNum() const {return pointNum_;}
+      void setPointNum(int pn) {pointNum_ = pn;}
 
-      int pointNum() const {return _pointNum;}
-      void setPointNum(int pn) {_pointNum = pn;}
-
-      void computeError()
+      void computeError() override
       {
         const VertexSE2* v1 = vertexXnRaw<0>();
         const VertexSegment2D* l2 = vertexXnRaw<1>();
@@ -62,26 +60,26 @@ namespace g2o {
         Vector3 prediction;
         prediction [2] = std::atan2(normal.y(), normal.x());
         Eigen::Map<Vector2> pt(&prediction[0]);
-        pt = (_pointNum==0) ? predP1 : predP2;
-        _error = prediction - _measurement;
-        _error[2]=normalize_theta(_error[2]);
+        pt = (pointNum_==0) ? predP1 : predP2;
+        error_ = prediction - measurement_;
+        error_[2]=normalize_theta(error_[2]);
       }
 
-      virtual bool setMeasurementData(const number_t* d) {
+      bool setMeasurementData(const number_t* d) override {
         Eigen::Map<const Vector3> data(d);
-        _measurement = data;
+        measurement_ = data;
         return true;
       }
 
-      virtual bool getMeasurementData(number_t* d) const {
+      bool getMeasurementData(number_t* d) const override {
         Eigen::Map<Vector3> data(d);
-        data = _measurement;
+        data = measurement_;
         return true;
       }
 
-      virtual int measurementDimension() const {return 3;}
+      int measurementDimension() const override {return 3;}
 
-      virtual bool setMeasurementFromState(){
+      bool setMeasurementFromState() override{
         const VertexSE2* v1 = vertexXnRaw<0>();
         const VertexSegment2D* l2 = vertexXnRaw<1>();
         SE2 iEst=v1->estimate().inverse();
@@ -92,16 +90,16 @@ namespace g2o {
         Vector3 prediction;
         prediction [2] = std::atan2(normal.y(), normal.x());
         Eigen::Map<Vector2> pt(&prediction[0]);
-        pt = (_pointNum==0)?predP1:predP2;
+        pt = (pointNum_==0)?predP1:predP2;
         setMeasurement(prediction);
         return true;
       }
 
-      virtual bool read(std::istream& is);
-      virtual bool write(std::ostream& os) const;
+      bool read(std::istream& is) override;
+      bool write(std::ostream& os) const override;
 
   protected:
-      int _pointNum;
+      int pointNum_ = 0;
 
 /* #ifndef NUMERIC_JACOBIAN_TWO_D_TYPES */
 /*       virtual void linearizeOplus(); */

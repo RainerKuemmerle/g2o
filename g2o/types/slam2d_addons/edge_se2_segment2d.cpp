@@ -28,10 +28,8 @@
 
 namespace g2o {
 
-EdgeSE2Segment2D::EdgeSE2Segment2D() : BaseBinaryEdge<4, Vector4, VertexSE2, VertexSegment2D>() {}
-
 bool EdgeSE2Segment2D::read(std::istream& is) {
-  internal::readVector(is, _measurement);
+  internal::readVector(is, measurement_);
   return readInformationMatrix(is);
 }
 
@@ -41,7 +39,7 @@ bool EdgeSE2Segment2D::write(std::ostream& os) const {
 }
 
 void EdgeSE2Segment2D::initialEstimate(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to) {
-  assert(from.size() == 1 && from.count(_vertices[0]) == 1 &&
+  assert(from.size() == 1 && from.count(vertices_[0]) == 1 &&
          "Can not initialize VertexSE2 position by VertexSegment2D. I could if i wanted. Not now");
 
   auto vi = vertexXn<0>();

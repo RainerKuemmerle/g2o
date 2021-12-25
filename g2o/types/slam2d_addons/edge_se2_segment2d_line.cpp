@@ -28,10 +28,8 @@
 
 namespace g2o {
 
-EdgeSE2Segment2DLine::EdgeSE2Segment2DLine() : BaseBinaryEdge<2, Vector2, VertexSE2, VertexSegment2D>() {}
-
 bool EdgeSE2Segment2DLine::read(std::istream& is) {
-  internal::readVector(is, _measurement);
+  internal::readVector(is, measurement_);
   return readInformationMatrix(is);
 }
 

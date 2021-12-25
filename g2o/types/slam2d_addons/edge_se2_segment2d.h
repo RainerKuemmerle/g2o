@@ -40,45 +40,44 @@ class EdgeSE2Segment2D
 {
  public:
   G2O_TYPES_SLAM2D_ADDONS_API EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-  G2O_TYPES_SLAM2D_ADDONS_API EdgeSE2Segment2D();
 
-  G2O_TYPES_SLAM2D_ADDONS_API Vector2 measurementP1() { return Eigen::Map<const Vector2>(&(_measurement[0])); }
-  G2O_TYPES_SLAM2D_ADDONS_API Vector2 measurementP2() { return Eigen::Map<const Vector2>(&(_measurement[2])); }
+  G2O_TYPES_SLAM2D_ADDONS_API Vector2 measurementP1() { return Eigen::Map<const Vector2>(&(measurement_[0])); }
+  G2O_TYPES_SLAM2D_ADDONS_API Vector2 measurementP2() { return Eigen::Map<const Vector2>(&(measurement_[2])); }
   G2O_TYPES_SLAM2D_ADDONS_API void setMeasurementP1(const Vector2& p1) {
-    Eigen::Map<Vector2> v(&_measurement[0]);
+    Eigen::Map<Vector2> v(&measurement_[0]);
     v = p1;
   }
   G2O_TYPES_SLAM2D_ADDONS_API void setMeasurementP2(const Vector2& p2) {
-    Eigen::Map<Vector2> v(&_measurement[2]);
+    Eigen::Map<Vector2> v(&measurement_[2]);
     v = p2;
   }
 
-  G2O_TYPES_SLAM2D_ADDONS_API void computeError() {
+  G2O_TYPES_SLAM2D_ADDONS_API void computeError() override {
     const VertexSE2* v1 = vertexXnRaw<0>();
     const VertexSegment2D* l2 = vertexXnRaw<1>();
-    Eigen::Map<Vector2> error1(&_error(0));
-    Eigen::Map<Vector2> error2(&_error(2));
+    Eigen::Map<Vector2> error1(&error_(0));
+    Eigen::Map<Vector2> error2(&error_(2));
     SE2 iEst = v1->estimate().inverse();
     error1 = (iEst * l2->estimateP1());
     error2 = (iEst * l2->estimateP2());
-    _error = _error - _measurement;
+    error_ = error_ - measurement_;
   }
 
-  G2O_TYPES_SLAM2D_ADDONS_API virtual bool setMeasurementData(const number_t* d) {
+  G2O_TYPES_SLAM2D_ADDONS_API bool setMeasurementData(const number_t* d) override {
     Eigen::Map<const Vector4> data(d);
-    _measurement = data;
+    measurement_ = data;
     return true;
   }
 
-  G2O_TYPES_SLAM2D_ADDONS_API virtual bool getMeasurementData(number_t* d) const {
+  G2O_TYPES_SLAM2D_ADDONS_API bool getMeasurementData(number_t* d) const override {
     Eigen::Map<Vector4> data(d);
-    data = _measurement;
+    data = measurement_;
     return true;
   }
 
-  G2O_TYPES_SLAM2D_ADDONS_API virtual int measurementDimension() const { return 4; }
+  G2O_TYPES_SLAM2D_ADDONS_API int measurementDimension() const override { return 4; }
 
-  G2O_TYPES_SLAM2D_ADDONS_API virtual bool setMeasurementFromState() {
+  G2O_TYPES_SLAM2D_ADDONS_API bool setMeasurementFromState() override {
     const VertexSE2* v1 = vertexXnRaw<0>();
     const VertexSegment2D* l2 = vertexXnRaw<1>();
     SE2 iEst = v1->estimate().inverse();
@@ -87,13 +86,13 @@ class EdgeSE2Segment2D
     return true;
   }
 
-  G2O_TYPES_SLAM2D_ADDONS_API virtual bool read(std::istream& is);
-  G2O_TYPES_SLAM2D_ADDONS_API virtual bool write(std::ostream& os) const;
+  G2O_TYPES_SLAM2D_ADDONS_API bool read(std::istream& is) override;
+  G2O_TYPES_SLAM2D_ADDONS_API bool write(std::ostream& os) const override;
 
-  G2O_TYPES_SLAM2D_ADDONS_API virtual void initialEstimate(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to);
-  G2O_TYPES_SLAM2D_ADDONS_API virtual number_t initialEstimatePossible(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to) {
+  G2O_TYPES_SLAM2D_ADDONS_API void initialEstimate(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to) override;
+  G2O_TYPES_SLAM2D_ADDONS_API number_t initialEstimatePossible(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to) override {
     (void)to;
-    return (from.count(_vertices[0]) == 1 ? 1.0 : -1.0);
+    return (from.count(vertices_[0]) == 1 ? 1.0 : -1.0);
   }
   /* #ifndef NUMERIC_JACOBIAN_TWO_D_TYPES */
   /*       virtual void linearizeOplus(); */

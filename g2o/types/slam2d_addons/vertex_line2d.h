@@ -43,65 +43,65 @@ namespace g2o {
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
       VertexLine2D();
 
-      number_t theta() const {return _estimate[0]; }
-      void setTheta(number_t t) { _estimate[0] = t; }
+      number_t theta() const {return estimate_[0]; }
+      void setTheta(number_t t) { estimate_[0] = t; }
 
-      number_t rho() const {return _estimate[1]; }
-      void setRho(number_t r) { _estimate[1] = r; }
+      number_t rho() const {return estimate_[1]; }
+      void setRho(number_t r) { estimate_[1] = r; }
 
-      virtual void setToOriginImpl() {
-        _estimate.setZero();
+      void setToOriginImpl() override {
+        estimate_.setZero();
       }
 
-      virtual bool setEstimateDataImpl(const number_t* est){
+      bool setEstimateDataImpl(const number_t* est) override{
         Eigen::Map<const Vector2> v(est);
-        _estimate=Line2D(v);
+        estimate_=Line2D(v);
         return true;
       }
 
-      virtual bool getEstimateData(number_t* est) const{
+      bool getEstimateData(number_t* est) const override{
         Eigen::Map<Vector2> v(est);
-        v=_estimate;
+        v=estimate_;
         return true;
       }
 
-      virtual int estimateDimension() const {
+      int estimateDimension() const override {
         return 2;
       }
 
-      virtual bool setMinimalEstimateDataImpl(const number_t* est){
+      bool setMinimalEstimateDataImpl(const number_t* est) override{
         return setEstimateData(est);
       }
 
-      virtual bool getMinimalEstimateData(number_t* est) const{
+      bool getMinimalEstimateData(number_t* est) const override{
         return getEstimateData(est);
       }
 
-      virtual int minimalEstimateDimension() const {
+      int minimalEstimateDimension() const override {
         return 2;
       }
 
-      virtual void oplusImpl(const number_t* update)
+      void oplusImpl(const number_t* update) override
       {
-        _estimate += Eigen::Map<const Vector2>(update);
-        _estimate(0) = normalize_theta(_estimate(0));
+        estimate_ += Eigen::Map<const Vector2>(update);
+        estimate_(0) = normalize_theta(estimate_(0));
       }
 
-      virtual bool read(std::istream& is);
-      virtual bool write(std::ostream& os) const;
-      int p1Id, p2Id;
+      bool read(std::istream& is) override;
+      bool write(std::ostream& os) const override;
+      int p1Id = -1, p2Id = -1;
   };
 
 #ifdef G2O_HAVE_OPENGL
   class G2O_TYPES_SLAM2D_ADDONS_API VertexLine2DDrawAction: public DrawAction{
   public:
     VertexLine2DDrawAction();
-    virtual bool operator()(HyperGraph::HyperGraphElement* element,
-                            HyperGraphElementAction::Parameters* params_);
+    bool operator()(HyperGraph::HyperGraphElement* element,
+                            HyperGraphElementAction::Parameters* params_) override;
 
    protected:
-    std::shared_ptr<FloatProperty> _pointSize;
-    virtual bool refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_);
+    std::shared_ptr<FloatProperty> pointSize_;
+    bool refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_) override;
   };
 #endif
 

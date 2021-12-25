@@ -28,14 +28,9 @@
 
 namespace g2o {
 
-  EdgeSE2Line2D::EdgeSE2Line2D() :
-    BaseBinaryEdge<2, Line2D, VertexSE2, VertexLine2D>()
-  {
-  }
-
   bool EdgeSE2Line2D::read(std::istream& is)
   {
-    internal::readVector(is, _measurement);
+    internal::readVector(is, measurement_);
     return readInformationMatrix(is);
   }
 
@@ -47,18 +42,18 @@ namespace g2o {
 
   void EdgeSE2Line2D::initialEstimate(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to)
   {
-    assert(from.size() == 1 && from.count(_vertices[0]) == 1 && "Can not initialize VertexSE2 position by VertexLine2D");
+    assert(from.size() == 1 && from.count(vertices_[0]) == 1 && "Can not initialize VertexSE2 position by VertexLine2D");
 
     auto vi = vertexXn<0>();
     VertexLine2D* vj = vertexXnRaw<1>();
     if (from.count(vi) > 0 && to == vj) {
       SE2 T=vi->estimate();
-      Vector2 est=_measurement;
+      Vector2 est=measurement_;
       est[0] += T.rotation().angle();
       est[0] = normalize_theta(est[0]);
       Vector2 n(std::cos(est[0]), std::sin(est[0]));
       est[1] += n.dot(T.translation());
-      vj->setEstimate(est);
+      vj->setEstimate(Line2D(est));
     }
   }
 

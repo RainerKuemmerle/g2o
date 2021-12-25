@@ -41,65 +41,65 @@ class G2O_TYPES_SLAM2D_ADDONS_API VertexSegment2D : public BaseVertex<4, Vector4
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
   VertexSegment2D();
 
-  Vector2 estimateP1() const { return Eigen::Map<const Vector2>(&(_estimate[0])); }
-  Vector2 estimateP2() const { return Eigen::Map<const Vector2>(&(_estimate[2])); }
+  Vector2 estimateP1() const { return Eigen::Map<const Vector2>(&(estimate_[0])); }
+  Vector2 estimateP2() const { return Eigen::Map<const Vector2>(&(estimate_[2])); }
   void setEstimateP1(const Vector2& p1) {
-    Eigen::Map<Vector2> v(&_estimate[0]);
+    Eigen::Map<Vector2> v(&estimate_[0]);
     v = p1;
   }
   void setEstimateP2(const Vector2& p2) {
-    Eigen::Map<Vector2> v(&_estimate[2]);
+    Eigen::Map<Vector2> v(&estimate_[2]);
     v = p2;
   }
 
-  virtual void setToOriginImpl() { _estimate.setZero(); }
+  void setToOriginImpl() override { estimate_.setZero(); }
 
-  virtual bool setEstimateDataImpl(const number_t* est) {
+  bool setEstimateDataImpl(const number_t* est) override {
     Eigen::Map<const Vector4> v(est);
-    _estimate = v;
+    estimate_ = v;
     return true;
   }
 
-  virtual bool getEstimateData(number_t* est) const {
+  bool getEstimateData(number_t* est) const override {
     Eigen::Map<Vector4> v(est);
-    v = _estimate;
+    v = estimate_;
     return true;
   }
 
-  virtual int estimateDimension() const { return 4; }
+  int estimateDimension() const override { return 4; }
 
-  virtual bool setMinimalEstimateDataImpl(const number_t* est) { return setEstimateData(est); }
+  bool setMinimalEstimateDataImpl(const number_t* est) override { return setEstimateData(est); }
 
-  virtual bool getMinimalEstimateData(number_t* est) const { return getEstimateData(est); }
+  bool getMinimalEstimateData(number_t* est) const override { return getEstimateData(est); }
 
-  virtual int minimalEstimateDimension() const { return 4; }
+  int minimalEstimateDimension() const override { return 4; }
 
-  virtual void oplusImpl(const number_t* update) {
+  void oplusImpl(const number_t* update) override {
     Eigen::Map<const Vector4> upd(update);
-    _estimate += upd;
+    estimate_ += upd;
   }
 
-  virtual bool read(std::istream& is);
-  virtual bool write(std::ostream& os) const;
+  bool read(std::istream& is) override;
+  bool write(std::ostream& os) const override;
 };
 
 class G2O_TYPES_SLAM2D_ADDONS_API VertexSegment2DWriteGnuplotAction : public WriteGnuplotAction {
  public:
   VertexSegment2DWriteGnuplotAction();
-  virtual bool operator()(HyperGraph::HyperGraphElement* element,
-                          HyperGraphElementAction::Parameters* params_);
+  bool operator()(HyperGraph::HyperGraphElement* element,
+                          HyperGraphElementAction::Parameters* params_) override;
 };
 
 #ifdef G2O_HAVE_OPENGL
 class G2O_TYPES_SLAM2D_ADDONS_API VertexSegment2DDrawAction : public DrawAction {
  public:
   VertexSegment2DDrawAction();
-  virtual bool operator()(HyperGraph::HyperGraphElement* element,
-                          HyperGraphElementAction::Parameters* params_);
+  bool operator()(HyperGraph::HyperGraphElement* element,
+                          HyperGraphElementAction::Parameters* params_) override;
 
  protected:
-  std::shared_ptr<FloatProperty> _pointSize;
-  virtual bool refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_);
+  std::shared_ptr<FloatProperty> pointSize_;
+  bool refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_) override;
 };
 #endif
 

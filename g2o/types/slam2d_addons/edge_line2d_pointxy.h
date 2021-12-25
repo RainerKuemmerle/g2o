@@ -40,40 +40,39 @@ namespace g2o {
   {
     public:
       G2O_TYPES_SLAM2D_ADDONS_API EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-      G2O_TYPES_SLAM2D_ADDONS_API EdgeLine2DPointXY();
 
-      G2O_TYPES_SLAM2D_ADDONS_API void computeError()
+      G2O_TYPES_SLAM2D_ADDONS_API void computeError() override
       {
         const VertexLine2D* l = vertexXnRaw<0>();
         const VertexPointXY* p = vertexXnRaw<1>();
         Vector2 n(std::cos(l->theta()), std::sin(l->theta()));
         number_t prediction=n.dot(p->estimate())-l->rho();
-        _error[0] =  prediction - _measurement;
+        error_[0] =  prediction - measurement_;
       }
 
-      G2O_TYPES_SLAM2D_ADDONS_API virtual bool setMeasurementData(const number_t* d){
-        _measurement = *d;
+      G2O_TYPES_SLAM2D_ADDONS_API bool setMeasurementData(const number_t* d) override{
+        measurement_ = *d;
         return true;
       }
 
-      G2O_TYPES_SLAM2D_ADDONS_API virtual bool getMeasurementData(number_t* d) const{
-        *d = _measurement;
+      G2O_TYPES_SLAM2D_ADDONS_API bool getMeasurementData(number_t* d) const override{
+        *d = measurement_;
         return true;
       }
 
-      G2O_TYPES_SLAM2D_ADDONS_API virtual int measurementDimension() const {return 1;}
+      G2O_TYPES_SLAM2D_ADDONS_API int measurementDimension() const override {return 1;}
 
-      G2O_TYPES_SLAM2D_ADDONS_API virtual bool setMeasurementFromState(){
+      G2O_TYPES_SLAM2D_ADDONS_API bool setMeasurementFromState() override{
         const VertexLine2D* l = vertexXnRaw<0>();
         const VertexPointXY* p = vertexXnRaw<1>();
         Vector2 n(std::cos(l->theta()), std::sin(l->theta()));
         number_t prediction=n.dot(p->estimate())-l->rho();
-        _measurement = prediction;
+        measurement_ = prediction;
         return true;
       }
 
-      G2O_TYPES_SLAM2D_ADDONS_API virtual bool read(std::istream& is);
-      G2O_TYPES_SLAM2D_ADDONS_API virtual bool write(std::ostream& os) const;
+      G2O_TYPES_SLAM2D_ADDONS_API bool read(std::istream& is) override;
+      G2O_TYPES_SLAM2D_ADDONS_API bool write(std::ostream& os) const override;
 
   };
 

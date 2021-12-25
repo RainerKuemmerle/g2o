@@ -39,41 +39,41 @@ class G2O_TYPES_SLAM2D_ADDONS_API EdgeLine2D : public BaseBinaryEdge<2, Line2D, 
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   EdgeLine2D();
 
-  void computeError() {
+  void computeError() override {
     const VertexLine2D* v1 = vertexXnRaw<0>();
     const VertexLine2D* v2 = vertexXnRaw<1>();
-    _error = (v2->estimate() - v1->estimate()) - _measurement;
+    error_ = (v2->estimate() - v1->estimate()) - measurement_;
   }
-  virtual bool read(std::istream& is);
-  virtual bool write(std::ostream& os) const;
+  bool read(std::istream& is) override;
+  bool write(std::ostream& os) const override;
 
-  virtual void setMeasurement(const Line2D& m) { _measurement = m; }
+  void setMeasurement(const Line2D& m) override { measurement_ = m; }
 
-  virtual void setMeasurement(const Vector2& m) { _measurement = m; }
+  virtual void setMeasurement(const Vector2& m) { measurement_ = Line2D(m); }
 
-  virtual bool setMeasurementData(const number_t* d) {
+  bool setMeasurementData(const number_t* d) override {
     Eigen::Map<const Vector2> m(d);
-    _measurement = Line2D(m);
+    measurement_ = Line2D(m);
     return true;
   }
 
-  virtual bool getMeasurementData(number_t* d) const {
+  bool getMeasurementData(number_t* d) const override {
     Eigen::Map<Vector2> m(d);
-    m = _measurement;
+    m = measurement_;
     return true;
   }
 
-  virtual int measurementDimension() const { return 2; }
+  int measurementDimension() const override { return 2; }
 
-  virtual bool setMeasurementFromState() {
+  bool setMeasurementFromState() override {
     const VertexLine2D* v1 = vertexXnRaw<0>();
     const VertexLine2D* v2 = vertexXnRaw<1>();
-    _measurement = Line2D((Vector2)(v2->estimate()) - (Vector2)v1->estimate());
+    measurement_ = Line2D(Vector2(v2->estimate()) - Vector2(v1->estimate()));
     return true;
   }
 
-  virtual number_t initialEstimatePossible(const OptimizableGraph::VertexSet&, OptimizableGraph::Vertex*) { return 0; }
-  virtual void linearizeOplus();
+  number_t initialEstimatePossible(const OptimizableGraph::VertexSet&, OptimizableGraph::Vertex*) override { return 0; }
+  void linearizeOplus() override;
 };
 
 }  // namespace g2o
