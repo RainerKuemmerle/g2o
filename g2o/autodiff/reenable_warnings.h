@@ -28,11 +28,11 @@
 //
 
 // This is not your usual header guard. See disable_warnings.h
-#ifdef CERES_WARNINGS_DISABLED
-#undef CERES_WARNINGS_DISABLED
+#ifdef G2O_CERES_WARNINGS_DISABLED
+#undef G2O_CERES_WARNINGS_DISABLED
 
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif
 
-#endif  // CERES_WARNINGS_DISABLED
+#endif  // G2O_CERES_WARNINGS_DISABLED

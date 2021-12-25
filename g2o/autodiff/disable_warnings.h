@@ -28,10 +28,10 @@
 //
 // This file has the sole purpose to silence warnings when including Ceres.
 
-// This is not your usual header guard. The macro CERES_WARNINGS_DISABLED
+// This is not your usual header guard. The macro G2O_CERES_WARNINGS_DISABLED
 // shows up again in reenable_warnings.h.
-#ifndef CERES_WARNINGS_DISABLED
-#define CERES_WARNINGS_DISABLED
+#ifndef G2O_CERES_WARNINGS_DISABLED
+#define G2O_CERES_WARNINGS_DISABLED
 
 #ifdef _MSC_VER
 #pragma warning(push)
@@ -41,4 +41,4 @@
 #pragma warning(disable : 4251)
 #endif
 
-#endif  // CERES_WARNINGS_DISABLED
+#endif  // G2O_CERES_WARNINGS_DISABLED

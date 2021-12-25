@@ -34,8 +34,8 @@
 // of these enums. Please update those routines if you extend or
 // remove enums from here.
 
-#ifndef CERES_PUBLIC_TYPES_H_
-#define CERES_PUBLIC_TYPES_H_
+#ifndef G2O_CERES_PUBLIC_TYPES_H_
+#define G2O_CERES_PUBLIC_TYPES_H_
 
 #include <string>
 
@@ -451,4 +451,4 @@ const double kImpossibleValue = 1e302;
 
 #include "reenable_warnings.h"
 
-#endif  // CERES_PUBLIC_TYPES_H_
+#endif  // G2O_CERES_PUBLIC_TYPES_H_

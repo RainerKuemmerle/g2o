@@ -29,8 +29,8 @@
 // Author: darius.rueckert@fau.de (Darius Rueckert)
 //
 
-#ifndef CERES_PUBLIC_INTERNAL_ARRAY_SELECTOR_H_
-#define CERES_PUBLIC_INTERNAL_ARRAY_SELECTOR_H_
+#ifndef G2O_CERES_PUBLIC_INTERNAL_ARRAY_SELECTOR_H_
+#define G2O_CERES_PUBLIC_INTERNAL_ARRAY_SELECTOR_H_
 
 #include <array>
 #include <vector>
@@ -92,4 +92,4 @@ struct ArraySelector<T, NumElements, MaxNumElementsOnStack, false, false>
 }  // namespace internal
 }  // namespace ceres
 
-#endif  // CERES_PUBLIC_INTERNAL_ARRAY_SELECTOR_H_
+#endif  // G2O_CERES_PUBLIC_INTERNAL_ARRAY_SELECTOR_H_

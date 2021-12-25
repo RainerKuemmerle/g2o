@@ -30,8 +30,8 @@
 //         mierle@gmail.com (Keir Mierle)
 //         jodebo_beck@gmx.de (Johannes Beck)
 
-#ifndef CERES_PUBLIC_INTERNAL_VARIADIC_EVALUATE_H_
-#define CERES_PUBLIC_INTERNAL_VARIADIC_EVALUATE_H_
+#ifndef G2O_CERES_PUBLIC_INTERNAL_VARIADIC_EVALUATE_H_
+#define G2O_CERES_PUBLIC_INTERNAL_VARIADIC_EVALUATE_H_
 
 #include <cstddef>
 #include <type_traits>
@@ -109,4 +109,4 @@ inline bool VariadicEvaluate(const Functor& functor,
 }  // namespace internal
 }  // namespace ceres
 
-#endif  // CERES_PUBLIC_INTERNAL_VARIADIC_EVALUATE_H_
+#endif  // G2O_CERES_PUBLIC_INTERNAL_VARIADIC_EVALUATE_H_

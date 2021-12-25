@@ -137,8 +137,8 @@
 // In general, the functions below will accept NULL pointers for all or some of
 // the Jacobian parameters, meaning that those Jacobians will not be computed.
 
-#ifndef CERES_PUBLIC_INTERNAL_AUTODIFF_H_
-#define CERES_PUBLIC_INTERNAL_AUTODIFF_H_
+#ifndef G2O_CERES_PUBLIC_INTERNAL_AUTODIFF_H_
+#define G2O_CERES_PUBLIC_INTERNAL_AUTODIFF_H_
 
 #include <array>
 #include <cstddef>
@@ -155,12 +155,12 @@
 // If the number of parameters exceeds this values, the corresponding jets are
 // placed on the heap. This will reduce performance by a factor of 2-5 on
 // current compilers.
-#ifndef CERES_AUTODIFF_MAX_PARAMETERS_ON_STACK
-#define CERES_AUTODIFF_MAX_PARAMETERS_ON_STACK 50
+#ifndef G2O_CERES_AUTODIFF_MAX_PARAMETERS_ON_STACK
+#define G2O_CERES_AUTODIFF_MAX_PARAMETERS_ON_STACK 50
 #endif
 
-#ifndef CERES_AUTODIFF_MAX_RESIDUALS_ON_STACK
-#define CERES_AUTODIFF_MAX_RESIDUALS_ON_STACK 20
+#ifndef G2O_CERES_AUTODIFF_MAX_RESIDUALS_ON_STACK
+#define G2O_CERES_AUTODIFF_MAX_RESIDUALS_ON_STACK 20
 #endif
 
 namespace ceres {
@@ -307,7 +307,7 @@ inline bool AutoDifferentiate(const Functor& functor,
 
   ArraySelector<JetT,
                 ParameterDims::kNumParameters,
-                CERES_AUTODIFF_MAX_PARAMETERS_ON_STACK>
+                G2O_CERES_AUTODIFF_MAX_PARAMETERS_ON_STACK>
       parameters_as_jets(ParameterDims::kNumParameters);
 
   // Pointers to the beginning of each parameter block
@@ -321,7 +321,7 @@ inline bool AutoDifferentiate(const Functor& functor,
   const int num_outputs =
       KNumResiduals == kDynamic ? dynamic_num_outputs : KNumResiduals;
 
-  ArraySelector<JetT, KNumResiduals, CERES_AUTODIFF_MAX_RESIDUALS_ON_STACK>
+  ArraySelector<JetT, KNumResiduals, G2O_CERES_AUTODIFF_MAX_RESIDUALS_ON_STACK>
       residuals_as_jets(num_outputs);
 
   // Invalidate the output Jets, so that we can detect if the user
@@ -349,4 +349,4 @@ inline bool AutoDifferentiate(const Functor& functor,
 }  // namespace internal
 }  // namespace ceres
 
-#endif  // CERES_PUBLIC_INTERNAL_AUTODIFF_H_
+#endif  // G2O_CERES_PUBLIC_INTERNAL_AUTODIFF_H_

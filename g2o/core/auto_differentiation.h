@@ -31,11 +31,7 @@
 #include <cassert>
 #include <type_traits>
 
-#ifdef G2O_USE_VENDORED_CERES
-  #include "g2o/EXTERNAL/ceres/autodiff.h"
-#else
-  #include <ceres/internal/autodiff.h>
-#endif
+#include "g2o/autodiff/autodiff.h"
 
 #include "eigen_types.h"
 #include "g2o/stuff/misc.h"
