@@ -154,8 +154,8 @@
 // both jets.h and autodiff.h to make taking derivatives of cost functions for
 // use in Ceres easier.
 
-#ifndef CERES_PUBLIC_JET_H_
-#define CERES_PUBLIC_JET_H_
+#ifndef G2O_CERES_PUBLIC_JET_H_
+#define G2O_CERES_PUBLIC_JET_H_
 
 #include <cmath>
 #include <iosfwd>
@@ -352,7 +352,7 @@ inline Jet<T, N> operator/(const Jet<T, N>& f, T s) {
 }
 
 // Binary comparison operators for both scalars and jets.
-#define CERES_DEFINE_JET_COMPARISON_OPERATOR(op)                    \
+#define G2O_CERES_DEFINE_JET_COMPARISON_OPERATOR(op)                    \
   template <typename T, int N>                                      \
   inline bool operator op(const Jet<T, N>& f, const Jet<T, N>& g) { \
     return f.a op g.a;                                              \
@@ -365,13 +365,13 @@ inline Jet<T, N> operator/(const Jet<T, N>& f, T s) {
   inline bool operator op(const Jet<T, N>& f, const T& s) {         \
     return f.a op s;                                                \
   }
-CERES_DEFINE_JET_COMPARISON_OPERATOR(<)   // NOLINT
-CERES_DEFINE_JET_COMPARISON_OPERATOR(<=)  // NOLINT
-CERES_DEFINE_JET_COMPARISON_OPERATOR(>)   // NOLINT
-CERES_DEFINE_JET_COMPARISON_OPERATOR(>=)  // NOLINT
-CERES_DEFINE_JET_COMPARISON_OPERATOR(==)  // NOLINT
-CERES_DEFINE_JET_COMPARISON_OPERATOR(!=)  // NOLINT
-#undef CERES_DEFINE_JET_COMPARISON_OPERATOR
+G2O_CERES_DEFINE_JET_COMPARISON_OPERATOR(<)   // NOLINT
+G2O_CERES_DEFINE_JET_COMPARISON_OPERATOR(<=)  // NOLINT
+G2O_CERES_DEFINE_JET_COMPARISON_OPERATOR(>)   // NOLINT
+G2O_CERES_DEFINE_JET_COMPARISON_OPERATOR(>=)  // NOLINT
+G2O_CERES_DEFINE_JET_COMPARISON_OPERATOR(==)  // NOLINT
+G2O_CERES_DEFINE_JET_COMPARISON_OPERATOR(!=)  // NOLINT
+#undef G2O_CERES_DEFINE_JET_COMPARISON_OPERATOR
 
 // Pull some functions from namespace std.
 //
@@ -596,21 +596,21 @@ inline Jet<T, N> erfc(const Jet<T, N>& x) {
 // function errors in client code (the specific warning is suppressed when
 // Ceres itself is built).
 inline double BesselJ0(double x) {
-#if defined(CERES_MSVC_USE_UNDERSCORE_PREFIXED_BESSEL_FUNCTIONS)
+#if defined(G2O_CERES_MSVC_USE_UNDERSCORE_PREFIXED_BESSEL_FUNCTIONS)
   return _j0(x);
 #else
   return j0(x);
 #endif
 }
 inline double BesselJ1(double x) {
-#if defined(CERES_MSVC_USE_UNDERSCORE_PREFIXED_BESSEL_FUNCTIONS)
+#if defined(G2O_CERES_MSVC_USE_UNDERSCORE_PREFIXED_BESSEL_FUNCTIONS)
   return _j1(x);
 #else
   return j1(x);
 #endif
 }
 inline double BesselJn(int n, double x) {
-#if defined(CERES_MSVC_USE_UNDERSCORE_PREFIXED_BESSEL_FUNCTIONS)
+#if defined(G2O_CERES_MSVC_USE_UNDERSCORE_PREFIXED_BESSEL_FUNCTIONS)
   return _jn(n, x);
 #else
   return jn(n, x);
@@ -1004,4 +1004,4 @@ struct ScalarBinaryOpTraits<T, ceres::Jet<T, N>, BinaryOp> {
 
 }  // namespace Eigen
 
-#endif  // CERES_PUBLIC_JET_H_
+#endif  // G2O_CERES_PUBLIC_JET_H_

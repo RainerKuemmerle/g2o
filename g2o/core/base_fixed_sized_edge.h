@@ -32,11 +32,7 @@
 #include <limits>
 #include <utility>
 
-#ifdef G2O_USE_VENDORED_CERES
-#include "g2o/EXTERNAL/ceres/fixed_array.h"
-#else
-#include <ceres/internal/fixed_array.h>
-#endif
+#include "g2o/autodiff/fixed_array.h"
 
 #include "base_edge.h"
 #include "g2o/config.h"

@@ -32,8 +32,8 @@
 // or the exclusive scan (sometimes called exclusive prefix sum) at compile
 // time.
 
-#ifndef CERES_PUBLIC_INTERNAL_INTEGER_SEQUENCE_ALGORITHM_H_
-#define CERES_PUBLIC_INTERNAL_INTEGER_SEQUENCE_ALGORITHM_H_
+#ifndef G2O_CERES_PUBLIC_INTERNAL_INTEGER_SEQUENCE_ALGORITHM_H_
+#define G2O_CERES_PUBLIC_INTERNAL_INTEGER_SEQUENCE_ALGORITHM_H_
 
 #include <utility>
 
@@ -167,4 +167,4 @@ using ExclusiveScan = typename ExclusiveScanT<Seq>::Type;
 }  // namespace internal
 }  // namespace ceres
 
-#endif  // CERES_PUBLIC_INTERNAL_INTEGER_SEQUENCE_ALGORITHM_H_
+#endif  // G2O_CERES_PUBLIC_INTERNAL_INTEGER_SEQUENCE_ALGORITHM_H_

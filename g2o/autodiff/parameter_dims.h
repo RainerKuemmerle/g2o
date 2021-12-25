@@ -28,8 +28,8 @@
 //
 // Author: jodebo_beck@gmx.de (Johannes Beck)
 
-#ifndef CERES_PUBLIC_INTERNAL_PARAMETER_DIMS_H_
-#define CERES_PUBLIC_INTERNAL_PARAMETER_DIMS_H_
+#ifndef G2O_CERES_PUBLIC_INTERNAL_PARAMETER_DIMS_H_
+#define G2O_CERES_PUBLIC_INTERNAL_PARAMETER_DIMS_H_
 
 #include <array>
 #include <utility>
@@ -121,4 +121,4 @@ using DynamicParameterDims = ParameterDims<true>;
 }  // namespace internal
 }  // namespace ceres
 
-#endif  // CERES_PUBLIC_INTERNAL_PARAMETER_DIMS_H_
+#endif  // G2O_CERES_PUBLIC_INTERNAL_PARAMETER_DIMS_H_

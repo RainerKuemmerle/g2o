@@ -29,11 +29,7 @@
 #include <iostream>
 #include <cassert>
 
-#ifdef G2O_USE_VENDORED_CERES
-#include "g2o/EXTERNAL/ceres/autodiff.h"
-#else
-#include <ceres/internal/autodiff.h>
-#endif
+#include "g2o/autodiff/autodiff.h"
 
 #include "g2o/core/auto_differentiation.h"
 #include "g2o/core/base_binary_edge.h"

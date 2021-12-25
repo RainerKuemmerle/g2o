@@ -27,8 +27,8 @@
 // accidentally overflowing your stack if large input is passed to
 // your function.
 
-#ifndef CERES_PUBLIC_INTERNAL_FIXED_ARRAY_H_
-#define CERES_PUBLIC_INTERNAL_FIXED_ARRAY_H_
+#ifndef G2O_CERES_PUBLIC_INTERNAL_FIXED_ARRAY_H_
+#define G2O_CERES_PUBLIC_INTERNAL_FIXED_ARRAY_H_
 
 #include <Eigen/Core>  // For Eigen::aligned_allocator
 #include <algorithm>
@@ -461,4 +461,4 @@ constexpr typename FixedArray<T, N, A>::size_type
 }  // namespace internal
 }  // namespace ceres
 
-#endif  // CERES_PUBLIC_INTERNAL_FIXED_ARRAY_H_
+#endif  // G2O_CERES_PUBLIC_INTERNAL_FIXED_ARRAY_H_

@@ -20,25 +20,25 @@
 // conversion of smart pointers. This file is an extension to the C++
 // standard <memory> library header file.
 
-#ifndef CERES_PUBLIC_INTERNAL_MEMORY_H_
-#define CERES_PUBLIC_INTERNAL_MEMORY_H_
+#ifndef G2O_CERES_PUBLIC_INTERNAL_MEMORY_H_
+#define G2O_CERES_PUBLIC_INTERNAL_MEMORY_H_
 
 #include <memory>
 
-#ifdef CERES_HAVE_EXCEPTIONS
-#define CERES_INTERNAL_TRY try
-#define CERES_INTERNAL_CATCH_ANY catch (...)
-#define CERES_INTERNAL_RETHROW \
+#ifdef G2O_CERES_HAVE_EXCEPTIONS
+#define G2O_CERES_INTERNAL_TRY try
+#define G2O_CERES_INTERNAL_CATCH_ANY catch (...)
+#define G2O_CERES_INTERNAL_RETHROW \
   do {                         \
     throw;                     \
   } while (false)
-#else  // CERES_HAVE_EXCEPTIONS
-#define CERES_INTERNAL_TRY if (true)
-#define CERES_INTERNAL_CATCH_ANY else if (false)
-#define CERES_INTERNAL_RETHROW \
+#else  // G2O_CERES_HAVE_EXCEPTIONS
+#define G2O_CERES_INTERNAL_TRY if (true)
+#define G2O_CERES_INTERNAL_CATCH_ANY else if (false)
+#define G2O_CERES_INTERNAL_RETHROW \
   do {                         \
   } while (false)
-#endif  // CERES_HAVE_EXCEPTIONS
+#endif  // G2O_CERES_HAVE_EXCEPTIONS
 
 namespace ceres {
 namespace internal {
@@ -49,16 +49,16 @@ void ConstructRange(Allocator& alloc,
                     Iterator last,
                     const Args&... args) {
   for (Iterator cur = first; cur != last; ++cur) {
-    CERES_INTERNAL_TRY {
+    G2O_CERES_INTERNAL_TRY {
       std::allocator_traits<Allocator>::construct(
           alloc, std::addressof(*cur), args...);
     }
-    CERES_INTERNAL_CATCH_ANY {
+    G2O_CERES_INTERNAL_CATCH_ANY {
       while (cur != first) {
         --cur;
         std::allocator_traits<Allocator>::destroy(alloc, std::addressof(*cur));
       }
-      CERES_INTERNAL_RETHROW;
+      G2O_CERES_INTERNAL_RETHROW;
     }
   }
 }
@@ -70,16 +70,16 @@ void CopyRange(Allocator& alloc,
                InputIterator last) {
   for (Iterator cur = destination; first != last;
        static_cast<void>(++cur), static_cast<void>(++first)) {
-    CERES_INTERNAL_TRY {
+    G2O_CERES_INTERNAL_TRY {
       std::allocator_traits<Allocator>::construct(
           alloc, std::addressof(*cur), *first);
     }
-    CERES_INTERNAL_CATCH_ANY {
+    G2O_CERES_INTERNAL_CATCH_ANY {
       while (cur != destination) {
         --cur;
         std::allocator_traits<Allocator>::destroy(alloc, std::addressof(*cur));
       }
-      CERES_INTERNAL_RETHROW;
+      G2O_CERES_INTERNAL_RETHROW;
     }
   }
 }
@@ -87,4 +87,4 @@ void CopyRange(Allocator& alloc,
 }  // namespace internal
 }  // namespace ceres
 
-#endif  // CERES_PUBLIC_INTERNAL_MEMORY_H_
+#endif  // G2O_CERES_PUBLIC_INTERNAL_MEMORY_H_
