@@ -140,18 +140,17 @@
 #ifndef CERES_PUBLIC_INTERNAL_AUTODIFF_H_
 #define CERES_PUBLIC_INTERNAL_AUTODIFF_H_
 
-#include <stddef.h>
-
 #include <array>
+#include <cstddef>
 #include <utility>
 
 #include "array_selector.h"
 #include "eigen.h"
 #include "fixed_array.h"
-#include "parameter_dims.h"
-#include "variadic_evaluate.h"
 #include "jet.h"
+#include "parameter_dims.h"
 #include "types.h"
+#include "variadic_evaluate.h"
 
 // If the number of parameters exceeds this values, the corresponding jets are
 // placed on the heap. This will reduce performance by a factor of 2-5 on
@@ -181,12 +180,12 @@ namespace internal {
 //
 // is what would get put in dst if N was 3, offset was 3, and the jet type JetT
 // was 8-dimensional.
-template <int j, int N, int Offset, typename T, typename JetT>
+template <int J, int N, int Offset, typename T, typename JetT>
 struct Make1stOrderPerturbation {
  public:
   inline static void Apply(const T* src, JetT* dst) {
-    dst[j] = JetT(src[j], j + Offset);
-    Make1stOrderPerturbation<j + 1, N, Offset, T, JetT>::Apply(src, dst);
+    dst[J] = JetT(src[J], J + Offset);
+    Make1stOrderPerturbation<J + 1, N, Offset, T, JetT>::Apply(src, dst);
   }
 };
 
@@ -294,7 +293,7 @@ struct Take1stOrderParts<std::integer_sequence<int>, ParameterIdx, Offset> {
                     T** /* NOT USED */) {}
 };
 
-template <int kNumResiduals,
+template <int KNumResiduals,
           typename ParameterDims,
           typename Functor,
           typename T>
@@ -303,7 +302,7 @@ inline bool AutoDifferentiate(const Functor& functor,
                               int dynamic_num_outputs,
                               T* function_value,
                               T** jacobians) {
-  typedef Jet<T, ParameterDims::kNumParameters> JetT;
+  using JetT = Jet<T, ParameterDims::kNumParameters>;
   using Parameters = typename ParameterDims::Parameters;
 
   ArraySelector<JetT,
@@ -320,9 +319,9 @@ inline bool AutoDifferentiate(const Functor& functor,
   // ?-operator here is compile-time evaluated, therefore num_outputs is also
   // a compile-time constant for functors with fixed residuals.
   const int num_outputs =
-      kNumResiduals == DYNAMIC ? dynamic_num_outputs : kNumResiduals;
+      KNumResiduals == kDynamic ? dynamic_num_outputs : KNumResiduals;
 
-  ArraySelector<JetT, kNumResiduals, CERES_AUTODIFF_MAX_RESIDUALS_ON_STACK>
+  ArraySelector<JetT, KNumResiduals, CERES_AUTODIFF_MAX_RESIDUALS_ON_STACK>
       residuals_as_jets(num_outputs);
 
   // Invalidate the output Jets, so that we can detect if the user

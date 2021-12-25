@@ -51,8 +51,6 @@
 #include "g2o/solvers/eigen/linear_solver_eigen.h"
 #endif
 
-using namespace std;
-
 namespace g2o {
 namespace bal {
 using Vector9 = VectorN<9>;
@@ -71,21 +69,21 @@ using Vector9 = VectorN<9>;
 class VertexCameraBAL : public g2o::BaseVertex<9, g2o::bal::Vector9> {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
-  VertexCameraBAL() {}
+  VertexCameraBAL() = default;
 
-  virtual bool read(std::istream& /*is*/) {
-    cerr << __PRETTY_FUNCTION__ << " not implemented yet" << endl;
+  bool read(std::istream& /*is*/) override {
+    std::cerr << __PRETTY_FUNCTION__ << " not implemented yet" << std::endl;
     return false;
   }
 
-  virtual bool write(std::ostream& /*os*/) const {
-    cerr << __PRETTY_FUNCTION__ << " not implemented yet" << endl;
+  bool write(std::ostream& /*os*/) const override {
+    std::cerr << __PRETTY_FUNCTION__ << " not implemented yet" << std::endl;
     return false;
   }
 
-  virtual void setToOriginImpl() { cerr << __PRETTY_FUNCTION__ << " not implemented yet" << endl; }
+  void setToOriginImpl() override { std::cerr << __PRETTY_FUNCTION__ << " not implemented yet" << std::endl; }
 
-  virtual void oplusImpl(const double* update) {
+  void oplusImpl(const double* update) override {
     g2o::bal::Vector9::ConstMapType v(update, VertexCameraBAL::kDimension);
     estimate_ += v;
   }
@@ -99,21 +97,21 @@ class VertexCameraBAL : public g2o::BaseVertex<9, g2o::bal::Vector9> {
 class VertexPointBAL : public g2o::BaseVertex<3, g2o::Vector3> {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
-  VertexPointBAL() {}
+  VertexPointBAL() = default;
 
-  virtual bool read(std::istream& /*is*/) {
-    cerr << __PRETTY_FUNCTION__ << " not implemented yet" << endl;
+  bool read(std::istream& /*is*/) override {
+    std::cerr << __PRETTY_FUNCTION__ << " not implemented yet" << std::endl;
     return false;
   }
 
-  virtual bool write(std::ostream& /*os*/) const {
-    cerr << __PRETTY_FUNCTION__ << " not implemented yet" << endl;
+  bool write(std::ostream& /*os*/) const override {
+    std::cerr << __PRETTY_FUNCTION__ << " not implemented yet" << std::endl;
     return false;
   }
 
-  virtual void setToOriginImpl() { cerr << __PRETTY_FUNCTION__ << " not implemented yet" << endl; }
+  void setToOriginImpl() override { std::cerr << __PRETTY_FUNCTION__ << " not implemented yet" << std::endl; }
 
-  virtual void oplusImpl(const double* update) {
+  void oplusImpl(const double* update) override {
     g2o::Vector3::ConstMapType v(update);
     estimate_ += v;
   }
@@ -145,13 +143,13 @@ class EdgeObservationBAL
     : public g2o::BaseBinaryEdge<2, g2o::Vector2, VertexCameraBAL, VertexPointBAL> {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
-  EdgeObservationBAL() {}
-  virtual bool read(std::istream& /*is*/) {
-    cerr << __PRETTY_FUNCTION__ << " not implemented yet" << endl;
+  EdgeObservationBAL() = default;
+  bool read(std::istream& /*is*/) override {
+    std::cerr << __PRETTY_FUNCTION__ << " not implemented yet" << std::endl;
     return false;
   }
-  virtual bool write(std::ostream& /*os*/) const {
-    cerr << __PRETTY_FUNCTION__ << " not implemented yet" << endl;
+  bool write(std::ostream& /*os*/) const override {
+    std::cerr << __PRETTY_FUNCTION__ << " not implemented yet" << std::endl;
     return false;
   }
 
@@ -210,9 +208,9 @@ int main(int argc, char** argv) {
   int maxIterations;
   bool verbose;
   bool usePCG;
-  string outputFilename;
-  string inputFilename;
-  string statsFilename;
+  std::string outputFilename;
+  std::string inputFilename;
+  std::string statsFilename;
   g2o::CommandArgs arg;
   arg.param("i", maxIterations, 5, "perform n iterations");
   arg.param("o", outputFilename, "", "write points into a vrml file");
@@ -223,23 +221,23 @@ int main(int argc, char** argv) {
 
   arg.parseArgs(argc, argv);
 
-  typedef g2o::BlockSolver<g2o::BlockSolverTraits<9, 3>> BalBlockSolver;
+  using BalBlockSolver = g2o::BlockSolver<g2o::BlockSolverTraits<9, 3>>;
 #ifdef G2O_HAVE_CHOLMOD
-  string choleskySolverName = "CHOLMOD";
-  typedef g2o::LinearSolverCholmod<BalBlockSolver::PoseMatrixType> BalLinearSolver;
+  std::string choleskySolverName = "CHOLMOD";
+  using BalLinearSolver = g2o::LinearSolverCholmod<BalBlockSolver::PoseMatrixType>;
 #else
-  string choleskySolverName = "Eigen";
-  typedef g2o::LinearSolverEigen<BalBlockSolver::PoseMatrixType> BalLinearSolver;
+  std::string choleskySolverName = "Eigen";
+  using BalLinearSolver = g2o::LinearSolverEigen<BalBlockSolver::PoseMatrixType>;
 #endif
-  typedef g2o::LinearSolverPCG<BalBlockSolver::PoseMatrixType> BalLinearSolverPCG;
+  using BalLinearSolverPCG = g2o::LinearSolverPCG<BalBlockSolver::PoseMatrixType>;
 
   g2o::SparseOptimizer optimizer;
   std::unique_ptr<g2o::LinearSolver<BalBlockSolver::PoseMatrixType>> linearSolver;
   if (usePCG) {
-    cout << "Using PCG" << endl;
+    std::cout << "Using PCG" << std::endl;
     linearSolver = g2o::make_unique<BalLinearSolverPCG>();
   } else {
-    cout << "Using Cholesky: " << choleskySolverName << endl;
+    std::cout << "Using Cholesky: " << choleskySolverName << std::endl;
     auto cholesky = g2o::make_unique<BalLinearSolver>();
     cholesky->setBlockOrdering(true);
     linearSolver = std::move(cholesky);
@@ -249,21 +247,23 @@ int main(int argc, char** argv) {
 
   // solver->setUserLambdaInit(1);
   optimizer.setAlgorithm(std::unique_ptr<g2o::OptimizationAlgorithm>(solver.release()));
-  if (statsFilename.size() > 0) {
+  if (!statsFilename.empty()) {
     optimizer.setComputeBatchStatistics(true);
   }
 
-  vector<std::shared_ptr<VertexPointBAL>> points;
-  vector<std::shared_ptr<VertexCameraBAL>> cameras;
+  std::vector<std::shared_ptr<VertexPointBAL>> points;
+  std::vector<std::shared_ptr<VertexCameraBAL>> cameras;
 
   // parse BAL dataset
-  cout << "Loading BAL dataset " << inputFilename << endl;
+  std::cout << "Loading BAL dataset " << inputFilename << std::endl;
   {
-    ifstream ifs(inputFilename.c_str());
-    int numCameras, numPoints, numObservations;
+    std::ifstream ifs(inputFilename.c_str());
+    int numCameras;
+    int numPoints;
+    int numObservations;
     ifs >> numCameras >> numPoints >> numObservations;
 
-    cerr << PVAR(numCameras) << " " << PVAR(numPoints) << " " << PVAR(numObservations) << endl;
+    std::cerr << PVAR(numCameras) << " " << PVAR(numPoints) << " " << PVAR(numObservations) << std::endl;
 
     int id = 0;
     cameras.reserve(numCameras);
@@ -281,15 +281,17 @@ int main(int argc, char** argv) {
       p->setMarginalized(true);
       bool addedVertex = optimizer.addVertex(p);
       if (!addedVertex) {
-        cerr << "failing adding vertex" << endl;
+        std::cerr << "failing adding vertex" << std::endl;
       }
       points.push_back(p);
     }
 
     // read in the observation
     for (int i = 0; i < numObservations; ++i) {
-      int camIndex, pointIndex;
-      double obsX, obsY;
+      int camIndex;
+      int pointIndex;
+      double obsX;
+      double obsY;
       ifs >> camIndex >> pointIndex >> obsX >> obsY;
 
       assert(camIndex >= 0 && (size_t)camIndex < cameras.size() && "Index out of bounds");
@@ -304,7 +306,7 @@ int main(int argc, char** argv) {
       e->setMeasurement(g2o::Vector2(obsX, obsY));
       bool addedEdge = optimizer.addEdge(e);
       if (!addedEdge) {
-        cerr << "error adding edge" << endl;
+        std::cerr << "error adding edge" << std::endl;
       }
     }
 
@@ -322,26 +324,25 @@ int main(int argc, char** argv) {
       points[i]->setEstimate(p);
     }
   }
-  cout << "done." << endl;
+  std::cout << "done." << std::endl;
 
-  cout << "Initializing ... " << flush;
+  std::cout << "Initializing ... " << std::flush;
   optimizer.initializeOptimization();
-  cout << "done." << endl;
+  std::cout << "done." << std::endl;
   optimizer.setVerbose(verbose);
-  cout << "Start to optimize" << endl;
+  std::cout << "Start to optimize" << std::endl;
   optimizer.optimize(maxIterations);
 
-  if (statsFilename != "") {
-    cerr << "writing stats to file \"" << statsFilename << "\" ... ";
-    ofstream fout(statsFilename.c_str());
-    const g2o::BatchStatisticsContainer& bsc = optimizer.batchStatistics();
-    for (size_t i = 0; i < bsc.size(); i++) fout << bsc[i] << endl;
-    cerr << "done." << endl;
+  if (!statsFilename.empty()) {
+    std::cerr << "writing stats to file \"" << statsFilename << "\" ... ";
+    std::ofstream fout(statsFilename.c_str());
+    for (const auto& stat : optimizer.batchStatistics()) fout << stat << std::endl;
+    std::cerr << "done." << std::endl;
   }
 
   // dump the points
-  if (outputFilename.size() > 0) {
-    ofstream fout(outputFilename.c_str());  // loadable with meshlab
+  if (!outputFilename.empty()) {
+    std::ofstream fout(outputFilename.c_str());  // loadable with meshlab
     fout << "#VRML V2.0 utf8\n"
          << "Shape {\n"
          << "  appearance Appearance {\n"
@@ -358,7 +359,7 @@ int main(int argc, char** argv) {
          << "    coord Coordinate {\n"
          << "      point [\n";
     for (const auto& p : points) {
-      fout << p->estimate().transpose() << endl;
+      fout << p->estimate().transpose() << std::endl;
     }
     fout << "    ]\n"
          << "  }\n"

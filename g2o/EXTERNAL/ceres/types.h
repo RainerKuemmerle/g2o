@@ -48,8 +48,8 @@ namespace ceres {
 // object takes ownership of the pointer argument, and will call
 // delete on it upon completion.
 enum Ownership {
-  DO_NOT_TAKE_OWNERSHIP,
-  TAKE_OWNERSHIP,
+  kDoNotTakeOwnership,
+  kTakeOwnership,
 };
 
 // TODO(keir): Considerably expand the explanations of each solver type.
@@ -60,42 +60,42 @@ enum LinearSolverType {
 
   // Solve the normal equations using a dense Cholesky solver; based
   // on Eigen.
-  DENSE_NORMAL_CHOLESKY,
+  kDenseNormalCholesky,
 
   // Solve the normal equations using a dense QR solver; based on
   // Eigen.
-  DENSE_QR,
+  kDenseQr,
 
   // Solve the normal equations using a sparse cholesky solver; requires
   // SuiteSparse or CXSparse.
-  SPARSE_NORMAL_CHOLESKY,
+  kSparseNormalCholesky,
 
   // Specialized solvers, specific to problems with a generalized
   // bi-partitite structure.
 
   // Solves the reduced linear system using a dense Cholesky solver;
   // based on Eigen.
-  DENSE_SCHUR,
+  kDenseSchur,
 
   // Solves the reduced linear system using a sparse Cholesky solver;
   // based on CHOLMOD.
-  SPARSE_SCHUR,
+  kSparseSchur,
 
   // Solves the reduced linear system using Conjugate Gradients, based
   // on a new Ceres implementation.  Suitable for large scale
   // problems.
-  ITERATIVE_SCHUR,
+  kIterativeSchur,
 
   // Conjugate gradients on the normal equations.
-  CGNR
+  kCgnr
 };
 
 enum PreconditionerType {
   // Trivial preconditioner - the identity matrix.
-  IDENTITY,
+  kIdentity,
 
   // Block diagonal of the Gauss-Newton Hessian.
-  JACOBI,
+  kJacobi,
 
   // Note: The following three preconditioners can only be used with
   // the ITERATIVE_SCHUR solver. They are well suited for Structure
@@ -103,7 +103,7 @@ enum PreconditionerType {
 
   // Block diagonal of the Schur complement. This preconditioner may
   // only be used with the ITERATIVE_SCHUR solver.
-  SCHUR_JACOBI,
+  kSchurJacobi,
 
   // Visibility clustering based preconditioners.
   //
@@ -111,8 +111,8 @@ enum PreconditionerType {
   // the scene to determine the sparsity structure of the
   // preconditioner. This is done using a clustering algorithm. The
   // available visibility clustering algorithms are described below.
-  CLUSTER_JACOBI,
-  CLUSTER_TRIDIAGONAL,
+  kClusterJacobi,
+  kClusterTridiagonal,
 
   // Subset preconditioner is a general purpose preconditioner
   // linear least squares problems. Given a set of residual blocks,
@@ -133,7 +133,7 @@ enum PreconditionerType {
   // well the matrix Q approximates J'J, or how well the chosen
   // residual blocks approximate the non-linear least squares
   // problem.
-  SUBSET,
+  kSubset,
 };
 
 enum VisibilityClusteringType {
@@ -145,7 +145,7 @@ enum VisibilityClusteringType {
   // This clustering algorithm can be quite slow, but gives high
   // quality clusters. The original visibility based clustering paper
   // used this algorithm.
-  CANONICAL_VIEWS,
+  kCanonicalViews,
 
   // The classic single linkage algorithm. It is extremely fast as
   // compared to CANONICAL_VIEWS, but can give slightly poorer
@@ -156,59 +156,59 @@ enum VisibilityClusteringType {
   // available, CLUSTER_JACOBI and CLUSTER_TRIDIAGONAL in combination
   // with the SINGLE_LINKAGE algorithm will generally give better
   // results.
-  SINGLE_LINKAGE
+  kSingleLinkage
 };
 
 enum SparseLinearAlgebraLibraryType {
   // High performance sparse Cholesky factorization and approximate
   // minimum degree ordering.
-  SUITE_SPARSE,
+  kSuiteSparse,
 
   // A lightweight replacement for SuiteSparse, which does not require
   // a LAPACK/BLAS implementation. Consequently, its performance is
   // also a bit lower than SuiteSparse.
-  CX_SPARSE,
+  kCxSparse,
 
   // Eigen's sparse linear algebra routines. In particular Ceres uses
   // the Simplicial LDLT routines.
-  EIGEN_SPARSE,
+  kEigenSparse,
 
   // Apple's Accelerate framework sparse linear algebra routines.
-  ACCELERATE_SPARSE,
+  kAccelerateSparse,
 
   // No sparse linear solver should be used.  This does not necessarily
   // imply that Ceres was built without any sparse library, although that
   // is the likely use case, merely that one should not be used.
-  NO_SPARSE
+  kNoSparse
 };
 
 enum DenseLinearAlgebraLibraryType {
-  EIGEN,
-  LAPACK,
+  kEigen,
+  kLapack,
 };
 
 // Logging options
 // The options get progressively noisier.
 enum LoggingType {
-  SILENT,
-  PER_MINIMIZER_ITERATION,
+  kSilent,
+  kPerMinimizerIteration,
 };
 
 enum MinimizerType {
-  LINE_SEARCH,
-  TRUST_REGION,
+  kLineSearch,
+  kTrustRegion,
 };
 
 enum LineSearchDirectionType {
   // Negative of the gradient.
-  STEEPEST_DESCENT,
+  kSteepestDescent,
 
   // A generalization of the Conjugate Gradient method to non-linear
   // functions. The generalization can be performed in a number of
   // different ways, resulting in a variety of search directions. The
   // precise choice of the non-linear conjugate gradient algorithm
   // used is determined by NonlinerConjuateGradientType.
-  NONLINEAR_CONJUGATE_GRADIENT,
+  kNonlinearConjugateGradient,
 
   // BFGS, and it's limited memory approximation L-BFGS, are quasi-Newton
   // algorithms that approximate the Hessian matrix by iteratively refining
@@ -263,8 +263,8 @@ enum LineSearchDirectionType {
   // A general reference for both methods:
   //
   // Nocedal J., Wright S., Numerical Optimization, 2nd Ed. Springer, 1999.
-  LBFGS,
-  BFGS,
+  kLbfgs,
+  kBfgs,
 };
 
 // Nonlinear conjugate gradient methods are a generalization of the
@@ -274,16 +274,16 @@ enum LineSearchDirectionType {
 // direction. Ceres provides a number of different variants. For more
 // details see Numerical Optimization by Nocedal & Wright.
 enum NonlinearConjugateGradientType {
-  FLETCHER_REEVES,
-  POLAK_RIBIERE,
-  HESTENES_STIEFEL,
+  kFletcherReeves,
+  kPolakRibiere,
+  kHestenesStiefel,
 };
 
 enum LineSearchType {
   // Backtracking line search with polynomial interpolation or
   // bisection.
-  ARMIJO,
-  WOLFE,
+  kArmijo,
+  kWolfe,
 };
 
 // Ceres supports different strategies for computing the trust region
@@ -292,7 +292,7 @@ enum TrustRegionStrategyType {
   // The default trust region strategy is to use the step computation
   // used in the Levenberg-Marquardt algorithm. For more details see
   // levenberg_marquardt_strategy.h
-  LEVENBERG_MARQUARDT,
+  kLevenbergMarquardt,
 
   // Powell's dogleg algorithm interpolates between the Cauchy point
   // and the Gauss-Newton step. It is particularly useful if the
@@ -308,7 +308,7 @@ enum TrustRegionStrategyType {
   // 2. For now this strategy should only be used with exact
   // factorization based linear solvers, i.e., SPARSE_SCHUR,
   // DENSE_SCHUR, DENSE_QR and SPARSE_NORMAL_CHOLESKY.
-  DOGLEG
+  kDogleg
 };
 
 // Ceres supports two different dogleg strategies.
@@ -322,11 +322,11 @@ enum DoglegType {
   // The traditional approach constructs a dogleg path
   // consisting of two line segments and finds the furthest
   // point on that path that is still inside the trust region.
-  TRADITIONAL_DOGLEG,
+  kTraditionalDogleg,
 
   // The subspace approach finds the exact minimum of the model
   // constrained to the subspace spanned by the dogleg path.
-  SUBSPACE_DOGLEG
+  kSubspaceDogleg
 };
 
 enum TerminationType {
@@ -338,17 +338,17 @@ enum TerminationType {
   // 3.  |step|_2 <= parameter_tolerance * ( |x|_2 +  parameter_tolerance)
   //
   // The user's parameter blocks will be updated with the solution.
-  CONVERGENCE,
+  kConvergence,
 
   // The solver ran for maximum number of iterations or maximum amount
   // of time specified by the user, but none of the convergence
   // criterion specified by the user were met. The user's parameter
   // blocks will be updated with the solution found so far.
-  NO_CONVERGENCE,
+  kNoConvergence,
 
   // The minimizer terminated because of an error.  The user's
   // parameter blocks will not be updated.
-  FAILURE,
+  kFailure,
 
   // Using an IterationCallback object, user code can control the
   // minimizer. The following enums indicate that the user code was
@@ -358,13 +358,13 @@ enum TerminationType {
   // IterationCallback returned SOLVER_TERMINATE_SUCCESSFULLY.
   //
   // The user's parameter blocks will be updated with the solution.
-  USER_SUCCESS,
+  kUserSuccess,
 
   // Minimizer terminated because because a user IterationCallback
   // returned SOLVER_ABORT.
   //
   // The user's parameter blocks will not be updated.
-  USER_FAILURE
+  kUserFailure
 };
 
 // Enums used by the IterationCallback instances to indicate to the
@@ -373,18 +373,18 @@ enum TerminationType {
 // terminate.
 enum CallbackReturnType {
   // Continue solving to next iteration.
-  SOLVER_CONTINUE,
+  kSolverContinue,
 
   // Terminate solver, and do not update the parameter blocks upon
   // return. Unless the user has set
   // Solver:Options:::update_state_every_iteration, in which case the
   // state would have been updated every iteration
   // anyways. Solver::Summary::termination_type is set to USER_ABORT.
-  SOLVER_ABORT,
+  kSolverAbort,
 
   // Terminate solver, update state and
   // return. Solver::Summary::termination_type is set to USER_SUCCESS.
-  SOLVER_TERMINATE_SUCCESSFULLY
+  kSolverTerminateSuccessfully
 };
 
 // The format in which linear least squares problems should be logged
@@ -394,7 +394,7 @@ enum DumpFormatType {
   // to stderr. The Jacobian is printed as a dense matrix. The vectors
   // D, x and f are printed as dense vectors. This should only be used
   // for small problems.
-  CONSOLE,
+  kConsole,
 
   // Write out the linear least squares problem to the directory
   // pointed to by Solver::Options::lsqp_dump_directory as text files
@@ -404,40 +404,40 @@ enum DumpFormatType {
   //
   // A MATLAB/octave script called lm_iteration_???.m is also output,
   // which can be used to parse and load the problem into memory.
-  TEXTFILE
+  kTextfile
 };
 
 // For SizedCostFunction and AutoDiffCostFunction, DYNAMIC can be
 // specified for the number of residuals. If specified, then the
 // number of residuas for that cost function can vary at runtime.
 enum DimensionType {
-  DYNAMIC = -1,
+  kDynamic = -1,
 };
 
 // The differentiation method used to compute numerical derivatives in
 // NumericDiffCostFunction and DynamicNumericDiffCostFunction.
 enum NumericDiffMethodType {
   // Compute central finite difference: f'(x) ~ (f(x+h) - f(x-h)) / 2h.
-  CENTRAL,
+  kCentral,
 
   // Compute forward finite difference: f'(x) ~ (f(x+h) - f(x)) / h.
-  FORWARD,
+  kForward,
 
   // Adaptive numerical differentiation using Ridders' method. Provides more
   // accurate and robust derivatives at the expense of additional cost
   // function evaluations.
-  RIDDERS
+  kRidders
 };
 
 enum LineSearchInterpolationType {
-  BISECTION,
-  QUADRATIC,
-  CUBIC,
+  kBisection,
+  kQuadratic,
+  kCubic,
 };
 
 enum CovarianceAlgorithmType {
-  DENSE_SVD,
-  SPARSE_QR,
+  kDenseSvd,
+  kSparseQr,
 };
 
 // It is a near impossibility that user code generates this exact

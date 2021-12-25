@@ -62,34 +62,34 @@ struct SumImpl;
 // Strip of and sum the first number.
 template <typename T, T N, T... Ns>
 struct SumImpl<std::integer_sequence<T, N, Ns...>> {
-  static constexpr T Value =
-      N + SumImpl<std::integer_sequence<T, Ns...>>::Value;
+  static constexpr T kValue =
+      N + SumImpl<std::integer_sequence<T, Ns...>>::kValue;
 };
 
 // Strip of and sum the first two numbers.
 template <typename T, T N1, T N2, T... Ns>
 struct SumImpl<std::integer_sequence<T, N1, N2, Ns...>> {
-  static constexpr T Value =
-      N1 + N2 + SumImpl<std::integer_sequence<T, Ns...>>::Value;
+  static constexpr T kValue =
+      N1 + N2 + SumImpl<std::integer_sequence<T, Ns...>>::kValue;
 };
 
 // Strip of and sum the first four numbers.
 template <typename T, T N1, T N2, T N3, T N4, T... Ns>
 struct SumImpl<std::integer_sequence<T, N1, N2, N3, N4, Ns...>> {
-  static constexpr T Value =
-      N1 + N2 + N3 + N4 + SumImpl<std::integer_sequence<T, Ns...>>::Value;
+  static constexpr T kValue =
+      N1 + N2 + N3 + N4 + SumImpl<std::integer_sequence<T, Ns...>>::kValue;
 };
 
 // Only one number is left. 'Value' is just that number ('recursion' ends).
 template <typename T, T N>
 struct SumImpl<std::integer_sequence<T, N>> {
-  static constexpr T Value = N;
+  static constexpr T kValue = N;
 };
 
 // No number is left. 'Value' is the identity element (for sum this is zero).
 template <typename T>
 struct SumImpl<std::integer_sequence<T>> {
-  static constexpr T Value = T(0);
+  static constexpr T kValue = T(0);
 };
 
 // Calculate the sum of an integer sequence. The resulting sum will be stored in
@@ -99,7 +99,7 @@ class Sum {
   using T = typename Seq::value_type;
 
  public:
-  static constexpr T Value = SumImpl<Seq>::Value;
+  static constexpr T kValue = SumImpl<Seq>::kValue;
 };
 
 // Implementation of calculating an exclusive scan (exclusive prefix sum) of an

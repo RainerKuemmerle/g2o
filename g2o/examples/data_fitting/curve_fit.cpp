@@ -35,8 +35,6 @@
 #include "g2o/stuff/command_args.h"
 #include "g2o/stuff/sampler.h"
 
-using namespace std;
-
 G2O_USE_OPTIMIZATION_LIBRARY(dense);
 
 /**
@@ -45,15 +43,14 @@ G2O_USE_OPTIMIZATION_LIBRARY(dense);
 class VertexParams : public g2o::BaseVertex<3, Eigen::Vector3d> {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
-  VertexParams() {}
 
-  virtual bool read(std::istream& /*is*/) { return false; }
+  bool read(std::istream& /*is*/) override { return false; }
 
-  virtual bool write(std::ostream& /*os*/) const { return false; }
+  bool write(std::ostream& /*os*/) const override { return false; }
 
-  virtual void setToOriginImpl() {}
+  void setToOriginImpl() override {}
 
-  virtual void oplusImpl(const double* update) {
+  void oplusImpl(const double* update) override {
     Eigen::Vector3d::ConstMapType v(update);
     estimate_ += v;
   }
@@ -69,13 +66,12 @@ class VertexParams : public g2o::BaseVertex<3, Eigen::Vector3d> {
 class EdgePointOnCurve : public g2o::BaseUnaryEdge<1, Eigen::Vector2d, VertexParams> {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-  EdgePointOnCurve() {}
-  virtual bool read(std::istream& /*is*/) {
-    cerr << __PRETTY_FUNCTION__ << " not implemented yet" << endl;
+  bool read(std::istream& /*is*/) override {
+    std::cerr << __PRETTY_FUNCTION__ << " not implemented yet" << std::endl;
     return false;
   }
-  virtual bool write(std::ostream& /*os*/) const {
-    cerr << __PRETTY_FUNCTION__ << " not implemented yet" << endl;
+  bool write(std::ostream& /*os*/) const override {
+    std::cerr << __PRETTY_FUNCTION__ << " not implemented yet" << std::endl;
     return false;
   }
 
@@ -96,7 +92,7 @@ int main(int argc, char** argv) {
   int numPoints;
   int maxIterations;
   bool verbose;
-  string dumpFilename;
+  std::string dumpFilename;
   g2o::CommandArgs arg;
   arg.param("dump", dumpFilename, "", "dump the points into a file");
   arg.param("numPoints", numPoints, 50, "number of points sampled from the curve");
@@ -110,7 +106,7 @@ int main(int argc, char** argv) {
   double a = 2.;
   double b = 0.4;
   double lambda = 0.2;
-  Eigen::Vector2d* points = new Eigen::Vector2d[numPoints];
+  auto* points = new Eigen::Vector2d[numPoints];
   for (int i = 0; i < numPoints; ++i) {
     double x = g2o::Sampler::uniformRand(0, 10);
     double y = a * exp(-lambda * x) + b;
@@ -120,9 +116,9 @@ int main(int argc, char** argv) {
     points[i].y() = y;
   }
 
-  if (dumpFilename.size() > 0) {
-    ofstream fout(dumpFilename.c_str());
-    for (int i = 0; i < numPoints; ++i) fout << points[i].transpose() << endl;
+  if (!dumpFilename.empty()) {
+    std::ofstream fout(dumpFilename.c_str());
+    for (int i = 0; i < numPoints; ++i) fout << points[i].transpose() << std::endl;
   }
 
   // setup the solver
@@ -154,16 +150,16 @@ int main(int argc, char** argv) {
   optimizer.setVerbose(verbose);
   optimizer.optimize(maxIterations);
 
-  if (verbose) cout << endl;
+  if (verbose) std::cout << std::endl;
 
   // print out the result
-  cout << "Target curve" << endl;
-  cout << "a * exp(-lambda * x) + b" << endl;
-  cout << "Iterative least squares solution" << endl;
-  cout << "a      = " << params->estimate()(0) << endl;
-  cout << "b      = " << params->estimate()(1) << endl;
-  cout << "lambda = " << params->estimate()(2) << endl;
-  cout << endl;
+  std::cout << "Target curve" << std::endl;
+  std::cout << "a * exp(-lambda * x) + b" << std::endl;
+  std::cout << "Iterative least squares solution" << std::endl;
+  std::cout << "a      = " << params->estimate()(0) << std::endl;
+  std::cout << "b      = " << params->estimate()(1) << std::endl;
+  std::cout << "lambda = " << params->estimate()(2) << std::endl;
+  std::cout << std::endl;
 
   // clean up
   delete[] points;

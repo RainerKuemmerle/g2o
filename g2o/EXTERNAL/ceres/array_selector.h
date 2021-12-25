@@ -57,36 +57,36 @@ namespace internal {
 //      -> std::vector<T>(num_elements)
 //
 template <typename T,
-          int num_elements,
-          int max_num_elements_on_stack,
-          bool dynamic = (num_elements == DYNAMIC),
-          bool fits_on_stack = (num_elements <= max_num_elements_on_stack)>
+          int NumElements,
+          int MaxNumElementsOnStack,
+          bool Dynamic = (NumElements == kDynamic),
+          bool FitsOnStack = (NumElements <= MaxNumElementsOnStack)>
 struct ArraySelector {};
 
 template <typename T,
-          int num_elements,
-          int max_num_elements_on_stack,
-          bool fits_on_stack>
+          int NumElements,
+          int MaxNumElementsOnStack,
+          bool FitsOnStack>
 struct ArraySelector<T,
-                     num_elements,
-                     max_num_elements_on_stack,
+                     NumElements,
+                     MaxNumElementsOnStack,
                      true,
-                     fits_on_stack>
-    : ceres::internal::FixedArray<T, max_num_elements_on_stack> {
-  ArraySelector(int s)
-      : ceres::internal::FixedArray<T, max_num_elements_on_stack>(s) {}
+                     FitsOnStack>
+    : ceres::internal::FixedArray<T, MaxNumElementsOnStack> {
+  explicit ArraySelector(int s)
+      : ceres::internal::FixedArray<T, MaxNumElementsOnStack>(s) {}
 };
 
-template <typename T, int num_elements, int max_num_elements_on_stack>
-struct ArraySelector<T, num_elements, max_num_elements_on_stack, false, true>
-    : std::array<T, num_elements> {
-  ArraySelector(int /*s*/) {  }
+template <typename T, int NumElements, int MaxNumElementsOnStack>
+struct ArraySelector<T, NumElements, MaxNumElementsOnStack, false, true>
+    : std::array<T, NumElements> {
+  explicit ArraySelector(int /*s*/) {  }
 };
 
-template <typename T, int num_elements, int max_num_elements_on_stack>
-struct ArraySelector<T, num_elements, max_num_elements_on_stack, false, false>
+template <typename T, int NumElements, int MaxNumElementsOnStack>
+struct ArraySelector<T, NumElements, MaxNumElementsOnStack, false, false>
     : std::vector<T> {
-  ArraySelector(int s) : std::vector<T>(s) {  }
+  explicit ArraySelector(int s) : std::vector<T>(s) {  }
 };
 
 }  // namespace internal

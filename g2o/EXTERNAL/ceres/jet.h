@@ -169,8 +169,8 @@ namespace ceres {
 
 template <typename T, int N>
 struct Jet {
-  enum { DIMENSION = N };
-  typedef T Scalar;
+  enum { kDimension = N };
+  using Scalar = T;
 
   // Default-construct "a" because otherwise this can lead to false errors about
   // uninitialized uses when other classes relying on default constructed T
@@ -874,33 +874,33 @@ inline std::ostream& operator<<(std::ostream& s, const Jet<T, N>& z) {
 namespace std {
 template <typename T, int N>
 struct numeric_limits<ceres::Jet<T, N>> {
-  static constexpr bool is_specialized = true;
-  static constexpr bool is_signed = std::numeric_limits<T>::is_signed;
-  static constexpr bool is_integer = std::numeric_limits<T>::is_integer;
-  static constexpr bool is_exact = std::numeric_limits<T>::is_exact;
-  static constexpr bool has_infinity = std::numeric_limits<T>::has_infinity;
-  static constexpr bool has_quiet_NaN = std::numeric_limits<T>::has_quiet_NaN;
-  static constexpr bool has_signaling_NaN =
+  static constexpr bool is_specialized = true; // NOLINT
+  static constexpr bool is_signed = std::numeric_limits<T>::is_signed; // NOLINT
+  static constexpr bool is_integer = std::numeric_limits<T>::is_integer; // NOLINT
+  static constexpr bool is_exact = std::numeric_limits<T>::is_exact; // NOLINT
+  static constexpr bool has_infinity = std::numeric_limits<T>::has_infinity; // NOLINT
+  static constexpr bool has_quiet_NaN = std::numeric_limits<T>::has_quiet_NaN; // NOLINT
+  static constexpr bool has_signaling_NaN = // NOLINT
       std::numeric_limits<T>::has_signaling_NaN;
-  static constexpr bool is_iec559 = std::numeric_limits<T>::is_iec559;
-  static constexpr bool is_bounded = std::numeric_limits<T>::is_bounded;
-  static constexpr bool is_modulo = std::numeric_limits<T>::is_modulo;
+  static constexpr bool is_iec559 = std::numeric_limits<T>::is_iec559; // NOLINT
+  static constexpr bool is_bounded = std::numeric_limits<T>::is_bounded; // NOLINT
+  static constexpr bool is_modulo = std::numeric_limits<T>::is_modulo; // NOLINT
 
-  static constexpr std::float_denorm_style has_denorm =
+  static constexpr std::float_denorm_style has_denorm = // NOLINT
       std::numeric_limits<T>::has_denorm;
-  static constexpr std::float_round_style round_style =
+  static constexpr std::float_round_style round_style = // NOLINT
       std::numeric_limits<T>::round_style;
 
-  static constexpr int digits = std::numeric_limits<T>::digits;
-  static constexpr int digits10 = std::numeric_limits<T>::digits10;
-  static constexpr int max_digits10 = std::numeric_limits<T>::max_digits10;
-  static constexpr int radix = std::numeric_limits<T>::radix;
-  static constexpr int min_exponent = std::numeric_limits<T>::min_exponent;
-  static constexpr int min_exponent10 = std::numeric_limits<T>::max_exponent10;
-  static constexpr int max_exponent = std::numeric_limits<T>::max_exponent;
-  static constexpr int max_exponent10 = std::numeric_limits<T>::max_exponent10;
-  static constexpr bool traps = std::numeric_limits<T>::traps;
-  static constexpr bool tinyness_before =
+  static constexpr int digits = std::numeric_limits<T>::digits; // NOLINT
+  static constexpr int digits10 = std::numeric_limits<T>::digits10; // NOLINT
+  static constexpr int max_digits10 = std::numeric_limits<T>::max_digits10; // NOLINT
+  static constexpr int radix = std::numeric_limits<T>::radix; // NOLINT
+  static constexpr int min_exponent = std::numeric_limits<T>::min_exponent; // NOLINT
+  static constexpr int min_exponent10 = std::numeric_limits<T>::max_exponent10; // NOLINT
+  static constexpr int max_exponent = std::numeric_limits<T>::max_exponent; // NOLINT
+  static constexpr int max_exponent10 = std::numeric_limits<T>::max_exponent10; // NOLINT
+  static constexpr bool traps = std::numeric_limits<T>::traps; // NOLINT
+  static constexpr bool tinyness_before = // NOLINT
       std::numeric_limits<T>::tinyness_before;
 
   static constexpr ceres::Jet<T, N> min() noexcept {
@@ -941,10 +941,10 @@ namespace Eigen {
 // Eigen arrays, getting all the goodness of Eigen combined with autodiff.
 template <typename T, int N>
 struct NumTraits<ceres::Jet<T, N>> {
-  typedef ceres::Jet<T, N> Real;
-  typedef ceres::Jet<T, N> NonInteger;
-  typedef ceres::Jet<T, N> Nested;
-  typedef ceres::Jet<T, N> Literal;
+  using Real = ceres::Jet<T, N>;
+  using NonInteger = ceres::Jet<T, N>;
+  using Nested = ceres::Jet<T, N>;
+  using Literal = ceres::Jet<T, N>;
 
   static typename ceres::Jet<T, N> dummy_precision() {
     return ceres::Jet<T, N>(1e-12);
@@ -957,29 +957,29 @@ struct NumTraits<ceres::Jet<T, N>> {
   static inline int digits10() { return NumTraits<T>::digits10(); }
 
   enum {
-    IsComplex = 0,
-    IsInteger = 0,
-    IsSigned,
-    ReadCost = 1,
-    AddCost = 1,
+    IsComplex = 0, // NOLINT
+    IsInteger = 0, // NOLINT
+    IsSigned, // NOLINT
+    ReadCost = 1, // NOLINT
+    AddCost = 1, // NOLINT
     // For Jet types, multiplication is more expensive than addition.
-    MulCost = 3,
-    HasFloatingPoint = 1,
-    RequireInitialization = 1
+    MulCost = 3, // NOLINT
+    HasFloatingPoint = 1, // NOLINT
+    RequireInitialization = 1 // NOLINT
   };
 
   template <bool Vectorized>
   struct Div {
     enum {
 #if defined(EIGEN_VECTORIZE_AVX)
-      AVX = true,
+      AVX = true, // NOLINT
 #else
-      AVX = false,
+      AVX = false, // NOLINT
 #endif
 
       // Assuming that for Jets, division is as expensive as
       // multiplication.
-      Cost = 3
+      Cost = 3 // NOLINT
     };
   };
 
@@ -995,11 +995,11 @@ struct NumTraits<ceres::Jet<T, N>> {
 // is only available on Eigen versions >= 3.3
 template <typename BinaryOp, typename T, int N>
 struct ScalarBinaryOpTraits<ceres::Jet<T, N>, T, BinaryOp> {
-  typedef ceres::Jet<T, N> ReturnType;
+  using ReturnType = ceres::Jet<T, N>;
 };
 template <typename BinaryOp, typename T, int N>
 struct ScalarBinaryOpTraits<T, ceres::Jet<T, N>, BinaryOp> {
-  typedef ceres::Jet<T, N> ReturnType;
+  using ReturnType = ceres::Jet<T, N>;
 };
 
 }  // namespace Eigen

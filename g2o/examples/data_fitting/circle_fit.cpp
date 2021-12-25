@@ -36,8 +36,6 @@
 #include "g2o/stuff/command_args.h"
 #include "g2o/stuff/sampler.h"
 
-using namespace std;
-
 G2O_USE_OPTIMIZATION_LIBRARY(dense);
 
 double errorOfSolution(int numPoints, Eigen::Vector2d* points, const Eigen::Vector3d& circle) {
@@ -57,15 +55,14 @@ double errorOfSolution(int numPoints, Eigen::Vector2d* points, const Eigen::Vect
 class VertexCircle : public g2o::BaseVertex<3, Eigen::Vector3d> {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
-  VertexCircle() {}
 
-  virtual bool read(std::istream& /*is*/) { return false; }
+  bool read(std::istream& /*is*/) override { return false; }
 
-  virtual bool write(std::ostream& /*os*/) const { return false; }
+  bool write(std::ostream& /*os*/) const override { return false; }
 
-  virtual void setToOriginImpl() { cerr << __PRETTY_FUNCTION__ << " not implemented yet" << endl; }
+  void setToOriginImpl() override { std::cerr << __PRETTY_FUNCTION__ << " not implemented yet" << std::endl; }
 
-  virtual void oplusImpl(const double* update) {
+  void oplusImpl(const double* update) override {
     Eigen::Vector3d::ConstMapType v(update);
     estimate_ += v;
   }
@@ -81,9 +78,8 @@ class VertexCircle : public g2o::BaseVertex<3, Eigen::Vector3d> {
 class EdgePointOnCircle : public g2o::BaseUnaryEdge<1, Eigen::Vector2d, VertexCircle> {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-  EdgePointOnCircle() {}
-  virtual bool read(std::istream& /*is*/) { return false; }
-  virtual bool write(std::ostream& /*os*/) const { return false; }
+  bool read(std::istream& /*is*/) override { return false; }
+  bool write(std::ostream& /*os*/) const override { return false; }
 
   template <typename T>
   bool operator()(const T* circle, T* error) const {
@@ -110,7 +106,7 @@ int main(int argc, char** argv) {
   // generate random data
   Eigen::Vector2d center(4.0, 2.0);
   double radius = 2.0;
-  Eigen::Vector2d* points = new Eigen::Vector2d[numPoints];
+  auto* points = new Eigen::Vector2d[numPoints];
 
   g2o::Sampler::seedRand();
   for (int i = 0; i < numPoints; ++i) {
@@ -149,14 +145,14 @@ int main(int argc, char** argv) {
   optimizer.setVerbose(verbose);
   optimizer.optimize(maxIterations);
 
-  if (verbose) cout << endl;
+  if (verbose) std::cout << std::endl;
 
   // print out the result
-  cout << "Iterative least squares solution" << endl;
-  cout << "center of the circle " << circle->estimate().head<2>().transpose() << endl;
-  cout << "radius of the cirlce " << circle->estimate()(2) << endl;
-  cout << "error " << errorOfSolution(numPoints, points, circle->estimate()) << endl;
-  cout << endl;
+  std::cout << "Iterative least squares solution" << std::endl;
+  std::cout << "center of the circle " << circle->estimate().head<2>().transpose() << std::endl;
+  std::cout << "radius of the cirlce " << circle->estimate()(2) << std::endl;
+  std::cout << "error " << errorOfSolution(numPoints, points, circle->estimate()) << std::endl;
+  std::cout << std::endl;
 
   // solve by linear least squares
   // Let (a, b) be the center of the circle and r the radius of the circle.
@@ -179,10 +175,10 @@ int main(int argc, char** argv) {
   Eigen::Vector3d solution = (A.transpose() * A).ldlt().solve(A.transpose() * b);
   // calculate the radius of the circle given the solution so far
   solution(2) = sqrt(pow(solution(0), 2) + pow(solution(1), 2) - solution(2));
-  cout << "Linear least squares solution" << endl;
-  cout << "center of the circle " << solution.head<2>().transpose() << endl;
-  cout << "radius of the cirlce " << solution(2) << endl;
-  cout << "error " << errorOfSolution(numPoints, points, solution) << endl;
+  std::cout << "Linear least squares solution" << std::endl;
+  std::cout << "center of the circle " << solution.head<2>().transpose() << std::endl;
+  std::cout << "radius of the cirlce " << solution(2) << std::endl;
+  std::cout << "error " << errorOfSolution(numPoints, points, solution) << std::endl;
 
   // clean up
   delete[] points;

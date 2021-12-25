@@ -82,9 +82,9 @@ class ParameterDims {
                 "At least one parameter block must be specified.");
 
   static constexpr int kNumParameters =
-      Sum<std::integer_sequence<int, Ns...>>::Value;
+      Sum<std::integer_sequence<int, Ns...>>::kValue;
 
-  static constexpr int GetDim(int dim) { return params_[dim]; }
+  static constexpr int GetDim(int dim) { return kParams[dim]; }
 
   // If one has all parameters packed into a single array this function unpacks
   // the parameters.
@@ -102,7 +102,7 @@ class ParameterDims {
     return std::array<T*, kNumParameterBlocks>{{ptr + Indices...}};
   }
 
-  static constexpr std::array<int, kNumParameterBlocks> params_{Ns...};
+  static constexpr std::array<int, kNumParameterBlocks> kParams{Ns...};
 };
 
 // Even static constexpr member variables needs to be defined (not only
@@ -110,7 +110,7 @@ class ParameterDims {
 // be in the header file.
 template <bool IsDynamic, int... Ns>
 constexpr std::array<int, ParameterDims<IsDynamic, Ns...>::kNumParameterBlocks>
-    ParameterDims<IsDynamic, Ns...>::params_;
+    ParameterDims<IsDynamic, Ns...>::kParams;
 
 // Using declarations for static and dynamic parameter dims. This makes client
 // code easier to read.

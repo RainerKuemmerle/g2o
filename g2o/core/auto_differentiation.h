@@ -49,9 +49,9 @@ namespace g2o {
  */
 template <typename Edge>
 struct EstimateAccessor {
-  template <int k>
+  template <int K>
   EIGEN_STRONG_INLINE number_t* data(Edge* that) {
-    return const_cast<number_t*>(that->template vertexXn<k>()->estimate().data());
+    return const_cast<number_t*>(that->template vertexXn<K>()->estimate().data());
   }
 };
 
@@ -67,12 +67,12 @@ struct EstimateAccessor {
 template <typename Edge>
 class EstimateAccessorGet {
  public:
-  template <int k>
+  template <int K>
   EIGEN_STRONG_INLINE number_t* data(Edge* that) {
-    auto& buffer = std::get<k>(_estimateBuffer);
-    buffer.resize(that->template vertexDimension<k>());
-    number_t* rawBuffer = const_cast<number_t*>(buffer.data());
-    bool gotData = that->template vertexXn<k>()->getEstimateData(rawBuffer);
+    auto& buffer = std::get<K>(estimateBuffer_);
+    buffer.resize(that->template vertexDimension<K>());
+    auto* rawBuffer = const_cast<number_t*>(buffer.data());
+    bool gotData = that->template vertexXn<K>()->getEstimateData(rawBuffer);
     assert(gotData && "Called getEstimateData, but seems unimplmented");
     return gotData ? rawBuffer : nullptr;
   }
@@ -86,7 +86,7 @@ class EstimateAccessorGet {
   };
 
   using Buffer = typename BufferType<std::make_index_sequence<Edge::kNrOfVertices>>::type;
-  Buffer _estimateBuffer;
+  Buffer estimateBuffer_;
 };
 
 /**
@@ -238,7 +238,7 @@ class AutoDifferentiation {
   template <typename A, typename B>
   static EIGEN_STRONG_INLINE void assign(const Eigen::MatrixBase<A>& a,
                                          const Eigen::MatrixBase<B>& b) {
-    Eigen::MatrixBase<A>& aux = const_cast<Eigen::MatrixBase<A>&>(a);
+    auto& aux = const_cast<Eigen::MatrixBase<A>&>(a);
     aux = b;
   }
 };
@@ -247,11 +247,11 @@ class AutoDifferentiation {
 
 // helper macros for fine-grained integration into own types
 #define G2O_MAKE_AUTO_AD_COMPUTEERROR                                                           \
-  void computeError() {                                                                         \
+  void computeError() override {                                                                         \
     g2o::AutoDifferentiation<std::remove_reference<decltype(*this)>::type>::computeError(this); \
   }
 #define G2O_MAKE_AUTO_AD_LINEARIZEOPLUS                                                      \
-  void linearizeOplus() {                                                                    \
+  void linearizeOplus() override {                                                                    \
     g2o::AutoDifferentiation<std::remove_reference<decltype(*this)>::type>::linearize(this); \
   }
 
@@ -264,13 +264,13 @@ class AutoDifferentiation {
 
 // helper macros for fine-grained integration into own types using EstimateAccessorGet
 #define G2O_MAKE_AUTO_AD_COMPUTEERROR_BY_GET                                                    \
-  void computeError() {                                                                         \
+  void computeError() override {                                                                         \
     using EdgeType = std::remove_reference<decltype(*this)>::type;                              \
     g2o::AutoDifferentiation<EdgeType, g2o::EstimateAccessorGet<EdgeType>>::computeError(this); \
   }
 
 #define G2O_MAKE_AUTO_AD_LINEARIZEOPLUS_BY_GET                                               \
-  void linearizeOplus() {                                                                    \
+  void linearizeOplus() override {                                                                    \
     using EdgeType = std::remove_reference<decltype(*this)>::type;                           \
     g2o::AutoDifferentiation<EdgeType, g2o::EstimateAccessorGet<EdgeType>>::linearize(this); \
   }
