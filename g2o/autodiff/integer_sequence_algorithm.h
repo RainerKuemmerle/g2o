@@ -37,6 +37,7 @@
 
 #include <utility>
 
+namespace g2o {
 namespace ceres {
 namespace internal {
 
@@ -130,14 +131,10 @@ template <typename T, T Sum, typename SeqIn, typename SeqOut>
 struct ExclusiveScanImpl;
 
 template <typename T, T Sum, T N, T... Ns, T... Rs>
-struct ExclusiveScanImpl<T,
-                         Sum,
-                         std::integer_sequence<T, N, Ns...>,
+struct ExclusiveScanImpl<T, Sum, std::integer_sequence<T, N, Ns...>,
                          std::integer_sequence<T, Rs...>> {
   using Type =
-      typename ExclusiveScanImpl<T,
-                                 Sum + N,
-                                 std::integer_sequence<T, Ns...>,
+      typename ExclusiveScanImpl<T, Sum + N, std::integer_sequence<T, Ns...>,
                                  std::integer_sequence<T, Rs..., Sum>>::Type;
 };
 
@@ -166,5 +163,6 @@ using ExclusiveScan = typename ExclusiveScanT<Seq>::Type;
 
 }  // namespace internal
 }  // namespace ceres
+}  // namespace g2o
 
 #endif  // G2O_CERES_PUBLIC_INTERNAL_INTEGER_SEQUENCE_ALGORITHM_H_

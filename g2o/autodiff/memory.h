@@ -29,29 +29,28 @@
 #define G2O_CERES_INTERNAL_TRY try
 #define G2O_CERES_INTERNAL_CATCH_ANY catch (...)
 #define G2O_CERES_INTERNAL_RETHROW \
-  do {                         \
-    throw;                     \
+  do {                             \
+    throw;                         \
   } while (false)
 #else  // G2O_CERES_HAVE_EXCEPTIONS
 #define G2O_CERES_INTERNAL_TRY if (true)
 #define G2O_CERES_INTERNAL_CATCH_ANY else if (false)
 #define G2O_CERES_INTERNAL_RETHROW \
-  do {                         \
+  do {                             \
   } while (false)
 #endif  // G2O_CERES_HAVE_EXCEPTIONS
 
+namespace g2o {
 namespace ceres {
 namespace internal {
 
 template <typename Allocator, typename Iterator, typename... Args>
-void ConstructRange(Allocator& alloc,
-                    Iterator first,
-                    Iterator last,
+void ConstructRange(Allocator& alloc, Iterator first, Iterator last,
                     const Args&... args) {
   for (Iterator cur = first; cur != last; ++cur) {
     G2O_CERES_INTERNAL_TRY {
-      std::allocator_traits<Allocator>::construct(
-          alloc, std::addressof(*cur), args...);
+      std::allocator_traits<Allocator>::construct(alloc, std::addressof(*cur),
+                                                  args...);
     }
     G2O_CERES_INTERNAL_CATCH_ANY {
       while (cur != first) {
@@ -64,15 +63,13 @@ void ConstructRange(Allocator& alloc,
 }
 
 template <typename Allocator, typename Iterator, typename InputIterator>
-void CopyRange(Allocator& alloc,
-               Iterator destination,
-               InputIterator first,
+void CopyRange(Allocator& alloc, Iterator destination, InputIterator first,
                InputIterator last) {
   for (Iterator cur = destination; first != last;
        static_cast<void>(++cur), static_cast<void>(++first)) {
     G2O_CERES_INTERNAL_TRY {
-      std::allocator_traits<Allocator>::construct(
-          alloc, std::addressof(*cur), *first);
+      std::allocator_traits<Allocator>::construct(alloc, std::addressof(*cur),
+                                                  *first);
     }
     G2O_CERES_INTERNAL_CATCH_ANY {
       while (cur != destination) {
@@ -86,5 +83,6 @@ void CopyRange(Allocator& alloc,
 
 }  // namespace internal
 }  // namespace ceres
+}  // namespace g2o
 
 #endif  // G2O_CERES_PUBLIC_INTERNAL_MEMORY_H_

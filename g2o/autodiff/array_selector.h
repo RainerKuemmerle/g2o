@@ -38,6 +38,7 @@
 #include "fixed_array.h"
 #include "types.h"
 
+namespace g2o {
 namespace ceres {
 namespace internal {
 
@@ -56,22 +57,14 @@ namespace internal {
 //   num_elements != DYNAMIC  &&  num_elements >  max_stack_size
 //      -> std::vector<T>(num_elements)
 //
-template <typename T,
-          int NumElements,
-          int MaxNumElementsOnStack,
+template <typename T, int NumElements, int MaxNumElementsOnStack,
           bool Dynamic = (NumElements == kDynamic),
           bool FitsOnStack = (NumElements <= MaxNumElementsOnStack)>
 struct ArraySelector {};
 
-template <typename T,
-          int NumElements,
-          int MaxNumElementsOnStack,
+template <typename T, int NumElements, int MaxNumElementsOnStack,
           bool FitsOnStack>
-struct ArraySelector<T,
-                     NumElements,
-                     MaxNumElementsOnStack,
-                     true,
-                     FitsOnStack>
+struct ArraySelector<T, NumElements, MaxNumElementsOnStack, true, FitsOnStack>
     : ceres::internal::FixedArray<T, MaxNumElementsOnStack> {
   explicit ArraySelector(int s)
       : ceres::internal::FixedArray<T, MaxNumElementsOnStack>(s) {}
@@ -80,16 +73,17 @@ struct ArraySelector<T,
 template <typename T, int NumElements, int MaxNumElementsOnStack>
 struct ArraySelector<T, NumElements, MaxNumElementsOnStack, false, true>
     : std::array<T, NumElements> {
-  explicit ArraySelector(int /*s*/) {  }
+  explicit ArraySelector(int /*s*/) {}
 };
 
 template <typename T, int NumElements, int MaxNumElementsOnStack>
 struct ArraySelector<T, NumElements, MaxNumElementsOnStack, false, false>
     : std::vector<T> {
-  explicit ArraySelector(int s) : std::vector<T>(s) {  }
+  explicit ArraySelector(int s) : std::vector<T>(s) {}
 };
 
 }  // namespace internal
 }  // namespace ceres
+}  // namespace g2o
 
 #endif  // G2O_CERES_PUBLIC_INTERNAL_ARRAY_SELECTOR_H_

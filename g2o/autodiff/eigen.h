@@ -33,27 +33,34 @@
 
 #include "Eigen/Core"
 
+namespace g2o {
 namespace ceres {
 
 using Vector = Eigen::Matrix<double, Eigen::Dynamic, 1>;
-using Matrix = Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>;
+using Matrix =
+    Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>;
 using VectorRef = Eigen::Map<Vector>;
 using MatrixRef = Eigen::Map<Matrix>;
 using ConstVectorRef = Eigen::Map<const Vector>;
 using ConstMatrixRef = Eigen::Map<const Matrix>;
 
 // Column major matrices for DenseSparseMatrix/DenseQRSolver
-using ColMajorMatrix = Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::ColMajor>;
+using ColMajorMatrix =
+    Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::ColMajor>;
 
-using ColMajorMatrixRef = Eigen::Map<ColMajorMatrix, 0, Eigen::Stride<Eigen::Dynamic, 1>>;
+using ColMajorMatrixRef =
+    Eigen::Map<ColMajorMatrix, 0, Eigen::Stride<Eigen::Dynamic, 1>>;
 
-using ConstColMajorMatrixRef = Eigen::Map<const ColMajorMatrix, 0, Eigen::Stride<Eigen::Dynamic, 1>>;
+using ConstColMajorMatrixRef =
+    Eigen::Map<const ColMajorMatrix, 0, Eigen::Stride<Eigen::Dynamic, 1>>;
 
 // C++ does not support templated typdefs, thus the need for this
 // struct so that we can support statically sized Matrix and Maps.
 template <int NumRows = Eigen::Dynamic, int NumCols = Eigen::Dynamic>
 struct EigenTypes {
-  using Matrix = Eigen::Matrix<double, NumRows, NumCols, NumCols == 1 ? Eigen::ColMajor : Eigen::RowMajor>;
+  using Matrix =
+      Eigen::Matrix<double, NumRows, NumCols,
+                    NumCols == 1 ? Eigen::ColMajor : Eigen::RowMajor>;
 
   using MatrixRef = Eigen::Map<Matrix>;
   using ConstMatrixRef = Eigen::Map<const Matrix>;
@@ -63,5 +70,6 @@ struct EigenTypes {
 };
 
 }  // namespace ceres
+}  // namespace g2o
 
 #endif  // G2O_CERES_INTERNAL_EIGEN_H_

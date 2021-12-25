@@ -165,6 +165,7 @@
 
 #include "Eigen/Core"
 
+namespace g2o {
 namespace ceres {
 
 template <typename T, int N>
@@ -352,7 +353,7 @@ inline Jet<T, N> operator/(const Jet<T, N>& f, T s) {
 }
 
 // Binary comparison operators for both scalars and jets.
-#define G2O_CERES_DEFINE_JET_COMPARISON_OPERATOR(op)                    \
+#define G2O_CERES_DEFINE_JET_COMPARISON_OPERATOR(op)                \
   template <typename T, int N>                                      \
   inline bool operator op(const Jet<T, N>& f, const Jet<T, N>& g) { \
     return f.a op g.a;                                              \
@@ -870,26 +871,25 @@ inline std::ostream& operator<<(std::ostream& s, const Jet<T, N>& z) {
   return s;
 }
 }  // namespace ceres
+}  // namespace g2o
 
 namespace std {
+// clang-format off
 template <typename T, int N>
-struct numeric_limits<ceres::Jet<T, N>> {
+struct numeric_limits<g2o::ceres::Jet<T, N>> {
   static constexpr bool is_specialized = true; // NOLINT
   static constexpr bool is_signed = std::numeric_limits<T>::is_signed; // NOLINT
   static constexpr bool is_integer = std::numeric_limits<T>::is_integer; // NOLINT
   static constexpr bool is_exact = std::numeric_limits<T>::is_exact; // NOLINT
   static constexpr bool has_infinity = std::numeric_limits<T>::has_infinity; // NOLINT
   static constexpr bool has_quiet_NaN = std::numeric_limits<T>::has_quiet_NaN; // NOLINT
-  static constexpr bool has_signaling_NaN = // NOLINT
-      std::numeric_limits<T>::has_signaling_NaN;
+  static constexpr bool has_signaling_NaN = std::numeric_limits<T>::has_signaling_NaN; // NOLINT
   static constexpr bool is_iec559 = std::numeric_limits<T>::is_iec559; // NOLINT
   static constexpr bool is_bounded = std::numeric_limits<T>::is_bounded; // NOLINT
   static constexpr bool is_modulo = std::numeric_limits<T>::is_modulo; // NOLINT
 
-  static constexpr std::float_denorm_style has_denorm = // NOLINT
-      std::numeric_limits<T>::has_denorm;
-  static constexpr std::float_round_style round_style = // NOLINT
-      std::numeric_limits<T>::round_style;
+  static constexpr std::float_denorm_style has_denorm = std::numeric_limits<T>::has_denorm; // NOLINT
+  static constexpr std::float_round_style round_style = std::numeric_limits<T>::round_style; // NOLINT
 
   static constexpr int digits = std::numeric_limits<T>::digits; // NOLINT
   static constexpr int digits10 = std::numeric_limits<T>::digits10; // NOLINT
@@ -900,38 +900,38 @@ struct numeric_limits<ceres::Jet<T, N>> {
   static constexpr int max_exponent = std::numeric_limits<T>::max_exponent; // NOLINT
   static constexpr int max_exponent10 = std::numeric_limits<T>::max_exponent10; // NOLINT
   static constexpr bool traps = std::numeric_limits<T>::traps; // NOLINT
-  static constexpr bool tinyness_before = // NOLINT
-      std::numeric_limits<T>::tinyness_before;
+  static constexpr bool tinyness_before = std::numeric_limits<T>::tinyness_before; // NOLINT
 
-  static constexpr ceres::Jet<T, N> min() noexcept {
-    return ceres::Jet<T, N>(std::numeric_limits<T>::min());
+  static constexpr g2o::ceres::Jet<T, N> min() noexcept {
+    return g2o::ceres::Jet<T, N>(std::numeric_limits<T>::min());
   }
-  static constexpr ceres::Jet<T, N> lowest() noexcept {
-    return ceres::Jet<T, N>(std::numeric_limits<T>::lowest());
+  static constexpr g2o::ceres::Jet<T, N> lowest() noexcept {
+    return g2o::ceres::Jet<T, N>(std::numeric_limits<T>::lowest());
   }
-  static constexpr ceres::Jet<T, N> epsilon() noexcept {
-    return ceres::Jet<T, N>(std::numeric_limits<T>::epsilon());
+  static constexpr g2o::ceres::Jet<T, N> epsilon() noexcept {
+    return g2o::ceres::Jet<T, N>(std::numeric_limits<T>::epsilon());
   }
-  static constexpr ceres::Jet<T, N> round_error() noexcept {
-    return ceres::Jet<T, N>(std::numeric_limits<T>::round_error());
+  static constexpr g2o::ceres::Jet<T, N> round_error() noexcept {
+    return g2o::ceres::Jet<T, N>(std::numeric_limits<T>::round_error());
   }
-  static constexpr ceres::Jet<T, N> infinity() noexcept {
-    return ceres::Jet<T, N>(std::numeric_limits<T>::infinity());
+  static constexpr g2o::ceres::Jet<T, N> infinity() noexcept {
+    return g2o::ceres::Jet<T, N>(std::numeric_limits<T>::infinity());
   }
-  static constexpr ceres::Jet<T, N> quiet_NaN() noexcept {
-    return ceres::Jet<T, N>(std::numeric_limits<T>::quiet_NaN());
+  static constexpr g2o::ceres::Jet<T, N> quiet_NaN() noexcept {
+    return g2o::ceres::Jet<T, N>(std::numeric_limits<T>::quiet_NaN());
   }
-  static constexpr ceres::Jet<T, N> signaling_NaN() noexcept {
-    return ceres::Jet<T, N>(std::numeric_limits<T>::signaling_NaN());
+  static constexpr g2o::ceres::Jet<T, N> signaling_NaN() noexcept {
+    return g2o::ceres::Jet<T, N>(std::numeric_limits<T>::signaling_NaN());
   }
-  static constexpr ceres::Jet<T, N> denorm_min() noexcept {
-    return ceres::Jet<T, N>(std::numeric_limits<T>::denorm_min());
+  static constexpr g2o::ceres::Jet<T, N> denorm_min() noexcept {
+    return g2o::ceres::Jet<T, N>(std::numeric_limits<T>::denorm_min());
   }
 
-  static constexpr ceres::Jet<T, N> max() noexcept {
-    return ceres::Jet<T, N>(std::numeric_limits<T>::max());
+  static constexpr g2o::ceres::Jet<T, N> max() noexcept {
+    return g2o::ceres::Jet<T, N>(std::numeric_limits<T>::max());
   }
 };
+// clang-format on
 
 }  // namespace std
 
@@ -940,14 +940,14 @@ namespace Eigen {
 // Creating a specialization of NumTraits enables placing Jet objects inside
 // Eigen arrays, getting all the goodness of Eigen combined with autodiff.
 template <typename T, int N>
-struct NumTraits<ceres::Jet<T, N>> {
-  using Real = ceres::Jet<T, N>;
-  using NonInteger = ceres::Jet<T, N>;
-  using Nested = ceres::Jet<T, N>;
-  using Literal = ceres::Jet<T, N>;
+struct NumTraits<g2o::ceres::Jet<T, N>> {
+  using Real = g2o::ceres::Jet<T, N>;
+  using NonInteger = g2o::ceres::Jet<T, N>;
+  using Nested = g2o::ceres::Jet<T, N>;
+  using Literal = g2o::ceres::Jet<T, N>;
 
-  static typename ceres::Jet<T, N> dummy_precision() {
-    return ceres::Jet<T, N>(1e-12);
+  static typename g2o::ceres::Jet<T, N> dummy_precision() {
+    return g2o::ceres::Jet<T, N>(1e-12);
   }
 
   static inline Real epsilon() {
@@ -957,29 +957,29 @@ struct NumTraits<ceres::Jet<T, N>> {
   static inline int digits10() { return NumTraits<T>::digits10(); }
 
   enum {
-    IsComplex = 0, // NOLINT
-    IsInteger = 0, // NOLINT
-    IsSigned, // NOLINT
-    ReadCost = 1, // NOLINT
-    AddCost = 1, // NOLINT
+    IsComplex = 0,  // NOLINT
+    IsInteger = 0,  // NOLINT
+    IsSigned,       // NOLINT
+    ReadCost = 1,   // NOLINT
+    AddCost = 1,    // NOLINT
     // For Jet types, multiplication is more expensive than addition.
-    MulCost = 3, // NOLINT
-    HasFloatingPoint = 1, // NOLINT
-    RequireInitialization = 1 // NOLINT
+    MulCost = 3,               // NOLINT
+    HasFloatingPoint = 1,      // NOLINT
+    RequireInitialization = 1  // NOLINT
   };
 
   template <bool Vectorized>
   struct Div {
     enum {
 #if defined(EIGEN_VECTORIZE_AVX)
-      AVX = true, // NOLINT
+      AVX = true,  // NOLINT
 #else
-      AVX = false, // NOLINT
+      AVX = false,  // NOLINT
 #endif
 
       // Assuming that for Jets, division is as expensive as
       // multiplication.
-      Cost = 3 // NOLINT
+      Cost = 3  // NOLINT
     };
   };
 
@@ -994,12 +994,12 @@ struct NumTraits<ceres::Jet<T, N>> {
 // performance by using the optimized scalar-to-Jet binary operations but
 // is only available on Eigen versions >= 3.3
 template <typename BinaryOp, typename T, int N>
-struct ScalarBinaryOpTraits<ceres::Jet<T, N>, T, BinaryOp> {
-  using ReturnType = ceres::Jet<T, N>;
+struct ScalarBinaryOpTraits<g2o::ceres::Jet<T, N>, T, BinaryOp> {
+  using ReturnType = g2o::ceres::Jet<T, N>;
 };
 template <typename BinaryOp, typename T, int N>
-struct ScalarBinaryOpTraits<T, ceres::Jet<T, N>, BinaryOp> {
-  using ReturnType = ceres::Jet<T, N>;
+struct ScalarBinaryOpTraits<T, g2o::ceres::Jet<T, N>, BinaryOp> {
+  using ReturnType = g2o::ceres::Jet<T, N>;
 };
 
 }  // namespace Eigen
