@@ -34,38 +34,37 @@
 using namespace std;
 using namespace g2o;
 
+namespace {
 struct RandomSBACam {
-  static SBACam create() { return SBACam(); } // TODO Randomize
+  static SBACam create() { return SBACam(); }  // TODO Randomize
   static bool isApprox(const SBACam& a, const SBACam& b) {
     return a.toVector().isApprox(b.toVector(), 1e-5) && a.Kcam.isApprox(b.Kcam, 1e-5);
   }
 };
 
+struct RandomSE3Quat {
+  static SE3Quat create() { return SE3Quat(); }  // TODO Randomize
+  static bool isApprox(const SE3Quat& a, const SE3Quat& b) {
+    return a.toVector().isApprox(b.toVector(), 1e-5);
+  }
+};
+}  // namespace
+
 /*
  * VERTEX Tests
  */
-TEST(IoSba, ReadWriteVertexIntrinsics) {
-  readWriteVectorBasedVertex<VertexIntrinsics>();
-}
+TEST(IoSba, ReadWriteVertexIntrinsics) { readWriteVectorBasedVertex<VertexIntrinsics>(); }
 
-TEST(IoSba, ReadWriteVertexCam) {
-  readWriteVectorBasedVertex<VertexCam, RandomSBACam>();
-}
+TEST(IoSba, ReadWriteVertexCam) { readWriteVectorBasedVertex<VertexCam, RandomSBACam>(); }
 
 /*
  * EDGE Tests
  */
-TEST(IoSba, ReadWriteEdgeProjectP2MC) {
-  readWriteVectorBasedEdge<EdgeProjectP2MC>();
-}
+TEST(IoSba, ReadWriteEdgeProjectP2MC) { readWriteVectorBasedEdge<EdgeProjectP2MC>(); }
 
-TEST(IoSba, ReadWriteEdgeProjectP2SC) {
-  readWriteVectorBasedEdge<EdgeProjectP2SC>();
-}
+TEST(IoSba, ReadWriteEdgeProjectP2SC) { readWriteVectorBasedEdge<EdgeProjectP2SC>(); }
 
-TEST(IoSba, ReadWriteEdgeSBACam) {
-  readWriteVectorBasedEdge<EdgeSBACam, RandomSBACam>();
-}
+TEST(IoSba, ReadWriteEdgeSBACam) { readWriteVectorBasedEdge<EdgeSBACam, RandomSE3Quat>(); }
 
 TEST(IoSba, ReadWriteEdgeSBAScale) {
   readWriteVectorBasedEdge<EdgeSBAScale, internal::RandomDouble>();

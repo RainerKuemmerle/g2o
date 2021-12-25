@@ -34,7 +34,7 @@ VertexSE2::VertexSE2() : BaseVertex<3, SE2>() {}
 bool VertexSE2::read(std::istream& is) {
   Eigen::Vector3d p;
   is >> p[0] >> p[1] >> p[2];
-  _estimate.fromVector(p);
+  estimate_.fromVector(p);
   return true;
 }
 

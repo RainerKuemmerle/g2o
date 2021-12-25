@@ -221,7 +221,7 @@ int main(int argc, const char* argv[]) {
                         g2o::Sampler::gaussRand(0., PIXEL_NOISE),
                         g2o::Sampler::gaussRand(0., PIXEL_NOISE / 16.0));
 
-          auto e = std::make_shared<g2o::Edge_XYZ_VSC>();
+          auto e = std::make_shared<g2o::EdgeXyzVsc>();
 
           e->vertices()[0] = v_p;
 

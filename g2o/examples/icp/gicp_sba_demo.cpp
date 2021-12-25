@@ -134,7 +134,7 @@ int main(int argc, char** argv) {
     nm1.normalize();
 
     auto e  // new edge with correct cohort for caching
-        = std::make_shared<Edge_V_V_GICP>();
+        = std::make_shared<EdgeVVGicp>();
 
     e->vertices()[0]  // first viewpoint
         = vp0;
@@ -195,7 +195,7 @@ int main(int argc, char** argv) {
             Vector3d(g2o::Sampler::gaussRand(0., pix_noise), g2o::Sampler::gaussRand(0., pix_noise),
                      g2o::Sampler::gaussRand(0., pix_noise / 16.0));
 
-        auto e = std::make_shared<g2o::Edge_XYZ_VSC>();
+        auto e = std::make_shared<g2o::EdgeXyzVsc>();
 
         e->vertices()[0] = v_p;
 

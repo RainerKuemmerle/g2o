@@ -59,7 +59,7 @@ void EdgeSE2PureCalib::computeError()
 
   SE2 laserMotionInRobotFrame = laserOffset->estimate() * measurement().laserMotion * laserOffset->estimate().inverse();
   SE2 delta = Ku_ij.inverse() * laserMotionInRobotFrame;
-  _error = delta.toVector();
+  error_ = delta.toVector();
 }
 
 } // end namespace

@@ -82,10 +82,10 @@ class EstimateAccessorGet {
   struct BufferType;
   template <std::size_t... Ints>
   struct BufferType<std::index_sequence<Ints...>> {
-    using type = std::tuple<VectorN<Edge::template VertexXnType<Ints>::Dimension>...>;
+    using type = std::tuple<VectorN<Edge::template VertexXnType<Ints>::kDimension>...>;
   };
 
-  using Buffer = typename BufferType<std::make_index_sequence<Edge::_nr_of_vertices>>::type;
+  using Buffer = typename BufferType<std::make_index_sequence<Edge::kNrOfVertices>>::type;
   Buffer _estimateBuffer;
 };
 
@@ -158,8 +158,8 @@ class AutoDifferentiation {
 
   //! helper for computing the error based on the functor in the edge
   static void computeError(Edge* that) {
-    static_assert(Edge::Dimension > 0, "Dynamically sized edges are not supported");
-    computeErrorNs(that, std::make_index_sequence<Edge::_nr_of_vertices>());
+    static_assert(Edge::kDimension > 0, "Dynamically sized edges are not supported");
+    computeErrorNs(that, std::make_index_sequence<Edge::kNrOfVertices>());
   }
 
   /**
@@ -170,15 +170,15 @@ class AutoDifferentiation {
    * evaluation of the Jacobian.
    */
   static void linearize(Edge* that) {
-    static_assert(Edge::Dimension > 0, "Dynamically sized edges are not supported");
-    linearizeOplusNs(that, std::make_index_sequence<Edge::_nr_of_vertices>());
+    static_assert(Edge::kDimension > 0, "Dynamically sized edges are not supported");
+    linearizeOplusNs(that, std::make_index_sequence<Edge::kNrOfVertices>());
   }
 
  protected:
   //! packed version to call the functor that evaluates the error function
   template <std::size_t... Ints>
   static void computeErrorNs(Edge* that, std::index_sequence<Ints...>) {
-    static_assert(std::min({Edge::template VertexXnType<Ints>::Dimension...}) > 0,
+    static_assert(std::min({Edge::template VertexXnType<Ints>::kDimension...}) > 0,
                   "Dynamically sized vertices are not supported");
     EstimateAccess estimateAccess;
     (*that)(estimateAccess.template data<Ints>(that)..., that->errorData());
@@ -189,7 +189,7 @@ class AutoDifferentiation {
    */
   template <std::size_t... Ints>
   static void linearizeOplusNs(Edge* that, std::index_sequence<Ints...>) {
-    static_assert(std::min({Edge::template VertexXnType<Ints>::Dimension...}) > 0,
+    static_assert(std::min({Edge::template VertexXnType<Ints>::kDimension...}) > 0,
                   "Dynamically sized vertices are not supported");
     // all vertices are fixed, no need to compute anything here
     if (that->allVerticesFixed()) {
@@ -199,7 +199,7 @@ class AutoDifferentiation {
     }
 
     // tuple containing the Jacobians
-    std::tuple<ADJacobianType<Edge::Dimension, Edge::template VertexXnType<Ints>::Dimension>...>
+    std::tuple<ADJacobianType<Edge::kDimension, Edge::template VertexXnType<Ints>::kDimension>...>
         ad_jacobians;
 
     // setting up the pointer to the parameters and the Jacobians for calling AD.
@@ -213,12 +213,12 @@ class AutoDifferentiation {
                                  ? nullptr
                                  : const_cast<number_t*>(std::get<Ints>(ad_jacobians).data())...};
     // Calls the automatic differentiation for evaluation of the Jacobians.
-    number_t errorValue[Edge::Dimension];
+    number_t errorValue[Edge::kDimension];
     using AutoDiffDims =
-        ceres::internal::StaticParameterDims<Edge::template VertexXnType<Ints>::Dimension...>;
+        ceres::internal::StaticParameterDims<Edge::template VertexXnType<Ints>::kDimension...>;
     bool diffState =
-        ceres::internal::AutoDifferentiate<Edge::Dimension, AutoDiffDims, Edge, number_t>(
-            *that, parameters, Edge::Dimension, errorValue, jacobians);
+        ceres::internal::AutoDifferentiate<Edge::kDimension, AutoDiffDims, Edge, number_t>(
+            *that, parameters, Edge::kDimension, errorValue, jacobians);
 
     assert(diffState && "Error during Automatic Differentiation");
     if (!diffState) {  // something went wrong during AD

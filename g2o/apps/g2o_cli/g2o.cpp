@@ -574,7 +574,7 @@ int main(int argc, char** argv)
 
     signal(SIGINT, sigquit_handler);
     int result=optimizer.optimize(maxIterations);
-    if (maxIterations > 0 && result==OptimizationAlgorithm::Fail){
+    if (maxIterations > 0 && result==OptimizationAlgorithm::kFail){
       cerr << "Cholesky failed, result might be invalid" << endl;
     } else if (computeMarginals){
       std::vector<std::pair<int, int> > blockIndices;

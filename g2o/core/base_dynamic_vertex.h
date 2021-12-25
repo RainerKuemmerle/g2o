@@ -39,10 +39,10 @@ class BaseDynamicVertex : public BaseVertex<-1, T> {
   // This method is responsible for actually changing the dimension of the state
   virtual bool setDimensionImpl(int newDimension) = 0;
 
-  using BaseVertex<-1, T>::_graph;
-  using BaseVertex<-1, T>::_dimension;
-  using BaseVertex<-1, T>::_b;
-  using BaseVertex<-1, T>::_edges;
+  using BaseVertex<-1, T>::graph_;
+  using BaseVertex<-1, T>::dimension_;
+  using BaseVertex<-1, T>::b_;
+  using BaseVertex<-1, T>::edges_;
   using BaseVertex<-1, T>::setHessianIndex;
   using BaseVertex<-1, T>::mapHessianMemory;
   using BaseVertex<-1, T>::updateCache;
@@ -55,27 +55,27 @@ bool BaseDynamicVertex<T>::setDimension(int newDimension) {
   if (newDimension < 0) return false;
 
   // Nothing to do if the dimension is unchanged.
-  if (newDimension == _dimension) return true;
+  if (newDimension == dimension_) return true;
 
   // Change the state to the requested dimension
   if (setDimensionImpl(newDimension) == false) return false;
 
   // Store the old dimension and assign the new
-  int oldDimension = _dimension;
-  _dimension = newDimension;
+  int oldDimension = dimension_;
+  dimension_ = newDimension;
 
   // Reset the allocation associated with this vertex and update the cache
   setHessianIndex(-1);
   mapHessianMemory(nullptr);
-  _b.resize(_dimension);
+  b_.resize(dimension_);
   updateCache();
 
   // If the dimension is being increased and this vertex is in a
   // graph, update the size of the Jacobian workspace just in case it
   // needs to grow.
-  if ((newDimension > oldDimension) && (_graph != nullptr)) {
-    JacobianWorkspace& jacobianWorkspace = _graph->jacobianWorkspace();
-    for (auto& e : _edges) {
+  if ((newDimension > oldDimension) && (graph_ != nullptr)) {
+    JacobianWorkspace& jacobianWorkspace = graph_->jacobianWorkspace();
+    for (auto& e : edges_) {
       jacobianWorkspace.updateSize(e.lock().get());
     }
   }

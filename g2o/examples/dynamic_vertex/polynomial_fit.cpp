@@ -45,24 +45,24 @@ public:
     setDimension(dimension);
 
     // Read the state
-    return g2o::internal::readVector(is, _estimate);
+    return g2o::internal::readVector(is, estimate_);
   }
 
   // Write the vertex
   virtual bool write(std::ostream& os) const {
-    os << _estimate.size() << " ";
-    return g2o::internal::writeVector(os, _estimate);
+    os << estimate_.size() << " ";
+    return g2o::internal::writeVector(os, estimate_);
   }
 
   // Reset to zero
   virtual void setToOriginImpl() {
-    _estimate.setZero();
+    estimate_.setZero();
   }
 
   // Direct linear add
   virtual void oplusImpl(const double* update) {
-    Eigen::VectorXd::ConstMapType v(update, _dimension);
-    _estimate += v;
+    Eigen::VectorXd::ConstMapType v(update, dimension_);
+    estimate_ += v;
   }
 
   // Resize the vertex state. In this case, we want to preserve as much of the
@@ -74,16 +74,16 @@ public:
 
     // Handle the special case this is the first time
     if (oldDimension == Eigen::Dynamic) {
-      _estimate.resize(newDimension);
-      _estimate.setZero();
+      estimate_.resize(newDimension);
+      estimate_.setZero();
       return true;
     }
 
-    _estimate.conservativeResize(newDimension);
+    estimate_.conservativeResize(newDimension);
 
     // If the state has expanded, pad with zeros
     if (oldDimension < newDimension)
-      _estimate.tail(newDimension-oldDimension).setZero();
+      estimate_.tail(newDimension-oldDimension).setZero();
 
     return true;
   }
@@ -114,14 +114,14 @@ public:
   }
 
   virtual bool write(std::ostream& os) const {
-    os << _x << " " << _measurement;
+    os << _x << " " << measurement_;
     return writeInformationMatrix(os);
   }
 
   // Compute the measurement from the eigen polynomial module
   virtual void computeError() {
     const PolynomialCoefficientVertex* vertex = vertexXnRaw<0>();
-    _error[0] = _measurement - Eigen::poly_eval(vertex->estimate(), _x);
+    error_[0] = measurement_ - Eigen::poly_eval(vertex->estimate(), _x);
   }
 
 private:

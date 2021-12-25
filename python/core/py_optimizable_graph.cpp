@@ -14,8 +14,9 @@ void declareOptimizableGraph(py::module& m) {
   py::class_<OptimizableGraph, HyperGraph> cls(m, "OptimizableGraph");
 
   py::enum_<CLS::ActionType>(cls, "ActionType")
-      .value("AT_PREITERATION", CLS::ActionType::AT_PREITERATION)
-      .value("AT_NUM_ELEMENTS", CLS::ActionType::AT_NUM_ELEMENTS)
+      .value("AT_PREITERATION", CLS::ActionType::kAtPreiteration)
+      .value("AT_POSTITERATION", CLS::ActionType::kAtPostiteration)
+      .value("AT_NUM_ELEMENTS", CLS::ActionType::kAtNumElements)
       .export_values();
 
   // typedef std::set<HyperGraphAction*>    HyperGraphActionSet;

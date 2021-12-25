@@ -36,7 +36,7 @@ EdgeSE2::EdgeSE2() : BaseBinaryEdge<3, SE2, VertexSE2, VertexSE2>() {}
 bool EdgeSE2::read(std::istream& is) {
   Vector3d p;
   is >> p[0] >> p[1] >> p[2];
-  _measurement.fromVector(p);
+  measurement_.fromVector(p);
   _inverseMeasurement = measurement().inverse();
   for (int i = 0; i < 3; ++i)
     for (int j = i; j < 3; ++j) {

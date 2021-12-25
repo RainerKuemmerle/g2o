@@ -43,7 +43,7 @@ class Edge3Constant : public g2o::BaseFixedSizedEdge<2, g2o::Vector2, g2o::Verte
     const auto a = vertexXnRaw<0>()->estimate();
     const auto b = vertexXnRaw<1>()->estimate();
     const auto c = vertexXnRaw<2>()->estimate();
-    _error = (a * b * c - _measurement).eval();
+    error_ = (a * b * c - measurement_).eval();
   }
   virtual bool read(std::istream&) { return false; };
   virtual bool write(std::ostream&) const { return false; };
@@ -57,7 +57,7 @@ class Edge3Dynamic : public g2o::BaseVariableSizedEdge<2, g2o::Vector2> {
     const auto a = static_cast<const g2o::VertexSE2*>(vertexRaw(0))->estimate();
     const auto b = static_cast<const g2o::VertexSE2*>(vertexRaw(1))->estimate();
     const auto c = static_cast<const g2o::VertexPointXY*>(vertexRaw(2))->estimate();
-    _error = (a * b * c - _measurement).eval();
+    error_ = (a * b * c - measurement_).eval();
   }
   virtual bool read(std::istream&) { return false; };
   virtual bool write(std::ostream&) const { return false; };

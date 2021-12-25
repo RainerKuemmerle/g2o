@@ -89,7 +89,7 @@ int SparseOptimizerOnline::optimize(int iterations, bool online)
 
   bool ok=true;
 
-  _algorithm->init(online);
+  algorithm_->init(online);
   if (!online) {
     ok = _underlyingSolver->buildStructure();
     if (! ok) {
@@ -149,7 +149,7 @@ int SparseOptimizerOnline::optimize(int iterations, bool online)
     computeActiveErrors();
     cerr
       << "nodes = " << vertices().size()
-      << "\t edges= " << _activeEdges.size()
+      << "\t edges= " << activeEdges_.size()
       << "\t chi2= " << FIXED(activeChi2())
       << endl;
   }
@@ -165,15 +165,15 @@ int SparseOptimizerOnline::optimize(int iterations, bool online)
 void SparseOptimizerOnline::update(double* update)
 {
   if (slamDimension == 3) {
-    for (size_t i=0; i < _ivMap.size(); ++i) {
-      OnlineVertexSE2* v= static_cast<OnlineVertexSE2*>(_ivMap[i]);
+    for (size_t i=0; i < ivMap_.size(); ++i) {
+      OnlineVertexSE2* v= static_cast<OnlineVertexSE2*>(ivMap_[i]);
       v->oplusUpdatedEstimate(update);
       update += 3;
     }
   }
   else if (slamDimension == 6) {
-    for (size_t i=0; i < _ivMap.size(); ++i) {
-      OnlineVertexSE3* v= static_cast<OnlineVertexSE3*>(_ivMap[i]);
+    for (size_t i=0; i < ivMap_.size(); ++i) {
+      OnlineVertexSE3* v= static_cast<OnlineVertexSE3*>(ivMap_[i]);
       v->oplusUpdatedEstimate(update);
       update += 6;
     }

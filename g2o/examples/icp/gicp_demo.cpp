@@ -117,7 +117,7 @@ int main() {
     nm1.normalize();
 
     auto e  // new edge with correct cohort for caching
-        = std::make_shared<Edge_V_V_GICP>();
+        = std::make_shared<EdgeVVGicp>();
 
     e->setVertex(0, vp0);  // first viewpoint
     e->setVertex(1, vp1);  // second viewpoint

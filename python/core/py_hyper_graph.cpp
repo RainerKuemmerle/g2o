@@ -8,17 +8,17 @@ void declareHyperGraph(py::module& m) {
   py::class_<HyperGraph> cls(m, "HyperGraph");
 
   py::enum_<HyperGraph::HyperGraphElementType>(cls, "HyperGraphElementType")
-      .value("HGET_VERTEX", HyperGraph::HyperGraphElementType::HGET_VERTEX)
-      .value("HGET_EDGE", HyperGraph::HyperGraphElementType::HGET_EDGE)
-      .value("HGET_PARAMETER", HyperGraph::HyperGraphElementType::HGET_PARAMETER)
-      .value("HGET_CACHE", HyperGraph::HyperGraphElementType::HGET_CACHE)
-      .value("HGET_DATA", HyperGraph::HyperGraphElementType::HGET_DATA)
-      .value("HGET_NUM_ELEMS", HyperGraph::HyperGraphElementType::HGET_NUM_ELEMS)
+      .value("HGET_VERTEX", HyperGraph::HyperGraphElementType::kHgetVertex)
+      .value("HGET_EDGE", HyperGraph::HyperGraphElementType::kHgetEdge)
+      .value("HGET_PARAMETER", HyperGraph::HyperGraphElementType::kHgetParameter)
+      .value("HGET_CACHE", HyperGraph::HyperGraphElementType::kHgetCache)
+      .value("HGET_DATA", HyperGraph::HyperGraphElementType::kHgetData)
+      .value("HGET_NUM_ELEMS", HyperGraph::HyperGraphElementType::kHgetNumElems)
       .export_values();
 
   py::enum_<HyperGraph::HyperGraphDefaultIds>(cls, "HyperGraphDefaultIds")
-      .value("UnassignedId", HyperGraph::HyperGraphDefaultIds::UnassignedId)
-      .value("InvalidId", HyperGraph::HyperGraphDefaultIds::InvalidId)
+      .value("UnassignedId", HyperGraph::HyperGraphDefaultIds::kUnassignedId)
+      .value("InvalidId", HyperGraph::HyperGraphDefaultIds::kInvalidId)
       .export_values();
 
   py::class_<HyperGraph::HyperGraphElement, std::shared_ptr<HyperGraph::HyperGraphElement>>(
@@ -58,7 +58,7 @@ void declareHyperGraph(py::module& m) {
 
   py::class_<HyperGraph::Vertex, HyperGraph::HyperGraphElement,
              std::shared_ptr<HyperGraph::Vertex>>(cls, "Vertex")
-      .def(py::init<int>(), "id"_a = HyperGraph::UnassignedId)
+      .def(py::init<int>(), "id"_a = HyperGraph::kUnassignedId)
       .def("id", &HyperGraph::Vertex::id)  // -> int
       .def("set_id", &HyperGraph::Vertex::setId,
            "id"_a)  // int -> void
@@ -70,7 +70,7 @@ void declareHyperGraph(py::module& m) {
 
   py::class_<HyperGraph::Edge, HyperGraph::HyperGraphElement, std::shared_ptr<HyperGraph::Edge>>(
       cls, "Edge")
-      .def(py::init<int>(), "id"_a = HyperGraph::InvalidId)
+      .def(py::init<int>(), "id"_a = HyperGraph::kInvalidId)
       .def("resize", &HyperGraph::Edge::resize,
            "size"_a)  // virtual, size_t -> void
       .def("vertices",

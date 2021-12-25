@@ -43,14 +43,14 @@ namespace g2o {
       virtual void oplusImpl(const double* update)
       {
         VertexSE3::oplusImpl(update);
-        updatedEstimate = _estimate;
+        updatedEstimate = estimate_;
       }
 
       void oplusUpdatedEstimate(double* update)
       {
         Eigen::Map<const Vector6> v(update);
         Isometry3 increment = internal::fromVectorMQT(v);
-        updatedEstimate = _estimate * increment;
+        updatedEstimate = estimate_ * increment;
       }
 
       VertexSE3::EstimateType updatedEstimate;
@@ -67,10 +67,10 @@ namespace g2o {
         auto fromEdge = std::static_pointer_cast<OnlineVertexSE3>(vertexXn<0>());
         auto toEdge   = std::static_pointer_cast<OnlineVertexSE3>(vertexXn<1>());
         if (from.count(fromEdge) > 0) {
-          toEdge->updatedEstimate = fromEdge->updatedEstimate * _measurement;
+          toEdge->updatedEstimate = fromEdge->updatedEstimate * measurement_;
           toEdge->setEstimate(toEdge->updatedEstimate);
         } else {
-          fromEdge->updatedEstimate = toEdge->updatedEstimate * _inverseMeasurement;
+          fromEdge->updatedEstimate = toEdge->updatedEstimate * inverseMeasurement_;
           fromEdge->setEstimate(fromEdge->updatedEstimate);
         }
       }
@@ -79,7 +79,7 @@ namespace g2o {
       {
         OnlineVertexSE3* from = static_cast<OnlineVertexSE3*>(vertexXnRaw<0>());
         OnlineVertexSE3* to = static_cast<OnlineVertexSE3*>(vertexXnRaw<1>());
-        Eigen::Isometry3d delta = _inverseMeasurement * from->estimate().inverse() * to->estimate();
+        Eigen::Isometry3d delta = inverseMeasurement_ * from->estimate().inverse() * to->estimate();
         Vector6 error = internal::toVectorMQT(delta);
         return error.dot(information() * error);
       }

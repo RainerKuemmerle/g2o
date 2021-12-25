@@ -39,7 +39,7 @@ EdgeSE2PointXY::EdgeSE2PointXY()
 
 bool EdgeSE2PointXY::read(std::istream& is) {
   readParamIds(is);
-  internal::readVector(is, _measurement);
+  internal::readVector(is, measurement_);
   return readInformationMatrix(is);
 }
 
@@ -51,12 +51,12 @@ bool EdgeSE2PointXY::write(std::ostream& os) const {
 
 void EdgeSE2PointXY::computeError() {
   const VertexPointXY* l2 = vertexXnRaw<1>();
-  _error = (_sensorCache->w2n() * l2->estimate()) - _measurement;
+  error_ = (_sensorCache->w2n() * l2->estimate()) - measurement_;
 }
 
 bool EdgeSE2PointXY::resolveCaches() {
   ParameterVector pv(1);
-  pv[0] = _parameters[0];
+  pv[0] = parameters_[0];
   resolveCache(_sensorCache, vertexXn<0>(), "TUTORIAL_CACHE_SE2_OFFSET", pv);
   return _sensorCache != 0;
 }

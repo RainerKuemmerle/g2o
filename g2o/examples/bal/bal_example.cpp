@@ -86,8 +86,8 @@ class VertexCameraBAL : public g2o::BaseVertex<9, g2o::bal::Vector9> {
   virtual void setToOriginImpl() { cerr << __PRETTY_FUNCTION__ << " not implemented yet" << endl; }
 
   virtual void oplusImpl(const double* update) {
-    g2o::bal::Vector9::ConstMapType v(update, VertexCameraBAL::Dimension);
-    _estimate += v;
+    g2o::bal::Vector9::ConstMapType v(update, VertexCameraBAL::kDimension);
+    estimate_ += v;
   }
 };
 
@@ -115,7 +115,7 @@ class VertexPointBAL : public g2o::BaseVertex<3, g2o::Vector3> {
 
   virtual void oplusImpl(const double* update) {
     g2o::Vector3::ConstMapType v(update);
-    _estimate += v;
+    estimate_ += v;
   }
 };
 

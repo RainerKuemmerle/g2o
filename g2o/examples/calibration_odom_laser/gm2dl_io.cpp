@@ -83,7 +83,7 @@ namespace g2o {
           v = std::dynamic_pointer_cast<VertexSE2>(optimizer.vertex(id));
           assert(v);
         }
-        v->setEstimate(p);
+        v->setEstimate(SE2(p));
         previousVertex = v;
 
       } else if (tag == "EDGE" || tag == "EDGE2" || tag == "EDGE_SE2"){

@@ -41,11 +41,11 @@ class G2O_TUTORIAL_SLAM2D_API VertexPointXY : public BaseVertex<2, Eigen::Vector
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
   VertexPointXY();
 
-  virtual void setToOriginImpl() { _estimate.setZero(); }
+  virtual void setToOriginImpl() { estimate_.setZero(); }
 
   virtual void oplusImpl(const double* update) {
-    _estimate[0] += update[0];
-    _estimate[1] += update[1];
+    estimate_[0] += update[0];
+    estimate_[1] += update[1];
   }
 
   virtual bool read(std::istream& is);

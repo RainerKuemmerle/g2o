@@ -34,11 +34,11 @@
 
 class VertexFlatSE2 : public g2o::BaseVertex<3, g2o::Vector3> {
  public:
-  virtual void setToOriginImpl() { _estimate.setZero(); }
+  virtual void setToOriginImpl() { estimate_.setZero(); }
 
   virtual void oplusImpl(const number_t* update) {
-    _estimate += Eigen::Map<const g2o::Vector3>(update);
-    _estimate(2) = g2o::normalize_theta(_estimate(2));
+    estimate_ += Eigen::Map<const g2o::Vector3>(update);
+    estimate_(2) = g2o::normalize_theta(estimate_(2));
   }
 
   virtual bool read(std::istream&) { return false; }
@@ -94,12 +94,12 @@ class EdgeSE2AD : public g2o::EdgeSE2 {
   template <typename T>
   bool operator()(const T* p1, const T* p2, T* error) const {
     //// original implementation
-    // SE2 delta = _inverseMeasurement * (v1->estimate().inverse()*v2->estimate());
+    // SE2 delta = inverseMeasurement_ * (v1->estimate().inverse()*v2->estimate());
     // _error = delta.toVector();
 
     Iso2<T> p1Iso = pointerToIso(p1);
     Iso2<T> p2Iso = pointerToIso(p2);
-    g2o::VectorN<3, T> invMeasAsVector = _inverseMeasurement.toVector().cast<T>();
+    g2o::VectorN<3, T> invMeasAsVector = inverseMeasurement_.toVector().cast<T>();
     Iso2<T> invMeas = pointerToIso(invMeasAsVector.data());
 
     Iso2<T> delta = invMeas * (p1Iso.inverse() * p2Iso);
@@ -200,8 +200,8 @@ TEST_F(AutoDifferentiation, ComputesNothingForFixed) {
 class AutoDifferentiationEdgeSE2 : public ::testing::Test {
  protected:
   void SetUp() override {
-    v1->setEstimate(g2o::Vector3(0, 0, 0));
-    v2->setEstimate(g2o::Vector3(1, 1, 1));
+    v1->setEstimate(g2o::SE2(0, 0, 0));
+    v2->setEstimate(g2o::SE2(1, 1, 1));
 
     g2o::SE2 meas(0.5, 0.5, 0.5);
 

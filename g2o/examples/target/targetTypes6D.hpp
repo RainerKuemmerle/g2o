@@ -20,12 +20,12 @@ class VertexPosition3D : public g2o::BaseVertex<3, Eigen::Vector3d> {
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   VertexPosition3D() {}
 
-  virtual void setToOriginImpl() { _estimate.setZero(); }
+  virtual void setToOriginImpl() { estimate_.setZero(); }
 
   virtual void oplusImpl(const double* update) {
-    _estimate[0] += update[0];
-    _estimate[1] += update[1];
-    _estimate[2] += update[2];
+    estimate_[0] += update[0];
+    estimate_[1] += update[1];
+    estimate_[2] += update[2];
   }
 
   virtual bool read(std::istream& /*is*/) { return false; }
@@ -40,10 +40,10 @@ class VertexPositionVelocity3D : public g2o::BaseVertex<6, Vector6d> {
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   VertexPositionVelocity3D() {}
 
-  virtual void setToOriginImpl() { _estimate.setZero(); }
+  virtual void setToOriginImpl() { estimate_.setZero(); }
 
   virtual void oplusImpl(const double* update) {
-    for (int k = 0; k < 6; k++) _estimate[k] += update[k];
+    for (int k = 0; k < 6; k++) estimate_[k] += update[k];
   }
 
   virtual bool read(std::istream& /*is*/) { return false; }
@@ -84,11 +84,11 @@ class TargetOdometry3DEdge
     Vector6d vjEst = viEst;
 
     for (int m = 0; m < 3; m++) {
-      vjEst[m] += _dt * (vjEst[m + 3] + 0.5 * _dt * _measurement[m]);
+      vjEst[m] += _dt * (vjEst[m + 3] + 0.5 * _dt * measurement_[m]);
     }
 
     for (int m = 0; m < 3; m++) {
-      vjEst[m + 3] += _dt * _measurement[m];
+      vjEst[m + 3] += _dt * measurement_[m];
     }
     vj->setEstimate(vjEst);
   }
@@ -108,11 +108,11 @@ class TargetOdometry3DEdge
     const VertexPositionVelocity3D* vj = vertexXnRaw<1>();
 
     for (int k = 0; k < 3; k++) {
-      _error[k] = vi->estimate()[k] + _dt * (vi->estimate()[k + 3] + 0.5 * _dt * _measurement[k]) -
+      error_[k] = vi->estimate()[k] + _dt * (vi->estimate()[k + 3] + 0.5 * _dt * measurement_[k]) -
                   vj->estimate()[k];
     }
     for (int k = 3; k < 6; k++) {
-      _error[k] = vi->estimate()[k] + _dt * _measurement[k - 3] - vj->estimate()[k];
+      error_[k] = vi->estimate()[k] + _dt * measurement_[k - 3] - vj->estimate()[k];
     }
   }
 
@@ -135,7 +135,7 @@ class GPSObservationEdgePositionVelocity3D
 
   void computeError() {
     const VertexPositionVelocity3D* v = vertexXnRaw<0>();
-    _error = v->estimate().head<3>() - _measurement;
+    error_ = v->estimate().head<3>() - measurement_;
   }
 
   virtual bool read(std::istream& /*is*/) { return false; }

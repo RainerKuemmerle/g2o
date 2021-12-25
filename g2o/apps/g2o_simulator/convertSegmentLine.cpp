@@ -60,7 +60,7 @@ struct LineInfo {
   explicit LineInfo(VertexSegment2D* s) {
     line=std::make_shared<VertexLine2D>();
     line->setId(s->id());
-    line->setEstimate(computeLineParameters(s->estimateP1(), s->estimateP2()));
+    line->setEstimate(Line2D(computeLineParameters(s->estimateP1(), s->estimateP2())));
   }
   std::shared_ptr<VertexLine2D> line;
   std::shared_ptr<VertexPointXY> p1;
@@ -171,12 +171,12 @@ int main(int argc, char** argv)
       el2->vertices()[0]=pose;
       el2->vertices()[1]=line;
       if (el) {
-        el2->setMeasurement(el->measurement());
+        el2->setMeasurement(Line2D(el->measurement()));
         el2->setInformation(el->information());
         outGraph.addEdge(el2);
       }
       if (es) {
-        el2->setMeasurement(computeLineParameters(es->measurementP1(), es->measurementP2()));
+        el2->setMeasurement(Line2D(computeLineParameters(es->measurementP1(), es->measurementP2())));
         Matrix2d el2info;
         el2info << 10000, 0, 0, 1000;
         el2->setInformation(el2info);
@@ -241,7 +241,7 @@ int main(int argc, char** argv)
         lparams[1]=n.dot(espl->point());
         Matrix2d li;
         li << si(2,2), 0, 0, 1000;
-        el2->setMeasurement(lparams);
+        el2->setMeasurement(Line2D(lparams));
         el2->setInformation(li);
         outGraph.addEdge(el2);
 

@@ -34,23 +34,23 @@ void declareTypesICP(py::module& m) {
 
   templatedBaseEdge<3, EdgeGICP>(m, "_3_EdgeGICP");
   templatedBaseBinaryEdge<3, EdgeGICP, VertexSE3, VertexSE3>(m, "_3_EdgeGICP_VertexSE3_VertexSE3");
-  py::class_<Edge_V_V_GICP, BaseBinaryEdge<3, EdgeGICP, VertexSE3, VertexSE3>,
-             std::shared_ptr<Edge_V_V_GICP>>(m, "Edge_V_V_GICP")
+  py::class_<EdgeVVGicp, BaseBinaryEdge<3, EdgeGICP, VertexSE3, VertexSE3>,
+             std::shared_ptr<EdgeVVGicp>>(m, "EdgeVVGicp")
       .def(py::init<>())
-      .def(py::init<const Edge_V_V_GICP*>())
+      .def(py::init<const EdgeVVGicp*>())
 
-      .def("compute_error", &Edge_V_V_GICP::computeError)
+      .def("compute_error", &EdgeVVGicp::computeError)
 #ifdef GICP_ANALYTIC_JACOBIANS
-      .def("linearize_oplus", &Edge_V_V_GICP::linearizeOplus)
+      .def("linearize_oplus", &EdgeVVGicp::linearizeOplus)
 #endif
 
-      .def_readwrite("pl_pl", &Edge_V_V_GICP::pl_pl)
-      .def_readwrite("cov0", &Edge_V_V_GICP::cov0)
-      .def_readwrite("cov1", &Edge_V_V_GICP::cov1)
+      .def_readwrite("pl_pl", &EdgeVVGicp::pl_pl)
+      .def_readwrite("cov0", &EdgeVVGicp::cov0)
+      .def_readwrite("cov1", &EdgeVVGicp::cov1)
 
-      .def_readwrite_static("dRidx", &Edge_V_V_GICP::dRidx)
-      .def_readwrite_static("dRidy", &Edge_V_V_GICP::dRidy)
-      .def_readwrite_static("dRidz", &Edge_V_V_GICP::dRidz);
+      .def_readwrite_static("dRidx", &EdgeVVGicp::dRidx_)
+      .def_readwrite_static("dRidy", &EdgeVVGicp::dRidy_)
+      .def_readwrite_static("dRidz", &EdgeVVGicp::dRidz_);
 
   py::class_<VertexSCam, VertexSE3, std::shared_ptr<VertexSCam>>(m, "VertexSCam")
       .def(py::init<>())
@@ -91,8 +91,8 @@ void declareTypesICP(py::module& m) {
            })
 
       // camera matrix and stereo baseline
-      .def_readwrite_static("Kcam", &VertexSCam::Kcam)
-      .def_readwrite_static("baseline", &VertexSCam::baseline)
+      .def_readwrite_static("Kcam", &VertexSCam::kcam_)
+      .def_readwrite_static("baseline", &VertexSCam::baseline_)
 
       // transformations
       .def_readwrite("w2n", &VertexSCam::w2n)  // transform from world to node coordinates
@@ -104,19 +104,19 @@ void declareTypesICP(py::module& m) {
       .def_readwrite("dRdy", &VertexSCam::dRdy)
       .def_readwrite("dRdz", &VertexSCam::dRdz)
 
-      .def_readwrite_static("dRidx", &VertexSCam::dRidx)
-      .def_readwrite_static("dRidy", &VertexSCam::dRidy)
-      .def_readwrite_static("dRidz", &VertexSCam::dRidz);
+      .def_readwrite_static("dRidx", &VertexSCam::dRidx_)
+      .def_readwrite_static("dRidy", &VertexSCam::dRidy_)
+      .def_readwrite_static("dRidz", &VertexSCam::dRidz_);
 
   templatedBaseBinaryEdge<3, Vector3, VertexPointXYZ, VertexSCam>(
       m, "_3_Vector3_VertexSBAPointXYZ_VertexSCam");
-  py::class_<Edge_XYZ_VSC, BaseBinaryEdge<3, Vector3, VertexPointXYZ, VertexSCam>,
-             std::shared_ptr<Edge_XYZ_VSC>>(m, "Edge_XYZ_VSC")
+  py::class_<EdgeXyzVsc, BaseBinaryEdge<3, Vector3, VertexPointXYZ, VertexSCam>,
+             std::shared_ptr<EdgeXyzVsc>>(m, "EdgeXyzVsc")
       .def(py::init<>())
-      .def("compute_error", &Edge_XYZ_VSC::computeError)
+      .def("compute_error", &EdgeXyzVsc::computeError)
 
 #ifdef SCAM_ANALYTIC_JACOBIANS
-      .def("linearize_oplus", &Edge_XYZ_VSC::linearizeOplus)
+      .def("linearize_oplus", &EdgeXyzVsc::linearizeOplus)
 #endif
 
       ;

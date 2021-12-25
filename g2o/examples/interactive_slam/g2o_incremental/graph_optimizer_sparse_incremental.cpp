@@ -91,7 +91,7 @@ namespace g2o {
   int SparseOptimizerIncremental::optimize(int iterations, bool online)
   {
     (void) iterations; // we only do one iteration anyhow
-    _algorithm->init(online);
+    algorithm_->init(online);
 
     bool ok=true;
 
@@ -124,14 +124,14 @@ namespace g2o {
       _underlyingSolver->buildSystem();
 
       // mark vertices to be sorted as last
-      int numBlocksRequired = _ivMap.size();
+      int numBlocksRequired = ivMap_.size();
       if (_cmember.size() < numBlocksRequired) {
         _cmember.resize(2 * numBlocksRequired);
       }
       memset(_cmember.data(), 0, numBlocksRequired * sizeof(int));
-      if (_ivMap.size() > 100) {
-        for (size_t i = _ivMap.size() - 20; i < _ivMap.size(); ++i) {
-          const HyperGraph::EdgeSetWeak& eset = _ivMap[i]->edges();
+      if (ivMap_.size() > 100) {
+        for (size_t i = ivMap_.size() - 20; i < ivMap_.size(); ++i) {
+          const HyperGraph::EdgeSetWeak& eset = ivMap_[i]->edges();
           for (HyperGraph::EdgeSetWeak::const_iterator it = eset.begin(); it != eset.end(); ++it) {
             auto e = std::static_pointer_cast<OptimizableGraph::Edge>(it->lock());
             OptimizableGraph::Vertex* v1 = static_cast<OptimizableGraph::Vertex*>(e->vertices()[0].get());
@@ -142,7 +142,7 @@ namespace g2o {
               _cmember(v2->hessianIndex()) = 1;
           }
         }
-        //OptimizableGraph::Vertex* lastPose = _ivMap.back();
+        //OptimizableGraph::Vertex* lastPose = ivMap_.back();
         //_cmember(lastPose->hessianIndex()) = 2;
       }
 
@@ -173,7 +173,7 @@ namespace g2o {
       computeActiveErrors();
       cerr
         << "nodes = " << vertices().size()
-        << "\t edges= " << _activeEdges.size()
+        << "\t edges= " << activeEdges_.size()
         << "\t chi2= " << FIXED(activeChi2())
         << endl;
     }
@@ -213,22 +213,22 @@ namespace g2o {
     // updating the internal structures
     HyperGraph::VertexContainer newVertices;
     newVertices.reserve(vset.size());
-    _activeVertices.reserve(_activeVertices.size() + vset.size());
-    _activeEdges.reserve(_activeEdges.size() + eset.size());
+    activeVertices_.reserve(activeVertices_.size() + vset.size());
+    activeEdges_.reserve(activeEdges_.size() + eset.size());
     for (HyperGraph::EdgeSet::iterator it = eset.begin(); it != eset.end(); ++it)
-      _activeEdges.push_back(std::static_pointer_cast<OptimizableGraph::Edge>(*it));
+      activeEdges_.push_back(std::static_pointer_cast<OptimizableGraph::Edge>(*it));
     //cerr << "updating internal done." << endl;
 
     // update the index mapping
-    size_t next = _ivMap.size();
+    size_t next = ivMap_.size();
     for (HyperGraph::VertexSet::iterator it = vset.begin(); it != vset.end(); ++it) {
       auto v = std::static_pointer_cast<OptimizableGraph::Vertex>(*it);
       if (! v->fixed()){
         if (! v->marginalized()){
           v->setHessianIndex(next);
-          _ivMap.push_back(v.get());
+          ivMap_.push_back(v.get());
           newVertices.push_back(v);
-          _activeVertices.push_back(v);
+          activeVertices_.push_back(v);
           next++;
         }
         else // not supported right now
@@ -326,7 +326,7 @@ namespace g2o {
     }
 
     // update the structure of the real block matrix
-    bool solverStatus = _algorithm->updateStructure(newVertices, eset);
+    bool solverStatus = algorithm_->updateStructure(newVertices, eset);
 
     bool updateStatus = computeCholeskyUpdate();
     if (! updateStatus) {

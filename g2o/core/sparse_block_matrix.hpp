@@ -43,7 +43,7 @@ namespace g2o {
   template <class MatrixType>
   void SparseBlockMatrix<MatrixType>::clear(bool dealloc) {
 #   ifdef G2O_OPENMP
-#   pragma omp parallel for default (shared) if (_blockCols.size() > 100)
+#   pragma omp parallel for default (shared) if (blockCols_.size() > 100)
 #   endif
     for (int i=0; i < static_cast<int>(blockCols_.size()); ++i) {
       for (typename SparseBlockMatrix<MatrixType>::IntBlockMap::const_iterator it=blockCols_[i].begin(); it!=blockCols_[i].end(); ++it){
@@ -127,20 +127,20 @@ namespace g2o {
   template <class MatrixTransposedType>
   bool SparseBlockMatrix<MatrixType>::transpose(SparseBlockMatrix<MatrixTransposedType>& dest) const
   {
-    if (!dest._hasStorage)
+    if (!dest.hasStorage_)
       return false;
-    if (rowBlockIndices_.size() != dest._colBlockIndices.size())
+    if (rowBlockIndices_.size() != dest.colBlockIndices_.size())
       return false;
-    if (colBlockIndices_.size() != dest._rowBlockIndices.size())
+    if (colBlockIndices_.size() != dest.rowBlockIndices_.size())
       return  false;
     for (size_t i = 0; i<rowBlockIndices_.size(); ++i)
     {
-      if (rowBlockIndices_[i] != dest._colBlockIndices[i])
+      if (rowBlockIndices_[i] != dest.colBlockIndices_[i])
         return false;
     }
     for (size_t i = 0; i<colBlockIndices_.size(); ++i)
     {
-      if (colBlockIndices_[i] != dest._rowBlockIndices[i])
+      if (colBlockIndices_[i] != dest.rowBlockIndices_[i])
         return false;
     }
 
@@ -208,19 +208,19 @@ namespace g2o {
   template < class MatrixResultType, class MatrixFactorType >
   bool SparseBlockMatrix<MatrixType>::multiply(SparseBlockMatrix<MatrixResultType>*& dest, const SparseBlockMatrix<MatrixFactorType> * M) const {
     // sanity check
-    if (colBlockIndices_.size()!=M->_rowBlockIndices.size())
+    if (colBlockIndices_.size()!=M->rowBlockIndices_.size())
       return false;
     for (size_t i=0; i<colBlockIndices_.size(); ++i){
-      if (colBlockIndices_[i]!=M->_rowBlockIndices[i])
+      if (colBlockIndices_[i]!=M->rowBlockIndices_[i])
         return false;
     }
     if (! dest) {
-      dest=new SparseBlockMatrix<MatrixResultType>(&rowBlockIndices_[0],&(M->_colBlockIndices[0]), rowBlockIndices_.size(), M->_colBlockIndices.size() );
+      dest=new SparseBlockMatrix<MatrixResultType>(&rowBlockIndices_[0],&(M->colBlockIndices_[0]), rowBlockIndices_.size(), M->colBlockIndices_.size() );
     }
-    if (! dest->_hasStorage)
+    if (! dest->hasStorage_)
       return false;
-    for (size_t i=0; i<M->_blockCols.size(); ++i){
-      for (typename SparseBlockMatrix<MatrixFactorType>::IntBlockMap::const_iterator it=M->_blockCols[i].begin(); it!=M->_blockCols[i].end(); ++it){
+    for (size_t i=0; i<M->blockCols_.size(); ++i){
+      for (typename SparseBlockMatrix<MatrixFactorType>::IntBlockMap::const_iterator it=M->blockCols_[i].begin(); it!=M->blockCols_[i].end(); ++it){
         // look for a non-zero block in a row of column it
         int colM=i;
         const typename SparseBlockMatrix<MatrixFactorType>::SparseMatrixBlock *b=it->second;

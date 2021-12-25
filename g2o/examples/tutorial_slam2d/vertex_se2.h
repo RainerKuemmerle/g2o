@@ -43,11 +43,11 @@ class G2O_TUTORIAL_SLAM2D_API VertexSE2 : public BaseVertex<3, SE2> {
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
   VertexSE2();
 
-  virtual void setToOriginImpl() { _estimate = SE2(); }
+  virtual void setToOriginImpl() { estimate_ = SE2(); }
 
   virtual void oplusImpl(const double* update) {
     SE2 up(update[0], update[1], update[2]);
-    _estimate *= up;
+    estimate_ *= up;
   }
 
   virtual bool read(std::istream& is);

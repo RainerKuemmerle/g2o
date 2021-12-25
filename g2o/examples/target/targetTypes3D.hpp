@@ -14,12 +14,12 @@ class VertexPosition3D : public g2o::BaseVertex<3, Eigen::Vector3d> {
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   VertexPosition3D() {}
 
-  virtual void setToOriginImpl() { _estimate.setZero(); }
+  virtual void setToOriginImpl() { estimate_.setZero(); }
 
   virtual void oplusImpl(const double* update) {
-    _estimate[0] += update[0];
-    _estimate[1] += update[1];
-    _estimate[2] += update[2];
+    estimate_[0] += update[0];
+    estimate_[1] += update[1];
+    estimate_[2] += update[2];
   }
 
   virtual bool read(std::istream& /*is*/) { return false; }
@@ -33,12 +33,12 @@ class VertexVelocity3D : public g2o::BaseVertex<3, Eigen::Vector3d> {
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   VertexVelocity3D() {}
 
-  virtual void setToOriginImpl() { _estimate.setZero(); }
+  virtual void setToOriginImpl() { estimate_.setZero(); }
 
   virtual void oplusImpl(const double* update) {
-    _estimate[0] += update[0];
-    _estimate[1] += update[1];
-    _estimate[2] += update[2];
+    estimate_[0] += update[0];
+    estimate_[1] += update[1];
+    estimate_[2] += update[2];
   }
 
   virtual bool read(std::istream& /*is*/) { return false; }
@@ -54,7 +54,7 @@ class GPSObservationPosition3DEdge
 
   void computeError() {
     const VertexPosition3D* v = vertexXnRaw<0>();
-    _error = v->estimate() - _measurement;
+    error_ = v->estimate() - measurement_;
   }
 
   virtual bool read(std::istream& /*is*/) { return false; }

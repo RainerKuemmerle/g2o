@@ -61,8 +61,8 @@ class VertexBaseline : public BaseVertex<1, double>
   public:
     VertexBaseline() {}
 
-    virtual void setToOriginImpl() { _estimate = 1.;}
-    virtual void oplusImpl(const double* update) { _estimate += update[0];}
+    virtual void setToOriginImpl() { estimate_ = 1.;}
+    virtual void oplusImpl(const double* update) { estimate_ += update[0];}
     virtual bool read(std::istream&) { return false;}
     virtual bool write(std::ostream&) const { return false;}
 };
@@ -90,7 +90,7 @@ class EdgeCalib : public BaseBinaryEdge<3, OdomAndLaserMotion, VertexSE2, Vertex
 
       SE2 laserMotionInRobotFrame = laserOffset->estimate() * measurement().laserMotion * laserOffset->estimate().inverse();
       SE2 delta = Ku_ij.inverse() * laserMotionInRobotFrame;
-      _error = delta.toVector();
+      error_ = delta.toVector();
     }
 
     virtual bool read(std::istream&) { return false;}

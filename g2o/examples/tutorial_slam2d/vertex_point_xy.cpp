@@ -31,10 +31,10 @@ using namespace Eigen;
 namespace g2o {
 namespace tutorial {
 
-VertexPointXY::VertexPointXY() : BaseVertex<2, Vector2d>() { _estimate.setZero(); }
+VertexPointXY::VertexPointXY() : BaseVertex<2, Vector2d>() { estimate_.setZero(); }
 
 bool VertexPointXY::read(std::istream& is) {
-  is >> _estimate[0] >> _estimate[1];
+  is >> estimate_[0] >> estimate_[1];
   return true;
 }
 

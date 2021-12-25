@@ -47,11 +47,11 @@ class G2O_TUTORIAL_SLAM2D_API EdgeSE2 : public BaseBinaryEdge<3, SE2, VertexSE2,
     const VertexSE2* v1 = vertexXnRaw<0>();
     const VertexSE2* v2 = vertexXnRaw<1>();
     SE2 delta = _inverseMeasurement * (v1->estimate().inverse() * v2->estimate());
-    _error = delta.toVector();
+    error_ = delta.toVector();
   }
 
   void setMeasurement(const SE2& m) {
-    _measurement = m;
+    measurement_ = m;
     _inverseMeasurement = m.inverse();
   }
 

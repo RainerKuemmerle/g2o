@@ -67,7 +67,7 @@ class VertexCircle : public g2o::BaseVertex<3, Eigen::Vector3d> {
 
   virtual void oplusImpl(const double* update) {
     Eigen::Vector3d::ConstMapType v(update);
-    _estimate += v;
+    estimate_ += v;
   }
 };
 

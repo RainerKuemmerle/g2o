@@ -41,19 +41,19 @@ class FPolynomialCoefficientVertex : public g2o::BaseVertex<3, Eigen::Vector3d> 
   // Read the vertex
   virtual bool read(std::istream& is) {
     // Read the state
-    return g2o::internal::readVector(is, _estimate);
+    return g2o::internal::readVector(is, estimate_);
   }
 
   // Write the vertex
-  virtual bool write(std::ostream& os) const { return g2o::internal::writeVector(os, _estimate); }
+  virtual bool write(std::ostream& os) const { return g2o::internal::writeVector(os, estimate_); }
 
   // Reset to zero
-  virtual void setToOriginImpl() { _estimate.setZero(); }
+  virtual void setToOriginImpl() { estimate_.setZero(); }
 
   // Direct linear add
   virtual void oplusImpl(const double* update) {
     Eigen::Vector3d::ConstMapType v(update, 3);
-    _estimate += v;
+    estimate_ += v;
   }
 };
 
@@ -81,29 +81,29 @@ class PPolynomialCoefficientVertex : public g2o::BaseDynamicVertex<Eigen::Vector
     setDimension(dimension);
 
     // Read the state
-    return g2o::internal::readVector(is, _estimate);
+    return g2o::internal::readVector(is, estimate_);
   }
 
   // Write the vertex
   virtual bool write(std::ostream& os) const {
-    os << _estimate.size() << " ";
-    return g2o::internal::writeVector(os, _estimate);
+    os << estimate_.size() << " ";
+    return g2o::internal::writeVector(os, estimate_);
   }
 
   // Reset to zero
-  virtual void setToOriginImpl() { _estimate.setZero(); }
+  virtual void setToOriginImpl() { estimate_.setZero(); }
 
   // Direct linear add
   virtual void oplusImpl(const double* update) {
-    Eigen::VectorXd::ConstMapType v(update, _dimension);
-    _estimate += v;
+    Eigen::VectorXd::ConstMapType v(update, dimension_);
+    estimate_ += v;
   }
 
   // Resize the vertex state. In this case, we simply trash whatever
   // was there before.
   virtual bool setDimensionImpl(int newDimension) {
-    _estimate.resize(newDimension);
-    _estimate.setZero();
+    estimate_.resize(newDimension);
+    estimate_.setZero();
     return true;
   }
 };
@@ -141,7 +141,7 @@ class MultipleValueEdge
 
   virtual bool write(std::ostream& os) const {
     g2o::internal::writeVector(os, _x);
-    g2o::internal::writeVector(os, _measurement);
+    g2o::internal::writeVector(os, measurement_);
     return writeInformationMatrix(os);
   }
 
@@ -149,9 +149,9 @@ class MultipleValueEdge
   virtual void computeError() {
     const FPolynomialCoefficientVertex* fvertex = vertexXnRaw<0>();
     const PPolynomialCoefficientVertex* pvertex = vertexXnRaw<1>();
-    for (int i = 0; i < _measurement.size(); ++i) {
+    for (int i = 0; i < measurement_.size(); ++i) {
       double x3 = pow(_x[i], 3);
-      _error[i] = _measurement[i] - Eigen::poly_eval(fvertex->estimate(), _x[i]) -
+      error_[i] = measurement_[i] - Eigen::poly_eval(fvertex->estimate(), _x[i]) -
                   x3 * (Eigen::poly_eval(pvertex->estimate(), _x[i]));
     }
   }
