@@ -24,44 +24,48 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include <signal.h>
-#include <iostream>
-#include <iomanip>
-#include <string>
-#include <fstream>
-#include <sstream>
 #include <algorithm>
 #include <cassert>
+#include <csignal>
+#include <fstream>
+#include <iomanip>
+#include <iostream>
+#include <sstream>
+#include <string>
 
 #include "dl_wrapper.h"
-#include "output_helper.h"
-#include "g2o_common.h"
-
 #include "g2o/config.h"
+#include "g2o/core/batch_stats.h"
 #include "g2o/core/estimate_propagator.h"
-#include "g2o/core/sparse_optimizer.h"
 #include "g2o/core/factory.h"
-#include "g2o/core/optimization_algorithm_factory.h"
 #include "g2o/core/hyper_dijkstra.h"
 #include "g2o/core/hyper_graph_action.h"
-#include "g2o/core/batch_stats.h"
+#include "g2o/core/optimization_algorithm.h"
+#include "g2o/core/optimization_algorithm_factory.h"
 #include "g2o/core/robust_kernel.h"
 #include "g2o/core/robust_kernel_factory.h"
-#include "g2o/core/optimization_algorithm.h"
+#include "g2o/core/sparse_optimizer.h"
 #include "g2o/core/sparse_optimizer_terminate_action.h"
-
-#include "g2o/stuff/macros.h"
 #include "g2o/stuff/color_macros.h"
 #include "g2o/stuff/command_args.h"
 #include "g2o/stuff/filesys_tools.h"
+#include "g2o/stuff/macros.h"
 #include "g2o/stuff/string_tools.h"
 #include "g2o/stuff/timeutil.h"
+#include "g2o_common.h"
+#include "output_helper.h"
 
 static bool hasToStop=false;
 
-using namespace std;
-using namespace g2o;
-using namespace Eigen;
+using g2o::SparseOptimizer;
+using g2o::OptimizableGraph;
+using g2o::OptimizationAlgorithmFactory;
+using g2o::HyperGraph;
+
+using std::cout;
+using std::cerr;
+using std::endl;
+using std::string;
 
 // sort according to max id, dimension
 struct IncrementalEdgesCompare {
@@ -70,13 +74,15 @@ struct IncrementalEdgesCompare {
     auto to1 = std::static_pointer_cast<const SparseOptimizer::Vertex>(e1->vertices()[1]);
     auto to2 = std::static_pointer_cast<const SparseOptimizer::Vertex>(e2->vertices()[1]);
 
-    int i11 = e1->vertices()[0]->id(), i12 = e1->vertices()[1]->id();
+    int i11 = e1->vertices()[0]->id();
+    int i12 = e1->vertices()[1]->id();
     if (i11 > i12) {
-      swap(i11, i12);
+      std::swap(i11, i12);
     }
-    int i21 = e2->vertices()[0]->id(), i22 = e2->vertices()[1]->id();
+    int i21 = e2->vertices()[0]->id();
+    int i22 = e2->vertices()[1]->id();
     if (i21 > i22) {
-      swap(i21, i22);
+      std::swap(i21, i22);
     }
     if (i12 < i22) return true;
     if (i12 > i22) return false;
@@ -88,7 +94,7 @@ struct IncrementalEdgesCompare {
 void sigquit_handler(int sig)
 {
   if (sig == SIGINT) {
-    hasToStop = 1;
+    hasToStop = true;
     static int cnt = 0;
     if (cnt++ == 2) {
       cerr << __PRETTY_FUNCTION__ << " forcing exit" << endl;
@@ -130,7 +136,7 @@ int main(int argc, char** argv)
   bool nonSequential;
   // command line parsing
   std::vector<int> gaugeList;
-  CommandArgs arg;
+  g2o::CommandArgs arg;
   arg.param("i", maxIterations, 5, "perform n iterations, if negative consider the gain");
   arg.param("gain", gain, 1e-6, "the gain used to stop optimization (default = 1e-6)");
   arg.param("ig",maxIterationsWithGain, std::numeric_limits<int>::max(), "Maximum number of iterations with gain enabled (default: inf)");
@@ -174,11 +180,11 @@ int main(int argc, char** argv)
 
 #ifndef G2O_DISABLE_DYNAMIC_LOADING_OF_LIBRARIES
   // registering all the types from the libraries
-  DlWrapper dlTypesWrapper;
-  loadStandardTypes(dlTypesWrapper, argc, argv);
+  g2o::DlWrapper dlTypesWrapper;
+  g2o::loadStandardTypes(dlTypesWrapper, argc, argv);
   // register all the solvers
-  DlWrapper dlSolverWrapper;
-  loadStandardSolver(dlSolverWrapper, argc, argv);
+  g2o::DlWrapper dlSolverWrapper;
+  g2o::loadStandardSolver(dlSolverWrapper, argc, argv);
 #else
   if (verbose)
     cout << "# linked version of g2o" << endl;
@@ -190,15 +196,15 @@ int main(int argc, char** argv)
   }
 
   if (listTypes) {
-    Factory::instance()->printRegisteredTypes(cout, true);
+    g2o::Factory::instance()->printRegisteredTypes(cout, true);
   }
 
   if (listRobustKernels) {
     std::vector<std::string> kernels;
-    RobustKernelFactory::instance()->fillKnownKernels(kernels);
+    g2o::RobustKernelFactory::instance()->fillKnownKernels(kernels);
     cout << "Robust Kernels:" << endl;
-    for (size_t i = 0; i < kernels.size(); ++i) {
-      cout << kernels[i] << endl;
+    for (auto & kernel : kernels) {
+      cout << kernel << endl;
     }
   }
 
@@ -209,46 +215,46 @@ int main(int argc, char** argv)
   if (maxIterations < 0) {
     cerr << "# setup termination criterion based on the gain of the iteration" << endl;
     maxIterations = maxIterationsWithGain;
-    auto terminateAction = std::make_shared<SparseOptimizerTerminateAction>();
+    auto terminateAction = std::make_shared<g2o::SparseOptimizerTerminateAction>();
     terminateAction->setGainThreshold(gain);
     terminateAction->setMaxIterations(maxIterationsWithGain);
     optimizer.addPostIterationAction(terminateAction);
   }
 
   // allocating the desired solver + testing whether the solver is okay
-  OptimizationAlgorithmProperty solverProperty;
+  g2o::OptimizationAlgorithmProperty solverProperty;
   optimizer.setAlgorithm(solverFactory->construct(strSolver, solverProperty));
   if (! optimizer.solver()) {
     cerr << "Error allocating solver. Allocating \"" << strSolver << "\" failed!" << endl;
     return 0;
   }
 
-  if (solverProperties.size() > 0) {
+  if (!solverProperties.empty()) {
     bool updateStatus = optimizer.solver()->updatePropertiesFromString(solverProperties);
     if (! updateStatus) {
       cerr << "Failure while updating the solver properties from the given string" << endl;
     }
   }
-  if (solverProperties.size() > 0 || printSolverProperties) {
+  if (!solverProperties.empty() || printSolverProperties) {
     optimizer.solver()->printProperties(cerr);
   }
 
   // Loading the input data
-  if (loadLookup.size() > 0) {
+  if (!loadLookup.empty()) {
     optimizer.setRenamedTypesFromString(loadLookup);
   }
-  if (inputFilename.size() == 0) {
+  if (inputFilename.empty()) {
     cerr << "No input data specified" << endl;
     return 0;
-  } else if (inputFilename == "-") {
+  } if (inputFilename == "-") {
     cerr << "Read input from stdin" << endl;
-    if (!optimizer.load(cin)) {
+    if (!optimizer.load(std::cin)) {
       cerr << "Error loading graph" << endl;
       return 2;
     }
   } else {
     cerr << "Read input from " << inputFilename << endl;
-    ifstream ifs(inputFilename.c_str());
+    std::ifstream ifs(inputFilename.c_str());
     if (!ifs) {
       cerr << "Failed to open file" << endl;
       return 1;
@@ -261,12 +267,12 @@ int main(int argc, char** argv)
   cerr << "Loaded " << optimizer.vertices().size() << " vertices" << endl;
   cerr << "Loaded " << optimizer.edges().size() << " edges" << endl;
 
-  if (optimizer.vertices().size() == 0) {
+  if (optimizer.vertices().empty()) {
     cerr << "Graph contains no vertices" << endl;
     return 1;
   }
 
-  set<int> vertexDimensions = optimizer.dimensions();
+  std::set<int> vertexDimensions = optimizer.dimensions();
   if (! optimizer.isSolverSuitable(solverProperty, vertexDimensions)) {
     cerr << "The selected solver is not suitable for optimizing the given graph" << endl;
     return 3;
@@ -279,7 +285,7 @@ int main(int argc, char** argv)
   // check for vertices to fix to remove DoF
   bool gaugeFreedom = optimizer.gaugeFreedom();
   std::shared_ptr<OptimizableGraph::Vertex> gauge;
-  if (gaugeList.size()){
+  if (!gaugeList.empty()){
     cerr << "Fixing gauges: ";
     for (size_t i=0; i<gaugeList.size(); i++){
       int id=gaugeList[i];
@@ -287,12 +293,11 @@ int main(int argc, char** argv)
       if (!v){
         cerr << "fatal, not found the vertex of id " << id << " in the gaugeList. Aborting";
         return -1;
-      } else {
-        if (i==0)
+      }         if (i==0)
           gauge = v;
         cerr << v->id() << " ";
-        v->setFixed(1);
-      }
+        v->setFixed(true);
+
     }
     cerr << endl;
     gaugeFreedom = false;
@@ -303,10 +308,9 @@ int main(int argc, char** argv)
     if (! gauge) {
       cerr <<  "# cannot find a vertex to fix in this thing" << endl;
       return 2;
-    } else {
-      cerr << "# graph is fixed by node " << gauge->id() << endl;
+    }       cerr << "# graph is fixed by node " << gauge->id() << endl;
       gauge->setFixed(true);
-    }
+
   } else {
     cerr << "# graph is fixed by priors or already fixed vertex" << endl;
   }
@@ -317,8 +321,8 @@ int main(int argc, char** argv)
     int minDim = *vertexDimensions.begin();
     if (maxDim != minDim) {
       cerr << "# Preparing Marginalization of the Landmarks ... ";
-      for (HyperGraph::VertexIDMap::iterator it=optimizer.vertices().begin(); it!=optimizer.vertices().end(); ++it){
-        auto v = std::static_pointer_cast<OptimizableGraph::Vertex>(it->second);
+      for (auto & it : optimizer.vertices()){
+        auto v = std::static_pointer_cast<OptimizableGraph::Vertex>(it.second);
         if (v->dimension() != maxDim) {
           v->setMarginalized(true);
         }
@@ -327,22 +331,22 @@ int main(int argc, char** argv)
     }
   }
 
-  if (robustKernel.size() > 0) {
-    AbstractRobustKernelCreator::Ptr creator = RobustKernelFactory::instance()->creator(robustKernel);
+  if (!robustKernel.empty()) {
+    g2o::AbstractRobustKernelCreator::Ptr creator = g2o::RobustKernelFactory::instance()->creator(robustKernel);
     cerr << "# Preparing robust error function ... ";
-    RobustKernelPtr robustKernel = creator->construct();
+    g2o::RobustKernelPtr robustKernel = creator->construct();
     if (huberWidth > 0) robustKernel->setDelta(huberWidth);
     if (creator) {
       if (nonSequential) {
-        for (SparseOptimizer::EdgeSet::iterator it = optimizer.edges().begin(); it != optimizer.edges().end(); ++it) {
-          auto e = std::dynamic_pointer_cast<SparseOptimizer::Edge>(*it);
+        for (const auto & it : optimizer.edges()) {
+          auto e = std::dynamic_pointer_cast<SparseOptimizer::Edge>(it);
           if (e->vertices().size() >= 2 && std::abs(e->vertex(0)->id() - e->vertex(1)->id()) != 1) {
             e->setRobustKernel(robustKernel);
           }
         }
       } else {
-        for (SparseOptimizer::EdgeSet::iterator it = optimizer.edges().begin(); it != optimizer.edges().end(); ++it) {
-          auto e = std::dynamic_pointer_cast<SparseOptimizer::Edge>(*it);
+        for (const auto & it : optimizer.edges()) {
+          auto e = std::dynamic_pointer_cast<SparseOptimizer::Edge>(it);
           e->setRobustKernel(robustKernel);
         }
       }
@@ -354,8 +358,8 @@ int main(int argc, char** argv)
 
   // sanity check
   auto optimizerWrapper = std::shared_ptr<HyperGraph>(&optimizer, [](HyperGraph*){});
-  HyperDijkstra d(optimizerWrapper);
-  UniformCostFunction f;
+  g2o::HyperDijkstra d(optimizerWrapper);
+  g2o::UniformCostFunction f;
   d.shortestPaths(gauge,&f);
   //cerr << PVAR(d.visited().size()) << endl;
 
@@ -381,14 +385,14 @@ int main(int argc, char** argv)
     cerr << "#\t iterations  " << incIterations << endl;
 
     SparseOptimizer::VertexIDMap vertices = optimizer.vertices();
-    for (auto it = vertices.begin(); it != vertices.end(); ++it) {
-      auto v = std::static_pointer_cast<SparseOptimizer::Vertex>(it->second);
-      maxDim = max(maxDim, v->dimension());
+    for (auto & vertice : vertices) {
+      auto v = std::static_pointer_cast<SparseOptimizer::Vertex>(vertice.second);
+      maxDim = std::max(maxDim, v->dimension());
     }
 
     SparseOptimizer::EdgeContainer edges;
-    for (auto it = optimizer.edges().begin(); it != optimizer.edges().end(); ++it) {
-      edges.emplace_back(std::dynamic_pointer_cast<SparseOptimizer::Edge>(*it));
+    for (const auto & it : optimizer.edges()) {
+      edges.emplace_back(std::dynamic_pointer_cast<SparseOptimizer::Edge>(it));
     }
     optimizer.edges().clear();
     optimizer.vertices().clear();
@@ -405,9 +409,7 @@ int main(int argc, char** argv)
     bool firstRound = true;
     HyperGraph::VertexSet verticesAdded;
     HyperGraph::EdgeSet edgesAdded;
-    for (auto it = edges.begin(); it != edges.end(); ++it) {
-      const auto& e = *it;
-
+    for (auto & e : edges) {
       int doInit = 0;
       auto v1 = optimizer.vertex(e->vertices()[0]->id());
       auto v2 = optimizer.vertex(e->vertices()[1]->id());
@@ -506,9 +508,9 @@ int main(int argc, char** argv)
           }
           verticesAdded.clear();
           edgesAdded.clear();
-          double ts = get_monotonic_time();
+          double ts = g2o::get_monotonic_time();
           int currentIt=optimizer.optimize(incIterations, !firstRound);
-          double dts = get_monotonic_time() - ts;
+          double dts = g2o::get_monotonic_time() - ts;
           cumTime += dts;
           firstRound = false;
           //optimizer->setOptimizationTime(cumTime);
@@ -538,9 +540,9 @@ int main(int argc, char** argv)
     } // for all edges
 
     if (! freshlyOptimized) {
-      double ts = get_monotonic_time();
+      double ts = g2o::get_monotonic_time();
       int currentIt=optimizer.optimize(incIterations, !firstRound);
-      double dts = get_monotonic_time() - ts;
+      double dts = g2o::get_monotonic_time() - ts;
       cumTime += dts;
       //optimizer->setOptimizationTime(cumTime);
       if (verbose) {
@@ -555,7 +557,7 @@ int main(int argc, char** argv)
 
     // BATCH optimization
 
-    if (statsFile!=""){
+    if (!statsFile.empty()){
       // allocate buffer for statistics;
       optimizer.setComputeBatchStatistics(true);
     }
@@ -567,30 +569,28 @@ int main(int argc, char** argv)
     if (initialGuess) {
       optimizer.computeInitialGuess();
     } else if (initialGuessOdometry) {
-      EstimatePropagatorCostOdometry costFunction(&optimizer);
+      g2o::EstimatePropagatorCostOdometry costFunction(&optimizer);
       optimizer.computeInitialGuess(costFunction);
     }
     double initChi = optimizer.chi2();
 
     signal(SIGINT, sigquit_handler);
     int result=optimizer.optimize(maxIterations);
-    if (maxIterations > 0 && result==OptimizationAlgorithm::kFail){
+    if (maxIterations > 0 && result==g2o::OptimizationAlgorithm::kFail){
       cerr << "Cholesky failed, result might be invalid" << endl;
     } else if (computeMarginals){
       std::vector<std::pair<int, int> > blockIndices;
-      for (size_t i=0; i<optimizer.activeVertices().size(); i++){
-        auto v = optimizer.activeVertices()[i];
+      for (const auto& v : optimizer.activeVertices()){
         if (v->hessianIndex()>=0){
-          blockIndices.push_back(make_pair(v->hessianIndex(), v->hessianIndex()));
+          blockIndices.emplace_back(v->hessianIndex(), v->hessianIndex());
         }
         if (v->hessianIndex()>0){
-          blockIndices.push_back(make_pair(v->hessianIndex()-1, v->hessianIndex()));
+          blockIndices.emplace_back(v->hessianIndex()-1, v->hessianIndex());
         }
       }
-      SparseBlockMatrix<MatrixXd> spinv;
+      g2o::SparseBlockMatrix<Eigen::MatrixXd> spinv;
       if (optimizer.computeMarginals(spinv, blockIndices)) {
-        for (size_t i=0; i<optimizer.activeVertices().size(); i++){
-          auto v = optimizer.activeVertices()[i];
+        for (const auto& v : optimizer.activeVertices()){
           cerr << "Vertex id:" << v->id() << endl;
           if (v->hessianIndex()>=0){
             cerr << "inv block :" << v->hessianIndex() << ", " << v->hessianIndex()<< endl;
@@ -609,53 +609,51 @@ int main(int argc, char** argv)
     optimizer.computeActiveErrors();
     double finalChi=optimizer.chi2();
 
-    if  (summaryFile!="") {
-      PropertyMap summary;
-      summary.makeProperty<StringProperty>("filename", inputFilename);
-      summary.makeProperty<IntProperty>("n_vertices", optimizer.vertices().size());
-      summary.makeProperty<IntProperty>("n_edges", optimizer.edges().size());
+    if  (!summaryFile.empty()) {
+      g2o::PropertyMap summary;
+      summary.makeProperty<g2o::StringProperty>("filename", inputFilename);
+      summary.makeProperty<g2o::IntProperty>("n_vertices", optimizer.vertices().size());
+      summary.makeProperty<g2o::IntProperty>("n_edges", optimizer.edges().size());
 
       int nLandmarks=0;
       int nPoses=0;
       int maxDim = *vertexDimensions.rbegin();
-      for (HyperGraph::VertexIDMap::iterator it = optimizer.vertices().begin();
-           it != optimizer.vertices().end(); ++it) {
-        auto v = std::static_pointer_cast<OptimizableGraph::Vertex>(it->second);
+      for (auto & it : optimizer.vertices()) {
+        auto v = std::static_pointer_cast<OptimizableGraph::Vertex>(it.second);
         if (v->dimension() != maxDim) {
           nLandmarks++;
         } else
           nPoses++;
       }
-      set<string> edgeTypes;
-      for (HyperGraph::EdgeSet::iterator it = optimizer.edges().begin();
-           it != optimizer.edges().end(); ++it) {
-        edgeTypes.insert(Factory::instance()->tag(it->get()));
+      std::set<string> edgeTypes;
+      for (const auto & it : optimizer.edges()) {
+        edgeTypes.insert(g2o::Factory::instance()->tag(it.get()));
       }
-      stringstream edgeTypesString;
-      for (std::set<string>::iterator it = edgeTypes.begin(); it != edgeTypes.end(); ++it) {
-        edgeTypesString << *it << " ";
+      std::stringstream edgeTypesString;
+      for (const auto & edgeType : edgeTypes) {
+        edgeTypesString << edgeType << " ";
       }
 
-      summary.makeProperty<IntProperty>("n_poses", nPoses);
-      summary.makeProperty<IntProperty>("n_landmarks", nLandmarks);
-      summary.makeProperty<StringProperty>("edge_types", edgeTypesString.str());
-      summary.makeProperty<DoubleProperty>("load_chi", loadChi);
-      summary.makeProperty<StringProperty>("solver", strSolver);
-      summary.makeProperty<BoolProperty>("robustKernel", robustKernel.size() > 0);
-      summary.makeProperty<DoubleProperty>("init_chi", initChi);
-      summary.makeProperty<DoubleProperty>("final_chi", finalChi);
-      summary.makeProperty<IntProperty>("maxIterations", maxIterations);
-      summary.makeProperty<IntProperty>("realIterations", result);
-      ofstream os;
-      os.open(summaryFile.c_str(), ios::app);
+      summary.makeProperty<g2o::IntProperty>("n_poses", nPoses);
+      summary.makeProperty<g2o::IntProperty>("n_landmarks", nLandmarks);
+      summary.makeProperty<g2o::StringProperty>("edge_types", edgeTypesString.str());
+      summary.makeProperty<g2o::DoubleProperty>("load_chi", loadChi);
+      summary.makeProperty<g2o::StringProperty>("solver", strSolver);
+      summary.makeProperty<g2o::BoolProperty>("robustKernel", !robustKernel.empty());
+      summary.makeProperty<g2o::DoubleProperty>("init_chi", initChi);
+      summary.makeProperty<g2o::DoubleProperty>("final_chi", finalChi);
+      summary.makeProperty<g2o::IntProperty>("maxIterations", maxIterations);
+      summary.makeProperty<g2o::IntProperty>("realIterations", result);
+      std::ofstream os;
+      os.open(summaryFile.c_str(), std::ios::app);
       summary.writeToCSV(os);
     }
 
 
-    if (statsFile!=""){
+    if (!statsFile.empty()){
       cerr << "writing stats to file \"" << statsFile << "\" ... ";
-      ofstream os(statsFile.c_str());
-      const BatchStatisticsContainer& bsc = optimizer.batchStatistics();
+      std::ofstream os(statsFile.c_str());
+      const g2o::BatchStatisticsContainer& bsc = optimizer.batchStatistics();
 
       for (int i=0; i<maxIterations; i++) {
         os << bsc[i] << endl;
@@ -666,14 +664,14 @@ int main(int argc, char** argv)
   }
 
   // saving again
-  if (gnudump.size() > 0) {
+  if (!gnudump.empty()) {
     bool gnuPlotStatus = saveGnuplot(gnudump, optimizer);
     if (! gnuPlotStatus) {
       cerr << "Error while writing gnuplot files" << endl;
     }
   }
 
-  if (outputfilename.size() > 0) {
+  if (!outputfilename.empty()) {
     if (outputfilename == "-") {
       cerr << "saving to stdout";
       optimizer.save(cout);

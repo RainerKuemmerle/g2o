@@ -37,12 +37,12 @@ namespace g2o {
   /**
    * will also look for -typeslib in (argc, argv) and load that types
    */
-  G2O_CLI_API void loadStandardTypes(DlWrapper& dlWrapper, int argc = 0, char** argv = 0);
+  G2O_CLI_API void loadStandardTypes(DlWrapper& dlWrapper, int argc = 0, char** argv = nullptr);
 
   /**
    * will also look for -solverlib in (argc, argv) and load that solver
    */
-  G2O_CLI_API void loadStandardSolver(DlWrapper& dlSolverWrapper, int argc = 0, char** argv = 0);
+  G2O_CLI_API void loadStandardSolver(DlWrapper& dlSolverWrapper, int argc = 0, char** argv = nullptr);
 
 } // end namespace
 

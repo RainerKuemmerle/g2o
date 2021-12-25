@@ -31,6 +31,7 @@
 #include <memory>
 #include <sstream>
 #include <string>
+#include <utility>
 
 #include "g2o_stuff_api.h"
 #include "string_tools.h"
@@ -54,7 +55,7 @@ class Property : public BaseProperty {
  public:
   using ValueType = T;
   explicit Property(const std::string& name_) : BaseProperty(name_) {}
-  Property(const std::string& name_, const T& v) : BaseProperty(name_), value_(v) {}
+  Property(const std::string& name_, T  v) : BaseProperty(name_), value_(std::move(v)) {}
   void setValue(const T& v) { value_ = v; }
   const T& value() const { return value_; }
   std::string toString() const override {

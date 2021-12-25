@@ -44,8 +44,10 @@ namespace g2o {
   class G2O_CLI_API DlWrapper
   {
     public:
-      DlWrapper();
-      virtual ~DlWrapper();
+      DlWrapper() = default;
+      virtual ~DlWrapper() = default;
+      DlWrapper(const DlWrapper& ) = delete;
+      DlWrapper& operator=(const DlWrapper&) = delete;
 
       /**
        * open all libs from a directory matching a specific pattern.
@@ -65,18 +67,11 @@ namespace g2o {
 
     protected:
 # if defined (UNIX) || defined(CYGWIN)
-      std::vector<void*> _handles;
+      std::vector<void*> handles_;
 #     elif defined (WINDOWS)
       std::vector<HMODULE> _handles;
 #     endif
-      std::vector<std::string> _filenames;
-
-    private:
-      /**
-       * it's not allowed to draw a copy of the wrapper
-       */
-      DlWrapper(const DlWrapper& );
-      DlWrapper& operator=(const DlWrapper& );
+      std::vector<std::string> filenames_;
   };
 
 }

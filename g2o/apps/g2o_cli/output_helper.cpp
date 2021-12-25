@@ -36,25 +36,29 @@
 
 #include <iostream>
 #include <fstream>
-using namespace std;
+
+using std::cerr;
+using std::endl;
+using std::string;
+using std::ofstream;
 
 namespace g2o {
 
-bool edgeAllVertsSameDim(OptimizableGraph::Edge* e, int dim)
+static bool edgeAllVertsSameDim(OptimizableGraph::Edge* e, int dim)
 {
-  for (size_t i = 0; i < e->vertices().size(); ++i) {
-    auto v = std::static_pointer_cast<OptimizableGraph::Vertex>(e->vertices()[i]);
-    if (v->dimension() != dim)
-      return false;
-  }
-  return true;
+  return std::all_of(e->vertices().cbegin(), e->vertices().cend(),
+                     [dim](const std::shared_ptr<HyperGraph::Vertex>& vertex) {
+                       auto* v =
+                           static_cast<OptimizableGraph::Vertex*>(vertex.get());
+                       return v->dimension() == dim;
+                     });
 }
 
 bool saveGnuplot(const std::string& gnudump, const OptimizableGraph& optimizer)
 {
   HyperGraph::VertexSet vset;
-  for (HyperGraph::VertexIDMap::const_iterator it=optimizer.vertices().begin(); it!=optimizer.vertices().end(); ++it){
-    vset.insert(it->second);
+  for (const auto & it : optimizer.vertices()){
+    vset.insert(it.second);
   }
   return saveGnuplot(gnudump, vset, optimizer.edges());
 }
@@ -70,24 +74,24 @@ bool saveGnuplot(const std::string& gnudump, const HyperGraph::VertexSet& vertic
   WriteGnuplotAction::Parameters params;
 
   int maxDim = -1;
-  int minDim = numeric_limits<int>::max();
-  for (HyperGraph::VertexSet::const_iterator it = vertices.begin(); it != vertices.end(); ++it){
-    auto v = std::static_pointer_cast<OptimizableGraph::Vertex>(*it);
+  int minDim = std::numeric_limits<int>::max();
+  for (const auto & vertice : vertices){
+    auto v = std::static_pointer_cast<OptimizableGraph::Vertex>(vertice);
     int vdim = v->dimension();
     maxDim = (std::max)(vdim, maxDim);
     minDim = (std::min)(vdim, minDim);
   }
 
   string extension = getFileExtension(gnudump);
-  if (extension.size() == 0)
+  if (extension.empty())
     extension = "dat";
   string baseFilename = getPureFilename(gnudump);
 
   // check for odometry edges
   bool hasOdomEdge = false;
   bool hasLandmarkEdge = false;
-  for (HyperGraph::EdgeSet::const_iterator it = edges.begin(); it != edges.end(); ++it) {
-    auto e = std::static_pointer_cast<OptimizableGraph::Edge>(*it);
+  for (const auto & edge : edges) {
+    auto e = std::static_pointer_cast<OptimizableGraph::Edge>(edge);
     if (e->vertices().size() == 2) {
       if (edgeAllVertsSameDim(e.get(), maxDim))
         hasOdomEdge = true;
@@ -110,8 +114,8 @@ bool saveGnuplot(const std::string& gnudump, const HyperGraph::VertexSet& vertic
     params.os = &fout;
 
     // writing odometry edges
-    for (HyperGraph::EdgeSet::const_iterator it = edges.begin(); it != edges.end(); ++it) {
-      auto e = std::static_pointer_cast<OptimizableGraph::Edge>(*it);
+    for (const auto & edge : edges) {
+      auto e = std::static_pointer_cast<OptimizableGraph::Edge>(edge);
       if (e->vertices().size() != 2 || ! edgeAllVertsSameDim(e.get(), maxDim))
         continue;
       (*saveGnuplot)(e.get(), &params);
@@ -130,8 +134,8 @@ bool saveGnuplot(const std::string& gnudump, const HyperGraph::VertexSet& vertic
     params.os = &fout;
 
     // writing landmark edges
-    for (HyperGraph::EdgeSet::const_iterator it = edges.begin(); it != edges.end(); ++it) {
-      auto e = std::static_pointer_cast<OptimizableGraph::Edge>(*it);
+    for (const auto & edge : edges) {
+      auto e = std::static_pointer_cast<OptimizableGraph::Edge>(edge);
       if (e->vertices().size() != 2 || edgeAllVertsSameDim(e.get(), maxDim))
         continue;
       (*saveGnuplot)(e.get(), &params);
@@ -139,7 +143,7 @@ bool saveGnuplot(const std::string& gnudump, const HyperGraph::VertexSet& vertic
     cerr << "done." << endl;
   }
 
-  if (1) {
+  {
     string filename = baseFilename + "_edges." + extension;
     cerr << "# saving " << filename << " ... ";
     ofstream fout(filename.c_str());
@@ -150,14 +154,14 @@ bool saveGnuplot(const std::string& gnudump, const HyperGraph::VertexSet& vertic
     params.os = &fout;
 
     // writing all edges
-    for (HyperGraph::EdgeSet::const_iterator it = edges.begin(); it != edges.end(); ++it) {
-      auto e = std::static_pointer_cast<OptimizableGraph::Edge>(*it);
+    for (const auto & edge : edges) {
+      auto e = std::static_pointer_cast<OptimizableGraph::Edge>(edge);
       (*saveGnuplot)(e.get(), &params);
     }
     cerr << "done." << endl;
   }
 
-  if (1) {
+  {
     string filename = baseFilename + "_vertices." + extension;
     cerr << "# saving " << filename << " ... ";
     ofstream fout(filename.c_str());
@@ -167,8 +171,8 @@ bool saveGnuplot(const std::string& gnudump, const HyperGraph::VertexSet& vertic
     }
     params.os = &fout;
 
-    for (HyperGraph::VertexSet::const_iterator it = vertices.begin(); it != vertices.end(); ++it){
-      auto v = std::static_pointer_cast<OptimizableGraph::Vertex>(*it);
+    for (const auto & vertice : vertices){
+      auto v = std::static_pointer_cast<OptimizableGraph::Vertex>(vertice);
       (*saveGnuplot)(v.get(), &params);
     }
     cerr << "done." << endl;
@@ -192,8 +196,8 @@ bool dumpEdges(std::ostream& os, const OptimizableGraph& optimizer)
   os << "set terminal x11 noraise" << endl;
   os << "set size ratio -1" << endl;
   os << "plot \"-\" w l" << endl;
-  for (HyperGraph::EdgeSet::const_iterator it = optimizer.edges().begin(); it != optimizer.edges().end(); ++it) {
-    auto e = std::static_pointer_cast<OptimizableGraph::Edge>(*it);
+  for (const auto & it : optimizer.edges()) {
+    auto e = std::static_pointer_cast<OptimizableGraph::Edge>(it);
     (*saveGnuplot)(e.get(), &params);
   }
   os << "e" << endl;

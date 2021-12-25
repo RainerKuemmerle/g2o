@@ -36,8 +36,6 @@
 
 namespace g2o {
 
-using namespace std;
-
 bool ParameterContainer::addParameter(const std::shared_ptr<Parameter>& p) {
   if (p->id() < 0) return false;
   auto it = find(p->id());
@@ -66,15 +64,15 @@ bool ParameterContainer::write(std::ostream& os) const {
     os << factory->tag(it.second.get()) << " ";
     os << it.second->id() << " ";
     it.second->write(os);
-    os << endl;
+    os << std::endl;
   }
   return true;
 }
 
 bool ParameterContainer::read(std::istream& is,
                               const std::map<std::string, std::string>* renamedTypesLookup) {
-  stringstream currentLine;
-  string token;
+  std::stringstream currentLine;
+  std::string token;
 
   Factory* factory = Factory::instance();
   HyperGraph::GraphElemBitset elemBitset;
@@ -103,12 +101,12 @@ bool ParameterContainer::read(std::istream& is,
     p->setId(pid);
     bool r = p->read(currentLine);
     if (!r) {
-      cerr << __PRETTY_FUNCTION__ << ": Error reading data " << token << " for parameter " << pid
-           << endl;
+      std::cerr << __PRETTY_FUNCTION__ << ": Error reading data " << token << " for parameter " << pid
+           << std::endl;
     } else {
       if (!addParameter(p)) {
-        cerr << __PRETTY_FUNCTION__ << ": Parameter of type:" << token << " id:" << pid
-             << " already defined" << endl;
+        std::cerr << __PRETTY_FUNCTION__ << ": Parameter of type:" << token << " id:" << pid
+             << " already defined" << std::endl;
       }
     }
   }  // while read line

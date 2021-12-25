@@ -53,27 +53,17 @@ using namespace std;
 
 namespace g2o {
 
-DlWrapper::DlWrapper()
-{
-}
-
-DlWrapper::~DlWrapper()
-{
-  //clear();
-}
-
 int DlWrapper::openLibraries(const std::string& directory, const std::string& pattern)
 {
   //cerr << "# loading libraries from " << directory << "\t pattern: " << pattern << endl;
   string searchPattern = directory + "/" + pattern;
-  if (pattern == "")
+  if (pattern.empty())
     searchPattern = directory + "/*";
   vector<string> matchingFiles = getFilesByPattern(searchPattern.c_str());
 
   int numLibs = 0;
-  for (size_t i = 0; i < matchingFiles.size(); ++i) {
-    const string& filename = matchingFiles[i];
-    if (find(_filenames.begin(), _filenames.end(), filename) != _filenames.end())
+  for (auto & filename : matchingFiles) {
+    if (find(filenames_.begin(), filenames_.end(), filename) != filenames_.end())
       continue;
 
     // If we are doing a release build, the wildcards will pick up the
@@ -100,16 +90,16 @@ int DlWrapper::openLibraries(const std::string& directory, const std::string& pa
 void DlWrapper::clear()
 {
 # if defined (UNIX) || defined(CYGWIN)
-  for (size_t i = 0; i < _handles.size(); ++i) {
-    dlclose(_handles[i]);
+  for (auto & _handle : handles_) {
+    dlclose(_handle);
   }
 #elif defined(WINDOWS)
   for (size_t i = 0; i < _handles.size(); ++i) {
     FreeLibrary(_handles[i]);
   }
 #endif
-  _filenames.clear();
-  _handles.clear();
+  filenames_.clear();
+  handles_.clear();
 }
 
 bool DlWrapper::openLibrary(const std::string& filename)
@@ -130,8 +120,8 @@ bool DlWrapper::openLibrary(const std::string& filename)
 
   //cerr << "loaded " << filename << endl;
 
-  _filenames.push_back(filename);
-  _handles.push_back(handle);
+  filenames_.push_back(filename);
+  handles_.push_back(handle);
   return true;
 }
 
