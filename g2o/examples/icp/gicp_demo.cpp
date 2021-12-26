@@ -24,7 +24,7 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include <stdint.h>
+#include <cstdint>
 
 #include <iostream>
 #include <random>
@@ -37,11 +37,12 @@
 #include "g2o/stuff/sampler.h"
 #include "g2o/types/icp/types_icp.h"
 
-using namespace Eigen;
-using namespace std;
-using namespace g2o;
+using std::cout;
+using std::cerr;
+using std::endl;
 
-int main() {
+namespace g2o {
+static int gicp_demo() {
   double euc_noise = 0.01;  // noise in position, m
   //  double outlier_ratio = 0.1;
 
@@ -55,19 +56,19 @@ int main() {
 
   optimizer.setAlgorithm(std::move(solver));
 
-  vector<Vector3d> true_points;
+  std::vector<Vector3> true_points;
   for (size_t i = 0; i < 1000; ++i) {
-    true_points.push_back(Vector3d((g2o::Sampler::uniformRand(0., 1.) - 0.5) * 3,
-                                   g2o::Sampler::uniformRand(0., 1.) - 0.5,
-                                   g2o::Sampler::uniformRand(0., 1.) + 10));
+    true_points.emplace_back((g2o::Sampler::uniformRand(0., 1.) - 0.5) * 3,
+                             g2o::Sampler::uniformRand(0., 1.) - 0.5,
+                             g2o::Sampler::uniformRand(0., 1.) + 10);
   }
 
   // set up two poses
   int vertex_id = 0;
   for (size_t i = 0; i < 2; ++i) {
     // set up rotation and translation for this node
-    Vector3d t(0, 0, i);
-    Quaterniond q;
+    Vector3 t(0, 0, i);
+    Quaternion q;
     q.setIdentity();
 
     Eigen::Isometry3d cam;  // camera pose
@@ -98,21 +99,21 @@ int main() {
     auto vp1 = std::dynamic_pointer_cast<VertexSE3>(optimizer.vertices().find(1)->second);
 
     // calculate the relative 3D position of the point
-    Vector3d pt0, pt1;
-    pt0 = vp0->estimate().inverse() * true_points[i];
-    pt1 = vp1->estimate().inverse() * true_points[i];
+    Vector3 pt0 = vp0->estimate().inverse() * true_points[i];
+    Vector3 pt1 = vp1->estimate().inverse() * true_points[i];
 
     // add in noise
-    pt0 += Vector3d(g2o::Sampler::gaussRand(0., euc_noise), g2o::Sampler::gaussRand(0., euc_noise),
-                    g2o::Sampler::gaussRand(0., euc_noise));
+    pt0 += Vector3(g2o::Sampler::gaussRand(0., euc_noise),
+                   g2o::Sampler::gaussRand(0., euc_noise),
+                   g2o::Sampler::gaussRand(0., euc_noise));
 
-    pt1 += Vector3d(g2o::Sampler::gaussRand(0., euc_noise), g2o::Sampler::gaussRand(0., euc_noise),
-                    g2o::Sampler::gaussRand(0., euc_noise));
+    pt1 += Vector3(g2o::Sampler::gaussRand(0., euc_noise),
+                   g2o::Sampler::gaussRand(0., euc_noise),
+                   g2o::Sampler::gaussRand(0., euc_noise));
 
     // form edge, with normals in varioius positions
-    Vector3d nm0, nm1;
-    nm0 << 0, i, 1;
-    nm1 << 0, i, 1;
+    Vector3 nm0(0, i, 1);
+    Vector3 nm1(0, i, 1);
     nm0.normalize();
     nm1.normalize();
 
@@ -147,7 +148,7 @@ int main() {
   // move second cam off of its true position
   auto vc = std::dynamic_pointer_cast<VertexSE3>(optimizer.vertices().find(1)->second);
   Eigen::Isometry3d cam = vc->estimate();
-  cam.translation() = Vector3d(0, 0, 0.2);
+  cam.translation() = Vector3(0, 0, 0.2);
   vc->setEstimate(cam);
 
   optimizer.initializeOptimization();
@@ -169,4 +170,10 @@ int main() {
               .translation()
               .transpose()
        << endl;
+  return 0;
+}
+}
+
+int main() {
+  return g2o::gicp_demo();
 }

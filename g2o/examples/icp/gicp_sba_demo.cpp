@@ -24,7 +24,7 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include <stdint.h>
+#include <cstdint>
 
 #include <iostream>
 #include <random>
@@ -37,11 +37,12 @@
 #include "g2o/stuff/sampler.h"
 #include "g2o/types/icp/types_icp.h"
 
-using namespace Eigen;
-using namespace std;
-using namespace g2o;
+using std::cout;
+using std::cerr;
+using std::endl;
 
-int main(int argc, char** argv) {
+namespace g2o {
+static int gicp_sba_demo(int argc, char** argv) {
   int num_points = 0;
 
   // check for arg, # of points to use in projection SBA
@@ -61,16 +62,16 @@ int main(int argc, char** argv) {
 
   optimizer.setAlgorithm(std::unique_ptr<OptimizationAlgorithm>(solver));
 
-  vector<Vector3d> true_points;
+  std::vector<Vector3> true_points;
   for (size_t i = 0; i < 1000; ++i) {
-    true_points.push_back(Vector3d((g2o::Sampler::uniformRand(0., 1.) - 0.5) * 3,
-                                   g2o::Sampler::uniformRand(0., 1.) - 0.5,
-                                   g2o::Sampler::uniformRand(0., 1.) + 10));
+    true_points.emplace_back((g2o::Sampler::uniformRand(0., 1.) - 0.5) * 3,
+                             g2o::Sampler::uniformRand(0., 1.) - 0.5,
+                             g2o::Sampler::uniformRand(0., 1.) + 10);
   }
 
   // set up camera params
-  Vector2d focal_length(500, 500);     // pixels
-  Vector2d principal_point(320, 240);  // 640x480 image
+  Vector2 focal_length(500, 500);     // pixels
+  Vector2 principal_point(320, 240);  // 640x480 image
   double baseline = 0.075;             // 7.5 cm baseline
 
   // set up camera params and projection matrices on vertices
@@ -81,8 +82,8 @@ int main(int argc, char** argv) {
   int vertex_id = 0;
   for (size_t i = 0; i < 2; ++i) {
     // set up rotation and translation for this node
-    Vector3d t(0, 0, i);
-    Quaterniond q;
+    Vector3 t(0, 0, i);
+    Quaternion q;
     q.setIdentity();
 
     Eigen::Isometry3d cam;  // camera pose
@@ -115,21 +116,21 @@ int main(int argc, char** argv) {
     auto vp1 = std::dynamic_pointer_cast<VertexSE3>(optimizer.vertices().find(1)->second);
 
     // calculate the relative 3D position of the point
-    Vector3d pt0, pt1;
-    pt0 = vp0->estimate().inverse() * true_points[i];
-    pt1 = vp1->estimate().inverse() * true_points[i];
+    Vector3 pt0 = vp0->estimate().inverse() * true_points[i];
+    Vector3 pt1 = vp1->estimate().inverse() * true_points[i];
 
     // add in noise
-    pt0 += Vector3d(g2o::Sampler::gaussRand(0., euc_noise), g2o::Sampler::gaussRand(0., euc_noise),
-                    g2o::Sampler::gaussRand(0., euc_noise));
+    pt0 += Vector3(g2o::Sampler::gaussRand(0., euc_noise),
+                   g2o::Sampler::gaussRand(0., euc_noise),
+                   g2o::Sampler::gaussRand(0., euc_noise));
 
-    pt1 += Vector3d(g2o::Sampler::gaussRand(0., euc_noise), g2o::Sampler::gaussRand(0., euc_noise),
-                    g2o::Sampler::gaussRand(0., euc_noise));
+    pt1 += Vector3(g2o::Sampler::gaussRand(0., euc_noise),
+                   g2o::Sampler::gaussRand(0., euc_noise),
+                   g2o::Sampler::gaussRand(0., euc_noise));
 
     // form edge, with normals in varioius positions
-    Vector3d nm0, nm1;
-    nm0 << 0, i, 1;
-    nm1 << 0, i, 1;
+    Vector3 nm0(0, i, 1);
+    Vector3 nm1(0, i, 1);
     nm0.normalize();
     nm1.normalize();
 
@@ -168,31 +169,31 @@ int main(int argc, char** argv) {
 
   true_points.clear();
   for (int i = 0; i < num_points; ++i) {
-    true_points.push_back(Vector3d((g2o::Sampler::uniformRand(0., 1.) - 0.5) * 3,
-                                   g2o::Sampler::uniformRand(0., 1.) - 0.5,
-                                   g2o::Sampler::uniformRand(0., 1.) + 10));
+    true_points.emplace_back((g2o::Sampler::uniformRand(0., 1.) - 0.5) * 3,
+                             g2o::Sampler::uniformRand(0., 1.) - 0.5,
+                             g2o::Sampler::uniformRand(0., 1.) + 10);
   }
 
   // add point projections to this vertex
-  for (size_t i = 0; i < true_points.size(); ++i) {
+  for (auto & true_point : true_points) {
     auto v_p = std::make_shared<g2o::VertexPointXYZ>();
 
     v_p->setId(vertex_id++);
     v_p->setMarginalized(true);
-    v_p->setEstimate(true_points.at(i) + Vector3d(g2o::Sampler::gaussRand(0., 1),
+    v_p->setEstimate(true_point + Vector3(g2o::Sampler::gaussRand(0., 1),
                                                   g2o::Sampler::gaussRand(0., 1),
                                                   g2o::Sampler::gaussRand(0., 1)));
 
     optimizer.addVertex(v_p);
 
     for (size_t j = 0; j < 2; ++j) {
-      Vector3d z;
+      Vector3 z;
       std::dynamic_pointer_cast<g2o::VertexSCam>(optimizer.vertices().find(j)->second)
-          ->mapPoint(z, true_points.at(i));
+          ->mapPoint(z, true_point);
 
       if (z[0] >= 0 && z[1] >= 0 && z[0] < 640 && z[1] < 480) {
-        z +=
-            Vector3d(g2o::Sampler::gaussRand(0., pix_noise), g2o::Sampler::gaussRand(0., pix_noise),
+        z += Vector3(g2o::Sampler::gaussRand(0., pix_noise),
+                     g2o::Sampler::gaussRand(0., pix_noise),
                      g2o::Sampler::gaussRand(0., pix_noise / 16.0));
 
         auto e = std::make_shared<g2o::EdgeXyzVsc>();
@@ -203,7 +204,7 @@ int main(int argc, char** argv) {
 
         e->setMeasurement(z);
         // e->inverseMeasurement() = -z;
-        e->information() = Matrix3d::Identity();
+        e->information() = Matrix3::Identity();
 
         // e->setRobustKernel(false);
         // e->setHuberWidth(1);
@@ -216,7 +217,7 @@ int main(int argc, char** argv) {
   // move second cam off of its true position
   auto vc = std::dynamic_pointer_cast<VertexSE3>(optimizer.vertices().find(1)->second);
   Eigen::Isometry3d cam = vc->estimate();
-  cam.translation() = Vector3d(-0.1, 0.1, 0.2);
+  cam.translation() = Vector3(-0.1, 0.1, 0.2);
   vc->setEstimate(cam);
   optimizer.initializeOptimization();
   optimizer.computeActiveErrors();
@@ -237,4 +238,10 @@ int main(int argc, char** argv) {
               .translation()
               .transpose()
        << endl;
+  return 0;
+}
+}
+
+int main(int argc, char** argv) {
+  return g2o::gicp_sba_demo(argc, argv);
 }
