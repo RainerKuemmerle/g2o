@@ -52,7 +52,8 @@ int main(int argc, char** argv) {
   bool hasSegmentSensor;
   int nSegments;
   int segmentGridSize;
-  double minSegmentLenght, maxSegmentLenght;
+  double minSegmentLenght;
+  double maxSegmentLenght;
 
 
   std::string outputFilename;
@@ -80,7 +81,7 @@ int main(int argc, char** argv) {
   OptimizableGraph graph;
   World world(&graph);
   for (int i=0; i<nlandmarks; i++){
-    WorldObjectPointXY * landmark = new WorldObjectPointXY;
+    auto * landmark = new WorldObjectPointXY;
     double x = sampleUniform(-.5,.5, &generator)*(worldSize+5);
     double y = sampleUniform(-.5,.5, &generator)*(worldSize+5);
     landmark->vertex()->setEstimate(Vector2d(x,y));
@@ -90,7 +91,7 @@ int main(int argc, char** argv) {
   cerr << "nSegments = " << nSegments << endl;
 
   for (int i=0; i<nSegments; i++){
-    WorldObjectSegment2D * segment = new WorldObjectSegment2D;
+    auto * segment = new WorldObjectSegment2D;
     int ix = sampleUniform(-segmentGridSize,segmentGridSize, &generator);
     int iy = sampleUniform(-segmentGridSize,segmentGridSize, &generator);
     int ith = sampleUniform(0,3, &generator);
@@ -126,7 +127,7 @@ int main(int argc, char** argv) {
   ss << "-steps" << simSteps;
 
   if (hasOdom) {
-    SensorOdometry2D* odometrySensor=new SensorOdometry2D("odometry");
+    auto* odometrySensor=new SensorOdometry2D("odometry");
     robot.addSensor(odometrySensor);
     Matrix3d odomInfo = odometrySensor->information();
     odomInfo.setIdentity();
@@ -137,7 +138,7 @@ int main(int argc, char** argv) {
   }
 
   if (hasPoseSensor) {
-    SensorPose2D* poseSensor = new SensorPose2D("poseSensor");
+    auto* poseSensor = new SensorPose2D("poseSensor");
     robot.addSensor(poseSensor);
     Matrix3d poseInfo = poseSensor->information();
     poseInfo.setIdentity();
@@ -148,7 +149,7 @@ int main(int argc, char** argv) {
   }
 
   if (hasPointSensor) {
-    SensorPointXY* pointSensor = new SensorPointXY("pointSensor");
+    auto* pointSensor = new SensorPointXY("pointSensor");
     robot.addSensor(pointSensor);
     Matrix2d pointInfo = pointSensor->information();
     pointInfo.setIdentity();
@@ -159,7 +160,7 @@ int main(int argc, char** argv) {
   }
 
   if (hasPointBearingSensor) {
-    SensorPointXYBearing* bearingSensor = new SensorPointXYBearing("bearingSensor");
+    auto* bearingSensor = new SensorPointXYBearing("bearingSensor");
     robot.addSensor(bearingSensor);
     bearingSensor->setInformation(bearingSensor->information()*1000);
     ss << "-pointBearing";
@@ -167,14 +168,14 @@ int main(int argc, char** argv) {
 
   if (hasSegmentSensor) {
     cerr << "creating Segment Sensor" << endl;
-    SensorSegment2D* segmentSensor = new SensorSegment2D("segmentSensor");
+    auto* segmentSensor = new SensorSegment2D("segmentSensor");
     cerr << "segmentSensorCreated" << endl;
     segmentSensor->setMaxRange(3);
     segmentSensor->setMinRange(.1);
     robot.addSensor(segmentSensor);
     segmentSensor->setInformation(segmentSensor->information()*1000);
 
-    SensorSegment2DLine* segmentSensorLine = new SensorSegment2DLine("segmentSensorSensorLine");
+    auto* segmentSensorLine = new SensorSegment2DLine("segmentSensorSensorLine");
     segmentSensorLine->setMaxRange(3);
     segmentSensorLine->setMinRange(.1);
     robot.addSensor(segmentSensorLine);
@@ -183,7 +184,7 @@ int main(int argc, char** argv) {
     m(0,0)*=10;
     segmentSensorLine->setInformation(m);
 
-    SensorSegment2DPointLine* segmentSensorPointLine = new SensorSegment2DPointLine("segmentSensorSensorPointLine");
+    auto* segmentSensorPointLine = new SensorSegment2DPointLine("segmentSensorSensorPointLine");
     segmentSensorPointLine->setMaxRange(3);
     segmentSensorPointLine->setMinRange(.1);
     robot.addSensor(segmentSensorPointLine);

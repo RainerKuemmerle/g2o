@@ -37,9 +37,9 @@ namespace g2o {
   class G2O_SIMULATOR_API SensorSegment2D: public PointSensorParameters, public BinarySensor<Robot2D, EdgeSE2Segment2D,WorldObjectSegment2D>{
   public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-    SensorSegment2D(const std::string& name_);
-    virtual void sense();
-    virtual void addNoise(EdgeType* e);
+    explicit SensorSegment2D(const std::string& name);
+    void sense() override;
+    void addNoise(EdgeType* e) override;
   protected:
     bool isVisible(WorldObjectType* to);
   };

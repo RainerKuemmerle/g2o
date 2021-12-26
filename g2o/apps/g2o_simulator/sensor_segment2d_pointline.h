@@ -37,12 +37,12 @@ namespace g2o {
   class G2O_SIMULATOR_API SensorSegment2DPointLine: public PointSensorParameters, public BinarySensor<Robot2D, EdgeSE2Segment2DPointLine,WorldObjectSegment2D>{
   public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-    SensorSegment2DPointLine(const std::string& name_);
-    virtual void sense();
-    virtual void addNoise(EdgeType* e);
+    explicit SensorSegment2DPointLine(const std::string& name);
+    void sense() override;
+    void addNoise(EdgeType* e) override;
   protected:
     bool isVisible(WorldObjectType* to);
-    int _visiblePoint;
+    int visiblePoint_;
   };
 
 }

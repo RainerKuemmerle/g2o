@@ -36,15 +36,15 @@ namespace g2o {
   class G2O_SIMULATOR_API SensorPointXYOffset: public PointSensorParameters, public BinarySensor<Robot2D, EdgeSE2PointXYOffset, WorldObjectPointXY>{
   public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-    typedef PoseVertexType::EstimateType RobotPoseType;
-    SensorPointXYOffset(const std::string& name_);
-    virtual void sense();
-    virtual void addNoise(EdgeType* e);
-    virtual void addParameters();
+    using RobotPoseType = PoseVertexType::EstimateType;
+    explicit SensorPointXYOffset(const std::string& name);
+    void sense() override;
+    void addNoise(EdgeType* e) override;
+    void addParameters() override;
   protected:
     bool isVisible(WorldObjectType* to);
-    std::shared_ptr<ParameterSE2Offset> _offsetParam;
-    RobotPoseType _sensorPose;
+    std::shared_ptr<ParameterSE2Offset> offsetParam_;
+    RobotPoseType sensorPose_;
   };
 
 }

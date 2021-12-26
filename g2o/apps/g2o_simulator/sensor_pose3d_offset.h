@@ -36,22 +36,22 @@ class SensorPose3DOffset : public PointSensorParameters,
                            public BinarySensor<Robot3D, EdgeSE3Offset, WorldObjectSE3> {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-  SensorPose3DOffset(const std::string& name_);
-  virtual void sense();
-  int stepsToIgnore() const { return _stepsToIgnore; }
-  void setStepsToIgnore(int stepsToIgnore_) { _stepsToIgnore = stepsToIgnore_; }
-  void addNoise(EdgeType* e);
-  virtual void addParameters();
-  std::shared_ptr<ParameterSE3Offset> offsetParam1() { return _offsetParam1; };
-  std::shared_ptr<ParameterSE3Offset> offsetParam2() { return _offsetParam2; };
+  explicit SensorPose3DOffset(const std::string& name);
+  void sense() override;
+  int stepsToIgnore() const { return stepsToIgnore_; }
+  void setStepsToIgnore(int stepsToIgnore) { stepsToIgnore_ = stepsToIgnore; }
+  void addNoise(EdgeType* e) override;
+  void addParameters() override;
+  std::shared_ptr<ParameterSE3Offset> offsetParam1() { return offsetParam1_; };
+  std::shared_ptr<ParameterSE3Offset> offsetParam2() { return offsetParam2_; };
 
  protected:
   bool isVisible(WorldObjectType* to);
-  int _stepsToIgnore;
-  std::shared_ptr<ParameterSE3Offset> _offsetParam1, _offsetParam2;
+  int stepsToIgnore_;
+  std::shared_ptr<ParameterSE3Offset> offsetParam1_, offsetParam2_;
 
   // these are temporaries
-  std::set<PoseObject*> _posesToIgnore;
+  std::set<PoseObject*> posesToIgnore_;
 };
 
 }  // namespace g2o

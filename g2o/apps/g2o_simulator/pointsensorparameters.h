@@ -33,22 +33,25 @@
 
 namespace g2o {
 
-  class G2O_SIMULATOR_API PointSensorParameters{
-  public:
-    //EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-    PointSensorParameters();
-    double maxRange() const {return sqrt(_maxRange2);}
-    void setMaxRange(double maxRange_)  {_maxRange2 = maxRange_*maxRange_;}
-    double minRange() const {return sqrt(_minRange2);}
-    void setMinRange(double minRange_)  {_minRange2 = minRange_*minRange_;}
-    double fov() const {return _fov;}
-    void setFov(double fov_)  {_fov = fov_;}
-    double maxAngularDifference() const { return _maxAngularDifference; }
-    void setMaxAngularDifference(double angularDifference) {_maxAngularDifference = angularDifference;}
-  protected:
-    double _maxRange2, _minRange2, _fov,  _maxAngularDifference;
-  };
+class G2O_SIMULATOR_API PointSensorParameters {
+ public:
+  PointSensorParameters() = default;
+  double maxRange() const { return sqrt(maxRange2_); }
+  void setMaxRange(double maxRange);
+  double minRange() const { return sqrt(minRange2_); }
+  void setMinRange(double minRange);
+  double fov() const { return fov_; }
+  void setFov(double fov);
+  double maxAngularDifference() const { return maxAngularDifference_; }
+  void setMaxAngularDifference(double angularDifference);
 
-}
+ protected:
+  double maxRange2_ = 25;
+  double minRange2_ = 0.01;
+  double fov_ = M_PI / 2;
+  double maxAngularDifference_ = M_PI / 2;
+};
+
+}  // namespace g2o
 
 #endif

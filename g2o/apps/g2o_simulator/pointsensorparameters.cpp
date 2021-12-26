@@ -26,14 +26,22 @@
 
 #include "pointsensorparameters.h"
 
-#include "g2o/stuff/misc.h" // for M_PI
+#include "g2o/stuff/misc.h"  // for M_PI
 
 // Robot2D
 namespace g2o {
-  PointSensorParameters::PointSensorParameters(){
-    _maxRange2 = 25;
-    _minRange2 = 0.01;
-    _fov = M_PI/2;
-    _maxAngularDifference = M_PI/2;
-  }
+
+void PointSensorParameters::setMaxRange(double maxRange) {
+  maxRange2_ = maxRange * maxRange;
 }
+
+void PointSensorParameters::setMinRange(double minRange) {
+  minRange2_ = minRange * minRange;
+}
+void PointSensorParameters::setFov(double fov) { fov_ = fov; }
+
+void PointSensorParameters::setMaxAngularDifference(double angularDifference) {
+  maxAngularDifference_ = angularDifference;
+}
+
+}  // namespace g2o

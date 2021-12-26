@@ -35,18 +35,18 @@ namespace g2o {
   class G2O_SIMULATOR_API SensorPose3D : public PointSensorParameters, public BinarySensor<Robot3D, EdgeSE3, WorldObjectSE3>  {
   public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-  SensorPose3D(const std::string& name_);
-    virtual void sense();
-    int stepsToIgnore() const {return _stepsToIgnore;}
-    void setStepsToIgnore(int stepsToIgnore_) {_stepsToIgnore = stepsToIgnore_;}
-    void addNoise(EdgeType* e);
+  explicit SensorPose3D(const std::string& name);
+    void sense() override;
+    int stepsToIgnore() const {return stepsToIgnore_;}
+    void setStepsToIgnore(int stepsToIgnore) {stepsToIgnore_ = stepsToIgnore;}
+    void addNoise(EdgeType* e) override;
 
   protected:
 
     bool isVisible(WorldObjectType* to);
-    int _stepsToIgnore;
+    int stepsToIgnore_;
     // these are temporaries
-    std::set<PoseObject*> _posesToIgnore;
+    std::set<PoseObject*> posesToIgnore_;
   };
 
 }

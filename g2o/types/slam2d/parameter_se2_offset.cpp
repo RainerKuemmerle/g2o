@@ -73,11 +73,13 @@ void CacheSE2Offset::updateImpl() {
   w2l_.translation() = w2l.translation();
 
   number_t alpha = v->estimate().rotation().angle();
-  number_t c = std::cos(alpha), s = std::sin(alpha);
+  number_t c = std::cos(alpha);
+  number_t s = std::sin(alpha);
   Matrix2 RInversePrime;
   RInversePrime << -s, c, -c, -s;
   RpInverse_RInversePrime_ =
-      offsetParam->offset().rotation().toRotationMatrix().transpose() * RInversePrime;
+      offsetParam->offset().rotation().toRotationMatrix().transpose() *
+      RInversePrime;
   RpInverse_RInverse_ = w2l.rotation();
 }
 

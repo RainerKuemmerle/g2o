@@ -27,30 +27,28 @@
 #include "simulator.h"
 #include <iostream>
 namespace g2o{
-  using namespace std;
 
   // BaseWorldObject
-  BaseWorldObject::~BaseWorldObject() {}
   OptimizableGraph* BaseWorldObject::graph() {
-    if (_world)
-      return _world-> graph();
-    return 0;
+    if (world_)
+      return world_-> graph();
+    return nullptr;
   }
 
-  void BaseWorldObject::setVertex(const std::shared_ptr<OptimizableGraph::Vertex>& vertex_){
-    _vertex= vertex_;
+  void BaseWorldObject::setVertex(const std::shared_ptr<OptimizableGraph::Vertex>& vertex){
+    vertex_= vertex;
   }
 
   // BaseRobot
   OptimizableGraph* BaseRobot::graph() {
-    if (_world)
-      return _world-> graph();
-    return 0;
+    if (world_)
+      return world_-> graph();
+    return nullptr;
   }
 
   bool BaseRobot::addSensor(BaseSensor* sensor){
     assert (graph());
-    std::pair<std::set<BaseSensor*>::iterator, bool> result=_sensors.insert(sensor);
+    std::pair<std::set<BaseSensor*>::iterator, bool> result=sensors_.insert(sensor);
     if(result.second){
       sensor->setRobot(this);
       sensor->addParameters();
@@ -59,28 +57,27 @@ namespace g2o{
   }
 
   void BaseRobot::sense() {
-    for (std::set<BaseSensor*>::iterator it=_sensors.begin(); it!=_sensors.end(); ++it){
-      BaseSensor* s=*it;
+    for (auto *s : sensors_){
       s->sense();
     }
   }
 
   // Sensor
   World* BaseSensor::world() {
-    if (!_robot)
-      return 0;
-    return _robot->world();
+    if (!robot_)
+      return nullptr;
+    return robot_->world();
   }
 
   OptimizableGraph* BaseSensor::graph() {
-    if (!_robot)
-      return 0;
-    return _robot->graph();
+    if (!robot_)
+      return nullptr;
+    return robot_->graph();
   }
 
   //World
   bool World::addRobot(BaseRobot* robot){
-    std::pair<std::set<BaseRobot*>::iterator, bool> result=_robots.insert(robot);
+    std::pair<std::set<BaseRobot*>::iterator, bool> result=robots_.insert(robot);
     if (result.second){
       robot->setWorld(this);
     }
@@ -88,12 +85,12 @@ namespace g2o{
   }
 
   bool World::addWorldObject(BaseWorldObject* object){
-    std::pair<std::set<BaseWorldObject*>::iterator, bool> result=_objects.insert(object);
+    std::pair<std::set<BaseWorldObject*>::iterator, bool> result=objects_.insert(object);
     if (result.second){
       object->setWorld(this);
     }
-    if (graph() && object->vertex()){
-      object->vertex()->setId(_runningId++);
+    if ((graph() != nullptr) && object->vertex()){
+      object->vertex()->setId(runningId_++);
       graph()->addVertex(object->vertex());
     }
     return result.second;
@@ -102,9 +99,9 @@ namespace g2o{
   bool World::addParameter(const std::shared_ptr<Parameter>& param){
     if ( !graph())
       return false;
-    param->setId(_paramId);
+    param->setId(paramId_);
     graph()->addParameter(param);
-    _paramId++;
+    paramId_++;
     return true;
   }
 

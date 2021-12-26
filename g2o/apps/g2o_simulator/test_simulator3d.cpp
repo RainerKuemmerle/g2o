@@ -72,7 +72,7 @@ int main(int argc, char** argv) {
   OptimizableGraph graph;
   World world(&graph);
   for (int i=0; i<nlandmarks; i++){
-    WorldObjectTrackXYZ * landmark = new WorldObjectTrackXYZ;
+    auto * landmark = new WorldObjectTrackXYZ;
     double x = sampleUniform(-.5, .5, &generator)*worldSize;
     double y = sampleUniform(-.5, .5, &generator)*worldSize;
     double z = sampleUniform(-.5, .5);
@@ -88,13 +88,13 @@ int main(int argc, char** argv) {
   ss << "-steps" << simSteps;
 
   if (hasOdom) {
-    SensorOdometry3D* odometrySensor=new SensorOdometry3D("odometry");
+    auto* odometrySensor=new SensorOdometry3D("odometry");
     robot.addSensor(odometrySensor);
     ss << "-odom";
   }
 
   if (hasPointSensor) {
-    SensorPointXYZ* pointSensor =  new SensorPointXYZ("pointSensor");
+    auto* pointSensor =  new SensorPointXYZ("pointSensor");
     pointSensor->setFov(M_PI/4);
     robot.addSensor(pointSensor);
     Eigen::Isometry3d cameraPose;
@@ -110,7 +110,7 @@ int main(int argc, char** argv) {
   }
 
   if (hasPointDisparitySensor){
-    SensorPointXYZDisparity* disparitySensor = new SensorPointXYZDisparity("disparitySensor");
+    auto* disparitySensor = new SensorPointXYZDisparity("disparitySensor");
     disparitySensor->setFov(M_PI/4);
     disparitySensor->setMinRange(0.5);
     disparitySensor->setMaxRange(2.);
@@ -127,7 +127,7 @@ int main(int argc, char** argv) {
   }
 
   if (hasPointDepthSensor){
-    SensorPointXYZDepth* depthSensor = new SensorPointXYZDepth("depthSensor");
+    auto* depthSensor = new SensorPointXYZDepth("depthSensor");
     depthSensor->setFov(M_PI/4);
     depthSensor->setMinRange(0.5);
     depthSensor->setMaxRange(2.);
@@ -144,7 +144,7 @@ int main(int argc, char** argv) {
   }
 
   if (hasPoseSensor){
-    SensorPose3D* poseSensor = new SensorPose3D("poseSensor");
+    auto* poseSensor = new SensorPose3D("poseSensor");
     robot.addSensor(poseSensor);
     poseSensor->setMaxRange(5);
     ss << "-pose";

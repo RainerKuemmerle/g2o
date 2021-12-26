@@ -27,49 +27,48 @@
 #include "sensor_se3_prior.h"
 
 namespace g2o {
-using namespace std;
 
 // SensorSE3Prior
-SensorSE3Prior::SensorSE3Prior(const std::string& name_)
-    : UnarySensor<Robot3D, EdgeSE3Prior>(name_) {
-  _offsetParam = 0;
-  _information.setIdentity();
-  _information *= 1000;
-  _information(2, 2) = 10;
-  setInformation(_information);
+SensorSE3Prior::SensorSE3Prior(const std::string& name)
+    : UnarySensor<Robot3D, EdgeSE3Prior>(name) {
+  offsetParam_ = nullptr;
+  information_.setIdentity();
+  information_ *= 1000;
+  information_(2, 2) = 10;
+  setInformation(information_);
 }
 
 void SensorSE3Prior::addParameters() {
-  if (!_offsetParam) _offsetParam = std::make_shared<ParameterSE3Offset>();
+  if (!offsetParam_) offsetParam_ = std::make_shared<ParameterSE3Offset>();
   assert(world());
-  world()->addParameter(_offsetParam);
+  world()->addParameter(offsetParam_);
 }
 
 void SensorSE3Prior::addNoise(EdgeType* e) {
-  EdgeType::ErrorVector _n = _sampler.generateSample();
+  EdgeType::ErrorVector _n = sampler_.generateSample();
   EdgeType::Measurement n = internal::fromVectorMQT(_n);
   e->setMeasurement(e->measurement() * n);
   e->setInformation(information());
 }
 
 void SensorSE3Prior::sense() {
-  if (!_offsetParam) {
+  if (!offsetParam_) {
     return;
   }
-  _robotPoseObject = 0;
-  RobotType* r = dynamic_cast<RobotType*>(robot());
-  std::list<PoseObject*>::reverse_iterator it = r->trajectory().rbegin();
+  robotPoseObject_ = nullptr;
+  auto* r = dynamic_cast<RobotType*>(robot());
+  auto it = r->trajectory().rbegin();
   int count = 0;
   while (it != r->trajectory().rend() && count < 1) {
-    if (!_robotPoseObject) _robotPoseObject = *it;
+    if (!robotPoseObject_) robotPoseObject_ = *it;
     ++it;
     count++;
   }
-  if (!_robotPoseObject) return;
-  _sensorPose = _robotPoseObject->vertex()->estimate() * _offsetParam->offset();
+  if (!robotPoseObject_) return;
+  sensorPose_ = robotPoseObject_->vertex()->estimate() * offsetParam_->offset();
   auto e = mkEdge();
   if (e && graph()) {
-    e->setParameterId(0, _offsetParam->id());
+    e->setParameterId(0, offsetParam_->id());
     graph()->addEdge(e);
     e->setMeasurementFromState();
     addNoise(e.get());

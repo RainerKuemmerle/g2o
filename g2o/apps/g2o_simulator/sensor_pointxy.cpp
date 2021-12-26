@@ -26,48 +26,44 @@
 
 #include "sensor_pointxy.h"
 
-using namespace Eigen;
-
 namespace g2o {
 
-SensorPointXY::SensorPointXY(const std::string& name_)
-    : BinarySensor<Robot2D, EdgeSE2PointXY, WorldObjectPointXY>(name_) {}
+SensorPointXY::SensorPointXY(const std::string& name)
+    : BinarySensor<Robot2D, EdgeSE2PointXY, WorldObjectPointXY>(name) {}
 
 void SensorPointXY::addNoise(EdgeType* e) {
-  EdgeType::ErrorVector n = _sampler.generateSample();
+  EdgeType::ErrorVector n = sampler_.generateSample();
   e->setMeasurement(e->measurement() + n);
   e->setInformation(information());
 }
 
 bool SensorPointXY::isVisible(SensorPointXY::WorldObjectType* to) {
-  if (!_robotPoseObject) return false;
+  if (!robotPoseObject_) return false;
 
   assert(to && to->vertex());
   VertexType::EstimateType pose = to->vertex()->estimate();
-  VertexType::EstimateType delta = _robotPoseObject->vertex()->estimate().inverse() * pose;
-  Vector2d translation = delta;
+  VertexType::EstimateType delta = robotPoseObject_->vertex()->estimate().inverse() * pose;
+  Vector2 translation = delta;
   double range2 = translation.squaredNorm();
-  if (range2 > _maxRange2) return false;
-  if (range2 < _minRange2) return false;
+  if (range2 > maxRange2_) return false;
+  if (range2 < minRange2_) return false;
   translation.normalize();
   double bearing = acos(translation.x());
-  if (fabs(bearing) > _fov) return false;
-  return true;
+  return fabs(bearing) <= fov_;
 }
 
 void SensorPointXY::sense() {
-  _robotPoseObject = 0;
-  RobotType* r = dynamic_cast<RobotType*>(robot());
-  std::list<PoseObject*>::reverse_iterator it = r->trajectory().rbegin();
+  robotPoseObject_ = nullptr;
+  auto* r = dynamic_cast<RobotType*>(robot());
+  auto it = r->trajectory().rbegin();
   int count = 0;
   while (it != r->trajectory().rend() && count < 1) {
-    if (!_robotPoseObject) _robotPoseObject = *it;
+    if (!robotPoseObject_) robotPoseObject_ = *it;
     ++it;
     count++;
   }
-  for (std::set<BaseWorldObject*>::iterator it = world()->objects().begin();
-       it != world()->objects().end(); ++it) {
-    WorldObjectType* o = dynamic_cast<WorldObjectType*>(*it);
+  for (auto *it : world()->objects()) {
+    auto* o = dynamic_cast<WorldObjectType*>(it);
     if (o && isVisible(o)) {
       auto e = mkEdge(o);
       if (e && graph()) {

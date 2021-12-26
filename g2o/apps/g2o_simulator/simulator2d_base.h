@@ -33,13 +33,13 @@
 
 namespace g2o {
 
-  typedef WorldObject<VertexSE2> WorldObjectSE2;
+  using WorldObjectSE2 = WorldObject<VertexSE2>;
 
-  typedef WorldObject<VertexPointXY> WorldObjectPointXY;
+  using WorldObjectPointXY = WorldObject<VertexPointXY>;
 
-  typedef WorldObject<VertexSegment2D> WorldObjectSegment2D;
+  using WorldObjectSegment2D = WorldObject<VertexSegment2D>;
 
-  typedef Robot<WorldObjectSE2>  Robot2D;
+  using Robot2D = Robot<WorldObjectSE2>;
 
 }
 

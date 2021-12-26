@@ -33,15 +33,15 @@
 
 namespace g2o {
 
-  class G2O_SIMULATOR_API SensorPointXYBearing: public PointSensorParameters, public BinarySensor<Robot2D, EdgeSE2PointXYBearing, WorldObjectPointXY>{ 
+  class G2O_SIMULATOR_API SensorPointXYBearing: public PointSensorParameters, public BinarySensor<Robot2D, EdgeSE2PointXYBearing, WorldObjectPointXY>{
   public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-    SensorPointXYBearing(const std::string& name_);
-    virtual void addNoise(EdgeType* e);
-    virtual void sense();
+    explicit SensorPointXYBearing(const std::string& name);
+    void addNoise(EdgeType* e) override;
+    void sense() override;
   protected:
     bool isVisible(WorldObjectType* to);
-  }; 
+  };
 
 }
 

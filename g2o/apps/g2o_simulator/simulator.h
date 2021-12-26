@@ -27,12 +27,14 @@
 #ifndef G2O_SIMULATOR_
 #define G2O_SIMULATOR_
 
-#include <string>
-#include <set>
 #include <list>
+#include <set>
+#include <string>
+#include <utility>
+
 #include "g2o/config.h"
-#include "g2o/types/slam3d/types_slam3d.h"
 #include "g2o/stuff/sampler.h"
+#include "g2o/types/slam3d/types_slam3d.h"
 #include "g2o_simulator_api.h"
 
 namespace g2o {
@@ -42,157 +44,161 @@ class BaseSensor;
 
 class G2O_SIMULATOR_API BaseWorldObject{
   public:
-    BaseWorldObject(World* world_=0) {_world = world_; _vertex=0;}
-    virtual ~BaseWorldObject();
-    void setWorld(World* world_) {_world = world_;}
-    World* world() {return _world;}
-    OptimizableGraph* graph();
-    std::shared_ptr<OptimizableGraph::Vertex> vertex() {return _vertex;}
-    virtual void setVertex(const std::shared_ptr<OptimizableGraph::Vertex>& vertex_);
+   explicit BaseWorldObject(World* world = nullptr)
+       : world_(world) {}
+   virtual ~BaseWorldObject() = default;
+   void setWorld(World* world) { world_ = world; }
+   World* world() { return world_; }
+   OptimizableGraph* graph();
+   std::shared_ptr<OptimizableGraph::Vertex> vertex() { return vertex_; }
+   virtual void setVertex(
+       const std::shared_ptr<OptimizableGraph::Vertex>& vertex);
   protected:
-    OptimizableGraph* _graph;
-    std::shared_ptr<OptimizableGraph::Vertex> _vertex;
-    World* _world;
+    World* world_;
+    OptimizableGraph* graph_ = nullptr;
+    std::shared_ptr<OptimizableGraph::Vertex> vertex_ = nullptr;
 };
 
-template <class VertexType_>
-class WorldObject: public BaseWorldObject, VertexType_{
+template <class VertexTypeT>
+class WorldObject: public BaseWorldObject, VertexTypeT {
   public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
-    typedef VertexType_ VertexType;
-    typedef typename VertexType_::EstimateType EstimateType;
-    WorldObject(World* world_=0): BaseWorldObject(world_){
-      _vertex = std::make_shared<VertexType>();
+    using VertexType = VertexTypeT;
+    using EstimateType = typename VertexType::EstimateType;
+    explicit WorldObject(World* world=nullptr): BaseWorldObject(world){
+      vertex_ = std::make_shared<VertexType>();
     }
-    virtual void setVertex(const std::shared_ptr<OptimizableGraph::Vertex>& vertex_) {
-      if(! dynamic_cast<VertexType*>(vertex_.get()))
+    void setVertex(const std::shared_ptr<OptimizableGraph::Vertex>& vertex) override {
+      if(! dynamic_cast<VertexType*>(vertex.get()))
         return;
-      _vertex = vertex_;
+      vertex_ = vertex;
     }
 
     std::shared_ptr<VertexType> vertex() {
-      if (! _vertex) return 0;
-      return std::dynamic_pointer_cast<VertexType>(_vertex);
+      if (! vertex_) return nullptr;
+      return std::dynamic_pointer_cast<VertexType>(vertex_);
     }
 };
 
 class G2O_SIMULATOR_API BaseRobot {
   public:
-    BaseRobot(World* world_, const std::string& name_){_world = world_; _name = name_; }
-    void setWorld(World* world_) {_world = world_;}
-    World* world() {return _world;}
-    const std::string& name() const {return _name;}
+    BaseRobot(World* world, std::string  name) :
+      world_(world), name_(std::move(name))
+    {}
+    void setWorld(World* world) {world_ = world;}
+    World* world() {return world_;}
+    const std::string& name() const {return name_;}
     OptimizableGraph* graph();
     bool addSensor(BaseSensor* sensor);
-    const std::set<BaseSensor*> sensors() {return _sensors;}
+    const std::set<BaseSensor*>& sensors() {return sensors_;}
     virtual void sense();
   protected:
-    World* _world;
-    std::set<BaseSensor*> _sensors;
-    std::string _name;
+    World* world_;
+    std::set<BaseSensor*> sensors_;
+    std::string name_;
 };
 
 class G2O_SIMULATOR_API World
 {
   public:
-    World(OptimizableGraph* graph_) {_graph = graph_; _runningId=0; _paramId=0;}
-    OptimizableGraph* graph() {return _graph;}
+    explicit World(OptimizableGraph* graph) : graph_(graph) {}
+    OptimizableGraph* graph() {return graph_;}
     bool addRobot(BaseRobot* robot);
     bool addWorldObject(BaseWorldObject* worldObject);
     bool addParameter(const std::shared_ptr<Parameter>& p);
 
-    std::set<BaseWorldObject*>& objects() {return _objects;}
-    std::set<BaseRobot*>&  robots() {return _robots; }
+    std::set<BaseWorldObject*>& objects() {return objects_;}
+    std::set<BaseRobot*>&  robots() {return robots_; }
   protected:
-    std::set<BaseWorldObject*> _objects;
-    std::set<BaseRobot*> _robots;
-    OptimizableGraph* _graph;
-    int _runningId;
-    int _paramId;
+    std::set<BaseWorldObject*> objects_;
+    std::set<BaseRobot*> robots_;
+    OptimizableGraph* graph_;
+    int runningId_ = 0;
+    int paramId_ = 0;
 };
 
 template <class RobotPoseObject>
 class Robot: public BaseRobot{
   public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
-    typedef RobotPoseObject PoseObject;
-    typedef std::list<PoseObject*> TrajectoryType;
-    typedef typename PoseObject::VertexType VertexType;
-    typedef typename PoseObject::EstimateType PoseType;
+    using PoseObject = RobotPoseObject;
+    using TrajectoryType = std::list<PoseObject *>;
+    using VertexType = typename PoseObject::VertexType;
+    using PoseType = typename PoseObject::EstimateType;
 
-    Robot(World* world_, const std::string& name_): BaseRobot(world_, name_){}
+    Robot(World* world, const std::string& name): BaseRobot(world, name){}
     virtual void relativeMove(const PoseType& movement_) {
-      _pose=_pose*movement_;
-      move(_pose);
+      pose_=pose_*movement_;
+      move(pose_);
     }
 
-    virtual void move(const PoseType& pose_) {
-      _pose=pose_;
+    virtual void move(const PoseType& pose) {
+      pose_=pose;
       if (world()) {
-        PoseObject* po=new PoseObject();
-        po->vertex()->setEstimate(_pose);
+        auto* po=new PoseObject();
+        po->vertex()->setEstimate(pose_);
         world()->addWorldObject(po);
-        _trajectory.push_back(po);
+        trajectory_.push_back(po);
       }
     }
 
-    TrajectoryType& trajectory() {return _trajectory;}
-    const PoseType& pose() const {return _pose;}
+    TrajectoryType& trajectory() {return trajectory_;}
+    const PoseType& pose() const {return pose_;}
   protected:
-    TrajectoryType _trajectory;
-    PoseType _pose;
+    TrajectoryType trajectory_;
+    PoseType pose_;
 };
 
 class G2O_SIMULATOR_API BaseSensor{
  public:
-  BaseSensor(const std::string& name_){ _name = name_;}
-  inline BaseRobot* robot() {return _robot;}
-  inline void setRobot(BaseRobot* robot_) {_robot = robot_;}
+  explicit BaseSensor(std::string  name) : name_(std::move(name)) {}
+  inline BaseRobot* robot() {return robot_;}
+  inline void setRobot(BaseRobot* robot) {robot_ = robot;}
   World* world();
   OptimizableGraph* graph();
-  std::vector<Parameter*> parameters() {return _parameters;}
+  std::vector<Parameter*> parameters() {return parameters_;}
   virtual void sense() = 0;
   virtual void addParameters() {}
  protected:
-  std::string _name;
-  std::vector<Parameter*> _parameters;
-  BaseRobot* _robot;
+  std::string name_;
+  std::vector<Parameter*> parameters_;
+  BaseRobot* robot_;
 };
 
-template <class RobotType_, class EdgeType_>
+template <class RobotTypeT, class EdgeTypeT>
 class UnarySensor: public BaseSensor {
   public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
-    typedef RobotType_ RobotType;
-    typedef typename RobotType::PoseObject PoseObject;
-    typedef typename RobotType::TrajectoryType TrajectoryType;
-    typedef typename RobotType::PoseObject::VertexType PoseVertexType;
-    typedef EdgeType_ EdgeType;
-    typedef typename EdgeType::InformationType InformationType;
+    using RobotType = RobotTypeT;
+    using PoseObject = typename RobotTypeT::PoseObject;
+    using TrajectoryType = typename RobotTypeT::TrajectoryType;
+    using PoseVertexType = typename RobotTypeT::PoseObject::VertexType;
+    using EdgeType = EdgeTypeT;
+    using InformationType = typename EdgeTypeT::InformationType;
 
-    UnarySensor(const std::string& name): BaseSensor(name) {
-      _information.setIdentity();
+    explicit UnarySensor(const std::string& name): BaseSensor(name) {
+      information_.setIdentity();
     }
 
-    void setInformation(const InformationType& information_ ) {
-      _information = information_ ;
-      _sampler.setDistribution(_information.inverse());
+    void setInformation(const InformationType& information) {
+      information_ = information;
+      sampler_.setDistribution(information_.inverse());
     }
 
-    const InformationType& information() {return _information; }
+    const InformationType& information() {return information_; }
 
-    virtual void sense() {
-      _robotPoseObject = 0;
+    void sense() override {
+      robotPoseObject_ = nullptr;
       // set the robot pose
       if (! robot())
         return;
 
-      RobotType* r =dynamic_cast<RobotType*>(robot());
+      auto* r =dynamic_cast<RobotType*>(robot());
       if (!r)
         return;
 
       if(! r->trajectory().empty())
-        _robotPoseObject = *(r->trajectory().rbegin());
+        robotPoseObject_ = *(r->trajectory().rbegin());
 
       if (! world() || ! graph())
         return;
@@ -207,62 +213,62 @@ class UnarySensor: public BaseSensor {
 
 
   protected:
-    PoseObject* _robotPoseObject;
-    InformationType _information;
+    PoseObject* robotPoseObject_;
+    InformationType information_;
 
     std::shared_ptr<EdgeType> mkEdge() {
       auto e = std::make_shared<EdgeType>();
-      e->vertices()[0]=_robotPoseObject->vertex();
+      e->vertices()[0]=robotPoseObject_->vertex();
       e->information().setIdentity();
       return e;
     }
-    GaussianSampler<typename EdgeType::ErrorVector, InformationType> _sampler;
+    GaussianSampler<typename EdgeType::ErrorVector, InformationType> sampler_;
     virtual void addNoise(EdgeType*){};
 };
 
-template <class RobotType_, class EdgeType_, class WorldObjectType_>
+template <class RobotTypeT, class EdgeTypeT, class WorldObjectTypeT>
 class BinarySensor: public BaseSensor {
   public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
-    typedef RobotType_ RobotType;
-    typedef typename RobotType::PoseObject PoseObject;
-    typedef typename RobotType::TrajectoryType TrajectoryType;
-    typedef typename RobotType::PoseObject::VertexType PoseVertexType;
-    typedef EdgeType_ EdgeType;
-    typedef WorldObjectType_ WorldObjectType;
-    typedef typename WorldObjectType::VertexType VertexType;
-    typedef typename EdgeType::InformationType InformationType;
+    using RobotType = RobotTypeT;
+    using PoseObject = typename RobotType::PoseObject;
+    using TrajectoryType = typename RobotType::TrajectoryType;
+    using PoseVertexType = typename RobotType::PoseObject::VertexType;
+    using EdgeType = EdgeTypeT;
+    using WorldObjectType = WorldObjectTypeT;
+    using VertexType = typename WorldObjectType::VertexType;
+    using InformationType = typename EdgeType::InformationType;
 
-    BinarySensor(const std::string& name): BaseSensor(name) {
-      _information.setIdentity();
+    explicit BinarySensor(const std::string& name): BaseSensor(name) {
+      information_.setIdentity();
     }
 
-    void setInformation(const InformationType& information_ ) {
-      _information = information_ ;
-      _sampler.setDistribution(_information.inverse());
+    void setInformation(const InformationType& information) {
+      information_ = information;
+      sampler_.setDistribution(information_.inverse());
     }
 
-    const InformationType& information() {return _information; }
+    const InformationType& information() {return information_; }
 
-    virtual void sense() {
-      _robotPoseObject = 0;
+    void sense() override {
+      robotPoseObject_ = nullptr;
       // set the robot pose
       if (! robot())
         return;
 
-      RobotType* r =dynamic_cast<RobotType*>(robot());
+      auto* r =dynamic_cast<RobotType*>(robot());
       if (!r)
         return;
 
       if(! r->trajectory().empty())
-        _robotPoseObject = *(r->trajectory().rbegin());
+        robotPoseObject_ = *(r->trajectory().rbegin());
 
       if (! world() || ! graph())
         return;
 
       // naive search. just for initial testing
-      for(std::set<BaseWorldObject*>::iterator it=world()->objects().begin(); it!=world()->objects().end(); ++it){
-        WorldObjectType * wo = dynamic_cast<WorldObjectType*>(*it);
+      for(auto it=world()->objects().begin(); it!=world()->objects().end(); ++it){
+        auto * wo = dynamic_cast<WorldObjectType*>(*it);
         if (wo){
           auto e = mkEdge(wo);
           if (e) {
@@ -276,17 +282,17 @@ class BinarySensor: public BaseSensor {
 
 
   protected:
-    PoseObject* _robotPoseObject;
-    InformationType _information;
+    PoseObject* robotPoseObject_;
+    InformationType information_;
 
     std::shared_ptr<EdgeType> mkEdge(WorldObjectType* object) {
       std::shared_ptr<EdgeType> e = std::make_shared<EdgeType>();
-      e->vertices()[0] = _robotPoseObject->vertex();
+      e->vertices()[0] = robotPoseObject_->vertex();
       e->vertices()[1] = object->vertex();
       e->information().setIdentity();
       return e;
     }
-    GaussianSampler<typename EdgeType::ErrorVector, InformationType> _sampler;
+    GaussianSampler<typename EdgeType::ErrorVector, InformationType> sampler_;
     virtual void addNoise(EdgeType*){};
 };
 

@@ -29,61 +29,57 @@
 #include "g2o/types/slam3d/isometry3d_mappings.h"
 
 namespace g2o {
-using namespace std;
-using namespace Eigen;
 
-SensorPose3D::SensorPose3D(const std::string& name_)
-    : BinarySensor<Robot3D, EdgeSE3, WorldObjectSE3>(name_) {
-  _stepsToIgnore = 10;
-  _information.setIdentity();
-  _information *= 100;
-  _information(3, 3) = 10000;
-  _information(4, 4) = 10000;
-  _information(5, 5) = 1000;
-  setInformation(_information);
+SensorPose3D::SensorPose3D(const std::string& name)
+    : BinarySensor<Robot3D, EdgeSE3, WorldObjectSE3>(name) {
+  stepsToIgnore_ = 10;
+  information_.setIdentity();
+  information_ *= 100;
+  information_(3, 3) = 10000;
+  information_(4, 4) = 10000;
+  information_(5, 5) = 1000;
+  setInformation(information_);
 }
 
 void SensorPose3D::addNoise(EdgeType* e) {
-  EdgeType::ErrorVector noise = _sampler.generateSample();
+  EdgeType::ErrorVector noise = sampler_.generateSample();
   EdgeType::Measurement n = internal::fromVectorMQT(noise);
   e->setMeasurement(e->measurement() * n);
   e->setInformation(information());
 }
 
 bool SensorPose3D::isVisible(SensorPose3D::WorldObjectType* to) {
-  if (!_robotPoseObject) return false;
-  if (_posesToIgnore.find(to) != _posesToIgnore.end()) return false;
+  if (!robotPoseObject_) return false;
+  if (posesToIgnore_.find(to) != posesToIgnore_.end()) return false;
 
   assert(to && to->vertex());
   VertexType::EstimateType pose = to->vertex()->estimate();
-  VertexType::EstimateType delta = _robotPoseObject->vertex()->estimate().inverse() * pose;
-  Vector3d translation = delta.translation();
+  VertexType::EstimateType delta = robotPoseObject_->vertex()->estimate().inverse() * pose;
+  Vector3 translation = delta.translation();
   double range2 = translation.squaredNorm();
-  if (range2 > _maxRange2) return false;
-  if (range2 < _minRange2) return false;
+  if (range2 > maxRange2_) return false;
+  if (range2 < minRange2_) return false;
   translation.normalize();
   double bearing = acos(translation.x());
-  if (fabs(bearing) > _fov) return false;
-  AngleAxisd a(delta.rotation());
-  if (fabs(a.angle()) > _maxAngularDifference) return false;
-  return true;
+  if (fabs(bearing) > fov_) return false;
+  AngleAxis a(delta.rotation());
+  return fabs(a.angle()) <= maxAngularDifference_;
 }
 
 void SensorPose3D::sense() {
-  _robotPoseObject = 0;
-  RobotType* r = dynamic_cast<RobotType*>(robot());
-  std::list<PoseObject*>::reverse_iterator it = r->trajectory().rbegin();
-  _posesToIgnore.clear();
+  robotPoseObject_ = nullptr;
+  auto* r = dynamic_cast<RobotType*>(robot());
+  auto it = r->trajectory().rbegin();
+  posesToIgnore_.clear();
   int count = 0;
-  while (it != r->trajectory().rend() && count < _stepsToIgnore) {
-    if (!_robotPoseObject) _robotPoseObject = *it;
-    _posesToIgnore.insert(*it);
+  while (it != r->trajectory().rend() && count < stepsToIgnore_) {
+    if (!robotPoseObject_) robotPoseObject_ = *it;
+    posesToIgnore_.insert(*it);
     ++it;
     count++;
   }
-  for (std::set<BaseWorldObject*>::iterator it = world()->objects().begin();
-       it != world()->objects().end(); ++it) {
-    WorldObjectType* o = dynamic_cast<WorldObjectType*>(*it);
+  for (auto *it : world()->objects()) {
+    auto* o = dynamic_cast<WorldObjectType*>(it);
     if (o && isVisible(o)) {
       auto e = mkEdge(o);
       if (e && graph()) {

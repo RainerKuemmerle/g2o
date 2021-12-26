@@ -67,7 +67,7 @@ struct LineInfo {
   std::shared_ptr<VertexPointXY> p2;
 };
 
-typedef std::map<int, LineInfo> LineInfoMap;
+using LineInfoMap = std::map<int, LineInfo>;
 
 int main(int argc, char** argv)
 {
@@ -113,10 +113,10 @@ int main(int argc, char** argv)
   // insert all lines in the infomap
   int currentId = -1000;
   bool firstVertexFound =false;
-  for (OptimizableGraph::VertexIDMap::iterator it=inGraph.vertices().begin(); it!=inGraph.vertices().end(); ++it){
-    currentId = currentId > it->first ?  currentId : it->first;
+  for (auto & it : inGraph.vertices()){
+    currentId = currentId > it.first ?  currentId : it.first;
 
-    VertexSE2 *pose=dynamic_cast<VertexSE2*> (it->second.get());
+    auto *pose=dynamic_cast<VertexSE2*> (it.second.get());
     if (pose){
       auto npose=std::make_shared<VertexSE2>();
       npose->setEstimate(pose->estimate());
@@ -128,7 +128,7 @@ int main(int argc, char** argv)
       }
     }
 
-    VertexSegment2D* s=dynamic_cast<VertexSegment2D*> (it->second.get());
+    auto* s=dynamic_cast<VertexSegment2D*> (it.second.get());
     if (s){
       LineInfo linfo(s);
       outGraph.addVertex(linfo.line);
@@ -139,8 +139,8 @@ int main(int argc, char** argv)
   currentId++;
 
   cerr << "filling in edges and odoms" << endl;
-  for (OptimizableGraph::EdgeSet::iterator it=inGraph.edges().begin(); it!=inGraph.edges().end(); ++it){
-    EdgeSE2* ods=dynamic_cast<EdgeSE2*> (it->get());
+  for (const auto & it : inGraph.edges()){
+    auto* ods=dynamic_cast<EdgeSE2*> (it.get());
     if (ods){
       auto ods2 = std::make_shared<EdgeSE2>();
       ods2->setMeasurement(ods->measurement());
@@ -150,17 +150,17 @@ int main(int argc, char** argv)
       outGraph.addEdge(ods2);
     }
 
-    EdgeSE2Segment2D* es=dynamic_cast<EdgeSE2Segment2D*> (it->get());
-    EdgeSE2Segment2DLine* el=dynamic_cast<EdgeSE2Segment2DLine*> (it->get());
-    EdgeSE2Segment2DPointLine* espl=dynamic_cast<EdgeSE2Segment2DPointLine*> (it->get());
+    auto* es=dynamic_cast<EdgeSE2Segment2D*> (it.get());
+    auto* el=dynamic_cast<EdgeSE2Segment2DLine*> (it.get());
+    auto* espl=dynamic_cast<EdgeSE2Segment2DPointLine*> (it.get());
 
     if (es || el || espl){
-      auto pose = std::dynamic_pointer_cast<VertexSE2>((*it)->vertices()[0]);
-      auto segment = std::dynamic_pointer_cast<VertexSegment2D>((*it)->vertices()[1]);
+      auto pose = std::dynamic_pointer_cast<VertexSE2>(it->vertices()[0]);
+      auto segment = std::dynamic_pointer_cast<VertexSegment2D>(it->vertices()[1]);
       if (!pose)
         continue;
       pose = std::dynamic_pointer_cast<VertexSE2>(outGraph.vertex(pose->id()));
-      LineInfoMap::iterator lit=lmap.find(segment->id());
+      auto lit=lmap.find(segment->id());
       assert (lit!=lmap.end());
       LineInfo& linfo = lit->second;
       auto line = linfo.line;

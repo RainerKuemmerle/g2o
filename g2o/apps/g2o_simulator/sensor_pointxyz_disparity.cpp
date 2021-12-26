@@ -27,68 +27,64 @@
 #include "sensor_pointxyz_disparity.h"
 
 namespace g2o {
-using namespace std;
-using namespace Eigen;
 
 // SensorPointXYZDisparity
-SensorPointXYZDisparity::SensorPointXYZDisparity(const std::string& name_)
-    : BinarySensor<Robot3D, EdgeSE3PointXYZDisparity, WorldObjectTrackXYZ>(name_) {
-  _offsetParam = 0;
-  _information.setIdentity();
-  _information *= 1000;
-  setInformation(_information);
+SensorPointXYZDisparity::SensorPointXYZDisparity(const std::string& name)
+    : BinarySensor<Robot3D, EdgeSE3PointXYZDisparity, WorldObjectTrackXYZ>(name) {
+  offsetParam_ = nullptr;
+  information_.setIdentity();
+  information_ *= 1000;
+  setInformation(information_);
 }
 
 bool SensorPointXYZDisparity::isVisible(SensorPointXYZDisparity::WorldObjectType* to) {
-  if (!_robotPoseObject) return false;
+  if (!robotPoseObject_) return false;
   assert(to && to->vertex());
   VertexType::EstimateType pose = to->vertex()->estimate();
-  VertexType::EstimateType delta = _sensorPose.inverse() * pose;
-  Vector3d translation = delta;
+  VertexType::EstimateType delta = sensorPose_.inverse() * pose;
+  Vector3 translation = delta;
   double range2 = translation.squaredNorm();
-  if (range2 > _maxRange2) return false;
-  if (range2 < _minRange2) return false;
+  if (range2 > maxRange2_) return false;
+  if (range2 < minRange2_) return false;
   translation.normalize();
   // the cameras have the z in front
   double bearing = acos(translation.z());
-  if (fabs(bearing) > _fov) return false;
-  return true;
+  return fabs(bearing) <= fov_;
 }
 
 void SensorPointXYZDisparity::addParameters() {
-  if (!_offsetParam) _offsetParam = std::make_shared<ParameterCamera>();
+  if (!offsetParam_) offsetParam_ = std::make_shared<ParameterCamera>();
   assert(world());
-  world()->addParameter(_offsetParam);
+  world()->addParameter(offsetParam_);
 }
 
 void SensorPointXYZDisparity::addNoise(EdgeType* e) {
-  EdgeType::ErrorVector n = _sampler.generateSample();
+  EdgeType::ErrorVector n = sampler_.generateSample();
   e->setMeasurement(e->measurement() + n);
   e->setInformation(information());
 }
 
 void SensorPointXYZDisparity::sense() {
-  if (!_offsetParam) {
+  if (!offsetParam_) {
     return;
   }
-  _robotPoseObject = 0;
-  RobotType* r = dynamic_cast<RobotType*>(robot());
-  std::list<PoseObject*>::reverse_iterator it = r->trajectory().rbegin();
+  robotPoseObject_ = nullptr;
+  auto* r = dynamic_cast<RobotType*>(robot());
+  auto it = r->trajectory().rbegin();
   int count = 0;
   while (it != r->trajectory().rend() && count < 1) {
-    if (!_robotPoseObject) _robotPoseObject = *it;
+    if (!robotPoseObject_) robotPoseObject_ = *it;
     ++it;
     count++;
   }
-  if (!_robotPoseObject) return;
-  _sensorPose = _robotPoseObject->vertex()->estimate() * _offsetParam->offset();
-  for (std::set<BaseWorldObject*>::iterator it = world()->objects().begin();
-       it != world()->objects().end(); ++it) {
-    WorldObjectType* o = dynamic_cast<WorldObjectType*>(*it);
+  if (!robotPoseObject_) return;
+  sensorPose_ = robotPoseObject_->vertex()->estimate() * offsetParam_->offset();
+  for (auto *it : world()->objects()) {
+    auto* o = dynamic_cast<WorldObjectType*>(it);
     if (o && isVisible(o)) {
       auto e = mkEdge(o);
       if (e && graph()) {
-        e->setParameterId(0, _offsetParam->id());
+        e->setParameterId(0, offsetParam_->id());
         graph()->addEdge(e);
         e->setMeasurementFromState();
         addNoise(e.get());

@@ -29,20 +29,19 @@
 #include "g2o/types/slam3d/isometry3d_mappings.h"
 
 namespace g2o {
-using namespace std;
 
-SensorOdometry3D::SensorOdometry3D(const std::string& name_)
-    : BinarySensor<Robot3D, EdgeSE3, WorldObjectSE3>(name_) {
-  _information.setIdentity();
-  _information *= 100;
-  _information(3, 3) = 10000;
-  _information(4, 4) = 10000;
-  _information(5, 5) = 10000;
-  setInformation(_information);
+SensorOdometry3D::SensorOdometry3D(const std::string& name)
+    : BinarySensor<Robot3D, EdgeSE3, WorldObjectSE3>(name) {
+  information_.setIdentity();
+  information_ *= 100;
+  information_(3, 3) = 10000;
+  information_(4, 4) = 10000;
+  information_(5, 5) = 10000;
+  setInformation(information_);
 }
 
 void SensorOdometry3D::addNoise(EdgeType* e) {
-  EdgeType::ErrorVector noise = _sampler.generateSample();
+  EdgeType::ErrorVector noise = sampler_.generateSample();
   EdgeType::Measurement n = internal::fromVectorMQT(noise);
   e->setMeasurement(e->measurement() * n);
   e->setInformation(information());
@@ -51,11 +50,12 @@ void SensorOdometry3D::addNoise(EdgeType* e) {
 void SensorOdometry3D::sense() {
   if (!robot()) return;
 
-  RobotType* r = dynamic_cast<RobotType*>(robot());
+  auto* r = dynamic_cast<RobotType*>(robot());
   if (!r) return;
 
-  PoseObject *pprev = 0, *pcurr = 0;
-  std::list<PoseObject*>::reverse_iterator it = r->trajectory().rbegin();
+  PoseObject *pprev = nullptr;
+  PoseObject *pcurr = nullptr;
+  auto it = r->trajectory().rbegin();
   if (it != r->trajectory().rend()) {
     pcurr = *it;
     ++it;
@@ -65,10 +65,11 @@ void SensorOdometry3D::sense() {
     ++it;
   }
   if (!(pcurr && pprev)) {
-    cerr << __PRETTY_FUNCTION__ << ": fatal, trajectory empty" << endl;
+    std::cerr << __PRETTY_FUNCTION__ << ": fatal, trajectory empty"
+              << std::endl;
     return;
   }
-  _robotPoseObject = pprev;
+  robotPoseObject_ = pprev;
   auto e = mkEdge(pcurr);
   if (e) {
     if (graph()) {
@@ -77,7 +78,7 @@ void SensorOdometry3D::sense() {
       addNoise(e.get());
     }
   }
-  _robotPoseObject = pcurr;
+  robotPoseObject_ = pcurr;
 }
 
 }  // namespace g2o

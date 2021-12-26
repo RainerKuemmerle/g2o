@@ -32,7 +32,6 @@ namespace g2o {
   // 1: p2clipped
   // 2: inside
   // 3: all clipped
-  using namespace Eigen;
 
   int clipSegmentCircle(Eigen::Vector2d& p1, Eigen::Vector2d& p2, double r) {
     double r2=r*r;
@@ -43,16 +42,16 @@ namespace g2o {
     double p=2*dp.dot(p1);
     double q=p1.squaredNorm()-r2;
     double disc = p*p - 4*q;
-    
+
     if (disc<=0) { // no intersection or single point intersection
-      return -1; 
+      return -1;
     }
     disc = sqrt(disc);
 
     double t1=.5*(-p-disc);
     double t2=.5*(-p+disc);
 
-    if ( t1 > length || t2 <0 ) 
+    if ( t1 > length || t2 <0 )
       return -1; // no intersection
     bool clip1=false;
     bool clip2=false;
@@ -106,32 +105,35 @@ namespace g2o {
   }
 
   int clipSegmentFov(Eigen::Vector2d& p1, Eigen::Vector2d& p2, double min, double max){
-    bool clip1 = false, clip2 = false;
+    bool clip1 = false;
+    bool clip2 = false;
     // normal to the first line
-    double amin =  sin(min), bmin = -cos(min);
+    double amin =  sin(min);
+    double bmin = -cos(min);
     int minClip=clipSegmentLine(p1,p2,amin,bmin,0);
     switch(minClip){
-    case -1: 
-      return -1; 
-    case  0: 
-      clip1 = true; 
+    case -1:
+      return -1;
+    case  0:
+      clip1 = true;
       break;
-    case  1: 
-      clip2 = true; 
+    case  1:
+      clip2 = true;
       break;
     default:;
     }
     // normal to the second line
-    double amax = -sin(max), bmax =  cos(max);
+    double amax = -sin(max);
+    double bmax =  cos(max);
     int maxClip=clipSegmentLine(p1,p2,amax,bmax,0);
     switch(maxClip){
-    case -1: 
-      return -1; 
-    case  0: 
-      clip1 = true; 
+    case -1:
+      return -1;
+    case  0:
+      clip1 = true;
       break;
-    case  1: 
-      clip2 = true; 
+    case  1:
+      clip2 = true;
       break;
     default:;
     }
@@ -150,5 +152,5 @@ namespace g2o {
     Eigen::Vector2d n(cos(lp[0]), sin(lp[0]));
     lp[1]=n.dot(p1+p2)*.5;
     return lp;
-  } 
+  }
 } // end namespace

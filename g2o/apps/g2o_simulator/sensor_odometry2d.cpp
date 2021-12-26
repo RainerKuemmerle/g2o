@@ -31,19 +31,19 @@
 
 // Robot2D
 namespace g2o {
-using namespace std;
 
-SensorOdometry2D::SensorOdometry2D(const std::string& name_)
-    : BinarySensor<Robot2D, EdgeSE2, WorldObjectSE2>(name_) {}
+SensorOdometry2D::SensorOdometry2D(const std::string& name)
+    : BinarySensor<Robot2D, EdgeSE2, WorldObjectSE2>(name) {}
 
 void SensorOdometry2D::sense() {
   if (!robot()) return;
 
-  RobotType* r = dynamic_cast<RobotType*>(robot());
+  auto* r = dynamic_cast<RobotType*>(robot());
   if (!r) return;
 
-  PoseObject *pprev = 0, *pcurr = 0;
-  std::list<PoseObject*>::reverse_iterator it = r->trajectory().rbegin();
+  PoseObject *pprev = nullptr;
+  PoseObject* pcurr = nullptr;
+  auto it = r->trajectory().rbegin();
   if (it != r->trajectory().rend()) {
     pcurr = *it;
     ++it;
@@ -53,21 +53,21 @@ void SensorOdometry2D::sense() {
     ++it;
   }
   if (!(pcurr && pprev)) {
-    cerr << __PRETTY_FUNCTION__ << ": fatal, trajectory empty" << endl;
+    std::cerr << __PRETTY_FUNCTION__ << ": fatal, trajectory empty" << std::endl;
     return;
   }
-  _robotPoseObject = pprev;
+  robotPoseObject_ = pprev;
   auto e = mkEdge(pcurr);
   if (e) {
     e->setMeasurementFromState();
     addNoise(e.get());
     if (graph()) graph()->addEdge(e);
   }
-  _robotPoseObject = pcurr;
+  robotPoseObject_ = pcurr;
 }
 
 void SensorOdometry2D::addNoise(EdgeType* e) {
-  EdgeType::ErrorVector noise = _sampler.generateSample();
+  EdgeType::ErrorVector noise = sampler_.generateSample();
   EdgeType::Measurement n;
   n.fromVector(noise);
   e->setMeasurement(e->measurement() * n);
