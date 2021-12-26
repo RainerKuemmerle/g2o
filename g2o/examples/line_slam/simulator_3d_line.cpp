@@ -222,7 +222,7 @@ struct LineSensor : public Sensor {
   Vector4 nline;
 };
 
-int simulator_3d_line(int argc, char** argv) {
+static int simulator_3d_line(int argc, char** argv) {
   bool fixLines;
   bool planarMotion;
   CommandArgs arg;
