@@ -35,12 +35,10 @@
 //#define _POSE_SENSOR_OFFSET
 //#define _POSE_PRIOR_SENSOR
 
-using namespace g2o;
-using namespace std;
-using namespace Eigen;
+using std::cerr;
 
 int main(int argc, char** argv) {
-  CommandArgs arg;
+  g2o::CommandArgs arg;
   int nlandmarks;
   int simSteps;
   double worldSize;
@@ -69,32 +67,32 @@ int main(int argc, char** argv) {
   arg.parseArgs(argc, argv);
 
   std::mt19937 generator;
-  OptimizableGraph graph;
-  World world(&graph);
+  g2o::OptimizableGraph graph;
+  g2o::World world(&graph);
   for (int i=0; i<nlandmarks; i++){
-    auto * landmark = new WorldObjectTrackXYZ;
-    double x = sampleUniform(-.5, .5, &generator)*worldSize;
-    double y = sampleUniform(-.5, .5, &generator)*worldSize;
-    double z = sampleUniform(-.5, .5);
-    landmark->vertex()->setEstimate(Vector3d(x,y,z));
+    auto * landmark = new g2o::WorldObjectTrackXYZ;
+    double x = g2o::sampleUniform(-.5, .5, &generator)*worldSize;
+    double y = g2o::sampleUniform(-.5, .5, &generator)*worldSize;
+    double z = g2o::sampleUniform(-.5, .5);
+    landmark->vertex()->setEstimate(g2o::Vector3(x,y,z));
     world.addWorldObject(landmark);
   }
-  Robot3D robot(&world, "myRobot");
+  g2o::Robot3D robot(&world, "myRobot");
   world.addRobot(&robot);
 
-  stringstream ss;
+  std::stringstream ss;
   ss << "-ws" << worldSize;
   ss << "-nl" << nlandmarks;
   ss << "-steps" << simSteps;
 
   if (hasOdom) {
-    auto* odometrySensor=new SensorOdometry3D("odometry");
+    auto* odometrySensor=new g2o::SensorOdometry3D("odometry");
     robot.addSensor(odometrySensor);
     ss << "-odom";
   }
 
   if (hasPointSensor) {
-    auto* pointSensor =  new SensorPointXYZ("pointSensor");
+    auto* pointSensor =  new g2o::SensorPointXYZ("pointSensor");
     pointSensor->setFov(M_PI/4);
     robot.addSensor(pointSensor);
     Eigen::Isometry3d cameraPose;
@@ -104,13 +102,13 @@ int main(int argc, char** argv) {
           0, -1,  0;
     pointSensor->setMaxRange(2.);
     cameraPose = R;
-    cameraPose.translation() = Vector3d(0.,0.,0.3);
+    cameraPose.translation() = g2o::Vector3(0.,0.,0.3);
     pointSensor->offsetParam()->setOffset(cameraPose);
     ss << "-pointXYZ";
   }
 
   if (hasPointDisparitySensor){
-    auto* disparitySensor = new SensorPointXYZDisparity("disparitySensor");
+    auto* disparitySensor = new g2o::SensorPointXYZDisparity("disparitySensor");
     disparitySensor->setFov(M_PI/4);
     disparitySensor->setMinRange(0.5);
     disparitySensor->setMaxRange(2.);
@@ -121,13 +119,13 @@ int main(int argc, char** argv) {
          -1,  0,  0,
           0, -1,  0;
     cameraPose = R;
-    cameraPose.translation() = Vector3d(0.,0.,0.3);
+    cameraPose.translation() = g2o::Vector3(0.,0.,0.3);
     disparitySensor->offsetParam()->setOffset(cameraPose);
     ss << "-disparity";
   }
 
   if (hasPointDepthSensor){
-    auto* depthSensor = new SensorPointXYZDepth("depthSensor");
+    auto* depthSensor = new g2o::SensorPointXYZDepth("depthSensor");
     depthSensor->setFov(M_PI/4);
     depthSensor->setMinRange(0.5);
     depthSensor->setMaxRange(2.);
@@ -138,13 +136,13 @@ int main(int argc, char** argv) {
          -1,  0,  0,
           0, -1,  0;
     cameraPose = R;
-    cameraPose.translation() = Vector3d(0.,0.,0.3);
+    cameraPose.translation() = g2o::Vector3(0.,0.,0.3);
     depthSensor->offsetParam()->setOffset(cameraPose);
     ss << "-depth";
   }
 
   if (hasPoseSensor){
-    auto* poseSensor = new SensorPose3D("poseSensor");
+    auto* poseSensor = new g2o::SensorPose3D("poseSensor");
     robot.addSensor(poseSensor);
     poseSensor->setMaxRange(5);
     ss << "-pose";
@@ -187,26 +185,26 @@ int main(int argc, char** argv) {
 
   robot.move(Eigen::Isometry3d::Identity());
   double pStraight=0.7;
-  Eigen::Isometry3d moveStraight = Eigen::Isometry3d::Identity(); moveStraight.translation() = Vector3d(1., 0., 0.);
+  Eigen::Isometry3d moveStraight = Eigen::Isometry3d::Identity(); moveStraight.translation() = g2o::Vector3(1., 0., 0.);
   double pLeft=0.15;
-  Eigen::Isometry3d moveLeft = Eigen::Isometry3d::Identity(); moveLeft = AngleAxisd(M_PI/2, Vector3d::UnitZ());
+  Eigen::Isometry3d moveLeft = Eigen::Isometry3d::Identity(); moveLeft = g2o::AngleAxis(M_PI/2, g2o::Vector3::UnitZ());
   //double pRight=0.15;
-  Eigen::Isometry3d moveRight = Eigen::Isometry3d::Identity(); moveRight = AngleAxisd(-M_PI/2,Vector3d::UnitZ());
+  Eigen::Isometry3d moveRight = Eigen::Isometry3d::Identity(); moveRight = g2o::AngleAxis(-M_PI/2,g2o::Vector3::UnitZ());
 
   Eigen::Matrix3d dtheta = Eigen::Matrix3d::Identity();
   for (int i=0; i<simSteps; i++){
     bool boundariesReached = true;
     cerr << "m";
-    Vector3d dt;
+    g2o::Vector3 dt;
     const Eigen::Isometry3d& pose = robot.pose();
     if (pose.translation().x() < -.5*worldSize){
-      dtheta = AngleAxisd(0,Vector3d::UnitZ());
+      dtheta = g2o::AngleAxis(0,g2o::Vector3::UnitZ());
     } else if (pose.translation().x() >  .5*worldSize){
-      dtheta = AngleAxisd(-M_PI,Vector3d::UnitZ());
+      dtheta = g2o::AngleAxis(-M_PI,g2o::Vector3::UnitZ());
     } else if (pose.translation().y() < -.5*worldSize){
-      dtheta = AngleAxisd(M_PI/2,Vector3d::UnitZ());
+      dtheta = g2o::AngleAxis(M_PI/2,g2o::Vector3::UnitZ());
     } else if (pose.translation().y() >  .5*worldSize){
-      dtheta = AngleAxisd(-M_PI/2,Vector3d::UnitZ());
+      dtheta = g2o::AngleAxis(-M_PI/2,g2o::Vector3::UnitZ());
     } else {
       boundariesReached=false;
     }
@@ -215,12 +213,12 @@ int main(int argc, char** argv) {
     if (boundariesReached){
       Eigen::Matrix3d mTheta = pose.rotation().inverse() * dtheta;
       move = mTheta;
-      AngleAxisd aa(mTheta);
+      g2o::AngleAxis aa(mTheta);
       if (aa.angle()<std::numeric_limits<double>::epsilon()){
-        move.translation() = Vector3d(1., 0., 0.);
+        move.translation() = g2o::Vector3(1., 0., 0.);
       }
     } else {
-      double sampled=sampleUniform();
+      double sampled=g2o::sampleUniform();
       if (sampled<pStraight)
         move=moveStraight;
       else if (sampled<pStraight+pLeft)
@@ -238,7 +236,7 @@ int main(int argc, char** argv) {
   }
   //string fname=outputFilename + ss.str() + ".g2o";
   //ofstream testStream(fname.c_str());
-  ofstream testStream(outputFilename.c_str());
+  std::ofstream testStream(outputFilename.c_str());
   graph.save(testStream);
 
 }
