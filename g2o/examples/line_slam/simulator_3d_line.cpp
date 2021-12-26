@@ -1,18 +1,17 @@
-#include <iostream>
 #include <fstream>
+#include <iostream>
+#include <utility>
 
 #include "g2o/core/sparse_optimizer.h"
+#include "g2o/stuff/command_args.h"
+#include "g2o/stuff/macros.h"
+#include "g2o/stuff/sampler.h"
 #include "g2o/types/slam3d/types_slam3d.h"
 #include "g2o/types/slam3d_addons/types_slam3d_addons.h"
-#include "g2o/stuff/macros.h"
-#include "g2o/stuff/command_args.h"
-#include "g2o/stuff/sampler.h"
 
-using namespace g2o;
-using namespace std;
-using namespace Eigen;
+namespace g2o {
 
-Eigen::Isometry3d sample_noise_from_se3(const Vector6& cov ) {
+static Isometry3 sample_noise_from_se3(const Vector6& cov ) {
   double nx = Sampler::gaussRand(0., cov(0));
   double ny = Sampler::gaussRand(0., cov(1));
   double nz = Sampler::gaussRand(0., cov(2));
@@ -21,76 +20,76 @@ Eigen::Isometry3d sample_noise_from_se3(const Vector6& cov ) {
   double npitch = Sampler::gaussRand(0., cov(4));
   double nyaw = Sampler::gaussRand(0., cov(5));
 
-  AngleAxisd aa(AngleAxisd(nyaw, Vector3d::UnitZ())*
-		AngleAxisd(nroll, Vector3d::UnitX())*
-		AngleAxisd(npitch, Vector3d::UnitY()));
+  AngleAxis aa(AngleAxis(nyaw, Vector3::UnitZ())*
+		AngleAxis(nroll, Vector3::UnitX())*
+		AngleAxis(npitch, Vector3::UnitY()));
 
-  Eigen::Isometry3d retval = Isometry3d::Identity();
+  auto retval = Isometry3::Identity();
   retval.matrix().block<3, 3>(0, 0) = aa.toRotationMatrix();
-  retval.translation() = Vector3d(nx, ny, nz);
+  retval.translation() = Vector3(nx, ny, nz);
   return retval;
 }
 
-Vector4d sample_noise_from_line(const Vector4d& cov) {
-  return Vector4d(Sampler::gaussRand(0., cov(0)), Sampler::gaussRand(0., cov(1)),
+static Vector4 sample_noise_from_line(const Vector4& cov) {
+  return Vector4(Sampler::gaussRand(0., cov(0)), Sampler::gaussRand(0., cov(1)),
                   Sampler::gaussRand(0., cov(2)), Sampler::gaussRand(0., cov(3)));
 }
 
 struct SimulatorItem {
-  SimulatorItem(OptimizableGraph* graph_): _graph(graph_) {}
-  OptimizableGraph* graph() { return _graph;}
-  virtual ~SimulatorItem(){}
+  explicit SimulatorItem(OptimizableGraph* graph_): graph_(graph_) {}
+  OptimizableGraph* graph() { return graph_;}
+  virtual ~SimulatorItem()= default;
 protected:
-  OptimizableGraph* _graph;
+  OptimizableGraph* graph_;
 };
 
 struct WorldItem : public SimulatorItem {
-  WorldItem(OptimizableGraph* graph_, std::shared_ptr<OptimizableGraph::Vertex> vertex_ = nullptr) :
-    SimulatorItem(graph_),_vertex(vertex_) {}
-  std::shared_ptr<OptimizableGraph::Vertex> vertex() { return _vertex; }
-  void  setVertex(const std::shared_ptr<OptimizableGraph::Vertex>& vertex_) { _vertex = vertex_; }
+  explicit WorldItem(OptimizableGraph* graph, std::shared_ptr<OptimizableGraph::Vertex> vertex = nullptr) :
+    SimulatorItem(graph),vertex_(std::move(vertex)) {}
+  std::shared_ptr<OptimizableGraph::Vertex> vertex() { return vertex_; }
+  void  setVertex(const std::shared_ptr<OptimizableGraph::Vertex>& vertex) { vertex_ = vertex; }
 protected:
-  std::shared_ptr<OptimizableGraph::Vertex> _vertex;
+  std::shared_ptr<OptimizableGraph::Vertex> vertex_;
 };
 
-typedef std::set<WorldItem*> WorldItemSet;
+using WorldItemSet = std::set<WorldItem *>;
 
 struct Robot;
 
 struct Sensor {
-  Sensor(Robot* robot_) : _robot(robot_) {}
-  Robot* robot() {return _robot;}
+  explicit Sensor(Robot* robot) : robot_(robot) {}
+  Robot* robot() {return robot_;}
   virtual bool isVisible(const WorldItem* ) const {return false;}
-  virtual bool sense(WorldItem* , const Isometry3d& ) {return false;}
-  virtual ~Sensor(){};
+  virtual bool sense(WorldItem* , const Isometry3& ) {return false;}
+  virtual ~Sensor()= default;;
 protected:
-  Robot* _robot;
+  Robot* robot_;
 };
 
-typedef std::vector<Sensor*> SensorVector;
+using SensorVector = std::vector<Sensor *>;
 
 struct Robot: public WorldItem {
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
 
-  Robot(OptimizableGraph* graph_) : WorldItem(graph_) {
-    _planarMotion = false;
-    _position = Isometry3d::Identity();
+  explicit Robot(OptimizableGraph* graph) : WorldItem(graph) {
+    planarMotion = false;
+    position = Isometry3::Identity();
   }
 
-  void move(const Isometry3d& newPosition, int& id) {
-    Isometry3d delta = _position.inverse() * newPosition;
-    _position = newPosition;
+  void move(const Isometry3& newPosition, int& id) {
+    Isometry3 delta = position.inverse() * newPosition;
+    position = newPosition;
     auto v = std::make_shared<VertexSE3>();
     v->setId(id);
     id++;
     graph()->addVertex(v);
-    if(_planarMotion) {
+    if(planarMotion) {
       // add a singleton constraint that locks the position of the robot on the plane
       auto planeConstraint = std::make_shared<EdgeSE3Prior>();
       Matrix6 pinfo = Matrix6::Zero();
       pinfo(2, 2) = 1e9;
       planeConstraint->setInformation(pinfo);
-      planeConstraint->setMeasurement(Isometry3d::Identity());
+      planeConstraint->setMeasurement(Isometry3::Identity());
       planeConstraint->vertices()[0] = v;
       planeConstraint->setParameterId(0, 0);
       graph()->addEdge(planeConstraint);
@@ -98,12 +97,9 @@ struct Robot: public WorldItem {
     if(vertex()) {
       auto oldV = std::dynamic_pointer_cast<VertexSE3>(vertex());
       auto e = std::make_shared<EdgeSE3>();
-      Isometry3d noise = sample_noise_from_se3(_nmovecov);
+      Isometry3 noise = sample_noise_from_se3(nmovecov);
       e->setMeasurement(delta * noise);
-      Matrix6 m = Matrix6::Identity();
-      for(int i = 0; i < 6; ++i) {
-	      m(i, i) = 1.0 / (_nmovecov(i));
-      }
+      Matrix6 m = Vector6(1.0 / nmovecov.array()).asDiagonal();
       e->setInformation(m);
       e->vertices()[0] = vertex();
       e->vertices()[1] = v;
@@ -111,54 +107,52 @@ struct Robot: public WorldItem {
       v->setEstimate(oldV->estimate() * e->measurement());
     }
     else {
-      v->setEstimate(_position);
+      v->setEstimate(position);
     }
     setVertex(v);
   }
 
-  void relativeMove(const Isometry3d& delta, int& id) {
-    Isometry3d newPosition = _position * delta;
+  void relativeMove(const Isometry3& delta, int& id) {
+    Isometry3 newPosition = position * delta;
     move(newPosition, id);
   }
 
-  void sense(WorldItem* wi = 0) {
-    for(size_t i = 0; i < _sensors.size(); ++i) {
-      Sensor* s = _sensors[i];
-      s->sense(wi, _position);
+  void sense(WorldItem* wi = nullptr) {
+    for(auto *s : sensors) {
+      s->sense(wi, position);
     }
   }
 
-  Isometry3d _position;
-  SensorVector _sensors;
-  Vector6 _nmovecov;
-  bool _planarMotion;
+  Isometry3 position;
+  SensorVector sensors;
+  Vector6 nmovecov;
+  bool planarMotion;
 };
 
-typedef std::vector<Robot*> RobotVector;
+using RobotVector = std::vector<Robot *>;
 
 struct Simulator : public SimulatorItem {
-  Simulator(OptimizableGraph* graph_) : SimulatorItem(graph_), _lastVertexId(0) {}
+  explicit Simulator(OptimizableGraph* graph_) : SimulatorItem(graph_), lastVertexId(0) {}
   void sense(int robotIndex) {
-    Robot* r = _robots[robotIndex];
-    for(WorldItemSet::iterator it = _world.begin(); it != _world.end(); ++it) {
-      WorldItem* item = *it;
+    Robot* r = robots[robotIndex];
+    for(auto *item : world) {
       r->sense(item);
     }
   }
 
-  void move(int robotIndex, const Isometry3d& newRobotPose) {
-    Robot* r = _robots[robotIndex];
-    r->move(newRobotPose, _lastVertexId);
+  void move(int robotIndex, const Isometry3& newRobotPose) {
+    Robot* r = robots[robotIndex];
+    r->move(newRobotPose, lastVertexId);
   }
 
-  void relativeMove(int robotIndex, const Isometry3d& delta) {
-    Robot* r = _robots[robotIndex];
-    r->relativeMove(delta, _lastVertexId);
+  void relativeMove(int robotIndex, const Isometry3& delta) {
+    Robot* r = robots[robotIndex];
+    r->relativeMove(delta, lastVertexId);
   }
 
-  int _lastVertexId;
-  WorldItemSet _world;
-  RobotVector _robots;
+  int lastVertexId;
+  WorldItemSet world;
+  RobotVector robots;
 };
 
 struct LineItem : public WorldItem {
@@ -173,29 +167,26 @@ struct LineItem : public WorldItem {
 struct LineSensor : public Sensor {
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
 
-  LineSensor(Robot* r, int offsetId, const Isometry3d& offset_) : Sensor(r) {
-    _offsetVertex = std::make_shared<VertexSE3>();
-    _offsetVertex->setId(offsetId);
-    _offsetVertex->setEstimate(offset_);
-    robot()->graph()->addVertex(_offsetVertex);
+  LineSensor(Robot* r, int offsetId, const Isometry3& offset_) : Sensor(r) {
+    offsetVertex = std::make_shared<VertexSE3>();
+    offsetVertex->setId(offsetId);
+    offsetVertex->setEstimate(offset_);
+    robot()->graph()->addVertex(offsetVertex);
   };
 
-  virtual bool isVisible(const WorldItem* wi) const {
+  bool isVisible(const WorldItem* wi) const override {
     if(!wi) {
       return false;
     }
-    const LineItem* li = dynamic_cast<const LineItem*>(wi);
-    if(!li) {
-      return false;
-    }
-    return true;
+    const auto* li = dynamic_cast<const LineItem*>(wi);
+    return li != nullptr;
   }
 
-  virtual bool sense(WorldItem* wi, const Isometry3d& position) {
+  bool sense(WorldItem* wi, const Isometry3& position) override {
     if(!wi) {
       return false;
     }
-    LineItem* li = dynamic_cast<LineItem*>(wi);
+    auto* li = dynamic_cast<LineItem*>(wi);
     if(!li) {
       return false;
     }
@@ -207,8 +198,8 @@ struct LineSensor : public Sensor {
     if(!robotVertex) {
       return false;
     }
-    const Isometry3d& robotPose = position;
-    Isometry3d sensorPose = robotPose * _offsetVertex->estimate();
+    const Isometry3& robotPose = position;
+    Isometry3 sensorPose = robotPose * offsetVertex->estimate();
     auto lineVertex = std::dynamic_pointer_cast<VertexLine3D>(li->vertex());
     Line3D worldLine = lineVertex->estimate();
 
@@ -217,59 +208,56 @@ struct LineSensor : public Sensor {
     auto e = std::make_shared<EdgeSE3Line3D>();
     e->vertices()[0] = robotVertex;
     e->vertices()[1] = lineVertex;
-    Vector4d noise = sample_noise_from_line(_nline);
+    Vector4 noise = sample_noise_from_line(nline);
     measuredLine.oplus(noise);
     e->setMeasurement(measuredLine);
-    Matrix4d m = Matrix4d::Zero();
-    m(0, 0) = 1.0 / (_nline(0));
-    m(1, 1) = 1.0 / (_nline(1));
-    m(2, 2) = 1.0 / (_nline(2));
-    m(3, 3) = 1.0 / (_nline(3));
+    Matrix4 m = Vector4(1.0 / nline.array()).asDiagonal();
     e->setInformation(m);
     e->setParameterId(0, 0);
     robot()->graph()->addEdge(e);
     return true;
   }
 
-  std::shared_ptr<VertexSE3> _offsetVertex;
-  Vector4d _nline;
+  std::shared_ptr<VertexSE3> offsetVertex;
+  Vector4 nline;
 };
 
-int main (int argc, char** argv) {
-  bool fixLines, planarMotion;
+int simulator_3d_line(int argc, char** argv) {
+  bool fixLines;
+  bool planarMotion;
   CommandArgs arg;
   arg.param("fixLines", fixLines, false, "fix the lines (do localization only)");
   arg.param("planarMotion", planarMotion, false, "robot moves on a plane");
   arg.parseArgs(argc, argv);
 
-  SparseOptimizer* g = new SparseOptimizer();
+  auto* g = new SparseOptimizer();
   auto odomOffset = std::make_shared<ParameterSE3Offset>();
   odomOffset->setId(0);
   g->addParameter(odomOffset);
 
   std::cout << "Creating simulator" << std::endl;
-  Simulator* sim = new Simulator(g);
+  auto* sim = new Simulator(g);
 
   std::cout << "Creating robot" << std::endl;
-  Robot* r = new Robot(g);
+  auto* r = new Robot(g);
 
   std::cout << "Creating line sensor" << std::endl;
-  Isometry3d sensorPose = Isometry3d::Identity();
-  LineSensor* ls = new LineSensor(r, 0, sensorPose);
-  ls->_nline << 0.001, 0.001, 0.001, 0.0001;
-  // ls->_nline << 1e-9, 1e-9, 1e-9, 1e-9;
-  r->_sensors.push_back(ls);
-  sim->_robots.push_back(r);
+  Isometry3 sensorPose = Isometry3::Identity();
+  auto* ls = new LineSensor(r, 0, sensorPose);
+  ls->nline = Vector4(0.001, 0.001, 0.001, 0.0001);
+  // ls->nline << 1e-9, 1e-9, 1e-9, 1e-9;
+  r->sensors.push_back(ls);
+  sim->robots.push_back(r);
 
   Line3D line;
   std::cout << "Creating landmark line 1" << std::endl;
-  LineItem* li = new LineItem(g, 1);
+  auto* li = new LineItem(g, 1);
   Vector6 liv;
   liv << 0.0, 0.0, 5.0, 0.0, 1.0, 0.0;
   line = Line3D::fromCartesian(liv);
   static_cast<VertexLine3D*>(li->vertex().get())->setEstimate(line);
   li->vertex()->setFixed(fixLines);
-  sim->_world.insert(li);
+  sim->world.insert(li);
 
   std::cout << "Creating landmark line 2" << std::endl;
   liv << 5.0, 0.0, 0.0, 0.0, 0.0, 1.0;
@@ -277,7 +265,7 @@ int main (int argc, char** argv) {
   li = new LineItem(g, 2);
   static_cast<VertexLine3D*>(li->vertex().get())->setEstimate(line);
   li->vertex()->setFixed(fixLines);
-  sim->_world.insert(li);
+  sim->world.insert(li);
 
   std::cout << "Creating landmark line 3" << std::endl;
   liv << 0.0, 5.0, 0.0, 1.0, 0.0, 0.0;
@@ -285,69 +273,52 @@ int main (int argc, char** argv) {
   li = new LineItem(g, 3);
   static_cast<VertexLine3D*>(li->vertex().get())->setEstimate(line);
   li->vertex()->setFixed(fixLines);
-  sim->_world.insert(li);
+  sim->world.insert(li);
 
-  Quaterniond q, iq;
+  Quaternion q;
+  Quaternion iq;
   if(planarMotion) {
-    r->_planarMotion = true;
-    r->_nmovecov << 0.01, 0.0025, 1e-9, 0.001, 0.001, 0.025;
-    q = Quaterniond(AngleAxisd(0.2, Vector3d::UnitZ()).toRotationMatrix());
-    iq = Quaterniond(AngleAxisd(-0.2, Vector3d::UnitZ()).toRotationMatrix());
+    r->planarMotion = true;
+    r->nmovecov << 0.01, 0.0025, 1e-9, 0.001, 0.001, 0.025;
+    q = Quaternion(AngleAxis(0.2, Vector3::UnitZ()));
+    iq = Quaternion(AngleAxis(-0.2, Vector3::UnitZ()));
   }
   else {
-    r->_planarMotion = false;
-    r->_nmovecov << 0.1, 0.005, 1e-9, 0.001, 0.001, 0.05;
-    q = Quaterniond((AngleAxisd(M_PI/10, Vector3d::UnitZ()) * AngleAxisd(0.1, Vector3d::UnitY())).toRotationMatrix());
-    iq = Quaterniond((AngleAxisd(-M_PI/10, Vector3d::UnitZ()) * AngleAxisd(0.1, Vector3d::UnitY())).toRotationMatrix());
+    r->planarMotion = false;
+    r->nmovecov << 0.1, 0.005, 1e-9, 0.001, 0.001, 0.05;
+    q = Quaternion(AngleAxis(M_PI/10, Vector3::UnitZ()) * AngleAxis(0.1, Vector3::UnitY()));
+    iq = Quaternion(AngleAxis(-M_PI/10, Vector3::UnitZ()) * AngleAxis(0.1, Vector3::UnitY()));
   }
 
-  Isometry3d delta = Isometry3d::Identity();
-  sim->_lastVertexId = 4;
+  sim->lastVertexId = 4;
 
-  Isometry3d startPose = Isometry3d::Identity();
-  startPose.matrix().block<3, 3>(0, 0) = AngleAxisd(-0.75 * M_PI, Vector3d::UnitZ()).toRotationMatrix();
+  Isometry3 startPose(AngleAxis(-0.75 * M_PI, Vector3::UnitZ()).toRotationMatrix());
   sim->move(0, startPose);
 
   int k = 20;
   int l = 2;
   double delta_t = 0.2;
   for(int j = 0; j < l; ++j) {
-    Vector3d tr(1.0, 0.0, 0.0);
-    delta.matrix().block<3, 3>(0, 0) = q.toRotationMatrix();
-    if(j == l-1) {
-      delta.matrix().block<3, 3>(0, 0) = Matrix3d::Identity();
-    }
-    delta.translation() = tr * (delta_t * j);
-    Isometry3d iDelta = delta.inverse();
+    Isometry3 delta(l - 1 ? q.toRotationMatrix() : Matrix3::Identity());
+    delta.translation() = Vector3(delta_t * j, 0.0, 0.0);
+    Isometry3 iDelta = delta.inverse();
     for(int a = 0; a < 2; ++a) {
       for(int i = 0; i < k; ++i) {
         std::cout << "m";
-        if(a == 0) {
-          sim->relativeMove(0, delta);
-        } else {
-          sim->relativeMove(0, iDelta);
-        }
+        sim->relativeMove(0, a == 0 ? delta : iDelta);
         std::cout << "s";
         sim->sense(0);
       }
     }
   }
   for (int j = 0; j < l; ++j) {
-    Vector3d tr(1.0, 0.0, 0.0);
-    delta.matrix().block<3, 3>(0, 0) = iq.toRotationMatrix();
-    if (j == l - 1) {
-      delta.matrix().block<3, 3>(0, 0) = Matrix3d::Identity();
-    }
-    delta.translation() = tr * (delta_t * j);
-    Isometry3d iDelta = delta.inverse();
+    Isometry3 delta(j != l - 1 ? iq.toRotationMatrix() : Matrix3::Identity());
+    delta.translation() = Vector3(delta_t * j, 0.0, 0.0);
+    Isometry3 iDelta = delta.inverse();
     for (int a = 0; a < 2; ++a) {
       for (int i = 0; i < k; ++i) {
         std::cout << "m";
-        if (a == 0) {
-          sim->relativeMove(0, delta);
-        } else {
-          sim->relativeMove(0, iDelta);
-        }
+        sim->relativeMove(0, a == 0 ? delta : iDelta);
         std::cout << "s";
         sim->sense(0);
       }
@@ -355,15 +326,20 @@ int main (int argc, char** argv) {
   }
   std::cout << std::endl;
 
-  ls->_offsetVertex->setFixed(true);
+  ls->offsetVertex->setFixed(true);
   auto gauge = g->vertex(4);
   if(gauge) {
     gauge->setFixed(true);
   }
 
-  ofstream osp("line3d.g2o");
+  std::ofstream osp("line3d.g2o");
   g->save(osp);
   std::cout << "Saved graph on file line3d.g2o, use g2o_viewer to work with it." << std::endl;
 
   return 0;
+}
+}
+
+int main (int argc, char** argv) {
+  return g2o::simulator_3d_line(argc, argv);
 }
