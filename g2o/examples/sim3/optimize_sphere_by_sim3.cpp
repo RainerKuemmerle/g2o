@@ -45,10 +45,9 @@
 #include "g2o/types/slam3d/types_slam3d.h"
 #include "g2o/types/slam3d/vertex_se3.h"
 
-using namespace std;
-using namespace g2o;
+G2O_USE_TYPE_GROUP(slam3d);
 
-extern "C" void G2O_FACTORY_EXPORT g2o_type_VertexSE3(void);
+namespace g2o {
 
 // Convert SE3 Vertex to Sim3 Vertex
 void ToVertexSim3(const g2o::VertexSE3& v_se3, g2o::VertexSim3Expmap* const v_sim3) {
@@ -88,21 +87,20 @@ void ToEdgeSim3(const g2o::EdgeSE3& e_se3, g2o::EdgeSim3* const e_sim3) {
 // interface and Sim is used for optimization.
 // g2o_viewer is avaliable to the result.
 
-int main(int argc, char** argv) {
-  g2o_type_VertexSE3();
+static int optimize_by_sim3(int argc, char** argv) {
   if (argc != 2) {
-    cout << "Usage: pose_graph_g2o_SE3 sphere.g2o" << endl;
+    std::cout << "Usage: pose_graph_g2o_SE3 sphere.g2o" << std::endl;
     return 1;
   }
-  ifstream fin(argv[1]);
+  std::ifstream fin(argv[1]);
   if (!fin) {
-    cout << "file " << argv[1] << " does not exist." << endl;
+    std::cout << "file " << argv[1] << " does not exist." << std::endl;
     return 1;
   }
 
   //  define the optimizer
-  typedef g2o::BlockSolver<g2o::BlockSolverTraits<7, 7>> BlockSolverType;
-  typedef g2o::LinearSolverEigen<BlockSolverType::PoseMatrixType> LinearSolverType;
+  using BlockSolverType = g2o::BlockSolver<g2o::BlockSolverTraits<7, 7>>;
+  using LinearSolverType = g2o::LinearSolverEigen<BlockSolverType::PoseMatrixType>;
   std::unique_ptr<g2o::OptimizationAlgorithm> solver(new g2o::OptimizationAlgorithmLevenberg(
       g2o::make_unique<BlockSolverType>(g2o::make_unique<LinearSolverType>())));
 
@@ -131,7 +129,7 @@ int main(int argc, char** argv) {
 
   // Convert all edges
   int edge_index = 0;
-  for (auto& tmp : interface.edges()) {
+  for (const auto& tmp : interface.edges()) {
     auto e_se3 = std::static_pointer_cast<g2o::EdgeSE3>(tmp);
     int idx0 = e_se3->vertex(0)->id();
     int idx1 = e_se3->vertex(1)->id();
@@ -146,11 +144,11 @@ int main(int argc, char** argv) {
     optimizer.addEdge(e_sim3);
   }
 
-  cout << "optimizing ..." << endl;
+  std::cout << "optimizing ..." << std::endl;
   optimizer.initializeOptimization();
   optimizer.optimize(30);
 
-  cout << "saving optimization results in VertexSE3..." << endl;
+  std::cout << "saving optimization results in VertexSE3..." << std::endl;
   auto vertices_sim3 = optimizer.vertices();
   auto vertices_se3 = interface.vertices();
 
@@ -164,4 +162,9 @@ int main(int argc, char** argv) {
 
   interface.save("result.g2o");
   return 0;
+}
+}
+
+int main (int argc, char** argv) {
+  return g2o::optimize_by_sim3(argc, argv);
 }
