@@ -31,9 +31,6 @@
 #include "g2o/core/sparse_optimizer.h"
 #include "g2o/stuff/command_args.h"
 
-using namespace std;
-using namespace g2o;
-
 // we use the 2D and 3D SLAM types here
 G2O_USE_TYPE_GROUP(slam2d);
 G2O_USE_TYPE_GROUP(slam3d);
@@ -42,9 +39,9 @@ G2O_USE_OPTIMIZATION_LIBRARY(eigen);
 int main(int argc, char** argv) {
   // Command line parsing
   int maxIterations;
-  string outputFilename;
-  string inputFilename;
-  CommandArgs arg;
+  std::string outputFilename;
+  std::string inputFilename;
+  g2o::CommandArgs arg;
   arg.param("i", maxIterations, 10, "perform n iterations, if negative consider the gain");
   arg.param("o", outputFilename, "", "output final version of the graph");
   arg.paramLeftOver("graph-input", inputFilename, "", "graph file which will be processed");
@@ -54,7 +51,7 @@ int main(int argc, char** argv) {
   // itself or Levenberg will handle it.
 
   // create the optimizer to load the data and carry out the optimization
-  SparseOptimizer optimizer;
+  g2o::SparseOptimizer optimizer;
   optimizer.setVerbose(true);
 
   // allocate the solver
@@ -62,24 +59,24 @@ int main(int argc, char** argv) {
   optimizer.setAlgorithm(
       g2o::OptimizationAlgorithmFactory::instance()->construct("lm_var", solverProperty));
 
-  ifstream ifs(inputFilename.c_str());
+  std::ifstream ifs(inputFilename.c_str());
   if (!ifs) {
-    cerr << "unable to open " << inputFilename << endl;
+    std::cerr << "unable to open " << inputFilename << std::endl;
     return 1;
   }
   optimizer.load(ifs);
   optimizer.initializeOptimization();
   optimizer.optimize(maxIterations);
 
-  if (outputFilename.size() > 0) {
+  if (!outputFilename.empty()) {
     if (outputFilename == "-") {
-      cerr << "saving to stdout";
-      optimizer.save(cout);
+      std::cerr << "saving to stdout";
+      optimizer.save(std::cout);
     } else {
-      cerr << "saving " << outputFilename << " ... ";
+      std::cerr << "saving " << outputFilename << " ... ";
       optimizer.save(outputFilename.c_str());
     }
-    cerr << "done." << endl;
+    std::cerr << "done." << std::endl;
   }
   return 0;
 }

@@ -36,10 +36,10 @@
 #include "g2o/types/slam3d/edge_se3.h"
 #include "g2o/types/slam3d/vertex_se3.h"
 
-using namespace std;
-using namespace g2o;
+namespace g2o
+{
 
-int main(int argc, char** argv) {
+static int create_sphere(int argc, char** argv) {
   // command line parsing
   int nodesPerLevel;
   int numLaps;
@@ -47,7 +47,7 @@ int main(int argc, char** argv) {
   double radius;
   std::vector<double> noiseTranslation;
   std::vector<double> noiseRotation;
-  string outFilename;
+  std::string outFilename;
   CommandArgs arg;
   arg.param("o", outFilename, "-", "output filename");
   arg.param("nodesPerLevel", nodesPerLevel, 50, "how many nodes per lap on the sphere");
@@ -62,24 +62,24 @@ int main(int argc, char** argv) {
   arg.param("randomSeed", randomSeed, false, "use a randomized seed for generating the sphere");
   arg.parseArgs(argc, argv);
 
-  if (noiseTranslation.size() == 0) {
-    cerr << "using default noise for the translation" << endl;
+  if (noiseTranslation.empty()) {
+    std::cerr << "using default noise for the translation" << std::endl;
     noiseTranslation.push_back(0.01);
     noiseTranslation.push_back(0.01);
     noiseTranslation.push_back(0.01);
   }
-  cerr << "Noise for the translation:";
-  for (size_t i = 0; i < noiseTranslation.size(); ++i) cerr << " " << noiseTranslation[i];
-  cerr << endl;
-  if (noiseRotation.size() == 0) {
-    cerr << "using default noise for the rotation" << endl;
+  std::cerr << "Noise for the translation:";
+  for (double i : noiseTranslation) std::cerr << " " << i;
+  std::cerr << std::endl;
+  if (noiseRotation.empty()) {
+    std::cerr << "using default noise for the rotation" << std::endl;
     noiseRotation.push_back(0.005);
     noiseRotation.push_back(0.005);
     noiseRotation.push_back(0.005);
   }
-  cerr << "Noise for the rotation:";
-  for (size_t i = 0; i < noiseRotation.size(); ++i) cerr << " " << noiseRotation[i];
-  cerr << endl;
+  std::cerr << "Noise for the rotation:";
+  for (double i : noiseRotation) std::cerr << " " << i;
+  std::cerr << std::endl;
 
   Eigen::Matrix3d transNoise = Eigen::Matrix3d::Zero();
   for (int i = 0; i < 3; ++i) transNoise(i, i) = std::pow(noiseTranslation[i], 2);
@@ -91,9 +91,9 @@ int main(int argc, char** argv) {
   information.block<3, 3>(0, 0) = transNoise.inverse();
   information.block<3, 3>(3, 3) = rotNoise.inverse();
 
-  vector<std::shared_ptr<VertexSE3>> vertices;
-  vector<std::shared_ptr<EdgeSE3>> odometryEdges;
-  vector<std::shared_ptr<EdgeSE3>> edges;
+  std::vector<std::shared_ptr<VertexSE3>> vertices;
+  std::vector<std::shared_ptr<EdgeSE3>> odometryEdges;
+  std::vector<std::shared_ptr<EdgeSE3>> edges;
   int id = 0;
   for (int f = 0; f < numLaps; ++f) {
     for (int n = 0; n < nodesPerLevel; ++n) {
@@ -153,26 +153,25 @@ int main(int argc, char** argv) {
   if (randomSeed) {
     std::random_device r;
     std::seed_seq seedSeq{r(), r(), r(), r(), r()};
-    vector<int> seeds(2);
+    std::vector<int> seeds(2);
     seedSeq.generate(seeds.begin(), seeds.end());
-    cerr << "using seeds:";
-    for (size_t i = 0; i < seeds.size(); ++i) cerr << " " << seeds[i];
-    cerr << endl;
+    std::cerr << "using seeds:";
+    for (int seed : seeds) std::cerr << " " << seed;
+    std::cerr << std::endl;
     transSampler.seed(seeds[0]);
     rotSampler.seed(seeds[1]);
   }
 
   // noise for all the edges
-  for (size_t i = 0; i < edges.size(); ++i) {
-    auto& e = edges[i];
-    Eigen::Quaterniond gtQuat = (Eigen::Quaterniond)e->measurement().linear();
+  for (auto & e : edges) {
+    Eigen::Quaterniond gtQuat = Eigen::Quaterniond(e->measurement().linear());
     Eigen::Vector3d gtTrans = e->measurement().translation();
 
     Eigen::Vector3d quatXYZ = rotSampler.generateSample();
     double qw = 1.0 - quatXYZ.norm();
     if (qw < 0) {
       qw = 0.;
-      cerr << "x";
+      std::cerr << "x";
     }
     Eigen::Quaterniond rot(qw, quatXYZ.x(), quatXYZ.y(), quatXYZ.z());
     rot.normalize();
@@ -180,14 +179,13 @@ int main(int argc, char** argv) {
     rot = gtQuat * rot;
     trans = gtTrans + trans;
 
-    Eigen::Isometry3d noisyMeasurement = (Eigen::Isometry3d)rot;
+    Eigen::Isometry3d noisyMeasurement = Eigen::Isometry3d(rot);
     noisyMeasurement.translation() = trans;
     e->setMeasurement(noisyMeasurement);
   }
 
   // concatenate all the odometry constraints to compute the initial state
-  for (size_t i = 0; i < odometryEdges.size(); ++i) {
-    auto& e = odometryEdges[i];
+  for (auto & e : odometryEdges) {
     auto from = std::static_pointer_cast<VertexSE3>(e->vertex(0));
     VertexSE3* to = static_cast<VertexSE3*>(e->vertex(1).get());
     HyperGraph::VertexSet aux;
@@ -196,33 +194,38 @@ int main(int argc, char** argv) {
   }
 
   // write output
-  ofstream fileOutputStream;
+  std::ofstream fileOutputStream;
   if (outFilename != "-") {
-    cerr << "Writing into " << outFilename << endl;
+    std::cerr << "Writing into " << outFilename << std::endl;
     fileOutputStream.open(outFilename.c_str());
   } else {
-    cerr << "writing to stdout" << endl;
+    std::cerr << "writing to stdout" << std::endl;
   }
 
-  string vertexTag = Factory::instance()->tag(vertices[0].get());
-  string edgeTag = Factory::instance()->tag(edges[0].get());
+  std::string vertexTag = Factory::instance()->tag(vertices[0].get());
+  std::string edgeTag = Factory::instance()->tag(edges[0].get());
 
-  ostream& fout = outFilename != "-" ? fileOutputStream : cout;
-  for (size_t i = 0; i < vertices.size(); ++i) {
-    VertexSE3* v = vertices[i].get();
+  std::ostream& fout = outFilename != "-" ? fileOutputStream : std::cout;
+  for (auto & vertice : vertices) {
+    VertexSE3* v = vertice.get();
     fout << vertexTag << " " << v->id() << " ";
     v->write(fout);
-    fout << endl;
+    fout << std::endl;
   }
 
-  for (size_t i = 0; i < edges.size(); ++i) {
-    EdgeSE3* e = edges[i].get();
+  for (auto & edge : edges) {
+    EdgeSE3* e = edge.get();
     VertexSE3* from = static_cast<VertexSE3*>(e->vertex(0).get());
     VertexSE3* to = static_cast<VertexSE3*>(e->vertex(1).get());
     fout << edgeTag << " " << from->id() << " " << to->id() << " ";
     e->write(fout);
-    fout << endl;
+    fout << std::endl;
   }
 
   return 0;
+}
+} // namespace g2o
+
+int main(int argc, char** argv) {
+  return g2o::create_sphere(argc, argv);
 }
