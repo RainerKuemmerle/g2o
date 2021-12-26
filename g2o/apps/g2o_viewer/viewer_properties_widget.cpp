@@ -30,10 +30,6 @@
   #include <cxxabi.h>
 #endif
 
-using namespace std;
-
-using namespace g2o;
-
 /**
  * demangle the name of a type, depends on the used compiler
  */
@@ -41,10 +37,10 @@ static std::string demangleName(const std::string& fullPropName)
 {
 #ifdef __GNUC__
   // find :: and extract the mangled class name from the whole string
-  string mangledName;
-  string propName;
-  string::size_type found = fullPropName.rfind("::");
-  if (found != string::npos) {
+  std::string mangledName;
+  std::string propName;
+  std::string::size_type found = fullPropName.rfind("::");
+  if (found != std::string::npos) {
     mangledName = fullPropName.substr(0, found);
     propName    = fullPropName.substr(found);
   } else {
@@ -52,15 +48,15 @@ static std::string demangleName(const std::string& fullPropName)
   }
 
   int status;
-  char* s = abi::__cxa_demangle(mangledName.c_str(), 0, 0, &status);
+  char* s = abi::__cxa_demangle(mangledName.c_str(), nullptr, nullptr, &status);
   if (status != 0) {
     free(s);
     return fullPropName;
-  } else {
-    std::string demangled(s);
-    free(s);
-    return demangled + propName;
   }
+  std::string demangled(s);
+  free(s);
+  return demangled + propName;
+
 #else
   // TODO for other compilers
   return fullPropName;
@@ -68,11 +64,7 @@ static std::string demangleName(const std::string& fullPropName)
 }
 
 ViewerPropertiesWidget::ViewerPropertiesWidget(QWidget * parent) :
-  PropertiesWidget(parent), _viewer(nullptr)
-{
-}
-
-ViewerPropertiesWidget::~ViewerPropertiesWidget()
+  PropertiesWidget(parent)
 {
 }
 
@@ -81,13 +73,13 @@ void ViewerPropertiesWidget::applyProperties()
   PropertiesWidget::applyProperties();
 
   // draw with the new properties
-  _viewer->setUpdateDisplay(true);
-  _viewer->update();
+  viewer_->setUpdateDisplay(true);
+  viewer_->update();
 }
 
 void ViewerPropertiesWidget::setViewer(g2o::G2oQGLViewer* viewer)
 {
-  _viewer = viewer;
+  viewer_ = viewer;
   setProperties(viewer->parameters());
 }
 

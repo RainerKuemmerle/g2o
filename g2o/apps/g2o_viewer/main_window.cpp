@@ -35,24 +35,20 @@
 #include <fstream>
 #include <iostream>
 #include <cassert>
-using namespace std;
-using namespace g2o;
+
+using std::cerr;
+using std::endl;
+using std::string;
 
 MainWindow::MainWindow(QWidget* parent)
-    : QMainWindow(parent),
-      _lastSolver(-1),
-      _viewerPropertiesWidget(0),
-      _optimizerPropertiesWidget(0),
-      _filename("") {
+    : QMainWindow(parent)
+
+      {
   setupUi(this);
-  leKernelWidth->setValidator(new QDoubleValidator(-numeric_limits<double>::max(), numeric_limits<double>::max(), 7, this));
+  leKernelWidth->setValidator(new QDoubleValidator(-std::numeric_limits<double>::max(), std::numeric_limits<double>::max(), 7, this));
   plainTextEdit->setMaximumBlockCount(1000);
   btnForceStop->hide();
   QObject::connect(cbDrawAxis, SIGNAL(toggled(bool)), viewer, SLOT(setAxisIsDrawn(bool)));
-}
-
-MainWindow::~MainWindow()
-{
 }
 
 void MainWindow::on_actionLoad_triggered(bool)
@@ -67,7 +63,7 @@ void MainWindow::on_actionSave_triggered(bool)
 {
   QString filename = QFileDialog::getSaveFileName(this, "Save g2o file", "", "g2o files (*.g2o)");
   if (! filename.isNull()) {
-    ofstream fout(filename.toStdString().c_str());
+    std::ofstream fout(filename.toStdString().c_str());
     viewer->graph->save(fout);
     if (fout.good())
       cerr << "Saved " << filename.toStdString() << endl;
@@ -78,7 +74,7 @@ void MainWindow::on_actionSave_triggered(bool)
 
 void MainWindow::on_btnOptimize_clicked()
 {
-  if (viewer->graph->vertices().size() == 0 || viewer->graph->edges().size() == 0) {
+  if (viewer->graph->vertices().empty() || viewer->graph->edges().empty()) {
     cerr << "Graph has no vertices / egdes" << endl;
     return;
   }
@@ -96,8 +92,8 @@ void MainWindow::on_btnOptimize_clicked()
   btnOptimize->hide();
   btnForceStop->show();
 
-  _forceStopFlag = false;
-  viewer->graph->setForceStopFlag(&_forceStopFlag);
+  forceStopFlag_ = false;
+  viewer->graph->setForceStopFlag(&forceStopFlag_);
 
   int maxIterations = spIterations->value();
   int iter = viewer->graph->optimize(maxIterations);
@@ -110,12 +106,12 @@ void MainWindow::on_btnOptimize_clicked()
 
   viewer->setUpdateDisplay(true);
   viewer->update();
-  _forceStopFlag = false;
+  forceStopFlag_ = false;
 }
 
 void MainWindow::on_btnInitialGuess_clicked()
 {
-  if (viewer->graph->activeEdges().size() == 0)
+  if (viewer->graph->activeEdges().empty())
     viewer->graph->initializeOptimization();
 
   switch (cbxIniitialGuessMethod->currentIndex()) {
@@ -126,7 +122,7 @@ void MainWindow::on_btnInitialGuess_clicked()
     case 1:
       // odometry
       {
-        EstimatePropagatorCostOdometry costFunction(viewer->graph);
+        g2o::EstimatePropagatorCostOdometry costFunction(viewer->graph);
         viewer->graph->computeInitialGuess(costFunction);
       }
       break;
@@ -141,7 +137,7 @@ void MainWindow::on_btnInitialGuess_clicked()
 
 void MainWindow::on_btnSetZero_clicked()
 {
-  if (viewer->graph->activeEdges().size() == 0)
+  if (viewer->graph->activeEdges().empty())
     viewer->graph->initializeOptimization();
 
   viewer->graph->setToOrigin();
@@ -151,10 +147,10 @@ void MainWindow::on_btnSetZero_clicked()
 
 void MainWindow::on_btnReload_clicked()
 {
-  if (_filename.length()>0){
-    cerr << "reloading " << _filename << endl;
+  if (filename_.length()>0){
+    cerr << "reloading " << filename_ << endl;
     viewer->graph->clear();
-    viewer->graph->load(_filename.c_str());
+    viewer->graph->load(filename_.c_str());
     viewer->setUpdateDisplay(true);
     viewer->update();
   }
@@ -162,7 +158,7 @@ void MainWindow::on_btnReload_clicked()
 
 void MainWindow::fixGraph()
 {
-  if (viewer->graph->vertices().size() == 0 || viewer->graph->edges().size() == 0) {
+  if (viewer->graph->vertices().empty() || viewer->graph->edges().empty()) {
     return;
   }
 
@@ -173,10 +169,9 @@ void MainWindow::fixGraph()
     if (! gauge) {
       cerr <<  "cannot find a vertex to fix in this thing" << endl;
       return;
-    } else {
-      cerr << "graph is fixed by node " << gauge->id() << endl;
+    }       cerr << "graph is fixed by node " << gauge->id() << endl;
       gauge->setFixed(true);
-    }
+
   } else {
     cerr << "graph is fixed by priors or nodes are already fixed" << endl;
   }
@@ -193,13 +188,13 @@ void MainWindow::on_actionQuit_triggered(bool)
 void MainWindow::updateDisplayedSolvers()
 {
   coOptimizer->clear();
-  _knownSolvers.clear();
-  const OptimizationAlgorithmFactory::CreatorList& knownSolvers = OptimizationAlgorithmFactory::instance()->creatorList();
+  knownSolvers_.clear();
+  const g2o::OptimizationAlgorithmFactory::CreatorList& knownSolvers = g2o::OptimizationAlgorithmFactory::instance()->creatorList();
 
   bool varFound = false;
-  string varType = "";
-  for (OptimizationAlgorithmFactory::CreatorList::const_iterator it = knownSolvers.begin(); it != knownSolvers.end(); ++it) {
-    const OptimizationAlgorithmProperty& sp = (*it)->property();
+  string varType;
+  for (const auto & knownSolver : knownSolvers) {
+    const g2o::OptimizationAlgorithmProperty& sp = knownSolver->property();
     if (sp.name == "gn_var" || sp.name == "gn_var_cholmod") {
       varType = sp.type;
       varFound = true;
@@ -208,33 +203,33 @@ void MainWindow::updateDisplayedSolvers()
   }
 
   if (varFound) {
-    for (OptimizationAlgorithmFactory::CreatorList::const_iterator it = knownSolvers.begin(); it != knownSolvers.end(); ++it) {
-      const OptimizationAlgorithmProperty& sp = (*it)->property();
+    for (const auto & knownSolver : knownSolvers) {
+      const g2o::OptimizationAlgorithmProperty& sp = knownSolver->property();
       if (sp.type == varType) {
         coOptimizer->addItem(QString::fromStdString(sp.name));
-        _knownSolvers.push_back(sp);
+        knownSolvers_.push_back(sp);
       }
     }
   }
 
-  map<string, vector<OptimizationAlgorithmProperty> > solverLookUp;
+  std::map<string, std::vector<g2o::OptimizationAlgorithmProperty> > solverLookUp;
 
-  for (OptimizationAlgorithmFactory::CreatorList::const_iterator it = knownSolvers.begin(); it != knownSolvers.end(); ++it) {
-    const OptimizationAlgorithmProperty& sp = (*it)->property();
+  for (const auto & knownSolver : knownSolvers) {
+    const g2o::OptimizationAlgorithmProperty& sp = knownSolver->property();
     if (varFound && varType == sp.type)
       continue;
     solverLookUp[sp.type].push_back(sp);
   }
 
-  for (map<string, vector<OptimizationAlgorithmProperty> >::iterator it = solverLookUp.begin(); it != solverLookUp.end(); ++it) {
-    if (_knownSolvers.size() > 0) {
+  for (auto & it : solverLookUp) {
+    if (!knownSolvers_.empty()) {
       coOptimizer->insertSeparator(coOptimizer->count());
-      _knownSolvers.push_back(OptimizationAlgorithmProperty());
+      knownSolvers_.emplace_back();
     }
-    const vector<OptimizationAlgorithmProperty>& vsp = it->second;
-    for (size_t j = 0; j < vsp.size(); ++j) {
-      coOptimizer->addItem(QString::fromStdString(vsp[j].name));
-      _knownSolvers.push_back(vsp[j]);
+    const std::vector<g2o::OptimizationAlgorithmProperty>& vsp = it.second;
+    for (const auto & j : vsp) {
+      coOptimizer->addItem(QString::fromStdString(j.name));
+      knownSolvers_.push_back(j);
     }
   }
 }
@@ -245,24 +240,24 @@ bool MainWindow::load(const QString& filename)
   bool loadStatus = false;
   if (filename == "-") {
     cerr << "reading stdin" << endl;
-    loadStatus = viewer->graph->load(cin);
+    loadStatus = viewer->graph->load(std::cin);
   } else {
-    ifstream ifs(filename.toStdString().c_str());
+    std::ifstream ifs(filename.toStdString().c_str());
     if (! ifs)
       return false;
     loadStatus = viewer->graph->load(ifs);
   }
   if (! loadStatus)
     return false;
-  _lastSolver = -1;
+  lastSolver_ = -1;
   viewer->setUpdateDisplay(true);
-  SparseOptimizer* optimizer = viewer->graph;
+  g2o::SparseOptimizer* optimizer = viewer->graph;
 
   // update the solvers which are suitable for this graph
-  set<int> vertDims = optimizer->dimensions();
-  for (size_t i = 0; i < _knownSolvers.size(); ++i) {
-    const OptimizationAlgorithmProperty& sp = _knownSolvers[i];
-    if (sp.name == "" && sp.desc == "")
+  std::set<int> vertDims = optimizer->dimensions();
+  for (size_t i = 0; i < knownSolvers_.size(); ++i) {
+    const g2o::OptimizationAlgorithmProperty& sp = knownSolvers_[i];
+    if (sp.name.empty() && sp.desc.empty())
       continue;
 
     bool suitableSolver = optimizer->isSolverSuitable(sp, vertDims);
@@ -285,35 +280,35 @@ bool MainWindow::allocateSolver(bool& allocatedNewSolver)
     return false;
   }
 
-  if (currentIndex == _lastSolver)
+  if (currentIndex == lastSolver_)
     return true;
 
   allocatedNewSolver = true;
   QString strSolver = coOptimizer->currentText();
 
   // create the new algorithm
-  OptimizationAlgorithmFactory* solverFactory = OptimizationAlgorithmFactory::instance();
-  viewer->graph->setAlgorithm(solverFactory->construct(strSolver.toStdString(), _currentOptimizationAlgorithmProperty));
+  g2o::OptimizationAlgorithmFactory* solverFactory = g2o::OptimizationAlgorithmFactory::instance();
+  viewer->graph->setAlgorithm(solverFactory->construct(strSolver.toStdString(), currentOptimizationAlgorithmProperty_));
 
-  _lastSolver = currentIndex;
+  lastSolver_ = currentIndex;
   return true;
 }
 
 bool MainWindow::prepare()
 {
-  SparseOptimizer* optimizer = viewer->graph;
-  if (_currentOptimizationAlgorithmProperty.requiresMarginalize) {
+  g2o::SparseOptimizer* optimizer = viewer->graph;
+  if (currentOptimizationAlgorithmProperty_.requiresMarginalize) {
     cerr << "Marginalizing Landmarks" << endl;
-    for (SparseOptimizer::VertexIDMap::const_iterator it = optimizer->vertices().begin(); it != optimizer->vertices().end(); ++it) {
-      OptimizableGraph::Vertex* v = static_cast<OptimizableGraph::Vertex*>(it->second.get());
+    for (const auto & it : optimizer->vertices()) {
+      auto* v = static_cast<g2o::OptimizableGraph::Vertex*>(it.second.get());
       int vdim = v->dimension();
-      v->setMarginalized((vdim == _currentOptimizationAlgorithmProperty.landmarkDim));
+      v->setMarginalized((vdim == currentOptimizationAlgorithmProperty_.landmarkDim));
     }
   }
   else {
     cerr << "Preparing (no marginalization of Landmarks)" << endl;
-    for (SparseOptimizer::VertexIDMap::const_iterator it = optimizer->vertices().begin(); it != optimizer->vertices().end(); ++it) {
-      OptimizableGraph::Vertex* v = static_cast<OptimizableGraph::Vertex*>(it->second.get());
+    for (const auto & it : optimizer->vertices()) {
+      auto* v = static_cast<g2o::OptimizableGraph::Vertex*>(it.second.get());
       v->setMarginalized(false);
     }
   }
@@ -323,7 +318,7 @@ bool MainWindow::prepare()
 
 void MainWindow::setRobustKernel()
 {
-  SparseOptimizer* optimizer = viewer->graph;
+  g2o::SparseOptimizer* optimizer = viewer->graph;
   bool robustKernel = cbRobustKernel->isChecked();
   double huberWidth = leKernelWidth->text().toDouble();
   //odometry edges are those whose node ids differ by 1
@@ -332,15 +327,15 @@ void MainWindow::setRobustKernel()
 
   if (robustKernel) {
     QString strRobustKernel = coRobustKernel->currentText();
-    AbstractRobustKernelCreator::Ptr creator = RobustKernelFactory::instance()->creator(strRobustKernel.toStdString());
+    g2o::AbstractRobustKernelCreator::Ptr creator = g2o::RobustKernelFactory::instance()->creator(strRobustKernel.toStdString());
     if (! creator) {
       cerr << strRobustKernel.toStdString() << " is not a valid robust kernel" << endl;
       return;
     }
     g2o::RobustKernelPtr robustKernel = creator->construct();
     robustKernel->setDelta(huberWidth);
-    for (SparseOptimizer::EdgeSet::const_iterator it = optimizer->edges().begin(); it != optimizer->edges().end(); ++it) {
-      OptimizableGraph::Edge* e = static_cast<OptimizableGraph::Edge*>(it->get());
+    for (const auto & it : optimizer->edges()) {
+      auto* e = static_cast<g2o::OptimizableGraph::Edge*>(it.get());
       if (onlyLoop) {
         if (e->vertices().size() >= 2 && std::abs(e->vertex(0)->id() - e->vertex(1)->id()) != 1) {
           e->setRobustKernel(robustKernel);
@@ -351,8 +346,8 @@ void MainWindow::setRobustKernel()
     }
   } else {
     g2o::RobustKernelPtr emptyKernel;
-    for (SparseOptimizer::EdgeSet::const_iterator it = optimizer->edges().begin(); it != optimizer->edges().end(); ++it) {
-      OptimizableGraph::Edge* e = static_cast<OptimizableGraph::Edge*>(it->get());
+    for (const auto & it : optimizer->edges()) {
+      auto* e = static_cast<g2o::OptimizableGraph::Edge*>(it.get());
       e->setRobustKernel(emptyKernel);
     }
   }
@@ -360,7 +355,7 @@ void MainWindow::setRobustKernel()
 
 void MainWindow::on_btnForceStop_clicked()
 {
-  _forceStopFlag = true;
+  forceStopFlag_ = true;
 }
 
 bool MainWindow::loadFromFile(const QString& filename)
@@ -368,7 +363,7 @@ bool MainWindow::loadFromFile(const QString& filename)
   viewer->graph->clear();
   bool loadStatus = load(filename);
   if (loadStatus){
-    _filename = filename.toStdString();
+    filename_ = filename.toStdString();
   }
   cerr << "loaded " << filename.toStdString() << " with " << viewer->graph->vertices().size()
     << " vertices and " << viewer->graph->edges().size() << " measurements" << endl;
@@ -391,19 +386,19 @@ void MainWindow::on_actionDefault_Background_triggered(bool)
 
 void MainWindow::on_actionProperties_triggered(bool)
 {
-  if (! _viewerPropertiesWidget) {
-    _viewerPropertiesWidget = new ViewerPropertiesWidget(this);
-    _viewerPropertiesWidget->setWindowTitle(tr("Drawing Options"));
+  if (! viewerPropertiesWidget_) {
+    viewerPropertiesWidget_ = new ViewerPropertiesWidget(this);
+    viewerPropertiesWidget_->setWindowTitle(tr("Drawing Options"));
   }
-  _viewerPropertiesWidget->setViewer(viewer);
-  _viewerPropertiesWidget->show();
+  viewerPropertiesWidget_->setViewer(viewer);
+  viewerPropertiesWidget_->show();
 }
 
 void MainWindow::on_btnOptimizerParamaters_clicked()
 {
-  if (! _optimizerPropertiesWidget) {
-    _optimizerPropertiesWidget = new PropertiesWidget(this);
-    _optimizerPropertiesWidget->setWindowTitle(tr("Internal Solver Properties"));
+  if (! optimizerPropertiesWidget_) {
+    optimizerPropertiesWidget_ = new PropertiesWidget(this);
+    optimizerPropertiesWidget_->setWindowTitle(tr("Internal Solver Properties"));
   }
   bool allocatedNewSolver;
   bool allocateStatus = allocateSolver(allocatedNewSolver);
@@ -414,11 +409,11 @@ void MainWindow::on_btnOptimizerParamaters_clicked()
   if (allocatedNewSolver)
     prepare();
   if (viewer->graph->solver()) {
-    _optimizerPropertiesWidget->setProperties(const_cast<g2o::PropertyMap*>(&viewer->graph->solver()->properties()));
+    optimizerPropertiesWidget_->setProperties(const_cast<g2o::PropertyMap*>(&viewer->graph->solver()->properties()));
   } else {
-    _optimizerPropertiesWidget->setProperties(0);
+    optimizerPropertiesWidget_->setProperties(nullptr);
   }
-  _optimizerPropertiesWidget->show();
+  optimizerPropertiesWidget_->show();
 }
 
 void MainWindow::on_actionSave_Screenshot_triggered(bool)
@@ -433,11 +428,7 @@ void MainWindow::on_actionSave_Screenshot_triggered(bool)
     assert(spacePos > 0 && "extracting the image format failed");
     QString format = selectedFilter.left(spacePos);
     // setting up the snapshot and save to file
-    if (format == "JPG") {
-      viewer->setSnapshotQuality(90);
-    } else {
-      viewer->setSnapshotQuality(-1);
-    }
+    viewer->setSnapshotQuality(format == "JPG" ? 90 : -1);
     viewer->setSnapshotFormat(format);
     viewer->saveSnapshot(filename);
     cerr << "saved snapshot " << filename.toStdString() << "(" << format.toStdString() << ")" << endl;
@@ -471,8 +462,8 @@ void MainWindow::updateRobustKernels()
 {
   coRobustKernel->clear();
   std::vector<std::string> kernels;
-  RobustKernelFactory::instance()->fillKnownKernels(kernels);
-  for (size_t i = 0; i < kernels.size(); ++i) {
-    coRobustKernel->addItem(QString::fromStdString(kernels[i]));
+  g2o::RobustKernelFactory::instance()->fillKnownKernels(kernels);
+  for (auto & kernel : kernels) {
+    coRobustKernel->addItem(QString::fromStdString(kernel));
   }
 }

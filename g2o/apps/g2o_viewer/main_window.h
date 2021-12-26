@@ -41,10 +41,9 @@ class G2O_VIEWER_API MainWindow : public QMainWindow, public Ui::BaseMainWindow
 {
   Q_OBJECT
   public:
-    MainWindow(QWidget * parent = 0);
-    ~MainWindow();
+    explicit MainWindow(QWidget * parent = nullptr);
+    ~MainWindow() override = default;
 
-  public:
     /**
      * list the available solvers in the GUI
      */
@@ -60,7 +59,7 @@ class G2O_VIEWER_API MainWindow : public QMainWindow, public Ui::BaseMainWindow
      */
     bool loadFromFile(const QString& filename);
 
-  public slots:
+  public slots: // NOLINT
     void on_actionLoad_triggered(bool);
     void on_actionSave_triggered(bool);
     void on_actionQuit_triggered(bool);
@@ -85,14 +84,14 @@ class G2O_VIEWER_API MainWindow : public QMainWindow, public Ui::BaseMainWindow
     void setRobustKernel();
     bool load(const QString& filename);
 
-    std::vector<g2o::OptimizationAlgorithmProperty> _knownSolvers;
-    int _lastSolver;
-    bool _forceStopFlag;
-    g2o::OptimizationAlgorithmProperty _currentOptimizationAlgorithmProperty;
+    std::vector<g2o::OptimizationAlgorithmProperty> knownSolvers_;
+    int lastSolver_ = -1;
+    bool forceStopFlag_;
+    g2o::OptimizationAlgorithmProperty currentOptimizationAlgorithmProperty_;
 
-    ViewerPropertiesWidget* _viewerPropertiesWidget;
-    PropertiesWidget* _optimizerPropertiesWidget;
-    std::string _filename;
+    ViewerPropertiesWidget* viewerPropertiesWidget_ = nullptr;
+    PropertiesWidget* optimizerPropertiesWidget_ = nullptr;
+    std::string filename_;
 };
 
 

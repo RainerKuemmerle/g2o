@@ -56,44 +56,40 @@ namespace {
   class StandardCamera : public qglviewer::Camera
   {
     public:
-      StandardCamera() : _standard(true) {};
+      StandardCamera() = default;
 
-      qglv_real zNear() const {
-        if (_standard)
-          return qglv_real(0.001);
-        else
-          return Camera::zNear();
+      qglv_real zNear() const override {
+        if (standard_) return qglv_real(0.001);
+        return Camera::zNear();
       }
 
-      qglv_real zFar() const
+      qglv_real zFar() const override
       {
-        if (_standard)
-          return qglv_real(10000.0);
-        else
-          return Camera::zFar();
+        if (standard_) return qglv_real(10000.0);
+        return Camera::zFar();
       }
 
-      bool standard() const {return _standard;}
-      void setStandard(bool s) { _standard = s;}
+      bool standard() const {return standard_;}
+      void setStandard(bool s) { standard_ = s;}
 
     private:
-      bool _standard;
+      bool standard_ = true;
   };
 
 } // end anonymous namespace
 
 G2oQGLViewer::G2oQGLViewer(QWidget* parent, const QGLWidget* shareWidget) :
   QGLViewer(parent, shareWidget),
-  graph(0), _drawActions(0), _drawList(0), _updateDisplay(true)
+   drawActions_(nullptr)
 {
   setAxisIsDrawn(false);
-  _drawActionParameters = new DrawAction::Parameters();
+  drawActionParameters_ = new DrawAction::Parameters();
 }
 
 G2oQGLViewer::~G2oQGLViewer()
 {
-  delete _drawActionParameters;
-  glDeleteLists(_drawList, 1);
+  delete drawActionParameters_;
+  glDeleteLists(drawList_, 1);
 }
 
 void G2oQGLViewer::draw()
@@ -101,20 +97,20 @@ void G2oQGLViewer::draw()
   if (! graph)
     return;
 
-  if (_drawActions == 0) {
-    _drawActions = HyperGraphActionLibrary::instance()->actionByName("draw");
+  if (drawActions_ == nullptr) {
+    drawActions_ = HyperGraphActionLibrary::instance()->actionByName("draw");
     assert(_drawActions);
   }
 
-  if (! _drawActions) // avoid segmentation fault in release build
+  if (! drawActions_) // avoid segmentation fault in release build
     return;
-  if (_updateDisplay) {
-    _updateDisplay = false;
-    glNewList(_drawList, GL_COMPILE_AND_EXECUTE);
-    applyAction(graph, _drawActions.get(), _drawActionParameters);
+  if (updateDisplay_) {
+    updateDisplay_ = false;
+    glNewList(drawList_, GL_COMPILE_AND_EXECUTE);
+    applyAction(graph, drawActions_.get(), drawActionParameters_);
     glEndList();
   } else {
-    glCallList(_drawList);
+    glCallList(drawList_);
   }
 }
 
@@ -165,12 +161,12 @@ void G2oQGLViewer::init()
   delete oldcam;
 
   // getting a display list
-  _drawList = glGenLists(1);
+  drawList_ = glGenLists(1);
 }
 
 void G2oQGLViewer::setUpdateDisplay(bool updateDisplay)
 {
-  _updateDisplay = updateDisplay;
+  updateDisplay_ = updateDisplay;
 }
 
 } // end namespace

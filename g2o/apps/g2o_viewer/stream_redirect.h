@@ -42,22 +42,22 @@ class QPlainTextEdit;
 class G2O_VIEWER_API StreamRedirect : public std::basic_streambuf<char>
 {
   public:
-    typedef std::char_traits<char>::int_type int_type;
+    using int_type = std::char_traits<char>::int_type;
 
-  public:
+  
     StreamRedirect(std::ostream &stream, QPlainTextEdit* te);
-    ~StreamRedirect();
+    ~StreamRedirect() override;
 
   protected:
-    virtual std::char_traits<char>::int_type overflow(int_type v);
-    virtual std::streamsize xsputn(const char *p, std::streamsize n); 
+    std::char_traits<char>::int_type overflow(int_type v) override;
+    std::streamsize xsputn(const char *p, std::streamsize n) override; 
 
   private:
-    std::ostream& _stream;
-    std::streambuf* _old_buf;
-    std::string _buffer;
-    QPlainTextEdit* _te;
-    QMutex _mutex;
+    std::ostream& stream_;
+    std::streambuf* old_buf_;
+    std::string buffer_;
+    QPlainTextEdit* te_;
+    QMutex mutex_;
 };
 
 #endif

@@ -37,18 +37,18 @@ class G2O_VIEWER_API PropertiesWidget : public QDialog, public Ui::BasePropertie
 {
   Q_OBJECT
   public:
-    PropertiesWidget(QWidget * parent = 0);
-    virtual ~PropertiesWidget();
+    explicit PropertiesWidget(QWidget * parent = nullptr);
+    ~PropertiesWidget() override;
 
     void setProperties(g2o::PropertyMap* properties);
 
-  public slots:
+
     void on_btnApply_clicked();
     void on_btnOK_clicked();
 
   protected:
-    std::vector<std::string> _propNames;
-    g2o::PropertyMap* _properties;
+    std::vector<std::string> propNames_;
+    g2o::PropertyMap* properties_ = nullptr;
 
     virtual void updateDisplayedProperties();
     virtual void applyProperties();

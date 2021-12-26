@@ -26,8 +26,7 @@
 namespace g2o {
 
 GuiHyperGraphAction::GuiHyperGraphAction() :
-  HyperGraphAction(),
-  viewer(0), dumpScreenshots(false)
+  HyperGraphAction() 
 {
 }
 
@@ -43,7 +42,7 @@ bool GuiHyperGraphAction::operator()(const HyperGraph* graph, Parameters* parame
     viewer->update();
 
     if (dumpScreenshots) {
-      ParametersIteration* p = dynamic_cast<ParametersIteration*>(parameters);
+      auto* p = dynamic_cast<ParametersIteration*>(parameters);
       if (p) {
         viewer->setSnapshotFormat(QString("PNG"));
         viewer->setSnapshotQuality(-1);

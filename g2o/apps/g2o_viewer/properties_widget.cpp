@@ -30,8 +30,8 @@ using namespace std;
 using namespace g2o;
 
 PropertiesWidget::PropertiesWidget(QWidget * parent) :
-  QDialog(parent),
-  _properties(0)
+  QDialog(parent)
+
 {
   setupUi(this);
 }
@@ -43,7 +43,7 @@ PropertiesWidget::~PropertiesWidget()
 void PropertiesWidget::updateDisplayedProperties()
 {
   tableWidget->clear();
-  _propNames.clear();
+  propNames_.clear();
 
   tableWidget->setColumnCount(2);
 
@@ -54,23 +54,23 @@ void PropertiesWidget::updateDisplayedProperties()
 
   tableWidget->verticalHeader()->hide();
 
-  PropertyMap* properties = _properties;
+  PropertyMap* properties = properties_;
   if (! properties)
     return;
   tableWidget->setRowCount(properties->size());
 
   int r = 0;
-  for (PropertyMap::PropertyMapIterator it = properties->begin(); it != properties->end(); ++it, ++r) {
+  for (auto it = properties->begin(); it != properties->end(); ++it, ++r) {
 
-    QTableWidgetItem* textItem = new QTableWidgetItem;
+    auto* textItem = new QTableWidgetItem;
     textItem->setText(QString::fromStdString(humanReadablePropName(it->first)));
     textItem->setFlags(textItem->flags() & ~Qt::ItemIsEditable);
     tableWidget->setItem(r, 0, textItem);
-    _propNames.push_back(it->first);
+    propNames_.push_back(it->first);
 
     if (dynamic_cast<Property<bool>*>(it->second.get())) {
-      Property<bool>* prop = static_cast<Property<bool>*>(it->second.get());
-      QTableWidgetItem* checkItem = new QTableWidgetItem;
+      auto* prop = static_cast<Property<bool>*>(it->second.get());
+      auto* checkItem = new QTableWidgetItem;
       checkItem->setText("enabled");
       checkItem->setFlags(checkItem->flags() | Qt::ItemIsUserCheckable);
       if (prop->value())
@@ -79,15 +79,12 @@ void PropertiesWidget::updateDisplayedProperties()
         checkItem->setCheckState(Qt::Unchecked);
       tableWidget->setItem(r, 1, checkItem);
     } else {
-      QLineEdit* editor = new QLineEdit(tableWidget);
+      auto* editor = new QLineEdit(tableWidget);
       editor->setText(QString::fromStdString(it->second->toString()));
       if (dynamic_cast<Property<int>*>(it->second.get())) {
         editor->setValidator(new QIntValidator(editor));
-      }
-      else if (dynamic_cast<Property<float>*>(it->second.get())) {
-        editor->setValidator(new QDoubleValidator(editor));
-      }
-      else if (dynamic_cast<Property<double>*>(it->second.get())) {
+      } else if (dynamic_cast<Property<float>*>(it->second.get()) ||
+                 dynamic_cast<Property<double>*>(it->second.get())) {
         editor->setValidator(new QDoubleValidator(editor));
       }
       tableWidget->setCellWidget(r, 1, editor);
@@ -100,19 +97,19 @@ void PropertiesWidget::updateDisplayedProperties()
 void PropertiesWidget::applyProperties()
 {
   assert(tableWidget->rowCount() == (int) _propNames.size());
-  PropertyMap* properties = _properties;
+  PropertyMap* properties = properties_;
   for (int r = 0; r < tableWidget->rowCount(); ++r) {
-    const std::string& propName = _propNames[r];
+    const std::string& propName = propNames_[r];
     std::shared_ptr<BaseProperty> baseProp = properties->getProperty<BaseProperty>(propName);
     if (! baseProp)
       continue;
 
     if (dynamic_cast<Property<bool>*>(baseProp.get())) {
-      Property<bool>* prop = static_cast<Property<bool>*>(baseProp.get());
+      auto* prop = static_cast<Property<bool>*>(baseProp.get());
       QTableWidgetItem* checkItem = tableWidget->item(r, 1);
       prop->setValue(checkItem->checkState() == Qt::Checked);
     } else {
-      QLineEdit* editor = dynamic_cast<QLineEdit*>(tableWidget->cellWidget(r, 1));
+      auto* editor = dynamic_cast<QLineEdit*>(tableWidget->cellWidget(r, 1));
       bool status = baseProp->fromString(editor->text().toStdString());
       if (! status) {
         cerr << "Warning: unable to set property " << baseProp->name() << endl;
@@ -139,6 +136,6 @@ std::string PropertiesWidget::humanReadablePropName(const std::string& propertyN
 
 void PropertiesWidget::setProperties(PropertyMap* properties)
 {
-  _properties = properties;
+  properties_ = properties;
   updateDisplayedProperties();
 }

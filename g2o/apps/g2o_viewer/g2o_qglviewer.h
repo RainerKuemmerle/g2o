@@ -33,31 +33,31 @@ namespace g2o {
   class G2O_VIEWER_API G2oQGLViewer : public QGLViewer
   {
     public:
-      G2oQGLViewer(QWidget* parent=NULL, const QGLWidget* shareWidget=0);
+      explicit G2oQGLViewer(QWidget* parent=nullptr, const QGLWidget* shareWidget=nullptr);
       G2oQGLViewer(const G2oQGLViewer&) = delete;
       G2oQGLViewer& operator=(const G2oQGLViewer&) = delete;
 
-      ~G2oQGLViewer();
-      void draw();
-      void init();
+      ~G2oQGLViewer() override;
+      void draw() override;
+      void init() override;
 
       /**
        * the viewer uses a display list to cache the drawing, use setUpdateDisplay() to force
        * the creation of an updated display list.
        */
-      bool updateDisplay() const { return _updateDisplay;}
+      bool updateDisplay() const { return updateDisplay_;}
       void setUpdateDisplay(bool updateDisplay);
 
-      DrawAction::Parameters* parameters() { return _drawActionParameters;}
+      DrawAction::Parameters* parameters() { return drawActionParameters_;}
 
-    public:
-      SparseOptimizer* graph;
+    
+      SparseOptimizer* graph = nullptr;
 
     protected:
-      HyperGraphElementAction::HyperGraphElementActionPtr _drawActions;
-      GLuint _drawList;
-      bool _updateDisplay;
-      DrawAction::Parameters* _drawActionParameters;
+      HyperGraphElementAction::HyperGraphElementActionPtr drawActions_;
+      GLuint drawList_ = 0;
+      bool updateDisplay_ = true;
+      DrawAction::Parameters* drawActionParameters_;
   };
 
 } // end namespace

@@ -33,15 +33,15 @@ namespace g2o {
   {
     public:
       GuiHyperGraphAction();
-      ~GuiHyperGraphAction();
+      ~GuiHyperGraphAction() override;
 
       /**
        * calling updateGL, processEvents to visualize the current state after each iteration
        */
-      bool operator()(const HyperGraph* graph, Parameters* parameters = 0);
+      bool operator()(const HyperGraph* graph, Parameters* parameters = nullptr) override;
 
-      G2oQGLViewer* viewer;   ///< the viewer which visualizes the graph
-      bool dumpScreenshots;
+      G2oQGLViewer* viewer = nullptr;   ///< the viewer which visualizes the graph
+      bool dumpScreenshots = false;
   };
 
 } // end namespace
