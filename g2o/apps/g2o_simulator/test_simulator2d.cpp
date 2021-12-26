@@ -33,12 +33,11 @@
 #include <fstream>
 #include <sstream>
 
-using namespace g2o;
-using namespace std;
-using namespace Eigen;
+using std::cerr;
+using std::endl;
 
 int main(int argc, char** argv) {
-  CommandArgs arg;
+  g2o::CommandArgs arg;
   int nlandmarks;
   int simSteps;
   double worldSize;
@@ -78,29 +77,29 @@ int main(int argc, char** argv) {
   arg.parseArgs(argc, argv);
 
   std::mt19937 generator;
-  OptimizableGraph graph;
-  World world(&graph);
+  g2o::OptimizableGraph graph;
+  g2o::World world(&graph);
   for (int i=0; i<nlandmarks; i++){
-    auto * landmark = new WorldObjectPointXY;
-    double x = sampleUniform(-.5,.5, &generator)*(worldSize+5);
-    double y = sampleUniform(-.5,.5, &generator)*(worldSize+5);
-    landmark->vertex()->setEstimate(Vector2d(x,y));
+    auto * landmark = new g2o::WorldObjectPointXY;
+    double x = g2o::sampleUniform(-.5,.5, &generator)*(worldSize+5);
+    double y = g2o::sampleUniform(-.5,.5, &generator)*(worldSize+5);
+    landmark->vertex()->setEstimate(g2o::Vector2(x,y));
     world.addWorldObject(landmark);
   }
 
   cerr << "nSegments = " << nSegments << endl;
 
   for (int i=0; i<nSegments; i++){
-    auto * segment = new WorldObjectSegment2D;
-    int ix = sampleUniform(-segmentGridSize,segmentGridSize, &generator);
-    int iy = sampleUniform(-segmentGridSize,segmentGridSize, &generator);
-    int ith = sampleUniform(0,3, &generator);
+    auto * segment = new g2o::WorldObjectSegment2D;
+    int ix = g2o::sampleUniform(-segmentGridSize,segmentGridSize, &generator);
+    int iy = g2o::sampleUniform(-segmentGridSize,segmentGridSize, &generator);
+    int ith = g2o::sampleUniform(0,3, &generator);
     double th= (M_PI/2)*ith;
     th=atan2(sin(th),cos(th));
     double xc = ix*(worldSize/segmentGridSize);
     double yc = iy*(worldSize/segmentGridSize);
 
-    double l2 = sampleUniform(minSegmentLenght, maxSegmentLenght, &generator);
+    double l2 = g2o::sampleUniform(minSegmentLenght, maxSegmentLenght, &generator);
 
     double x1 = xc + cos(th)*l2;
     double y1 = yc + sin(th)*l2;
@@ -108,28 +107,24 @@ int main(int argc, char** argv) {
     double y2 = yc - sin(th)*l2;
 
 
-    segment->vertex()->setEstimateP1(Vector2d(x1,y1));
-    segment->vertex()->setEstimateP2(Vector2d(x2,y2));
+    segment->vertex()->setEstimateP1(g2o::Vector2(x1,y1));
+    segment->vertex()->setEstimateP2(g2o::Vector2(x2,y2));
     world.addWorldObject(segment);
   }
 
-
-
-
-
-  Robot2D robot(&world, "myRobot");
+  g2o::Robot2D robot(&world, "myRobot");
   world.addRobot(&robot);
 
 
-  stringstream ss;
+  std::stringstream ss;
   ss << "-ws" << worldSize;
   ss << "-nl" << nlandmarks;
   ss << "-steps" << simSteps;
 
   if (hasOdom) {
-    auto* odometrySensor=new SensorOdometry2D("odometry");
+    auto* odometrySensor=new g2o::SensorOdometry2D("odometry");
     robot.addSensor(odometrySensor);
-    Matrix3d odomInfo = odometrySensor->information();
+    g2o::Matrix3 odomInfo = odometrySensor->information();
     odomInfo.setIdentity();
     odomInfo*=500;
     odomInfo(2,2)=5000;
@@ -138,9 +133,9 @@ int main(int argc, char** argv) {
   }
 
   if (hasPoseSensor) {
-    auto* poseSensor = new SensorPose2D("poseSensor");
+    auto* poseSensor = new g2o::SensorPose2D("poseSensor");
     robot.addSensor(poseSensor);
-    Matrix3d poseInfo = poseSensor->information();
+    g2o::Matrix3 poseInfo = poseSensor->information();
     poseInfo.setIdentity();
     poseInfo*=500;
     poseInfo(2,2)=5000;
@@ -149,9 +144,9 @@ int main(int argc, char** argv) {
   }
 
   if (hasPointSensor) {
-    auto* pointSensor = new SensorPointXY("pointSensor");
+    auto* pointSensor = new g2o::SensorPointXY("pointSensor");
     robot.addSensor(pointSensor);
-    Matrix2d pointInfo = pointSensor->information();
+    g2o::Matrix2 pointInfo = pointSensor->information();
     pointInfo.setIdentity();
     pointInfo*=1000;
     pointSensor->setInformation(pointInfo);
@@ -160,7 +155,7 @@ int main(int argc, char** argv) {
   }
 
   if (hasPointBearingSensor) {
-    auto* bearingSensor = new SensorPointXYBearing("bearingSensor");
+    auto* bearingSensor = new g2o::SensorPointXYBearing("bearingSensor");
     robot.addSensor(bearingSensor);
     bearingSensor->setInformation(bearingSensor->information()*1000);
     ss << "-pointBearing";
@@ -168,27 +163,27 @@ int main(int argc, char** argv) {
 
   if (hasSegmentSensor) {
     cerr << "creating Segment Sensor" << endl;
-    auto* segmentSensor = new SensorSegment2D("segmentSensor");
+    auto* segmentSensor = new g2o::SensorSegment2D("segmentSensor");
     cerr << "segmentSensorCreated" << endl;
     segmentSensor->setMaxRange(3);
     segmentSensor->setMinRange(.1);
     robot.addSensor(segmentSensor);
     segmentSensor->setInformation(segmentSensor->information()*1000);
 
-    auto* segmentSensorLine = new SensorSegment2DLine("segmentSensorSensorLine");
+    auto* segmentSensorLine = new g2o::SensorSegment2DLine("segmentSensorSensorLine");
     segmentSensorLine->setMaxRange(3);
     segmentSensorLine->setMinRange(.1);
     robot.addSensor(segmentSensorLine);
-    Matrix2d m=segmentSensorLine->information();
+    g2o::Matrix2 m=segmentSensorLine->information();
     m=m*1000;
     m(0,0)*=10;
     segmentSensorLine->setInformation(m);
 
-    auto* segmentSensorPointLine = new SensorSegment2DPointLine("segmentSensorSensorPointLine");
+    auto* segmentSensorPointLine = new g2o::SensorSegment2DPointLine("segmentSensorSensorPointLine");
     segmentSensorPointLine->setMaxRange(3);
     segmentSensorPointLine->setMinRange(.1);
     robot.addSensor(segmentSensorPointLine);
-    Matrix3d m3=segmentSensorPointLine->information();
+    g2o::Matrix3 m3=segmentSensorPointLine->information();
     m3=m3*1000;
     m3(2,2)*=10;
     segmentSensorPointLine->setInformation(m3);
@@ -197,20 +192,19 @@ int main(int argc, char** argv) {
   }
 
 
-  robot.move(SE2());
+  robot.move(g2o::SE2());
   double pStraight=0.7;
-  SE2 moveStraight; moveStraight.setTranslation(Vector2d(1., 0.));
+  g2o::SE2 moveStraight; moveStraight.setTranslation(g2o::Vector2(1., 0.));
   double pLeft=0.15;
-  SE2 moveLeft; moveLeft.setRotation(Rotation2Dd(M_PI/2));
+  g2o::SE2 moveLeft; moveLeft.setRotation(g2o::Rotation2D(M_PI/2));
   //double pRight=0.15;
-  SE2 moveRight; moveRight.setRotation(Rotation2Dd(-M_PI/2));
+  g2o::SE2 moveRight; moveRight.setRotation(g2o::Rotation2D(-M_PI/2));
 
   for (int i=0; i<simSteps; i++){
     cerr << "m";
-    SE2 move;
-    SE2 pose=robot.pose();
+    g2o::SE2 pose=robot.pose();
     double dtheta=-100;
-    Vector2d dt;
+    g2o::Vector2 dt;
     if (pose.translation().x() < -.5*worldSize){
       dtheta = 0;
     }
@@ -226,9 +220,10 @@ int main(int argc, char** argv) {
     if (pose.translation().y() >  .5*worldSize){
       dtheta = -M_PI/2;
     }
+    g2o::SE2 move;
     if (dtheta< -M_PI) {
       // select a random move of the robot
-      double sampled=sampleUniform(0.,1.,&generator);
+      double sampled=g2o::sampleUniform(0.,1.,&generator);
       if (sampled<pStraight)
         move=moveStraight;
       else if (sampled<pStraight+pLeft)
@@ -237,9 +232,9 @@ int main(int argc, char** argv) {
         move=moveRight;
     } else {
       double mTheta=dtheta-pose.rotation().angle();
-      move.setRotation(Rotation2Dd(mTheta));
+      move.setRotation(g2o::Rotation2D(mTheta));
       if (move.rotation().angle()<std::numeric_limits<double>::epsilon()){
-        move.setTranslation(Vector2d(1., 0.));
+        move.setTranslation(g2o::Vector2(1., 0.));
       }
     }
     robot.relativeMove(move);
@@ -248,7 +243,7 @@ int main(int argc, char** argv) {
     robot.sense();
   }
   //string fname=outputFilename + ss.str() + ".g2o";
-  ofstream testStream(outputFilename.c_str());
+  std::ofstream testStream(outputFilename.c_str());
   graph.save(testStream);
 
   return 0;
