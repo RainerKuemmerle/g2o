@@ -28,10 +28,6 @@
 
 namespace g2o {
 
-EdgeSE2PureCalib::EdgeSE2PureCalib()
-{
-}
-
 bool EdgeSE2PureCalib::read(std::istream& is)
 {
   (void) is;

@@ -45,18 +45,19 @@
 #include "g2o/core/optimization_algorithm_factory.h"
 #include "g2o/core/factory.h"
 
-using namespace std;
-using namespace g2o;
-
 static bool hasToStop = false;
 
 G2O_USE_OPTIMIZATION_LIBRARY(eigen);
 G2O_USE_TYPE_GROUP(slam2d);
 
+using std::cerr;
+using std::endl;
+using std::string;
+
 void sigquit_handler(int sig)
 {
   if (sig == SIGINT) {
-    hasToStop = 1;
+    hasToStop = true;
     static int cnt = 0;
     if (cnt++ == 2) {
       cerr << __PRETTY_FUNCTION__ << " forcing exit" << endl;
@@ -74,7 +75,7 @@ int main(int argc, char** argv)
   string outputfilename;
   bool initialGuess;
   // command line parsing
-  CommandArgs commandLineArguments;
+  g2o::CommandArgs commandLineArguments;
   commandLineArguments.param("i", maxIterations, 10, "perform n iterations");
   commandLineArguments.param("v", verbose, false, "verbose output of the optimization process");
   commandLineArguments.param("guess", initialGuess, false, "initial guess based on spanning tree");
@@ -84,21 +85,21 @@ int main(int argc, char** argv)
 
   commandLineArguments.parseArgs(argc, argv);
 
-  OptimizationAlgorithmFactory* solverFactory = OptimizationAlgorithmFactory::instance();
+  g2o::OptimizationAlgorithmFactory* solverFactory = g2o::OptimizationAlgorithmFactory::instance();
 
-  SparseOptimizer optimizer;
+  g2o::SparseOptimizer optimizer;
   optimizer.setVerbose(verbose);
   optimizer.setForceStopFlag(&hasToStop);
 
-  OptimizationAlgorithmProperty solverProperty;
+  g2o::OptimizationAlgorithmProperty solverProperty;
   optimizer.setAlgorithm(solverFactory->construct("lm_var", solverProperty));
 
   // loading
-  if (! Gm2dlIO::readGm2dl(inputFilename, optimizer, false)) {
+  if (! g2o::Gm2dlIO::readGm2dl(inputFilename, optimizer, false)) {
     cerr << "Error while loading gm2dl file" << endl;
   }
 
-  auto laserOffset = std::dynamic_pointer_cast<VertexSE2>(optimizer.vertex(numeric_limits<int>::max()));
+  auto laserOffset = std::dynamic_pointer_cast<g2o::VertexSE2>(optimizer.vertex(std::numeric_limits<int>::max()));
   //laserOffset->setEstimate(SE2()); // set to Identity
   if (laserOffset) {
     cerr << "Initial laser offset " << laserOffset->estimate().toVector().transpose() << endl;
@@ -110,18 +111,17 @@ int main(int argc, char** argv)
     if (! gauge) {
       cerr <<  "# cannot find a vertex to fix in this thing" << endl;
       return 2;
-    } else {
-      cerr << "# graph is fixed by node " << gauge->id() << endl;
+    }       cerr << "# graph is fixed by node " << gauge->id() << endl;
       gauge->setFixed(true);
-    }
+
   } else {
     cerr << "# graph is fixed by priors" << endl;
   }
 
   // sanity check
-  auto pointerWrapper = std::shared_ptr<HyperGraph>(&optimizer, [](HyperGraph*){});
-  HyperDijkstra d(pointerWrapper);
-  UniformCostFunction f;
+  auto pointerWrapper = std::shared_ptr<g2o::HyperGraph>(&optimizer, [](g2o::HyperGraph*){});
+  g2o::HyperDijkstra d(pointerWrapper);
+  g2o::UniformCostFunction f;
   d.shortestPaths(gauge, &f);
   //cerr << PVAR(d.visited().size()) << endl;
 
@@ -129,11 +129,10 @@ int main(int argc, char** argv)
     cerr << CL_RED("Warning: d.visited().size() != optimizer.vertices().size()") << endl;
     cerr << "visited: " << d.visited().size() << endl;
     cerr << "vertices: " << optimizer.vertices().size() << endl;
-    if (1)
-    for (auto it = optimizer.vertices().begin(); it != optimizer.vertices().end(); ++it) {
-      if (d.visited().count(it->second) == 0) {
-        auto v = static_cast<OptimizableGraph::Vertex*>(it->second.get());
-        cerr << "\t unvisited vertex " << it->first << " " << (void*)v << endl;
+    for (auto & it : optimizer.vertices()) {
+      if (d.visited().count(it.second) == 0) {
+        auto *v = static_cast<g2o::OptimizableGraph::Vertex*>(it.second.get());
+        cerr << "\t unvisited vertex " << it.first << " " << static_cast<void*>(v) << endl;
         v->setFixed(true);
       }
     }
@@ -157,17 +156,17 @@ int main(int argc, char** argv)
     cerr << "Calibrated laser offset " << laserOffset->estimate().toVector().transpose() << endl;
   }
 
-  if (outputfilename.size() > 0) {
-    Gm2dlIO::updateLaserData(optimizer);
+  if (!outputfilename.empty()) {
+    g2o::Gm2dlIO::updateLaserData(optimizer);
     cerr << "Writing " << outputfilename << " ... ";
-    bool writeStatus = Gm2dlIO::writeGm2dl(outputfilename, optimizer);
+    bool writeStatus = g2o::Gm2dlIO::writeGm2dl(outputfilename, optimizer);
     cerr << (writeStatus ? "done." : "failed") << endl;
   }
 
-  if (gnudump.size() > 0) {
-    ofstream fout(gnudump.c_str());
-    for (SparseOptimizer::VertexIDMap::const_iterator it = optimizer.vertices().begin(); it != optimizer.vertices().end(); ++it) {
-      VertexSE2* v = dynamic_cast<VertexSE2*>(it->second.get());
+  if (!gnudump.empty()) {
+    std::ofstream fout(gnudump.c_str());
+    for (const auto & it : optimizer.vertices()) {
+      auto* v = dynamic_cast<g2o::VertexSE2*>(it.second.get());
       fout << v->estimate().toVector().transpose() << endl;
     }
   }

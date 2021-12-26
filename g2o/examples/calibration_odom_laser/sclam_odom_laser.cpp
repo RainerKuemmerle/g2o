@@ -48,9 +48,9 @@
 #include "g2o/types/data/robot_laser.h"
 #include "g2o/types/data/data_queue.h"
 
-using namespace std;
-using namespace g2o;
-using namespace Eigen;
+using std::cerr;
+using std::endl;
+using std::string;
 
 static bool hasToStop = false;
 
@@ -66,7 +66,9 @@ void sigquit_handler(int sig)
   }
 }
 
-int main(int argc, char** argv)
+namespace g2o {
+
+int run_sclam_odom_laser(int argc, char** argv)
 {
   bool fixLaser;
   int maxIterations;
@@ -114,10 +116,9 @@ int main(int argc, char** argv)
     if (! gauge) {
       cerr <<  "# cannot find a vertex to fix in this thing" << endl;
       return 2;
-    } else {
-      cerr << "# graph is fixed by node " << gauge->id() << endl;
+    }       cerr << "# graph is fixed by node " << gauge->id() << endl;
       gauge->setFixed(true);
-    }
+
   } else {
     cerr << "# graph is fixed by priors" << endl;
   }
@@ -135,25 +136,24 @@ int main(int argc, char** argv)
     cerr << CL_RED("Warning: d.visited().size() != optimizer.vertices().size()") << endl;
     cerr << "visited: " << d.visited().size() << endl;
     cerr << "vertices: " << optimizer.vertices().size() << endl;
-    if (1)
-      for (SparseOptimizer::VertexIDMap::const_iterator it = optimizer.vertices().begin(); it != optimizer.vertices().end(); ++it) {
-        if (d.visited().count(it->second) == 0) {
-          OptimizableGraph::Vertex* v = static_cast<OptimizableGraph::Vertex*>(it->second.get());
-          cerr << "\t unvisited vertex " << it->first << " " << (void*)v << endl;
+    for (const auto & it : optimizer.vertices()) {
+        if (d.visited().count(it.second) == 0) {
+          auto* v = static_cast<OptimizableGraph::Vertex*>(it.second.get());
+          cerr << "\t unvisited vertex " << it.first << " " << static_cast<void*>(v) << endl;
           v->setFixed(true);
         }
       }
   }
 
-  for (SparseOptimizer::VertexIDMap::const_iterator it = optimizer.vertices().begin(); it != optimizer.vertices().end(); ++it) {
-    OptimizableGraph::Vertex* v = static_cast<OptimizableGraph::Vertex*>(it->second.get());
+  for (const auto & it : optimizer.vertices()) {
+    auto* v = static_cast<OptimizableGraph::Vertex*>(it.second.get());
     if (v->fixed()) {
-      cerr << "\t fixed vertex " << it->first << endl;
+      cerr << "\t fixed vertex " << it.first << endl;
     }
   }
 
-  auto laserOffset = std::dynamic_pointer_cast<VertexSE2>(optimizer.vertex(Gm2dlIO::ID_LASERPOSE));
-  auto odomParamsVertex = std::dynamic_pointer_cast<VertexOdomDifferentialParams>(optimizer.vertex(Gm2dlIO::ID_ODOMCALIB));
+  auto laserOffset = std::dynamic_pointer_cast<VertexSE2>(optimizer.vertex(Gm2dlIO::kIdLaserpose));
+  auto odomParamsVertex = std::dynamic_pointer_cast<VertexOdomDifferentialParams>(optimizer.vertex(Gm2dlIO::kIdOdomcalib));
 
   if (fixLaser) {
     cerr << "Fix position of the laser offset" << endl;
@@ -182,14 +182,14 @@ int main(int argc, char** argv)
   cerr << "vertices: " << optimizer.vertices().size() << endl;
   cerr << "edges: " << optimizer.edges().size() << endl;
 
-  if (dumpGraphFilename.size() > 0) {
+  if (!dumpGraphFilename.empty()) {
     cerr << "Writing " << dumpGraphFilename << " ... ";
     optimizer.save(dumpGraphFilename.c_str());
     cerr << "done." << endl;
   }
 
   // optional input of a seperate file for applying the odometry calibration
-  if (odomTestFilename.size() > 0) {
+  if (!odomTestFilename.empty()) {
 
     DataQueue testRobotLaserQueue;
     int numTestOdom = Gm2dlIO::readRobotLaser(odomTestFilename, testRobotLaserQueue);
@@ -197,14 +197,14 @@ int main(int argc, char** argv)
       cerr << "Unable to read test data" << endl;
     } else {
 
-      ofstream rawStream("odometry_raw.txt");
-      ofstream calibratedStream("odometry_calibrated.txt");
-      const Vector3d& odomCalib = odomParamsVertex ? odomParamsVertex->estimate() : Vector3d::Ones();
+      std::ofstream rawStream("odometry_raw.txt");
+      std::ofstream calibratedStream("odometry_calibrated.txt");
+      Vector3 odomCalib = odomParamsVertex ? odomParamsVertex->estimate() : Vector3::Ones();
       RobotLaser* prev = dynamic_cast<RobotLaser*>(testRobotLaserQueue.buffer().begin()->second);
       SE2 prevCalibratedPose = prev->odomPose();
 
-      for (DataQueue::Buffer::const_iterator it = testRobotLaserQueue.buffer().begin(); it != testRobotLaserQueue.buffer().end(); ++it) {
-        RobotLaser* cur = dynamic_cast<RobotLaser*>(it->second);
+      for (auto it : testRobotLaserQueue.buffer()) {
+        auto* cur = dynamic_cast<RobotLaser*>(it.second);
         assert(cur);
 
         double dt = cur->timestamp() - prev->timestamp();
@@ -236,7 +236,7 @@ int main(int argc, char** argv)
 
   }
 
-  if (outputfilename.size() > 0) {
+  if (!outputfilename.empty()) {
     Gm2dlIO::updateLaserData(optimizer);
     cerr << "Writing " << outputfilename << " ... ";
     bool writeStatus = Gm2dlIO::writeGm2dl(outputfilename, optimizer);
@@ -244,4 +244,10 @@ int main(int argc, char** argv)
   }
 
   return 0;
+}
+}
+
+int main(int argc, char** argv)
+{
+  return g2o::run_sclam_odom_laser(argc, argv);
 }

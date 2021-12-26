@@ -42,7 +42,7 @@ namespace g2o {
     double timeInterval;
   };
 
-  typedef std::vector<MotionInformation, Eigen::aligned_allocator<MotionInformation> >     MotionInformationVector;
+  using MotionInformationVector = std::vector<MotionInformation, Eigen::aligned_allocator<MotionInformation>>;
 
 } // end namespace
 

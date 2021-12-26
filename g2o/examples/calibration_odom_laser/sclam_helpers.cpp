@@ -42,23 +42,21 @@
 #include "g2o/solvers/eigen/linear_solver_eigen.h"
 
 #include <iostream>
-using namespace std;
-using namespace Eigen;
 
 namespace g2o {
 
-  static const double INFORMATION_SCALING_ODOMETRY = 100;
+  static constexpr double kInformationScalingOdometry = 100;
 
   void addOdometryCalibLinksDifferential(SparseOptimizer& optimizer, const DataQueue& odomData)
   {
     auto odomParamsVertex = std::make_shared<VertexOdomDifferentialParams>();
     odomParamsVertex->setToOrigin();
-    odomParamsVertex->setId(Gm2dlIO::ID_ODOMCALIB);
+    odomParamsVertex->setId(Gm2dlIO::kIdOdomcalib);
     optimizer.addVertex(odomParamsVertex);
 
     SparseOptimizer::EdgeSet odomCalibEdges;
-    for (SparseOptimizer::EdgeSet::const_iterator it = optimizer.edges().begin(); it != optimizer.edges().end(); ++it) {
-      EdgeSE2SensorCalib* scanmatchEdge = dynamic_cast<EdgeSE2SensorCalib*>(it->get());
+    for (const auto & it : optimizer.edges()) {
+      auto* scanmatchEdge = dynamic_cast<EdgeSE2SensorCalib*>(it.get());
       if (! scanmatchEdge)
         continue;
 
@@ -70,13 +68,13 @@ namespace g2o {
 
       auto rl1 = std::dynamic_pointer_cast<RobotLaser>(r1->userData());
       auto rl2 = std::dynamic_pointer_cast<RobotLaser>(r2->userData());
-      RobotLaser* odom1 = dynamic_cast<RobotLaser*>(odomData.findClosestData(rl1->timestamp()));
-      RobotLaser* odom2 = dynamic_cast<RobotLaser*>(odomData.findClosestData(rl2->timestamp()));
+      auto* odom1 = dynamic_cast<RobotLaser*>(odomData.findClosestData(rl1->timestamp()));
+      auto* odom2 = dynamic_cast<RobotLaser*>(odomData.findClosestData(rl2->timestamp()));
 
       if (fabs(rl1->timestamp() - rl2->timestamp()) < 1e-7) {
-        cerr << "strange egde " << r1->id() << " <-> " << r2->id() << endl;
-        cerr << FIXED(PVAR(rl1->timestamp()) << "\t " << PVAR(rl2->timestamp())) << endl;
-        cerr << FIXED(PVAR(odom1->timestamp()) << "\t " << PVAR(odom2->timestamp())) << endl;
+        std::cerr << "strange egde " << r1->id() << " <-> " << r2->id() << std::endl;
+        std::cerr << FIXED(PVAR(rl1->timestamp()) << "\t " << PVAR(rl2->timestamp())) << std::endl;
+        std::cerr << FIXED(PVAR(odom1->timestamp()) << "\t " << PVAR(odom2->timestamp())) << std::endl;
       }
 
       //cerr << PVAR(odom1->odomPose().toVector().transpose()) << endl;
@@ -94,23 +92,23 @@ namespace g2o {
       e->setMeasurement(OdomConvert::convertToVelocity(mm));
       //cerr << PVAR(e->measurement()) << endl;
 
-      e->information() = Matrix3d::Identity() * INFORMATION_SCALING_ODOMETRY;
+      e->information() = Matrix3::Identity() * kInformationScalingOdometry;
       odomCalibEdges.insert(e);
     }
 
-    for (SparseOptimizer::EdgeSet::iterator it = odomCalibEdges.begin(); it != odomCalibEdges.end(); ++it)
-      optimizer.addEdge(*it);
+    for (const auto & odomCalibEdge : odomCalibEdges)
+      optimizer.addEdge(odomCalibEdge);
 
   }
 
   void allocateSolverForSclam(SparseOptimizer& optimizer, bool levenberg)
   {
-    typedef BlockSolver< BlockSolverTraits<-1, -1> >  SclamBlockSolver;
-    typedef LinearSolverEigen<SclamBlockSolver::PoseMatrixType> SclamLinearSolver;
+    using SclamBlockSolver = BlockSolver<BlockSolverTraits<-1, -1>>;
+    using SclamLinearSolver = LinearSolverEigen<SclamBlockSolver::PoseMatrixType>;
 
     std::unique_ptr<SclamLinearSolver> linearSolver = g2o::make_unique<SclamLinearSolver>();
     linearSolver->setBlockOrdering(false);
-    OptimizationAlgorithm* solver = 0;
+    OptimizationAlgorithm* solver = nullptr;
     if (levenberg) {
       solver = new OptimizationAlgorithmLevenberg(g2o::make_unique<SclamBlockSolver>(std::move(linearSolver)));
     } else {

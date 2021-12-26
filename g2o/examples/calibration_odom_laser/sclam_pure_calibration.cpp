@@ -51,29 +51,32 @@
 #include "g2o/types/data/robot_laser.h"
 #include "g2o/types/data/data_queue.h"
 
-using namespace std;
-using namespace g2o;
+using std::cerr;
+using std::endl;
+using std::string;
 
 static Eigen::Vector2d linearSolution;
+
+namespace g2o {
 
 class VertexBaseline : public BaseVertex<1, double>
 {
   public:
-    VertexBaseline() {}
+    VertexBaseline() = default;
 
-    virtual void setToOriginImpl() { estimate_ = 1.;}
-    virtual void oplusImpl(const double* update) { estimate_ += update[0];}
-    virtual bool read(std::istream&) { return false;}
-    virtual bool write(std::ostream&) const { return false;}
+    void setToOriginImpl() override { estimate_ = 1.;}
+    void oplusImpl(const double* update) override { estimate_ += update[0];}
+    bool read(std::istream&) override { return false;}
+    bool write(std::ostream&) const override { return false;}
 };
 
 class EdgeCalib : public BaseBinaryEdge<3, OdomAndLaserMotion, VertexSE2, VertexBaseline>
 {
   public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
-    EdgeCalib() {}
+    EdgeCalib() = default;
 
-    void computeError()
+    void computeError() override
     {
       const VertexSE2* laserOffset = vertexXnRaw<0>();
       const VertexBaseline* odomParams = vertexXnRaw<1>();
@@ -93,11 +96,11 @@ class EdgeCalib : public BaseBinaryEdge<3, OdomAndLaserMotion, VertexSE2, Vertex
       error_ = delta.toVector();
     }
 
-    virtual bool read(std::istream&) { return false;}
-    virtual bool write(std::ostream&) const { return false;}
+    bool read(std::istream&) override { return false;}
+    bool write(std::ostream&) const override { return false;}
 };
 
-int main(int argc, char** argv)
+int run_sclam_pure_calibration(int argc, char** argv)
 {
   bool fixLaser;
   int maxIterations;
@@ -141,25 +144,26 @@ int main(int argc, char** argv)
   if (numRobotLaser == 0) {
     cerr << "No robot laser read" << endl;
     return 0;
-  } else {
+  }
+  {
     RobotLaser* rl = dynamic_cast<RobotLaser*>(robotLaserQueue.buffer().begin()->second);
     initialLaserPose = rl->odomPose().inverse() * rl->laserPose();
     cerr << PVAR(initialLaserPose.toVector().transpose()) << endl;
   }
 
   // adding the measurements
-  vector<MotionInformation, Eigen::aligned_allocator<MotionInformation> > motions;
+  std::vector<MotionInformation, Eigen::aligned_allocator<MotionInformation> > motions;
   {
-    std::map<double, RobotData*>::const_iterator it = robotLaserQueue.buffer().begin();
-    std::map<double, RobotData*>::const_iterator prevIt = it++;
+    auto it = robotLaserQueue.buffer().begin();
+    auto prevIt = it++;
     for (; it != robotLaserQueue.buffer().end(); ++it) {
       MotionInformation mi;
-      RobotLaser* prevLaser = dynamic_cast<RobotLaser*>(prevIt->second);
-      RobotLaser* curLaser = dynamic_cast<RobotLaser*>(it->second);
+      auto* prevLaser = dynamic_cast<RobotLaser*>(prevIt->second);
+      auto* curLaser = dynamic_cast<RobotLaser*>(it->second);
       mi.laserMotion = prevLaser->laserPose().inverse() * curLaser->laserPose();
       // get the motion of the robot in that time interval
-      RobotLaser* prevOdom = dynamic_cast<RobotLaser*>(odometryQueue.findClosestData(prevLaser->timestamp()));
-      RobotLaser* curOdom = dynamic_cast<RobotLaser*>(odometryQueue.findClosestData(curLaser->timestamp()));
+      auto* prevOdom = dynamic_cast<RobotLaser*>(odometryQueue.findClosestData(prevLaser->timestamp()));
+      auto* curOdom = dynamic_cast<RobotLaser*>(odometryQueue.findClosestData(curLaser->timestamp()));
       mi.odomMotion = prevOdom->odomPose().inverse() * curOdom->odomPose();
       mi.timeInterval = prevOdom->timestamp() - curOdom->timestamp();
       prevIt = it;
@@ -167,19 +171,19 @@ int main(int argc, char** argv)
     }
   }
 
-  if (1) {
+  {
     auto laserOffset = std::make_shared<VertexSE2>();
-    laserOffset->setId(Gm2dlIO::ID_LASERPOSE);
+    laserOffset->setId(Gm2dlIO::kIdLaserpose);
     laserOffset->setEstimate(initialLaserPose);
     optimizer.addVertex(laserOffset);
     auto odomParamsVertex = std::make_shared<VertexOdomDifferentialParams>();
-    odomParamsVertex->setId(Gm2dlIO::ID_ODOMCALIB);
+    odomParamsVertex->setId(Gm2dlIO::kIdOdomcalib);
     odomParamsVertex->setEstimate(Eigen::Vector3d(1., 1., 1.));
     optimizer.addVertex(odomParamsVertex);
-    for (size_t i = 0; i < motions.size(); ++i) {
-      const SE2& odomMotion = motions[i].odomMotion;
-      const SE2& laserMotion = motions[i].laserMotion;
-      const double& timeInterval = motions[i].timeInterval;
+    for (auto & motion : motions) {
+      const SE2& odomMotion = motion.odomMotion;
+      const SE2& laserMotion = motion.laserMotion;
+      const double& timeInterval = motion.timeInterval;
       // add the edge
       MotionMeasurement mm(odomMotion.translation().x(), odomMotion.translation().y(), odomMotion.rotation().angle(), timeInterval);
       OdomAndLaserMotion meas;
@@ -231,17 +235,17 @@ int main(int argc, char** argv)
 
   //constructing non-linear least squares
   auto laserOffset = std::make_shared<VertexSE2>();
-  laserOffset->setId(Gm2dlIO::ID_LASERPOSE);
+  laserOffset->setId(Gm2dlIO::kIdLaserpose);
   laserOffset->setEstimate(initialLaserPose);
   optimizer.addVertex(laserOffset);
   auto odomParamsVertex = std::make_shared<VertexBaseline>();
-  odomParamsVertex->setId(Gm2dlIO::ID_ODOMCALIB);
+  odomParamsVertex->setId(Gm2dlIO::kIdOdomcalib);
   odomParamsVertex->setEstimate(1.);
   optimizer.addVertex(odomParamsVertex);
-  for (size_t i = 0; i < motions.size(); ++i) {
-    const SE2& odomMotion = motions[i].odomMotion;
-    const SE2& laserMotion = motions[i].laserMotion;
-    const double& timeInterval = motions[i].timeInterval;
+  for (auto & motion : motions) {
+    const SE2& odomMotion = motion.odomMotion;
+    const SE2& laserMotion = motion.laserMotion;
+    const double& timeInterval = motion.timeInterval;
     // add the edge
     MotionMeasurement mm(odomMotion.translation().x(), odomMotion.translation().y(), odomMotion.rotation().angle(), timeInterval);
     OdomAndLaserMotion meas;
@@ -281,14 +285,14 @@ int main(int argc, char** argv)
     cerr << "Odometry parameters (scaling factors (v_l, v_r, b)): " << closedFormOdom.transpose() << endl;
   }
 
-  if (dumpGraphFilename.size() > 0) {
+  if (!dumpGraphFilename.empty()) {
     cerr << "Writing " << dumpGraphFilename << " ... ";
     optimizer.save(dumpGraphFilename.c_str());
     cerr << "done." << endl;
   }
 
   // optional input of a separate file for applying the odometry calibration
-  if (odomTestFilename.size() > 0) {
+  if (!odomTestFilename.empty()) {
 
     DataQueue testRobotLaserQueue;
     int numTestOdom = Gm2dlIO::readRobotLaser(odomTestFilename, testRobotLaserQueue);
@@ -296,13 +300,13 @@ int main(int argc, char** argv)
       cerr << "Unable to read test data" << endl;
     } else {
 
-      ofstream rawStream("odometry_raw.txt");
-      ofstream calibratedStream("odometry_calibrated.txt");
+      std::ofstream rawStream("odometry_raw.txt");
+      std::ofstream calibratedStream("odometry_calibrated.txt");
       RobotLaser* prev = dynamic_cast<RobotLaser*>(testRobotLaserQueue.buffer().begin()->second);
       SE2 prevCalibratedPose = prev->odomPose();
 
-      for (DataQueue::Buffer::const_iterator it = testRobotLaserQueue.buffer().begin(); it != testRobotLaserQueue.buffer().end(); ++it) {
-        RobotLaser* cur = dynamic_cast<RobotLaser*>(it->second);
+      for (auto it : testRobotLaserQueue.buffer()) {
+        auto* cur = dynamic_cast<RobotLaser*>(it.second);
         assert(cur);
 
         double dt = cur->timestamp() - prev->timestamp();
@@ -335,4 +339,9 @@ int main(int argc, char** argv)
   }
 
   return 0;
+}
+}
+
+int main(int argc, char** argv) {
+  return g2o::run_sclam_pure_calibration(argc, argv);
 }

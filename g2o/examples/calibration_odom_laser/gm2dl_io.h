@@ -45,8 +45,8 @@ namespace g2o {
       /**
        * the global ID we assign the laser pose vertex
        */
-      static const int ID_LASERPOSE;
-      static const int ID_ODOMCALIB;
+      static const int kIdLaserpose;
+      static const int kIdOdomcalib;
 
       static bool readGm2dl(const std::string& filename, SparseOptimizer& optimizer, bool overrideCovariances = false);
 

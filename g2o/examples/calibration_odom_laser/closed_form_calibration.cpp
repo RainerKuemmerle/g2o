@@ -36,22 +36,21 @@
 #define SQR(X)		( std::pow(X,2) )
 #define CUBE(X)		( std::pow(X,3) )
 
-using namespace Eigen;
-
 namespace g2o {
 
 bool ClosedFormCalibration::calibrate(const MotionInformationVector& measurements, SE2& laserOffset, Eigen::Vector3d& odomParams)
 {
   std::vector<VelocityMeasurement, Eigen::aligned_allocator<VelocityMeasurement> > velMeasurements;
-  for (size_t i = 0; i < measurements.size(); ++i) {
-    const SE2& odomMotion = measurements[i].odomMotion;
-    const double& timeInterval = measurements[i].timeInterval;
+  for (const auto & measurement : measurements) {
+    const SE2& odomMotion = measurement.odomMotion;
+    const double& timeInterval = measurement.timeInterval;
     MotionMeasurement mm(odomMotion.translation().x(), odomMotion.translation().y(), odomMotion.rotation().angle(), timeInterval);
     VelocityMeasurement velMeas = OdomConvert::convertToVelocity(mm);
     velMeasurements.push_back(velMeas);
   }
 
-  double J_21, J_22;
+  double J_21;
+  double J_22;
   {
     Eigen::MatrixXd A(measurements.size(), 2);
     Eigen::VectorXd x(measurements.size());
@@ -91,12 +90,12 @@ bool ClosedFormCalibration::calibrate(const MotionInformationVector& measurement
     L(0, 0) = -c_x;
     L(0, 1) = 1 - cos(o_theta_k);
     L(0, 2) = sin(o_theta_k);
-    L(0, 3) = laserMotion.translation().x(); 
+    L(0, 3) = laserMotion.translation().x();
     L(0, 4) = -laserMotion.translation().y();
     L(1, 0) = -c_y;
     L(1, 1) = - sin(o_theta_k);
     L(1, 2) = 1 - cos(o_theta_k);
-    L(1, 3) = laserMotion.translation().y(); 
+    L(1, 3) = laserMotion.translation().y();
     L(1, 4) = laserMotion.translation().x();
     M.noalias() += L.transpose() * L;
   }
@@ -111,11 +110,11 @@ bool ClosedFormCalibration::calibrate(const MotionInformationVector& measurement
   double m22 = M(1,1);
   double m34 = M(2,3);
   double m35 = M(2,4);
-  double m44 = M(3,3); 
+  double m44 = M(3,3);
 
   double a = m11 * SQR(m22) - m22 * SQR(m13);
-  double b = 2*m11 * SQR(m22) * m44 - SQR(m22) * SQR(m14) - 2*m22 * SQR(m13) * m44 - 2*m11 * m22 * SQR(m34) 
-    - 2*m11 * m22 * SQR(m35) - SQR(m22) * SQR(m15) + 2*m13 * m22 * m34 * m14 + SQR(m13) * SQR(m34) 
+  double b = 2*m11 * SQR(m22) * m44 - SQR(m22) * SQR(m14) - 2*m22 * SQR(m13) * m44 - 2*m11 * m22 * SQR(m34)
+    - 2*m11 * m22 * SQR(m35) - SQR(m22) * SQR(m15) + 2*m13 * m22 * m34 * m14 + SQR(m13) * SQR(m34)
     + 2*m13 * m22 * m35 * m15 + SQR(m13) * SQR(m35);
   double c = - 2*m13 * CUBE(m35) * m15 - m22 * SQR(m13) * SQR(m44) + m11 * SQR(m22) * SQR(m44) + SQR(m13) * SQR(m35) * m44
     + 2*m13 * m22 * m34 * m14 * m44 + SQR(m13) * SQR(m34) * m44 - 2*m11 * m22 * SQR(m34) * m44 - 2 * m13 * CUBE(m34) * m14
@@ -125,7 +124,8 @@ bool ClosedFormCalibration::calibrate(const MotionInformationVector& measurement
     - SQR(m22) * SQR(m15) * m44;
 
   // solve the quadratic equation
-  double lambda1, lambda2;
+  double lambda1;
+  double lambda2;
   if(a < std::numeric_limits<double>::epsilon()) {
     if(b <= std::numeric_limits<double>::epsilon())
       return false;
@@ -162,7 +162,7 @@ Eigen::VectorXd ClosedFormCalibration::solveLagrange(const Eigen::Matrix<double,
   A.noalias() += M;
 
   // compute the kernel of A by SVD
-  Eigen::JacobiSVD< Eigen::Matrix<double,5,5> > svd(A, ComputeFullV);
+  Eigen::JacobiSVD< Eigen::Matrix<double,5,5> > svd(A, Eigen::ComputeFullV);
   Eigen::VectorXd result = svd.matrixV().col(4);
   //for (int i = 0; i < 5; ++i)
   //std::cout << "singular value " << i << " "  << svd.singularValues()(i) << std::endl;
