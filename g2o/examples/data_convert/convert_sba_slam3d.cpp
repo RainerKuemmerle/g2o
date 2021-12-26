@@ -36,10 +36,14 @@
 #include "g2o/types/slam3d/parameter_camera.h"
 #include "g2o/types/slam3d/edge_se3_pointxyz_disparity.h"
 
-using namespace std;
-using namespace g2o;
+using std::cout;
+using std::cerr;
+using std::endl;
+using std::string;
 
-int main(int argc, char** argv)
+namespace g2o {
+
+static int convert_sba_slam3d(int argc, char** argv)
 {
   string inputFilename;
   string outputFilename;
@@ -63,9 +67,9 @@ int main(int argc, char** argv)
   double fx = -1;
   double baseline = -1;
   bool firstCam = true;
-  for (OptimizableGraph::VertexIDMap::const_iterator it = inputGraph.vertices().begin(); it != inputGraph.vertices().end(); ++it) {
-    if (dynamic_cast<VertexCam*>(it->second.get())) {
-      VertexCam* v = static_cast<VertexCam*>(it->second.get());
+  for (const auto & it : inputGraph.vertices()) {
+    if (dynamic_cast<VertexCam*>(it.second.get())) {
+      auto* v = static_cast<VertexCam*>(it.second.get());
       if (firstCam) {
         firstCam = false;
         auto camParams = std::make_shared<g2o::ParameterCamera>();
@@ -87,8 +91,8 @@ int main(int argc, char** argv)
         assert(0 && "Failure adding camera vertex");
       }
     }
-    else if (dynamic_cast<VertexPointXYZ*>(it->second.get())) {
-      VertexPointXYZ* v = static_cast<VertexPointXYZ*>(it->second.get());
+    else if (dynamic_cast<VertexPointXYZ*>(it.second.get())) {
+      auto* v = static_cast<VertexPointXYZ*>(it.second.get());
 
       auto ov = std::make_shared<VertexPointXYZ>();
       ov->setId(v->id());
@@ -99,9 +103,9 @@ int main(int argc, char** argv)
     }
   }
 
-  for (OptimizableGraph::EdgeSet::const_iterator it = inputGraph.edges().begin(); it != inputGraph.edges().end(); ++it) {
-    if (dynamic_cast<EdgeProjectP2SC*>(it->get())) {
-      EdgeProjectP2SC* e = static_cast<EdgeProjectP2SC*>(it->get());
+  for (const auto & it : inputGraph.edges()) {
+    if (dynamic_cast<EdgeProjectP2SC*>(it.get())) {
+      auto* e = static_cast<EdgeProjectP2SC*>(it.get());
 
       auto oe = std::make_shared<EdgeSE3PointXYZDisparity>();
       oe->vertices()[0] = outputGraph.vertex(e->vertices()[1]->id());
@@ -112,7 +116,7 @@ int main(int argc, char** argv)
       double disparity = kx - e->measurement()(2);
 
       oe->setMeasurement(Eigen::Vector3d(kx, ky, disparity / (fx * baseline)));
-      oe->setInformation(e->information()); // TODO convert information matrix
+      oe->setInformation(e->information()); // TODO(goki): convert information matrix
       oe->setParameterId(0,0);
       if (! outputGraph.addEdge(oe)) {
         assert(0 && "error adding edge");
@@ -123,8 +127,14 @@ int main(int argc, char** argv)
   cout << "Vertices in/out:\t" << inputGraph.vertices().size() << " " << outputGraph.vertices().size() << endl;
   cout << "Edges in/out:\t" << inputGraph.edges().size() << " " << outputGraph.edges().size() << endl;
 
-  cout << "Writing output ... " << flush;
+  cout << "Writing output ... " << std::flush;
   outputGraph.save(outputFilename.c_str());
   cout << "done." << endl;
   return 0;
+}
+}
+
+int main(int argc, char** argv)
+{
+  return g2o::convert_sba_slam3d(argc, argv);
 }

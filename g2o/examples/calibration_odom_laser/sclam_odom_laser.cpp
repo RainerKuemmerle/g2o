@@ -68,7 +68,7 @@ void sigquit_handler(int sig)
 
 namespace g2o {
 
-int run_sclam_odom_laser(int argc, char** argv)
+static int run_sclam_odom_laser(int argc, char** argv)
 {
   bool fixLaser;
   int maxIterations;

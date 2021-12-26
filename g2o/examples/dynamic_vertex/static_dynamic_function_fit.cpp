@@ -39,19 +39,19 @@ class FPolynomialCoefficientVertex : public g2o::BaseVertex<3, Eigen::Vector3d> 
   FPolynomialCoefficientVertex() { setToOrigin(); }
 
   // Read the vertex
-  virtual bool read(std::istream& is) {
+  bool read(std::istream& is) override {
     // Read the state
     return g2o::internal::readVector(is, estimate_);
   }
 
   // Write the vertex
-  virtual bool write(std::ostream& os) const { return g2o::internal::writeVector(os, estimate_); }
+  bool write(std::ostream& os) const override { return g2o::internal::writeVector(os, estimate_); }
 
   // Reset to zero
-  virtual void setToOriginImpl() { estimate_.setZero(); }
+  void setToOriginImpl() override { estimate_.setZero(); }
 
   // Direct linear add
-  virtual void oplusImpl(const double* update) {
+  void oplusImpl(const double* update) override {
     Eigen::Vector3d::ConstMapType v(update, 3);
     estimate_ += v;
   }
@@ -65,14 +65,14 @@ class PPolynomialCoefficientVertex : public g2o::BaseDynamicVertex<Eigen::Vector
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
 
   // Create the vertex
-  PPolynomialCoefficientVertex() {}
+  PPolynomialCoefficientVertex() = default;
 
   // Read the vertex
-  virtual bool read(std::istream& is) {
+  bool read(std::istream& is) override {
     // Read the dimension
     int dimension;
     is >> dimension;
-    if (is.good() == false) {
+    if (!is.good()) {
       return false;
     }
 
@@ -85,23 +85,23 @@ class PPolynomialCoefficientVertex : public g2o::BaseDynamicVertex<Eigen::Vector
   }
 
   // Write the vertex
-  virtual bool write(std::ostream& os) const {
+  bool write(std::ostream& os) const override {
     os << estimate_.size() << " ";
     return g2o::internal::writeVector(os, estimate_);
   }
 
   // Reset to zero
-  virtual void setToOriginImpl() { estimate_.setZero(); }
+  void setToOriginImpl() override { estimate_.setZero(); }
 
   // Direct linear add
-  virtual void oplusImpl(const double* update) {
+  void oplusImpl(const double* update) override {
     Eigen::VectorXd::ConstMapType v(update, dimension_);
     estimate_ += v;
   }
 
   // Resize the vertex state. In this case, we simply trash whatever
   // was there before.
-  virtual bool setDimensionImpl(int newDimension) {
+  bool setDimensionImpl(int newDimension) override {
     estimate_.resize(newDimension);
     estimate_.setZero();
     return true;
@@ -123,42 +123,42 @@ class MultipleValueEdge
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
 
-  MultipleValueEdge(const FunctionObservation& obs, double omega) : _x(obs.x) {
+  MultipleValueEdge(const FunctionObservation& obs, double omega) : x_(obs.x) {
     setDimension(obs.z.size());
     setMeasurement(obs.z);
-    InformationType I = Eigen::MatrixXd::Identity(_x.size(), _x.size()) * omega;
+    InformationType I = Eigen::MatrixXd::Identity(x_.size(), x_.size()) * omega;
     setInformation(I);
   }
 
-  virtual bool read(std::istream& is) {
+  bool read(std::istream& is) override {
     Eigen::VectorXd z;
-    g2o::internal::readVector(is, _x);
+    g2o::internal::readVector(is, x_);
     g2o::internal::readVector(is, z);
     setMeasurement(z);
 
     return readInformationMatrix(is);
   }
 
-  virtual bool write(std::ostream& os) const {
-    g2o::internal::writeVector(os, _x);
+  bool write(std::ostream& os) const override {
+    g2o::internal::writeVector(os, x_);
     g2o::internal::writeVector(os, measurement_);
     return writeInformationMatrix(os);
   }
 
   // Compute the measurement from the eigen polynomial module
-  virtual void computeError() {
+  void computeError() override {
     const FPolynomialCoefficientVertex* fvertex = vertexXnRaw<0>();
     const PPolynomialCoefficientVertex* pvertex = vertexXnRaw<1>();
     for (int i = 0; i < measurement_.size(); ++i) {
-      double x3 = pow(_x[i], 3);
-      error_[i] = measurement_[i] - Eigen::poly_eval(fvertex->estimate(), _x[i]) -
-                  x3 * (Eigen::poly_eval(pvertex->estimate(), _x[i]));
+      double x3 = pow(x_[i], 3);
+      error_[i] = measurement_[i] - Eigen::poly_eval(fvertex->estimate(), x_[i]) -
+                  x3 * (Eigen::poly_eval(pvertex->estimate(), x_[i]));
     }
   }
 
  private:
   // The points that the polynomial is computed at
-  Eigen::VectorXd _x;
+  Eigen::VectorXd x_;
 };
 
 int main(int argc, const char* argv[]) {

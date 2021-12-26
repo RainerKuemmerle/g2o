@@ -100,7 +100,7 @@ class EdgeCalib : public BaseBinaryEdge<3, OdomAndLaserMotion, VertexSE2, Vertex
     bool write(std::ostream&) const override { return false;}
 };
 
-int run_sclam_pure_calibration(int argc, char** argv)
+static int run_sclam_pure_calibration(int argc, char** argv)
 {
   bool fixLaser;
   int maxIterations;

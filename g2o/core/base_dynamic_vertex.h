@@ -58,7 +58,7 @@ bool BaseDynamicVertex<T>::setDimension(int newDimension) {
   if (newDimension == dimension_) return true;
 
   // Change the state to the requested dimension
-  if (setDimensionImpl(newDimension) == false) return false;
+  if (!static_cast<bool>(setDimensionImpl(newDimension))) return false;
 
   // Store the old dimension and assign the new
   int oldDimension = dimension_;

@@ -28,15 +28,14 @@ public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
 
   // Create the vertex
-  PolynomialCoefficientVertex() {
-  }
+  PolynomialCoefficientVertex() = default;
 
   // Read the vertex
-  virtual bool read(std::istream& is) {
+  bool read(std::istream& is) override {
     // Read the dimension
     int dimension;
     is >> dimension;
-    if (is.good() == false) {
+    if (!is.good()) {
       return false;
     }
 
@@ -49,18 +48,18 @@ public:
   }
 
   // Write the vertex
-  virtual bool write(std::ostream& os) const {
+  bool write(std::ostream& os) const override {
     os << estimate_.size() << " ";
     return g2o::internal::writeVector(os, estimate_);
   }
 
   // Reset to zero
-  virtual void setToOriginImpl() {
+  void setToOriginImpl() override {
     estimate_.setZero();
   }
 
   // Direct linear add
-  virtual void oplusImpl(const double* update) {
+  void oplusImpl(const double* update) override {
     Eigen::VectorXd::ConstMapType v(update, dimension_);
     estimate_ += v;
   }
@@ -68,7 +67,7 @@ public:
   // Resize the vertex state. In this case, we want to preserve as much of the
   // state as we can. Therefore, we use conservativeResize and pad with zeros
   // at the end if the state dimension has increased.
-  virtual bool setDimensionImpl(int newDimension)
+  bool setDimensionImpl(int newDimension) override
   {
     int oldDimension = dimension();
 
@@ -100,34 +99,34 @@ class PolynomialSingleValueEdge : public g2o::BaseUnaryEdge<1, double, Polynomia
 public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
 
-  PolynomialSingleValueEdge(double x, double z, const PolynomialSingleValueEdge::InformationType& omega) : _x(x) {
-    _x = x;
+  PolynomialSingleValueEdge(double x, double z, const PolynomialSingleValueEdge::InformationType& omega) : x_(x) {
+    x_ = x;
     setMeasurement(z);
     setInformation(omega);
   }
 
-  virtual bool read(std::istream& is) {
+  bool read(std::istream& is) override {
     double z;
-    is >> _x >> z;
+    is >> x_ >> z;
     setMeasurement(z);
     return readInformationMatrix(is);
   }
 
-  virtual bool write(std::ostream& os) const {
-    os << _x << " " << measurement_;
+  bool write(std::ostream& os) const override {
+    os << x_ << " " << measurement_;
     return writeInformationMatrix(os);
   }
 
   // Compute the measurement from the eigen polynomial module
-  virtual void computeError() {
+  void computeError() override {
     const PolynomialCoefficientVertex* vertex = vertexXnRaw<0>();
-    error_[0] = measurement_ - Eigen::poly_eval(vertex->estimate(), _x);
+    error_[0] = measurement_ - Eigen::poly_eval(vertex->estimate(), x_);
   }
 
 private:
 
   // The point that the polynomial is computed at
-  double _x;
+  double x_;
 };
 
 int main(int argc, const char* argv[]) {
