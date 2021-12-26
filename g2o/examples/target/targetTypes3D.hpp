@@ -12,54 +12,54 @@
 class VertexPosition3D : public g2o::BaseVertex<3, Eigen::Vector3d> {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-  VertexPosition3D() {}
+  VertexPosition3D() = default;
 
-  virtual void setToOriginImpl() { estimate_.setZero(); }
+  void setToOriginImpl() override { estimate_.setZero(); }
 
-  virtual void oplusImpl(const double* update) {
+  void oplusImpl(const double* update) override {
     estimate_[0] += update[0];
     estimate_[1] += update[1];
     estimate_[2] += update[2];
   }
 
-  virtual bool read(std::istream& /*is*/) { return false; }
+  bool read(std::istream& /*is*/) override { return false; }
 
-  virtual bool write(std::ostream& /*os*/) const { return false; }
+  bool write(std::ostream& /*os*/) const override { return false; }
 };
 
 // Store velocity separately from position?
 class VertexVelocity3D : public g2o::BaseVertex<3, Eigen::Vector3d> {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-  VertexVelocity3D() {}
+  VertexVelocity3D() = default;
 
-  virtual void setToOriginImpl() { estimate_.setZero(); }
+  void setToOriginImpl() override { estimate_.setZero(); }
 
-  virtual void oplusImpl(const double* update) {
+  void oplusImpl(const double* update) override {
     estimate_[0] += update[0];
     estimate_[1] += update[1];
     estimate_[2] += update[2];
   }
 
-  virtual bool read(std::istream& /*is*/) { return false; }
+  bool read(std::istream& /*is*/) override { return false; }
 
-  virtual bool write(std::ostream& /*os*/) const { return false; }
+  bool write(std::ostream& /*os*/) const override { return false; }
 };
 
 // The idealised GPS measurement; this is 3D and linear
 class GPSObservationPosition3DEdge
     : public g2o::BaseUnaryEdge<3, Eigen::Vector3d, VertexPosition3D> {
  public:
-  GPSObservationPosition3DEdge() {}
+  GPSObservationPosition3DEdge() = default;
 
-  void computeError() {
+  void computeError() override {
     const VertexPosition3D* v = vertexXnRaw<0>();
     error_ = v->estimate() - measurement_;
   }
 
-  virtual bool read(std::istream& /*is*/) { return false; }
+  bool read(std::istream& /*is*/) override { return false; }
 
-  virtual bool write(std::ostream& /*os*/) const { return false; }
+  bool write(std::ostream& /*os*/) const override { return false; }
 };
 
 #endif  //  __TARGET_TYPES_3D_HPP__

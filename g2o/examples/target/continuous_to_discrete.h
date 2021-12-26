@@ -11,19 +11,20 @@ void continuousToDiscrete(MatrixType& Fd, MatrixType& Qd,
 {
   enum
   {
-    NX = MatrixType::ColsAtCompileTime,
-    NY = MatrixType::RowsAtCompileTime,
-    NX2 = 2 * MatrixType::RowsAtCompileTime
+    kNx = MatrixType::ColsAtCompileTime,
+    kNy = MatrixType::RowsAtCompileTime,
+    kNX2 = 2 * MatrixType::RowsAtCompileTime
   };
 
-  typedef Eigen::Matrix<typename MatrixType::Scalar,NX2,NX2> DoubleSizedMatrixType;
-  DoubleSizedMatrixType bigA(NX2,NX2), bigB(NX2,NX2);
+  using DoubleSizedMatrixType = Eigen::Matrix<typename MatrixType::Scalar, kNX2, kNX2>;
+  DoubleSizedMatrixType bigA(kNX2,kNX2);
+  DoubleSizedMatrixType bigB(kNX2,kNX2);
 
   // Construct the "big A matrix"
-  bigA.template topLeftCorner<NX,NX>()=-Fc*dt;
-  bigA.template topRightCorner<NX,NX>()= Qc * dt;
-  bigA.template bottomLeftCorner<NX,NX>().setZero();
-  bigA.template bottomRightCorner<NX,NX>()=Fc.transpose() * dt;
+  bigA.template topLeftCorner<kNx,kNx>()=-Fc*dt;
+  bigA.template topRightCorner<kNx,kNx>()= Qc * dt;
+  bigA.template bottomLeftCorner<kNx,kNx>().setZero();
+  bigA.template bottomRightCorner<kNx,kNx>()=Fc.transpose() * dt;
 
   // bigB = expm(bigA)
   //Eigen::MatrixExponential<DoubleSizedMatrixType> me(bigA);
@@ -31,8 +32,8 @@ void continuousToDiscrete(MatrixType& Fd, MatrixType& Qd,
   bigB = bigA.exp();
 
   // Extract the discrete time components
-  Fd = bigB.template bottomRightCorner<NX,NX>().transpose();
-  Qd = Fd * bigB.template topRightCorner<NX,NX>();
+  Fd = bigB.template bottomRightCorner<kNx,kNx>().transpose();
+  Qd = Fd * bigB.template topRightCorner<kNx,kNx>();
 }
 
 #endif // __CONTINUOUS_TO_DISCRETE_H__
