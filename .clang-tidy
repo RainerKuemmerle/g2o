@@ -72,7 +72,7 @@ Checks: >
 # Turn all the warnings from the checks above into errors.
 #WarningsAsErrors: "*"
 
-HeaderFilterRegex: "(g2o/).*\\.h$"
+HeaderFilterRegex: "(g2o/).*\\.(h|hpp)$"
 
 CheckOptions:
   - { key: modernize-use-default-member-init.UseAssignment,       value: 1          }

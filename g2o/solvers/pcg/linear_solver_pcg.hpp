@@ -79,7 +79,7 @@ namespace internal {
 template <typename MatrixType>
 bool LinearSolverPCG<MatrixType>::solve(const SparseBlockMatrix<MatrixType>& A, number_t* x, number_t* b)
 {
-  const bool indexRequired = indices_.size() == 0;
+  const bool indexRequired = indices_.empty();
   diag_.clear();
   J_.clear();
 
@@ -90,7 +90,7 @@ bool LinearSolverPCG<MatrixType>::solve(const SparseBlockMatrix<MatrixType>& A, 
     if (col.size() > 0) {
       typename SparseBlockMatrix<MatrixType>::IntBlockMap::const_iterator it;
       for (it = col.begin(); it != col.end(); ++it) {
-        if (it->first == (int)i) { // only the upper triangular block is needed
+        if (it->first == static_cast<int>(i)) { // only the upper triangular block is needed
           diag_.push_back(it->second);
           J_.push_back(it->second->inverse());
           break;
@@ -111,7 +111,10 @@ bool LinearSolverPCG<MatrixType>::solve(const SparseBlockMatrix<MatrixType>& A, 
   const Eigen::Map<VectorX> bvec(b, n);
   xvec.setZero();
 
-  VectorX r, d, q, s;
+  VectorX r;
+  VectorX d;
+  VectorX q;
+  VectorX s;
   d.setZero(n);
   q.setZero(n);
   s.setZero(n);
@@ -137,7 +140,7 @@ bool LinearSolverPCG<MatrixType>::solve(const SparseBlockMatrix<MatrixType>& A, 
     mult(A.colBlockIndices(), d, q);
     number_t a = dn / d.dot(q);
     xvec += a*d;
-    // TODO: reset residual here every 50 iterations
+    // TODO(goki): reset residual here every 50 iterations
     r -= a*q;
     multDiag(A.colBlockIndices(), J_, r, s);
     number_t dold = dn;

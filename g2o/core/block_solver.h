@@ -167,8 +167,8 @@ namespace g2o {
       std::vector<OpenMPMutex> coefficientsMutex_;
 #    endif
 
-      std::unique_ptr<number_t[], aligned_deleter<number_t>> coefficients_;
-      std::unique_ptr<number_t[], aligned_deleter<number_t>> bschur_;
+      std::unique_ptr<number_t[], AlignedDeleter<number_t>> coefficients_;
+      std::unique_ptr<number_t[], AlignedDeleter<number_t>> bschur_;
 
       bool doSchur_ = true;
       int numPoses_ = 0;

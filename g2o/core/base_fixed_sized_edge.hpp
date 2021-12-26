@@ -86,20 +86,20 @@ template <int D, typename E, typename... VertexTypes>
 template <int N, int M, typename AtOType>
 void BaseFixedSizedEdge<D, E, VertexTypes...>::constructOffDiagonalQuadraticFormM(
     const AtOType& AtO) {
-  constexpr auto fromId = N;
-  constexpr auto toId = N + M + 1;
+  constexpr auto kFromId = N;
+  constexpr auto kToId = N + M + 1;
   assert(fromId < toId && "Index mixed up");
-  auto to = vertexXn<toId>();
+  auto to = vertexXn<kToId>();
   if (!to->fixed()) {
-    const auto& B = std::get<toId>(jacobianOplus_);
-    constexpr auto K = internal::pair_to_index(fromId, toId);
+    const auto& B = std::get<kToId>(jacobianOplus_);
+    constexpr auto kK = internal::pair_to_index(kFromId, kToId);
     internal::QuadraticFormLock lck(*to);
     (void)lck;
-    if (hessianRowMajor_[K]) {  // we have to write to the block as transposed
-      auto& hessianTransposed = std::get<K>(hessianTupleTransposed_);
+    if (hessianRowMajor_[kK]) {  // we have to write to the block as transposed
+      auto& hessianTransposed = std::get<kK>(hessianTupleTransposed_);
       hessianTransposed.noalias() += B.transpose() * AtO.transpose();
     } else {
-      auto& hessian = std::get<K>(hessianTuple_);
+      auto& hessian = std::get<kK>(hessianTuple_);
       hessian.noalias() += AtO * B;
     }
   }
@@ -152,16 +152,13 @@ void BaseFixedSizedEdge<D, E, VertexTypes...>::linearizeOplusN() {
 
   auto& jacobianOplus = std::get<N>(jacobianOplus_);
 
-  constexpr number_t delta = cst(1e-9);
-  constexpr number_t scalar = 1 / (2 * delta);
+  constexpr number_t kDelta = cst(1e-9);
+  constexpr number_t kScalar = 1 / (2 * kDelta);
 
   internal::QuadraticFormLock lck(*vertex);
   (void)lck;
 
-  typedef typename std::conditional<
-      VertexXnType<N>::kDimension == -1, ceres::internal::FixedArray<number_t>,
-      ceres::internal::FixedArray<number_t, static_cast<size_t>(VertexXnType<N>::kDimension)> >::type
-      FixedArray;
+  using FixedArray = typename std::conditional<VertexXnType<N>::kDimension == -1, ceres::internal::FixedArray<number_t>, ceres::internal::FixedArray<number_t, static_cast<size_t>(VertexXnType<N>::kDimension)>>::type;
   FixedArray add_vertex(vertexDimension<N>());
   add_vertex.fill(0.);
 
@@ -169,20 +166,20 @@ void BaseFixedSizedEdge<D, E, VertexTypes...>::linearizeOplusN() {
   // add small step along the unit vector in each dimension
   for (int d = 0; d < vertexDimension<N>(); ++d) {
     vertex->push();
-    add_vertex[d] = delta;
+    add_vertex[d] = kDelta;
     vertex->oplus(add_vertex.data());
     computeError();
     auto errorBak = this->error();
     vertex->pop();
     vertex->push();
-    add_vertex[d] = -delta;
+    add_vertex[d] = -kDelta;
     vertex->oplus(add_vertex.data());
     computeError();
     errorBak -= this->error();
     vertex->pop();
     add_vertex[d] = 0.0;
 
-    jacobianOplus.col(d) = scalar * errorBak;
+    jacobianOplus.col(d) = kScalar * errorBak;
   }  // end dimension
 }
 
