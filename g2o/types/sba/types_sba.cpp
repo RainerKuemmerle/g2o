@@ -25,6 +25,7 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "types_sba.h"
+
 #include <iostream>
 
 #include "g2o/core/factory.h"
@@ -32,16 +33,16 @@
 
 namespace g2o {
 
-  using namespace std;
+using namespace std;
 
-  G2O_REGISTER_TYPE_GROUP(sba);
+G2O_REGISTER_TYPE_GROUP(sba);
 
-  G2O_REGISTER_TYPE(VERTEX_CAM, VertexCam);
-  G2O_REGISTER_TYPE(VERTEX_INTRINSICS, VertexIntrinsics);
+G2O_REGISTER_TYPE(VERTEX_CAM, VertexCam);
+G2O_REGISTER_TYPE(VERTEX_INTRINSICS, VertexIntrinsics);
 
-  G2O_REGISTER_TYPE(EDGE_PROJECT_P2MC, EdgeProjectP2MC);
-  G2O_REGISTER_TYPE(EDGE_PROJECT_P2SC, EdgeProjectP2SC);
-  G2O_REGISTER_TYPE(EDGE_CAM, EdgeSBACam);
-  G2O_REGISTER_TYPE(EDGE_SCALE, EdgeSBAScale);
+G2O_REGISTER_TYPE(EDGE_PROJECT_P2MC, EdgeProjectP2MC);
+G2O_REGISTER_TYPE(EDGE_PROJECT_P2SC, EdgeProjectP2SC);
+G2O_REGISTER_TYPE(EDGE_CAM, EdgeSBACam);
+G2O_REGISTER_TYPE(EDGE_SCALE, EdgeSBAScale);
 
-} // end namespace
+}  // namespace g2o

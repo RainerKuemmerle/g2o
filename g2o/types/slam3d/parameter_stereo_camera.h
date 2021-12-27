@@ -49,6 +49,6 @@ class G2O_TYPES_SLAM3D_API ParameterStereoCamera : public ParameterCamera {
  protected:
   number_t _baseline;
 };
-}   // namespace g2o
+}  // namespace g2o
 
 #endif

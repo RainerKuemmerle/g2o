@@ -28,34 +28,19 @@
 
 namespace g2o {
 
-  RobotData::RobotData() :
-    HyperGraph::Data(),
-    _timestamp(-1.), _loggerTimestamp(-1.)
-  {
-  }
+RobotData::RobotData()
+    : HyperGraph::Data(), _timestamp(-1.), _loggerTimestamp(-1.) {}
 
-  RobotData::~RobotData()
-  {
-  }
+RobotData::~RobotData() {}
 
-  void RobotData::setTimestamp(number_t ts)
-  {
-    _timestamp = ts;
-  }
+void RobotData::setTimestamp(number_t ts) { _timestamp = ts; }
 
-  void RobotData::setLoggerTimestamp(number_t ts)
-  {
-    _loggerTimestamp = ts;
-  }
+void RobotData::setLoggerTimestamp(number_t ts) { _loggerTimestamp = ts; }
 
-  void RobotData::setTag(const std::string& tag)
-  {
-    _tag = tag;
-  }
+void RobotData::setTag(const std::string& tag) { _tag = tag; }
 
-  void RobotData::setHostname(const std::string& hostname)
-  {
-    _hostname = hostname;
-  }
+void RobotData::setHostname(const std::string& hostname) {
+  _hostname = hostname;
+}
 
-} // end namespace
+}  // namespace g2o

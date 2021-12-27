@@ -37,7 +37,8 @@ void BaseVariableSizedEdge<D, E>::constructQuadraticForm() {
     number_t error = this->chi2();
     Vector3 rho;
     this->robustKernel()->robustify(error, rho);
-    Eigen::Matrix<number_t, D, 1, Eigen::ColMajor> omega_r = -_information * _error;
+    Eigen::Matrix<number_t, D, 1, Eigen::ColMajor> omega_r =
+        -_information * _error;
     omega_r *= rho[1];
     computeQuadraticForm(this->robustInformation(rho), omega_r);
   } else {
@@ -46,12 +47,15 @@ void BaseVariableSizedEdge<D, E>::constructQuadraticForm() {
 }
 
 template <int D, typename E>
-void BaseVariableSizedEdge<D, E>::linearizeOplus(JacobianWorkspace& jacobianWorkspace) {
+void BaseVariableSizedEdge<D, E>::linearizeOplus(
+    JacobianWorkspace& jacobianWorkspace) {
   for (size_t i = 0; i < _vertices.size(); ++i) {
-    OptimizableGraph::Vertex* v = static_cast<OptimizableGraph::Vertex*>(_vertices[i]);
+    OptimizableGraph::Vertex* v =
+        static_cast<OptimizableGraph::Vertex*>(_vertices[i]);
     assert(v->dimension() >= 0);
     new (&_jacobianOplus[i])
-        JacobianType(jacobianWorkspace.workspaceForVertex(i), D < 0 ? _dimension : D, v->dimension());
+        JacobianType(jacobianWorkspace.workspaceForVertex(i),
+                     D < 0 ? _dimension : D, v->dimension());
   }
   linearizeOplus();
 }
@@ -65,7 +69,8 @@ void BaseVariableSizedEdge<D, E>::linearizeOplus() {
 
   for (size_t i = 0; i < _vertices.size(); ++i) {
     // Xi - estimate the jacobian numerically
-    OptimizableGraph::Vertex* vi = static_cast<OptimizableGraph::Vertex*>(_vertices[i]);
+    OptimizableGraph::Vertex* vi =
+        static_cast<OptimizableGraph::Vertex*>(_vertices[i]);
 
     if (vi->fixed()) {
       continue;
@@ -76,7 +81,8 @@ void BaseVariableSizedEdge<D, E>::linearizeOplus() {
     assert(vi_dim >= 0);
 
     assert(_dimension >= 0);
-    assert(_jacobianOplus[i].rows() == _dimension && _jacobianOplus[i].cols() == vi_dim &&
+    assert(_jacobianOplus[i].rows() == _dimension &&
+           _jacobianOplus[i].cols() == vi_dim &&
            "jacobian cache dimension does not match");
     _jacobianOplus[i].resize(_dimension, vi_dim);
     // add small step along the unit vector in each dimension
@@ -104,11 +110,14 @@ void BaseVariableSizedEdge<D, E>::linearizeOplus() {
 }
 
 template <int D, typename E>
-void BaseVariableSizedEdge<D, E>::mapHessianMemory(number_t* d, int i, int j, bool rowMajor) {
+void BaseVariableSizedEdge<D, E>::mapHessianMemory(number_t* d, int i, int j,
+                                                   bool rowMajor) {
   int idx = internal::computeUpperTriangleIndex(i, j);
   assert(idx < (int)_hessian.size());
-  OptimizableGraph::Vertex* vi = static_cast<OptimizableGraph::Vertex*>(HyperGraph::Edge::vertex(i));
-  OptimizableGraph::Vertex* vj = static_cast<OptimizableGraph::Vertex*>(HyperGraph::Edge::vertex(j));
+  OptimizableGraph::Vertex* vi =
+      static_cast<OptimizableGraph::Vertex*>(HyperGraph::Edge::vertex(i));
+  OptimizableGraph::Vertex* vj =
+      static_cast<OptimizableGraph::Vertex*>(HyperGraph::Edge::vertex(j));
   assert(vi->dimension() >= 0);
   assert(vj->dimension() >= 0);
   HessianHelper& h = _hessian[idx];
@@ -143,9 +152,11 @@ bool BaseVariableSizedEdge<D, E>::allVerticesFixed() const {
 }
 
 template <int D, typename E>
-void BaseVariableSizedEdge<D, E>::computeQuadraticForm(const InformationType& omega, const ErrorVector& weightedError) {
+void BaseVariableSizedEdge<D, E>::computeQuadraticForm(
+    const InformationType& omega, const ErrorVector& weightedError) {
   for (size_t i = 0; i < _vertices.size(); ++i) {
-    OptimizableGraph::Vertex* from = static_cast<OptimizableGraph::Vertex*>(_vertices[i]);
+    OptimizableGraph::Vertex* from =
+        static_cast<OptimizableGraph::Vertex*>(_vertices[i]);
     bool istatus = !(from->fixed());
 
     if (istatus) {
@@ -166,7 +177,8 @@ void BaseVariableSizedEdge<D, E>::computeQuadraticForm(const InformationType& om
 
       // compute the off-diagonal blocks ij for all j
       for (size_t j = i + 1; j < _vertices.size(); ++j) {
-        OptimizableGraph::Vertex* to = static_cast<OptimizableGraph::Vertex*>(_vertices[j]);
+        OptimizableGraph::Vertex* to =
+            static_cast<OptimizableGraph::Vertex*>(_vertices[j]);
 
         bool jstatus = !(to->fixed());
         if (jstatus) {
@@ -175,7 +187,8 @@ void BaseVariableSizedEdge<D, E>::computeQuadraticForm(const InformationType& om
           int idx = internal::computeUpperTriangleIndex(i, j);
           assert(idx < (int)_hessian.size());
           HessianHelper& hhelper = _hessian[idx];
-          if (hhelper.transposed) {  // we have to write to the block as transposed
+          if (hhelper
+                  .transposed) {  // we have to write to the block as transposed
             hhelper.matrix.noalias() += B.transpose() * AtO.transpose();
           } else {
             hhelper.matrix.noalias() += AtO * B;

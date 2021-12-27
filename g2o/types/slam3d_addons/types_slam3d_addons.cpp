@@ -25,51 +25,52 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "types_slam3d_addons.h"
+
+#include <iostream>
+#include <typeinfo>
+
 #include "g2o/core/factory.h"
 #include "g2o/stuff/macros.h"
 
-#include <typeinfo>
-#include <iostream>
-
 namespace g2o {
 
-  G2O_REGISTER_TYPE_GROUP(slam3d_addons);
+G2O_REGISTER_TYPE_GROUP(slam3d_addons);
 
-  G2O_REGISTER_TYPE(VERTEX3, VertexSE3Euler);
-  G2O_REGISTER_TYPE(EDGE3, EdgeSE3Euler);
-  G2O_REGISTER_TYPE(VERTEX_PLANE, VertexPlane);
-  G2O_REGISTER_TYPE(EDGE_SE3_PLANE_CALIB, EdgeSE3PlaneSensorCalib);
+G2O_REGISTER_TYPE(VERTEX3, VertexSE3Euler);
+G2O_REGISTER_TYPE(EDGE3, EdgeSE3Euler);
+G2O_REGISTER_TYPE(VERTEX_PLANE, VertexPlane);
+G2O_REGISTER_TYPE(EDGE_SE3_PLANE_CALIB, EdgeSE3PlaneSensorCalib);
 
-  G2O_REGISTER_TYPE(VERTEX_LINE3D, VertexLine3D);
-  G2O_REGISTER_TYPE(EDGE_SE3_LINE3D, EdgeSE3Line3D);
-  G2O_REGISTER_TYPE(EDGE_PLANE, EdgePlane);
-  G2O_REGISTER_TYPE(EDGE_SE3_CALIB, EdgeSE3Calib);
-
-#ifdef G2O_HAVE_OPENGL
-  G2O_REGISTER_ACTION(CacheCameraDrawAction);
-  G2O_REGISTER_ACTION(VertexPlaneDrawAction);
-  G2O_REGISTER_ACTION(EdgeSE3PlaneSensorCalibDrawAction);
-  G2O_REGISTER_ACTION(VertexLine3DDrawAction);
-  G2O_REGISTER_ACTION(EdgeSE3Line3DDrawAction);
-#endif
-
-  G2O_ATTRIBUTE_CONSTRUCTOR(init_slam3d_addons_types)
-  {
-    static bool initialized = false;
-    if (initialized)
-      return;
-    initialized = true;
+G2O_REGISTER_TYPE(VERTEX_LINE3D, VertexLine3D);
+G2O_REGISTER_TYPE(EDGE_SE3_LINE3D, EdgeSE3Line3D);
+G2O_REGISTER_TYPE(EDGE_PLANE, EdgePlane);
+G2O_REGISTER_TYPE(EDGE_SE3_CALIB, EdgeSE3Calib);
 
 #ifdef G2O_HAVE_OPENGL
-    HyperGraphActionLibrary* actionLib = HyperGraphActionLibrary::instance();
-    HyperGraphElementAction::HyperGraphElementActionPtr vertexse3eulerdraw(new g2o::VertexSE3DrawAction);
-    vertexse3eulerdraw->setTypeName(typeid(VertexSE3Euler).name());
-    actionLib->registerAction(vertexse3eulerdraw);
-
-    HyperGraphElementAction::HyperGraphElementActionPtr edgese3eulerdraw(new g2o::EdgeSE3DrawAction);
-    edgese3eulerdraw->setTypeName(typeid(EdgeSE3Euler).name());
-    actionLib->registerAction(edgese3eulerdraw);
+G2O_REGISTER_ACTION(CacheCameraDrawAction);
+G2O_REGISTER_ACTION(VertexPlaneDrawAction);
+G2O_REGISTER_ACTION(EdgeSE3PlaneSensorCalibDrawAction);
+G2O_REGISTER_ACTION(VertexLine3DDrawAction);
+G2O_REGISTER_ACTION(EdgeSE3Line3DDrawAction);
 #endif
-  }
 
-} // end namespace
+G2O_ATTRIBUTE_CONSTRUCTOR(init_slam3d_addons_types) {
+  static bool initialized = false;
+  if (initialized) return;
+  initialized = true;
+
+#ifdef G2O_HAVE_OPENGL
+  HyperGraphActionLibrary* actionLib = HyperGraphActionLibrary::instance();
+  HyperGraphElementAction::HyperGraphElementActionPtr vertexse3eulerdraw(
+      new g2o::VertexSE3DrawAction);
+  vertexse3eulerdraw->setTypeName(typeid(VertexSE3Euler).name());
+  actionLib->registerAction(vertexse3eulerdraw);
+
+  HyperGraphElementAction::HyperGraphElementActionPtr edgese3eulerdraw(
+      new g2o::EdgeSE3DrawAction);
+  edgese3eulerdraw->setTypeName(typeid(EdgeSE3Euler).name());
+  actionLib->registerAction(edgese3eulerdraw);
+#endif
+}
+
+}  // namespace g2o

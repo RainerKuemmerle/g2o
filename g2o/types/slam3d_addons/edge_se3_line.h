@@ -28,72 +28,66 @@
 #define G2O_EDGE_SE3_LINE_H_
 
 #include "g2o/core/base_binary_edge.h"
-#include "g2o/types/slam3d/vertex_se3.h"
 #include "g2o/types/slam3d/parameter_se3_offset.h"
-
+#include "g2o/types/slam3d/vertex_se3.h"
+#include "g2o_types_slam3d_addons_api.h"
 #include "line3d.h"
 #include "vertex_line3d.h"
-#include "g2o_types_slam3d_addons_api.h"
 
 namespace g2o {
 
-  class G2O_TYPES_SLAM3D_ADDONS_API EdgeSE3Line3D : public BaseBinaryEdge<4, Line3D, VertexSE3, VertexLine3D> {
-    public:
-      EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
+class G2O_TYPES_SLAM3D_ADDONS_API EdgeSE3Line3D
+    : public BaseBinaryEdge<4, Line3D, VertexSE3, VertexLine3D> {
+ public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
 
-      EdgeSE3Line3D();
+  EdgeSE3Line3D();
 
-      virtual bool read(std::istream& is);
-      virtual bool write(std::ostream& os) const;
+  virtual bool read(std::istream& is);
+  virtual bool write(std::ostream& os) const;
 
-      void computeError();
+  void computeError();
 
-      virtual void setMeasurement(const Vector6& m) {
-        _measurement = m;
-      }
+  virtual void setMeasurement(const Vector6& m) { _measurement = m; }
 
-      virtual void setMeasurement(const Line3D& m) {
-        _measurement = Line3D(m);
-      }
+  virtual void setMeasurement(const Line3D& m) { _measurement = Line3D(m); }
 
-      virtual bool setMeasurementData(const number_t* d) {
-        Eigen::Map<const Vector6> v(d);	
-        _measurement = Line3D(v);
-        return true;
-      }
+  virtual bool setMeasurementData(const number_t* d) {
+    Eigen::Map<const Vector6> v(d);
+    _measurement = Line3D(v);
+    return true;
+  }
 
-      virtual bool getMeasurementData(number_t* d) const {
-        Eigen::Map<Vector6> v(d);
-        v = _measurement;
-        return true;
-      }
+  virtual bool getMeasurementData(number_t* d) const {
+    Eigen::Map<Vector6> v(d);
+    v = _measurement;
+    return true;
+  }
 
-      virtual int measurementDimension() const {
-	return 6;
-      }
+  virtual int measurementDimension() const { return 6; }
 
-      Vector3 color;
-      
-  private:
-    ParameterSE3Offset* offsetParam;
-    CacheSE3Offset* cache;
-    virtual bool resolveCaches();
+  Vector3 color;
 
-  };
+ private:
+  ParameterSE3Offset* offsetParam;
+  CacheSE3Offset* cache;
+  virtual bool resolveCaches();
+};
 
 #ifdef G2O_HAVE_OPENGL
-  class EdgeSE3Line3DDrawAction : public DrawAction {
-  public:
-    G2O_TYPES_SLAM3D_ADDONS_API EdgeSE3Line3DDrawAction();
-    G2O_TYPES_SLAM3D_ADDONS_API virtual HyperGraphElementAction* operator()(HyperGraph::HyperGraphElement* element,
-									    HyperGraphElementAction::Parameters* params_);
-    
-  protected:
-    virtual bool refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_);
-    FloatProperty* _lineLength, *_lineWidth;
-    
-  };
+class EdgeSE3Line3DDrawAction : public DrawAction {
+ public:
+  G2O_TYPES_SLAM3D_ADDONS_API EdgeSE3Line3DDrawAction();
+  G2O_TYPES_SLAM3D_ADDONS_API virtual HyperGraphElementAction* operator()(
+      HyperGraph::HyperGraphElement* element,
+      HyperGraphElementAction::Parameters* params_);
+
+ protected:
+  virtual bool refreshPropertyPtrs(
+      HyperGraphElementAction::Parameters* params_);
+  FloatProperty *_lineLength, *_lineWidth;
+};
 #endif
-  
-}
+
+}  // namespace g2o
 #endif

@@ -27,9 +27,9 @@
 #ifndef G2O_SBA_VERTEX_CAM_H
 #define G2O_SBA_VERTEX_CAM_H
 
-#include "sbacam.h"
 #include "g2o/core/base_vertex.h"
 #include "g2o_types_sba_api.h"
+#include "sbacam.h"
 
 namespace g2o {
 
@@ -37,70 +37,62 @@ namespace g2o {
  * \brief SBACam Vertex, (x,y,z,qw,qx,qy,qz)
  * the parameterization for the increments constructed is a 6d vector
  * (x,y,z,qx,qy,qz) (note that we leave out the w part of the quaternion.
- * qw is assumed to be positive, otherwise there is an ambiguity in qx,qy,qz as a rotation
+ * qw is assumed to be positive, otherwise there is an ambiguity in qx,qy,qz as
+ * a rotation
  */
-  class G2O_TYPES_SBA_API VertexCam : public BaseVertex<6, SBACam>
-{
-  public:
-    EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
-    VertexCam();
+class G2O_TYPES_SBA_API VertexCam : public BaseVertex<6, SBACam> {
+ public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
+  VertexCam();
 
-    virtual bool read(std::istream& is);
-    virtual bool write(std::ostream& os) const;
+  virtual bool read(std::istream& is);
+  virtual bool write(std::ostream& os) const;
 
-    virtual void setToOriginImpl() {
-      _estimate = SBACam();
-    }
+  virtual void setToOriginImpl() { _estimate = SBACam(); }
 
-    virtual void setEstimate(const SBACam& cam){
-      BaseVertex<6, SBACam>::setEstimate(cam);
-      _estimate.setTransform();
-      _estimate.setProjection();
-      _estimate.setDr();
-    }
+  virtual void setEstimate(const SBACam& cam) {
+    BaseVertex<6, SBACam>::setEstimate(cam);
+    _estimate.setTransform();
+    _estimate.setProjection();
+    _estimate.setDr();
+  }
 
-    virtual void oplusImpl(const number_t* update)
-    {
-      Eigen::Map<const Vector6> v(update);
-      _estimate.update(v);
-      _estimate.setTransform();
-      _estimate.setProjection();
-      _estimate.setDr();
-    }
+  virtual void oplusImpl(const number_t* update) {
+    Eigen::Map<const Vector6> v(update);
+    _estimate.update(v);
+    _estimate.setTransform();
+    _estimate.setProjection();
+    _estimate.setDr();
+  }
 
+  virtual bool setEstimateDataImpl(const number_t* est) {
+    Eigen::Map<const Vector7> v(est);
+    _estimate.fromVector(v);
+    return true;
+  }
 
-    virtual bool setEstimateDataImpl(const number_t* est){
-      Eigen::Map <const Vector7> v(est);
-      _estimate.fromVector(v);
-      return true;
-    }
+  virtual bool getEstimateData(number_t* est) const {
+    Eigen::Map<Vector7> v(est);
+    v = estimate().toVector();
+    return true;
+  }
 
-    virtual bool getEstimateData(number_t* est) const{
-      Eigen::Map <Vector7> v(est);
-      v = estimate().toVector();
-      return true;
-    }
+  virtual int estimateDimension() const { return 7; }
 
-    virtual int estimateDimension() const {
-      return 7;
-    }
+  virtual bool setMinimalEstimateDataImpl(const number_t* est) {
+    Eigen::Map<const Vector6> v(est);
+    _estimate.fromMinimalVector(v);
+    return true;
+  }
 
-    virtual bool setMinimalEstimateDataImpl(const number_t* est){
-      Eigen::Map<const Vector6> v(est);
-      _estimate.fromMinimalVector(v);
-      return true;
-    }
+  virtual bool getMinimalEstimateData(number_t* est) const {
+    Eigen::Map<Vector6> v(est);
+    v = _estimate.toMinimalVector();
+    return true;
+  }
 
-    virtual bool getMinimalEstimateData(number_t* est) const{
-      Eigen::Map<Vector6> v(est);
-      v = _estimate.toMinimalVector();
-      return true;
-    }
-
-    virtual int minimalEstimateDimension() const {
-      return 6;
-    }
- };
+  virtual int minimalEstimateDimension() const { return 6; }
+};
 }  // namespace g2o
 
 #endif

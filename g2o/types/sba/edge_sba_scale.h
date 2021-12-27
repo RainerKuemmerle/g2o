@@ -36,7 +36,8 @@ namespace g2o {
 /**
  * \brief edge between two SBAcam that specifies the distance between them
  */
-class G2O_TYPES_SBA_API EdgeSBAScale : public BaseBinaryEdge<1, number_t, VertexCam, VertexCam> {
+class G2O_TYPES_SBA_API EdgeSBAScale
+    : public BaseBinaryEdge<1, number_t, VertexCam, VertexCam> {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   EdgeSBAScale();

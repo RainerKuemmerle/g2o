@@ -76,7 +76,8 @@ class LinearSolverCSparse : public LinearSolverCCS<MatrixType> {
         _csIntWorkspace(nullptr) {}
 
   LinearSolverCSparse(LinearSolverCSparse<MatrixType> const&) = delete;
-  LinearSolverCSparse& operator=(LinearSolverCSparse<MatrixType> const&) = delete;
+  LinearSolverCSparse& operator=(LinearSolverCSparse<MatrixType> const&) =
+      delete;
 
   virtual ~LinearSolverCSparse() {
     if (_symbolicDecomposition) {
@@ -103,17 +104,20 @@ class LinearSolverCSparse : public LinearSolverCCS<MatrixType> {
     number_t t = get_monotonic_time();
     // _x = _b for calling csparse
     if (x != b) memcpy(x, b, _ccsA.n * sizeof(number_t));
-    int ok = csparse_extension::cs_cholsolsymb(&_ccsA, x, _symbolicDecomposition, _csWorkspace,
-                                               _csIntWorkspace);
+    int ok = csparse_extension::cs_cholsolsymb(
+        &_ccsA, x, _symbolicDecomposition, _csWorkspace, _csIntWorkspace);
     if (!ok && this->writeDebug()) {
-      std::cerr << "Cholesky failure, writing debug.txt (Hessian loadable by Octave)" << std::endl;
+      std::cerr
+          << "Cholesky failure, writing debug.txt (Hessian loadable by Octave)"
+          << std::endl;
       csparse_extension::writeCs2Octave("debug.txt", &_ccsA, true);
     }
 
     G2OBatchStatistics* globalStats = G2OBatchStatistics::globalStats();
     if (globalStats) {
       globalStats->timeNumericDecomposition = get_monotonic_time() - t;
-      globalStats->choleskyNNZ = static_cast<size_t>(_symbolicDecomposition->lnz);
+      globalStats->choleskyNNZ =
+          static_cast<size_t>(_symbolicDecomposition->lnz);
     }
 
     return ok != 0;
@@ -171,7 +175,8 @@ class LinearSolverCSparse : public LinearSolverCCS<MatrixType> {
       cs_free(P);  // clean the memory
 
       // apply the scalar permutation to finish symbolic decomposition
-      _symbolicDecomposition = (css*)cs_calloc(1, sizeof(css)); /* allocate result S */
+      _symbolicDecomposition =
+          (css*)cs_calloc(1, sizeof(css)); /* allocate result S */
       _symbolicDecomposition->pinv = cs_pinv(_scalarPermutation.data(), n);
       cs* C = cs_symperm(&_ccsA, _symbolicDecomposition->pinv, 0);
       _symbolicDecomposition->parent = cs_etree(C, 0);
@@ -193,8 +198,10 @@ class LinearSolverCSparse : public LinearSolverCCS<MatrixType> {
       globalStats->timeSymbolicDecomposition = get_monotonic_time() - t;
     }
 
-    /* std::cerr << "# Number of nonzeros in L: " << (int)_symbolicDecomposition->lnz << " by " */
-    /*   << (_blockOrdering ? "block" : "scalar") << " AMD ordering " << std::endl; */
+    /* std::cerr << "# Number of nonzeros in L: " <<
+     * (int)_symbolicDecomposition->lnz << " by " */
+    /*   << (_blockOrdering ? "block" : "scalar") << " AMD ordering " <<
+     * std::endl; */
   }
 
   void fillCSparse(const SparseBlockMatrix<MatrixType>& A, bool onlyValues) {
@@ -235,19 +242,22 @@ class LinearSolverCSparse : public LinearSolverCCS<MatrixType> {
   }
 
   /**
-   * Implementation of the general parts for computing the inverse blocks of the linear system
-   * matrix. Here we call a function to do the underlying computation.
+   * Implementation of the general parts for computing the inverse blocks of the
+   * linear system matrix. Here we call a function to do the underlying
+   * computation.
    */
-  bool solveBlocks_impl(const SparseBlockMatrix<MatrixType>& A,
-                        std::function<void(MarginalCovarianceCholesky&)> compute) {
+  bool solveBlocks_impl(
+      const SparseBlockMatrix<MatrixType>& A,
+      std::function<void(MarginalCovarianceCholesky&)> compute) {
     prepareSolve(A);
     bool ok = true;
-    csn* numericCholesky = csparse_extension::cs_chol_workspace(&_ccsA, _symbolicDecomposition,
-                                                                _csIntWorkspace, _csWorkspace);
+    csn* numericCholesky = csparse_extension::cs_chol_workspace(
+        &_ccsA, _symbolicDecomposition, _csIntWorkspace, _csWorkspace);
     if (numericCholesky) {
       MarginalCovarianceCholesky mcc;
-      mcc.setCholeskyFactor(_ccsA.n, numericCholesky->L->p, numericCholesky->L->i,
-                            numericCholesky->L->x, _symbolicDecomposition->pinv);
+      mcc.setCholeskyFactor(_ccsA.n, numericCholesky->L->p,
+                            numericCholesky->L->i, numericCholesky->L->x,
+                            _symbolicDecomposition->pinv);
       compute(mcc);
       cs_nfree(numericCholesky);
     } else {
@@ -256,7 +266,8 @@ class LinearSolverCSparse : public LinearSolverCCS<MatrixType> {
     }
     G2OBatchStatistics* globalStats = G2OBatchStatistics::globalStats();
     if (globalStats) {
-      globalStats->choleskyNNZ = static_cast<size_t>(_symbolicDecomposition->lnz);
+      globalStats->choleskyNNZ =
+          static_cast<size_t>(_symbolicDecomposition->lnz);
     }
     return ok;
   }

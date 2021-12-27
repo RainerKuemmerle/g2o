@@ -31,77 +31,82 @@
 
 namespace g2o {
 
-  VertexLine3D::VertexLine3D() : BaseVertex<4, Line3D>(), color(1., 0.5, 0.) {
-  }
+VertexLine3D::VertexLine3D() : BaseVertex<4, Line3D>(), color(1., 0.5, 0.) {}
 
-  bool VertexLine3D::read(std::istream& is) {
-    Vector6 lv;
-    bool state = internal::readVector(is, lv);
-    setEstimate(Line3D(lv));
-    return state;
-  }
+bool VertexLine3D::read(std::istream& is) {
+  Vector6 lv;
+  bool state = internal::readVector(is, lv);
+  setEstimate(Line3D(lv));
+  return state;
+}
 
-  bool VertexLine3D::write(std::ostream& os) const {
-    return internal::writeVector(os, _estimate);
-  }
+bool VertexLine3D::write(std::ostream& os) const {
+  return internal::writeVector(os, _estimate);
+}
 
 #ifdef G2O_HAVE_OPENGL
-  VertexLine3DDrawAction::VertexLine3DDrawAction()
-      : DrawAction(typeid(VertexLine3D).name()), _lineLength(nullptr), _lineWidth(nullptr) {}
+VertexLine3DDrawAction::VertexLine3DDrawAction()
+    : DrawAction(typeid(VertexLine3D).name()),
+      _lineLength(nullptr),
+      _lineWidth(nullptr) {}
 
-  bool VertexLine3DDrawAction::refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_) {
-    if(!DrawAction::refreshPropertyPtrs(params_)) {
-      return false;
-    }
-    if(_previousParams) {
-      _lineLength = _previousParams->makeProperty<FloatProperty>(_typeName + "::LINE_LENGTH", 15);
-      _lineWidth = _previousParams->makeProperty<FloatProperty>(_typeName + "::LINE_WIDTH", 5);
-    }
-    else {
-      _lineLength = 0;
-      _lineWidth = 0;
-    }
-    return true;
+bool VertexLine3DDrawAction::refreshPropertyPtrs(
+    HyperGraphElementAction::Parameters* params_) {
+  if (!DrawAction::refreshPropertyPtrs(params_)) {
+    return false;
+  }
+  if (_previousParams) {
+    _lineLength = _previousParams->makeProperty<FloatProperty>(
+        _typeName + "::LINE_LENGTH", 15);
+    _lineWidth = _previousParams->makeProperty<FloatProperty>(
+        _typeName + "::LINE_WIDTH", 5);
+  } else {
+    _lineLength = 0;
+    _lineWidth = 0;
+  }
+  return true;
+}
+
+HyperGraphElementAction* VertexLine3DDrawAction::operator()(
+    HyperGraph::HyperGraphElement* element,
+    HyperGraphElementAction::Parameters* params_) {
+  if (typeid(*element).name() != _typeName) {
+    return nullptr;
   }
 
-  HyperGraphElementAction* VertexLine3DDrawAction::operator()(HyperGraph::HyperGraphElement* element,
-							     HyperGraphElementAction::Parameters* params_) {
-    if(typeid(*element).name() != _typeName) {
-      return nullptr;
-    }
-
-    refreshPropertyPtrs(params_);
-    if(!_previousParams) {
-      return this;
-    }
-
-    if(_show && !_show->value()) {
-      return this;
-    }
-
-    VertexLine3D* that = static_cast<VertexLine3D*>(element);
-    Line3D line = that->estimate();
-    line.normalize();
-    Vector3 direction = line.d();
-    Vector3 npoint = line.d().cross(line.w());
-    glPushMatrix();
-    glColor3f(float(that->color(0)), float(that->color(1)), float(that->color(2)));
-    if(_lineLength && _lineWidth) {
-      glLineWidth(float(_lineWidth->value()));
-      glBegin(GL_LINES);
-      glNormal3f(float(npoint.x()), float(npoint.y()), float(npoint.z()));
-      glVertex3f(float(npoint.x() - direction.x() * _lineLength->value() / 2),
-                 float(npoint.y() - direction.y() * _lineLength->value() / 2),
-                 float(npoint.z() - direction.z() * _lineLength->value() / 2));
-      glVertex3f(float(npoint.x() + direction.x() * _lineLength->value() / 2),
-                 float(npoint.y() + direction.y() * _lineLength->value() / 2),
-                 float(npoint.z() + direction.z() * _lineLength->value() / 2));
-      glEnd();
-    }
-    glPopMatrix();
-
+  refreshPropertyPtrs(params_);
+  if (!_previousParams) {
     return this;
   }
+
+  if (_show && !_show->value()) {
+    return this;
+  }
+
+  VertexLine3D* that = static_cast<VertexLine3D*>(element);
+  Line3D line = that->estimate();
+  line.normalize();
+  Vector3 direction = line.d();
+  Vector3 npoint = line.d().cross(line.w());
+  glPushMatrix();
+  glColor3f(float(that->color(0)), float(that->color(1)),
+            float(that->color(2)));
+  if (_lineLength && _lineWidth) {
+    glLineWidth(float(_lineWidth->value()));
+    glBegin(GL_LINES);
+    glNormal3f(float(npoint.x()), float(npoint.y()), float(npoint.z()));
+    glVertex3f(float(npoint.x() - direction.x() * _lineLength->value() / 2),
+               float(npoint.y() - direction.y() * _lineLength->value() / 2),
+               float(npoint.z() - direction.z() * _lineLength->value() / 2));
+    glVertex3f(float(npoint.x() + direction.x() * _lineLength->value() / 2),
+               float(npoint.y() + direction.y() * _lineLength->value() / 2),
+               float(npoint.z() + direction.z() * _lineLength->value() / 2));
+    glEnd();
+  }
+  glPopMatrix();
+
+  return this;
+}
 #endif
 
-}
+}  // namespace g2o

@@ -36,11 +36,14 @@
 namespace g2o {
 
 class EdgeSE2Segment2DLine
-    : public BaseBinaryEdge<2, Vector2, VertexSE2, VertexSegment2D>  // Avoid redefinition of BaseEdge in MSVC
+    : public BaseBinaryEdge<2, Vector2, VertexSE2,
+                            VertexSegment2D>  // Avoid redefinition of BaseEdge
+                                              // in MSVC
 {
  public:
   G2O_TYPES_SLAM2D_ADDONS_API EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-  G2O_TYPES_SLAM2D_ADDONS_API EdgeSE2Segment2DLine();
+      G2O_TYPES_SLAM2D_ADDONS_API
+      EdgeSE2Segment2DLine();
 
   G2O_TYPES_SLAM2D_ADDONS_API number_t theta() const { return _measurement[0]; }
   G2O_TYPES_SLAM2D_ADDONS_API number_t rho() const { return _measurement[1]; }
@@ -50,43 +53,51 @@ class EdgeSE2Segment2DLine
 
   G2O_TYPES_SLAM2D_ADDONS_API void computeError() {
     const VertexSE2* v1 = static_cast<const VertexSE2*>(_vertices[0]);
-    const VertexSegment2D* l2 = static_cast<const VertexSegment2D*>(_vertices[1]);
+    const VertexSegment2D* l2 =
+        static_cast<const VertexSegment2D*>(_vertices[1]);
     SE2 iEst = v1->estimate().inverse();
     Vector2 predP1 = iEst * l2->estimateP1();
     Vector2 predP2 = iEst * l2->estimateP2();
     Vector2 dP = predP2 - predP1;
     Vector2 normal(dP.y(), -dP.x());
     normal.normalize();
-    Vector2 prediction(std::atan2(normal.y(), normal.x()), predP1.dot(normal) * .5 + predP2.dot(normal) * .5);
+    Vector2 prediction(std::atan2(normal.y(), normal.x()),
+                       predP1.dot(normal) * .5 + predP2.dot(normal) * .5);
 
     _error = prediction - _measurement;
     _error[0] = normalize_theta(_error[0]);
   }
 
-  G2O_TYPES_SLAM2D_ADDONS_API virtual bool setMeasurementData(const number_t* d) {
+  G2O_TYPES_SLAM2D_ADDONS_API virtual bool setMeasurementData(
+      const number_t* d) {
     Eigen::Map<const Vector2> data(d);
     _measurement = data;
     return true;
   }
 
-  G2O_TYPES_SLAM2D_ADDONS_API virtual bool getMeasurementData(number_t* d) const {
+  G2O_TYPES_SLAM2D_ADDONS_API virtual bool getMeasurementData(
+      number_t* d) const {
     Eigen::Map<Vector2> data(d);
     data = _measurement;
     return true;
   }
 
-  G2O_TYPES_SLAM2D_ADDONS_API virtual int measurementDimension() const { return 2; }
+  G2O_TYPES_SLAM2D_ADDONS_API virtual int measurementDimension() const {
+    return 2;
+  }
 
   G2O_TYPES_SLAM2D_ADDONS_API virtual bool setMeasurementFromState() {
     const VertexSE2* v1 = static_cast<const VertexSE2*>(_vertices[0]);
-    const VertexSegment2D* l2 = static_cast<const VertexSegment2D*>(_vertices[1]);
+    const VertexSegment2D* l2 =
+        static_cast<const VertexSegment2D*>(_vertices[1]);
     SE2 iEst = v1->estimate().inverse();
     Vector2 predP1 = iEst * l2->estimateP1();
     Vector2 predP2 = iEst * l2->estimateP2();
     Vector2 dP = predP2 - predP1;
     Vector2 normal(dP.y(), -dP.x());
     normal.normalize();
-    Vector2 prediction(std::atan2(normal.y(), normal.x()), predP1.dot(normal) * .5 + predP2.dot(normal) * .5);
+    Vector2 prediction(std::atan2(normal.y(), normal.x()),
+                       predP1.dot(normal) * .5 + predP2.dot(normal) * .5);
     _measurement = prediction;
     return true;
   }
@@ -99,18 +110,22 @@ class EdgeSE2Segment2DLine
   /* #endif */
 };
 
-/*   class G2O_TYPES_SLAM2D_ADDONS_API EdgeSE2Segment2DLineWriteGnuplotAction: public WriteGnuplotAction { */
+/*   class G2O_TYPES_SLAM2D_ADDONS_API EdgeSE2Segment2DLineWriteGnuplotAction:
+ * public WriteGnuplotAction { */
 /*   public: */
 /*     EdgeSE2Segment2DLineWriteGnuplotAction(); */
-/*     virtual HyperGraphElementAction* operator()(HyperGraph::HyperGraphElement* element,  */
+/*     virtual HyperGraphElementAction*
+ * operator()(HyperGraph::HyperGraphElement* element,  */
 /*             HyperGraphElementAction::Parameters* params_); */
 /*   }; */
 
 /* #ifdef G2O_HAVE_OPENGL */
-/*   class G2O_TYPES_SLAM2D_ADDONS_API EdgeSE2Segment2DLineDrawAction: public DrawAction{ */
+/*   class G2O_TYPES_SLAM2D_ADDONS_API EdgeSE2Segment2DLineDrawAction: public
+ * DrawAction{ */
 /*   public: */
 /*     EdgeSE2Segment2DLineDrawAction(); */
-/*     virtual HyperGraphElementAction* operator()(HyperGraph::HyperGraphElement* element,  */
+/*     virtual HyperGraphElementAction*
+ * operator()(HyperGraph::HyperGraphElement* element,  */
 /*             HyperGraphElementAction::Parameters* params_); */
 /*   }; */
 /* #endif */

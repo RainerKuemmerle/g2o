@@ -43,7 +43,8 @@ class Driver;
 class ParserInterface {
  public:
   /**
-   * construct a parser and use the given AbstractSlamInterface to communicate with the SLAM algorithm.
+   * construct a parser and use the given AbstractSlamInterface to communicate
+   * with the SLAM algorithm.
    */
   explicit ParserInterface(AbstractSlamInterface* slamInterface);
   ParserInterface& operator=(const ParserInterface&) = delete;

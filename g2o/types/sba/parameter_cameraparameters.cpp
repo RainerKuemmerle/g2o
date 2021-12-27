@@ -33,9 +33,12 @@ namespace g2o {
 CameraParameters::CameraParameters()
     : focal_length(1.), principle_point(Vector2(0., 0.)), baseline(0.5) {}
 
-CameraParameters::CameraParameters(number_t focal_length, const Vector2 &principle_point,
+CameraParameters::CameraParameters(number_t focal_length,
+                                   const Vector2 &principle_point,
                                    number_t baseline)
-    : focal_length(focal_length), principle_point(principle_point), baseline(baseline) {}
+    : focal_length(focal_length),
+      principle_point(principle_point),
+      baseline(baseline) {}
 
 bool CameraParameters::read(std::istream &is) {
   is >> focal_length;

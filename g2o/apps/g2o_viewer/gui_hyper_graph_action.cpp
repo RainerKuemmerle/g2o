@@ -18,26 +18,21 @@
 
 #include "gui_hyper_graph_action.h"
 
-#include "g2o_qglviewer.h"
-
 #include <QApplication>
 #include <QtGlobal>
 
+#include "g2o_qglviewer.h"
+
 namespace g2o {
 
-GuiHyperGraphAction::GuiHyperGraphAction() :
-  HyperGraphAction(),
-  viewer(0), dumpScreenshots(false)
-{
-}
+GuiHyperGraphAction::GuiHyperGraphAction()
+    : HyperGraphAction(), viewer(0), dumpScreenshots(false) {}
 
-GuiHyperGraphAction::~GuiHyperGraphAction()
-{
-}
+GuiHyperGraphAction::~GuiHyperGraphAction() {}
 
-HyperGraphAction* GuiHyperGraphAction::operator()(const HyperGraph* graph, Parameters* parameters)
-{
-  (void) graph;
+HyperGraphAction* GuiHyperGraphAction::operator()(const HyperGraph* graph,
+                                                  Parameters* parameters) {
+  (void)graph;
   if (viewer) {
     viewer->setUpdateDisplay(true);
     viewer->update();
@@ -48,9 +43,11 @@ HyperGraphAction* GuiHyperGraphAction::operator()(const HyperGraph* graph, Param
         viewer->setSnapshotFormat(QString("PNG"));
         viewer->setSnapshotQuality(-1);
 #if QT_VERSION < QT_VERSION_CHECK(5, 5, 0)
-        viewer->saveSnapshot(QString().sprintf("g2o%.6d.png", p->iteration), true);
+        viewer->saveSnapshot(QString().sprintf("g2o%.6d.png", p->iteration),
+                             true);
 #else
-        viewer->saveSnapshot(QString().asprintf("g2o%.6d.png", p->iteration), true);
+        viewer->saveSnapshot(QString().asprintf("g2o%.6d.png", p->iteration),
+                             true);
 #endif
       }
     }
@@ -61,4 +58,4 @@ HyperGraphAction* GuiHyperGraphAction::operator()(const HyperGraph* graph, Param
   return 0;
 }
 
-} // end namespace
+}  // namespace g2o

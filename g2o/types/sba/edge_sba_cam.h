@@ -36,7 +36,8 @@ namespace g2o {
 /**
  * \brief 3D edge between two SBAcam
  */
-class G2O_TYPES_SBA_API EdgeSBACam : public BaseBinaryEdge<6, SE3Quat, VertexCam, VertexCam> {
+class G2O_TYPES_SBA_API EdgeSBACam
+    : public BaseBinaryEdge<6, SE3Quat, VertexCam, VertexCam> {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
   EdgeSBACam();

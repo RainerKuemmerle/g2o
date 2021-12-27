@@ -29,9 +29,9 @@
 #include <iostream>
 
 #ifdef G2O_USE_VENDORED_CERES
-  #include "g2o/EXTERNAL/ceres/autodiff.h"
+#include "g2o/EXTERNAL/ceres/autodiff.h"
 #else
-  #include <ceres/internal/autodiff.h>
+#include <ceres/internal/autodiff.h>
 #endif
 
 #include "g2o/core/auto_differentiation.h"
@@ -63,7 +63,8 @@ using Vector9 = VectorN<9>;
  * \brief camera vertex which stores the parameters for a pinhole camera
  *
  * The parameters of the camera are
- * - rx,ry,rz representing the rotation axis, whereas the angle is given by ||(rx,ry,rz)||
+ * - rx,ry,rz representing the rotation axis, whereas the angle is given by
+ * ||(rx,ry,rz)||
  * - tx,ty,tz the translation of the camera
  * - f the focal length of the camera
  * - k1, k2 two radial distortion parameters
@@ -83,7 +84,9 @@ class VertexCameraBAL : public g2o::BaseVertex<9, g2o::bal::Vector9> {
     return false;
   }
 
-  virtual void setToOriginImpl() { cerr << __PRETTY_FUNCTION__ << " not implemented yet" << endl; }
+  virtual void setToOriginImpl() {
+    cerr << __PRETTY_FUNCTION__ << " not implemented yet" << endl;
+  }
 
   virtual void oplusImpl(const double* update) {
     g2o::bal::Vector9::ConstMapType v(update, VertexCameraBAL::Dimension);
@@ -111,7 +114,9 @@ class VertexPointBAL : public g2o::BaseVertex<3, g2o::Vector3> {
     return false;
   }
 
-  virtual void setToOriginImpl() { cerr << __PRETTY_FUNCTION__ << " not implemented yet" << endl; }
+  virtual void setToOriginImpl() {
+    cerr << __PRETTY_FUNCTION__ << " not implemented yet" << endl;
+  }
 
   virtual void oplusImpl(const double* update) {
     g2o::Vector3::ConstMapType v(update);
@@ -129,11 +134,11 @@ class VertexPointBAL : public g2o::BaseVertex<3, g2o::Vector3> {
  * R,t,f,k1,k2 is:
  * P  =  R * X + t     (conversion from world to camera coordinates)
  * p  = -P / P.z       (perspective division)
- * p' =  f * r(p) * p  (conversion to pixel coordinates) where P.z is the third (z) coordinate of P.
+ * p' =  f * r(p) * p  (conversion to pixel coordinates) where P.z is the third
+ * (z) coordinate of P.
  *
- * In the last equation, r(p) is a function that computes a scaling factor to undo the radial
- * distortion:
- * r(p) = 1.0 + k1 * ||p||^2 + k2 * ||p||^4.
+ * In the last equation, r(p) is a function that computes a scaling factor to
+ * undo the radial distortion: r(p) = 1.0 + k1 * ||p||^2 + k2 * ||p||^4.
  *
  * This gives a projection in pixels, where the origin of the image is the
  * center of the image, the positive x-axis points right, and the positive
@@ -142,7 +147,8 @@ class VertexPointBAL : public g2o::BaseVertex<3, g2o::Vector3> {
  * as in OpenGL).
  */
 class EdgeObservationBAL
-    : public g2o::BaseBinaryEdge<2, g2o::Vector2, VertexCameraBAL, VertexPointBAL> {
+    : public g2o::BaseBinaryEdge<2, g2o::Vector2, VertexCameraBAL,
+                                 VertexPointBAL> {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
   EdgeObservationBAL() {}
@@ -219,22 +225,27 @@ int main(int argc, char** argv) {
   arg.param("pcg", usePCG, false, "use PCG instead of the Cholesky");
   arg.param("v", verbose, false, "verbose output of the optimization process");
   arg.param("stats", statsFilename, "", "specify a file for the statistics");
-  arg.paramLeftOver("graph-input", inputFilename, "", "file which will be processed");
+  arg.paramLeftOver("graph-input", inputFilename, "",
+                    "file which will be processed");
 
   arg.parseArgs(argc, argv);
 
   typedef g2o::BlockSolver<g2o::BlockSolverTraits<9, 3>> BalBlockSolver;
 #ifdef G2O_HAVE_CHOLMOD
   string choleskySolverName = "CHOLMOD";
-  typedef g2o::LinearSolverCholmod<BalBlockSolver::PoseMatrixType> BalLinearSolver;
+  typedef g2o::LinearSolverCholmod<BalBlockSolver::PoseMatrixType>
+      BalLinearSolver;
 #else
   string choleskySolverName = "Eigen";
-  typedef g2o::LinearSolverEigen<BalBlockSolver::PoseMatrixType> BalLinearSolver;
+  typedef g2o::LinearSolverEigen<BalBlockSolver::PoseMatrixType>
+      BalLinearSolver;
 #endif
-  typedef g2o::LinearSolverPCG<BalBlockSolver::PoseMatrixType> BalLinearSolverPCG;
+  typedef g2o::LinearSolverPCG<BalBlockSolver::PoseMatrixType>
+      BalLinearSolverPCG;
 
   g2o::SparseOptimizer optimizer;
-  std::unique_ptr<g2o::LinearSolver<BalBlockSolver::PoseMatrixType>> linearSolver;
+  std::unique_ptr<g2o::LinearSolver<BalBlockSolver::PoseMatrixType>>
+      linearSolver;
   if (usePCG) {
     cout << "Using PCG" << endl;
     linearSolver = g2o::make_unique<BalLinearSolverPCG>();
@@ -244,8 +255,9 @@ int main(int argc, char** argv) {
     cholesky->setBlockOrdering(true);
     linearSolver = std::move(cholesky);
   }
-  g2o::OptimizationAlgorithmLevenberg* solver = new g2o::OptimizationAlgorithmLevenberg(
-      g2o::make_unique<BalBlockSolver>(std::move(linearSolver)));
+  g2o::OptimizationAlgorithmLevenberg* solver =
+      new g2o::OptimizationAlgorithmLevenberg(
+          g2o::make_unique<BalBlockSolver>(std::move(linearSolver)));
 
   // solver->setUserLambdaInit(1);
   optimizer.setAlgorithm(solver);
@@ -263,7 +275,8 @@ int main(int argc, char** argv) {
     int numCameras, numPoints, numObservations;
     ifs >> numCameras >> numPoints >> numObservations;
 
-    cerr << PVAR(numCameras) << " " << PVAR(numPoints) << " " << PVAR(numObservations) << endl;
+    cerr << PVAR(numCameras) << " " << PVAR(numPoints) << " "
+         << PVAR(numObservations) << endl;
 
     int id = 0;
     cameras.reserve(numCameras);
@@ -292,9 +305,11 @@ int main(int argc, char** argv) {
       double obsX, obsY;
       ifs >> camIndex >> pointIndex >> obsX >> obsY;
 
-      assert(camIndex >= 0 && (size_t)camIndex < cameras.size() && "Index out of bounds");
+      assert(camIndex >= 0 && (size_t)camIndex < cameras.size() &&
+             "Index out of bounds");
       VertexCameraBAL* cam = cameras[camIndex];
-      assert(pointIndex >= 0 && (size_t)pointIndex < points.size() && "Index out of bounds");
+      assert(pointIndex >= 0 && (size_t)pointIndex < points.size() &&
+             "Index out of bounds");
       VertexPointBAL* point = points[pointIndex];
 
       EdgeObservationBAL* e = new EdgeObservationBAL;
@@ -359,7 +374,8 @@ int main(int argc, char** argv) {
          << "  geometry PointSet {\n"
          << "    coord Coordinate {\n"
          << "      point [\n";
-    for (vector<VertexPointBAL*>::const_iterator it = points.begin(); it != points.end(); ++it) {
+    for (vector<VertexPointBAL*>::const_iterator it = points.begin();
+         it != points.end(); ++it) {
       fout << (*it)->estimate().transpose() << endl;
     }
     fout << "    ]\n"

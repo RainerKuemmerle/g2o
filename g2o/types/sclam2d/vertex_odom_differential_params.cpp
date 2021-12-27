@@ -28,19 +28,15 @@
 
 namespace g2o {
 
-  VertexOdomDifferentialParams::VertexOdomDifferentialParams() :
-    BaseVertex <3, Vector3>()
-  {
-  }
+VertexOdomDifferentialParams::VertexOdomDifferentialParams()
+    : BaseVertex<3, Vector3>() {}
 
-  bool VertexOdomDifferentialParams::read(std::istream& is)
-  {
-    return internal::readVector(is, _estimate);
-  }
-
-  bool VertexOdomDifferentialParams::write(std::ostream& os) const
-  {
-    return internal::writeVector(os, estimate());
-  }
-
+bool VertexOdomDifferentialParams::read(std::istream& is) {
+  return internal::readVector(is, _estimate);
 }
+
+bool VertexOdomDifferentialParams::write(std::ostream& os) const {
+  return internal::writeVector(os, estimate());
+}
+
+}  // namespace g2o

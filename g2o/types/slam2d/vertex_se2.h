@@ -30,82 +30,81 @@
 #include "g2o/config.h"
 #include "g2o/core/base_vertex.h"
 #include "g2o/core/hyper_graph_action.h"
-#include "se2.h"
 #include "g2o_types_slam2d_api.h"
+#include "se2.h"
 
 namespace g2o {
 
-  /**
-   * \brief 2D pose Vertex, (x,y,theta)
-   */
-  class G2O_TYPES_SLAM2D_API VertexSE2 : public BaseVertex<3, SE2>
-  {
-    public:
-      EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-      VertexSE2();
+/**
+ * \brief 2D pose Vertex, (x,y,theta)
+ */
+class G2O_TYPES_SLAM2D_API VertexSE2 : public BaseVertex<3, SE2> {
+ public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+  VertexSE2();
 
-      virtual void setToOriginImpl() {
-        _estimate = SE2();
-      }
+  virtual void setToOriginImpl() { _estimate = SE2(); }
 
-      virtual void oplusImpl(const number_t* update)
-      {
-        Vector2 t=_estimate.translation();
-        t+=Eigen::Map<const Vector2>(update);
-        number_t angle=normalize_theta(_estimate.rotation().angle() + update[2]);
-        _estimate.setTranslation(t);
-        _estimate.setRotation(Rotation2D(angle));
-      }
+  virtual void oplusImpl(const number_t* update) {
+    Vector2 t = _estimate.translation();
+    t += Eigen::Map<const Vector2>(update);
+    number_t angle = normalize_theta(_estimate.rotation().angle() + update[2]);
+    _estimate.setTranslation(t);
+    _estimate.setRotation(Rotation2D(angle));
+  }
 
-      virtual bool setEstimateDataImpl(const number_t* est){
-        _estimate=SE2(est[0], est[1], est[2]);
-        return true;
-      }
+  virtual bool setEstimateDataImpl(const number_t* est) {
+    _estimate = SE2(est[0], est[1], est[2]);
+    return true;
+  }
 
-      virtual bool getEstimateData(number_t* est) const {
-        Eigen::Map<Vector3> v(est);
-        v = _estimate.toVector();
-        return true;
-      }
-      
-      virtual int estimateDimension() const { return 3; }
+  virtual bool getEstimateData(number_t* est) const {
+    Eigen::Map<Vector3> v(est);
+    v = _estimate.toVector();
+    return true;
+  }
 
-      virtual bool setMinimalEstimateDataImpl(const number_t* est){
-        return setEstimateData(est);
-      }
+  virtual int estimateDimension() const { return 3; }
 
-      virtual bool getMinimalEstimateData(number_t* est) const {
-        return getEstimateData(est);
-      }
-      
-      virtual int minimalEstimateDimension() const { return 3; }
+  virtual bool setMinimalEstimateDataImpl(const number_t* est) {
+    return setEstimateData(est);
+  }
 
-      virtual bool read(std::istream& is);
-      virtual bool write(std::ostream& os) const;
+  virtual bool getMinimalEstimateData(number_t* est) const {
+    return getEstimateData(est);
+  }
 
-  };
+  virtual int minimalEstimateDimension() const { return 3; }
 
-  class G2O_TYPES_SLAM2D_API VertexSE2WriteGnuplotAction: public WriteGnuplotAction {
-  public:
-    VertexSE2WriteGnuplotAction();
-    virtual HyperGraphElementAction* operator()(HyperGraph::HyperGraphElement* element, 
-            HyperGraphElementAction::Parameters* params_ );
-  };
+  virtual bool read(std::istream& is);
+  virtual bool write(std::ostream& os) const;
+};
+
+class G2O_TYPES_SLAM2D_API VertexSE2WriteGnuplotAction
+    : public WriteGnuplotAction {
+ public:
+  VertexSE2WriteGnuplotAction();
+  virtual HyperGraphElementAction* operator()(
+      HyperGraph::HyperGraphElement* element,
+      HyperGraphElementAction::Parameters* params_);
+};
 
 #ifdef G2O_HAVE_OPENGL
-  class G2O_TYPES_SLAM2D_API VertexSE2DrawAction: public DrawAction{
-  public:
-    VertexSE2DrawAction();
-    virtual HyperGraphElementAction* operator()(HyperGraph::HyperGraphElement* element, 
-            HyperGraphElementAction::Parameters* params_ );
-  protected:
-    HyperGraphElementAction* _drawActions;
-    virtual bool refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_);
-    FloatProperty* _triangleX, *_triangleY;
+class G2O_TYPES_SLAM2D_API VertexSE2DrawAction : public DrawAction {
+ public:
+  VertexSE2DrawAction();
+  virtual HyperGraphElementAction* operator()(
+      HyperGraph::HyperGraphElement* element,
+      HyperGraphElementAction::Parameters* params_);
 
-  };
+ protected:
+  HyperGraphElementAction* _drawActions;
+  virtual bool refreshPropertyPtrs(
+      HyperGraphElementAction::Parameters* params_);
+  FloatProperty *_triangleX, *_triangleY;
+};
 #endif
 
-} // end namespace
+}  // namespace g2o
 
 #endif

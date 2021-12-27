@@ -26,27 +26,30 @@
 
 #ifndef G2O_SENSOR_LINE3D_H_
 #define G2O_SENSOR_LINE3D_H_
-#include "simulator3d_base.h"
-#include "pointsensorparameters.h"
 #include "g2o_simulator_api.h"
+#include "pointsensorparameters.h"
+#include "simulator3d_base.h"
 
 namespace g2o {
 
-  class G2O_SIMULATOR_API SensorPointLine3D: public PointSensorParameters, public BinarySensor<Robot3D, EdgeSE3Line WorldObjectLine3D>{
-  public:
-    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-    typedef PoseVertexType::EstimateType RobotPoseType;
-    SensorLine3D(const std::string& name_);
-    virtual void sense();
-    virtual void addParameters();
-    ParameterSE3Offset* offsetParam() {return _offsetParam;};
-    void addNoise(EdgeType* e);
-  protected:
-    bool isVisible(WorldObjectType* to);
-    RobotPoseType _sensorPose;
-    ParameterSE3Offset* _offsetParam;
-  };
+class G2O_SIMULATOR_API SensorPointLine3D
+    : public PointSensorParameters,
+      public BinarySensor<Robot3D, EdgeSE3Line WorldObjectLine3D> {
+ public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+  typedef PoseVertexType::EstimateType RobotPoseType;
+  SensorLine3D(const std::string& name_);
+  virtual void sense();
+  virtual void addParameters();
+  ParameterSE3Offset* offsetParam() { return _offsetParam; };
+  void addNoise(EdgeType* e);
 
-}
+ protected:
+  bool isVisible(WorldObjectType* to);
+  RobotPoseType _sensorPose;
+  ParameterSE3Offset* _offsetParam;
+};
+
+}  // namespace g2o
 
 #endif

@@ -33,7 +33,10 @@
 
 namespace g2o {
 
-EdgeSE2LotsOfXY::EdgeSE2LotsOfXY() : BaseVariableSizedEdge<-1, VectorX>(), _observedPoints(0) { resize(0); }
+EdgeSE2LotsOfXY::EdgeSE2LotsOfXY()
+    : BaseVariableSizedEdge<-1, VectorX>(), _observedPoints(0) {
+  resize(0);
+}
 
 void EdgeSE2LotsOfXY::computeError() {
   VertexSE2* pose = static_cast<VertexSE2*>(_vertices[0]);
@@ -136,10 +139,12 @@ void EdgeSE2LotsOfXY::linearizeOplus() {
   _jacobianOplus[0] = Ji;
 }
 
-void EdgeSE2LotsOfXY::initialEstimate(const OptimizableGraph::VertexSet& fixed, OptimizableGraph::Vertex* toEstimate) {
+void EdgeSE2LotsOfXY::initialEstimate(const OptimizableGraph::VertexSet& fixed,
+                                      OptimizableGraph::Vertex* toEstimate) {
   (void)toEstimate;
 
-  assert(initialEstimatePossible(fixed, toEstimate) && "Bad vertices specified");
+  assert(initialEstimatePossible(fixed, toEstimate) &&
+         "Bad vertices specified");
 
   VertexSE2* pose = static_cast<VertexSE2*>(_vertices[0]);
 
@@ -152,7 +157,8 @@ void EdgeSE2LotsOfXY::initialEstimate(const OptimizableGraph::VertexSet& fixed, 
   }
 #endif
 
-  for (std::set<HyperGraph::Vertex*>::iterator it = fixed.begin(); it != fixed.end(); ++it) {
+  for (std::set<HyperGraph::Vertex*>::iterator it = fixed.begin();
+       it != fixed.end(); ++it) {
     for (unsigned int i = 1; i < _vertices.size(); i++) {
       VertexPointXY* vert = static_cast<VertexPointXY*>(_vertices[i]);
       if (vert->id() == (*it)->id()) estimate_this[i - 1] = false;
@@ -169,11 +175,13 @@ void EdgeSE2LotsOfXY::initialEstimate(const OptimizableGraph::VertexSet& fixed, 
   }
 }
 
-number_t EdgeSE2LotsOfXY::initialEstimatePossible(const OptimizableGraph::VertexSet& fixed,
-                                                  OptimizableGraph::Vertex* toEstimate) {
+number_t EdgeSE2LotsOfXY::initialEstimatePossible(
+    const OptimizableGraph::VertexSet& fixed,
+    OptimizableGraph::Vertex* toEstimate) {
   (void)toEstimate;
 
-  for (std::set<HyperGraph::Vertex*>::iterator it = fixed.begin(); it != fixed.end(); ++it) {
+  for (std::set<HyperGraph::Vertex*>::iterator it = fixed.begin();
+       it != fixed.end(); ++it) {
     if (_vertices[0]->id() == (*it)->id()) {
       return 1.0;
     }

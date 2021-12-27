@@ -42,12 +42,16 @@ using namespace g2o;
 
 struct RandomPlane3D {
   static Plane3D create() { return Plane3D(Vector4::Random()); }
-  static bool isApprox(const Plane3D& a, const Plane3D& b) { return a.coeffs().isApprox(b.coeffs(), 1e-5); }
+  static bool isApprox(const Plane3D& a, const Plane3D& b) {
+    return a.coeffs().isApprox(b.coeffs(), 1e-5);
+  }
 };
 
 struct RandomLine3D {
   static Line3D create() { return Line3D(Vector6::Random()); }
-  static bool isApprox(const Line3D& a, const Line3D& b) { return a.isApprox(b, 1e-5); }
+  static bool isApprox(const Line3D& a, const Line3D& b) {
+    return a.isApprox(b, 1e-5);
+  }
 };
 
 class IoSlam3dAddonsParam : public ::testing::Test {
@@ -88,9 +92,13 @@ TEST(IoSlam3dAddOns, ReadWriteVertexPlane) {
   readWriteVectorBasedVertex<VertexPlane, RandomPlane3D>(outputVertex);
 }
 
-TEST(IoSlam3dAddOns, ReadWriteVertexLine3D) { readWriteVectorBasedVertex<VertexLine3D, RandomLine3D>(); }
+TEST(IoSlam3dAddOns, ReadWriteVertexLine3D) {
+  readWriteVectorBasedVertex<VertexLine3D, RandomLine3D>();
+}
 
-TEST(IoSlam3dAddOns, ReadWriteEdgeSE3Calib) { readWriteVectorBasedEdge<EdgeSE3Calib, internal::RandomIsometry3>(); }
+TEST(IoSlam3dAddOns, ReadWriteEdgeSE3Calib) {
+  readWriteVectorBasedEdge<EdgeSE3Calib, internal::RandomIsometry3>();
+}
 
 TEST_F(IoSlam3dAddonsParam, ReadWriteEdgeSE3Line3D) {
   // prepare edge
@@ -103,4 +111,6 @@ TEST_F(IoSlam3dAddonsParam, ReadWriteEdgeSE3Line3D) {
   readWriteVectorBasedEdge<EdgeSE3Line3D, RandomLine3D>(outputEdge);
 }
 
-TEST(IoSlam3dAddOns, ReadWriteEdgeSE3PlaneSensorCalib) { readWriteVectorBasedEdge<EdgeSE3PlaneSensorCalib, RandomPlane3D>(); }
+TEST(IoSlam3dAddOns, ReadWriteEdgeSE3PlaneSensorCalib) {
+  readWriteVectorBasedEdge<EdgeSE3PlaneSensorCalib, RandomPlane3D>();
+}

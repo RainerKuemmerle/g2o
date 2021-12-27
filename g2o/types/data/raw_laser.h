@@ -27,56 +27,57 @@
 #ifndef G2O_RAW_LASER_H
 #define G2O_RAW_LASER_H
 
-#include "robot_data.h"
-#include "laser_parameters.h"
-#include "g2o_types_data_api.h"
-
+#include <Eigen/Core>
 #include <vector>
 
-#include<Eigen/Core>
+#include "g2o_types_data_api.h"
+#include "laser_parameters.h"
+#include "robot_data.h"
 
 namespace g2o {
 
+/**
+ * \brief Raw laser measuerement
+ *
+ * A raw laser measuerement. The read/write function correspond to the format of
+ * CARMEN.
+ */
+class G2O_TYPES_DATA_API RawLaser : public RobotData {
+ public:
+  typedef std::vector<Vector2, Eigen::aligned_allocator<Vector2> >
+      Point2DVector;
+
+ public:
+  RawLaser();
+  ~RawLaser();
+
+  virtual bool write(std::ostream& os) const;
+  virtual bool read(std::istream& is);
+
   /**
-   * \brief Raw laser measuerement
-   *
-   * A raw laser measuerement. The read/write function correspond to the format of CARMEN.
+   * computes a cartesian view of the beams (x,y).
+   * @return a vector with the points of the scan in cartesian coordinates.
    */
-  class G2O_TYPES_DATA_API RawLaser : public RobotData {
-    public:
-      typedef std::vector<Vector2, Eigen::aligned_allocator<Vector2> >      Point2DVector;
+  Point2DVector cartesian() const;
 
-    public:
-      RawLaser();
-      ~RawLaser();
+  //! the range measurements by the laser
+  const std::vector<number_t>& ranges() const { return _ranges; }
+  void setRanges(const std::vector<number_t>& ranges);
 
-      virtual bool write(std::ostream& os) const;
-      virtual bool read(std::istream& is);
+  //! the remission measurements by the laser
+  const std::vector<number_t>& remissions() const { return _remissions; }
+  void setRemissions(const std::vector<number_t>& remissions);
 
-      /**
-       * computes a cartesian view of the beams (x,y).
-       * @return a vector with the points of the scan in cartesian coordinates.
-       */
-      Point2DVector cartesian() const;
+  //! the parameters of the laser
+  const LaserParameters& laserParams() const { return _laserParams; }
+  void setLaserParams(const LaserParameters& laserParams);
 
-      //! the range measurements by the laser
-      const std::vector<number_t>& ranges() const { return _ranges;}
-      void setRanges(const std::vector<number_t>& ranges);
+ protected:
+  std::vector<number_t> _ranges;
+  std::vector<number_t> _remissions;
+  LaserParameters _laserParams;
+};
 
-      //! the remission measurements by the laser
-      const std::vector<number_t>& remissions() const { return _remissions;}
-      void setRemissions(const std::vector<number_t>& remissions);
-
-      //! the parameters of the laser
-      const LaserParameters& laserParams() const { return _laserParams;}
-      void setLaserParams(const LaserParameters& laserParams);
-
-    protected:
-      std::vector<number_t> _ranges;
-      std::vector<number_t> _remissions;
-      LaserParameters _laserParams;
-  };
-
-} // end namespace
+}  // namespace g2o
 
 #endif

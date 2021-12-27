@@ -27,60 +27,58 @@
 #ifndef G2O_EDGE_POINTXY_H
 #define G2O_EDGE_POINTXY_H
 
-#include "vertex_point_xy.h"
 #include "g2o/config.h"
 #include "g2o/core/base_binary_edge.h"
 #include "g2o_types_slam2d_api.h"
+#include "vertex_point_xy.h"
 
 namespace g2o {
 
-  class G2O_TYPES_SLAM2D_API EdgePointXY : public BaseBinaryEdge<2, Vector2, VertexPointXY, VertexPointXY>
-  {
-    public:
-      EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
-      EdgePointXY();
+class G2O_TYPES_SLAM2D_API EdgePointXY
+    : public BaseBinaryEdge<2, Vector2, VertexPointXY, VertexPointXY> {
+ public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
+  EdgePointXY();
 
-      void computeError()
-      {
-        const VertexPointXY* v1 = static_cast<const VertexPointXY*>(_vertices[0]);
-        const VertexPointXY* v2 = static_cast<const VertexPointXY*>(_vertices[1]);
-        _error = (v2->estimate()-v1->estimate())-_measurement;
-      }
-      virtual bool read(std::istream& is);
-      virtual bool write(std::ostream& os) const;
+  void computeError() {
+    const VertexPointXY* v1 = static_cast<const VertexPointXY*>(_vertices[0]);
+    const VertexPointXY* v2 = static_cast<const VertexPointXY*>(_vertices[1]);
+    _error = (v2->estimate() - v1->estimate()) - _measurement;
+  }
+  virtual bool read(std::istream& is);
+  virtual bool write(std::ostream& os) const;
 
-      virtual void setMeasurement(const Vector2& m){
-        _measurement = m;
-      }
+  virtual void setMeasurement(const Vector2& m) { _measurement = m; }
 
-      virtual bool setMeasurementData(const number_t* d){
-        _measurement=Vector2(d[0], d[1]);
-        return true;
-      }
+  virtual bool setMeasurementData(const number_t* d) {
+    _measurement = Vector2(d[0], d[1]);
+    return true;
+  }
 
-      virtual bool getMeasurementData(number_t* d) const {
-        Eigen::Map<Vector2> m(d);
-        m = _measurement;
-        return true;
-      }
+  virtual bool getMeasurementData(number_t* d) const {
+    Eigen::Map<Vector2> m(d);
+    m = _measurement;
+    return true;
+  }
 
-      virtual int measurementDimension() const {return 2;}
+  virtual int measurementDimension() const { return 2; }
 
-      virtual bool setMeasurementFromState() {
-        const VertexPointXY* v1 = static_cast<const VertexPointXY*>(_vertices[0]);
-        const VertexPointXY* v2 = static_cast<const VertexPointXY*>(_vertices[1]);
-        _measurement = v2->estimate()-v1->estimate();
-        return true;
-      }
+  virtual bool setMeasurementFromState() {
+    const VertexPointXY* v1 = static_cast<const VertexPointXY*>(_vertices[0]);
+    const VertexPointXY* v2 = static_cast<const VertexPointXY*>(_vertices[1]);
+    _measurement = v2->estimate() - v1->estimate();
+    return true;
+  }
 
-
-      virtual number_t initialEstimatePossible(const OptimizableGraph::VertexSet& , OptimizableGraph::Vertex* ) { return 0;}
+  virtual number_t initialEstimatePossible(const OptimizableGraph::VertexSet&,
+                                           OptimizableGraph::Vertex*) {
+    return 0;
+  }
 #ifndef NUMERIC_JACOBIAN_TWO_D_TYPES
-      virtual void linearizeOplus();
+  virtual void linearizeOplus();
 #endif
-  };
+};
 
-
-} // end namespace
+}  // namespace g2o
 
 #endif

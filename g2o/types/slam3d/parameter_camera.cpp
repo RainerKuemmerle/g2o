@@ -25,118 +25,120 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "parameter_camera.h"
+
 #include "isometry3d_gradients.h"
 #include "isometry3d_mappings.h"
 
 #ifdef G2O_HAVE_OPENGL
-#include "g2o/stuff/opengl_wrapper.h"
 #include "g2o/stuff/opengl_primitives.h"
+#include "g2o/stuff/opengl_wrapper.h"
 #endif
 
 using namespace std;
 
 namespace g2o {
 
-  ParameterCamera::ParameterCamera(){
-    setId(-1);
-    setKcam(1,1,0.5,0.5);
-    setOffset();
-  }
+ParameterCamera::ParameterCamera() {
+  setId(-1);
+  setKcam(1, 1, 0.5, 0.5);
+  setOffset();
+}
 
-  void ParameterCamera::setOffset(const Isometry3& offset_){
-    ParameterSE3Offset::setOffset(offset_);
-    _Kcam_inverseOffsetR = _Kcam * inverseOffset().rotation();
-  }
+void ParameterCamera::setOffset(const Isometry3& offset_) {
+  ParameterSE3Offset::setOffset(offset_);
+  _Kcam_inverseOffsetR = _Kcam * inverseOffset().rotation();
+}
 
-  void ParameterCamera::setKcam(number_t fx, number_t fy, number_t cx, number_t cy){
-    _Kcam.setZero();
-    _Kcam(0,0) = fx;
-    _Kcam(1,1) = fy;
-    _Kcam(0,2) = cx;
-    _Kcam(1,2) = cy;
-    _Kcam(2,2) = 1.0;
-    _invKcam = _Kcam.inverse();
-    _Kcam_inverseOffsetR = _Kcam * inverseOffset().rotation();
-  }
+void ParameterCamera::setKcam(number_t fx, number_t fy, number_t cx,
+                              number_t cy) {
+  _Kcam.setZero();
+  _Kcam(0, 0) = fx;
+  _Kcam(1, 1) = fy;
+  _Kcam(0, 2) = cx;
+  _Kcam(1, 2) = cy;
+  _Kcam(2, 2) = 1.0;
+  _invKcam = _Kcam.inverse();
+  _Kcam_inverseOffsetR = _Kcam * inverseOffset().rotation();
+}
 
+bool ParameterCamera::read(std::istream& is) {
+  Vector7 off;
+  internal::readVector(is, off);
+  // normalize the quaternion to recover numerical precision lost by storing as
+  // human readable text
+  Vector4::MapType(off.data() + 3).normalize();
+  setOffset(internal::fromVectorQT(off));
+  number_t fx, fy, cx, cy;
+  is >> fx >> fy >> cx >> cy;
+  setKcam(fx, fy, cx, cy);
+  return is.good();
+}
 
-  bool ParameterCamera::read(std::istream& is) {
-    Vector7 off;
-    internal::readVector(is, off);
-    // normalize the quaternion to recover numerical precision lost by storing as human readable text
-    Vector4::MapType(off.data()+3).normalize();
-    setOffset(internal::fromVectorQT(off));
-    number_t fx,fy,cx,cy;
-    is >> fx >> fy >> cx >> cy;
-    setKcam(fx,fy,cx,cy);
-    return is.good();
-  }
+bool ParameterCamera::write(std::ostream& os) const {
+  internal::writeVector(os, internal::toVectorQT(_offset));
+  os << _Kcam(0, 0) << " ";
+  os << _Kcam(1, 1) << " ";
+  os << _Kcam(0, 2) << " ";
+  os << _Kcam(1, 2) << " ";
+  return os.good();
+}
 
-  bool ParameterCamera::write(std::ostream& os) const {
-    internal::writeVector(os, internal::toVectorQT(_offset));
-    os << _Kcam(0,0) << " ";
-    os << _Kcam(1,1) << " ";
-    os << _Kcam(0,2) << " ";
-    os << _Kcam(1,2) << " ";
-    return os.good();
-  }
+bool CacheCamera::resolveDependancies() {
+  if (!CacheSE3Offset::resolveDependancies()) return false;
+  params = dynamic_cast<ParameterCamera*>(_parameters[0]);
+  return params != 0;
+}
 
-  bool CacheCamera::resolveDependancies(){
-    if  (!CacheSE3Offset::resolveDependancies())
-      return false;
-    params = dynamic_cast<ParameterCamera*>(_parameters[0]);
-    return params != 0;
-  }
-
-  void CacheCamera::updateImpl(){
-    CacheSE3Offset::updateImpl();
-    _w2i.matrix().topLeftCorner<3,4>() = params->Kcam() * w2n().matrix().topLeftCorner<3,4>();
-  }
+void CacheCamera::updateImpl() {
+  CacheSE3Offset::updateImpl();
+  _w2i.matrix().topLeftCorner<3, 4>() =
+      params->Kcam() * w2n().matrix().topLeftCorner<3, 4>();
+}
 
 #ifdef G2O_HAVE_OPENGL
 
-  CacheCameraDrawAction::CacheCameraDrawAction(): DrawAction(typeid(CacheCamera).name()){
-    _previousParams = (DrawAction::Parameters*)0x42;
-    refreshPropertyPtrs(0);
+CacheCameraDrawAction::CacheCameraDrawAction()
+    : DrawAction(typeid(CacheCamera).name()) {
+  _previousParams = (DrawAction::Parameters*)0x42;
+  refreshPropertyPtrs(0);
+}
+
+bool CacheCameraDrawAction::refreshPropertyPtrs(
+    HyperGraphElementAction::Parameters* params_) {
+  if (!DrawAction::refreshPropertyPtrs(params_)) return false;
+  if (_previousParams) {
+    _cameraZ = _previousParams->makeProperty<FloatProperty>(
+        _typeName + "::CAMERA_Z", .05f);
+    _cameraSide = _previousParams->makeProperty<FloatProperty>(
+        _typeName + "::CAMERA_SIDE", .05f);
+
+  } else {
+    _cameraZ = 0;
+    _cameraSide = 0;
   }
+  return true;
+}
 
+HyperGraphElementAction* CacheCameraDrawAction::operator()(
+    HyperGraph::HyperGraphElement* element,
+    HyperGraphElementAction::Parameters* params) {
+  if (typeid(*element).name() != _typeName) return nullptr;
+  CacheCamera* that = static_cast<CacheCamera*>(element);
+  refreshPropertyPtrs(params);
+  if (!_previousParams) return this;
 
-  bool CacheCameraDrawAction::refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_){
-    if (! DrawAction::refreshPropertyPtrs(params_))
-      return false;
-    if (_previousParams){
-      _cameraZ = _previousParams->makeProperty<FloatProperty>(_typeName + "::CAMERA_Z", .05f);
-      _cameraSide = _previousParams->makeProperty<FloatProperty>(_typeName + "::CAMERA_SIDE", .05f);
+  if (_show && !_show->value()) return this;
 
-    } else {
-      _cameraZ = 0;
-      _cameraSide = 0;
-    }
-    return true;
-  }
-
-  HyperGraphElementAction* CacheCameraDrawAction::operator()(HyperGraph::HyperGraphElement* element,
-                 HyperGraphElementAction::Parameters* params){
-    if (typeid(*element).name()!=_typeName)
-      return nullptr;
-    CacheCamera* that = static_cast<CacheCamera*>(element);
-    refreshPropertyPtrs(params);
-    if (! _previousParams)
-      return this;
-
-    if (_show && !_show->value())
-      return this;
-
-    glPushAttrib(GL_COLOR);
-    glColor3f(POSE_PARAMETER_COLOR);
-    glPushMatrix();
-    glMultMatrixd(that->camParams()->offset().cast<double>().data());
-    glRotatef(180.0f, 0.0f, 1.0f, 0.0f);
-    opengl::drawPyramid(_cameraSide->value(), _cameraZ->value());
-    glPopMatrix();
-    glPopAttrib();
-    return this;
-  }
+  glPushAttrib(GL_COLOR);
+  glColor3f(POSE_PARAMETER_COLOR);
+  glPushMatrix();
+  glMultMatrixd(that->camParams()->offset().cast<double>().data());
+  glRotatef(180.0f, 0.0f, 1.0f, 0.0f);
+  opengl::drawPyramid(_cameraSide->value(), _cameraZ->value());
+  glPopMatrix();
+  glPopAttrib();
+  return this;
+}
 #endif
 
-}
+}  // namespace g2o

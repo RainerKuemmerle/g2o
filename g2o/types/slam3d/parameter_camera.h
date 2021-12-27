@@ -28,60 +28,63 @@
 #define G2O_CAMERA_PARAMETERS_H_
 
 #include "g2o/core/hyper_graph_action.h"
-#include "parameter_se3_offset.h"
 #include "g2o_types_slam3d_api.h"
+#include "parameter_se3_offset.h"
 
 namespace g2o {
-  /**
-   * \brief parameters for a camera
-   */
-  class G2O_TYPES_SLAM3D_API ParameterCamera: public ParameterSE3Offset {
-    public:
-      EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
-      ParameterCamera();
-      void setKcam(number_t fx, number_t fy, number_t cx, number_t cy);
-      void setOffset(const Isometry3& offset_ = Isometry3::Identity());
+/**
+ * \brief parameters for a camera
+ */
+class G2O_TYPES_SLAM3D_API ParameterCamera : public ParameterSE3Offset {
+ public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
+  ParameterCamera();
+  void setKcam(number_t fx, number_t fy, number_t cx, number_t cy);
+  void setOffset(const Isometry3& offset_ = Isometry3::Identity());
 
-      virtual bool read(std::istream& is);
-      virtual bool write(std::ostream& os) const;
+  virtual bool read(std::istream& is);
+  virtual bool write(std::ostream& os) const;
 
-      const Matrix3& Kcam() const { return _Kcam;}
-      const Matrix3& invKcam() const { return _invKcam;}
-      const Matrix3& Kcam_inverseOffsetR() const { return _Kcam_inverseOffsetR;}
+  const Matrix3& Kcam() const { return _Kcam; }
+  const Matrix3& invKcam() const { return _invKcam; }
+  const Matrix3& Kcam_inverseOffsetR() const { return _Kcam_inverseOffsetR; }
 
-    protected:
-      Matrix3 _Kcam;
-      Matrix3 _invKcam;
-      Matrix3 _Kcam_inverseOffsetR;
-  };
+ protected:
+  Matrix3 _Kcam;
+  Matrix3 _invKcam;
+  Matrix3 _Kcam_inverseOffsetR;
+};
 
-  class G2O_TYPES_SLAM3D_API CacheCamera: public CacheSE3Offset {
-  public:
-    EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
-    //! parameters of the camera
-    const ParameterCamera* camParams() const {return params;}
-    //! return the world to image transform
-    const Affine3& w2i() const {return _w2i;}
+class G2O_TYPES_SLAM3D_API CacheCamera : public CacheSE3Offset {
+ public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
+  //! parameters of the camera
+  const ParameterCamera* camParams() const { return params; }
+  //! return the world to image transform
+  const Affine3& w2i() const { return _w2i; }
 
-  protected:
-    virtual void updateImpl();
-    virtual bool resolveDependancies();
-    Affine3 _w2i; ///< world to image transform
-    ParameterCamera* params;
-  };
-
+ protected:
+  virtual void updateImpl();
+  virtual bool resolveDependancies();
+  Affine3 _w2i;  ///< world to image transform
+  ParameterCamera* params;
+};
 
 #ifdef G2O_HAVE_OPENGL
-  class G2O_TYPES_SLAM3D_API CacheCameraDrawAction: public DrawAction{
-    public:
-      CacheCameraDrawAction();
-      virtual HyperGraphElementAction* operator()(HyperGraph::HyperGraphElement* element, HyperGraphElementAction::Parameters* params_ );
-    protected:
-      virtual bool refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_);
-      FloatProperty* _cameraZ, *_cameraSide;
-  };
+class G2O_TYPES_SLAM3D_API CacheCameraDrawAction : public DrawAction {
+ public:
+  CacheCameraDrawAction();
+  virtual HyperGraphElementAction* operator()(
+      HyperGraph::HyperGraphElement* element,
+      HyperGraphElementAction::Parameters* params_);
+
+ protected:
+  virtual bool refreshPropertyPtrs(
+      HyperGraphElementAction::Parameters* params_);
+  FloatProperty *_cameraZ, *_cameraSide;
+};
 #endif
 
-} // end namespace
+}  // namespace g2o
 
 #endif

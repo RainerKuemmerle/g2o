@@ -28,48 +28,46 @@
 #define G2O_TUTORIAL_PARAMETER_SE2_OFFSET_H
 
 #include "g2o/core/cache.h"
-#include "se2.h"
 #include "g2o_tutorial_slam2d_api.h"
+#include "se2.h"
 
 namespace g2o {
-  namespace tutorial {
+namespace tutorial {
 
-    class G2O_TUTORIAL_SLAM2D_API ParameterSE2Offset: public Parameter
-    {
-      public:
-        EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
-        ParameterSE2Offset();
+class G2O_TUTORIAL_SLAM2D_API ParameterSE2Offset : public Parameter {
+ public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
+  ParameterSE2Offset();
 
-        void setOffset(const SE2& offset = SE2());
+  void setOffset(const SE2& offset = SE2());
 
-        const SE2& offset() const { return _offset;}
-        const SE2& inverseOffset() const { return _inverseOffset;}
+  const SE2& offset() const { return _offset; }
+  const SE2& inverseOffset() const { return _inverseOffset; }
 
-        virtual bool read(std::istream& is);
-        virtual bool write(std::ostream& os) const;
+  virtual bool read(std::istream& is);
+  virtual bool write(std::ostream& os) const;
 
-      protected:
-        SE2 _offset;
-        SE2 _inverseOffset;
-    };
+ protected:
+  SE2 _offset;
+  SE2 _inverseOffset;
+};
 
-    class G2O_TUTORIAL_SLAM2D_API CacheSE2Offset: public Cache
-    {
-      public:
-        EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
+class G2O_TUTORIAL_SLAM2D_API CacheSE2Offset : public Cache {
+ public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
 
-        const SE2& w2n() const { return _w2n;}
-        const SE2& n2w() const { return _n2w;}
+  const SE2& w2n() const { return _w2n; }
+  const SE2& n2w() const { return _n2w; }
 
-      protected:
-        virtual void updateImpl();
-        virtual bool resolveDependancies();
+ protected:
+  virtual void updateImpl();
+  virtual bool resolveDependancies();
 
-        ParameterSE2Offset* _offsetParam;
-        SE2 _w2n, _n2w; 
-    };
+  ParameterSE2Offset* _offsetParam;
+  SE2 _w2n, _n2w;
+};
 
-  } // end namespace tutorial
-} // end namespace
+}  // end namespace tutorial
+}  // namespace g2o
 
 #endif

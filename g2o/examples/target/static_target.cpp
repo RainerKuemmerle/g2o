@@ -53,12 +53,14 @@ int main() {
   typedef BlockSolver<BlockSolverTraits<3, 3>> BlockSolver_3_3;
   OptimizationAlgorithmGaussNewton* solver =
       new OptimizationAlgorithmGaussNewton(g2o::make_unique<BlockSolver_3_3>(
-          g2o::make_unique<LinearSolverEigen<BlockSolver_3_3::PoseMatrixType>>()));
+          g2o::make_unique<
+              LinearSolverEigen<BlockSolver_3_3::PoseMatrixType>>()));
 
   optimizer.setAlgorithm(solver);
 
   // Sample the actual location of the target
-  Vector3d truePoint(sampleUniform(-500, 500), sampleUniform(-500, 500), sampleUniform(-500, 500));
+  Vector3d truePoint(sampleUniform(-500, 500), sampleUniform(-500, 500),
+                     sampleUniform(-500, 500));
 
   // Construct vertex which corresponds to the actual point of the target
   VertexPosition3D* position = new VertexPosition3D();
@@ -74,9 +76,10 @@ int main() {
   double noiseSigma = noiseLimit * noiseLimit / 12.0;
 
   for (int i = 0; i < numMeasurements; i++) {
-    Vector3d measurement = truePoint + Vector3d(sampleUniform(-0.5, 0.5) * noiseLimit,
-                                                sampleUniform(-0.5, 0.5) * noiseLimit,
-                                                sampleUniform(-0.5, 0.5) * noiseLimit);
+    Vector3d measurement =
+        truePoint + Vector3d(sampleUniform(-0.5, 0.5) * noiseLimit,
+                             sampleUniform(-0.5, 0.5) * noiseLimit,
+                             sampleUniform(-0.5, 0.5) * noiseLimit);
     GPSObservationPosition3DEdge* goe = new GPSObservationPosition3DEdge();
     goe->setVertex(0, position);
     goe->setMeasurement(measurement);
@@ -91,7 +94,9 @@ int main() {
 
   cout << "truePoint=\n" << truePoint << endl;
   cerr << "computed estimate=\n"
-       << dynamic_cast<VertexPosition3D*>(optimizer.vertices().find(0)->second)->estimate() << endl;
+       << dynamic_cast<VertexPosition3D*>(optimizer.vertices().find(0)->second)
+              ->estimate()
+       << endl;
 
   // position->setMarginalized(true);
 

@@ -29,7 +29,8 @@
 namespace g2o {
 
 // point to camera projection, monocular
-EdgeProjectP2MC::EdgeProjectP2MC() : BaseBinaryEdge<2, Vector2, VertexPointXYZ, VertexCam>() {
+EdgeProjectP2MC::EdgeProjectP2MC()
+    : BaseBinaryEdge<2, Vector2, VertexPointXYZ, VertexCam>() {
   information().setIdentity();
 }
 
@@ -47,7 +48,8 @@ bool EdgeProjectP2MC::write(std::ostream &os) const {
 
 void EdgeProjectP2MC::computeError() {
   // from <Point> to <Cam>
-  const VertexPointXYZ *point = static_cast<const VertexPointXYZ *>(_vertices[0]);
+  const VertexPointXYZ *point =
+      static_cast<const VertexPointXYZ *>(_vertices[0]);
   const VertexCam *cam = static_cast<const VertexCam *>(_vertices[1]);
 
   // calculate the projection
@@ -65,7 +67,8 @@ void EdgeProjectP2MC::computeError() {
   // error, which is backwards from the normal observed - calculated
   // _measurement is the measured projection
   _error = perr - _measurement;
-  // std::cerr << _error.x() << " " << _error.y() <<  " " << chi2() << std::endl;
+  // std::cerr << _error.x() << " " << _error.y() <<  " " << chi2() <<
+  // std::endl;
 }
 
 void EdgeProjectP2MC::linearizeOplus() {
@@ -97,7 +100,9 @@ void EdgeProjectP2MC::linearizeOplus() {
   number_t ipz2fy = ipz2 * cam.Kcam(1, 1);  // Fy
 
   // check for local vars
-  Vector3 pwt = (pt - trans).head<3>();  // transform translations, use differential rotation
+  Vector3 pwt =
+      (pt - trans)
+          .head<3>();  // transform translations, use differential rotation
 
   // dx
   Vector3 dp = cam.dRdx * pwt;  // dR'/dq * [pw - t]

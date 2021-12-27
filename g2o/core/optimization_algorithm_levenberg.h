@@ -27,69 +27,75 @@
 #ifndef G2O_SOLVER_LEVENBERG_H
 #define G2O_SOLVER_LEVENBERG_H
 
-#include "optimization_algorithm_with_hessian.h"
-#include "g2o_core_api.h"
-
 #include <memory>
+
+#include "g2o_core_api.h"
+#include "optimization_algorithm_with_hessian.h"
 
 namespace g2o {
 
+/**
+ * \brief Implementation of the Levenberg Algorithm
+ */
+class G2O_CORE_API OptimizationAlgorithmLevenberg
+    : public OptimizationAlgorithmWithHessian {
+ public:
   /**
-   * \brief Implementation of the Levenberg Algorithm
+   * construct the Levenberg algorithm, which will use the given Solver for
+   * solving the linearized system.
    */
-  class G2O_CORE_API OptimizationAlgorithmLevenberg : public OptimizationAlgorithmWithHessian
-  {
-    public:
-      /**
-       * construct the Levenberg algorithm, which will use the given Solver for solving the
-       * linearized system.
-       */
-      explicit OptimizationAlgorithmLevenberg(std::unique_ptr<Solver> solver);
-      virtual ~OptimizationAlgorithmLevenberg();
+  explicit OptimizationAlgorithmLevenberg(std::unique_ptr<Solver> solver);
+  virtual ~OptimizationAlgorithmLevenberg();
 
-      virtual SolverResult solve(int iteration, bool online = false);
+  virtual SolverResult solve(int iteration, bool online = false);
 
-      virtual void printVerbose(std::ostream& os) const;
+  virtual void printVerbose(std::ostream& os) const;
 
-      //! return the currently used damping factor
-      number_t currentLambda() const { return _currentLambda;}
+  //! return the currently used damping factor
+  number_t currentLambda() const { return _currentLambda; }
 
-      //! the number of internal iteration if an update step increases chi^2 within Levenberg-Marquardt
-      void setMaxTrialsAfterFailure(int max_trials);
+  //! the number of internal iteration if an update step increases chi^2 within
+  //! Levenberg-Marquardt
+  void setMaxTrialsAfterFailure(int max_trials);
 
-      //! get the number of inner iterations for Levenberg-Marquardt
-      int maxTrialsAfterFailure() const { return _maxTrialsAfterFailure->value();}
+  //! get the number of inner iterations for Levenberg-Marquardt
+  int maxTrialsAfterFailure() const { return _maxTrialsAfterFailure->value(); }
 
-      //! return the lambda set by the user, if < 0 the SparseOptimizer will compute the initial lambda
-      number_t userLambdaInit() {return _userLambdaInit->value();}
-      //! specify the initial lambda used for the first iteraion, if not given the SparseOptimizer tries to compute a suitable value
-      void setUserLambdaInit(number_t lambda);
+  //! return the lambda set by the user, if < 0 the SparseOptimizer will compute
+  //! the initial lambda
+  number_t userLambdaInit() { return _userLambdaInit->value(); }
+  //! specify the initial lambda used for the first iteraion, if not given the
+  //! SparseOptimizer tries to compute a suitable value
+  void setUserLambdaInit(number_t lambda);
 
-      //! return the number of levenberg iterations performed in the last round
-      int levenbergIteration() { return _levenbergIterations;}
+  //! return the number of levenberg iterations performed in the last round
+  int levenbergIteration() { return _levenbergIterations; }
 
-    protected:
-      // Levenberg parameters
-      Property<int>* _maxTrialsAfterFailure;
-      Property<number_t>* _userLambdaInit;
-      number_t _currentLambda;
-      number_t _tau;
-      number_t _goodStepLowerScale; ///< lower bound for lambda decrease if a good LM step
-      number_t _goodStepUpperScale; ///< upper bound for lambda decrease if a good LM step
-      number_t _ni;
-      int _levenbergIterations;   ///< the numer of levenberg iterations performed to accept the last step
+ protected:
+  // Levenberg parameters
+  Property<int>* _maxTrialsAfterFailure;
+  Property<number_t>* _userLambdaInit;
+  number_t _currentLambda;
+  number_t _tau;
+  number_t _goodStepLowerScale;  ///< lower bound for lambda decrease if a good
+                                 ///< LM step
+  number_t _goodStepUpperScale;  ///< upper bound for lambda decrease if a good
+                                 ///< LM step
+  number_t _ni;
+  int _levenbergIterations;  ///< the numer of levenberg iterations performed to
+                             ///< accept the last step
 
-      /**
-       * helper for Levenberg, this function computes the initial damping factor, if the user did not
-       * specify an own value, see setUserLambdaInit()
-       */
-      number_t computeLambdaInit() const;
-      number_t computeScale() const;
+  /**
+   * helper for Levenberg, this function computes the initial damping factor, if
+   * the user did not specify an own value, see setUserLambdaInit()
+   */
+  number_t computeLambdaInit() const;
+  number_t computeScale() const;
 
-  private:
-      std::unique_ptr<Solver> m_solver;
-  };
+ private:
+  std::unique_ptr<Solver> m_solver;
+};
 
-} // end namespace
+}  // namespace g2o
 
 #endif

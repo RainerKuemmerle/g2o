@@ -27,37 +27,30 @@
 #include "edge_xy_prior.h"
 
 #ifdef G2O_HAVE_OPENGL
-#include "g2o/stuff/opengl_wrapper.h"
 #include "g2o/stuff/opengl_primitives.h"
+#include "g2o/stuff/opengl_wrapper.h"
 #endif
 
 namespace g2o {
 
-  EdgeXYPrior::EdgeXYPrior() :
-    BaseUnaryEdge<2, Vector2, VertexPointXY>()
-  {
-    _information.setIdentity();
-    _error.setZero();
-  }
+EdgeXYPrior::EdgeXYPrior() : BaseUnaryEdge<2, Vector2, VertexPointXY>() {
+  _information.setIdentity();
+  _error.setZero();
+}
 
-  bool EdgeXYPrior::read(std::istream& is)
-  {
-    internal::readVector(is, _measurement);
-    readInformationMatrix(is);
-    return true;
-  }
+bool EdgeXYPrior::read(std::istream& is) {
+  internal::readVector(is, _measurement);
+  readInformationMatrix(is);
+  return true;
+}
 
-  bool EdgeXYPrior::write(std::ostream& os) const
-  {
-    internal::writeVector(os, measurement());
-    return writeInformationMatrix(os);
-  }
+bool EdgeXYPrior::write(std::ostream& os) const {
+  internal::writeVector(os, measurement());
+  return writeInformationMatrix(os);
+}
 
 #ifndef NUMERIC_JACOBIAN_TWO_D_TYPES
-  void EdgeXYPrior::linearizeOplus()
-  {
-    _jacobianOplusXi=Matrix2::Identity();
-  }
+void EdgeXYPrior::linearizeOplus() { _jacobianOplusXi = Matrix2::Identity(); }
 #endif
 
-} // end namespace
+}  // namespace g2o

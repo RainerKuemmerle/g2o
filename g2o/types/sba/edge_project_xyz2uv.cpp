@@ -50,7 +50,8 @@ bool EdgeProjectXYZ2UV::write(std::ostream& os) const {
 void EdgeProjectXYZ2UV::computeError() {
   const VertexSE3Expmap* v1 = static_cast<const VertexSE3Expmap*>(_vertices[1]);
   const VertexPointXYZ* v2 = static_cast<const VertexPointXYZ*>(_vertices[0]);
-  const CameraParameters* cam = static_cast<const CameraParameters*>(parameter(0));
+  const CameraParameters* cam =
+      static_cast<const CameraParameters*>(parameter(0));
   _error = measurement() - cam->cam_map(v1->estimate().map(v2->estimate()));
 }
 
@@ -66,7 +67,8 @@ void EdgeProjectXYZ2UV::linearizeOplus() {
   number_t z = xyz_trans[2];
   number_t z_2 = z * z;
 
-  const CameraParameters* cam = static_cast<const CameraParameters*>(parameter(0));
+  const CameraParameters* cam =
+      static_cast<const CameraParameters*>(parameter(0));
 
   Eigen::Matrix<number_t, 2, 3, Eigen::ColMajor> tmp;
   tmp(0, 0) = cam->focal_length;

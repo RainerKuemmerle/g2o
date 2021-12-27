@@ -24,15 +24,15 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+#include <Eigen/Core>
+#include <Eigen/StdVector>
 #include <cmath>
 #include <fstream>
 #include <iostream>
 #include <vector>
 
-#include <Eigen/Core>
-#include <Eigen/StdVector>
-
 #include "g2o/core/block_solver.h"
+#include "g2o/core/factory.h"
 #include "g2o/core/optimization_algorithm_gauss_newton.h"
 #include "g2o/core/optimization_algorithm_levenberg.h"
 #include "g2o/core/robust_kernel_impl.h"
@@ -44,8 +44,6 @@
 #include "g2o/types/slam3d/edge_se3.h"
 #include "g2o/types/slam3d/types_slam3d.h"
 #include "g2o/types/slam3d/vertex_se3.h"
-
-#include "g2o/core/factory.h"
 
 using namespace std;
 using namespace g2o;

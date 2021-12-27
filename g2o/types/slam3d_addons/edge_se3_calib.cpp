@@ -30,14 +30,17 @@
 
 namespace g2o {
 
-EdgeSE3Calib::EdgeSE3Calib() : BaseVariableSizedEdge<6, Isometry3>() { resize(3); }
+EdgeSE3Calib::EdgeSE3Calib() : BaseVariableSizedEdge<6, Isometry3>() {
+  resize(3);
+}
 
 void EdgeSE3Calib::computeError() {
   const VertexSE3* v1 = static_cast<const VertexSE3*>(_vertices[0]);
   const VertexSE3* v2 = static_cast<const VertexSE3*>(_vertices[1]);
   const VertexSE3* calib = static_cast<const VertexSE3*>(_vertices[2]);
-  _error = g2o::internal::toVectorMQT(_measurement.inverse() * calib->estimate().inverse() * v1->estimate().inverse() *
-                                      v2->estimate() * calib->estimate());
+  _error = g2o::internal::toVectorMQT(
+      _measurement.inverse() * calib->estimate().inverse() *
+      v1->estimate().inverse() * v2->estimate() * calib->estimate());
 }
 
 bool EdgeSE3Calib::write(std::ostream& os) const {
@@ -48,7 +51,8 @@ bool EdgeSE3Calib::write(std::ostream& os) const {
 bool EdgeSE3Calib::read(std::istream& is) {
   Vector7 meas;
   internal::readVector(is, meas);
-  // normalize the quaternion to recover numerical precision lost by storing as human readable text
+  // normalize the quaternion to recover numerical precision lost by storing as
+  // human readable text
   Vector4::MapType(meas.data() + 3).normalize();
   setMeasurement(g2o::internal::fromVectorQT(meas));
   return readInformationMatrix(is);

@@ -26,75 +26,68 @@
 
 #include "optimization_algorithm_with_hessian.h"
 
-#include "solver.h"
-#include "optimizable_graph.h"
-#include "sparse_optimizer.h"
-
 #include <iostream>
+
+#include "optimizable_graph.h"
+#include "solver.h"
+#include "sparse_optimizer.h"
 using namespace std;
 
 namespace g2o {
 
-  OptimizationAlgorithmWithHessian::OptimizationAlgorithmWithHessian(Solver& solver) :
-    OptimizationAlgorithm(),
-    _solver(solver)
-  {
-    _writeDebug = _properties.makeProperty<Property<bool> >("writeDebug", true);
-  }
+OptimizationAlgorithmWithHessian::OptimizationAlgorithmWithHessian(
+    Solver& solver)
+    : OptimizationAlgorithm(), _solver(solver) {
+  _writeDebug = _properties.makeProperty<Property<bool> >("writeDebug", true);
+}
 
-  OptimizationAlgorithmWithHessian::~OptimizationAlgorithmWithHessian()
-  {}
+OptimizationAlgorithmWithHessian::~OptimizationAlgorithmWithHessian() {}
 
-  bool OptimizationAlgorithmWithHessian::init(bool online)
-  {
-    assert(_optimizer && "_optimizer not set");
-    _solver.setWriteDebug(_writeDebug->value());
-    bool useSchur=false;
-    for (OptimizableGraph::VertexContainer::const_iterator it=_optimizer->activeVertices().begin(); it!=_optimizer->activeVertices().end(); ++it) {
-      OptimizableGraph::Vertex* v= *it;
-      if (v->marginalized()){
-        useSchur=true;
-        break;
-      }
+bool OptimizationAlgorithmWithHessian::init(bool online) {
+  assert(_optimizer && "_optimizer not set");
+  _solver.setWriteDebug(_writeDebug->value());
+  bool useSchur = false;
+  for (OptimizableGraph::VertexContainer::const_iterator it =
+           _optimizer->activeVertices().begin();
+       it != _optimizer->activeVertices().end(); ++it) {
+    OptimizableGraph::Vertex* v = *it;
+    if (v->marginalized()) {
+      useSchur = true;
+      break;
     }
-    if (useSchur)
-    {
-      if  (_solver.supportsSchur())
-        _solver.setSchur(true);
-    }
-    else
-    {
-      if  (_solver.supportsSchur())
-        _solver.setSchur(false);
-    }
-
-    bool initState = _solver.init(_optimizer, online);
-    return initState;
+  }
+  if (useSchur) {
+    if (_solver.supportsSchur()) _solver.setSchur(true);
+  } else {
+    if (_solver.supportsSchur()) _solver.setSchur(false);
   }
 
-  bool OptimizationAlgorithmWithHessian::computeMarginals(SparseBlockMatrix<MatrixX>& spinv, const std::vector<std::pair<int, int> >& blockIndices)
-  {
-    return _solver.computeMarginals(spinv, blockIndices);
-  }
+  bool initState = _solver.init(_optimizer, online);
+  return initState;
+}
 
-  bool OptimizationAlgorithmWithHessian::buildLinearStructure()
-  {
-    return _solver.buildStructure();
-  }
+bool OptimizationAlgorithmWithHessian::computeMarginals(
+    SparseBlockMatrix<MatrixX>& spinv,
+    const std::vector<std::pair<int, int> >& blockIndices) {
+  return _solver.computeMarginals(spinv, blockIndices);
+}
 
-  void OptimizationAlgorithmWithHessian::updateLinearSystem()
-  {
-    _solver.buildSystem();
-  }
+bool OptimizationAlgorithmWithHessian::buildLinearStructure() {
+  return _solver.buildStructure();
+}
 
-  bool OptimizationAlgorithmWithHessian::updateStructure(const std::vector<HyperGraph::Vertex*>& vset, const HyperGraph::EdgeSet& edges)
-  {
-    return _solver.updateStructure(vset, edges);
-  }
+void OptimizationAlgorithmWithHessian::updateLinearSystem() {
+  _solver.buildSystem();
+}
 
-  void OptimizationAlgorithmWithHessian::setWriteDebug(bool writeDebug)
-  {
-    _writeDebug->setValue(writeDebug);
-  }
+bool OptimizationAlgorithmWithHessian::updateStructure(
+    const std::vector<HyperGraph::Vertex*>& vset,
+    const HyperGraph::EdgeSet& edges) {
+  return _solver.updateStructure(vset, edges);
+}
 
-} // end namespace
+void OptimizationAlgorithmWithHessian::setWriteDebug(bool writeDebug) {
+  _writeDebug->setValue(writeDebug);
+}
+
+}  // namespace g2o

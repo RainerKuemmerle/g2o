@@ -28,8 +28,8 @@
 #include "g2o/config.h"
 // clang-format on
 
-#include "g2o/core/optimization_algorithm_factory.h"
 #include "g2o/core/optimization_algorithm.h"
+#include "g2o/core/optimization_algorithm_factory.h"
 #include "gmock/gmock.h"
 
 #if defined G2O_HAVE_CHOLMOD
@@ -46,7 +46,8 @@ G2O_USE_OPTIMIZATION_LIBRARY(structure_only);
 G2O_USE_OPTIMIZATION_LIBRARY(slam2d_linear);
 
 TEST(AlgorithmFactory, ContainsBasicSolvers) {
-  g2o::OptimizationAlgorithmFactory* factory = g2o::OptimizationAlgorithmFactory::instance();
+  g2o::OptimizationAlgorithmFactory* factory =
+      g2o::OptimizationAlgorithmFactory::instance();
 
   // collect all names
   std::set<std::string> names;
@@ -60,7 +61,8 @@ TEST(AlgorithmFactory, ContainsBasicSolvers) {
 }
 
 TEST(AlgorithmFactory, AllocatingSolver) {
-  g2o::OptimizationAlgorithmFactory* factory = g2o::OptimizationAlgorithmFactory::instance();
+  g2o::OptimizationAlgorithmFactory* factory =
+      g2o::OptimizationAlgorithmFactory::instance();
 
   for (auto& creator : factory->creatorList()) {
     g2o::OptimizationAlgorithmProperty solverProperty;
@@ -73,7 +75,8 @@ TEST(AlgorithmFactory, AllocatingSolver) {
 }
 
 TEST(AlgorithmFactory, AllocatingInvalidReturnsNull) {
-  g2o::OptimizationAlgorithmFactory* factory = g2o::OptimizationAlgorithmFactory::instance();
+  g2o::OptimizationAlgorithmFactory* factory =
+      g2o::OptimizationAlgorithmFactory::instance();
 
   const std::string name("xyz_supper_solver");
   g2o::OptimizationAlgorithmProperty solverProperty;
@@ -83,7 +86,8 @@ TEST(AlgorithmFactory, AllocatingInvalidReturnsNull) {
 }
 
 TEST(AlgorithmFactory, PrintSolverProperties) {
-  g2o::OptimizationAlgorithmFactory* factory = g2o::OptimizationAlgorithmFactory::instance();
+  g2o::OptimizationAlgorithmFactory* factory =
+      g2o::OptimizationAlgorithmFactory::instance();
 
   const std::string name("gn_var");
   g2o::OptimizationAlgorithmProperty solverProperty;
@@ -98,7 +102,8 @@ TEST(AlgorithmFactory, PrintSolverProperties) {
 }
 
 TEST(AlgorithmFactory, ListsAllSolvers) {
-  g2o::OptimizationAlgorithmFactory* factory = g2o::OptimizationAlgorithmFactory::instance();
+  g2o::OptimizationAlgorithmFactory* factory =
+      g2o::OptimizationAlgorithmFactory::instance();
 
   // collect all names
   std::set<std::string> names;

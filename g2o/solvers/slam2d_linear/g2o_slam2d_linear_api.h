@@ -55,4 +55,4 @@
 #define G2O_SLAM2D_LINEAR_API
 #endif
 
-#endif // G2O_TYPES_SLAM2D_API_H
+#endif  // G2O_TYPES_SLAM2D_API_H

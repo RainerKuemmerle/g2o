@@ -24,26 +24,24 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include <iostream>
-#include <map>
 #include <csignal>
 #include <fstream>
+#include <iostream>
+#include <map>
 
-#include "g2o/types/sclam2d/types_sclam2d.h"
-#include "g2o/types/data/types_data.h"
-#include "gm2dl_io.h"
-
-#include "g2o/stuff/macros.h"
+#include "g2o/core/factory.h"
+#include "g2o/core/hyper_dijkstra.h"
+#include "g2o/core/optimization_algorithm_factory.h"
+#include "g2o/core/sparse_optimizer.h"
 #include "g2o/stuff/color_macros.h"
 #include "g2o/stuff/command_args.h"
 #include "g2o/stuff/filesys_tools.h"
+#include "g2o/stuff/macros.h"
 #include "g2o/stuff/string_tools.h"
 #include "g2o/stuff/timeutil.h"
-
-#include "g2o/core/sparse_optimizer.h"
-#include "g2o/core/hyper_dijkstra.h"
-#include "g2o/core/optimization_algorithm_factory.h"
-#include "g2o/core/factory.h"
+#include "g2o/types/data/types_data.h"
+#include "g2o/types/sclam2d/types_sclam2d.h"
+#include "gm2dl_io.h"
 
 using namespace std;
 using namespace g2o;
@@ -53,8 +51,7 @@ static bool hasToStop = false;
 G2O_USE_OPTIMIZATION_LIBRARY(eigen);
 G2O_USE_TYPE_GROUP(slam2d);
 
-void sigquit_handler(int sig)
-{
+void sigquit_handler(int sig) {
   if (sig == SIGINT) {
     hasToStop = 1;
     static int cnt = 0;
@@ -65,8 +62,7 @@ void sigquit_handler(int sig)
   }
 }
 
-int main(int argc, char** argv)
-{
+int main(int argc, char** argv) {
   int maxIterations;
   bool verbose;
   string inputFilename;
@@ -76,15 +72,21 @@ int main(int argc, char** argv)
   // command line parsing
   CommandArgs commandLineArguments;
   commandLineArguments.param("i", maxIterations, 10, "perform n iterations");
-  commandLineArguments.param("v", verbose, false, "verbose output of the optimization process");
-  commandLineArguments.param("guess", initialGuess, false, "initial guess based on spanning tree");
-  commandLineArguments.param("gnudump", gnudump, "", "dump to gnuplot data file");
-  commandLineArguments.param("o", outputfilename, "", "output final version of the graph");
-  commandLineArguments.paramLeftOver("gm2dl-input", inputFilename, "", "gm2dl file which will be processed");
+  commandLineArguments.param("v", verbose, false,
+                             "verbose output of the optimization process");
+  commandLineArguments.param("guess", initialGuess, false,
+                             "initial guess based on spanning tree");
+  commandLineArguments.param("gnudump", gnudump, "",
+                             "dump to gnuplot data file");
+  commandLineArguments.param("o", outputfilename, "",
+                             "output final version of the graph");
+  commandLineArguments.paramLeftOver("gm2dl-input", inputFilename, "",
+                                     "gm2dl file which will be processed");
 
   commandLineArguments.parseArgs(argc, argv);
 
-  OptimizationAlgorithmFactory* solverFactory = OptimizationAlgorithmFactory::instance();
+  OptimizationAlgorithmFactory* solverFactory =
+      OptimizationAlgorithmFactory::instance();
 
   SparseOptimizer optimizer;
   optimizer.setVerbose(verbose);
@@ -94,21 +96,23 @@ int main(int argc, char** argv)
   optimizer.setAlgorithm(solverFactory->construct("lm_var", solverProperty));
 
   // loading
-  if (! Gm2dlIO::readGm2dl(inputFilename, optimizer, false)) {
+  if (!Gm2dlIO::readGm2dl(inputFilename, optimizer, false)) {
     cerr << "Error while loading gm2dl file" << endl;
   }
 
-  VertexSE2* laserOffset = dynamic_cast<VertexSE2*>(optimizer.vertex(numeric_limits<int>::max()));
-  //laserOffset->setEstimate(SE2()); // set to Identity
+  VertexSE2* laserOffset =
+      dynamic_cast<VertexSE2*>(optimizer.vertex(numeric_limits<int>::max()));
+  // laserOffset->setEstimate(SE2()); // set to Identity
   if (laserOffset) {
-    cerr << "Initial laser offset " << laserOffset->estimate().toVector().transpose() << endl;
+    cerr << "Initial laser offset "
+         << laserOffset->estimate().toVector().transpose() << endl;
   }
   bool gaugeFreedom = optimizer.gaugeFreedom();
 
   OptimizableGraph::Vertex* gauge = optimizer.findGauge();
   if (gaugeFreedom) {
-    if (! gauge) {
-      cerr <<  "# cannot find a vertex to fix in this thing" << endl;
+    if (!gauge) {
+      cerr << "# cannot find a vertex to fix in this thing" << endl;
       return 2;
     } else {
       cerr << "# graph is fixed by node " << gauge->id() << endl;
@@ -122,38 +126,44 @@ int main(int argc, char** argv)
   HyperDijkstra d(&optimizer);
   UniformCostFunction f;
   d.shortestPaths(gauge, &f);
-  //cerr << PVAR(d.visited().size()) << endl;
+  // cerr << PVAR(d.visited().size()) << endl;
 
-  if (d.visited().size()!=optimizer.vertices().size()) {
-    cerr << CL_RED("Warning: d.visited().size() != optimizer.vertices().size()") << endl;
+  if (d.visited().size() != optimizer.vertices().size()) {
+    cerr << CL_RED("Warning: d.visited().size() != optimizer.vertices().size()")
+         << endl;
     cerr << "visited: " << d.visited().size() << endl;
     cerr << "vertices: " << optimizer.vertices().size() << endl;
     if (1)
-    for (SparseOptimizer::VertexIDMap::const_iterator it = optimizer.vertices().begin(); it != optimizer.vertices().end(); ++it) {
-      OptimizableGraph::Vertex* v = static_cast<OptimizableGraph::Vertex*>(it->second);
-      if (d.visited().count(v) == 0) {
-        cerr << "\t unvisited vertex " << it->first << " " << (void*)v << endl;
-        v->setFixed(true);
+      for (SparseOptimizer::VertexIDMap::const_iterator it =
+               optimizer.vertices().begin();
+           it != optimizer.vertices().end(); ++it) {
+        OptimizableGraph::Vertex* v =
+            static_cast<OptimizableGraph::Vertex*>(it->second);
+        if (d.visited().count(v) == 0) {
+          cerr << "\t unvisited vertex " << it->first << " " << (void*)v
+               << endl;
+          v->setFixed(true);
+        }
       }
-    }
   }
 
   optimizer.initializeOptimization();
   optimizer.computeActiveErrors();
   cerr << "Initial chi2 = " << FIXED(optimizer.chi2()) << endl;
 
-  //if (guessCostFunction)
-  //optimizer.computeInitialGuess(guessCostFunction);
+  // if (guessCostFunction)
+  // optimizer.computeInitialGuess(guessCostFunction);
 
   signal(SIGINT, sigquit_handler);
 
-  int i=optimizer.optimize(maxIterations);
-  if (maxIterations > 0 && !i){
+  int i = optimizer.optimize(maxIterations);
+  if (maxIterations > 0 && !i) {
     cerr << "optimize failed, result might be invalid" << endl;
   }
 
   if (laserOffset) {
-    cerr << "Calibrated laser offset " << laserOffset->estimate().toVector().transpose() << endl;
+    cerr << "Calibrated laser offset "
+         << laserOffset->estimate().toVector().transpose() << endl;
   }
 
   if (outputfilename.size() > 0) {
@@ -165,7 +175,9 @@ int main(int argc, char** argv)
 
   if (gnudump.size() > 0) {
     ofstream fout(gnudump.c_str());
-    for (SparseOptimizer::VertexIDMap::const_iterator it = optimizer.vertices().begin(); it != optimizer.vertices().end(); ++it) {
+    for (SparseOptimizer::VertexIDMap::const_iterator it =
+             optimizer.vertices().begin();
+         it != optimizer.vertices().end(); ++it) {
       VertexSE2* v = dynamic_cast<VertexSE2*>(it->second);
       fout << v->estimate().toVector().transpose() << endl;
     }

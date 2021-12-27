@@ -28,39 +28,36 @@
 
 namespace g2o {
 
-  EdgeSE2Line2D::EdgeSE2Line2D() :
-    BaseBinaryEdge<2, Line2D, VertexSE2, VertexLine2D>()
-  {
-  }
+EdgeSE2Line2D::EdgeSE2Line2D()
+    : BaseBinaryEdge<2, Line2D, VertexSE2, VertexLine2D>() {}
 
-  bool EdgeSE2Line2D::read(std::istream& is)
-  {
-    internal::readVector(is, _measurement);
-    return readInformationMatrix(is);
-  }
+bool EdgeSE2Line2D::read(std::istream& is) {
+  internal::readVector(is, _measurement);
+  return readInformationMatrix(is);
+}
 
-  bool EdgeSE2Line2D::write(std::ostream& os) const
-  {
-    internal::writeVector(os, measurement());
-    return writeInformationMatrix(os);
-  }
+bool EdgeSE2Line2D::write(std::ostream& os) const {
+  internal::writeVector(os, measurement());
+  return writeInformationMatrix(os);
+}
 
-  void EdgeSE2Line2D::initialEstimate(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to)
-  {
-    assert(from.size() == 1 && from.count(_vertices[0]) == 1 && "Can not initialize VertexSE2 position by VertexLine2D");
+void EdgeSE2Line2D::initialEstimate(const OptimizableGraph::VertexSet& from,
+                                    OptimizableGraph::Vertex* to) {
+  assert(from.size() == 1 && from.count(_vertices[0]) == 1 &&
+         "Can not initialize VertexSE2 position by VertexLine2D");
 
-    VertexSE2* vi     = static_cast<VertexSE2*>(_vertices[0]);
-    VertexLine2D* vj = static_cast<VertexLine2D*>(_vertices[1]);
-    if (from.count(vi) > 0 && to == vj) {
-      SE2 T=vi->estimate();
-      Vector2 est=_measurement;
-      est[0] += T.rotation().angle();
-      est[0] = normalize_theta(est[0]);
-      Vector2 n(std::cos(est[0]), std::sin(est[0]));
-      est[1] += n.dot(T.translation());
-      vj->setEstimate(est);
-    }
+  VertexSE2* vi = static_cast<VertexSE2*>(_vertices[0]);
+  VertexLine2D* vj = static_cast<VertexLine2D*>(_vertices[1]);
+  if (from.count(vi) > 0 && to == vj) {
+    SE2 T = vi->estimate();
+    Vector2 est = _measurement;
+    est[0] += T.rotation().angle();
+    est[0] = normalize_theta(est[0]);
+    Vector2 n(std::cos(est[0]), std::sin(est[0]));
+    est[1] += n.dot(T.translation());
+    vj->setEstimate(est);
   }
+}
 
 // #ifndef NUMERIC_JACOBIAN_TWO_D_TYPES
 //   void EdgeSE2Line2D::linearizeOplus()
@@ -91,31 +88,39 @@ namespace g2o {
 //   }
 // #endif
 
-//   EdgeSE2Line2DWriteGnuplotAction::EdgeSE2Line2DWriteGnuplotAction(): WriteGnuplotAction(typeid(EdgeSE2Line2D).name()){}
+//   EdgeSE2Line2DWriteGnuplotAction::EdgeSE2Line2DWriteGnuplotAction():
+//   WriteGnuplotAction(typeid(EdgeSE2Line2D).name()){}
 
-//   HyperGraphElementAction* EdgeSE2Line2DWriteGnuplotAction::operator()(HyperGraph::HyperGraphElement* element, HyperGraphElementAction::Parameters* params_){
+//   HyperGraphElementAction*
+//   EdgeSE2Line2DWriteGnuplotAction::operator()(HyperGraph::HyperGraphElement*
+//   element, HyperGraphElementAction::Parameters* params_){
 //     if (typeid(*element).name()!=_typeName)
 //       return nullptr;
-//     WriteGnuplotAction::Parameters* params=static_cast<WriteGnuplotAction::Parameters*>(params_);
-//     if (!params->os){
-//       std::cerr << __PRETTY_FUNCTION__ << ": warning, on valid os specified" << std::endl;
-//       return nullptr;
+//     WriteGnuplotAction::Parameters*
+//     params=static_cast<WriteGnuplotAction::Parameters*>(params_); if
+//     (!params->os){
+//       std::cerr << __PRETTY_FUNCTION__ << ": warning, on valid os specified"
+//       << std::endl; return nullptr;
 //     }
 
 //     EdgeSE2Line2D* e =  static_cast<EdgeSE2Line2D*>(element);
 //     VertexSE2* fromEdge = static_cast<VertexSE2*>(e->vertex(0));
 //     VertexLine2D* toEdge   = static_cast<VertexLine2D*>(e->vertex(1));
-//     *(params->os) << fromEdge->estimate().translation().x() << " " << fromEdge->estimate().translation().y()
+//     *(params->os) << fromEdge->estimate().translation().x() << " " <<
+//     fromEdge->estimate().translation().y()
 //       << " " << fromEdge->estimate().rotation().angle() << std::endl;
-//     *(params->os) << toEdge->estimate().x() << " " << toEdge->estimate().y() << std::endl;
+//     *(params->os) << toEdge->estimate().x() << " " << toEdge->estimate().y()
+//     << std::endl;
 //     *(params->os) << std::endl;
 //     return this;
 //   }
 
 // #ifdef G2O_HAVE_OPENGL
-//   EdgeSE2Line2DDrawAction::EdgeSE2Line2DDrawAction(): DrawAction(typeid(EdgeSE2Line2D).name()){}
+//   EdgeSE2Line2DDrawAction::EdgeSE2Line2DDrawAction():
+//   DrawAction(typeid(EdgeSE2Line2D).name()){}
 
-//   HyperGraphElementAction* EdgeSE2Line2DDrawAction::operator()(HyperGraph::HyperGraphElement* element,
+//   HyperGraphElementAction*
+//   EdgeSE2Line2DDrawAction::operator()(HyperGraph::HyperGraphElement* element,
 //                 HyperGraphElementAction::Parameters*  params_){
 //     if (typeid(*element).name()!=_typeName)
 //       return nullptr;
@@ -126,7 +131,6 @@ namespace g2o {
 
 //     if (_show && !_show->value())
 //       return this;
-
 
 //     EdgeSE2Line2D* e =  static_cast<EdgeSE2Line2D*>(element);
 //     VertexSE2* fromEdge = static_cast<VertexSE2*>(e->vertex(0));
@@ -143,4 +147,4 @@ namespace g2o {
 //   }
 // #endif
 
-} // end namespace
+}  // namespace g2o

@@ -81,7 +81,8 @@ bool EdgeSBACam::getMeasurementData(number_t* d) const {
 void EdgeSBACam::computeError() {
   const VertexCam* v1 = dynamic_cast<const VertexCam*>(_vertices[0]);
   const VertexCam* v2 = dynamic_cast<const VertexCam*>(_vertices[1]);
-  SE3Quat delta = _inverseMeasurement * (v1->estimate().inverse() * v2->estimate());
+  SE3Quat delta =
+      _inverseMeasurement * (v1->estimate().inverse() * v2->estimate());
   _error[0] = delta.translation().x();
   _error[1] = delta.translation().y();
   _error[2] = delta.translation().z();

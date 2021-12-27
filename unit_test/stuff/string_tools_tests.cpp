@@ -80,7 +80,8 @@ TEST(Stuff, StrSplit) {
   ASSERT_EQ("42", tokens[0]);
   tokens = g2o::strSplit("1,2;3:4", ";,:");
   ASSERT_EQ(4, tokens.size());
-  for (size_t i = 0; i < tokens.size(); ++i) ASSERT_EQ(g2o::formatString("%d", int(i+1)), tokens[i]);
+  for (size_t i = 0; i < tokens.size(); ++i)
+    ASSERT_EQ(g2o::formatString("%d", int(i + 1)), tokens[i]);
 }
 
 TEST(Stuff, StrStartsWith) {
@@ -97,7 +98,7 @@ TEST(Stuff, StrEndsWith) {
   ASSERT_FALSE(g2o::strEndsWith("Hello World!", "!!Hello World!"));
 }
 
-#if defined (UNIX) && !defined(ANDROID)
+#if defined(UNIX) && !defined(ANDROID)
 TEST(Stuff, StrExpand) {
   char* envVar = getenv("HOME");
   if (envVar == nullptr) {

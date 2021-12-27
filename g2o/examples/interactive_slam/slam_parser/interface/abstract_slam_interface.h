@@ -44,10 +44,12 @@ class AbstractSlamInterface {
    * @param tag: the tag specifying the type of the vertex
    * @param id: the unique id of the node.
    * @param dimension: the dimension of the node.
-   * @param values: the pose of the node, may be empty (i.e., the engine should initialize the node itself)
+   * @param values: the pose of the node, may be empty (i.e., the engine should
+   * initialize the node itself)
    * @return true, if adding was successful
    */
-  virtual bool addNode(const std::string& tag, int id, int dimension, const std::vector<double>& values) = 0;
+  virtual bool addNode(const std::string& tag, int id, int dimension,
+                       const std::vector<double>& values) = 0;
 
   /**
    * adding an edge to the SLAM engine.
@@ -57,12 +59,14 @@ class AbstractSlamInterface {
    * @param v1: the unique id of the edge of the first vertex
    * @param v2: the unique id of the edge of the second vertex
    * @param measurement: the measurement of the constraint
-   * @param information: the information matrix (inverse of the covariance) representing the uncertainty of the
-   * measurement (row-major upper triangular and diagonal)
+   * @param information: the information matrix (inverse of the covariance)
+   * representing the uncertainty of the measurement (row-major upper triangular
+   * and diagonal)
    * @return true, if adding was successful
    */
-  virtual bool addEdge(const std::string& tag, int id, int dimension, int v1, int v2,
-                       const std::vector<double>& measurement, const std::vector<double>& information) = 0;
+  virtual bool addEdge(const std::string& tag, int id, int dimension, int v1,
+                       int v2, const std::vector<double>& measurement,
+                       const std::vector<double>& information) = 0;
 
   /**
    * set some nodes to a fixed position

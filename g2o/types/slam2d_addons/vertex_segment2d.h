@@ -36,13 +36,18 @@
 
 namespace g2o {
 
-class G2O_TYPES_SLAM2D_ADDONS_API VertexSegment2D : public BaseVertex<4, Vector4> {
+class G2O_TYPES_SLAM2D_ADDONS_API VertexSegment2D
+    : public BaseVertex<4, Vector4> {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
   VertexSegment2D();
 
-  Vector2 estimateP1() const { return Eigen::Map<const Vector2>(&(_estimate[0])); }
-  Vector2 estimateP2() const { return Eigen::Map<const Vector2>(&(_estimate[2])); }
+  Vector2 estimateP1() const {
+    return Eigen::Map<const Vector2>(&(_estimate[0]));
+  }
+  Vector2 estimateP2() const {
+    return Eigen::Map<const Vector2>(&(_estimate[2]));
+  }
   void setEstimateP1(const Vector2& p1) {
     Eigen::Map<Vector2> v(&_estimate[0]);
     v = p1;
@@ -68,9 +73,13 @@ class G2O_TYPES_SLAM2D_ADDONS_API VertexSegment2D : public BaseVertex<4, Vector4
 
   virtual int estimateDimension() const { return 4; }
 
-  virtual bool setMinimalEstimateDataImpl(const number_t* est) { return setEstimateData(est); }
+  virtual bool setMinimalEstimateDataImpl(const number_t* est) {
+    return setEstimateData(est);
+  }
 
-  virtual bool getMinimalEstimateData(number_t* est) const { return getEstimateData(est); }
+  virtual bool getMinimalEstimateData(number_t* est) const {
+    return getEstimateData(est);
+  }
 
   virtual int minimalEstimateDimension() const { return 4; }
 
@@ -83,23 +92,28 @@ class G2O_TYPES_SLAM2D_ADDONS_API VertexSegment2D : public BaseVertex<4, Vector4
   virtual bool write(std::ostream& os) const;
 };
 
-class G2O_TYPES_SLAM2D_ADDONS_API VertexSegment2DWriteGnuplotAction : public WriteGnuplotAction {
+class G2O_TYPES_SLAM2D_ADDONS_API VertexSegment2DWriteGnuplotAction
+    : public WriteGnuplotAction {
  public:
   VertexSegment2DWriteGnuplotAction();
-  virtual HyperGraphElementAction* operator()(HyperGraph::HyperGraphElement* element,
-                                              HyperGraphElementAction::Parameters* params_);
+  virtual HyperGraphElementAction* operator()(
+      HyperGraph::HyperGraphElement* element,
+      HyperGraphElementAction::Parameters* params_);
 };
 
 #ifdef G2O_HAVE_OPENGL
-class G2O_TYPES_SLAM2D_ADDONS_API VertexSegment2DDrawAction : public DrawAction {
+class G2O_TYPES_SLAM2D_ADDONS_API VertexSegment2DDrawAction
+    : public DrawAction {
  public:
   VertexSegment2DDrawAction();
-  virtual HyperGraphElementAction* operator()(HyperGraph::HyperGraphElement* element,
-                                              HyperGraphElementAction::Parameters* params_);
+  virtual HyperGraphElementAction* operator()(
+      HyperGraph::HyperGraphElement* element,
+      HyperGraphElementAction::Parameters* params_);
 
  protected:
   FloatProperty* _pointSize;
-  virtual bool refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_);
+  virtual bool refreshPropertyPtrs(
+      HyperGraphElementAction::Parameters* params_);
 };
 #endif
 

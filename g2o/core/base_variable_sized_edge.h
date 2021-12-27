@@ -37,15 +37,16 @@
 #include "robust_kernel.h"
 
 #ifdef G2O_USE_VENDORED_CERES
-  #include "g2o/EXTERNAL/ceres/fixed_array.h"
+#include "g2o/EXTERNAL/ceres/fixed_array.h"
 #else
-  #include <ceres/internal/fixed_array.h>
+#include <ceres/internal/fixed_array.h>
 #endif
 
 namespace g2o {
 
 /**
- * \brief base class to represent an edge connecting an arbitrary number of nodes
+ * \brief base class to represent an edge connecting an arbitrary number of
+ * nodes
  *
  * D - Dimension of the measurement
  * E - type to represent the measurement
@@ -68,7 +69,9 @@ class BaseVariableSizedEdge : public BaseEdge<D, E> {
   typedef MatrixX::MapType JacobianType;
   typedef typename BaseEdge<D, E>::ErrorVector ErrorVector;
   typedef typename BaseEdge<D, E>::InformationType InformationType;
-  typedef Eigen::Map<MatrixX, MatrixX::Flags & Eigen::PacketAccessBit ? Eigen::Aligned : Eigen::Unaligned>
+  typedef Eigen::Map<MatrixX, MatrixX::Flags & Eigen::PacketAccessBit
+                                  ? Eigen::Aligned
+                                  : Eigen::Unaligned>
       HessianBlockType;
 
   BaseVariableSizedEdge() : BaseEdge<D, E>() {}
@@ -102,7 +105,8 @@ class BaseVariableSizedEdge : public BaseEdge<D, E> {
   std::vector<JacobianType, Eigen::aligned_allocator<JacobianType> >
       _jacobianOplus;  ///< jacobians of the edge (w.r.t. oplus)
 
-  void computeQuadraticForm(const InformationType& omega, const ErrorVector& weightedError);
+  void computeQuadraticForm(const InformationType& omega,
+                            const ErrorVector& weightedError);
 
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW

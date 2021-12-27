@@ -28,12 +28,12 @@
 #include "g2o/core/optimization_algorithm_gauss_newton.h"
 #include "g2o/solvers/eigen/linear_solver_eigen.h"
 
-
 namespace g2o {
 namespace internal {
 
 typedef g2o::BlockSolver<g2o::BlockSolverTraits<-1, -1> > SlamBlockSolver;
-typedef g2o::LinearSolverEigen<SlamBlockSolver::PoseMatrixType> SlamLinearSolver;
+typedef g2o::LinearSolverEigen<SlamBlockSolver::PoseMatrixType>
+    SlamLinearSolver;
 
 g2o::SparseOptimizer* createOptimizerForTests() {
   // Initialize the SparseOptimizer
@@ -41,7 +41,8 @@ g2o::SparseOptimizer* createOptimizerForTests() {
   auto linearSolver = g2o::make_unique<SlamLinearSolver>();
   linearSolver->setBlockOrdering(false);
   auto blockSolver = g2o::make_unique<SlamBlockSolver>(std::move(linearSolver));
-  mOptimizer->setAlgorithm(new g2o::OptimizationAlgorithmGaussNewton(std::move(blockSolver)));
+  mOptimizer->setAlgorithm(
+      new g2o::OptimizationAlgorithmGaussNewton(std::move(blockSolver)));
   return mOptimizer;
 }
 

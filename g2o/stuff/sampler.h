@@ -39,7 +39,8 @@
 
 namespace g2o {
 
-number_t G2O_STUFF_API sampleUniform(number_t min = 0, number_t max = 1, std::mt19937* generator = 0);
+number_t G2O_STUFF_API sampleUniform(number_t min = 0, number_t max = 1,
+                                     std::mt19937* generator = 0);
 number_t G2O_STUFF_API sampleGaussian(std::mt19937* generator = 0);
 
 template <class SampleType, class CovarianceType>
@@ -47,7 +48,8 @@ class GaussianSampler {
  public:
   GaussianSampler(GaussianSampler const&) = delete;
   GaussianSampler& operator=(const GaussianSampler&) = delete;
-  GaussianSampler(bool hasGenerator = true) : _generator(hasGenerator ? new std::mt19937 : nullptr) {}
+  GaussianSampler(bool hasGenerator = true)
+      : _generator(hasGenerator ? new std::mt19937 : nullptr) {}
   void setDistribution(const CovarianceType& cov) {
     Eigen::LLT<CovarianceType> cholDecomp;
     cholDecomp.compute(cov);
@@ -65,7 +67,8 @@ class GaussianSampler {
     }
     return _cholesky * s;
   }
-  //! seed the random number generator, returns false if not having an own generator.
+  //! seed the random number generator, returns false if not having an own
+  //! generator.
   bool seed(int s) {
     if (!_generator) return false;
     _generator->seed(s);
@@ -97,12 +100,15 @@ class G2O_STUFF_API Sampler {
    * sample a number from a uniform distribution
    */
   static number_t uniformRand(number_t lowerBndr, number_t upperBndr) {
-    return lowerBndr + ((number_t)std::rand() / (RAND_MAX + 1.0)) * (upperBndr - lowerBndr);
+    return lowerBndr +
+           ((number_t)std::rand() / (RAND_MAX + 1.0)) * (upperBndr - lowerBndr);
   }
   /**
    * default seed function using the current time in seconds
    */
-  static void seedRand() { seedRand(static_cast<unsigned int>(std::time(NULL))); }
+  static void seedRand() {
+    seedRand(static_cast<unsigned int>(std::time(NULL)));
+  }
 
   /** seed the random number generator */
   static void seedRand(unsigned int seed) { std::srand(seed); }

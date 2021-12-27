@@ -28,38 +28,38 @@
 
 namespace g2o {
 
-EdgeSE2PureCalib::EdgeSE2PureCalib()
-{
-}
+EdgeSE2PureCalib::EdgeSE2PureCalib() {}
 
-bool EdgeSE2PureCalib::read(std::istream& is)
-{
-  (void) is;
+bool EdgeSE2PureCalib::read(std::istream& is) {
+  (void)is;
   return false;
 }
 
-bool EdgeSE2PureCalib::write(std::ostream& os) const
-{
-  (void) os;
+bool EdgeSE2PureCalib::write(std::ostream& os) const {
+  (void)os;
   return false;
 }
 
-void EdgeSE2PureCalib::computeError()
-{
+void EdgeSE2PureCalib::computeError() {
   const VertexSE2* laserOffset = static_cast<const VertexSE2*>(_vertices[0]);
-  const VertexOdomDifferentialParams* odomParams = dynamic_cast<const VertexOdomDifferentialParams*>(_vertices[1]);
+  const VertexOdomDifferentialParams* odomParams =
+      dynamic_cast<const VertexOdomDifferentialParams*>(_vertices[1]);
 
   // get the calibrated motion given by the odometry
-  VelocityMeasurement calibratedVelocityMeasurment(measurement().velocityMeasurement.vl() * odomParams->estimate()(0),
+  VelocityMeasurement calibratedVelocityMeasurment(
+      measurement().velocityMeasurement.vl() * odomParams->estimate()(0),
       measurement().velocityMeasurement.vr() * odomParams->estimate()(1),
       measurement().velocityMeasurement.dt());
-  MotionMeasurement mm = OdomConvert::convertToMotion(calibratedVelocityMeasurment, odomParams->estimate()(2));
+  MotionMeasurement mm = OdomConvert::convertToMotion(
+      calibratedVelocityMeasurment, odomParams->estimate()(2));
   SE2 Ku_ij;
   Ku_ij.fromVector(mm.measurement());
 
-  SE2 laserMotionInRobotFrame = laserOffset->estimate() * measurement().laserMotion * laserOffset->estimate().inverse();
+  SE2 laserMotionInRobotFrame = laserOffset->estimate() *
+                                measurement().laserMotion *
+                                laserOffset->estimate().inverse();
   SE2 delta = Ku_ij.inverse() * laserMotionInRobotFrame;
   _error = delta.toVector();
 }
 
-} // end namespace
+}  // namespace g2o

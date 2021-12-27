@@ -30,9 +30,13 @@
 
 namespace g2o {
 
-VertexIntrinsics::VertexIntrinsics() { _estimate << cst(1.), cst(1.), cst(.5), cst(.5), cst(.1); }
+VertexIntrinsics::VertexIntrinsics() {
+  _estimate << cst(1.), cst(1.), cst(.5), cst(.5), cst(.1);
+}
 
-bool VertexIntrinsics::read(std::istream& is) { return internal::readVector(is, _estimate); }
+bool VertexIntrinsics::read(std::istream& is) {
+  return internal::readVector(is, _estimate);
+}
 
 bool VertexIntrinsics::write(std::ostream& os) const {
   return internal::writeVector(os, estimate());
@@ -42,6 +46,8 @@ void VertexIntrinsics::setToOriginImpl() {
   _estimate << cst(1.), cst(1.), cst(0.5), cst(0.5), cst(0.1);
 }
 
-void VertexIntrinsics::oplusImpl(const number_t* update) { _estimate.head<4>() += Vector4(update); }
+void VertexIntrinsics::oplusImpl(const number_t* update) {
+  _estimate.head<4>() += Vector4(update);
+}
 
 }  // namespace g2o

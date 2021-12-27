@@ -27,7 +27,7 @@
 #ifndef G2O_TYPES_SCLAM_H
 #define G2O_TYPES_SCLAM_H
 
-#include "edge_se2_sensor_calib.h"
 #include "edge_se2_odom_differential_calib.h"
+#include "edge_se2_sensor_calib.h"
 
 #endif

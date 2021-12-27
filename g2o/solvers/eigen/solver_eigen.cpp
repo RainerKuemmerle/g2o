@@ -41,10 +41,10 @@ namespace g2o {
 namespace {
 template <int p, int l, bool blockorder>
 std::unique_ptr<BlockSolverBase> AllocateSolver() {
-  std::cerr << "# Using EigenSparseCholesky poseDim " << p << " landMarkDim " << l
-            << " blockordering " << blockorder << std::endl;
-  auto linearSolver =
-      g2o::make_unique<LinearSolverEigen<typename BlockSolverPL<p, l>::PoseMatrixType>>();
+  std::cerr << "# Using EigenSparseCholesky poseDim " << p << " landMarkDim "
+            << l << " blockordering " << blockorder << std::endl;
+  auto linearSolver = g2o::make_unique<
+      LinearSolverEigen<typename BlockSolverPL<p, l>::PoseMatrixType>>();
   linearSolver->setBlockOrdering(blockorder);
   return g2o::make_unique<BlockSolverPL<p, l>>(std::move(linearSolver));
 }
@@ -54,7 +54,8 @@ std::unique_ptr<BlockSolverBase> AllocateSolver() {
  * helper function for allocating
  */
 static OptimizationAlgorithm* createSolver(const std::string& fullSolverName) {
-  static const std::map<std::string, std::function<std::unique_ptr<BlockSolverBase>()>>
+  static const std::map<std::string,
+                        std::function<std::unique_ptr<BlockSolverBase>()>>
       solver_factories{
           {"var", &AllocateSolver<-1, -1, true>},
           {"fix3_2", &AllocateSolver<3, 2, true>},
@@ -86,7 +87,9 @@ class EigenSolverCreator : public AbstractOptimizationAlgorithmCreator {
  public:
   explicit EigenSolverCreator(const OptimizationAlgorithmProperty& p)
       : AbstractOptimizationAlgorithmCreator(p) {}
-  virtual OptimizationAlgorithm* construct() { return createSolver(property().name); }
+  virtual OptimizationAlgorithm* construct() {
+    return createSolver(property().name);
+  }
 };
 
 // clang-format off

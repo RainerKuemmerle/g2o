@@ -32,25 +32,27 @@
 
 namespace g2o {
 
-  /**
-   * \brief parameters for a 2D range finder
-   */
-  struct G2O_TYPES_DATA_API LaserParameters
-  {
-    EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
-    LaserParameters(int type, int beams, number_t firstBeamAngle, number_t angularStep, number_t maxRange, number_t accuracy, int remissionMode, number_t minRange = 0);
-    LaserParameters(int beams, number_t firstBeamAngle, number_t angularStep, number_t maxRange, number_t minRange = 0);
-    SE2 laserPose;
-    int type;
-    number_t firstBeamAngle;
-    number_t fov;
-    number_t angularStep;
-    number_t accuracy;
-    int remissionMode;
-    number_t maxRange;
-    number_t minRange;
-  };
+/**
+ * \brief parameters for a 2D range finder
+ */
+struct G2O_TYPES_DATA_API LaserParameters {
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
+  LaserParameters(int type, int beams, number_t firstBeamAngle,
+                  number_t angularStep, number_t maxRange, number_t accuracy,
+                  int remissionMode, number_t minRange = 0);
+  LaserParameters(int beams, number_t firstBeamAngle, number_t angularStep,
+                  number_t maxRange, number_t minRange = 0);
+  SE2 laserPose;
+  int type;
+  number_t firstBeamAngle;
+  number_t fov;
+  number_t angularStep;
+  number_t accuracy;
+  int remissionMode;
+  number_t maxRange;
+  number_t minRange;
+};
 
-}
+}  // namespace g2o
 
 #endif

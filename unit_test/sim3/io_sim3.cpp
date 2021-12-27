@@ -40,7 +40,8 @@ struct RandomSim3 {
     return Sim3(randomOrientation, randomPosition, 1.0);
   }
   static bool isApprox(const Sim3& a, const Sim3& b) {
-    return a.translation().isApprox(b.translation(), 1e-5) && a.rotation().isApprox(b.rotation(), 1e-5) &&
+    return a.translation().isApprox(b.translation(), 1e-5) &&
+           a.rotation().isApprox(b.rotation(), 1e-5) &&
            fabs(a.scale() - b.scale()) < 1e-5;
   }
 };

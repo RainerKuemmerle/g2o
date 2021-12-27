@@ -27,14 +27,21 @@
 #ifndef _DQUAT2MAT_H_
 #define _DQUAT2MAT_H_
 #include <Eigen/Core>
+
 #include "g2o_types_slam3d_api.h"
 
 namespace g2o {
-  namespace internal {
+namespace internal {
 
-    void  G2O_TYPES_SLAM3D_API compute_dq_dR ( Eigen::Matrix<number_t, 3 , 9, Eigen::ColMajor>&  dq_dR , const number_t&  r11 , const number_t&  r21 , const number_t&  r31 , const number_t&  r12 , const number_t&  r22 , const number_t&  r32 , const number_t&  r13 , const number_t&  r23 , const number_t&  r33 );
+void G2O_TYPES_SLAM3D_API
+compute_dq_dR(Eigen::Matrix<number_t, 3, 9, Eigen::ColMajor>& dq_dR,
+              const number_t& r11, const number_t& r21, const number_t& r31,
+              const number_t& r12, const number_t& r22, const number_t& r32,
+              const number_t& r13, const number_t& r23, const number_t& r33);
 
-    void  G2O_TYPES_SLAM3D_API compute_dR_dq ( Eigen::Matrix<number_t, 9 , 3, Eigen::ColMajor>&  dR_dq , const number_t&  qx , const number_t&  qy , const number_t&  qz , const number_t&  qw ) ;
-  }
-}
+void G2O_TYPES_SLAM3D_API compute_dR_dq(
+    Eigen::Matrix<number_t, 9, 3, Eigen::ColMajor>& dR_dq, const number_t& qx,
+    const number_t& qy, const number_t& qz, const number_t& qw);
+}  // namespace internal
+}  // namespace g2o
 #endif

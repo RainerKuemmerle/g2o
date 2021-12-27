@@ -36,7 +36,8 @@
 namespace g2o {
 using namespace std;
 
-std::unique_ptr<HyperGraphActionLibrary> HyperGraphActionLibrary::actionLibInstance;
+std::unique_ptr<HyperGraphActionLibrary>
+    HyperGraphActionLibrary::actionLibInstance;
 
 HyperGraphAction::Parameters::~Parameters() {}
 
@@ -45,33 +46,40 @@ HyperGraphAction::ParametersIteration::ParametersIteration(int iter)
 
 HyperGraphAction::~HyperGraphAction() {}
 
-HyperGraphAction* HyperGraphAction::operator()(const HyperGraph*, Parameters*) { return nullptr; }
+HyperGraphAction* HyperGraphAction::operator()(const HyperGraph*, Parameters*) {
+  return nullptr;
+}
 
 HyperGraphElementAction::Parameters::~Parameters() {}
 
 HyperGraphElementAction::HyperGraphElementAction(const std::string& typeName_)
     : _typeName(typeName_) {}
 
-void HyperGraphElementAction::setTypeName(const std::string& typeName_) { _typeName = typeName_; }
+void HyperGraphElementAction::setTypeName(const std::string& typeName_) {
+  _typeName = typeName_;
+}
 
-HyperGraphElementAction* HyperGraphElementAction::operator()(HyperGraph::HyperGraphElement*,
-                                                             HyperGraphElementAction::Parameters*) {
+HyperGraphElementAction* HyperGraphElementAction::operator()(
+    HyperGraph::HyperGraphElement*, HyperGraphElementAction::Parameters*) {
   return nullptr;
 }
 
-HyperGraphElementAction* HyperGraphElementAction::operator()(const HyperGraph::HyperGraphElement*,
-                                                             HyperGraphElementAction::Parameters*) {
+HyperGraphElementAction* HyperGraphElementAction::operator()(
+    const HyperGraph::HyperGraphElement*,
+    HyperGraphElementAction::Parameters*) {
   return nullptr;
 }
 
 HyperGraphElementAction::~HyperGraphElementAction() {}
 
-HyperGraphElementActionCollection::HyperGraphElementActionCollection(const std::string& name_) {
+HyperGraphElementActionCollection::HyperGraphElementActionCollection(
+    const std::string& name_) {
   _name = name_;
 }
 
 HyperGraphElementAction* HyperGraphElementActionCollection::operator()(
-    HyperGraph::HyperGraphElement* element, HyperGraphElementAction::Parameters* params) {
+    HyperGraph::HyperGraphElement* element,
+    HyperGraphElementAction::Parameters* params) {
   ActionMap::iterator it = _actionMap.find(typeid(*element).name());
   // cerr << typeid(*element).name() << endl;
   if (it == _actionMap.end()) return nullptr;
@@ -80,7 +88,8 @@ HyperGraphElementAction* HyperGraphElementActionCollection::operator()(
 }
 
 HyperGraphElementAction* HyperGraphElementActionCollection::operator()(
-    const HyperGraph::HyperGraphElement* element, HyperGraphElementAction::Parameters* params) {
+    const HyperGraph::HyperGraphElement* element,
+    HyperGraphElementAction::Parameters* params) {
   ActionMap::iterator it = _actionMap.find(typeid(*element).name());
   if (it == _actionMap.end()) return nullptr;
   HyperGraphElementAction* action = it->second.get();
@@ -90,11 +99,13 @@ HyperGraphElementAction* HyperGraphElementActionCollection::operator()(
 bool HyperGraphElementActionCollection::registerAction(
     const HyperGraphElementAction::HyperGraphElementActionPtr& action) {
 #ifdef G2O_DEBUG_ACTIONLIB
-  cerr << __PRETTY_FUNCTION__ << " " << action->name() << " " << action->typeName() << endl;
+  cerr << __PRETTY_FUNCTION__ << " " << action->name() << " "
+       << action->typeName() << endl;
 #endif
   if (action->name() != name()) {
     cerr << __PRETTY_FUNCTION__
-         << ": invalid attempt to register an action in a collection with a different name "
+         << ": invalid attempt to register an action in a collection with a "
+            "different name "
          << name() << " " << action->name() << endl;
   }
   _actionMap.insert(make_pair(action->typeName(), action));
@@ -103,8 +114,8 @@ bool HyperGraphElementActionCollection::registerAction(
 
 bool HyperGraphElementActionCollection::unregisterAction(
     const HyperGraphElementAction::HyperGraphElementActionPtr& action) {
-  for (HyperGraphElementAction::ActionMap::iterator it = _actionMap.begin(); it != _actionMap.end();
-       ++it) {
+  for (HyperGraphElementAction::ActionMap::iterator it = _actionMap.begin();
+       it != _actionMap.end(); ++it) {
     if (it->second == action) {
       _actionMap.erase(it);
       return true;
@@ -115,7 +126,8 @@ bool HyperGraphElementActionCollection::unregisterAction(
 
 HyperGraphActionLibrary* HyperGraphActionLibrary::instance() {
   if (actionLibInstance == 0) {
-    actionLibInstance = std::unique_ptr<HyperGraphActionLibrary>(new HyperGraphActionLibrary);
+    actionLibInstance =
+        std::unique_ptr<HyperGraphActionLibrary>(new HyperGraphActionLibrary);
   }
   return actionLibInstance.get();
 }
@@ -125,7 +137,8 @@ void HyperGraphActionLibrary::destroy() {
   actionLibInstance.swap(aux);
 }
 
-HyperGraphElementAction* HyperGraphActionLibrary::actionByName(const std::string& name) {
+HyperGraphElementAction* HyperGraphActionLibrary::actionByName(
+    const std::string& name) {
   HyperGraphElementAction::ActionMap::iterator it = _actionMap.find(name);
   if (it != _actionMap.end()) return it->second.get();
   return nullptr;
@@ -139,7 +152,9 @@ bool HyperGraphActionLibrary::registerAction(
     collection = dynamic_cast<HyperGraphElementActionCollection*>(oldAction);
     if (!collection) {
       cerr << __PRETTY_FUNCTION__
-           << ": fatal error, a collection is not at the first level in the library" << endl;
+           << ": fatal error, a collection is not at the first level in the "
+              "library"
+           << endl;
       return false;
     }
   }
@@ -147,11 +162,13 @@ bool HyperGraphActionLibrary::registerAction(
     return collection->registerAction(action);
   }
 #ifdef G2O_DEBUG_ACTIONLIB
-  cerr << __PRETTY_FUNCTION__ << ": creating collection for \"" << action->name() << "\"" << endl;
+  cerr << __PRETTY_FUNCTION__ << ": creating collection for \""
+       << action->name() << "\"" << endl;
 #endif
   collection = new HyperGraphElementActionCollection(action->name());
-  _actionMap.insert(
-      make_pair(action->name(), HyperGraphElementAction::HyperGraphElementActionPtr(collection)));
+  _actionMap.insert(make_pair(
+      action->name(),
+      HyperGraphElementAction::HyperGraphElementActionPtr(collection)));
   return collection->registerAction(action);
 }
 
@@ -159,11 +176,12 @@ bool HyperGraphActionLibrary::unregisterAction(
     const HyperGraphElementAction::HyperGraphElementActionPtr& action) {
   list<HyperGraphElementActionCollection*> collectionDeleteList;
 
-  // Search all the collections and delete the registered actions; if a collection becomes empty,
-  // schedule it for deletion; note that we can't delete the collections as we go because this will
-  // screw up the state of the iterators
-  for (HyperGraphElementAction::ActionMap::iterator it = _actionMap.begin(); it != _actionMap.end();
-       ++it) {
+  // Search all the collections and delete the registered actions; if a
+  // collection becomes empty, schedule it for deletion; note that we can't
+  // delete the collections as we go because this will screw up the state of the
+  // iterators
+  for (HyperGraphElementAction::ActionMap::iterator it = _actionMap.begin();
+       it != _actionMap.end(); ++it) {
     HyperGraphElementActionCollection* collection =
         dynamic_cast<HyperGraphElementActionCollection*>(it->second.get());
     if (collection != nullptr) {
@@ -175,7 +193,8 @@ bool HyperGraphActionLibrary::unregisterAction(
   }
 
   // Delete any empty action collections
-  for (list<HyperGraphElementActionCollection*>::iterator itc = collectionDeleteList.begin();
+  for (list<HyperGraphElementActionCollection*>::iterator itc =
+           collectionDeleteList.begin();
        itc != collectionDeleteList.end(); ++itc) {
     // cout << "Deleting collection " << (*itc)->name() << endl;
     _actionMap.erase((*itc)->name());
@@ -191,14 +210,16 @@ WriteGnuplotAction::WriteGnuplotAction(const std::string& typeName_)
 
 DrawAction::Parameters::Parameters() {}
 
-DrawAction::DrawAction(const std::string& typeName_) : HyperGraphElementAction(typeName_) {
+DrawAction::DrawAction(const std::string& typeName_)
+    : HyperGraphElementAction(typeName_) {
   _name = "draw";
   _previousParams = (Parameters*)0x42;
   refreshPropertyPtrs(0);
   _cacheDrawActions = 0;
 }
 
-bool DrawAction::refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_) {
+bool DrawAction::refreshPropertyPtrs(
+    HyperGraphElementAction::Parameters* params_) {
   if (_previousParams == params_) return false;
   DrawAction::Parameters* p = dynamic_cast<DrawAction::Parameters*>(params_);
   if (!p) {
@@ -215,13 +236,16 @@ bool DrawAction::refreshPropertyPtrs(HyperGraphElementAction::Parameters* params
 
 void DrawAction::initializeDrawActionsCache() {
   if (!_cacheDrawActions) {
-    _cacheDrawActions = HyperGraphActionLibrary::instance()->actionByName("draw");
+    _cacheDrawActions =
+        HyperGraphActionLibrary::instance()->actionByName("draw");
   }
 }
 
-void DrawAction::drawCache(CacheContainer* caches, HyperGraphElementAction::Parameters* params_) {
+void DrawAction::drawCache(CacheContainer* caches,
+                           HyperGraphElementAction::Parameters* params_) {
   if (caches) {
-    for (CacheContainer::iterator it = caches->begin(); it != caches->end(); ++it) {
+    for (CacheContainer::iterator it = caches->begin(); it != caches->end();
+         ++it) {
       Cache* c = it->second;
       (*_cacheDrawActions)(c, params_);
     }
@@ -237,7 +261,8 @@ void DrawAction::drawUserData(HyperGraph::Data* data,
 }
 
 void applyAction(HyperGraph* graph, HyperGraphElementAction* action,
-                 HyperGraphElementAction::Parameters* params, const std::string& typeName) {
+                 HyperGraphElementAction::Parameters* params,
+                 const std::string& typeName) {
   for (HyperGraph::VertexIDMap::iterator it = graph->vertices().begin();
        it != graph->vertices().end(); ++it) {
     auto& aux = *it->second;
@@ -245,10 +270,11 @@ void applyAction(HyperGraph* graph, HyperGraphElementAction* action,
       (*action)(it->second, params);
     }
   }
-  for (HyperGraph::EdgeSet::iterator it = graph->edges().begin(); it != graph->edges().end();
-       ++it) {
+  for (HyperGraph::EdgeSet::iterator it = graph->edges().begin();
+       it != graph->edges().end(); ++it) {
     auto& aux = **it;
-    if (typeName.empty() || typeid(aux).name() == typeName) (*action)(*it, params);
+    if (typeName.empty() || typeid(aux).name() == typeName)
+      (*action)(*it, params);
   }
 }
 

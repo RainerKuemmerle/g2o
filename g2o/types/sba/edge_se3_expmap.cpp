@@ -28,7 +28,8 @@
 
 namespace g2o {
 
-EdgeSE3Expmap::EdgeSE3Expmap() : BaseBinaryEdge<6, SE3Quat, VertexSE3Expmap, VertexSE3Expmap>() {}
+EdgeSE3Expmap::EdgeSE3Expmap()
+    : BaseBinaryEdge<6, SE3Quat, VertexSE3Expmap, VertexSE3Expmap>() {}
 
 bool EdgeSE3Expmap::read(std::istream& is) {
   Vector7 meas;

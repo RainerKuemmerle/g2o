@@ -36,10 +36,11 @@ namespace g2o {
 /**
  * \brief prior for an SE3 element
  *
- * Provides a prior for a 3d pose vertex. Again the measurement is represented by an
- * Isometry3 matrix.
+ * Provides a prior for a 3d pose vertex. Again the measurement is represented
+ * by an Isometry3 matrix.
  */
-class G2O_TYPES_SLAM3D_API EdgeSE3Prior : public BaseUnaryEdge<6, Isometry3, VertexSE3> {
+class G2O_TYPES_SLAM3D_API EdgeSE3Prior
+    : public BaseUnaryEdge<6, Isometry3, VertexSE3> {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   EdgeSE3Prior();
@@ -74,12 +75,14 @@ class G2O_TYPES_SLAM3D_API EdgeSE3Prior : public BaseUnaryEdge<6, Isometry3, Ver
 
   virtual bool setMeasurementFromState();
 
-  virtual number_t initialEstimatePossible(const OptimizableGraph::VertexSet& /*from*/,
-                                           OptimizableGraph::Vertex* /*to*/) {
+  virtual number_t initialEstimatePossible(
+      const OptimizableGraph::VertexSet& /*from*/,
+      OptimizableGraph::Vertex* /*to*/) {
     return 1.;
   }
 
-  virtual void initialEstimate(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to);
+  virtual void initialEstimate(const OptimizableGraph::VertexSet& from,
+                               OptimizableGraph::Vertex* to);
 
  protected:
   Isometry3 _inverseMeasurement;

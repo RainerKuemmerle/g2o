@@ -51,7 +51,9 @@ bool ParameterSE2Offset::read(std::istream& is) {
   return state;
 }
 
-bool ParameterSE2Offset::write(std::ostream& os) const { return internal::writeVector(os, offset().toVector()); }
+bool ParameterSE2Offset::write(std::ostream& os) const {
+  return internal::writeVector(os, offset().toVector());
+}
 
 CacheSE2Offset::CacheSE2Offset() : Cache(), _offsetParam(0) {}
 
@@ -79,10 +81,14 @@ void CacheSE2Offset::updateImpl() {
   number_t c = std::cos(alpha), s = std::sin(alpha);
   Matrix2 RInversePrime;
   RInversePrime << -s, c, -c, -s;
-  _RpInverse_RInversePrime = _offsetParam->offset().rotation().toRotationMatrix().transpose() * RInversePrime;
+  _RpInverse_RInversePrime =
+      _offsetParam->offset().rotation().toRotationMatrix().transpose() *
+      RInversePrime;
   _RpInverse_RInverse = w2l.rotation();
 }
 
-void CacheSE2Offset::setOffsetParam(ParameterSE2Offset* offsetParam) { _offsetParam = offsetParam; }
+void CacheSE2Offset::setOffsetParam(ParameterSE2Offset* offsetParam) {
+  _offsetParam = offsetParam;
+}
 
 }  // namespace g2o

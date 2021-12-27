@@ -27,9 +27,9 @@
 #ifndef G2O_COMMAND_ARGS_H
 #define G2O_COMMAND_ARGS_H
 
+#include <iostream>
 #include <string>
 #include <vector>
-#include <iostream>
 
 #include "g2o_stuff_api.h"
 
@@ -42,80 +42,94 @@ namespace g2o {
  * we can store the config in a file and reload a parameter set from
  * this file.
  */
-class G2O_STUFF_API CommandArgs
-{
-  public:
-    struct CommandArgument
-    {
-      std::string name;
-      std::string description;
-      int type;
-      void* data;
-      bool parsed;
-      bool optional;
-      CommandArgument() : name(""), description(""), type(0), data(nullptr), parsed(false), optional(false)
-      {}
-    };
-  public:
-    virtual ~CommandArgs();
+class G2O_STUFF_API CommandArgs {
+ public:
+  struct CommandArgument {
+    std::string name;
+    std::string description;
+    int type;
+    void* data;
+    bool parsed;
+    bool optional;
+    CommandArgument()
+        : name(""),
+          description(""),
+          type(0),
+          data(nullptr),
+          parsed(false),
+          optional(false) {}
+  };
 
-    /**
-     * parse the command line for the requested parameters.
-     * @param argc the number of params
-     * @param argv the value array
-     * @param exitOnError call exit() if the parsing fails
-     * @return true, if parsing was correct
-     */
-    bool parseArgs(int argc, char** argv, bool exitOnError = true);
+ public:
+  virtual ~CommandArgs();
 
-    /** add a bool parameter, if found on the command line, will toggle defValue */
-    void param(const std::string& name, bool& p, bool defValue, const std::string& desc);
-    /** add a int parameter */
-    void param(const std::string& name, int& p, int defValue, const std::string& desc);
-    /** add a float parameter */
-    void param(const std::string& name, float& p, float defValue, const std::string& desc);
-    /** add a float parameter */
-    void param(const std::string& name, double& p, double defValue, const std::string& desc);
-    /** add a string parameter */
-    void param(const std::string& name, std::string& p, const std::string& defValue, const std::string& desc);
-    /** add an int vector parameter */
-    void param(const std::string& name, std::vector<int>& p, const std::vector<int>& defValue, const std::string& desc);
-    /** add an vector of doubles as a parameter */
-    void param(const std::string& name, std::vector<double>& p, const std::vector<double>& defValue, const std::string& desc);
-    /** add a param wich is specified as a plain argument */
-    void paramLeftOver(const std::string& name, std::string& p, const std::string& defValue, const std::string& desc, bool optional = false);
+  /**
+   * parse the command line for the requested parameters.
+   * @param argc the number of params
+   * @param argv the value array
+   * @param exitOnError call exit() if the parsing fails
+   * @return true, if parsing was correct
+   */
+  bool parseArgs(int argc, char** argv, bool exitOnError = true);
 
-    /**
-     * print the value of all params to an ostream
-     */
-    void printParams(std::ostream& os);
+  /** add a bool parameter, if found on the command line, will toggle defValue
+   */
+  void param(const std::string& name, bool& p, bool defValue,
+             const std::string& desc);
+  /** add a int parameter */
+  void param(const std::string& name, int& p, int defValue,
+             const std::string& desc);
+  /** add a float parameter */
+  void param(const std::string& name, float& p, float defValue,
+             const std::string& desc);
+  /** add a float parameter */
+  void param(const std::string& name, double& p, double defValue,
+             const std::string& desc);
+  /** add a string parameter */
+  void param(const std::string& name, std::string& p,
+             const std::string& defValue, const std::string& desc);
+  /** add an int vector parameter */
+  void param(const std::string& name, std::vector<int>& p,
+             const std::vector<int>& defValue, const std::string& desc);
+  /** add an vector of doubles as a parameter */
+  void param(const std::string& name, std::vector<double>& p,
+             const std::vector<double>& defValue, const std::string& desc);
+  /** add a param wich is specified as a plain argument */
+  void paramLeftOver(const std::string& name, std::string& p,
+                     const std::string& defValue, const std::string& desc,
+                     bool optional = false);
 
-    //! return the banner string
-    const std::string& getBanner() const { return _banner; }
-    void setBanner(const std::string& banner);
+  /**
+   * print the value of all params to an ostream
+   */
+  void printParams(std::ostream& os);
 
-    /**
-     * print the help
-     */
-    void printHelp(std::ostream& os);
+  //! return the banner string
+  const std::string& getBanner() const { return _banner; }
+  void setBanner(const std::string& banner);
 
-    /**
-     * returns true, if the param was parsed via the command line
-     */
-    bool parsedParam(const std::string& paramFlag) const;
+  /**
+   * print the help
+   */
+  void printHelp(std::ostream& os);
 
-  protected:
-    std::vector<CommandArgument> _args;
-    std::vector<CommandArgument> _leftOvers;
-    std::vector<CommandArgument> _leftOversOptional;
-    std::string _banner;
-    std::string _progName;
+  /**
+   * returns true, if the param was parsed via the command line
+   */
+  bool parsedParam(const std::string& paramFlag) const;
 
-    const char* type2str(int t) const;
-    void str2arg(const std::string& input, CommandArgument& ca) const;
-    std::string arg2str(const CommandArgument& ca) const;
+ protected:
+  std::vector<CommandArgument> _args;
+  std::vector<CommandArgument> _leftOvers;
+  std::vector<CommandArgument> _leftOversOptional;
+  std::string _banner;
+  std::string _progName;
+
+  const char* type2str(int t) const;
+  void str2arg(const std::string& input, CommandArgument& ca) const;
+  std::string arg2str(const CommandArgument& ca) const;
 };
 
-} // end namespace
+}  // namespace g2o
 
 #endif
