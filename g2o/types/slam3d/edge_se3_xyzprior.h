@@ -27,52 +27,57 @@
 #ifndef G2O_EDGE_SE3_PRIOR_XYZ_H
 #define G2O_EDGE_SE3_PRIOR_XYZ_H
 
-#include "vertex_se3.h"
 #include "g2o/core/base_unary_edge.h"
-#include "parameter_se3_offset.h"
 #include "g2o_types_slam3d_api.h"
+#include "parameter_se3_offset.h"
+#include "vertex_se3.h"
 
 namespace g2o {
-  /**
-   * \brief Prior for a 3D pose with constraints only in xyz direction
-   */
-  class G2O_TYPES_SLAM3D_API EdgeSE3XYZPrior : public BaseUnaryEdge<3, Vector3, VertexSE3>
-  {
-  public:
-    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-    EdgeSE3XYZPrior();
+/**
+ * \brief Prior for a 3D pose with constraints only in xyz direction
+ */
+class G2O_TYPES_SLAM3D_API EdgeSE3XYZPrior
+    : public BaseUnaryEdge<3, Vector3, VertexSE3> {
+ public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+  EdgeSE3XYZPrior();
 
-    virtual bool setMeasurementData(const number_t* d) {
-      Eigen::Map<const Vector3> v(d);
-      _measurement = v;
-      return true;
-    }
+  virtual bool setMeasurementData(const number_t* d) {
+    Eigen::Map<const Vector3> v(d);
+    _measurement = v;
+    return true;
+  }
 
-    virtual bool getMeasurementData(number_t* d) const {
-      Eigen::Map<Vector3> v(d);
-      v = _measurement;
-      return true;
-    }
+  virtual bool getMeasurementData(number_t* d) const {
+    Eigen::Map<Vector3> v(d);
+    v = _measurement;
+    return true;
+  }
 
-    virtual int measurementDimension() const {return Dimension;}
+  virtual int measurementDimension() const { return Dimension; }
 
-    virtual bool read(std::istream& is);
-    virtual bool write(std::ostream& os) const;
-    virtual void computeError();
-    virtual void linearizeOplus();
-    virtual bool setMeasurementFromState();
+  virtual bool read(std::istream& is);
+  virtual bool write(std::ostream& os) const;
+  virtual void computeError();
+  virtual void linearizeOplus();
+  virtual bool setMeasurementFromState();
 
-    virtual number_t initialEstimatePossible(const OptimizableGraph::VertexSet& /*from*/, OptimizableGraph::Vertex* /*to*/) {return 1.;}
-    virtual void initialEstimate(const OptimizableGraph::VertexSet& /*from_*/, OptimizableGraph::Vertex* /*to_*/);
+  virtual number_t initialEstimatePossible(
+      const OptimizableGraph::VertexSet& /*from*/,
+      OptimizableGraph::Vertex* /*to*/) {
+    return 1.;
+  }
+  virtual void initialEstimate(const OptimizableGraph::VertexSet& /*from_*/,
+                               OptimizableGraph::Vertex* /*to_*/);
 
-    const ParameterSE3Offset* offsetParameter() { return _offsetParam; }
+  const ParameterSE3Offset* offsetParameter() { return _offsetParam; }
 
-  protected:
-    virtual bool resolveCaches();
-    ParameterSE3Offset* _offsetParam;
-    CacheSE3Offset* _cache;
-  };
+ protected:
+  virtual bool resolveCaches();
+  ParameterSE3Offset* _offsetParam;
+  CacheSE3Offset* _cache;
+};
 
-} // end namespace
+}  // namespace g2o
 
 #endif

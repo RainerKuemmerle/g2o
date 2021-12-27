@@ -28,7 +28,7 @@
 #define G2O_TYPES_DATA_H
 
 #include "robot_laser.h"
-#include "vertex_tag.h"
 #include "vertex_ellipse.h"
+#include "vertex_tag.h"
 
 #endif

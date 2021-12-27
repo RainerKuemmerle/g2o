@@ -28,13 +28,13 @@
 #define G2O_OS_SPECIFIC_HH_
 
 #ifdef WINDOWS
+#include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdarg.h>
 #ifndef _WINDOWS
 #include <sys/time.h>
 #endif
-#define drand48() ((number_t) rand()/(number_t)RAND_MAX)
+#define drand48() ((number_t)rand() / (number_t)RAND_MAX)
 
 #ifdef __cplusplus
 extern "C" {

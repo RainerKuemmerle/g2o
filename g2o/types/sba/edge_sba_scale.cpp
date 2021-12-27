@@ -29,7 +29,8 @@
 namespace g2o {
 
 // point to camera projection, stereo
-EdgeSBAScale::EdgeSBAScale() : BaseBinaryEdge<1, number_t, VertexCam, VertexCam>() {}
+EdgeSBAScale::EdgeSBAScale()
+    : BaseBinaryEdge<1, number_t, VertexCam, VertexCam>() {}
 
 bool EdgeSBAScale::read(std::istream& is) {
   number_t meas;

@@ -24,40 +24,47 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "structure_only_solver.h"
-
-#include "g2o/core/optimization_algorithm_factory.h"
 #include "g2o/core/optimization_algorithm.h"
+#include "g2o/core/optimization_algorithm_factory.h"
 #include "g2o/stuff/macros.h"
+#include "structure_only_solver.h"
 
 namespace g2o {
 
-  /**
-   * helper function for allocating
-   */
-  static OptimizationAlgorithm* createSolver(const std::string& fullSolverName)
-  {
-    if (fullSolverName == "structure_only_2") {
-      OptimizationAlgorithm* optimizationAlgo = new StructureOnlySolver<2>;
-      return optimizationAlgo;
-    }
-    else if (fullSolverName == "structure_only_3") {
-      OptimizationAlgorithm* optimizationAlgo = new StructureOnlySolver<3>;
-      return optimizationAlgo;
-    }
-    else
-      return nullptr;
+/**
+ * helper function for allocating
+ */
+static OptimizationAlgorithm* createSolver(const std::string& fullSolverName) {
+  if (fullSolverName == "structure_only_2") {
+    OptimizationAlgorithm* optimizationAlgo = new StructureOnlySolver<2>;
+    return optimizationAlgo;
+  } else if (fullSolverName == "structure_only_3") {
+    OptimizationAlgorithm* optimizationAlgo = new StructureOnlySolver<3>;
+    return optimizationAlgo;
+  } else
+    return nullptr;
+}
+
+class StructureOnlyCreator : public AbstractOptimizationAlgorithmCreator {
+ public:
+  explicit StructureOnlyCreator(const OptimizationAlgorithmProperty& p)
+      : AbstractOptimizationAlgorithmCreator(p) {}
+  virtual OptimizationAlgorithm* construct() {
+    return createSolver(property().name);
   }
+};
 
-  class StructureOnlyCreator : public AbstractOptimizationAlgorithmCreator {
-   public:
-    explicit StructureOnlyCreator(const OptimizationAlgorithmProperty& p) : AbstractOptimizationAlgorithmCreator(p) {}
-    virtual OptimizationAlgorithm* construct() { return createSolver(property().name); }
-  };
+G2O_REGISTER_OPTIMIZATION_LIBRARY(structure_only);
 
-  G2O_REGISTER_OPTIMIZATION_LIBRARY(structure_only);
+G2O_REGISTER_OPTIMIZATION_ALGORITHM(
+    structure_only_2,
+    new StructureOnlyCreator(OptimizationAlgorithmProperty(
+        "structure_only_2", "Optimize the landmark poses (2D)", "Eigen", true,
+        3, 2)));
+G2O_REGISTER_OPTIMIZATION_ALGORITHM(
+    structure_only_3,
+    new StructureOnlyCreator(OptimizationAlgorithmProperty(
+        "structure_only_3", "Optimize the landmark poses (3D)", "Eigen", true,
+        6, 3)));
 
-  G2O_REGISTER_OPTIMIZATION_ALGORITHM(structure_only_2, new StructureOnlyCreator(OptimizationAlgorithmProperty("structure_only_2", "Optimize the landmark poses (2D)", "Eigen", true, 3, 2)));
-  G2O_REGISTER_OPTIMIZATION_ALGORITHM(structure_only_3, new StructureOnlyCreator(OptimizationAlgorithmProperty("structure_only_3", "Optimize the landmark poses (3D)", "Eigen", true, 6, 3)));
-
-} // end namespace
+}  // namespace g2o

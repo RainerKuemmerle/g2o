@@ -24,29 +24,26 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include <iostream>
-#include <map>
 #include <csignal>
 #include <fstream>
+#include <iostream>
+#include <map>
 
-#include "sclam_helpers.h"
-#include "gm2dl_io.h"
-
-#include "g2o/stuff/macros.h"
+#include "g2o/core/hyper_dijkstra.h"
+#include "g2o/core/sparse_optimizer.h"
 #include "g2o/stuff/color_macros.h"
 #include "g2o/stuff/command_args.h"
 #include "g2o/stuff/filesys_tools.h"
+#include "g2o/stuff/macros.h"
 #include "g2o/stuff/string_tools.h"
 #include "g2o/stuff/timeutil.h"
-
-#include "g2o/core/sparse_optimizer.h"
-#include "g2o/core/hyper_dijkstra.h"
-
-#include "g2o/types/sclam2d/vertex_odom_differential_params.h"
-#include "g2o/types/sclam2d/odometry_measurement.h"
-#include "g2o/types/slam2d/vertex_se2.h"
-#include "g2o/types/data/robot_laser.h"
 #include "g2o/types/data/data_queue.h"
+#include "g2o/types/data/robot_laser.h"
+#include "g2o/types/sclam2d/odometry_measurement.h"
+#include "g2o/types/sclam2d/vertex_odom_differential_params.h"
+#include "g2o/types/slam2d/vertex_se2.h"
+#include "gm2dl_io.h"
+#include "sclam_helpers.h"
 
 using namespace std;
 using namespace g2o;
@@ -54,8 +51,7 @@ using namespace Eigen;
 
 static bool hasToStop = false;
 
-void sigquit_handler(int sig)
-{
+void sigquit_handler(int sig) {
   if (sig == SIGINT) {
     hasToStop = true;
     static int cnt = 0;
@@ -66,8 +62,7 @@ void sigquit_handler(int sig)
   }
 }
 
-int main(int argc, char** argv)
-{
+int main(int argc, char** argv) {
   bool fixLaser;
   int maxIterations;
   bool verbose;
@@ -79,13 +74,20 @@ int main(int argc, char** argv)
   // command line parsing
   CommandArgs commandLineArguments;
   commandLineArguments.param("i", maxIterations, 10, "perform n iterations");
-  commandLineArguments.param("v", verbose, false, "verbose output of the optimization process");
-  commandLineArguments.param("o", outputfilename, "", "output final version of the graph");
-  commandLineArguments.param("test", odomTestFilename, "", "apply odometry calibration to some test data");
-  commandLineArguments.param("dump", dumpGraphFilename, "", "write the graph to the disk");
-  commandLineArguments.param("fixLaser", fixLaser, false, "keep the laser offset fixed during optimization");
-  commandLineArguments.paramLeftOver("gm2dl-input", inputFilename, "", "gm2dl file which will be processed");
-  commandLineArguments.paramLeftOver("raw-log", rawFilename, "", "raw log file containing the odometry");
+  commandLineArguments.param("v", verbose, false,
+                             "verbose output of the optimization process");
+  commandLineArguments.param("o", outputfilename, "",
+                             "output final version of the graph");
+  commandLineArguments.param("test", odomTestFilename, "",
+                             "apply odometry calibration to some test data");
+  commandLineArguments.param("dump", dumpGraphFilename, "",
+                             "write the graph to the disk");
+  commandLineArguments.param("fixLaser", fixLaser, false,
+                             "keep the laser offset fixed during optimization");
+  commandLineArguments.paramLeftOver("gm2dl-input", inputFilename, "",
+                                     "gm2dl file which will be processed");
+  commandLineArguments.paramLeftOver("raw-log", rawFilename, "",
+                                     "raw log file containing the odometry");
 
   commandLineArguments.parseArgs(argc, argv);
 
@@ -96,7 +98,7 @@ int main(int argc, char** argv)
   allocateSolverForSclam(optimizer);
 
   // loading
-  if (! Gm2dlIO::readGm2dl(inputFilename, optimizer, false)) {
+  if (!Gm2dlIO::readGm2dl(inputFilename, optimizer, false)) {
     cerr << "Error while loading gm2dl file" << endl;
   }
   DataQueue robotLaserQueue;
@@ -111,8 +113,8 @@ int main(int argc, char** argv)
 
   OptimizableGraph::Vertex* gauge = optimizer.findGauge();
   if (gaugeFreedom) {
-    if (! gauge) {
-      cerr <<  "# cannot find a vertex to fix in this thing" << endl;
+    if (!gauge) {
+      cerr << "# cannot find a vertex to fix in this thing" << endl;
       return 2;
     } else {
       cerr << "# graph is fixed by node " << gauge->id() << endl;
@@ -128,31 +130,42 @@ int main(int argc, char** argv)
   HyperDijkstra d(&optimizer);
   UniformCostFunction f;
   d.shortestPaths(gauge, &f);
-  //cerr << PVAR(d.visited().size()) << endl;
+  // cerr << PVAR(d.visited().size()) << endl;
 
-  if (d.visited().size()!=optimizer.vertices().size()) {
-    cerr << CL_RED("Warning: d.visited().size() != optimizer.vertices().size()") << endl;
+  if (d.visited().size() != optimizer.vertices().size()) {
+    cerr << CL_RED("Warning: d.visited().size() != optimizer.vertices().size()")
+         << endl;
     cerr << "visited: " << d.visited().size() << endl;
     cerr << "vertices: " << optimizer.vertices().size() << endl;
     if (1)
-      for (SparseOptimizer::VertexIDMap::const_iterator it = optimizer.vertices().begin(); it != optimizer.vertices().end(); ++it) {
-        OptimizableGraph::Vertex* v = static_cast<OptimizableGraph::Vertex*>(it->second);
+      for (SparseOptimizer::VertexIDMap::const_iterator it =
+               optimizer.vertices().begin();
+           it != optimizer.vertices().end(); ++it) {
+        OptimizableGraph::Vertex* v =
+            static_cast<OptimizableGraph::Vertex*>(it->second);
         if (d.visited().count(v) == 0) {
-          cerr << "\t unvisited vertex " << it->first << " " << (void*)v << endl;
+          cerr << "\t unvisited vertex " << it->first << " " << (void*)v
+               << endl;
           v->setFixed(true);
         }
       }
   }
 
-  for (SparseOptimizer::VertexIDMap::const_iterator it = optimizer.vertices().begin(); it != optimizer.vertices().end(); ++it) {
-    OptimizableGraph::Vertex* v = static_cast<OptimizableGraph::Vertex*>(it->second);
+  for (SparseOptimizer::VertexIDMap::const_iterator it =
+           optimizer.vertices().begin();
+       it != optimizer.vertices().end(); ++it) {
+    OptimizableGraph::Vertex* v =
+        static_cast<OptimizableGraph::Vertex*>(it->second);
     if (v->fixed()) {
       cerr << "\t fixed vertex " << it->first << endl;
     }
   }
 
-  VertexSE2* laserOffset = dynamic_cast<VertexSE2*>(optimizer.vertex(Gm2dlIO::ID_LASERPOSE));
-  VertexOdomDifferentialParams* odomParamsVertex = dynamic_cast<VertexOdomDifferentialParams*>(optimizer.vertex(Gm2dlIO::ID_ODOMCALIB));
+  VertexSE2* laserOffset =
+      dynamic_cast<VertexSE2*>(optimizer.vertex(Gm2dlIO::ID_LASERPOSE));
+  VertexOdomDifferentialParams* odomParamsVertex =
+      dynamic_cast<VertexOdomDifferentialParams*>(
+          optimizer.vertex(Gm2dlIO::ID_ODOMCALIB));
 
   if (fixLaser) {
     cerr << "Fix position of the laser offset" << endl;
@@ -165,17 +178,19 @@ int main(int argc, char** argv)
   optimizer.computeActiveErrors();
   cerr << "Initial chi2 = " << FIXED(optimizer.chi2()) << endl;
 
-  int i=optimizer.optimize(maxIterations);
-  if (maxIterations > 0 && !i){
+  int i = optimizer.optimize(maxIterations);
+  if (maxIterations > 0 && !i) {
     cerr << "optimize failed, result might be invalid" << endl;
   }
 
   if (laserOffset) {
-    cerr << "Calibrated laser offset (x, y, theta):" << laserOffset->estimate().toVector().transpose() << endl;
+    cerr << "Calibrated laser offset (x, y, theta):"
+         << laserOffset->estimate().toVector().transpose() << endl;
   }
 
   if (odomParamsVertex) {
-    cerr << "Odometry parameters (scaling factors (v_l, v_r, b)): " << odomParamsVertex->estimate().transpose() << endl;
+    cerr << "Odometry parameters (scaling factors (v_l, v_r, b)): "
+         << odomParamsVertex->estimate().transpose() << endl;
   }
 
   cerr << "vertices: " << optimizer.vertices().size() << endl;
@@ -189,20 +204,23 @@ int main(int argc, char** argv)
 
   // optional input of a seperate file for applying the odometry calibration
   if (odomTestFilename.size() > 0) {
-
     DataQueue testRobotLaserQueue;
-    int numTestOdom = Gm2dlIO::readRobotLaser(odomTestFilename, testRobotLaserQueue);
+    int numTestOdom =
+        Gm2dlIO::readRobotLaser(odomTestFilename, testRobotLaserQueue);
     if (numTestOdom == 0) {
       cerr << "Unable to read test data" << endl;
     } else {
-
       ofstream rawStream("odometry_raw.txt");
       ofstream calibratedStream("odometry_calibrated.txt");
-      const Vector3d& odomCalib = odomParamsVertex ? odomParamsVertex->estimate() : Vector3d::Ones();
-      RobotLaser* prev = dynamic_cast<RobotLaser*>(testRobotLaserQueue.buffer().begin()->second);
+      const Vector3d& odomCalib =
+          odomParamsVertex ? odomParamsVertex->estimate() : Vector3d::Ones();
+      RobotLaser* prev = dynamic_cast<RobotLaser*>(
+          testRobotLaserQueue.buffer().begin()->second);
       SE2 prevCalibratedPose = prev->odomPose();
 
-      for (DataQueue::Buffer::const_iterator it = testRobotLaserQueue.buffer().begin(); it != testRobotLaserQueue.buffer().end(); ++it) {
+      for (DataQueue::Buffer::const_iterator it =
+               testRobotLaserQueue.buffer().begin();
+           it != testRobotLaserQueue.buffer().end(); ++it) {
         RobotLaser* cur = dynamic_cast<RobotLaser*>(it->second);
         assert(cur);
 
@@ -210,14 +228,20 @@ int main(int argc, char** argv)
         SE2 motion = prev->odomPose().inverse() * cur->odomPose();
 
         // convert to velocity measurment
-        MotionMeasurement motionMeasurement(motion.translation().x(), motion.translation().y(), motion.rotation().angle(), dt);
-        VelocityMeasurement velocityMeasurement = OdomConvert::convertToVelocity(motionMeasurement);
+        MotionMeasurement motionMeasurement(motion.translation().x(),
+                                            motion.translation().y(),
+                                            motion.rotation().angle(), dt);
+        VelocityMeasurement velocityMeasurement =
+            OdomConvert::convertToVelocity(motionMeasurement);
 
         // apply calibration
         VelocityMeasurement calibratedVelocityMeasurment = velocityMeasurement;
-        calibratedVelocityMeasurment.setVl(odomCalib(0) * calibratedVelocityMeasurment.vl());
-        calibratedVelocityMeasurment.setVr(odomCalib(1) * calibratedVelocityMeasurment.vr());
-        MotionMeasurement mm = OdomConvert::convertToMotion(calibratedVelocityMeasurment, odomCalib(2));
+        calibratedVelocityMeasurment.setVl(odomCalib(0) *
+                                           calibratedVelocityMeasurment.vl());
+        calibratedVelocityMeasurment.setVr(odomCalib(1) *
+                                           calibratedVelocityMeasurment.vr());
+        MotionMeasurement mm = OdomConvert::convertToMotion(
+            calibratedVelocityMeasurment, odomCalib(2));
 
         // combine calibrated odometry with the previous pose
         SE2 remappedOdom;
@@ -225,14 +249,17 @@ int main(int argc, char** argv)
         SE2 calOdomPose = prevCalibratedPose * remappedOdom;
 
         // write output
-        rawStream << prev->odomPose().translation().x() << " " << prev->odomPose().translation().y() << " " << prev->odomPose().rotation().angle() << endl;
-        calibratedStream << calOdomPose.translation().x() << " " << calOdomPose.translation().y() << " " << calOdomPose.rotation().angle() << endl;
+        rawStream << prev->odomPose().translation().x() << " "
+                  << prev->odomPose().translation().y() << " "
+                  << prev->odomPose().rotation().angle() << endl;
+        calibratedStream << calOdomPose.translation().x() << " "
+                         << calOdomPose.translation().y() << " "
+                         << calOdomPose.rotation().angle() << endl;
 
         prevCalibratedPose = calOdomPose;
         prev = cur;
       }
     }
-
   }
 
   if (outputfilename.size() > 0) {

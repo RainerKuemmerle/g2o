@@ -27,85 +27,82 @@
 #ifndef G2O_VERTEX_TRACKXYZ_H_
 #define G2O_VERTEX_TRACKXYZ_H_
 
-#include "g2o_types_slam3d_api.h"
 #include "g2o/core/base_vertex.h"
 #include "g2o/core/hyper_graph_action.h"
+#include "g2o_types_slam3d_api.h"
 
 namespace g2o {
-  /**
-   * \brief Vertex for a tracked point in space
-   */
-  class G2O_TYPES_SLAM3D_API VertexPointXYZ : public BaseVertex<3, Vector3>
-  {
-    public:
-      EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
-      VertexPointXYZ() {}
-      virtual bool read(std::istream& is);
-      virtual bool write(std::ostream& os) const;
+/**
+ * \brief Vertex for a tracked point in space
+ */
+class G2O_TYPES_SLAM3D_API VertexPointXYZ : public BaseVertex<3, Vector3> {
+ public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
+  VertexPointXYZ() {}
+  virtual bool read(std::istream& is);
+  virtual bool write(std::ostream& os) const;
 
-      virtual void setToOriginImpl() { _estimate.fill(0.); }
+  virtual void setToOriginImpl() { _estimate.fill(0.); }
 
-      virtual void oplusImpl(const number_t* update_) {
-        Eigen::Map<const Vector3> update(update_);
-        _estimate += update;
-      }
+  virtual void oplusImpl(const number_t* update_) {
+    Eigen::Map<const Vector3> update(update_);
+    _estimate += update;
+  }
 
-      virtual bool setEstimateDataImpl(const number_t* est){
-        Eigen::Map<const Vector3> estMap(est);
-        _estimate = estMap;
-        return true;
-      }
+  virtual bool setEstimateDataImpl(const number_t* est) {
+    Eigen::Map<const Vector3> estMap(est);
+    _estimate = estMap;
+    return true;
+  }
 
-      virtual bool getEstimateData(number_t* est) const{
-        Eigen::Map<Vector3> estMap(est);
-        estMap = _estimate;
-        return true;
-      }
+  virtual bool getEstimateData(number_t* est) const {
+    Eigen::Map<Vector3> estMap(est);
+    estMap = _estimate;
+    return true;
+  }
 
-      virtual int estimateDimension() const {
-        return Dimension;
-      }
+  virtual int estimateDimension() const { return Dimension; }
 
-      virtual bool setMinimalEstimateDataImpl(const number_t* est){
-        _estimate = Eigen::Map<const Vector3>(est);
-        return true;
-      }
+  virtual bool setMinimalEstimateDataImpl(const number_t* est) {
+    _estimate = Eigen::Map<const Vector3>(est);
+    return true;
+  }
 
-      virtual bool getMinimalEstimateData(number_t* est) const{
-        Eigen::Map<Vector3> v(est);
-        v = _estimate;
-        return true;
-      }
+  virtual bool getMinimalEstimateData(number_t* est) const {
+    Eigen::Map<Vector3> v(est);
+    v = _estimate;
+    return true;
+  }
 
-      virtual int minimalEstimateDimension() const {
-        return Dimension;
-      }
+  virtual int minimalEstimateDimension() const { return Dimension; }
+};
 
-  };
-
-  class G2O_TYPES_SLAM3D_API VertexPointXYZWriteGnuplotAction: public WriteGnuplotAction
-  {
-    public:
-      VertexPointXYZWriteGnuplotAction();
-      virtual HyperGraphElementAction* operator()(HyperGraph::HyperGraphElement* element, HyperGraphElementAction::Parameters* params_ );
-  };
+class G2O_TYPES_SLAM3D_API VertexPointXYZWriteGnuplotAction
+    : public WriteGnuplotAction {
+ public:
+  VertexPointXYZWriteGnuplotAction();
+  virtual HyperGraphElementAction* operator()(
+      HyperGraph::HyperGraphElement* element,
+      HyperGraphElementAction::Parameters* params_);
+};
 
 #ifdef G2O_HAVE_OPENGL
-  /**
-   * \brief visualize a 3D point
-   */
-  class VertexPointXYZDrawAction: public DrawAction{
-    public:
-      VertexPointXYZDrawAction();
-      virtual HyperGraphElementAction* operator()(HyperGraph::HyperGraphElement* element,
-          HyperGraphElementAction::Parameters* params_);
+/**
+ * \brief visualize a 3D point
+ */
+class VertexPointXYZDrawAction : public DrawAction {
+ public:
+  VertexPointXYZDrawAction();
+  virtual HyperGraphElementAction* operator()(
+      HyperGraph::HyperGraphElement* element,
+      HyperGraphElementAction::Parameters* params_);
 
-
-    protected:
-      FloatProperty *_pointSize;
-      virtual bool refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_);
-  };
+ protected:
+  FloatProperty* _pointSize;
+  virtual bool refreshPropertyPtrs(
+      HyperGraphElementAction::Parameters* params_);
+};
 #endif
 
-}
+}  // namespace g2o
 #endif

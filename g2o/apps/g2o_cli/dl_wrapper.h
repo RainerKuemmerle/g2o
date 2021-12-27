@@ -27,8 +27,8 @@
 #ifndef G2O_DL_WRAPPER_H
 #define G2O_DL_WRAPPER_H
 
-#include <vector>
 #include <string>
+#include <vector>
 
 #ifdef WINDOWS
 #include <windows.h>
@@ -38,47 +38,47 @@
 
 namespace g2o {
 
+/**
+ * \brief Loading libraries during run-time
+ */
+class G2O_CLI_API DlWrapper {
+ public:
+  DlWrapper();
+  virtual ~DlWrapper();
+
   /**
-   * \brief Loading libraries during run-time
+   * open all libs from a directory matching a specific pattern.
+   * @return number of loaded libs
    */
-  class G2O_CLI_API DlWrapper
-  {
-    public:
-      DlWrapper();
-      virtual ~DlWrapper();
+  int openLibraries(const std::string& directory,
+                    const std::string& pattern = "");
 
-      /**
-       * open all libs from a directory matching a specific pattern.
-       * @return number of loaded libs
-       */
-      int openLibraries(const std::string& directory, const std::string& pattern = "");
+  /**
+   * open a specific library
+   */
+  bool openLibrary(const std::string& filename);
 
-      /**
-       * open a specific library
-       */
-      bool openLibrary(const std::string& filename);
+  /**
+   * free all loaded libs, i.e., call dlclose()
+   */
+  void clear();
 
-      /**
-       * free all loaded libs, i.e., call dlclose()
-       */
-      void clear();
+ protected:
+#if defined(UNIX) || defined(CYGWIN)
+  std::vector<void*> _handles;
+#elif defined(WINDOWS)
+  std::vector<HMODULE> _handles;
+#endif
+  std::vector<std::string> _filenames;
 
-    protected:
-# if defined (UNIX) || defined(CYGWIN)
-      std::vector<void*> _handles;
-#     elif defined (WINDOWS)
-      std::vector<HMODULE> _handles;
-#     endif
-      std::vector<std::string> _filenames;
+ private:
+  /**
+   * it's not allowed to draw a copy of the wrapper
+   */
+  DlWrapper(const DlWrapper&);
+  DlWrapper& operator=(const DlWrapper&);
+};
 
-    private:
-      /**
-       * it's not allowed to draw a copy of the wrapper
-       */
-      DlWrapper(const DlWrapper& );
-      DlWrapper& operator=(const DlWrapper& );
-  };
-
-}
+}  // namespace g2o
 
 #endif

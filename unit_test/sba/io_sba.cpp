@@ -35,9 +35,10 @@ using namespace std;
 using namespace g2o;
 
 struct RandomSBACam {
-  static SBACam create() { return SBACam(); } // TODO Randomize
+  static SBACam create() { return SBACam(); }  // TODO Randomize
   static bool isApprox(const SBACam& a, const SBACam& b) {
-    return a.toVector().isApprox(b.toVector(), 1e-5) && a.Kcam.isApprox(b.Kcam, 1e-5);
+    return a.toVector().isApprox(b.toVector(), 1e-5) &&
+           a.Kcam.isApprox(b.Kcam, 1e-5);
   }
 };
 

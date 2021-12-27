@@ -46,7 +46,8 @@ bool writeCs2Octave(const char* filename, const cs* A, bool upperTriangular) {
     const int* Aj = A->p;
     const int* Ai = A->i;
     const number_t* Ax = A->x;
-    return writeTripletMatrix(filename, A->nz, rows, cols, Ai, Aj, Ax, upperTriangular);
+    return writeTripletMatrix(filename, A->nz, rows, cols, Ai, Aj, Ax,
+                              upperTriangular);
   }
 }
 

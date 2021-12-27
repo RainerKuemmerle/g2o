@@ -27,49 +27,48 @@
 #ifndef G2O_TICTOC_H
 #define G2O_TICTOC_H
 
-#include "g2o_stuff_api.h"
-
 #include <string>
+
+#include "g2o_stuff_api.h"
 
 namespace g2o {
 
-  /**
-   * \brief Profile the timing of certain parts of your algorithm.
-   *
-   * Profile the timing of certain parts of your algorithm.
-   * A typical use-case is as follows:
-   *
-   * tictoc("doSomething");
-   * // place the code here.
-   * tictoc("doSomething");
-   *
-   * This will calculate statistics for the operations within
-   * the two calls to tictoc()
-   *
-   * If the environment variable G2O_ENABLE_TICTOC is defined, the timing will
-   * be performed.
-   */
-   G2O_STUFF_API number_t tictoc(const char* algorithmPart);
+/**
+ * \brief Profile the timing of certain parts of your algorithm.
+ *
+ * Profile the timing of certain parts of your algorithm.
+ * A typical use-case is as follows:
+ *
+ * tictoc("doSomething");
+ * // place the code here.
+ * tictoc("doSomething");
+ *
+ * This will calculate statistics for the operations within
+ * the two calls to tictoc()
+ *
+ * If the environment variable G2O_ENABLE_TICTOC is defined, the timing will
+ * be performed.
+ */
+G2O_STUFF_API number_t tictoc(const char* algorithmPart);
 
-   /**
-    * \brief Simplify calls to tictoc() for a whole scope
-    *
-    * See also the macro G2O_SCOPED_TICTOC below.
-    */
-   class G2O_STUFF_API ScopedTictoc
-   {
-     public:
-       ScopedTictoc(const char* algorithmPart);
-       ~ScopedTictoc();
-     protected:
-       std::string _algorithmPart;
-   };
+/**
+ * \brief Simplify calls to tictoc() for a whole scope
+ *
+ * See also the macro G2O_SCOPED_TICTOC below.
+ */
+class G2O_STUFF_API ScopedTictoc {
+ public:
+  ScopedTictoc(const char* algorithmPart);
+  ~ScopedTictoc();
 
-} // end namespace
+ protected:
+  std::string _algorithmPart;
+};
+
+}  // namespace g2o
 
 #ifndef G2O_SCOPED_TICTOC
-#define G2O_SCOPED_TICTOC(s) \
-  g2o::ScopedTictoc scopedTictoc (s)
+#define G2O_SCOPED_TICTOC(s) g2o::ScopedTictoc scopedTictoc(s)
 #endif
 
 #endif

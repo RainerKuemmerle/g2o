@@ -27,83 +27,78 @@
 #ifndef G2O_VERTEX_LINE2D_H
 #define G2O_VERTEX_LINE2D_H
 
-#include "g2o_types_slam2d_addons_api.h"
 #include "g2o/config.h"
 #include "g2o/core/base_vertex.h"
 #include "g2o/core/hyper_graph_action.h"
 #include "g2o/stuff/misc.h"
 #include "g2o/types/slam2d/vertex_point_xy.h"
+#include "g2o_types_slam2d_addons_api.h"
 #include "line_2d.h"
 
 namespace g2o {
 
-  class G2O_TYPES_SLAM2D_ADDONS_API VertexLine2D : public BaseVertex<2, Line2D>
-  {
-    public:
-      EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
-      VertexLine2D();
+class G2O_TYPES_SLAM2D_ADDONS_API VertexLine2D : public BaseVertex<2, Line2D> {
+ public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
+  VertexLine2D();
 
-      number_t theta() const {return _estimate[0]; }
-      void setTheta(number_t t) { _estimate[0] = t; }
+  number_t theta() const { return _estimate[0]; }
+  void setTheta(number_t t) { _estimate[0] = t; }
 
-      number_t rho() const {return _estimate[1]; }
-      void setRho(number_t r) { _estimate[1] = r; }
+  number_t rho() const { return _estimate[1]; }
+  void setRho(number_t r) { _estimate[1] = r; }
 
-      virtual void setToOriginImpl() {
-        _estimate.setZero();
-      }
+  virtual void setToOriginImpl() { _estimate.setZero(); }
 
-      virtual bool setEstimateDataImpl(const number_t* est){
-        Eigen::Map<const Vector2> v(est);
-        _estimate=Line2D(v);
-        return true;
-      }
+  virtual bool setEstimateDataImpl(const number_t* est) {
+    Eigen::Map<const Vector2> v(est);
+    _estimate = Line2D(v);
+    return true;
+  }
 
-      virtual bool getEstimateData(number_t* est) const{
-        Eigen::Map<Vector2> v(est);
-        v=_estimate;
-        return true;
-      }
+  virtual bool getEstimateData(number_t* est) const {
+    Eigen::Map<Vector2> v(est);
+    v = _estimate;
+    return true;
+  }
 
-      virtual int estimateDimension() const {
-        return 2;
-      }
+  virtual int estimateDimension() const { return 2; }
 
-      virtual bool setMinimalEstimateDataImpl(const number_t* est){
-        return setEstimateData(est);
-      }
+  virtual bool setMinimalEstimateDataImpl(const number_t* est) {
+    return setEstimateData(est);
+  }
 
-      virtual bool getMinimalEstimateData(number_t* est) const{
-        return getEstimateData(est);
-      }
+  virtual bool getMinimalEstimateData(number_t* est) const {
+    return getEstimateData(est);
+  }
 
-      virtual int minimalEstimateDimension() const {
-        return 2;
-      }
+  virtual int minimalEstimateDimension() const { return 2; }
 
-      virtual void oplusImpl(const number_t* update)
-      {
-        _estimate += Eigen::Map<const Vector2>(update);
-        _estimate(0) = normalize_theta(_estimate(0));
-      }
+  virtual void oplusImpl(const number_t* update) {
+    _estimate += Eigen::Map<const Vector2>(update);
+    _estimate(0) = normalize_theta(_estimate(0));
+  }
 
-      virtual bool read(std::istream& is);
-      virtual bool write(std::ostream& os) const;
-      int p1Id, p2Id;
-  };
+  virtual bool read(std::istream& is);
+  virtual bool write(std::ostream& os) const;
+  int p1Id, p2Id;
+};
 
 #ifdef G2O_HAVE_OPENGL
-  class G2O_TYPES_SLAM2D_ADDONS_API VertexLine2DDrawAction: public DrawAction{
-  public:
-    VertexLine2DDrawAction();
-    virtual HyperGraphElementAction* operator()(HyperGraph::HyperGraphElement* element,
-            HyperGraphElementAction::Parameters* params_);
-  protected:
-    FloatProperty *_pointSize;
-    virtual bool refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_);
-  };
+class G2O_TYPES_SLAM2D_ADDONS_API VertexLine2DDrawAction : public DrawAction {
+ public:
+  VertexLine2DDrawAction();
+  virtual HyperGraphElementAction* operator()(
+      HyperGraph::HyperGraphElement* element,
+      HyperGraphElementAction::Parameters* params_);
+
+ protected:
+  FloatProperty* _pointSize;
+  virtual bool refreshPropertyPtrs(
+      HyperGraphElementAction::Parameters* params_);
+};
 #endif
 
-}
+}  // namespace g2o
 
 #endif

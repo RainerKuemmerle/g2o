@@ -30,64 +30,61 @@
 #endif
 namespace g2o {
 
-  EdgeSE2SensorCalib::EdgeSE2SensorCalib() :
-    BaseFixedSizedEdge<3, SE2, VertexSE2, VertexSE2, VertexSE2>()
-  {
-  }
+EdgeSE2SensorCalib::EdgeSE2SensorCalib()
+    : BaseFixedSizedEdge<3, SE2, VertexSE2, VertexSE2, VertexSE2>() {}
 
-  void EdgeSE2SensorCalib::initialEstimate(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to)
-  {
-    (void) to;
-    VertexSE2* vi = static_cast<VertexSE2*>(_vertices[0]);
-    VertexSE2* vj = static_cast<VertexSE2*>(_vertices[1]);
-    VertexSE2* l  = static_cast<VertexSE2*>(_vertices[2]);
-    if (from.count(l) == 0)
-      return;
-    if (from.count(vi) == 1) {
-      vj->setEstimate(vi->estimate() * l->estimate() * measurement() * l->estimate().inverse());
-    } else {
-      vi->setEstimate(vj->estimate() * l->estimate() * _inverseMeasurement * l->estimate().inverse());
-    }
+void EdgeSE2SensorCalib::initialEstimate(
+    const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to) {
+  (void)to;
+  VertexSE2* vi = static_cast<VertexSE2*>(_vertices[0]);
+  VertexSE2* vj = static_cast<VertexSE2*>(_vertices[1]);
+  VertexSE2* l = static_cast<VertexSE2*>(_vertices[2]);
+  if (from.count(l) == 0) return;
+  if (from.count(vi) == 1) {
+    vj->setEstimate(vi->estimate() * l->estimate() * measurement() *
+                    l->estimate().inverse());
+  } else {
+    vi->setEstimate(vj->estimate() * l->estimate() * _inverseMeasurement *
+                    l->estimate().inverse());
   }
+}
 
-  bool EdgeSE2SensorCalib::read(std::istream& is)
-  {
-    Vector3 p;
-    internal::readVector(is, p);
-    _measurement.fromVector(p);
-    _inverseMeasurement=measurement().inverse();
-    return readInformationMatrix(is);
-  }
+bool EdgeSE2SensorCalib::read(std::istream& is) {
+  Vector3 p;
+  internal::readVector(is, p);
+  _measurement.fromVector(p);
+  _inverseMeasurement = measurement().inverse();
+  return readInformationMatrix(is);
+}
 
-  bool EdgeSE2SensorCalib::write(std::ostream& os) const
-  {
-    internal::writeVector(os, measurement().toVector());
-    return writeInformationMatrix(os);
-  }
+bool EdgeSE2SensorCalib::write(std::ostream& os) const {
+  internal::writeVector(os, measurement().toVector());
+  return writeInformationMatrix(os);
+}
 
 #ifdef G2O_HAVE_OPENGL
-  EdgeSE2SensorCalibDrawAction::EdgeSE2SensorCalibDrawAction() :
-    DrawAction(typeid(EdgeSE2SensorCalib).name())
-  {
-  }
+EdgeSE2SensorCalibDrawAction::EdgeSE2SensorCalibDrawAction()
+    : DrawAction(typeid(EdgeSE2SensorCalib).name()) {}
 
-  HyperGraphElementAction* EdgeSE2SensorCalibDrawAction::operator()(HyperGraph::HyperGraphElement* element, HyperGraphElementAction::Parameters* )
-  {
-    if (typeid(*element).name()!=_typeName)
-      return nullptr;
-    EdgeSE2SensorCalib* e = static_cast<EdgeSE2SensorCalib*>(element);
-    VertexSE2* fromEdge = static_cast<VertexSE2*>(e->vertex(0));
-    VertexSE2* toEdge   = static_cast<VertexSE2*>(e->vertex(1));
-    glColor3f(0.5,0.5,1.0);
-    glPushAttrib(GL_ENABLE_BIT);
-    glDisable(GL_LIGHTING);
-    glBegin(GL_LINES);
-    glVertex3f((float)fromEdge->estimate().translation().x(),(float)fromEdge->estimate().translation().y(),0.f);
-    glVertex3f((float)toEdge->estimate().translation().x(),(float)toEdge->estimate().translation().y(),0.f);
-    glEnd();
-    glPopAttrib();
-    return this;
-  }
+HyperGraphElementAction* EdgeSE2SensorCalibDrawAction::operator()(
+    HyperGraph::HyperGraphElement* element,
+    HyperGraphElementAction::Parameters*) {
+  if (typeid(*element).name() != _typeName) return nullptr;
+  EdgeSE2SensorCalib* e = static_cast<EdgeSE2SensorCalib*>(element);
+  VertexSE2* fromEdge = static_cast<VertexSE2*>(e->vertex(0));
+  VertexSE2* toEdge = static_cast<VertexSE2*>(e->vertex(1));
+  glColor3f(0.5, 0.5, 1.0);
+  glPushAttrib(GL_ENABLE_BIT);
+  glDisable(GL_LIGHTING);
+  glBegin(GL_LINES);
+  glVertex3f((float)fromEdge->estimate().translation().x(),
+             (float)fromEdge->estimate().translation().y(), 0.f);
+  glVertex3f((float)toEdge->estimate().translation().x(),
+             (float)toEdge->estimate().translation().y(), 0.f);
+  glEnd();
+  glPopAttrib();
+  return this;
+}
 #endif
 
-} // end namespace
+}  // namespace g2o

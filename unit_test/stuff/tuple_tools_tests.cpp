@@ -24,12 +24,10 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+#include "g2o/stuff/tuple_tools.h"
 #include "gtest/gtest.h"
 
-#include "g2o/stuff/tuple_tools.h"
-
-TEST(Stuff, Tuple_init)
-{ 
+TEST(Stuff, Tuple_init) {
   std::tuple<int, int, int> not_initialized;
   auto initialized = g2o::tuple_init(1, not_initialized);
   ASSERT_EQ(1, std::get<0>(initialized));
@@ -37,16 +35,14 @@ TEST(Stuff, Tuple_init)
   ASSERT_EQ(1, std::get<2>(initialized));
 }
 
-TEST(Stuff, Tuple_apply)
-{ 
+TEST(Stuff, Tuple_apply) {
   auto t = std::make_tuple(1, 2, 3);
   ASSERT_EQ(1, std::get<0>(t));
   ASSERT_EQ(2, std::get<1>(t));
   ASSERT_EQ(3, std::get<2>(t));
-  auto plus_one = [](int& i){++i;};
+  auto plus_one = [](int& i) { ++i; };
   g2o::tuple_apply_i(plus_one, t, 1);
   ASSERT_EQ(1, std::get<0>(t));
   ASSERT_EQ(3, std::get<1>(t));
   ASSERT_EQ(3, std::get<2>(t));
 }
-

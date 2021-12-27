@@ -66,8 +66,8 @@ TEST(General, RobustKernelFactory) {
 }
 
 /**
- * Type parameterized class for a fixture to setup a linear solver along with some data of a linear
- * system to be solved.
+ * Type parameterized class for a fixture to setup a linear solver along with
+ * some data of a linear system to be solved.
  */
 template <typename T>
 class RobustKernelTests : public Test {

@@ -24,33 +24,28 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+#include "g2o/core/jacobian_workspace.h"
+#include "g2o/core/optimizable_graph.h"
+#include "g2o/types/slam3d/dquat2mat.h"
+#include "g2o/types/slam3d/edge_pointxyz.h"
+#include "g2o/types/slam3d/edge_se3.h"
+#include "g2o/types/slam3d/edge_se3_pointxyz.h"
+#include "g2o/types/slam3d/edge_se3_xyzprior.h"
 #include "gtest/gtest.h"
-
 #include "unit_test/test_helper/evaluate_jacobian.h"
 #include "unit_test/test_helper/random_state.h"
 
-#include "g2o/core/jacobian_workspace.h"
-#include "g2o/types/slam3d/edge_se3.h"
-#include "g2o/types/slam3d/edge_pointxyz.h"
-#include "g2o/types/slam3d/edge_se3_pointxyz.h"
-#include "g2o/types/slam3d/edge_se3_xyzprior.h"
-#include "g2o/types/slam3d/dquat2mat.h"
-
-
-#include "g2o/core/optimizable_graph.h"
-
 #ifdef G2O_USE_VENDORED_CERES
-  #include "g2o/EXTERNAL/ceres/autodiff.h"
+#include "g2o/EXTERNAL/ceres/autodiff.h"
 #else
-  #include <ceres/internal/autodiff.h>
+#include <ceres/internal/autodiff.h>
 #endif
 
 using namespace std;
 using namespace g2o;
 using namespace g2o::internal;
 
-TEST(Slam3D, EdgeSE3Jacobian)
-{
+TEST(Slam3D, EdgeSE3Jacobian) {
   VertexSE3 v1;
   v1.setId(0);
 
@@ -76,8 +71,7 @@ TEST(Slam3D, EdgeSE3Jacobian)
   }
 }
 
-TEST(Slam3D, EdgeSE3XYZPriorJacobian)
-{
+TEST(Slam3D, EdgeSE3XYZPriorJacobian) {
   VertexSE3 v1;
   v1.setId(0);
 
@@ -104,8 +98,7 @@ TEST(Slam3D, EdgeSE3XYZPriorJacobian)
   }
 }
 
-TEST(Slam3D, EdgeSE3PointXYZJacobian)
-{
+TEST(Slam3D, EdgeSE3PointXYZJacobian) {
   OptimizableGraph graph;
 
   VertexSE3* v1 = new VertexSE3;
@@ -142,8 +135,7 @@ TEST(Slam3D, EdgeSE3PointXYZJacobian)
   }
 }
 
-TEST(Slam3D, EdgePointXYZJacobian)
-{
+TEST(Slam3D, EdgePointXYZJacobian) {
   VertexPointXYZ v1;
   v1.setId(0);
 
@@ -172,54 +164,49 @@ TEST(Slam3D, EdgePointXYZJacobian)
 /**
  * \brief Functor used to compute the Jacobian via AD
  */
-struct RotationMatrix2QuaternionManifold
-{
-  template<typename T>
-  bool operator()(const T* rotMatSerialized, T* quaternion) const
-  {
-    typename Eigen::Matrix<T, 3, 3, Eigen::ColMajor>::ConstMapType R(rotMatSerialized);
+struct RotationMatrix2QuaternionManifold {
+  template <typename T>
+  bool operator()(const T* rotMatSerialized, T* quaternion) const {
+    typename Eigen::Matrix<T, 3, 3, Eigen::ColMajor>::ConstMapType R(
+        rotMatSerialized);
 
     T t = R.trace();
     if (t > T(0)) {
-      //cerr << "w";
+      // cerr << "w";
       t = sqrt(t + T(1));
-      //T w = T(0.5)*t;
-      t = T(0.5)/t;
-      quaternion[0] = (R(2,1) - R(1,2)) * t;
-      quaternion[1] = (R(0,2) - R(2,0)) * t;
-      quaternion[2] = (R(1,0) - R(0,1)) * t;
+      // T w = T(0.5)*t;
+      t = T(0.5) / t;
+      quaternion[0] = (R(2, 1) - R(1, 2)) * t;
+      quaternion[1] = (R(0, 2) - R(2, 0)) * t;
+      quaternion[2] = (R(1, 0) - R(0, 1)) * t;
     } else {
       int i = 0;
-      if (R(1,1) > R(0,0))
-        i = 1;
-      if (R(2,2) > R(i,i))
-        i = 2;
-      int j = (i+1)%3;
-      int k = (j+1)%3;
-      //cerr << i;
+      if (R(1, 1) > R(0, 0)) i = 1;
+      if (R(2, 2) > R(i, i)) i = 2;
+      int j = (i + 1) % 3;
+      int k = (j + 1) % 3;
+      // cerr << i;
 
-      t = sqrt(R(i,i) - R(j,j) - R(k,k) + T(1.0));
+      t = sqrt(R(i, i) - R(j, j) - R(k, k) + T(1.0));
       quaternion[i] = T(0.5) * t;
-      t = T(0.5)/t;
-      quaternion[j] = (R(j,i) + R(i,j)) * t;
-      quaternion[k] = (R(k,i) + R(i,k)) * t;
-      T w = (R(k,j) - R(j,k)) * t;
+      t = T(0.5) / t;
+      quaternion[j] = (R(j, i) + R(i, j)) * t;
+      quaternion[k] = (R(k, i) + R(i, k)) * t;
+      T w = (R(k, j) - R(j, k)) * t;
       // normalize to our manifold, such that w is positive
       if (w < cst(0)) {
-        //cerr << "  normalizing w > 0  ";
-        for (int l = 0; l < 3; ++l)
-          quaternion[l] *= T(-1);
+        // cerr << "  normalizing w > 0  ";
+        for (int l = 0; l < 3; ++l) quaternion[l] *= T(-1);
       }
     }
     return true;
   }
 };
 
-TEST(Slam3D, dqDRJacobian)
-{
-  Eigen::Matrix<number_t, 3, 9, Eigen::ColMajor>  dq_dR;
+TEST(Slam3D, dqDRJacobian) {
+  Eigen::Matrix<number_t, 3, 9, Eigen::ColMajor> dq_dR;
   Eigen::Matrix<number_t, 3, 9, Eigen::RowMajor> dq_dR_AD;
-  dq_dR_AD.setZero(); // avoid warning about uninitialized memory
+  dq_dR_AD.setZero();  // avoid warning about uninitialized memory
   for (int k = 0; k < 10000; ++k) {
     // create a random rotation matrix by sampling a random 3d vector
     // that will be used in axis-angle representation to create the matrix
@@ -229,20 +216,21 @@ TEST(Slam3D, dqDRJacobian)
     Matrix3 Re = rotation.toRotationMatrix();
 
     // our analytic function which we want to evaluate
-    Eigen::Matrix<number_t, 3, 9, Eigen::ColMajor>  dq_dR;
-    compute_dq_dR (dq_dR,
-        Re(0,0),Re(1,0),Re(2,0),
-        Re(0,1),Re(1,1),Re(2,1),
-        Re(0,2),Re(1,2),Re(2,2));
+    Eigen::Matrix<number_t, 3, 9, Eigen::ColMajor> dq_dR;
+    compute_dq_dR(dq_dR, Re(0, 0), Re(1, 0), Re(2, 0), Re(0, 1), Re(1, 1),
+                  Re(2, 1), Re(0, 2), Re(1, 2), Re(2, 2));
 
     // compute the Jacobian using AD
-    number_t *parameters[] = { Re.data() };
-    number_t *jacobians[] = { dq_dR_AD.data() };
+    number_t* parameters[] = {Re.data()};
+    number_t* jacobians[] = {dq_dR_AD.data()};
     number_t value[3];
     RotationMatrix2QuaternionManifold rot2quat;
-    using RotationMatrix2QuaternionManifoldDims = ceres::internal::StaticParameterDims<9>;
-    ceres::internal::AutoDifferentiate<3, RotationMatrix2QuaternionManifoldDims, RotationMatrix2QuaternionManifold,
-                                       number_t>(rot2quat, parameters, 3, value, jacobians);
+    using RotationMatrix2QuaternionManifoldDims =
+        ceres::internal::StaticParameterDims<9>;
+    ceres::internal::AutoDifferentiate<3, RotationMatrix2QuaternionManifoldDims,
+                                       RotationMatrix2QuaternionManifold,
+                                       number_t>(rot2quat, parameters, 3, value,
+                                                 jacobians);
 
     number_t maxDifference = (dq_dR - dq_dR_AD).array().abs().maxCoeff();
     EXPECT_NEAR(0., maxDifference, 1e-7);

@@ -36,7 +36,8 @@
 namespace g2o {
 
 class G2O_TYPES_SBA_API EdgeProjectPSI2UV
-    : public g2o::BaseFixedSizedEdge<2, Vector2, VertexPointXYZ, VertexSE3Expmap, VertexSE3Expmap> {
+    : public g2o::BaseFixedSizedEdge<2, Vector2, VertexPointXYZ,
+                                     VertexSE3Expmap, VertexSE3Expmap> {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 

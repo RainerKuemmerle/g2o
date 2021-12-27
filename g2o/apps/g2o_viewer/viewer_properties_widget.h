@@ -22,24 +22,22 @@
 #include "g2o_viewer_api.h"
 #include "properties_widget.h"
 
-namespace g2o
-{
-  class G2oQGLViewer;
+namespace g2o {
+class G2oQGLViewer;
 }
 
-class G2O_VIEWER_API ViewerPropertiesWidget : public PropertiesWidget
-{
-  public:
-    ViewerPropertiesWidget(QWidget * parent = 0);
-    virtual ~ViewerPropertiesWidget();
+class G2O_VIEWER_API ViewerPropertiesWidget : public PropertiesWidget {
+ public:
+  ViewerPropertiesWidget(QWidget* parent = 0);
+  virtual ~ViewerPropertiesWidget();
 
-    void setViewer(g2o::G2oQGLViewer* viewer);
+  void setViewer(g2o::G2oQGLViewer* viewer);
 
-  protected:
-    g2o::G2oQGLViewer* _viewer;
+ protected:
+  g2o::G2oQGLViewer* _viewer;
 
-    virtual void applyProperties();
-    virtual std::string humanReadablePropName(const std::string& probName) const;
+  virtual void applyProperties();
+  virtual std::string humanReadablePropName(const std::string& probName) const;
 };
 
 #endif

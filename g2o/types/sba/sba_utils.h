@@ -39,15 +39,16 @@ inline Vector3 invert_depth(const Vector3& x) {
   return unproject(aux) / x[2];
 }
 
-inline Eigen::Matrix<number_t, 2, 3, Eigen::ColMajor> d_proj_d_y(const number_t& f,
-                                                                 const Vector3& xyz) {
+inline Eigen::Matrix<number_t, 2, 3, Eigen::ColMajor> d_proj_d_y(
+    const number_t& f, const Vector3& xyz) {
   number_t z_sq = xyz[2] * xyz[2];
   Eigen::Matrix<number_t, 2, 3, Eigen::ColMajor> J;
   J << f / xyz[2], 0, -(f * xyz[0]) / z_sq, 0, f / xyz[2], -(f * xyz[1]) / z_sq;
   return J;
 }
 
-inline Eigen::Matrix<number_t, 3, 6, Eigen::ColMajor> d_expy_d_y(const Vector3& y) {
+inline Eigen::Matrix<number_t, 3, 6, Eigen::ColMajor> d_expy_d_y(
+    const Vector3& y) {
   Eigen::Matrix<number_t, 3, 6, Eigen::ColMajor> J;
   J.topLeftCorner<3, 3>() = -skew(y);
   J.bottomRightCorner<3, 3>().setIdentity();

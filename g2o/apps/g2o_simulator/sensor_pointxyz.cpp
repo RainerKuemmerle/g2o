@@ -84,7 +84,8 @@ void SensorPointXYZ::sense() {
   }
   if (!_robotPoseObject) return;
   _sensorPose = _robotPoseObject->vertex()->estimate() * _offsetParam->offset();
-  for (std::set<BaseWorldObject*>::iterator it = world()->objects().begin(); it != world()->objects().end(); ++it) {
+  for (std::set<BaseWorldObject*>::iterator it = world()->objects().begin();
+       it != world()->objects().end(); ++it) {
     WorldObjectType* o = dynamic_cast<WorldObjectType*>(*it);
     if (o && isVisible(o)) {
       EdgeType* e = mkEdge(o);

@@ -34,7 +34,8 @@
 
 namespace g2o {
 
-class G2O_TYPES_SLAM2D_ADDONS_API EdgeLine2D : public BaseBinaryEdge<2, Line2D, VertexLine2D, VertexLine2D> {
+class G2O_TYPES_SLAM2D_ADDONS_API EdgeLine2D
+    : public BaseBinaryEdge<2, Line2D, VertexLine2D, VertexLine2D> {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   EdgeLine2D();
@@ -72,7 +73,10 @@ class G2O_TYPES_SLAM2D_ADDONS_API EdgeLine2D : public BaseBinaryEdge<2, Line2D, 
     return true;
   }
 
-  virtual number_t initialEstimatePossible(const OptimizableGraph::VertexSet&, OptimizableGraph::Vertex*) { return 0; }
+  virtual number_t initialEstimatePossible(const OptimizableGraph::VertexSet&,
+                                           OptimizableGraph::Vertex*) {
+    return 0;
+  }
 #ifndef NUMERIC_JACOBIAN_THREE_D_TYPES
   virtual void linearizeOplus();
 #endif

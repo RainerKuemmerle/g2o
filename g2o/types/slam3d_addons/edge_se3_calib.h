@@ -27,27 +27,30 @@
 #ifndef G2O_EDGE_SE3_CALIB_H
 #define G2O_EDGE_SE3_CALIB_H
 
-#include "g2o_types_slam3d_addons_api.h"
 #include "g2o/core/base_variable_sized_edge.h"
-#include "g2o/types/slam3d/vertex_se3.h"
 #include "g2o/types/slam3d/isometry3d_mappings.h"
+#include "g2o/types/slam3d/vertex_se3.h"
+#include "g2o_types_slam3d_addons_api.h"
 
-namespace g2o
+namespace g2o {
+/**
+ * \brief Landmark measurement that also calibrates an offset for the landmark
+ * measurement
+ */
+class EdgeSE3Calib
+    : public BaseVariableSizedEdge<6, Isometry3>  // Avoid redefinition of
+                                                  // BaseEdge in MSVC
 {
-  /**
-   * \brief Landmark measurement that also calibrates an offset for the landmark measurement
-   */
-  class EdgeSE3Calib : public BaseVariableSizedEdge<6, Isometry3> //Avoid redefinition of BaseEdge in MSVC
-  {
-    public:
-      G2O_TYPES_SLAM3D_ADDONS_API EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-      G2O_TYPES_SLAM3D_ADDONS_API EdgeSE3Calib();
+ public:
+  G2O_TYPES_SLAM3D_ADDONS_API EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+      G2O_TYPES_SLAM3D_ADDONS_API
+      EdgeSE3Calib();
 
-      G2O_TYPES_SLAM3D_ADDONS_API void computeError();
-      G2O_TYPES_SLAM3D_ADDONS_API virtual bool read(std::istream& is);
-      G2O_TYPES_SLAM3D_ADDONS_API virtual bool write(std::ostream& os) const;
-  };
+  G2O_TYPES_SLAM3D_ADDONS_API void computeError();
+  G2O_TYPES_SLAM3D_ADDONS_API virtual bool read(std::istream& is);
+  G2O_TYPES_SLAM3D_ADDONS_API virtual bool write(std::ostream& os) const;
+};
 
-} // end namespace
+}  // namespace g2o
 
 #endif

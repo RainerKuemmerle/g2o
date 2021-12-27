@@ -70,17 +70,20 @@ void EdgeStereoSE3ProjectXYZOnlyPose::linearizeOplus() {
 }
 
 void EdgeStereoSE3ProjectXYZOnlyPose::computeError() {
-  const VertexSE3Expmap *v1 = static_cast<const VertexSE3Expmap *>(_vertices[0]);
+  const VertexSE3Expmap *v1 =
+      static_cast<const VertexSE3Expmap *>(_vertices[0]);
   Vector3 obs(_measurement);
   _error = obs - cam_project(v1->estimate().map(Xw));
 }
 
 bool EdgeStereoSE3ProjectXYZOnlyPose::isDepthPositive() {
-  const VertexSE3Expmap *v1 = static_cast<const VertexSE3Expmap *>(_vertices[0]);
+  const VertexSE3Expmap *v1 =
+      static_cast<const VertexSE3Expmap *>(_vertices[0]);
   return (v1->estimate().map(Xw))(2) > 0;
 }
 
-Vector3 EdgeStereoSE3ProjectXYZOnlyPose::cam_project(const Vector3 &trans_xyz) const {
+Vector3 EdgeStereoSE3ProjectXYZOnlyPose::cam_project(
+    const Vector3 &trans_xyz) const {
   const float invz = 1.0f / trans_xyz[2];
   Vector3 res;
   res[0] = trans_xyz[0] * invz * fx + cx;

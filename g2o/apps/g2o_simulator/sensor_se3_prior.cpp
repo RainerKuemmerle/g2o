@@ -30,7 +30,8 @@ namespace g2o {
 using namespace std;
 
 // SensorSE3Prior
-SensorSE3Prior::SensorSE3Prior(const std::string& name_) : UnarySensor<Robot3D, EdgeSE3Prior>(name_) {
+SensorSE3Prior::SensorSE3Prior(const std::string& name_)
+    : UnarySensor<Robot3D, EdgeSE3Prior>(name_) {
   _offsetParam = 0;
   _information.setIdentity();
   _information *= 1000;

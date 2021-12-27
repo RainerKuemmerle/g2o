@@ -28,34 +28,34 @@
 #define G2O_DATA_QUEUE_H
 
 #include <map>
+
 #include "g2o_types_data_api.h"
 
 namespace g2o {
 
-  class RobotData;
+class RobotData;
 
-  /**
-   * \brief a simple queue to store data and retrieve based on a timestamp
-   */
-  class G2O_TYPES_DATA_API DataQueue
-  {
-    public:
-      typedef std::map<number_t, RobotData*>           Buffer;
+/**
+ * \brief a simple queue to store data and retrieve based on a timestamp
+ */
+class G2O_TYPES_DATA_API DataQueue {
+ public:
+  typedef std::map<number_t, RobotData*> Buffer;
 
-    public:
-      void add(RobotData* rd);
+ public:
+  void add(RobotData* rd);
 
-      RobotData* findClosestData(number_t timestamp) const;
+  RobotData* findClosestData(number_t timestamp) const;
 
-      RobotData* before(number_t timestamp) const;
-      RobotData* after(number_t timestamp) const;
+  RobotData* before(number_t timestamp) const;
+  RobotData* after(number_t timestamp) const;
 
-      const Buffer& buffer() const {return _buffer;}
+  const Buffer& buffer() const { return _buffer; }
 
-    protected:
-      Buffer _buffer;
-  };
+ protected:
+  Buffer _buffer;
+};
 
-} // end namespace
+}  // namespace g2o
 
 #endif

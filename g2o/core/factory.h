@@ -73,12 +73,13 @@ class G2O_CORE_API Factory {
   HyperGraph::HyperGraphElement* construct(const std::string& tag) const;
 
   /**
-   * construct a graph element based on its tag, but only if it's type (a bitmask) matches. A
-   * bitmask without any bit set will construct any item. Otherwise a bit has to be set to allow
-   * construction of a graph element.
+   * construct a graph element based on its tag, but only if it's type (a
+   * bitmask) matches. A bitmask without any bit set will construct any item.
+   * Otherwise a bit has to be set to allow construction of a graph element.
    */
   HyperGraph::HyperGraphElement* construct(
-      const std::string& tag, const HyperGraph::GraphElemBitset& elemsToConstruct) const;
+      const std::string& tag,
+      const HyperGraph::GraphElemBitset& elemsToConstruct) const;
 
   /**
    * return whether the factory knows this tag or not
@@ -121,8 +122,8 @@ class RegisterTypeProxy {
  public:
   RegisterTypeProxy(const std::string& name) : _name(name) {
 #ifdef G2O_DEBUG_FACTORY
-    std::cout << __FUNCTION__ << ": Registering " << _name << " of type " << typeid(T).name()
-              << std::endl;
+    std::cout << __FUNCTION__ << ": Registering " << _name << " of type "
+              << typeid(T).name() << std::endl;
 #endif
     _creator.reset(new HyperGraphElementCreator<T>());
     Factory::instance()->registerType(_name, _creator);
@@ -157,6 +158,7 @@ class RegisterTypeProxy {
 
 #define G2O_USE_TYPE_GROUP(typeGroupName)                                  \
   extern "C" void G2O_FACTORY_IMPORT g2o_type_group_##typeGroupName(void); \
-  static g2o::ForceLinker g2o_force_type_link_##typeGroupName(g2o_type_group_##typeGroupName);
+  static g2o::ForceLinker g2o_force_type_link_##typeGroupName(             \
+      g2o_type_group_##typeGroupName);
 
 #endif

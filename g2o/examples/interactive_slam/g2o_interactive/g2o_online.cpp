@@ -24,27 +24,24 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include <iostream>
-#include <iomanip>
 #include <csignal>
 #include <cstdlib>
+#include <iomanip>
+#include <iostream>
 
-#include "g2o/stuff/macros.h"
 #include "g2o/stuff/command_args.h"
+#include "g2o/stuff/macros.h"
 #include "g2o/stuff/timeutil.h"
-
-#include "slam_parser/interface/parser_interface.h"
-
 #include "g2o_slam_interface.h"
 #include "graph_optimizer_sparse_online.h"
+#include "slam_parser/interface/parser_interface.h"
 
-static bool hasToStop=false;
+static bool hasToStop = false;
 
 using namespace std;
 using namespace g2o;
 
-void sigquit_handler(int sig)
-{
+void sigquit_handler(int sig) {
   if (sig == SIGINT) {
     hasToStop = 1;
     static int cnt = 0;
@@ -55,15 +52,15 @@ void sigquit_handler(int sig)
   }
 }
 
-int main(int argc, char** argv)
-{
+int main(int argc, char** argv) {
   bool pcg;
   int updateEachN;
   bool vis;
   bool verbose;
   // command line parsing
   CommandArgs arg;
-  arg.param("update", updateEachN, 10, "update the graph after inserting N nodes");
+  arg.param("update", updateEachN, 10,
+            "update the graph after inserting N nodes");
   arg.param("pcg", pcg, false, "use PCG instead of Cholesky");
   arg.param("v", verbose, false, "verbose output of the optimization process");
   arg.param("g", vis, false, "gnuplot visualization");
@@ -80,8 +77,7 @@ int main(int argc, char** argv)
 
   SlamParser::ParserInterface parserInterface(&slamInterface);
 
-  while (parserInterface.parseCommand(cin))
-  {
+  while (parserInterface.parseCommand(cin)) {
     // do something additional if needed
   }
 

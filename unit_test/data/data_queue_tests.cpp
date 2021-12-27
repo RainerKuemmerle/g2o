@@ -58,13 +58,18 @@ TEST(Data, DataQueue) {
   ASSERT_EQ(nullptr, dataQueue.after(ktimeOffset + knumData - 1.));
 
   ASSERT_DOUBLE_EQ(ktimeOffset, dataQueue.findClosestData(0.)->timestamp());
-  ASSERT_DOUBLE_EQ(ktimeOffset + knumData - 1.,
-                   dataQueue.findClosestData(ktimeOffset + knumData + 1)->timestamp());
+  ASSERT_DOUBLE_EQ(
+      ktimeOffset + knumData - 1.,
+      dataQueue.findClosestData(ktimeOffset + knumData + 1)->timestamp());
 
-  ASSERT_DOUBLE_EQ(ktimeOffset, dataQueue.findClosestData(ktimeOffset)->timestamp());
-  ASSERT_DOUBLE_EQ(ktimeOffset, dataQueue.findClosestData(ktimeOffset + 0.45)->timestamp());
-  ASSERT_DOUBLE_EQ(ktimeOffset + 1., dataQueue.findClosestData(ktimeOffset + 0.55)->timestamp());
-  ASSERT_DOUBLE_EQ(ktimeOffset + 1., dataQueue.findClosestData(ktimeOffset + 1.)->timestamp());
+  ASSERT_DOUBLE_EQ(ktimeOffset,
+                   dataQueue.findClosestData(ktimeOffset)->timestamp());
+  ASSERT_DOUBLE_EQ(ktimeOffset,
+                   dataQueue.findClosestData(ktimeOffset + 0.45)->timestamp());
+  ASSERT_DOUBLE_EQ(ktimeOffset + 1.,
+                   dataQueue.findClosestData(ktimeOffset + 0.55)->timestamp());
+  ASSERT_DOUBLE_EQ(ktimeOffset + 1.,
+                   dataQueue.findClosestData(ktimeOffset + 1.)->timestamp());
 
   // clean up
   for (auto d : myRobotData) delete d;

@@ -27,35 +27,37 @@
 #ifndef G2O_SIMUTILS_H_
 #define G2O_SIMUTILS_H_
 
-#include "simulator2d_base.h"
-#include "pointsensorparameters.h"
 #include "g2o_simulator_api.h"
+#include "pointsensorparameters.h"
+#include "simulator2d_base.h"
 
 namespace g2o {
-  // -1: outside
-  // 0: p1Clipped
-  // 1: p2clipped
-  // 2: inside
-  // 3: all clipped
+// -1: outside
+// 0: p1Clipped
+// 1: p2clipped
+// 2: inside
+// 3: all clipped
 
-  G2O_SIMULATOR_API int clipSegmentCircle(Eigen::Vector2d& p1, Eigen::Vector2d& p2, double r);
+G2O_SIMULATOR_API int clipSegmentCircle(Eigen::Vector2d& p1,
+                                        Eigen::Vector2d& p2, double r);
 
-  // -1: outside
-  // 0: p1Clipped
-  // 1: p2clipped
-  // 2: inside
-  G2O_SIMULATOR_API int clipSegmentLine(Eigen::Vector2d& p1, Eigen::Vector2d& p2, double a, double b, double c );
-  
+// -1: outside
+// 0: p1Clipped
+// 1: p2clipped
+// 2: inside
+G2O_SIMULATOR_API int clipSegmentLine(Eigen::Vector2d& p1, Eigen::Vector2d& p2,
+                                      double a, double b, double c);
 
-  // -1: outside
-  // 0: p1Clipped
-  // 1: p2clipped
-  // 2: inside
-  // 3: all clipped
-  G2O_SIMULATOR_API int clipSegmentFov(Eigen::Vector2d& p1, Eigen::Vector2d& p2, double min, double max);
+// -1: outside
+// 0: p1Clipped
+// 1: p2clipped
+// 2: inside
+// 3: all clipped
+G2O_SIMULATOR_API int clipSegmentFov(Eigen::Vector2d& p1, Eigen::Vector2d& p2,
+                                     double min, double max);
 
-  
-  G2O_SIMULATOR_API Eigen::Vector2d computeLineParameters(const Eigen::Vector2d& p1, const Eigen::Vector2d& p2);
-}
+G2O_SIMULATOR_API Eigen::Vector2d computeLineParameters(
+    const Eigen::Vector2d& p1, const Eigen::Vector2d& p2);
+}  // namespace g2o
 
 #endif

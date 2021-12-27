@@ -27,11 +27,11 @@
 #ifndef G2O_TIMEUTIL_H
 #define G2O_TIMEUTIL_H
 
-#include <string>
 #include <chrono>
+#include <string>
 
-#include "g2o_stuff_api.h"
 #include "g2o/stuff/misc.h"
+#include "g2o_stuff_api.h"
 
 /** @addtogroup utils **/
 // @{
@@ -41,20 +41,20 @@
  */
 
 /// Executes code, only if secs are gone since last exec.
-/// extended version, in which the current time is given, e.g., timestamp of IPC message
+/// extended version, in which the current time is given, e.g., timestamp of IPC
+/// message
 #ifndef DO_EVERY_TS
-#define DO_EVERY_TS(secs, currentTime, code) \
-if (1) {\
-  static number_t s_lastDone_ = (currentTime); \
-  number_t s_now_ = (currentTime); \
-  if (s_lastDone_ > s_now_) \
-    s_lastDone_ = s_now_; \
-  if (s_now_ - s_lastDone_ > (secs)) { \
-    code; \
-    s_lastDone_ = s_now_; \
-  }\
-} else \
-  (void)0
+#define DO_EVERY_TS(secs, currentTime, code)        \
+  if (1) {                                          \
+    static number_t s_lastDone_ = (currentTime);    \
+    number_t s_now_ = (currentTime);                \
+    if (s_lastDone_ > s_now_) s_lastDone_ = s_now_; \
+    if (s_now_ - s_lastDone_ > (secs)) {            \
+      code;                                         \
+      s_lastDone_ = s_now_;                         \
+    }                                               \
+  } else                                            \
+    (void)0
 #endif
 
 /// Executes code, only if secs are gone since last exec.
@@ -63,13 +63,14 @@ if (1) {\
 #endif
 
 #ifndef MEASURE_TIME
-#define MEASURE_TIME(text, code) \
-  if(1) { \
-    number_t _start_time_ = g2o::get_time(); \
-    code; \
-    std::cerr << text << " took " << g2o::get_time() - _start_time_ << " sec" << std::endl; \
-  } else \
-    (void) 0
+#define MEASURE_TIME(text, code)                                              \
+  if (1) {                                                                    \
+    number_t _start_time_ = g2o::get_time();                                  \
+    code;                                                                     \
+    std::cerr << text << " took " << g2o::get_time() - _start_time_ << " sec" \
+              << std::endl;                                                   \
+  } else                                                                      \
+    (void)0
 #endif
 
 namespace g2o {
@@ -79,9 +80,8 @@ using seconds = std::chrono::duration<number_t>;
 /**
  * return the current time in seconds since 1. Jan 1970
  */
-inline number_t get_time() 
-{
-  return seconds{ std::chrono::system_clock::now().time_since_epoch() }.count();
+inline number_t get_time() {
+  return seconds{std::chrono::system_clock::now().time_since_epoch()}.count();
 }
 
 /**
@@ -98,21 +98,20 @@ G2O_STUFF_API number_t get_monotonic_time();
  * just create and instance at the beginning of the function.
  */
 class G2O_STUFF_API ScopeTime {
-  public: 
-    ScopeTime(const char* title);
-    ~ScopeTime();
-  private:
-    std::string _title;
-    number_t _startTime;
+ public:
+  ScopeTime(const char* title);
+  ~ScopeTime();
+
+ private:
+  std::string _title;
+  number_t _startTime;
 };
 
-} // end namespace
+}  // namespace g2o
 
 #ifndef MEASURE_FUNCTION_TIME
-#define MEASURE_FUNCTION_TIME \
-  g2o::ScopeTime scopeTime(__PRETTY_FUNCTION__)
+#define MEASURE_FUNCTION_TIME g2o::ScopeTime scopeTime(__PRETTY_FUNCTION__)
 #endif
-
 
 // @}
 #endif

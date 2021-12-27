@@ -46,4 +46,4 @@
 #define G2O_HIERARCHICAL_API
 #endif
 
-#endif // G2O_CSPARSE_API_H
+#endif  // G2O_CSPARSE_API_H

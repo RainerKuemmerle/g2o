@@ -40,7 +40,8 @@ using namespace std;
 
 G2O_USE_OPTIMIZATION_LIBRARY(dense);
 
-double errorOfSolution(int numPoints, Eigen::Vector2d* points, const Eigen::Vector3d& circle) {
+double errorOfSolution(int numPoints, Eigen::Vector2d* points,
+                       const Eigen::Vector3d& circle) {
   Eigen::Vector2d center = circle.head<2>();
   double radius = circle(2);
   double error = 0.;
@@ -63,7 +64,9 @@ class VertexCircle : public g2o::BaseVertex<3, Eigen::Vector3d> {
 
   virtual bool write(std::ostream& /*os*/) const { return false; }
 
-  virtual void setToOriginImpl() { cerr << __PRETTY_FUNCTION__ << " not implemented yet" << endl; }
+  virtual void setToOriginImpl() {
+    cerr << __PRETTY_FUNCTION__ << " not implemented yet" << endl;
+  }
 
   virtual void oplusImpl(const double* update) {
     Eigen::Vector3d::ConstMapType v(update);
@@ -78,7 +81,8 @@ class VertexCircle : public g2o::BaseVertex<3, Eigen::Vector3d> {
  * The error function computes the distance of the point to
  * the center minus the radius of the circle.
  */
-class EdgePointOnCircle : public g2o::BaseUnaryEdge<1, Eigen::Vector2d, VertexCircle> {
+class EdgePointOnCircle
+    : public g2o::BaseUnaryEdge<1, Eigen::Vector2d, VertexCircle> {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   EdgePointOnCircle() {}
@@ -102,7 +106,8 @@ int main(int argc, char** argv) {
   int maxIterations;
   bool verbose;
   g2o::CommandArgs arg;
-  arg.param("numPoints", numPoints, 100, "number of points sampled from the circle");
+  arg.param("numPoints", numPoints, 100,
+            "number of points sampled from the circle");
   arg.param("i", maxIterations, 10, "perform n iterations");
   arg.param("v", verbose, false, "verbose output of the optimization process");
   arg.parseArgs(argc, argv);
@@ -127,13 +132,15 @@ int main(int argc, char** argv) {
   // allocate the solver
   g2o::OptimizationAlgorithmProperty solverProperty;
   optimizer.setAlgorithm(
-      g2o::OptimizationAlgorithmFactory::instance()->construct("lm_dense", solverProperty));
+      g2o::OptimizationAlgorithmFactory::instance()->construct("lm_dense",
+                                                               solverProperty));
 
   // build the optimization problem given the points
   // 1. add the circle vertex
   VertexCircle* circle = new VertexCircle();
   circle->setId(0);
-  circle->setEstimate(Eigen::Vector3d(3.0, 3.0, 3.0));  // some initial value for the circle
+  circle->setEstimate(
+      Eigen::Vector3d(3.0, 3.0, 3.0));  // some initial value for the circle
   optimizer.addVertex(circle);
   // 2. add the points we measured
   for (int i = 0; i < numPoints; ++i) {
@@ -153,9 +160,11 @@ int main(int argc, char** argv) {
 
   // print out the result
   cout << "Iterative least squares solution" << endl;
-  cout << "center of the circle " << circle->estimate().head<2>().transpose() << endl;
+  cout << "center of the circle " << circle->estimate().head<2>().transpose()
+       << endl;
   cout << "radius of the cirlce " << circle->estimate()(2) << endl;
-  cout << "error " << errorOfSolution(numPoints, points, circle->estimate()) << endl;
+  cout << "error " << errorOfSolution(numPoints, points, circle->estimate())
+       << endl;
   cout << endl;
 
   // solve by linear least squares
@@ -176,7 +185,8 @@ int main(int argc, char** argv) {
     A(i, 2) = 1;
     b(i) = -pow(points[i].x(), 2) - pow(points[i].y(), 2);
   }
-  Eigen::Vector3d solution = (A.transpose() * A).ldlt().solve(A.transpose() * b);
+  Eigen::Vector3d solution =
+      (A.transpose() * A).ldlt().solve(A.transpose() * b);
   // calculate the radius of the circle given the solution so far
   solution(2) = sqrt(pow(solution(0), 2) + pow(solution(1), 2) - solution(2));
   cout << "Linear least squares solution" << endl;

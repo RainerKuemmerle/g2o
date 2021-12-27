@@ -63,8 +63,9 @@ bool writeVector(const string& filename, const number_t* v, int n) {
   return os.good();
 }
 
-bool writeCCSMatrix(const string& filename, int rows, int cols, const int* Ap, const int* Ai,
-                    const double* Ax, bool upperTriangleSymmetric) {
+bool writeCCSMatrix(const string& filename, int rows, int cols, const int* Ap,
+                    const int* Ai, const double* Ax,
+                    bool upperTriangleSymmetric) {
   vector<TripletEntry> entries;
   entries.reserve((size_t)Ap[cols]);
   for (int i = 0; i < cols; i++) {
@@ -72,15 +73,17 @@ bool writeCCSMatrix(const string& filename, int rows, int cols, const int* Ap, c
     const int& rend = Ap[i + 1];
     for (int j = rbeg; j < rend; j++) {
       entries.emplace_back(TripletEntry(Ai[j], i, Ax[j]));
-      if (upperTriangleSymmetric && Ai[j] != i) entries.emplace_back(TripletEntry(i, Ai[j], Ax[j]));
+      if (upperTriangleSymmetric && Ai[j] != i)
+        entries.emplace_back(TripletEntry(i, Ai[j], Ax[j]));
     }
   }
   sort(entries.begin(), entries.end(), TripletColSort());
   return writeTripletEntries(filename, rows, cols, entries);
 }
 
-bool writeTripletMatrix(const std::string& filename, int nz, int rows, int cols, const int* Ai,
-                        const int* Aj, const double* Ax, bool upperTriangleSymmetric) {
+bool writeTripletMatrix(const std::string& filename, int nz, int rows, int cols,
+                        const int* Ai, const int* Aj, const double* Ax,
+                        bool upperTriangleSymmetric) {
   vector<TripletEntry> entries;
   entries.reserve(nz);
   for (int i = 0; i < nz; ++i) {

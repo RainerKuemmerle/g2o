@@ -53,8 +53,9 @@ Factory* Factory::instance() {
   return factoryInstance.get();
 }
 
-void Factory::registerType(const std::string& tag,
-                           const std::shared_ptr<AbstractHyperGraphElementCreator>& c) {
+void Factory::registerType(
+    const std::string& tag,
+    const std::shared_ptr<AbstractHyperGraphElementCreator>& c) {
   CreatorMap::const_iterator foundIt = _creator.find(tag);
   if (foundIt != _creator.end()) {
     cerr << "FACTORY WARNING: Overwriting Vertex tag " << tag << endl;
@@ -62,7 +63,8 @@ void Factory::registerType(const std::string& tag,
   }
   TagLookup::const_iterator tagIt = _tagLookup.find(c->name());
   if (tagIt != _tagLookup.end()) {
-    cerr << "FACTORY WARNING: Registering same class for two tags " << c->name() << endl;
+    cerr << "FACTORY WARNING: Registering same class for two tags " << c->name()
+         << endl;
     assert(0);
   }
 
@@ -124,11 +126,12 @@ void Factory::unregisterType(const std::string& tag) {
   }
 }
 
-HyperGraph::HyperGraphElement* Factory::construct(const std::string& tag) const {
+HyperGraph::HyperGraphElement* Factory::construct(
+    const std::string& tag) const {
   CreatorMap::const_iterator foundIt = _creator.find(tag);
   if (foundIt != _creator.end()) {
-    // cerr << "tag " << tag << " -> " << (void*) foundIt->second->creator << " " <<
-    // foundIt->second->creator->name() << endl;
+    // cerr << "tag " << tag << " -> " << (void*) foundIt->second->creator << "
+    // " << foundIt->second->creator->name() << endl;
     return foundIt->second->creator->construct();
   }
   return nullptr;
@@ -143,7 +146,8 @@ const std::string& Factory::tag(const HyperGraph::HyperGraphElement* e) const {
 
 void Factory::fillKnownTypes(std::vector<std::string>& types) const {
   types.clear();
-  for (CreatorMap::const_iterator it = _creator.begin(); it != _creator.end(); ++it)
+  for (CreatorMap::const_iterator it = _creator.begin(); it != _creator.end();
+       ++it)
     types.push_back(it->first);
 }
 
@@ -165,14 +169,16 @@ void Factory::destroy() {
 void Factory::printRegisteredTypes(std::ostream& os, bool comment) const {
   if (comment) os << "# ";
   os << "types:" << endl;
-  for (CreatorMap::const_iterator it = _creator.begin(); it != _creator.end(); ++it) {
+  for (CreatorMap::const_iterator it = _creator.begin(); it != _creator.end();
+       ++it) {
     if (comment) os << "#";
     cerr << "\t" << it->first << endl;
   }
 }
 
 HyperGraph::HyperGraphElement* Factory::construct(
-    const std::string& tag, const HyperGraph::GraphElemBitset& elemsToConstruct) const {
+    const std::string& tag,
+    const HyperGraph::GraphElemBitset& elemsToConstruct) const {
   if (elemsToConstruct.none()) {
     return construct(tag);
   }

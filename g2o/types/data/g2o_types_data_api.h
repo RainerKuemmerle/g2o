@@ -55,4 +55,4 @@
 #define G2O_TYPES_DATA_API
 #endif
 
-#endif // G2O_TYPES_DATA_API_H
+#endif  // G2O_TYPES_DATA_API_H

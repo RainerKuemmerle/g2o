@@ -45,17 +45,23 @@ struct RandomSE3Quat {
     result.normalizeRotation();
     return result;
   }
-  static bool isApprox(const SE3Quat& a, const SE3Quat& b) { return a.toVector().isApprox(b.toVector(), 1e-5); }
+  static bool isApprox(const SE3Quat& a, const SE3Quat& b) {
+    return a.toVector().isApprox(b.toVector(), 1e-5);
+  }
 };
 
 struct RandomIsometry3 {
   static Isometry3 create() { return randomIsometry3(); }
-  static bool isApprox(const Isometry3& a, const Isometry3& b) { return a.isApprox(b, 1e-5); }
+  static bool isApprox(const Isometry3& a, const Isometry3& b) {
+    return a.isApprox(b, 1e-5);
+  }
 };
 
 struct RandomDouble {
   static double create() { return g2o::Sampler::uniformRand(-1., 1.); }
-  static bool isApprox(const double& a, const double& b) { return std::abs(a - b) < 1e-5; }
+  static bool isApprox(const double& a, const double& b) {
+    return std::abs(a - b) < 1e-5;
+  }
 };
 
 }  // namespace internal

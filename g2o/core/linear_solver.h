@@ -38,8 +38,9 @@ namespace g2o {
 /**
  * \brief basic solver for Ax = b
  *
- * basic solver for Ax = b which has to reimplemented for different linear algebra libraries.
- * A is assumed to be symmetric (only upper triangular block is stored) and positive-semi-definit.
+ * basic solver for Ax = b which has to reimplemented for different linear
+ * algebra libraries. A is assumed to be symmetric (only upper triangular block
+ * is stored) and positive-semi-definit.
  */
 template <typename MatrixType>
 class LinearSolver {
@@ -48,7 +49,8 @@ class LinearSolver {
   virtual ~LinearSolver() {}
 
   /**
-   * init for operating on matrices with a different non-zero pattern like before
+   * init for operating on matrices with a different non-zero pattern like
+   * before
    */
   virtual bool init() = 0;
 
@@ -58,13 +60,15 @@ class LinearSolver {
    * If the matrix changes call init() before.
    * solve system Ax = b, x and b have to allocated beforehand!!
    */
-  virtual bool solve(const SparseBlockMatrix<MatrixType>& A, number_t* x, number_t* b) = 0;
+  virtual bool solve(const SparseBlockMatrix<MatrixType>& A, number_t* x,
+                     number_t* b) = 0;
 
   /**
    * Inverts the diagonal blocks of A
    * @returns false if not defined.
    */
-  virtual bool solveBlocks(number_t**& blocks, const SparseBlockMatrix<MatrixType>& A) {
+  virtual bool solveBlocks(number_t**& blocks,
+                           const SparseBlockMatrix<MatrixType>& A) {
     (void)blocks;
     (void)A;
     return false;
@@ -74,9 +78,10 @@ class LinearSolver {
    * Inverts the a block pattern of A in spinv
    * @returns false if not defined.
    */
-  virtual bool solvePattern(SparseBlockMatrix<MatrixX>& spinv,
-                            const std::vector<std::pair<int, int> >& blockIndices,
-                            const SparseBlockMatrix<MatrixType>& A) {
+  virtual bool solvePattern(
+      SparseBlockMatrix<MatrixX>& spinv,
+      const std::vector<std::pair<int, int> >& blockIndices,
+      const SparseBlockMatrix<MatrixType>& A) {
     (void)spinv;
     (void)blockIndices;
     (void)A;
@@ -88,7 +93,8 @@ class LinearSolver {
   void setWriteDebug(bool b) { _writeDebug = b; }
 
   //! allocate block memory structure
-  static void allocateBlocks(const SparseBlockMatrix<MatrixType>& A, number_t**& blocks) {
+  static void allocateBlocks(const SparseBlockMatrix<MatrixType>& A,
+                             number_t**& blocks) {
     blocks = new number_t*[A.rows()];
     number_t** block = blocks;
     for (size_t i = 0; i < A.rowBlockIndices().size(); ++i) {
@@ -99,7 +105,8 @@ class LinearSolver {
   }
 
   //! de-allocate the block structure
-  static void deallocateBlocks(const SparseBlockMatrix<MatrixType>& A, number_t**& blocks) {
+  static void deallocateBlocks(const SparseBlockMatrix<MatrixType>& A,
+                               number_t**& blocks) {
     for (size_t i = 0; i < A.rowBlockIndices().size(); ++i) {
       delete[] blocks[i];
     }
@@ -112,7 +119,8 @@ class LinearSolver {
    */
   template <typename BlockDerived, typename ScalarDerived>
   static void blockToScalarPermutation(
-      const SparseBlockMatrix<MatrixType>& A, const Eigen::MatrixBase<BlockDerived>& p,
+      const SparseBlockMatrix<MatrixType>& A,
+      const Eigen::MatrixBase<BlockDerived>& p,
       const Eigen::MatrixBase<ScalarDerived>& scalar /* output */) {
     int n = A.cols();
     Eigen::MatrixBase<ScalarDerived>& scalarPermutation =
@@ -130,8 +138,8 @@ class LinearSolver {
     assert((int)scalarIdx == n);
   }
 
-  protected:
-   bool _writeDebug;
+ protected:
+  bool _writeDebug;
 };
 
 /**
@@ -140,10 +148,12 @@ class LinearSolver {
 template <typename MatrixType>
 class LinearSolverCCS : public LinearSolver<MatrixType> {
  public:
-  LinearSolverCCS() : LinearSolver<MatrixType>(), _ccsMatrix(0), _blockOrdering(true) {}
+  LinearSolverCCS()
+      : LinearSolver<MatrixType>(), _ccsMatrix(0), _blockOrdering(true) {}
   ~LinearSolverCCS() { delete _ccsMatrix; }
 
-  virtual bool solveBlocks(number_t**& blocks, const SparseBlockMatrix<MatrixType>& A) {
+  virtual bool solveBlocks(number_t**& blocks,
+                           const SparseBlockMatrix<MatrixType>& A) {
     auto compute = [&](MarginalCovarianceCholesky& mcc) {
       if (!blocks) LinearSolverCCS<MatrixType>::allocateBlocks(A, blocks);
       mcc.computeCovariance(blocks, A.rowBlockIndices());
@@ -151,9 +161,10 @@ class LinearSolverCCS : public LinearSolver<MatrixType> {
     return solveBlocks_impl(A, compute);
   }
 
-  virtual bool solvePattern(SparseBlockMatrix<MatrixX>& spinv,
-                            const std::vector<std::pair<int, int> >& blockIndices,
-                            const SparseBlockMatrix<MatrixType>& A) {
+  virtual bool solvePattern(
+      SparseBlockMatrix<MatrixX>& spinv,
+      const std::vector<std::pair<int, int> >& blockIndices,
+      const SparseBlockMatrix<MatrixType>& A) {
     auto compute = [&](MarginalCovarianceCholesky& mcc) {
       mcc.computeCovariance(spinv, A.rowBlockIndices(), blockIndices);
     };
@@ -170,12 +181,14 @@ class LinearSolverCCS : public LinearSolver<MatrixType> {
 
   void initMatrixStructure(const SparseBlockMatrix<MatrixType>& A) {
     delete _ccsMatrix;
-    _ccsMatrix = new SparseBlockMatrixCCS<MatrixType>(A.rowBlockIndices(), A.colBlockIndices());
+    _ccsMatrix = new SparseBlockMatrixCCS<MatrixType>(A.rowBlockIndices(),
+                                                      A.colBlockIndices());
     A.fillSparseBlockMatrixCCS(*_ccsMatrix);
   }
 
-  virtual bool solveBlocks_impl(const SparseBlockMatrix<MatrixType>& A,
-                                std::function<void(MarginalCovarianceCholesky&)> compute) = 0;
+  virtual bool solveBlocks_impl(
+      const SparseBlockMatrix<MatrixType>& A,
+      std::function<void(MarginalCovarianceCholesky&)> compute) = 0;
 };
 
 }  // namespace g2o

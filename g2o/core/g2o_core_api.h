@@ -29,4 +29,4 @@
 #define G2O_CORE_API
 #endif
 
-#endif // G2O_CORE_API_H
+#endif  // G2O_CORE_API_H

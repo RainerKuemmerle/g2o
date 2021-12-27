@@ -49,8 +49,9 @@ class VertexFlatSE2 : public g2o::BaseVertex<3, g2o::Vector3> {
  * A test case edge connecting three vertices.
  * Here we project a point along two poses and compare it against a measurement
  */
-class Edge3ADTester : public g2o::BaseFixedSizedEdge<2, g2o::Vector2, VertexFlatSE2, VertexFlatSE2,
-                                                     g2o::VertexPointXY> {
+class Edge3ADTester
+    : public g2o::BaseFixedSizedEdge<2, g2o::Vector2, VertexFlatSE2,
+                                     VertexFlatSE2, g2o::VertexPointXY> {
  public:
   using g2o::BaseFixedSizedEdge<2, g2o::Vector2, VertexFlatSE2, VertexFlatSE2,
                                 g2o::VertexPointXY>::linearizeOplus;
@@ -94,12 +95,13 @@ class EdgeSE2AD : public g2o::EdgeSE2 {
   template <typename T>
   bool operator()(const T* p1, const T* p2, T* error) const {
     //// original implementation
-    // SE2 delta = _inverseMeasurement * (v1->estimate().inverse()*v2->estimate());
-    // _error = delta.toVector();
+    // SE2 delta = _inverseMeasurement *
+    // (v1->estimate().inverse()*v2->estimate()); _error = delta.toVector();
 
     Iso2<T> p1Iso = pointerToIso(p1);
     Iso2<T> p2Iso = pointerToIso(p2);
-    g2o::VectorN<3, T> invMeasAsVector = _inverseMeasurement.toVector().cast<T>();
+    g2o::VectorN<3, T> invMeasAsVector =
+        _inverseMeasurement.toVector().cast<T>();
     Iso2<T> invMeas = pointerToIso(invMeasAsVector.data());
 
     Iso2<T> delta = invMeas * (p1Iso.inverse() * p2Iso);
@@ -107,7 +109,8 @@ class EdgeSE2AD : public g2o::EdgeSE2 {
     return true;
   }
 
-  using g2o::BaseBinaryEdge<3, g2o::SE2, g2o::VertexSE2, g2o::VertexSE2>::linearizeOplus;
+  using g2o::BaseBinaryEdge<3, g2o::SE2, g2o::VertexSE2,
+                            g2o::VertexSE2>::linearizeOplus;
   G2O_MAKE_AUTO_AD_LINEARIZEOPLUS_BY_GET
 
  protected:
@@ -168,17 +171,26 @@ TEST_F(AutoDifferentiation, ComputesSomething) {
   std::cerr << PVAR(testEdge.jacobianOplusXn<2>()) << std::endl;
 #endif
 
-  ASSERT_FALSE(testEdge.jacobianOplusXn<0>().array().isNaN().any()) << "Jacobian contains NaN";
-  ASSERT_FALSE(testEdge.jacobianOplusXn<1>().array().isNaN().any()) << "Jacobian contains NaN";
-  ASSERT_FALSE(testEdge.jacobianOplusXn<2>().array().isNaN().any()) << "Jacobian contains NaN";
+  ASSERT_FALSE(testEdge.jacobianOplusXn<0>().array().isNaN().any())
+      << "Jacobian contains NaN";
+  ASSERT_FALSE(testEdge.jacobianOplusXn<1>().array().isNaN().any())
+      << "Jacobian contains NaN";
+  ASSERT_FALSE(testEdge.jacobianOplusXn<2>().array().isNaN().any())
+      << "Jacobian contains NaN";
 
-  ASSERT_FALSE(testEdge.jacobianOplusXn<0>().array().isInf().any()) << "Jacobian not finite";
-  ASSERT_FALSE(testEdge.jacobianOplusXn<1>().array().isInf().any()) << "Jacobian not finite";
-  ASSERT_FALSE(testEdge.jacobianOplusXn<2>().array().isInf().any()) << "Jacobian not finite";
+  ASSERT_FALSE(testEdge.jacobianOplusXn<0>().array().isInf().any())
+      << "Jacobian not finite";
+  ASSERT_FALSE(testEdge.jacobianOplusXn<1>().array().isInf().any())
+      << "Jacobian not finite";
+  ASSERT_FALSE(testEdge.jacobianOplusXn<2>().array().isInf().any())
+      << "Jacobian not finite";
 
-  ASSERT_LE(0, testEdge.jacobianOplusXn<0>().array().abs().maxCoeff()) << "Jacobian is zero";
-  ASSERT_LE(0, testEdge.jacobianOplusXn<1>().array().abs().maxCoeff()) << "Jacobian is zero";
-  ASSERT_LE(0, testEdge.jacobianOplusXn<2>().array().abs().maxCoeff()) << "Jacobian is zero";
+  ASSERT_LE(0, testEdge.jacobianOplusXn<0>().array().abs().maxCoeff())
+      << "Jacobian is zero";
+  ASSERT_LE(0, testEdge.jacobianOplusXn<1>().array().abs().maxCoeff())
+      << "Jacobian is zero";
+  ASSERT_LE(0, testEdge.jacobianOplusXn<2>().array().abs().maxCoeff())
+      << "Jacobian is zero";
 }
 
 TEST_F(AutoDifferentiation, ComputesNothingForFixed) {
@@ -186,16 +198,18 @@ TEST_F(AutoDifferentiation, ComputesNothingForFixed) {
 
   testEdge.linearizeOplus(jacobianWorkspace);
 
-  ASSERT_LE(0, testEdge.jacobianOplusXn<0>().array().abs().maxCoeff()) << "Jacobian is zero";
+  ASSERT_LE(0, testEdge.jacobianOplusXn<0>().array().abs().maxCoeff())
+      << "Jacobian is zero";
   ASSERT_DOUBLE_EQ(0, testEdge.jacobianOplusXn<1>().array().abs().maxCoeff())
       << "Jacobian is non-zero";
-  ASSERT_LE(0, testEdge.jacobianOplusXn<2>().array().abs().maxCoeff()) << "Jacobian is zero";
+  ASSERT_LE(0, testEdge.jacobianOplusXn<2>().array().abs().maxCoeff())
+      << "Jacobian is zero";
 }
 
 /**
- * Test fixture for performing the AD tests of EdgeSE2. We setup two vertices and edges to perform
- * the tests. As edges we have the default EdgeSE2 from g2o and the EdgeSE2AD which uses an AD
- * implementation.
+ * Test fixture for performing the AD tests of EdgeSE2. We setup two vertices
+ * and edges to perform the tests. As edges we have the default EdgeSE2 from g2o
+ * and the EdgeSE2AD which uses an AD implementation.
  */
 class AutoDifferentiationEdgeSE2 : public ::testing::Test {
  protected:
@@ -233,25 +247,35 @@ TEST_F(AutoDifferentiationEdgeSE2, AdComputesSomething) {
   std::cerr << PVAR(testEdgeAd.jacobianOplusXn<1>()) << std::endl;
 #endif
 
-  ASSERT_FALSE(testEdgeAd.jacobianOplusXn<0>().array().isNaN().any()) << "Jacobian contains NaN";
-  ASSERT_FALSE(testEdgeAd.jacobianOplusXn<1>().array().isNaN().any()) << "Jacobian contains NaN";
+  ASSERT_FALSE(testEdgeAd.jacobianOplusXn<0>().array().isNaN().any())
+      << "Jacobian contains NaN";
+  ASSERT_FALSE(testEdgeAd.jacobianOplusXn<1>().array().isNaN().any())
+      << "Jacobian contains NaN";
 
-  ASSERT_FALSE(testEdgeAd.jacobianOplusXn<0>().array().isInf().any()) << "Jacobian not finite";
-  ASSERT_FALSE(testEdgeAd.jacobianOplusXn<1>().array().isInf().any()) << "Jacobian not finite";
+  ASSERT_FALSE(testEdgeAd.jacobianOplusXn<0>().array().isInf().any())
+      << "Jacobian not finite";
+  ASSERT_FALSE(testEdgeAd.jacobianOplusXn<1>().array().isInf().any())
+      << "Jacobian not finite";
 
-  ASSERT_LE(0, testEdgeAd.jacobianOplusXn<0>().array().abs().maxCoeff()) << "Jacobian is zero";
-  ASSERT_LE(0, testEdgeAd.jacobianOplusXn<1>().array().abs().maxCoeff()) << "Jacobian is zero";
+  ASSERT_LE(0, testEdgeAd.jacobianOplusXn<0>().array().abs().maxCoeff())
+      << "Jacobian is zero";
+  ASSERT_LE(0, testEdgeAd.jacobianOplusXn<1>().array().abs().maxCoeff())
+      << "Jacobian is zero";
 }
 
 TEST_F(AutoDifferentiationEdgeSE2, AdComputesCorrect) {
   // ugly syntax to call the Jacobian into a workspace
-  testEdge.g2o::BaseBinaryEdge<3, g2o::SE2, g2o::VertexSE2, g2o::VertexSE2>::linearizeOplus(
-      jacobianWorkspace);
-  // here no ugly call needed because we use the base class one directly, see above
+  testEdge
+      .g2o::BaseBinaryEdge<3, g2o::SE2, g2o::VertexSE2,
+                           g2o::VertexSE2>::linearizeOplus(jacobianWorkspace);
+  // here no ugly call needed because we use the base class one directly, see
+  // above
   testEdgeAd.linearizeOplus(jacobianWorkspaceAd);
 
-  ASSERT_TRUE(testEdgeAd.jacobianOplusXn<0>().isApprox(testEdge.jacobianOplusXn<0>()))
+  ASSERT_TRUE(
+      testEdgeAd.jacobianOplusXn<0>().isApprox(testEdge.jacobianOplusXn<0>()))
       << "Jacobian differs";
-  ASSERT_TRUE(testEdgeAd.jacobianOplusXn<1>().isApprox(testEdge.jacobianOplusXn<1>()))
+  ASSERT_TRUE(
+      testEdgeAd.jacobianOplusXn<1>().isApprox(testEdge.jacobianOplusXn<1>()))
       << "Jacobian differs";
 }

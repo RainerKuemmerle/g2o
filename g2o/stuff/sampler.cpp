@@ -28,20 +28,18 @@
 
 namespace g2o {
 
-  static std::normal_distribution<number_t> _univariateSampler(0., 1.);
-  static std::uniform_real_distribution<number_t> _uniformReal;
-  static std::mt19937 _gen_real;
- 
-  number_t sampleUniform(number_t min, number_t max, std::mt19937* generator){
-    if (generator)
-      return _uniformReal(*generator)*(max-min)+min;
-    return _uniformReal(_gen_real)*(max-min)+min;
-  }
+static std::normal_distribution<number_t> _univariateSampler(0., 1.);
+static std::uniform_real_distribution<number_t> _uniformReal;
+static std::mt19937 _gen_real;
 
-  number_t sampleGaussian(std::mt19937* generator){
-    if (generator)
-      return _univariateSampler(*generator);
-    return _univariateSampler(_gen_real);
-  }
-
+number_t sampleUniform(number_t min, number_t max, std::mt19937* generator) {
+  if (generator) return _uniformReal(*generator) * (max - min) + min;
+  return _uniformReal(_gen_real) * (max - min) + min;
 }
+
+number_t sampleGaussian(std::mt19937* generator) {
+  if (generator) return _univariateSampler(*generator);
+  return _univariateSampler(_gen_real);
+}
+
+}  // namespace g2o

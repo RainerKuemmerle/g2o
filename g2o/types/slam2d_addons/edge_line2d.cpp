@@ -34,7 +34,8 @@
 using namespace g2o;
 using namespace Eigen;
 
-EdgeLine2D::EdgeLine2D() : BaseBinaryEdge<2, Line2D, VertexLine2D, VertexLine2D>() {
+EdgeLine2D::EdgeLine2D()
+    : BaseBinaryEdge<2, Line2D, VertexLine2D, VertexLine2D>() {
   _information.setIdentity();
   _error.setZero();
 }

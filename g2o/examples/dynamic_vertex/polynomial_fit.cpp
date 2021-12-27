@@ -9,27 +9,27 @@
 
 #include <unsupported/Eigen/Polynomials>
 
-#include "g2o/stuff/sampler.h"
-#include "g2o/core/sparse_optimizer.h"
-#include "g2o/core/block_solver.h"
-#include "g2o/core/optimization_algorithm_levenberg.h"
+#include "g2o/core/base_binary_edge.h"
 #include "g2o/core/base_dynamic_vertex.h"
 #include "g2o/core/base_unary_edge.h"
-#include "g2o/core/base_binary_edge.h"
+#include "g2o/core/block_solver.h"
+#include "g2o/core/optimization_algorithm_levenberg.h"
+#include "g2o/core/sparse_optimizer.h"
 #include "g2o/solvers/eigen/linear_solver_eigen.h"
+#include "g2o/stuff/sampler.h"
 
 // Declare the custom types used in the graph
 
 // This vertex stores the coefficients of the polynomial. It is dynamic because
 // we can change it at runtime.
 
-class PolynomialCoefficientVertex : public g2o::BaseDynamicVertex<Eigen::VectorXd> {
-public:
+class PolynomialCoefficientVertex
+    : public g2o::BaseDynamicVertex<Eigen::VectorXd> {
+ public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
 
   // Create the vertex
-  PolynomialCoefficientVertex() {
-  }
+  PolynomialCoefficientVertex() {}
 
   // Read the vertex
   virtual bool read(std::istream& is) {
@@ -55,9 +55,7 @@ public:
   }
 
   // Reset to zero
-  virtual void setToOriginImpl() {
-    _estimate.setZero();
-  }
+  virtual void setToOriginImpl() { _estimate.setZero(); }
 
   // Direct linear add
   virtual void oplusImpl(const double* update) {
@@ -68,8 +66,7 @@ public:
   // Resize the vertex state. In this case, we want to preserve as much of the
   // state as we can. Therefore, we use conservativeResize and pad with zeros
   // at the end if the state dimension has increased.
-  virtual bool setDimensionImpl(int newDimension)
-  {
+  virtual bool setDimensionImpl(int newDimension) {
     int oldDimension = dimension();
 
     // Handle the special case this is the first time
@@ -83,7 +80,7 @@ public:
 
     // If the state has expanded, pad with zeros
     if (oldDimension < newDimension)
-      _estimate.tail(newDimension-oldDimension).setZero();
+      _estimate.tail(newDimension - oldDimension).setZero();
 
     return true;
   }
@@ -95,12 +92,15 @@ public:
 
 // Note that x is not a measurement so it has to be stored separately.
 
-class PolynomialSingleValueEdge : public g2o::BaseUnaryEdge<1, double, PolynomialCoefficientVertex> {
-
-public:
+class PolynomialSingleValueEdge
+    : public g2o::BaseUnaryEdge<1, double, PolynomialCoefficientVertex> {
+ public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
 
-  PolynomialSingleValueEdge(double x, double z, const PolynomialSingleValueEdge::InformationType& omega) : _x(x) {
+  PolynomialSingleValueEdge(
+      double x, double z,
+      const PolynomialSingleValueEdge::InformationType& omega)
+      : _x(x) {
     _x = x;
     setMeasurement(z);
     setInformation(omega);
@@ -120,18 +120,17 @@ public:
 
   // Compute the measurement from the eigen polynomial module
   virtual void computeError() {
-    const PolynomialCoefficientVertex* vertex = static_cast<const PolynomialCoefficientVertex*> (_vertices[0]);
+    const PolynomialCoefficientVertex* vertex =
+        static_cast<const PolynomialCoefficientVertex*>(_vertices[0]);
     _error[0] = _measurement - Eigen::poly_eval(vertex->estimate(), _x);
   }
 
-private:
-
+ private:
   // The point that the polynomial is computed at
   double _x;
 };
 
 int main(int argc, const char* argv[]) {
-
   // Number of dimensions of the polynomial; the default is 4
   int polynomialDimension = 4;
   if (argc > 1) {
@@ -165,7 +164,8 @@ int main(int argc, const char* argv[]) {
 
   // Construct the graph and set up the solver and optimiser
   std::unique_ptr<g2o::BlockSolverX::LinearSolverType> linearSolver =
-      g2o::make_unique<g2o::LinearSolverEigen<g2o::BlockSolverX::PoseMatrixType>>();
+      g2o::make_unique<
+          g2o::LinearSolverEigen<g2o::BlockSolverX::PoseMatrixType>>();
 
   // Set up the solver
   std::unique_ptr<g2o::BlockSolverX> blockSolver =
@@ -173,10 +173,11 @@ int main(int argc, const char* argv[]) {
 
   // Set up the optimisation algorithm
   g2o::OptimizationAlgorithm* optimisationAlgorithm =
-    new g2o::OptimizationAlgorithmLevenberg(move(blockSolver));
+      new g2o::OptimizationAlgorithmLevenberg(move(blockSolver));
 
   // Create the graph and configure it
-  std::unique_ptr<g2o::SparseOptimizer> optimizer = g2o::make_unique<g2o::SparseOptimizer>();
+  std::unique_ptr<g2o::SparseOptimizer> optimizer =
+      g2o::make_unique<g2o::SparseOptimizer>();
   optimizer->setVerbose(true);
   optimizer->setAlgorithm(optimisationAlgorithm);
 
@@ -186,12 +187,14 @@ int main(int argc, const char* argv[]) {
   optimizer->addVertex(pv);
 
   // Create the information matrix
-  PolynomialSingleValueEdge::InformationType omega = PolynomialSingleValueEdge::InformationType::Zero();
+  PolynomialSingleValueEdge::InformationType omega =
+      PolynomialSingleValueEdge::InformationType::Zero();
   omega(0, 0) = 1 / (sigmaZ * sigmaZ);
 
   // Create the observations and the edges
   for (int i = 0; i < obs; ++i) {
-    PolynomialSingleValueEdge* pe = new PolynomialSingleValueEdge(x[i], z[i], omega);
+    PolynomialSingleValueEdge* pe =
+        new PolynomialSingleValueEdge(x[i], z[i], omega);
     pe->setVertex(0, pv);
     optimizer->addEdge(pe);
   }
@@ -201,16 +204,20 @@ int main(int argc, const char* argv[]) {
   // dynamically change the vertex dimensions in an alreacy
   // constructed graph. Note that you must call initializeOptimization
   // before you can optimize after a state dimension has changed.
-  for (int testDimension = 1; testDimension <= polynomialDimension; ++testDimension) {
+  for (int testDimension = 1; testDimension <= polynomialDimension;
+       ++testDimension) {
     pv->setDimension(testDimension);
     optimizer->initializeOptimization();
     optimizer->optimize(10);
-    std::cout << "Computed parameters = " << pv->estimate().transpose() << std::endl;
+    std::cout << "Computed parameters = " << pv->estimate().transpose()
+              << std::endl;
   }
-  for (int testDimension = polynomialDimension - 1; testDimension >= 1; --testDimension) {
+  for (int testDimension = polynomialDimension - 1; testDimension >= 1;
+       --testDimension) {
     pv->setDimension(testDimension);
     optimizer->initializeOptimization();
     optimizer->optimize(10);
-    std::cout << "Computed parameters = " << pv->estimate().transpose() << std::endl;
+    std::cout << "Computed parameters = " << pv->estimate().transpose()
+              << std::endl;
   }
 }

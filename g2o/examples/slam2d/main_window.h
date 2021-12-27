@@ -22,29 +22,27 @@
 #include "ui_base_main_window.h"
 
 namespace g2o {
-  class OptimizationAlgorithm;
+class OptimizationAlgorithm;
 }
 
-class MainWindow : public QMainWindow, public Ui::BaseMainWindow
-{
+class MainWindow : public QMainWindow, public Ui::BaseMainWindow {
   Q_OBJECT
-  public:
-    MainWindow(QWidget * parent = 0);
-    ~MainWindow();
+ public:
+  MainWindow(QWidget* parent = 0);
+  ~MainWindow();
 
-    g2o::OptimizationAlgorithm* solverGaussNewton;
-    g2o::OptimizationAlgorithm* solverLevenberg;
+  g2o::OptimizationAlgorithm* solverGaussNewton;
+  g2o::OptimizationAlgorithm* solverLevenberg;
 
-  public slots:
-    void on_actionLoad_triggered(bool);
-    void on_actionSave_triggered(bool);
-    void on_actionQuit_triggered(bool);
-    void on_btnOptimize_clicked();
-    void on_btnInitialGuess_clicked();
+ public slots:
+  void on_actionLoad_triggered(bool);
+  void on_actionSave_triggered(bool);
+  void on_actionQuit_triggered(bool);
+  void on_btnOptimize_clicked();
+  void on_btnInitialGuess_clicked();
 
-  protected:
-    void fixGraph();
-
+ protected:
+  void fixGraph();
 };
 
 #endif

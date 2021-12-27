@@ -34,10 +34,11 @@ namespace g2o {
 G2O_USE_TYPE_GROUP(sba);
 G2O_REGISTER_TYPE_GROUP(sim3);
 
-G2O_REGISTER_TYPE(VERTEX_SIM3:EXPMAP, VertexSim3Expmap);
-G2O_REGISTER_TYPE(EDGE_SIM3:EXPMAP, EdgeSim3);
-G2O_REGISTER_TYPE(EDGE_PROJECT_SIM3_XYZ:EXPMAP, EdgeSim3ProjectXYZ);
-G2O_REGISTER_TYPE(EDGE_PROJECT_INVERSE_SIM3_XYZ:EXPMAP, EdgeInverseSim3ProjectXYZ);
+G2O_REGISTER_TYPE(VERTEX_SIM3 : EXPMAP, VertexSim3Expmap);
+G2O_REGISTER_TYPE(EDGE_SIM3 : EXPMAP, EdgeSim3);
+G2O_REGISTER_TYPE(EDGE_PROJECT_SIM3_XYZ : EXPMAP, EdgeSim3ProjectXYZ);
+G2O_REGISTER_TYPE(EDGE_PROJECT_INVERSE_SIM3_XYZ
+                  : EXPMAP, EdgeInverseSim3ProjectXYZ);
 
 VertexSim3Expmap::VertexSim3Expmap() : BaseVertex<7, Sim3>() {
   _marginalized = false;
@@ -54,7 +55,8 @@ VertexSim3Expmap::VertexSim3Expmap() : BaseVertex<7, Sim3>() {
   _focal_length2[1] = 1;
 }
 
-EdgeSim3::EdgeSim3() : BaseBinaryEdge<7, Sim3, VertexSim3Expmap, VertexSim3Expmap>() {}
+EdgeSim3::EdgeSim3()
+    : BaseBinaryEdge<7, Sim3, VertexSim3Expmap, VertexSim3Expmap>() {}
 
 bool VertexSim3Expmap::read(std::istream &is) {
   Vector7 cam2world;
@@ -91,55 +93,58 @@ bool EdgeSim3::write(std::ostream &os) const {
 
 #if G2O_SIM3_JACOBIAN
 void EdgeSim3::linearizeOplus() {
-    VertexSim3Expmap *v1 = static_cast<VertexSim3Expmap *>(_vertices[0]);
-    VertexSim3Expmap *v2 = static_cast<VertexSim3Expmap *>(_vertices[1]);
-    const Sim3 Si(v1->estimate());//Siw
-    const Sim3 Sj(v2->estimate());
+  VertexSim3Expmap *v1 = static_cast<VertexSim3Expmap *>(_vertices[0]);
+  VertexSim3Expmap *v2 = static_cast<VertexSim3Expmap *>(_vertices[1]);
+  const Sim3 Si(v1->estimate());  // Siw
+  const Sim3 Sj(v2->estimate());
 
-    const Sim3& Sji = _measurement;
+  const Sim3 &Sji = _measurement;
 
-    // error in Lie Algebra
-    const Eigen::Matrix<double, 7, 1> error = (Sji * Si * Sj.inverse()).log();
-    const Eigen::Vector3d phi = error.block<3, 1>(0, 0); // rotation
-    const Eigen::Vector3d tau = error.block<3, 1>(3, 0); // translation
-    const double s = error(6);                           // scale
+  // error in Lie Algebra
+  const Eigen::Matrix<double, 7, 1> error = (Sji * Si * Sj.inverse()).log();
+  const Eigen::Vector3d phi = error.block<3, 1>(0, 0);  // rotation
+  const Eigen::Vector3d tau = error.block<3, 1>(3, 0);  // translation
+  const double s = error(6);                            // scale
 
-    const Eigen::Matrix<double, 7, 7> I7 = Eigen::Matrix<double, 7, 7>::Identity();
-    const Eigen::Matrix<double, 3, 3> I3 = Eigen::Matrix<double, 3, 3>::Identity();
+  const Eigen::Matrix<double, 7, 7> I7 =
+      Eigen::Matrix<double, 7, 7>::Identity();
+  const Eigen::Matrix<double, 3, 3> I3 =
+      Eigen::Matrix<double, 3, 3>::Identity();
 
-    // Jacobi Matrix of Si
-    // note: because the order of rotation and translation is different,
-    //       so it is slightly different from the formula.
-    Eigen::Matrix<double, 7, 7> jacobi_i = Eigen::Matrix<double, 7, 7>::Zero();
-    jacobi_i.block<3, 3>(0, 0) = -skew(phi);
-    jacobi_i.block<3, 3>(3, 3) = -(skew(phi) + s * I3);
-    jacobi_i.block<3, 3>(3, 0) = -skew(tau);
-    jacobi_i.block<3, 1>(3, 6) = tau;
+  // Jacobi Matrix of Si
+  // note: because the order of rotation and translation is different,
+  //       so it is slightly different from the formula.
+  Eigen::Matrix<double, 7, 7> jacobi_i = Eigen::Matrix<double, 7, 7>::Zero();
+  jacobi_i.block<3, 3>(0, 0) = -skew(phi);
+  jacobi_i.block<3, 3>(3, 3) = -(skew(phi) + s * I3);
+  jacobi_i.block<3, 3>(3, 0) = -skew(tau);
+  jacobi_i.block<3, 1>(3, 6) = tau;
 
-    // Adjoint matrix of Sji
-    Eigen::Matrix<double, 7, 7> adj_Sji = I7;
-    adj_Sji.block<3, 3>(0, 0) = Sji.rotation().toRotationMatrix();
-    adj_Sji.block<3, 3>(3, 3) = Sji.scale() * Sji.rotation().toRotationMatrix();
-    adj_Sji.block<3, 3>(3, 0) =
-        skew(Sji.translation()) * Sji.rotation().toRotationMatrix();
-    adj_Sji.block<3, 1>(3, 6) = -Sji.translation();
+  // Adjoint matrix of Sji
+  Eigen::Matrix<double, 7, 7> adj_Sji = I7;
+  adj_Sji.block<3, 3>(0, 0) = Sji.rotation().toRotationMatrix();
+  adj_Sji.block<3, 3>(3, 3) = Sji.scale() * Sji.rotation().toRotationMatrix();
+  adj_Sji.block<3, 3>(3, 0) =
+      skew(Sji.translation()) * Sji.rotation().toRotationMatrix();
+  adj_Sji.block<3, 1>(3, 6) = -Sji.translation();
 
-    _jacobianOplusXi = (I7 + 0.5 * jacobi_i) * adj_Sji;
+  _jacobianOplusXi = (I7 + 0.5 * jacobi_i) * adj_Sji;
 
-    // Jacobi Matrix of Sj
-    Eigen::Matrix<double, 7, 7> jacobi_j = Eigen::Matrix<double, 7, 7>::Zero();
-    jacobi_j.block<3, 3>(0, 0) = skew(phi);
-    jacobi_j.block<3, 3>(3, 3) = skew(phi) + s * I3;
-    jacobi_j.block<3, 3>(3, 0) = skew(tau);
-    jacobi_j.block<3, 1>(3, 6) = -tau;
+  // Jacobi Matrix of Sj
+  Eigen::Matrix<double, 7, 7> jacobi_j = Eigen::Matrix<double, 7, 7>::Zero();
+  jacobi_j.block<3, 3>(0, 0) = skew(phi);
+  jacobi_j.block<3, 3>(3, 3) = skew(phi) + s * I3;
+  jacobi_j.block<3, 3>(3, 0) = skew(tau);
+  jacobi_j.block<3, 1>(3, 6) = -tau;
 
-    _jacobianOplusXj = -(I7 + 0.5 * jacobi_j);
+  _jacobianOplusXj = -(I7 + 0.5 * jacobi_j);
 }
 #endif
 
-  /**Sim3ProjectXYZ*/
+/**Sim3ProjectXYZ*/
 
-EdgeSim3ProjectXYZ::EdgeSim3ProjectXYZ() : BaseBinaryEdge<2, Vector2, VertexPointXYZ, VertexSim3Expmap>() {}
+EdgeSim3ProjectXYZ::EdgeSim3ProjectXYZ()
+    : BaseBinaryEdge<2, Vector2, VertexPointXYZ, VertexSim3Expmap>() {}
 
 bool EdgeSim3ProjectXYZ::read(std::istream &is) {
   internal::readVector(is, _measurement);
@@ -151,9 +156,8 @@ bool EdgeSim3ProjectXYZ::write(std::ostream &os) const {
   return writeInformationMatrix(os);
 }
 
-EdgeInverseSim3ProjectXYZ::EdgeInverseSim3ProjectXYZ() :
-    BaseBinaryEdge<2, Vector2, VertexPointXYZ, VertexSim3Expmap>() {
-}
+EdgeInverseSim3ProjectXYZ::EdgeInverseSim3ProjectXYZ()
+    : BaseBinaryEdge<2, Vector2, VertexPointXYZ, VertexSim3Expmap>() {}
 
 bool EdgeInverseSim3ProjectXYZ::read(std::istream &is) {
   internal::readVector(is, _measurement);
@@ -198,7 +202,6 @@ bool EdgeInverseSim3ProjectXYZ::write(std::ostream &os) const {
 //    _jacobianOplusXj(0,5) = x/z_2 *_focal_length(0);
 //    _jacobianOplusXj(0,6) = 0; // scale is ignored
 
-
 //    _jacobianOplusXj(1,0) = (1+y*y/z_2) *_focal_length(1);
 //    _jacobianOplusXj(1,1) = -x*y/z_2 *_focal_length(1);
 //    _jacobianOplusXj(1,2) = -x/z *_focal_length(1);
@@ -208,4 +211,4 @@ bool EdgeInverseSim3ProjectXYZ::write(std::ostream &os) const {
 //    _jacobianOplusXj(1,6) = 0; // scale is ignored
 //  }
 
-} // end namespace
+}  // namespace g2o

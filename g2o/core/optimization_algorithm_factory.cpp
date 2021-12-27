@@ -38,7 +38,8 @@ AbstractOptimizationAlgorithmCreator::AbstractOptimizationAlgorithmCreator(
     const OptimizationAlgorithmProperty& p)
     : _property(p) {}
 
-std::unique_ptr<OptimizationAlgorithmFactory> OptimizationAlgorithmFactory::factoryInstance;
+std::unique_ptr<OptimizationAlgorithmFactory>
+    OptimizationAlgorithmFactory::factoryInstance;
 
 OptimizationAlgorithmFactory* OptimizationAlgorithmFactory::instance() {
   if (factoryInstance == nullptr) {
@@ -53,7 +54,8 @@ void OptimizationAlgorithmFactory::registerSolver(
   CreatorList::iterator foundIt = findSolver(name);
   if (foundIt != _creator.end()) {
     _creator.erase(foundIt);
-    cerr << "SOLVER FACTORY WARNING: Overwriting Solver creator " << name << endl;
+    cerr << "SOLVER FACTORY WARNING: Overwriting Solver creator " << name
+         << endl;
     assert(0);
   }
   _creator.push_back(c);
@@ -69,7 +71,8 @@ void OptimizationAlgorithmFactory::unregisterSolver(
 }
 
 OptimizationAlgorithm* OptimizationAlgorithmFactory::construct(
-    const std::string& name, OptimizationAlgorithmProperty& solverProperty) const {
+    const std::string& name,
+    OptimizationAlgorithmProperty& solverProperty) const {
   CreatorList::const_iterator foundIt = findSolver(name);
   if (foundIt != _creator.end()) {
     solverProperty = (*foundIt)->property();
@@ -86,11 +89,14 @@ void OptimizationAlgorithmFactory::destroy() {
 
 void OptimizationAlgorithmFactory::listSolvers(std::ostream& os) const {
   size_t solverNameColumnLength = 0;
-  for (CreatorList::const_iterator it = _creator.begin(); it != _creator.end(); ++it)
-    solverNameColumnLength = std::max(solverNameColumnLength, (*it)->property().name.size());
+  for (CreatorList::const_iterator it = _creator.begin(); it != _creator.end();
+       ++it)
+    solverNameColumnLength =
+        std::max(solverNameColumnLength, (*it)->property().name.size());
   solverNameColumnLength += 4;
 
-  for (CreatorList::const_iterator it = _creator.begin(); it != _creator.end(); ++it) {
+  for (CreatorList::const_iterator it = _creator.begin(); it != _creator.end();
+       ++it) {
     const OptimizationAlgorithmProperty& sp = (*it)->property();
     os << sp.name;
     for (size_t i = sp.name.size(); i < solverNameColumnLength; ++i) os << ' ';
@@ -98,18 +104,20 @@ void OptimizationAlgorithmFactory::listSolvers(std::ostream& os) const {
   }
 }
 
-OptimizationAlgorithmFactory::CreatorList::const_iterator OptimizationAlgorithmFactory::findSolver(
-    const std::string& name) const {
-  for (CreatorList::const_iterator it = _creator.begin(); it != _creator.end(); ++it) {
+OptimizationAlgorithmFactory::CreatorList::const_iterator
+OptimizationAlgorithmFactory::findSolver(const std::string& name) const {
+  for (CreatorList::const_iterator it = _creator.begin(); it != _creator.end();
+       ++it) {
     const OptimizationAlgorithmProperty& sp = (*it)->property();
     if (sp.name == name) return it;
   }
   return _creator.end();
 }
 
-OptimizationAlgorithmFactory::CreatorList::iterator OptimizationAlgorithmFactory::findSolver(
-    const std::string& name) {
-  for (CreatorList::iterator it = _creator.begin(); it != _creator.end(); ++it) {
+OptimizationAlgorithmFactory::CreatorList::iterator
+OptimizationAlgorithmFactory::findSolver(const std::string& name) {
+  for (CreatorList::iterator it = _creator.begin(); it != _creator.end();
+       ++it) {
     const OptimizationAlgorithmProperty& sp = (*it)->property();
     if (sp.name == name) return it;
   }

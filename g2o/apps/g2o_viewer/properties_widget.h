@@ -19,40 +19,39 @@
 #ifndef G2O_PROPERTIES_WINDOW_H
 #define G2O_PROPERTIES_WINDOW_H
 
-#include <vector>
-#include <string>
-
 #include <QDialog>
+#include <string>
+#include <vector>
 
 #include "g2o_viewer_api.h"
 #include "ui_base_properties_widget.h"
 
-namespace g2o
-{
-  class G2oQGLViewer;
-  class PropertyMap;
-}
+namespace g2o {
+class G2oQGLViewer;
+class PropertyMap;
+}  // namespace g2o
 
-class G2O_VIEWER_API PropertiesWidget : public QDialog, public Ui::BasePropertiesWidget
-{
+class G2O_VIEWER_API PropertiesWidget : public QDialog,
+                                        public Ui::BasePropertiesWidget {
   Q_OBJECT
-  public:
-    PropertiesWidget(QWidget * parent = 0);
-    virtual ~PropertiesWidget();
+ public:
+  PropertiesWidget(QWidget* parent = 0);
+  virtual ~PropertiesWidget();
 
-    void setProperties(g2o::PropertyMap* properties);
+  void setProperties(g2o::PropertyMap* properties);
 
-  public slots:
-    void on_btnApply_clicked();
-    void on_btnOK_clicked();
+ public slots:
+  void on_btnApply_clicked();
+  void on_btnOK_clicked();
 
-  protected:
-    std::vector<std::string> _propNames;
-    g2o::PropertyMap* _properties;
+ protected:
+  std::vector<std::string> _propNames;
+  g2o::PropertyMap* _properties;
 
-    virtual void updateDisplayedProperties();
-    virtual void applyProperties();
-    virtual std::string humanReadablePropName(const std::string& propertyName) const;
+  virtual void updateDisplayedProperties();
+  virtual void applyProperties();
+  virtual std::string humanReadablePropName(
+      const std::string& propertyName) const;
 };
 
 #endif

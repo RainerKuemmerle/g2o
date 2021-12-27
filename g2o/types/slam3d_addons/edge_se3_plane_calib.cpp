@@ -34,8 +34,8 @@ namespace g2o {
 using namespace std;
 using namespace Eigen;
 
-EdgeSE3PlaneSensorCalib::EdgeSE3PlaneSensorCalib() :
-  BaseVariableSizedEdge<3, Plane3D>(), color(cst(0.1), cst(0.1), cst(0.1)) {
+EdgeSE3PlaneSensorCalib::EdgeSE3PlaneSensorCalib()
+    : BaseVariableSizedEdge<3, Plane3D>(), color(cst(0.1), cst(0.1), cst(0.1)) {
   resize(3);
 }
 
@@ -56,13 +56,18 @@ bool EdgeSE3PlaneSensorCalib::write(std::ostream& os) const {
 
 #ifdef G2O_HAVE_OPENGL
 EdgeSE3PlaneSensorCalibDrawAction::EdgeSE3PlaneSensorCalibDrawAction()
-    : DrawAction(typeid(EdgeSE3PlaneSensorCalib).name()), _planeWidth(nullptr), _planeHeight(nullptr) {}
+    : DrawAction(typeid(EdgeSE3PlaneSensorCalib).name()),
+      _planeWidth(nullptr),
+      _planeHeight(nullptr) {}
 
-bool EdgeSE3PlaneSensorCalibDrawAction::refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_) {
+bool EdgeSE3PlaneSensorCalibDrawAction::refreshPropertyPtrs(
+    HyperGraphElementAction::Parameters* params_) {
   if (!DrawAction::refreshPropertyPtrs(params_)) return false;
   if (_previousParams) {
-    _planeWidth = _previousParams->makeProperty<FloatProperty>(_typeName + "::PLANE_WIDTH", 0.5f);
-    _planeHeight = _previousParams->makeProperty<FloatProperty>(_typeName + "::PLANE_HEIGHT", 0.5f);
+    _planeWidth = _previousParams->makeProperty<FloatProperty>(
+        _typeName + "::PLANE_WIDTH", 0.5f);
+    _planeHeight = _previousParams->makeProperty<FloatProperty>(
+        _typeName + "::PLANE_HEIGHT", 0.5f);
   } else {
     _planeWidth = 0;
     _planeHeight = 0;
@@ -70,8 +75,9 @@ bool EdgeSE3PlaneSensorCalibDrawAction::refreshPropertyPtrs(HyperGraphElementAct
   return true;
 }
 
-HyperGraphElementAction* EdgeSE3PlaneSensorCalibDrawAction::operator()(HyperGraph::HyperGraphElement* element,
-                                                                       HyperGraphElementAction::Parameters* params_) {
+HyperGraphElementAction* EdgeSE3PlaneSensorCalibDrawAction::operator()(
+    HyperGraph::HyperGraphElement* element,
+    HyperGraphElementAction::Parameters* params_) {
   if (typeid(*element).name() != _typeName) return nullptr;
 
   refreshPropertyPtrs(params_);
@@ -79,7 +85,8 @@ HyperGraphElementAction* EdgeSE3PlaneSensorCalibDrawAction::operator()(HyperGrap
 
   if (_show && !_show->value()) return this;
 
-  EdgeSE3PlaneSensorCalib* that = dynamic_cast<EdgeSE3PlaneSensorCalib*>(element);
+  EdgeSE3PlaneSensorCalib* that =
+      dynamic_cast<EdgeSE3PlaneSensorCalib*>(element);
 
   if (!that) return this;
 
@@ -92,7 +99,8 @@ HyperGraphElementAction* EdgeSE3PlaneSensorCalibDrawAction::operator()(HyperGrap
     number_t azimuth = Plane3D::azimuth(that->measurement().normal());
     number_t elevation = Plane3D::elevation(that->measurement().normal());
 
-    glColor3f(float(that->color(0)), float(that->color(1)), float(that->color(2)));
+    glColor3f(float(that->color(0)), float(that->color(1)),
+              float(that->color(2)));
     glPushMatrix();
     Isometry3 robotAndSensor = robot->estimate() * sensor->estimate();
     glMultMatrixd(robotAndSensor.matrix().cast<double>().eval().data());

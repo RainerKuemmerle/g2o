@@ -65,7 +65,9 @@ G2O_STUFF_API std::string getPureFilename(const std::string& filename);
  * change the fileextension of a given filename.
  * Only if filename contains an extension, otherwise filename is returned.
  */
-G2O_STUFF_API std::string changeFileExtension(const std::string& filename, const std::string& newExt, bool stripDot = false);
+G2O_STUFF_API std::string changeFileExtension(const std::string& filename,
+                                              const std::string& newExt,
+                                              bool stripDot = false);
 
 /**
  * return the basename of the given filename
@@ -89,6 +91,6 @@ G2O_STUFF_API bool fileExists(const char* filename);
  */
 G2O_STUFF_API std::vector<std::string> getFilesByPattern(const char* pattern);
 
-} // end namespace
+}  // namespace g2o
 // @}
 #endif

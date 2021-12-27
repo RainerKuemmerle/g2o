@@ -3,16 +3,14 @@
 
 #include <g2o/config.h>
 
-namespace g2o
-{
-    template<typename T>
-    void release(T* obj)
-    {
-        (void)obj;
+namespace g2o {
+template <typename T>
+void release(T* obj) {
+  (void)obj;
 #if G2O_DELETE_IMPLICITLY_OWNED_OBJECTS
-        delete obj;
+  delete obj;
 #endif
-    }
 }
+}  // namespace g2o
 
 #endif

@@ -47,7 +47,8 @@ bool EdgeSE3Prior::resolveCaches() {
   assert(_offsetParam);
   ParameterVector pv(1);
   pv[0] = _offsetParam;
-  resolveCache(_cache, (OptimizableGraph::Vertex*)_vertices[0], "CACHE_SE3_OFFSET", pv);
+  resolveCache(_cache, (OptimizableGraph::Vertex*)_vertices[0],
+               "CACHE_SE3_OFFSET", pv);
   return _cache != 0;
 }
 
@@ -87,7 +88,8 @@ bool EdgeSE3Prior::setMeasurementFromState() {
   return true;
 }
 
-void EdgeSE3Prior::initialEstimate(const OptimizableGraph::VertexSet& /*from_*/, OptimizableGraph::Vertex* /*to_*/) {
+void EdgeSE3Prior::initialEstimate(const OptimizableGraph::VertexSet& /*from_*/,
+                                   OptimizableGraph::Vertex* /*to_*/) {
   VertexSE3* v = static_cast<VertexSE3*>(_vertices[0]);
   assert(v && "Vertex for the Prior edge is not set");
 
@@ -98,7 +100,8 @@ void EdgeSE3Prior::initialEstimate(const OptimizableGraph::VertexSet& /*from_*/,
   }
   // do not set rotation, as that part of the information is all zero
   if (_information.block<3, 3>(3, 3).array().abs().sum() == 0) {
-    newEstimate.matrix().block<3, 3>(0, 0) = internal::extractRotation(v->estimate());
+    newEstimate.matrix().block<3, 3>(0, 0) =
+        internal::extractRotation(v->estimate());
   }
   v->setEstimate(newEstimate);
 }

@@ -42,14 +42,16 @@ bool EdgeSE3ProjectXYZ::write(std::ostream &os) const {
 }
 
 void EdgeSE3ProjectXYZ::computeError() {
-  const VertexSE3Expmap *v1 = static_cast<const VertexSE3Expmap *>(_vertices[1]);
+  const VertexSE3Expmap *v1 =
+      static_cast<const VertexSE3Expmap *>(_vertices[1]);
   const VertexPointXYZ *v2 = static_cast<const VertexPointXYZ *>(_vertices[0]);
   Vector2 obs(_measurement);
   _error = obs - cam_project(v1->estimate().map(v2->estimate()));
 }
 
 bool EdgeSE3ProjectXYZ::isDepthPositive() {
-  const VertexSE3Expmap *v1 = static_cast<const VertexSE3Expmap *>(_vertices[1]);
+  const VertexSE3Expmap *v1 =
+      static_cast<const VertexSE3Expmap *>(_vertices[1]);
   const VertexPointXYZ *v2 = static_cast<const VertexPointXYZ *>(_vertices[0]);
   return (v1->estimate().map(v2->estimate()))(2) > 0.0;
 }

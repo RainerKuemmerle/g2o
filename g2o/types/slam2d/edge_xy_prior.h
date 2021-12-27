@@ -27,58 +27,56 @@
 #ifndef G2O_EDGE_XY_PRIOR_H
 #define G2O_EDGE_XY_PRIOR_H
 
-#include "vertex_point_xy.h"
 #include "g2o/config.h"
 #include "g2o/core/base_unary_edge.h"
 #include "g2o_types_slam2d_api.h"
+#include "vertex_point_xy.h"
 
 namespace g2o {
 
-  class G2O_TYPES_SLAM2D_API EdgeXYPrior : public BaseUnaryEdge<2, Vector2, VertexPointXY>
-  {
-    public:
-      EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-        EdgeXYPrior();
+class G2O_TYPES_SLAM2D_API EdgeXYPrior
+    : public BaseUnaryEdge<2, Vector2, VertexPointXY> {
+ public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+  EdgeXYPrior();
 
-      void computeError()
-      {
-        const VertexPointXY* v = static_cast<const VertexPointXY*>(_vertices[0]);
-        _error = v->estimate()-_measurement;
-      }
-      virtual bool read(std::istream& is);
-      virtual bool write(std::ostream& os) const;
+  void computeError() {
+    const VertexPointXY* v = static_cast<const VertexPointXY*>(_vertices[0]);
+    _error = v->estimate() - _measurement;
+  }
+  virtual bool read(std::istream& is);
+  virtual bool write(std::ostream& os) const;
 
-      virtual void setMeasurement(const Vector2& m){
-        _measurement = m;
-      }
+  virtual void setMeasurement(const Vector2& m) { _measurement = m; }
 
-      virtual bool setMeasurementData(const number_t* d){
-        _measurement=Vector2(d[0], d[1]);
-        return true;
-      }
+  virtual bool setMeasurementData(const number_t* d) {
+    _measurement = Vector2(d[0], d[1]);
+    return true;
+  }
 
-      virtual bool getMeasurementData(number_t* d) const {
-        Eigen::Map<Vector2> m(d);
-        m=_measurement;
-        return true;
-      }
+  virtual bool getMeasurementData(number_t* d) const {
+    Eigen::Map<Vector2> m(d);
+    m = _measurement;
+    return true;
+  }
 
-      virtual int measurementDimension() const {return 2;}
+  virtual int measurementDimension() const { return 2; }
 
-      virtual bool setMeasurementFromState() {
-        const VertexPointXY* v = static_cast<const VertexPointXY*>(_vertices[0]);
-        _measurement = v->estimate();
-        return true;
-      }
+  virtual bool setMeasurementFromState() {
+    const VertexPointXY* v = static_cast<const VertexPointXY*>(_vertices[0]);
+    _measurement = v->estimate();
+    return true;
+  }
 
-
-      virtual number_t initialEstimatePossible(const OptimizableGraph::VertexSet& , OptimizableGraph::Vertex* ) { return 0.;}
+  virtual number_t initialEstimatePossible(const OptimizableGraph::VertexSet&,
+                                           OptimizableGraph::Vertex*) {
+    return 0.;
+  }
 #ifndef NUMERIC_JACOBIAN_TWO_D_TYPES
-      virtual void linearizeOplus();
+  virtual void linearizeOplus();
 #endif
-  };
+};
 
-
-} // end namespace
+}  // namespace g2o
 
 #endif

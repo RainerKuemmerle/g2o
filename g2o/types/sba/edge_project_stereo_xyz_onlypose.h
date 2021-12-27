@@ -35,7 +35,8 @@ namespace g2o {
 
 // Edge to optimize only the camera pose stereo
 // TODO why does this exist? Fix point in optimization instead?
-class G2O_TYPES_SBA_API EdgeStereoSE3ProjectXYZOnlyPose : public BaseUnaryEdge<3, Vector3, VertexSE3Expmap> {
+class G2O_TYPES_SBA_API EdgeStereoSE3ProjectXYZOnlyPose
+    : public BaseUnaryEdge<3, Vector3, VertexSE3Expmap> {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 

@@ -28,7 +28,8 @@
 
 namespace g2o {
 
-EdgeSE2Segment2D::EdgeSE2Segment2D() : BaseBinaryEdge<4, Vector4, VertexSE2, VertexSegment2D>() {}
+EdgeSE2Segment2D::EdgeSE2Segment2D()
+    : BaseBinaryEdge<4, Vector4, VertexSE2, VertexSegment2D>() {}
 
 bool EdgeSE2Segment2D::read(std::istream& is) {
   internal::readVector(is, _measurement);
@@ -40,9 +41,11 @@ bool EdgeSE2Segment2D::write(std::ostream& os) const {
   return writeInformationMatrix(os);
 }
 
-void EdgeSE2Segment2D::initialEstimate(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to) {
+void EdgeSE2Segment2D::initialEstimate(const OptimizableGraph::VertexSet& from,
+                                       OptimizableGraph::Vertex* to) {
   assert(from.size() == 1 && from.count(_vertices[0]) == 1 &&
-         "Can not initialize VertexSE2 position by VertexSegment2D. I could if i wanted. Not now");
+         "Can not initialize VertexSE2 position by VertexSegment2D. I could if "
+         "i wanted. Not now");
 
   VertexSE2* vi = static_cast<VertexSE2*>(_vertices[0]);
   VertexSegment2D* vj = static_cast<VertexSegment2D*>(_vertices[1]);
@@ -56,12 +59,12 @@ void EdgeSE2Segment2D::initialEstimate(const OptimizableGraph::VertexSet& from, 
 //   void EdgeSE2Segment2D::linearizeOplus()
 //   {
 //     const VertexSE2* vi     = static_cast<const VertexSE2*>(_vertices[0]);
-//     const VertexSegment2D* vj = static_cast<const VertexSegment2D*>(_vertices[1]);
-//     const number_t& x1        = vi->estimate().translation()[0];
-//     const number_t& y1        = vi->estimate().translation()[1];
-//     const number_t& th1       = vi->estimate().rotation().angle();
-//     const number_t& x2        = vj->estimate()[0];
-//     const number_t& y2        = vj->estimate()[1];
+//     const VertexSegment2D* vj = static_cast<const
+//     VertexSegment2D*>(_vertices[1]); const number_t& x1        =
+//     vi->estimate().translation()[0]; const number_t& y1        =
+//     vi->estimate().translation()[1]; const number_t& th1       =
+//     vi->estimate().rotation().angle(); const number_t& x2        =
+//     vj->estimate()[0]; const number_t& y2        = vj->estimate()[1];
 
 //     number_t aux_1 = cos(th1) ;
 //     number_t aux_2 = -aux_1 ;
@@ -84,30 +87,37 @@ void EdgeSE2Segment2D::initialEstimate(const OptimizableGraph::VertexSet& from, 
 //   EdgeSE2Segment2DWriteGnuplotAction::EdgeSE2Segment2DWriteGnuplotAction():
 //   WriteGnuplotAction(typeid(EdgeSE2Segment2D).name()){}
 
-//   HyperGraphElementAction* EdgeSE2Segment2DWriteGnuplotAction::operator()(HyperGraph::HyperGraphElement* element,
-//   HyperGraphElementAction::Parameters* params_){
+//   HyperGraphElementAction*
+//   EdgeSE2Segment2DWriteGnuplotAction::operator()(HyperGraph::HyperGraphElement*
+//   element, HyperGraphElementAction::Parameters* params_){
 //     if (typeid(*element).name()!=_typeName)
 //       return nullptr;
-//     WriteGnuplotAction::Parameters* params=static_cast<WriteGnuplotAction::Parameters*>(params_);
-//     if (!params->os){
-//       std::cerr << __PRETTY_FUNCTION__ << ": warning, on valid os specified" << std::endl;
-//       return nullptr;
+//     WriteGnuplotAction::Parameters*
+//     params=static_cast<WriteGnuplotAction::Parameters*>(params_); if
+//     (!params->os){
+//       std::cerr << __PRETTY_FUNCTION__ << ": warning, on valid os specified"
+//       << std::endl; return nullptr;
 //     }
 
 //     EdgeSE2Segment2D* e =  static_cast<EdgeSE2Segment2D*>(element);
 //     VertexSE2* fromEdge = static_cast<VertexSE2*>(e->vertex(0));
 //     VertexSegment2D* toEdge   = static_cast<VertexSegment2D*>(e->vertex(1));
-//     *(params->os) << fromEdge->estimate().translation().x() << " " << fromEdge->estimate().translation().y()
+//     *(params->os) << fromEdge->estimate().translation().x() << " " <<
+//     fromEdge->estimate().translation().y()
 //       << " " << fromEdge->estimate().rotation().angle() << std::endl;
-//     *(params->os) << toEdge->estimate().x() << " " << toEdge->estimate().y() << std::endl;
+//     *(params->os) << toEdge->estimate().x() << " " << toEdge->estimate().y()
+//     << std::endl;
 //     *(params->os) << std::endl;
 //     return this;
 //   }
 
 // #ifdef G2O_HAVE_OPENGL
-//   EdgeSE2Segment2DDrawAction::EdgeSE2Segment2DDrawAction(): DrawAction(typeid(EdgeSE2Segment2D).name()){}
+//   EdgeSE2Segment2DDrawAction::EdgeSE2Segment2DDrawAction():
+//   DrawAction(typeid(EdgeSE2Segment2D).name()){}
 
-//   HyperGraphElementAction* EdgeSE2Segment2DDrawAction::operator()(HyperGraph::HyperGraphElement* element,
+//   HyperGraphElementAction*
+//   EdgeSE2Segment2DDrawAction::operator()(HyperGraph::HyperGraphElement*
+//   element,
 //                 HyperGraphElementAction::Parameters*  params_){
 //     if (typeid(*element).name()!=_typeName)
 //       return nullptr;

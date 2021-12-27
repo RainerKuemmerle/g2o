@@ -24,30 +24,27 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include <iostream>
 #include <cmath>
+#include <iostream>
 
-#include "simulator.h"
-
-#include "vertex_se2.h"
-#include "vertex_point_xy.h"
 #include "edge_se2.h"
 #include "edge_se2_pointxy.h"
-#include "types_tutorial_slam2d.h"
-
-#include "g2o/core/sparse_optimizer.h"
 #include "g2o/core/block_solver.h"
 #include "g2o/core/factory.h"
 #include "g2o/core/optimization_algorithm_factory.h"
 #include "g2o/core/optimization_algorithm_gauss_newton.h"
+#include "g2o/core/sparse_optimizer.h"
 #include "g2o/solvers/eigen/linear_solver_eigen.h"
+#include "simulator.h"
+#include "types_tutorial_slam2d.h"
+#include "vertex_point_xy.h"
+#include "vertex_se2.h"
 
 using namespace std;
 using namespace g2o;
 using namespace g2o::tutorial;
 
-int main()
-{
+int main() {
   // TODO simulate different sensor offset
   // simulate a robot observing landmarks while travelling on a grid
   SE2 sensorOffsetTransf(0.2, 0.1, -0.1);
@@ -59,15 +56,16 @@ int main()
    * creating the optimization problem
    ********************************************************************************/
 
-  typedef BlockSolver< BlockSolverTraits<-1, -1> >  SlamBlockSolver;
+  typedef BlockSolver<BlockSolverTraits<-1, -1> > SlamBlockSolver;
   typedef LinearSolverEigen<SlamBlockSolver::PoseMatrixType> SlamLinearSolver;
 
   // allocating the optimizer
   SparseOptimizer optimizer;
   auto linearSolver = g2o::make_unique<SlamLinearSolver>();
   linearSolver->setBlockOrdering(false);
-  OptimizationAlgorithmGaussNewton* solver = new OptimizationAlgorithmGaussNewton(
-    g2o::make_unique<SlamBlockSolver>(std::move(linearSolver)));
+  OptimizationAlgorithmGaussNewton* solver =
+      new OptimizationAlgorithmGaussNewton(
+          g2o::make_unique<SlamBlockSolver>(std::move(linearSolver)));
 
   optimizer.setAlgorithm(solver);
 
@@ -83,7 +81,7 @@ int main()
   for (size_t i = 0; i < simulator.poses().size(); ++i) {
     const Simulator::GridPose& p = simulator.poses()[i];
     const SE2& t = p.simulatorPose;
-    VertexSE2* robot =  new VertexSE2;
+    VertexSE2* robot = new VertexSE2;
     robot->setId(p.id);
     robot->setEstimate(t);
     optimizer.addVertex(robot);
@@ -117,8 +115,9 @@ int main()
 
   cerr << "Optimization: add landmark observations ... ";
   for (size_t i = 0; i < simulator.landmarkObservations().size(); ++i) {
-    const Simulator::LandmarkEdge& simEdge = simulator.landmarkObservations()[i];
-    EdgeSE2PointXY* landmarkObservation =  new EdgeSE2PointXY;
+    const Simulator::LandmarkEdge& simEdge =
+        simulator.landmarkObservations()[i];
+    EdgeSE2PointXY* landmarkObservation = new EdgeSE2PointXY;
     landmarkObservation->vertices()[0] = optimizer.vertex(simEdge.from);
     landmarkObservation->vertices()[1] = optimizer.vertex(simEdge.to);
     landmarkObservation->setMeasurement(simEdge.simulatorMeas);
@@ -127,7 +126,6 @@ int main()
     optimizer.addEdge(landmarkObservation);
   }
   cerr << "done." << endl;
-
 
   /*********************************************************************************
    * optimization

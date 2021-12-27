@@ -34,16 +34,17 @@
 
 namespace g2o {
 
-  struct G2O_CALIBRATION_ODOM_LASER_API MotionInformation
-  {
-    EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
-    SE2 laserMotion;
-    SE2 odomMotion;
-    double timeInterval;
-  };
+struct G2O_CALIBRATION_ODOM_LASER_API MotionInformation {
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
+  SE2 laserMotion;
+  SE2 odomMotion;
+  double timeInterval;
+};
 
-  typedef std::vector<MotionInformation, Eigen::aligned_allocator<MotionInformation> >     MotionInformationVector;
+typedef std::vector<MotionInformation,
+                    Eigen::aligned_allocator<MotionInformation> >
+    MotionInformationVector;
 
-} // end namespace
+}  // namespace g2o
 
 #endif

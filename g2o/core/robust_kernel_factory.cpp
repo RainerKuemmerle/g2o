@@ -42,11 +42,12 @@ RobustKernelFactory* RobustKernelFactory::instance() {
   return factoryInstance.get();
 }
 
-void RobustKernelFactory::registerRobustKernel(const std::string& tag,
-                                               const AbstractRobustKernelCreator::Ptr& c) {
+void RobustKernelFactory::registerRobustKernel(
+    const std::string& tag, const AbstractRobustKernelCreator::Ptr& c) {
   CreatorMap::const_iterator foundIt = _creator.find(tag);
   if (foundIt != _creator.end()) {
-    cerr << "RobustKernelFactory WARNING: Overwriting robust kernel tag " << tag << endl;
+    cerr << "RobustKernelFactory WARNING: Overwriting robust kernel tag " << tag
+         << endl;
     assert(0);
   }
 
@@ -68,7 +69,8 @@ RobustKernel* RobustKernelFactory::construct(const std::string& tag) const {
   return nullptr;
 }
 
-AbstractRobustKernelCreator* RobustKernelFactory::creator(const std::string& tag) const {
+AbstractRobustKernelCreator* RobustKernelFactory::creator(
+    const std::string& tag) const {
   CreatorMap::const_iterator foundIt = _creator.find(tag);
   if (foundIt != _creator.end()) {
     return foundIt->second.get();
@@ -76,9 +78,11 @@ AbstractRobustKernelCreator* RobustKernelFactory::creator(const std::string& tag
   return nullptr;
 }
 
-void RobustKernelFactory::fillKnownKernels(std::vector<std::string>& types) const {
+void RobustKernelFactory::fillKnownKernels(
+    std::vector<std::string>& types) const {
   types.clear();
-  for (CreatorMap::const_iterator it = _creator.begin(); it != _creator.end(); ++it)
+  for (CreatorMap::const_iterator it = _creator.begin(); it != _creator.end();
+       ++it)
     types.push_back(it->first);
 }
 

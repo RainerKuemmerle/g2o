@@ -36,7 +36,8 @@ namespace g2o {
 /**
  * \brief plane measurement that also calibrates an offset for the sensor
  */
-class G2O_TYPES_SLAM3D_ADDONS_API EdgeSE3PlaneSensorCalib : public BaseVariableSizedEdge<3, Plane3D> {
+class G2O_TYPES_SLAM3D_ADDONS_API EdgeSE3PlaneSensorCalib
+    : public BaseVariableSizedEdge<3, Plane3D> {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
   EdgeSE3PlaneSensorCalib();
@@ -44,7 +45,8 @@ class G2O_TYPES_SLAM3D_ADDONS_API EdgeSE3PlaneSensorCalib : public BaseVariableS
 
   void computeError() {
     const VertexSE3* v1 = static_cast<const VertexSE3*>(_vertices[0]);
-    const VertexPlane* planeVertex = static_cast<const VertexPlane*>(_vertices[1]);
+    const VertexPlane* planeVertex =
+        static_cast<const VertexPlane*>(_vertices[1]);
     const VertexSE3* offset = static_cast<const VertexSE3*>(_vertices[2]);
     const Plane3D& plane = planeVertex->estimate();
     // measurement function: remap the plane in global coordinates
@@ -63,11 +65,13 @@ class G2O_TYPES_SLAM3D_ADDONS_API EdgeSE3PlaneSensorCalib : public BaseVariableS
 class EdgeSE3PlaneSensorCalibDrawAction : public DrawAction {
  public:
   G2O_TYPES_SLAM3D_ADDONS_API EdgeSE3PlaneSensorCalibDrawAction();
-  G2O_TYPES_SLAM3D_ADDONS_API virtual HyperGraphElementAction* operator()(HyperGraph::HyperGraphElement* element,
-                                                                          HyperGraphElementAction::Parameters* params_);
+  G2O_TYPES_SLAM3D_ADDONS_API virtual HyperGraphElementAction* operator()(
+      HyperGraph::HyperGraphElement* element,
+      HyperGraphElementAction::Parameters* params_);
 
  protected:
-  virtual bool refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_);
+  virtual bool refreshPropertyPtrs(
+      HyperGraphElementAction::Parameters* params_);
   FloatProperty *_planeWidth, *_planeHeight;
 };
 #endif

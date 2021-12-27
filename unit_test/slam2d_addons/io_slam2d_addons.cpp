@@ -30,8 +30,8 @@
 #include "g2o/types/slam2d_addons/edge_se2_line2d.h"
 #include "g2o/types/slam2d_addons/edge_se2_segment2d.h"
 #include "g2o/types/slam2d_addons/edge_se2_segment2d_line.h"
-#include "g2o/types/slam2d_addons/vertex_segment2d.h"
 #include "g2o/types/slam2d_addons/edge_se2_segment2d_pointLine.h"
+#include "g2o/types/slam2d_addons/vertex_segment2d.h"
 #include "gtest/gtest.h"
 #include "unit_test/test_helper/io.h"
 
@@ -40,17 +40,31 @@ using namespace g2o;
 
 struct RandomLine2D {
   static Line2D create() { return Line2D(g2o::Vector2::Random()); }
-  static bool isApprox(const Line2D& a, const Line2D& b) { return a.isApprox(b, 1e-5); }
+  static bool isApprox(const Line2D& a, const Line2D& b) {
+    return a.isApprox(b, 1e-5);
+  }
 };
 
-TEST(IoSlam2dAddOns, ReadWriteVertexSegment2D) { readWriteVectorBasedVertex<VertexSegment2D>(); }
+TEST(IoSlam2dAddOns, ReadWriteVertexSegment2D) {
+  readWriteVectorBasedVertex<VertexSegment2D>();
+}
 
-TEST(IoSlam2dAddOns, ReadWriteEdgeLine2D) { readWriteVectorBasedEdge<EdgeLine2D, RandomLine2D>(); }
+TEST(IoSlam2dAddOns, ReadWriteEdgeLine2D) {
+  readWriteVectorBasedEdge<EdgeLine2D, RandomLine2D>();
+}
 
-TEST(IoSlam2dAddOns, ReadWriteEdgeSE2Line2D) { readWriteVectorBasedEdge<EdgeSE2Line2D, RandomLine2D>(); }
+TEST(IoSlam2dAddOns, ReadWriteEdgeSE2Line2D) {
+  readWriteVectorBasedEdge<EdgeSE2Line2D, RandomLine2D>();
+}
 
-TEST(IoSlam2dAddOns, ReadWriteEdgeSE2Segment2D) { readWriteVectorBasedEdge<EdgeSE2Segment2D>(); }
+TEST(IoSlam2dAddOns, ReadWriteEdgeSE2Segment2D) {
+  readWriteVectorBasedEdge<EdgeSE2Segment2D>();
+}
 
-TEST(IoSlam2dAddOns, ReadWriteEdgeSE2Segment2DLine) { readWriteVectorBasedEdge<EdgeSE2Segment2DLine>(); }
+TEST(IoSlam2dAddOns, ReadWriteEdgeSE2Segment2DLine) {
+  readWriteVectorBasedEdge<EdgeSE2Segment2DLine>();
+}
 
-TEST(IoSlam2dAddOns, ReadWriteEdgeSE2Segment2DPointLine) { readWriteVectorBasedEdge<EdgeSE2Segment2DPointLine>(); }
+TEST(IoSlam2dAddOns, ReadWriteEdgeSE2Segment2DPointLine) {
+  readWriteVectorBasedEdge<EdgeSE2Segment2DPointLine>();
+}
