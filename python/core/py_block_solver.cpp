@@ -21,33 +21,53 @@ void declareBlockSolver(py::module& m) {
   typedef BlockSolverX::PoseMatrixType MatrixX;
 
 #if G2O_HAVE_CHOLMOD
-  templatedPyLinearSolver<g2o::LinearSolverCholmod<MatrixSE2>, BlockSolver_3_2>(m, "CholmodSE2");
-  templatedPyLinearSolver<g2o::LinearSolverCholmod<MatrixSE3>, BlockSolver_6_3>(m, "CholmodSE3");
-  templatedPyLinearSolver<g2o::LinearSolverCholmod<MatrixSim3>, BlockSolver_7_3>(m, "CholmodSim3");
-  templatedPyLinearSolver<g2o::LinearSolverCholmod<MatrixX>, BlockSolverX>(m, "CholmodX");
+  templatedPyLinearSolver<g2o::LinearSolverCholmod<MatrixSE2>, BlockSolver_3_2>(
+      m, "CholmodSE2");
+  templatedPyLinearSolver<g2o::LinearSolverCholmod<MatrixSE3>, BlockSolver_6_3>(
+      m, "CholmodSE3");
+  templatedPyLinearSolver<g2o::LinearSolverCholmod<MatrixSim3>,
+                          BlockSolver_7_3>(m, "CholmodSim3");
+  templatedPyLinearSolver<g2o::LinearSolverCholmod<MatrixX>, BlockSolverX>(
+      m, "CholmodX");
 #endif
 
 #if G2O_HAVE_CSPARSE
-  templatedPyLinearSolver<g2o::LinearSolverCSparse<MatrixSE2>, BlockSolver_3_2>(m, "CSparseSE2");
-  templatedPyLinearSolver<g2o::LinearSolverCSparse<MatrixSE3>, BlockSolver_6_3>(m, "CSparseSE3");
-  templatedPyLinearSolver<g2o::LinearSolverCSparse<MatrixSim3>, BlockSolver_7_3>(m, "CSparseSim3");
-  templatedPyLinearSolver<g2o::LinearSolverCSparse<MatrixX>, BlockSolverX>(m, "CSparseX");
+  templatedPyLinearSolver<g2o::LinearSolverCSparse<MatrixSE2>, BlockSolver_3_2>(
+      m, "CSparseSE2");
+  templatedPyLinearSolver<g2o::LinearSolverCSparse<MatrixSE3>, BlockSolver_6_3>(
+      m, "CSparseSE3");
+  templatedPyLinearSolver<g2o::LinearSolverCSparse<MatrixSim3>,
+                          BlockSolver_7_3>(m, "CSparseSim3");
+  templatedPyLinearSolver<g2o::LinearSolverCSparse<MatrixX>, BlockSolverX>(
+      m, "CSparseX");
 #endif
 
-  templatedPyLinearSolver<g2o::LinearSolverEigen<MatrixSE2>, BlockSolver_3_2>(m, "EigenSE2");
-  templatedPyLinearSolver<g2o::LinearSolverEigen<MatrixSE3>, BlockSolver_6_3>(m, "EigenSE3");
-  templatedPyLinearSolver<g2o::LinearSolverEigen<MatrixSim3>, BlockSolver_7_3>(m, "EigenSim3");
-  templatedPyLinearSolver<g2o::LinearSolverEigen<MatrixX>, BlockSolverX>(m, "EigenX");
+  templatedPyLinearSolver<g2o::LinearSolverEigen<MatrixSE2>, BlockSolver_3_2>(
+      m, "EigenSE2");
+  templatedPyLinearSolver<g2o::LinearSolverEigen<MatrixSE3>, BlockSolver_6_3>(
+      m, "EigenSE3");
+  templatedPyLinearSolver<g2o::LinearSolverEigen<MatrixSim3>, BlockSolver_7_3>(
+      m, "EigenSim3");
+  templatedPyLinearSolver<g2o::LinearSolverEigen<MatrixX>, BlockSolverX>(
+      m, "EigenX");
 
-  templatedPyLinearSolver_<g2o::LinearSolverDense<MatrixSE2>, BlockSolver_3_2>(m, "DenseSE2");
-  templatedPyLinearSolver_<g2o::LinearSolverDense<MatrixSE3>, BlockSolver_6_3>(m, "DenseSE3");
-  templatedPyLinearSolver_<g2o::LinearSolverDense<MatrixSim3>, BlockSolver_7_3>(m, "DenseSim3");
-  templatedPyLinearSolver_<g2o::LinearSolverDense<MatrixX>, BlockSolverX>(m, "DenseX");
+  templatedPyLinearSolver_<g2o::LinearSolverDense<MatrixSE2>, BlockSolver_3_2>(
+      m, "DenseSE2");
+  templatedPyLinearSolver_<g2o::LinearSolverDense<MatrixSE3>, BlockSolver_6_3>(
+      m, "DenseSE3");
+  templatedPyLinearSolver_<g2o::LinearSolverDense<MatrixSim3>, BlockSolver_7_3>(
+      m, "DenseSim3");
+  templatedPyLinearSolver_<g2o::LinearSolverDense<MatrixX>, BlockSolverX>(
+      m, "DenseX");
 
-  templatedPyLinearSolver_<g2o::LinearSolverPCG<MatrixSE2>, BlockSolver_3_2>(m, "PCGSE2");
-  templatedPyLinearSolver_<g2o::LinearSolverPCG<MatrixSE3>, BlockSolver_6_3>(m, "PCGSE3");
-  templatedPyLinearSolver_<g2o::LinearSolverPCG<MatrixSim3>, BlockSolver_7_3>(m, "PCGSim3");
-  templatedPyLinearSolver_<g2o::LinearSolverPCG<MatrixX>, BlockSolverX>(m, "PCGX");
+  templatedPyLinearSolver_<g2o::LinearSolverPCG<MatrixSE2>, BlockSolver_3_2>(
+      m, "PCGSE2");
+  templatedPyLinearSolver_<g2o::LinearSolverPCG<MatrixSE3>, BlockSolver_6_3>(
+      m, "PCGSE3");
+  templatedPyLinearSolver_<g2o::LinearSolverPCG<MatrixSim3>, BlockSolver_7_3>(
+      m, "PCGSim3");
+  templatedPyLinearSolver_<g2o::LinearSolverPCG<MatrixX>, BlockSolverX>(m,
+                                                                        "PCGX");
 
   templatedPyBlockSolver<BlockSolver_3_2>(m, "SE2");
   templatedPyBlockSolver<BlockSolver_6_3>(m, "SE3");

@@ -25,7 +25,6 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <cstdint>
-
 #include <iostream>
 #include <random>
 
@@ -37,8 +36,8 @@
 #include "g2o/stuff/sampler.h"
 #include "g2o/types/icp/types_icp.h"
 
-using std::cout;
 using std::cerr;
+using std::cout;
 using std::endl;
 
 namespace g2o {
@@ -58,7 +57,8 @@ static int gicp_sba_demo(int argc, char** argv) {
   // variable-size block solver
   g2o::OptimizationAlgorithm* solver =
       new g2o::OptimizationAlgorithmLevenberg(g2o::make_unique<BlockSolverX>(
-          g2o::make_unique<LinearSolverEigen<g2o::BlockSolverX::PoseMatrixType>>()));
+          g2o::make_unique<
+              LinearSolverEigen<g2o::BlockSolverX::PoseMatrixType>>()));
 
   optimizer.setAlgorithm(std::unique_ptr<OptimizationAlgorithm>(solver));
 
@@ -72,11 +72,11 @@ static int gicp_sba_demo(int argc, char** argv) {
   // set up camera params
   Vector2 focal_length(500, 500);     // pixels
   Vector2 principal_point(320, 240);  // 640x480 image
-  double baseline = 0.075;             // 7.5 cm baseline
+  double baseline = 0.075;            // 7.5 cm baseline
 
   // set up camera params and projection matrices on vertices
-  g2o::VertexSCam::setKcam(focal_length[0], focal_length[1], principal_point[0], principal_point[1],
-                           baseline);
+  g2o::VertexSCam::setKcam(focal_length[0], focal_length[1], principal_point[0],
+                           principal_point[1], baseline);
 
   // set up two poses
   int vertex_id = 0;
@@ -112,8 +112,10 @@ static int gicp_sba_demo(int argc, char** argv) {
   // set up point matches for GICP
   for (size_t i = 0; i < true_points.size(); ++i) {
     // get two poses
-    auto vp0 = std::dynamic_pointer_cast<VertexSE3>(optimizer.vertices().find(0)->second);
-    auto vp1 = std::dynamic_pointer_cast<VertexSE3>(optimizer.vertices().find(1)->second);
+    auto vp0 = std::dynamic_pointer_cast<VertexSE3>(
+        optimizer.vertices().find(0)->second);
+    auto vp1 = std::dynamic_pointer_cast<VertexSE3>(
+        optimizer.vertices().find(1)->second);
 
     // calculate the relative 3D position of the point
     Vector3 pt0 = vp0->estimate().inverse() * true_points[i];
@@ -175,20 +177,21 @@ static int gicp_sba_demo(int argc, char** argv) {
   }
 
   // add point projections to this vertex
-  for (auto & true_point : true_points) {
+  for (auto& true_point : true_points) {
     auto v_p = std::make_shared<g2o::VertexPointXYZ>();
 
     v_p->setId(vertex_id++);
     v_p->setMarginalized(true);
     v_p->setEstimate(true_point + Vector3(g2o::Sampler::gaussRand(0., 1),
-                                                  g2o::Sampler::gaussRand(0., 1),
-                                                  g2o::Sampler::gaussRand(0., 1)));
+                                          g2o::Sampler::gaussRand(0., 1),
+                                          g2o::Sampler::gaussRand(0., 1)));
 
     optimizer.addVertex(v_p);
 
     for (size_t j = 0; j < 2; ++j) {
       Vector3 z;
-      std::dynamic_pointer_cast<g2o::VertexSCam>(optimizer.vertices().find(j)->second)
+      std::dynamic_pointer_cast<g2o::VertexSCam>(
+          optimizer.vertices().find(j)->second)
           ->mapPoint(z, true_point);
 
       if (z[0] >= 0 && z[1] >= 0 && z[0] < 640 && z[1] < 480) {
@@ -215,7 +218,8 @@ static int gicp_sba_demo(int argc, char** argv) {
   }  // done with adding projection points
 
   // move second cam off of its true position
-  auto vc = std::dynamic_pointer_cast<VertexSE3>(optimizer.vertices().find(1)->second);
+  auto vc = std::dynamic_pointer_cast<VertexSE3>(
+      optimizer.vertices().find(1)->second);
   Eigen::Isometry3d cam = vc->estimate();
   cam.translation() = Vector3(-0.1, 0.1, 0.2);
   vc->setEstimate(cam);
@@ -228,20 +232,20 @@ static int gicp_sba_demo(int argc, char** argv) {
   optimizer.optimize(20);
 
   cout << endl << "Second vertex should be near 0,0,1" << endl;
-  cout << std::dynamic_pointer_cast<VertexSE3>(optimizer.vertices().find(0)->second)
+  cout << std::dynamic_pointer_cast<VertexSE3>(
+              optimizer.vertices().find(0)->second)
               ->estimate()
               .translation()
               .transpose()
        << endl;
-  cout << std::dynamic_pointer_cast<VertexSE3>(optimizer.vertices().find(1)->second)
+  cout << std::dynamic_pointer_cast<VertexSE3>(
+              optimizer.vertices().find(1)->second)
               ->estimate()
               .translation()
               .transpose()
        << endl;
   return 0;
 }
-}
+}  // namespace g2o
 
-int main(int argc, char** argv) {
-  return g2o::gicp_sba_demo(argc, argv);
-}
+int main(int argc, char** argv) { return g2o::gicp_sba_demo(argc, argv); }

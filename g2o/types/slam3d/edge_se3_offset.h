@@ -27,42 +27,41 @@
 #ifndef G2O_EDGE_SE3_OFFSET_H_
 #define G2O_EDGE_SE3_OFFSET_H_
 
-
 #include "edge_se3.h"
 #include "g2o_types_slam3d_api.h"
 
 namespace g2o {
-  class CacheSE3Offset;
+class CacheSE3Offset;
 
-  /**
-   * \brief Offset edge
-   */
-  // first two args are the measurement type, second two the connection classes
-  class G2O_TYPES_SLAM3D_API EdgeSE3Offset : public EdgeSE3 {
-    public:
-      EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
-      EdgeSE3Offset();
-      bool read(std::istream& is) override ;
-      bool write(std::ostream& os) const override ;
+/**
+ * \brief Offset edge
+ */
+// first two args are the measurement type, second two the connection classes
+class G2O_TYPES_SLAM3D_API EdgeSE3Offset : public EdgeSE3 {
+ public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
+  EdgeSE3Offset();
+  bool read(std::istream& is) override;
+  bool write(std::ostream& os) const override;
 
-      void computeError() override ;
+  void computeError() override;
 
+  void linearizeOplus() override;
 
-      void linearizeOplus() override ;
+  bool setMeasurementFromState() override;
 
-      bool setMeasurementFromState() override ;
+  number_t initialEstimatePossible(const OptimizableGraph::VertexSet& /*from*/,
+                                   OptimizableGraph::Vertex* /*to*/) override {
+    return 1.;
+  }
 
-      number_t initialEstimatePossible(const OptimizableGraph::VertexSet& /*from*/,
-          OptimizableGraph::Vertex* /*to*/) override {
-        return 1.;
-      }
+  void initialEstimate(const OptimizableGraph::VertexSet& from,
+                       OptimizableGraph::Vertex* to) override;
 
-      void initialEstimate(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to) override ;
+ protected:
+  bool resolveCaches() override;
+  std::shared_ptr<CacheSE3Offset> cacheFrom_, cacheTo_;
+};
 
-    protected:
-      bool resolveCaches() override ;
-      std::shared_ptr<CacheSE3Offset> cacheFrom_, cacheTo_;
-  };
-
-} // end namespace
+}  // namespace g2o
 #endif

@@ -42,9 +42,11 @@ int main(int argc, char** argv) {
   std::string outputFilename;
   std::string inputFilename;
   g2o::CommandArgs arg;
-  arg.param("i", maxIterations, 10, "perform n iterations, if negative consider the gain");
+  arg.param("i", maxIterations, 10,
+            "perform n iterations, if negative consider the gain");
   arg.param("o", outputFilename, "", "output final version of the graph");
-  arg.paramLeftOver("graph-input", inputFilename, "", "graph file which will be processed");
+  arg.paramLeftOver("graph-input", inputFilename, "",
+                    "graph file which will be processed");
   arg.parseArgs(argc, argv);
 
   // NOTE: We skip to fix a vertex here, either this is stored in the file
@@ -57,7 +59,8 @@ int main(int argc, char** argv) {
   // allocate the solver
   g2o::OptimizationAlgorithmProperty solverProperty;
   optimizer.setAlgorithm(
-      g2o::OptimizationAlgorithmFactory::instance()->construct("lm_var", solverProperty));
+      g2o::OptimizationAlgorithmFactory::instance()->construct("lm_var",
+                                                               solverProperty));
 
   std::ifstream ifs(inputFilename.c_str());
   if (!ifs) {

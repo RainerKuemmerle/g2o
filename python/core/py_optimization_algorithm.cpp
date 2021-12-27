@@ -18,31 +18,35 @@ void declareOptimizationAlgorithm(py::module& m) {
   py::class_<OptimizationAlgorithmProperty>(m, "OptimizationAlgorithmProperty");
 
   py::class_<OptimizationAlgorithmWithHessian, OptimizationAlgorithm,
-             std::shared_ptr<OptimizationAlgorithmWithHessian>>(m,
-                                                                "OptimizationAlgorithmWithHessian");
+             std::shared_ptr<OptimizationAlgorithmWithHessian>>(
+      m, "OptimizationAlgorithmWithHessian");
 
   py::class_<OptimizationAlgorithmGaussNewton, OptimizationAlgorithmWithHessian,
-             std::shared_ptr<OptimizationAlgorithmGaussNewton>>(m,
-                                                                "OptimizationAlgorithmGaussNewton")
+             std::shared_ptr<OptimizationAlgorithmGaussNewton>>(
+      m, "OptimizationAlgorithmGaussNewton")
       .def(py::init([](PyBlockSolverBase& blockSolver) {
         return new OptimizationAlgorithmGaussNewton(blockSolver.solver());
       }));
 
   py::class_<OptimizationAlgorithmLevenberg, OptimizationAlgorithmWithHessian,
-             std::shared_ptr<OptimizationAlgorithmLevenberg>>(m, "OptimizationAlgorithmLevenberg")
+             std::shared_ptr<OptimizationAlgorithmLevenberg>>(
+      m, "OptimizationAlgorithmLevenberg")
       .def(py::init([](PyBlockSolverBase& blockSolver) {
         return new OptimizationAlgorithmLevenberg(blockSolver.solver());
       }));
 
   py::class_<OptimizationAlgorithmDogleg, OptimizationAlgorithmWithHessian,
-             std::shared_ptr<OptimizationAlgorithmDogleg>>(m, "OptimizationAlgorithmDogleg")
+             std::shared_ptr<OptimizationAlgorithmDogleg>>(
+      m, "OptimizationAlgorithmDogleg")
       .def(py::init([](PyBlockSolverBase& blockSolver) {
         return new OptimizationAlgorithmDogleg(blockSolver.base_solver());
       }));
 
-  py::class_<AbstractOptimizationAlgorithmCreator>(m, "AbstractOptimizationAlgorithmCreator");
+  py::class_<AbstractOptimizationAlgorithmCreator>(
+      m, "AbstractOptimizationAlgorithmCreator");
 
-  py::class_<RegisterOptimizationAlgorithmProxy>(m, "RegisterOptimizationAlgorithmProxy");
+  py::class_<RegisterOptimizationAlgorithmProxy>(
+      m, "RegisterOptimizationAlgorithmProxy");
 }
 
 }  // end namespace g2o

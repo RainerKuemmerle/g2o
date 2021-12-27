@@ -36,7 +36,8 @@ namespace g2o {
 /**
  * \brief 3D edge between two SBAcam
  */
-class G2O_TYPES_SBA_API EdgeSBACam : public BaseBinaryEdge<6, SE3Quat, VertexCam, VertexCam> {
+class G2O_TYPES_SBA_API EdgeSBACam
+    : public BaseBinaryEdge<6, SE3Quat, VertexCam, VertexCam> {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
   bool read(std::istream& is) override;
@@ -46,11 +47,11 @@ class G2O_TYPES_SBA_API EdgeSBACam : public BaseBinaryEdge<6, SE3Quat, VertexCam
   void setMeasurement(const SE3Quat& meas) override;
 
   number_t initialEstimatePossible(const OptimizableGraph::VertexSet&,
-                                           OptimizableGraph::Vertex*) override {
+                                   OptimizableGraph::Vertex*) override {
     return cst(1.);
   }
   void initialEstimate(const OptimizableGraph::VertexSet& from,
-                               OptimizableGraph::Vertex* to) override;
+                       OptimizableGraph::Vertex* to) override;
 
   bool setMeasurementData(const number_t* d) override;
 

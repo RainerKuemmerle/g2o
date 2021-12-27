@@ -27,73 +27,75 @@
 #ifndef G2O_LINEAR_SOLVER_PCG_H
 #define G2O_LINEAR_SOLVER_PCG_H
 
-#include "g2o/core/linear_solver.h"
-#include "g2o/core/batch_stats.h"
-
-#include <vector>
+#include <Eigen/Core>
 #include <utility>
-#include<Eigen/Core>
+#include <vector>
+
+#include "g2o/core/batch_stats.h"
+#include "g2o/core/linear_solver.h"
 
 namespace g2o {
 
-  /**
-   * \brief linear solver using PCG, pre-conditioner is block Jacobi
-   */
-  template <typename MatrixType>
-  class LinearSolverPCG : public LinearSolver<MatrixType>
-  {
-    public:
-      LinearSolverPCG() :
-      LinearSolver<MatrixType>()
-      {
-      }
+/**
+ * \brief linear solver using PCG, pre-conditioner is block Jacobi
+ */
+template <typename MatrixType>
+class LinearSolverPCG : public LinearSolver<MatrixType> {
+ public:
+  LinearSolverPCG() : LinearSolver<MatrixType>() {}
 
-      bool init() override
-      {
-        residual_ = -1.0;
-        indices_.clear();
-        sparseMat_.clear();
-        return true;
-      }
+  bool init() override {
+    residual_ = -1.0;
+    indices_.clear();
+    sparseMat_.clear();
+    return true;
+  }
 
-      bool solve(const SparseBlockMatrix<MatrixType>& A, number_t* x, number_t* b) override;
+  bool solve(const SparseBlockMatrix<MatrixType>& A, number_t* x,
+             number_t* b) override;
 
-      //! return the tolerance for terminating PCG before convergence
-      number_t tolerance() const { return tolerance_;}
-      void setTolerance(number_t tolerance) { tolerance_ = tolerance;}
+  //! return the tolerance for terminating PCG before convergence
+  number_t tolerance() const { return tolerance_; }
+  void setTolerance(number_t tolerance) { tolerance_ = tolerance; }
 
-      int maxIterations() const { return maxIter_;}
-      void setMaxIterations(int maxIter) { maxIter_ = maxIter;}
+  int maxIterations() const { return maxIter_; }
+  void setMaxIterations(int maxIter) { maxIter_ = maxIter; }
 
-      bool absoluteTolerance() const { return absoluteTolerance_;}
-      void setAbsoluteTolerance(bool absoluteTolerance) { absoluteTolerance_ = absoluteTolerance;}
+  bool absoluteTolerance() const { return absoluteTolerance_; }
+  void setAbsoluteTolerance(bool absoluteTolerance) {
+    absoluteTolerance_ = absoluteTolerance;
+  }
 
-      bool verbose() const { return verbose_;}
-      void setVerbose(bool verbose) { verbose_ = verbose;}
+  bool verbose() const { return verbose_; }
+  void setVerbose(bool verbose) { verbose_ = verbose; }
 
-    protected:
-      using MatrixVector = std::vector< MatrixType, Eigen::aligned_allocator<MatrixType> >;
-      using MatrixPtrVector = std::vector<const MatrixType*>;
+ protected:
+  using MatrixVector =
+      std::vector<MatrixType, Eigen::aligned_allocator<MatrixType> >;
+  using MatrixPtrVector = std::vector<const MatrixType*>;
 
-      number_t tolerance_ = cst(1e-6);
-      number_t residual_ = -1.;
-      bool absoluteTolerance_ = true;
-      bool verbose_ = false;
-      int maxIter_ = -1;
+  number_t tolerance_ = cst(1e-6);
+  number_t residual_ = -1.;
+  bool absoluteTolerance_ = true;
+  bool verbose_ = false;
+  int maxIter_ = -1;
 
-      MatrixPtrVector diag_;
-      MatrixVector J_;
+  MatrixPtrVector diag_;
+  MatrixVector J_;
 
-      std::vector<std::pair<int, int> > indices_;
-      MatrixPtrVector sparseMat_;
+  std::vector<std::pair<int, int> > indices_;
+  MatrixPtrVector sparseMat_;
 
-      void multDiag(const std::vector<int>& colBlockIndices, MatrixVector& A, const VectorX& src, VectorX& dest);
-      void multDiag(const std::vector<int>& colBlockIndices, MatrixPtrVector& A, const VectorX& src, VectorX& dest);
-      void mult(const std::vector<int>& colBlockIndices, const VectorX& src, VectorX& dest);
-  };
+  void multDiag(const std::vector<int>& colBlockIndices, MatrixVector& A,
+                const VectorX& src, VectorX& dest);
+  void multDiag(const std::vector<int>& colBlockIndices, MatrixPtrVector& A,
+                const VectorX& src, VectorX& dest);
+  void mult(const std::vector<int>& colBlockIndices, const VectorX& src,
+            VectorX& dest);
+};
 
 #include "linear_solver_pcg.hpp"
 
-}// end namespace
+}  // namespace g2o
 
 #endif

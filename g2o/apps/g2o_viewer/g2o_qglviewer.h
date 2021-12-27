@@ -19,47 +19,46 @@
 #ifndef G2O_QGL_GRAPH_VIEWER_H
 #define G2O_QGL_GRAPH_VIEWER_H
 
-#include "qglviewer.h"
-#include "g2o_viewer_api.h"
 #include "g2o/core/hyper_graph_action.h"
+#include "g2o_viewer_api.h"
+#include "qglviewer.h"
 
 namespace g2o {
 
-  class SparseOptimizer;
+class SparseOptimizer;
+
+/**
+ * \brief OpenGL based viewer for the graph
+ */
+class G2O_VIEWER_API G2oQGLViewer : public QGLViewer {
+ public:
+  explicit G2oQGLViewer(QWidget* parent = nullptr,
+                        const QGLWidget* shareWidget = nullptr);
+  G2oQGLViewer(const G2oQGLViewer&) = delete;
+  G2oQGLViewer& operator=(const G2oQGLViewer&) = delete;
+
+  ~G2oQGLViewer() override;
+  void draw() override;
+  void init() override;
 
   /**
-   * \brief OpenGL based viewer for the graph
+   * the viewer uses a display list to cache the drawing, use setUpdateDisplay()
+   * to force the creation of an updated display list.
    */
-  class G2O_VIEWER_API G2oQGLViewer : public QGLViewer
-  {
-    public:
-      explicit G2oQGLViewer(QWidget* parent=nullptr, const QGLWidget* shareWidget=nullptr);
-      G2oQGLViewer(const G2oQGLViewer&) = delete;
-      G2oQGLViewer& operator=(const G2oQGLViewer&) = delete;
+  bool updateDisplay() const { return updateDisplay_; }
+  void setUpdateDisplay(bool updateDisplay);
 
-      ~G2oQGLViewer() override;
-      void draw() override;
-      void init() override;
+  DrawAction::Parameters* parameters() { return drawActionParameters_; }
 
-      /**
-       * the viewer uses a display list to cache the drawing, use setUpdateDisplay() to force
-       * the creation of an updated display list.
-       */
-      bool updateDisplay() const { return updateDisplay_;}
-      void setUpdateDisplay(bool updateDisplay);
+  SparseOptimizer* graph = nullptr;
 
-      DrawAction::Parameters* parameters() { return drawActionParameters_;}
+ protected:
+  HyperGraphElementAction::HyperGraphElementActionPtr drawActions_;
+  GLuint drawList_ = 0;
+  bool updateDisplay_ = true;
+  DrawAction::Parameters* drawActionParameters_;
+};
 
-    
-      SparseOptimizer* graph = nullptr;
-
-    protected:
-      HyperGraphElementAction::HyperGraphElementActionPtr drawActions_;
-      GLuint drawList_ = 0;
-      bool updateDisplay_ = true;
-      DrawAction::Parameters* drawActionParameters_;
-  };
-
-} // end namespace
+}  // namespace g2o
 
 #endif

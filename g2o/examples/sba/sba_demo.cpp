@@ -60,18 +60,24 @@ int main(int argc, const char* argv[]) {
   if (argc < 2) {
     cout << endl;
     cout << "Please type: " << endl;
-    cout << "ba_demo [PIXEL_NOISE] [OUTLIER RATIO] [ROBUST_KERNEL] [STRUCTURE_ONLY] [DENSE]"
+    cout << "ba_demo [PIXEL_NOISE] [OUTLIER RATIO] [ROBUST_KERNEL] "
+            "[STRUCTURE_ONLY] [DENSE]"
          << endl;
     cout << endl;
     cout << "PIXEL_NOISE: noise in image space (E.g.: 1)" << endl;
-    cout << "OUTLIER_RATIO: probability of spuroius observation  (default: 0.0)" << endl;
-    cout << "ROBUST_KERNEL: use robust kernel (0 or 1; default: 0==false)" << endl;
-    cout << "STRUCTURE_ONLY: performe structure-only BA to get better point initializations (0 or "
+    cout << "OUTLIER_RATIO: probability of spuroius observation  (default: 0.0)"
+         << endl;
+    cout << "ROBUST_KERNEL: use robust kernel (0 or 1; default: 0==false)"
+         << endl;
+    cout << "STRUCTURE_ONLY: performe structure-only BA to get better point "
+            "initializations (0 or "
             "1; default: 0==false)"
          << endl;
     cout << "DENSE: Use dense solver (0 or 1; default: 0==false)" << endl;
     cout << endl;
-    cout << "Note, if OUTLIER_RATIO is above 0, ROBUST_KERNEL should be set to 1==true." << endl;
+    cout << "Note, if OUTLIER_RATIO is above 0, ROBUST_KERNEL should be set to "
+            "1==true."
+         << endl;
     cout << endl;
     exit(0);
   }
@@ -108,21 +114,24 @@ int main(int argc, const char* argv[]) {
   optimizer.setVerbose(false);
   std::unique_ptr<g2o::BlockSolver_6_3::LinearSolverType> linearSolver;
   if (DENSE) {
-    linearSolver = g2o::make_unique<g2o::LinearSolverDense<g2o::BlockSolver_6_3::PoseMatrixType>>();
+    linearSolver = g2o::make_unique<
+        g2o::LinearSolverDense<g2o::BlockSolver_6_3::PoseMatrixType>>();
     cerr << "Using DENSE" << endl;
   } else {
 #ifdef G2O_HAVE_CHOLMOD
     cerr << "Using CHOLMOD" << endl;
-    linearSolver =
-        g2o::make_unique<g2o::LinearSolverCholmod<g2o::BlockSolver_6_3::PoseMatrixType>>();
+    linearSolver = g2o::make_unique<
+        g2o::LinearSolverCholmod<g2o::BlockSolver_6_3::PoseMatrixType>>();
 #else
-    linearSolver = g2o::make_unique<g2o::LinearSolverEigen<g2o::BlockSolver_6_3::PoseMatrixType>>();
+    linearSolver = g2o::make_unique<
+        g2o::LinearSolverEigen<g2o::BlockSolver_6_3::PoseMatrixType>>();
     cerr << "Using CSPARSE" << endl;
 #endif
   }
 
-  std::unique_ptr<g2o::OptimizationAlgorithm> solver(new g2o::OptimizationAlgorithmLevenberg(
-      g2o::make_unique<g2o::BlockSolver_6_3>(std::move(linearSolver))));
+  std::unique_ptr<g2o::OptimizationAlgorithm> solver(
+      new g2o::OptimizationAlgorithmLevenberg(
+          g2o::make_unique<g2o::BlockSolver_6_3>(std::move(linearSolver))));
 
   optimizer.setAlgorithm(std::move(solver));
 
@@ -130,19 +139,20 @@ int main(int argc, const char* argv[]) {
   std::vector<g2o::Vector3> true_points;
   for (size_t i = 0; i < 500; ++i) {
     true_points.emplace_back((g2o::Sampler::uniformRand(0., 1.) - 0.5) * 3,
-                                   g2o::Sampler::uniformRand(0., 1.) - 0.5,
-                                   g2o::Sampler::uniformRand(0., 1.) + 10);
+                             g2o::Sampler::uniformRand(0., 1.) - 0.5,
+                             g2o::Sampler::uniformRand(0., 1.) + 10);
   }
 
   g2o::Vector2 focal_length(500, 500);     // pixels
   g2o::Vector2 principal_point(320, 240);  // 640x480 image
-  double baseline = 0.075;             // 7.5 cm baseline
+  double baseline = 0.075;                 // 7.5 cm baseline
 
-  std::vector<g2o::Isometry3, Eigen::aligned_allocator<g2o::Isometry3>> true_poses;
+  std::vector<g2o::Isometry3, Eigen::aligned_allocator<g2o::Isometry3>>
+      true_poses;
 
   // set up camera params
-  g2o::VertexSCam::setKcam(focal_length[0], focal_length[1], principal_point[0], principal_point[1],
-                           baseline);
+  g2o::VertexSCam::setKcam(focal_length[0], focal_length[1], principal_point[0],
+                           principal_point[1], baseline);
 
   // set up 5 vertices, first 2 fixed
   int vertex_id = 0;
@@ -182,9 +192,10 @@ int main(int argc, const char* argv[]) {
 
     v_p->setId(point_id);
     v_p->setMarginalized(true);
-    v_p->setEstimate(true_points.at(i) + g2o::Vector3(g2o::Sampler::gaussRand(0., 1),
-                                                  g2o::Sampler::gaussRand(0., 1),
-                                                  g2o::Sampler::gaussRand(0., 1)));
+    v_p->setEstimate(true_points.at(i) +
+                     g2o::Vector3(g2o::Sampler::gaussRand(0., 1),
+                                  g2o::Sampler::gaussRand(0., 1),
+                                  g2o::Sampler::gaussRand(0., 1)));
 
     int num_obs = 0;
 
@@ -204,22 +215,23 @@ int main(int argc, const char* argv[]) {
       bool inlier = true;
       for (size_t j = 0; j < true_poses.size(); ++j) {
         g2o::Vector3 z;
-        dynamic_cast<g2o::VertexSCam*>(optimizer.vertices().find(j)->second.get())
+        dynamic_cast<g2o::VertexSCam*>(
+            optimizer.vertices().find(j)->second.get())
             ->mapPoint(z, true_points.at(i));
 
         if (z[0] >= 0 && z[1] >= 0 && z[0] < 640 && z[1] < 480) {
           double sam = g2o::Sampler::uniformRand(0., 1.);
           if (sam < OUTLIER_RATIO) {
             z = g2o::Vector3(Sample::uniform(64, 640), Sample::uniform(0, 480),
-                         Sample::uniform(0, 64));  // disparity
-            z(2) = z(0) - z(2);                    // px' now
+                             Sample::uniform(0, 64));  // disparity
+            z(2) = z(0) - z(2);                        // px' now
 
             inlier = false;
           }
 
           z += g2o::Vector3(g2o::Sampler::gaussRand(0., PIXEL_NOISE),
-                        g2o::Sampler::gaussRand(0., PIXEL_NOISE),
-                        g2o::Sampler::gaussRand(0., PIXEL_NOISE / 16.0));
+                            g2o::Sampler::gaussRand(0., PIXEL_NOISE),
+                            g2o::Sampler::gaussRand(0., PIXEL_NOISE / 16.0));
 
           auto e = std::make_shared<g2o::EdgeXyzVsc>();
 
@@ -246,7 +258,8 @@ int main(int argc, const char* argv[]) {
         sum_diff2 += diff.dot(diff);
       }
       // else
-      //   cout << "Point: " << point_id <<  "has at least one spurious observation" <<endl;
+      //   cout << "Point: " << point_id <<  "has at least one spurious
+      //   observation" <<endl;
 
       pointid_2_trueid.insert(std::make_pair(point_id, i));
 
@@ -264,8 +277,9 @@ int main(int argc, const char* argv[]) {
     cout << "Performing structure-only BA:" << endl;
     g2o::StructureOnlySolver<3> structure_only_ba;
     g2o::OptimizableGraph::VertexContainer points;
-    for (const auto & it : optimizer.vertices()) {
-      auto v = std::static_pointer_cast<g2o::OptimizableGraph::Vertex>(it.second);
+    for (const auto& it : optimizer.vertices()) {
+      auto v =
+          std::static_pointer_cast<g2o::OptimizableGraph::Vertex>(it.second);
       if (v->dimension() == 3) points.push_back(v);
     }
 
@@ -277,13 +291,13 @@ int main(int argc, const char* argv[]) {
   optimizer.optimize(10);
 
   cout << endl;
-  cout << "Point error before optimisation (inliers only): " << sqrt(sum_diff2 / inliers.size())
-       << endl;
+  cout << "Point error before optimisation (inliers only): "
+       << sqrt(sum_diff2 / inliers.size()) << endl;
 
   point_num = 0;
   sum_diff2 = 0;
 
-  for (auto & it : pointid_2_trueid) {
+  for (auto& it : pointid_2_trueid) {
     auto v_it = optimizer.vertices().find(it.first);
 
     if (v_it == optimizer.vertices().end()) {
@@ -307,7 +321,7 @@ int main(int argc, const char* argv[]) {
     ++point_num;
   }
 
-  cout << "Point error after optimisation (inliers only): " << sqrt(sum_diff2 / inliers.size())
-       << endl;
+  cout << "Point error after optimisation (inliers only): "
+       << sqrt(sum_diff2 / inliers.size()) << endl;
   cout << endl;
 }

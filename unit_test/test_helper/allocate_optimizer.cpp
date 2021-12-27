@@ -33,7 +33,8 @@ namespace g2o {
 namespace internal {
 
 typedef g2o::BlockSolver<g2o::BlockSolverTraits<-1, -1> > SlamBlockSolver;
-typedef g2o::LinearSolverEigen<SlamBlockSolver::PoseMatrixType> SlamLinearSolver;
+typedef g2o::LinearSolverEigen<SlamBlockSolver::PoseMatrixType>
+    SlamLinearSolver;
 
 namespace {
 std::unique_ptr<g2o::SparseOptimizer> create(bool lm) {
@@ -53,9 +54,13 @@ std::unique_ptr<g2o::SparseOptimizer> create(bool lm) {
 }
 }  // namespace
 
-std::unique_ptr<g2o::SparseOptimizer> createOptimizerForTests() { return create(false); }
+std::unique_ptr<g2o::SparseOptimizer> createOptimizerForTests() {
+  return create(false);
+}
 
-std::unique_ptr<g2o::SparseOptimizer> createLmOptimizerForTests() { return create(true); }
+std::unique_ptr<g2o::SparseOptimizer> createLmOptimizerForTests() {
+  return create(true);
+}
 
 }  // namespace internal
 }  // namespace g2o

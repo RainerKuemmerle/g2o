@@ -25,89 +25,90 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "parameter_se3_offset.h"
-#include "vertex_se3.h"
+
 #include "isometry3d_gradients.h"
+#include "vertex_se3.h"
 
 #ifdef G2O_HAVE_OPENGL
-#include "g2o/stuff/opengl_wrapper.h"
 #include "g2o/stuff/opengl_primitives.h"
+#include "g2o/stuff/opengl_wrapper.h"
 #endif
 
 namespace g2o {
 
-  ParameterSE3Offset::ParameterSE3Offset(){
-    setOffset();
-  }
+ParameterSE3Offset::ParameterSE3Offset() { setOffset(); }
 
-  void ParameterSE3Offset::setOffset(const Isometry3& offset){
-    offset_ = offset;
-    inverseOffset_ = offset_.inverse();
-  }
+void ParameterSE3Offset::setOffset(const Isometry3& offset) {
+  offset_ = offset;
+  inverseOffset_ = offset_.inverse();
+}
 
-  bool ParameterSE3Offset::read(std::istream& is) {
-    Vector7 off;
-    bool state = internal::readVector(is, off);
-    // normalize the quaternion to recover numerical precision lost by storing as human readable text
-    Vector4::MapType(off.data()+3).normalize();
-    setOffset(internal::fromVectorQT(off));
-    return state;
-  }
+bool ParameterSE3Offset::read(std::istream& is) {
+  Vector7 off;
+  bool state = internal::readVector(is, off);
+  // normalize the quaternion to recover numerical precision lost by storing as
+  // human readable text
+  Vector4::MapType(off.data() + 3).normalize();
+  setOffset(internal::fromVectorQT(off));
+  return state;
+}
 
-  bool ParameterSE3Offset::write(std::ostream& os) const {
-    return internal::writeVector(os, internal::toVectorQT(offset_));
-  }
+bool ParameterSE3Offset::write(std::ostream& os) const {
+  return internal::writeVector(os, internal::toVectorQT(offset_));
+}
 
-  void CacheSE3Offset::updateImpl(){
+void CacheSE3Offset::updateImpl() {
 #ifndef NDEBUG
-  ParameterSE3Offset* offsetParam = dynamic_cast<ParameterSE3Offset*>(parameters_[0].get());
+  ParameterSE3Offset* offsetParam =
+      dynamic_cast<ParameterSE3Offset*>(parameters_[0].get());
 #else
   auto* offsetParam = static_cast<ParameterSE3Offset*>(parameters_[0].get());
 #endif
 
-    const auto* v = static_cast<const VertexSE3*>(vertex());
-    n2w_ = v->estimate() * offsetParam->offset();
-    w2n_ = n2w_.inverse();
-    w2l_ = v->estimate().inverse();
-  }
+  const auto* v = static_cast<const VertexSE3*>(vertex());
+  n2w_ = v->estimate() * offsetParam->offset();
+  w2n_ = n2w_.inverse();
+  w2l_ = v->estimate().inverse();
+}
 
 #ifdef G2O_HAVE_OPENGL
-  CacheSE3OffsetDrawAction::CacheSE3OffsetDrawAction(): DrawAction(typeid(CacheSE3Offset).name()){
-    previousParams_ = reinterpret_cast<DrawAction::Parameters*>(0x42);
-    refreshPropertyPtrs(nullptr);
-  }
+CacheSE3OffsetDrawAction::CacheSE3OffsetDrawAction()
+    : DrawAction(typeid(CacheSE3Offset).name()) {
+  previousParams_ = reinterpret_cast<DrawAction::Parameters*>(0x42);
+  refreshPropertyPtrs(nullptr);
+}
 
-  bool CacheSE3OffsetDrawAction::refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_){
-    if (! DrawAction::refreshPropertyPtrs(params_))
-      return false;
-    if (previousParams_){
-      cubeSide_ = previousParams_->makeProperty<FloatProperty>(typeName_ + "::CUBE_SIDE", .05F);
-    } else {
-      cubeSide_ = nullptr;
-    }
-    return true;
+bool CacheSE3OffsetDrawAction::refreshPropertyPtrs(
+    HyperGraphElementAction::Parameters* params_) {
+  if (!DrawAction::refreshPropertyPtrs(params_)) return false;
+  if (previousParams_) {
+    cubeSide_ = previousParams_->makeProperty<FloatProperty>(
+        typeName_ + "::CUBE_SIDE", .05F);
+  } else {
+    cubeSide_ = nullptr;
   }
+  return true;
+}
 
-  bool CacheSE3OffsetDrawAction::operator()(HyperGraph::HyperGraphElement* element,
-                HyperGraphElementAction::Parameters* params_){
-    if (typeid(*element).name()!=typeName_)
-      return false;
-    auto* that = static_cast<CacheSE3Offset*>(element);
-    refreshPropertyPtrs(params_);
-    if (! previousParams_)
-      return true;
+bool CacheSE3OffsetDrawAction::operator()(
+    HyperGraph::HyperGraphElement* element,
+    HyperGraphElementAction::Parameters* params_) {
+  if (typeid(*element).name() != typeName_) return false;
+  auto* that = static_cast<CacheSE3Offset*>(element);
+  refreshPropertyPtrs(params_);
+  if (!previousParams_) return true;
 
-    if (show_ && !show_->value())
-      return true;
-    float cs = cubeSide_ ? cubeSide_->value() : 1.0F;
-    glPushAttrib(GL_COLOR);
-    glColor3f(POSE_PARAMETER_COLOR);
-    glPushMatrix();
-    glMultMatrixd(that->offsetParam()->offset().cast<double>().data());
-    opengl::drawBox(cs,cs,cs);
-    glPopMatrix();
-    glPopAttrib();
-    return true;
-  }
+  if (show_ && !show_->value()) return true;
+  float cs = cubeSide_ ? cubeSide_->value() : 1.0F;
+  glPushAttrib(GL_COLOR);
+  glColor3f(POSE_PARAMETER_COLOR);
+  glPushMatrix();
+  glMultMatrixd(that->offsetParam()->offset().cast<double>().data());
+  opengl::drawBox(cs, cs, cs);
+  glPopMatrix();
+  glPopAttrib();
+  return true;
+}
 #endif
 
-} // end namespace
+}  // namespace g2o

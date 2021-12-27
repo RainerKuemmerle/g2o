@@ -34,8 +34,9 @@ namespace g2o {
 
 using namespace std;
 
-BackBoneTreeAction::BackBoneTreeAction(SparseOptimizer* optimizer, const std::string& vertexTag,
-                                       int level, int step)
+BackBoneTreeAction::BackBoneTreeAction(SparseOptimizer* optimizer,
+                                       const std::string& vertexTag, int level,
+                                       int step)
     : _optimizer(optimizer), _vertexTag(vertexTag), _level(level), _step(step) {
   _factory = Factory::instance();
   init();
@@ -45,7 +46,8 @@ void BackBoneTreeAction::init() {
   _vsMap.clear();
   _vsMmap.clear();
   _freeEdges.clear();
-  for (auto it = _optimizer->edges().begin(); it != _optimizer->edges().end(); ++it) {
+  for (auto it = _optimizer->edges().begin(); it != _optimizer->edges().end();
+       ++it) {
     auto e = std::static_pointer_cast<OptimizableGraph::Edge>(*it);
     if (e->level() == _level) {
       _freeEdges.insert(e);
@@ -53,12 +55,14 @@ void BackBoneTreeAction::init() {
   }
 }
 
-double BackBoneTreeAction::perform(const std::shared_ptr<HyperGraph::Vertex>& v,
-                                   const std::shared_ptr<HyperGraph::Vertex>& vParent,
-                                   const std::shared_ptr<HyperGraph::Edge>& e, double distance) {
+double BackBoneTreeAction::perform(
+    const std::shared_ptr<HyperGraph::Vertex>& v,
+    const std::shared_ptr<HyperGraph::Vertex>& vParent,
+    const std::shared_ptr<HyperGraph::Edge>& e, double distance) {
   int depth = (int)distance;
   if (_factory->tag(v.get()) != _vertexTag) return 0;
-  auto vParentCast = std::static_pointer_cast<OptimizableGraph::Vertex>(vParent);
+  auto vParentCast =
+      std::static_pointer_cast<OptimizableGraph::Vertex>(vParent);
   auto parentStar = getStar(vParentCast);
   if (!parentStar) {
     parentStar = std::make_shared<Star>(_level + 1, _optimizer);
@@ -79,8 +83,9 @@ double BackBoneTreeAction::perform(const std::shared_ptr<HyperGraph::Vertex>& v,
   return 1;
 }
 
-void BackBoneTreeAction::addToMap(const std::shared_ptr<Star>& s,
-                                  const std::shared_ptr<OptimizableGraph::Vertex>& v) {
+void BackBoneTreeAction::addToMap(
+    const std::shared_ptr<Star>& s,
+    const std::shared_ptr<OptimizableGraph::Vertex>& v) {
   VertexStarMap::iterator it = _vsMap.find(v);
   if (it != _vsMap.end())
     it->second = s;
@@ -97,8 +102,9 @@ std::shared_ptr<Star> BackBoneTreeAction::getStar(
   return it->second;
 }
 
-bool BackBoneTreeAction::fillStar(const std::shared_ptr<Star>& s,
-                                  const std::shared_ptr<OptimizableGraph::Edge>& e) {
+bool BackBoneTreeAction::fillStar(
+    const std::shared_ptr<Star>& s,
+    const std::shared_ptr<OptimizableGraph::Edge>& e) {
   HyperGraph::EdgeSet::iterator it = _freeEdges.find(e);
   if (it != _freeEdges.end()) {
     _freeEdges.erase(it);

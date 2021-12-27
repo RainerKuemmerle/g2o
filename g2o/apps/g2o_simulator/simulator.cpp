@@ -25,85 +25,84 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "simulator.h"
+
 #include <iostream>
-namespace g2o{
+namespace g2o {
 
-  // BaseWorldObject
-  OptimizableGraph* BaseWorldObject::graph() {
-    if (world_)
-      return world_-> graph();
-    return nullptr;
+// BaseWorldObject
+OptimizableGraph* BaseWorldObject::graph() {
+  if (world_) return world_->graph();
+  return nullptr;
+}
+
+void BaseWorldObject::setVertex(
+    const std::shared_ptr<OptimizableGraph::Vertex>& vertex) {
+  vertex_ = vertex;
+}
+
+// BaseRobot
+OptimizableGraph* BaseRobot::graph() {
+  if (world_) return world_->graph();
+  return nullptr;
+}
+
+bool BaseRobot::addSensor(BaseSensor* sensor) {
+  assert(graph());
+  std::pair<std::set<BaseSensor*>::iterator, bool> result =
+      sensors_.insert(sensor);
+  if (result.second) {
+    sensor->setRobot(this);
+    sensor->addParameters();
   }
+  return result.second;
+}
 
-  void BaseWorldObject::setVertex(const std::shared_ptr<OptimizableGraph::Vertex>& vertex){
-    vertex_= vertex;
+void BaseRobot::sense() {
+  for (auto* s : sensors_) {
+    s->sense();
   }
+}
 
-  // BaseRobot
-  OptimizableGraph* BaseRobot::graph() {
-    if (world_)
-      return world_-> graph();
-    return nullptr;
+// Sensor
+World* BaseSensor::world() {
+  if (!robot_) return nullptr;
+  return robot_->world();
+}
+
+OptimizableGraph* BaseSensor::graph() {
+  if (!robot_) return nullptr;
+  return robot_->graph();
+}
+
+// World
+bool World::addRobot(BaseRobot* robot) {
+  std::pair<std::set<BaseRobot*>::iterator, bool> result =
+      robots_.insert(robot);
+  if (result.second) {
+    robot->setWorld(this);
   }
+  return result.second;
+}
 
-  bool BaseRobot::addSensor(BaseSensor* sensor){
-    assert (graph());
-    std::pair<std::set<BaseSensor*>::iterator, bool> result=sensors_.insert(sensor);
-    if(result.second){
-      sensor->setRobot(this);
-      sensor->addParameters();
-    }
-    return result.second;
+bool World::addWorldObject(BaseWorldObject* object) {
+  std::pair<std::set<BaseWorldObject*>::iterator, bool> result =
+      objects_.insert(object);
+  if (result.second) {
+    object->setWorld(this);
   }
-
-  void BaseRobot::sense() {
-    for (auto *s : sensors_){
-      s->sense();
-    }
+  if ((graph() != nullptr) && object->vertex()) {
+    object->vertex()->setId(runningId_++);
+    graph()->addVertex(object->vertex());
   }
+  return result.second;
+}
 
-  // Sensor
-  World* BaseSensor::world() {
-    if (!robot_)
-      return nullptr;
-    return robot_->world();
-  }
+bool World::addParameter(const std::shared_ptr<Parameter>& param) {
+  if (!graph()) return false;
+  param->setId(paramId_);
+  graph()->addParameter(param);
+  paramId_++;
+  return true;
+}
 
-  OptimizableGraph* BaseSensor::graph() {
-    if (!robot_)
-      return nullptr;
-    return robot_->graph();
-  }
-
-  //World
-  bool World::addRobot(BaseRobot* robot){
-    std::pair<std::set<BaseRobot*>::iterator, bool> result=robots_.insert(robot);
-    if (result.second){
-      robot->setWorld(this);
-    }
-    return result.second;
-  }
-
-  bool World::addWorldObject(BaseWorldObject* object){
-    std::pair<std::set<BaseWorldObject*>::iterator, bool> result=objects_.insert(object);
-    if (result.second){
-      object->setWorld(this);
-    }
-    if ((graph() != nullptr) && object->vertex()){
-      object->vertex()->setId(runningId_++);
-      graph()->addVertex(object->vertex());
-    }
-    return result.second;
-  }
-
-  bool World::addParameter(const std::shared_ptr<Parameter>& param){
-    if ( !graph())
-      return false;
-    param->setId(paramId_);
-    graph()->addParameter(param);
-    paramId_++;
-    return true;
-  }
-
-
-} // end namespace
+}  // namespace g2o

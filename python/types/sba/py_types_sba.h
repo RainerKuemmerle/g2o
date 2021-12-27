@@ -8,7 +8,8 @@
 namespace g2o {
 
 void declareTypesSBA(py::module& m) {
-  py::class_<VertexIntrinsics, BaseVertex<4, Eigen::Matrix<double, 5, 1, Eigen::ColMajor>>,
+  py::class_<VertexIntrinsics,
+             BaseVertex<4, Eigen::Matrix<double, 5, 1, Eigen::ColMajor>>,
              std::shared_ptr<VertexIntrinsics>>(m, "VertexIntrinsics")
       .def(py::init<>())
       .def("set_to_origin_impl", &VertexIntrinsics::setToOriginImpl)
@@ -16,7 +17,8 @@ void declareTypesSBA(py::module& m) {
       ;
 
   templatedBaseVertex<6, SBACam>(m, "_6_SBACam");
-  py::class_<VertexCam, BaseVertex<6, SBACam>, std::shared_ptr<VertexCam>>(m, "VertexCam")
+  py::class_<VertexCam, BaseVertex<6, SBACam>, std::shared_ptr<VertexCam>>(
+      m, "VertexCam")
       .def(py::init<>())
       .def("set_to_origin_impl", &VertexCam::setToOriginImpl)
       .def("set_estimate", &VertexCam::setEstimate)  // const SBACam& -> void
@@ -24,7 +26,8 @@ void declareTypesSBA(py::module& m) {
       .def("set_estimate_data_impl", &VertexCam::setEstimateDataImpl)
       .def("get_estimate_data", &VertexCam::getEstimateData)
       .def("estimate_dimension", &VertexCam::estimateDimension)
-      .def("set_minimal_estimate_data_impl", &VertexCam::setMinimalEstimateDataImpl)
+      .def("set_minimal_estimate_data_impl",
+           &VertexCam::setMinimalEstimateDataImpl)
       .def("get_minimal_estimate_data", &VertexCam::getMinimalEstimateData)
       .def("minimal_estimate_dimension", &VertexCam::minimalEstimateDimension);
 
@@ -32,7 +35,8 @@ void declareTypesSBA(py::module& m) {
   // first two args are the measurement type, second two the connection classes
   templatedBaseBinaryEdge<2, Vector2, VertexPointXYZ, VertexCam>(
       m, "_2_Vector2_VertexPointXYZ_VertexCam");
-  py::class_<EdgeProjectP2MC, BaseBinaryEdge<2, Vector2, VertexPointXYZ, VertexCam>,
+  py::class_<EdgeProjectP2MC,
+             BaseBinaryEdge<2, Vector2, VertexPointXYZ, VertexCam>,
              std::shared_ptr<EdgeProjectP2MC>>(m, "EdgeProjectP2MC")
       .def(py::init<>())
       .def("compute_error", &EdgeProjectP2MC::computeError)  // () -> void
@@ -42,13 +46,15 @@ void declareTypesSBA(py::module& m) {
   // first two args are the measurement type, second two the connection classes
   templatedBaseBinaryEdge<3, Vector3, VertexPointXYZ, VertexCam>(
       m, "_3_Vector3_VertexPointXYZ_VertexCam");
-  py::class_<EdgeProjectP2SC, BaseBinaryEdge<3, Vector3, VertexPointXYZ, VertexCam>,
+  py::class_<EdgeProjectP2SC,
+             BaseBinaryEdge<3, Vector3, VertexPointXYZ, VertexCam>,
              std::shared_ptr<EdgeProjectP2SC>>(m, "EdgeProjectP2SC")
       .def(py::init<>())
       .def("compute_error", &EdgeProjectP2SC::computeError)  // () -> void
       .def("linearize_oplus", &EdgeProjectP2SC::linearizeOplus);
 
-  templatedBaseBinaryEdge<6, SE3Quat, VertexCam, VertexCam>(m, "_6_SE3Quat_VertexCam_VertexCam");
+  templatedBaseBinaryEdge<6, SE3Quat, VertexCam, VertexCam>(
+      m, "_6_SE3Quat_VertexCam_VertexCam");
   py::class_<EdgeSBACam, BaseBinaryEdge<6, SE3Quat, VertexCam, VertexCam>,
              std::shared_ptr<EdgeSBACam>>(m, "EdgeSBACam")
       .def(py::init<>())
@@ -60,7 +66,8 @@ void declareTypesSBA(py::module& m) {
       .def("measurement_dimension", &EdgeSBACam::measurementDimension)
       .def("set_measurement_from_state", &EdgeSBACam::setMeasurementFromState);
 
-  templatedBaseBinaryEdge<1, double, VertexCam, VertexCam>(m, "_1_double_VertexCam_VertexCam");
+  templatedBaseBinaryEdge<1, double, VertexCam, VertexCam>(
+      m, "_1_double_VertexCam_VertexCam");
   py::class_<EdgeSBAScale, BaseBinaryEdge<1, double, VertexCam, VertexCam>,
              std::shared_ptr<EdgeSBAScale>>(m, "EdgeSBAScale")
       .def(py::init<>())

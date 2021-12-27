@@ -36,149 +36,148 @@
 
 namespace g2o {
 
-  bool RobotLaser::read(std::istream& is)
-  {
-    int type;
-    number_t angle;
-    number_t fov;
-    number_t res;
-    number_t maxrange;
-    number_t acc;
-    int remission_mode;
-    is >> type >> angle >> fov >> res >> maxrange >> acc >> remission_mode;
+bool RobotLaser::read(std::istream& is) {
+  int type;
+  number_t angle;
+  number_t fov;
+  number_t res;
+  number_t maxrange;
+  number_t acc;
+  int remission_mode;
+  is >> type >> angle >> fov >> res >> maxrange >> acc >> remission_mode;
 
-    int beams;
-    is >> beams;
-    laserParams_ = LaserParameters(type, beams, angle, res, maxrange, acc, remission_mode);
-    ranges_.resize(beams);
-    for (int i=0; i<beams; i++)
-      is >> ranges_[i];
+  int beams;
+  is >> beams;
+  laserParams_ =
+      LaserParameters(type, beams, angle, res, maxrange, acc, remission_mode);
+  ranges_.resize(beams);
+  for (int i = 0; i < beams; i++) is >> ranges_[i];
 
-    is >> beams;
-    remissions_.resize(beams);
-    for (int i = 0; i < beams; i++)
-      is >> remissions_[i];
+  is >> beams;
+  remissions_.resize(beams);
+  for (int i = 0; i < beams; i++) is >> remissions_[i];
 
-    // special robot laser stuff
-    number_t x;
-    number_t y;
-    number_t theta;
-    is >> x >> y >> theta;
-    SE2 lp(x,y,theta);
-    //cerr << "x: " << x << " y:" << y << " th:" << theta << " ";
-    is >> x >> y >> theta;
-    //cerr << "x: " << x << " y:" << y << " th:" << theta;
-    odomPose_ = SE2(x,y,theta);
-    laserParams_.laserPose = odomPose_.inverse()*lp;
-    is >> laserTv_ >>  laserRv_ >>  forwardSafetyDist_ >> sideSaftyDist_ >> turnAxis_;
+  // special robot laser stuff
+  number_t x;
+  number_t y;
+  number_t theta;
+  is >> x >> y >> theta;
+  SE2 lp(x, y, theta);
+  // cerr << "x: " << x << " y:" << y << " th:" << theta << " ";
+  is >> x >> y >> theta;
+  // cerr << "x: " << x << " y:" << y << " th:" << theta;
+  odomPose_ = SE2(x, y, theta);
+  laserParams_.laserPose = odomPose_.inverse() * lp;
+  is >> laserTv_ >> laserRv_ >> forwardSafetyDist_ >> sideSaftyDist_ >>
+      turnAxis_;
 
-    // timestamp + host
-    is >> timestamp_;
-    is >> hostname_;
-    is >> loggerTimestamp_;
-    return true;
-  }
+  // timestamp + host
+  is >> timestamp_;
+  is >> hostname_;
+  is >> loggerTimestamp_;
+  return true;
+}
 
-  bool RobotLaser::write(std::ostream& os) const
-  {
-    os << laserParams_.type << " " << laserParams_.firstBeamAngle << " " << laserParams_.fov << " "
-      << laserParams_.angularStep << " " << laserParams_.maxRange << " " << laserParams_.accuracy << " "
-      << laserParams_.remissionMode << " ";
-    os << ranges().size();
-    for (double i : ranges())
-      os << " " << i;
-    os << " " << remissions_.size();
-    for (double remission : remissions_)
-      os << " " << remission;
+bool RobotLaser::write(std::ostream& os) const {
+  os << laserParams_.type << " " << laserParams_.firstBeamAngle << " "
+     << laserParams_.fov << " " << laserParams_.angularStep << " "
+     << laserParams_.maxRange << " " << laserParams_.accuracy << " "
+     << laserParams_.remissionMode << " ";
+  os << ranges().size();
+  for (double i : ranges()) os << " " << i;
+  os << " " << remissions_.size();
+  for (double remission : remissions_) os << " " << remission;
 
-    // odometry pose
-    Vector3 p = (odomPose_ * laserParams_.laserPose).toVector();
-    os << " " << p.x() << " " << p.y() << " " << p.z();
-    p = odomPose_.toVector();
-    os << " " << p.x() << " " << p.y() << " " << p.z();
+  // odometry pose
+  Vector3 p = (odomPose_ * laserParams_.laserPose).toVector();
+  os << " " << p.x() << " " << p.y() << " " << p.z();
+  p = odomPose_.toVector();
+  os << " " << p.x() << " " << p.y() << " " << p.z();
 
-    // crap values
-    os << FIXED(" " <<  laserTv_ << " " <<  laserRv_ << " " << forwardSafetyDist_ << " "
-        << sideSaftyDist_ << " " << turnAxis_);
-    os << FIXED(" " << timestamp() << " " << hostname() << " " << loggerTimestamp());
+  // crap values
+  os << FIXED(" " << laserTv_ << " " << laserRv_ << " " << forwardSafetyDist_
+                  << " " << sideSaftyDist_ << " " << turnAxis_);
+  os << FIXED(" " << timestamp() << " " << hostname() << " "
+                  << loggerTimestamp());
 
-    return os.good();
-  }
+  return os.good();
+}
 
-  void RobotLaser::setOdomPose(const SE2& odomPose)
-  {
-    odomPose_ = odomPose;
-  }
-
-
-
+void RobotLaser::setOdomPose(const SE2& odomPose) { odomPose_ = odomPose; }
 
 #ifdef G2O_HAVE_OPENGL
-  RobotLaserDrawAction::RobotLaserDrawAction()
-      : DrawAction(typeid(RobotLaser).name()), beamsDownsampling_(nullptr), pointSize_(nullptr), maxRange_(nullptr) {}
+RobotLaserDrawAction::RobotLaserDrawAction()
+    : DrawAction(typeid(RobotLaser).name()),
+      beamsDownsampling_(nullptr),
+      pointSize_(nullptr),
+      maxRange_(nullptr) {}
 
-  bool RobotLaserDrawAction::refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_){
-    if (!DrawAction::refreshPropertyPtrs(params_))
-      return false;
-    if (previousParams_){
-      beamsDownsampling_ = previousParams_->makeProperty<IntProperty>(typeName_ + "::BEAMS_DOWNSAMPLING", 1);
-      pointSize_ = previousParams_->makeProperty<FloatProperty>(typeName_ + "::POINT_SIZE", 1.0F);
-      maxRange_ = previousParams_->makeProperty<FloatProperty>(typeName_ + "::MAX_RANGE", -1.);
-    } else {
-      beamsDownsampling_ = nullptr;
-      pointSize_= nullptr;
-      maxRange_ = nullptr;
-    }
+bool RobotLaserDrawAction::refreshPropertyPtrs(
+    HyperGraphElementAction::Parameters* params_) {
+  if (!DrawAction::refreshPropertyPtrs(params_)) return false;
+  if (previousParams_) {
+    beamsDownsampling_ = previousParams_->makeProperty<IntProperty>(
+        typeName_ + "::BEAMS_DOWNSAMPLING", 1);
+    pointSize_ = previousParams_->makeProperty<FloatProperty>(
+        typeName_ + "::POINT_SIZE", 1.0F);
+    maxRange_ = previousParams_->makeProperty<FloatProperty>(
+        typeName_ + "::MAX_RANGE", -1.);
+  } else {
+    beamsDownsampling_ = nullptr;
+    pointSize_ = nullptr;
+    maxRange_ = nullptr;
+  }
+  return true;
+}
+
+bool RobotLaserDrawAction::operator()(
+    HyperGraph::HyperGraphElement* element,
+    HyperGraphElementAction::Parameters* params_) {
+  if (typeid(*element).name() != typeName_) return false;
+
+  refreshPropertyPtrs(params_);
+  if (!previousParams_) {
     return true;
   }
+  if (show_ && !show_->value()) return true;
+  auto* that = static_cast<RobotLaser*>(element);
 
-  bool RobotLaserDrawAction::operator()(HyperGraph::HyperGraphElement* element,
-                                        HyperGraphElementAction::Parameters* params_) {
-    if (typeid(*element).name()!=typeName_)
-      return false;
-
-    refreshPropertyPtrs(params_);
-    if (! previousParams_){
-      return true;
+  RawLaser::Point2DVector points = that->cartesian();
+  if (maxRange_ && maxRange_->value() >= 0) {
+    // prune the cartesian points;
+    RawLaser::Point2DVector npoints(points.size());
+    int k = 0;
+    auto r2 = std::pow(maxRange_->value(), 2);
+    for (auto& point : points) {
+      if (point.squaredNorm() < r2) npoints[k++] = point;
     }
-    if (show_ && !show_->value())
-      return true;
-    auto* that = static_cast<RobotLaser*>(element);
-
-    RawLaser::Point2DVector points=that->cartesian();
-    if (maxRange_ && maxRange_->value() >=0 ) {
-      // prune the cartesian points;
-      RawLaser::Point2DVector npoints(points.size());
-      int k = 0;
-      auto r2 = std::pow(maxRange_->value(), 2);
-      for (auto & point : points) {
-        if (point.squaredNorm() < r2) npoints[k++] = point;
-      }
-      points = npoints;
-      npoints.resize(k);
-    }
-
-    glPushMatrix();
-    const SE2& laserPose = that->laserParams().laserPose;
-    glTranslatef(static_cast<float>(laserPose.translation().x()), static_cast<float>(laserPose.translation().y()), 0.F);
-    glRotatef(static_cast<float>RAD2DEG(laserPose.rotation().angle()),0.F,0.F,1.F);
-    glColor4f(1.F,0.F,0.F,0.5F);
-    int step = 1;
-    if (beamsDownsampling_ )
-      step = beamsDownsampling_->value();
-    if (pointSize_) {
-      glPointSize(pointSize_->value());
-    }
-
-    glBegin(GL_POINTS);
-    for (size_t i=0; i<points.size(); i+=step){
-      glVertex3f(static_cast<float>(points[i].x()), static_cast<float>(points[i].y()), 0.F);
-    }
-    glEnd();
-    glPopMatrix();
-
-    return true;
+    points = npoints;
+    npoints.resize(k);
   }
+
+  glPushMatrix();
+  const SE2& laserPose = that->laserParams().laserPose;
+  glTranslatef(static_cast<float>(laserPose.translation().x()),
+               static_cast<float>(laserPose.translation().y()), 0.F);
+  glRotatef(static_cast<float> RAD2DEG(laserPose.rotation().angle()), 0.F, 0.F,
+            1.F);
+  glColor4f(1.F, 0.F, 0.F, 0.5F);
+  int step = 1;
+  if (beamsDownsampling_) step = beamsDownsampling_->value();
+  if (pointSize_) {
+    glPointSize(pointSize_->value());
+  }
+
+  glBegin(GL_POINTS);
+  for (size_t i = 0; i < points.size(); i += step) {
+    glVertex3f(static_cast<float>(points[i].x()),
+               static_cast<float>(points[i].y()), 0.F);
+  }
+  glEnd();
+  glPopMatrix();
+
+  return true;
+}
 #endif
 
-}
+}  // namespace g2o

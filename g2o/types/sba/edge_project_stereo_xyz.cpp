@@ -28,7 +28,8 @@
 
 namespace g2o {
 
-Vector3 EdgeStereoSE3ProjectXYZ::cam_project(const Vector3 &trans_xyz, const float &bf) const {
+Vector3 EdgeStereoSE3ProjectXYZ::cam_project(const Vector3 &trans_xyz,
+                                             const float &bf) const {
   const number_t invz = 1.0F / trans_xyz[2];
   Vector3 res;
   res[0] = trans_xyz[0] * invz * fx + cx;

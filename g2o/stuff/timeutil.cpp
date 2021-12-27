@@ -25,19 +25,21 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "timeutil.h"
+
 #include <iostream>
 
 namespace g2o {
 
-  ScopeTime::ScopeTime(const char* title) : title_(title), startTime_(get_monotonic_time()) {}
+ScopeTime::ScopeTime(const char* title)
+    : title_(title), startTime_(get_monotonic_time()) {}
 
-  ScopeTime::~ScopeTime() {
-    std::cerr << title_<<" took "<<1000*(get_monotonic_time()-startTime_)<<"ms.\n";
-  }
+ScopeTime::~ScopeTime() {
+  std::cerr << title_ << " took " << 1000 * (get_monotonic_time() - startTime_)
+            << "ms.\n";
+}
 
-  number_t get_monotonic_time()
-  {
-    return seconds{ std::chrono::steady_clock::now().time_since_epoch() }.count();
-  }
+number_t get_monotonic_time() {
+  return seconds{std::chrono::steady_clock::now().time_since_epoch()}.count();
+}
 
-} // end namespace
+}  // namespace g2o

@@ -68,7 +68,9 @@ class G2O_TUTORIAL_SLAM2D_API SE2 {
     return *this;
   }
 
-  Eigen::Vector2d operator*(const Eigen::Vector2d& v) const { return _t + _R * v; }
+  Eigen::Vector2d operator*(const Eigen::Vector2d& v) const {
+    return _t + _R * v;
+  }
 
   SE2 inverse() const {
     SE2 ret;

@@ -32,7 +32,8 @@
 using namespace std;
 
 using SlamBlockSolver = g2o::BlockSolver<g2o::BlockSolverTraits<-1, -1> >;
-using SlamLinearSolver = g2o::LinearSolverEigen<SlamBlockSolver::PoseMatrixType>;
+using SlamLinearSolver =
+    g2o::LinearSolverEigen<SlamBlockSolver::PoseMatrixType>;
 
 MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) { setupUi(this); }
 
@@ -40,20 +41,22 @@ MainWindow::~MainWindow() {}
 
 void MainWindow::on_actionLoad_triggered(bool) {
   viewer->graph->clear();
-  QString filename =
-      QFileDialog::getOpenFileName(this, "Load g2o file", "", "g2o files (*.g2o);;All Files (*)");
+  QString filename = QFileDialog::getOpenFileName(
+      this, "Load g2o file", "", "g2o files (*.g2o);;All Files (*)");
   if (!filename.isNull()) {
     ifstream ifs(filename.toStdString().c_str());
     viewer->graph->load(ifs);
-    cerr << "Graph loaded with " << viewer->graph->vertices().size() << " vertices and "
-         << viewer->graph->edges().size() << " measurments" << endl;
+    cerr << "Graph loaded with " << viewer->graph->vertices().size()
+         << " vertices and " << viewer->graph->edges().size() << " measurments"
+         << endl;
   }
   viewer->update();
   fixGraph();
 }
 
 void MainWindow::on_actionSave_triggered(bool) {
-  QString filename = QFileDialog::getSaveFileName(this, "Save g2o file", "", "g2o files (*.g2o)");
+  QString filename = QFileDialog::getSaveFileName(this, "Save g2o file", "",
+                                                  "g2o files (*.g2o)");
   if (!filename.isNull()) {
     ofstream fout(filename.toStdString().c_str());
     viewer->graph->save(fout);
@@ -67,7 +70,8 @@ void MainWindow::on_actionSave_triggered(bool) {
 void MainWindow::on_actionQuit_triggered(bool) { close(); }
 
 void MainWindow::on_btnOptimize_clicked() {
-  if (viewer->graph->vertices().size() == 0 || viewer->graph->edges().size() == 0) {
+  if (viewer->graph->vertices().size() == 0 ||
+      viewer->graph->edges().size() == 0) {
     cerr << "Graph has no vertices / egdes" << endl;
     return;
   }
@@ -75,13 +79,16 @@ void MainWindow::on_btnOptimize_clicked() {
   viewer->graph->initializeOptimization();
 
   if (rbGauss->isChecked()) {
-    if (!dynamic_cast<g2o::OptimizationAlgorithmGaussNewton*>(viewer->graph->solver().get()))
+    if (!dynamic_cast<g2o::OptimizationAlgorithmGaussNewton*>(
+            viewer->graph->solver().get()))
       viewer->graph->setAlgorithm(createGaussNewton());
   } else if (rbLevenberg->isChecked()) {
-    if (!dynamic_cast<g2o::OptimizationAlgorithmLevenberg*>(viewer->graph->solver().get()))
+    if (!dynamic_cast<g2o::OptimizationAlgorithmLevenberg*>(
+            viewer->graph->solver().get()))
       viewer->graph->setAlgorithm(createLevenberg());
   } else {
-    if (!dynamic_cast<g2o::OptimizationAlgorithmGaussNewton*>(viewer->graph->solver().get()))
+    if (!dynamic_cast<g2o::OptimizationAlgorithmGaussNewton*>(
+            viewer->graph->solver().get()))
       viewer->graph->setAlgorithm(createGaussNewton());
   }
 
@@ -107,7 +114,8 @@ void MainWindow::on_btnInitialGuess_clicked() {
 }
 
 void MainWindow::fixGraph() {
-  if (viewer->graph->vertices().size() == 0 || viewer->graph->edges().size() == 0) {
+  if (viewer->graph->vertices().size() == 0 ||
+      viewer->graph->edges().size() == 0) {
     return;
   }
 
@@ -133,14 +141,16 @@ void MainWindow::fixGraph() {
 std::unique_ptr<g2o::OptimizationAlgorithm> MainWindow::createGaussNewton() {
   auto linearSolverGN = g2o::make_unique<SlamLinearSolver>();
   linearSolverGN->setBlockOrdering(false);
-  return std::unique_ptr<g2o::OptimizationAlgorithm>(new g2o::OptimizationAlgorithmGaussNewton(
-      g2o::make_unique<SlamBlockSolver>(std::move(linearSolverGN))));
+  return std::unique_ptr<g2o::OptimizationAlgorithm>(
+      new g2o::OptimizationAlgorithmGaussNewton(
+          g2o::make_unique<SlamBlockSolver>(std::move(linearSolverGN))));
 }
 
 std::unique_ptr<g2o::OptimizationAlgorithm> MainWindow::createLevenberg() {
   // Levenberg
   auto linearSolverLM = g2o::make_unique<SlamLinearSolver>();
   linearSolverLM->setBlockOrdering(false);
-  return std::unique_ptr<g2o::OptimizationAlgorithm>(new g2o::OptimizationAlgorithmLevenberg(
-      g2o::make_unique<SlamBlockSolver>(std::move(linearSolverLM))));
+  return std::unique_ptr<g2o::OptimizationAlgorithm>(
+      new g2o::OptimizationAlgorithmLevenberg(
+          g2o::make_unique<SlamBlockSolver>(std::move(linearSolverLM))));
 }

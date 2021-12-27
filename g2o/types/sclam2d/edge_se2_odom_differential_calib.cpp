@@ -32,8 +32,7 @@
 
 namespace g2o {
 
-bool EdgeSE2OdomDifferentialCalib::read(std::istream& is)
-{
+bool EdgeSE2OdomDifferentialCalib::read(std::istream& is) {
   number_t vl;
   number_t vr;
   number_t dt;
@@ -43,9 +42,9 @@ bool EdgeSE2OdomDifferentialCalib::read(std::istream& is)
   return readInformationMatrix(is);
 }
 
-bool EdgeSE2OdomDifferentialCalib::write(std::ostream& os) const
-{
-  os << measurement().vl() << " " << measurement().vr() << " " << measurement().dt() << " ";
+bool EdgeSE2OdomDifferentialCalib::write(std::ostream& os) const {
+  os << measurement().vl() << " " << measurement().vr() << " "
+     << measurement().dt() << " ";
   return writeInformationMatrix(os);
 }
 
@@ -53,8 +52,9 @@ bool EdgeSE2OdomDifferentialCalib::write(std::ostream& os) const
 EdgeSE2OdomDifferentialCalibDrawAction::EdgeSE2OdomDifferentialCalibDrawAction()
     : DrawAction(typeid(EdgeSE2OdomDifferentialCalib).name()) {}
 
-bool EdgeSE2OdomDifferentialCalibDrawAction::operator()(HyperGraph::HyperGraphElement* element,
-                                                        HyperGraphElementAction::Parameters*) {
+bool EdgeSE2OdomDifferentialCalibDrawAction::operator()(
+    HyperGraph::HyperGraphElement* element,
+    HyperGraphElementAction::Parameters*) {
   if (typeid(*element).name() != typeName_) return false;
   auto* e = static_cast<EdgeSE2OdomDifferentialCalib*>(element);
   auto fromEdge = e->vertexXn<0>();
@@ -64,8 +64,10 @@ bool EdgeSE2OdomDifferentialCalibDrawAction::operator()(HyperGraph::HyperGraphEl
   glPushAttrib(GL_ENABLE_BIT);
   glDisable(GL_LIGHTING);
   glBegin(GL_LINES);
-  glVertex3f(static_cast<float>(fromEdge->estimate().translation().x()), static_cast<float>(fromEdge->estimate().translation().y()), 0.F);
-  glVertex3f(static_cast<float>(toEdge->estimate().translation().x()), static_cast<float>(toEdge->estimate().translation().y()), 0.F);
+  glVertex3f(static_cast<float>(fromEdge->estimate().translation().x()),
+             static_cast<float>(fromEdge->estimate().translation().y()), 0.F);
+  glVertex3f(static_cast<float>(toEdge->estimate().translation().x()),
+             static_cast<float>(toEdge->estimate().translation().y()), 0.F);
   glEnd();
   glPopAttrib();
   return true;

@@ -53,19 +53,22 @@ class StructureOnlyCreator : public AbstractOptimizationAlgorithmCreator {
   explicit StructureOnlyCreator(const OptimizationAlgorithmProperty& p)
       : AbstractOptimizationAlgorithmCreator(p) {}
   std::unique_ptr<OptimizationAlgorithm> construct() override {
-    return std::unique_ptr<OptimizationAlgorithm>(createSolver(property().name));
+    return std::unique_ptr<OptimizationAlgorithm>(
+        createSolver(property().name));
   }
 };
 
 G2O_REGISTER_OPTIMIZATION_LIBRARY(structure_only);
 
-G2O_REGISTER_OPTIMIZATION_ALGORITHM(structure_only_2,
-                                    new StructureOnlyCreator(OptimizationAlgorithmProperty(
-                                        "structure_only_2", "Optimize the landmark poses (2D)",
-                                        "Eigen", true, 3, 2)));
-G2O_REGISTER_OPTIMIZATION_ALGORITHM(structure_only_3,
-                                    new StructureOnlyCreator(OptimizationAlgorithmProperty(
-                                        "structure_only_3", "Optimize the landmark poses (3D)",
-                                        "Eigen", true, 6, 3)));
+G2O_REGISTER_OPTIMIZATION_ALGORITHM(
+    structure_only_2,
+    new StructureOnlyCreator(OptimizationAlgorithmProperty(
+        "structure_only_2", "Optimize the landmark poses (2D)", "Eigen", true,
+        3, 2)));
+G2O_REGISTER_OPTIMIZATION_ALGORITHM(
+    structure_only_3,
+    new StructureOnlyCreator(OptimizationAlgorithmProperty(
+        "structure_only_3", "Optimize the landmark poses (3D)", "Eigen", true,
+        6, 3)));
 
 }  // namespace g2o

@@ -27,26 +27,29 @@
 #ifndef G2O_SENSOR_POINTXY_OFFSET_H_
 #define G2O_SENSOR_POINTXY_OFFSET_H_
 
-#include "simulator2d_base.h"
-#include "pointsensorparameters.h"
 #include "g2o_simulator_api.h"
+#include "pointsensorparameters.h"
+#include "simulator2d_base.h"
 
 namespace g2o {
 
-  class G2O_SIMULATOR_API SensorPointXYOffset: public PointSensorParameters, public BinarySensor<Robot2D, EdgeSE2PointXYOffset, WorldObjectPointXY>{
-  public:
-    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-    using RobotPoseType = PoseVertexType::EstimateType;
-    explicit SensorPointXYOffset(const std::string& name);
-    void sense() override;
-    void addNoise(EdgeType* e) override;
-    void addParameters() override;
-  protected:
-    bool isVisible(WorldObjectType* to);
-    std::shared_ptr<ParameterSE2Offset> offsetParam_;
-    RobotPoseType sensorPose_;
-  };
+class G2O_SIMULATOR_API SensorPointXYOffset
+    : public PointSensorParameters,
+      public BinarySensor<Robot2D, EdgeSE2PointXYOffset, WorldObjectPointXY> {
+ public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+  using RobotPoseType = PoseVertexType::EstimateType;
+  explicit SensorPointXYOffset(const std::string& name);
+  void sense() override;
+  void addNoise(EdgeType* e) override;
+  void addParameters() override;
 
-}
+ protected:
+  bool isVisible(WorldObjectType* to);
+  std::shared_ptr<ParameterSE2Offset> offsetParam_;
+  RobotPoseType sensorPose_;
+};
+
+}  // namespace g2o
 
 #endif

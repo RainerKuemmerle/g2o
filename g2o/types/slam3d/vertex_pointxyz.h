@@ -27,85 +27,80 @@
 #ifndef G2O_VERTEX_TRACKXYZ_H_
 #define G2O_VERTEX_TRACKXYZ_H_
 
-#include "g2o_types_slam3d_api.h"
 #include "g2o/core/base_vertex.h"
 #include "g2o/core/hyper_graph_action.h"
+#include "g2o_types_slam3d_api.h"
 
 namespace g2o {
-  /**
-   * \brief Vertex for a tracked point in space
-   */
-  class G2O_TYPES_SLAM3D_API VertexPointXYZ : public BaseVertex<3, Vector3>
-  {
-    public:
-      EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
-      VertexPointXYZ() = default;
-      bool read(std::istream& is) override ;
-      bool write(std::ostream& os) const override ;
+/**
+ * \brief Vertex for a tracked point in space
+ */
+class G2O_TYPES_SLAM3D_API VertexPointXYZ : public BaseVertex<3, Vector3> {
+ public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
+  VertexPointXYZ() = default;
+  bool read(std::istream& is) override;
+  bool write(std::ostream& os) const override;
 
-      void setToOriginImpl() override { estimate_.fill(0.); }
+  void setToOriginImpl() override { estimate_.fill(0.); }
 
-      void oplusImpl(const number_t* update_) override {
-        Eigen::Map<const Vector3> update(update_);
-        estimate_ += update;
-      }
+  void oplusImpl(const number_t* update_) override {
+    Eigen::Map<const Vector3> update(update_);
+    estimate_ += update;
+  }
 
-      bool setEstimateDataImpl(const number_t* est) override {
-        Eigen::Map<const Vector3> estMap(est);
-        estimate_ = estMap;
-        return true;
-      }
+  bool setEstimateDataImpl(const number_t* est) override {
+    Eigen::Map<const Vector3> estMap(est);
+    estimate_ = estMap;
+    return true;
+  }
 
-      bool getEstimateData(number_t* est) const override {
-        Eigen::Map<Vector3> estMap(est);
-        estMap = estimate_;
-        return true;
-      }
+  bool getEstimateData(number_t* est) const override {
+    Eigen::Map<Vector3> estMap(est);
+    estMap = estimate_;
+    return true;
+  }
 
-      int estimateDimension() const override {
-        return kDimension;
-      }
+  int estimateDimension() const override { return kDimension; }
 
-      bool setMinimalEstimateDataImpl(const number_t* est) override {
-        estimate_ = Eigen::Map<const Vector3>(est);
-        return true;
-      }
+  bool setMinimalEstimateDataImpl(const number_t* est) override {
+    estimate_ = Eigen::Map<const Vector3>(est);
+    return true;
+  }
 
-      bool getMinimalEstimateData(number_t* est) const override {
-        Eigen::Map<Vector3> v(est);
-        v = estimate_;
-        return true;
-      }
+  bool getMinimalEstimateData(number_t* est) const override {
+    Eigen::Map<Vector3> v(est);
+    v = estimate_;
+    return true;
+  }
 
-      int minimalEstimateDimension() const override {
-        return kDimension;
-      }
+  int minimalEstimateDimension() const override { return kDimension; }
+};
 
-  };
-
-  class G2O_TYPES_SLAM3D_API VertexPointXYZWriteGnuplotAction: public WriteGnuplotAction
-  {
-    public:
-      VertexPointXYZWriteGnuplotAction();
-      bool operator()(HyperGraph::HyperGraphElement* element,
-                              HyperGraphElementAction::Parameters* params_) override ;
-  };
+class G2O_TYPES_SLAM3D_API VertexPointXYZWriteGnuplotAction
+    : public WriteGnuplotAction {
+ public:
+  VertexPointXYZWriteGnuplotAction();
+  bool operator()(HyperGraph::HyperGraphElement* element,
+                  HyperGraphElementAction::Parameters* params_) override;
+};
 
 #ifdef G2O_HAVE_OPENGL
-  /**
-   * \brief visualize a 3D point
-   */
-  class VertexPointXYZDrawAction: public DrawAction{
-    public:
-      VertexPointXYZDrawAction();
-      bool operator()(HyperGraph::HyperGraphElement* element,
-                              HyperGraphElementAction::Parameters* params_) override ;
+/**
+ * \brief visualize a 3D point
+ */
+class VertexPointXYZDrawAction : public DrawAction {
+ public:
+  VertexPointXYZDrawAction();
+  bool operator()(HyperGraph::HyperGraphElement* element,
+                  HyperGraphElementAction::Parameters* params_) override;
 
-     protected:
-      std::shared_ptr<FloatProperty> pointSize_;
-      bool refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_) override ;
-  };
+ protected:
+  std::shared_ptr<FloatProperty> pointSize_;
+  bool refreshPropertyPtrs(
+      HyperGraphElementAction::Parameters* params_) override;
+};
 #endif
 
-}
+}  // namespace g2o
 #endif

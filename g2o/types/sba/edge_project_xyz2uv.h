@@ -48,7 +48,6 @@ class G2O_TYPES_SBA_API EdgeProjectXYZ2UV
   void computeError() override;
   void linearizeOplus() override;
 
- 
   std::shared_ptr<CameraParameters> _cam;  // TODO(goki): make protected member?
 };
 

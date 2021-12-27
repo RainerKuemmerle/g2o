@@ -32,16 +32,16 @@
 #include <limits>
 
 #include "base_edge.h"
+#include "g2o/autodiff/fixed_array.h"
 #include "g2o/config.h"
 #include "g2o/stuff/misc.h"
 #include "robust_kernel.h"
 
-#include "g2o/autodiff/fixed_array.h"
-
 namespace g2o {
 
 /**
- * \brief base class to represent an edge connecting an arbitrary number of nodes
+ * \brief base class to represent an edge connecting an arbitrary number of
+ * nodes
  *
  * D - Dimension of the measurement
  * E - type to represent the measurement
@@ -64,8 +64,9 @@ class BaseVariableSizedEdge : public BaseEdge<D, E> {
   using ErrorVector = typename BaseEdge<D, E>::ErrorVector;
   using InformationType = typename BaseEdge<D, E>::InformationType;
   using HessianBlockType =
-      Eigen::Map<MatrixX,
-                 MatrixX::Flags & Eigen::PacketAccessBit ? Eigen::Aligned : Eigen::Unaligned>;
+      Eigen::Map<MatrixX, MatrixX::Flags & Eigen::PacketAccessBit
+                              ? Eigen::Aligned
+                              : Eigen::Unaligned>;
 
   BaseVariableSizedEdge() : BaseEdge<D, E>() {}
 
@@ -98,7 +99,8 @@ class BaseVariableSizedEdge : public BaseEdge<D, E> {
   std::vector<JacobianType, Eigen::aligned_allocator<JacobianType> >
       jacobianOplus_;  ///< jacobians of the edge (w.r.t. oplus)
 
-  void computeQuadraticForm(const InformationType& omega, const ErrorVector& weightedError);
+  void computeQuadraticForm(const InformationType& omega,
+                            const ErrorVector& weightedError);
 
   OptimizableGraph::Vertex* vertexRaw(size_t n) const {
     assert(n < vertices_.size() && "Index out of bounds");

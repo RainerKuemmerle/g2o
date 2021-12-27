@@ -28,44 +28,38 @@
 
 namespace g2o {
 
-  EdgePointXYZ::EdgePointXYZ() 
-    
-  {
-    information_.setIdentity();
-    error_.setZero();
-  }
+EdgePointXYZ::EdgePointXYZ()
 
-  bool EdgePointXYZ::read(std::istream& is)
-  {
-    Vector3 p;
-    is >> p[0] >> p[1] >> p[2];
-    setMeasurement(p);
-    for (int i = 0; i < 3; ++i)
-      for (int j = i; j < 3; ++j) {
-        is >> information()(i, j);
-        if (i != j)
-          information()(j, i) = information()(i, j);
-      }
-    return true;
-  }
+{
+  information_.setIdentity();
+  error_.setZero();
+}
 
-  bool EdgePointXYZ::write(std::ostream& os) const
-  {
-    Vector3 p = measurement();
-    os << p.x() << " " << p.y() << " " << p.z();
-    for (int i = 0; i < 3; ++i)
-      for (int j = i; j < 3; ++j)
-        os << " " << information()(i, j);
-    return os.good();
-  }
+bool EdgePointXYZ::read(std::istream& is) {
+  Vector3 p;
+  is >> p[0] >> p[1] >> p[2];
+  setMeasurement(p);
+  for (int i = 0; i < 3; ++i)
+    for (int j = i; j < 3; ++j) {
+      is >> information()(i, j);
+      if (i != j) information()(j, i) = information()(i, j);
+    }
+  return true;
+}
 
+bool EdgePointXYZ::write(std::ostream& os) const {
+  Vector3 p = measurement();
+  os << p.x() << " " << p.y() << " " << p.z();
+  for (int i = 0; i < 3; ++i)
+    for (int j = i; j < 3; ++j) os << " " << information()(i, j);
+  return os.good();
+}
 
 #ifndef NUMERIC_JACOBIAN_THREE_D_TYPES
-  void EdgePointXYZ::linearizeOplus()
-  {
-    jacobianOplusXi_=-Matrix3::Identity();
-    jacobianOplusXj_= Matrix3::Identity();
-  }
+void EdgePointXYZ::linearizeOplus() {
+  jacobianOplusXi_ = -Matrix3::Identity();
+  jacobianOplusXj_ = Matrix3::Identity();
+}
 #endif
 
-} // end namespace
+}  // namespace g2o

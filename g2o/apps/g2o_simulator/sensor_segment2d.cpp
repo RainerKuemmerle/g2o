@@ -33,8 +33,7 @@
 namespace g2o {
 
 SensorSegment2D::SensorSegment2D(const std::string& name)
-    : BinarySensor<Robot2D, EdgeSE2Segment2D, WorldObjectSegment2D>(name) {
-}
+    : BinarySensor<Robot2D, EdgeSE2Segment2D, WorldObjectSegment2D>(name) {}
 
 void SensorSegment2D::addNoise(EdgeType* e) {
   EdgeType::ErrorVector n = sampler_.generateSample();
@@ -94,7 +93,8 @@ bool SensorSegment2D::isVisible(SensorSegment2D::WorldObjectType* to) {
       break;
     default:;
   }
-  return !clip1 && !clip2;  // only if both endpoints have not been clipped do something
+  return !clip1 &&
+         !clip2;  // only if both endpoints have not been clipped do something
 }
 
 void SensorSegment2D::sense() {
@@ -107,7 +107,7 @@ void SensorSegment2D::sense() {
     ++it;
     count++;
   }
-  for (auto *it : world()->objects()) {
+  for (auto* it : world()->objects()) {
     auto* o = dynamic_cast<WorldObjectType*>(it);
     if (o && isVisible(o)) {
       auto e = mkEdge(o);

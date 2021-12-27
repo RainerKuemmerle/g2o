@@ -26,240 +26,240 @@
 
 #include "estimate_propagator.h"
 
+#include <algorithm>
+#include <cassert>
+#include <fstream>
+#include <iostream>
 #include <queue>
 #include <vector>
-#include <cassert>
-#include <iostream>
-#include <algorithm>
-#include <fstream>
 
 //#define DEBUG_ESTIMATE_PROPAGATOR
 
 namespace g2o {
 
-# ifdef DEBUG_ESTIMATE_PROPAGATOR
-  struct FrontierLevelCmp {
-    bool operator()(EstimatePropagator::AdjacencyMapEntry* e1, EstimatePropagator::AdjacencyMapEntry* e2) const
-    {
-      return e1->frontierLevel() < e2->frontierLevel();
-    }
-  };
-# endif
-
-  EstimatePropagator::AdjacencyMapEntry::AdjacencyMapEntry()
-  {
-    reset();
-  }
-
-  void EstimatePropagator::AdjacencyMapEntry::reset()
-  {
-    child_ = nullptr;
-    parent_.clear();
-    edge_ = nullptr;
-    distance_ = std::numeric_limits<number_t>::max();
-    frontierLevel_ = -1;
-    inQueue_ = false;
-  }
-
-  EstimatePropagator::EstimatePropagator(OptimizableGraph* g): graph_(g)
-  {
-    for (const auto & it : graph_->vertices()){
-      AdjacencyMapEntry entry;
-      entry.child_ = std::static_pointer_cast<OptimizableGraph::Vertex>(it.second);
-      adjacencyMap_.insert(make_pair(entry.child(), entry));
-    }
-  }
-
-  void EstimatePropagator::reset()
-  {
-    for (const auto & it : visited_){
-      auto v = std::static_pointer_cast<OptimizableGraph::Vertex>(it);
-      auto at = adjacencyMap_.find(v);
-      assert(at != _adjacencyMap.end());
-      at->second.reset();
-    }
-    visited_.clear();
-  }
-
-  void EstimatePropagator::propagate(const std::shared_ptr<OptimizableGraph::Vertex>& v,
-      const EstimatePropagator::PropagateCost& cost,
-       const EstimatePropagator::PropagateAction& action,
-       number_t maxDistance,
-       number_t maxEdgeCost)
-  {
-    OptimizableGraph::VertexSet vset;
-    vset.insert(v);
-    propagate(vset, cost, action, maxDistance, maxEdgeCost);
-  }
-
-  void EstimatePropagator::propagate(OptimizableGraph::VertexSet& vset,
-      const EstimatePropagator::PropagateCost& cost,
-       const EstimatePropagator::PropagateAction& action,
-       number_t maxDistance,
-       number_t maxEdgeCost)
-  {
-    reset();
-
-    PriorityQueue frontier;
-    for (const auto & vit : vset){
-      auto v = std::static_pointer_cast<OptimizableGraph::Vertex>(vit);
-      auto it = adjacencyMap_.find(v);
-      assert(it != _adjacencyMap.end());
-      it->second.distance_ = 0.;
-      it->second.parent_.clear();
-      it->second.frontierLevel_ = 0;
-      frontier.push(&it->second);
-    }
-
-    while(! frontier.empty()){
-      AdjacencyMapEntry* entry = frontier.pop();
-      const auto& u = entry->child();
-      number_t uDistance = entry->distance();
-      //cerr << "uDistance " << uDistance << endl;
-
-      // initialize the vertex
-      if (entry->frontierLevel_ > 0) {
-        action(entry->edge().get(), entry->parent(), u.get());
-      }
-
-      /* std::pair< OptimizableGraph::VertexSet::iterator, bool> insertResult = */ visited_.insert(u);
-      auto et = u->edges().begin();
-      while (et != u->edges().end()) {
-        auto edge = std::static_pointer_cast<OptimizableGraph::Edge>(et->lock());
-        ++et;
-
-        int maxFrontier = -1;
-        OptimizableGraph::VertexSet initializedVertices;
-        for (size_t i = 0; i < edge->vertices().size(); ++i) {
-          auto z = std::static_pointer_cast<OptimizableGraph::Vertex>(edge->vertex(i));
-          if (!z) continue;
-          auto ot = adjacencyMap_.find(z);
-          if (ot->second.distance_ != std::numeric_limits<number_t>::max()) {
-            initializedVertices.insert(z);
-            maxFrontier = (std::max)(maxFrontier, ot->second.frontierLevel_);
-          }
-        }
-        assert(maxFrontier >= 0);
-
-        for (size_t i = 0; i < edge->vertices().size(); ++i) {
-          auto z = std::static_pointer_cast<OptimizableGraph::Vertex>(edge->vertex(i));
-          if (!z) continue;
-          if (z == u) continue;
-          size_t wasInitialized = initializedVertices.erase(z);
-
-          number_t edgeDistance = cost(edge.get(), initializedVertices, z.get());
-          if (edgeDistance > 0. && edgeDistance != std::numeric_limits<number_t>::max() &&
-              edgeDistance < maxEdgeCost) {
-            number_t zDistance = uDistance + edgeDistance;
-            // cerr << z->id() << " " << zDistance << endl;
-
-            auto ot = adjacencyMap_.find(z);
-            assert(ot != _adjacencyMap.end());
-
-            if (zDistance < ot->second.distance() && zDistance < maxDistance) {
-              // if (ot->second.inQueue)
-              // cerr << "Updating" << endl;
-              ot->second.distance_ = zDistance;
-              ot->second.parent_ = initializedVertices;
-              ot->second.edge_ = edge;
-              ot->second.frontierLevel_ = maxFrontier + 1;
-              frontier.push(&ot->second);
-            }
-          }
-
-          if (wasInitialized > 0)
-            initializedVertices.insert(z);
-        }
-      }
-    }
-
-    // writing debug information like cost for reaching each vertex and the parent used to initialize
 #ifdef DEBUG_ESTIMATE_PROPAGATOR
-    cerr << "Writing cost.dat" << endl;
-    ofstream costStream("cost.dat");
-    for (AdjacencyMap::const_iterator it = _adjacencyMap.begin(); it != _adjacencyMap.end(); ++it) {
-      HyperGraph::Vertex* u = it->second.child();
-      costStream << "vertex " << u->id() << "  cost " << it->second._distance << endl;
-    }
-    cerr << "Writing init.dat" << endl;
-    ofstream initStream("init.dat");
-    vector<AdjacencyMapEntry*> frontierLevels;
-    for (AdjacencyMap::iterator it = _adjacencyMap.begin(); it != _adjacencyMap.end(); ++it) {
-      if (it->second._frontierLevel > 0)
-        frontierLevels.push_back(&it->second);
-    }
-    sort(frontierLevels.begin(), frontierLevels.end(), FrontierLevelCmp());
-    for (vector<AdjacencyMapEntry*>::const_iterator it = frontierLevels.begin(); it != frontierLevels.end(); ++it) {
-      AdjacencyMapEntry* entry       = *it;
-      OptimizableGraph::Vertex* to   = entry->child();
-
-      initStream << "calling init level = " << entry->_frontierLevel << "\t (";
-      for (OptimizableGraph::VertexSet::iterator pit = entry->parent().begin(); pit != entry->parent().end(); ++pit) {
-        initStream << " " << (*pit)->id();
-      }
-      initStream << " ) -> " << to->id() << endl;
-    }
+struct FrontierLevelCmp {
+  bool operator()(EstimatePropagator::AdjacencyMapEntry* e1,
+                  EstimatePropagator::AdjacencyMapEntry* e2) const {
+    return e1->frontierLevel() < e2->frontierLevel();
+  }
+};
 #endif
 
+EstimatePropagator::AdjacencyMapEntry::AdjacencyMapEntry() { reset(); }
+
+void EstimatePropagator::AdjacencyMapEntry::reset() {
+  child_ = nullptr;
+  parent_.clear();
+  edge_ = nullptr;
+  distance_ = std::numeric_limits<number_t>::max();
+  frontierLevel_ = -1;
+  inQueue_ = false;
+}
+
+EstimatePropagator::EstimatePropagator(OptimizableGraph* g) : graph_(g) {
+  for (const auto& it : graph_->vertices()) {
+    AdjacencyMapEntry entry;
+    entry.child_ =
+        std::static_pointer_cast<OptimizableGraph::Vertex>(it.second);
+    adjacencyMap_.insert(make_pair(entry.child(), entry));
+  }
+}
+
+void EstimatePropagator::reset() {
+  for (const auto& it : visited_) {
+    auto v = std::static_pointer_cast<OptimizableGraph::Vertex>(it);
+    auto at = adjacencyMap_.find(v);
+    assert(at != _adjacencyMap.end());
+    at->second.reset();
+  }
+  visited_.clear();
+}
+
+void EstimatePropagator::propagate(
+    const std::shared_ptr<OptimizableGraph::Vertex>& v,
+    const EstimatePropagator::PropagateCost& cost,
+    const EstimatePropagator::PropagateAction& action, number_t maxDistance,
+    number_t maxEdgeCost) {
+  OptimizableGraph::VertexSet vset;
+  vset.insert(v);
+  propagate(vset, cost, action, maxDistance, maxEdgeCost);
+}
+
+void EstimatePropagator::propagate(
+    OptimizableGraph::VertexSet& vset,
+    const EstimatePropagator::PropagateCost& cost,
+    const EstimatePropagator::PropagateAction& action, number_t maxDistance,
+    number_t maxEdgeCost) {
+  reset();
+
+  PriorityQueue frontier;
+  for (const auto& vit : vset) {
+    auto v = std::static_pointer_cast<OptimizableGraph::Vertex>(vit);
+    auto it = adjacencyMap_.find(v);
+    assert(it != _adjacencyMap.end());
+    it->second.distance_ = 0.;
+    it->second.parent_.clear();
+    it->second.frontierLevel_ = 0;
+    frontier.push(&it->second);
   }
 
-  void EstimatePropagator::PriorityQueue::push(AdjacencyMapEntry* entry)
-  {
-    assert(entry != NULL);
-    if (entry->inQueue_) {
-      assert(entry->queueIt->second == entry);
-      erase(entry->queueIt_);
+  while (!frontier.empty()) {
+    AdjacencyMapEntry* entry = frontier.pop();
+    const auto& u = entry->child();
+    number_t uDistance = entry->distance();
+    // cerr << "uDistance " << uDistance << endl;
+
+    // initialize the vertex
+    if (entry->frontierLevel_ > 0) {
+      action(entry->edge().get(), entry->parent(), u.get());
     }
 
-    entry->queueIt_ = insert(std::make_pair(entry->distance(), entry));
-    assert(entry->queueIt != end());
-    entry->inQueue_ = true;
+    /* std::pair< OptimizableGraph::VertexSet::iterator, bool> insertResult = */
+    visited_.insert(u);
+    auto et = u->edges().begin();
+    while (et != u->edges().end()) {
+      auto edge = std::static_pointer_cast<OptimizableGraph::Edge>(et->lock());
+      ++et;
+
+      int maxFrontier = -1;
+      OptimizableGraph::VertexSet initializedVertices;
+      for (size_t i = 0; i < edge->vertices().size(); ++i) {
+        auto z =
+            std::static_pointer_cast<OptimizableGraph::Vertex>(edge->vertex(i));
+        if (!z) continue;
+        auto ot = adjacencyMap_.find(z);
+        if (ot->second.distance_ != std::numeric_limits<number_t>::max()) {
+          initializedVertices.insert(z);
+          maxFrontier = (std::max)(maxFrontier, ot->second.frontierLevel_);
+        }
+      }
+      assert(maxFrontier >= 0);
+
+      for (size_t i = 0; i < edge->vertices().size(); ++i) {
+        auto z =
+            std::static_pointer_cast<OptimizableGraph::Vertex>(edge->vertex(i));
+        if (!z) continue;
+        if (z == u) continue;
+        size_t wasInitialized = initializedVertices.erase(z);
+
+        number_t edgeDistance = cost(edge.get(), initializedVertices, z.get());
+        if (edgeDistance > 0. &&
+            edgeDistance != std::numeric_limits<number_t>::max() &&
+            edgeDistance < maxEdgeCost) {
+          number_t zDistance = uDistance + edgeDistance;
+          // cerr << z->id() << " " << zDistance << endl;
+
+          auto ot = adjacencyMap_.find(z);
+          assert(ot != _adjacencyMap.end());
+
+          if (zDistance < ot->second.distance() && zDistance < maxDistance) {
+            // if (ot->second.inQueue)
+            // cerr << "Updating" << endl;
+            ot->second.distance_ = zDistance;
+            ot->second.parent_ = initializedVertices;
+            ot->second.edge_ = edge;
+            ot->second.frontierLevel_ = maxFrontier + 1;
+            frontier.push(&ot->second);
+          }
+        }
+
+        if (wasInitialized > 0) initializedVertices.insert(z);
+      }
+    }
   }
 
-  EstimatePropagator::AdjacencyMapEntry* EstimatePropagator::PriorityQueue::pop()
-  {
-    assert(!empty());
-    auto it = begin();
-    AdjacencyMapEntry* entry = it->second;
-    erase(it);
+  // writing debug information like cost for reaching each vertex and the parent
+  // used to initialize
+#ifdef DEBUG_ESTIMATE_PROPAGATOR
+  cerr << "Writing cost.dat" << endl;
+  ofstream costStream("cost.dat");
+  for (AdjacencyMap::const_iterator it = _adjacencyMap.begin();
+       it != _adjacencyMap.end(); ++it) {
+    HyperGraph::Vertex* u = it->second.child();
+    costStream << "vertex " << u->id() << "  cost " << it->second._distance
+               << endl;
+  }
+  cerr << "Writing init.dat" << endl;
+  ofstream initStream("init.dat");
+  vector<AdjacencyMapEntry*> frontierLevels;
+  for (AdjacencyMap::iterator it = _adjacencyMap.begin();
+       it != _adjacencyMap.end(); ++it) {
+    if (it->second._frontierLevel > 0) frontierLevels.push_back(&it->second);
+  }
+  sort(frontierLevels.begin(), frontierLevels.end(), FrontierLevelCmp());
+  for (vector<AdjacencyMapEntry*>::const_iterator it = frontierLevels.begin();
+       it != frontierLevels.end(); ++it) {
+    AdjacencyMapEntry* entry = *it;
+    OptimizableGraph::Vertex* to = entry->child();
 
-    assert(entry != NULL);
-    entry->queueIt_ = end();
-    entry->inQueue_ = false;
-    return entry;
+    initStream << "calling init level = " << entry->_frontierLevel << "\t (";
+    for (OptimizableGraph::VertexSet::iterator pit = entry->parent().begin();
+         pit != entry->parent().end(); ++pit) {
+      initStream << " " << (*pit)->id();
+    }
+    initStream << " ) -> " << to->id() << endl;
+  }
+#endif
+}
+
+void EstimatePropagator::PriorityQueue::push(AdjacencyMapEntry* entry) {
+  assert(entry != NULL);
+  if (entry->inQueue_) {
+    assert(entry->queueIt->second == entry);
+    erase(entry->queueIt_);
   }
 
-  EstimatePropagatorCost::EstimatePropagatorCost (SparseOptimizer* graph) :
-    graph_(graph)
-  {
-  }
+  entry->queueIt_ = insert(std::make_pair(entry->distance(), entry));
+  assert(entry->queueIt != end());
+  entry->inQueue_ = true;
+}
 
-  number_t EstimatePropagatorCost::operator()(OptimizableGraph::Edge* edge, const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to_) const
-  {
-    auto* e = dynamic_cast<OptimizableGraph::Edge*>(edge);
-    auto* to = dynamic_cast<OptimizableGraph::Vertex*>(to_);
-    auto it = graph_->findActiveEdge(e);
-    if (it == graph_->activeEdges().end()) // it has to be an active edge
-      return std::numeric_limits<number_t>::max();
-    return e->initialEstimatePossible(from, to);
-  }
+EstimatePropagator::AdjacencyMapEntry*
+EstimatePropagator::PriorityQueue::pop() {
+  assert(!empty());
+  auto it = begin();
+  AdjacencyMapEntry* entry = it->second;
+  erase(it);
 
-  EstimatePropagatorCostOdometry::EstimatePropagatorCostOdometry(SparseOptimizer* graph) :
-    EstimatePropagatorCost(graph)
-  {
-  }
+  assert(entry != NULL);
+  entry->queueIt_ = end();
+  entry->inQueue_ = false;
+  return entry;
+}
 
-  number_t EstimatePropagatorCostOdometry::operator()(OptimizableGraph::Edge* edge, const OptimizableGraph::VertexSet& from_, OptimizableGraph::Vertex* to_) const
-  {
-    auto* e = dynamic_cast<OptimizableGraph::Edge*>(edge);
-    OptimizableGraph::Vertex* from = dynamic_cast<OptimizableGraph::Vertex*>(from_.begin()->get());
-    auto* to = dynamic_cast<OptimizableGraph::Vertex*>(to_);
-    if (std::abs(from->id() - to->id()) != 1) // simple method to identify odometry edges in a pose graph
-      return std::numeric_limits<number_t>::max();
-    auto it = graph_->findActiveEdge(e);
-    if (it == graph_->activeEdges().end()) // it has to be an active edge
-      return std::numeric_limits<number_t>::max();
-    return e->initialEstimatePossible(from_, to);
-  }
+EstimatePropagatorCost::EstimatePropagatorCost(SparseOptimizer* graph)
+    : graph_(graph) {}
 
-} // end namespace
+number_t EstimatePropagatorCost::operator()(
+    OptimizableGraph::Edge* edge, const OptimizableGraph::VertexSet& from,
+    OptimizableGraph::Vertex* to_) const {
+  auto* e = dynamic_cast<OptimizableGraph::Edge*>(edge);
+  auto* to = dynamic_cast<OptimizableGraph::Vertex*>(to_);
+  auto it = graph_->findActiveEdge(e);
+  if (it == graph_->activeEdges().end())  // it has to be an active edge
+    return std::numeric_limits<number_t>::max();
+  return e->initialEstimatePossible(from, to);
+}
+
+EstimatePropagatorCostOdometry::EstimatePropagatorCostOdometry(
+    SparseOptimizer* graph)
+    : EstimatePropagatorCost(graph) {}
+
+number_t EstimatePropagatorCostOdometry::operator()(
+    OptimizableGraph::Edge* edge, const OptimizableGraph::VertexSet& from_,
+    OptimizableGraph::Vertex* to_) const {
+  auto* e = dynamic_cast<OptimizableGraph::Edge*>(edge);
+  OptimizableGraph::Vertex* from =
+      dynamic_cast<OptimizableGraph::Vertex*>(from_.begin()->get());
+  auto* to = dynamic_cast<OptimizableGraph::Vertex*>(to_);
+  if (std::abs(from->id() - to->id()) !=
+      1)  // simple method to identify odometry edges in a pose graph
+    return std::numeric_limits<number_t>::max();
+  auto it = graph_->findActiveEdge(e);
+  if (it == graph_->activeEdges().end())  // it has to be an active edge
+    return std::numeric_limits<number_t>::max();
+  return e->initialEstimatePossible(from_, to);
+}
+
+}  // namespace g2o

@@ -28,39 +28,38 @@
 
 namespace g2o {
 
-  void EdgeSE2Prior::initialEstimate(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to)
-  {
-    assert(from.size() == 0); (void) from; (void) to;
-    VertexSE2* v1 = vertexXnRaw<0>();
-    v1->setEstimate(measurement_);
-  }
+void EdgeSE2Prior::initialEstimate(const OptimizableGraph::VertexSet& from,
+                                   OptimizableGraph::Vertex* to) {
+  assert(from.size() == 0);
+  (void)from;
+  (void)to;
+  VertexSE2* v1 = vertexXnRaw<0>();
+  v1->setEstimate(measurement_);
+}
 
-  bool EdgeSE2Prior::read(std::istream& is)
-  {
-    Vector3 p;
-    internal::readVector(is, p);
-    setMeasurement(SE2(p));
-    inverseMeasurement_= measurement_.inverse();
-    readInformationMatrix(is);
-    return true;
-  }
+bool EdgeSE2Prior::read(std::istream& is) {
+  Vector3 p;
+  internal::readVector(is, p);
+  setMeasurement(SE2(p));
+  inverseMeasurement_ = measurement_.inverse();
+  readInformationMatrix(is);
+  return true;
+}
 
-  bool EdgeSE2Prior::write(std::ostream& os) const
-  {
-    internal::writeVector(os, measurement().toVector());
-    return writeInformationMatrix(os);
-  }
+bool EdgeSE2Prior::write(std::ostream& os) const {
+  internal::writeVector(os, measurement().toVector());
+  return writeInformationMatrix(os);
+}
 
-  void EdgeSE2Prior::setMeasurement(const SE2& m)
-  {
-    measurement_ = m;
-    inverseMeasurement_ = m.inverse();
-  }
+void EdgeSE2Prior::setMeasurement(const SE2& m) {
+  measurement_ = m;
+  inverseMeasurement_ = m.inverse();
+}
 
-  bool EdgeSE2Prior::setMeasurementData(const number_t* d) {
-    measurement_=SE2(d[0], d[1], d[2]);
-    inverseMeasurement_ = measurement_.inverse();
-    return true;
-  }
+bool EdgeSE2Prior::setMeasurementData(const number_t* d) {
+  measurement_ = SE2(d[0], d[1], d[2]);
+  inverseMeasurement_ = measurement_.inverse();
+  return true;
+}
 
-} // end namespace
+}  // namespace g2o

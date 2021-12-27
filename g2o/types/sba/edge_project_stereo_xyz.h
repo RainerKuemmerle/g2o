@@ -35,7 +35,8 @@
 namespace g2o {
 
 // Projection using focal_length in x and y directions stereo
-class G2O_TYPES_SBA_API EdgeStereoSE3ProjectXYZ : public BaseBinaryEdge<3, Vector3, VertexPointXYZ, VertexSE3Expmap> {
+class G2O_TYPES_SBA_API EdgeStereoSE3ProjectXYZ
+    : public BaseBinaryEdge<3, Vector3, VertexPointXYZ, VertexSE3Expmap> {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 

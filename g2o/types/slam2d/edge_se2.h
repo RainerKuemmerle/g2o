@@ -27,91 +27,96 @@
 #ifndef G2O_EDGE_SE2_H
 #define G2O_EDGE_SE2_H
 
-#include "vertex_se2.h"
 #include "g2o/config.h"
 #include "g2o/core/base_binary_edge.h"
 #include "g2o_types_slam2d_api.h"
+#include "vertex_se2.h"
 
 namespace g2o {
 
-  /**
-   * \brief 2D edge between two Vertex2
-   */
-  class G2O_TYPES_SLAM2D_API EdgeSE2 : public BaseBinaryEdge<3, SE2, VertexSE2, VertexSE2>
-  {
-    public:
-      EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-      EdgeSE2() = default;
+/**
+ * \brief 2D edge between two Vertex2
+ */
+class G2O_TYPES_SLAM2D_API EdgeSE2
+    : public BaseBinaryEdge<3, SE2, VertexSE2, VertexSE2> {
+ public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+  EdgeSE2() = default;
 
-      void computeError() override
-      {
-        const VertexSE2* v1 = vertexXnRaw<0>();
-        const VertexSE2* v2 = vertexXnRaw<1>();
-        SE2 delta = inverseMeasurement_ * (v1->estimate().inverse()*v2->estimate());
-        error_ = delta.toVector();
-      }
-      bool read(std::istream& is) override;
-      bool write(std::ostream& os) const override;
+  void computeError() override {
+    const VertexSE2* v1 = vertexXnRaw<0>();
+    const VertexSE2* v2 = vertexXnRaw<1>();
+    SE2 delta =
+        inverseMeasurement_ * (v1->estimate().inverse() * v2->estimate());
+    error_ = delta.toVector();
+  }
+  bool read(std::istream& is) override;
+  bool write(std::ostream& os) const override;
 
-      void setMeasurement(const SE2& m) override {
-        measurement_ = m;
-        inverseMeasurement_ = m.inverse();
-      }
+  void setMeasurement(const SE2& m) override {
+    measurement_ = m;
+    inverseMeasurement_ = m.inverse();
+  }
 
-      bool setMeasurementData(const number_t* d) override {
-        measurement_=SE2(d[0], d[1], d[2]);
-        inverseMeasurement_ = measurement_.inverse();
-        return true;
-      }
+  bool setMeasurementData(const number_t* d) override {
+    measurement_ = SE2(d[0], d[1], d[2]);
+    inverseMeasurement_ = measurement_.inverse();
+    return true;
+  }
 
-      bool getMeasurementData(number_t* d) const override {
-        Vector3 v=measurement_.toVector();
-        d[0] = v[0];
-        d[1] = v[1];
-        d[2] = v[2];
-        return true;
-      }
+  bool getMeasurementData(number_t* d) const override {
+    Vector3 v = measurement_.toVector();
+    d[0] = v[0];
+    d[1] = v[1];
+    d[2] = v[2];
+    return true;
+  }
 
-      int measurementDimension() const override {return 3;}
+  int measurementDimension() const override { return 3; }
 
-      bool setMeasurementFromState() override {
-        const VertexSE2* v1 = vertexXnRaw<0>();
-        const VertexSE2* v2 = vertexXnRaw<1>();
-        measurement_ = v1->estimate().inverse()*v2->estimate();
-        inverseMeasurement_ = measurement_.inverse();
-        return true;
-      }
+  bool setMeasurementFromState() override {
+    const VertexSE2* v1 = vertexXnRaw<0>();
+    const VertexSE2* v2 = vertexXnRaw<1>();
+    measurement_ = v1->estimate().inverse() * v2->estimate();
+    inverseMeasurement_ = measurement_.inverse();
+    return true;
+  }
 
-
-      number_t initialEstimatePossible(const OptimizableGraph::VertexSet& , OptimizableGraph::Vertex* ) override { return 1.;}
-      void initialEstimate(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to) override;
+  number_t initialEstimatePossible(const OptimizableGraph::VertexSet&,
+                                   OptimizableGraph::Vertex*) override {
+    return 1.;
+  }
+  void initialEstimate(const OptimizableGraph::VertexSet& from,
+                       OptimizableGraph::Vertex* to) override;
 #ifndef NUMERIC_JACOBIAN_TWO_D_TYPES
-      void linearizeOplus() override;
+  void linearizeOplus() override;
 #endif
-    protected:
-      SE2 inverseMeasurement_;
-  };
+ protected:
+  SE2 inverseMeasurement_;
+};
 
-  class G2O_TYPES_SLAM2D_API EdgeSE2WriteGnuplotAction: public WriteGnuplotAction {
-  public:
-    EdgeSE2WriteGnuplotAction();
-    bool operator()(HyperGraph::HyperGraphElement* element,
-                    HyperGraphElementAction::Parameters* params_) override;
-  };
+class G2O_TYPES_SLAM2D_API EdgeSE2WriteGnuplotAction
+    : public WriteGnuplotAction {
+ public:
+  EdgeSE2WriteGnuplotAction();
+  bool operator()(HyperGraph::HyperGraphElement* element,
+                  HyperGraphElementAction::Parameters* params_) override;
+};
 
 #ifdef G2O_HAVE_OPENGL
-  class G2O_TYPES_SLAM2D_API EdgeSE2DrawAction: public DrawAction{
-  public:
-    EdgeSE2DrawAction();
-    bool operator()(HyperGraph::HyperGraphElement* element,
-                    HyperGraphElementAction::Parameters* params_) override;
+class G2O_TYPES_SLAM2D_API EdgeSE2DrawAction : public DrawAction {
+ public:
+  EdgeSE2DrawAction();
+  bool operator()(HyperGraph::HyperGraphElement* element,
+                  HyperGraphElementAction::Parameters* params_) override;
 
-   protected:
-    bool refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_) override;
-    std::shared_ptr<FloatProperty> triangleX_, triangleY_;
-  };
+ protected:
+  bool refreshPropertyPtrs(
+      HyperGraphElementAction::Parameters* params_) override;
+  std::shared_ptr<FloatProperty> triangleX_, triangleY_;
+};
 #endif
 
-} // end namespace
+}  // namespace g2o
 
 #endif

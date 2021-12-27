@@ -27,85 +27,83 @@
 #ifndef G2O_VERTEX_SE2_OFFSET_PARAMETERS_H_
 #define G2O_VERTEX_SE2_OFFSET_PARAMETERS_H_
 
-
-#include "se2.h"
-#include "g2o_types_slam2d_api.h"
 #include "g2o/core/cache.h"
-
+#include "g2o_types_slam2d_api.h"
+#include "se2.h"
 
 namespace g2o {
 
-  class VertexSE2;
+class VertexSE2;
+
+/**
+ * \brief offset for an SE2
+ */
+class G2O_TYPES_SLAM2D_API ParameterSE2Offset : public Parameter {
+ public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
+  ParameterSE2Offset();
+
+  bool read(std::istream& is) override;
+  bool write(std::ostream& os) const override;
 
   /**
-   * \brief offset for an SE2
+   * update the offset to a new value.
+   * re-calculates the different representations, e.g., the rotation matrix
    */
-  class G2O_TYPES_SLAM2D_API ParameterSE2Offset: public Parameter
-  {
-    public:
-      EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
-      ParameterSE2Offset();
+  void setOffset(const SE2& offset_ = SE2());
 
-      bool read(std::istream& is) override;
-      bool write(std::ostream& os) const override;
+  const SE2& offset() const { return offset_; }
 
-      /**
-       * update the offset to a new value.
-       * re-calculates the different representations, e.g., the rotation matrix
-       */
-      void setOffset(const SE2& offset_ = SE2());
+  //! rotation of the offset as 2x2 rotation matrix
+  const Isometry2& offsetMatrix() const { return offsetMatrix_; }
 
-      const SE2& offset() const { return offset_;}
+  //! rotation of the inverse offset as 2x2 rotation matrix
+  const Isometry2& inverseOffsetMatrix() const { return inverseOffsetMatrix_; }
 
-      //! rotation of the offset as 2x2 rotation matrix
-      const Isometry2& offsetMatrix() const { return offsetMatrix_;}
+ protected:
+  SE2 offset_;
+  Isometry2 offsetMatrix_;
+  Isometry2 inverseOffsetMatrix_;
+};
 
-      //! rotation of the inverse offset as 2x2 rotation matrix
-      const Isometry2& inverseOffsetMatrix() const { return inverseOffsetMatrix_;}
+/**
+ * \brief caching the offset related to a vertex
+ */
+class G2O_TYPES_SLAM2D_API CacheSE2Offset : public Cache {
+ public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
+  using ParameterType = ParameterSE2Offset;
 
-    protected:
-      SE2 offset_;
-      Isometry2 offsetMatrix_;
-      Isometry2 inverseOffsetMatrix_;
-  };
+  CacheSE2Offset() = default;
+  void updateImpl() override;
 
-  /**
-   * \brief caching the offset related to a vertex
-   */
-  class G2O_TYPES_SLAM2D_API CacheSE2Offset: public Cache {
-    public:
-      EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
-      using ParameterType = ParameterSE2Offset;
+  std::shared_ptr<ParameterSE2Offset> offsetParam() const {
+    return std::static_pointer_cast<ParameterSE2Offset>(parameters_[0]);
+  }
 
-      CacheSE2Offset() = default;
-      void updateImpl() override;
+  const SE2& w2n() const { return se2_w2n_; }
+  const SE2& n2w() const { return se2_n2w_; }
 
-      std::shared_ptr<ParameterSE2Offset> offsetParam() const {
-        return std::static_pointer_cast<ParameterSE2Offset>(parameters_[0]);
-      }
+  const Isometry2& w2nMatrix() const { return w2n_; }
+  const Isometry2& n2wMatrix() const { return n2w_; }
+  const Isometry2& w2lMatrix() const { return w2l_; }
 
-      const SE2& w2n() const {return se2_w2n_;}
-      const SE2& n2w() const {return se2_n2w_;}
+  Matrix2 RpInverseRInverseMatrix() const { return RpInverse_RInverse_; }
+  Matrix2 RpInverseRInversePrimeMatrix() const {
+    return RpInverse_RInversePrime_;
+  }
 
-      const Isometry2& w2nMatrix() const { return w2n_;}
-      const Isometry2& n2wMatrix() const { return n2w_;}
-      const Isometry2& w2lMatrix() const { return w2l_;}
+ protected:
+  SE2 se2_w2n_;
+  SE2 se2_n2w_;
 
-      Matrix2 RpInverseRInverseMatrix() const { return RpInverse_RInverse_; }
-      Matrix2 RpInverseRInversePrimeMatrix() const { return RpInverse_RInversePrime_; }
+  Isometry2 w2n_;  ///< world to sensor transform
+  Isometry2 w2l_;  ///< world to local
+  Isometry2 n2w_;  ///< sensor to world
+  Matrix2 RpInverse_RInverse_;
+  Matrix2 RpInverse_RInversePrime_;
+};
 
-    protected:
-      SE2 se2_w2n_;
-      SE2 se2_n2w_;
-
-      Isometry2 w2n_; ///< world to sensor transform
-      Isometry2 w2l_; ///< world to local
-      Isometry2 n2w_; ///< sensor to world
-      Matrix2 RpInverse_RInverse_;
-      Matrix2 RpInverse_RInversePrime_;
-
-  };
-
-}
+}  // namespace g2o
 
 #endif

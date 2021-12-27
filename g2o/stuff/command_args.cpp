@@ -26,10 +26,10 @@
 
 #include "command_args.h"
 
+#include <algorithm>
 #include <cstdlib>
 #include <cstring>
 #include <fstream>
-#include <algorithm>
 #include <functional>
 
 #include "misc.h"
@@ -45,7 +45,7 @@ void readVector(const std::string& s, std::vector<T>& v) {
   v.clear();
 
   std::vector<std::string> elements = strSplit(s, ",;");
-  for (const std::string& s: elements) {
+  for (const std::string& s : elements) {
     T val = stringToType<T>(s);
     v.emplace_back(val);
   }
@@ -90,7 +90,15 @@ std::string argument2String(const CommandArgs::CommandArgument& ca) {
 
 }  // namespace
 
-enum CommandArgumentType { kCatDouble, kCatFloat, kCatInt, kCatString, kCatBool, kCatVectorInt, kCatVectorDouble };
+enum CommandArgumentType {
+  kCatDouble,
+  kCatFloat,
+  kCatInt,
+  kCatString,
+  kCatBool,
+  kCatVectorInt,
+  kCatVectorDouble
+};
 
 bool CommandArgs::parseArgs(int argc, char** argv, bool exitOnError) {
   progName_ = argv[0];
@@ -144,7 +152,8 @@ bool CommandArgs::parseArgs(int argc, char** argv, bool exitOnError) {
         }
       }
       if (it == args_.end()) {
-        std::cerr << "Error: Unknown Option '" << name << "' (use -help to get list of options).\n";
+        std::cerr << "Error: Unknown Option '" << name
+                  << "' (use -help to get list of options).\n";
         if (exitOnError) exit(1);
         return false;
       }
@@ -173,7 +182,8 @@ bool CommandArgs::parseArgs(int argc, char** argv, bool exitOnError) {
   return true;
 }
 
-void CommandArgs::param(const std::string& name, bool& p, bool defValue, const std::string& desc) {
+void CommandArgs::param(const std::string& name, bool& p, bool defValue,
+                        const std::string& desc) {
   CommandArgument ca;
   ca.name = name;
   ca.description = desc;
@@ -184,7 +194,8 @@ void CommandArgs::param(const std::string& name, bool& p, bool defValue, const s
   args_.push_back(ca);
 }
 
-void CommandArgs::param(const std::string& name, int& p, int defValue, const std::string& desc) {
+void CommandArgs::param(const std::string& name, int& p, int defValue,
+                        const std::string& desc) {
   CommandArgument ca;
   ca.name = name;
   ca.description = desc;
@@ -195,7 +206,8 @@ void CommandArgs::param(const std::string& name, int& p, int defValue, const std
   args_.push_back(ca);
 }
 
-void CommandArgs::param(const std::string& name, float& p, float defValue, const std::string& desc) {
+void CommandArgs::param(const std::string& name, float& p, float defValue,
+                        const std::string& desc) {
   CommandArgument ca;
   ca.name = name;
   ca.description = desc;
@@ -206,7 +218,8 @@ void CommandArgs::param(const std::string& name, float& p, float defValue, const
   args_.push_back(ca);
 }
 
-void CommandArgs::param(const std::string& name, double& p, double defValue, const std::string& desc) {
+void CommandArgs::param(const std::string& name, double& p, double defValue,
+                        const std::string& desc) {
   CommandArgument ca;
   ca.name = name;
   ca.description = desc;
@@ -217,7 +230,8 @@ void CommandArgs::param(const std::string& name, double& p, double defValue, con
   args_.push_back(ca);
 }
 
-void CommandArgs::param(const std::string& name, std::string& p, const std::string& defValue, const std::string& desc) {
+void CommandArgs::param(const std::string& name, std::string& p,
+                        const std::string& defValue, const std::string& desc) {
   CommandArgument ca;
   ca.name = name;
   ca.description = desc;
@@ -228,7 +242,8 @@ void CommandArgs::param(const std::string& name, std::string& p, const std::stri
   args_.push_back(ca);
 }
 
-void CommandArgs::param(const std::string& name, std::vector<int>& p, const std::vector<int>& defValue,
+void CommandArgs::param(const std::string& name, std::vector<int>& p,
+                        const std::vector<int>& defValue,
                         const std::string& desc) {
   CommandArgument ca;
   ca.name = name;
@@ -240,7 +255,8 @@ void CommandArgs::param(const std::string& name, std::vector<int>& p, const std:
   args_.push_back(ca);
 }
 
-void CommandArgs::param(const std::string& name, std::vector<double>& p, const std::vector<double>& defValue,
+void CommandArgs::param(const std::string& name, std::vector<double>& p,
+                        const std::vector<double>& defValue,
                         const std::string& desc) {
   CommandArgument ca;
   ca.name = name;
@@ -281,28 +297,32 @@ void CommandArgs::printHelp(std::ostream& os) {
       if (arg.type != kCatBool) {
         std::string defaultValueStr = arg2str(arg);
         if (!defaultValueStr.empty())
-          tableStrings.emplace_back(arg.name + " " + type2str(arg.type),
-                                    arg.description + " (default: " + defaultValueStr + ")");
+          tableStrings.emplace_back(
+              arg.name + " " + type2str(arg.type),
+              arg.description + " (default: " + defaultValueStr + ")");
         else
-          tableStrings.emplace_back(arg.name + " " + type2str(arg.type), arg.description);
+          tableStrings.emplace_back(arg.name + " " + type2str(arg.type),
+                                    arg.description);
       } else
         tableStrings.emplace_back(arg.name, arg.description);
       maxArgLen = (std::max)(maxArgLen, tableStrings.back().first.size());
     }
-    sort(tableStrings.begin(), tableStrings.end(), CmpPairFirst<std::string, std::string>());
+    sort(tableStrings.begin(), tableStrings.end(),
+         CmpPairFirst<std::string, std::string>());
     maxArgLen += 3;
     for (const auto& tableString : tableStrings) {
       os << "-" << tableString.first;
       for (size_t l = tableString.first.size(); l < maxArgLen; ++l) os << " ";
       os << tableString.second << std::endl;
     }
-    //TODO(goki): should output description for leftOver params
+    // TODO(goki): should output description for leftOver params
   }
 }
 
 void CommandArgs::setBanner(const std::string& banner) { banner_ = banner; }
 
-void CommandArgs::paramLeftOver(const std::string& name, std::string& p, const std::string& defValue,
+void CommandArgs::paramLeftOver(const std::string& name, std::string& p,
+                                const std::string& defValue,
                                 const std::string& desc, bool optional) {
   CommandArgument ca;
   ca.name = name;

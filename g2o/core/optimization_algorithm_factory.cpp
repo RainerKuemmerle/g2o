@@ -34,10 +34,11 @@
 namespace g2o {
 
 AbstractOptimizationAlgorithmCreator::AbstractOptimizationAlgorithmCreator(
-    OptimizationAlgorithmProperty  p)
+    OptimizationAlgorithmProperty p)
     : property_(std::move(p)) {}
 
-std::unique_ptr<OptimizationAlgorithmFactory> OptimizationAlgorithmFactory::factoryInstance_;
+std::unique_ptr<OptimizationAlgorithmFactory>
+    OptimizationAlgorithmFactory::factoryInstance_;
 
 OptimizationAlgorithmFactory* OptimizationAlgorithmFactory::instance() {
   if (factoryInstance_ == nullptr) {
@@ -52,7 +53,8 @@ void OptimizationAlgorithmFactory::registerSolver(
   auto foundIt = findSolver(name);
   if (foundIt != creator_.end()) {
     creator_.erase(foundIt);
-    std::cerr << "SOLVER FACTORY WARNING: Overwriting Solver creator " << name << std::endl;
+    std::cerr << "SOLVER FACTORY WARNING: Overwriting Solver creator " << name
+              << std::endl;
     assert(0);
   }
   creator_.push_back(c);
@@ -68,13 +70,15 @@ void OptimizationAlgorithmFactory::unregisterSolver(
 }
 
 std::unique_ptr<OptimizationAlgorithm> OptimizationAlgorithmFactory::construct(
-    const std::string& name, OptimizationAlgorithmProperty& solverProperty) const {
+    const std::string& name,
+    OptimizationAlgorithmProperty& solverProperty) const {
   auto foundIt = findSolver(name);
   if (foundIt != creator_.end()) {
     solverProperty = (*foundIt)->property();
     return (*foundIt)->construct();
   }
-  std::cerr << "SOLVER FACTORY WARNING: Unable to create solver " << name << std::endl;
+  std::cerr << "SOLVER FACTORY WARNING: Unable to create solver " << name
+            << std::endl;
   return std::unique_ptr<OptimizationAlgorithm>();
 }
 
@@ -85,11 +89,12 @@ void OptimizationAlgorithmFactory::destroy() {
 
 void OptimizationAlgorithmFactory::listSolvers(std::ostream& os) const {
   size_t solverNameColumnLength = 0;
-  for (const auto & it : creator_)
-    solverNameColumnLength = std::max(solverNameColumnLength, it->property().name.size());
+  for (const auto& it : creator_)
+    solverNameColumnLength =
+        std::max(solverNameColumnLength, it->property().name.size());
   solverNameColumnLength += 4;
 
-  for (const auto & it : creator_) {
+  for (const auto& it : creator_) {
     const OptimizationAlgorithmProperty& sp = it->property();
     os << sp.name;
     for (size_t i = sp.name.size(); i < solverNameColumnLength; ++i) os << ' ';
@@ -97,8 +102,8 @@ void OptimizationAlgorithmFactory::listSolvers(std::ostream& os) const {
   }
 }
 
-OptimizationAlgorithmFactory::CreatorList::const_iterator OptimizationAlgorithmFactory::findSolver(
-    const std::string& name) const {
+OptimizationAlgorithmFactory::CreatorList::const_iterator
+OptimizationAlgorithmFactory::findSolver(const std::string& name) const {
   for (auto it = creator_.begin(); it != creator_.end(); ++it) {
     const OptimizationAlgorithmProperty& sp = (*it)->property();
     if (sp.name == name) return it;
@@ -106,8 +111,8 @@ OptimizationAlgorithmFactory::CreatorList::const_iterator OptimizationAlgorithmF
   return creator_.end();
 }
 
-OptimizationAlgorithmFactory::CreatorList::iterator OptimizationAlgorithmFactory::findSolver(
-    const std::string& name) {
+OptimizationAlgorithmFactory::CreatorList::iterator
+OptimizationAlgorithmFactory::findSolver(const std::string& name) {
   for (auto it = creator_.begin(); it != creator_.end(); ++it) {
     const OptimizationAlgorithmProperty& sp = (*it)->property();
     if (sp.name == name) return it;

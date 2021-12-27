@@ -86,13 +86,16 @@ TEST(Stuff, FileExists) {
   ASSERT_FALSE(g2o::fileExists("test12345"));
 
   ASSERT_TRUE(g2o::fileExists(G2O_SRC_DIR));
-  ASSERT_TRUE(g2o::fileExists((std::string(G2O_SRC_DIR) + pathSep + "CMakeLists.txt").c_str()));
+  ASSERT_TRUE(g2o::fileExists(
+      (std::string(G2O_SRC_DIR) + pathSep + "CMakeLists.txt").c_str()));
 }
 
 TEST(Stuff, GetFilesByPattern) {
   using namespace testing;
-  std::string pattern = std::string(G2O_SRC_DIR) + pathSep + "doc" + pathSep + "license*.txt";
-  std::vector<std::string> licenseFiles = g2o::getFilesByPattern(pattern.c_str());
+  std::string pattern =
+      std::string(G2O_SRC_DIR) + pathSep + "doc" + pathSep + "license*.txt";
+  std::vector<std::string> licenseFiles =
+      g2o::getFilesByPattern(pattern.c_str());
   ASSERT_THAT(licenseFiles, SizeIs(3));
   ASSERT_THAT(licenseFiles, Each(ContainsRegex("license.*\\.txt$")));
 }

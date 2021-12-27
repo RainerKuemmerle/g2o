@@ -34,90 +34,85 @@
 
 namespace g2o {
 
-  Cache::CacheKey::CacheKey(std::string  type_, ParameterVector  parameters_) :
-    type_(std::move(type_)), parameters_(std::move(parameters_))
-  {
+Cache::CacheKey::CacheKey(std::string type_, ParameterVector parameters_)
+    : type_(std::move(type_)), parameters_(std::move(parameters_)) {}
+
+Cache::Cache(CacheContainer* container, ParameterVector parameters)
+    : parameters_(std::move(parameters)), container_(container) {}
+
+bool Cache::CacheKey::operator<(const Cache::CacheKey& c) const {
+  if (type_ < c.type_) return true;
+  if (c.type_ < type_) return false;
+  return std::lexicographical_compare(parameters_.begin(), parameters_.end(),
+                                      c.parameters_.begin(),
+                                      c.parameters_.end());
+}
+
+OptimizableGraph::Vertex* Cache::vertex() const {
+  return container_ ? container_->vertex() : nullptr;
+}
+
+const ParameterVector& Cache::parameters() const { return parameters_; }
+
+Cache::CacheKey Cache::key() const {
+  Factory* factory = Factory::instance();
+  return CacheKey(factory->tag(this), parameters_);
+};
+
+void Cache::update() {
+  if (!updateNeeded_) return;
+  updateImpl();
+  updateNeeded_ = false;
+}
+
+CacheContainer::CacheContainer(OptimizableGraph::Vertex* vertex)
+    : updateNeeded_(true) {
+  vertex_ = vertex;
+}
+
+std::shared_ptr<Cache> CacheContainer::findCache(const Cache::CacheKey& key) {
+  auto it = find(key);
+  if (it == end()) return nullptr;
+  return it->second;
+}
+
+std::shared_ptr<Cache> CacheContainer::createCache(const Cache::CacheKey& key) {
+  Factory* f = Factory::instance();
+  std::unique_ptr<HyperGraph::HyperGraphElement> e = f->construct(key.type());
+  if (!e) {
+    std::cerr << __PRETTY_FUNCTION__ << std::endl;
+    std::cerr << "fatal error in creating cache of type " << key.type()
+              << std::endl;
+    return nullptr;
   }
-
-  Cache::Cache(CacheContainer* container, ParameterVector parameters)
-      : parameters_(std::move(parameters)), container_(container) {}
-
-  bool Cache::CacheKey::operator<(const Cache::CacheKey& c) const{
-    if (type_ < c.type_)
-      return true;
-    if (c.type_ < type_)
-      return false;
-    return std::lexicographical_compare(parameters_.begin(), parameters_.end(),
-                                        c.parameters_.begin(), c.parameters_.end());
+  auto c = std::shared_ptr<Cache>(dynamic_cast<Cache*>(e.release()));
+  if (!c) {
+    std::cerr << __PRETTY_FUNCTION__ << std::endl;
+    std::cerr << "fatal error in creating cache of type " << key.type()
+              << std::endl;
+    return nullptr;
   }
+  c->container_ = this;
+  c->parameters_ = key.parameters_;
+  insert(make_pair(key, c));
+  c->update();
+  return c;
+}
 
-  OptimizableGraph::Vertex* Cache::vertex() const {
-    return container_ ? container_->vertex() : nullptr;
+OptimizableGraph::Vertex* CacheContainer::vertex() const { return vertex_; }
+
+void CacheContainer::update() {
+  for (auto& it : *this) {
+    (it.second)->update();
   }
+  updateNeeded_ = false;
+}
 
-  const ParameterVector& Cache::parameters() const {
-    return parameters_;
+void CacheContainer::setUpdateNeeded(bool needUpdate) {
+  updateNeeded_ = needUpdate;
+  for (auto& it : *this) {
+    (it.second)->updateNeeded_ = needUpdate;
   }
+}
 
-  Cache::CacheKey Cache::key() const {
-    Factory* factory=Factory::instance();
-    return CacheKey(factory->tag(this), parameters_);
-  };
-
-
-  void Cache::update(){
-    if (! updateNeeded_)
-      return;
-    updateImpl();
-    updateNeeded_=false;
-  }
-
-  CacheContainer::CacheContainer(OptimizableGraph::Vertex* vertex) : updateNeeded_(true) { vertex_ = vertex; }
-
-  std::shared_ptr<Cache> CacheContainer::findCache(const Cache::CacheKey& key) {
-    auto it=find(key);
-    if (it==end())
-      return nullptr;
-    return it->second;
-  }
-
-  std::shared_ptr<Cache> CacheContainer::createCache(const Cache::CacheKey& key){
-    Factory* f = Factory::instance();
-    std::unique_ptr<HyperGraph::HyperGraphElement> e = f->construct(key.type());
-    if (!e) {
-      std::cerr << __PRETTY_FUNCTION__ << std::endl;
-      std::cerr << "fatal error in creating cache of type " << key.type() << std::endl;
-      return nullptr;
-    }
-    auto c = std::shared_ptr<Cache>(dynamic_cast<Cache*>(e.release()));
-    if (! c){
-      std::cerr << __PRETTY_FUNCTION__ << std::endl;
-      std::cerr << "fatal error in creating cache of type " << key.type() << std::endl;
-      return nullptr;
-    }
-    c->container_ = this;
-    c->parameters_ = key.parameters_;
-    insert(make_pair(key, c));
-    c->update();
-    return c;
-  }
-
-  OptimizableGraph::Vertex* CacheContainer::vertex() const {
-    return vertex_;
-  }
-
-  void CacheContainer::update() {
-    for (auto & it : *this){
-      (it.second)->update();
-    }
-    updateNeeded_=false;
-  }
-
-  void CacheContainer::setUpdateNeeded(bool needUpdate) {
-    updateNeeded_=needUpdate;
-    for (auto & it : *this){
-      (it.second)->updateNeeded_ = needUpdate;
-    }
-  }
-
-} // end namespace
+}  // namespace g2o

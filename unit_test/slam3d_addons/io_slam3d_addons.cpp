@@ -49,7 +49,9 @@ struct RandomPlane3D {
 
 struct RandomLine3D {
   static Line3D create() { return Line3D(Vector6::Random()); }
-  static bool isApprox(const Line3D& a, const Line3D& b) { return a.isApprox(b, 1e-5); }
+  static bool isApprox(const Line3D& a, const Line3D& b) {
+    return a.isApprox(b, 1e-5);
+  }
 };
 
 class IoSlam3dAddonsParam : public ::testing::Test {

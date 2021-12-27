@@ -26,29 +26,30 @@
 
 #ifndef G2O_SENSOR_POSE3D_H_
 #define G2O_SENSOR_POSE3D_H_
-#include "simulator3d_base.h"
-#include "pointsensorparameters.h"
 #include "g2o_simulator_api.h"
+#include "pointsensorparameters.h"
+#include "simulator3d_base.h"
 
 namespace g2o {
 
-  class G2O_SIMULATOR_API SensorPose3D : public PointSensorParameters, public BinarySensor<Robot3D, EdgeSE3, WorldObjectSE3>  {
-  public:
-    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+class G2O_SIMULATOR_API SensorPose3D
+    : public PointSensorParameters,
+      public BinarySensor<Robot3D, EdgeSE3, WorldObjectSE3> {
+ public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   explicit SensorPose3D(const std::string& name);
-    void sense() override;
-    int stepsToIgnore() const {return stepsToIgnore_;}
-    void setStepsToIgnore(int stepsToIgnore) {stepsToIgnore_ = stepsToIgnore;}
-    void addNoise(EdgeType* e) override;
+  void sense() override;
+  int stepsToIgnore() const { return stepsToIgnore_; }
+  void setStepsToIgnore(int stepsToIgnore) { stepsToIgnore_ = stepsToIgnore; }
+  void addNoise(EdgeType* e) override;
 
-  protected:
+ protected:
+  bool isVisible(WorldObjectType* to);
+  int stepsToIgnore_;
+  // these are temporaries
+  std::set<PoseObject*> posesToIgnore_;
+};
 
-    bool isVisible(WorldObjectType* to);
-    int stepsToIgnore_;
-    // these are temporaries
-    std::set<PoseObject*> posesToIgnore_;
-  };
-
-}
+}  // namespace g2o
 
 #endif

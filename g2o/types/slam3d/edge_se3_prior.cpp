@@ -33,7 +33,7 @@
 namespace g2o {
 
 // point to camera projection, monocular
-EdgeSE3Prior::EdgeSE3Prior()  {
+EdgeSE3Prior::EdgeSE3Prior() {
   setMeasurement(Isometry3::Identity());
   information().setIdentity();
   resizeParameters(1);
@@ -85,18 +85,21 @@ bool EdgeSE3Prior::setMeasurementFromState() {
   return true;
 }
 
-void EdgeSE3Prior::initialEstimate(const OptimizableGraph::VertexSet& /*from_*/, OptimizableGraph::Vertex* /*to_*/) {
+void EdgeSE3Prior::initialEstimate(const OptimizableGraph::VertexSet& /*from_*/,
+                                   OptimizableGraph::Vertex* /*to_*/) {
   VertexSE3* v = vertexXnRaw<0>();
   assert(v && "Vertex for the Prior edge is not set");
 
-  Isometry3 newEstimate = cache_->offsetParam()->offset().inverse() * measurement();
+  Isometry3 newEstimate =
+      cache_->offsetParam()->offset().inverse() * measurement();
   // do not set translation, as that part of the information is all zero
   if (information_.block<3, 3>(0, 0).array().abs().sum() == 0) {
     newEstimate.translation() = v->estimate().translation();
   }
   // do not set rotation, as that part of the information is all zero
   if (information_.block<3, 3>(3, 3).array().abs().sum() == 0) {
-    newEstimate.matrix().block<3, 3>(0, 0) = internal::extractRotation(v->estimate());
+    newEstimate.matrix().block<3, 3>(0, 0) =
+        internal::extractRotation(v->estimate());
   }
   v->setEstimate(newEstimate);
 }

@@ -34,11 +34,11 @@
 #endif
 
 #ifdef G2O_OPENGL_FOUND
-# ifdef __APPLE__
-#  include <OpenGL/gl.h>
-# else
-#  include <GL/gl.h>
-# endif
+#ifdef __APPLE__
+#include <OpenGL/gl.h>
+#else
+#include <GL/gl.h>
+#endif
 #endif
 
 #endif

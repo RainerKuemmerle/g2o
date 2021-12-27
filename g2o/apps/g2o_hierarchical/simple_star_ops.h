@@ -39,28 +39,32 @@
 
 namespace g2o {
 
-G2O_HIERARCHICAL_API void constructEdgeStarMap(EdgeStarMap& esmap, StarSet& stars, bool low = true);
+G2O_HIERARCHICAL_API void constructEdgeStarMap(EdgeStarMap& esmap,
+                                               StarSet& stars, bool low = true);
 
-G2O_HIERARCHICAL_API size_t vertexEdgesInStar(HyperGraph::EdgeSet& eset,
-                                              const std::shared_ptr<OptimizableGraph::Vertex>& v,
-                                              const std::shared_ptr<Star>& s, EdgeStarMap& esmap);
+G2O_HIERARCHICAL_API size_t
+vertexEdgesInStar(HyperGraph::EdgeSet& eset,
+                  const std::shared_ptr<OptimizableGraph::Vertex>& v,
+                  const std::shared_ptr<Star>& s, EdgeStarMap& esmap);
 
-G2O_HIERARCHICAL_API void starsInVertex(StarSet& stars,
-                                        const std::shared_ptr<OptimizableGraph::Vertex>& v,
-                                        EdgeStarMap& esmap);
+G2O_HIERARCHICAL_API void starsInVertex(
+    StarSet& stars, const std::shared_ptr<OptimizableGraph::Vertex>& v,
+    EdgeStarMap& esmap);
 
-G2O_HIERARCHICAL_API void assignHierarchicalEdges(StarSet& stars, EdgeStarMap& esmap,
-                                                  EdgeLabeler* labeler, EdgeCreator* creator,
-                                                  SparseOptimizer* optimizer, int minNumEdges,
-                                                  int maxIterations);
+G2O_HIERARCHICAL_API void assignHierarchicalEdges(
+    StarSet& stars, EdgeStarMap& esmap, EdgeLabeler* labeler,
+    EdgeCreator* creator, SparseOptimizer* optimizer, int minNumEdges,
+    int maxIterations);
 
 G2O_HIERARCHICAL_API void computeBorder(StarSet& stars, EdgeStarMap& hesmap);
 
 G2O_HIERARCHICAL_API void computeSimpleStars(
-    StarSet& stars, SparseOptimizer* optimizer, EdgeLabeler* labeler, EdgeCreator* creator,
-    const std::shared_ptr<OptimizableGraph::Vertex>& gauge_, const std::string& edgeTag,
-    const std::string& vertexTag, int level, int step, int backboneIterations = 1,
-    int starIterations = 30, double rejectionThreshold = 1e-5, bool debug = false);
+    StarSet& stars, SparseOptimizer* optimizer, EdgeLabeler* labeler,
+    EdgeCreator* creator,
+    const std::shared_ptr<OptimizableGraph::Vertex>& gauge_,
+    const std::string& edgeTag, const std::string& vertexTag, int level,
+    int step, int backboneIterations = 1, int starIterations = 30,
+    double rejectionThreshold = 1e-5, bool debug = false);
 
 }  // namespace g2o
 #endif

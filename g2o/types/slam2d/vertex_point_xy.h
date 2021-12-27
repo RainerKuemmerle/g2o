@@ -27,84 +27,77 @@
 #ifndef G2O_VERTEX_POINT_XY_H
 #define G2O_VERTEX_POINT_XY_H
 
-#include "g2o_types_slam2d_api.h"
+#include <Eigen/Core>
+
 #include "g2o/config.h"
 #include "g2o/core/base_vertex.h"
 #include "g2o/core/hyper_graph_action.h"
-
-#include <Eigen/Core>
+#include "g2o_types_slam2d_api.h"
 
 namespace g2o {
 
-  class G2O_TYPES_SLAM2D_API VertexPointXY : public BaseVertex<2, Vector2>
-  {
-    public:
-      EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
-      VertexPointXY();
+class G2O_TYPES_SLAM2D_API VertexPointXY : public BaseVertex<2, Vector2> {
+ public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
+  VertexPointXY();
 
-      void setToOriginImpl() override {
-        estimate_.setZero();
-      }
+  void setToOriginImpl() override { estimate_.setZero(); }
 
-      bool setEstimateDataImpl(const number_t* est) override{
-        estimate_[0] = est[0];
-        estimate_[1] = est[1];
-        return true;
-      }
+  bool setEstimateDataImpl(const number_t* est) override {
+    estimate_[0] = est[0];
+    estimate_[1] = est[1];
+    return true;
+  }
 
-      bool getEstimateData(number_t* est) const override{
-        est[0] = estimate_[0];
-        est[1] = estimate_[1];
-        return true;
-      }
+  bool getEstimateData(number_t* est) const override {
+    est[0] = estimate_[0];
+    est[1] = estimate_[1];
+    return true;
+  }
 
-      int estimateDimension() const override {
-        return 2;
-      }
+  int estimateDimension() const override { return 2; }
 
-      bool setMinimalEstimateDataImpl(const number_t* est) override{
-        return setEstimateData(est);
-      }
+  bool setMinimalEstimateDataImpl(const number_t* est) override {
+    return setEstimateData(est);
+  }
 
-      bool getMinimalEstimateData(number_t* est) const override{
-        return getEstimateData(est);
-      }
+  bool getMinimalEstimateData(number_t* est) const override {
+    return getEstimateData(est);
+  }
 
-      int minimalEstimateDimension() const override {
-        return 2;
-      }
+  int minimalEstimateDimension() const override { return 2; }
 
-      void oplusImpl(const number_t* update) override
-      {
-        estimate_[0] += update[0];
-        estimate_[1] += update[1];
-      }
+  void oplusImpl(const number_t* update) override {
+    estimate_[0] += update[0];
+    estimate_[1] += update[1];
+  }
 
-      bool read(std::istream& is) override;
-      bool write(std::ostream& os) const override;
+  bool read(std::istream& is) override;
+  bool write(std::ostream& os) const override;
+};
 
-  };
-
-  class G2O_TYPES_SLAM2D_API VertexPointXYWriteGnuplotAction: public WriteGnuplotAction {
-  public:
-    VertexPointXYWriteGnuplotAction();
-    bool operator()(HyperGraph::HyperGraphElement* element,
-                            HyperGraphElementAction::Parameters* params) override;
-  };
+class G2O_TYPES_SLAM2D_API VertexPointXYWriteGnuplotAction
+    : public WriteGnuplotAction {
+ public:
+  VertexPointXYWriteGnuplotAction();
+  bool operator()(HyperGraph::HyperGraphElement* element,
+                  HyperGraphElementAction::Parameters* params) override;
+};
 
 #ifdef G2O_HAVE_OPENGL
-  class G2O_TYPES_SLAM2D_API VertexPointXYDrawAction: public DrawAction{
-  public:
-    VertexPointXYDrawAction();
-    bool operator()(HyperGraph::HyperGraphElement* element,
-                            HyperGraphElementAction::Parameters* params) override;
+class G2O_TYPES_SLAM2D_API VertexPointXYDrawAction : public DrawAction {
+ public:
+  VertexPointXYDrawAction();
+  bool operator()(HyperGraph::HyperGraphElement* element,
+                  HyperGraphElementAction::Parameters* params) override;
 
-   protected:
-    std::shared_ptr<FloatProperty> pointSize_;
-    bool refreshPropertyPtrs(HyperGraphElementAction::Parameters* params) override;
-  };
+ protected:
+  std::shared_ptr<FloatProperty> pointSize_;
+  bool refreshPropertyPtrs(
+      HyperGraphElementAction::Parameters* params) override;
+};
 #endif
 
-}
+}  // namespace g2o
 
 #endif

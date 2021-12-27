@@ -83,31 +83,38 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
   };
 
   /**
-   * \brief order edges based on the internal ID, which is assigned to the edge in addEdge()
+   * \brief order edges based on the internal ID, which is assigned to the edge
+   * in addEdge()
    */
   struct G2O_CORE_API EdgeIDCompare {
     bool operator()(const Edge* e1, const Edge* e2) const {
       return e1->internalId() < e2->internalId();
     }
-    bool operator()(const HyperGraph::Edge* e1, const HyperGraph::Edge* e2) const {
-      return operator()(static_cast<const Edge*>(e1), static_cast<const Edge*>(e2));
+    bool operator()(const HyperGraph::Edge* e1,
+                    const HyperGraph::Edge* e2) const {
+      return operator()(static_cast<const Edge*>(e1),
+                        static_cast<const Edge*>(e2));
     }
     bool operator()(const std::shared_ptr<OptimizableGraph::Edge>& e1,
                     const HyperGraph::Edge* e2) const {
-      return operator()(static_cast<const Edge*>(e1.get()), static_cast<const Edge*>(e2));
+      return operator()(static_cast<const Edge*>(e1.get()),
+                        static_cast<const Edge*>(e2));
     }
     bool operator()(const std::shared_ptr<OptimizableGraph::Edge>& e1,
                     const std::shared_ptr<OptimizableGraph::Edge>& e2) const {
-      return operator()(static_cast<const Edge*>(e1.get()), static_cast<const Edge*>(e2.get()));
+      return operator()(static_cast<const Edge*>(e1.get()),
+                        static_cast<const Edge*>(e2.get()));
     }
     bool operator()(const std::shared_ptr<HyperGraph::Edge>& e1,
                     const std::shared_ptr<HyperGraph::Edge>& e2) const {
-      return operator()(static_cast<const Edge*>(e1.get()), static_cast<const Edge*>(e2.get()));
+      return operator()(static_cast<const Edge*>(e1.get()),
+                        static_cast<const Edge*>(e2.get()));
     }
   };
 
   //! vector container for vertices
-  using VertexContainer = std::vector<std::shared_ptr<OptimizableGraph::Vertex>>;
+  using VertexContainer =
+      std::vector<std::shared_ptr<OptimizableGraph::Vertex>>;
   using VertexContainerRaw = std::vector<OptimizableGraph::Vertex*>;
   //! vector container for edges
   using EdgeContainer = std::vector<std::shared_ptr<OptimizableGraph::Edge>>;
@@ -115,7 +122,8 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
   /**
    * \brief A general case Vertex for optimization
    */
-  class G2O_CORE_API Vertex : public HyperGraph::Vertex, public HyperGraph::DataContainer {
+  class G2O_CORE_API Vertex : public HyperGraph::Vertex,
+                              public HyperGraph::DataContainer {
    private:
     friend struct OptimizableGraph;
 
@@ -218,8 +226,8 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
       // If dim is -ve, getEstimateData is not implemented and fails
       if (dim < 0) return false;
 
-      // If the vector isn't the right size to store the estimate, try to resize it.
-      // This only works if the vector is dynamic. If it is static, fail.
+      // If the vector isn't the right size to store the estimate, try to resize
+      // it. This only works if the vector is dynamic. If it is static, fail.
       if (estimate.size() != dim) {
         if ((estimate.RowsAtCompileTime == Eigen::Dynamic) ||
             (estimate.ColsAtCompileTime == Eigen::Dynamic))
@@ -231,8 +239,8 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
     };
 
     /**
-     * returns the dimension of the extended representation used by get/setEstimate(number_t*)
-     * -1 if it is not supported
+     * returns the dimension of the extended representation used by
+     * get/setEstimate(number_t*) -1 if it is not supported
      */
     virtual int estimateDimension() const;
 
@@ -293,8 +301,8 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
       // If dim is -ve, getMinimalEstimateData is not implemented and fails
       if (dim < 0) return false;
 
-      // If the vector isn't the right size to store the estimate, try to resize it.
-      // This only works if the vector is dynamic. If it is static, fail.
+      // If the vector isn't the right size to store the estimate, try to resize
+      // it. This only works if the vector is dynamic. If it is static, fail.
       if (estimate.size() != dim) {
         if ((estimate.RowsAtCompileTime == Eigen::Dynamic) ||
             (estimate.ColsAtCompileTime == Eigen::Dynamic))
@@ -306,18 +314,20 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
     };
 
     /**
-     * returns the dimension of the extended representation used by get/setEstimate(number_t*)
-     * -1 if it is not supported
+     * returns the dimension of the extended representation used by
+     * get/setEstimate(number_t*) -1 if it is not supported
      */
     virtual int minimalEstimateDimension() const;
 
     //! backup the position of the vertex to a stack
     virtual void push() = 0;
 
-    //! restore the position of the vertex by retrieving the position from the stack
+    //! restore the position of the vertex by retrieving the position from the
+    //! stack
     virtual void pop() = 0;
 
-    //! pop the last element from the stack, without restoring the current estimate
+    //! pop the last element from the stack, without restoring the current
+    //! estimate
     virtual void discardTop() = 0;
 
     //! return the stack size
@@ -325,16 +335,17 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
 
     /**
      * Update the position of the node from the parameters in v.
-     * Depends on the implementation of oplusImpl in derived classes to actually carry
-     * out the update.
-     * Will also call updateCache() to update the caches of depending on the vertex.
+     * Depends on the implementation of oplusImpl in derived classes to actually
+     * carry out the update. Will also call updateCache() to update the caches
+     * of depending on the vertex.
      */
     void oplus(const number_t* v) {
       oplusImpl(v);
       updateCache();
     }
 
-    //! temporary index of this node in the parameter vector obtained from linearization
+    //! temporary index of this node in the parameter vector obtained from
+    //! linearization
     int hessianIndex() const { return hessianIndex_; }
     //! set the temporary index of the vertex in the parameter blocks
     void setHessianIndex(int ti) { hessianIndex_ = ti; }
@@ -352,8 +363,8 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
     //! dimension of the estimated state belonging to this node
     int dimension() const { return dimension_; }
 
-    //! sets the id of the node in the graph be sure that the graph keeps consistent after changing
-    //! the id
+    //! sets the id of the node in the graph be sure that the graph keeps
+    //! consistent after changing the id
     void setId(int id) override { id_ = id; }
 
     //! set the row of this vertex in the Hessian
@@ -365,12 +376,13 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
     OptimizableGraph* graph() { return graph_; }
 
     /**
-     * lock for the block of the hessian and the b vector associated with this vertex, to avoid
-     * race-conditions if multi-threaded.
+     * lock for the block of the hessian and the b vector associated with this
+     * vertex, to avoid race-conditions if multi-threaded.
      */
     void lockQuadraticForm() { quadraticFormMutex_.lock(); }
     /**
-     * unlock the block of the hessian and the b vector associated with this vertex
+     * unlock the block of the hessian and the b vector associated with this
+     * vertex
      */
     void unlockQuadraticForm() { quadraticFormMutex_.unlock(); }
 
@@ -416,7 +428,8 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
     virtual bool setMinimalEstimateDataImpl(const number_t*) { return false; }
   };
 
-  class G2O_CORE_API Edge : public HyperGraph::Edge, public HyperGraph::DataContainer {
+  class G2O_CORE_API Edge : public HyperGraph::Edge,
+                            public HyperGraph::DataContainer {
    private:
     friend struct OptimizableGraph;
 
@@ -438,13 +451,13 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
     //! @returns true on success
     virtual bool getMeasurementData(number_t* m) const;
 
-    //! returns the dimension of the measurement in the extended representation which is used
-    //! by get/setMeasurement;
+    //! returns the dimension of the measurement in the extended representation
+    //! which is used by get/setMeasurement;
     virtual int measurementDimension() const;
 
     /**
-     * sets the estimate to have a zero error, based on the current value of the state variables
-     * returns false if not supported.
+     * sets the estimate to have a zero error, based on the current value of the
+     * state variables returns false if not supported.
      */
     virtual bool setMeasurementFromState();
 
@@ -459,12 +472,13 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
     virtual const number_t* errorData() const = 0;
     virtual number_t* errorData() = 0;
 
-    //! returns the memory of the information matrix, usable for example with a Eigen::Map<MatrixX>
+    //! returns the memory of the information matrix, usable for example with a
+    //! Eigen::Map<MatrixX>
     virtual const number_t* informationData() const = 0;
     virtual number_t* informationData() = 0;
 
-    //! computes the chi2 based on the cached error value, only valid after computeError has been
-    //! called.
+    //! computes the chi2 based on the cached error value, only valid after
+    //! computeError has been called.
     virtual number_t chi2() const = 0;
 
     /**
@@ -481,8 +495,8 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
      * @param d the memory location to which we map
      * @param i index of the vertex i
      * @param j index of the vertex j (j > i, upper triangular fashion)
-     * @param rowMajor if true, will write in rowMajor order to the block. Since EIGEN is
-     * columnMajor by default, this results in writing the transposed
+     * @param rowMajor if true, will write in rowMajor order to the block. Since
+     * EIGEN is columnMajor by default, this results in writing the transposed
      */
     virtual void mapHessianMemory(number_t* d, int i, int j, bool rowMajor) = 0;
 
@@ -492,18 +506,20 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
      */
     virtual void linearizeOplus(JacobianWorkspace& jacobianWorkspace) = 0;
 
-    /** set the estimate of the to vertex, based on the estimate of the from vertices in the edge.
+    /** set the estimate of the to vertex, based on the estimate of the from
+     * vertices in the edge.
      */
     virtual void initialEstimate(const OptimizableGraph::VertexSet& from,
                                  OptimizableGraph::Vertex* to) = 0;
 
     /**
-     * override in your class if it's possible to initialize the vertices in certain combinations.
-     * The return value may correspond to the cost for initiliaizng the vertex but should be
-     * positive if the initialization is possible and negative if not possible.
+     * override in your class if it's possible to initialize the vertices in
+     * certain combinations. The return value may correspond to the cost for
+     * initiliaizng the vertex but should be positive if the initialization is
+     * possible and negative if not possible.
      */
-    virtual number_t initialEstimatePossible(const OptimizableGraph::VertexSet& from,
-                                             OptimizableGraph::Vertex* to) {
+    virtual number_t initialEstimatePossible(
+        const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to) {
       (void)from;
       (void)to;
       return -1.;
@@ -531,7 +547,9 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
     const OptimizableGraph* graph() const;
 
     bool setParameterId(int argNum, int paramId);
-    std::shared_ptr<Parameter> parameter(int argNo) const { return parameters_.at(argNo); }
+    std::shared_ptr<Parameter> parameter(int argNo) const {
+      return parameters_.at(argNo);
+    }
     size_t numParameters() const { return parameters_.size(); }
 
     const std::vector<int>& parameterIds() const { return parameterIds_; }
@@ -558,7 +576,8 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
 
     template <typename CacheType>
     void resolveCache(std::shared_ptr<CacheType>& cache,
-                      const std::shared_ptr<OptimizableGraph::Vertex>& v, const std::string& type,
+                      const std::shared_ptr<OptimizableGraph::Vertex>& v,
+                      const std::string& type,
                       const ParameterVector& parameters);
 
     bool resolveParameters();
@@ -579,7 +598,8 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
 
   /**
    * adds a new vertex.
-   * @return false if a vertex with the same id as v is already in the graph, true otherwise.
+   * @return false if a vertex with the same id as v is already in the graph,
+   * true otherwise.
    */
   virtual bool addVertex(const std::shared_ptr<HyperGraph::Vertex>& v,
                          const std::shared_ptr<HyperGraph::Data>& userData);
@@ -588,24 +608,29 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
     return addVertex(v, noData);
   }
 
-  //! removes a vertex from the graph. Returns true on success (vertex was present)
-  bool removeVertex(const std::shared_ptr<HyperGraph::Vertex>& v, bool detach = false) override;
+  //! removes a vertex from the graph. Returns true on success (vertex was
+  //! present)
+  bool removeVertex(const std::shared_ptr<HyperGraph::Vertex>& v,
+                    bool detach = false) override;
 
   /**
    * adds a new edge.
-   * The edge should point to the vertices that it is connecting (setFrom/setTo).
-   * @return false if the insertion does not work (incompatible types of the vertices/missing
-   * vertex). true otherwise.
+   * The edge should point to the vertices that it is connecting
+   * (setFrom/setTo).
+   * @return false if the insertion does not work (incompatible types of the
+   * vertices/missing vertex). true otherwise.
    */
   // virtual bool addEdge(const std::shared_ptr<HyperGraph::Edge>& e);
   bool addEdge(const std::shared_ptr<HyperGraph::Edge>& e) override;
 
   /**
-   * overridden from HyperGraph, to mantain the bookkeeping of the caches/parameters and jacobian
-   * workspaces consistent upon a change in the veretx.
+   * overridden from HyperGraph, to mantain the bookkeeping of the
+   * caches/parameters and jacobian workspaces consistent upon a change in the
+   * veretx.
    * @return false if something goes wrong.
    */
-  bool setEdgeVertex(const std::shared_ptr<HyperGraph::Edge>& e, int pos, const std::shared_ptr<HyperGraph::Vertex>& v) override;
+  bool setEdgeVertex(const std::shared_ptr<HyperGraph::Edge>& e, int pos,
+                     const std::shared_ptr<HyperGraph::Vertex>& v) override;
 
   //! returns the chi2 of the current configuration
   number_t chi2() const;
@@ -615,10 +640,13 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
 
   //! Recompute the size of the Jacobian workspace from all the
   //! edges in the graph.
-  void recomputeJacobianWorkspaceSize() { jacobianWorkspace_.updateSize(*this, true); }
+  void recomputeJacobianWorkspaceSize() {
+    jacobianWorkspace_.updateSize(*this, true);
+  }
 
   /**
-   * iterates over all vertices and returns a set of all the vertex dimensions in the graph
+   * iterates over all vertices and returns a set of all the vertex dimensions
+   * in the graph
    */
   std::set<int> dimensions() const;
 
@@ -628,9 +656,11 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
    */
   virtual int optimize(int iterations, bool online = false);
 
-  //! called at the beginning of an iteration (argument is the number of the iteration)
+  //! called at the beginning of an iteration (argument is the number of the
+  //! iteration)
   virtual void preIteration(int);
-  //! called at the end of an iteration (argument is the number of the iteration)
+  //! called at the end of an iteration (argument is the number of the
+  //! iteration)
   virtual void postIteration(int);
 
   //! add an action to be executed before each iteration
@@ -639,18 +669,22 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
   bool addPostIterationAction(const std::shared_ptr<HyperGraphAction>& action);
 
   //! remove an action that should no longer be execured before each iteration
-  bool removePreIterationAction(const std::shared_ptr<HyperGraphAction>& action);
+  bool removePreIterationAction(
+      const std::shared_ptr<HyperGraphAction>& action);
   //! remove an action that should no longer be execured after each iteration
-  bool removePostIterationAction(const std::shared_ptr<HyperGraphAction>& action);
+  bool removePostIterationAction(
+      const std::shared_ptr<HyperGraphAction>& action);
 
   //! push the estimate of all variables onto a stack
   virtual void push();
   //! pop (restore) the estimate of all variables from the stack
   virtual void pop();
-  //! discard the last backup of the estimate for all variables by removing it from the stack
+  //! discard the last backup of the estimate for all variables by removing it
+  //! from the stack
   virtual void discardTop();
 
-  //! load the graph from a stream. Uses the Factory singleton for creating the vertices and edges.
+  //! load the graph from a stream. Uses the Factory singleton for creating the
+  //! vertices and edges.
   virtual bool load(std::istream& is);
   bool load(const char* filename);
   //! save the graph to a stream. Again uses the Factory system.
@@ -668,8 +702,8 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
   virtual void push(HyperGraph::VertexSet& vset);
   //! pop (restore) the estimate a subset of the variables from the stack
   virtual void pop(HyperGraph::VertexSet& vset);
-  //! ignore the latest stored element on the stack, remove it from the stack but do not restore the
-  //! estimate
+  //! ignore the latest stored element on the stack, remove it from the stack
+  //! but do not restore the estimate
   virtual void discardTop(HyperGraph::VertexSet& vset);
 
   //! fixes/releases a set of vertices
@@ -678,14 +712,16 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
   /**
    * set the renamed types lookup from a string, format is for example:
    * VERTEX_CAM=VERTEX_SE3:EXPMAP,EDGE_PROJECT_P2MC=EDGE_PROJECT_XYZ:EXPMAP
-   * This will change the occurance of VERTEX_CAM in the file to VERTEX_SE3:EXPMAP
+   * This will change the occurance of VERTEX_CAM in the file to
+   * VERTEX_SE3:EXPMAP
    */
   void setRenamedTypesFromString(const std::string& types);
 
   /**
    * test whether a solver is suitable for optimizing this graph.
    * @param solverProperty the solver property to evaluate.
-   * @param vertDims should equal to the set returned by dimensions() to avoid re-evaluating.
+   * @param vertDims should equal to the set returned by dimensions() to avoid
+   * re-evaluating.
    */
   bool isSolverSuitable(const OptimizationAlgorithmProperty& solverProperty,
                         const std::set<int>& vertDims = std::set<int>()) const;
@@ -697,13 +733,17 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
    */
   virtual void clearParameters();
 
-  bool addParameter(const std::shared_ptr<Parameter>& p) { return parameters_.addParameter(p); }
+  bool addParameter(const std::shared_ptr<Parameter>& p) {
+    return parameters_.addParameter(p);
+  }
 
-  std::shared_ptr<Parameter> parameter(int id) { return parameters_.getParameter(id); }
+  std::shared_ptr<Parameter> parameter(int id) {
+    return parameters_.getParameter(id);
+  }
 
   /**
-   * verify that all the information of the edges are semi positive definite, i.e.,
-   * all Eigenvalues are >= 0.
+   * verify that all the information of the edges are semi positive definite,
+   * i.e., all Eigenvalues are >= 0.
    * @param verbose output edges with not PSD information matrix on cerr
    * @return true if all edges have PSD information matrix
    */
@@ -711,7 +751,9 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
 
   //! the workspace for storing the Jacobians of the graph
   JacobianWorkspace& jacobianWorkspace() { return jacobianWorkspace_; }
-  const JacobianWorkspace& jacobianWorkspace() const { return jacobianWorkspace_; }
+  const JacobianWorkspace& jacobianWorkspace() const {
+    return jacobianWorkspace_;
+  }
 
   /**
    * Eigen starting from version 3.1 requires that we call an initialize
@@ -727,8 +769,9 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
   //! apply a unary function to all vertices
   void forEachVertex(const std::function<void(OptimizableGraph::Vertex*)>& fn);
   //! apply a unary function to the vertices in vset
-  static void forEachVertex(HyperGraph::VertexSet& vset,
-                            const std::function<void(OptimizableGraph::Vertex*)>& fn);
+  static void forEachVertex(
+      HyperGraph::VertexSet& vset,
+      const std::function<void(OptimizableGraph::Vertex*)>& fn);
 
  protected:
   std::map<std::string, std::string> renamedTypesLookup_;

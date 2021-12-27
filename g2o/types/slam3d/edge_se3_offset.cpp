@@ -25,84 +25,90 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "edge_se3_offset.h"
-#include "isometry3d_gradients.h"
-#include "parameter_se3_offset.h"
 
 #include <iostream>
 
+#include "isometry3d_gradients.h"
+#include "parameter_se3_offset.h"
+
 namespace g2o {
 
-  EdgeSE3Offset::EdgeSE3Offset()  {
-    information().setIdentity();
-    resizeParameters(2);
-    installParameter<CacheSE3Offset::ParameterType>(0);
-    installParameter<CacheSE3Offset::ParameterType>(1);
-  }
-
-  bool EdgeSE3Offset::resolveCaches(){
-    ParameterVector pv(1);
-    pv[0] = parameters_[0];
-    resolveCache(cacheFrom_, vertexXn<0>(), "CACHE_SE3_OFFSET", pv);
-    pv[0] = parameters_[1];
-    resolveCache(cacheTo_, vertexXn<0>(), "CACHE_SE3_OFFSET", pv);
-    return (cacheFrom_ && cacheTo_);
-  }
-
-  bool EdgeSE3Offset::read(std::istream& is) {
-    bool state = readParamIds(is);
-
-    Vector7 meas;
-    state &= internal::readVector(is, meas);
-    // normalize the quaternion to recover numerical precision lost by storing as human readable text
-    Vector4::MapType(meas.data() + 3).normalize();
-    setMeasurement(internal::fromVectorQT(meas));
-
-    state &= readInformationMatrix(is);
-    return state;
-  }
-
-  bool EdgeSE3Offset::write(std::ostream& os) const {
-    writeParamIds(os);
-    internal::writeVector(os, internal::toVectorQT(measurement_));
-    writeInformationMatrix(os);
-    return os.good();
-  }
-
-  void EdgeSE3Offset::computeError() {
-    Isometry3 delta=inverseMeasurement_ * cacheFrom_->w2n() * cacheTo_->n2w();
-    error_=internal::toVectorMQT(delta);
-  }
-
-  bool EdgeSE3Offset::setMeasurementFromState(){
-    Isometry3 delta = cacheFrom_->w2n() * cacheTo_->n2w();
-    setMeasurement(delta);
-    return true;
-  }
-
-  void EdgeSE3Offset::linearizeOplus() {
-    // BaseBinaryEdge<6, SE3Quat, VertexSE3, VertexSE3>::linearizeOplus();
-
-    VertexSE3* from = vertexXnRaw<0>();
-    VertexSE3* to = vertexXnRaw<1>();
-    Isometry3 E;
-    const Isometry3& Xi = from->estimate();
-    const Isometry3& Xj = to->estimate();
-    const Isometry3& Pi = cacheFrom_->offsetParam()->offset();
-    const Isometry3& Pj = cacheTo_->offsetParam()->offset();
-    const Isometry3& Z = measurement_;
-    internal::computeEdgeSE3Gradient(E, jacobianOplusXi_, jacobianOplusXj_, Z, Xi, Xj, Pi, Pj);
-  }
-
-  void EdgeSE3Offset::initialEstimate(const OptimizableGraph::VertexSet& from_, OptimizableGraph::Vertex* /*to_*/) {
-    VertexSE3* from = vertexXnRaw<0>();
-    VertexSE3* to = vertexXnRaw<1>();
-
-    Isometry3 virtualMeasurement = cacheFrom_->offsetParam()->offset() * measurement() * cacheTo_->offsetParam()->offset().inverse();
-
-    if (from_.count(vertexXn<0>()) > 0) {
-      to->setEstimate(from->estimate() * virtualMeasurement);
-    } else
-      from->setEstimate(to->estimate() * virtualMeasurement.inverse());
-  }
-
+EdgeSE3Offset::EdgeSE3Offset() {
+  information().setIdentity();
+  resizeParameters(2);
+  installParameter<CacheSE3Offset::ParameterType>(0);
+  installParameter<CacheSE3Offset::ParameterType>(1);
 }
+
+bool EdgeSE3Offset::resolveCaches() {
+  ParameterVector pv(1);
+  pv[0] = parameters_[0];
+  resolveCache(cacheFrom_, vertexXn<0>(), "CACHE_SE3_OFFSET", pv);
+  pv[0] = parameters_[1];
+  resolveCache(cacheTo_, vertexXn<0>(), "CACHE_SE3_OFFSET", pv);
+  return (cacheFrom_ && cacheTo_);
+}
+
+bool EdgeSE3Offset::read(std::istream& is) {
+  bool state = readParamIds(is);
+
+  Vector7 meas;
+  state &= internal::readVector(is, meas);
+  // normalize the quaternion to recover numerical precision lost by storing as
+  // human readable text
+  Vector4::MapType(meas.data() + 3).normalize();
+  setMeasurement(internal::fromVectorQT(meas));
+
+  state &= readInformationMatrix(is);
+  return state;
+}
+
+bool EdgeSE3Offset::write(std::ostream& os) const {
+  writeParamIds(os);
+  internal::writeVector(os, internal::toVectorQT(measurement_));
+  writeInformationMatrix(os);
+  return os.good();
+}
+
+void EdgeSE3Offset::computeError() {
+  Isometry3 delta = inverseMeasurement_ * cacheFrom_->w2n() * cacheTo_->n2w();
+  error_ = internal::toVectorMQT(delta);
+}
+
+bool EdgeSE3Offset::setMeasurementFromState() {
+  Isometry3 delta = cacheFrom_->w2n() * cacheTo_->n2w();
+  setMeasurement(delta);
+  return true;
+}
+
+void EdgeSE3Offset::linearizeOplus() {
+  // BaseBinaryEdge<6, SE3Quat, VertexSE3, VertexSE3>::linearizeOplus();
+
+  VertexSE3* from = vertexXnRaw<0>();
+  VertexSE3* to = vertexXnRaw<1>();
+  Isometry3 E;
+  const Isometry3& Xi = from->estimate();
+  const Isometry3& Xj = to->estimate();
+  const Isometry3& Pi = cacheFrom_->offsetParam()->offset();
+  const Isometry3& Pj = cacheTo_->offsetParam()->offset();
+  const Isometry3& Z = measurement_;
+  internal::computeEdgeSE3Gradient(E, jacobianOplusXi_, jacobianOplusXj_, Z, Xi,
+                                   Xj, Pi, Pj);
+}
+
+void EdgeSE3Offset::initialEstimate(const OptimizableGraph::VertexSet& from_,
+                                    OptimizableGraph::Vertex* /*to_*/) {
+  VertexSE3* from = vertexXnRaw<0>();
+  VertexSE3* to = vertexXnRaw<1>();
+
+  Isometry3 virtualMeasurement = cacheFrom_->offsetParam()->offset() *
+                                 measurement() *
+                                 cacheTo_->offsetParam()->offset().inverse();
+
+  if (from_.count(vertexXn<0>()) > 0) {
+    to->setEstimate(from->estimate() * virtualMeasurement);
+  } else
+    from->setEstimate(to->estimate() * virtualMeasurement.inverse());
+}
+
+}  // namespace g2o

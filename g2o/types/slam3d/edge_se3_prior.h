@@ -38,21 +38,22 @@ namespace g2o {
 /**
  * \brief prior for an SE3 element
  *
- * Provides a prior for a 3d pose vertex. Again the measurement is represented by an
- * Isometry3 matrix.
+ * Provides a prior for a 3d pose vertex. Again the measurement is represented
+ * by an Isometry3 matrix.
  */
-class G2O_TYPES_SLAM3D_API EdgeSE3Prior : public BaseUnaryEdge<6, Isometry3, VertexSE3> {
+class G2O_TYPES_SLAM3D_API EdgeSE3Prior
+    : public BaseUnaryEdge<6, Isometry3, VertexSE3> {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   EdgeSE3Prior();
-  bool read(std::istream& is) override ;
-  bool write(std::ostream& os) const override ;
+  bool read(std::istream& is) override;
+  bool write(std::ostream& os) const override;
 
   // return the error estimate as a 3-vector
-  void computeError() override ;
+  void computeError() override;
 
   // jacobian
-  void linearizeOplus() override ;
+  void linearizeOplus() override;
 
   void setMeasurement(const Isometry3& m) override {
     measurement_ = m;
@@ -74,18 +75,19 @@ class G2O_TYPES_SLAM3D_API EdgeSE3Prior : public BaseUnaryEdge<6, Isometry3, Ver
 
   int measurementDimension() const override { return 7; }
 
-  bool setMeasurementFromState() override ;
+  bool setMeasurementFromState() override;
 
   number_t initialEstimatePossible(const OptimizableGraph::VertexSet& /*from*/,
-                                           OptimizableGraph::Vertex* /*to*/) override {
+                                   OptimizableGraph::Vertex* /*to*/) override {
     return 1.;
   }
 
-  void initialEstimate(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to) override ;
+  void initialEstimate(const OptimizableGraph::VertexSet& from,
+                       OptimizableGraph::Vertex* to) override;
 
  protected:
   Isometry3 inverseMeasurement_;
-  bool resolveCaches() override ;
+  bool resolveCaches() override;
   std::shared_ptr<CacheSE3Offset> cache_;
 };
 

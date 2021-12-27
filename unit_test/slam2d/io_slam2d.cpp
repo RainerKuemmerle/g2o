@@ -43,9 +43,12 @@ struct RandomSE2 {
   static SE2 create() {
     Vector2 randomPosition = Vector2::Random();
     Vector2 randomOrientation = Vector2::Random();
-    return SE2(randomPosition.x(), randomPosition.y(), std::atan2(randomOrientation.y(), randomOrientation.x()));
+    return SE2(randomPosition.x(), randomPosition.y(),
+               std::atan2(randomOrientation.y(), randomOrientation.x()));
   }
-  static bool isApprox(const SE2& a, const SE2& b) { return a.toVector().isApprox(b.toVector(), 1e-5); }
+  static bool isApprox(const SE2& a, const SE2& b) {
+    return a.toVector().isApprox(b.toVector(), 1e-5);
+  }
 };
 
 TEST(IoSlam2d, ReadWriteVertexSE2) {
@@ -61,7 +64,8 @@ TEST(IoSlam2d, ReadWriteParameterSE2Offset) {
   outputParam.setOffset(SE2(1., 2., 0.3));
   ParameterSE2Offset inputParam;
   readWriteGraphElement(outputParam, &inputParam);
-  ASSERT_TRUE(outputParam.offset().toVector().isApprox(inputParam.offset().toVector()));
+  ASSERT_TRUE(
+      outputParam.offset().toVector().isApprox(inputParam.offset().toVector()));
 }
 
 TEST(IoSlam2d, ReadWriteEdgeSE2) {

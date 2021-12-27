@@ -57,18 +57,24 @@ int main(int argc, const char* argv[]) {
   if (argc < 2) {
     cout << endl;
     cout << "Please type: " << endl;
-    cout << "ba_demo [PIXEL_NOISE] [OUTLIER RATIO] [ROBUST_KERNEL] [STRUCTURE_ONLY] [DENSE]"
+    cout << "ba_demo [PIXEL_NOISE] [OUTLIER RATIO] [ROBUST_KERNEL] "
+            "[STRUCTURE_ONLY] [DENSE]"
          << endl;
     cout << endl;
     cout << "PIXEL_NOISE: noise in image space (E.g.: 1)" << endl;
-    cout << "OUTLIER_RATIO: probability of spuroius observation  (default: 0.0)" << endl;
-    cout << "ROBUST_KERNEL: use robust kernel (0 or 1; default: 0==false)" << endl;
-    cout << "STRUCTURE_ONLY: performe structure-only BA to get better point initializations (0 or "
+    cout << "OUTLIER_RATIO: probability of spuroius observation  (default: 0.0)"
+         << endl;
+    cout << "ROBUST_KERNEL: use robust kernel (0 or 1; default: 0==false)"
+         << endl;
+    cout << "STRUCTURE_ONLY: performe structure-only BA to get better point "
+            "initializations (0 or "
             "1; default: 0==false)"
          << endl;
     cout << "DENSE: Use dense solver (0 or 1; default: 0==false)" << endl;
     cout << endl;
-    cout << "Note, if OUTLIER_RATIO is above 0, ROBUST_KERNEL should be set to 1==true." << endl;
+    cout << "Note, if OUTLIER_RATIO is above 0, ROBUST_KERNEL should be set to "
+            "1==true."
+         << endl;
     cout << endl;
     exit(0);
   }
@@ -115,20 +121,22 @@ int main(int argc, const char* argv[]) {
 
   g2o::OptimizationAlgorithmProperty solverProperty;
   optimizer.setAlgorithm(
-      g2o::OptimizationAlgorithmFactory::instance()->construct(solverName, solverProperty));
+      g2o::OptimizationAlgorithmFactory::instance()->construct(solverName,
+                                                               solverProperty));
 
   std::vector<g2o::Vector3> true_points;
   for (size_t i = 0; i < 500; ++i) {
     true_points.emplace_back((g2o::Sampler::uniformRand(0., 1.) - 0.5) * 3,
-                                   g2o::Sampler::uniformRand(0., 1.) - 0.5,
-                                   g2o::Sampler::uniformRand(0., 1.) + 3);
+                             g2o::Sampler::uniformRand(0., 1.) - 0.5,
+                             g2o::Sampler::uniformRand(0., 1.) + 3);
   }
 
   double focal_length = 1000.;
   g2o::Vector2 principal_point(320., 240.);
 
   std::vector<g2o::SE3Quat, Eigen::aligned_allocator<g2o::SE3Quat> > true_poses;
-  auto cam_params = std::make_shared<g2o::CameraParameters>(focal_length, principal_point, 0.);
+  auto cam_params = std::make_shared<g2o::CameraParameters>(
+      focal_length, principal_point, 0.);
   cam_params->setId(0);
 
   if (!optimizer.addParameter(cam_params)) {
@@ -164,11 +172,12 @@ int main(int argc, const char* argv[]) {
     auto v_p = std::make_shared<g2o::VertexPointXYZ>();
     v_p->setId(point_id);
     v_p->setMarginalized(true);
-    v_p->setEstimate(true_points.at(i) + g2o::Vector3(g2o::Sampler::gaussRand(0., 1),
-                                                  g2o::Sampler::gaussRand(0., 1),
-                                                  g2o::Sampler::gaussRand(0., 1)));
+    v_p->setEstimate(true_points.at(i) +
+                     g2o::Vector3(g2o::Sampler::gaussRand(0., 1),
+                                  g2o::Sampler::gaussRand(0., 1),
+                                  g2o::Sampler::gaussRand(0., 1)));
     int num_obs = 0;
-    for (auto & true_pose : true_poses) {
+    for (auto& true_pose : true_poses) {
       g2o::Vector2 z = cam_params->cam_map(true_pose.map(true_points.at(i)));
       if (z[0] >= 0 && z[1] >= 0 && z[0] < 640 && z[1] < 480) {
         ++num_obs;
@@ -178,7 +187,8 @@ int main(int argc, const char* argv[]) {
       optimizer.addVertex(v_p);
       bool inlier = true;
       for (size_t j = 0; j < true_poses.size(); ++j) {
-        g2o::Vector2 z = cam_params->cam_map(true_poses.at(j).map(true_points.at(i)));
+        g2o::Vector2 z =
+            cam_params->cam_map(true_poses.at(j).map(true_points.at(i)));
 
         if (z[0] >= 0 && z[1] >= 0 && z[0] < 640 && z[1] < 480) {
           double sam = g2o::Sampler::uniformRand(0., 1.);
@@ -187,7 +197,7 @@ int main(int argc, const char* argv[]) {
             inlier = false;
           }
           z += g2o::Vector2(g2o::Sampler::gaussRand(0., PIXEL_NOISE),
-                        g2o::Sampler::gaussRand(0., PIXEL_NOISE));
+                            g2o::Sampler::gaussRand(0., PIXEL_NOISE));
           auto e = std::make_shared<g2o::EdgeProjectXYZ2UV>();
           e->setVertex(0, v_p);
           e->setVertex(1, optimizer.vertices().find(j)->second);
@@ -219,8 +229,9 @@ int main(int argc, const char* argv[]) {
     g2o::StructureOnlySolver<3> structure_only_ba;
     cout << "Performing structure-only BA:" << endl;
     g2o::OptimizableGraph::VertexContainer points;
-    for (const auto & it : optimizer.vertices()) {
-      auto v = std::static_pointer_cast<g2o::OptimizableGraph::Vertex>(it.second);
+    for (const auto& it : optimizer.vertices()) {
+      auto v =
+          std::static_pointer_cast<g2o::OptimizableGraph::Vertex>(it.second);
       if (v->dimension() == 3) points.push_back(v);
     }
     structure_only_ba.calc(points, 10);
@@ -230,11 +241,11 @@ int main(int argc, const char* argv[]) {
   cout << "Performing full BA:" << endl;
   optimizer.optimize(10);
   cout << endl;
-  cout << "Point error before optimisation (inliers only): " << sqrt(sum_diff2 / inliers.size())
-       << endl;
+  cout << "Point error before optimisation (inliers only): "
+       << sqrt(sum_diff2 / inliers.size()) << endl;
   point_num = 0;
   sum_diff2 = 0;
-  for (auto & it : pointid_2_trueid) {
+  for (auto& it : pointid_2_trueid) {
     auto v_it = optimizer.vertices().find(it.first);
     if (v_it == optimizer.vertices().end()) {
       std::cerr << "Vertex " << it.first << " not in graph!" << endl;
@@ -250,7 +261,7 @@ int main(int argc, const char* argv[]) {
     sum_diff2 += diff.dot(diff);
     ++point_num;
   }
-  cout << "Point error after optimisation (inliers only): " << sqrt(sum_diff2 / inliers.size())
-       << endl;
+  cout << "Point error after optimisation (inliers only): "
+       << sqrt(sum_diff2 / inliers.size()) << endl;
   cout << endl;
 }

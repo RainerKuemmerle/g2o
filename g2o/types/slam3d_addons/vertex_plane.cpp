@@ -28,76 +28,78 @@
 
 #include "g2o/stuff/opengl_wrapper.h"
 
-namespace g2o
-{
+namespace g2o {
 
-  VertexPlane::VertexPlane(){
-    color << cst(.2), cst(.2), cst(.2);
-  }
+VertexPlane::VertexPlane() { color << cst(.2), cst(.2), cst(.2); }
 
-  bool VertexPlane::read(std::istream& is) {
-    Vector4 lv;
-    bool state = internal::readVector(is, lv);
-    setEstimate(Plane3D(lv));
-    state &= internal::readVector(is, color);
-    return state;
-  }
+bool VertexPlane::read(std::istream& is) {
+  Vector4 lv;
+  bool state = internal::readVector(is, lv);
+  setEstimate(Plane3D(lv));
+  state &= internal::readVector(is, color);
+  return state;
+}
 
-  bool VertexPlane::write(std::ostream& os) const {
-    bool state = internal::writeVector(os, estimate_.toVector());
-    state &= internal::writeVector(os, color);
-    return state;
-  }
+bool VertexPlane::write(std::ostream& os) const {
+  bool state = internal::writeVector(os, estimate_.toVector());
+  state &= internal::writeVector(os, color);
+  return state;
+}
 
 #ifdef G2O_HAVE_OPENGL
 
-  VertexPlaneDrawAction::VertexPlaneDrawAction()
-      : DrawAction(typeid(VertexPlane).name()), planeWidth_(nullptr), planeHeight_(nullptr) {}
+VertexPlaneDrawAction::VertexPlaneDrawAction()
+    : DrawAction(typeid(VertexPlane).name()),
+      planeWidth_(nullptr),
+      planeHeight_(nullptr) {}
 
-  bool VertexPlaneDrawAction::refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_)
-  {
-    if (!DrawAction::refreshPropertyPtrs(params_))
-      return false;
-    if (previousParams_){
-      planeWidth_ = previousParams_->makeProperty<FloatProperty>(typeName_ + "::PLANE_WIDTH", 3);
-      planeHeight_ = previousParams_->makeProperty<FloatProperty>(typeName_ + "::PLANE_HEIGHT", 3);
-    } else {
-      planeWidth_ = nullptr;
-      planeHeight_ = nullptr;
-    }
-    return true;
+bool VertexPlaneDrawAction::refreshPropertyPtrs(
+    HyperGraphElementAction::Parameters* params_) {
+  if (!DrawAction::refreshPropertyPtrs(params_)) return false;
+  if (previousParams_) {
+    planeWidth_ = previousParams_->makeProperty<FloatProperty>(
+        typeName_ + "::PLANE_WIDTH", 3);
+    planeHeight_ = previousParams_->makeProperty<FloatProperty>(
+        typeName_ + "::PLANE_HEIGHT", 3);
+  } else {
+    planeWidth_ = nullptr;
+    planeHeight_ = nullptr;
+  }
+  return true;
+}
+
+bool VertexPlaneDrawAction::operator()(
+    HyperGraph::HyperGraphElement* element,
+    HyperGraphElementAction::Parameters* params_) {
+  if (typeid(*element).name() != typeName_) return false;
+  refreshPropertyPtrs(params_);
+  if (!previousParams_) return true;
+  if (show_ && !show_->value()) return true;
+
+  if (planeWidth_ && planeHeight_) {
+    auto* that = static_cast<VertexPlane*>(element);
+    number_t d = that->estimate().distance();
+    number_t azimuth = Plane3D::azimuth(that->estimate().normal());
+    number_t elevation = Plane3D::elevation(that->estimate().normal());
+    glColor3f(float(that->color(0)), float(that->color(1)),
+              float(that->color(2)));
+    glPushMatrix();
+    glRotatef(float(RAD2DEG(azimuth)), 0.F, 0.F, 1.F);
+    glRotatef(float(RAD2DEG(elevation)), 0.F, -1.F, 0.F);
+    glTranslatef(float(d), 0.F, 0.F);
+
+    glBegin(GL_QUADS);
+    glNormal3f(-1.F, 0.F, 0.F);
+    glVertex3f(0.F, -planeWidth_->value(), -planeHeight_->value());
+    glVertex3f(0.F, planeWidth_->value(), -planeHeight_->value());
+    glVertex3f(0.F, planeWidth_->value(), planeHeight_->value());
+    glVertex3f(0.F, -planeWidth_->value(), planeHeight_->value());
+    glEnd();
+    glPopMatrix();
   }
 
-  bool VertexPlaneDrawAction::operator()(HyperGraph::HyperGraphElement* element,
-                                         HyperGraphElementAction::Parameters* params_) {
-    if (typeid(*element).name() != typeName_) return false;
-    refreshPropertyPtrs(params_);
-    if (!previousParams_) return true;
-    if (show_ && !show_->value()) return true;
-
-    if (planeWidth_ && planeHeight_) {
-      auto* that = static_cast<VertexPlane*>(element);
-      number_t d = that->estimate().distance();
-      number_t azimuth = Plane3D::azimuth(that->estimate().normal());
-      number_t elevation = Plane3D::elevation(that->estimate().normal());
-      glColor3f(float(that->color(0)), float(that->color(1)), float(that->color(2)));
-      glPushMatrix();
-      glRotatef(float(RAD2DEG(azimuth)), 0.F, 0.F, 1.F);
-      glRotatef(float(RAD2DEG(elevation)), 0.F, -1.F, 0.F);
-      glTranslatef(float(d), 0.F, 0.F);
-
-      glBegin(GL_QUADS);
-      glNormal3f(-1.F, 0.F, 0.F);
-      glVertex3f(0.F, -planeWidth_->value(), -planeHeight_->value());
-      glVertex3f(0.F, planeWidth_->value(), -planeHeight_->value());
-      glVertex3f(0.F, planeWidth_->value(), planeHeight_->value());
-      glVertex3f(0.F, -planeWidth_->value(), planeHeight_->value());
-      glEnd();
-      glPopMatrix();
-    }
-
-    return true;
-  }
+  return true;
+}
 #endif
 
-}
+}  // namespace g2o

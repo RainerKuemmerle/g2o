@@ -10,7 +10,8 @@ namespace g2o {
 void declareSim3(py::module& m) {
   py::class_<Sim3>(m, "Sim3")
       .def(py::init<>())
-      .def(py::init<const Eigen::Quaterniond&, const Eigen::Vector3d&, double>())
+      .def(
+          py::init<const Eigen::Quaterniond&, const Eigen::Vector3d&, double>())
       .def(py::init<const Eigen::Matrix3d&, const Eigen::Vector3d&, double>())
       .def(py::init<const Vector7&>())
 

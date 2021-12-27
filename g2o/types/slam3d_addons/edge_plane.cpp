@@ -28,7 +28,7 @@
 
 namespace g2o {
 
-EdgePlane::EdgePlane()  {
+EdgePlane::EdgePlane() {
   information().setIdentity();
   error_.setZero();
 }

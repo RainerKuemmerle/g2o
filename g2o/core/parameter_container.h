@@ -29,43 +29,44 @@
 
 #include <iosfwd>
 #include <map>
-#include <string>
 #include <memory>
+#include <string>
 
 namespace g2o {
 
-    class Parameter;
+class Parameter;
 
-    /**
-     * \brief map id to parameters
-     */
-    class ParameterContainer : protected std::map<int, std::shared_ptr<Parameter>>
-    {
-    public:
-      using BaseClass = std::map<int, std::shared_ptr<Parameter>>;
+/**
+ * \brief map id to parameters
+ */
+class ParameterContainer : protected std::map<int, std::shared_ptr<Parameter>> {
+ public:
+  using BaseClass = std::map<int, std::shared_ptr<Parameter>>;
 
-      /**
-       * create a container for the parameters.
-       */
-      ParameterContainer() = default;
-      virtual ~ParameterContainer() = default;
-      //! add parameter to the container
-      bool addParameter(const std::shared_ptr<Parameter>& p);
-      //! return a parameter based on its ID
-      std::shared_ptr<Parameter> getParameter(int id) const;
-      //! remove a parameter from the container and returns the formerly stored parameter
-      std::shared_ptr<Parameter> detachParameter(int id);
-      //! read parameters from a stream
-      virtual bool read(std::istream& is, const std::map<std::string, std::string>* renamedTypesLookup = nullptr);
-      //! write the data to a stream
-      virtual bool write(std::ostream& os) const;
+  /**
+   * create a container for the parameters.
+   */
+  ParameterContainer() = default;
+  virtual ~ParameterContainer() = default;
+  //! add parameter to the container
+  bool addParameter(const std::shared_ptr<Parameter>& p);
+  //! return a parameter based on its ID
+  std::shared_ptr<Parameter> getParameter(int id) const;
+  //! remove a parameter from the container and returns the formerly stored
+  //! parameter
+  std::shared_ptr<Parameter> detachParameter(int id);
+  //! read parameters from a stream
+  virtual bool read(
+      std::istream& is,
+      const std::map<std::string, std::string>* renamedTypesLookup = nullptr);
+  //! write the data to a stream
+  virtual bool write(std::ostream& os) const;
 
-      // stuff of the base class that should re-appear
-      using BaseClass::size;
-      using BaseClass::clear;
+  // stuff of the base class that should re-appear
+  using BaseClass::clear;
+  using BaseClass::size;
+};
 
-    };
-
-} // end namespace
+}  // namespace g2o
 
 #endif

@@ -28,8 +28,7 @@
 
 namespace g2o {
 
-EdgeProjectXYZ2UV::EdgeProjectXYZ2UV()
-     {
+EdgeProjectXYZ2UV::EdgeProjectXYZ2UV() {
   resizeParameters(1);
   installParameter<CameraParameters>(0);
 }

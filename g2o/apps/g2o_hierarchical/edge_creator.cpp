@@ -32,17 +32,20 @@ namespace g2o {
 
 using namespace std;
 
-bool EdgeCreator::addAssociation(const std::string& vertexTypes, const std::string& edgeType,
+bool EdgeCreator::addAssociation(const std::string& vertexTypes,
+                                 const std::string& edgeType,
                                  const std::vector<int>& parameterIds) {
   EntryMap::iterator it = _vertexToEdgeMap.find(vertexTypes);
   if (it != _vertexToEdgeMap.end())
     it->second = edgeType;
   else
-    _vertexToEdgeMap.insert(make_pair(vertexTypes, EdgeCreatorEntry(edgeType, parameterIds)));
+    _vertexToEdgeMap.insert(
+        make_pair(vertexTypes, EdgeCreatorEntry(edgeType, parameterIds)));
   return true;
 }
 
-bool EdgeCreator::addAssociation(const std::string& vertexTypes, const std::string& edgeType) {
+bool EdgeCreator::addAssociation(const std::string& vertexTypes,
+                                 const std::string& edgeType) {
   return addAssociation(vertexTypes, edgeType, std::vector<int>());
 }
 

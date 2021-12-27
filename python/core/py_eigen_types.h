@@ -7,14 +7,19 @@
 namespace g2o {
 namespace {
 
-template <typename _Scalar, int _Dim, int _Mode, int _Options = Eigen::AutoAlign>
+template <typename _Scalar, int _Dim, int _Mode,
+          int _Options = Eigen::AutoAlign>
 void templatedEigenIsometry(py::module& m, const std::string& name) {
   using CLS = Eigen::Transform<_Scalar, _Dim, _Mode, _Options>;
 
-  typedef typename Eigen::Matrix<_Scalar, CLS::Rows, CLS::HDim, CLS::Options> MatrixType;
-  typedef typename Eigen::Matrix<_Scalar, CLS::Dim, CLS::HDim, CLS::Options> CompactMatrixType;
-  typedef typename Eigen::Matrix<_Scalar, CLS::Dim, CLS::Dim, CLS::Options> RotationMatrixType;
-  typedef typename Eigen::Matrix<_Scalar, CLS::Dim, Eigen::Dynamic> TranslationMatrixType;
+  typedef typename Eigen::Matrix<_Scalar, CLS::Rows, CLS::HDim, CLS::Options>
+      MatrixType;
+  typedef typename Eigen::Matrix<_Scalar, CLS::Dim, CLS::HDim, CLS::Options>
+      CompactMatrixType;
+  typedef typename Eigen::Matrix<_Scalar, CLS::Dim, CLS::Dim, CLS::Options>
+      RotationMatrixType;
+  typedef typename Eigen::Matrix<_Scalar, CLS::Dim, Eigen::Dynamic>
+      TranslationMatrixType;
 
   py::class_<CLS>(m, name.c_str())
       //.def(py::init<>())
@@ -40,7 +45,8 @@ void templatedEigenIsometry(py::module& m, const std::string& name) {
       .def(py::init([](Eigen::Quaterniond& q, TranslationMatrixType& t) {
         MatrixType matrix = MatrixType::Identity();
         Eigen::Matrix3d r = q.toRotationMatrix();
-        matrix.block(0, 0, CLS::Dim, CLS::Dim) = r.block(0, 0, CLS::Dim, CLS::Dim);
+        matrix.block(0, 0, CLS::Dim, CLS::Dim) =
+            r.block(0, 0, CLS::Dim, CLS::Dim);
         matrix.block(0, CLS::Dim, CLS::Dim, 1) = t;
         return CLS(matrix);
       }))
@@ -55,7 +61,9 @@ void templatedEigenIsometry(py::module& m, const std::string& name) {
              trans.matrix().block(0, 0, CLS::Dim, CLS::Dim) = r;
            })
 
-      .def("set_translation", [](CLS& trans, TranslationMatrixType& t) { trans.translation() = t; })
+      .def(
+          "set_translation",
+          [](CLS& trans, TranslationMatrixType& t) { trans.translation() = t; })
 
       .def(py::self * py::self)
 
@@ -64,12 +72,14 @@ void templatedEigenIsometry(py::module& m, const std::string& name) {
              Eigen::Matrix<_Scalar, CLS::Dim, 1> result = trans * t;
              return result;
            })
-      .def("__mul__", [](CLS& trans, TranslationMatrixType& t) { return trans * t; })
+      .def("__mul__",
+           [](CLS& trans, TranslationMatrixType& t) { return trans * t; })
 
       .def("rows", &CLS::rows)
       .def("cols", &CLS::cols)
 
-      .def("__call__", [](CLS& trans, int row, int col) { return trans(row, col); })
+      .def("__call__",
+           [](CLS& trans, int row, int col) { return trans(row, col); })
       //.def("__getitem__", )
 
       .def("matrix", (MatrixType & (CLS::*)()) & CLS::matrix)
@@ -95,48 +105,58 @@ void templatedEigenIsometry(py::module& m, const std::string& name) {
       .def_property_readonly("R",
                              [](CLS& trans) {
                                MatrixType matrix = trans.matrix();
-                               RotationMatrixType r = matrix.block(0, 0, CLS::Dim, CLS::Dim);
+                               RotationMatrixType r =
+                                   matrix.block(0, 0, CLS::Dim, CLS::Dim);
                                return r;
                              })
 
       .def("Quaternion",
            [](CLS& trans) {
              MatrixType matrix = trans.matrix();
-             Eigen::Matrix<_Scalar, 3, 3> r = Eigen::Matrix<_Scalar, 3, 3>::Identity();
-             r.block(0, 0, CLS::Dim, CLS::Dim) = matrix.block(0, 0, CLS::Dim, CLS::Dim);
+             Eigen::Matrix<_Scalar, 3, 3> r =
+                 Eigen::Matrix<_Scalar, 3, 3>::Identity();
+             r.block(0, 0, CLS::Dim, CLS::Dim) =
+                 matrix.block(0, 0, CLS::Dim, CLS::Dim);
              return Eigen::Quaterniond(r);
            })
       .def("rotation",
            [](CLS& trans) {
              MatrixType matrix = trans.matrix();
-             Eigen::Matrix<_Scalar, 3, 3> r = Eigen::Matrix<_Scalar, 3, 3>::Identity();
-             r.block(0, 0, CLS::Dim, CLS::Dim) = matrix.block(0, 0, CLS::Dim, CLS::Dim);
+             Eigen::Matrix<_Scalar, 3, 3> r =
+                 Eigen::Matrix<_Scalar, 3, 3>::Identity();
+             r.block(0, 0, CLS::Dim, CLS::Dim) =
+                 matrix.block(0, 0, CLS::Dim, CLS::Dim);
              return Eigen::Quaterniond(r);
            })
       .def("orientation",
            [](CLS& trans) {
              MatrixType matrix = trans.matrix();
-             Eigen::Matrix<_Scalar, 3, 3> r = Eigen::Matrix<_Scalar, 3, 3>::Identity();
-             r.block(0, 0, CLS::Dim, CLS::Dim) = matrix.block(0, 0, CLS::Dim, CLS::Dim);
+             Eigen::Matrix<_Scalar, 3, 3> r =
+                 Eigen::Matrix<_Scalar, 3, 3>::Identity();
+             r.block(0, 0, CLS::Dim, CLS::Dim) =
+                 matrix.block(0, 0, CLS::Dim, CLS::Dim);
              return Eigen::Quaterniond(r);
            })
       // .def_property_readonly("q", [](CLS& trans) {
       //         MatrixType matrix = trans.matrix();
-      //         Eigen::Matrix<_Scalar, 3, 3> r = Eigen::Matrix<_Scalar, 3, 3>::Identity();
-      //         r.block(0, 0, CLS::Dim, CLS::Dim) = matrix.block(0, 0, CLS::Dim, CLS::Dim);
-      //         return Eigen::Quaterniond(r);
+      //         Eigen::Matrix<_Scalar, 3, 3> r = Eigen::Matrix<_Scalar, 3,
+      //         3>::Identity(); r.block(0, 0, CLS::Dim, CLS::Dim) =
+      //         matrix.block(0, 0, CLS::Dim, CLS::Dim); return
+      //         Eigen::Quaterniond(r);
       //     })
 
       .def("translation",
            [](CLS& trans) {
              MatrixType matrix = trans.matrix();
-             Eigen::Matrix<_Scalar, CLS::Dim, 1> t = matrix.block(0, CLS::Dim, CLS::Dim, 1);
+             Eigen::Matrix<_Scalar, CLS::Dim, 1> t =
+                 matrix.block(0, CLS::Dim, CLS::Dim, 1);
              return t;
            })
       .def("position",
            [](CLS& trans) {
              MatrixType matrix = trans.matrix();
-             Eigen::Matrix<_Scalar, CLS::Dim, 1> t = matrix.block(0, CLS::Dim, CLS::Dim, 1);
+             Eigen::Matrix<_Scalar, CLS::Dim, 1> t =
+                 matrix.block(0, CLS::Dim, CLS::Dim, 1);
              return t;
            })
       .def_property_readonly("t",
@@ -147,7 +167,8 @@ void templatedEigenIsometry(py::module& m, const std::string& name) {
                                return t;
                              })
 
-      .def("inverse", &CLS::inverse, "traits"_a = (Eigen::TransformTraits)(CLS::Mode))
+      .def("inverse", &CLS::inverse,
+           "traits"_a = (Eigen::TransformTraits)(CLS::Mode))
       .def("make_affine", &CLS::makeAffine)
 
       ;

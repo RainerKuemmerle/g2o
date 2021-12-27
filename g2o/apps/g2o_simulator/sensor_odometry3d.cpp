@@ -53,8 +53,8 @@ void SensorOdometry3D::sense() {
   auto* r = dynamic_cast<RobotType*>(robot());
   if (!r) return;
 
-  PoseObject *pprev = nullptr;
-  PoseObject *pcurr = nullptr;
+  PoseObject* pprev = nullptr;
+  PoseObject* pcurr = nullptr;
   auto it = r->trajectory().rbegin();
   if (it != r->trajectory().rend()) {
     pcurr = *it;

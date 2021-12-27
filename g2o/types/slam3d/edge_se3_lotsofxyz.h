@@ -28,45 +28,44 @@
 #define G2O_SE3_LOTSOF_XYZ
 
 #include "g2o/config.h"
-#include "g2o_types_slam3d_api.h"
 #include "g2o/core/base_variable_sized_edge.h"
-#include "vertex_se3.h"
+#include "g2o_types_slam3d_api.h"
 #include "vertex_pointxyz.h"
+#include "vertex_se3.h"
 
-namespace g2o{
+namespace g2o {
 
-  class G2O_TYPES_SLAM3D_API EdgeSE3LotsOfXYZ : public BaseVariableSizedEdge<-1, VectorX>{
+class G2O_TYPES_SLAM3D_API EdgeSE3LotsOfXYZ
+    : public BaseVariableSizedEdge<-1, VectorX> {
+ protected:
+  unsigned int observedPoints_ = 0;
 
-    protected:
-      unsigned int observedPoints_ = 0;
+ public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
+  EdgeSE3LotsOfXYZ();
 
-    public:
-      EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
-      EdgeSE3LotsOfXYZ();
+  void setSize(int vertices) {
+    resize(vertices);
+    observedPoints_ = vertices - 1;
+    measurement_.resize(observedPoints_ * 3L, 1);
+    setDimension(observedPoints_ * 3);
+  }
 
-      void setSize(int vertices){
-        resize(vertices);
-        observedPoints_ = vertices-1;
-        measurement_.resize(observedPoints_*3L, 1);
-        setDimension(observedPoints_*3);
-      }
+  void computeError() override;
 
-      void computeError() override ;
+  bool read(std::istream& is) override;
+  bool write(std::ostream& os) const override;
 
-      bool read(std::istream& is) override ;
-      bool write(std::ostream& os) const override ;
+  bool setMeasurementFromState() override;
 
-      bool setMeasurementFromState() override ;
+  void initialEstimate(const OptimizableGraph::VertexSet&,
+                       OptimizableGraph::Vertex*) override;
+  number_t initialEstimatePossible(const OptimizableGraph::VertexSet&,
+                                   OptimizableGraph::Vertex*) override;
 
-      void initialEstimate(const OptimizableGraph::VertexSet&, OptimizableGraph::Vertex*) override ;
-      number_t initialEstimatePossible(const OptimizableGraph::VertexSet&, OptimizableGraph::Vertex*) override ;
+  void linearizeOplus() override;
+};
 
-      void linearizeOplus() override;
+}  // namespace g2o
 
-  };
-
-}
-
-
-
-#endif // G2O_SE3_LOTSOF_XYZ
+#endif  // G2O_SE3_LOTSOF_XYZ

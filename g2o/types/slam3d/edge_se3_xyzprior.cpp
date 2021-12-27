@@ -28,60 +28,63 @@
 
 namespace g2o {
 
-  EdgeSE3XYZPrior::EdgeSE3XYZPrior()  
-  {
-    information().setIdentity();
-    setMeasurement(Vector3::Zero());
-    resizeParameters(1);
-    installParameter<CacheSE3Offset::ParameterType>(0);
+EdgeSE3XYZPrior::EdgeSE3XYZPrior() {
+  information().setIdentity();
+  setMeasurement(Vector3::Zero());
+  resizeParameters(1);
+  installParameter<CacheSE3Offset::ParameterType>(0);
+}
+
+bool EdgeSE3XYZPrior::resolveCaches() {
+  ParameterVector pv(1);
+  pv[0] = parameters_[0];
+  resolveCache(cache_, vertexXn<0>(), "CACHE_SE3_OFFSET", pv);
+  return cache_ != nullptr;
+}
+
+bool EdgeSE3XYZPrior::read(std::istream& is) {
+  readParamIds(is);
+  internal::readVector(is, measurement_);
+  return readInformationMatrix(is);
+}
+
+bool EdgeSE3XYZPrior::write(std::ostream& os) const {
+  writeParamIds(os);
+  internal::writeVector(os, measurement());
+  return writeInformationMatrix(os);
+}
+
+void EdgeSE3XYZPrior::computeError() {
+  const VertexSE3* v = vertexXnRaw<0>();
+  error_ = v->estimate().translation() - measurement_;
+}
+
+void EdgeSE3XYZPrior::linearizeOplus() {
+  const VertexSE3* v = vertexXnRaw<0>();
+  jacobianOplusXi_.block<3, 3>(0, 0) = v->estimate().rotation();
+  jacobianOplusXi_.block<3, 3>(0, 3) = Eigen::Matrix3d::Zero();
+}
+
+bool EdgeSE3XYZPrior::setMeasurementFromState() {
+  const VertexSE3* v = vertexXnRaw<0>();
+  measurement_ = v->estimate().translation();
+  return true;
+}
+
+void EdgeSE3XYZPrior::initialEstimate(
+    const OptimizableGraph::VertexSet& /*from_*/,
+    OptimizableGraph::Vertex* /*to_*/) {
+  VertexSE3* v = vertexXnRaw<0>();
+  assert(v && "Vertex for the Prior edge is not set");
+
+  Isometry3 newEstimate = cache_->offsetParam()->offset().inverse() *
+                          Eigen::Translation3d(measurement());
+  if (information_.block<3, 3>(0, 0).array().abs().sum() ==
+      0) {  // do not set translation, as that part of the information is all
+            // zero
+    newEstimate.translation() = v->estimate().translation();
   }
+  v->setEstimate(newEstimate);
+}
 
-  bool EdgeSE3XYZPrior::resolveCaches(){
-    ParameterVector pv(1);
-    pv[0] = parameters_[0];
-    resolveCache(cache_, vertexXn<0>(), "CACHE_SE3_OFFSET", pv);
-    return cache_ != nullptr;
-  }
-
-  bool EdgeSE3XYZPrior::read(std::istream& is)
-  {
-    readParamIds(is);
-    internal::readVector(is, measurement_);
-    return readInformationMatrix(is);
-  }
-
-  bool EdgeSE3XYZPrior::write(std::ostream& os) const {
-    writeParamIds(os);
-    internal::writeVector(os, measurement());
-    return writeInformationMatrix(os);
-  }
-
-  void EdgeSE3XYZPrior::computeError() {
-    const VertexSE3* v = vertexXnRaw<0>();
-    error_ = v->estimate().translation() - measurement_;
-  }
-
-  void EdgeSE3XYZPrior::linearizeOplus() {
-    const VertexSE3* v = vertexXnRaw<0>();
-    jacobianOplusXi_.block<3, 3>(0, 0) = v->estimate().rotation();
-    jacobianOplusXi_.block<3, 3>(0, 3) = Eigen::Matrix3d::Zero();
-  }
-
-  bool EdgeSE3XYZPrior::setMeasurementFromState() {
-    const VertexSE3* v = vertexXnRaw<0>();
-    measurement_ = v->estimate().translation();
-    return true;
-  }
-
-  void EdgeSE3XYZPrior::initialEstimate(const OptimizableGraph::VertexSet& /*from_*/, OptimizableGraph::Vertex* /*to_*/) {
-    VertexSE3 *v = vertexXnRaw<0>();
-    assert(v && "Vertex for the Prior edge is not set");
-
-    Isometry3 newEstimate = cache_->offsetParam()->offset().inverse() * Eigen::Translation3d(measurement());
-    if (information_.block<3,3>(0,0).array().abs().sum() == 0){ // do not set translation, as that part of the information is all zero
-      newEstimate.translation() = v->estimate().translation();
-    }
-    v->setEstimate(newEstimate);
-  }
-
-} // end namespace
+}  // namespace g2o

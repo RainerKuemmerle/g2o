@@ -36,12 +36,17 @@
 namespace g2o {
 
 class EdgeSE2Segment2DLine
-    : public BaseBinaryEdge<2, Vector2, VertexSE2, VertexSegment2D>  // Avoid redefinition of BaseEdge in MSVC
+    : public BaseBinaryEdge<2, Vector2, VertexSE2,
+                            VertexSegment2D>  // Avoid redefinition of BaseEdge
+                                              // in MSVC
 {
  public:
   G2O_TYPES_SLAM2D_ADDONS_API EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
-  G2O_TYPES_SLAM2D_ADDONS_API number_t theta() const { return measurement_[0]; }
+      G2O_TYPES_SLAM2D_ADDONS_API number_t
+      theta() const {
+    return measurement_[0];
+  }
   G2O_TYPES_SLAM2D_ADDONS_API number_t rho() const { return measurement_[1]; }
 
   G2O_TYPES_SLAM2D_ADDONS_API void setTheta(number_t t) { measurement_[0] = t; }
@@ -56,25 +61,30 @@ class EdgeSE2Segment2DLine
     Vector2 dP = predP2 - predP1;
     Vector2 normal(dP.y(), -dP.x());
     normal.normalize();
-    Vector2 prediction(std::atan2(normal.y(), normal.x()), predP1.dot(normal) * .5 + predP2.dot(normal) * .5);
+    Vector2 prediction(std::atan2(normal.y(), normal.x()),
+                       predP1.dot(normal) * .5 + predP2.dot(normal) * .5);
 
     error_ = prediction - measurement_;
     error_[0] = normalize_theta(error_[0]);
   }
 
-  G2O_TYPES_SLAM2D_ADDONS_API bool setMeasurementData(const number_t* d) override {
+  G2O_TYPES_SLAM2D_ADDONS_API bool setMeasurementData(
+      const number_t* d) override {
     Eigen::Map<const Vector2> data(d);
     measurement_ = data;
     return true;
   }
 
-  G2O_TYPES_SLAM2D_ADDONS_API bool getMeasurementData(number_t* d) const override {
+  G2O_TYPES_SLAM2D_ADDONS_API bool getMeasurementData(
+      number_t* d) const override {
     Eigen::Map<Vector2> data(d);
     data = measurement_;
     return true;
   }
 
-  G2O_TYPES_SLAM2D_ADDONS_API int measurementDimension() const override { return 2; }
+  G2O_TYPES_SLAM2D_ADDONS_API int measurementDimension() const override {
+    return 2;
+  }
 
   G2O_TYPES_SLAM2D_ADDONS_API bool setMeasurementFromState() override {
     const VertexSE2* v1 = vertexXnRaw<0>();
@@ -85,7 +95,8 @@ class EdgeSE2Segment2DLine
     Vector2 dP = predP2 - predP1;
     Vector2 normal(dP.y(), -dP.x());
     normal.normalize();
-    Vector2 prediction(std::atan2(normal.y(), normal.x()), predP1.dot(normal) * .5 + predP2.dot(normal) * .5);
+    Vector2 prediction(std::atan2(normal.y(), normal.x()),
+                       predP1.dot(normal) * .5 + predP2.dot(normal) * .5);
     measurement_ = prediction;
     return true;
   }
@@ -98,18 +109,22 @@ class EdgeSE2Segment2DLine
   /* #endif */
 };
 
-/*   class G2O_TYPES_SLAM2D_ADDONS_API EdgeSE2Segment2DLineWriteGnuplotAction: public WriteGnuplotAction { */
+/*   class G2O_TYPES_SLAM2D_ADDONS_API EdgeSE2Segment2DLineWriteGnuplotAction:
+ * public WriteGnuplotAction { */
 /*   public: */
 /*     EdgeSE2Segment2DLineWriteGnuplotAction(); */
-/*     virtual HyperGraphElementAction* operator()(HyperGraph::HyperGraphElement* element,  */
+/*     virtual HyperGraphElementAction*
+ * operator()(HyperGraph::HyperGraphElement* element,  */
 /*             HyperGraphElementAction::Parameters* params_); */
 /*   }; */
 
 /* #ifdef G2O_HAVE_OPENGL */
-/*   class G2O_TYPES_SLAM2D_ADDONS_API EdgeSE2Segment2DLineDrawAction: public DrawAction{ */
+/*   class G2O_TYPES_SLAM2D_ADDONS_API EdgeSE2Segment2DLineDrawAction: public
+ * DrawAction{ */
 /*   public: */
 /*     EdgeSE2Segment2DLineDrawAction(); */
-/*     virtual HyperGraphElementAction* operator()(HyperGraph::HyperGraphElement* element,  */
+/*     virtual HyperGraphElementAction*
+ * operator()(HyperGraph::HyperGraphElement* element,  */
 /*             HyperGraphElementAction::Parameters* params_); */
 /*   }; */
 /* #endif */

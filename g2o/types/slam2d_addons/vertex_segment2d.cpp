@@ -40,80 +40,83 @@
 
 namespace g2o {
 
-  VertexSegment2D::VertexSegment2D() 
-    
-  {
-    estimate_.setZero();
+VertexSegment2D::VertexSegment2D()
+
+{
+  estimate_.setZero();
+}
+
+bool VertexSegment2D::read(std::istream& is) {
+  return internal::readVector(is, estimate_);
+}
+
+bool VertexSegment2D::write(std::ostream& os) const {
+  return internal::writeVector(os, estimate());
+}
+
+VertexSegment2DWriteGnuplotAction::VertexSegment2DWriteGnuplotAction()
+    : WriteGnuplotAction(typeid(VertexSegment2D).name()) {}
+
+bool VertexSegment2DWriteGnuplotAction::operator()(
+    HyperGraph::HyperGraphElement* element,
+    HyperGraphElementAction::Parameters* params_) {
+  if (typeid(*element).name() != typeName_) return false;
+
+  auto* params = static_cast<WriteGnuplotAction::Parameters*>(params_);
+  if (!params->os) {
+    std::cerr << __PRETTY_FUNCTION__ << ": warning, no valid os specified"
+              << std::endl;
+    return false;
   }
 
-  bool VertexSegment2D::read(std::istream& is)
-  {
-    return internal::readVector(is, estimate_);
-  }
-
-  bool VertexSegment2D::write(std::ostream& os) const
-  {
-    return internal::writeVector(os, estimate());
-  }
-
-  VertexSegment2DWriteGnuplotAction::VertexSegment2DWriteGnuplotAction(): WriteGnuplotAction(typeid(VertexSegment2D).name()){}
-
-  bool VertexSegment2DWriteGnuplotAction::operator()(HyperGraph::HyperGraphElement* element,
-                                                     HyperGraphElementAction::Parameters* params_) {
-    if (typeid(*element).name()!=typeName_)
-      return false;
-
-    auto* params=static_cast<WriteGnuplotAction::Parameters*>(params_);
-    if (!params->os){
-      std::cerr << __PRETTY_FUNCTION__ << ": warning, no valid os specified" << std::endl;
-      return false;
-    }
-
-    auto* v =  static_cast<VertexSegment2D*>(element);
-    *(params->os) << v->estimateP1().x() << " " << v->estimateP1().y() << std::endl;
-    *(params->os) << v->estimateP2().x() << " " << v->estimateP2().y() << std::endl;
-    *(params->os) << std::endl;
-    return true;
-  }
+  auto* v = static_cast<VertexSegment2D*>(element);
+  *(params->os) << v->estimateP1().x() << " " << v->estimateP1().y()
+                << std::endl;
+  *(params->os) << v->estimateP2().x() << " " << v->estimateP2().y()
+                << std::endl;
+  *(params->os) << std::endl;
+  return true;
+}
 
 #ifdef G2O_HAVE_OPENGL
-  VertexSegment2DDrawAction::VertexSegment2DDrawAction()
-      : DrawAction(typeid(VertexSegment2D).name()), pointSize_(nullptr) {}
+VertexSegment2DDrawAction::VertexSegment2DDrawAction()
+    : DrawAction(typeid(VertexSegment2D).name()), pointSize_(nullptr) {}
 
-  bool VertexSegment2DDrawAction::refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_){
-    if (! DrawAction::refreshPropertyPtrs(params_))
-      return false;
-    if (previousParams_){
-      pointSize_ = previousParams_->makeProperty<FloatProperty>(typeName_ + "::POINT_SIZE", 1.);
-    } else {
-      pointSize_ = nullptr;
-    }
-    return true;
+bool VertexSegment2DDrawAction::refreshPropertyPtrs(
+    HyperGraphElementAction::Parameters* params_) {
+  if (!DrawAction::refreshPropertyPtrs(params_)) return false;
+  if (previousParams_) {
+    pointSize_ = previousParams_->makeProperty<FloatProperty>(
+        typeName_ + "::POINT_SIZE", 1.);
+  } else {
+    pointSize_ = nullptr;
   }
+  return true;
+}
 
-  bool VertexSegment2DDrawAction::operator()(HyperGraph::HyperGraphElement* element,
-                                             HyperGraphElementAction::Parameters* params_) {
-    if (typeid(*element).name()!=typeName_)
-      return false;
+bool VertexSegment2DDrawAction::operator()(
+    HyperGraph::HyperGraphElement* element,
+    HyperGraphElementAction::Parameters* params_) {
+  if (typeid(*element).name() != typeName_) return false;
 
-    refreshPropertyPtrs(params_);
-    if (! previousParams_)
-      return true;
+  refreshPropertyPtrs(params_);
+  if (!previousParams_) return true;
 
-    if (show_ && !show_->value())
-      return true;
+  if (show_ && !show_->value()) return true;
 
-    auto* that = static_cast<VertexSegment2D*>(element);
-    glColor3f(0.8F,0.5F,0.3F);
-    if (pointSize_) {
-      glPointSize(pointSize_->value());
-    }
-    glBegin(GL_LINES);
-    glVertex3f(static_cast<float>(that->estimateP1().x()),static_cast<float>(that->estimateP1().y()),0.F);
-    glVertex3f(static_cast<float>(that->estimateP2().x()),static_cast<float>(that->estimateP2().y()),0.F);
-    glEnd();
-    return true;
+  auto* that = static_cast<VertexSegment2D*>(element);
+  glColor3f(0.8F, 0.5F, 0.3F);
+  if (pointSize_) {
+    glPointSize(pointSize_->value());
   }
+  glBegin(GL_LINES);
+  glVertex3f(static_cast<float>(that->estimateP1().x()),
+             static_cast<float>(that->estimateP1().y()), 0.F);
+  glVertex3f(static_cast<float>(that->estimateP2().x()),
+             static_cast<float>(that->estimateP2().y()), 0.F);
+  glEnd();
+  return true;
+}
 #endif
 
-} // end namespace
+}  // namespace g2o

@@ -37,32 +37,35 @@
 #ifndef G2O_FAST_OUTPUT_H
 #define G2O_FAST_OUTPUT_H
 
-#include <cstdio>
-#include <stdint.h>
 #include <assert.h>
+#include <stdint.h>
+
+#include <cstdio>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-inline void strreverse(char* begin, char* end)
-{
+inline void strreverse(char* begin, char* end) {
   char aux;
-  while (end > begin)
-    aux = *end, *end-- = *begin, *begin++ = aux;
+  while (end > begin) aux = *end, *end-- = *begin, *begin++ = aux;
 }
 
-inline int modp_dtoa(double value, char* str, int prec)
-{
-  static const double pow10[] = {1, 10, 100, 1000, 10000, 100000, 1000000, 10000000, 100000000, 1000000000};
+inline int modp_dtoa(double value, char* str, int prec) {
+  static const double pow10[] = {1,         10,        100,     1000,
+                                 10000,     100000,    1000000, 10000000,
+                                 100000000, 1000000000};
 
   /* Hacky test for NaN
    * under -fast-math this won't work, but then you also won't
    * have correct nan values anyways.  The alternative is
    * to link with libmath (bad) or hack IEEE double bits (bad)
    */
-  if (! (value == value)) {
-    str[0] = 'n'; str[1] = 'a'; str[2] = 'n'; str[3] = '\0';
+  if (!(value == value)) {
+    str[0] = 'n';
+    str[1] = 'a';
+    str[2] = 'n';
+    str[3] = '\0';
     assert(0);
     return 3;
   }
@@ -79,7 +82,6 @@ inline int modp_dtoa(double value, char* str, int prec)
     prec = 9;
   }
 
-
   /* we'll work in positive values and deal with the
      negative sign issue later */
   int neg = 0;
@@ -88,8 +90,7 @@ inline int modp_dtoa(double value, char* str, int prec)
     value = -value;
   }
 
-
-  int whole = (int) value;
+  int whole = (int)value;
   double tmp = (value - whole) * pow10[prec];
   uint32_t frac = (uint32_t)(tmp);
   diff = tmp - frac;
@@ -143,38 +144,39 @@ inline int modp_dtoa(double value, char* str, int prec)
   // do whole part
   // Take care of sign
   // Conversion. Number is reversed.
-  do *wstr++ = (char)(48 + (whole % 10)); while (whole /= 10);
+  do *wstr++ = (char)(48 + (whole % 10));
+  while (whole /= 10);
   if (neg) {
     *wstr++ = '-';
   }
   //*wstr='\0';
-  strreverse(str, wstr-1);
+  strreverse(str, wstr - 1);
   return wstr - str;
 }
 
-inline int modp_uitoa10(uint32_t value, char* str)
-{
-  char* wstr=str;
+inline int modp_uitoa10(uint32_t value, char* str) {
+  char* wstr = str;
   // Conversion. Number is reversed.
-  do *wstr++ = (char)(48 + (value % 10)); while (value /= 10);
+  do *wstr++ = (char)(48 + (value % 10));
+  while (value /= 10);
   //*wstr='\0';
   // Reverse string
-  strreverse(str, wstr-1);
+  strreverse(str, wstr - 1);
   return wstr - str;
 }
 
-inline int modp_itoa10(int32_t value, char* str)
-{
-  char* wstr=str;
+inline int modp_itoa10(int32_t value, char* str) {
+  char* wstr = str;
   // Take care of sign
   unsigned int uvalue = (value < 0) ? -value : value;
   // Conversion. Number is reversed.
-  do *wstr++ = (char)(48 + (uvalue % 10)); while(uvalue /= 10);
+  do *wstr++ = (char)(48 + (uvalue % 10));
+  while (uvalue /= 10);
   if (value < 0) *wstr++ = '-';
-  *wstr='\0';
+  *wstr = '\0';
 
   // Reverse string
-  strreverse(str,wstr-1);
+  strreverse(str, wstr - 1);
   return wstr - str;
 }
 

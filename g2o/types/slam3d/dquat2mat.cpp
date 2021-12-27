@@ -33,9 +33,10 @@ namespace internal {
 
 #include "dquat2mat_maxima_generated.cpp"  // NOLINT
 
-int q2m(number_t& S, number_t& qw, const number_t& r00, const number_t& r10, const number_t& r20,
-        const number_t& r01, const number_t& r11, const number_t& r21, const number_t& r02,
-        const number_t& r12, const number_t& r22) { // NOLINT
+int q2m(number_t& S, number_t& qw, const number_t& r00, const number_t& r10,
+        const number_t& r20, const number_t& r01, const number_t& r11,
+        const number_t& r21, const number_t& r02, const number_t& r12,
+        const number_t& r22) {  // NOLINT
   number_t tr = r00 + r11 + r22;
   if (tr > 0) {
     S = sqrt(tr + 1.0) * 2;  // S=4*qw
@@ -68,26 +69,33 @@ int q2m(number_t& S, number_t& qw, const number_t& r00, const number_t& r10, con
   return 3;
 }
 
-void compute_dq_dR(Eigen::Matrix<number_t, 3, 9, Eigen::ColMajor>& dq_dR, const number_t& r11,
-                   const number_t& r21, const number_t& r31, const number_t& r12,
-                   const number_t& r22, const number_t& r32, const number_t& r13,
-                   const number_t& r23, const number_t& r33) {
+void compute_dq_dR(Eigen::Matrix<number_t, 3, 9, Eigen::ColMajor>& dq_dR,
+                   const number_t& r11, const number_t& r21,
+                   const number_t& r31, const number_t& r12,
+                   const number_t& r22, const number_t& r32,
+                   const number_t& r13, const number_t& r23,
+                   const number_t& r33) {
   number_t qw;
   number_t S;
-  int whichCase = q2m(S, qw, r11, r21, r31, r12, r22, r32, r13, r23, r33); // NOLINT
+  int whichCase =
+      q2m(S, qw, r11, r21, r31, r12, r22, r32, r13, r23, r33);  // NOLINT
   S *= .25;
   switch (whichCase) {
     case 0:
-      compute_dq_dR_w(dq_dR, S, r11, r21, r31, r12, r22, r32, r13, r23, r33); // NOLINT
+      compute_dq_dR_w(dq_dR, S, r11, r21, r31, r12, r22, r32, r13, r23,
+                      r33);  // NOLINT
       break;
     case 1:
-      compute_dq_dR_x(dq_dR, S, r11, r21, r31, r12, r22, r32, r13, r23, r33); // NOLINT
+      compute_dq_dR_x(dq_dR, S, r11, r21, r31, r12, r22, r32, r13, r23,
+                      r33);  // NOLINT
       break;
     case 2:
-      compute_dq_dR_y(dq_dR, S, r11, r21, r31, r12, r22, r32, r13, r23, r33); // NOLINT
+      compute_dq_dR_y(dq_dR, S, r11, r21, r31, r12, r22, r32, r13, r23,
+                      r33);  // NOLINT
       break;
     case 3:
-      compute_dq_dR_z(dq_dR, S, r11, r21, r31, r12, r22, r32, r13, r23, r33); // NOLINT
+      compute_dq_dR_z(dq_dR, S, r11, r21, r31, r12, r22, r32, r13, r23,
+                      r33);  // NOLINT
       break;
   }
   if (qw <= 0) dq_dR *= -1;

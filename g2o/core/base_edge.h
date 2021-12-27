@@ -40,7 +40,8 @@ namespace internal {
 
 #ifdef G2O_OPENMP
 struct QuadraticFormLock {
-  explicit QuadraticFormLock(OptimizableGraph::Vertex& vertex) : _vertex(vertex) {
+  explicit QuadraticFormLock(OptimizableGraph::Vertex& vertex)
+      : _vertex(vertex) {
     _vertex.lockQuadraticForm();
   }
   ~QuadraticFormLock() { _vertex.unlockQuadraticForm(); }
@@ -55,9 +56,9 @@ struct QuadraticFormLock {
 #endif
 
 /**
- * Declaring the types for the error vector and the information matrix depending on the size of the
- * error function. In particular, the information matrix needs to match the size of the error
- * vector.
+ * Declaring the types for the error vector and the information matrix depending
+ * on the size of the error function. In particular, the information matrix
+ * needs to match the size of the error vector.
  */
 template <int D>
 struct BaseEdgeTraits {
@@ -66,13 +67,16 @@ struct BaseEdgeTraits {
   using InformationType = Eigen::Matrix<number_t, D, D, Eigen::ColMajor>;
 };
 /**
- * Same as above but for dimension not known at compilation, i.e., dynamically sized edges.
+ * Same as above but for dimension not known at compilation, i.e., dynamically
+ * sized edges.
  */
 template <>
 struct BaseEdgeTraits<-1> {
   static constexpr int kDimension = -1;
-  using ErrorVector = Eigen::Matrix<number_t, Eigen::Dynamic, 1, Eigen::ColMajor>;
-  using InformationType = Eigen::Matrix<number_t, Eigen::Dynamic, Eigen::Dynamic, Eigen::ColMajor>;
+  using ErrorVector =
+      Eigen::Matrix<number_t, Eigen::Dynamic, 1, Eigen::ColMajor>;
+  using InformationType =
+      Eigen::Matrix<number_t, Eigen::Dynamic, Eigen::Dynamic, Eigen::ColMajor>;
 };
 
 }  // namespace internal
@@ -95,28 +99,39 @@ class BaseEdge : public OptimizableGraph::Edge {
   ErrorVector& error() { return error_; }
 
   //! information matrix of the constraint
-  EIGEN_STRONG_INLINE const InformationType& information() const { return information_; }
+  EIGEN_STRONG_INLINE const InformationType& information() const {
+    return information_;
+  }
   EIGEN_STRONG_INLINE InformationType& information() { return information_; }
-  void setInformation(const InformationType& information) { information_ = information; }
+  void setInformation(const InformationType& information) {
+    information_ = information;
+  }
 
-  const number_t* informationData() const override { return information_.data(); }
+  const number_t* informationData() const override {
+    return information_.data();
+  }
   number_t* informationData() override { return information_.data(); }
 
   //! accessor functions for the measurement represented by the edge
-  EIGEN_STRONG_INLINE const Measurement& measurement() const { return measurement_; }
+  EIGEN_STRONG_INLINE const Measurement& measurement() const {
+    return measurement_;
+  }
   virtual void setMeasurement(const Measurement& m) { measurement_ = m; }
 
   virtual int rank() const { return dimension(); }
 
-  void initialEstimate(const OptimizableGraph::VertexSet&, OptimizableGraph::Vertex*) override {
-    std::cerr << "inititialEstimate() is not implemented, please give implementation in your "
+  void initialEstimate(const OptimizableGraph::VertexSet&,
+                       OptimizableGraph::Vertex*) override {
+    std::cerr << "inititialEstimate() is not implemented, please give "
+                 "implementation in your "
                  "derived class"
               << std::endl;
   }
 
   /**
    * set the dimension for a dynamically sizeable error function.
-   * The member will not be declared for edges having a fixed size at compile time.
+   * The member will not be declared for edges having a fixed size at compile
+   * time.
    */
   template <int Dim = D>
   typename std::enable_if<Dim == -1, void>::type setDimension(int dim) {
@@ -127,26 +142,32 @@ class BaseEdge : public OptimizableGraph::Edge {
 
  protected:
   Measurement measurement_;      ///< the measurement of the edge
-  InformationType information_;  ///< information matrix of the edge. Information = inv(covariance)
-  ErrorVector error_;            ///< error vector, stores the result after computeError() is called
+  InformationType information_;  ///< information matrix of the edge.
+                                 ///< Information = inv(covariance)
+  ErrorVector error_;  ///< error vector, stores the result after computeError()
+                       ///< is called
 
   /**
-   * calculate the robust information matrix by updating the information matrix of the error
+   * calculate the robust information matrix by updating the information matrix
+   * of the error
    */
   InformationType robustInformation(const Vector3& rho) const {
     InformationType result = rho[1] * information_;
     // ErrorVector weightedErrror = _information * _error;
-    // result.noalias() += 2 * rho[2] * (weightedErrror * weightedErrror.transpose());
+    // result.noalias() += 2 * rho[2] * (weightedErrror *
+    // weightedErrror.transpose());
     return result;
   }
 
   //! write the upper trinagular part of the information matrix into the stream
   bool writeInformationMatrix(std::ostream& os) const {
     for (int i = 0; i < information().rows(); ++i)
-      for (int j = i; j < information().cols(); ++j) os << information()(i, j) << " ";
+      for (int j = i; j < information().cols(); ++j)
+        os << information()(i, j) << " ";
     return os.good();
   }
-  //! reads the upper triangular part of the matrix and recovers the missing symmetrical elements
+  //! reads the upper triangular part of the matrix and recovers the missing
+  //! symmetrical elements
   bool readInformationMatrix(std::istream& is) {
     for (int i = 0; i < information().rows() && is.good(); ++i)
       for (int j = i; j < information().cols() && is.good(); ++j) {

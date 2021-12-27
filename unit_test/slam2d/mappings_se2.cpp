@@ -24,15 +24,13 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "gtest/gtest.h"
-
 #include "g2o/types/slam2d/se2.h"
+#include "gtest/gtest.h"
 
 using namespace std;
 using namespace g2o;
 
-TEST(MappingsSlam2D, SE2)
-{
+TEST(MappingsSlam2D, SE2) {
   // constructor from 3 values
   SE2 s1(cst(0.), cst(1.), cst(2.));
   EXPECT_DOUBLE_EQ(0., s1[0]);

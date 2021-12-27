@@ -36,7 +36,8 @@ namespace g2o {
 /**
  * \brief edge between two SBAcam that specifies the distance between them
  */
-class G2O_TYPES_SBA_API EdgeSBAScale : public BaseBinaryEdge<1, number_t, VertexCam, VertexCam> {
+class G2O_TYPES_SBA_API EdgeSBAScale
+    : public BaseBinaryEdge<1, number_t, VertexCam, VertexCam> {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   bool read(std::istream& is) override;
@@ -44,11 +45,11 @@ class G2O_TYPES_SBA_API EdgeSBAScale : public BaseBinaryEdge<1, number_t, Vertex
   void computeError() override;
   void setMeasurement(const number_t& m) override { measurement_ = m; }
   number_t initialEstimatePossible(const OptimizableGraph::VertexSet&,
-                                           OptimizableGraph::Vertex*) override {
+                                   OptimizableGraph::Vertex*) override {
     return cst(1.);
   }
   void initialEstimate(const OptimizableGraph::VertexSet& from_,
-                               OptimizableGraph::Vertex* to_) override;
+                       OptimizableGraph::Vertex* to_) override;
 };
 
 }  // namespace g2o

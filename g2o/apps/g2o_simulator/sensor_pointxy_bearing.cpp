@@ -39,12 +39,14 @@ void SensorPointXYBearing::addNoise(EdgeType* e) {
   e->setInformation(information());
 }
 
-bool SensorPointXYBearing::isVisible(SensorPointXYBearing::WorldObjectType* to) {
+bool SensorPointXYBearing::isVisible(
+    SensorPointXYBearing::WorldObjectType* to) {
   if (!robotPoseObject_) return false;
 
   assert(to && to->vertex());
   VertexType::EstimateType pose = to->vertex()->estimate();
-  VertexType::EstimateType delta = robotPoseObject_->vertex()->estimate().inverse() * pose;
+  VertexType::EstimateType delta =
+      robotPoseObject_->vertex()->estimate().inverse() * pose;
   Vector2 translation = delta;
   double range2 = translation.squaredNorm();
   if (range2 > maxRange2_) return false;
@@ -64,7 +66,7 @@ void SensorPointXYBearing::sense() {
     ++it;
     count++;
   }
-  for (auto *it : world()->objects()) {
+  for (auto* it : world()->objects()) {
     auto* o = dynamic_cast<WorldObjectType*>(it);
     if (o && isVisible(o)) {
       auto e = mkEdge(o);

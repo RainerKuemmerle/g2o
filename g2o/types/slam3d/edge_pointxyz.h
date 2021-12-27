@@ -27,60 +27,58 @@
 #ifndef G2O_EDGE_POINTXYZ_H
 #define G2O_EDGE_POINTXYZ_H
 
-#include "vertex_pointxyz.h"
 #include "g2o/config.h"
 #include "g2o/core/base_binary_edge.h"
 #include "g2o_types_slam3d_api.h"
+#include "vertex_pointxyz.h"
 
 namespace g2o {
 
-  class G2O_TYPES_SLAM3D_API EdgePointXYZ : public BaseBinaryEdge<3, Vector3, VertexPointXYZ, VertexPointXYZ>
-  {
-    public:
-      EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-        EdgePointXYZ();
+class G2O_TYPES_SLAM3D_API EdgePointXYZ
+    : public BaseBinaryEdge<3, Vector3, VertexPointXYZ, VertexPointXYZ> {
+ public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+  EdgePointXYZ();
 
-      void computeError() override 
-      {
-        const VertexPointXYZ* v1 = vertexXnRaw<0>();
-        const VertexPointXYZ* v2 = vertexXnRaw<1>();
-        error_ = (v2->estimate()-v1->estimate())-measurement_;
-      }
-      bool read(std::istream& is) override ;
-      bool write(std::ostream& os) const override ;
+  void computeError() override {
+    const VertexPointXYZ* v1 = vertexXnRaw<0>();
+    const VertexPointXYZ* v2 = vertexXnRaw<1>();
+    error_ = (v2->estimate() - v1->estimate()) - measurement_;
+  }
+  bool read(std::istream& is) override;
+  bool write(std::ostream& os) const override;
 
-      void setMeasurement(const Vector3& m) override {
-        measurement_ = m;
-      }
+  void setMeasurement(const Vector3& m) override { measurement_ = m; }
 
-      bool setMeasurementData(const number_t* d) override {
-        measurement_=Vector3(d[0], d[1], d[2]);
-        return true;
-      }
+  bool setMeasurementData(const number_t* d) override {
+    measurement_ = Vector3(d[0], d[1], d[2]);
+    return true;
+  }
 
-      bool getMeasurementData(number_t* d) const override {
-        Eigen::Map<Vector3> m(d);
-        m = measurement_;
-        return true;
-      }
+  bool getMeasurementData(number_t* d) const override {
+    Eigen::Map<Vector3> m(d);
+    m = measurement_;
+    return true;
+  }
 
-      int measurementDimension() const override {return 3;}
+  int measurementDimension() const override { return 3; }
 
-      bool setMeasurementFromState() override {
-        const VertexPointXYZ* v1 = vertexXnRaw<0>();
-        const VertexPointXYZ* v2 = vertexXnRaw<1>();
-        measurement_ = v2->estimate()-v1->estimate();
-        return true;
-      }
+  bool setMeasurementFromState() override {
+    const VertexPointXYZ* v1 = vertexXnRaw<0>();
+    const VertexPointXYZ* v2 = vertexXnRaw<1>();
+    measurement_ = v2->estimate() - v1->estimate();
+    return true;
+  }
 
-
-      number_t initialEstimatePossible(const OptimizableGraph::VertexSet& , OptimizableGraph::Vertex* ) override { return 0;}
+  number_t initialEstimatePossible(const OptimizableGraph::VertexSet&,
+                                   OptimizableGraph::Vertex*) override {
+    return 0;
+  }
 #ifndef NUMERIC_JACOBIAN_THREE_D_TYPES
-      void linearizeOplus() override;
+  void linearizeOplus() override;
 #endif
-  };
+};
 
-
-} // end namespace
+}  // namespace g2o
 
 #endif

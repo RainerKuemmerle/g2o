@@ -21,62 +21,71 @@ void declareSparseOptimizer(py::module& m) {
       .def(py::init<>())
 
       .def("initialize_optimization",
-           (bool (CLS::*)(HyperGraph::EdgeSet&)) & CLS::initializeOptimization,
+           (bool(CLS::*)(HyperGraph::EdgeSet&)) & CLS::initializeOptimization,
            "eset"_a)  // virtual
       .def("initialize_optimization",
-           (bool (CLS::*)(HyperGraph::VertexSet&, int)) & CLS::initializeOptimization, "vset"_a,
+           (bool(CLS::*)(HyperGraph::VertexSet&, int)) &
+               CLS::initializeOptimization,
+           "vset"_a,
            "level"_a = 0)  // virtual
-      .def("initialize_optimization", (bool (CLS::*)(int)) & CLS::initializeOptimization,
+      .def("initialize_optimization",
+           (bool(CLS::*)(int)) & CLS::initializeOptimization,
            "level"_a = 0)  // virtual
 
       .def("update_initialization", &CLS::updateInitialization, "vset"_a,
            "eset"_a)  // virtual, ->bool
-      .def("compute_initial_guess", (void (CLS::*)()) & CLS::computeInitialGuess)  // virtual
       .def("compute_initial_guess",
-           (void (CLS::*)(EstimatePropagatorCost&)) & CLS::computeInitialGuess,
+           (void(CLS::*)()) & CLS::computeInitialGuess)  // virtual
+      .def("compute_initial_guess",
+           (void(CLS::*)(EstimatePropagatorCost&)) & CLS::computeInitialGuess,
            "propagator"_a)                      // virtual
       .def("set_to_origin", &CLS::setToOrigin)  // virtual
 
-      .def("optimize", &CLS::optimize, "iterations"_a, "online"_a = false)  // -> int
+      .def("optimize", &CLS::optimize, "iterations"_a,
+           "online"_a = false)  // -> int
 
-      // .def("compute_marginals", (bool (CLS::*) (SparseBlockMatrix<MatrixXD>&, const
-      // std::vector<std::pair<int, int> >&))
+      // .def("compute_marginals", (bool (CLS::*) (SparseBlockMatrix<MatrixXD>&,
+      // const std::vector<std::pair<int, int> >&))
       //         &CLS::computeMarginals, "spinv"_a, "block_indices"_a)
-      // .def("compute_marginals", (bool (CLS::*) (SparseBlockMatrix<MatrixXD>&, const
-      // OptimizableGraph::Vertex*))
+      // .def("compute_marginals", (bool (CLS::*) (SparseBlockMatrix<MatrixXD>&,
+      // const OptimizableGraph::Vertex*))
       //         &CLS::computeMarginals, "spinv"_a, "vertex"_a)
-      // .def("compute_marginals", (bool (CLS::*) (SparseBlockMatrix<MatrixXD>&, const
-      // OptimizableGraph::VertexContainer&))
+      // .def("compute_marginals", (bool (CLS::*) (SparseBlockMatrix<MatrixXD>&,
+      // const OptimizableGraph::VertexContainer&))
       //         &CLS::computeMarginals, "spinv"_a, "vertices"_a)
 
       // segfault (一︿一)
-      // .def("compute_marginals", [](CLS& optimizer, const std::vector<std::pair<int, int> >&
-      // block_indices){
+      // .def("compute_marginals", [](CLS& optimizer, const
+      // std::vector<std::pair<int, int> >& block_indices){
       //         SparseBlockMatrix<MatrixXD> spinv;
       //         optimizer.computeMarginals(spinv, block_indices);
       // 		return spinv;},
       // 		py::return_value_policy::copy)
-      // .def("compute_marginals", [](CLS& optimizer, const OptimizableGraph::Vertex* vertex){
+      // .def("compute_marginals", [](CLS& optimizer, const
+      // OptimizableGraph::Vertex* vertex){
       //         SparseBlockMatrix<MatrixXD> spinv;
       //         optimizer.computeMarginals(spinv, vertex);
       // 		return spinv;},
       // 		py::return_value_policy::copy)
       // .def("compute_marginals", [](CLS& optimizer, size_t vertex_id){
       //         SparseBlockMatrix<MatrixXD> spinv;
-      // 		const g2o::OptimizableGraph::Vertex* vertex = optimizer.vertex(vertex_id);
+      // 		const g2o::OptimizableGraph::Vertex* vertex =
+      // optimizer.vertex(vertex_id);
       //         optimizer.computeMarginals(spinv, vertex);
       // 		return spinv;},
       // 		py::return_value_policy::copy)
-      // .def("compute_marginals", [](CLS& optimizer, const OptimizableGraph::VertexContainer&
-      // vertices){
+      // .def("compute_marginals", [](CLS& optimizer, const
+      // OptimizableGraph::VertexContainer& vertices){
       //         SparseBlockMatrix<MatrixXD> spinv;
       //         optimizer.computeMarginals(spinv, vertices);
       // 		return spinv;},
       // 		py::return_value_policy::copy)
 
-      // The gauge should be fixed() and then the optimization can work (if no additional dof are in
-      // the system. The default implementation returns a node with maximum dimension.
-      .def("find_gauge", &CLS::findGauge)                 // virtual, -> OptimizableGraph::Vertex*
+      // The gauge should be fixed() and then the optimization can work (if no
+      // additional dof are in the system. The default implementation returns a
+      // node with maximum dimension.
+      .def("find_gauge",
+           &CLS::findGauge)  // virtual, -> OptimizableGraph::Vertex*
       .def("gauge_freedom", &CLS::gaugeFreedom)           // -> bool
       .def("active_chi2", &CLS::activeChi2)               // -> double
       .def("active_robust_chi2", &CLS::activeRobustChi2)  // -> double
@@ -89,71 +98,87 @@ void declareSparseOptimizer(py::module& m) {
       .def("force_stop_flag", &CLS::forceStopFlag)  // -> bool*
       .def("terminate", &CLS::terminate)            // -> bool
 
-      .def("index_mapping", &CLS::indexMapping)      // -> const VertexContainer&
-      .def("active_vertices", &CLS::activeVertices)  // -> const VertexContainer&
-      .def("active_edges", &CLS::activeEdges)        // -> const EdgeContainer&
-      .def("remove_vertex", &CLS::removeVertex, "v"_a, "detach"_a = false)  // virtual, -> bool
+      .def("index_mapping", &CLS::indexMapping)  // -> const VertexContainer&
+      .def("active_vertices",
+           &CLS::activeVertices)               // -> const VertexContainer&
+      .def("active_edges", &CLS::activeEdges)  // -> const EdgeContainer&
+      .def("remove_vertex", &CLS::removeVertex, "v"_a,
+           "detach"_a = false)  // virtual, -> bool
 
       .def("find_active_vertex", &CLS::findActiveVertex,
            "v"_a)  // -> VertexContainer::const_iterator, const
       .def("find_active_edge", &CLS::findActiveEdge,
            "e"_a)  // -> EdgeContainer::const_iterator, const
 
-      .def("algorithm", &CLS::algorithm, py::return_value_policy::reference)  // -> const OptimizationAlgorithm&, const
-      .def("solver", &CLS::solver, py::return_value_policy::reference)        // -> OptimizationAlgorithm*
+      .def("algorithm", &CLS::algorithm,
+           py::return_value_policy::reference)  // -> const
+                                                // OptimizationAlgorithm&, const
+      .def("solver", &CLS::solver,
+           py::return_value_policy::reference)  // -> OptimizationAlgorithm*
       //.def("set_algorithm", &CLS::setAlgorithm,
       //        "algorithm"_a, py::keep_alive<1, 2>()) // -> void
 
       .def(
           "set_algorithm",
-          [](CLS& optimizer, const std::shared_ptr<OptimizationAlgorithm>& algorithm) {
+          [](CLS& optimizer,
+             const std::shared_ptr<OptimizationAlgorithm>& algorithm) {
             optimizer.setAlgorithm(algorithm);
           },
           py::keep_alive<1, 2>())
       .def(
           "set_algorithm",
-          [](CLS& optimizer, const std::shared_ptr<OptimizationAlgorithmWithHessian>& algorithm) {
+          [](CLS& optimizer,
+             const std::shared_ptr<OptimizationAlgorithmWithHessian>&
+                 algorithm) { optimizer.setAlgorithm(algorithm); },
+          py::keep_alive<1, 2>())
+      .def(
+          "set_algorithm",
+          [](CLS& optimizer,
+             const std::shared_ptr<OptimizationAlgorithmGaussNewton>&
+                 algorithm) { optimizer.setAlgorithm(algorithm); },
+          py::keep_alive<1, 2>())
+      .def(
+          "set_algorithm",
+          [](CLS& optimizer,
+             const std::shared_ptr<OptimizationAlgorithmLevenberg>& algorithm) {
             optimizer.setAlgorithm(algorithm);
           },
           py::keep_alive<1, 2>())
       .def(
           "set_algorithm",
-          [](CLS& optimizer, const std::shared_ptr<OptimizationAlgorithmGaussNewton>& algorithm) {
-            optimizer.setAlgorithm(algorithm);
-          },
-          py::keep_alive<1, 2>())
-      .def(
-          "set_algorithm",
-          [](CLS& optimizer, const std::shared_ptr<OptimizationAlgorithmLevenberg>& algorithm) {
-            optimizer.setAlgorithm(algorithm);
-          },
-          py::keep_alive<1, 2>())
-      .def(
-          "set_algorithm",
-          [](CLS& optimizer, const std::shared_ptr<OptimizationAlgorithmDogleg>& algorithm) {
+          [](CLS& optimizer,
+             const std::shared_ptr<OptimizationAlgorithmDogleg>& algorithm) {
             optimizer.setAlgorithm(algorithm);
           },
           py::keep_alive<1, 2>())
 
-      .def("push", (void (CLS::*)(SparseOptimizer::VertexContainer&)) & CLS::push, "vlist"_a)
-      .def("push", (void (CLS::*)(HyperGraph::VertexSet&)) & CLS::push, "vlist"_a)
-      .def("push", (void (CLS::*)()) & CLS::push)
+      .def("push",
+           (void(CLS::*)(SparseOptimizer::VertexContainer&)) & CLS::push,
+           "vlist"_a)
+      .def("push", (void(CLS::*)(HyperGraph::VertexSet&)) & CLS::push,
+           "vlist"_a)
+      .def("push", (void(CLS::*)()) & CLS::push)
 
-      .def("pop", (void (CLS::*)(SparseOptimizer::VertexContainer&)) & CLS::pop, "vlist"_a)
-      .def("pop", (void (CLS::*)(HyperGraph::VertexSet&)) & CLS::pop, "vlist"_a)
-      .def("pop", (void (CLS::*)()) & CLS::pop)
+      .def("pop", (void(CLS::*)(SparseOptimizer::VertexContainer&)) & CLS::pop,
+           "vlist"_a)
+      .def("pop", (void(CLS::*)(HyperGraph::VertexSet&)) & CLS::pop, "vlist"_a)
+      .def("pop", (void(CLS::*)()) & CLS::pop)
 
       .def("discard_top",
-           (void (CLS::*)(SparseOptimizer::VertexContainer&)) & CLS::discardTop)  // -> void
-      .def("discard_top", (void (CLS::*)()) & CLS::discardTop)
+           (void(CLS::*)(SparseOptimizer::VertexContainer&)) &
+               CLS::discardTop)  // -> void
+      .def("discard_top", (void(CLS::*)()) & CLS::discardTop)
 
-      .def("clear", &CLS::clear)                                // virtual, -> void
-      .def("compute_active_errors", &CLS::computeActiveErrors)  // virtual, -> void
-      .def("update", &CLS::update, "update"_a)                  // -> void
+      .def("clear", &CLS::clear)  // virtual, -> void
+      .def("compute_active_errors",
+           &CLS::computeActiveErrors)           // virtual, -> void
+      .def("update", &CLS::update, "update"_a)  // -> void
 
       .def("batch_statistics",
-           (const BatchStatisticsContainer& (CLS::*)() const) & CLS::batchStatistics)
-      .def("set_compute_batch_statistics", &CLS::setComputeBatchStatistics)  // -> void
+           (const BatchStatisticsContainer& (CLS::*)() const) &
+               CLS::batchStatistics)
+      .def("set_compute_batch_statistics",
+           &CLS::setComputeBatchStatistics)  // -> void
       .def("compute_batch_statistics", &CLS::computeBatchStatistics)
 
       // callbacks

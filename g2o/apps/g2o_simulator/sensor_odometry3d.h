@@ -27,19 +27,20 @@
 #ifndef G2O_SENSOR_ODOMETRY3D_H_
 #define G2O_SENSOR_ODOMETRY3D_H_
 
-#include "simulator3d_base.h"
 #include "g2o_simulator_api.h"
+#include "simulator3d_base.h"
 
 namespace g2o {
 
-  class G2O_SIMULATOR_API SensorOdometry3D: public BinarySensor<Robot3D, EdgeSE3, WorldObjectSE3 > {
-  public:
-    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-    explicit SensorOdometry3D(const std::string& name);
-    void sense() override;
-    void addNoise(EdgeType* e) override;
-  };
+class G2O_SIMULATOR_API SensorOdometry3D
+    : public BinarySensor<Robot3D, EdgeSE3, WorldObjectSE3> {
+ public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+  explicit SensorOdometry3D(const std::string& name);
+  void sense() override;
+  void addNoise(EdgeType* e) override;
+};
 
-}
+}  // namespace g2o
 
 #endif

@@ -30,59 +30,56 @@
 #include "g2o/config.h"
 #include "g2o/core/base_vertex.h"
 #include "g2o/core/hyper_graph_action.h"
-
 #include "g2o_types_slam3d_addons_api.h"
 #include "line3d.h"
 
 namespace g2o {
 
-  class G2O_TYPES_SLAM3D_ADDONS_API VertexLine3D : public BaseVertex<4, Line3D> {
-  public:
-    EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
+class G2O_TYPES_SLAM3D_ADDONS_API VertexLine3D : public BaseVertex<4, Line3D> {
+ public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
 
-    VertexLine3D();
-    bool read(std::istream& is) override;
-    bool write(std::ostream& os) const override;
+  VertexLine3D();
+  bool read(std::istream& is) override;
+  bool write(std::ostream& os) const override;
 
-    void setToOriginImpl() override { estimate_ = Line3D(); }
+  void setToOriginImpl() override { estimate_ = Line3D(); }
 
-    void oplusImpl(const number_t* update_) override {
-      Eigen::Map<const Vector4> update(update_);
-      estimate_.oplus(update);
-    }
+  void oplusImpl(const number_t* update_) override {
+    Eigen::Map<const Vector4> update(update_);
+    estimate_.oplus(update);
+  }
 
-    bool setEstimateDataImpl(const number_t* est) override {
-      Eigen::Map<const Vector6> _est(est);
-      estimate_ = Line3D(_est);
-      return true;
-    }
+  bool setEstimateDataImpl(const number_t* est) override {
+    Eigen::Map<const Vector6> _est(est);
+    estimate_ = Line3D(_est);
+    return true;
+  }
 
-    bool getEstimateData(number_t* est) const override {
-      Eigen::Map<Vector6> _est(est);
-      _est = estimate_;
-      return true;
-    }
+  bool getEstimateData(number_t* est) const override {
+    Eigen::Map<Vector6> _est(est);
+    _est = estimate_;
+    return true;
+  }
 
-    int estimateDimension() const override {
-      return 6;
-    }
+  int estimateDimension() const override { return 6; }
 
-    Vector3 color;
-  };
+  Vector3 color;
+};
 
 #ifdef G2O_HAVE_OPENGL
-  class VertexLine3DDrawAction : public DrawAction {
-  public:
-    VertexLine3DDrawAction();
-    bool operator()(HyperGraph::HyperGraphElement* element,
-                            HyperGraphElementAction::Parameters* params_) override;
+class VertexLine3DDrawAction : public DrawAction {
+ public:
+  VertexLine3DDrawAction();
+  bool operator()(HyperGraph::HyperGraphElement* element,
+                  HyperGraphElementAction::Parameters* params_) override;
 
-   protected:
-    bool refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_) override;
-    std::shared_ptr<FloatProperty> lineLength_, lineWidth_;
-
-  };
+ protected:
+  bool refreshPropertyPtrs(
+      HyperGraphElementAction::Parameters* params_) override;
+  std::shared_ptr<FloatProperty> lineLength_, lineWidth_;
+};
 #endif
 
-}
+}  // namespace g2o
 #endif

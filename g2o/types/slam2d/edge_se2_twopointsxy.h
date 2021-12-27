@@ -28,28 +28,30 @@
 #define G2O_EDGE_SE2_TWOPOINTS_XY_H
 
 #include "g2o/config.h"
-#include "g2o_types_slam2d_api.h"
 #include "g2o/core/base_variable_sized_edge.h"
-#include "vertex_se2.h"
+#include "g2o_types_slam2d_api.h"
 #include "vertex_point_xy.h"
+#include "vertex_se2.h"
 
-namespace g2o{
+namespace g2o {
 
-  class G2O_TYPES_SLAM2D_API EdgeSE2TwoPointsXY : public BaseVariableSizedEdge<4, Vector4>
-  {
-    public:
-      EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
-      EdgeSE2TwoPointsXY();
+class G2O_TYPES_SLAM2D_API EdgeSE2TwoPointsXY
+    : public BaseVariableSizedEdge<4, Vector4> {
+ public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
+  EdgeSE2TwoPointsXY();
 
-      void computeError() override;
+  void computeError() override;
 
-      bool read(std::istream& is) override;
-      bool write(std::ostream& os) const override;
+  bool read(std::istream& is) override;
+  bool write(std::ostream& os) const override;
 
-      bool setMeasurementFromState() override;
+  bool setMeasurementFromState() override;
 
-      void initialEstimate(const OptimizableGraph::VertexSet&, OptimizableGraph::Vertex*) override;
-      number_t initialEstimatePossible(const OptimizableGraph::VertexSet&, OptimizableGraph::Vertex*) override;
-  };
-}
-#endif	// G2O_EDGE_SE2_TWOPOINTS_XY_H
+  void initialEstimate(const OptimizableGraph::VertexSet&,
+                       OptimizableGraph::Vertex*) override;
+  number_t initialEstimatePossible(const OptimizableGraph::VertexSet&,
+                                   OptimizableGraph::Vertex*) override;
+};
+}  // namespace g2o
+#endif  // G2O_EDGE_SE2_TWOPOINTS_XY_H

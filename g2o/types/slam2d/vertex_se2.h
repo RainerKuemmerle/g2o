@@ -30,83 +30,79 @@
 #include "g2o/config.h"
 #include "g2o/core/base_vertex.h"
 #include "g2o/core/hyper_graph_action.h"
-#include "se2.h"
 #include "g2o_types_slam2d_api.h"
+#include "se2.h"
 
 namespace g2o {
 
-  /**
-   * \brief 2D pose Vertex, (x,y,theta)
-   */
-  class G2O_TYPES_SLAM2D_API VertexSE2 : public BaseVertex<3, SE2>
-  {
-    public:
-      EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-      VertexSE2() = default;
+/**
+ * \brief 2D pose Vertex, (x,y,theta)
+ */
+class G2O_TYPES_SLAM2D_API VertexSE2 : public BaseVertex<3, SE2> {
+ public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+  VertexSE2() = default;
 
-      void setToOriginImpl() override {
-        estimate_ = SE2();
-      }
+  void setToOriginImpl() override { estimate_ = SE2(); }
 
-      void oplusImpl(const number_t* update) override
-      {
-        Vector2 t=estimate_.translation();
-        t+=Eigen::Map<const Vector2>(update);
-        number_t angle=normalize_theta(estimate_.rotation().angle() + update[2]);
-        estimate_.setTranslation(t);
-        estimate_.setRotation(Rotation2D(angle));
-      }
+  void oplusImpl(const number_t* update) override {
+    Vector2 t = estimate_.translation();
+    t += Eigen::Map<const Vector2>(update);
+    number_t angle = normalize_theta(estimate_.rotation().angle() + update[2]);
+    estimate_.setTranslation(t);
+    estimate_.setRotation(Rotation2D(angle));
+  }
 
-      bool setEstimateDataImpl(const number_t* est) override{
-        estimate_=SE2(est[0], est[1], est[2]);
-        return true;
-      }
+  bool setEstimateDataImpl(const number_t* est) override {
+    estimate_ = SE2(est[0], est[1], est[2]);
+    return true;
+  }
 
-      bool getEstimateData(number_t* est) const override {
-        Eigen::Map<Vector3> v(est);
-        v = estimate_.toVector();
-        return true;
-      }
+  bool getEstimateData(number_t* est) const override {
+    Eigen::Map<Vector3> v(est);
+    v = estimate_.toVector();
+    return true;
+  }
 
-      int estimateDimension() const override { return 3; }
+  int estimateDimension() const override { return 3; }
 
-      bool setMinimalEstimateDataImpl(const number_t* est) override{
-        return setEstimateData(est);
-      }
+  bool setMinimalEstimateDataImpl(const number_t* est) override {
+    return setEstimateData(est);
+  }
 
-      bool getMinimalEstimateData(number_t* est) const override {
-        return getEstimateData(est);
-      }
+  bool getMinimalEstimateData(number_t* est) const override {
+    return getEstimateData(est);
+  }
 
-      int minimalEstimateDimension() const override { return 3; }
+  int minimalEstimateDimension() const override { return 3; }
 
-      bool read(std::istream& is) override;
-      bool write(std::ostream& os) const override;
+  bool read(std::istream& is) override;
+  bool write(std::ostream& os) const override;
+};
 
-  };
-
-  class G2O_TYPES_SLAM2D_API VertexSE2WriteGnuplotAction: public WriteGnuplotAction {
-  public:
-    VertexSE2WriteGnuplotAction();
-    bool operator()(HyperGraph::HyperGraphElement* element,
-                            HyperGraphElementAction::Parameters* params_) override;
-  };
+class G2O_TYPES_SLAM2D_API VertexSE2WriteGnuplotAction
+    : public WriteGnuplotAction {
+ public:
+  VertexSE2WriteGnuplotAction();
+  bool operator()(HyperGraph::HyperGraphElement* element,
+                  HyperGraphElementAction::Parameters* params_) override;
+};
 
 #ifdef G2O_HAVE_OPENGL
-  class G2O_TYPES_SLAM2D_API VertexSE2DrawAction: public DrawAction{
-  public:
-    VertexSE2DrawAction();
-    bool operator()(HyperGraph::HyperGraphElement* element,
-                            HyperGraphElementAction::Parameters* params_) override;
+class G2O_TYPES_SLAM2D_API VertexSE2DrawAction : public DrawAction {
+ public:
+  VertexSE2DrawAction();
+  bool operator()(HyperGraph::HyperGraphElement* element,
+                  HyperGraphElementAction::Parameters* params_) override;
 
-   protected:
-    HyperGraphElementAction* drawActions_ = nullptr;
-    bool refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_) override;
-    std::shared_ptr<FloatProperty> triangleX_, triangleY_;
-
-  };
+ protected:
+  HyperGraphElementAction* drawActions_ = nullptr;
+  bool refreshPropertyPtrs(
+      HyperGraphElementAction::Parameters* params_) override;
+  std::shared_ptr<FloatProperty> triangleX_, triangleY_;
+};
 #endif
 
-} // end namespace
+}  // namespace g2o
 
 #endif

@@ -28,66 +28,70 @@
 #define G2O_EDGE_SE2_LINE2D_H
 
 #include "g2o/config.h"
-#include "g2o/types/slam2d/vertex_se2.h"
-#include "vertex_line2d.h"
 #include "g2o/core/base_binary_edge.h"
 #include "g2o/stuff/misc.h"
+#include "g2o/types/slam2d/vertex_se2.h"
 #include "g2o_types_slam2d_addons_api.h"
+#include "vertex_line2d.h"
 
 namespace g2o {
 
-  class G2O_TYPES_SLAM2D_ADDONS_API EdgeSE2Line2D : public BaseBinaryEdge<2, Line2D, VertexSE2, VertexLine2D>
-  {
-    public:
-      EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-      void computeError() override
-      {
-        const VertexSE2* v1 = vertexXnRaw<0>();
-        const VertexLine2D* l2 = vertexXnRaw<1>();
-        Vector2 prediction=l2->estimate();
-        SE2 iT=v1->estimate().inverse();
-        prediction[0] += iT.rotation().angle();
-        prediction[0] = normalize_theta(prediction[0]);
-        Vector2 n(std::cos(prediction[0]), std::sin(prediction[0]));
-        prediction[1] += n.dot(iT.translation());
-        error_ =  prediction - measurement_;
-        error_ [0] =  normalize_theta(error_[0]);
-      }
+class G2O_TYPES_SLAM2D_ADDONS_API EdgeSE2Line2D
+    : public BaseBinaryEdge<2, Line2D, VertexSE2, VertexLine2D> {
+ public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+  void computeError() override {
+    const VertexSE2* v1 = vertexXnRaw<0>();
+    const VertexLine2D* l2 = vertexXnRaw<1>();
+    Vector2 prediction = l2->estimate();
+    SE2 iT = v1->estimate().inverse();
+    prediction[0] += iT.rotation().angle();
+    prediction[0] = normalize_theta(prediction[0]);
+    Vector2 n(std::cos(prediction[0]), std::sin(prediction[0]));
+    prediction[1] += n.dot(iT.translation());
+    error_ = prediction - measurement_;
+    error_[0] = normalize_theta(error_[0]);
+  }
 
-      bool setMeasurementData(const number_t* d) override{
-        measurement_[0]=d[0];
-        measurement_[1]=d[1];
-        return true;
-      }
+  bool setMeasurementData(const number_t* d) override {
+    measurement_[0] = d[0];
+    measurement_[1] = d[1];
+    return true;
+  }
 
-      bool getMeasurementData(number_t* d) const override{
-        d[0] = measurement_[0];
-        d[1] = measurement_[1];
-        return true;
-      }
+  bool getMeasurementData(number_t* d) const override {
+    d[0] = measurement_[0];
+    d[1] = measurement_[1];
+    return true;
+  }
 
-      int measurementDimension() const override {return 2;}
+  int measurementDimension() const override { return 2; }
 
-      bool setMeasurementFromState() override{
-        const VertexSE2* v1 = vertexXnRaw<0>();
-        const VertexLine2D* l2 = vertexXnRaw<1>();
-        Vector2 prediction=l2->estimate();
-        SE2 iT=v1->estimate().inverse();
-        prediction[0] += iT.rotation().angle();
-        prediction[0] = normalize_theta(prediction[0]);
-        Vector2 n(std::cos(prediction[0]), std::sin(prediction[0]));
-        prediction[1] += n.dot(iT.translation());
-        measurement_ = Line2D(prediction);
-        return true;
-      }
+  bool setMeasurementFromState() override {
+    const VertexSE2* v1 = vertexXnRaw<0>();
+    const VertexLine2D* l2 = vertexXnRaw<1>();
+    Vector2 prediction = l2->estimate();
+    SE2 iT = v1->estimate().inverse();
+    prediction[0] += iT.rotation().angle();
+    prediction[0] = normalize_theta(prediction[0]);
+    Vector2 n(std::cos(prediction[0]), std::sin(prediction[0]));
+    prediction[1] += n.dot(iT.translation());
+    measurement_ = Line2D(prediction);
+    return true;
+  }
 
-      bool read(std::istream& is) override;
-      bool write(std::ostream& os) const override;
+  bool read(std::istream& is) override;
+  bool write(std::ostream& os) const override;
 
-      void initialEstimate(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to) override;
-      number_t initialEstimatePossible(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to) override { (void) to; return (from.count(vertices_[0]) == 1 ? 1.0 : -1.0);}
-  };
+  void initialEstimate(const OptimizableGraph::VertexSet& from,
+                       OptimizableGraph::Vertex* to) override;
+  number_t initialEstimatePossible(const OptimizableGraph::VertexSet& from,
+                                   OptimizableGraph::Vertex* to) override {
+    (void)to;
+    return (from.count(vertices_[0]) == 1 ? 1.0 : -1.0);
+  }
+};
 
-} // end namespace
+}  // namespace g2o
 
 #endif

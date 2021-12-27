@@ -48,7 +48,8 @@ bool PropertyMap::eraseProperty(const std::string& name) {
   return true;
 }
 
-bool PropertyMap::updatePropertyFromString(const std::string& name, const std::string& value) { // NOLINT
+bool PropertyMap::updatePropertyFromString(
+    const std::string& name, const std::string& value) {  // NOLINT
   auto it = find(name);
   if (it == end()) return false;
   it->second->fromString(value);
@@ -72,7 +73,8 @@ bool PropertyMap::updateMapFromString(const std::string& values) {
   for (const auto& entry : valuesMap) {
     std::vector<std::string> m = strSplit(entry, "=");
     if (m.size() != 2) {
-      std::cerr << __PRETTY_FUNCTION__ << ": unable to extract name=value pair from " << entry
+      std::cerr << __PRETTY_FUNCTION__
+                << ": unable to extract name=value pair from " << entry
                 << std::endl;
       continue;
     }

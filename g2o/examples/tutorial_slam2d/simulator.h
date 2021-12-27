@@ -51,7 +51,8 @@ class G2O_TUTORIAL_SLAM2D_API Simulator {
     std::vector<int> seenBy;
     Landmark() : id(-1) {}
   };
-  typedef std::vector<Landmark, Eigen::aligned_allocator<Landmark> > LandmarkVector;
+  typedef std::vector<Landmark, Eigen::aligned_allocator<Landmark> >
+      LandmarkVector;
   typedef std::vector<Landmark*> LandmarkPtrVector;
 
   /**
@@ -64,7 +65,8 @@ class G2O_TUTORIAL_SLAM2D_API Simulator {
     SE2 simulatorPose;
     LandmarkPtrVector landmarks;  ///< the landmarks observed by this node
   };
-  typedef std::vector<GridPose, Eigen::aligned_allocator<GridPose> > PosesVector;
+  typedef std::vector<GridPose, Eigen::aligned_allocator<GridPose> >
+      PosesVector;
 
   /**
    * \brief odometry constraint
@@ -77,7 +79,8 @@ class G2O_TUTORIAL_SLAM2D_API Simulator {
     Eigen::Matrix3d information;
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
   };
-  typedef std::vector<GridEdge, Eigen::aligned_allocator<GridEdge> > GridEdgeVector;
+  typedef std::vector<GridEdge, Eigen::aligned_allocator<GridEdge> >
+      GridEdgeVector;
 
   struct G2O_TUTORIAL_SLAM2D_API LandmarkEdge {
     int from;
@@ -87,7 +90,8 @@ class G2O_TUTORIAL_SLAM2D_API Simulator {
     Eigen::Matrix2d information;
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
   };
-  typedef std::vector<LandmarkEdge, Eigen::aligned_allocator<LandmarkEdge> > LandmarkEdgeVector;
+  typedef std::vector<LandmarkEdge, Eigen::aligned_allocator<LandmarkEdge> >
+      LandmarkEdgeVector;
 
  public:
   Simulator();
@@ -98,7 +102,9 @@ class G2O_TUTORIAL_SLAM2D_API Simulator {
   const PosesVector& poses() const { return _poses; }
   const LandmarkVector& landmarks() const { return _landmarks; }
   const GridEdgeVector& odometry() const { return _odometry; }
-  const LandmarkEdgeVector& landmarkObservations() const { return _landmarkObservations; }
+  const LandmarkEdgeVector& landmarkObservations() const {
+    return _landmarkObservations;
+  }
 
  protected:
   PosesVector _poses;
@@ -109,8 +115,8 @@ class G2O_TUTORIAL_SLAM2D_API Simulator {
   GridPose generateNewPose(const GridPose& prev, const SE2& trueMotion,
                            const Eigen::Vector2d& transNoise, double rotNoise);
   SE2 getMotion(int motionDirection, double stepLen);
-  SE2 sampleTransformation(const SE2& trueMotion_, const Eigen::Vector2d& transNoise,
-                           double rotNoise);
+  SE2 sampleTransformation(const SE2& trueMotion_,
+                           const Eigen::Vector2d& transNoise, double rotNoise);
 };
 
 }  // namespace tutorial

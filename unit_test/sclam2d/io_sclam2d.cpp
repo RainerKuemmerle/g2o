@@ -40,26 +40,37 @@ struct RandomSE2 {
   static SE2 create() {
     auto randomPosition = Vector2::Random();
     auto randomOrientation = Vector2::Random();
-    return SE2(randomPosition.x(), randomPosition.y(), std::atan2(randomOrientation.y(), randomOrientation.x()));
+    return SE2(randomPosition.x(), randomPosition.y(),
+               std::atan2(randomOrientation.y(), randomOrientation.x()));
   }
-  static bool isApprox(const SE2& a, const SE2& b) { return a.toVector().isApprox(b.toVector(), 1e-5); }
+  static bool isApprox(const SE2& a, const SE2& b) {
+    return a.toVector().isApprox(b.toVector(), 1e-5);
+  }
 };
 
 struct RandomVelocityMeasurement {
   static VelocityMeasurement create() {
     auto randomValues = Vector3::Random();
-    return VelocityMeasurement(randomValues(0), randomValues(1), randomValues(2));
+    return VelocityMeasurement(randomValues(0), randomValues(1),
+                               randomValues(2));
   }
-  static bool isApprox(const VelocityMeasurement& a, const VelocityMeasurement& b) {
-    return a.measurement().isApprox(b.measurement(), 1e-5) && fabs(a.dt() - b.dt()) < 1e-5;
+  static bool isApprox(const VelocityMeasurement& a,
+                       const VelocityMeasurement& b) {
+    return a.measurement().isApprox(b.measurement(), 1e-5) &&
+           fabs(a.dt() - b.dt()) < 1e-5;
   }
 };
 }  // namespace
 
-TEST(IoSclam2d, ReadWriteVertexOdomDifferentialParams) { readWriteVectorBasedVertex<VertexOdomDifferentialParams>(); }
+TEST(IoSclam2d, ReadWriteVertexOdomDifferentialParams) {
+  readWriteVectorBasedVertex<VertexOdomDifferentialParams>();
+}
 
-TEST(IoSclam2d, ReadWriteEdgeSE2SensorCalib) { readWriteVectorBasedEdge<EdgeSE2SensorCalib, RandomSE2>(); }
+TEST(IoSclam2d, ReadWriteEdgeSE2SensorCalib) {
+  readWriteVectorBasedEdge<EdgeSE2SensorCalib, RandomSE2>();
+}
 
 TEST(IoSclam2d, ReadWriteEdgeSE2OdomDifferentialCalib) {
-  readWriteVectorBasedEdge<EdgeSE2OdomDifferentialCalib, RandomVelocityMeasurement>();
+  readWriteVectorBasedEdge<EdgeSE2OdomDifferentialCalib,
+                           RandomVelocityMeasurement>();
 }

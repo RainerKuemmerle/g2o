@@ -30,105 +30,106 @@
 
 namespace g2o {
 
-  EdgeSE3Line3D::EdgeSE3Line3D() {
-    information().setIdentity();
-    resizeParameters(1);
-    installParameter<CacheSE3Offset::ParameterType>(0);
-    color << 0.0, 0.5, 1.0;
-  }
+EdgeSE3Line3D::EdgeSE3Line3D() {
+  information().setIdentity();
+  resizeParameters(1);
+  installParameter<CacheSE3Offset::ParameterType>(0);
+  color << 0.0, 0.5, 1.0;
+}
 
-  bool EdgeSE3Line3D::read(std::istream& is) {
-    bool state = readParamIds(is);
-    state &= internal::readVector(is, measurement_);
-    state &= readInformationMatrix(is);
-    return state;
-  }
+bool EdgeSE3Line3D::read(std::istream& is) {
+  bool state = readParamIds(is);
+  state &= internal::readVector(is, measurement_);
+  state &= readInformationMatrix(is);
+  return state;
+}
 
-  bool EdgeSE3Line3D::write(std::ostream& os) const {
-    writeParamIds(os);
-    internal::writeVector(os, measurement());
-    return writeInformationMatrix(os);
-  }
+bool EdgeSE3Line3D::write(std::ostream& os) const {
+  writeParamIds(os);
+  internal::writeVector(os, measurement());
+  return writeInformationMatrix(os);
+}
 
-  void EdgeSE3Line3D::computeError() {
-    const VertexSE3* se3Vertex = vertexXnRaw<0>();
-    const VertexLine3D* lineVertex = vertexXnRaw<1>();
-    const Line3D& line = lineVertex->estimate();
-    Line3D localLine = se3Vertex->estimate().inverse() * line;
-    error_ = localLine.ominus(measurement_);
-  }
+void EdgeSE3Line3D::computeError() {
+  const VertexSE3* se3Vertex = vertexXnRaw<0>();
+  const VertexLine3D* lineVertex = vertexXnRaw<1>();
+  const Line3D& line = lineVertex->estimate();
+  Line3D localLine = se3Vertex->estimate().inverse() * line;
+  error_ = localLine.ominus(measurement_);
+}
 
-  bool EdgeSE3Line3D::resolveCaches() {
-    ParameterVector pv(1);
-    pv[0] = parameters_[0];
-    resolveCache(cache_, vertexXn<0>(), "CACHE_SE3_OFFSET", pv);
-    return cache_ != nullptr;
-  }
+bool EdgeSE3Line3D::resolveCaches() {
+  ParameterVector pv(1);
+  pv[0] = parameters_[0];
+  resolveCache(cache_, vertexXn<0>(), "CACHE_SE3_OFFSET", pv);
+  return cache_ != nullptr;
+}
 
 #ifdef G2O_HAVE_OPENGL
-  EdgeSE3Line3DDrawAction::EdgeSE3Line3DDrawAction()
-      : DrawAction(typeid(EdgeSE3Line3D).name()), lineLength_(nullptr), lineWidth_(nullptr) {}
+EdgeSE3Line3DDrawAction::EdgeSE3Line3DDrawAction()
+    : DrawAction(typeid(EdgeSE3Line3D).name()),
+      lineLength_(nullptr),
+      lineWidth_(nullptr) {}
 
-  bool EdgeSE3Line3DDrawAction::refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_) {
-    if(!DrawAction::refreshPropertyPtrs(params_)) {
-      return false;
-    }
-    if(previousParams_) {
-      lineLength_ = previousParams_->makeProperty<FloatProperty>(typeName_ + "::LINE_LENGTH", 4.0F);
-      lineWidth_ = previousParams_->makeProperty<FloatProperty>(typeName_ + "::LINE_WIDTH", 2.0F);
-    }
-    else {
-      lineLength_ = nullptr;
-      lineWidth_ = nullptr;
-    }
-    return true;
+bool EdgeSE3Line3DDrawAction::refreshPropertyPtrs(
+    HyperGraphElementAction::Parameters* params_) {
+  if (!DrawAction::refreshPropertyPtrs(params_)) {
+    return false;
+  }
+  if (previousParams_) {
+    lineLength_ = previousParams_->makeProperty<FloatProperty>(
+        typeName_ + "::LINE_LENGTH", 4.0F);
+    lineWidth_ = previousParams_->makeProperty<FloatProperty>(
+        typeName_ + "::LINE_WIDTH", 2.0F);
+  } else {
+    lineLength_ = nullptr;
+    lineWidth_ = nullptr;
+  }
+  return true;
+}
+
+bool EdgeSE3Line3DDrawAction::operator()(
+    HyperGraph::HyperGraphElement* element,
+    HyperGraphElementAction::Parameters* params_) {
+  if (typeid(*element).name() != typeName_) return false;
+
+  refreshPropertyPtrs(params_);
+  if (!previousParams_) return true;
+
+  if (show_ && !show_->value()) return true;
+
+  auto* that = dynamic_cast<EdgeSE3Line3D*>(element);
+  if (!that) return true;
+  auto robot = std::dynamic_pointer_cast<VertexSE3>(that->vertex(0));
+  auto landmark = std::dynamic_pointer_cast<VertexLine3D>(that->vertex(1));
+
+  if (!robot || !landmark) return false;
+
+  if (lineLength_ && lineWidth_) {
+    Line3D line = that->measurement();
+    line.normalize();
+    Vector3 direction = line.d();
+    Vector3 npoint = line.d().cross(line.w());
+
+    glPushMatrix();
+    glMultMatrixd(robot->estimate().matrix().cast<double>().eval().data());
+    glColor3f(float(that->color(0)), float(that->color(1)),
+              float(that->color(2)));
+    glLineWidth(float(lineWidth_->value()));
+    glBegin(GL_LINES);
+    glNormal3f(float(npoint.x()), float(npoint.y()), float(npoint.z()));
+    glVertex3f(float(npoint.x() - direction.x() * lineLength_->value() / 2),
+               float(npoint.y() - direction.y() * lineLength_->value() / 2),
+               float(npoint.z() - direction.z() * lineLength_->value() / 2));
+    glVertex3f(float(npoint.x() + direction.x() * lineLength_->value() / 2),
+               float(npoint.y() + direction.y() * lineLength_->value() / 2),
+               float(npoint.z() + direction.z() * lineLength_->value() / 2));
+    glEnd();
+    glPopMatrix();
   }
 
-  bool EdgeSE3Line3DDrawAction::operator()(HyperGraph::HyperGraphElement* element,
-                                           HyperGraphElementAction::Parameters* params_) {
-    if(typeid(*element).name() != typeName_)
-      return false;
-
-    refreshPropertyPtrs(params_);
-    if(!previousParams_)
-      return true;
-
-    if(show_ && !show_->value())
-      return true;
-
-    auto* that = dynamic_cast<EdgeSE3Line3D*>(element);
-    if(!that)
-      return true;
-    auto robot  = std::dynamic_pointer_cast<VertexSE3>(that->vertex(0));
-    auto landmark = std::dynamic_pointer_cast<VertexLine3D>(that->vertex(1));
-
-    if(!robot || !landmark)
-      return false;
-
-    if (lineLength_ && lineWidth_) {
-      Line3D line = that->measurement();
-      line.normalize();
-      Vector3 direction = line.d();
-      Vector3 npoint = line.d().cross(line.w());
-
-      glPushMatrix();
-      glMultMatrixd(robot->estimate().matrix().cast<double>().eval().data());
-      glColor3f(float(that->color(0)), float(that->color(1)), float(that->color(2)));
-      glLineWidth(float(lineWidth_->value()));
-      glBegin(GL_LINES);
-      glNormal3f(float(npoint.x()), float(npoint.y()), float(npoint.z()));
-      glVertex3f(float(npoint.x() - direction.x() * lineLength_->value() / 2),
-                 float(npoint.y() - direction.y() * lineLength_->value() / 2),
-                 float(npoint.z() - direction.z() * lineLength_->value() / 2));
-      glVertex3f(float(npoint.x() + direction.x() * lineLength_->value() / 2),
-                 float(npoint.y() + direction.y() * lineLength_->value() / 2),
-                 float(npoint.z() + direction.z() * lineLength_->value() / 2));
-      glEnd();
-      glPopMatrix();
-    }
-
-    return true;
-  }
+  return true;
+}
 #endif
 
-}
+}  // namespace g2o

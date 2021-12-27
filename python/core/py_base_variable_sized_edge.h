@@ -12,13 +12,14 @@ void templatedBaseVariableSizedEdge(py::module& m, const std::string& suffix) {
   // typedef typename BaseEdge<D,E>::ErrorVector ErrorVector;
   // typedef typename BaseEdge<D,E>::InformationType InformationType;
 
-  py::class_<CLS, BaseEdge<D, E>, std::shared_ptr<CLS>>(m,
-                                                        ("BaseVariableSizedEdge" + suffix).c_str())
+  py::class_<CLS, BaseEdge<D, E>, std::shared_ptr<CLS>>(
+      m, ("BaseVariableSizedEdge" + suffix).c_str())
       .def("resize", &CLS::resize, "size"_a)              // size_t ->
       .def("all_vertices_fixed", &CLS::allVerticesFixed)  // -> bool
       .def("construct_quadratic_form", &CLS::constructQuadraticForm)
-      .def("linearize_oplus", (void (CLS::*)(JacobianWorkspace&)) & CLS::linearizeOplus)
-      .def("linearize_oplus", (void (CLS::*)()) & CLS::linearizeOplus)
+      .def("linearize_oplus",
+           (void(CLS::*)(JacobianWorkspace&)) & CLS::linearizeOplus)
+      .def("linearize_oplus", (void(CLS::*)()) & CLS::linearizeOplus)
       .def("mapHessianMemory", &CLS::mapHessianMemory, "d"_a, "i"_a, "j"_a,
            "row_major"_a)  // (double*, i, j, bool) ->
 
@@ -26,7 +27,8 @@ void templatedBaseVariableSizedEdge(py::module& m, const std::string& suffix) {
 }
 
 template <typename E>
-void templatedDynamicBaseVariableSizedEdge(py::module& m, const std::string& suffix) {
+void templatedDynamicBaseVariableSizedEdge(py::module& m,
+                                           const std::string& suffix) {
   using CLS = BaseVariableSizedEdge<-1, E>;
 
   // typedef typename BaseEdge<-1,E>::ErrorVector ErrorVector;
@@ -37,8 +39,9 @@ void templatedDynamicBaseVariableSizedEdge(py::module& m, const std::string& suf
       .def("resize", &CLS::resize, "size"_a)              // size_t ->
       .def("all_vertices_fixed", &CLS::allVerticesFixed)  // -> bool
       .def("construct_quadratic_form", &CLS::constructQuadraticForm)
-      .def("linearize_oplus", (void (CLS::*)(JacobianWorkspace&)) & CLS::linearizeOplus)
-      .def("linearize_oplus", (void (CLS::*)()) & CLS::linearizeOplus)
+      .def("linearize_oplus",
+           (void(CLS::*)(JacobianWorkspace&)) & CLS::linearizeOplus)
+      .def("linearize_oplus", (void(CLS::*)()) & CLS::linearizeOplus)
       .def("mapHessianMemory", &CLS::mapHessianMemory, "d"_a, "i"_a, "j"_a,
            "row_major"_a)  // (double*, i, j, bool) ->
 

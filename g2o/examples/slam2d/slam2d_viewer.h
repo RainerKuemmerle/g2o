@@ -23,21 +23,20 @@
 
 namespace g2o {
 
-  class SparseOptimizer;
+class SparseOptimizer;
 
-  class Slam2DViewer : public QGLViewer
-  {
-    public:
-      Slam2DViewer(QWidget* parent=NULL, const QGLWidget* shareWidget=0);
-      ~Slam2DViewer();
-      virtual void draw();
-      void init();
+class Slam2DViewer : public QGLViewer {
+ public:
+  Slam2DViewer(QWidget* parent = NULL, const QGLWidget* shareWidget = 0);
+  ~Slam2DViewer();
+  virtual void draw();
+  void init();
 
-    public:
-      SparseOptimizer* graph;
-      bool drawCovariance;
-  };
+ public:
+  SparseOptimizer* graph;
+  bool drawCovariance;
+};
 
-} // end namespace
+}  // namespace g2o
 
 #endif

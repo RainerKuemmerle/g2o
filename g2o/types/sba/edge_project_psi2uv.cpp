@@ -51,12 +51,13 @@ void EdgeProjectPSI2UV::computeError() {
   const VertexPointXYZ *psi = vertexXnRaw<0>();
   const VertexSE3Expmap *T_p_from_world = vertexXnRaw<1>();
   const VertexSE3Expmap *T_anchor_from_world = vertexXnRaw<2>();
-  const CameraParameters *cam = static_cast<const CameraParameters *>(parameter(0).get());
+  const CameraParameters *cam =
+      static_cast<const CameraParameters *>(parameter(0).get());
 
   Vector2 obs(measurement_);
-  error_ =
-      obs - cam->cam_map(T_p_from_world->estimate() * T_anchor_from_world->estimate().inverse() *
-                         internal::invert_depth(psi->estimate()));
+  error_ = obs - cam->cam_map(T_p_from_world->estimate() *
+                              T_anchor_from_world->estimate().inverse() *
+                              internal::invert_depth(psi->estimate()));
 }
 
 void EdgeProjectPSI2UV::linearizeOplus() {
@@ -65,20 +66,23 @@ void EdgeProjectPSI2UV::linearizeOplus() {
   VertexSE3Expmap *vpose = vertexXnRaw<1>();
   SE3Quat T_cw = vpose->estimate();
   VertexSE3Expmap *vanchor = vertexXnRaw<2>();
-  const CameraParameters *cam = static_cast<const CameraParameters *>(parameter(0).get());
+  const CameraParameters *cam =
+      static_cast<const CameraParameters *>(parameter(0).get());
 
   SE3Quat A_aw = vanchor->estimate();
   SE3Quat T_ca = T_cw * A_aw.inverse();
   Vector3 x_a = internal::invert_depth(psi_a);
   Vector3 y = T_ca * x_a;
-  Eigen::Matrix<number_t, 2, 3, Eigen::ColMajor> Jcam = internal::d_proj_d_y(cam->focal_length, y);
+  Eigen::Matrix<number_t, 2, 3, Eigen::ColMajor> Jcam =
+      internal::d_proj_d_y(cam->focal_length, y);
 
   auto &jacobianOplus0 = std::get<0>(this->jacobianOplus_);
   auto &jacobianOplus1 = std::get<1>(this->jacobianOplus_);
   auto &jacobianOplus2 = std::get<2>(this->jacobianOplus_);
   jacobianOplus0 = -Jcam * internal::d_Tinvpsi_d_psi(T_ca, psi_a);
   jacobianOplus1 = -Jcam * internal::d_expy_d_y(y);
-  jacobianOplus2 = Jcam * T_ca.rotation().toRotationMatrix() * internal::d_expy_d_y(x_a);
+  jacobianOplus2 =
+      Jcam * T_ca.rotation().toRotationMatrix() * internal::d_expy_d_y(x_a);
 }
 
 }  // namespace g2o

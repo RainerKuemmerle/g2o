@@ -25,75 +25,64 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "string_tools.h"
-#include "os_specific.h"
-#include "macros.h"
 
-#include <cctype>
-#include <string>
-#include <cstdarg>
-#include <cstring>
 #include <algorithm>
+#include <cctype>
+#include <cstdarg>
 #include <cstdio>
+#include <cstring>
 #include <iostream>
 #include <iterator>
+#include <string>
 
-#if (defined (UNIX) || defined(CYGWIN)) && !defined(ANDROID)
+#include "macros.h"
+#include "os_specific.h"
+
+#if (defined(UNIX) || defined(CYGWIN)) && !defined(ANDROID)
 #include <wordexp.h>
 #endif
 
 namespace g2o {
 
-std::string trim(const std::string& s)
-{
-  if(s.length() == 0)
-    return s;
+std::string trim(const std::string& s) {
+  if (s.length() == 0) return s;
   std::string::size_type b = s.find_first_not_of(" \t\n");
   std::string::size_type e = s.find_last_not_of(" \t\n");
-  if(b == std::string::npos)
-    return "";
+  if (b == std::string::npos) return "";
   return std::string(s, b, e - b + 1);
 }
 
-std::string trimLeft(const std::string& s)
-{
-  if(s.length() == 0)
-    return s;
+std::string trimLeft(const std::string& s) {
+  if (s.length() == 0) return s;
   std::string::size_type b = s.find_first_not_of(" \t\n");
   std::string::size_type e = s.length() - 1;
-  if(b == std::string::npos)
-    return "";
+  if (b == std::string::npos) return "";
   return std::string(s, b, e - b + 1);
 }
 
-std::string trimRight(const std::string& s)
-{
-  if(s.length() == 0)
-    return s;
+std::string trimRight(const std::string& s) {
+  if (s.length() == 0) return s;
   std::string::size_type b = 0;
   std::string::size_type e = s.find_last_not_of(" \t\n");
-  if(e == std::string::npos)
-    return "";
+  if (e == std::string::npos) return "";
   return std::string(s, b, e - b + 1);
 }
 
-std::string strToLower(const std::string& s)
-{
+std::string strToLower(const std::string& s) {
   std::string ret;
   std::transform(s.begin(), s.end(), std::back_inserter(ret),
                  [](unsigned char c) { return std::tolower(c); });
   return ret;
 }
 
-std::string strToUpper(const std::string& s)
-{
+std::string strToUpper(const std::string& s) {
   std::string ret;
   std::transform(s.begin(), s.end(), std::back_inserter(ret),
                  [](unsigned char c) { return std::toupper(c); });
   return ret;
 }
 
-std::string formatString(const char* fmt, ...)
-{
+std::string formatString(const char* fmt, ...) {
   char* auxPtr = nullptr;
   va_list arg_list;
   va_start(arg_list, fmt);
@@ -103,14 +92,14 @@ std::string formatString(const char* fmt, ...)
   if (numChar != -1)
     retString = auxPtr;
   else {
-    std::cerr << __PRETTY_FUNCTION__ << ": Error while allocating memory" << std::endl;
+    std::cerr << __PRETTY_FUNCTION__ << ": Error while allocating memory"
+              << std::endl;
   }
   free(auxPtr);
   return retString;
 }
 
-int strPrintf(std::string& str, const char* fmt, ...)
-{
+int strPrintf(std::string& str, const char* fmt, ...) {
   char* auxPtr = nullptr;
   va_list arg_list;
   va_start(arg_list, fmt);
@@ -121,65 +110,59 @@ int strPrintf(std::string& str, const char* fmt, ...)
   return numChars;
 }
 
-std::string strExpandFilename(const std::string& filename)
-{
-#if (defined (UNIX) || defined(CYGWIN)) && !defined(ANDROID)
+std::string strExpandFilename(const std::string& filename) {
+#if (defined(UNIX) || defined(CYGWIN)) && !defined(ANDROID)
   std::string result = filename;
   wordexp_t p;
 
   wordexp(filename.c_str(), &p, 0);
-  if(p.we_wordc > 0) {
+  if (p.we_wordc > 0) {
     result = p.we_wordv[0];
   }
   wordfree(&p);
   return result;
 #else
-  (void) filename;
-  std::cerr << "WARNING: " << __PRETTY_FUNCTION__ << " not implemented" << std::endl;
+  (void)filename;
+  std::cerr << "WARNING: " << __PRETTY_FUNCTION__ << " not implemented"
+            << std::endl;
   return std::string();
 #endif
 }
 
-std::vector<std::string> strSplit(const std::string& str, const std::string& delimiters)
-{
+std::vector<std::string> strSplit(const std::string& str,
+                                  const std::string& delimiters) {
   std::vector<std::string> tokens;
   if (str.empty()) return tokens;
   std::string::size_type lastPos = 0;
-  std::string::size_type pos     = 0;
+  std::string::size_type pos = 0;
 
   do {
     pos = str.find_first_of(delimiters, lastPos);
     tokens.push_back(str.substr(lastPos, pos - lastPos));
     lastPos = pos + 1;
-  }  while (std::string::npos != pos);
+  } while (std::string::npos != pos);
 
   return tokens;
 }
 
-bool strStartsWith(const std::string& s, const std::string& start)
-{
-  if (s.size() < start.size())
-    return false;
+bool strStartsWith(const std::string& s, const std::string& start) {
+  if (s.size() < start.size()) return false;
   return equal(start.begin(), start.end(), s.begin());
 }
 
-bool strEndsWith(const std::string& s, const std::string& end)
-{
-  if (s.size() < end.size())
-    return false;
+bool strEndsWith(const std::string& s, const std::string& end) {
+  if (s.size() < end.size()) return false;
   return equal(end.rbegin(), end.rend(), s.rbegin());
 }
 
-int readLine(std::istream& is, std::stringstream& currentLine)
-{
-  if (is.eof())
-    return -1;
+int readLine(std::istream& is, std::stringstream& currentLine) {
+  if (is.eof()) return -1;
   currentLine.str("");
   currentLine.clear();
   is.get(*currentLine.rdbuf());
-  if (is.fail()) // fail is set on empty lines
+  if (is.fail())  // fail is set on empty lines
     is.clear();
-  G2O_FSKIP_LINE(is); // read \n not read by get()
+  G2O_FSKIP_LINE(is);  // read \n not read by get()
   return static_cast<int>(currentLine.str().size());
 }
 

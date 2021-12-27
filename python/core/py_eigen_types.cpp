@@ -11,29 +11,37 @@ void declareEigenTypes(py::module& m) {
       .def(py::init<const Eigen::AngleAxisd&>())
       .def(py::init<const Eigen::Matrix<double, 3, 3>&>())
       //.def(py::init<const Eigen::Matrix<double, 4, 1>&>())
-      .def(py::init<const double&, const double&, const double&, const double&>(), "w"_a, "x"_a,
-           "y"_a, "z"_a)
+      .def(py::init<const double&, const double&, const double&,
+                    const double&>(),
+           "w"_a, "x"_a, "y"_a, "z"_a)
 
       .def(py::init([](const Eigen::Matrix<double, 4, 1>& m) {
-        // return std::unique_ptr<Eigen::Quaterniond>(new Eigen::Quaterniond(m(3,0), m(0,0), m(1,0),
-        // m(2,0)));
+        // return std::unique_ptr<Eigen::Quaterniond>(new
+        // Eigen::Quaterniond(m(3,0), m(0,0), m(1,0), m(2,0)));
         return std::unique_ptr<Eigen::Quaterniond>(
             new Eigen::Quaterniond(m(0, 0), m(1, 0), m(2, 0), m(3, 0)));
       }))
 
-      .def_static("from_two_vectors",
-                  [](Eigen::Matrix<double, 3, 1>& a, Eigen::Matrix<double, 3, 1>& b) {
-                    return Eigen::Quaterniond::FromTwoVectors(a, b);
-                  })
+      .def_static(
+          "from_two_vectors",
+          [](Eigen::Matrix<double, 3, 1>& a, Eigen::Matrix<double, 3, 1>& b) {
+            return Eigen::Quaterniond::FromTwoVectors(a, b);
+          })
 
-      .def("x", (const double& (Eigen::Quaterniond::*)() const) & Eigen::Quaterniond::x)
-      .def("y", (const double& (Eigen::Quaterniond::*)() const) & Eigen::Quaterniond::y)
-      .def("z", (const double& (Eigen::Quaterniond::*)() const) & Eigen::Quaterniond::z)
-      .def("w", (const double& (Eigen::Quaterniond::*)() const) & Eigen::Quaterniond::w)
+      .def("x", (const double& (Eigen::Quaterniond::*)() const) &
+                    Eigen::Quaterniond::x)
+      .def("y", (const double& (Eigen::Quaterniond::*)() const) &
+                    Eigen::Quaterniond::y)
+      .def("z", (const double& (Eigen::Quaterniond::*)() const) &
+                    Eigen::Quaterniond::z)
+      .def("w", (const double& (Eigen::Quaterniond::*)() const) &
+                    Eigen::Quaterniond::w)
 
-      .def("vec", (const Eigen::VectorBlock<const Eigen::Quaterniond::Coefficients, 3> (
-                      Eigen::Quaterniond::*)() const) &
-                      Eigen::Quaterniond::vec)
+      .def(
+          "vec",
+          (const Eigen::VectorBlock<const Eigen::Quaterniond::Coefficients, 3> (
+              Eigen::Quaterniond::*)() const) &
+              Eigen::Quaterniond::vec)
 
       .def_static("identity", &Eigen::Quaterniond::Identity)
       .def("set_identity", [](Eigen::Quaterniond& q) { q.setIdentity(); })
@@ -46,15 +54,19 @@ void declareEigenTypes(py::module& m) {
       .def("norm", &Eigen::Quaterniond::norm)
       .def("normalize", &Eigen::Quaterniond::normalize)
       .def("normalized", &Eigen::Quaterniond::normalized)
-      .def("dot", [](Eigen::Quaterniond& q1, Eigen::Quaterniond& q2) { return q1.dot(q2); })
+      .def("dot", [](Eigen::Quaterniond& q1,
+                     Eigen::Quaterniond& q2) { return q1.dot(q2); })
       .def("angular_distance",
-           [](Eigen::Quaterniond& q1, Eigen::Quaterniond& q2) { return q1.angularDistance(q2); })
+           [](Eigen::Quaterniond& q1, Eigen::Quaterniond& q2) {
+             return q1.angularDistance(q2);
+           })
       .def(py::self * py::self)
       .def(py::self *= py::self)
       .def("inverse", &Eigen::Quaterniond::inverse)
       .def("conjugate", &Eigen::Quaterniond::conjugate)
-      .def("coeffs", (Eigen::Quaterniond::Coefficients & (Eigen::Quaterniond::*)()) &
-                         Eigen::Quaterniond::coeffs)  // x, y, z, w
+      .def("coeffs",
+           (Eigen::Quaterniond::Coefficients & (Eigen::Quaterniond::*)()) &
+               Eigen::Quaterniond::coeffs)  // x, y, z, w
 
       .def("__mul__",
            [](Eigen::Quaterniond& q, Eigen::Matrix<double, 3, 1>& t) {
@@ -62,7 +74,8 @@ void declareEigenTypes(py::module& m) {
              Eigen::Matrix<double, 3, 1> result = q._transformVector(t);
              return result;
            })
-      //.def("__mul__", [](Eigen::Quaterniond& q, Eigen::Matrix<double,3,Eigen::Dynamic>& t) {
+      //.def("__mul__", [](Eigen::Quaterniond& q,
+      //Eigen::Matrix<double,3,Eigen::Dynamic>& t) {
       //        return q * t;
       //    })
 
@@ -75,15 +88,18 @@ void declareEigenTypes(py::module& m) {
       .def(py::init<const double&>())
       .def(py::init<const Eigen::Matrix<double, 2, 2>&>())
 
-      .def("angle", (double& (Eigen::Rotation2Dd::*)()) & Eigen::Rotation2Dd::angle)
-      .def("smallest_positive_angle", &Eigen::Rotation2Dd::smallestPositiveAngle)
+      .def("angle",
+           (double& (Eigen::Rotation2Dd::*)()) & Eigen::Rotation2Dd::angle)
+      .def("smallest_positive_angle",
+           &Eigen::Rotation2Dd::smallestPositiveAngle)
       .def("smallest_angle", &Eigen::Rotation2Dd::smallestAngle)
       .def("inverse", &Eigen::Rotation2Dd::inverse)
       .def(py::self * py::self)
       .def(py::self *= py::self)
       .def(py::self * Eigen::Matrix<double, 2, 1>())
-      //.def("from_rotation_matrix", (Eigen::Rotation2Dd& (Eigen::Rotation2Dd::*) (const
-      //Eigen::Matrix<double, 2, 2>&)) 		&Eigen::Rotation2Dd::fromRotationMatrix)
+      //.def("from_rotation_matrix", (Eigen::Rotation2Dd&
+      //(Eigen::Rotation2Dd::*) (const Eigen::Matrix<double, 2, 2>&))
+      // &Eigen::Rotation2Dd::fromRotationMatrix)
       .def("from_rotation_matrix",
            [](Eigen::Rotation2Dd& r, const Eigen::Matrix<double, 2, 2>& R) {
              r.fromRotationMatrix(R);
@@ -101,9 +117,10 @@ void declareEigenTypes(py::module& m) {
       .def(py::init<const Eigen::AngleAxisd&>())
       .def(py::init<const Eigen::Quaterniond&>())
       .def(py::init<const Eigen::Matrix<double, 3, 3>&>())
-      .def("angle", (double& (Eigen::AngleAxisd::*)()) & Eigen::AngleAxisd::angle)
-      .def("axis",
-           (Eigen::Matrix<double, 3, 1> & (Eigen::AngleAxisd::*)()) & Eigen::AngleAxisd::axis)
+      .def("angle",
+           (double& (Eigen::AngleAxisd::*)()) & Eigen::AngleAxisd::angle)
+      .def("axis", (Eigen::Matrix<double, 3, 1> & (Eigen::AngleAxisd::*)()) &
+                       Eigen::AngleAxisd::axis)
       .def(py::self * py::self)
       .def(py::self * Eigen::Quaterniond())
       .def(Eigen::Quaterniond() * py::self)

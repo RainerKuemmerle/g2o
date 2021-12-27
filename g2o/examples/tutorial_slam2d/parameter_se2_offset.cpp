@@ -53,9 +53,11 @@ bool ParameterSE2Offset::write(std::ostream& os) const {
 
 void CacheSE2Offset::updateImpl() {
 #ifndef NDEBUG
-  ParameterSE2Offset* offsetParam = dynamic_cast<ParameterSE2Offset*>(parameters_[0].get());
+  ParameterSE2Offset* offsetParam =
+      dynamic_cast<ParameterSE2Offset*>(parameters_[0].get());
 #else
-  ParameterSE2Offset* offsetParam = static_cast<ParameterSE2Offset*>(parameters_[0].get());
+  ParameterSE2Offset* offsetParam =
+      static_cast<ParameterSE2Offset*>(parameters_[0].get());
 #endif
   const VertexSE2* v = static_cast<const VertexSE2*>(vertex());
   _n2w = v->estimate() * offsetParam->offset();

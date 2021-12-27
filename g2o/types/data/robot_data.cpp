@@ -28,24 +28,14 @@
 
 namespace g2o {
 
-  void RobotData::setTimestamp(number_t ts)
-  {
-    timestamp_ = ts;
-  }
+void RobotData::setTimestamp(number_t ts) { timestamp_ = ts; }
 
-  void RobotData::setLoggerTimestamp(number_t ts)
-  {
-    loggerTimestamp_ = ts;
-  }
+void RobotData::setLoggerTimestamp(number_t ts) { loggerTimestamp_ = ts; }
 
-  void RobotData::setTag(const std::string& tag)
-  {
-    tag_ = tag;
-  }
+void RobotData::setTag(const std::string& tag) { tag_ = tag; }
 
-  void RobotData::setHostname(const std::string& hostname)
-  {
-    hostname_ = hostname;
-  }
+void RobotData::setHostname(const std::string& hostname) {
+  hostname_ = hostname;
+}
 
-} // end namespace
+}  // namespace g2o

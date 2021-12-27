@@ -41,12 +41,14 @@ std::unique_ptr<g2o::Solver> AllocateSolver() {
   std::cerr << "# Using PCG poseDim " << P << " landMarkDim " << L << std::endl;
 
   return g2o::make_unique<BlockSolverPL<P, L>>(
-      g2o::make_unique<LinearSolverPCG<typename BlockSolverPL<P, L>::PoseMatrixType>>());
+      g2o::make_unique<
+          LinearSolverPCG<typename BlockSolverPL<P, L>::PoseMatrixType>>());
 }
 }  // namespace
 
 static OptimizationAlgorithm* createSolver(const std::string& fullSolverName) {
-  static const std::map<std::string, std::function<std::unique_ptr<g2o::Solver>()>>
+  static const std::map<std::string,
+                        std::function<std::unique_ptr<g2o::Solver>()>>
       kSolverFactories{
           {"pcg", &AllocateSolver<-1, -1>},
           {"pcg3_2", &AllocateSolver<3, 2>},
@@ -75,7 +77,8 @@ class PCGSolverCreator : public AbstractOptimizationAlgorithmCreator {
   explicit PCGSolverCreator(const OptimizationAlgorithmProperty& p)
       : AbstractOptimizationAlgorithmCreator(p) {}
   std::unique_ptr<OptimizationAlgorithm> construct() override {
-    return std::unique_ptr<OptimizationAlgorithm>(createSolver(property().name));
+    return std::unique_ptr<OptimizationAlgorithm>(
+        createSolver(property().name));
   }
 };
 
@@ -84,41 +87,49 @@ G2O_REGISTER_OPTIMIZATION_LIBRARY(pcg);
 G2O_REGISTER_OPTIMIZATION_ALGORITHM(
     gn_pcg, new PCGSolverCreator(OptimizationAlgorithmProperty(
                 "gn_pcg",
-                "Gauss-Newton: PCG solver using block-Jacobi pre-conditioner (variable blocksize)",
+                "Gauss-Newton: PCG solver using block-Jacobi pre-conditioner "
+                "(variable blocksize)",
                 "PCG", false, Eigen::Dynamic, Eigen::Dynamic)));
 G2O_REGISTER_OPTIMIZATION_ALGORITHM(
     gn_pcg3_2, new PCGSolverCreator(OptimizationAlgorithmProperty(
                    "gn_pcg3_2",
-                   "Gauss-Newton: PCG solver using block-Jacobi pre-conditioner (fixed blocksize)",
+                   "Gauss-Newton: PCG solver using block-Jacobi "
+                   "pre-conditioner (fixed blocksize)",
                    "PCG", true, 3, 2)));
 G2O_REGISTER_OPTIMIZATION_ALGORITHM(
     gn_pcg6_3, new PCGSolverCreator(OptimizationAlgorithmProperty(
                    "gn_pcg6_3",
-                   "Gauss-Newton: PCG solver using block-Jacobi pre-conditioner (fixed blocksize)",
+                   "Gauss-Newton: PCG solver using block-Jacobi "
+                   "pre-conditioner (fixed blocksize)",
                    "PCG", true, 6, 3)));
 G2O_REGISTER_OPTIMIZATION_ALGORITHM(
     gn_pcg7_3, new PCGSolverCreator(OptimizationAlgorithmProperty(
                    "gn_pcg7_3",
-                   "Gauss-Newton: PCG solver using block-Jacobi pre-conditioner (fixed blocksize)",
+                   "Gauss-Newton: PCG solver using block-Jacobi "
+                   "pre-conditioner (fixed blocksize)",
                    "PCG", true, 7, 3)));
 G2O_REGISTER_OPTIMIZATION_ALGORITHM(
-    lm_pcg,
-    new PCGSolverCreator(OptimizationAlgorithmProperty(
-        "lm_pcg", "Levenberg: PCG solver using block-Jacobi pre-conditioner (variable blocksize)",
-        "PCG", false, Eigen::Dynamic, Eigen::Dynamic)));
+    lm_pcg, new PCGSolverCreator(OptimizationAlgorithmProperty(
+                "lm_pcg",
+                "Levenberg: PCG solver using block-Jacobi pre-conditioner "
+                "(variable blocksize)",
+                "PCG", false, Eigen::Dynamic, Eigen::Dynamic)));
 G2O_REGISTER_OPTIMIZATION_ALGORITHM(
-    lm_pcg3_2,
-    new PCGSolverCreator(OptimizationAlgorithmProperty(
-        "lm_pcg3_2", "Levenberg: PCG solver using block-Jacobi pre-conditioner (fixed blocksize)",
-        "PCG", true, 3, 2)));
+    lm_pcg3_2, new PCGSolverCreator(OptimizationAlgorithmProperty(
+                   "lm_pcg3_2",
+                   "Levenberg: PCG solver using block-Jacobi pre-conditioner "
+                   "(fixed blocksize)",
+                   "PCG", true, 3, 2)));
 G2O_REGISTER_OPTIMIZATION_ALGORITHM(
-    lm_pcg6_3,
-    new PCGSolverCreator(OptimizationAlgorithmProperty(
-        "lm_pcg6_3", "Levenberg: PCG solver using block-Jacobi pre-conditioner (fixed blocksize)",
-        "PCG", true, 6, 3)));
+    lm_pcg6_3, new PCGSolverCreator(OptimizationAlgorithmProperty(
+                   "lm_pcg6_3",
+                   "Levenberg: PCG solver using block-Jacobi pre-conditioner "
+                   "(fixed blocksize)",
+                   "PCG", true, 6, 3)));
 G2O_REGISTER_OPTIMIZATION_ALGORITHM(
-    lm_pcg7_3,
-    new PCGSolverCreator(OptimizationAlgorithmProperty(
-        "lm_pcg7_3", "Levenberg: PCG solver using block-Jacobi pre-conditioner (fixed blocksize)",
-        "PCG", true, 7, 3)));
+    lm_pcg7_3, new PCGSolverCreator(OptimizationAlgorithmProperty(
+                   "lm_pcg7_3",
+                   "Levenberg: PCG solver using block-Jacobi pre-conditioner "
+                   "(fixed blocksize)",
+                   "PCG", true, 7, 3)));
 }  // namespace g2o

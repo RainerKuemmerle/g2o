@@ -55,7 +55,8 @@ class Property : public BaseProperty {
  public:
   using ValueType = T;
   explicit Property(const std::string& name_) : BaseProperty(name_) {}
-  Property(const std::string& name_, T  v) : BaseProperty(name_), value_(std::move(v)) {}
+  Property(const std::string& name_, T v)
+      : BaseProperty(name_), value_(std::move(v)) {}
   void setValue(const T& v) { value_ = v; }
   const T& value() const { return value_; }
   std::string toString() const override {
@@ -75,7 +76,8 @@ class Property : public BaseProperty {
 /**
  * \brief a collection of properties mapping from name to the property itself
  */
-class G2O_STUFF_API PropertyMap : protected std::map<std::string, std::shared_ptr<BaseProperty>> {
+class G2O_STUFF_API PropertyMap
+    : protected std::map<std::string, std::shared_ptr<BaseProperty>> {
  public:
   using BaseClass = std::map<std::string, std::shared_ptr<BaseProperty>>;
   using PropertyMapIterator = BaseClass::iterator;
@@ -113,7 +115,8 @@ class G2O_STUFF_API PropertyMap : protected std::map<std::string, std::shared_pt
    * create a property and insert it
    */
   template <typename P>
-  std::shared_ptr<P> makeProperty(const std::string& name_, const typename P::ValueType& v) {
+  std::shared_ptr<P> makeProperty(const std::string& name_,
+                                  const typename P::ValueType& v) {
     auto it = find(name_);
     if (it == end()) {
       std::shared_ptr<P> p = std::make_shared<P>(name_, v);
@@ -127,7 +130,8 @@ class G2O_STUFF_API PropertyMap : protected std::map<std::string, std::shared_pt
    * update a specfic property with a new value
    * @return true if the params is stored and update was carried out
    */
-  bool updatePropertyFromString(const std::string& name, const std::string& value);
+  bool updatePropertyFromString(const std::string& name,
+                                const std::string& value);
 
   /**
    * update the map based on a name=value string, e.g., name1=val1,name2=val2

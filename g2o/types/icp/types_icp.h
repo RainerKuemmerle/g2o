@@ -139,10 +139,11 @@ class G2O_TYPES_ICP_API EdgeGICP {
 //    3 values for position wrt frame
 //    3 values for normal wrt frame, not used here
 // first two args are the measurement type, second two the connection classes
-class G2O_TYPES_ICP_API EdgeVVGicp : public BaseBinaryEdge<3, EdgeGICP, VertexSE3, VertexSE3> {
+class G2O_TYPES_ICP_API EdgeVVGicp
+    : public BaseBinaryEdge<3, EdgeGICP, VertexSE3, VertexSE3> {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
-  EdgeVVGicp()  = default;
+  EdgeVVGicp() = default;
   explicit EdgeVVGicp(const EdgeVVGicp *e);
 
   // switch to go between point-plane and plane-plane
@@ -200,8 +201,9 @@ class G2O_TYPES_ICP_API EdgeVVGicp : public BaseBinaryEdge<3, EdgeGICP, VertexSE
 
     // re-define the information matrix
     // topLeftCorner<3,3>() is the rotation()
-    const Matrix3 transform =
-        (vp0->estimate().inverse() * vp1->estimate()).matrix().topLeftCorner<3, 3>();
+    const Matrix3 transform = (vp0->estimate().inverse() * vp1->estimate())
+                                  .matrix()
+                                  .topLeftCorner<3, 3>();
     information() = (cov0 + transform * cov1 * transform.transpose()).inverse();
   }
 
@@ -218,9 +220,9 @@ class G2O_TYPES_ICP_API EdgeVVGicp : public BaseBinaryEdge<3, EdgeGICP, VertexSE
 
 /**
  * \brief Stereo camera vertex, derived from SE3 class.
- * Note that we use the actual pose of the vertex as its parameterization, rather
- * than the transform from RW to camera coords.
- * Uses static vars for camera params, so there is a single camera setup.
+ * Note that we use the actual pose of the vertex as its parameterization,
+ * rather than the transform from RW to camera coords. Uses static vars for
+ * camera params, so there is a single camera setup.
  */
 class G2O_TYPES_ICP_API VertexSCam : public VertexSE3 {
  public:
@@ -241,16 +243,18 @@ class G2O_TYPES_ICP_API VertexSCam : public VertexSE3 {
   static number_t baseline_;
 
   // transformations
-  Eigen::Matrix<number_t, 3, 4, Eigen::ColMajor> w2n;  // transform from world to node coordinates
-  Eigen::Matrix<number_t, 3, 4, Eigen::ColMajor> w2i;  // transform from world to image coordinates
+  Eigen::Matrix<number_t, 3, 4, Eigen::ColMajor>
+      w2n;  // transform from world to node coordinates
+  Eigen::Matrix<number_t, 3, 4, Eigen::ColMajor>
+      w2i;  // transform from world to image coordinates
 
   // Derivatives of the rotation matrix transpose wrt quaternion xyz, used for
   // calculating Jacobian wrt pose of a projection.
   Matrix3 dRdx, dRdy, dRdz;
 
   // transforms
-  static void transformW2F(Eigen::Matrix<number_t, 3, 4, Eigen::ColMajor> &m, const Vector3 &trans,
-                           const Quaternion &qrot) {
+  static void transformW2F(Eigen::Matrix<number_t, 3, 4, Eigen::ColMajor> &m,
+                           const Vector3 &trans, const Quaternion &qrot) {
     m.block<3, 3>(0, 0) = qrot.toRotationMatrix().transpose();
     m.col(3).setZero();  // make sure there's no translation
     Vector4 tt;
@@ -259,14 +263,15 @@ class G2O_TYPES_ICP_API VertexSCam : public VertexSE3 {
     m.col(3) = -m * tt;
   }
 
-  static void transformF2W(Eigen::Matrix<number_t, 3, 4, Eigen::ColMajor> &m, const Vector3 &trans,
-                           const Quaternion &qrot) {
+  static void transformF2W(Eigen::Matrix<number_t, 3, 4, Eigen::ColMajor> &m,
+                           const Vector3 &trans, const Quaternion &qrot) {
     m.block<3, 3>(0, 0) = qrot.toRotationMatrix();
     m.col(3) = trans;
   }
 
   // set up camera matrix
-  static void setKcam(number_t fx, number_t fy, number_t cx, number_t cy, number_t tx) {
+  static void setKcam(number_t fx, number_t fy, number_t cx, number_t cy,
+                      number_t tx) {
     kcam_.setZero();
     kcam_(0, 0) = fx;
     kcam_(1, 1) = fy;
@@ -289,8 +294,8 @@ class G2O_TYPES_ICP_API VertexSCam : public VertexSE3 {
   // sets angle derivatives
   void setDr() {
     // inefficient, just for testing
-    // use simple multiplications and additions for production code in calculating dRdx,y,z
-    // for dS'*R', with dS the incremental change
+    // use simple multiplications and additions for production code in
+    // calculating dRdx,y,z for dS'*R', with dS the incremental change
     dRdx = dRidx_ * w2n.block<3, 3>(0, 0);
     dRdy = dRidy_ * w2n.block<3, 3>(0, 0);
     dRdz = dRidz_ * w2n.block<3, 3>(0, 0);

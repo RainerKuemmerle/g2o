@@ -1,6 +1,7 @@
 #pragma once
 
 #include <g2o/types/sclam2d/odometry_measurement.h>
+
 #include "g2opy.h"
 
 namespace g2o {
@@ -20,7 +21,8 @@ void declareOdometryMeasurement(py::module& m) {
 
   py::class_<MotionMeasurement>(m, "MotionMeasurement")
       .def(py::init<>())
-      .def(py::init<double, double, double, double>(), "x"_a, "y"_a, "theta"_a, "dt"_a)
+      .def(py::init<double, double, double, double>(), "x"_a, "y"_a, "theta"_a,
+           "dt"_a)
       .def(py::init<const Vector3&, double>(), "m"_a, "dt"_a)
 
       .def("x", &MotionMeasurement::x)
@@ -42,7 +44,8 @@ void declareOdometryMeasurement(py::module& m) {
       ;
 
   templatedBaseEdge<3, VelocityMeasurement>(m, "_3_VelocityMeasurement");
-  templatedBaseVariableSizedEdge<3, VelocityMeasurement>(m, "_3_VelocityMeasurement");
+  templatedBaseVariableSizedEdge<3, VelocityMeasurement>(
+      m, "_3_VelocityMeasurement");
 }
 
 }  // namespace g2o

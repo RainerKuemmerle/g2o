@@ -33,7 +33,7 @@
 
 namespace g2o {
 
-EdgeSE2LotsOfXY::EdgeSE2LotsOfXY()   { resize(0); }
+EdgeSE2LotsOfXY::EdgeSE2LotsOfXY() { resize(0); }
 
 void EdgeSE2LotsOfXY::computeError() {
   auto* pose = static_cast<VertexSE2*>(vertexRaw(0));
@@ -136,10 +136,12 @@ void EdgeSE2LotsOfXY::linearizeOplus() {
   jacobianOplus_[0] = Ji;
 }
 
-void EdgeSE2LotsOfXY::initialEstimate(const OptimizableGraph::VertexSet& fixed, OptimizableGraph::Vertex* toEstimate) {
+void EdgeSE2LotsOfXY::initialEstimate(const OptimizableGraph::VertexSet& fixed,
+                                      OptimizableGraph::Vertex* toEstimate) {
   (void)toEstimate;
 
-  assert(initialEstimatePossible(fixed, toEstimate) && "Bad vertices specified");
+  assert(initialEstimatePossible(fixed, toEstimate) &&
+         "Bad vertices specified");
 
   auto* pose = static_cast<VertexSE2*>(vertexRaw(0));
 
@@ -152,7 +154,7 @@ void EdgeSE2LotsOfXY::initialEstimate(const OptimizableGraph::VertexSet& fixed, 
   }
 #endif
 
-  for (const auto & it : fixed) {
+  for (const auto& it : fixed) {
     for (unsigned int i = 1; i < vertices_.size(); i++) {
       auto* vert = static_cast<VertexPointXY*>(vertexRaw(i));
       if (vert->id() == it->id()) estimate_this[i - 1] = false;
@@ -169,11 +171,12 @@ void EdgeSE2LotsOfXY::initialEstimate(const OptimizableGraph::VertexSet& fixed, 
   }
 }
 
-number_t EdgeSE2LotsOfXY::initialEstimatePossible(const OptimizableGraph::VertexSet& fixed,
-                                                  OptimizableGraph::Vertex* toEstimate) {
+number_t EdgeSE2LotsOfXY::initialEstimatePossible(
+    const OptimizableGraph::VertexSet& fixed,
+    OptimizableGraph::Vertex* toEstimate) {
   (void)toEstimate;
 
-  for (const auto & it : fixed) {
+  for (const auto& it : fixed) {
     if (vertices_[0]->id() == it->id()) {
       return 1.0;
     }

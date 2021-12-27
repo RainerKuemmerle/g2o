@@ -27,63 +27,59 @@
 #ifndef G2O_VERTEX_PLANE_H_
 #define G2O_VERTEX_PLANE_H_
 
-#include "g2o_types_slam3d_addons_api.h"
 #include "g2o/config.h"
 #include "g2o/core/base_vertex.h"
 #include "g2o/core/hyper_graph_action.h"
+#include "g2o_types_slam3d_addons_api.h"
 #include "plane3d.h"
 
-namespace g2o
-{
+namespace g2o {
 
-  class G2O_TYPES_SLAM3D_ADDONS_API VertexPlane : public BaseVertex<3, Plane3D>
-    {
-    public:
-      EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
-      VertexPlane();
+class G2O_TYPES_SLAM3D_ADDONS_API VertexPlane : public BaseVertex<3, Plane3D> {
+ public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
+  VertexPlane();
 
-      bool read(std::istream& is) override;
-      bool write(std::ostream& os) const override;
+  bool read(std::istream& is) override;
+  bool write(std::ostream& os) const override;
 
-      void setToOriginImpl() override { estimate_ = Plane3D(); }
+  void setToOriginImpl() override { estimate_ = Plane3D(); }
 
-      void oplusImpl(const number_t* update_) override {
-        Eigen::Map<const Vector3> update(update_);
-        estimate_.oplus(update);
-      }
+  void oplusImpl(const number_t* update_) override {
+    Eigen::Map<const Vector3> update(update_);
+    estimate_.oplus(update);
+  }
 
-      bool setEstimateDataImpl(const number_t* est) override {
-        Eigen::Map<const Vector4> _est(est);
-        estimate_.fromVector(_est);
-        return true;
-      }
+  bool setEstimateDataImpl(const number_t* est) override {
+    Eigen::Map<const Vector4> _est(est);
+    estimate_.fromVector(_est);
+    return true;
+  }
 
-      bool getEstimateData(number_t* est) const override {
-        Eigen::Map<Vector4> _est(est);
-        _est = estimate_.toVector();
-        return true;
-      }
+  bool getEstimateData(number_t* est) const override {
+    Eigen::Map<Vector4> _est(est);
+    _est = estimate_.toVector();
+    return true;
+  }
 
-      int estimateDimension() const override {
-        return 4;
-      }
+  int estimateDimension() const override { return 4; }
 
-      Vector3 color;
-    };
+  Vector3 color;
+};
 
 #ifdef G2O_HAVE_OPENGL
-  class VertexPlaneDrawAction: public DrawAction
-  {
-    public:
-      VertexPlaneDrawAction();
-      bool operator()(HyperGraph::HyperGraphElement* element,
-                              HyperGraphElementAction::Parameters* params_) override;
+class VertexPlaneDrawAction : public DrawAction {
+ public:
+  VertexPlaneDrawAction();
+  bool operator()(HyperGraph::HyperGraphElement* element,
+                  HyperGraphElementAction::Parameters* params_) override;
 
-     protected:
-      bool refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_) override;
-      std::shared_ptr<FloatProperty> planeWidth_, planeHeight_;
-  };
+ protected:
+  bool refreshPropertyPtrs(
+      HyperGraphElementAction::Parameters* params_) override;
+  std::shared_ptr<FloatProperty> planeWidth_, planeHeight_;
+};
 #endif
 
-}
+}  // namespace g2o
 #endif

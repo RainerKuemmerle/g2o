@@ -60,7 +60,7 @@ std::shared_ptr<Parameter> ParameterContainer::detachParameter(int id) {
 
 bool ParameterContainer::write(std::ostream& os) const {
   Factory* factory = Factory::instance();
-  for (const auto & it : *this) {
+  for (const auto& it : *this) {
     os << factory->tag(it.second.get()) << " ";
     os << it.second->id() << " ";
     it.second->write(os);
@@ -69,8 +69,9 @@ bool ParameterContainer::write(std::ostream& os) const {
   return true;
 }
 
-bool ParameterContainer::read(std::istream& is,
-                              const std::map<std::string, std::string>* renamedTypesLookup) {
+bool ParameterContainer::read(
+    std::istream& is,
+    const std::map<std::string, std::string>* renamedTypesLookup) {
   std::stringstream currentLine;
   std::string token;
 
@@ -90,10 +91,12 @@ bool ParameterContainer::read(std::istream& is,
       }
     }
 
-    std::shared_ptr<HyperGraph::HyperGraphElement> element = factory->construct(token, elemBitset);
+    std::shared_ptr<HyperGraph::HyperGraphElement> element =
+        factory->construct(token, elemBitset);
     if (!element)  // not a parameter or otherwise unknown tag
       continue;
-    assert(element->elementType() == HyperGraph::HGET_PARAMETER && "Should be a param");
+    assert(element->elementType() == HyperGraph::HGET_PARAMETER &&
+           "Should be a param");
 
     auto p = std::static_pointer_cast<Parameter>(element);
     int pid;
@@ -101,12 +104,12 @@ bool ParameterContainer::read(std::istream& is,
     p->setId(pid);
     bool r = p->read(currentLine);
     if (!r) {
-      std::cerr << __PRETTY_FUNCTION__ << ": Error reading data " << token << " for parameter " << pid
-           << std::endl;
+      std::cerr << __PRETTY_FUNCTION__ << ": Error reading data " << token
+                << " for parameter " << pid << std::endl;
     } else {
       if (!addParameter(p)) {
-        std::cerr << __PRETTY_FUNCTION__ << ": Parameter of type:" << token << " id:" << pid
-             << " already defined" << std::endl;
+        std::cerr << __PRETTY_FUNCTION__ << ": Parameter of type:" << token
+                  << " id:" << pid << " already defined" << std::endl;
       }
     }
   }  // while read line

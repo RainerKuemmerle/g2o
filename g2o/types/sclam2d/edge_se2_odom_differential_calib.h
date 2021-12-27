@@ -36,7 +36,8 @@
 namespace g2o {
 
 class G2O_TYPES_SCLAM2D_API EdgeSE2OdomDifferentialCalib
-    : public BaseFixedSizedEdge<3, VelocityMeasurement, VertexSE2, VertexSE2, VertexOdomDifferentialParams> {
+    : public BaseFixedSizedEdge<3, VelocityMeasurement, VertexSE2, VertexSE2,
+                                VertexOdomDifferentialParams> {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
 
@@ -48,9 +49,11 @@ class G2O_TYPES_SCLAM2D_API EdgeSE2OdomDifferentialCalib
     const SE2& x2 = v2->estimate();
 
     // get the calibrated motion given by the odometry
-    VelocityMeasurement calibratedVelocityMeasurment(measurement().vl() * params->estimate()(0),
-                                                     measurement().vr() * params->estimate()(1), measurement().dt());
-    MotionMeasurement mm = OdomConvert::convertToMotion(calibratedVelocityMeasurment, params->estimate()(2));
+    VelocityMeasurement calibratedVelocityMeasurment(
+        measurement().vl() * params->estimate()(0),
+        measurement().vr() * params->estimate()(1), measurement().dt());
+    MotionMeasurement mm = OdomConvert::convertToMotion(
+        calibratedVelocityMeasurment, params->estimate()(2));
     SE2 Ku_ij;
     Ku_ij.fromVector(mm.measurement());
 
@@ -63,11 +66,12 @@ class G2O_TYPES_SCLAM2D_API EdgeSE2OdomDifferentialCalib
 };
 
 #ifdef G2O_HAVE_OPENGL
-class G2O_TYPES_SCLAM2D_API EdgeSE2OdomDifferentialCalibDrawAction : public DrawAction {
+class G2O_TYPES_SCLAM2D_API EdgeSE2OdomDifferentialCalibDrawAction
+    : public DrawAction {
  public:
   EdgeSE2OdomDifferentialCalibDrawAction();
   bool operator()(HyperGraph::HyperGraphElement* element,
-                          HyperGraphElementAction::Parameters* params_) override;
+                  HyperGraphElementAction::Parameters* params_) override;
 };
 #endif
 

@@ -25,11 +25,9 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "g2o/types/sim3/types_seven_dof_expmap.h"
-
 #include "gtest/gtest.h"
 
-TEST(Sim3, VertexSE3ExpmapCtor)
-{
+TEST(Sim3, VertexSE3ExpmapCtor) {
   auto* v = new g2o::VertexSE3Expmap();
   ASSERT_NE(nullptr, v);
   delete v;

@@ -35,7 +35,8 @@ using namespace g2o;
 
 using SparseBlockMatrixX = SparseBlockMatrix<MatrixX>;
 
-std::ostream& operator<<(std::ostream& os, const SparseBlockMatrixX::SparseMatrixBlock& m) {
+std::ostream& operator<<(std::ostream& os,
+                         const SparseBlockMatrixX::SparseMatrixBlock& m) {
   for (int i = 0; i < m.rows(); ++i) {
     for (int j = 0; j < m.cols(); ++j) os << m(i, j) << " ";
     os << endl;

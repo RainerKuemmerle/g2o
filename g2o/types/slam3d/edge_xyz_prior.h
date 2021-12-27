@@ -32,45 +32,47 @@
 #include "vertex_pointxyz.h"
 
 namespace g2o {
-  /**
-   * \brief prior for an XYZ vertex (VertexPointXYZ)
-   *
-   * Provides a prior for a 3d point vertex. The measurement is represented by a
-   * Vector3 with a corresponding 3x3 upper triangle covariance matrix (upper triangle only).
-   */
-  class G2O_TYPES_SLAM3D_API EdgeXYZPrior : public BaseUnaryEdge<3, Vector3, VertexPointXYZ> {
-  public:
-    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-    EdgeXYZPrior();
-    bool read(std::istream& is) override ;
-    bool write(std::ostream& os) const override ;
+/**
+ * \brief prior for an XYZ vertex (VertexPointXYZ)
+ *
+ * Provides a prior for a 3d point vertex. The measurement is represented by a
+ * Vector3 with a corresponding 3x3 upper triangle covariance matrix (upper
+ * triangle only).
+ */
+class G2O_TYPES_SLAM3D_API EdgeXYZPrior
+    : public BaseUnaryEdge<3, Vector3, VertexPointXYZ> {
+ public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+  EdgeXYZPrior();
+  bool read(std::istream& is) override;
+  bool write(std::ostream& os) const override;
 
-    void computeError() override ;
+  void computeError() override;
 
-    // jacobian
-    void linearizeOplus() override ;
+  // jacobian
+  void linearizeOplus() override;
 
-    bool setMeasurementData(const number_t* d) override {
-        Eigen::Map<const Vector3> v(d);
-        measurement_ = v;
-        return true;
-    }
+  bool setMeasurementData(const number_t* d) override {
+    Eigen::Map<const Vector3> v(d);
+    measurement_ = v;
+    return true;
+  }
 
-    bool getMeasurementData(number_t* d) const override {
-        Eigen::Map<Vector3> v(d);
-        v = measurement_;
-        return true;
-    }
+  bool getMeasurementData(number_t* d) const override {
+    Eigen::Map<Vector3> v(d);
+    v = measurement_;
+    return true;
+  }
 
-    int measurementDimension() const override { return 3; }
+  int measurementDimension() const override { return 3; }
 
-    bool setMeasurementFromState() override ;
+  bool setMeasurementFromState() override;
 
-    number_t initialEstimatePossible(const OptimizableGraph::VertexSet& /*from*/,
-             OptimizableGraph::Vertex* /*to*/) override {
-      return 0;
-    }
-  };
+  number_t initialEstimatePossible(const OptimizableGraph::VertexSet& /*from*/,
+                                   OptimizableGraph::Vertex* /*to*/) override {
+    return 0;
+  }
+};
 
-}
+}  // namespace g2o
 #endif

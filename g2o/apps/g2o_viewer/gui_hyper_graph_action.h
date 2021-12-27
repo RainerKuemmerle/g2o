@@ -19,31 +19,32 @@
 #ifndef G2O_GUI_HYPER_GRAPH_ACTION_H
 #define G2O_GUI_HYPER_GRAPH_ACTION_H
 
-#include "g2o_viewer_api.h"
 #include "g2o/core/hyper_graph_action.h"
+#include "g2o_viewer_api.h"
 
 namespace g2o {
 
-  class G2oQGLViewer;
+class G2oQGLViewer;
+
+/**
+ * \brief action which calls an GUI update after each iteration
+ */
+class G2O_VIEWER_API GuiHyperGraphAction : public HyperGraphAction {
+ public:
+  GuiHyperGraphAction();
+  ~GuiHyperGraphAction() override;
 
   /**
-   * \brief action which calls an GUI update after each iteration
+   * calling updateGL, processEvents to visualize the current state after each
+   * iteration
    */
-  class G2O_VIEWER_API GuiHyperGraphAction : public HyperGraphAction
-  {
-    public:
-      GuiHyperGraphAction();
-      ~GuiHyperGraphAction() override;
+  bool operator()(const HyperGraph* graph,
+                  Parameters* parameters = nullptr) override;
 
-      /**
-       * calling updateGL, processEvents to visualize the current state after each iteration
-       */
-      bool operator()(const HyperGraph* graph, Parameters* parameters = nullptr) override;
+  G2oQGLViewer* viewer = nullptr;  ///< the viewer which visualizes the graph
+  bool dumpScreenshots = false;
+};
 
-      G2oQGLViewer* viewer = nullptr;   ///< the viewer which visualizes the graph
-      bool dumpScreenshots = false;
-  };
-
-} // end namespace
+}  // namespace g2o
 
 #endif

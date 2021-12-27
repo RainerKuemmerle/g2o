@@ -34,17 +34,18 @@
 #include "filesys_tools.h"
 
 #include <sys/stat.h>
-#include <ctime>
 #include <sys/types.h>
+
 #include <cstdio>
+#include <ctime>
 #include <iostream>
 
 #ifdef WINDOWS
-#include <windows.h>
 #include <winbase.h>
+#include <windows.h>
 #endif
 
-#if (defined (UNIX) || defined(CYGWIN)) && !defined(ANDROID)
+#if (defined(UNIX) || defined(CYGWIN)) && !defined(ANDROID)
 #include <wordexp.h>
 #endif
 
@@ -55,48 +56,40 @@
 
 namespace g2o {
 
-std::string getFileExtension(const std::string& filename)
-{
+std::string getFileExtension(const std::string& filename) {
   std::string::size_type lastDot = filename.find_last_of('.');
-  if (lastDot != std::string::npos)
-    return filename.substr(lastDot + 1);
+  if (lastDot != std::string::npos) return filename.substr(lastDot + 1);
   return "";
 }
 
-std::string getPureFilename(const std::string& filename)
-{
+std::string getPureFilename(const std::string& filename) {
   std::string::size_type lastDot = filename.find_last_of('.');
-  if (lastDot != std::string::npos)
-    return filename.substr(0, lastDot);
+  if (lastDot != std::string::npos) return filename.substr(0, lastDot);
   return filename;
 }
 
-std::string getBasename(const std::string& filename)
-{
+std::string getBasename(const std::string& filename) {
 #ifdef WINDOWS
   std::string::size_type lastSlash = filename.find_last_of('\\');
 #else
   std::string::size_type lastSlash = filename.find_last_of('/');
 #endif
-  if (lastSlash != std::string::npos)
-    return filename.substr(lastSlash + 1);
+  if (lastSlash != std::string::npos) return filename.substr(lastSlash + 1);
   return filename;
 }
 
-std::string getDirname(const std::string& filename)
-{
+std::string getDirname(const std::string& filename) {
 #ifdef WINDOWS
   std::string::size_type lastSlash = filename.find_last_of('\\');
 #else
   std::string::size_type lastSlash = filename.find_last_of('/');
 #endif
-  if (lastSlash != std::string::npos)
-    return filename.substr(0, lastSlash);
+  if (lastSlash != std::string::npos) return filename.substr(0, lastSlash);
   return "";
 }
 
-std::string changeFileExtension(const std::string& filename, const std::string& newExt, bool stripDot)
-{
+std::string changeFileExtension(const std::string& filename,
+                                const std::string& newExt, bool stripDot) {
   std::string::size_type lastDot = filename.find_last_of('.');
   if (lastDot != std::string::npos) {
     if (!stripDot) ++lastDot;
@@ -105,14 +98,12 @@ std::string changeFileExtension(const std::string& filename, const std::string& 
   return filename;
 }
 
-bool fileExists(const char* filename)
-{
+bool fileExists(const char* filename) {
   struct stat statInfo;
   return (stat(filename, &statInfo) == 0);
 }
 
-std::vector<std::string> getFilesByPattern(const char* pattern)
-{
+std::vector<std::string> getFilesByPattern(const char* pattern) {
   std::vector<std::string> result;
 
 #ifdef WINDOWS
@@ -126,7 +117,7 @@ std::vector<std::string> getFilesByPattern(const char* pattern)
     FindClose(hFind);
   }
 
-#elif (defined (UNIX) || defined (CYGWIN)) && !defined(ANDROID)
+#elif (defined(UNIX) || defined(CYGWIN)) && !defined(ANDROID)
 
   wordexp_t p;
   wordexp(pattern, &p, 0);
@@ -136,15 +127,14 @@ std::vector<std::string> getFilesByPattern(const char* pattern)
   // something - or give up
 #ifdef __APPLE__
   for (int k = 0; (k < 100) && (p.we_wordc == 0); k++) {
-    //chrono::milliseconds duration(20);
-    //this_thread::sleep_for(duration);
+    // chrono::milliseconds duration(20);
+    // this_thread::sleep_for(duration);
     wordexp(pattern, &p, WRDE_APPEND);
   }
 #endif
 
   result.reserve(p.we_wordc);
-  for (size_t i = 0; i < p.we_wordc; ++i)
-    result.emplace_back(p.we_wordv[i]);
+  for (size_t i = 0; i < p.we_wordc; ++i) result.emplace_back(p.we_wordv[i]);
 
   wordfree(&p);
 
@@ -153,4 +143,4 @@ std::vector<std::string> getFilesByPattern(const char* pattern)
   return result;
 }
 
-}
+}  // namespace g2o

@@ -28,61 +28,59 @@
 #define G2O_EDGE_SE2_POINT_XY_OFFSET_H_
 
 #include "g2o/core/base_binary_edge.h"
-
-#include "vertex_se2.h"
-#include "vertex_point_xy.h"
 #include "g2o_types_slam2d_api.h"
+#include "parameter_se2_offset.h"
+#include "vertex_point_xy.h"
+#include "vertex_se2.h"
 
 namespace g2o {
 
+/*! \class EdgeSE2PointXYOffset
+ * \brief g2o edge from a track to a point node
+ */
+// first two args are the measurement type, second two the connection classes
+class G2O_TYPES_SLAM2D_API EdgeSE2PointXYOffset
+    : public BaseBinaryEdge<2, Vector2, VertexSE2, VertexPointXY> {
+ public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+  EdgeSE2PointXYOffset();
+  bool read(std::istream& is) override;
+  bool write(std::ostream& os) const override;
 
-  /*! \class EdgeSE2PointXYOffset
-   * \brief g2o edge from a track to a point node
-   */
-  // first two args are the measurement type, second two the connection classes
-  class G2O_TYPES_SLAM2D_API EdgeSE2PointXYOffset : public BaseBinaryEdge<2, Vector2, VertexSE2, VertexPointXY> {
-  public:
-    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-    EdgeSE2PointXYOffset();
-    bool read(std::istream& is) override;
-    bool write(std::ostream& os) const override;
+  void computeError() override;
+  void linearizeOplus() override;
 
-    void computeError() override;
-    void linearizeOplus() override;
+  void setMeasurement(const Vector2& m) override { measurement_ = m; }
 
+  bool setMeasurementData(const number_t* d) override {
+    Eigen::Map<const Vector2> v(d);
+    measurement_ = v;
+    return true;
+  }
 
-    void setMeasurement(const Vector2& m) override{
-      measurement_ = m;
-    }
+  bool getMeasurementData(number_t* d) const override {
+    Eigen::Map<Vector2> v(d);
+    v = measurement_;
+    return true;
+  }
 
-    bool setMeasurementData(const number_t* d) override{
-      Eigen::Map<const Vector2> v(d);
-      measurement_ = v;
-      return true;
-    }
+  int measurementDimension() const override { return 3; }
 
-    bool getMeasurementData(number_t* d) const override{
-      Eigen::Map<Vector2> v(d);
-      v=measurement_;
-      return true;
-    }
+  bool setMeasurementFromState() override;
 
-    int measurementDimension() const override {return 3;}
+  number_t initialEstimatePossible(const OptimizableGraph::VertexSet& from,
+                                   OptimizableGraph::Vertex* to) override {
+    (void)to;
+    return (from.count(vertices_[0]) == 1 ? 1.0 : -1.0);
+  }
 
-    bool setMeasurementFromState() override ;
+  void initialEstimate(const OptimizableGraph::VertexSet& from,
+                       OptimizableGraph::Vertex* to) override;
 
-    number_t initialEstimatePossible(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to) override {
-      (void)to;
-      return (from.count(vertices_[0]) == 1 ? 1.0 : -1.0);
-    }
+ private:
+  std::shared_ptr<CacheSE2Offset> cache_;
+  bool resolveCaches() override;
+};
 
-    void initialEstimate(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to) override;
-
-  private:
-    std::shared_ptr<CacheSE2Offset> cache_;
-    bool resolveCaches() override;
-
-  };
-
-}
+}  // namespace g2o
 #endif

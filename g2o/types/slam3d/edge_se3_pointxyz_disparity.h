@@ -27,74 +27,76 @@
 #ifndef G2O_EDGE_SE3_POINTXYZ_DISPARITY_H_
 #define G2O_EDGE_SE3_POINTXYZ_DISPARITY_H_
 
-#include "vertex_se3.h"
-#include "vertex_pointxyz.h"
-#include "g2o/core/hyper_graph_action.h"
 #include "g2o/core/base_binary_edge.h"
+#include "g2o/core/hyper_graph_action.h"
 #include "parameter_camera.h"
+#include "vertex_pointxyz.h"
+#include "vertex_se3.h"
 
 #define EDGE_PROJECT_DISPARITY_ANALYTIC_JACOBIAN
 namespace g2o {
 
-  /**
-   * \brief edge from a track to a depth camera node using a disparity measurement
-   *
-   * the disparity measurement is normalized: disparity / (focal_x * baseline)
-   */
-  // first two args are the measurement type, second two the connection classes
-  class G2O_TYPES_SLAM3D_API EdgeSE3PointXYZDisparity : public BaseBinaryEdge<3, Vector3, VertexSE3, VertexPointXYZ> {
-  public:
-    EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
-    EdgeSE3PointXYZDisparity();
-    bool read(std::istream& is) override ;
-    bool write(std::ostream& os) const override;
+/**
+ * \brief edge from a track to a depth camera node using a disparity measurement
+ *
+ * the disparity measurement is normalized: disparity / (focal_x * baseline)
+ */
+// first two args are the measurement type, second two the connection classes
+class G2O_TYPES_SLAM3D_API EdgeSE3PointXYZDisparity
+    : public BaseBinaryEdge<3, Vector3, VertexSE3, VertexPointXYZ> {
+ public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
+  EdgeSE3PointXYZDisparity();
+  bool read(std::istream& is) override;
+  bool write(std::ostream& os) const override;
 
-    // return the error estimate as a 3-vector
-    void computeError() override;
+  // return the error estimate as a 3-vector
+  void computeError() override;
 
 #ifdef EDGE_PROJECT_DISPARITY_ANALYTIC_JACOBIAN
-    void linearizeOplus() override;
+  void linearizeOplus() override;
 #endif
 
-    bool setMeasurementData(const number_t* d) override{
-      Eigen::Map<const Vector3> v(d);
-      measurement_ = v;
-      return true;
-    }
+  bool setMeasurementData(const number_t* d) override {
+    Eigen::Map<const Vector3> v(d);
+    measurement_ = v;
+    return true;
+  }
 
-    bool getMeasurementData(number_t* d) const override{
-      Eigen::Map<Vector3> v(d);
-      v=measurement_;
-      return true;
-    }
+  bool getMeasurementData(number_t* d) const override {
+    Eigen::Map<Vector3> v(d);
+    v = measurement_;
+    return true;
+  }
 
-    int measurementDimension() const override {return 3;}
+  int measurementDimension() const override { return 3; }
 
-    bool setMeasurementFromState() override;
+  bool setMeasurementFromState() override;
 
-    number_t initialEstimatePossible(const OptimizableGraph::VertexSet& from,
-             OptimizableGraph::Vertex* to) override {
-      (void) to;
-      return (from.count(vertices_[0]) == 1 ? 1.0 : -1.0);
-    }
+  number_t initialEstimatePossible(const OptimizableGraph::VertexSet& from,
+                                   OptimizableGraph::Vertex* to) override {
+    (void)to;
+    return (from.count(vertices_[0]) == 1 ? 1.0 : -1.0);
+  }
 
-    void initialEstimate(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to) override;
+  void initialEstimate(const OptimizableGraph::VertexSet& from,
+                       OptimizableGraph::Vertex* to) override;
 
-  private:
-    Eigen::Matrix<number_t,3,9,Eigen::ColMajor> J_; // jacobian before projection
-    bool resolveCaches() override;
-    std::shared_ptr<CacheCamera> cache_;
-  };
-
+ private:
+  Eigen::Matrix<number_t, 3, 9, Eigen::ColMajor>
+      J_;  // jacobian before projection
+  bool resolveCaches() override;
+  std::shared_ptr<CacheCamera> cache_;
+};
 
 #ifdef G2O_HAVE_OPENGL
-  class G2O_TYPES_SLAM3D_API EdgeProjectDisparityDrawAction: public DrawAction{
-  public:
-    EdgeProjectDisparityDrawAction();
-    bool operator()(HyperGraph::HyperGraphElement* element,
-                            HyperGraphElementAction::Parameters* params_) override;
-  };
+class G2O_TYPES_SLAM3D_API EdgeProjectDisparityDrawAction : public DrawAction {
+ public:
+  EdgeProjectDisparityDrawAction();
+  bool operator()(HyperGraph::HyperGraphElement* element,
+                  HyperGraphElementAction::Parameters* params_) override;
+};
 #endif
 
-}
+}  // namespace g2o
 #endif

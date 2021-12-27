@@ -24,89 +24,93 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "parameter_se2_offset.h"
 #include "edge_se2_pointxy_offset.h"
+
 #include <iostream>
+
+#include "parameter_se2_offset.h"
 
 namespace g2o {
 
-  // point to camera projection, monocular
-  EdgeSE2PointXYOffset::EdgeSE2PointXYOffset()  {
-    information().setIdentity();
-    resizeParameters(1);
-    installParameter<CacheSE2Offset::ParameterType>(0);
-  }
-
-  bool EdgeSE2PointXYOffset::resolveCaches(){
-    ParameterVector pv(1);
-    pv[0] = parameters_[0];
-    resolveCache(cache_, vertexXn<0>(), "CACHE_SE2_OFFSET", pv);
-    return cache_ != nullptr;
-  }
-
-
-  bool EdgeSE2PointXYOffset::read(std::istream& is) {
-    int pId;
-    is >> pId;
-    setParameterId(0, pId);
-    // measured keypoint
-    internal::readVector(is, measurement_);
-    if (is.bad()) return false;
-    readInformationMatrix(is);
-    //  we overwrite the information matrix in case of read errors
-    if (is.bad()) information().setIdentity();
-    return true;
-  }
-
-  bool EdgeSE2PointXYOffset::write(std::ostream& os) const {
-    os << parameters_[0]->id() << " ";
-    internal::writeVector(os, measurement());
-    return writeInformationMatrix(os);
-  }
-
-  void EdgeSE2PointXYOffset::computeError() {
-    // from cam to point (track)
-    // VertexSE2 *rob = static_cast<VertexSE2*>(vertices_[0]);
-    VertexPointXY *point = vertexXnRaw<1>();
-
-    Vector2 perr = cache_->w2lMatrix() * point->estimate();
-
-    // error, which is backwards from the normal observed - calculated
-    // measurement_ is the measured projection
-    error_ = perr - measurement_;
-  }
-
-  void EdgeSE2PointXYOffset::linearizeOplus() {
-    VertexSE2 *rob = vertexXnRaw<0>();
-    VertexPointXY *point = vertexXnRaw<1>();
-    jacobianOplusXi_.block<2,2>(0,0) = - cache_->RpInverseRInverseMatrix();
-    jacobianOplusXi_.block<2,1>(0,2) = cache_->RpInverseRInversePrimeMatrix()*(point->estimate()-rob->estimate().translation());
-    jacobianOplusXj_ = cache_->RpInverseRInverseMatrix();
-  }
-
-
-  bool EdgeSE2PointXYOffset::setMeasurementFromState(){
-    VertexPointXY *point = vertexXnRaw<1>();
-
-    measurement_ = cache_->w2lMatrix() * point->estimate();
-    return true;
-  }
-
-
-  void EdgeSE2PointXYOffset::initialEstimate(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* /*to_*/)
-  {
-    (void) from;
-    assert(from.size() == 1 && from.count(vertices_[0]) == 1 && "Can not initialize VertexDepthCam position by VertexTrackXY");
-
-    VertexSE2 *cam = vertexXnRaw<0>();
-    VertexPointXY *point = vertexXnRaw<1>();
-    // SE2OffsetCache* vcache = (SE2OffsetCache* ) cam->getCache(_cacheIds[0]);
-    // if (! vcache){
-    //   cerr << "fatal error in retrieving cache" << endl;
-    // }
-    // SE2OffsetParameters* params=vcache->params;
-    Vector2 p=measurement_;
-    point->setEstimate(cam->estimate() * (cache_->offsetParam()->offsetMatrix() * p));
-  }
-
+// point to camera projection, monocular
+EdgeSE2PointXYOffset::EdgeSE2PointXYOffset() {
+  information().setIdentity();
+  resizeParameters(1);
+  installParameter<CacheSE2Offset::ParameterType>(0);
 }
+
+bool EdgeSE2PointXYOffset::resolveCaches() {
+  ParameterVector pv(1);
+  pv[0] = parameters_[0];
+  resolveCache(cache_, vertexXn<0>(), "CACHE_SE2_OFFSET", pv);
+  return cache_ != nullptr;
+}
+
+bool EdgeSE2PointXYOffset::read(std::istream &is) {
+  int pId;
+  is >> pId;
+  setParameterId(0, pId);
+  // measured keypoint
+  internal::readVector(is, measurement_);
+  if (is.bad()) return false;
+  readInformationMatrix(is);
+  //  we overwrite the information matrix in case of read errors
+  if (is.bad()) information().setIdentity();
+  return true;
+}
+
+bool EdgeSE2PointXYOffset::write(std::ostream &os) const {
+  os << parameters_[0]->id() << " ";
+  internal::writeVector(os, measurement());
+  return writeInformationMatrix(os);
+}
+
+void EdgeSE2PointXYOffset::computeError() {
+  // from cam to point (track)
+  // VertexSE2 *rob = static_cast<VertexSE2*>(vertices_[0]);
+  VertexPointXY *point = vertexXnRaw<1>();
+
+  Vector2 perr = cache_->w2lMatrix() * point->estimate();
+
+  // error, which is backwards from the normal observed - calculated
+  // measurement_ is the measured projection
+  error_ = perr - measurement_;
+}
+
+void EdgeSE2PointXYOffset::linearizeOplus() {
+  VertexSE2 *rob = vertexXnRaw<0>();
+  VertexPointXY *point = vertexXnRaw<1>();
+  jacobianOplusXi_.block<2, 2>(0, 0) = -cache_->RpInverseRInverseMatrix();
+  jacobianOplusXi_.block<2, 1>(0, 2) =
+      cache_->RpInverseRInversePrimeMatrix() *
+      (point->estimate() - rob->estimate().translation());
+  jacobianOplusXj_ = cache_->RpInverseRInverseMatrix();
+}
+
+bool EdgeSE2PointXYOffset::setMeasurementFromState() {
+  VertexPointXY *point = vertexXnRaw<1>();
+
+  measurement_ = cache_->w2lMatrix() * point->estimate();
+  return true;
+}
+
+void EdgeSE2PointXYOffset::initialEstimate(
+    const OptimizableGraph::VertexSet &from,
+    OptimizableGraph::Vertex * /*to_*/) {
+  (void)from;
+  assert(from.size() == 1 && from.count(vertices_[0]) == 1 &&
+         "Can not initialize VertexDepthCam position by VertexTrackXY");
+
+  VertexSE2 *cam = vertexXnRaw<0>();
+  VertexPointXY *point = vertexXnRaw<1>();
+  // SE2OffsetCache* vcache = (SE2OffsetCache* ) cam->getCache(_cacheIds[0]);
+  // if (! vcache){
+  //   cerr << "fatal error in retrieving cache" << endl;
+  // }
+  // SE2OffsetParameters* params=vcache->params;
+  Vector2 p = measurement_;
+  point->setEstimate(cam->estimate() *
+                     (cache_->offsetParam()->offsetMatrix() * p));
+}
+
+}  // namespace g2o

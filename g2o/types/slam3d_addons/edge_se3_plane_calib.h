@@ -36,7 +36,8 @@ namespace g2o {
 /**
  * \brief plane measurement that also calibrates an offset for the sensor
  */
-class G2O_TYPES_SLAM3D_ADDONS_API EdgeSE3PlaneSensorCalib : public BaseVariableSizedEdge<3, Plane3D> {
+class G2O_TYPES_SLAM3D_ADDONS_API EdgeSE3PlaneSensorCalib
+    : public BaseVariableSizedEdge<3, Plane3D> {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
   EdgeSE3PlaneSensorCalib();
@@ -63,11 +64,13 @@ class G2O_TYPES_SLAM3D_ADDONS_API EdgeSE3PlaneSensorCalib : public BaseVariableS
 class EdgeSE3PlaneSensorCalibDrawAction : public DrawAction {
  public:
   G2O_TYPES_SLAM3D_ADDONS_API EdgeSE3PlaneSensorCalibDrawAction();
-  G2O_TYPES_SLAM3D_ADDONS_API bool operator()(HyperGraph::HyperGraphElement* element,
-                                                      HyperGraphElementAction::Parameters* params_) override;
+  G2O_TYPES_SLAM3D_ADDONS_API bool operator()(
+      HyperGraph::HyperGraphElement* element,
+      HyperGraphElementAction::Parameters* params_) override;
 
  protected:
-  bool refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_) override;
+  bool refreshPropertyPtrs(
+      HyperGraphElementAction::Parameters* params_) override;
   std::shared_ptr<FloatProperty> planeWidth_, planeHeight_;
 };
 #endif

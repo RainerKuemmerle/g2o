@@ -26,58 +26,60 @@
 
 #include "tools.h"
 
-#include <queue>
-#include <vector>
-#include <map>
-#include <set>
 #include <limits>
+#include <map>
+#include <queue>
+#include <set>
+#include <vector>
 
 #include "g2o/types/slam2d/types_three_dof.h"
 
-namespace g2o{
+namespace g2o {
 
-  using namespace std;
+using namespace std;
 
-  void findConnectedEdgesWithCostLimit(HyperGraph::EdgeSet& selected,
-               HyperGraph::EdgeSet& border,
-               HyperGraph::Edge* start,
-               HyperDijkstra::CostFunction* cost,
-               double maxEdgeCost,
-               double comparisonConditioner){
+void findConnectedEdgesWithCostLimit(HyperGraph::EdgeSet& selected,
+                                     HyperGraph::EdgeSet& border,
+                                     HyperGraph::Edge* start,
+                                     HyperDijkstra::CostFunction* cost,
+                                     double maxEdgeCost,
+                                     double comparisonConditioner) {
+  (void)comparisonConditioner;  // no warning (unused)
+  typedef std::queue<HyperGraph::Edge*> EdgeDeque;
+  EdgeDeque frontier;
+  frontier.push(start);
 
-    (void) comparisonConditioner; // no warning (unused)
-    typedef std::queue<HyperGraph::Edge*> EdgeDeque;
-    EdgeDeque frontier;
-    frontier.push(start);
+  selected.clear();
+  border.clear();
 
-    selected.clear();
-    border.clear();
+  while (!frontier.empty()) {
+    HyperGraph::Edge* e = frontier.front();
+    frontier.pop();
 
-    while (! frontier.empty()){
-      HyperGraph::Edge* e=frontier.front();
-      frontier.pop();
+    const VertexSE2* from = dynamic_cast<const VertexSE2*>(e->vertices()[0]);
+    const VertexSE2* to = dynamic_cast<const VertexSE2*>(e->vertices()[1]);
 
-      const VertexSE2* from = dynamic_cast<const VertexSE2*>(e->vertices()[0]);
-      const VertexSE2* to   = dynamic_cast<const VertexSE2*>(e->vertices()[1]);
+    if (!(from && to)) continue;
 
-      if (!(from && to))
-        continue;
-
-      double edgecost = (*cost)(e, e->vertices()[0], e->vertices()[1]);
-      if (edgecost != std::numeric_limits<double>::max()) {
-        if (edgecost > maxEdgeCost) {  // + comparisonConditioner) {
-          border.insert(e);
-        } else /*if (edgecost <= maxEdgeCost)*/ {
-          selected.insert(e);
-          for (auto it = e->vertices()[0]->edges().begin(); it != e->vertices()[0]->edges().end(); ++it) {
-            if (selected.find(*it) == selected.end()) frontier.push(dynamic_cast<HyperGraph::Edge*>(*it));
-          }
-          for (auto it = e->vertices()[1]->edges().begin(); it != e->vertices()[1]->edges().end(); ++it) {
-            if (selected.find(*it) == selected.end()) frontier.push(dynamic_cast<HyperGraph::Edge*>(*it));
-          }
+    double edgecost = (*cost)(e, e->vertices()[0], e->vertices()[1]);
+    if (edgecost != std::numeric_limits<double>::max()) {
+      if (edgecost > maxEdgeCost) {  // + comparisonConditioner) {
+        border.insert(e);
+      } else /*if (edgecost <= maxEdgeCost)*/ {
+        selected.insert(e);
+        for (auto it = e->vertices()[0]->edges().begin();
+             it != e->vertices()[0]->edges().end(); ++it) {
+          if (selected.find(*it) == selected.end())
+            frontier.push(dynamic_cast<HyperGraph::Edge*>(*it));
+        }
+        for (auto it = e->vertices()[1]->edges().begin();
+             it != e->vertices()[1]->edges().end(); ++it) {
+          if (selected.find(*it) == selected.end())
+            frontier.push(dynamic_cast<HyperGraph::Edge*>(*it));
         }
       }
     }
   }
+}
 
-};
+};  // namespace g2o

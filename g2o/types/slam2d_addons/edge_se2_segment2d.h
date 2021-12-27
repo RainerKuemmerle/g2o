@@ -36,13 +36,20 @@
 namespace g2o {
 
 class EdgeSE2Segment2D
-    : public BaseBinaryEdge<4, Vector4, VertexSE2, VertexSegment2D>  // Avoid redefinition of BaseEdge in MSVC
+    : public BaseBinaryEdge<4, Vector4, VertexSE2,
+                            VertexSegment2D>  // Avoid redefinition of BaseEdge
+                                              // in MSVC
 {
  public:
   G2O_TYPES_SLAM2D_ADDONS_API EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
-  G2O_TYPES_SLAM2D_ADDONS_API Vector2 measurementP1() { return Eigen::Map<const Vector2>(&(measurement_[0])); }
-  G2O_TYPES_SLAM2D_ADDONS_API Vector2 measurementP2() { return Eigen::Map<const Vector2>(&(measurement_[2])); }
+      G2O_TYPES_SLAM2D_ADDONS_API Vector2
+      measurementP1() {
+    return Eigen::Map<const Vector2>(&(measurement_[0]));
+  }
+  G2O_TYPES_SLAM2D_ADDONS_API Vector2 measurementP2() {
+    return Eigen::Map<const Vector2>(&(measurement_[2]));
+  }
   G2O_TYPES_SLAM2D_ADDONS_API void setMeasurementP1(const Vector2& p1) {
     Eigen::Map<Vector2> v(&measurement_[0]);
     v = p1;
@@ -63,19 +70,23 @@ class EdgeSE2Segment2D
     error_ = error_ - measurement_;
   }
 
-  G2O_TYPES_SLAM2D_ADDONS_API bool setMeasurementData(const number_t* d) override {
+  G2O_TYPES_SLAM2D_ADDONS_API bool setMeasurementData(
+      const number_t* d) override {
     Eigen::Map<const Vector4> data(d);
     measurement_ = data;
     return true;
   }
 
-  G2O_TYPES_SLAM2D_ADDONS_API bool getMeasurementData(number_t* d) const override {
+  G2O_TYPES_SLAM2D_ADDONS_API bool getMeasurementData(
+      number_t* d) const override {
     Eigen::Map<Vector4> data(d);
     data = measurement_;
     return true;
   }
 
-  G2O_TYPES_SLAM2D_ADDONS_API int measurementDimension() const override { return 4; }
+  G2O_TYPES_SLAM2D_ADDONS_API int measurementDimension() const override {
+    return 4;
+  }
 
   G2O_TYPES_SLAM2D_ADDONS_API bool setMeasurementFromState() override {
     const VertexSE2* v1 = vertexXnRaw<0>();
@@ -89,8 +100,12 @@ class EdgeSE2Segment2D
   G2O_TYPES_SLAM2D_ADDONS_API bool read(std::istream& is) override;
   G2O_TYPES_SLAM2D_ADDONS_API bool write(std::ostream& os) const override;
 
-  G2O_TYPES_SLAM2D_ADDONS_API void initialEstimate(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to) override;
-  G2O_TYPES_SLAM2D_ADDONS_API number_t initialEstimatePossible(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to) override {
+  G2O_TYPES_SLAM2D_ADDONS_API void initialEstimate(
+      const OptimizableGraph::VertexSet& from,
+      OptimizableGraph::Vertex* to) override;
+  G2O_TYPES_SLAM2D_ADDONS_API number_t
+  initialEstimatePossible(const OptimizableGraph::VertexSet& from,
+                          OptimizableGraph::Vertex* to) override {
     (void)to;
     return (from.count(vertices_[0]) == 1 ? 1.0 : -1.0);
   }
@@ -99,18 +114,22 @@ class EdgeSE2Segment2D
   /* #endif */
 };
 
-/*   class G2O_TYPES_SLAM2D_ADDONS_API EdgeSE2Segment2DWriteGnuplotAction: public WriteGnuplotAction { */
+/*   class G2O_TYPES_SLAM2D_ADDONS_API EdgeSE2Segment2DWriteGnuplotAction:
+ * public WriteGnuplotAction { */
 /*   public: */
 /*     EdgeSE2Segment2DWriteGnuplotAction(); */
-/*     virtual HyperGraphElementAction* operator()(HyperGraph::HyperGraphElement* element,  */
+/*     virtual HyperGraphElementAction*
+ * operator()(HyperGraph::HyperGraphElement* element,  */
 /*             HyperGraphElementAction::Parameters* params_); */
 /*   }; */
 
 /* #ifdef G2O_HAVE_OPENGL */
-/*   class G2O_TYPES_SLAM2D_ADDONS_API EdgeSE2Segment2DDrawAction: public DrawAction{ */
+/*   class G2O_TYPES_SLAM2D_ADDONS_API EdgeSE2Segment2DDrawAction: public
+ * DrawAction{ */
 /*   public: */
 /*     EdgeSE2Segment2DDrawAction(); */
-/*     virtual HyperGraphElementAction* operator()(HyperGraph::HyperGraphElement* element,  */
+/*     virtual HyperGraphElementAction*
+ * operator()(HyperGraph::HyperGraphElement* element,  */
 /*             HyperGraphElementAction::Parameters* params_); */
 /*   }; */
 /* #endif */

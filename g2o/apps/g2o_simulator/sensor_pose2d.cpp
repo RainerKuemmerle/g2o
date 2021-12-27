@@ -39,7 +39,8 @@ bool SensorPose2D::isVisible(SensorPose2D::WorldObjectType* to) {
 
   assert(to && to->vertex());
   VertexType::EstimateType pose = to->vertex()->estimate();
-  VertexType::EstimateType delta = robotPoseObject_->vertex()->estimate().inverse() * pose;
+  VertexType::EstimateType delta =
+      robotPoseObject_->vertex()->estimate().inverse() * pose;
   Vector2 translation = delta.translation();
   double range2 = translation.squaredNorm();
   if (range2 > maxRange2_) return false;
@@ -71,7 +72,7 @@ void SensorPose2D::sense() {
     ++it;
     count++;
   }
-  for (auto *it : world()->objects()) {
+  for (auto* it : world()->objects()) {
     auto* o = dynamic_cast<WorldObjectType*>(it);
     if (o && isVisible(o)) {
       auto e = mkEdge(o);

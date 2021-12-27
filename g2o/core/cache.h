@@ -30,86 +30,85 @@
 #include <map>
 #include <memory>
 
-#include "optimizable_graph.h"
 #include "g2o_core_api.h"
+#include "optimizable_graph.h"
 
 namespace g2o {
 
-  class CacheContainer;
+class CacheContainer;
 
-  class G2O_CORE_API Cache: public HyperGraph::HyperGraphElement
-  {
-    public:
-      friend class CacheContainer;
-      class G2O_CORE_API CacheKey
-      {
-        public:
-          friend class CacheContainer;
-          CacheKey() = default;
-          CacheKey(std::string  type_, ParameterVector  parameters_);
+class G2O_CORE_API Cache : public HyperGraph::HyperGraphElement {
+ public:
+  friend class CacheContainer;
+  class G2O_CORE_API CacheKey {
+   public:
+    friend class CacheContainer;
+    CacheKey() = default;
+    CacheKey(std::string type_, ParameterVector parameters_);
 
-          bool operator<(const CacheKey& c) const;
+    bool operator<(const CacheKey& c) const;
 
-          const std::string& type() const { return type_;}
-          const ParameterVector& parameters() const { return parameters_;}
+    const std::string& type() const { return type_; }
+    const ParameterVector& parameters() const { return parameters_; }
 
-        protected:
-          std::string type_;
-          ParameterVector parameters_;
-      };
-
-      explicit Cache(CacheContainer* container = nullptr,
-            ParameterVector  parameters = ParameterVector());
-
-      CacheKey key() const;
-
-      OptimizableGraph::Vertex* vertex() const;
-      const ParameterVector& parameters() const;
-
-      void update();
-
-      HyperGraph::HyperGraphElementType elementType() const override { return HyperGraph::kHgetCache;}
-
-    protected:
-      //! redefine this to do the update
-      virtual void updateImpl() = 0;
-
-      bool updateNeeded_ = true;
-      ParameterVector parameters_;
-      CacheContainer* container_;
+   protected:
+    std::string type_;
+    ParameterVector parameters_;
   };
 
-  class G2O_CORE_API CacheContainer: public std::map<Cache::CacheKey, std::shared_ptr<Cache>>
-  {
-    public:
-      friend OptimizableGraph::Edge;
-      explicit CacheContainer(OptimizableGraph::Vertex* vertex_);
-      OptimizableGraph::Vertex* vertex() const;
-      std::shared_ptr<Cache> findCache(const Cache::CacheKey& key);
-      void setUpdateNeeded(bool needUpdate=true);
-      void update();
-    protected:
-      std::shared_ptr<Cache> createCache(const Cache::CacheKey& key);
-      OptimizableGraph::Vertex* vertex_;
-      bool updateNeeded_;
-  };
+  explicit Cache(CacheContainer* container = nullptr,
+                 ParameterVector parameters = ParameterVector());
 
+  CacheKey key() const;
 
-  template <typename CacheType>
-  void OptimizableGraph::Edge::resolveCache(std::shared_ptr<CacheType>& cache,
-      const std::shared_ptr<OptimizableGraph::Vertex>& v,
-      const std::string& type,
-      const ParameterVector& parameters_)
-  {
-    CacheContainer* container= v->cacheContainer();
-    Cache::CacheKey key(type, parameters_);
-    std::shared_ptr<Cache> c = container->findCache(key);
-    if (!c) {
-      c = container->createCache(key);
-    }
-    cache = std::dynamic_pointer_cast<CacheType>(c);
+  OptimizableGraph::Vertex* vertex() const;
+  const ParameterVector& parameters() const;
+
+  void update();
+
+  HyperGraph::HyperGraphElementType elementType() const override {
+    return HyperGraph::kHgetCache;
   }
 
-} // end namespace
+ protected:
+  //! redefine this to do the update
+  virtual void updateImpl() = 0;
+
+  bool updateNeeded_ = true;
+  ParameterVector parameters_;
+  CacheContainer* container_;
+};
+
+class G2O_CORE_API CacheContainer
+    : public std::map<Cache::CacheKey, std::shared_ptr<Cache>> {
+ public:
+  friend OptimizableGraph::Edge;
+  explicit CacheContainer(OptimizableGraph::Vertex* vertex_);
+  OptimizableGraph::Vertex* vertex() const;
+  std::shared_ptr<Cache> findCache(const Cache::CacheKey& key);
+  void setUpdateNeeded(bool needUpdate = true);
+  void update();
+
+ protected:
+  std::shared_ptr<Cache> createCache(const Cache::CacheKey& key);
+  OptimizableGraph::Vertex* vertex_;
+  bool updateNeeded_;
+};
+
+template <typename CacheType>
+void OptimizableGraph::Edge::resolveCache(
+    std::shared_ptr<CacheType>& cache,
+    const std::shared_ptr<OptimizableGraph::Vertex>& v, const std::string& type,
+    const ParameterVector& parameters_) {
+  CacheContainer* container = v->cacheContainer();
+  Cache::CacheKey key(type, parameters_);
+  std::shared_ptr<Cache> c = container->findCache(key);
+  if (!c) {
+    c = container->createCache(key);
+  }
+  cache = std::dynamic_pointer_cast<CacheType>(c);
+}
+
+}  // namespace g2o
 
 #endif

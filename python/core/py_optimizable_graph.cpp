@@ -22,9 +22,10 @@ void declareOptimizableGraph(py::module& m) {
   // typedef std::set<HyperGraphAction*>    HyperGraphActionSet;
 
   py::class_<CLS::VertexIDCompare>(cls, "VertexIDCompare")
-      .def("__call__", [](const CLS::Vertex* v1, const CLS::Vertex* v2) -> bool {
-        return v1->id() < v2->id();
-      });
+      .def("__call__",
+           [](const CLS::Vertex* v1, const CLS::Vertex* v2) -> bool {
+             return v1->id() < v2->id();
+           });
 
   py::class_<CLS::EdgeIDCompare>(cls, "EdgeIDCompare")
       .def("__call__", [](const CLS::Edge* e1, const CLS::Edge* e2) -> bool {
@@ -39,38 +40,44 @@ void declareOptimizableGraph(py::module& m) {
       //.def(py::init<>())   // invalid new-expression of abstract class
       .def("set_to_origin", &CLS::Vertex::setToOrigin)  // -> void
       .def("set_estimate_data",
-           (bool (CLS::Vertex::*)(const double*)) & CLS::Vertex::setEstimateData, "estimate"_a,
-           py::keep_alive<1, 2>())
+           (bool(CLS::Vertex::*)(const double*)) & CLS::Vertex::setEstimateData,
+           "estimate"_a, py::keep_alive<1, 2>())
       .def("set_estimate_data",
-           (bool (CLS::Vertex::*)(const std::vector<double>&)) & CLS::Vertex::setEstimateData,
+           (bool(CLS::Vertex::*)(const std::vector<double>&)) &
+               CLS::Vertex::setEstimateData,
            "estimate"_a, py::keep_alive<1, 2>())
       .def("get_estimate_data",
-           (bool (CLS::Vertex::*)(double*) const) & CLS::Vertex::getEstimateData, "estimate"_a,
-           py::keep_alive<1, 2>())
+           (bool(CLS::Vertex::*)(double*) const) & CLS::Vertex::getEstimateData,
+           "estimate"_a, py::keep_alive<1, 2>())
       .def("get_estimate_data",
-           (bool (CLS::Vertex::*)(std::vector<double>&) const) & CLS::Vertex::getEstimateData,
+           (bool(CLS::Vertex::*)(std::vector<double>&) const) &
+               CLS::Vertex::getEstimateData,
            "estimate"_a, py::keep_alive<1, 2>())
 
       .def("set_minimal_estimate_data",
-           (bool (CLS::Vertex::*)(const double*)) & CLS::Vertex::setMinimalEstimateData,
+           (bool(CLS::Vertex::*)(const double*)) &
+               CLS::Vertex::setMinimalEstimateData,
            "estimate"_a, py::keep_alive<1, 2>())
-      .def(
-          "set_minimal_estimate_data",
-          (bool (CLS::Vertex::*)(const std::vector<double>&)) & CLS::Vertex::setMinimalEstimateData,
-          "estimate"_a, py::keep_alive<1, 2>())
+      .def("set_minimal_estimate_data",
+           (bool(CLS::Vertex::*)(const std::vector<double>&)) &
+               CLS::Vertex::setMinimalEstimateData,
+           "estimate"_a, py::keep_alive<1, 2>())
       .def("get_minimal_estimate_data",
-           (bool (CLS::Vertex::*)(double*) const) & CLS::Vertex::getMinimalEstimateData,
+           (bool(CLS::Vertex::*)(double*) const) &
+               CLS::Vertex::getMinimalEstimateData,
            "estimate"_a)
-      .def(
-          "get_minimal_estimate_data",
-          (bool (CLS::Vertex::*)(std::vector<double>&) const) & CLS::Vertex::getMinimalEstimateData,
-          "estimate"_a)
+      .def("get_minimal_estimate_data",
+           (bool(CLS::Vertex::*)(std::vector<double>&) const) &
+               CLS::Vertex::getMinimalEstimateData,
+           "estimate"_a)
 
-      .def("estimate_dimension", &CLS::Vertex::estimateDimension)                 // virtual, -> int
-      .def("minimal_estimate_dimension", &CLS::Vertex::minimalEstimateDimension)  // virtual, -> int
+      .def("estimate_dimension",
+           &CLS::Vertex::estimateDimension)  // virtual, -> int
+      .def("minimal_estimate_dimension",
+           &CLS::Vertex::minimalEstimateDimension)  // virtual, -> int
 
       .def("oplus", &CLS::Vertex::oplus,
-           "v"_a)                                        // const double* -> void
+           "v"_a)  // const double* -> void
       .def("hessian_index", &CLS::Vertex::hessianIndex)  // -> int
       .def("set_hessian_index", &CLS::Vertex::setHessianIndex,
            "ti"_a)  // int -> void
@@ -90,27 +97,32 @@ void declareOptimizableGraph(py::module& m) {
       .def("set_col_in_hessian", &CLS::Vertex::setColInHessian,
            "c"_a)  // int -> void
 
-      .def("graph", (OptimizableGraph * (CLS::Vertex::*)()) & CLS::Vertex::graph,
+      .def("graph",
+           (OptimizableGraph * (CLS::Vertex::*)()) & CLS::Vertex::graph,
            py::return_value_policy::reference)
 
       .def("lock_quadratic_form", &CLS::Vertex::lockQuadraticForm)
       .def("unlock_quadratic_form", &CLS::Vertex::unlockQuadraticForm)
       .def("update_cache", &CLS::Vertex::updateCache);
 
-  py::class_<CLS::Edge, HyperGraph::Edge, HyperGraph::DataContainer, std::shared_ptr<CLS::Edge>>(
-      cls, "OptimizableGraph_Edge")
+  py::class_<CLS::Edge, HyperGraph::Edge, HyperGraph::DataContainer,
+             std::shared_ptr<CLS::Edge>>(cls, "OptimizableGraph_Edge")
       //.def(py::init<>())
       .def("set_measurement_data", &CLS::Edge::setMeasurementData,
            "m"_a)  // const double* -> bool
       .def("get_measurement_data", &CLS::Edge::getMeasurementData,
-           "m"_a)                                                              // double * -> bool
-      .def("measurement_dimension", &CLS::Edge::measurementDimension)          // -> int
-      .def("set_measurement_from_state", &CLS::Edge::setMeasurementFromState)  // -> bool
+           "m"_a)  // double * -> bool
+      .def("measurement_dimension", &CLS::Edge::measurementDimension)  // -> int
+      .def("set_measurement_from_state",
+           &CLS::Edge::setMeasurementFromState)        // -> bool
       .def("robust_kernel", &CLS::Edge::robustKernel)  // -> RobustKernelPtr
-      .def("set_robust_kernel", &CLS::Edge::setRobustKernel, "ptr"_a)  // RobustKernel* -> void
+      .def("set_robust_kernel", &CLS::Edge::setRobustKernel,
+           "ptr"_a)  // RobustKernel* -> void
 
-      .def("initial_estimate_possible", &CLS::Edge::initialEstimatePossible, "from"_a,
-           "to"_a)  // (const OptimizableGraph::VertexSet&, OptimizableGraph::VertexSet&) -> double
+      .def("initial_estimate_possible", &CLS::Edge::initialEstimatePossible,
+           "from"_a,
+           "to"_a)  // (const OptimizableGraph::VertexSet&,
+                    // OptimizableGraph::VertexSet&) -> double
       .def("level", &CLS::Edge::level)  // -> int
       .def("set_level", &CLS::Edge::setLevel,
            "l"_a)                               // int -> void
@@ -128,53 +140,63 @@ void declareOptimizableGraph(py::module& m) {
       .def("param_ids", &CLS::Edge::parameterIds);
 
   cls.def(py::init<>());
-  cls.def("vertex", (std::shared_ptr<CLS::Vertex>(CLS::*)(int)) & CLS::vertex, "id"_a,
+  cls.def("vertex", (std::shared_ptr<CLS::Vertex>(CLS::*)(int)) & CLS::vertex,
+          "id"_a,
           py::return_value_policy::reference);  // int -> Vertex*
 
   cls.def("add_vertex",
-          (bool (CLS::*)(const std::shared_ptr<HyperGraph::Vertex>&,
-                         const std::shared_ptr<HyperGraph::Data>&)) &
+          (bool(CLS::*)(const std::shared_ptr<HyperGraph::Vertex>&,
+                        const std::shared_ptr<HyperGraph::Data>&)) &
               CLS::addVertex,
           "v"_a, "user_data"_a);
   cls.def("add_vertex",
-          (bool (CLS::*)(const std::shared_ptr<HyperGraph::Vertex>&)) & CLS::addVertex,
+          (bool(CLS::*)(const std::shared_ptr<HyperGraph::Vertex>&)) &
+              CLS::addVertex,
           "v"_a);
   cls.def("remove_vertex", &CLS::removeVertex, "v"_a,
           "detach"_a);  // virtual, (Vertex*, bool) -> bool
 
-  cls.def("add_edge",
-          (bool (CLS::*)(const std::shared_ptr<HyperGraph::Edge>&)) & CLS::addEdge, "e"_a);
-  //   cls.def("add_edge", (bool (CLS::*)(const std::shared_ptr<HyperGraph::Edge>&)) & CLS::addEdge,
+  cls.def(
+      "add_edge",
+      (bool(CLS::*)(const std::shared_ptr<HyperGraph::Edge>&)) & CLS::addEdge,
+      "e"_a);
+  //   cls.def("add_edge", (bool (CLS::*)(const
+  //   std::shared_ptr<HyperGraph::Edge>&)) & CLS::addEdge,
   //           "e"_a, py::keep_alive<1, 2>());
 
-  cls.def("set_edge_vertex", &CLS::setEdgeVertex, "e"_a, "pos"_a, "v"_a, py::keep_alive<1, 2>(),
-          py::keep_alive<1, 4>());  // (HyperGraph::Edge*, int, HyperGraph::Vertex*) -> bool
-  cls.def("chi2", &CLS::chi2);      // -> double
+  cls.def("set_edge_vertex", &CLS::setEdgeVertex, "e"_a, "pos"_a, "v"_a,
+          py::keep_alive<1, 2>(),
+          py::keep_alive<1, 4>());               // (HyperGraph::Edge*, int,
+                                                 // HyperGraph::Vertex*) -> bool
+  cls.def("chi2", &CLS::chi2);                   // -> double
   cls.def("max_dimension", &CLS::maxDimension);  // -> int
   cls.def("dimensions", &CLS::dimensions);       // -> std::set<int>
 
-  cls.def("optimize", &CLS::optimize, "iterations"_a, "online"_a = false);  // (int, bool) -> int
-  cls.def("pre_iteration", &CLS::preIteration);                             // int -> void
-  cls.def("post_iteration", &CLS::postIteration);                           // int -> void
+  cls.def("optimize", &CLS::optimize, "iterations"_a,
+          "online"_a = false);                     // (int, bool) -> int
+  cls.def("pre_iteration", &CLS::preIteration);    // int -> void
+  cls.def("post_iteration", &CLS::postIteration);  // int -> void
 
   cls.def("add_pre_iteration_action", &CLS::addPreIterationAction, "action"_a,
           py::keep_alive<1, 2>());  // HyperGraphAction* -> bool
   cls.def("add_post_iteration_action", &CLS::addPostIterationAction, "action"_a,
           py::keep_alive<1, 2>());  // HyperGraphAction* -> bool
-  cls.def("remove_pre_iteration_action", &CLS::removePreIterationAction, "action"_a,
-          py::keep_alive<1, 2>());  // HyperGraphAction* -> bool
-  cls.def("remove_post_iteration_action", &CLS::removePostIterationAction, "action"_a,
-          py::keep_alive<1, 2>());  // HyperGraphAction* -> bool
+  cls.def("remove_pre_iteration_action", &CLS::removePreIterationAction,
+          "action"_a, py::keep_alive<1, 2>());  // HyperGraphAction* -> bool
+  cls.def("remove_post_iteration_action", &CLS::removePostIterationAction,
+          "action"_a, py::keep_alive<1, 2>());  // HyperGraphAction* -> bool
 
-  cls.def("push", (void (CLS::*)()) & CLS::push);
-  cls.def("push", (void (CLS::*)(HyperGraph::VertexSet&)) & CLS::push);
-  cls.def("pop", (void (CLS::*)()) & CLS::pop);
-  cls.def("pop", (void (CLS::*)(HyperGraph::VertexSet&)) & CLS::pop);
-  cls.def("discard_top", (void (CLS::*)()) & CLS::discardTop);
-  cls.def("discard_top", (void (CLS::*)(HyperGraph::VertexSet&)) & CLS::discardTop);
+  cls.def("push", (void(CLS::*)()) & CLS::push);
+  cls.def("push", (void(CLS::*)(HyperGraph::VertexSet&)) & CLS::push);
+  cls.def("pop", (void(CLS::*)()) & CLS::pop);
+  cls.def("pop", (void(CLS::*)(HyperGraph::VertexSet&)) & CLS::pop);
+  cls.def("discard_top", (void(CLS::*)()) & CLS::discardTop);
+  cls.def("discard_top",
+          (void(CLS::*)(HyperGraph::VertexSet&)) & CLS::discardTop);
 
-  cls.def("load", (bool (CLS::*)(const char*)) & CLS::load, "filename"_a);
-  cls.def("save", (bool (CLS::*)(const char*, int) const) & CLS::save, "filename"_a, "level"_a = 0);
+  cls.def("load", (bool(CLS::*)(const char*)) & CLS::load, "filename"_a);
+  cls.def("save", (bool(CLS::*)(const char*, int) const) & CLS::save,
+          "filename"_a, "level"_a = 0);
 
   cls.def("set_fixed", &CLS::setFixed, "vset"_a, "fixes"_a,
           py::keep_alive<1, 2>());  // (HyperGraph::VertexSet&, bool) -> void
@@ -189,7 +211,8 @@ void declareOptimizableGraph(py::module& m) {
           "verbose"_a = false);  // bool -> bool
 
   cls.def_static("init_multi_threading", &CLS::initMultiThreading);
-  cls.def("jacobian_workspace", (JacobianWorkspace & (CLS::*)()) & CLS::jacobianWorkspace);
+  cls.def("jacobian_workspace",
+          (JacobianWorkspace & (CLS::*)()) & CLS::jacobianWorkspace);
   // cls.def("parameters", (ParameterContainer& (CLS::*) ()) &CLS::parameters);
 
   // saveSubset

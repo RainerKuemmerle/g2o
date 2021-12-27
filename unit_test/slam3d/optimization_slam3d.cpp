@@ -35,7 +35,8 @@
 using namespace std;
 using namespace g2o;
 
-typedef g2o::LinearSolverEigen<g2o::BlockSolverX::PoseMatrixType> SlamLinearSolver;
+typedef g2o::LinearSolverEigen<g2o::BlockSolverX::PoseMatrixType>
+    SlamLinearSolver;
 
 template <typename T>
 class Slam3DOptimization : public testing::Test {
@@ -45,7 +46,8 @@ class Slam3DOptimization : public testing::Test {
   Slam3DOptimization() {
     auto linearSolver = g2o::make_unique<SlamLinearSolver>();
     linearSolver->setBlockOrdering(false);
-    auto blockSolver = g2o::make_unique<g2o::BlockSolverX>(std::move(linearSolver));
+    auto blockSolver =
+        g2o::make_unique<g2o::BlockSolverX>(std::move(linearSolver));
     std::unique_ptr<g2o::OptimizationAlgorithm> algorithm(
         new OptimizationAlgo(std::move(blockSolver)));
 
@@ -88,9 +90,12 @@ TYPED_TEST_P(Slam3DOptimization, Translation) {
   ASSERT_GT(1e-6, this->optimizer.chi2());
   ASSERT_GT(1e-6, this->optimizer.activeChi2());
 
-  auto v2AfterOpti = dynamic_pointer_cast<g2o::VertexSE3>(this->optimizer.vertex(1));
-  ASSERT_TRUE(v2AfterOpti->estimate().translation().isApprox(g2o::Vector3::Zero()));
-  ASSERT_TRUE(v2AfterOpti->estimate().rotation().diagonal().isApprox(g2o::Vector3::Ones()));
+  auto v2AfterOpti =
+      dynamic_pointer_cast<g2o::VertexSE3>(this->optimizer.vertex(1));
+  ASSERT_TRUE(
+      v2AfterOpti->estimate().translation().isApprox(g2o::Vector3::Zero()));
+  ASSERT_TRUE(v2AfterOpti->estimate().rotation().diagonal().isApprox(
+      g2o::Vector3::Ones()));
 }
 
 TYPED_TEST_P(Slam3DOptimization, Rotation) {
@@ -124,15 +129,20 @@ TYPED_TEST_P(Slam3DOptimization, Rotation) {
   ASSERT_GT(1e-6, this->optimizer.chi2());
   ASSERT_GT(1e-6, this->optimizer.activeChi2());
 
-  auto v2AfterOpti = dynamic_pointer_cast<g2o::VertexSE3>(this->optimizer.vertex(1));
-  ASSERT_TRUE(v2AfterOpti->estimate().translation().isApprox(g2o::Vector3::Zero()));
-  ASSERT_TRUE(v2AfterOpti->estimate().rotation().diagonal().isApprox(g2o::Vector3::Ones()));
+  auto v2AfterOpti =
+      dynamic_pointer_cast<g2o::VertexSE3>(this->optimizer.vertex(1));
+  ASSERT_TRUE(
+      v2AfterOpti->estimate().translation().isApprox(g2o::Vector3::Zero()));
+  ASSERT_TRUE(v2AfterOpti->estimate().rotation().diagonal().isApprox(
+      g2o::Vector3::Ones()));
 }
 
 // registering the test suite and all the types to be tested
 REGISTER_TYPED_TEST_SUITE_P(Slam3DOptimization, Translation, Rotation);
 
 using OptimizationAlgorithmTypes =
-    ::testing::Types<OptimizationAlgorithmGaussNewton, OptimizationAlgorithmLevenberg,
+    ::testing::Types<OptimizationAlgorithmGaussNewton,
+                     OptimizationAlgorithmLevenberg,
                      OptimizationAlgorithmDogleg>;
-INSTANTIATE_TYPED_TEST_SUITE_P(Slam3D, Slam3DOptimization, OptimizationAlgorithmTypes);
+INSTANTIATE_TYPED_TEST_SUITE_P(Slam3D, Slam3DOptimization,
+                               OptimizationAlgorithmTypes);

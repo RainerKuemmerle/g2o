@@ -31,17 +31,16 @@
 
 namespace g2o {
 
-  class CommandArgs;
+class CommandArgs;
 
-  /**
-   * \brief wrapper for running the g2o viewer
-   */
-  class G2O_VIEWER_API RunG2OViewer
-  {
-    public:
-      static int run(int argc, char** argv, CommandArgs& arg);
-  };
+/**
+ * \brief wrapper for running the g2o viewer
+ */
+class G2O_VIEWER_API RunG2OViewer {
+ public:
+  static int run(int argc, char** argv, CommandArgs& arg);
+};
 
-} // end namespace
+}  // namespace g2o
 
 #endif

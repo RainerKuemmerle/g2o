@@ -1,10 +1,10 @@
 #include <benchmark/benchmark.h>
 
+#include "g2o/autodiff/fixed_array.h"
 #include "g2o/core/dynamic_aligned_buffer.hpp"
 
-#include "g2o/autodiff/fixed_array.h"
-
-// Test several different ways of evaluating Jacobians to see the impact of different ways of implementing stuff.
+// Test several different ways of evaluating Jacobians to see the impact of
+// different ways of implementing stuff.
 
 template <typename number_t, int D>
 void BM_FixedArray(benchmark::State& state) {
@@ -72,7 +72,8 @@ void BM_VariableArrayPointer(benchmark::State& state) {
 template <typename number_t, int D>
 void BM_StaticEigenMatrix(benchmark::State& state) {
   while (state.KeepRunning()) {
-    Eigen::Matrix<number_t, D, 1> add_vi = Eigen::Matrix<number_t, D, 1>::Zero();
+    Eigen::Matrix<number_t, D, 1> add_vi =
+        Eigen::Matrix<number_t, D, 1>::Zero();
     for (int i = 0; i < D; ++i) {
       benchmark::DoNotOptimize(add_vi[i] = 1);
       benchmark::DoNotOptimize(add_vi[i] = -1);
@@ -84,7 +85,8 @@ void BM_StaticEigenMatrix(benchmark::State& state) {
 template <typename number_t, int D>
 void BM_StaticEigenMatrixPointer(benchmark::State& state) {
   while (state.KeepRunning()) {
-    Eigen::Matrix<number_t, D, 1> add_vi = Eigen::Matrix<number_t, D, 1>::Zero();
+    Eigen::Matrix<number_t, D, 1> add_vi =
+        Eigen::Matrix<number_t, D, 1>::Zero();
     number_t* v = add_vi.data();
     for (int i = 0; i < D; ++i) {
       benchmark::DoNotOptimize((*v) = 1);
@@ -206,19 +208,19 @@ void BM_ClassFixedArrayDynamic(benchmark::State& state) {
   }
 }
 
-#define DECLARE_TESTS(N, D)                                    \
-  BENCHMARK_TEMPLATE2(BM_FixedArray, N, D);                    \
-  BENCHMARK_TEMPLATE2(BM_FixedArrayPointer, N, D);             \
-  BENCHMARK_TEMPLATE(BM_VariableArray, N)->Arg(D);             \
-  BENCHMARK_TEMPLATE(BM_VariableArrayPointer, N)->Arg(D);      \
-  BENCHMARK_TEMPLATE2(BM_StaticEigenMatrix, N, D);             \
-  BENCHMARK_TEMPLATE2(BM_StaticEigenMatrixPointer, N, D);      \
-  BENCHMARK_TEMPLATE(BM_DynamicEigenMatrix, N)->Arg(D);        \
-  BENCHMARK_TEMPLATE(BM_DynamicEigenMatrixPointer, N)->Arg(D); \
-  BENCHMARK_TEMPLATE2(BM_DynamicAlignedBuffer, N, D);          \
-  BENCHMARK_TEMPLATE2(BM_DynamicAlignedPointerBuffer, N, D);   \
-  BENCHMARK_TEMPLATE(BM_StaticDynamicPointerHybrid, N)->Arg(D);\
-  BENCHMARK_TEMPLATE(BM_ClassFixedArrayStatic, N, D);               \
+#define DECLARE_TESTS(N, D)                                     \
+  BENCHMARK_TEMPLATE2(BM_FixedArray, N, D);                     \
+  BENCHMARK_TEMPLATE2(BM_FixedArrayPointer, N, D);              \
+  BENCHMARK_TEMPLATE(BM_VariableArray, N)->Arg(D);              \
+  BENCHMARK_TEMPLATE(BM_VariableArrayPointer, N)->Arg(D);       \
+  BENCHMARK_TEMPLATE2(BM_StaticEigenMatrix, N, D);              \
+  BENCHMARK_TEMPLATE2(BM_StaticEigenMatrixPointer, N, D);       \
+  BENCHMARK_TEMPLATE(BM_DynamicEigenMatrix, N)->Arg(D);         \
+  BENCHMARK_TEMPLATE(BM_DynamicEigenMatrixPointer, N)->Arg(D);  \
+  BENCHMARK_TEMPLATE2(BM_DynamicAlignedBuffer, N, D);           \
+  BENCHMARK_TEMPLATE2(BM_DynamicAlignedPointerBuffer, N, D);    \
+  BENCHMARK_TEMPLATE(BM_StaticDynamicPointerHybrid, N)->Arg(D); \
+  BENCHMARK_TEMPLATE(BM_ClassFixedArrayStatic, N, D);           \
   BENCHMARK_TEMPLATE(BM_ClassFixedArrayDynamic, N)->Arg(D);
 
 /*

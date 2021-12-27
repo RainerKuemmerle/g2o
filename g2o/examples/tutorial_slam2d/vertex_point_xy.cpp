@@ -31,7 +31,9 @@ using namespace Eigen;
 namespace g2o {
 namespace tutorial {
 
-VertexPointXY::VertexPointXY() : BaseVertex<2, Vector2d>() { estimate_.setZero(); }
+VertexPointXY::VertexPointXY() : BaseVertex<2, Vector2d>() {
+  estimate_.setZero();
+}
 
 bool VertexPointXY::read(std::istream& is) {
   is >> estimate_[0] >> estimate_[1];

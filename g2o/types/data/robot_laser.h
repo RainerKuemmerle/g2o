@@ -27,51 +27,53 @@
 #ifndef G2O_ROBOT_LASER_H
 #define G2O_ROBOT_LASER_H
 
-#include "raw_laser.h"
-#include "g2o_types_data_api.h"
 #include "g2o/core/hyper_graph_action.h"
+#include "g2o_types_data_api.h"
+#include "raw_laser.h"
 
 namespace g2o {
 
-  /**
-   * \brief laser measurement obtained by a robot
-   *
-   * A laser measurement obtained by a robot. The measurement is equipped with a pose of the robot at which
-   * the measurement was taken. The read/write function correspond to the CARMEN logfile format.
-   */
-  class G2O_TYPES_DATA_API RobotLaser : public RawLaser
-  {
-    public:
-      EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
+/**
+ * \brief laser measurement obtained by a robot
+ *
+ * A laser measurement obtained by a robot. The measurement is equipped with a
+ * pose of the robot at which the measurement was taken. The read/write function
+ * correspond to the CARMEN logfile format.
+ */
+class G2O_TYPES_DATA_API RobotLaser : public RawLaser {
+ public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
 
-      bool write(std::ostream& os) const override;
-      bool read(std::istream& is) override;
+  bool write(std::ostream& os) const override;
+  bool read(std::istream& is) override;
 
-      SE2 laserPose() const { return odomPose_ * laserParams_.laserPose;}
-      const SE2& odomPose() const { return odomPose_;}
-      void setOdomPose(const SE2& odomPose);
+  SE2 laserPose() const { return odomPose_ * laserParams_.laserPose; }
+  const SE2& odomPose() const { return odomPose_; }
+  void setOdomPose(const SE2& odomPose);
 
-    protected:
-      SE2 odomPose_;
-      //! velocities and safety distances of the robot.
-      number_t laserTv_ = 0., laserRv_ = 0., forwardSafetyDist_ = 0., sideSaftyDist_ = 0., turnAxis_ = 0.;
-  };
+ protected:
+  SE2 odomPose_;
+  //! velocities and safety distances of the robot.
+  number_t laserTv_ = 0., laserRv_ = 0., forwardSafetyDist_ = 0.,
+           sideSaftyDist_ = 0., turnAxis_ = 0.;
+};
 
 #ifdef G2O_HAVE_OPENGL
-  class G2O_TYPES_DATA_API RobotLaserDrawAction: public DrawAction{
-  public:
-    RobotLaserDrawAction();
-    bool operator()(HyperGraph::HyperGraphElement* element,
-                            HyperGraphElementAction::Parameters* params_) override;
+class G2O_TYPES_DATA_API RobotLaserDrawAction : public DrawAction {
+ public:
+  RobotLaserDrawAction();
+  bool operator()(HyperGraph::HyperGraphElement* element,
+                  HyperGraphElementAction::Parameters* params_) override;
 
-   protected:
-    bool refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_) override;
-    std::shared_ptr<IntProperty> beamsDownsampling_;
-    std::shared_ptr<FloatProperty> pointSize_;
-    std::shared_ptr<FloatProperty> maxRange_;
-  };
+ protected:
+  bool refreshPropertyPtrs(
+      HyperGraphElementAction::Parameters* params_) override;
+  std::shared_ptr<IntProperty> beamsDownsampling_;
+  std::shared_ptr<FloatProperty> pointSize_;
+  std::shared_ptr<FloatProperty> maxRange_;
+};
 #endif
 
-}
+}  // namespace g2o
 
 #endif

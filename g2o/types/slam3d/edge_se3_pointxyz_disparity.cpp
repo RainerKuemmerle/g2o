@@ -26,175 +26,183 @@
 
 #include "edge_se3_pointxyz_disparity.h"
 
-#include <iostream>
 #include <iomanip>
+#include <iostream>
 
 #ifdef G2O_HAVE_OPENGL
-#include "g2o/stuff/opengl_wrapper.h"
 #include "g2o/stuff/opengl_primitives.h"
+#include "g2o/stuff/opengl_wrapper.h"
 #endif
 
 namespace g2o {
 
-  // point to camera projection, monocular
-  EdgeSE3PointXYZDisparity::EdgeSE3PointXYZDisparity()
-       {
-    resizeParameters(1);
-    installParameter<CacheCamera::ParameterType>(0);
-    information().setIdentity();
-    information()(2, 2) = 1000.;
-    J_.fill(0);
-    J_.block<3, 3>(0, 0) = -Matrix3::Identity();
-  }
+// point to camera projection, monocular
+EdgeSE3PointXYZDisparity::EdgeSE3PointXYZDisparity() {
+  resizeParameters(1);
+  installParameter<CacheCamera::ParameterType>(0);
+  information().setIdentity();
+  information()(2, 2) = 1000.;
+  J_.fill(0);
+  J_.block<3, 3>(0, 0) = -Matrix3::Identity();
+}
 
-  bool EdgeSE3PointXYZDisparity::resolveCaches(){
-    ParameterVector pv(1);
-    pv[0]=parameters_[0];
-    resolveCache(cache_, vertexXn<0>(),"CACHE_CAMERA",pv);
-    return cache_ != nullptr;
-  }
+bool EdgeSE3PointXYZDisparity::resolveCaches() {
+  ParameterVector pv(1);
+  pv[0] = parameters_[0];
+  resolveCache(cache_, vertexXn<0>(), "CACHE_CAMERA", pv);
+  return cache_ != nullptr;
+}
 
+bool EdgeSE3PointXYZDisparity::read(std::istream& is) {
+  readParamIds(is);
+  internal::readVector(is, measurement_);
+  return readInformationMatrix(is);
+}
 
-  bool EdgeSE3PointXYZDisparity::read(std::istream& is) {
-    readParamIds(is);
-    internal::readVector(is, measurement_);
-    return readInformationMatrix(is);
-  }
+bool EdgeSE3PointXYZDisparity::write(std::ostream& os) const {
+  writeParamIds(os);
+  internal::writeVector(os, measurement());
+  return writeInformationMatrix(os);
+}
 
-  bool EdgeSE3PointXYZDisparity::write(std::ostream& os) const {
-    writeParamIds(os);
-    internal::writeVector(os, measurement());
-    return writeInformationMatrix(os);
-  }
+void EdgeSE3PointXYZDisparity::computeError() {
+  // VertexSE3 *cam = static_cast<VertexSE3*>(vertices_[0]);
+  VertexPointXYZ* point = vertexXnRaw<1>();
+  const Vector3& pt = point->estimate();
 
-  void EdgeSE3PointXYZDisparity::computeError() {
-    //VertexSE3 *cam = static_cast<VertexSE3*>(vertices_[0]);
-    VertexPointXYZ *point = vertexXnRaw<1>();
-    const Vector3& pt = point->estimate();
+  Vector3 p = cache_->w2i() * pt;
 
-    Vector3 p = cache_->w2i() * pt;
+  Vector3 perr;
+  perr.head<2>() = p.head<2>() / p(2);
+  perr(2) = 1 / p(2);
 
-    Vector3 perr;
-    perr.head<2>() = p.head<2>()/p(2);
-    perr(2) = 1/p(2);
-
-    // error, which is backwards from the normal observed - calculated
-    // measurement_ is the measured projection
-    error_ = perr - measurement_;
-  }
+  // error, which is backwards from the normal observed - calculated
+  // measurement_ is the measured projection
+  error_ = perr - measurement_;
+}
 
 #ifdef EDGE_PROJECT_DISPARITY_ANALYTIC_JACOBIAN
 
-  void EdgeSE3PointXYZDisparity::linearizeOplus() {
-    //VertexSE3 *cam = static_cast<VertexSE3 *>(vertices_[0]);
-    VertexPointXYZ *vp = vertexXnRaw<1>();
+void EdgeSE3PointXYZDisparity::linearizeOplus() {
+  // VertexSE3 *cam = static_cast<VertexSE3 *>(vertices_[0]);
+  VertexPointXYZ* vp = vertexXnRaw<1>();
 
-    const Vector3& pt = vp->estimate();
+  const Vector3& pt = vp->estimate();
 
-    Vector3 Zcam = cache_->w2l() * vp->estimate();
+  Vector3 Zcam = cache_->w2l() * vp->estimate();
 
-    //  J(0,3) = -0.0;
-    J_(0,4) = -2*Zcam(2);
-    J_(0,5) = 2*Zcam(1);
+  //  J(0,3) = -0.0;
+  J_(0, 4) = -2 * Zcam(2);
+  J_(0, 5) = 2 * Zcam(1);
 
-    J_(1,3) = 2*Zcam(2);
-    //  J(1,4) = -0.0;
-    J_(1,5) = -2*Zcam(0);
+  J_(1, 3) = 2 * Zcam(2);
+  //  J(1,4) = -0.0;
+  J_(1, 5) = -2 * Zcam(0);
 
-    J_(2,3) = -2*Zcam(1);
-    J_(2,4) = 2*Zcam(0);
-    //  J(2,5) = -0.0;
+  J_(2, 3) = -2 * Zcam(1);
+  J_(2, 4) = 2 * Zcam(0);
+  //  J(2,5) = -0.0;
 
-    J_.block<3,3>(0,6) = cache_->w2l().rotation();
+  J_.block<3, 3>(0, 6) = cache_->w2l().rotation();
 
-    //Eigen::Matrix<number_t,3,9,Eigen::ColMajor> Jprime = vcache->params->Kcam_inverseOffsetR  * J;
-    Eigen::Matrix<number_t,3,9,Eigen::ColMajor> Jprime = cache_->camParams()->Kcam_inverseOffsetR()  * J_;
-    Eigen::Matrix<number_t,3,9,Eigen::ColMajor> Jhom;
-    Vector3 Zprime = cache_->w2i() * pt;
+  // Eigen::Matrix<number_t,3,9,Eigen::ColMajor> Jprime =
+  // vcache->params->Kcam_inverseOffsetR  * J;
+  Eigen::Matrix<number_t, 3, 9, Eigen::ColMajor> Jprime =
+      cache_->camParams()->Kcam_inverseOffsetR() * J_;
+  Eigen::Matrix<number_t, 3, 9, Eigen::ColMajor> Jhom;
+  Vector3 Zprime = cache_->w2i() * pt;
 
-    Jhom.block<2,9>(0,0) = 1/(Zprime(2)*Zprime(2)) * (Jprime.block<2,9>(0,0)*Zprime(2) - Zprime.head<2>() * Jprime.block<1,9>(2,0));
-    Jhom.block<1,9>(2,0) = - 1/(Zprime(2)*Zprime(2)) * Jprime.block<1,9>(2,0);
+  Jhom.block<2, 9>(0, 0) = 1 / (Zprime(2) * Zprime(2)) *
+                           (Jprime.block<2, 9>(0, 0) * Zprime(2) -
+                            Zprime.head<2>() * Jprime.block<1, 9>(2, 0));
+  Jhom.block<1, 9>(2, 0) =
+      -1 / (Zprime(2) * Zprime(2)) * Jprime.block<1, 9>(2, 0);
 
-    jacobianOplusXi_ = Jhom.block<3,6>(0,0);
-    jacobianOplusXj_ = Jhom.block<3,3>(0,6);
-  }
+  jacobianOplusXi_ = Jhom.block<3, 6>(0, 0);
+  jacobianOplusXj_ = Jhom.block<3, 3>(0, 6);
+}
 
 #endif
 
-  bool EdgeSE3PointXYZDisparity::setMeasurementFromState(){
-    //VertexSE3 *cam = static_cast< VertexSE3*>(vertices_[0]);
-    VertexPointXYZ *point = vertexXnRaw<1>();
-    const Vector3 &pt = point->estimate();
+bool EdgeSE3PointXYZDisparity::setMeasurementFromState() {
+  // VertexSE3 *cam = static_cast< VertexSE3*>(vertices_[0]);
+  VertexPointXYZ* point = vertexXnRaw<1>();
+  const Vector3& pt = point->estimate();
 
-    // VertexCameraCache* vcache = (VertexCameraCache*) cam->getCache(_cacheIds[0]);
-    // if (! vcache){
-    //   cerr << "fatal error in retrieving cache" << endl;
-    // }
+  // VertexCameraCache* vcache = (VertexCameraCache*)
+  // cam->getCache(_cacheIds[0]); if (! vcache){
+  //   cerr << "fatal error in retrieving cache" << endl;
+  // }
 
-    Vector3 p = cache_->w2i() * pt;
+  Vector3 p = cache_->w2i() * pt;
 
-    Vector3 perr;
-    perr.head<2>() = p.head<2>()/p(2);
-    perr(2) = 1/p(2);
+  Vector3 perr;
+  perr.head<2>() = p.head<2>() / p(2);
+  perr(2) = 1 / p(2);
 
-    // error, which is backwards from the normal observed - calculated
-    // measurement_ is the measured projection
-    measurement_ = perr;
-    return true;
-  }
+  // error, which is backwards from the normal observed - calculated
+  // measurement_ is the measured projection
+  measurement_ = perr;
+  return true;
+}
 
-  void EdgeSE3PointXYZDisparity::initialEstimate(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* /*to*/)
-  {
-    (void) from;
-    assert(from.size() == 1 && from.count(vertices_[0]) == 1 && "Can not initialize VertexDepthCam position by VertexTrackXYZ");
-    VertexSE3 *cam = vertexXnRaw<0>();
-    VertexPointXYZ *point = vertexXnRaw<1>();
+void EdgeSE3PointXYZDisparity::initialEstimate(
+    const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* /*to*/) {
+  (void)from;
+  assert(from.size() == 1 && from.count(vertices_[0]) == 1 &&
+         "Can not initialize VertexDepthCam position by VertexTrackXYZ");
+  VertexSE3* cam = vertexXnRaw<0>();
+  VertexPointXYZ* point = vertexXnRaw<1>();
 
-    // VertexCameraCache* vcache = (VertexCameraCache* ) cam->getCache(_cacheIds[0]);
-    // if (! vcache){
-    //   cerr << "fatal error in retrieving cache" << endl;
-    // }
-    //ParameterCamera* params=vcache->params;
-    const Eigen::Matrix<number_t, 3, 3, Eigen::ColMajor>& invKcam = cache_->camParams()->invKcam();
-    Vector3 p;
-    number_t w=1./measurement_(2);
-    p.head<2>() = measurement_.head<2>()*w;
-    p(2) = w;
-    p = invKcam * p;
-    p = cam->estimate() * (cache_->camParams()->offset() * p);
-    point->setEstimate(p);
-  }
-
+  // VertexCameraCache* vcache = (VertexCameraCache* )
+  // cam->getCache(_cacheIds[0]); if (! vcache){
+  //   cerr << "fatal error in retrieving cache" << endl;
+  // }
+  // ParameterCamera* params=vcache->params;
+  const Eigen::Matrix<number_t, 3, 3, Eigen::ColMajor>& invKcam =
+      cache_->camParams()->invKcam();
+  Vector3 p;
+  number_t w = 1. / measurement_(2);
+  p.head<2>() = measurement_.head<2>() * w;
+  p(2) = w;
+  p = invKcam * p;
+  p = cam->estimate() * (cache_->camParams()->offset() * p);
+  point->setEstimate(p);
+}
 
 #ifdef G2O_HAVE_OPENGL
-  EdgeProjectDisparityDrawAction::EdgeProjectDisparityDrawAction(): DrawAction(typeid(EdgeSE3PointXYZDisparity).name()){}
+EdgeProjectDisparityDrawAction::EdgeProjectDisparityDrawAction()
+    : DrawAction(typeid(EdgeSE3PointXYZDisparity).name()) {}
 
-  bool EdgeProjectDisparityDrawAction::operator()(HyperGraph::HyperGraphElement* element,
-                                                  HyperGraphElementAction::Parameters* params_) {
-    if (typeid(*element).name() != typeName_) return false;
-    refreshPropertyPtrs(params_);
-    if (! previousParams_)
-      return true;
+bool EdgeProjectDisparityDrawAction::operator()(
+    HyperGraph::HyperGraphElement* element,
+    HyperGraphElementAction::Parameters* params_) {
+  if (typeid(*element).name() != typeName_) return false;
+  refreshPropertyPtrs(params_);
+  if (!previousParams_) return true;
 
-    if (show_ && !show_->value())
-      return true;
-    auto* e =  static_cast<EdgeSE3PointXYZDisparity*>(element);
-    auto* fromEdge = static_cast<VertexSE3*>(e->vertices()[0].get());
-    auto* toEdge   = static_cast<VertexPointXYZ*>(e->vertices()[1].get());
-    if (! fromEdge || ! toEdge)
-      return true;
-    ParameterCamera* camParam = static_cast<ParameterCamera*>(e->parameter(0).get());
-    Isometry3 fromTransform=fromEdge->estimate() * camParam->offset();
-    glColor3f(LANDMARK_EDGE_COLOR);
-    glPushAttrib(GL_ENABLE_BIT);
-    glDisable(GL_LIGHTING);
-    glBegin(GL_LINES);
-    glVertex3f(static_cast<float>(fromTransform.translation().x()),static_cast<float>(fromTransform.translation().y()),static_cast<float>(fromTransform.translation().z()));
-    glVertex3f(static_cast<float>(toEdge->estimate().x()),static_cast<float>(toEdge->estimate().y()),static_cast<float>(toEdge->estimate().z()));
-    glEnd();
-    glPopAttrib();
-    return true;
-  }
+  if (show_ && !show_->value()) return true;
+  auto* e = static_cast<EdgeSE3PointXYZDisparity*>(element);
+  auto* fromEdge = static_cast<VertexSE3*>(e->vertices()[0].get());
+  auto* toEdge = static_cast<VertexPointXYZ*>(e->vertices()[1].get());
+  if (!fromEdge || !toEdge) return true;
+  ParameterCamera* camParam =
+      static_cast<ParameterCamera*>(e->parameter(0).get());
+  Isometry3 fromTransform = fromEdge->estimate() * camParam->offset();
+  glColor3f(LANDMARK_EDGE_COLOR);
+  glPushAttrib(GL_ENABLE_BIT);
+  glDisable(GL_LIGHTING);
+  glBegin(GL_LINES);
+  glVertex3f(static_cast<float>(fromTransform.translation().x()),
+             static_cast<float>(fromTransform.translation().y()),
+             static_cast<float>(fromTransform.translation().z()));
+  glVertex3f(static_cast<float>(toEdge->estimate().x()),
+             static_cast<float>(toEdge->estimate().y()),
+             static_cast<float>(toEdge->estimate().z()));
+  glEnd();
+  glPopAttrib();
+  return true;
+}
 #endif
 
-}
+}  // namespace g2o

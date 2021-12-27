@@ -27,65 +27,69 @@
 #ifndef G2O_VERTEX_ELLIPSE_H
 #define G2O_VERTEX_ELLIPSE_H
 
-#include "robot_data.h"
-#include "g2o_types_data_api.h"
 #include "g2o/core/hyper_graph_action.h"
+#include "g2o_types_data_api.h"
+#include "robot_data.h"
 
 namespace g2o {
 
-  /**
-   * \brief string ellipse to be attached to a vertex
-   */
-  class G2O_TYPES_DATA_API VertexEllipse : public RobotData
-  {
-    public:
-      using myVector2fVector = std::vector<Vector2F, Eigen::aligned_allocator<Vector2F>>;
+/**
+ * \brief string ellipse to be attached to a vertex
+ */
+class G2O_TYPES_DATA_API VertexEllipse : public RobotData {
+ public:
+  using myVector2fVector =
+      std::vector<Vector2F, Eigen::aligned_allocator<Vector2F>>;
 
-      EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
-      VertexEllipse();
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
+  VertexEllipse();
 
-      bool write(std::ostream& os) const override;
-      bool read(std::istream& is) override;
+  bool write(std::ostream& os) const override;
+  bool read(std::istream& is) override;
 
-      const Matrix3F& covariance() {return covariance_;}
-      void setCovariance( Matrix3F& c) { covariance_ = c; updateSVD();}
-      const Matrix2F& U() {return UMatrix_;}
-      const Vector2F& singularValues() {return singularValues_;}
+  const Matrix3F& covariance() { return covariance_; }
+  void setCovariance(Matrix3F& c) {
+    covariance_ = c;
+    updateSVD();
+  }
+  const Matrix2F& U() { return UMatrix_; }
+  const Vector2F& singularValues() { return singularValues_; }
 
-      const myVector2fVector& matchingVertices() { return matchingVertices_; }
-      void addMatchingVertex(float x, float y) {
-        Vector2F v(x, y);
-        matchingVertices_.push_back(v);
-      }
+  const myVector2fVector& matchingVertices() { return matchingVertices_; }
+  void addMatchingVertex(float x, float y) {
+    Vector2F v(x, y);
+    matchingVertices_.push_back(v);
+  }
 
-      void clearMatchingVertices() { matchingVertices_.clear(); }
+  void clearMatchingVertices() { matchingVertices_.clear(); }
 
-      const std::vector<int>& matchingVerticesIDs() { return matchingVerticesIDs_; }
-      void addMatchingVertexID(int id) { matchingVerticesIDs_.push_back(id); }
-      void clearMatchingVerticesIDs(){matchingVerticesIDs_.clear();}
+  const std::vector<int>& matchingVerticesIDs() { return matchingVerticesIDs_; }
+  void addMatchingVertexID(int id) { matchingVerticesIDs_.push_back(id); }
+  void clearMatchingVerticesIDs() { matchingVerticesIDs_.clear(); }
 
-  protected:
-      void updateSVD() const;
-      Matrix3F covariance_;
-      mutable Matrix2F UMatrix_;
-      mutable Vector2F singularValues_;
-      std::vector<int> matchingVerticesIDs_;
-      myVector2fVector matchingVertices_;
-  };
+ protected:
+  void updateSVD() const;
+  Matrix3F covariance_;
+  mutable Matrix2F UMatrix_;
+  mutable Vector2F singularValues_;
+  std::vector<int> matchingVerticesIDs_;
+  myVector2fVector matchingVertices_;
+};
 
 #ifdef G2O_HAVE_OPENGL
-  class G2O_TYPES_DATA_API VertexEllipseDrawAction : public DrawAction {
-   public:
-    VertexEllipseDrawAction();
-    bool operator()(HyperGraph::HyperGraphElement* element,
-                            HyperGraphElementAction::Parameters* params_) override;
+class G2O_TYPES_DATA_API VertexEllipseDrawAction : public DrawAction {
+ public:
+  VertexEllipseDrawAction();
+  bool operator()(HyperGraph::HyperGraphElement* element,
+                  HyperGraphElementAction::Parameters* params_) override;
 
-   protected:
-    bool refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_) override;
-    std::shared_ptr<DoubleProperty> scaleFactor_;
-  };
+ protected:
+  bool refreshPropertyPtrs(
+      HyperGraphElementAction::Parameters* params_) override;
+  std::shared_ptr<DoubleProperty> scaleFactor_;
+};
 #endif
 
-}
+}  // namespace g2o
 
 #endif

@@ -54,8 +54,9 @@ Factory* Factory::instance() {
   return factoryInstance_.get();
 }
 
-void Factory::registerType(const std::string& tag,
-                           std::unique_ptr<AbstractHyperGraphElementCreator> c) {
+void Factory::registerType(
+    const std::string& tag,
+    std::unique_ptr<AbstractHyperGraphElementCreator> c) {
   CreatorMap::const_iterator foundIt = creator_.find(tag);
   if (foundIt != creator_.end()) {
     cerr << "FACTORY WARNING: Overwriting Vertex tag " << tag << endl;
@@ -63,7 +64,8 @@ void Factory::registerType(const std::string& tag,
   }
   TagLookup::const_iterator tagIt = tagLookup_.find(c->name());
   if (tagIt != tagLookup_.end()) {
-    cerr << "FACTORY WARNING: Registering same class for two tags " << c->name() << endl;
+    cerr << "FACTORY WARNING: Registering same class for two tags " << c->name()
+         << endl;
     assert(0);
   }
 
@@ -100,7 +102,8 @@ void Factory::registerType(const std::string& tag,
   cerr << endl;
 #endif
 
-  std::unique_ptr<CreatorInformation> ci = std::make_unique<CreatorInformation>();
+  std::unique_ptr<CreatorInformation> ci =
+      std::make_unique<CreatorInformation>();
   ci->elementTypeBit = element->elementType();
   ci->creator = std::move(c);
   tagLookup_[ci->creator->name()] = tag;
@@ -123,11 +126,12 @@ void Factory::unregisterType(const std::string& tag) {
   }
 }
 
-std::unique_ptr<HyperGraph::HyperGraphElement> Factory::construct(const std::string& tag) const {
+std::unique_ptr<HyperGraph::HyperGraphElement> Factory::construct(
+    const std::string& tag) const {
   auto foundIt = creator_.find(tag);
   if (foundIt != creator_.end()) {
-    // cerr << "tag " << tag << " -> " << (void*) foundIt->second->creator << " " <<
-    // foundIt->second->creator->name() << endl;
+    // cerr << "tag " << tag << " -> " << (void*) foundIt->second->creator << "
+    // " << foundIt->second->creator->name() << endl;
     return foundIt->second->creator->construct();
   }
   return nullptr;
@@ -142,8 +146,7 @@ const std::string& Factory::tag(const HyperGraph::HyperGraphElement* e) const {
 
 void Factory::fillKnownTypes(std::vector<std::string>& types) const {
   types.clear();
-  for (const auto & it : creator_)
-    types.push_back(it.first);
+  for (const auto& it : creator_) types.push_back(it.first);
 }
 
 bool Factory::knowsTag(const std::string& tag, int* elementType) const {
@@ -164,14 +167,15 @@ void Factory::destroy() {
 void Factory::printRegisteredTypes(std::ostream& os, bool comment) const {
   if (comment) os << "# ";
   os << "types:" << endl;
-  for (const auto & it : creator_) {
+  for (const auto& it : creator_) {
     if (comment) os << "#";
     cerr << "\t" << it.first << endl;
   }
 }
 
 std::unique_ptr<HyperGraph::HyperGraphElement> Factory::construct(
-    const std::string& tag, const HyperGraph::GraphElemBitset& elemsToConstruct) const {
+    const std::string& tag,
+    const HyperGraph::GraphElemBitset& elemsToConstruct) const {
   if (elemsToConstruct.none()) {
     return construct(tag);
   }

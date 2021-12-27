@@ -36,86 +36,83 @@
 
 namespace g2o {
 
-  VertexLine2D::VertexLine2D()  
-  {
-    estimate_.setZero();
-  }
+VertexLine2D::VertexLine2D() { estimate_.setZero(); }
 
-  bool VertexLine2D::read(std::istream& is)
-  {
-    is >> estimate_[0] >> estimate_[1] >> p1Id >> p2Id;
-    return true;
-  }
+bool VertexLine2D::read(std::istream& is) {
+  is >> estimate_[0] >> estimate_[1] >> p1Id >> p2Id;
+  return true;
+}
 
-  bool VertexLine2D::write(std::ostream& os) const
-  {
-    os << estimate()(0) << " " << estimate()(1) << " " << p1Id << " " << p2Id;
-    return os.good();
-  }
+bool VertexLine2D::write(std::ostream& os) const {
+  os << estimate()(0) << " " << estimate()(1) << " " << p1Id << " " << p2Id;
+  return os.good();
+}
 
 #ifdef G2O_HAVE_OPENGL
-  VertexLine2DDrawAction::VertexLine2DDrawAction() : DrawAction(typeid(VertexLine2D).name()), pointSize_(nullptr) {}
+VertexLine2DDrawAction::VertexLine2DDrawAction()
+    : DrawAction(typeid(VertexLine2D).name()), pointSize_(nullptr) {}
 
-  bool VertexLine2DDrawAction::refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_){
-    if (! DrawAction::refreshPropertyPtrs(params_))
-      return false;
-    if (previousParams_){
-      pointSize_ = previousParams_->makeProperty<FloatProperty>(typeName_ + "::POINT_SIZE", 1.);
-    } else {
-      pointSize_ = nullptr;
-    }
-    return true;
+bool VertexLine2DDrawAction::refreshPropertyPtrs(
+    HyperGraphElementAction::Parameters* params_) {
+  if (!DrawAction::refreshPropertyPtrs(params_)) return false;
+  if (previousParams_) {
+    pointSize_ = previousParams_->makeProperty<FloatProperty>(
+        typeName_ + "::POINT_SIZE", 1.);
+  } else {
+    pointSize_ = nullptr;
+  }
+  return true;
+}
+
+bool VertexLine2DDrawAction::operator()(
+    HyperGraph::HyperGraphElement* element,
+    HyperGraphElementAction::Parameters* params_) {
+  if (typeid(*element).name() != typeName_) return false;
+
+  refreshPropertyPtrs(params_);
+  if (!previousParams_) return true;
+
+  if (show_ && !show_->value()) return true;
+
+  auto* that = static_cast<VertexLine2D*>(element);
+  glPushAttrib(GL_CURRENT_BIT | GL_BLEND);
+  if (pointSize_) {
+    glPointSize(pointSize_->value());
+  }
+  Vector2 n(std::cos(that->theta()), std::sin(that->theta()));
+  Vector2 pmiddle = n * that->rho();
+  Vector2 t(-n.y(), n.x());
+  number_t l1{};
+  number_t l2 = 10;
+  auto vp1 = std::dynamic_pointer_cast<VertexPointXY>(
+      that->graph()->vertex(that->p1Id));
+  auto vp2 = std::dynamic_pointer_cast<VertexPointXY>(
+      that->graph()->vertex(that->p2Id));
+
+  glColor4f(0.8F, 0.5F, 0.3F, 0.3F);
+  if (vp1 && vp2) {
+    glColor4f(0.8F, 0.5F, 0.3F, 0.7F);
+  } else if (vp1 || vp2) {
+    glColor4f(0.8F, 0.5F, 0.3F, 0.5F);
   }
 
-  bool VertexLine2DDrawAction::operator()(HyperGraph::HyperGraphElement* element,
-                                          HyperGraphElementAction::Parameters* params_) {
-    if (typeid(*element).name()!=typeName_)
-      return false;
-
-    refreshPropertyPtrs(params_);
-    if (! previousParams_)
-      return true;
-
-    if (show_ && !show_->value())
-      return true;
-
-    auto* that = static_cast<VertexLine2D*>(element);
-    glPushAttrib(GL_CURRENT_BIT | GL_BLEND);
-    if (pointSize_) {
-      glPointSize(pointSize_->value());
-    }
-    Vector2 n(std::cos(that->theta()), std::sin(that->theta()));
-    Vector2 pmiddle=n*that->rho();
-    Vector2 t(-n.y(), n.x());
-    number_t l1{};
-    number_t l2 = 10;
-    auto vp1 = std::dynamic_pointer_cast<VertexPointXY> (that->graph()->vertex(that->p1Id));
-    auto vp2 = std::dynamic_pointer_cast<VertexPointXY> (that->graph()->vertex(that->p2Id));
-
-    glColor4f(0.8F,0.5F,0.3F,0.3F);
-    if (vp1 && vp2) {
-      glColor4f(0.8F,0.5F,0.3F,0.7F);
-    } else if (vp1 || vp2){
-      glColor4f(0.8F,0.5F,0.3F,0.5F);
-    }
-
-    if (vp1) {
-      glColor4f(0.8F,0.5F,0.3F,0.7F);
-      l1 = t.dot(vp1->estimate()-pmiddle);
-    }
-    if (vp2) {
-      glColor4f(0.8F,0.5F,0.3F,0.7F);
-      l2 = t.dot(vp2->estimate()-pmiddle);
-    }
-    Vector2 p1=pmiddle+t*l1;
-    Vector2 p2=pmiddle+t*l2;
-    glBegin(GL_LINES);
-    glVertex3f(static_cast<float>(p1.x()),p1.y(),0.F);
-    glVertex3f(static_cast<float>(p2.x()),p2.y(),0.F);
-    glEnd();
-    glPopAttrib();
-    return true;
+  if (vp1) {
+    glColor4f(0.8F, 0.5F, 0.3F, 0.7F);
+    l1 = t.dot(vp1->estimate() - pmiddle);
   }
+  if (vp2) {
+    glColor4f(0.8F, 0.5F, 0.3F, 0.7F);
+    l2 = t.dot(vp2->estimate() - pmiddle);
+  }
+  Vector2 p1 = pmiddle + t * l1;
+  Vector2 p2 = pmiddle + t * l2;
+  glBegin(GL_LINES);
+  glVertex3f(static_cast<float>(p1.x()), p1.y(), 0.F);
+  glVertex3f(static_cast<float>(p2.x()), p2.y(), 0.F);
+  glEnd();
+  glPopAttrib();
+  return true;
+}
 #endif
 
-} // end namespace
+}  // namespace g2o

@@ -31,7 +31,8 @@
 namespace g2o {
 
 SensorSegment2DPointLine::SensorSegment2DPointLine(const std::string& name)
-    : BinarySensor<Robot2D, EdgeSE2Segment2DPointLine, WorldObjectSegment2D>(name),
+    : BinarySensor<Robot2D, EdgeSE2Segment2DPointLine, WorldObjectSegment2D>(
+          name),
       visiblePoint_(0) {}
 
 void SensorSegment2DPointLine::addNoise(EdgeType* e) {
@@ -40,7 +41,8 @@ void SensorSegment2DPointLine::addNoise(EdgeType* e) {
   e->setInformation(information());
 }
 
-bool SensorSegment2DPointLine::isVisible(SensorSegment2DPointLine::WorldObjectType* to) {
+bool SensorSegment2DPointLine::isVisible(
+    SensorSegment2DPointLine::WorldObjectType* to) {
   if (!robotPoseObject_) return false;
 
   assert(to && to->vertex());
@@ -113,7 +115,7 @@ void SensorSegment2DPointLine::sense() {
     ++it;
     count++;
   }
-  for (auto *it : world()->objects()) {
+  for (auto* it : world()->objects()) {
     auto* o = dynamic_cast<WorldObjectType*>(it);
     if (o && isVisible(o)) {
       auto e = mkEdge(o);

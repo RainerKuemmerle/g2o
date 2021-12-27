@@ -40,18 +40,16 @@
 
 namespace g2o {
 
-  bool EdgeLine2DPointXY::read(std::istream& is)
-  {
-    is >> measurement_;
-    is >> information()(0,0);
-    return true;
-  }
+bool EdgeLine2DPointXY::read(std::istream& is) {
+  is >> measurement_;
+  is >> information()(0, 0);
+  return true;
+}
 
-  bool EdgeLine2DPointXY::write(std::ostream& os) const
-  {
-    os << measurement() << " ";
-    os << information()(0,0);
-    return os.good();
-  }
+bool EdgeLine2DPointXY::write(std::ostream& os) const {
+  os << measurement() << " ";
+  os << information()(0, 0);
+  return os.good();
+}
 
-} // end namespace
+}  // namespace g2o

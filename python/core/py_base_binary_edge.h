@@ -11,14 +11,15 @@ void templatedBaseBinaryEdge(pybind11::module& m, const std::string& suffix) {
 
   templatedBaseFixedSizedEdge<D, E, VertexXi, VertexXj>(m, suffix);
 
-  pybind11::class_<CLS, BaseFixedSizedEdge<D, E, VertexXi, VertexXj>, BaseEdge<D, E>,
-                   std::shared_ptr<CLS>>(m, ("BaseBinaryEdge" + suffix).c_str())
+  pybind11::class_<CLS, BaseFixedSizedEdge<D, E, VertexXi, VertexXj>,
+                   BaseEdge<D, E>, std::shared_ptr<CLS>>(
+      m, ("BaseBinaryEdge" + suffix).c_str())
       //.def(pybind11::init<>())    // lead to "error:
       /*
       .def_readwrite("jacobian_oplus_xi",
-                     &CLS::template jacobianOplusXn<0>())  // -> JacobianXiOplusType&
-      .def_readwrite("jacobian_oplus_xj",
-                     &CLS::template jacobianOplusXn<1>())  //-> JacobianXjOplusType&
+                     &CLS::template jacobianOplusXn<0>())  // ->
+      JacobianXiOplusType& .def_readwrite("jacobian_oplus_xj", &CLS::template
+      jacobianOplusXn<1>())  //-> JacobianXjOplusType&
       */
       ;
 }

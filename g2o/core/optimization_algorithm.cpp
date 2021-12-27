@@ -28,23 +28,21 @@
 
 namespace g2o {
 
-void OptimizationAlgorithm::printProperties(std::ostream& os) const
-{
-  os << "------------- Algorithm Properties -------------"  << std::endl;
-  for (const auto & property : properties_) {
+void OptimizationAlgorithm::printProperties(std::ostream& os) const {
+  os << "------------- Algorithm Properties -------------" << std::endl;
+  for (const auto& property : properties_) {
     os << property.first << "\t" << property.second->toString() << std::endl;
   }
   os << "------------------------------------------------" << std::endl;
 }
 
-bool OptimizationAlgorithm::updatePropertiesFromString(const std::string& propString)
-{
+bool OptimizationAlgorithm::updatePropertiesFromString(
+    const std::string& propString) {
   return properties_.updateMapFromString(propString);
 }
 
-void OptimizationAlgorithm::setOptimizer(SparseOptimizer* optimizer)
-{
+void OptimizationAlgorithm::setOptimizer(SparseOptimizer* optimizer) {
   optimizer_ = optimizer;
 }
 
-} // end namespace
+}  // namespace g2o

@@ -29,7 +29,6 @@
 #include <iostream>
 
 #include "g2o/autodiff/autodiff.h"
-
 #include "g2o/core/auto_differentiation.h"
 #include "g2o/core/base_binary_edge.h"
 #include "g2o/core/base_vertex.h"
@@ -57,7 +56,8 @@ using Vector9 = VectorN<9>;
  * \brief camera vertex which stores the parameters for a pinhole camera
  *
  * The parameters of the camera are
- * - rx,ry,rz representing the rotation axis, whereas the angle is given by ||(rx,ry,rz)||
+ * - rx,ry,rz representing the rotation axis, whereas the angle is given by
+ * ||(rx,ry,rz)||
  * - tx,ty,tz the translation of the camera
  * - f the focal length of the camera
  * - k1, k2 two radial distortion parameters
@@ -77,7 +77,9 @@ class VertexCameraBAL : public g2o::BaseVertex<9, g2o::bal::Vector9> {
     return false;
   }
 
-  void setToOriginImpl() override { std::cerr << __PRETTY_FUNCTION__ << " not implemented yet" << std::endl; }
+  void setToOriginImpl() override {
+    std::cerr << __PRETTY_FUNCTION__ << " not implemented yet" << std::endl;
+  }
 
   void oplusImpl(const double* update) override {
     g2o::bal::Vector9::ConstMapType v(update, VertexCameraBAL::kDimension);
@@ -105,7 +107,9 @@ class VertexPointBAL : public g2o::BaseVertex<3, g2o::Vector3> {
     return false;
   }
 
-  void setToOriginImpl() override { std::cerr << __PRETTY_FUNCTION__ << " not implemented yet" << std::endl; }
+  void setToOriginImpl() override {
+    std::cerr << __PRETTY_FUNCTION__ << " not implemented yet" << std::endl;
+  }
 
   void oplusImpl(const double* update) override {
     g2o::Vector3::ConstMapType v(update);
@@ -123,11 +127,11 @@ class VertexPointBAL : public g2o::BaseVertex<3, g2o::Vector3> {
  * R,t,f,k1,k2 is:
  * P  =  R * X + t     (conversion from world to camera coordinates)
  * p  = -P / P.z       (perspective division)
- * p' =  f * r(p) * p  (conversion to pixel coordinates) where P.z is the third (z) coordinate of P.
+ * p' =  f * r(p) * p  (conversion to pixel coordinates) where P.z is the third
+ * (z) coordinate of P.
  *
- * In the last equation, r(p) is a function that computes a scaling factor to undo the radial
- * distortion:
- * r(p) = 1.0 + k1 * ||p||^2 + k2 * ||p||^4.
+ * In the last equation, r(p) is a function that computes a scaling factor to
+ * undo the radial distortion: r(p) = 1.0 + k1 * ||p||^2 + k2 * ||p||^4.
  *
  * This gives a projection in pixels, where the origin of the image is the
  * center of the image, the positive x-axis points right, and the positive
@@ -136,7 +140,8 @@ class VertexPointBAL : public g2o::BaseVertex<3, g2o::Vector3> {
  * as in OpenGL).
  */
 class EdgeObservationBAL
-    : public g2o::BaseBinaryEdge<2, g2o::Vector2, VertexCameraBAL, VertexPointBAL> {
+    : public g2o::BaseBinaryEdge<2, g2o::Vector2, VertexCameraBAL,
+                                 VertexPointBAL> {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
   EdgeObservationBAL() = default;
@@ -213,22 +218,27 @@ int main(int argc, char** argv) {
   arg.param("pcg", usePCG, false, "use PCG instead of the Cholesky");
   arg.param("v", verbose, false, "verbose output of the optimization process");
   arg.param("stats", statsFilename, "", "specify a file for the statistics");
-  arg.paramLeftOver("graph-input", inputFilename, "", "file which will be processed");
+  arg.paramLeftOver("graph-input", inputFilename, "",
+                    "file which will be processed");
 
   arg.parseArgs(argc, argv);
 
   using BalBlockSolver = g2o::BlockSolver<g2o::BlockSolverTraits<9, 3>>;
 #ifdef G2O_HAVE_CHOLMOD
   std::string choleskySolverName = "CHOLMOD";
-  using BalLinearSolver = g2o::LinearSolverCholmod<BalBlockSolver::PoseMatrixType>;
+  using BalLinearSolver =
+      g2o::LinearSolverCholmod<BalBlockSolver::PoseMatrixType>;
 #else
   std::string choleskySolverName = "Eigen";
-  using BalLinearSolver = g2o::LinearSolverEigen<BalBlockSolver::PoseMatrixType>;
+  using BalLinearSolver =
+      g2o::LinearSolverEigen<BalBlockSolver::PoseMatrixType>;
 #endif
-  using BalLinearSolverPCG = g2o::LinearSolverPCG<BalBlockSolver::PoseMatrixType>;
+  using BalLinearSolverPCG =
+      g2o::LinearSolverPCG<BalBlockSolver::PoseMatrixType>;
 
   g2o::SparseOptimizer optimizer;
-  std::unique_ptr<g2o::LinearSolver<BalBlockSolver::PoseMatrixType>> linearSolver;
+  std::unique_ptr<g2o::LinearSolver<BalBlockSolver::PoseMatrixType>>
+      linearSolver;
   if (usePCG) {
     std::cout << "Using PCG" << std::endl;
     linearSolver = g2o::make_unique<BalLinearSolverPCG>();
@@ -242,7 +252,8 @@ int main(int argc, char** argv) {
       g2o::make_unique<BalBlockSolver>(std::move(linearSolver)));
 
   // solver->setUserLambdaInit(1);
-  optimizer.setAlgorithm(std::unique_ptr<g2o::OptimizationAlgorithm>(solver.release()));
+  optimizer.setAlgorithm(
+      std::unique_ptr<g2o::OptimizationAlgorithm>(solver.release()));
   if (!statsFilename.empty()) {
     optimizer.setComputeBatchStatistics(true);
   }
@@ -259,7 +270,8 @@ int main(int argc, char** argv) {
     int numObservations;
     ifs >> numCameras >> numPoints >> numObservations;
 
-    std::cerr << PVAR(numCameras) << " " << PVAR(numPoints) << " " << PVAR(numObservations) << std::endl;
+    std::cerr << PVAR(numCameras) << " " << PVAR(numPoints) << " "
+              << PVAR(numObservations) << std::endl;
 
     int id = 0;
     cameras.reserve(numCameras);
@@ -290,9 +302,11 @@ int main(int argc, char** argv) {
       double obsY;
       ifs >> camIndex >> pointIndex >> obsX >> obsY;
 
-      assert(camIndex >= 0 && (size_t)camIndex < cameras.size() && "Index out of bounds");
+      assert(camIndex >= 0 && (size_t)camIndex < cameras.size() &&
+             "Index out of bounds");
       const auto& cam = cameras[camIndex];
-      assert(pointIndex >= 0 && (size_t)pointIndex < points.size() && "Index out of bounds");
+      assert(pointIndex >= 0 && (size_t)pointIndex < points.size() &&
+             "Index out of bounds");
       const auto& point = points[pointIndex];
 
       auto e = std::make_shared<EdgeObservationBAL>();
@@ -332,7 +346,8 @@ int main(int argc, char** argv) {
   if (!statsFilename.empty()) {
     std::cerr << "writing stats to file \"" << statsFilename << "\" ... ";
     std::ofstream fout(statsFilename.c_str());
-    for (const auto& stat : optimizer.batchStatistics()) fout << stat << std::endl;
+    for (const auto& stat : optimizer.batchStatistics())
+      fout << stat << std::endl;
     std::cerr << "done." << std::endl;
   }
 

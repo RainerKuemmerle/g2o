@@ -27,8 +27,8 @@
 #ifndef G2O_SEVEN_DOF_EXPMAP_TYPES
 #define G2O_SEVEN_DOF_EXPMAP_TYPES
 #include "g2o/config.h"
-#include "g2o/core/base_vertex.h"
 #include "g2o/core/base_binary_edge.h"
+#include "g2o/core/base_vertex.h"
 #include "g2o/types/sba/types_six_dof_expmap.h"
 #include "sim3.h"
 
@@ -50,8 +50,8 @@
 #endif
 namespace g2o {
 
-// explicit instantiation of BaseVertex, if not instantiated causes already defined error in some cases (msvc debug only)
-// see links below
+// explicit instantiation of BaseVertex, if not instantiated causes already
+// defined error in some cases (msvc debug only) see links below
 // https://stackoverflow.com/questions/44960760/msvc-dll-exporting-class-that-inherits-from-template-cause-lnk2005-already-defin
 // https://developercommunity.visualstudio.com/content/problem/224597/linker-failing-because-of-multiple-definitions-of.html
 template class BaseVertex<7, Sim3>;
@@ -62,41 +62,36 @@ template class BaseVertex<7, Sim3>;
  * (x,y,z,qx,qy,qz) (note that we leave out the w part of the quaternion.
  *
  * Will represent relative transformation between two cameras
-*/
-class G2O_TYPES_SIM3_API VertexSim3Expmap : public BaseVertex<7, Sim3>
-{
+ */
+class G2O_TYPES_SIM3_API VertexSim3Expmap : public BaseVertex<7, Sim3> {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
   VertexSim3Expmap();
   bool read(std::istream& is) override;
   bool write(std::ostream& os) const override;
 
-  void setToOriginImpl() override {
-    estimate_ = Sim3();
-  }
+  void setToOriginImpl() override { estimate_ = Sim3(); }
 
-  void oplusImpl(const number_t* update_) override
-  {
+  void oplusImpl(const number_t* update_) override {
     Eigen::Map<Vector7> update(const_cast<number_t*>(update_));
 
-    if (_fix_scale)
-      update[6] = 0;
+    if (_fix_scale) update[6] = 0;
 
     Sim3 s(update);
-    setEstimate(s*estimate());
+    setEstimate(s * estimate());
   }
 
   Vector2 _principle_point1, _principle_point2;
   Vector2 _focal_length1, _focal_length2;
 
-  Vector2 cam_map1(const Vector2 &v) const {
+  Vector2 cam_map1(const Vector2& v) const {
     Vector2 res;
     res[0] = v[0] * _focal_length1[0] + _principle_point1[0];
     res[1] = v[1] * _focal_length1[1] + _principle_point1[1];
     return res;
   }
 
-  Vector2 cam_map2(const Vector2 &v) const {
+  Vector2 cam_map2(const Vector2& v) const {
     Vector2 res;
     res[0] = v[0] * _focal_length2[0] + _principle_point2[0];
     res[1] = v[1] * _focal_length2[1] + _principle_point2[1];
@@ -105,85 +100,84 @@ class G2O_TYPES_SIM3_API VertexSim3Expmap : public BaseVertex<7, Sim3>
 
   bool _fix_scale;
 
-
  protected:
 };
 
-  /**
+/**
  * \brief 7D edge between two Vertex7
  */
-  class G2O_TYPES_SIM3_API EdgeSim3 : public BaseBinaryEdge<7, Sim3, VertexSim3Expmap, VertexSim3Expmap>
-  {
-  public:
-    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-    bool read(std::istream& is) override;
-    bool write(std::ostream& os) const override;
-    void computeError() override
-    {
-      const VertexSim3Expmap* v1 = vertexXnRaw<0>();
-      const VertexSim3Expmap* v2 = vertexXnRaw<1>();
+class G2O_TYPES_SIM3_API EdgeSim3
+    : public BaseBinaryEdge<7, Sim3, VertexSim3Expmap, VertexSim3Expmap> {
+ public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+  bool read(std::istream& is) override;
+  bool write(std::ostream& os) const override;
+  void computeError() override {
+    const VertexSim3Expmap* v1 = vertexXnRaw<0>();
+    const VertexSim3Expmap* v2 = vertexXnRaw<1>();
 
-      Sim3 C(measurement_);
-      Sim3 err=C*v1->estimate()*v2->estimate().inverse();
-      error_ = err.log();
-    }
+    Sim3 C(measurement_);
+    Sim3 err = C * v1->estimate() * v2->estimate().inverse();
+    error_ = err.log();
+  }
 
-    number_t initialEstimatePossible(const OptimizableGraph::VertexSet& , OptimizableGraph::Vertex* ) override { return 1.;}
-    void initialEstimate(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* /*to*/) override
-    {
-      auto v1 = vertexXn<0>();
-      auto v2 = vertexXn<1>();
-      if (from.count(v1) > 0)
-        v2->setEstimate(measurement()*v1->estimate());
-      else
-        v1->setEstimate(measurement().inverse()*v2->estimate());
-    }
-    #if G2O_SIM3_JACOBIAN
-    virtual void linearizeOplus();
-    #endif
-  };
-
-
-/**/
-class G2O_TYPES_SIM3_API EdgeSim3ProjectXYZ : public  BaseBinaryEdge<2, Vector2,  VertexPointXYZ, VertexSim3Expmap>
-{
-  public:
-    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-    bool read(std::istream& is) override;
-    bool write(std::ostream& os) const override;
-
-    void computeError() override
-    {
-      const VertexSim3Expmap* v1 = vertexXnRaw<1>();
-      const VertexPointXYZ* v2 = vertexXnRaw<0>();
-
-      Vector2 obs(measurement_);
-      error_ = obs-v1->cam_map1(project(v1->estimate().map(v2->estimate())));
-    }
-
-   // virtual void linearizeOplus();
-
+  number_t initialEstimatePossible(const OptimizableGraph::VertexSet&,
+                                   OptimizableGraph::Vertex*) override {
+    return 1.;
+  }
+  void initialEstimate(const OptimizableGraph::VertexSet& from,
+                       OptimizableGraph::Vertex* /*to*/) override {
+    auto v1 = vertexXn<0>();
+    auto v2 = vertexXn<1>();
+    if (from.count(v1) > 0)
+      v2->setEstimate(measurement() * v1->estimate());
+    else
+      v1->setEstimate(measurement().inverse() * v2->estimate());
+  }
+#if G2O_SIM3_JACOBIAN
+  virtual void linearizeOplus();
+#endif
 };
 
 /**/
-class G2O_TYPES_SIM3_API EdgeInverseSim3ProjectXYZ : public BaseBinaryEdge<2, Vector2, VertexPointXYZ, VertexSim3Expmap> {
+class G2O_TYPES_SIM3_API EdgeSim3ProjectXYZ
+    : public BaseBinaryEdge<2, Vector2, VertexPointXYZ, VertexSim3Expmap> {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-  bool read(std::istream &is) override;
-  bool write(std::ostream &os) const override;
+  bool read(std::istream& is) override;
+  bool write(std::ostream& os) const override;
 
   void computeError() override {
-    const VertexSim3Expmap *v1 = vertexXnRaw<1>();
-    const VertexPointXYZ *v2 = vertexXnRaw<0>();
+    const VertexSim3Expmap* v1 = vertexXnRaw<1>();
+    const VertexPointXYZ* v2 = vertexXnRaw<0>();
 
     Vector2 obs(measurement_);
-    error_ = obs - v1->cam_map2(project(v1->estimate().inverse().map(v2->estimate())));
+    error_ = obs - v1->cam_map1(project(v1->estimate().map(v2->estimate())));
   }
 
   // virtual void linearizeOplus();
-
 };
 
-} // end namespace
+/**/
+class G2O_TYPES_SIM3_API EdgeInverseSim3ProjectXYZ
+    : public BaseBinaryEdge<2, Vector2, VertexPointXYZ, VertexSim3Expmap> {
+ public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+  bool read(std::istream& is) override;
+  bool write(std::ostream& os) const override;
+
+  void computeError() override {
+    const VertexSim3Expmap* v1 = vertexXnRaw<1>();
+    const VertexPointXYZ* v2 = vertexXnRaw<0>();
+
+    Vector2 obs(measurement_);
+    error_ = obs - v1->cam_map2(
+                       project(v1->estimate().inverse().map(v2->estimate())));
+  }
+
+  // virtual void linearizeOplus();
+};
+
+}  // namespace g2o
 
 #endif

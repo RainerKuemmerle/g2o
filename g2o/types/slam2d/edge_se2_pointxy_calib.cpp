@@ -28,34 +28,32 @@
 
 namespace g2o {
 
-  EdgeSE2PointXYCalib::EdgeSE2PointXYCalib() 
-    
-  {
-    resize(3);
-  }
+EdgeSE2PointXYCalib::EdgeSE2PointXYCalib()
 
-  void EdgeSE2PointXYCalib::initialEstimate(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* /*to*/)
-  {
-    assert(from.size() == 1 && from.count(vertices_[0]) == 1 && "Can not initialize VertexSE2 position by VertexPointXY");
+{
+  resize(3);
+}
 
-    if (from.count(vertices_[0]) != 1)
-      return;
-    auto* vi     = static_cast<VertexSE2*>(vertexRaw(0));
-    auto* vj = static_cast<VertexPointXY*>(vertexRaw(1));
-    vj->setEstimate(vi->estimate() * measurement_);
-  }
+void EdgeSE2PointXYCalib::initialEstimate(
+    const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* /*to*/) {
+  assert(from.size() == 1 && from.count(vertices_[0]) == 1 &&
+         "Can not initialize VertexSE2 position by VertexPointXY");
 
-  bool EdgeSE2PointXYCalib::read(std::istream& is)
-  {
-    internal::readVector(is, measurement_);
-    readInformationMatrix(is);
-    return true;
-  }
+  if (from.count(vertices_[0]) != 1) return;
+  auto* vi = static_cast<VertexSE2*>(vertexRaw(0));
+  auto* vj = static_cast<VertexPointXY*>(vertexRaw(1));
+  vj->setEstimate(vi->estimate() * measurement_);
+}
 
-  bool EdgeSE2PointXYCalib::write(std::ostream& os) const
-  {
-    internal::writeVector(os, measurement());
-    return writeInformationMatrix(os);
-  }
+bool EdgeSE2PointXYCalib::read(std::istream& is) {
+  internal::readVector(is, measurement_);
+  readInformationMatrix(is);
+  return true;
+}
 
-} // end namespace
+bool EdgeSE2PointXYCalib::write(std::ostream& os) const {
+  internal::writeVector(os, measurement());
+  return writeInformationMatrix(os);
+}
+
+}  // namespace g2o

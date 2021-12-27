@@ -33,7 +33,7 @@
 
 namespace g2o {
 
-EdgeLine2D::EdgeLine2D()  {
+EdgeLine2D::EdgeLine2D() {
   information_.setIdentity();
   error_.setZero();
 }
@@ -53,4 +53,4 @@ void EdgeLine2D::linearizeOplus() {
   jacobianOplusXj_ = Matrix2::Identity();
 }
 
-}
+}  // namespace g2o

@@ -27,36 +27,31 @@
 #include <tuple>
 namespace g2o {
 
-template<int I>
-struct TupleApplyI
-{
-  template<typename F, typename T>
-  void operator()(F&& f, T& t, int i)
-  {
-    if(i == I - 1)
+template <int I>
+struct TupleApplyI {
+  template <typename F, typename T>
+  void operator()(F&& f, T& t, int i) {
+    if (i == I - 1)
       f(std::get<I - 1>(t));
     else
       TupleApplyI<I - 1>()(f, t, i);
   }
 };
 
-template<>
-struct TupleApplyI<0>
-{
-  template<typename F, typename T>
-  void operator()(F&&, T&, int) { }
+template <>
+struct TupleApplyI<0> {
+  template <typename F, typename T>
+  void operator()(F&&, T&, int) {}
 };
 
-template<typename F, typename T>
-void tuple_apply_i(F&& f, T& t, int i)
-{
+template <typename F, typename T>
+void tuple_apply_i(F&& f, T& t, int i) {
   TupleApplyI<std::tuple_size<T>::value>()(f, t, i);
 }
 
-template<typename Value, typename... Ts2>
-std::tuple<Ts2...> tuple_init(const Value& value, const std::tuple<Ts2...>&)
-{
+template <typename Value, typename... Ts2>
+std::tuple<Ts2...> tuple_init(const Value& value, const std::tuple<Ts2...>&) {
   return std::tuple<Ts2...>{Ts2{value}...};
 }
 
-} // end namespace
+}  // namespace g2o

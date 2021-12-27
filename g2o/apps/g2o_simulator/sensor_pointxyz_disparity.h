@@ -34,7 +34,8 @@ namespace g2o {
 
 class G2O_SIMULATOR_API SensorPointXYZDisparity
     : public PointSensorParameters,
-      public BinarySensor<Robot3D, EdgeSE3PointXYZDisparity, WorldObjectTrackXYZ> {
+      public BinarySensor<Robot3D, EdgeSE3PointXYZDisparity,
+                          WorldObjectTrackXYZ> {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   using RobotPoseType = PoseVertexType::EstimateType;

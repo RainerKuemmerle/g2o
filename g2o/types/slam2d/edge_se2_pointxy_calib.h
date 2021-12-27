@@ -27,37 +27,43 @@
 #ifndef G2O_EDGE_SE2_XY_CALIB_H
 #define G2O_EDGE_SE2_XY_CALIB_H
 
-#include "vertex_se2.h"
-#include "vertex_point_xy.h"
 #include "g2o/core/base_variable_sized_edge.h"
 #include "g2o_types_slam2d_api.h"
+#include "vertex_point_xy.h"
+#include "vertex_se2.h"
 
 namespace g2o {
 
-  /**
-   * \brief Landmark measurement that also calibrates an offset for the landmark measurement
-   */
-  class G2O_TYPES_SLAM2D_API EdgeSE2PointXYCalib : public BaseVariableSizedEdge<2, Vector2>
-  {
-    public:
-      EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-      EdgeSE2PointXYCalib();
+/**
+ * \brief Landmark measurement that also calibrates an offset for the landmark
+ * measurement
+ */
+class G2O_TYPES_SLAM2D_API EdgeSE2PointXYCalib
+    : public BaseVariableSizedEdge<2, Vector2> {
+ public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+  EdgeSE2PointXYCalib();
 
-      void computeError() override
-      {
-        const auto* v1     = static_cast<const VertexSE2*>(vertexRaw(0));
-        const auto* l2 = static_cast<const VertexPointXY*>(vertexRaw(1));
-        const auto* calib  = static_cast<const VertexSE2*>(vertexRaw(2));
-        error_ = ((v1->estimate() * calib->estimate()).inverse() * l2->estimate()) - measurement_;
-      }
+  void computeError() override {
+    const auto* v1 = static_cast<const VertexSE2*>(vertexRaw(0));
+    const auto* l2 = static_cast<const VertexPointXY*>(vertexRaw(1));
+    const auto* calib = static_cast<const VertexSE2*>(vertexRaw(2));
+    error_ = ((v1->estimate() * calib->estimate()).inverse() * l2->estimate()) -
+             measurement_;
+  }
 
-      bool read(std::istream& is) override;
-      bool write(std::ostream& os) const override;
+  bool read(std::istream& is) override;
+  bool write(std::ostream& os) const override;
 
-      number_t initialEstimatePossible(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to) override { (void) to; return (from.count(vertices_[0]) == 1 ? 1.0 : -1.0);}
-      void initialEstimate(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to) override;
-  };
+  number_t initialEstimatePossible(const OptimizableGraph::VertexSet& from,
+                                   OptimizableGraph::Vertex* to) override {
+    (void)to;
+    return (from.count(vertices_[0]) == 1 ? 1.0 : -1.0);
+  }
+  void initialEstimate(const OptimizableGraph::VertexSet& from,
+                       OptimizableGraph::Vertex* to) override;
+};
 
-}
+}  // namespace g2o
 
 #endif

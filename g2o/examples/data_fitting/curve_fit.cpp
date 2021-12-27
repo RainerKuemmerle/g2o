@@ -63,7 +63,8 @@ class VertexParams : public g2o::BaseVertex<3, Eigen::Vector3d> {
  * The error function computes the difference between the curve
  * and the point.
  */
-class EdgePointOnCurve : public g2o::BaseUnaryEdge<1, Eigen::Vector2d, VertexParams> {
+class EdgePointOnCurve
+    : public g2o::BaseUnaryEdge<1, Eigen::Vector2d, VertexParams> {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   bool read(std::istream& /*is*/) override {
@@ -95,7 +96,8 @@ int main(int argc, char** argv) {
   std::string dumpFilename;
   g2o::CommandArgs arg;
   arg.param("dump", dumpFilename, "", "dump the points into a file");
-  arg.param("numPoints", numPoints, 50, "number of points sampled from the curve");
+  arg.param("numPoints", numPoints, 50,
+            "number of points sampled from the curve");
   arg.param("i", maxIterations, 10, "perform n iterations");
   arg.param("v", verbose, false, "verbose output of the optimization process");
 
@@ -118,7 +120,8 @@ int main(int argc, char** argv) {
 
   if (!dumpFilename.empty()) {
     std::ofstream fout(dumpFilename.c_str());
-    for (int i = 0; i < numPoints; ++i) fout << points[i].transpose() << std::endl;
+    for (int i = 0; i < numPoints; ++i)
+      fout << points[i].transpose() << std::endl;
   }
 
   // setup the solver
@@ -128,13 +131,15 @@ int main(int argc, char** argv) {
   // allocate the solver
   g2o::OptimizationAlgorithmProperty solverProperty;
   optimizer.setAlgorithm(
-      g2o::OptimizationAlgorithmFactory::instance()->construct("lm_dense", solverProperty));
+      g2o::OptimizationAlgorithmFactory::instance()->construct("lm_dense",
+                                                               solverProperty));
 
   // build the optimization problem given the points
   // 1. add the parameter vertex
   auto params = std::make_shared<VertexParams>();
   params->setId(0);
-  params->setEstimate(Eigen::Vector3d(1, 1, 1));  // some initial value for the params
+  params->setEstimate(
+      Eigen::Vector3d(1, 1, 1));  // some initial value for the params
   optimizer.addVertex(params);
   // 2. add the points we measured to be on the curve
   for (int i = 0; i < numPoints; ++i) {

@@ -29,9 +29,7 @@
 namespace g2o {
 
 // point to camera projection, monocular
-EdgeProjectP2MC::EdgeProjectP2MC()  {
-  information().setIdentity();
-}
+EdgeProjectP2MC::EdgeProjectP2MC() { information().setIdentity(); }
 
 bool EdgeProjectP2MC::read(std::istream &is) {
   // measured keypoint
@@ -65,7 +63,8 @@ void EdgeProjectP2MC::computeError() {
   // error, which is backwards from the normal observed - calculated
   // measurement_ is the measured projection
   error_ = perr - measurement_;
-  // std::cerr << error_.x() << " " << error_.y() <<  " " << chi2() << std::endl;
+  // std::cerr << error_.x() << " " << error_.y() <<  " " << chi2() <<
+  // std::endl;
 }
 
 void EdgeProjectP2MC::linearizeOplus() {
@@ -98,7 +97,9 @@ void EdgeProjectP2MC::linearizeOplus() {
   number_t ipz2fy = ipz2 * cam.Kcam(1, 1);  // Fy
 
   // check for local vars
-  Vector3 pwt = (pt - trans).head<3>();  // transform translations, use differential rotation
+  Vector3 pwt =
+      (pt - trans)
+          .head<3>();  // transform translations, use differential rotation
 
   // dx
   Vector3 dp = cam.dRdx * pwt;  // dR'/dq * [pw - t]

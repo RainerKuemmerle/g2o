@@ -27,55 +27,59 @@
 #ifndef G2O_EDGE_SE2_PRIOR_H
 #define G2O_EDGE_SE2_PRIOR_H
 
-#include "vertex_se2.h"
 #include "g2o/core/base_unary_edge.h"
 #include "g2o_types_slam2d_api.h"
+#include "vertex_se2.h"
 
 namespace g2o {
 
-  /**
-   * \brief Prior for a two D pose
-   */
-  class G2O_TYPES_SLAM2D_API EdgeSE2Prior : public BaseUnaryEdge<3, SE2, VertexSE2>
-  {
-    public:
-      EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
-      EdgeSE2Prior() = default;
+/**
+ * \brief Prior for a two D pose
+ */
+class G2O_TYPES_SLAM2D_API EdgeSE2Prior
+    : public BaseUnaryEdge<3, SE2, VertexSE2> {
+ public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
+  EdgeSE2Prior() = default;
 
-      void computeError() override
-      {
-        const VertexSE2* v1 = vertexXnRaw<0>();
-        SE2 delta = inverseMeasurement_ * v1->estimate();
-        error_ = delta.toVector();
-      }
+  void computeError() override {
+    const VertexSE2* v1 = vertexXnRaw<0>();
+    SE2 delta = inverseMeasurement_ * v1->estimate();
+    error_ = delta.toVector();
+  }
 
-      void linearizeOplus() override {
-        jacobianOplusXi_.setZero();
-        jacobianOplusXi_.block<2,2>(0,0)=inverseMeasurement_.rotation().toRotationMatrix();
-        jacobianOplusXi_(2,2)=1.;
-      }
+  void linearizeOplus() override {
+    jacobianOplusXi_.setZero();
+    jacobianOplusXi_.block<2, 2>(0, 0) =
+        inverseMeasurement_.rotation().toRotationMatrix();
+    jacobianOplusXi_(2, 2) = 1.;
+  }
 
-      void setMeasurement(const SE2& m) override;
-      bool setMeasurementData(const number_t* d) override;
+  void setMeasurement(const SE2& m) override;
+  bool setMeasurementData(const number_t* d) override;
 
-      bool getMeasurementData(number_t* d) const override {
-        Eigen::Map<Vector3> v(d);
-        v = measurement_.toVector();
-        return true;
-      }
+  bool getMeasurementData(number_t* d) const override {
+    Eigen::Map<Vector3> v(d);
+    v = measurement_.toVector();
+    return true;
+  }
 
-      int measurementDimension() const override {return 3;}
+  int measurementDimension() const override { return 3; }
 
-      bool read(std::istream& is) override;
-      bool write(std::ostream& os) const override;
+  bool read(std::istream& is) override;
+  bool write(std::ostream& os) const override;
 
-      number_t initialEstimatePossible(const OptimizableGraph::VertexSet& , OptimizableGraph::Vertex* ) override { return 1.;}
-      void initialEstimate(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to) override;
+  number_t initialEstimatePossible(const OptimizableGraph::VertexSet&,
+                                   OptimizableGraph::Vertex*) override {
+    return 1.;
+  }
+  void initialEstimate(const OptimizableGraph::VertexSet& from,
+                       OptimizableGraph::Vertex* to) override;
 
-    protected:
-      SE2 inverseMeasurement_;
-  };
+ protected:
+  SE2 inverseMeasurement_;
+};
 
-}
+}  // namespace g2o
 
 #endif

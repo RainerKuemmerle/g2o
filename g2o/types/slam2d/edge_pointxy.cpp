@@ -27,42 +27,37 @@
 #include "edge_pointxy.h"
 
 #ifdef G2O_HAVE_OPENGL
-#include "g2o/stuff/opengl_wrapper.h"
 #include "g2o/stuff/opengl_primitives.h"
+#include "g2o/stuff/opengl_wrapper.h"
 #endif
 
 namespace g2o {
 
-  EdgePointXY::EdgePointXY() 
-    
-  {
-    information_.setIdentity();
-    error_.setZero();
-  }
+EdgePointXY::EdgePointXY()
 
-  bool EdgePointXY::read(std::istream& is)
-  {
-    Vector2 p;
-    internal::readVector(is, p);
-    setMeasurement(p);
-    readInformationMatrix(is);
-    return true;
-  }
+{
+  information_.setIdentity();
+  error_.setZero();
+}
 
-  bool EdgePointXY::write(std::ostream& os) const
-  {
-    internal::writeVector(os, measurement());
-    return writeInformationMatrix(os);
-  }
+bool EdgePointXY::read(std::istream& is) {
+  Vector2 p;
+  internal::readVector(is, p);
+  setMeasurement(p);
+  readInformationMatrix(is);
+  return true;
+}
 
+bool EdgePointXY::write(std::ostream& os) const {
+  internal::writeVector(os, measurement());
+  return writeInformationMatrix(os);
+}
 
 #ifndef NUMERIC_JACOBIAN_TWO_D_TYPES
-  void EdgePointXY::linearizeOplus()
-  {
-    jacobianOplusXi_=-Matrix2::Identity();
-    jacobianOplusXj_= Matrix2::Identity();
-  }
+void EdgePointXY::linearizeOplus() {
+  jacobianOplusXi_ = -Matrix2::Identity();
+  jacobianOplusXj_ = Matrix2::Identity();
+}
 #endif
 
-
-} // end namespace
+}  // namespace g2o

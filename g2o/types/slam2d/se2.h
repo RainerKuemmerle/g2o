@@ -36,93 +36,87 @@
 
 namespace g2o {
 
-  /**
-   * \brief represent SE2
-   */
-  class G2O_TYPES_SLAM2D_API SE2 {
-    public:
-      EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
-      SE2():R_(0),t_(0,0){}
+/**
+ * \brief represent SE2
+ */
+class G2O_TYPES_SLAM2D_API SE2 {
+ public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
+  SE2() : R_(0), t_(0, 0) {}
 
-      explicit SE2(const Isometry2& iso): R_(0), t_(iso.translation()){
-        R_.fromRotationMatrix(iso.linear());
-      }
+  explicit SE2(const Isometry2& iso) : R_(0), t_(iso.translation()) {
+    R_.fromRotationMatrix(iso.linear());
+  }
 
-      explicit SE2(const Vector3& v):R_(v[2]),t_(v[0],v[1]){}
+  explicit SE2(const Vector3& v) : R_(v[2]), t_(v[0], v[1]) {}
 
-      SE2(number_t x, number_t y, number_t theta):R_(theta),t_(x,y){}
+  SE2(number_t x, number_t y, number_t theta) : R_(theta), t_(x, y) {}
 
-      //! translational component
-      inline const Vector2& translation() const {return t_;}
-      void setTranslation(const Vector2& t) {t_=t;}
+  //! translational component
+  inline const Vector2& translation() const { return t_; }
+  void setTranslation(const Vector2& t) { t_ = t; }
 
-      //! rotational component
-      inline const Rotation2D& rotation() const {return R_;}
-      void setRotation(const Rotation2D& R) {R_=R;}
+  //! rotational component
+  inline const Rotation2D& rotation() const { return R_; }
+  void setRotation(const Rotation2D& R) { R_ = R; }
 
-      //! concatenate two SE2 elements (motion composition)
-      inline SE2 operator * (const SE2& tr2) const{
-        SE2 result(*this);
-        result *= tr2;
-        return result;
-      }
+  //! concatenate two SE2 elements (motion composition)
+  inline SE2 operator*(const SE2& tr2) const {
+    SE2 result(*this);
+    result *= tr2;
+    return result;
+  }
 
-      //! motion composition operator
-      inline SE2& operator *= (const SE2& tr2){
-        t_+=R_*tr2.t_;
-        R_.angle()+=tr2.R_.angle();
-        R_.angle()=normalize_theta(R_.angle());
-        return *this;
-      }
+  //! motion composition operator
+  inline SE2& operator*=(const SE2& tr2) {
+    t_ += R_ * tr2.t_;
+    R_.angle() += tr2.R_.angle();
+    R_.angle() = normalize_theta(R_.angle());
+    return *this;
+  }
 
-      //! project a 2D vector
-      inline Vector2 operator * (const Vector2& v) const {
-        return t_+R_*v;
-      }
+  //! project a 2D vector
+  inline Vector2 operator*(const Vector2& v) const { return t_ + R_ * v; }
 
-      //! invert :-)
-      inline SE2 inverse() const{
-        SE2 ret;
-        ret.R_=R_.inverse();
-        ret.R_.angle()=normalize_theta(ret.R_.angle());
+  //! invert :-)
+  inline SE2 inverse() const {
+    SE2 ret;
+    ret.R_ = R_.inverse();
+    ret.R_.angle() = normalize_theta(ret.R_.angle());
 #ifdef _MSC_VER
-        ret._t=ret._R*(Vector2(_t*-1.));
+    ret._t = ret._R * (Vector2(_t * -1.));
 #else
-        ret.t_=ret.R_*(t_*-1.);
+    ret.t_ = ret.R_ * (t_ * -1.);
 #endif
-        return ret;
-      }
+    return ret;
+  }
 
-      inline number_t operator [](int i) const {
-        assert (i>=0 && i<3);
-        if (i<2)
-          return t_(i);
-        return R_.angle();
-      }
+  inline number_t operator[](int i) const {
+    assert(i >= 0 && i < 3);
+    if (i < 2) return t_(i);
+    return R_.angle();
+  }
 
+  //! assign from a 3D vector (x, y, theta)
+  inline void fromVector(const Vector3& v) { *this = SE2(v[0], v[1], v[2]); }
 
-      //! assign from a 3D vector (x, y, theta)
-      inline void fromVector (const Vector3& v){
-        *this=SE2(v[0], v[1], v[2]);
-      }
+  //! convert to a 3D vector (x, y, theta)
+  inline Vector3 toVector() const {
+    return Vector3(t_.x(), t_.y(), R_.angle());
+  }
 
-      //! convert to a 3D vector (x, y, theta)
-      inline Vector3 toVector() const {
-        return Vector3(t_.x(), t_.y(), R_.angle());
-      }
+  inline Isometry2 toIsometry() const {
+    Isometry2 iso = Isometry2::Identity();
+    iso.linear() = R_.toRotationMatrix();
+    iso.translation() = t_;
+    return iso;
+  }
 
-      inline Isometry2 toIsometry() const {
-        Isometry2 iso = Isometry2::Identity();
-        iso.linear() = R_.toRotationMatrix();
-        iso.translation() = t_;
-        return iso;
-      }
+ protected:
+  Rotation2D R_;
+  Vector2 t_;
+};
 
-    protected:
-      Rotation2D R_;
-      Vector2 t_;
-  };
-
-} // end namespace
+}  // namespace g2o
 
 #endif

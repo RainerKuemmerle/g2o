@@ -28,40 +28,33 @@
 
 #include <QPlainTextEdit>
 #include <QString>
-
 #include <iostream>
 using namespace std;
 
-StreamRedirect::StreamRedirect(std::ostream &stream, QPlainTextEdit* te):
-  stream_(stream), te_(te)
-{
+StreamRedirect::StreamRedirect(std::ostream &stream, QPlainTextEdit *te)
+    : stream_(stream), te_(te) {
   old_buf_ = stream.rdbuf();
   stream_.rdbuf(this);
 }
 
-StreamRedirect::~StreamRedirect()
-{
-  if (!buffer_.empty())
-    xsputn(buffer_.c_str(), buffer_.size());
+StreamRedirect::~StreamRedirect() {
+  if (!buffer_.empty()) xsputn(buffer_.c_str(), buffer_.size());
   stream_.rdbuf(old_buf_);
 }
 
-std::char_traits<char>::int_type StreamRedirect::overflow(int_type v)
-{
+std::char_traits<char>::int_type StreamRedirect::overflow(int_type v) {
   mutex_.lock();
   if (v == '\n') {
     te_->appendPlainText(QString::fromLatin1(buffer_.c_str(), buffer_.size()));
     buffer_.clear();
-  }
-  else
+  } else
     buffer_.push_back(v);
 
   mutex_.unlock();
   return v;
 }
 
-std::streamsize StreamRedirect::xsputn(const char *p, std::streamsize n)
-{
+std::streamsize StreamRedirect::xsputn(const char *p, std::streamsize n) {
   mutex_.lock();
   buffer_.append(p, p + n);
 

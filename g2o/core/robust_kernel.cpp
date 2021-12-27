@@ -28,18 +28,12 @@
 
 namespace g2o {
 
-RobustKernel::RobustKernel() 
-  
-= default;
+RobustKernel::RobustKernel()
 
-RobustKernel::RobustKernel(number_t delta) :
-  delta_(delta)
-{
-}
+    = default;
 
-void RobustKernel::setDelta(number_t delta)
-{
-  delta_ = delta;
-}
+RobustKernel::RobustKernel(number_t delta) : delta_(delta) {}
 
-} // end namespace g2o
+void RobustKernel::setDelta(number_t delta) { delta_ = delta; }
+
+}  // end namespace g2o

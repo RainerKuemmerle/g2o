@@ -38,7 +38,8 @@ using namespace g2o;
 using namespace std;
 
 template <typename T>
-bool anonymizeLandmarkEdge(const std::shared_ptr<HyperGraph::Edge>& e_, OptimizableGraph& g) {
+bool anonymizeLandmarkEdge(const std::shared_ptr<HyperGraph::Edge>& e_,
+                           OptimizableGraph& g) {
   auto e = std::dynamic_pointer_cast<T>(e_);
   if (!e) return false;
   g.setEdgeVertex(e, 1, nullptr);
@@ -46,7 +47,8 @@ bool anonymizeLandmarkEdge(const std::shared_ptr<HyperGraph::Edge>& e_, Optimiza
 }
 
 template <typename T>
-bool anonymizePoseEdge(const std::shared_ptr<HyperGraph::Edge>& e_, OptimizableGraph& g) {
+bool anonymizePoseEdge(const std::shared_ptr<HyperGraph::Edge>& e_,
+                       OptimizableGraph& g) {
   auto e = std::dynamic_pointer_cast<T>(e_);
   if (!e) return false;
   auto from = e->vertex(0);
@@ -70,7 +72,8 @@ int main(int argc, char** argv) {
   std::string outputFilename;
   std::string inputFilename;
   arg.param("o", outputFilename, "anon.g2o", "output file");
-  arg.paramLeftOver("graph-output", inputFilename, "", "graph file which will be read", true);
+  arg.paramLeftOver("graph-output", inputFilename, "",
+                    "graph file which will be read", true);
   arg.parseArgs(argc, argv);
   OptimizableGraph graph;
 

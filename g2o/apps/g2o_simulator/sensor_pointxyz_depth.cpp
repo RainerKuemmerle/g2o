@@ -77,7 +77,7 @@ void SensorPointXYZDepth::sense() {
   }
   if (!robotPoseObject_) return;
   sensorPose_ = robotPoseObject_->vertex()->estimate() * offsetParam_->offset();
-  for (auto *it : world()->objects()) {
+  for (auto* it : world()->objects()) {
     auto* o = dynamic_cast<WorldObjectType*>(it);
     if (o && isVisible(o)) {
       auto e = mkEdge(o);

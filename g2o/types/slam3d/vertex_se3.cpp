@@ -25,114 +25,118 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vertex_se3.h"
+
 #include "g2o/core/factory.h"
 #ifdef G2O_HAVE_OPENGL
-#include "g2o/stuff/opengl_wrapper.h"
 #include "g2o/stuff/opengl_primitives.h"
+#include "g2o/stuff/opengl_wrapper.h"
 #endif
 
 #include <iostream>
+
 #include "g2o/core/cache.h"
 
 namespace g2o {
 
-  VertexSE3::VertexSE3()
-  {
-    setToOriginImpl();
-    updateCache();
+VertexSE3::VertexSE3() {
+  setToOriginImpl();
+  updateCache();
+}
+
+bool VertexSE3::read(std::istream& is) {
+  Vector7 est;
+  bool state = internal::readVector(is, est);
+  setEstimate(internal::fromVectorQT(est));
+  return state;
+}
+
+bool VertexSE3::write(std::ostream& os) const {
+  return internal::writeVector(os, internal::toVectorQT(estimate()));
+}
+
+VertexSE3WriteGnuplotAction::VertexSE3WriteGnuplotAction()
+    : WriteGnuplotAction(typeid(VertexSE3).name()) {}
+
+bool VertexSE3WriteGnuplotAction::operator()(
+    HyperGraph::HyperGraphElement* element,
+    HyperGraphElementAction::Parameters* params_) {
+  if (typeid(*element).name() != typeName_) return false;
+  auto* params = static_cast<WriteGnuplotAction::Parameters*>(params_);
+  if (!params->os) {
+    std::cerr << __PRETTY_FUNCTION__ << ": warning, no valid os specified"
+              << std::endl;
+    return false;
   }
 
-  bool VertexSE3::read(std::istream& is)
-  {
-    Vector7 est;
-    bool state = internal::readVector(is, est);
-    setEstimate(internal::fromVectorQT(est));
-    return state;
-  }
-
-  bool VertexSE3::write(std::ostream& os) const
-  {
-    return internal::writeVector(os, internal::toVectorQT(estimate()));
-  }
-
-  VertexSE3WriteGnuplotAction::VertexSE3WriteGnuplotAction(): WriteGnuplotAction(typeid(VertexSE3).name()){}
-
-  bool VertexSE3WriteGnuplotAction::operator()(HyperGraph::HyperGraphElement* element, HyperGraphElementAction::Parameters* params_){
-    if (typeid(*element).name()!=typeName_)
-      return false;
-    auto* params=static_cast<WriteGnuplotAction::Parameters*>(params_);
-    if (!params->os){
-      std::cerr << __PRETTY_FUNCTION__ << ": warning, no valid os specified" << std::endl;
-      return false;
-    }
-
-    auto* v =  static_cast<VertexSE3*>(element);
-    Vector6 est=internal::toVectorMQT(v->estimate());
-    for (int i=0; i<6; i++)
-      *(params->os) << est[i] << " ";
-    *(params->os) << std::endl;
-    return true;
-  }
+  auto* v = static_cast<VertexSE3*>(element);
+  Vector6 est = internal::toVectorMQT(v->estimate());
+  for (int i = 0; i < 6; i++) *(params->os) << est[i] << " ";
+  *(params->os) << std::endl;
+  return true;
+}
 
 #ifdef G2O_HAVE_OPENGL
-  void drawTriangle(float xSize, float ySize){
-    Vector3F p[3];
-    glBegin(GL_TRIANGLES);
-    p[0] << 0., 0., 0.;
-    p[1] << -xSize, ySize, 0.;
-    p[2] << -xSize, -ySize, 0.;
-    for (int i = 1; i < 2; ++i) {
-      Vector3F normal = (p[i] - p[0]).cross(p[i+1] - p[0]);
-      glNormal3f(normal.x(), normal.y(), normal.z());
-      glVertex3f(p[0].x(), p[0].y(), p[0].z());
-      glVertex3f(p[i].x(), p[i].y(), p[i].z());
-      glVertex3f(p[i+1].x(), p[i+1].y(), p[i+1].z());
-    }
-    glEnd();
+void drawTriangle(float xSize, float ySize) {
+  Vector3F p[3];
+  glBegin(GL_TRIANGLES);
+  p[0] << 0., 0., 0.;
+  p[1] << -xSize, ySize, 0.;
+  p[2] << -xSize, -ySize, 0.;
+  for (int i = 1; i < 2; ++i) {
+    Vector3F normal = (p[i] - p[0]).cross(p[i + 1] - p[0]);
+    glNormal3f(normal.x(), normal.y(), normal.z());
+    glVertex3f(p[0].x(), p[0].y(), p[0].z());
+    glVertex3f(p[i].x(), p[i].y(), p[i].z());
+    glVertex3f(p[i + 1].x(), p[i + 1].y(), p[i + 1].z());
   }
+  glEnd();
+}
 
-  VertexSE3DrawAction::VertexSE3DrawAction()
-      : DrawAction(typeid(VertexSE3).name()), triangleX_(nullptr), triangleY_(nullptr) {
-    cacheDrawActions_ = nullptr;
+VertexSE3DrawAction::VertexSE3DrawAction()
+    : DrawAction(typeid(VertexSE3).name()),
+      triangleX_(nullptr),
+      triangleY_(nullptr) {
+  cacheDrawActions_ = nullptr;
+}
+
+bool VertexSE3DrawAction::refreshPropertyPtrs(
+    HyperGraphElementAction::Parameters* params_) {
+  if (!DrawAction::refreshPropertyPtrs(params_)) return false;
+  if (previousParams_) {
+    triangleX_ = previousParams_->makeProperty<FloatProperty>(
+        typeName_ + "::TRIANGLE_X", .2F);
+    triangleY_ = previousParams_->makeProperty<FloatProperty>(
+        typeName_ + "::TRIANGLE_Y", .05F);
+  } else {
+    triangleX_ = nullptr;
+    triangleY_ = nullptr;
   }
+  return true;
+}
 
-  bool VertexSE3DrawAction::refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_){
-    if (!DrawAction::refreshPropertyPtrs(params_))
-      return false;
-    if (previousParams_){
-      triangleX_ = previousParams_->makeProperty<FloatProperty>(typeName_ + "::TRIANGLE_X", .2F);
-      triangleY_ = previousParams_->makeProperty<FloatProperty>(typeName_ + "::TRIANGLE_Y", .05F);
-    } else {
-      triangleX_ = nullptr;
-      triangleY_ = nullptr;
-    }
-    return true;
-  }
+bool VertexSE3DrawAction::operator()(
+    HyperGraph::HyperGraphElement* element,
+    HyperGraphElementAction::Parameters* params_) {
+  if (typeid(*element).name() != typeName_) return false;
+  initializeDrawActionsCache();
+  refreshPropertyPtrs(params_);
 
-  bool VertexSE3DrawAction::operator()(HyperGraph::HyperGraphElement* element,
-                 HyperGraphElementAction::Parameters* params_){
-    if (typeid(*element).name()!=typeName_)
-      return false;
-    initializeDrawActionsCache();
-    refreshPropertyPtrs(params_);
+  if (!previousParams_) return true;
 
-    if (! previousParams_)
-      return true;
+  if (show_ && !show_->value()) return true;
 
-    if (show_ && !show_->value())
-      return true;
+  auto* that = static_cast<VertexSE3*>(element);
 
-    auto* that = static_cast<VertexSE3*>(element);
-
-    glColor3f(POSE_VERTEX_COLOR);
-    glPushMatrix();
-    glMultMatrixd(that->estimate().matrix().cast<double>().eval().data());
-    opengl::drawArrow2D(triangleX_->value(), triangleY_->value(), triangleX_->value()*.3F);
-    drawCache(that->cacheContainer(), params_);
-    drawUserData(that->userData().get(), params_);
-    glPopMatrix();
-    return true;
-  }
+  glColor3f(POSE_VERTEX_COLOR);
+  glPushMatrix();
+  glMultMatrixd(that->estimate().matrix().cast<double>().eval().data());
+  opengl::drawArrow2D(triangleX_->value(), triangleY_->value(),
+                      triangleX_->value() * .3F);
+  drawCache(that->cacheContainer(), params_);
+  drawUserData(that->userData().get(), params_);
+  glPopMatrix();
+  return true;
+}
 #endif
 
-}
+}  // namespace g2o

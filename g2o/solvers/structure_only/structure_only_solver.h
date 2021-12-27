@@ -57,19 +57,21 @@ class StructureOnlySolver : public OptimizationAlgorithm {
  public:
   StructureOnlySolver() = default;
 
-  OptimizationAlgorithm::SolverResult solve(int iteration, bool online = false) override {
+  OptimizationAlgorithm::SolverResult solve(int iteration,
+                                            bool online = false) override {
     (void)iteration;
     (void)online;
     return calc(points_, 1);
   }
 
-  OptimizationAlgorithm::SolverResult calc(OptimizableGraph::VertexContainer& vertices,
-                                           int num_iters, int num_max_trials = 10) {
+  OptimizationAlgorithm::SolverResult calc(
+      OptimizableGraph::VertexContainer& vertices, int num_iters,
+      int num_max_trials = 10) {
     JacobianWorkspace auxWorkspace;
     auxWorkspace.updateSize(2, 50);
     auxWorkspace.allocate();
 
-    for (auto & v : vertices) {
+    for (auto& v : vertices) {
       bool stop = false;
       assert(v->dimension() == PointDoF);
       g2o::HyperGraph::EdgeSetWeak& track = v->edges();
@@ -79,7 +81,7 @@ class StructureOnlySolver : public OptimizationAlgorithm {
       number_t mu = cst(0.01);
       number_t nu = 2;
 
-      for (const auto & it_t : track) {
+      for (const auto& it_t : track) {
         auto e = std::static_pointer_cast<OptimizableGraph::Edge>(it_t.lock());
         e->computeError();
         if (e->robustKernel()) {
@@ -102,8 +104,9 @@ class StructureOnlySolver : public OptimizationAlgorithm {
           g2o::HyperGraph::EdgeSetWeak& track = v->edges();
           assert(track.size() >= 1);
 
-          for (const auto & it_t : track) {
-            auto e = std::static_pointer_cast<OptimizableGraph::Edge>(it_t.lock());
+          for (const auto& it_t : track) {
+            auto e =
+                std::static_pointer_cast<OptimizableGraph::Edge>(it_t.lock());
 
             // fix all the other vertices and remember their fix value
 #ifdef WINDOWS
@@ -112,7 +115,8 @@ class StructureOnlySolver : public OptimizationAlgorithm {
             bool remember_fix_status[e->vertices().size()];
 #endif
             for (size_t k = 0; k < e->vertices().size(); ++k) {
-              auto otherV = std::static_pointer_cast<OptimizableGraph::Vertex>(e->vertex(k));
+              auto otherV = std::static_pointer_cast<OptimizableGraph::Vertex>(
+                  e->vertex(k));
               if (otherV != v) {
                 remember_fix_status[k] = otherV->fixed();
                 otherV->setFixed(true);
@@ -126,14 +130,16 @@ class StructureOnlySolver : public OptimizationAlgorithm {
 
             // Restore frame's initial fixed() values
             for (size_t k = 0; k < e->vertices().size(); ++k) {
-              auto otherV = std::static_pointer_cast<OptimizableGraph::Vertex>(e->vertex(k));
+              auto otherV = std::static_pointer_cast<OptimizableGraph::Vertex>(
+                  e->vertex(k));
               if (otherV != v) {
                 otherV->setFixed(remember_fix_status[k]);
               }
             }
           }
 
-          using PointVector = Eigen::Matrix<number_t, PointDoF, 1, Eigen::ColMajor>;
+          using PointVector =
+              Eigen::Matrix<number_t, PointDoF, 1, Eigen::ColMajor>;
           Eigen::Map<PointVector> b(v->bData(), v->dimension());
           if (b.norm() < 0.001) {
             stop = true;
@@ -142,7 +148,8 @@ class StructureOnlySolver : public OptimizationAlgorithm {
 
           int trial = 0;
           do {
-            using PointMatrix = Eigen::Matrix<number_t, PointDoF, PointDoF, Eigen::ColMajor>;
+            using PointMatrix =
+                Eigen::Matrix<number_t, PointDoF, PointDoF, Eigen::ColMajor>;
             PointMatrix H_pp_mu = H_pp;
             H_pp_mu.diagonal().array() += mu;
             Eigen::LDLT<PointMatrix> chol_H_pp(H_pp_mu);
@@ -152,8 +159,9 @@ class StructureOnlySolver : public OptimizationAlgorithm {
               v->push();
               v->oplus(delta_p.data());
               number_t new_chi2 = 0;
-              for (const auto & it_t : track) {
-                auto e = std::static_pointer_cast<OptimizableGraph::Edge>(it_t.lock());
+              for (const auto& it_t : track) {
+                auto e = std::static_pointer_cast<OptimizableGraph::Edge>(
+                    it_t.lock());
                 e->computeError();
                 if (e->robustKernel()) {
                   Vector3 rho;
@@ -175,12 +183,13 @@ class StructureOnlySolver : public OptimizationAlgorithm {
               }
             }
 
-            // update the damping factor based on the result of the last increment
+            // update the damping factor based on the result of the last
+            // increment
             if (goodStep) {
               mu *= cst(1. / 3.);
               nu = 2.;
               trial = 0;
-              break; // TODO(Rainer): Revisit the rule to break here
+              break;  // TODO(Rainer): Revisit the rule to break here
             }
             mu *= nu;
             nu *= 2.;
@@ -207,12 +216,12 @@ class StructureOnlySolver : public OptimizationAlgorithm {
   }
 
   bool computeMarginals(SparseBlockMatrix<MatrixX>&,
-                                const std::vector<std::pair<int, int> >&) override {
+                        const std::vector<std::pair<int, int> >&) override {
     return false;
   }
 
   bool updateStructure(const HyperGraph::VertexContainer& /*vset*/,
-                               const HyperGraph::EdgeSet& /*edges*/) override {
+                       const HyperGraph::EdgeSet& /*edges*/) override {
     return true;
   }
 

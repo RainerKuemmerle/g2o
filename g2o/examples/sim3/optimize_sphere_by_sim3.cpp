@@ -50,7 +50,8 @@ G2O_USE_TYPE_GROUP(slam3d);
 namespace g2o {
 
 // Convert SE3 Vertex to Sim3 Vertex
-void ToVertexSim3(const g2o::VertexSE3& v_se3, g2o::VertexSim3Expmap* const v_sim3) {
+void ToVertexSim3(const g2o::VertexSE3& v_se3,
+                  g2o::VertexSim3Expmap* const v_sim3) {
   Eigen::Isometry3d se3 = v_se3.estimate().inverse();
   Eigen::Matrix3d r = se3.rotation();
   Eigen::Vector3d t = se3.translation();
@@ -60,7 +61,8 @@ void ToVertexSim3(const g2o::VertexSE3& v_se3, g2o::VertexSim3Expmap* const v_si
 }
 
 // Convert Sim3 Vertex to SE3 Vertex
-void ToVertexSE3(const g2o::VertexSim3Expmap& v_sim3, g2o::VertexSE3* const v_se3) {
+void ToVertexSE3(const g2o::VertexSim3Expmap& v_sim3,
+                 g2o::VertexSE3* const v_se3) {
   g2o::Sim3 sim3 = v_sim3.estimate().inverse();
   Eigen::Matrix3d r = sim3.rotation().toRotationMatrix();
   Eigen::Vector3d t = sim3.translation();
@@ -100,9 +102,11 @@ static int optimize_by_sim3(int argc, char** argv) {
 
   //  define the optimizer
   using BlockSolverType = g2o::BlockSolver<g2o::BlockSolverTraits<7, 7>>;
-  using LinearSolverType = g2o::LinearSolverEigen<BlockSolverType::PoseMatrixType>;
-  std::unique_ptr<g2o::OptimizationAlgorithm> solver(new g2o::OptimizationAlgorithmLevenberg(
-      g2o::make_unique<BlockSolverType>(g2o::make_unique<LinearSolverType>())));
+  using LinearSolverType =
+      g2o::LinearSolverEigen<BlockSolverType::PoseMatrixType>;
+  std::unique_ptr<g2o::OptimizationAlgorithm> solver(
+      new g2o::OptimizationAlgorithmLevenberg(g2o::make_unique<BlockSolverType>(
+          g2o::make_unique<LinearSolverType>())));
 
   g2o::SparseOptimizer optimizer;
   optimizer.setAlgorithm(std::move(solver));
@@ -163,8 +167,6 @@ static int optimize_by_sim3(int argc, char** argv) {
   interface.save("result.g2o");
   return 0;
 }
-}
+}  // namespace g2o
 
-int main (int argc, char** argv) {
-  return g2o::optimize_by_sim3(argc, argv);
-}
+int main(int argc, char** argv) { return g2o::optimize_by_sim3(argc, argv); }

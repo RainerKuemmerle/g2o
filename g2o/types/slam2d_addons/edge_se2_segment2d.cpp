@@ -38,9 +38,11 @@ bool EdgeSE2Segment2D::write(std::ostream& os) const {
   return writeInformationMatrix(os);
 }
 
-void EdgeSE2Segment2D::initialEstimate(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to) {
+void EdgeSE2Segment2D::initialEstimate(const OptimizableGraph::VertexSet& from,
+                                       OptimizableGraph::Vertex* to) {
   assert(from.size() == 1 && from.count(vertices_[0]) == 1 &&
-         "Can not initialize VertexSE2 position by VertexSegment2D. I could if i wanted. Not now");
+         "Can not initialize VertexSE2 position by VertexSegment2D. I could if "
+         "i wanted. Not now");
 
   auto vi = vertexXn<0>();
   auto vj = vertexXn<1>();

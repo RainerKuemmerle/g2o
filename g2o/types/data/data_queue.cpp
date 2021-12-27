@@ -30,43 +30,32 @@
 
 namespace g2o {
 
-  RobotData* DataQueue::findClosestData(number_t timestamp) const
-  {
-    if (buffer_.rbegin()->first < timestamp)
-      return buffer_.rbegin()->second;
-    if (buffer_.begin()->first > timestamp)
-      return buffer_.begin()->second;
+RobotData* DataQueue::findClosestData(number_t timestamp) const {
+  if (buffer_.rbegin()->first < timestamp) return buffer_.rbegin()->second;
+  if (buffer_.begin()->first > timestamp) return buffer_.begin()->second;
 
-    auto ub = buffer_.upper_bound(timestamp);
-    auto lb = ub;
-    --lb;
-    if (fabs(lb->first - timestamp) < fabs(ub->first - timestamp))
-      return lb->second;
-          return ub->second;
-  }
-
-  RobotData* DataQueue::before(number_t timestamp) const
-  {
-    if (buffer_.empty() || buffer_.begin()->first >= timestamp)
-      return nullptr;
-    auto lb = buffer_.upper_bound(timestamp);
-    --lb; // now it's the lower bound
+  auto ub = buffer_.upper_bound(timestamp);
+  auto lb = ub;
+  --lb;
+  if (fabs(lb->first - timestamp) < fabs(ub->first - timestamp))
     return lb->second;
-  }
+  return ub->second;
+}
 
-  RobotData* DataQueue::after(number_t timestamp) const
-  {
-    if (buffer_.empty() || buffer_.rbegin()->first < timestamp)
-      return nullptr;
-    auto ub = buffer_.upper_bound(timestamp);
-    if (ub == buffer_.end())
-      return nullptr;
-    return ub->second;
-  }
+RobotData* DataQueue::before(number_t timestamp) const {
+  if (buffer_.empty() || buffer_.begin()->first >= timestamp) return nullptr;
+  auto lb = buffer_.upper_bound(timestamp);
+  --lb;  // now it's the lower bound
+  return lb->second;
+}
 
-  void DataQueue::add(RobotData* rd)
-  {
-    buffer_[rd->timestamp()] = rd;
-  }
+RobotData* DataQueue::after(number_t timestamp) const {
+  if (buffer_.empty() || buffer_.rbegin()->first < timestamp) return nullptr;
+  auto ub = buffer_.upper_bound(timestamp);
+  if (ub == buffer_.end()) return nullptr;
+  return ub->second;
+}
 
-} // end namespace
+void DataQueue::add(RobotData* rd) { buffer_[rd->timestamp()] = rd; }
+
+}  // namespace g2o

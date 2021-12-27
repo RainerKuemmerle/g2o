@@ -91,7 +91,8 @@ bool SensorSegment2DLine::isVisible(SensorSegment2DLine::WorldObjectType* to) {
       break;
     default:;
   }
-  return clip1 && clip2;  // only if both endpoints have been clipped do something
+  return clip1 &&
+         clip2;  // only if both endpoints have been clipped do something
 }
 
 void SensorSegment2DLine::sense() {
@@ -104,7 +105,7 @@ void SensorSegment2DLine::sense() {
     ++it;
     count++;
   }
-  for (auto *it : world()->objects()) {
+  for (auto* it : world()->objects()) {
     auto* o = dynamic_cast<WorldObjectType*>(it);
     if (o && isVisible(o)) {
       auto e = mkEdge(o);

@@ -36,8 +36,8 @@
 #include "edge_se2_segment2d_pointLine.h"
 
 // line slam ver 2
-#include "edge_se2_line2d.h"
-#include "edge_line2d_pointxy.h"
 #include "edge_line2d.h"
+#include "edge_line2d_pointxy.h"
+#include "edge_se2_line2d.h"
 
 #endif

@@ -32,37 +32,39 @@
 
 namespace g2o {
 
-  class SparseOptimizer;
+class SparseOptimizer;
 
-  /**
-   * \brief stop iterating based on the gain which is (oldChi - currentChi) / currentChi.
-   *
-   * stop iterating based on the gain which is (oldChi - currentChi) / currentChi.
-   * If the gain is larger than zero and below the threshold, then the optimizer is stopped.
-   * Typically usage of this action includes adding it as a postIteration action, by calling
-   * addPostIterationAction on a sparse optimizer.
-   */
-  class G2O_CORE_API SparseOptimizerTerminateAction : public HyperGraphAction
-  {
-    public:
-      SparseOptimizerTerminateAction();
-      bool operator()(const HyperGraph* graph, Parameters* parameters = nullptr) override;
+/**
+ * \brief stop iterating based on the gain which is (oldChi - currentChi) /
+ * currentChi.
+ *
+ * stop iterating based on the gain which is (oldChi - currentChi) / currentChi.
+ * If the gain is larger than zero and below the threshold, then the optimizer
+ * is stopped. Typically usage of this action includes adding it as a
+ * postIteration action, by calling addPostIterationAction on a sparse
+ * optimizer.
+ */
+class G2O_CORE_API SparseOptimizerTerminateAction : public HyperGraphAction {
+ public:
+  SparseOptimizerTerminateAction();
+  bool operator()(const HyperGraph* graph,
+                  Parameters* parameters = nullptr) override;
 
-      number_t gainThreshold() const { return gainThreshold_;}
-      void setGainThreshold(number_t gainThreshold);
+  number_t gainThreshold() const { return gainThreshold_; }
+  void setGainThreshold(number_t gainThreshold);
 
-      int maxIterations() const { return maxIterations_;}
-      void setMaxIterations(int maxit);
+  int maxIterations() const { return maxIterations_; }
+  void setMaxIterations(int maxit);
 
-    protected:
-      number_t gainThreshold_;
-      number_t lastChi_{0};
-      bool auxTerminateFlag_{false};
-      int maxIterations_;
+ protected:
+  number_t gainThreshold_;
+  number_t lastChi_{0};
+  bool auxTerminateFlag_{false};
+  int maxIterations_;
 
-      void setOptimizerStopFlag(const SparseOptimizer* optimizer, bool stop);
-  };
+  void setOptimizerStopFlag(const SparseOptimizer* optimizer, bool stop);
+};
 
-} // end namespace
+}  // namespace g2o
 
 #endif

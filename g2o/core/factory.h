@@ -59,7 +59,8 @@ class G2O_CORE_API Factory {
   /**
    * register a tag for a specific creator
    */
-  void registerType(const std::string& tag, std::unique_ptr<AbstractHyperGraphElementCreator> c);
+  void registerType(const std::string& tag,
+                    std::unique_ptr<AbstractHyperGraphElementCreator> c);
 
   /**
    * unregister a tag for a specific creator
@@ -69,15 +70,17 @@ class G2O_CORE_API Factory {
   /**
    * construct a graph element based on its tag
    */
-  std::unique_ptr<HyperGraph::HyperGraphElement> construct(const std::string& tag) const;
+  std::unique_ptr<HyperGraph::HyperGraphElement> construct(
+      const std::string& tag) const;
 
   /**
-   * construct a graph element based on its tag, but only if it's type (a bitmask) matches. A
-   * bitmask without any bit set will construct any item. Otherwise a bit has to be set to allow
-   * construction of a graph element.
+   * construct a graph element based on its tag, but only if it's type (a
+   * bitmask) matches. A bitmask without any bit set will construct any item.
+   * Otherwise a bit has to be set to allow construction of a graph element.
    */
   std::unique_ptr<HyperGraph::HyperGraphElement> construct(
-      const std::string& tag, const HyperGraph::GraphElemBitset& elemsToConstruct) const;
+      const std::string& tag,
+      const HyperGraph::GraphElemBitset& elemsToConstruct) const;
 
   /**
    * return whether the factory knows this tag or not
@@ -120,10 +123,11 @@ class RegisterTypeProxy {
  public:
   explicit RegisterTypeProxy(const std::string& name) {
 #ifdef G2O_DEBUG_FACTORY
-    std::cout << __FUNCTION__ << ": Registering " << name << " of type " << typeid(T).name()
-              << std::endl;
+    std::cout << __FUNCTION__ << ": Registering " << name << " of type "
+              << typeid(T).name() << std::endl;
 #endif
-    Factory::instance()->registerType(name, std::make_unique<HyperGraphElementCreator<T>>());
+    Factory::instance()->registerType(
+        name, std::make_unique<HyperGraphElementCreator<T>>());
   }
 };
 
@@ -151,6 +155,7 @@ class RegisterTypeProxy {
 
 #define G2O_USE_TYPE_GROUP(typeGroupName)                                  \
   extern "C" void G2O_FACTORY_IMPORT g2o_type_group_##typeGroupName(void); \
-  static g2o::ForceLinker g2o_force_type_link_##typeGroupName(g2o_type_group_##typeGroupName);
+  static g2o::ForceLinker g2o_force_type_link_##typeGroupName(             \
+      g2o_type_group_##typeGroupName);
 
 #endif

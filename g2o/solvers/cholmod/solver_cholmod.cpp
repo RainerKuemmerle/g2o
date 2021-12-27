@@ -42,17 +42,18 @@ namespace g2o {
 namespace {
 template <int P, int L, bool Blockorder>
 std::unique_ptr<BlockSolverBase> AllocateSolver() {
-  std::cerr << "# Using CHOLMOD poseDim " << P << " landMarkDim " << L << " blockordering "
-            << Blockorder << std::endl;
-  auto linearSolver =
-      g2o::make_unique<LinearSolverCholmod<typename BlockSolverPL<P, L>::PoseMatrixType>>();
+  std::cerr << "# Using CHOLMOD poseDim " << P << " landMarkDim " << L
+            << " blockordering " << Blockorder << std::endl;
+  auto linearSolver = g2o::make_unique<
+      LinearSolverCholmod<typename BlockSolverPL<P, L>::PoseMatrixType>>();
   linearSolver->setBlockOrdering(Blockorder);
   return g2o::make_unique<BlockSolverPL<P, L>>(std::move(linearSolver));
 }
 }  // namespace
 
 static OptimizationAlgorithm* createSolver(const std::string& fullSolverName) {
-  static const std::map<std::string, std::function<std::unique_ptr<BlockSolverBase>()>>
+  static const std::map<std::string,
+                        std::function<std::unique_ptr<BlockSolverBase>()>>
       kSolverFactories{
           {"var_cholmod", &AllocateSolver<-1, -1, true>},
           {"fix3_2_cholmod", &AllocateSolver<3, 2, true>},
@@ -89,7 +90,8 @@ class CholmodSolverCreator : public AbstractOptimizationAlgorithmCreator {
   explicit CholmodSolverCreator(const OptimizationAlgorithmProperty& p)
       : AbstractOptimizationAlgorithmCreator(p) {}
   std::unique_ptr<OptimizationAlgorithm> construct() override {
-    return std::unique_ptr<OptimizationAlgorithm>(createSolver(property().name));
+    return std::unique_ptr<OptimizationAlgorithm>(
+        createSolver(property().name));
   }
 };
 
@@ -98,86 +100,101 @@ G2O_REGISTER_OPTIMIZATION_LIBRARY(cholmod);
 G2O_REGISTER_OPTIMIZATION_ALGORITHM(
     gn_var_cholmod,
     new CholmodSolverCreator(OptimizationAlgorithmProperty(
-        "gn_var_cholmod", "Gauss-Newton: Cholesky solver using CHOLMOD (variable blocksize)",
+        "gn_var_cholmod",
+        "Gauss-Newton: Cholesky solver using CHOLMOD (variable blocksize)",
         "CHOLMOD", false, Eigen::Dynamic, Eigen::Dynamic)));
 G2O_REGISTER_OPTIMIZATION_ALGORITHM(
     gn_fix3_2_cholmod,
     new CholmodSolverCreator(OptimizationAlgorithmProperty(
-        "gn_fix3_2_cholmod", "Gauss-Newton: Cholesky solver using CHOLMOD (fixed blocksize)",
+        "gn_fix3_2_cholmod",
+        "Gauss-Newton: Cholesky solver using CHOLMOD (fixed blocksize)",
         "CHOLMOD", true, 3, 2)));
 G2O_REGISTER_OPTIMIZATION_ALGORITHM(
     gn_fix6_3_cholmod,
     new CholmodSolverCreator(OptimizationAlgorithmProperty(
-        "gn_fix6_3_cholmod", "Gauss-Newton: Cholesky solver using CHOLMOD (fixed blocksize)",
+        "gn_fix6_3_cholmod",
+        "Gauss-Newton: Cholesky solver using CHOLMOD (fixed blocksize)",
         "CHOLMOD", true, 6, 3)));
 G2O_REGISTER_OPTIMIZATION_ALGORITHM(
     gn_fix7_3_cholmod,
     new CholmodSolverCreator(OptimizationAlgorithmProperty(
-        "gn_fix7_3_cholmod", "Gauss-Newton: Cholesky solver using CHOLMOD (fixed blocksize)",
+        "gn_fix7_3_cholmod",
+        "Gauss-Newton: Cholesky solver using CHOLMOD (fixed blocksize)",
         "CHOLMOD", true, 7, 3)));
 G2O_REGISTER_OPTIMIZATION_ALGORITHM(
     lm_var_cholmod,
     new CholmodSolverCreator(OptimizationAlgorithmProperty(
-        "lm_var_cholmod", "Levenberg: Cholesky solver using CHOLMOD (variable blocksize)",
+        "lm_var_cholmod",
+        "Levenberg: Cholesky solver using CHOLMOD (variable blocksize)",
         "CHOLMOD", false, Eigen::Dynamic, Eigen::Dynamic)));
 G2O_REGISTER_OPTIMIZATION_ALGORITHM(
     lm_fix3_2_cholmod,
     new CholmodSolverCreator(OptimizationAlgorithmProperty(
-        "lm_fix3_2_cholmod", "Levenberg: Cholesky solver using CHOLMOD (fixed blocksize)",
-        "CHOLMOD", true, 3, 2)));
+        "lm_fix3_2_cholmod",
+        "Levenberg: Cholesky solver using CHOLMOD (fixed blocksize)", "CHOLMOD",
+        true, 3, 2)));
 G2O_REGISTER_OPTIMIZATION_ALGORITHM(
     lm_fix6_3_cholmod,
     new CholmodSolverCreator(OptimizationAlgorithmProperty(
-        "lm_fix6_3_cholmod", "Levenberg: Cholesky solver using CHOLMOD (fixed blocksize)",
-        "CHOLMOD", true, 6, 3)));
+        "lm_fix6_3_cholmod",
+        "Levenberg: Cholesky solver using CHOLMOD (fixed blocksize)", "CHOLMOD",
+        true, 6, 3)));
 G2O_REGISTER_OPTIMIZATION_ALGORITHM(
     lm_fix7_3_cholmod,
     new CholmodSolverCreator(OptimizationAlgorithmProperty(
-        "lm_fix7_3_cholmod", "Levenberg: Cholesky solver using CHOLMOD (fixed blocksize)",
-        "CHOLMOD", true, 7, 3)));
+        "lm_fix7_3_cholmod",
+        "Levenberg: Cholesky solver using CHOLMOD (fixed blocksize)", "CHOLMOD",
+        true, 7, 3)));
 
 #ifdef ADD_SCALAR_ORDERING
 G2O_REGISTER_OPTIMIZATION_ALGORITHM(
     gn_fix3_2_cholmod_scalar,
     new CholmodSolverCreator(OptimizationAlgorithmProperty(
         "gn_fix3_2_cholmod_scalar",
-        "Gauss-Newton: Cholesky solver using CHOLMOD (fixed blocksize, scalar ordering)", "CHOLMOD",
-        true, 3, 2)));
+        "Gauss-Newton: Cholesky solver using CHOLMOD (fixed blocksize, scalar "
+        "ordering)",
+        "CHOLMOD", true, 3, 2)));
 G2O_REGISTER_OPTIMIZATION_ALGORITHM(
     gn_fix6_3_cholmod_scalar,
     new CholmodSolverCreator(OptimizationAlgorithmProperty(
         "gn_fix6_3_cholmod_scalar",
-        "Gauss-Newton: Cholesky solver using CHOLMOD (fixed blocksize, scalar ordering)", "CHOLMOD",
-        true, 6, 3)));
+        "Gauss-Newton: Cholesky solver using CHOLMOD (fixed blocksize, scalar "
+        "ordering)",
+        "CHOLMOD", true, 6, 3)));
 G2O_REGISTER_OPTIMIZATION_ALGORITHM(
     gn_fix7_3_cholmod_scalar,
     new CholmodSolverCreator(OptimizationAlgorithmProperty(
         "gn_fix7_3_cholmod_scalar",
-        "Gauss-Newton: Cholesky solver using CHOLMOD (fixed blocksize, scalar ordering)", "CHOLMOD",
-        true, 7, 3)));
+        "Gauss-Newton: Cholesky solver using CHOLMOD (fixed blocksize, scalar "
+        "ordering)",
+        "CHOLMOD", true, 7, 3)));
 G2O_REGISTER_OPTIMIZATION_ALGORITHM(
     lm_fix3_2_cholmod_scalar,
     new CholmodSolverCreator(OptimizationAlgorithmProperty(
         "lm_fix3_2_cholmod_scalar",
-        "Levenberg: Cholesky solver using CHOLMOD (fixed blocksize, scalar ordering)", "CHOLMOD",
-        true, 3, 2)));
+        "Levenberg: Cholesky solver using CHOLMOD (fixed blocksize, scalar "
+        "ordering)",
+        "CHOLMOD", true, 3, 2)));
 G2O_REGISTER_OPTIMIZATION_ALGORITHM(
     lm_fix6_3_cholmod_scalar,
     new CholmodSolverCreator(OptimizationAlgorithmProperty(
         "lm_fix6_3_cholmod_scalar",
-        "Levenberg: Cholesky solver using CHOLMOD (fixed blocksize, scalar ordering)", "CHOLMOD",
-        true, 6, 3)));
+        "Levenberg: Cholesky solver using CHOLMOD (fixed blocksize, scalar "
+        "ordering)",
+        "CHOLMOD", true, 6, 3)));
 G2O_REGISTER_OPTIMIZATION_ALGORITHM(
     lm_fix7_3_cholmod_scalar,
     new CholmodSolverCreator(OptimizationAlgorithmProperty(
         "lm_fix7_3_cholmod_scalar",
-        "Levenberg: Cholesky solver using CHOLMOD (fixed blocksize, scalar ordering)", "CHOLMOD",
-        true, 7, 3)));
+        "Levenberg: Cholesky solver using CHOLMOD (fixed blocksize, scalar "
+        "ordering)",
+        "CHOLMOD", true, 7, 3)));
 #endif
 
 G2O_REGISTER_OPTIMIZATION_ALGORITHM(
     dl_var_cholmod,
     new CholmodSolverCreator(OptimizationAlgorithmProperty(
-        "dl_var_cholmod", "Dogleg: Cholesky solver using CHOLMOD (variable blocksize)", "CHOLMOD",
+        "dl_var_cholmod",
+        "Dogleg: Cholesky solver using CHOLMOD (variable blocksize)", "CHOLMOD",
         false, Eigen::Dynamic, Eigen::Dynamic)));
 }  // namespace g2o

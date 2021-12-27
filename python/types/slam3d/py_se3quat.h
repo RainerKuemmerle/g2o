@@ -11,9 +11,12 @@ namespace g2o {
 void declareSE3Quat(py::module& m) {
   py::class_<SE3Quat>(m, "SE3Quat")
       .def(py::init<>())
-      .def(py::init<const Eigen::Ref<const Matrix3>&, const Eigen::Ref<const Vector3>&>(), "R"_a,
-           "t"_a)
-      .def(py::init<const Eigen::Quaterniond&, const Eigen::Ref<const Vector3>&>(), "q"_a, "t"_a)
+      .def(py::init<const Eigen::Ref<const Matrix3>&,
+                    const Eigen::Ref<const Vector3>&>(),
+           "R"_a, "t"_a)
+      .def(py::init<const Eigen::Quaterniond&,
+                    const Eigen::Ref<const Vector3>&>(),
+           "q"_a, "t"_a)
       .def(py::init<const Eigen::Ref<const Vector6>&>(), "v"_a)
       .def(py::init<const Eigen::Ref<const Vector7>&>(), "v"_a)
 

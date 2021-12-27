@@ -41,7 +41,7 @@ void SensorOdometry2D::sense() {
   auto* r = dynamic_cast<RobotType*>(robot());
   if (!r) return;
 
-  PoseObject *pprev = nullptr;
+  PoseObject* pprev = nullptr;
   PoseObject* pcurr = nullptr;
   auto it = r->trajectory().rbegin();
   if (it != r->trajectory().rend()) {
@@ -53,7 +53,8 @@ void SensorOdometry2D::sense() {
     ++it;
   }
   if (!(pcurr && pprev)) {
-    std::cerr << __PRETTY_FUNCTION__ << ": fatal, trajectory empty" << std::endl;
+    std::cerr << __PRETTY_FUNCTION__ << ": fatal, trajectory empty"
+              << std::endl;
     return;
   }
   robotPoseObject_ = pprev;

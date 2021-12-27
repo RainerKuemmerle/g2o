@@ -31,7 +31,8 @@
 // This vertex stores the coefficients of the f(x) polynomial. This is
 // quadratic, and always has a degree of three.
 
-class FPolynomialCoefficientVertex : public g2o::BaseVertex<3, Eigen::Vector3d> {
+class FPolynomialCoefficientVertex
+    : public g2o::BaseVertex<3, Eigen::Vector3d> {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
 
@@ -45,7 +46,9 @@ class FPolynomialCoefficientVertex : public g2o::BaseVertex<3, Eigen::Vector3d> 
   }
 
   // Write the vertex
-  bool write(std::ostream& os) const override { return g2o::internal::writeVector(os, estimate_); }
+  bool write(std::ostream& os) const override {
+    return g2o::internal::writeVector(os, estimate_);
+  }
 
   // Reset to zero
   void setToOriginImpl() override { estimate_.setZero(); }
@@ -57,10 +60,11 @@ class FPolynomialCoefficientVertex : public g2o::BaseVertex<3, Eigen::Vector3d> 
   }
 };
 
-// This vertex stores the coefficients of the p(x) polynomial. It is dynamic because
-// we can change it at runtime.
+// This vertex stores the coefficients of the p(x) polynomial. It is dynamic
+// because we can change it at runtime.
 
-class PPolynomialCoefficientVertex : public g2o::BaseDynamicVertex<Eigen::VectorXd> {
+class PPolynomialCoefficientVertex
+    : public g2o::BaseDynamicVertex<Eigen::VectorXd> {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
 
@@ -118,7 +122,8 @@ struct FunctionObservation {
 // The edge which encodes the observations
 
 class MultipleValueEdge
-    : public g2o::BaseBinaryEdge<Eigen::Dynamic, Eigen::VectorXd, FPolynomialCoefficientVertex,
+    : public g2o::BaseBinaryEdge<Eigen::Dynamic, Eigen::VectorXd,
+                                 FPolynomialCoefficientVertex,
                                  PPolynomialCoefficientVertex> {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
@@ -151,7 +156,8 @@ class MultipleValueEdge
     const PPolynomialCoefficientVertex* pvertex = vertexXnRaw<1>();
     for (int i = 0; i < measurement_.size(); ++i) {
       double x3 = pow(x_[i], 3);
-      error_[i] = measurement_[i] - Eigen::poly_eval(fvertex->estimate(), x_[i]) -
+      error_[i] = measurement_[i] -
+                  Eigen::poly_eval(fvertex->estimate(), x_[i]) -
                   x3 * (Eigen::poly_eval(pvertex->estimate(), x_[i]));
     }
   }
@@ -183,7 +189,8 @@ int main(int argc, const char* argv[]) {
     p[i] = g2o::sampleUniform(-1, 1);
   }
 
-  std::cout << "Ground truth vectors f=" << f.transpose() << "; p=" << p.transpose() << std::endl;
+  std::cout << "Ground truth vectors f=" << f.transpose()
+            << "; p=" << p.transpose() << std::endl;
 
   // The number of observations in the polynomial; the defaultis 6
   int obs = 6;
@@ -207,14 +214,16 @@ int main(int argc, const char* argv[]) {
     for (int o = 0; o < numObs; ++o) {
       fo.x[o] = g2o::sampleUniform(-5, 5);
       double x3 = pow(fo.x[o], 3);
-      fo.z[o] = Eigen::poly_eval(f, fo.x[o]) + x3 * (Eigen::poly_eval(p, fo.x[o])) +
+      fo.z[o] = Eigen::poly_eval(f, fo.x[o]) +
+                x3 * (Eigen::poly_eval(p, fo.x[o])) +
                 sigmaZ * g2o::sampleGaussian();
     }
   }
 
   // Construct the graph and set up the solver and optimiser
   std::unique_ptr<g2o::BlockSolverX::LinearSolverType> linearSolver =
-      g2o::make_unique<g2o::LinearSolverEigen<g2o::BlockSolverX::PoseMatrixType>>();
+      g2o::make_unique<
+          g2o::LinearSolverEigen<g2o::BlockSolverX::PoseMatrixType>>();
 
   // Set up the solver
   std::unique_ptr<g2o::BlockSolverX> blockSolver =
@@ -225,7 +234,8 @@ int main(int argc, const char* argv[]) {
       new g2o::OptimizationAlgorithmLevenberg(move(blockSolver)));
 
   // Create the graph and configure it
-  std::unique_ptr<g2o::SparseOptimizer> optimizer = g2o::make_unique<g2o::SparseOptimizer>();
+  std::unique_ptr<g2o::SparseOptimizer> optimizer =
+      g2o::make_unique<g2o::SparseOptimizer>();
   optimizer->setVerbose(true);
   optimizer->setAlgorithm(std::move(optimisationAlgorithm));
 
@@ -255,14 +265,16 @@ int main(int argc, const char* argv[]) {
   // dynamically change the vertex dimensions in an alreacy
   // constructed graph. Note that you must call initializeOptimization
   // before you can optimize after a state dimension has changed.
-  for (int testDimension = 1; testDimension <= polynomialDimension; ++testDimension) {
+  for (int testDimension = 1; testDimension <= polynomialDimension;
+       ++testDimension) {
     pv->setDimension(testDimension);
     optimizer->initializeOptimization();
     optimizer->optimize(10);
     std::cout << "Computed parameters: f=" << pf->estimate().transpose()
               << "; p=" << pv->estimate().transpose() << std::endl;
   }
-  for (int testDimension = polynomialDimension - 1; testDimension >= 1; --testDimension) {
+  for (int testDimension = polynomialDimension - 1; testDimension >= 1;
+       --testDimension) {
     pv->setDimension(testDimension);
     optimizer->initializeOptimization();
     optimizer->optimize(10);

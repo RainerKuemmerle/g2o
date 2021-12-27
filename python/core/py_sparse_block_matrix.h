@@ -16,7 +16,8 @@ void templatedSparseBlockMatrix(py::module& m, const std::string& suffix) {
       .def("clear", &CLS::clear, "dealloc"_a = false)
       .def("cols", &CLS::cols)
       .def("rows", &CLS::rows)
-      .def("block", (const MatrixType* (CLS::*)(int, int) const) & CLS::block, "r"_a, "c"_a)
+      .def("block", (const MatrixType* (CLS::*)(int, int) const) & CLS::block,
+           "r"_a, "c"_a)
 
       // TODO
 
@@ -24,6 +25,8 @@ void templatedSparseBlockMatrix(py::module& m, const std::string& suffix) {
 }
 }  // namespace
 
-void delcareSparseBlockMatrix(py::module& m) { templatedSparseBlockMatrix<MatrixX>(m, "X"); }
+void delcareSparseBlockMatrix(py::module& m) {
+  templatedSparseBlockMatrix<MatrixX>(m, "X");
+}
 
 }  // namespace g2o

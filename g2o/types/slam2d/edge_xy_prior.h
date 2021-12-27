@@ -34,12 +34,15 @@
 
 namespace g2o {
 
-class G2O_TYPES_SLAM2D_API EdgeXYPrior : public BaseUnaryEdge<2, Vector2, VertexPointXY> {
+class G2O_TYPES_SLAM2D_API EdgeXYPrior
+    : public BaseUnaryEdge<2, Vector2, VertexPointXY> {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   EdgeXYPrior();
 
-  void computeError() override { error_ = vertexXnRaw<0>()->estimate() - measurement_; }
+  void computeError() override {
+    error_ = vertexXnRaw<0>()->estimate() - measurement_;
+  }
   bool read(std::istream& is) override;
   bool write(std::ostream& os) const override;
 
@@ -64,7 +67,7 @@ class G2O_TYPES_SLAM2D_API EdgeXYPrior : public BaseUnaryEdge<2, Vector2, Vertex
   }
 
   number_t initialEstimatePossible(const OptimizableGraph::VertexSet&,
-                                           OptimizableGraph::Vertex*) override {
+                                   OptimizableGraph::Vertex*) override {
     return 0.;
   }
 #ifndef NUMERIC_JACOBIAN_TWO_D_TYPES

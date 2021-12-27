@@ -19,9 +19,8 @@
 #include "properties_widget.h"
 
 #include <QLineEdit>
-
-#include <iostream>
 #include <cassert>
+#include <iostream>
 
 #include "g2o/stuff/property.h"
 
@@ -29,19 +28,16 @@ using namespace std;
 
 using namespace g2o;
 
-PropertiesWidget::PropertiesWidget(QWidget * parent) :
-  QDialog(parent)
+PropertiesWidget::PropertiesWidget(QWidget* parent)
+    : QDialog(parent)
 
 {
   setupUi(this);
 }
 
-PropertiesWidget::~PropertiesWidget()
-{
-}
+PropertiesWidget::~PropertiesWidget() {}
 
-void PropertiesWidget::updateDisplayedProperties()
-{
+void PropertiesWidget::updateDisplayedProperties() {
   tableWidget->clear();
   propNames_.clear();
 
@@ -55,13 +51,11 @@ void PropertiesWidget::updateDisplayedProperties()
   tableWidget->verticalHeader()->hide();
 
   PropertyMap* properties = properties_;
-  if (! properties)
-    return;
+  if (!properties) return;
   tableWidget->setRowCount(properties->size());
 
   int r = 0;
   for (auto it = properties->begin(); it != properties->end(); ++it, ++r) {
-
     auto* textItem = new QTableWidgetItem;
     textItem->setText(QString::fromStdString(humanReadablePropName(it->first)));
     textItem->setFlags(textItem->flags() & ~Qt::ItemIsEditable);
@@ -89,20 +83,18 @@ void PropertiesWidget::updateDisplayedProperties()
       }
       tableWidget->setCellWidget(r, 1, editor);
     }
-
   }
   tableWidget->resizeColumnToContents(0);
 }
 
-void PropertiesWidget::applyProperties()
-{
-  assert(tableWidget->rowCount() == (int) _propNames.size());
+void PropertiesWidget::applyProperties() {
+  assert(tableWidget->rowCount() == (int)_propNames.size());
   PropertyMap* properties = properties_;
   for (int r = 0; r < tableWidget->rowCount(); ++r) {
     const std::string& propName = propNames_[r];
-    std::shared_ptr<BaseProperty> baseProp = properties->getProperty<BaseProperty>(propName);
-    if (! baseProp)
-      continue;
+    std::shared_ptr<BaseProperty> baseProp =
+        properties->getProperty<BaseProperty>(propName);
+    if (!baseProp) continue;
 
     if (dynamic_cast<Property<bool>*>(baseProp.get())) {
       auto* prop = static_cast<Property<bool>*>(baseProp.get());
@@ -111,31 +103,26 @@ void PropertiesWidget::applyProperties()
     } else {
       auto* editor = dynamic_cast<QLineEdit*>(tableWidget->cellWidget(r, 1));
       bool status = baseProp->fromString(editor->text().toStdString());
-      if (! status) {
+      if (!status) {
         cerr << "Warning: unable to set property " << baseProp->name() << endl;
       }
     }
   }
 }
 
-void PropertiesWidget::on_btnApply_clicked()
-{
-  applyProperties();
-}
+void PropertiesWidget::on_btnApply_clicked() { applyProperties(); }
 
-void PropertiesWidget::on_btnOK_clicked()
-{
+void PropertiesWidget::on_btnOK_clicked() {
   applyProperties();
   close();
 }
 
-std::string PropertiesWidget::humanReadablePropName(const std::string& propertyName) const
-{
+std::string PropertiesWidget::humanReadablePropName(
+    const std::string& propertyName) const {
   return propertyName;
 }
 
-void PropertiesWidget::setProperties(PropertyMap* properties)
-{
+void PropertiesWidget::setProperties(PropertyMap* properties) {
   properties_ = properties;
   updateDisplayedProperties();
 }

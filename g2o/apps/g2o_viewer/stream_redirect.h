@@ -27,10 +27,10 @@
 #ifndef G2O_STREAM_REDIRECT_H
 #define G2O_STREAM_REDIRECT_H
 
+#include <QMutex>
 #include <iostream>
 #include <streambuf>
 #include <string>
-#include <QMutex>
 
 #include "g2o_viewer_api.h"
 
@@ -39,25 +39,23 @@ class QPlainTextEdit;
 /**
  * \brief redirect a stream to a QPlainTextEdit
  */
-class G2O_VIEWER_API StreamRedirect : public std::basic_streambuf<char>
-{
-  public:
-    using int_type = std::char_traits<char>::int_type;
+class G2O_VIEWER_API StreamRedirect : public std::basic_streambuf<char> {
+ public:
+  using int_type = std::char_traits<char>::int_type;
 
-  
-    StreamRedirect(std::ostream &stream, QPlainTextEdit* te);
-    ~StreamRedirect() override;
+  StreamRedirect(std::ostream& stream, QPlainTextEdit* te);
+  ~StreamRedirect() override;
 
-  protected:
-    std::char_traits<char>::int_type overflow(int_type v) override;
-    std::streamsize xsputn(const char *p, std::streamsize n) override; 
+ protected:
+  std::char_traits<char>::int_type overflow(int_type v) override;
+  std::streamsize xsputn(const char* p, std::streamsize n) override;
 
-  private:
-    std::ostream& stream_;
-    std::streambuf* old_buf_;
-    std::string buffer_;
-    QPlainTextEdit* te_;
-    QMutex mutex_;
+ private:
+  std::ostream& stream_;
+  std::streambuf* old_buf_;
+  std::string buffer_;
+  QPlainTextEdit* te_;
+  QMutex mutex_;
 };
 
 #endif

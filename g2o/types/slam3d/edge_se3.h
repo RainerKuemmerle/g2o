@@ -28,83 +28,85 @@
 #define G2O_EDGE_SE3_H_
 
 #include "g2o/core/base_binary_edge.h"
-
 #include "g2o_types_slam3d_api.h"
 #include "vertex_se3.h"
 
 namespace g2o {
 
-  /**
-   * \brief Edge between two 3D pose vertices
-   *
-   * The transformation between the two vertices is given as an Isometry3.
-   * If z denotes the measurement, then the error function is given as follows:
-   * z^-1 * (x_i^-1 * x_j)
-   */
-  class G2O_TYPES_SLAM3D_API EdgeSE3 : public BaseBinaryEdge<6, Isometry3, VertexSE3, VertexSE3> {
-    public:
-      EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
-      EdgeSE3();
-      bool read(std::istream& is) override;
-      bool write(std::ostream& os) const override;
+/**
+ * \brief Edge between two 3D pose vertices
+ *
+ * The transformation between the two vertices is given as an Isometry3.
+ * If z denotes the measurement, then the error function is given as follows:
+ * z^-1 * (x_i^-1 * x_j)
+ */
+class G2O_TYPES_SLAM3D_API EdgeSE3
+    : public BaseBinaryEdge<6, Isometry3, VertexSE3, VertexSE3> {
+ public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
+  EdgeSE3();
+  bool read(std::istream& is) override;
+  bool write(std::ostream& os) const override;
 
-      void computeError() override;
+  void computeError() override;
 
-      void setMeasurement(const Isometry3& m) override{
-        measurement_ = m;
-        inverseMeasurement_ = m.inverse();
-      }
+  void setMeasurement(const Isometry3& m) override {
+    measurement_ = m;
+    inverseMeasurement_ = m.inverse();
+  }
 
-      bool setMeasurementData(const number_t* d) override{
-        Eigen::Map<const Vector7> v(d);
-        setMeasurement(internal::fromVectorQT(v));
-        return true;
-      }
+  bool setMeasurementData(const number_t* d) override {
+    Eigen::Map<const Vector7> v(d);
+    setMeasurement(internal::fromVectorQT(v));
+    return true;
+  }
 
-      bool getMeasurementData(number_t* d) const override{
-        Eigen::Map<Vector7> v(d);
-        v = internal::toVectorQT(measurement_);
-        return true;
-      }
+  bool getMeasurementData(number_t* d) const override {
+    Eigen::Map<Vector7> v(d);
+    v = internal::toVectorQT(measurement_);
+    return true;
+  }
 
-      void linearizeOplus() override;
+  void linearizeOplus() override;
 
-      int measurementDimension() const override {return 7;}
+  int measurementDimension() const override { return 7; }
 
-      bool setMeasurementFromState() override ;
+  bool setMeasurementFromState() override;
 
-      number_t initialEstimatePossible(const OptimizableGraph::VertexSet& /*from*/,
-          OptimizableGraph::Vertex* /*to*/) override {
-        return 1.;
-      }
+  number_t initialEstimatePossible(const OptimizableGraph::VertexSet& /*from*/,
+                                   OptimizableGraph::Vertex* /*to*/) override {
+    return 1.;
+  }
 
-      void initialEstimate(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to) override;
+  void initialEstimate(const OptimizableGraph::VertexSet& from,
+                       OptimizableGraph::Vertex* to) override;
 
-    protected:
-      Isometry3 inverseMeasurement_;
-  };
+ protected:
+  Isometry3 inverseMeasurement_;
+};
 
-  /**
-   * \brief Output the pose-pose constraint to Gnuplot data file
-   */
-  class G2O_TYPES_SLAM3D_API EdgeSE3WriteGnuplotAction: public WriteGnuplotAction {
-  public:
-    EdgeSE3WriteGnuplotAction();
-    bool operator()(HyperGraph::HyperGraphElement* element,
-                            HyperGraphElementAction::Parameters* params_) override;
-  };
+/**
+ * \brief Output the pose-pose constraint to Gnuplot data file
+ */
+class G2O_TYPES_SLAM3D_API EdgeSE3WriteGnuplotAction
+    : public WriteGnuplotAction {
+ public:
+  EdgeSE3WriteGnuplotAction();
+  bool operator()(HyperGraph::HyperGraphElement* element,
+                  HyperGraphElementAction::Parameters* params_) override;
+};
 
 #ifdef G2O_HAVE_OPENGL
-  /**
-   * \brief Visualize a 3D pose-pose constraint
-   */
-  class G2O_TYPES_SLAM3D_API EdgeSE3DrawAction: public DrawAction{
-  public:
-    EdgeSE3DrawAction();
-    bool operator()(HyperGraph::HyperGraphElement* element,
-                            HyperGraphElementAction::Parameters* params_) override;
-  };
+/**
+ * \brief Visualize a 3D pose-pose constraint
+ */
+class G2O_TYPES_SLAM3D_API EdgeSE3DrawAction : public DrawAction {
+ public:
+  EdgeSE3DrawAction();
+  bool operator()(HyperGraph::HyperGraphElement* element,
+                  HyperGraphElementAction::Parameters* params_) override;
+};
 #endif
 
-} // end namespace
+}  // namespace g2o
 #endif

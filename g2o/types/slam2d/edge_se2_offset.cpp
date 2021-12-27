@@ -26,66 +26,68 @@
 
 #include "edge_se2_offset.h"
 
-#include "parameter_se2_offset.h"
-
 #include <iostream>
+
+#include "parameter_se2_offset.h"
 
 namespace g2o {
 
-  EdgeSE2Offset::EdgeSE2Offset()  {
-    information().setIdentity();
-    resizeParameters(2);
-    installParameter<CacheSE2Offset::ParameterType>(0);
-    installParameter<CacheSE2Offset::ParameterType>(1);
-  }
-
-  bool EdgeSE2Offset::resolveCaches(){
-    ParameterVector pv(1);
-    pv[0] = parameters_[0];
-    resolveCache(cacheFrom_, vertexXn<0>(), "CACHE_SE2_OFFSET", pv);
-    pv[0] = parameters_[1];
-    resolveCache(cacheTo_, vertexXn<1>(), "CACHE_SE2_OFFSET", pv);
-    return (cacheFrom_ && cacheTo_);
-  }
-
-  bool EdgeSE2Offset::read(std::istream& is) {
-    bool state = readParamIds(is);
-
-    Vector3 meas;
-    state &= internal::readVector(is, meas);
-    setMeasurement(SE2(meas));
-    state &= readInformationMatrix(is);
-    return state;
-  }
-
-  bool EdgeSE2Offset::write(std::ostream& os) const {
-    writeParamIds(os);
-    internal::writeVector(os, measurement().toVector());
-    return writeInformationMatrix(os);
-  }
-
-  void EdgeSE2Offset::computeError() {
-    SE2 delta=inverseMeasurement_ * cacheFrom_->w2n() * cacheTo_->n2w();
-    error_.head<2>() = delta.translation();
-    error_(2)=delta.rotation().angle();
-  }
-
-  bool EdgeSE2Offset::setMeasurementFromState(){
-    SE2 delta = cacheFrom_->w2n() * cacheTo_->n2w();
-    setMeasurement(delta);
-    return true;
-  }
-
-  void EdgeSE2Offset::initialEstimate(const OptimizableGraph::VertexSet& from_, OptimizableGraph::Vertex* /*to_*/) {
-    auto from = vertexXn<0>();
-    auto to   = vertexXn<1>();
-
-    SE2 virtualMeasurement = cacheFrom_->offsetParam()->offset() * measurement() * cacheTo_->offsetParam()->offset().inverse();
-
-    if (from_.count(from) > 0)
-      to->setEstimate(from->estimate() * virtualMeasurement);
-    else
-      from->setEstimate(to->estimate() * virtualMeasurement.inverse());
-  }
-
+EdgeSE2Offset::EdgeSE2Offset() {
+  information().setIdentity();
+  resizeParameters(2);
+  installParameter<CacheSE2Offset::ParameterType>(0);
+  installParameter<CacheSE2Offset::ParameterType>(1);
 }
+
+bool EdgeSE2Offset::resolveCaches() {
+  ParameterVector pv(1);
+  pv[0] = parameters_[0];
+  resolveCache(cacheFrom_, vertexXn<0>(), "CACHE_SE2_OFFSET", pv);
+  pv[0] = parameters_[1];
+  resolveCache(cacheTo_, vertexXn<1>(), "CACHE_SE2_OFFSET", pv);
+  return (cacheFrom_ && cacheTo_);
+}
+
+bool EdgeSE2Offset::read(std::istream& is) {
+  bool state = readParamIds(is);
+
+  Vector3 meas;
+  state &= internal::readVector(is, meas);
+  setMeasurement(SE2(meas));
+  state &= readInformationMatrix(is);
+  return state;
+}
+
+bool EdgeSE2Offset::write(std::ostream& os) const {
+  writeParamIds(os);
+  internal::writeVector(os, measurement().toVector());
+  return writeInformationMatrix(os);
+}
+
+void EdgeSE2Offset::computeError() {
+  SE2 delta = inverseMeasurement_ * cacheFrom_->w2n() * cacheTo_->n2w();
+  error_.head<2>() = delta.translation();
+  error_(2) = delta.rotation().angle();
+}
+
+bool EdgeSE2Offset::setMeasurementFromState() {
+  SE2 delta = cacheFrom_->w2n() * cacheTo_->n2w();
+  setMeasurement(delta);
+  return true;
+}
+
+void EdgeSE2Offset::initialEstimate(const OptimizableGraph::VertexSet& from_,
+                                    OptimizableGraph::Vertex* /*to_*/) {
+  auto from = vertexXn<0>();
+  auto to = vertexXn<1>();
+
+  SE2 virtualMeasurement = cacheFrom_->offsetParam()->offset() * measurement() *
+                           cacheTo_->offsetParam()->offset().inverse();
+
+  if (from_.count(from) > 0)
+    to->setEstimate(from->estimate() * virtualMeasurement);
+  else
+    from->setEstimate(to->estimate() * virtualMeasurement.inverse());
+}
+
+}  // namespace g2o

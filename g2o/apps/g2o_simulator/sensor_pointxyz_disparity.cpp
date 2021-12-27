@@ -30,14 +30,16 @@ namespace g2o {
 
 // SensorPointXYZDisparity
 SensorPointXYZDisparity::SensorPointXYZDisparity(const std::string& name)
-    : BinarySensor<Robot3D, EdgeSE3PointXYZDisparity, WorldObjectTrackXYZ>(name) {
+    : BinarySensor<Robot3D, EdgeSE3PointXYZDisparity, WorldObjectTrackXYZ>(
+          name) {
   offsetParam_ = nullptr;
   information_.setIdentity();
   information_ *= 1000;
   setInformation(information_);
 }
 
-bool SensorPointXYZDisparity::isVisible(SensorPointXYZDisparity::WorldObjectType* to) {
+bool SensorPointXYZDisparity::isVisible(
+    SensorPointXYZDisparity::WorldObjectType* to) {
   if (!robotPoseObject_) return false;
   assert(to && to->vertex());
   VertexType::EstimateType pose = to->vertex()->estimate();
@@ -79,7 +81,7 @@ void SensorPointXYZDisparity::sense() {
   }
   if (!robotPoseObject_) return;
   sensorPose_ = robotPoseObject_->vertex()->estimate() * offsetParam_->offset();
-  for (auto *it : world()->objects()) {
+  for (auto* it : world()->objects()) {
     auto* o = dynamic_cast<WorldObjectType*>(it);
     if (o && isVisible(o)) {
       auto e = mkEdge(o);

@@ -16,11 +16,15 @@ void declareTypesICP(py::module& m) {
       .def("make_rot0", &EdgeGICP::makeRot0, "set up rotation matrix for pos0")
       .def("make_rot1", &EdgeGICP::makeRot1, "set up rotation matrix for pos1")
 
-      .def("prec0", &EdgeGICP::prec0, "e"_a, "returns a precision matrix for point-plane")
-      .def("prec1", &EdgeGICP::prec1, "e"_a, "returns a precision matrix for point-plane")
+      .def("prec0", &EdgeGICP::prec0, "e"_a,
+           "returns a precision matrix for point-plane")
+      .def("prec1", &EdgeGICP::prec1, "e"_a,
+           "returns a precision matrix for point-plane")
 
-      .def("cov0", &EdgeGICP::cov0, "e"_a, "return a covariance matrix for plane-plane")
-      .def("cov1", &EdgeGICP::cov1, "e"_a, "return a covariance matrix for plane-plane")
+      .def("cov0", &EdgeGICP::cov0, "e"_a,
+           "return a covariance matrix for plane-plane")
+      .def("cov1", &EdgeGICP::cov1, "e"_a,
+           "return a covariance matrix for plane-plane")
 
       // point positions
       .def_readwrite("pos0", &EdgeGICP::pos0)
@@ -33,7 +37,8 @@ void declareTypesICP(py::module& m) {
       .def_readwrite("R1", &EdgeGICP::R1);
 
   templatedBaseEdge<3, EdgeGICP>(m, "_3_EdgeGICP");
-  templatedBaseBinaryEdge<3, EdgeGICP, VertexSE3, VertexSE3>(m, "_3_EdgeGICP_VertexSE3_VertexSE3");
+  templatedBaseBinaryEdge<3, EdgeGICP, VertexSE3, VertexSE3>(
+      m, "_3_EdgeGICP_VertexSE3_VertexSE3");
   py::class_<EdgeVVGicp, BaseBinaryEdge<3, EdgeGICP, VertexSE3, VertexSE3>,
              std::shared_ptr<EdgeVVGicp>>(m, "EdgeVVGicp")
       .def(py::init<>())
@@ -52,26 +57,28 @@ void declareTypesICP(py::module& m) {
       .def_readwrite_static("dRidy", &EdgeVVGicp::dRidy_)
       .def_readwrite_static("dRidz", &EdgeVVGicp::dRidz_);
 
-  py::class_<VertexSCam, VertexSE3, std::shared_ptr<VertexSCam>>(m, "VertexSCam")
+  py::class_<VertexSCam, VertexSE3, std::shared_ptr<VertexSCam>>(m,
+                                                                 "VertexSCam")
       .def(py::init<>())
 
       .def("oplus_impl", &VertexSCam::oplusImpl)
 
       .def_static("transform_w2f", &VertexSCam::transformW2F, "m"_a, "trans"_a,
-                  "qrot"_a)  // (Eigen::Matrix<double,3,4>&, const Eigen::Vector3d&, const
-                             // Eigen::Quaterniond&) ->
+                  "qrot"_a)  // (Eigen::Matrix<double,3,4>&, const
+                             // Eigen::Vector3d&, const Eigen::Quaterniond&) ->
       .def_static("transform_f2w", &VertexSCam::transformF2W, "m"_a, "trans"_a,
-                  "qrot"_a)  // (Eigen::Matrix<double,3,4>&, const Eigen::Vector3d&, const
-                             // Eigen::Quaterniond&) ->
+                  "qrot"_a)  // (Eigen::Matrix<double,3,4>&, const
+                             // Eigen::Vector3d&, const Eigen::Quaterniond&) ->
 
-      .def_static("set_cam", &VertexSCam::setKcam, "fx"_a, "fy"_a, "cx"_a, "cy"_a, "tx"_a,
-                  "set up camera matrix")
+      .def_static("set_cam", &VertexSCam::setKcam, "fx"_a, "fy"_a, "cx"_a,
+                  "cy"_a, "tx"_a, "set up camera matrix")
 
       .def("set_transform", &VertexSCam::setTransform,
            "set transform from world to cam coords")  // () -> void
 
       .def("set_projection", &VertexSCam::setProjection,
-           "Set up world-to-image projection matrix (w2i), assumes camera parameters are "
+           "Set up world-to-image projection matrix (w2i), assumes camera "
+           "parameters are "
            "filled.")  // () -> void
 
       .def("set_derivative", &VertexSCam::setDr,
@@ -82,7 +89,8 @@ void declareTypesICP(py::module& m) {
 
       //.def("map_point", &VertexSCam::mapPoint,
       //        "res"_a, "pt3"_a,
-      //        "calculate stereo projection")   // (Vector3&, const Vector3&) ->
+      //        "calculate stereo projection")   // (Vector3&, const Vector3&)
+      //        ->
       .def("map_point",
            [](VertexSCam& cam, const Vector3& point) {
              Vector3 res;
@@ -95,11 +103,13 @@ void declareTypesICP(py::module& m) {
       .def_readwrite_static("baseline", &VertexSCam::baseline_)
 
       // transformations
-      .def_readwrite("w2n", &VertexSCam::w2n)  // transform from world to node coordinates
-      .def_readwrite("w2i", &VertexSCam::w2i)  // transform from world to image coordinates
+      .def_readwrite(
+          "w2n", &VertexSCam::w2n)  // transform from world to node coordinates
+      .def_readwrite(
+          "w2i", &VertexSCam::w2i)  // transform from world to image coordinates
 
-      // Derivatives of the rotation matrix transpose wrt quaternion xyz, used for
-      // calculating Jacobian wrt pose of a projection.
+      // Derivatives of the rotation matrix transpose wrt quaternion xyz, used
+      // for calculating Jacobian wrt pose of a projection.
       .def_readwrite("dRdx", &VertexSCam::dRdx)
       .def_readwrite("dRdy", &VertexSCam::dRdy)
       .def_readwrite("dRdz", &VertexSCam::dRdz)

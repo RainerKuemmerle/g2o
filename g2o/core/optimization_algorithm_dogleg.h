@@ -27,69 +27,68 @@
 #ifndef G2O_OPTIMIZATION_ALGORITHM_DOGLEG_H
 #define G2O_OPTIMIZATION_ALGORITHM_DOGLEG_H
 
-#include "optimization_algorithm_with_hessian.h"
-#include "g2o_core_api.h"
-
 #include <memory>
+
+#include "g2o_core_api.h"
+#include "optimization_algorithm_with_hessian.h"
 
 namespace g2o {
 
-  class BlockSolverBase;
+class BlockSolverBase;
+
+/**
+ * \brief Implementation of Powell's Dogleg Algorithm
+ */
+class G2O_CORE_API OptimizationAlgorithmDogleg
+    : public OptimizationAlgorithmWithHessian {
+ public:
+  /** \brief type of the step to take */
+  enum { kStepUndefined, kStepSd, kStepGn, kStepDl };
 
   /**
-   * \brief Implementation of Powell's Dogleg Algorithm
+   * construct the Dogleg algorithm, which will use the given Solver for solving
+   * the linearized system.
    */
-  class G2O_CORE_API OptimizationAlgorithmDogleg : public OptimizationAlgorithmWithHessian
-  {
-    public:
-      /** \brief type of the step to take */
-      enum {
-        kStepUndefined,
-        kStepSd, kStepGn, kStepDl
-      };
+  explicit OptimizationAlgorithmDogleg(std::unique_ptr<BlockSolverBase> solver);
+  ~OptimizationAlgorithmDogleg() override;
 
-      /**
-       * construct the Dogleg algorithm, which will use the given Solver for solving the
-       * linearized system.
-       */
-      explicit OptimizationAlgorithmDogleg(std::unique_ptr<BlockSolverBase> solver);
-      ~OptimizationAlgorithmDogleg() override;
+  SolverResult solve(int iteration, bool online = false) override;
 
-      SolverResult solve(int iteration, bool online = false) override;
+  void printVerbose(std::ostream& os) const override;
 
-      void printVerbose(std::ostream& os) const override;
+  //! return the type of the last step taken by the algorithm
+  int lastStep() const { return lastStep_; }
+  //! return the diameter of the trust region
+  number_t trustRegion() const { return delta_; }
 
-      //! return the type of the last step taken by the algorithm
-      int lastStep() const { return lastStep_;}
-      //! return the diameter of the trust region
-      number_t trustRegion() const { return delta_;}
+  //! convert the type into an integer
+  static const char* stepType2Str(int stepType);
 
-      //! convert the type into an integer
-      static const char* stepType2Str(int stepType);
+ protected:
+  // parameters
+  std::shared_ptr<Property<int>> maxTrialsAfterFailure_;
+  std::shared_ptr<Property<number_t>> userDeltaInit_;
+  // damping to enforce positive definite matrix
+  std::shared_ptr<Property<number_t>> initialLambda_;
+  std::shared_ptr<Property<number_t>> lamdbaFactor_;
 
-    protected:
-      // parameters
-      std::shared_ptr<Property<int>> maxTrialsAfterFailure_;
-      std::shared_ptr<Property<number_t>> userDeltaInit_;
-      // damping to enforce positive definite matrix
-      std::shared_ptr<Property<number_t>> initialLambda_;
-      std::shared_ptr<Property<number_t>> lamdbaFactor_;
+  VectorX hsd_;        ///< steepest decent step
+  VectorX hdl_;        ///< final dogleg step
+  VectorX auxVector_;  ///< auxilary vector used to perform multiplications or
+                       ///< other stuff
 
-      VectorX hsd_;        ///< steepest decent step
-      VectorX hdl_;        ///< final dogleg step
-      VectorX auxVector_;  ///< auxilary vector used to perform multiplications or other stuff
+  number_t
+      currentLambda_;  ///< the damping factor to force positive definite matrix
+  number_t delta_;     ///< trust region
+  int lastStep_;       ///< type of the step taken by the algorithm
+  bool wasPDInAllIterations_;  ///< the matrix we solve was positive definite in
+                               ///< all iterations -> if not apply damping
+  int lastNumTries_;
 
-      number_t currentLambda_;     ///< the damping factor to force positive definite matrix
-      number_t delta_;             ///< trust region
-      int lastStep_;               ///< type of the step taken by the algorithm
-      bool wasPDInAllIterations_;  ///< the matrix we solve was positive definite in all iterations -> if not apply
-                                   ///< damping
-      int lastNumTries_;
+ private:
+  std::unique_ptr<BlockSolverBase> m_solver_;
+};
 
-     private:
-      std::unique_ptr<BlockSolverBase> m_solver_;
-  };
-
-} // end namespace
+}  // namespace g2o
 
 #endif

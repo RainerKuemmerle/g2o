@@ -27,46 +27,49 @@
 #ifndef G2O_OPTIMIZATION_ALGORITHM_WITH_HESSIAN_H
 #define G2O_OPTIMIZATION_ALGORITHM_WITH_HESSIAN_H
 
-#include "optimization_algorithm.h"
 #include "g2o_core_api.h"
+#include "optimization_algorithm.h"
 
 namespace g2o {
 
-  class Solver;
+class Solver;
+
+/**
+ * \brief Base for solvers operating on the approximated Hessian, e.g.,
+ * Gauss-Newton, Levenberg
+ */
+class G2O_CORE_API OptimizationAlgorithmWithHessian
+    : public OptimizationAlgorithm {
+ public:
+  explicit OptimizationAlgorithmWithHessian(Solver& solver);
+
+  bool init(bool online = false) override;
+
+  bool computeMarginals(
+      SparseBlockMatrix<MatrixX>& spinv,
+      const std::vector<std::pair<int, int>>& blockIndices) override;
+
+  virtual bool buildLinearStructure();
+
+  virtual void updateLinearSystem();
+
+  bool updateStructure(const HyperGraph::VertexContainer& vset,
+                       const HyperGraph::EdgeSet& edges) override;
+
+  //! return the underlying solver used to solve the linear system
+  Solver& solver() { return solver_; }
 
   /**
-   * \brief Base for solvers operating on the approximated Hessian, e.g., Gauss-Newton, Levenberg
+   * write debug output of the Hessian if system is not positive definite
    */
-  class G2O_CORE_API OptimizationAlgorithmWithHessian : public OptimizationAlgorithm
-  {
-    public:
-      explicit OptimizationAlgorithmWithHessian(Solver& solver);
+  virtual void setWriteDebug(bool writeDebug);
+  virtual bool writeDebug() const { return writeDebug_->value(); }
 
-      bool init(bool online = false) override;
+ protected:
+  Solver& solver_;
+  std::shared_ptr<Property<bool>> writeDebug_;
+};
 
-      bool computeMarginals(SparseBlockMatrix<MatrixX>& spinv, const std::vector<std::pair<int, int> >& blockIndices) override;
-
-      virtual bool buildLinearStructure();
-
-      virtual void updateLinearSystem();
-
-      bool updateStructure(const HyperGraph::VertexContainer& vset, const HyperGraph::EdgeSet& edges) override;
-
-      //! return the underlying solver used to solve the linear system
-      Solver& solver() { return solver_;}
-
-      /**
-       * write debug output of the Hessian if system is not positive definite
-       */
-      virtual void setWriteDebug(bool writeDebug);
-      virtual bool writeDebug() const { return writeDebug_->value();}
-
-    protected:
-      Solver& solver_;
-      std::shared_ptr<Property<bool>> writeDebug_;
-
-  };
-
-}// end namespace
+}  // namespace g2o
 
 #endif

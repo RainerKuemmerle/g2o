@@ -29,49 +29,53 @@
 
 #include <memory>
 
-#include "vertex_se3.h"
 #include "g2o/core/base_unary_edge.h"
-#include "parameter_se3_offset.h"
 #include "g2o_types_slam3d_api.h"
+#include "parameter_se3_offset.h"
+#include "vertex_se3.h"
 
 namespace g2o {
-  /**
-   * \brief Prior for a 3D pose with constraints only in xyz direction
-   */
-  class G2O_TYPES_SLAM3D_API EdgeSE3XYZPrior : public BaseUnaryEdge<3, Vector3, VertexSE3>
-  {
-  public:
-    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-    EdgeSE3XYZPrior();
+/**
+ * \brief Prior for a 3D pose with constraints only in xyz direction
+ */
+class G2O_TYPES_SLAM3D_API EdgeSE3XYZPrior
+    : public BaseUnaryEdge<3, Vector3, VertexSE3> {
+ public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+  EdgeSE3XYZPrior();
 
-    bool setMeasurementData(const number_t* d) override {
-      Eigen::Map<const Vector3> v(d);
-      measurement_ = v;
-      return true;
-    }
+  bool setMeasurementData(const number_t* d) override {
+    Eigen::Map<const Vector3> v(d);
+    measurement_ = v;
+    return true;
+  }
 
-    bool getMeasurementData(number_t* d) const override {
-      Eigen::Map<Vector3> v(d);
-      v = measurement_;
-      return true;
-    }
+  bool getMeasurementData(number_t* d) const override {
+    Eigen::Map<Vector3> v(d);
+    v = measurement_;
+    return true;
+  }
 
-    int measurementDimension() const override {return kDimension;}
+  int measurementDimension() const override { return kDimension; }
 
-    bool read(std::istream& is) override ;
-    bool write(std::ostream& os) const override ;
-    void computeError() override ;
-    void linearizeOplus() override ;
-    bool setMeasurementFromState() override ;
+  bool read(std::istream& is) override;
+  bool write(std::ostream& os) const override;
+  void computeError() override;
+  void linearizeOplus() override;
+  bool setMeasurementFromState() override;
 
-    number_t initialEstimatePossible(const OptimizableGraph::VertexSet& /*from*/, OptimizableGraph::Vertex* /*to*/) override {return 1.;}
-    void initialEstimate(const OptimizableGraph::VertexSet& /*from_*/, OptimizableGraph::Vertex* /*to_*/) override ;
+  number_t initialEstimatePossible(const OptimizableGraph::VertexSet& /*from*/,
+                                   OptimizableGraph::Vertex* /*to*/) override {
+    return 1.;
+  }
+  void initialEstimate(const OptimizableGraph::VertexSet& /*from_*/,
+                       OptimizableGraph::Vertex* /*to_*/) override;
 
-  protected:
-    bool resolveCaches() override ;
-    std::shared_ptr<CacheSE3Offset> cache_;
-  };
+ protected:
+  bool resolveCaches() override;
+  std::shared_ptr<CacheSE3Offset> cache_;
+};
 
-} // end namespace
+}  // namespace g2o
 
 #endif

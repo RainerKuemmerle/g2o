@@ -35,31 +35,32 @@
 
 namespace g2o {
 
-  /**
-   * \brief data recorded by the robot
-   */
-  class G2O_TYPES_DATA_API RobotData : public HyperGraph::Data
-  {
-    public:
-      number_t timestamp() const { return timestamp_;}
-      void setTimestamp(number_t ts);
+/**
+ * \brief data recorded by the robot
+ */
+class G2O_TYPES_DATA_API RobotData : public HyperGraph::Data {
+ public:
+  number_t timestamp() const { return timestamp_; }
+  void setTimestamp(number_t ts);
 
-      number_t loggerTimestamp() const { return loggerTimestamp_;}
-      void setLoggerTimestamp(number_t ts);
+  number_t loggerTimestamp() const { return loggerTimestamp_; }
+  void setLoggerTimestamp(number_t ts);
 
-      const std::string& tag() const { return tag_;}
-      void setTag(const std::string& tag);
+  const std::string& tag() const { return tag_; }
+  void setTag(const std::string& tag);
 
-      const std::string& hostname() const { return hostname_;}
-      void setHostname(const std::string& hostname);
+  const std::string& hostname() const { return hostname_; }
+  void setHostname(const std::string& hostname);
 
-    protected:
-      number_t timestamp_ = -1.; ///< timestamp when the measurement was generated
-      number_t loggerTimestamp_ = -1.; ///< timestamp when the measurement was recorded
-      std::string tag_; ///< string tag (FLASER, ROBOTLASER, ODOM..) of the line in the log
-      std::string hostname_; ///< name of the computer/robot generating the data
-  };
+ protected:
+  number_t timestamp_ = -1.;  ///< timestamp when the measurement was generated
+  number_t loggerTimestamp_ =
+      -1.;  ///< timestamp when the measurement was recorded
+  std::string
+      tag_;  ///< string tag (FLASER, ROBOTLASER, ODOM..) of the line in the log
+  std::string hostname_;  ///< name of the computer/robot generating the data
+};
 
-} // end namespace
+}  // namespace g2o
 
 #endif

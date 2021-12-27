@@ -27,49 +27,51 @@
 #ifndef G2O_VERTEX_TAG_H
 #define G2O_VERTEX_TAG_H
 
-#include "robot_data.h"
-#include "g2o_types_data_api.h"
 #include "g2o/core/hyper_graph_action.h"
+#include "g2o_types_data_api.h"
+#include "robot_data.h"
 
 namespace g2o {
 
-  /**
-   * \brief string tag to be attached to a vertex
-   *
-   * A laser measurement obtained by a robot. The measurement is equipped with a pose of the robot at which
-   * the measurement was taken. The read/write function correspond to the CARMEN logfile format.
-   */
-  class G2O_TYPES_DATA_API VertexTag : public RobotData
-  {
-    public:
-      EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
+/**
+ * \brief string tag to be attached to a vertex
+ *
+ * A laser measurement obtained by a robot. The measurement is equipped with a
+ * pose of the robot at which the measurement was taken. The read/write function
+ * correspond to the CARMEN logfile format.
+ */
+class G2O_TYPES_DATA_API VertexTag : public RobotData {
+ public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
 
-      bool write(std::ostream& os) const override;
-      bool read(std::istream& is) override;
+  bool write(std::ostream& os) const override;
+  bool read(std::istream& is) override;
 
-      const std::string& name() const { return name_;}
-      void setName(const std::string& name) {name_=name;}
-      const Vector3F& position() const {return position_;}
-      void setPosition( const Vector3F& p) {position_ = p;}
-    protected:
-      std::string name_;
-      Vector3F position_;
-      Vector3F odom2d_;
-  };
+  const std::string& name() const { return name_; }
+  void setName(const std::string& name) { name_ = name; }
+  const Vector3F& position() const { return position_; }
+  void setPosition(const Vector3F& p) { position_ = p; }
 
- #ifdef G2O_HAVE_OPENGL
-  class G2O_TYPES_DATA_API VertexTagDrawAction: public DrawAction{
-  public:
-    VertexTagDrawAction();
-    bool operator()(HyperGraph::HyperGraphElement* element,
-                            HyperGraphElementAction::Parameters* params_) override;
+ protected:
+  std::string name_;
+  Vector3F position_;
+  Vector3F odom2d_;
+};
 
-   protected:
-    bool refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_) override;
-    std::shared_ptr<DoubleProperty> textSize_;
-  };
+#ifdef G2O_HAVE_OPENGL
+class G2O_TYPES_DATA_API VertexTagDrawAction : public DrawAction {
+ public:
+  VertexTagDrawAction();
+  bool operator()(HyperGraph::HyperGraphElement* element,
+                  HyperGraphElementAction::Parameters* params_) override;
+
+ protected:
+  bool refreshPropertyPtrs(
+      HyperGraphElementAction::Parameters* params_) override;
+  std::shared_ptr<DoubleProperty> textSize_;
+};
 #endif
 
-}
+}  // namespace g2o
 
 #endif

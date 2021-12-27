@@ -28,100 +28,111 @@
 #define G2O_EDGE_SE2_SEGMENT2D_POINTLINE_H
 
 #include "g2o/config.h"
-#include "g2o/types/slam2d/vertex_se2.h"
-#include "vertex_segment2d.h"
 #include "g2o/core/base_binary_edge.h"
+#include "g2o/types/slam2d/vertex_se2.h"
 #include "g2o_types_slam2d_addons_api.h"
+#include "vertex_segment2d.h"
 
 namespace g2o {
 
-  class G2O_TYPES_SLAM2D_ADDONS_API EdgeSE2Segment2DPointLine : public BaseBinaryEdge<3, Vector3, VertexSE2, VertexSegment2D>
-  {
-    public:
-      EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-      number_t   theta() const {return measurement_[2];}
-      Vector2 point()   const {Eigen::Map<const Vector2> p(&measurement_[0]); return p;}
+class G2O_TYPES_SLAM2D_ADDONS_API EdgeSE2Segment2DPointLine
+    : public BaseBinaryEdge<3, Vector3, VertexSE2, VertexSegment2D> {
+ public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+  number_t theta() const { return measurement_[2]; }
+  Vector2 point() const {
+    Eigen::Map<const Vector2> p(&measurement_[0]);
+    return p;
+  }
 
-      void   setTheta(number_t t)  {measurement_[2] = t;}
-      void   setPoint(const Vector2& p_)  {Eigen::Map<Vector2> p(&measurement_[0]); p=p_; }
+  void setTheta(number_t t) { measurement_[2] = t; }
+  void setPoint(const Vector2& p_) {
+    Eigen::Map<Vector2> p(&measurement_[0]);
+    p = p_;
+  }
 
-      int pointNum() const {return pointNum_;}
-      void setPointNum(int pn) {pointNum_ = pn;}
+  int pointNum() const { return pointNum_; }
+  void setPointNum(int pn) { pointNum_ = pn; }
 
-      void computeError() override
-      {
-        const VertexSE2* v1 = vertexXnRaw<0>();
-        const VertexSegment2D* l2 = vertexXnRaw<1>();
-        SE2 iEst=v1->estimate().inverse();
-        Vector2 predP1 = iEst * l2->estimateP1();
-        Vector2 predP2 = iEst * l2->estimateP2();
-        Vector2 dP = predP2 - predP1;
-        Vector2 normal(dP.y(), -dP.x()); normal.normalize();
-        Vector3 prediction;
-        prediction [2] = std::atan2(normal.y(), normal.x());
-        Eigen::Map<Vector2> pt(&prediction[0]);
-        pt = (pointNum_==0) ? predP1 : predP2;
-        error_ = prediction - measurement_;
-        error_[2]=normalize_theta(error_[2]);
-      }
+  void computeError() override {
+    const VertexSE2* v1 = vertexXnRaw<0>();
+    const VertexSegment2D* l2 = vertexXnRaw<1>();
+    SE2 iEst = v1->estimate().inverse();
+    Vector2 predP1 = iEst * l2->estimateP1();
+    Vector2 predP2 = iEst * l2->estimateP2();
+    Vector2 dP = predP2 - predP1;
+    Vector2 normal(dP.y(), -dP.x());
+    normal.normalize();
+    Vector3 prediction;
+    prediction[2] = std::atan2(normal.y(), normal.x());
+    Eigen::Map<Vector2> pt(&prediction[0]);
+    pt = (pointNum_ == 0) ? predP1 : predP2;
+    error_ = prediction - measurement_;
+    error_[2] = normalize_theta(error_[2]);
+  }
 
-      bool setMeasurementData(const number_t* d) override {
-        Eigen::Map<const Vector3> data(d);
-        measurement_ = data;
-        return true;
-      }
+  bool setMeasurementData(const number_t* d) override {
+    Eigen::Map<const Vector3> data(d);
+    measurement_ = data;
+    return true;
+  }
 
-      bool getMeasurementData(number_t* d) const override {
-        Eigen::Map<Vector3> data(d);
-        data = measurement_;
-        return true;
-      }
+  bool getMeasurementData(number_t* d) const override {
+    Eigen::Map<Vector3> data(d);
+    data = measurement_;
+    return true;
+  }
 
-      int measurementDimension() const override {return 3;}
+  int measurementDimension() const override { return 3; }
 
-      bool setMeasurementFromState() override{
-        const VertexSE2* v1 = vertexXnRaw<0>();
-        const VertexSegment2D* l2 = vertexXnRaw<1>();
-        SE2 iEst=v1->estimate().inverse();
-        Vector2 predP1 = iEst * l2->estimateP1();
-        Vector2 predP2 = iEst * l2->estimateP2();
-        Vector2 dP = predP2 - predP1;
-        Vector2 normal(dP.y(), -dP.x()); normal.normalize();
-        Vector3 prediction;
-        prediction [2] = std::atan2(normal.y(), normal.x());
-        Eigen::Map<Vector2> pt(&prediction[0]);
-        pt = (pointNum_==0)?predP1:predP2;
-        setMeasurement(prediction);
-        return true;
-      }
+  bool setMeasurementFromState() override {
+    const VertexSE2* v1 = vertexXnRaw<0>();
+    const VertexSegment2D* l2 = vertexXnRaw<1>();
+    SE2 iEst = v1->estimate().inverse();
+    Vector2 predP1 = iEst * l2->estimateP1();
+    Vector2 predP2 = iEst * l2->estimateP2();
+    Vector2 dP = predP2 - predP1;
+    Vector2 normal(dP.y(), -dP.x());
+    normal.normalize();
+    Vector3 prediction;
+    prediction[2] = std::atan2(normal.y(), normal.x());
+    Eigen::Map<Vector2> pt(&prediction[0]);
+    pt = (pointNum_ == 0) ? predP1 : predP2;
+    setMeasurement(prediction);
+    return true;
+  }
 
-      bool read(std::istream& is) override;
-      bool write(std::ostream& os) const override;
+  bool read(std::istream& is) override;
+  bool write(std::ostream& os) const override;
 
-  protected:
-      int pointNum_ = 0;
+ protected:
+  int pointNum_ = 0;
 
-/* #ifndef NUMERIC_JACOBIAN_TWO_D_TYPES */
-/*       virtual void linearizeOplus(); */
-/* #endif */
-  };
+  /* #ifndef NUMERIC_JACOBIAN_TWO_D_TYPES */
+  /*       virtual void linearizeOplus(); */
+  /* #endif */
+};
 
-/*   class G2O_TYPES_SLAM2D_ADDONS_API EdgeSE2Segment2DPointLineWriteGnuplotAction: public WriteGnuplotAction { */
+/*   class G2O_TYPES_SLAM2D_ADDONS_API
+ * EdgeSE2Segment2DPointLineWriteGnuplotAction: public WriteGnuplotAction { */
 /*   public: */
 /*     EdgeSE2Segment2DPointLineWriteGnuplotAction(); */
-/*     virtual HyperGraphElementAction* operator()(HyperGraph::HyperGraphElement* element,  */
+/*     virtual HyperGraphElementAction*
+ * operator()(HyperGraph::HyperGraphElement* element,  */
 /*             HyperGraphElementAction::Parameters* params_); */
 /*   }; */
 
 /* #ifdef G2O_HAVE_OPENGL */
-/*   class G2O_TYPES_SLAM2D_ADDONS_API EdgeSE2Segment2DPointLineDrawAction: public DrawAction{ */
+/*   class G2O_TYPES_SLAM2D_ADDONS_API EdgeSE2Segment2DPointLineDrawAction:
+ * public DrawAction{ */
 /*   public: */
 /*     EdgeSE2Segment2DPointLineDrawAction(); */
-/*     virtual HyperGraphElementAction* operator()(HyperGraph::HyperGraphElement* element,  */
+/*     virtual HyperGraphElementAction*
+ * operator()(HyperGraph::HyperGraphElement* element,  */
 /*             HyperGraphElementAction::Parameters* params_); */
 /*   }; */
 /* #endif */
 
-} // end namespace
+}  // namespace g2o
 
 #endif

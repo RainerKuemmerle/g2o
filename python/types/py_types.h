@@ -1,7 +1,6 @@
 #pragma once
 
 #include "g2opy.h"
-
 #include "icp/py_types_icp.h"
 #include "sba/py_sbacam.h"
 #include "sba/py_types_sba.h"

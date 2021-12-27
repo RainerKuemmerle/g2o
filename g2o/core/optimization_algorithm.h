@@ -27,88 +27,92 @@
 #ifndef G2O_OPTIMIZATION_ALGORITHM_H
 #define G2O_OPTIMIZATION_ALGORITHM_H
 
-#include <vector>
-#include <utility>
 #include <iosfwd>
+#include <utility>
+#include <vector>
 
 #include "g2o/stuff/property.h"
-
+#include "g2o_core_api.h"
 #include "hyper_graph.h"
 #include "sparse_block_matrix.h"
-#include "g2o_core_api.h"
 
 namespace g2o {
 
-  class SparseOptimizer;
+class SparseOptimizer;
+
+/**
+ * \brief Generic interface for a non-linear solver operating on a graph
+ */
+class G2O_CORE_API OptimizationAlgorithm {
+ public:
+  enum G2O_CORE_API SolverResult { kTerminate = 2, kOk = 1, kFail = -1 };
+  OptimizationAlgorithm() = default;
+  virtual ~OptimizationAlgorithm() = default;
+  OptimizationAlgorithm(const OptimizationAlgorithm&) = delete;
+  OptimizationAlgorithm& operator=(const OptimizationAlgorithm&) = delete;
 
   /**
-   * \brief Generic interface for a non-linear solver operating on a graph
+   * initialize the solver, called once before the first call to solve()
    */
-  class G2O_CORE_API OptimizationAlgorithm
-  {
-    public:
-      enum G2O_CORE_API SolverResult {kTerminate=2, kOk=1, kFail=-1};
-      OptimizationAlgorithm() = default;
-      virtual ~OptimizationAlgorithm() = default;
-      OptimizationAlgorithm(const OptimizationAlgorithm&) = delete;
-      OptimizationAlgorithm& operator=(const OptimizationAlgorithm&) = delete;
+  virtual bool init(bool online = false) = 0;
 
-      /**
-       * initialize the solver, called once before the first call to solve()
-       */
-      virtual bool init(bool online = false) = 0;
+  /**
+   * Solve one iteration. The SparseOptimizer running on-top will call this
+   * for the given number of iterations.
+   * @param iteration indicates the current iteration
+   */
+  virtual SolverResult solve(int iteration, bool online = false) = 0;
 
-      /**
-       * Solve one iteration. The SparseOptimizer running on-top will call this
-       * for the given number of iterations.
-       * @param iteration indicates the current iteration
-       */
-      virtual SolverResult solve(int iteration, bool online = false) = 0;
+  /**
+   * computes the block diagonal elements of the pattern specified in the input
+   * and stores them in given SparseBlockMatrix.
+   * If your solver does not support computing the marginals, return false.
+   */
+  virtual bool computeMarginals(
+      SparseBlockMatrix<MatrixX>& spinv,
+      const std::vector<std::pair<int, int> >& blockIndices) = 0;
 
-      /**
-       * computes the block diagonal elements of the pattern specified in the input
-       * and stores them in given SparseBlockMatrix.
-       * If your solver does not support computing the marginals, return false.
-       */
-      virtual bool computeMarginals(SparseBlockMatrix<MatrixX>& spinv, const std::vector<std::pair<int, int> >& blockIndices) = 0;
+  /**
+   * update the structures for online processing
+   */
+  virtual bool updateStructure(const HyperGraph::VertexContainer& vset,
+                               const HyperGraph::EdgeSet& edges) = 0;
 
-      /**
-       * update the structures for online processing
-       */
-      virtual bool updateStructure(const HyperGraph::VertexContainer& vset, const HyperGraph::EdgeSet& edges) = 0;
+  /**
+   * called by the optimizer if verbose. re-implement, if you want to print
+   * something
+   */
+  virtual void printVerbose(std::ostream& os) const { (void)os; };
 
-      /**
-       * called by the optimizer if verbose. re-implement, if you want to print something
-       */
-      virtual void printVerbose(std::ostream& os) const {(void) os;};
+  //! return the optimizer operating on
+  const SparseOptimizer* optimizer() const { return optimizer_; }
+  SparseOptimizer* optimizer() { return optimizer_; }
 
-      //! return the optimizer operating on
-      const SparseOptimizer* optimizer() const { return optimizer_;}
-      SparseOptimizer* optimizer() { return optimizer_;}
+  /**
+   * specify on which optimizer the solver should work on
+   */
+  void setOptimizer(SparseOptimizer* optimizer);
 
-      /**
-       * specify on which optimizer the solver should work on
-       */
-      void setOptimizer(SparseOptimizer* optimizer);
+  //! return the properties of the solver
+  const PropertyMap& properties() const { return properties_; }
 
-      //! return the properties of the solver
-      const PropertyMap& properties() const { return properties_;}
+  /**
+   * update the properties from a string, see PropertyMap::updateMapFromString()
+   */
+  bool updatePropertiesFromString(const std::string& propString);
 
-      /**
-       * update the properties from a string, see PropertyMap::updateMapFromString()
-       */
-      bool updatePropertiesFromString(const std::string& propString);
+  /**
+   * print the properties to a stream in a human readable fashion
+   */
+  void printProperties(std::ostream& os) const;
 
-      /**
-       * print the properties to a stream in a human readable fashion
-       */
-      void printProperties(std::ostream& os) const;
+ protected:
+  SparseOptimizer* optimizer_ =
+      nullptr;              ///< the optimizer the solver is working on
+  PropertyMap properties_;  ///< the properties of your solver, use this to
+                            ///< store the parameters of your solver
+};
 
-    protected:
-      SparseOptimizer* optimizer_ = nullptr;   ///< the optimizer the solver is working on
-      PropertyMap properties_;       ///< the properties of your solver, use this to store the parameters of your solver
-  };
-
-} // end namespace
+}  // namespace g2o
 
 #endif

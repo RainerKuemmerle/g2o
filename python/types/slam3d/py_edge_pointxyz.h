@@ -10,7 +10,8 @@ void declareEdgePointXYZ(py::module& m) {
   templatedBaseBinaryEdge<3, Vector3, VertexPointXYZ, VertexPointXYZ>(
       m, "_3_Vector3_VertexPointXYZ_VertexPointXYZ");
 
-  py::class_<EdgePointXYZ, BaseBinaryEdge<3, Vector3, VertexPointXYZ, VertexPointXYZ>,
+  py::class_<EdgePointXYZ,
+             BaseBinaryEdge<3, Vector3, VertexPointXYZ, VertexPointXYZ>,
              std::shared_ptr<EdgePointXYZ>>(m, "EdgePointXYZ")
       .def(py::init<>())
 

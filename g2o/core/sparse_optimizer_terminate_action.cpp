@@ -26,75 +26,73 @@
 
 #include "sparse_optimizer_terminate_action.h"
 
-#include "sparse_optimizer.h"
-
 #include <limits>
+
+#include "sparse_optimizer.h"
 
 namespace g2o {
 
-  SparseOptimizerTerminateAction::SparseOptimizerTerminateAction() :
-    HyperGraphAction(),
-    gainThreshold_(cst(1e-6)), 
-    maxIterations_(std::numeric_limits<int>::max())
-  {
-  }
+SparseOptimizerTerminateAction::SparseOptimizerTerminateAction()
+    : HyperGraphAction(),
+      gainThreshold_(cst(1e-6)),
+      maxIterations_(std::numeric_limits<int>::max()) {}
 
-  void SparseOptimizerTerminateAction::setGainThreshold(number_t gainThreshold)
-  {
-    gainThreshold_ = gainThreshold;
-  }
+void SparseOptimizerTerminateAction::setGainThreshold(number_t gainThreshold) {
+  gainThreshold_ = gainThreshold;
+}
 
-  bool SparseOptimizerTerminateAction::operator()(const HyperGraph* graph, Parameters* parameters)
-  {
-    assert(dynamic_cast<const SparseOptimizer*>(graph) && "graph is not a SparseOptimizer");
-    assert(dynamic_cast<HyperGraphAction::ParametersIteration*>(parameters) && "error casting parameters");
+bool SparseOptimizerTerminateAction::operator()(const HyperGraph* graph,
+                                                Parameters* parameters) {
+  assert(dynamic_cast<const SparseOptimizer*>(graph) &&
+         "graph is not a SparseOptimizer");
+  assert(dynamic_cast<HyperGraphAction::ParametersIteration*>(parameters) &&
+         "error casting parameters");
 
-    const auto* optimizer = static_cast<const SparseOptimizer*>(graph);
-    auto* params = static_cast<HyperGraphAction::ParametersIteration*>(parameters);
+  const auto* optimizer = static_cast<const SparseOptimizer*>(graph);
+  auto* params =
+      static_cast<HyperGraphAction::ParametersIteration*>(parameters);
 
-    const_cast<SparseOptimizer*>(optimizer)->computeActiveErrors();
-    if (params->iteration < 0)
-    {
-      // let the optimizer run for at least one iteration
-      // Hence, we reset the stop flag
-      setOptimizerStopFlag(optimizer, false);
-    } else if (params->iteration == 0) {
-      // first iteration, just store the chi2 value
-      lastChi_ = optimizer->activeRobustChi2();
+  const_cast<SparseOptimizer*>(optimizer)->computeActiveErrors();
+  if (params->iteration < 0) {
+    // let the optimizer run for at least one iteration
+    // Hence, we reset the stop flag
+    setOptimizerStopFlag(optimizer, false);
+  } else if (params->iteration == 0) {
+    // first iteration, just store the chi2 value
+    lastChi_ = optimizer->activeRobustChi2();
+  } else {
+    // compute the gain and stop the optimizer in case the
+    // gain is below the threshold or we reached the max
+    // number of iterations
+    bool stopOptimizer = false;
+    if (params->iteration < maxIterations_) {
+      number_t currentChi = optimizer->activeRobustChi2();
+      number_t gain = (lastChi_ - currentChi) / currentChi;
+      lastChi_ = currentChi;
+      if (gain >= 0 && gain < gainThreshold_) stopOptimizer = true;
     } else {
-      // compute the gain and stop the optimizer in case the
-      // gain is below the threshold or we reached the max
-      // number of iterations
-      bool stopOptimizer = false;
-      if (params->iteration < maxIterations_) {
-        number_t currentChi = optimizer->activeRobustChi2();
-        number_t gain = (lastChi_ - currentChi) / currentChi;
-        lastChi_ = currentChi;
-        if (gain >= 0 && gain < gainThreshold_)
-          stopOptimizer = true;
-      } else {
-        stopOptimizer = true;
-      }
-      if (stopOptimizer) { // tell the optimizer to stop
-        setOptimizerStopFlag(optimizer, true);
-      }
+      stopOptimizer = true;
     }
-    return true;
-  }
-
-  void SparseOptimizerTerminateAction::setMaxIterations(int maxit)
-  {
-    maxIterations_ = maxit;
-  }
-
-  void SparseOptimizerTerminateAction::setOptimizerStopFlag(const SparseOptimizer* optimizer, bool stop)
-  {
-    if (optimizer->forceStopFlag()) {
-      *(optimizer->forceStopFlag()) = stop;
-    } else {
-      auxTerminateFlag_ = stop;
-      const_cast<SparseOptimizer*>(optimizer)->setForceStopFlag(&auxTerminateFlag_);
+    if (stopOptimizer) {  // tell the optimizer to stop
+      setOptimizerStopFlag(optimizer, true);
     }
   }
+  return true;
+}
 
-} // end namespace
+void SparseOptimizerTerminateAction::setMaxIterations(int maxit) {
+  maxIterations_ = maxit;
+}
+
+void SparseOptimizerTerminateAction::setOptimizerStopFlag(
+    const SparseOptimizer* optimizer, bool stop) {
+  if (optimizer->forceStopFlag()) {
+    *(optimizer->forceStopFlag()) = stop;
+  } else {
+    auxTerminateFlag_ = stop;
+    const_cast<SparseOptimizer*>(optimizer)->setForceStopFlag(
+        &auxTerminateFlag_);
+  }
+}
+
+}  // namespace g2o

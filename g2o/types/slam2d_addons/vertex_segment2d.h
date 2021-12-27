@@ -36,13 +36,18 @@
 
 namespace g2o {
 
-class G2O_TYPES_SLAM2D_ADDONS_API VertexSegment2D : public BaseVertex<4, Vector4> {
+class G2O_TYPES_SLAM2D_ADDONS_API VertexSegment2D
+    : public BaseVertex<4, Vector4> {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
   VertexSegment2D();
 
-  Vector2 estimateP1() const { return Eigen::Map<const Vector2>(&(estimate_[0])); }
-  Vector2 estimateP2() const { return Eigen::Map<const Vector2>(&(estimate_[2])); }
+  Vector2 estimateP1() const {
+    return Eigen::Map<const Vector2>(&(estimate_[0]));
+  }
+  Vector2 estimateP2() const {
+    return Eigen::Map<const Vector2>(&(estimate_[2]));
+  }
   void setEstimateP1(const Vector2& p1) {
     Eigen::Map<Vector2> v(&estimate_[0]);
     v = p1;
@@ -68,9 +73,13 @@ class G2O_TYPES_SLAM2D_ADDONS_API VertexSegment2D : public BaseVertex<4, Vector4
 
   int estimateDimension() const override { return 4; }
 
-  bool setMinimalEstimateDataImpl(const number_t* est) override { return setEstimateData(est); }
+  bool setMinimalEstimateDataImpl(const number_t* est) override {
+    return setEstimateData(est);
+  }
 
-  bool getMinimalEstimateData(number_t* est) const override { return getEstimateData(est); }
+  bool getMinimalEstimateData(number_t* est) const override {
+    return getEstimateData(est);
+  }
 
   int minimalEstimateDimension() const override { return 4; }
 
@@ -83,23 +92,26 @@ class G2O_TYPES_SLAM2D_ADDONS_API VertexSegment2D : public BaseVertex<4, Vector4
   bool write(std::ostream& os) const override;
 };
 
-class G2O_TYPES_SLAM2D_ADDONS_API VertexSegment2DWriteGnuplotAction : public WriteGnuplotAction {
+class G2O_TYPES_SLAM2D_ADDONS_API VertexSegment2DWriteGnuplotAction
+    : public WriteGnuplotAction {
  public:
   VertexSegment2DWriteGnuplotAction();
   bool operator()(HyperGraph::HyperGraphElement* element,
-                          HyperGraphElementAction::Parameters* params_) override;
+                  HyperGraphElementAction::Parameters* params_) override;
 };
 
 #ifdef G2O_HAVE_OPENGL
-class G2O_TYPES_SLAM2D_ADDONS_API VertexSegment2DDrawAction : public DrawAction {
+class G2O_TYPES_SLAM2D_ADDONS_API VertexSegment2DDrawAction
+    : public DrawAction {
  public:
   VertexSegment2DDrawAction();
   bool operator()(HyperGraph::HyperGraphElement* element,
-                          HyperGraphElementAction::Parameters* params_) override;
+                  HyperGraphElementAction::Parameters* params_) override;
 
  protected:
   std::shared_ptr<FloatProperty> pointSize_;
-  bool refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_) override;
+  bool refreshPropertyPtrs(
+      HyperGraphElementAction::Parameters* params_) override;
 };
 #endif
 

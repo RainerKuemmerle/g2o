@@ -58,15 +58,18 @@ std::ostream& operator<<(std::ostream& os, const G2OBatchStatistics& st) {
   os << PTHING(timeQuadraticForm);  // construct the quadratic form in the graph
 
   // block_solver (constructs Ax=b, plus maybe schur);
-  os << PTHING(timeSchurComplement);  // compute schur complement (0 if not done);
+  os << PTHING(
+      timeSchurComplement);  // compute schur complement (0 if not done);
 
   // linear solver (computes Ax=b); );
-  os << PTHING(timeSymbolicDecomposition);  // symbolic decomposition (0 if not done);
-  os << PTHING(timeNumericDecomposition);   // numeric decomposition  (0 if not done);
-  os << PTHING(timeLinearSolution);         // total time for solving Ax=b
-  os << PTHING(iterationsLinearSolver);     // iterations of PCG
-  os << PTHING(timeUpdate);                 // oplus
-  os << PTHING(timeIteration);              // total time );
+  os << PTHING(
+      timeSymbolicDecomposition);  // symbolic decomposition (0 if not done);
+  os << PTHING(
+      timeNumericDecomposition);     // numeric decomposition  (0 if not done);
+  os << PTHING(timeLinearSolution);  // total time for solving Ax=b
+  os << PTHING(iterationsLinearSolver);  // iterations of PCG
+  os << PTHING(timeUpdate);              // oplus
+  os << PTHING(timeIteration);           // total time );
 
   os << PTHING(levenbergIterations);
   os << PTHING(timeLinearSolver);
@@ -80,6 +83,8 @@ std::ostream& operator<<(std::ostream& os, const G2OBatchStatistics& st) {
   return os;
 };
 
-void G2OBatchStatistics::setGlobalStats(G2OBatchStatistics* b) { globalStats_ = b; }
+void G2OBatchStatistics::setGlobalStats(G2OBatchStatistics* b) {
+  globalStats_ = b;
+}
 
 }  // namespace g2o

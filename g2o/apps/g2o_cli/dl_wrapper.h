@@ -27,8 +27,8 @@
 #ifndef G2O_DL_WRAPPER_H
 #define G2O_DL_WRAPPER_H
 
-#include <vector>
 #include <string>
+#include <vector>
 
 #ifdef WINDOWS
 #include <windows.h>
@@ -38,42 +38,42 @@
 
 namespace g2o {
 
+/**
+ * \brief Loading libraries during run-time
+ */
+class G2O_CLI_API DlWrapper {
+ public:
+  DlWrapper() = default;
+  virtual ~DlWrapper() = default;
+  DlWrapper(const DlWrapper&) = delete;
+  DlWrapper& operator=(const DlWrapper&) = delete;
+
   /**
-   * \brief Loading libraries during run-time
+   * open all libs from a directory matching a specific pattern.
+   * @return number of loaded libs
    */
-  class G2O_CLI_API DlWrapper
-  {
-    public:
-      DlWrapper() = default;
-      virtual ~DlWrapper() = default;
-      DlWrapper(const DlWrapper& ) = delete;
-      DlWrapper& operator=(const DlWrapper&) = delete;
+  int openLibraries(const std::string& directory,
+                    const std::string& pattern = "");
 
-      /**
-       * open all libs from a directory matching a specific pattern.
-       * @return number of loaded libs
-       */
-      int openLibraries(const std::string& directory, const std::string& pattern = "");
+  /**
+   * open a specific library
+   */
+  bool openLibrary(const std::string& filename);
 
-      /**
-       * open a specific library
-       */
-      bool openLibrary(const std::string& filename);
+  /**
+   * free all loaded libs, i.e., call dlclose()
+   */
+  void clear();
 
-      /**
-       * free all loaded libs, i.e., call dlclose()
-       */
-      void clear();
+ protected:
+#if defined(UNIX) || defined(CYGWIN)
+  std::vector<void*> handles_;
+#elif defined(WINDOWS)
+  std::vector<HMODULE> _handles;
+#endif
+  std::vector<std::string> filenames_;
+};
 
-    protected:
-# if defined (UNIX) || defined(CYGWIN)
-      std::vector<void*> handles_;
-#     elif defined (WINDOWS)
-      std::vector<HMODULE> _handles;
-#     endif
-      std::vector<std::string> filenames_;
-  };
-
-}
+}  // namespace g2o
 
 #endif

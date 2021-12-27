@@ -38,82 +38,76 @@
 
 namespace g2o {
 
-  /**
-   * \brief linear solver using dense cholesky decomposition
-   */
-  template <typename MatrixType>
-  class LinearSolverDense : public LinearSolver<MatrixType>
-  {
-    public:
-      LinearSolverDense() :
-        LinearSolver<MatrixType>()
-      {
-      }
+/**
+ * \brief linear solver using dense cholesky decomposition
+ */
+template <typename MatrixType>
+class LinearSolverDense : public LinearSolver<MatrixType> {
+ public:
+  LinearSolverDense() : LinearSolver<MatrixType>() {}
 
-      bool init() override
-      {
-        reset_ = true;
-        return true;
-      }
+  bool init() override {
+    reset_ = true;
+    return true;
+  }
 
-      bool solve(const SparseBlockMatrix<MatrixType>& A, number_t* x, number_t* b) override
-      {
-        int n = A.cols();
-        int m = A.cols();
+  bool solve(const SparseBlockMatrix<MatrixType>& A, number_t* x,
+             number_t* b) override {
+    int n = A.cols();
+    int m = A.cols();
 
-        MatrixX& H = H_;
-        if (H.cols() != n) {
-          H.resize(n, m);
-          reset_ = true;
-        }
-        if (reset_) {
-          reset_ = false;
-          H.setZero();
-        }
+    MatrixX& H = H_;
+    if (H.cols() != n) {
+      H.resize(n, m);
+      reset_ = true;
+    }
+    if (reset_) {
+      reset_ = false;
+      H.setZero();
+    }
 
-        // copy the sparse block matrix into a dense matrix
-        int c_idx = 0;
-        for (size_t i = 0; i < A.blockCols().size(); ++i) {
-          int c_size = A.colsOfBlock(i);
-          assert(c_idx == A.colBaseOfBlock(i) && "mismatch in block indices");
+    // copy the sparse block matrix into a dense matrix
+    int c_idx = 0;
+    for (size_t i = 0; i < A.blockCols().size(); ++i) {
+      int c_size = A.colsOfBlock(i);
+      assert(c_idx == A.colBaseOfBlock(i) && "mismatch in block indices");
 
-          const typename SparseBlockMatrix<MatrixType>::IntBlockMap& col = A.blockCols()[i];
-          if (col.size() > 0) {
-            typename SparseBlockMatrix<MatrixType>::IntBlockMap::const_iterator it;
-            for (it = col.begin(); it != col.end(); ++it) {
-              int r_idx = A.rowBaseOfBlock(it->first);
-              // only the upper triangular block is processed
-              if (it->first <= static_cast<int>(i)) {
-                int r_size = A.rowsOfBlock(it->first);
-                H.block(r_idx, c_idx, r_size, c_size) = *(it->second);
-                if (r_idx != c_idx) // write the lower triangular block
-                  H.block(c_idx, r_idx, c_size, r_size) = it->second->transpose();
-              }
-            }
+      const typename SparseBlockMatrix<MatrixType>::IntBlockMap& col =
+          A.blockCols()[i];
+      if (col.size() > 0) {
+        typename SparseBlockMatrix<MatrixType>::IntBlockMap::const_iterator it;
+        for (it = col.begin(); it != col.end(); ++it) {
+          int r_idx = A.rowBaseOfBlock(it->first);
+          // only the upper triangular block is processed
+          if (it->first <= static_cast<int>(i)) {
+            int r_size = A.rowsOfBlock(it->first);
+            H.block(r_idx, c_idx, r_size, c_size) = *(it->second);
+            if (r_idx != c_idx)  // write the lower triangular block
+              H.block(c_idx, r_idx, c_size, r_size) = it->second->transpose();
           }
-
-          c_idx += c_size;
         }
-
-        // solving via Cholesky decomposition
-        VectorX::MapType xvec(x, m);
-        VectorX::ConstMapType bvec(b, n);
-        cholesky_.compute(H);
-        if (cholesky_.isPositive()) {
-          xvec = cholesky_.solve(bvec);
-          return true;
-        }
-        return false;
       }
 
-    protected:
-      bool reset_ = true;
-      MatrixX H_;
-      Eigen::LDLT<MatrixX> cholesky_;
+      c_idx += c_size;
+    }
 
-  };
+    // solving via Cholesky decomposition
+    VectorX::MapType xvec(x, m);
+    VectorX::ConstMapType bvec(b, n);
+    cholesky_.compute(H);
+    if (cholesky_.isPositive()) {
+      xvec = cholesky_.solve(bvec);
+      return true;
+    }
+    return false;
+  }
 
+ protected:
+  bool reset_ = true;
+  MatrixX H_;
+  Eigen::LDLT<MatrixX> cholesky_;
+};
 
-}// end namespace
+}  // namespace g2o
 
 #endif

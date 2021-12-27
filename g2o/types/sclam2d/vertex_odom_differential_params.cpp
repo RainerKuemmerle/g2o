@@ -28,14 +28,12 @@
 
 namespace g2o {
 
-  bool VertexOdomDifferentialParams::read(std::istream& is)
-  {
-    return internal::readVector(is, estimate_);
-  }
-
-  bool VertexOdomDifferentialParams::write(std::ostream& os) const
-  {
-    return internal::writeVector(os, estimate());
-  }
-
+bool VertexOdomDifferentialParams::read(std::istream& is) {
+  return internal::readVector(is, estimate_);
 }
+
+bool VertexOdomDifferentialParams::write(std::ostream& os) const {
+  return internal::writeVector(os, estimate());
+}
+
+}  // namespace g2o

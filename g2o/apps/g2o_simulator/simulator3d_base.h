@@ -33,14 +33,14 @@
 
 namespace g2o {
 
-  using WorldObjectSE3 = WorldObject<VertexSE3>;
+using WorldObjectSE3 = WorldObject<VertexSE3>;
 
-  using WorldObjectTrackXYZ = WorldObject<VertexPointXYZ>;
+using WorldObjectTrackXYZ = WorldObject<VertexPointXYZ>;
 
-  using WorldObjectLine3D = WorldObject<VertexLine3D>;
+using WorldObjectLine3D = WorldObject<VertexLine3D>;
 
-  using Robot3D = Robot<WorldObjectSE3>;
+using Robot3D = Robot<WorldObjectSE3>;
 
-}
+}  // namespace g2o
 
 #endif

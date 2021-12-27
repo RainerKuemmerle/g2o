@@ -40,8 +40,8 @@ class G2O_TYPES_SLAM3D_API ParameterStereoCamera : public ParameterCamera {
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
   ParameterStereoCamera();
 
-  bool read(std::istream& is) override ;
-  bool write(std::ostream& os) const override ;
+  bool read(std::istream& is) override;
+  bool write(std::ostream& os) const override;
 
   void setBaseline(number_t baseline) { baseline_ = baseline; }
   number_t baseline() const { return baseline_; }
@@ -49,6 +49,6 @@ class G2O_TYPES_SLAM3D_API ParameterStereoCamera : public ParameterCamera {
  protected:
   number_t baseline_;
 };
-}   // namespace g2o
+}  // namespace g2o
 
 #endif

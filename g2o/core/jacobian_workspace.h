@@ -37,66 +37,70 @@
 
 namespace g2o {
 
-  struct OptimizableGraph;
+struct OptimizableGraph;
+
+/**
+ * \brief provide memory workspace for computing the Jacobians
+ *
+ * The workspace is used by an OptimizableGraph to provide temporary memory
+ * for computing the Jacobian of the error functions.
+ * Before calling linearizeOplus on an edge, the workspace needs to be allocated
+ * by calling allocate().
+ *
+ * By default, the sizes are updated incrementally with each call. If the reset
+ * flag is set to true, the counts are set back to
+ */
+class G2O_CORE_API JacobianWorkspace {
+ public:
+  using WorkspaceVector =
+      std::vector<VectorX, Eigen::aligned_allocator<VectorX>>;
+  JacobianWorkspace() = default;
+  ~JacobianWorkspace() = default;
 
   /**
-   * \brief provide memory workspace for computing the Jacobians
-   *
-   * The workspace is used by an OptimizableGraph to provide temporary memory
-   * for computing the Jacobian of the error functions.
-   * Before calling linearizeOplus on an edge, the workspace needs to be allocated
-   * by calling allocate().
-   *
-   * By default, the sizes are updated incrementally with each call. If the reset flag is set to true,
-   * the counts are set back to
+   * allocate the workspace
    */
-  class G2O_CORE_API JacobianWorkspace
-  {
-    public:
-      using WorkspaceVector = std::vector<VectorX, Eigen::aligned_allocator<VectorX>>;
-      JacobianWorkspace() = default;
-      ~JacobianWorkspace() = default;
+  bool allocate();
 
-      /**
-       * allocate the workspace
-       */
-      bool allocate();
+  /**
+   * update the maximum required workspace needed by taking into account this
+   * edge
+   */
+  void updateSize(const HyperGraph::Edge* e, bool reset = false);
 
-      /**
-       * update the maximum required workspace needed by taking into account this edge
-       */
-      void updateSize(const HyperGraph::Edge* e, bool reset = false);
+  /**
+   * update the required workspace by looking at a full graph
+   */
+  void updateSize(const OptimizableGraph& graph, bool reset = false);
 
-      /**
-       * update the required workspace by looking at a full graph
-       */
-      void updateSize(const OptimizableGraph& graph, bool reset = false);
+  /**
+   * manually update with the given parameters
+   */
+  void updateSize(int numVertices, int dimension, bool reset = false);
 
-      /**
-       * manually update with the given parameters
-       */
-      void updateSize(int numVertices, int dimension, bool reset = false);
+  /**
+   * set the full workspace to zero
+   */
+  void setZero();
 
-      /**
-       * set the full workspace to zero
-       */
-      void setZero();
+  /**
+   * return the workspace for a vertex in an edge
+   */
+  number_t* workspaceForVertex(int vertexIndex) {
+    assert(vertexIndex >= 0 && (size_t)vertexIndex < _workspace.size() &&
+           "Index out of bounds");
+    return workspace_[vertexIndex].data();
+  }
 
-      /**
-       * return the workspace for a vertex in an edge
-       */
-      number_t* workspaceForVertex(int vertexIndex)
-      {
-        assert(vertexIndex >= 0 && (size_t)vertexIndex < _workspace.size() && "Index out of bounds");
-        return workspace_[vertexIndex].data();
-      }
+ protected:
+  WorkspaceVector
+      workspace_;  ///< the memory pre-allocated for computing the Jacobians
+  int maxNumVertices_{
+      -1};  ///< the maximum number of vertices connected by a hyper-edge
+  int maxDimension_{
+      -1};  ///< the maximum dimension (number of elements) for a Jacobian
+};
 
-    protected:
-      WorkspaceVector workspace_;   ///< the memory pre-allocated for computing the Jacobians
-      int maxNumVertices_{-1};          ///< the maximum number of vertices connected by a hyper-edge
-      int maxDimension_{-1};            ///< the maximum dimension (number of elements) for a Jacobian
-  };
-
-} // end namespace
+}  // namespace g2o
 
 #endif

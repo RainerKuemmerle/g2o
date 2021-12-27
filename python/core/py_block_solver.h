@@ -25,7 +25,9 @@ class PyBlockSolverBase {
 
   virtual std::unique_ptr<Solver> solver() { return std::move(block_solver); };
 
-  virtual std::unique_ptr<BlockSolverBase> base_solver() { return std::move(block_base_solver); };
+  virtual std::unique_ptr<BlockSolverBase> base_solver() {
+    return std::move(block_base_solver);
+  };
 };
 
 namespace {
@@ -45,8 +47,9 @@ void templatedPyLinearSolver(py::module& m, const std::string& suffix) {
 
   py::class_<CLS>(m, ("LinearSolver" + suffix).c_str())
       .def(py::init<>())
-      .def("set_block_ordering",
-           [](CLS& ls, bool blockOrdering) { ls.solver->setBlockOrdering(blockOrdering); });
+      .def("set_block_ordering", [](CLS& ls, bool blockOrdering) {
+        ls.solver->setBlockOrdering(blockOrdering);
+      });
 }
 
 template <typename LinearSolverT, typename BlockSolverT>
@@ -62,41 +65,48 @@ class PyBlockSolver : public PyBlockSolverBase {
   std::unique_ptr<BlockSolverT> block_solver;
 
 #if G2O_HAVE_CHOLMOD
-  PyBlockSolver(PyLinearSolver<g2o::LinearSolverCholmod<typename BlockSolverT::PoseMatrixType>,
-                               BlockSolverT>& linearSolver)
+  PyBlockSolver(PyLinearSolver<
+                g2o::LinearSolverCholmod<typename BlockSolverT::PoseMatrixType>,
+                BlockSolverT>& linearSolver)
       : block_solver(g2o::make_unique<BlockSolverT>(
             (std::unique_ptr<typename BlockSolverT::LinearSolverType>)std::move(
                 linearSolver.solver))){};
 #endif
 
 #if G2O_HAVE_CSPARSE
-  PyBlockSolver(PyLinearSolver<g2o::LinearSolverCSparse<typename BlockSolverT::PoseMatrixType>,
-                               BlockSolverT>& linearSolver)
+  PyBlockSolver(PyLinearSolver<
+                g2o::LinearSolverCSparse<typename BlockSolverT::PoseMatrixType>,
+                BlockSolverT>& linearSolver)
       : block_solver(g2o::make_unique<BlockSolverT>(
             (std::unique_ptr<typename BlockSolverT::LinearSolverType>)std::move(
                 linearSolver.solver))){};
 #endif
 
-  PyBlockSolver(PyLinearSolver<g2o::LinearSolverEigen<typename BlockSolverT::PoseMatrixType>,
-                               BlockSolverT>& linearSolver)
+  PyBlockSolver(PyLinearSolver<
+                g2o::LinearSolverEigen<typename BlockSolverT::PoseMatrixType>,
+                BlockSolverT>& linearSolver)
       : block_solver(g2o::make_unique<BlockSolverT>(
             (std::unique_ptr<typename BlockSolverT::LinearSolverType>)std::move(
                 linearSolver.solver))){};
 
-  PyBlockSolver(PyLinearSolver<g2o::LinearSolverDense<typename BlockSolverT::PoseMatrixType>,
-                               BlockSolverT>& linearSolver)
+  PyBlockSolver(PyLinearSolver<
+                g2o::LinearSolverDense<typename BlockSolverT::PoseMatrixType>,
+                BlockSolverT>& linearSolver)
       : block_solver(g2o::make_unique<BlockSolverT>(
             (std::unique_ptr<typename BlockSolverT::LinearSolverType>)std::move(
                 linearSolver.solver))){};
 
-  PyBlockSolver(PyLinearSolver<g2o::LinearSolverPCG<typename BlockSolverT::PoseMatrixType>,
-                               BlockSolverT>& linearSolver)
+  PyBlockSolver(PyLinearSolver<
+                g2o::LinearSolverPCG<typename BlockSolverT::PoseMatrixType>,
+                BlockSolverT>& linearSolver)
       : block_solver(g2o::make_unique<BlockSolverT>(
             (std::unique_ptr<typename BlockSolverT::LinearSolverType>)std::move(
                 linearSolver.solver))){};
 
   std::unique_ptr<Solver> solver() { return std::move(block_solver); };
-  std::unique_ptr<BlockSolverBase> base_solver() { return std::move(block_solver); };
+  std::unique_ptr<BlockSolverBase> base_solver() {
+    return std::move(block_solver);
+  };
 };
 
 template <typename BlockSolverT>
@@ -105,19 +115,24 @@ void templatedPyBlockSolver(py::module& m, const std::string& suffix) {
 
   py::class_<CLS, PyBlockSolverBase>(m, ("BlockSolver" + suffix).c_str())
 #if G2O_HAVE_CHOLMOD
-      .def(py::init<PyLinearSolver<g2o::LinearSolverCholmod<typename BlockSolverT::PoseMatrixType>,
-                                   BlockSolverT>&>())
+      .def(py::init<PyLinearSolver<
+               g2o::LinearSolverCholmod<typename BlockSolverT::PoseMatrixType>,
+               BlockSolverT>&>())
 #endif
 #if G2O_HAVE_CSPARSE
-      .def(py::init<PyLinearSolver<g2o::LinearSolverCSparse<typename BlockSolverT::PoseMatrixType>,
-                                   BlockSolverT>&>())
+      .def(py::init<PyLinearSolver<
+               g2o::LinearSolverCSparse<typename BlockSolverT::PoseMatrixType>,
+               BlockSolverT>&>())
 #endif
-      .def(py::init<PyLinearSolver<g2o::LinearSolverEigen<typename BlockSolverT::PoseMatrixType>,
-                                   BlockSolverT>&>())
-      .def(py::init<PyLinearSolver<g2o::LinearSolverDense<typename BlockSolverT::PoseMatrixType>,
-                                   BlockSolverT>&>())
-      .def(py::init<PyLinearSolver<g2o::LinearSolverPCG<typename BlockSolverT::PoseMatrixType>,
-                                   BlockSolverT>&>());
+      .def(py::init<PyLinearSolver<
+               g2o::LinearSolverEigen<typename BlockSolverT::PoseMatrixType>,
+               BlockSolverT>&>())
+      .def(py::init<PyLinearSolver<
+               g2o::LinearSolverDense<typename BlockSolverT::PoseMatrixType>,
+               BlockSolverT>&>())
+      .def(py::init<PyLinearSolver<
+               g2o::LinearSolverPCG<typename BlockSolverT::PoseMatrixType>,
+               BlockSolverT>&>());
 }
 
 }  // namespace

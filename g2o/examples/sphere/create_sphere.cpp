@@ -36,8 +36,7 @@
 #include "g2o/types/slam3d/edge_se3.h"
 #include "g2o/types/slam3d/vertex_se3.h"
 
-namespace g2o
-{
+namespace g2o {
 
 static int create_sphere(int argc, char** argv) {
   // command line parsing
@@ -50,16 +49,21 @@ static int create_sphere(int argc, char** argv) {
   std::string outFilename;
   CommandArgs arg;
   arg.param("o", outFilename, "-", "output filename");
-  arg.param("nodesPerLevel", nodesPerLevel, 50, "how many nodes per lap on the sphere");
-  arg.param("laps", numLaps, 50, "how many times the robot travels around the sphere");
+  arg.param("nodesPerLevel", nodesPerLevel, 50,
+            "how many nodes per lap on the sphere");
+  arg.param("laps", numLaps, 50,
+            "how many times the robot travels around the sphere");
   arg.param("radius", radius, 100., "radius of the sphere");
   arg.param("noiseTranslation", noiseTranslation, std::vector<double>(),
-            "set the noise level for the translation, separated by semicolons without spaces e.g: "
+            "set the noise level for the translation, separated by semicolons "
+            "without spaces e.g: "
             "\"0.1;0.1;0.1\"");
   arg.param("noiseRotation", noiseRotation, std::vector<double>(),
-            "set the noise level for the rotation, separated by semicolons without spaces e.g: "
+            "set the noise level for the rotation, separated by semicolons "
+            "without spaces e.g: "
             "\"0.001;0.001;0.001\"");
-  arg.param("randomSeed", randomSeed, false, "use a randomized seed for generating the sphere");
+  arg.param("randomSeed", randomSeed, false,
+            "use a randomized seed for generating the sphere");
   arg.parseArgs(argc, argv);
 
   if (noiseTranslation.empty()) {
@@ -82,7 +86,8 @@ static int create_sphere(int argc, char** argv) {
   std::cerr << std::endl;
 
   Eigen::Matrix3d transNoise = Eigen::Matrix3d::Zero();
-  for (int i = 0; i < 3; ++i) transNoise(i, i) = std::pow(noiseTranslation[i], 2);
+  for (int i = 0; i < 3; ++i)
+    transNoise(i, i) = std::pow(noiseTranslation[i], 2);
 
   Eigen::Matrix3d rotNoise = Eigen::Matrix3d::Zero();
   for (int i = 0; i < 3; ++i) rotNoise(i, i) = std::pow(noiseRotation[i], 2);
@@ -100,9 +105,11 @@ static int create_sphere(int argc, char** argv) {
       auto v = std::make_shared<VertexSE3>();
       v->setId(id++);
 
-      Eigen::AngleAxisd rotz(-M_PI + 2 * n * M_PI / nodesPerLevel, Eigen::Vector3d::UnitZ());
-      Eigen::AngleAxisd roty(-0.5 * M_PI + id * M_PI / (numLaps * nodesPerLevel),
-                             Eigen::Vector3d::UnitY());
+      Eigen::AngleAxisd rotz(-M_PI + 2 * n * M_PI / nodesPerLevel,
+                             Eigen::Vector3d::UnitZ());
+      Eigen::AngleAxisd roty(
+          -0.5 * M_PI + id * M_PI / (numLaps * nodesPerLevel),
+          Eigen::Vector3d::UnitY());
       Eigen::Matrix3d rot = (rotz * roty).toRotationMatrix();
 
       Eigen::Isometry3d t;
@@ -163,7 +170,7 @@ static int create_sphere(int argc, char** argv) {
   }
 
   // noise for all the edges
-  for (auto & e : edges) {
+  for (auto& e : edges) {
     Eigen::Quaterniond gtQuat = Eigen::Quaterniond(e->measurement().linear());
     Eigen::Vector3d gtTrans = e->measurement().translation();
 
@@ -185,7 +192,7 @@ static int create_sphere(int argc, char** argv) {
   }
 
   // concatenate all the odometry constraints to compute the initial state
-  for (auto & e : odometryEdges) {
+  for (auto& e : odometryEdges) {
     auto from = std::static_pointer_cast<VertexSE3>(e->vertex(0));
     VertexSE3* to = static_cast<VertexSE3*>(e->vertex(1).get());
     HyperGraph::VertexSet aux;
@@ -206,14 +213,14 @@ static int create_sphere(int argc, char** argv) {
   std::string edgeTag = Factory::instance()->tag(edges[0].get());
 
   std::ostream& fout = outFilename != "-" ? fileOutputStream : std::cout;
-  for (auto & vertice : vertices) {
+  for (auto& vertice : vertices) {
     VertexSE3* v = vertice.get();
     fout << vertexTag << " " << v->id() << " ";
     v->write(fout);
     fout << std::endl;
   }
 
-  for (auto & edge : edges) {
+  for (auto& edge : edges) {
     EdgeSE3* e = edge.get();
     VertexSE3* from = static_cast<VertexSE3*>(e->vertex(0).get());
     VertexSE3* to = static_cast<VertexSE3*>(e->vertex(1).get());
@@ -224,8 +231,6 @@ static int create_sphere(int argc, char** argv) {
 
   return 0;
 }
-} // namespace g2o
+}  // namespace g2o
 
-int main(int argc, char** argv) {
-  return g2o::create_sphere(argc, argv);
-}
+int main(int argc, char** argv) { return g2o::create_sphere(argc, argv); }

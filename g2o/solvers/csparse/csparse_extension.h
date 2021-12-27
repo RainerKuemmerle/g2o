@@ -30,18 +30,21 @@
 
 namespace g2o {
 
-  namespace csparse_extension {
+namespace csparse_extension {
 
 // our extensions to csparse
 // Copyright (C) 2011 R. Kuemmerle, G. Grisetti, W. Burgard
-  /**
-   * Originally from CSparse, avoid memory re-allocations by giving workspace pointers
-   * CSparse: Copyright (c) 2006-2011, Timothy A. Davis.
-   */
-G2O_CSPARSE_EXTENSION_API csn* cs_chol_workspace (const cs *A, const css *S, int* cin, number_t* xin);
-G2O_CSPARSE_EXTENSION_API int cs_cholsolsymb(const cs *A, number_t *b, const css* S, number_t* x, int* work);
+/**
+ * Originally from CSparse, avoid memory re-allocations by giving workspace
+ * pointers CSparse: Copyright (c) 2006-2011, Timothy A. Davis.
+ */
+G2O_CSPARSE_EXTENSION_API csn* cs_chol_workspace(const cs* A, const css* S,
+                                                 int* cin, number_t* xin);
+G2O_CSPARSE_EXTENSION_API int cs_cholsolsymb(const cs* A, number_t* b,
+                                             const css* S, number_t* x,
+                                             int* work);
 
-} // end namespace
-} // end namespace
+}  // namespace csparse_extension
+}  // namespace g2o
 
 #endif

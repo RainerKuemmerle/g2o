@@ -28,9 +28,7 @@
 
 namespace g2o {
 
-EdgeSE3LotsOfXYZ::EdgeSE3LotsOfXYZ()   {
-  resize(0);
-}
+EdgeSE3LotsOfXYZ::EdgeSE3LotsOfXYZ() { resize(0); }
 
 bool EdgeSE3LotsOfXYZ::setMeasurementFromState() {
   auto *pose = static_cast<VertexSE3 *>(vertexRaw(0));
@@ -65,7 +63,7 @@ void EdgeSE3LotsOfXYZ::computeError() {
 }
 
 void EdgeSE3LotsOfXYZ::linearizeOplus() {
-  auto *pose = static_cast<g2o::VertexSE3*>(vertexRaw(0));
+  auto *pose = static_cast<g2o::VertexSE3 *>(vertexRaw(0));
 
   // initialize Ji matrix
   MatrixX Ji;
@@ -76,7 +74,7 @@ void EdgeSE3LotsOfXYZ::linearizeOplus() {
   Matrix3 poseRot = pose->estimate().inverse().rotation();
 
   for (unsigned int i = 1; i < vertices_.size(); i++) {
-    auto *point = static_cast<g2o::VertexPointXYZ*>(vertexRaw(i));
+    auto *point = static_cast<g2o::VertexPointXYZ *>(vertexRaw(i));
     Vector3 Zcam = pose->estimate().inverse() * point->estimate();
 
     unsigned int index = 3 * (i - 1);
@@ -115,7 +113,8 @@ bool EdgeSE3LotsOfXYZ::read(std::istream &is) {
   // read the measurements
   for (unsigned int i = 0; i < observedPoints_; i++) {
     unsigned int index = 3 * i;
-    is >> measurement_[index] >> measurement_[index + 1] >> measurement_[index + 2];
+    is >> measurement_[index] >> measurement_[index + 1] >>
+        measurement_[index + 2];
   }
 
   // read the information matrix
@@ -140,7 +139,8 @@ bool EdgeSE3LotsOfXYZ::write(std::ostream &os) const {
   // write measurements
   for (unsigned int i = 0; i < observedPoints_; i++) {
     unsigned int index = 3 * i;
-    os << " " << measurement_[index] << " " << measurement_[index + 1] << " " << measurement_[index + 2];
+    os << " " << measurement_[index] << " " << measurement_[index + 1] << " "
+       << measurement_[index + 2];
   }
 
   // write information matrix
@@ -152,10 +152,12 @@ bool EdgeSE3LotsOfXYZ::write(std::ostream &os) const {
   return os.good();
 }
 
-void EdgeSE3LotsOfXYZ::initialEstimate(const OptimizableGraph::VertexSet &fixed, OptimizableGraph::Vertex *toEstimate) {
+void EdgeSE3LotsOfXYZ::initialEstimate(const OptimizableGraph::VertexSet &fixed,
+                                       OptimizableGraph::Vertex *toEstimate) {
   (void)toEstimate;
 
-  assert(initialEstimatePossible(fixed, toEstimate) && "Bad vertices specified");
+  assert(initialEstimatePossible(fixed, toEstimate) &&
+         "Bad vertices specified");
 
   auto *pose = static_cast<VertexSE3 *>(vertexRaw(0));
 
@@ -168,7 +170,7 @@ void EdgeSE3LotsOfXYZ::initialEstimate(const OptimizableGraph::VertexSet &fixed,
   }
 #endif
 
-  for (const auto & it : fixed) {
+  for (const auto &it : fixed) {
     for (unsigned int i = 1; i < vertices_.size(); i++) {
       auto *vert = static_cast<VertexPointXYZ *>(vertexRaw(i));
       if (vert->id() == it->id()) estimate_this[i - 1] = false;
@@ -178,18 +180,20 @@ void EdgeSE3LotsOfXYZ::initialEstimate(const OptimizableGraph::VertexSet &fixed,
   for (unsigned int i = 1; i < vertices_.size(); i++) {
     if (estimate_this[i - 1]) {
       unsigned int index = 3 * (i - 1);
-      Vector3 submeas(measurement_[index], measurement_[index + 1], measurement_[index + 2]);
+      Vector3 submeas(measurement_[index], measurement_[index + 1],
+                      measurement_[index + 2]);
       auto *vert = static_cast<VertexPointXYZ *>(vertexRaw(i));
       vert->setEstimate(pose->estimate() * submeas);
     }
   }
 }
 
-number_t EdgeSE3LotsOfXYZ::initialEstimatePossible(const OptimizableGraph::VertexSet &fixed,
-                                                   OptimizableGraph::Vertex *toEstimate) {
+number_t EdgeSE3LotsOfXYZ::initialEstimatePossible(
+    const OptimizableGraph::VertexSet &fixed,
+    OptimizableGraph::Vertex *toEstimate) {
   (void)toEstimate;
 
-  for (const auto & it : fixed) {
+  for (const auto &it : fixed) {
     if (vertexRaw(0)->id() == it->id()) {
       return 1.0;
     }

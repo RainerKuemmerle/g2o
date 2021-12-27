@@ -1,7 +1,7 @@
 #include <iostream>
 
-#include "g2o/types/slam3d/isometry3d_mappings.h"
 #include "g2o/types/slam3d/isometry3d_gradients.h"
+#include "g2o/types/slam3d/isometry3d_mappings.h"
 #include "g2o/types/slam3d_addons/types_slam3d_addons.h"
 
 using namespace std;
@@ -11,7 +11,7 @@ using namespace g2o::internal;
 
 template <typename T>
 ostream& printVector(ostream& os, const T& t) {
-  for(int i = 0; i < t.rows(); ++i) {
+  for (int i = 0; i < t.rows(); ++i) {
     os << t(i) << " ";
   }
   return os;
@@ -45,7 +45,8 @@ int main(int /*argc*/, char** /*argv*/) {
   std::cout << "l1: " << std::endl;
   printPlueckerLine(std::cout, l1);
   std::cout << "azimuth: " << g2o::internal::getAzimuth(l1.d()) << std::endl;
-  std::cout << "elevation: " << g2o::internal::getElevation(l1.d()) << std::endl;
+  std::cout << "elevation: " << g2o::internal::getElevation(l1.d())
+            << std::endl;
   std::cout << std::endl;
 
   Line3D l2(l1);
@@ -54,12 +55,14 @@ int main(int /*argc*/, char** /*argv*/) {
   std::cout << std::endl;
 
   Eigen::Vector4d mv = l2.ominus(l1);
-  Eigen::Quaterniond q(sqrt(1 - mv.head<3>().squaredNorm()), mv.x(), mv.y(), mv.z());
+  Eigen::Quaterniond q(sqrt(1 - mv.head<3>().squaredNorm()), mv.x(), mv.y(),
+                       mv.z());
   Eigen::Vector3d euler_angles = q.toRotationMatrix().eulerAngles(2, 1, 0);
   double yaw = euler_angles[0];
   double pitch = euler_angles[1];
-  double roll = euler_angles[2];  
-  std::cout << "l1 ominus l2: " << roll << " " << pitch << " " << yaw << " " << mv[3] << std::endl;
+  double roll = euler_angles[2];
+  std::cout << "l1 ominus l2: " << roll << " " << pitch << " " << yaw << " "
+            << mv[3] << std::endl;
   std::cout << std::endl;
 
   v << 0.0, 0.0, 1.0, 0.5, 0.5, 0.0;
@@ -68,27 +71,31 @@ int main(int /*argc*/, char** /*argv*/) {
   std::cout << "l1: " << std::endl;
   printPlueckerLine(std::cout, l1);
   std::cout << "azimuth: " << g2o::internal::getAzimuth(l1.d()) << std::endl;
-  std::cout << "elevation: " << g2o::internal::getElevation(l1.d()) << std::endl;
+  std::cout << "elevation: " << g2o::internal::getElevation(l1.d())
+            << std::endl;
   std::cout << std::endl;
-  
+
   v << 0.0, 0.0, 1.0, 0.5, -0.5, 0.0;
   l2 = Line3D(v);
   l2.normalize();
   std::cout << "l2: " << std::endl;
   printPlueckerLine(std::cout, l2);
   std::cout << "azimuth: " << g2o::internal::getAzimuth(l2.d()) << std::endl;
-  std::cout << "elevation: " << g2o::internal::getElevation(l2.d()) << std::endl;
+  std::cout << "elevation: " << g2o::internal::getElevation(l2.d())
+            << std::endl;
   std::cout << std::endl;
 
   mv = l2.ominus(l1);
-  q = Eigen::Quaterniond(sqrt(1 - mv.head<3>().squaredNorm()), mv.x(), mv.y(), mv.z());
+  q = Eigen::Quaterniond(sqrt(1 - mv.head<3>().squaredNorm()), mv.x(), mv.y(),
+                         mv.z());
   euler_angles = q.toRotationMatrix().eulerAngles(2, 1, 0);
   yaw = euler_angles[0];
   pitch = euler_angles[1];
-  roll = euler_angles[2];  
-  std::cout << "l1 ominus l2: " << roll << " " << pitch << " " << yaw << " " << mv[3] << std::endl;
+  roll = euler_angles[2];
+  std::cout << "l1 ominus l2: " << roll << " " << pitch << " " << yaw << " "
+            << mv[3] << std::endl;
   std::cout << std::endl;
-  
+
   Line3D l3 = Line3D(l1);
   std::cout << "l3: " << std::endl;
   printPlueckerLine(std::cout, l3);
@@ -111,11 +118,11 @@ int main(int /*argc*/, char** /*argv*/) {
   ll.normalize();
   l.push_back(ll);
 
-  for(size_t i = 0; i < l.size(); ++i) {
+  for (size_t i = 0; i < l.size(); ++i) {
     Line3D& line = l[i];
-    std::cout << "line: "
-	      << line.d()[0] << " " << line.d()[1] << " "  << line.d()[2] << " "
-	      << line.w()[0] << " " << line.w()[1] << " "  << line.w()[2] << std::endl;
+    std::cout << "line: " << line.d()[0] << " " << line.d()[1] << " "
+              << line.d()[2] << " " << line.w()[0] << " " << line.w()[1] << " "
+              << line.w()[2] << std::endl;
   }
   std::cout << std::endl;
 
@@ -124,15 +131,15 @@ int main(int /*argc*/, char** /*argv*/) {
   std::cout << "R: " << std::endl << T.linear() << std::endl;
   std::cout << "t: " << std::endl << T.translation() << std::endl;
   std::cout << std::endl;
-  
-  for(size_t i = 0; i < l.size(); ++i) {
+
+  for (size_t i = 0; i < l.size(); ++i) {
     Line3D& line = l[i];
     line = T * line;
-    std::cout << "line: "
-	      << line.d()[0] << " " << line.d()[1] << " " << line.d()[2] << " "
-	      << line.w()[0] << " " << line.w()[1] << " " << line.w()[2] << std::endl;
+    std::cout << "line: " << line.d()[0] << " " << line.d()[1] << " "
+              << line.d()[2] << " " << line.w()[0] << " " << line.w()[1] << " "
+              << line.w()[2] << std::endl;
   }
   std::cout << std::endl;
-  
+
   return 0;
 }

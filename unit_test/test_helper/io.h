@@ -66,7 +66,8 @@ struct OptionalPtr {
 template <typename T>
 struct RandomEstimate {
   static typename T::EstimateType create() { return T::EstimateType::Random(); }
-  static bool isApprox(const typename T::EstimateType& a, const typename T::EstimateType& b) {
+  static bool isApprox(const typename T::EstimateType& a,
+                       const typename T::EstimateType& b) {
     return a.isApprox(b, 1e-5);
   }
 };
@@ -74,18 +75,20 @@ struct RandomEstimate {
 template <typename T>
 struct RandomMeasurement {
   static typename T::Measurement create() { return T::Measurement::Random(); }
-  static bool isApprox(const typename T::Measurement& a, const typename T::Measurement& b) {
+  static bool isApprox(const typename T::Measurement& a,
+                       const typename T::Measurement& b) {
     return a.isApprox(b, 1e-5);
   }
 };
 
 template <typename T, typename RandomEstimateFunctor = RandomEstimate<T>>
-void readWriteVectorBasedVertex(OptionalPtr<T> outputVertex = OptionalPtr<T>()) {
+void readWriteVectorBasedVertex(
+    OptionalPtr<T> outputVertex = OptionalPtr<T>()) {
   outputVertex.ptr->setEstimate(RandomEstimateFunctor::create());
   T inputVertex;
   readWriteGraphElement(*outputVertex.ptr, &inputVertex);
-  ASSERT_TRUE(
-      RandomEstimateFunctor::isApprox(outputVertex.ptr->estimate(), inputVertex.estimate()));
+  ASSERT_TRUE(RandomEstimateFunctor::isApprox(outputVertex.ptr->estimate(),
+                                              inputVertex.estimate()));
 }
 
 template <typename T, typename RandomMeasurementFunctor = RandomMeasurement<T>>
@@ -94,9 +97,10 @@ void readWriteVectorBasedEdge(OptionalPtr<T> outputEdge = OptionalPtr<T>()) {
   randomizeInformationMatrix(outputEdge.ptr->information());
   T inputEdge;
   readWriteGraphElement(*outputEdge.ptr, &inputEdge);
+  ASSERT_TRUE(RandomMeasurementFunctor::isApprox(outputEdge.ptr->measurement(),
+                                                 inputEdge.measurement()));
   ASSERT_TRUE(
-      RandomMeasurementFunctor::isApprox(outputEdge.ptr->measurement(), inputEdge.measurement()));
-  ASSERT_TRUE(outputEdge.ptr->information().isApprox(inputEdge.information(), 1e-5));
+      outputEdge.ptr->information().isApprox(inputEdge.information(), 1e-5));
   ASSERT_TRUE(outputEdge.ptr->parameterIds() == inputEdge.parameterIds());
 }
 

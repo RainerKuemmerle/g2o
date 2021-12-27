@@ -25,36 +25,33 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "edge_xyz_prior.h"
+
 #include <iostream>
 
 namespace g2o {
 
-  EdgeXYZPrior::EdgeXYZPrior()  {
-    information().setIdentity();
-  }
+EdgeXYZPrior::EdgeXYZPrior() { information().setIdentity(); }
 
-  bool EdgeXYZPrior::read(std::istream& is) {
-    internal::readVector(is, measurement_);
-    return readInformationMatrix(is);
-  }
-
-  bool EdgeXYZPrior::write(std::ostream& os) const {
-    internal::writeVector(os, measurement());
-    return writeInformationMatrix(os);
-  }
-
-  void EdgeXYZPrior::computeError() {
-    const VertexPointXYZ* v = vertexXnRaw<0>();
-    error_ = v->estimate() - measurement_;
-  }
-
-  void EdgeXYZPrior::linearizeOplus(){
-      jacobianOplusXi_ = Matrix3::Identity();
-  }
-
-  bool EdgeXYZPrior::setMeasurementFromState(){
-      const VertexPointXYZ* v = vertexXnRaw<0>();
-      measurement_ = v->estimate();
-      return true;
-  }
+bool EdgeXYZPrior::read(std::istream& is) {
+  internal::readVector(is, measurement_);
+  return readInformationMatrix(is);
 }
+
+bool EdgeXYZPrior::write(std::ostream& os) const {
+  internal::writeVector(os, measurement());
+  return writeInformationMatrix(os);
+}
+
+void EdgeXYZPrior::computeError() {
+  const VertexPointXYZ* v = vertexXnRaw<0>();
+  error_ = v->estimate() - measurement_;
+}
+
+void EdgeXYZPrior::linearizeOplus() { jacobianOplusXi_ = Matrix3::Identity(); }
+
+bool EdgeXYZPrior::setMeasurementFromState() {
+  const VertexPointXYZ* v = vertexXnRaw<0>();
+  measurement_ = v->estimate();
+  return true;
+}
+}  // namespace g2o

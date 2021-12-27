@@ -27,63 +27,65 @@
 #ifndef G2O_EDGE_SE2_SENSOR_CALIB_H
 #define G2O_EDGE_SE2_SENSOR_CALIB_H
 
-#include "g2o_types_sclam2d_api.h"
 #include "g2o/core/base_fixed_sized_edge.h"
 #include "g2o/types/slam2d/vertex_se2.h"
+#include "g2o_types_sclam2d_api.h"
 
 namespace g2o {
 
-  /**
-   * \brief scanmatch measurement that also calibrates an offset for the laser
-   */
-  class G2O_TYPES_SCLAM2D_API EdgeSE2SensorCalib : public BaseFixedSizedEdge<3, SE2, VertexSE2, VertexSE2, VertexSE2>
-  {
-    public:
-      EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
+/**
+ * \brief scanmatch measurement that also calibrates an offset for the laser
+ */
+class G2O_TYPES_SCLAM2D_API EdgeSE2SensorCalib
+    : public BaseFixedSizedEdge<3, SE2, VertexSE2, VertexSE2, VertexSE2> {
+ public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
 
-      void computeError() override
-      {
-        const VertexSE2* v1          = vertexXnRaw<0>();
-        const VertexSE2* v2          = vertexXnRaw<1>();
-        const VertexSE2* laserOffset = vertexXnRaw<2>();
-        const SE2& x1 = v1->estimate();
-        const SE2& x2 = v2->estimate();
-        SE2 delta = inverseMeasurement_ * ((x1 * laserOffset->estimate()).inverse() * x2 * laserOffset->estimate());
-        error_ = delta.toVector();
-      }
+  void computeError() override {
+    const VertexSE2* v1 = vertexXnRaw<0>();
+    const VertexSE2* v2 = vertexXnRaw<1>();
+    const VertexSE2* laserOffset = vertexXnRaw<2>();
+    const SE2& x1 = v1->estimate();
+    const SE2& x2 = v2->estimate();
+    SE2 delta =
+        inverseMeasurement_ * ((x1 * laserOffset->estimate()).inverse() * x2 *
+                               laserOffset->estimate());
+    error_ = delta.toVector();
+  }
 
-      void setMeasurement(const SE2& m) override{
-        measurement_ = m;
-        inverseMeasurement_ = m.inverse();
-      }
+  void setMeasurement(const SE2& m) override {
+    measurement_ = m;
+    inverseMeasurement_ = m.inverse();
+  }
 
-      number_t initialEstimatePossible(const OptimizableGraph::VertexSet& from,
-                                               OptimizableGraph::Vertex* to) override {
-        if (from.count(vertices_[2]) == 1  // need the laser offset
-            && ((from.count(vertices_[0]) == 1 && to == vertices_[1].get()) ||
-                ((from.count(vertices_[1]) == 1 && to == vertices_[0].get())))) {
-          return 1.0;
-        }
-        return -1.0;
-      }
-      void initialEstimate(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to) override;
+  number_t initialEstimatePossible(const OptimizableGraph::VertexSet& from,
+                                   OptimizableGraph::Vertex* to) override {
+    if (from.count(vertices_[2]) == 1  // need the laser offset
+        && ((from.count(vertices_[0]) == 1 && to == vertices_[1].get()) ||
+            ((from.count(vertices_[1]) == 1 && to == vertices_[0].get())))) {
+      return 1.0;
+    }
+    return -1.0;
+  }
+  void initialEstimate(const OptimizableGraph::VertexSet& from,
+                       OptimizableGraph::Vertex* to) override;
 
-      bool read(std::istream& is) override;
-      bool write(std::ostream& os) const override;
+  bool read(std::istream& is) override;
+  bool write(std::ostream& os) const override;
 
-    protected:
-      SE2 inverseMeasurement_;
-  };
+ protected:
+  SE2 inverseMeasurement_;
+};
 
 #ifdef G2O_HAVE_OPENGL
-  class EdgeSE2SensorCalibDrawAction: public DrawAction {
-  public:
-    EdgeSE2SensorCalibDrawAction();
-    bool operator()(HyperGraph::HyperGraphElement* element,
-                            HyperGraphElementAction::Parameters* params_) override;
-  };
+class EdgeSE2SensorCalibDrawAction : public DrawAction {
+ public:
+  EdgeSE2SensorCalibDrawAction();
+  bool operator()(HyperGraph::HyperGraphElement* element,
+                  HyperGraphElementAction::Parameters* params_) override;
+};
 #endif
 
-} // end namespace
+}  // namespace g2o
 
 #endif

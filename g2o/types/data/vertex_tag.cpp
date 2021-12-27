@@ -29,75 +29,76 @@
 #include "g2o/stuff/macros.h"
 
 #ifdef G2O_HAVE_OPENGL
-#include "g2o/stuff/opengl_wrapper.h"
-#include "g2o/stuff/opengl_primitives.h"
 #include "g2o/EXTERNAL/freeglut/freeglut_minimal.h"
+#include "g2o/stuff/opengl_primitives.h"
+#include "g2o/stuff/opengl_wrapper.h"
 #endif
 
 #include <iomanip>
 
 namespace g2o {
 
-  bool VertexTag::read(std::istream& is)
-  {
-    is >> name_;
-    is >> position_.x() >> position_.y() >> position_.z();
-    is >> odom2d_.x() >> odom2d_.y() >> odom2d_.z();
-    is >> timestamp_;
-    is >> hostname_;
-    is >> loggerTimestamp_;
-    return true;
-  }
+bool VertexTag::read(std::istream& is) {
+  is >> name_;
+  is >> position_.x() >> position_.y() >> position_.z();
+  is >> odom2d_.x() >> odom2d_.y() >> odom2d_.z();
+  is >> timestamp_;
+  is >> hostname_;
+  is >> loggerTimestamp_;
+  return true;
+}
 
-  bool VertexTag::write(std::ostream& os) const
-  {
-    os << name_ << " ";
-    os << FIXED(position_.x() << " " << position_.y() << " " << position_.z() << " ");
-    os << FIXED(odom2d_.x() << " " << odom2d_.y() << " " << odom2d_.z() << " ");
-    os << FIXED(" " << timestamp() << " " << hostname() << " " << loggerTimestamp());
-    return os.good();
-  }
-
-
+bool VertexTag::write(std::ostream& os) const {
+  os << name_ << " ";
+  os << FIXED(position_.x()
+              << " " << position_.y() << " " << position_.z() << " ");
+  os << FIXED(odom2d_.x() << " " << odom2d_.y() << " " << odom2d_.z() << " ");
+  os << FIXED(" " << timestamp() << " " << hostname() << " "
+                  << loggerTimestamp());
+  return os.good();
+}
 
 #ifdef G2O_HAVE_OPENGL
-  VertexTagDrawAction::VertexTagDrawAction() : DrawAction(typeid(VertexTag).name()), textSize_(nullptr) {}
+VertexTagDrawAction::VertexTagDrawAction()
+    : DrawAction(typeid(VertexTag).name()), textSize_(nullptr) {}
 
-  bool VertexTagDrawAction::refreshPropertyPtrs(HyperGraphElementAction::Parameters* params_){
-    if (!DrawAction::refreshPropertyPtrs(params_))
-      return false;
-    if (previousParams_){
-      textSize_ = previousParams_->makeProperty<DoubleProperty>(typeName_ + "::TEXT_SIZE", 1);
-    } else {
-      textSize_ = nullptr;
-    }
+bool VertexTagDrawAction::refreshPropertyPtrs(
+    HyperGraphElementAction::Parameters* params_) {
+  if (!DrawAction::refreshPropertyPtrs(params_)) return false;
+  if (previousParams_) {
+    textSize_ = previousParams_->makeProperty<DoubleProperty>(
+        typeName_ + "::TEXT_SIZE", 1);
+  } else {
+    textSize_ = nullptr;
+  }
+  return true;
+}
+
+bool VertexTagDrawAction::operator()(
+    HyperGraph::HyperGraphElement* element,
+    HyperGraphElementAction::Parameters* params_) {
+  if (typeid(*element).name() != typeName_) return false;
+
+  refreshPropertyPtrs(params_);
+  if (!previousParams_) {
     return true;
   }
+  auto* that = static_cast<VertexTag*>(element);
 
-  bool VertexTagDrawAction::operator()(HyperGraph::HyperGraphElement* element,
-                                       HyperGraphElementAction::Parameters* params_) {
-    if (typeid(*element).name()!=typeName_)
-      return false;
-
-    refreshPropertyPtrs(params_);
-    if (! previousParams_){
-      return true;
-    }
-    auto* that = static_cast<VertexTag*>(element);
-
-    glPushMatrix();
-    glColor3f(1.F,0.2F,1.F);
-    glTranslatef(that->position().x(), that->position().y(), that->position().z());
-    float textSize = 1;
-    if (textSize_ )
-      textSize = static_cast<float>(textSize_->value());
-    opengl::drawBox(0.1F*textSize, 0.1F*textSize, 0.1F*textSize);
-    glTranslatef(0.2F*textSize, 0.F, 0.F);
-    glScalef(0.003F*textSize,0.003F*textSize,1.F);
-    freeglut_minimal::glutStrokeString(freeglut_minimal::kGlutStrokeRoman, that->name().c_str());
-    glPopMatrix();
-    return true;
-  }
+  glPushMatrix();
+  glColor3f(1.F, 0.2F, 1.F);
+  glTranslatef(that->position().x(), that->position().y(),
+               that->position().z());
+  float textSize = 1;
+  if (textSize_) textSize = static_cast<float>(textSize_->value());
+  opengl::drawBox(0.1F * textSize, 0.1F * textSize, 0.1F * textSize);
+  glTranslatef(0.2F * textSize, 0.F, 0.F);
+  glScalef(0.003F * textSize, 0.003F * textSize, 1.F);
+  freeglut_minimal::glutStrokeString(freeglut_minimal::kGlutStrokeRoman,
+                                     that->name().c_str());
+  glPopMatrix();
+  return true;
+}
 #endif
 
-}
+}  // namespace g2o

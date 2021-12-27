@@ -38,15 +38,18 @@ namespace g2o {
  * \brief describe the properties of a solver
  */
 struct G2O_CORE_API OptimizationAlgorithmProperty {
-  std::string name;                  ///< name of the solver, e.g., var
-  std::string desc;                  ///< short description of the solver
-  std::string type;                  ///< type of solver, e.g., "CSparse Cholesky", "PCG"
-  bool requiresMarginalize = false;  ///< whether the solver requires marginalization of landmarks
-  int poseDim = -1;                  ///< dimension of the pose vertices (-1 if variable)
-  int landmarkDim = -1;              ///< dimension of the landmark vertices (-1 if variable)
+  std::string name;  ///< name of the solver, e.g., var
+  std::string desc;  ///< short description of the solver
+  std::string type;  ///< type of solver, e.g., "CSparse Cholesky", "PCG"
+  bool requiresMarginalize =
+      false;  ///< whether the solver requires marginalization of landmarks
+  int poseDim = -1;  ///< dimension of the pose vertices (-1 if variable)
+  int landmarkDim =
+      -1;  ///< dimension of the landmark vertices (-1 if variable)
   OptimizationAlgorithmProperty() = default;
-  OptimizationAlgorithmProperty(std::string name_, std::string desc_, std::string type_,
-                                bool requiresMarginalize_, int poseDim_, int landmarkDim_)
+  OptimizationAlgorithmProperty(std::string name_, std::string desc_,
+                                std::string type_, bool requiresMarginalize_,
+                                int poseDim_, int landmarkDim_)
       : name(std::move(name_)),
         desc(std::move(desc_)),
         type(std::move(type_)),

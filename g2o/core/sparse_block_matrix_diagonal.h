@@ -27,81 +27,83 @@
 #ifndef G2O_SPARSE_BLOCK_MATRIX_DIAGONAL_H
 #define G2O_SPARSE_BLOCK_MATRIX_DIAGONAL_H
 
-#include <vector>
 #include <Eigen/Core>
+#include <vector>
 
 #include "g2o/config.h"
 #include "matrix_operations.h"
 
 namespace g2o {
 
-  /**
-   * \brief Sparse matrix which uses blocks on the diagonal
-   *
-   * This class is used as a const view on a SparseBlockMatrix
-   * which allows a faster iteration over the elements of the
-   * matrix.
-   */
-  template <class MatrixType>
-  class SparseBlockMatrixDiagonal
-  {
-    public:
-      //! this is the type of the elementary block, it is an Eigen::Matrix.
-      using SparseMatrixBlock = MatrixType;
+/**
+ * \brief Sparse matrix which uses blocks on the diagonal
+ *
+ * This class is used as a const view on a SparseBlockMatrix
+ * which allows a faster iteration over the elements of the
+ * matrix.
+ */
+template <class MatrixType>
+class SparseBlockMatrixDiagonal {
+ public:
+  //! this is the type of the elementary block, it is an Eigen::Matrix.
+  using SparseMatrixBlock = MatrixType;
 
-      //! columns of the matrix
-      int cols() const {return !blockIndices_.empty() ? blockIndices_.back() : 0;}
-      //! rows of the matrix
-      int rows() const {return !blockIndices_.empty() ? blockIndices_.back() : 0;}
+  //! columns of the matrix
+  int cols() const { return !blockIndices_.empty() ? blockIndices_.back() : 0; }
+  //! rows of the matrix
+  int rows() const { return !blockIndices_.empty() ? blockIndices_.back() : 0; }
 
-      using DiagonalVector = std::vector<MatrixType, Eigen::aligned_allocator<MatrixType>>;
+  using DiagonalVector =
+      std::vector<MatrixType, Eigen::aligned_allocator<MatrixType>>;
 
-      explicit SparseBlockMatrixDiagonal(const std::vector<int>& blockIndices) :
-        blockIndices_(blockIndices)
-      {}
+  explicit SparseBlockMatrixDiagonal(const std::vector<int>& blockIndices)
+      : blockIndices_(blockIndices) {}
 
-      //! how many rows/cols does the block at block-row / block-column r has?
-      inline int dimOfBlock(int r) const { return r ? blockIndices_[r] - blockIndices_[r-1] : blockIndices_[0] ; }
+  //! how many rows/cols does the block at block-row / block-column r has?
+  inline int dimOfBlock(int r) const {
+    return r ? blockIndices_[r] - blockIndices_[r - 1] : blockIndices_[0];
+  }
 
-      //! where does the row /col at block-row / block-column r starts?
-      inline int baseOfBlock(int r) const { return r ? blockIndices_[r-1] : 0 ; }
+  //! where does the row /col at block-row / block-column r starts?
+  inline int baseOfBlock(int r) const { return r ? blockIndices_[r - 1] : 0; }
 
-      //! the block matrices per block-column
-      const DiagonalVector& diagonal() const { return diagonal_;}
-      DiagonalVector& diagonal() { return diagonal_;}
+  //! the block matrices per block-column
+  const DiagonalVector& diagonal() const { return diagonal_; }
+  DiagonalVector& diagonal() { return diagonal_; }
 
-      //! indices of the row blocks
-      const std::vector<int>& blockIndices() const { return blockIndices_;}
+  //! indices of the row blocks
+  const std::vector<int>& blockIndices() const { return blockIndices_; }
 
-      void multiply(number_t*& dest, const number_t* src) const
-      {
-        int destSize=cols();
-        if (! dest) {
-          dest=new number_t[destSize];
-          memset(dest,0, destSize*sizeof(number_t));
-        }
+  void multiply(number_t*& dest, const number_t* src) const {
+    int destSize = cols();
+    if (!dest) {
+      dest = new number_t[destSize];
+      memset(dest, 0, destSize * sizeof(number_t));
+    }
 
-        // map the memory by Eigen
-        Eigen::Map<VectorX> destVec(dest, destSize);
-        Eigen::Map<const VectorX> srcVec(src, rows());
+    // map the memory by Eigen
+    Eigen::Map<VectorX> destVec(dest, destSize);
+    Eigen::Map<const VectorX> srcVec(src, rows());
 
-#      ifdef G2O_OPENMP
-#      pragma omp parallel for default (shared) schedule(dynamic, 10)
-#      endif
-        for (int i=0; i < static_cast<int>(diagonal_.size()); ++i){
-          int destOffset = baseOfBlock(i);
-          int srcOffset = destOffset;
-          const SparseMatrixBlock& A = diagonal_[i];
-          // destVec += *A.transpose() * srcVec (according to the sub-vector parts)
-          internal::template axpy<SparseMatrixBlock>(A, srcVec, srcOffset, destVec, destOffset);
-        }
-      }
+#ifdef G2O_OPENMP
+#pragma omp parallel for default(shared) schedule(dynamic, 10)
+#endif
+    for (int i = 0; i < static_cast<int>(diagonal_.size()); ++i) {
+      int destOffset = baseOfBlock(i);
+      int srcOffset = destOffset;
+      const SparseMatrixBlock& A = diagonal_[i];
+      // destVec += *A.transpose() * srcVec (according to the sub-vector parts)
+      internal::template axpy<SparseMatrixBlock>(A, srcVec, srcOffset, destVec,
+                                                 destOffset);
+    }
+  }
 
-    protected:
-      const std::vector<int>& blockIndices_; ///< vector of the indices of the blocks along the diagonal
-      DiagonalVector diagonal_;
-  };
+ protected:
+  const std::vector<int>& blockIndices_;  ///< vector of the indices of the
+                                          ///< blocks along the diagonal
+  DiagonalVector diagonal_;
+};
 
-} //end namespace
+}  // namespace g2o
 
 #endif

@@ -80,7 +80,8 @@ bool EdgeStereoSE3ProjectXYZOnlyPose::isDepthPositive() {
   return (v1->estimate().map(Xw))(2) > 0;
 }
 
-Vector3 EdgeStereoSE3ProjectXYZOnlyPose::cam_project(const Vector3 &trans_xyz) const {
+Vector3 EdgeStereoSE3ProjectXYZOnlyPose::cam_project(
+    const Vector3 &trans_xyz) const {
   const float invz = 1.0F / trans_xyz[2];
   Vector3 res;
   res[0] = trans_xyz[0] * invz * fx + cx;

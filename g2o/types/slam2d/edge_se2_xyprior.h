@@ -27,49 +27,47 @@
 #ifndef G2O_EDGE_SE2_PRIOR_XY_H
 #define G2O_EDGE_SE2_PRIOR_XY_H
 
-#include "vertex_se2.h"
 #include "g2o/core/base_unary_edge.h"
 #include "g2o_types_slam2d_api.h"
+#include "vertex_se2.h"
 
 namespace g2o {
 
-  /**
-   * \brief Prior for a two D pose with constraints only in xy direction (like gps)
-   */
-  class G2O_TYPES_SLAM2D_API EdgeSE2XYPrior : public BaseUnaryEdge<2, Vector2, VertexSE2>
-  {
-  public:
-    EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
-    EdgeSE2XYPrior() = default;
+/**
+ * \brief Prior for a two D pose with constraints only in xy direction (like
+ * gps)
+ */
+class G2O_TYPES_SLAM2D_API EdgeSE2XYPrior
+    : public BaseUnaryEdge<2, Vector2, VertexSE2> {
+ public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
+  EdgeSE2XYPrior() = default;
 
-    bool setMeasurementData(const number_t* d) override
-    {
-      measurement_[0]=d[0];
-      measurement_[1]=d[1];
-      return true;
-    }
+  bool setMeasurementData(const number_t* d) override {
+    measurement_[0] = d[0];
+    measurement_[1] = d[1];
+    return true;
+  }
 
-    bool getMeasurementData(number_t* d) const override
-    {
-      d[0] = measurement_[0];
-      d[1] = measurement_[1];
-      return true;
-    }
+  bool getMeasurementData(number_t* d) const override {
+    d[0] = measurement_[0];
+    d[1] = measurement_[1];
+    return true;
+  }
 
-    int measurementDimension() const override {return 2;}
+  int measurementDimension() const override { return 2; }
 
-    void linearizeOplus() override;
+  void linearizeOplus() override;
 
-    bool read(std::istream& is) override;
-    bool write(std::ostream& os) const override;
+  bool read(std::istream& is) override;
+  bool write(std::ostream& os) const override;
 
-    void computeError() override
-    {
-      const VertexSE2* v = vertexXnRaw<0>();
-      error_ = v->estimate().translation() - measurement_;
-    }
-  };
+  void computeError() override {
+    const VertexSE2* v = vertexXnRaw<0>();
+    error_ = v->estimate().translation() - measurement_;
+  }
+};
 
-} // end namespace
+}  // namespace g2o
 
 #endif

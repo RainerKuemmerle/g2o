@@ -52,8 +52,9 @@ HyperGraph::Edge::Edge(int id) : id_(id) {}
 HyperGraph::Edge::~Edge() = default;
 
 int HyperGraph::Edge::numUndefinedVertices() const {
-  return std::count_if(vertices_.begin(), vertices_.end(),
-                       [](const std::shared_ptr<Vertex>& ptr) { return ptr == nullptr; });
+  return std::count_if(
+      vertices_.begin(), vertices_.end(),
+      [](const std::shared_ptr<Vertex>& ptr) { return ptr == nullptr; });
 }
 
 void HyperGraph::Edge::resize(size_t size) { vertices_.resize(size, nullptr); }
@@ -99,7 +100,8 @@ bool HyperGraph::addEdge(const std::shared_ptr<Edge>& e) {
   if (e->vertices().size() == 2) {
     if (e->vertices()[0] == e->vertices()[1]) return false;
   } else if (e->vertices().size() == 3) {
-    if (e->vertices()[0] == e->vertices()[1] || e->vertices()[0] == e->vertices()[2] ||
+    if (e->vertices()[0] == e->vertices()[1] ||
+        e->vertices()[0] == e->vertices()[2] ||
         e->vertices()[1] == e->vertices()[2])
       return false;
   } else if (e->vertices().size() > 3) {
@@ -118,7 +120,8 @@ bool HyperGraph::addEdge(const std::shared_ptr<Edge>& e) {
   return true;
 }
 
-bool HyperGraph::setEdgeVertex(const std::shared_ptr<Edge>& e, int pos, const std::shared_ptr<Vertex>& v) {
+bool HyperGraph::setEdgeVertex(const std::shared_ptr<Edge>& e, int pos,
+                               const std::shared_ptr<Vertex>& v) {
   auto vOld = e->vertex(pos);
   if (vOld) vOld->edges().erase(e);
   e->setVertex(pos, v);
@@ -126,8 +129,8 @@ bool HyperGraph::setEdgeVertex(const std::shared_ptr<Edge>& e, int pos, const st
   return true;
 }
 
-bool HyperGraph::mergeVertices(std::shared_ptr<Vertex>& vBig, std::shared_ptr<Vertex>& vSmall,
-                               bool erase) {
+bool HyperGraph::mergeVertices(std::shared_ptr<Vertex>& vBig,
+                               std::shared_ptr<Vertex>& vSmall, bool erase) {
   auto it = vertices_.find(vBig->id());
   if (it == vertices_.end()) return false;
 
@@ -136,7 +139,7 @@ bool HyperGraph::mergeVertices(std::shared_ptr<Vertex>& vBig, std::shared_ptr<Ve
 
   EdgeSetWeak tmp = vSmall->edges();
   bool ok = true;
-  for (const auto & it : tmp) {
+  for (const auto& it : tmp) {
     std::shared_ptr<HyperGraph::Edge> e = it.lock();
     for (size_t i = 0; i < e->vertices().size(); i++) {
       if (e->vertex(i) == vSmall) {
@@ -153,7 +156,7 @@ bool HyperGraph::detachVertex(const std::shared_ptr<Vertex>& v) {
   if (it == vertices_.end()) return false;
   assert(it->second == v);
   EdgeSetWeak tmp = v->edges();
-  for (const auto & it : tmp) {
+  for (const auto& it : tmp) {
     std::shared_ptr<HyperGraph::Edge> e = it.lock();
     for (size_t i = 0; i < e->vertices().size(); i++) {
       if (v == e->vertex(i)) setEdgeVertex(e, i, kNonExistantVertex);
@@ -174,7 +177,7 @@ bool HyperGraph::removeVertex(const std::shared_ptr<Vertex>& v, bool detach) {
   assert(it->second == v);
   // remove all edges which are entering or leaving v;
   EdgeSetWeak tmp = v->edges();
-  for (const auto & it : tmp) {
+  for (const auto& it : tmp) {
     if (!removeEdge(it.lock())) {
       assert(0 && "error in erasing vertex");
     }

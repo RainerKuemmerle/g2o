@@ -32,8 +32,9 @@
 
 namespace g2o {
 
-class G2O_SIMULATOR_API SensorSE3Prior : public PointSensorParameters,
-                                         public UnarySensor<Robot3D, EdgeSE3Prior> {
+class G2O_SIMULATOR_API SensorSE3Prior
+    : public PointSensorParameters,
+      public UnarySensor<Robot3D, EdgeSE3Prior> {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   using RobotPoseType = PoseVertexType::EstimateType;
