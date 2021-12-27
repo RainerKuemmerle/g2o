@@ -26,18 +26,6 @@
 
 #include "edge_line2d_pointxy.h"
 
-#ifdef WINDOWS
-#include <windows.h>
-#endif
-
-#ifdef G2O_HAVE_OPENGL
-#ifdef __APPLE__
-#include <OpenGL/gl.h>
-#else
-#include <GL/gl.h>
-#endif
-#endif
-
 namespace g2o {
 
 EdgeLine2DPointXY::EdgeLine2DPointXY()

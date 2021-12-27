@@ -27,12 +27,14 @@
 #ifndef G2O_DL_WRAPPER_H
 #define G2O_DL_WRAPPER_H
 
-#include <string>
-#include <vector>
-
+// clang-format off
 #ifdef WINDOWS
 #include <windows.h>
 #endif
+// clang-format on
+
+#include <string>
+#include <vector>
 
 #include "g2o_cli_api.h"
 
