@@ -33,17 +33,18 @@
  ****************************************************************************/
 #include "filesys_tools.h"
 
+// clang-format off
+#ifdef WINDOWS
+#include <windows.h>
+#endif
+// clang-format on
+
 #include <sys/stat.h>
 #include <sys/types.h>
 
 #include <cstdio>
 #include <ctime>
 #include <iostream>
-
-#ifdef WINDOWS
-#include <winbase.h>
-#include <windows.h>
-#endif
 
 #if (defined(UNIX) || defined(CYGWIN)) && !defined(ANDROID)
 #include <wordexp.h>
