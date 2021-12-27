@@ -26,10 +26,6 @@
 
 #include "vertex_line2d.h"
 
-#ifdef WINDOWS
-#include <windows.h>
-#endif
-
 #ifdef G2O_HAVE_OPENGL
 #include "g2o/stuff/opengl_wrapper.h"
 #endif
