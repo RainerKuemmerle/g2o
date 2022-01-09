@@ -35,8 +35,11 @@ namespace g2o {
 
 G2O_REGISTER_TYPE_GROUP(slam3d);
 
-G2O_REGISTER_TYPE(VERTEX_SE3 : QUAT, VertexSE3);
-G2O_REGISTER_TYPE(EDGE_SE3 : QUAT, EdgeSE3);
+// clang-format off
+// otherwise it will result in non-working "VERTEX_SE3 : QUAT"
+G2O_REGISTER_TYPE(VERTEX_SE3:QUAT, VertexSE3);
+G2O_REGISTER_TYPE(EDGE_SE3:QUAT, EdgeSE3);
+// clang-format on
 G2O_REGISTER_TYPE(VERTEX_TRACKXYZ, VertexPointXYZ);
 
 G2O_REGISTER_TYPE(PARAMS_SE3OFFSET, ParameterSE3Offset);
