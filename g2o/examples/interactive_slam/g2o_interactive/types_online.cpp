@@ -35,7 +35,10 @@ G2O_REGISTER_TYPE_GROUP(online);
 G2O_REGISTER_TYPE(ONLINE_EDGE_SE2, OnlineEdgeSE2);
 G2O_REGISTER_TYPE(ONLINE_VERTEX_SE2, OnlineVertexSE2);
 
-G2O_REGISTER_TYPE(ONLINE_VERTEX_SE3 : QUAT, OnlineVertexSE3);
-G2O_REGISTER_TYPE(ONLINE_EDGE_SE3 : QUAT, OnlineEdgeSE3);
+// clang-format off
+// otherwise it will result in non-working "ONLINE_VERTEX_SE3 : QUAT"
+G2O_REGISTER_TYPE(ONLINE_VERTEX_SE3:QUAT, OnlineVertexSE3);
+G2O_REGISTER_TYPE(ONLINE_EDGE_SE3:QUAT, OnlineEdgeSE3);
+// clang-format on
 
 }  // namespace g2o
