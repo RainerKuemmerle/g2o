@@ -29,18 +29,19 @@
 
 #include <Eigen/Cholesky>
 #include <Eigen/Core>
+#include <utility>
 
 namespace g2o {
 
 template <class SampleType>
 struct SigmaPoint {
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
-  SigmaPoint(const SampleType& sample, number_t wi, number_t wp)
-      : _sample(sample), _wi(wi), _wp(wp) {}
-  SigmaPoint() : _wi(0), _wp(0) {}
+  SigmaPoint(SampleType sample, number_t wi, number_t wp)
+      : _sample(std::move(sample)), _wi(wi), _wp(wp) {}
+  SigmaPoint() = default;
   SampleType _sample;
-  number_t _wi;
-  number_t _wp;
+  number_t _wi = 0;
+  number_t _wp = 0;
 };
 
 template <class SampleType, class CovarianceType>

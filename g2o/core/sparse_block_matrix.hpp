@@ -89,8 +89,7 @@ SparseBlockMatrix<MatrixType>::block(int r, int c, bool alloc) {
 template <class MatrixType>
 const typename SparseBlockMatrix<MatrixType>::SparseMatrixBlock*
 SparseBlockMatrix<MatrixType>::block(int r, int c) const {
-  typename SparseBlockMatrix<MatrixType>::IntBlockMap::const_iterator it =
-      blockCols_[c].find(r);
+  auto it = blockCols_[c].find(r);
   if (it == blockCols_[c].end()) return nullptr;
   return it->second;
 }

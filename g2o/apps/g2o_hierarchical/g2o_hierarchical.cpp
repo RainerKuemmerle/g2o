@@ -24,10 +24,9 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include <signal.h>
-
 #include <algorithm>
 #include <cassert>
+#include <csignal>
 #include <fstream>
 #include <iomanip>
 #include <iostream>
@@ -62,14 +61,15 @@
 // #include "g2o/types/slam3d_new/parameter_camera.h"
 // #include "g2o/types/slam3d_new/parameter_se3_offset.h"
 
-static bool hasToStop = false;
+using std::cerr;
+using std::endl;
+using std::string;
 
-using namespace std;
-using namespace g2o;
+static bool hasToStop = false;
 
 void sigquit_handler(int sig) {
   if (sig == SIGINT) {
-    hasToStop = 1;
+    hasToStop = true;
     static int cnt = 0;
     if (cnt++ == 2) {
       cerr << __PRETTY_FUNCTION__ << " forcing exit" << endl;
@@ -91,9 +91,11 @@ void sigquit_handler(int sig) {
 // EDGE_PROJECT_DEPTH=EDGE_PROJECT_DEPTH_NEW,\
 // CACHE_CAMERA=CACHE_CAMERA_NEW,\
 // CACHE_SE3_OFFSET=CACHE_SE3_OFFSET_NEW";
-
 */
-int main(int argc, char** argv) {
+
+namespace g2o {
+
+int run_hierarchical(int argc, char** argv) {
   int starIterations;
   int highIterations;
   int lowIterations;
@@ -190,20 +192,20 @@ int main(int argc, char** argv) {
   if (listSolvers) solverFactory->listSolvers(cerr);
 
   if (listTypes) {
-    Factory::instance()->printRegisteredTypes(cout, true);
+    Factory::instance()->printRegisteredTypes(std::cout, true);
   }
 
   if (listRobustKernels) {
     std::vector<std::string> kernels;
     RobustKernelFactory::instance()->fillKnownKernels(kernels);
-    cout << "Robust Kernels:" << endl;
-    for (size_t i = 0; i < kernels.size(); ++i) {
-      cout << kernels[i] << endl;
+    std::cout << "Robust Kernels:" << endl;
+    for (auto& kernel : kernels) {
+      std::cout << kernel << endl;
     }
   }
 
   AbstractRobustKernelCreator::Ptr kernelCreator;
-  if (robustKernel.size() > 0) {
+  if (!robustKernel.empty()) {
     kernelCreator = RobustKernelFactory::instance()->creator(robustKernel);
   }
 
@@ -212,21 +214,22 @@ int main(int argc, char** argv) {
   optimizer.setForceStopFlag(&hasToStop);
 
   // Loading the input data
-  if (loadLookup.size() > 0) {
+  if (!loadLookup.empty()) {
     optimizer.setRenamedTypesFromString(loadLookup);
   }
-  if (inputFilename.size() == 0) {
+  if (inputFilename.empty()) {
     cerr << "No input data specified" << endl;
     return 0;
-  } else if (inputFilename == "-") {
+  }
+  if (inputFilename == "-") {
     cerr << "Read input from stdin" << endl;
-    if (!optimizer.load(cin)) {
+    if (!optimizer.load(std::cin)) {
       cerr << "Error loading graph" << endl;
       return 2;
     }
   } else {
     cerr << "Read input from " << inputFilename << endl;
-    ifstream ifs(inputFilename.c_str());
+    std::ifstream ifs(inputFilename.c_str());
     if (!ifs) {
       cerr << "Failed to open file" << endl;
       return 1;
@@ -241,14 +244,6 @@ int main(int argc, char** argv) {
 
   OptimizableGraph::EdgeSet originalEdges = optimizer.edges();
 
-  if (0 && outputfilename.size() > 0) {
-    cerr << "saving " << outputfilename << " ... ";
-    ofstream os(outputfilename.c_str());
-    optimizer.save(os);
-    cerr << "done." << endl;
-    return 0;
-  }
-
   EdgeCreator creator;
   creator.addAssociation("VERTEX_SE2;VERTEX_SE2;", "EDGE_SE2");
   creator.addAssociation("VERTEX_SE2;VERTEX_XY;", "EDGE_SE2_XY");
@@ -257,8 +252,7 @@ int main(int argc, char** argv) {
 
   std::shared_ptr<Parameter> p0 = optimizer.parameter(0);
   if (p0) {
-    ParameterSE3Offset* originalParams =
-        dynamic_cast<ParameterSE3Offset*>(p0.get());
+    auto* originalParams = dynamic_cast<ParameterSE3Offset*>(p0.get());
     if (originalParams) {
       cerr << "ORIGINAL PARAMS" << endl;
       auto se3OffsetParam = std::make_shared<ParameterSE3Offset>();
@@ -273,13 +267,14 @@ int main(int argc, char** argv) {
 
   EdgeLabeler labeler(&optimizer);
 
-  if (optimizer.vertices().size() == 0) {
+  if (optimizer.vertices().empty()) {
     cerr << "Graph contains no vertices" << endl;
     return 1;
   }
 
   // allocating the desired solver + testing whether the solver is okay
-  OptimizationAlgorithmProperty solverProperty, hsolverProperty;
+  OptimizationAlgorithmProperty solverProperty;
+  OptimizationAlgorithmProperty hsolverProperty;
   std::shared_ptr<OptimizationAlgorithm> solver =
       solverFactory->construct(strSolver, solverProperty);
   std::shared_ptr<OptimizationAlgorithm> hsolver =
@@ -295,7 +290,7 @@ int main(int argc, char** argv) {
     return 0;
   }
 
-  set<int> vertexDimensions = optimizer.dimensions();
+  std::set<int> vertexDimensions = optimizer.dimensions();
   if (!optimizer.isSolverSuitable(solverProperty, vertexDimensions)) {
     cerr << "The selected solver is not suitable for optimizing the given graph"
          << endl;
@@ -351,10 +346,10 @@ int main(int argc, char** argv) {
     if (!gauge) {
       cerr << "# cannot find a vertex to fix in this thing" << endl;
       return 2;
-    } else {
-      cerr << "# graph is fixed by node " << gauge->id() << endl;
-      gauge->setFixed(true);
     }
+    cerr << "# graph is fixed by node " << gauge->id() << endl;
+    gauge->setFixed(true);
+
   } else {
     cerr << "# graph is fixed by priors" << endl;
   }
@@ -391,9 +386,8 @@ int main(int argc, char** argv) {
 
   //  if (robustKernel) {
   // cerr << "# Preparing robust error function ... ";
-  for (SparseOptimizer::EdgeSet::iterator it = optimizer.edges().begin();
-       it != optimizer.edges().end(); ++it) {
-    auto e = std::dynamic_pointer_cast<SparseOptimizer::Edge>(*it);
+  for (const auto& it : optimizer.edges()) {
+    auto e = std::dynamic_pointer_cast<SparseOptimizer::Edge>(it);
     if (kernelCreator) {
       e->setRobustKernel(kernelCreator->construct());
       if (huberWidth > 0) e->robustKernel()->setDelta(huberWidth);
@@ -422,46 +416,39 @@ int main(int argc, char** argv) {
   OptimizableGraph::EdgeSet heset;
   OptimizableGraph::VertexSet hvset;
   HyperGraph::VertexSet hgauge;
-  for (StarSet::iterator it = stars.begin(); it != stars.end(); ++it) {
-    const auto& s = *it;
+  for (const auto& s : stars) {
     if (hgauge.empty()) hgauge = s->gauge();
 
-    for (HyperGraph::VertexSet::iterator git = s->gauge().begin();
-         git != s->gauge().end(); ++git) {
-      hvset.insert(*git);
+    for (const auto& git : s->gauge()) {
+      hvset.insert(git);
     }
 
-    for (HyperGraph::EdgeSet::iterator iit = s->_starEdges.begin();
-         iit != s->_starEdges.end(); ++iit) {
-      const auto& e = *iit;
+    for (const auto& e : s->starEdges()) {
       eset.insert(e);
-      for (size_t i = 0; i < e->vertices().size(); i++) {
-        vset.insert(e->vertices()[i]);
+      for (auto& i : e->vertices()) {
+        vset.insert(i);
       }
     }
-    for (HyperGraph::EdgeSet::iterator iit = s->starFrontierEdges().begin();
-         iit != s->starFrontierEdges().end(); ++iit) {
-      heset.insert(*iit);
+    for (const auto& iit : s->starFrontierEdges()) {
+      heset.insert(iit);
     }
   }
   cerr << "eset.size()= " << eset.size() << endl;
   cerr << "heset.size()= " << heset.size() << endl;
 
-  ofstream starStream("stars.g2o");
+  std::ofstream starStream("stars.g2o");
   optimizer.saveSubset(starStream, eset);
   starStream.close();
 
-  ofstream hstarStream("hstars.g2o");
+  std::ofstream hstarStream("hstars.g2o");
   optimizer.saveSubset(hstarStream, heset);
   hstarStream.close();
 
   cerr << "stars done!" << endl;
 
   cerr << "optimizing the high layer" << endl;
-  for (HyperGraph::VertexSet::iterator it = hgauge.begin(); it != hgauge.end();
-       ++it) {
-    OptimizableGraph::Vertex* g =
-        dynamic_cast<OptimizableGraph::Vertex*>(it->get());
+  for (const auto& it : hgauge) {
+    auto* g = dynamic_cast<OptimizableGraph::Vertex*>(it.get());
     g->setFixed(true);
   }
   optimizer.setAlgorithm(hsolver);
@@ -481,10 +468,8 @@ int main(int argc, char** argv) {
 
   if (!kernelCreator) {
     cerr << "# Robust error function disabled ";
-    for (SparseOptimizer::EdgeSet::iterator it = optimizer.edges().begin();
-         it != optimizer.edges().end(); ++it) {
-      SparseOptimizer::Edge* e =
-          dynamic_cast<SparseOptimizer::Edge*>(it->get());
+    for (const auto& it : optimizer.edges()) {
+      auto* e = dynamic_cast<SparseOptimizer::Edge*>(it.get());
       e->setRobustKernel(nullptr);
     }
     cerr << "done." << endl;
@@ -493,10 +478,8 @@ int main(int argc, char** argv) {
   }
 
   cerr << "fixing the hstructure, and optimizing the floating nodes" << endl;
-  for (OptimizableGraph::VertexSet::iterator it = hvset.begin();
-       it != hvset.end(); ++it) {
-    OptimizableGraph::Vertex* g =
-        dynamic_cast<OptimizableGraph::Vertex*>(it->get());
+  for (const auto& it : hvset) {
+    auto* g = dynamic_cast<OptimizableGraph::Vertex*>(it.get());
     g->setFixed(true);
   }
   optimizer.initializeOptimization(eset);
@@ -504,23 +487,19 @@ int main(int argc, char** argv) {
   optimizer.optimize(1);
   cerr << "done" << endl;
   if (debug) {
-    ofstream os("debug_low_level.g2o");
+    std::ofstream os("debug_low_level.g2o");
     optimizer.saveSubset(os, eset);
   }
 
   cerr << "adding the original constraints, locking hierarchical solution and "
           "optimizing the free variables"
        << endl;
-  for (OptimizableGraph::VertexSet::iterator it = vset.begin();
-       it != vset.end(); ++it) {
-    OptimizableGraph::Vertex* g =
-        dynamic_cast<OptimizableGraph::Vertex*>(it->get());
+  for (const auto& it : vset) {
+    auto* g = dynamic_cast<OptimizableGraph::Vertex*>(it.get());
     g->setFixed(true);
   }
-  for (HyperGraph::VertexSet::iterator it = hgauge.begin(); it != hgauge.end();
-       ++it) {
-    OptimizableGraph::Vertex* g =
-        dynamic_cast<OptimizableGraph::Vertex*>(it->get());
+  for (const auto& it : hgauge) {
+    auto* g = dynamic_cast<OptimizableGraph::Vertex*>(it.get());
     g->setFixed(true);
   }
   optimizer.setAlgorithm(solver);
@@ -529,16 +508,12 @@ int main(int argc, char** argv) {
   optimizer.optimize(lowIterations);
 
   cerr << "relaxing the full problem" << endl;
-  for (OptimizableGraph::VertexSet::iterator it = vset.begin();
-       it != vset.end(); ++it) {
-    OptimizableGraph::Vertex* g =
-        dynamic_cast<OptimizableGraph::Vertex*>(it->get());
+  for (const auto& it : vset) {
+    auto* g = dynamic_cast<OptimizableGraph::Vertex*>(it.get());
     g->setFixed(false);
   }
-  for (HyperGraph::VertexSet::iterator it = hgauge.begin(); it != hgauge.end();
-       ++it) {
-    OptimizableGraph::Vertex* g =
-        dynamic_cast<OptimizableGraph::Vertex*>(it->get());
+  for (const auto& it : hgauge) {
+    auto* g = dynamic_cast<OptimizableGraph::Vertex*>(it.get());
     g->setFixed(true);
   }
   optimizer.initializeOptimization(0);
@@ -548,7 +523,7 @@ int main(int argc, char** argv) {
   optimizer.computeActiveErrors();
   double finalChi = optimizer.activeChi2();
 
-  if (summaryFile != "") {
+  if (!summaryFile.empty()) {
     PropertyMap summary;
     summary.makeProperty<StringProperty>("filename", inputFilename);
     summary.makeProperty<IntProperty>("n_vertices",
@@ -557,10 +532,8 @@ int main(int argc, char** argv) {
     int nLandmarks = 0;
     int nPoses = 0;
     int maxDim = *vertexDimensions.rbegin();
-    for (HyperGraph::VertexIDMap::iterator it = optimizer.vertices().begin();
-         it != optimizer.vertices().end(); ++it) {
-      OptimizableGraph::Vertex* v =
-          static_cast<OptimizableGraph::Vertex*>(it->second.get());
+    for (auto& it : optimizer.vertices()) {
+      auto* v = static_cast<OptimizableGraph::Vertex*>(it.second.get());
       if (v->dimension() != maxDim) {
         nLandmarks++;
       } else
@@ -568,20 +541,17 @@ int main(int argc, char** argv) {
     }
 
     int nEdges = 0;
-    set<string> edgeTypes;
-    for (HyperGraph::EdgeSet::iterator it = optimizer.edges().begin();
-         it != optimizer.edges().end(); ++it) {
-      OptimizableGraph::Edge* e =
-          dynamic_cast<OptimizableGraph::Edge*>(it->get());
+    std::set<string> edgeTypes;
+    for (const auto& it : optimizer.edges()) {
+      auto* e = dynamic_cast<OptimizableGraph::Edge*>(it.get());
       if (e->level() == 0) {
         edgeTypes.insert(Factory::instance()->tag(e));
         nEdges++;
       }
     }
-    stringstream edgeTypesString;
-    for (std::set<string>::iterator it = edgeTypes.begin();
-         it != edgeTypes.end(); ++it) {
-      edgeTypesString << *it << " ";
+    std::stringstream edgeTypesString;
+    for (const auto& edgeType : edgeTypes) {
+      edgeTypesString << edgeType << " ";
     }
 
     summary.makeProperty<IntProperty>("n_edges", nEdges);
@@ -601,18 +571,18 @@ int main(int argc, char** argv) {
     summary.makeProperty<DoubleProperty>("h_initChi", hInitChi);
     summary.makeProperty<DoubleProperty>("h_finalChi", hFinalChi);
 
-    ofstream os;
-    os.open(summaryFile.c_str(), ios::app);
+    std::ofstream os;
+    os.open(summaryFile.c_str(), std::ios::app);
     summary.writeToCSV(os);
   }
 
-  if (outputfilename.size() > 0) {
+  if (!outputfilename.empty()) {
     if (outputfilename == "-") {
       cerr << "saving to stdout";
-      optimizer.saveSubset(cout, originalEdges);
+      optimizer.saveSubset(std::cout, originalEdges);
     } else {
       cerr << "saving " << outputfilename << " ... ";
-      ofstream os(outputfilename.c_str());
+      std::ofstream os(outputfilename.c_str());
       optimizer.saveSubset(os, originalEdges);
     }
     cerr << "done." << endl;
@@ -625,3 +595,7 @@ int main(int argc, char** argv) {
 
   return 0;
 }
+
+}  // namespace g2o
+
+int main(int argc, char** argv) { return g2o::run_hierarchical(argc, argv); }

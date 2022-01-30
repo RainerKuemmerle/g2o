@@ -57,89 +57,89 @@ class GLUWrapper {
 
 void drawArrow2D(float len, float head_width, float head_len) {
   glBegin(GL_LINES);
-  glVertex2f(0.f, 0.f);
-  glVertex2f(len, 0.f);
+  glVertex2f(0.F, 0.F);
+  glVertex2f(len, 0.F);
   glEnd();
 
-  glNormal3f(0.f, 0.f, 1.f);
+  glNormal3f(0.F, 0.F, 1.F);
   glBegin(GL_TRIANGLES);
-  glVertex2f(len, 0.f);
-  glVertex2f(len - head_len, 0.5f * head_width);
-  glVertex2f(len - head_len, -0.5f * head_width);
+  glVertex2f(len, 0.F);
+  glVertex2f(len - head_len, 0.5F * head_width);
+  glVertex2f(len - head_len, -0.5F * head_width);
   glEnd();
 }
 
 void drawPoseBox() {
   glPushMatrix();
-  glScalef(0.5f, 1.f, 1.f);
+  glScalef(0.5F, 1.F, 1.F);
   glPushMatrix();
-  glScalef(1.f, 0.25f, 0.5f);
-  glTranslatef(-0.5f, 0.5f, 0.f);
-  glColor3f(1.0f, 0.3f, 0.3f);
-  drawBox(1.f, 1.f, 1.f);
+  glScalef(1.F, 0.25F, 0.5F);
+  glTranslatef(-0.5F, 0.5F, 0.F);
+  glColor3f(1.0F, 0.3F, 0.3F);
+  drawBox(1.F, 1.F, 1.F);
   glPopMatrix();
 
   glPushMatrix();
-  glScalef(1.f, 0.25f, 0.5f);
-  glTranslatef(-0.5f, -0.5f, 0.f);
-  glColor3f(1.0f, 0.1f, 0.1f);
-  drawBox(1.f, 1.f, 1.f);
+  glScalef(1.F, 0.25F, 0.5F);
+  glTranslatef(-0.5F, -0.5F, 0.F);
+  glColor3f(1.0F, 0.1F, 0.1F);
+  drawBox(1.F, 1.F, 1.F);
   glPopMatrix();
 
   glPushMatrix();
-  glScalef(1.f, 0.25f, 0.5f);
-  glTranslatef(+0.5f, 0.5f, 0.f);
-  glColor3f(0.3f, 0.3f, 1.0f);
-  drawBox(1.f, 1.f, 1.f);
+  glScalef(1.F, 0.25F, 0.5F);
+  glTranslatef(+0.5F, 0.5F, 0.F);
+  glColor3f(0.3F, 0.3F, 1.0F);
+  drawBox(1.F, 1.F, 1.F);
   glPopMatrix();
 
   glPushMatrix();
-  glScalef(1.f, 0.25f, 0.5f);
-  glTranslatef(+0.5f, -0.5f, 0.f);
-  glColor3f(0.1f, 0.1f, 1.f);
-  drawBox(1.f, 1.f, 1.f);
+  glScalef(1.F, 0.25F, 0.5F);
+  glTranslatef(+0.5F, -0.5F, 0.F);
+  glColor3f(0.1F, 0.1F, 1.F);
+  drawBox(1.F, 1.F, 1.F);
   glPopMatrix();
   glPopMatrix();
 }
 
 void drawBox(GLfloat l, GLfloat w, GLfloat h) {
-  GLfloat sx = l * 0.5f;
-  GLfloat sy = w * 0.5f;
-  GLfloat sz = h * 0.5f;
+  GLfloat sx = l * 0.5F;
+  GLfloat sy = w * 0.5F;
+  GLfloat sz = h * 0.5F;
 
   glBegin(GL_QUADS);
   // bottom
-  glNormal3f(0.0f, 0.0f, -1.0f);
+  glNormal3f(0.0F, 0.0F, -1.0F);
   glVertex3f(-sx, -sy, -sz);
   glVertex3f(-sx, sy, -sz);
   glVertex3f(sx, sy, -sz);
   glVertex3f(sx, -sy, -sz);
   // top
-  glNormal3f(0.0f, 0.0f, 1.0f);
+  glNormal3f(0.0F, 0.0F, 1.0F);
   glVertex3f(-sx, -sy, sz);
   glVertex3f(-sx, sy, sz);
   glVertex3f(sx, sy, sz);
   glVertex3f(sx, -sy, sz);
   // back
-  glNormal3f(-1.0f, 0.0f, 0.0f);
+  glNormal3f(-1.0F, 0.0F, 0.0F);
   glVertex3f(-sx, -sy, -sz);
   glVertex3f(-sx, sy, -sz);
   glVertex3f(-sx, sy, sz);
   glVertex3f(-sx, -sy, sz);
   // front
-  glNormal3f(1.0f, 0.0f, 0.0f);
+  glNormal3f(1.0F, 0.0F, 0.0F);
   glVertex3f(sx, -sy, -sz);
   glVertex3f(sx, sy, -sz);
   glVertex3f(sx, sy, sz);
   glVertex3f(sx, -sy, sz);
   // left
-  glNormal3f(0.0f, -1.0f, 0.0f);
+  glNormal3f(0.0F, -1.0F, 0.0F);
   glVertex3f(-sx, -sy, -sz);
   glVertex3f(sx, -sy, -sz);
   glVertex3f(sx, -sy, sz);
   glVertex3f(-sx, -sy, sz);
   // right
-  glNormal3f(0.0f, 1.0f, 0.0f);
+  glNormal3f(0.0F, 1.0F, 0.0F);
   glVertex3f(-sx, sy, -sz);
   glVertex3f(sx, sy, -sz);
   glVertex3f(sx, sy, sz);
@@ -148,15 +148,15 @@ void drawBox(GLfloat l, GLfloat w, GLfloat h) {
 }
 
 void drawPlane(GLfloat l, GLfloat w) {
-  GLfloat sx = l * 0.5f;
-  GLfloat sy = w * 0.5f;
+  GLfloat sx = l * 0.5F;
+  GLfloat sy = w * 0.5F;
 
   glBegin(GL_QUADS);
-  glNormal3f(0.0f, 0.0f, 1.0f);
-  glVertex3f(-sx, -sy, 0.f);
-  glVertex3f(-sx, sy, 0.f);
-  glVertex3f(sx, sy, 0.f);
-  glVertex3f(sx, -sy, 0.f);
+  glNormal3f(0.0F, 0.0F, 1.0F);
+  glVertex3f(-sx, -sy, 0.F);
+  glVertex3f(-sx, sy, 0.F);
+  glVertex3f(sx, sy, 0.F);
+  glVertex3f(sx, -sy, 0.F);
   glEnd();
 }
 
@@ -169,34 +169,34 @@ void drawEllipsoid(GLfloat r1, GLfloat r2, GLfloat r3) {
   if (!hasNormalization) glEnable(GL_NORMALIZE);
   glPushMatrix();
   glScalef(r1, r2, r3);
-  gluSphere(GLUWrapper::getQuadradic(), 1.0f, 32, 32);
+  gluSphere(GLUWrapper::getQuadradic(), 1.0F, 32, 32);
   glPopMatrix();
   if (!hasNormalization) glDisable(GL_NORMALIZE);
 }
 
 void drawCone(GLfloat radius, GLfloat height) {
   glPushMatrix();
-  glRotatef(-90.f, 1.f, 0.f, 0.f);
-  glTranslatef(0.f, 0.f, -height / 2.0f);
-  gluCylinder(GLUWrapper::getQuadradic(), radius, 0.f, height, 32, 1);
+  glRotatef(-90.F, 1.F, 0.F, 0.F);
+  glTranslatef(0.F, 0.F, -height / 2.0F);
+  gluCylinder(GLUWrapper::getQuadradic(), radius, 0.F, height, 32, 1);
   gluDisk(GLUWrapper::getQuadradic(), 0, radius, 32, 1);
   glPopMatrix();
 }
 
 void drawCylinder(GLfloat radius, GLfloat height) {
   glPushMatrix();
-  glRotatef(-90, 1.f, 0.f, 0.f);
-  glTranslatef(0.f, 0.f, +height / 2.0f);
-  gluDisk(GLUWrapper::getQuadradic(), 0.f, radius, 32, 1);
+  glRotatef(-90, 1.F, 0.F, 0.F);
+  glTranslatef(0.F, 0.F, +height / 2.0F);
+  gluDisk(GLUWrapper::getQuadradic(), 0.F, radius, 32, 1);
   glTranslatef(0, 0, -height);
   gluCylinder(GLUWrapper::getQuadradic(), radius, radius, height, 32, 1);
-  glRotatef(180, 1.f, 0.f, 0.f);
+  glRotatef(180, 1.F, 0.F, 0.F);
   gluDisk(GLUWrapper::getQuadradic(), 0, radius, 32, 1);
   glPopMatrix();
 }
 
 void drawDisk(GLfloat radius) {
-  glRotatef(90, 0.f, 1.f, 0.f);
+  glRotatef(90, 0.F, 1.F, 0.F);
   gluDisk(GLUWrapper::getQuadradic(), 0, radius, 32, 1);
 }
 
@@ -207,25 +207,25 @@ void drawCircle(GLfloat radius, int segments) {
     double angle = i * angleStep;
     float x = radius * cos(angle);
     float y = radius * sin(angle);
-    glVertex3f(x, y, 0.f);
+    glVertex3f(x, y, 0.F);
   }
   glEnd();
 }
 
 void drawPyramid(GLfloat length, GLfloat height) {
   glPushMatrix();
-  glTranslatef(0.f, 0.f, -height / 2.0f);
-  glRotatef(45, 0.f, 0.f, 1.f);
-  gluCylinder(GLUWrapper::getQuadradic(), length, 0.f, height, 4, 1);
+  glTranslatef(0.F, 0.F, -height / 2.0F);
+  glRotatef(45, 0.F, 0.F, 1.F);
+  gluCylinder(GLUWrapper::getQuadradic(), length, 0.F, height, 4, 1);
   gluDisk(GLUWrapper::getQuadradic(), 0, length, 4, 1);
   glPopMatrix();
 }
 
 void drawRangeRing(GLfloat range, GLfloat fov, GLfloat range_width) {
   glPushMatrix();
-  glRotatef((fov / 2.0f) - 90, 0.f, 0.f, 1.f);
+  glRotatef((fov / 2.0F) - 90, 0.F, 0.F, 1.F);
   gluPartialDisk(GLUWrapper::getQuadradic(), range, range + range_width, 32, 1,
-                 0.f, fov);
+                 0.F, fov);
   glPopMatrix();
 }
 
@@ -236,23 +236,23 @@ void drawSlice(GLfloat radius, GLfloat height, GLfloat fov,
   double angle_step = fov_rad / num_slices;
   double angle_step_half = angle_step * 0.5;
 
-  GLfloat height_half = height * 0.5f;
+  GLfloat height_half = height * 0.5F;
   GLfloat lower_z = -height_half;
   GLfloat upper_z = height_half;
 
-  auto last_x = float(std::cos(-fov_rad * 0.5f) * radius);
-  auto last_y = float(std::sin(-fov_rad * 0.5f) * radius);
+  auto last_x = float(std::cos(-fov_rad * 0.5F) * radius);
+  auto last_y = float(std::sin(-fov_rad * 0.5F) * radius);
 
   glPushMatrix();
   glBegin(GL_TRIANGLES);
   glNormal3f(static_cast<float>(std::sin(-fov_rad * 0.5)),
-             static_cast<float>(-std::cos(-fov_rad * 0.5)), 0.f);
-  glVertex3f(0.f, 0.f, upper_z);
-  glVertex3f(0.f, 0.f, lower_z);
+             static_cast<float>(-std::cos(-fov_rad * 0.5)), 0.F);
+  glVertex3f(0.F, 0.F, upper_z);
+  glVertex3f(0.F, 0.F, lower_z);
   glVertex3f(last_x, last_y, upper_z);
   glVertex3f(last_x, last_y, upper_z);
   glVertex3f(last_x, last_y, lower_z);
-  glVertex3f(0.f, 0.f, lower_z);
+  glVertex3f(0.F, 0.F, lower_z);
 
   double start_angle = -0.5 * fov_rad + angle_step;
   double angle = start_angle;
@@ -263,17 +263,17 @@ void drawSlice(GLfloat radius, GLfloat height, GLfloat fov,
     auto front_normal_y = static_cast<float>(std::sin(angle + angle_step_half));
 
     // lower triangle
-    glNormal3f(0.f, 0.f, -1.f);
-    glVertex3f(0.f, 0.f, lower_z);
+    glNormal3f(0.F, 0.F, -1.F);
+    glVertex3f(0.F, 0.F, lower_z);
     glVertex3f(x, y, lower_z);
     glVertex3f(last_x, last_y, lower_z);
     // upper
-    glNormal3f(0.f, 0.f, 1.f);
-    glVertex3f(0.f, 0.f, upper_z);
+    glNormal3f(0.F, 0.F, 1.F);
+    glVertex3f(0.F, 0.F, upper_z);
     glVertex3f(x, y, upper_z);
     glVertex3f(last_x, last_y, upper_z);
     // front rectangle (we use two triangles)
-    glNormal3f(front_normal_x, front_normal_y, 0.f);
+    glNormal3f(front_normal_x, front_normal_y, 0.F);
     glVertex3f(last_x, last_y, upper_z);
     glVertex3f(last_x, last_y, lower_z);
     glVertex3f(x, y, upper_z);
@@ -287,13 +287,13 @@ void drawSlice(GLfloat radius, GLfloat height, GLfloat fov,
   }
 
   glNormal3f(float(-std::sin(fov_rad * 0.5)), float(std::cos(fov_rad * 0.5)),
-             -0.f);
-  glVertex3f(0.f, 0.f, upper_z);
-  glVertex3f(0.f, 0.f, lower_z);
+             -0.F);
+  glVertex3f(0.F, 0.F, upper_z);
+  glVertex3f(0.F, 0.F, lower_z);
   glVertex3f(last_x, last_y, upper_z);
   glVertex3f(last_x, last_y, upper_z);
   glVertex3f(last_x, last_y, lower_z);
-  glVertex3f(0.f, 0.f, lower_z);
+  glVertex3f(0.F, 0.F, lower_z);
 
   glEnd();
   glPopMatrix();

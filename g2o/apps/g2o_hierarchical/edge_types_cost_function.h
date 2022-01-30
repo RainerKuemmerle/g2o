@@ -47,12 +47,11 @@ struct EdgeTypesCostFunction : public HyperDijkstra::CostFunction {
   //! @param edgeTag: the tag of the edge type to consider
   //! @param vertexTag: the tag of the vertex to  consider
   //! @param level: the level of the edge
-  EdgeTypesCostFunction(const std::string& edgeTag,
-                        const std::string& vertexTag, int level);
+  EdgeTypesCostFunction(std::string edgeTag, std::string vertexTag, int level);
 
   //! cost operator
-  virtual double operator()(HyperGraph::Edge* e_, HyperGraph::Vertex* from,
-                            HyperGraph::Vertex* to);
+  double operator()(HyperGraph::Edge* e_, HyperGraph::Vertex* from,
+                    HyperGraph::Vertex* to) override;
 
   std::string _edgeTag;
   std::string _vertexTag;

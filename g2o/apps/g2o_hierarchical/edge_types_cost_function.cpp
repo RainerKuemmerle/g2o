@@ -27,23 +27,23 @@
 #include "edge_types_cost_function.h"
 
 #include <limits>
+#include <utility>
 
 #include "g2o/core/factory.h"
 
 namespace g2o {
 
-EdgeTypesCostFunction::EdgeTypesCostFunction(const std::string& edgeTag,
-                                             const std::string& vertexTag,
-                                             int level)
-    : _edgeTag(edgeTag),
-      _vertexTag(vertexTag),
+EdgeTypesCostFunction::EdgeTypesCostFunction(std::string edgeTag,
+                                             std::string vertexTag, int level)
+    : _edgeTag(std::move(edgeTag)),
+      _vertexTag(std::move(vertexTag)),
       _factory(Factory::instance()),
       _level(level) {}
 
 double EdgeTypesCostFunction::operator()(HyperGraph::Edge* e_,
                                          HyperGraph::Vertex* from,
                                          HyperGraph::Vertex* to) {
-  OptimizableGraph::Edge* e = (OptimizableGraph::Edge*)(e_);
+  auto* e = static_cast<OptimizableGraph::Edge*>(e_);
   if (e->level() == _level && _factory->tag(e) == _edgeTag &&
       _factory->tag(from) == _vertexTag && _factory->tag(to) == _vertexTag) {
     return 1.;

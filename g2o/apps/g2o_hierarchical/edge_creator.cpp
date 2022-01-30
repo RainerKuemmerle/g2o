@@ -30,16 +30,14 @@
 
 namespace g2o {
 
-using namespace std;
-
 bool EdgeCreator::addAssociation(const std::string& vertexTypes,
                                  const std::string& edgeType,
                                  const std::vector<int>& parameterIds) {
-  EntryMap::iterator it = _vertexToEdgeMap.find(vertexTypes);
-  if (it != _vertexToEdgeMap.end())
-    it->second = edgeType;
+  auto it = vertexToEdgeMap_.find(vertexTypes);
+  if (it != vertexToEdgeMap_.end())
+    it->second = EdgeCreatorEntry(edgeType);
   else
-    _vertexToEdgeMap.insert(
+    vertexToEdgeMap_.insert(
         make_pair(vertexTypes, EdgeCreatorEntry(edgeType, parameterIds)));
   return true;
 }
@@ -49,10 +47,10 @@ bool EdgeCreator::addAssociation(const std::string& vertexTypes,
   return addAssociation(vertexTypes, edgeType, std::vector<int>());
 }
 
-bool EdgeCreator::removeAssociation(std::string vertexTypes) {
-  EntryMap::iterator it = _vertexToEdgeMap.find(vertexTypes);
-  if (it == _vertexToEdgeMap.end()) return false;
-  _vertexToEdgeMap.erase(it);
+bool EdgeCreator::removeAssociation(const std::string& vertexTypes) {
+  auto it = vertexToEdgeMap_.find(vertexTypes);
+  if (it == vertexToEdgeMap_.end()) return false;
+  vertexToEdgeMap_.erase(it);
   return true;
 }
 
@@ -60,27 +58,27 @@ std::shared_ptr<OptimizableGraph::Edge> EdgeCreator::createEdge(
     const OptimizableGraph::VertexContainer& vertices) {
   std::stringstream key;
   Factory* factory = Factory::instance();
-  for (size_t i = 0; i < vertices.size(); i++) {
-    key << factory->tag(vertices[i].get()) << ";";
+  for (const auto& vertex : vertices) {
+    key << factory->tag(vertex.get()) << ";";
   }
-  EntryMap::iterator it = _vertexToEdgeMap.find(key.str());
-  if (it == _vertexToEdgeMap.end()) {
-    cerr << "no thing in factory: " << key.str() << endl;
-    return 0;
+  auto it = vertexToEdgeMap_.find(key.str());
+  if (it == vertexToEdgeMap_.end()) {
+    std::cerr << "no thing in factory: " << key.str() << std::endl;
+    return nullptr;
   }
   std::shared_ptr<HyperGraph::HyperGraphElement> element =
       factory->construct(it->second._edgeTypeName);
   if (!element) {
-    cerr << "no thing can be created" << endl;
-    return 0;
+    std::cerr << "no thing can be created" << std::endl;
+    return nullptr;
   }
   std::shared_ptr<OptimizableGraph::Edge> e =
       std::dynamic_pointer_cast<OptimizableGraph::Edge>(element);
   assert(it->second._parameterIds.size() == e->numParameters());
   for (size_t i = 0; i < it->second._parameterIds.size(); i++) {
     if (!e->setParameterId(i, it->second._parameterIds[i])) {
-      cerr << "no thing in good for setting params" << endl;
-      return 0;
+      std::cerr << "no thing in good for setting params" << std::endl;
+      return nullptr;
     }
   }
   assert(e);

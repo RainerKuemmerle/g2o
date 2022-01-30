@@ -24,12 +24,11 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include <signal.h>
-
 #include <Eigen/Core>
 #include <Eigen/Dense>
 #include <algorithm>
 #include <cassert>
+#include <csignal>
 #include <fstream>
 #include <iomanip>
 #include <iostream>
@@ -55,40 +54,39 @@
 #include "g2o/stuff/unscented.h"
 #include "star.h"
 
-using namespace std;
-using namespace g2o;
-using namespace Eigen;
+using std::cerr;
+using std::endl;
 
-typedef SigmaPoint<VectorXd> MySigmaPoint;
+using MySigmaPoint = g2o::SigmaPoint<g2o::VectorX>;
+
+namespace g2o {
 
 void testMarginals(SparseOptimizer& optimizer) {
   cerr << "Projecting marginals" << endl;
   std::vector<std::pair<int, int> > blockIndices;
-  for (size_t i = 0; i < optimizer.activeVertices().size(); i++) {
-    const auto& v = optimizer.activeVertices()[i];
+  for (const auto& v : optimizer.activeVertices()) {
     if (v->hessianIndex() >= 0) {
-      blockIndices.push_back(make_pair(v->hessianIndex(), v->hessianIndex()));
+      blockIndices.emplace_back(v->hessianIndex(), v->hessianIndex());
     }
     // if (v->hessianIndex()>0){
     //   blockIndices.push_back(make_pair(v->hessianIndex()-1,
     //   v->hessianIndex()));
     // }
   }
-  SparseBlockMatrix<MatrixXd> spinv;
+  SparseBlockMatrix<MatrixX> spinv;
   if (optimizer.computeMarginals(spinv, blockIndices)) {
-    for (size_t i = 0; i < optimizer.activeVertices().size(); i++) {
-      const auto& v = optimizer.activeVertices()[i];
+    for (const auto& v : optimizer.activeVertices()) {
       cerr << "Vertex id:" << v->id() << endl;
       if (v->hessianIndex() >= 0) {
         cerr << "increments block :" << v->hessianIndex() << ", "
              << v->hessianIndex() << " covariance:" << endl;
-        VectorXd mean(
+        VectorX mean(
             v->minimalEstimateDimension());  // HACK: need to set identity
         mean.fill(0);
-        VectorXd oldMean(
+        VectorX oldMean(
             v->minimalEstimateDimension());  // HACK: need to set identity
         v->getMinimalEstimateData(&oldMean[0]);
-        MatrixXd& cov = *(spinv.block(v->hessianIndex(), v->hessianIndex()));
+        MatrixX& cov = *(spinv.block(v->hessianIndex(), v->hessianIndex()));
         std::vector<MySigmaPoint, Eigen::aligned_allocator<MySigmaPoint> > spts;
         cerr << cov << endl;
         if (!sampleUnscented(spts, mean, cov)) continue;
@@ -112,7 +110,7 @@ void testMarginals(SparseOptimizer& optimizer) {
           // cerr << tspts[j]._sample << endl;
           v->pop();
         }
-        MatrixXd cov2 = cov;
+        MatrixX cov2 = cov;
         reconstructGaussian(mean, cov2, tspts);
         cerr << "global block :" << v->hessianIndex() << ", "
              << v->hessianIndex() << endl;
@@ -133,15 +131,15 @@ void testMarginals(SparseOptimizer& optimizer) {
 }
 
 int unscentedTest() {
-  MatrixXd m = MatrixXd(6, 6);
+  MatrixX m = MatrixX(6, 6);
   for (int i = 0; i < 6; i++) {
     for (int j = i; j < 6; j++) {
       m(i, j) = m(j, i) = i * j + 1;
     }
   }
-  m += MatrixXd::Identity(6, 6);
+  m += MatrixX::Identity(6, 6);
   cerr << m;
-  VectorXd mean(6);
+  VectorX mean(6);
   mean.fill(1);
 
   std::vector<MySigmaPoint, Eigen::aligned_allocator<MySigmaPoint> > spts;
@@ -152,8 +150,8 @@ int unscentedTest() {
     cerr << spts[i]._sample << endl;
   }
 
-  VectorXd recMean(6);
-  MatrixXd recCov(6, 6);
+  VectorX recMean(6);
+  MatrixX recCov(6, 6);
 
   reconstructGaussian(recMean, recCov, spts);
 
@@ -165,3 +163,5 @@ int unscentedTest() {
 
   return 0;
 }
+
+}  // namespace g2o

@@ -51,7 +51,8 @@ namespace g2o {
  * of the state variables.  It does so by using an EdgeLabeler class.
  */
 
-struct Star {
+class Star {
+ public:
   //! constructs a star at level l in the graph of the sparse optimizer passed
   //! as argument
   //! @param level: the (higher) level of the star
@@ -65,34 +66,35 @@ struct Star {
   bool labelStarEdges(int iterations, EdgeLabeler* labeler);
 
   //! returns the level of the lower edges in the star
-  inline int level() const { return _level; };
+  inline int level() const { return level_; };
   //! returns the optimizer
-  inline SparseOptimizer* optimizer() { return _optimizer; }
+  inline SparseOptimizer* optimizer() const { return optimizer_; }
   //! low level edge set
-  inline HyperGraph::EdgeSet& lowLevelEdges() { return _lowLevelEdges; }
+  inline HyperGraph::EdgeSet& lowLevelEdges() { return lowLevelEdges_; }
   //! high level edge set
-  inline HyperGraph::EdgeSet& starEdges() { return _starEdges; }
+  inline HyperGraph::EdgeSet& starEdges() { return starEdges_; }
   //! edges in the high level that lead to some node owned by a different star
-  inline HyperGraph::EdgeSet& starFrontierEdges() { return _starFrontierEdges; }
+  inline HyperGraph::EdgeSet& starFrontierEdges() { return starFrontierEdges_; }
   //! set of nodes to keep fixed in the optimization
-  inline HyperGraph::VertexSet& gauge() { return _gauge; }
+  inline HyperGraph::VertexSet& gauge() { return gauge_; }
   //! set of all vertices in the low level
-  inline HyperGraph::VertexSet& lowLevelVertices() { return _lowLevelVertices; }
+  inline HyperGraph::VertexSet& lowLevelVertices() { return lowLevelVertices_; }
 
+ protected:
   //! level of the star
-  int _level;
+  int level_;
   //! optimizer
-  SparseOptimizer* _optimizer;
+  SparseOptimizer* optimizer_;
   //! edges in the lower level
-  HyperGraph::EdgeSet _lowLevelEdges;
+  HyperGraph::EdgeSet lowLevelEdges_;
   //! edges in the star
-  HyperGraph::EdgeSet _starEdges;
+  HyperGraph::EdgeSet starEdges_;
   //! edges in the star that lead to some other star
-  HyperGraph::EdgeSet _starFrontierEdges;
+  HyperGraph::EdgeSet starFrontierEdges_;
   //! vertices that are fixed (center of the star)
-  HyperGraph::VertexSet _gauge;
+  HyperGraph::VertexSet gauge_;
   //! vertices that are fixed (center of the star)
-  HyperGraph::VertexSet _lowLevelVertices;
+  HyperGraph::VertexSet lowLevelVertices_;
 };
 
 // clang-format off

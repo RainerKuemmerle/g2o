@@ -47,7 +47,7 @@ struct G2O_HIERARCHICAL_API EdgeLabeler {
   //! constructs an edge labeler that operates on the optimizer passed as
   //! argument
   //! @param optimizer: the optimizer
-  EdgeLabeler(SparseOptimizer* optimizer);
+  explicit EdgeLabeler(SparseOptimizer* optimizer);
 
   //! Labels the set of edges passed as argument. It computes the cholesky
   //! information matrix. This method only woorks aftec having called an
@@ -63,22 +63,22 @@ struct G2O_HIERARCHICAL_API EdgeLabeler {
   //! an edge
   //! @param pattern: the blocks of the inverse covered by the edge
   //! @param e: the edge
-  void augmentSparsePattern(std::set<std::pair<int, int> >& pattern,
-                            OptimizableGraph::Edge* e);
+  static void augmentSparsePattern(std::set<std::pair<int, int> >& pattern,
+                                   OptimizableGraph::Edge* e);
 
   //! helper function that computes the inverse based on the sparse pattenrn
   //! @param spinv:   the output block inverse
   //! @param pattern: the blocks of the inverse covered by the edge
   //! @returns true on successm, false on failure, .
-  bool computePartialInverse(SparseBlockMatrix<Eigen::MatrixXd>& spinv,
+  bool computePartialInverse(SparseBlockMatrix<MatrixX>& spinv,
                              const std::set<std::pair<int, int> >& pattern);
 
   //! helper function that labes a specific edge based on the marginals in the
   //! sparse block inverse
   //! @returns true on success, false on failure
-  bool labelEdge(const SparseBlockMatrix<Eigen::MatrixXd>& spinv,
-                 OptimizableGraph::Edge* e);
-  SparseOptimizer* _optimizer;
+  static bool labelEdge(const SparseBlockMatrix<MatrixX>& spinv,
+                        OptimizableGraph::Edge* e);
+  SparseOptimizer* optimizer_;
 };
 
 }  // namespace g2o

@@ -80,24 +80,22 @@ void compute_dq_dR(Eigen::Matrix<number_t, 3, 9, Eigen::ColMajor>& dq_dR,
   int whichCase =
       q2m(S, qw, r11, r21, r31, r12, r22, r32, r13, r23, r33);  // NOLINT
   S *= .25;
+  // clang-format off
   switch (whichCase) {
     case 0:
-      compute_dq_dR_w(dq_dR, S, r11, r21, r31, r12, r22, r32, r13, r23,
-                      r33);  // NOLINT
+      compute_dq_dR_w(dq_dR, S, r11, r21, r31, r12, r22, r32, r13, r23, r33);  // NOLINT
       break;
     case 1:
-      compute_dq_dR_x(dq_dR, S, r11, r21, r31, r12, r22, r32, r13, r23,
-                      r33);  // NOLINT
+      compute_dq_dR_x(dq_dR, S, r11, r21, r31, r12, r22, r32, r13, r23, r33);  // NOLINT
       break;
     case 2:
-      compute_dq_dR_y(dq_dR, S, r11, r21, r31, r12, r22, r32, r13, r23,
-                      r33);  // NOLINT
+      compute_dq_dR_y(dq_dR, S, r11, r21, r31, r12, r22, r32, r13, r23, r33);  // NOLINT
       break;
     case 3:
-      compute_dq_dR_z(dq_dR, S, r11, r21, r31, r12, r22, r32, r13, r23,
-                      r33);  // NOLINT
+      compute_dq_dR_z(dq_dR, S, r11, r21, r31, r12, r22, r32, r13, r23, r33);  // NOLINT
       break;
   }
+  // clang-format on
   if (qw <= 0) dq_dR *= -1;
 }
 }  // namespace internal

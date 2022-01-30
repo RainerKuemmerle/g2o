@@ -61,7 +61,7 @@ G2O_HIERARCHICAL_API void computeBorder(StarSet& stars, EdgeStarMap& hesmap);
 G2O_HIERARCHICAL_API void computeSimpleStars(
     StarSet& stars, SparseOptimizer* optimizer, EdgeLabeler* labeler,
     EdgeCreator* creator,
-    const std::shared_ptr<OptimizableGraph::Vertex>& gauge_,
+    const std::shared_ptr<OptimizableGraph::Vertex>& gauge,
     const std::string& edgeTag, const std::string& vertexTag, int level,
     int step, int backboneIterations = 1, int starIterations = 30,
     double rejectionThreshold = 1e-5, bool debug = false);

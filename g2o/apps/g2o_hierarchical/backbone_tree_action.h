@@ -52,18 +52,18 @@ struct BackBoneTreeAction : public HyperDijkstra::TreeAction {
    * @param level: the level of the lowLevelEdges of the stars in the backbone
    * @param step:  depth in tree after which a new star is initialized
    */
-  BackBoneTreeAction(SparseOptimizer* optimizer, const std::string& vertexTag,
+  BackBoneTreeAction(SparseOptimizer* optimizer, std::string vertexTag,
                      int level, int step);
 
   //! initializes the visit and clears the internal structures
   void init();
 
   //! map vertex->star. Contains the most recent vertex assignment
-  inline VertexStarMap& vertexStarMap() { return _vsMap; }
+  inline VertexStarMap& vertexStarMap() { return vsMap_; }
   //! multimap vertex->star. Contains all the vertex assignments to all stars
-  inline VertexStarMultimap& vertexStarMultiMap() { return _vsMmap; }
+  inline VertexStarMultimap& vertexStarMultiMap() { return vsMmap_; }
   //! edges that are not yet assigned to any star
-  inline HyperGraph::EdgeSet& freeEdges() { return _freeEdges; }
+  inline HyperGraph::EdgeSet& freeEdges() { return freeEdges_; }
 
   /**
    * action to be performed during the descent of the dijkstra tree.  it
@@ -74,10 +74,10 @@ struct BackBoneTreeAction : public HyperDijkstra::TreeAction {
    * @param e: the edge between v and its parent
    * @param distance: the depth in the tree
    */
-  virtual double perform(const std::shared_ptr<HyperGraph::Vertex>& v,
-                         const std::shared_ptr<HyperGraph::Vertex>& vParent,
-                         const std::shared_ptr<HyperGraph::Edge>& e,
-                         double distance);
+  double perform(const std::shared_ptr<HyperGraph::Vertex>& v,
+                 const std::shared_ptr<HyperGraph::Vertex>& vParent,
+                 const std::shared_ptr<HyperGraph::Edge>& e,
+                 double distance) override;
 
  protected:
   /**
@@ -98,15 +98,15 @@ struct BackBoneTreeAction : public HyperDijkstra::TreeAction {
   bool fillStar(const std::shared_ptr<Star>& s,
                 const std::shared_ptr<OptimizableGraph::Edge>& e_);
 
-  SparseOptimizer* _optimizer;
-  std::string _vertexTag;
-  int _level;
-  int _step;
+  SparseOptimizer* optimizer_;
+  std::string vertexTag_;
+  int level_;
+  int step_;
 
-  VertexStarMap _vsMap;
-  VertexStarMultimap _vsMmap;
-  HyperGraph::EdgeSet _freeEdges;
-  Factory* _factory;
+  VertexStarMap vsMap_;
+  VertexStarMultimap vsMmap_;
+  HyperGraph::EdgeSet freeEdges_;
+  Factory* factory_;
 };
 
 }  // namespace g2o

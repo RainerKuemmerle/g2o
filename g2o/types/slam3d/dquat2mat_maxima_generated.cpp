@@ -24,12 +24,12 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-void compute_dq_dR_w(Eigen::Matrix<number_t, 3, 9>& dq_dR_w, const number_t& qw,
-                     const number_t& r00, const number_t& r10,
-                     const number_t& r20, const number_t& r01,
-                     const number_t& r11, const number_t& r21,
-                     const number_t& r02, const number_t& r12,
-                     const number_t& r22) {  // NOLINT
+void compute_dq_dR_w(Eigen::Matrix<number_t, 3, 9>& dq_dR_w,  // NOLINT
+                     const number_t& qw, const number_t& r00,
+                     const number_t& r10, const number_t& r20,
+                     const number_t& r01, const number_t& r11,
+                     const number_t& r21, const number_t& r02,
+                     const number_t& r12, const number_t& r22) {
   (void)r00;
   (void)r11;
   (void)r22;
@@ -68,12 +68,12 @@ void compute_dq_dR_w(Eigen::Matrix<number_t, 3, 9>& dq_dR_w, const number_t& qw,
   dq_dR_w(2, 7) = 0;
   dq_dR_w(2, 8) = _aux7;
 }
-void compute_dq_dR_x(Eigen::Matrix<number_t, 3, 9>& dq_dR_x, const number_t& qx,
-                     const number_t& r00, const number_t& r10,
-                     const number_t& r20, const number_t& r01,
-                     const number_t& r11, const number_t& r21,
-                     const number_t& r02, const number_t& r12,
-                     const number_t& r22) {  // NOLINT
+void compute_dq_dR_x(Eigen::Matrix<number_t, 3, 9>& dq_dR_x,  // NOLINT
+                     const number_t& qx, const number_t& r00,
+                     const number_t& r10, const number_t& r20,
+                     const number_t& r01, const number_t& r11,
+                     const number_t& r21, const number_t& r02,
+                     const number_t& r12, const number_t& r22) {
   (void)r00;
   (void)r11;
   (void)r21;
@@ -115,12 +115,12 @@ void compute_dq_dR_x(Eigen::Matrix<number_t, 3, 9>& dq_dR_x, const number_t& qx,
   dq_dR_x(2, 7) = 0;
   dq_dR_x(2, 8) = _aux8;
 }
-void compute_dq_dR_y(Eigen::Matrix<number_t, 3, 9>& dq_dR_y, const number_t& qy,
-                     const number_t& r00, const number_t& r10,
-                     const number_t& r20, const number_t& r01,
-                     const number_t& r11, const number_t& r21,
-                     const number_t& r02, const number_t& r12,
-                     const number_t& r22) {  // NOLINT
+void compute_dq_dR_y(Eigen::Matrix<number_t, 3, 9>& dq_dR_y,  // NOLINT
+                     const number_t& qy, const number_t& r00,
+                     const number_t& r10, const number_t& r20,
+                     const number_t& r01, const number_t& r11,
+                     const number_t& r21, const number_t& r02,
+                     const number_t& r12, const number_t& r22) {
   (void)r00;
   (void)r20;
   (void)r11;
@@ -162,12 +162,12 @@ void compute_dq_dR_y(Eigen::Matrix<number_t, 3, 9>& dq_dR_y, const number_t& qy,
   dq_dR_y(2, 7) = _aux5;
   dq_dR_y(2, 8) = _aux8;
 }
-void compute_dq_dR_z(Eigen::Matrix<number_t, 3, 9>& dq_dR_z, const number_t& qz,
-                     const number_t& r00, const number_t& r10,
-                     const number_t& r20, const number_t& r01,
-                     const number_t& r11, const number_t& r21,
-                     const number_t& r02, const number_t& r12,
-                     const number_t& r22) {  // NOLINT
+void compute_dq_dR_z(Eigen::Matrix<number_t, 3, 9>& dq_dR_z,  // NOLINT
+                     const number_t& qz, const number_t& r00,
+                     const number_t& r10, const number_t& r20,
+                     const number_t& r01, const number_t& r11,
+                     const number_t& r21, const number_t& r02,
+                     const number_t& r12, const number_t& r22) {
   (void)r00;
   (void)r10;
   (void)r01;
@@ -209,9 +209,9 @@ void compute_dq_dR_z(Eigen::Matrix<number_t, 3, 9>& dq_dR_z, const number_t& qz,
   dq_dR_z(2, 7) = 0;
   dq_dR_z(2, 8) = 0.125 * _aux4;
 }
-void compute_dR_dq(Eigen::Matrix<number_t, 9, 3>& dR_dq, const number_t& qx,
-                   const number_t& qy, const number_t& qz,
-                   const number_t& qw) {  // NOLINT
+void compute_dR_dq(Eigen::Matrix<number_t, 9, 3>& dR_dq,  // NOLINT
+                   const number_t& qx, const number_t& qy, const number_t& qz,
+                   const number_t& qw) {
   number_t _aux1 = -4 * qy;
   number_t _aux2 = -4 * qz;
   number_t _aux3 = 1 / qw;

@@ -27,6 +27,7 @@
 #ifndef G2O_EDGE_CREATOR_
 #define G2O_EDGE_CREATOR_
 
+#include <utility>
 #include <vector>
 
 #include "g2o/core/sparse_optimizer.h"
@@ -44,18 +45,18 @@ namespace g2o {
  */
 struct G2O_HIERARCHICAL_API EdgeCreator {
   struct EdgeCreatorEntry {
-    EdgeCreatorEntry(const std::string& edgeTypeName,
-                     const std::vector<int>& parameterIds)
-        : _edgeTypeName(edgeTypeName), _parameterIds(parameterIds) {}
+    EdgeCreatorEntry(std::string edgeTypeName, std::vector<int> parameterIds)
+        : _edgeTypeName(std::move(edgeTypeName)),
+          _parameterIds(std::move(parameterIds)) {}
 
-    EdgeCreatorEntry(const std::string& edgeTypeName)
-        : _edgeTypeName(edgeTypeName) {}
+    explicit EdgeCreatorEntry(std::string edgeTypeName)
+        : _edgeTypeName(std::move(edgeTypeName)) {}
 
     std::string _edgeTypeName;
     std::vector<int> _parameterIds;
   };
 
-  typedef std::map<std::string, EdgeCreatorEntry> EntryMap;
+  using EntryMap = std::map<std::string, EdgeCreatorEntry>;
 
   //! Adds an association to the association map
   //! @param vertexTypes: a string containing the tags of the vertices separated
@@ -82,7 +83,7 @@ struct G2O_HIERARCHICAL_API EdgeCreator {
 
   //! Removes an association to the association map.
   //! @params vertexTypes: the string of the vertex ids connected by the edge
-  bool removeAssociation(std::string vertexTypes);
+  bool removeAssociation(const std::string& vertexTypes);
 
   //! constructs an edge based on the verticesVector given as argument
   //! The vertices of the newly created edge are set to the parameter
@@ -93,7 +94,7 @@ struct G2O_HIERARCHICAL_API EdgeCreator {
       const OptimizableGraph::VertexContainer& vertices);
 
  protected:
-  EntryMap _vertexToEdgeMap;
+  EntryMap vertexToEdgeMap_;
 };
 
 }  // namespace g2o

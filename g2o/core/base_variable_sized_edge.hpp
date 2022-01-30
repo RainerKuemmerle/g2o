@@ -61,8 +61,8 @@ void BaseVariableSizedEdge<D, E>::linearizeOplus(
 
 template <int D, typename E>
 void BaseVariableSizedEdge<D, E>::linearizeOplus() {
-  constexpr number_t delta = cst(1e-9);
-  constexpr number_t scalar = 1 / (2 * delta);
+  constexpr number_t kDelta = cst(1e-9);
+  constexpr number_t kScalar = 1 / (2 * kDelta);
   ErrorVector errorBak;
   ErrorVector errorBeforeNumeric = error_;
 
@@ -88,20 +88,20 @@ void BaseVariableSizedEdge<D, E>::linearizeOplus() {
     add_vi.fill(0.);
     for (int d = 0; d < vi_dim; ++d) {
       vi->push();
-      add_vi[d] = delta;
+      add_vi[d] = kDelta;
       vi->oplus(add_vi.data());
       computeError();
       errorBak = error_;
       vi->pop();
       vi->push();
-      add_vi[d] = -delta;
+      add_vi[d] = -kDelta;
       vi->oplus(add_vi.data());
       computeError();
       errorBak -= error_;
       vi->pop();
       add_vi[d] = 0.0;
 
-      jacobianOplus_[i].col(d) = scalar * errorBak;
+      jacobianOplus_[i].col(d) = kScalar * errorBak;
     }  // end dimension
     error_ = errorBeforeNumeric;
   }
@@ -134,7 +134,7 @@ void BaseVariableSizedEdge<D, E>::resize(size_t size) {
   int maxIdx = (n * (n - 1)) / 2;
   assert(maxIdx >= 0);
   hessian_.resize(maxIdx);
-  jacobianOplus_.resize(size, JacobianType(0, 0, 0));
+  jacobianOplus_.resize(size, JacobianType(nullptr, 0, 0));
 }
 
 template <int D, typename E>
