@@ -1,0 +1,26 @@
+name: Clang-format-check
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  checkout-and-check-formatting:
+    runs-on: ubuntu-20.04
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install clang
+        run: |
+          echo "deb http://apt.llvm.org/focal/ llvm-toolchain-focal-13 main" | sudo tee -a /etc/apt/sources.list.d/clang.list
+          wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
+          sudo apt-get update
+          sudo apt-get install clang-format-13
+          sudo ln -s /usr/lib/llvm-13/bin/clang-format /usr/local/bin/clang-format
+          clang-format --version
+
+      - name: clang format check
+        run: bash script/run-style-check-diff.sh
