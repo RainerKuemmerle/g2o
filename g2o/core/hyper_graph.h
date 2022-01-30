@@ -199,21 +199,21 @@ class G2O_CORE_API HyperGraph {
       returns the pointer to the ith vertex connected to the hyper-edge.
       */
     std::shared_ptr<const Vertex> vertex(size_t i) const {
-      assert(i < _vertices.size() && "index out of bounds");
+      assert(i < vertices_.size() && "index out of bounds");
       return vertices_[i];
     }
     /**
       returns the pointer to the ith vertex connected to the hyper-edge.
       */
     std::shared_ptr<Vertex> vertex(size_t i) {
-      assert(i < _vertices.size() && "index out of bounds");
+      assert(i < vertices_.size() && "index out of bounds");
       return vertices_[i];
     }
     /**
       set the ith vertex on the hyper-edge to the pointer supplied
       */
     void setVertex(size_t i, const std::shared_ptr<Vertex>& v) {
-      assert(i < _vertices.size() && "index out of bounds");
+      assert(i < vertices_.size() && "index out of bounds");
       vertices_[i] = v;
     }
 

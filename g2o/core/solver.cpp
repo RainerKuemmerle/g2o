@@ -49,7 +49,7 @@ void Solver::resizeVector(size_t sx) {
     free_aligned(x_);
     x_ = allocate_aligned<number_t>(maxXSize_);
 #ifndef NDEBUG
-    memset(_x, 0, _maxXSize * sizeof(number_t));
+    memset(x_, 0, maxXSize_ * sizeof(number_t));
 #endif
     if (b_) {  // backup the former b, might still be needed for online
                // processing
@@ -60,7 +60,7 @@ void Solver::resizeVector(size_t sx) {
     } else {
       b_ = allocate_aligned<number_t>(maxXSize_);
 #ifndef NDEBUG
-      memset(_b, 0, _maxXSize * sizeof(number_t));
+      memset(b_, 0, maxXSize_ * sizeof(number_t));
 #endif
     }
   }

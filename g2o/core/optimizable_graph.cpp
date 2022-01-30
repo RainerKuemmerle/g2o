@@ -142,7 +142,7 @@ bool OptimizableGraph::Edge::resolveParameters() {
     int index = parameterIds_[i];
     parameters_[i] = graph()->parameter(index);
 #ifndef NDEBUG
-    auto& aux = *_parameters[i];
+    auto& aux = *parameters_[i];
     if (typeid(aux).name() != _parameterTypes[i]) {
       cerr << __PRETTY_FUNCTION__
            << ": FATAL, parameter type mismatch - encountered "
@@ -278,7 +278,7 @@ bool OptimizableGraph::setEdgeVertex(
   }
   if (!e->numUndefinedVertices()) {
 #ifndef NDEBUG
-    auto ee = dynamic_pointer_cast<OptimizableGraph::Edge>(e);
+    auto ee = std::dynamic_pointer_cast<OptimizableGraph::Edge>(e);
     assert(ee && "Edge is not a OptimizableGraph::Edge");
 #else
     auto ee = std::static_pointer_cast<OptimizableGraph::Edge>(e);
@@ -421,7 +421,7 @@ bool OptimizableGraph::load(std::istream& is) {
     std::shared_ptr<HyperGraph::HyperGraphElement> pelement =
         factory->construct(token, elemParamBitset);
     if (pelement) {  // not a parameter or otherwise unknown tag
-      assert(pelement->elementType() == HyperGraph::HGET_PARAMETER &&
+      assert(pelement->elementType() == HyperGraph::kHgetParameter &&
              "Should be a param");
       auto p = std::static_pointer_cast<Parameter>(pelement);
       int pid;
@@ -534,7 +534,7 @@ bool OptimizableGraph::load(std::istream& is) {
   }  // while read line
 
 #ifndef NDEBUG
-  cerr << "Loaded " << _parameters.size() << " parameters" << endl;
+  cerr << "Loaded " << parameters_.size() << " parameters" << endl;
 #endif
 
   return true;

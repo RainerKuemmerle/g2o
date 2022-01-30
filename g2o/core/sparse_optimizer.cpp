@@ -60,7 +60,7 @@ void SparseOptimizer::computeActiveErrors() {
   }
 
 #ifdef G2O_OPENMP
-#pragma omp parallel for default(shared) if (_activeEdges.size() > 50)
+#pragma omp parallel for default(shared) if (activeEdges_.size() > 50)
 #endif
   for (auto& _activeEdge : activeEdges_) {
     OptimizableGraph::Edge* e = _activeEdge.get();
@@ -68,8 +68,8 @@ void SparseOptimizer::computeActiveErrors() {
   }
 
 #ifndef NDEBUG
-  for (int k = 0; k < static_cast<int>(_activeEdges.size()); ++k) {
-    OptimizableGraph::Edge* e = _activeEdges[k].get();
+  for (int k = 0; k < static_cast<int>(activeEdges_.size()); ++k) {
+    OptimizableGraph::Edge* e = activeEdges_[k].get();
     bool hasNan = arrayHasNaN(e->errorData(), e->dimension());
     if (hasNan) {
       cerr << "computeActiveErrors(): found NaN in error for edge " << e
@@ -421,8 +421,8 @@ void SparseOptimizer::update(const number_t* update) {
 #ifndef NDEBUG
     bool hasNan = arrayHasNaN(update, v->dimension());
     if (hasNan)
-      cerr << __PRETTY_FUNCTION__ << ": Update contains a nan for vertex "
-           << v->id() << endl;
+      std::cerr << __PRETTY_FUNCTION__ << ": Update contains a nan for vertex "
+                << v->id() << std::endl;
 #endif
     v->oplus(update);
     update += v->dimension();
