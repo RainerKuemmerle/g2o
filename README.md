@@ -111,7 +111,7 @@ will install g2o together with its required dependencies. In this case no manual
 
 If using [vcpkg](https://github.com/Microsoft/vcpkg), then
 
-`scripts\install-deps-windows.bat`
+`script\install-deps-windows.bat`
 
 will build and install the required dependencies. The location of `vcpkg` and required triplet are determined by the environment variables `VCPKG_ROOT_DIR` and `VCPKG_DEFAULT_TRIPLET`.
 
