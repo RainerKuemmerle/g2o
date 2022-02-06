@@ -31,8 +31,6 @@ class G2oQGLViewer;
  */
 class G2O_VIEWER_API GuiHyperGraphAction : public HyperGraphAction {
  public:
-  GuiHyperGraphAction();
-  ~GuiHyperGraphAction() override;
 
   /**
    * calling updateGL, processEvents to visualize the current state after each

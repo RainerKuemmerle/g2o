@@ -50,17 +50,15 @@
 #define SO_EXT_LEN 2
 #endif
 
-using namespace std;
-
 namespace g2o {
 
 int DlWrapper::openLibraries(const std::string& directory,
                              const std::string& pattern) {
   // cerr << "# loading libraries from " << directory << "\t pattern: " <<
   // pattern << endl;
-  string searchPattern = directory + "/" + pattern;
+  std::string searchPattern = directory + "/" + pattern;
   if (pattern.empty()) searchPattern = directory + "/*";
-  vector<string> matchingFiles = getFilesByPattern(searchPattern.c_str());
+  std::vector<std::string> matchingFiles = getFilesByPattern(searchPattern.c_str());
 
   int numLibs = 0;
   for (auto& filename : matchingFiles) {
@@ -74,11 +72,11 @@ int DlWrapper::openLibraries(const std::string& directory,
       // wildcard expansion to wordexp.
 
 #ifndef G2O_LIBRARY_POSTFIX
-    if ((filename.rfind(string("_d.") + SO_EXT) ==
+    if ((filename.rfind(std::string("_d.") + SO_EXT) ==
          filename.length() - 3 - SO_EXT_LEN) ||
-        (filename.rfind(string("_rd.") + SO_EXT) ==
+        (filename.rfind(std::string("_rd.") + SO_EXT) ==
          filename.length() - 4 - SO_EXT_LEN) ||
-        (filename.rfind(string("_s.") + SO_EXT) ==
+        (filename.rfind(std::string("_s.") + SO_EXT) ==
          filename.length() - 3 - SO_EXT_LEN))
       continue;
 #endif
@@ -109,14 +107,14 @@ bool DlWrapper::openLibrary(const std::string& filename) {
 #if defined(UNIX) || defined(CYGWIN)
   void* handle = dlopen(filename.c_str(), RTLD_LAZY);
   if (!handle) {
-    cerr << __PRETTY_FUNCTION__ << " Cannot open library: " << dlerror()
+    std::cerr << __PRETTY_FUNCTION__ << " Cannot open library: " << dlerror()
          << '\n';
     return false;
   }
 #elif defined(WINDOWS)
   HMODULE handle = LoadLibrary(filename.c_str());
   if (!handle) {
-    cerr << __PRETTY_FUNCTION__ << " Cannot open library." << endl;
+    std::cerr << __PRETTY_FUNCTION__ << " Cannot open library." << std::endl;
     return false;
   }
 #endif

@@ -34,8 +34,7 @@
 #include "g2o/types/slam2d/types_slam2d.h"
 #include "g2o/types/slam3d/types_slam3d.h"
 
-using namespace g2o;
-using namespace std;
+namespace g2o {
 
 template <typename T>
 bool anonymizeLandmarkEdge(const std::shared_ptr<HyperGraph::Edge>& e_,
@@ -67,47 +66,52 @@ bool anonymizePoseEdge(const std::shared_ptr<HyperGraph::Edge>& e_,
   return false;
 }
 
+}  // namespace g2o
+
 int main(int argc, char** argv) {
-  CommandArgs arg;
+  g2o::CommandArgs arg;
   std::string outputFilename;
   std::string inputFilename;
   arg.param("o", outputFilename, "anon.g2o", "output file");
   arg.paramLeftOver("graph-output", inputFilename, "",
                     "graph file which will be read", true);
   arg.parseArgs(argc, argv);
-  OptimizableGraph graph;
+  g2o::OptimizableGraph graph;
 
-  if (inputFilename.size() == 0) {
-    cerr << "No input data specified" << endl;
+  if (inputFilename.empty()) {
+    std::cerr << "No input data specified" << std::endl;
     return 0;
-  } else if (inputFilename == "-") {
-    cerr << "Read input from stdin" << endl;
-    if (!graph.load(cin)) {
-      cerr << "Error loading graph" << endl;
+  }
+  if (inputFilename == "-") {
+    std::cerr << "Read input from stdin" << std::endl;
+    if (!graph.load(std::cin)) {
+      std::cerr << "Error loading graph" << std::endl;
       return 2;
     }
   } else {
-    cerr << "Read input from " << inputFilename << endl;
-    ifstream ifs(inputFilename.c_str());
+    std::cerr << "Read input from " << inputFilename << std::endl;
+    std::ifstream ifs(inputFilename.c_str());
     if (!ifs) {
-      cerr << "Failed to open file" << endl;
+      std::cerr << "Failed to open file" << std::endl;
       return 1;
     }
     if (!graph.load(ifs)) {
-      cerr << "Error loading graph" << endl;
+      std::cerr << "Error loading graph" << std::endl;
       return 2;
     }
   }
 
   for (auto it = graph.edges().begin(); it != graph.edges().end(); ++it) {
     const auto& e = *it;
-    if (anonymizeLandmarkEdge<EdgeSE2PointXY>(e, graph)) continue;
-    if (anonymizeLandmarkEdge<EdgeSE2PointXYOffset>(e, graph)) continue;
-    if (anonymizeLandmarkEdge<EdgeSE2PointXYBearing>(e, graph)) continue;
-    if (anonymizePoseEdge<EdgeSE2>(e, graph)) continue;
-    if (anonymizePoseEdge<EdgeSE2Offset>(e, graph)) continue;
+    // clang-format off
+    if (g2o::anonymizeLandmarkEdge<g2o::EdgeSE2PointXY>(e, graph)) continue;
+    if (g2o::anonymizeLandmarkEdge<g2o::EdgeSE2PointXYOffset>(e, graph)) continue;
+    if (g2o::anonymizeLandmarkEdge<g2o::EdgeSE2PointXYBearing>(e, graph)) continue;
+    if (g2o::anonymizePoseEdge<g2o::EdgeSE2>(e, graph)) continue;
+    if (g2o::anonymizePoseEdge<g2o::EdgeSE2Offset>(e, graph)) continue;
+    // clang-format on
   }
 
-  ofstream os(outputFilename.c_str());
+  std::ofstream os(outputFilename.c_str());
   graph.save(os);
 }

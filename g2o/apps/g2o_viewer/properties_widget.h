@@ -36,7 +36,7 @@ class G2O_VIEWER_API PropertiesWidget : public QDialog,
   Q_OBJECT
  public:
   explicit PropertiesWidget(QWidget* parent = nullptr);
-  ~PropertiesWidget() override;
+  ~PropertiesWidget() override = default;
 
   void setProperties(g2o::PropertyMap* properties);
 

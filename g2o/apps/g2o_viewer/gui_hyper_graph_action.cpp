@@ -25,10 +25,6 @@
 
 namespace g2o {
 
-GuiHyperGraphAction::GuiHyperGraphAction() : HyperGraphAction() {}
-
-GuiHyperGraphAction::~GuiHyperGraphAction() {}
-
 bool GuiHyperGraphAction::operator()(const HyperGraph* graph,
                                      Parameters* parameters) {
   (void)graph;
@@ -45,7 +41,7 @@ bool GuiHyperGraphAction::operator()(const HyperGraph* graph,
         viewer->saveSnapshot(QString().sprintf("g2o%.6d.png", p->iteration),
                              true);
 #else
-        viewer->saveSnapshot(QString().asprintf("g2o%.6d.png", p->iteration),
+        viewer->saveSnapshot(QString::asprintf("g2o%.6d.png", p->iteration),
                              true);
 #endif
       }

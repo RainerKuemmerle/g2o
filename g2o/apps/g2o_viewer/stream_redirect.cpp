@@ -29,7 +29,6 @@
 #include <QPlainTextEdit>
 #include <QString>
 #include <iostream>
-using namespace std;
 
 StreamRedirect::StreamRedirect(std::ostream &stream, QPlainTextEdit *te)
     : stream_(stream), te_(te) {

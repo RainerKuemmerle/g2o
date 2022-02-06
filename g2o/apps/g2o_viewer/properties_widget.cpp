@@ -24,18 +24,12 @@
 
 #include "g2o/stuff/property.h"
 
-using namespace std;
-
-using namespace g2o;
-
 PropertiesWidget::PropertiesWidget(QWidget* parent)
     : QDialog(parent)
 
 {
   setupUi(this);
 }
-
-PropertiesWidget::~PropertiesWidget() {}
 
 void PropertiesWidget::updateDisplayedProperties() {
   tableWidget->clear();
@@ -50,7 +44,7 @@ void PropertiesWidget::updateDisplayedProperties() {
 
   tableWidget->verticalHeader()->hide();
 
-  PropertyMap* properties = properties_;
+  g2o::PropertyMap* properties = properties_;
   if (!properties) return;
   tableWidget->setRowCount(properties->size());
 
@@ -62,8 +56,8 @@ void PropertiesWidget::updateDisplayedProperties() {
     tableWidget->setItem(r, 0, textItem);
     propNames_.push_back(it->first);
 
-    if (dynamic_cast<Property<bool>*>(it->second.get())) {
-      auto* prop = static_cast<Property<bool>*>(it->second.get());
+    if (dynamic_cast<g2o::Property<bool>*>(it->second.get())) {
+      auto* prop = static_cast<g2o::Property<bool>*>(it->second.get());
       auto* checkItem = new QTableWidgetItem;
       checkItem->setText("enabled");
       checkItem->setFlags(checkItem->flags() | Qt::ItemIsUserCheckable);
@@ -75,10 +69,10 @@ void PropertiesWidget::updateDisplayedProperties() {
     } else {
       auto* editor = new QLineEdit(tableWidget);
       editor->setText(QString::fromStdString(it->second->toString()));
-      if (dynamic_cast<Property<int>*>(it->second.get())) {
+      if (dynamic_cast<g2o::Property<int>*>(it->second.get())) {
         editor->setValidator(new QIntValidator(editor));
-      } else if (dynamic_cast<Property<float>*>(it->second.get()) ||
-                 dynamic_cast<Property<double>*>(it->second.get())) {
+      } else if (dynamic_cast<g2o::Property<float>*>(it->second.get()) ||
+                 dynamic_cast<g2o::Property<double>*>(it->second.get())) {
         editor->setValidator(new QDoubleValidator(editor));
       }
       tableWidget->setCellWidget(r, 1, editor);
@@ -89,22 +83,23 @@ void PropertiesWidget::updateDisplayedProperties() {
 
 void PropertiesWidget::applyProperties() {
   assert(tableWidget->rowCount() == (int)_propNames.size());
-  PropertyMap* properties = properties_;
+  g2o::PropertyMap* properties = properties_;
   for (int r = 0; r < tableWidget->rowCount(); ++r) {
     const std::string& propName = propNames_[r];
-    std::shared_ptr<BaseProperty> baseProp =
-        properties->getProperty<BaseProperty>(propName);
+    std::shared_ptr<g2o::BaseProperty> baseProp =
+        properties->getProperty<g2o::BaseProperty>(propName);
     if (!baseProp) continue;
 
-    if (dynamic_cast<Property<bool>*>(baseProp.get())) {
-      auto* prop = static_cast<Property<bool>*>(baseProp.get());
+    if (dynamic_cast<g2o::Property<bool>*>(baseProp.get())) {
+      auto* prop = static_cast<g2o::Property<bool>*>(baseProp.get());
       QTableWidgetItem* checkItem = tableWidget->item(r, 1);
       prop->setValue(checkItem->checkState() == Qt::Checked);
     } else {
       auto* editor = dynamic_cast<QLineEdit*>(tableWidget->cellWidget(r, 1));
       bool status = baseProp->fromString(editor->text().toStdString());
       if (!status) {
-        cerr << "Warning: unable to set property " << baseProp->name() << endl;
+        std::cerr << "Warning: unable to set property " << baseProp->name()
+                  << std::endl;
       }
     }
   }
@@ -122,7 +117,7 @@ std::string PropertiesWidget::humanReadablePropName(
   return propertyName;
 }
 
-void PropertiesWidget::setProperties(PropertyMap* properties) {
+void PropertiesWidget::setProperties(g2o::PropertyMap* properties) {
   properties_ = properties;
   updateDisplayedProperties();
 }
