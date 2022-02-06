@@ -52,6 +52,9 @@ jobs:
 
       - name: ccache
         uses: hendrikmuhs/ccache-action@v1
+        with:
+          key: ${{ matrix.os }}-${{ matrix.type }}
+          max-size: 1000M
 
       - name: Install dependencies on Ubuntu
         if: runner.os == 'Linux'
