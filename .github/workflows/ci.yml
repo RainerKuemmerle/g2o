@@ -50,6 +50,9 @@ jobs:
           echo github.event_name: ${{github.event_name}}
           echo runner.os: ${{runner.os}}
 
+      - name: ccache
+        uses: hendrikmuhs/ccache-action@v1
+
       - name: Install dependencies on Ubuntu
         if: runner.os == 'Linux'
         run: |
@@ -67,7 +70,7 @@ jobs:
       - name: Configure CMake
         run: |
           cmake --version
-          cmake -B ${{github.workspace}}/build -DBUILD_UNITTESTS=ON -DBUILD_CODE_COVERAGE=${{matrix.config.do_coverage}} -DCMAKE_BUILD_TYPE=${{matrix.config.build_type}}
+          cmake -B ${{github.workspace}}/build -DBUILD_UNITTESTS=ON -DBUILD_CODE_COVERAGE=${{matrix.config.do_coverage}} -DCMAKE_BUILD_TYPE=${{matrix.config.build_type}} -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
 
       - name: Build Introspection
         shell: bash
