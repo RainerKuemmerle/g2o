@@ -264,7 +264,7 @@ class SparseBlockMatrixHashMap {
    * add a block to the pattern, return a pointer to the added block
    */
   MatrixType* addBlock(int r, int c, bool zeroBlock = false) {
-    assert(c < (int)_blockCols.size() &&
+    assert(c < static_cast<int>(blockCols_.size()) &&
            "accessing column which is not available");
     SparseColumn& sparseColumn = blockCols_[c];
     auto foundIt = sparseColumn.find(r);

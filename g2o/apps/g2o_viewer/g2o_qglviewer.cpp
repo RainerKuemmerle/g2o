@@ -95,7 +95,7 @@ void G2oQGLViewer::draw() {
 
   if (drawActions_ == nullptr) {
     drawActions_ = HyperGraphActionLibrary::instance()->actionByName("draw");
-    assert(_drawActions);
+    assert(drawActions_);
   }
 
   if (!drawActions_)  // avoid segmentation fault in release build

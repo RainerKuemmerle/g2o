@@ -135,7 +135,7 @@ bool OptimizableGraph::Edge::resolveParameters() {
     return false;
   }
 
-  assert(_parameters.size() == _parameterIds.size());
+  assert(parameters_.size() == parameterIds_.size());
   // cerr << __PRETTY_FUNCTION__ << ": encountered " << _parameters.size() << "
   // parameters" << endl;
   for (size_t i = 0; i < parameters_.size(); i++) {
@@ -143,10 +143,10 @@ bool OptimizableGraph::Edge::resolveParameters() {
     parameters_[i] = graph()->parameter(index);
 #ifndef NDEBUG
     auto& aux = *parameters_[i];
-    if (typeid(aux).name() != _parameterTypes[i]) {
+    if (typeid(aux).name() != parameterTypes_[i]) {
       cerr << __PRETTY_FUNCTION__
            << ": FATAL, parameter type mismatch - encountered "
-           << typeid(aux).name() << "; should be " << _parameterTypes[i]
+           << typeid(aux).name() << "; should be " << parameterTypes_[i]
            << endl;
     }
 #endif

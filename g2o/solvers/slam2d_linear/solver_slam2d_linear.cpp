@@ -114,7 +114,7 @@ bool SolverSLAM2DLinear::solveOrientation() {
   // off diagonal for each edge
   for (const auto& it : optimizer_->activeEdges()) {
 #ifndef NDEBUG
-    auto* e = dynamic_cast<EdgeSE2*>(it->get());
+    auto* e = dynamic_cast<EdgeSE2*>(it.get());
     assert(e && "Active edges contain non-odometry edge");  //
 #else
     auto* e = static_cast<EdgeSE2*>(it.get());

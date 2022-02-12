@@ -76,7 +76,7 @@ HyperDijkstra::HyperDijkstra(std::shared_ptr<HyperGraph> g)
 void HyperDijkstra::reset() {
   for (const auto& it : visited_) {
     auto at = adjacencyMap_.find(it);
-    assert(at != _adjacencyMap.end());
+    assert(at != adjacencyMap_.end());
     at->second = AdjacencyMapEntry(at->first, nullptr, nullptr,
                                    std::numeric_limits<number_t>::max());
   }
@@ -102,7 +102,7 @@ void HyperDijkstra::shortestPaths(HyperGraph::VertexSet& vset,
       std::cerr << __PRETTY_FUNCTION__ << "Vertex " << v->id()
                 << " is not in the adjacency map" << std::endl;
     }
-    assert(it != _adjacencyMap.end());
+    assert(it != adjacencyMap_.end());
     it->second.distance_ = 0.;
     it->second.parent_ = nullptr;
     frontier.push(it->second);
@@ -117,7 +117,7 @@ void HyperDijkstra::shortestPaths(HyperGraph::VertexSet& vset,
       std::cerr << __PRETTY_FUNCTION__ << "Vertex " << u->id()
                 << " is not in the adjacency map" << std::endl;
     }
-    assert(ut != _adjacencyMap.end());
+    assert(ut != adjacencyMap_.end());
     number_t uDistance = ut->second.distance();
 
     std::pair<HyperGraph::VertexSet::iterator, bool> insertResult =
@@ -142,7 +142,7 @@ void HyperDijkstra::shortestPaths(HyperGraph::VertexSet& vset,
         // cerr << z->id() << " " << zDistance << endl;
 
         auto ot = adjacencyMap_.find(z);
-        assert(ot != _adjacencyMap.end());
+        assert(ot != adjacencyMap_.end());
 
         if (zDistance + comparisonConditioner < ot->second.distance() &&
             zDistance < maxDistance) {

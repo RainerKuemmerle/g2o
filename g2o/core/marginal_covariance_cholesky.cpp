@@ -54,7 +54,7 @@ void MarginalCovarianceCholesky::setCholeskyFactor(int n, int* Lp, int* Li,
   for (int r = 0; r < n; ++r) {
     const int& sc = Ap_[r];  // L is lower triangular, thus the first elem in
                              // the column is the diagonal entry
-    assert(r == _Ai[sc] && "Error in CCS storage of L");
+    assert(r == Ai_[sc] && "Error in CCS storage of L");
     diag_[r] = 1.0 / Ax_[sc];
   }
 }
@@ -134,7 +134,7 @@ void MarginalCovarianceCholesky::computeCovariance(
           std::swap(r, c);
         int idx = computeIndex(r, c);
         LookupMap::const_iterator foundIt = map_.find(idx);
-        assert(foundIt != _map.end());
+        assert(foundIt != map_.end());
         cov[rr * vdim + cc] = foundIt->second;
         if (rr != cc) cov[cc * vdim + rr] = foundIt->second;
       }
@@ -201,7 +201,7 @@ void MarginalCovarianceCholesky::computeCovariance(
         if (r > c) std::swap(r, c);
         int idx = computeIndex(r, c);
         LookupMap::const_iterator foundIt = map_.find(idx);
-        assert(foundIt != _map.end());
+        assert(foundIt != map_.end());
         (*block)(iRow, iCol) = foundIt->second;
       }
   }

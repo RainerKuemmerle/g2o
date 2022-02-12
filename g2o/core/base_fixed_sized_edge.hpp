@@ -26,7 +26,7 @@
 
 template <int D, typename E, typename... VertexTypes>
 void BaseFixedSizedEdge<D, E, VertexTypes...>::resize(size_t size) {
-  assert(size == _nr_of_vertices &&
+  assert(size == kNrOfVertices &&
          "attempting to resize a constant size edge");
   BaseEdge<D, E>::resize(size);
 }
@@ -95,7 +95,7 @@ void BaseFixedSizedEdge<D, E, VertexTypes...>::
     constructOffDiagonalQuadraticFormM(const AtOType& AtO) {
   constexpr auto kFromId = N;
   constexpr auto kToId = N + M + 1;
-  assert(fromId < toId && "Index mixed up");
+  assert(kFromId < kToId && "Index mixed up");
   auto to = vertexXn<kToId>();
   if (!to->fixed()) {
     const auto& B = std::get<kToId>(jacobianOplus_);

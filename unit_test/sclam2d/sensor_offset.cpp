@@ -240,7 +240,7 @@ class SensorCalibrationFromData
 
     const std::string data = std::get<0>(GetParam());
     const int sensorOffsetId = std::get<1>(GetParam());
-    const g2o::SE2 expectedSensorOffset = std::get<2>(GetParam());
+    expectedSensorOffset = std::get<2>(GetParam());
 
     std::stringstream input(data);
     optimizer->load(input);
@@ -251,6 +251,7 @@ class SensorCalibrationFromData
  protected:
   std::unique_ptr<g2o::SparseOptimizer> optimizer;
   std::shared_ptr<g2o::VertexSE2> sensorOffsetVertex;
+  g2o::SE2 expectedSensorOffset;
 };
 
 TEST_P(SensorCalibrationFromData, Optimization) {
@@ -259,6 +260,7 @@ TEST_P(SensorCalibrationFromData, Optimization) {
   optimizer->optimize(10);
   auto after = sensorOffsetVertex->estimate().toVector();
   EXPECT_NE(before, after);
+  EXPECT_TRUE(after.isApprox(expectedSensorOffset.toVector(), 1e-2));
 }
 
 INSTANTIATE_TEST_SUITE_P(Sclam, SensorCalibrationFromData,

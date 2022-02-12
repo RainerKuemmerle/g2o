@@ -72,8 +72,8 @@ void SparseOptimizer::computeActiveErrors() {
     OptimizableGraph::Edge* e = activeEdges_[k].get();
     bool hasNan = arrayHasNaN(e->errorData(), e->dimension());
     if (hasNan) {
-      cerr << "computeActiveErrors(): found NaN in error for edge " << e
-           << endl;
+      std::cerr << "computeActiveErrors(): found NaN in error for edge " << e
+                << std::endl;
     }
   }
 #endif
@@ -237,8 +237,8 @@ bool SparseOptimizer::initializeOptimization(HyperGraph::VertexSet& vset,
           int k;
           bool hasNan = arrayHasNaN(estimateData.data(), estimateDim, &k);
           if (hasNan)
-            cerr << __PRETTY_FUNCTION__ << ": Vertex " << v->id()
-                 << " contains a nan entry at index " << k << endl;
+            std::cerr << __PRETTY_FUNCTION__ << ": Vertex " << v->id()
+                      << " contains a nan entry at index " << k << std::endl;
         }
       }
 #endif

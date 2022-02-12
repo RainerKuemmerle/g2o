@@ -95,7 +95,7 @@ bool ParameterContainer::read(
         factory->construct(token, elemBitset);
     if (!element)  // not a parameter or otherwise unknown tag
       continue;
-    assert(element->elementType() == HyperGraph::HGET_PARAMETER &&
+    assert(element->elementType() == HyperGraph::kHgetParameter &&
            "Should be a param");
 
     auto p = std::static_pointer_cast<Parameter>(element);

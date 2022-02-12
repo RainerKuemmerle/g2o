@@ -58,8 +58,8 @@ OptimizationAlgorithmDogleg::~OptimizationAlgorithmDogleg() = default;
 
 OptimizationAlgorithm::SolverResult OptimizationAlgorithmDogleg::solve(
     int iteration, bool online) {
-  assert(_optimizer && "_optimizer not set");
-  assert(_solver.optimizer() == _optimizer &&
+  assert(optimizer_ && "optimizer_ not set");
+  assert(solver_.optimizer() == optimizer_ &&
          "underlying linear solver operates on different graph");
 
   auto& blockSolver = static_cast<BlockSolverBase&>(solver_);
@@ -176,7 +176,7 @@ OptimizationAlgorithm::SolverResult OptimizationAlgorithmDogleg::solve(
       assert(beta > 0. && beta < 1 && "Error while computing beta");
       hdl_ = hsd_ + beta * (hgn - hsd_);
       lastStep_ = kStepDl;
-      assert(_hdl.norm() < _delta + 1e-5 &&
+      assert(hdl_.norm() < delta_ + 1e-5 &&
              "Computed step does not correspond to the trust region");
     }
 

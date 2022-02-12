@@ -87,7 +87,7 @@ class G2O_CORE_API JacobianWorkspace {
    * return the workspace for a vertex in an edge
    */
   number_t* workspaceForVertex(int vertexIndex) {
-    assert(vertexIndex >= 0 && (size_t)vertexIndex < _workspace.size() &&
+    assert(vertexIndex >= 0 && (size_t)vertexIndex < workspace_.size() &&
            "Index out of bounds");
     return workspace_[vertexIndex].data();
   }

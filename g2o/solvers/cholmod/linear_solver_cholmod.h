@@ -236,13 +236,13 @@ class LinearSolverCholmod : public LinearSolverCCS<MatrixType> {
 
   //! compute the cholmodFactor for the given matrix A
   bool computeCholmodFactor(const SparseBlockMatrix<MatrixType>& A, double& t) {
-    // _cholmodFactor used as bool, if not existing will copy the whole
+    // cholmodFactor_ used as bool, if not existing will copy the whole
     // structure, otherwise only the values
     fillCholmodExt(A, cholmodFactor_ != nullptr);
 
     if (cholmodFactor_ == nullptr) {
       computeSymbolicDecomposition(A);
-      assert(_cholmodFactor != 0 && "Symbolic cholesky failed");
+      assert(cholmodFactor_ != 0 && "Symbolic cholesky failed");
     }
     t = get_monotonic_time();
 
@@ -270,8 +270,8 @@ class LinearSolverCholmod : public LinearSolverCCS<MatrixType> {
     int change_status = cholmod_change_factor(CHOLMOD_REAL, 1, 0, 1, 1,
                                               cholmodFactor_, &cholmodCommon_);
     if (!change_status) return false;
-    assert(_cholmodFactor->is_ll && !_cholmodFactor->is_super &&
-           _cholmodFactor->is_monotonic && "Cholesky factor has wrong format");
+    assert(cholmodFactor_->is_ll && !cholmodFactor_->is_super &&
+           cholmodFactor_->is_monotonic && "Cholesky factor has wrong format");
 
     // invert the permutation
     int* p = static_cast<int*>(cholmodFactor_->Perm);

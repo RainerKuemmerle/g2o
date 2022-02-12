@@ -53,8 +53,8 @@ OptimizationAlgorithmLevenberg::OptimizationAlgorithmLevenberg(
 
 OptimizationAlgorithm::SolverResult OptimizationAlgorithmLevenberg::solve(
     int iteration, bool online) {
-  assert(_optimizer && "_optimizer not set");
-  assert(_solver.optimizer() == _optimizer &&
+  assert(optimizer_ && "optimizer_ not set");
+  assert(solver_.optimizer() == optimizer_ &&
          "underlying linear solver operates on different graph");
 
   if (iteration == 0 &&

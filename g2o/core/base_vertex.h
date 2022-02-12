@@ -114,13 +114,13 @@ class BaseVertex : public OptimizableGraph::Vertex {
 
   void push() override { backup_.push(estimate_); }
   void pop() override {
-    assert(!_backup.empty());
+    assert(!backup_.empty());
     estimate_ = backup_.top();
     backup_.pop();
     updateCache();
   }
   void discardTop() override {
-    assert(!_backup.empty());
+    assert(!backup_.empty());
     backup_.pop();
   }
   int stackSize() const override { return backup_.size(); }

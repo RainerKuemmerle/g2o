@@ -134,7 +134,7 @@ class LinearSolverCSparse : public LinearSolverCCS<MatrixType> {
     // perform symbolic cholesky once
     if (symbolicDecomposition_ == nullptr) {
       computeSymbolicDecomposition(A);
-      assert(_symbolicDecomposition && "Symbolic cholesky failed");
+      assert(symbolicDecomposition_ && "Symbolic cholesky failed");
     }
     // re-allocate the temporary workspace for cholesky
     if (csWorkspaceSize_ < ccsA_.n) {

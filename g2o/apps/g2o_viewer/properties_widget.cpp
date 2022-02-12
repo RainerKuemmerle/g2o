@@ -82,7 +82,7 @@ void PropertiesWidget::updateDisplayedProperties() {
 }
 
 void PropertiesWidget::applyProperties() {
-  assert(tableWidget->rowCount() == (int)_propNames.size());
+  assert(tableWidget->rowCount() == (int)propNames_.size());
   g2o::PropertyMap* properties = properties_;
   for (int r = 0; r < tableWidget->rowCount(); ++r) {
     const std::string& propName = propNames_[r];

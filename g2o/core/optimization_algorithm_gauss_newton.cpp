@@ -42,7 +42,7 @@ OptimizationAlgorithmGaussNewton::OptimizationAlgorithmGaussNewton(
 
 OptimizationAlgorithm::SolverResult OptimizationAlgorithmGaussNewton::solve(
     int iteration, bool online) {
-  assert(_solver.optimizer() == _optimizer &&
+  assert(solver_.optimizer() == optimizer_ &&
          "underlying linear solver operates on different graph");
   bool ok = true;
 

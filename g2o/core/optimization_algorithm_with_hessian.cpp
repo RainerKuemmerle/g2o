@@ -43,7 +43,7 @@ OptimizationAlgorithmWithHessian::OptimizationAlgorithmWithHessian(
 }
 
 bool OptimizationAlgorithmWithHessian::init(bool online) {
-  assert(_optimizer && "_optimizer not set");
+  assert(optimizer_ && "optimizer_ not set");
   solver_.setWriteDebug(writeDebug_->value());
   bool useSchur = false;
   for (const auto& v : optimizer_->activeVertices()) {

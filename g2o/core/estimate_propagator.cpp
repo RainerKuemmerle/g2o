@@ -70,7 +70,7 @@ void EstimatePropagator::reset() {
   for (const auto& it : visited_) {
     auto v = std::static_pointer_cast<OptimizableGraph::Vertex>(it);
     auto at = adjacencyMap_.find(v);
-    assert(at != _adjacencyMap.end());
+    assert(at != adjacencyMap_.end());
     at->second.reset();
   }
   visited_.clear();
@@ -97,7 +97,7 @@ void EstimatePropagator::propagate(
   for (const auto& vit : vset) {
     auto v = std::static_pointer_cast<OptimizableGraph::Vertex>(vit);
     auto it = adjacencyMap_.find(v);
-    assert(it != _adjacencyMap.end());
+    assert(it != adjacencyMap_.end());
     it->second.distance_ = 0.;
     it->second.parent_.clear();
     it->second.frontierLevel_ = 0;
@@ -151,7 +151,7 @@ void EstimatePropagator::propagate(
           // cerr << z->id() << " " << zDistance << endl;
 
           auto ot = adjacencyMap_.find(z);
-          assert(ot != _adjacencyMap.end());
+          assert(ot != adjacencyMap_.end());
 
           if (zDistance < ot->second.distance() && zDistance < maxDistance) {
             // if (ot->second.inQueue)
@@ -174,8 +174,8 @@ void EstimatePropagator::propagate(
 #ifdef DEBUG_ESTIMATE_PROPAGATOR
   cerr << "Writing cost.dat" << endl;
   ofstream costStream("cost.dat");
-  for (AdjacencyMap::const_iterator it = _adjacencyMap.begin();
-       it != _adjacencyMap.end(); ++it) {
+  for (AdjacencyMap::const_iterator it = adjacencyMap_.begin();
+       it != adjacencyMap_.end(); ++it) {
     HyperGraph::Vertex* u = it->second.child();
     costStream << "vertex " << u->id() << "  cost " << it->second._distance
                << endl;
@@ -183,8 +183,8 @@ void EstimatePropagator::propagate(
   cerr << "Writing init.dat" << endl;
   ofstream initStream("init.dat");
   vector<AdjacencyMapEntry*> frontierLevels;
-  for (AdjacencyMap::iterator it = _adjacencyMap.begin();
-       it != _adjacencyMap.end(); ++it) {
+  for (AdjacencyMap::iterator it = adjacencyMap_.begin();
+       it != adjacencyMap_.end(); ++it) {
     if (it->second._frontierLevel > 0) frontierLevels.push_back(&it->second);
   }
   sort(frontierLevels.begin(), frontierLevels.end(), FrontierLevelCmp());
@@ -206,12 +206,12 @@ void EstimatePropagator::propagate(
 void EstimatePropagator::PriorityQueue::push(AdjacencyMapEntry* entry) {
   assert(entry != NULL);
   if (entry->inQueue_) {
-    assert(entry->queueIt->second == entry);
+    assert(entry->queueIt_->second == entry);
     erase(entry->queueIt_);
   }
 
   entry->queueIt_ = insert(std::make_pair(entry->distance(), entry));
-  assert(entry->queueIt != end());
+  assert(entry->queueIt_ != end());
   entry->inQueue_ = true;
 }
 

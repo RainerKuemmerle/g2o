@@ -49,7 +49,7 @@ void BlockSolver<Traits>::resize(int* blockPoseIndices, int numPoseBlocks,
 
   if (doSchur_) {
     // the following two are only used in schur
-    assert(_sizePoses > 0 && "allocating with wrong size");
+    assert(sizePoses_ > 0 && "allocating with wrong size");
     coefficients_.reset(allocate_aligned<number_t>(totalDim));
     bschur_.reset(allocate_aligned<number_t>(sizePoses_));
   }
@@ -98,7 +98,7 @@ BlockSolver<Traits>::~BlockSolver() = default;
 
 template <typename Traits>
 bool BlockSolver<Traits>::buildStructure(bool zeroBlocks) {
-  assert(_optimizer);
+  assert(optimizer_);
 
   size_t sparseDim = 0;
   numPoses_ = 0;
@@ -145,7 +145,7 @@ bool BlockSolver<Traits>::buildStructure(bool zeroBlocks) {
       ++landmarkIdx;
     }
   }
-  assert(poseIdx == _numPoses && landmarkIdx == _numLandmarks);
+  assert(poseIdx == numPoses_ && landmarkIdx == numLandmarks_);
 
   // temporary structures for building the pattern of the Schur complement
   SparseBlockMatrixHashMap<PoseMatrixType>* schurMatrixLookup = nullptr;
@@ -356,7 +356,7 @@ bool BlockSolver<Traits>::solve() {
     }
     db = Dinv * db;
 
-    assert((size_t)landmarkIndex < _HplCCS->blockCols().size() &&
+    assert((size_t)landmarkIndex < HplCCS_->blockCols().size() &&
            "Index out of bounds");
     const typename SparseBlockMatrixCCS<PoseLandmarkMatrixType>::SparseColumn&
         landmarkColumn = HplCCS_->blockCols()[landmarkIndex];
@@ -369,7 +369,7 @@ bool BlockSolver<Traits>::solve() {
       assert(Bi);
 
       PoseLandmarkMatrixType BDinv = (*Bi) * (Dinv);
-      assert(_HplCCS->rowBaseOfBlock(i1) < _sizePoses && "Index out of bounds");
+      assert(HplCCS_->rowBaseOfBlock(i1) < sizePoses_ && "Index out of bounds");
       typename PoseVectorType::MapType Bb(
           &coefficients_[HplCCS_->rowBaseOfBlock(i1)], Bi->rows());
 #ifdef G2O_OPENMP
@@ -378,7 +378,7 @@ bool BlockSolver<Traits>::solve() {
       Bb.noalias() += (*Bi) * db;
 
       assert(i1 >= 0 &&
-             i1 < static_cast<int>(_HschurTransposedCCS->blockCols().size()) &&
+             i1 < static_cast<int>(HschurTransposedCCS_->blockCols().size()) &&
              "Index out of bounds");
       auto targetColumnIt = HschurTransposedCCS_->blockCols()[i1].begin();
 
@@ -390,9 +390,9 @@ bool BlockSolver<Traits>::solve() {
         int i2 = it_inner->row;
         const PoseLandmarkMatrixType* Bj = it_inner->block;
         assert(Bj);
-        while (targetColumnIt->row < i2 /*&& targetColumnIt != _HschurTransposedCCS->blockCols()[i1].end()*/)
+        while (targetColumnIt->row < i2 /*&& targetColumnIt != HschurTransposedCCS_->blockCols()[i1].end()*/)
           ++targetColumnIt;
-        assert(targetColumnIt != _HschurTransposedCCS->blockCols()[i1].end() &&
+        assert(targetColumnIt != HschurTransposedCCS_->blockCols()[i1].end() &&
                targetColumnIt->row == i2 &&
                "invalid iterator, something wrong with the matrix structure");
         PoseMatrixType* Hi1i2 = targetColumnIt->block;  //_Hschur->block(i1,i2);
@@ -474,7 +474,7 @@ bool BlockSolver<Traits>::buildSystem() {
   // clear b vector
 #ifdef G2O_OPENMP
 #pragma omp parallel for default( \
-    shared) if (_optimizer->indexMapping().size() > 1000)
+    shared) if (optimizer_->indexMapping().size() > 1000)
 #endif
   for (auto* v : optimizer_->indexMapping()) {
     assert(v);
@@ -495,9 +495,9 @@ bool BlockSolver<Traits>::buildSystem() {
 #else
   // if running with threads need to produce copies of the workspace for each
   // thread
-  JacobianWorkspace jacobianWorkspace = _optimizer->jacobianWorkspace();
+  JacobianWorkspace jacobianWorkspace = optimizer_->jacobianWorkspace();
 #pragma omp parallel for default(shared) firstprivate( \
-    jacobianWorkspace) if (_optimizer->activeEdges().size() > 100)
+    jacobianWorkspace) if (optimizer_->activeEdges().size() > 100)
 #endif
   for (const auto& e : optimizer_->activeEdges()) {
     e->linearizeOplus(
@@ -523,7 +523,7 @@ bool BlockSolver<Traits>::buildSystem() {
   // flush the current system in a sparse block matrix
 #ifdef G2O_OPENMP
 #pragma omp parallel for default( \
-    shared) if (_optimizer->indexMapping().size() > 1000)
+    shared) if (optimizer_->indexMapping().size() > 1000)
 #endif
   for (auto* v : optimizer_->indexMapping()) {
     int iBase = v->colInHessian();
@@ -541,7 +541,7 @@ bool BlockSolver<Traits>::setLambda(number_t lambda, bool backup) {
     diagonalBackupLandmark_.resize(numLandmarks_);
   }
 #ifdef G2O_OPENMP
-#pragma omp parallel for default(shared) if (_numPoses > 100)
+#pragma omp parallel for default(shared) if (numPoses_ > 100)
 #endif
   for (int i = 0; i < numPoses_; ++i) {
     PoseMatrixType* b = Hpp_->block(i, i);
@@ -549,7 +549,7 @@ bool BlockSolver<Traits>::setLambda(number_t lambda, bool backup) {
     b->diagonal().array() += lambda;
   }
 #ifdef G2O_OPENMP
-#pragma omp parallel for default(shared) if (_numLandmarks > 100)
+#pragma omp parallel for default(shared) if (numLandmarks_ > 100)
 #endif
   for (int i = 0; i < numLandmarks_; ++i) {
     LandmarkMatrixType* b = Hll_->block(i, i);
@@ -561,9 +561,9 @@ bool BlockSolver<Traits>::setLambda(number_t lambda, bool backup) {
 
 template <typename Traits>
 void BlockSolver<Traits>::restoreDiagonal() {
-  assert((int)_diagonalBackupPose.size() == _numPoses &&
+  assert((int)diagonalBackupPose_.size() == numPoses_ &&
          "Mismatch in dimensions");
-  assert((int)_diagonalBackupLandmark.size() == _numLandmarks &&
+  assert((int)diagonalBackupLandmark_.size() == numLandmarks_ &&
          "Mismatch in dimensions");
   for (int i = 0; i < numPoses_; ++i) {
     PoseMatrixType* b = Hpp_->block(i, i);
