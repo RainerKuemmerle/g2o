@@ -37,19 +37,19 @@ namespace tutorial {
 class G2O_TUTORIAL_SLAM2D_API ParameterSE2Offset : public Parameter {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
-  ParameterSE2Offset();
+  ParameterSE2Offset() = default;
 
   void setOffset(const SE2& offset = SE2());
 
-  const SE2& offset() const { return _offset; }
-  const SE2& inverseOffset() const { return _inverseOffset; }
+  const SE2& offset() const { return offset_; }
+  const SE2& inverseOffset() const { return inverseOffset_; }
 
-  virtual bool read(std::istream& is);
-  virtual bool write(std::ostream& os) const;
+  bool read(std::istream& is) override;
+  bool write(std::ostream& os) const override;
 
  protected:
-  SE2 _offset;
-  SE2 _inverseOffset;
+  SE2 offset_;
+  SE2 inverseOffset_;
 };
 
 class G2O_TUTORIAL_SLAM2D_API CacheSE2Offset : public Cache {
@@ -57,13 +57,13 @@ class G2O_TUTORIAL_SLAM2D_API CacheSE2Offset : public Cache {
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
   using ParameterType = ParameterSE2Offset;
 
-  const SE2& w2n() const { return _w2n; }
-  const SE2& n2w() const { return _n2w; }
+  const SE2& w2n() const { return w2n_; }
+  const SE2& n2w() const { return n2w_; }
 
  protected:
-  virtual void updateImpl();
+  void updateImpl() override;
 
-  SE2 _w2n, _n2w;
+  SE2 w2n_, n2w_;
 };
 
 }  // end namespace tutorial

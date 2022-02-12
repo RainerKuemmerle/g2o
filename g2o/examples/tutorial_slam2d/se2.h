@@ -41,55 +41,55 @@ namespace tutorial {
 class G2O_TUTORIAL_SLAM2D_API SE2 {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
-  SE2() : _R(0), _t(0, 0) {}
+  SE2() : R_(0), t_(0, 0) {}
 
-  SE2(double x, double y, double theta) : _R(theta), _t(x, y) {}
+  SE2(double x, double y, double theta) : R_(theta), t_(x, y) {}
 
-  const Eigen::Vector2d& translation() const { return _t; }
+  const Eigen::Vector2d& translation() const { return t_; }
 
-  Eigen::Vector2d& translation() { return _t; }
+  Eigen::Vector2d& translation() { return t_; }
 
-  const Eigen::Rotation2Dd& rotation() const { return _R; }
+  const Eigen::Rotation2Dd& rotation() const { return R_; }
 
-  Eigen::Rotation2Dd& rotation() { return _R; }
+  Eigen::Rotation2Dd& rotation() { return R_; }
 
   SE2 operator*(const SE2& tr2) const {
     SE2 result(*this);
-    result._t += _R * tr2._t;
-    result._R.angle() += tr2._R.angle();
-    result._R.angle() = normalize_theta(result._R.angle());
+    result.t_ += R_ * tr2.t_;
+    result.R_.angle() += tr2.R_.angle();
+    result.R_.angle() = normalize_theta(result.R_.angle());
     return result;
   }
 
   SE2& operator*=(const SE2& tr2) {
-    _t += _R * tr2._t;
-    _R.angle() += tr2._R.angle();
-    _R.angle() = normalize_theta(_R.angle());
+    t_ += R_ * tr2.t_;
+    R_.angle() += tr2.R_.angle();
+    R_.angle() = normalize_theta(R_.angle());
     return *this;
   }
 
   Eigen::Vector2d operator*(const Eigen::Vector2d& v) const {
-    return _t + _R * v;
+    return t_ + R_ * v;
   }
 
   SE2 inverse() const {
     SE2 ret;
-    ret._R = _R.inverse();
-    ret._R.angle() = normalize_theta(ret._R.angle());
-    ret._t = ret._R * (Eigen::Vector2d(-1 * _t));
+    ret.R_ = R_.inverse();
+    ret.R_.angle() = normalize_theta(ret.R_.angle());
+    ret.t_ = ret.R_ * (Eigen::Vector2d(-1 * t_));
     return ret;
   }
 
   double operator[](int i) const {
     assert(i >= 0 && i < 3);
-    if (i < 2) return _t(i);
-    return _R.angle();
+    if (i < 2) return t_(i);
+    return R_.angle();
   }
 
   double& operator[](int i) {
     assert(i >= 0 && i < 3);
-    if (i < 2) return _t(i);
-    return _R.angle();
+    if (i < 2) return t_(i);
+    return R_.angle();
   }
 
   void fromVector(const Eigen::Vector3d& v) { *this = SE2(v[0], v[1], v[2]); }
@@ -103,8 +103,8 @@ class G2O_TUTORIAL_SLAM2D_API SE2 {
   }
 
  protected:
-  Eigen::Rotation2Dd _R;
-  Eigen::Vector2d _t;
+  Eigen::Rotation2Dd R_;
+  Eigen::Vector2d t_;
 };
 
 }  // namespace tutorial

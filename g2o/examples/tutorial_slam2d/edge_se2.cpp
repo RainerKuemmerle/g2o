@@ -26,18 +26,14 @@
 
 #include "edge_se2.h"
 
-using namespace Eigen;
-
 namespace g2o {
 namespace tutorial {
 
-EdgeSE2::EdgeSE2() : BaseBinaryEdge<3, SE2, VertexSE2, VertexSE2>() {}
-
 bool EdgeSE2::read(std::istream& is) {
-  Vector3d p;
+  Vector3 p;
   is >> p[0] >> p[1] >> p[2];
   measurement_.fromVector(p);
-  _inverseMeasurement = measurement().inverse();
+  inverseMeasurement_ = measurement().inverse();
   for (int i = 0; i < 3; ++i)
     for (int j = i; j < 3; ++j) {
       is >> information()(i, j);
@@ -47,7 +43,7 @@ bool EdgeSE2::read(std::istream& is) {
 }
 
 bool EdgeSE2::write(std::ostream& os) const {
-  Vector3d p = measurement().toVector();
+  Vector3 p = measurement().toVector();
   os << p.x() << " " << p.y() << " " << p.z();
   for (int i = 0; i < 3; ++i)
     for (int j = i; j < 3; ++j) os << " " << information()(i, j);

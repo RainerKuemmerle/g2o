@@ -31,37 +31,37 @@
 namespace g2o {
 namespace tutorial {
 
-ParameterSE2Offset::ParameterSE2Offset() {}
-
 void ParameterSE2Offset::setOffset(const SE2& offset) {
-  _offset = offset;
-  _inverseOffset = offset.inverse();
+  offset_ = offset;
+  inverseOffset_ = offset.inverse();
 }
 
 bool ParameterSE2Offset::read(std::istream& is) {
-  double x, y, th;
+  double x;
+  double y;
+  double th;
   is >> x >> y >> th;
   setOffset(SE2(x, y, th));
   return true;
 }
 
 bool ParameterSE2Offset::write(std::ostream& os) const {
-  os << _offset.translation().x() << " " << _offset.translation().y() << " "
-     << _offset.rotation().angle();
+  os << offset_.translation().x() << " " << offset_.translation().y() << " "
+     << offset_.rotation().angle();
   return os.good();
 }
 
 void CacheSE2Offset::updateImpl() {
 #ifndef NDEBUG
-  ParameterSE2Offset* offsetParam =
+  auto* offsetParam =
       dynamic_cast<ParameterSE2Offset*>(parameters_[0].get());
 #else
   ParameterSE2Offset* offsetParam =
       static_cast<ParameterSE2Offset*>(parameters_[0].get());
 #endif
-  const VertexSE2* v = static_cast<const VertexSE2*>(vertex());
-  _n2w = v->estimate() * offsetParam->offset();
-  _w2n = _n2w.inverse();
+  const auto* v = static_cast<const VertexSE2*>(vertex());
+  n2w_ = v->estimate() * offsetParam->offset();
+  w2n_ = n2w_.inverse();
 }
 
 }  // end namespace tutorial

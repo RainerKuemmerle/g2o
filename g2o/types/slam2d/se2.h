@@ -84,7 +84,7 @@ class G2O_TYPES_SLAM2D_API SE2 {
     ret.R_ = R_.inverse();
     ret.R_.angle() = normalize_theta(ret.R_.angle());
 #ifdef _MSC_VER
-    ret._t = ret._R * (Vector2(_t * -1.));
+    ret._t = ret.R_ * (Vector2(t_ * -1.));
 #else
     ret.t_ = ret.R_ * (t_ * -1.);
 #endif

@@ -46,9 +46,6 @@
 #include <GL/glu.h>
 #endif
 
-#include <iostream>
-using namespace std;
-
 namespace g2o {
 
 namespace {

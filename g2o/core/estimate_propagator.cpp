@@ -204,7 +204,7 @@ void EstimatePropagator::propagate(
 }
 
 void EstimatePropagator::PriorityQueue::push(AdjacencyMapEntry* entry) {
-  assert(entry != NULL);
+  assert(entry != nullptr);
   if (entry->inQueue_) {
     assert(entry->queueIt_->second == entry);
     erase(entry->queueIt_);
@@ -222,7 +222,7 @@ EstimatePropagator::PriorityQueue::pop() {
   AdjacencyMapEntry* entry = it->second;
   erase(it);
 
-  assert(entry != NULL);
+  assert(entry != nullptr);
   entry->queueIt_ = end();
   entry->inQueue_ = false;
   return entry;

@@ -68,8 +68,8 @@ void SparseOptimizer::computeActiveErrors() {
   }
 
 #ifndef NDEBUG
-  for (int k = 0; k < static_cast<int>(activeEdges_.size()); ++k) {
-    OptimizableGraph::Edge* e = activeEdges_[k].get();
+  for (auto & activeEdge : activeEdges_) {
+    OptimizableGraph::Edge* e = activeEdge.get();
     bool hasNan = arrayHasNaN(e->errorData(), e->dimension());
     if (hasNan) {
       std::cerr << "computeActiveErrors(): found NaN in error for edge " << e
@@ -233,7 +233,7 @@ bool SparseOptimizer::initializeOptimization(HyperGraph::VertexSet& vset,
       int estimateDim = v->estimateDimension();
       if (estimateDim > 0) {
         VectorX estimateData(estimateDim);
-        if (v->getEstimateData(estimateData.data()) == true) {
+        if (v->getEstimateData(estimateData.data())) {
           int k;
           bool hasNan = arrayHasNaN(estimateData.data(), estimateDim, &k);
           if (hasNan)

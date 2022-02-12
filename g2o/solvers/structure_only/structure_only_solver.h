@@ -102,7 +102,7 @@ class StructureOnlySolver : public OptimizationAlgorithm {
           v->clearQuadraticForm();
 
           g2o::HyperGraph::EdgeSetWeak& track = v->edges();
-          assert(track.size() >= 1);
+          assert(!track.empty());
 
           for (const auto& it_t : track) {
             auto e =

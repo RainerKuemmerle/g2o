@@ -26,12 +26,10 @@
 
 #include "vertex_point_xy.h"
 
-using namespace Eigen;
-
 namespace g2o {
 namespace tutorial {
 
-VertexPointXY::VertexPointXY() : BaseVertex<2, Vector2d>() {
+VertexPointXY::VertexPointXY()  {
   estimate_.setZero();
 }
 

@@ -38,22 +38,21 @@ namespace tutorial {
 
 class G2O_TUTORIAL_SLAM2D_API Simulator {
  public:
-  enum G2O_TUTORIAL_SLAM2D_API MotionType { MO_LEFT, MO_RIGHT, MO_NUM_ELEMS };
+  enum G2O_TUTORIAL_SLAM2D_API MotionType { kMoLeft, kMoRight, kMoNumElems };
 
   /**
    * \brief simulated landmark
    */
   struct G2O_TUTORIAL_SLAM2D_API Landmark {
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
-    int id;
+    int id = -1;
     Eigen::Vector2d truePose;
     Eigen::Vector2d simulatedPose;
     std::vector<int> seenBy;
-    Landmark() : id(-1) {}
+    Landmark()  = default;
   };
-  typedef std::vector<Landmark, Eigen::aligned_allocator<Landmark> >
-      LandmarkVector;
-  typedef std::vector<Landmark*> LandmarkPtrVector;
+  using LandmarkVector = std::vector<Landmark, Eigen::aligned_allocator<Landmark>>;
+  using LandmarkPtrVector = std::vector<Landmark *>;
 
   /**
    * simulated pose of the robot
@@ -65,8 +64,7 @@ class G2O_TUTORIAL_SLAM2D_API Simulator {
     SE2 simulatorPose;
     LandmarkPtrVector landmarks;  ///< the landmarks observed by this node
   };
-  typedef std::vector<GridPose, Eigen::aligned_allocator<GridPose> >
-      PosesVector;
+  using PosesVector = std::vector<GridPose, Eigen::aligned_allocator<GridPose>>;
 
   /**
    * \brief odometry constraint
@@ -79,8 +77,7 @@ class G2O_TUTORIAL_SLAM2D_API Simulator {
     Eigen::Matrix3d information;
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
   };
-  typedef std::vector<GridEdge, Eigen::aligned_allocator<GridEdge> >
-      GridEdgeVector;
+  using GridEdgeVector = std::vector<GridEdge, Eigen::aligned_allocator<GridEdge>>;
 
   struct G2O_TUTORIAL_SLAM2D_API LandmarkEdge {
     int from;
@@ -90,32 +87,30 @@ class G2O_TUTORIAL_SLAM2D_API Simulator {
     Eigen::Matrix2d information;
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
   };
-  typedef std::vector<LandmarkEdge, Eigen::aligned_allocator<LandmarkEdge> >
-      LandmarkEdgeVector;
+  using LandmarkEdgeVector = std::vector<LandmarkEdge, Eigen::aligned_allocator<LandmarkEdge>>;
 
- public:
+
   Simulator();
-  ~Simulator();
 
   void simulate(int numPoses, const SE2& sensorOffset = SE2());
 
-  const PosesVector& poses() const { return _poses; }
-  const LandmarkVector& landmarks() const { return _landmarks; }
-  const GridEdgeVector& odometry() const { return _odometry; }
+  const PosesVector& poses() const { return poses_; }
+  const LandmarkVector& landmarks() const { return landmarks_; }
+  const GridEdgeVector& odometry() const { return odometry_; }
   const LandmarkEdgeVector& landmarkObservations() const {
-    return _landmarkObservations;
+    return landmarkObservations_;
   }
 
  protected:
-  PosesVector _poses;
-  LandmarkVector _landmarks;
-  GridEdgeVector _odometry;
-  LandmarkEdgeVector _landmarkObservations;
+  PosesVector poses_;
+  LandmarkVector landmarks_;
+  GridEdgeVector odometry_;
+  LandmarkEdgeVector landmarkObservations_;
 
-  GridPose generateNewPose(const GridPose& prev, const SE2& trueMotion,
+  static GridPose generateNewPose(const GridPose& prev, const SE2& trueMotion,
                            const Eigen::Vector2d& transNoise, double rotNoise);
-  SE2 getMotion(int motionDirection, double stepLen);
-  SE2 sampleTransformation(const SE2& trueMotion_,
+  static SE2 getMotion(int motionDirection, double stepLen);
+  static SE2 sampleTransformation(const SE2& trueMotion_,
                            const Eigen::Vector2d& transNoise, double rotNoise);
 };
 

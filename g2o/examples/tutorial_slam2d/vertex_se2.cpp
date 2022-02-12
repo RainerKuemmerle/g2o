@@ -29,7 +29,7 @@
 namespace g2o {
 namespace tutorial {
 
-VertexSE2::VertexSE2() : BaseVertex<3, SE2>() {}
+VertexSE2::VertexSE2()  = default;
 
 bool VertexSE2::read(std::istream& is) {
   Eigen::Vector3d p;

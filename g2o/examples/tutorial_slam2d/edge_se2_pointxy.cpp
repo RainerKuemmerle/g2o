@@ -26,13 +26,10 @@
 
 #include "edge_se2_pointxy.h"
 
-using namespace Eigen;
-
 namespace g2o {
 namespace tutorial {
 
-EdgeSE2PointXY::EdgeSE2PointXY()
-    : BaseBinaryEdge<2, Vector2d, VertexSE2, VertexPointXY>() {
+EdgeSE2PointXY::EdgeSE2PointXY() {
   resizeParameters(1);
   installParameter<CacheSE2Offset::ParameterType>(0);
 }
@@ -51,14 +48,14 @@ bool EdgeSE2PointXY::write(std::ostream& os) const {
 
 void EdgeSE2PointXY::computeError() {
   const VertexPointXY* l2 = vertexXnRaw<1>();
-  error_ = (_sensorCache->w2n() * l2->estimate()) - measurement_;
+  error_ = (sensorCache_->w2n() * l2->estimate()) - measurement_;
 }
 
 bool EdgeSE2PointXY::resolveCaches() {
   ParameterVector pv(1);
   pv[0] = parameters_[0];
-  resolveCache(_sensorCache, vertexXn<0>(), "TUTORIAL_CACHE_SE2_OFFSET", pv);
-  return _sensorCache != 0;
+  resolveCache(sensorCache_, vertexXn<0>(), "TUTORIAL_CACHE_SE2_OFFSET", pv);
+  return sensorCache_ != nullptr;
 }
 
 }  // namespace tutorial

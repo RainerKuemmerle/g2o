@@ -242,7 +242,7 @@ class LinearSolverCholmod : public LinearSolverCCS<MatrixType> {
 
     if (cholmodFactor_ == nullptr) {
       computeSymbolicDecomposition(A);
-      assert(cholmodFactor_ != 0 && "Symbolic cholesky failed");
+      assert(cholmodFactor_ != nullptr && "Symbolic cholesky failed");
     }
     t = get_monotonic_time();
 

@@ -96,7 +96,7 @@ void HyperDijkstra::shortestPaths(HyperGraph::VertexSet& vset,
   reset();
   std::priority_queue<AdjacencyMapEntry> frontier;
   for (const auto& v : vset) {
-    assert(v != 0);
+    assert(v != nullptr);
     auto it = adjacencyMap_.find(v);
     if (it == adjacencyMap_.end()) {
       std::cerr << __PRETTY_FUNCTION__ << "Vertex " << v->id()

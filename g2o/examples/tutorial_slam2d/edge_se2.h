@@ -42,26 +42,26 @@ class G2O_TUTORIAL_SLAM2D_API EdgeSE2
     : public BaseBinaryEdge<3, SE2, VertexSE2, VertexSE2> {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
-  EdgeSE2();
+  EdgeSE2() = default;
 
-  void computeError() {
+  void computeError() override {
     const VertexSE2* v1 = vertexXnRaw<0>();
     const VertexSE2* v2 = vertexXnRaw<1>();
     SE2 delta =
-        _inverseMeasurement * (v1->estimate().inverse() * v2->estimate());
+        inverseMeasurement_ * (v1->estimate().inverse() * v2->estimate());
     error_ = delta.toVector();
   }
 
-  void setMeasurement(const SE2& m) {
+  void setMeasurement(const SE2& m) override {
     measurement_ = m;
-    _inverseMeasurement = m.inverse();
+    inverseMeasurement_ = m.inverse();
   }
 
-  virtual bool read(std::istream& is);
-  virtual bool write(std::ostream& os) const;
+  bool read(std::istream& is) override;
+  bool write(std::ostream& os) const override;
 
  protected:
-  SE2 _inverseMeasurement;
+  SE2 inverseMeasurement_;
 };
 
 }  // namespace tutorial

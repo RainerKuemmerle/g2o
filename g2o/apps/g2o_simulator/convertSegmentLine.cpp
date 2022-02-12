@@ -24,10 +24,9 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include <signal.h>
-
 #include <algorithm>
 #include <cassert>
+#include <csignal>
 #include <fstream>
 #include <iomanip>
 #include <iostream>
@@ -52,9 +51,11 @@
 #include "g2o/stuff/timeutil.h"
 #include "g2o/types/slam2d_addons/types_slam2d_addons.h"
 
-using namespace std;
-using namespace g2o;
-using namespace Eigen;
+using std::cerr;
+using std::endl;
+using std::string;
+
+namespace g2o {
 
 struct LineInfo {
   explicit LineInfo(VertexSegment2D* s) {
@@ -70,7 +71,7 @@ struct LineInfo {
 
 using LineInfoMap = std::map<int, LineInfo>;
 
-int main(int argc, char** argv) {
+static int run_main(int argc, char** argv) {
   string outputfilename;
   string inputFilename;
   CommandArgs arg;
@@ -83,18 +84,19 @@ int main(int argc, char** argv) {
 
   // registering all the types from the libraries
 
-  if (inputFilename.size() == 0) {
+  if (inputFilename.empty()) {
     cerr << "No input data specified" << endl;
     return 0;
-  } else if (inputFilename == "-") {
+  }
+  if (inputFilename == "-") {
     cerr << "Read input from stdin" << endl;
-    if (!inGraph.load(cin)) {
+    if (!inGraph.load(std::cin)) {
       cerr << "Error loading graph" << endl;
       return 2;
     }
   } else {
     cerr << "Read input from " << inputFilename << endl;
-    ifstream ifs(inputFilename.c_str());
+    std::ifstream ifs(inputFilename.c_str());
     if (!ifs) {
       cerr << "Failed to open file" << endl;
       return 1;
@@ -132,7 +134,7 @@ int main(int argc, char** argv) {
     if (s) {
       LineInfo linfo(s);
       outGraph.addVertex(linfo.line);
-      lmap.insert(make_pair(s->id(), linfo));
+      lmap.insert(std::make_pair(s->id(), linfo));
     }
   }
 
@@ -178,11 +180,11 @@ int main(int argc, char** argv) {
       if (es) {
         el2->setMeasurement(Line2D(
             computeLineParameters(es->measurementP1(), es->measurementP2())));
-        Matrix2d el2info;
+        Matrix2 el2info;
         el2info << 10000, 0, 0, 1000;
         el2->setInformation(el2info);
         outGraph.addEdge(el2);
-        Matrix4d si = es->information();
+        Matrix4 si = es->information();
         if (!p1) {
           p1 = std::make_shared<VertexPointXY>();
           p1->setEstimate(segment->estimateP1());
@@ -220,7 +222,7 @@ int main(int argc, char** argv) {
         p1e->vertices()[0] = pose;
         p1e->vertices()[1] = p1;
         p1e->setMeasurement(es->measurementP1());
-        Matrix2d p1i = si.block<2, 2>(0, 0);
+        Matrix2 p1i = si.block<2, 2>(0, 0);
         p1e->setInformation(p1i);
         outGraph.addEdge(p1e);
 
@@ -228,18 +230,18 @@ int main(int argc, char** argv) {
         p2e->vertices()[0] = pose;
         p2e->vertices()[1] = p2;
         p2e->setMeasurement(es->measurementP2());
-        Matrix2d p2i = si.block<2, 2>(2, 2);
+        Matrix2 p2i = si.block<2, 2>(2, 2);
         p2e->setInformation(p2i);
         outGraph.addEdge(p2e);
       }
 
       if (espl) {
-        Matrix3d si = espl->information();
-        Vector2d lparams;
+        Matrix3 si = espl->information();
+        Vector2 lparams;
         lparams[0] = espl->theta();
-        Vector2d n(cos(espl->theta()), sin(espl->theta()));
+        Vector2 n(cos(espl->theta()), sin(espl->theta()));
         lparams[1] = n.dot(espl->point());
-        Matrix2d li;
+        Matrix2 li;
         li << si(2, 2), 0, 0, 1000;
         el2->setMeasurement(Line2D(lparams));
         el2->setInformation(li);
@@ -252,7 +254,7 @@ int main(int argc, char** argv) {
           pX->setId(currentId++);
           outGraph.addVertex(pX);
 
-          Vector2d estPx;
+          Vector2 estPx;
           if (espl->pointNum()) {
             estPx = segment->estimateP1();
             line->p1Id = pX->id();
@@ -276,17 +278,17 @@ int main(int argc, char** argv) {
         pXe->vertices()[0] = pose;
         pXe->vertices()[1] = pX;
         pXe->setMeasurement(espl->point());
-        Matrix2d pXi = si.block<2, 2>(0, 0);
+        Matrix2 pXi = si.block<2, 2>(0, 0);
         pXe->setInformation(pXi);
         outGraph.addEdge(pXe);
       }
     }
   }
 
-  if (outputfilename.size() > 0) {
+  if (!outputfilename.empty()) {
     if (outputfilename == "-") {
       cerr << "saving to stdout";
-      outGraph.save(cout);
+      outGraph.save(std::cout);
     } else {
       cerr << "saving " << outputfilename << " ... ";
       outGraph.save(outputfilename.c_str());
@@ -301,3 +303,7 @@ int main(int argc, char** argv) {
 
   return 0;
 }
+
+}  // namespace g2o
+
+int main(int argc, char** argv) { return g2o::run_main(argc, argv); }

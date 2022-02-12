@@ -47,15 +47,15 @@ class G2O_TUTORIAL_SLAM2D_API EdgeSE2PointXY
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
   EdgeSE2PointXY();
 
-  void computeError();
+  void computeError() override;
 
-  virtual bool read(std::istream& is);
-  virtual bool write(std::ostream& os) const;
+  bool read(std::istream& is) override;
+  bool write(std::ostream& os) const override;
 
  protected:
-  std::shared_ptr<CacheSE2Offset> _sensorCache;
+  std::shared_ptr<CacheSE2Offset> sensorCache_;
 
-  virtual bool resolveCaches();
+  bool resolveCaches() override;
 };
 
 }  // namespace tutorial
