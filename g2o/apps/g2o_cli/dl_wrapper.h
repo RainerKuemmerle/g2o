@@ -69,7 +69,7 @@ class G2O_CLI_API DlWrapper {
 #if defined(UNIX) || defined(CYGWIN)
   std::vector<void*> handles_;
 #elif defined(WINDOWS)
-  std::vector<HMODULE> _handles;
+  std::vector<HMODULE> handles_;
 #endif
   std::vector<std::string> filenames_;
 };

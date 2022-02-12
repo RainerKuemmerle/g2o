@@ -90,15 +90,13 @@ int DlWrapper::openLibraries(const std::string& directory,
 }
 
 void DlWrapper::clear() {
+  for (auto& handle : handles_) {
 #if defined(UNIX) || defined(CYGWIN)
-  for (auto& _handle : handles_) {
-    dlclose(_handle);
-  }
+    dlclose(handle);
 #elif defined(WINDOWS)
-  for (size_t i = 0; i < _handles.size(); ++i) {
-    FreeLibrary(_handles[i]);
-  }
+    FreeLibrary(handle);
 #endif
+  }
   filenames_.clear();
   handles_.clear();
 }
