@@ -117,12 +117,11 @@ template <class MatrixTransposedType>
 void SparseBlockMatrix<MatrixType>::transpose_internal(
     SparseBlockMatrix<MatrixTransposedType>& dest) const {
   for (size_t i = 0; i < blockCols_.size(); ++i) {
-    for (typename SparseBlockMatrix<MatrixType>::IntBlockMap::const_iterator
-             it = blockCols_[i].begin();
-         it != blockCols_[i].end(); ++it) {
-      typename SparseBlockMatrix<MatrixType>::SparseMatrixBlock* s = it->second;
+    for (const auto& block : blockCols_[i]) {
+      typename SparseBlockMatrix<MatrixType>::SparseMatrixBlock* s =
+          block.second;
       typename SparseBlockMatrix<MatrixTransposedType>::SparseMatrixBlock* d =
-          dest.block(i, it->first, true);
+          dest.block(i, block.first, true);
       *d = s->transpose();
     }
   }
@@ -214,18 +213,13 @@ bool SparseBlockMatrix<MatrixType>::multiply(
   }
   if (!dest->hasStorage_) return false;
   for (size_t i = 0; i < M->blockCols_.size(); ++i) {
-    for (typename SparseBlockMatrix<
-             MatrixFactorType>::IntBlockMap::const_iterator it =
-             M->blockCols_[i].begin();
-         it != M->blockCols_[i].end(); ++it) {
+    for (const auto& block : M->blockCols_[i]) {
       // look for a non-zero block in a row of column it
       int colM = i;
-      const typename SparseBlockMatrix<MatrixFactorType>::SparseMatrixBlock* b =
-          it->second;
-      typename SparseBlockMatrix<MatrixType>::IntBlockMap::const_iterator rbt =
-          blockCols_[it->first].begin();
-      while (rbt != blockCols_[it->first].end()) {
-        // int colA=it->first;
+      const auto* b = block.second;
+      auto rbt = blockCols_[block.first].begin();
+      while (rbt != blockCols_[block.first].end()) {
+        // int colA=block.first;
         int rowA = rbt->first;
         typename SparseBlockMatrix<MatrixType>::SparseMatrixBlock* a =
             rbt->second;
@@ -470,15 +464,11 @@ bool SparseBlockMatrix<MatrixType>::symmPermutation(
   for (size_t i = 0; i < n; ++i) {
     // cerr << PVAR(i) <<  " ";
     int pi = pinv[i];
-    for (typename SparseBlockMatrix<MatrixType>::IntBlockMap::const_iterator
-             it = blockCols_[i].begin();
-         it != blockCols_[i].end(); ++it) {
-      int pj = pinv[it->first];
+    for (const auto& block : blockCols_[i]) {
+      int pj = pinv[block.first];
 
-      const typename SparseBlockMatrix<MatrixType>::SparseMatrixBlock* s =
-          it->second;
-
-      typename SparseBlockMatrix<MatrixType>::SparseMatrixBlock* b = 0;
+      const auto* s = block.second;
+      typename SparseBlockMatrix<MatrixType>::SparseMatrixBlock* b = nullptr;
       if (!onlyUpper || pj <= pi) {
         b = dest->block(pj, pi, true);
         assert(b->cols() == s->cols());

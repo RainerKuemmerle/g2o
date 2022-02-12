@@ -421,6 +421,7 @@ if(MSVC)
 
   add_definitions(-DNOMINMAX)
   add_definitions(-D_USE_MATH_DEFINES)
+  add_definitions(-D_CRT_NONSTDC_NO_WARNINGS)
 
   # exception handling
   add_definitions("/EHsc")

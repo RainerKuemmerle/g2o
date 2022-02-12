@@ -162,7 +162,7 @@ void EdgeSE3LotsOfXYZ::initialEstimate(const OptimizableGraph::VertexSet &fixed,
   auto *pose = static_cast<VertexSE3 *>(vertexRaw(0));
 
 #ifdef _MSC_VER
-  std::vector<bool> estimate_this(_observedPoints, true);
+  std::vector<bool> estimate_this(observedPoints_, true);
 #else
   bool estimate_this[observedPoints_];
   for (unsigned int i = 0; i < observedPoints_; i++) {
