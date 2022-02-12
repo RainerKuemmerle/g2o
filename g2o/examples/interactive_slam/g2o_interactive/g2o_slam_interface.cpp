@@ -33,13 +33,16 @@
 #include "graph_optimizer_sparse_online.h"
 #include "types_slam2d_online.h"
 #include "types_slam3d_online.h"
-using namespace std;
-using namespace Eigen;
+
+using std::cerr;
+using std::cout;
+using std::endl;
+using std::flush;
 
 namespace g2o {
 
 namespace {
-void quat_to_euler(const Eigen::Quaterniond& q, double& yaw, double& pitch,
+void quat_to_euler(const Quaternion& q, double& yaw, double& pitch,
                    double& roll) {
   const double& q0 = q.w();
   const double& q1 = q.x();
@@ -50,25 +53,26 @@ void quat_to_euler(const Eigen::Quaterniond& q, double& yaw, double& pitch,
   yaw = atan2(2 * (q0 * q3 + q1 * q2), 1 - 2 * (q2 * q2 + q3 * q3));
 }
 
-void jac_quat3_euler3(Eigen::Matrix<double, 6, 6>& J, const SE3Quat& t) {
-  const Vector3d& tr0 = t.translation();
-  const Quaterniond& q0 = t.rotation();
+void jac_quat3_euler3(MatrixN<6>& J, const SE3Quat& t) {
+  const Vector3& tr0 = t.translation();
+  const Quaternion& q0 = t.rotation();
 
   double delta = 1e-6;
   double idelta = 1. / (2. * delta);
 
   for (int i = 0; i < 6; i++) {
-    SE3Quat ta, tb;
+    SE3Quat ta;
+    SE3Quat tb;
     if (i < 3) {
-      Vector3d tra = tr0;
-      Vector3d trb = tr0;
+      Vector3 tra = tr0;
+      Vector3 trb = tr0;
       tra[i] -= delta;
       trb[i] += delta;
       ta = SE3Quat(q0, tra);
       tb = SE3Quat(q0, trb);
     } else {
-      Quaterniond qa = q0;
-      Quaterniond qb = q0;
+      Quaternion qa = q0;
+      Quaternion qb = q0;
       if (i == 3) {
         qa.x() -= delta;
         qb.x() += delta;
@@ -85,12 +89,13 @@ void jac_quat3_euler3(Eigen::Matrix<double, 6, 6>& J, const SE3Quat& t) {
       tb = SE3Quat(qb, tr0);
     }
 
-    Vector3d dtr = (tb.translation() - ta.translation()) * idelta;
-    Vector3d taAngles, tbAngles;
+    Vector3 dtr = (tb.translation() - ta.translation()) * idelta;
+    Vector3 taAngles;
+    Vector3 tbAngles;
     quat_to_euler(ta.rotation(), taAngles(2), taAngles(1), taAngles(0));
     quat_to_euler(tb.rotation(), tbAngles(2), tbAngles(1), tbAngles(0));
-    Vector3d da =
-        (tbAngles - taAngles) * idelta;  // TODO wraparounds not handled
+    Vector3 da =
+        (tbAngles - taAngles) * idelta;  // TODO(goki): wraparounds not handled
 
     for (int j = 0; j < 6; j++) {
       if (j < 3) {
@@ -104,21 +109,21 @@ void jac_quat3_euler3(Eigen::Matrix<double, 6, 6>& J, const SE3Quat& t) {
 }  // namespace
 
 G2oSlamInterface::G2oSlamInterface(SparseOptimizerOnline* optimizer)
-    : _optimizer(optimizer),
-      _firstOptimization(true),
-      _nodesAdded(0),
-      _incIterations(1),
-      _updateGraphEachN(10),
-      _batchEveryN(100),
-      _lastBatchStep(0),
-      _initSolverDone(false) {}
+    : optimizer_(optimizer),
+      firstOptimization_(true),
+      nodesAdded_(0),
+      incIterations_(1),
+      updateGraphEachN_(10),
+      batchEveryN_(100),
+      lastBatchStep_(0),
+      initSolverDone_(false) {}
 
 bool G2oSlamInterface::addNode(const std::string& tag, int id, int dimension,
                                const std::vector<double>& values) {
   // allocating the desired solver + testing whether the solver is okay
-  if (!_initSolverDone) {
-    _initSolverDone = true;
-    _optimizer->initSolver(dimension, _batchEveryN);
+  if (!initSolverDone_) {
+    initSolverDone_ = true;
+    optimizer_->initSolver(dimension, batchEveryN_);
   }
 
   // we add the node when we are asked to add the according edge
@@ -135,7 +140,7 @@ bool G2oSlamInterface::addEdge(const std::string& tag, int id, int dimension,
                                const std::vector<double>& information) {
   (void)tag;
   (void)id;
-  size_t oldEdgesSize = _optimizer->edges().size();
+  size_t oldEdgesSize = optimizer_->edges().size();
 
   if (dimension == 3) {
     SE2 transf(measurement[0], measurement[1], measurement[2]);
@@ -149,23 +154,23 @@ bool G2oSlamInterface::addEdge(const std::string& tag, int id, int dimension,
     // cerr << PVAR(infMat) << endl;
 
     int doInit = 0;
-    auto v1 = _optimizer->vertex(v1Id);
-    auto v2 = _optimizer->vertex(v2Id);
+    auto v1 = optimizer_->vertex(v1Id);
+    auto v2 = optimizer_->vertex(v2Id);
     if (!v1) {
       auto v = v1 = addVertex(dimension, v1Id);
-      _verticesAdded.insert(v);
+      verticesAdded_.insert(v);
       doInit = 1;
-      ++_nodesAdded;
+      ++nodesAdded_;
     }
 
     if (!v2) {
       auto v = v2 = addVertex(dimension, v2Id);
-      _verticesAdded.insert(v);
+      verticesAdded_.insert(v);
       doInit = 2;
-      ++_nodesAdded;
+      ++nodesAdded_;
     }
 
-    if (_optimizer->edges().size() == 0) {
+    if (optimizer_->edges().empty()) {
       cerr << "FIRST EDGE ";
       if (v1->id() < v2->id()) {
         cerr << "fixing " << v1->id() << endl;
@@ -181,8 +186,8 @@ bool G2oSlamInterface::addEdge(const std::string& tag, int id, int dimension,
     e->vertices()[1] = v2;
     e->setMeasurement(transf);
     e->setInformation(infMat);
-    _optimizer->addEdge(e);
-    _edgesAdded.insert(e);
+    optimizer_->addEdge(e);
+    edgesAdded_.insert(e);
 
     if (doInit) {
       auto from =
@@ -214,7 +219,7 @@ bool G2oSlamInterface::addEdge(const std::string& tag, int id, int dimension,
 
   } else if (dimension == 6) {
     Eigen::Isometry3d transf;
-    Matrix<double, 6, 6> infMat;
+    MatrixN<6> infMat;
 
     if (measurement.size() == 7) {  // measurement is a Quaternion
       Vector7 meas;
@@ -234,7 +239,7 @@ bool G2oSlamInterface::addEdge(const std::string& tag, int id, int dimension,
       aux << measurement[0], measurement[1], measurement[2], measurement[3],
           measurement[4], measurement[5];
       transf = internal::fromVectorET(aux);
-      Matrix<double, 6, 6> infMatEuler;
+      MatrixN<6> infMatEuler;
       int idx = 0;
       for (int r = 0; r < 6; ++r)
         for (int c = r; c < 6; ++c, ++idx) {
@@ -242,7 +247,7 @@ bool G2oSlamInterface::addEdge(const std::string& tag, int id, int dimension,
           infMatEuler(r, c) = infMatEuler(c, r) = information[idx];
         }
       // convert information matrix to our internal representation
-      Matrix<double, 6, 6> J;
+      MatrixN<6> J;
       SE3Quat transfAsSe3(transf.matrix().topLeftCorner<3, 3>(),
                           transf.translation());
       jac_quat3_euler3(J, transfAsSe3);
@@ -252,23 +257,23 @@ bool G2oSlamInterface::addEdge(const std::string& tag, int id, int dimension,
     }
 
     int doInit = 0;
-    auto v1 = _optimizer->vertex(v1Id);
-    auto v2 = _optimizer->vertex(v2Id);
+    auto v1 = optimizer_->vertex(v1Id);
+    auto v2 = optimizer_->vertex(v2Id);
     if (!v1) {
       auto v = v1 = addVertex(dimension, v1Id);
-      _verticesAdded.insert(v);
+      verticesAdded_.insert(v);
       doInit = 1;
-      ++_nodesAdded;
+      ++nodesAdded_;
     }
 
     if (!v2) {
       auto v = v2 = addVertex(dimension, v2Id);
-      _verticesAdded.insert(v);
+      verticesAdded_.insert(v);
       doInit = 2;
-      ++_nodesAdded;
+      ++nodesAdded_;
     }
 
-    if (_optimizer->edges().size() == 0) {
+    if (optimizer_->edges().empty()) {
       cerr << "FIRST EDGE ";
       if (v1->id() < v2->id()) {
         cerr << "fixing " << v1->id() << endl;
@@ -284,8 +289,8 @@ bool G2oSlamInterface::addEdge(const std::string& tag, int id, int dimension,
     e->vertices()[1] = v2;
     e->setMeasurement(transf);
     e->setInformation(infMat);
-    _optimizer->addEdge(e);
-    _edgesAdded.insert(e);
+    optimizer_->addEdge(e);
+    edgesAdded_.insert(e);
 
     if (doInit) {
       auto from =
@@ -322,15 +327,15 @@ bool G2oSlamInterface::addEdge(const std::string& tag, int id, int dimension,
   }
 
   if (oldEdgesSize == 0) {
-    _optimizer->jacobianWorkspace().allocate();
+    optimizer_->jacobianWorkspace().allocate();
   }
 
   return true;
 }
 
 bool G2oSlamInterface::fixNode(const std::vector<int>& nodes) {
-  for (size_t i = 0; i < nodes.size(); ++i) {
-    OptimizableGraph::Vertex* v = _optimizer->vertex(nodes[i]).get();
+  for (int node : nodes) {
+    OptimizableGraph::Vertex* v = optimizer_->vertex(node).get();
     if (v) v->setFixed(true);
   }
   return true;
@@ -340,17 +345,14 @@ bool G2oSlamInterface::queryState(const std::vector<int>& nodes) {
   // return true;
   cout << "BEGIN" << endl;
 #if 1
-  if (nodes.size() == 0) {
-    for (OptimizableGraph::VertexIDMap::const_iterator it =
-             _optimizer->vertices().begin();
-         it != _optimizer->vertices().end(); ++it) {
-      OptimizableGraph::Vertex* v =
-          static_cast<OptimizableGraph::Vertex*>(it->second.get());
+  if (nodes.empty()) {
+    for (const auto& it : optimizer_->vertices()) {
+      auto* v = static_cast<OptimizableGraph::Vertex*>(it.second.get());
       printVertex(v);
     }
   } else {
-    for (size_t i = 0; i < nodes.size(); ++i) {
-      OptimizableGraph::Vertex* v = _optimizer->vertex(nodes[i]).get();
+    for (int node : nodes) {
+      OptimizableGraph::Vertex* v = optimizer_->vertex(node).get();
       if (v) printVertex(v);
     }
   }
@@ -362,7 +364,7 @@ bool G2oSlamInterface::queryState(const std::vector<int>& nodes) {
 
 bool G2oSlamInterface::solveState() {
   SolveResult state = solve();
-  return state != ERROR;
+  return state != kError;
 }
 
 std::shared_ptr<OptimizableGraph::Vertex> G2oSlamInterface::addVertex(
@@ -370,16 +372,16 @@ std::shared_ptr<OptimizableGraph::Vertex> G2oSlamInterface::addVertex(
   if (dimension == 3) {
     auto v = std::make_shared<OnlineVertexSE2>();
     v->setId(id);  // estimate will be set later when the edge is added
-    _optimizer->addVertex(v);
+    optimizer_->addVertex(v);
     return v;
-  } else if (dimension == 6) {
+  }
+  if (dimension == 6) {
     auto v = std::make_shared<OnlineVertexSE3>();
     v->setId(id);  // estimate will be set later when the edge is added
-    _optimizer->addVertex(v);
+    optimizer_->addVertex(v);
     return v;
-  } else {
-    return nullptr;
   }
+  return nullptr;
 }
 
 bool G2oSlamInterface::printVertex(OptimizableGraph::Vertex* v) {
@@ -387,7 +389,7 @@ bool G2oSlamInterface::printVertex(OptimizableGraph::Vertex* v) {
   int vdim = v->dimension();
   if (vdim == 3) {
     char* s = buffer;
-    OnlineVertexSE2* v2 = static_cast<OnlineVertexSE2*>(v);
+    auto* v2 = static_cast<OnlineVertexSE2*>(v);
     memcpy(s, "VERTEX_XYT ", 11);
     s += 11;
     s += modp_itoa10(v->id(), s);
@@ -400,10 +402,11 @@ bool G2oSlamInterface::printVertex(OptimizableGraph::Vertex* v) {
     *s++ = '\n';
     cout.write(buffer, s - buffer);
     return true;
-  } else if (vdim == 6) {
+  }
+  if (vdim == 6) {
     char* s = buffer;
-    OnlineVertexSE3* v3 = static_cast<OnlineVertexSE3*>(v);
-    Vector3d eulerAngles =
+    auto* v3 = static_cast<OnlineVertexSE3*>(v);
+    Vector3 eulerAngles =
         internal::toEuler(v3->updatedEstimate.matrix().topLeftCorner<3, 3>());
     const double& roll = eulerAngles(0);
     const double& pitch = eulerAngles(1);
@@ -430,42 +433,43 @@ bool G2oSlamInterface::printVertex(OptimizableGraph::Vertex* v) {
   return false;
 }
 
-void G2oSlamInterface::setUpdateGraphEachN(int n) { _updateGraphEachN = n; }
+void G2oSlamInterface::setUpdateGraphEachN(int n) { updateGraphEachN_ = n; }
 
 G2oSlamInterface::SolveResult G2oSlamInterface::solve() {
-  if (_nodesAdded >= _updateGraphEachN) {
+  if (nodesAdded_ >= updateGraphEachN_) {
     // decide on batch step or normal step
-    _optimizer->batchStep = false;
-    if ((int)_optimizer->vertices().size() - _lastBatchStep >= _batchEveryN) {
-      _lastBatchStep = _optimizer->vertices().size();
-      _optimizer->batchStep = true;
+    optimizer_->batchStep = false;
+    if (static_cast<int>(optimizer_->vertices().size()) - lastBatchStep_ >=
+        batchEveryN_) {
+      lastBatchStep_ = optimizer_->vertices().size();
+      optimizer_->batchStep = true;
     }
 
-    if (_firstOptimization) {
-      if (!_optimizer->initializeOptimization()) {
+    if (firstOptimization_) {
+      if (!optimizer_->initializeOptimization()) {
         cerr << "initialization failed" << endl;
-        return ERROR;
+        return kError;
       }
     } else {
-      if (!_optimizer->updateInitialization(_verticesAdded, _edgesAdded)) {
+      if (!optimizer_->updateInitialization(verticesAdded_, edgesAdded_)) {
         cerr << "updating initialization failed" << endl;
-        return ERROR;
+        return kError;
       }
     }
 
-    int currentIt = _optimizer->optimize(_incIterations, !_firstOptimization);
+    int currentIt = optimizer_->optimize(incIterations_, !firstOptimization_);
     (void)currentIt;
-    _firstOptimization = false;
-    _nodesAdded = 0;
-    _verticesAdded.clear();
-    _edgesAdded.clear();
-    if (_optimizer->batchStep) return SOLVED_BATCH;
-    return SOLVED;
+    firstOptimization_ = false;
+    nodesAdded_ = 0;
+    verticesAdded_.clear();
+    edgesAdded_.clear();
+    if (optimizer_->batchStep) return kSolvedBatch;
+    return kSolved;
   }
 
-  return NOOP;
+  return kNoop;
 }
 
-void G2oSlamInterface::setBatchSolveEachN(int n) { _batchEveryN = n; }
+void G2oSlamInterface::setBatchSolveEachN(int n) { batchEveryN_ = n; }
 
 }  // namespace g2o

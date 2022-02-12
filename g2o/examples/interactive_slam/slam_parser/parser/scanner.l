@@ -6,8 +6,8 @@
 #include "scanner.h"
 
 /* import the parser's token type into a local typedef */
-typedef SlamParser::Parser::token token;
-typedef SlamParser::Parser::token_type token_type;
+typedef slam_parser::Parser::token token;
+typedef slam_parser::Parser::token_type token_type;
 
 /* By default yylex returns int, we use token_type. Unfortunately yyterminate
  * by default returns 0, which is not of token_type. */
@@ -35,7 +35,7 @@ typedef SlamParser::Parser::token_type token_type;
 /*%option debug*/
 
 /* no support for include files is planned */
-%option yywrap nounput 
+%option yywrap nounput
 
 /* enables the use of start condition stacks */
 %option stack
@@ -131,15 +131,11 @@ typedef SlamParser::Parser::token_type token_type;
 
 %% /*** Additional Code ***/
 
-namespace SlamParser {
+namespace slam_parser {
 
 Scanner::Scanner(std::istream* in,
 		 std::ostream* out)
     : SlamFlexLexer(in, out)
-{
-}
-
-Scanner::~Scanner()
 {
 }
 

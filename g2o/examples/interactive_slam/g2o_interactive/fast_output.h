@@ -37,9 +37,8 @@
 #ifndef G2O_FAST_OUTPUT_H
 #define G2O_FAST_OUTPUT_H
 
-#include <assert.h>
-#include <stdint.h>
-
+#include <cassert>
+#include <cstdint>
 #include <cstdio>
 
 #ifdef __cplusplus
@@ -52,9 +51,9 @@ inline void strreverse(char* begin, char* end) {
 }
 
 inline int modp_dtoa(double value, char* str, int prec) {
-  static const double pow10[] = {1,         10,        100,     1000,
-                                 10000,     100000,    1000000, 10000000,
-                                 100000000, 1000000000};
+  static const double kPow10[] = {1,         10,        100,     1000,
+                                  10000,     100000,    1000000, 10000000,
+                                  100000000, 1000000000};
 
   /* Hacky test for NaN
    * under -fast-math this won't work, but then you also won't
@@ -70,7 +69,7 @@ inline int modp_dtoa(double value, char* str, int prec) {
     return 3;
   }
   /* if input is larger than thres_max, revert to exponential */
-  const double thres_max = (double)(0x7FFFFFFF);
+  const auto thres_max = (double)(0x7FFFFFFF);
 
   double diff = 0.0;
   char* wstr = str;
@@ -91,14 +90,14 @@ inline int modp_dtoa(double value, char* str, int prec) {
   }
 
   int whole = (int)value;
-  double tmp = (value - whole) * pow10[prec];
-  uint32_t frac = (uint32_t)(tmp);
+  double tmp = (value - whole) * kPow10[prec];
+  auto frac = (uint32_t)(tmp);
   diff = tmp - frac;
 
   if (diff > 0.5) {
     ++frac;
     /* handle rollover, e.g.  case 0.99 with prec 1 is 1.0  */
-    if (frac >= pow10[prec]) {
+    if (frac >= kPow10[prec]) {
       frac = 0;
       ++whole;
     }
@@ -120,10 +119,9 @@ inline int modp_dtoa(double value, char* str, int prec) {
 
   if (prec == 0) {
     diff = value - whole;
-    if (diff > 0.5) {
+    if (diff > 0.5 || (diff == 0.5 && (whole & 1))) {
       /* greater than 0.5, round up, e.g. 1.6 -> 2 */
-      ++whole;
-    } else if (diff == 0.5 && (whole & 1)) {
+      //
       /* exactly 0.5 and ODD, then round up */
       /* 1.5 -> 2, but 2.5 -> 2 */
       ++whole;
@@ -134,7 +132,7 @@ inline int modp_dtoa(double value, char* str, int prec) {
     do {
       --count;
       *wstr++ = (char)(48 + (frac % 10));
-    } while (frac /= 10);
+    } while ((frac /= 10U) != 0U);
     // add extra 0s
     while (count-- > 0) *wstr++ = '0';
     // add decimal
@@ -145,7 +143,7 @@ inline int modp_dtoa(double value, char* str, int prec) {
   // Take care of sign
   // Conversion. Number is reversed.
   do *wstr++ = (char)(48 + (whole % 10));
-  while (whole /= 10);
+  while ((whole /= 10) != 0);
   if (neg) {
     *wstr++ = '-';
   }
@@ -158,7 +156,7 @@ inline int modp_uitoa10(uint32_t value, char* str) {
   char* wstr = str;
   // Conversion. Number is reversed.
   do *wstr++ = (char)(48 + (value % 10));
-  while (value /= 10);
+  while ((value /= 10U) != 0U);
   //*wstr='\0';
   // Reverse string
   strreverse(str, wstr - 1);
@@ -171,7 +169,7 @@ inline int modp_itoa10(int32_t value, char* str) {
   unsigned int uvalue = (value < 0) ? -value : value;
   // Conversion. Number is reversed.
   do *wstr++ = (char)(48 + (uvalue % 10));
-  while (uvalue /= 10);
+  while ((uvalue /= 10U) != 0U);
   if (value < 0) *wstr++ = '-';
   *wstr = '\0';
 

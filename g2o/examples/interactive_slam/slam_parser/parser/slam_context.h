@@ -29,18 +29,17 @@
 
 #include <vector>
 
-namespace SlamParser {
+namespace slam_parser {
 
 class CommandNode;
 
 class SlamContext {
  public:
-  SlamContext();
-  virtual ~SlamContext();
+  virtual ~SlamContext() = default;
 
   virtual bool process(CommandNode* commandNode);
 };
 
-}  // namespace SlamParser
+}  // namespace slam_parser
 
 #endif

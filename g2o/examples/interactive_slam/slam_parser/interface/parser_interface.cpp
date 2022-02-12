@@ -29,29 +29,29 @@
 #include "slam_context_interface.h"
 #include "slam_parser/parser/driver.h"
 
-namespace SlamParser {
+namespace slam_parser {
 
 ParserInterface::ParserInterface(AbstractSlamInterface* slamInterface) {
-  _slamContextInterface = new SlamContextInterface(slamInterface);
-  _driver = new Driver(*_slamContextInterface);
+  slamContextInterface_ = new SlamContextInterface(slamInterface);
+  driver_ = new Driver(*slamContextInterface_);
   //_driver->trace_parsing = true;
   //_driver->trace_scanning = true;
 }
 
 ParserInterface::~ParserInterface() {
-  delete _slamContextInterface;
-  delete _driver;
+  delete slamContextInterface_;
+  delete driver_;
 }
 
 bool ParserInterface::parseCommand(std::istream& input) {
   if (input.eof()) return false;
-  _buffer.str("");
-  _buffer.clear();
-  input.get(*_buffer.rdbuf(), ';');
+  buffer_.str("");
+  buffer_.clear();
+  input.get(*buffer_.rdbuf(), ';');
   if (!input.eof())  // get the ';'
-    _buffer << (char)input.get();
-  _driver->parse_stream(_buffer);
+    buffer_ << static_cast<char>(input.get());
+  driver_->parse_stream(buffer_);
   return true;
 }
 
-}  // namespace SlamParser
+}  // namespace slam_parser

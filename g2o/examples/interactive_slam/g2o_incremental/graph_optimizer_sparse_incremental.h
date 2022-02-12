@@ -30,30 +30,30 @@ class G2O_INCREMENTAL_API SparseOptimizerIncremental
     : public SparseOptimizerOnline {
  public:
   SparseOptimizerIncremental();
-  ~SparseOptimizerIncremental();
+  ~SparseOptimizerIncremental() override;
 
-  int optimize(int iterations, bool online = false);
+  int optimize(int iterations, bool online = false) override;
 
-  virtual bool updateInitialization(HyperGraph::VertexSet& vset,
-                                    HyperGraph::EdgeSet& eset);
+  bool updateInitialization(HyperGraph::VertexSet& vset,
+                            HyperGraph::EdgeSet& eset) override;
 
-  virtual bool initSolver(int dimension, int batchEveryN);
+  bool initSolver(int dimension, int batchEveryN) override;
 
  protected:
-  SparseBlockMatrix<Eigen::MatrixXd> _updateMat;
-  cholmod_common _cholmodCommon;
-  CholmodExt* _cholmodSparse;
-  cholmod_factor* _cholmodFactor;
-  cholmod_triplet* _permutedUpdate;
-  cholmod_factor* _L;
-  LinearSolverCholmodOnlineInterface* _solverInterface;
+  SparseBlockMatrix<Eigen::MatrixXd> updateMat_;
+  cholmod_common cholmodCommon_;
+  CholmodExt* cholmodSparse_;
+  cholmod_factor* cholmodFactor_;
+  cholmod_triplet* permutedUpdate_;
+  cholmod_factor* L_;
+  LinearSolverCholmodOnlineInterface* solverInterface_;
 
-  HyperGraph::VertexSet _touchedVertices;
-  Eigen::VectorXi _perm;
-  Eigen::VectorXi _cmember;
+  HyperGraph::VertexSet touchedVertices_;
+  Eigen::VectorXi perm_;
+  Eigen::VectorXi cmember_;
 
-  Eigen::VectorXi _tripletWorkspace;
-  CholmodExt* _permutedUpdateAsSparse;
+  Eigen::VectorXi tripletWorkspace_;
+  CholmodExt* permutedUpdateAsSparse_;
 
   bool computeCholeskyUpdate();
   void convertTripletUpdateToSparse();

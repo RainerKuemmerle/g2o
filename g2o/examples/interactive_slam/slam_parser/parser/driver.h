@@ -30,14 +30,14 @@
 #include <string>
 #include <vector>
 
-namespace SlamParser {
+namespace slam_parser {
 
 class SlamContext;
 
 class Driver {
  public:
   /// construct a new parser driver context
-  Driver(class SlamContext& slamContext_);
+  explicit Driver(class SlamContext& slamContext_);
 
   /// enable debug output in the flex scanner
   bool trace_scanning;
@@ -92,6 +92,6 @@ class Driver {
   class SlamContext& slamContext;
 };
 
-}  // namespace SlamParser
+}  // namespace slam_parser
 
 #endif

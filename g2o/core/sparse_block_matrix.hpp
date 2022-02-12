@@ -507,9 +507,7 @@ int SparseBlockMatrix<MatrixType>::fillCCS(number_t* Cx,
     int cstart = i ? colBlockIndices_[i - 1] : 0;
     int csize = colsOfBlock(i);
     for (int c = 0; c < csize; ++c) {
-      for (auto
-               it = blockCols_[i].begin();
-           it != blockCols_[i].end(); ++it) {
+      for (auto it = blockCols_[i].begin(); it != blockCols_[i].end(); ++it) {
         const typename SparseBlockMatrix<MatrixType>::SparseMatrixBlock* b =
             it->second;
         int rstart = it->first ? rowBlockIndices_[it->first - 1] : 0;
@@ -534,9 +532,7 @@ int SparseBlockMatrix<MatrixType>::fillCCS(int* Cp, int* Ci, number_t* Cx,
     int csize = colsOfBlock(i);
     for (int c = 0; c < csize; ++c) {
       *Cp = nz;
-      for (auto
-               it = blockCols_[i].begin();
-           it != blockCols_[i].end(); ++it) {
+      for (auto it = blockCols_[i].begin(); it != blockCols_[i].end(); ++it) {
         const typename SparseBlockMatrix<MatrixType>::SparseMatrixBlock* b =
             it->second;
         int rstart = it->first ? rowBlockIndices_[it->first - 1] : 0;

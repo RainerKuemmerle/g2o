@@ -37,9 +37,9 @@ namespace g2o {
 class G2O_INTERACTIVE_API OnlineVertexSE2 : public VertexSE2 {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
-  OnlineVertexSE2() : VertexSE2() {}
+  OnlineVertexSE2() = default;
 
-  virtual void oplusImpl(const double* update) {
+  void oplusImpl(const double* update) override {
     VertexSE2::oplusImpl(update);
     updatedEstimate = estimate_;
   }
@@ -59,10 +59,10 @@ class G2O_INTERACTIVE_API OnlineVertexSE2 : public VertexSE2 {
 class G2O_INTERACTIVE_API OnlineEdgeSE2 : public EdgeSE2 {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
-  OnlineEdgeSE2() : EdgeSE2() {}
+  OnlineEdgeSE2() = default;
 
   void initialEstimate(const OptimizableGraph::VertexSet& from,
-                       OptimizableGraph::Vertex* /* to */) {
+                       OptimizableGraph::Vertex* /* to */) override {
     auto fromEdge = std::static_pointer_cast<OnlineVertexSE2>(vertexXn<0>());
     auto toEdge = std::static_pointer_cast<OnlineVertexSE2>(vertexXn<1>());
     if (from.count(fromEdge) > 0) {
@@ -74,11 +74,9 @@ class G2O_INTERACTIVE_API OnlineEdgeSE2 : public EdgeSE2 {
     }
   }
 
-  double chi2() const {
-    const OnlineVertexSE2* v1 =
-        static_cast<const OnlineVertexSE2*>(vertexXnRaw<0>());
-    const OnlineVertexSE2* v2 =
-        static_cast<const OnlineVertexSE2*>(vertexXnRaw<1>());
+  double chi2() const override {
+    const auto* v1 = static_cast<const OnlineVertexSE2*>(vertexXnRaw<0>());
+    const auto* v2 = static_cast<const OnlineVertexSE2*>(vertexXnRaw<1>());
     SE2 delta = inverseMeasurement_ *
                 (v1->updatedEstimate.inverse() * v2->updatedEstimate);
     Eigen::Vector3d error = delta.toVector();

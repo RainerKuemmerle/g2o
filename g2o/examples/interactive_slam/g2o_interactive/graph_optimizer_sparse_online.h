@@ -37,31 +37,30 @@ class Solver;
 class G2O_INTERACTIVE_API SparseOptimizerOnline : public SparseOptimizer {
  public:
   explicit SparseOptimizerOnline(bool pcg = false);
-  virtual ~SparseOptimizerOnline();
+  ~SparseOptimizerOnline() override;
 
-  int optimize(int iterations, bool online = false);
+  int optimize(int iterations, bool online = false) override;
 
-  virtual bool updateInitialization(HyperGraph::VertexSet& vset,
-                                    HyperGraph::EdgeSet& eset);
+  bool updateInitialization(HyperGraph::VertexSet& vset,
+                            HyperGraph::EdgeSet& eset) override;
 
   void update(double* update);
 
   virtual bool initSolver(int dimension, int batchEveryN);
 
- public:
-  int slamDimension;
+  int slamDimension = 3;
 
-  HyperGraph::EdgeSet* newEdges;
+  HyperGraph::EdgeSet* newEdges = nullptr;
 
-  bool batchStep;
-  bool vizWithGnuplot;
+  bool batchStep = true;
+  bool vizWithGnuplot = false;
 
   virtual void gnuplotVisualization();
 
  protected:
-  FILE* _gnuplot;
-  bool _usePcg;
-  Solver* _underlyingSolver;
+  FILE* gnuplot_ = nullptr;
+  bool usePcg_;
+  Solver* underlyingSolver_ = nullptr;
 };
 
 }  // namespace g2o

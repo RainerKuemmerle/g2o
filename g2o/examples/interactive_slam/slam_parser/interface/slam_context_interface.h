@@ -29,7 +29,7 @@
 
 #include "slam_parser/parser/slam_context.h"
 
-namespace SlamParser {
+namespace slam_parser {
 
 class AbstractSlamInterface;
 
@@ -38,14 +38,14 @@ class SlamContextInterface : public SlamContext {
   explicit SlamContextInterface(AbstractSlamInterface* slam);
   SlamContextInterface& operator=(const SlamContextInterface&) = delete;
   SlamContextInterface(const SlamContextInterface&) = delete;
-  ~SlamContextInterface();
+  ~SlamContextInterface() override = default;
 
-  bool process(CommandNode* commandNode);
+  bool process(CommandNode* commandNode) override;
 
  protected:
-  AbstractSlamInterface* _slam;
+  AbstractSlamInterface* slam_;
 };
 
-}  // namespace SlamParser
+}  // namespace slam_parser
 
 #endif

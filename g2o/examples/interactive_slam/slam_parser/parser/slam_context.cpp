@@ -29,34 +29,32 @@
 #include <iostream>
 
 #include "commands.h"
-using namespace std;
 
-namespace SlamParser {
+using std::cerr;
+using std::endl;
 
-SlamContext::SlamContext() {}
-
-SlamContext::~SlamContext() {}
+namespace slam_parser {
 
 bool SlamContext::process(CommandNode* commandNode) {
   cerr << "SlamContext::process -> ";
   switch (commandNode->commandType()) {
-    case CT_ADD_NODE:
+    case kCtAddNode:
       cerr << "ADD NODE" << endl;
       break;
-    case CT_ADD_EDGE:
+    case kCtAddEdge:
       cerr << "ADD EDGE" << endl;
       break;
-    case CT_SOLVE_STATE:
+    case kCtSolveState:
       cerr << "SOLVE STATE" << endl;
       break;
-    case CT_QUERY_STATE:
+    case kCtQueryState:
       cerr << "QUERY STATE" << endl;
       break;
-    case CT_FIX:
+    case kCtFix:
       cerr << "FIX NODE" << endl;
       break;
   }
   return true;
 }
 
-}  // namespace SlamParser
+}  // namespace slam_parser

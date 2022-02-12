@@ -30,7 +30,7 @@
 #include <string>
 #include <vector>
 
-namespace SlamParser {
+namespace slam_parser {
 
 /**
  * \brief interface for communicating with the SLAM algorithm
@@ -89,6 +89,6 @@ class AbstractSlamInterface {
   virtual bool solveState() = 0;
 };
 
-}  // namespace SlamParser
+}  // namespace slam_parser
 
 #endif

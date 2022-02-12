@@ -32,7 +32,7 @@
 
 #include "abstract_slam_interface.h"
 
-namespace SlamParser {
+namespace slam_parser {
 
 class SlamContextInterface;
 class Driver;
@@ -57,11 +57,11 @@ class ParserInterface {
   bool parseCommand(std::istream& input);
 
  protected:
-  SlamContextInterface* _slamContextInterface;
-  Driver* _driver;
-  std::stringstream _buffer;
+  SlamContextInterface* slamContextInterface_;
+  Driver* driver_;
+  std::stringstream buffer_;
 };
 
-}  // namespace SlamParser
+}  // namespace slam_parser
 
 #endif

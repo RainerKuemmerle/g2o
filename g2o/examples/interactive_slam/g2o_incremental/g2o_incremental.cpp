@@ -60,10 +60,10 @@ inline void solveAndPrint(G2oSlamInterface& slamInterface, bool verbose) {
   G2oSlamInterface::SolveResult solverState = slamInterface.solve();
   if (!verbose) {
     switch (solverState) {
-      case G2oSlamInterface::SOLVED:
+      case G2oSlamInterface::kSolved:
         cout << ".";  //<< flush;
         break;
-      case G2oSlamInterface::SOLVED_BATCH:
+      case G2oSlamInterface::kSolvedBatch:
         cout << "b " << slamInterface.optimizer()->vertices().size() << endl;
         break;
       default:
@@ -74,7 +74,7 @@ inline void solveAndPrint(G2oSlamInterface& slamInterface, bool verbose) {
 
 void sigquit_handler(int sig) {
   if (sig == SIGINT) {
-    hasToStop = 1;
+    hasToStop = true;
     static int cnt = 0;
     if (cnt++ == 2) {
       cerr << __PRETTY_FUNCTION__ << " forcing exit" << endl;
@@ -141,7 +141,7 @@ int main(int argc, char** argv) {
       currentLine >> token;
       if (token == "EDGE_SE2") {
         graphDimension = 3;
-        edgesFromGraph.push_back(EdgeInformation());
+        edgesFromGraph.emplace_back();
         EdgeInformation& currentEdge = edgesFromGraph.back();
         currentLine >> currentEdge.fromId >> currentEdge.toId;
         currentEdge.measurement.resize(3);
@@ -151,15 +151,13 @@ int main(int argc, char** argv) {
         for (int i = 0; i < 6; ++i) currentLine >> currentEdge.information[i];
       } else if (token == "EDGE_SE3:QUAT") {
         graphDimension = 6;
-        edgesFromGraph.push_back(EdgeInformation());
+        edgesFromGraph.emplace_back();
         EdgeInformation& currentEdge = edgesFromGraph.back();
         currentLine >> currentEdge.fromId >> currentEdge.toId;
         currentEdge.measurement.resize(7);
-        for (size_t i = 0; i < currentEdge.measurement.size(); ++i)
-          currentLine >> currentEdge.measurement[i];
+        for (double& i : currentEdge.measurement) currentLine >> i;
         currentEdge.information.resize(21);
-        for (size_t i = 0; i < currentEdge.information.size(); ++i)
-          currentLine >> currentEdge.information[i];
+        for (double& i : currentEdge.information) currentLine >> i;
       }
     }
     assert(graphDimension > 0);
@@ -173,9 +171,7 @@ int main(int argc, char** argv) {
     tictoc("inc_optimize");
     int lastNode = 2;
     slamInterface.addNode("", 0, graphDimension, vector<double>());
-    for (vector<EdgeInformation>::const_iterator it = edgesFromGraph.begin();
-         it != edgesFromGraph.end(); ++it) {
-      const EdgeInformation& e = *it;
+    for (const auto& e : edgesFromGraph) {
       int minNodeId = max(e.fromId, e.toId);
       if (minNodeId > lastNode) {
         // cerr << "try to solve" << endl;
@@ -190,7 +186,7 @@ int main(int argc, char** argv) {
     tictoc("inc_optimize");
   } else {
     // Reading the protocol via stdin
-    SlamParser::ParserInterface parserInterface(&slamInterface);
+    slam_parser::ParserInterface parserInterface(&slamInterface);
     while (parserInterface.parseCommand(cin)) {
     }
   }

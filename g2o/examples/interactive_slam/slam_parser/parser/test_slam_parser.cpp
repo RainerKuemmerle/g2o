@@ -29,14 +29,13 @@
 #include "commands.h"
 #include "driver.h"
 #include "slam_context.h"
-using namespace std;
 
 int main() {
-  SlamParser::SlamContext slamContext;
-  SlamParser::Driver driver(slamContext);
+  slam_parser::SlamContext slamContext;
+  slam_parser::Driver driver(slamContext);
   driver.trace_parsing = true;
   driver.trace_scanning = true;
 
-  bool parseStatus = driver.parse_stream(cin);
+  bool parseStatus = driver.parse_stream(std::cin);
   if (!parseStatus) return 1;
 }

@@ -27,10 +27,10 @@
 %skeleton "lalr1.cc"
 
 /* namespace to enclose parser in */
-%name-prefix="SlamParser"
+%define api.prefix {slam_parser}
 
 /* set the parser's class identifier */
-%define "parser_class_name" "Parser"
+%define api.parser.class {Parser}
 
 /* keep track of the current position within the input */
 %locations
@@ -46,7 +46,7 @@
 %parse-param { class Driver& driver }
 
 /* verbose error messages */
-%error-verbose
+%define parse.error verbose
 
  /*** BEGIN TOKEN - Change the example grammar's tokens below ***/
 
@@ -251,7 +251,7 @@ start	: /* empty */
 
 %% /*** Additional Code ***/
 
-void SlamParser::Parser::error(const Parser::location_type& l, const std::string& m)
+void slam_parser::Parser::error(const Parser::location_type& l, const std::string& m)
 {
   driver.error(l, m);
 }

@@ -39,51 +39,50 @@ namespace g2o {
 class SparseOptimizerOnline;
 
 class G2O_INTERACTIVE_API G2oSlamInterface
-    : public SlamParser::AbstractSlamInterface {
+    : public slam_parser::AbstractSlamInterface {
  public:
-  enum SolveResult { SOLVED, SOLVED_BATCH, NOOP, ERROR };
+  enum SolveResult { kSolved, kSolvedBatch, kNoop, kError };
 
- public:
-  G2oSlamInterface(SparseOptimizerOnline* optimizer);
+  explicit G2oSlamInterface(SparseOptimizerOnline* optimizer);
 
   bool addNode(const std::string& tag, int id, int dimension,
-               const std::vector<double>& values);
+               const std::vector<double>& values) override;
 
   bool addEdge(const std::string& tag, int id, int dimension, int v1, int v2,
                const std::vector<double>& measurement,
-               const std::vector<double>& information);
+               const std::vector<double>& information) override;
 
-  bool fixNode(const std::vector<int>& nodes);
+  bool fixNode(const std::vector<int>& nodes) override;
 
-  bool queryState(const std::vector<int>& nodes);
+  bool queryState(const std::vector<int>& nodes) override;
 
-  bool solveState();
+  bool solveState() override;
 
   SolveResult solve();
 
-  int updatedGraphEachN() const { return _updateGraphEachN; }
+  int updatedGraphEachN() const { return updateGraphEachN_; }
   void setUpdateGraphEachN(int n);
 
-  int batchSolveEachN() const { return _batchEveryN; }
+  int batchSolveEachN() const { return batchEveryN_; }
   void setBatchSolveEachN(int n);
 
-  SparseOptimizerOnline* optimizer() { return _optimizer; }
+  SparseOptimizerOnline* optimizer() { return optimizer_; }
 
  protected:
-  SparseOptimizerOnline* _optimizer;
-  bool _firstOptimization;
-  int _nodesAdded;
-  int _incIterations;
-  int _updateGraphEachN;
-  int _batchEveryN;
-  int _lastBatchStep;
-  bool _initSolverDone;
+  SparseOptimizerOnline* optimizer_;
+  bool firstOptimization_;
+  int nodesAdded_;
+  int incIterations_;
+  int updateGraphEachN_;
+  int batchEveryN_;
+  int lastBatchStep_;
+  bool initSolverDone_;
 
-  HyperGraph::VertexSet _verticesAdded;
-  HyperGraph::EdgeSet _edgesAdded;
+  HyperGraph::VertexSet verticesAdded_;
+  HyperGraph::EdgeSet edgesAdded_;
 
   std::shared_ptr<OptimizableGraph::Vertex> addVertex(int dimension, int id);
-  bool printVertex(OptimizableGraph::Vertex* v);
+  static bool printVertex(OptimizableGraph::Vertex* v);
 };
 
 }  // namespace g2o

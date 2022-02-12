@@ -28,105 +28,106 @@
 #define COMMANDS_H
 
 #include <string>
+#include <utility>
 #include <vector>
 
-namespace SlamParser {
+namespace slam_parser {
 
 enum CommandType {
-  CT_ADD_NODE,
-  CT_ADD_EDGE,
-  CT_SOLVE_STATE,
-  CT_QUERY_STATE,
-  CT_FIX,
+  kCtAddNode,
+  kCtAddEdge,
+  kCtSolveState,
+  kCtQueryState,
+  kCtFix,
 };
 
 class CommandNode {
  public:
-  CommandNode(CommandType commandType, const std::string& tag)
-      : _commandType(commandType), _tag(tag) {}
-  virtual ~CommandNode() {}
-  CommandType commandType() const { return _commandType; }
-  const std::string& tag() const { return _tag; }
+  CommandNode(CommandType commandType, std::string tag)
+      : commandType_(commandType), tag_(std::move(std::move(tag))) {}
+  virtual ~CommandNode() = default;
+  CommandType commandType() const { return commandType_; }
+  const std::string& tag() const { return tag_; }
 
  protected:
-  CommandType _commandType;
-  std::string _tag;
+  CommandType commandType_;
+  std::string tag_;
 };
 
 class AddNode : public CommandNode {
  public:
   AddNode(const std::string& tag, int id, int dimension,
-          const std::vector<double>& values = std::vector<double>())
-      : CommandNode(CT_ADD_NODE, tag),
-        _id(id),
-        _dimension(dimension),
-        _values(values) {}
+          std::vector<double> values = std::vector<double>())
+      : CommandNode(kCtAddNode, tag),
+        id_(id),
+        dimension_(dimension),
+        values_(std::move(std::move(values))) {}
 
-  int id() const { return _id; }
-  int dimension() const { return _dimension; }
-  const std::vector<double>& values() { return _values; }
+  int id() const { return id_; }
+  int dimension() const { return dimension_; }
+  const std::vector<double>& values() { return values_; }
 
  protected:
-  int _id;
-  int _dimension;
-  std::vector<double> _values;
+  int id_;
+  int dimension_;
+  std::vector<double> values_;
 };
 
 class AddEdge : public CommandNode {
  public:
   AddEdge(const std::string& tag, int id, int dimension, int id1, int id2,
-          const std::vector<double>& values,
-          const std::vector<double> information)
-      : CommandNode(CT_ADD_EDGE, tag),
-        _id(id),
-        _dimension(dimension),
-        _id1(id1),
-        _id2(id2),
-        _values(values),
-        _information(information) {}
+          std::vector<double> values, std::vector<double> information)
+      : CommandNode(kCtAddEdge, tag),
+        id_(id),
+        dimension_(dimension),
+        id1_(id1),
+        id2_(id2),
+        values_(std::move(std::move(values))),
+        information_(std::move(std::move(information))) {}
 
-  int id() const { return _id; }
-  int dimension() const { return _dimension; }
-  int id1() const { return _id1; }
-  int id2() const { return _id2; }
-  const std::vector<double>& values() { return _values; }
-  const std::vector<double>& information() { return _information; }
+  int id() const { return id_; }
+  int dimension() const { return dimension_; }
+  int id1() const { return id1_; }
+  int id2() const { return id2_; }
+  const std::vector<double>& values() { return values_; }
+  const std::vector<double>& information() { return information_; }
 
  protected:
-  int _id;
-  int _dimension;
-  int _id1;
-  int _id2;
-  std::vector<double> _values;
-  std::vector<double> _information;
+  int id_;
+  int dimension_;
+  int id1_;
+  int id2_;
+  std::vector<double> values_;
+  std::vector<double> information_;
 };
 
 class SolveSate : public CommandNode {
  public:
-  SolveSate(const std::string& tag) : CommandNode(CT_SOLVE_STATE, tag) {}
+  explicit SolveSate(const std::string& tag)
+      : CommandNode(kCtSolveState, tag) {}
 };
 
 class QueryState : public CommandNode {
  public:
   explicit QueryState(const std::string& tag,
-                      const std::vector<int>& ids = std::vector<int>())
-      : CommandNode(CT_QUERY_STATE, tag), _ids(ids) {}
-  const std::vector<int>& ids() { return _ids; }
+                      std::vector<int> ids = std::vector<int>())
+      : CommandNode(kCtQueryState, tag), ids_(std::move(std::move(ids))) {}
+  const std::vector<int>& ids() { return ids_; }
 
  protected:
-  std::vector<int> _ids;
+  std::vector<int> ids_;
 };
 
 class FixNode : public CommandNode {
  public:
-  explicit FixNode(const std::string& tag, const std::vector<int>& ids)
-      : CommandNode(CT_FIX, tag), _ids(ids) {}
-  const std::vector<int>& ids() { return _ids; }
+  explicit FixNode(const std::string& tag, std::vector<int> ids)
+      : CommandNode(kCtFix, tag), ids_(std::move(std::move(ids))) {}
+  const std::vector<int>& ids() { return ids_; }
 
  protected:
-  std::vector<int> _ids;
+  std::vector<int> ids_;
 };
 
-}  // namespace SlamParser
+}  // namespace slam_parser
 
 #endif

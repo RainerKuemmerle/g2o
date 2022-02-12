@@ -32,7 +32,7 @@
 #include "scanner.h"
 #include "slam_context.h"
 
-namespace SlamParser {
+namespace slam_parser {
 
 Driver::Driver(class SlamContext& slamContext_)
     : trace_scanning(false),
@@ -71,4 +71,4 @@ void Driver::error(const class location& l, const std::string& m) {
 
 void Driver::error(const std::string& m) { std::cerr << m << std::endl; }
 
-}  // namespace SlamParser
+}  // namespace slam_parser

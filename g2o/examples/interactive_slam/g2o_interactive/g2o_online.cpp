@@ -43,7 +43,7 @@ using namespace g2o;
 
 void sigquit_handler(int sig) {
   if (sig == SIGINT) {
-    hasToStop = 1;
+    hasToStop = true;
     static int cnt = 0;
     if (cnt++ == 2) {
       cerr << __PRETTY_FUNCTION__ << " forcing exit" << endl;
@@ -75,7 +75,7 @@ int main(int argc, char** argv) {
   G2oSlamInterface slamInterface(&optimizer);
   slamInterface.setUpdateGraphEachN(updateEachN);
 
-  SlamParser::ParserInterface parserInterface(&slamInterface);
+  slam_parser::ParserInterface parserInterface(&slamInterface);
 
   while (parserInterface.parseCommand(cin)) {
     // do something additional if needed
