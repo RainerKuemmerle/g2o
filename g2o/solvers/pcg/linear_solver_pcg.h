@@ -51,7 +51,7 @@ class LinearSolverPCG : public LinearSolver<MatrixType> {
     return true;
   }
 
-  bool solve(const SparseBlockMatrix<MatrixType>& A, const number_t* x,
+  bool solve(const SparseBlockMatrix<MatrixType>& A, number_t* x,
              number_t* b) override;
 
   //! return the tolerance for terminating PCG before convergence

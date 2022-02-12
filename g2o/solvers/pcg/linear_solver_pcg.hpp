@@ -82,7 +82,7 @@ inline void pcg_atxpy(const MatrixX& A, const VectorX& x, int xoff, VectorX& y,
 
 template <typename MatrixType>
 bool LinearSolverPCG<MatrixType>::solve(const SparseBlockMatrix<MatrixType>& A,
-                                        const number_t* x, number_t* b) {
+                                        number_t* x, number_t* b) {
   const bool indexRequired = indices_.empty();
   diag_.clear();
   J_.clear();
@@ -114,7 +114,7 @@ bool LinearSolverPCG<MatrixType>::solve(const SparseBlockMatrix<MatrixType>& A,
   int n = A.rows();
   assert(n > 0 && "Hessian has 0 rows/cols");
   Eigen::Map<VectorX> xvec(x, A.cols());
-  const Eigen::VectorX::ConstMapType bvec(b, n);
+  const VectorX::ConstMapType bvec(b, n);
   xvec.setZero();
 
   VectorX r;

@@ -507,7 +507,7 @@ int SparseBlockMatrix<MatrixType>::fillCCS(number_t* Cx,
     int cstart = i ? colBlockIndices_[i - 1] : 0;
     int csize = colsOfBlock(i);
     for (int c = 0; c < csize; ++c) {
-      for (typename SparseBlockMatrix<MatrixType>::IntBlockMap::const_iterator
+      for (auto
                it = blockCols_[i].begin();
            it != blockCols_[i].end(); ++it) {
         const typename SparseBlockMatrix<MatrixType>::SparseMatrixBlock* b =
@@ -534,7 +534,7 @@ int SparseBlockMatrix<MatrixType>::fillCCS(int* Cp, int* Ci, number_t* Cx,
     int csize = colsOfBlock(i);
     for (int c = 0; c < csize; ++c) {
       *Cp = nz;
-      for (typename SparseBlockMatrix<MatrixType>::IntBlockMap::const_iterator
+      for (auto
                it = blockCols_[i].begin();
            it != blockCols_[i].end(); ++it) {
         const typename SparseBlockMatrix<MatrixType>::SparseMatrixBlock* b =
