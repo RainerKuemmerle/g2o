@@ -42,10 +42,7 @@ void declareHyperGraph(py::module& m) {
   py::class_<HyperGraph::DataContainer,
              std::shared_ptr<HyperGraph::DataContainer>>(cls, "DataContainer")
       .def(py::init<>())
-      .def("user_data",
-           (HyperGraph::Data * (HyperGraph::DataContainer::*)()) &
-               HyperGraph::DataContainer::userData,
-           py::return_value_policy::reference)
+      .def("user_data", &HyperGraph::DataContainer::userData)
       .def("set_user_data", &HyperGraph::DataContainer::setUserData, "obs"_a,
            py::keep_alive<1, 2>())  // Data* -> void
       .def("add_user_data", &HyperGraph::DataContainer::addUserData, "obs"_a,
