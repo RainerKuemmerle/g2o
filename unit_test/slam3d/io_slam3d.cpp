@@ -143,38 +143,37 @@ TEST_F(IoSlam3dParam, ReadWriteEdgeSE3Offset) {
 
   // Test IO
   readWriteVectorBasedEdge<EdgeSE3Offset, internal::RandomIsometry3>(
-      outputEdge.get());
+      outputEdge);
 }
 
 TEST_F(IoSlam3dParam, ReadWriteEdgeSE3PointXYZ) {
   auto outputEdge = std::make_shared<EdgeSE3PointXYZ>();
   ASSERT_TRUE(preparePosePointEdge(outputEdge));
-  readWriteVectorBasedEdge<EdgeSE3PointXYZ>(outputEdge.get());
+  readWriteVectorBasedEdge<EdgeSE3PointXYZ>(outputEdge);
 }
 
 TEST_F(IoSlam3dParam, ReadWriteEdgeSE3Prior) {
   auto outputEdge = std::make_shared<EdgeSE3Prior>();
   ASSERT_TRUE(preparePosePoseEdge(outputEdge));
-  readWriteVectorBasedEdge<EdgeSE3Prior, internal::RandomIsometry3>(
-      outputEdge.get());
+  readWriteVectorBasedEdge<EdgeSE3Prior, internal::RandomIsometry3>(outputEdge);
 }
 
 TEST_F(IoSlam3dParam, ReadWriteEdgeSE3PointXYZDepth) {
   auto outputEdge = std::make_shared<EdgeSE3PointXYZDepth>();
   ASSERT_TRUE(prepareCamPointEdge(outputEdge));
-  readWriteVectorBasedEdge<EdgeSE3PointXYZDepth>(outputEdge.get());
+  readWriteVectorBasedEdge<EdgeSE3PointXYZDepth>(outputEdge);
 }
 
 TEST_F(IoSlam3dParam, ReadWriteEdgeSE3PointXYZDisparity) {
   auto outputEdge = std::make_shared<EdgeSE3PointXYZDisparity>();
   ASSERT_TRUE(prepareCamPointEdge(outputEdge));
-  readWriteVectorBasedEdge<EdgeSE3PointXYZDisparity>(outputEdge.get());
+  readWriteVectorBasedEdge<EdgeSE3PointXYZDisparity>(outputEdge);
 }
 
 TEST_F(IoSlam3dParam, ReadWriteEdgeSE3XYZPrior) {
   auto outputEdge = std::make_shared<EdgeSE3XYZPrior>();
   ASSERT_TRUE(preparePosePoseEdge(outputEdge));
-  readWriteVectorBasedEdge<EdgeSE3XYZPrior>(outputEdge.get());
+  readWriteVectorBasedEdge<EdgeSE3XYZPrior>(outputEdge);
 }
 
 // Parameter tests

@@ -28,6 +28,7 @@
 #define TESTHELPER_IO_H
 
 #include <Eigen/Core>
+#include <memory>
 #include <sstream>
 
 #include "gtest/gtest.h"
@@ -54,13 +55,9 @@ void randomizeInformationMatrix(Eigen::MatrixBase<Derived>& m) {
  */
 template <typename T>
 struct OptionalPtr {
-  OptionalPtr() : ptr(new T), own(true) {}
-  OptionalPtr(T* p) : ptr(p), own(false) {}
-  ~OptionalPtr() {
-    if (own) delete ptr;
-  }
-  T* ptr;
-  bool own;
+  OptionalPtr() : ptr(new T) {}
+  OptionalPtr(std::shared_ptr<T> p) : ptr(p) {}
+  std::shared_ptr<T> ptr;
 };
 
 template <typename T>

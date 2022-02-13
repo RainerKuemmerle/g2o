@@ -29,10 +29,10 @@
 #include <cmath>
 #include <tuple>
 
-#include "allocate_optimizer.h"
 #include "g2o/core/sparse_optimizer.h"
 #include "g2o/stuff/sampler.h"
 #include "g2o/types/sclam2d/edge_se2_sensor_calib.h"
+#include "unit_test/test_helper/allocate_optimizer.h"
 
 using SensorCalibrationParam = std::tuple<int, g2o::SE2>;
 

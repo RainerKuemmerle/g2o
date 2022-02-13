@@ -26,7 +26,6 @@
 
 #include <numeric>
 
-#include "allocate_optimizer.h"
 #include "g2o/core/factory.h"
 #include "g2o/core/optimization_algorithm_property.h"
 #include "g2o/core/sparse_optimizer.h"
@@ -34,6 +33,7 @@
 #include "g2o/types/slam2d/types_slam2d.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
+#include "unit_test/test_helper/allocate_optimizer.h"
 
 G2O_USE_TYPE_GROUP(slam2d);
 

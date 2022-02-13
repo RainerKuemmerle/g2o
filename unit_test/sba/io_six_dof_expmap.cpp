@@ -101,7 +101,7 @@ class IoSixDofExpmapParam : public ::testing::Test {
 TEST_F(IoSixDofExpmapParam, ReadWriteEdgeProjectXYZ2UV) {
   auto outputEdge = std::make_shared<EdgeProjectXYZ2UV>();
   prepareEdge(outputEdge);
-  readWriteVectorBasedEdge<EdgeProjectXYZ2UV>(outputEdge.get());
+  readWriteVectorBasedEdge<EdgeProjectXYZ2UV>(outputEdge);
 }
 
 TEST_F(IoSixDofExpmapParam, ReadWriteEdgeProjectPSI2UV) {
@@ -111,11 +111,11 @@ TEST_F(IoSixDofExpmapParam, ReadWriteEdgeProjectPSI2UV) {
   auto outputEdge = std::make_shared<EdgeProjectPSI2UV>();
   outputEdge->setVertex(2, p2);
   prepareEdge(outputEdge);
-  readWriteVectorBasedEdge<EdgeProjectPSI2UV>(outputEdge.get());
+  readWriteVectorBasedEdge<EdgeProjectPSI2UV>(outputEdge);
 }
 
 TEST_F(IoSixDofExpmapParam, ReadWriteEdgeProjectXYZ2UVU) {
   auto outputEdge = std::make_shared<EdgeProjectXYZ2UVU>();
   prepareEdge(outputEdge);
-  readWriteVectorBasedEdge<EdgeProjectXYZ2UVU>(outputEdge.get());
+  readWriteVectorBasedEdge<EdgeProjectXYZ2UVU>(outputEdge);
 }

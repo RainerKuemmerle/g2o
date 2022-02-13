@@ -86,7 +86,7 @@ TEST(IoSlam3dAddOns, ReadWriteVertexSE3Euler) {
 
 TEST(IoSlam3dAddOns, ReadWriteVertexPlane) {
   // setting up the vertex for output
-  VertexPlane* outputVertex = new VertexPlane();
+  auto outputVertex = std::make_shared<VertexPlane>();
   outputVertex->color = Vector3::Random();
   // IO Test
   readWriteVectorBasedVertex<VertexPlane, RandomPlane3D>(outputVertex);
@@ -108,7 +108,7 @@ TEST_F(IoSlam3dAddonsParam, ReadWriteEdgeSE3Line3D) {
   outputEdge->setVertex(1, line);
   ASSERT_TRUE(graph->addEdge(outputEdge));
   // test IO
-  readWriteVectorBasedEdge<EdgeSE3Line3D, RandomLine3D>(outputEdge.get());
+  readWriteVectorBasedEdge<EdgeSE3Line3D, RandomLine3D>(outputEdge);
 }
 
 TEST(IoSlam3dAddOns, ReadWriteEdgeSE3PlaneSensorCalib) {

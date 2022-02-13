@@ -24,11 +24,11 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "allocate_optimizer.h"
 #include "g2o/core/robust_kernel_factory.h"
 #include "g2o/core/robust_kernel_impl.h"
 #include "g2o/stuff/misc.h"
 #include "gmock/gmock.h"
+#include "unit_test/test_helper/allocate_optimizer.h"
 
 using namespace testing;
 

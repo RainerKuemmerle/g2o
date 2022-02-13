@@ -1,5 +1,5 @@
 // g2o - General Graph Optimization
-// Copyright (C) 2011 R. Kuemmerle, G. Grisetti, W. Burgard
+// Copyright (C) 2011 R. Kuemmerle, G. Grisetti, H. Strasdat, W. Burgard
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -24,25 +24,26 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef G2O_TEST_ALLOCATE_OPTIMIZER_H
-#define G2O_TEST_ALLOCATE_OPTIMIZER_H
+#ifndef G2O_TEST_HELPER_API_H
+#define G2O_TEST_HELPER_API_H
 
-#include <memory>
+#include "g2o/config.h"
 
-#include "g2o_test_helper_api.h"
-
-namespace g2o {
-
-class SparseOptimizer;
-
-namespace internal {
-
-// clang-format off
-G2O_TEST_HELPER_API std::unique_ptr<g2o::SparseOptimizer> createOptimizerForTests();
-G2O_TEST_HELPER_API std::unique_ptr<g2o::SparseOptimizer> createLmOptimizerForTests();
-// clang-format on
-
-}  // namespace internal
-}  // namespace g2o
-
+#ifdef _MSC_VER
+// We are using a Microsoft compiler:
+#ifdef G2O_SHARED_LIBS
+#ifdef unittest_helper_EXPORTS
+#define G2O_TEST_HELPER_API __declspec(dllexport)
+#else
+#define G2O_TEST_HELPER_API __declspec(dllimport)
 #endif
+#else
+#define G2O_TEST_HELPER_API
+#endif
+
+#else
+// Not Microsoft compiler so set empty definition:
+#define G2O_TEST_HELPER_API
+#endif
+
+#endif  // G2O_TYPES_SLAM2D_API_H
