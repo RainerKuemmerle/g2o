@@ -1,22 +1,13 @@
 # download pybind11
-configure_file(pybind11/CMakeLists.txt.in ${CMAKE_BINARY_DIR}/pybind11-download/CMakeLists.txt)
-execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" .
-  RESULT_VARIABLE result
-  WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/pybind11-download )
-if(result)
-  message(FATAL_ERROR "CMake step for pybind11 failed: ${result}")
-endif()
-execute_process(COMMAND ${CMAKE_COMMAND} --build .
-  RESULT_VARIABLE result
-  WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/pybind11-download )
-if(result)
-  message(FATAL_ERROR "Build step for pybind11 failed: ${result}")
-endif()
-
-# Add pybind11 directly to our build.
-add_subdirectory(${CMAKE_BINARY_DIR}/pybind11-src
-                 ${CMAKE_BINARY_DIR}/pybind11-build
-                 EXCLUDE_FROM_ALL)
+include(FetchContent)
+FetchContent_Declare(
+  pybind11
+  GIT_REPOSITORY https://github.com/pybind/pybind11.git
+  GIT_TAG        v2.9.1
+)
+# For Windows: Prevent overriding the parent project's compiler/linker settings
+set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+FetchContent_MakeAvailable(pybind11)
 
 ###################################################
 # python wrapper library
