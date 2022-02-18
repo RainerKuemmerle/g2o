@@ -61,9 +61,9 @@ jobs:
       - name: Test
         run: |
           cd ${{github.workspace}}/build
-          $Env:PATH += ;${{github.workspace}}\bin\${{matrix.config.build_type}}
-          $Env:PATH += ;${{github.workspace}}\lib\${{matrix.config.build_type}}
-          $Env:PATH += ;${{github.workspace}}\build\bin\${{matrix.config.build_type}}
-          $Env:PATH += ;${{github.workspace}}\build\lib\${{matrix.config.build_type}}
+          $Env:PATH += ";${{github.workspace}}\bin\${{matrix.config.build_type}}"
+          $Env:PATH += ";${{github.workspace}}\lib\${{matrix.config.build_type}}"
+          $Env:PATH += ";${{github.workspace}}\build\bin\${{matrix.config.build_type}}"
+          $Env:PATH += ";${{github.workspace}}\build\lib\${{matrix.config.build_type}}"
           ctest -C ${{matrix.config.build_type}} --extra-verbose --output-on-failure
 
