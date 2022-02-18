@@ -39,7 +39,7 @@ jobs:
 
       - name: Install libraries with vcpkg
         run: |
-          vcpkg --triplet x64-windows install eigen3 suitesparse
+          vcpkg --triplet x64-windows install eigen3
 
       - name: Configure CMake
         run: |
