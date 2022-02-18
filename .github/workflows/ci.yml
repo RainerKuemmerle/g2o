@@ -28,14 +28,6 @@ jobs:
             build_type: "Debug",
             do_coverage: "OFF",
           }
-        #- {
-            #name: "Windows Latest MSVC",
-            #os: windows-latest,
-            #build_type: "Debug",
-            #environment_script: "C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/VC/Auxiliary/Build/vcvars64.bat",
-            #generators: "Visual Studio 16 2019"
-            #do_coverage: "OFF",
-          #}
 
 
     steps:
@@ -65,10 +57,6 @@ jobs:
       - name: Install dependencies on macOS
         if: runner.os == 'macOS'
         run: brew install cmake eigen
-
-      #- name: Install dependencies on Windows
-        #if: runner.os == 'Windows'
-        #run: brew install cmake eigen
 
       - name: Configure CMake
         run: |

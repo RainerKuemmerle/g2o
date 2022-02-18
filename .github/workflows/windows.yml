@@ -48,7 +48,7 @@ jobs:
       - name: Configure CMake
         run: |
           cmake --version
-          cmake -B ${{github.workspace}}/build  -G "Visual Studio 16 2019" -A x64 -DBUILD_UNITTESTS=ON -DCMAKE_BUILD_TYPE=${{matrix.config.build_type}} -DEIGEN3_INCLUDE_DIR=C:/vcpkg/packages/eigen3_x64-windows/include/eigen3
+          cmake -B ${{github.workspace}}/build  -G "Visual Studio 16 2019" -A x64 -DBUILD_UNITTESTS=ON -DCMAKE_BUILD_TYPE=${{matrix.config.build_type}} -DCMAKE_TOOLCHAIN_FILE=C:\vcpkg\scripts\buildsystems\vcpkg.cmake
 
       - name: Build Introspection
         run: |
@@ -59,6 +59,7 @@ jobs:
         run: cmake --build ${{github.workspace}}/build --config ${{matrix.config.build_type}} -j 2
 
       - name: Test
-        working-directory: ${{github.workspace}}/build
-        run: ctest -C ${{matrix.config.build_type}} --extra-verbose --output-on-failure
+        run: |
+          cd ${{github.workspace}}/build
+          ctest -C ${{matrix.config.build_type}} --extra-verbose --output-on-failure
 
