@@ -48,7 +48,7 @@ jobs:
       - name: Configure CMake
         run: |
           cmake --version
-          cmake -B ${{github.workspace}}/build  -G "Visual Studio 16 2019" -A x64 -DBUILD_UNITTESTS=ON -DCMAKE_BUILD_TYPE=${{matrix.config.build_type}} -DCMAKE_TOOLCHAIN_FILE=C:\vcpkg\scripts\buildsystems\vcpkg.cmake
+          cmake -B ${{github.workspace}}/build  -G ${{matrix.config.generators}} -A x64 -DBUILD_UNITTESTS=ON -DCMAKE_BUILD_TYPE=${{matrix.config.build_type}} -DCMAKE_TOOLCHAIN_FILE=C:\vcpkg\scripts\buildsystems\vcpkg.cmake
 
       - name: Build Introspection
         run: |
@@ -61,6 +61,9 @@ jobs:
       - name: Test
         run: |
           cd ${{github.workspace}}/build
-          set PATH=%PATH%;${{github.workspace}}\bin\${{matrix.config.build_type}};${{github.workspace}}\lib\${{matrix.config.build_type}};${{github.workspace}}\build\bin\${{matrix.config.build_type}};${{github.workspace}}\build\lib\${{matrix.config.build_type}}
+          $Env:PATH += ;${{github.workspace}}\bin\${{matrix.config.build_type}}
+          $Env:PATH += ;${{github.workspace}}\lib\${{matrix.config.build_type}}
+          $Env:PATH += ;${{github.workspace}}\build\bin\${{matrix.config.build_type}}
+          $Env:PATH += ;${{github.workspace}}\build\lib\${{matrix.config.build_type}}
           ctest -C ${{matrix.config.build_type}} --extra-verbose --output-on-failure
 
