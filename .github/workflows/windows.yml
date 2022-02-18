@@ -61,5 +61,6 @@ jobs:
       - name: Test
         run: |
           cd ${{github.workspace}}/build
+          set PATH=%PATH%;${{github.workspace}}\bin\${{matrix.config.build_type}};${{github.workspace}}\lib\${{matrix.config.build_type}};${{github.workspace}}\build\bin\${{matrix.config.build_type}};${{github.workspace}}\build\lib\${{matrix.config.build_type}}
           ctest -C ${{matrix.config.build_type}} --extra-verbose --output-on-failure
 
