@@ -51,12 +51,9 @@ jobs:
           cmake -B ${{github.workspace}}/build  -G "Visual Studio 16 2019" -A x64 -DBUILD_UNITTESTS=ON -DCMAKE_BUILD_TYPE=${{matrix.config.build_type}} -DEIGEN3_INCLUDE_DIR=C:/vcpkg/packages/eigen3_x64-windows/include/eigen3
 
       - name: Build Introspection
-        shell: bash
         run: |
           echo "g2o config.h"
-          cat ${{github.workspace}}/build/g2o/config.h
-          echo "ENV"
-          env | sort
+          type ${{github.workspace}}/build/g2o/config.h
 
       - name: Build
         run: cmake --build ${{github.workspace}}/build --config ${{matrix.config.build_type}} -j 2
