@@ -41,6 +41,10 @@ jobs:
         run: |
           vcpkg --triplet x64-windows install eigen3
 
+      - name: Eigen Introspection
+        run: |
+          type C:/vcpkg/packages/eigen3_x64-windows/debug/lib/pkgconfig/eigen3.pc
+
       - name: Configure CMake
         run: |
           cmake --version
