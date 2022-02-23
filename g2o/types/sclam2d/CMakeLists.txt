@@ -13,7 +13,7 @@ if (APPLE)
 endif()
 target_link_libraries(types_sclam2d types_slam2d core)
 if(G2O_HAVE_OPENGL)
-  target_link_libraries(types_sclam2d ${OPENGL_gl_LIBRARY})
+  target_link_libraries(types_sclam2d opengl_helper)
 endif()
 
 install(TARGETS types_sclam2d

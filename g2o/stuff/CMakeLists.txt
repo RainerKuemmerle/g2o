@@ -31,8 +31,9 @@ if(OPENGL_FOUND AND G2O_HAVE_OPENGL)
     opengl_primitives.cpp opengl_primitives.h
     )
   if (APPLE)
-  set_target_properties(opengl_helper PROPERTIES INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
-endif()
+    set_target_properties(opengl_helper PROPERTIES INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
+  endif()
+
   install(TARGETS opengl_helper
     EXPORT ${G2O_TARGETS_EXPORT_NAME}
     RUNTIME DESTINATION ${RUNTIME_DESTINATION}
