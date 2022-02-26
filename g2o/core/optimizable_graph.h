@@ -33,6 +33,7 @@
 #include <set>
 #include <typeinfo>
 
+#include "cache.h"
 #include "g2o/stuff/macros.h"
 #include "g2o_core_api.h"
 #include "hyper_graph.h"
@@ -46,7 +47,6 @@ namespace g2o {
 
 class HyperGraphAction;
 struct OptimizationAlgorithmProperty;
-class CacheContainer;
 class RobustKernel;
 
 /**
