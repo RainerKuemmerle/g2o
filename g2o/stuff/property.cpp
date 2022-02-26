@@ -67,14 +67,14 @@ bool PropertyMap::updatePropertyFromString(const std::string& name,
 }
 
 void PropertyMap::writeToCSV(std::ostream& os) const {
-  for (PropertyMapConstIterator it = begin(); it != end(); ++it) {
-    BaseProperty* p = it->second;
-    os << p->name() << ", ";
+  for (auto it = cbegin(); it != cend(); ++it) {
+    if (it != cbegin()) os << ",";
+    os << it->second->name();
   }
   os << std::endl;
-  for (PropertyMapConstIterator it = begin(); it != end(); ++it) {
-    BaseProperty* p = it->second;
-    os << p->toString() << ", ";
+  for (auto it = cbegin(); it != cend(); ++it) {
+    if (it != cbegin()) os << ",";
+    os << it->second->toString();
   }
   os << std::endl;
 }
