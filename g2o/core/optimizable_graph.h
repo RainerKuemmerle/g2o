@@ -29,6 +29,7 @@
 
 #include <functional>
 #include <iostream>
+#include <memory>
 #include <set>
 #include <typeinfo>
 
@@ -129,7 +130,7 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
 
    public:
     Vertex() = default;
-    ~Vertex() override;
+    ~Vertex() override = default;
 
     //! sets the node to the origin (used in the multilevel stuff)
     void setToOrigin() {
@@ -396,15 +397,15 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
     CacheContainer* cacheContainer();
 
    protected:
-    OptimizableGraph* graph_{nullptr};
-    int hessianIndex_{-1};
-    bool fixed_{false};
-    bool marginalized_{false};
+    OptimizableGraph* graph_ = nullptr;
+    int hessianIndex_ = -1;
+    bool fixed_ = false;
+    bool marginalized_ = false;
     int dimension_;
-    int colInHessian_{-1};
+    int colInHessian_ = -1;
     OpenMPMutex quadraticFormMutex_;
 
-    CacheContainer* cacheContainer_{nullptr};
+    std::unique_ptr<CacheContainer> cacheContainer_;
 
     /**
      * update the position of the node from the parameters in v.
@@ -435,7 +436,7 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
 
    public:
     Edge();
-    ~Edge() override;
+    ~Edge() override = default;
 
     // indicates if all vertices are fixed
     virtual bool allVerticesFixed() const = 0;

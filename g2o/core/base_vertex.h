@@ -32,6 +32,7 @@
 #include <Eigen/Dense>
 #include <stack>
 
+#include "cache.h"
 #include "creators.h"
 #include "g2o/stuff/macros.h"
 #include "optimizable_graph.h"

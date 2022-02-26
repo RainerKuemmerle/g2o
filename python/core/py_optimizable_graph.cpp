@@ -1,5 +1,6 @@
 #include "py_optimizable_graph.h"
 
+#include <g2o/core/cache.h>
 #include <g2o/core/hyper_graph_action.h>
 #include <g2o/core/jacobian_workspace.h>
 #include <g2o/core/robust_kernel.h>
