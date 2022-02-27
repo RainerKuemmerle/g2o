@@ -23,7 +23,7 @@ if (APPLE)
 endif()
 target_link_libraries(types_slam3d_addons types_slam3d core)
 if(G2O_HAVE_OPENGL)
-  target_link_libraries(types_slam3d_addons ${OPENGL_gl_LIBRARY} )
+  target_link_libraries(types_slam3d_addons opengl_helper)
 endif()
 
 install(TARGETS types_slam3d_addons
