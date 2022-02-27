@@ -32,7 +32,6 @@
 #include <limits>
 #include <type_traits>
 
-#include "cache.h"
 #include "optimizable_graph.h"
 
 namespace g2o {

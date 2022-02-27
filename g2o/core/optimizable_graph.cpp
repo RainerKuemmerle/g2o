@@ -65,8 +65,8 @@ std::ostream& printIdChain(std::ostream& os, const std::vector<int>& ids) {
 }  // namespace
 
 CacheContainer* OptimizableGraph::Vertex::cacheContainer() {
-  if (!cacheContainer_) cacheContainer_ = std::make_unique<CacheContainer>(this);
-  return cacheContainer_.get();
+  if (!cacheContainer_) cacheContainer_ = new CacheContainer(this);
+  return cacheContainer_;
 }
 
 void OptimizableGraph::Vertex::updateCache() {
@@ -75,6 +75,8 @@ void OptimizableGraph::Vertex::updateCache() {
     cacheContainer_->update();
   }
 }
+
+OptimizableGraph::Vertex::~Vertex() { delete cacheContainer_; }
 
 bool OptimizableGraph::Vertex::setEstimateData(const number_t* estimate) {
   bool ret = setEstimateDataImpl(estimate);
@@ -102,6 +104,8 @@ bool OptimizableGraph::Vertex::getMinimalEstimateData(number_t*) const {
 int OptimizableGraph::Vertex::minimalEstimateDimension() const { return -1; }
 
 OptimizableGraph::Edge::Edge() : robustKernel_(nullptr) {}
+
+OptimizableGraph::Edge::~Edge() = default;
 
 OptimizableGraph* OptimizableGraph::Edge::graph() {
   if (vertices_.empty()) return nullptr;
