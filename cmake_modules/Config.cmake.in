@@ -1,7 +1,10 @@
 include(CMakeFindDependencyMacro)
 
 find_dependency(Eigen3)
-find_dependency(OpenGL)
+
+if(G2O_USE_OPENGL)
+  find_dependency(OpenGL)
+endif()
 
 include("${CMAKE_CURRENT_LIST_DIR}/@G2O_TARGETS_EXPORT_NAME@.cmake")
 
