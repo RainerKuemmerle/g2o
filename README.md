@@ -24,6 +24,10 @@ to several variants of SLAM and BA. g2o offers a performance comparable to
 implementations of state-of-the-art approaches for the specific problems
 (02/2011).
 
+## Python and different memory management
+The branch [pymem](https://github.com/RainerKuemmerle/g2o/tree/pymem) contains a python wrapper and switches to smart pointer instead of RAW pointers.
+It is currently experimental but PRs and improvements are welcome - as always.
+
 ## Papers Describing the Approach
 
 Rainer Kuemmerle, Giorgio Grisetti, Hauke Strasdat,
