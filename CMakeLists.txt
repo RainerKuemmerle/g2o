@@ -363,8 +363,8 @@ if(BUILD_CODE_COVERAGE AND CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
 endif()
 
 # Compiler specific options for gcc
+option (BUILD_WITH_MARCH_NATIVE "Build with \"-march native\"" OFF)
 if(CMAKE_COMPILER_IS_GNUCXX)
-  option (BUILD_WITH_MARCH_NATIVE "Build with \"-march native\"" OFF)
   message(STATUS "Compiling with GCC")
 
   # Generic settings for optimisation
@@ -397,6 +397,11 @@ endif(CMAKE_COMPILER_IS_GNUCXX)
 if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   message(STATUS "Compiling with Clang")
 
+  # Linux
+  if(BUILD_WITH_MARCH_NATIVE AND NOT "${CMAKE_SYSTEM_PROCESSOR}" MATCHES "arm" AND "${CMAKE_SYSTEM_NAME}" MATCHES "Linux")
+    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -march=native")
+    set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -march=native")
+  endif()
   # OS X
   if(BUILD_WITH_MARCH_NATIVE AND "${CMAKE_SYSTEM_NAME}" MATCHES "Darwin")
     set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -march=native")
