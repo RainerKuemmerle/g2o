@@ -145,7 +145,7 @@ int main(int argc, const char* argv[]) {
 
   std::cout << "Ground truth vector=" << p.transpose() << std::endl;
 
-  // The number of observations in the polynomial; the defautl is 6
+  // The number of observations in the polynomial; the default is 6
   int obs = 6;
   if (argc > 2) {
     obs = atoi(argv[2]);

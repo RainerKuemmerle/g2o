@@ -574,7 +574,7 @@ inline Jet<T, N> fmin(const Jet<T, N>& x, const Jet<T, N>& y) {
   return y < x ? y : x;
 }
 
-// erf is defined as an integral that cannot be expressed analyticaly
+// erf is defined as an integral that cannot be expressed analytically
 // however, the derivative is trivial to compute
 // erf(x + h) = erf(x) + h * 2*exp(-x^2)/sqrt(pi)
 template <typename T, int N>

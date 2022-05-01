@@ -46,12 +46,12 @@ void EdgeSE2PureCalib::computeError() {
       dynamic_cast<const VertexOdomDifferentialParams*>(_vertices[1]);
 
   // get the calibrated motion given by the odometry
-  VelocityMeasurement calibratedVelocityMeasurment(
+  VelocityMeasurement calibratedVelocityMeasurement(
       measurement().velocityMeasurement.vl() * odomParams->estimate()(0),
       measurement().velocityMeasurement.vr() * odomParams->estimate()(1),
       measurement().velocityMeasurement.dt());
   MotionMeasurement mm = OdomConvert::convertToMotion(
-      calibratedVelocityMeasurment, odomParams->estimate()(2));
+      calibratedVelocityMeasurement, odomParams->estimate()(2));
   SE2 Ku_ij;
   Ku_ij.fromVector(mm.measurement());
 

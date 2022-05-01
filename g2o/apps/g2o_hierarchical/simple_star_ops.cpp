@@ -238,7 +238,7 @@ void computeSimpleStars(StarSet& stars, SparseOptimizer* optimizer,
     if (backboneEdges.empty()) continue;
 
     // cerr << "optimizing backbone" << endl;
-    // one of these  should be the gauge, to be simple we select the fisrt one
+    // one of these  should be the gauge, to be simple we select the first one
     // in the backbone
     OptimizableGraph::VertexSet gauge;
     gauge.insert(*backboneVertices.begin());

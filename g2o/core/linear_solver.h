@@ -40,7 +40,7 @@ namespace g2o {
  *
  * basic solver for Ax = b which has to reimplemented for different linear
  * algebra libraries. A is assumed to be symmetric (only upper triangular block
- * is stored) and positive-semi-definit.
+ * is stored) and positive-semi-definite.
  */
 template <typename MatrixType>
 class LinearSolver {

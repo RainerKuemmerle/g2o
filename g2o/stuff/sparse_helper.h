@@ -67,7 +67,7 @@ G2O_STUFF_API bool writeCCSMatrix(const std::string& filename, int rows,
  * @param cols number of colmuns of the matrix
  * @param Ai pointer to the row index (nz elements)
  * @param Aj pointer to the column index (nz elements)
- * @param Ax pointer to the vlaues index (nz elements)
+ * @param Ax pointer to the values index (nz elements)
  */
 G2O_STUFF_API bool writeTripletMatrix(const std::string& filename, int nz,
                                       int rows, int cols, const int* Ai,

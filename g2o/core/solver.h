@@ -90,7 +90,7 @@ class G2O_CORE_API Solver {
   virtual bool setLambda(number_t lambda, bool backup = false) = 0;
 
   /**
-   * restore a previosly made backup of the diagonal
+   * restore a previously made backup of the diagonal
    */
   virtual void restoreDiagonal() = 0;
 
@@ -114,7 +114,7 @@ class G2O_CORE_API Solver {
 
   /**
    * does this solver support the Schur complement for solving a system
-   * consisting of poses and landmarks. Re-implemement in a derived solver, if
+   * consisting of poses and landmarks. Re-implement in a derived solver, if
    * your solver supports it.
    */
   virtual bool supportsSchur() { return false; }

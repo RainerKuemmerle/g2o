@@ -157,9 +157,9 @@ class BaseEdge : public OptimizableGraph::Edge {
    */
   InformationType robustInformation(const Vector3& rho) const {
     InformationType result = rho[1] * _information;
-    // ErrorVector weightedErrror = _information * _error;
-    // result.noalias() += 2 * rho[2] * (weightedErrror *
-    // weightedErrror.transpose());
+    // ErrorVector weightedError = _information * _error;
+    // result.noalias() += 2 * rho[2] * (weightedError *
+    // weightedError.transpose());
     return result;
   }
 

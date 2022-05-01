@@ -39,7 +39,7 @@ void MainWindow::on_actionLoad_triggered(bool) {
     ifstream ifs(filename.toStdString().c_str());
     viewer->graph->load(ifs);
     cerr << "Graph loaded with " << viewer->graph->vertices().size()
-         << " vertices and " << viewer->graph->edges().size() << " measurments"
+         << " vertices and " << viewer->graph->edges().size() << " Measurements"
          << endl;
   }
   viewer->update();
@@ -64,7 +64,7 @@ void MainWindow::on_actionQuit_triggered(bool) { close(); }
 void MainWindow::on_btnOptimize_clicked() {
   if (viewer->graph->vertices().size() == 0 ||
       viewer->graph->edges().size() == 0) {
-    cerr << "Graph has no vertices / egdes" << endl;
+    cerr << "Graph has no vertices / edges" << endl;
     return;
   }
 

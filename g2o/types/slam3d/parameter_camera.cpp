@@ -83,8 +83,8 @@ bool ParameterCamera::write(std::ostream& os) const {
   return os.good();
 }
 
-bool CacheCamera::resolveDependancies() {
-  if (!CacheSE3Offset::resolveDependancies()) return false;
+bool CacheCamera::resolveDependencies() {
+  if (!CacheSE3Offset::resolveDependencies()) return false;
   params = dynamic_cast<ParameterCamera*>(_parameters[0]);
   return params != 0;
 }

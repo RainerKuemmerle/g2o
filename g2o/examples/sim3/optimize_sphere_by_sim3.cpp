@@ -88,7 +88,7 @@ void ToEdgeSim3(const g2o::EdgeSE3& e_se3, g2o::EdgeSim3* const e_sim3) {
 // This example optimize the data created by create_sphere.
 // Because the data is recore by VertexSE3 and EdgeSE3, SE3 is used for
 // interface and Sim is used for optimization.
-// g2o_viewer is avaliable to the result.
+// g2o_viewer is available to the result.
 
 int main(int argc, char** argv) {
   g2o_type_VertexSE3();

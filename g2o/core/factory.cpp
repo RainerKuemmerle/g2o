@@ -99,7 +99,7 @@ void Factory::registerType(
       cerr << " -> Data";
       break;
     default:
-      assert(0 && "Unknown element type occured, fix elementTypes");
+      assert(0 && "Unknown element type occurred, fix elementTypes");
       break;
   }
   cerr << endl;

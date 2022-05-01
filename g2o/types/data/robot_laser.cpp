@@ -42,7 +42,7 @@ RobotLaser::RobotLaser()
       _laserTv(0.),
       _laserRv(0.),
       _forwardSafetyDist(0.),
-      _sideSaftyDist(0.),
+      _sideSafetyDist(0.),
       _turnAxis(0.) {}
 
 RobotLaser::~RobotLaser() {}
@@ -73,7 +73,7 @@ bool RobotLaser::read(std::istream& is) {
   // cerr << "x: " << x << " y:" << y << " th:" << theta;
   _odomPose = SE2(x, y, theta);
   _laserParams.laserPose = _odomPose.inverse() * lp;
-  is >> _laserTv >> _laserRv >> _forwardSafetyDist >> _sideSaftyDist >>
+  is >> _laserTv >> _laserRv >> _forwardSafetyDist >> _sideSafetyDist >>
       _turnAxis;
 
   // timestamp + host
@@ -101,7 +101,7 @@ bool RobotLaser::write(std::ostream& os) const {
 
   // crap values
   os << FIXED(" " << _laserTv << " " << _laserRv << " " << _forwardSafetyDist
-                  << " " << _sideSaftyDist << " " << _turnAxis);
+                  << " " << _sideSafetyDist << " " << _turnAxis);
   os << FIXED(" " << timestamp() << " " << hostname() << " "
                   << loggerTimestamp());
 

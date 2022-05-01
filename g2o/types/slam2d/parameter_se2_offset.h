@@ -102,7 +102,7 @@ class G2O_TYPES_SLAM2D_API CacheSE2Offset : public Cache {
   Matrix2 _RpInverse_RInversePrime;
 
  protected:
-  virtual bool resolveDependancies();
+  virtual bool resolveDependencies();
 };
 
 }  // namespace g2o

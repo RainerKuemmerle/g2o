@@ -59,7 +59,7 @@ bool ParameterSE3Offset::write(std::ostream& os) const {
 
 CacheSE3Offset::CacheSE3Offset() : Cache(), _offsetParam(0) {}
 
-bool CacheSE3Offset::resolveDependancies() {
+bool CacheSE3Offset::resolveDependencies() {
   _offsetParam = dynamic_cast<ParameterSE3Offset*>(_parameters[0]);
   return _offsetParam != 0;
 }

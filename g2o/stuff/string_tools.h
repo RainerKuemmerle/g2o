@@ -70,7 +70,7 @@ G2O_STUFF_API std::string strToLower(const std::string& s);
 G2O_STUFF_API std::string strToUpper(const std::string& s);
 
 /**
- * read integer values (seperated by spaces) from a string and store
+ * read integer values (separated by spaces) from a string and store
  * them in the given OutputIterator.
  */
 template <typename OutputIterator>
@@ -87,7 +87,7 @@ OutputIterator readInts(const char* str, OutputIterator out) {
 }
 
 /**
- * read float values (seperated by spaces) from a string and store
+ * read float values (separated by spaces) from a string and store
  * them in the given OutputIterator.
  */
 template <typename OutputIterator>

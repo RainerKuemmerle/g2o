@@ -57,7 +57,7 @@ void CacheSE2Offset::updateImpl() {
   _w2n = _n2w.inverse();
 }
 
-bool CacheSE2Offset::resolveDependancies() {
+bool CacheSE2Offset::resolveDependencies() {
   _offsetParam = dynamic_cast<ParameterSE2Offset*>(_parameters[0]);
   return _offsetParam != 0;
 }

@@ -38,7 +38,7 @@ namespace g2o {
  * \brief base for all robust cost functions
  *
  * Note in all the implementations for the other cost functions the e in the
- * funtions corresponds to the sqaured errors, i.e., the robustification
+ * functions corresponds to the squared errors, i.e., the robustification
  * functions gets passed the squared error.
  *
  * e.g. the robustified least squares function is
