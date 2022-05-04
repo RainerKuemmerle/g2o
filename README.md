@@ -135,11 +135,11 @@ by the following command sequence.
 The binaries will be placed in bin and the libraries in lib which
 are both located in the top-level folder.
 
-On Windows with `vcpkg` the following two commands will generate build scripts for Visual Studio 2017 MSVC 14 tool set:
+On Windows with `vcpkg` the following two commands will generate build scripts for Visual Studio 2017 MSVC 15 tool set (please change the Visual Studio version number in accordance with your system):
 
 -   `mkdir build`
 -   `cd build`
--   `cmake -G "Visual Studio 14 2017 Win64" -DG2O_BUILD_APPS=ON -DG2O_BUILD_EXAMPLES=ON -DVCPKG_TARGET_TRIPLET="%VCPKG_DEFAULT_TRIPLET%" -DCMAKE_TOOLCHAIN_FILE="%VCPKG_ROOT_DIR%\scripts\buildsystems\vcpkg.cmake" ..`
+-   `cmake -G "Visual Studio 15 2017 Win64" -DG2O_BUILD_APPS=ON -DG2O_BUILD_EXAMPLES=ON -DVCPKG_TARGET_TRIPLET="%VCPKG_DEFAULT_TRIPLET%" -DCMAKE_TOOLCHAIN_FILE="%VCPKG_ROOT_DIR%\scripts\buildsystems\vcpkg.cmake" ..`
 
 If you are compiling on Windows and you are for some reasons **not** using `vcpkg` please download Eigen3 and extract it.
 Within cmake-gui set the variable G2O_EIGEN3_INCLUDE to that directory.
