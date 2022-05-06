@@ -84,7 +84,7 @@ class G2O_TYPES_SLAM3D_API CacheSE3Offset : public Cache {
   Isometry3 _w2l;
 
  protected:
-  virtual bool resolveDependancies();
+  virtual bool resolveDependencies();
 };
 
 #ifdef G2O_HAVE_OPENGL

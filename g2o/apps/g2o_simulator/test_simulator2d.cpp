@@ -53,17 +53,17 @@ int main(int argc, char** argv) {
   bool hasSegmentSensor;
   int nSegments;
   int segmentGridSize;
-  double minSegmentLenght, maxSegmentLenght;
+  double minSegmentLength, maxSegmentLength;
 
   std::string outputFilename;
   arg.param("nlandmarks", nlandmarks, 100, "number of landmarks in the map");
   arg.param("nSegments", nSegments, 1000, "number of segments");
   arg.param("segmentGridSize", segmentGridSize, 50,
             "number of cells of the grid where to align the segments");
-  arg.param("minSegmentLenght", minSegmentLenght, 0.5,
-            "minimal lenght of a segment in the world");
-  arg.param("maxSegmentLenght", maxSegmentLenght, 3,
-            "maximal lenght of a segment in the world");
+  arg.param("minSegmentLength", minSegmentLength, 0.5,
+            "minimal Length of a segment in the world");
+  arg.param("maxSegmentLength", maxSegmentLength, 3,
+            "maximal Length of a segment in the world");
 
   arg.param("simSteps", simSteps, 100, "number of simulation steps");
   arg.param("worldSize", worldSize, 25.0, "size of the world");
@@ -106,7 +106,7 @@ int main(int argc, char** argv) {
     double xc = ix * (worldSize / segmentGridSize);
     double yc = iy * (worldSize / segmentGridSize);
 
-    double l2 = sampleUniform(minSegmentLenght, maxSegmentLenght, &generator);
+    double l2 = sampleUniform(minSegmentLength, maxSegmentLength, &generator);
 
     double x1 = xc + cos(th) * l2;
     double y1 = yc + sin(th) * l2;

@@ -79,7 +79,7 @@ void MainWindow::on_actionSave_triggered(bool) {
 void MainWindow::on_btnOptimize_clicked() {
   if (viewer->graph->vertices().size() == 0 ||
       viewer->graph->edges().size() == 0) {
-    cerr << "Graph has no vertices / egdes" << endl;
+    cerr << "Graph has no vertices / edges" << endl;
     return;
   }
 
@@ -410,7 +410,7 @@ void MainWindow::on_actionProperties_triggered(bool) {
   _viewerPropertiesWidget->show();
 }
 
-void MainWindow::on_btnOptimizerParamaters_clicked() {
+void MainWindow::on_btnOptimizerParameters_clicked() {
   if (!_optimizerPropertiesWidget) {
     _optimizerPropertiesWidget = new PropertiesWidget(this);
     _optimizerPropertiesWidget->setWindowTitle(

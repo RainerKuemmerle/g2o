@@ -116,7 +116,7 @@ MyParams* p = dynamic_cast<MyParams*>opt->(parameters(id));
    2) In an edge where you want to use a cache, you should
       define a createCache(int vertexNum) function that creates a 
       new instance of cache for the vertex at position 
-      vertexNum withing Edge::_vertices.
+      vertexNum within Edge::_vertices.
 
    3) Before inserting an edge that uses a cache in a graph,
       you should tell the system which cache id is associated to 
@@ -139,7 +139,7 @@ class MyCache: public VertexCache{
 
 class EdgeThatUsesACache: public EdgeThatDoesNotUseACache{
 	EdgeThatUsesACache(): EdgeThatDoesNotUseACache{
-		// resize the cahce vector, all empty caches
+		// resize the cache vector, all empty caches
 		_cacheIds.resize(vertices().size(), -1);
 	}
 	
@@ -188,7 +188,7 @@ e->setCacheId(0,first_cache_id);
 e->setCacheId(1,second_cache_id);
 e->setCacheId(2,third_cache_id);
 
-3) Add the edge in the graph. This will take care of all necessary bookeeping.
+3) Add the edge in the graph. This will take care of all necessary bookkeeping.
 
 g.addEdge(e);
 

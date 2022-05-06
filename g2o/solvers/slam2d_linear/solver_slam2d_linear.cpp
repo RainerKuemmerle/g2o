@@ -96,11 +96,11 @@ bool SolverSLAM2DLinear::solveOrientation() {
 
   typedef Eigen::Matrix<number_t, 1, 1, Eigen::ColMajor> ScalarMatrix;
 
-  std::vector<int> blockIndeces(_optimizer->indexMapping().size());
+  std::vector<int> blockIndices(_optimizer->indexMapping().size());
   for (size_t i = 0; i < _optimizer->indexMapping().size(); ++i)
-    blockIndeces[i] = i + 1;
+    blockIndices[i] = i + 1;
 
-  SparseBlockMatrix<ScalarMatrix> H(blockIndeces.data(), blockIndeces.data(),
+  SparseBlockMatrix<ScalarMatrix> H(blockIndices.data(), blockIndices.data(),
                                     _optimizer->indexMapping().size(),
                                     _optimizer->indexMapping().size());
 

@@ -4,7 +4,7 @@ The SLAM executable accepts actions, such as adding (ADD) a constraint, solving
 the system (SOLVE), and retrieving estimates (QUERY). The executable responds
 to a query by returning the data enclosed in a BEGIN...END block. 
 
-Variables, or vertices in the graph, explicitly state the reprensentation. 2D
+Variables, or vertices in the graph, explicitly state the representation. 2D
 poses are represented by VERTEX_XYT, 3D poses by VERTEX_XYZRPY. In the future,
 Quaternions and other representations could be supported, but note that it is
 up to the SLAM algorithm to choose the internal representation of the angles.

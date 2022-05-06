@@ -101,7 +101,7 @@ Cache* Cache::installDependency(const std::string& type_,
   return c;
 }
 
-bool Cache::resolveDependancies() { return true; }
+bool Cache::resolveDependencies() { return true; }
 
 CacheContainer::CacheContainer(OptimizableGraph::Vertex* vertex_)
     : _updateNeeded(true) {
@@ -130,7 +130,7 @@ Cache* CacheContainer::createCache(const Cache::CacheKey& key) {
   }
   c->_container = this;
   c->_parameters = key._parameters;
-  if (c->resolveDependancies()) {
+  if (c->resolveDependencies()) {
     insert(make_pair(key, c));
     c->update();
     return c;

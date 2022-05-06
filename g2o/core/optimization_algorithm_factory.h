@@ -24,8 +24,8 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef G2O_OPTMIZATION_ALGORITHM_PROPERTY_H
-#define G2O_OPTMIZATION_ALGORITHM_PROPERTY_H
+#ifndef G2O_OPTIMIZATION_ALGORITHM_FACTORY_H
+#define G2O_OPTIMIZATION_ALGORITHM_FACTORY_H
 
 #include <iostream>
 #include <list>
@@ -67,7 +67,7 @@ class G2O_CORE_API AbstractOptimizationAlgorithmCreator {
  * \brief create solvers based on their short name
  *
  * Factory to allocate solvers based on their short name.
- * The Factory is implemented as a sigleton and the single
+ * The Factory is implemented as a singleton and the single
  * instance can be accessed via the instance() function.
  */
 class G2O_CORE_API OptimizationAlgorithmFactory {
@@ -151,7 +151,7 @@ class RegisterOptimizationAlgorithmProxy {
  * Use the following macro to register a whole library of
  * algorithms to the factory, e.g.,
  * G2O_REGISTER_OPTIMIZATION_LIBRARY(csparse)
- * In another programm that links to your library or loads
+ * In another program that links to your library or loads
  * it via dlopen() (or similar functions) you should indicate
  * the desired usage of the solver by using the
  * G2O_REGISTER_OPTIMIZATION_LIBRARY() macro. Here, you

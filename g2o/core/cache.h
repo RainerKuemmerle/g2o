@@ -97,7 +97,7 @@ class G2O_CORE_API Cache : public HyperGraph::HyperGraphElement {
    * it is better that you redefine your own cache member variables, for better
    * readability
    */
-  virtual bool resolveDependancies();
+  virtual bool resolveDependencies();
 
   bool _updateNeeded;
   ParameterVector _parameters;

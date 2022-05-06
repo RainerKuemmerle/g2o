@@ -296,7 +296,7 @@ class G2O_CORE_API SparseOptimizer : public OptimizableGraph {
   /**** callbacks ****/
   //! add an action to be executed before the error vectors are computed
   bool addComputeErrorAction(HyperGraphAction* action);
-  //! remove an action that should no longer be execured before computing the
+  //! remove an action that should no longer be executed before computing the
   //! error vectors
   bool removeComputeErrorAction(HyperGraphAction* action);
 

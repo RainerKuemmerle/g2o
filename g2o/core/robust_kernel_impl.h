@@ -43,7 +43,7 @@ class G2O_CORE_API RobustKernelScaleDelta : public RobustKernel {
  public:
   /**
    * construct the scaled kernel ontop of another kernel which might be shared
-   * accross several scaled kernels
+   * across several scaled kernels
    */
   explicit RobustKernelScaleDelta(const RobustKernelPtr& kernel,
                                   number_t delta = 1.);

@@ -65,7 +65,7 @@ TEST(IoSixDofExpmap, ReadWriteEdgeStereoSE3ProjectXYZOnlyPose) {
 }
 
 /*
- * EDGE Tests inlcuding a Camera Parameter
+ * EDGE Tests including a Camera Parameter
  */
 class IoSixDofExpmapParam : public ::testing::Test {
  protected:

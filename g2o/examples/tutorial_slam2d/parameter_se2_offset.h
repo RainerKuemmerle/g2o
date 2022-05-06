@@ -61,7 +61,7 @@ class G2O_TUTORIAL_SLAM2D_API CacheSE2Offset : public Cache {
 
  protected:
   virtual void updateImpl();
-  virtual bool resolveDependancies();
+  virtual bool resolveDependencies();
 
   ParameterSE2Offset* _offsetParam;
   SE2 _w2n, _n2w;

@@ -75,7 +75,7 @@ class G2O_CORE_API OptimizationAlgorithmDogleg
 
   VectorX _hsd;        ///< steepest decent step
   VectorX _hdl;        ///< final dogleg step
-  VectorX _auxVector;  ///< auxilary vector used to perform multiplications or
+  VectorX _auxVector;  ///< auxiliary vector used to perform multiplications or
                        ///< other stuff
 
   number_t

@@ -65,7 +65,7 @@ class G2O_TYPES_SLAM3D_API CacheCamera : public CacheSE3Offset {
 
  protected:
   virtual void updateImpl();
-  virtual bool resolveDependancies();
+  virtual bool resolveDependencies();
   Affine3 _w2i;  ///< world to image transform
   ParameterCamera* params;
 };

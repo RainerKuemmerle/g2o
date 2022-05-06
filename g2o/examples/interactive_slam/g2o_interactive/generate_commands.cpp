@@ -147,7 +147,7 @@ int main(int argc, char** argv) {
   if (1) {
     int maxDim = 0;
 
-    cerr << "# incremental setttings" << endl;
+    cerr << "# incremental settings" << endl;
     cerr << "#\t solve every " << updateGraphEachN << endl;
 
     SparseOptimizer::VertexIDMap vertices = optimizer.vertices();
