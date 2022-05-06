@@ -73,7 +73,7 @@ void addOdometryCalibLinksDifferential(SparseOptimizer& optimizer,
         dynamic_cast<RobotLaser*>(odomData.findClosestData(rl2->timestamp()));
 
     if (fabs(rl1->timestamp() - rl2->timestamp()) < 1e-7) {
-      std::cerr << "strange egde " << r1->id() << " <-> " << r2->id()
+      std::cerr << "strange edge " << r1->id() << " <-> " << r2->id()
                 << std::endl;
       std::cerr << FIXED(PVAR(rl1->timestamp())
                          << "\t " << PVAR(rl2->timestamp()))

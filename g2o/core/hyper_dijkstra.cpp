@@ -191,7 +191,7 @@ void HyperDijkstra::visitAdjacencyMap(AdjacencyMap& amap, TreeAction* action,
                                       bool useDistance) {
   using Deque = std::deque<std::shared_ptr<HyperGraph::Vertex>>;
   Deque q;
-  // scans for the vertices without the parent (whcih are the roots of the
+  // scans for the vertices without the parent (which are the roots of the
   // trees) and applies the action to them.
   for (auto& it : amap) {
     AdjacencyMapEntry& entry(it.second);

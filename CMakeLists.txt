@@ -23,7 +23,7 @@ endif(NOT CMAKE_BUILD_TYPE)
 set(CMAKE_DEBUG_POSTFIX "_d" CACHE STRING "postfix applied to debug build of libraries")
 set(CMAKE_RELEASE_POSTFIX "" CACHE STRING "postfix applied to release build of libraries")
 set(CMAKE_RELWITHDEBINFO_POSTFIX "_rd" CACHE STRING "postfix applied to release-with-debug-information libraries")
-set(CMAKE_MINSIZEREL_POSTFIX "_s" CACHE STRING "postfix applied to minimium-size-build libraries")
+set(CMAKE_MINSIZEREL_POSTFIX "_s" CACHE STRING "postfix applied to minimum-size-build libraries")
 
 # work out the postfix; required where we use OUTPUT_NAME
 if(CMAKE_BUILD_TYPE MATCHES Release)
@@ -364,8 +364,8 @@ if(BUILD_WITH_CLANG_TIDY)
 endif()
 
 # Compiler specific options for gcc
+option (BUILD_WITH_MARCH_NATIVE "Build with \"-march native\"" OFF)
 if(CMAKE_COMPILER_IS_GNUCXX)
-  option (BUILD_WITH_MARCH_NATIVE "Build with \"-march native\"" OFF)
   message(STATUS "Compiling with GCC")
 
   # Generic settings for optimisation
@@ -398,6 +398,11 @@ endif(CMAKE_COMPILER_IS_GNUCXX)
 if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   message(STATUS "Compiling with Clang")
 
+  # Linux
+  if(BUILD_WITH_MARCH_NATIVE AND NOT "${CMAKE_SYSTEM_PROCESSOR}" MATCHES "arm" AND "${CMAKE_SYSTEM_NAME}" MATCHES "Linux")
+    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -march=native")
+    set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -march=native")
+  endif()
   # OS X
   if(BUILD_WITH_MARCH_NATIVE AND "${CMAKE_SYSTEM_NAME}" MATCHES "Darwin")
     set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -march=native")

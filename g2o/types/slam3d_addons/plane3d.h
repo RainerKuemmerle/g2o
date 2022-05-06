@@ -73,7 +73,7 @@ class G2O_TYPES_SLAM3D_ADDONS_API Plane3D {
   }
 
   inline void oplus(const Vector3& v) {
-    // construct a normal from azimuth and evelation;
+    // construct a normal from azimuth and elevation;
     number_t _azimuth = v[0];
     number_t _elevation = v[1];
     number_t s = std::sin(_elevation);

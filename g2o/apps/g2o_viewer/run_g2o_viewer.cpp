@@ -39,7 +39,7 @@ namespace g2o {
  * \brief helper for calling usleep on any system using Qt
  */
 class SleepThread : public QThread {
- public:  // make the proctected methods publicly available
+ public:  // make the protected methods publicly available
   using QThread::msleep;
   using QThread::usleep;
 };

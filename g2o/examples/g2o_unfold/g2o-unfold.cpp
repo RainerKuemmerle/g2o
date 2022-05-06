@@ -656,7 +656,7 @@ int main(int argc, char** argv) {
     chi2Thres = sumChi2 / cnt * 1.4;
     cerr << "  threshold=" << chi2Thres << "  done" << endl;
 
-    cerr << "Searchin for high error edges .. ";
+    cerr << "Searching for high error edges .. ";
     HyperGraph::EdgeSet highErrorEdges;
     HyperGraph::EdgeSet highErrorEdgesToFeatures;
     HyperGraph::EdgeSet edgesToOptimize;

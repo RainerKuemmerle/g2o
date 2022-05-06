@@ -24,6 +24,10 @@ to several variants of SLAM and BA. g2o offers a performance comparable to
 implementations of state-of-the-art approaches for the specific problems
 (02/2011).
 
+## Python and updated memory management
+The branch [pymem](https://github.com/RainerKuemmerle/g2o/tree/pymem) contains a python wrapper and switches to smart pointer instead of RAW pointers.
+It is currently experimental but PRs and improvements are welcome - as always.
+
 ## Papers Describing the Approach
 
 Rainer Kuemmerle, Giorgio Grisetti, Hauke Strasdat,
@@ -131,14 +135,18 @@ by the following command sequence.
 The binaries will be placed in bin and the libraries in lib which
 are both located in the top-level folder.
 
-On Windows with `vcpkg` the following two commands will generate build scripts for Visual Studio 2017 MSVC 14 tool set:
+On Windows with `vcpkg` the following two commands will generate build scripts for Visual Studio 2017 MSVC 15 tool set (please change the Visual Studio version number in accordance with your system):
 
 -   `mkdir build`
 -   `cd build`
--   `cmake -G "Visual Studio 14 2017 Win64" -DG2O_BUILD_APPS=ON -DG2O_BUILD_EXAMPLES=ON -DVCPKG_TARGET_TRIPLET="%VCPKG_DEFAULT_TRIPLET%" -DCMAKE_TOOLCHAIN_FILE="%VCPKG_ROOT_DIR%\scripts\buildsystems\vcpkg.cmake" ..`
+-   `cmake -G "Visual Studio 15 2017 Win64" -DG2O_BUILD_APPS=ON -DG2O_BUILD_EXAMPLES=ON -DVCPKG_TARGET_TRIPLET="%VCPKG_DEFAULT_TRIPLET%" -DCMAKE_TOOLCHAIN_FILE="%VCPKG_ROOT_DIR%\scripts\buildsystems\vcpkg.cmake" ..`
 
 If you are compiling on Windows and you are for some reasons **not** using `vcpkg` please download Eigen3 and extract it.
-Within cmake-gui set the variable G2O_EIGEN3_INCLUDE to that directory.
+Within cmake-gui set the variable EIGEN3_INCLUDE_DIR to that directory.
+
+-   `mkdir build`
+-   `cd build`
+-   `cmake .. -G "Visual Studio 15 2017 Win64" -DG2O_BUILD_APPS=ON -DG2O_BUILD_EXAMPLES=ON -DEIGEN3_INCLUDE_DIR="<THE_PATH_WHERE_YOU_PLACED_EIGEN3_AND_THE_EIGEN3_CMakeLists.txt>"
 
 ## Cross-Compiling for Android
 

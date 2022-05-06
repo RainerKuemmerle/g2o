@@ -65,7 +65,7 @@ void RobustKernelHuber::robustify(number_t e, Vector3& rho) const {
     rho[1] = 1.;
     rho[2] = 0.;
   } else {                     // outlier
-    number_t sqrte = sqrt(e);  // absolut value of the error
+    number_t sqrte = sqrt(e);  // absolute value of the error
     rho[0] =
         2 * sqrte * delta_ - dsqr;  // rho(e)   = 2 * delta * e^(1/2) - delta^2
     rho[1] = delta_ / sqrte;        // rho'(e)  = delta / sqrt(e)

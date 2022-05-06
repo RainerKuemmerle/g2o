@@ -41,7 +41,7 @@ namespace g2o {
  * Given the problem of landmark-based SLAM or bundle adjustment, this class
  * performs optimization on the landmarks while the poses are kept fixed. This
  * can be done very efficiently, since the position on the landmarks are
- * indepdented given the poses are known.
+ * independent given the poses are known.
  *
  * This class slightly misuses the API of g2o. It is designed in a way, it can
  * work on the very same graph which reflects the problem of landmark-based

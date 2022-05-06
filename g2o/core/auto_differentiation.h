@@ -141,7 +141,7 @@ class EstimateAccessorGet {
  * can include into the public section of your edge class. See below for the
  * macro. If you use the macro, you do not need to implement computeError() and
  * linearizeOPlus() in your edge. Both methods will be ready for integration
- * into the g2o framework. You may, however, decide agains the macro and provide
+ * into the g2o framework. You may, however, decide against the macro and provide
  * the implementation on your own if this suits your edge class better.
  *
  * Example integration: g2o/examples/bal/bal_example.cpp

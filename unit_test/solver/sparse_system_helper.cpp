@@ -34,8 +34,8 @@
 namespace g2o {
 namespace internal {
 
-static std::vector<int> readIndices(const std::string& indeces) {
-  std::stringstream tokens(indeces);
+static std::vector<int> readIndices(const std::string& indices) {
+  std::stringstream tokens(indices);
 
   int numElems = 0;
   tokens >> numElems;

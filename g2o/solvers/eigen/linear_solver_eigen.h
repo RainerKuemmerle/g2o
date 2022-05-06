@@ -136,7 +136,7 @@ class LinearSolverEigen : public LinearSolverCCS<MatrixType> {
   }
 
   /**
-   * compute the symbolic decompostion of the matrix only once.
+   * compute the symbolic decomposition of the matrix only once.
    * Since A has the same pattern in all the iterations, we only
    * compute the fill-in reducing ordering once and re-use for all
    * the following iterations.

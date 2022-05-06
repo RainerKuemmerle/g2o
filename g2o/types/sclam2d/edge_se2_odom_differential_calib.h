@@ -49,11 +49,11 @@ class G2O_TYPES_SCLAM2D_API EdgeSE2OdomDifferentialCalib
     const SE2& x2 = v2->estimate();
 
     // get the calibrated motion given by the odometry
-    VelocityMeasurement calibratedVelocityMeasurment(
+    VelocityMeasurement calibratedVelocityMeasurement(
         measurement().vl() * params->estimate()(0),
         measurement().vr() * params->estimate()(1), measurement().dt());
     MotionMeasurement mm = OdomConvert::convertToMotion(
-        calibratedVelocityMeasurment, params->estimate()(2));
+        calibratedVelocityMeasurement, params->estimate()(2));
     SE2 Ku_ij;
     Ku_ij.fromVector(mm.measurement());
 

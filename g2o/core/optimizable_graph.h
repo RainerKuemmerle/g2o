@@ -485,7 +485,7 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
      * Linearizes the constraint in the edge.
      * Makes side effect on the vertices of the graph by changing
      * the parameter vector b and the hessian blocks ii and jj.
-     * The off diagoinal block is accesed via _hessian.
+     * The off diagoinal block is accessed via _hessian.
      */
     virtual void constructQuadraticForm() = 0;
 
@@ -624,7 +624,7 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
   bool addEdge(const std::shared_ptr<HyperGraph::Edge>& e) override;
 
   /**
-   * overridden from HyperGraph, to mantain the bookkeeping of the
+   * overridden from HyperGraph, to maintain the bookkeeping of the
    * caches/parameters and jacobian workspaces consistent upon a change in the
    * veretx.
    * @return false if something goes wrong.
@@ -668,10 +668,10 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
   //! add an action to be executed after each iteration
   bool addPostIterationAction(const std::shared_ptr<HyperGraphAction>& action);
 
-  //! remove an action that should no longer be execured before each iteration
+  //! remove an action that should no longer be executed before each iteration
   bool removePreIterationAction(
       const std::shared_ptr<HyperGraphAction>& action);
-  //! remove an action that should no longer be execured after each iteration
+  //! remove an action that should no longer be executed after each iteration
   bool removePostIterationAction(
       const std::shared_ptr<HyperGraphAction>& action);
 
@@ -712,7 +712,7 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
   /**
    * set the renamed types lookup from a string, format is for example:
    * VERTEX_CAM=VERTEX_SE3:EXPMAP,EDGE_PROJECT_P2MC=EDGE_PROJECT_XYZ:EXPMAP
-   * This will change the occurance of VERTEX_CAM in the file to
+   * This will change the occurrence of VERTEX_CAM in the file to
    * VERTEX_SE3:EXPMAP
    */
   void setRenamedTypesFromString(const std::string& types);

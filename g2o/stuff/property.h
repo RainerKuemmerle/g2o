@@ -127,7 +127,7 @@ class G2O_STUFF_API PropertyMap
   }
 
   /**
-   * update a specfic property with a new value
+   * update a specific property with a new value
    * @return true if the params is stored and update was carried out
    */
   bool updatePropertyFromString(const std::string& name,

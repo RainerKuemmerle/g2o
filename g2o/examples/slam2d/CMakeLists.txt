@@ -25,7 +25,7 @@ set_target_properties(slam2d_g2o PROPERTIES OUTPUT_NAME slam2d_g2o${EXE_POSTFIX}
 
 if(Qt5_POSITION_INDEPENDENT_CODE)
     set_property(TARGET slam2d_g2o PROPERTY COMPILE_FLAGS -fPIC)
-    message(STATUS "Generating position indpendent code for slam2d because Qt5 was built with -reduce-relocations")
+    message(STATUS "Generating position independent code for slam2d because Qt5 was built with -reduce-relocations")
     # Note: using
     #       set(CMAKE_POSITION_INDEPENDENT_CODE ON)
     #       does not seem to work: This generates some libraries with -fPIE which is not enough for Qt...

@@ -81,7 +81,7 @@ class G2O_CORE_API OptimizationAlgorithmLevenberg
   number_t goodStepUpperScale_;  ///< upper bound for lambda decrease if a good
                                  ///< LM step
   number_t ni_;
-  int levenbergIterations_;  ///< the numer of levenberg iterations performed to
+  int levenbergIterations_;  ///< the number of levenberg iterations performed to
                              ///< accept the last step
 
   /**

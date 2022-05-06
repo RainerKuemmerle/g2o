@@ -198,7 +198,7 @@ static int run_sclam_odom_laser(int argc, char** argv) {
     cerr << "done." << endl;
   }
 
-  // optional input of a seperate file for applying the odometry calibration
+  // optional input of a separate file for applying the odometry calibration
   if (!odomTestFilename.empty()) {
     DataQueue testRobotLaserQueue;
     int numTestOdom =
@@ -221,7 +221,7 @@ static int run_sclam_odom_laser(int argc, char** argv) {
         double dt = cur->timestamp() - prev->timestamp();
         SE2 motion = prev->odomPose().inverse() * cur->odomPose();
 
-        // convert to velocity measurment
+        // convert to velocity Measurement
         MotionMeasurement motionMeasurement(motion.translation().x(),
                                             motion.translation().y(),
                                             motion.rotation().angle(), dt);
@@ -229,13 +229,13 @@ static int run_sclam_odom_laser(int argc, char** argv) {
             OdomConvert::convertToVelocity(motionMeasurement);
 
         // apply calibration
-        VelocityMeasurement calibratedVelocityMeasurment = velocityMeasurement;
-        calibratedVelocityMeasurment.setVl(odomCalib(0) *
-                                           calibratedVelocityMeasurment.vl());
-        calibratedVelocityMeasurment.setVr(odomCalib(1) *
-                                           calibratedVelocityMeasurment.vr());
+        VelocityMeasurement calibratedVelocityMeasurement = velocityMeasurement;
+        calibratedVelocityMeasurement.setVl(odomCalib(0) *
+                                           calibratedVelocityMeasurement.vl());
+        calibratedVelocityMeasurement.setVr(odomCalib(1) *
+                                           calibratedVelocityMeasurement.vr());
         MotionMeasurement mm = OdomConvert::convertToMotion(
-            calibratedVelocityMeasurment, odomCalib(2));
+            calibratedVelocityMeasurement, odomCalib(2));
 
         // combine calibrated odometry with the previous pose
         SE2 remappedOdom;

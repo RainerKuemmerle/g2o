@@ -510,7 +510,7 @@ int main(int argc, char** argv) {
                 //<< from->id() << "(" << from->dimension() << ") " << endl;
                 e->initialEstimate(toSet, from.get());
               } else {
-                assert(0 && "Added unitialized variable to the graph");
+                assert(0 && "Added uninitialized variable to the graph");
               }
               break;
             }
@@ -523,7 +523,7 @@ int main(int argc, char** argv) {
                 //<< to->id() << "(" << to->dimension() << ") " << endl;
                 e->initialEstimate(fromSet, to.get());
               } else {
-                assert(0 && "Added unitialized variable to the graph");
+                assert(0 && "Added uninitialized variable to the graph");
               }
               break;
             }

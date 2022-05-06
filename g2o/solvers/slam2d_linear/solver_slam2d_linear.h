@@ -37,7 +37,7 @@ namespace g2o {
  *
  * Needs to operate on the full graph, whereas the nodes connected by
  * odometry are 0 -> 1 -> 2 -> ...
- * Furthermore excactly one node should be the fixed vertex.
+ * Furthermore exactly one node should be the fixed vertex.
  * Within the first iteration the orientation of the nodes is computed. In
  * the subsequent iterations full non-linear GN is carried out.
  * The linear approximation is correct, if the covariance of the constraints

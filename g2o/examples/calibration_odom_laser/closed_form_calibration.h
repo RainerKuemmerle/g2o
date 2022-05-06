@@ -35,7 +35,7 @@
 namespace g2o {
 
 /**
- * \brief Simultaneous calibration of the laser offest and the parameters of a
+ * \brief Simultaneous calibration of the laser offset and the parameters of a
  * differential drive
  *
  * Approach described by Censi et al.

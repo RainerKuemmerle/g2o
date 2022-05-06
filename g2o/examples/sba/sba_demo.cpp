@@ -69,7 +69,7 @@ int main(int argc, const char* argv[]) {
          << endl;
     cout << "ROBUST_KERNEL: use robust kernel (0 or 1; default: 0==false)"
          << endl;
-    cout << "STRUCTURE_ONLY: performe structure-only BA to get better point "
+    cout << "STRUCTURE_ONLY: performed structure-only BA to get better point "
             "initializations (0 or "
             "1; default: 0==false)"
          << endl;
