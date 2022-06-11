@@ -82,7 +82,7 @@ class G2O_CORE_API EstimatePropagator {
    * You may derive an own one, if necessary. The default is to call
    * initialEstimate(from, to) for the edge.
    */
-  struct PropagateAction {
+  struct G2O_CORE_API PropagateAction {
     virtual void operator()(OptimizableGraph::Edge* e,
                             const OptimizableGraph::VertexSet& from,
                             OptimizableGraph::Vertex* to) const {
@@ -97,7 +97,7 @@ class G2O_CORE_API EstimatePropagator {
   /**
    * \brief priority queue for AdjacencyMapEntry
    */
-  class PriorityQueue : public std::multimap<number_t, AdjacencyMapEntry*> {
+  class G2O_CORE_API PriorityQueue : public std::multimap<number_t, AdjacencyMapEntry*> {
    public:
     void push(AdjacencyMapEntry* entry);
     AdjacencyMapEntry* pop();
@@ -106,7 +106,7 @@ class G2O_CORE_API EstimatePropagator {
   /**
    * \brief data structure for loopuk during Dijkstra
    */
-  class AdjacencyMapEntry {
+  class G2O_CORE_API AdjacencyMapEntry {
    public:
     friend class EstimatePropagator;
     friend class PriorityQueue;
@@ -133,7 +133,7 @@ class G2O_CORE_API EstimatePropagator {
   /**
    * \brief hash function for a vertex
    */
-  class VertexIDHashFunction {
+  class G2O_CORE_API VertexIDHashFunction {
    public:
     size_t operator()(
         const std::shared_ptr<OptimizableGraph::Vertex>& v) const {
