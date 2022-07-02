@@ -62,7 +62,7 @@ int main(int argc, const char* argv[]) {
          << endl;
     cout << endl;
     cout << "PIXEL_NOISE: noise in image space (E.g.: 1)" << endl;
-    cout << "OUTLIER_RATIO: probability of spuroius observation  (default: 0.0)"
+    cout << "OUTLIER_RATIO: probability of spurious observation  (default: 0.0)"
          << endl;
     cout << "ROBUST_KERNEL: use robust kernel (0 or 1; default: 0==false)"
          << endl;
