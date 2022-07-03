@@ -20,14 +20,9 @@ namespace g2o {
 // helper class
 class PyBlockSolverBase {
  public:
-  std::unique_ptr<Solver> block_solver;
-  std::unique_ptr<BlockSolverBase> block_base_solver;
-
-  virtual std::unique_ptr<Solver> solver() { return std::move(block_solver); };
-
-  virtual std::unique_ptr<BlockSolverBase> base_solver() {
-    return std::move(block_base_solver);
-  };
+  virtual ~PyBlockSolverBase() = default;
+  virtual std::unique_ptr<Solver> solver() = 0;
+  virtual std::unique_ptr<BlockSolverBase> base_solver() = 0;
 };
 
 namespace {
