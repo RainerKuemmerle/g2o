@@ -31,6 +31,7 @@
 #include "g2o/types/slam3d/edge_pointxyz.h"
 #include "g2o/types/slam3d/edge_se3.h"
 #include "g2o/types/slam3d/edge_se3_pointxyz.h"
+#include "g2o/types/slam3d/edge_se3_pointxyz_depth.h"
 #include "g2o/types/slam3d/edge_se3_xyzprior.h"
 #include "gtest/gtest.h"
 #include "unit_test/test_helper/evaluate_jacobian.h"
@@ -229,5 +230,49 @@ TEST(Slam3D, dqDRJacobian) {
 
     number_t maxDifference = (dq_dR - dq_dR_AD).array().abs().maxCoeff();
     EXPECT_NEAR(0., maxDifference, 1e-7);
+  }
+}
+
+TEST(Slam3D, EdgeSE3PointXYZDepthJacobian) {
+  OptimizableGraph graph;
+
+  auto v1 = std::make_shared<VertexSE3>();
+  v1->setId(0);
+  graph.addVertex(v1);
+
+  auto v2 = std::make_shared<VertexPointXYZ>();
+  v2->setId(1);
+  graph.addVertex(v2);
+
+  auto paramOffset = std::make_shared<ParameterCamera>();
+  paramOffset->setId(0);
+  graph.addParameter(paramOffset);
+
+  auto e = std::make_shared<EdgeSE3PointXYZDepth>();
+  e->setVertex(0, v1);
+  e->setVertex(1, v2);
+  e->setInformation(EdgeSE3PointXYZDepth::InformationType::Identity());
+  e->setParameterId(0, paramOffset->id());
+  graph.addEdge(e);
+
+  JacobianWorkspace jacobianWorkspace;
+  JacobianWorkspace numericJacobianWorkspace;
+  numericJacobianWorkspace.updateSize(e.get());
+  numericJacobianWorkspace.allocate();
+
+  auto depth_epsilon = [](const number_t x, const number_t y) {
+    constexpr int64_t ulp = 900000000000;
+    return std::max(
+        1e-4, std::numeric_limits<number_t>::epsilon() * std::abs(x + y) * ulp);
+  };
+
+  for (int k = 0; k < 10000; ++k) {
+    paramOffset->setOffset(internal::randomIsometry3());
+    v1->setEstimate(internal::randomIsometry3());
+    v2->setEstimate(Eigen::Vector3d::Random());
+    e->setMeasurement(Eigen::Vector3d::Random());
+
+    evaluateJacobian(*e, jacobianWorkspace, numericJacobianWorkspace,
+                     depth_epsilon);
   }
 }

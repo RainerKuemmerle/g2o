@@ -78,9 +78,6 @@ class G2O_TYPES_SLAM3D_API EdgeSE3PointXYZDepth
                        OptimizableGraph::Vertex* to) override;
 
  private:
-  Eigen::Matrix<number_t, 3, 9, Eigen::ColMajor>
-      J_;  // jacobian before projection
-
   bool resolveCaches() override;
   std::shared_ptr<CacheCamera> cache_;
 };
