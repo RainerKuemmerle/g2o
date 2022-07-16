@@ -30,15 +30,23 @@
 #include <gtest/gtest.h>
 
 #include <Eigen/Core>
+#include <functional>
 
 #include "g2o/core/base_binary_edge.h"
 #include "g2o/core/base_unary_edge.h"
 
 namespace g2o {
 
+namespace internal {
+number_t epsilon(const number_t, const number_t) { return 1e-6; }
+}  // namespace internal
+
+using EpsilonFunction = std::function<number_t(const number_t, const number_t)>;
+
 template <typename EdgeType>
 void evaluateJacobianUnary(EdgeType& e, JacobianWorkspace& jacobianWorkspace,
-                           JacobianWorkspace& numericJacobianWorkspace) {
+                           JacobianWorkspace& numericJacobianWorkspace,
+                           EpsilonFunction eps = internal::epsilon) {
   // calling the analytic Jacobian but writing to the numeric workspace
   e.BaseUnaryEdge<EdgeType::kDimension, typename EdgeType::Measurement,
                   typename EdgeType::VertexXiType>::
@@ -57,13 +65,14 @@ void evaluateJacobianUnary(EdgeType& e, JacobianWorkspace& jacobianWorkspace,
   int numElems = EdgeType::kDimension;
   numElems *= EdgeType::VertexXiType::kDimension;
   for (int j = 0; j < numElems; ++j) {
-    EXPECT_NEAR(n[j], a[j], 1e-6);
+    EXPECT_NEAR(n[j], a[j], eps(n[j], a[j]));
   }
 }
 
 template <typename EdgeType>
 void evaluateJacobian(EdgeType& e, JacobianWorkspace& jacobianWorkspace,
-                      JacobianWorkspace& numericJacobianWorkspace) {
+                      JacobianWorkspace& numericJacobianWorkspace,
+                      EpsilonFunction eps = internal::epsilon) {
   // calling the analytic Jacobian but writing to the numeric workspace
   e.BaseBinaryEdge<EdgeType::kDimension, typename EdgeType::Measurement,
                    typename EdgeType::VertexXiType,
@@ -83,12 +92,10 @@ void evaluateJacobian(EdgeType& e, JacobianWorkspace& jacobianWorkspace,
     number_t* n = numericJacobianWorkspace.workspaceForVertex(i);
     number_t* a = jacobianWorkspace.workspaceForVertex(i);
     int numElems = EdgeType::kDimension;
-    if (i == 0)
-      numElems *= EdgeType::VertexXiType::kDimension;
-    else
-      numElems *= EdgeType::VertexXjType::kDimension;
+    numElems *= i == 0 ? EdgeType::VertexXiType::kDimension
+                       : EdgeType::VertexXjType::kDimension;
     for (int j = 0; j < numElems; ++j) {
-      EXPECT_NEAR(n[j], a[j], 1e-6);
+      EXPECT_NEAR(n[j], a[j], eps(n[j], a[j]));
     }
   }
 }
