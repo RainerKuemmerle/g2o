@@ -42,8 +42,6 @@ EdgeSE3PointXYZDisparity::EdgeSE3PointXYZDisparity() {
   installParameter<CacheCamera::ParameterType>(0);
   information().setIdentity();
   information()(2, 2) = 1000.;
-  J_.fill(0);
-  J_.block<3, 3>(0, 0) = -Matrix3::Identity();
 }
 
 bool EdgeSE3PointXYZDisparity::resolveCaches() {
@@ -91,25 +89,28 @@ void EdgeSE3PointXYZDisparity::linearizeOplus() {
 
   Vector3 Zcam = cache_->w2l() * vp->estimate();
 
+  using JacType = Eigen::Matrix<number_t, 3, 9>;
+  JacType Jprime = JacType::Zero();
+  Jprime.block<3, 3>(0, 0) = -Matrix3::Identity();
+
   //  J(0,3) = -0.0;
-  J_(0, 4) = -2 * Zcam(2);
-  J_(0, 5) = 2 * Zcam(1);
+  Jprime(0, 4) = -2 * Zcam(2);
+  Jprime(0, 5) = 2 * Zcam(1);
 
-  J_(1, 3) = 2 * Zcam(2);
+  Jprime(1, 3) = 2 * Zcam(2);
   //  J(1,4) = -0.0;
-  J_(1, 5) = -2 * Zcam(0);
+  Jprime(1, 5) = -2 * Zcam(0);
 
-  J_(2, 3) = -2 * Zcam(1);
-  J_(2, 4) = 2 * Zcam(0);
+  Jprime(2, 3) = -2 * Zcam(1);
+  Jprime(2, 4) = 2 * Zcam(0);
   //  J(2,5) = -0.0;
 
-  J_.block<3, 3>(0, 6) = cache_->w2l().rotation();
+  Jprime.block<3, 3>(0, 6) = cache_->w2l().rotation();
 
   // Eigen::Matrix<number_t,3,9,Eigen::ColMajor> Jprime =
   // vcache->params->Kcam_inverseOffsetR  * J;
-  Eigen::Matrix<number_t, 3, 9, Eigen::ColMajor> Jprime =
-      cache_->camParams()->Kcam_inverseOffsetR() * J_;
-  Eigen::Matrix<number_t, 3, 9, Eigen::ColMajor> Jhom;
+  Jprime = cache_->camParams()->Kcam_inverseOffsetR() * Jprime;
+  JacType Jhom;
   Vector3 Zprime = cache_->w2i() * pt;
 
   Jhom.block<2, 9>(0, 0) = 1 / (Zprime(2) * Zprime(2)) *

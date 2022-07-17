@@ -32,6 +32,7 @@
 #include "g2o/types/slam3d/edge_se3.h"
 #include "g2o/types/slam3d/edge_se3_pointxyz.h"
 #include "g2o/types/slam3d/edge_se3_pointxyz_depth.h"
+#include "g2o/types/slam3d/edge_se3_pointxyz_disparity.h"
 #include "g2o/types/slam3d/edge_se3_xyzprior.h"
 #include "gtest/gtest.h"
 #include "unit_test/test_helper/evaluate_jacobian.h"
@@ -40,6 +41,15 @@
 using namespace std;
 using namespace g2o;
 using namespace g2o::internal;
+
+namespace {
+auto depth_epsilon = [](const number_t x, const number_t y) {
+  constexpr int64_t ulp = 900000000000;
+  return std::max(
+      2e-4, std::numeric_limits<number_t>::epsilon() * std::abs(x + y) * ulp);
+};
+
+}
 
 TEST(Slam3D, EdgeSE3Jacobian) {
   auto v1 = std::make_shared<VertexSE3>();
@@ -260,11 +270,43 @@ TEST(Slam3D, EdgeSE3PointXYZDepthJacobian) {
   numericJacobianWorkspace.updateSize(e.get());
   numericJacobianWorkspace.allocate();
 
-  auto depth_epsilon = [](const number_t x, const number_t y) {
-    constexpr int64_t ulp = 900000000000;
-    return std::max(
-        1e-4, std::numeric_limits<number_t>::epsilon() * std::abs(x + y) * ulp);
-  };
+  for (int k = 0; k < 10000; ++k) {
+    paramOffset->setOffset(internal::randomIsometry3());
+    v1->setEstimate(internal::randomIsometry3());
+    v2->setEstimate(Eigen::Vector3d::Random());
+    e->setMeasurement(Eigen::Vector3d::Random());
+
+    evaluateJacobian(*e, jacobianWorkspace, numericJacobianWorkspace,
+                     depth_epsilon);
+  }
+}
+
+TEST(Slam3D, EdgeSE3PointXYZDisparityJacobian) {
+  OptimizableGraph graph;
+
+  auto v1 = std::make_shared<VertexSE3>();
+  v1->setId(0);
+  graph.addVertex(v1);
+
+  auto v2 = std::make_shared<VertexPointXYZ>();
+  v2->setId(1);
+  graph.addVertex(v2);
+
+  auto paramOffset = std::make_shared<ParameterCamera>();
+  paramOffset->setId(0);
+  graph.addParameter(paramOffset);
+
+  auto e = std::make_shared<EdgeSE3PointXYZDisparity>();
+  e->setVertex(0, v1);
+  e->setVertex(1, v2);
+  e->setInformation(EdgeSE3PointXYZDisparity::InformationType::Identity());
+  e->setParameterId(0, paramOffset->id());
+  graph.addEdge(e);
+
+  JacobianWorkspace jacobianWorkspace;
+  JacobianWorkspace numericJacobianWorkspace;
+  numericJacobianWorkspace.updateSize(e.get());
+  numericJacobianWorkspace.allocate();
 
   for (int k = 0; k < 10000; ++k) {
     paramOffset->setOffset(internal::randomIsometry3());
