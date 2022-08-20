@@ -43,6 +43,7 @@ struct G2O_CORE_API HyperDijkstra {
   };
 
   struct G2O_CORE_API TreeAction {
+    virtual ~TreeAction() = default;
     virtual number_t perform(const std::shared_ptr<HyperGraph::Vertex>& v,
                              const std::shared_ptr<HyperGraph::Vertex>& vParent,
                              const std::shared_ptr<HyperGraph::Edge>& e);
