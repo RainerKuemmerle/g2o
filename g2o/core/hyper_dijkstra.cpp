@@ -89,7 +89,7 @@ bool operator<(const HyperDijkstra::AdjacencyMapEntry& a,
 }
 
 void HyperDijkstra::shortestPaths(HyperGraph::VertexSet& vset,
-                                  HyperDijkstra::CostFunction* cost,
+                                  HyperDijkstra::CostFunction& cost,
                                   number_t maxDistance,
                                   number_t comparisonConditioner, bool directed,
                                   number_t maxEdgeCost) {
@@ -134,7 +134,7 @@ void HyperDijkstra::shortestPaths(HyperGraph::VertexSet& vset,
         auto z = edge->vertex(i);
         if (z == u) continue;
 
-        number_t edgeDistance = (*cost)(edge.get(), u.get(), z.get());
+        number_t edgeDistance = cost(edge.get(), u.get(), z.get());
         if (edgeDistance == std::numeric_limits<number_t>::max() ||
             edgeDistance > maxEdgeCost)
           continue;
@@ -157,7 +157,7 @@ void HyperDijkstra::shortestPaths(HyperGraph::VertexSet& vset,
 }
 
 void HyperDijkstra::shortestPaths(const std::shared_ptr<HyperGraph::Vertex>& v,
-                                  HyperDijkstra::CostFunction* cost,
+                                  HyperDijkstra::CostFunction& cost,
                                   number_t maxDistance,
                                   number_t comparisonConditioner, bool directed,
                                   number_t maxEdgeCost) {
@@ -169,8 +169,7 @@ void HyperDijkstra::shortestPaths(const std::shared_ptr<HyperGraph::Vertex>& v,
 
 void HyperDijkstra::computeTree(AdjacencyMap& amap) {
   for (auto& it : amap) {
-    AdjacencyMapEntry& entry(it.second);
-    entry.children_.clear();
+    it.second.children_.clear();
   }
   for (auto it = amap.begin(); it != amap.end(); ++it) {
     AdjacencyMapEntry& entry(it->second);
@@ -187,7 +186,7 @@ void HyperDijkstra::computeTree(AdjacencyMap& amap) {
   }
 }
 
-void HyperDijkstra::visitAdjacencyMap(AdjacencyMap& amap, TreeAction* action,
+void HyperDijkstra::visitAdjacencyMap(AdjacencyMap& amap, TreeAction& action,
                                       bool useDistance) {
   using Deque = std::deque<std::shared_ptr<HyperGraph::Vertex>>;
   Deque q;
@@ -196,7 +195,7 @@ void HyperDijkstra::visitAdjacencyMap(AdjacencyMap& amap, TreeAction* action,
   for (auto& it : amap) {
     AdjacencyMapEntry& entry(it.second);
     if (!entry.parent()) {
-      action->perform(it.first, nullptr, nullptr);
+      action.perform(it.first, nullptr, nullptr);
       q.push_back(it.first);
     }
   }
@@ -224,9 +223,9 @@ void HyperDijkstra::visitAdjacencyMap(AdjacencyMap& amap, TreeAction* action,
       assert(adjacencyIt->second.child() == child);
       assert(adjacencyIt->second.parent() == parent);
       if (!useDistance) {
-        action->perform(child, parent, edge);
+        action.perform(child, parent, edge);
       } else {
-        action->perform(child, parent, edge, adjacencyIt->second.distance());
+        action.perform(child, parent, edge, adjacencyIt->second.distance());
       }
       q.push_back(child);
     }
@@ -238,7 +237,7 @@ void HyperDijkstra::connectedSubset(
     HyperGraph::VertexSet& connected, HyperGraph::VertexSet& visited,
     HyperGraph::VertexSet& startingSet, const std::shared_ptr<HyperGraph>& g,
     const std::shared_ptr<HyperGraph::Vertex>& v,
-    HyperDijkstra::CostFunction* cost, number_t distance,
+    HyperDijkstra::CostFunction& cost, number_t distance,
     number_t comparisonConditioner, number_t maxEdgeCost) {
   using VertexDeque = std::queue<std::shared_ptr<HyperGraph::Vertex>>;
   visited.clear();

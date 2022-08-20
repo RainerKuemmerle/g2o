@@ -62,7 +62,7 @@ void delcareHyperDijkstra(py::module& m) {
 
   cls.def("shortest_paths",
           (void(HyperDijkstra::*)(const std::shared_ptr<HyperGraph::Vertex>&,
-                                  HyperDijkstra::CostFunction*, double, double,
+                                  HyperDijkstra::CostFunction&, double, double,
                                   bool, double)) &
               HyperDijkstra::shortestPaths,
           "v"_a, "cost"_a, "maxDistance"_a = std::numeric_limits<double>::max(),
@@ -72,7 +72,7 @@ void delcareHyperDijkstra(py::module& m) {
 
   cls.def("shortest_paths",
           (void(HyperDijkstra::*)(HyperGraph::VertexSet&,
-                                  HyperDijkstra::CostFunction*, double, double,
+                                  HyperDijkstra::CostFunction&, double, double,
                                   bool, double)) &
               HyperDijkstra::shortestPaths,
           "vset"_a, "cost"_a,
@@ -81,8 +81,7 @@ void delcareHyperDijkstra(py::module& m) {
           "maxEdgeCost"_a = std::numeric_limits<double>::max(),
           py::keep_alive<1, 2>(), py::keep_alive<1, 3>());
 
-  cls.def_static("compute_tree", &HyperDijkstra::computeTree, "amap"_a,
-                 py::keep_alive<1, 2>());  // (AdjacencyMap&) -> void
+  cls.def_static("compute_tree", &HyperDijkstra::computeTree);
   cls.def_static(
       "visit_adjacency_map", &HyperDijkstra::visitAdjacencyMap, "amap"_a,
       "action"_a, "useDistance"_a = false, py::keep_alive<1, 2>(),

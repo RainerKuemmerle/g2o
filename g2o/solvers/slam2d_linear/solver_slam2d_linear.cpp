@@ -149,12 +149,12 @@ bool SolverSLAM2DLinear::solveOrientation() {
   auto pointerWrapper =
       std::shared_ptr<HyperGraph>(optimizer_, [](HyperGraph*) {});
   HyperDijkstra hyperDijkstra(pointerWrapper);
-  hyperDijkstra.shortestPaths(root, &uniformCost);
+  hyperDijkstra.shortestPaths(root, uniformCost);
 
   HyperDijkstra::computeTree(hyperDijkstra.adjacencyMap());
   ThetaTreeAction thetaTreeAction(thetaGuess);
   HyperDijkstra::visitAdjacencyMap(hyperDijkstra.adjacencyMap(),
-                                   &thetaTreeAction);
+                                   thetaTreeAction);
 
   // construct for the orientation
   for (const auto& it : optimizer_->activeEdges()) {

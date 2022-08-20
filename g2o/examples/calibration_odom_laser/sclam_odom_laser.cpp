@@ -132,7 +132,7 @@ static int run_sclam_odom_laser(int argc, char** argv) {
   auto dummy = std::shared_ptr<HyperGraph>(&optimizer, [](HyperGraph*) {});
   HyperDijkstra d(dummy);
   UniformCostFunction f;
-  d.shortestPaths(gauge, &f);
+  d.shortestPaths(gauge, f);
   // cerr << PVAR(d.visited().size()) << endl;
 
   if (d.visited().size() != optimizer.vertices().size()) {

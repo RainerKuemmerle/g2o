@@ -394,7 +394,7 @@ int main(int argc, char** argv) {
       std::shared_ptr<HyperGraph>(&optimizer, [](HyperGraph*) {});
   g2o::HyperDijkstra d(optimizerWrapper);
   g2o::UniformCostFunction f;
-  d.shortestPaths(gauge, &f);
+  d.shortestPaths(gauge, f);
   // cerr << PVAR(d.visited().size()) << endl;
 
   if (d.visited().size() != optimizer.vertices().size()) {

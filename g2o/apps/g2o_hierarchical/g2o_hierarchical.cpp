@@ -359,7 +359,7 @@ int run_hierarchical(int argc, char** argv) {
       std::shared_ptr<HyperGraph>(&optimizer, [](HyperGraph*) {});
   HyperDijkstra d(pointerWrapper);
   UniformCostFunction f;
-  d.shortestPaths(gauge, &f);
+  d.shortestPaths(gauge, f);
   // cerr << PVAR(d.visited().size()) << endl;
 
   if (d.visited().size() != optimizer.vertices().size()) {

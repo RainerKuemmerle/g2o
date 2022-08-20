@@ -87,25 +87,25 @@ struct G2O_CORE_API HyperDijkstra {
 
   void shortestPaths(
       const std::shared_ptr<HyperGraph::Vertex>& v,
-      HyperDijkstra::CostFunction* cost,
+      HyperDijkstra::CostFunction& cost,
       number_t maxDistance = std::numeric_limits<number_t>::max(),
       number_t comparisonConditioner = 1e-3, bool directed = false,
       number_t maxEdgeCost = std::numeric_limits<number_t>::max());
 
   void shortestPaths(
-      HyperGraph::VertexSet& vset, HyperDijkstra::CostFunction* cost,
+      HyperGraph::VertexSet& vset, HyperDijkstra::CostFunction& cost,
       number_t maxDistance = std::numeric_limits<number_t>::max(),
       number_t comparisonConditioner = 1e-3, bool directed = false,
       number_t maxEdgeCost = std::numeric_limits<number_t>::max());
 
   static void computeTree(AdjacencyMap& amap);
-  static void visitAdjacencyMap(AdjacencyMap& amap, TreeAction* action,
+  static void visitAdjacencyMap(AdjacencyMap& amap, TreeAction& action,
                                 bool useDistance = false);
   static void connectedSubset(
       HyperGraph::VertexSet& connected, HyperGraph::VertexSet& visited,
       HyperGraph::VertexSet& startingSet, const std::shared_ptr<HyperGraph>& g,
       const std::shared_ptr<HyperGraph::Vertex>& v,
-      HyperDijkstra::CostFunction* cost, number_t distance,
+      HyperDijkstra::CostFunction& cost, number_t distance,
       number_t comparisonConditioner,
       number_t maxEdgeCost = std::numeric_limits<number_t>::max());
 

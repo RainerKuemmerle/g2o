@@ -180,7 +180,7 @@ void computeSimpleStars(StarSet& stars, SparseOptimizer* optimizer,
   // compute a spanning tree based on the types of edges and vertices in the
   // pool
   EdgeTypesCostFunction f(edgeTag, vertexTag, level);
-  d.shortestPaths(gauge, &f, std::numeric_limits<double>::max(), 1e-6, false,
+  d.shortestPaths(gauge, f, std::numeric_limits<double>::max(), 1e-6, false,
                   std::numeric_limits<double>::max() / 2);
 
   HyperDijkstra::computeTree(d.adjacencyMap());
@@ -191,7 +191,7 @@ void computeSimpleStars(StarSet& stars, SparseOptimizer* optimizer,
 
   // perform breadth-first visit of the visit tree and create the stars on the
   // backbone
-  g2o::HyperDijkstra::visitAdjacencyMap(d.adjacencyMap(), &bact, true);
+  g2o::HyperDijkstra::visitAdjacencyMap(d.adjacencyMap(), bact, true);
   stars.clear();
 
   for (auto& it : bact.vertexStarMultiMap()) {
@@ -301,8 +301,8 @@ void computeSimpleStars(StarSet& stars, SparseOptimizer* optimizer,
 
     // // then optimize the vertices one at a time to check if a solution is
     // good
-    for (const auto& otherVertice : otherVertices) {
-      auto v = std::static_pointer_cast<OptimizableGraph::Vertex>(otherVertice);
+    for (const auto& otherVertex : otherVertices) {
+      auto v = std::static_pointer_cast<OptimizableGraph::Vertex>(otherVertex);
       v->solveDirect();
       // cerr << " " << d;
       // if  a solution is found, add a vertex and all the edges in
@@ -338,10 +338,10 @@ void computeSimpleStars(StarSet& stars, SparseOptimizer* optimizer,
       if (solverWithHessian) solverWithHessian->updateLinearSystem();
       HyperGraph::EdgeSet prunedStarEdges = backboneEdges;
       HyperGraph::VertexSet prunedStarVertices = backboneVertices;
-      for (const auto& otherVertice : otherVertices) {
+      for (const auto& otherVertex : otherVertices) {
         // discard the vertices whose error is too big
         auto v =
-            std::static_pointer_cast<OptimizableGraph::Vertex>(otherVertice);
+            std::static_pointer_cast<OptimizableGraph::Vertex>(otherVertex);
         MatrixX h(v->dimension(), v->dimension());
         for (int i = 0; i < v->dimension(); i++) {
           for (int j = 0; j < v->dimension(); j++) h(i, j) = v->hessian(i, j);
