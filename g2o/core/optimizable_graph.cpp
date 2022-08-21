@@ -66,7 +66,7 @@ std::ostream& printIdChain(std::ostream& os, const std::vector<int>& ids) {
 
 std::shared_ptr<CacheContainer> OptimizableGraph::Vertex::cacheContainer() {
   if (!cacheContainer_) {
-    cacheContainer_ = std::make_shared<CacheContainer>(this);
+    cacheContainer_ = std::make_shared<CacheContainer>(*this);
   }
   return cacheContainer_;
 }

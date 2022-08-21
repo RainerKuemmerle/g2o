@@ -64,10 +64,10 @@ void CacheSE3Offset::updateImpl() {
   auto* offsetParam = static_cast<ParameterSE3Offset*>(parameters_[0].get());
 #endif
 
-  const auto* v = static_cast<const VertexSE3*>(vertex());
-  n2w_ = v->estimate() * offsetParam->offset();
+  const auto& v = static_cast<const VertexSE3&>(vertex());
+  n2w_ = v.estimate() * offsetParam->offset();
   w2n_ = n2w_.inverse();
-  w2l_ = v->estimate().inverse();
+  w2l_ = v.estimate().inverse();
 }
 
 #ifdef G2O_HAVE_OPENGL

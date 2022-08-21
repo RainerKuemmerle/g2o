@@ -58,8 +58,8 @@ void CacheSE2Offset::updateImpl() {
   auto* offsetParam = static_cast<ParameterSE2Offset*>(parameters_[0].get());
 #endif
 
-  const auto* v = static_cast<const VertexSE2*>(vertex());
-  se2_n2w_ = v->estimate() * offsetParam->offset();
+  const auto& v = static_cast<const VertexSE2&>(vertex());
+  se2_n2w_ = v.estimate() * offsetParam->offset();
 
   n2w_ = se2_n2w_.rotation().toRotationMatrix();
   n2w_.translation() = se2_n2w_.translation();
@@ -68,11 +68,11 @@ void CacheSE2Offset::updateImpl() {
   w2n_ = se2_w2n_.rotation().toRotationMatrix();
   w2n_.translation() = se2_w2n_.translation();
 
-  SE2 w2l = v->estimate().inverse();
+  SE2 w2l = v.estimate().inverse();
   w2l_ = w2l.rotation().toRotationMatrix();
   w2l_.translation() = w2l.translation();
 
-  number_t alpha = v->estimate().rotation().angle();
+  number_t alpha = v.estimate().rotation().angle();
   number_t c = std::cos(alpha);
   number_t s = std::sin(alpha);
   Matrix2 RInversePrime;

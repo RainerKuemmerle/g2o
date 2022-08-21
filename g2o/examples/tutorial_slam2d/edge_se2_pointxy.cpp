@@ -54,7 +54,8 @@ void EdgeSE2PointXY::computeError() {
 bool EdgeSE2PointXY::resolveCaches() {
   ParameterVector pv(1);
   pv[0] = parameters_[0];
-  resolveCache(sensorCache_, vertexXn<0>(), "TUTORIAL_CACHE_SE2_OFFSET", pv);
+  sensorCache_ = resolveCache<CacheSE2Offset>(vertexXn<0>(),
+                                              "TUTORIAL_CACHE_SE2_OFFSET", pv);
   return sensorCache_ != nullptr;
 }
 

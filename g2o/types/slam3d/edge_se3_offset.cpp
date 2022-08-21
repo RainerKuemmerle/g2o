@@ -43,9 +43,11 @@ EdgeSE3Offset::EdgeSE3Offset() {
 bool EdgeSE3Offset::resolveCaches() {
   ParameterVector pv(1);
   pv[0] = parameters_[0];
-  resolveCache(cacheFrom_, vertexXn<0>(), "CACHE_SE3_OFFSET", pv);
+  cacheFrom_ =
+      resolveCache<CacheSE3Offset>(vertexXn<0>(), "CACHE_SE3_OFFSET", pv);
   pv[0] = parameters_[1];
-  resolveCache(cacheTo_, vertexXn<0>(), "CACHE_SE3_OFFSET", pv);
+  cacheTo_ =
+      resolveCache<CacheSE3Offset>(vertexXn<0>(), "CACHE_SE3_OFFSET", pv);
   return (cacheFrom_ && cacheTo_);
 }
 

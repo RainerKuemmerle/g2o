@@ -39,7 +39,7 @@ EdgeSE3PointXYZDepth::EdgeSE3PointXYZDepth() {
 bool EdgeSE3PointXYZDepth::resolveCaches() {
   ParameterVector pv(1);
   pv[0] = parameters_[0];
-  resolveCache(cache_, vertexXn<0>(), "CACHE_CAMERA", pv);
+  cache_ = resolveCache<CacheCamera>(vertexXn<0>(), "CACHE_CAMERA", pv);
   return cache_ != nullptr;
 }
 

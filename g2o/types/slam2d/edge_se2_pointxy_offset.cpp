@@ -42,7 +42,7 @@ EdgeSE2PointXYOffset::EdgeSE2PointXYOffset() {
 bool EdgeSE2PointXYOffset::resolveCaches() {
   ParameterVector pv(1);
   pv[0] = parameters_[0];
-  resolveCache(cache_, vertexXn<0>(), "CACHE_SE2_OFFSET", pv);
+  cache_ = resolveCache<CacheSE2Offset>(vertexXn<0>(), "CACHE_SE2_OFFSET", pv);
   return cache_ != nullptr;
 }
 

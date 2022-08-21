@@ -575,10 +575,9 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
     }
 
     template <typename CacheType>
-    void resolveCache(std::shared_ptr<CacheType>& cache,
-                      const std::shared_ptr<OptimizableGraph::Vertex>& v,
-                      const std::string& type,
-                      const ParameterVector& parameters);
+    std::shared_ptr<CacheType> resolveCache(
+        const std::shared_ptr<OptimizableGraph::Vertex>& v,
+        const std::string& type, const ParameterVector& parameters);
 
     bool resolveParameters();
     virtual bool resolveCaches();

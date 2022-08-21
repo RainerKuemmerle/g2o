@@ -61,7 +61,7 @@ void EdgeSE3Line3D::computeError() {
 bool EdgeSE3Line3D::resolveCaches() {
   ParameterVector pv(1);
   pv[0] = parameters_[0];
-  resolveCache(cache_, vertexXn<0>(), "CACHE_SE3_OFFSET", pv);
+  cache_ = resolveCache<CacheSE3Offset>(vertexXn<0>(), "CACHE_SE3_OFFSET", pv);
   return cache_ != nullptr;
 }
 

@@ -48,8 +48,8 @@ bool Cache::CacheKey::operator<(const Cache::CacheKey& c) const {
                                       c.parameters_.end());
 }
 
-OptimizableGraph::Vertex* Cache::vertex() const {
-  return container_ ? container_->vertex() : nullptr;
+const OptimizableGraph::Vertex& Cache::vertex() const {
+  return container_->vertex();
 }
 
 const ParameterVector& Cache::parameters() const { return parameters_; }
@@ -65,10 +65,8 @@ void Cache::update() {
   updateNeeded_ = false;
 }
 
-CacheContainer::CacheContainer(OptimizableGraph::Vertex* vertex)
-    : updateNeeded_(true) {
-  vertex_ = vertex;
-}
+CacheContainer::CacheContainer(const OptimizableGraph::Vertex& vertex)
+    : vertex_{vertex}, updateNeeded_{true} {}
 
 std::shared_ptr<Cache> CacheContainer::findCache(const Cache::CacheKey& key) {
   auto it = find(key);
@@ -99,7 +97,7 @@ std::shared_ptr<Cache> CacheContainer::createCache(const Cache::CacheKey& key) {
   return c;
 }
 
-OptimizableGraph::Vertex* CacheContainer::vertex() const { return vertex_; }
+const OptimizableGraph::Vertex& CacheContainer::vertex() const { return vertex_; }
 
 void CacheContainer::update() {
   for (auto& it : *this) {

@@ -47,7 +47,7 @@ EdgeSE3PointXYZDisparity::EdgeSE3PointXYZDisparity() {
 bool EdgeSE3PointXYZDisparity::resolveCaches() {
   ParameterVector pv(1);
   pv[0] = parameters_[0];
-  resolveCache(cache_, vertexXn<0>(), "CACHE_CAMERA", pv);
+  cache_ = resolveCache<CacheCamera>(vertexXn<0>(), "CACHE_CAMERA", pv);
   return cache_ != nullptr;
 }
 
