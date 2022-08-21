@@ -56,7 +56,7 @@ void SparseOptimizer::computeActiveErrors() {
   // call the callbacks in case there is something registered
   HyperGraphActionSet& actions = graphActions_[kAtComputeactiverror];
   if (!actions.empty()) {
-    for (const auto& action : actions) (*action)(this);
+    for (const auto& action : actions) (*action)(*this);
   }
 
 #ifdef G2O_OPENMP

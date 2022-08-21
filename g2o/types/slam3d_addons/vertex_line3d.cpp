@@ -51,7 +51,7 @@ VertexLine3DDrawAction::VertexLine3DDrawAction()
       lineWidth_(nullptr) {}
 
 bool VertexLine3DDrawAction::refreshPropertyPtrs(
-    HyperGraphElementAction::Parameters* params_) {
+    const std::shared_ptr<HyperGraphElementAction::Parameters>& params_) {
   if (!DrawAction::refreshPropertyPtrs(params_)) {
     return false;
   }
@@ -68,9 +68,9 @@ bool VertexLine3DDrawAction::refreshPropertyPtrs(
 }
 
 bool VertexLine3DDrawAction::operator()(
-    HyperGraph::HyperGraphElement* element,
-    HyperGraphElementAction::Parameters* params_) {
-  if (typeid(*element).name() != typeName_) {
+    HyperGraph::HyperGraphElement& element,
+    const std::shared_ptr<HyperGraphElementAction::Parameters>& params_) {
+  if (typeid(element).name() != typeName_) {
     return false;
   }
 
@@ -83,7 +83,7 @@ bool VertexLine3DDrawAction::operator()(
     return true;
   }
 
-  auto* that = static_cast<VertexLine3D*>(element);
+  auto* that = static_cast<VertexLine3D*>(&element);
   Line3D line = that->estimate();
   line.normalize();
   Vector3 direction = line.d();

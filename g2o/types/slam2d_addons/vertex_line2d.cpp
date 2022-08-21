@@ -49,7 +49,7 @@ VertexLine2DDrawAction::VertexLine2DDrawAction()
     : DrawAction(typeid(VertexLine2D).name()), pointSize_(nullptr) {}
 
 bool VertexLine2DDrawAction::refreshPropertyPtrs(
-    HyperGraphElementAction::Parameters* params_) {
+    const std::shared_ptr<HyperGraphElementAction::Parameters>& params_) {
   if (!DrawAction::refreshPropertyPtrs(params_)) return false;
   if (previousParams_) {
     pointSize_ = previousParams_->makeProperty<FloatProperty>(
@@ -61,16 +61,16 @@ bool VertexLine2DDrawAction::refreshPropertyPtrs(
 }
 
 bool VertexLine2DDrawAction::operator()(
-    HyperGraph::HyperGraphElement* element,
-    HyperGraphElementAction::Parameters* params_) {
-  if (typeid(*element).name() != typeName_) return false;
+    HyperGraph::HyperGraphElement& element,
+    const std::shared_ptr<HyperGraphElementAction::Parameters>& params_) {
+  if (typeid(element).name() != typeName_) return false;
 
   refreshPropertyPtrs(params_);
   if (!previousParams_) return true;
 
   if (show_ && !show_->value()) return true;
 
-  auto* that = static_cast<VertexLine2D*>(element);
+  auto* that = static_cast<VertexLine2D*>(&element);
   glPushAttrib(GL_CURRENT_BIT | GL_BLEND);
   if (pointSize_) {
     glPointSize(pointSize_->value());

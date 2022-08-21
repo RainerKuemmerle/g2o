@@ -72,7 +72,7 @@ EdgeSE3Line3DDrawAction::EdgeSE3Line3DDrawAction()
       lineWidth_(nullptr) {}
 
 bool EdgeSE3Line3DDrawAction::refreshPropertyPtrs(
-    HyperGraphElementAction::Parameters* params_) {
+    const std::shared_ptr<HyperGraphElementAction::Parameters>& params_) {
   if (!DrawAction::refreshPropertyPtrs(params_)) {
     return false;
   }
@@ -89,16 +89,16 @@ bool EdgeSE3Line3DDrawAction::refreshPropertyPtrs(
 }
 
 bool EdgeSE3Line3DDrawAction::operator()(
-    HyperGraph::HyperGraphElement* element,
-    HyperGraphElementAction::Parameters* params_) {
-  if (typeid(*element).name() != typeName_) return false;
+    HyperGraph::HyperGraphElement& element,
+    const std::shared_ptr<HyperGraphElementAction::Parameters>& params_) {
+  if (typeid(element).name() != typeName_) return false;
 
   refreshPropertyPtrs(params_);
   if (!previousParams_) return true;
 
   if (show_ && !show_->value()) return true;
 
-  auto* that = dynamic_cast<EdgeSE3Line3D*>(element);
+  auto* that = dynamic_cast<EdgeSE3Line3D*>(&element);
   if (!that) return true;
   auto robot = std::dynamic_pointer_cast<VertexSE3>(that->vertex(0));
   auto landmark = std::dynamic_pointer_cast<VertexLine3D>(that->vertex(1));

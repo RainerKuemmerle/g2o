@@ -71,7 +71,7 @@ bool saveGnuplot(const std::string& gnudump,
          << endl;
     return false;
   }
-  WriteGnuplotAction::Parameters params;
+  auto params = std::make_shared<WriteGnuplotAction::Parameters>();
 
   int maxDim = -1;
   int minDim = std::numeric_limits<int>::max();
@@ -109,14 +109,14 @@ bool saveGnuplot(const std::string& gnudump,
       cerr << "Unable to open file" << endl;
       return false;
     }
-    params.os = &fout;
+    params->os = &fout;
 
     // writing odometry edges
     for (const auto& edge : edges) {
       auto e = std::static_pointer_cast<OptimizableGraph::Edge>(edge);
       if (e->vertices().size() != 2 || !edgeAllVertsSameDim(e.get(), maxDim))
         continue;
-      (*saveGnuplot)(e.get(), &params);
+      (*saveGnuplot)(*e, params);
     }
     cerr << "done." << endl;
   }
@@ -129,14 +129,14 @@ bool saveGnuplot(const std::string& gnudump,
       cerr << "Unable to open file" << endl;
       return false;
     }
-    params.os = &fout;
+    params->os = &fout;
 
     // writing landmark edges
     for (const auto& edge : edges) {
       auto e = std::static_pointer_cast<OptimizableGraph::Edge>(edge);
       if (e->vertices().size() != 2 || edgeAllVertsSameDim(e.get(), maxDim))
         continue;
-      (*saveGnuplot)(e.get(), &params);
+      (*saveGnuplot)(*e, params);
     }
     cerr << "done." << endl;
   }
@@ -149,12 +149,12 @@ bool saveGnuplot(const std::string& gnudump,
       cerr << "Unable to open file" << endl;
       return false;
     }
-    params.os = &fout;
+    params->os = &fout;
 
     // writing all edges
     for (const auto& edge : edges) {
       auto e = std::static_pointer_cast<OptimizableGraph::Edge>(edge);
-      (*saveGnuplot)(e.get(), &params);
+      (*saveGnuplot)(*e, params);
     }
     cerr << "done." << endl;
   }
@@ -167,11 +167,11 @@ bool saveGnuplot(const std::string& gnudump,
       cerr << "Unable to open file" << endl;
       return false;
     }
-    params.os = &fout;
+    params->os = &fout;
 
-    for (const auto& vertice : vertices) {
-      auto v = std::static_pointer_cast<OptimizableGraph::Vertex>(vertice);
-      (*saveGnuplot)(v.get(), &params);
+    for (const auto& vertex : vertices) {
+      auto v = std::static_pointer_cast<OptimizableGraph::Vertex>(vertex);
+      (*saveGnuplot)(*v, params);
     }
     cerr << "done." << endl;
   }
@@ -188,8 +188,8 @@ bool dumpEdges(std::ostream& os, const OptimizableGraph& optimizer) {
          << endl;
     return false;
   }
-  WriteGnuplotAction::Parameters params;
-  params.os = &os;
+  auto params = std::make_shared<WriteGnuplotAction::Parameters>();
+  params->os = &os;
 
   // writing all edges
   os << "set terminal x11 noraise" << endl;
@@ -197,7 +197,7 @@ bool dumpEdges(std::ostream& os, const OptimizableGraph& optimizer) {
   os << "plot \"-\" w l" << endl;
   for (const auto& it : optimizer.edges()) {
     auto e = std::static_pointer_cast<OptimizableGraph::Edge>(it);
-    (*saveGnuplot)(e.get(), &params);
+    (*saveGnuplot)(*e, params);
   }
   os << "e" << endl;
 

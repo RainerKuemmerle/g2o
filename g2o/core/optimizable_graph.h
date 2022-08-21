@@ -393,7 +393,7 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
 
     virtual void updateCache();
 
-    CacheContainer* cacheContainer();
+    std::shared_ptr<CacheContainer> cacheContainer();
 
    protected:
     OptimizableGraph* graph_{nullptr};
@@ -404,7 +404,7 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
     int colInHessian_{-1};
     OpenMPMutex quadraticFormMutex_;
 
-    CacheContainer* cacheContainer_{nullptr};
+    std::shared_ptr<CacheContainer> cacheContainer_{nullptr};
 
     /**
      * update the position of the node from the parameters in v.
@@ -416,7 +416,7 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
     virtual void setToOriginImpl() = 0;
 
     /**
-     * writes the estimater to an array of number_t
+     * writes the estimate to an array of number_t
      * @returns true on success
      */
     virtual bool setEstimateDataImpl(const number_t*) { return false; }

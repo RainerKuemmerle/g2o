@@ -29,6 +29,10 @@ PropertiesWidget::PropertiesWidget(QWidget* parent)
 
 {
   setupUi(this);
+  connect(btnApply, &QPushButton::clicked, this,
+          &PropertiesWidget::on_btnApply_clicked);
+  connect(btnOK, &QPushButton::clicked, this,
+          &PropertiesWidget::on_btnOK_clicked);
 }
 
 void PropertiesWidget::updateDisplayedProperties() {

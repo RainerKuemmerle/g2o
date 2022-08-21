@@ -100,7 +100,7 @@ void OptimizableGraph::Edge::resolveCache(
     std::shared_ptr<CacheType>& cache,
     const std::shared_ptr<OptimizableGraph::Vertex>& v, const std::string& type,
     const ParameterVector& parameters_) {
-  CacheContainer* container = v->cacheContainer();
+  std::shared_ptr<CacheContainer> container = v->cacheContainer();
   Cache::CacheKey key(type, parameters_);
   std::shared_ptr<Cache> c = container->findCache(key);
   if (!c) {

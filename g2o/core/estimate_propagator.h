@@ -45,6 +45,7 @@ namespace g2o {
  */
 class G2O_CORE_API EstimatePropagatorCost {
  public:
+  virtual ~EstimatePropagatorCost() = default;
   explicit EstimatePropagatorCost(SparseOptimizer* graph);
   virtual number_t operator()(OptimizableGraph::Edge* edge,
                               const OptimizableGraph::VertexSet& from,
@@ -76,6 +77,7 @@ class G2O_CORE_API EstimatePropagatorCostOdometry
  */
 class G2O_CORE_API EstimatePropagator {
  public:
+  virtual ~EstimatePropagator() = default;
   /**
    * \brief Applying the action for propagating.
    *
@@ -83,6 +85,7 @@ class G2O_CORE_API EstimatePropagator {
    * initialEstimate(from, to) for the edge.
    */
   struct G2O_CORE_API PropagateAction {
+    virtual ~PropagateAction() = default;
     virtual void operator()(OptimizableGraph::Edge* e,
                             const OptimizableGraph::VertexSet& from,
                             OptimizableGraph::Vertex* to) const {

@@ -113,7 +113,7 @@ RobotLaserDrawAction::RobotLaserDrawAction()
       maxRange_(nullptr) {}
 
 bool RobotLaserDrawAction::refreshPropertyPtrs(
-    HyperGraphElementAction::Parameters* params_) {
+    const std::shared_ptr<HyperGraphElementAction::Parameters>& params_) {
   if (!DrawAction::refreshPropertyPtrs(params_)) return false;
   if (previousParams_) {
     beamsDownsampling_ = previousParams_->makeProperty<IntProperty>(
@@ -131,16 +131,16 @@ bool RobotLaserDrawAction::refreshPropertyPtrs(
 }
 
 bool RobotLaserDrawAction::operator()(
-    HyperGraph::HyperGraphElement* element,
-    HyperGraphElementAction::Parameters* params_) {
-  if (typeid(*element).name() != typeName_) return false;
+    HyperGraph::HyperGraphElement& element,
+    const std::shared_ptr<HyperGraphElementAction::Parameters>& params_) {
+  if (typeid(element).name() != typeName_) return false;
 
   refreshPropertyPtrs(params_);
   if (!previousParams_) {
     return true;
   }
   if (show_ && !show_->value()) return true;
-  auto* that = static_cast<RobotLaser*>(element);
+  auto* that = static_cast<RobotLaser*>(&element);
 
   RawLaser::Point2DVector points = that->cartesian();
   if (maxRange_ && maxRange_->value() >= 0) {

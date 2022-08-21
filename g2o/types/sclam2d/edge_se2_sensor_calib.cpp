@@ -64,10 +64,10 @@ EdgeSE2SensorCalibDrawAction::EdgeSE2SensorCalibDrawAction()
     : DrawAction(typeid(EdgeSE2SensorCalib).name()) {}
 
 bool EdgeSE2SensorCalibDrawAction::operator()(
-    HyperGraph::HyperGraphElement* element,
-    HyperGraphElementAction::Parameters*) {
-  if (typeid(*element).name() != typeName_) return false;
-  auto* e = static_cast<EdgeSE2SensorCalib*>(element);
+    HyperGraph::HyperGraphElement& element,
+    const std::shared_ptr<HyperGraphElementAction::Parameters>&) {
+  if (typeid(element).name() != typeName_) return false;
+  auto* e = static_cast<EdgeSE2SensorCalib*>(&element);
   auto fromEdge = e->vertexXn<0>();
   auto toEdge = e->vertexXn<1>();
   if (!fromEdge.get() || !toEdge.get()) return true;

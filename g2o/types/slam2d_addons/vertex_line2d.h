@@ -88,13 +88,15 @@ class G2O_TYPES_SLAM2D_ADDONS_API VertexLine2D : public BaseVertex<2, Line2D> {
 class G2O_TYPES_SLAM2D_ADDONS_API VertexLine2DDrawAction : public DrawAction {
  public:
   VertexLine2DDrawAction();
-  bool operator()(HyperGraph::HyperGraphElement* element,
-                  HyperGraphElementAction::Parameters* params_) override;
+  bool operator()(HyperGraph::HyperGraphElement& element,
+                  const std::shared_ptr<HyperGraphElementAction::Parameters>&
+                      params_) override;
 
  protected:
   std::shared_ptr<FloatProperty> pointSize_;
   bool refreshPropertyPtrs(
-      HyperGraphElementAction::Parameters* params_) override;
+      const std::shared_ptr<HyperGraphElementAction::Parameters>& params_)
+      override;
 };
 #endif
 

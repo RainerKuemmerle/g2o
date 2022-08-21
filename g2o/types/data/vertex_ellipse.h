@@ -80,12 +80,14 @@ class G2O_TYPES_DATA_API VertexEllipse : public RobotData {
 class G2O_TYPES_DATA_API VertexEllipseDrawAction : public DrawAction {
  public:
   VertexEllipseDrawAction();
-  bool operator()(HyperGraph::HyperGraphElement* element,
-                  HyperGraphElementAction::Parameters* params_) override;
+  bool operator()(HyperGraph::HyperGraphElement& element,
+                  const std::shared_ptr<HyperGraphElementAction::Parameters>&
+                      params_) override;
 
  protected:
   bool refreshPropertyPtrs(
-      HyperGraphElementAction::Parameters* params_) override;
+      const std::shared_ptr<HyperGraphElementAction::Parameters>& params_)
+      override;
   std::shared_ptr<DoubleProperty> scaleFactor_;
 };
 #endif

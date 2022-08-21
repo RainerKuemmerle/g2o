@@ -81,8 +81,9 @@ class G2O_TYPES_SCLAM2D_API EdgeSE2SensorCalib
 class EdgeSE2SensorCalibDrawAction : public DrawAction {
  public:
   EdgeSE2SensorCalibDrawAction();
-  bool operator()(HyperGraph::HyperGraphElement* element,
-                  HyperGraphElementAction::Parameters* params_) override;
+  bool operator()(HyperGraph::HyperGraphElement& element,
+                  const std::shared_ptr<HyperGraphElementAction::Parameters>&
+                      params_) override;
 };
 #endif
 

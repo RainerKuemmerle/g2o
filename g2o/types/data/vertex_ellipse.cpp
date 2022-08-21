@@ -104,7 +104,7 @@ VertexEllipseDrawAction::VertexEllipseDrawAction()
 }
 
 bool VertexEllipseDrawAction::refreshPropertyPtrs(
-    HyperGraphElementAction::Parameters* params_) {
+    const std::shared_ptr<HyperGraphElementAction::Parameters>& params_) {
   if (!DrawAction::refreshPropertyPtrs(params_)) return false;
   if (previousParams_) {
     scaleFactor_ =
@@ -116,9 +116,9 @@ bool VertexEllipseDrawAction::refreshPropertyPtrs(
 }
 
 bool VertexEllipseDrawAction::operator()(
-    HyperGraph::HyperGraphElement* element,
-    HyperGraphElementAction::Parameters* params_) {
-  if (typeid(*element).name() != typeName_) return false;
+    HyperGraph::HyperGraphElement& element,
+    const std::shared_ptr<HyperGraphElementAction::Parameters>& params_) {
+  if (typeid(element).name() != typeName_) return false;
 
   refreshPropertyPtrs(params_);
   if (!previousParams_) {
@@ -126,7 +126,7 @@ bool VertexEllipseDrawAction::operator()(
   }
   if (show_ && !show_->value()) return true;
 
-  auto* that = dynamic_cast<VertexEllipse*>(element);
+  auto* that = dynamic_cast<VertexEllipse*>(&element);
 
   glPushMatrix();
 

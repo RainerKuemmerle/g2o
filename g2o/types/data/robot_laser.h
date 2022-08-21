@@ -62,12 +62,14 @@ class G2O_TYPES_DATA_API RobotLaser : public RawLaser {
 class G2O_TYPES_DATA_API RobotLaserDrawAction : public DrawAction {
  public:
   RobotLaserDrawAction();
-  bool operator()(HyperGraph::HyperGraphElement* element,
-                  HyperGraphElementAction::Parameters* params_) override;
+  bool operator()(HyperGraph::HyperGraphElement& element,
+                  const std::shared_ptr<HyperGraphElementAction::Parameters>&
+                      params_) override;
 
  protected:
   bool refreshPropertyPtrs(
-      HyperGraphElementAction::Parameters* params_) override;
+      const std::shared_ptr<HyperGraphElementAction::Parameters>& params_)
+      override;
   std::shared_ptr<IntProperty> beamsDownsampling_;
   std::shared_ptr<FloatProperty> pointSize_;
   std::shared_ptr<FloatProperty> maxRange_;

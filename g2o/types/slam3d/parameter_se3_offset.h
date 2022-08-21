@@ -90,12 +90,14 @@ class G2O_TYPES_SLAM3D_API CacheSE3Offset : public Cache {
 class G2O_TYPES_SLAM3D_API CacheSE3OffsetDrawAction : public DrawAction {
  public:
   CacheSE3OffsetDrawAction();
-  bool operator()(HyperGraph::HyperGraphElement* element,
-                  HyperGraphElementAction::Parameters* params_) override;
+  bool operator()(HyperGraph::HyperGraphElement& element,
+                  const std::shared_ptr<HyperGraphElementAction::Parameters>&
+                      params_) override;
 
  protected:
   bool refreshPropertyPtrs(
-      HyperGraphElementAction::Parameters* params_) override;
+      const std::shared_ptr<HyperGraphElementAction::Parameters>& params_)
+      override;
   std::shared_ptr<FloatProperty> cubeSide_;
 };
 #endif

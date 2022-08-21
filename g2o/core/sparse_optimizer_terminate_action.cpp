@@ -41,16 +41,17 @@ void SparseOptimizerTerminateAction::setGainThreshold(number_t gainThreshold) {
   gainThreshold_ = gainThreshold;
 }
 
-bool SparseOptimizerTerminateAction::operator()(const HyperGraph* graph,
-                                                Parameters* parameters) {
-  assert(dynamic_cast<const SparseOptimizer*>(graph) &&
+bool SparseOptimizerTerminateAction::operator()(
+    const HyperGraph& graph, const std::shared_ptr<Parameters>& parameters) {
+  assert(dynamic_cast<const SparseOptimizer*>(&graph) &&
          "graph is not a SparseOptimizer");
-  assert(dynamic_cast<HyperGraphAction::ParametersIteration*>(parameters) &&
-         "error casting parameters");
+  assert(
+      dynamic_cast<HyperGraphAction::ParametersIteration*>(parameters.get()) &&
+      "error casting parameters");
 
-  const auto* optimizer = static_cast<const SparseOptimizer*>(graph);
-  auto* params =
-      static_cast<HyperGraphAction::ParametersIteration*>(parameters);
+  const auto* optimizer = static_cast<const SparseOptimizer*>(&graph);
+  auto params = std::static_pointer_cast<HyperGraphAction::ParametersIteration>(
+      parameters);
 
   const_cast<SparseOptimizer*>(optimizer)->computeActiveErrors();
   if (params->iteration < 0) {

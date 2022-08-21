@@ -92,8 +92,9 @@ class G2O_TYPES_SLAM3D_API EdgeSE3WriteGnuplotAction
     : public WriteGnuplotAction {
  public:
   EdgeSE3WriteGnuplotAction();
-  bool operator()(HyperGraph::HyperGraphElement* element,
-                  HyperGraphElementAction::Parameters* params_) override;
+  bool operator()(HyperGraph::HyperGraphElement& element,
+                  const std::shared_ptr<HyperGraphElementAction::Parameters>&
+                      params_) override;
 };
 
 #ifdef G2O_HAVE_OPENGL
@@ -103,8 +104,9 @@ class G2O_TYPES_SLAM3D_API EdgeSE3WriteGnuplotAction
 class G2O_TYPES_SLAM3D_API EdgeSE3DrawAction : public DrawAction {
  public:
   EdgeSE3DrawAction();
-  bool operator()(HyperGraph::HyperGraphElement* element,
-                  HyperGraphElementAction::Parameters* params_) override;
+  bool operator()(HyperGraph::HyperGraphElement& element,
+                  const std::shared_ptr<HyperGraphElementAction::Parameters>&
+                      params_) override;
 };
 #endif
 

@@ -81,8 +81,8 @@ class G2O_TYPES_SLAM3D_API VertexPointXYZWriteGnuplotAction
     : public WriteGnuplotAction {
  public:
   VertexPointXYZWriteGnuplotAction();
-  bool operator()(HyperGraph::HyperGraphElement* element,
-                  HyperGraphElementAction::Parameters* params_) override;
+  bool operator()(HyperGraph::HyperGraphElement& element,
+                  const std::shared_ptr<HyperGraphElementAction::Parameters>& params_) override;
 };
 
 #ifdef G2O_HAVE_OPENGL
@@ -92,13 +92,13 @@ class G2O_TYPES_SLAM3D_API VertexPointXYZWriteGnuplotAction
 class VertexPointXYZDrawAction : public DrawAction {
  public:
   VertexPointXYZDrawAction();
-  bool operator()(HyperGraph::HyperGraphElement* element,
-                  HyperGraphElementAction::Parameters* params_) override;
+  bool operator()(HyperGraph::HyperGraphElement& element,
+                  const std::shared_ptr<HyperGraphElementAction::Parameters>& params_) override;
 
  protected:
   std::shared_ptr<FloatProperty> pointSize_;
   bool refreshPropertyPtrs(
-      HyperGraphElementAction::Parameters* params_) override;
+      const std::shared_ptr<HyperGraphElementAction::Parameters>& params_) override;
 };
 #endif
 

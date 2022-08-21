@@ -70,8 +70,9 @@ class G2O_TYPES_SCLAM2D_API EdgeSE2OdomDifferentialCalibDrawAction
     : public DrawAction {
  public:
   EdgeSE2OdomDifferentialCalibDrawAction();
-  bool operator()(HyperGraph::HyperGraphElement* element,
-                  HyperGraphElementAction::Parameters* params_) override;
+  bool operator()(HyperGraph::HyperGraphElement& element,
+                  const std::shared_ptr<HyperGraphElementAction::Parameters>&
+                      params_) override;
 };
 #endif
 

@@ -99,17 +99,17 @@ EdgeSE3WriteGnuplotAction::EdgeSE3WriteGnuplotAction()
     : WriteGnuplotAction(typeid(EdgeSE3).name()) {}
 
 bool EdgeSE3WriteGnuplotAction::operator()(
-    HyperGraph::HyperGraphElement* element,
-    HyperGraphElementAction::Parameters* params_) {
-  if (typeid(*element).name() != typeName_) return false;
-  auto* params = static_cast<WriteGnuplotAction::Parameters*>(params_);
+    HyperGraph::HyperGraphElement& element,
+    const std::shared_ptr<HyperGraphElementAction::Parameters>& params_) {
+  if (typeid(element).name() != typeName_) return false;
+  auto* params = static_cast<WriteGnuplotAction::Parameters*>(params_.get());
   if (!params->os) {
     std::cerr << __PRETTY_FUNCTION__ << ": warning, on valid os specified"
               << std::endl;
     return false;
   }
 
-  auto* e = static_cast<EdgeSE3*>(element);
+  auto* e = static_cast<EdgeSE3*>(&element);
   auto* fromEdge = static_cast<VertexSE3*>(e->vertices()[0].get());
   auto* toEdge = static_cast<VertexSE3*>(e->vertices()[1].get());
   Vector6 fromV;
@@ -130,15 +130,15 @@ bool EdgeSE3WriteGnuplotAction::operator()(
 EdgeSE3DrawAction::EdgeSE3DrawAction() : DrawAction(typeid(EdgeSE3).name()) {}
 
 bool EdgeSE3DrawAction::operator()(
-    HyperGraph::HyperGraphElement* element,
-    HyperGraphElementAction::Parameters* params_) {
-  if (typeid(*element).name() != typeName_) return false;
+    HyperGraph::HyperGraphElement& element,
+    const std::shared_ptr<HyperGraphElementAction::Parameters>& params_) {
+  if (typeid(element).name() != typeName_) return false;
   refreshPropertyPtrs(params_);
   if (!previousParams_) return true;
 
   if (show_ && !show_->value()) return true;
 
-  auto* e = static_cast<EdgeSE3*>(element);
+  auto* e = static_cast<EdgeSE3*>(&element);
   auto* fromEdge = static_cast<VertexSE3*>(e->vertices()[0].get());
   auto* toEdge = static_cast<VertexSE3*>(e->vertices()[1].get());
   if (!fromEdge || !toEdge) return true;

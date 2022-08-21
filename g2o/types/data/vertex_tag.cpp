@@ -63,7 +63,7 @@ VertexTagDrawAction::VertexTagDrawAction()
     : DrawAction(typeid(VertexTag).name()), textSize_(nullptr) {}
 
 bool VertexTagDrawAction::refreshPropertyPtrs(
-    HyperGraphElementAction::Parameters* params_) {
+    const std::shared_ptr<HyperGraphElementAction::Parameters>& params_) {
   if (!DrawAction::refreshPropertyPtrs(params_)) return false;
   if (previousParams_) {
     textSize_ = previousParams_->makeProperty<DoubleProperty>(
@@ -75,15 +75,15 @@ bool VertexTagDrawAction::refreshPropertyPtrs(
 }
 
 bool VertexTagDrawAction::operator()(
-    HyperGraph::HyperGraphElement* element,
-    HyperGraphElementAction::Parameters* params_) {
-  if (typeid(*element).name() != typeName_) return false;
+    HyperGraph::HyperGraphElement& element,
+    const std::shared_ptr<HyperGraphElementAction::Parameters>& params_) {
+  if (typeid(element).name() != typeName_) return false;
 
   refreshPropertyPtrs(params_);
   if (!previousParams_) {
     return true;
   }
-  auto* that = static_cast<VertexTag*>(element);
+  auto* that = static_cast<VertexTag*>(&element);
 
   glPushMatrix();
   glColor3f(1.F, 0.2F, 1.F);

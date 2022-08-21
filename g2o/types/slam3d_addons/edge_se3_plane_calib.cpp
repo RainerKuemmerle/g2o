@@ -59,7 +59,7 @@ EdgeSE3PlaneSensorCalibDrawAction::EdgeSE3PlaneSensorCalibDrawAction()
       planeHeight_(nullptr) {}
 
 bool EdgeSE3PlaneSensorCalibDrawAction::refreshPropertyPtrs(
-    HyperGraphElementAction::Parameters* params_) {
+    const std::shared_ptr<HyperGraphElementAction::Parameters>& params_) {
   if (!DrawAction::refreshPropertyPtrs(params_)) return false;
   if (previousParams_) {
     planeWidth_ = previousParams_->makeProperty<FloatProperty>(
@@ -74,16 +74,16 @@ bool EdgeSE3PlaneSensorCalibDrawAction::refreshPropertyPtrs(
 }
 
 bool EdgeSE3PlaneSensorCalibDrawAction::operator()(
-    HyperGraph::HyperGraphElement* element,
-    HyperGraphElementAction::Parameters* params_) {
-  if (typeid(*element).name() != typeName_) return false;
+    HyperGraph::HyperGraphElement& element,
+    const std::shared_ptr<HyperGraphElementAction::Parameters>& params_) {
+  if (typeid(element).name() != typeName_) return false;
 
   refreshPropertyPtrs(params_);
   if (!previousParams_) return true;
 
   if (show_ && !show_->value()) return true;
 
-  auto* that = dynamic_cast<EdgeSE3PlaneSensorCalib*>(element);
+  auto* that = dynamic_cast<EdgeSE3PlaneSensorCalib*>(&element);
 
   if (!that) return true;
 

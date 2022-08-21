@@ -74,7 +74,7 @@ void ViewerPropertiesWidget::applyProperties() {
 
 void ViewerPropertiesWidget::setViewer(g2o::G2oQGLViewer* viewer) {
   viewer_ = viewer;
-  setProperties(viewer->parameters());
+  setProperties(viewer->parameters().get());
 }
 
 std::string ViewerPropertiesWidget::humanReadablePropName(

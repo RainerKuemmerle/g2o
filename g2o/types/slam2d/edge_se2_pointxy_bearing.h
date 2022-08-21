@@ -83,16 +83,16 @@ class G2O_TYPES_SLAM2D_API EdgeSE2PointXYBearingWriteGnuplotAction
     : public WriteGnuplotAction {
  public:
   EdgeSE2PointXYBearingWriteGnuplotAction();
-  bool operator()(HyperGraph::HyperGraphElement* element,
-                  HyperGraphElementAction::Parameters* params_) override;
+  bool operator()(HyperGraph::HyperGraphElement& element,
+                  const std::shared_ptr<HyperGraphElementAction::Parameters>& params_) override;
 };
 
 #ifdef G2O_HAVE_OPENGL
 class G2O_TYPES_SLAM2D_API EdgeSE2PointXYBearingDrawAction : public DrawAction {
  public:
   EdgeSE2PointXYBearingDrawAction();
-  bool operator()(HyperGraph::HyperGraphElement* element,
-                  HyperGraphElementAction::Parameters* params_) override;
+  bool operator()(HyperGraph::HyperGraphElement& element,
+                  const std::shared_ptr<HyperGraphElementAction::Parameters>& params_) override;
 };
 #endif
 

@@ -58,17 +58,17 @@ VertexSE3WriteGnuplotAction::VertexSE3WriteGnuplotAction()
     : WriteGnuplotAction(typeid(VertexSE3).name()) {}
 
 bool VertexSE3WriteGnuplotAction::operator()(
-    HyperGraph::HyperGraphElement* element,
-    HyperGraphElementAction::Parameters* params_) {
-  if (typeid(*element).name() != typeName_) return false;
-  auto* params = static_cast<WriteGnuplotAction::Parameters*>(params_);
+    HyperGraph::HyperGraphElement& element,
+    const std::shared_ptr<HyperGraphElementAction::Parameters>& params_) {
+  if (typeid(element).name() != typeName_) return false;
+  auto* params = static_cast<WriteGnuplotAction::Parameters*>(params_.get());
   if (!params->os) {
     std::cerr << __PRETTY_FUNCTION__ << ": warning, no valid os specified"
               << std::endl;
     return false;
   }
 
-  auto* v = static_cast<VertexSE3*>(element);
+  auto* v = static_cast<VertexSE3*>(&element);
   Vector6 est = internal::toVectorMQT(v->estimate());
   for (int i = 0; i < 6; i++) *(params->os) << est[i] << " ";
   *(params->os) << std::endl;
@@ -100,7 +100,7 @@ VertexSE3DrawAction::VertexSE3DrawAction()
 }
 
 bool VertexSE3DrawAction::refreshPropertyPtrs(
-    HyperGraphElementAction::Parameters* params_) {
+    const std::shared_ptr<HyperGraphElementAction::Parameters>& params_) {
   if (!DrawAction::refreshPropertyPtrs(params_)) return false;
   if (previousParams_) {
     triangleX_ = previousParams_->makeProperty<FloatProperty>(
@@ -115,9 +115,9 @@ bool VertexSE3DrawAction::refreshPropertyPtrs(
 }
 
 bool VertexSE3DrawAction::operator()(
-    HyperGraph::HyperGraphElement* element,
-    HyperGraphElementAction::Parameters* params_) {
-  if (typeid(*element).name() != typeName_) return false;
+    HyperGraph::HyperGraphElement& element,
+    const std::shared_ptr<HyperGraphElementAction::Parameters>& params_) {
+  if (typeid(element).name() != typeName_) return false;
   initializeDrawActionsCache();
   refreshPropertyPtrs(params_);
 
@@ -125,7 +125,7 @@ bool VertexSE3DrawAction::operator()(
 
   if (show_ && !show_->value()) return true;
 
-  auto* that = static_cast<VertexSE3*>(element);
+  auto* that = static_cast<VertexSE3*>(&element);
 
   glColor3f(POSE_VERTEX_COLOR);
   glPushMatrix();
@@ -133,7 +133,7 @@ bool VertexSE3DrawAction::operator()(
   opengl::drawArrow2D(triangleX_->value(), triangleY_->value(),
                       triangleX_->value() * .3F);
   drawCache(that->cacheContainer(), params_);
-  drawUserData(that->userData().get(), params_);
+  drawUserData(that->userData(), params_);
   glPopMatrix();
   return true;
 }

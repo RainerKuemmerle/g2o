@@ -48,7 +48,7 @@ VertexPointXYZDrawAction::VertexPointXYZDrawAction()
     : DrawAction(typeid(VertexPointXYZ).name()), pointSize_(nullptr) {}
 
 bool VertexPointXYZDrawAction::refreshPropertyPtrs(
-    HyperGraphElementAction::Parameters* params_) {
+    const std::shared_ptr<HyperGraphElementAction::Parameters>& params_) {
   if (!DrawAction::refreshPropertyPtrs(params_)) return false;
   if (previousParams_) {
     pointSize_ = previousParams_->makeProperty<FloatProperty>(
@@ -60,15 +60,15 @@ bool VertexPointXYZDrawAction::refreshPropertyPtrs(
 }
 
 bool VertexPointXYZDrawAction::operator()(
-    HyperGraph::HyperGraphElement* element,
-    HyperGraphElementAction::Parameters* params) {
-  if (typeid(*element).name() != typeName_) return false;
+    HyperGraph::HyperGraphElement& element,
+    const std::shared_ptr<HyperGraphElementAction::Parameters>& params) {
+  if (typeid(element).name() != typeName_) return false;
   initializeDrawActionsCache();
   refreshPropertyPtrs(params);
   if (!previousParams_) return true;
 
   if (show_ && !show_->value()) return true;
-  auto* that = static_cast<VertexPointXYZ*>(element);
+  auto* that = static_cast<VertexPointXYZ*>(&element);
 
   glPushMatrix();
   glPushAttrib(GL_ENABLE_BIT | GL_POINT_BIT);
@@ -81,7 +81,7 @@ bool VertexPointXYZDrawAction::operator()(
   opengl::drawPoint(ps);
   glPopAttrib();
   drawCache(that->cacheContainer(), params);
-  drawUserData(that->userData().get(), params);
+  drawUserData(that->userData(), params);
   glPopMatrix();
   return true;
 }
@@ -91,17 +91,17 @@ VertexPointXYZWriteGnuplotAction::VertexPointXYZWriteGnuplotAction()
     : WriteGnuplotAction(typeid(VertexPointXYZ).name()) {}
 
 bool VertexPointXYZWriteGnuplotAction::operator()(
-    HyperGraph::HyperGraphElement* element,
-    HyperGraphElementAction::Parameters* params_) {
-  if (typeid(*element).name() != typeName_) return false;
-  auto* params = static_cast<WriteGnuplotAction::Parameters*>(params_);
+    HyperGraph::HyperGraphElement& element,
+    const std::shared_ptr<HyperGraphElementAction::Parameters>& params_) {
+  if (typeid(element).name() != typeName_) return false;
+  auto* params = static_cast<WriteGnuplotAction::Parameters*>(params_.get());
   if (!params->os) {
     std::cerr << __PRETTY_FUNCTION__ << ": warning, no valid os specified"
               << std::endl;
     return false;
   }
 
-  auto* v = static_cast<VertexPointXYZ*>(element);
+  auto* v = static_cast<VertexPointXYZ*>(&element);
   *(params->os) << v->estimate().x() << " " << v->estimate().y() << " "
                 << v->estimate().z() << " " << std::endl;
   return true;

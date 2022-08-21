@@ -54,18 +54,18 @@ VertexSegment2DWriteGnuplotAction::VertexSegment2DWriteGnuplotAction()
     : WriteGnuplotAction(typeid(VertexSegment2D).name()) {}
 
 bool VertexSegment2DWriteGnuplotAction::operator()(
-    HyperGraph::HyperGraphElement* element,
-    HyperGraphElementAction::Parameters* params_) {
-  if (typeid(*element).name() != typeName_) return false;
+    HyperGraph::HyperGraphElement& element,
+    const std::shared_ptr<HyperGraphElementAction::Parameters>& params_) {
+  if (typeid(element).name() != typeName_) return false;
 
-  auto* params = static_cast<WriteGnuplotAction::Parameters*>(params_);
+  auto* params = static_cast<WriteGnuplotAction::Parameters*>(params_.get());
   if (!params->os) {
     std::cerr << __PRETTY_FUNCTION__ << ": warning, no valid os specified"
               << std::endl;
     return false;
   }
 
-  auto* v = static_cast<VertexSegment2D*>(element);
+  auto* v = static_cast<VertexSegment2D*>(&element);
   *(params->os) << v->estimateP1().x() << " " << v->estimateP1().y()
                 << std::endl;
   *(params->os) << v->estimateP2().x() << " " << v->estimateP2().y()
@@ -79,7 +79,7 @@ VertexSegment2DDrawAction::VertexSegment2DDrawAction()
     : DrawAction(typeid(VertexSegment2D).name()), pointSize_(nullptr) {}
 
 bool VertexSegment2DDrawAction::refreshPropertyPtrs(
-    HyperGraphElementAction::Parameters* params_) {
+    const std::shared_ptr<HyperGraphElementAction::Parameters>& params_) {
   if (!DrawAction::refreshPropertyPtrs(params_)) return false;
   if (previousParams_) {
     pointSize_ = previousParams_->makeProperty<FloatProperty>(
@@ -91,16 +91,16 @@ bool VertexSegment2DDrawAction::refreshPropertyPtrs(
 }
 
 bool VertexSegment2DDrawAction::operator()(
-    HyperGraph::HyperGraphElement* element,
-    HyperGraphElementAction::Parameters* params_) {
-  if (typeid(*element).name() != typeName_) return false;
+    HyperGraph::HyperGraphElement& element,
+    const std::shared_ptr<HyperGraphElementAction::Parameters>& params_) {
+  if (typeid(element).name() != typeName_) return false;
 
   refreshPropertyPtrs(params_);
   if (!previousParams_) return true;
 
   if (show_ && !show_->value()) return true;
 
-  auto* that = static_cast<VertexSegment2D*>(element);
+  auto* that = static_cast<VertexSegment2D*>(&element);
   glColor3f(0.8F, 0.5F, 0.3F);
   if (pointSize_) {
     glPointSize(pointSize_->value());

@@ -79,13 +79,10 @@ class StandardCamera : public qglviewer::Camera {
 G2oQGLViewer::G2oQGLViewer(QWidget* parent, const QGLWidget* shareWidget)
     : QGLViewer(parent, shareWidget), drawActions_(nullptr) {
   setAxisIsDrawn(false);
-  drawActionParameters_ = new DrawAction::Parameters();
+  drawActionParameters_ = std::make_shared<DrawAction::Parameters>();
 }
 
-G2oQGLViewer::~G2oQGLViewer() {
-  delete drawActionParameters_;
-  glDeleteLists(drawList_, 1);
-}
+G2oQGLViewer::~G2oQGLViewer() { glDeleteLists(drawList_, 1); }
 
 void G2oQGLViewer::draw() {
   if (!graph) return;
@@ -100,7 +97,7 @@ void G2oQGLViewer::draw() {
   if (updateDisplay_) {
     updateDisplay_ = false;
     glNewList(drawList_, GL_COMPILE_AND_EXECUTE);
-    applyAction(graph, drawActions_.get(), drawActionParameters_);
+    applyAction(*graph, *drawActions_, drawActionParameters_);
     glEndList();
   } else {
     glCallList(drawList_);

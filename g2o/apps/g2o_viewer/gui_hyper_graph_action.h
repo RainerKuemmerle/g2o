@@ -31,13 +31,13 @@ class G2oQGLViewer;
  */
 class G2O_VIEWER_API GuiHyperGraphAction : public HyperGraphAction {
  public:
-
   /**
    * calling updateGL, processEvents to visualize the current state after each
    * iteration
    */
-  bool operator()(const HyperGraph* graph,
-                  Parameters* parameters = nullptr) override;
+  bool operator()(const HyperGraph& graph,
+                  const std::shared_ptr<HyperGraphAction::Parameters>&
+                      parameters = nullptr) override;
 
   G2oQGLViewer* viewer = nullptr;  ///< the viewer which visualizes the graph
   bool dumpScreenshots = false;

@@ -64,8 +64,9 @@ class G2O_CORE_API HyperGraphAction {
   /**
    * re-implement to carry out an action given the graph
    */
-  virtual bool operator()(const HyperGraph* graph,
-                          Parameters* parameters = nullptr);
+  virtual bool operator()(
+      const HyperGraph& graph,
+      const std::shared_ptr<Parameters>& parameters = nullptr);
 };
 
 /**
@@ -81,10 +82,9 @@ class G2O_CORE_API HyperGraphElementAction {
   //! on which it operates
   explicit HyperGraphElementAction(std::string typeName = "");
 
-  //! redefine this to do the action stuff. If successful, the action returns a
-  //! pointer to itself
-  virtual bool operator()(HyperGraph::HyperGraphElement* element,
-                          Parameters* parameters);
+  //! redefine this to do the action stuff. If successful, returns true.
+  virtual bool operator()(HyperGraph::HyperGraphElement& element,
+                          const std::shared_ptr<Parameters>& parameters);
 
   virtual ~HyperGraphElementAction();
 
@@ -119,8 +119,8 @@ class G2O_CORE_API HyperGraphElementActionCollection
    * calling functions, they return a pointer to the instance of action in
    * actionMap that was active on element
    */
-  bool operator()(HyperGraph::HyperGraphElement* element,
-                  Parameters* parameters) override;
+  bool operator()(HyperGraph::HyperGraphElement& element,
+                  const std::shared_ptr<Parameters>& parameters) override;
   ActionMap& actionMap() { return actionMap_; }
   //! inserts an action in the pool. The action should have the same name of the
   //! container. returns false on failure (the container has a different name
@@ -174,10 +174,11 @@ class G2O_CORE_API HyperGraphActionLibrary {
 /**
  * apply an action to all the elements of the graph.
  */
-void G2O_CORE_API
-applyAction(HyperGraph* graph, HyperGraphElementAction* action,
-            HyperGraphElementAction::Parameters* parameters = nullptr,
-            const std::string& typeName = "");
+void G2O_CORE_API applyAction(
+    HyperGraph& graph, HyperGraphElementAction& action,
+    const std::shared_ptr<HyperGraphElementAction::Parameters>& parameters =
+        nullptr,
+    const std::string& typeName = "");
 
 /**
  * brief write into gnuplot
@@ -205,13 +206,15 @@ class G2O_CORE_API DrawAction : public HyperGraphElementAction {
 
  protected:
   virtual bool refreshPropertyPtrs(
-      HyperGraphElementAction::Parameters* params_);
+      const std::shared_ptr<HyperGraphElementAction::Parameters>& params);
   void initializeDrawActionsCache();
-  void drawCache(CacheContainer* caches,
-                 HyperGraphElementAction::Parameters* params_);
-  void drawUserData(HyperGraph::Data* data,
-                    HyperGraphElementAction::Parameters* params_);
-  Parameters* previousParams_;
+  void drawCache(
+      const std::shared_ptr<CacheContainer>& caches,
+      const std::shared_ptr<HyperGraphElementAction::Parameters>& params);
+  void drawUserData(
+      const std::shared_ptr<HyperGraph::Data>& data,
+      const std::shared_ptr<HyperGraphElementAction::Parameters>& params);
+  std::shared_ptr<Parameters> previousParams_;
   std::shared_ptr<BoolProperty> show_;
   std::shared_ptr<BoolProperty> showId_;
   HyperGraphElementAction::HyperGraphElementActionPtr cacheDrawActions_;

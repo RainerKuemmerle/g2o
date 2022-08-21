@@ -77,12 +77,14 @@ class G2O_TYPES_SLAM3D_API CacheCamera : public CacheSE3Offset {
 class G2O_TYPES_SLAM3D_API CacheCameraDrawAction : public DrawAction {
  public:
   CacheCameraDrawAction();
-  bool operator()(HyperGraph::HyperGraphElement* element,
-                  HyperGraphElementAction::Parameters* params_) override;
+  bool operator()(HyperGraph::HyperGraphElement& element,
+                  const std::shared_ptr<HyperGraphElementAction::Parameters>&
+                      params_) override;
 
  protected:
   bool refreshPropertyPtrs(
-      HyperGraphElementAction::Parameters* params_) override;
+      const std::shared_ptr<HyperGraphElementAction::Parameters>& params_)
+      override;
   std::shared_ptr<FloatProperty> cameraZ_, cameraSide_;
 };
 #endif

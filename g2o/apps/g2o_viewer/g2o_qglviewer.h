@@ -48,7 +48,9 @@ class G2O_VIEWER_API G2oQGLViewer : public QGLViewer {
   bool updateDisplay() const { return updateDisplay_; }
   void setUpdateDisplay(bool updateDisplay);
 
-  DrawAction::Parameters* parameters() { return drawActionParameters_; }
+  std::shared_ptr<DrawAction::Parameters> parameters() const {
+    return drawActionParameters_;
+  }
 
   SparseOptimizer* graph = nullptr;
 
@@ -56,7 +58,7 @@ class G2O_VIEWER_API G2oQGLViewer : public QGLViewer {
   HyperGraphElementAction::HyperGraphElementActionPtr drawActions_;
   GLuint drawList_ = 0;
   bool updateDisplay_ = true;
-  DrawAction::Parameters* drawActionParameters_;
+  std::shared_ptr<DrawAction::Parameters> drawActionParameters_;
 };
 
 }  // namespace g2o

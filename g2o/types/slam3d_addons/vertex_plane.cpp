@@ -54,7 +54,7 @@ VertexPlaneDrawAction::VertexPlaneDrawAction()
       planeHeight_(nullptr) {}
 
 bool VertexPlaneDrawAction::refreshPropertyPtrs(
-    HyperGraphElementAction::Parameters* params_) {
+    const std::shared_ptr<HyperGraphElementAction::Parameters>& params_) {
   if (!DrawAction::refreshPropertyPtrs(params_)) return false;
   if (previousParams_) {
     planeWidth_ = previousParams_->makeProperty<FloatProperty>(
@@ -69,15 +69,15 @@ bool VertexPlaneDrawAction::refreshPropertyPtrs(
 }
 
 bool VertexPlaneDrawAction::operator()(
-    HyperGraph::HyperGraphElement* element,
-    HyperGraphElementAction::Parameters* params_) {
-  if (typeid(*element).name() != typeName_) return false;
+    HyperGraph::HyperGraphElement& element,
+    const std::shared_ptr<HyperGraphElementAction::Parameters>& params_) {
+  if (typeid(element).name() != typeName_) return false;
   refreshPropertyPtrs(params_);
   if (!previousParams_) return true;
   if (show_ && !show_->value()) return true;
 
   if (planeWidth_ && planeHeight_) {
-    auto* that = static_cast<VertexPlane*>(element);
+    auto* that = static_cast<VertexPlane*>(&element);
     number_t d = that->estimate().distance();
     number_t azimuth = Plane3D::azimuth(that->estimate().normal());
     number_t elevation = Plane3D::elevation(that->estimate().normal());

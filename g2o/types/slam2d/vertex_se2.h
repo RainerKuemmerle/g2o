@@ -84,21 +84,24 @@ class G2O_TYPES_SLAM2D_API VertexSE2WriteGnuplotAction
     : public WriteGnuplotAction {
  public:
   VertexSE2WriteGnuplotAction();
-  bool operator()(HyperGraph::HyperGraphElement* element,
-                  HyperGraphElementAction::Parameters* params_) override;
+  bool operator()(HyperGraph::HyperGraphElement& element,
+                  const std::shared_ptr<HyperGraphElementAction::Parameters>&
+                      parameters) override;
 };
 
 #ifdef G2O_HAVE_OPENGL
 class G2O_TYPES_SLAM2D_API VertexSE2DrawAction : public DrawAction {
  public:
   VertexSE2DrawAction();
-  bool operator()(HyperGraph::HyperGraphElement* element,
-                  HyperGraphElementAction::Parameters* params_) override;
+  bool operator()(HyperGraph::HyperGraphElement& element,
+                  const std::shared_ptr<HyperGraphElementAction::Parameters>&
+                      parameters) override;
 
  protected:
   HyperGraphElementAction* drawActions_ = nullptr;
   bool refreshPropertyPtrs(
-      HyperGraphElementAction::Parameters* params_) override;
+      const std::shared_ptr<HyperGraphElementAction::Parameters>& parameters)
+      override;
   std::shared_ptr<FloatProperty> triangleX_, triangleY_;
 };
 #endif

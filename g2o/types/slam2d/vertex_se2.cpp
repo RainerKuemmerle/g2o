@@ -50,17 +50,18 @@ VertexSE2WriteGnuplotAction::VertexSE2WriteGnuplotAction()
     : WriteGnuplotAction(typeid(VertexSE2).name()) {}
 
 bool VertexSE2WriteGnuplotAction::operator()(
-    HyperGraph::HyperGraphElement* element,
-    HyperGraphElementAction::Parameters* params_) {
-  if (typeid(*element).name() != typeName_) return false;
-  auto* params = static_cast<WriteGnuplotAction::Parameters*>(params_);
+    HyperGraph::HyperGraphElement& element,
+    const std::shared_ptr<HyperGraphElementAction::Parameters>& parameters) {
+  if (typeid(element).name() != typeName_) return false;
+  auto params =
+      std::static_pointer_cast<WriteGnuplotAction::Parameters>(parameters);
   if (!params || !params->os) {
     std::cerr << __PRETTY_FUNCTION__
               << ": warning, no valid output stream specified" << std::endl;
     return false;
   }
 
-  auto* v = static_cast<VertexSE2*>(element);
+  auto* v = static_cast<VertexSE2*>(&element);
   *(params->os) << v->estimate().translation().x() << " "
                 << v->estimate().translation().y() << " "
                 << v->estimate().rotation().angle() << std::endl;
@@ -74,8 +75,8 @@ VertexSE2DrawAction::VertexSE2DrawAction()
       triangleY_(nullptr) {}
 
 bool VertexSE2DrawAction::refreshPropertyPtrs(
-    HyperGraphElementAction::Parameters* params_) {
-  if (!DrawAction::refreshPropertyPtrs(params_)) return false;
+    const std::shared_ptr<HyperGraphElementAction::Parameters>& parameters) {
+  if (!DrawAction::refreshPropertyPtrs(parameters)) return false;
   if (previousParams_) {
     triangleX_ = previousParams_->makeProperty<FloatProperty>(
         typeName_ + "::TRIANGLE_X", .2F);
@@ -89,17 +90,17 @@ bool VertexSE2DrawAction::refreshPropertyPtrs(
 }
 
 bool VertexSE2DrawAction::operator()(
-    HyperGraph::HyperGraphElement* element,
-    HyperGraphElementAction::Parameters* params_) {
-  if (typeid(*element).name() != typeName_) return false;
+    HyperGraph::HyperGraphElement& element,
+    const std::shared_ptr<HyperGraphElementAction::Parameters>& parameters) {
+  if (typeid(element).name() != typeName_) return false;
   initializeDrawActionsCache();
-  refreshPropertyPtrs(params_);
+  refreshPropertyPtrs(parameters);
 
   if (!previousParams_) return true;
 
   if (show_ && !show_->value()) return true;
 
-  auto* that = static_cast<VertexSE2*>(element);
+  auto* that = static_cast<VertexSE2*>(&element);
 
   glColor3f(POSE_VERTEX_COLOR);
   glPushMatrix();
@@ -110,8 +111,8 @@ bool VertexSE2DrawAction::operator()(
   opengl::drawArrow2D(static_cast<float>(triangleX_->value()),
                       static_cast<float>(triangleY_->value()),
                       static_cast<float>(triangleX_->value()) * .3F);
-  drawCache(that->cacheContainer(), params_);
-  drawUserData(that->userData().get(), params_);
+  drawCache(that->cacheContainer(), parameters);
+  drawUserData(that->userData(), parameters);
   glPopMatrix();
   return true;
 }

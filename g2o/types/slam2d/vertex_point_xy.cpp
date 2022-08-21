@@ -55,18 +55,18 @@ VertexPointXYWriteGnuplotAction::VertexPointXYWriteGnuplotAction()
     : WriteGnuplotAction(typeid(VertexPointXY).name()) {}
 
 bool VertexPointXYWriteGnuplotAction::operator()(
-    HyperGraph::HyperGraphElement* element,
-    HyperGraphElementAction::Parameters* params) {
-  if (typeid(*element).name() != typeName_) return false;
+    HyperGraph::HyperGraphElement& element,
+    const std::shared_ptr<HyperGraphElementAction::Parameters>& params) {
+  if (typeid(element).name() != typeName_) return false;
 
-  auto* gnuplot_params = static_cast<WriteGnuplotAction::Parameters*>(params);
+  auto* gnuplot_params = static_cast<WriteGnuplotAction::Parameters*>(params.get());
   if (!gnuplot_params->os) {
     std::cerr << __PRETTY_FUNCTION__ << ": warning, on valid os specified"
               << std::endl;
     return false;
   }
 
-  auto* v = static_cast<VertexPointXY*>(element);
+  auto* v = static_cast<VertexPointXY*>(&element);
   *(gnuplot_params->os) << v->estimate().x() << " " << v->estimate().y()
                         << std::endl;
   return true;
@@ -77,7 +77,7 @@ VertexPointXYDrawAction::VertexPointXYDrawAction()
     : DrawAction(typeid(VertexPointXY).name()), pointSize_(nullptr) {}
 
 bool VertexPointXYDrawAction::refreshPropertyPtrs(
-    HyperGraphElementAction::Parameters* params) {
+    const std::shared_ptr<HyperGraphElementAction::Parameters>& params) {
   if (!DrawAction::refreshPropertyPtrs(params)) return false;
   if (previousParams_) {
     pointSize_ = previousParams_->makeProperty<FloatProperty>(
@@ -89,15 +89,15 @@ bool VertexPointXYDrawAction::refreshPropertyPtrs(
 }
 
 bool VertexPointXYDrawAction::operator()(
-    HyperGraph::HyperGraphElement* element,
-    HyperGraphElementAction::Parameters* params) {
-  if (typeid(*element).name() != typeName_) return false;
+    HyperGraph::HyperGraphElement& element,
+    const std::shared_ptr<HyperGraphElementAction::Parameters>& params) {
+  if (typeid(element).name() != typeName_) return false;
   initializeDrawActionsCache();
   refreshPropertyPtrs(params);
   if (!previousParams_) return true;
 
   if (show_ && !show_->value()) return true;
-  auto* that = static_cast<VertexPointXY*>(element);
+  auto* that = static_cast<VertexPointXY*>(&element);
 
   glPushMatrix();
   glPushAttrib(GL_ENABLE_BIT | GL_POINT_BIT);
@@ -108,7 +108,7 @@ bool VertexPointXYDrawAction::operator()(
   opengl::drawPoint(ps);
   glPopAttrib();
   drawCache(that->cacheContainer(), params);
-  drawUserData(that->userData().get(), params);
+  drawUserData(that->userData(), params);
   glPopMatrix();
   return true;
 }

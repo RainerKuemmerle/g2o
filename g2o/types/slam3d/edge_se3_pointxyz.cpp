@@ -157,15 +157,15 @@ EdgeSE3PointXYZDrawAction::EdgeSE3PointXYZDrawAction()
     : DrawAction(typeid(EdgeSE3PointXYZ).name()) {}
 
 bool EdgeSE3PointXYZDrawAction::operator()(
-    HyperGraph::HyperGraphElement* element,
-    HyperGraphElementAction::Parameters* params_) {
-  if (typeid(*element).name() != typeName_) return false;
+    HyperGraph::HyperGraphElement& element,
+    const std::shared_ptr<HyperGraphElementAction::Parameters>& params_) {
+  if (typeid(element).name() != typeName_) return false;
   refreshPropertyPtrs(params_);
   if (!previousParams_) return true;
 
   if (show_ && !show_->value()) return true;
 
-  auto* e = static_cast<EdgeSE3PointXYZ*>(element);
+  auto* e = static_cast<EdgeSE3PointXYZ*>(&element);
   VertexSE3* fromEdge = static_cast<VertexSE3*>(e->vertex(0).get());
   VertexPointXYZ* toEdge = static_cast<VertexPointXYZ*>(e->vertex(1).get());
   if (!fromEdge || !toEdge) return true;

@@ -176,14 +176,14 @@ EdgeProjectDisparityDrawAction::EdgeProjectDisparityDrawAction()
     : DrawAction(typeid(EdgeSE3PointXYZDisparity).name()) {}
 
 bool EdgeProjectDisparityDrawAction::operator()(
-    HyperGraph::HyperGraphElement* element,
-    HyperGraphElementAction::Parameters* params_) {
-  if (typeid(*element).name() != typeName_) return false;
+    HyperGraph::HyperGraphElement& element,
+    const std::shared_ptr<HyperGraphElementAction::Parameters>& params_) {
+  if (typeid(element).name() != typeName_) return false;
   refreshPropertyPtrs(params_);
   if (!previousParams_) return true;
 
   if (show_ && !show_->value()) return true;
-  auto* e = static_cast<EdgeSE3PointXYZDisparity*>(element);
+  auto* e = static_cast<EdgeSE3PointXYZDisparity*>(&element);
   auto* fromEdge = static_cast<VertexSE3*>(e->vertices()[0].get());
   auto* toEdge = static_cast<VertexPointXYZ*>(e->vertices()[1].get());
   if (!fromEdge || !toEdge) return true;

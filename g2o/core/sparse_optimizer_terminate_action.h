@@ -47,8 +47,9 @@ class SparseOptimizer;
 class G2O_CORE_API SparseOptimizerTerminateAction : public HyperGraphAction {
  public:
   SparseOptimizerTerminateAction();
-  bool operator()(const HyperGraph* graph,
-                  Parameters* parameters = nullptr) override;
+  bool operator()(
+      const HyperGraph& graph,
+      const std::shared_ptr<Parameters>& parameters = nullptr) override;
 
   number_t gainThreshold() const { return gainThreshold_; }
   void setGainThreshold(number_t gainThreshold);

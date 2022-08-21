@@ -80,12 +80,14 @@ class EdgeSE3Line3DDrawAction : public DrawAction {
  public:
   G2O_TYPES_SLAM3D_ADDONS_API EdgeSE3Line3DDrawAction();
   G2O_TYPES_SLAM3D_ADDONS_API bool operator()(
-      HyperGraph::HyperGraphElement* element,
-      HyperGraphElementAction::Parameters* params_) override;
+      HyperGraph::HyperGraphElement& element,
+      const std::shared_ptr<HyperGraphElementAction::Parameters>& params_)
+      override;
 
  protected:
   bool refreshPropertyPtrs(
-      HyperGraphElementAction::Parameters* params_) override;
+      const std::shared_ptr<HyperGraphElementAction::Parameters>& params_)
+      override;
   std::shared_ptr<FloatProperty> lineLength_, lineWidth_;
 };
 #endif

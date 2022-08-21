@@ -62,12 +62,12 @@ class G2O_TYPES_DATA_API VertexTag : public RobotData {
 class G2O_TYPES_DATA_API VertexTagDrawAction : public DrawAction {
  public:
   VertexTagDrawAction();
-  bool operator()(HyperGraph::HyperGraphElement* element,
-                  HyperGraphElementAction::Parameters* params_) override;
+  bool operator()(HyperGraph::HyperGraphElement& element,
+                  const std::shared_ptr<HyperGraphElementAction::Parameters>&) override;
 
  protected:
   bool refreshPropertyPtrs(
-      HyperGraphElementAction::Parameters* params_) override;
+      const std::shared_ptr<HyperGraphElementAction::Parameters>&) override;
   std::shared_ptr<DoubleProperty> textSize_;
 };
 #endif

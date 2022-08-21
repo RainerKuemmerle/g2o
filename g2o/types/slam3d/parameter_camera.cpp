@@ -93,13 +93,10 @@ void CacheCamera::updateImpl() {
 #ifdef G2O_HAVE_OPENGL
 
 CacheCameraDrawAction::CacheCameraDrawAction()
-    : DrawAction(typeid(CacheCamera).name()) {
-  previousParams_ = reinterpret_cast<DrawAction::Parameters*>(0x42);
-  refreshPropertyPtrs(nullptr);
-}
+    : DrawAction(typeid(CacheCamera).name()) {}
 
 bool CacheCameraDrawAction::refreshPropertyPtrs(
-    HyperGraphElementAction::Parameters* params_) {
+    const std::shared_ptr<HyperGraphElementAction::Parameters>& params_) {
   if (!DrawAction::refreshPropertyPtrs(params_)) return false;
   if (previousParams_) {
     cameraZ_ = previousParams_->makeProperty<FloatProperty>(
@@ -115,10 +112,10 @@ bool CacheCameraDrawAction::refreshPropertyPtrs(
 }
 
 bool CacheCameraDrawAction::operator()(
-    HyperGraph::HyperGraphElement* element,
-    HyperGraphElementAction::Parameters* params) {
-  if (typeid(*element).name() != typeName_) return false;
-  auto* that = static_cast<CacheCamera*>(element);
+    HyperGraph::HyperGraphElement& element,
+    const std::shared_ptr<HyperGraphElementAction::Parameters>& params) {
+  if (typeid(element).name() != typeName_) return false;
+  auto* that = static_cast<CacheCamera*>(&element);
   refreshPropertyPtrs(params);
   if (!previousParams_) return true;
 

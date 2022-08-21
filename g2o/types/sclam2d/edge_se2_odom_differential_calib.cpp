@@ -53,10 +53,10 @@ EdgeSE2OdomDifferentialCalibDrawAction::EdgeSE2OdomDifferentialCalibDrawAction()
     : DrawAction(typeid(EdgeSE2OdomDifferentialCalib).name()) {}
 
 bool EdgeSE2OdomDifferentialCalibDrawAction::operator()(
-    HyperGraph::HyperGraphElement* element,
-    HyperGraphElementAction::Parameters*) {
-  if (typeid(*element).name() != typeName_) return false;
-  auto* e = static_cast<EdgeSE2OdomDifferentialCalib*>(element);
+    HyperGraph::HyperGraphElement& element,
+    const std::shared_ptr<HyperGraphElementAction::Parameters>&) {
+  if (typeid(element).name() != typeName_) return false;
+  auto* e = static_cast<EdgeSE2OdomDifferentialCalib*>(&element);
   auto fromEdge = e->vertexXn<0>();
   auto toEdge = e->vertexXn<1>();
   if (!fromEdge || !toEdge) return true;

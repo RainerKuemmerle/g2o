@@ -64,8 +64,10 @@ std::ostream& printIdChain(std::ostream& os, const std::vector<int>& ids) {
 }
 }  // namespace
 
-CacheContainer* OptimizableGraph::Vertex::cacheContainer() {
-  if (!cacheContainer_) cacheContainer_ = new CacheContainer(this);
+std::shared_ptr<CacheContainer> OptimizableGraph::Vertex::cacheContainer() {
+  if (!cacheContainer_) {
+    cacheContainer_ = std::make_shared<CacheContainer>(this);
+  }
   return cacheContainer_;
 }
 
@@ -76,7 +78,7 @@ void OptimizableGraph::Vertex::updateCache() {
   }
 }
 
-OptimizableGraph::Vertex::~Vertex() { delete cacheContainer_; }
+OptimizableGraph::Vertex::~Vertex() = default;
 
 bool OptimizableGraph::Vertex::setEstimateData(const number_t* estimate) {
   bool ret = setEstimateDataImpl(estimate);
@@ -694,9 +696,9 @@ std::set<int> OptimizableGraph::dimensions() const {
 
 void OptimizableGraph::performActions(int iter, HyperGraphActionSet& actions) {
   if (!actions.empty()) {
-    HyperGraphAction::ParametersIteration params(iter);
+    auto params = std::make_shared<HyperGraphAction::ParametersIteration>(iter);
     for (const auto& action : actions) {
-      (*action)(this, &params);
+      (*action)(*this, params);
     }
   }
 }

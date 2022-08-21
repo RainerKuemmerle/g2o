@@ -86,17 +86,17 @@ EdgeSE2WriteGnuplotAction::EdgeSE2WriteGnuplotAction()
     : WriteGnuplotAction(typeid(EdgeSE2).name()) {}
 
 bool EdgeSE2WriteGnuplotAction::operator()(
-    HyperGraph::HyperGraphElement* element,
-    HyperGraphElementAction::Parameters* params_) {
-  if (typeid(*element).name() != typeName_) return false;
-  auto* params = static_cast<WriteGnuplotAction::Parameters*>(params_);
+    HyperGraph::HyperGraphElement& element,
+    const std::shared_ptr<HyperGraphElementAction::Parameters>& params_) {
+  if (typeid(element).name() != typeName_) return false;
+  auto params = std::static_pointer_cast<WriteGnuplotAction::Parameters>(params_);
   if (!params->os) {
     std::cerr << __PRETTY_FUNCTION__ << ": warning, on valid os specified"
               << std::endl;
     return false;
   }
 
-  auto* e = static_cast<EdgeSE2*>(element);
+  auto* e = static_cast<EdgeSE2*>(&element);
   auto fromEdge = e->vertexXn<0>();
   auto toEdge = e->vertexXn<1>();
   *(params->os) << fromEdge->estimate().translation().x() << " "
@@ -116,7 +116,7 @@ EdgeSE2DrawAction::EdgeSE2DrawAction()
       triangleY_(nullptr) {}
 
 bool EdgeSE2DrawAction::refreshPropertyPtrs(
-    HyperGraphElementAction::Parameters* params_) {
+    const std::shared_ptr<HyperGraphElementAction::Parameters>& params_) {
   if (!DrawAction::refreshPropertyPtrs(params_)) return false;
   if (previousParams_) {
     triangleX_ = previousParams_->makeProperty<FloatProperty>(
@@ -131,16 +131,16 @@ bool EdgeSE2DrawAction::refreshPropertyPtrs(
 }
 
 bool EdgeSE2DrawAction::operator()(
-    HyperGraph::HyperGraphElement* element,
-    HyperGraphElementAction::Parameters* params_) {
-  if (typeid(*element).name() != typeName_) return false;
+    HyperGraph::HyperGraphElement& element,
+    const std::shared_ptr<HyperGraphElementAction::Parameters>& params_) {
+  if (typeid(element).name() != typeName_) return false;
 
   refreshPropertyPtrs(params_);
   if (!previousParams_) return true;
 
   if (show_ && !show_->value()) return true;
 
-  auto* e = static_cast<EdgeSE2*>(element);
+  auto* e = static_cast<EdgeSE2*>(&element);
   auto from = e->vertexXn<0>();
   auto to = e->vertexXn<1>();
   if (!from && !to) return true;

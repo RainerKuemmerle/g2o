@@ -46,7 +46,8 @@ HyperGraphAction::ParametersIteration::ParametersIteration(int iter)
 
 HyperGraphAction::~HyperGraphAction() = default;
 
-bool HyperGraphAction::operator()(const HyperGraph*, Parameters*) {
+bool HyperGraphAction::operator()(const HyperGraph&,
+                                  const std::shared_ptr<Parameters>&) {
   return false;
 }
 
@@ -59,8 +60,8 @@ void HyperGraphElementAction::setTypeName(std::string typeName) {
   typeName_ = std::move(typeName);
 }
 
-bool HyperGraphElementAction::operator()(HyperGraph::HyperGraphElement*,
-                                         HyperGraphElementAction::Parameters*) {
+bool HyperGraphElementAction::operator()(HyperGraph::HyperGraphElement&,
+                                         const std::shared_ptr<Parameters>&) {
   return false;
 }
 
@@ -72,9 +73,9 @@ HyperGraphElementActionCollection::HyperGraphElementActionCollection(
 }
 
 bool HyperGraphElementActionCollection::operator()(
-    HyperGraph::HyperGraphElement* element,
-    HyperGraphElementAction::Parameters* parameters) {
-  auto it = actionMap_.find(typeid(*element).name());
+    HyperGraph::HyperGraphElement& element,
+    const std::shared_ptr<Parameters>& parameters) {
+  auto it = actionMap_.find(typeid(element).name());
   if (it == actionMap_.end()) return false;
   HyperGraphElementAction* action = it->second.get();
   return (*action)(element, parameters);
@@ -192,15 +193,15 @@ DrawAction::Parameters::Parameters() = default;
 DrawAction::DrawAction(const std::string& typeName_)
     : HyperGraphElementAction(typeName_) {
   name_ = "draw";
-  previousParams_ = reinterpret_cast<Parameters*>(0x42);
+  // previousParams_.reset(reinterpret_cast<Parameters*>(0x42));
   refreshPropertyPtrs(nullptr);
   cacheDrawActions_ = nullptr;
 }
 
 bool DrawAction::refreshPropertyPtrs(
-    HyperGraphElementAction::Parameters* params_) {
-  if (previousParams_ == params_) return false;
-  auto* p = dynamic_cast<DrawAction::Parameters*>(params_);
+    const std::shared_ptr<HyperGraphElementAction::Parameters>& params) {
+  if (previousParams_ == params) return false;
+  auto p = std::dynamic_pointer_cast<DrawAction::Parameters>(params);
   if (!p) {
     previousParams_ = nullptr;
     show_ = nullptr;
@@ -220,37 +221,41 @@ void DrawAction::initializeDrawActionsCache() {
   }
 }
 
-void DrawAction::drawCache(CacheContainer* caches,
-                           HyperGraphElementAction::Parameters* params_) {
+void DrawAction::drawCache(
+    const std::shared_ptr<CacheContainer>& caches,
+    const std::shared_ptr<HyperGraphElementAction::Parameters>& params) {
   if (caches) {
     for (auto& cache : *caches) {
       Cache* c = cache.second.get();
-      (*cacheDrawActions_)(c, params_);
+      (*cacheDrawActions_)(*c, params);
     }
   }
 }
 
-void DrawAction::drawUserData(HyperGraph::Data* data,
-                              HyperGraphElementAction::Parameters* params_) {
+void DrawAction::drawUserData(
+    const std::shared_ptr<HyperGraph::Data>& data,
+    const std::shared_ptr<HyperGraphElementAction::Parameters>& params) {
+  HyperGraph::Data* dataPtr = data.get();
   while (data && cacheDrawActions_) {
-    (*cacheDrawActions_)(data, params_);
-    data = data->next().get();
+    (*cacheDrawActions_)(*dataPtr, params);
+    dataPtr = dataPtr->next().get();
   }
 }
 
-void applyAction(HyperGraph* graph, HyperGraphElementAction* action,
-                 HyperGraphElementAction::Parameters* parameters,
-                 const std::string& typeName) {
-  for (auto& it : graph->vertices()) {
+void applyAction(
+    HyperGraph& graph, HyperGraphElementAction& action,
+    const std::shared_ptr<HyperGraphElementAction::Parameters>& parameters,
+    const std::string& typeName) {
+  for (auto& it : graph.vertices()) {
     auto& aux = *it.second;
     if (typeName.empty() || typeid(aux).name() == typeName) {
-      (*action)(it.second.get(), parameters);
+      (action)(*it.second, parameters);
     }
   }
-  for (const auto& it : graph->edges()) {
+  for (const auto& it : graph.edges()) {
     auto& aux = *it;
     if (typeName.empty() || typeid(aux).name() == typeName)
-      (*action)(it.get(), parameters);
+      (action)(aux, parameters);
   }
 }
 
