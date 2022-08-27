@@ -41,6 +41,11 @@ io_helper.h
 g2o_core_api.h
 )
 
+target_include_directories(core PUBLIC
+  "$<BUILD_INTERFACE:${g2o_SOURCE_DIR};${PROJECT_BINARY_DIR}>"
+  $<INSTALL_INTERFACE:include/g2o/core>
+)
+
 set_target_properties(core PROPERTIES OUTPUT_NAME ${LIB_PREFIX}core)
 target_link_libraries(core PUBLIC stuff ${G2O_EIGEN3_EIGEN_TARGET})
 if(G2O_USE_VENDORED_CERES)
