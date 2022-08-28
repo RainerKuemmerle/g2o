@@ -28,6 +28,8 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+#include "g2o/config.h"
+
 #ifdef WINDOWS
 #include <windows.h>
 #endif
