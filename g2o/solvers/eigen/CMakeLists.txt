@@ -8,6 +8,11 @@ if (APPLE)
 endif()
 target_link_libraries(solver_eigen core)
 
+target_include_directories(solver_eigen PUBLIC
+  "$<BUILD_INTERFACE:${g2o_SOURCE_DIR};${PROJECT_BINARY_DIR}>"
+  $<INSTALL_INTERFACE:include/g2o/solver_eigen>
+)
+
 install(TARGETS solver_eigen
   EXPORT ${G2O_TARGETS_EXPORT_NAME}
   RUNTIME DESTINATION ${RUNTIME_DESTINATION}
