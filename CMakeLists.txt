@@ -492,9 +492,6 @@ else()
   include_directories(${EIGEN3_INCLUDE_DIR})
 endif ()
 
-# Set up the top-level include directories
-include_directories(${g2o_SOURCE_DIR} ${PROJECT_BINARY_DIR})
-
 # Generate config.h
 set(G2O_OPENGL_FOUND ${OPENGL_FOUND})
 set(G2O_HAVE_CHOLMOD ${CHOLMOD_FOUND})

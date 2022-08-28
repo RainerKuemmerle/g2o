@@ -10,6 +10,11 @@ add_library(stuff ${G2O_LIB_TYPE}
   g2o_stuff_api.h
 )
 
+target_include_directories(stuff PUBLIC
+  "$<BUILD_INTERFACE:${g2o_SOURCE_DIR};${PROJECT_BINARY_DIR}>"
+  $<INSTALL_INTERFACE:include/g2o/stuff>
+)
+
 set_target_properties(stuff PROPERTIES OUTPUT_NAME ${LIB_PREFIX}stuff)
 target_link_libraries(stuff PUBLIC ${G2O_EIGEN3_EIGEN_TARGET})
 
@@ -41,6 +46,11 @@ if(OPENGL_FOUND AND G2O_HAVE_OPENGL)
     ARCHIVE DESTINATION ${ARCHIVE_DESTINATION}
     INCLUDES DESTINATION ${INCLUDES_DESTINATION}
     )
+
+  target_include_directories(opengl_helper PUBLIC
+    "$<BUILD_INTERFACE:${g2o_SOURCE_DIR};${PROJECT_BINARY_DIR}>"
+    $<INSTALL_INTERFACE:include/g2o/stuff>
+  )
 
   target_link_libraries(opengl_helper PUBLIC ${G2O_OPENGL_TARGET} ${G2O_EIGEN3_EIGEN_TARGET})
   set_target_properties(opengl_helper PROPERTIES OUTPUT_NAME "${LIB_PREFIX}opengl_helper")

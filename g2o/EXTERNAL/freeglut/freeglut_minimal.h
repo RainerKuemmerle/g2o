@@ -28,7 +28,17 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include "g2o/stuff/opengl_wrapper.h"
+#include "g2o/config.h"
+
+#ifdef WINDOWS
+#include <windows.h>
+#endif
+
+#ifdef __APPLE__
+#include <OpenGL/gl.h>
+#else
+#include <GL/gl.h>
+#endif
 
 #ifdef _MSC_VER
 // We are using a Microsoft compiler:
