@@ -55,7 +55,7 @@ class G2O_TYPES_SLAM3D_API SE3Quat {
     normalizeRotation();
   }
 
-  SE3Quat(const Quaternion& q, Vector3 t) : r_(q), t_(std::move(std::move(t))) {
+  SE3Quat(Quaternion q, Vector3 t) : r_(std::move(q)), t_(std::move(std::move(t))) {
     normalizeRotation();
   }
 

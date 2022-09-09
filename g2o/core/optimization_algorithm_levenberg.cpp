@@ -37,14 +37,7 @@ namespace g2o {
 
 OptimizationAlgorithmLevenberg::OptimizationAlgorithmLevenberg(
     std::unique_ptr<Solver> solver)
-    : OptimizationAlgorithmWithHessian(*solver),
-      currentLambda_(cst(-1.)),
-      tau_(cst(1e-5)),
-      goodStepLowerScale_(cst(1. / 3.)),
-      goodStepUpperScale_(cst(2. / 3.)),
-      ni_(cst(2.)),
-      levenbergIterations_(0),
-      m_solver_{std::move(solver)} {
+    : OptimizationAlgorithmWithHessian(*solver), m_solver_{std::move(solver)} {
   userLambdaInit_ =
       properties_.makeProperty<Property<number_t> >("initialLambda", 0.);
   maxTrialsAfterFailure_ =

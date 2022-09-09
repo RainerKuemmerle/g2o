@@ -40,7 +40,7 @@ number_t BaseVertex<D, T>::solveDirect(number_t lambda) {
   if (g2o_isnan(det) || det < std::numeric_limits<number_t>::epsilon())
     return det;
   Eigen::Matrix<number_t, D, 1, Eigen::ColMajor> dx = tempA.llt().solve(b_);
-  oplus(&dx[0]);
+  oplus(dx.data());
   return det;
 }
 

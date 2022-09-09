@@ -65,8 +65,8 @@ std::unique_ptr<T> make_unique(ArgTs&&... args) {
  * converts a number constant to a number_t constant at compile time
  * to avoid having to cast everything to avoid warnings.
  **/
-inline constexpr number_t cst(long double v) {
-  return static_cast<number_t>(v);
+inline constexpr number_t cst(long double value) {
+  return static_cast<number_t>(value);
 }
 
 constexpr number_t const_pi() { return cst(3.14159265358979323846); }
@@ -75,15 +75,15 @@ constexpr number_t const_pi() { return cst(3.14159265358979323846); }
  * return the square value
  */
 template <typename T>
-inline T square(T x) {
-  return x * x;
+inline T square(T value) {
+  return value * value;
 }
 
 /**
  * return the hypot of x and y
  */
 template <typename T>
-inline T hypot(T x, T y) {
+inline T hypot(T x, T y) {  // NOLINT
   return static_cast<T>(std::sqrt(x * x + y * y));
 }
 
@@ -91,7 +91,7 @@ inline T hypot(T x, T y) {
  * return the squared hypot of x and y
  */
 template <typename T>
-inline T hypot_sqr(T x, T y) {
+inline T hypot_sqr(T x, T y) {  // NOLINT
   return x * x + y * y;
 }
 
@@ -121,50 +121,51 @@ inline number_t normalize_theta(number_t theta) {
 /**
  * inverse of an angle, i.e., +180 degree
  */
-inline number_t inverse_theta(number_t th) {
-  return normalize_theta(th + const_pi());
+inline number_t inverse_theta(number_t theta) {
+  return normalize_theta(theta + const_pi());
 }
 
 /**
  * average two angles
  */
 inline number_t average_angle(number_t theta1, number_t theta2) {
-  number_t x = std::cos(theta1) + std::cos(theta2);
-  number_t y = std::sin(theta1) + std::sin(theta2);
-  if (x == 0 && y == 0) return 0;
-  return std::atan2(y, x);
+  number_t x_coord = std::cos(theta1) + std::cos(theta2);
+  number_t y_coord = std::sin(theta1) + std::sin(theta2);
+  if (x_coord == 0 && y_coord == 0) return 0;
+  return std::atan2(y_coord, x_coord);
 }
 
 /**
  * sign function.
- * @return the sign of x. +1 for x > 0, -1 for x < 0, 0 for x == 0
+ * @return the sign of value. +1 for value > 0, -1 for value < 0, 0 for value ==
+ * 0
  */
 template <typename T>
-inline int sign(T x) {
-  if (x > 0) return 1;
-  if (x < 0) return -1;
+inline int sign(T value) {
+  if (value > 0) return 1;
+  if (value < 0) return -1;
   return 0;
 }
 
 /**
- * clamp x to the interval [l, u]
+ * clamp value to the interval [lower, upper]
  */
 template <typename T>
-inline T clamp(T l, T x, T u) {
-  if (x < l) return l;
-  if (x > u) return u;
-  return x;
+inline T clamp(T lower, T value, T upper) {
+  if (value < lower) return lower;
+  if (value > upper) return upper;
+  return value;
 }
 
 /**
- * wrap x to be in the interval [l, u]
+ * wrap value to be in the interval [lower, upper]
  */
 template <typename T>
-inline T wrap(T l, T x, T u) {
-  T intervalWidth = u - l;
-  while (x < l) x += intervalWidth;
-  while (x > u) x -= intervalWidth;
-  return x;
+inline T wrap(T lower, T value, T upper) {
+  T intervalWidth = upper - lower;
+  while (value < lower) value += intervalWidth;
+  while (value > upper) value -= intervalWidth;
+  return value;
 }
 
 /**

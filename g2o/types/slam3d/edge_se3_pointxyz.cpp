@@ -29,15 +29,11 @@
 #include "parameter_se3_offset.h"
 
 #ifdef G2O_HAVE_OPENGL
+#include "g2o/stuff/opengl_primitives.h"
 #include "g2o/stuff/opengl_wrapper.h"
 #endif
 
 #include <iostream>
-
-#ifdef G2O_HAVE_OPENGL
-#include "g2o/stuff/opengl_primitives.h"
-#include "g2o/stuff/opengl_wrapper.h"
-#endif
 
 namespace g2o {
 

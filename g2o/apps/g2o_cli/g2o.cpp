@@ -727,10 +727,5 @@ int main(int argc, char** argv) {
     cerr << "done." << endl;
   }
 
-  // destroy all the singletons
-  // Factory::destroy();
-  // OptimizationAlgorithmFactory::destroy();
-  // HyperGraphActionLibrary::destroy();
-
   return 0;
 }

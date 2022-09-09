@@ -74,15 +74,15 @@ class G2O_CORE_API OptimizationAlgorithmLevenberg
   // Levenberg parameters
   std::shared_ptr<Property<int>> maxTrialsAfterFailure_;
   std::shared_ptr<Property<number_t>> userLambdaInit_;
-  number_t currentLambda_;
-  number_t tau_;
-  number_t goodStepLowerScale_;  ///< lower bound for lambda decrease if a good
-                                 ///< LM step
-  number_t goodStepUpperScale_;  ///< upper bound for lambda decrease if a good
-                                 ///< LM step
-  number_t ni_;
-  int levenbergIterations_;  ///< the number of levenberg iterations performed to
-                             ///< accept the last step
+  number_t currentLambda_ = cst(-1.);
+  number_t tau_ = cst(1e-5);
+  number_t goodStepLowerScale_ = cst(1. / 3.);  ///< lower bound for lambda
+                                                ///< decrease if a good LM step
+  number_t goodStepUpperScale_ = cst(2. / 3.);  ///< upper bound for lambda
+                                                ///< decrease if a good LM step
+  number_t ni_ = cst(2.);
+  int levenbergIterations_ = 0;  ///< the number of Levenberg iterations
+                                 ///< performed to accept the last step
 
   /**
    * helper for Levenberg, this function computes the initial damping factor, if

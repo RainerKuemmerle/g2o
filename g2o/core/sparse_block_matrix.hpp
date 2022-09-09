@@ -97,7 +97,7 @@ SparseBlockMatrix<MatrixType>::block(int r, int c) const {
 template <class MatrixType>
 SparseBlockMatrix<MatrixType>* SparseBlockMatrix<MatrixType>::clone() const {
   auto* ret =
-      new SparseBlockMatrix(&rowBlockIndices_[0], &colBlockIndices_[0],
+      new SparseBlockMatrix(rowBlockIndices_.data(), colBlockIndices_.data(),
                             rowBlockIndices_.size(), colBlockIndices_.size());
   for (size_t i = 0; i < blockCols_.size(); ++i) {
     for (typename SparseBlockMatrix<MatrixType>::IntBlockMap::const_iterator
@@ -150,7 +150,7 @@ template <class MatrixTransposedType>
 std::unique_ptr<SparseBlockMatrix<MatrixTransposedType>>
 SparseBlockMatrix<MatrixType>::transposed() const {
   auto dest = g2o::make_unique<SparseBlockMatrix<MatrixTransposedType>>(
-      &colBlockIndices_[0], &rowBlockIndices_[0], colBlockIndices_.size(),
+      colBlockIndices_.data(), rowBlockIndices_.data(), colBlockIndices_.size(),
       rowBlockIndices_.size());
   transpose_internal(*dest);
   return dest;
@@ -190,7 +190,7 @@ template <class MatrixType>
 std::unique_ptr<SparseBlockMatrix<MatrixType>>
 SparseBlockMatrix<MatrixType>::added() const {
   auto a = g2o::make_unique<SparseBlockMatrix>(
-      &rowBlockIndices_[0], &colBlockIndices_[0], rowBlockIndices_.size(),
+      rowBlockIndices_.data(), colBlockIndices_.data(), rowBlockIndices_.size(),
       colBlockIndices_.size());
   add_internal(*a);
   return a;
@@ -208,7 +208,7 @@ bool SparseBlockMatrix<MatrixType>::multiply(
   }
   if (!dest) {
     dest = new SparseBlockMatrix<MatrixResultType>(
-        &rowBlockIndices_[0], &(M->colBlockIndices_[0]),
+        rowBlockIndices_.data(), M->colBlockIndices_.data(),
         rowBlockIndices_.size(), M->colBlockIndices_.size());
   }
   if (!dest->hasStorage_) return false;

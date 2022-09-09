@@ -146,9 +146,9 @@ void MarginalCovarianceCholesky::computeCovariance(
     SparseBlockMatrix<MatrixX>& spinv, const std::vector<int>& rowBlockIndices,
     const std::vector<std::pair<int, int> >& blockIndices) {
   // allocate the sparse
-  spinv = SparseBlockMatrix<MatrixX>(&rowBlockIndices[0], &rowBlockIndices[0],
-                                     rowBlockIndices.size(),
-                                     rowBlockIndices.size(), true);
+  spinv = SparseBlockMatrix<MatrixX>(
+      rowBlockIndices.data(), rowBlockIndices.data(), rowBlockIndices.size(),
+      rowBlockIndices.size(), true);
   map_.clear();
   std::vector<MatrixElem> elemsToCompute;
   for (const auto& blockIndice : blockIndices) {

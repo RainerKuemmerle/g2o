@@ -66,6 +66,7 @@ Checks: >
   -readability-named-parameter,
   -readability-redundant-declaration,
   -readability-function-cognitive-complexity,
+  -readability-identifier-length,
   -bugprone-easily-swappable-parameters,
   -bugprone-narrowing-conversions
 

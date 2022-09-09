@@ -64,12 +64,11 @@ class OpenMPMutex {
  public:
   OpenMPMutex() = default;
   ~OpenMPMutex() { assert(cnt_ == 0 && "Freeing locked mutex"); }
-  void lock() {
-    assert(++cnt_ == 1 && "Locking already locked mutex");  // NOLINT
+  void lock() {  // NOLINT
+    assert(++cnt_ == 1 && "Locking already locked mutex");
   }
-  void unlock() {
-    assert(--cnt_ == 0 &&  // NOLINT
-           "Trying to unlock a mutex which is not locked");
+  void unlock() { // NOLINT
+    assert(--cnt_ == 0 && "Trying to unlock a mutex which is not locked");
   }
 
  protected:

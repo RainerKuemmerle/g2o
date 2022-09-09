@@ -85,7 +85,7 @@ void testMarginals(SparseOptimizer& optimizer) {
         mean.fill(0);
         VectorX oldMean(
             v->minimalEstimateDimension());  // HACK: need to set identity
-        v->getMinimalEstimateData(&oldMean[0]);
+        v->getMinimalEstimateData(oldMean.data());
         MatrixX& cov = *(spinv.block(v->hessianIndex(), v->hessianIndex()));
         std::vector<MySigmaPoint, Eigen::aligned_allocator<MySigmaPoint> > spts;
         cerr << cov << endl;
@@ -99,12 +99,12 @@ void testMarginals(SparseOptimizer& optimizer) {
         for (size_t j = 0; j < spts.size(); j++) {
           v->push();
           // cerr << "v_before [" << j << "]" << endl;
-          v->getMinimalEstimateData(&mean[0]);
+          v->getMinimalEstimateData(mean.data());
           // cerr << mean << endl;
           // cerr << "sigma [" << j << "]" << endl;
           // cerr << spts[j]._sample << endl;
-          v->oplus(&(spts[j]._sample[0]));
-          v->getMinimalEstimateData(&mean[0]);
+          v->oplus(spts[j]._sample.data());
+          v->getMinimalEstimateData(mean.data());
           tspts[j]._sample = mean;
           // cerr << "oplus [" << j << "]" << endl;
           // cerr << tspts[j]._sample << endl;

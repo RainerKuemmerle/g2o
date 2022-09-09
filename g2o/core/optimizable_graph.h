@@ -183,8 +183,9 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
      */
     bool setEstimateData(const std::vector<number_t>& estimate) {
       int dim = estimateDimension();
-      if ((dim == -1) || (estimate.size() != std::size_t(dim))) return false;
-      return setEstimateData(&estimate[0]);
+      if ((dim == -1) || (estimate.size() != static_cast<std::size_t>(dim)))
+        return false;
+      return setEstimateData(estimate.data());
     };
 
     /**
@@ -206,18 +207,18 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
     virtual bool getEstimateData(number_t* estimate) const;
 
     /**
-     * writes the estimater to an array of number_t
+     * writes the estimate to an array of number_t
      * @returns true on success
      */
     virtual bool getEstimateData(std::vector<number_t>& estimate) const {
       int dim = estimateDimension();
       if (dim < 0) return false;
       estimate.resize(dim);
-      return getEstimateData(&estimate[0]);
+      return getEstimateData(estimate.data());
     };
 
     /**
-     * writes the estimater to an array of number_t
+     * writes the estimate to an array of number_t
      * @returns true on success
      */
     template <typename Derived>
@@ -258,8 +259,8 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
      */
     bool setMinimalEstimateData(const std::vector<number_t>& estimate) {
       int dim = minimalEstimateDimension();
-      if ((dim == -1) || (estimate.size() != std::size_t(dim))) return false;
-      return setMinimalEstimateData(&estimate[0]);
+      if ((dim == -1) || (estimate.size() != static_cast<std::size_t>(dim))) return false;
+      return setMinimalEstimateData(estimate.data());
     };
 
     /**
@@ -288,7 +289,7 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
       int dim = minimalEstimateDimension();
       if (dim < 0) return false;
       estimate.resize(dim);
-      return getMinimalEstimateData(&estimate[0]);
+      return getMinimalEstimateData(estimate.data());
     };
 
     /**

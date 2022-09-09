@@ -23,9 +23,10 @@ void free_aligned(Type* block) {
 
 template <typename Type>
 struct DynamicAlignedBuffer {
-  explicit DynamicAlignedBuffer(size_t size) : size_{0}, ptr_{nullptr} {
-    allocate(size);
-  }
+  explicit DynamicAlignedBuffer(size_t size) { allocate(size); }
+
+  DynamicAlignedBuffer(DynamicAlignedBuffer const&) = delete;
+  DynamicAlignedBuffer  & operator=(DynamicAlignedBuffer const&) = delete;
 
   ~DynamicAlignedBuffer() { free(); }
 
@@ -52,8 +53,8 @@ struct DynamicAlignedBuffer {
     }
   }
 
-  std::size_t size_;
-  Type* ptr_;
+  std::size_t size_ = 0;
+  Type* ptr_ = nullptr;
 };
 
 template <typename T>
