@@ -122,9 +122,8 @@ class BaseEdge : public OptimizableGraph::Edge {
 
   void initialEstimate(const OptimizableGraph::VertexSet&,
                        OptimizableGraph::Vertex*) override {
-    std::cerr << "inititialEstimate() is not implemented, please give "
-                 "implementation in your "
-                 "derived class"
+    std::cerr << "initialEstimate() is not implemented, please give "
+                 "implementation in your derived class"
               << std::endl;
   }
 

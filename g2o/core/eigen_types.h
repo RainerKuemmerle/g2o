@@ -49,6 +49,7 @@ using VectorN = Eigen::Matrix<T, N, 1, Eigen::ColMajor>;
 using Vector2 = VectorN<2>;
 using Vector3 = VectorN<3>;
 using Vector4 = VectorN<4>;
+using Vector5 = VectorN<5>;
 using Vector6 = VectorN<6>;
 using Vector7 = VectorN<7>;
 using VectorX = VectorN<Eigen::Dynamic>;
