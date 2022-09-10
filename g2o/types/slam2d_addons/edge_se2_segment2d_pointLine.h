@@ -41,13 +41,13 @@ class G2O_TYPES_SLAM2D_ADDONS_API EdgeSE2Segment2DPointLine
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   number_t theta() const { return measurement_[2]; }
   Vector2 point() const {
-    Eigen::Map<const Vector2> p(&measurement_[0]);
+    Eigen::Map<const Vector2> p(measurement_.data());
     return p;
   }
 
   void setTheta(number_t t) { measurement_[2] = t; }
   void setPoint(const Vector2& p_) {
-    Eigen::Map<Vector2> p(&measurement_[0]);
+    Eigen::Map<Vector2> p(measurement_.data());
     p = p_;
   }
 
@@ -65,7 +65,7 @@ class G2O_TYPES_SLAM2D_ADDONS_API EdgeSE2Segment2DPointLine
     normal.normalize();
     Vector3 prediction;
     prediction[2] = std::atan2(normal.y(), normal.x());
-    Eigen::Map<Vector2> pt(&prediction[0]);
+    Eigen::Map<Vector2> pt(prediction.data());
     pt = (pointNum_ == 0) ? predP1 : predP2;
     error_ = prediction - measurement_;
     error_[2] = normalize_theta(error_[2]);
@@ -96,7 +96,7 @@ class G2O_TYPES_SLAM2D_ADDONS_API EdgeSE2Segment2DPointLine
     normal.normalize();
     Vector3 prediction;
     prediction[2] = std::atan2(normal.y(), normal.x());
-    Eigen::Map<Vector2> pt(&prediction[0]);
+    Eigen::Map<Vector2> pt(prediction.data());
     pt = (pointNum_ == 0) ? predP1 : predP2;
     setMeasurement(prediction);
     return true;
@@ -112,26 +112,6 @@ class G2O_TYPES_SLAM2D_ADDONS_API EdgeSE2Segment2DPointLine
   /*       virtual void linearizeOplus(); */
   /* #endif */
 };
-
-/*   class G2O_TYPES_SLAM2D_ADDONS_API
- * EdgeSE2Segment2DPointLineWriteGnuplotAction: public WriteGnuplotAction { */
-/*   public: */
-/*     EdgeSE2Segment2DPointLineWriteGnuplotAction(); */
-/*     virtual HyperGraphElementAction*
- * operator()(HyperGraph::HyperGraphElement* element,  */
-/*             HyperGraphElementAction::Parameters* params_); */
-/*   }; */
-
-/* #ifdef G2O_HAVE_OPENGL */
-/*   class G2O_TYPES_SLAM2D_ADDONS_API EdgeSE2Segment2DPointLineDrawAction:
- * public DrawAction{ */
-/*   public: */
-/*     EdgeSE2Segment2DPointLineDrawAction(); */
-/*     virtual HyperGraphElementAction*
- * operator()(HyperGraph::HyperGraphElement* element,  */
-/*             HyperGraphElementAction::Parameters* params_); */
-/*   }; */
-/* #endif */
 
 }  // namespace g2o
 

@@ -113,7 +113,7 @@ bool LinearSolverPCG<MatrixType>::solve(const SparseBlockMatrix<MatrixType>& A,
 
   int n = A.rows();
   assert(n > 0 && "Hessian has 0 rows/cols");
-  Eigen::Map<VectorX> xvec(x, A.cols());
+  VectorX::MapType xvec(x, A.cols());
   const VectorX::ConstMapType bvec(b, n);
   xvec.setZero();
 

@@ -19,6 +19,8 @@
 
 #include <camd.h>
 
+#include <cstddef>
+
 #include "g2o/solvers/cholmod/linear_solver_cholmod.h"
 #include "g2o_incremental_api.h"
 
@@ -29,7 +31,7 @@ namespace g2o {
  */
 class G2O_INCREMENTAL_API LinearSolverCholmodOnlineInterface {
  public:
-  LinearSolverCholmodOnlineInterface() {}
+  LinearSolverCholmodOnlineInterface() = default;
   virtual int choleskyUpdate(cholmod_sparse* update) = 0;
   virtual bool solve(double* x, double* b) = 0;
   virtual cholmod_factor* L() const = 0;
@@ -95,8 +97,9 @@ class LinearSolverCholmodOnline : public LinearSolver<MatrixType>,
                    "loadable by Octave)"
                 << std::endl;
       writeCCSMatrix("debug.txt", cholmodSparse_->nrow, cholmodSparse_->ncol,
-                     (int*)cholmodSparse_->p, (int*)cholmodSparse_->i,
-                     (double*)cholmodSparse_->x, true);
+                     reinterpret_cast<int*>(cholmodSparse_->p),
+                     reinterpret_cast<int*>(cholmodSparse_->i),
+                     reinterpret_cast<double*>(cholmodSparse_->x), true);
       return false;
     }
 
@@ -125,7 +128,7 @@ class LinearSolverCholmodOnline : public LinearSolver<MatrixType>,
    */
   size_t nonZerosInL() const override {
     size_t nnz = 0;
-    int* nz = (int*)cholmodFactor_->nz;
+    int* nz = reinterpret_cast<int*>(cholmodFactor_->nz);
     if (!nz) return 0;
     for (size_t i = 0; i < cholmodFactor_->n; ++i) nnz += nz[i];
     return nnz;
@@ -139,8 +142,9 @@ class LinearSolverCholmodOnline : public LinearSolver<MatrixType>,
           << "Cholesky failure, writing debug.txt (Hessian loadable by Octave)"
           << std::endl;
       writeCCSMatrix("debug.txt", cholmodSparse_->nrow, cholmodSparse_->ncol,
-                     (int*)cholmodSparse_->p, (int*)cholmodSparse_->i,
-                     (double*)cholmodSparse_->x, true);
+                     reinterpret_cast<int*>(cholmodSparse_->p),
+                     reinterpret_cast<int*>(cholmodSparse_->i),
+                     reinterpret_cast<double*>(cholmodSparse_->x), true);
       return 0;
     }
     return result;
@@ -178,11 +182,13 @@ class LinearSolverCholmodOnline : public LinearSolver<MatrixType>,
 
     A.fillBlockStructure(matrixStructure_);
 
-    // get the ordering for the block matrix
-    if (blockPermutation_.size() <
-        matrixStructure_.n)  // double space if resizing
-      blockPermutation_.resize(2 * matrixStructure_.n);
+    // double space if resizing
+    if (blockPermutation_.size() < matrixStructure_.n) {
+      blockPermutation_.resize(static_cast<Eigen::Index>(2) *
+                               matrixStructure_.n);
+    }
 
+    // get the ordering for the block matrix
     int amdStatus = camd_order(matrixStructure_.n, matrixStructure_.Ap,
                                matrixStructure_.Aii, blockPermutation_.data(),
                                nullptr, nullptr, cmember->data());
@@ -194,7 +200,7 @@ class LinearSolverCholmodOnline : public LinearSolver<MatrixType>,
     // additional blocks
     if (scalarPermutation_.size() == 0)
       scalarPermutation_.resize(cholmodSparse_->ncol);
-    if (scalarPermutation_.size() < (int)cholmodSparse_->ncol)
+    if (scalarPermutation_.size() < static_cast<int>(cholmodSparse_->ncol))
       scalarPermutation_.resize(2 * cholmodSparse_->ncol);
     size_t scalarIdx = 0;
     for (int i = 0; i < matrixStructure_.n; ++i) {
@@ -236,7 +242,7 @@ class LinearSolverCholmodOnline : public LinearSolver<MatrixType>,
           cholmodSparse_->columnsAllocated == 0
               ? n
               : 2 * n;  // pre-allocate more space if re-allocating
-      delete[](int*) cholmodSparse_->p;
+      delete[] reinterpret_cast<int*>(cholmodSparse_->p);
       cholmodSparse_->p = new int[cholmodSparse_->columnsAllocated + 1];
     }
     if (!onlyValues) {
@@ -248,8 +254,8 @@ class LinearSolverCholmodOnline : public LinearSolver<MatrixType>,
             cholmodSparse_->nzmax == 0
                 ? nzmax
                 : 2 * nzmax;  // pre-allocate more space if re-allocating
-        delete[](double*) cholmodSparse_->x;
-        delete[](int*) cholmodSparse_->i;
+        delete[] reinterpret_cast<double*>(cholmodSparse_->x);
+        delete[] reinterpret_cast<int*>(cholmodSparse_->i);
         cholmodSparse_->i = new int[cholmodSparse_->nzmax];
         cholmodSparse_->x = new double[cholmodSparse_->nzmax];
       }
@@ -259,14 +265,15 @@ class LinearSolverCholmodOnline : public LinearSolver<MatrixType>,
 
     int nz = 0;
     if (onlyValues)
-      nz = A.fillCCS((double*)cholmodSparse_->x, true);
+      nz = A.fillCCS(reinterpret_cast<double*>(cholmodSparse_->x), true);
     else
-      nz = A.fillCCS((int*)cholmodSparse_->p, (int*)cholmodSparse_->i,
-                     (double*)cholmodSparse_->x, true);
+      nz = A.fillCCS(reinterpret_cast<int*>(cholmodSparse_->p),
+                     reinterpret_cast<int*>(cholmodSparse_->i),
+                     reinterpret_cast<double*>(cholmodSparse_->x), true);
 
-    int* cp = (int*)cholmodSparse_->p;
-    int* ci = (int*)cholmodSparse_->i;
-    auto* cx = (double*)cholmodSparse_->x;
+    int* cp = reinterpret_cast<int*>(cholmodSparse_->p);
+    int* ci = reinterpret_cast<int*>(cholmodSparse_->i);
+    auto* cx = reinterpret_cast<double*>(cholmodSparse_->x);
 
     cp = &cp[origN];
     ci = &ci[nz];

@@ -167,8 +167,7 @@ struct Robot : public WorldItem {
 using RobotVector = std::vector<Robot*>;
 
 struct Simulator : public SimulatorItem {
-  explicit Simulator(OptimizableGraph* graph_)
-      : SimulatorItem(graph_), lastVertexId(0) {}
+  explicit Simulator(OptimizableGraph* graph_) : SimulatorItem(graph_) {}
   void sense(int robotIndex) {
     Robot* r = robots[robotIndex];
     for (auto* item : world) {
@@ -186,7 +185,7 @@ struct Simulator : public SimulatorItem {
     r->relativeMove(delta, lastVertexId);
   }
 
-  int lastVertexId;
+  int lastVertexId = 0;
   WorldItemSet world;
   RobotVector robots;
 };

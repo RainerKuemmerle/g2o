@@ -166,14 +166,14 @@ class EdgeObservationBAL
 
     // Rodrigues' formula for the rotation
     T theta = camera.template head<3>().norm();
-    if (theta > T(0)) {
+    if (theta > T{0}) {
       g2o::VectorN<3, T> v = camera.template head<3>() / theta;
       T cth = cos(theta);
       T sth = sin(theta);
 
       g2o::VectorN<3, T> vXp = v.cross(point);
       T vDotp = v.dot(point);
-      T oneMinusCth = T(1) - cth;
+      T oneMinusCth = T{1} - cth;
 
       p = point * cth + vXp * sth + v * vDotp * oneMinusCth;
     } else {
@@ -192,7 +192,7 @@ class EdgeObservationBAL
     const T& f = camera(6);
     const T& k1 = camera(7);
     const T& k2 = camera(8);
-    T r_p = T(1) + k1 * radiusSqr + k2 * radiusSqr * radiusSqr;
+    T r_p = T{1} + k1 * radiusSqr + k2 * radiusSqr * radiusSqr;
     g2o::VectorN<2, T> prediction = f * r_p * projectedPoint;
 
     // compute the error

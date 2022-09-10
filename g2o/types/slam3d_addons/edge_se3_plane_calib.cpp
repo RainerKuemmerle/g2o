@@ -98,15 +98,16 @@ bool EdgeSE3PlaneSensorCalibDrawAction::operator()(
     number_t azimuth = Plane3D::azimuth(that->measurement().normal());
     number_t elevation = Plane3D::elevation(that->measurement().normal());
 
-    glColor3f(float(that->color(0)), float(that->color(1)),
-              float(that->color(2)));
+    glColor3f(static_cast<float>(that->color(0)),
+              static_cast<float>(that->color(1)),
+              static_cast<float>(that->color(2)));
     glPushMatrix();
     Isometry3 robotAndSensor = robot->estimate() * sensor->estimate();
     glMultMatrixd(robotAndSensor.matrix().cast<double>().eval().data());
 
-    glRotatef(float(RAD2DEG(azimuth)), 0.F, 0.F, 1.F);
-    glRotatef(float(RAD2DEG(elevation)), 0.F, -1.F, 0.F);
-    glTranslatef(float(d), 0.F, 0.F);
+    glRotatef(static_cast<float>(RAD2DEG(azimuth)), 0.F, 0.F, 1.F);
+    glRotatef(static_cast<float>(RAD2DEG(elevation)), 0.F, -1.F, 0.F);
+    glTranslatef(static_cast<float>(d), 0.F, 0.F);
 
     float planeWidth = planeWidth_->value();
     float planeHeight = planeHeight_->value();

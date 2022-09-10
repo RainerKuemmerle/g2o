@@ -29,7 +29,6 @@
 #include "g2o/core/optimization_algorithm_levenberg.h"
 #include "g2o/core/sparse_optimizer.h"
 #include "g2o/solvers/eigen/linear_solver_eigen.h"
-using namespace std;
 
 using SlamBlockSolver = g2o::BlockSolver<g2o::BlockSolverTraits<-1, -1> >;
 using SlamLinearSolver =
@@ -37,18 +36,16 @@ using SlamLinearSolver =
 
 MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) { setupUi(this); }
 
-MainWindow::~MainWindow() {}
-
 void MainWindow::on_actionLoad_triggered(bool) {
   viewer->graph->clear();
   QString filename = QFileDialog::getOpenFileName(
       this, "Load g2o file", "", "g2o files (*.g2o);;All Files (*)");
   if (!filename.isNull()) {
-    ifstream ifs(filename.toStdString().c_str());
+    std::ifstream ifs(filename.toStdString().c_str());
     viewer->graph->load(ifs);
-    cerr << "Graph loaded with " << viewer->graph->vertices().size()
-         << " vertices and " << viewer->graph->edges().size() << " Measurements"
-         << endl;
+    std::cerr << "Graph loaded with " << viewer->graph->vertices().size()
+              << " vertices and " << viewer->graph->edges().size()
+              << " Measurements" << std::endl;
   }
   viewer->update();
   fixGraph();
@@ -58,48 +55,43 @@ void MainWindow::on_actionSave_triggered(bool) {
   QString filename = QFileDialog::getSaveFileName(this, "Save g2o file", "",
                                                   "g2o files (*.g2o)");
   if (!filename.isNull()) {
-    ofstream fout(filename.toStdString().c_str());
+    std::ofstream fout(filename.toStdString().c_str());
     viewer->graph->save(fout);
     if (fout.good())
-      cerr << "Saved " << filename.toStdString() << endl;
+      std::cerr << "Saved " << filename.toStdString() << std::endl;
     else
-      cerr << "Error while saving file" << endl;
+      std::cerr << "Error while saving file" << std::endl;
   }
 }
 
 void MainWindow::on_actionQuit_triggered(bool) { close(); }
 
 void MainWindow::on_btnOptimize_clicked() {
-  if (viewer->graph->vertices().size() == 0 ||
-      viewer->graph->edges().size() == 0) {
-    cerr << "Graph has no vertices / edges" << endl;
+  if (viewer->graph->vertices().empty() || viewer->graph->edges().empty()) {
+    std::cerr << "Graph has no vertices / edges" << std::endl;
     return;
   }
 
   viewer->graph->initializeOptimization();
 
-  if (rbGauss->isChecked()) {
-    if (!dynamic_cast<g2o::OptimizationAlgorithmGaussNewton*>(
-            viewer->graph->solver().get()))
-      viewer->graph->setAlgorithm(createGaussNewton());
-  } else if (rbLevenberg->isChecked()) {
-    if (!dynamic_cast<g2o::OptimizationAlgorithmLevenberg*>(
-            viewer->graph->solver().get()))
+  if (rbLevenberg->isChecked()) {
+    if (dynamic_cast<g2o::OptimizationAlgorithmLevenberg*>(
+            viewer->graph->solver().get()) == nullptr)
       viewer->graph->setAlgorithm(createLevenberg());
   } else {
-    if (!dynamic_cast<g2o::OptimizationAlgorithmGaussNewton*>(
-            viewer->graph->solver().get()))
+    if (dynamic_cast<g2o::OptimizationAlgorithmGaussNewton*>(
+            viewer->graph->solver().get()) == nullptr)
       viewer->graph->setAlgorithm(createGaussNewton());
   }
 
   int maxIterations = spIterations->value();
   int iter = viewer->graph->optimize(maxIterations);
   if (maxIterations > 0 && !iter) {
-    cerr << "Optimization failed, result might be invalid" << endl;
+    std::cerr << "Optimization failed, result might be invalid" << std::endl;
   }
 
   if (cbCovariances->isChecked()) {
-    // TODO implementation of covariance estimates
+    // TODO(Rainer): implementation of covariance estimates
     // viewer->graph->solver()->computeMarginals();
   }
   viewer->drawCovariance = cbCovariances->isChecked();
@@ -114,8 +106,7 @@ void MainWindow::on_btnInitialGuess_clicked() {
 }
 
 void MainWindow::fixGraph() {
-  if (viewer->graph->vertices().size() == 0 ||
-      viewer->graph->edges().size() == 0) {
+  if (viewer->graph->vertices().empty() || viewer->graph->edges().empty()) {
     return;
   }
 
@@ -124,14 +115,13 @@ void MainWindow::fixGraph() {
   auto gauge = viewer->graph->findGauge();
   if (gaugeFreedom) {
     if (!gauge) {
-      cerr << "cannot find a vertex to fix in this thing" << endl;
+      std::cerr << "cannot find a vertex to fix in this thing" << std::endl;
       return;
-    } else {
-      cerr << "graph is fixed by node " << gauge->id() << endl;
-      gauge->setFixed(true);
     }
+    std::cerr << "graph is fixed by node " << gauge->id() << std::endl;
+    gauge->setFixed(true);
   } else {
-    cerr << "graph is fixed by priors" << endl;
+    std::cerr << "graph is fixed by priors" << std::endl;
   }
 
   viewer->graph->setVerbose(true);

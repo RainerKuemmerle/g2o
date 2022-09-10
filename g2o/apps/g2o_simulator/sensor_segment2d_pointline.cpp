@@ -32,8 +32,7 @@ namespace g2o {
 
 SensorSegment2DPointLine::SensorSegment2DPointLine(const std::string& name)
     : BinarySensor<Robot2D, EdgeSE2Segment2DPointLine, WorldObjectSegment2D>(
-          name),
-      visiblePoint_(0) {}
+          name) {}
 
 void SensorSegment2DPointLine::addNoise(EdgeType* e) {
   EdgeType::ErrorVector n = sampler_.generateSample();

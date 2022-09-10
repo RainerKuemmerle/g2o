@@ -81,12 +81,13 @@ bool VertexPlaneDrawAction::operator()(
     number_t d = that->estimate().distance();
     number_t azimuth = Plane3D::azimuth(that->estimate().normal());
     number_t elevation = Plane3D::elevation(that->estimate().normal());
-    glColor3f(float(that->color(0)), float(that->color(1)),
-              float(that->color(2)));
+    glColor3f(static_cast<float>(that->color(0)),
+              static_cast<float>(that->color(1)),
+              static_cast<float>(that->color(2)));
     glPushMatrix();
-    glRotatef(float(RAD2DEG(azimuth)), 0.F, 0.F, 1.F);
-    glRotatef(float(RAD2DEG(elevation)), 0.F, -1.F, 0.F);
-    glTranslatef(float(d), 0.F, 0.F);
+    glRotatef(static_cast<float>(RAD2DEG(azimuth)), 0.F, 0.F, 1.F);
+    glRotatef(static_cast<float>(RAD2DEG(elevation)), 0.F, -1.F, 0.F);
+    glTranslatef(static_cast<float>(d), 0.F, 0.F);
 
     glBegin(GL_QUADS);
     glNormal3f(-1.F, 0.F, 0.F);

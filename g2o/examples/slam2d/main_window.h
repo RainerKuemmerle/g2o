@@ -29,11 +29,14 @@ class OptimizationAlgorithm;
 class MainWindow : public QMainWindow, public Ui::BaseMainWindow {
   Q_OBJECT
  public:
-  MainWindow(QWidget* parent = 0);
-  ~MainWindow();
+  explicit MainWindow(QWidget* parent = nullptr);
+  ~MainWindow() override = default;
 
   static std::unique_ptr<g2o::OptimizationAlgorithm> createGaussNewton();
   static std::unique_ptr<g2o::OptimizationAlgorithm> createLevenberg();
+
+ protected:
+  void fixGraph();
 
  public slots:
   void on_actionLoad_triggered(bool);
@@ -41,9 +44,6 @@ class MainWindow : public QMainWindow, public Ui::BaseMainWindow {
   void on_actionQuit_triggered(bool);
   void on_btnOptimize_clicked();
   void on_btnInitialGuess_clicked();
-
- protected:
-  void fixGraph();
 };
 
 #endif

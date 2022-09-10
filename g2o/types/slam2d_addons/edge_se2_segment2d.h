@@ -45,13 +45,13 @@ class EdgeSE2Segment2D
 
       G2O_TYPES_SLAM2D_ADDONS_API Vector2
       measurementP1() {
-    return Eigen::Map<const Vector2>(&(measurement_[0]));
+    return Eigen::Map<const Vector2>(measurement_.data());
   }
   G2O_TYPES_SLAM2D_ADDONS_API Vector2 measurementP2() {
     return Eigen::Map<const Vector2>(&(measurement_[2]));
   }
   G2O_TYPES_SLAM2D_ADDONS_API void setMeasurementP1(const Vector2& p1) {
-    Eigen::Map<Vector2> v(&measurement_[0]);
+    Eigen::Map<Vector2> v(measurement_.data());
     v = p1;
   }
   G2O_TYPES_SLAM2D_ADDONS_API void setMeasurementP2(const Vector2& p2) {

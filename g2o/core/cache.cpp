@@ -66,7 +66,7 @@ void Cache::update() {
 }
 
 CacheContainer::CacheContainer(const OptimizableGraph::Vertex& vertex)
-    : vertex_{vertex}, updateNeeded_{true} {}
+    : vertex_{vertex} {}
 
 std::shared_ptr<Cache> CacheContainer::findCache(const Cache::CacheKey& key) {
   auto it = find(key);

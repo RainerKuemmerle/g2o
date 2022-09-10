@@ -81,8 +81,8 @@ class EdgePointOnCurve
     const T& a = params[0];
     const T& b = params[1];
     const T& lambda = params[2];
-    T fval = a * exp(-lambda * T(measurement()(0))) + b;
-    error[0] = fval - measurement()(1);
+    T fval = a * exp(-lambda * T{measurement()(0)}) + b;
+    error[0] = fval - T{measurement()(1)};
     return true;
   }
 

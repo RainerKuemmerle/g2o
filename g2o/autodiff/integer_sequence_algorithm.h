@@ -90,7 +90,7 @@ struct SumImpl<std::integer_sequence<T, N>> {
 // No number is left. 'Value' is the identity element (for sum this is zero).
 template <typename T>
 struct SumImpl<std::integer_sequence<T>> {
-  static constexpr T kValue = T(0);
+  static constexpr T kValue = T{0};
 };
 
 // Calculate the sum of an integer sequence. The resulting sum will be stored in
@@ -154,7 +154,7 @@ class ExclusiveScanT {
 
  public:
   using Type =
-      typename ExclusiveScanImpl<T, T(0), Seq, std::integer_sequence<T>>::Type;
+      typename ExclusiveScanImpl<T, T{0}, Seq, std::integer_sequence<T>>::Type;
 };
 
 // Helper to use exclusive scan without typename.

@@ -18,12 +18,11 @@
 
 #include <QApplication>
 #include <iostream>
+#include <memory>
 
 #include "g2o/core/factory.h"
 #include "g2o/core/sparse_optimizer.h"
 #include "main_window.h"
-using namespace std;
-using namespace g2o;
 
 G2O_USE_TYPE_GROUP(slam2d);
 
@@ -31,10 +30,8 @@ int main(int argc, char** argv) {
   QApplication qapp(argc, argv);
 
   MainWindow mw;
+  mw.viewer->graph = std::make_unique<g2o::SparseOptimizer>();
+  mw.viewer->graph->setAlgorithm(MainWindow::createGaussNewton());
   mw.show();
-
-  mw.viewer->graph = new SparseOptimizer();
-
-  mw.viewer->graph->setAlgorithm(mw.createGaussNewton());
-  return qapp.exec();
+  return QApplication::exec();
 }

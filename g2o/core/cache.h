@@ -92,7 +92,7 @@ class G2O_CORE_API CacheContainer
  protected:
   std::shared_ptr<Cache> createCache(const Cache::CacheKey& key);
   const OptimizableGraph::Vertex& vertex_;
-  bool updateNeeded_;
+  bool updateNeeded_ = true;
 };
 
 template <typename CacheType>

@@ -19,6 +19,8 @@
 #ifndef SLAM2D_VIEWER_H
 #define SLAM2D_VIEWER_H
 
+#include <memory>
+
 #include "qglviewer.h"
 
 namespace g2o {
@@ -27,14 +29,14 @@ class SparseOptimizer;
 
 class Slam2DViewer : public QGLViewer {
  public:
-  Slam2DViewer(QWidget* parent = NULL, const QGLWidget* shareWidget = 0);
-  ~Slam2DViewer();
-  virtual void draw();
-  void init();
+  explicit Slam2DViewer(QWidget* parent = nullptr,
+                        const QGLWidget* shareWidget = nullptr);
+  ~Slam2DViewer() override = default;
+  void draw() override;
+  void init() override;
 
- public:
-  SparseOptimizer* graph;
-  bool drawCovariance;
+  std::unique_ptr<SparseOptimizer> graph;
+  bool drawCovariance = false;
 };
 
 }  // namespace g2o

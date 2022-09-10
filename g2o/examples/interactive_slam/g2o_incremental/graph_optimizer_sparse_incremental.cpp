@@ -20,10 +20,8 @@
 #include "g2o/core/optimization_algorithm_gauss_newton.h"
 #include "g2o/examples/interactive_slam/g2o_interactive/types_slam2d_online.h"
 #include "g2o/examples/interactive_slam/g2o_interactive/types_slam3d_online.h"
+#include "g2o/examples/target/targetTypes6D.hpp"
 #include "g2o/stuff/macros.h"
-
-using namespace std;
-using namespace Eigen;
 
 namespace g2o {
 
@@ -95,8 +93,8 @@ int SparseOptimizerIncremental::optimize(int iterations, bool online) {
     if (!online) {
       ok = underlyingSolver_->buildStructure();
       if (!ok) {
-        cerr << __PRETTY_FUNCTION__ << ": Failure while building CCS structure"
-             << endl;
+        std::cerr << __PRETTY_FUNCTION__
+                  << ": Failure while building CCS structure" << std::endl;
         return 0;
       }
     }
@@ -121,7 +119,7 @@ int SparseOptimizerIncremental::optimize(int iterations, bool online) {
     // mark vertices to be sorted as last
     int numBlocksRequired = ivMap_.size();
     if (cmember_.size() < numBlocksRequired) {
-      cmember_.resize(2 * numBlocksRequired);
+      cmember_.resize(static_cast<Eigen::Index>(2) * numBlocksRequired);
     }
     memset(cmember_.data(), 0, numBlocksRequired * sizeof(int));
     if (ivMap_.size() > 100) {
@@ -163,9 +161,9 @@ int SparseOptimizerIncremental::optimize(int iterations, bool online) {
 
   if (verbose()) {
     computeActiveErrors();
-    cerr << "nodes = " << vertices().size()
-         << "\t edges= " << activeEdges_.size()
-         << "\t chi2= " << FIXED(activeChi2()) << endl;
+    std::cerr << "nodes = " << vertices().size()
+              << "\t edges= " << activeEdges_.size()
+              << "\t chi2= " << FIXED(activeChi2()) << std::endl;
   }
 
   if (vizWithGnuplot) gnuplotVisualization();
@@ -242,11 +240,9 @@ bool SparseOptimizerIncremental::updateInitialization(
     backupIdx[idx].hessianData = v->hessianData();
     ++idx;
   }
-  sort(backupIdx,
-       backupIdx +
-           touchedVertices_
-               .size());  // sort according to the hessianIndex which is the
-                          // same order as used later by the optimizer
+  // sort according to the hessianIndex which is the same order as used later by
+  // the optimizer
+  std::sort(backupIdx, backupIdx + touchedVertices_.size());
   for (int i = 0; i < idx; ++i) {
     backupIdx[i].vertex->setHessianIndex(i);
   }
@@ -259,7 +255,7 @@ bool SparseOptimizerIncremental::updateInitialization(
   updateMat_.blockCols().clear();
 
   // placing the current stuff in _updateMat
-  MatrixXd* lastBlock = nullptr;
+  MatrixX* lastBlock = nullptr;
   int sizePoses = 0;
   for (int i = 0; i < idx; ++i) {
     OptimizableGraph::Vertex* v = backupIdx[i].vertex;
@@ -271,7 +267,7 @@ bool SparseOptimizerIncremental::updateInitialization(
     int ind = v->hessianIndex();
     // cerr << PVAR(ind) << endl;
     if (ind >= 0) {
-      MatrixXd* m = updateMat_.block(ind, ind, true);
+      MatrixX* m = updateMat_.block(ind, ind, true);
       v->mapHessianMemory(m->data());
       lastBlock = m;
     }
@@ -280,8 +276,8 @@ bool SparseOptimizerIncremental::updateInitialization(
 
   for (const auto& it : eset) {
     auto* e = static_cast<OptimizableGraph::Edge*>(it.get());
-    auto* v1 = (OptimizableGraph::Vertex*)e->vertices()[0].get();
-    auto* v2 = (OptimizableGraph::Vertex*)e->vertices()[1].get();
+    auto* v1 = static_cast<OptimizableGraph::Vertex*>(e->vertices()[0].get());
+    auto* v2 = static_cast<OptimizableGraph::Vertex*>(e->vertices()[1].get());
 
     int ind1 = v1->hessianIndex();
     if (ind1 == -1) continue;
@@ -289,9 +285,9 @@ bool SparseOptimizerIncremental::updateInitialization(
     if (ind2 == -1) continue;
     bool transposedBlock = ind1 > ind2;
     if (transposedBlock)  // make sure, we allocate the upper triangular block
-      swap(ind1, ind2);
+      std::swap(ind1, ind2);
 
-    MatrixXd* m = updateMat_.block(ind1, ind2, true);
+    Eigen::MatrixXd* m = updateMat_.block(ind1, ind2, true);
     e->mapHessianMemory(m->data(), 0, 1, transposedBlock);
   }
 
@@ -318,7 +314,7 @@ bool SparseOptimizerIncremental::updateInitialization(
 
   bool updateStatus = computeCholeskyUpdate();
   if (!updateStatus) {
-    cerr << "Error while computing update" << endl;
+    std::cerr << "Error while computing update" << std::endl;
   }
 
   cholmod_sparse* updateAsSparseFactor =
@@ -357,7 +353,7 @@ bool SparseOptimizerIncremental::updateInitialization(
         int row = perm_(rbase + roff);
         int col = ccol;
         if (col > row)  // lower triangular entry
-          swap(col, row);
+          std::swap(col, row);
         Bi[permutedUpdate_->nnz] = row;
         Bj[permutedUpdate_->nnz] = col;
         Bx[permutedUpdate_->nnz] = val;
@@ -389,7 +385,7 @@ bool SparseOptimizerIncremental::computeCholeskyUpdate() {
     cholmodFactor_ = nullptr;
   }
 
-  const SparseBlockMatrix<MatrixXd>& A = updateMat_;
+  const SparseBlockMatrix<MatrixX>& A = updateMat_;
   size_t m = A.rows();
   size_t n = A.cols();
 
@@ -447,11 +443,7 @@ bool SparseOptimizerIncremental::computeCholeskyUpdate() {
   // change to the specific format we need to have a pretty normal L
   int change_status = cholmod_change_factor(CHOLMOD_REAL, 1, 0, 1, 1,
                                             cholmodFactor_, &cholmodCommon_);
-  if (!change_status) {
-    return false;
-  }
-
-  return true;
+  return change_status != 0;
 }
 
 static std::unique_ptr<OptimizationAlgorithm> createSolver(
@@ -481,7 +473,7 @@ bool SparseOptimizerIncremental::initSolver(int dimension, int batchEveryN) {
         &gaussNewton->solver());
     assert(bs && "Unable to get internal block solver");
     auto* s =
-        dynamic_cast<LinearSolverCholmodOnline<Matrix3d>*>(&bs->linearSolver());
+        dynamic_cast<LinearSolverCholmodOnline<Matrix3>*>(&bs->linearSolver());
     bs->setAdditionalVectorSpace(300);
     bs->setSchur(false);
     solverInterface_ = s;
@@ -494,8 +486,8 @@ bool SparseOptimizerIncremental::initSolver(int dimension, int batchEveryN) {
     auto* bs = dynamic_cast<BlockSolver<BlockSolverTraits<6, 3>>*>(
         &gaussNewton->solver());
     assert(bs && "Unable to get internal block solver");
-    auto* s = dynamic_cast<LinearSolverCholmodOnline<Matrix<double, 6, 6>>*>(
-        &bs->linearSolver());
+    auto* s =
+        dynamic_cast<LinearSolverCholmodOnline<Matrix6d>*>(&bs->linearSolver());
     bs->setAdditionalVectorSpace(600);
     bs->setSchur(false);
     solverInterface_ = s;
@@ -504,8 +496,8 @@ bool SparseOptimizerIncremental::initSolver(int dimension, int batchEveryN) {
   solverInterface_->cmember = &cmember_;
   solverInterface_->batchEveryN = batchEveryN;
   if (!solver()) {
-    cerr << "Error allocating solver. Allocating CHOLMOD solver failed!"
-         << endl;
+    std::cerr << "Error allocating solver. Allocating CHOLMOD solver failed!"
+              << std::endl;
     return false;
   }
   return true;

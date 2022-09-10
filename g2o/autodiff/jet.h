@@ -157,13 +157,12 @@
 #ifndef G2O_CERES_PUBLIC_JET_H_
 #define G2O_CERES_PUBLIC_JET_H_
 
+#include <Eigen/Core>
 #include <cmath>
 #include <iosfwd>
 #include <iostream>  // NOLINT
 #include <limits>
 #include <string>
-
-#include "Eigen/Core"
 
 namespace g2o {
 namespace ceres {
@@ -190,7 +189,7 @@ struct Jet {
   Jet(const T& value, int k) {
     a = value;
     v.setConstant(Scalar());
-    v[k] = T(1.0);
+    v[k] = T{1.0};
   }
 
   // Constructor from scalar and vector part
@@ -333,7 +332,7 @@ inline Jet<T, N> operator/(const Jet<T, N>& f, const Jet<T, N>& g) {
   //   b + v   (b + v)(b - v)        b^2
   //
   // which holds because v*v = 0.
-  const T g_a_inverse = T(1.0) / g.a;
+  const T g_a_inverse = T{1.0} / g.a;
   const T f_a_by_g_a = f.a * g_a_inverse;
   return Jet<T, N>(f_a_by_g_a, (f.v - f_a_by_g_a * g.v) * g_a_inverse);
 }
@@ -348,7 +347,7 @@ inline Jet<T, N> operator/(T s, const Jet<T, N>& g) {
 // Binary / with a scalar: x / s
 template <typename T, int N>
 inline Jet<T, N> operator/(const Jet<T, N>& f, T s) {
-  const T s_inverse = T(1.0) / s;
+  const T s_inverse = T{1.0} / s;
   return Jet<T, N>(f.a * s_inverse, f.v * s_inverse);
 }
 
@@ -422,13 +421,13 @@ inline bool IsNormal(double x)   { return std::isnormal(x); }
 // abs(x + h) ~= x + h or -(x + h)
 template <typename T, int N>
 inline Jet<T, N> abs(const Jet<T, N>& f) {
-  return (f.a < T(0.0) ? -f : f);
+  return (f.a < T{0.0} ? -f : f);
 }
 
 // log(a + h) ~= log(a) + h / a
 template <typename T, int N>
 inline Jet<T, N> log(const Jet<T, N>& f) {
-  const T a_inverse = T(1.0) / f.a;
+  const T a_inverse = T{1.0} / f.a;
   return Jet<T, N>(log(f.a), f.v * a_inverse);
 }
 
@@ -443,7 +442,7 @@ inline Jet<T, N> exp(const Jet<T, N>& f) {
 template <typename T, int N>
 inline Jet<T, N> sqrt(const Jet<T, N>& f) {
   const T tmp = sqrt(f.a);
-  const T two_a_inverse = T(1.0) / (T(2.0) * tmp);
+  const T two_a_inverse = T{1.0} / (T{2.0} * tmp);
   return Jet<T, N>(tmp, f.v * two_a_inverse);
 }
 
@@ -456,7 +455,7 @@ inline Jet<T, N> cos(const Jet<T, N>& f) {
 // acos(a + h) ~= acos(a) - 1 / sqrt(1 - a^2) h
 template <typename T, int N>
 inline Jet<T, N> acos(const Jet<T, N>& f) {
-  const T tmp = -T(1.0) / sqrt(T(1.0) - f.a * f.a);
+  const T tmp = -T{1.0} / sqrt(T{1.0} - f.a * f.a);
   return Jet<T, N>(acos(f.a), tmp * f.v);
 }
 
@@ -469,7 +468,7 @@ inline Jet<T, N> sin(const Jet<T, N>& f) {
 // asin(a + h) ~= asin(a) + 1 / sqrt(1 - a^2) h
 template <typename T, int N>
 inline Jet<T, N> asin(const Jet<T, N>& f) {
-  const T tmp = T(1.0) / sqrt(T(1.0) - f.a * f.a);
+  const T tmp = T{1.0} / sqrt(T{1.0} - f.a * f.a);
   return Jet<T, N>(asin(f.a), tmp * f.v);
 }
 
@@ -477,14 +476,14 @@ inline Jet<T, N> asin(const Jet<T, N>& f) {
 template <typename T, int N>
 inline Jet<T, N> tan(const Jet<T, N>& f) {
   const T tan_a = tan(f.a);
-  const T tmp = T(1.0) + tan_a * tan_a;
+  const T tmp = T{1.0} + tan_a * tan_a;
   return Jet<T, N>(tan_a, tmp * f.v);
 }
 
 // atan(a + h) ~= atan(a) + 1 / (1 + a^2) h
 template <typename T, int N>
 inline Jet<T, N> atan(const Jet<T, N>& f) {
-  const T tmp = T(1.0) / (T(1.0) + f.a * f.a);
+  const T tmp = T{1.0} / (T{1.0} + f.a * f.a);
   return Jet<T, N>(atan(f.a), tmp * f.v);
 }
 
@@ -504,7 +503,7 @@ inline Jet<T, N> cosh(const Jet<T, N>& f) {
 template <typename T, int N>
 inline Jet<T, N> tanh(const Jet<T, N>& f) {
   const T tanh_a = tanh(f.a);
-  const T tmp = T(1.0) - tanh_a * tanh_a;
+  const T tmp = T{1.0} - tanh_a * tanh_a;
   return Jet<T, N>(tanh_a, tmp * f.v);
 }
 
@@ -531,7 +530,7 @@ inline Jet<T, N> ceil(const Jet<T, N>& f) {
 // cbrt(a + h) ~= cbrt(a) + h / (3 a ^ (2/3))
 template <typename T, int N>
 inline Jet<T, N> cbrt(const Jet<T, N>& f) {
-  const T derivative = T(1.0) / (T(3.0) * cbrt(f.a * f.a));
+  const T derivative = T{1.0} / (T{3.0} * cbrt(f.a * f.a));
   return Jet<T, N>(cbrt(f.a), f.v * derivative);
 }
 
@@ -539,14 +538,14 @@ inline Jet<T, N> cbrt(const Jet<T, N>& f) {
 template <typename T, int N>
 inline Jet<T, N> exp2(const Jet<T, N>& f) {
   const T tmp = exp2(f.a);
-  const T derivative = tmp * log(T(2));
+  const T derivative = tmp * log(T{2});
   return Jet<T, N>(tmp, f.v * derivative);
 }
 
 // log2(x + h) ~= log2(x) + h / (x * log(2))
 template <typename T, int N>
 inline Jet<T, N> log2(const Jet<T, N>& f) {
-  const T derivative = T(1.0) / (f.a * log(T(2)));
+  const T derivative = T{1.0} / (f.a * log(T{2}));
   return Jet<T, N>(log2(f.a), f.v * derivative);
 }
 
@@ -636,7 +635,7 @@ inline Jet<T, N> BesselJ0(const Jet<T, N>& f) {
 template <typename T, int N>
 inline Jet<T, N> BesselJ1(const Jet<T, N>& f) {
   return Jet<T, N>(BesselJ1(f.a),
-                   T(0.5) * (BesselJ0(f.a) - BesselJn(2, f.a)) * f.v);
+                   T{0.5} * (BesselJ0(f.a) - BesselJn(2, f.a)) * f.v);
 }
 
 // See formula http://dlmf.nist.gov/10.6#E1
@@ -645,7 +644,7 @@ template <typename T, int N>
 inline Jet<T, N> BesselJn(int n, const Jet<T, N>& f) {
   return Jet<T, N>(
       BesselJn(n, f.a),
-      T(0.5) * (BesselJn(n - 1, f.a) - BesselJn(n + 1, f.a)) * f.v);
+      T{0.5} * (BesselJn(n - 1, f.a) - BesselJn(n + 1, f.a)) * f.v);
 }
 
 // Jet Classification. It is not clear what the appropriate semantics are for
@@ -733,7 +732,7 @@ inline Jet<T, N> atan2(const Jet<T, N>& g, const Jet<T, N>& f) {
   //   f = a + da
   //   g = b + db
 
-  T const tmp = T(1.0) / (f.a * f.a + g.a * g.a);
+  T const tmp = T{1.0} / (f.a * f.a + g.a * g.a);
   return Jet<T, N>(atan2(g.a, f.a), tmp * (-g.a * f.v + f.a * g.v));
 }
 
@@ -741,7 +740,7 @@ inline Jet<T, N> atan2(const Jet<T, N>& g, const Jet<T, N>& f) {
 // (a+da)^p ~= a^p + p*a^(p-1) da
 template <typename T, int N>
 inline Jet<T, N> pow(const Jet<T, N>& f, double g) {
-  T const tmp = g * pow(f.a, g - T(1.0));
+  T const tmp = g * pow(f.a, g - T{1.0});
   return Jet<T, N>(pow(f.a, g), tmp * f.v);
 }
 
@@ -760,14 +759,14 @@ template <typename T, int N>
 inline Jet<T, N> pow(T f, const Jet<T, N>& g) {
   Jet<T, N> result;
 
-  if (f == T(0) && g.a > T(0)) {
+  if (f == T{0} && g.a > T{0}) {
     // Handle case 2.
-    result = Jet<T, N>(T(0.0));
+    result = Jet<T, N>(T{0.0});
   } else {
     if (f < 0 && g.a == floor(g.a)) {  // Handle case 3.
       result = Jet<T, N>(pow(f, g.a));
       for (int i = 0; i < N; i++) {
-        if (g.v[i] != T(0.0)) {
+        if (g.v[i] != T{0.0}) {
           // Return a NaN when g.v != 0.
           result.v[i] = std::numeric_limits<T>::quiet_NaN();
         }
@@ -822,10 +821,10 @@ template <typename T, int N>
 inline Jet<T, N> pow(const Jet<T, N>& f, const Jet<T, N>& g) {
   Jet<T, N> result;
 
-  if (f.a == T(0) && g.a >= T(1)) {
+  if (f.a == T{0} && g.a >= T{1}) {
     // Handle cases 2 and 3.
-    if (g.a > T(1)) {
-      result = Jet<T, N>(T(0.0));
+    if (g.a > T{1}) {
+      result = Jet<T, N>(T{0.0});
     } else {
       result = f;
     }
@@ -833,12 +832,12 @@ inline Jet<T, N> pow(const Jet<T, N>& f, const Jet<T, N>& g) {
   } else {
     if (f.a < T(0) && g.a == floor(g.a)) {
       // Handle cases 7 and 8.
-      T const tmp = g.a * pow(f.a, g.a - T(1.0));
+      T const tmp = g.a * pow(f.a, g.a - T{1.0});
       result = Jet<T, N>(pow(f.a, g.a), tmp * f.v);
       for (int i = 0; i < N; i++) {
-        if (g.v[i] != T(0.0)) {
+        if (g.v[i] != T{0.0}) {
           // Return a NaN when g.v != 0.
-          result.v[i] = T(std::numeric_limits<double>::quiet_NaN());
+          result.v[i] = T{std::numeric_limits<double>::quiet_NaN()};
         }
       }
     } else {

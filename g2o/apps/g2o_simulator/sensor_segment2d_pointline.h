@@ -46,7 +46,7 @@ class G2O_SIMULATOR_API SensorSegment2DPointLine
 
  protected:
   bool isVisible(WorldObjectType* to);
-  int visiblePoint_;
+  int visiblePoint_ = 0;
 };
 
 }  // namespace g2o

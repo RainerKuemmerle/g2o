@@ -70,13 +70,13 @@ class G2O_INTERACTIVE_API G2oSlamInterface
 
  protected:
   SparseOptimizerOnline* optimizer_;
-  bool firstOptimization_;
-  int nodesAdded_;
-  int incIterations_;
-  int updateGraphEachN_;
-  int batchEveryN_;
-  int lastBatchStep_;
-  bool initSolverDone_;
+  bool firstOptimization_ = true;
+  int nodesAdded_ = 0;
+  int incIterations_ = 1;
+  int updateGraphEachN_ = 10;
+  int batchEveryN_ = 100;
+  int lastBatchStep_ = 0;
+  bool initSolverDone_ = false;
 
   HyperGraph::VertexSet verticesAdded_;
   HyperGraph::EdgeSet edgesAdded_;

@@ -38,15 +38,12 @@
 
 static bool hasToStop = false;
 
-using namespace std;
-using namespace g2o;
-
 void sigquit_handler(int sig) {
   if (sig == SIGINT) {
     hasToStop = true;
     static int cnt = 0;
     if (cnt++ == 2) {
-      cerr << __PRETTY_FUNCTION__ << " forcing exit" << endl;
+      std::cerr << __PRETTY_FUNCTION__ << " forcing exit" << std::endl;
       exit(1);
     }
   }
@@ -58,7 +55,7 @@ int main(int argc, char** argv) {
   bool vis;
   bool verbose;
   // command line parsing
-  CommandArgs arg;
+  g2o::CommandArgs arg;
   arg.param("update", updateEachN, 10,
             "update the graph after inserting N nodes");
   arg.param("pcg", pcg, false, "use PCG instead of Cholesky");
@@ -67,17 +64,17 @@ int main(int argc, char** argv) {
 
   arg.parseArgs(argc, argv);
 
-  SparseOptimizerOnline optimizer(pcg);
+  g2o::SparseOptimizerOnline optimizer(pcg);
   optimizer.setVerbose(verbose);
   optimizer.setForceStopFlag(&hasToStop);
   optimizer.vizWithGnuplot = vis;
 
-  G2oSlamInterface slamInterface(&optimizer);
+  g2o::G2oSlamInterface slamInterface(&optimizer);
   slamInterface.setUpdateGraphEachN(updateEachN);
 
   slam_parser::ParserInterface parserInterface(&slamInterface);
 
-  while (parserInterface.parseCommand(cin)) {
+  while (parserInterface.parseCommand(std::cin)) {
     // do something additional if needed
   }
 

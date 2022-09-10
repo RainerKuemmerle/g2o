@@ -56,8 +56,7 @@ void CacheSE2Offset::updateImpl() {
   auto* offsetParam =
       dynamic_cast<ParameterSE2Offset*>(parameters_[0].get());
 #else
-  ParameterSE2Offset* offsetParam =
-      static_cast<ParameterSE2Offset*>(parameters_[0].get());
+  auto* offsetParam = static_cast<ParameterSE2Offset*>(parameters_[0].get());
 #endif
   const auto& v = static_cast<const VertexSE2&>(vertex());
   n2w_ = v.estimate() * offsetParam->offset();

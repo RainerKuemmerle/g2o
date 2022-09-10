@@ -28,9 +28,6 @@
 
 static bool hasToStop = false;
 
-using namespace std;
-using namespace g2o;
-
 /**
  * \brief Store the information parsed from a g2o file
  */
@@ -46,25 +43,28 @@ struct EdgeInformation {
  */
 struct IncrementalEdgesCompare {
   bool operator()(const EdgeInformation& e1, const EdgeInformation& e2) {
-    int i11 = e1.fromId, i12 = e1.toId;
-    if (i11 > i12) swap(i11, i12);
-    int i21 = e2.fromId, i22 = e2.toId;
-    if (i21 > i22) swap(i21, i22);
+    int i11 = e1.fromId;
+    int i12 = e1.toId;
+    if (i11 > i12) std::swap(i11, i12);
+    int i21 = e2.fromId;
+    int i22 = e2.toId;
+    if (i21 > i22) std::swap(i21, i22);
     if (i12 < i22) return true;
     if (i12 > i22) return false;
     return i11 < i21;
   }
 };
 
-inline void solveAndPrint(G2oSlamInterface& slamInterface, bool verbose) {
-  G2oSlamInterface::SolveResult solverState = slamInterface.solve();
+inline void solveAndPrint(g2o::G2oSlamInterface& slamInterface, bool verbose) {
+  g2o::G2oSlamInterface::SolveResult solverState = slamInterface.solve();
   if (!verbose) {
     switch (solverState) {
-      case G2oSlamInterface::kSolved:
-        cout << ".";  //<< flush;
+      case g2o::G2oSlamInterface::kSolved:
+        std::cout << ".";  //<< flush;
         break;
-      case G2oSlamInterface::kSolvedBatch:
-        cout << "b " << slamInterface.optimizer()->vertices().size() << endl;
+      case g2o::G2oSlamInterface::kSolvedBatch:
+        std::cout << "b " << slamInterface.optimizer()->vertices().size()
+                  << std::endl;
         break;
       default:
         break;
@@ -77,21 +77,21 @@ void sigquit_handler(int sig) {
     hasToStop = true;
     static int cnt = 0;
     if (cnt++ == 2) {
-      cerr << __PRETTY_FUNCTION__ << " forcing exit" << endl;
+      std::cerr << __PRETTY_FUNCTION__ << " forcing exit" << std::endl;
       exit(1);
     }
   }
 }
 
 int main(int argc, char** argv) {
-  string inputFilename;
-  string outputFilename;
+  std::string inputFilename;
+  std::string outputFilename;
   int updateEachN;
   int batchEachN;
   bool verbose;
   bool vis;
   // command line parsing
-  CommandArgs arg;
+  g2o::CommandArgs arg;
   arg.param("batch", batchEachN, 100,
             "solve by a batch Cholesky after inserting N nodes");
   arg.param("update", updateEachN, 10,
@@ -104,20 +104,20 @@ int main(int argc, char** argv) {
 
   arg.parseArgs(argc, argv);
 
-  SparseOptimizerIncremental optimizer;
+  g2o::SparseOptimizerIncremental optimizer;
   optimizer.setVerbose(verbose);
   optimizer.setForceStopFlag(&hasToStop);
   optimizer.vizWithGnuplot = vis;
 
-  G2oSlamInterface slamInterface(&optimizer);
+  g2o::G2oSlamInterface slamInterface(&optimizer);
   slamInterface.setUpdateGraphEachN(updateEachN);
   slamInterface.setBatchSolveEachN(batchEachN);
 
-  cerr << "Updating every " << updateEachN << endl;
-  cerr << "Batch step every " << batchEachN << endl;
+  std::cerr << "Updating every " << updateEachN << std::endl;
+  std::cerr << "Batch step every " << batchEachN << std::endl;
 
-  if (inputFilename.size() > 0) {  // operating on a file
-    vector<EdgeInformation> edgesFromGraph;
+  if (!inputFilename.empty()) {  // operating on a file
+    std::vector<EdgeInformation> edgesFromGraph;
 
     // HACK force tictoc statistics
 #if defined _MSC_VER || defined __MINGW32__
@@ -128,16 +128,16 @@ int main(int argc, char** argv) {
 
     // parse the edge from the file
     int graphDimension = 0;
-    cerr << "Parsing " << inputFilename << " ... ";
-    tictoc("parsing");
-    ifstream ifs(inputFilename.c_str());
+    std::cerr << "Parsing " << inputFilename << " ... ";
+    g2o::tictoc("parsing");
+    std::ifstream ifs(inputFilename.c_str());
     if (!ifs) {
-      cerr << "Failure to open " << inputFilename << endl;
+      std::cerr << "Failure to open " << inputFilename << std::endl;
       return 1;
     }
-    stringstream currentLine;
-    while (readLine(ifs, currentLine)) {
-      string token;
+    std::stringstream currentLine;
+    while (g2o::readLine(ifs, currentLine)) {
+      std::string token;
       currentLine >> token;
       if (token == "EDGE_SE2") {
         graphDimension = 3;
@@ -161,38 +161,38 @@ int main(int argc, char** argv) {
       }
     }
     assert(graphDimension > 0);
-    sort(edgesFromGraph.begin(), edgesFromGraph.end(),
-         IncrementalEdgesCompare());
-    tictoc("parsing");
-    cerr << "done." << endl;
+    std::sort(edgesFromGraph.begin(), edgesFromGraph.end(),
+              IncrementalEdgesCompare());
+    g2o::tictoc("parsing");
+    std::cerr << "done." << std::endl;
 
     // adding edges to the graph. Add all edges connecting a node and then call
     // optimize
-    tictoc("inc_optimize");
+    g2o::tictoc("inc_optimize");
     int lastNode = 2;
-    slamInterface.addNode("", 0, graphDimension, vector<double>());
+    slamInterface.addNode("", 0, graphDimension, std::vector<double>());
     for (const auto& e : edgesFromGraph) {
-      int minNodeId = max(e.fromId, e.toId);
+      int minNodeId = std::max(e.fromId, e.toId);
       if (minNodeId > lastNode) {
-        // cerr << "try to solve" << endl;
+        // std::cerr << "try to solve" << std::endl;
         lastNode = minNodeId;
         solveAndPrint(slamInterface, verbose);
       }
-      // cerr << "adding " << e.fromId << " " << e.toId << endl;
+      // std::cerr << "adding " << e.fromId << " " << e.toId << std::endl;
       slamInterface.addEdge("", 0, graphDimension, e.fromId, e.toId,
                             e.measurement, e.information);
     }
     solveAndPrint(slamInterface, verbose);
-    tictoc("inc_optimize");
+    g2o::tictoc("inc_optimize");
   } else {
     // Reading the protocol via stdin
     slam_parser::ParserInterface parserInterface(&slamInterface);
-    while (parserInterface.parseCommand(cin)) {
+    while (parserInterface.parseCommand(std::cin)) {
     }
   }
 
-  if (outputFilename.size() > 0) {
-    cerr << "Saving " << outputFilename << endl;
+  if (!outputFilename.empty()) {
+    std::cerr << "Saving " << outputFilename << std::endl;
     optimizer.save(outputFilename.c_str());
   }
 

@@ -109,14 +109,7 @@ void jac_quat3_euler3(MatrixN<6>& J, const SE3Quat& t) {
 }  // namespace
 
 G2oSlamInterface::G2oSlamInterface(SparseOptimizerOnline* optimizer)
-    : optimizer_(optimizer),
-      firstOptimization_(true),
-      nodesAdded_(0),
-      incIterations_(1),
-      updateGraphEachN_(10),
-      batchEveryN_(100),
-      lastBatchStep_(0),
-      initSolverDone_(false) {}
+    : optimizer_(optimizer) {}
 
 bool G2oSlamInterface::addNode(const std::string& tag, int id, int dimension,
                                const std::vector<double>& values) {

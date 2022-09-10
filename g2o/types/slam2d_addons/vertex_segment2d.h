@@ -43,13 +43,13 @@ class G2O_TYPES_SLAM2D_ADDONS_API VertexSegment2D
   VertexSegment2D();
 
   Vector2 estimateP1() const {
-    return Eigen::Map<const Vector2>(&(estimate_[0]));
+    return Eigen::Map<const Vector2>(estimate_.data());
   }
   Vector2 estimateP2() const {
     return Eigen::Map<const Vector2>(&(estimate_[2]));
   }
   void setEstimateP1(const Vector2& p1) {
-    Eigen::Map<Vector2> v(&estimate_[0]);
+    Eigen::Map<Vector2> v(estimate_.data());
     v = p1;
   }
   void setEstimateP2(const Vector2& p2) {

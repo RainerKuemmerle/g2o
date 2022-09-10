@@ -89,18 +89,26 @@ bool VertexLine3DDrawAction::operator()(
   Vector3 direction = line.d();
   Vector3 npoint = line.d().cross(line.w());
   glPushMatrix();
-  glColor3f(float(that->color(0)), float(that->color(1)),
-            float(that->color(2)));
+  glColor3f(static_cast<float>(that->color(0)),
+            static_cast<float>(that->color(1)),
+            static_cast<float>(that->color(2)));
   if (lineLength_ && lineWidth_) {
-    glLineWidth(float(lineWidth_->value()));
+    glLineWidth(static_cast<float>(lineWidth_->value()));
     glBegin(GL_LINES);
-    glNormal3f(float(npoint.x()), float(npoint.y()), float(npoint.z()));
-    glVertex3f(float(npoint.x() - direction.x() * lineLength_->value() / 2),
-               float(npoint.y() - direction.y() * lineLength_->value() / 2),
-               float(npoint.z() - direction.z() * lineLength_->value() / 2));
-    glVertex3f(float(npoint.x() + direction.x() * lineLength_->value() / 2),
-               float(npoint.y() + direction.y() * lineLength_->value() / 2),
-               float(npoint.z() + direction.z() * lineLength_->value() / 2));
+    glNormal3f(static_cast<float>(npoint.x()), static_cast<float>(npoint.y()),
+               static_cast<float>(npoint.z()));
+    glVertex3f(static_cast<float>(npoint.x() -
+                                  direction.x() * lineLength_->value() / 2),
+               static_cast<float>(npoint.y() -
+                                  direction.y() * lineLength_->value() / 2),
+               static_cast<float>(npoint.z() -
+                                  direction.z() * lineLength_->value() / 2));
+    glVertex3f(static_cast<float>(npoint.x() +
+                                  direction.x() * lineLength_->value() / 2),
+               static_cast<float>(npoint.y() +
+                                  direction.y() * lineLength_->value() / 2),
+               static_cast<float>(npoint.z() +
+                                  direction.z() * lineLength_->value() / 2));
     glEnd();
   }
   glPopMatrix();

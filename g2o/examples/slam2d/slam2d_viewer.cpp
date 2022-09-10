@@ -25,7 +25,6 @@
 #include "g2o/stuff/opengl_primitives.h"
 #include "g2o/types/slam2d/vertex_point_xy.h"
 #include "g2o/types/slam2d/vertex_se2.h"
-using namespace std;
 
 // some macro helpers for identifying the version number of QGLViewer
 // QGLViewer changed some parts of its API in version 2.6.
@@ -53,43 +52,39 @@ namespace {
  */
 class StandardCamera : public qglviewer::Camera {
  public:
-  StandardCamera() : _standard(true){};
+  StandardCamera() = default;
 
-  qglv_real zNear() const {
-    if (_standard)
-      return 0.001f;
-    else
-      return Camera::zNear();
+  qglv_real zNear() const override {
+    if (standard_) return 0.001F;
+    return Camera::zNear();
   }
 
-  qglv_real zFar() const {
-    if (_standard)
-      return 1000.0f;
-    else
-      return Camera::zFar();
+  qglv_real zFar() const override {
+    if (standard_) return 1000.0F;
+    return Camera::zFar();
   }
 
-  const bool& standard() const { return _standard; }
-  bool& standard() { return _standard; }
+  const bool& standard() const { return standard_; }
+  bool& standard() { return standard_; }
 
  private:
-  bool _standard;
+  bool standard_ = true;
 };
 
 void drawSE2(const VertexSE2* v) {
-  static const double len = 0.2;
-  static Eigen::Vector2d p1(0.75 * len, 0.);
-  static Eigen::Vector2d p2(-0.25 * len, 0.5 * len);
-  static Eigen::Vector2d p3(-0.25 * len, -0.5 * len);
+  constexpr double kLen = 0.2;
+  static const Eigen::Vector2d kP1(0.75 * kLen, 0.);
+  static const Eigen::Vector2d kP2(-0.25 * kLen, 0.5 * kLen);
+  static const Eigen::Vector2d kP3(-0.25 * kLen, -0.5 * kLen);
 
   const SE2& pose = v->estimate();
 
-  Eigen::Vector2d aux = pose * p1;
-  glVertex3f(aux[0], aux[1], 0.f);
-  aux = pose * p2;
-  glVertex3f(aux[0], aux[1], 0.f);
-  aux = pose * p3;
-  glVertex3f(aux[0], aux[1], 0.f);
+  Eigen::Vector2d aux = pose * kP1;
+  glVertex3f(aux[0], aux[1], 0.F);
+  aux = pose * kP2;
+  glVertex3f(aux[0], aux[1], 0.F);
+  aux = pose * kP3;
+  glVertex3f(aux[0], aux[1], 0.F);
 }
 
 template <typename Derived>
@@ -97,7 +92,7 @@ void drawCov(const Eigen::Vector2d& p, const Eigen::MatrixBase<Derived>& cov) {
   const double scalingFactor = 1.;
 
   glPushMatrix();
-  glTranslatef(p.x(), p.y(), 0.f);
+  glTranslatef(p.x(), p.y(), 0.F);
 
   const typename Derived::Scalar& a = cov(0, 0);
   const typename Derived::Scalar& b = cov(0, 1);
@@ -115,56 +110,51 @@ void drawCov(const Eigen::Vector2d& p, const Eigen::MatrixBase<Derived>& cov) {
   double majorAxis = 3.0 * sqrt(lambda1);
   double minorAxis = 3.0 * sqrt(lambda2);
 
-  glRotatef(RAD2DEG(theta), 0.f, 0.f, 1.f);
-  glScalef(majorAxis * scalingFactor, minorAxis * scalingFactor, 1.f);
-  glColor4f(1.0f, 1.f, 0.f, 0.4f);
-  opengl::drawDisk(1.f);
-  glColor4f(0.f, 0.f, 0.f, 1.0f);
-  opengl::drawCircle(1.f);
+  glRotatef(RAD2DEG(theta), 0.F, 0.F, 1.F);
+  glScalef(majorAxis * scalingFactor, minorAxis * scalingFactor, 1.F);
+  glColor4f(1.0F, 1.F, 0.F, 0.4F);
+  opengl::drawDisk(1.F);
+  glColor4f(0.F, 0.F, 0.F, 1.0F);
+  opengl::drawCircle(1.F);
   glPopMatrix();
 }
 
 }  // end anonymous namespace
 
 Slam2DViewer::Slam2DViewer(QWidget* parent, const QGLWidget* shareWidget)
-    : QGLViewer(parent, shareWidget), graph(0), drawCovariance(false) {}
-
-Slam2DViewer::~Slam2DViewer() {}
+    : QGLViewer(parent, shareWidget), graph(nullptr) {}
 
 void Slam2DViewer::draw() {
   if (!graph) return;
 
   // drawing the graph
-  glColor4f(0.00f, 0.67f, 1.00f, 1.f);
+  glColor4f(0.00F, 0.67F, 1.00F, 1.F);
   glBegin(GL_TRIANGLES);
-  for (SparseOptimizer::VertexIDMap::iterator it = graph->vertices().begin();
-       it != graph->vertices().end(); ++it) {
-    VertexSE2* v = dynamic_cast<VertexSE2*>(it->second.get());
+  for (auto& v_ptr : graph->vertices()) {
+    auto* v = dynamic_cast<VertexSE2*>(v_ptr.second.get());
     if (v) {
       drawSE2(v);
     }
   }
   glEnd();
 
-  glColor4f(1.00f, 0.67f, 0.00f, 1.f);
-  glPointSize(2.f);
+  glColor4f(1.00F, 0.67F, 0.00F, 1.F);
+  glPointSize(2.F);
   glBegin(GL_POINTS);
-  for (SparseOptimizer::VertexIDMap::iterator it = graph->vertices().begin();
-       it != graph->vertices().end(); ++it) {
-    VertexPointXY* v = dynamic_cast<VertexPointXY*>(it->second.get());
+  for (auto& v_ptr : graph->vertices()) {
+    auto* v = dynamic_cast<VertexPointXY*>(v_ptr.second.get());
     if (v) {
-      glVertex3f(v->estimate()(0), v->estimate()(1), 0.f);
+      glVertex3f(v->estimate()(0), v->estimate()(1), 0.F);
     }
   }
   glEnd();
-  glPointSize(1.f);
+  glPointSize(1.F);
 
   if (drawCovariance) {
-    for (SparseOptimizer::VertexIDMap::iterator it = graph->vertices().begin();
-         it != graph->vertices().end(); ++it) {
-      VertexSE2* v = dynamic_cast<VertexSE2*>(it->second.get());
+    for (auto& v_ptr : graph->vertices()) {
+      auto* v = dynamic_cast<VertexSE2*>(v_ptr.second.get());
       if (v) {
-        // TODO
+        // TODO(Rainer): Implement draw function for covariance.
         // drawCov(v->estimate().translation(), v->uncertainty());
       }
     }
