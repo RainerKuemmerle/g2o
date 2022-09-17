@@ -5,7 +5,7 @@
 
 namespace g2o {
 
-void declareVertexSE2(py::module& m) {
+inline void declareVertexSE2(py::module& m) {
   py::class_<VertexSE2, BaseVertex<3, SE2>, std::shared_ptr<VertexSE2>>(
       m, "VertexSE2")
       .def(py::init<>())

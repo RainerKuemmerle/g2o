@@ -3,6 +3,7 @@
 #include <g2o/types/sclam2d/odometry_measurement.h>
 
 #include "g2opy.h"
+#include "python/core/py_base_edge.h"
 
 namespace g2o {
 

@@ -5,7 +5,7 @@
 
 namespace g2o {
 
-void declareVertexPointXY(py::module& m) {
+inline void declareVertexPointXY(py::module& m) {
   py::class_<VertexPointXY, BaseVertex<2, Vector2>,
              std::shared_ptr<VertexPointXY>>(m, "VertexPointXY")
       .def(py::init<>())

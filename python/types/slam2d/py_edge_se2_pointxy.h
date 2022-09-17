@@ -9,7 +9,7 @@
 
 namespace g2o {
 
-void declareEdgeSE2PointXY(py::module& m) {
+inline void declareEdgeSE2PointXY(py::module& m) {
   templatedBaseBinaryEdge<2, Vector2, VertexSE2, VertexPointXY>(
       m, "_2_Vector2_VertexSE2_VertexPointXY");
   py::class_<EdgeSE2PointXY,

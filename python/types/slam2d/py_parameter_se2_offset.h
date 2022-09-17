@@ -5,7 +5,7 @@
 
 namespace g2o {
 
-void declareParameterSE2Offset(py::module& m) {
+inline void declareParameterSE2Offset(py::module& m) {
   py::class_<ParameterSE2Offset, Parameter,
              std::shared_ptr<ParameterSE2Offset>>(m, "ParameterSE2Offset")
       .def(py::init<>())

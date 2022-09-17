@@ -8,7 +8,7 @@
 
 namespace g2o {
 
-void declareSE2(py::module& m) {
+inline void declareSE2(py::module& m) {
   py::class_<SE2>(m, "SE2")
       .def(py::init<>())
       .def(py::init<const Isometry2&>())
