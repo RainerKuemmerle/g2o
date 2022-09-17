@@ -10,7 +10,7 @@
 
 namespace g2o {
 
-void declareEdgeSE3(py::module& m) {
+inline void declareEdgeSE3(py::module& m) {
   templatedBaseBinaryEdge<6, Isometry3, VertexSE3, VertexSE3>(
       m, "_6_Isometry3_VertexSE3_VertexSE3");
   py::class_<EdgeSE3, BaseBinaryEdge<6, Isometry3, VertexSE3, VertexSE3>,

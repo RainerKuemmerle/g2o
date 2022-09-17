@@ -1,5 +1,6 @@
 #pragma once
 
+#include "python/core/py_base_binary_edge.h"
 #include "g2o/types/slam3d/edge_se3_pointxyz.h"
 #include "g2o/types/slam3d/edge_se3_pointxyz_depth.h"
 #include "g2o/types/slam3d/edge_se3_pointxyz_disparity.h"
@@ -7,7 +8,7 @@
 
 namespace g2o {
 
-void declareEdgeSE3PointXYZ(py::module& m) {
+inline void declareEdgeSE3PointXYZ(py::module& m) {
   templatedBaseBinaryEdge<3, Vector3, VertexSE3, VertexPointXYZ>(
       m, "_3_Vector3_VertexSE3_VertexPointXYZ");
   py::class_<EdgeSE3PointXYZ,

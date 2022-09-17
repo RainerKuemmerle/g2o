@@ -8,7 +8,7 @@
 
 namespace g2o {
 
-void declareSE3Quat(py::module& m) {
+inline void declareSE3Quat(py::module& m) {
   py::class_<SE3Quat>(m, "SE3Quat")
       .def(py::init<>())
       .def(py::init<const Eigen::Ref<const Matrix3>&,

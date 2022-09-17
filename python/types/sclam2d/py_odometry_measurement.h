@@ -4,6 +4,7 @@
 
 #include "g2opy.h"
 #include "python/core/py_base_edge.h"
+#include "python/core/py_base_variable_sized_edge.h"
 
 namespace g2o {
 

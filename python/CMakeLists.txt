@@ -31,9 +31,11 @@ pybind11_add_module(g2opy
     core/py_sparse_optimizer.cpp
     # types
     types/icp/py_types_icp.cpp
+    types/pure/py_types_pure.cpp
     types/slam2d/py_types_slam2d.cpp
     types/slam3d/py_types_slam3d.cpp
-    types/pure/py_types_pure.cpp
+    types/sba/py_types_sba.cpp
+    types/sba/py_types_six_dof_expmap.cpp
     # module main
     g2opy.cpp)
 

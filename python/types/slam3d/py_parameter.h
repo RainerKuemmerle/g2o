@@ -7,7 +7,7 @@
 
 namespace g2o {
 
-void declareSalm3dParameter(py::module& m) {
+inline void declareSalm3dParameter(py::module& m) {
   py::class_<ParameterSE3Offset, Parameter,
              std::shared_ptr<ParameterSE3Offset>>(m, "ParameterSE3Offset")
       .def(py::init<>())
