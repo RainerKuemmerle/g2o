@@ -22,7 +22,7 @@ void declareHyperGraph(py::module& m) {
       .value("InvalidId", HyperGraph::HyperGraphDefaultIds::kInvalidId)
       .export_values();
 
-  py::class_<HyperGraph::HyperGraphElement,
+  py::class_<HyperGraph::HyperGraphElement,  // NOLINT
              std::shared_ptr<HyperGraph::HyperGraphElement>>(
       cls, "HyperGraphElement");
 
@@ -64,8 +64,8 @@ void declareHyperGraph(py::module& m) {
       .def("set_id", &HyperGraph::Vertex::setId,
            "id"_a)  // int -> void
       .def("edges",
-           (HyperGraph::EdgeSetWeak & (HyperGraph::Vertex::*)()) &
-               HyperGraph::Vertex::edges,
+           static_cast<HyperGraph::EdgeSetWeak& (HyperGraph::Vertex::*)()>(
+               &HyperGraph::Vertex::edges),
            py::return_value_policy::reference)
       .def("element_type",
            &HyperGraph::Vertex::elementType)  // virtual, ->
@@ -78,12 +78,12 @@ void declareHyperGraph(py::module& m) {
       .def("resize", &HyperGraph::Edge::resize,
            "size"_a)  // virtual, size_t -> void
       .def("vertices",
-           (HyperGraph::VertexContainer & (HyperGraph::Edge::*)()) &
-               HyperGraph::Edge::vertices,
+           static_cast<HyperGraph::VertexContainer& (HyperGraph::Edge::*)()>(
+               &HyperGraph::Edge::vertices),
            py::return_value_policy::reference)
       .def("vertex",
-           (std::shared_ptr<HyperGraph::Vertex>(HyperGraph::Edge::*)(size_t)) &
-               HyperGraph::Edge::vertex,
+           static_cast<std::shared_ptr<HyperGraph::Vertex> (
+               HyperGraph::Edge::*)(size_t)>(&HyperGraph::Edge::vertex),
            "i"_a, py::return_value_policy::reference)
       .def("set_vertex", &HyperGraph::Edge::setVertex, "i"_a, "v"_a,
            py::keep_alive<1, 2>())  // (size_t, Vertex*) -> void
@@ -99,8 +99,8 @@ void declareHyperGraph(py::module& m) {
 
   cls.def(py::init<>());
   cls.def("vertex",
-          (std::shared_ptr<HyperGraph::Vertex>(HyperGraph::*)(int)) &
-              HyperGraph::vertex,
+          static_cast<std::shared_ptr<HyperGraph::Vertex> (HyperGraph::*)(int)>(
+              &HyperGraph::vertex),
           "id"_a, py::return_value_policy::reference);
 
   cls.def("remove_vertex", &HyperGraph::removeVertex, "v"_a,
@@ -110,14 +110,16 @@ void declareHyperGraph(py::module& m) {
   cls.def("clear", &HyperGraph::clear);  // virtual, ->void
 
   cls.def("vertices",
-          (HyperGraph::VertexIDMap & (HyperGraph::*)()) & HyperGraph::vertices,
+          static_cast<HyperGraph::VertexIDMap& (HyperGraph::*)()>(
+              &HyperGraph::vertices),
           py::return_value_policy::reference);
-  cls.def("edges",
-          (HyperGraph::EdgeSet & (HyperGraph::*)()) & HyperGraph::edges,
-          py::return_value_policy::reference);
+  cls.def(
+      "edges",
+      static_cast<HyperGraph::EdgeSet& (HyperGraph::*)()>(&HyperGraph::edges),
+      py::return_value_policy::reference);
 
-  cls.def("add_vertex", &HyperGraph::addVertex,
-          "v"_a);  // virtual, Vertex* -> bool
+  cls.def("add_vertex", &HyperGraph::addVertex, "v"_a,
+          py::keep_alive<1, 2>());  // virtual, Vertex* -> bool
   cls.def("add_edge", &HyperGraph::addEdge, "e"_a,
           py::keep_alive<1, 2>());  // virtual, Edge* -> bool
   cls.def("set_edge_vertex", &HyperGraph::setEdgeVertex, "e"_a, "pos"_a, "v"_a,

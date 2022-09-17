@@ -60,11 +60,11 @@ void delcareEstimatePropagator(py::module& m) {
   cls.def("graph", &EstimatePropagator::graph);  // -> OptimizableGraph*
 
   cls.def("propagate",
-          (void(EstimatePropagator::*)(
+          static_cast<void (EstimatePropagator::*)(
               const std::shared_ptr<OptimizableGraph::Vertex>&,
               const EstimatePropagator::PropagateCost&,
-              const EstimatePropagator::PropagateAction&, double, double)) &
-              EstimatePropagator::propagate,
+              const EstimatePropagator::PropagateAction&, double, double)>(
+              &EstimatePropagator::propagate),
           "v"_a, "cost"_a, "action"_a,
           "maxDistance"_a = std::numeric_limits<double>::max(),
           "maxEdgeCost"_a = std::numeric_limits<double>::max(),
@@ -72,11 +72,11 @@ void delcareEstimatePropagator(py::module& m) {
           py::keep_alive<1, 4>());
 
   cls.def("propagate",
-          (void(EstimatePropagator::*)(
+          static_cast<void (EstimatePropagator::*)(
               OptimizableGraph::VertexSet&,
               const EstimatePropagator::PropagateCost&,
-              const EstimatePropagator::PropagateAction&, double, double)) &
-              EstimatePropagator::propagate,
+              const EstimatePropagator::PropagateAction&, double, double)>(
+              &EstimatePropagator::propagate),
           "vset"_a, "cost"_a, "action"_a,
           "maxDistance"_a = std::numeric_limits<double>::max(),
           "maxEdgeCost"_a = std::numeric_limits<double>::max(),

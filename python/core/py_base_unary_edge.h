@@ -2,6 +2,7 @@
 
 #include "g2o/core/base_unary_edge.h"
 #include "g2opy.h"
+#include "py_base_fixed_sized_edge.h"
 
 namespace g2o {
 

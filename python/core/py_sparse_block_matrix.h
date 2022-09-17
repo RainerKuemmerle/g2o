@@ -6,27 +6,6 @@
 
 namespace g2o {
 
-namespace {
-template <class MatrixType = MatrixX>
-void templatedSparseBlockMatrix(py::module& m, const std::string& suffix) {
-  using CLS = SparseBlockMatrix<MatrixType>;
-
-  py::class_<CLS>(m, ("SparseBlockMatrix" + suffix).c_str())
-      .def(py::init<>())
-      .def("clear", &CLS::clear, "dealloc"_a = false)
-      .def("cols", &CLS::cols)
-      .def("rows", &CLS::rows)
-      .def("block", (const MatrixType* (CLS::*)(int, int) const) & CLS::block,
-           "r"_a, "c"_a)
-
-      // TODO
-
-      ;
-}
-}  // namespace
-
-void delcareSparseBlockMatrix(py::module& m) {
-  templatedSparseBlockMatrix<MatrixX>(m, "X");
-}
+void delcareSparseBlockMatrix(py::module& m);
 
 }  // namespace g2o

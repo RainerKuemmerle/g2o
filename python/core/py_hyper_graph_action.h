@@ -5,7 +5,7 @@
 
 namespace g2o {
 
-void delcareHyperGraphAction(py::module& m) {
+inline void delcareHyperGraphAction(py::module& m) {
   py::class_<HyperGraphAction, std::shared_ptr<HyperGraphAction>>(
       m, "HyperGraphAction");
 

@@ -12,14 +12,15 @@ void templatedBaseFixedSizedEdge(py::module& m, const std::string& suffix) {
   py::class_<CLS, BaseEdge<D, E>, std::shared_ptr<CLS>>(
       m, ("BaseFixedSizedEdge" + suffix).c_str())
       //.def(py::init<>())    // lead to "error: invalid new-expression of
-      //abstract class type ..."
+      // abstract class type ..."
       .def("create_vertex", &CLS::createVertex,
            "i"_a)  // -> OptimizableGraph::Vertex*
       .def("resize", &CLS::resize)
       .def("all_vertices_fixed", &CLS::allVerticesFixed)
       .def("linearize_oplus",
-           (void(CLS::*)(JacobianWorkspace&)) & CLS::linearizeOplus)
-      .def("linearize_oplus", (void(CLS::*)()) & CLS::linearizeOplus)
+           static_cast<void (CLS::*)(JacobianWorkspace&)>(&CLS::linearizeOplus))
+      .def("linearize_oplus",
+           static_cast<void (CLS::*)()>(&CLS::linearizeOplus))
       .def("construct_quadratic_form", &CLS::constructQuadraticForm)
       .def("map_hessian_memory", &CLS::mapHessianMemory, "d"_a, "i"_a, "j"_a,
            "row_mayor"_a);

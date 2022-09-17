@@ -6,7 +6,7 @@
 
 namespace g2o {
 
-void declareParameter(py::module& m) {
+inline void declareParameter(py::module& m) {
   py::class_<Parameter, HyperGraph::HyperGraphElement,
              std::shared_ptr<Parameter>>(m, "Parameter")
       //.def(py::init<>())

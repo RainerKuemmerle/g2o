@@ -10,16 +10,16 @@ void declareJacobianWorkspace(py::module& m) {
       .def(py::init<>())
       .def("allocate", &JacobianWorkspace::allocate)
       .def("update_size",
-           (void(JacobianWorkspace::*)(const HyperGraph::Edge*, bool)) &
-               JacobianWorkspace::updateSize,
+           static_cast<void (JacobianWorkspace::*)(
+               const HyperGraph::Edge*, bool)>(&JacobianWorkspace::updateSize),
            "e"_a, "reset"_a = false)
       .def("update_size",
-           (void(JacobianWorkspace::*)(const OptimizableGraph&, bool)) &
-               JacobianWorkspace::updateSize,
+           static_cast<void (JacobianWorkspace::*)(
+               const OptimizableGraph&, bool)>(&JacobianWorkspace::updateSize),
            "graph"_a, "reset"_a = false)
       .def("update_size",
-           (void(JacobianWorkspace::*)(int, int, bool)) &
-               JacobianWorkspace::updateSize,
+           static_cast<void (JacobianWorkspace::*)(int, int, bool)>(
+               &JacobianWorkspace::updateSize),
            "num_vertices"_a, "dimension"_a, "reset"_a = false)
 
       .def("workspace_for_vertex", &JacobianWorkspace::workspaceForVertex,

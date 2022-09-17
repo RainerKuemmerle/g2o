@@ -1,6 +1,7 @@
 #pragma once
 
 #include "g2o/core/base_edge.h"
+#include "g2o/core/eigen_types.h"
 #include "g2opy.h"
 
 namespace g2o {
@@ -9,20 +10,21 @@ template <int D, typename E>
 void templatedBaseEdge(py::module& m, const std::string& suffix) {
   using CLS = BaseEdge<D, E>;
 
-  typedef Eigen::Matrix<number_t, D, 1, Eigen::ColMajor> ErrorVector;
-  typedef Eigen::Matrix<number_t, D, D, Eigen::ColMajor> InformationType;
+  using ErrorVector = typename CLS::ErrorVector;
+  using InformationType = typename CLS::InformationType;
 
   py::class_<CLS, OptimizableGraph::Edge, std::shared_ptr<CLS>>(
       m, ("BaseEdge" + suffix).c_str())
       //.def(py::init<>())
       .def("chi2", &CLS::chi2)
       //.def("error_data", (double* (CLS::*) ()) &CLS::errorData) // -> data*
-      .def("error", (ErrorVector & (CLS::*)()) & CLS::error)  // -> ErrorVector
+      .def("error",
+           static_cast<ErrorVector& (CLS::*)()>(&CLS::error))  // -> ErrorVector
 
       //.def("information_data", (double* (CLS::*) ()) &CLS::informationData) //
       //-> data*
-      .def("information", (InformationType & (CLS::*)()) &
-                              CLS::information)  // -> InformationType
+      .def("information", static_cast<InformationType& (CLS::*)()>(
+                              &CLS::information))  // -> InformationType
       .def("set_information", &CLS::setInformation, "information"_a,
            py::keep_alive<1, 2>())  // InformationType ->
 
@@ -39,23 +41,22 @@ void templatedBaseEdge(py::module& m, const std::string& suffix) {
 
 template <typename E>
 void templatedDynamicBaseEdge(py::module& m, const std::string& suffix) {
-  using namespace py::literals;
   using CLS = BaseEdge<-1, E>;
 
-  typedef Eigen::Matrix<double, Eigen::Dynamic, 1, Eigen::ColMajor> ErrorVector;
-  typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::ColMajor>
-      InformationType;
+  using ErrorVector = typename CLS::ErrorVector;
+  using InformationType = typename CLS::InformationType;
 
   py::class_<CLS, OptimizableGraph::Edge, std::shared_ptr<CLS>>(
       m, ("DynamicBaseEdge" + suffix).c_str())
       .def("chi2", &CLS::chi2)
       //.def("error_data", (double* (CLS::*) ()) &CLS::errorData) // -> data*
-      .def("error", (ErrorVector & (CLS::*)()) & CLS::error)  // -> ErrorVector
+      .def("error",
+           static_cast<ErrorVector& (CLS::*)()>(&CLS::error))  // -> ErrorVector
 
       //.def("information_data", (double* (CLS::*) ()) &CLS::informationData) //
       //-> data*
-      .def("information", (InformationType & (CLS::*)()) &
-                              CLS::information)  // -> InformationType
+      .def("information", static_cast<InformationType& (CLS::*)()>(
+                              &CLS::information))  // -> InformationType
       .def("set_information", &CLS::setInformation, "information"_a,
            py::keep_alive<1, 2>())  // InformationType ->
 

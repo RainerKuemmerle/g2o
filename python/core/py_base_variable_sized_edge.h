@@ -18,8 +18,9 @@ void templatedBaseVariableSizedEdge(py::module& m, const std::string& suffix) {
       .def("all_vertices_fixed", &CLS::allVerticesFixed)  // -> bool
       .def("construct_quadratic_form", &CLS::constructQuadraticForm)
       .def("linearize_oplus",
-           (void(CLS::*)(JacobianWorkspace&)) & CLS::linearizeOplus)
-      .def("linearize_oplus", (void(CLS::*)()) & CLS::linearizeOplus)
+           static_cast<void (CLS::*)(JacobianWorkspace&)>(&CLS::linearizeOplus))
+      .def("linearize_oplus",
+           static_cast<void (CLS::*)()>(&CLS::linearizeOplus))
       .def("mapHessianMemory", &CLS::mapHessianMemory, "d"_a, "i"_a, "j"_a,
            "row_major"_a)  // (double*, i, j, bool) ->
 
@@ -40,8 +41,9 @@ void templatedDynamicBaseVariableSizedEdge(py::module& m,
       .def("all_vertices_fixed", &CLS::allVerticesFixed)  // -> bool
       .def("construct_quadratic_form", &CLS::constructQuadraticForm)
       .def("linearize_oplus",
-           (void(CLS::*)(JacobianWorkspace&)) & CLS::linearizeOplus)
-      .def("linearize_oplus", (void(CLS::*)()) & CLS::linearizeOplus)
+           static_cast<void (CLS::*)(JacobianWorkspace&)>(&CLS::linearizeOplus))
+      .def("linearize_oplus",
+           static_cast<void (CLS::*)()>(&CLS::linearizeOplus))
       .def("mapHessianMemory", &CLS::mapHessianMemory, "d"_a, "i"_a, "j"_a,
            "row_major"_a)  // (double*, i, j, bool) ->
 

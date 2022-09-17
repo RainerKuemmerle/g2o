@@ -21,23 +21,25 @@ void declareSparseOptimizer(py::module& m) {
       .def(py::init<>())
 
       .def("initialize_optimization",
-           (bool(CLS::*)(HyperGraph::EdgeSet&)) & CLS::initializeOptimization,
+           static_cast<bool (CLS::*)(HyperGraph::EdgeSet&)>(
+               &CLS::initializeOptimization),
            "eset"_a)  // virtual
       .def("initialize_optimization",
-           (bool(CLS::*)(HyperGraph::VertexSet&, int)) &
-               CLS::initializeOptimization,
+           static_cast<bool (CLS::*)(HyperGraph::VertexSet&, int)>(
+               &CLS::initializeOptimization),
            "vset"_a,
            "level"_a = 0)  // virtual
       .def("initialize_optimization",
-           (bool(CLS::*)(int)) & CLS::initializeOptimization,
+           static_cast<bool (CLS::*)(int)>(&CLS::initializeOptimization),
            "level"_a = 0)  // virtual
 
       .def("update_initialization", &CLS::updateInitialization, "vset"_a,
            "eset"_a)  // virtual, ->bool
       .def("compute_initial_guess",
-           (void(CLS::*)()) & CLS::computeInitialGuess)  // virtual
+           static_cast<void (CLS::*)()>(&CLS::computeInitialGuess))  // virtual
       .def("compute_initial_guess",
-           (void(CLS::*)(EstimatePropagatorCost&)) & CLS::computeInitialGuess,
+           static_cast<void (CLS::*)(EstimatePropagatorCost&)>(
+               &CLS::computeInitialGuess),
            "propagator"_a)                      // virtual
       .def("set_to_origin", &CLS::setToOrigin)  // virtual
 
@@ -84,10 +86,11 @@ void declareSparseOptimizer(py::module& m) {
       // The gauge should be fixed() and then the optimization can work (if no
       // additional dof are in the system. The default implementation returns a
       // node with maximum dimension.
-      .def("find_gauge",
-           &CLS::findGauge)  // virtual, -> OptimizableGraph::Vertex*
-      .def("gauge_freedom", &CLS::gaugeFreedom)           // -> bool
-      .def("active_chi2", &CLS::activeChi2)               // -> double
+      .def("find_gauge", &CLS::findGauge,
+           py::return_value_policy::reference)   // virtual, ->
+                                                 // OptimizableGraph::Vertex*
+      .def("gauge_freedom", &CLS::gaugeFreedom)  // -> bool
+      .def("active_chi2", &CLS::activeChi2)      // -> double
       .def("active_robust_chi2", &CLS::activeRobustChi2)  // -> double
       .def("verbose", &CLS::verbose)                      // -> bool
       .def("set_verbose", &CLS::setVerbose,
@@ -153,21 +156,26 @@ void declareSparseOptimizer(py::module& m) {
           py::keep_alive<1, 2>())
 
       .def("push",
-           (void(CLS::*)(SparseOptimizer::VertexContainer&)) & CLS::push,
+           static_cast<void (CLS::*)(SparseOptimizer::VertexContainer&)>(
+               &CLS::push),
            "vlist"_a)
-      .def("push", (void(CLS::*)(HyperGraph::VertexSet&)) & CLS::push,
+      .def("push",
+           static_cast<void (CLS::*)(HyperGraph::VertexSet&)>(&CLS::push),
            "vlist"_a)
-      .def("push", (void(CLS::*)()) & CLS::push)
+      .def("push", static_cast<void (CLS::*)()>(&CLS::push))
 
-      .def("pop", (void(CLS::*)(SparseOptimizer::VertexContainer&)) & CLS::pop,
+      .def("pop",
+           static_cast<void (CLS::*)(SparseOptimizer::VertexContainer&)>(
+               &CLS::pop),
            "vlist"_a)
-      .def("pop", (void(CLS::*)(HyperGraph::VertexSet&)) & CLS::pop, "vlist"_a)
-      .def("pop", (void(CLS::*)()) & CLS::pop)
+      .def("pop", static_cast<void (CLS::*)(HyperGraph::VertexSet&)>(&CLS::pop),
+           "vlist"_a)
+      .def("pop", static_cast<void (CLS::*)()>(&CLS::pop))
 
       .def("discard_top",
-           (void(CLS::*)(SparseOptimizer::VertexContainer&)) &
-               CLS::discardTop)  // -> void
-      .def("discard_top", (void(CLS::*)()) & CLS::discardTop)
+           static_cast<void (CLS::*)(SparseOptimizer::VertexContainer&)>(
+               &CLS::discardTop))  // -> void
+      .def("discard_top", static_cast<void (CLS::*)()>(&CLS::discardTop))
 
       .def("clear", &CLS::clear)  // virtual, -> void
       .def("compute_active_errors",
@@ -175,8 +183,8 @@ void declareSparseOptimizer(py::module& m) {
       .def("update", &CLS::update, "update"_a)  // -> void
 
       .def("batch_statistics",
-           (const BatchStatisticsContainer& (CLS::*)() const) &
-               CLS::batchStatistics)
+           static_cast<const BatchStatisticsContainer& (CLS::*)() const>(
+               &CLS::batchStatistics))
       .def("set_compute_batch_statistics",
            &CLS::setComputeBatchStatistics)  // -> void
       .def("compute_batch_statistics", &CLS::computeBatchStatistics)

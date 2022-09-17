@@ -33,6 +33,7 @@
 #include <stack>
 
 #include "creators.h"
+#include "g2o/core/eigen_types.h"
 #include "g2o/stuff/macros.h"
 #include "optimizable_graph.h"
 
@@ -57,12 +58,11 @@ class BaseVertex : public OptimizableGraph::Vertex {
   static const int kDimension =
       D;  ///< dimension of the estimate (minimal) in the manifold space
 
+  using BVector = VectorN<D>;
   using HessianBlockType =
-      Eigen::Map<Eigen::Matrix<number_t, D, D, Eigen::ColMajor>,
-                 Eigen::Matrix<number_t, D, D, Eigen::ColMajor>::Flags &
-                         Eigen::PacketAccessBit
-                     ? Eigen::Aligned
-                     : Eigen::Unaligned>;
+      Eigen::Map<MatrixN<D>, MatrixN<D>::Flags & Eigen::PacketAccessBit
+                                 ? Eigen::Aligned
+                                 : Eigen::Unaligned>;
 
   BaseVertex();
 
@@ -106,8 +106,8 @@ class BaseVertex : public OptimizableGraph::Vertex {
   inline number_t solveDirect(number_t lambda = 0) override;
 
   //! return right hand side b of the constructed linear system
-  Eigen::Matrix<number_t, D, 1, Eigen::ColMajor>& b() { return b_; }
-  const Eigen::Matrix<number_t, D, 1, Eigen::ColMajor>& b() const { return b_; }
+  BVector& b() { return b_; }
+  const BVector& b() const { return b_; }
   //! return the hessian block associated with the vertex
   HessianBlockType& A() { return hessian_; }
   const HessianBlockType& A() const { return hessian_; }
@@ -135,7 +135,7 @@ class BaseVertex : public OptimizableGraph::Vertex {
 
  protected:
   HessianBlockType hessian_;
-  Eigen::Matrix<number_t, D, 1, Eigen::ColMajor> b_;
+  BVector b_;
   EstimateType estimate_;
   BackupStackType backup_;
 

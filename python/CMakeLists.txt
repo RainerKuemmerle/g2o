@@ -27,6 +27,7 @@ pybind11_add_module(g2opy
     core/py_optimizable_graph.cpp
     core/py_optimization_algorithm.cpp
     core/py_robust_kernel.cpp
+    core/py_sparse_block_matrix.cpp
     core/py_sparse_optimizer.cpp
     # types
     types/slam2d/py_types_slam2d.cpp

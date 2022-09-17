@@ -12,12 +12,14 @@
 namespace g2o {
 
 void declareOptimizationAlgorithm(py::module& m) {
-  py::class_<OptimizationAlgorithm, std::shared_ptr<OptimizationAlgorithm>>(
-      m, "OptimizationAlgorithm");
+  py::class_<OptimizationAlgorithm,  // NOLINT
+             std::shared_ptr<OptimizationAlgorithm>>(m,
+                                                     "OptimizationAlgorithm");
 
-  py::class_<OptimizationAlgorithmProperty>(m, "OptimizationAlgorithmProperty");
+  py::class_<OptimizationAlgorithmProperty>(  // NOLINT
+      m, "OptimizationAlgorithmProperty");
 
-  py::class_<OptimizationAlgorithmWithHessian, OptimizationAlgorithm,
+  py::class_<OptimizationAlgorithmWithHessian, OptimizationAlgorithm,  // NOLINT
              std::shared_ptr<OptimizationAlgorithmWithHessian>>(
       m, "OptimizationAlgorithmWithHessian");
 
@@ -42,7 +44,7 @@ void declareOptimizationAlgorithm(py::module& m) {
         return new OptimizationAlgorithmDogleg(blockSolver.base_solver());
       }));
 
-  py::class_<AbstractOptimizationAlgorithmCreator>(
+  py::class_<AbstractOptimizationAlgorithmCreator>(  // NOLINT
       m, "AbstractOptimizationAlgorithmCreator");
 
   py::class_<RegisterOptimizationAlgorithmProxy>(

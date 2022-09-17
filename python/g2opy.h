@@ -8,7 +8,7 @@
 
 #include <memory>
 
-namespace py = pybind11;
-using namespace pybind11::literals;
+namespace py = pybind11;             // NOLINT
+using namespace pybind11::literals;  // NOLINT
 
 #endif
