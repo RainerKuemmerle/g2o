@@ -23,7 +23,6 @@ void templatedBaseVariableSizedEdge(py::module& m, const std::string& suffix) {
            static_cast<void (CLS::*)()>(&CLS::linearizeOplus))
       .def("mapHessianMemory", &CLS::mapHessianMemory, "d"_a, "i"_a, "j"_a,
            "row_major"_a)  // (double*, i, j, bool) ->
-
       ;
 }
 
@@ -46,7 +45,6 @@ void templatedDynamicBaseVariableSizedEdge(py::module& m,
            static_cast<void (CLS::*)()>(&CLS::linearizeOplus))
       .def("mapHessianMemory", &CLS::mapHessianMemory, "d"_a, "i"_a, "j"_a,
            "row_major"_a)  // (double*, i, j, bool) ->
-
       ;
 }
 

@@ -12,7 +12,7 @@ FetchContent_MakeAvailable(pybind11)
 ###################################################
 # python wrapper library
 pybind11_add_module(g2opy
-    # # core
+    # core
     core/py_base_edge.cpp
     core/py_base_variable_sized_edge.cpp
     core/py_base_vertex.cpp
@@ -32,6 +32,8 @@ pybind11_add_module(g2opy
     # types
     types/slam2d/py_types_slam2d.cpp
     types/slam3d/py_types_slam3d.cpp
+    # python pure
+    types/pure/py_types_pure.cpp
     # module main
     g2opy.cpp)
 

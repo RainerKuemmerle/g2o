@@ -10,6 +10,7 @@
 #include "sim3/py_types_seven_dof_expmap.h"
 #include "slam2d/py_types_slam2d.h"
 #include "slam3d/py_types_slam3d.h"
+#include "pure/py_types_pure.h"
 
 namespace g2o {
 
@@ -34,6 +35,9 @@ void declareTypes(py::module& m) {
 
   // sclam2d
   declareTypesSclam2d(m);
+
+  // pure python types
+  declareTypesPure(m);
 }
 
 }  // end namespace g2o

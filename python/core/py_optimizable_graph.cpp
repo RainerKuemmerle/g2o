@@ -162,13 +162,14 @@ void declareOptimizableGraph(py::module& m) {
   cls.def("remove_vertex", &CLS::removeVertex, "v"_a,
           "detach"_a);  // virtual, (Vertex*, bool) -> bool
 
+//   cls.def(
+//       "add_edge",
+//       (bool(CLS::*)(const std::shared_ptr<HyperGraph::Edge>&)) & CLS::addEdge,
+//       "e"_a);
   cls.def("add_edge",
           static_cast<bool (CLS::*)(const std::shared_ptr<HyperGraph::Edge>&)>(
               &CLS::addEdge),
           "e"_a, py::keep_alive<1, 2>());
-  //   cls.def("add_edge", (bool (CLS::*)(const
-  //   std::shared_ptr<HyperGraph::Edge>&)) & CLS::addEdge,
-  //           "e"_a, py::keep_alive<1, 2>());
 
   cls.def("set_edge_vertex", &CLS::setEdgeVertex, "e"_a, "pos"_a, "v"_a,
           py::keep_alive<1, 2>(),
