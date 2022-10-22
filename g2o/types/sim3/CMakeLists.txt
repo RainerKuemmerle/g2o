@@ -9,6 +9,10 @@ if (APPLE)
 endif()
 target_link_libraries(types_sim3 PUBLIC types_sba)
 
+target_include_directories(types_sim3 PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+  $<INSTALL_INTERFACE:include/g2o/types/sim3>)
+
 install(TARGETS types_sim3
   EXPORT ${G2O_TARGETS_EXPORT_NAME}
   RUNTIME DESTINATION ${RUNTIME_DESTINATION}
