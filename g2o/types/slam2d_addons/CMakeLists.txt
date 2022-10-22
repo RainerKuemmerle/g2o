@@ -21,6 +21,10 @@ if(G2O_HAVE_OPENGL)
   target_link_libraries(types_slam2d_addons opengl_helper)
 endif()
 
+target_include_directories(types_slam2d_addons PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+  $<INSTALL_INTERFACE:include/g2o/types/slam2d_addons>)
+
 install(TARGETS types_slam2d_addons
   EXPORT ${G2O_TARGETS_EXPORT_NAME}
   RUNTIME DESTINATION ${RUNTIME_DESTINATION}

@@ -36,6 +36,10 @@ if (APPLE)
 endif()
 target_link_libraries(types_sba core types_slam3d)
 
+target_include_directories(types_sba PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+  $<INSTALL_INTERFACE:include/g2o/types/sba>)
+
 install(TARGETS types_sba
   EXPORT ${G2O_TARGETS_EXPORT_NAME}
   RUNTIME DESTINATION ${RUNTIME_DESTINATION}
