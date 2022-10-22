@@ -9,6 +9,10 @@ if (APPLE)
 endif()
 target_link_libraries(types_icp types_sba types_slam3d)
 
+target_include_directories(types_icp PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+  $<INSTALL_INTERFACE:include/g2o/types/icp>)
+
 install(TARGETS types_icp
   EXPORT ${G2O_TARGETS_EXPORT_NAME}
   RUNTIME DESTINATION ${RUNTIME_DESTINATION}

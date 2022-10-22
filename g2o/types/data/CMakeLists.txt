@@ -21,6 +21,10 @@ if(G2O_HAVE_OPENGL)
   target_link_libraries(types_data freeglut_minimal opengl_helper)
 endif()
 
+target_include_directories(types_data PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+  $<INSTALL_INTERFACE:include/g2o/types/data>)
+
 install(TARGETS types_data
   EXPORT ${G2O_TARGETS_EXPORT_NAME}
   RUNTIME DESTINATION ${RUNTIME_DESTINATION}

@@ -9,7 +9,7 @@ endif()
 target_link_libraries(solver_eigen core)
 
 target_include_directories(solver_eigen PUBLIC
-  "$<BUILD_INTERFACE:${g2o_SOURCE_DIR};${PROJECT_BINARY_DIR}>"
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
   $<INSTALL_INTERFACE:include/g2o/solvers/eigen>
 )
 
