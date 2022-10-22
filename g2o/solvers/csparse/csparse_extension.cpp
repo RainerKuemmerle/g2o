@@ -34,21 +34,18 @@ namespace csparse_extension {
  */
 int cs_cholsolsymb(const cs *A, number_t *b, const css *S, number_t *x,
                    int *work) {
-  csn *N;
-  int n;
-  int ok;
   if (!CS_CSC(A) || !b || !S || !x) {
     std::cerr << __PRETTY_FUNCTION__ << ": No valid input!" << std::endl;
     assert(0);  // get a backtrace in debug mode
     return (0); /* check inputs */
   }
-  n = A->n;
-  N = cs_chol_workspace(A, S, work, x); /* numeric Cholesky factorization */
+  const int n = A->n;
+  csn* N = cs_chol_workspace(A, S, work, x); /* numeric Cholesky factorization */
   if (!N) {
     std::cerr << __PRETTY_FUNCTION__ << ": cholesky failed!" << std::endl;
     /*assert(0);*/
   }
-  ok = static_cast<int>(N != nullptr);
+  const int ok = static_cast<int>(N != nullptr);
   if (ok) {
     cs_ipvec(S->pinv, b, x, n); /* x = P*b */
     cs_lsolve(N->L, x);         /* x = L\x */

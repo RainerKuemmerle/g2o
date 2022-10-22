@@ -56,11 +56,11 @@ static OptimizationAlgorithm* createSolver(const std::string& fullSolverName) {
           {"pcg7_3", &AllocateSolver<7, 3>},
       };
 
-  std::string solverName = fullSolverName.substr(3);
+  const std::string solverName = fullSolverName.substr(3);
   auto solverf = kSolverFactories.find(solverName);
   if (solverf == kSolverFactories.end()) return nullptr;
 
-  std::string methodName = fullSolverName.substr(0, 2);
+  const std::string methodName = fullSolverName.substr(0, 2);
 
   if (methodName == "gn") {
     return new OptimizationAlgorithmGaussNewton(solverf->second());

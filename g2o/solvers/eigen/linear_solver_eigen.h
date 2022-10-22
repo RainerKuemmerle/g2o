@@ -43,7 +43,7 @@ namespace g2o {
  * \brief linear solver which uses the sparse Cholesky solver from Eigen
  *
  * Has no dependencies except Eigen. Hence, should compile almost everywhere
- * without to much issues. Performance should be similar to CSparse.
+ * without too much issues. Performance should be similar to CSparse.
  */
 template <typename MatrixType>
 class LinearSolverEigen : public LinearSolverCCS<MatrixType> {
@@ -69,7 +69,7 @@ class LinearSolverEigen : public LinearSolverCCS<MatrixType> {
                                        const PermutationMatrix& permutation) {
       m_Pinv = permutation;
       m_P = permutation.inverse();
-      int size = a.cols();
+      const int size = a.cols();
       SparseMatrix ap(size, size);
       ap.selfadjointView<Eigen::Upper>() =
           a.selfadjointView<UpLo>().twistedBy(m_P);
@@ -142,7 +142,7 @@ class LinearSolverEigen : public LinearSolverCCS<MatrixType> {
    * the following iterations.
    */
   void computeSymbolicDecomposition(const SparseBlockMatrix<MatrixType>& A) {
-    number_t t = get_monotonic_time();
+    const number_t t = get_monotonic_time();
     if (!this->blockOrdering()) {
       cholesky_.analyzePattern(sparseMatrix_);
     } else {

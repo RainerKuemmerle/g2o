@@ -74,7 +74,7 @@ class StructureOnlySolver : public OptimizationAlgorithm {
     for (auto& v : vertices) {
       bool stop = false;
       assert(v->dimension() == PointDoF);
-      g2o::HyperGraph::EdgeSetWeak& track = v->edges();
+      const g2o::HyperGraph::EdgeSetWeak& track = v->edges();
       assert(track.size() >= 2);
       number_t chi2 = 0;
       // TODO(Rainer): make these parameters
@@ -101,7 +101,7 @@ class StructureOnlySolver : public OptimizationAlgorithm {
           H_pp.setZero();
           v->clearQuadraticForm();
 
-          g2o::HyperGraph::EdgeSetWeak& track = v->edges();
+          const g2o::HyperGraph::EdgeSetWeak& track = v->edges();
           assert(!track.empty());
 
           for (const auto& it_t : track) {
@@ -172,7 +172,7 @@ class StructureOnlySolver : public OptimizationAlgorithm {
                 }
               }
               assert(g2o_isnan(new_chi2) == false && "Chi is NaN");
-              number_t rho = (chi2 - new_chi2);
+              const number_t rho = (chi2 - new_chi2);
               if (rho > 0 && g2o_isfinite(new_chi2)) {
                 goodStep = true;
                 chi2 = new_chi2;

@@ -53,8 +53,8 @@ class LinearSolverDense : public LinearSolver<MatrixType> {
 
   bool solve(const SparseBlockMatrix<MatrixType>& A, number_t* x,
              number_t* b) override {
-    int n = A.cols();
-    int m = A.cols();
+    const int n = A.cols();
+    const int m = A.cols();
 
     MatrixX& H = H_;
     if (H.cols() != n) {
@@ -69,7 +69,7 @@ class LinearSolverDense : public LinearSolver<MatrixType> {
     // copy the sparse block matrix into a dense matrix
     int c_idx = 0;
     for (size_t i = 0; i < A.blockCols().size(); ++i) {
-      int c_size = A.colsOfBlock(i);
+      const int c_size = A.colsOfBlock(i);
       assert(c_idx == A.colBaseOfBlock(i) && "mismatch in block indices");
 
       const typename SparseBlockMatrix<MatrixType>::IntBlockMap& col =

@@ -32,8 +32,8 @@ namespace g2o {
 namespace csparse_extension {
 
 bool writeCs2Octave(const char* filename, const cs* A, bool upperTriangular) {
-  int cols = A->n;
-  int rows = A->m;
+  const int cols = A->n;
+  const int rows = A->m;
 
   if (A->nz == -1) {  // CCS matrix
     const int* Ap = A->p;

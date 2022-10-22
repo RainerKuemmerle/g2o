@@ -75,7 +75,7 @@ SolverSLAM2DLinear::SolverSLAM2DLinear(std::unique_ptr<Solver> solver)
 OptimizationAlgorithm::SolverResult SolverSLAM2DLinear::solve(int iteration,
                                                               bool online) {
   if (iteration == 0) {
-    bool status = solveOrientation();
+    const bool status = solveOrientation();
     if (!status) return OptimizationAlgorithm::kFail;
   }
 
@@ -104,7 +104,7 @@ bool SolverSLAM2DLinear::solveOrientation() {
 
   // building the structure, diagonal for each active vertex
   for (auto* v : optimizer_->indexMapping()) {
-    int poseIdx = v->hessianIndex();
+    const int poseIdx = v->hessianIndex();
     ScalarMatrix* m = H.block(poseIdx, poseIdx, true);
     m->setZero();
   }
@@ -130,7 +130,7 @@ bool SolverSLAM2DLinear::solveOrientation() {
       continue;
     }
 
-    bool transposedBlock = ind1 > ind2;
+    const bool transposedBlock = ind1 > ind2;
     if (transposedBlock) {  // make sure, we allocate the upper triangle block
       std::swap(ind1, ind2);
     }
@@ -162,20 +162,20 @@ bool SolverSLAM2DLinear::solveOrientation() {
     auto from = e->vertexXn<0>();
     auto to = e->vertexXn<1>();
 
-    number_t omega = e->information()(2, 2);
+    const number_t omega = e->information()(2, 2);
 
-    number_t fromThetaGuess =
+    const number_t fromThetaGuess =
         from->hessianIndex() < 0 ? 0. : thetaGuess[from->hessianIndex()];
-    number_t toThetaGuess =
+    const number_t toThetaGuess =
         to->hessianIndex() < 0 ? 0. : thetaGuess[to->hessianIndex()];
-    number_t error = normalize_theta(-e->measurement().rotation().angle() +
-                                     toThetaGuess - fromThetaGuess);
+    const number_t error = normalize_theta(
+        -e->measurement().rotation().angle() + toThetaGuess - fromThetaGuess);
 
-    bool fromNotFixed = !(from->fixed());
-    bool toNotFixed = !(to->fixed());
+    const bool fromNotFixed = !(from->fixed());
+    const bool toNotFixed = !(to->fixed());
 
     if (fromNotFixed || toNotFixed) {
-      number_t omega_r = -omega * error;
+      const number_t omega_r = -omega * error;
       if (fromNotFixed) {
         b(from->hessianIndex()) -= omega_r;
         (*H.block(from->hessianIndex(), from->hessianIndex()))(0, 0) += omega;
@@ -197,7 +197,7 @@ bool SolverSLAM2DLinear::solveOrientation() {
   using SystemSolver = LinearSolverEigen<ScalarMatrix>;
   SystemSolver linearSystemSolver;
   linearSystemSolver.init();
-  bool ok = linearSystemSolver.solve(H, x.data(), b.data());
+  const bool ok = linearSystemSolver.solve(H, x.data(), b.data());
   if (!ok) {
     std::cerr << __PRETTY_FUNCTION__ << "Failure while solving linear system"
               << std::endl;
@@ -209,8 +209,9 @@ bool SolverSLAM2DLinear::solveOrientation() {
   root->setToOrigin();
   for (auto* vv : optimizer_->indexMapping()) {
     auto* v = static_cast<VertexSE2*>(vv);
-    int poseIdx = v->hessianIndex();
-    SE2 poseUpdate(0, 0, normalize_theta(thetaGuess(poseIdx) + x(poseIdx)));
+    const int poseIdx = v->hessianIndex();
+    const SE2 poseUpdate(0, 0,
+                         normalize_theta(thetaGuess(poseIdx) + x(poseIdx)));
     v->setEstimate(poseUpdate);
   }
 

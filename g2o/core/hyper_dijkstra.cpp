@@ -201,18 +201,16 @@ void HyperDijkstra::visitAdjacencyMap(AdjacencyMap& amap, TreeAction& action,
   }
 
   // std::cerr << "q.size()" << q.size() << endl;
-  int count = 0;
   while (!q.empty()) {
     auto parent = q.front();
     q.pop_front();
-    ++count;
     auto parentIt = amap.find(parent);
     if (parentIt == amap.end()) {
       continue;
     }
     // cerr << "parent= " << parent << " parent id= " << parent->id() << "\t
     // children id =";
-    HyperGraph::VertexSet& childs(parentIt->second.children());
+    const HyperGraph::VertexSet& childs = parentIt->second.children();
     for (const auto& child : childs) {
       // cerr << child->id();
       auto adjacencyIt = amap.find(child);
