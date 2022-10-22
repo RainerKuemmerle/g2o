@@ -131,7 +131,7 @@ class MultipleValueEdge
   MultipleValueEdge(const FunctionObservation& obs, double omega) : x_(obs.x) {
     setDimension(obs.z.size());
     setMeasurement(obs.z);
-    InformationType I = Eigen::MatrixXd::Identity(x_.size(), x_.size()) * omega;
+    const InformationType I = Eigen::MatrixXd::Identity(x_.size(), x_.size()) * omega;
     setInformation(I);
   }
 
@@ -155,7 +155,7 @@ class MultipleValueEdge
     const FPolynomialCoefficientVertex* fvertex = vertexXnRaw<0>();
     const PPolynomialCoefficientVertex* pvertex = vertexXnRaw<1>();
     for (int i = 0; i < measurement_.size(); ++i) {
-      double x3 = pow(x_[i], 3);
+      const double x3 = pow(x_[i], 3);
       error_[i] = measurement_[i] -
                   Eigen::poly_eval(fvertex->estimate(), x_[i]) -
                   x3 * (Eigen::poly_eval(pvertex->estimate(), x_[i]));
@@ -192,7 +192,7 @@ int main(int argc, const char* argv[]) {
   std::cout << "Ground truth vectors f=" << f.transpose()
             << "; p=" << p.transpose() << std::endl;
 
-  // The number of observations in the polynomial; the defaultis 6
+  // The number of observations in the polynomial; the default is 6
   int obs = 6;
   if (argc > 2) {
     obs = atoi(argv[2]);
@@ -202,18 +202,18 @@ int main(int argc, const char* argv[]) {
 
   // Sample the observations. This is a set of function
   // observations. The cardinality of each observation set is random.
-  double sigmaZ = 0.1;
+  const double sigmaZ = 0.1;
   std::vector<FunctionObservation> observations(obs);
   std::uniform_int_distribution<int> cardinalitySampler(1, 5);
 
   for (int i = 0; i < obs; ++i) {
     FunctionObservation& fo = observations[i];
-    int numObs = cardinalitySampler(generator);
+    const int numObs = cardinalitySampler(generator);
     fo.x.resize(numObs);
     fo.z.resize(numObs);
     for (int o = 0; o < numObs; ++o) {
       fo.x[o] = g2o::sampleUniform(-5, 5);
-      double x3 = pow(fo.x[o], 3);
+      const double x3 = pow(fo.x[o], 3);
       fo.z[o] = Eigen::poly_eval(f, fo.x[o]) +
                 x3 * (Eigen::poly_eval(p, fo.x[o])) +
                 sigmaZ * g2o::sampleGaussian();
@@ -227,11 +227,11 @@ int main(int argc, const char* argv[]) {
 
   // Set up the solver
   std::unique_ptr<g2o::BlockSolverX> blockSolver =
-      g2o::make_unique<g2o::BlockSolverX>(move(linearSolver));
+      g2o::make_unique<g2o::BlockSolverX>(std::move(linearSolver));
 
   // Set up the optimisation algorithm
   std::unique_ptr<g2o::OptimizationAlgorithm> optimisationAlgorithm(
-      new g2o::OptimizationAlgorithmLevenberg(move(blockSolver)));
+      new g2o::OptimizationAlgorithmLevenberg(std::move(blockSolver)));
 
   // Create the graph and configure it
   std::unique_ptr<g2o::SparseOptimizer> optimizer =

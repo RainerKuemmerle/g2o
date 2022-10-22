@@ -111,7 +111,6 @@ void assignHierarchicalEdges(StarSet& stars, EdgeStarMap& esmap,
                              SparseOptimizer* optimizer, int minNumEdges,
                              int maxIterations) {
   // now construct the hierarchical edges for all the stars
-  int starNum = 0;
   for (const auto& s : stars) {
     std::vector<std::shared_ptr<OptimizableGraph::Vertex>> vertices(2);
     vertices[0] =
@@ -123,11 +122,11 @@ void assignHierarchicalEdges(StarSet& stars, EdgeStarMap& esmap,
       vertices[1] = v;
       if (v == vertices[0]) continue;
       HyperGraph::EdgeSet eInSt;
-      int numEdges = vertexEdgesInStar(eInSt, v, s, esmap);
+      const int numEdges = vertexEdgesInStar(eInSt, v, s, esmap);
       if (Factory::instance()->tag(v.get()) ==
               Factory::instance()->tag(vertices[0].get()) ||
           numEdges > minNumEdges) {
-        std::shared_ptr<OptimizableGraph::Edge> e =
+        const std::shared_ptr<OptimizableGraph::Edge> e =
             creator->createEdge(vertices);
         // cerr << "creating edge" << e << endl;
         if (e) {
@@ -145,9 +144,8 @@ void assignHierarchicalEdges(StarSet& stars, EdgeStarMap& esmap,
     }
     s->lowLevelVertices() = vNew;
 
-    bool labelOk = s->labelStarEdges(maxIterations, labeler);
+    const bool labelOk = s->labelStarEdges(maxIterations, labeler);
     (void)labelOk;
-    starNum++;
   }
 }
 
@@ -325,7 +323,7 @@ void computeSimpleStars(StarSet& stars, SparseOptimizer* optimizer,
     // cerr << "opt init" << endl;
     s->optimizer()->initializeOptimization(s->lowLevelEdges());
     optimizer->computeActiveErrors();
-    int starOptResult = s->optimizer()->optimize(starIterations);
+    const int starOptResult = s->optimizer()->optimize(starIterations);
     // cerr << starOptResult << "(" << starIterations << ")  " << endl;
 
     if (!starIterations || starOptResult > 0) {
@@ -356,7 +354,7 @@ void computeSimpleStars(StarSet& stars, SparseOptimizer* optimizer,
           emax = ev(i).real() < emax ? emax : ev(i).real();
         }
 
-        double d = emin / emax;
+        const double d = emin / emax;
 
         // cerr << " " << d;
         if (d > rejectionThreshold) {
