@@ -44,9 +44,9 @@ using namespace g2o::internal;
 
 namespace {
 auto depth_epsilon = [](const number_t x, const number_t y) {
-  constexpr int64_t ulp = 900000000000;
+  constexpr int64_t kUlp = 900000000000;
   return std::max(
-      2e-4, std::numeric_limits<number_t>::epsilon() * std::abs(x + y) * ulp);
+      2e-4, std::numeric_limits<number_t>::epsilon() * std::abs(x + y) * kUlp);
 };
 
 }
@@ -210,7 +210,6 @@ struct RotationMatrix2QuaternionManifold {
 };
 
 TEST(Slam3D, dqDRJacobian) {
-  Eigen::Matrix<number_t, 3, 9, Eigen::ColMajor> dq_dR;
   Eigen::Matrix<number_t, 3, 9, Eigen::RowMajor> dq_dR_AD;
   dq_dR_AD.setZero();  // avoid warning about uninitialized memory
   for (int k = 0; k < 10000; ++k) {
@@ -218,7 +217,7 @@ TEST(Slam3D, dqDRJacobian) {
     // that will be used in axis-angle representation to create the matrix
     Vector3 rotAxisAngle = Vector3::Random();
     rotAxisAngle += Vector3::Random();
-    AngleAxis rotation(rotAxisAngle.norm(), rotAxisAngle.normalized());
+    const AngleAxis rotation(rotAxisAngle.norm(), rotAxisAngle.normalized());
     Matrix3 Re = rotation.toRotationMatrix();
 
     // our analytic function which we want to evaluate
@@ -230,7 +229,7 @@ TEST(Slam3D, dqDRJacobian) {
     number_t* parameters[] = {Re.data()};
     number_t* jacobians[] = {dq_dR_AD.data()};
     number_t value[3];
-    RotationMatrix2QuaternionManifold rot2quat;
+    const RotationMatrix2QuaternionManifold rot2quat;
     using RotationMatrix2QuaternionManifoldDims =
         ceres::internal::StaticParameterDims<9>;
     ceres::internal::AutoDifferentiate<3, RotationMatrix2QuaternionManifoldDims,
@@ -238,7 +237,7 @@ TEST(Slam3D, dqDRJacobian) {
                                        number_t>(rot2quat, parameters, 3, value,
                                                  jacobians);
 
-    number_t maxDifference = (dq_dR - dq_dR_AD).array().abs().maxCoeff();
+    const number_t maxDifference = (dq_dR - dq_dR_AD).array().abs().maxCoeff();
     EXPECT_NEAR(0., maxDifference, 1e-7);
   }
 }

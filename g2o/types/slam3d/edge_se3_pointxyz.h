@@ -55,7 +55,7 @@ class G2O_TYPES_SLAM3D_API EdgeSE3PointXYZ
   void setMeasurement(const Vector3& m) override { measurement_ = m; }
 
   bool setMeasurementData(const number_t* d) override {
-    Eigen::Map<const Vector3> v(d);
+    const Eigen::Map<const Vector3> v(d);
     measurement_ = v;
     return true;
   }
@@ -80,8 +80,6 @@ class G2O_TYPES_SLAM3D_API EdgeSE3PointXYZ
                        OptimizableGraph::Vertex* to) override;
 
  private:
-  Eigen::Matrix<number_t, 3, 9, Eigen::ColMajor>
-      J_;  // jacobian before projection
   std::shared_ptr<CacheSE3Offset> cache_;
   bool resolveCaches() override;
 };

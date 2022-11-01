@@ -40,8 +40,6 @@ namespace g2o {
 // point to camera projection, monocular
 EdgeSE3PointXYZ::EdgeSE3PointXYZ() {
   information().setIdentity();
-  J_.fill(0);
-  J_.block<3, 3>(0, 0) = -Matrix3::Identity();
   resizeParameters(1);
   installParameter<CacheSE3Offset::ParameterType>(0);
 }
@@ -74,7 +72,7 @@ void EdgeSE3PointXYZ::computeError() {
   // VertexSE3 *cam = static_cast<VertexSE3*>(vertices_[0]);
   VertexPointXYZ* point = vertexXnRaw<1>();
 
-  Vector3 perr = cache_->w2n() * point->estimate();
+  const Vector3 perr = cache_->w2n() * point->estimate();
 
   // error, which is backwards from the normal observed - calculated
   // measurement_ is the measured projection
@@ -88,22 +86,27 @@ void EdgeSE3PointXYZ::linearizeOplus() {
 
   Vector3 Zcam = cache_->w2l() * vp->estimate();
 
+  using JacType = Eigen::Matrix<number_t, 3, 9>;
+
+  JacType Jprime = JacType::Zero();
+  Jprime.block<3, 3>(0, 0) = -Matrix3::Identity();
+
   //  J(0,3) = -0.0;
-  J_(0, 4) = -2 * Zcam(2);
-  J_(0, 5) = 2 * Zcam(1);
+  Jprime(0, 4) = -2 * Zcam(2);
+  Jprime(0, 5) = 2 * Zcam(1);
 
-  J_(1, 3) = 2 * Zcam(2);
+  Jprime(1, 3) = 2 * Zcam(2);
   //  J(1,4) = -0.0;
-  J_(1, 5) = -2 * Zcam(0);
+  Jprime(1, 5) = -2 * Zcam(0);
 
-  J_(2, 3) = -2 * Zcam(1);
-  J_(2, 4) = 2 * Zcam(0);
+  Jprime(2, 3) = -2 * Zcam(1);
+  Jprime(2, 4) = 2 * Zcam(0);
   //  J(2,5) = -0.0;
 
-  J_.block<3, 3>(0, 6) = cache_->w2l().rotation();
+  Jprime.block<3, 3>(0, 6) = cache_->w2l().rotation();
 
   Eigen::Matrix<number_t, 3, 9, Eigen::ColMajor> Jhom =
-      cache_->offsetParam()->inverseOffset().rotation() * J_;
+      cache_->offsetParam()->inverseOffset().rotation() * Jprime;
 
   jacobianOplusXi_ = Jhom.block<3, 6>(0, 0);
   jacobianOplusXj_ = Jhom.block<3, 3>(0, 6);
@@ -125,7 +128,7 @@ bool EdgeSE3PointXYZ::setMeasurementFromState() {
   //   cerr << "fatal error in retrieving cache" << endl;
   // }
 
-  Vector3 perr = cache_->w2n() * pt;
+  const Vector3 perr = cache_->w2n() * pt;
   measurement_ = perr;
   return true;
 }
@@ -144,7 +147,7 @@ void EdgeSE3PointXYZ::initialEstimate(const OptimizableGraph::VertexSet& from,
   //   cerr << "fatal error in retrieving cache" << endl;
   // }
   // SE3OffsetParameters* params=vcache->params;
-  Vector3 p = measurement_;
+  const Vector3 p = measurement_;
   point->setEstimate(cam->estimate() * (cache_->offsetParam()->offset() * p));
 }
 
