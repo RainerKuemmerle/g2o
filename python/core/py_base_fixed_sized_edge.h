@@ -13,8 +13,9 @@ void templatedBaseFixedSizedEdge(py::module& m, const std::string& suffix) {
       m, ("BaseFixedSizedEdge" + suffix).c_str())
       //.def(py::init<>())    // lead to "error: invalid new-expression of
       // abstract class type ..."
-      .def("create_vertex", &CLS::createVertex,
-           "i"_a)  // -> OptimizableGraph::Vertex*
+      // TODO(Rainer): Fix binding of create_vertex
+      //  .def("create_vertex", &CLS::createVertex,
+      //       "i"_a)  // -> OptimizableGraph::Vertex*
       .def("resize", &CLS::resize)
       .def("all_vertices_fixed", &CLS::allVerticesFixed)
       .def("linearize_oplus",
