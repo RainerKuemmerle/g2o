@@ -82,7 +82,7 @@ int main(int argc, const char* argv[]) {
     exit(0);
   }
 
-  double PIXEL_NOISE = atof(argv[1]);
+  const double PIXEL_NOISE = atof(argv[1]);
 
   double OUTLIER_RATIO = 0.0;
 
@@ -143,21 +143,21 @@ int main(int argc, const char* argv[]) {
                              g2o::Sampler::uniformRand(0., 1.) + 10);
   }
 
-  g2o::Vector2 focal_length(500, 500);     // pixels
-  g2o::Vector2 principal_point(320, 240);  // 640x480 image
-  double baseline = 0.075;                 // 7.5 cm baseline
+  const g2o::Vector2 focal_length(500, 500);     // pixels
+  const g2o::Vector2 principal_point(320, 240);  // 640x480 image
+  constexpr double kBaseline = 0.075;            // 7.5 cm baseline
 
   std::vector<g2o::Isometry3, Eigen::aligned_allocator<g2o::Isometry3>>
       true_poses;
 
   // set up camera params
   g2o::VertexSCam::setKcam(focal_length[0], focal_length[1], principal_point[0],
-                           principal_point[1], baseline);
+                           principal_point[1], kBaseline);
 
   // set up 5 vertices, first 2 fixed
   int vertex_id = 0;
   for (size_t i = 0; i < 5; ++i) {
-    g2o::Vector3 trans(i * 0.04 - 1., 0, 0);
+    const g2o::Vector3 trans(i * 0.04 - 1., 0, 0);
 
     Eigen::Quaterniond q;
     q.setIdentity();
@@ -179,7 +179,6 @@ int main(int argc, const char* argv[]) {
   }
 
   int point_id = vertex_id;
-  int point_num = 0;
   double sum_diff2 = 0;
 
   cout << endl;
@@ -220,7 +219,7 @@ int main(int argc, const char* argv[]) {
             ->mapPoint(z, true_points.at(i));
 
         if (z[0] >= 0 && z[1] >= 0 && z[0] < 640 && z[1] < 480) {
-          double sam = g2o::Sampler::uniformRand(0., 1.);
+          const double sam = g2o::Sampler::uniformRand(0., 1.);
           if (sam < OUTLIER_RATIO) {
             z = g2o::Vector3(Sample::uniform(64, 640), Sample::uniform(0, 480),
                              Sample::uniform(0, 64));  // disparity
@@ -253,7 +252,7 @@ int main(int argc, const char* argv[]) {
 
       if (inlier) {
         inliers.insert(point_id);
-        g2o::Vector3 diff = v_p->estimate() - true_points[i];
+        const g2o::Vector3 diff = v_p->estimate() - true_points[i];
 
         sum_diff2 += diff.dot(diff);
       }
@@ -264,7 +263,6 @@ int main(int argc, const char* argv[]) {
       pointid_2_trueid.insert(std::make_pair(point_id, i));
 
       ++point_id;
-      ++point_num;
     }
   }
 
@@ -294,7 +292,6 @@ int main(int argc, const char* argv[]) {
   cout << "Point error before optimisation (inliers only): "
        << sqrt(sum_diff2 / inliers.size()) << endl;
 
-  point_num = 0;
   sum_diff2 = 0;
 
   for (auto& it : pointid_2_trueid) {
@@ -312,13 +309,11 @@ int main(int argc, const char* argv[]) {
       exit(-1);
     }
 
-    g2o::Vector3 diff = v_p->estimate() - true_points[it.second];
+    const g2o::Vector3 diff = v_p->estimate() - true_points[it.second];
 
     if (inliers.find(it.first) == inliers.end()) continue;
 
     sum_diff2 += diff.dot(diff);
-
-    ++point_num;
   }
 
   cout << "Point error after optimisation (inliers only): "
