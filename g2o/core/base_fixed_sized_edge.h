@@ -104,20 +104,21 @@ std::tuple<Args...> createHessianMaps(const std::tuple<Args...>&) {
   return std::tuple<Args...>{createHessianMapK<Args>()...};
 }
 
-// clang-format off
-template <std::size_t I, typename... Tp>
-typename std::enable_if<I >= sizeof...(Tp), OptimizableGraph::Vertex*>::type createNthVertexType(size_t) {
-  return nullptr;  // end of recursion, return null
+template <int I, typename EdgeType, typename... CtorArgs>
+typename std::enable_if<I == -1, OptimizableGraph::Vertex*>::type
+createNthVertexType(int /*i*/, const EdgeType& /*t*/, CtorArgs... /*args*/) {
+  return nullptr;
 }
-template <std::size_t I, typename... Tp>
-typename std::enable_if <I < sizeof...(Tp), OptimizableGraph::Vertex*>::type createNthVertexType(size_t i) {
+
+template <int I, typename EdgeType, typename... CtorArgs>
+typename std::enable_if<I != -1, OptimizableGraph::Vertex*>::type
+createNthVertexType(int i, const EdgeType& t, CtorArgs... args) {
   if (i == I) {
-    using VertexType = typename std::tuple_element<I, std::tuple<Tp...>>::type;
-    return new VertexType();
+    using VertexType = typename EdgeType::template VertexXnType<I>;
+    return new VertexType(args...);
   }
-  return createNthVertexType<I + 1, Tp...>(i);
+  return createNthVertexType<I - 1, EdgeType, CtorArgs...>(i, t, args...);
 }
-// clang-format on
 }  // namespace internal
 
 template <int D, typename E, typename... VertexTypes>
@@ -216,10 +217,13 @@ class BaseFixedSizedEdge : public BaseEdge<D, E> {
   }
 
   //! create an instance of the Nth VertexType
-  OptimizableGraph::Vertex* createVertex(int i) override {
+  template <typename... CtorArgs>
+  OptimizableGraph::Vertex* createVertex(int i, CtorArgs... args) {
     if (i < 0) return nullptr;
-    return internal::createNthVertexType<0, VertexTypes...>(
-        static_cast<size_t>(i));
+    return internal::createNthVertexType<
+        sizeof...(VertexTypes) - 1,
+        typename std::remove_reference<decltype(*this)>::type, CtorArgs...>(
+        i, *this, args...);
   };
 
   void resize(size_t size) override;
