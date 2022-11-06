@@ -31,9 +31,7 @@
 #include "g2o/stuff/sampler.h"
 #include "g2o/types/data/robot_laser.h"
 
-using namespace std;
-using namespace g2o;
-using namespace testing;
+using namespace testing; // NOLINT
 
 MATCHER(NearEq, "") { return fabs(std::get<0>(arg) - std::get<1>(arg)) < 0.01; }
 
@@ -44,25 +42,25 @@ MATCHER(PointsNearEq, "") {
 TEST(Data, ReadWriteRobotLaser) {
   constexpr int kNumBeams = 180;
 
-  vector<number_t> ranges;
-  vector<number_t> remissions;
+  std::vector<number_t> ranges;
+  std::vector<number_t> remissions;
   for (int i = 0; i < kNumBeams; ++i) {
     ranges.push_back(i * 0.1);
-    remissions.push_back(sampleUniform(0., 1.));
+    remissions.push_back(g2o::sampleUniform(0., 1.));
   }
 
-  LaserParameters laserParams(kNumBeams, -M_PI_2, 1.0, 20.0);
-  RobotLaser laser;
+  const g2o::LaserParameters laserParams(kNumBeams, -M_PI_2, 1.0, 20.0);
+  g2o::RobotLaser laser;
   laser.setLaserParams(laserParams);
   laser.setRanges(ranges);
   laser.setRemissions(remissions);
-  laser.setOdomPose(SE2(1., 2., 0.34));
+  laser.setOdomPose(g2o::SE2(1., 2., 0.34));
 
   // write the data to read again
-  stringstream dataStream;
+  std::stringstream dataStream;
   laser.write(dataStream);
 
-  RobotLaser recoveredLaser;
+  g2o::RobotLaser recoveredLaser;
   recoveredLaser.read(dataStream);
 
   ASSERT_THAT(recoveredLaser.ranges(), SizeIs(laser.ranges().size()));

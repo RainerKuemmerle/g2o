@@ -26,51 +26,46 @@
 
 #include <gmock/gmock.h>
 
+#include <memory>
 #include <vector>
 
 #include "g2o/types/data/data_queue.h"
 #include "g2o/types/data/robot_data.h"
 
-using namespace std;
-using namespace g2o;
-
-class MyTrivialRobotData : public RobotData {
-  virtual bool write(std::ostream&) const { return false; }
-  virtual bool read(std::istream&) { return false; }
+class MyTrivialRobotData : public g2o::RobotData {
+   bool write(std::ostream&) const override { return false; }
+   bool read(std::istream&) override { return false; }
 };
 
 TEST(Data, DataQueue) {
-  vector<RobotData*> myRobotData;
-  constexpr int knumData = 10;
-  constexpr double ktimeOffset = 1234567890.;
-  for (int i = 0; i < knumData; ++i) {
-    RobotData* data = new MyTrivialRobotData();
-    data->setTimestamp(ktimeOffset + i);
+  std::vector<std::shared_ptr<MyTrivialRobotData>> myRobotData;
+  constexpr int kNumData = 10;
+  constexpr double kTimeOffset = 1234567890.;
+  for (int i = 0; i < kNumData; ++i) {
+    auto data = std::make_shared<MyTrivialRobotData>();
+    data->setTimestamp(kTimeOffset + i);
     myRobotData.emplace_back(data);
   }
 
   // create the robot queue
-  DataQueue dataQueue;
-  for (auto d : myRobotData) dataQueue.add(d);
+  g2o::DataQueue dataQueue;
+  for (const auto& d : myRobotData) dataQueue.add(d);
 
   // TESTS
-  ASSERT_EQ(nullptr, dataQueue.before(ktimeOffset));
-  ASSERT_EQ(nullptr, dataQueue.after(ktimeOffset + knumData - 1.));
+  ASSERT_EQ(nullptr, dataQueue.before(kTimeOffset));
+  ASSERT_EQ(nullptr, dataQueue.after(kTimeOffset + kNumData - 1.));
 
-  ASSERT_DOUBLE_EQ(ktimeOffset, dataQueue.findClosestData(0.)->timestamp());
+  ASSERT_DOUBLE_EQ(kTimeOffset, dataQueue.findClosestData(0.)->timestamp());
   ASSERT_DOUBLE_EQ(
-      ktimeOffset + knumData - 1.,
-      dataQueue.findClosestData(ktimeOffset + knumData + 1)->timestamp());
+      kTimeOffset + kNumData - 1.,
+      dataQueue.findClosestData(kTimeOffset + kNumData + 1)->timestamp());
 
-  ASSERT_DOUBLE_EQ(ktimeOffset,
-                   dataQueue.findClosestData(ktimeOffset)->timestamp());
-  ASSERT_DOUBLE_EQ(ktimeOffset,
-                   dataQueue.findClosestData(ktimeOffset + 0.45)->timestamp());
-  ASSERT_DOUBLE_EQ(ktimeOffset + 1.,
-                   dataQueue.findClosestData(ktimeOffset + 0.55)->timestamp());
-  ASSERT_DOUBLE_EQ(ktimeOffset + 1.,
-                   dataQueue.findClosestData(ktimeOffset + 1.)->timestamp());
-
-  // clean up
-  for (auto d : myRobotData) delete d;
+  ASSERT_DOUBLE_EQ(kTimeOffset,
+                   dataQueue.findClosestData(kTimeOffset)->timestamp());
+  ASSERT_DOUBLE_EQ(kTimeOffset,
+                   dataQueue.findClosestData(kTimeOffset + 0.45)->timestamp());
+  ASSERT_DOUBLE_EQ(kTimeOffset + 1.,
+                   dataQueue.findClosestData(kTimeOffset + 0.55)->timestamp());
+  ASSERT_DOUBLE_EQ(kTimeOffset + 1.,
+                   dataQueue.findClosestData(kTimeOffset + 1.)->timestamp());
 }

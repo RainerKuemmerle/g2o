@@ -28,6 +28,7 @@
 #include <fstream>
 #include <iostream>
 #include <map>
+#include <memory>
 
 #include "g2o/core/hyper_dijkstra.h"
 #include "g2o/core/sparse_optimizer.h"
@@ -104,14 +105,15 @@ static int run_sclam_odom_laser(int argc, char** argv) {
     cerr << "Error while loading gm2dl file" << endl;
   }
   DataQueue robotLaserQueue;
-  int numLaserOdom = Gm2dlIO::readRobotLaser(rawFilename, robotLaserQueue);
+  const int numLaserOdom =
+      Gm2dlIO::readRobotLaser(rawFilename, robotLaserQueue);
   if (numLaserOdom == 0) {
     cerr << "No raw information read" << endl;
     return 0;
   }
   cerr << "Read " << numLaserOdom << " laser readings from file" << endl;
 
-  bool gaugeFreedom = optimizer.gaugeFreedom();
+  const bool gaugeFreedom = optimizer.gaugeFreedom();
 
   auto gauge = optimizer.findGauge();
   if (gaugeFreedom) {
@@ -174,7 +176,7 @@ static int run_sclam_odom_laser(int argc, char** argv) {
   optimizer.computeActiveErrors();
   cerr << "Initial chi2 = " << FIXED(optimizer.chi2()) << endl;
 
-  int i = optimizer.optimize(maxIterations);
+  const int i = optimizer.optimize(maxIterations);
   if (maxIterations > 0 && !i) {
     cerr << "optimize failed, result might be invalid" << endl;
   }
@@ -201,7 +203,7 @@ static int run_sclam_odom_laser(int argc, char** argv) {
   // optional input of a separate file for applying the odometry calibration
   if (!odomTestFilename.empty()) {
     DataQueue testRobotLaserQueue;
-    int numTestOdom =
+    const int numTestOdom =
         Gm2dlIO::readRobotLaser(odomTestFilename, testRobotLaserQueue);
     if (numTestOdom == 0) {
       cerr << "Unable to read test data" << endl;
@@ -210,22 +212,22 @@ static int run_sclam_odom_laser(int argc, char** argv) {
       std::ofstream calibratedStream("odometry_calibrated.txt");
       Vector3 odomCalib =
           odomParamsVertex ? odomParamsVertex->estimate() : Vector3::Ones();
-      RobotLaser* prev = dynamic_cast<RobotLaser*>(
+      auto prev = std::dynamic_pointer_cast<RobotLaser>(
           testRobotLaserQueue.buffer().begin()->second);
       SE2 prevCalibratedPose = prev->odomPose();
 
-      for (auto it : testRobotLaserQueue.buffer()) {
-        auto* cur = dynamic_cast<RobotLaser*>(it.second);
+      for (const auto& it : testRobotLaserQueue.buffer()) {
+        auto cur = std::dynamic_pointer_cast<RobotLaser>(it.second);
         assert(cur);
 
-        double dt = cur->timestamp() - prev->timestamp();
-        SE2 motion = prev->odomPose().inverse() * cur->odomPose();
+        const double dt = cur->timestamp() - prev->timestamp();
+        const SE2 motion = prev->odomPose().inverse() * cur->odomPose();
 
         // convert to velocity Measurement
-        MotionMeasurement motionMeasurement(motion.translation().x(),
-                                            motion.translation().y(),
-                                            motion.rotation().angle(), dt);
-        VelocityMeasurement velocityMeasurement =
+        const MotionMeasurement motionMeasurement(
+            motion.translation().x(), motion.translation().y(),
+            motion.rotation().angle(), dt);
+        const VelocityMeasurement velocityMeasurement =
             OdomConvert::convertToVelocity(motionMeasurement);
 
         // apply calibration
@@ -234,13 +236,13 @@ static int run_sclam_odom_laser(int argc, char** argv) {
                                            calibratedVelocityMeasurement.vl());
         calibratedVelocityMeasurement.setVr(odomCalib(1) *
                                            calibratedVelocityMeasurement.vr());
-        MotionMeasurement mm = OdomConvert::convertToMotion(
+        const MotionMeasurement mm = OdomConvert::convertToMotion(
             calibratedVelocityMeasurement, odomCalib(2));
 
         // combine calibrated odometry with the previous pose
         SE2 remappedOdom;
         remappedOdom.fromVector(mm.measurement());
-        SE2 calOdomPose = prevCalibratedPose * remappedOdom;
+        const SE2 calOdomPose = prevCalibratedPose * remappedOdom;
 
         // write output
         rawStream << prev->odomPose().translation().x() << " "
@@ -259,7 +261,7 @@ static int run_sclam_odom_laser(int argc, char** argv) {
   if (!outputfilename.empty()) {
     Gm2dlIO::updateLaserData(optimizer);
     cerr << "Writing " << outputfilename << " ... ";
-    bool writeStatus = Gm2dlIO::writeGm2dl(outputfilename, optimizer);
+    const bool writeStatus = Gm2dlIO::writeGm2dl(outputfilename, optimizer);
     cerr << (writeStatus ? "done." : "failed") << endl;
   }
 

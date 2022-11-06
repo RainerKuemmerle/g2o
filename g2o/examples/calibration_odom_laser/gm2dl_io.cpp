@@ -28,6 +28,7 @@
 
 #include <fstream>
 #include <iostream>
+#include <memory>
 
 #include "g2o/core/factory.h"
 #include "g2o/core/sparse_optimizer.h"
@@ -60,7 +61,7 @@ bool Gm2dlIO::readGm2dl(const std::string& filename, SparseOptimizer& optimizer,
   std::stringstream currentLine;
   std::shared_ptr<VertexSE2> previousVertex;
   while (true) {
-    int bytesRead = readLine(is, currentLine);
+    const int bytesRead = readLine(is, currentLine);
     if (bytesRead == -1) break;
     std::string tag;
     currentLine >> tag;
@@ -174,7 +175,7 @@ bool Gm2dlIO::writeGm2dl(const std::string& filename,
     fout << std::endl;
     auto data = v->userData();
     if (data) {  // writing the data via the factory
-      std::string tag = factory->tag(data.get());
+      const std::string tag = factory->tag(data.get());
       if (!tag.empty()) {
         fout << tag << " ";
         data->write(fout);
@@ -244,12 +245,12 @@ int Gm2dlIO::readRobotLaser(const std::string& filename, DataQueue& queue) {
   // parse the GM2DL file and extract the vertices, edges, and the laser data
   std::stringstream currentLine;
   while (true) {
-    int bytesRead = readLine(is, currentLine);
+    const int bytesRead = readLine(is, currentLine);
     if (bytesRead == -1) break;
     std::string tag;
     currentLine >> tag;
     if (tag == "ROBOTLASER1") {
-      auto* rl2 = new RobotLaser;
+      auto rl2 = std::make_shared<RobotLaser>();
       rl2->read(currentLine);
       queue.add(rl2);
       cnt++;

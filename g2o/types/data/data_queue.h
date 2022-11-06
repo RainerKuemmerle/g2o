@@ -28,6 +28,7 @@
 #define G2O_DATA_QUEUE_H
 
 #include <map>
+#include <memory>
 
 #include "g2o_types_data_api.h"
 
@@ -40,14 +41,15 @@ class RobotData;
  */
 class G2O_TYPES_DATA_API DataQueue {
  public:
-  using Buffer = std::map<number_t, RobotData*>;
+  using RobotDataPtr = std::shared_ptr<RobotData>;
+  using Buffer = std::map<number_t, RobotDataPtr>;
 
-  void add(RobotData* rd);
+  void add(RobotDataPtr rd);
 
-  RobotData* findClosestData(number_t timestamp) const;
+  RobotDataPtr findClosestData(number_t timestamp) const;
 
-  RobotData* before(number_t timestamp) const;
-  RobotData* after(number_t timestamp) const;
+  RobotDataPtr before(number_t timestamp) const;
+  RobotDataPtr after(number_t timestamp) const;
 
   const Buffer& buffer() const { return buffer_; }
 

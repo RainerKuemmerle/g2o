@@ -27,6 +27,7 @@
 #include "sclam_helpers.h"
 
 #include <iostream>
+#include <memory>
 
 #include "g2o/core/block_solver.h"
 #include "g2o/core/optimization_algorithm_gauss_newton.h"
@@ -67,10 +68,10 @@ void addOdometryCalibLinksDifferential(SparseOptimizer& optimizer,
 
     auto rl1 = std::dynamic_pointer_cast<RobotLaser>(r1->userData());
     auto rl2 = std::dynamic_pointer_cast<RobotLaser>(r2->userData());
-    auto* odom1 =
-        dynamic_cast<RobotLaser*>(odomData.findClosestData(rl1->timestamp()));
-    auto* odom2 =
-        dynamic_cast<RobotLaser*>(odomData.findClosestData(rl2->timestamp()));
+    auto odom1 = std::dynamic_pointer_cast<RobotLaser>(
+        odomData.findClosestData(rl1->timestamp()));
+    auto odom2 = std::dynamic_pointer_cast<RobotLaser>(
+        odomData.findClosestData(rl2->timestamp()));
 
     if (fabs(rl1->timestamp() - rl2->timestamp()) < 1e-7) {
       std::cerr << "strange edge " << r1->id() << " <-> " << r2->id()
@@ -85,7 +86,7 @@ void addOdometryCalibLinksDifferential(SparseOptimizer& optimizer,
 
     // cerr << PVAR(odom1->odomPose().toVector().transpose()) << endl;
 
-    SE2 odomMotion = odom1->odomPose().inverse() * odom2->odomPose();
+    const SE2 odomMotion = odom1->odomPose().inverse() * odom2->odomPose();
     // cerr << PVAR(odomMotion.toVector().transpose()) << endl;
     // cerr << PVAR(scanmatchEdge->measurement().toVector().transpose()) <<
     // endl;
@@ -95,7 +96,7 @@ void addOdometryCalibLinksDifferential(SparseOptimizer& optimizer,
     e->vertices()[1] = r2;
     e->vertices()[2] = odomParamsVertex;
 
-    MotionMeasurement mm(
+    const MotionMeasurement mm(
         odomMotion.translation().x(), odomMotion.translation().y(),
         odomMotion.rotation().angle(), odom2->timestamp() - odom1->timestamp());
     e->setMeasurement(OdomConvert::convertToVelocity(mm));
