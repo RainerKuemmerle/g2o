@@ -101,14 +101,14 @@ void drawCov(const Eigen::Vector2d& p, const Eigen::MatrixBase<Derived>& cov) {
   /* get eigen-values */
   double D = a * d - b * b;  // determinant of the matrix
   double T = a + d;          // Trace of the matrix
-  double h = sqrt(0.25 * (T * T) - D);
-  double lambda1 =
+  const double h = sqrt(0.25 * (T * T) - D);
+  const double lambda1 =
       0.5 * T + h;  // solving characteristic polynom using p-q-formula
-  double lambda2 = 0.5 * T - h;
+  const double lambda2 = 0.5 * T - h;
 
-  double theta = 0.5 * atan2(2.0 * b, a - d);
-  double majorAxis = 3.0 * sqrt(lambda1);
-  double minorAxis = 3.0 * sqrt(lambda2);
+  const double theta = 0.5 * atan2(2.0 * b, a - d);
+  const double majorAxis = 3.0 * sqrt(lambda1);
+  const double minorAxis = 3.0 * sqrt(lambda2);
 
   glRotatef(RAD2DEG(theta), 0.F, 0.F, 1.F);
   glScalef(majorAxis * scalingFactor, minorAxis * scalingFactor, 1.F);

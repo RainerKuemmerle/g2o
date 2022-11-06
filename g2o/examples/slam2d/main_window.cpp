@@ -38,7 +38,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) { setupUi(this); }
 
 void MainWindow::on_actionLoad_triggered(bool) {
   viewer->graph->clear();
-  QString filename = QFileDialog::getOpenFileName(
+  const QString filename = QFileDialog::getOpenFileName(
       this, "Load g2o file", "", "g2o files (*.g2o);;All Files (*)");
   if (!filename.isNull()) {
     std::ifstream ifs(filename.toStdString().c_str());
@@ -52,7 +52,7 @@ void MainWindow::on_actionLoad_triggered(bool) {
 }
 
 void MainWindow::on_actionSave_triggered(bool) {
-  QString filename = QFileDialog::getSaveFileName(this, "Save g2o file", "",
+  const QString filename = QFileDialog::getSaveFileName(this, "Save g2o file", "",
                                                   "g2o files (*.g2o)");
   if (!filename.isNull()) {
     std::ofstream fout(filename.toStdString().c_str());
@@ -84,8 +84,8 @@ void MainWindow::on_btnOptimize_clicked() {
       viewer->graph->setAlgorithm(createGaussNewton());
   }
 
-  int maxIterations = spIterations->value();
-  int iter = viewer->graph->optimize(maxIterations);
+  const int maxIterations = spIterations->value();
+  const int iter = viewer->graph->optimize(maxIterations);
   if (maxIterations > 0 && !iter) {
     std::cerr << "Optimization failed, result might be invalid" << std::endl;
   }
@@ -111,7 +111,7 @@ void MainWindow::fixGraph() {
   }
 
   // check for vertices to fix to remove DoF
-  bool gaugeFreedom = viewer->graph->gaugeFreedom();
+  const bool gaugeFreedom = viewer->graph->gaugeFreedom();
   auto gauge = viewer->graph->findGauge();
   if (gaugeFreedom) {
     if (!gauge) {

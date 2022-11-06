@@ -27,7 +27,7 @@
 G2O_USE_TYPE_GROUP(slam2d);
 
 int main(int argc, char** argv) {
-  QApplication qapp(argc, argv);
+  const QApplication qapp(argc, argv);
 
   MainWindow mw;
   mw.viewer->graph = std::make_unique<g2o::SparseOptimizer>();
