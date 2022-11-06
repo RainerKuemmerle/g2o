@@ -84,8 +84,10 @@ using Affine3 = Eigen::Transform<number_t, 3, Eigen::Affine, Eigen::ColMajor>;
 using Rotation2D = Eigen::Rotation2D<number_t>;
 
 using Quaternion = Eigen::Quaternion<number_t>;
-
 using AngleAxis = Eigen::AngleAxis<number_t>;
+
+using Translation2 = Eigen::Translation<number_t, 2>;
+using Translation3 = Eigen::Translation<number_t, 3>;
 
 }  // end namespace g2o
 
