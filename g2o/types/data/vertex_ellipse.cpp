@@ -46,7 +46,7 @@ VertexEllipse::VertexEllipse()
       singularValues_(Vector2F::Zero()) {}
 
 void VertexEllipse::updateSVD() const {
-  Eigen::SelfAdjointEigenSolver<Matrix2F> eigenSolver(
+  const Eigen::SelfAdjointEigenSolver<Matrix2F> eigenSolver(
       covariance_.block<2, 2>(0, 0));
   UMatrix_ = eigenSolver.eigenvectors();
   singularValues_ = eigenSolver.eigenvalues();
@@ -90,8 +90,8 @@ bool VertexEllipse::write(std::ostream& os) const {
      << covariance_(1, 2) << " " << covariance_(2, 2) << " ";
 
   os << matchingVertices_.size() << " ";
-  for (const auto& matchingVertice : matchingVertices_) {
-    os << matchingVertice.x() << " " << matchingVertice.y() << " ";
+  for (const auto& matchingVertex : matchingVertices_) {
+    os << matchingVertex.x() << " " << matchingVertex.y() << " ";
   }
 
   return os.good();
@@ -130,9 +130,9 @@ bool VertexEllipseDrawAction::operator()(
 
   glPushMatrix();
 
-  float sigmaTheta = std::sqrt(that->covariance()(2, 2));
-  float x = 0.1F * cosf(sigmaTheta);
-  float y = 0.1F * sinf(sigmaTheta);
+  const float sigmaTheta = std::sqrt(that->covariance()(2, 2));
+  const float x = 0.1F * cosf(sigmaTheta);
+  const float y = 0.1F * sinf(sigmaTheta);
 
   glColor3f(1.F, 0.7F, 1.F);
   glBegin(GL_LINE_STRIP);
@@ -150,7 +150,7 @@ bool VertexEllipseDrawAction::operator()(
   }
 
   Matrix2F rot = that->U();
-  float angle = std::atan2(rot(1, 0), rot(0, 0));
+  const float angle = std::atan2(rot(1, 0), rot(0, 0));
   glRotatef(angle * 180.0 / const_pi(), 0., 0., 1.);
   Vector2F sv = that->singularValues();
   glScalef(sqrt(sv(0)), sqrt(sv(1)), 1);
@@ -158,7 +158,7 @@ bool VertexEllipseDrawAction::operator()(
   glColor3f(1.F, 0.7F, 1.F);
   glBegin(GL_LINE_LOOP);
   for (int i = 0; i < 36; i++) {
-    float rad = i * const_pi() / 18.0;
+    const float rad = i * const_pi() / 18.0;
     glVertex2f(std::cos(rad), std::sin(rad));
   }
   glEnd();

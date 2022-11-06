@@ -62,7 +62,7 @@ bool RobotLaser::read(std::istream& is) {
   number_t y;
   number_t theta;
   is >> x >> y >> theta;
-  SE2 lp(x, y, theta);
+  const SE2 lp(x, y, theta);
   // cerr << "x: " << x << " y:" << y << " th:" << theta << " ";
   is >> x >> y >> theta;
   // cerr << "x: " << x << " y:" << y << " th:" << theta;
@@ -84,9 +84,9 @@ bool RobotLaser::write(std::ostream& os) const {
      << laserParams_.maxRange << " " << laserParams_.accuracy << " "
      << laserParams_.remissionMode << " ";
   os << ranges().size();
-  for (double i : ranges()) os << " " << i;
+  for (const double i : ranges()) os << " " << i;
   os << " " << remissions_.size();
-  for (double remission : remissions_) os << " " << remission;
+  for (const double remission : remissions_) os << " " << remission;
 
   // odometry pose
   Vector3 p = (odomPose_ * laserParams_.laserPose).toVector();

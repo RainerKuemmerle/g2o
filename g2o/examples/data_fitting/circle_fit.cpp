@@ -31,6 +31,7 @@
 #include "g2o/core/auto_differentiation.h"
 #include "g2o/core/base_unary_edge.h"
 #include "g2o/core/base_vertex.h"
+#include "g2o/core/eigen_types.h"
 #include "g2o/core/optimization_algorithm_factory.h"
 #include "g2o/core/sparse_optimizer.h"
 #include "g2o/stuff/command_args.h"
@@ -38,17 +39,23 @@
 
 G2O_USE_OPTIMIZATION_LIBRARY(dense);
 
-double errorOfSolution(int numPoints, Eigen::Vector2d* points,
+namespace {
+using PointVector =
+    std::vector<g2o::Vector2, Eigen::aligned_allocator<g2o::Vector2>>;
+
+double errorOfSolution(const PointVector& points,
                        const Eigen::Vector3d& circle) {
-  Eigen::Vector2d center = circle.head<2>();
-  double radius = circle(2);
+  const Eigen::Vector2d center = circle.head<2>();
+  const double radius = circle(2);
   double error = 0.;
-  for (int i = 0; i < numPoints; ++i) {
-    double d = (points[i] - center).norm() - radius;
-    error += d * d;
+  for (const auto& point : points) {
+    const double distance = (point - center).norm() - radius;
+    error += distance * distance;
   }
   return error;
 }
+
+}  // namespace
 
 /**
  * \brief a circle located at x,y with radius r
@@ -109,14 +116,14 @@ int main(int argc, char** argv) {
   arg.parseArgs(argc, argv);
 
   // generate random data
-  Eigen::Vector2d center(4.0, 2.0);
-  double radius = 2.0;
-  auto* points = new Eigen::Vector2d[numPoints];
+  const Eigen::Vector2d center(4.0, 2.0);
+  constexpr double kRadius = 2.0;
+  PointVector points(numPoints);
 
   g2o::Sampler::seedRand();
   for (int i = 0; i < numPoints; ++i) {
-    double r = g2o::Sampler::gaussRand(radius, 0.05);
-    double angle = g2o::Sampler::uniformRand(0.0, 2.0 * M_PI);
+    const double r = g2o::Sampler::gaussRand(kRadius, 0.05);
+    const double angle = g2o::Sampler::uniformRand(0.0, 2.0 * M_PI);
     points[i].x() = center.x() + r * cos(angle);
     points[i].y() = center.y() + r * sin(angle);
   }
@@ -158,9 +165,8 @@ int main(int argc, char** argv) {
   std::cout << "Iterative least squares solution" << std::endl;
   std::cout << "center of the circle "
             << circle->estimate().head<2>().transpose() << std::endl;
-  std::cout << "radius of the cirlce " << circle->estimate()(2) << std::endl;
-  std::cout << "error "
-            << errorOfSolution(numPoints, points, circle->estimate())
+  std::cout << "radius of the circle " << circle->estimate()(2) << std::endl;
+  std::cout << "error " << errorOfSolution(points, circle->estimate())
             << std::endl;
   std::cout << std::endl;
 
@@ -189,12 +195,8 @@ int main(int argc, char** argv) {
   std::cout << "Linear least squares solution" << std::endl;
   std::cout << "center of the circle " << solution.head<2>().transpose()
             << std::endl;
-  std::cout << "radius of the cirlce " << solution(2) << std::endl;
-  std::cout << "error " << errorOfSolution(numPoints, points, solution)
-            << std::endl;
-
-  // clean up
-  delete[] points;
+  std::cout << "radius of the circle " << solution(2) << std::endl;
+  std::cout << "error " << errorOfSolution(points, solution) << std::endl;
 
   return 0;
 }

@@ -37,16 +37,18 @@
 
 namespace g2o {
 
-namespace internal {
-number_t epsilon(const number_t, const number_t) { return 1e-6; }
-}  // namespace internal
-
 using EpsilonFunction = std::function<number_t(const number_t, const number_t)>;
+
+namespace internal {
+static EpsilonFunction epsilon = [](const number_t, const number_t) {
+  return 1e-6;
+};
+}  // namespace internal
 
 template <typename EdgeType>
 void evaluateJacobianUnary(EdgeType& e, JacobianWorkspace& jacobianWorkspace,
                            JacobianWorkspace& numericJacobianWorkspace,
-                           EpsilonFunction eps = internal::epsilon) {
+                           const EpsilonFunction& eps = internal::epsilon) {
   // calling the analytic Jacobian but writing to the numeric workspace
   e.BaseUnaryEdge<EdgeType::kDimension, typename EdgeType::Measurement,
                   typename EdgeType::VertexXiType>::

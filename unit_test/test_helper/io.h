@@ -56,7 +56,7 @@ void randomizeInformationMatrix(Eigen::MatrixBase<Derived>& m) {
 template <typename T>
 struct OptionalPtr {
   OptionalPtr() : ptr(new T) {}
-  OptionalPtr(std::shared_ptr<T> p) : ptr(p) {}
+  OptionalPtr(std::shared_ptr<T> p) : ptr(p) {}  // NOLINT
   std::shared_ptr<T> ptr;
 };
 

@@ -54,7 +54,7 @@ static int convert_sba_slam3d(int argc, char** argv) {
   commandLineArguments.parseArgs(argc, argv);
 
   OptimizableGraph inputGraph;
-  bool loadStatus = inputGraph.load(inputFilename.c_str());
+  const bool loadStatus = inputGraph.load(inputFilename.c_str());
   if (!loadStatus) {
     cerr << "Error while loading input data" << endl;
     return 1;
@@ -110,9 +110,9 @@ static int convert_sba_slam3d(int argc, char** argv) {
       oe->vertices()[0] = outputGraph.vertex(e->vertices()[1]->id());
       oe->vertices()[1] = outputGraph.vertex(e->vertices()[0]->id());
 
-      double kx = e->measurement().x();
-      double ky = e->measurement().y();
-      double disparity = kx - e->measurement()(2);
+      const double kx = e->measurement().x();
+      const double ky = e->measurement().y();
+      const double disparity = kx - e->measurement()(2);
 
       oe->setMeasurement(Eigen::Vector3d(kx, ky, disparity / (fx * baseline)));
       oe->setInformation(

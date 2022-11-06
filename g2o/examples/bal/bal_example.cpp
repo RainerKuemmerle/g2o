@@ -225,11 +225,11 @@ int main(int argc, char** argv) {
 
   using BalBlockSolver = g2o::BlockSolver<g2o::BlockSolverTraits<9, 3>>;
 #ifdef G2O_HAVE_CHOLMOD
-  std::string choleskySolverName = "CHOLMOD";
+  const std::string choleskySolverName = "CHOLMOD";
   using BalLinearSolver =
       g2o::LinearSolverCholmod<BalBlockSolver::PoseMatrixType>;
 #else
-  std::string choleskySolverName = "Eigen";
+  const std::string choleskySolverName = "Eigen";
   using BalLinearSolver =
       g2o::LinearSolverEigen<BalBlockSolver::PoseMatrixType>;
 #endif
@@ -287,7 +287,7 @@ int main(int argc, char** argv) {
       auto p = std::make_shared<VertexPointBAL>();
       p->setId(id);
       p->setMarginalized(true);
-      bool addedVertex = optimizer.addVertex(p);
+      const bool addedVertex = optimizer.addVertex(p);
       if (!addedVertex) {
         std::cerr << "failing adding vertex" << std::endl;
       }
@@ -314,7 +314,7 @@ int main(int argc, char** argv) {
       e->setVertex(1, point);
       e->setInformation(g2o::Matrix2::Identity());
       e->setMeasurement(g2o::Vector2(obsX, obsY));
-      bool addedEdge = optimizer.addEdge(e);
+      const bool addedEdge = optimizer.addEdge(e);
       if (!addedEdge) {
         std::cerr << "error adding edge" << std::endl;
       }

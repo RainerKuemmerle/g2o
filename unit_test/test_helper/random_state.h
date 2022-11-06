@@ -24,6 +24,8 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+#include <Eigen/Geometry>
+#include "g2o/config.h"
 #include "g2o/core/eigen_types.h"
 #include "g2o/stuff/sampler.h"
 #include "g2o/types/slam3d/se3quat.h"
@@ -31,12 +33,9 @@
 namespace g2o {
 namespace internal {
 inline Isometry3 randomIsometry3() {
-  Eigen::Vector3d rotAxisAngle = Eigen::Vector3d::Random();
-  rotAxisAngle += Eigen::Vector3d::Random();
-  Eigen::AngleAxisd rotation(rotAxisAngle.norm(), rotAxisAngle.normalized());
-  Eigen::Isometry3d result = (Eigen::Isometry3d)rotation.toRotationMatrix();
-  result.translation() = Eigen::Vector3d::Random();
-  return result;
+  const g2o::Vector3 rotAxisAngle = g2o::Vector3::Random() + g2o::Vector3::Random();
+  const g2o::AngleAxis rotation(rotAxisAngle.norm(), rotAxisAngle.normalized());
+  return g2o::Translation3(g2o::Vector3::Random()) * rotation;
 }
 
 struct RandomSE3Quat {

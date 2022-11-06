@@ -27,6 +27,7 @@
 #include <Eigen/Core>
 #include <iostream>
 
+#include "g2o/config.h"
 #include "g2o/core/auto_differentiation.h"
 #include "g2o/core/base_unary_edge.h"
 #include "g2o/core/base_vertex.h"
@@ -105,23 +106,26 @@ int main(int argc, char** argv) {
 
   // generate random data
   g2o::Sampler::seedRand();
-  double a = 2.;
-  double b = 0.4;
-  double lambda = 0.2;
-  auto* points = new Eigen::Vector2d[numPoints];
+  std::vector<g2o::Vector2, Eigen::aligned_allocator<g2o::Vector2>> points(
+      numPoints);
   for (int i = 0; i < numPoints; ++i) {
-    double x = g2o::Sampler::uniformRand(0, 10);
-    double y = a * exp(-lambda * x) + b;
-    // add Gaussian noise
-    y += g2o::Sampler::gaussRand(0, 0.02);
+    constexpr double kA = 2.;
+    constexpr double kB = 0.4;
+    constexpr double kLambda = 0.2;
+    const double x = g2o::Sampler::uniformRand(0, 10);
+    const double y = kA * exp(-kLambda * x) +
+                     kB
+                     // add Gaussian noise
+                     + g2o::Sampler::gaussRand(0, 0.02);
     points[i].x() = x;
     points[i].y() = y;
   }
 
   if (!dumpFilename.empty()) {
     std::ofstream fout(dumpFilename.c_str());
-    for (int i = 0; i < numPoints; ++i)
-      fout << points[i].transpose() << std::endl;
+    for (const auto& point : points) {
+      fout << point.transpose() << std::endl;
+    }
   }
 
   // setup the solver
@@ -144,7 +148,7 @@ int main(int argc, char** argv) {
   // 2. add the points we measured to be on the curve
   for (int i = 0; i < numPoints; ++i) {
     auto e = std::make_shared<EdgePointOnCurve>();
-    e->setInformation(Eigen::Matrix<double, 1, 1>::Identity());
+    e->setInformation(Eigen::Matrix<number_t, 1, 1>::Identity());
     e->setVertex(0, params);
     e->setMeasurement(points[i]);
     optimizer.addEdge(e);
@@ -165,9 +169,6 @@ int main(int argc, char** argv) {
   std::cout << "b      = " << params->estimate()(1) << std::endl;
   std::cout << "lambda = " << params->estimate()(2) << std::endl;
   std::cout << std::endl;
-
-  // clean up
-  delete[] points;
 
   return 0;
 }

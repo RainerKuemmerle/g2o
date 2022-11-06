@@ -73,7 +73,7 @@ static int create_sphere(int argc, char** argv) {
     noiseTranslation.push_back(0.01);
   }
   std::cerr << "Noise for the translation:";
-  for (double i : noiseTranslation) std::cerr << " " << i;
+  for (const double i : noiseTranslation) std::cerr << " " << i;
   std::cerr << std::endl;
   if (noiseRotation.empty()) {
     std::cerr << "using default noise for the rotation" << std::endl;
@@ -82,7 +82,7 @@ static int create_sphere(int argc, char** argv) {
     noiseRotation.push_back(0.005);
   }
   std::cerr << "Noise for the rotation:";
-  for (double i : noiseRotation) std::cerr << " " << i;
+  for (const double i : noiseRotation) std::cerr << " " << i;
   std::cerr << std::endl;
 
   Eigen::Matrix3d transNoise = Eigen::Matrix3d::Zero();
@@ -105,12 +105,12 @@ static int create_sphere(int argc, char** argv) {
       auto v = std::make_shared<VertexSE3>();
       v->setId(id++);
 
-      Eigen::AngleAxisd rotz(-M_PI + 2 * n * M_PI / nodesPerLevel,
+      const Eigen::AngleAxisd rotz(-M_PI + 2 * n * M_PI / nodesPerLevel,
                              Eigen::Vector3d::UnitZ());
-      Eigen::AngleAxisd roty(
+      const Eigen::AngleAxisd roty(
           -0.5 * M_PI + id * M_PI / (numLaps * nodesPerLevel),
           Eigen::Vector3d::UnitY());
-      Eigen::Matrix3d rot = (rotz * roty).toRotationMatrix();
+      const Eigen::Matrix3d rot = (rotz * roty).toRotationMatrix();
 
       Eigen::Isometry3d t;
       t = rot;
@@ -124,7 +124,7 @@ static int create_sphere(int argc, char** argv) {
   for (size_t i = 1; i < vertices.size(); ++i) {
     const auto& prev = vertices[i - 1];
     const auto& cur = vertices[i];
-    Eigen::Isometry3d t = prev->estimate().inverse() * cur->estimate();
+    const Eigen::Isometry3d t = prev->estimate().inverse() * cur->estimate();
     auto e = std::make_shared<EdgeSE3>();
     e->setVertex(0, prev);
     e->setVertex(1, cur);
@@ -137,11 +137,11 @@ static int create_sphere(int argc, char** argv) {
   // generate loop closure edges
   for (int f = 1; f < numLaps; ++f) {
     for (int nn = 0; nn < nodesPerLevel; ++nn) {
-      auto from = vertices[(f - 1) * nodesPerLevel + nn];
+      const auto& from = vertices[(f - 1) * nodesPerLevel + nn];
       for (int n = -1; n <= 1; ++n) {
         if (f == numLaps - 1 && n == 1) continue;
-        auto to = vertices[f * nodesPerLevel + nn + n];
-        Eigen::Isometry3d t = from->estimate().inverse() * to->estimate();
+        const auto& to = vertices[f * nodesPerLevel + nn + n];
+        const Eigen::Isometry3d t = from->estimate().inverse() * to->estimate();
         auto e = std::make_shared<EdgeSE3>();
         e->setVertex(0, from);
         e->setVertex(1, to);
@@ -163,7 +163,7 @@ static int create_sphere(int argc, char** argv) {
     std::vector<int> seeds(2);
     seedSeq.generate(seeds.begin(), seeds.end());
     std::cerr << "using seeds:";
-    for (int seed : seeds) std::cerr << " " << seed;
+    for (const int seed : seeds) std::cerr << " " << seed;
     std::cerr << std::endl;
     transSampler.seed(seeds[0]);
     rotSampler.seed(seeds[1]);
@@ -171,10 +171,10 @@ static int create_sphere(int argc, char** argv) {
 
   // noise for all the edges
   for (auto& e : edges) {
-    Eigen::Quaterniond gtQuat = Eigen::Quaterniond(e->measurement().linear());
-    Eigen::Vector3d gtTrans = e->measurement().translation();
+    const Eigen::Quaterniond gtQuat = Eigen::Quaterniond(e->measurement().linear());
+    const Eigen::Vector3d gtTrans = e->measurement().translation();
 
-    Eigen::Vector3d quatXYZ = rotSampler.generateSample();
+    const Eigen::Vector3d quatXYZ = rotSampler.generateSample();
     double qw = 1.0 - quatXYZ.norm();
     if (qw < 0) {
       qw = 0.;
@@ -193,11 +193,11 @@ static int create_sphere(int argc, char** argv) {
 
   // concatenate all the odometry constraints to compute the initial state
   for (auto& e : odometryEdges) {
-    auto from = std::static_pointer_cast<VertexSE3>(e->vertex(0));
-    VertexSE3* to = static_cast<VertexSE3*>(e->vertex(1).get());
+    auto from = e->vertexXn<0>();
+    auto to = e->vertexXn<1>();
     HyperGraph::VertexSet aux;
     aux.insert(from);
-    e->initialEstimate(aux, to);
+    e->initialEstimate(aux, to.get());
   }
 
   // write output
@@ -209,23 +209,21 @@ static int create_sphere(int argc, char** argv) {
     std::cerr << "writing to stdout" << std::endl;
   }
 
-  std::string vertexTag = Factory::instance()->tag(vertices[0].get());
-  std::string edgeTag = Factory::instance()->tag(edges[0].get());
+  const std::string vertexTag = Factory::instance()->tag(vertices[0].get());
+  const std::string edgeTag = Factory::instance()->tag(edges[0].get());
 
   std::ostream& fout = outFilename != "-" ? fileOutputStream : std::cout;
-  for (auto& vertice : vertices) {
-    VertexSE3* v = vertice.get();
-    fout << vertexTag << " " << v->id() << " ";
-    v->write(fout);
+  for (auto& vertex : vertices) {
+    fout << vertexTag << " " << vertex->id() << " ";
+    vertex->write(fout);
     fout << std::endl;
   }
 
   for (auto& edge : edges) {
-    EdgeSE3* e = edge.get();
-    VertexSE3* from = static_cast<VertexSE3*>(e->vertex(0).get());
-    VertexSE3* to = static_cast<VertexSE3*>(e->vertex(1).get());
+    auto from = edge->vertexXn<0>();
+    auto to = edge->vertexXn<1>();
     fout << edgeTag << " " << from->id() << " " << to->id() << " ";
-    e->write(fout);
+    edge->write(fout);
     fout << std::endl;
   }
 

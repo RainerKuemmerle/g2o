@@ -31,9 +31,7 @@
 namespace g2o {
 
 RawLaser::RawLaser()
-    :
-
-      laserParams_(0, 180, -const_pi() / 2, const_pi() / 180, 50, cst(0.1), 0) {
+    : laserParams_(0, 180, -const_pi() / 2, const_pi() / 180, 50, cst(0.1), 0) {
 }
 
 bool RawLaser::write(std::ostream& /*os*/) const {
@@ -87,7 +85,7 @@ RawLaser::Point2DVector RawLaser::cartesian() const {
   for (size_t i = 0; i < ranges_.size(); ++i) {
     const number_t& r = ranges_[i];
     if (r < laserParams_.maxRange && r > laserParams_.minRange) {
-      number_t alpha =
+      const number_t alpha =
           laserParams_.firstBeamAngle + i * laserParams_.angularStep;
       points.push_back(Vector2(std::cos(alpha) * r, std::sin(alpha) * r));
     }
