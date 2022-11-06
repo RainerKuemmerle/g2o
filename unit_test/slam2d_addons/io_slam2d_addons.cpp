@@ -35,8 +35,7 @@
 #include "gtest/gtest.h"
 #include "unit_test/test_helper/io.h"
 
-using namespace std;
-using namespace g2o;
+using namespace g2o; // NOLINT
 
 struct RandomLine2D {
   static Line2D create() { return Line2D(g2o::Vector2::Random()); }

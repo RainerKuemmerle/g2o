@@ -33,29 +33,29 @@
 class CommandArgsTest : public ::testing::Test {
  protected:
   void SetUp() override {
-    arg.param(argumentNames[0], valueInt, 5, "integer value");
-    arg.param(argumentNames[1], valueDouble, 1e-6, "double value");
-    arg.param(argumentNames[2], valueBool, false, "boolean");
-    arg.param(argumentNames[3], valueVectorInt, std::vector<int>(),
+    arg_.param(argumentNames_[0], valueInt_, 5, "integer value");
+    arg_.param(argumentNames_[1], valueDouble_, 1e-6, "double value");
+    arg_.param(argumentNames_[2], valueBool_, false, "boolean");
+    arg_.param(argumentNames_[3], valueVectorInt_, std::vector<int>(),
               "vector of int");
-    arg.param(argumentNames[4], valueVectorDouble, std::vector<double>(),
+    arg_.param(argumentNames_[4], valueVectorDouble_, std::vector<double>(),
               "vector of double");
-    arg.param(argumentNames[5], valueString, "", "string value");
-    arg.param(argumentNames[6], valueFloat, 1e4, "float value");
-    arg.paramLeftOver("input", valueStringLeftOverOptional, "",
+    arg_.param(argumentNames_[5], valueString_, "", "string value");
+    arg_.param(argumentNames_[6], valueFloat_, 1e4, "float value");
+    arg_.paramLeftOver("input", valueStringLeftOverOptional_, "",
                       "optional param", true);
   }
 
   void call(const std::vector<std::string>& arguments) {
-    std::string testname = "unit_test";
-    int argc = arguments.size() + 1;
+    const std::string testname = "unit_test";
+    const int argc = arguments.size() + 1;
     char** argv = new char*[argc];
     for (int i = 0; i < argc; ++i) argv[i] = nullptr;
     argv[0] = copyIntoArray(testname);
     for (size_t i = 0; i < arguments.size(); ++i) {
       argv[i + 1] = copyIntoArray(arguments[i]);
     }
-    arg.parseArgs(argc, argv, false);
+    arg_.parseArgs(argc, argv, false);
     for (int i = 0; i < argc; ++i) delete[] argv[i];
     delete[] argv;
   }
@@ -67,60 +67,60 @@ class CommandArgsTest : public ::testing::Test {
     return cstr;
   }
 
-  g2o::CommandArgs arg;
+  g2o::CommandArgs arg_;
 
-  std::vector<std::string> argumentNames = {"i",  "d",      "b", "vi",
+  std::vector<std::string> argumentNames_ = {"i",  "d",      "b", "vi",
                                             "vd", "string", "f"};
 
-  int valueInt;
-  double valueDouble;
-  float valueFloat;
-  bool valueBool;
-  std::string valueString;
-  std::vector<int> valueVectorInt;
-  std::vector<double> valueVectorDouble;
-  std::string valueStringLeftOverOptional;
+  int valueInt_;
+  double valueDouble_;
+  float valueFloat_;
+  bool valueBool_;
+  std::string valueString_;
+  std::vector<int> valueVectorInt_;
+  std::vector<double> valueVectorDouble_;
+  std::string valueStringLeftOverOptional_;
 };
 
 TEST_F(CommandArgsTest, DefaultValues) {
-  std::vector<std::string> arguments;
+  const std::vector<std::string> arguments;
   call(arguments);
-  for (const auto& p : argumentNames) {
-    EXPECT_FALSE(arg.parsedParam(p));
+  for (const auto& p : argumentNames_) {
+    EXPECT_FALSE(arg_.parsedParam(p));
   }
-  EXPECT_EQ(valueInt, 5);
-  EXPECT_DOUBLE_EQ(valueDouble, 1e-6);
-  EXPECT_FLOAT_EQ(valueFloat, 1e4);
-  EXPECT_FALSE(valueBool);
-  EXPECT_EQ(valueVectorInt.size(), 0);
-  EXPECT_EQ(valueVectorDouble.size(), 0);
-  EXPECT_EQ(valueString, "");
-  EXPECT_EQ(valueStringLeftOverOptional, "");
+  EXPECT_EQ(valueInt_, 5);
+  EXPECT_DOUBLE_EQ(valueDouble_, 1e-6);
+  EXPECT_FLOAT_EQ(valueFloat_, 1e4);
+  EXPECT_FALSE(valueBool_);
+  EXPECT_EQ(valueVectorInt_.size(), 0);
+  EXPECT_EQ(valueVectorDouble_.size(), 0);
+  EXPECT_EQ(valueString_, "");
+  EXPECT_EQ(valueStringLeftOverOptional_, "");
 }
 
 TEST_F(CommandArgsTest, ParseValues) {
   // clang-format off
-  std::vector<std::string> arguments = {
-    "-" + argumentNames[0], "42",
-    "-" + argumentNames[1], "0.5",
-    "-" + argumentNames[2],
-    "-" + argumentNames[3], "1,2,3,4",
-    "-" + argumentNames[4], "1.,20.,3.4",
-    "-" + argumentNames[5], "summary.txt",
-    "-" + argumentNames[6], "17.4",
+  const std::vector<std::string> arguments = {
+    "-" + argumentNames_[0], "42",
+    "-" + argumentNames_[1], "0.5",
+    "-" + argumentNames_[2],
+    "-" + argumentNames_[3], "1,2,3,4",
+    "-" + argumentNames_[4], "1.,20.,3.4",
+    "-" + argumentNames_[5], "summary.txt",
+    "-" + argumentNames_[6], "17.4",
     "optional.txt"
   };
   // clang-format on
   call(arguments);
-  for (const auto& p : argumentNames) {
-    EXPECT_TRUE(arg.parsedParam(p)) << "failed param: " << p;
+  for (const auto& p : argumentNames_) {
+    EXPECT_TRUE(arg_.parsedParam(p)) << "failed param: " << p;
   }
-  EXPECT_EQ(valueInt, 42);
-  EXPECT_DOUBLE_EQ(valueDouble, 0.5);
-  EXPECT_FLOAT_EQ(valueFloat, 17.4);
-  EXPECT_TRUE(valueBool);
-  EXPECT_EQ(valueVectorInt, std::vector<int>({1, 2, 3, 4}));
-  EXPECT_EQ(valueVectorDouble, std::vector<double>({1., 20., 3.4}));
-  EXPECT_EQ(valueString, "summary.txt");
-  EXPECT_EQ(valueStringLeftOverOptional, "optional.txt");
+  EXPECT_EQ(valueInt_, 42);
+  EXPECT_DOUBLE_EQ(valueDouble_, 0.5);
+  EXPECT_FLOAT_EQ(valueFloat_, 17.4);
+  EXPECT_TRUE(valueBool_);
+  EXPECT_EQ(valueVectorInt_, std::vector<int>({1, 2, 3, 4}));
+  EXPECT_EQ(valueVectorDouble_, std::vector<double>({1., 20., 3.4}));
+  EXPECT_EQ(valueString_, "summary.txt");
+  EXPECT_EQ(valueStringLeftOverOptional_, "optional.txt");
 }

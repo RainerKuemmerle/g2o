@@ -26,6 +26,7 @@
 
 #include "sparse_system_helper.h"
 
+#include <cstddef>
 #include <stdexcept>
 #include <vector>
 
@@ -200,11 +201,11 @@ void fillTestMatrix(g2o::SparseBlockMatrixX& A) {
   // reading RBI
   input >> token >> token;
   std::getline(input, token);
-  std::vector<int> rowBlockIndices = readIndices(token);
+  const std::vector<int> rowBlockIndices = readIndices(token);
   // reading CBI
   input >> token >> token;
   std::getline(input, token);
-  std::vector<int> colBlockIndices = readIndices(token);
+  const std::vector<int> colBlockIndices = readIndices(token);
 
   // allocating the matrix and read the elements of the matrix
   A.clear(true);
@@ -217,9 +218,10 @@ void fillTestMatrix(g2o::SparseBlockMatrixX& A) {
       throw std::logic_error("Expected BLOCK as token");
     }
     input >> token;
-    int ri, ci;
+    int ri;
+    int ci;
     input >> ri >> ci;
-    auto sparseBlock = A.block(ri, ci, true);
+    auto* sparseBlock = A.block(ri, ci, true);
     sparseBlock->resize(A.rowsOfBlock(ri), A.colsOfBlock(ci));
     for (int rr = 0; rr < sparseBlock->rows(); rr++) {
       for (int cc = 0; cc < sparseBlock->cols(); cc++) {
@@ -254,7 +256,7 @@ g2o::MatrixX createTestMatrixInverse() {
 
 g2o::VectorX createTestVectorB() {
   g2o::VectorX result;
-  result.resize(12 * 3);
+  result.resize(static_cast<Eigen::Index>(12 * 3));
   int idx = 0;
   result(idx++) = 6.19602;
   result(idx++) = -53.8323;
@@ -297,7 +299,7 @@ g2o::VectorX createTestVectorB() {
 
 g2o::VectorX createTestVectorX() {
   g2o::VectorX result;
-  result.resize(12 * 3);
+  result.resize(static_cast<Eigen::Index>(12 * 3));
   int idx = 0;
   result(idx++) = -0.03134963;
   result(idx++) = 0.01363732;

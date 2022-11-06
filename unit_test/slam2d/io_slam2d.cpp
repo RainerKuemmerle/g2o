@@ -36,50 +36,49 @@
 #include "gtest/gtest.h"
 #include "unit_test/test_helper/io.h"
 
-using namespace std;
-using namespace g2o;
-
+namespace {
 struct RandomSE2 {
-  static SE2 create() {
-    Vector2 randomPosition = Vector2::Random();
-    Vector2 randomOrientation = Vector2::Random();
-    return SE2(randomPosition.x(), randomPosition.y(),
-               std::atan2(randomOrientation.y(), randomOrientation.x()));
+  static g2o::SE2 create() {
+    g2o::Vector2 randomPosition = g2o::Vector2::Random();
+    g2o::Vector2 randomOrientation = g2o::Vector2::Random();
+    return g2o::SE2(randomPosition.x(), randomPosition.y(),
+                    std::atan2(randomOrientation.y(), randomOrientation.x()));
   }
-  static bool isApprox(const SE2& a, const SE2& b) {
+  static bool isApprox(const g2o::SE2& a, const g2o::SE2& b) {
     return a.toVector().isApprox(b.toVector(), 1e-5);
   }
 };
+}  // namespace
 
 TEST(IoSlam2d, ReadWriteVertexSE2) {
-  readWriteVectorBasedVertex<VertexSE2, RandomSE2>();
+  g2o::readWriteVectorBasedVertex<g2o::VertexSE2, RandomSE2>();
 }
 
 TEST(IoSlam2d, ReadWriteVertexPointXY) {
-  readWriteVectorBasedVertex<VertexPointXY>();
+  g2o::readWriteVectorBasedVertex<g2o::VertexPointXY>();
 }
 
 TEST(IoSlam2d, ReadWriteParameterSE2Offset) {
-  ParameterSE2Offset outputParam;
-  outputParam.setOffset(SE2(1., 2., 0.3));
-  ParameterSE2Offset inputParam;
+  g2o::ParameterSE2Offset outputParam;
+  outputParam.setOffset(g2o::SE2(1., 2., 0.3));
+  g2o::ParameterSE2Offset inputParam;
   readWriteGraphElement(outputParam, &inputParam);
   ASSERT_TRUE(
       outputParam.offset().toVector().isApprox(inputParam.offset().toVector()));
 }
 
 TEST(IoSlam2d, ReadWriteEdgeSE2) {
-  readWriteVectorBasedEdge<EdgeSE2, RandomSE2>();
+  g2o::readWriteVectorBasedEdge<g2o::EdgeSE2, RandomSE2>();
 }
 
 TEST(IoSlam2d, ReadWriteEdgeSE2Prior) {
-  readWriteVectorBasedEdge<EdgeSE2Prior, RandomSE2>();
+  g2o::readWriteVectorBasedEdge<g2o::EdgeSE2Prior, RandomSE2>();
 }
 
 TEST(IoSlam2d, ReadWriteEdgeSE2PointXY) {
-  readWriteVectorBasedEdge<EdgeSE2PointXY>();
+  g2o::readWriteVectorBasedEdge<g2o::EdgeSE2PointXY>();
 }
 
 TEST(IoSlam2d, ReadWriteEdgeXYPrior) {
-  readWriteVectorBasedEdge<EdgeXYPrior>();
+  g2o::readWriteVectorBasedEdge<g2o::EdgeXYPrior>();
 }

@@ -106,8 +106,8 @@ TEST(Stuff, StrExpand) {
     SUCCEED();
     return;
   }
-  std::string expanded = g2o::strExpandFilename("$HOME/filename.txt");
-  std::string expected = g2o::formatString("%s/filename.txt", envVar);
+  const std::string expanded = g2o::strExpandFilename("$HOME/filename.txt");
+  const std::string expected = g2o::formatString("%s/filename.txt", envVar);
   EXPECT_EQ(expanded, expected);
 }
 #endif

@@ -34,11 +34,9 @@
 #include "g2o/types/slam2d/edge_se2_prior.h"
 #include "unit_test/test_helper/evaluate_jacobian.h"
 
-using namespace std;
-using namespace g2o;
-using namespace Eigen;
+using namespace g2o;  // NOLINT
 
-static SE2 randomSE2() { return SE2(Vector3d::Random()); }
+static SE2 randomSE2() { return SE2(Vector3::Random()); }
 
 TEST(Slam2D, EdgeSE2Jacobian) {
   auto v1 = std::make_shared<VertexSE2>();

@@ -51,12 +51,11 @@ TEST(AlgorithmFactory, ContainsBasicSolvers) {
 
   // collect all names
   std::set<std::string> names;
-  for (auto& creator : factory->creatorList()) {
-    g2o::OptimizationAlgorithmProperty solverProperty;
+  for (const auto& creator : factory->creatorList()) {
     names.insert(creator->property().name);
   }
 
-  std::vector<std::string> basicSolvers = {"gn_var", "lm_var", "dl_var"};
+  const std::vector<std::string> basicSolvers = {"gn_var", "lm_var", "dl_var"};
   ASSERT_THAT(names, testing::IsSupersetOf(basicSolvers));
 }
 
@@ -64,9 +63,9 @@ TEST(AlgorithmFactory, AllocatingSolver) {
   g2o::OptimizationAlgorithmFactory* factory =
       g2o::OptimizationAlgorithmFactory::instance();
 
-  for (auto& creator : factory->creatorList()) {
+  for (const auto& creator : factory->creatorList()) {
     g2o::OptimizationAlgorithmProperty solverProperty;
-    std::string name = creator->property().name;
+    const std::string& name = creator->property().name;
 
     auto algo = factory->construct(name, solverProperty);
     ASSERT_NE(nullptr, algo) << "Cannot allocate solver " << name;
@@ -103,8 +102,7 @@ TEST(AlgorithmFactory, ListsAllSolvers) {
 
   // collect all names
   std::set<std::string> names;
-  for (auto& creator : factory->creatorList()) {
-    g2o::OptimizationAlgorithmProperty solverProperty;
+  for (const auto& creator : factory->creatorList()) {
     names.insert(creator->property().name);
   }
 

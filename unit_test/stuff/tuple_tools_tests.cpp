@@ -27,15 +27,15 @@
 #include "g2o/stuff/tuple_tools.h"
 #include "gtest/gtest.h"
 
-TEST(Stuff, Tuple_init) {
-  std::tuple<int, int, int> not_initialized;
+TEST(Stuff, TupleInit) {
+  const std::tuple<int, int, int> not_initialized;
   auto initialized = g2o::tuple_init(1, not_initialized);
   ASSERT_EQ(1, std::get<0>(initialized));
   ASSERT_EQ(1, std::get<1>(initialized));
   ASSERT_EQ(1, std::get<2>(initialized));
 }
 
-TEST(Stuff, Tuple_apply) {
+TEST(Stuff, TupleApply) {
   auto t = std::make_tuple(1, 2, 3);
   ASSERT_EQ(1, std::get<0>(t));
   ASSERT_EQ(2, std::get<1>(t));

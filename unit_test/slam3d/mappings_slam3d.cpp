@@ -28,51 +28,49 @@
 #include "g2o/types/slam3d/isometry3d_mappings.h"
 #include "gtest/gtest.h"
 
-using namespace std;
-
 TEST(MappingsSlam3D, EulerConversion) {
-  g2o::Vector3 eulerAngles(.1, .2, .3);
-  g2o::Matrix3 m1 = g2o::internal::fromEuler(eulerAngles);
-  g2o::Vector3 eulerAnglesFromMatrix = g2o::internal::toEuler(m1);
+  const g2o::Vector3 eulerAngles(.1, .2, .3);
+  const g2o::Matrix3 m1 = g2o::internal::fromEuler(eulerAngles);
+  const g2o::Vector3 eulerAnglesFromMatrix = g2o::internal::toEuler(m1);
   for (int i = 0; i < 3; ++i)
     EXPECT_DOUBLE_EQ(eulerAngles(i), eulerAnglesFromMatrix(i));
 }
 
 TEST(MappingsSlam3D, QuaternionConversion) {
-  g2o::Vector3 eulerAngles(.1, .2, .3);
-  g2o::Matrix3 m1 = g2o::internal::fromEuler(eulerAngles);
-  g2o::Vector3 q = g2o::internal::toCompactQuaternion(m1);
-  g2o::Matrix3 m2 = g2o::internal::fromCompactQuaternion(q);
+  const g2o::Vector3 eulerAngles(.1, .2, .3);
+  const g2o::Matrix3 m1 = g2o::internal::fromEuler(eulerAngles);
+  const g2o::Vector3 q = g2o::internal::toCompactQuaternion(m1);
+  const g2o::Matrix3 m2 = g2o::internal::fromCompactQuaternion(q);
   for (int r = 0; r < 3; ++r)
     for (int c = 0; c < 3; ++c) EXPECT_DOUBLE_EQ(m1(r, c), m2(r, c));
 }
 
 TEST(MappingsSlam3D, ET) {
-  g2o::Vector3 eulerAngles(.1, .2, .3);
+  const g2o::Vector3 eulerAngles(.1, .2, .3);
   g2o::Vector6 et;
   g2o::Vector3 t(1., 2., 3.);
   et.block<3, 1>(0, 0) = t;
   et.block<3, 1>(3, 0) = eulerAngles;
-  g2o::Matrix3 m1 = g2o::internal::fromEuler(eulerAngles);
+  const g2o::Matrix3 m1 = g2o::internal::fromEuler(eulerAngles);
 
   g2o::Isometry3 i1 = g2o::internal::fromVectorET(et);
   for (int r = 0; r < 3; ++r) EXPECT_EQ(t(r), i1.translation()(r));
 
   EXPECT_NEAR(0., (i1.linear() - m1).array().abs().maxCoeff(), 1e-6);
 
-  g2o::Vector6 et2 = g2o::internal::toVectorET(i1);
+  const g2o::Vector6 et2 = g2o::internal::toVectorET(i1);
   EXPECT_NEAR(0., (et - et2).array().abs().maxCoeff(), 1e-6);
 }
 
 TEST(MappingsSlam3D, MQT) {
-  g2o::Vector3 eulerAngles(.1, .2, .3);
+  const g2o::Vector3 eulerAngles(.1, .2, .3);
   g2o::Vector6 et;
-  g2o::Vector3 t(1., 2., 3.);
+  const g2o::Vector3 t(1., 2., 3.);
   et.block<3, 1>(0, 0) = t;
   et.block<3, 1>(3, 0) = eulerAngles;
   g2o::Isometry3 i1 = g2o::internal::fromVectorET(et);
 
-  g2o::Vector6 qt1 = g2o::internal::toVectorMQT(i1);
+  const g2o::Vector6 qt1 = g2o::internal::toVectorMQT(i1);
 
   g2o::Isometry3 i2 = g2o::internal::fromVectorMQT(qt1);
   EXPECT_NEAR(0., (i1.linear() - i2.linear()).array().abs().maxCoeff(), 1e-6);
@@ -81,14 +79,14 @@ TEST(MappingsSlam3D, MQT) {
 }
 
 TEST(MappingsSlam3D, QT) {
-  g2o::Vector3 eulerAngles(.1, .2, .3);
+  const g2o::Vector3 eulerAngles(.1, .2, .3);
   g2o::Vector6 et;
-  g2o::Vector3 t(1., 2., 3.);
+  const g2o::Vector3 t(1., 2., 3.);
   et.block<3, 1>(0, 0) = t;
   et.block<3, 1>(3, 0) = eulerAngles;
   g2o::Isometry3 i1 = g2o::internal::fromVectorET(et);
 
-  g2o::Vector7 qt2 = g2o::internal::toVectorQT(i1);
+  const g2o::Vector7 qt2 = g2o::internal::toVectorQT(i1);
 
   g2o::Isometry3 i2 = g2o::internal::fromVectorQT(qt2);
   EXPECT_NEAR(0., (i1.linear() - i2.linear()).array().abs().maxCoeff(), 1e-6);

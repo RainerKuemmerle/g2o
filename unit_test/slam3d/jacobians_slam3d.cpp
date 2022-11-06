@@ -38,9 +38,7 @@
 #include "unit_test/test_helper/evaluate_jacobian.h"
 #include "unit_test/test_helper/random_state.h"
 
-using namespace std;
-using namespace g2o;
-using namespace g2o::internal;
+using namespace g2o; //NOLINT
 
 namespace {
 auto depth_epsilon = [](const number_t x, const number_t y) {
@@ -222,7 +220,7 @@ TEST(Slam3D, dqDRJacobian) {
 
     // our analytic function which we want to evaluate
     Eigen::Matrix<number_t, 3, 9, Eigen::ColMajor> dq_dR;
-    compute_dq_dR(dq_dR, Re(0, 0), Re(1, 0), Re(2, 0), Re(0, 1), Re(1, 1),
+    internal::compute_dq_dR(dq_dR, Re(0, 0), Re(1, 0), Re(2, 0), Re(0, 1), Re(1, 1),
                   Re(2, 1), Re(0, 2), Re(1, 2), Re(2, 2));
 
     // compute the Jacobian using AD

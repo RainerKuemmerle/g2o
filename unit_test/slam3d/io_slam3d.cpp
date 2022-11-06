@@ -24,6 +24,7 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+#include <memory>
 #include <sstream>
 
 #include "g2o/types/slam3d/edge_pointxyz.h"
@@ -42,66 +43,65 @@
 #include "unit_test/test_helper/io.h"
 #include "unit_test/test_helper/random_state.h"
 
-using namespace std;
-using namespace g2o;
+using namespace g2o; //NOLINT
 
 class IoSlam3dParam : public ::testing::Test {
  protected:
   void SetUp() override {
-    graph.reset(new g2o::OptimizableGraph);
+    graph_ = std::make_unique<g2o::OptimizableGraph>();
 
     // setting up parameters for tests
-    paramOffset.reset(new ParameterSE3Offset());
-    paramOffset->setId(paramId++);
-    graph->addParameter(paramOffset);
+    paramOffset_.reset(new ParameterSE3Offset());
+    paramOffset_->setId(paramId_++);
+    graph_->addParameter(paramOffset_);
 
-    paramCamera.reset(new ParameterCamera);
-    paramCamera->setId(paramId++);
-    graph->addParameter(paramCamera);
+    paramCamera_.reset(new ParameterCamera);
+    paramCamera_->setId(paramId_++);
+    graph_->addParameter(paramCamera_);
 
     // setting up some vertices
     for (int i = 0; i < 2; ++i) {
       auto p = std::make_shared<VertexSE3>();
-      p->setId(numVertices++);
-      graph->addVertex(p);
-      poses.at(i) = p;
+      p->setId(numVertices_++);
+      graph_->addVertex(p);
+      poses_.at(i) = p;
     }
-    point.reset(new VertexPointXYZ);
-    point->setId(numVertices++);
-    graph->addVertex(point);
+    point_.reset(new VertexPointXYZ);
+    point_->setId(numVertices_++);
+    graph_->addVertex(point_);
   }
 
   template <typename T>
   bool preparePosePoseEdge(T& e) {
-    e->setParameterId(0, paramOffset->id());
+    e->setParameterId(0, paramOffset_->id());
     for (size_t i = 0; i < e->vertices().size(); ++i)
-      e->setVertex(i, poses.at(i));
-    return graph->addEdge(e);
+      e->setVertex(i, poses_.at(i));
+    return graph_->addEdge(e);
   }
 
   template <typename T>
   bool preparePosePointEdge(T& e) {
-    e->setParameterId(0, paramOffset->id());
-    e->setVertex(0, poses.at(0));
-    e->setVertex(1, point);
-    return graph->addEdge(e);
+    e->setParameterId(0, paramOffset_->id());
+    e->setVertex(0, poses_.at(0));
+    e->setVertex(1, point_);
+    return graph_->addEdge(e);
   }
 
   template <typename T>
   bool prepareCamPointEdge(T& e) {
-    e->setParameterId(0, paramCamera->id());
-    e->setVertex(0, poses.at(0));
-    e->setVertex(1, point);
-    return graph->addEdge(e);
+    e->setParameterId(0, paramCamera_->id());
+    e->setVertex(0, poses_.at(0));
+    e->setVertex(1, point_);
+    return graph_->addEdge(e);
   }
 
-  std::unique_ptr<g2o::OptimizableGraph> graph;
-  std::shared_ptr<VertexPointXYZ> point;
-  std::shared_ptr<ParameterSE3Offset> paramOffset;
-  std::shared_ptr<ParameterCamera> paramCamera;
-  std::vector<std::shared_ptr<VertexSE3>> poses = {nullptr, nullptr};
-  int numVertices = 0;
-  int paramId = 42;
+  std::unique_ptr<g2o::OptimizableGraph> graph_;
+  std::shared_ptr<VertexPointXYZ> point_;
+  std::shared_ptr<ParameterSE3Offset> paramOffset_;
+  std::shared_ptr<ParameterCamera> paramCamera_;
+  std::vector<std::shared_ptr<VertexSE3>> poses_ = {nullptr, nullptr};
+  int numVertices_ = 0;
+  int paramId_ = 42;
 };
 
 /*
@@ -133,8 +133,8 @@ TEST(IoSlam3d, ReadWriteEdgeXYZPrior) {
 TEST_F(IoSlam3dParam, ReadWriteEdgeSE3Offset) {
   // additional graph structures
   auto paramOffset2 = std::make_shared<ParameterSE3Offset>();
-  paramOffset2->setId(paramId++);
-  graph->addParameter(paramOffset2);
+  paramOffset2->setId(paramId_++);
+  graph_->addParameter(paramOffset2);
 
   // setting up the edge for output
   auto outputEdge = std::make_shared<EdgeSE3Offset>();

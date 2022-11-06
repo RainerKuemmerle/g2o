@@ -41,7 +41,7 @@ class PropertyTest : public ::testing::Test {
 TEST_F(PropertyTest, Erase) {
   EXPECT_EQ(propertyMap_.size(), 3);
   EXPECT_TRUE(propertyMap_.getProperty<g2o::StringProperty>("string"));
-  bool erased = propertyMap_.eraseProperty("string");
+  const bool erased = propertyMap_.eraseProperty("string");
   EXPECT_TRUE(erased);
   EXPECT_EQ(propertyMap_.size(), 2);
   EXPECT_FALSE(propertyMap_.getProperty<g2o::StringProperty>("string"));
@@ -67,7 +67,7 @@ TEST_F(PropertyTest, UpdatePropertyFromString) {
 TEST_F(PropertyTest, UpdateMapFromString) {
   auto intProperty = propertyMap_.getProperty<g2o::IntProperty>("int");
   auto stringProperty = propertyMap_.getProperty<g2o::StringProperty>("string");
-  bool updated = propertyMap_.updateMapFromString("int=21,string=updated");
+  const bool updated = propertyMap_.updateMapFromString("int=21,string=updated");
   EXPECT_TRUE(updated);
   EXPECT_EQ(intProperty->value(), 21);
   EXPECT_EQ(stringProperty->value(), "updated");

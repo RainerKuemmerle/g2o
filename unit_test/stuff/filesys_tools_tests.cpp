@@ -32,9 +32,9 @@
 
 namespace {
 #ifdef WINDOWS
-static const std::string pathSep = "\\";
+const std::string pathSep = "\\";
 #else
-static const std::string pathSep = "/";
+const std::string pathSep = "/";
 #endif
 }  // namespace
 
@@ -91,10 +91,10 @@ TEST(Stuff, FileExists) {
 }
 
 TEST(Stuff, GetFilesByPattern) {
-  using namespace testing;
-  std::string pattern =
+  using namespace testing;  // NOLINT
+  const std::string pattern =
       std::string(G2O_SRC_DIR) + pathSep + "doc" + pathSep + "license*.txt";
-  std::vector<std::string> licenseFiles =
+  const std::vector<std::string> licenseFiles =
       g2o::getFilesByPattern(pattern.c_str());
   ASSERT_THAT(licenseFiles, SizeIs(3));
   ASSERT_THAT(licenseFiles, Each(ContainsRegex("license.*\\.txt$")));

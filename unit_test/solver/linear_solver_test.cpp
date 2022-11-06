@@ -39,11 +39,11 @@
 #include "sparse_system_helper.h"
 
 struct BlockOrdering {
-  static constexpr bool blockOrdering = true;
+  static constexpr bool kBlockOrdering = true;
 };
 
 struct NoBlockOrdering {
-  static constexpr bool blockOrdering = false;
+  static constexpr bool kBlockOrdering = false;
 };
 
 /**
@@ -56,44 +56,46 @@ class LS : public testing::Test {
   using LinearSolverType = typename T::first_type;
   using OrderingType = typename T::second_type;
 
-  LS() : linearsolver(g2o::make_unique<LinearSolverType>()) {
-    g2o::internal::fillTestMatrix(sparse_matrix);
+  LS() : linearsolver_(g2o::make_unique<LinearSolverType>()) {
+    g2o::internal::fillTestMatrix(sparse_matrix_);
   }
 
  protected:
-  std::unique_ptr<LinearSolverType> linearsolver;
-  g2o::SparseBlockMatrixX sparse_matrix;
-  g2o::MatrixX matrix_inverse = g2o::internal::createTestMatrixInverse();
-  g2o::VectorX x_vector = g2o::internal::createTestVectorX();
-  g2o::VectorX b_vector = g2o::internal::createTestVectorB();
+  std::unique_ptr<LinearSolverType> linearsolver_;
+  g2o::SparseBlockMatrixX sparse_matrix_;
+  g2o::MatrixX matrix_inverse_ = g2o::internal::createTestMatrixInverse();
+  g2o::VectorX x_vector_ = g2o::internal::createTestVectorX();
+  g2o::VectorX b_vector_ = g2o::internal::createTestVectorB();
 };
 TYPED_TEST_SUITE_P(LS);
 
 TYPED_TEST_P(LS, Solve) {
-  this->linearsolver->setBlockOrdering(TypeParam::second_type::blockOrdering);
+  this->linearsolver_->setBlockOrdering(TypeParam::second_type::kBlockOrdering);
 
   g2o::VectorX solver_solution;
   for (int solve_iter = 0; solve_iter < 2; ++solve_iter) {
-    solver_solution.setZero(this->b_vector.size());
-    this->linearsolver->solve(this->sparse_matrix, solver_solution.data(),
-                              this->b_vector.data());
+    solver_solution.setZero(this->b_vector_.size());
+    this->linearsolver_->solve(this->sparse_matrix_, solver_solution.data(),
+                              this->b_vector_.data());
 
-    ASSERT_TRUE(solver_solution.isApprox(this->x_vector, 1e-6))
+    ASSERT_TRUE(solver_solution.isApprox(this->x_vector_, 1e-6))
         << "Solution differs on iteration " << solve_iter;
   }
 }
 
 TYPED_TEST_P(LS, SolvePattern) {
-  this->linearsolver->setBlockOrdering(TypeParam::second_type::blockOrdering);
+  this->linearsolver_->setBlockOrdering(TypeParam::second_type::kBlockOrdering);
 
   g2o::SparseBlockMatrixX spinv;
   std::vector<std::pair<int, int> > blockIndices;
+  blockIndices.reserve(
+      static_cast<int>(this->sparse_matrix_.rowBlockIndices().size()));
   for (int i = 0;
-       i < static_cast<int>(this->sparse_matrix.rowBlockIndices().size()); ++i)
-    blockIndices.emplace_back(std::make_pair(i, i));
+       i < static_cast<int>(this->sparse_matrix_.rowBlockIndices().size()); ++i)
+    blockIndices.emplace_back(i, i);
 
-  bool state = this->linearsolver->solvePattern(spinv, blockIndices,
-                                                this->sparse_matrix);
+  bool state = this->linearsolver_->solvePattern(spinv, blockIndices,
+                                                this->sparse_matrix_);
   ASSERT_TRUE(!state || spinv.rowBlockIndices().size() == blockIndices.size());
   if (!state) {  // solver does not implement solving for a pattern return in
                  // this case
@@ -109,8 +111,8 @@ TYPED_TEST_P(LS, SolvePattern) {
     int numCols = spinv.colsOfBlock(idx.second);
 
     g2o::MatrixX expected =
-        this->matrix_inverse.block(rr, cc, numRows, numCols);
-    g2o::MatrixX actual = *spinv.block(idx.first, idx.second);
+        this->matrix_inverse_.block(rr, cc, numRows, numCols);
+    const g2o::MatrixX actual = *spinv.block(idx.first, idx.second);
 
     EXPECT_TRUE(actual.isApprox(expected, 1e-6))
         << "block " << idx.first << " " << idx.second << " differs";
@@ -118,10 +120,10 @@ TYPED_TEST_P(LS, SolvePattern) {
 }
 
 TYPED_TEST_P(LS, SolveBlocks) {
-  this->linearsolver->setBlockOrdering(TypeParam::second_type::blockOrdering);
+  this->linearsolver_->setBlockOrdering(TypeParam::second_type::kBlockOrdering);
 
   number_t** blocks = nullptr;
-  bool state = this->linearsolver->solveBlocks(blocks, this->sparse_matrix);
+  bool state = this->linearsolver_->solveBlocks(blocks, this->sparse_matrix_);
   ASSERT_TRUE(!state || blocks != nullptr);
   if (!state) {  // solver does not implement solving for a pattern return in
                  // this case
@@ -130,20 +132,20 @@ TYPED_TEST_P(LS, SolveBlocks) {
     return;
   }
 
-  for (size_t i = 0; i < this->sparse_matrix.rowBlockIndices().size(); ++i) {
-    int rr = this->sparse_matrix.rowBaseOfBlock(i);
-    int cc = this->sparse_matrix.colBaseOfBlock(i);
-    int numRows = this->sparse_matrix.rowsOfBlock(i);
-    int numCols = this->sparse_matrix.colsOfBlock(i);
+  for (size_t i = 0; i < this->sparse_matrix_.rowBlockIndices().size(); ++i) {
+    int rr = this->sparse_matrix_.rowBaseOfBlock(i);
+    int cc = this->sparse_matrix_.colBaseOfBlock(i);
+    int numRows = this->sparse_matrix_.rowsOfBlock(i);
+    int numCols = this->sparse_matrix_.colsOfBlock(i);
 
     g2o::MatrixX expected =
-        this->matrix_inverse.block(rr, cc, numRows, numCols);
-    g2o::MatrixX::MapType actual(blocks[i], numRows, numCols);
+        this->matrix_inverse_.block(rr, cc, numRows, numCols);
+    const g2o::MatrixX::MapType actual(blocks[i], numRows, numCols);
 
     EXPECT_TRUE(actual.isApprox(expected, 1e-6))
         << "block " << i << " " << i << " differs";
   }
-  TypeParam::first_type::deallocateBlocks(this->sparse_matrix, blocks);
+  TypeParam::first_type::deallocateBlocks(this->sparse_matrix_, blocks);
 }
 
 // registering the test suite and all the types to be tested

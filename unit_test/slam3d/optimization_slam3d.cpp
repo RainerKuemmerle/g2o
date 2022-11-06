@@ -32,11 +32,10 @@
 #include "g2o/types/slam3d/edge_se3.h"
 #include "gtest/gtest.h"
 
-using namespace std;
-using namespace g2o;
+using namespace g2o;  // NOLINT
 
-typedef g2o::LinearSolverEigen<g2o::BlockSolverX::PoseMatrixType>
-    SlamLinearSolver;
+using SlamLinearSolver =
+    g2o::LinearSolverEigen<g2o::BlockSolverX::PoseMatrixType>;
 
 template <typename T>
 class Slam3DOptimization : public testing::Test {
@@ -51,11 +50,11 @@ class Slam3DOptimization : public testing::Test {
     std::unique_ptr<g2o::OptimizationAlgorithm> algorithm(
         new OptimizationAlgo(std::move(blockSolver)));
 
-    optimizer.setAlgorithm(std::move(algorithm));
+    optimizer_.setAlgorithm(std::move(algorithm));
   }
 
  protected:
-  g2o::SparseOptimizer optimizer;
+  g2o::SparseOptimizer optimizer_;
 };
 TYPED_TEST_SUITE_P(Slam3DOptimization);
 
@@ -64,7 +63,7 @@ TYPED_TEST_P(Slam3DOptimization, Translation) {
   v->setId(0);
   v->setEstimate(g2o::Isometry3::Identity());
   v->setFixed(true);
-  this->optimizer.addVertex(v);
+  this->optimizer_.addVertex(v);
 
   v = std::make_shared<g2o::VertexSE3>();
   v->setId(1);
@@ -73,25 +72,25 @@ TYPED_TEST_P(Slam3DOptimization, Translation) {
   p2.translation() << 10., 10., 10.;
   v->setEstimate(p2);
   v->setFixed(false);
-  this->optimizer.addVertex(v);
+  this->optimizer_.addVertex(v);
 
   auto e = std::make_shared<g2o::EdgeSE3>();
   e->setInformation(g2o::EdgeSE3::InformationType::Identity());
   e->setMeasurement(g2o::Isometry3::Identity());
-  e->vertices()[0] = this->optimizer.vertex(0);
-  e->vertices()[1] = this->optimizer.vertex(1);
-  this->optimizer.addEdge(e);
+  e->vertices()[0] = this->optimizer_.vertex(0);
+  e->vertices()[1] = this->optimizer_.vertex(1);
+  this->optimizer_.addEdge(e);
 
-  this->optimizer.initializeOptimization();
-  this->optimizer.computeActiveErrors();
-  ASSERT_LT(0., this->optimizer.chi2());
-  int numOptimization = this->optimizer.optimize(100);
+  this->optimizer_.initializeOptimization();
+  this->optimizer_.computeActiveErrors();
+  ASSERT_LT(0., this->optimizer_.chi2());
+  int numOptimization = this->optimizer_.optimize(100);
   ASSERT_LT(0, numOptimization);
-  ASSERT_GT(1e-6, this->optimizer.chi2());
-  ASSERT_GT(1e-6, this->optimizer.activeChi2());
+  ASSERT_GT(1e-6, this->optimizer_.chi2());
+  ASSERT_GT(1e-6, this->optimizer_.activeChi2());
 
   auto v2AfterOpti =
-      dynamic_pointer_cast<g2o::VertexSE3>(this->optimizer.vertex(1));
+      std::dynamic_pointer_cast<g2o::VertexSE3>(this->optimizer_.vertex(1));
   ASSERT_TRUE(
       v2AfterOpti->estimate().translation().isApprox(g2o::Vector3::Zero()));
   ASSERT_TRUE(v2AfterOpti->estimate().rotation().diagonal().isApprox(
@@ -103,7 +102,7 @@ TYPED_TEST_P(Slam3DOptimization, Rotation) {
   v->setId(0);
   v->setEstimate(g2o::Isometry3::Identity());
   v->setFixed(true);
-  this->optimizer.addVertex(v);
+  this->optimizer_.addVertex(v);
 
   v = std::make_shared<g2o::VertexSE3>();
   v->setId(1);
@@ -112,25 +111,25 @@ TYPED_TEST_P(Slam3DOptimization, Rotation) {
   p2 *= g2o::AngleAxis(g2o::deg2rad(2), g2o::Vector3::Ones().normalized());
   v->setEstimate(p2);
   v->setFixed(false);
-  this->optimizer.addVertex(v);
+  this->optimizer_.addVertex(v);
 
   auto e = std::make_shared<g2o::EdgeSE3>();
   e->setInformation(g2o::EdgeSE3::InformationType::Identity());
   e->setMeasurement(g2o::Isometry3::Identity());
-  e->vertices()[0] = this->optimizer.vertex(0);
-  e->vertices()[1] = this->optimizer.vertex(1);
-  this->optimizer.addEdge(e);
+  e->vertices()[0] = this->optimizer_.vertex(0);
+  e->vertices()[1] = this->optimizer_.vertex(1);
+  this->optimizer_.addEdge(e);
 
-  this->optimizer.initializeOptimization();
-  this->optimizer.computeActiveErrors();
-  ASSERT_LT(0., this->optimizer.chi2());
-  int numOptimization = this->optimizer.optimize(100);
+  this->optimizer_.initializeOptimization();
+  this->optimizer_.computeActiveErrors();
+  ASSERT_LT(0., this->optimizer_.chi2());
+  int numOptimization = this->optimizer_.optimize(100);
   ASSERT_LT(0, numOptimization);
-  ASSERT_GT(1e-6, this->optimizer.chi2());
-  ASSERT_GT(1e-6, this->optimizer.activeChi2());
+  ASSERT_GT(1e-6, this->optimizer_.chi2());
+  ASSERT_GT(1e-6, this->optimizer_.activeChi2());
 
   auto v2AfterOpti =
-      dynamic_pointer_cast<g2o::VertexSE3>(this->optimizer.vertex(1));
+      std::dynamic_pointer_cast<g2o::VertexSE3>(this->optimizer_.vertex(1));
   ASSERT_TRUE(
       v2AfterOpti->estimate().translation().isApprox(g2o::Vector3::Zero()));
   ASSERT_TRUE(v2AfterOpti->estimate().rotation().diagonal().isApprox(

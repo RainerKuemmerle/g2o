@@ -36,84 +36,84 @@ number_t simple_normalize_theta(number_t th) {
 }  // namespace
 
 TEST(Stuff, NormalizeTheta) {
-  constexpr double epsilon = 1e-9;
-  EXPECT_NEAR(0, g2o::normalize_theta(0), epsilon);
-  EXPECT_NEAR(M_PI, g2o::normalize_theta(M_PI), epsilon);
-  EXPECT_NEAR(0, g2o::normalize_theta(2 * M_PI), epsilon);
-  EXPECT_NEAR(M_PI, g2o::normalize_theta(3 * M_PI), epsilon);
-  EXPECT_NEAR(0, g2o::normalize_theta(4 * M_PI), epsilon);
+  constexpr double kEpsilon = 1e-9;
+  EXPECT_NEAR(0, g2o::normalize_theta(0), kEpsilon);
+  EXPECT_NEAR(M_PI, g2o::normalize_theta(M_PI), kEpsilon);
+  EXPECT_NEAR(0, g2o::normalize_theta(2 * M_PI), kEpsilon);
+  EXPECT_NEAR(M_PI, g2o::normalize_theta(3 * M_PI), kEpsilon);
+  EXPECT_NEAR(0, g2o::normalize_theta(4 * M_PI), kEpsilon);
 
-  EXPECT_NEAR(0, g2o::normalize_theta(-0), epsilon);
-  EXPECT_NEAR(M_PI, g2o::normalize_theta(-M_PI), epsilon);
-  EXPECT_NEAR(0, g2o::normalize_theta(-2 * M_PI), epsilon);
-  EXPECT_NEAR(M_PI, g2o::normalize_theta(-3 * M_PI), epsilon);
-  EXPECT_NEAR(0, g2o::normalize_theta(-4 * M_PI), epsilon);
+  EXPECT_NEAR(0, g2o::normalize_theta(-0), kEpsilon);
+  EXPECT_NEAR(M_PI, g2o::normalize_theta(-M_PI), kEpsilon);
+  EXPECT_NEAR(0, g2o::normalize_theta(-2 * M_PI), kEpsilon);
+  EXPECT_NEAR(M_PI, g2o::normalize_theta(-3 * M_PI), kEpsilon);
+  EXPECT_NEAR(0, g2o::normalize_theta(-4 * M_PI), kEpsilon);
 
-  EXPECT_NEAR(0, g2o::normalize_theta(-0), epsilon);
-  EXPECT_NEAR(-M_PI / 2, g2o::normalize_theta(-M_PI / 2), epsilon);
-  EXPECT_NEAR(M_PI, g2o::normalize_theta(-M_PI), epsilon);
-  EXPECT_NEAR(M_PI / 2, g2o::normalize_theta(-3 * M_PI / 2), epsilon);
-  EXPECT_NEAR(0, g2o::normalize_theta(-4 * M_PI / 2), epsilon);
+  EXPECT_NEAR(0, g2o::normalize_theta(-0), kEpsilon);
+  EXPECT_NEAR(-M_PI / 2, g2o::normalize_theta(-M_PI / 2), kEpsilon);
+  EXPECT_NEAR(M_PI, g2o::normalize_theta(-M_PI), kEpsilon);
+  EXPECT_NEAR(M_PI / 2, g2o::normalize_theta(-3 * M_PI / 2), kEpsilon);
+  EXPECT_NEAR(0, g2o::normalize_theta(-4 * M_PI / 2), kEpsilon);
 
-  EXPECT_NEAR(0, g2o::normalize_theta(0), epsilon);
-  EXPECT_NEAR(M_PI / 2, g2o::normalize_theta(M_PI / 2), epsilon);
-  EXPECT_NEAR(M_PI / 2, g2o::normalize_theta(5 * M_PI / 2), epsilon);
-  EXPECT_NEAR(M_PI / 2, g2o::normalize_theta(9 * M_PI / 2), epsilon);
-  EXPECT_NEAR(M_PI / 2, g2o::normalize_theta(-3 * M_PI / 2), epsilon);
+  EXPECT_NEAR(0, g2o::normalize_theta(0), kEpsilon);
+  EXPECT_NEAR(M_PI / 2, g2o::normalize_theta(M_PI / 2), kEpsilon);
+  EXPECT_NEAR(M_PI / 2, g2o::normalize_theta(5 * M_PI / 2), kEpsilon);
+  EXPECT_NEAR(M_PI / 2, g2o::normalize_theta(9 * M_PI / 2), kEpsilon);
+  EXPECT_NEAR(M_PI / 2, g2o::normalize_theta(-3 * M_PI / 2), kEpsilon);
 }
 
 TEST(Stuff, NormalizeThetaCmpBruteForce) {
-  constexpr double epsilon = 1e-9;
+  constexpr double kEpsilon = 1e-9;
   for (double d = -10.; d <= 10.; d += 0.1) {
-    EXPECT_NEAR(simple_normalize_theta(d), g2o::normalize_theta(d), epsilon);
+    EXPECT_NEAR(simple_normalize_theta(d), g2o::normalize_theta(d), kEpsilon);
   }
 }
 
 TEST(Stuff, Deg2Rad) {
-  constexpr double epsilon = 1e-9;
-  EXPECT_NEAR(0, g2o::deg2rad(0), epsilon);
-  EXPECT_NEAR(M_PI / 2, g2o::deg2rad(90), epsilon);
-  EXPECT_NEAR(M_PI, g2o::deg2rad(180), epsilon);
-  EXPECT_NEAR(M_PI * 3 / 2, g2o::deg2rad(270), epsilon);
-  EXPECT_NEAR(2 * M_PI, g2o::deg2rad(360), epsilon);
-  EXPECT_NEAR(M_PI / 3, g2o::deg2rad(60), epsilon);
-  EXPECT_NEAR(M_PI * 2 / 3, g2o::deg2rad(120), epsilon);
-  EXPECT_NEAR(M_PI / 4, g2o::deg2rad(45), epsilon);
-  EXPECT_NEAR(M_PI * 3 / 4, g2o::deg2rad(135), epsilon);
-  EXPECT_NEAR(M_PI / 6, g2o::deg2rad(30), epsilon);
+  constexpr double kEpsilon = 1e-9;
+  EXPECT_NEAR(0, g2o::deg2rad(0), kEpsilon);
+  EXPECT_NEAR(M_PI / 2, g2o::deg2rad(90), kEpsilon);
+  EXPECT_NEAR(M_PI, g2o::deg2rad(180), kEpsilon);
+  EXPECT_NEAR(M_PI * 3 / 2, g2o::deg2rad(270), kEpsilon);
+  EXPECT_NEAR(2 * M_PI, g2o::deg2rad(360), kEpsilon);
+  EXPECT_NEAR(M_PI / 3, g2o::deg2rad(60), kEpsilon);
+  EXPECT_NEAR(M_PI * 2 / 3, g2o::deg2rad(120), kEpsilon);
+  EXPECT_NEAR(M_PI / 4, g2o::deg2rad(45), kEpsilon);
+  EXPECT_NEAR(M_PI * 3 / 4, g2o::deg2rad(135), kEpsilon);
+  EXPECT_NEAR(M_PI / 6, g2o::deg2rad(30), kEpsilon);
 }
 
 TEST(Stuff, Rad2Deg) {
-  constexpr double epsilon = 1e-9;
-  EXPECT_NEAR(g2o::rad2deg(0), 0, epsilon);
-  EXPECT_NEAR(g2o::rad2deg(M_PI / 2), 90, epsilon);
-  EXPECT_NEAR(g2o::rad2deg(M_PI), 180, epsilon);
-  EXPECT_NEAR(g2o::rad2deg(M_PI * 3 / 2), 270, epsilon);
-  EXPECT_NEAR(g2o::rad2deg(2 * M_PI), 360, epsilon);
-  EXPECT_NEAR(g2o::rad2deg(M_PI / 3), 60, epsilon);
-  EXPECT_NEAR(g2o::rad2deg(M_PI * 2 / 3), 120, epsilon);
-  EXPECT_NEAR(g2o::rad2deg(M_PI / 4), 45, epsilon);
-  EXPECT_NEAR(g2o::rad2deg(M_PI * 3 / 4), 135, epsilon);
-  EXPECT_NEAR(g2o::rad2deg(M_PI / 6), 30, epsilon);
+  constexpr double kEpsilon = 1e-9;
+  EXPECT_NEAR(g2o::rad2deg(0), 0, kEpsilon);
+  EXPECT_NEAR(g2o::rad2deg(M_PI / 2), 90, kEpsilon);
+  EXPECT_NEAR(g2o::rad2deg(M_PI), 180, kEpsilon);
+  EXPECT_NEAR(g2o::rad2deg(M_PI * 3 / 2), 270, kEpsilon);
+  EXPECT_NEAR(g2o::rad2deg(2 * M_PI), 360, kEpsilon);
+  EXPECT_NEAR(g2o::rad2deg(M_PI / 3), 60, kEpsilon);
+  EXPECT_NEAR(g2o::rad2deg(M_PI * 2 / 3), 120, kEpsilon);
+  EXPECT_NEAR(g2o::rad2deg(M_PI / 4), 45, kEpsilon);
+  EXPECT_NEAR(g2o::rad2deg(M_PI * 3 / 4), 135, kEpsilon);
+  EXPECT_NEAR(g2o::rad2deg(M_PI / 6), 30, kEpsilon);
 }
 
 TEST(Stuff, ArrayHasNaN) {
-  constexpr int size = 10;
-  number_t data[size];
-  std::fill_n(data, size, 0);
+  constexpr int kSize = 10;
+  number_t data[kSize];
+  std::fill_n(data, kSize, 0);
 
   auto aux = [](const number_t* data, int size) {
     int nanIndex = -1;
-    bool hasNan = g2o::arrayHasNaN(data, size, &nanIndex);
+    const bool hasNan = g2o::arrayHasNaN(data, size, &nanIndex);
     return std::make_pair(hasNan, nanIndex);
   };
 
-  EXPECT_EQ(std::make_pair(false, -1), aux(data, size));
+  EXPECT_EQ(std::make_pair(false, -1), aux(data, kSize));
 
-  for (int i = 0; i < size; ++i) {
-    std::fill_n(data, size, 0);
+  for (int i = 0; i < kSize; ++i) {
+    std::fill_n(data, kSize, 0);
     data[i] = std::numeric_limits<number_t>::quiet_NaN();
-    EXPECT_EQ(std::make_pair(true, i), aux(data, size));
+    EXPECT_EQ(std::make_pair(true, i), aux(data, kSize));
   }
 }
 
