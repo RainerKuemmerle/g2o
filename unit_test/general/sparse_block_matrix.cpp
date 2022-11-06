@@ -26,26 +26,25 @@
 
 #include "g2o/core/sparse_block_matrix.h"
 
+#include <gtest/gtest.h>
+
 #include <iostream>
 
-#include "gtest/gtest.h"
-
-using namespace std;
-using namespace g2o;
-
-using SparseBlockMatrixX = SparseBlockMatrix<MatrixX>;
+namespace {
+using SparseBlockMatrixX = g2o::SparseBlockMatrix<g2o::MatrixX>;
+}
 
 std::ostream& operator<<(std::ostream& os,
                          const SparseBlockMatrixX::SparseMatrixBlock& m) {
   for (int i = 0; i < m.rows(); ++i) {
     for (int j = 0; j < m.cols(); ++j) os << m(i, j) << " ";
-    os << endl;
+    os << std::endl;
   }
   return os;
 }
 
 TEST(General, SparseBlockMatrix) {
-  auto fill_block = [](MatrixX& b) {
+  auto fill_block = [](g2o::MatrixX& b) {
     for (int i = 0; i < b.rows(); ++i)
       for (int j = 0; j < b.cols(); ++j) {
         b(i, j) = i * b.cols() + j;
@@ -54,7 +53,7 @@ TEST(General, SparseBlockMatrix) {
 
   int rcol[] = {3, 6, 8, 12};
   int ccol[] = {2, 4, 13};
-  SparseBlockMatrixX* M = new SparseBlockMatrixX(rcol, ccol, 4, 3);
+  auto* M = new SparseBlockMatrixX(rcol, ccol, 4, 3);
 
   SparseBlockMatrixX::SparseMatrixBlock* b = M->block(0, 0, true);
   EXPECT_EQ(3, b->rows());
@@ -72,12 +71,12 @@ TEST(General, SparseBlockMatrix) {
   fill_block(*b);
 
   auto Ms = M->added();
-  bool addResult = M->add(*Ms);
+  const bool addResult = M->add(*Ms);
   EXPECT_TRUE(addResult);
   EXPECT_EQ(Ms->rows(), M->rows());
   EXPECT_EQ(Ms->cols(), M->cols());
 
-  auto Mt = M->transposed<MatrixX>();
+  auto Mt = M->transposed<g2o::MatrixX>();
   EXPECT_EQ(M->rows(), Mt->cols());
   EXPECT_EQ(M->cols(), Mt->rows());
   // cerr << *Mt << endl;

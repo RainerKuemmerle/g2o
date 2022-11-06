@@ -24,13 +24,14 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+#include <gmock/gmock.h>
+
 #include "g2o/core/robust_kernel_factory.h"
 #include "g2o/core/robust_kernel_impl.h"
 #include "g2o/stuff/misc.h"
-#include "gmock/gmock.h"
 #include "unit_test/test_helper/allocate_optimizer.h"
 
-using namespace testing;
+using namespace testing;  // NOLINT
 
 TEST(General, RobustKernelFactory) {
   g2o::RobustKernelFactory* factory = g2o::RobustKernelFactory::instance();
@@ -49,7 +50,7 @@ TEST(General, RobustKernelFactory) {
   }
 
   // remove one kernel
-  std::string kernelToRemove = kernels[kernels.size() / 2];
+  const std::string kernelToRemove = kernels[kernels.size() / 2];
   factory->unregisterType(kernelToRemove);
   // check that we cannot create it
   ASSERT_THAT(factory->creator(kernelToRemove), IsNull());
@@ -87,14 +88,14 @@ class RobustKernelTests : public Test {
    * Estimate the first order derivative numerically
    */
   number_t estimateDerivative(number_t x) {
-    constexpr number_t delta = g2o::cst(1e-9);
+    constexpr number_t kDelta = g2o::cst(1e-9);
 
     g2o::Vector3 first;
     g2o::Vector3 second;
-    this->kernel_.robustify(x + delta, first);
-    this->kernel_.robustify(x - delta, second);
+    this->kernel_.robustify(x + kDelta, first);
+    this->kernel_.robustify(x - kDelta, second);
 
-    number_t result = (1 / (2 * delta)) * (first(0) - second(0));
+    const number_t result = (1 / (2 * kDelta)) * (first(0) - second(0));
     return result;
   }
 };

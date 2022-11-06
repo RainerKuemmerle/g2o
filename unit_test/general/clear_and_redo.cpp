@@ -24,10 +24,11 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+#include <gtest/gtest.h>
+
 #include "g2o/core/sparse_optimizer.h"
 #include "g2o/core/sparse_optimizer_terminate_action.h"
 #include "g2o/types/slam3d/types_slam3d.h"
-#include "gtest/gtest.h"
 #include "unit_test/test_helper/allocate_optimizer.h"
 
 TEST(General, ClearAndRedo) {
@@ -92,7 +93,7 @@ TEST(General, ClearAndRedo) {
     mOptimizer.initializeOptimization();
     mOptimizer.computeInitialGuess();
     mOptimizer.computeActiveErrors();
-    int iter = mOptimizer.optimize(10);
+    const int iter = mOptimizer.optimize(10);
     if (iter <= 0) {
       ADD_FAILURE() << "Optimization did not happen";
     } else {

@@ -26,59 +26,58 @@
 
 #include "g2o/core/base_fixed_sized_edge.h"
 
+#include <gtest/gtest.h>
+
 #include "g2o/core/base_unary_edge.h"
 #include "g2o/core/base_variable_sized_edge.h"
 #include "g2o/core/eigen_types.h"
 #include "g2o/core/robust_kernel_impl.h"
 #include "g2o/types/slam2d/vertex_point_xy.h"
 #include "g2o/types/slam2d/vertex_se2.h"
-#include "gtest/gtest.h"
 
 class Edge3Constant
     : public g2o::BaseFixedSizedEdge<2, g2o::Vector2, g2o::VertexSE2,
                                      g2o::VertexSE2, g2o::VertexPointXY> {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
-  Edge3Constant()
-      : g2o::BaseFixedSizedEdge<2, g2o::Vector2, g2o::VertexSE2, g2o::VertexSE2,
-                                g2o::VertexPointXY>(){};
-  void computeError() {
+  Edge3Constant() = default;
+  void computeError() override {
     const auto a = vertexXnRaw<0>()->estimate();
     const auto b = vertexXnRaw<1>()->estimate();
     const auto c = vertexXnRaw<2>()->estimate();
     error_ = (a * b * c - measurement_).eval();
   }
-  virtual bool read(std::istream&) { return false; };
-  virtual bool write(std::ostream&) const { return false; };
+  bool read(std::istream&) override { return false; };
+  bool write(std::ostream&) const override { return false; };
 };
 
 class Edge3Dynamic : public g2o::BaseVariableSizedEdge<2, g2o::Vector2> {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
-  Edge3Dynamic() : g2o::BaseVariableSizedEdge<2, g2o::Vector2>() { resize(3); };
-  void computeError() {
+  Edge3Dynamic() { resize(3); };
+  void computeError() override {
     const auto a = static_cast<const g2o::VertexSE2*>(vertexRaw(0))->estimate();
     const auto b = static_cast<const g2o::VertexSE2*>(vertexRaw(1))->estimate();
     const auto c =
         static_cast<const g2o::VertexPointXY*>(vertexRaw(2))->estimate();
     error_ = (a * b * c - measurement_).eval();
   }
-  virtual bool read(std::istream&) { return false; };
-  virtual bool write(std::ostream&) const { return false; };
+  bool read(std::istream&) override { return false; };
+  bool write(std::ostream&) const override { return false; };
 };
 
 class VertexNotDefaultCtor : public g2o::BaseVertex<2, g2o::Vector2> {
  public:
-  VertexNotDefaultCtor(int x, int y) { _estimate = g2o::Vector2(x, y); }
+  VertexNotDefaultCtor(int x, int y) { estimate_ = g2o::Vector2(x, y); }
 
-  virtual void oplusImpl(const number_t* update) {
-    _estimate[0] += update[0];
-    _estimate[1] += update[1];
+  void oplusImpl(const number_t* update) override {
+    estimate_[0] += update[0];
+    estimate_[1] += update[1];
   }
 
-  virtual void setToOriginImpl() { _estimate.setZero(); }
-  virtual bool read(std::istream& /*is*/) { return false; };
-  virtual bool write(std::ostream& /*os*/) const { return false; };
+  void setToOriginImpl() override { estimate_.setZero(); }
+  bool read(std::istream& /*is*/) override { return false; };
+  bool write(std::ostream& /*os*/) const override { return false; };
 };
 
 class EdgeUnaryCreateVertexTester
@@ -86,17 +85,16 @@ class EdgeUnaryCreateVertexTester
  public:
   EdgeUnaryCreateVertexTester() = default;
 
-  void computeError() {
-    const VertexNotDefaultCtor* v =
-        static_cast<const VertexNotDefaultCtor*>(_vertices[0]);
-    _error = v->estimate() - _measurement;
+  void computeError() override {
+    const VertexNotDefaultCtor* v = vertexXnRaw<0>();
+    error_ = v->estimate() - measurement_;
   }
-  virtual bool read(std::istream& /*is*/) { return false; };
-  virtual bool write(std::ostream& /*os*/) const { return false; };
+  bool read(std::istream& /*is*/) override { return false; };
+  bool write(std::ostream& /*os*/) const override { return false; };
 
-  virtual void setMeasurement(const g2o::Vector2& m) { _measurement = m; }
+  void setMeasurement(const g2o::Vector2& m) override { measurement_ = m; }
 
-  virtual int measurementDimension() const { return 2; }
+  int measurementDimension() const override { return 2; }
 };
 
 TEST(General, IndexToPairToIndex) {
@@ -222,9 +220,9 @@ class EdgeTester {
   Eigen::Matrix<number_t, 2, 2> hessian22;
 };
 
-TEST(ConstantEdgeTest, ConstantEdge_allVerticesFixed) {
-  EdgeTester<Edge3Dynamic> dynamic;
-  EdgeTester<Edge3Constant> constant;
+TEST(ConstantEdgeTest, ConstantEdgeAllVerticesFixed) {
+  const EdgeTester<Edge3Dynamic> dynamic;
+  const EdgeTester<Edge3Constant> constant;
   ASSERT_EQ(dynamic.edge.allVerticesFixed(), constant.edge.allVerticesFixed());
   ASSERT_FALSE(constant.edge.allVerticesFixed());
   dynamic.v1->setFixed(true);
@@ -237,7 +235,7 @@ TEST(ConstantEdgeTest, ConstantEdge_allVerticesFixed) {
   ASSERT_TRUE(constant.edge.allVerticesFixed());
 }
 
-TEST(ConstantEdgeTest, ConstantEdge_computeError) {
+TEST(ConstantEdgeTest, ConstantEdgeComputeError) {
   EdgeTester<Edge3Dynamic> dynamic;
   EdgeTester<Edge3Constant> constant;
   dynamic.edge.computeError();
@@ -245,7 +243,7 @@ TEST(ConstantEdgeTest, ConstantEdge_computeError) {
   EXPECT_DOUBLE_EQ(0.0, (dynamic.edge.error() - constant.edge.error()).norm());
 }
 
-TEST(ConstantEdgeTest, ConstantEdge_linearizeOplus) {
+TEST(ConstantEdgeTest, ConstantEdgeLinearizeOplus) {
   EdgeTester<Edge3Dynamic> dynamic;
   EdgeTester<Edge3Constant> constant;
   dynamic.edge.computeError();
@@ -272,7 +270,7 @@ TEST(ConstantEdgeTest, ConstantEdge_linearizeOplus) {
                        .norm());
 }
 
-TEST(ConstantEdgeTest, ConstantEdge_constructQuadraticForm) {
+TEST(ConstantEdgeTest, ConstantEdgeConstructQuadraticForm) {
   EdgeTester<Edge3Dynamic> dynamic;
   EdgeTester<Edge3Constant> constant;
   dynamic.edge.computeError();
@@ -291,7 +289,7 @@ TEST(ConstantEdgeTest, ConstantEdge_constructQuadraticForm) {
   EXPECT_NEAR(0.0, (dynamic.hessian12 - constant.hessian12).norm(), 1e-7);
 }
 
-TEST(ConstantEdgeTest, ConstantEdge_constructQuadraticForm_robust) {
+TEST(ConstantEdgeTest, ConstantEdgeConstructQuadraticFormRobust) {
   EdgeTester<Edge3Dynamic> dynamic;
   EdgeTester<Edge3Constant> constant;
 
@@ -324,7 +322,7 @@ TEST(ConstantEdgeTest, ConstantEdge_constructQuadraticForm_robust) {
   EXPECT_NEAR(0.0, (dynamic.hessian12 - constant.hessian12).norm(), 1e-7);
 }
 
-TEST(ConstantEdgeTest, ConstantEdge_constructQuadraticForm_rowMajor) {
+TEST(ConstantEdgeTest, ConstantEdgeConstructQuadraticFormRowMajor) {
   EdgeTester<Edge3Dynamic> dynamic;
   EdgeTester<Edge3Constant> constant;
   dynamic.edge.mapHessianMemory(dynamic.hessian01.data(), 0, 1, true);
