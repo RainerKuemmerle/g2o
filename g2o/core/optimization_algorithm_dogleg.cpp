@@ -66,7 +66,7 @@ OptimizationAlgorithm::SolverResult OptimizationAlgorithmDogleg::solve(
 
   if (iteration == 0 &&
       !online) {  // built up the CCS structure, here due to easy time measure
-    bool ok = solver_.buildStructure();
+    const bool ok = solver_.buildStructure();
     if (!ok) {
       std::cerr << __PRETTY_FUNCTION__
                 << ": Failure while building CCS structure" << std::endl;
@@ -90,7 +90,7 @@ OptimizationAlgorithm::SolverResult OptimizationAlgorithmDogleg::solve(
     t = get_monotonic_time();
   }
 
-  number_t currentChi = optimizer_->activeRobustChi2();
+  const number_t currentChi = optimizer_->activeRobustChi2();
 
   solver_.buildSystem();
   if (globalStats) {
@@ -102,11 +102,11 @@ OptimizationAlgorithm::SolverResult OptimizationAlgorithmDogleg::solve(
   // compute alpha
   auxVector_.setZero();
   blockSolver.multiplyHessian(auxVector_.data(), solver_.b());
-  number_t bNormSquared = b.squaredNorm();
-  number_t alpha = bNormSquared / auxVector_.dot(b);
+  const number_t bNormSquared = b.squaredNorm();
+  const number_t alpha = bNormSquared / auxVector_.dot(b);
 
   hsd_ = alpha * b;
-  number_t hsdNorm = hsd_.norm();
+  const number_t hsdNorm = hsd_.norm();
   number_t hgnNorm = -1.;
 
   bool solvedGaussNewton = false;
@@ -160,15 +160,15 @@ OptimizationAlgorithm::SolverResult OptimizationAlgorithmDogleg::solve(
       lastStep_ = kStepSd;
     } else {
       auxVector_ = hgn - hsd_;  // b - a
-      number_t c = hsd_.dot(auxVector_);
-      number_t bmaSquaredNorm = auxVector_.squaredNorm();
+      const number_t c = hsd_.dot(auxVector_);
+      const number_t bmaSquaredNorm = auxVector_.squaredNorm();
       number_t beta;
       if (c <= 0.)
         beta = (-c + sqrt(c * c + bmaSquaredNorm *
                                       (delta_ * delta_ - hsd_.squaredNorm()))) /
                bmaSquaredNorm;
       else {
-        number_t hsdSqrNorm = hsd_.squaredNorm();
+        const number_t hsdSqrNorm = hsd_.squaredNorm();
         beta =
             (delta_ * delta_ - hsdSqrNorm) /
             (c + sqrt(c * c + bmaSquaredNorm * (delta_ * delta_ - hsdSqrNorm)));
@@ -189,10 +189,10 @@ OptimizationAlgorithm::SolverResult OptimizationAlgorithmDogleg::solve(
     optimizer_->push();
     optimizer_->update(hdl_.data());
     optimizer_->computeActiveErrors();
-    number_t newChi = optimizer_->activeRobustChi2();
-    number_t nonLinearGain = currentChi - newChi;
+    const number_t newChi = optimizer_->activeRobustChi2();
+    const number_t nonLinearGain = currentChi - newChi;
     if (fabs(linearGain) < 1e-12) linearGain = cst(1e-12);
-    number_t rho = nonLinearGain / linearGain;
+    const number_t rho = nonLinearGain / linearGain;
     // cerr << PVAR(nonLinearGain) << " " << PVAR(linearGain) << " " <<
     // PVAR(rho) << endl;
     if (rho > 0) {  // step is good and will be accepted

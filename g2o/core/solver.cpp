@@ -41,7 +41,7 @@ Solver::~Solver() {
 }
 
 void Solver::resizeVector(size_t sx) {
-  size_t oldSize = xSize_;
+  const size_t oldSize = xSize_;
   xSize_ = sx;
   sx += additionalVectorSpace_;  // allocate some additional space if requested
   if (maxXSize_ < sx) {

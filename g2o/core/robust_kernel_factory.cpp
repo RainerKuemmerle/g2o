@@ -42,7 +42,7 @@ RobustKernelFactory* RobustKernelFactory::instance() {
 
 void RobustKernelFactory::registerRobustKernel(
     const std::string& tag, const AbstractRobustKernelCreator::Ptr& c) {
-  CreatorMap::const_iterator foundIt = creator_.find(tag);
+  const CreatorMap::const_iterator foundIt = creator_.find(tag);
   if (foundIt != creator_.end()) {
     assert(0 && "Overwriting robust kernel tag");
   }

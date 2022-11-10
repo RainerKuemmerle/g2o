@@ -48,9 +48,9 @@ namespace tutorial {
 
 static int run_slam2d_tutorial() {
   // TODO(Rainer): simulate different sensor offset
-  // simulate a robot observing landmarks while travelling on a grid
-  SE2 sensorOffsetTransf(0.2, 0.1, -0.1);
-  int numNodes = 300;
+  // simulate a robot observing landmarks while traveling on a grid
+  const SE2 sensorOffsetTransf(0.2, 0.1, -0.1);
+  const int numNodes = 300;
   Simulator simulator;
   simulator.simulate(numNodes, sensorOffsetTransf);
 

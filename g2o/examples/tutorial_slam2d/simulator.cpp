@@ -47,42 +47,41 @@ inline double round(double number) {
 using LandmarkGrid = std::map<int, std::map<int, Simulator::LandmarkPtrVector>>;
 
 Simulator::Simulator() {
-  time_t seed = time(nullptr);
+  const time_t seed = time(nullptr);
   Sampler::seedRand(static_cast<unsigned int>(seed));
 }
 
 void Simulator::simulate(int numPoses, const SE2& sensorOffset) {
   // simulate a robot observing landmarks while travelling on a grid
-  int steps = 5;
-  double stepLen = 1.0;
-  int boundArea = 50;
+  const int steps = 5;
+  const double stepLen = 1.0;
+  const int boundArea = 50;
 
-  double maxSensorRangeLandmarks = 2.5 * stepLen;
+  const double maxSensorRangeLandmarks = 2.5 * stepLen;
 
-  int landMarksPerSquareMeter = 1;
-  double observationProb = 0.8;
+  const int landMarksPerSquareMeter = 1;
+  const double observationProb = 0.8;
 
-  int landmarksRange = 2;
+  const int landmarksRange = 2;
 
-  Eigen::Vector2d transNoise(0.05, 0.01);
-  double rotNoise = DEG2RAD(2.);
-  Eigen::Vector2d landmarkNoise(0.05, 0.05);
+  const Eigen::Vector2d transNoise(0.05, 0.01);
+  const double rotNoise = DEG2RAD(2.);
+  const Eigen::Vector2d landmarkNoise(0.05, 0.05);
 
-  Eigen::Vector2d bound(boundArea, boundArea);
+  const Eigen::Vector2d bound(boundArea, boundArea);
 
   Eigen::VectorXd probLimits;
   probLimits.resize(kMoNumElems);
   for (int i = 0; i < probLimits.size(); ++i)
     probLimits[i] = (i + 1) / static_cast<double>(kMoNumElems);
 
-  Eigen::Matrix3d covariance;
-  covariance.fill(0.);
-  covariance(0, 0) = transNoise[0] * transNoise[0];
-  covariance(1, 1) = transNoise[1] * transNoise[1];
-  covariance(2, 2) = rotNoise * rotNoise;
-  Eigen::Matrix3d information = covariance.inverse();
+  const Eigen::Matrix3d covariance =
+      Eigen::Vector3d(transNoise[0] * transNoise[0],
+                      transNoise[1] * transNoise[1], rotNoise * rotNoise)
+          .asDiagonal();
+  const Eigen::Matrix3d information = covariance.inverse();
 
-  SE2 maxStepTransf(stepLen * steps, 0, 0);
+  const SE2 maxStepTransf(stepLen * steps, 0, 0);
   Simulator::PosesVector& poses = poses_;
   poses.clear();
   LandmarkVector& landmarks = landmarks_;
@@ -97,14 +96,14 @@ void Simulator::simulate(int numPoses, const SE2& sensorOffset) {
     // add straight motions
     for (int i = 1; i < steps && static_cast<int>(poses.size()) < numPoses;
          ++i) {
-      Simulator::GridPose nextGridPose = generateNewPose(
+      const Simulator::GridPose nextGridPose = generateNewPose(
           poses.back(), SE2(stepLen, 0, 0), transNoise, rotNoise);
       poses.push_back(nextGridPose);
     }
     if (static_cast<int>(poses.size()) == numPoses) break;
 
     // sample a new motion direction
-    double sampleMove = Sampler::uniformRand(0., 1.);
+    const double sampleMove = Sampler::uniformRand(0., 1.);
     int motionDirection = 0;
     while (probLimits[motionDirection] < sampleMove &&
            motionDirection + 1 < kMoNumElems) {
@@ -140,12 +139,12 @@ void Simulator::simulate(int numPoses, const SE2& sensorOffset) {
   cerr << "Simulator: Creating landmarks ... ";
   LandmarkGrid grid;
   for (const auto& pose : poses) {
-    int ccx = static_cast<int>(round(pose.truePose.translation().x()));
-    int ccy = static_cast<int>(round(pose.truePose.translation().y()));
+    const int ccx = static_cast<int>(round(pose.truePose.translation().x()));
+    const int ccy = static_cast<int>(round(pose.truePose.translation().y()));
     for (int a = -landmarksRange; a <= landmarksRange; a++)
       for (int b = -landmarksRange; b <= landmarksRange; b++) {
-        int cx = ccx + a;
-        int cy = ccy + b;
+        const int cx = ccx + a;
+        const int cy = ccy + b;
         LandmarkPtrVector& landmarksForCell = grid[cx][cy];
         if (landmarksForCell.empty()) {
           for (int i = 0; i < landMarksPerSquareMeter; ++i) {
@@ -166,32 +165,32 @@ void Simulator::simulate(int numPoses, const SE2& sensorOffset) {
   cerr << "done." << endl;
 
   cerr << "Simulator: Simulating landmark observations for the poses ... ";
-  double maxSensorSqr = maxSensorRangeLandmarks * maxSensorRangeLandmarks;
+  const double maxSensorSqr = maxSensorRangeLandmarks * maxSensorRangeLandmarks;
   int globalId = 0;
   for (auto& pose : poses) {
     Simulator::GridPose& pv = pose;
-    int cx = static_cast<int>(round(pose.truePose.translation().x()));
-    int cy = static_cast<int>(round(pose.truePose.translation().y()));
-    int numGridCells = static_cast<int>(maxSensorRangeLandmarks) + 1;
+    const int cx = static_cast<int>(round(pose.truePose.translation().x()));
+    const int cy = static_cast<int>(round(pose.truePose.translation().y()));
+    const int numGridCells = static_cast<int>(maxSensorRangeLandmarks) + 1;
 
     pv.id = globalId++;
-    SE2 trueInv = pv.truePose.inverse();
+    const SE2 trueInv = pv.truePose.inverse();
 
     for (int xx = cx - numGridCells; xx <= cx + numGridCells; ++xx)
       for (int yy = cy - numGridCells; yy <= cy + numGridCells; ++yy) {
-        LandmarkPtrVector& landmarksForCell = grid[xx][yy];
+        const LandmarkPtrVector& landmarksForCell = grid[xx][yy];
         if (landmarksForCell.empty()) continue;
         for (auto* l : landmarksForCell) {
-          double dSqr =
+          const double dSqr =
               hypot_sqr(pv.truePose.translation().x() - l->truePose.x(),
                         pv.truePose.translation().y() - l->truePose.y());
           if (dSqr > maxSensorSqr) continue;
-          double obs = Sampler::uniformRand(0.0, 1.0);
+          const double obs = Sampler::uniformRand(0.0, 1.0);
           if (obs > observationProb)  // we do not see this one...
             continue;
           if (l->id < 0) l->id = globalId++;
           if (l->seenBy.empty()) {
-            Eigen::Vector2d trueObservation = trueInv * l->truePose;
+            const Eigen::Vector2d trueObservation = trueInv * l->truePose;
             Eigen::Vector2d observation = trueObservation;
             observation[0] += Sampler::gaussRand(0., landmarkNoise[0]);
             observation[1] += Sampler::gaussRand(0., landmarkNoise[1]);
@@ -227,11 +226,11 @@ void Simulator::simulate(int numPoses, const SE2& sensorOffset) {
   // add the landmark observations
   {
     cerr << "Simulator: add landmark observations ... ";
-    Eigen::Matrix2d covariance;
-    covariance.fill(0.);
-    covariance(0, 0) = landmarkNoise[0] * landmarkNoise[0];
-    covariance(1, 1) = landmarkNoise[1] * landmarkNoise[1];
-    Eigen::Matrix2d information = covariance.inverse();
+    const Eigen::Matrix2d covariance =
+        Eigen::Vector2d(landmarkNoise[0] * landmarkNoise[0],
+                        landmarkNoise[1] * landmarkNoise[1])
+            .asDiagonal();
+    const Eigen::Matrix2d information = covariance.inverse();
 
     for (auto& p : poses) {
       for (size_t j = 0; j < p.landmarks.size(); ++j) {
@@ -243,12 +242,11 @@ void Simulator::simulate(int numPoses, const SE2& sensorOffset) {
     }
 
     for (auto& p : poses) {
-      SE2 trueInv = (p.truePose * sensorOffset).inverse();
+      const SE2 trueInv = (p.truePose * sensorOffset).inverse();
       for (size_t j = 0; j < p.landmarks.size(); ++j) {
         Landmark* l = p.landmarks[j];
-        Eigen::Vector2d observation;
-        Eigen::Vector2d trueObservation = trueInv * l->truePose;
-        observation = trueObservation;
+        const Eigen::Vector2d trueObservation = trueInv * l->truePose;
+        Eigen::Vector2d observation = trueObservation;
         if (!l->seenBy.empty() &&
             l->seenBy[0] ==
                 p.id) {  // write the initial position of the landmark
@@ -276,7 +274,7 @@ void Simulator::simulate(int numPoses, const SE2& sensorOffset) {
   // cleaning up
   for (auto& it : grid) {
     for (auto& itt : it.second) {
-      Simulator::LandmarkPtrVector& landmarks = itt.second;
+      const Simulator::LandmarkPtrVector& landmarks = itt.second;
       for (auto& landmark : landmarks) delete landmark;
     }
   }
@@ -288,7 +286,8 @@ Simulator::GridPose Simulator::generateNewPose(
   Simulator::GridPose nextPose;
   nextPose.id = prev.id + 1;
   nextPose.truePose = prev.truePose * trueMotion;
-  SE2 noiseMotion = sampleTransformation(trueMotion, transNoise, rotNoise);
+  const SE2 noiseMotion =
+      sampleTransformation(trueMotion, transNoise, rotNoise);
   nextPose.simulatorPose = prev.simulatorPose * noiseMotion;
   return nextPose;
 }

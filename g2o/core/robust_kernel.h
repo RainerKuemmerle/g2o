@@ -47,7 +47,7 @@ namespace g2o {
  */
 class G2O_CORE_API RobustKernel {
  public:
-  RobustKernel();
+  RobustKernel() = default;
   explicit RobustKernel(number_t delta);
   virtual ~RobustKernel() = default;
   /**

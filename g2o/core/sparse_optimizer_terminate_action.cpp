@@ -67,16 +67,15 @@ bool SparseOptimizerTerminateAction::operator()(
     // number of iterations
     bool stopOptimizer = false;
     if (params->iteration < maxIterations_) {
-      number_t currentChi = optimizer->activeRobustChi2();
-      number_t gain = (lastChi_ - currentChi) / currentChi;
+      const number_t currentChi = optimizer->activeRobustChi2();
+      const number_t gain = (lastChi_ - currentChi) / currentChi;
       lastChi_ = currentChi;
-      if (gain >= 0 && gain < gainThreshold_) stopOptimizer = true;
+      stopOptimizer = gain >= 0 && gain < gainThreshold_;
     } else {
       stopOptimizer = true;
     }
-    if (stopOptimizer) {  // tell the optimizer to stop
-      setOptimizerStopFlag(optimizer, true);
-    }
+    // tell the optimizer to stop
+    setOptimizerStopFlag(optimizer, stopOptimizer);
   }
   return true;
 }

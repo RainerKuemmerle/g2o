@@ -29,7 +29,7 @@
 namespace g2o {
 namespace tutorial {
 
-VertexSE2::VertexSE2()  = default;
+VertexSE2::VertexSE2() = default;
 
 bool VertexSE2::read(std::istream& is) {
   Eigen::Vector3d p;
@@ -39,7 +39,7 @@ bool VertexSE2::read(std::istream& is) {
 }
 
 bool VertexSE2::write(std::ostream& os) const {
-  Eigen::Vector3d p = estimate().toVector();
+  const Eigen::Vector3d p = estimate().toVector();
   os << p[0] << " " << p[1] << " " << p[2];
   return os.good();
 }
