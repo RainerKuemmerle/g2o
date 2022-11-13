@@ -233,7 +233,7 @@ class G2O_TYPES_ICP_API VertexSCam : public VertexSE3 {
   bool write(std::ostream &os) const override;
 
   // capture the update function to reset aux transforms
-  void oplusImpl(const number_t *update) override {
+  void oplusImpl(const VectorX::MapType& update) override {
     VertexSE3::oplusImpl(update);
     setAll();
   }

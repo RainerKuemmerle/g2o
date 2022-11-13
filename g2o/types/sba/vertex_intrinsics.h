@@ -45,7 +45,7 @@ class G2O_TYPES_SBA_API VertexIntrinsics
 
   void setToOriginImpl() override;
 
-  void oplusImpl(const number_t* update) override;
+  void oplusImpl(const VectorX::MapType& update) override;
 };
 
 }  // namespace g2o

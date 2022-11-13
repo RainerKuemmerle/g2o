@@ -58,9 +58,8 @@ class PolynomialCoefficientVertex
   void setToOriginImpl() override { estimate_.setZero(); }
 
   // Direct linear add
-  void oplusImpl(const double* update) override {
-    Eigen::VectorXd::ConstMapType v(update, dimension_);
-    estimate_ += v;
+  void oplusImpl(const g2o::VectorX::MapType& update) override {
+    estimate_ += update;
   }
 
   // Resize the vertex state. In this case, we want to preserve as much of the

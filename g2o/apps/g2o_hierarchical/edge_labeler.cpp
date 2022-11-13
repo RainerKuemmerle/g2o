@@ -28,6 +28,7 @@
 
 #include <Eigen/Dense>
 
+#include "g2o/core/eigen_types.h"
 #include "g2o/stuff/unscented.h"
 
 using std::cerr;
@@ -180,7 +181,6 @@ bool EdgeLabeler::labelEdge(const SparseBlockMatrix<MatrixX>& spinv,
   // cerr << "sigma points are extracted, remapping to measurement space" <<
   // endl;
   for (size_t i = 0; i < incrementPoints.size(); i++) {
-    int cumPos = 0;
     // VectorX globalPoint(maxDim);
 
     // push all the "active" state variables
@@ -191,14 +191,15 @@ bool EdgeLabeler::labelEdge(const SparseBlockMatrix<MatrixX>& spinv,
       vr->push();
     }
 
+    number_t* sample_ptr = incrementPoints[i]._sample.data();
     for (auto& j : e->vertices()) {
       auto vr = std::static_pointer_cast<OptimizableGraph::Vertex>(j);
       int tj = vr->hessianIndex();
       if (tj == -1) continue;
-      vr->oplus(&incrementPoints[i]._sample[cumPos]);
+      vr->oplus(VectorX::MapType(sample_ptr, vr->minimalEstimateDimension()));
       // assert(vr->getMinimalEstimateData(&globalPoint[cumPos]) &&
       // "Vertex::getMinimalEstimateData(...) not implemented");
-      cumPos += vr->minimalEstimateDimension();
+      sample_ptr += vr->minimalEstimateDimension();
     }
 
     // construct the sigma point in the global space

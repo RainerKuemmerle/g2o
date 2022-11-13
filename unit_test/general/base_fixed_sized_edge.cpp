@@ -70,9 +70,8 @@ class VertexNotDefaultCtor : public g2o::BaseVertex<2, g2o::Vector2> {
  public:
   VertexNotDefaultCtor(int x, int y) { estimate_ = g2o::Vector2(x, y); }
 
-  void oplusImpl(const number_t* update) override {
-    estimate_[0] += update[0];
-    estimate_[1] += update[1];
+  void oplusImpl(const g2o::VectorX::MapType& update) override {
+    estimate_ += update.head<2>();
   }
 
   void setToOriginImpl() override { estimate_.setZero(); }

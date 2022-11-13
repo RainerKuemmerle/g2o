@@ -74,8 +74,8 @@ class G2O_TYPES_SLAM2D_ADDONS_API VertexLine2D : public BaseVertex<2, Line2D> {
 
   int minimalEstimateDimension() const override { return 2; }
 
-  void oplusImpl(const number_t* update) override {
-    estimate_ += Eigen::Map<const Vector2>(update);
+  void oplusImpl(const VectorX::MapType& update) override {
+    estimate_ += update.head<kDimension>();
     estimate_(0) = normalize_theta(estimate_(0));
   }
 

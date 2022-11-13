@@ -40,6 +40,7 @@
 #include "g2o/apps/g2o_cli/dl_wrapper.h"
 #include "g2o/apps/g2o_cli/g2o_common.h"
 #include "g2o/apps/g2o_cli/output_helper.h"
+#include "g2o/core/eigen_types.h"
 #include "g2o/core/estimate_propagator.h"
 #include "g2o/core/factory.h"
 #include "g2o/core/hyper_dijkstra.h"
@@ -103,7 +104,8 @@ void testMarginals(SparseOptimizer& optimizer) {
           // cerr << mean << endl;
           // cerr << "sigma [" << j << "]" << endl;
           // cerr << spts[j]._sample << endl;
-          v->oplus(spts[j]._sample.data());
+          v->oplus(
+              VectorX::MapType(spts[j]._sample.data(), spts[j]._sample.size()));
           v->getMinimalEstimateData(mean.data());
           tspts[j]._sample = mean;
           // cerr << "oplus [" << j << "]" << endl;

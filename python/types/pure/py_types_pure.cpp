@@ -50,10 +50,9 @@ class VectorXVertex : public BaseDynamicVertex<VectorX> {
 
   // oplusImpl for python consuming a vector
   virtual void oplus_impl(const VectorX& v) = 0;
-  void oplusImpl(const number_t* v) override {
-    const VectorX::ConstMapType asVectorMap(const_cast<number_t*>(v),
-                                            dimension());
-    oplus_impl(asVectorMap);
+  void oplusImpl(const VectorX::MapType& update) override {
+    // TODO(goki): Can we use the MapType directly
+    oplus_impl(update);
   }
 };
 

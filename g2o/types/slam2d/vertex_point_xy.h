@@ -67,9 +67,8 @@ class G2O_TYPES_SLAM2D_API VertexPointXY : public BaseVertex<2, Vector2> {
 
   int minimalEstimateDimension() const override { return 2; }
 
-  void oplusImpl(const number_t* update) override {
-    estimate_[0] += update[0];
-    estimate_[1] += update[1];
+  void oplusImpl(const VectorX::MapType& update) override {
+    estimate_ += update.head<2>();
   }
 
   bool read(std::istream& is) override;

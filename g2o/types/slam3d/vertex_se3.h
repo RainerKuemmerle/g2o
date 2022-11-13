@@ -96,9 +96,8 @@ class G2O_TYPES_SLAM3D_API VertexSE3 : public BaseVertex<6, Isometry3> {
    * element qw of the quaternion is recovred by
    * || (qw,qx,qy,qz) || == 1 => qw = sqrt(1 - || (qx,qy,qz) ||
    */
-  void oplusImpl(const number_t* update) override {
-    Eigen::Map<const Vector6> v(update);
-    Isometry3 increment = internal::fromVectorMQT(v);
+  void oplusImpl(const VectorX::MapType& update) override {
+    const Isometry3 increment = internal::fromVectorMQT(update);
     estimate_ = estimate_ * increment;
     if (++numOplusCalls_ > kOrthogonalizeAfter) {
       numOplusCalls_ = 0;

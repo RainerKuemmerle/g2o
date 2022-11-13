@@ -36,8 +36,8 @@ class VertexFlatSE2 : public g2o::BaseVertex<3, g2o::Vector3> {
  public:
   void setToOriginImpl() override { estimate_.setZero(); }
 
-  void oplusImpl(const number_t* update) override {
-    estimate_ += Eigen::Map<const g2o::Vector3>(update);
+  void oplusImpl(const g2o::VectorX::MapType& update) override {
+    estimate_ += update.head<kDimension>();
     estimate_(2) = g2o::normalize_theta(estimate_(2));
   }
 

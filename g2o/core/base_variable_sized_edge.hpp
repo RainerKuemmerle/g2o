@@ -84,18 +84,19 @@ void BaseVariableSizedEdge<D, E>::linearizeOplus() {
            "jacobian cache dimension does not match");
     jacobianOplus_[i].resize(dimension_, vi_dim);
     // add small step along the unit vector in each dimension
-    ceres::internal::FixedArray<number_t> add_vi(vi_dim);
-    add_vi.fill(0.);
+    VectorX add_vi_buffer(vi_dim);
+    add_vi_buffer.fill(0.);
+    VectorX::MapType add_vi(add_vi_buffer.data(), add_vi_buffer.size());
     for (int d = 0; d < vi_dim; ++d) {
       vi->push();
       add_vi[d] = kDelta;
-      vi->oplus(add_vi.data());
+      vi->oplus(add_vi);
       computeError();
       errorBak = error_;
       vi->pop();
       vi->push();
       add_vi[d] = -kDelta;
-      vi->oplus(add_vi.data());
+      vi->oplus(add_vi);
       computeError();
       errorBak -= error_;
       vi->pop();

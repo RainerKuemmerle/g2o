@@ -38,8 +38,8 @@ class G2O_TYPES_SCLAM2D_API VertexOdomDifferentialParams
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
   void setToOriginImpl() override { estimate_ << 1., 1., 1.; }
 
-  void oplusImpl(const number_t* v) override {
-    for (int i = 0; i < 3; i++) estimate_(i) += v[i];
+  void oplusImpl(const VectorX::MapType& update) override {
+    for (int i = 0; i < 3; i++) estimate_(i) += update[i];
   }
 
   bool read(std::istream& is) override;

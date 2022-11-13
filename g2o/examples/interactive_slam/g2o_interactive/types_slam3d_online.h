@@ -39,7 +39,7 @@ class G2O_INTERACTIVE_API OnlineVertexSE3 : public VertexSE3 {
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
   OnlineVertexSE3() : updatedEstimate(Eigen::Isometry3d::Identity()) {}
 
-  void oplusImpl(const double* update) override {
+  void oplusImpl(const VectorX::MapType& update) override {
     VertexSE3::oplusImpl(update);
     updatedEstimate = estimate_;
   }

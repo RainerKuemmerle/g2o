@@ -44,9 +44,8 @@ class G2O_TYPES_SLAM3D_API VertexPointXYZ : public BaseVertex<3, Vector3> {
 
   void setToOriginImpl() override { estimate_.fill(0.); }
 
-  void oplusImpl(const number_t* update_) override {
-    Eigen::Map<const Vector3> update(update_);
-    estimate_ += update;
+  void oplusImpl(const VectorX::MapType& update) override {
+    estimate_ += update.head<kDimension>();
   }
 
   bool setEstimateDataImpl(const number_t* est) override {

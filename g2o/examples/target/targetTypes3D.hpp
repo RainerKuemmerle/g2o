@@ -16,10 +16,8 @@ class VertexPosition3D : public g2o::BaseVertex<3, Eigen::Vector3d> {
 
   void setToOriginImpl() override { estimate_.setZero(); }
 
-  void oplusImpl(const double* update) override {
-    estimate_[0] += update[0];
-    estimate_[1] += update[1];
-    estimate_[2] += update[2];
+  void oplusImpl(const g2o::VectorX::MapType& update) override {
+    estimate_ += update;
   }
 
   bool read(std::istream& /*is*/) override { return false; }
@@ -35,10 +33,8 @@ class VertexVelocity3D : public g2o::BaseVertex<3, Eigen::Vector3d> {
 
   void setToOriginImpl() override { estimate_.setZero(); }
 
-  void oplusImpl(const double* update) override {
-    estimate_[0] += update[0];
-    estimate_[1] += update[1];
-    estimate_[2] += update[2];
+  void oplusImpl(const g2o::VectorX::MapType& update) override {
+    estimate_ += update;
   }
 
   bool read(std::istream& /*is*/) override { return false; }

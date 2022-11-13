@@ -27,6 +27,7 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
+#include <cstddef>
 #include <numeric>
 
 #include "g2o/core/factory.h"
@@ -248,8 +249,10 @@ class GeneralGraphOperations : public ::testing::Test {
   }
 
   std::unique_ptr<g2o::SparseOptimizer> optimizer_;
-  static const size_t kNumVertices = 3;
+  static constexpr size_t kNumVertices = 3;
 };
+
+constexpr size_t GeneralGraphOperations::kNumVertices;
 
 TEST_F(GeneralGraphOperations, SavingGraph) {
   std::stringstream graphData;

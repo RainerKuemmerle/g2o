@@ -157,7 +157,7 @@ class StructureOnlySolver : public OptimizationAlgorithm {
             if (chol_H_pp.isPositive()) {
               PointVector delta_p = chol_H_pp.solve(b);
               v->push();
-              v->oplus(delta_p.data());
+              v->oplus(VectorX::MapType(delta_p.data(), delta_p.size()));
               number_t new_chi2 = 0;
               for (const auto& it_t : track) {
                 auto e = std::static_pointer_cast<OptimizableGraph::Edge>(

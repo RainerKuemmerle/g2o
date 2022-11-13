@@ -39,8 +39,8 @@ number_t BaseVertex<D, T>::solveDirect(number_t lambda) {
   number_t det = tempA.determinant();
   if (g2o_isnan(det) || det < std::numeric_limits<number_t>::epsilon())
     return det;
-  Eigen::Matrix<number_t, D, 1, Eigen::ColMajor> dx = tempA.llt().solve(b_);
-  oplus(dx.data());
+  BVector dx = tempA.llt().solve(b_);
+  oplus(VectorX::MapType(dx.data(), dx.size()));
   return det;
 }
 

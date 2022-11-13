@@ -44,9 +44,8 @@ class G2O_TUTORIAL_SLAM2D_API VertexPointXY
 
   void setToOriginImpl() override { estimate_.setZero(); }
 
-  void oplusImpl(const double* update) override {
-    estimate_[0] += update[0];
-    estimate_[1] += update[1];
+  void oplusImpl(const g2o::VectorX::MapType& update) override {
+    estimate_ += update;
   }
 
   bool read(std::istream& is) override;

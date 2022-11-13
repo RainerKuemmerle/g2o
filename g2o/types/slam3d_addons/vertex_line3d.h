@@ -45,8 +45,7 @@ class G2O_TYPES_SLAM3D_ADDONS_API VertexLine3D : public BaseVertex<4, Line3D> {
 
   void setToOriginImpl() override { estimate_ = Line3D(); }
 
-  void oplusImpl(const number_t* update_) override {
-    Eigen::Map<const Vector4> update(update_);
+  void oplusImpl(const VectorX::MapType& update) override {
     estimate_.oplus(update);
   }
 
