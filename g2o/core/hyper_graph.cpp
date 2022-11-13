@@ -34,8 +34,6 @@
 
 namespace g2o {
 
-static std::shared_ptr<HyperGraph::Vertex> kNonExistantVertex(nullptr);
-
 HyperGraph::Data::Data() {
   next_ = nullptr;
   dataContainer_ = nullptr;
@@ -74,7 +72,7 @@ std::shared_ptr<const HyperGraph::Vertex> HyperGraph::vertex(int id) const {
 }
 
 bool HyperGraph::addVertex(const std::shared_ptr<Vertex>& v) {
-  auto result = vertices_.insert(std::make_pair(v->id(), v));
+  auto result = vertices_.emplace(v->id(), v);
   return result.second;
 }
 
@@ -87,7 +85,7 @@ bool HyperGraph::changeId(std::shared_ptr<Vertex>& v, int newId) {
   if (v != v2) return false;
   vertices_.erase(v->id());
   v->setId(newId);
-  vertices_.insert(std::make_pair(v->id(), v));
+  vertices_.emplace(v->id(), v);
   return true;
 }
 
@@ -110,11 +108,11 @@ bool HyperGraph::addEdge(const std::shared_ptr<Edge>& e) {
     if (vertexPointer.size() != e->vertices().size()) return false;
   }
 
-  std::pair<EdgeSet::iterator, bool> result = edges_.insert(e);
+  std::pair<EdgeSet::iterator, bool> result = edges_.emplace(e);
   if (!result.second) return false;
 
   for (auto& v : e->vertices()) {  // connect the vertices to this edge
-    v->edges().insert(e);
+    v->edges().emplace(e);
   }
 
   return true;
@@ -125,7 +123,7 @@ bool HyperGraph::setEdgeVertex(const std::shared_ptr<Edge>& e, int pos,
   auto vOld = e->vertex(pos);
   if (vOld) vOld->edges().erase(e);
   e->setVertex(pos, v);
-  if (v) v->edges().insert(e);
+  if (v) v->edges().emplace(e);
   return true;
 }
 
@@ -159,7 +157,10 @@ bool HyperGraph::detachVertex(const std::shared_ptr<Vertex>& v) {
   for (const auto& it : tmp) {
     std::shared_ptr<HyperGraph::Edge> e = it.lock();
     for (size_t i = 0; i < e->vertices().size(); i++) {
-      if (v == e->vertex(i)) setEdgeVertex(e, i, kNonExistantVertex);
+      if (v == e->vertex(i)) {
+        const std::shared_ptr<Vertex> nonExistantVertex;
+        setEdgeVertex(e, i, nonExistantVertex);
+      }
     }
   }
   return true;
