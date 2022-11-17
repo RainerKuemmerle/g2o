@@ -248,7 +248,7 @@ class GeneralGraphOperations : public ::testing::Test {
   }
 
   std::unique_ptr<g2o::SparseOptimizer> optimizer_;
-  static constexpr size_t kNumVertices = 3;
+  static const size_t kNumVertices = 3;
 };
 
 TEST_F(GeneralGraphOperations, SavingGraph) {
