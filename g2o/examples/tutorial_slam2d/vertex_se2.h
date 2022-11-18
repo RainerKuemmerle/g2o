@@ -45,7 +45,7 @@ class G2O_TUTORIAL_SLAM2D_API VertexSE2 : public BaseVertex<3, SE2> {
 
   void setToOriginImpl() override { estimate_ = SE2(); }
 
-  void oplusImpl(const double* update) override {
+  void oplusImpl(const g2o::VectorX::MapType& update) override {
     SE2 up(update[0], update[1], update[2]);
     estimate_ *= up;
   }

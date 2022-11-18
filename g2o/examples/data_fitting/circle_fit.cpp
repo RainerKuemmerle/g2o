@@ -72,9 +72,8 @@ class VertexCircle : public g2o::BaseVertex<3, Eigen::Vector3d> {
     std::cerr << __PRETTY_FUNCTION__ << " not implemented yet" << std::endl;
   }
 
-  void oplusImpl(const double* update) override {
-    Eigen::Vector3d::ConstMapType v(update);
-    estimate_ += v;
+  void oplusImpl(const g2o::VectorX::MapType& update) override {
+    estimate_ += update.head<kDimension>();
   }
 };
 

@@ -56,9 +56,8 @@ class G2O_TYPES_SBA_API VertexCam : public BaseVertex<6, SBACam> {
     estimate_.setDr();
   }
 
-  void oplusImpl(const number_t* update) override {
-    Eigen::Map<const Vector6> v(update);
-    estimate_.update(v);
+  void oplusImpl(const VectorX::MapType& update) override {
+    estimate_.update(update.head<kDimension>());
     estimate_.setTransform();
     estimate_.setProjection();
     estimate_.setDr();

@@ -34,6 +34,7 @@
 #include "g2o/core/base_vertex.h"
 #include "g2o/core/batch_stats.h"
 #include "g2o/core/block_solver.h"
+#include "g2o/core/eigen_types.h"
 #include "g2o/core/optimization_algorithm_levenberg.h"
 #include "g2o/core/solver.h"
 #include "g2o/core/sparse_optimizer.h"
@@ -81,9 +82,8 @@ class VertexCameraBAL : public g2o::BaseVertex<9, g2o::bal::Vector9> {
     std::cerr << __PRETTY_FUNCTION__ << " not implemented yet" << std::endl;
   }
 
-  void oplusImpl(const double* update) override {
-    g2o::bal::Vector9::ConstMapType v(update, VertexCameraBAL::kDimension);
-    estimate_ += v;
+  void oplusImpl(const g2o::VectorX::MapType& update) override {
+    estimate_ += update;
   }
 };
 
@@ -111,9 +111,8 @@ class VertexPointBAL : public g2o::BaseVertex<3, g2o::Vector3> {
     std::cerr << __PRETTY_FUNCTION__ << " not implemented yet" << std::endl;
   }
 
-  void oplusImpl(const double* update) override {
-    g2o::Vector3::ConstMapType v(update);
-    estimate_ += v;
+  void oplusImpl(const g2o::VectorX::MapType& update) override {
+    estimate_ += update;
   }
 };
 

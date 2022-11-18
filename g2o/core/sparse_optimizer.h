@@ -278,7 +278,7 @@ class G2O_CORE_API SparseOptimizer : public OptimizableGraph {
    * @param update: the number_t vector containing the stacked
    * elements of the increments on the vertices.
    */
-  void update(const number_t* update);
+  void update(number_t* update);
 
   /**
      returns the set of batch statistics about the optimisation

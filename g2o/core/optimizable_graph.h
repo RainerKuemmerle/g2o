@@ -340,7 +340,7 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
      * carry out the update. Will also call updateCache() to update the caches
      * of depending on the vertex.
      */
-    void oplus(const number_t* v) {
+    void oplus(const VectorX::MapType& v) {
       oplusImpl(v);
       updateCache();
     }
@@ -411,7 +411,7 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
      * update the position of the node from the parameters in v.
      * Implement in your class!
      */
-    virtual void oplusImpl(const number_t* v) = 0;
+    virtual void oplusImpl(const VectorX::MapType& v) = 0;
 
     //! sets the node to the origin (used in the multilevel stuff)
     virtual void setToOriginImpl() = 0;

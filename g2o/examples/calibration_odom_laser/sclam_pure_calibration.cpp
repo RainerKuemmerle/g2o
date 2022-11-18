@@ -62,7 +62,9 @@ class VertexBaseline : public BaseVertex<1, double> {
   VertexBaseline() = default;
 
   void setToOriginImpl() override { estimate_ = 1.; }
-  void oplusImpl(const double* update) override { estimate_ += update[0]; }
+  void oplusImpl(const VectorX::MapType& update) override {
+    estimate_ += update[0];
+  }
   bool read(std::istream&) override { return false; }
   bool write(std::ostream&) const override { return false; }
 };

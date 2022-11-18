@@ -26,8 +26,7 @@
 
 template <int D, typename E, typename... VertexTypes>
 void BaseFixedSizedEdge<D, E, VertexTypes...>::resize(size_t size) {
-  assert(size == kNrOfVertices &&
-         "attempting to resize a constant size edge");
+  assert(size == kNrOfVertices && "attempting to resize a constant size edge");
   BaseEdge<D, E>::resize(size);
 }
 
@@ -170,25 +169,24 @@ void BaseFixedSizedEdge<D, E, VertexTypes...>::linearizeOplusN() {
   internal::QuadraticFormLock lck(*vertex);
   (void)lck;
 
-  using FixedArray = typename std::conditional<
-      VertexXnType<N>::kDimension == -1, ceres::internal::FixedArray<number_t>,
-      ceres::internal::FixedArray<
-          number_t, static_cast<size_t>(VertexXnType<N>::kDimension)>>::type;
-  FixedArray add_vertex(vertexDimension<N>());
-  add_vertex.fill(0.);
+  using VectorType = typename VertexXnType<N>::BVector;
+  VectorType add_vertex_buffer(vertexDimension<N>());
+  add_vertex_buffer.fill(0.);
+  VectorX::MapType add_vertex(add_vertex_buffer.data(),
+                              add_vertex_buffer.size());
 
   // estimate the jacobian numerically
   // add small step along the unit vector in each dimension
   for (int d = 0; d < vertexDimension<N>(); ++d) {
     vertex->push();
     add_vertex[d] = kDelta;
-    vertex->oplus(add_vertex.data());
+    vertex->oplus(add_vertex);
     computeError();
     auto errorBak = this->error();
     vertex->pop();
     vertex->push();
     add_vertex[d] = -kDelta;
-    vertex->oplus(add_vertex.data());
+    vertex->oplus(add_vertex);
     computeError();
     errorBak -= this->error();
     vertex->pop();

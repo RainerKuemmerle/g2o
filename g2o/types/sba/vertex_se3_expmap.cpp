@@ -43,9 +43,8 @@ bool VertexSE3Expmap::write(std::ostream& os) const {
 
 void VertexSE3Expmap::setToOriginImpl() { estimate_ = SE3Quat(); }
 
-void VertexSE3Expmap::oplusImpl(const number_t* update_) {
-  Eigen::Map<const Vector6> update(update_);
-  setEstimate(SE3Quat::exp(update) * estimate());
+void VertexSE3Expmap::oplusImpl(const VectorX::MapType& update) {
+  setEstimate(SE3Quat::exp(update.head<kDimension>()) * estimate());
 }
 
 }  // namespace g2o

@@ -72,10 +72,11 @@ class G2O_TYPES_SIM3_API VertexSim3Expmap : public BaseVertex<7, Sim3> {
 
   void setToOriginImpl() override { estimate_ = Sim3(); }
 
-  void oplusImpl(const number_t* update_) override {
-    Eigen::Map<Vector7> update(const_cast<number_t*>(update_));
-
-    if (_fix_scale) update[6] = 0;
+  void oplusImpl(const VectorX::MapType& update) override {
+    if (_fix_scale) {
+      auto& update_non_const = const_cast<VectorX::MapType&>(update);
+      update_non_const[6] = 0;
+    }
 
     Sim3 s(update);
     setEstimate(s * estimate());

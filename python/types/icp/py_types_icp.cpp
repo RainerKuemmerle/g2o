@@ -61,7 +61,12 @@ void declareTypesICP(py::module& m) {
                                                                  "VertexSCam")
       .def(py::init<>())
 
-      .def("oplus_impl", &VertexSCam::oplusImpl)
+      .def("oplus_impl",
+           [](VertexSCam& v, const VectorX& update) {
+             VectorX::MapType updateMap(const_cast<number_t*>(update.data()),
+                                        update.size());
+             v.oplusImpl(updateMap);
+           })
 
       .def_static("transform_w2f", &VertexSCam::transformW2F, "m"_a, "trans"_a,
                   "qrot"_a)  // (Eigen::Matrix<double,3,4>&, const

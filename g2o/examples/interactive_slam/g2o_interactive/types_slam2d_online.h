@@ -39,7 +39,7 @@ class G2O_INTERACTIVE_API OnlineVertexSE2 : public VertexSE2 {
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
   OnlineVertexSE2() = default;
 
-  void oplusImpl(const double* update) override {
+  void oplusImpl(const VectorX::MapType& update) override {
     VertexSE2::oplusImpl(update);
     updatedEstimate = estimate_;
   }

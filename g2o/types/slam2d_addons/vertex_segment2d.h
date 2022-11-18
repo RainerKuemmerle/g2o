@@ -83,9 +83,8 @@ class G2O_TYPES_SLAM2D_ADDONS_API VertexSegment2D
 
   int minimalEstimateDimension() const override { return 4; }
 
-  void oplusImpl(const number_t* update) override {
-    Eigen::Map<const Vector4> upd(update);
-    estimate_ += upd;
+  void oplusImpl(const VectorX::MapType& update) override {
+    estimate_ += update.head<kDimension>();
   }
 
   bool read(std::istream& is) override;

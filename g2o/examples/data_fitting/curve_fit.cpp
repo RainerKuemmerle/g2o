@@ -51,9 +51,8 @@ class VertexParams : public g2o::BaseVertex<3, Eigen::Vector3d> {
 
   void setToOriginImpl() override {}
 
-  void oplusImpl(const double* update) override {
-    Eigen::Vector3d::ConstMapType v(update);
-    estimate_ += v;
+  void oplusImpl(const g2o::VectorX::MapType& update) override {
+    estimate_ += update.head<kDimension>();
   }
 };
 

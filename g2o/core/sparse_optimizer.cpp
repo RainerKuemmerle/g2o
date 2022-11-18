@@ -35,6 +35,7 @@
 #include "batch_stats.h"
 #include "estimate_propagator.h"
 #include "g2o/config.h"
+#include "g2o/core/eigen_types.h"
 #include "g2o/stuff/macros.h"
 #include "g2o/stuff/misc.h"
 #include "g2o/stuff/timeutil.h"
@@ -415,8 +416,9 @@ int SparseOptimizer::optimize(int iterations, bool online) {
   return cjIterations;
 }
 
-void SparseOptimizer::update(const number_t* update) {
+void SparseOptimizer::update(number_t* update) {
   // update the graph by calling oplus on the vertices
+  VectorX::MapType updateMap(nullptr, 42);
   for (auto* v : ivMap_) {
 #ifndef NDEBUG
     bool hasNan = arrayHasNaN(update, v->dimension());
@@ -424,7 +426,8 @@ void SparseOptimizer::update(const number_t* update) {
       std::cerr << __PRETTY_FUNCTION__ << ": Update contains a nan for vertex "
                 << v->id() << std::endl;
 #endif
-    v->oplus(update);
+    new (&updateMap) VectorX::MapType(update, v->dimension());
+    v->oplus(updateMap);
     update += v->dimension();
   }
 }

@@ -3,8 +3,10 @@
 #include <g2o/core/hyper_graph_action.h>
 #include <g2o/core/jacobian_workspace.h>
 #include <g2o/core/robust_kernel.h>
-//#include <g2o/core/parameter_container.h>
+// #include <g2o/core/parameter_container.h>
 #include <g2o/core/optimizable_graph.h>
+
+#include "g2o/core/eigen_types.h"
 
 namespace g2o {
 
@@ -78,8 +80,13 @@ void declareOptimizableGraph(py::module& m) {
       .def("minimal_estimate_dimension",
            &CLS::Vertex::minimalEstimateDimension)  // virtual, -> int
 
-      .def("oplus", &CLS::Vertex::oplus,
-           "v"_a)  // const double* -> void
+      //.def("oplus", &CLS::Vertex::oplus, "v"_a)  // const VectorX& -> void
+      .def("oplus",
+           [](CLS::Vertex& v, const VectorX& update) {
+             VectorX::MapType updateMap(const_cast<number_t*>(update.data()),
+                                        update.size());
+             v.oplus(updateMap);
+           })
       .def("hessian_index", &CLS::Vertex::hessianIndex)  // -> int
       .def("set_hessian_index", &CLS::Vertex::setHessianIndex,
            "ti"_a)  // int -> void
@@ -162,10 +169,10 @@ void declareOptimizableGraph(py::module& m) {
   cls.def("remove_vertex", &CLS::removeVertex, "v"_a,
           "detach"_a);  // virtual, (Vertex*, bool) -> bool
 
-//   cls.def(
-//       "add_edge",
-//       (bool(CLS::*)(const std::shared_ptr<HyperGraph::Edge>&)) & CLS::addEdge,
-//       "e"_a);
+  //   cls.def(
+  //       "add_edge",
+  //       (bool(CLS::*)(const std::shared_ptr<HyperGraph::Edge>&)) &
+  //       CLS::addEdge, "e"_a);
   cls.def("add_edge",
           static_cast<bool (CLS::*)(const std::shared_ptr<HyperGraph::Edge>&)>(
               &CLS::addEdge),

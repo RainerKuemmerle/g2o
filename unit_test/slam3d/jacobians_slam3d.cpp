@@ -38,7 +38,7 @@
 #include "unit_test/test_helper/evaluate_jacobian.h"
 #include "unit_test/test_helper/random_state.h"
 
-using namespace g2o; //NOLINT
+using namespace g2o;  // NOLINT
 
 namespace {
 auto depth_epsilon = [](const number_t x, const number_t y) {
@@ -220,8 +220,8 @@ TEST(Slam3D, dqDRJacobian) {
 
     // our analytic function which we want to evaluate
     Eigen::Matrix<number_t, 3, 9, Eigen::ColMajor> dq_dR;
-    internal::compute_dq_dR(dq_dR, Re(0, 0), Re(1, 0), Re(2, 0), Re(0, 1), Re(1, 1),
-                  Re(2, 1), Re(0, 2), Re(1, 2), Re(2, 2));
+    internal::compute_dq_dR(dq_dR, Re(0, 0), Re(1, 0), Re(2, 0), Re(0, 1),
+                            Re(1, 1), Re(2, 1), Re(0, 2), Re(1, 2), Re(2, 2));
 
     // compute the Jacobian using AD
     number_t* parameters[] = {Re.data()};
@@ -262,6 +262,10 @@ TEST(Slam3D, EdgeSE3PointXYZDepthJacobian) {
   e->setParameterId(0, paramOffset->id());
   graph.addEdge(e);
 
+  auto conservative_depth_epsilon = [](const number_t x, const number_t y) {
+    return std::max(0.01, depth_epsilon(x, y));
+  };
+
   JacobianWorkspace jacobianWorkspace;
   JacobianWorkspace numericJacobianWorkspace;
   numericJacobianWorkspace.updateSize(e.get());
@@ -274,7 +278,7 @@ TEST(Slam3D, EdgeSE3PointXYZDepthJacobian) {
     e->setMeasurement(Eigen::Vector3d::Random());
 
     evaluateJacobian(*e, jacobianWorkspace, numericJacobianWorkspace,
-                     depth_epsilon);
+                     conservative_depth_epsilon);
   }
 }
 

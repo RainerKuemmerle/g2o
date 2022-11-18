@@ -45,8 +45,7 @@ class G2O_TYPES_SLAM3D_ADDONS_API VertexPlane : public BaseVertex<3, Plane3D> {
 
   void setToOriginImpl() override { estimate_ = Plane3D(); }
 
-  void oplusImpl(const number_t* update_) override {
-    Eigen::Map<const Vector3> update(update_);
+  void oplusImpl(const VectorX::MapType& update) override {
     estimate_.oplus(update);
   }
 

@@ -46,8 +46,8 @@ void VertexIntrinsics::setToOriginImpl() {
   estimate_ << cst(1.), cst(1.), cst(0.5), cst(0.5), cst(0.1);
 }
 
-void VertexIntrinsics::oplusImpl(const number_t* update) {
-  estimate_.head<4>() += Vector4(update);
+void VertexIntrinsics::oplusImpl(const VectorX::MapType& update) {
+  estimate_.head<4>() += update.head<kDimension>();
 }
 
 }  // namespace g2o
