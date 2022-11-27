@@ -63,8 +63,8 @@ void declareTypesICP(py::module& m) {
 
       .def("oplus_impl",
            [](VertexSCam& v, const VectorX& update) {
-             VectorX::MapType updateMap(const_cast<number_t*>(update.data()),
-                                        update.size());
+             const VectorX::MapType updateMap(
+                 const_cast<number_t*>(update.data()), update.size());
              v.oplusImpl(updateMap);
            })
 
