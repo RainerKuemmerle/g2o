@@ -54,7 +54,7 @@ MainWindow::MainWindow(QWidget* parent)
 }
 
 void MainWindow::on_actionLoad_triggered(bool) {
-  QString filename = QFileDialog::getOpenFileName(
+  const QString filename = QFileDialog::getOpenFileName(
       this, "Load g2o file", "", "g2o files (*.g2o);;All Files (*)");
   if (!filename.isNull()) {
     loadFromFile(filename);
@@ -62,8 +62,8 @@ void MainWindow::on_actionLoad_triggered(bool) {
 }
 
 void MainWindow::on_actionSave_triggered(bool) {
-  QString filename = QFileDialog::getSaveFileName(this, "Save g2o file", "",
-                                                  "g2o files (*.g2o)");
+  const QString filename = QFileDialog::getSaveFileName(
+      this, "Save g2o file", "", "g2o files (*.g2o)");
   if (!filename.isNull()) {
     std::ofstream fout(filename.toStdString().c_str());
     viewer->graph->save(fout);
@@ -81,7 +81,7 @@ void MainWindow::on_btnOptimize_clicked() {
   }
 
   bool allocatedNewSolver;
-  bool allocateStatus = allocateSolver(allocatedNewSolver);
+  const bool allocateStatus = allocateSolver(allocatedNewSolver);
   if (!allocateStatus) {
     cerr << "Error while allocating solver" << endl;
     return;
@@ -95,8 +95,8 @@ void MainWindow::on_btnOptimize_clicked() {
   forceStopFlag_ = false;
   viewer->graph->setForceStopFlag(&forceStopFlag_);
 
-  int maxIterations = spIterations->value();
-  int iter = viewer->graph->optimize(maxIterations);
+  const int maxIterations = spIterations->value();
+  const int iter = viewer->graph->optimize(maxIterations);
   if (maxIterations > 0 && !iter) {
     cerr << "Optimization failed, result might be invalid" << endl;
   }
@@ -159,7 +159,7 @@ void MainWindow::fixGraph() {
   }
 
   // check for vertices to fix to remove DoF
-  bool gaugeFreedom = viewer->graph->gaugeFreedom();
+  const bool gaugeFreedom = viewer->graph->gaugeFreedom();
   auto gauge = viewer->graph->findGauge();
   if (gaugeFreedom) {
     if (!gauge) {
@@ -245,12 +245,12 @@ bool MainWindow::load(const QString& filename) {
   g2o::SparseOptimizer* optimizer = viewer->graph;
 
   // update the solvers which are suitable for this graph
-  std::set<int> vertDims = optimizer->dimensions();
+  const std::set<int> vertDims = optimizer->dimensions();
   for (size_t i = 0; i < knownSolvers_.size(); ++i) {
     const g2o::OptimizationAlgorithmProperty& sp = knownSolvers_[i];
     if (sp.name.empty() && sp.desc.empty()) continue;
 
-    bool suitableSolver = optimizer->isSolverSuitable(sp, vertDims);
+    const bool suitableSolver = optimizer->isSolverSuitable(sp, vertDims);
     qobject_cast<QStandardItemModel*>(coOptimizer->model())
         ->item(i)
         ->setEnabled(suitableSolver);
@@ -263,10 +263,10 @@ bool MainWindow::allocateSolver(bool& allocatedNewSolver) {
     cerr << "No solvers available" << endl;
     return false;
   }
-  int currentIndex = coOptimizer->currentIndex();
-  bool enabled = qobject_cast<QStandardItemModel*>(coOptimizer->model())
-                     ->item(currentIndex)
-                     ->isEnabled();
+  const int currentIndex = coOptimizer->currentIndex();
+  const bool enabled = qobject_cast<QStandardItemModel*>(coOptimizer->model())
+                           ->item(currentIndex)
+                           ->isEnabled();
 
   if (!enabled) {
     cerr << "selected solver is not enabled" << endl;
@@ -276,7 +276,7 @@ bool MainWindow::allocateSolver(bool& allocatedNewSolver) {
   if (currentIndex == lastSolver_) return true;
 
   allocatedNewSolver = true;
-  QString strSolver = coOptimizer->currentText();
+  const QString strSolver = coOptimizer->currentText();
 
   // create the new algorithm
   g2o::OptimizationAlgorithmFactory* solverFactory =
@@ -294,7 +294,7 @@ bool MainWindow::prepare() {
     cerr << "Marginalizing Landmarks" << endl;
     for (const auto& it : optimizer->vertices()) {
       auto* v = static_cast<g2o::OptimizableGraph::Vertex*>(it.second.get());
-      int vdim = v->dimension();
+      const int vdim = v->dimension();
       v->setMarginalized(
           (vdim == currentOptimizationAlgorithmProperty_.landmarkDim));
     }
@@ -311,15 +311,14 @@ bool MainWindow::prepare() {
 
 void MainWindow::setRobustKernel() {
   g2o::SparseOptimizer* optimizer = viewer->graph;
-  bool robustKernel = cbRobustKernel->isChecked();
-  double huberWidth = leKernelWidth->text().toDouble();
+  const bool robustKernel = cbRobustKernel->isChecked();
+  const double huberWidth = leKernelWidth->text().toDouble();
   // odometry edges are those whose node ids differ by 1
-
-  bool onlyLoop = cbOnlyLoop->isChecked();
+  const bool onlyLoop = cbOnlyLoop->isChecked();
 
   if (robustKernel) {
-    QString strRobustKernel = coRobustKernel->currentText();
-    g2o::AbstractRobustKernelCreator::Ptr creator =
+    const QString strRobustKernel = coRobustKernel->currentText();
+    const g2o::AbstractRobustKernelCreator::Ptr creator =
         g2o::RobustKernelFactory::instance()->creator(
             strRobustKernel.toStdString());
     if (!creator) {
@@ -327,7 +326,7 @@ void MainWindow::setRobustKernel() {
            << endl;
       return;
     }
-    g2o::RobustKernelPtr robustKernel = creator->construct();
+    const g2o::RobustKernelPtr robustKernel = creator->construct();
     robustKernel->setDelta(huberWidth);
     for (const auto& it : optimizer->edges()) {
       auto* e = static_cast<g2o::OptimizableGraph::Edge*>(it.get());
@@ -341,7 +340,7 @@ void MainWindow::setRobustKernel() {
       }
     }
   } else {
-    g2o::RobustKernelPtr emptyKernel;
+    const g2o::RobustKernelPtr emptyKernel;
     for (const auto& it : optimizer->edges()) {
       auto* e = static_cast<g2o::OptimizableGraph::Edge*>(it.get());
       e->setRobustKernel(emptyKernel);

@@ -62,9 +62,9 @@ void MarginalCovarianceCholesky::setCholeskyFactor(int n, int* Lp, int* Li,
 number_t MarginalCovarianceCholesky::computeEntry(int r, int c)  // NOLINT
 {
   assert(r <= c);
-  int idx = computeIndex(r, c);
+  const int idx = computeIndex(r, c);
 
-  LookupMap::const_iterator foundIt = map_.find(idx);
+  const LookupMap::const_iterator foundIt = map_.find(idx);
   if (foundIt != map_.end()) {
     return foundIt->second;
   }
@@ -73,10 +73,10 @@ number_t MarginalCovarianceCholesky::computeEntry(int r, int c)  // NOLINT
   number_t s = 0.;
   const int& sc = Ap_[r];
   const int& ec = Ap_[r + 1];
-  for (int j = sc + 1; j < ec;
-       ++j) {  // sum over row r while skipping the element on the diagonal
+  // sum over row r while skipping the element on the diagonal
+  for (int j = sc + 1; j < ec; ++j) {
     const int& rr = Ai_[j];
-    number_t val =
+    const number_t val =
         rr < c ? computeEntry(rr, c) : computeEntry(c, rr);  // NOLINT
     s += val * Ax_[j];
   }
@@ -97,8 +97,8 @@ void MarginalCovarianceCholesky::computeCovariance(
   map_.clear();
   int base = 0;
   std::vector<MatrixElem> elemsToCompute;
-  for (int nbase : blockIndices) {
-    int vdim = nbase - base;
+  for (const int nbase : blockIndices) {
+    const int vdim = nbase - base;
     for (int rr = 0; rr < vdim; ++rr)
       for (int cc = rr; cc < vdim; ++cc) {
         int r = perm_ ? perm_[rr + base] : rr + base;  // apply permutation
@@ -123,8 +123,8 @@ void MarginalCovarianceCholesky::computeCovariance(
   // memory
   base = 0;
   for (size_t i = 0; i < blockIndices.size(); ++i) {
-    int nbase = blockIndices[i];
-    int vdim = nbase - base;
+    const int nbase = blockIndices[i];
+    const int vdim = nbase - base;
     number_t* cov = covBlocks[i];
     for (int rr = 0; rr < vdim; ++rr)
       for (int cc = rr; cc < vdim; ++cc) {
@@ -132,8 +132,8 @@ void MarginalCovarianceCholesky::computeCovariance(
         int c = perm_ ? perm_[cc + base] : cc + base;
         if (r > c)  // upper triangle
           std::swap(r, c);
-        int idx = computeIndex(r, c);
-        LookupMap::const_iterator foundIt = map_.find(idx);
+        const int idx = computeIndex(r, c);
+        const LookupMap::const_iterator foundIt = map_.find(idx);
         assert(foundIt != map_.end());
         cov[rr * vdim + cc] = foundIt->second;
         if (rr != cc) cov[cc * vdim + rr] = foundIt->second;
@@ -152,22 +152,22 @@ void MarginalCovarianceCholesky::computeCovariance(
   map_.clear();
   std::vector<MatrixElem> elemsToCompute;
   for (const auto& blockIndice : blockIndices) {
-    int blockRow = blockIndice.first;
-    int blockCol = blockIndice.second;
+    const int blockRow = blockIndice.first;
+    const int blockCol = blockIndice.second;
     assert(blockRow >= 0);
     assert(blockRow < (int)rowBlockIndices.size());
     assert(blockCol >= 0);
     assert(blockCol < (int)rowBlockIndices.size());
 
-    int rowBase = spinv.rowBaseOfBlock(blockRow);
-    int colBase = spinv.colBaseOfBlock(blockCol);
+    const int rowBase = spinv.rowBaseOfBlock(blockRow);
+    const int colBase = spinv.colBaseOfBlock(blockCol);
 
     MatrixX* block = spinv.block(blockRow, blockCol, true);
     assert(block);
     for (int iRow = 0; iRow < block->rows(); ++iRow)
       for (int iCol = 0; iCol < block->cols(); ++iCol) {
-        int rr = rowBase + iRow;
-        int cc = colBase + iCol;
+        const int rr = rowBase + iRow;
+        const int cc = colBase + iCol;
         int r = perm_ ? perm_[rr] : rr;  // apply permutation
         int c = perm_ ? perm_[cc] : cc;
         if (r > c) std::swap(r, c);
@@ -185,22 +185,22 @@ void MarginalCovarianceCholesky::computeCovariance(
 
   // set the marginal covariance
   for (const auto& blockIndice : blockIndices) {
-    int blockRow = blockIndice.first;
-    int blockCol = blockIndice.second;
-    int rowBase = spinv.rowBaseOfBlock(blockRow);
-    int colBase = spinv.colBaseOfBlock(blockCol);
+    const int blockRow = blockIndice.first;
+    const int blockCol = blockIndice.second;
+    const int rowBase = spinv.rowBaseOfBlock(blockRow);
+    const int colBase = spinv.colBaseOfBlock(blockCol);
 
     MatrixX* block = spinv.block(blockRow, blockCol);
     assert(block);
     for (int iRow = 0; iRow < block->rows(); ++iRow)
       for (int iCol = 0; iCol < block->cols(); ++iCol) {
-        int rr = rowBase + iRow;
-        int cc = colBase + iCol;
+        const int rr = rowBase + iRow;
+        const int cc = colBase + iCol;
         int r = perm_ ? perm_[rr] : rr;  // apply permutation
         int c = perm_ ? perm_[cc] : cc;
         if (r > c) std::swap(r, c);
-        int idx = computeIndex(r, c);
-        LookupMap::const_iterator foundIt = map_.find(idx);
+        const int idx = computeIndex(r, c);
+        const LookupMap::const_iterator foundIt = map_.find(idx);
         assert(foundIt != map_.end());
         (*block)(iRow, iCol) = foundIt->second;
       }

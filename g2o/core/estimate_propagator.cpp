@@ -107,7 +107,7 @@ void EstimatePropagator::propagate(
   while (!frontier.empty()) {
     AdjacencyMapEntry* entry = frontier.pop();
     const auto& u = entry->child();
-    number_t uDistance = entry->distance();
+    const number_t uDistance = entry->distance();
     // cerr << "uDistance " << uDistance << endl;
 
     // initialize the vertex
@@ -141,13 +141,14 @@ void EstimatePropagator::propagate(
             std::static_pointer_cast<OptimizableGraph::Vertex>(edge->vertex(i));
         if (!z) continue;
         if (z == u) continue;
-        size_t wasInitialized = initializedVertices.erase(z);
+        const size_t wasInitialized = initializedVertices.erase(z);
 
-        number_t edgeDistance = cost(edge.get(), initializedVertices, z.get());
+        const number_t edgeDistance =
+            cost(edge.get(), initializedVertices, z.get());
         if (edgeDistance > 0. &&
             edgeDistance != std::numeric_limits<number_t>::max() &&
             edgeDistance < maxEdgeCost) {
-          number_t zDistance = uDistance + edgeDistance;
+          const number_t zDistance = uDistance + edgeDistance;
           // cerr << z->id() << " " << zDistance << endl;
 
           auto ot = adjacencyMap_.find(z);

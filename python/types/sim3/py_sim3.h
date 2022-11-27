@@ -7,7 +7,7 @@
 
 namespace g2o {
 
-void declareSim3(py::module& m) {
+inline void declareSim3(py::module& m) {
   py::class_<Sim3>(m, "Sim3")
       .def(py::init<>())
       .def(

@@ -6,7 +6,7 @@
 
 namespace g2o {
 
-void declareEdgeSE2SensorCalib(py::module& m) {
+inline void declareEdgeSE2SensorCalib(py::module& m) {
   templatedBaseFixedSizedEdge<3, SE2, VertexSE2, VertexSE2, VertexSE2>(
       m, "_3_SE2_VertexSE2_VertexSE2_VertexSE2");
 

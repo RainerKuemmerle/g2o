@@ -6,7 +6,7 @@
 
 namespace g2o {
 
-void declareEdgeSE2OdomDifferentialCalib(py::module& m) {
+inline void declareEdgeSE2OdomDifferentialCalib(py::module& m) {
   templatedBaseFixedSizedEdge<3, VelocityMeasurement, VertexSE2, VertexSE2,
                               VertexOdomDifferentialParams>(
       m,

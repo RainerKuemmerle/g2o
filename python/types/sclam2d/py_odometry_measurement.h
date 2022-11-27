@@ -8,7 +8,7 @@
 
 namespace g2o {
 
-void declareOdometryMeasurement(py::module& m) {
+inline void declareOdometryMeasurement(py::module& m) {
   py::class_<VelocityMeasurement>(m, "VelocityMeasurement")
       .def(py::init<>())
       .def(py::init<double, double, double>(), "vl"_a, "vr"_a, "dt"_a)

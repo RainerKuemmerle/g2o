@@ -57,12 +57,12 @@ Factory* Factory::instance() {
 void Factory::registerType(
     const std::string& tag,
     std::unique_ptr<AbstractHyperGraphElementCreator> c) {
-  CreatorMap::const_iterator foundIt = creator_.find(tag);
+  const CreatorMap::const_iterator foundIt = creator_.find(tag);
   if (foundIt != creator_.end()) {
     cerr << "FACTORY WARNING: Overwriting Vertex tag " << tag << endl;
     assert(0);
   }
-  TagLookup::const_iterator tagIt = tagLookup_.find(c->name());
+  const TagLookup::const_iterator tagIt = tagLookup_.find(c->name());
   if (tagIt != tagLookup_.end()) {
     cerr << "FACTORY WARNING: Registering same class for two tags " << c->name()
          << endl;
@@ -138,10 +138,10 @@ std::unique_ptr<HyperGraph::HyperGraphElement> Factory::construct(
 }
 
 const std::string& Factory::tag(const HyperGraph::HyperGraphElement* e) const {
-  static std::string emptyStr;
+  static const std::string kEmptyStr;
   auto foundIt = tagLookup_.find(typeid(*e).name());
   if (foundIt != tagLookup_.end()) return foundIt->second;
-  return emptyStr;
+  return kEmptyStr;
 }
 
 void Factory::fillKnownTypes(std::vector<std::string>& types) const {

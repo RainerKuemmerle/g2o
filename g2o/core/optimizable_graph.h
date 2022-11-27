@@ -153,10 +153,7 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
      */
     virtual int copyB(number_t* b_) const = 0;
 
-    // //! get the b vector element
-    // virtual const number_t& b(int i) const = 0;
-    // virtual number_t& b(int i) = 0;
-    // //! return a pointer to the b vector associated with this vertex
+    //! return a pointer to the b vector associated with this vertex
     virtual number_t* bData() const = 0;
 
     //! return a map onto the b vector
@@ -471,7 +468,7 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
     /**
      * specify the robust kernel to be used in this edge
      */
-    void setRobustKernel(const std::shared_ptr<RobustKernel>& ptr);
+    void setRobustKernel(std::shared_ptr<RobustKernel> ptr);
 
     //! returns the error vector cached after calling the computeError;
     virtual const number_t* errorData() const = 0;
@@ -490,7 +487,7 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
      * Linearizes the constraint in the edge.
      * Makes side effect on the vertices of the graph by changing
      * the parameter vector b and the hessian blocks ii and jj.
-     * The off diagoinal block is accessed via _hessian.
+     * The off diagonal block is accessed via _hessian.
      */
     virtual void constructQuadraticForm() = 0;
 
@@ -520,7 +517,7 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
     /**
      * override in your class if it's possible to initialize the vertices in
      * certain combinations. The return value may correspond to the cost for
-     * initiliaizng the vertex but should be positive if the initialization is
+     * initializing the vertex but should be positive if the initialization is
      * possible and negative if not possible.
      */
     virtual number_t initialEstimatePossible(
@@ -630,7 +627,7 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
   /**
    * overridden from HyperGraph, to maintain the bookkeeping of the
    * caches/parameters and jacobian workspaces consistent upon a change in the
-   * veretx.
+   * vertex.
    * @return false if something goes wrong.
    */
   bool setEdgeVertex(const std::shared_ptr<HyperGraph::Edge>& e, int pos,

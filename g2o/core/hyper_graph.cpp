@@ -108,7 +108,7 @@ bool HyperGraph::addEdge(const std::shared_ptr<Edge>& e) {
     if (vertexPointer.size() != e->vertices().size()) return false;
   }
 
-  std::pair<EdgeSet::iterator, bool> result = edges_.emplace(e);
+  const std::pair<EdgeSet::iterator, bool> result = edges_.emplace(e);
   if (!result.second) return false;
 
   for (auto& v : e->vertices()) {  // connect the vertices to this edge
@@ -135,10 +135,10 @@ bool HyperGraph::mergeVertices(std::shared_ptr<Vertex>& vBig,
   it = vertices_.find(vSmall->id());
   if (it == vertices_.end()) return false;
 
-  EdgeSetWeak tmp = vSmall->edges();
+  const EdgeSetWeak tmp = vSmall->edges();
   bool ok = true;
   for (const auto& it : tmp) {
-    std::shared_ptr<HyperGraph::Edge> e = it.lock();
+    const std::shared_ptr<HyperGraph::Edge> e = it.lock();
     for (size_t i = 0; i < e->vertices().size(); i++) {
       if (e->vertex(i) == vSmall) {
         ok &= setEdgeVertex(e, i, vBig);
@@ -153,9 +153,9 @@ bool HyperGraph::detachVertex(const std::shared_ptr<Vertex>& v) {
   auto it = vertices_.find(v->id());
   if (it == vertices_.end()) return false;
   assert(it->second == v);
-  EdgeSetWeak tmp = v->edges();
+  const EdgeSetWeak tmp = v->edges();
   for (const auto& it : tmp) {
-    std::shared_ptr<HyperGraph::Edge> e = it.lock();
+    const std::shared_ptr<HyperGraph::Edge> e = it.lock();
     for (size_t i = 0; i < e->vertices().size(); i++) {
       if (v == e->vertex(i)) {
         const std::shared_ptr<Vertex> nonExistantVertex;
@@ -168,7 +168,7 @@ bool HyperGraph::detachVertex(const std::shared_ptr<Vertex>& v) {
 
 bool HyperGraph::removeVertex(const std::shared_ptr<Vertex>& v, bool detach) {
   if (detach) {
-    bool result = detachVertex(v);
+    const bool result = detachVertex(v);
     if (!result) {
       assert(0 && "inconsistency in detaching vertex");
     }
@@ -177,7 +177,7 @@ bool HyperGraph::removeVertex(const std::shared_ptr<Vertex>& v, bool detach) {
   if (it == vertices_.end()) return false;
   assert(it->second == v);
   // remove all edges which are entering or leaving v;
-  EdgeSetWeak tmp = v->edges();
+  const EdgeSetWeak tmp = v->edges();
   for (const auto& it : tmp) {
     if (!removeEdge(it.lock())) {
       assert(0 && "error in erasing vertex");

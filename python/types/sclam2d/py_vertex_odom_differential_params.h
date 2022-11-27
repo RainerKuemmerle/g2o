@@ -6,7 +6,7 @@
 
 namespace g2o {
 
-void declareVertexOdomDifferentialParams(py::module& m) {
+inline void declareVertexOdomDifferentialParams(py::module& m) {
   py::class_<VertexOdomDifferentialParams, BaseVertex<3, Vector3>,
              std::shared_ptr<VertexOdomDifferentialParams>>(
       m, "VertexOdomDifferentialParams")

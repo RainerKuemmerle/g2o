@@ -55,8 +55,8 @@ void JacobianWorkspace::updateSize(const HyperGraph::Edge* e_, bool reset) {
   }
 
   const auto* e = static_cast<const OptimizableGraph::Edge*>(e_);
-  int errorDimension = e->dimension();
-  int numVertices = e->vertices().size();
+  const int errorDimension = e->dimension();
+  const int numVertices = e->vertices().size();
   int maxDimensionForEdge = -1;
 
   for (int i = 0; i < numVertices; ++i) {

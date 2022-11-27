@@ -39,6 +39,10 @@ class G2O_CORE_API MatrixStructure {
  public:
   MatrixStructure() = default;
   ~MatrixStructure();
+
+  MatrixStructure(const MatrixStructure&) = delete;
+  MatrixStructure& operator=(const MatrixStructure&) = delete;
+
   /**
    * allocate space for the Matrix Structure. You may call this on an already
    * allocated struct, it will then reallocate the memory + additional space

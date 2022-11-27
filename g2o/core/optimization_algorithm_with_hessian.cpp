@@ -36,9 +36,7 @@ namespace g2o {
 
 OptimizationAlgorithmWithHessian::OptimizationAlgorithmWithHessian(
     Solver& solver)
-    :
-
-      solver_(solver) {
+    : solver_(solver) {
   writeDebug_ = properties_.makeProperty<Property<bool> >("writeDebug", true);
 }
 
@@ -58,7 +56,7 @@ bool OptimizationAlgorithmWithHessian::init(bool online) {
     if (solver_.supportsSchur()) solver_.setSchur(false);
   }
 
-  bool initState = solver_.init(optimizer_, online);
+  const bool initState = solver_.init(optimizer_, online);
   return initState;
 }
 

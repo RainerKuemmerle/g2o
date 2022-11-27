@@ -33,6 +33,7 @@
 #include <iomanip>
 #include <iostream>
 #include <iterator>
+#include <utility>
 
 #include "cache.h"
 #include "estimate_propagator.h"
@@ -170,8 +171,8 @@ bool OptimizableGraph::Edge::resolveParameters() {
 }
 
 void OptimizableGraph::Edge::setRobustKernel(
-    const std::shared_ptr<RobustKernel>& ptr) {
-  robustKernel_ = ptr;
+    std::shared_ptr<RobustKernel> ptr) {
+  robustKernel_ = std::move(ptr);
 }
 
 bool OptimizableGraph::Edge::resolveCaches() { return true; }

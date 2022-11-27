@@ -80,7 +80,7 @@ bool ParameterContainer::read(
   elemBitset[HyperGraph::kHgetParameter] = true;
 
   while (true) {
-    int bytesRead = readLine(is, currentLine);
+    const int bytesRead = readLine(is, currentLine);
     if (bytesRead == -1) break;
     currentLine >> token;
     if (bytesRead == 0 || token.empty() || token[0] == '#') continue;
@@ -91,7 +91,7 @@ bool ParameterContainer::read(
       }
     }
 
-    std::shared_ptr<HyperGraph::HyperGraphElement> element =
+    const std::shared_ptr<HyperGraph::HyperGraphElement> element =
         factory->construct(token, elemBitset);
     if (!element)  // not a parameter or otherwise unknown tag
       continue;
@@ -102,7 +102,7 @@ bool ParameterContainer::read(
     int pid;
     currentLine >> pid;
     p->setId(pid);
-    bool r = p->read(currentLine);
+    const bool r = p->read(currentLine);
     if (!r) {
       std::cerr << __PRETTY_FUNCTION__ << ": Error reading data " << token
                 << " for parameter " << pid << std::endl;

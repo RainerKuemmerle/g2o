@@ -77,14 +77,14 @@ bool saveGnuplot(const std::string& gnudump,
   int minDim = std::numeric_limits<int>::max();
   for (const auto& vertice : vertices) {
     auto v = std::static_pointer_cast<OptimizableGraph::Vertex>(vertice);
-    int vdim = v->dimension();
+    const int vdim = v->dimension();
     maxDim = (std::max)(vdim, maxDim);
     minDim = (std::min)(vdim, minDim);
   }
 
   string extension = getFileExtension(gnudump);
   if (extension.empty()) extension = "dat";
-  string baseFilename = getPureFilename(gnudump);
+  const string baseFilename = getPureFilename(gnudump);
 
   // check for odometry edges
   bool hasOdomEdge = false;
@@ -100,7 +100,6 @@ bool saveGnuplot(const std::string& gnudump,
     if (hasOdomEdge && hasLandmarkEdge) break;
   }
 
-  bool fileStatus = true;
   if (hasOdomEdge) {
     string odomFilename = baseFilename + "_odom_edges." + extension;
     cerr << "# saving " << odomFilename << " ... ";
@@ -122,7 +121,7 @@ bool saveGnuplot(const std::string& gnudump,
   }
 
   if (hasLandmarkEdge) {
-    string filename = baseFilename + "_landmarks_edges." + extension;
+    const string filename = baseFilename + "_landmarks_edges." + extension;
     cerr << "# saving " << filename << " ... ";
     ofstream fout(filename.c_str());
     if (!fout) {
@@ -142,7 +141,7 @@ bool saveGnuplot(const std::string& gnudump,
   }
 
   {
-    string filename = baseFilename + "_edges." + extension;
+    const string filename = baseFilename + "_edges." + extension;
     cerr << "# saving " << filename << " ... ";
     ofstream fout(filename.c_str());
     if (!fout) {
@@ -160,7 +159,7 @@ bool saveGnuplot(const std::string& gnudump,
   }
 
   {
-    string filename = baseFilename + "_vertices." + extension;
+    const string filename = baseFilename + "_vertices." + extension;
     cerr << "# saving " << filename << " ... ";
     ofstream fout(filename.c_str());
     if (!fout) {
@@ -176,7 +175,8 @@ bool saveGnuplot(const std::string& gnudump,
     cerr << "done." << endl;
   }
 
-  return fileStatus;
+  // TODO(goki): Determine a proper return value for writing to file
+  return true;
 }
 
 bool dumpEdges(std::ostream& os, const OptimizableGraph& optimizer) {

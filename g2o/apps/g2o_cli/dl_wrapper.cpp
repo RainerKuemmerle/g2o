@@ -56,12 +56,13 @@ int DlWrapper::openLibraries(const std::string& directory,
                              const std::string& pattern) {
   // cerr << "# loading libraries from " << directory << "\t pattern: " <<
   // pattern << endl;
-  std::string searchPattern = directory + "/" + pattern;
-  if (pattern.empty()) searchPattern = directory + "/*";
-  std::vector<std::string> matchingFiles = getFilesByPattern(searchPattern.c_str());
+  const std::string searchPattern =
+      pattern.empty() ? directory + "/*" : directory + "/" + pattern;
+  const std::vector<std::string> matchingFiles =
+      getFilesByPattern(searchPattern.c_str());
 
   int numLibs = 0;
-  for (auto& filename : matchingFiles) {
+  for (const auto& filename : matchingFiles) {
     if (find(filenames_.begin(), filenames_.end(), filename) !=
         filenames_.end())
       continue;
@@ -106,7 +107,7 @@ bool DlWrapper::openLibrary(const std::string& filename) {
   void* handle = dlopen(filename.c_str(), RTLD_LAZY);
   if (!handle) {
     std::cerr << __PRETTY_FUNCTION__ << " Cannot open library: " << dlerror()
-         << '\n';
+              << '\n';
     return false;
   }
 #elif defined(WINDOWS)

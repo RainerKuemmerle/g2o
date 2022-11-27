@@ -130,7 +130,7 @@ HyperGraphActionLibrary::actionByName(const std::string& name) {
 
 bool HyperGraphActionLibrary::registerAction(
     const HyperGraphElementAction::HyperGraphElementActionPtr& action) {
-  HyperGraphElementAction::HyperGraphElementActionPtr oldAction =
+  const HyperGraphElementAction::HyperGraphElementActionPtr oldAction =
       actionByName(action->name());
   std::shared_ptr<HyperGraphElementActionCollection> collection;
   if (oldAction) {
