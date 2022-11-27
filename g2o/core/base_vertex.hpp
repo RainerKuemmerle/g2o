@@ -45,11 +45,6 @@ number_t BaseVertex<D, T>::solveDirect(number_t lambda) {
 }
 
 template <int D, typename T>
-void BaseVertex<D, T>::clearQuadraticForm() {
-  b_.setZero();
-}
-
-template <int D, typename T>
 void BaseVertex<D, T>::mapHessianMemory(number_t* d) {
   const int vertexDim = G2O_VERTEX_DIM;
   new (&hessian_) HessianBlockType(d, vertexDim, vertexDim);

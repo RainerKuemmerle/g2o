@@ -17,18 +17,10 @@ void templatedBaseVertex(py::module& m, const std::string& suffix) {
       //.def_readonly_static("dimension", &BaseVertex<D, T>::Dimension)   //
       // lead to undefined
       // symbol error
-      .def("hessian",
-           static_cast<double& (BaseVertex<D, T>::*)(int, int)>(
-               &BaseVertex<D, T>::hessian),
-           "i"_a, "j"_a)
-      .def("hessian_determinant", &CLS::hessianDeterminant)
-      //.def("hessian_data", &CLS::hessianData) //
+      .def("hessian_map", &CLS::hessianMap)
       //-> double* .def("map_hessian_memory", &CLS::mapHessianMemory) // double*
       //-> void .def("copy_b", &CLS::copyB) // double* -> void
-
-      .def("b", static_cast<double& (CLS::*)(int)>(&CLS::b), "i"_a)
-      //.def("b_data", &CLS::bData) // -> double*
-
+      .def("b_map", &CLS::bMap)
       .def("clear_quadratic_form", &CLS::clearQuadraticForm)
       .def("solve_direct", &CLS::solveDirect)
       .def("b", static_cast<BVector& (CLS::*)()>(&CLS::b),

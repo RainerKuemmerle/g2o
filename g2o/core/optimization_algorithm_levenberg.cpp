@@ -1,3 +1,4 @@
+
 // g2o - General Graph Optimization
 // Copyright (C) 2011 R. Kuemmerle, G. Grisetti, W. Burgard
 // All rights reserved.
@@ -52,7 +53,7 @@ OptimizationAlgorithm::SolverResult OptimizationAlgorithmLevenberg::solve(
 
   if (iteration == 0 &&
       !online) {  // built up the CCS structure, here due to easy time measure
-    bool ok = solver_.buildStructure();
+    const bool ok = solver_.buildStructure();
     if (!ok) {
       std::cerr << __PRETTY_FUNCTION__
                 << ": Failure while building CCS structure" << std::endl;
@@ -92,7 +93,7 @@ OptimizationAlgorithm::SolverResult OptimizationAlgorithmLevenberg::solve(
     }
     // update the diagonal of the system matrix
     solver_.setLambda(currentLambda_, true);
-    bool ok2 = solver_.solve();
+    const bool ok2 = solver_.solve();
     if (globalStats) {
       globalStats->timeLinearSolution += get_monotonic_time() - t;
       t = get_monotonic_time();
@@ -106,9 +107,8 @@ OptimizationAlgorithm::SolverResult OptimizationAlgorithmLevenberg::solve(
     solver_.restoreDiagonal();
 
     optimizer_->computeActiveErrors();
-    number_t tempChi = optimizer_->activeRobustChi2();
-
-    if (!ok2) tempChi = std::numeric_limits<number_t>::max();
+    const number_t tempChi = ok2 ? optimizer_->activeRobustChi2()
+                                 : std::numeric_limits<number_t>::max();
 
     rho = (currentChi - tempChi);
     number_t scale = computeScale();
@@ -119,7 +119,7 @@ OptimizationAlgorithm::SolverResult OptimizationAlgorithmLevenberg::solve(
       number_t alpha = 1. - pow((2 * rho - 1), 3);
       // crop lambda between minimum and maximum factors
       alpha = (std::min)(alpha, goodStepUpperScale_);
-      number_t scaleFactor = (std::max)(goodStepLowerScale_, alpha);
+      const number_t scaleFactor = (std::max)(goodStepLowerScale_, alpha);
       currentLambda_ *= scaleFactor;
       ni_ = 2;
       currentChi = tempChi;
@@ -145,10 +145,9 @@ number_t OptimizationAlgorithmLevenberg::computeLambdaInit() const {
   number_t maxDiagonal = 0;
   for (auto* v : optimizer_->indexMapping()) {
     assert(v);
-    int dim = v->dimension();
-    for (int j = 0; j < dim; ++j) {
-      maxDiagonal = std::max(fabs(v->hessian(j, j)), maxDiagonal);
-    }
+    MatrixN<Eigen::Dynamic>::MapType hessian = v->hessianMap();
+    maxDiagonal =
+        std::max(hessian.diagonal().cwiseAbs().maxCoeff(), maxDiagonal);
   }
   return tau_ * maxDiagonal;
 }

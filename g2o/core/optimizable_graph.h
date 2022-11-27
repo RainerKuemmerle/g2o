@@ -32,6 +32,7 @@
 #include <set>
 #include <typeinfo>
 
+#include "g2o/core/eigen_types.h"
 #include "g2o/stuff/macros.h"
 #include "g2o_core_api.h"
 #include "hyper_graph.h"
@@ -129,7 +130,7 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
 
    public:
     Vertex() = default;
-    ~Vertex() override;
+    ~Vertex() override = default;
 
     //! sets the node to the origin (used in the multilevel stuff)
     void setToOrigin() {
@@ -137,11 +138,11 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
       updateCache();
     }
 
-    //! get the element from the hessian matrix
-    virtual const number_t& hessian(int i, int j) const = 0;
-    virtual number_t& hessian(int i, int j) = 0;
-    virtual number_t hessianDeterminant() const = 0;
-    virtual number_t* hessianData() = 0;
+    //! get the mapped memory of the hessian matrix
+    virtual number_t* hessianData() const = 0;
+
+    //! return a map of the mapped Hessian
+    MatrixX::MapType hessianMap() const;
 
     /** maps the internal matrix to some external memory location */
     virtual void mapHessianMemory(number_t* d) = 0;
@@ -152,11 +153,14 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
      */
     virtual int copyB(number_t* b_) const = 0;
 
-    //! get the b vector element
-    virtual const number_t& b(int i) const = 0;
-    virtual number_t& b(int i) = 0;
-    //! return a pointer to the b vector associated with this vertex
-    virtual number_t* bData() = 0;
+    // //! get the b vector element
+    // virtual const number_t& b(int i) const = 0;
+    // virtual number_t& b(int i) = 0;
+    // //! return a pointer to the b vector associated with this vertex
+    virtual number_t* bData() const = 0;
+
+    //! return a map onto the b vector
+    VectorX::MapType bMap() const;
 
     /**
      * set the b vector part of this vertex to zero
@@ -201,7 +205,7 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
     };
 
     /**
-     * writes the estimater to an array of number_t
+     * writes the estimates to an array of number_t
      * @returns true on success
      */
     virtual bool getEstimateData(number_t* estimate) const;
@@ -664,9 +668,9 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
   virtual void postIteration(int);
 
   //! add an action to be executed before each iteration
-  bool addPreIterationAction(const std::shared_ptr<HyperGraphAction>& action);
+  bool addPreIterationAction(std::shared_ptr<HyperGraphAction> action);
   //! add an action to be executed after each iteration
-  bool addPostIterationAction(const std::shared_ptr<HyperGraphAction>& action);
+  bool addPostIterationAction(std::shared_ptr<HyperGraphAction> action);
 
   //! remove an action that should no longer be executed before each iteration
   bool removePreIterationAction(

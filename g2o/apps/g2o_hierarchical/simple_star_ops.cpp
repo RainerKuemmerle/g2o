@@ -340,10 +340,7 @@ void computeSimpleStars(StarSet& stars, SparseOptimizer* optimizer,
         // discard the vertices whose error is too big
         auto v =
             std::static_pointer_cast<OptimizableGraph::Vertex>(otherVertex);
-        MatrixX h(v->dimension(), v->dimension());
-        for (int i = 0; i < v->dimension(); i++) {
-          for (int j = 0; j < v->dimension(); j++) h(i, j) = v->hessian(i, j);
-        }
+        const MatrixX h = v->hessianMap();
         Eigen::EigenSolver<MatrixX> esolver;
         esolver.compute(h);
         Eigen::VectorXcd ev = esolver.eigenvalues();

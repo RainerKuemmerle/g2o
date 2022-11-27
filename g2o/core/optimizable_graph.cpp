@@ -71,6 +71,16 @@ std::shared_ptr<CacheContainer> OptimizableGraph::Vertex::cacheContainer() {
   return cacheContainer_;
 }
 
+MatrixX::MapType OptimizableGraph::Vertex::hessianMap() const {
+  const int dim = dimension();
+  return MatrixN<Eigen::Dynamic>::MapType(hessianData(), dim, dim);
+}
+
+VectorX::MapType OptimizableGraph::Vertex::bMap() const {
+  const int dim = dimension();
+  return VectorX::MapType(bData(), dim);
+}
+
 void OptimizableGraph::Vertex::updateCache() {
   if (cacheContainer_) {
     cacheContainer_->setUpdateNeeded();
@@ -78,10 +88,8 @@ void OptimizableGraph::Vertex::updateCache() {
   }
 }
 
-OptimizableGraph::Vertex::~Vertex() = default;
-
 bool OptimizableGraph::Vertex::setEstimateData(const number_t* estimate) {
-  bool ret = setEstimateDataImpl(estimate);
+  const bool ret = setEstimateDataImpl(estimate);
   updateCache();
   return ret;
 }
@@ -94,7 +102,7 @@ int OptimizableGraph::Vertex::estimateDimension() const { return -1; }
 
 bool OptimizableGraph::Vertex::setMinimalEstimateData(
     const number_t* estimate) {
-  bool ret = setMinimalEstimateDataImpl(estimate);
+  const bool ret = setMinimalEstimateDataImpl(estimate);
   updateCache();
   return ret;
 }
@@ -141,7 +149,7 @@ bool OptimizableGraph::Edge::resolveParameters() {
   // cerr << __PRETTY_FUNCTION__ << ": encountered " << _parameters.size() << "
   // parameters" << endl;
   for (size_t i = 0; i < parameters_.size(); i++) {
-    int index = parameterIds_[i];
+    const int index = parameterIds_[i];
     parameters_[i] = graph()->parameter(index);
 #ifndef NDEBUG
     auto& aux = *parameters_[i];
@@ -234,7 +242,7 @@ bool OptimizableGraph::addEdge(const std::shared_ptr<HyperGraph::Edge>& he) {
     return false;
   }
 
-  bool eresult = HyperGraph::addEdge(he);
+  const bool eresult = HyperGraph::addEdge(he);
   if (!eresult) return false;
 
   e->internalId_ = nextEdgeId_++;
@@ -377,7 +385,7 @@ bool OptimizableGraph::load(std::istream& is) {
 
   int lineNumber = 0;
   while (true) {
-    int bytesRead = readLine(is, currentLine);
+    const int bytesRead = readLine(is, currentLine);
     lineNumber++;
     if (bytesRead == -1) break;
     currentLine >> token;
@@ -420,7 +428,7 @@ bool OptimizableGraph::load(std::istream& is) {
     }
 
     // first handle the parameters
-    std::shared_ptr<HyperGraph::HyperGraphElement> pelement =
+    const std::shared_ptr<HyperGraph::HyperGraphElement> pelement =
         factory->construct(token, elemParamBitset);
     if (pelement) {  // not a parameter or otherwise unknown tag
       assert(pelement->elementType() == HyperGraph::kHgetParameter &&
@@ -429,7 +437,7 @@ bool OptimizableGraph::load(std::istream& is) {
       int pid;
       currentLine >> pid;
       p->setId(pid);
-      bool r = p->read(currentLine);
+      const bool r = p->read(currentLine);
       if (!r) {
         cerr << __PRETTY_FUNCTION__ << ": Error reading data " << token
              << " for parameter " << pid << " at line " << lineNumber << endl;
@@ -443,14 +451,14 @@ bool OptimizableGraph::load(std::istream& is) {
       continue;
     }
 
-    std::shared_ptr<HyperGraph::HyperGraphElement> element =
+    const std::shared_ptr<HyperGraph::HyperGraphElement> element =
         factory->construct(token, elemBitset);
     if (dynamic_cast<Vertex*>(element.get())) {  // it's a vertex type
       previousData = nullptr;
       auto v = std::static_pointer_cast<Vertex>(element);
       int id;
       currentLine >> id;
-      bool r = v->read(currentLine);
+      const bool r = v->read(currentLine);
       if (!r)
         cerr << __PRETTY_FUNCTION__ << ": Error reading vertex " << token << " "
              << id << " at line " << lineNumber << endl;
@@ -465,7 +473,7 @@ bool OptimizableGraph::load(std::istream& is) {
       // cerr << "it is an edge" << endl;
       previousData = nullptr;
       auto e = std::static_pointer_cast<Edge>(element);
-      int numV = e->vertices().size();
+      const int numV = e->vertices().size();
 
       vector<int> ids;
       if (!e->vertices().empty()) {
@@ -482,7 +490,7 @@ bool OptimizableGraph::load(std::istream& is) {
       }
       bool vertsOkay = true;
       for (size_t l = 0; l < ids.size(); ++l) {
-        int vertexId = ids[l];
+        const int vertexId = ids[l];
         if (vertexId != HyperGraph::kUnassignedId) {
           auto v = vertex(vertexId);
           if (!v) {
@@ -498,7 +506,7 @@ bool OptimizableGraph::load(std::istream& is) {
         printIdChain(cerr, ids) << std::endl;
         e = nullptr;
       } else {
-        bool r = e->read(currentLine);
+        const bool r = e->read(currentLine);
         if (!r || !addEdge(e)) {
           cerr << __PRETTY_FUNCTION__ << ": Unable to add edge " << token
                << " at line " << lineNumber << " IDs: ";
@@ -513,7 +521,7 @@ bool OptimizableGraph::load(std::istream& is) {
       // cerr << "read data packet " << token << " vertex " <<
       // previousVertex->id() << endl;
       auto d = std::static_pointer_cast<Data>(element);
-      bool r = d->read(currentLine);
+      const bool r = d->read(currentLine);
       if (!r) {
         cerr << __PRETTY_FUNCTION__ << ": Error reading data " << token
              << " at line " << lineNumber << " IDs: " << endl;
@@ -633,16 +641,16 @@ int OptimizableGraph::maxDimension() const {
 
 void OptimizableGraph::setRenamedTypesFromString(const std::string& types) {
   Factory* factory = Factory::instance();
-  vector<string> typesMap = strSplit(types, ",");
-  for (auto& i : typesMap) {
+  const vector<string> typesMap = strSplit(types, ",");
+  for (const auto& i : typesMap) {
     vector<string> m = strSplit(i, "=");
     if (m.size() != 2) {
       cerr << __PRETTY_FUNCTION__ << ": unable to extract type map from " << i
            << endl;
       continue;
     }
-    string typeInFile = trim(m[0]);
-    string loadedType = trim(m[1]);
+    const string typeInFile = trim(m[0]);
+    const string loadedType = trim(m[1]);
     if (!factory->knowsTag(loadedType)) {
       cerr << __PRETTY_FUNCTION__ << ": unknown type " << loadedType << endl;
       continue;
@@ -712,16 +720,16 @@ void OptimizableGraph::postIteration(int iter) {
 }
 
 bool OptimizableGraph::addPostIterationAction(
-    const std::shared_ptr<HyperGraphAction>& action) {
-  std::pair<HyperGraphActionSet::iterator, bool> insertResult =
-      graphActions_[kAtPostiteration].insert(action);
+    std::shared_ptr<HyperGraphAction> action) {
+  const std::pair<HyperGraphActionSet::iterator, bool> insertResult =
+      graphActions_[kAtPostiteration].emplace(action);
   return insertResult.second;
 }
 
 bool OptimizableGraph::addPreIterationAction(
-    const std::shared_ptr<HyperGraphAction>& action) {
-  std::pair<HyperGraphActionSet::iterator, bool> insertResult =
-      graphActions_[kAtPreiteration].insert(action);
+    std::shared_ptr<HyperGraphAction> action) {
+  const std::pair<HyperGraphActionSet::iterator, bool> insertResult =
+      graphActions_[kAtPreiteration].emplace(action);
   return insertResult.second;
 }
 
@@ -738,7 +746,7 @@ bool OptimizableGraph::removePostIterationAction(
 bool OptimizableGraph::saveUserData(std::ostream& os, HyperGraph::Data* d) {
   Factory* factory = Factory::instance();
   while (d) {  // write the data packet for the vertex
-    string tag = factory->tag(d);
+    const string tag = factory->tag(d);
     if (!tag.empty()) {
       os << tag << " ";
       d->write(os);
@@ -752,7 +760,7 @@ bool OptimizableGraph::saveUserData(std::ostream& os, HyperGraph::Data* d) {
 bool OptimizableGraph::saveVertex(std::ostream& os,
                                   OptimizableGraph::Vertex* v) {
   Factory* factory = Factory::instance();
-  string tag = factory->tag(v);
+  const string tag = factory->tag(v);
   if (!tag.empty()) {
     os << tag << " " << v->id() << " ";
     v->write(os);
@@ -768,7 +776,7 @@ bool OptimizableGraph::saveVertex(std::ostream& os,
 
 bool OptimizableGraph::saveParameter(std::ostream& os, Parameter* p) {
   Factory* factory = Factory::instance();
-  string tag = factory->tag(p);
+  const string tag = factory->tag(p);
   if (!tag.empty()) {
     os << tag << " " << p->id() << " ";
     p->write(os);
@@ -779,11 +787,11 @@ bool OptimizableGraph::saveParameter(std::ostream& os, Parameter* p) {
 
 bool OptimizableGraph::saveEdge(std::ostream& os, OptimizableGraph::Edge* e) {
   Factory* factory = Factory::instance();
-  string tag = factory->tag(e);
+  const string tag = factory->tag(e);
   if (!tag.empty()) {
     os << tag << " ";
     for (auto& it : e->vertices()) {
-      int vertexId = it ? it->id() : HyperGraph::kUnassignedId;
+      const int vertexId = it ? it->id() : HyperGraph::kUnassignedId;
       os << vertexId << " ";
     }
     e->write(os);
@@ -815,12 +823,12 @@ bool OptimizableGraph::verifyInformationMatrices(bool verbose) const {
     MatrixX::MapType information(e->informationData(), e->dimension(),
                                  e->dimension());
     // test on symmetry
-    bool isSymmetric = information.transpose() == information;
+    const bool isSymmetric = information.transpose() == information;
     bool okay = isSymmetric;
     if (isSymmetric) {
       // compute the eigenvalues
       eigenSolver.compute(information, Eigen::EigenvaluesOnly);
-      bool isSPD = eigenSolver.eigenvalues()(0) >= 0.;
+      const bool isSPD = eigenSolver.eigenvalues()(0) >= 0.;
       okay = okay && isSPD;
     }
     allEdgeOk = allEdgeOk && okay;

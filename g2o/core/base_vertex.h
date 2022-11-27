@@ -33,19 +33,24 @@
 #include <stack>
 
 #include "creators.h"
+#include "g2o/config.h"
 #include "g2o/core/eigen_types.h"
 #include "g2o/stuff/macros.h"
 #include "optimizable_graph.h"
 
 namespace g2o {
+
 #define G2O_VERTEX_DIM ((D == Eigen::Dynamic) ? dimension_ : D)
+
 /**
  * \brief Templatized BaseVertex
  *
  * Templatized BaseVertex
- * D  : minimal dimension of the vertex, e.g., 3 for rotation in 3D. -1 means
- * dynamically assigned at runtime. T  : internal type to represent the
- * estimate, e.g., Quaternion for rotation in 3D
+ *
+ * D: minimal dimension of the vertex, e.g., 3 for rotation in 3D. -1 means
+ * dynamically assigned at runtime.
+ * T: internal type to represent the estimate, e.g., Quaternion for rotation in
+ * 3D
  */
 template <int D, typename T>
 class BaseVertex : public OptimizableGraph::Vertex {
@@ -66,22 +71,11 @@ class BaseVertex : public OptimizableGraph::Vertex {
 
   BaseVertex();
 
-  const number_t& hessian(int i, int j) const override {
-    assert(i < G2O_VERTEX_DIM && j < G2O_VERTEX_DIM);
-    return hessian_(i, j);
-  }
-  number_t& hessian(int i, int j) override {
-    assert(i < G2O_VERTEX_DIM && j < G2O_VERTEX_DIM);
-    return hessian_(i, j);
-  }
-  number_t hessianDeterminant() const override {
-    return hessian_.determinant();
-  }
-  number_t* hessianData() override {
+  number_t* hessianData() const override {
     return const_cast<number_t*>(hessian_.data());
   }
 
-  inline void mapHessianMemory(number_t* d) override;
+  void mapHessianMemory(number_t* d) override;
 
   int copyB(number_t* b) const override {
     const int vertexDim = G2O_VERTEX_DIM;
@@ -89,21 +83,13 @@ class BaseVertex : public OptimizableGraph::Vertex {
     return vertexDim;
   }
 
-  const number_t& b(int i) const override {
-    assert(i < D);
-    return b_(i);
-  }
-  number_t& b(int i) override {
-    assert(i < G2O_VERTEX_DIM);
-    return b_(i);
-  }
-  number_t* bData() override { return b_.data(); }
+  number_t* bData() const override { return const_cast<number_t*>(b_.data()); }
 
-  inline void clearQuadraticForm() override;
+  void clearQuadraticForm() override { b_.setZero(); }
 
   //! updates the current vertex with the direct solution x += H_ii\b_ii
   //! @returns the determinant of the inverted hessian
-  inline number_t solveDirect(number_t lambda = 0) override;
+  number_t solveDirect(number_t lambda = 0) override;
 
   //! return right hand side b of the constructed linear system
   BVector& b() { return b_; }
