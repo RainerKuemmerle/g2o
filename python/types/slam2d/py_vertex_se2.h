@@ -10,7 +10,6 @@ inline void declareVertexSE2(py::module& m) {
       m, "VertexSE2")
       .def(py::init<>())
       .def("set_to_origin_impl", &VertexSE2::setToOriginImpl)
-      .def("oplus_impl", &VertexSE2::oplusImpl)
       .def("set_estimate_data_impl", &VertexSE2::setEstimateDataImpl)
       .def("get_estimate_data", &VertexSE2::getEstimateData)
       .def("estimate_dimension", &VertexSE2::estimateDimension)

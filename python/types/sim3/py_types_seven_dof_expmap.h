@@ -11,7 +11,6 @@ void declareTypesSevenDofExpmap(py::module& m) {
              std::shared_ptr<VertexSim3Expmap>>(m, "VertexSim3Expmap")
       .def(py::init<>())
       .def("set_to_origin_impl", &VertexSim3Expmap::setToOriginImpl)
-      .def("oplus_impl", &VertexSim3Expmap::oplusImpl)
       .def("cam_map1", &VertexSim3Expmap::cam_map1)
       .def("cam_map2", &VertexSim3Expmap::cam_map2);
 

@@ -13,7 +13,6 @@ void declareTypesSBA(py::module& m) {
              std::shared_ptr<VertexIntrinsics>>(m, "VertexIntrinsics")
       .def(py::init<>())
       .def("set_to_origin_impl", &VertexIntrinsics::setToOriginImpl)
-      .def("oplus_impl", &VertexIntrinsics::oplusImpl)  // double* -> void
       ;
 
   templatedBaseVertex<6, SBACam>(m, "_6_SBACam");
@@ -22,7 +21,6 @@ void declareTypesSBA(py::module& m) {
       .def(py::init<>())
       .def("set_to_origin_impl", &VertexCam::setToOriginImpl)
       .def("set_estimate", &VertexCam::setEstimate)  // const SBACam& -> void
-      .def("oplus_impl", &VertexCam::oplusImpl)
       .def("set_estimate_data_impl", &VertexCam::setEstimateDataImpl)
       .def("get_estimate_data", &VertexCam::getEstimateData)
       .def("estimate_dimension", &VertexCam::estimateDimension)

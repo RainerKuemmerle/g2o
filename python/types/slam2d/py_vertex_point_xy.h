@@ -10,7 +10,6 @@ inline void declareVertexPointXY(py::module& m) {
              std::shared_ptr<VertexPointXY>>(m, "VertexPointXY")
       .def(py::init<>())
       .def("set_to_origin_impl", &VertexPointXY::setToOriginImpl)
-      .def("oplus_impl", &VertexPointXY::oplusImpl)
       .def("set_estimate_data_impl", &VertexPointXY::setEstimateDataImpl)
       .def("get_estimate_data", &VertexPointXY::getEstimateData)
       .def("estimate_dimension", &VertexPointXY::estimateDimension)

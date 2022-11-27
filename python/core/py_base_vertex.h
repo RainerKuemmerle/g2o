@@ -1,6 +1,7 @@
 #pragma once
 
 #include "g2o/core/base_vertex.h"
+#include "g2o/core/eigen_types.h"
 #include "g2opy.h"
 
 namespace g2o {
@@ -17,10 +18,9 @@ void templatedBaseVertex(py::module& m, const std::string& suffix) {
       //.def_readonly_static("dimension", &BaseVertex<D, T>::Dimension)   //
       // lead to undefined
       // symbol error
-      .def("hessian_map", &CLS::hessianMap)
+      .def("hessian", [](const CLS& v) { return MatrixX(v.hessianMap()); })
       //-> double* .def("map_hessian_memory", &CLS::mapHessianMemory) // double*
       //-> void .def("copy_b", &CLS::copyB) // double* -> void
-      .def("b_map", &CLS::bMap)
       .def("clear_quadratic_form", &CLS::clearQuadraticForm)
       .def("solve_direct", &CLS::solveDirect)
       .def("b", static_cast<BVector& (CLS::*)()>(&CLS::b),

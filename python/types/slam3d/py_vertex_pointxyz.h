@@ -18,8 +18,7 @@ inline void declareVertexPointXYZ(py::module& m) {
            &VertexPointXYZ::setMinimalEstimateDataImpl)
       .def("get_minimal_estimate_data", &VertexPointXYZ::getMinimalEstimateData)
       .def("minimal_estimate_dimension",
-           &VertexPointXYZ::minimalEstimateDimension)
-      .def("oplus_impl", &VertexPointXYZ::oplusImpl);
+           &VertexPointXYZ::minimalEstimateDimension);
 
   // class G2O_TYPES_SLAM3D_API VertexPointXYZWriteGnuplotAction: public
   // WriteGnuplotAction class VertexPointXYZDrawAction: public DrawAction

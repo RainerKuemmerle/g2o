@@ -17,8 +17,7 @@ inline void declareVertexSE3(py::module& m) {
       .def("set_minimal_estimate_data_impl",
            &VertexSE3::setMinimalEstimateDataImpl)
       .def("get_minimal_estimate_data", &VertexSE3::getMinimalEstimateData)
-      .def("minimal_estimate_dimension", &VertexSE3::minimalEstimateDimension)
-      .def("oplus_impl", &VertexSE3::oplusImpl);
+      .def("minimal_estimate_dimension", &VertexSE3::minimalEstimateDimension);
 }
 
 }  // end namespace g2o
