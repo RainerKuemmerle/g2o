@@ -169,11 +169,11 @@ int main(int argc, const char* argv[]) {
 
   // Set up the solver
   std::unique_ptr<g2o::BlockSolverX> blockSolver =
-      g2o::make_unique<g2o::BlockSolverX>(move(linearSolver));
+      g2o::make_unique<g2o::BlockSolverX>(std::move(linearSolver));
 
   // Set up the optimisation algorithm
   g2o::OptimizationAlgorithm* optimisationAlgorithm =
-      new g2o::OptimizationAlgorithmLevenberg(move(blockSolver));
+      new g2o::OptimizationAlgorithmLevenberg(std::move(blockSolver));
 
   // Create the graph and configure it
   std::unique_ptr<g2o::SparseOptimizer> optimizer =
