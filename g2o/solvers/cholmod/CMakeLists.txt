@@ -3,6 +3,8 @@ if (NOT G2O_USE_CHOLMOD)
 endif()
 
 add_library(solver_cholmod ${G2O_LIB_TYPE}
+  cholmod_ext.h
+  cholmod_wrapper.cpp cholmod_wrapper.h
   solver_cholmod.cpp
   linear_solver_cholmod.h
 )

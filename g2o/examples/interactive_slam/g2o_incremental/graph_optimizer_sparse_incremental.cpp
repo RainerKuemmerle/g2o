@@ -53,7 +53,7 @@ struct VertexBackup {
 }  // namespace
 
 SparseOptimizerIncremental::SparseOptimizerIncremental() {
-  _cholmodSparse = new CholmodExt();
+  _cholmodSparse = new cholmod::CholmodExt();
   _cholmodFactor = 0;
   cholmod_start(&_cholmodCommon);
 
@@ -69,7 +69,7 @@ SparseOptimizerIncremental::SparseOptimizerIncremental() {
   _cholmodFactor = 0;
   _solverInterface = 0;
 
-  _permutedUpdateAsSparse = new CholmodExt;
+  _permutedUpdateAsSparse = new cholmod::CholmodExt;
 }
 
 SparseOptimizerIncremental::~SparseOptimizerIncremental() {
@@ -410,7 +410,7 @@ bool SparseOptimizerIncremental::computeCholeskyUpdate() {
         _cholmodSparse->columnsAllocated == 0
             ? n
             : 2 * n;  // pre-allocate more space if re-allocating
-    delete[](int*) _cholmodSparse->p;
+    delete[] (int*)_cholmodSparse->p;
     _cholmodSparse->p = new int[_cholmodSparse->columnsAllocated + 1];
   }
   size_t nzmax = A.nonZeros();
@@ -421,8 +421,8 @@ bool SparseOptimizerIncremental::computeCholeskyUpdate() {
         _cholmodSparse->nzmax == 0
             ? nzmax
             : 2 * nzmax;  // pre-allocate more space if re-allocating
-    delete[](double*) _cholmodSparse->x;
-    delete[](int*) _cholmodSparse->i;
+    delete[] (double*)_cholmodSparse->x;
+    delete[] (int*)_cholmodSparse->i;
     _cholmodSparse->i = new int[_cholmodSparse->nzmax];
     _cholmodSparse->x = new double[_cholmodSparse->nzmax];
   }
@@ -531,15 +531,15 @@ void SparseOptimizerIncremental::convertTripletUpdateToSparse() {
   // reallocate num-zeros
   if (_permutedUpdateAsSparse->nzmax < _permutedUpdate->nzmax) {
     _permutedUpdateAsSparse->nzmax = _permutedUpdate->nzmax;
-    delete[](int*) _permutedUpdateAsSparse->i;
-    delete[](double*) _permutedUpdateAsSparse->x;
+    delete[] (int*)_permutedUpdateAsSparse->i;
+    delete[] (double*)_permutedUpdateAsSparse->x;
     _permutedUpdateAsSparse->x = new double[_permutedUpdateAsSparse->nzmax];
     _permutedUpdateAsSparse->i = new int[_permutedUpdateAsSparse->nzmax];
   }
 
   if (_permutedUpdateAsSparse->columnsAllocated < _permutedUpdate->ncol) {
     _permutedUpdateAsSparse->columnsAllocated = 2 * _permutedUpdate->ncol;
-    delete[](int*) _permutedUpdateAsSparse->p;
+    delete[] (int*)_permutedUpdateAsSparse->p;
     _permutedUpdateAsSparse->p =
         new int[_permutedUpdateAsSparse->columnsAllocated + 1];
   }

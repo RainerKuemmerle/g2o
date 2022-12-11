@@ -24,35 +24,33 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef G2O_CSPARSE_WRAPPER_H
-#define G2O_CSPARSE_WRAPPER_H
+#ifndef G2O_CHOLMOD_WRAPPER_H
+#define G2O_CHOLMOD_WRAPPER_H
 
 #include <cstddef>
 #include <memory>
 
-#include "g2o/core/eigen_types.h"
-
 namespace g2o {
-namespace csparse {
+namespace cholmod {
 
-class CSparse {
+class Cholmod {
  public:
-  CSparse();
-  ~CSparse();
+  Cholmod();
+  ~Cholmod();
 
-  //! View onto the sparse matrix structure of CSparse using CCS storage
+  //! View onto the sparse matrix structure of Cholmod using CCS storage
   struct SparseView {
-    int& m;
-    int& n;
-    int& nzmax;
+    size_t& nrow;
+    size_t& ncol;
+    size_t& nzmax;
     int*& p;
     int*& i;
     double*& x;
-    int& columnsAllocated;
-    SparseView(int& m, int& n, int& nzmax, int*& p, int*& i, double*& x,
-               int& columnsAllocated)
-        : m(m),
-          n(n),
+    size_t& columnsAllocated;
+    SparseView(size_t& nrow, size_t& ncol, size_t& nzmax, int*& p, int*& i,
+               double*& x, size_t& columnsAllocated)
+        : nrow(nrow),
+          ncol(ncol),
           nzmax(nzmax),
           p(p),
           i(i),
@@ -62,41 +60,38 @@ class CSparse {
 
   //! View onto the cholesky factor
   struct FactorView {
-    int& n;
+    size_t& n;
     int*& p;
     int*& i;
     double*& x;
-    int*& pinv;
-    FactorView(int& n, int*& p, int*& i, double*& x, int*& pinv)
-        : n(n), p(p), i(i), x(x), pinv(pinv) {}
+    int*& perm;
+    FactorView(size_t& n, int*& p, int*& i, double*& x, int*& perm)
+        : n(n), p(p), i(i), x(x), perm(perm) {}
   };
 
   bool factorize();
   bool hasFactor() const;
   void freeFactor();
-  FactorView factor();
+  bool simplifyFactor();
 
   //! compute AMD ordering on the given SparseView, store into result
-  bool amd(const SparseView& sparseView, VectorXI& result);
+  bool amd(SparseView& sparseView, int* result);
 
   int choleskyNz() const;
 
-  bool solve(double* x, double* b) const;
+  void solve(double* x, double* b) const;
 
   bool analyze();
   bool analyze_p(int* permutation);
 
-  bool hasSymbolic() const;
-  void freeSymbolic();
-
   SparseView sparseView();
-  bool writeSparse(const std::string& filename) const;
+  FactorView factor();
 
  private:
   class Impl;
   std::unique_ptr<Impl> pImpl;
 };
 
-}  // namespace csparse
+}  // namespace cholmod
 }  // namespace g2o
 #endif
