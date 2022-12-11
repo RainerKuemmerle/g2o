@@ -18,8 +18,12 @@
 #define G2O_LINEAR_SOLVER_CHOLMOD_ONLINE
 
 #include <camd.h>
+#include <cholmod.h>
 
-#include "g2o/solvers/cholmod/linear_solver_cholmod.h"
+#include "g2o/core/batch_stats.h"
+#include "g2o/core/linear_solver.h"
+#include "g2o/solvers/cholmod/cholmod_ext.h"
+#include "g2o/stuff/timeutil.h"
 #include "g2o_incremental_api.h"
 
 namespace g2o {
@@ -46,7 +50,7 @@ class LinearSolverCholmodOnline : public LinearSolver<MatrixType>,
                                   public LinearSolverCholmodOnlineInterface {
  public:
   LinearSolverCholmodOnline() : LinearSolver<MatrixType>() {
-    _cholmodSparse = new CholmodExt();
+    _cholmodSparse = new cholmod::CholmodExt();
     _cholmodFactor = 0;
     cholmod_start(&_cholmodCommon);
 
@@ -165,7 +169,7 @@ class LinearSolverCholmodOnline : public LinearSolver<MatrixType>,
  protected:
   // temp used for cholesky with cholmod
   cholmod_common _cholmodCommon;
-  CholmodExt* _cholmodSparse;
+  cholmod::CholmodExt* _cholmodSparse;
   cholmod_factor* _cholmodFactor;
   bool _blockOrdering;
   MatrixStructure _matrixStructure;
@@ -235,7 +239,7 @@ class LinearSolverCholmodOnline : public LinearSolver<MatrixType>,
           _cholmodSparse->columnsAllocated == 0
               ? n
               : 2 * n;  // pre-allocate more space if re-allocating
-      delete[](int*) _cholmodSparse->p;
+      delete[] (int*)_cholmodSparse->p;
       _cholmodSparse->p = new int[_cholmodSparse->columnsAllocated + 1];
     }
     if (!onlyValues) {
@@ -247,8 +251,8 @@ class LinearSolverCholmodOnline : public LinearSolver<MatrixType>,
             _cholmodSparse->nzmax == 0
                 ? nzmax
                 : 2 * nzmax;  // pre-allocate more space if re-allocating
-        delete[](double*) _cholmodSparse->x;
-        delete[](int*) _cholmodSparse->i;
+        delete[] (double*)_cholmodSparse->x;
+        delete[] (int*)_cholmodSparse->i;
         _cholmodSparse->i = new int[_cholmodSparse->nzmax];
         _cholmodSparse->x = new double[_cholmodSparse->nzmax];
       }
