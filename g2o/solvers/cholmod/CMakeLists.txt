@@ -8,7 +8,6 @@ add_library(solver_cholmod ${G2O_LIB_TYPE}
 )
 
 target_include_directories(solver_cholmod PUBLIC
-  ${CHOLMOD_INCLUDES}
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
     $<INSTALL_INTERFACE:include/g2o/solvers/cholmod>)
 
@@ -18,14 +17,15 @@ if (APPLE)
 endif()
 
 add_definitions(${BLAS_DEFINITIONS} ${LAPACK_DEFINITIONS})
-target_link_libraries(solver_cholmod ${CHOLMOD_LIBRARIES} ${BLAS_LIBRARIES} ${LAPACK_LIBRARIES} core)
+target_link_libraries(solver_cholmod core)
+target_link_libraries(solver_cholmod SuiteSparse::CHOLMOD)
 
 install(TARGETS solver_cholmod
   EXPORT ${G2O_TARGETS_EXPORT_NAME}
   RUNTIME DESTINATION ${RUNTIME_DESTINATION}
   LIBRARY DESTINATION ${LIBRARY_DESTINATION}
   ARCHIVE DESTINATION ${ARCHIVE_DESTINATION}
-  INCLUDES DESTINATION ${INCLUDES_DESTINATION} ${CHOLMOD_INCLUDE_DIR}
+  INCLUDES DESTINATION ${INCLUDES_DESTINATION}
 )
 
 file(GLOB headers "${CMAKE_CURRENT_SOURCE_DIR}/*.h" "${CMAKE_CURRENT_SOURCE_DIR}/*.hpp")

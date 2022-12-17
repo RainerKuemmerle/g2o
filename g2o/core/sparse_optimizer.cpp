@@ -36,6 +36,7 @@
 #include "estimate_propagator.h"
 #include "g2o/config.h"
 #include "g2o/core/eigen_types.h"
+#include "g2o/core/optimizable_graph.h"
 #include "g2o/stuff/macros.h"
 #include "g2o/stuff/misc.h"
 #include "g2o/stuff/timeutil.h"
@@ -106,11 +107,7 @@ number_t SparseOptimizer::activeRobustChi2() const {
 std::shared_ptr<OptimizableGraph::Vertex> SparseOptimizer::findGauge() {
   if (vertices().empty()) return nullptr;
 
-  int maxDim = 0;
-  for (auto& it : vertices()) {
-    auto* v = static_cast<OptimizableGraph::Vertex*>(it.second.get());
-    maxDim = std::max(maxDim, v->dimension());
-  }
+  const int maxDim = maxDimension();
 
   std::shared_ptr<OptimizableGraph::Vertex> rut;
   for (auto& it : vertices()) {
@@ -126,11 +123,7 @@ std::shared_ptr<OptimizableGraph::Vertex> SparseOptimizer::findGauge() {
 bool SparseOptimizer::gaugeFreedom() {
   if (vertices().empty()) return false;
 
-  int maxDim = 0;
-  for (auto& it : vertices()) {
-    auto* v = static_cast<OptimizableGraph::Vertex*>(it.second.get());
-    maxDim = std::max(maxDim, v->dimension());
-  }
+  const int maxDim = maxDimension();
 
   for (auto& it : vertices()) {
     auto* v = static_cast<OptimizableGraph::Vertex*>(it.second.get());
@@ -515,23 +508,11 @@ void SparseOptimizer::pop(SparseOptimizer::VertexContainer& vlist) {
 }
 
 void SparseOptimizer::push(HyperGraph::VertexSet& vlist) {
-  for (const auto& it : vlist) {
-    auto* v = static_cast<OptimizableGraph::Vertex*>(it.get());
-    if (v)
-      v->push();
-    else
-      std::cerr << __FUNCTION__ << ": FATAL PUSH SET" << std::endl;
-  }
+  OptimizableGraph::push(vlist);
 }
 
 void SparseOptimizer::pop(HyperGraph::VertexSet& vlist) {
-  for (const auto& it : vlist) {
-    auto* v = static_cast<OptimizableGraph::Vertex*>(it.get());
-    if (v)
-      v->pop();
-    else
-      std::cerr << __FUNCTION__ << ": FATAL POP SET" << std::endl;
-  }
+  OptimizableGraph::pop(vlist);
 }
 
 void SparseOptimizer::discardTop(SparseOptimizer::VertexContainer& vlist) {

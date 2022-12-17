@@ -20,6 +20,7 @@ target_link_libraries(csparse_extension PUBLIC stuff ${CSPARSE_LIBRARY} ${G2O_EI
 
 add_library(solver_csparse ${G2O_LIB_TYPE}
   solver_csparse.cpp
+  csparse_wrapper.cpp csparse_wrapper.h
   linear_solver_csparse.h
   g2o_csparse_api.h
 )

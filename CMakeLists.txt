@@ -106,10 +106,8 @@ endif()
 
 # For building the CHOLMOD based solvers
 option(G2O_USE_CHOLMOD "Build g2o with CHOLMOD support" ON)
-find_package(Cholmod)
-find_package(BLAS)
-find_package(LAPACK)
-if (G2O_USE_CHOLMOD AND CHOLMOD_FOUND AND BLAS_FOUND AND LAPACK_FOUND)
+find_package(SuiteSparse)
+if (G2O_USE_CHOLMOD AND SuiteSparse_CHOLMOD_FOUND)
   message(STATUS "Enable support for Cholmod")
   set(CHOLMOD_FOUND TRUE)
 else()
@@ -529,6 +527,10 @@ install(
     EXPORT "${G2O_TARGETS_EXPORT_NAME}"
     NAMESPACE "${G2O_NAMESPACE}"
     DESTINATION "${G2O_CONFIG_INSTALL_DIR}")
+
+install(
+    FILES "${g2o_SOURCE_DIR}/cmake_modules/FindSuiteSparse.cmake"
+    DESTINATION "${G2O_CONFIG_INSTALL_DIR}/modules")
 
 # building unit test framework and our tests
 option(BUILD_UNITTESTS "build unit test framework and the tests" OFF)
