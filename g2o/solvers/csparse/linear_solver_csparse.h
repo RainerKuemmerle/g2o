@@ -52,7 +52,7 @@ class LinearSolverCSparse : public LinearSolverCCS<MatrixType> {
 
   virtual ~LinearSolverCSparse() = default;
 
-  virtual bool init() {
+  bool init() override {
     csparse_.freeSymbolic();
     return true;
   }
@@ -154,9 +154,9 @@ class LinearSolverCSparse : public LinearSolverCCS<MatrixType> {
     ccsA.n = n;
 
     if (onlyValues) {
-      this->_ccsMatrix->fillCCS(ccsA.x, true);
+      this->ccsMatrix_->fillCCS(ccsA.x, true);
     } else {
-      int nz = this->_ccsMatrix->fillCCS(ccsA.p, ccsA.i, ccsA.x, true);
+      int nz = this->ccsMatrix_->fillCCS(ccsA.p, ccsA.i, ccsA.x, true);
       (void)nz;
       assert(nz <= ccsA.nzmax);
     }
