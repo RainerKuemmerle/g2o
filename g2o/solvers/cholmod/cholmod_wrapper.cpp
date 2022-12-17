@@ -50,7 +50,17 @@ class Cholmod::Impl {
     cholmodCommon.supernodal =
         CHOLMOD_AUTO;  // CHOLMOD_SUPERNODAL; //CHOLMOD_SIMPLICIAL;
   }
-  ~Impl() { cholmod_finish(&cholmodCommon); }
+  ~Impl() {
+    freeFactor();
+    cholmod_finish(&cholmodCommon);
+  }
+
+  void freeFactor() {
+    if (cholmodFactor != nullptr) {
+      cholmod_free_factor(&cholmodFactor, &cholmodCommon);
+      cholmodFactor = nullptr;
+    }
+  }
 
   cholmod_common cholmodCommon;
   CholmodExt cholmodSparse;
@@ -61,12 +71,7 @@ Cholmod::Cholmod() : pImpl(std::make_unique<Impl>()) {}
 
 Cholmod::~Cholmod() = default;
 
-void Cholmod::freeFactor() {
-  if (pImpl->cholmodFactor != nullptr) {
-    cholmod_free_factor(&pImpl->cholmodFactor, &pImpl->cholmodCommon);
-    pImpl->cholmodFactor = nullptr;
-  }
-}
+void Cholmod::freeFactor() { pImpl->freeFactor(); }
 
 bool Cholmod::hasFactor() const { return pImpl->cholmodFactor != nullptr; }
 
