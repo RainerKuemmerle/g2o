@@ -35,6 +35,7 @@
 #include "batch_stats.h"
 #include "estimate_propagator.h"
 #include "g2o/config.h"
+#include "g2o/core/optimizable_graph.h"
 #include "g2o/core/ownership.h"
 #include "g2o/stuff/macros.h"
 #include "g2o/stuff/misc.h"
@@ -116,13 +117,7 @@ number_t SparseOptimizer::activeRobustChi2() const {
 OptimizableGraph::Vertex* SparseOptimizer::findGauge() {
   if (vertices().empty()) return nullptr;
 
-  int maxDim = 0;
-  for (HyperGraph::VertexIDMap::iterator it = vertices().begin();
-       it != vertices().end(); ++it) {
-    OptimizableGraph::Vertex* v =
-        static_cast<OptimizableGraph::Vertex*>(it->second);
-    maxDim = std::max(maxDim, v->dimension());
-  }
+  int maxDim = maxDimension();
 
   OptimizableGraph::Vertex* rut = 0;
   for (HyperGraph::VertexIDMap::iterator it = vertices().begin();
@@ -140,13 +135,7 @@ OptimizableGraph::Vertex* SparseOptimizer::findGauge() {
 bool SparseOptimizer::gaugeFreedom() {
   if (vertices().empty()) return false;
 
-  int maxDim = 0;
-  for (HyperGraph::VertexIDMap::iterator it = vertices().begin();
-       it != vertices().end(); ++it) {
-    OptimizableGraph::Vertex* v =
-        static_cast<OptimizableGraph::Vertex*>(it->second);
-    maxDim = std::max(maxDim, v->dimension());
-  }
+  int maxDim = maxDimension();
 
   for (HyperGraph::VertexIDMap::iterator it = vertices().begin();
        it != vertices().end(); ++it) {
@@ -556,25 +545,11 @@ void SparseOptimizer::pop(SparseOptimizer::VertexContainer& vlist) {
 }
 
 void SparseOptimizer::push(HyperGraph::VertexSet& vlist) {
-  for (HyperGraph::VertexSet::iterator it = vlist.begin(); it != vlist.end();
-       ++it) {
-    OptimizableGraph::Vertex* v = dynamic_cast<OptimizableGraph::Vertex*>(*it);
-    if (v)
-      v->push();
-    else
-      cerr << __FUNCTION__ << ": FATAL PUSH SET" << endl;
-  }
+  OptimizableGraph::push(vlist);
 }
 
 void SparseOptimizer::pop(HyperGraph::VertexSet& vlist) {
-  for (HyperGraph::VertexSet::iterator it = vlist.begin(); it != vlist.end();
-       ++it) {
-    OptimizableGraph::Vertex* v = dynamic_cast<OptimizableGraph::Vertex*>(*it);
-    if (v)
-      v->pop();
-    else
-      cerr << __FUNCTION__ << ": FATAL POP SET" << endl;
-  }
+  OptimizableGraph::pop(vlist);
 }
 
 void SparseOptimizer::discardTop(SparseOptimizer::VertexContainer& vlist) {
