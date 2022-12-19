@@ -24,7 +24,9 @@
 
 namespace g2o {
 
+namespace cholmod {
 struct CholmodExt;
+}
 
 class G2O_INCREMENTAL_API SparseOptimizerIncremental
     : public SparseOptimizerOnline {
@@ -42,7 +44,7 @@ class G2O_INCREMENTAL_API SparseOptimizerIncremental
  protected:
   SparseBlockMatrix<Eigen::MatrixXd> _updateMat;
   cholmod_common _cholmodCommon;
-  CholmodExt* _cholmodSparse;
+  cholmod::CholmodExt* _cholmodSparse;
   cholmod_factor* _cholmodFactor;
   cholmod_triplet* _permutedUpdate;
   cholmod_factor* _L;
@@ -53,7 +55,7 @@ class G2O_INCREMENTAL_API SparseOptimizerIncremental
   Eigen::VectorXi _cmember;
 
   Eigen::VectorXi _tripletWorkspace;
-  CholmodExt* _permutedUpdateAsSparse;
+  cholmod::CholmodExt* _permutedUpdateAsSparse;
 
   bool computeCholeskyUpdate();
   void convertTripletUpdateToSparse();
