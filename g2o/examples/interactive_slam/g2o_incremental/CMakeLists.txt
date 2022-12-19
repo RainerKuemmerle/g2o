@@ -5,7 +5,7 @@ add_library(g2o_incremental_library ${G2O_LIB_TYPE}
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../)
 
 set_target_properties(g2o_incremental_library PROPERTIES OUTPUT_NAME ${LIB_PREFIX}incremental)
-target_link_libraries(g2o_incremental_library g2o_interactive_library solver_cholmod ${CAMD_LIBRARY})
+target_link_libraries(g2o_incremental_library g2o_interactive_library solver_cholmod ${CAMD_LIBRARY} SuiteSparse::CHOLMOD)
 
 add_executable(g2o_incremental_application g2o_incremental.cpp)
 target_link_libraries(g2o_incremental_application g2o_incremental_library)
