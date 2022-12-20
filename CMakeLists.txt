@@ -526,10 +526,6 @@ install(
     NAMESPACE "${G2O_NAMESPACE}"
     DESTINATION "${G2O_CONFIG_INSTALL_DIR}")
 
-install(
-    FILES "${g2o_SOURCE_DIR}/cmake_modules/FindSuiteSparse.cmake"
-    DESTINATION "${G2O_CONFIG_INSTALL_DIR}/modules")
-
 # building unit test framework and our tests
 option(BUILD_UNITTESTS "build unit test framework and the tests" OFF)
 if(BUILD_UNITTESTS)
