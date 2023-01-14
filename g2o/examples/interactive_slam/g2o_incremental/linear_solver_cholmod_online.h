@@ -18,10 +18,12 @@
 #define G2O_LINEAR_SOLVER_CHOLMOD_ONLINE
 
 #include <camd.h>
+#include <cholmod.h>
 
-#include <cstddef>
-
-#include "g2o/solvers/cholmod/linear_solver_cholmod.h"
+#include "g2o/core/batch_stats.h"
+#include "g2o/core/linear_solver.h"
+#include "g2o/solvers/cholmod/cholmod_ext.h"
+#include "g2o/stuff/timeutil.h"
 #include "g2o_incremental_api.h"
 
 namespace g2o {
@@ -48,14 +50,14 @@ class LinearSolverCholmodOnline : public LinearSolver<MatrixType>,
                                   public LinearSolverCholmodOnlineInterface {
  public:
   LinearSolverCholmodOnline() : LinearSolver<MatrixType>() {
-    cholmodSparse_ = new CholmodExt();
+    cholmodSparse_ = new cholmod::CholmodExt();
     cholmodFactor_ = nullptr;
     cholmod_start(&cholmodCommon_);
 
     // setup ordering strategy
     cholmodCommon_.nmethods = 1;
     cholmodCommon_.method[0].ordering = CHOLMOD_AMD;  // CHOLMOD_COLAMD
-    //_cholmodCommon.postorder = 0;
+    // cholmodCommon_.postorder = 0;
 
     cholmodCommon_.supernodal =
         CHOLMOD_AUTO;  // CHOLMOD_SUPERNODAL; //CHOLMOD_SIMPLICIAL;
@@ -81,7 +83,7 @@ class LinearSolverCholmodOnline : public LinearSolver<MatrixType>,
 
     computeSymbolicDecomposition(A);
     assert(cholmodFactor_ && "Symbolic cholesky failed");
-    double t = get_monotonic_time();
+    const double t = get_monotonic_time();
 
     // setting up b for calling cholmod
     cholmod_dense bcholmod;
@@ -170,7 +172,7 @@ class LinearSolverCholmodOnline : public LinearSolver<MatrixType>,
  protected:
   // temp used for cholesky with cholmod
   cholmod_common cholmodCommon_;
-  CholmodExt* cholmodSparse_;
+  cholmod::CholmodExt* cholmodSparse_;
   cholmod_factor* cholmodFactor_;
   bool blockOrdering_;
   MatrixStructure matrixStructure_;
@@ -178,7 +180,7 @@ class LinearSolverCholmodOnline : public LinearSolver<MatrixType>,
 
  public:
   void computeSymbolicDecomposition(const SparseBlockMatrix<MatrixType>& A) {
-    double t = get_monotonic_time();
+    const double t = get_monotonic_time();
 
     A.fillBlockStructure(matrixStructure_);
 

@@ -51,7 +51,7 @@ struct VertexBackup {
 }  // namespace
 
 SparseOptimizerIncremental::SparseOptimizerIncremental() {
-  cholmodSparse_ = new CholmodExt();
+  cholmodSparse_ = new cholmod::CholmodExt();
   cholmodFactor_ = nullptr;
   cholmod_start(&cholmodCommon_);
 
@@ -67,13 +67,12 @@ SparseOptimizerIncremental::SparseOptimizerIncremental() {
   cholmodFactor_ = nullptr;
   solverInterface_ = nullptr;
 
-  permutedUpdateAsSparse_ = new CholmodExt;
+  permutedUpdateAsSparse_ = new cholmod::CholmodExt;
 }
 
 SparseOptimizerIncremental::~SparseOptimizerIncremental() {
   delete permutedUpdateAsSparse_;
   updateMat_.clear(true);
-  delete cholmodSparse_;
   if (cholmodFactor_) {
     cholmod_free_factor(&cholmodFactor_, &cholmodCommon_);
     cholmodFactor_ = nullptr;
@@ -367,10 +366,10 @@ bool SparseOptimizerIncremental::updateInitialization(
 #endif
 
 #if 0
-    cholmod_sparse* updatePermuted = cholmod_triplet_to_sparse(_permutedUpdate, _permutedUpdate->nnz, &_cholmodCommon);
+    cholmod_sparse* updatePermuted = cholmod_triplet_to_sparse(_permutedUpdate, _permutedUpdate->nnz, &cholmodCommon_);
     //writeCCSMatrix("update-permuted.txt", updatePermuted->nrow, updatePermuted->ncol, (int*)updatePermuted->p, (int*)updatePermuted->i, (double*)updatePermuted->x, false);
     _solverInterface->choleskyUpdate(updatePermuted);
-    cholmod_free_sparse(&updatePermuted, &_cholmodCommon);
+    cholmod_free_sparse(&updatePermuted, &cholmodCommon_);
 #else
   convertTripletUpdateToSparse();
   solverInterface_->choleskyUpdate(permutedUpdateAsSparse_);
@@ -386,8 +385,8 @@ bool SparseOptimizerIncremental::computeCholeskyUpdate() {
   }
 
   const SparseBlockMatrix<MatrixX>& A = updateMat_;
-  size_t m = A.rows();
-  size_t n = A.cols();
+  const size_t m = A.rows();
+  const size_t n = A.cols();
 
   if (cholmodSparse_->columnsAllocated < n) {
     // std::cerr << __PRETTY_FUNCTION__ << ": reallocating columns" <<
@@ -399,7 +398,7 @@ bool SparseOptimizerIncremental::computeCholeskyUpdate() {
     delete[] static_cast<int*>(cholmodSparse_->p);
     cholmodSparse_->p = new int[cholmodSparse_->columnsAllocated + 1];
   }
-  size_t nzmax = A.nonZeros();
+  const size_t nzmax = A.nonZeros();
   if (cholmodSparse_->nzmax < nzmax) {
     // std::cerr << __PRETTY_FUNCTION__ << ": reallocating row + values" <<
     // std::endl;
@@ -418,9 +417,9 @@ bool SparseOptimizerIncremental::computeCholeskyUpdate() {
   A.fillCCS(static_cast<int*>(cholmodSparse_->p),
             static_cast<int*>(cholmodSparse_->i),
             static_cast<double*>(cholmodSparse_->x), true);
-  // writeCCSMatrix("updatesparse.txt", _cholmodSparse->nrow,
-  // _cholmodSparse->ncol, (int*)_cholmodSparse->p, (int*)_cholmodSparse->i,
-  // (double*)_cholmodSparse->x, true);
+  // writeCCSMatrix("updatesparse.txt", cholmodSparse_->nrow,
+  // cholmodSparse_->ncol, (int*)cholmodSparse_->,_ (int*)cholmodSparse_->i,
+  // (double*)holmodSparse__->x, rue_;_
 
   cholmodFactor_ = cholmod_analyze(cholmodSparse_, &cholmodCommon_);
   cholmod_factorize(cholmodSparse_, cholmodFactor_, &cholmodCommon_);
@@ -434,14 +433,14 @@ bool SparseOptimizerIncremental::computeCholeskyUpdate() {
 
   if (cholmodCommon_.status == CHOLMOD_NOT_POSDEF) {
     // std::cerr << "Cholesky failure, writing debug.txt (Hessian loadable by
-    // Octave)" << std::endl; writeCCSMatrix("debug.txt", _cholmodSparse->nrow,
-    // _cholmodSparse->ncol, (int*)_cholmodSparse->p, (int*)_cholmodSparse->i,
-    // (double*)_cholmodSparse->x, true);
+    // Octave)" << std::endl; writeCCSMatrix("debug.txt", cholmodSparse_->nrow,
+    // cholmodSparse_->ncol, (int*)cholmodSparse_->p, (int*)holmodSparse__->i,
+    // (double*)holmodSparse__->x, rue_);
     return false;
   }
 
   // change to the specific format we need to have a pretty normal L
-  int change_status = cholmod_change_factor(CHOLMOD_REAL, 1, 0, 1, 1,
+  const int change_status = cholmod_change_factor(CHOLMOD_REAL, 1, 0, 1, 1,
                                             cholmodFactor_, &cholmodCommon_);
   return change_status != 0;
 }
