@@ -37,7 +37,8 @@ namespace g2o {
 BaseProperty::BaseProperty(std::string name) : name_(std::move(name)) {}
 
 bool PropertyMap::addProperty(const std::shared_ptr<BaseProperty>& p) {
-  std::pair<PropertyMapIterator, bool> result = insert(make_pair(p->name(), p));
+  const std::pair<PropertyMapIterator, bool> result =
+      insert(make_pair(p->name(), p));
   return result.second;
 }
 
@@ -71,7 +72,7 @@ void PropertyMap::writeToCSV(std::ostream& os) const {
 
 bool PropertyMap::updateMapFromString(const std::string& values) {
   bool status = true;
-  std::vector<std::string> valuesMap = strSplit(values, ",");
+  const std::vector<std::string> valuesMap = strSplit(values, ",");
   for (const auto& entry : valuesMap) {
     std::vector<std::string> m = strSplit(entry, "=");
     if (m.size() != 2) {
@@ -80,8 +81,8 @@ bool PropertyMap::updateMapFromString(const std::string& values) {
                 << std::endl;
       continue;
     }
-    std::string name = trim(m[0]);
-    std::string value = trim(m[1]);
+    const std::string name = trim(m[0]);
+    const std::string value = trim(m[1]);
     status = status && updatePropertyFromString(name, value);
   }
   return status;

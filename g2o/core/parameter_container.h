@@ -49,7 +49,7 @@ class ParameterContainer : protected std::map<int, std::shared_ptr<Parameter>> {
   ParameterContainer() = default;
   virtual ~ParameterContainer() = default;
   //! add parameter to the container
-  bool addParameter(const std::shared_ptr<Parameter>& p);
+  bool addParameter(std::shared_ptr<Parameter> p);
   //! return a parameter based on its ID
   std::shared_ptr<Parameter> getParameter(int id) const;
   //! remove a parameter from the container and returns the formerly stored

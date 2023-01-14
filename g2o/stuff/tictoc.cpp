@@ -91,7 +91,8 @@ struct TicTocInitializer {
       printf("|          TICTOC STATISTICS             |\n");
       printf("------------------------------------------\n");
       for (const auto& sortedElement : sortedElements) {
-        number_t avgTime = sortedElement.totalTime / sortedElement.numCalls;
+        const number_t avgTime =
+            sortedElement.totalTime / sortedElement.numCalls;
         printf("%s", sortedElement.algorithmPart.c_str());
         for (int i = sortedElement.algorithmPart.size(); i < longestName; ++i)
           putchar(' ');
@@ -112,8 +113,8 @@ number_t tictoc(const char* algorithmPart) {
   if (!initializer.enabled) return 0.;
 
   TicTocMap& tictocElements = initializer.tictocElements;
-  static number_t alpha = cst(0.01);
-  number_t now = get_monotonic_time();
+  constexpr number_t kAlpha = cst(0.01);
+  const number_t now = get_monotonic_time();
 
   number_t dt = 0.;
   auto foundIt = tictocElements.find(algorithmPart);
@@ -133,8 +134,8 @@ number_t tictoc(const char* algorithmPart) {
         foundIt->second.exponentialMovingAverage = dt;
       else
         foundIt->second.exponentialMovingAverage =
-            (1. - alpha) * foundIt->second.exponentialMovingAverage +
-            alpha * dt;
+            (1. - kAlpha) * foundIt->second.exponentialMovingAverage +
+            kAlpha * dt;
       foundIt->second.numCalls++;
     } else {
       foundIt->second.ticTime = now;

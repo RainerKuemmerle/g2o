@@ -151,9 +151,9 @@ void MarginalCovarianceCholesky::computeCovariance(
       rowBlockIndices.size(), true);
   map_.clear();
   std::vector<MatrixElem> elemsToCompute;
-  for (const auto& blockIndice : blockIndices) {
-    const int blockRow = blockIndice.first;
-    const int blockCol = blockIndice.second;
+  for (const auto& blockIndex : blockIndices) {
+    const int blockRow = blockIndex.first;
+    const int blockCol = blockIndex.second;
     assert(blockRow >= 0);
     assert(blockRow < (int)rowBlockIndices.size());
     assert(blockCol >= 0);
@@ -184,9 +184,9 @@ void MarginalCovarianceCholesky::computeCovariance(
   }
 
   // set the marginal covariance
-  for (const auto& blockIndice : blockIndices) {
-    const int blockRow = blockIndice.first;
-    const int blockCol = blockIndice.second;
+  for (const auto& blockIndex : blockIndices) {
+    const int blockRow = blockIndex.first;
+    const int blockCol = blockIndex.second;
     const int rowBase = spinv.rowBaseOfBlock(blockRow);
     const int colBase = spinv.colBaseOfBlock(blockCol);
 

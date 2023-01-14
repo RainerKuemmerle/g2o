@@ -80,7 +80,7 @@ bool MatrixStructure::write(const char* filename) const {
   const int& rows = m;
 
   std::string name = filename;
-  std::string::size_type lastDot = name.find_last_of('.');
+  const std::string::size_type lastDot = name.find_last_of('.');
   if (lastDot != std::string::npos) name = name.substr(0, lastDot);
 
   std::vector<std::pair<int, int> > entries;

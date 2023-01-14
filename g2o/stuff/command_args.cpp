@@ -44,7 +44,7 @@ template <typename T>
 void readVector(const std::string& s, std::vector<T>& v) {
   v.clear();
 
-  std::vector<std::string> elements = strSplit(s, ",;");
+  const std::vector<std::string> elements = strSplit(s, ",;");
   for (const std::string& s : elements) {
     T val = stringToType<T>(s);
     v.emplace_back(val);
@@ -62,7 +62,7 @@ std::string writeVectorAsString(const std::vector<T>& v) {
 template <typename T>
 void parseArgument(const std::string& input, CommandArgs::CommandArgument& ca) {
   T aux;
-  bool convertStatus = convertString(input, aux);
+  const bool convertStatus = convertString(input, aux);
   if (convertStatus) {
     T* data = static_cast<T*>(ca.data);
     *data = aux;
@@ -73,7 +73,7 @@ template <typename T>
 void parseVector(const std::string& input, CommandArgs::CommandArgument& ca) {
   std::vector<T> aux;
   readVector(input, aux);
-  bool convertStatus = !aux.empty();
+  const bool convertStatus = !aux.empty();
   if (convertStatus) {
     auto data = static_cast<std::vector<T>*>(ca.data);
     *data = aux;
@@ -120,7 +120,7 @@ bool CommandArgs::parseArgs(int argc, char** argv, bool exitOnError) {
       break;
     }
 
-    std::string::size_type dashPos = name.find_first_not_of('-');
+    const std::string::size_type dashPos = name.find_first_not_of('-');
     if (dashPos != std::string::npos) name = name.substr(dashPos);
 
     if (name == "help" || name == "h") {
@@ -295,7 +295,7 @@ void CommandArgs::printHelp(std::ostream& os) {
     size_t maxArgLen = 0;
     for (const auto& arg : args_) {
       if (arg.type != kCatBool) {
-        std::string defaultValueStr = arg2str(arg);
+        const std::string defaultValueStr = arg2str(arg);
         if (!defaultValueStr.empty())
           tableStrings.emplace_back(
               arg.name + " " + type2str(arg.type),

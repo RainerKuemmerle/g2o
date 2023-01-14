@@ -46,24 +46,24 @@ namespace g2o {
 
 std::string trim(const std::string& s) {
   if (s.length() == 0) return s;
-  std::string::size_type b = s.find_first_not_of(" \t\n");
-  std::string::size_type e = s.find_last_not_of(" \t\n");
+  const std::string::size_type b = s.find_first_not_of(" \t\n");
+  const std::string::size_type e = s.find_last_not_of(" \t\n");
   if (b == std::string::npos) return "";
   return std::string(s, b, e - b + 1);
 }
 
 std::string trimLeft(const std::string& s) {
   if (s.length() == 0) return s;
-  std::string::size_type b = s.find_first_not_of(" \t\n");
-  std::string::size_type e = s.length() - 1;
+  const std::string::size_type b = s.find_first_not_of(" \t\n");
+  const std::string::size_type e = s.length() - 1;
   if (b == std::string::npos) return "";
   return std::string(s, b, e - b + 1);
 }
 
 std::string trimRight(const std::string& s) {
   if (s.length() == 0) return s;
-  std::string::size_type b = 0;
-  std::string::size_type e = s.find_last_not_of(" \t\n");
+  const std::string::size_type b = 0;
+  const std::string::size_type e = s.find_last_not_of(" \t\n");
   if (e == std::string::npos) return "";
   return std::string(s, b, e - b + 1);
 }
@@ -86,7 +86,7 @@ std::string formatString(const char* fmt, ...) {
   char* auxPtr = nullptr;
   va_list arg_list;
   va_start(arg_list, fmt);
-  int numChar = vasprintf(&auxPtr, fmt, arg_list);
+  const int numChar = vasprintf(&auxPtr, fmt, arg_list);
   va_end(arg_list);
   std::string retString;
   if (numChar != -1)
@@ -103,7 +103,7 @@ int strPrintf(std::string& str, const char* fmt, ...) {
   char* auxPtr = nullptr;
   va_list arg_list;
   va_start(arg_list, fmt);
-  int numChars = vasprintf(&auxPtr, fmt, arg_list);
+  const int numChars = vasprintf(&auxPtr, fmt, arg_list);
   va_end(arg_list);
   str = auxPtr;
   free(auxPtr);

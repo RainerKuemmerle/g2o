@@ -51,29 +51,29 @@
 #endif
 
 #ifdef __APPLE__
-//#include <chrono>
-//#include <thread>
+// #include <chrono>
+// #include <thread>
 #endif
 
 namespace g2o {
 
 std::string getFileExtension(const std::string& filename) {
-  std::string::size_type lastDot = filename.find_last_of('.');
+  const std::string::size_type lastDot = filename.find_last_of('.');
   if (lastDot != std::string::npos) return filename.substr(lastDot + 1);
   return "";
 }
 
 std::string getPureFilename(const std::string& filename) {
-  std::string::size_type lastDot = filename.find_last_of('.');
+  const std::string::size_type lastDot = filename.find_last_of('.');
   if (lastDot != std::string::npos) return filename.substr(0, lastDot);
   return filename;
 }
 
 std::string getBasename(const std::string& filename) {
 #ifdef WINDOWS
-  std::string::size_type lastSlash = filename.find_last_of('\\');
+  const std::string::size_type lastSlash = filename.find_last_of('\\');
 #else
-  std::string::size_type lastSlash = filename.find_last_of('/');
+  const std::string::size_type lastSlash = filename.find_last_of('/');
 #endif
   if (lastSlash != std::string::npos) return filename.substr(lastSlash + 1);
   return filename;
@@ -81,9 +81,9 @@ std::string getBasename(const std::string& filename) {
 
 std::string getDirname(const std::string& filename) {
 #ifdef WINDOWS
-  std::string::size_type lastSlash = filename.find_last_of('\\');
+  const std::string::size_type lastSlash = filename.find_last_of('\\');
 #else
-  std::string::size_type lastSlash = filename.find_last_of('/');
+  const std::string::size_type lastSlash = filename.find_last_of('/');
 #endif
   if (lastSlash != std::string::npos) return filename.substr(0, lastSlash);
   return "";

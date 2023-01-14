@@ -37,7 +37,7 @@ namespace g2o {
 static bool writeTripletEntries(const std::string& filename, int rows, int cols,
                                 const std::vector<TripletEntry>& triplets) {
   std::string name = filename;
-  std::string::size_type lastDot = name.find_last_of('.');
+  const std::string::size_type lastDot = name.find_last_of('.');
   if (lastDot != std::string::npos) name = name.substr(0, lastDot);
 
   std::ofstream fout(filename.c_str());
@@ -70,9 +70,9 @@ bool writeCCSMatrix(const std::string& filename, int rows, int cols,
     const int& rbeg = Ap[i];
     const int& rend = Ap[i + 1];
     for (int j = rbeg; j < rend; j++) {
-      entries.emplace_back(TripletEntry(Ai[j], i, Ax[j]));
+      entries.emplace_back(Ai[j], i, Ax[j]);
       if (upperTriangleSymmetric && Ai[j] != i)
-        entries.emplace_back(TripletEntry(i, Ai[j], Ax[j]));
+        entries.emplace_back(i, Ai[j], Ax[j]);
     }
   }
   sort(entries.begin(), entries.end(), TripletColSort());
@@ -86,9 +86,9 @@ bool writeTripletMatrix(const std::string& filename, int nz, int rows, int cols,
   std::vector<TripletEntry> entries;
   entries.reserve(nz);
   for (int i = 0; i < nz; ++i) {
-    entries.emplace_back(TripletEntry(Ai[i], Aj[i], Ax[i]));
+    entries.emplace_back(Ai[i], Aj[i], Ax[i]);
     if (upperTriangleSymmetric && Ai[i] != Aj[i])
-      entries.emplace_back(TripletEntry(Aj[i], Ai[i], Ax[i]));
+      entries.emplace_back(Aj[i], Ai[i], Ax[i]);
   }
   std::sort(entries.begin(), entries.end(), TripletColSort());
   return writeTripletEntries(filename, rows, cols, entries);

@@ -36,11 +36,11 @@
 
 namespace g2o {
 
-bool ParameterContainer::addParameter(const std::shared_ptr<Parameter>& p) {
+bool ParameterContainer::addParameter(std::shared_ptr<Parameter> p) {
   if (p->id() < 0) return false;
   auto it = find(p->id());
   if (it != end()) return false;
-  insert(make_pair(p->id(), p));
+  emplace(p->id(), p);
   return true;
 }
 
@@ -53,7 +53,7 @@ std::shared_ptr<Parameter> ParameterContainer::getParameter(int id) const {
 std::shared_ptr<Parameter> ParameterContainer::detachParameter(int id) {
   auto it = find(id);
   if (it == end()) return nullptr;
-  std::shared_ptr<Parameter> p = it->second;
+  std::shared_ptr<Parameter> p = std::move(it->second);
   erase(it);
   return p;
 }
