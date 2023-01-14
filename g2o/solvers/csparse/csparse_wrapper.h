@@ -77,7 +77,7 @@ class CSparse {
   FactorView factor();
 
   //! compute AMD ordering on the given SparseView, store into result
-  bool amd(const SparseView& sparseView, VectorXI& result);
+  static bool amd(const SparseView& sparseView, VectorXI& result);
 
   int choleskyNz() const;
 
@@ -94,7 +94,7 @@ class CSparse {
 
  private:
   class Impl;
-  std::unique_ptr<Impl> pImpl;
+  std::unique_ptr<Impl> pImpl_;
 };
 
 }  // namespace csparse

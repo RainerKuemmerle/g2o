@@ -116,7 +116,7 @@ int SparseOptimizerIncremental::optimize(int iterations, bool online) {
     underlyingSolver_->buildSystem();
 
     // mark vertices to be sorted as last
-    int numBlocksRequired = ivMap_.size();
+    const int numBlocksRequired = ivMap_.size();
     if (cmember_.size() < numBlocksRequired) {
       cmember_.resize(static_cast<Eigen::Index>(2) * numBlocksRequired);
     }
@@ -150,7 +150,7 @@ int SparseOptimizerIncremental::optimize(int iterations, bool online) {
     // update the b vector
     for (const auto& _touchedVertice : touchedVertices_) {
       auto* v = static_cast<OptimizableGraph::Vertex*>(_touchedVertice.get());
-      int iBase = v->colInHessian();
+      const int iBase = v->colInHessian();
       v->copyB(underlyingSolver_->b() + iBase);
     }
     solverInterface_->solve(underlyingSolver_->x(), underlyingSolver_->b());
@@ -258,12 +258,12 @@ bool SparseOptimizerIncremental::updateInitialization(
   int sizePoses = 0;
   for (int i = 0; i < idx; ++i) {
     OptimizableGraph::Vertex* v = backupIdx[i].vertex;
-    int dim = v->dimension();
+    const int dim = v->dimension();
     sizePoses += dim;
     updateMat_.rowBlockIndices().push_back(sizePoses);
     updateMat_.colBlockIndices().push_back(sizePoses);
     updateMat_.blockCols().emplace_back();
-    int ind = v->hessianIndex();
+    const int ind = v->hessianIndex();
     // cerr << PVAR(ind) << endl;
     if (ind >= 0) {
       MatrixX* m = updateMat_.block(ind, ind, true);
@@ -282,7 +282,7 @@ bool SparseOptimizerIncremental::updateInitialization(
     if (ind1 == -1) continue;
     int ind2 = v2->hessianIndex();
     if (ind2 == -1) continue;
-    bool transposedBlock = ind1 > ind2;
+    const bool transposedBlock = ind1 > ind2;
     if (transposedBlock)  // make sure, we allocate the upper triangular block
       std::swap(ind1, ind2);
 
@@ -309,9 +309,9 @@ bool SparseOptimizerIncremental::updateInitialization(
   }
 
   // update the structure of the real block matrix
-  bool solverStatus = algorithm_->updateStructure(newVertices, eset);
+  const bool solverStatus = algorithm_->updateStructure(newVertices, eset);
 
-  bool updateStatus = computeCholeskyUpdate();
+  const bool updateStatus = computeCholeskyUpdate();
   if (!updateStatus) {
     std::cerr << "Error while computing update" << std::endl;
   }
@@ -337,16 +337,16 @@ bool SparseOptimizerIncremental::updateInitialization(
     for (size_t c = 0; c < updateAsSparseFactor->ncol; ++c) {
       const int& rbeg = Ap[c];
       const int& rend = Ap[c + 1];
-      int cc = c / slamDimension;
-      int coff = c % slamDimension;
+      const int cc = c / slamDimension;
+      const int coff = c % slamDimension;
       const int& cbase = backupIdx[cc].vertex->colInHessian();
       const int& ccol = perm_(cbase + coff);
       for (int j = rbeg; j < rend; j++) {
         const int& r = Ai[j];
         const double& val = Ax[j];
 
-        int rr = r / slamDimension;
-        int roff = r % slamDimension;
+        const int rr = r / slamDimension;
+        const int roff = r % slamDimension;
         const int& rbase = backupIdx[rr].vertex->colInHessian();
 
         int row = perm_(rbase + roff);
@@ -553,7 +553,7 @@ void SparseOptimizerIncremental::convertTripletUpdateToSparse() {
   assert((size_t)nz == permutedUpdate_->nnz);
 
   for (size_t k = 0; k < permutedUpdate_->nnz; ++k) {
-    int p = w[Tj[k]]++;
+    const int p = w[Tj[k]]++;
     Ci[p] = Ti[k]; /* A(i,j) is the pth entry in C */
     Cx[p] = Tx[k];
   }

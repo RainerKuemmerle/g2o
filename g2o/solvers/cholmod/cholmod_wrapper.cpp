@@ -67,13 +67,13 @@ class Cholmod::Impl {
   cholmod_factor* cholmodFactor = nullptr;
 };
 
-Cholmod::Cholmod() : pImpl(std::make_unique<Impl>()) {}
+Cholmod::Cholmod() : pImpl_(std::make_unique<Impl>()) {}
 
 Cholmod::~Cholmod() = default;
 
-void Cholmod::freeFactor() { pImpl->freeFactor(); }
+void Cholmod::freeFactor() { pImpl_->freeFactor(); }
 
-bool Cholmod::hasFactor() const { return pImpl->cholmodFactor != nullptr; }
+bool Cholmod::hasFactor() const { return pImpl_->cholmodFactor != nullptr; }
 
 bool Cholmod::amd(SparseView& sparseView, int* result) {
   cholmod_sparse auxCholmodSparse;
@@ -82,9 +82,9 @@ bool Cholmod::amd(SparseView& sparseView, int* result) {
   auxCholmodSparse.ncol = sparseView.ncol;
   auxCholmodSparse.p = sparseView.p;
   auxCholmodSparse.i = sparseView.i;
-  auxCholmodSparse.nz = 0;
-  auxCholmodSparse.x = 0;
-  auxCholmodSparse.z = 0;
+  auxCholmodSparse.nz = nullptr;
+  auxCholmodSparse.x = nullptr;
+  auxCholmodSparse.z = nullptr;
   auxCholmodSparse.stype = 1;
   auxCholmodSparse.xtype = CHOLMOD_PATTERN;
   auxCholmodSparse.itype = CHOLMOD_INT;
@@ -92,13 +92,13 @@ bool Cholmod::amd(SparseView& sparseView, int* result) {
   auxCholmodSparse.sorted = 1;
   auxCholmodSparse.packed = 1;
 
-  int amdStatus =
-      cholmod_amd(&auxCholmodSparse, NULL, 0, result, &pImpl->cholmodCommon);
+  const int amdStatus = cholmod_amd(&auxCholmodSparse, nullptr, 0, result,
+                                    &pImpl_->cholmodCommon);
   return amdStatus != 0;
 }
 
 Cholmod::SparseView Cholmod::sparseView() {
-  CholmodExt& sparse = pImpl->cholmodSparse;
+  CholmodExt& sparse = pImpl_->cholmodSparse;
   return Cholmod::SparseView(
       sparse.nrow, sparse.ncol, sparse.nzmax,
       *reinterpret_cast<int**>(&sparse.p), *reinterpret_cast<int**>(&sparse.i),
@@ -106,7 +106,7 @@ Cholmod::SparseView Cholmod::sparseView() {
 }
 
 Cholmod::FactorView Cholmod::factor() {
-  cholmod_factor& factor = *pImpl->cholmodFactor;
+  cholmod_factor& factor = *pImpl_->cholmodFactor;
   return Cholmod::FactorView(factor.n, *reinterpret_cast<int**>(&factor.p),
                              *reinterpret_cast<int**>(&factor.i),
                              *reinterpret_cast<double**>(&factor.x),
@@ -116,52 +116,52 @@ Cholmod::FactorView Cholmod::factor() {
 void Cholmod::solve(double* x, double* b) const {
   // setting up b for calling cholmod
   cholmod_dense bcholmod;
-  bcholmod.nrow = bcholmod.d = pImpl->cholmodSparse.nrow;
+  bcholmod.nrow = bcholmod.d = pImpl_->cholmodSparse.nrow;
   bcholmod.ncol = 1;
   bcholmod.x = b;
   bcholmod.xtype = CHOLMOD_REAL;
   bcholmod.dtype = CHOLMOD_DOUBLE;
-  cholmod_dense* xcholmod = cholmod_solve(CHOLMOD_A, pImpl->cholmodFactor,
-                                          &bcholmod, &pImpl->cholmodCommon);
+  cholmod_dense* xcholmod = cholmod_solve(CHOLMOD_A, pImpl_->cholmodFactor,
+                                          &bcholmod, &pImpl_->cholmodCommon);
   std::memcpy(x, xcholmod->x,
               sizeof(double) * bcholmod.nrow);  // copy back to our array
-  cholmod_free_dense(&xcholmod, &pImpl->cholmodCommon);
+  cholmod_free_dense(&xcholmod, &pImpl_->cholmodCommon);
 }
 
 bool Cholmod::analyze() {
   // setup ordering strategy
-  pImpl->cholmodCommon.nmethods = 1;
-  pImpl->cholmodCommon.method[0].ordering = CHOLMOD_AMD;  // CHOLMOD_COLAMD
-  pImpl->cholmodFactor =
-      cholmod_analyze(&pImpl->cholmodSparse,
-                      &pImpl->cholmodCommon);  // symbolic factorization
+  pImpl_->cholmodCommon.nmethods = 1;
+  pImpl_->cholmodCommon.method[0].ordering = CHOLMOD_AMD;  // CHOLMOD_COLAMD
+  pImpl_->cholmodFactor =
+      cholmod_analyze(&pImpl_->cholmodSparse,
+                      &pImpl_->cholmodCommon);  // symbolic factorization
   return true;
 }
 
 bool Cholmod::analyze_p(int* permutation) {
-  pImpl->cholmodCommon.nmethods = 1;
-  pImpl->cholmodCommon.method[0].ordering = CHOLMOD_GIVEN;
-  pImpl->cholmodFactor = cholmod_analyze_p(&pImpl->cholmodSparse, permutation,
-                                           NULL, 0, &pImpl->cholmodCommon);
+  pImpl_->cholmodCommon.nmethods = 1;
+  pImpl_->cholmodCommon.method[0].ordering = CHOLMOD_GIVEN;
+  pImpl_->cholmodFactor = cholmod_analyze_p(&pImpl_->cholmodSparse, permutation,
+                                            nullptr, 0, &pImpl_->cholmodCommon);
   return true;
 }
 
 int Cholmod::choleskyNz() const {
-  return static_cast<int>(pImpl->cholmodCommon.method[0].lnz);
+  return static_cast<int>(pImpl_->cholmodCommon.method[0].lnz);
 }
 
 bool Cholmod::factorize() {
-  cholmod_factorize(&pImpl->cholmodSparse, pImpl->cholmodFactor,
-                    &pImpl->cholmodCommon);
-  return pImpl->cholmodCommon.status == CHOLMOD_OK;
+  cholmod_factorize(&pImpl_->cholmodSparse, pImpl_->cholmodFactor,
+                    &pImpl_->cholmodCommon);
+  return pImpl_->cholmodCommon.status == CHOLMOD_OK;
 }
 
 bool Cholmod::simplifyFactor() {
   // convert the factorization to LL, simplical, packed, monotonic
-  int change_status = cholmod_change_factor(
-      CHOLMOD_REAL, 1, 0, 1, 1, pImpl->cholmodFactor, &pImpl->cholmodCommon);
-  assert(pImpl->cholmodFactor->is_ll && !pImpl->cholmodFactor->is_super &&
-         pImpl->cholmodFactor->is_monotonic &&
+  const int change_status = cholmod_change_factor(
+      CHOLMOD_REAL, 1, 0, 1, 1, pImpl_->cholmodFactor, &pImpl_->cholmodCommon);
+  assert(pImpl_->cholmodFactor->is_ll && !pImpl_->cholmodFactor->is_super &&
+         pImpl_->cholmodFactor->is_monotonic &&
          "Cholesky factor has wrong format");
   return change_status != 0;
 }

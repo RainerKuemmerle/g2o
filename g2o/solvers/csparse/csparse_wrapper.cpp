@@ -101,18 +101,18 @@ class CSparse::Impl {
   CSparseExt ccsA;
 };
 
-CSparse::CSparse() : pImpl(std::make_unique<Impl>()) {}
+CSparse::CSparse() : pImpl_(std::make_unique<Impl>()) {}
 
 CSparse::~CSparse() = default;
 
 void CSparse::freeFactor() {
-  if (pImpl->numericCholesky) {
-    cs_nfree(pImpl->numericCholesky);
-    pImpl->numericCholesky = nullptr;
+  if (pImpl_->numericCholesky) {
+    cs_nfree(pImpl_->numericCholesky);
+    pImpl_->numericCholesky = nullptr;
   }
 }
 
-bool CSparse::hasFactor() const { return pImpl->numericCholesky != nullptr; }
+bool CSparse::hasFactor() const { return pImpl_->numericCholesky != nullptr; }
 
 bool CSparse::amd(const SparseView& sparseView, VectorXI& result) {
   // prepare block structure for the CSparse call
@@ -122,8 +122,8 @@ bool CSparse::amd(const SparseView& sparseView, VectorXI& result) {
   auxBlock.n = sparseView.n;
   auxBlock.p = sparseView.p;
   auxBlock.i = sparseView.i;
-  auxBlock.x = NULL;  // no values
-  auxBlock.nz = -1;   // CCS format
+  auxBlock.x = nullptr;  // no values
+  auxBlock.nz = -1;      // CCS format
 
   // AMD ordering on the block structure
   int* permutation = cs_amd(1, &auxBlock);
@@ -136,83 +136,84 @@ bool CSparse::amd(const SparseView& sparseView, VectorXI& result) {
 }
 
 CSparse::SparseView CSparse::sparseView() {
-  CSparseExt& sparse = pImpl->ccsA;
+  CSparseExt& sparse = pImpl_->ccsA;
   return CSparse::SparseView(sparse.m, sparse.n, sparse.nzmax, sparse.p,
                              sparse.i, sparse.x, sparse.columnsAllocated);
 }
 
 CSparse::FactorView CSparse::factor() {
-  csn* factor = pImpl->numericCholesky;
+  csn* factor = pImpl_->numericCholesky;
   return CSparse::FactorView(factor->L->n, factor->L->p, factor->L->i,
-                             factor->L->x, pImpl->symbolicDecomposition->pinv);
+                             factor->L->x, pImpl_->symbolicDecomposition->pinv);
 }
 
 bool CSparse::solve(double* x, double* b) const {
-  pImpl->prepareWorkspace();
+  pImpl_->prepareWorkspace();
 
-  if (x != b) memcpy(x, b, pImpl->ccsA.n * sizeof(double));
-  int ok = csparse_extension::cs_cholsolsymb(
-      &pImpl->ccsA, x, pImpl->symbolicDecomposition, pImpl->csWorkspace,
-      pImpl->csIntWorkspace);
+  if (x != b) memcpy(x, b, pImpl_->ccsA.n * sizeof(double));
+  const int ok = csparse_extension::cs_cholsolsymb(
+      &pImpl_->ccsA, x, pImpl_->symbolicDecomposition, pImpl_->csWorkspace,
+      pImpl_->csIntWorkspace);
   return static_cast<bool>(ok);
 }
 
 bool CSparse::analyze() {
   freeSymbolic();
-  pImpl->symbolicDecomposition = cs_schol(1, &pImpl->ccsA);
-  return pImpl->symbolicDecomposition != nullptr;
+  pImpl_->symbolicDecomposition = cs_schol(1, &pImpl_->ccsA);
+  return pImpl_->symbolicDecomposition != nullptr;
 }
 
 bool CSparse::analyze_p(int* permutation) {
   freeSymbolic();
-  pImpl->symbolicDecomposition = (css*)cs_calloc(1, sizeof(css));
-  int n = pImpl->ccsA.n;
-  pImpl->symbolicDecomposition->pinv = cs_pinv(permutation, n);
-  cs* C = cs_symperm(&pImpl->ccsA, pImpl->symbolicDecomposition->pinv, 0);
-  pImpl->symbolicDecomposition->parent = cs_etree(C, 0);
-  int* post = cs_post(pImpl->symbolicDecomposition->parent, n);
-  int* c = cs_counts(C, pImpl->symbolicDecomposition->parent, post, 0);
+  pImpl_->symbolicDecomposition = static_cast<css*>(cs_calloc(1, sizeof(css)));
+  const int n = pImpl_->ccsA.n;
+  pImpl_->symbolicDecomposition->pinv = cs_pinv(permutation, n);
+  cs* C = cs_symperm(&pImpl_->ccsA, pImpl_->symbolicDecomposition->pinv, 0);
+  pImpl_->symbolicDecomposition->parent = cs_etree(C, 0);
+  int* post = cs_post(pImpl_->symbolicDecomposition->parent, n);
+  int* c = cs_counts(C, pImpl_->symbolicDecomposition->parent, post, 0);
   cs_free(post);
   cs_spfree(C);
-  pImpl->symbolicDecomposition->cp = (int*)cs_malloc(n + 1, sizeof(int));
-  pImpl->symbolicDecomposition->unz = pImpl->symbolicDecomposition->lnz =
-      cs_cumsum(pImpl->symbolicDecomposition->cp, c, n);
+  pImpl_->symbolicDecomposition->cp =
+      static_cast<int*>(cs_malloc(n + 1, sizeof(int)));
+  pImpl_->symbolicDecomposition->unz = pImpl_->symbolicDecomposition->lnz =
+      cs_cumsum(pImpl_->symbolicDecomposition->cp, c, n);
   cs_free(c);
-  if (pImpl->symbolicDecomposition->lnz < 0) {
-    cs_sfree(pImpl->symbolicDecomposition);
-    pImpl->symbolicDecomposition = nullptr;
+  if (pImpl_->symbolicDecomposition->lnz < 0) {
+    cs_sfree(pImpl_->symbolicDecomposition);
+    pImpl_->symbolicDecomposition = nullptr;
   }
-  return pImpl->symbolicDecomposition != nullptr;
+  return pImpl_->symbolicDecomposition != nullptr;
 }
 
 int CSparse::choleskyNz() const {
-  if (pImpl->symbolicDecomposition) return pImpl->symbolicDecomposition->lnz;
+  if (pImpl_->symbolicDecomposition) return pImpl_->symbolicDecomposition->lnz;
   return -1;
 }
 
 bool CSparse::factorize() {
-  pImpl->prepareWorkspace();
+  pImpl_->prepareWorkspace();
   freeFactor();
-  pImpl->numericCholesky = csparse_extension::cs_chol_workspace(
-      &pImpl->ccsA, pImpl->symbolicDecomposition, pImpl->csIntWorkspace,
-      pImpl->csWorkspace);
+  pImpl_->numericCholesky = csparse_extension::cs_chol_workspace(
+      &pImpl_->ccsA, pImpl_->symbolicDecomposition, pImpl_->csIntWorkspace,
+      pImpl_->csWorkspace);
 
-  return pImpl->numericCholesky != nullptr;
+  return pImpl_->numericCholesky != nullptr;
 }
 
 bool CSparse::hasSymbolic() const {
-  return pImpl->symbolicDecomposition != nullptr;
+  return pImpl_->symbolicDecomposition != nullptr;
 }
 
 void CSparse::freeSymbolic() {
-  if (pImpl->symbolicDecomposition != nullptr) {
-    cs_sfree(pImpl->symbolicDecomposition);
-    pImpl->symbolicDecomposition = nullptr;
+  if (pImpl_->symbolicDecomposition != nullptr) {
+    cs_sfree(pImpl_->symbolicDecomposition);
+    pImpl_->symbolicDecomposition = nullptr;
   }
 }
 
 bool CSparse::writeSparse(const std::string& filename) const {
-  return csparse_extension::writeCs2Octave(filename.c_str(), &pImpl->ccsA,
+  return csparse_extension::writeCs2Octave(filename.c_str(), &pImpl_->ccsA,
                                            true);
 }
 
