@@ -89,7 +89,7 @@ class LinearSolverCSparse : public LinearSolverCCS<MatrixType> {
     // perform symbolic cholesky once
     if (!hasSymbolic) {
       computeSymbolicDecomposition(A);
-      assert(csparse.hasSymbolic() && "Symbolic cholesky failed");
+      assert(csparse_.hasSymbolic() && "Symbolic cholesky failed");
     }
   }
 
@@ -111,7 +111,7 @@ class LinearSolverCSparse : public LinearSolverCCS<MatrixType> {
 
       // AMD ordering on the block structure
       VectorXI blockPermutation;
-      csparse_.amd(auxBlock, blockPermutation);
+      g2o::csparse::CSparse::amd(auxBlock, blockPermutation);
 
       // blow up the permutation to the scalar matrix
       VectorXI scalarPermutation;

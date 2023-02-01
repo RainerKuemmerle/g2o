@@ -167,7 +167,7 @@ class LinearSolverCholmod : public LinearSolverCCS<MatrixType> {
 
     if (!hasFactor) {
       computeSymbolicDecomposition(A);
-      assert(_cholmod.hasFactor() && "Symbolic cholesky failed");
+      assert(cholmod_.hasFactor() && "Symbolic cholesky failed");
     }
 
     t = get_monotonic_time();
