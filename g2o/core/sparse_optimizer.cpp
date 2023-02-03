@@ -560,8 +560,12 @@ void SparseOptimizer::discardTop(SparseOptimizer::VertexContainer& vlist) {
 void SparseOptimizer::setVerbose(bool verbose) { _verbose = verbose; }
 
 void SparseOptimizer::setAlgorithm(OptimizationAlgorithm* algorithm) {
-  if (_algorithm)  // reset the optimizer for the formerly used solver
+  if (_algorithm) {
+    // reset the optimizer for the formerly used solver in case release() won't
+    // delete it
     _algorithm->setOptimizer(nullptr);
+    release(_algorithm);
+  }
 
   _algorithm = algorithm;
 
