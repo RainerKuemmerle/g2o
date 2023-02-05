@@ -150,7 +150,7 @@ endif()
 
 # Eigen library parallelise itself, though, presumably due to performance issues
 # OPENMP is experimental. We experienced some slowdown with it
-set(G2O_USE_OPENMP OFF CACHE BOOL "Build g2o with OpenMP support (EXPERIMENTAL)")
+option(G2O_USE_OPENMP "Build g2o with OpenMP support (EXPERIMENTAL)" OFF)
 if(G2O_USE_OPENMP)
   find_package(OpenMP)
   if(OPENMP_FOUND)
@@ -167,7 +167,7 @@ set(OpenGL_GL_PREFERENCE "GLVND")
 find_package(OpenGL)
 
 # If OpenGL was found, use the import target if available. If not, use old-style includes
-set(G2O_USE_OPENGL ON CACHE BOOL "Build g2o with OpenGL support for visualization")
+option(G2O_USE_OPENGL "Build g2o with OpenGL support for visualization" ON)
 if (OPENGL_FOUND AND G2O_USE_OPENGL)
   if (TARGET OpenGL::GL)
     set(G2O_OPENGL_TARGET "OpenGL::GL;OpenGL::GLU")
@@ -187,10 +187,10 @@ find_package(QGLViewer)
 # granularity and dependency in the types supported.
 
 # 2D types
-set(G2O_BUILD_SLAM2D_TYPES ON CACHE BOOL "Build SLAM2D types")
-set(G2O_BUILD_SLAM2D_ADDON_TYPES ON CACHE BOOL "Build SLAM2D addon types")
-set(G2O_BUILD_DATA_TYPES ON CACHE BOOL "Build SLAM2D data types")
-set(G2O_BUILD_SCLAM2D_TYPES ON CACHE BOOL "Build SCLAM2D types")
+option(G2O_BUILD_SLAM2D_TYPES "Build SLAM2D types" ON)
+option(G2O_BUILD_SLAM2D_ADDON_TYPES "Build SLAM2D addon types" ON)
+option(G2O_BUILD_DATA_TYPES "Build SLAM2D data types" ON)
+option(G2O_BUILD_SCLAM2D_TYPES "Build SCLAM2D types" ON)
 
 # Process the arguments. If G2O_BUILD_SLAM2D_TYPES is disabled, forceably
 # disable all types. Otherwise, update messages on the types enabled.
@@ -213,11 +213,11 @@ else()
 endif()
 
 # 3D types
-set(G2O_BUILD_SLAM3D_TYPES ON CACHE BOOL "Build SLAM 3D types")
-set(G2O_BUILD_SLAM3D_ADDON_TYPES ON CACHE BOOL "Build SLAM 3D addon types")
-set(G2O_BUILD_SBA_TYPES ON CACHE BOOL "Build SLAM3D SBA types")
-set(G2O_BUILD_ICP_TYPES ON CACHE BOOL "Build SLAM3D ICP types")
-set(G2O_BUILD_SIM3_TYPES ON CACHE BOOL "Build SLAM3D sim3 types")
+option(G2O_BUILD_SLAM3D_TYPES "Build SLAM 3D types" ON)
+option(G2O_BUILD_SLAM3D_ADDON_TYPES "Build SLAM 3D addon types" ON)
+option(G2O_BUILD_SBA_TYPES "Build SLAM3D SBA types" ON)
+option(G2O_BUILD_ICP_TYPES "Build SLAM3D ICP types" ON)
+option(G2O_BUILD_SIM3_TYPES "Build SLAM3D sim3 types" ON)
 
 # Process the arguments. If G2O_BUILD_SLAM3D_TYPES is disabled, forceably
 # disable all the types. Enable SBA if it's not enabled but one of it's
@@ -261,7 +261,7 @@ else()
 endif()
 
 # shall we build the core apps using the library
-set(G2O_BUILD_APPS ON CACHE BOOL "Build g2o apps")
+option(G2O_BUILD_APPS "Build g2o apps" ON)
 if(G2O_BUILD_APPS)
   message(STATUS "Compiling g2o apps")
 endif(G2O_BUILD_APPS)
@@ -271,7 +271,7 @@ CMAKE_DEPENDENT_OPTION(G2O_BUILD_LINKED_APPS "Build apps linked with the librari
   "G2O_BUILD_APPS" OFF)
 
 # shall we build the examples
-set(G2O_BUILD_EXAMPLES ON CACHE BOOL "Build g2o examples")
+option(G2O_BUILD_EXAMPLES "Build g2o examples" ON)
 if(G2O_BUILD_EXAMPLES)
   message(STATUS "Compiling g2o examples")
 endif(G2O_BUILD_EXAMPLES)
@@ -299,7 +299,7 @@ macro(DEFINE_SSE_VAR  _setname)
 		endif()
 	else (DO_SSE_AUTODETECT)
 		# Manual:
-		set("DISABLE_${_setname}" OFF CACHE BOOL "Forces compilation WITHOUT ${_setname} extensions")
+		option("DISABLE_${_setname}" "Forces compilation WITHOUT ${_setname} extensions" OFF)
 		mark_as_advanced("DISABLE_${_setname}")
 		set(CMAKE_G2O_HAS_${_setname} 0)
 		if (NOT DISABLE_${_setname})
