@@ -12,18 +12,25 @@ set(LIB_PREFIX g2o_)
 set(g2o_C_FLAGS)
 set(g2o_CXX_FLAGS)
 
-# default built type
-if(NOT CMAKE_BUILD_TYPE)
-  set(CMAKE_BUILD_TYPE Release CACHE STRING
-      "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel."
-      FORCE)
-endif(NOT CMAKE_BUILD_TYPE)
+# manually check for top-level project if CMake is older than 3.21
+if(CMAKE_VERSION VERSION_LESS 3.21)
+  string(COMPARE EQUAL "${CMAKE_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}" PROJECT_IS_TOP_LEVEL)
+endif()
 
-# postfix, based on type
-set(CMAKE_DEBUG_POSTFIX "_d" CACHE STRING "postfix applied to debug build of libraries")
-set(CMAKE_RELEASE_POSTFIX "" CACHE STRING "postfix applied to release build of libraries")
-set(CMAKE_RELWITHDEBINFO_POSTFIX "_rd" CACHE STRING "postfix applied to release-with-debug-information libraries")
-set(CMAKE_MINSIZEREL_POSTFIX "_s" CACHE STRING "postfix applied to minimum-size-build libraries")
+if(PROJECT_IS_TOP_LEVEL)
+  # default built type
+  if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Release CACHE STRING
+            "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel."
+            FORCE)
+  endif()
+
+  # postfix, based on type
+  set(CMAKE_DEBUG_POSTFIX "_d" CACHE STRING "postfix applied to debug build of libraries")
+  set(CMAKE_RELEASE_POSTFIX "" CACHE STRING "postfix applied to release build of libraries")
+  set(CMAKE_RELWITHDEBINFO_POSTFIX "_rd" CACHE STRING "postfix applied to release-with-debug-information libraries")
+  set(CMAKE_MINSIZEREL_POSTFIX "_s" CACHE STRING "postfix applied to minimum-size-build libraries")
+endif()
 
 # work out the postfix; required where we use OUTPUT_NAME
 if(CMAKE_BUILD_TYPE MATCHES Release)
