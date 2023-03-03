@@ -67,7 +67,8 @@ TEST_F(PropertyTest, UpdatePropertyFromString) {
 TEST_F(PropertyTest, UpdateMapFromString) {
   auto intProperty = propertyMap_.getProperty<g2o::IntProperty>("int");
   auto stringProperty = propertyMap_.getProperty<g2o::StringProperty>("string");
-  const bool updated = propertyMap_.updateMapFromString("int=21,string=updated");
+  const bool updated =
+      propertyMap_.updateMapFromString("int=21,string=updated");
   EXPECT_TRUE(updated);
   EXPECT_EQ(intProperty->value(), 21);
   EXPECT_EQ(stringProperty->value(), "updated");

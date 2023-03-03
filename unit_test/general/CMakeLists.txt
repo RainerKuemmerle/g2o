@@ -1,5 +1,6 @@
 add_executable(unittest_general
   auto_diff.cpp
+  batch_statistics.cpp
   graph_operations.cpp
   clear_and_redo.cpp
   base_fixed_sized_edge.cpp

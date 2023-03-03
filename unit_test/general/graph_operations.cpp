@@ -31,6 +31,7 @@
 #include <numeric>
 
 #include "g2o/core/factory.h"
+#include "g2o/core/hyper_graph.h"
 #include "g2o/core/optimization_algorithm_property.h"
 #include "g2o/core/sparse_optimizer.h"
 #include "g2o/stuff/string_tools.h"
@@ -56,6 +57,9 @@ TEST(General, GraphAddVertex) {
   ASSERT_FALSE(optimizer->addVertex(v1));
   ASSERT_EQ(size_t(1), optimizer->vertices().size());
 
+  auto v1_from_optimizer = optimizer->vertex(0);
+  ASSERT_EQ(v1.get(), v1_from_optimizer.get());
+
   {
     auto v2 = std::make_shared<g2o::VertexSE2>();
     v2->setId(0);
@@ -65,7 +69,8 @@ TEST(General, GraphAddVertex) {
   }
 
   // removing vertex
-  ASSERT_TRUE(optimizer->removeVertex(v1));
+  const bool removed = optimizer->removeVertex(v1, true);
+  ASSERT_TRUE(removed);
   ASSERT_EQ(nullptr, v1->graph());
   ASSERT_THAT(optimizer->vertices(), testing::SizeIs(0));
 }
@@ -105,6 +110,10 @@ TEST(General, GraphAddEdge) {
   ASSERT_FALSE(optimizer->addEdge(e3))
       << "Adding binary edge with same vertices was possible";
   ASSERT_EQ(size_t(1), optimizer->edges().size());
+
+  const bool removed = optimizer->removeEdge(e1);
+  ASSERT_TRUE(removed);
+  ASSERT_TRUE(optimizer->edges().empty());
 }
 
 TEST(General, GraphAddVertexAndClear) {
@@ -125,6 +134,30 @@ TEST(General, GraphAddVertexAndClear) {
   ASSERT_TRUE(otherOptimizer->addVertex(v1));
   ASSERT_EQ(v1->graph(), otherOptimizer.get());
   ASSERT_THAT(otherOptimizer->vertices(), testing::SizeIs(1));
+}
+
+TEST(General, GraphChangeId) {
+  std::unique_ptr<g2o::SparseOptimizer> optimizer(
+      g2o::internal::createOptimizerForTests());
+
+  auto v1 = std::make_shared<g2o::VertexSE2>();
+  v1->setId(0);
+  auto v2 = std::make_shared<g2o::VertexSE2>();
+  v2->setId(1);
+  optimizer->addVertex(v1);
+
+  EXPECT_EQ(v1->id(), 0);
+  auto aux = std::static_pointer_cast<g2o::HyperGraph::Vertex>(v1);
+  const bool changed_id = optimizer->changeId(aux, 42);
+  EXPECT_TRUE(changed_id);
+  EXPECT_EQ(v1->id(), 42);
+
+  EXPECT_EQ(v2->id(), 1);
+  aux = std::static_pointer_cast<g2o::HyperGraph::Vertex>(v2);
+
+  const bool not_changed = optimizer->changeId(aux, 17);
+  EXPECT_FALSE(not_changed);
+  EXPECT_EQ(v2->id(), 1);
 }
 
 /**
