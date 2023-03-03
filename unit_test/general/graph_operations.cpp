@@ -24,6 +24,7 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+#include <memory>
 #include <numeric>
 
 #include "allocate_optimizer.h"
@@ -54,6 +55,9 @@ TEST(General, GraphAddVertex) {
   ASSERT_FALSE(optimizer->addVertex(v1));
   ASSERT_EQ(size_t(1), optimizer->vertices().size());
 
+  auto* v1_from_optimizer = optimizer->vertex(0);
+  ASSERT_EQ(v1, v1_from_optimizer);
+
   {
     g2o::VertexSE2* v2 = new g2o::VertexSE2();
     v2->setId(0);
@@ -62,6 +66,10 @@ TEST(General, GraphAddVertex) {
     ASSERT_EQ(nullptr, v2->graph());
     delete v2;
   }
+
+  const bool removed = optimizer->removeVertex(v1, true);
+  ASSERT_TRUE(removed);
+  ASSERT_TRUE(optimizer->vertices().empty());
 
   delete optimizer;
 }
@@ -102,9 +110,34 @@ TEST(General, GraphAddEdge) {
       << "Adding binary edge with same vertices was possible";
   ASSERT_EQ(size_t(1), optimizer->edges().size());
 
+  const bool removed = optimizer->removeEdge(e1);
+  ASSERT_TRUE(removed);
+  ASSERT_TRUE(optimizer->edges().empty());
+
   delete e2;
   delete e3;
   delete optimizer;
+}
+
+TEST(General, GraphChangeId) {
+  std::unique_ptr<g2o::SparseOptimizer> optimizer(
+      g2o::internal::createOptimizerForTests());
+
+  g2o::VertexSE2* v1 = new g2o::VertexSE2();
+  v1->setId(0);
+  g2o::VertexSE2 v2;
+  v2.setId(1);
+  optimizer->addVertex(v1);
+
+  EXPECT_EQ(v1->id(), 0);
+  const bool changed_id = optimizer->changeId(v1, 42);
+  EXPECT_TRUE(changed_id);
+  EXPECT_EQ(v1->id(), 42);
+
+  EXPECT_EQ(v2.id(), 1);
+  const bool not_changed = optimizer->changeId(&v2, 17);
+  EXPECT_FALSE(not_changed);
+  EXPECT_EQ(v2.id(), 1);
 }
 
 /**
