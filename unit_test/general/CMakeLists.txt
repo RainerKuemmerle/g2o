@@ -1,6 +1,7 @@
 add_executable(unittest_general
   allocate_optimizer.cpp allocate_optimizer.h
   auto_diff.cpp
+  batch_statistics.cpp
   graph_operations.cpp
   clear_and_redo.cpp
   base_fixed_sized_edge.cpp
