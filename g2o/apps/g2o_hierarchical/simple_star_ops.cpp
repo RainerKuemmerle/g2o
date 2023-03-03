@@ -112,7 +112,6 @@ void assignHierarchicalEdges(StarSet& stars, EdgeStarMap& esmap,
                              SparseOptimizer* optimizer, int minNumEdges,
                              int maxIterations) {
   // now construct the hierarchical edges for all the stars
-  int starNum = 0;
   for (StarSet::iterator it = stars.begin(); it != stars.end(); ++it) {
     Star* s = *it;
     std::vector<OptimizableGraph::Vertex*> vertices(2);
@@ -148,8 +147,8 @@ void assignHierarchicalEdges(StarSet& stars, EdgeStarMap& esmap,
     s->lowLevelVertices() = vNew;
 
     bool labelOk = s->labelStarEdges(maxIterations, labeler);
+    assert(labelOk);
     (void)labelOk;
-    starNum++;
   }
 }
 
@@ -407,7 +406,7 @@ void computeSimpleStars(StarSet& stars, SparseOptimizer* optimizer,
 
     if (debug) {
       char starLowName[100];
-      sprintf(starLowName, "star-%04d-low.g2o", starNum);
+      snprintf(starLowName, 99, "star-%04d-low.g2o", starNum);
       ofstream starLowStream(starLowName);
       optimizer->saveSubset(starLowStream, s->_lowLevelEdges);
     }
@@ -417,7 +416,7 @@ void computeSimpleStars(StarSet& stars, SparseOptimizer* optimizer,
     if (labelOk) {
       if (debug) {
         char starHighName[100];
-        sprintf(starHighName, "star-%04d-high.g2o", starNum);
+        snprintf(starHighName, 99, "star-%04d-high.g2o", starNum);
         ofstream starHighStream(starHighName);
         optimizer->saveSubset(starHighStream, s->_starEdges);
       }
