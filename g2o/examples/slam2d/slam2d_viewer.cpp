@@ -189,7 +189,7 @@ void Slam2DViewer::init() {
   // mouse bindings
 #ifdef QGLVIEWER_DEPRECATED_MOUSEBINDING
   setMouseBinding(Qt::NoModifier, Qt::RightButton, CAMERA, ZOOM);
-  setMouseBinding(Qt::NoModifier, Qt::MidButton, CAMERA, TRANSLATE);
+  setMouseBinding(Qt::NoModifier, Qt::MiddleButton, CAMERA, TRANSLATE);
 #else
   setMouseBinding(Qt::RightButton, CAMERA, ZOOM);
   setMouseBinding(Qt::MidButton, CAMERA, TRANSLATE);
