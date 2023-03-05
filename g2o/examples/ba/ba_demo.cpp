@@ -162,7 +162,6 @@ int main(int argc, const char* argv[]) {
     vertex_id++;
   }
   int point_id = vertex_id;
-  int point_num = 0;
   double sum_diff2 = 0;
 
   cout << endl;
@@ -222,7 +221,6 @@ int main(int argc, const char* argv[]) {
       }
       pointid_2_trueid.insert(make_pair(point_id, i));
       ++point_id;
-      ++point_num;
     }
   }
   cout << endl;
@@ -248,7 +246,6 @@ int main(int argc, const char* argv[]) {
   cout << endl;
   cout << "Point error before optimisation (inliers only): "
        << sqrt(sum_diff2 / inliers.size()) << endl;
-  point_num = 0;
   sum_diff2 = 0;
   for (unordered_map<int, int>::iterator it = pointid_2_trueid.begin();
        it != pointid_2_trueid.end(); ++it) {
@@ -266,7 +263,6 @@ int main(int argc, const char* argv[]) {
     Vector3d diff = v_p->estimate() - true_points[it->second];
     if (inliers.find(it->first) == inliers.end()) continue;
     sum_diff2 += diff.dot(diff);
-    ++point_num;
   }
   cout << "Point error after optimisation (inliers only): "
        << sqrt(sum_diff2 / inliers.size()) << endl;
