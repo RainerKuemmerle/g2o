@@ -56,8 +56,8 @@ int main(int argc, char** argv) {
 
   // variable-size block solver
   g2o::OptimizationAlgorithmLevenberg* solver =
-      new g2o::OptimizationAlgorithmLevenberg(g2o::make_unique<BlockSolverX>(
-          g2o::make_unique<
+      new g2o::OptimizationAlgorithmLevenberg(std::make_unique<BlockSolverX>(
+          std::make_unique<
               LinearSolverEigen<g2o::BlockSolverX::PoseMatrixType>>()));
 
   optimizer.setAlgorithm(solver);

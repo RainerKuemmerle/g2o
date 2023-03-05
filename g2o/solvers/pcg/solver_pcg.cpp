@@ -40,8 +40,8 @@ template <int p, int l>
 std::unique_ptr<g2o::Solver> AllocateSolver() {
   std::cerr << "# Using PCG poseDim " << p << " landMarkDim " << l << std::endl;
 
-  return g2o::make_unique<BlockSolverPL<p, l>>(
-      g2o::make_unique<
+  return std::make_unique<BlockSolverPL<p, l>>(
+      std::make_unique<
           LinearSolverPCG<typename BlockSolverPL<p, l>::PoseMatrixType>>());
 }
 }  // namespace

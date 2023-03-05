@@ -62,24 +62,24 @@ void BlockSolver<Traits>::resize(int* blockPoseIndices, int numPoseBlocks,
     _bschur.reset(allocate_aligned<number_t>(_sizePoses));
   }
 
-  _Hpp = g2o::make_unique<PoseHessianType>(blockPoseIndices, blockPoseIndices,
+  _Hpp = std::make_unique<PoseHessianType>(blockPoseIndices, blockPoseIndices,
                                            numPoseBlocks, numPoseBlocks);
   if (_doSchur) {
-    _Hschur = g2o::make_unique<PoseHessianType>(
+    _Hschur = std::make_unique<PoseHessianType>(
         blockPoseIndices, blockPoseIndices, numPoseBlocks, numPoseBlocks);
-    _Hll = g2o::make_unique<LandmarkHessianType>(
+    _Hll = std::make_unique<LandmarkHessianType>(
         blockLandmarkIndices, blockLandmarkIndices, numLandmarkBlocks,
         numLandmarkBlocks);
     _DInvSchur =
-        g2o::make_unique<SparseBlockMatrixDiagonal<LandmarkMatrixType>>(
+        std::make_unique<SparseBlockMatrixDiagonal<LandmarkMatrixType>>(
             _Hll->colBlockIndices());
-    _Hpl = g2o::make_unique<PoseLandmarkHessianType>(
+    _Hpl = std::make_unique<PoseLandmarkHessianType>(
         blockPoseIndices, blockLandmarkIndices, numPoseBlocks,
         numLandmarkBlocks);
-    _HplCCS = g2o::make_unique<SparseBlockMatrixCCS<PoseLandmarkMatrixType>>(
+    _HplCCS = std::make_unique<SparseBlockMatrixCCS<PoseLandmarkMatrixType>>(
         _Hpl->rowBlockIndices(), _Hpl->colBlockIndices());
     _HschurTransposedCCS =
-        g2o::make_unique<SparseBlockMatrixCCS<PoseMatrixType>>(
+        std::make_unique<SparseBlockMatrixCCS<PoseMatrixType>>(
             _Hschur->colBlockIndices(), _Hschur->rowBlockIndices());
 #ifdef G2O_OPENMP
     _coefficientsMutex.resize(numPoseBlocks);

@@ -133,8 +133,8 @@ int main(int argc, const char* argv[]) {
         g2o::LinearSolverEigen<g2o::BlockSolver_6_3::PoseMatrixType>;
 #endif
     solver = new g2o::OptimizationAlgorithmLevenberg(
-        g2o::make_unique<g2o::BlockSolver_6_3>(
-            g2o::make_unique<LinearSolver>()));
+        std::make_unique<g2o::BlockSolver_6_3>(
+            std::make_unique<LinearSolver>()));
   } else {
 #ifdef G2O_HAVE_CHOLMOD
     using LinearSolver =
@@ -144,7 +144,7 @@ int main(int argc, const char* argv[]) {
         g2o::LinearSolverEigen<g2o::BlockSolverX::PoseMatrixType>;
 #endif
     solver = new g2o::OptimizationAlgorithmLevenberg(
-        g2o::make_unique<g2o::BlockSolverX>(g2o::make_unique<LinearSolver>()));
+        std::make_unique<g2o::BlockSolverX>(std::make_unique<LinearSolver>()));
   }
 
   optimizer.setAlgorithm(solver);
