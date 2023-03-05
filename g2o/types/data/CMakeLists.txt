@@ -19,6 +19,7 @@ if (APPLE)
 endif()
 
 
+target_compile_features(types_data PUBLIC cxx_std_17)
 target_link_libraries(types_data core types_slam2d)
 if(G2O_HAVE_OPENGL)
   target_link_libraries(types_data freeglut_minimal opengl_helper)

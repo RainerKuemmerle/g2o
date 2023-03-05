@@ -58,7 +58,7 @@ else()
   find_package(Ceres REQUIRED)
   target_link_libraries(core PUBLIC ceres)
 endif()
-target_compile_features(core PUBLIC cxx_std_14)
+target_compile_features(core PUBLIC cxx_std_17)
 
 if (APPLE)
   set_target_properties(core PROPERTIES INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")

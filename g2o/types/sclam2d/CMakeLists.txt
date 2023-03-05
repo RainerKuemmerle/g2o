@@ -14,6 +14,7 @@ set_target_properties(types_sclam2d PROPERTIES
 if (APPLE)
   set_target_properties(types_sclam2d PROPERTIES INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
 endif()
+target_compile_features(types_sclam2d PUBLIC cxx_std_17)
 target_link_libraries(types_sclam2d types_slam2d core)
 if(G2O_HAVE_OPENGL)
   target_link_libraries(types_sclam2d opengl_helper)

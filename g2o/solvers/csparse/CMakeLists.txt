@@ -39,6 +39,7 @@ target_include_directories(solver_csparse PUBLIC
   $<BUILD_INTERFACE:${CSPARSE_INCLUDE_DIR}>
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
   $<INSTALL_INTERFACE:include/g2o/solvers/csparse>)
+target_compile_features(solver_csparse PUBLIC cxx_std_17)
 target_link_libraries(solver_csparse
   PUBLIC csparse_extension
   PUBLIC core)
