@@ -44,8 +44,7 @@ namespace g2o {
  */
 class G2O_TYPES_DATA_API RawLaser : public RobotData {
  public:
-  typedef std::vector<Vector2, Eigen::aligned_allocator<Vector2> >
-      Point2DVector;
+  using Point2DVector = std::vector<Vector2>;
 
  public:
   RawLaser();

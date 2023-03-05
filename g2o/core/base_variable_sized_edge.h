@@ -102,7 +102,7 @@ class BaseVariableSizedEdge : public BaseEdge<D, E> {
   using BaseEdge<D, E>::_dimension;
 
   std::vector<HessianHelper> _hessian;
-  std::vector<JacobianType, Eigen::aligned_allocator<JacobianType> >
+  std::vector<JacobianType>
       _jacobianOplus;  ///< jacobians of the edge (w.r.t. oplus)
 
   void computeQuadraticForm(const InformationType& omega,

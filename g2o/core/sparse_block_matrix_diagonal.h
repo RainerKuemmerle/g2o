@@ -53,8 +53,7 @@ class SparseBlockMatrixDiagonal {
   //! rows of the matrix
   int rows() const { return _blockIndices.size() ? _blockIndices.back() : 0; }
 
-  typedef std::vector<MatrixType, Eigen::aligned_allocator<MatrixType> >
-      DiagonalVector;
+  using DiagonalVector = std::vector<MatrixType>;
 
   SparseBlockMatrixDiagonal(const std::vector<int>& blockIndices)
       : _blockIndices(blockIndices) {}

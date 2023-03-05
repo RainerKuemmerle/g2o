@@ -162,8 +162,7 @@ bool EdgeLabeler::labelEdge(const SparseBlockMatrix<MatrixXd>& spinv,
   // now cov contains the aggregate marginals of the state variables in the edge
   VectorXd incMean(maxDim);
   incMean.fill(0);
-  std::vector<MySigmaPoint, Eigen::aligned_allocator<MySigmaPoint> >
-      incrementPoints;
+  std::vector<MySigmaPoint> incrementPoints;
   if (!sampleUnscented(incrementPoints, incMean, cov)) {
     cerr << "sampleUnscented fail" << endl;
     return false;
@@ -178,8 +177,7 @@ bool EdgeLabeler::labelEdge(const SparseBlockMatrix<MatrixXd>& spinv,
   assert(smss && "Edge::setMeasurementFromState() not implemented");
 
   // std::vector<MySigmaPoint> globalPoints(incrementPoints.size());
-  std::vector<MySigmaPoint, Eigen::aligned_allocator<MySigmaPoint> >
-      errorPoints(incrementPoints.size());
+  std::vector<MySigmaPoint> errorPoints(incrementPoints.size());
 
   // for each sigma point, project it to the global space, by considering those
   // variables that are involved

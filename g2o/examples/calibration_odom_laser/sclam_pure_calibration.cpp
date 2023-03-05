@@ -155,8 +155,7 @@ int main(int argc, char** argv) {
   }
 
   // adding the measurements
-  vector<MotionInformation, Eigen::aligned_allocator<MotionInformation> >
-      motions;
+  vector<MotionInformation> motions;
   {
     std::map<double, RobotData*>::const_iterator it =
         robotLaserQueue.buffer().begin();
@@ -346,9 +345,9 @@ int main(int argc, char** argv) {
         // apply calibration
         VelocityMeasurement calibratedVelocityMeasurement = velocityMeasurement;
         calibratedVelocityMeasurement.setVl(odomCalib(0) *
-                                           calibratedVelocityMeasurement.vl());
+                                            calibratedVelocityMeasurement.vl());
         calibratedVelocityMeasurement.setVr(odomCalib(1) *
-                                           calibratedVelocityMeasurement.vr());
+                                            calibratedVelocityMeasurement.vr());
         MotionMeasurement mm = OdomConvert::convertToMotion(
             calibratedVelocityMeasurement, odomCalib(2));
 

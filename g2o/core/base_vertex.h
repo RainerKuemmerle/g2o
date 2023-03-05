@@ -49,21 +49,18 @@ namespace g2o {
 template <int D, typename T>
 class BaseVertex : public OptimizableGraph::Vertex {
  public:
-  typedef T EstimateType;
-  typedef std::stack<
-      EstimateType,
-      std::vector<EstimateType, Eigen::aligned_allocator<EstimateType> > >
-      BackupStackType;
+  using EstimateType = T;
+  using BackupStackType = std::stack<EstimateType, std::vector<EstimateType> >;
 
   static const int Dimension =
       D;  ///< dimension of the estimate (minimal) in the manifold space
 
-  typedef Eigen::Map<Eigen::Matrix<number_t, D, D, Eigen::ColMajor>,
-                     Eigen::Matrix<number_t, D, D, Eigen::ColMajor>::Flags &
-                             Eigen::PacketAccessBit
-                         ? Eigen::Aligned
-                         : Eigen::Unaligned>
-      HessianBlockType;
+  using HessianBlockType =
+      Eigen::Map<Eigen::Matrix<number_t, D, D, Eigen::ColMajor>,
+                 Eigen::Matrix<number_t, D, D, Eigen::ColMajor>::Flags &
+                         Eigen::PacketAccessBit
+                     ? Eigen::Aligned
+                     : Eigen::Unaligned>;
 
  public:
   BaseVertex();
