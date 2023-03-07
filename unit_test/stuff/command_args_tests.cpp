@@ -124,3 +124,25 @@ TEST_F(CommandArgsTest, ParseValues) {
   EXPECT_EQ(valueString, "summary.txt");
   EXPECT_EQ(valueStringLeftOverOptional, "optional.txt");
 }
+
+namespace {
+class CommandArgsTestAdapter : public g2o::CommandArgs {
+ public:
+  using g2o::CommandArgs::type2str;
+};
+}  // namespace
+
+class CommandArgsTypeToStr : public testing::TestWithParam<int> {
+ protected:
+  CommandArgsTestAdapter command_args;
+};
+
+TEST_P(CommandArgsTypeToStr, type2str) {
+  const int type = GetParam();
+  const std::string type_str = command_args.type2str(type);
+  EXPECT_FALSE(type_str.empty());
+}
+
+INSTANTIATE_TEST_SUITE_P(CommandArgsTest, CommandArgsTypeToStr,
+                         testing::Range(0, 7),
+                         testing::PrintToStringParamName());
