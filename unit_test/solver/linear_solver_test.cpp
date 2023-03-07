@@ -28,6 +28,7 @@
 #include "g2o/config.h"
 // clang-format on
 
+#include "g2o/solvers/dense/linear_solver_dense.h"
 #include "g2o/solvers/eigen/linear_solver_eigen.h"
 #ifdef G2O_HAVE_CSPARSE
 #include "g2o/solvers/csparse/linear_solver_csparse.h"
@@ -38,13 +39,28 @@
 #include "gtest/gtest.h"
 #include "sparse_system_helper.h"
 
+namespace {
 struct BlockOrdering {
-  static constexpr bool kBlockOrdering = true;
+  template <typename T>
+  void setOrdering(T& solver) {
+    solver.setBlockOrdering(true);
+  }
 };
 
 struct NoBlockOrdering {
-  static constexpr bool kBlockOrdering = false;
+  template <typename T>
+  void setOrdering(T& solver) {
+    solver.setBlockOrdering(false);
+  }
 };
+
+struct NoooOrdering {
+  template <typename T>
+  void setOrdering(T& solver) {
+    (void)solver;
+  }
+};
+}  // namespace
 
 /**
  * Type parameterized class for a fixture to setup a linear solver along with
@@ -62,6 +78,7 @@ class LS : public testing::Test {
 
  protected:
   std::unique_ptr<LinearSolverType> linearsolver_;
+  OrderingType ordering_;
   g2o::SparseBlockMatrixX sparse_matrix_;
   g2o::MatrixX matrix_inverse_ = g2o::internal::createTestMatrixInverse();
   g2o::VectorX x_vector_ = g2o::internal::createTestVectorX();
@@ -70,7 +87,7 @@ class LS : public testing::Test {
 TYPED_TEST_SUITE_P(LS);
 
 TYPED_TEST_P(LS, Solve) {
-  this->linearsolver_->setBlockOrdering(TypeParam::second_type::kBlockOrdering);
+  this->ordering_.setOrdering(*this->linearsolver_);
 
   g2o::VectorX solver_solution;
   for (int solve_iter = 0; solve_iter < 2; ++solve_iter) {
@@ -84,7 +101,7 @@ TYPED_TEST_P(LS, Solve) {
 }
 
 TYPED_TEST_P(LS, SolvePattern) {
-  this->linearsolver_->setBlockOrdering(TypeParam::second_type::kBlockOrdering);
+  this->ordering_.setOrdering(*this->linearsolver_);
 
   g2o::SparseBlockMatrixX spinv;
   std::vector<std::pair<int, int> > blockIndices;
@@ -120,7 +137,7 @@ TYPED_TEST_P(LS, SolvePattern) {
 }
 
 TYPED_TEST_P(LS, SolveBlocks) {
-  this->linearsolver_->setBlockOrdering(TypeParam::second_type::kBlockOrdering);
+  this->ordering_.setOrdering(*this->linearsolver_);
 
   number_t** blocks = nullptr;
   bool state = this->linearsolver_->solveBlocks(blocks, this->sparse_matrix_);
@@ -161,5 +178,6 @@ using LinearSolverTypes = ::testing::Types<
     std::pair<g2o::LinearSolverCholmod<g2o::MatrixX>, BlockOrdering>,
 #endif
     std::pair<g2o::LinearSolverEigen<g2o::MatrixX>, NoBlockOrdering>,
-    std::pair<g2o::LinearSolverEigen<g2o::MatrixX>, BlockOrdering> >;
+    std::pair<g2o::LinearSolverEigen<g2o::MatrixX>, BlockOrdering>,
+    std::pair<g2o::LinearSolverDense<g2o::MatrixX>, NoooOrdering>>;
 INSTANTIATE_TYPED_TEST_SUITE_P(LinearSolver, LS, LinearSolverTypes);

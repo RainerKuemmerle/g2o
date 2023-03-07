@@ -43,7 +43,7 @@ jobs:
           echo runner.os: ${{runner.os}}
 
       - name: ccache
-        uses: hendrikmuhs/ccache-action@v1
+        uses: hendrikmuhs/ccache-action@v1.2
         with:
           key: ${{ matrix.os }}-${{ matrix.type }}
           max-size: 1000M
@@ -51,8 +51,8 @@ jobs:
       - name: Install dependencies on Ubuntu
         if: runner.os == 'Linux'
         run: |
-          sudo apt-get update
-          sudo apt-get install libeigen3-dev qtdeclarative5-dev qt5-qmake libqglviewer-dev-qt5 libsuitesparse-dev lcov
+          sudo apt update
+          sudo apt install libeigen3-dev qtdeclarative5-dev qt5-qmake libqglviewer-dev-qt5 libsuitesparse-dev lcov
 
       - name: Install dependencies on macOS
         if: runner.os == 'macOS'
