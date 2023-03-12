@@ -38,8 +38,13 @@ if (G2O_BUILD_SLAM3D_TYPES)
 endif()
 
 if(G2O_BUILD_SLAM2D_TYPES AND G2O_BUILD_SLAM3D_TYPES)
-  add_subdirectory(simple_optimize)
+  add_subdirectory(anonymize_observations)
   add_subdirectory(interactive_slam)
+  add_subdirectory(simple_optimize)
+endif()
+
+if(G2O_BUILD_SLAM2D_TYPES AND G2O_BUILD_SLAM2D_ADDON_TYPES AND G2O_BUILD_SLAM3D_TYPES)
+  add_subdirectory(convert_segment_line)
 endif()
 
 if(Qt5_FOUND AND QGLVIEWER_FOUND)

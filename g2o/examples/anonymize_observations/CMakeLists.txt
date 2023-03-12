@@ -1,0 +1,5 @@
+add_executable(g2o_anonymize_observations_application
+  g2o_anonymize_observations.cpp
+)
+target_link_libraries(g2o_anonymize_observations_application types_slam3d types_slam2d core)
+set_target_properties(g2o_anonymize_observations_application PROPERTIES OUTPUT_NAME g2o_anonymize_observations)

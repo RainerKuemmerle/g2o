@@ -16,6 +16,6 @@ add_executable(tutorial_slam2d
   tutorial_slam2d.cpp
 )
 
-set_target_properties(tutorial_slam2d PROPERTIES OUTPUT_NAME tutorial_slam2d${EXE_POSTFIX})
+set_target_properties(tutorial_slam2d PROPERTIES OUTPUT_NAME tutorial_slam2d)
 
 target_link_libraries(tutorial_slam2d tutorial_slam2d_library)

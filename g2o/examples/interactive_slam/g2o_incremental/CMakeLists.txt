@@ -9,7 +9,7 @@ target_link_libraries(g2o_incremental_library g2o_interactive_library solver_cho
 
 add_executable(g2o_incremental_application g2o_incremental.cpp)
 target_link_libraries(g2o_incremental_application g2o_incremental_library)
-set_target_properties(g2o_incremental_application PROPERTIES OUTPUT_NAME g2o_incremental${EXE_POSTFIX})
+set_target_properties(g2o_incremental_application PROPERTIES OUTPUT_NAME g2o_incremental)
 
 install(TARGETS g2o_incremental_library g2o_incremental_application
   RUNTIME DESTINATION ${RUNTIME_DESTINATION}

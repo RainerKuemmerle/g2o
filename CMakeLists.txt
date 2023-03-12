@@ -24,24 +24,7 @@ if(PROJECT_IS_TOP_LEVEL)
             "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel."
             FORCE)
   endif()
-
-  # postfix, based on type
-  set(CMAKE_DEBUG_POSTFIX "_d" CACHE STRING "postfix applied to debug build of libraries")
-  set(CMAKE_RELEASE_POSTFIX "" CACHE STRING "postfix applied to release build of libraries")
-  set(CMAKE_RELWITHDEBINFO_POSTFIX "_rd" CACHE STRING "postfix applied to release-with-debug-information libraries")
-  set(CMAKE_MINSIZEREL_POSTFIX "_s" CACHE STRING "postfix applied to minimum-size-build libraries")
 endif()
-
-# work out the postfix; required where we use OUTPUT_NAME
-if(CMAKE_BUILD_TYPE MATCHES Release)
-  set(EXE_POSTFIX)
-elseif(CMAKE_BUILD_TYPE MATCHES Debug)
-  set(EXE_POSTFIX ${CMAKE_DEBUG_POSTFIX})
-elseif(CMAKE_BUILD_TYPE MATCHES RelWithDebInfo)
-  set(EXE_POSTFIX ${CMAKE_RELWITHDEBINFO_POSTFIX})
-elseif(CMAKE_BUILD_TYPE MATCHES MinSizeRel)
-  set(EXE_POSTFIX ${CMAKE_MINSIZEREL_POSTFIX})
-endif(CMAKE_BUILD_TYPE MATCHES Release)
 
 # Allow the developer to select if Dynamic or Static libraries are built
 option (BUILD_SHARED_LIBS "Build Shared Libraries (preferred and required for the g2o plugin system)" ON)
@@ -68,11 +51,11 @@ if(APPLE)
 endif(APPLE)
 
 # Set the output directory for the build executables and libraries
-set(g2o_RUNTIME_OUTPUT_DIRECTORY ${g2o_SOURCE_DIR}/bin CACHE PATH "Target for the binaries")
+set(g2o_RUNTIME_OUTPUT_DIRECTORY ${g2o_BINARY_DIR}/bin CACHE PATH "Target for the binaries")
 if(WIN32)
-  set(g2o_LIBRARY_OUTPUT_DIRECTORY ${g2o_SOURCE_DIR}/bin CACHE PATH "Target for the libraries")
+  set(g2o_LIBRARY_OUTPUT_DIRECTORY ${g2o_BINARY_DIR}/bin CACHE PATH "Target for the libraries")
 else(WIN32)
-  set(g2o_LIBRARY_OUTPUT_DIRECTORY ${g2o_SOURCE_DIR}/lib CACHE PATH "Target for the libraries")
+  set(g2o_LIBRARY_OUTPUT_DIRECTORY ${g2o_BINARY_DIR}/lib CACHE PATH "Target for the libraries")
 endif(WIN32)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${g2o_LIBRARY_OUTPUT_DIRECTORY})
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${g2o_LIBRARY_OUTPUT_DIRECTORY})
