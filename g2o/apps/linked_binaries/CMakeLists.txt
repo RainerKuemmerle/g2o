@@ -23,7 +23,7 @@ install(TARGETS g2o_cli_application_linked
 )
 
 
-if(QT4_FOUND AND QGLVIEWER_FOUND)
+if(Qt5_FOUND AND QGLVIEWER_FOUND)
   include(${QT_USE_FILE})
   include_directories(${QT_INCLUDES})
 
