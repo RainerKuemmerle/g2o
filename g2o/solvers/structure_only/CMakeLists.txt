@@ -4,6 +4,9 @@ add_library(solver_structure_only ${G2O_LIB_TYPE}
 )
 
 set_target_properties(solver_structure_only PROPERTIES OUTPUT_NAME ${LIB_PREFIX}solver_structure_only)
+set_target_properties(solver_structure_only PROPERTIES
+  VERSION ${G2O_LIB_VERSION}
+  SOVERSION ${G2O_LIB_SOVERSION})
 if (APPLE)
   set_target_properties(solver_structure_only PROPERTIES INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
 endif()

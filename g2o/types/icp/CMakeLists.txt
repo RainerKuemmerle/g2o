@@ -4,6 +4,9 @@ add_library(types_icp ${G2O_LIB_TYPE}
 )
 
 set_target_properties(types_icp PROPERTIES OUTPUT_NAME ${LIB_PREFIX}types_icp)
+set_target_properties(types_icp PROPERTIES
+  VERSION ${G2O_LIB_VERSION}
+  SOVERSION ${G2O_LIB_SOVERSION})
 if (APPLE)
   set_target_properties(types_icp PROPERTIES INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
 endif()

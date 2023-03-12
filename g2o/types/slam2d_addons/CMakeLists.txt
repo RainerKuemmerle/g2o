@@ -13,6 +13,9 @@ add_library(types_slam2d_addons ${G2O_LIB_TYPE}
 )
 
 set_target_properties(types_slam2d_addons PROPERTIES OUTPUT_NAME ${LIB_PREFIX}types_slam2d_addons)
+set_target_properties(types_slam2d_addons PROPERTIES
+  VERSION ${G2O_LIB_VERSION}
+  SOVERSION ${G2O_LIB_SOVERSION})
 if (APPLE)
   set_target_properties(types_slam2d_addons PROPERTIES INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
 endif()

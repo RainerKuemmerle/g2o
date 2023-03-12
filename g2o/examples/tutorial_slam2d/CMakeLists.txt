@@ -9,6 +9,9 @@ add_library(tutorial_slam2d_library ${G2O_LIB_TYPE}
 )
 
 set_target_properties(tutorial_slam2d_library PROPERTIES OUTPUT_NAME ${LIB_PREFIX}tutorial_slam2d)
+set_target_properties(tutorial_slam2d_library PROPERTIES
+  VERSION ${G2O_LIB_VERSION}
+  SOVERSION ${G2O_LIB_SOVERSION})
 
 target_link_libraries(tutorial_slam2d_library core solver_eigen)
 

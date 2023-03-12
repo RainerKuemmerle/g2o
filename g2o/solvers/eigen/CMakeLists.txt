@@ -3,6 +3,9 @@ add_library(solver_eigen ${G2O_LIB_TYPE}
   linear_solver_eigen.h
 )
 set_target_properties(solver_eigen PROPERTIES OUTPUT_NAME ${LIB_PREFIX}solver_eigen)
+set_target_properties(solver_eigen PROPERTIES
+  VERSION ${G2O_LIB_VERSION}
+  SOVERSION ${G2O_LIB_SOVERSION})
 if (APPLE)
   set_target_properties(solver_eigen PROPERTIES INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
 endif()
