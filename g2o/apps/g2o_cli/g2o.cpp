@@ -133,9 +133,9 @@ int main(int argc, char** argv) {
   arg.param("i", maxIterations, 5,
             "perform n iterations, if negative consider the gain");
   arg.param("gain", gain, 1e-6,
-            "the gain used to stop optimization (default = 1e-6)");
+            "the gain used to stop optimization");
   arg.param("ig", maxIterationsWithGain, std::numeric_limits<int>::max(),
-            "Maximum number of iterations with gain enabled (default: inf)");
+            "Maximum number of iterations with gain enabled");
   arg.param("v", verbose, false, "verbose output of the optimization process");
   arg.param("guess", initialGuess, false,
             "initial guess based on spanning tree");
