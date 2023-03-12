@@ -1,0 +1,4 @@
+add_executable(convertSegmentLine_application convertSegmentLine.cpp)
+target_link_libraries(convertSegmentLine_application g2o_simulator_library)
+target_link_libraries(convertSegmentLine_application types_slam2d_addons types_slam3d types_slam2d core)
+set_target_properties(convertSegmentLine_application PROPERTIES OUTPUT_NAME convertSegmentLine)
