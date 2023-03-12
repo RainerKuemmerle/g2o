@@ -28,7 +28,7 @@ add_executable(g2o_hierarchical_application
 
 target_link_libraries(g2o_hierarchical_application g2o_hierarchical_library g2o_cli_library types_slam3d ) #types_slam3d_new
 
-set_target_properties(g2o_hierarchical_application PROPERTIES OUTPUT_NAME g2o_hierarchical${EXE_POSTFIX})
+set_target_properties(g2o_hierarchical_application PROPERTIES OUTPUT_NAME g2o_hierarchical)
 
 install(TARGETS g2o_hierarchical_library
    EXPORT ${G2O_TARGETS_EXPORT_NAME}

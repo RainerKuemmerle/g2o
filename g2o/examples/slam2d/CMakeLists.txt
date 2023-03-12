@@ -21,7 +21,7 @@ add_executable(slam2d_g2o
   ${UI_SOURCES}
 )
 
-set_target_properties(slam2d_g2o PROPERTIES OUTPUT_NAME slam2d_g2o${EXE_POSTFIX})
+set_target_properties(slam2d_g2o PROPERTIES OUTPUT_NAME slam2d_g2o)
 
 if(Qt5_POSITION_INDEPENDENT_CODE)
     set_property(TARGET slam2d_g2o PROPERTY COMPILE_FLAGS -fPIC)

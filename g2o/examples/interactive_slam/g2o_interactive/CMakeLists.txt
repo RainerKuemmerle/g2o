@@ -11,7 +11,7 @@ target_link_libraries(g2o_interactive_library core types_slam2d types_slam3d sol
 
 add_executable(g2o_online_application g2o_online.cpp)
 target_link_libraries(g2o_online_application g2o_interactive_library)
-set_target_properties(g2o_online_application PROPERTIES OUTPUT_NAME g2o_online${EXE_POSTFIX})
+set_target_properties(g2o_online_application PROPERTIES OUTPUT_NAME g2o_online)
 
 #add_executable(generate_commands_application generate_commands.cpp)
 #target_link_libraries(generate_commands_application g2o_interactive_library)

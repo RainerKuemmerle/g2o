@@ -25,7 +25,7 @@ set_target_properties(parser_library PROPERTIES OUTPUT_NAME ${LIB_PREFIX}parser)
 
 #add_executable(test_slam_parser test_slam_parser.cpp)
 #target_link_libraries(test_slam_parser parser_library)
-#set_target_properties(test_slam_parser PROPERTIES OUTPUT_NAME test_slam_parser${EXE_POSTFIX})
+#set_target_properties(test_slam_parser PROPERTIES OUTPUT_NAME test_slam_parser)
 
 install(TARGETS parser_library
   RUNTIME DESTINATION ${RUNTIME_DESTINATION}

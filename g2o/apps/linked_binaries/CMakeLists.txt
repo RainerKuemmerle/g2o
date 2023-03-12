@@ -5,7 +5,7 @@ add_executable(g2o_cli_application_linked
   ../g2o_cli/g2o.cpp)
 
 target_link_libraries(g2o_cli_application_linked g2o_cli_library)
-set_target_properties(g2o_cli_application_linked PROPERTIES OUTPUT_NAME g2o_linked${EXE_POSTFIX})
+set_target_properties(g2o_cli_application_linked PROPERTIES OUTPUT_NAME g2o_linked)
 
 # linking solvers
 target_link_libraries(g2o_cli_application_linked solver_csparse solver_pcg)
@@ -32,7 +32,7 @@ if(QT4_FOUND AND QGLVIEWER_FOUND)
     )
 
   target_link_libraries(g2o_viewer_linked viewer_library)
-  set_target_properties(g2o_viewer_linked PROPERTIES OUTPUT_NAME g2o_viewer_linked${EXE_POSTFIX})
+  set_target_properties(g2o_viewer_linked PROPERTIES OUTPUT_NAME g2o_viewer_linked)
 
   # linking solvers
   target_link_libraries(g2o_viewer_linked solver_csparse solver_pcg)
