@@ -46,3 +46,7 @@ if(Qt5_FOUND AND QGLVIEWER_FOUND)
   add_subdirectory(slam2d)
 endif()
 
+# complex example of hierarchical optimization
+if (G2O_BUILD_SLAM3D_TYPES)
+  add_subdirectory(g2o_hierarchical)
+endif()
