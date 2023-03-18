@@ -29,6 +29,7 @@ if (APPLE)
 endif()
 
 add_definitions(${BLAS_DEFINITIONS} ${LAPACK_DEFINITIONS})
+target_compile_features(solver_cholmod PUBLIC cxx_std_17)
 target_link_libraries(solver_cholmod
     PUBLIC core
     PRIVATE SuiteSparse::CHOLMOD

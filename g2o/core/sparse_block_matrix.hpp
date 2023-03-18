@@ -156,7 +156,7 @@ template <class MatrixType>
 template <class MatrixTransposedType>
 std::unique_ptr<SparseBlockMatrix<MatrixTransposedType>>
 SparseBlockMatrix<MatrixType>::transposed() const {
-  auto dest = g2o::make_unique<SparseBlockMatrix<MatrixTransposedType>>(
+  auto dest = std::make_unique<SparseBlockMatrix<MatrixTransposedType>>(
       &_colBlockIndices[0], &_rowBlockIndices[0], _colBlockIndices.size(),
       _rowBlockIndices.size());
   transpose_internal(*dest);
@@ -198,7 +198,7 @@ bool SparseBlockMatrix<MatrixType>::add(
 template <class MatrixType>
 std::unique_ptr<SparseBlockMatrix<MatrixType>>
 SparseBlockMatrix<MatrixType>::added() const {
-  auto a = g2o::make_unique<SparseBlockMatrix>(
+  auto a = std::make_unique<SparseBlockMatrix>(
       &_rowBlockIndices[0], &_colBlockIndices[0], _rowBlockIndices.size(),
       _colBlockIndices.size());
   add_internal(*a);

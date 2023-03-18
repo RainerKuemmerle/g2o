@@ -61,8 +61,8 @@ int main() {
   typedef BlockSolver<BlockSolverTraits<6, 6>> BlockSolver;
 
   OptimizationAlgorithm* optimizationAlgorithm =
-      new OptimizationAlgorithmGaussNewton(g2o::make_unique<BlockSolver>(
-          g2o::make_unique<LinearSolverEigen<BlockSolver::PoseMatrixType>>()));
+      new OptimizationAlgorithmGaussNewton(std::make_unique<BlockSolver>(
+          std::make_unique<LinearSolverEigen<BlockSolver::PoseMatrixType>>()));
 
   optimizer.setAlgorithm(optimizationAlgorithm);
 

@@ -51,9 +51,8 @@ class G2O_TUTORIAL_SLAM2D_API Simulator {
     std::vector<int> seenBy;
     Landmark() : id(-1) {}
   };
-  typedef std::vector<Landmark, Eigen::aligned_allocator<Landmark> >
-      LandmarkVector;
-  typedef std::vector<Landmark*> LandmarkPtrVector;
+  using LandmarkVector = std::vector<Landmark>;
+  using LandmarkPtrVector = std::vector<Landmark*>;
 
   /**
    * simulated pose of the robot
@@ -65,8 +64,7 @@ class G2O_TUTORIAL_SLAM2D_API Simulator {
     SE2 simulatorPose;
     LandmarkPtrVector landmarks;  ///< the landmarks observed by this node
   };
-  typedef std::vector<GridPose, Eigen::aligned_allocator<GridPose> >
-      PosesVector;
+  using PosesVector = std::vector<GridPose>;
 
   /**
    * \brief odometry constraint
@@ -79,8 +77,7 @@ class G2O_TUTORIAL_SLAM2D_API Simulator {
     Eigen::Matrix3d information;
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
   };
-  typedef std::vector<GridEdge, Eigen::aligned_allocator<GridEdge> >
-      GridEdgeVector;
+  using GridEdgeVector = std::vector<GridEdge>;
 
   struct G2O_TUTORIAL_SLAM2D_API LandmarkEdge {
     int from;
@@ -90,8 +87,7 @@ class G2O_TUTORIAL_SLAM2D_API Simulator {
     Eigen::Matrix2d information;
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
   };
-  typedef std::vector<LandmarkEdge, Eigen::aligned_allocator<LandmarkEdge> >
-      LandmarkEdgeVector;
+  using LandmarkEdgeVector = std::vector<LandmarkEdge>;
 
  public:
   Simulator();

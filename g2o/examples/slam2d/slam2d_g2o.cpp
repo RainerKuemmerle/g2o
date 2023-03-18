@@ -43,16 +43,16 @@ int main(int argc, char** argv) {
   typedef LinearSolverEigen<SlamBlockSolver::PoseMatrixType> SlamLinearSolver;
 
   // Gauss Newton
-  auto linearSolverGN = g2o::make_unique<SlamLinearSolver>();
+  auto linearSolverGN = std::make_unique<SlamLinearSolver>();
   linearSolverGN->setBlockOrdering(false);
   mw.solverGaussNewton = new OptimizationAlgorithmGaussNewton(
-      g2o::make_unique<SlamBlockSolver>(std::move(linearSolverGN)));
+      std::make_unique<SlamBlockSolver>(std::move(linearSolverGN)));
 
   // Levenberg
-  auto linearSolverLM = g2o::make_unique<SlamLinearSolver>();
+  auto linearSolverLM = std::make_unique<SlamLinearSolver>();
   linearSolverLM->setBlockOrdering(false);
   mw.solverLevenberg = new OptimizationAlgorithmLevenberg(
-      g2o::make_unique<SlamBlockSolver>(std::move(linearSolverLM)));
+      std::make_unique<SlamBlockSolver>(std::move(linearSolverLM)));
 
   mw.viewer->graph->setAlgorithm(mw.solverGaussNewton);
   return qapp.exec();

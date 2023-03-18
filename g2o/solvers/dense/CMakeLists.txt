@@ -10,6 +10,7 @@ if (APPLE)
   set_target_properties(solver_dense PROPERTIES INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
 endif()
 
+target_compile_features(solver_dense PUBLIC cxx_std_17)
 target_link_libraries(solver_dense core)
 
 install(TARGETS solver_dense

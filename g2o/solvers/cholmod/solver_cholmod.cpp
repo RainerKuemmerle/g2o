@@ -43,10 +43,10 @@ template <int p, int l, bool blockorder>
 std::unique_ptr<BlockSolverBase> AllocateSolver() {
   std::cerr << "# Using CHOLMOD poseDim " << p << " landMarkDim " << l
             << " blockordering " << blockorder << std::endl;
-  auto linearSolver = g2o::make_unique<
+  auto linearSolver = std::make_unique<
       LinearSolverCholmod<typename BlockSolverPL<p, l>::PoseMatrixType>>();
   linearSolver->setBlockOrdering(blockorder);
-  return g2o::make_unique<BlockSolverPL<p, l>>(std::move(linearSolver));
+  return std::make_unique<BlockSolverPL<p, l>>(std::move(linearSolver));
 }
 }  // namespace
 

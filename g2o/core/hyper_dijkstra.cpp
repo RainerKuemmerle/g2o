@@ -203,11 +203,9 @@ void HyperDijkstra::visitAdjacencyMap(AdjacencyMap& amap, TreeAction* action,
   }
 
   // std::cerr << "q.size()" << q.size() << endl;
-  int count = 0;
   while (!q.empty()) {
     HyperGraph::Vertex* parent = q.front();
     q.pop_front();
-    ++count;
     AdjacencyMap::iterator parentIt = amap.find(parent);
     if (parentIt == amap.end()) {
       continue;

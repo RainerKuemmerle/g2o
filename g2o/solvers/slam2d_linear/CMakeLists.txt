@@ -12,6 +12,7 @@ if (APPLE)
   set_target_properties(solver_slam2d_linear PROPERTIES INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
 endif()
 
+target_compile_features(solver_slam2d_linear PUBLIC cxx_std_17)
 target_link_libraries(solver_slam2d_linear solver_eigen types_slam2d)
 
 install(TARGETS solver_slam2d_linear

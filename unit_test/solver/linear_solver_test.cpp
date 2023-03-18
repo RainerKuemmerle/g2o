@@ -72,7 +72,7 @@ class LS : public testing::Test {
   using LinearSolverType = typename T::first_type;
   using OrderingType = typename T::second_type;
 
-  LS() : linearsolver(g2o::make_unique<LinearSolverType>()) {
+  LS() : linearsolver(std::make_unique<LinearSolverType>()) {
     g2o::internal::fillTestMatrix(sparse_matrix);
   }
 

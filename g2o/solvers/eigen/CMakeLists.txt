@@ -9,6 +9,7 @@ set_target_properties(solver_eigen PROPERTIES
 if (APPLE)
   set_target_properties(solver_eigen PROPERTIES INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
 endif()
+target_compile_features(solver_eigen PUBLIC cxx_std_17)
 target_link_libraries(solver_eigen core)
 
 target_include_directories(solver_eigen PUBLIC

@@ -52,8 +52,7 @@ struct OptimizableGraph;
  */
 class G2O_CORE_API JacobianWorkspace {
  public:
-  typedef std::vector<VectorX, Eigen::aligned_allocator<VectorX> >
-      WorkspaceVector;
+  using WorkspaceVector = std::vector<VectorX>;
 
  public:
   JacobianWorkspace();

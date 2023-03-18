@@ -34,8 +34,8 @@ std::unique_ptr<g2o::Solver> AllocateCholmodSolver() {
   std::cerr << "# Using CHOLMOD online poseDim " << p << " landMarkDim " << l
             << " blockordering 1" << std::endl;
 
-  return g2o::make_unique<BlockSolverPL<p, l>>(
-      g2o::make_unique<LinearSolverCholmodOnline<
+  return std::make_unique<BlockSolverPL<p, l>>(
+      std::make_unique<LinearSolverCholmodOnline<
           typename BlockSolverPL<p, l>::PoseMatrixType>>());
 }
 

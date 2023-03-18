@@ -38,9 +38,9 @@ typedef g2o::LinearSolverEigen<SlamBlockSolver::PoseMatrixType>
 g2o::SparseOptimizer* createOptimizerForTests() {
   // Initialize the SparseOptimizer
   g2o::SparseOptimizer* mOptimizer = new g2o::SparseOptimizer();
-  auto linearSolver = g2o::make_unique<SlamLinearSolver>();
+  auto linearSolver = std::make_unique<SlamLinearSolver>();
   linearSolver->setBlockOrdering(false);
-  auto blockSolver = g2o::make_unique<SlamBlockSolver>(std::move(linearSolver));
+  auto blockSolver = std::make_unique<SlamBlockSolver>(std::move(linearSolver));
   mOptimizer->setAlgorithm(
       new g2o::OptimizationAlgorithmGaussNewton(std::move(blockSolver)));
   return mOptimizer;

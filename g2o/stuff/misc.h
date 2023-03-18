@@ -54,14 +54,6 @@ struct CmpPairFirst {
 };
 
 /**
- * helper function for creating an object in a unique_ptr.
- */
-template <typename T, typename... ArgTs>
-std::unique_ptr<T> make_unique(ArgTs&&... args) {
-  return std::unique_ptr<T>(new T(std::forward<ArgTs>(args)...));
-};
-
-/**
  * converts a number constant to a number_t constant at compile time
  * to avoid having to cast everything to avoid warnings.
  **/

@@ -77,9 +77,8 @@ class LinearSolverPCG : public LinearSolver<MatrixType> {
   void setVerbose(bool verbose) { _verbose = verbose; }
 
  protected:
-  typedef std::vector<MatrixType, Eigen::aligned_allocator<MatrixType> >
-      MatrixVector;
-  typedef std::vector<const MatrixType*> MatrixPtrVector;
+  using MatrixVector = std::vector<MatrixType>;
+  using MatrixPtrVector = std::vector<const MatrixType*>;
 
   number_t _tolerance;
   number_t _residual;
