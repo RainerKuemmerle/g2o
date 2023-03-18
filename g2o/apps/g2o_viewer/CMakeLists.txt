@@ -23,6 +23,9 @@ add_library(viewer_library ${G2O_LIB_TYPE}
   ${UI_HEADERS} ${UI_SOURCES}
 )
 set_target_properties(viewer_library PROPERTIES OUTPUT_NAME ${LIB_PREFIX}viewer)
+set_target_properties(viewer_library PROPERTIES
+  VERSION ${G2O_LIB_VERSION}
+  SOVERSION ${G2O_LIB_SOVERSION})
 if (APPLE)
   set_target_properties(viewer_library PROPERTIES INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
 endif()

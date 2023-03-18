@@ -47,6 +47,9 @@ target_include_directories(core PUBLIC
 )
 
 set_target_properties(core PROPERTIES OUTPUT_NAME ${LIB_PREFIX}core)
+set_target_properties(core PROPERTIES
+  VERSION ${G2O_LIB_VERSION}
+  SOVERSION ${G2O_LIB_SOVERSION})
 target_link_libraries(core PUBLIC stuff ${G2O_EIGEN3_EIGEN_TARGET})
 if(G2O_USE_VENDORED_CERES)
   target_compile_definitions(core PUBLIC "G2O_USE_VENDORED_CERES")

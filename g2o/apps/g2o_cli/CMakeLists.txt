@@ -6,6 +6,9 @@ add_library(g2o_cli_library ${G2O_LIB_TYPE}
 )
 
 set_target_properties(g2o_cli_library PROPERTIES OUTPUT_NAME ${LIB_PREFIX}cli)
+set_target_properties(g2o_cli_library PROPERTIES
+  VERSION ${G2O_LIB_VERSION}
+  SOVERSION ${G2O_LIB_SOVERSION})
 if (APPLE)
   set_target_properties(g2o_cli_library PROPERTIES INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
 endif()

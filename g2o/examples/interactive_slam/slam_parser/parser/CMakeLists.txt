@@ -22,6 +22,9 @@ endif()
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
 set_target_properties(parser_library PROPERTIES OUTPUT_NAME ${LIB_PREFIX}parser)
+set_target_properties(parser_library PROPERTIES
+  VERSION ${G2O_LIB_VERSION}
+  SOVERSION ${G2O_LIB_SOVERSION})
 
 #add_executable(test_slam_parser test_slam_parser.cpp)
 #target_link_libraries(test_slam_parser parser_library)

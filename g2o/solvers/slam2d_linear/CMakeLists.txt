@@ -5,6 +5,9 @@ add_library(solver_slam2d_linear ${G2O_LIB_TYPE}
 )
 
 set_target_properties(solver_slam2d_linear PROPERTIES OUTPUT_NAME ${LIB_PREFIX}solver_slam2d_linear)
+set_target_properties(solver_slam2d_linear PROPERTIES
+  VERSION ${G2O_LIB_VERSION}
+  SOVERSION ${G2O_LIB_SOVERSION})
 if (APPLE)
   set_target_properties(solver_slam2d_linear PROPERTIES INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
 endif()
