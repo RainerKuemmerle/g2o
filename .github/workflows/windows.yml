@@ -48,7 +48,7 @@ jobs:
       - name: Configure CMake
         run: |
           cmake --version
-          cmake -B ${{github.workspace}}/build  -G "${{matrix.config.generators}}" -A x64 -DBUILD_UNITTESTS=ON -DCMAKE_BUILD_TYPE=${{matrix.config.build_type}} -DCMAKE_TOOLCHAIN_FILE=C:\vcpkg\scripts\buildsystems\vcpkg.cmake
+          cmake -B ${{github.workspace}}/build  -G "${{matrix.config.generators}}" -A x64 -DBUILD_UNITTESTS=ON -DG2O_BUILD_EXAMPLES=OFF -DCMAKE_BUILD_TYPE=${{matrix.config.build_type}} -DCMAKE_TOOLCHAIN_FILE=C:\vcpkg\scripts\buildsystems\vcpkg.cmake
 
       - name: Build Introspection
         run: |
