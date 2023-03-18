@@ -54,7 +54,7 @@ struct NoBlockOrdering {
   }
 };
 
-struct NoooOrdering {
+struct NoopOrdering {
   template <typename T>
   void setOrdering(T& solver) {
     (void)solver;
@@ -179,5 +179,5 @@ using LinearSolverTypes = ::testing::Types<
 #endif
     std::pair<g2o::LinearSolverEigen<g2o::MatrixX>, NoBlockOrdering>,
     std::pair<g2o::LinearSolverEigen<g2o::MatrixX>, BlockOrdering>,
-    std::pair<g2o::LinearSolverDense<g2o::MatrixX>, NoooOrdering>>;
+    std::pair<g2o::LinearSolverDense<g2o::MatrixX>, NoopOrdering>>;
 INSTANTIATE_TYPED_TEST_SUITE_P(LinearSolver, LS, LinearSolverTypes);
