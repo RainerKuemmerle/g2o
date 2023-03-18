@@ -14,7 +14,7 @@ class PyLinearSolver {
   // std::unique_ptr<typename BlockSolverT::LinearSolverType> solver;
   std::unique_ptr<LinearSolverT> solver;
 
-  PyLinearSolver() : solver(g2o::make_unique<LinearSolverT>()){};
+  PyLinearSolver() : solver(std::make_unique<LinearSolverT>()){};
 };
 
 template <typename LinearSolverT, typename BlockSolverT>
@@ -48,7 +48,7 @@ class PyBlockSolver : public PyBlockSolverBase {
       PyLinearSolver<g2o::LinearSolverCholmod<PoseMatrixType>, BlockSolverT>&
           linearSolver)
       : block_solver(
-            g2o::make_unique<BlockSolverT>(std::move(linearSolver.solver))){};
+            std::make_unique<BlockSolverT>(std::move(linearSolver.solver))){};
 #endif
 
 #if G2O_HAVE_CSPARSE
@@ -56,23 +56,23 @@ class PyBlockSolver : public PyBlockSolverBase {
       PyLinearSolver<g2o::LinearSolverCSparse<PoseMatrixType>, BlockSolverT>&
           linearSolver)
       : block_solver(
-            g2o::make_unique<BlockSolverT>(std::move(linearSolver.solver))){};
+            std::make_unique<BlockSolverT>(std::move(linearSolver.solver))){};
 #endif
 
   explicit PyBlockSolver(PyLinearSolver<g2o::LinearSolverEigen<PoseMatrixType>,
                                         BlockSolverT>& linearSolver)
       : block_solver(
-            g2o::make_unique<BlockSolverT>(std::move(linearSolver.solver))){};
+            std::make_unique<BlockSolverT>(std::move(linearSolver.solver))){};
 
   explicit PyBlockSolver(PyLinearSolver<g2o::LinearSolverDense<PoseMatrixType>,
                                         BlockSolverT>& linearSolver)
       : block_solver(
-            g2o::make_unique<BlockSolverT>(std::move(linearSolver.solver))){};
+            std::make_unique<BlockSolverT>(std::move(linearSolver.solver))){};
 
   explicit PyBlockSolver(PyLinearSolver<g2o::LinearSolverPCG<PoseMatrixType>,
                                         BlockSolverT>& linearSolver)
       : block_solver(
-            g2o::make_unique<BlockSolverT>(std::move(linearSolver.solver))){};
+            std::make_unique<BlockSolverT>(std::move(linearSolver.solver))){};
 
   std::unique_ptr<Solver> solver() override { return std::move(block_solver); };
   std::unique_ptr<BlockSolverBase> base_solver() override {

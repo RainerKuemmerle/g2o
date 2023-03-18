@@ -41,9 +41,9 @@ namespace {
 std::unique_ptr<g2o::SparseOptimizer> create(bool lm) {
   // Initialize the SparseOptimizer
   auto mOptimizer = std::make_unique<g2o::SparseOptimizer>();
-  auto linearSolver = g2o::make_unique<SlamLinearSolver>();
+  auto linearSolver = std::make_unique<SlamLinearSolver>();
   linearSolver->setBlockOrdering(false);
-  auto blockSolver = g2o::make_unique<SlamBlockSolver>(std::move(linearSolver));
+  auto blockSolver = std::make_unique<SlamBlockSolver>(std::move(linearSolver));
   if (lm) {
     mOptimizer->setAlgorithm(std::shared_ptr<g2o::OptimizationAlgorithm>(
         new g2o::OptimizationAlgorithmLevenberg(std::move(blockSolver))));

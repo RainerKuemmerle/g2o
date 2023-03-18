@@ -25,6 +25,9 @@ add_library(g2o_simulator_library ${G2O_LIB_TYPE}
 )
 
 set_target_properties(g2o_simulator_library PROPERTIES OUTPUT_NAME ${LIB_PREFIX}simulator)
+set_target_properties(g2o_simulator_library PROPERTIES
+  VERSION ${G2O_LIB_VERSION}
+  SOVERSION ${G2O_LIB_SOVERSION})
 if (APPLE)
   set_target_properties(g2o_simulator_library PROPERTIES INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
 endif()
@@ -35,26 +38,15 @@ add_executable(g2o_simulator2d_application
   test_simulator2d.cpp
 )
 target_link_libraries(g2o_simulator2d_application g2o_simulator_library types_slam2d_addons types_slam2d core)
-set_target_properties(g2o_simulator2d_application PROPERTIES OUTPUT_NAME g2o_simulator2d${EXE_POSTFIX})
-
-add_executable(convertSegmentLine_application convertSegmentLine.cpp)
-target_link_libraries(convertSegmentLine_application g2o_simulator_library types_slam2d_addons types_slam3d types_slam2d core)
-set_target_properties(convertSegmentLine_application PROPERTIES OUTPUT_NAME convertSegmentLine${EXE_POSTFIX})
-
+set_target_properties(g2o_simulator2d_application PROPERTIES OUTPUT_NAME g2o_simulator2d)
 
 add_executable(g2o_simulator3d_application
   test_simulator3d.cpp
 )
 target_link_libraries(g2o_simulator3d_application g2o_simulator_library types_slam3d_addons types_slam3d types_slam2d_addons types_slam2d core)
-set_target_properties(g2o_simulator3d_application PROPERTIES OUTPUT_NAME g2o_simulator3d${EXE_POSTFIX})
+set_target_properties(g2o_simulator3d_application PROPERTIES OUTPUT_NAME g2o_simulator3d)
 
-add_executable(g2o_anonymize_observations_application
-  g2o_anonymize_observations.cpp
-)
-target_link_libraries(g2o_anonymize_observations_application types_slam3d types_slam2d core)
-set_target_properties(g2o_anonymize_observations_application PROPERTIES OUTPUT_NAME g2o_anonymize_observations${EXE_POSTFIX})
-
-install(TARGETS g2o_simulator_library g2o_simulator2d_application g2o_simulator3d_application g2o_anonymize_observations_application
+install(TARGETS g2o_simulator_library g2o_simulator2d_application g2o_simulator3d_application
   EXPORT ${G2O_TARGETS_EXPORT_NAME}
   RUNTIME DESTINATION ${RUNTIME_DESTINATION}
   LIBRARY DESTINATION ${LIBRARY_DESTINATION}

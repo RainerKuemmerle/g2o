@@ -115,15 +115,15 @@ void allocateSolverForSclam(SparseOptimizer& optimizer, bool levenberg) {
   using SclamLinearSolver = LinearSolverEigen<SclamBlockSolver::PoseMatrixType>;
 
   std::unique_ptr<SclamLinearSolver> linearSolver =
-      g2o::make_unique<SclamLinearSolver>();
+      std::make_unique<SclamLinearSolver>();
   linearSolver->setBlockOrdering(false);
   OptimizationAlgorithm* solver = nullptr;
   if (levenberg) {
     solver = new OptimizationAlgorithmLevenberg(
-        g2o::make_unique<SclamBlockSolver>(std::move(linearSolver)));
+        std::make_unique<SclamBlockSolver>(std::move(linearSolver)));
   } else {
     solver = new OptimizationAlgorithmGaussNewton(
-        g2o::make_unique<SclamBlockSolver>(std::move(linearSolver)));
+        std::make_unique<SclamBlockSolver>(std::move(linearSolver)));
   }
   optimizer.setAlgorithm(std::unique_ptr<OptimizationAlgorithm>(solver));
 }

@@ -50,8 +50,8 @@ static int static_target() {
   // 3D observations marginalise to a 3D estimate
   using BlockSolver_3_3 = BlockSolver<BlockSolverTraits<3, 3>>;
   std::unique_ptr<OptimizationAlgorithm> solver(
-      new OptimizationAlgorithmGaussNewton(g2o::make_unique<BlockSolver_3_3>(
-          g2o::make_unique<
+      new OptimizationAlgorithmGaussNewton(std::make_unique<BlockSolver_3_3>(
+          std::make_unique<
               LinearSolverEigen<BlockSolver_3_3::PoseMatrixType>>())));
 
   optimizer.setAlgorithm(std::move(solver));

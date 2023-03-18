@@ -49,10 +49,10 @@ class G2O_TUTORIAL_SLAM2D_API Simulator {
     Eigen::Vector2d truePose;
     Eigen::Vector2d simulatedPose;
     std::vector<int> seenBy;
-    Landmark()  = default;
+    Landmark() = default;
   };
-  using LandmarkVector = std::vector<Landmark, Eigen::aligned_allocator<Landmark>>;
-  using LandmarkPtrVector = std::vector<Landmark *>;
+  using LandmarkVector = std::vector<Landmark>;
+  using LandmarkPtrVector = std::vector<Landmark*>;
 
   /**
    * simulated pose of the robot
@@ -64,7 +64,7 @@ class G2O_TUTORIAL_SLAM2D_API Simulator {
     SE2 simulatorPose;
     LandmarkPtrVector landmarks;  ///< the landmarks observed by this node
   };
-  using PosesVector = std::vector<GridPose, Eigen::aligned_allocator<GridPose>>;
+  using PosesVector = std::vector<GridPose>;
 
   /**
    * \brief odometry constraint
@@ -77,7 +77,7 @@ class G2O_TUTORIAL_SLAM2D_API Simulator {
     Eigen::Matrix3d information;
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
   };
-  using GridEdgeVector = std::vector<GridEdge, Eigen::aligned_allocator<GridEdge>>;
+  using GridEdgeVector = std::vector<GridEdge>;
 
   struct G2O_TUTORIAL_SLAM2D_API LandmarkEdge {
     int from;
@@ -87,8 +87,7 @@ class G2O_TUTORIAL_SLAM2D_API Simulator {
     Eigen::Matrix2d information;
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
   };
-  using LandmarkEdgeVector = std::vector<LandmarkEdge, Eigen::aligned_allocator<LandmarkEdge>>;
-
+  using LandmarkEdgeVector = std::vector<LandmarkEdge>;
 
   Simulator();
 
@@ -108,10 +107,12 @@ class G2O_TUTORIAL_SLAM2D_API Simulator {
   LandmarkEdgeVector landmarkObservations_;
 
   static GridPose generateNewPose(const GridPose& prev, const SE2& trueMotion,
-                           const Eigen::Vector2d& transNoise, double rotNoise);
+                                  const Eigen::Vector2d& transNoise,
+                                  double rotNoise);
   static SE2 getMotion(int motionDirection, double stepLen);
   static SE2 sampleTransformation(const SE2& trueMotion_,
-                           const Eigen::Vector2d& transNoise, double rotNoise);
+                                  const Eigen::Vector2d& transNoise,
+                                  double rotNoise);
 };
 
 }  // namespace tutorial

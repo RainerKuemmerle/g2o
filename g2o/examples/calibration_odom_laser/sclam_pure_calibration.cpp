@@ -162,8 +162,7 @@ static int run_sclam_pure_calibration(int argc, char** argv) {
   }
 
   // adding the measurements
-  std::vector<MotionInformation, Eigen::aligned_allocator<MotionInformation> >
-      motions;
+  std::vector<MotionInformation> motions;
   {
     auto it = robotLaserQueue.buffer().begin();
     auto prevIt = it++;

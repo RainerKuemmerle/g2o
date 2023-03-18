@@ -240,15 +240,15 @@ int main(int argc, char** argv) {
       linearSolver;
   if (usePCG) {
     std::cout << "Using PCG" << std::endl;
-    linearSolver = g2o::make_unique<BalLinearSolverPCG>();
+    linearSolver = std::make_unique<BalLinearSolverPCG>();
   } else {
     std::cout << "Using Cholesky: " << choleskySolverName << std::endl;
-    auto cholesky = g2o::make_unique<BalLinearSolver>();
+    auto cholesky = std::make_unique<BalLinearSolver>();
     cholesky->setBlockOrdering(true);
     linearSolver = std::move(cholesky);
   }
-  auto solver = g2o::make_unique<g2o::OptimizationAlgorithmLevenberg>(
-      g2o::make_unique<BalBlockSolver>(std::move(linearSolver)));
+  auto solver = std::make_unique<g2o::OptimizationAlgorithmLevenberg>(
+      std::make_unique<BalBlockSolver>(std::move(linearSolver)));
 
   // solver->setUserLambdaInit(1);
   optimizer.setAlgorithm(

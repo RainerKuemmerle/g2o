@@ -17,6 +17,9 @@ add_library(g2o_hierarchical_library ${G2O_LIB_TYPE}
 
 
 set_target_properties(g2o_hierarchical_library PROPERTIES OUTPUT_NAME ${LIB_PREFIX}hierarchical)
+set_target_properties(g2o_hierarchical_library PROPERTIES
+  VERSION ${G2O_LIB_VERSION}
+  SOVERSION ${G2O_LIB_SOVERSION})
 if (APPLE)
   set_target_properties(g2o_hierarchical_library PROPERTIES INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
 endif()
@@ -28,7 +31,7 @@ add_executable(g2o_hierarchical_application
 
 target_link_libraries(g2o_hierarchical_application g2o_hierarchical_library g2o_cli_library types_slam3d ) #types_slam3d_new
 
-set_target_properties(g2o_hierarchical_application PROPERTIES OUTPUT_NAME g2o_hierarchical${EXE_POSTFIX})
+set_target_properties(g2o_hierarchical_application PROPERTIES OUTPUT_NAME g2o_hierarchical)
 
 install(TARGETS g2o_hierarchical_library
    EXPORT ${G2O_TARGETS_EXPORT_NAME}

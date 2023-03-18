@@ -185,7 +185,7 @@ void declareEigenTypes(py::module& m) {
            "w"_a, "x"_a, "y"_a, "z"_a)
 
       .def(py::init([](const Eigen::Matrix<double, 4, 1>& m) {
-        return g2o::make_unique<Eigen::Quaterniond>(m(0), m(1), m(2), m(3));
+        return std::make_unique<Eigen::Quaterniond>(m(0), m(1), m(2), m(3));
       }))
 
       .def_static(

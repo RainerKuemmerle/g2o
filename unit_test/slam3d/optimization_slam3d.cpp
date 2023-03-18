@@ -43,10 +43,10 @@ class Slam3DOptimization : public testing::Test {
   using OptimizationAlgo = T;
 
   Slam3DOptimization() {
-    auto linearSolver = g2o::make_unique<SlamLinearSolver>();
+    auto linearSolver = std::make_unique<SlamLinearSolver>();
     linearSolver->setBlockOrdering(false);
     auto blockSolver =
-        g2o::make_unique<g2o::BlockSolverX>(std::move(linearSolver));
+        std::make_unique<g2o::BlockSolverX>(std::move(linearSolver));
     std::unique_ptr<g2o::OptimizationAlgorithm> algorithm(
         new OptimizationAlgo(std::move(blockSolver)));
 

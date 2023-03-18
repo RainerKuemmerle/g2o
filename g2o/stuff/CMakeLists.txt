@@ -16,6 +16,10 @@ target_include_directories(stuff PUBLIC
 )
 
 set_target_properties(stuff PROPERTIES OUTPUT_NAME ${LIB_PREFIX}stuff)
+set_target_properties(stuff PROPERTIES
+  VERSION ${G2O_LIB_VERSION}
+  SOVERSION ${G2O_LIB_SOVERSION})
+target_compile_features(stuff PUBLIC cxx_std_17)
 target_link_libraries(stuff PUBLIC ${G2O_EIGEN3_EIGEN_TARGET})
 
 if (APPLE)
@@ -53,7 +57,11 @@ if(OPENGL_FOUND AND G2O_HAVE_OPENGL)
   )
 
   target_link_libraries(opengl_helper PUBLIC ${G2O_OPENGL_TARGET} ${G2O_EIGEN3_EIGEN_TARGET})
+  target_compile_features(opengl_helper PUBLIC cxx_std_17)
   set_target_properties(opengl_helper PROPERTIES OUTPUT_NAME "${LIB_PREFIX}opengl_helper")
+  set_target_properties(opengl_helper PROPERTIES
+    VERSION ${G2O_LIB_VERSION}
+    SOVERSION ${G2O_LIB_SOVERSION})
 endif()
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Linux" AND NOT ANDROID)

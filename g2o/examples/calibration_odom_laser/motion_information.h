@@ -41,8 +41,7 @@ struct G2O_CALIBRATION_ODOM_LASER_API MotionInformation {
   double timeInterval;
 };
 
-using MotionInformationVector =
-    std::vector<MotionInformation, Eigen::aligned_allocator<MotionInformation>>;
+using MotionInformationVector = std::vector<MotionInformation>;
 
 }  // namespace g2o
 

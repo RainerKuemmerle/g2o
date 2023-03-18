@@ -59,8 +59,8 @@ static int constant_velocity_target() {
   using BlockSolver = BlockSolver<BlockSolverTraits<6, 6>>;
 
   std::unique_ptr<OptimizationAlgorithm> optimizationAlgorithm(
-      new OptimizationAlgorithmGaussNewton(g2o::make_unique<BlockSolver>(
-          g2o::make_unique<LinearSolverEigen<BlockSolver::PoseMatrixType>>())));
+      new OptimizationAlgorithmGaussNewton(std::make_unique<BlockSolver>(
+          std::make_unique<LinearSolverEigen<BlockSolver::PoseMatrixType>>())));
 
   optimizer.setAlgorithm(std::move(optimizationAlgorithm));
 

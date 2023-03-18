@@ -167,10 +167,8 @@ class BlockSolver : public BlockSolverBase {
 
   std::unique_ptr<LinearSolverType> linearSolver_;
 
-  std::vector<PoseVectorType, Eigen::aligned_allocator<PoseVectorType>>
-      diagonalBackupPose_;
-  std::vector<LandmarkVectorType, Eigen::aligned_allocator<LandmarkVectorType>>
-      diagonalBackupLandmark_;
+  std::vector<PoseVectorType> diagonalBackupPose_;
+  std::vector<LandmarkVectorType> diagonalBackupLandmark_;
 
 #ifdef G2O_OPENMP
   std::vector<OpenMPMutex> coefficientsMutex_;

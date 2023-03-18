@@ -38,8 +38,7 @@ namespace g2o {
  */
 class G2O_TYPES_DATA_API VertexEllipse : public RobotData {
  public:
-  using myVector2fVector =
-      std::vector<Vector2F, Eigen::aligned_allocator<Vector2F>>;
+  using myVector2fVector = std::vector<Vector2F>;
 
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
   VertexEllipse();

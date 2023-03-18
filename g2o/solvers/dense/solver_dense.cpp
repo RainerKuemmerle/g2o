@@ -40,8 +40,8 @@ template <int P, int L>
 std::unique_ptr<g2o::Solver> AllocateSolver() {
   std::cerr << "# Using DENSE poseDim " << P << " landMarkDim " << L
             << std::endl;
-  return g2o::make_unique<BlockSolverPL<P, L>>(
-      g2o::make_unique<
+  return std::make_unique<BlockSolverPL<P, L>>(
+      std::make_unique<
           LinearSolverDense<typename BlockSolverPL<P, L>::PoseMatrixType>>());
 }
 }  // namespace

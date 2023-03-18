@@ -56,9 +56,7 @@ template <int D, typename T>
 class BaseVertex : public OptimizableGraph::Vertex {
  public:
   using EstimateType = T;
-  using BackupStackType = std::stack<
-      EstimateType,
-      std::vector<EstimateType, Eigen::aligned_allocator<EstimateType>>>;
+  using BackupStackType = std::stack<EstimateType, std::vector<EstimateType> >;
 
   static const int kDimension =
       D;  ///< dimension of the estimate (minimal) in the manifold space

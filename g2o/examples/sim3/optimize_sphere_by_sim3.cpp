@@ -105,8 +105,8 @@ static int optimize_by_sim3(int argc, char** argv) {
   using LinearSolverType =
       g2o::LinearSolverEigen<BlockSolverType::PoseMatrixType>;
   std::unique_ptr<g2o::OptimizationAlgorithm> solver(
-      new g2o::OptimizationAlgorithmLevenberg(g2o::make_unique<BlockSolverType>(
-          g2o::make_unique<LinearSolverType>())));
+      new g2o::OptimizationAlgorithmLevenberg(std::make_unique<BlockSolverType>(
+          std::make_unique<LinearSolverType>())));
 
   g2o::SparseOptimizer optimizer;
   optimizer.setAlgorithm(std::move(solver));

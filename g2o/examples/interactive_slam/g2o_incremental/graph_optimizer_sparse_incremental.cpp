@@ -32,8 +32,8 @@ std::unique_ptr<g2o::Solver> AllocateCholmodSolver() {
   std::cerr << "# Using CHOLMOD online poseDim " << P << " landMarkDim " << L
             << " blockordering 1" << std::endl;
 
-  return g2o::make_unique<BlockSolverPL<P, L>>(
-      g2o::make_unique<LinearSolverCholmodOnline<
+  return std::make_unique<BlockSolverPL<P, L>>(
+      std::make_unique<LinearSolverCholmodOnline<
           typename BlockSolverPL<P, L>::PoseMatrixType>>());
 }
 
@@ -440,8 +440,8 @@ bool SparseOptimizerIncremental::computeCholeskyUpdate() {
   }
 
   // change to the specific format we need to have a pretty normal L
-  const int change_status = cholmod_change_factor(CHOLMOD_REAL, 1, 0, 1, 1,
-                                            cholmodFactor_, &cholmodCommon_);
+  const int change_status = cholmod_change_factor(
+      CHOLMOD_REAL, 1, 0, 1, 1, cholmodFactor_, &cholmodCommon_);
   return change_status != 0;
 }
 

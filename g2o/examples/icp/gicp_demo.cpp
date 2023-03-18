@@ -50,8 +50,8 @@ static int gicp_demo() {
 
   // variable-size block solver
   std::unique_ptr<g2o::OptimizationAlgorithm> solver(
-      new g2o::OptimizationAlgorithmLevenberg(g2o::make_unique<BlockSolverX>(
-          g2o::make_unique<
+      new g2o::OptimizationAlgorithmLevenberg(std::make_unique<BlockSolverX>(
+          std::make_unique<
               LinearSolverDense<g2o::BlockSolverX::PoseMatrixType>>())));
 
   optimizer.setAlgorithm(std::move(solver));

@@ -23,6 +23,9 @@ add_library(viewer_library ${G2O_LIB_TYPE}
   ${UI_HEADERS} ${UI_SOURCES}
 )
 set_target_properties(viewer_library PROPERTIES OUTPUT_NAME ${LIB_PREFIX}viewer)
+set_target_properties(viewer_library PROPERTIES
+  VERSION ${G2O_LIB_VERSION}
+  SOVERSION ${G2O_LIB_SOVERSION})
 if (APPLE)
   set_target_properties(viewer_library PROPERTIES INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
 endif()
@@ -31,7 +34,7 @@ add_executable(g2o_viewer
   g2o_viewer.cpp
 )
 
-set_target_properties(g2o_viewer PROPERTIES OUTPUT_NAME g2o_viewer${EXE_POSTFIX})
+set_target_properties(g2o_viewer PROPERTIES OUTPUT_NAME g2o_viewer)
 
 target_link_libraries(viewer_library core g2o_cli_library ${QGLVIEWER_LIBRARY} ${MY_QT_LIBRARIES} ${OPENGL_LIBRARY})
 target_link_libraries(viewer_library core opengl_helper)

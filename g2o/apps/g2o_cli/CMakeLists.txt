@@ -6,6 +6,9 @@ add_library(g2o_cli_library ${G2O_LIB_TYPE}
 )
 
 set_target_properties(g2o_cli_library PROPERTIES OUTPUT_NAME ${LIB_PREFIX}cli)
+set_target_properties(g2o_cli_library PROPERTIES
+  VERSION ${G2O_LIB_VERSION}
+  SOVERSION ${G2O_LIB_SOVERSION})
 if (APPLE)
   set_target_properties(g2o_cli_library PROPERTIES INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
 endif()
@@ -33,7 +36,7 @@ set_property(TARGET g2o_cli_library APPEND PROPERTY COMPILE_DEFINITIONS $<$<CONF
 #set_property(TARGET g2o_cli_library APPEND PROPERTY COMPILE_DEFINITIONS_RELWITHDEBINFO G2O_LIBRARY_POSTFIX="${CMAKE_RELWITHDEBINFO_POSTFIX}")
 #set_property(TARGET g2o_cli_library APPEND PROPERTY COMPILE_DEFINITIONS_MINSIZEREL     G2O_LIBRARY_POSTFIX="${CMAKE_MINSIZEREL_POSTFIX}")
 
-set_target_properties(g2o_cli_application PROPERTIES OUTPUT_NAME g2o${EXE_POSTFIX})
+set_target_properties(g2o_cli_application PROPERTIES OUTPUT_NAME g2o)
 
 install(TARGETS g2o_cli_library g2o_cli_application
   EXPORT ${G2O_TARGETS_EXPORT_NAME}

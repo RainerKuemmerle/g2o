@@ -13,9 +13,13 @@ add_library(types_slam2d_addons ${G2O_LIB_TYPE}
 )
 
 set_target_properties(types_slam2d_addons PROPERTIES OUTPUT_NAME ${LIB_PREFIX}types_slam2d_addons)
+set_target_properties(types_slam2d_addons PROPERTIES
+  VERSION ${G2O_LIB_VERSION}
+  SOVERSION ${G2O_LIB_SOVERSION})
 if (APPLE)
   set_target_properties(types_slam2d_addons PROPERTIES INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
 endif()
+target_compile_features(types_slam2d_addons PUBLIC cxx_std_17)
 target_link_libraries(types_slam2d_addons types_slam2d core)
 if(G2O_HAVE_OPENGL)
   target_link_libraries(types_slam2d_addons opengl_helper)

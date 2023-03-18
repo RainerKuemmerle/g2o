@@ -63,11 +63,11 @@ static int run_slam2d_tutorial() {
 
   // allocating the optimizer
   SparseOptimizer optimizer;
-  auto linearSolver = g2o::make_unique<SlamLinearSolver>();
+  auto linearSolver = std::make_unique<SlamLinearSolver>();
   linearSolver->setBlockOrdering(false);
   std::unique_ptr<OptimizationAlgorithm> solver(
       new OptimizationAlgorithmGaussNewton(
-          g2o::make_unique<SlamBlockSolver>(std::move(linearSolver))));
+          std::make_unique<SlamBlockSolver>(std::move(linearSolver))));
 
   optimizer.setAlgorithm(std::move(solver));
 

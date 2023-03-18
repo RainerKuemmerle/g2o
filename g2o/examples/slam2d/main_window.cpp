@@ -129,18 +129,18 @@ void MainWindow::fixGraph() {
 }
 
 std::unique_ptr<g2o::OptimizationAlgorithm> MainWindow::createGaussNewton() {
-  auto linearSolverGN = g2o::make_unique<SlamLinearSolver>();
+  auto linearSolverGN = std::make_unique<SlamLinearSolver>();
   linearSolverGN->setBlockOrdering(false);
   return std::unique_ptr<g2o::OptimizationAlgorithm>(
       new g2o::OptimizationAlgorithmGaussNewton(
-          g2o::make_unique<SlamBlockSolver>(std::move(linearSolverGN))));
+          std::make_unique<SlamBlockSolver>(std::move(linearSolverGN))));
 }
 
 std::unique_ptr<g2o::OptimizationAlgorithm> MainWindow::createLevenberg() {
   // Levenberg
-  auto linearSolverLM = g2o::make_unique<SlamLinearSolver>();
+  auto linearSolverLM = std::make_unique<SlamLinearSolver>();
   linearSolverLM->setBlockOrdering(false);
   return std::unique_ptr<g2o::OptimizationAlgorithm>(
       new g2o::OptimizationAlgorithmLevenberg(
-          g2o::make_unique<SlamBlockSolver>(std::move(linearSolverLM))));
+          std::make_unique<SlamBlockSolver>(std::move(linearSolverLM))));
 }
