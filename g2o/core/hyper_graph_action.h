@@ -217,7 +217,6 @@ class G2O_CORE_API DrawAction : public HyperGraphElementAction {
                     HyperGraphElementAction::Parameters* params_);
   Parameters* _previousParams;
   BoolProperty* _show;
-  BoolProperty* _showId;
   HyperGraphElementAction* _cacheDrawActions;
 };
 
