@@ -17,11 +17,11 @@ jobs:
       matrix:
         config:
         - {
-            name: "Windows 2019 MSVC",
-            os: windows-2019,
+            name: "Windows 2022 MSVC",
+            os: windows-2022,
             build_type: "Debug",
-            environment_script: "C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/VC/Auxiliary/Build/vcvars64.bat",
-            generators: "Visual Studio 16 2019"
+            environment_script: "C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VC/Auxiliary/Build/vcvars64.bat",
+            generators: "Visual Studio 17 2022"
           }
 
 
