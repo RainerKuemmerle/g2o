@@ -225,11 +225,9 @@ bool DrawAction::refreshPropertyPtrs(
   if (!p) {
     _previousParams = 0;
     _show = 0;
-    _showId = 0;
   } else {
     _previousParams = p;
     _show = p->makeProperty<BoolProperty>(_typeName + "::SHOW", true);
-    _showId = p->makeProperty<BoolProperty>(_typeName + "::SHOW_ID", false);
   }
   return true;
 }
