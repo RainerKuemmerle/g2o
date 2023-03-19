@@ -79,7 +79,7 @@ licenses for more details.
 
 ## Requirements
 
--   C++14 compiler (CI pipeline runs with gcc, clang and MSVC)
+-   C++17 compiler (CI pipeline runs with gcc, clang and MSVC)
 -   cmake             <http://www.cmake.org>
 -   Eigen3            <http://eigen.tuxfamily.org>
 
