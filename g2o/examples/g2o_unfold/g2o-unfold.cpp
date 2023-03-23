@@ -27,8 +27,8 @@
 //  ../aisnavigation-free/bin/g2o-unfold -i 30 -solver var_cholmod -v -gnudump
 //  vic.dat ../datasets/2D/victoriaPark/victoriaPark.g2o
 
-#include <signal.h>
-
+#include <cassert>
+#include <csignal>
 #include <algorithm>
 #include <fstream>
 #include <iostream>

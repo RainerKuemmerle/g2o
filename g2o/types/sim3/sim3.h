@@ -28,6 +28,7 @@
 #define G2O_SIM_3
 
 #include <Eigen/Geometry>
+#include <cassert>
 
 #include "g2o/stuff/misc.h"
 #include "g2o/types/slam3d/se3_ops.h"

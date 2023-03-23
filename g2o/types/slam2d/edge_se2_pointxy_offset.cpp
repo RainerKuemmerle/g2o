@@ -27,6 +27,7 @@
 #include "edge_se2_pointxy_offset.h"
 
 #include <iostream>
+#include <cassert>
 
 #include "parameter_se2_offset.h"
 

@@ -24,6 +24,8 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+#include <cassert>
+
 namespace internal {
 inline int computeUpperTriangleIndex(int i, int j) {
   int elemsUpToCol = ((j - 1) * j) / 2;

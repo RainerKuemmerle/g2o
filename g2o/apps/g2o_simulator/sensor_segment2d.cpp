@@ -26,6 +26,7 @@
 
 #include "sensor_segment2d.h"
 
+#include <cassert>
 #include <iostream>
 
 #include "g2o/apps/g2o_simulator/simutils.h"

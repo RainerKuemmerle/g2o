@@ -26,6 +26,8 @@
 
 #include "edge_se3_xyzprior.h"
 
+#include <cassert>
+
 namespace g2o {
 
 EdgeSE3XYZPrior::EdgeSE3XYZPrior()

@@ -26,6 +26,7 @@
 
 #include "jacobian_workspace.h"
 
+#include <cassert>
 #include <cmath>
 
 #include "optimizable_graph.h"

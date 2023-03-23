@@ -26,6 +26,8 @@
 
 #include "sensor_pose2d.h"
 
+#include <cassert>
+
 using namespace Eigen;
 
 namespace g2o {

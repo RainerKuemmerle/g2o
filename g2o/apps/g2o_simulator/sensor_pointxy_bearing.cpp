@@ -26,6 +26,8 @@
 
 #include "sensor_pointxy_bearing.h"
 
+#include <cassert>
+
 using namespace Eigen;
 
 namespace g2o {

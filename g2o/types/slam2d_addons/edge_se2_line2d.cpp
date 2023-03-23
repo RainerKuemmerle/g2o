@@ -26,6 +26,8 @@
 
 #include "edge_se2_line2d.h"
 
+#include <cassert>
+
 namespace g2o {
 
 EdgeSE2Line2D::EdgeSE2Line2D()

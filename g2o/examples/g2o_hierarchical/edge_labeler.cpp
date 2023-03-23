@@ -27,6 +27,7 @@
 #include "edge_labeler.h"
 
 #include <Eigen/Dense>
+#include <cassert>
 
 #include "g2o/stuff/unscented.h"
 

@@ -27,6 +27,7 @@
 #include <Eigen/LU>
 #include <fstream>
 #include <iomanip>
+#include <cassert>
 
 #include "g2o/stuff/macros.h"
 #include "g2o/stuff/misc.h"

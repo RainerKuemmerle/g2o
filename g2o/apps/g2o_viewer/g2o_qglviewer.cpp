@@ -18,6 +18,8 @@
 
 #include "g2o_qglviewer.h"
 
+#include <cassert>
+
 #include "g2o/core/hyper_graph_action.h"
 #include "g2o/core/sparse_optimizer.h"
 #include "g2o/stuff/opengl_primitives.h"

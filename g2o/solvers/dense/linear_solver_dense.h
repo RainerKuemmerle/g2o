@@ -32,6 +32,7 @@
 #include <Eigen/Core>
 #include <utility>
 #include <vector>
+#include <cassert>
 
 #include "g2o/core/batch_stats.h"
 #include "g2o/core/linear_solver.h"

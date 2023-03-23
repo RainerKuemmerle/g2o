@@ -6,6 +6,7 @@
 #include <g2o/core/base_vertex.h>
 
 #include <Eigen/Core>
+#include <cassert>
 
 using namespace g2o;
 

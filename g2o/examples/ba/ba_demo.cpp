@@ -26,6 +26,7 @@
 
 #include <stdint.h>
 
+#include <cassert>
 #include <iostream>
 #include <unordered_set>
 
