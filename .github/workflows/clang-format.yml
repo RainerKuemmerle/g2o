@@ -15,11 +15,11 @@ jobs:
 
       - name: Install clang
         run: |
-          echo "deb http://apt.llvm.org/focal/ llvm-toolchain-focal-15 main" | sudo tee -a /etc/apt/sources.list.d/clang.list
+          echo "deb http://apt.llvm.org/focal/ llvm-toolchain-focal-16 main" | sudo tee -a /etc/apt/sources.list.d/clang.list
           wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
           sudo apt-get update
-          sudo apt-get install clang-format-15
-          sudo ln -s /usr/lib/llvm-15/bin/clang-format /usr/local/bin/clang-format
+          sudo apt-get install clang-format-16
+          sudo ln -s /usr/lib/llvm-16/bin/clang-format /usr/local/bin/clang-format
           clang-format --version
 
       - name: clang format check
