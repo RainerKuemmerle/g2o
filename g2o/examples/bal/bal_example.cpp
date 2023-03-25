@@ -70,21 +70,21 @@ class VertexCameraBAL : public g2o::BaseVertex<9, g2o::bal::Vector9> {
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
   VertexCameraBAL() {}
 
-  virtual bool read(std::istream& /*is*/) {
+  bool read(std::istream& /*is*/) override {
     cerr << __PRETTY_FUNCTION__ << " not implemented yet" << endl;
     return false;
   }
 
-  virtual bool write(std::ostream& /*os*/) const {
+  bool write(std::ostream& /*os*/) const override {
     cerr << __PRETTY_FUNCTION__ << " not implemented yet" << endl;
     return false;
   }
 
-  virtual void setToOriginImpl() {
+  void setToOriginImpl() override {
     cerr << __PRETTY_FUNCTION__ << " not implemented yet" << endl;
   }
 
-  virtual void oplusImpl(const double* update) {
+  void oplusImpl(const double* update) override {
     g2o::bal::Vector9::ConstMapType v(update, VertexCameraBAL::Dimension);
     _estimate += v;
   }
@@ -100,21 +100,21 @@ class VertexPointBAL : public g2o::BaseVertex<3, g2o::Vector3> {
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
   VertexPointBAL() {}
 
-  virtual bool read(std::istream& /*is*/) {
+  bool read(std::istream& /*is*/) override {
     cerr << __PRETTY_FUNCTION__ << " not implemented yet" << endl;
     return false;
   }
 
-  virtual bool write(std::ostream& /*os*/) const {
+  bool write(std::ostream& /*os*/) const override {
     cerr << __PRETTY_FUNCTION__ << " not implemented yet" << endl;
     return false;
   }
 
-  virtual void setToOriginImpl() {
+  void setToOriginImpl() override {
     cerr << __PRETTY_FUNCTION__ << " not implemented yet" << endl;
   }
 
-  virtual void oplusImpl(const double* update) {
+  void oplusImpl(const double* update) override {
     g2o::Vector3::ConstMapType v(update);
     _estimate += v;
   }
@@ -148,11 +148,11 @@ class EdgeObservationBAL
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
   EdgeObservationBAL() {}
-  virtual bool read(std::istream& /*is*/) {
+  bool read(std::istream& /*is*/) override {
     cerr << __PRETTY_FUNCTION__ << " not implemented yet" << endl;
     return false;
   }
-  virtual bool write(std::ostream& /*os*/) const {
+  bool write(std::ostream& /*os*/) const override {
     cerr << __PRETTY_FUNCTION__ << " not implemented yet" << endl;
     return false;
   }
