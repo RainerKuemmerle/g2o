@@ -26,19 +26,13 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 //
-// This file has the sole purpose to silence warnings when including Ceres.
 
-// This is not your usual header guard. The macro CERES_WARNINGS_DISABLED
-// shows up again in reenable_warnings.h.
-#ifndef CERES_WARNINGS_DISABLED
-#define CERES_WARNINGS_DISABLED
+// This is not your usual header guard. See disable_warnings.h
+#ifdef G2O_CERES_WARNINGS_DISABLED
+#undef G2O_CERES_WARNINGS_DISABLED
 
 #ifdef _MSC_VER
-#pragma warning(push)
-// Disable the warning C4251 which is triggered by stl classes in
-// Ceres' public interface. To quote MSDN: "C4251 can be ignored "
-// "if you are deriving from a type in the Standard C++ Library"
-#pragma warning(disable : 4251)
+#pragma warning(pop)
 #endif
 
-#endif  // CERES_WARNINGS_DISABLED
+#endif  // G2O_CERES_WARNINGS_DISABLED

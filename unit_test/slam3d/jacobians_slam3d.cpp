@@ -24,6 +24,7 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+#include "g2o/autodiff/autodiff.h"
 #include "g2o/core/jacobian_workspace.h"
 #include "g2o/core/optimizable_graph.h"
 #include "g2o/types/slam3d/dquat2mat.h"
@@ -34,12 +35,6 @@
 #include "gtest/gtest.h"
 #include "unit_test/test_helper/evaluate_jacobian.h"
 #include "unit_test/test_helper/random_state.h"
-
-#ifdef G2O_USE_VENDORED_CERES
-#include "g2o/EXTERNAL/ceres/autodiff.h"
-#else
-#include <ceres/internal/autodiff.h>
-#endif
 
 using namespace std;
 using namespace g2o;

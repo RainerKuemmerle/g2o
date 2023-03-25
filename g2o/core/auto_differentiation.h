@@ -31,13 +31,8 @@
 #include <cassert>
 #include <type_traits>
 
-#ifdef G2O_USE_VENDORED_CERES
-#include "g2o/EXTERNAL/ceres/autodiff.h"
-#else
-#include <ceres/internal/autodiff.h>
-#endif
-
 #include "eigen_types.h"
+#include "g2o/autodiff/autodiff.h"
 #include "g2o/stuff/misc.h"
 #include "g2o_core_api.h"
 
@@ -146,8 +141,8 @@ class EstimateAccessorGet {
  * can include into the public section of your edge class. See below for the
  * macro. If you use the macro, you do not need to implement computeError() and
  * linearizeOPlus() in your edge. Both methods will be ready for integration
- * into the g2o framework. You may, however, decide against the macro and provide
- * the implementation on your own if this suits your edge class better.
+ * into the g2o framework. You may, however, decide against the macro and
+ * provide the implementation on your own if this suits your edge class better.
  *
  * Example integration: g2o/examples/bal/bal_example.cpp
  * This provides a self-contained example for integration of AD into an
@@ -269,12 +264,12 @@ class AutoDifferentiation {
 
 // helper macros for fine-grained integration into own types
 #define G2O_MAKE_AUTO_AD_COMPUTEERROR                                      \
-  void computeError() {                                                    \
+  void computeError() override {                                           \
     g2o::AutoDifferentiation<                                              \
         std::remove_reference<decltype(*this)>::type>::computeError(this); \
   }
 #define G2O_MAKE_AUTO_AD_LINEARIZEOPLUS                                 \
-  void linearizeOplus() {                                               \
+  void linearizeOplus() override {                                      \
     g2o::AutoDifferentiation<                                           \
         std::remove_reference<decltype(*this)>::type>::linearize(this); \
   }
@@ -289,14 +284,14 @@ class AutoDifferentiation {
 // helper macros for fine-grained integration into own types using
 // EstimateAccessorGet
 #define G2O_MAKE_AUTO_AD_COMPUTEERROR_BY_GET                               \
-  void computeError() {                                                    \
+  void computeError() override {                                           \
     using EdgeType = std::remove_reference<decltype(*this)>::type;         \
     g2o::AutoDifferentiation<                                              \
         EdgeType, g2o::EstimateAccessorGet<EdgeType>>::computeError(this); \
   }
 
 #define G2O_MAKE_AUTO_AD_LINEARIZEOPLUS_BY_GET                          \
-  void linearizeOplus() {                                               \
+  void linearizeOplus() override {                                      \
     using EdgeType = std::remove_reference<decltype(*this)>::type;      \
     g2o::AutoDifferentiation<                                           \
         EdgeType, g2o::EstimateAccessorGet<EdgeType>>::linearize(this); \

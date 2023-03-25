@@ -9,6 +9,7 @@ target_include_directories(freeglut_minimal PUBLIC
   "$<BUILD_INTERFACE:${g2o_SOURCE_DIR};${PROJECT_BINARY_DIR}>"
   $<INSTALL_INTERFACE:include/g2o/freeglut_minimal>
 )
+target_compile_features(freeglut_minimal PUBLIC cxx_std_17)
 
 set_target_properties(freeglut_minimal PROPERTIES OUTPUT_NAME ${LIB_PREFIX}ext_freeglut_minimal)
 set_target_properties(freeglut_minimal PROPERTIES

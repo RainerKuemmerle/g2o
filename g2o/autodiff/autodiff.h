@@ -137,8 +137,8 @@
 // In general, the functions below will accept NULL pointers for all or some of
 // the Jacobian parameters, meaning that those Jacobians will not be computed.
 
-#ifndef CERES_PUBLIC_INTERNAL_AUTODIFF_H_
-#define CERES_PUBLIC_INTERNAL_AUTODIFF_H_
+#ifndef G2O_CERES_PUBLIC_INTERNAL_AUTODIFF_H_
+#define G2O_CERES_PUBLIC_INTERNAL_AUTODIFF_H_
 
 #include <stddef.h>
 
@@ -148,22 +148,23 @@
 #include "array_selector.h"
 #include "eigen.h"
 #include "fixed_array.h"
-#include "parameter_dims.h"
-#include "variadic_evaluate.h"
 #include "jet.h"
+#include "parameter_dims.h"
 #include "types.h"
+#include "variadic_evaluate.h"
 
 // If the number of parameters exceeds this values, the corresponding jets are
 // placed on the heap. This will reduce performance by a factor of 2-5 on
 // current compilers.
-#ifndef CERES_AUTODIFF_MAX_PARAMETERS_ON_STACK
-#define CERES_AUTODIFF_MAX_PARAMETERS_ON_STACK 50
+#ifndef G2O_CERES_AUTODIFF_MAX_PARAMETERS_ON_STACK
+#define G2O_CERES_AUTODIFF_MAX_PARAMETERS_ON_STACK 50
 #endif
 
-#ifndef CERES_AUTODIFF_MAX_RESIDUALS_ON_STACK
-#define CERES_AUTODIFF_MAX_RESIDUALS_ON_STACK 20
+#ifndef G2O_CERES_AUTODIFF_MAX_RESIDUALS_ON_STACK
+#define G2O_CERES_AUTODIFF_MAX_RESIDUALS_ON_STACK 20
 #endif
 
+namespace g2o {
 namespace ceres {
 namespace internal {
 
@@ -210,22 +211,20 @@ struct Make1stOrderPerturbations;
 
 template <int N, int... Ns, int ParameterIdx, int Offset>
 struct Make1stOrderPerturbations<std::integer_sequence<int, N, Ns...>,
-                                 ParameterIdx,
-                                 Offset> {
+                                 ParameterIdx, Offset> {
   template <typename T, typename JetT>
   inline static void Apply(T const* const* parameters, JetT* x) {
     Make1stOrderPerturbation<0, N, Offset, T, JetT>::Apply(
         parameters[ParameterIdx], x + Offset);
     Make1stOrderPerturbations<std::integer_sequence<int, Ns...>,
-                              ParameterIdx + 1,
-                              Offset + N>::Apply(parameters, x);
+                              ParameterIdx + 1, Offset + N>::Apply(parameters,
+                                                                   x);
   }
 };
 
 // End of 'recursion'. Nothing more to do.
 template <int ParameterIdx, int Total>
-struct Make1stOrderPerturbations<std::integer_sequence<int>,
-                                 ParameterIdx,
+struct Make1stOrderPerturbations<std::integer_sequence<int>, ParameterIdx,
                                  Total> {
   template <typename T, typename JetT>
   static void Apply(T const* const* /* NOT USED */, JetT* /* NOT USED */) {}
@@ -271,16 +270,14 @@ template <typename Seq, int ParameterIdx = 0, int Offset = 0>
 struct Take1stOrderParts;
 
 template <int N, int... Ns, int ParameterIdx, int Offset>
-struct Take1stOrderParts<std::integer_sequence<int, N, Ns...>,
-                         ParameterIdx,
+struct Take1stOrderParts<std::integer_sequence<int, N, Ns...>, ParameterIdx,
                          Offset> {
   template <typename JetT, typename T>
   inline static void Apply(int num_outputs, JetT* output, T** jacobians) {
     if (jacobians[ParameterIdx]) {
       Take1stOrderPart<Offset, N>(num_outputs, output, jacobians[ParameterIdx]);
     }
-    Take1stOrderParts<std::integer_sequence<int, Ns...>,
-                      ParameterIdx + 1,
+    Take1stOrderParts<std::integer_sequence<int, Ns...>, ParameterIdx + 1,
                       Offset + N>::Apply(num_outputs, output, jacobians);
   }
 };
@@ -289,26 +286,21 @@ struct Take1stOrderParts<std::integer_sequence<int, N, Ns...>,
 template <int ParameterIdx, int Offset>
 struct Take1stOrderParts<std::integer_sequence<int>, ParameterIdx, Offset> {
   template <typename T, typename JetT>
-  static void Apply(int /* NOT USED*/,
-                    JetT* /* NOT USED*/,
+  static void Apply(int /* NOT USED*/, JetT* /* NOT USED*/,
                     T** /* NOT USED */) {}
 };
 
-template <int kNumResiduals,
-          typename ParameterDims,
-          typename Functor,
+template <int kNumResiduals, typename ParameterDims, typename Functor,
           typename T>
 inline bool AutoDifferentiate(const Functor& functor,
                               T const* const* parameters,
-                              int dynamic_num_outputs,
-                              T* function_value,
+                              int dynamic_num_outputs, T* function_value,
                               T** jacobians) {
   typedef Jet<T, ParameterDims::kNumParameters> JetT;
   using Parameters = typename ParameterDims::Parameters;
 
-  ArraySelector<JetT,
-                ParameterDims::kNumParameters,
-                CERES_AUTODIFF_MAX_PARAMETERS_ON_STACK>
+  ArraySelector<JetT, ParameterDims::kNumParameters,
+                G2O_CERES_AUTODIFF_MAX_PARAMETERS_ON_STACK>
       parameters_as_jets(ParameterDims::kNumParameters);
 
   // Pointers to the beginning of each parameter block
@@ -320,9 +312,9 @@ inline bool AutoDifferentiate(const Functor& functor,
   // ?-operator here is compile-time evaluated, therefore num_outputs is also
   // a compile-time constant for functors with fixed residuals.
   const int num_outputs =
-      kNumResiduals == DYNAMIC ? dynamic_num_outputs : kNumResiduals;
+      kNumResiduals == kDynamic ? dynamic_num_outputs : kNumResiduals;
 
-  ArraySelector<JetT, kNumResiduals, CERES_AUTODIFF_MAX_RESIDUALS_ON_STACK>
+  ArraySelector<JetT, kNumResiduals, G2O_CERES_AUTODIFF_MAX_RESIDUALS_ON_STACK>
       residuals_as_jets(num_outputs);
 
   // Invalidate the output Jets, so that we can detect if the user
@@ -335,19 +327,20 @@ inline bool AutoDifferentiate(const Functor& functor,
   Make1stOrderPerturbations<Parameters>::Apply(parameters,
                                                parameters_as_jets.data());
 
-  if (!VariadicEvaluate<ParameterDims>(
-          functor, unpacked_parameters.data(), residuals_as_jets.data())) {
+  if (!VariadicEvaluate<ParameterDims>(functor, unpacked_parameters.data(),
+                                       residuals_as_jets.data())) {
     return false;
   }
 
   Take0thOrderPart(num_outputs, residuals_as_jets.data(), function_value);
-  Take1stOrderParts<Parameters>::Apply(
-      num_outputs, residuals_as_jets.data(), jacobians);
+  Take1stOrderParts<Parameters>::Apply(num_outputs, residuals_as_jets.data(),
+                                       jacobians);
 
   return true;
 }
 
 }  // namespace internal
 }  // namespace ceres
+}  // namespace g2o
 
-#endif  // CERES_PUBLIC_INTERNAL_AUTODIFF_H_
+#endif  // G2O_CERES_PUBLIC_INTERNAL_AUTODIFF_H_

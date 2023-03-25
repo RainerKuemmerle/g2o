@@ -82,8 +82,8 @@ class G2O_CORE_API OptimizationAlgorithmLevenberg
   number_t _goodStepUpperScale;  ///< upper bound for lambda decrease if a good
                                  ///< LM step
   number_t _ni;
-  int _levenbergIterations;  ///< the number of levenberg iterations performed to
-                             ///< accept the last step
+  int _levenbergIterations;  ///< the number of levenberg iterations performed
+                             ///< to accept the last step
 
   /**
    * helper for Levenberg, this function computes the initial damping factor, if

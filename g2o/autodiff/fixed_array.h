@@ -27,8 +27,8 @@
 // accidentally overflowing your stack if large input is passed to
 // your function.
 
-#ifndef CERES_PUBLIC_INTERNAL_FIXED_ARRAY_H_
-#define CERES_PUBLIC_INTERNAL_FIXED_ARRAY_H_
+#ifndef G2O_CERES_PUBLIC_INTERNAL_FIXED_ARRAY_H_
+#define G2O_CERES_PUBLIC_INTERNAL_FIXED_ARRAY_H_
 
 #include <Eigen/Core>  // For Eigen::aligned_allocator
 #include <algorithm>
@@ -40,6 +40,7 @@
 
 #include "memory.h"
 
+namespace g2o {
 namespace ceres {
 namespace internal {
 
@@ -53,8 +54,7 @@ constexpr static auto kFixedArrayUseDefault = static_cast<size_t>(-1);
 // safe some heap memory.
 template <typename T>
 using FixedArrayDefaultAllocator =
-    typename std::conditional<std::is_trivial<T>::value,
-                              std::allocator<T>,
+    typename std::conditional<std::is_trivial<T>::value, std::allocator<T>,
                               Eigen::aligned_allocator<T>>::type;
 
 // -----------------------------------------------------------------------------
@@ -80,8 +80,7 @@ using FixedArrayDefaultAllocator =
 // heap allocation, it will do so with global `::operator new[]()` and
 // `::operator delete[]()`, even if T provides class-scope overrides for these
 // operators.
-template <typename T,
-          size_t N = kFixedArrayUseDefault,
+template <typename T, size_t N = kFixedArrayUseDefault,
           typename A = FixedArrayDefaultAllocator<T>>
 class FixedArray {
   static_assert(!std::is_array<T>::value || std::extent<T>::value > 0,
@@ -122,10 +121,10 @@ class FixedArray {
              const allocator_type& a = allocator_type())
       : FixedArray(other.begin(), other.end(), a) {}
 
-  FixedArray(FixedArray&& other, const allocator_type& a = allocator_type())
+  FixedArray(FixedArray&& other,
+             const allocator_type& a = allocator_type()) noexcept
       : FixedArray(std::make_move_iterator(other.begin()),
-                   std::make_move_iterator(other.end()),
-                   a) {}
+                   std::make_move_iterator(other.end()), a) {}
 
   // Creates an array object that can store `n` elements.
   // Note that trivially constructible elements will be uninitialized.
@@ -137,8 +136,7 @@ class FixedArray {
   }
 
   // Creates an array initialized with `n` copies of `val`.
-  FixedArray(size_type n,
-             const value_type& val,
+  FixedArray(size_type n, const value_type& val,
              const allocator_type& a = allocator_type())
       : storage_(n, a) {
     ConstructRange(storage_.alloc(), storage_.begin(), storage_.end(), val);
@@ -153,8 +151,7 @@ class FixedArray {
   // range. The array's size will always be `std::distance(first, last)`.
   // REQUIRES: Iterator must be a forward_iterator or better.
   template <typename Iterator, EnableIfForwardIterator<Iterator>* = nullptr>
-  FixedArray(Iterator first,
-             Iterator last,
+  FixedArray(Iterator first, Iterator last,
              const allocator_type& a = allocator_type())
       : storage_(std::distance(first, last), a) {
     CopyRange(storage_.alloc(), storage_.begin(), first, last);
@@ -210,16 +207,12 @@ class FixedArray {
   //
   // Returns a reference the ith element of the fixed array.
   // REQUIRES: 0 <= i < size()
-  reference operator[](size_type i) {
-    return data()[i];
-  }
+  reference operator[](size_type i) { return data()[i]; }
 
   // Overload of FixedArray::operator()[] to return a const reference to the
   // ith element of the fixed array.
   // REQUIRES: 0 <= i < size()
-  const_reference operator[](size_type i) const {
-    return data()[i];
-  }
+  const_reference operator[](size_type i) const { return data()[i]; }
 
   // FixedArray::front()
   //
@@ -315,8 +308,8 @@ class FixedArray {
   }
 
   friend bool operator<(const FixedArray& lhs, const FixedArray& rhs) {
-    return std::lexicographical_compare(
-        lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
+    return std::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(),
+                                        rhs.end());
   }
 
   friend bool operator>(const FixedArray& lhs, const FixedArray& rhs) {
@@ -397,8 +390,7 @@ class FixedArray {
   };
 
   using InlinedStorage =
-      typename std::conditional<inline_elements == 0,
-                                EmptyInlinedStorage,
+      typename std::conditional<inline_elements == 0, EmptyInlinedStorage,
                                 NonEmptyInlinedStorage>::type;
 
   // Storage
@@ -436,10 +428,9 @@ class FixedArray {
       if (UsingInlinedStorage(size())) {
         InlinedStorage::AnnotateConstruct(size());
         return InlinedStorage::data();
-      } else {
-        return reinterpret_cast<StorageElement*>(
-            AllocatorTraits::allocate(alloc(), size()));
       }
+      return reinterpret_cast<StorageElement*>(
+          AllocatorTraits::allocate(alloc(), size()));
     }
 
     // Using std::tuple and not absl::CompressedTuple, as it has a lot of
@@ -460,5 +451,6 @@ constexpr typename FixedArray<T, N, A>::size_type
 
 }  // namespace internal
 }  // namespace ceres
+}  // namespace g2o
 
-#endif  // CERES_PUBLIC_INTERNAL_FIXED_ARRAY_H_
+#endif  // G2O_CERES_PUBLIC_INTERNAL_FIXED_ARRAY_H_

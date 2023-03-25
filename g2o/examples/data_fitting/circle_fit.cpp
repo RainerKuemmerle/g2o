@@ -60,15 +60,15 @@ class VertexCircle : public g2o::BaseVertex<3, Eigen::Vector3d> {
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
   VertexCircle() {}
 
-  virtual bool read(std::istream& /*is*/) { return false; }
+  bool read(std::istream& /*is*/) override { return false; }
 
-  virtual bool write(std::ostream& /*os*/) const { return false; }
+  bool write(std::ostream& /*os*/) const override { return false; }
 
-  virtual void setToOriginImpl() {
+  void setToOriginImpl() override {
     cerr << __PRETTY_FUNCTION__ << " not implemented yet" << endl;
   }
 
-  virtual void oplusImpl(const double* update) {
+  void oplusImpl(const double* update) override {
     Eigen::Vector3d::ConstMapType v(update);
     _estimate += v;
   }
@@ -86,8 +86,8 @@ class EdgePointOnCircle
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   EdgePointOnCircle() {}
-  virtual bool read(std::istream& /*is*/) { return false; }
-  virtual bool write(std::ostream& /*os*/) const { return false; }
+  bool read(std::istream& /*is*/) override { return false; }
+  bool write(std::ostream& /*os*/) const override { return false; }
 
   template <typename T>
   bool operator()(const T* circle, T* error) const {

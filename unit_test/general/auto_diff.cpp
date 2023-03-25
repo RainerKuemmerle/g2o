@@ -82,8 +82,8 @@ class Edge3ADTester
   G2O_MAKE_AUTO_AD_FUNCTIONS
 
   // NOOPs
-  virtual bool read(std::istream&) { return false; };
-  virtual bool write(std::ostream&) const { return false; };
+  bool read(std::istream&) override { return false; };
+  bool write(std::ostream&) const override { return false; };
 };
 
 /**

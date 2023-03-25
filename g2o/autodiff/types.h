@@ -1,5 +1,5 @@
 // Ceres Solver - A fast non-linear least squares minimizer
-// Copyright 2015 Google Inc. All rights reserved.
+// Copyright 2019 Google Inc. All rights reserved.
 // http://ceres-solver.org/
 //
 // Redistribution and use in source and binary forms, with or without
@@ -26,13 +26,41 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 //
+// Author: sameeragarwal@google.com (Sameer Agarwal)
+//
+// Enums and other top level class definitions.
+//
+// Note: internal/types.cc defines stringification routines for some
+// of these enums. Please update those routines if you extend or
+// remove enums from here.
 
-// This is not your usual header guard. See disable_warnings.h
-#ifdef CERES_WARNINGS_DISABLED
-#undef CERES_WARNINGS_DISABLED
+#ifndef G2O_CERES_PUBLIC_TYPES_H_
+#define G2O_CERES_PUBLIC_TYPES_H_
 
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
+#include <string>
 
-#endif  // CERES_WARNINGS_DISABLED
+#include "disable_warnings.h"
+
+namespace g2o {
+namespace ceres {
+
+// For SizedCostFunction and AutoDiffCostFunction, DYNAMIC can be
+// specified for the number of residuals. If specified, then the
+// number of residuas for that cost function can vary at runtime.
+enum DimensionType {
+  kDynamic = -1,
+};
+
+// It is a near impossibility that user code generates this exact
+// value in normal operation, thus we will use it to fill arrays
+// before passing them to user code. If on return an element of the
+// array still contains this value, we will assume that the user code
+// did not write to that memory location.
+const double kImpossibleValue = 1e302;
+
+}  // namespace ceres
+}  // namespace g2o
+
+#include "reenable_warnings.h"
+
+#endif  // G2O_CERES_PUBLIC_TYPES_H_

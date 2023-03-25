@@ -30,8 +30,8 @@
 //         mierle@gmail.com (Keir Mierle)
 //         jodebo_beck@gmx.de (Johannes Beck)
 
-#ifndef CERES_PUBLIC_INTERNAL_VARIADIC_EVALUATE_H_
-#define CERES_PUBLIC_INTERNAL_VARIADIC_EVALUATE_H_
+#ifndef G2O_CERES_PUBLIC_INTERNAL_VARIADIC_EVALUATE_H_
+#define G2O_CERES_PUBLIC_INTERNAL_VARIADIC_EVALUATE_H_
 
 #include <stddef.h>
 
@@ -40,15 +40,14 @@
 
 #include "parameter_dims.h"
 
+namespace g2o {
 namespace ceres {
 namespace internal {
 
 // For fixed size cost functors
 template <typename Functor, typename T, int... Indices>
-inline bool VariadicEvaluateImpl(const Functor& functor,
-                                 T const* const* input,
-                                 T* output,
-                                 std::false_type /*is_dynamic*/,
+inline bool VariadicEvaluateImpl(const Functor& functor, T const* const* input,
+                                 T* output, std::false_type /*is_dynamic*/,
                                  std::integer_sequence<int, Indices...>) {
   static_assert(sizeof...(Indices),
                 "Invalid number of parameter blocks. At least one parameter "
@@ -58,25 +57,21 @@ inline bool VariadicEvaluateImpl(const Functor& functor,
 
 // For dynamic sized cost functors
 template <typename Functor, typename T>
-inline bool VariadicEvaluateImpl(const Functor& functor,
-                                 T const* const* input,
-                                 T* output,
-                                 std::true_type /*is_dynamic*/,
+inline bool VariadicEvaluateImpl(const Functor& functor, T const* const* input,
+                                 T* output, std::true_type /*is_dynamic*/,
                                  std::integer_sequence<int>) {
   return functor(input, output);
 }
 
 // For ceres cost functors (not ceres::CostFunction)
 template <typename ParameterDims, typename Functor, typename T>
-inline bool VariadicEvaluateImpl(const Functor& functor,
-                                 T const* const* input,
-                                 T* output,
-                                 const void* /* NOT USED */) {
+inline bool VariadicEvaluateImpl(const Functor& functor, T const* const* input,
+                                 T* output, const void* /* NOT USED */) {
   using ParameterBlockIndices =
       std::make_integer_sequence<int, ParameterDims::kNumParameterBlocks>;
   using IsDynamic = std::integral_constant<bool, ParameterDims::kIsDynamic>;
-  return VariadicEvaluateImpl(
-      functor, input, output, IsDynamic(), ParameterBlockIndices());
+  return VariadicEvaluateImpl(functor, input, output, IsDynamic(),
+                              ParameterBlockIndices());
 }
 
 // For ceres::CostFunction
@@ -101,13 +96,13 @@ inline bool VariadicEvaluateImpl(const Functor& functor,
 // blocks. The signature of the functor must have the following signature
 // 'bool()(const T* i_1, const T* i_2, ... const T* i_n, T* output)'.
 template <typename ParameterDims, typename Functor, typename T>
-inline bool VariadicEvaluate(const Functor& functor,
-                             T const* const* input,
+inline bool VariadicEvaluate(const Functor& functor, T const* const* input,
                              T* output) {
   return VariadicEvaluateImpl<ParameterDims>(functor, input, output, &functor);
 }
 
 }  // namespace internal
 }  // namespace ceres
+}  // namespace g2o
 
-#endif  // CERES_PUBLIC_INTERNAL_VARIADIC_EVALUATE_H_
+#endif  // G2O_CERES_PUBLIC_INTERNAL_VARIADIC_EVALUATE_H_

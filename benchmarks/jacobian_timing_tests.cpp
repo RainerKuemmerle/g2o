@@ -1,12 +1,7 @@
 #include <benchmark/benchmark.h>
 
+#include "g2o/autodiff/fixed_array.h"
 #include "g2o/core/dynamic_aligned_buffer.hpp"
-
-#ifdef G2O_USE_VENDORED_CERES
-#include "g2o/EXTERNAL/ceres/fixed_array.h"
-#else
-#include <ceres/internal/fixed_array.h>
-#endif
 
 // Test several different ways of evaluating Jacobians to see the impact of
 // different ways of implementing stuff.
