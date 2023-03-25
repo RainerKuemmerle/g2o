@@ -51,7 +51,7 @@ bool EdgeCreator::addAssociation(const std::string& vertexTypes,
   return addAssociation(vertexTypes, edgeType, std::vector<int>());
 }
 
-bool EdgeCreator::removeAssociation(std::string vertexTypes) {
+bool EdgeCreator::removeAssociation(const std::string& vertexTypes) {
   EntryMap::iterator it = _vertexToEdgeMap.find(vertexTypes);
   if (it == _vertexToEdgeMap.end()) return false;
   _vertexToEdgeMap.erase(it);
