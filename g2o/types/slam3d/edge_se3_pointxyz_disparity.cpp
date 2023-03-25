@@ -26,6 +26,7 @@
 
 #include "edge_se3_pointxyz_disparity.h"
 
+#include <cassert>
 #include <iomanip>
 #include <iostream>
 

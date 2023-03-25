@@ -26,6 +26,7 @@
 
 #include "optimization_algorithm_dogleg.h"
 
+#include <cassert>
 #include <iostream>
 
 #include "batch_stats.h"

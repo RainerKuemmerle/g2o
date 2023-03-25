@@ -164,8 +164,7 @@
 #include <limits>
 #include <string>
 
-namespace g2o {
-namespace ceres {
+namespace g2o::ceres {
 
 template <typename T, int N>
 struct Jet {
@@ -869,8 +868,7 @@ inline std::ostream& operator<<(std::ostream& s, const Jet<T, N>& z) {
   s << "]";
   return s;
 }
-}  // namespace ceres
-}  // namespace g2o
+}  // namespace g2o::ceres
 
 namespace std {
 // clang-format off

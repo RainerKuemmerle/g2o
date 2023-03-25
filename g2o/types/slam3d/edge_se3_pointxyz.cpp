@@ -33,6 +33,7 @@
 #include "g2o/stuff/opengl_wrapper.h"
 #endif
 
+#include <cassert>
 #include <iostream>
 
 namespace g2o {

@@ -26,6 +26,8 @@
 
 #include "edge_se3_lotsofxyz.h"
 
+#include <cassert>
+
 namespace g2o {
 
 EdgeSE3LotsOfXYZ::EdgeSE3LotsOfXYZ() { resize(0); }

@@ -20,6 +20,8 @@
 #include <camd.h>
 #include <cholmod.h>
 
+#include <cassert>
+
 #include "g2o/core/batch_stats.h"
 #include "g2o/core/linear_solver.h"
 #include "g2o/solvers/cholmod/cholmod_ext.h"

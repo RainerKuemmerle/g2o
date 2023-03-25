@@ -27,6 +27,8 @@
 #ifndef G2O_LINEAR_SOLVER_CHOLMOD
 #define G2O_LINEAR_SOLVER_CHOLMOD
 
+#include <cassert>
+
 #include "cholmod_wrapper.h"
 #include "g2o/core/batch_stats.h"
 #include "g2o/core/linear_solver.h"

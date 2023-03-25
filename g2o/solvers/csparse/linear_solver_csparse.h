@@ -27,6 +27,7 @@
 #ifndef G2O_LINEAR_SOLVERCSPARSE_H
 #define G2O_LINEAR_SOLVERCSPARSE_H
 
+#include <cassert>
 #include <iostream>
 
 #include "csparse_wrapper.h"

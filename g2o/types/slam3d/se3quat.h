@@ -29,6 +29,7 @@
 
 #include <Eigen/Core>
 #include <Eigen/Geometry>
+#include <cassert>
 #include <utility>
 
 #include "g2o/stuff/misc.h"
@@ -55,7 +56,8 @@ class G2O_TYPES_SLAM3D_API SE3Quat {
     normalizeRotation();
   }
 
-  SE3Quat(Quaternion q, Vector3 t) : r_(std::move(q)), t_(std::move(std::move(t))) {
+  SE3Quat(Quaternion q, Vector3 t)
+      : r_(std::move(q)), t_(std::move(std::move(t))) {
     normalizeRotation();
   }
 

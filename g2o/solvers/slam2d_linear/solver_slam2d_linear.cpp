@@ -27,6 +27,7 @@
 #include "solver_slam2d_linear.h"
 
 #include <Eigen/Core>
+#include <cassert>
 
 #include "g2o/core/hyper_dijkstra.h"
 #include "g2o/core/solver.h"

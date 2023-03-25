@@ -27,6 +27,8 @@
 #ifndef G2O_BASE_DYNAMIC_VERTEX_H
 #define G2O_BASE_DYNAMIC_VERTEX_H
 
+#include <cassert>
+
 #include "base_vertex.h"
 
 namespace g2o {

@@ -27,9 +27,9 @@
 //  ../aisnavigation-free/bin/g2o-unfold -i 30 -solver var_cholmod -v -gnudump
 //  vic.dat ../datasets/2D/victoriaPark/victoriaPark.g2o
 
-#include <signal.h>
-
 #include <algorithm>
+#include <cassert>
+#include <csignal>
 #include <fstream>
 #include <iostream>
 #include <sstream>
@@ -49,9 +49,9 @@
 #include "g2o/types/slam3d/types_six_dof_quat.h"
 #include "tools.h"
 
-//#ifdef GO_CHOLMOD_SUPPORT
+// #ifdef GO_CHOLMOD_SUPPORT
 #include "g2o/solvers/cholmod/linear_solver_cholmod.h"
-//#endif
+// #endif
 #include "g2o/solvers/csparse/linear_solver_csparse.h"
 #include "g2o/solvers/pcg/linear_solver_pcg.h"
 
@@ -191,7 +191,7 @@ Solver* str2solver(const std::string& strSolver_, SparseOptimizer* opt) {
   bool useCholmod = false;
   if (strEndsWith(strSolver, "_cholmod")) {
     string::size_type idx = strSolver.rfind("_cholmod");
-    strSolver = strSolver.substr(0, idx);
+    strSolver.resize(idx);
     useCholmod = true;
   }
 #ifndef GO_CHOLMOD_SUPPORT
@@ -304,7 +304,7 @@ void gnudump_edges(const string& gnudump, const string& file_suffix,
   }
 }
 
-void gnudump_features(string gnudump, string file_suffix,
+void gnudump_features(const string& gnudump, const string& file_suffix,
                       HyperGraph::EdgeSet::const_iterator begin,
                       HyperGraph::EdgeSet::const_iterator end) {
   // -------

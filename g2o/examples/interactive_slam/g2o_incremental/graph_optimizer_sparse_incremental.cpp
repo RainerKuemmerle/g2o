@@ -16,6 +16,8 @@
 
 #include "graph_optimizer_sparse_incremental.h"
 
+#include <cassert>
+
 #include "g2o/core/block_solver.h"
 #include "g2o/core/optimization_algorithm_gauss_newton.h"
 #include "g2o/examples/interactive_slam/g2o_interactive/types_slam2d_online.h"

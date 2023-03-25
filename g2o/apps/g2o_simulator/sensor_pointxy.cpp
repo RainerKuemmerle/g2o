@@ -26,6 +26,8 @@
 
 #include "sensor_pointxy.h"
 
+#include <cassert>
+
 namespace g2o {
 
 SensorPointXY::SensorPointXY(const std::string& name)

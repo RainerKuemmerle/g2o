@@ -26,6 +26,8 @@
 
 #include "edge_se2_prior.h"
 
+#include <cassert>
+
 namespace g2o {
 
 void EdgeSE2Prior::initialEstimate(const OptimizableGraph::VertexSet& from,

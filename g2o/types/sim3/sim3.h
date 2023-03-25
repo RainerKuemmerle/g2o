@@ -28,6 +28,7 @@
 #define G2O_SIM_3
 
 #include <Eigen/Geometry>
+#include <cassert>
 #include <utility>
 
 #include "g2o/stuff/misc.h"

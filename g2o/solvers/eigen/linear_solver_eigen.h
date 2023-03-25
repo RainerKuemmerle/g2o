@@ -29,6 +29,7 @@
 
 #include <Eigen/Sparse>
 #include <Eigen/SparseCholesky>
+#include <cassert>
 #include <iostream>
 #include <vector>
 

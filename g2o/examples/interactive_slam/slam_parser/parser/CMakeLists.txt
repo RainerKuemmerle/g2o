@@ -21,6 +21,7 @@ endif()
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
+target_compile_features(parser_library PUBLIC cxx_std_17)
 set_target_properties(parser_library PROPERTIES OUTPUT_NAME ${LIB_PREFIX}parser)
 set_target_properties(parser_library PROPERTIES
   VERSION ${G2O_LIB_VERSION}

@@ -29,6 +29,7 @@
 #include <Eigen/Cholesky>
 #include <Eigen/Eigenvalues>
 #include <Eigen/LU>
+#include <cassert>
 #include <iostream>
 
 #include "backbone_tree_action.h"

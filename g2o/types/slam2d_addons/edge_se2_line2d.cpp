@@ -26,6 +26,8 @@
 
 #include "edge_se2_line2d.h"
 
+#include <cassert>
+
 namespace g2o {
 
 bool EdgeSE2Line2D::read(std::istream& is) {

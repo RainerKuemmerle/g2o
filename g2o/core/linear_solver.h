@@ -27,6 +27,7 @@
 #ifndef G2O_LINEAR_SOLVER_H
 #define G2O_LINEAR_SOLVER_H
 
+#include <cassert>
 #include <functional>
 
 #include "g2o/core/marginal_covariance_cholesky.h"

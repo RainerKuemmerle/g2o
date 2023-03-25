@@ -26,6 +26,8 @@
 
 #include "edge_se2_pointxy_calib.h"
 
+#include <cassert>
+
 namespace g2o {
 
 EdgeSE2PointXYCalib::EdgeSE2PointXYCalib()

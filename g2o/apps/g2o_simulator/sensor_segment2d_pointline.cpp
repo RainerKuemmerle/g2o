@@ -26,6 +26,8 @@
 
 #include "sensor_segment2d_pointline.h"
 
+#include <cassert>
+
 #include "g2o/apps/g2o_simulator/simutils.h"
 
 namespace g2o {

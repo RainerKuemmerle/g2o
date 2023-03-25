@@ -30,6 +30,7 @@
 #include <Eigen/Cholesky>
 #include <Eigen/Core>
 #include <Eigen/Dense>
+#include <cassert>
 #include <stack>
 
 #include "creators.h"

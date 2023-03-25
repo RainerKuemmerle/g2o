@@ -26,6 +26,7 @@
 
 #include "optimization_algorithm_gauss_newton.h"
 
+#include <cassert>
 #include <iostream>
 
 #include "batch_stats.h"

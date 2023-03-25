@@ -26,6 +26,8 @@
 
 // helpers for doing fixed or variable size operations on the matrices
 
+#include <cassert>
+
 namespace internal {
 
 #ifdef _MSC_VER

@@ -38,8 +38,6 @@
 #include "unit_test/test_helper/evaluate_jacobian.h"
 #include "unit_test/test_helper/random_state.h"
 
-using namespace g2o;  // NOLINT
-
 namespace {
 auto depth_epsilon = [](const number_t x, const number_t y) {
   constexpr int64_t kUlp = 900000000000;
@@ -48,6 +46,10 @@ auto depth_epsilon = [](const number_t x, const number_t y) {
 };
 
 }
+
+using namespace std;
+using namespace g2o;
+using namespace g2o::internal;
 
 TEST(Slam3D, EdgeSE3Jacobian) {
   auto v1 = std::make_shared<VertexSE3>();

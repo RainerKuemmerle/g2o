@@ -26,6 +26,8 @@
 
 #include "edge_se2_pointxy.h"
 
+#include <cassert>
+
 #ifdef G2O_HAVE_OPENGL
 #include "g2o/stuff/opengl_primitives.h"
 #include "g2o/stuff/opengl_wrapper.h"

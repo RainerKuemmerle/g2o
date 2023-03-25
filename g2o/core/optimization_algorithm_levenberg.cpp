@@ -27,6 +27,7 @@
 
 #include "optimization_algorithm_levenberg.h"
 
+#include <cassert>
 #include <iostream>
 
 #include "batch_stats.h"

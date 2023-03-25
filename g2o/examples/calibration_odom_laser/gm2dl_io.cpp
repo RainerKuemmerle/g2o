@@ -26,6 +26,7 @@
 
 #include "gm2dl_io.h"
 
+#include <cassert>
 #include <fstream>
 #include <iostream>
 #include <memory>

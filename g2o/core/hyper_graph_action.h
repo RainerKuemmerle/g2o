@@ -38,7 +38,7 @@
 #include "hyper_graph.h"
 
 // define to get verbose output
-//#define G2O_DEBUG_ACTIONLIB
+// #define G2O_DEBUG_ACTIONLIB
 
 namespace g2o {
 
@@ -216,7 +216,6 @@ class G2O_CORE_API DrawAction : public HyperGraphElementAction {
       const std::shared_ptr<HyperGraphElementAction::Parameters>& params);
   std::shared_ptr<Parameters> previousParams_;
   std::shared_ptr<BoolProperty> show_;
-  std::shared_ptr<BoolProperty> showId_;
   HyperGraphElementAction::HyperGraphElementActionPtr cacheDrawActions_;
 };
 

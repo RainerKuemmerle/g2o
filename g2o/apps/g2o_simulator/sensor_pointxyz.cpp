@@ -26,6 +26,8 @@
 
 #include "sensor_pointxyz.h"
 
+#include <cassert>
+
 namespace g2o {
 
 // SensorPointXYZ

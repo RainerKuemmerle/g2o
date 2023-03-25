@@ -29,6 +29,7 @@
 #include <algorithm>
 #include <fstream>
 #include <string>
+#include <string_view>
 #include <vector>
 
 namespace g2o {
@@ -75,13 +76,15 @@ void MatrixStructure::free() {
   Ap = nullptr;
 }
 
-bool MatrixStructure::write(const char* filename) const {
+bool MatrixStructure::write(std::string_view filename) const {
   const int& cols = n;
   const int& rows = m;
 
-  std::string name = filename;
-  const std::string::size_type lastDot = name.find_last_of('.');
-  if (lastDot != std::string::npos) name = name.substr(0, lastDot);
+  const std::string_view name = [&filename]() {
+    const std::string::size_type lastDot = filename.find_last_of('.');
+    if (lastDot != std::string_view::npos) return filename.substr(0, lastDot);
+    return filename;
+  }();
 
   std::vector<std::pair<int, int> > entries;
   for (int i = 0; i < cols; ++i) {
@@ -95,7 +98,8 @@ bool MatrixStructure::write(const char* filename) const {
 
   sort(entries.begin(), entries.end(), ColSort());
 
-  std::ofstream fout(filename);
+  const std::string output_filename(filename);
+  std::ofstream fout(output_filename);
   fout << "# name: " << name << std::endl;
   fout << "# type: sparse matrix" << std::endl;
   fout << "# nnz: " << entries.size() << std::endl;

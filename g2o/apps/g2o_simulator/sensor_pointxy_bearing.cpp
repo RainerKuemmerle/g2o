@@ -26,6 +26,8 @@
 
 #include "sensor_pointxy_bearing.h"
 
+#include <cassert>
+
 namespace g2o {
 
 SensorPointXYBearing::SensorPointXYBearing(const std::string& name)

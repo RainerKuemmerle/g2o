@@ -39,9 +39,7 @@
 
 #include "parameter_dims.h"
 
-namespace g2o {
-namespace ceres {
-namespace internal {
+namespace g2o::ceres::internal {
 
 // For fixed size cost functors
 template <typename Functor, typename T, int... Indices>
@@ -100,8 +98,6 @@ inline bool VariadicEvaluate(const Functor& functor, T const* const* input,
   return VariadicEvaluateImpl<ParameterDims>(functor, input, output, &functor);
 }
 
-}  // namespace internal
-}  // namespace ceres
-}  // namespace g2o
+}  // namespace g2o::ceres::internal
 
 #endif  // G2O_CERES_PUBLIC_INTERNAL_VARIADIC_EVALUATE_H_

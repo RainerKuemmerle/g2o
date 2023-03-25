@@ -26,6 +26,7 @@
 
 #include <Eigen/Core>
 #include <Eigen/Geometry>
+#include <cassert>
 #include <iostream>
 
 #include "g2o/autodiff/autodiff.h"
@@ -47,11 +48,9 @@
 #include "g2o/solvers/eigen/linear_solver_eigen.h"
 #endif
 
-namespace g2o {
-namespace bal {
+namespace g2o::bal {
 using Vector9 = VectorN<9>;
-}
-}  // namespace g2o
+}  // namespace g2o::bal
 
 /**
  * \brief camera vertex which stores the parameters for a pinhole camera

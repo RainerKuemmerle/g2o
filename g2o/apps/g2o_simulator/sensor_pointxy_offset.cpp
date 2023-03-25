@@ -26,6 +26,8 @@
 
 #include "sensor_pointxy_offset.h"
 
+#include <cassert>
+
 #include "g2o/core/factory.h"
 
 namespace g2o {

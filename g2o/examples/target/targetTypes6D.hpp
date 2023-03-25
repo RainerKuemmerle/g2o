@@ -6,6 +6,7 @@
 #include <g2o/core/base_vertex.h>
 
 #include <Eigen/Core>
+#include <cassert>
 
 using Vector6d = Eigen::Matrix<double, 6, 1>;
 using Matrix6d = Eigen::Matrix<double, 6, 6>;

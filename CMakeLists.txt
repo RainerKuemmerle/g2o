@@ -36,13 +36,6 @@ if (BUILD_SHARED_LIBS)
   set (G2O_LIB_TYPE SHARED)
 endif()
 
-# There seems to be an issue with MSVC8
-# see http://eigen.tuxfamily.org/bz/show_bug.cgi?id=83
-if(MSVC90)
-  add_definitions(-DEIGEN_DONT_ALIGN_STATICALLY=1)
-  message(STATUS "Disabling memory alignment for MSVC8")
-endif(MSVC90)
-
 # On the Mac platform, configure the RPATH as per the INSTALL, to
 # avoid the problem of loading both the built and INSTALLed versions
 # of the shared targets

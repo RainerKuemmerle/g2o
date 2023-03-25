@@ -26,6 +26,8 @@
 
 #include "edge_se2_segment2d.h"
 
+#include <cassert>
+
 namespace g2o {
 
 bool EdgeSE2Segment2D::read(std::istream& is) {

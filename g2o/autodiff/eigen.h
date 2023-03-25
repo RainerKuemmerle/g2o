@@ -33,8 +33,7 @@
 
 #include "Eigen/Core"
 
-namespace g2o {
-namespace ceres {
+namespace g2o::ceres {
 
 using Vector = Eigen::Matrix<double, Eigen::Dynamic, 1>;
 using Matrix =
@@ -69,7 +68,6 @@ struct EigenTypes {
   using ConstVectorRef = Eigen::Map<const Eigen::Matrix<double, NumRows, 1>>;
 };
 
-}  // namespace ceres
-}  // namespace g2o
+}  // namespace g2o::ceres
 
 #endif  // G2O_CERES_INTERNAL_EIGEN_H_

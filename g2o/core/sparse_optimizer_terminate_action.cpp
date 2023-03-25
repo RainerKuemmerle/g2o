@@ -26,6 +26,7 @@
 
 #include "sparse_optimizer_terminate_action.h"
 
+#include <cassert>
 #include <limits>
 
 #include "sparse_optimizer.h"

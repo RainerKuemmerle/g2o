@@ -26,6 +26,8 @@
 
 #include "sensor_pose2d.h"
 
+#include <cassert>
+
 namespace g2o {
 
 SensorPose2D::SensorPose2D(const std::string& name)

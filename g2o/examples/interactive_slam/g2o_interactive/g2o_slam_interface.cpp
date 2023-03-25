@@ -26,6 +26,7 @@
 
 #include "g2o_slam_interface.h"
 
+#include <cassert>
 #include <iostream>
 
 #include "fast_output.h"

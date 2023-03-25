@@ -25,6 +25,7 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <Eigen/LU>
+#include <cassert>
 #include <fstream>
 #include <iomanip>
 
