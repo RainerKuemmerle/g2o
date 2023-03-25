@@ -31,9 +31,8 @@
 #include <cassert>
 #include <type_traits>
 
-#include "g2o/autodiff/autodiff.h"
-
 #include "eigen_types.h"
+#include "g2o/autodiff/autodiff.h"
 #include "g2o/stuff/misc.h"
 #include "g2o_core_api.h"
 
@@ -142,8 +141,8 @@ class EstimateAccessorGet {
  * can include into the public section of your edge class. See below for the
  * macro. If you use the macro, you do not need to implement computeError() and
  * linearizeOPlus() in your edge. Both methods will be ready for integration
- * into the g2o framework. You may, however, decide against the macro and provide
- * the implementation on your own if this suits your edge class better.
+ * into the g2o framework. You may, however, decide against the macro and
+ * provide the implementation on your own if this suits your edge class better.
  *
  * Example integration: g2o/examples/bal/bal_example.cpp
  * This provides a self-contained example for integration of AD into an

@@ -1,8 +1,7 @@
 #include <benchmark/benchmark.h>
 
-#include "g2o/core/dynamic_aligned_buffer.hpp"
-
 #include "g2o/autodiff/fixed_array.h"
+#include "g2o/core/dynamic_aligned_buffer.hpp"
 
 // Test several different ways of evaluating Jacobians to see the impact of
 // different ways of implementing stuff.

@@ -32,9 +32,8 @@
 #include <limits>
 #include <utility>
 
-#include "g2o/autodiff/fixed_array.h"
-
 #include "base_edge.h"
+#include "g2o/autodiff/fixed_array.h"
 #include "g2o/config.h"
 #include "g2o/stuff/misc.h"
 #include "g2o/stuff/tuple_tools.h"

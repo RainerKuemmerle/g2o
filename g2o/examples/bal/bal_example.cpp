@@ -26,11 +26,10 @@
 
 #include <Eigen/Core>
 #include <Eigen/Geometry>
-#include <iostream>
 #include <cassert>
+#include <iostream>
 
 #include "g2o/autodiff/autodiff.h"
-
 #include "g2o/core/auto_differentiation.h"
 #include "g2o/core/base_binary_edge.h"
 #include "g2o/core/base_vertex.h"
