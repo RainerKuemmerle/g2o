@@ -82,7 +82,7 @@ struct G2O_HIERARCHICAL_API EdgeCreator {
 
   //! Removes an association to the association map.
   //! @params vertexTypes: the string of the vertex ids connected by the edge
-  bool removeAssociation(std::string vertexTypes);
+  bool removeAssociation(const std::string& vertexTypes);
 
   //! constructs an edge based on the verticesVector given as argument
   //! The vertices of the newly created edge are set to the parameter
