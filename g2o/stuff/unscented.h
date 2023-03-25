@@ -29,6 +29,7 @@
 
 #include <Eigen/Cholesky>
 #include <Eigen/Core>
+#include <cassert>
 
 namespace g2o {
 

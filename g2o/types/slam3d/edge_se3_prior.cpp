@@ -27,6 +27,7 @@
 #include "edge_se3_prior.h"
 
 #include <iostream>
+#include <cassert>
 
 #include "isometry3d_gradients.h"
 

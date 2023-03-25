@@ -26,6 +26,8 @@
 
 #include "sensor_pose3d.h"
 
+#include <cassert>
+
 #include "g2o/types/slam3d/isometry3d_mappings.h"
 
 namespace g2o {

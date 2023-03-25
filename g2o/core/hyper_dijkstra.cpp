@@ -26,8 +26,7 @@
 
 #include "hyper_dijkstra.h"
 
-#include <assert.h>
-
+#include <cassert>
 #include <deque>
 #include <iostream>
 #include <queue>

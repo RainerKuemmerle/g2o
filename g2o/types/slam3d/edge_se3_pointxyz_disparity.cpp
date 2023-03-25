@@ -28,6 +28,7 @@
 
 #include <iomanip>
 #include <iostream>
+#include <cassert>
 
 #ifdef G2O_HAVE_OPENGL
 #include "g2o/stuff/opengl_primitives.h"

@@ -37,9 +37,8 @@
 #ifndef G2O_FAST_OUTPUT_H
 #define G2O_FAST_OUTPUT_H
 
-#include <assert.h>
-#include <stdint.h>
-
+#include <cassert>
+#include <cstdint>
 #include <cstdio>
 
 #ifdef __cplusplus

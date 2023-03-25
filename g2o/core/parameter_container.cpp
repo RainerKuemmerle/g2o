@@ -26,6 +26,7 @@
 
 #include "parameter_container.h"
 
+#include <cassert>
 #include <iostream>
 
 #include "factory.h"

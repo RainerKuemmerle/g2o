@@ -28,6 +28,7 @@
 #define G2O_LINEAR_SOLVERCSPARSE_H
 
 #include <iostream>
+#include <cassert>
 
 #include "csparse_wrapper.h"
 #include "g2o/core/batch_stats.h"

@@ -27,6 +27,7 @@
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 #include <iostream>
+#include <cassert>
 
 #ifdef G2O_USE_VENDORED_CERES
 #include "g2o/EXTERNAL/ceres/autodiff.h"

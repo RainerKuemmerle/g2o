@@ -29,6 +29,7 @@
 
 #include <Eigen/Core>
 #include <Eigen/Geometry>
+#include <cassert>
 
 #include "g2o/stuff/misc.h"
 #include "se3_ops.h"

@@ -27,6 +27,7 @@
 #include "g2o_slam_interface.h"
 
 #include <iostream>
+#include <cassert>
 
 #include "fast_output.h"
 #include "g2o/types/slam3d/se3quat.h"

@@ -26,6 +26,8 @@
 
 #include "sensor_pointxyz_disparity.h"
 
+#include <cassert>
+
 namespace g2o {
 using namespace std;
 using namespace Eigen;

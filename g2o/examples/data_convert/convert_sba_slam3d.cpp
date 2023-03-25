@@ -26,6 +26,7 @@
 
 #include <fstream>
 #include <iostream>
+#include <cassert>
 
 #include "g2o/core/optimizable_graph.h"
 #include "g2o/stuff/command_args.h"

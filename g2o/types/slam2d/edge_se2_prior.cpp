@@ -26,6 +26,8 @@
 
 #include "edge_se2_prior.h"
 
+#include <cassert>
+
 namespace g2o {
 
 EdgeSE2Prior::EdgeSE2Prior() : BaseUnaryEdge<3, SE2, VertexSE2>() {}

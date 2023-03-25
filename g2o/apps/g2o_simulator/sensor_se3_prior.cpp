@@ -26,6 +26,8 @@
 
 #include "sensor_se3_prior.h"
 
+#include <cassert>
+
 namespace g2o {
 using namespace std;
 

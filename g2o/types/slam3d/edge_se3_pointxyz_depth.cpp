@@ -26,6 +26,8 @@
 
 #include "edge_se3_pointxyz_depth.h"
 
+#include <cassert>
+
 namespace g2o {
 
 // point to camera projection, monocular

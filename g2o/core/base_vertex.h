@@ -31,6 +31,7 @@
 #include <Eigen/Core>
 #include <Eigen/Dense>
 #include <stack>
+#include <cassert>
 
 #include "creators.h"
 #include "g2o/stuff/macros.h"

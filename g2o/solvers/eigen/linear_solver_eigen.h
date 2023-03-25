@@ -31,6 +31,7 @@
 #include <Eigen/SparseCholesky>
 #include <iostream>
 #include <vector>
+#include <cassert>
 
 #include "g2o/core/batch_stats.h"
 #include "g2o/core/linear_solver.h"
