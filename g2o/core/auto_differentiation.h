@@ -265,12 +265,12 @@ class AutoDifferentiation {
 
 // helper macros for fine-grained integration into own types
 #define G2O_MAKE_AUTO_AD_COMPUTEERROR                                      \
-  void computeError() {                                                    \
+  void computeError() override {                                           \
     g2o::AutoDifferentiation<                                              \
         std::remove_reference<decltype(*this)>::type>::computeError(this); \
   }
 #define G2O_MAKE_AUTO_AD_LINEARIZEOPLUS                                 \
-  void linearizeOplus() {                                               \
+  void linearizeOplus() override {                                      \
     g2o::AutoDifferentiation<                                           \
         std::remove_reference<decltype(*this)>::type>::linearize(this); \
   }
@@ -285,14 +285,14 @@ class AutoDifferentiation {
 // helper macros for fine-grained integration into own types using
 // EstimateAccessorGet
 #define G2O_MAKE_AUTO_AD_COMPUTEERROR_BY_GET                               \
-  void computeError() {                                                    \
+  void computeError() override {                                           \
     using EdgeType = std::remove_reference<decltype(*this)>::type;         \
     g2o::AutoDifferentiation<                                              \
         EdgeType, g2o::EstimateAccessorGet<EdgeType>>::computeError(this); \
   }
 
 #define G2O_MAKE_AUTO_AD_LINEARIZEOPLUS_BY_GET                          \
-  void linearizeOplus() {                                               \
+  void linearizeOplus() override {                                      \
     using EdgeType = std::remove_reference<decltype(*this)>::type;      \
     g2o::AutoDifferentiation<                                           \
         EdgeType, g2o::EstimateAccessorGet<EdgeType>>::linearize(this); \

@@ -47,13 +47,13 @@ class VertexParams : public g2o::BaseVertex<3, Eigen::Vector3d> {
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
   VertexParams() {}
 
-  virtual bool read(std::istream& /*is*/) { return false; }
+  bool read(std::istream& /*is*/) override { return false; }
 
-  virtual bool write(std::ostream& /*os*/) const { return false; }
+  bool write(std::ostream& /*os*/) const override { return false; }
 
-  virtual void setToOriginImpl() {}
+  void setToOriginImpl() override {}
 
-  virtual void oplusImpl(const double* update) {
+  void oplusImpl(const double* update) override {
     Eigen::Vector3d::ConstMapType v(update);
     _estimate += v;
   }
@@ -71,11 +71,11 @@ class EdgePointOnCurve
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   EdgePointOnCurve() {}
-  virtual bool read(std::istream& /*is*/) {
+  bool read(std::istream& /*is*/) override {
     cerr << __PRETTY_FUNCTION__ << " not implemented yet" << endl;
     return false;
   }
-  virtual bool write(std::ostream& /*os*/) const {
+  bool write(std::ostream& /*os*/) const override {
     cerr << __PRETTY_FUNCTION__ << " not implemented yet" << endl;
     return false;
   }
