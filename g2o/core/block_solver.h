@@ -48,14 +48,14 @@ template <int _PoseDim, int _LandmarkDim>
 struct BlockSolverTraits {
   static const int PoseDim = _PoseDim;
   static const int LandmarkDim = _LandmarkDim;
-  typedef Eigen::Matrix<number_t, PoseDim, PoseDim, Eigen::ColMajor>
+  typedef Eigen::Matrix<double, PoseDim, PoseDim, Eigen::ColMajor>
       PoseMatrixType;
-  typedef Eigen::Matrix<number_t, LandmarkDim, LandmarkDim, Eigen::ColMajor>
+  typedef Eigen::Matrix<double, LandmarkDim, LandmarkDim, Eigen::ColMajor>
       LandmarkMatrixType;
-  typedef Eigen::Matrix<number_t, PoseDim, LandmarkDim, Eigen::ColMajor>
+  typedef Eigen::Matrix<double, PoseDim, LandmarkDim, Eigen::ColMajor>
       PoseLandmarkMatrixType;
-  typedef Eigen::Matrix<number_t, PoseDim, 1, Eigen::ColMajor> PoseVectorType;
-  typedef Eigen::Matrix<number_t, LandmarkDim, 1, Eigen::ColMajor>
+  typedef Eigen::Matrix<double, PoseDim, 1, Eigen::ColMajor> PoseVectorType;
+  typedef Eigen::Matrix<double, LandmarkDim, 1, Eigen::ColMajor>
       LandmarkVectorType;
 
   typedef SparseBlockMatrix<PoseMatrixType> PoseHessianType;
@@ -93,7 +93,7 @@ class BlockSolverBase : public Solver {
   /**
    * compute dest = H * src
    */
-  virtual void multiplyHessian(number_t* dest, const number_t* src) const = 0;
+  virtual void multiplyHessian(double* dest, const double* src) const = 0;
 };
 
 /**
@@ -133,7 +133,7 @@ class BlockSolver : public BlockSolverBase {
   virtual bool computeMarginals(
       SparseBlockMatrix<MatrixX>& spinv,
       const std::vector<std::pair<int, int>>& blockIndices);
-  virtual bool setLambda(number_t lambda, bool backup = false);
+  virtual bool setLambda(double lambda, bool backup = false);
   virtual void restoreDiagonal();
   virtual bool supportsSchur() { return true; }
   virtual bool schur() { return _doSchur; }
@@ -146,7 +146,7 @@ class BlockSolver : public BlockSolverBase {
 
   virtual bool saveHessian(const std::string& fileName) const;
 
-  virtual void multiplyHessian(number_t* dest, const number_t* src) const {
+  virtual void multiplyHessian(double* dest, const double* src) const {
     _Hpp->multiplySymmetricUpperTriangle(dest, src);
   }
 
@@ -177,8 +177,8 @@ class BlockSolver : public BlockSolverBase {
 
   bool _doSchur;
 
-  std::unique_ptr<number_t[], aligned_deleter<number_t>> _coefficients;
-  std::unique_ptr<number_t[], aligned_deleter<number_t>> _bschur;
+  std::unique_ptr<double[], aligned_deleter<double>> _coefficients;
+  std::unique_ptr<double[], aligned_deleter<double>> _bschur;
 
   int _numPoses, _numLandmarks;
   int _sizePoses, _sizeLandmarks;

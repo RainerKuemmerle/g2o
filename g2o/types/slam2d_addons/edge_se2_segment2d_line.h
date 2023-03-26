@@ -45,11 +45,11 @@ class EdgeSE2Segment2DLine
       G2O_TYPES_SLAM2D_ADDONS_API
       EdgeSE2Segment2DLine();
 
-  G2O_TYPES_SLAM2D_ADDONS_API number_t theta() const { return _measurement[0]; }
-  G2O_TYPES_SLAM2D_ADDONS_API number_t rho() const { return _measurement[1]; }
+  G2O_TYPES_SLAM2D_ADDONS_API double theta() const { return _measurement[0]; }
+  G2O_TYPES_SLAM2D_ADDONS_API double rho() const { return _measurement[1]; }
 
-  G2O_TYPES_SLAM2D_ADDONS_API void setTheta(number_t t) { _measurement[0] = t; }
-  G2O_TYPES_SLAM2D_ADDONS_API void setRho(number_t r) { _measurement[1] = r; }
+  G2O_TYPES_SLAM2D_ADDONS_API void setTheta(double t) { _measurement[0] = t; }
+  G2O_TYPES_SLAM2D_ADDONS_API void setRho(double r) { _measurement[1] = r; }
 
   G2O_TYPES_SLAM2D_ADDONS_API void computeError() {
     const VertexSE2* v1 = static_cast<const VertexSE2*>(_vertices[0]);
@@ -68,15 +68,13 @@ class EdgeSE2Segment2DLine
     _error[0] = normalize_theta(_error[0]);
   }
 
-  G2O_TYPES_SLAM2D_ADDONS_API virtual bool setMeasurementData(
-      const number_t* d) {
+  G2O_TYPES_SLAM2D_ADDONS_API virtual bool setMeasurementData(const double* d) {
     Eigen::Map<const Vector2> data(d);
     _measurement = data;
     return true;
   }
 
-  G2O_TYPES_SLAM2D_ADDONS_API virtual bool getMeasurementData(
-      number_t* d) const {
+  G2O_TYPES_SLAM2D_ADDONS_API virtual bool getMeasurementData(double* d) const {
     Eigen::Map<Vector2> data(d);
     data = _measurement;
     return true;

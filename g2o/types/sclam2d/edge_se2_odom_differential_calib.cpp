@@ -37,7 +37,7 @@ EdgeSE2OdomDifferentialCalib::EdgeSE2OdomDifferentialCalib()
                          VertexOdomDifferentialParams>() {}
 
 bool EdgeSE2OdomDifferentialCalib::read(std::istream& is) {
-  number_t vl, vr, dt;
+  double vl, vr, dt;
   is >> vl >> vr >> dt;
   VelocityMeasurement vm(vl, vr, dt);
   setMeasurement(vm);

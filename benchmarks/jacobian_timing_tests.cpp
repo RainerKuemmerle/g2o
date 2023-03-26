@@ -6,10 +6,10 @@
 // Test several different ways of evaluating Jacobians to see the impact of
 // different ways of implementing stuff.
 
-template <typename number_t, int D>
+template <typename double, int D>
 void BM_FixedArray(benchmark::State& state) {
   while (state.KeepRunning()) {
-    number_t add_vi[D] = {};
+    double add_vi[D] = {};
     for (int i = 0; i < D; ++i) {
       benchmark::DoNotOptimize(add_vi[i] = 1);
       benchmark::DoNotOptimize(add_vi[i] = -1);
@@ -18,11 +18,11 @@ void BM_FixedArray(benchmark::State& state) {
   }
 }
 
-template <typename number_t, int D>
+template <typename double, int D>
 void BM_FixedArrayPointer(benchmark::State& state) {
   while (state.KeepRunning()) {
-    number_t add_vi[D] = {};
-    number_t* v = &add_vi[0];
+    double add_vi[D] = {};
+    double* v = &add_vi[0];
     for (int i = 0; i < D; ++i) {
       benchmark::DoNotOptimize((*v) = 1);
       benchmark::DoNotOptimize((*v) = -1);
@@ -31,13 +31,13 @@ void BM_FixedArrayPointer(benchmark::State& state) {
   }
 }
 
-template <typename number_t>
+template <typename double>
 void BM_VariableArray(benchmark::State& state) {
   while (state.KeepRunning()) {
     const int d = state.range(0);
 
-    number_t add_vi[d];
-    // std::fill(add_vi, add_vi + d, number_t(0.0));
+    double add_vi[d];
+    // std::fill(add_vi, add_vi + d, double(0.0));
 
     for (int i = 0; i < d; ++i) {
       benchmark::DoNotOptimize(add_vi[i] = 0);
@@ -51,15 +51,15 @@ void BM_VariableArray(benchmark::State& state) {
   }
 }
 
-template <typename number_t>
+template <typename double>
 void BM_VariableArrayPointer(benchmark::State& state) {
   while (state.KeepRunning()) {
     const int d = state.range(0);
-    number_t add_vi[d];
+    double add_vi[d];
 
-    std::fill(add_vi, add_vi + d, number_t(0.0));
+    std::fill(add_vi, add_vi + d, double(0.0));
 
-    number_t* v = &add_vi[0];
+    double* v = &add_vi[0];
 
     for (int i = 0; i < d; ++i) {
       benchmark::DoNotOptimize((*v) = 1);
@@ -69,11 +69,10 @@ void BM_VariableArrayPointer(benchmark::State& state) {
   }
 }
 
-template <typename number_t, int D>
+template <typename double, int D>
 void BM_StaticEigenMatrix(benchmark::State& state) {
   while (state.KeepRunning()) {
-    Eigen::Matrix<number_t, D, 1> add_vi =
-        Eigen::Matrix<number_t, D, 1>::Zero();
+    Eigen::Matrix<double, D, 1> add_vi = Eigen::Matrix<double, D, 1>::Zero();
     for (int i = 0; i < D; ++i) {
       benchmark::DoNotOptimize(add_vi[i] = 1);
       benchmark::DoNotOptimize(add_vi[i] = -1);
@@ -82,12 +81,11 @@ void BM_StaticEigenMatrix(benchmark::State& state) {
   }
 }
 
-template <typename number_t, int D>
+template <typename double, int D>
 void BM_StaticEigenMatrixPointer(benchmark::State& state) {
   while (state.KeepRunning()) {
-    Eigen::Matrix<number_t, D, 1> add_vi =
-        Eigen::Matrix<number_t, D, 1>::Zero();
-    number_t* v = add_vi.data();
+    Eigen::Matrix<double, D, 1> add_vi = Eigen::Matrix<double, D, 1>::Zero();
+    double* v = add_vi.data();
     for (int i = 0; i < D; ++i) {
       benchmark::DoNotOptimize((*v) = 1);
       benchmark::DoNotOptimize((*v) = -1);
@@ -96,11 +94,11 @@ void BM_StaticEigenMatrixPointer(benchmark::State& state) {
   }
 }
 
-template <typename number_t>
+template <typename double>
 void BM_DynamicEigenMatrix(benchmark::State& state) {
   while (state.KeepRunning()) {
     const int d = state.range(0);
-    Eigen::Matrix<number_t, Eigen::Dynamic, 1> add_vi(d);
+    Eigen::Matrix<double, Eigen::Dynamic, 1> add_vi(d);
     add_vi.setZero();
     for (int i = 0; i < d; ++i) {
       benchmark::DoNotOptimize(add_vi[i] = 1);
@@ -110,13 +108,13 @@ void BM_DynamicEigenMatrix(benchmark::State& state) {
   }
 }
 
-template <typename number_t>
+template <typename double>
 void BM_DynamicEigenMatrixPointer(benchmark::State& state) {
   while (state.KeepRunning()) {
     const int d = state.range(0);
-    Eigen::Matrix<number_t, Eigen::Dynamic, 1> add_vi(d);
+    Eigen::Matrix<double, Eigen::Dynamic, 1> add_vi(d);
     add_vi.setZero();
-    number_t* v = add_vi.data();
+    double* v = add_vi.data();
     for (int i = 0; i < d; ++i) {
       benchmark::DoNotOptimize((*v) = 1);
       benchmark::DoNotOptimize((*v) = -1);
@@ -125,13 +123,13 @@ void BM_DynamicEigenMatrixPointer(benchmark::State& state) {
   }
 }
 
-template <typename number_t>
+template <typename double>
 void BM_DynamicAlignedBuffer(benchmark::State& state) {
   while (state.KeepRunning()) {
     const int d = state.range(0);
-    static g2o::dynamic_aligned_buffer<number_t> buffer{size_t(d)};
-    number_t* add_vi = buffer.request(d);
-    std::fill(add_vi, add_vi + d, number_t(0.0));
+    static g2o::dynamic_aligned_buffer<double> buffer{size_t(d)};
+    double* add_vi = buffer.request(d);
+    std::fill(add_vi, add_vi + d, double(0.0));
     for (int i = 0; i < d; ++i) {
       benchmark::DoNotOptimize(add_vi[i] = 1);
       benchmark::DoNotOptimize(add_vi[i] = -1);
@@ -140,14 +138,14 @@ void BM_DynamicAlignedBuffer(benchmark::State& state) {
   }
 }
 
-template <typename number_t>
+template <typename double>
 void BM_DynamicAlignedBufferPointer(benchmark::State& state) {
   while (state.KeepRunning()) {
     const int d = state.range(0);
-    static g2o::dynamic_aligned_buffer<number_t> buffer{size_t(d)};
-    number_t* add_vi = buffer.request(d);
-    std::fill(add_vi, add_vi + d, number_t(0.0));
-    number_t* v = add_vi;
+    static g2o::dynamic_aligned_buffer<double> buffer{size_t(d)};
+    double* add_vi = buffer.request(d);
+    std::fill(add_vi, add_vi + d, double(0.0));
+    double* v = add_vi;
 
     for (int i = 0; i < d; ++i) {
       benchmark::DoNotOptimize((*v) = 1);
@@ -157,21 +155,21 @@ void BM_DynamicAlignedBufferPointer(benchmark::State& state) {
   }
 }
 
-template <typename number_t>
+template <typename double>
 void BM_StaticDynamicDynamicAlignedBufferHybrid(benchmark::State& state) {
   while (state.KeepRunning()) {
     const int d = state.range(0);
     if (d <= 10) {
-      number_t add_vi[10] = {};
+      double add_vi[10] = {};
       for (int i = 0; i < d; ++i) {
         benchmark::DoNotOptimize(add_vi[i] = 1);
         benchmark::DoNotOptimize(add_vi[i] = -1);
         benchmark::DoNotOptimize(add_vi[i] = 0);
       }
     } else {
-      static g2o::dynamic_aligned_buffer<number_t> buffer{size_t(d)};
-      number_t* add_vi = buffer.request(d);
-      std::fill(add_vi, add_vi + d, number_t(0.0));
+      static g2o::dynamic_aligned_buffer<double> buffer{size_t(d)};
+      double* add_vi = buffer.request(d);
+      std::fill(add_vi, add_vi + d, double(0.0));
       for (int i = 0; i < d; ++i) {
         benchmark::DoNotOptimize(add_vi[i] = 1);
         benchmark::DoNotOptimize(add_vi[i] = -1);
@@ -181,10 +179,10 @@ void BM_StaticDynamicDynamicAlignedBufferHybrid(benchmark::State& state) {
   }
 }
 
-template <typename number_t, int D>
+template <typename double, int D>
 void BM_ClassFixedArrayStatic(benchmark::State& state) {
   while (state.KeepRunning()) {
-    ceres::internal::FixedArray<number_t, D> add_vi(D);
+    ceres::internal::FixedArray<double, D> add_vi(D);
     add_vi.fill(0.);
     for (int i = 0; i < D; ++i) {
       benchmark::DoNotOptimize(add_vi[i] = 1);
@@ -194,11 +192,11 @@ void BM_ClassFixedArrayStatic(benchmark::State& state) {
   }
 }
 
-template <typename number_t>
+template <typename double>
 void BM_ClassFixedArrayDynamic(benchmark::State& state) {
   while (state.KeepRunning()) {
     const int d = state.range(0);
-    ceres::internal::FixedArray<number_t> add_vi(d);
+    ceres::internal::FixedArray<double> add_vi(d);
     add_vi.fill(0.);
     for (int i = 0; i < d; ++i) {
       benchmark::DoNotOptimize(add_vi[i] = 1);

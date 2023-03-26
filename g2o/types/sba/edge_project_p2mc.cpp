@@ -87,17 +87,17 @@ void EdgeProjectP2MC::linearizeOplus() {
 
   // Jacobians wrt camera parameters
   // set d(quat-x) values [ pz*dpx/dx - px*dpz/dx ] / pz^2
-  number_t px = pc(0);
-  number_t py = pc(1);
-  number_t pz = pc(2);
-  number_t ipz2 = 1.0 / (pz * pz);
+  double px = pc(0);
+  double py = pc(1);
+  double pz = pc(2);
+  double ipz2 = 1.0 / (pz * pz);
   if (g2o_isnan(ipz2)) {
     std::cout << "[SetJac] infinite jac" << std::endl;
     abort();
   }
 
-  number_t ipz2fx = ipz2 * cam.Kcam(0, 0);  // Fx
-  number_t ipz2fy = ipz2 * cam.Kcam(1, 1);  // Fy
+  double ipz2fx = ipz2 * cam.Kcam(0, 0);  // Fx
+  double ipz2fy = ipz2 * cam.Kcam(1, 1);  // Fy
 
   // check for local vars
   Vector3 pwt =

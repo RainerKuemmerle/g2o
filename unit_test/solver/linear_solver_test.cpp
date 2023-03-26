@@ -137,7 +137,7 @@ TYPED_TEST_P(LS, SolvePattern) {
 TYPED_TEST_P(LS, SolveBlocks) {
   this->ordering.setOrdering(*this->linearsolver);
 
-  number_t** blocks = nullptr;
+  double** blocks = nullptr;
   bool state = this->linearsolver->solveBlocks(blocks, this->sparse_matrix);
   ASSERT_TRUE(!state || blocks != nullptr);
   if (!state) {  // solver does not implement solving for a pattern return in

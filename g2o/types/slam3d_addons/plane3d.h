@@ -54,19 +54,19 @@ class G2O_TYPES_SLAM3D_ADDONS_API Plane3D {
     normalize(_coeffs);
   }
 
-  static number_t azimuth(const Vector3& v) { return std::atan2(v(1), v(0)); }
+  static double azimuth(const Vector3& v) { return std::atan2(v(1), v(0)); }
 
-  static number_t elevation(const Vector3& v) {
+  static double elevation(const Vector3& v) {
     return std::atan2(v(2), v.head<2>().norm());
   }
 
-  number_t distance() const { return -_coeffs(3); }
+  double distance() const { return -_coeffs(3); }
 
   Vector3 normal() const { return _coeffs.head<3>(); }
 
   static Matrix3 rotation(const Vector3& v) {
-    number_t _azimuth = azimuth(v);
-    number_t _elevation = elevation(v);
+    double _azimuth = azimuth(v);
+    double _elevation = elevation(v);
     return (AngleAxis(_azimuth, Vector3::UnitZ()) *
             AngleAxis(-_elevation, Vector3::UnitY()))
         .toRotationMatrix();
@@ -74,14 +74,14 @@ class G2O_TYPES_SLAM3D_ADDONS_API Plane3D {
 
   inline void oplus(const Vector3& v) {
     // construct a normal from azimuth and elevation;
-    number_t _azimuth = v[0];
-    number_t _elevation = v[1];
-    number_t s = std::sin(_elevation), c = std::cos(_elevation);
+    double _azimuth = v[0];
+    double _elevation = v[1];
+    double s = std::sin(_elevation), c = std::cos(_elevation);
     Vector3 n(c * std::cos(_azimuth), c * std::sin(_azimuth), s);
 
     // rotate the normal
     Matrix3 R = rotation(normal());
-    number_t d = distance() + v[2];
+    double d = distance() + v[2];
     _coeffs.head<3>() = R * n;
     _coeffs(3) = -d;
     normalize(_coeffs);
@@ -91,13 +91,13 @@ class G2O_TYPES_SLAM3D_ADDONS_API Plane3D {
     // construct the rotation that would bring the plane normal in (1 0 0)
     Matrix3 R = rotation(normal()).transpose();
     Vector3 n = R * plane.normal();
-    number_t d = distance() - plane.distance();
+    double d = distance() - plane.distance();
     return Vector3(azimuth(n), elevation(n), d);
   }
 
  protected:
   static inline void normalize(Vector4& coeffs) {
-    number_t n = coeffs.head<3>().norm();
+    double n = coeffs.head<3>().norm();
     coeffs = coeffs * (1. / n);
   }
 

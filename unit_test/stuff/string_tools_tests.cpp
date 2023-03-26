@@ -24,10 +24,12 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+#include <gtest/gtest.h>
+
 #include <cstdlib>
+#include <sstream>
 
 #include "g2o/stuff/string_tools.h"
-#include "gtest/gtest.h"
 
 TEST(Stuff, Trim) {
   ASSERT_EQ("abc", g2o::trim("abc   "));
@@ -98,6 +100,32 @@ TEST(Stuff, StrEndsWith) {
   ASSERT_FALSE(g2o::strEndsWith("Hello World!", "!!Hello World!"));
 }
 
+TEST(Stuff, ReadLine) {
+  std::stringstream content;
+  content << "foo" << std::endl;
+  content << "" << std::endl;
+  content << "bar" << std::endl;
+  content << "foo bar" << std::endl;
+
+  std::stringstream currentLine;
+  ASSERT_EQ(g2o::readLine(content, currentLine), 3);
+  ASSERT_EQ(currentLine.str(), "foo");
+  ASSERT_EQ(g2o::readLine(content, currentLine), 0);
+  ASSERT_EQ(currentLine.str(), "");
+  ASSERT_EQ(g2o::readLine(content, currentLine), 3);
+  ASSERT_EQ(currentLine.str(), "bar");
+  ASSERT_EQ(g2o::readLine(content, currentLine), 7);
+  ASSERT_EQ(currentLine.str(), "foo bar");
+  ASSERT_EQ(g2o::readLine(content, currentLine), -1);
+  ASSERT_EQ(g2o::readLine(content, currentLine), -1);
+
+  content = std::stringstream();
+  content << "foobar";
+  ASSERT_EQ(g2o::readLine(content, currentLine), 6);
+  ASSERT_EQ(currentLine.str(), "foobar");
+  ASSERT_EQ(g2o::readLine(content, currentLine), -1);
+}
+
 #if defined(UNIX) && !defined(ANDROID)
 TEST(Stuff, StrExpand) {
   char* envVar = getenv("HOME");
@@ -106,8 +134,8 @@ TEST(Stuff, StrExpand) {
     SUCCEED();
     return;
   }
-  std::string expanded = g2o::strExpandFilename("$HOME/filename.txt");
-  std::string expected = g2o::formatString("%s/filename.txt", envVar);
+  const std::string expanded = g2o::strExpandFilename("$HOME/filename.txt");
+  const std::string expected = g2o::formatString("%s/filename.txt", envVar);
   EXPECT_EQ(expanded, expected);
 }
 #endif

@@ -34,9 +34,8 @@ namespace csparse_extension {
  * Originally from CSparse, avoid memory re-allocations by giving workspace
  * pointers CSparse: Copyright (c) 2006-2011, Timothy A. Davis.
  */
-int cs_cholsolsymb(const cs *A, number_t *b, const css *S, number_t *x,
-                   int *work) {
-  csn *N;
+int cs_cholsolsymb(const cs* A, double* b, const css* S, double* x, int* work) {
+  csn* N;
   int n, ok;
   if (!CS_CSC(A) || !b || !S || !x) {
     cerr << __PRETTY_FUNCTION__ << ": No valid input!" << endl;
@@ -65,20 +64,20 @@ int cs_cholsolsymb(const cs *A, number_t *b, const css *S, number_t *x,
  * pointers CSparse: Copyright (c) 2006-2011, Timothy A. Davis.
  */
 /* L = chol (A, [pinv parent cp]), pinv is optional */
-csn *cs_chol_workspace(const cs *A, const css *S, int *cin, number_t *xin) {
-  number_t d, lki, *Lx, *x, *Cx;
+csn* cs_chol_workspace(const cs* A, const css* S, int* cin, double* xin) {
+  double lki, *Lx, *x, *Cx;
   int top, i, p, k, n, *Li, *Lp, *cp, *pinv, *s, *c, *parent, *Cp, *Ci;
   cs *L, *C, *E;
-  csn *N;
+  csn* N;
   if (!CS_CSC(A) || !S || !S->cp || !S->parent) return (NULL);
   n = A->n;
-  N = (csn *)cs_calloc(1, sizeof(csn)); /* allocate result */
-  c = cin;                              /* get int workspace */
-  x = xin;                              /* get number_t workspace */
+  N = (csn*)cs_calloc(1, sizeof(csn)); /* allocate result */
+  c = cin;                             /* get int workspace */
+  x = xin;                             /* get double workspace */
   cp = S->cp;
   pinv = S->pinv;
   parent = S->parent;
-  C = pinv ? cs_symperm(A, pinv, 1) : ((cs *)A);
+  C = pinv ? cs_symperm(A, pinv, 1) : ((cs*)A);
   E = pinv ? C : NULL; /* E is alias for A, or a copy E=A(p,p) */
   if (!N || !c || !x || !C) return (cs_ndone(N, E, NULL, NULL, 0));
   s = c + n;
@@ -100,10 +99,10 @@ csn *cs_chol_workspace(const cs *A, const css *S, int *cin, number_t *xin) {
     {
       if (Ci[p] <= k) x[Ci[p]] = Cx[p];
     }
-    d = x[k]; /* d = C(k,k) */
-    x[k] = 0; /* clear x for k+1st iteration */
+    double d = x[k]; /* d = C(k,k) */
+    x[k] = 0;        /* clear x for k+1st iteration */
     /* --- Triangular solve --------------------------------------------- */
-    for (; top < n; top++) /* solve L(0:k-1,0:k-1) * x = C(:,k) */
+    for (; top < n; top++)    /* solve L(0:k-1,0:k-1) * x = C(:,k) */
     {
       i = s[top];             /* s [top..n-1] is pattern of L(k,:) */
       lki = x[i] / Lx[Lp[i]]; /* L(k,i) = x (i) / L(i,i) */
@@ -113,7 +112,7 @@ csn *cs_chol_workspace(const cs *A, const css *S, int *cin, number_t *xin) {
       }
       d -= lki * lki; /* d = d - L(k,i)*L(k,i) */
       p = c[i]++;
-      Li[p] = k; /* store L(k,i) in column i */
+      Li[p] = k;      /* store L(k,i) in column i */
       Lx[p] = lki;
     }
     /* --- Compute L(k,k) ----------------------------------------------- */

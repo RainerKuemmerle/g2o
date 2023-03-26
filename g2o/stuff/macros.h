@@ -106,18 +106,8 @@ for static C++ objects. For GCC, uses a constructor attribute."
 // some macros that are only useful for c++
 #ifdef __cplusplus
 
-#define G2O_FSKIP_LINE(f)                                   \
-  {                                                         \
-    char c = ' ';                                           \
-    while (c != '\n' && f.good() && !(f).eof()) (f).get(c); \
-  }
-
 #ifndef PVAR
 #define PVAR(s) #s << " = " << (s) << std::flush
-#endif
-
-#ifndef PVARA
-#define PVARA(s) #s << " = " << RAD2DEG(s) << "deg" << std::flush
 #endif
 
 #ifndef FIXED

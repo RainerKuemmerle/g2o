@@ -61,14 +61,14 @@ class LinearSolver {
    * If the matrix changes call init() before.
    * solve system Ax = b, x and b have to allocated beforehand!!
    */
-  virtual bool solve(const SparseBlockMatrix<MatrixType>& A, number_t* x,
-                     number_t* b) = 0;
+  virtual bool solve(const SparseBlockMatrix<MatrixType>& A, double* x,
+                     double* b) = 0;
 
   /**
    * Inverts the diagonal blocks of A
    * @returns false if not defined.
    */
-  virtual bool solveBlocks(number_t**& blocks,
+  virtual bool solveBlocks(double**& blocks,
                            const SparseBlockMatrix<MatrixType>& A) {
     (void)blocks;
     (void)A;
@@ -95,19 +95,19 @@ class LinearSolver {
 
   //! allocate block memory structure
   static void allocateBlocks(const SparseBlockMatrix<MatrixType>& A,
-                             number_t**& blocks) {
-    blocks = new number_t*[A.rows()];
-    number_t** block = blocks;
+                             double**& blocks) {
+    blocks = new double*[A.rows()];
+    double** block = blocks;
     for (size_t i = 0; i < A.rowBlockIndices().size(); ++i) {
       int dim = A.rowsOfBlock(i) * A.colsOfBlock(i);
-      *block = new number_t[dim];
+      *block = new double[dim];
       block++;
     }
   }
 
   //! de-allocate the block structure
   static void deallocateBlocks(const SparseBlockMatrix<MatrixType>& A,
-                               number_t**& blocks) {
+                               double**& blocks) {
     for (size_t i = 0; i < A.rowBlockIndices().size(); ++i) {
       delete[] blocks[i];
     }
@@ -153,7 +153,7 @@ class LinearSolverCCS : public LinearSolver<MatrixType> {
       : LinearSolver<MatrixType>(), _ccsMatrix(0), _blockOrdering(true) {}
   ~LinearSolverCCS() { delete _ccsMatrix; }
 
-  virtual bool solveBlocks(number_t**& blocks,
+  virtual bool solveBlocks(double**& blocks,
                            const SparseBlockMatrix<MatrixType>& A) {
     auto compute = [&](MarginalCovarianceCholesky& mcc) {
       if (!blocks) LinearSolverCCS<MatrixType>::allocateBlocks(A, blocks);

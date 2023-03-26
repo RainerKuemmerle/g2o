@@ -33,31 +33,31 @@ namespace g2o {
 
 VelocityMeasurement::VelocityMeasurement() : _measurement(0., 0.), _dt(0.) {}
 
-VelocityMeasurement::VelocityMeasurement(number_t vl, number_t vr, number_t dt)
+VelocityMeasurement::VelocityMeasurement(double vl, double vr, double dt)
     : _measurement(vl, vr), _dt(dt) {}
 
 MotionMeasurement::MotionMeasurement() : _measurement(0., 0., 0.), _dt(0.) {}
 
-MotionMeasurement::MotionMeasurement(number_t x, number_t y, number_t theta,
-                                     number_t dt)
+MotionMeasurement::MotionMeasurement(double x, double y, double theta,
+                                     double dt)
     : _measurement(x, y, theta), _dt(dt) {}
 
-MotionMeasurement::MotionMeasurement(const Vector3& m, number_t dt)
+MotionMeasurement::MotionMeasurement(const Vector3& m, double dt)
     : _measurement(m), _dt(dt) {}
 
 VelocityMeasurement OdomConvert::convertToVelocity(const MotionMeasurement& m) {
   if (fabs(m.theta()) > 1e-7) {
-    const number_t translation = std::hypot(m.x(), m.y());
-    const number_t R = translation / (2 * sin(m.theta() / 2));
-    number_t w = 0.;
+    const double translation = std::hypot(m.x(), m.y());
+    const double R = translation / (2 * sin(m.theta() / 2));
+    double w = 0.;
     if (fabs(m.dt()) > 1e-7) w = m.theta() / m.dt();
 
-    const number_t vl = (2. * R * w - w) / 2.;
-    const number_t vr = w + vl;
+    const double vl = (2. * R * w - w) / 2.;
+    const double vr = w + vl;
 
     return VelocityMeasurement(vl, vr, m.dt());
   } else {
-    number_t vl, vr;
+    double vl, vr;
     if (fabs(m.dt()) > 1e-7)
       vl = vr = std::hypot(m.x(), m.y()) / m.dt();
     else
@@ -67,11 +67,11 @@ VelocityMeasurement OdomConvert::convertToVelocity(const MotionMeasurement& m) {
 }
 
 MotionMeasurement OdomConvert::convertToMotion(const VelocityMeasurement& v,
-                                               number_t l) {
-  number_t x, y, theta;
+                                               double l) {
+  double x, y, theta;
   if (fabs(v.vr() - v.vl()) > 1e-7) {
-    number_t R = l * 0.5 * ((v.vl() + v.vr()) / (v.vr() - v.vl()));
-    number_t w = (v.vr() - v.vl()) / l;
+    double R = l * 0.5 * ((v.vl() + v.vr()) / (v.vr() - v.vl()));
+    double w = (v.vr() - v.vl()) / l;
 
     theta = w * v.dt();
     Rotation2D rot(theta);
@@ -80,7 +80,7 @@ MotionMeasurement OdomConvert::convertToMotion(const VelocityMeasurement& v,
     x = motion.x();
     y = motion.y();
   } else {
-    number_t tv = 0.5 * (v.vr() + v.vl());
+    double tv = 0.5 * (v.vr() + v.vl());
     theta = 0.;
     x = tv * v.dt();
     y = 0.;

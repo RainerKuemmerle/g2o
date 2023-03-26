@@ -50,15 +50,15 @@ class G2O_CORE_API SparseOptimizerTerminateAction : public HyperGraphAction {
   virtual HyperGraphAction* operator()(const HyperGraph* graph,
                                        Parameters* parameters = 0);
 
-  number_t gainThreshold() const { return _gainThreshold; }
-  void setGainThreshold(number_t gainThreshold);
+  double gainThreshold() const { return _gainThreshold; }
+  void setGainThreshold(double gainThreshold);
 
   int maxIterations() const { return _maxIterations; }
   void setMaxIterations(int maxit);
 
  protected:
-  number_t _gainThreshold;
-  number_t _lastChi;
+  double _gainThreshold;
+  double _lastChi;
   bool _auxTerminateFlag;
   int _maxIterations;
 

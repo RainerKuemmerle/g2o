@@ -49,8 +49,8 @@ namespace g2o {
 template <typename MatrixType>
 class LinearSolverEigen : public LinearSolverCCS<MatrixType> {
  public:
-  typedef Eigen::SparseMatrix<number_t, Eigen::ColMajor> SparseMatrix;
-  typedef Eigen::Triplet<number_t> Triplet;
+  typedef Eigen::SparseMatrix<double, Eigen::ColMajor> SparseMatrix;
+  typedef Eigen::Triplet<double> Triplet;
   typedef Eigen::PermutationMatrix<Eigen::Dynamic, Eigen::Dynamic>
       PermutationMatrix;
 
@@ -90,7 +90,7 @@ class LinearSolverEigen : public LinearSolverCCS<MatrixType> {
     return true;
   }
 
-  bool solve(const SparseBlockMatrix<MatrixType>& A, number_t* x, number_t* b) {
+  bool solve(const SparseBlockMatrix<MatrixType>& A, double* x, double* b) {
     double t;
     bool cholState = computeCholesky(A, t);
     if (!cholState) return false;
@@ -143,7 +143,7 @@ class LinearSolverEigen : public LinearSolverCCS<MatrixType> {
    * the following iterations.
    */
   void computeSymbolicDecomposition(const SparseBlockMatrix<MatrixType>& A) {
-    number_t t = get_monotonic_time();
+    double t = get_monotonic_time();
     if (!this->blockOrdering()) {
       _cholesky.analyzePattern(_sparseMatrix);
     } else {
@@ -208,8 +208,7 @@ class LinearSolverEigen : public LinearSolverCCS<MatrixType> {
             _cholesky.matrixL().nestedExpression().outerIndexPtr()),
         const_cast<int*>(
             _cholesky.matrixL().nestedExpression().innerIndexPtr()),
-        const_cast<number_t*>(
-            _cholesky.matrixL().nestedExpression().valuePtr()),
+        const_cast<double*>(_cholesky.matrixL().nestedExpression().valuePtr()),
         const_cast<int*>(_cholesky.permutationP().indices().data()));
     compute(mcc);  // call the desired computation on the mcc object
     // book keeping statistics

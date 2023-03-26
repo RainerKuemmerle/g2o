@@ -101,12 +101,12 @@ bool EdgeSE2LotsOfXY::write(std::ostream& os) const {
 
 void EdgeSE2LotsOfXY::linearizeOplus() {
   const VertexSE2* vi = static_cast<const VertexSE2*>(_vertices[0]);
-  const number_t& x1 = vi->estimate().translation()[0];
-  const number_t& y1 = vi->estimate().translation()[1];
-  const number_t& th1 = vi->estimate().rotation().angle();
+  const double& x1 = vi->estimate().translation()[0];
+  const double& y1 = vi->estimate().translation()[1];
+  const double& th1 = vi->estimate().rotation().angle();
 
-  number_t ct = std::cos(th1);
-  number_t st = std::sin(th1);
+  double ct = std::cos(th1);
+  double st = std::sin(th1);
 
   MatrixX Ji;
   unsigned int rows = 2 * (_vertices.size() - 1);
@@ -121,8 +121,8 @@ void EdgeSE2LotsOfXY::linearizeOplus() {
   for (unsigned int i = 1; i < _vertices.size(); i++) {
     g2o::VertexPointXY* point = (g2o::VertexPointXY*)(_vertices[i]);
 
-    const number_t& x2 = point->estimate()[0];
-    const number_t& y2 = point->estimate()[1];
+    const double& x2 = point->estimate()[0];
+    const double& y2 = point->estimate()[1];
 
     unsigned int index = 2 * (i - 1);
 
@@ -177,7 +177,7 @@ void EdgeSE2LotsOfXY::initialEstimate(const OptimizableGraph::VertexSet& fixed,
   }
 }
 
-number_t EdgeSE2LotsOfXY::initialEstimatePossible(
+double EdgeSE2LotsOfXY::initialEstimatePossible(
     const OptimizableGraph::VertexSet& fixed,
     OptimizableGraph::Vertex* toEstimate) {
   (void)toEstimate;

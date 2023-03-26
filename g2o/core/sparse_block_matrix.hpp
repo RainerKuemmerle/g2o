@@ -252,12 +252,12 @@ bool SparseBlockMatrix<MatrixType>::multiply(
 }
 
 template <class MatrixType>
-void SparseBlockMatrix<MatrixType>::multiply(number_t*& dest,
-                                             const number_t* src) const {
+void SparseBlockMatrix<MatrixType>::multiply(double*& dest,
+                                             const double* src) const {
   if (!dest) {
-    dest = new number_t[_rowBlockIndices[_rowBlockIndices.size() - 1]];
+    dest = new double[_rowBlockIndices[_rowBlockIndices.size() - 1]];
     memset(dest, 0,
-           _rowBlockIndices[_rowBlockIndices.size() - 1] * sizeof(number_t));
+           _rowBlockIndices[_rowBlockIndices.size() - 1] * sizeof(double));
   }
 
   // map the memory by Eigen
@@ -283,11 +283,11 @@ void SparseBlockMatrix<MatrixType>::multiply(number_t*& dest,
 
 template <class MatrixType>
 void SparseBlockMatrix<MatrixType>::multiplySymmetricUpperTriangle(
-    number_t*& dest, const number_t* src) const {
+    double*& dest, const double* src) const {
   if (!dest) {
-    dest = new number_t[_rowBlockIndices[_rowBlockIndices.size() - 1]];
+    dest = new double[_rowBlockIndices[_rowBlockIndices.size() - 1]];
     memset(dest, 0,
-           _rowBlockIndices[_rowBlockIndices.size() - 1] * sizeof(number_t));
+           _rowBlockIndices[_rowBlockIndices.size() - 1] * sizeof(double));
   }
 
   // map the memory by Eigen
@@ -317,13 +317,13 @@ void SparseBlockMatrix<MatrixType>::multiplySymmetricUpperTriangle(
 }
 
 template <class MatrixType>
-void SparseBlockMatrix<MatrixType>::rightMultiply(number_t*& dest,
-                                                  const number_t* src) const {
+void SparseBlockMatrix<MatrixType>::rightMultiply(double*& dest,
+                                                  const double* src) const {
   int destSize = cols();
 
   if (!dest) {
-    dest = new number_t[destSize];
-    memset(dest, 0, destSize * sizeof(number_t));
+    dest = new double[destSize];
+    memset(dest, 0, destSize * sizeof(double));
   }
 
   // map the memory by Eigen
@@ -350,7 +350,7 @@ void SparseBlockMatrix<MatrixType>::rightMultiply(number_t*& dest,
 }
 
 template <class MatrixType>
-void SparseBlockMatrix<MatrixType>::scale(number_t a_) {
+void SparseBlockMatrix<MatrixType>::scale(double a_) {
   for (size_t i = 0; i < _blockCols.size(); ++i) {
     for (typename SparseBlockMatrix<MatrixType>::IntBlockMap::const_iterator
              it = _blockCols[i].begin();
@@ -515,10 +515,10 @@ bool SparseBlockMatrix<MatrixType>::symmPermutation(
 }
 
 template <class MatrixType>
-int SparseBlockMatrix<MatrixType>::fillCCS(number_t* Cx,
+int SparseBlockMatrix<MatrixType>::fillCCS(double* Cx,
                                            bool upperTriangle) const {
   assert(Cx && "Target destination is NULL");
-  number_t* CxStart = Cx;
+  double* CxStart = Cx;
   for (size_t i = 0; i < _blockCols.size(); ++i) {
     int cstart = i ? _colBlockIndices[i - 1] : 0;
     int csize = colsOfBlock(i);
@@ -532,7 +532,7 @@ int SparseBlockMatrix<MatrixType>::fillCCS(number_t* Cx,
 
         int elemsToCopy = b->rows();
         if (upperTriangle && rstart == cstart) elemsToCopy = c + 1;
-        memcpy(Cx, b->data() + c * b->rows(), elemsToCopy * sizeof(number_t));
+        memcpy(Cx, b->data() + c * b->rows(), elemsToCopy * sizeof(double));
         Cx += elemsToCopy;
       }
     }
@@ -541,7 +541,7 @@ int SparseBlockMatrix<MatrixType>::fillCCS(number_t* Cx,
 }
 
 template <class MatrixType>
-int SparseBlockMatrix<MatrixType>::fillCCS(int* Cp, int* Ci, number_t* Cx,
+int SparseBlockMatrix<MatrixType>::fillCCS(int* Cp, int* Ci, double* Cx,
                                            bool upperTriangle) const {
   assert(Cp && Ci && Cx && "Target destination is NULL");
   int nz = 0;

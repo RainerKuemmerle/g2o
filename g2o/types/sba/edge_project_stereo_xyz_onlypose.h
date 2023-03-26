@@ -55,7 +55,7 @@ class G2O_TYPES_SBA_API EdgeStereoSE3ProjectXYZOnlyPose
   Vector3 cam_project(const Vector3 &trans_xyz) const;
 
   Vector3 Xw;
-  number_t fx, fy, cx, cy, bf;
+  double fx, fy, cx, cy, bf;
 };
 
 }  // namespace g2o

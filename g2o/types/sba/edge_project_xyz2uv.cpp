@@ -62,15 +62,15 @@ void EdgeProjectXYZ2UV::linearizeOplus() {
   Vector3 xyz = vi->estimate();
   Vector3 xyz_trans = T.map(xyz);
 
-  number_t x = xyz_trans[0];
-  number_t y = xyz_trans[1];
-  number_t z = xyz_trans[2];
-  number_t z_2 = z * z;
+  double x = xyz_trans[0];
+  double y = xyz_trans[1];
+  double z = xyz_trans[2];
+  double z_2 = z * z;
 
   const CameraParameters* cam =
       static_cast<const CameraParameters*>(parameter(0));
 
-  Eigen::Matrix<number_t, 2, 3, Eigen::ColMajor> tmp;
+  Eigen::Matrix<double, 2, 3, Eigen::ColMajor> tmp;
   tmp(0, 0) = cam->focal_length;
   tmp(0, 1) = 0;
   tmp(0, 2) = -x / z * cam->focal_length;

@@ -72,7 +72,7 @@ class VertexNotDefaultCtor : public g2o::BaseVertex<2, g2o::Vector2> {
  public:
   VertexNotDefaultCtor(int x, int y) { _estimate = g2o::Vector2(x, y); }
 
-  virtual void oplusImpl(const number_t* update) {
+  virtual void oplusImpl(const double* update) {
     _estimate[0] += update[0];
     _estimate[1] += update[1];
   }
@@ -214,12 +214,12 @@ class EdgeTester {
 
   g2o::JacobianWorkspace jacobianWorkspace;
 
-  Eigen::Matrix<number_t, 3, 3> hessian01;
-  Eigen::Matrix<number_t, 3, 2> hessian02;
-  Eigen::Matrix<number_t, 3, 2> hessian12;
-  Eigen::Matrix<number_t, 3, 3> hessian00;
-  Eigen::Matrix<number_t, 3, 3> hessian11;
-  Eigen::Matrix<number_t, 2, 2> hessian22;
+  Eigen::Matrix<double, 3, 3> hessian01;
+  Eigen::Matrix<double, 3, 2> hessian02;
+  Eigen::Matrix<double, 3, 2> hessian12;
+  Eigen::Matrix<double, 3, 3> hessian00;
+  Eigen::Matrix<double, 3, 3> hessian11;
+  Eigen::Matrix<double, 2, 2> hessian22;
 };
 
 TEST(ConstantEdgeTest, ConstantEdge_allVerticesFixed) {
@@ -329,16 +329,16 @@ TEST(ConstantEdgeTest, ConstantEdge_constructQuadraticForm_rowMajor) {
   EdgeTester<Edge3Dynamic> dynamic;
   EdgeTester<Edge3Constant> constant;
   dynamic.edge.mapHessianMemory(dynamic.hessian01.data(), 0, 1, true);
-  Eigen::Matrix<number_t, 2, 3> hessian20_dynamic;
-  Eigen::Matrix<number_t, 2, 3> hessian21_dynamic;
+  Eigen::Matrix<double, 2, 3> hessian20_dynamic;
+  Eigen::Matrix<double, 2, 3> hessian21_dynamic;
   hessian20_dynamic.setZero();
   hessian21_dynamic.setZero();
   dynamic.edge.mapHessianMemory(hessian20_dynamic.data(), 0, 2, true);
   dynamic.edge.mapHessianMemory(hessian21_dynamic.data(), 1, 2, true);
 
   constant.edge.mapHessianMemory(constant.hessian01.data(), 0, 1, true);
-  Eigen::Matrix<number_t, 2, 3> hessian20_constant;
-  Eigen::Matrix<number_t, 2, 3> hessian21_constant;
+  Eigen::Matrix<double, 2, 3> hessian20_constant;
+  Eigen::Matrix<double, 2, 3> hessian21_constant;
   hessian20_constant.setZero();
   hessian21_constant.setZero();
   constant.edge.mapHessianMemory(hessian20_constant.data(), 0, 2, true);

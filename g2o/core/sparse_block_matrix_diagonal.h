@@ -73,11 +73,11 @@ class SparseBlockMatrixDiagonal {
   //! indices of the row blocks
   const std::vector<int>& blockIndices() const { return _blockIndices; }
 
-  void multiply(number_t*& dest, const number_t* src) const {
+  void multiply(double*& dest, const double* src) const {
     int destSize = cols();
     if (!dest) {
-      dest = new number_t[destSize];
-      memset(dest, 0, destSize * sizeof(number_t));
+      dest = new double[destSize];
+      memset(dest, 0, destSize * sizeof(double));
     }
 
     // map the memory by Eigen

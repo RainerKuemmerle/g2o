@@ -41,13 +41,13 @@ class G2O_TYPES_SLAM2D_ADDONS_API EdgeSE2Segment2DPointLine
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   EdgeSE2Segment2DPointLine();
 
-  number_t theta() const { return _measurement[2]; }
+  double theta() const { return _measurement[2]; }
   Vector2 point() const {
     Eigen::Map<const Vector2> p(&_measurement[0]);
     return p;
   }
 
-  void setTheta(number_t t) { _measurement[2] = t; }
+  void setTheta(double t) { _measurement[2] = t; }
   void setPoint(const Vector2& p_) {
     Eigen::Map<Vector2> p(&_measurement[0]);
     p = p_;
@@ -74,13 +74,13 @@ class G2O_TYPES_SLAM2D_ADDONS_API EdgeSE2Segment2DPointLine
     _error[2] = normalize_theta(_error[2]);
   }
 
-  virtual bool setMeasurementData(const number_t* d) {
+  virtual bool setMeasurementData(const double* d) {
     Eigen::Map<const Vector3> data(d);
     _measurement = data;
     return true;
   }
 
-  virtual bool getMeasurementData(number_t* d) const {
+  virtual bool getMeasurementData(double* d) const {
     Eigen::Map<Vector3> data(d);
     data = _measurement;
     return true;

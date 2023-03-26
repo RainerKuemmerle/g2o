@@ -89,8 +89,8 @@ void SparseOptimizer::computeActiveErrors() {
 #endif
 }
 
-number_t SparseOptimizer::activeChi2() const {
-  number_t chi = 0.0;
+double SparseOptimizer::activeChi2() const {
+  double chi = 0.0;
   for (EdgeContainer::const_iterator it = _activeEdges.begin();
        it != _activeEdges.end(); ++it) {
     const OptimizableGraph::Edge* e = *it;
@@ -99,9 +99,9 @@ number_t SparseOptimizer::activeChi2() const {
   return chi;
 }
 
-number_t SparseOptimizer::activeRobustChi2() const {
+double SparseOptimizer::activeRobustChi2() const {
   Vector3 rho;
-  number_t chi = 0.0;
+  double chi = 0.0;
   for (EdgeContainer::const_iterator it = _activeEdges.begin();
        it != _activeEdges.end(); ++it) {
     const OptimizableGraph::Edge* e = *it;
@@ -388,7 +388,7 @@ int SparseOptimizer::optimize(int iterations, bool online) {
   }
 
   int cjIterations = 0;
-  number_t cumTime = 0;
+  double cumTime = 0;
   bool ok = true;
 
   ok = _algorithm->init(online);
@@ -412,7 +412,7 @@ int SparseOptimizer::optimize(int iterations, bool online) {
       cstat.numVertices = _activeVertices.size();
     }
 
-    number_t ts = get_monotonic_time();
+    double ts = get_monotonic_time();
     result = _algorithm->solve(i, online);
     ok = (result == OptimizationAlgorithm::OK);
 
@@ -425,7 +425,7 @@ int SparseOptimizer::optimize(int iterations, bool online) {
     }
 
     if (verbose()) {
-      number_t dts = get_monotonic_time() - ts;
+      double dts = get_monotonic_time() - ts;
       cumTime += dts;
       if (!errorComputed) computeActiveErrors();
       cerr << "iteration= " << i << "\t chi2= " << FIXED(activeRobustChi2())
@@ -443,7 +443,7 @@ int SparseOptimizer::optimize(int iterations, bool online) {
   return cjIterations;
 }
 
-void SparseOptimizer::update(const number_t* update) {
+void SparseOptimizer::update(const double* update) {
   // update the graph by calling oplus on the vertices
   for (size_t i = 0; i < _ivMap.size(); ++i) {
     OptimizableGraph::Vertex* v = _ivMap[i];

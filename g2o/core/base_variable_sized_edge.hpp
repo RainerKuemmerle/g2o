@@ -36,10 +36,10 @@ inline int computeUpperTriangleIndex(int i, int j) {
 template <int D, typename E>
 void BaseVariableSizedEdge<D, E>::constructQuadraticForm() {
   if (this->robustKernel()) {
-    number_t error = this->chi2();
+    double error = this->chi2();
     Vector3 rho;
     this->robustKernel()->robustify(error, rho);
-    Eigen::Matrix<number_t, D, 1, Eigen::ColMajor> omega_r =
+    Eigen::Matrix<double, D, 1, Eigen::ColMajor> omega_r =
         -_information * _error;
     omega_r *= rho[1];
     computeQuadraticForm(this->robustInformation(rho), omega_r);
@@ -64,8 +64,8 @@ void BaseVariableSizedEdge<D, E>::linearizeOplus(
 
 template <int D, typename E>
 void BaseVariableSizedEdge<D, E>::linearizeOplus() {
-  const number_t delta = cst(1e-9);
-  const number_t scalar = 1 / (2 * delta);
+  const double delta = cst(1e-9);
+  const double scalar = 1 / (2 * delta);
   ErrorVector errorBak;
   ErrorVector errorBeforeNumeric = _error;
 
@@ -88,7 +88,7 @@ void BaseVariableSizedEdge<D, E>::linearizeOplus() {
            "jacobian cache dimension does not match");
     _jacobianOplus[i].resize(_dimension, vi_dim);
     // add small step along the unit vector in each dimension
-    ceres::internal::FixedArray<number_t> add_vi(vi_dim);
+    ceres::internal::FixedArray<double> add_vi(vi_dim);
     add_vi.fill(0.);
     for (int d = 0; d < vi_dim; ++d) {
       vi->push();
@@ -112,7 +112,7 @@ void BaseVariableSizedEdge<D, E>::linearizeOplus() {
 }
 
 template <int D, typename E>
-void BaseVariableSizedEdge<D, E>::mapHessianMemory(number_t* d, int i, int j,
+void BaseVariableSizedEdge<D, E>::mapHessianMemory(double* d, int i, int j,
                                                    bool rowMajor) {
   int idx = internal::computeUpperTriangleIndex(i, j);
   assert(idx < (int)_hessian.size());

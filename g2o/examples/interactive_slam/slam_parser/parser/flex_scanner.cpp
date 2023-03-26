@@ -965,7 +965,7 @@ void yyFlexLexer::LexerOutput(const char *buf, int size) {
 int yyFlexLexer::yy_get_next_buffer() {
   char *dest = YY_CURRENT_BUFFER_LVALUE->yy_ch_buf;
   char *source = (yytext_ptr);
-  int number_to_move, i;
+  int doubleo_move, i;
   int ret_val;
 
   if ((yy_c_buf_p) > &YY_CURRENT_BUFFER_LVALUE->yy_ch_buf[(yy_n_chars) + 1])
@@ -991,9 +991,9 @@ int yyFlexLexer::yy_get_next_buffer() {
   /* Try to read more data. */
 
   /* First move last chars to start of buffer. */
-  number_to_move = (int)((yy_c_buf_p) - (yytext_ptr)) - 1;
+  doubleo_move = (int)((yy_c_buf_p) - (yytext_ptr)) - 1;
 
-  for (i = 0; i < number_to_move; ++i) *(dest++) = *(source++);
+  for (i = 0; i < doubleo_move; ++i) *(dest++) = *(source++);
 
   if (YY_CURRENT_BUFFER_LVALUE->yy_buffer_status == YY_BUFFER_EOF_PENDING)
     /* don't do the read, it's not guaranteed to return an EOF,
@@ -1002,8 +1002,7 @@ int yyFlexLexer::yy_get_next_buffer() {
     YY_CURRENT_BUFFER_LVALUE->yy_n_chars = (yy_n_chars) = 0;
 
   else {
-    int num_to_read =
-        YY_CURRENT_BUFFER_LVALUE->yy_buf_size - number_to_move - 1;
+    int num_to_read = YY_CURRENT_BUFFER_LVALUE->yy_buf_size - doubleo_move - 1;
 
     while (num_to_read <= 0) { /* Not enough room in the buffer - grow it. */
 
@@ -1032,20 +1031,20 @@ int yyFlexLexer::yy_get_next_buffer() {
 
       (yy_c_buf_p) = &b->yy_ch_buf[yy_c_buf_p_offset];
 
-      num_to_read = YY_CURRENT_BUFFER_LVALUE->yy_buf_size - number_to_move - 1;
+      num_to_read = YY_CURRENT_BUFFER_LVALUE->yy_buf_size - doubleo_move - 1;
     }
 
     if (num_to_read > YY_READ_BUF_SIZE) num_to_read = YY_READ_BUF_SIZE;
 
     /* Read in more data. */
-    YY_INPUT((&YY_CURRENT_BUFFER_LVALUE->yy_ch_buf[number_to_move]),
-             (yy_n_chars), (size_t)num_to_read);
+    YY_INPUT((&YY_CURRENT_BUFFER_LVALUE->yy_ch_buf[doubleo_move]), (yy_n_chars),
+             (size_t)num_to_read);
 
     YY_CURRENT_BUFFER_LVALUE->yy_n_chars = (yy_n_chars);
   }
 
   if ((yy_n_chars) == 0) {
-    if (number_to_move == YY_MORE_ADJ) {
+    if (doubleo_move == YY_MORE_ADJ) {
       ret_val = EOB_ACT_END_OF_FILE;
       yyrestart(yyin);
     }
@@ -1059,17 +1058,17 @@ int yyFlexLexer::yy_get_next_buffer() {
   else
     ret_val = EOB_ACT_CONTINUE_SCAN;
 
-  if ((yy_size_t)((yy_n_chars) + number_to_move) >
+  if ((yy_size_t)((yy_n_chars) + doubleo_move) >
       YY_CURRENT_BUFFER_LVALUE->yy_buf_size) {
     /* Extend the array by 50%, plus the number we really need. */
-    yy_size_t new_size = (yy_n_chars) + number_to_move + ((yy_n_chars) >> 1);
+    yy_size_t new_size = (yy_n_chars) + doubleo_move + ((yy_n_chars) >> 1);
     YY_CURRENT_BUFFER_LVALUE->yy_ch_buf = (char *)Slamrealloc(
         (void *)YY_CURRENT_BUFFER_LVALUE->yy_ch_buf, new_size);
     if (!YY_CURRENT_BUFFER_LVALUE->yy_ch_buf)
       YY_FATAL_ERROR("out of dynamic memory in yy_get_next_buffer()");
   }
 
-  (yy_n_chars) += number_to_move;
+  (yy_n_chars) += doubleo_move;
   YY_CURRENT_BUFFER_LVALUE->yy_ch_buf[(yy_n_chars)] = YY_END_OF_BUFFER_CHAR;
   YY_CURRENT_BUFFER_LVALUE->yy_ch_buf[(yy_n_chars) + 1] = YY_END_OF_BUFFER_CHAR;
 
@@ -1137,10 +1136,10 @@ void yyFlexLexer::yyunput(int c, char *yy_bp) {
   if (yy_cp < YY_CURRENT_BUFFER_LVALUE->yy_ch_buf +
                   2) { /* need to shift things up to make room */
     /* +2 for EOB chars. */
-    int number_to_move = (yy_n_chars) + 2;
+    int doubleo_move = (yy_n_chars) + 2;
     char *dest = &YY_CURRENT_BUFFER_LVALUE
                       ->yy_ch_buf[YY_CURRENT_BUFFER_LVALUE->yy_buf_size + 2];
-    char *source = &YY_CURRENT_BUFFER_LVALUE->yy_ch_buf[number_to_move];
+    char* source = &YY_CURRENT_BUFFER_LVALUE->yy_ch_buf[doubleo_move];
 
     while (source > YY_CURRENT_BUFFER_LVALUE->yy_ch_buf) *--dest = *--source;
 

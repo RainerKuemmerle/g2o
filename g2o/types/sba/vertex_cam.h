@@ -57,7 +57,7 @@ class G2O_TYPES_SBA_API VertexCam : public BaseVertex<6, SBACam> {
     _estimate.setDr();
   }
 
-  virtual void oplusImpl(const number_t* update) {
+  virtual void oplusImpl(const double* update) {
     Eigen::Map<const Vector6> v(update);
     _estimate.update(v);
     _estimate.setTransform();
@@ -65,13 +65,13 @@ class G2O_TYPES_SBA_API VertexCam : public BaseVertex<6, SBACam> {
     _estimate.setDr();
   }
 
-  virtual bool setEstimateDataImpl(const number_t* est) {
+  virtual bool setEstimateDataImpl(const double* est) {
     Eigen::Map<const Vector7> v(est);
     _estimate.fromVector(v);
     return true;
   }
 
-  virtual bool getEstimateData(number_t* est) const {
+  virtual bool getEstimateData(double* est) const {
     Eigen::Map<Vector7> v(est);
     v = estimate().toVector();
     return true;
@@ -79,13 +79,13 @@ class G2O_TYPES_SBA_API VertexCam : public BaseVertex<6, SBACam> {
 
   virtual int estimateDimension() const { return 7; }
 
-  virtual bool setMinimalEstimateDataImpl(const number_t* est) {
+  virtual bool setMinimalEstimateDataImpl(const double* est) {
     Eigen::Map<const Vector6> v(est);
     _estimate.fromMinimalVector(v);
     return true;
   }
 
-  virtual bool getMinimalEstimateData(number_t* est) const {
+  virtual bool getMinimalEstimateData(double* est) const {
     Eigen::Map<Vector6> v(est);
     v = _estimate.toMinimalVector();
     return true;

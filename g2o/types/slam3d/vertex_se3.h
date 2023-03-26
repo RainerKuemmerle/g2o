@@ -61,13 +61,13 @@ class G2O_TYPES_SLAM3D_API VertexSE3 : public BaseVertex<6, Isometry3> {
   virtual bool read(std::istream& is);
   virtual bool write(std::ostream& os) const;
 
-  virtual bool setEstimateDataImpl(const number_t* est) {
+  virtual bool setEstimateDataImpl(const double* est) {
     Eigen::Map<const Vector7> v(est);
     _estimate = internal::fromVectorQT(v);
     return true;
   }
 
-  virtual bool getEstimateData(number_t* est) const {
+  virtual bool getEstimateData(double* est) const {
     Eigen::Map<Vector7> v(est);
     v = internal::toVectorQT(_estimate);
     return true;
@@ -75,13 +75,13 @@ class G2O_TYPES_SLAM3D_API VertexSE3 : public BaseVertex<6, Isometry3> {
 
   virtual int estimateDimension() const { return 7; }
 
-  virtual bool setMinimalEstimateDataImpl(const number_t* est) {
+  virtual bool setMinimalEstimateDataImpl(const double* est) {
     Eigen::Map<const Vector6> v(est);
     _estimate = internal::fromVectorMQT(v);
     return true;
   }
 
-  virtual bool getMinimalEstimateData(number_t* est) const {
+  virtual bool getMinimalEstimateData(double* est) const {
     Eigen::Map<Vector6> v(est);
     v = internal::toVectorMQT(_estimate);
     return true;
@@ -96,7 +96,7 @@ class G2O_TYPES_SLAM3D_API VertexSE3 : public BaseVertex<6, Isometry3> {
    * element qw of the quaternion is recovred by
    * || (qw,qx,qy,qz) || == 1 => qw = sqrt(1 - || (qx,qy,qz) ||
    */
-  virtual void oplusImpl(const number_t* update) {
+  virtual void oplusImpl(const double* update) {
     Eigen::Map<const Vector6> v(update);
     Isometry3 increment = internal::fromVectorMQT(v);
     _estimate = _estimate * increment;

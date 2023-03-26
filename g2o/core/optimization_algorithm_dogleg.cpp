@@ -42,14 +42,14 @@ OptimizationAlgorithmDogleg::OptimizationAlgorithmDogleg(
     std::unique_ptr<BlockSolverBase> solver)
     : OptimizationAlgorithmWithHessian(*solver.get()),
       m_solver{std::move(solver)} {
-  _userDeltaInit = _properties.makeProperty<Property<number_t>>("initialDelta",
-                                                                (number_t)1e4);
+  _userDeltaInit =
+      _properties.makeProperty<Property<double>>("initialDelta", (double)1e4);
   _maxTrialsAfterFailure =
       _properties.makeProperty<Property<int>>("maxTrialsAfterFailure", 100);
-  _initialLambda = _properties.makeProperty<Property<number_t>>("initialLambda",
-                                                                (number_t)1e-7);
+  _initialLambda =
+      _properties.makeProperty<Property<double>>("initialLambda", (double)1e-7);
   _lamdbaFactor =
-      _properties.makeProperty<Property<number_t>>("lambdaFactor", 10.);
+      _properties.makeProperty<Property<double>>("lambdaFactor", 10.);
   _delta = _userDeltaInit->value();
   _lastStep = STEP_UNDEFINED;
   _wasPDInAllIterations = true;
@@ -85,7 +85,7 @@ OptimizationAlgorithm::SolverResult OptimizationAlgorithmDogleg::solve(
     _wasPDInAllIterations = true;
   }
 
-  number_t t = get_monotonic_time();
+  double t = get_monotonic_time();
   _optimizer->computeActiveErrors();
   G2OBatchStatistics* globalStats = G2OBatchStatistics::globalStats();
   if (globalStats) {
@@ -93,7 +93,7 @@ OptimizationAlgorithm::SolverResult OptimizationAlgorithmDogleg::solve(
     t = get_monotonic_time();
   }
 
-  number_t currentChi = _optimizer->activeRobustChi2();
+  double currentChi = _optimizer->activeRobustChi2();
 
   _solver.buildSystem();
   if (globalStats) {
@@ -105,12 +105,12 @@ OptimizationAlgorithm::SolverResult OptimizationAlgorithmDogleg::solve(
   // compute alpha
   _auxVector.setZero();
   blockSolver.multiplyHessian(_auxVector.data(), _solver.b());
-  number_t bNormSquared = b.squaredNorm();
-  number_t alpha = bNormSquared / _auxVector.dot(b);
+  double bNormSquared = b.squaredNorm();
+  double alpha = bNormSquared / _auxVector.dot(b);
 
   _hsd = alpha * b;
-  number_t hsdNorm = _hsd.norm();
-  number_t hgnNorm = -1.;
+  double hsdNorm = _hsd.norm();
+  double hgnNorm = -1.;
 
   bool solvedGaussNewton = false;
   bool goodStep = false;
@@ -120,8 +120,8 @@ OptimizationAlgorithm::SolverResult OptimizationAlgorithmDogleg::solve(
     ++numTries;
 
     if (!solvedGaussNewton) {
-      const number_t minLambda = cst(1e-12);
-      const number_t maxLambda = cst(1e3);
+      const double minLambda = cst(1e-12);
+      const double maxLambda = cst(1e3);
       solvedGaussNewton = true;
       // apply a damping factor to enforce positive definite Hessian, if the
       // matrix appeared to be not positive definite in at least one iteration
@@ -163,15 +163,15 @@ OptimizationAlgorithm::SolverResult OptimizationAlgorithmDogleg::solve(
       _lastStep = STEP_SD;
     } else {
       _auxVector = hgn - _hsd;  // b - a
-      number_t c = _hsd.dot(_auxVector);
-      number_t bmaSquaredNorm = _auxVector.squaredNorm();
-      number_t beta;
+      double c = _hsd.dot(_auxVector);
+      double bmaSquaredNorm = _auxVector.squaredNorm();
+      double beta;
       if (c <= 0.)
         beta = (-c + sqrt(c * c + bmaSquaredNorm *
                                       (_delta * _delta - _hsd.squaredNorm()))) /
                bmaSquaredNorm;
       else {
-        number_t hsdSqrNorm = _hsd.squaredNorm();
+        double hsdSqrNorm = _hsd.squaredNorm();
         beta =
             (_delta * _delta - hsdSqrNorm) /
             (c + sqrt(c * c + bmaSquaredNorm * (_delta * _delta - hsdSqrNorm)));
@@ -186,16 +186,16 @@ OptimizationAlgorithm::SolverResult OptimizationAlgorithmDogleg::solve(
     // compute the linear gain
     _auxVector.setZero();
     blockSolver.multiplyHessian(_auxVector.data(), _hdl.data());
-    number_t linearGain = -1 * (_auxVector.dot(_hdl)) + 2 * (b.dot(_hdl));
+    double linearGain = -1 * (_auxVector.dot(_hdl)) + 2 * (b.dot(_hdl));
 
     // apply the update and see what happens
     _optimizer->push();
     _optimizer->update(_hdl.data());
     _optimizer->computeActiveErrors();
-    number_t newChi = _optimizer->activeRobustChi2();
-    number_t nonLinearGain = currentChi - newChi;
+    double newChi = _optimizer->activeRobustChi2();
+    double nonLinearGain = currentChi - newChi;
     if (fabs(linearGain) < 1e-12) linearGain = cst(1e-12);
-    number_t rho = nonLinearGain / linearGain;
+    double rho = nonLinearGain / linearGain;
     // cerr << PVAR(nonLinearGain) << " " << PVAR(linearGain) << " " <<
     // PVAR(rho) << endl;
     if (rho > 0) {  // step is good and will be accepted
@@ -207,7 +207,7 @@ OptimizationAlgorithm::SolverResult OptimizationAlgorithmDogleg::solve(
 
     // update trust region based on the step quality
     if (rho > 0.75)
-      _delta = std::max<number_t>(_delta, 3 * _hdl.norm());
+      _delta = std::max<double>(_delta, 3 * _hdl.norm());
     else if (rho < 0.25)
       _delta *= 0.5;
   } while (!goodStep && numTries < _maxTrialsAfterFailure->value());

@@ -52,7 +52,7 @@ class G2O_CORE_API OptimizationAlgorithmLevenberg
   virtual void printVerbose(std::ostream& os) const;
 
   //! return the currently used damping factor
-  number_t currentLambda() const { return _currentLambda; }
+  double currentLambda() const { return _currentLambda; }
 
   //! the number of internal iteration if an update step increases chi^2 within
   //! Levenberg-Marquardt
@@ -63,10 +63,10 @@ class G2O_CORE_API OptimizationAlgorithmLevenberg
 
   //! return the lambda set by the user, if < 0 the SparseOptimizer will compute
   //! the initial lambda
-  number_t userLambdaInit() { return _userLambdaInit->value(); }
+  double userLambdaInit() { return _userLambdaInit->value(); }
   //! specify the initial lambda used for the first iteraion, if not given the
   //! SparseOptimizer tries to compute a suitable value
-  void setUserLambdaInit(number_t lambda);
+  void setUserLambdaInit(double lambda);
 
   //! return the number of levenberg iterations performed in the last round
   int levenbergIteration() { return _levenbergIterations; }
@@ -74,14 +74,14 @@ class G2O_CORE_API OptimizationAlgorithmLevenberg
  protected:
   // Levenberg parameters
   Property<int>* _maxTrialsAfterFailure;
-  Property<number_t>* _userLambdaInit;
-  number_t _currentLambda;
-  number_t _tau;
-  number_t _goodStepLowerScale;  ///< lower bound for lambda decrease if a good
-                                 ///< LM step
-  number_t _goodStepUpperScale;  ///< upper bound for lambda decrease if a good
-                                 ///< LM step
-  number_t _ni;
+  Property<double>* _userLambdaInit;
+  double _currentLambda;
+  double _tau;
+  double _goodStepLowerScale;  ///< lower bound for lambda decrease if a good
+                               ///< LM step
+  double _goodStepUpperScale;  ///< upper bound for lambda decrease if a good
+                               ///< LM step
+  double _ni;
   int _levenbergIterations;  ///< the number of levenberg iterations performed
                              ///< to accept the last step
 
@@ -89,8 +89,8 @@ class G2O_CORE_API OptimizationAlgorithmLevenberg
    * helper for Levenberg, this function computes the initial damping factor, if
    * the user did not specify an own value, see setUserLambdaInit()
    */
-  number_t computeLambdaInit() const;
-  number_t computeScale() const;
+  double computeLambdaInit() const;
+  double computeScale() const;
 
  private:
   std::unique_ptr<Solver> m_solver;

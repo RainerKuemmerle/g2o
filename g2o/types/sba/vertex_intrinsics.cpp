@@ -46,7 +46,7 @@ void VertexIntrinsics::setToOriginImpl() {
   _estimate << cst(1.), cst(1.), cst(0.5), cst(0.5), cst(0.1);
 }
 
-void VertexIntrinsics::oplusImpl(const number_t* update) {
+void VertexIntrinsics::oplusImpl(const double* update) {
   _estimate.head<4>() += Vector4(update);
 }
 

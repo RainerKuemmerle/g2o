@@ -64,8 +64,8 @@ struct QuadraticFormLock {
 template <int D>
 struct BaseEdgeTraits {
   static constexpr int Dimension = D;
-  typedef Eigen::Matrix<number_t, D, 1, Eigen::ColMajor> ErrorVector;
-  typedef Eigen::Matrix<number_t, D, D, Eigen::ColMajor> InformationType;
+  typedef Eigen::Matrix<double, D, 1, Eigen::ColMajor> ErrorVector;
+  typedef Eigen::Matrix<double, D, D, Eigen::ColMajor> InformationType;
 };
 /**
  * Same as above but for dimension not known at compilation, i.e., dynamically
@@ -74,10 +74,8 @@ struct BaseEdgeTraits {
 template <>
 struct BaseEdgeTraits<-1> {
   static constexpr int Dimension = -1;
-  typedef Eigen::Matrix<number_t, Eigen::Dynamic, 1, Eigen::ColMajor>
-      ErrorVector;
-  typedef Eigen::Matrix<number_t, Eigen::Dynamic, Eigen::Dynamic,
-                        Eigen::ColMajor>
+  typedef Eigen::Matrix<double, Eigen::Dynamic, 1, Eigen::ColMajor> ErrorVector;
+  typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::ColMajor>
       InformationType;
 };
 
@@ -95,10 +93,10 @@ class BaseEdge : public OptimizableGraph::Edge {
 
   virtual ~BaseEdge() {}
 
-  virtual number_t chi2() const { return _error.dot(information() * _error); }
+  virtual double chi2() const { return _error.dot(information() * _error); }
 
-  virtual const number_t* errorData() const { return _error.data(); }
-  virtual number_t* errorData() { return _error.data(); }
+  virtual const double* errorData() const { return _error.data(); }
+  virtual double* errorData() { return _error.data(); }
   const ErrorVector& error() const { return _error; }
   ErrorVector& error() { return _error; }
 
@@ -111,10 +109,8 @@ class BaseEdge : public OptimizableGraph::Edge {
     _information = information;
   }
 
-  virtual const number_t* informationData() const {
-    return _information.data();
-  }
-  virtual number_t* informationData() { return _information.data(); }
+  virtual const double* informationData() const { return _information.data(); }
+  virtual double* informationData() { return _information.data(); }
 
   //! accessor functions for the measurement represented by the edge
   EIGEN_STRONG_INLINE const Measurement& measurement() const {

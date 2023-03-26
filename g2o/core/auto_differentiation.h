@@ -45,9 +45,8 @@ namespace g2o {
 template <typename Edge>
 struct EstimateAccessor {
   template <int k>
-  EIGEN_STRONG_INLINE number_t* data(Edge* that) {
-    return const_cast<number_t*>(
-        that->template vertexXn<k>()->estimate().data());
+  EIGEN_STRONG_INLINE double* data(Edge* that) {
+    return const_cast<double*>(that->template vertexXn<k>()->estimate().data());
   }
 };
 
@@ -64,10 +63,10 @@ template <typename Edge>
 class EstimateAccessorGet {
  public:
   template <int k>
-  EIGEN_STRONG_INLINE number_t* data(Edge* that) {
+  EIGEN_STRONG_INLINE double* data(Edge* that) {
     auto& buffer = std::get<k>(_estimateBuffer);
     buffer.resize(that->template vertexDimension<k>());
-    number_t* rawBuffer = const_cast<number_t*>(buffer.data());
+    double* rawBuffer = const_cast<double*>(buffer.data());
     bool gotData = that->template vertexXn<k>()->getEstimateData(rawBuffer);
     assert(gotData && "Called getEstimateData, but seems unimplmented");
     return gotData ? rawBuffer : nullptr;
@@ -103,7 +102,7 @@ class EstimateAccessorGet {
  * class VertexFlatSE2 : public g2o::BaseVertex<3, g2o::Vector3> {
  *  public:
  *   virtual void setToOriginImpl() { _estimate.setZero(); }
- *   virtual void oplusImpl(const number_t* update) {
+ *   virtual void oplusImpl(const double* update) {
  *    _estimate += Eigen::Map<const g2o::Vector3>(update);
  *    _estimate(2) = g2o::normalize_theta(_estimate(2));
  *   }
@@ -158,7 +157,7 @@ class AutoDifferentiation {
   //! type for the Jacobians during AD
   template <int EdgeDimension, int VertexDimension>
   using ADJacobianType =
-      typename Eigen::Matrix<number_t, EdgeDimension, VertexDimension,
+      typename Eigen::Matrix<double, EdgeDimension, VertexDimension,
                              Eigen::RowMajor>;
 
   //! helper for computing the error based on the functor in the edge
@@ -215,24 +214,24 @@ class AutoDifferentiation {
     // setting up the pointer to the parameters and the Jacobians for calling
     // AD.
     EstimateAccess estimateAccess;
-    number_t* parameters[] = {estimateAccess.template data<Ints>(that)...};
-    // number_t* parameters[] = { /* trivial case would be */
-    //     const_cast<number_t*>(that->template
+    double* parameters[] = {estimateAccess.template data<Ints>(that)...};
+    // double* parameters[] = { /* trivial case would be */
+    //     const_cast<double*>(that->template
     //     vertexXn<Ints>()->estimate().data())...};
 
     // pointers to the Jacobians, set to NULL if vertex is fixed to skip
     // computation
-    number_t* jacobians[] = {
+    double* jacobians[] = {
         that->template vertexXn<Ints>()->fixed()
             ? nullptr
-            : const_cast<number_t*>(std::get<Ints>(ad_jacobians).data())...};
+            : const_cast<double*>(std::get<Ints>(ad_jacobians).data())...};
     // Calls the automatic differentiation for evaluation of the Jacobians.
-    number_t errorValue[Edge::Dimension];
+    double errorValue[Edge::Dimension];
     using AutoDiffDims = ceres::internal::StaticParameterDims<
         Edge::template VertexXnType<Ints>::Dimension...>;
     bool diffState =
         ceres::internal::AutoDifferentiate<Edge::Dimension, AutoDiffDims, Edge,
-                                           number_t>(
+                                           double>(
             *that, parameters, Edge::Dimension, errorValue, jacobians);
 
     assert(diffState && "Error during Automatic Differentiation");

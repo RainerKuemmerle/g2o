@@ -28,7 +28,7 @@
 #include "gtest/gtest.h"
 
 namespace {
-number_t simple_normalize_theta(number_t th) {
+double simple_normalize_theta(double th) {
   while (th >= g2o::const_pi()) th -= 2. * g2o::const_pi();
   while (th < -g2o::const_pi()) th += 2. * g2o::const_pi();
   return th;
@@ -99,10 +99,10 @@ TEST(Stuff, Rad2Deg) {
 
 TEST(Stuff, ArrayHasNaN) {
   constexpr int size = 10;
-  number_t data[size];
+  double data[size];
   std::fill_n(data, size, 0);
 
-  auto aux = [](const number_t* data, int size) {
+  auto aux = [](const double* data, int size) {
     int nanIndex = -1;
     bool hasNan = g2o::arrayHasNaN(data, size, &nanIndex);
     return std::make_pair(hasNan, nanIndex);
@@ -112,7 +112,7 @@ TEST(Stuff, ArrayHasNaN) {
 
   for (int i = 0; i < size; ++i) {
     std::fill_n(data, size, 0);
-    data[i] = std::numeric_limits<number_t>::quiet_NaN();
+    data[i] = std::numeric_limits<double>::quiet_NaN();
     EXPECT_EQ(std::make_pair(true, i), aux(data, size));
   }
 }

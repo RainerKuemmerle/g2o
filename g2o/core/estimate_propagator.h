@@ -46,9 +46,9 @@ namespace g2o {
 class G2O_CORE_API EstimatePropagatorCost {
  public:
   EstimatePropagatorCost(SparseOptimizer* graph);
-  virtual number_t operator()(OptimizableGraph::Edge* edge,
-                              const OptimizableGraph::VertexSet& from,
-                              OptimizableGraph::Vertex* to_) const;
+  virtual double operator()(OptimizableGraph::Edge* edge,
+                            const OptimizableGraph::VertexSet& from,
+                            OptimizableGraph::Vertex* to_) const;
   virtual const char* name() const { return "spanning tree"; }
 
  protected:
@@ -65,9 +65,9 @@ class G2O_CORE_API EstimatePropagatorCostOdometry
     : public EstimatePropagatorCost {
  public:
   EstimatePropagatorCostOdometry(SparseOptimizer* graph);
-  virtual number_t operator()(OptimizableGraph::Edge* edge,
-                              const OptimizableGraph::VertexSet& from_,
-                              OptimizableGraph::Vertex* to_) const;
+  virtual double operator()(OptimizableGraph::Edge* edge,
+                            const OptimizableGraph::VertexSet& from_,
+                            OptimizableGraph::Vertex* to_) const;
   virtual const char* name() const { return "odometry"; }
 };
 
@@ -97,7 +97,7 @@ class G2O_CORE_API EstimatePropagator {
   /**
    * \brief priority queue for AdjacencyMapEntry
    */
-  class PriorityQueue : public std::multimap<number_t, AdjacencyMapEntry*> {
+  class PriorityQueue : public std::multimap<double, AdjacencyMapEntry*> {
    public:
     void push(AdjacencyMapEntry* entry);
     AdjacencyMapEntry* pop();
@@ -115,14 +115,14 @@ class G2O_CORE_API EstimatePropagator {
     OptimizableGraph::Vertex* child() const { return _child; }
     const OptimizableGraph::VertexSet& parent() const { return _parent; }
     OptimizableGraph::Edge* edge() const { return _edge; }
-    number_t distance() const { return _distance; }
+    double distance() const { return _distance; }
     int frontierLevel() const { return _frontierLevel; }
 
    protected:
     OptimizableGraph::Vertex* _child;
     OptimizableGraph::VertexSet _parent;
     OptimizableGraph::Edge* _edge;
-    number_t _distance;
+    double _distance;
     int _frontierLevel;
 
    private:  // for PriorityQueue
@@ -159,8 +159,8 @@ class G2O_CORE_API EstimatePropagator {
       OptimizableGraph::Vertex* v,
       const EstimatePropagator::PropagateCost& cost,
       const EstimatePropagator::PropagateAction& action = PropagateAction(),
-      number_t maxDistance = std::numeric_limits<number_t>::max(),
-      number_t maxEdgeCost = std::numeric_limits<number_t>::max());
+      double maxDistance = std::numeric_limits<double>::max(),
+      double maxEdgeCost = std::numeric_limits<double>::max());
 
   /**
    * same as above but starting to propagate from a set of vertices instead of
@@ -170,8 +170,8 @@ class G2O_CORE_API EstimatePropagator {
       OptimizableGraph::VertexSet& vset,
       const EstimatePropagator::PropagateCost& cost,
       const EstimatePropagator::PropagateAction& action = PropagateAction(),
-      number_t maxDistance = std::numeric_limits<number_t>::max(),
-      number_t maxEdgeCost = std::numeric_limits<number_t>::max());
+      double maxDistance = std::numeric_limits<double>::max(),
+      double maxEdgeCost = std::numeric_limits<double>::max());
 
  protected:
   void reset();

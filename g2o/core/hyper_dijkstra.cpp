@@ -38,34 +38,34 @@ namespace g2o {
 
 using namespace std;
 
-number_t HyperDijkstra::TreeAction::perform(HyperGraph::Vertex* v,
-                                            HyperGraph::Vertex* vParent,
-                                            HyperGraph::Edge* e) {
+double HyperDijkstra::TreeAction::perform(HyperGraph::Vertex* v,
+                                          HyperGraph::Vertex* vParent,
+                                          HyperGraph::Edge* e) {
   (void)v;
   (void)vParent;
   (void)e;
-  return std::numeric_limits<number_t>::max();
+  return std::numeric_limits<double>::max();
 }
 
-number_t HyperDijkstra::TreeAction::perform(HyperGraph::Vertex* v,
-                                            HyperGraph::Vertex* vParent,
-                                            HyperGraph::Edge* e,
-                                            number_t distance) {
+double HyperDijkstra::TreeAction::perform(HyperGraph::Vertex* v,
+                                          HyperGraph::Vertex* vParent,
+                                          HyperGraph::Edge* e,
+                                          double distance) {
   if (distance == -1) return perform(v, vParent, e);
-  return std::numeric_limits<number_t>::max();
+  return std::numeric_limits<double>::max();
 }
 
 HyperDijkstra::AdjacencyMapEntry::AdjacencyMapEntry(HyperGraph::Vertex* child_,
                                                     HyperGraph::Vertex* parent_,
                                                     HyperGraph::Edge* edge_,
-                                                    number_t distance_)
+                                                    double distance_)
     : _child(child_), _parent(parent_), _edge(edge_), _distance(distance_) {}
 
 HyperDijkstra::HyperDijkstra(HyperGraph* g) : _graph(g) {
   for (HyperGraph::VertexIDMap::const_iterator it = _graph->vertices().begin();
        it != _graph->vertices().end(); ++it) {
     AdjacencyMapEntry entry(it->second, 0, 0,
-                            std::numeric_limits<number_t>::max());
+                            std::numeric_limits<double>::max());
     _adjacencyMap.insert(make_pair(entry.child(), entry));
   }
 }
@@ -75,8 +75,8 @@ void HyperDijkstra::reset() {
        it != _visited.end(); ++it) {
     AdjacencyMap::iterator at = _adjacencyMap.find(*it);
     assert(at != _adjacencyMap.end());
-    at->second = AdjacencyMapEntry(at->first, 0, 0,
-                                   std::numeric_limits<number_t>::max());
+    at->second =
+        AdjacencyMapEntry(at->first, 0, 0, std::numeric_limits<double>::max());
   }
   _visited.clear();
 }
@@ -88,9 +88,9 @@ bool operator<(const HyperDijkstra::AdjacencyMapEntry& a,
 
 void HyperDijkstra::shortestPaths(HyperGraph::VertexSet& vset,
                                   HyperDijkstra::CostFunction* cost,
-                                  number_t maxDistance,
-                                  number_t comparisonConditioner, bool directed,
-                                  number_t maxEdgeCost) {
+                                  double maxDistance,
+                                  double comparisonConditioner, bool directed,
+                                  double maxEdgeCost) {
   reset();
   std::priority_queue<AdjacencyMapEntry> frontier;
   for (HyperGraph::VertexSet::iterator vit = vset.begin(); vit != vset.end();
@@ -118,7 +118,7 @@ void HyperDijkstra::shortestPaths(HyperGraph::VertexSet& vset,
            << " is not in the adjacency map" << endl;
     }
     assert(ut != _adjacencyMap.end());
-    number_t uDistance = ut->second.distance();
+    double uDistance = ut->second.distance();
 
     std::pair<HyperGraph::VertexSet::iterator, bool> insertResult =
         _visited.insert(u);
@@ -134,11 +134,11 @@ void HyperDijkstra::shortestPaths(HyperGraph::VertexSet& vset,
         HyperGraph::Vertex* z = edge->vertex(i);
         if (z == u) continue;
 
-        number_t edgeDistance = (*cost)(edge, u, z);
-        if (edgeDistance == std::numeric_limits<number_t>::max() ||
+        double edgeDistance = (*cost)(edge, u, z);
+        if (edgeDistance == std::numeric_limits<double>::max() ||
             edgeDistance > maxEdgeCost)
           continue;
-        number_t zDistance = uDistance + edgeDistance;
+        double zDistance = uDistance + edgeDistance;
         // cerr << z->id() << " " << zDistance << endl;
 
         AdjacencyMap::iterator ot = _adjacencyMap.find(z);
@@ -158,9 +158,9 @@ void HyperDijkstra::shortestPaths(HyperGraph::VertexSet& vset,
 
 void HyperDijkstra::shortestPaths(HyperGraph::Vertex* v,
                                   HyperDijkstra::CostFunction* cost,
-                                  number_t maxDistance,
-                                  number_t comparisonConditioner, bool directed,
-                                  number_t maxEdgeCost) {
+                                  double maxDistance,
+                                  double comparisonConditioner, bool directed,
+                                  double maxEdgeCost) {
   HyperGraph::VertexSet vset;
   vset.insert(v);
   shortestPaths(vset, cost, maxDistance, comparisonConditioner, directed,
@@ -237,8 +237,8 @@ void HyperDijkstra::visitAdjacencyMap(AdjacencyMap& amap, TreeAction* action,
 void HyperDijkstra::connectedSubset(
     HyperGraph::VertexSet& connected, HyperGraph::VertexSet& visited,
     HyperGraph::VertexSet& startingSet, HyperGraph* g, HyperGraph::Vertex* v,
-    HyperDijkstra::CostFunction* cost, number_t distance,
-    number_t comparisonConditioner, number_t maxEdgeCost) {
+    HyperDijkstra::CostFunction* cost, double distance,
+    double comparisonConditioner, double maxEdgeCost) {
   typedef std::queue<HyperGraph::Vertex*> VertexDeque;
   visited.clear();
   connected.clear();
@@ -264,9 +264,9 @@ void HyperDijkstra::connectedSubset(
   }
 }
 
-number_t UniformCostFunction::operator()(HyperGraph::Edge* /*edge*/,
-                                         HyperGraph::Vertex* /*from*/,
-                                         HyperGraph::Vertex* /*to*/) {
+double UniformCostFunction::operator()(HyperGraph::Edge* /*edge*/,
+                                       HyperGraph::Vertex* /*from*/,
+                                       HyperGraph::Vertex* /*to*/) {
   return 1.;
 }
 

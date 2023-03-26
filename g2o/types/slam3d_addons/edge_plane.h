@@ -51,13 +51,13 @@ class G2O_TYPES_SLAM3D_ADDONS_API EdgePlane
 
   virtual void setMeasurement(const Vector4& m) { _measurement = m; }
 
-  virtual bool setMeasurementData(const number_t* d) {
+  virtual bool setMeasurementData(const double* d) {
     Eigen::Map<const Vector4> m(d);
     _measurement = m;
     return true;
   }
 
-  virtual bool getMeasurementData(number_t* d) const {
+  virtual bool getMeasurementData(double* d) const {
     Eigen::Map<Vector4> m(d);
     m = _measurement;
     return true;

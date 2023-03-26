@@ -176,13 +176,13 @@ class G2O_CORE_API SparseOptimizer : public OptimizableGraph {
   bool gaugeFreedom();
 
   /**returns the cached chi2 of the active portion of the graph*/
-  number_t activeChi2() const;
+  double activeChi2() const;
   /**
    * returns the cached chi2 of the active portion of the graph.
    * In contrast to activeChi2() this functions considers the weighting
    * of the error according to the robustification of the error functions.
    */
-  number_t activeRobustChi2() const;
+  double activeRobustChi2() const;
 
   //! verbose information during optimization
   bool verbose() const { return _verbose; }
@@ -273,10 +273,10 @@ class G2O_CORE_API SparseOptimizer : public OptimizableGraph {
 
   /**
    * update the estimate of the active vertices
-   * @param update: the number_t vector containing the stacked
+   * @param update: the double vector containing the stacked
    * elements of the increments on the vertices.
    */
-  void update(const number_t* update);
+  void update(const double* update);
 
   /**
      returns the set of batch statistics about the optimisation

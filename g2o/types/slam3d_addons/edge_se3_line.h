@@ -52,13 +52,13 @@ class G2O_TYPES_SLAM3D_ADDONS_API EdgeSE3Line3D
 
   virtual void setMeasurement(const Line3D& m) { _measurement = Line3D(m); }
 
-  virtual bool setMeasurementData(const number_t* d) {
+  virtual bool setMeasurementData(const double* d) {
     Eigen::Map<const Vector6> v(d);
     _measurement = Line3D(v);
     return true;
   }
 
-  virtual bool getMeasurementData(number_t* d) const {
+  virtual bool getMeasurementData(double* d) const {
     Eigen::Map<Vector6> v(d);
     v = _measurement;
     return true;

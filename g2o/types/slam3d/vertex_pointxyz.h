@@ -44,18 +44,18 @@ class G2O_TYPES_SLAM3D_API VertexPointXYZ : public BaseVertex<3, Vector3> {
 
   virtual void setToOriginImpl() { _estimate.fill(0.); }
 
-  virtual void oplusImpl(const number_t* update_) {
+  virtual void oplusImpl(const double* update_) {
     Eigen::Map<const Vector3> update(update_);
     _estimate += update;
   }
 
-  virtual bool setEstimateDataImpl(const number_t* est) {
+  virtual bool setEstimateDataImpl(const double* est) {
     Eigen::Map<const Vector3> estMap(est);
     _estimate = estMap;
     return true;
   }
 
-  virtual bool getEstimateData(number_t* est) const {
+  virtual bool getEstimateData(double* est) const {
     Eigen::Map<Vector3> estMap(est);
     estMap = _estimate;
     return true;
@@ -63,12 +63,12 @@ class G2O_TYPES_SLAM3D_API VertexPointXYZ : public BaseVertex<3, Vector3> {
 
   virtual int estimateDimension() const { return Dimension; }
 
-  virtual bool setMinimalEstimateDataImpl(const number_t* est) {
+  virtual bool setMinimalEstimateDataImpl(const double* est) {
     _estimate = Eigen::Map<const Vector3>(est);
     return true;
   }
 
-  virtual bool getMinimalEstimateData(number_t* est) const {
+  virtual bool getMinimalEstimateData(double* est) const {
     Eigen::Map<Vector3> v(est);
     v = _estimate;
     return true;

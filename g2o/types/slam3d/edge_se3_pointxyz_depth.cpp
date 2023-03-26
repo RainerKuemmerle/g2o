@@ -98,11 +98,11 @@ void EdgeSE3PointXYZDepth::linearizeOplus() {
 
   J.block<3, 3>(0, 6) = cache->w2l().rotation();
 
-  Eigen::Matrix<number_t, 3, 9, Eigen::ColMajor> Jprime =
+  Eigen::Matrix<double, 3, 9, Eigen::ColMajor> Jprime =
       params->Kcam_inverseOffsetR() * J;
   Vector3 Zprime = cache->w2i() * pt;
 
-  Eigen::Matrix<number_t, 3, 9, Eigen::ColMajor> Jhom;
+  Eigen::Matrix<double, 3, 9, Eigen::ColMajor> Jhom;
   Jhom.block<2, 9>(0, 0) = 1 / (Zprime(2) * Zprime(2)) *
                            (Jprime.block<2, 9>(0, 0) * Zprime(2) -
                             Zprime.head<2>() * Jprime.block<1, 9>(2, 0));
@@ -136,7 +136,7 @@ void EdgeSE3PointXYZDepth::initialEstimate(
 
   VertexSE3* cam = dynamic_cast<VertexSE3*>(_vertices[0]);
   VertexPointXYZ* point = dynamic_cast<VertexPointXYZ*>(_vertices[1]);
-  const Eigen::Matrix<number_t, 3, 3, Eigen::ColMajor>& invKcam =
+  const Eigen::Matrix<double, 3, 3, Eigen::ColMajor>& invKcam =
       params->invKcam();
   Vector3 p;
   p(2) = _measurement(2);

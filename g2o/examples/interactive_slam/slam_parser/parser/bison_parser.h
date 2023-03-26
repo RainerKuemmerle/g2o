@@ -214,7 +214,7 @@ class Parser {
   location_stack_type yylocation_stack_;
 
   /// Internal symbol numbers.
-  typedef unsigned char token_number_type;
+  typedef unsigned char token_doubleype;
   /* Tables.  */
   /// For a state, the index in \a yytable_ of its portion.
   static const signed char yypact_[];
@@ -258,9 +258,9 @@ class Parser {
 
 #if YYDEBUG
   /// A type to store symbol numbers and -1.
-  typedef signed char rhs_number_type;
+  typedef signed char rhs_doubleype;
   /// A `-1'-separated list of the rules' RHS.
-  static const rhs_number_type yyrhs_[];
+  static const rhs_doubleype yyrhs_[];
   /// For each rule, the index of the first RHS symbol in \a yyrhs_.
   static const unsigned char yyprhs_[];
   /// For each rule, its source line number.
@@ -278,7 +278,7 @@ class Parser {
 #endif
 
   /// Convert a scanner token number \a t to a symbol number.
-  token_number_type yytranslate_(int t);
+  token_doubleype yytranslate_(int t);
 
   /// \brief Reclaim the memory associated to a symbol.
   /// \param yymsg        Why this token is reclaimed.
@@ -302,7 +302,7 @@ class Parser {
   static const int yyerrcode_;
   static const int yyntokens_;
   static const unsigned int yyuser_token_number_max_;
-  static const token_number_type yyundef_token_;
+  static const token_doubleype yyundef_token_;
 
   /* User arguments.  */
   class Driver& driver;

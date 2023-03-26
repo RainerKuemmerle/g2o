@@ -33,20 +33,20 @@
 namespace g2o {
 
 RobustKernelScaleDelta::RobustKernelScaleDelta(const RobustKernelPtr& kernel,
-                                               number_t delta)
+                                               double delta)
     : RobustKernel(delta), _kernel(kernel) {}
 
-RobustKernelScaleDelta::RobustKernelScaleDelta(number_t delta)
+RobustKernelScaleDelta::RobustKernelScaleDelta(double delta)
     : RobustKernel(delta) {}
 
 void RobustKernelScaleDelta::setKernel(const RobustKernelPtr& ptr) {
   _kernel = ptr;
 }
 
-void RobustKernelScaleDelta::robustify(number_t error, Vector3& rho) const {
+void RobustKernelScaleDelta::robustify(double error, Vector3& rho) const {
   if (_kernel.get()) {
-    number_t dsqr = _delta * _delta;
-    number_t dsqrReci = 1. / dsqr;
+    double dsqr = _delta * _delta;
+    double dsqrReci = 1. / dsqr;
     _kernel->robustify(dsqrReci * error, rho);
     rho[0] *= dsqr;
     rho[2] *= dsqrReci;
@@ -57,14 +57,14 @@ void RobustKernelScaleDelta::robustify(number_t error, Vector3& rho) const {
   }
 }
 
-void RobustKernelHuber::robustify(number_t e, Vector3& rho) const {
-  number_t dsqr = _delta * _delta;
+void RobustKernelHuber::robustify(double e, Vector3& rho) const {
+  double dsqr = _delta * _delta;
   if (e <= dsqr) {  // inlier
     rho[0] = e;
     rho[1] = 1.;
     rho[2] = 0.;
   } else {                     // outlier
-    number_t sqrte = sqrt(e);  // absolute value of the error
+    double sqrte = sqrt(e);    // absolute value of the error
     rho[0] =
         2 * sqrte * _delta - dsqr;  // rho(e)   = 2 * delta * e^(1/2) - delta^2
     rho[1] = _delta / sqrte;        // rho'(e)  = delta / sqrt(e)
@@ -73,54 +73,54 @@ void RobustKernelHuber::robustify(number_t e, Vector3& rho) const {
   }
 }
 
-void RobustKernelPseudoHuber::robustify(number_t e2, Vector3& rho) const {
-  number_t dsqr = _delta * _delta;
-  number_t dsqrReci = 1. / dsqr;
-  number_t aux1 = dsqrReci * e2 + 1.0;
-  number_t aux2 = sqrt(aux1);
+void RobustKernelPseudoHuber::robustify(double e2, Vector3& rho) const {
+  double dsqr = _delta * _delta;
+  double dsqrReci = 1. / dsqr;
+  double aux1 = dsqrReci * e2 + 1.0;
+  double aux2 = sqrt(aux1);
   rho[0] = 2 * dsqr * (aux2 - 1);
   rho[1] = 1. / aux2;
   rho[2] = -0.5 * dsqrReci * rho[1] / aux1;
 }
 
-void RobustKernelCauchy::robustify(number_t e2, Vector3& rho) const {
-  number_t dsqr = _delta * _delta;
-  number_t dsqrReci = 1. / dsqr;
-  number_t aux = dsqrReci * e2 + 1.0;
+void RobustKernelCauchy::robustify(double e2, Vector3& rho) const {
+  double dsqr = _delta * _delta;
+  double dsqrReci = 1. / dsqr;
+  double aux = dsqrReci * e2 + 1.0;
   rho[0] = dsqr * log(aux);
   rho[1] = 1. / aux;
   rho[2] = -dsqrReci * std::pow(rho[1], 2);
 }
 
-void RobustKernelGemanMcClure::robustify(number_t e2, Vector3& rho) const {
-  const number_t aux = _delta / (_delta + e2);
+void RobustKernelGemanMcClure::robustify(double e2, Vector3& rho) const {
+  const double aux = _delta / (_delta + e2);
   rho[0] = e2 * aux;
   rho[1] = aux * aux;
   rho[2] = -2. * rho[1] * aux;
 }
 
-void RobustKernelWelsch::robustify(number_t e2, Vector3& rho) const {
-  const number_t dsqr = _delta * _delta;
-  const number_t aux = e2 / dsqr;
-  const number_t aux2 = exp(-aux);
+void RobustKernelWelsch::robustify(double e2, Vector3& rho) const {
+  const double dsqr = _delta * _delta;
+  const double aux = e2 / dsqr;
+  const double aux2 = exp(-aux);
   rho[0] = dsqr * (1. - aux2);
   rho[1] = aux2;
   rho[2] = -aux2 / dsqr;
 }
 
-void RobustKernelFair::robustify(number_t e2, Vector3& rho) const {
-  const number_t sqrte = sqrt(e2);
-  const number_t aux = sqrte / _delta;
+void RobustKernelFair::robustify(double e2, Vector3& rho) const {
+  const double sqrte = sqrt(e2);
+  const double aux = sqrte / _delta;
   rho[0] = 2. * _delta * _delta * (aux - log1p(aux));
   rho[1] = 1. / (1. + aux);
   rho[2] = -0.5 / (sqrte * (1. + aux));
 }
 
-void RobustKernelTukey::robustify(number_t e2, Vector3& rho) const {
-  const number_t e = sqrt(e2);
-  const number_t delta2 = _delta * _delta;
+void RobustKernelTukey::robustify(double e2, Vector3& rho) const {
+  const double e = sqrt(e2);
+  const double delta2 = _delta * _delta;
   if (e <= _delta) {
-    const number_t aux = e2 / delta2;
+    const double aux = e2 / delta2;
     rho[0] = delta2 * (1. - std::pow((1. - aux), 3)) / 3.;
     rho[1] = std::pow((1. - aux), 2);
     rho[2] = -2. * (1. - aux) / delta2;
@@ -131,8 +131,8 @@ void RobustKernelTukey::robustify(number_t e2, Vector3& rho) const {
   }
 }
 
-void RobustKernelSaturated::robustify(number_t e2, Vector3& rho) const {
-  number_t dsqr = _delta * _delta;
+void RobustKernelSaturated::robustify(double e2, Vector3& rho) const {
+  double dsqr = _delta * _delta;
   if (e2 <= dsqr) {  // inlier
     rho[0] = e2;
     rho[1] = 1.;
@@ -145,15 +145,15 @@ void RobustKernelSaturated::robustify(number_t e2, Vector3& rho) const {
 }
 
 // delta is used as $phi$
-void RobustKernelDCS::robustify(number_t e2, Vector3& rho) const {
-  const number_t& phi = _delta;
-  number_t scale = (2.0 * phi) / (phi + e2);
+void RobustKernelDCS::robustify(double e2, Vector3& rho) const {
+  const double& phi = _delta;
+  double scale = (2.0 * phi) / (phi + e2);
   if (scale >= 1.0) {  // limit scale to max of 1 and return this
     rho[0] = e2;
     rho[1] = 1.;
     rho[2] = 0;
   } else {
-    number_t phi_sqr = phi * phi;
+    double phi_sqr = phi * phi;
     rho[0] = scale * e2 * scale;
     rho[1] = (4 * phi_sqr * (phi - e2)) / std::pow(phi + e2, 3);
     rho[2] = -(8 * phi_sqr * (2 * phi - e2)) / std::pow(phi + e2, 4);

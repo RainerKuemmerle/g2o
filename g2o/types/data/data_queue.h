@@ -40,15 +40,15 @@ class RobotData;
  */
 class G2O_TYPES_DATA_API DataQueue {
  public:
-  typedef std::map<number_t, RobotData*> Buffer;
+  typedef std::map<double, RobotData*> Buffer;
 
  public:
   void add(RobotData* rd);
 
-  RobotData* findClosestData(number_t timestamp) const;
+  RobotData* findClosestData(double timestamp) const;
 
-  RobotData* before(number_t timestamp) const;
-  RobotData* after(number_t timestamp) const;
+  RobotData* before(double timestamp) const;
+  RobotData* after(double timestamp) const;
 
   const Buffer& buffer() const { return _buffer; }
 

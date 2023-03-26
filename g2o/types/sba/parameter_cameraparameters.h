@@ -39,17 +39,17 @@ class G2O_TYPES_SBA_API CameraParameters : public g2o::Parameter {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
   CameraParameters();
-  CameraParameters(number_t focal_length, const Vector2 &principle_point,
-                   number_t baseline);
+  CameraParameters(double focal_length, const Vector2& principle_point,
+                   double baseline);
 
   Vector2 cam_map(const Vector3 &trans_xyz) const;
   Vector3 stereocam_uvu_map(const Vector3 &trans_xyz) const;
   bool read(std::istream &is);
   bool write(std::ostream &os) const;
 
-  number_t focal_length;
+  double focal_length;
   Vector2 principle_point;
-  number_t baseline;
+  double baseline;
 };
 
 }  // namespace g2o

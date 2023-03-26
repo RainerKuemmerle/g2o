@@ -43,11 +43,12 @@ bool VertexCam::read(std::istream& is) {
   SBACam cam(r, t);
 
   // now fx, fy, cx, cy, baseline
-  number_t fx, fy, cx, cy, tx;
+  double fx;
 
   // try to read one value
   is >> fx;
   if (is.good()) {
+    double fy, cx, cy, tx;
     is >> fy >> cx >> cy >> tx;
     cam.setKcam(fx, fy, cx, cy, tx);
   } else {

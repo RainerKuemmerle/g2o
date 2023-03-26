@@ -120,25 +120,25 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
     }
 
     //! get the element from the hessian matrix
-    virtual const number_t& hessian(int i, int j) const = 0;
-    virtual number_t& hessian(int i, int j) = 0;
-    virtual number_t hessianDeterminant() const = 0;
-    virtual number_t* hessianData() = 0;
+    virtual const double& hessian(int i, int j) const = 0;
+    virtual double& hessian(int i, int j) = 0;
+    virtual double hessianDeterminant() const = 0;
+    virtual double* hessianData() = 0;
 
     /** maps the internal matrix to some external memory location */
-    virtual void mapHessianMemory(number_t* d) = 0;
+    virtual void mapHessianMemory(double* d) = 0;
 
     /**
      * copies the b vector in the array b_
      * @return the number of elements copied
      */
-    virtual int copyB(number_t* b_) const = 0;
+    virtual int copyB(double* b_) const = 0;
 
     //! get the b vector element
-    virtual const number_t& b(int i) const = 0;
-    virtual number_t& b(int i) = 0;
+    virtual const double& b(int i) const = 0;
+    virtual double& b(int i) = 0;
     //! return a pointer to the b vector associated with this vertex
-    virtual number_t* bData() = 0;
+    virtual double* bData() = 0;
 
     /**
      * set the b vector part of this vertex to zero
@@ -149,28 +149,28 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
      * updates the current vertex with the direct solution x += H_ii\b_ii
      * @return the determinant of the inverted hessian
      */
-    virtual number_t solveDirect(number_t lambda = 0) = 0;
+    virtual double solveDirect(double lambda = 0) = 0;
 
     /**
-     * sets the initial estimate from an array of number_t
+     * sets the initial estimate from an array of double
      * Implement setEstimateDataImpl()
      * @return true on success
      */
-    bool setEstimateData(const number_t* estimate);
+    bool setEstimateData(const double* estimate);
 
     /**
-     * sets the initial estimate from an array of number_t
+     * sets the initial estimate from an array of double
      * Implement setEstimateDataImpl()
      * @return true on success
      */
-    bool setEstimateData(const std::vector<number_t>& estimate) {
+    bool setEstimateData(const std::vector<double>& estimate) {
       int dim = estimateDimension();
       if ((dim == -1) || (estimate.size() != std::size_t(dim))) return false;
       return setEstimateData(&estimate[0]);
     };
 
     /**
-     * sets the initial estimate from an array of number_t
+     * sets the initial estimate from an array of double
      * Implement setEstimateDataImpl()
      * @return true on success
      */
@@ -182,16 +182,16 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
     };
 
     /**
-     * writes the estimater to an array of number_t
+     * writes the estimater to an array of double
      * @returns true on success
      */
-    virtual bool getEstimateData(number_t* estimate) const;
+    virtual bool getEstimateData(double* estimate) const;
 
     /**
-     * writes the estimater to an array of number_t
+     * writes the estimater to an array of double
      * @returns true on success
      */
-    virtual bool getEstimateData(std::vector<number_t>& estimate) const {
+    virtual bool getEstimateData(std::vector<double>& estimate) const {
       int dim = estimateDimension();
       if (dim < 0) return false;
       estimate.resize(dim);
@@ -199,7 +199,7 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
     };
 
     /**
-     * writes the estimater to an array of number_t
+     * writes the estimater to an array of double
      * @returns true on success
      */
     template <typename Derived>
@@ -222,30 +222,30 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
 
     /**
      * returns the dimension of the extended representation used by
-     * get/setEstimate(number_t*) -1 if it is not supported
+     * get/setEstimate(double*) -1 if it is not supported
      */
     virtual int estimateDimension() const;
 
     /**
-     * sets the initial estimate from an array of number_t.
+     * sets the initial estimate from an array of double.
      * Implement setMinimalEstimateDataImpl()
      * @return true on success
      */
-    bool setMinimalEstimateData(const number_t* estimate);
+    bool setMinimalEstimateData(const double* estimate);
 
     /**
-     * sets the initial estimate from an array of number_t.
+     * sets the initial estimate from an array of double.
      * Implement setMinimalEstimateDataImpl()
      * @return true on success
      */
-    bool setMinimalEstimateData(const std::vector<number_t>& estimate) {
+    bool setMinimalEstimateData(const std::vector<double>& estimate) {
       int dim = minimalEstimateDimension();
       if ((dim == -1) || (estimate.size() != std::size_t(dim))) return false;
       return setMinimalEstimateData(&estimate[0]);
     };
 
     /**
-     * sets the initial estimate from an eigen type of number_t.
+     * sets the initial estimate from an eigen type of double.
      * Implement setMinimalEstimateDataImpl()
      * @return true on success
      */
@@ -257,16 +257,16 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
     };
 
     /**
-     * writes the estimate to an array of number_t
+     * writes the estimate to an array of double
      * @returns true on success
      */
-    virtual bool getMinimalEstimateData(number_t* estimate) const;
+    virtual bool getMinimalEstimateData(double* estimate) const;
 
     /**
-     * writes the estimate to an array of number_t
+     * writes the estimate to an array of double
      * @returns true on success
      */
-    virtual bool getMinimalEstimateData(std::vector<number_t>& estimate) const {
+    virtual bool getMinimalEstimateData(std::vector<double>& estimate) const {
       int dim = minimalEstimateDimension();
       if (dim < 0) return false;
       estimate.resize(dim);
@@ -274,7 +274,7 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
     };
 
     /**
-     * writes the estimate to an eigen type number_t
+     * writes the estimate to an eigen type double
      * @returns true on success
      */
     template <typename Derived>
@@ -297,7 +297,7 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
 
     /**
      * returns the dimension of the extended representation used by
-     * get/setEstimate(number_t*) -1 if it is not supported
+     * get/setEstimate(double*) -1 if it is not supported
      */
     virtual int minimalEstimateDimension() const;
 
@@ -321,7 +321,7 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
      * carry out the update. Will also call updateCache() to update the caches
      * of depending on the vertex.
      */
-    void oplus(const number_t* v) {
+    void oplus(const double* v) {
       oplusImpl(v);
       updateCache();
     }
@@ -395,22 +395,22 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
      * update the position of the node from the parameters in v.
      * Implement in your class!
      */
-    virtual void oplusImpl(const number_t* v) = 0;
+    virtual void oplusImpl(const double* v) = 0;
 
     //! sets the node to the origin (used in the multilevel stuff)
     virtual void setToOriginImpl() = 0;
 
     /**
-     * writes the estimater to an array of number_t
+     * writes the estimater to an array of double
      * @returns true on success
      */
-    virtual bool setEstimateDataImpl(const number_t*) { return false; }
+    virtual bool setEstimateDataImpl(const double*) { return false; }
 
     /**
-     * sets the initial estimate from an array of number_t
+     * sets the initial estimate from an array of double
      * @return true on success
      */
-    virtual bool setMinimalEstimateDataImpl(const number_t*) { return false; }
+    virtual bool setMinimalEstimateDataImpl(const double*) { return false; }
   };
 
   class G2O_CORE_API Edge : public HyperGraph::Edge,
@@ -428,13 +428,13 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
     // computes the error of the edge and stores it in an internal structure
     virtual void computeError() = 0;
 
-    //! sets the measurement from an array of number_t
+    //! sets the measurement from an array of double
     //! @returns true on success
-    virtual bool setMeasurementData(const number_t* m);
+    virtual bool setMeasurementData(const double* m);
 
-    //! writes the measurement to an array of number_t
+    //! writes the measurement to an array of double
     //! @returns true on success
-    virtual bool getMeasurementData(number_t* m) const;
+    virtual bool getMeasurementData(double* m) const;
 
     //! returns the dimension of the measurement in the extended representation
     //! which is used by get/setMeasurement;
@@ -454,17 +454,17 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
     void setRobustKernel(RobustKernel* ptr);
 
     //! returns the error vector cached after calling the computeError;
-    virtual const number_t* errorData() const = 0;
-    virtual number_t* errorData() = 0;
+    virtual const double* errorData() const = 0;
+    virtual double* errorData() = 0;
 
     //! returns the memory of the information matrix, usable for example with a
     //! Eigen::Map<MatrixX>
-    virtual const number_t* informationData() const = 0;
-    virtual number_t* informationData() = 0;
+    virtual const double* informationData() const = 0;
+    virtual double* informationData() = 0;
 
     //! computes the chi2 based on the cached error value, only valid after
     //! computeError has been called.
-    virtual number_t chi2() const = 0;
+    virtual double chi2() const = 0;
 
     /**
      * Linearizes the constraint in the edge.
@@ -483,7 +483,7 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
      * @param rowMajor if true, will write in rowMajor order to the block. Since
      * EIGEN is columnMajor by default, this results in writing the transposed
      */
-    virtual void mapHessianMemory(number_t* d, int i, int j, bool rowMajor) = 0;
+    virtual void mapHessianMemory(double* d, int i, int j, bool rowMajor) = 0;
 
     /**
      * Linearizes the constraint in the edge in the manifold space, and store
@@ -502,7 +502,7 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
      * initiliaizng the vertex but should be positive if the initialization is
      * possible and negative if not possible.
      */
-    virtual number_t initialEstimatePossible(
+    virtual double initialEstimatePossible(
         const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to) {
       (void)from;
       (void)to;
@@ -616,7 +616,7 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
                              HyperGraph::Vertex* v);
 
   //! returns the chi2 of the current configuration
-  number_t chi2() const;
+  double chi2() const;
 
   //! return the maximum dimension of all vertices in the graph
   int maxDimension() const;

@@ -95,9 +95,9 @@ HyperGraphElementAction* EdgeSE3PlaneSensorCalibDrawAction::operator()(
   if (!robot || !sensor) return nullptr;
 
   if (_planeWidth && _planeHeight) {
-    number_t d = that->measurement().distance();
-    number_t azimuth = Plane3D::azimuth(that->measurement().normal());
-    number_t elevation = Plane3D::elevation(that->measurement().normal());
+    double d = that->measurement().distance();
+    double azimuth = Plane3D::azimuth(that->measurement().normal());
+    double elevation = Plane3D::elevation(that->measurement().normal());
 
     glColor3f(float(that->color(0)), float(that->color(1)),
               float(that->color(2)));

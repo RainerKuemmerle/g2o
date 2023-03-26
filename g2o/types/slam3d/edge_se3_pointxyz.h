@@ -54,13 +54,13 @@ class G2O_TYPES_SLAM3D_API EdgeSE3PointXYZ
 
   virtual void setMeasurement(const Vector3& m) { _measurement = m; }
 
-  virtual bool setMeasurementData(const number_t* d) {
+  virtual bool setMeasurementData(const double* d) {
     Eigen::Map<const Vector3> v(d);
     _measurement = v;
     return true;
   }
 
-  virtual bool getMeasurementData(number_t* d) const {
+  virtual bool getMeasurementData(double* d) const {
     Eigen::Map<Vector3> v(d);
     v = _measurement;
     return true;
@@ -70,7 +70,7 @@ class G2O_TYPES_SLAM3D_API EdgeSE3PointXYZ
 
   virtual bool setMeasurementFromState();
 
-  virtual number_t initialEstimatePossible(
+  virtual double initialEstimatePossible(
       const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to) {
     (void)to;
     return (from.count(_vertices[0]) == 1 ? 1.0 : -1.0);
@@ -82,8 +82,7 @@ class G2O_TYPES_SLAM3D_API EdgeSE3PointXYZ
   const ParameterSE3Offset* offsetParameter() { return offsetParam; }
 
  private:
-  Eigen::Matrix<number_t, 3, 9, Eigen::ColMajor>
-      J;  // jacobian before projection
+  Eigen::Matrix<double, 3, 9, Eigen::ColMajor> J;  // jacobian before projection
   ParameterSE3Offset* offsetParam;
   CacheSE3Offset* cache;
   virtual bool resolveCaches();

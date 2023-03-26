@@ -104,7 +104,7 @@ class G2O_TYPES_ICP_API EdgeGICP {
   }
 
   // returns a precision matrix for point-plane
-  Matrix3 prec0(number_t e) {
+  Matrix3 prec0(double e) {
     makeRot0();
     Matrix3 prec;
     prec << e, 0, 0, 0, e, 0, 0, 0, 1;
@@ -112,7 +112,7 @@ class G2O_TYPES_ICP_API EdgeGICP {
   }
 
   // returns a precision matrix for point-plane
-  Matrix3 prec1(number_t e) {
+  Matrix3 prec1(double e) {
     makeRot1();
     Matrix3 prec;
     prec << e, 0, 0, 0, e, 0, 0, 0, 1;
@@ -120,7 +120,7 @@ class G2O_TYPES_ICP_API EdgeGICP {
   }
 
   // return a covariance matrix for plane-plane
-  Matrix3 cov0(number_t e) {
+  Matrix3 cov0(double e) {
     makeRot0();
     Matrix3 cov;
     cov << 1, 0, 0, 0, 1, 0, 0, 0, e;
@@ -128,7 +128,7 @@ class G2O_TYPES_ICP_API EdgeGICP {
   }
 
   // return a covariance matrix for plane-plane
-  Matrix3 cov1(number_t e) {
+  Matrix3 cov1(double e) {
     makeRot1();
     Matrix3 cov;
     cov << 1, 0, 0, 0, 1, 0, 0, 0, e;
@@ -236,19 +236,19 @@ class G2O_TYPES_ICP_API VertexSCam : public VertexSE3 {
   virtual bool write(std::ostream &os) const;
 
   // capture the update function to reset aux transforms
-  virtual void oplusImpl(const number_t *update) {
+  virtual void oplusImpl(const double* update) {
     VertexSE3::oplusImpl(update);
     setAll();
   }
 
   // camera matrix and stereo baseline
   static Matrix3 Kcam;
-  static number_t baseline;
+  static double baseline;
 
   // transformations
-  Eigen::Matrix<number_t, 3, 4, Eigen::ColMajor>
+  Eigen::Matrix<double, 3, 4, Eigen::ColMajor>
       w2n;  // transform from world to node coordinates
-  Eigen::Matrix<number_t, 3, 4, Eigen::ColMajor>
+  Eigen::Matrix<double, 3, 4, Eigen::ColMajor>
       w2i;  // transform from world to image coordinates
 
   // Derivatives of the rotation matrix transpose wrt quaternion xyz, used for
@@ -256,8 +256,8 @@ class G2O_TYPES_ICP_API VertexSCam : public VertexSE3 {
   Matrix3 dRdx, dRdy, dRdz;
 
   // transforms
-  static void transformW2F(Eigen::Matrix<number_t, 3, 4, Eigen::ColMajor> &m,
-                           const Vector3 &trans, const Quaternion &qrot) {
+  static void transformW2F(Eigen::Matrix<double, 3, 4, Eigen::ColMajor>& m,
+                           const Vector3& trans, const Quaternion& qrot) {
     m.block<3, 3>(0, 0) = qrot.toRotationMatrix().transpose();
     m.col(3).setZero();  // make sure there's no translation
     Vector4 tt;
@@ -266,15 +266,14 @@ class G2O_TYPES_ICP_API VertexSCam : public VertexSE3 {
     m.col(3) = -m * tt;
   }
 
-  static void transformF2W(Eigen::Matrix<number_t, 3, 4, Eigen::ColMajor> &m,
-                           const Vector3 &trans, const Quaternion &qrot) {
+  static void transformF2W(Eigen::Matrix<double, 3, 4, Eigen::ColMajor>& m,
+                           const Vector3& trans, const Quaternion& qrot) {
     m.block<3, 3>(0, 0) = qrot.toRotationMatrix();
     m.col(3) = trans;
   }
 
   // set up camera matrix
-  static void setKcam(number_t fx, number_t fy, number_t cx, number_t cy,
-                      number_t tx) {
+  static void setKcam(double fx, double fy, double cx, double cy, double tx) {
     Kcam.setZero();
     Kcam(0, 0) = fx;
     Kcam(1, 1) = fy;
@@ -320,7 +319,7 @@ class G2O_TYPES_ICP_API VertexSCam : public VertexSE3 {
     Vector3 p2 = w2n * pt;
     Vector3 pb(baseline, 0, 0);
 
-    number_t invp1 = cst(1.0) / p1(2);
+    double invp1 = cst(1.0) / p1(2);
     res.head<2>() = p1.head<2>() * invp1;
 
     // right camera px

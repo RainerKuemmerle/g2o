@@ -72,8 +72,8 @@ class G2O_TYPES_SIM3_API VertexSim3Expmap : public BaseVertex<7, Sim3> {
 
   virtual void setToOriginImpl() { _estimate = Sim3(); }
 
-  virtual void oplusImpl(const number_t* update_) {
-    Eigen::Map<Vector7> update(const_cast<number_t*>(update_));
+  virtual void oplusImpl(const double* update_) {
+    Eigen::Map<Vector7> update(const_cast<double*>(update_));
 
     if (_fix_scale) update[6] = 0;
 
@@ -124,8 +124,8 @@ class G2O_TYPES_SIM3_API EdgeSim3
     _error = error_.log();
   }
 
-  virtual number_t initialEstimatePossible(const OptimizableGraph::VertexSet&,
-                                           OptimizableGraph::Vertex*) {
+  virtual double initialEstimatePossible(const OptimizableGraph::VertexSet&,
+                                         OptimizableGraph::Vertex*) {
     return 1.;
   }
   virtual void initialEstimate(const OptimizableGraph::VertexSet& from,
