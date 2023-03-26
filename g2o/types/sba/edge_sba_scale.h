@@ -37,16 +37,16 @@ namespace g2o {
  * \brief edge between two SBAcam that specifies the distance between them
  */
 class G2O_TYPES_SBA_API EdgeSBAScale
-    : public BaseBinaryEdge<1, number_t, VertexCam, VertexCam> {
+    : public BaseBinaryEdge<1, double, VertexCam, VertexCam> {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   EdgeSBAScale();
   virtual bool read(std::istream& is);
   virtual bool write(std::ostream& os) const;
   void computeError();
-  virtual void setMeasurement(const number_t& m) { _measurement = m; }
-  virtual number_t initialEstimatePossible(const OptimizableGraph::VertexSet&,
-                                           OptimizableGraph::Vertex*) {
+  virtual void setMeasurement(const double& m) { _measurement = m; }
+  virtual double initialEstimatePossible(const OptimizableGraph::VertexSet&,
+                                         OptimizableGraph::Vertex*) {
     return cst(1.);
   }
   virtual void initialEstimate(const OptimizableGraph::VertexSet& from_,

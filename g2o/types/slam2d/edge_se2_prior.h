@@ -56,9 +56,9 @@ class G2O_TYPES_SLAM2D_API EdgeSE2Prior
   }
 
   virtual void setMeasurement(const SE2& m);
-  virtual bool setMeasurementData(const number_t* d);
+  virtual bool setMeasurementData(const double* d);
 
-  virtual bool getMeasurementData(number_t* d) const {
+  virtual bool getMeasurementData(double* d) const {
     Eigen::Map<Vector3> v(d);
     v = _measurement.toVector();
     return true;
@@ -69,8 +69,8 @@ class G2O_TYPES_SLAM2D_API EdgeSE2Prior
   virtual bool read(std::istream& is);
   virtual bool write(std::ostream& os) const;
 
-  virtual number_t initialEstimatePossible(const OptimizableGraph::VertexSet&,
-                                           OptimizableGraph::Vertex*) {
+  virtual double initialEstimatePossible(const OptimizableGraph::VertexSet&,
+                                         OptimizableGraph::Vertex*) {
     return 1.;
   }
   virtual void initialEstimate(const OptimizableGraph::VertexSet& from,

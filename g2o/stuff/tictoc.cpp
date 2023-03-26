@@ -42,12 +42,12 @@ namespace g2o {
  * \brief Internal structure of the tictoc profiling
  */
 struct TicTocElement {
-  number_t ticTime;    ///< the time of the last tic
-  number_t totalTime;  ///< the total time of this part of the algorithm
+  double ticTime;      ///< the time of the last tic
+  double totalTime;    ///< the total time of this part of the algorithm
   int numCalls;        ///< the number of calls
-  number_t minTime;
-  number_t maxTime;
-  number_t exponentialMovingAverage;  ///< exponential moving average with alpha
+  double minTime;
+  double maxTime;
+  double exponentialMovingAverage;    ///< exponential moving average with alpha
                                       ///< = 0.01
   std::string algorithmPart;          ///< name / description of the code block
   bool clockIsRunning;
@@ -55,7 +55,7 @@ struct TicTocElement {
       : ticTime(0.),
         totalTime(0.),
         numCalls(0),
-        minTime(std::numeric_limits<number_t>::max()),
+        minTime(std::numeric_limits<double>::max()),
         maxTime(0.),
         exponentialMovingAverage(0.),
         clockIsRunning(true) {}
@@ -100,7 +100,7 @@ struct TicTocInitializer {
       for (std::vector<TicTocElement>::const_iterator it =
                sortedElements.begin();
            it != sortedElements.end(); ++it) {
-        number_t avgTime = it->totalTime / it->numCalls;
+        double avgTime = it->totalTime / it->numCalls;
         printf("%s", it->algorithmPart.c_str());
         for (int i = it->algorithmPart.size(); i < longestName; ++i)
           putchar(' ');
@@ -115,15 +115,15 @@ struct TicTocInitializer {
   }
 };
 
-number_t tictoc(const char* algorithmPart) {
+double tictoc(const char* algorithmPart) {
   static TicTocInitializer initializer;
   if (!initializer.enabled) return 0.;
 
   TicTocMap& tictocElements = initializer.tictocElements;
-  static number_t alpha = cst(0.01);
-  number_t now = get_monotonic_time();
+  static double alpha = cst(0.01);
+  double now = get_monotonic_time();
 
-  number_t dt = 0.;
+  double dt = 0.;
   TicTocMap::iterator foundIt = tictocElements.find(algorithmPart);
   if (foundIt == tictocElements.end()) {
     // insert element

@@ -85,7 +85,7 @@ class BaseVariableSizedEdge : public BaseEdge<D, E> {
 
   virtual void constructQuadraticForm();
 
-  virtual void mapHessianMemory(number_t* d, int i, int j, bool rowMajor);
+  virtual void mapHessianMemory(double* d, int i, int j, bool rowMajor);
 
   using BaseEdge<D, E>::computeError;
 

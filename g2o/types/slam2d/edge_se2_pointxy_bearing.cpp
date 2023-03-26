@@ -43,7 +43,7 @@ void EdgeSE2PointXYBearing::initialEstimate(
          "Can not initialize VertexSE2 position by VertexPointXY");
 
   if (from.count(_vertices[0]) != 1) return;
-  number_t r = 2.;
+  double r = 2.;
   const VertexSE2* v1 = static_cast<const VertexSE2*>(_vertices[0]);
   VertexPointXY* l2 = static_cast<VertexPointXY*>(_vertices[1]);
   SE2 t = v1->estimate();
@@ -108,8 +108,8 @@ HyperGraphElementAction* EdgeSE2PointXYBearingDrawAction::operator()(
   VertexSE2* from = static_cast<VertexSE2*>(e->vertex(0));
   VertexPointXY* to = static_cast<VertexPointXY*>(e->vertex(1));
   if (!from) return this;
-  number_t guessRange = 5;
-  number_t theta = e->measurement();
+  double guessRange = 5;
+  double theta = e->measurement();
   Vector2 p(std::cos(theta) * guessRange, std::sin(theta) * guessRange);
   glPushAttrib(GL_ENABLE_BIT | GL_LIGHTING | GL_COLOR);
   glDisable(GL_LIGHTING);

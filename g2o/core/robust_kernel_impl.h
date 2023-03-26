@@ -46,15 +46,15 @@ class G2O_CORE_API RobustKernelScaleDelta : public RobustKernel {
    * across several scaled kernels
    */
   explicit RobustKernelScaleDelta(const RobustKernelPtr& kernel,
-                                  number_t delta = 1.);
-  explicit RobustKernelScaleDelta(number_t delta = 1.);
+                                  double delta = 1.);
+  explicit RobustKernelScaleDelta(double delta = 1.);
 
   //! return the underlying kernel
   const RobustKernelPtr kernel() const { return _kernel; }
   //! use another kernel for the underlying operation
   void setKernel(const RobustKernelPtr& ptr);
 
-  void robustify(number_t error, Vector3& rho) const;
+  void robustify(double error, Vector3& rho) const;
 
  protected:
   RobustKernelPtr _kernel;
@@ -76,7 +76,7 @@ class G2O_CORE_API RobustKernelScaleDelta : public RobustKernel {
  */
 class G2O_CORE_API RobustKernelHuber : public RobustKernel {
  public:
-  virtual void robustify(number_t e2, Vector3& rho) const;
+  virtual void robustify(double e2, Vector3& rho) const;
 };
 
 /**
@@ -92,7 +92,7 @@ class G2O_CORE_API RobustKernelHuber : public RobustKernel {
  */
 class G2O_CORE_API RobustKernelPseudoHuber : public RobustKernel {
  public:
-  virtual void robustify(number_t e2, Vector3& rho) const;
+  virtual void robustify(double e2, Vector3& rho) const;
 };
 
 /**
@@ -105,7 +105,7 @@ class G2O_CORE_API RobustKernelPseudoHuber : public RobustKernel {
  */
 class G2O_CORE_API RobustKernelCauchy : public RobustKernel {
  public:
-  virtual void robustify(number_t e2, Vector3& rho) const;
+  virtual void robustify(double e2, Vector3& rho) const;
 };
 
 /**
@@ -121,7 +121,7 @@ class G2O_CORE_API RobustKernelCauchy : public RobustKernel {
  */
 class G2O_CORE_API RobustKernelGemanMcClure : public RobustKernel {
  public:
-  virtual void robustify(number_t e2, Vector3& rho) const;
+  virtual void robustify(double e2, Vector3& rho) const;
 };
 
 /**
@@ -135,7 +135,7 @@ class G2O_CORE_API RobustKernelGemanMcClure : public RobustKernel {
  */
 class G2O_CORE_API RobustKernelWelsch : public RobustKernel {
  public:
-  virtual void robustify(number_t e2, Vector3& rho) const;
+  virtual void robustify(double e2, Vector3& rho) const;
 };
 
 /**
@@ -149,7 +149,7 @@ class G2O_CORE_API RobustKernelWelsch : public RobustKernel {
  */
 class G2O_CORE_API RobustKernelFair : public RobustKernel {
  public:
-  virtual void robustify(number_t e2, Vector3& rho) const;
+  virtual void robustify(double e2, Vector3& rho) const;
 };
 
 /**
@@ -167,7 +167,7 @@ class G2O_CORE_API RobustKernelFair : public RobustKernel {
  */
 class G2O_CORE_API RobustKernelTukey : public RobustKernel {
  public:
-  virtual void robustify(number_t e2, Vector3& rho) const;
+  virtual void robustify(double e2, Vector3& rho) const;
 };
 
 /**
@@ -177,7 +177,7 @@ class G2O_CORE_API RobustKernelTukey : public RobustKernel {
  */
 class G2O_CORE_API RobustKernelSaturated : public RobustKernel {
  public:
-  virtual void robustify(number_t e2, Vector3& rho) const;
+  virtual void robustify(double e2, Vector3& rho) const;
 };
 
 /**
@@ -189,7 +189,7 @@ class G2O_CORE_API RobustKernelSaturated : public RobustKernel {
  */
 class G2O_CORE_API RobustKernelDCS : public RobustKernel {
  public:
-  virtual void robustify(number_t e2, Vector3& rho) const;
+  virtual void robustify(double e2, Vector3& rho) const;
 };
 }  // end namespace g2o
 

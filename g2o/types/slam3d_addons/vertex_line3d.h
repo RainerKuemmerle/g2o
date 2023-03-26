@@ -45,18 +45,18 @@ class G2O_TYPES_SLAM3D_ADDONS_API VertexLine3D : public BaseVertex<4, Line3D> {
 
   virtual void setToOriginImpl() { _estimate = Line3D(); }
 
-  virtual void oplusImpl(const number_t* update_) {
+  virtual void oplusImpl(const double* update_) {
     Eigen::Map<const Vector4> update(update_);
     _estimate.oplus(update);
   }
 
-  virtual bool setEstimateDataImpl(const number_t* est) {
+  virtual bool setEstimateDataImpl(const double* est) {
     Eigen::Map<const Vector6> _est(est);
     _estimate = Line3D(_est);
     return true;
   }
 
-  virtual bool getEstimateData(number_t* est) const {
+  virtual bool getEstimateData(double* est) const {
     Eigen::Map<Vector6> _est(est);
     _est = _estimate;
     return true;

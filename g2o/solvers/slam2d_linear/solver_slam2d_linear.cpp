@@ -48,14 +48,14 @@ class ThetaTreeAction : public HyperDijkstra::TreeAction {
  public:
   explicit ThetaTreeAction(VectorX& theta)
       : HyperDijkstra::TreeAction(), _thetaGuess(theta) {}
-  virtual number_t perform(HyperGraph::Vertex* v, HyperGraph::Vertex* vParent,
-                           HyperGraph::Edge* e) {
+  virtual double perform(HyperGraph::Vertex* v, HyperGraph::Vertex* vParent,
+                         HyperGraph::Edge* e) {
     if (!vParent) return 0.;
     EdgeSE2* odom = static_cast<EdgeSE2*>(e);
     VertexSE2* from = static_cast<VertexSE2*>(vParent);
     VertexSE2* to = static_cast<VertexSE2*>(v);
     assert(to->hessianIndex() >= 0);
-    number_t fromTheta =
+    double fromTheta =
         from->hessianIndex() < 0 ? 0. : _thetaGuess[from->hessianIndex()];
     bool direct = odom->vertices()[0] == from;
     if (direct)
@@ -95,7 +95,7 @@ bool SolverSLAM2DLinear::solveOrientation() {
   b.setZero(_optimizer->indexMapping().size());
   x.setZero(_optimizer->indexMapping().size());
 
-  typedef Eigen::Matrix<number_t, 1, 1, Eigen::ColMajor> ScalarMatrix;
+  typedef Eigen::Matrix<double, 1, 1, Eigen::ColMajor> ScalarMatrix;
 
   std::vector<int> blockIndices(_optimizer->indexMapping().size());
   for (size_t i = 0; i < _optimizer->indexMapping().size(); ++i)
@@ -170,20 +170,20 @@ bool SolverSLAM2DLinear::solveOrientation() {
     VertexSE2* from = static_cast<VertexSE2*>(e->vertices()[0]);
     VertexSE2* to = static_cast<VertexSE2*>(e->vertices()[1]);
 
-    number_t omega = e->information()(2, 2);
+    double omega = e->information()(2, 2);
 
-    number_t fromThetaGuess =
+    double fromThetaGuess =
         from->hessianIndex() < 0 ? 0. : thetaGuess[from->hessianIndex()];
-    number_t toThetaGuess =
+    double toThetaGuess =
         to->hessianIndex() < 0 ? 0. : thetaGuess[to->hessianIndex()];
-    number_t error = normalize_theta(-e->measurement().rotation().angle() +
-                                     toThetaGuess - fromThetaGuess);
+    double error = normalize_theta(-e->measurement().rotation().angle() +
+                                   toThetaGuess - fromThetaGuess);
 
     bool fromNotFixed = !(from->fixed());
     bool toNotFixed = !(to->fixed());
 
     if (fromNotFixed || toNotFixed) {
-      number_t omega_r = -omega * error;
+      double omega_r = -omega * error;
       if (fromNotFixed) {
         b(from->hessianIndex()) -= omega_r;
         (*H.block(from->hessianIndex(), from->hessianIndex()))(0, 0) += omega;

@@ -40,7 +40,7 @@ SparseOptimizerTerminateAction::SparseOptimizerTerminateAction()
       _auxTerminateFlag(false),
       _maxIterations(std::numeric_limits<int>::max()) {}
 
-void SparseOptimizerTerminateAction::setGainThreshold(number_t gainThreshold) {
+void SparseOptimizerTerminateAction::setGainThreshold(double gainThreshold) {
   _gainThreshold = gainThreshold;
 }
 
@@ -69,8 +69,8 @@ HyperGraphAction* SparseOptimizerTerminateAction::operator()(
     // number of iterations
     bool stopOptimizer = false;
     if (params->iteration < _maxIterations) {
-      number_t currentChi = optimizer->activeRobustChi2();
-      number_t gain = (_lastChi - currentChi) / currentChi;
+      double currentChi = optimizer->activeRobustChi2();
+      double gain = (_lastChi - currentChi) / currentChi;
       _lastChi = currentChi;
       if (gain >= 0 && gain < _gainThreshold) stopOptimizer = true;
     } else {

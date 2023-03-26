@@ -39,7 +39,7 @@ class G2O_TYPES_SCLAM2D_API VertexOdomDifferentialParams
   VertexOdomDifferentialParams();
   virtual void setToOriginImpl() { _estimate << 1., 1., 1.; }
 
-  virtual void oplusImpl(const number_t* v) {
+  virtual void oplusImpl(const double* v) {
     for (int i = 0; i < 3; i++) _estimate(i) += v[i];
   }
 

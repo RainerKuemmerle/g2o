@@ -50,12 +50,12 @@ class G2O_TYPES_SLAM2D_API EdgePointXY
 
   virtual void setMeasurement(const Vector2& m) { _measurement = m; }
 
-  virtual bool setMeasurementData(const number_t* d) {
+  virtual bool setMeasurementData(const double* d) {
     _measurement = Vector2(d[0], d[1]);
     return true;
   }
 
-  virtual bool getMeasurementData(number_t* d) const {
+  virtual bool getMeasurementData(double* d) const {
     Eigen::Map<Vector2> m(d);
     m = _measurement;
     return true;
@@ -70,8 +70,8 @@ class G2O_TYPES_SLAM2D_API EdgePointXY
     return true;
   }
 
-  virtual number_t initialEstimatePossible(const OptimizableGraph::VertexSet&,
-                                           OptimizableGraph::Vertex*) {
+  virtual double initialEstimatePossible(const OptimizableGraph::VertexSet&,
+                                         OptimizableGraph::Vertex*) {
     return 0;
   }
 #ifndef NUMERIC_JACOBIAN_TWO_D_TYPES

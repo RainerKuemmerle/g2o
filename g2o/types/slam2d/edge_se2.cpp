@@ -63,10 +63,10 @@ void EdgeSE2::initialEstimate(const OptimizableGraph::VertexSet& from,
 void EdgeSE2::linearizeOplus() {
   const VertexSE2* vi = static_cast<const VertexSE2*>(_vertices[0]);
   const VertexSE2* vj = static_cast<const VertexSE2*>(_vertices[1]);
-  number_t thetai = vi->estimate().rotation().angle();
+  double thetai = vi->estimate().rotation().angle();
 
   Vector2 dt = vj->estimate().translation() - vi->estimate().translation();
-  number_t si = std::sin(thetai), ci = std::cos(thetai);
+  double si = std::sin(thetai), ci = std::cos(thetai);
 
   _jacobianOplusXi << -ci, -si, -si * dt.x() + ci * dt.y(), si, -ci,
       -ci * dt.x() - si * dt.y(), 0, 0, -1;

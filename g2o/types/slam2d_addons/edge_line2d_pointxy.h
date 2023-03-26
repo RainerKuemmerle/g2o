@@ -37,7 +37,7 @@
 namespace g2o {
 
 class EdgeLine2DPointXY
-    : public BaseBinaryEdge<1, number_t, VertexLine2D,
+    : public BaseBinaryEdge<1, double, VertexLine2D,
                             VertexPointXY>  // Avoid redefinition of BaseEdge in
                                             // MSVC
 {
@@ -50,18 +50,16 @@ class EdgeLine2DPointXY
     const VertexLine2D* l = static_cast<const VertexLine2D*>(_vertices[0]);
     const VertexPointXY* p = static_cast<const VertexPointXY*>(_vertices[1]);
     Vector2 n(std::cos(l->theta()), std::sin(l->theta()));
-    number_t prediction = n.dot(p->estimate()) - l->rho();
+    double prediction = n.dot(p->estimate()) - l->rho();
     _error[0] = prediction - _measurement;
   }
 
-  G2O_TYPES_SLAM2D_ADDONS_API virtual bool setMeasurementData(
-      const number_t* d) {
+  G2O_TYPES_SLAM2D_ADDONS_API virtual bool setMeasurementData(const double* d) {
     _measurement = *d;
     return true;
   }
 
-  G2O_TYPES_SLAM2D_ADDONS_API virtual bool getMeasurementData(
-      number_t* d) const {
+  G2O_TYPES_SLAM2D_ADDONS_API virtual bool getMeasurementData(double* d) const {
     *d = _measurement;
     return true;
   }
@@ -74,7 +72,7 @@ class EdgeLine2DPointXY
     const VertexLine2D* l = static_cast<const VertexLine2D*>(_vertices[0]);
     const VertexPointXY* p = static_cast<const VertexPointXY*>(_vertices[1]);
     Vector2 n(std::cos(l->theta()), std::sin(l->theta()));
-    number_t prediction = n.dot(p->estimate()) - l->rho();
+    double prediction = n.dot(p->estimate()) - l->rho();
     _measurement = prediction;
     return true;
   }
@@ -84,7 +82,7 @@ class EdgeLine2DPointXY
 
   /* virtual void initialEstimate(const OptimizableGraph::VertexSet& from,
    * OptimizableGraph::Vertex* to); */
-  /* virtual number_t initialEstimatePossible(const OptimizableGraph::VertexSet&
+  /* virtual double initialEstimatePossible(const OptimizableGraph::VertexSet&
    * from, OptimizableGraph::Vertex* to) { (void) to; return
    * (from.count(_vertices[0]) == 1 ? 1.0 : -1.0);} */
   /* #ifndef NUMERIC_JACOBIAN_TWO_D_TYPES */

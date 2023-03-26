@@ -50,10 +50,10 @@ bool BaseFixedSizedEdge<D, E, VertexTypes...>::allVerticesFixed() const {
 template <int D, typename E, typename... VertexTypes>
 void BaseFixedSizedEdge<D, E, VertexTypes...>::constructQuadraticForm() {
   if (this->robustKernel()) {
-    number_t error = this->chi2();
+    double error = this->chi2();
     Vector3 rho;
     this->robustKernel()->robustify(error, rho);
-    Eigen::Matrix<number_t, D, 1, Eigen::ColMajor> omega_r =
+    Eigen::Matrix<double, D, 1, Eigen::ColMajor> omega_r =
         -_information * _error;
     omega_r *= rho[1];
     constructQuadraticFormNs(this->robustInformation(rho), omega_r,
@@ -166,16 +166,16 @@ void BaseFixedSizedEdge<D, E, VertexTypes...>::linearizeOplusN() {
 
   auto& jacobianOplus = std::get<N>(_jacobianOplus);
 
-  constexpr number_t delta = cst(1e-9);
-  constexpr number_t scalar = 1 / (2 * delta);
+  constexpr double delta = cst(1e-9);
+  constexpr double scalar = 1 / (2 * delta);
 
   internal::QuadraticFormLock lck(*vertex);
   (void)lck;
 
   typedef typename std::conditional<
-      VertexXnType<N>::Dimension == -1, ceres::internal::FixedArray<number_t>,
+      VertexXnType<N>::Dimension == -1, ceres::internal::FixedArray<double>,
       ceres::internal::FixedArray<
-          number_t, static_cast<size_t>(VertexXnType<N>::Dimension)> >::type
+          double, static_cast<size_t>(VertexXnType<N>::Dimension)> >::type
       FixedArray;
   FixedArray add_vertex(vertexDimension<N>());
   add_vertex.fill(0.);
@@ -222,7 +222,7 @@ void BaseFixedSizedEdge<D, E, VertexTypes...>::linearizeOplus() {
  * We have to pass the size at runtime to allow dynamically sized verices.
  */
 struct MapHessianMemoryK {
-  number_t* d;
+  double* d;
   int rows;
   int cols;
   template <typename HessianT>
@@ -233,7 +233,7 @@ struct MapHessianMemoryK {
 };
 
 template <int D, typename E, typename... VertexTypes>
-void BaseFixedSizedEdge<D, E, VertexTypes...>::mapHessianMemory(number_t* d,
+void BaseFixedSizedEdge<D, E, VertexTypes...>::mapHessianMemory(double* d,
                                                                 int i, int j,
                                                                 bool rowMajor) {
   assert(i < j && "index assumption violated");

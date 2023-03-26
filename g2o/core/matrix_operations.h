@@ -42,12 +42,12 @@ inline void axpy(const MatrixType& A, const Eigen::Map<const VectorX>& x,
 }
 
 template <int t>
-inline void axpy(const Eigen::Matrix<number_t, Eigen::Dynamic, t>& A,
+inline void axpy(const Eigen::Matrix<double, Eigen::Dynamic, t>& A,
                  const Eigen::Map<const VectorX>& x, int xoff,
                  Eigen::Map<VectorX>& y, int yoff) {
   y.segment(yoff, A.rows()) +=
       A *
-      x.segment<Eigen::Matrix<number_t, Eigen::Dynamic, t>::ColsAtCompileTime>(
+      x.segment<Eigen::Matrix<double, Eigen::Dynamic, t>::ColsAtCompileTime>(
           xoff);
 }
 
@@ -65,10 +65,10 @@ inline void atxpy(const MatrixType& A, const Eigen::Map<const VectorX>& x,
 }
 
 template <int t>
-inline void atxpy(const Eigen::Matrix<number_t, Eigen::Dynamic, t>& A,
+inline void atxpy(const Eigen::Matrix<double, Eigen::Dynamic, t>& A,
                   const Eigen::Map<const VectorX>& x, int xoff,
                   Eigen::Map<VectorX>& y, int yoff) {
-  y.segment<Eigen::Matrix<number_t, Eigen::Dynamic, t>::ColsAtCompileTime>(
+  y.segment<Eigen::Matrix<double, Eigen::Dynamic, t>::ColsAtCompileTime>(
       yoff) += A.transpose() * x.segment(xoff, A.rows());
 }
 

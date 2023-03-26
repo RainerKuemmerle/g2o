@@ -44,8 +44,8 @@ MATCHER(PointsNearEq, "") {
 TEST(Data, ReadWriteRobotLaser) {
   constexpr int kNumBeams = 180;
 
-  vector<number_t> ranges;
-  vector<number_t> remissions;
+  vector<double> ranges;
+  vector<double> remissions;
   for (int i = 0; i < kNumBeams; ++i) {
     ranges.push_back(i * 0.1);
     remissions.push_back(sampleUniform(0., 1.));

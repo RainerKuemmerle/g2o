@@ -33,9 +33,9 @@ RobotData::RobotData()
 
 RobotData::~RobotData() {}
 
-void RobotData::setTimestamp(number_t ts) { _timestamp = ts; }
+void RobotData::setTimestamp(double ts) { _timestamp = ts; }
 
-void RobotData::setLoggerTimestamp(number_t ts) { _loggerTimestamp = ts; }
+void RobotData::setLoggerTimestamp(double ts) { _loggerTimestamp = ts; }
 
 void RobotData::setTag(const std::string& tag) { _tag = tag; }
 

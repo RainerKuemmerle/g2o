@@ -33,7 +33,7 @@ EdgeStereoSE3ProjectXYZ::EdgeStereoSE3ProjectXYZ()
 
 Vector3 EdgeStereoSE3ProjectXYZ::cam_project(const Vector3 &trans_xyz,
                                              const float &bf) const {
-  const number_t invz = 1.0f / trans_xyz[2];
+  const double invz = 1.0f / trans_xyz[2];
   Vector3 res;
   res[0] = trans_xyz[0] * invz * fx + cx;
   res[1] = trans_xyz[1] * invz * fy + cy;
@@ -60,10 +60,10 @@ void EdgeStereoSE3ProjectXYZ::linearizeOplus() {
 
   const Matrix3 R = T.rotation().toRotationMatrix();
 
-  number_t x = xyz_trans[0];
-  number_t y = xyz_trans[1];
-  number_t z = xyz_trans[2];
-  number_t z_2 = z * z;
+  double x = xyz_trans[0];
+  double y = xyz_trans[1];
+  double z = xyz_trans[2];
+  double z_2 = z * z;
 
   _jacobianOplusXi(0, 0) = -fx * R(0, 0) / z + fx * x * R(2, 0) / z_2;
   _jacobianOplusXi(0, 1) = -fx * R(0, 1) / z + fx * x * R(2, 1) / z_2;

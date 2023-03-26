@@ -46,7 +46,7 @@ class G2O_TYPES_SBA_API VertexSE3Expmap : public BaseVertex<6, SE3Quat> {
   bool read(std::istream& is);
   bool write(std::ostream& os) const;
   void setToOriginImpl();
-  void oplusImpl(const number_t* update_);
+  void oplusImpl(const double* update_);
 };
 
 }  // namespace g2o

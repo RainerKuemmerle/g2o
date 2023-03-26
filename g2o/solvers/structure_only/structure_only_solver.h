@@ -81,10 +81,10 @@ class StructureOnlySolver : public OptimizationAlgorithm {
       assert(v->dimension() == PointDoF);
       g2o::HyperGraph::EdgeSet& track = v->edges();
       assert(track.size() >= 2);
-      number_t chi2 = 0;
+      double chi2 = 0;
       // TODO make these parameters
-      number_t mu = cst(0.01);
-      number_t nu = 2;
+      double mu = cst(0.01);
+      double nu = 2;
 
       for (g2o::HyperGraph::EdgeSet::iterator it_t = track.begin();
            it_t != track.end(); ++it_t) {
@@ -101,7 +101,7 @@ class StructureOnlySolver : public OptimizationAlgorithm {
       }
 
       if (v->fixed() == false) {
-        Eigen::Matrix<number_t, PointDoF, PointDoF, Eigen::ColMajor> H_pp;
+        Eigen::Matrix<double, PointDoF, PointDoF, Eigen::ColMajor> H_pp;
         H_pp.resize(v->dimension(), v->dimension());
         v->mapHessianMemory(H_pp.data());
         for (int i_g = 0; i_g < num_iters; ++i_g) {
@@ -146,7 +146,7 @@ class StructureOnlySolver : public OptimizationAlgorithm {
             }
           }
 
-          Eigen::Map<Eigen::Matrix<number_t, PointDoF, 1, Eigen::ColMajor> > b(
+          Eigen::Map<Eigen::Matrix<double, PointDoF, 1, Eigen::ColMajor> > b(
               v->bData(), v->dimension());
 
           if (b.norm() < 0.001) {
@@ -156,19 +156,19 @@ class StructureOnlySolver : public OptimizationAlgorithm {
 
           int trial = 0;
           do {
-            Eigen::Matrix<number_t, PointDoF, PointDoF, Eigen::ColMajor>
-                H_pp_mu = H_pp;
+            Eigen::Matrix<double, PointDoF, PointDoF, Eigen::ColMajor> H_pp_mu =
+                H_pp;
             H_pp_mu.diagonal().array() += mu;
             Eigen::LDLT<
-                Eigen::Matrix<number_t, PointDoF, PointDoF, Eigen::ColMajor> >
+                Eigen::Matrix<double, PointDoF, PointDoF, Eigen::ColMajor> >
                 chol_H_pp(H_pp_mu);
             bool goodStep = false;
             if (chol_H_pp.isPositive()) {
-              Eigen::Matrix<number_t, PointDoF, 1, Eigen::ColMajor> delta_p =
+              Eigen::Matrix<double, PointDoF, 1, Eigen::ColMajor> delta_p =
                   chol_H_pp.solve(b);
               v->push();
               v->oplus(delta_p.data());
-              number_t new_chi2 = 0;
+              double new_chi2 = 0;
               for (g2o::HyperGraph::EdgeSet::iterator it_t = track.begin();
                    it_t != track.end(); ++it_t) {
                 g2o::OptimizableGraph::Edge* e =
@@ -183,7 +183,7 @@ class StructureOnlySolver : public OptimizationAlgorithm {
                 }
               }
               assert(g2o_isnan(new_chi2) == false && "Chi is NaN");
-              number_t rho = (chi2 - new_chi2);
+              double rho = (chi2 - new_chi2);
               if (rho > 0 && g2o_isfinite(new_chi2)) {
                 goodStep = true;
                 chi2 = new_chi2;

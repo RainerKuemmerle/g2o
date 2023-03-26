@@ -60,20 +60,20 @@ class G2O_TYPES_DATA_API RawLaser : public RobotData {
   Point2DVector cartesian() const;
 
   //! the range measurements by the laser
-  const std::vector<number_t>& ranges() const { return _ranges; }
-  void setRanges(const std::vector<number_t>& ranges);
+  const std::vector<double>& ranges() const { return _ranges; }
+  void setRanges(const std::vector<double>& ranges);
 
   //! the remission measurements by the laser
-  const std::vector<number_t>& remissions() const { return _remissions; }
-  void setRemissions(const std::vector<number_t>& remissions);
+  const std::vector<double>& remissions() const { return _remissions; }
+  void setRemissions(const std::vector<double>& remissions);
 
   //! the parameters of the laser
   const LaserParameters& laserParams() const { return _laserParams; }
   void setLaserParams(const LaserParameters& laserParams);
 
  protected:
-  std::vector<number_t> _ranges;
-  std::vector<number_t> _remissions;
+  std::vector<double> _ranges;
+  std::vector<double> _remissions;
   LaserParameters _laserParams;
 };
 

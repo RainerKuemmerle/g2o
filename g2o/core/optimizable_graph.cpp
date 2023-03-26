@@ -87,25 +87,23 @@ OptimizableGraph::Vertex::~Vertex() {
   delete _userData;
 }
 
-bool OptimizableGraph::Vertex::setEstimateData(const number_t* v) {
+bool OptimizableGraph::Vertex::setEstimateData(const double* v) {
   bool ret = setEstimateDataImpl(v);
   updateCache();
   return ret;
 }
 
-bool OptimizableGraph::Vertex::getEstimateData(number_t*) const {
-  return false;
-}
+bool OptimizableGraph::Vertex::getEstimateData(double*) const { return false; }
 
 int OptimizableGraph::Vertex::estimateDimension() const { return -1; }
 
-bool OptimizableGraph::Vertex::setMinimalEstimateData(const number_t* v) {
+bool OptimizableGraph::Vertex::setMinimalEstimateData(const double* v) {
   bool ret = setMinimalEstimateDataImpl(v);
   updateCache();
   return ret;
 }
 
-bool OptimizableGraph::Vertex::getMinimalEstimateData(number_t*) const {
+bool OptimizableGraph::Vertex::getMinimalEstimateData(double*) const {
   return false;
 }
 
@@ -174,13 +172,9 @@ void OptimizableGraph::Edge::setRobustKernel(RobustKernel* ptr) {
 
 bool OptimizableGraph::Edge::resolveCaches() { return true; }
 
-bool OptimizableGraph::Edge::setMeasurementData(const number_t*) {
-  return false;
-}
+bool OptimizableGraph::Edge::setMeasurementData(const double*) { return false; }
 
-bool OptimizableGraph::Edge::getMeasurementData(number_t*) const {
-  return false;
-}
+bool OptimizableGraph::Edge::getMeasurementData(double*) const { return false; }
 
 int OptimizableGraph::Edge::measurementDimension() const { return -1; }
 
@@ -295,8 +289,8 @@ int OptimizableGraph::optimize(int /*iterations*/, bool /*online*/) {
   return 0;
 }
 
-number_t OptimizableGraph::chi2() const {
-  number_t chi = 0.0;
+double OptimizableGraph::chi2() const {
+  double chi = 0.0;
   for (OptimizableGraph::EdgeSet::const_iterator it = this->edges().begin();
        it != this->edges().end(); ++it) {
     const OptimizableGraph::Edge* e =

@@ -48,33 +48,32 @@ Quaternion& normalize(Quaternion& q) {
 // functions to handle the rotation part
 Vector3 toEuler(const Matrix3& R) {
   Quaternion q(R);
-  const number_t& q0 = q.w();
-  const number_t& q1 = q.x();
-  const number_t& q2 = q.y();
-  const number_t& q3 = q.z();
-  number_t roll =
+  const double& q0 = q.w();
+  const double& q1 = q.x();
+  const double& q2 = q.y();
+  const double& q3 = q.z();
+  double roll =
       std::atan2(2 * (q0 * q1 + q2 * q3), 1 - 2 * (q1 * q1 + q2 * q2));
-  number_t pitch = std::asin(2 * (q0 * q2 - q3 * q1));
-  number_t yaw =
-      std::atan2(2 * (q0 * q3 + q1 * q2), 1 - 2 * (q2 * q2 + q3 * q3));
+  double pitch = std::asin(2 * (q0 * q2 - q3 * q1));
+  double yaw = std::atan2(2 * (q0 * q3 + q1 * q2), 1 - 2 * (q2 * q2 + q3 * q3));
   return Vector3(roll, pitch, yaw);
 }
 
 Matrix3 fromEuler(const Vector3& v) {
   // UNOPTIMIZED
-  number_t roll = v[0];
-  number_t pitch = v[1];
-  number_t yaw = v[2];
-  number_t sy = std::sin(yaw * cst(0.5));
-  number_t cy = std::cos(yaw * cst(0.5));
-  number_t sp = std::sin(pitch * cst(0.5));
-  number_t cp = std::cos(pitch * cst(0.5));
-  number_t sr = std::sin(roll * cst(0.5));
-  number_t cr = std::cos(roll * cst(0.5));
-  number_t w = cr * cp * cy + sr * sp * sy;
-  number_t x = sr * cp * cy - cr * sp * sy;
-  number_t y = cr * sp * cy + sr * cp * sy;
-  number_t z = cr * cp * sy - sr * sp * cy;
+  double roll = v[0];
+  double pitch = v[1];
+  double yaw = v[2];
+  double sy = std::sin(yaw * cst(0.5));
+  double cy = std::cos(yaw * cst(0.5));
+  double sp = std::sin(pitch * cst(0.5));
+  double cp = std::cos(pitch * cst(0.5));
+  double sr = std::sin(roll * cst(0.5));
+  double cr = std::cos(roll * cst(0.5));
+  double w = cr * cp * cy + sr * sp * sy;
+  double x = sr * cp * cy - cr * sp * sy;
+  double y = cr * sp * cy + sr * cp * sy;
+  double z = cr * cp * sy - sr * sp * cy;
   return Quaternion(w, x, y, z).toRotationMatrix();
 }
 
@@ -86,7 +85,7 @@ Vector3 toCompactQuaternion(const Matrix3& R) {
 }
 
 Matrix3 fromCompactQuaternion(const Vector3& v) {
-  number_t w = 1 - v.squaredNorm();
+  double w = 1 - v.squaredNorm();
   if (w < 0)
     return Matrix3::Identity();
   else

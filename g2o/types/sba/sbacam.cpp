@@ -72,8 +72,8 @@ void SBACam::update(const Vector6& update) {
 }
 
 // transforms
-void SBACam::transformW2F(Eigen::Matrix<number_t, 3, 4>& m,
-                          const Vector3& trans, const Quaternion& qrot) {
+void SBACam::transformW2F(Eigen::Matrix<double, 3, 4>& m, const Vector3& trans,
+                          const Quaternion& qrot) {
   m.block<3, 3>(0, 0) = qrot.toRotationMatrix().transpose();
   m.col(3).setZero();  // make sure there's no translation
   Vector4 tt;
@@ -82,15 +82,14 @@ void SBACam::transformW2F(Eigen::Matrix<number_t, 3, 4>& m,
   m.col(3) = -m * tt;
 }
 
-void SBACam::transformF2W(Eigen::Matrix<number_t, 3, 4>& m,
-                          const Vector3& trans, const Quaternion& qrot) {
+void SBACam::transformF2W(Eigen::Matrix<double, 3, 4>& m, const Vector3& trans,
+                          const Quaternion& qrot) {
   m.block<3, 3>(0, 0) = qrot.toRotationMatrix();
   m.col(3) = trans;
 }
 
 // set up camera matrix
-void SBACam::setKcam(number_t fx, number_t fy, number_t cx, number_t cy,
-                     number_t tx) {
+void SBACam::setKcam(double fx, double fy, double cx, double cy, double tx) {
   Kcam.setZero();
   Kcam(0, 0) = fx;
   Kcam(1, 1) = fy;

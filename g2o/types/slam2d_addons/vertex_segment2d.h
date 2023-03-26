@@ -59,13 +59,13 @@ class G2O_TYPES_SLAM2D_ADDONS_API VertexSegment2D
 
   virtual void setToOriginImpl() { _estimate.setZero(); }
 
-  virtual bool setEstimateDataImpl(const number_t* est) {
+  virtual bool setEstimateDataImpl(const double* est) {
     Eigen::Map<const Vector4> v(est);
     _estimate = v;
     return true;
   }
 
-  virtual bool getEstimateData(number_t* est) const {
+  virtual bool getEstimateData(double* est) const {
     Eigen::Map<Vector4> v(est);
     v = _estimate;
     return true;
@@ -73,17 +73,17 @@ class G2O_TYPES_SLAM2D_ADDONS_API VertexSegment2D
 
   virtual int estimateDimension() const { return 4; }
 
-  virtual bool setMinimalEstimateDataImpl(const number_t* est) {
+  virtual bool setMinimalEstimateDataImpl(const double* est) {
     return setEstimateData(est);
   }
 
-  virtual bool getMinimalEstimateData(number_t* est) const {
+  virtual bool getMinimalEstimateData(double* est) const {
     return getEstimateData(est);
   }
 
   virtual int minimalEstimateDimension() const { return 4; }
 
-  virtual void oplusImpl(const number_t* update) {
+  virtual void oplusImpl(const double* update) {
     Eigen::Map<const Vector4> upd(update);
     _estimate += upd;
   }

@@ -59,11 +59,11 @@ class LinearSolverPCG : public LinearSolver<MatrixType> {
     return true;
   }
 
-  bool solve(const SparseBlockMatrix<MatrixType>& A, number_t* x, number_t* b);
+  bool solve(const SparseBlockMatrix<MatrixType>& A, double* x, double* b);
 
   //! return the tolerance for terminating PCG before convergence
-  number_t tolerance() const { return _tolerance; }
-  void setTolerance(number_t tolerance) { _tolerance = tolerance; }
+  double tolerance() const { return _tolerance; }
+  void setTolerance(double tolerance) { _tolerance = tolerance; }
 
   int maxIterations() const { return _maxIter; }
   void setMaxIterations(int maxIter) { _maxIter = maxIter; }
@@ -80,8 +80,8 @@ class LinearSolverPCG : public LinearSolver<MatrixType> {
   using MatrixVector = std::vector<MatrixType>;
   using MatrixPtrVector = std::vector<const MatrixType*>;
 
-  number_t _tolerance;
-  number_t _residual;
+  double _tolerance;
+  double _residual;
   bool _absoluteTolerance;
   bool _verbose;
   int _maxIter;

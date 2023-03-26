@@ -77,8 +77,8 @@ void CacheSE2Offset::updateImpl() {
   _w2l = w2l.rotation().toRotationMatrix();
   _w2l.translation() = w2l.translation();
 
-  number_t alpha = v->estimate().rotation().angle();
-  number_t c = std::cos(alpha), s = std::sin(alpha);
+  double alpha = v->estimate().rotation().angle();
+  double c = std::cos(alpha), s = std::sin(alpha);
   Matrix2 RInversePrime;
   RInversePrime << -s, c, -c, -s;
   _RpInverse_RInversePrime =

@@ -54,12 +54,12 @@ struct CmpPairFirst {
 };
 
 /**
- * converts a number constant to a number_t constant at compile time
+ * converts a number constant to a double constant at compile time
  * to avoid having to cast everything to avoid warnings.
  **/
-inline constexpr number_t cst(long double v) { return (number_t)v; }
+inline constexpr double cst(long double v) { return (double)v; }
 
-constexpr number_t const_pi() { return cst(3.14159265358979323846); }
+constexpr double const_pi() { return cst(3.14159265358979323846); }
 
 /**
  * return the square value
@@ -88,22 +88,20 @@ inline T hypot_sqr(T x, T y) {
 /**
  * convert from degree to radian
  */
-inline number_t deg2rad(number_t degree) {
+inline double deg2rad(double degree) {
   return degree * cst(0.01745329251994329576);
 }
 
 /**
  * convert from radian to degree
  */
-inline number_t rad2deg(number_t rad) {
-  return rad * cst(57.29577951308232087721);
-}
+inline double rad2deg(double rad) { return rad * cst(57.29577951308232087721); }
 
 /**
  * normalize the angle
  */
-inline number_t normalize_theta(number_t theta) {
-  const number_t result = fmod(theta + const_pi(), 2.0 * const_pi());
+inline double normalize_theta(double theta) {
+  const double result = fmod(theta + const_pi(), 2.0 * const_pi());
   if (result <= 0.0) return result + const_pi();
   return result - const_pi();
 }
@@ -111,15 +109,15 @@ inline number_t normalize_theta(number_t theta) {
 /**
  * inverse of an angle, i.e., +180 degree
  */
-inline number_t inverse_theta(number_t th) {
+inline double inverse_theta(double th) {
   return normalize_theta(th + const_pi());
 }
 
 /**
  * average two angles
  */
-inline number_t average_angle(number_t theta1, number_t theta2) {
-  number_t x, y;
+inline double average_angle(double theta1, double theta2) {
+  double x, y;
 
   x = std::cos(theta1) + std::cos(theta2);
   y = std::sin(theta1) + std::sin(theta2);
@@ -167,7 +165,7 @@ inline T wrap(T l, T x, T u) {
 /**
  * tests whether there is a NaN in the array
  */
-inline bool arrayHasNaN(const number_t* array, int size, int* nanIndex = 0) {
+inline bool arrayHasNaN(const double* array, int size, int* nanIndex = 0) {
   for (int i = 0; i < size; ++i)
     if (g2o_isnan(array[i])) {
       if (nanIndex) *nanIndex = i;

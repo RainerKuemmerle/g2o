@@ -45,7 +45,7 @@ class G2O_CORE_API MarginalCovarianceCholesky {
    * hash struct for storing the matrix elements needed to compute the
    * covariance
    */
-  typedef std::unordered_map<int, number_t> LookupMap;
+  typedef std::unordered_map<int, double> LookupMap;
 
  public:
   MarginalCovarianceCholesky();
@@ -55,7 +55,7 @@ class G2O_CORE_API MarginalCovarianceCholesky {
    * compute the marginal cov for the given block indices, write the result to
    * the covBlocks memory (which has to be provided by the caller).
    */
-  void computeCovariance(number_t** covBlocks,
+  void computeCovariance(double** covBlocks,
                          const std::vector<int>& blockIndices);
 
   /**
@@ -75,19 +75,19 @@ class G2O_CORE_API MarginalCovarianceCholesky {
    * computeCovariance(). The pointers are owned by the caller,
    * MarginalCovarianceCholesky does not free the pointers.
    */
-  void setCholeskyFactor(int n, int* Lp, int* Li, number_t* Lx, int* permInv);
+  void setCholeskyFactor(int n, int* Lp, int* Li, double* Lx, int* permInv);
 
  protected:
   // information about the cholesky factor (lower triangle)
   int _n;         ///< L is an n X n matrix
   int* _Ap;       ///< column pointer of the CCS storage
   int* _Ai;       ///< row indices of the CCS storage
-  number_t* _Ax;  ///< values of the cholesky factor
+  double* _Ax;    ///< values of the cholesky factor
   int* _perm;  ///< permutation of the cholesky factor. Variable re-ordering for
                ///< better fill-in
 
   LookupMap _map;  ///< hash look up table for the already computed entries
-  std::vector<number_t> _diag;  ///< cache 1 / H_ii to avoid recalculations
+  std::vector<double> _diag;  ///< cache 1 / H_ii to avoid recalculations
 
   //! compute the index used for hashing
   int computeIndex(int r, int c) const { /*assert(r <= c);*/
@@ -98,7 +98,7 @@ class G2O_CORE_API MarginalCovarianceCholesky {
    * permutation, and upper triangular. May issue recursive calls to itself to
    * compute the missing values.
    */
-  number_t computeEntry(int r, int c);
+  double computeEntry(int r, int c);
 };
 
 }  // namespace g2o

@@ -47,13 +47,13 @@ class G2O_TYPES_SLAM2D_API EdgeSE2PointXY
     _error = (v1->estimate().inverse() * l2->estimate()) - _measurement;
   }
 
-  virtual bool setMeasurementData(const number_t* d) {
+  virtual bool setMeasurementData(const double* d) {
     _measurement[0] = d[0];
     _measurement[1] = d[1];
     return true;
   }
 
-  virtual bool getMeasurementData(number_t* d) const {
+  virtual bool getMeasurementData(double* d) const {
     d[0] = _measurement[0];
     d[1] = _measurement[1];
     return true;
@@ -73,7 +73,7 @@ class G2O_TYPES_SLAM2D_API EdgeSE2PointXY
 
   virtual void initialEstimate(const OptimizableGraph::VertexSet& from,
                                OptimizableGraph::Vertex* to);
-  virtual number_t initialEstimatePossible(
+  virtual double initialEstimatePossible(
       const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to) {
     (void)to;
     return (from.count(_vertices[0]) == 1 ? 1.0 : -1.0);

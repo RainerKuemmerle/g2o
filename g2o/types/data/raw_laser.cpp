@@ -47,7 +47,7 @@ bool RawLaser::write(std::ostream& /*os*/) const {
 
 bool RawLaser::read(std::istream& is) {
   int type;
-  number_t angle, fov, res, maxrange, acc;
+  double angle, fov, res, maxrange, acc;
   int remission_mode;
   is >> type >> angle >> fov >> res >> maxrange >> acc >> remission_mode;
 
@@ -69,9 +69,9 @@ bool RawLaser::read(std::istream& is) {
   return true;
 }
 
-void RawLaser::setRanges(const vector<number_t>& ranges) { _ranges = ranges; }
+void RawLaser::setRanges(const vector<double>& ranges) { _ranges = ranges; }
 
-void RawLaser::setRemissions(const std::vector<number_t>& remissions) {
+void RawLaser::setRemissions(const std::vector<double>& remissions) {
   _remissions = remissions;
 }
 
@@ -82,10 +82,9 @@ void RawLaser::setLaserParams(const LaserParameters& laserParams) {
 RawLaser::Point2DVector RawLaser::cartesian() const {
   Point2DVector points;
   for (size_t i = 0; i < _ranges.size(); ++i) {
-    const number_t& r = _ranges[i];
+    const double& r = _ranges[i];
     if (r < _laserParams.maxRange && r > _laserParams.minRange) {
-      number_t alpha =
-          _laserParams.firstBeamAngle + i * _laserParams.angularStep;
+      double alpha = _laserParams.firstBeamAngle + i * _laserParams.angularStep;
       points.push_back(Vector2(std::cos(alpha) * r, std::sin(alpha) * r));
     }
   }

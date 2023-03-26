@@ -73,7 +73,7 @@ void EdgeProjectPSI2UV::linearizeOplus() {
   SE3Quat T_ca = T_cw * A_aw.inverse();
   Vector3 x_a = internal::invert_depth(psi_a);
   Vector3 y = T_ca * x_a;
-  Eigen::Matrix<number_t, 2, 3, Eigen::ColMajor> Jcam =
+  Eigen::Matrix<double, 2, 3, Eigen::ColMajor> Jcam =
       internal::d_proj_d_y(cam->focal_length, y);
 
   auto &jacobianOplus0 = std::get<0>(this->_jacobianOplus);

@@ -60,8 +60,8 @@ class G2O_TYPES_SLAM2D_API EdgeSE2LotsOfXY
 
   virtual void initialEstimate(const OptimizableGraph::VertexSet&,
                                OptimizableGraph::Vertex*);
-  virtual number_t initialEstimatePossible(const OptimizableGraph::VertexSet&,
-                                           OptimizableGraph::Vertex*);
+  virtual double initialEstimatePossible(const OptimizableGraph::VertexSet&,
+                                         OptimizableGraph::Vertex*);
 
   virtual void linearizeOplus();
 };

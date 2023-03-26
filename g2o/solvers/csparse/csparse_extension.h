@@ -39,9 +39,9 @@ namespace csparse_extension {
  * pointers CSparse: Copyright (c) 2006-2011, Timothy A. Davis.
  */
 G2O_CSPARSE_EXTENSION_API csn* cs_chol_workspace(const cs* A, const css* S,
-                                                 int* cin, number_t* xin);
-G2O_CSPARSE_EXTENSION_API int cs_cholsolsymb(const cs* A, number_t* b,
-                                             const css* S, number_t* workspace,
+                                                 int* cin, double* xin);
+G2O_CSPARSE_EXTENSION_API int cs_cholsolsymb(const cs* A, double* b,
+                                             const css* S, double* workspace,
                                              int* work);
 
 }  // namespace csparse_extension

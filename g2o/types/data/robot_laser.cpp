@@ -49,7 +49,7 @@ RobotLaser::~RobotLaser() {}
 
 bool RobotLaser::read(std::istream& is) {
   int type;
-  number_t angle, fov, res, maxrange, acc;
+  double angle, fov, res, maxrange, acc;
   int remission_mode;
   is >> type >> angle >> fov >> res >> maxrange >> acc >> remission_mode;
 
@@ -65,7 +65,7 @@ bool RobotLaser::read(std::istream& is) {
   for (int i = 0; i < beams; i++) is >> _remissions[i];
 
   // special robot laser stuff
-  number_t x, y, theta;
+  double x, y, theta;
   is >> x >> y >> theta;
   SE2 lp(x, y, theta);
   // cerr << "x: " << x << " y:" << y << " th:" << theta << " ";

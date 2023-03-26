@@ -115,9 +115,9 @@ void EdgeSE2TwoPointsXY::initialEstimate(
   }
 }
 
-number_t EdgeSE2TwoPointsXY::initialEstimatePossible(
-    const OptimizableGraph::VertexSet &fixed,
-    OptimizableGraph::Vertex *toEstimate) {
+double EdgeSE2TwoPointsXY::initialEstimatePossible(
+    const OptimizableGraph::VertexSet& fixed,
+    OptimizableGraph::Vertex* toEstimate) {
   (void)toEstimate;
 
   for (std::set<HyperGraph::Vertex *>::iterator it = fixed.begin();

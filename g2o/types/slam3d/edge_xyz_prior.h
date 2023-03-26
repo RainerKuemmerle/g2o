@@ -52,13 +52,13 @@ class G2O_TYPES_SLAM3D_API EdgeXYZPrior
   // jacobian
   virtual void linearizeOplus();
 
-  virtual bool setMeasurementData(const number_t* d) {
+  virtual bool setMeasurementData(const double* d) {
     Eigen::Map<const Vector3> v(d);
     _measurement = v;
     return true;
   }
 
-  virtual bool getMeasurementData(number_t* d) const {
+  virtual bool getMeasurementData(double* d) const {
     Eigen::Map<Vector3> v(d);
     v = _measurement;
     return true;
@@ -68,7 +68,7 @@ class G2O_TYPES_SLAM3D_API EdgeXYZPrior
 
   virtual bool setMeasurementFromState();
 
-  virtual number_t initialEstimatePossible(
+  virtual double initialEstimatePossible(
       const OptimizableGraph::VertexSet& /*from*/,
       OptimizableGraph::Vertex* /*to*/) {
     return 0;

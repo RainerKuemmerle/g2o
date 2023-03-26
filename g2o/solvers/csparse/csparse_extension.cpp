@@ -34,8 +34,7 @@ namespace csparse_extension {
  * Originally from CSparse, avoid memory re-allocations by giving workspace
  * pointers CSparse: Copyright (c) 2006-2011, Timothy A. Davis.
  */
-int cs_cholsolsymb(const cs *A, number_t *b, const css *S, number_t *x,
-                   int *work) {
+int cs_cholsolsymb(const cs* A, double* b, const css* S, double* x, int* work) {
   csn *N;
   int n, ok;
   if (!CS_CSC(A) || !b || !S || !x) {
@@ -65,8 +64,8 @@ int cs_cholsolsymb(const cs *A, number_t *b, const css *S, number_t *x,
  * pointers CSparse: Copyright (c) 2006-2011, Timothy A. Davis.
  */
 /* L = chol (A, [pinv parent cp]), pinv is optional */
-csn *cs_chol_workspace(const cs *A, const css *S, int *cin, number_t *xin) {
-  number_t d, lki, *Lx, *x, *Cx;
+csn* cs_chol_workspace(const cs* A, const css* S, int* cin, double* xin) {
+  double d, lki, *Lx, *x, *Cx;
   int top, i, p, k, n, *Li, *Lp, *cp, *pinv, *s, *c, *parent, *Cp, *Ci;
   cs *L, *C, *E;
   csn *N;
@@ -74,7 +73,7 @@ csn *cs_chol_workspace(const cs *A, const css *S, int *cin, number_t *xin) {
   n = A->n;
   N = (csn *)cs_calloc(1, sizeof(csn)); /* allocate result */
   c = cin;                              /* get int workspace */
-  x = xin;                              /* get number_t workspace */
+  x = xin;                              /* get double workspace */
   cp = S->cp;
   pinv = S->pinv;
   parent = S->parent;

@@ -36,18 +36,18 @@ TEST(Slam3D, OrthogonalMatrix) {
   rot = rot * (g2o::Matrix3)g2o::AngleAxis(0.01, g2o::Vector3::UnitX());
 
   shouldBeIdentity = R * R.transpose();
-  number_t initialDifference =
+  double initialDifference =
       (shouldBeIdentity - g2o::Matrix3::Identity()).array().abs().maxCoeff();
   EXPECT_DOUBLE_EQ(0., initialDifference);
 
   // introduce numerical inaccuracies
   for (int i = 0; i < 10000; ++i) R = R * rot;
   shouldBeIdentity = R * R.transpose();
-  number_t afterMultDifference =
+  double afterMultDifference =
       (shouldBeIdentity - g2o::Matrix3::Identity()).array().abs().maxCoeff();
   EXPECT_GE(afterMultDifference, initialDifference);
 
-  number_t inaccurateDet = R.determinant();
+  double inaccurateDet = R.determinant();
   g2o::Matrix3 approxSolution = R;
   g2o::internal::approximateNearestOrthogonalMatrix(approxSolution);
   g2o::internal::nearestOrthogonalMatrix(R);
@@ -55,7 +55,7 @@ TEST(Slam3D, OrthogonalMatrix) {
   EXPECT_LE(std::abs(R.determinant() - 1.), std::abs(inaccurateDet - 1.));
   EXPECT_NEAR(1.0, R.determinant(), 1e-7);
   shouldBeIdentity = R * R.transpose();
-  number_t nearestDifference =
+  double nearestDifference =
       (shouldBeIdentity - g2o::Matrix3::Identity()).array().abs().maxCoeff();
   EXPECT_NEAR(0., nearestDifference, 1e-7);
 
@@ -63,7 +63,7 @@ TEST(Slam3D, OrthogonalMatrix) {
   for (int i = 0; i < 3; ++i) EXPECT_NEAR(1.0, R.col(i).norm(), 1e-7);
 
   shouldBeIdentity = approxSolution * approxSolution.transpose();
-  number_t approxNearestDifference =
+  double approxNearestDifference =
       (shouldBeIdentity - Eigen::Matrix3d::Identity()).array().abs().maxCoeff();
   EXPECT_NEAR(0., approxNearestDifference, 1e-6);
   EXPECT_NEAR(1.0, approxSolution.determinant(), 1e-6);

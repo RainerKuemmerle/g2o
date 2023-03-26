@@ -65,14 +65,14 @@ void EdgeSBACam::setMeasurement(const SE3Quat& meas) {
   _inverseMeasurement = meas.inverse();
 }
 
-bool EdgeSBACam::setMeasurementData(const number_t* d) {
+bool EdgeSBACam::setMeasurementData(const double* d) {
   Eigen::Map<const Vector7> v(d);
   _measurement.fromVector(v);
   _inverseMeasurement = _measurement.inverse();
   return true;
 }
 
-bool EdgeSBACam::getMeasurementData(number_t* d) const {
+bool EdgeSBACam::getMeasurementData(double* d) const {
   Eigen::Map<Vector7> v(d);
   v = _measurement.toVector();
   return true;

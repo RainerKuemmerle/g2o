@@ -55,7 +55,7 @@ class G2O_TYPES_SLAM2D_API EdgeSE2PointXYCalib
   virtual bool read(std::istream& is);
   virtual bool write(std::ostream& os) const;
 
-  virtual number_t initialEstimatePossible(
+  virtual double initialEstimatePossible(
       const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to) {
     (void)to;
     return (from.count(_vertices[0]) == 1 ? 1.0 : -1.0);

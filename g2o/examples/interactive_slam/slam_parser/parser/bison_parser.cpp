@@ -949,7 +949,7 @@ const char* const Parser::yytname_[] = {"\"end of file\"",
 
 #if YYDEBUG
 /* YYRHS -- A `-1'-separated list of the rules' RHS.  */
-const Parser::rhs_number_type Parser::yyrhs_[] = {
+const Parser::rhs_doubleype Parser::yyrhs_[] = {
     25, 0,  -1, 4,  -1, 17, 4,  -1, 4,  -1, 5,  -1, 7,  8,  4,  -1, 7,  8,  4,
     18, 18, 18, -1, 7,  10, 4,  4,  4,  18, 18, 18, 18, 18, 18, 18, 18, 18, -1,
     7,  9,  4,  -1, 7,  9,  4,  18, 18, 18, 18, 18, 18, -1, 7,  11, 4,  4,  4,
@@ -993,8 +993,8 @@ void Parser::yy_reduce_print_(int yyrule) {
 #endif  // YYDEBUG
 
 /* YYTRANSLATE(YYLEX) -- Bison symbol number corresponding to YYLEX.  */
-Parser::token_number_type Parser::yytranslate_(int t) {
-  static const token_number_type translate_table[] = {
+Parser::token_doubleype Parser::yytranslate_(int t) {
+  static const token_doubleype translate_table[] = {
       0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,  2,  2,  2,  2, 2, 2, 2, 2, 2, 2,
       2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,  2,  2,  2,  2, 2, 2, 2, 2, 2, 2,
       2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,  15, 2,  2,  2, 2, 2, 2, 2, 2, 2,
@@ -1023,7 +1023,7 @@ const int Parser::yyerrcode_ = 256;
 const int Parser::yyntokens_ = 16;
 
 const unsigned int Parser::yyuser_token_number_max_ = 269;
-const Parser::token_number_type Parser::yyundef_token_ = 2;
+const Parser::token_doubleype Parser::yyundef_token_ = 2;
 
 /* Line 1054 of lalr1.cc  */
 #line 1 "[Bison:b4_percent_define_default]"

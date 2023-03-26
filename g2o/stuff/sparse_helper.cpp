@@ -58,7 +58,7 @@ static bool writeTripletEntries(const std::string& filename, int rows, int cols,
   return fout.good();
 }
 
-bool writeVector(const string& filename, const number_t* v, int n) {
+bool writeVector(const string& filename, const double* v, int n) {
   ofstream os(filename.c_str());
   os << fixed;
   for (int i = 0; i < n; i++) os << *v++ << endl;

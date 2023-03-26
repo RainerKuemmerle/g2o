@@ -49,8 +49,7 @@ void ParameterCamera::setOffset(const Isometry3& offset_) {
   _Kcam_inverseOffsetR = _Kcam * inverseOffset().rotation();
 }
 
-void ParameterCamera::setKcam(number_t fx, number_t fy, number_t cx,
-                              number_t cy) {
+void ParameterCamera::setKcam(double fx, double fy, double cx, double cy) {
   _Kcam.setZero();
   _Kcam(0, 0) = fx;
   _Kcam(1, 1) = fy;
@@ -68,7 +67,7 @@ bool ParameterCamera::read(std::istream& is) {
   // human readable text
   Vector4::MapType(off.data() + 3).normalize();
   setOffset(internal::fromVectorQT(off));
-  number_t fx, fy, cx, cy;
+  double fx, fy, cx, cy;
   is >> fx >> fy >> cx >> cy;
   setKcam(fx, fy, cx, cy);
   return is.good();

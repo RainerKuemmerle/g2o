@@ -34,9 +34,9 @@
 
 namespace g2o {
 
-typedef Eigen::Matrix<number_t, 6, 1> Vector6;
-typedef Eigen::Matrix<number_t, 6, 6> Matrix6;
-typedef Eigen::Matrix<number_t, 6, 4> Matrix6x4;
+typedef Eigen::Matrix<double, 6, 1> Vector6;
+typedef Eigen::Matrix<double, 6, 6> Matrix6;
+typedef Eigen::Matrix<double, 6, 4> Matrix6x4;
 
 struct OrthonormalLine3D {
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
@@ -115,14 +115,14 @@ class Line3D : public Vector6 {
     Vector2 mags;
     mags << line.d().norm(), line.w().norm();
 
-    number_t wn = 1.0 / mags.norm();
+    double wn = 1.0 / mags.norm();
     ortho.W << mags.y() * wn, -mags.x() * wn, mags.x() * wn, mags.y() * wn;
 
-    number_t mn = 1.0 / mags.y();
-    number_t dn = 1.0 / mags.x();
+    double mn = 1.0 / mags.y();
+    double dn = 1.0 / mags.x();
     Vector3 mdcross;
     mdcross = line.w().cross(line.d());
-    number_t mdcrossn = 1.0 / mdcross.norm();
+    double mdcrossn = 1.0 / mdcross.norm();
     ortho.U << line.w().x() * mn, line.d().x() * dn, mdcross.x() * mdcrossn,
         line.w().y() * mn, line.d().y() * dn, mdcross.y() * mdcrossn,
         line.w().z() * mn, line.d().z() * dn, mdcross.z() * mdcrossn;
@@ -131,7 +131,7 @@ class Line3D : public Vector6 {
   }
 
   G2O_TYPES_SLAM3D_ADDONS_API inline void normalize() {
-    number_t n = 1.0 / d().norm();
+    double n = 1.0 / d().norm();
     (*this) *= n;
   }
 
@@ -184,16 +184,15 @@ G2O_TYPES_SLAM3D_ADDONS_API Vector6 transformCartesianLine(const Isometry3& t,
 
 G2O_TYPES_SLAM3D_ADDONS_API Vector6 normalizeCartesianLine(const Vector6& line);
 
-static inline number_t mline_elevation(const number_t v[3]) {
+static inline double mline_elevation(const double v[3]) {
   return std::atan2(v[2], sqrt(v[0] * v[0] + v[1] * v[1]));
 }
 
-G2O_TYPES_SLAM3D_ADDONS_API inline number_t getAzimuth(
-    const Vector3& direction) {
+G2O_TYPES_SLAM3D_ADDONS_API inline double getAzimuth(const Vector3& direction) {
   return std::atan2(direction.y(), direction.x());
 }
 
-G2O_TYPES_SLAM3D_ADDONS_API inline number_t getElevation(
+G2O_TYPES_SLAM3D_ADDONS_API inline double getElevation(
     const Vector3& direction) {
   return std::atan2(direction.z(), direction.head<2>().norm());
 }
