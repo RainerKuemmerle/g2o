@@ -90,6 +90,8 @@ class BaseEdge : public OptimizableGraph::Edge {
   typedef typename internal::BaseEdgeTraits<D>::InformationType InformationType;
 
   BaseEdge() : OptimizableGraph::Edge() { _dimension = D; }
+  BaseEdge& operator=(const BaseEdge&) = delete;
+  BaseEdge(const BaseEdge&) = delete;
 
   virtual ~BaseEdge() {}
 

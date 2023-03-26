@@ -376,3 +376,8 @@ TEST(ConstantEdgeTest, ConstantEdge_constructQuadraticForm_rowMajor) {
       (constant_colMajor.hessian12 - hessian21_constant.transpose()).norm(),
       1e-7);
 }
+
+TEST(ConstantEdgeTest, NotCopyAssignable) {
+  EXPECT_FALSE(std::is_copy_assignable<Edge3Constant>::value);
+  EXPECT_FALSE(std::is_copy_assignable<VertexNotDefaultCtor>::value);
+}

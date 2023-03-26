@@ -65,6 +65,8 @@ class BaseVertex : public OptimizableGraph::Vertex {
 
  public:
   BaseVertex();
+  BaseVertex& operator=(const BaseVertex&) = delete;
+  BaseVertex(const BaseVertex&) = delete;
 
   virtual const double& hessian(int i, int j) const {
     assert(i < G2O_VERTEX_DIM && j < G2O_VERTEX_DIM);
