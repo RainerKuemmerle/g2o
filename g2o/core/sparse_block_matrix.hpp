@@ -603,7 +603,7 @@ bool SparseBlockMatrix<MatrixType>::writeOctave(const char* filename,
                                                 bool upperTriangle) const {
   std::string name = filename;
   std::string::size_type lastDot = name.find_last_of('.');
-  if (lastDot != std::string::npos) name = name.substr(0, lastDot);
+  if (lastDot != std::string::npos) name.resize(lastDot);
 
   std::vector<TripletEntry> entries;
   for (size_t i = 0; i < _blockCols.size(); ++i) {
