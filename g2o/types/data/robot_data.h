@@ -40,16 +40,16 @@ namespace g2o {
  */
 class G2O_TYPES_DATA_API RobotData : public HyperGraph::Data {
  public:
-  double timestamp() const { return timestamp_; }
+  [[nodiscard]] double timestamp() const { return timestamp_; }
   void setTimestamp(double ts);
 
-  double loggerTimestamp() const { return loggerTimestamp_; }
+  [[nodiscard]] double loggerTimestamp() const { return loggerTimestamp_; }
   void setLoggerTimestamp(double ts);
 
-  const std::string& tag() const { return tag_; }
+  [[nodiscard]] const std::string& tag() const { return tag_; }
   void setTag(const std::string& tag);
 
-  const std::string& hostname() const { return hostname_; }
+  [[nodiscard]] const std::string& hostname() const { return hostname_; }
   void setHostname(const std::string& hostname);
 
  protected:

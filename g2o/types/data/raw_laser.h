@@ -56,18 +56,18 @@ class G2O_TYPES_DATA_API RawLaser : public RobotData {
    * computes a cartesian view of the beams (x,y).
    * @return a vector with the points of the scan in cartesian coordinates.
    */
-  Point2DVector cartesian() const;
+  [[nodiscard]] Point2DVector cartesian() const;
 
   //! the range measurements by the laser
-  const std::vector<double>& ranges() const { return ranges_; }
+  [[nodiscard]] const std::vector<double>& ranges() const { return ranges_; }
   void setRanges(const std::vector<double>& ranges);
 
   //! the remission measurements by the laser
-  const std::vector<double>& remissions() const { return remissions_; }
+  [[nodiscard]] const std::vector<double>& remissions() const { return remissions_; }
   void setRemissions(const std::vector<double>& remissions);
 
   //! the parameters of the laser
-  const LaserParameters& laserParams() const { return laserParams_; }
+  [[nodiscard]] const LaserParameters& laserParams() const { return laserParams_; }
   void setLaserParams(const LaserParameters& laserParams);
 
  protected:
