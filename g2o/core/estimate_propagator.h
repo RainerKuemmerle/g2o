@@ -29,6 +29,7 @@
 
 #include <limits>
 #include <map>
+#include <string_view>
 #include <unordered_map>
 
 #include "g2o_core_api.h"
@@ -50,7 +51,9 @@ class G2O_CORE_API EstimatePropagatorCost {
   virtual double operator()(OptimizableGraph::Edge* edge,
                             const OptimizableGraph::VertexSet& from,
                             OptimizableGraph::Vertex* to_) const;
-  virtual const char* name() const { return "spanning tree"; }
+  [[nodiscard]] virtual std::string_view name() const {
+    return "spanning tree";
+  }
 
  protected:
   SparseOptimizer* graph_;
@@ -67,9 +70,9 @@ class G2O_CORE_API EstimatePropagatorCostOdometry
  public:
   explicit EstimatePropagatorCostOdometry(SparseOptimizer* graph);
   double operator()(OptimizableGraph::Edge* edge,
-                      const OptimizableGraph::VertexSet& from_,
-                      OptimizableGraph::Vertex* to_) const override;
-  const char* name() const override { return "odometry"; }
+                    const OptimizableGraph::VertexSet& from_,
+                    OptimizableGraph::Vertex* to_) const override;
+  [[nodiscard]] std::string_view name() const override { return "odometry"; }
 };
 
 /**
@@ -100,7 +103,8 @@ class G2O_CORE_API EstimatePropagator {
   /**
    * \brief priority queue for AdjacencyMapEntry
    */
-  class G2O_CORE_API PriorityQueue : public std::multimap<double, AdjacencyMapEntry*> {
+  class G2O_CORE_API PriorityQueue
+      : public std::multimap<double, AdjacencyMapEntry*> {
    public:
     void push(AdjacencyMapEntry* entry);
     AdjacencyMapEntry* pop();

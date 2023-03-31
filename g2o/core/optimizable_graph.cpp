@@ -655,9 +655,8 @@ void OptimizableGraph::setRenamedTypesFromString(const std::string& types) {
   }
 
   cerr << "# load look up table" << endl;
-  for (std::map<std::string, std::string>::const_iterator it =
-           renamedTypesLookup_.begin();
-       it != renamedTypesLookup_.end(); ++it) {
+  for (auto it = renamedTypesLookup_.begin(); it != renamedTypesLookup_.end();
+       ++it) {
     cerr << "#\t" << it->first << " -> " << it->second << endl;
   }
 }
