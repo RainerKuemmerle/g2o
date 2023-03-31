@@ -51,8 +51,8 @@ void BlockSolver<Traits>::resize(int* blockPoseIndices, int numPoseBlocks,
   if (doSchur_) {
     // the following two are only used in schur
     assert(sizePoses_ > 0 && "allocating with wrong size");
-    coefficients_.reset(allocate_aligned<number_t>(totalDim));
-    bschur_.reset(allocate_aligned<number_t>(sizePoses_));
+    coefficients_.reset(allocate_aligned<double>(totalDim));
+    bschur_.reset(allocate_aligned<double>(sizePoses_));
   }
 
   Hpp_ = std::make_unique<PoseHessianType>(blockPoseIndices, blockPoseIndices,
@@ -312,7 +312,7 @@ template <typename Traits>
 bool BlockSolver<Traits>::solve() {
   // cerr << __PRETTY_FUNCTION__ << endl;
   if (!doSchur_) {
-    number_t t = get_monotonic_time();
+    double t = get_monotonic_time();
     bool ok = linearSolver_->solve(*Hpp_, x_, b_);
     G2OBatchStatistics* globalStats = G2OBatchStatistics::globalStats();
     if (globalStats) {
@@ -326,14 +326,14 @@ bool BlockSolver<Traits>::solve() {
   // schur thing
 
   // backup the coefficient matrix
-  number_t t = get_monotonic_time();
+  double t = get_monotonic_time();
 
   // _Hschur = _Hpp, but keeping the pattern of _Hschur
   Hschur_->clear();
   Hpp_->add(*Hschur_);
 
   //_DInvSchur->clear();
-  memset(coefficients_.get(), 0, sizePoses_ * sizeof(number_t));
+  memset(coefficients_.get(), 0, sizePoses_ * sizeof(double));
 #ifdef G2O_OPENMP
 #pragma omp parallel for default(shared) schedule(dynamic, 10)
 #endif
@@ -405,7 +405,7 @@ bool BlockSolver<Traits>::solve() {
   // cerr << "Solve [marginalize] = " <<  get_monotonic_time()-t << endl;
 
   // _bschur = _b for calling solver, and not touching _b
-  memcpy(bschur_.get(), b_, sizePoses_ * sizeof(number_t));
+  memcpy(bschur_.get(), b_, sizePoses_ * sizeof(double));
   for (int i = 0; i < sizePoses_; ++i) {
     bschur_[i] -= coefficients_[i];
   }
@@ -431,25 +431,25 @@ bool BlockSolver<Traits>::solve() {
 
   // _x contains the solution for the poses, now applying it to the landmarks to
   // get the new part of the solution;
-  number_t* xp = x_;
-  number_t* cp = coefficients_.get();
+  double* xp = x_;
+  double* cp = coefficients_.get();
 
-  number_t* xl = x_ + sizePoses_;
-  number_t* cl = coefficients_.get() + sizePoses_;
-  number_t* bl = b_ + sizePoses_;
+  double* xl = x_ + sizePoses_;
+  double* cl = coefficients_.get() + sizePoses_;
+  double* bl = b_ + sizePoses_;
 
   // cp = -xp
   for (int i = 0; i < sizePoses_; ++i) cp[i] = -xp[i];
 
   // cl = bl
-  memcpy(cl, bl, sizeLandmarks_ * sizeof(number_t));
+  memcpy(cl, bl, sizeLandmarks_ * sizeof(double));
 
   // cl = bl - Bt * xp
   // Bt->multiply(cl, cp);
   HplCCS_->rightMultiply(cl, cp);
 
   // xl = Dinv * cl
-  memset(xl, 0, sizeLandmarks_ * sizeof(number_t));
+  memset(xl, 0, sizeLandmarks_ * sizeof(double));
   DInvSchur_->multiply(xl, cl);
   //_DInvSchur->rightMultiply(xl,cl);
   // cerr << "Solve [landmark delta] = " <<  get_monotonic_time()-t << endl;
@@ -461,7 +461,7 @@ template <typename Traits>
 bool BlockSolver<Traits>::computeMarginals(
     SparseBlockMatrix<MatrixX>& spinv,
     const std::vector<std::pair<int, int>>& blockIndices) {
-  number_t t = get_monotonic_time();
+  double t = get_monotonic_time();
   bool ok = linearSolver_->solvePattern(spinv, blockIndices, *Hpp_);
   G2OBatchStatistics* globalStats = G2OBatchStatistics::globalStats();
   if (globalStats) {
@@ -536,7 +536,7 @@ bool BlockSolver<Traits>::buildSystem() {
 }
 
 template <typename Traits>
-bool BlockSolver<Traits>::setLambda(number_t lambda, bool backup) {
+bool BlockSolver<Traits>::setLambda(double lambda, bool backup) {
   if (backup) {
     diagonalBackupPose_.resize(numPoses_);
     diagonalBackupLandmark_.resize(numLandmarks_);

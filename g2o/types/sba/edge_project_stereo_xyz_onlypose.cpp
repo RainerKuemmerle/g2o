@@ -42,10 +42,10 @@ void EdgeStereoSE3ProjectXYZOnlyPose::linearizeOplus() {
   VertexSE3Expmap *vi = vertexXnRaw<0>();
   Vector3 xyz_trans = vi->estimate().map(Xw);
 
-  number_t x = xyz_trans[0];
-  number_t y = xyz_trans[1];
-  number_t invz = 1.0 / xyz_trans[2];
-  number_t invz_2 = invz * invz;
+  double x = xyz_trans[0];
+  double y = xyz_trans[1];
+  double invz = 1.0 / xyz_trans[2];
+  double invz_2 = invz * invz;
 
   jacobianOplusXi_(0, 0) = x * y * invz_2 * fx;
   jacobianOplusXi_(0, 1) = -(1 + (x * x * invz_2)) * fx;

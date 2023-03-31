@@ -43,13 +43,13 @@ class G2O_TYPES_SLAM2D_API VertexPointXY : public BaseVertex<2, Vector2> {
 
   void setToOriginImpl() override { estimate_.setZero(); }
 
-  bool setEstimateDataImpl(const number_t* est) override {
+  bool setEstimateDataImpl(const double* est) override {
     estimate_[0] = est[0];
     estimate_[1] = est[1];
     return true;
   }
 
-  bool getEstimateData(number_t* est) const override {
+  bool getEstimateData(double* est) const override {
     est[0] = estimate_[0];
     est[1] = estimate_[1];
     return true;
@@ -57,11 +57,11 @@ class G2O_TYPES_SLAM2D_API VertexPointXY : public BaseVertex<2, Vector2> {
 
   int estimateDimension() const override { return 2; }
 
-  bool setMinimalEstimateDataImpl(const number_t* est) override {
+  bool setMinimalEstimateDataImpl(const double* est) override {
     return setEstimateData(est);
   }
 
-  bool getMinimalEstimateData(number_t* est) const override {
+  bool getMinimalEstimateData(double* est) const override {
     return getEstimateData(est);
   }
 

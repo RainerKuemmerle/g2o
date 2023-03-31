@@ -87,15 +87,15 @@ class RobustKernelTests : public Test {
   /**
    * Estimate the first order derivative numerically
    */
-  number_t estimateDerivative(number_t x) {
-    constexpr number_t kDelta = g2o::cst(1e-9);
+  double estimateDerivative(double x) {
+    constexpr double kDelta = g2o::cst(1e-9);
 
     g2o::Vector3 first;
     g2o::Vector3 second;
     this->kernel_.robustify(x + kDelta, first);
     this->kernel_.robustify(x - kDelta, second);
 
-    const number_t result = (1 / (2 * kDelta)) * (first(0) - second(0));
+    const double result = (1 / (2 * kDelta)) * (first(0) - second(0));
     return result;
   }
 };
@@ -113,7 +113,7 @@ TYPED_TEST_P(RobustKernelTests, Derivative) {
   for (auto e : this->error_values_) {
     g2o::Vector3 val = g2o::Vector3::Zero();
     this->kernel_.robustify(e, val);
-    number_t estimatedJac = this->estimateDerivative(e);
+    double estimatedJac = this->estimateDerivative(e);
     ASSERT_THAT(val(1), DoubleNear(estimatedJac, 1e-5));
   }
 }

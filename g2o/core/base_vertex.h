@@ -69,26 +69,28 @@ class BaseVertex : public OptimizableGraph::Vertex {
                                  : Eigen::Unaligned>;
 
   BaseVertex();
+  BaseVertex& operator=(const BaseVertex&) = delete;
+  BaseVertex(const BaseVertex&) = delete;
 
-  number_t* hessianData() const override {
-    return const_cast<number_t*>(hessian_.data());
+  double* hessianData() const override {
+    return const_cast<double*>(hessian_.data());
   }
 
-  void mapHessianMemory(number_t* d) override;
+  void mapHessianMemory(double* d) override;
 
-  int copyB(number_t* b) const override {
+  int copyB(double* b) const override {
     const int vertexDim = G2O_VERTEX_DIM;
-    memcpy(b, b_.data(), vertexDim * sizeof(number_t));
+    memcpy(b, b_.data(), vertexDim * sizeof(double));
     return vertexDim;
   }
 
-  number_t* bData() const override { return const_cast<number_t*>(b_.data()); }
+  double* bData() const override { return const_cast<double*>(b_.data()); }
 
   void clearQuadraticForm() override { b_.setZero(); }
 
   //! updates the current vertex with the direct solution x += H_ii\b_ii
   //! @returns the determinant of the inverted hessian
-  number_t solveDirect(number_t lambda = 0) override;
+  double solveDirect(double lambda = 0) override;
 
   //! return right hand side b of the constructed linear system
   BVector& b() { return b_; }

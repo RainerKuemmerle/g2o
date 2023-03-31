@@ -30,9 +30,10 @@
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 
-#include "g2o/config.h"
-
 namespace g2o {
+
+// define number_t to be some sort of backwards compatible
+using number_t = double;
 
 using Vector2I = Eigen::Matrix<int, 2, 1, Eigen::ColMajor>;
 using Vector3I = Eigen::Matrix<int, 3, 1, Eigen::ColMajor>;
@@ -44,7 +45,7 @@ using Vector3F = Eigen::Matrix<float, 3, 1, Eigen::ColMajor>;
 using Vector4F = Eigen::Matrix<float, 4, 1, Eigen::ColMajor>;
 using VectorXF = Eigen::Matrix<float, Eigen::Dynamic, 1, Eigen::ColMajor>;
 
-template <int N, typename T = number_t>
+template <int N, typename T = double>
 using VectorN = Eigen::Matrix<T, N, 1, Eigen::ColMajor>;
 using Vector2 = VectorN<2>;
 using Vector3 = VectorN<3>;
@@ -66,28 +67,22 @@ using Matrix4F = Eigen::Matrix<float, 4, 4, Eigen::ColMajor>;
 using MatrixXF =
     Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::ColMajor>;
 
-template <int N, typename T = number_t>
+template <int N, typename T = double>
 using MatrixN = Eigen::Matrix<T, N, N, Eigen::ColMajor>;
 using Matrix2 = MatrixN<2>;
 using Matrix3 = MatrixN<3>;
 using Matrix4 = MatrixN<4>;
 using MatrixX = MatrixN<Eigen::Dynamic>;
 
-using Isometry2 =
-    Eigen::Transform<number_t, 2, Eigen::Isometry, Eigen::ColMajor>;
-using Isometry3 =
-    Eigen::Transform<number_t, 3, Eigen::Isometry, Eigen::ColMajor>;
-
-using Affine2 = Eigen::Transform<number_t, 2, Eigen::Affine, Eigen::ColMajor>;
-using Affine3 = Eigen::Transform<number_t, 3, Eigen::Affine, Eigen::ColMajor>;
-
-using Rotation2D = Eigen::Rotation2D<number_t>;
-
-using Quaternion = Eigen::Quaternion<number_t>;
-using AngleAxis = Eigen::AngleAxis<number_t>;
-
-using Translation2 = Eigen::Translation<number_t, 2>;
-using Translation3 = Eigen::Translation<number_t, 3>;
+using Isometry2 = Eigen::Transform<double, 2, Eigen::Isometry, Eigen::ColMajor>;
+using Isometry3 = Eigen::Transform<double, 3, Eigen::Isometry, Eigen::ColMajor>;
+using Affine2 = Eigen::Transform<double, 2, Eigen::Affine, Eigen::ColMajor>;
+using Affine3 = Eigen::Transform<double, 3, Eigen::Affine, Eigen::ColMajor>;
+using Rotation2D = Eigen::Rotation2D<double>;
+using Quaternion = Eigen::Quaternion<double>;
+using AngleAxis = Eigen::AngleAxis<double>;
+using Translation2 = Eigen::Translation<double, 2>;
+using Translation3 = Eigen::Translation<double, 3>;
 
 }  // end namespace g2o
 

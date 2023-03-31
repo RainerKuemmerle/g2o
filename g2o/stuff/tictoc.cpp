@@ -42,16 +42,16 @@ namespace g2o {
  * \brief Internal structure of the tictoc profiling
  */
 struct TicTocElement {
-  number_t ticTime = 0.;    ///< the time of the last tic
-  number_t totalTime = 0.;  ///< the total time of this part of the algorithm
+  double ticTime = 0.;      ///< the time of the last tic
+  double totalTime = 0.;    ///< the total time of this part of the algorithm
   int numCalls = 0;         ///< the number of calls
-  number_t minTime;
-  number_t maxTime = 0.;
-  number_t exponentialMovingAverage =
-      0.;                     ///< exponential moving average with alpha = 0.01
+  double minTime;
+  double maxTime = 0.;
+  double exponentialMovingAverage =
+      0.;                       ///< exponential moving average with alpha = 0.01
   std::string algorithmPart;  ///< name / description of the code block
   bool clockIsRunning = true;
-  TicTocElement() : minTime(std::numeric_limits<number_t>::max()) {}
+  TicTocElement() : minTime(std::numeric_limits<double>::max()) {}
   bool operator<(const TicTocElement& other) const {
     return totalTime < other.totalTime;
   }
@@ -91,7 +91,7 @@ struct TicTocInitializer {
       printf("|          TICTOC STATISTICS             |\n");
       printf("------------------------------------------\n");
       for (const auto& sortedElement : sortedElements) {
-        const number_t avgTime =
+        const double avgTime =
             sortedElement.totalTime / sortedElement.numCalls;
         printf("%s", sortedElement.algorithmPart.c_str());
         for (int i = sortedElement.algorithmPart.size(); i < longestName; ++i)
@@ -108,15 +108,15 @@ struct TicTocInitializer {
   }
 };
 
-number_t tictoc(const char* algorithmPart) {
+double tictoc(const char* algorithmPart) {
   static TicTocInitializer initializer;
   if (!initializer.enabled) return 0.;
 
   TicTocMap& tictocElements = initializer.tictocElements;
-  constexpr number_t kAlpha = cst(0.01);
-  const number_t now = get_monotonic_time();
+  constexpr double kAlpha = cst(0.01);
+  const double now = get_monotonic_time();
 
-  number_t dt = 0.;
+  double dt = 0.;
   auto foundIt = tictocElements.find(algorithmPart);
   if (foundIt == tictocElements.end()) {
     // insert element

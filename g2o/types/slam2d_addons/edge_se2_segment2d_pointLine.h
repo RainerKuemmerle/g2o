@@ -39,13 +39,13 @@ class G2O_TYPES_SLAM2D_ADDONS_API EdgeSE2Segment2DPointLine
     : public BaseBinaryEdge<3, Vector3, VertexSE2, VertexSegment2D> {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-  number_t theta() const { return measurement_[2]; }
+  double theta() const { return measurement_[2]; }
   Vector2 point() const {
     Eigen::Map<const Vector2> p(measurement_.data());
     return p;
   }
 
-  void setTheta(number_t t) { measurement_[2] = t; }
+  void setTheta(double t) { measurement_[2] = t; }
   void setPoint(const Vector2& p_) {
     Eigen::Map<Vector2> p(measurement_.data());
     p = p_;
@@ -71,13 +71,13 @@ class G2O_TYPES_SLAM2D_ADDONS_API EdgeSE2Segment2DPointLine
     error_[2] = normalize_theta(error_[2]);
   }
 
-  bool setMeasurementData(const number_t* d) override {
+  bool setMeasurementData(const double* d) override {
     Eigen::Map<const Vector3> data(d);
     measurement_ = data;
     return true;
   }
 
-  bool getMeasurementData(number_t* d) const override {
+  bool getMeasurementData(double* d) const override {
     Eigen::Map<Vector3> data(d);
     data = measurement_;
     return true;

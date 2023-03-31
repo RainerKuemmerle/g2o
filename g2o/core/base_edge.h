@@ -63,8 +63,8 @@ struct QuadraticFormLock {
 template <int D>
 struct BaseEdgeTraits {
   static constexpr int kDimension = D;
-  using ErrorVector = Eigen::Matrix<number_t, D, 1, Eigen::ColMajor>;
-  using InformationType = Eigen::Matrix<number_t, D, D, Eigen::ColMajor>;
+  using ErrorVector = Eigen::Matrix<double, D, 1, Eigen::ColMajor>;
+  using InformationType = Eigen::Matrix<double, D, D, Eigen::ColMajor>;
 };
 /**
  * Same as above but for dimension not known at compilation, i.e., dynamically
@@ -74,9 +74,9 @@ template <>
 struct BaseEdgeTraits<-1> {
   static constexpr int kDimension = -1;
   using ErrorVector =
-      Eigen::Matrix<number_t, Eigen::Dynamic, 1, Eigen::ColMajor>;
+      Eigen::Matrix<double, Eigen::Dynamic, 1, Eigen::ColMajor>;
   using InformationType =
-      Eigen::Matrix<number_t, Eigen::Dynamic, Eigen::Dynamic, Eigen::ColMajor>;
+      Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::ColMajor>;
 };
 
 }  // namespace internal
@@ -90,11 +90,13 @@ class BaseEdge : public OptimizableGraph::Edge {
   using InformationType = typename internal::BaseEdgeTraits<D>::InformationType;
 
   BaseEdge() : OptimizableGraph::Edge() { dimension_ = D; }
+  BaseEdge& operator=(const BaseEdge&) = delete;
+  BaseEdge(const BaseEdge&) = delete;
 
-  number_t chi2() const override { return error_.dot(information() * error_); }
+  double chi2() const override { return error_.dot(information() * error_); }
 
-  const number_t* errorData() const override { return error_.data(); }
-  number_t* errorData() override { return error_.data(); }
+  const double* errorData() const override { return error_.data(); }
+  double* errorData() override { return error_.data(); }
   const ErrorVector& error() const { return error_; }
   ErrorVector& error() { return error_; }
 
@@ -107,10 +109,8 @@ class BaseEdge : public OptimizableGraph::Edge {
     information_ = information;
   }
 
-  const number_t* informationData() const override {
-    return information_.data();
-  }
-  number_t* informationData() override { return information_.data(); }
+  const double* informationData() const override { return information_.data(); }
+  double* informationData() override { return information_.data(); }
 
   //! accessor functions for the measurement represented by the edge
   EIGEN_STRONG_INLINE const Measurement& measurement() const {

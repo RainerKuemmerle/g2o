@@ -54,7 +54,7 @@ class G2O_TYPES_DATA_API RobotLaser : public RawLaser {
  protected:
   SE2 odomPose_;
   //! velocities and safety distances of the robot.
-  number_t laserTv_ = 0., laserRv_ = 0., forwardSafetyDist_ = 0.,
+  double laserTv_ = 0., laserRv_ = 0., forwardSafetyDist_ = 0.,
            sideSafetyDist_ = 0., turnAxis_ = 0.;
 };
 

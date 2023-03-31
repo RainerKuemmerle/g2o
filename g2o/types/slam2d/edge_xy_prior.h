@@ -48,12 +48,12 @@ class G2O_TYPES_SLAM2D_API EdgeXYPrior
 
   void setMeasurement(const Vector2& m) override { measurement_ = m; }
 
-  bool setMeasurementData(const number_t* d) override {
+  bool setMeasurementData(const double* d) override {
     measurement_ = Vector2(d[0], d[1]);
     return true;
   }
 
-  bool getMeasurementData(number_t* d) const override {
+  bool getMeasurementData(double* d) const override {
     Eigen::Map<Vector2> m(d);
     m = measurement_;
     return true;
@@ -66,8 +66,8 @@ class G2O_TYPES_SLAM2D_API EdgeXYPrior
     return true;
   }
 
-  number_t initialEstimatePossible(const OptimizableGraph::VertexSet&,
-                                   OptimizableGraph::Vertex*) override {
+  double initialEstimatePossible(const OptimizableGraph::VertexSet&,
+                                 OptimizableGraph::Vertex*) override {
     return 0.;
   }
 #ifndef NUMERIC_JACOBIAN_TWO_D_TYPES

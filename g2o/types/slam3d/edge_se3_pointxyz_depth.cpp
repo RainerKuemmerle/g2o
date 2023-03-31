@@ -80,7 +80,7 @@ void EdgeSE3PointXYZDepth::linearizeOplus() {
 
   Vector3 Zcam = cache_->w2l() * pt;
 
-  using JacType = Eigen::Matrix<number_t, 3, 9>;
+  using JacType = Eigen::Matrix<double, 3, 9>;
 
   JacType Jprime = JacType::Zero();
   Jprime.block<3, 3>(0, 0) = -Matrix3::Identity();
@@ -136,7 +136,7 @@ void EdgeSE3PointXYZDepth::initialEstimate(
 
   VertexSE3* cam = vertexXnRaw<0>();
   VertexPointXYZ* point = vertexXnRaw<1>();
-  const Eigen::Matrix<number_t, 3, 3, Eigen::ColMajor>& invKcam =
+  const Eigen::Matrix<double, 3, 3, Eigen::ColMajor>& invKcam =
       cache_->camParams()->invKcam();
   Vector3 p;
   p(2) = measurement_(2);

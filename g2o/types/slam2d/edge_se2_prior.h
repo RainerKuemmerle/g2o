@@ -56,9 +56,9 @@ class G2O_TYPES_SLAM2D_API EdgeSE2Prior
   }
 
   void setMeasurement(const SE2& m) override;
-  bool setMeasurementData(const number_t* d) override;
+  bool setMeasurementData(const double* d) override;
 
-  bool getMeasurementData(number_t* d) const override {
+  bool getMeasurementData(double* d) const override {
     Eigen::Map<Vector3> v(d);
     v = measurement_.toVector();
     return true;
@@ -69,8 +69,8 @@ class G2O_TYPES_SLAM2D_API EdgeSE2Prior
   bool read(std::istream& is) override;
   bool write(std::ostream& os) const override;
 
-  number_t initialEstimatePossible(const OptimizableGraph::VertexSet&,
-                                   OptimizableGraph::Vertex*) override {
+  double initialEstimatePossible(const OptimizableGraph::VertexSet&,
+                                 OptimizableGraph::Vertex*) override {
     return 1.;
   }
   void initialEstimate(const OptimizableGraph::VertexSet& from,

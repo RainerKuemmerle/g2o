@@ -58,7 +58,7 @@ void EdgeSE2Prior::setMeasurement(const SE2& m) {
   inverseMeasurement_ = m.inverse();
 }
 
-bool EdgeSE2Prior::setMeasurementData(const number_t* d) {
+bool EdgeSE2Prior::setMeasurementData(const double* d) {
   measurement_ = SE2(d[0], d[1], d[2]);
   inverseMeasurement_ = measurement_.inverse();
   return true;

@@ -36,8 +36,8 @@ namespace g2o {
 
 struct TripletEntry {
   int r, c;
-  number_t x;
-  TripletEntry(int r_, int c_, number_t x_) : r(r_), c(c_), x(x_) {}
+  double x;
+  TripletEntry(int r_, int c_, double x_) : r(r_), c(c_), x(x_) {}
 };
 struct TripletColSort {
   bool operator()(const TripletEntry& e1, const TripletEntry& e2) const {
@@ -48,7 +48,7 @@ struct TripletColSort {
 /**
  * write an array to a file, debugging
  */
-G2O_STUFF_API bool writeVector(const std::string& filename, const number_t* v,
+G2O_STUFF_API bool writeVector(const std::string& filename, const double* v,
                                int n);
 
 /**

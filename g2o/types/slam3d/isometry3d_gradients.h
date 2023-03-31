@@ -35,18 +35,18 @@
 namespace g2o {
 namespace internal {
 // forward declaration
-/* void G2O_TYPES_SLAM3D_API compute_dq_dR (Eigen::Matrix<number_t, 3 , 9,
- * Eigen::ColMajor>&  dq_dR , const number_t&  r11 , const number_t&  r21 ,
- * const number_t&  r31 , const number_t&  r12 , const number_t&  r22 , const
- * number_t&  r32 , const number_t&  r13 , const number_t&  r23 , const
- * number_t&  r33 );  */
+/* void G2O_TYPES_SLAM3D_API compute_dq_dR (Eigen::Matrix<double, 3 , 9,
+ * Eigen::ColMajor>&  dq_dR , const double&  r11 , const double&  r21 ,
+ * const double&  r31 , const double&  r12 , const double&  r22 , const
+ * double&  r32 , const double&  r13 , const double&  r23 , const
+ * double&  r33 );  */
 
 template <typename Derived, typename DerivedOther, bool Transposed = false>
 inline void skew(Eigen::MatrixBase<Derived>& s,
                  const Eigen::MatrixBase<DerivedOther>& v) {
-  const number_t x = 2 * v(0);
-  const number_t y = 2 * v(1);
-  const number_t z = 2 * v(2);
+  const double x = 2 * v(0);
+  const double y = 2 * v(1);
+  const double z = 2 * v(2);
   if (Transposed)
     s << 0., -z, y, z, 0, -x, -y, x, 0;
   else
@@ -63,15 +63,15 @@ template <typename Derived, typename DerivedOther, bool Transposed = false>
 void skew(Eigen::MatrixBase<Derived>& Sx, Eigen::MatrixBase<Derived>& Sy,
           Eigen::MatrixBase<Derived>& Sz,
           const Eigen::MatrixBase<DerivedOther>& R) {
-  const number_t r11 = 2 * R(0, 0);
-  const number_t r12 = 2 * R(0, 1);
-  const number_t r13 = 2 * R(0, 2);
-  const number_t r21 = 2 * R(1, 0);
-  const number_t r22 = 2 * R(1, 1);
-  const number_t r23 = 2 * R(1, 2);
-  const number_t r31 = 2 * R(2, 0);
-  const number_t r32 = 2 * R(2, 1);
-  const number_t r33 = 2 * R(2, 2);
+  const double r11 = 2 * R(0, 0);
+  const double r12 = 2 * R(0, 1);
+  const double r13 = 2 * R(0, 2);
+const double r21 = 2 * R(1, 0);
+  const double r22 = 2 * R(1, 1);
+  const double r23 = 2 * R(1, 2);
+const double r31 = 2 * R(2, 0);
+  const double r32 = 2 * R(2, 1);
+  const double r33 = 2 * R(2, 2);
   if (Transposed) {
     Sx << 0, 0, 0, r31, r32, r33, -r21, -r22, -r23;
     Sy << -r31, -r32, -r33, 0, 0, 0, r11, r12, r13;
@@ -122,7 +122,7 @@ void computeEdgeSE3Gradient(Isometry3& E,
   Isometry3::ConstTranslationPart tbc = BC.translation();
   Isometry3::ConstLinearPart Rbc = extractRotation(BC);
 
-  Eigen::Matrix<number_t, 3, 9, Eigen::ColMajor> dq_dR;
+  Eigen::Matrix<double, 3, 9, Eigen::ColMajor> dq_dR;
   compute_dq_dR(dq_dR, Re(0, 0), Re(1, 0), Re(2, 0), Re(0, 1), Re(1, 1),
                 Re(2, 1), Re(0, 2), Re(1, 2), Re(2, 2));
 
@@ -151,8 +151,8 @@ void computeEdgeSE3Gradient(Isometry3& E,
 
   // dre/dqi
   {
-    number_t buf[27];
-    Eigen::Map<Eigen::Matrix<number_t, 9, 3, Eigen::ColMajor> > M(buf);
+    double buf[27];
+    Eigen::Map<Eigen::Matrix<double, 9, 3, Eigen::ColMajor> > M(buf);
     Matrix3 Sxt;
     Matrix3 Syt;
     Matrix3 Szt;
@@ -181,8 +181,8 @@ void computeEdgeSE3Gradient(Isometry3& E,
 
   // dre/dqj
   {
-    number_t buf[27];
-    Eigen::Map<Eigen::Matrix<number_t, 9, 3, Eigen::ColMajor> > M(buf);
+    double buf[27];
+    Eigen::Map<Eigen::Matrix<double, 9, 3, Eigen::ColMajor> > M(buf);
     Matrix3 Sx;
     Matrix3 Sy;
     Matrix3 Sz;
@@ -231,7 +231,7 @@ void computeEdgeSE3Gradient(Isometry3& E,
   Isometry3::ConstLinearPart Rb = extractRotation(B);
   Isometry3::ConstTranslationPart tb = B.translation();
 
-  Eigen::Matrix<number_t, 3, 9, Eigen::ColMajor> dq_dR;
+  Eigen::Matrix<double, 3, 9, Eigen::ColMajor> dq_dR;
   compute_dq_dR(dq_dR, Re(0, 0), Re(1, 0), Re(2, 0), Re(0, 1), Re(1, 1),
                 Re(2, 1), Re(0, 2), Re(1, 2), Re(2, 2));
 
@@ -253,8 +253,8 @@ void computeEdgeSE3Gradient(Isometry3& E,
 
   // dte/dqj: this is zero
 
-  number_t buf[27];
-  Eigen::Map<Eigen::Matrix<number_t, 9, 3, Eigen::ColMajor> > M(buf);
+  double buf[27];
+  Eigen::Map<Eigen::Matrix<double, 9, 3, Eigen::ColMajor> > M(buf);
   Matrix3 Sxt;
   Matrix3 Syt;
   Matrix3 Szt;
@@ -302,7 +302,7 @@ void computeEdgeSE3PriorGradient(Isometry3& E,
   E = A * B;
   Isometry3::ConstLinearPart Re = extractRotation(E);
 
-  Eigen::Matrix<number_t, 3, 9, Eigen::ColMajor> dq_dR;
+  Eigen::Matrix<double, 3, 9, Eigen::ColMajor> dq_dR;
   compute_dq_dR(dq_dR, Re(0, 0), Re(1, 0), Re(2, 0), Re(0, 1), Re(1, 1),
                 Re(2, 1), Re(0, 2), Re(1, 2), Re(2, 2));
 
@@ -323,8 +323,8 @@ void computeEdgeSE3PriorGradient(Isometry3& E,
 
   // dre/dq
   {
-    number_t buf[27];
-    Eigen::Map<Eigen::Matrix<number_t, 9, 3, Eigen::ColMajor> > M(buf);
+    double buf[27];
+    Eigen::Map<Eigen::Matrix<double, 9, 3, Eigen::ColMajor> > M(buf);
     Matrix3 Sx;
     Matrix3 Sy;
     Matrix3 Sz;

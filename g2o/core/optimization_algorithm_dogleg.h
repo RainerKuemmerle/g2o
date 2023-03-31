@@ -59,7 +59,7 @@ class G2O_CORE_API OptimizationAlgorithmDogleg
   //! return the type of the last step taken by the algorithm
   int lastStep() const { return lastStep_; }
   //! return the diameter of the trust region
-  number_t trustRegion() const { return delta_; }
+  double trustRegion() const { return delta_; }
 
   //! convert the type into an integer
   static const char* stepType2Str(int stepType);
@@ -67,19 +67,18 @@ class G2O_CORE_API OptimizationAlgorithmDogleg
  protected:
   // parameters
   std::shared_ptr<Property<int>> maxTrialsAfterFailure_;
-  std::shared_ptr<Property<number_t>> userDeltaInit_;
+  std::shared_ptr<Property<double>> userDeltaInit_;
   // damping to enforce positive definite matrix
-  std::shared_ptr<Property<number_t>> initialLambda_;
-  std::shared_ptr<Property<number_t>> lamdbaFactor_;
-
+  std::shared_ptr<Property<double>> initialLambda_;
+  std::shared_ptr<Property<double>> lamdbaFactor_;
   VectorX hsd_;        ///< steepest decent step
   VectorX hdl_;        ///< final dogleg step
   VectorX auxVector_;  ///< auxiliary vector used to perform multiplications or
                        ///< other stuff
 
-  number_t
+  double
       currentLambda_;  ///< the damping factor to force positive definite matrix
-  number_t delta_;     ///< trust region
+  double delta_;     ///< trust region
   int lastStep_;       ///< type of the step taken by the algorithm
   bool wasPDInAllIterations_;  ///< the matrix we solve was positive definite in
                                ///< all iterations -> if not apply damping

@@ -49,14 +49,14 @@ struct BlockSolverTraits {
   static const int kPoseDim = PoseDim;
   static const int kLandmarkDim = LandmarkDim;
   using PoseMatrixType =
-      Eigen::Matrix<number_t, kPoseDim, kPoseDim, Eigen::ColMajor>;
+      Eigen::Matrix<double, kPoseDim, kPoseDim, Eigen::ColMajor>;
   using LandmarkMatrixType =
-      Eigen::Matrix<number_t, kLandmarkDim, kLandmarkDim, Eigen::ColMajor>;
+      Eigen::Matrix<double, kLandmarkDim, kLandmarkDim, Eigen::ColMajor>;
   using PoseLandmarkMatrixType =
-      Eigen::Matrix<number_t, kPoseDim, kLandmarkDim, Eigen::ColMajor>;
-  using PoseVectorType = Eigen::Matrix<number_t, kPoseDim, 1, Eigen::ColMajor>;
+      Eigen::Matrix<double, kPoseDim, kLandmarkDim, Eigen::ColMajor>;
+  using PoseVectorType = Eigen::Matrix<double, kPoseDim, 1, Eigen::ColMajor>;
   using LandmarkVectorType =
-      Eigen::Matrix<number_t, kLandmarkDim, 1, Eigen::ColMajor>;
+      Eigen::Matrix<double, kLandmarkDim, 1, Eigen::ColMajor>;
 
   using PoseHessianType = SparseBlockMatrix<PoseMatrixType>;
   using LandmarkHessianType = SparseBlockMatrix<LandmarkMatrixType>;
@@ -93,7 +93,7 @@ class BlockSolverBase : public Solver {
   /**
    * compute dest = H * src
    */
-  virtual void multiplyHessian(number_t* dest, const number_t* src) const = 0;
+  virtual void multiplyHessian(double* dest, const double* src) const = 0;
 };
 
 /**
@@ -132,7 +132,7 @@ class BlockSolver : public BlockSolverBase {
   bool computeMarginals(
       SparseBlockMatrix<MatrixX>& spinv,
       const std::vector<std::pair<int, int>>& blockIndices) override;
-  bool setLambda(number_t lambda, bool backup = false) override;
+  bool setLambda(double lambda, bool backup = false) override;
   void restoreDiagonal() override;
   bool supportsSchur() override { return true; }
   bool schur() override { return doSchur_; }
@@ -145,7 +145,7 @@ class BlockSolver : public BlockSolverBase {
 
   bool saveHessian(const std::string& fileName) const override;
 
-  void multiplyHessian(number_t* dest, const number_t* src) const override {
+  void multiplyHessian(double* dest, const double* src) const override {
     Hpp_->multiplySymmetricUpperTriangle(dest, src);
   }
 
@@ -174,8 +174,8 @@ class BlockSolver : public BlockSolverBase {
   std::vector<OpenMPMutex> coefficientsMutex_;
 #endif
 
-  std::unique_ptr<number_t[], AlignedDeleter<number_t>> coefficients_;
-  std::unique_ptr<number_t[], AlignedDeleter<number_t>> bschur_;
+  std::unique_ptr<double[], AlignedDeleter<double>> coefficients_;
+  std::unique_ptr<double[], AlignedDeleter<double>> bschur_;
 
   bool doSchur_ = true;
   int numPoses_ = 0;

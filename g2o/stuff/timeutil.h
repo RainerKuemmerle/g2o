@@ -46,8 +46,8 @@
 #ifndef DO_EVERY_TS
 #define DO_EVERY_TS(secs, currentTime, code)        \
   if (1) {                                          \
-    static number_t s_lastDone_ = (currentTime);    \
-    number_t s_now_ = (currentTime);                \
+    static double s_lastDone_ = (currentTime);      \
+    double s_now_ = (currentTime);                  \
     if (s_lastDone_ > s_now_) s_lastDone_ = s_now_; \
     if (s_now_ - s_lastDone_ > (secs)) {            \
       code;                                         \
@@ -65,7 +65,7 @@
 #ifndef MEASURE_TIME
 #define MEASURE_TIME(text, code)                                      \
   if (1) {                                                            \
-    number_t _start_time_ = g2o::get_time();                          \
+    double _start_time_ = g2o::get_time();                            \
     code;                                                             \
     std::cerr << (text) << " took " << g2o::get_time() - _start_time_ \
               << " sec" << std::endl;                                 \
@@ -75,12 +75,12 @@
 
 namespace g2o {
 
-using seconds = std::chrono::duration<number_t>;
+using seconds = std::chrono::duration<double>;
 
 /**
  * return the current time in seconds since 1. Jan 1970
  */
-inline number_t get_time() {
+inline double get_time() {
   return seconds{std::chrono::system_clock::now().time_since_epoch()}.count();
 }
 
@@ -89,7 +89,7 @@ inline number_t get_time() {
  * have a reference point. Consider this for measuring how long some
  * code fragments required to execute.
  */
-G2O_STUFF_API number_t get_monotonic_time();
+G2O_STUFF_API double get_monotonic_time();
 
 /**
  * \brief Class to measure the time spent in a scope
@@ -104,7 +104,7 @@ class G2O_STUFF_API ScopeTime {
 
  private:
   std::string title_;
-  number_t startTime_;
+  double startTime_;
 };
 
 }  // namespace g2o

@@ -41,7 +41,7 @@ void EdgeSE2PointXYBearing::initialEstimate(
          "Can not initialize VertexSE2 position by VertexPointXY");
 
   if (from.count(vertices_[0]) != 1) return;
-  number_t r = 2.;
+  double r = 2.;
   const VertexSE2* v1 = vertexXnRaw<0>();
   VertexPointXY* l2 = vertexXnRaw<1>();
   SE2 t = v1->estimate();
@@ -105,8 +105,8 @@ bool EdgeSE2PointXYBearingDrawAction::operator()(
   auto from = e->vertexXn<0>();
   auto to = e->vertexXn<1>();
   if (!from) return true;
-  number_t guessRange = 5;
-  number_t theta = e->measurement();
+  double guessRange = 5;
+  double theta = e->measurement();
   Vector2 p(std::cos(theta) * guessRange, std::sin(theta) * guessRange);
   glPushAttrib(GL_ENABLE_BIT | GL_LIGHTING | GL_COLOR);
   glDisable(GL_LIGHTING);

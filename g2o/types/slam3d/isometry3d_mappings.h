@@ -66,7 +66,7 @@ inline Isometry3::ConstLinearPart extractRotation(const Isometry3& A)  // NOLINT
 template <typename Derived>
 void nearestOrthogonalMatrix(const Eigen::MatrixBase<Derived>& R) {
   Eigen::JacobiSVD<Matrix3> svd(R, Eigen::ComputeFullU | Eigen::ComputeFullV);
-  number_t det = (svd.matrixU() * svd.matrixV().adjoint()).determinant();
+  double det = (svd.matrixU() * svd.matrixV().adjoint()).determinant();
   Matrix3 scaledU(svd.matrixU());
   scaledU.col(0) /= det;
   const_cast<Eigen::MatrixBase<Derived>&>(R) =

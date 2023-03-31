@@ -70,15 +70,13 @@ class EdgeSE2Segment2D
     error_ = error_ - measurement_;
   }
 
-  G2O_TYPES_SLAM2D_ADDONS_API bool setMeasurementData(
-      const number_t* d) override {
+  G2O_TYPES_SLAM2D_ADDONS_API bool setMeasurementData(const double* d) override {
     Eigen::Map<const Vector4> data(d);
     measurement_ = data;
     return true;
   }
 
-  G2O_TYPES_SLAM2D_ADDONS_API bool getMeasurementData(
-      number_t* d) const override {
+  G2O_TYPES_SLAM2D_ADDONS_API bool getMeasurementData(double* d) const override {
     Eigen::Map<Vector4> data(d);
     data = measurement_;
     return true;
@@ -103,7 +101,7 @@ class EdgeSE2Segment2D
   G2O_TYPES_SLAM2D_ADDONS_API void initialEstimate(
       const OptimizableGraph::VertexSet& from,
       OptimizableGraph::Vertex* to) override;
-  G2O_TYPES_SLAM2D_ADDONS_API number_t
+  G2O_TYPES_SLAM2D_ADDONS_API double
   initialEstimatePossible(const OptimizableGraph::VertexSet& from,
                           OptimizableGraph::Vertex* to) override {
     (void)to;

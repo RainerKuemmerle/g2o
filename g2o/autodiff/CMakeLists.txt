@@ -1,7 +1,4 @@
 add_library(g2o_ceres_ad INTERFACE)
-set_target_properties(g2o_ceres_ad PROPERTIES
-    CXX_STANDARD 17
-)
 
 target_link_libraries(g2o_ceres_ad INTERFACE ${G2O_EIGEN3_EIGEN_TARGET})
 

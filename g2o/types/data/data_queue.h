@@ -42,14 +42,14 @@ class RobotData;
 class G2O_TYPES_DATA_API DataQueue {
  public:
   using RobotDataPtr = std::shared_ptr<RobotData>;
-  using Buffer = std::map<number_t, RobotDataPtr>;
+  using Buffer = std::map<double, RobotDataPtr>;
 
   void add(RobotDataPtr rd);
 
-  RobotDataPtr findClosestData(number_t timestamp) const;
+  RobotDataPtr findClosestData(double timestamp) const;
 
-  RobotDataPtr before(number_t timestamp) const;
-  RobotDataPtr after(number_t timestamp) const;
+  RobotDataPtr before(double timestamp) const;
+  RobotDataPtr after(double timestamp) const;
 
   const Buffer& buffer() const { return buffer_; }
 

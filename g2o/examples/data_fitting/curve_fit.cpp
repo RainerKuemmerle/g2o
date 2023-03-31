@@ -147,7 +147,7 @@ int main(int argc, char** argv) {
   // 2. add the points we measured to be on the curve
   for (int i = 0; i < numPoints; ++i) {
     auto e = std::make_shared<EdgePointOnCurve>();
-    e->setInformation(Eigen::Matrix<number_t, 1, 1>::Identity());
+    e->setInformation(Eigen::Matrix<double, 1, 1>::Identity());
     e->setVertex(0, params);
     e->setMeasurement(points[i]);
     optimizer.addEdge(e);

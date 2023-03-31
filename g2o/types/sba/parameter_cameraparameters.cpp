@@ -34,10 +34,10 @@ namespace g2o {
 
 CameraParameters::CameraParameters() : principle_point(Vector2(0., 0.)) {}
 
-CameraParameters::CameraParameters(number_t focalLength, Vector2 principlePoint,
-                                   number_t baseLine)
+CameraParameters::CameraParameters(double focalLength, const Vector2& principlePoint,
+                                   double baseLine)
     : focal_length(focalLength),
-      principle_point(std::move(principlePoint)),
+      principle_point(principlePoint),
       baseline(baseLine) {}
 
 bool CameraParameters::read(std::istream &is) {
@@ -66,8 +66,8 @@ Vector2 CameraParameters::cam_map(const Vector3 &trans_xyz) const {
 
 Vector3 CameraParameters::stereocam_uvu_map(const Vector3 &trans_xyz) const {
   Vector2 uv_left = cam_map(trans_xyz);
-  number_t proj_x_right = (trans_xyz[0] - baseline) / trans_xyz[2];
-  number_t u_right = proj_x_right * focal_length + principle_point[0];
+  double proj_x_right = (trans_xyz[0] - baseline) / trans_xyz[2];
+  double u_right = proj_x_right * focal_length + principle_point[0];
   return Vector3(uv_left[0], uv_left[1], u_right);
 }
 

@@ -50,8 +50,8 @@ class G2O_TYPES_SLAM2D_API EdgeSE2TwoPointsXY
 
   void initialEstimate(const OptimizableGraph::VertexSet&,
                        OptimizableGraph::Vertex*) override;
-  number_t initialEstimatePossible(const OptimizableGraph::VertexSet&,
-                                   OptimizableGraph::Vertex*) override;
+  double initialEstimatePossible(const OptimizableGraph::VertexSet&,
+                                 OptimizableGraph::Vertex*) override;
 };
 }  // namespace g2o
 #endif  // G2O_EDGE_SE2_TWOPOINTS_XY_H

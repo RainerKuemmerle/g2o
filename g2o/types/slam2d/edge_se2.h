@@ -58,13 +58,13 @@ class G2O_TYPES_SLAM2D_API EdgeSE2
     inverseMeasurement_ = m.inverse();
   }
 
-  bool setMeasurementData(const number_t* d) override {
+  bool setMeasurementData(const double* d) override {
     measurement_ = SE2(d[0], d[1], d[2]);
     inverseMeasurement_ = measurement_.inverse();
     return true;
   }
 
-  bool getMeasurementData(number_t* d) const override {
+  bool getMeasurementData(double* d) const override {
     Vector3 v = measurement_.toVector();
     d[0] = v[0];
     d[1] = v[1];
@@ -82,8 +82,8 @@ class G2O_TYPES_SLAM2D_API EdgeSE2
     return true;
   }
 
-  number_t initialEstimatePossible(const OptimizableGraph::VertexSet&,
-                                   OptimizableGraph::Vertex*) override {
+  double initialEstimatePossible(const OptimizableGraph::VertexSet&,
+                                 OptimizableGraph::Vertex*) override {
     return 1.;
   }
   void initialEstimate(const OptimizableGraph::VertexSet& from,

@@ -43,13 +43,13 @@ class G2O_TYPES_SLAM2D_API EdgeSE2XYPrior
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
   EdgeSE2XYPrior() = default;
 
-  bool setMeasurementData(const number_t* d) override {
+  bool setMeasurementData(const double* d) override {
     measurement_[0] = d[0];
     measurement_[1] = d[1];
     return true;
   }
 
-  bool getMeasurementData(number_t* d) const override {
+  bool getMeasurementData(double* d) const override {
     d[0] = measurement_[0];
     d[1] = measurement_[1];
     return true;

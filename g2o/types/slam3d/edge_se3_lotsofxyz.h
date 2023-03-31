@@ -60,8 +60,8 @@ class G2O_TYPES_SLAM3D_API EdgeSE3LotsOfXYZ
 
   void initialEstimate(const OptimizableGraph::VertexSet&,
                        OptimizableGraph::Vertex*) override;
-  number_t initialEstimatePossible(const OptimizableGraph::VertexSet&,
-                                   OptimizableGraph::Vertex*) override;
+  double initialEstimatePossible(const OptimizableGraph::VertexSet&,
+                                 OptimizableGraph::Vertex*) override;
 
   void linearizeOplus() override;
 };

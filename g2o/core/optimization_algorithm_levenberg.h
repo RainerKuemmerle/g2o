@@ -51,7 +51,7 @@ class G2O_CORE_API OptimizationAlgorithmLevenberg
   void printVerbose(std::ostream& os) const override;
 
   //! return the currently used damping factor
-  number_t currentLambda() const { return currentLambda_; }
+  double currentLambda() const { return currentLambda_; }
 
   //! the number of internal iteration if an update step increases chi^2 within
   //! Levenberg-Marquardt
@@ -62,10 +62,10 @@ class G2O_CORE_API OptimizationAlgorithmLevenberg
 
   //! return the lambda set by the user, if < 0 the SparseOptimizer will compute
   //! the initial lambda
-  number_t userLambdaInit() { return userLambdaInit_->value(); }
+  double userLambdaInit() { return userLambdaInit_->value(); }
   //! specify the initial lambda used for the first iteraion, if not given the
   //! SparseOptimizer tries to compute a suitable value
-  void setUserLambdaInit(number_t lambda);
+  void setUserLambdaInit(double lambda);
 
   //! return the number of levenberg iterations performed in the last round
   int levenbergIteration() const { return levenbergIterations_; }
@@ -73,14 +73,14 @@ class G2O_CORE_API OptimizationAlgorithmLevenberg
  protected:
   // Levenberg parameters
   std::shared_ptr<Property<int>> maxTrialsAfterFailure_;
-  std::shared_ptr<Property<number_t>> userLambdaInit_;
-  number_t currentLambda_ = cst(-1.);
-  number_t tau_ = cst(1e-5);
-  number_t goodStepLowerScale_ = cst(1. / 3.);  ///< lower bound for lambda
-                                                ///< decrease if a good LM step
-  number_t goodStepUpperScale_ = cst(2. / 3.);  ///< upper bound for lambda
-                                                ///< decrease if a good LM step
-  number_t ni_ = cst(2.);
+  std::shared_ptr<Property<double>> userLambdaInit_;
+  double currentLambda_ = cst(-1.);
+  double tau_ = cst(1e-5);
+  double goodStepLowerScale_ = cst(1. / 3.);  ///< lower bound for lambda
+                                              ///< decrease if a good LM step
+  double goodStepUpperScale_ = cst(2. / 3.);  ///< upper bound for lambda
+                                              ///< decrease if a good LM step
+  double ni_ = cst(2.);
   int levenbergIterations_ = 0;  ///< the number of Levenberg iterations
                                  ///< performed to accept the last step
 
@@ -88,8 +88,8 @@ class G2O_CORE_API OptimizationAlgorithmLevenberg
    * helper for Levenberg, this function computes the initial damping factor, if
    * the user did not specify an own value, see setUserLambdaInit()
    */
-  number_t computeLambdaInit() const;
-  number_t computeScale() const;
+  double computeLambdaInit() const;
+  double computeScale() const;
 
  private:
   std::unique_ptr<Solver> m_solver_;

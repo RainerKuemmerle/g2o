@@ -78,7 +78,7 @@ class G2O_TYPES_SLAM3D_API SE3Quat {
       if (r_.norm() > 1.) {
         r_.normalize();
       } else {
-        number_t w2 = cst(1.) - r_.squaredNorm();
+        double w2 = cst(1.) - r_.squaredNorm();
         r_.w() = (w2 < cst(0.)) ? cst(0.) : std::sqrt(w2);
       }
     } else if (v.size() == 7) {
@@ -121,7 +121,7 @@ class G2O_TYPES_SLAM3D_API SE3Quat {
     return ret;
   }
 
-  inline number_t operator[](int i) const {
+  inline double operator[](int i) const {
     assert(i < 7);
     if (i < 3) return t_[i];
     return r_.coeffs()[i - 3];
@@ -156,7 +156,7 @@ class G2O_TYPES_SLAM3D_API SE3Quat {
   }
 
   inline void fromMinimalVector(const Vector6& v) {
-    number_t w = cst(1.) - v[3] * v[3] - v[4] * v[4] - v[5] * v[5];
+    double w = cst(1.) - v[3] * v[3] - v[4] * v[4] - v[5] * v[5];
     if (w > 0) {
       r_ = Quaternion(std::sqrt(w), v[3], v[4], v[5]);
     } else {
@@ -168,7 +168,7 @@ class G2O_TYPES_SLAM3D_API SE3Quat {
   Vector6 log() const {
     Vector6 res;
     Matrix3 R = r_.toRotationMatrix();
-    number_t d = cst(0.5) * (R(0, 0) + R(1, 1) + R(2, 2) - 1);
+    double d = cst(0.5) * (R(0, 0) + R(1, 1) + R(2, 2) - 1);
     Vector3 omega;
     Vector3 upsilon;
 
@@ -181,7 +181,7 @@ class G2O_TYPES_SLAM3D_API SE3Quat {
       V_inv = Matrix3::Identity() - cst(0.5) * Omega +
               (cst(1.) / cst(12.)) * (Omega * Omega);
     } else {
-      number_t theta = std::acos(d);
+      double theta = std::acos(d);
       omega = theta / (2 * std::sqrt(1 - d * d)) * dR;
       Matrix3 Omega = skew(omega);
       V_inv = (Matrix3::Identity() - cst(0.5) * Omega +
@@ -208,7 +208,7 @@ class G2O_TYPES_SLAM3D_API SE3Quat {
     Vector3 upsilon;
     for (int i = 0; i < 3; i++) upsilon[i] = update[i + 3];
 
-    number_t theta = omega.norm();
+    double theta = omega.norm();
     Matrix3 Omega = skew(omega);
 
     Matrix3 R;
@@ -232,9 +232,9 @@ class G2O_TYPES_SLAM3D_API SE3Quat {
     return SE3Quat(Quaternion(R), V * upsilon);
   }
 
-  Eigen::Matrix<number_t, 6, 6, Eigen::ColMajor> adj() const {
+  Eigen::Matrix<double, 6, 6, Eigen::ColMajor> adj() const {
     Matrix3 R = r_.toRotationMatrix();
-    Eigen::Matrix<number_t, 6, 6, Eigen::ColMajor> res;
+    Eigen::Matrix<double, 6, 6, Eigen::ColMajor> res;
     res.block(0, 0, 3, 3) = R;
     res.block(3, 3, 3, 3) = R;
     res.block(3, 0, 3, 3) = skew(t_) * R;
@@ -242,8 +242,8 @@ class G2O_TYPES_SLAM3D_API SE3Quat {
     return res;
   }
 
-  Eigen::Matrix<number_t, 4, 4, Eigen::ColMajor> to_homogeneous_matrix() const {
-    Eigen::Matrix<number_t, 4, 4, Eigen::ColMajor> homogeneous_matrix;
+  Eigen::Matrix<double, 4, 4, Eigen::ColMajor> to_homogeneous_matrix() const {
+    Eigen::Matrix<double, 4, 4, Eigen::ColMajor> homogeneous_matrix;
     homogeneous_matrix.setIdentity();
     homogeneous_matrix.block(0, 0, 3, 3) = r_.toRotationMatrix();
     homogeneous_matrix.col(3).head(3) = translation();
@@ -273,10 +273,10 @@ inline std::ostream& operator<<(std::ostream& out_str, const SE3Quat& se3) {
   return out_str;
 }
 
-// G2O_TYPES_SLAM3D_API Quaternion euler_to_quat(number_t yaw, number_t pitch,
-// number_t roll); G2O_TYPES_SLAM3D_API void quat_to_euler(const Quaternion& q,
-// number_t& yaw, number_t& pitch, number_t& roll); G2O_TYPES_SLAM3D_API void
-// jac_quat3_euler3(Eigen::Matrix<number_t, 6, 6, Eigen::ColMajor>& J, const
+// G2O_TYPES_SLAM3D_API Quaternion euler_to_quat(double yaw, double pitch,
+// double roll); G2O_TYPES_SLAM3D_API void quat_to_euler(const Quaternion& q,
+// double& yaw, double& pitch, double& roll); G2O_TYPES_SLAM3D_API void
+// jac_quat3_euler3(Eigen::Matrix<double, 6, 6, Eigen::ColMajor>& J, const
 // SE3Quat& t);
 
 }  // namespace g2o

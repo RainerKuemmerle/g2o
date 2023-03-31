@@ -49,10 +49,10 @@ bool BaseFixedSizedEdge<D, E, VertexTypes...>::allVerticesFixed() const {
 template <int D, typename E, typename... VertexTypes>
 void BaseFixedSizedEdge<D, E, VertexTypes...>::constructQuadraticForm() {
   if (this->robustKernel()) {
-    number_t error = this->chi2();
+    double error = this->chi2();
     Vector3 rho;
     this->robustKernel()->robustify(error, rho);
-    Eigen::Matrix<number_t, D, 1, Eigen::ColMajor> omega_r =
+    Eigen::Matrix<double, D, 1, Eigen::ColMajor> omega_r =
         -information_ * error_;
     omega_r *= rho[1];
     constructQuadraticFormNs(this->robustInformation(rho), omega_r,
@@ -165,8 +165,8 @@ void BaseFixedSizedEdge<D, E, VertexTypes...>::linearizeOplusN() {
 
   auto& jacobianOplus = std::get<N>(jacobianOplus_);
 
-  constexpr number_t kDelta = cst(1e-9);
-  constexpr number_t kScalar = 1 / (2 * kDelta);
+  constexpr double kDelta = cst(1e-9);
+  constexpr double kScalar = 1 / (2 * kDelta);
 
   internal::QuadraticFormLock lck(*vertex);
   (void)lck;
@@ -219,7 +219,7 @@ void BaseFixedSizedEdge<D, E, VertexTypes...>::linearizeOplus() {
  * We have to pass the size at runtime to allow dynamically sized verices.
  */
 struct MapHessianMemoryK {
-  number_t* d;
+  double* d;
   int rows;
   int cols;
   template <typename HessianT>
@@ -230,7 +230,7 @@ struct MapHessianMemoryK {
 };
 
 template <int D, typename E, typename... VertexTypes>
-void BaseFixedSizedEdge<D, E, VertexTypes...>::mapHessianMemory(number_t* d,
+void BaseFixedSizedEdge<D, E, VertexTypes...>::mapHessianMemory(double* d,
                                                                 int i, int j,
                                                                 bool rowMajor) {
   assert(i < j && "index assumption violated");

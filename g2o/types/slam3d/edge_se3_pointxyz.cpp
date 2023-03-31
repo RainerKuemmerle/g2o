@@ -87,7 +87,7 @@ void EdgeSE3PointXYZ::linearizeOplus() {
 
   Vector3 Zcam = cache_->w2l() * vp->estimate();
 
-  using JacType = Eigen::Matrix<number_t, 3, 9>;
+  using JacType = Eigen::Matrix<double, 3, 9>;
 
   JacType Jprime = JacType::Zero();
   Jprime.block<3, 3>(0, 0) = -Matrix3::Identity();
@@ -106,7 +106,7 @@ void EdgeSE3PointXYZ::linearizeOplus() {
 
   Jprime.block<3, 3>(0, 6) = cache_->w2l().rotation();
 
-  Eigen::Matrix<number_t, 3, 9, Eigen::ColMajor> Jhom =
+  Eigen::Matrix<double, 3, 9, Eigen::ColMajor> Jhom =
       cache_->offsetParam()->inverseOffset().rotation() * Jprime;
 
   jacobianOplusXi_ = Jhom.block<3, 6>(0, 0);

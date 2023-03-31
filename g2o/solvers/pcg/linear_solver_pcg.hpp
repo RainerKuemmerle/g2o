@@ -84,7 +84,7 @@ inline void pcg_atxpy(const MatrixX& A, const VectorX& x, int xoff, VectorX& y,
 
 template <typename MatrixType>
 bool LinearSolverPCG<MatrixType>::solve(const SparseBlockMatrix<MatrixType>& A,
-                                        number_t* x, number_t* b) {
+                                        double* x, double* b) {
   const bool indexRequired = indices_.empty();
   diag_.clear();
   J_.clear();
@@ -129,8 +129,8 @@ bool LinearSolverPCG<MatrixType>::solve(const SparseBlockMatrix<MatrixType>& A,
 
   r = bvec;
   multDiag(A.colBlockIndices(), J_, r, d);
-  number_t dn = r.dot(d);
-  number_t d0 = tolerance_ * dn;
+  double dn = r.dot(d);
+  double d0 = tolerance_ * dn;
 
   if (absoluteTolerance_) {
     if (residual_ > 0.0 && residual_ > d0) d0 = residual_;
@@ -144,14 +144,14 @@ bool LinearSolverPCG<MatrixType>::solve(const SparseBlockMatrix<MatrixType>& A,
       std::cerr << "residual[" << iteration << "]: " << dn << std::endl;
     if (dn <= d0) break;  // done
     mult(A.colBlockIndices(), d, q);
-    number_t a = dn / d.dot(q);
+    double a = dn / d.dot(q);
     xvec += a * d;
     // TODO(goki): reset residual here every 50 iterations
     r -= a * q;
     multDiag(A.colBlockIndices(), J_, r, s);
-    number_t dold = dn;
+    double dold = dn;
     dn = r.dot(s);
-    number_t ba = dn / dold;
+    double ba = dn / dold;
     d = s + ba * d;
   }
   // std::cerr << "residual[" << iteration << "]: " << dn << std::endl;

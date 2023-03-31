@@ -35,7 +35,7 @@ EdgeSE3LotsOfXYZ::EdgeSE3LotsOfXYZ() { resize(0); }
 bool EdgeSE3LotsOfXYZ::setMeasurementFromState() {
   auto *pose = static_cast<VertexSE3 *>(vertexRaw(0));
 
-  Eigen::Transform<number_t, 3, 1> poseinv = pose->estimate().inverse();
+  Eigen::Transform<double, 3, 1> poseinv = pose->estimate().inverse();
 
   for (unsigned int i = 0; i < observedPoints_; i++) {
     auto *xyz = static_cast<VertexPointXYZ *>(vertexRaw(1 + i));
@@ -190,9 +190,9 @@ void EdgeSE3LotsOfXYZ::initialEstimate(const OptimizableGraph::VertexSet &fixed,
   }
 }
 
-number_t EdgeSE3LotsOfXYZ::initialEstimatePossible(
-    const OptimizableGraph::VertexSet &fixed,
-    OptimizableGraph::Vertex *toEstimate) {
+double EdgeSE3LotsOfXYZ::initialEstimatePossible(
+    const OptimizableGraph::VertexSet& fixed,
+    OptimizableGraph::Vertex* toEstimate) {
   (void)toEstimate;
 
   for (const auto &it : fixed) {

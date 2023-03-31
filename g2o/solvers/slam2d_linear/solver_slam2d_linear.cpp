@@ -46,15 +46,15 @@ class ThetaTreeAction : public HyperDijkstra::TreeAction {
  public:
   explicit ThetaTreeAction(VectorX& theta)
       : HyperDijkstra::TreeAction(), thetaGuess_(theta) {}
-  number_t perform(const std::shared_ptr<HyperGraph::Vertex>& v,
+  double perform(const std::shared_ptr<HyperGraph::Vertex>& v,
                    const std::shared_ptr<HyperGraph::Vertex>& vParent,
-                   const std::shared_ptr<HyperGraph::Edge>& e) override {
+                 const std::shared_ptr<HyperGraph::Edge>& e) override {
     if (!vParent) return 0.;
     auto* odom = static_cast<EdgeSE2*>(e.get());
     auto* from = static_cast<VertexSE2*>(vParent.get());
     auto* to = static_cast<VertexSE2*>(v.get());
     assert(to->hessianIndex() >= 0);
-    number_t fromTheta =
+    double fromTheta =
         from->hessianIndex() < 0 ? 0. : thetaGuess_[from->hessianIndex()];
     bool direct = odom->vertices()[0].get() == from;
     if (direct)
@@ -93,7 +93,7 @@ bool SolverSLAM2DLinear::solveOrientation() {
   b.setZero(optimizer_->indexMapping().size());
   x.setZero(optimizer_->indexMapping().size());
 
-  using ScalarMatrix = Eigen::Matrix<number_t, 1, 1, Eigen::ColMajor>;
+  using ScalarMatrix = Eigen::Matrix<double, 1, 1, Eigen::ColMajor>;
 
   std::vector<int> blockIndices(optimizer_->indexMapping().size());
   for (size_t i = 0; i < optimizer_->indexMapping().size(); ++i)
@@ -163,20 +163,20 @@ bool SolverSLAM2DLinear::solveOrientation() {
     auto from = e->vertexXn<0>();
     auto to = e->vertexXn<1>();
 
-    const number_t omega = e->information()(2, 2);
+    const double omega = e->information()(2, 2);
 
-    const number_t fromThetaGuess =
+    const double fromThetaGuess =
         from->hessianIndex() < 0 ? 0. : thetaGuess[from->hessianIndex()];
-    const number_t toThetaGuess =
+    const double toThetaGuess =
         to->hessianIndex() < 0 ? 0. : thetaGuess[to->hessianIndex()];
-    const number_t error = normalize_theta(
+    const double error = normalize_theta(
         -e->measurement().rotation().angle() + toThetaGuess - fromThetaGuess);
 
     const bool fromNotFixed = !(from->fixed());
     const bool toNotFixed = !(to->fixed());
 
     if (fromNotFixed || toNotFixed) {
-      const number_t omega_r = -omega * error;
+      const double omega_r = -omega * error;
       if (fromNotFixed) {
         b(from->hessianIndex()) -= omega_r;
         (*H.block(from->hessianIndex(), from->hessianIndex()))(0, 0) += omega;

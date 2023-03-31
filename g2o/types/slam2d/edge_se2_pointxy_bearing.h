@@ -36,7 +36,7 @@
 namespace g2o {
 
 class G2O_TYPES_SLAM2D_API EdgeSE2PointXYBearing
-    : public BaseBinaryEdge<1, number_t, VertexSE2, VertexPointXY> {
+    : public BaseBinaryEdge<1, double, VertexSE2, VertexPointXY> {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   EdgeSE2PointXYBearing() = default;
@@ -44,16 +44,16 @@ class G2O_TYPES_SLAM2D_API EdgeSE2PointXYBearing
     const VertexSE2* v1 = vertexXnRaw<0>();
     const VertexPointXY* l2 = vertexXnRaw<1>();
     Vector2 delta = (v1->estimate().inverse() * l2->estimate());
-    number_t angle = std::atan2(delta[1], delta[0]);
+    double angle = std::atan2(delta[1], delta[0]);
     error_[0] = normalize_theta(measurement_ - angle);
   }
 
-  bool setMeasurementData(const number_t* d) override {
+  bool setMeasurementData(const double* d) override {
     measurement_ = d[0];
     return true;
   }
 
-  bool getMeasurementData(number_t* d) const override {
+  bool getMeasurementData(double* d) const override {
     d[0] = measurement_;
     return true;
   }
@@ -71,7 +71,7 @@ class G2O_TYPES_SLAM2D_API EdgeSE2PointXYBearing
   bool read(std::istream& is) override;
   bool write(std::ostream& os) const override;
 
-  number_t initialEstimatePossible(const OptimizableGraph::VertexSet& from,
+  double initialEstimatePossible(const OptimizableGraph::VertexSet& from,
                                    OptimizableGraph::Vertex*) override {
     return (from.count(vertices_[0]) == 1 ? 1.0 : -1.0);
   }

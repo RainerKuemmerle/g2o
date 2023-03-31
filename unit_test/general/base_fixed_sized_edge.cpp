@@ -211,12 +211,12 @@ class EdgeTester {
 
   g2o::JacobianWorkspace jacobianWorkspace;
 
-  Eigen::Matrix<number_t, 3, 3> hessian01;
-  Eigen::Matrix<number_t, 3, 2> hessian02;
-  Eigen::Matrix<number_t, 3, 2> hessian12;
-  Eigen::Matrix<number_t, 3, 3> hessian00;
-  Eigen::Matrix<number_t, 3, 3> hessian11;
-  Eigen::Matrix<number_t, 2, 2> hessian22;
+  Eigen::Matrix<double, 3, 3> hessian01;
+  Eigen::Matrix<double, 3, 2> hessian02;
+  Eigen::Matrix<double, 3, 2> hessian12;
+  Eigen::Matrix<double, 3, 3> hessian00;
+  Eigen::Matrix<double, 3, 3> hessian11;
+  Eigen::Matrix<double, 2, 2> hessian22;
 };
 
 TEST(ConstantEdgeTest, ConstantEdgeAllVerticesFixed) {
@@ -325,16 +325,16 @@ TEST(ConstantEdgeTest, ConstantEdgeConstructQuadraticFormRowMajor) {
   EdgeTester<Edge3Dynamic> dynamic;
   EdgeTester<Edge3Constant> constant;
   dynamic.edge.mapHessianMemory(dynamic.hessian01.data(), 0, 1, true);
-  Eigen::Matrix<number_t, 2, 3> hessian20_dynamic;
-  Eigen::Matrix<number_t, 2, 3> hessian21_dynamic;
+  Eigen::Matrix<double, 2, 3> hessian20_dynamic;
+  Eigen::Matrix<double, 2, 3> hessian21_dynamic;
   hessian20_dynamic.setZero();
   hessian21_dynamic.setZero();
   dynamic.edge.mapHessianMemory(hessian20_dynamic.data(), 0, 2, true);
   dynamic.edge.mapHessianMemory(hessian21_dynamic.data(), 1, 2, true);
 
   constant.edge.mapHessianMemory(constant.hessian01.data(), 0, 1, true);
-  Eigen::Matrix<number_t, 2, 3> hessian20_constant;
-  Eigen::Matrix<number_t, 2, 3> hessian21_constant;
+  Eigen::Matrix<double, 2, 3> hessian20_constant;
+  Eigen::Matrix<double, 2, 3> hessian21_constant;
   hessian20_constant.setZero();
   hessian21_constant.setZero();
   constant.edge.mapHessianMemory(hessian20_constant.data(), 0, 2, true);
@@ -371,4 +371,9 @@ TEST(ConstantEdgeTest, ConstantEdgeConstructQuadraticFormRowMajor) {
       0.0,
       (constant_colMajor.hessian12 - hessian21_constant.transpose()).norm(),
       1e-7);
+}
+
+TEST(ConstantEdgeTest, NotCopyAssignable) {
+  EXPECT_FALSE(std::is_copy_assignable<Edge3Constant>::value);
+  EXPECT_FALSE(std::is_copy_assignable<VertexNotDefaultCtor>::value);
 }

@@ -94,9 +94,9 @@ bool EdgeSE3PlaneSensorCalibDrawAction::operator()(
   if (!robot || !sensor) return false;
 
   if (planeWidth_ && planeHeight_) {
-    number_t d = that->measurement().distance();
-    number_t azimuth = Plane3D::azimuth(that->measurement().normal());
-    number_t elevation = Plane3D::elevation(that->measurement().normal());
+    double d = that->measurement().distance();
+    double azimuth = Plane3D::azimuth(that->measurement().normal());
+    double elevation = Plane3D::elevation(that->measurement().normal());
 
     glColor3f(static_cast<float>(that->color(0)),
               static_cast<float>(that->color(1)),

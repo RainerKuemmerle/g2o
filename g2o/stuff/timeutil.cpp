@@ -38,7 +38,7 @@ ScopeTime::~ScopeTime() {
             << "ms.\n";
 }
 
-number_t get_monotonic_time() {
+double get_monotonic_time() {
   return seconds{std::chrono::steady_clock::now().time_since_epoch()}.count();
 }
 

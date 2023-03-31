@@ -41,22 +41,22 @@ class G2O_TYPES_SCLAM2D_API VelocityMeasurement {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
   VelocityMeasurement();
-  VelocityMeasurement(number_t vl, number_t vr, number_t dt);
+  VelocityMeasurement(double vl, double vr, double dt);
 
-  number_t vl() const { return measurement_(0); }
-  void setVl(number_t v) { measurement_(0) = v; }
+  double vl() const { return measurement_(0); }
+  void setVl(double v) { measurement_(0) = v; }
 
-  number_t vr() const { return measurement_(1); }
-  void setVr(number_t v) { measurement_(1) = v; }
+  double vr() const { return measurement_(1); }
+  void setVr(double v) { measurement_(1) = v; }
 
-  number_t dt() const { return dt_; }
-  void setDt(number_t t) { dt_ = t; }
+  double dt() const { return dt_; }
+  void setDt(double t) { dt_ = t; }
 
   const Vector2& measurement() const { return measurement_; }
 
  protected:
   Vector2 measurement_;
-  number_t dt_ = 0.;
+  double dt_ = 0.;
 };
 
 /**
@@ -66,26 +66,26 @@ class G2O_TYPES_SCLAM2D_API MotionMeasurement {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
   MotionMeasurement();
-  MotionMeasurement(number_t x, number_t y, number_t theta, number_t dt);
-  MotionMeasurement(Vector3 m, number_t dt);
+  MotionMeasurement(double x, double y, double theta, double dt);
+  MotionMeasurement(Vector3 m, double dt);
 
-  number_t x() const { return measurement_(0); }
-  void setX(number_t v) { measurement_(0) = v; }
+  double x() const { return measurement_(0); }
+  void setX(double v) { measurement_(0) = v; }
 
-  number_t y() const { return measurement_(1); }
-  void setY(number_t v) { measurement_(1) = v; }
+  double y() const { return measurement_(1); }
+  void setY(double v) { measurement_(1) = v; }
 
-  number_t theta() const { return measurement_(2); }
-  void setTheta(number_t v) { measurement_(2) = v; }
+  double theta() const { return measurement_(2); }
+  void setTheta(double v) { measurement_(2) = v; }
 
-  number_t dt() const { return dt_; }
-  void setDt(number_t t) { dt_ = t; }
+  double dt() const { return dt_; }
+  void setDt(double t) { dt_ = t; }
 
   const Vector3& measurement() const { return measurement_; }
 
  protected:
   Vector3 measurement_;
-  number_t dt_ = 0.;
+  double dt_ = 0.;
 };
 
 /**
@@ -95,7 +95,7 @@ class G2O_TYPES_SCLAM2D_API OdomConvert {
  public:
   static VelocityMeasurement convertToVelocity(const MotionMeasurement& m);
   static MotionMeasurement convertToMotion(const VelocityMeasurement& vi,
-                                           number_t l = 1.0);
+                                           double l = 1.0);
 };
 
 }  // namespace g2o

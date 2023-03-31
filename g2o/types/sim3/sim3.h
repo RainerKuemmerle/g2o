@@ -41,7 +41,7 @@ struct Sim3 {
  protected:
   Quaternion r_;
   Vector3 t_;
-  number_t s_;
+  double s_;
 
  public:
   Sim3() {
@@ -50,12 +50,12 @@ struct Sim3 {
     s_ = 1.;
   }
 
-  Sim3(Quaternion r, Vector3 t, number_t s)
+  Sim3(Quaternion r, Vector3 t, double s)
       : r_(std::move(r)), t_(std::move(t)), s_(s) {
     normalizeRotation();
   }
 
-  Sim3(const Matrix3& R, Vector3 t, number_t s)
+  Sim3(const Matrix3& R, Vector3 t, double s)
       : r_(Quaternion(R)), t_(std::move(t)), s_(s) {
     normalizeRotation();
   }
@@ -67,8 +67,8 @@ struct Sim3 {
     Vector3 upsilon;
     for (int i = 0; i < 3; i++) upsilon[i] = update[i + 3];
 
-    number_t sigma = update[6];
-    number_t theta = omega.norm();
+    double sigma = update[6];
+    double theta = omega.norm();
     Matrix3 Omega = skew(omega);
     s_ = std::exp(sigma);
     Matrix3 Omega2 = Omega * Omega;
@@ -76,10 +76,10 @@ struct Sim3 {
     I.setIdentity();
     Matrix3 R;
 
-    number_t eps = cst(0.00001);
-    number_t A;
-    number_t B;
-    number_t C;
+    double eps = cst(0.00001);
+    double A;
+    double B;
+    double C;
     if (fabs(sigma) < eps) {
       C = 1;
       if (theta < eps) {
@@ -90,7 +90,7 @@ struct Sim3 {
                  2);  // R=I+(1-cos(theta))*a^a^+sin(theta)*a^~=(omit
                       // O(theta^3))=I+theta^2/2*a^a^+theta*a^
       } else {
-        number_t theta2 = theta * theta;
+        double theta2 = theta * theta;
         A = (1 - std::cos(theta)) / (theta2);
         B = (theta - std::sin(theta)) / (theta2 * theta);
         R = I + std::sin(theta) / theta * Omega +
@@ -99,7 +99,7 @@ struct Sim3 {
     } else {
       C = (s_ - 1) / sigma;
       if (theta < eps) {
-        number_t sigma2 = sigma * sigma;
+        double sigma2 = sigma * sigma;
         A = ((sigma - 1) * s_ + 1) / sigma2;
         B = ((cst(0.5) * sigma2 - sigma + 1) * s_ - 1) /
             (sigma2 *
@@ -112,11 +112,11 @@ struct Sim3 {
       } else {
         R = I + std::sin(theta) / theta * Omega +
             (1 - std::cos(theta)) / (theta * theta) * Omega2;
-        number_t a = s_ * std::sin(theta);
-        number_t b = s_ * std::cos(theta);
-        number_t theta2 = theta * theta;
-        number_t sigma2 = sigma * sigma;
-        number_t c = theta2 + sigma2;
+        double a = s_ * std::sin(theta);
+        double b = s_ * std::cos(theta);
+        double theta2 = theta * theta;
+        double sigma2 = sigma * sigma;
+        double c = theta2 + sigma2;
         A = (a * sigma + (1 - b) * theta) / (theta * c);
         B = (C - ((b - 1) * sigma + a * theta) / (c)) * 1 / (theta2);
       }
@@ -131,22 +131,22 @@ struct Sim3 {
 
   Vector7 log() const {
     Vector7 res;
-    number_t sigma = std::log(s_);
+    double sigma = std::log(s_);
 
     Vector3 omega;
     Vector3 upsilon;
 
     Matrix3 R = r_.toRotationMatrix();
-    number_t d = cst(0.5) * (R(0, 0) + R(1, 1) + R(2, 2) - 1);
+    double d = cst(0.5) * (R(0, 0) + R(1, 1) + R(2, 2) - 1);
 
     Matrix3 Omega;
 
-    number_t eps = cst(0.00001);
+    double eps = cst(0.00001);
     Matrix3 I = Matrix3::Identity();
 
-    number_t A;
-    number_t B;
-    number_t C;
+    double A;
+    double B;
+    double C;
     if (fabs(sigma) < eps) {
       C = 1;
       if (d > 1 - eps) {
@@ -155,8 +155,8 @@ struct Sim3 {
         A = cst(1. / 2.);
         B = cst(1. / 6.);
       } else {
-        number_t theta = std::acos(d);
-        number_t theta2 = theta * theta;
+        double theta = std::acos(d);
+        double theta2 = theta * theta;
         omega = theta / (2 * std::sqrt(1 - d * d)) * deltaR(R);
         Omega = skew(omega);
         A = (1 - std::cos(theta)) / (theta2);
@@ -165,7 +165,7 @@ struct Sim3 {
     } else {
       C = (s_ - 1) / sigma;
       if (d > 1 - eps) {
-        number_t sigma2 = sigma * sigma;
+        double sigma2 = sigma * sigma;
         omega = cst(0.5) * deltaR(R);
         Omega = skew(omega);
         A = ((sigma - 1) * s_ + 1) / (sigma2);
@@ -178,13 +178,13 @@ struct Sim3 {
         //=limit(theta->0)(s*sigma-s)*cos(theta)/(2*(sigma2+3*theta2))+-s/(2*sigma2)+(s-1)/sigma^3=
         //=(s*sigma-s)/2/sigma2-s/2/sigma2+(s-1)/sigma^3=[(0.5*sigma2-sigma+1)*s-1]/sigma^3
       } else {
-        number_t theta = std::acos(d);
+        double theta = std::acos(d);
         omega = theta / (2 * std::sqrt(1 - d * d)) * deltaR(R);
         Omega = skew(omega);
-        number_t theta2 = theta * theta;
-        number_t a = s_ * std::sin(theta);
-        number_t b = s_ * std::cos(theta);
-        number_t c = theta2 + sigma * sigma;
+        double theta2 = theta * theta;
+        double a = s_ * std::sin(theta);
+        double b = s_ * std::cos(theta);
+        double c = theta2 + sigma * sigma;
         A = (a * sigma + (1 - b) * theta) / (theta * c);
         B = (C - ((b - 1) * sigma + a * theta) / (c)) * 1 / (theta2);
       }
@@ -207,7 +207,7 @@ struct Sim3 {
     return Sim3(r_.conjugate(), r_.conjugate() * ((-1 / s_) * t_), 1 / s_);
   }
 
-  number_t operator[](int i) const {
+  double operator[](int i) const {
     assert(i < 8);
     if (i < 4) {
       return r_.coeffs()[i];
@@ -218,7 +218,7 @@ struct Sim3 {
     return s_;
   }
 
-  number_t& operator[](int i) {
+  double& operator[](int i) {
     assert(i < 8);
     if (i < 4) {
       return r_.coeffs()[i];
@@ -256,9 +256,9 @@ struct Sim3 {
 
   inline Quaternion& rotation() { return r_; }
 
-  inline const number_t& scale() const { return s_; }
+  inline const double& scale() const { return s_; }
 
-  inline number_t& scale() { return s_; }
+  inline double& scale() { return s_; }
 };
 
 inline std::ostream& operator<<(std::ostream& out_str, const Sim3& sim3) {

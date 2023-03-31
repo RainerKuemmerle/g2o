@@ -39,9 +39,9 @@
 
 namespace g2o {
 
-number_t G2O_STUFF_API sampleUniform(number_t min = 0, number_t max = 1,
-                                     std::mt19937* generator = nullptr);
-number_t G2O_STUFF_API sampleGaussian(std::mt19937* generator = nullptr);
+double G2O_STUFF_API sampleUniform(double min = 0, double max = 1,
+                                   std::mt19937* generator = nullptr);
+double G2O_STUFF_API sampleGaussian(std::mt19937* generator = nullptr);
 
 template <class SampleType, class CovarianceType>
 class GaussianSampler {
@@ -86,11 +86,11 @@ class G2O_STUFF_API Sampler {
    * Gaussian random with a mean and standard deviation. Uses the
    * Polar method of Marsaglia.
    */
-  static number_t gaussRand(number_t mean, number_t sigma) {
-    number_t y;
-    number_t r2;
+  static double gaussRand(double mean, double sigma) {
+    double y;
+    double r2;
     do {
-      number_t x = -1.0 + 2.0 * uniformRand(0.0, 1.0);
+      double x = -1.0 + 2.0 * uniformRand(0.0, 1.0);
       y = -1.0 + 2.0 * uniformRand(0.0, 1.0);
       r2 = x * x + y * y;
     } while (r2 > 1.0 || r2 == 0.0);
@@ -100,8 +100,8 @@ class G2O_STUFF_API Sampler {
   /**
    * sample a number from a uniform distribution
    */
-  static number_t uniformRand(number_t lowerBndr, number_t upperBndr) {
-    return lowerBndr + (static_cast<number_t>(std::rand()) / (RAND_MAX + 1.0)) *
+  static double uniformRand(double lowerBndr, double upperBndr) {
+    return lowerBndr + (static_cast<double>(std::rand()) / (RAND_MAX + 1.0)) *
                            (upperBndr - lowerBndr);
   }
   /**

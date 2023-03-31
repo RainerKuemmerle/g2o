@@ -58,11 +58,11 @@ class LinearSolverCSparse : public LinearSolverCCS<MatrixType> {
     return true;
   }
 
-  bool solve(const SparseBlockMatrix<MatrixType>& A, number_t* x,
-             number_t* b) override {
+  bool solve(const SparseBlockMatrix<MatrixType>& A, double* x,
+             double* b) override {
     prepareSolve(A);
 
-    const number_t t = get_monotonic_time();
+    const double t = get_monotonic_time();
     bool ok = csparse_.solve(x, b);
     if (!ok && this->writeDebug()) {
       std::cerr
@@ -95,7 +95,7 @@ class LinearSolverCSparse : public LinearSolverCCS<MatrixType> {
   }
 
   void computeSymbolicDecomposition(const SparseBlockMatrix<MatrixType>& A) {
-    const number_t t = get_monotonic_time();
+    const double t = get_monotonic_time();
     if (!this->blockOrdering()) {
       csparse_.analyze();
     } else {
@@ -148,7 +148,7 @@ class LinearSolverCSparse : public LinearSolverCCS<MatrixType> {
         delete[] ccsA.x;
         delete[] ccsA.i;
         ccsA.i = new int[ccsA.nzmax];
-        ccsA.x = new number_t[ccsA.nzmax];
+        ccsA.x = new double[ccsA.nzmax];
       }
     }
     ccsA.m = m;

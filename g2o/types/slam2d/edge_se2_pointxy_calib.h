@@ -55,7 +55,7 @@ class G2O_TYPES_SLAM2D_API EdgeSE2PointXYCalib
   bool read(std::istream& is) override;
   bool write(std::ostream& os) const override;
 
-  number_t initialEstimatePossible(const OptimizableGraph::VertexSet& from,
+  double initialEstimatePossible(const OptimizableGraph::VertexSet& from,
                                    OptimizableGraph::Vertex* to) override {
     (void)to;
     return (from.count(vertices_[0]) == 1 ? 1.0 : -1.0);

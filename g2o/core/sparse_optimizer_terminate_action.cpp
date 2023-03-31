@@ -38,7 +38,7 @@ SparseOptimizerTerminateAction::SparseOptimizerTerminateAction()
       gainThreshold_(cst(1e-6)),
       maxIterations_(std::numeric_limits<int>::max()) {}
 
-void SparseOptimizerTerminateAction::setGainThreshold(number_t gainThreshold) {
+void SparseOptimizerTerminateAction::setGainThreshold(double gainThreshold) {
   gainThreshold_ = gainThreshold;
 }
 
@@ -68,8 +68,8 @@ bool SparseOptimizerTerminateAction::operator()(
     // number of iterations
     bool stopOptimizer = false;
     if (params->iteration < maxIterations_) {
-      const number_t currentChi = optimizer->activeRobustChi2();
-      const number_t gain = (lastChi_ - currentChi) / currentChi;
+      const double currentChi = optimizer->activeRobustChi2();
+      const double gain = (lastChi_ - currentChi) / currentChi;
       lastChi_ = currentChi;
       stopOptimizer = gain >= 0 && gain < gainThreshold_;
     } else {

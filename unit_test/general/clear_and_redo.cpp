@@ -45,20 +45,20 @@ TEST(General, ClearAndRedo) {
   for (int i = 0; i < 2; i++) {
     // Add vertices
     auto v0 = std::make_shared<g2o::VertexSE3>();
-    v0->setEstimate(Eigen::Transform<number_t, 3, 1>(
-        Eigen::Translation<number_t, 3>(0, 0, 0)));
+    v0->setEstimate(
+        Eigen::Transform<double, 3, 1>(Eigen::Translation<double, 3>(0, 0, 0)));
     v0->setId(0);
     mOptimizer.addVertex(v0);
 
     auto v1 = std::make_shared<g2o::VertexSE3>();
-    v1->setEstimate(Eigen::Transform<number_t, 3, 1>(
-        Eigen::Translation<number_t, 3>(0, 0, 0)));
+    v1->setEstimate(
+        Eigen::Transform<double, 3, 1>(Eigen::Translation<double, 3>(0, 0, 0)));
     v1->setId(1);
     mOptimizer.addVertex(v1);
 
     auto v2 = std::make_shared<g2o::VertexSE3>();
-    v2->setEstimate(Eigen::Transform<number_t, 3, 1>(
-        Eigen::Translation<number_t, 3>(0, 0, 0)));
+    v2->setEstimate(
+        Eigen::Transform<double, 3, 1>(Eigen::Translation<double, 3>(0, 0, 0)));
     v2->setId(2);
     mOptimizer.addVertex(v2);
 
@@ -66,16 +66,14 @@ TEST(General, ClearAndRedo) {
     auto e1 = std::make_shared<g2o::EdgeSE3>();
     e1->vertices()[0] = mOptimizer.vertex(0);
     e1->vertices()[1] = mOptimizer.vertex(1);
-    e1->setMeasurement(
-        g2o::Isometry3(Eigen::Translation<number_t, 3>(1, 0, 0)));
+    e1->setMeasurement(g2o::Isometry3(Eigen::Translation<double, 3>(1, 0, 0)));
     e1->setInformation(g2o::MatrixN<6>::Identity());
     mOptimizer.addEdge(e1);
 
     auto e2 = std::make_shared<g2o::EdgeSE3>();
     e2->vertices()[0] = mOptimizer.vertex(1);
     e2->vertices()[1] = mOptimizer.vertex(2);
-    e2->setMeasurement(
-        g2o::Isometry3(Eigen::Translation<number_t, 3>(0, 1, 0)));
+    e2->setMeasurement(g2o::Isometry3(Eigen::Translation<double, 3>(0, 1, 0)));
     e2->setInformation(g2o::MatrixN<6>::Identity());
     mOptimizer.addEdge(e2);
 
@@ -83,7 +81,7 @@ TEST(General, ClearAndRedo) {
     e3->vertices()[0] = mOptimizer.vertex(2);
     e3->vertices()[1] = mOptimizer.vertex(0);
     e3->setMeasurement(
-        g2o::Isometry3(Eigen::Translation<number_t, 3>(-0.8, -0.7, 0.1)));
+        g2o::Isometry3(Eigen::Translation<double, 3>(-0.8, -0.7, 0.1)));
     e3->setInformation(g2o::MatrixN<6>::Identity());
     mOptimizer.addEdge(e3);
 

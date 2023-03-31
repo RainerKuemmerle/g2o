@@ -51,7 +51,7 @@ class G2O_TYPES_SLAM2D_API SE2 {
 
   explicit SE2(const Vector3& v) : R_(v[2]), t_(v[0], v[1]) {}
 
-  SE2(number_t x, number_t y, number_t theta) : R_(theta), t_(x, y) {}
+  SE2(double x, double y, double theta) : R_(theta), t_(x, y) {}
 
   //! translational component
   inline const Vector2& translation() const { return t_; }
@@ -92,7 +92,7 @@ class G2O_TYPES_SLAM2D_API SE2 {
     return ret;
   }
 
-  inline number_t operator[](int i) const {
+  inline double operator[](int i) const {
     assert(i >= 0 && i < 3);
     if (i < 2) return t_(i);
     return R_.angle();

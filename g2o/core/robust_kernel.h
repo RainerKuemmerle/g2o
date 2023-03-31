@@ -48,7 +48,7 @@ namespace g2o {
 class G2O_CORE_API RobustKernel {
  public:
   RobustKernel() = default;
-  explicit RobustKernel(number_t delta);
+  explicit RobustKernel(double delta);
   virtual ~RobustKernel() = default;
   /**
    * compute the scaling factor for a error:
@@ -58,17 +58,17 @@ class G2O_CORE_API RobustKernel {
    * rho[1]: First derivative of the scaling function
    * rho[2]: Second derivative of the scaling function
    */
-  virtual void robustify(number_t squaredError, Vector3& rho) const = 0;
+  virtual void robustify(double squaredError, Vector3& rho) const = 0;
 
   /**
    * set the window size of the error. A squared error above delta^2 is
    * considered as outlier in the data.
    */
-  virtual void setDelta(number_t delta);
-  number_t delta() const { return delta_; }
+  virtual void setDelta(double delta);
+  double delta() const { return delta_; }
 
  protected:
-  number_t delta_{1.};
+  double delta_{1.};
 };
 using RobustKernelPtr = std::shared_ptr<RobustKernel>;
 

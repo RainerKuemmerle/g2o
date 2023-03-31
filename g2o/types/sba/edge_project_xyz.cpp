@@ -58,12 +58,12 @@ void EdgeSE3ProjectXYZ::linearizeOplus() {
   Vector3 xyz = vi->estimate();
   Vector3 xyz_trans = T.map(xyz);
 
-  number_t x = xyz_trans[0];
-  number_t y = xyz_trans[1];
-  number_t z = xyz_trans[2];
-  number_t z_2 = z * z;
+  double x = xyz_trans[0];
+  double y = xyz_trans[1];
+  double z = xyz_trans[2];
+  double z_2 = z * z;
 
-  Eigen::Matrix<number_t, 2, 3> tmp;
+  Eigen::Matrix<double, 2, 3> tmp;
   tmp(0, 0) = fx;
   tmp(0, 1) = 0;
   tmp(0, 2) = -x / z * fx;

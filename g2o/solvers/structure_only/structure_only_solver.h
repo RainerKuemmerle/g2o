@@ -78,10 +78,10 @@ class StructureOnlySolver : public OptimizationAlgorithm {
       assert(v->dimension() == PointDoF);
       const g2o::HyperGraph::EdgeSetWeak& track = v->edges();
       assert(track.size() >= 2);
-      number_t chi2 = 0;
+      double chi2 = 0;
       // TODO(Rainer): make these parameters
-      number_t mu = cst(0.01);
-      number_t nu = 2;
+      double mu = cst(0.01);
+      double nu = 2;
 
       for (const auto& it_t : track) {
         auto e = std::static_pointer_cast<OptimizableGraph::Edge>(it_t.lock());
@@ -96,7 +96,7 @@ class StructureOnlySolver : public OptimizationAlgorithm {
       }
 
       if (!v->fixed()) {
-        Eigen::Matrix<number_t, PointDoF, PointDoF, Eigen::ColMajor> H_pp;
+        Eigen::Matrix<double, PointDoF, PointDoF, Eigen::ColMajor> H_pp;
         H_pp.resize(v->dimension(), v->dimension());
         v->mapHessianMemory(H_pp.data());
         for (int i_g = 0; i_g < num_iters; ++i_g) {
@@ -141,7 +141,7 @@ class StructureOnlySolver : public OptimizationAlgorithm {
           }
 
           using PointVector =
-              Eigen::Matrix<number_t, PointDoF, 1, Eigen::ColMajor>;
+              Eigen::Matrix<double, PointDoF, 1, Eigen::ColMajor>;
           Eigen::Map<PointVector> b(v->bData(), v->dimension());
           if (b.norm() < 0.001) {
             stop = true;
@@ -151,7 +151,7 @@ class StructureOnlySolver : public OptimizationAlgorithm {
           int trial = 0;
           do {
             using PointMatrix =
-                Eigen::Matrix<number_t, PointDoF, PointDoF, Eigen::ColMajor>;
+                Eigen::Matrix<double, PointDoF, PointDoF, Eigen::ColMajor>;
             PointMatrix H_pp_mu = H_pp;
             H_pp_mu.diagonal().array() += mu;
             Eigen::LDLT<PointMatrix> chol_H_pp(H_pp_mu);
@@ -160,7 +160,7 @@ class StructureOnlySolver : public OptimizationAlgorithm {
               PointVector delta_p = chol_H_pp.solve(b);
               v->push();
               v->oplus(VectorX::MapType(delta_p.data(), delta_p.size()));
-              number_t new_chi2 = 0;
+              double new_chi2 = 0;
               for (const auto& it_t : track) {
                 auto e = std::static_pointer_cast<OptimizableGraph::Edge>(
                     it_t.lock());
@@ -174,7 +174,7 @@ class StructureOnlySolver : public OptimizationAlgorithm {
                 }
               }
               assert(g2o_isnan(new_chi2) == false && "Chi is NaN");
-              const number_t rho = (chi2 - new_chi2);
+              const double rho = (chi2 - new_chi2);
               if (rho > 0 && g2o_isfinite(new_chi2)) {
                 goodStep = true;
                 chi2 = new_chi2;

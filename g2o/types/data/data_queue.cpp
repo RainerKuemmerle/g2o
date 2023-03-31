@@ -30,7 +30,7 @@
 
 namespace g2o {
 
-DataQueue::RobotDataPtr DataQueue::findClosestData(number_t timestamp) const {
+DataQueue::RobotDataPtr DataQueue::findClosestData(double timestamp) const {
   if (buffer_.rbegin()->first < timestamp) return buffer_.rbegin()->second;
   if (buffer_.begin()->first > timestamp) return buffer_.begin()->second;
 
@@ -42,14 +42,14 @@ DataQueue::RobotDataPtr DataQueue::findClosestData(number_t timestamp) const {
   return ub->second;
 }
 
-DataQueue::RobotDataPtr DataQueue::before(number_t timestamp) const {
+DataQueue::RobotDataPtr DataQueue::before(double timestamp) const {
   if (buffer_.empty() || buffer_.begin()->first >= timestamp) return nullptr;
   auto lb = buffer_.upper_bound(timestamp);
   --lb;  // now it's the lower bound
   return lb->second;
 }
 
-DataQueue::RobotDataPtr DataQueue::after(number_t timestamp) const {
+DataQueue::RobotDataPtr DataQueue::after(double timestamp) const {
   if (buffer_.empty() || buffer_.rbegin()->first < timestamp) return nullptr;
   auto ub = buffer_.upper_bound(timestamp);
   if (ub == buffer_.end()) return nullptr;

@@ -63,13 +63,13 @@ class G2O_TYPES_SBA_API VertexCam : public BaseVertex<6, SBACam> {
     estimate_.setDr();
   }
 
-  bool setEstimateDataImpl(const number_t* est) override {
+  bool setEstimateDataImpl(const double* est) override {
     Eigen::Map<const Vector7> v(est);
     estimate_.fromVector(v);
     return true;
   }
 
-  bool getEstimateData(number_t* est) const override {
+  bool getEstimateData(double* est) const override {
     Eigen::Map<Vector7> v(est);
     v = estimate().toVector();
     return true;
@@ -77,13 +77,13 @@ class G2O_TYPES_SBA_API VertexCam : public BaseVertex<6, SBACam> {
 
   int estimateDimension() const override { return 7; }
 
-  bool setMinimalEstimateDataImpl(const number_t* est) override {
+  bool setMinimalEstimateDataImpl(const double* est) override {
     Eigen::Map<const Vector6> v(est);
     estimate_.fromMinimalVector(v);
     return true;
   }
 
-  bool getMinimalEstimateData(number_t* est) const override {
+  bool getMinimalEstimateData(double* est) const override {
     Eigen::Map<Vector6> v(est);
     v = estimate_.toMinimalVector();
     return true;

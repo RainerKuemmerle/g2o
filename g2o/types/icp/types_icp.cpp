@@ -62,7 +62,7 @@ Matrix3 VertexSCam::dRidx_;  // differential quat matrices
 Matrix3 VertexSCam::dRidy_;  // differential quat matrices
 Matrix3 VertexSCam::dRidz_;  // differential quat matrices
 Matrix3 VertexSCam::kcam_;
-number_t VertexSCam::baseline_;
+double VertexSCam::baseline_;
 
 // global initialization
 G2O_ATTRIBUTE_CONSTRUCTOR(init_icp_types) { types_icp::init(); }
@@ -118,7 +118,7 @@ bool EdgeVVGicp::read(std::istream &is) {
 
   // point-plane only
   Matrix3 prec;
-  number_t v = cst(.01);
+  double v = cst(.01);
   prec << v, 0, 0, 0, v, 0, 0, 0, 1;
   const Matrix3 &R = measurement().R0;  // plane of the point in vp0
   information() = R.transpose() * prec * R;
@@ -201,31 +201,31 @@ void Edge_XYZ_VSC::linearizeOplus() {
   trans(3) = 1.0;
 
   // first get the world point in camera coords
-  Eigen::Matrix<number_t, 3, 1, Eigen::ColMajor> pc = vc->w2n * pt;
+  Eigen::Matrix<double, 3, 1, Eigen::ColMajor> pc = vc->w2n * pt;
 
   // Jacobians wrt camera parameters
   // set d(quat-x) values [ pz*dpx/dx - px*dpz/dx ] / pz^2
-  number_t px = pc(0);
-  number_t py = pc(1);
-  number_t pz = pc(2);
-  number_t ipz2 = 1.0 / (pz * pz);
+  double px = pc(0);
+  double py = pc(1);
+  double pz = pc(2);
+  double ipz2 = 1.0 / (pz * pz);
   if (isnan(ipz2)) {
     std::cout << "[SetJac] infinite jac" << std::endl;
     *(int *)0x0 = 0;
   }
 
-  number_t ipz2fx = ipz2 * vc->Kcam(0, 0);  // Fx
-  number_t ipz2fy = ipz2 * vc->Kcam(1, 1);  // Fy
-  number_t b = vc->baseline;                // stereo baseline
+  double ipz2fx = ipz2 * vc->Kcam(0, 0);  // Fx
+  double ipz2fy = ipz2 * vc->Kcam(1, 1);  // Fy
+  double b = vc->baseline;                // stereo baseline
 
-  Eigen::Matrix<number_t, 3, 1, Eigen::ColMajor> pwt;
+  Eigen::Matrix<double, 3, 1, Eigen::ColMajor> pwt;
 
   // check for local vars
   pwt = (pt - trans)
             .head<3>();  // transform translations, use differential rotation
 
   // dx
-  Eigen::Matrix<number_t, 3, 1, Eigen::ColMajor> dp =
+  Eigen::Matrix<double, 3, 1, Eigen::ColMajor> dp =
       vc->dRdx * pwt;  // dR'/dq * [pw - t]
   jacobianOplusXj_(0, 3) = (pz * dp(0) - px * dp(2)) * ipz2fx;
   jacobianOplusXj_(1, 3) = (pz * dp(1) - py * dp(2)) * ipz2fy;

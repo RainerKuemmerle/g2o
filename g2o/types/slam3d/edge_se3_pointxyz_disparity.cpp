@@ -90,7 +90,7 @@ void EdgeSE3PointXYZDisparity::linearizeOplus() {
 
   Vector3 Zcam = cache_->w2l() * vp->estimate();
 
-  using JacType = Eigen::Matrix<number_t, 3, 9>;
+  using JacType = Eigen::Matrix<double, 3, 9>;
   JacType Jprime = JacType::Zero();
   Jprime.block<3, 3>(0, 0) = -Matrix3::Identity();
 
@@ -108,7 +108,7 @@ void EdgeSE3PointXYZDisparity::linearizeOplus() {
 
   Jprime.block<3, 3>(0, 6) = cache_->w2l().rotation();
 
-  // Eigen::Matrix<number_t,3,9,Eigen::ColMajor> Jprime =
+  // Eigen::Matrix<double,3,9,Eigen::ColMajor> Jprime =
   // vcache->params->Kcam_inverseOffsetR  * J;
   Jprime = cache_->camParams()->Kcam_inverseOffsetR() * Jprime;
   JacType Jhom;
@@ -161,10 +161,10 @@ void EdgeSE3PointXYZDisparity::initialEstimate(
   //   cerr << "fatal error in retrieving cache" << endl;
   // }
   // ParameterCamera* params=vcache->params;
-  const Eigen::Matrix<number_t, 3, 3, Eigen::ColMajor>& invKcam =
+  const Eigen::Matrix<double, 3, 3, Eigen::ColMajor>& invKcam =
       cache_->camParams()->invKcam();
   Vector3 p;
-  number_t w = 1. / measurement_(2);
+  double w = 1. / measurement_(2);
   p.head<2>() = measurement_.head<2>() * w;
   p(2) = w;
   p = invKcam * p;

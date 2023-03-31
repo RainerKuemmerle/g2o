@@ -51,13 +51,13 @@ class G2O_TYPES_SLAM3D_ADDONS_API EdgePlane
 
   void setMeasurement(const Vector4& m) override { measurement_ = m; }
 
-  bool setMeasurementData(const number_t* d) override {
+  bool setMeasurementData(const double* d) override {
     Eigen::Map<const Vector4> m(d);
     measurement_ = m;
     return true;
   }
 
-  bool getMeasurementData(number_t* d) const override {
+  bool getMeasurementData(double* d) const override {
     Eigen::Map<Vector4> m(d);
     m = measurement_;
     return true;

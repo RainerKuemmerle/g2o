@@ -95,7 +95,7 @@ OutputIterator readFloats(const char* str, OutputIterator out) {
   char* cl = const_cast<char*>(str);
   char* cle = cl;
   while (true) {
-    number_t val = strtod(cl, &cle);
+    double val = strtod(cl, &cle);
     if (cl == cle) break;
     *out++ = val;
     cl = cle;
@@ -168,6 +168,11 @@ G2O_STUFF_API std::vector<std::string> strSplit(const std::string& s,
  * -1 on eof()
  */
 G2O_STUFF_API int readLine(std::istream& is, std::stringstream& currentLine);
+
+/**
+ * read from string until the end of a line is reached.
+ */
+G2O_STUFF_API void skipLine(std::istream& is);
 
 // @}
 

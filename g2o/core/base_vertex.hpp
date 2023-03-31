@@ -31,13 +31,13 @@ BaseVertex<D, T>::BaseVertex()
 }
 
 template <int D, typename T>
-number_t BaseVertex<D, T>::solveDirect(number_t lambda) {
-  Eigen::Matrix<number_t, D, D, Eigen::ColMajor> tempA =
-      hessian_ + Eigen::Matrix<number_t, D, D, Eigen::ColMajor>::Identity(
+double BaseVertex<D, T>::solveDirect(double lambda) {
+  Eigen::Matrix<double, D, D, Eigen::ColMajor> tempA =
+      hessian_ + Eigen::Matrix<double, D, D, Eigen::ColMajor>::Identity(
                      G2O_VERTEX_DIM, G2O_VERTEX_DIM) *
                      lambda;
-  number_t det = tempA.determinant();
-  if (g2o_isnan(det) || det < std::numeric_limits<number_t>::epsilon())
+  double det = tempA.determinant();
+  if (g2o_isnan(det) || det < std::numeric_limits<double>::epsilon())
     return det;
   BVector dx = tempA.llt().solve(b_);
   oplus(VectorX::MapType(dx.data(), dx.size()));
@@ -45,7 +45,7 @@ number_t BaseVertex<D, T>::solveDirect(number_t lambda) {
 }
 
 template <int D, typename T>
-void BaseVertex<D, T>::mapHessianMemory(number_t* d) {
+void BaseVertex<D, T>::mapHessianMemory(double* d) {
   const int vertexDim = G2O_VERTEX_DIM;
   new (&hessian_) HessianBlockType(d, vertexDim, vertexDim);
 }

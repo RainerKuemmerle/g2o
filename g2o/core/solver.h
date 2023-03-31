@@ -88,7 +88,7 @@ class G2O_CORE_API Solver {
    * true, then the solver should store a backup of the diagonal, which can be
    * restored by restoreDiagonal()
    */
-  virtual bool setLambda(number_t lambda, bool backup = false) = 0;
+  virtual bool setLambda(double lambda, bool backup = false) = 0;
 
   /**
    * restore a previously made backup of the diagonal
@@ -96,11 +96,11 @@ class G2O_CORE_API Solver {
   virtual void restoreDiagonal() = 0;
 
   //! return x, the solution vector
-  number_t* x() { return x_; }
-  const number_t* x() const { return x_; }
+  double* x() { return x_; }
+  const double* x() const { return x_; }
   //! return b, the right hand side of the system
-  number_t* b() { return b_; }
-  const number_t* b() const { return b_; }
+  double* b() { return b_; }
+  const double* b() const { return b_; }
 
   //! return the size of the solution vector (x) and b
   size_t vectorSize() const { return xSize_; }
@@ -138,8 +138,8 @@ class G2O_CORE_API Solver {
 
  protected:
   SparseOptimizer* optimizer_{nullptr};
-  number_t* x_{nullptr};
-  number_t* b_{nullptr};
+  double* x_{nullptr};
+  double* b_{nullptr};
   size_t xSize_{0}, maxXSize_{0};
   bool isLevenberg_{
       false};  ///< the system we gonna solve is a Levenberg-Marquardt system

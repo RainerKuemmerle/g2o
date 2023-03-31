@@ -41,7 +41,7 @@ OptimizationAlgorithmLevenberg::OptimizationAlgorithmLevenberg(
     std::unique_ptr<Solver> solver)
     : OptimizationAlgorithmWithHessian(*solver), m_solver_{std::move(solver)} {
   userLambdaInit_ =
-      properties_.makeProperty<Property<number_t> >("initialLambda", 0.);
+      properties_.makeProperty<Property<double> >("initialLambda", 0.);
   maxTrialsAfterFailure_ =
       properties_.makeProperty<Property<int> >("maxTrialsAfterFailure", 10);
 }
@@ -62,7 +62,7 @@ OptimizationAlgorithm::SolverResult OptimizationAlgorithmLevenberg::solve(
     }
   }
 
-  number_t t = get_monotonic_time();
+  double t = get_monotonic_time();
   optimizer_->computeActiveErrors();
   G2OBatchStatistics* globalStats = G2OBatchStatistics::globalStats();
   if (globalStats) {
@@ -70,7 +70,7 @@ OptimizationAlgorithm::SolverResult OptimizationAlgorithmLevenberg::solve(
     t = get_monotonic_time();
   }
 
-  number_t currentChi = optimizer_->activeRobustChi2();
+  double currentChi = optimizer_->activeRobustChi2();
 
   solver_.buildSystem();
   if (globalStats) {
@@ -83,7 +83,7 @@ OptimizationAlgorithm::SolverResult OptimizationAlgorithmLevenberg::solve(
     ni_ = 2;
   }
 
-  number_t rho = 0;
+  double rho = 0;
   int& qmax = levenbergIterations_;
   qmax = 0;
   do {
@@ -108,19 +108,18 @@ OptimizationAlgorithm::SolverResult OptimizationAlgorithmLevenberg::solve(
     solver_.restoreDiagonal();
 
     optimizer_->computeActiveErrors();
-    const number_t tempChi = ok2 ? optimizer_->activeRobustChi2()
-                                 : std::numeric_limits<number_t>::max();
+    const double tempChi = ok2 ? optimizer_->activeRobustChi2()
+                                 : std::numeric_limits<double>::max();
 
     rho = (currentChi - tempChi);
-    number_t scale = computeScale();
-    scale += cst(1e-3);  // make sure it's non-zero :)
+    double scale = ok2 ? computeScale() + cst(1e-3) : 1; // make sure it's non-zero :)
     rho /= scale;
 
-    if (rho > 0 && g2o_isfinite(tempChi)) {  // last step was good
-      number_t alpha = 1. - pow((2 * rho - 1), 3);
+    if (rho > 0 && g2o_isfinite(tempChi) && ok2) {  // last step was good
+      double alpha = 1. - pow((2 * rho - 1), 3);
       // crop lambda between minimum and maximum factors
       alpha = (std::min)(alpha, goodStepUpperScale_);
-      const number_t scaleFactor = (std::max)(goodStepLowerScale_, alpha);
+      const double scaleFactor = (std::max)(goodStepLowerScale_, alpha);
       currentLambda_ *= scaleFactor;
       ni_ = 2;
       currentChi = tempChi;
@@ -141,9 +140,9 @@ OptimizationAlgorithm::SolverResult OptimizationAlgorithmLevenberg::solve(
   return kOk;
 }
 
-number_t OptimizationAlgorithmLevenberg::computeLambdaInit() const {
+double OptimizationAlgorithmLevenberg::computeLambdaInit() const {
   if (userLambdaInit_->value() > 0) return userLambdaInit_->value();
-  number_t maxDiagonal = 0;
+  double maxDiagonal = 0;
   for (auto* v : optimizer_->indexMapping()) {
     assert(v);
     MatrixN<Eigen::Dynamic>::MapType hessian = v->hessianMap();
@@ -153,8 +152,8 @@ number_t OptimizationAlgorithmLevenberg::computeLambdaInit() const {
   return tau_ * maxDiagonal;
 }
 
-number_t OptimizationAlgorithmLevenberg::computeScale() const {
-  number_t scale = 0;
+double OptimizationAlgorithmLevenberg::computeScale() const {
+  double scale = 0;
   for (size_t j = 0; j < solver_.vectorSize(); j++) {
     scale +=
         solver_.x()[j] * (currentLambda_ * solver_.x()[j] + solver_.b()[j]);
@@ -166,7 +165,7 @@ void OptimizationAlgorithmLevenberg::setMaxTrialsAfterFailure(int max_trials) {
   maxTrialsAfterFailure_->setValue(max_trials);
 }
 
-void OptimizationAlgorithmLevenberg::setUserLambdaInit(number_t lambda) {
+void OptimizationAlgorithmLevenberg::setUserLambdaInit(double lambda) {
   userLambdaInit_->setValue(lambda);
 }
 

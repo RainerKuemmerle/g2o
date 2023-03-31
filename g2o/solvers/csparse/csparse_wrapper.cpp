@@ -87,7 +87,7 @@ class CSparse::Impl {
     if (csWorkspaceSize < ccsA.n) {
       csWorkspaceSize = csWorkspaceSize == 0 ? ccsA.n : 2 * ccsA.n;
       delete[] csWorkspace;
-      csWorkspace = new number_t[csWorkspaceSize];
+      csWorkspace = new double[csWorkspaceSize];
       delete[] csIntWorkspace;
       csIntWorkspace = new int[2 * csWorkspaceSize];
     }
@@ -95,7 +95,7 @@ class CSparse::Impl {
 
   css* symbolicDecomposition = nullptr;
   int csWorkspaceSize = 0;
-  number_t* csWorkspace = nullptr;
+  double* csWorkspace = nullptr;
   int* csIntWorkspace = nullptr;
   csn* numericCholesky = nullptr;
   CSparseExt ccsA;

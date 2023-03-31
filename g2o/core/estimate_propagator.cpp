@@ -52,7 +52,7 @@ void EstimatePropagator::AdjacencyMapEntry::reset() {
   child_ = nullptr;
   parent_.clear();
   edge_ = nullptr;
-  distance_ = std::numeric_limits<number_t>::max();
+  distance_ = std::numeric_limits<double>::max();
   frontierLevel_ = -1;
   inQueue_ = false;
 }
@@ -79,8 +79,8 @@ void EstimatePropagator::reset() {
 void EstimatePropagator::propagate(
     const std::shared_ptr<OptimizableGraph::Vertex>& v,
     const EstimatePropagator::PropagateCost& cost,
-    const EstimatePropagator::PropagateAction& action, number_t maxDistance,
-    number_t maxEdgeCost) {
+    const EstimatePropagator::PropagateAction& action, double maxDistance,
+    double maxEdgeCost) {
   OptimizableGraph::VertexSet vset;
   vset.insert(v);
   propagate(vset, cost, action, maxDistance, maxEdgeCost);
@@ -89,8 +89,8 @@ void EstimatePropagator::propagate(
 void EstimatePropagator::propagate(
     OptimizableGraph::VertexSet& vset,
     const EstimatePropagator::PropagateCost& cost,
-    const EstimatePropagator::PropagateAction& action, number_t maxDistance,
-    number_t maxEdgeCost) {
+    const EstimatePropagator::PropagateAction& action, double maxDistance,
+    double maxEdgeCost) {
   reset();
 
   PriorityQueue frontier;
@@ -107,7 +107,7 @@ void EstimatePropagator::propagate(
   while (!frontier.empty()) {
     AdjacencyMapEntry* entry = frontier.pop();
     const auto& u = entry->child();
-    const number_t uDistance = entry->distance();
+    const double uDistance = entry->distance();
     // cerr << "uDistance " << uDistance << endl;
 
     // initialize the vertex
@@ -129,7 +129,7 @@ void EstimatePropagator::propagate(
             std::static_pointer_cast<OptimizableGraph::Vertex>(edge->vertex(i));
         if (!z) continue;
         auto ot = adjacencyMap_.find(z);
-        if (ot->second.distance_ != std::numeric_limits<number_t>::max()) {
+        if (ot->second.distance_ != std::numeric_limits<double>::max()) {
           initializedVertices.insert(z);
           maxFrontier = (std::max)(maxFrontier, ot->second.frontierLevel_);
         }
@@ -143,12 +143,12 @@ void EstimatePropagator::propagate(
         if (z == u) continue;
         const size_t wasInitialized = initializedVertices.erase(z);
 
-        const number_t edgeDistance =
+        const double edgeDistance =
             cost(edge.get(), initializedVertices, z.get());
         if (edgeDistance > 0. &&
-            edgeDistance != std::numeric_limits<number_t>::max() &&
+            edgeDistance != std::numeric_limits<double>::max() &&
             edgeDistance < maxEdgeCost) {
-          const number_t zDistance = uDistance + edgeDistance;
+          const double zDistance = uDistance + edgeDistance;
           // cerr << z->id() << " " << zDistance << endl;
 
           auto ot = adjacencyMap_.find(z);
@@ -232,14 +232,14 @@ EstimatePropagator::PriorityQueue::pop() {
 EstimatePropagatorCost::EstimatePropagatorCost(SparseOptimizer* graph)
     : graph_(graph) {}
 
-number_t EstimatePropagatorCost::operator()(
+double EstimatePropagatorCost::operator()(
     OptimizableGraph::Edge* edge, const OptimizableGraph::VertexSet& from,
     OptimizableGraph::Vertex* to_) const {
   auto* e = dynamic_cast<OptimizableGraph::Edge*>(edge);
   auto* to = dynamic_cast<OptimizableGraph::Vertex*>(to_);
   auto it = graph_->findActiveEdge(e);
   if (it == graph_->activeEdges().end())  // it has to be an active edge
-    return std::numeric_limits<number_t>::max();
+    return std::numeric_limits<double>::max();
   return e->initialEstimatePossible(from, to);
 }
 
@@ -247,7 +247,7 @@ EstimatePropagatorCostOdometry::EstimatePropagatorCostOdometry(
     SparseOptimizer* graph)
     : EstimatePropagatorCost(graph) {}
 
-number_t EstimatePropagatorCostOdometry::operator()(
+double EstimatePropagatorCostOdometry::operator()(
     OptimizableGraph::Edge* edge, const OptimizableGraph::VertexSet& from_,
     OptimizableGraph::Vertex* to_) const {
   auto* e = dynamic_cast<OptimizableGraph::Edge*>(edge);
@@ -256,10 +256,10 @@ number_t EstimatePropagatorCostOdometry::operator()(
   auto* to = dynamic_cast<OptimizableGraph::Vertex*>(to_);
   if (std::abs(from->id() - to->id()) !=
       1)  // simple method to identify odometry edges in a pose graph
-    return std::numeric_limits<number_t>::max();
+    return std::numeric_limits<double>::max();
   auto it = graph_->findActiveEdge(e);
   if (it == graph_->activeEdges().end())  // it has to be an active edge
-    return std::numeric_limits<number_t>::max();
+    return std::numeric_limits<double>::max();
   return e->initialEstimatePossible(from_, to);
 }
 

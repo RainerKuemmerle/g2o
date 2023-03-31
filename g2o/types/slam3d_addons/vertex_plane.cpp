@@ -78,9 +78,9 @@ bool VertexPlaneDrawAction::operator()(
 
   if (planeWidth_ && planeHeight_) {
     auto* that = static_cast<VertexPlane*>(&element);
-    number_t d = that->estimate().distance();
-    number_t azimuth = Plane3D::azimuth(that->estimate().normal());
-    number_t elevation = Plane3D::elevation(that->estimate().normal());
+    double d = that->estimate().distance();
+    double azimuth = Plane3D::azimuth(that->estimate().normal());
+    double elevation = Plane3D::elevation(that->estimate().normal());
     glColor3f(static_cast<float>(that->color(0)),
               static_cast<float>(that->color(1)),
               static_cast<float>(that->color(2)));

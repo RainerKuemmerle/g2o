@@ -58,7 +58,7 @@ class G2O_TYPES_SCLAM2D_API EdgeSE2SensorCalib
     inverseMeasurement_ = m.inverse();
   }
 
-  number_t initialEstimatePossible(const OptimizableGraph::VertexSet& from,
+  double initialEstimatePossible(const OptimizableGraph::VertexSet& from,
                                    OptimizableGraph::Vertex* to) override {
     if (from.count(vertices_[2]) == 1  // need the laser offset
         && ((from.count(vertices_[0]) == 1 && to == vertices_[1].get()) ||

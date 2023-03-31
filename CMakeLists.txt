@@ -445,7 +445,7 @@ if(MSVC)
   add_definitions(-D_CRT_SECURE_NO_WARNINGS=1)  # Avoid deprecated fprintf(), etc.
   add_definitions("/nologo")
   # TODO not sure this should be a thing
-  add_definitions("/wd4244") # Conversion from number_t -> int
+  add_definitions("/wd4244") # Conversion from double -> int
   add_definitions("/wd4267") # Conversion during return
   add_definitions("/wd4522") # Duplicated operator=() in Eigen headers
 

@@ -40,7 +40,7 @@ Vector6 Line3D::toCartesian() const {
   Vector6 cartesian;
   cartesian.tail<3>() = d() / d().norm();
   Matrix3 W = -skew(d());
-  number_t damping = cst(1e-9);
+  double damping = cst(1e-9);
   Matrix3 A = W.transpose() * W + (Matrix3::Identity() * damping);
   cartesian.head<3>() = A.ldlt().solve(W.transpose() * w());
   return cartesian;

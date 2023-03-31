@@ -42,32 +42,30 @@ struct G2O_CORE_API G2OBatchStatistics {
   int iteration;    ///< which iteration
   int numVertices;  ///< how many vertices are involved
   int numEdges;     ///< how many edges
-  number_t chi2;    ///< total chi2
+  double chi2;      ///< total chi2
 
   /** timings **/
   // nonlinear part
-  number_t timeResiduals;      ///< residuals
-  number_t timeLinearize;      ///< jacobians
-  number_t timeQuadraticForm;  ///< construct the quadratic form in the graph
+  double timeResiduals;        ///< residuals
+  double timeLinearize;        ///< jacobians
+  double timeQuadraticForm;    ///< construct the quadratic form in the graph
   int levenbergIterations;     ///< number of iterations performed by LM
   // block_solver (constructs Ax=b, plus maybe schur)
-  number_t timeSchurComplement;  ///< compute schur complement (0 if not done)
+  double timeSchurComplement;  ///< compute schur complement (0 if not done)
 
   // linear solver (computes Ax=b);
-  number_t
-      timeSymbolicDecomposition;  ///< symbolic decomposition (0 if not done)
-  number_t
-      timeNumericDecomposition;  ///< numeric decomposition  (0 if not done)
-  number_t timeLinearSolution;   ///< total time for solving Ax=b (including
-                                 ///< detup for schur)
-  number_t timeLinearSolver;     ///< time for solving, excluding Schur setup
+  double timeSymbolicDecomposition;  ///< symbolic decomposition (0 if not done)
+  double timeNumericDecomposition;   ///< numeric decomposition  (0 if not done)
+  double timeLinearSolution;         ///< total time for solving Ax=b (including
+                                     ///< detup for schur)
+  double timeLinearSolver;       ///< time for solving, excluding Schur setup
   int iterationsLinearSolver;    ///< iterations of PCG, (0 if not used, i.e.,
                                  ///< Cholesky)
-  number_t timeUpdate;           ///< time to apply the update
-  number_t timeIteration;        ///< total time;
+  double timeUpdate;             ///< time to apply the update
+  double timeIteration;          ///< total time;
 
-  number_t timeMarginals;  ///< computing the inverse elements (solve blocks)
-                           ///< and thus the marginal covariances
+  double timeMarginals;  ///< computing the inverse elements (solve blocks)
+                         ///< and thus the marginal covariances
 
   // information about the Hessian matrix
   size_t hessianDimension;      ///< rows / cols of the Hessian

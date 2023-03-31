@@ -49,7 +49,7 @@ OptimizationAlgorithm::SolverResult OptimizationAlgorithmGaussNewton::solve(
 
   // here so that correct component for max-mixtures can be computed before the
   // build structure
-  number_t t = get_monotonic_time();
+  double t = get_monotonic_time();
   optimizer_->computeActiveErrors();
   G2OBatchStatistics* globalStats = G2OBatchStatistics::globalStats();
   if (globalStats) {

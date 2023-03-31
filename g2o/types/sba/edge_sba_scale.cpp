@@ -29,7 +29,7 @@
 namespace g2o {
 
 bool EdgeSBAScale::read(std::istream& is) {
-  number_t meas;
+  double meas;
   is >> meas;
   setMeasurement(meas);
   information().setIdentity();
@@ -49,14 +49,14 @@ void EdgeSBAScale::initialEstimate(const OptimizableGraph::VertexSet& from_,
   // compute the translation vector of v1 w.r.t v2
   if (from_.count(v1) == 1) {
     SE3Quat delta = (v1->estimate().inverse() * v2->estimate());
-    number_t norm = delta.translation().norm();
-    number_t alpha = measurement_ / norm;
+    double norm = delta.translation().norm();
+    double alpha = measurement_ / norm;
     delta.setTranslation(delta.translation() * alpha);
     v2->setEstimate(SBACam(v1->estimate() * delta));
   } else {
     SE3Quat delta = (v2->estimate().inverse() * v1->estimate());
-    number_t norm = delta.translation().norm();
-    number_t alpha = measurement_ / norm;
+    double norm = delta.translation().norm();
+    double alpha = measurement_ / norm;
     delta.setTranslation(delta.translation() * alpha);
     v1->setEstimate(SBACam(v2->estimate() * delta));
   }

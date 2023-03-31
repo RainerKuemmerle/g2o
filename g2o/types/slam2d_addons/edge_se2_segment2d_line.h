@@ -43,14 +43,14 @@ class EdgeSE2Segment2DLine
  public:
   G2O_TYPES_SLAM2D_ADDONS_API EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
-      G2O_TYPES_SLAM2D_ADDONS_API number_t
+      G2O_TYPES_SLAM2D_ADDONS_API double
       theta() const {
     return measurement_[0];
   }
-  G2O_TYPES_SLAM2D_ADDONS_API number_t rho() const { return measurement_[1]; }
+  G2O_TYPES_SLAM2D_ADDONS_API double rho() const { return measurement_[1]; }
 
-  G2O_TYPES_SLAM2D_ADDONS_API void setTheta(number_t t) { measurement_[0] = t; }
-  G2O_TYPES_SLAM2D_ADDONS_API void setRho(number_t r) { measurement_[1] = r; }
+  G2O_TYPES_SLAM2D_ADDONS_API void setTheta(double t) { measurement_[0] = t; }
+  G2O_TYPES_SLAM2D_ADDONS_API void setRho(double r) { measurement_[1] = r; }
 
   G2O_TYPES_SLAM2D_ADDONS_API void computeError() override {
     const VertexSE2* v1 = vertexXnRaw<0>();
@@ -68,15 +68,13 @@ class EdgeSE2Segment2DLine
     error_[0] = normalize_theta(error_[0]);
   }
 
-  G2O_TYPES_SLAM2D_ADDONS_API bool setMeasurementData(
-      const number_t* d) override {
+  G2O_TYPES_SLAM2D_ADDONS_API bool setMeasurementData(const double* d) override {
     Eigen::Map<const Vector2> data(d);
     measurement_ = data;
     return true;
   }
 
-  G2O_TYPES_SLAM2D_ADDONS_API bool getMeasurementData(
-      number_t* d) const override {
+  G2O_TYPES_SLAM2D_ADDONS_API bool getMeasurementData(double* d) const override {
     Eigen::Map<Vector2> data(d);
     data = measurement_;
     return true;

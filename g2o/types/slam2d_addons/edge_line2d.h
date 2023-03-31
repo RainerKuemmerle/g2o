@@ -52,13 +52,13 @@ class G2O_TYPES_SLAM2D_ADDONS_API EdgeLine2D
 
   virtual void setMeasurement(const Vector2& m) { measurement_ = Line2D(m); }
 
-  bool setMeasurementData(const number_t* d) override {
+  bool setMeasurementData(const double* d) override {
     Eigen::Map<const Vector2> m(d);
     measurement_ = Line2D(m);
     return true;
   }
 
-  bool getMeasurementData(number_t* d) const override {
+  bool getMeasurementData(double* d) const override {
     Eigen::Map<Vector2> m(d);
     m = measurement_;
     return true;
@@ -73,8 +73,8 @@ class G2O_TYPES_SLAM2D_ADDONS_API EdgeLine2D
     return true;
   }
 
-  number_t initialEstimatePossible(const OptimizableGraph::VertexSet&,
-                                   OptimizableGraph::Vertex*) override {
+  double initialEstimatePossible(const OptimizableGraph::VertexSet&,
+                                 OptimizableGraph::Vertex*) override {
     return 0;
   }
   void linearizeOplus() override;

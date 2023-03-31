@@ -43,11 +43,11 @@ class G2O_TYPES_SLAM3D_API ParameterStereoCamera : public ParameterCamera {
   bool read(std::istream& is) override;
   bool write(std::ostream& os) const override;
 
-  void setBaseline(number_t baseline) { baseline_ = baseline; }
-  number_t baseline() const { return baseline_; }
+  void setBaseline(double baseline) { baseline_ = baseline; }
+  double baseline() const { return baseline_; }
 
  protected:
-  number_t baseline_;
+  double baseline_;
 };
 }  // namespace g2o
 

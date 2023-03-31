@@ -122,8 +122,8 @@ class G2O_TYPES_SIM3_API EdgeSim3
     error_ = err.log();
   }
 
-  number_t initialEstimatePossible(const OptimizableGraph::VertexSet&,
-                                   OptimizableGraph::Vertex*) override {
+  double initialEstimatePossible(const OptimizableGraph::VertexSet&,
+                                 OptimizableGraph::Vertex*) override {
     return 1.;
   }
   void initialEstimate(const OptimizableGraph::VertexSet& from,

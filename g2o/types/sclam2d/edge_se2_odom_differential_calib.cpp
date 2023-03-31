@@ -33,9 +33,9 @@
 namespace g2o {
 
 bool EdgeSE2OdomDifferentialCalib::read(std::istream& is) {
-  number_t vl;
-  number_t vr;
-  number_t dt;
+  double vl;
+  double vr;
+  double dt;
   is >> vl >> vr >> dt;
   VelocityMeasurement vm(vl, vr, dt);
   setMeasurement(vm);

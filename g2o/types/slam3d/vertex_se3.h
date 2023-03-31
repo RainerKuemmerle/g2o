@@ -61,13 +61,13 @@ class G2O_TYPES_SLAM3D_API VertexSE3 : public BaseVertex<6, Isometry3> {
   bool read(std::istream& is) override;
   bool write(std::ostream& os) const override;
 
-  bool setEstimateDataImpl(const number_t* est) override {
+  bool setEstimateDataImpl(const double* est) override {
     Eigen::Map<const Vector7> v(est);
     estimate_ = internal::fromVectorQT(v);
     return true;
   }
 
-  bool getEstimateData(number_t* est) const override {
+  bool getEstimateData(double* est) const override {
     Eigen::Map<Vector7> v(est);
     v = internal::toVectorQT(estimate_);
     return true;
@@ -75,13 +75,13 @@ class G2O_TYPES_SLAM3D_API VertexSE3 : public BaseVertex<6, Isometry3> {
 
   int estimateDimension() const override { return 7; }
 
-  bool setMinimalEstimateDataImpl(const number_t* est) override {
+  bool setMinimalEstimateDataImpl(const double* est) override {
     Eigen::Map<const Vector6> v(est);
     estimate_ = internal::fromVectorMQT(v);
     return true;
   }
 
-  bool getMinimalEstimateData(number_t* est) const override {
+  bool getMinimalEstimateData(double* est) const override {
     Eigen::Map<Vector6> v(est);
     v = internal::toVectorMQT(estimate_);
     return true;

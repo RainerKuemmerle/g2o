@@ -83,7 +83,7 @@ void declareOptimizableGraph(py::module& m) {
       //.def("oplus", &CLS::Vertex::oplus, "v"_a)  // const VectorX& -> void
       .def("oplus",
            [](CLS::Vertex& v, const VectorX& update) {
-             VectorX::MapType updateMap(const_cast<number_t*>(update.data()),
+             VectorX::MapType updateMap(const_cast<double*>(update.data()),
                                         update.size());
              v.oplus(updateMap);
            })

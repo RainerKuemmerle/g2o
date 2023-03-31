@@ -38,11 +38,11 @@ namespace g2o {
 
 bool RobotLaser::read(std::istream& is) {
   int type;
-  number_t angle;
-  number_t fov;
-  number_t res;
-  number_t maxrange;
-  number_t acc;
+  double angle;
+  double fov;
+  double res;
+  double maxrange;
+  double acc;
   int remission_mode;
   is >> type >> angle >> fov >> res >> maxrange >> acc >> remission_mode;
 
@@ -58,9 +58,9 @@ bool RobotLaser::read(std::istream& is) {
   for (int i = 0; i < beams; i++) is >> remissions_[i];
 
   // special robot laser stuff
-  number_t x;
-  number_t y;
-  number_t theta;
+  double x;
+  double y;
+  double theta;
   is >> x >> y >> theta;
   const SE2 lp(x, y, theta);
   // cerr << "x: " << x << " y:" << y << " th:" << theta << " ";

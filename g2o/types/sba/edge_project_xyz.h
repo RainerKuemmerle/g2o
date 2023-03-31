@@ -48,7 +48,7 @@ class G2O_TYPES_SBA_API EdgeSE3ProjectXYZ
   void linearizeOplus() override;
   Vector2 cam_project(const Vector3 &trans_xyz) const;
 
-  number_t fx, fy, cx, cy;
+  double fx, fy, cx, cy;
 };
 
 }  // namespace g2o

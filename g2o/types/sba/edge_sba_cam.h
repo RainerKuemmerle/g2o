@@ -46,16 +46,16 @@ class G2O_TYPES_SBA_API EdgeSBACam
 
   void setMeasurement(const SE3Quat& meas) override;
 
-  number_t initialEstimatePossible(const OptimizableGraph::VertexSet&,
-                                   OptimizableGraph::Vertex*) override {
+  double initialEstimatePossible(const OptimizableGraph::VertexSet&,
+                                 OptimizableGraph::Vertex*) override {
     return cst(1.);
   }
   void initialEstimate(const OptimizableGraph::VertexSet& from,
                        OptimizableGraph::Vertex* to) override;
 
-  bool setMeasurementData(const number_t* d) override;
+  bool setMeasurementData(const double* d) override;
 
-  bool getMeasurementData(number_t* d) const override;
+  bool getMeasurementData(double* d) const override;
 
   int measurementDimension() const override { return 7; }
 

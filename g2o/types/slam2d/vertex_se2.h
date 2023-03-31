@@ -48,17 +48,17 @@ class G2O_TYPES_SLAM2D_API VertexSE2 : public BaseVertex<3, SE2> {
   void oplusImpl(const VectorX::MapType& update) override {
     Vector2 t = estimate_.translation();
     t += update.head<2>();
-    number_t angle = normalize_theta(estimate_.rotation().angle() + update[2]);
+    double angle = normalize_theta(estimate_.rotation().angle() + update[2]);
     estimate_.setTranslation(t);
     estimate_.setRotation(Rotation2D(angle));
   }
 
-  bool setEstimateDataImpl(const number_t* est) override {
+  bool setEstimateDataImpl(const double* est) override {
     estimate_ = SE2(est[0], est[1], est[2]);
     return true;
   }
 
-  bool getEstimateData(number_t* est) const override {
+  bool getEstimateData(double* est) const override {
     Eigen::Map<Vector3> v(est);
     v = estimate_.toVector();
     return true;
@@ -66,11 +66,11 @@ class G2O_TYPES_SLAM2D_API VertexSE2 : public BaseVertex<3, SE2> {
 
   int estimateDimension() const override { return 3; }
 
-  bool setMinimalEstimateDataImpl(const number_t* est) override {
+  bool setMinimalEstimateDataImpl(const double* est) override {
     return setEstimateData(est);
   }
 
-  bool getMinimalEstimateData(number_t* est) const override {
+  bool getMinimalEstimateData(double* est) const override {
     return getEstimateData(est);
   }
 

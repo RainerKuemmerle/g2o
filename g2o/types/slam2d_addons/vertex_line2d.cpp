@@ -78,8 +78,8 @@ bool VertexLine2DDrawAction::operator()(
   Vector2 n(std::cos(that->theta()), std::sin(that->theta()));
   Vector2 pmiddle = n * that->rho();
   Vector2 t(-n.y(), n.x());
-  number_t l1{};
-  number_t l2 = 10;
+  double l1{};
+  double l2 = 10;
   auto vp1 = std::dynamic_pointer_cast<VertexPointXY>(
       that->graph()->vertex(that->p1Id));
   auto vp2 = std::dynamic_pointer_cast<VertexPointXY>(

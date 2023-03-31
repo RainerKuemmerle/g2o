@@ -36,10 +36,10 @@ inline int computeUpperTriangleIndex(int i, int j) {
 template <int D, typename E>
 void BaseVariableSizedEdge<D, E>::constructQuadraticForm() {
   if (this->robustKernel()) {
-    number_t error = this->chi2();
+    double error = this->chi2();
     Vector3 rho;
     this->robustKernel()->robustify(error, rho);
-    Eigen::Matrix<number_t, D, 1, Eigen::ColMajor> omega_r =
+    Eigen::Matrix<double, D, 1, Eigen::ColMajor> omega_r =
         -information_ * error_;
     omega_r *= rho[1];
     computeQuadraticForm(this->robustInformation(rho), omega_r);
@@ -63,8 +63,8 @@ void BaseVariableSizedEdge<D, E>::linearizeOplus(
 
 template <int D, typename E>
 void BaseVariableSizedEdge<D, E>::linearizeOplus() {
-  constexpr number_t kDelta = cst(1e-9);
-  constexpr number_t kScalar = 1 / (2 * kDelta);
+  constexpr double kDelta = cst(1e-9);
+  constexpr double kScalar = 1 / (2 * kDelta);
   ErrorVector errorBak;
   ErrorVector errorBeforeNumeric = error_;
 
@@ -111,7 +111,7 @@ void BaseVariableSizedEdge<D, E>::linearizeOplus() {
 }
 
 template <int D, typename E>
-void BaseVariableSizedEdge<D, E>::mapHessianMemory(number_t* d, int i, int j,
+void BaseVariableSizedEdge<D, E>::mapHessianMemory(double* d, int i, int j,
                                                    bool rowMajor) {
   int idx = internal::computeUpperTriangleIndex(i, j);
   assert(idx < (int)hessian_.size());

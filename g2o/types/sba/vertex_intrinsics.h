@@ -36,7 +36,7 @@ namespace g2o {
  * \brief Vertex encoding the intrinsics of the camera fx, fy, cx, xy, baseline;
  */
 class G2O_TYPES_SBA_API VertexIntrinsics
-    : public BaseVertex<4, Eigen::Matrix<number_t, 5, 1, Eigen::ColMajor> > {
+    : public BaseVertex<4, Eigen::Matrix<double, 5, 1, Eigen::ColMajor> > {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   VertexIntrinsics();

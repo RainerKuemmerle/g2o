@@ -42,7 +42,7 @@ struct MatrixElem {
 };
 
 void MarginalCovarianceCholesky::setCholeskyFactor(int n, int* Lp, int* Li,
-                                                   number_t* Lx, int* permInv) {
+                                                   double* Lx, int* permInv) {
   n_ = n;
   Ap_ = Lp;
   Ai_ = Li;
@@ -59,7 +59,7 @@ void MarginalCovarianceCholesky::setCholeskyFactor(int n, int* Lp, int* Li,
   }
 }
 
-number_t MarginalCovarianceCholesky::computeEntry(int r, int c)  // NOLINT
+double MarginalCovarianceCholesky::computeEntry(int r, int c)  // NOLINT
 {
   assert(r <= c);
   const int idx = computeIndex(r, c);
@@ -70,20 +70,20 @@ number_t MarginalCovarianceCholesky::computeEntry(int r, int c)  // NOLINT
   }
 
   // compute the summation over column r
-  number_t s = 0.;
+  double s = 0.;
   const int& sc = Ap_[r];
   const int& ec = Ap_[r + 1];
   // sum over row r while skipping the element on the diagonal
   for (int j = sc + 1; j < ec; ++j) {
     const int& rr = Ai_[j];
-    const number_t val =
+    const double val =
         rr < c ? computeEntry(rr, c) : computeEntry(c, rr);  // NOLINT
     s += val * Ax_[j];
   }
 
-  number_t result;
+  double result;
   if (r == c) {
-    const number_t& diagElem = diag_[r];
+    const double& diagElem = diag_[r];
     result = diagElem * (diagElem - s);
   } else {
     result = -s * diag_[r];
@@ -93,7 +93,7 @@ number_t MarginalCovarianceCholesky::computeEntry(int r, int c)  // NOLINT
 }
 
 void MarginalCovarianceCholesky::computeCovariance(
-    number_t** covBlocks, const std::vector<int>& blockIndices) {
+    double** covBlocks, const std::vector<int>& blockIndices) {
   map_.clear();
   int base = 0;
   std::vector<MatrixElem> elemsToCompute;
@@ -125,7 +125,7 @@ void MarginalCovarianceCholesky::computeCovariance(
   for (size_t i = 0; i < blockIndices.size(); ++i) {
     const int nbase = blockIndices[i];
     const int vdim = nbase - base;
-    number_t* cov = covBlocks[i];
+    double* cov = covBlocks[i];
     for (int rr = 0; rr < vdim; ++rr)
       for (int cc = rr; cc < vdim; ++cc) {
         int r = perm_ ? perm_[rr + base] : rr + base;  // apply permutation

@@ -42,8 +42,8 @@ MATCHER(PointsNearEq, "") {
 TEST(Data, ReadWriteRobotLaser) {
   constexpr int kNumBeams = 180;
 
-  std::vector<number_t> ranges;
-  std::vector<number_t> remissions;
+  std::vector<double> ranges;
+  std::vector<double> remissions;
   for (int i = 0; i < kNumBeams; ++i) {
     ranges.push_back(i * 0.1);
     remissions.push_back(g2o::sampleUniform(0., 1.));

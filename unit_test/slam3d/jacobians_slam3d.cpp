@@ -39,10 +39,10 @@
 #include "unit_test/test_helper/random_state.h"
 
 namespace {
-auto depth_epsilon = [](const number_t x, const number_t y) {
+auto depth_epsilon = [](const double x, const double y) {
   constexpr int64_t kUlp = 900000000000;
   return std::max(
-      2e-4, std::numeric_limits<number_t>::epsilon() * std::abs(x + y) * kUlp);
+      2e-4, std::numeric_limits<double>::epsilon() * std::abs(x + y) * kUlp);
 };
 
 }
@@ -210,7 +210,7 @@ struct RotationMatrix2QuaternionManifold {
 };
 
 TEST(Slam3D, dqDRJacobian) {
-  Eigen::Matrix<number_t, 3, 9, Eigen::RowMajor> dq_dR_AD;
+  Eigen::Matrix<double, 3, 9, Eigen::RowMajor> dq_dR_AD;
   dq_dR_AD.setZero();  // avoid warning about uninitialized memory
   for (int k = 0; k < 10000; ++k) {
     // create a random rotation matrix by sampling a random 3d vector
@@ -221,23 +221,23 @@ TEST(Slam3D, dqDRJacobian) {
     Matrix3 Re = rotation.toRotationMatrix();
 
     // our analytic function which we want to evaluate
-    Eigen::Matrix<number_t, 3, 9, Eigen::ColMajor> dq_dR;
+    Eigen::Matrix<double, 3, 9, Eigen::ColMajor> dq_dR;
     internal::compute_dq_dR(dq_dR, Re(0, 0), Re(1, 0), Re(2, 0), Re(0, 1),
                             Re(1, 1), Re(2, 1), Re(0, 2), Re(1, 2), Re(2, 2));
 
     // compute the Jacobian using AD
-    number_t* parameters[] = {Re.data()};
-    number_t* jacobians[] = {dq_dR_AD.data()};
-    number_t value[3];
+    double* parameters[] = {Re.data()};
+    double* jacobians[] = {dq_dR_AD.data()};
+    double value[3];
     const RotationMatrix2QuaternionManifold rot2quat;
     using RotationMatrix2QuaternionManifoldDims =
         ceres::internal::StaticParameterDims<9>;
     ceres::internal::AutoDifferentiate<3, RotationMatrix2QuaternionManifoldDims,
                                        RotationMatrix2QuaternionManifold,
-                                       number_t>(rot2quat, parameters, 3, value,
-                                                 jacobians);
+                                       double>(rot2quat, parameters, 3, value,
+                                               jacobians);
 
-    const number_t maxDifference = (dq_dR - dq_dR_AD).array().abs().maxCoeff();
+    const double maxDifference = (dq_dR - dq_dR_AD).array().abs().maxCoeff();
     EXPECT_NEAR(0., maxDifference, 1e-7);
   }
 }
@@ -264,7 +264,7 @@ TEST(Slam3D, EdgeSE3PointXYZDepthJacobian) {
   e->setParameterId(0, paramOffset->id());
   graph.addEdge(e);
 
-  auto conservative_depth_epsilon = [](const number_t x, const number_t y) {
+  auto conservative_depth_epsilon = [](const double x, const double y) {
     return std::max(0.01, depth_epsilon(x, y));
   };
 

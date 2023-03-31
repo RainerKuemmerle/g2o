@@ -49,13 +49,13 @@ class G2O_TYPES_SLAM3D_ADDONS_API VertexPlane : public BaseVertex<3, Plane3D> {
     estimate_.oplus(update);
   }
 
-  bool setEstimateDataImpl(const number_t* est) override {
+  bool setEstimateDataImpl(const double* est) override {
     Eigen::Map<const Vector4> _est(est);
     estimate_.fromVector(_est);
     return true;
   }
 
-  bool getEstimateData(number_t* est) const override {
+  bool getEstimateData(double* est) const override {
     Eigen::Map<Vector4> _est(est);
     _est = estimate_.toVector();
     return true;

@@ -162,8 +162,16 @@ int readLine(std::istream& is, std::stringstream& currentLine) {
   is.get(*currentLine.rdbuf());
   if (is.fail())  // fail is set on empty lines
     is.clear();
-  G2O_FSKIP_LINE(is);  // read \n not read by get()
+  skipLine(is);   // read \n not read by get()
+  if (currentLine.str().empty() && is.eof()) {
+    return -1;
+  }
   return static_cast<int>(currentLine.str().size());
+}
+
+void skipLine(std::istream& is) {
+  char c = ' ';
+  while (c != '\n' && is.good() && !is.eof()) is.get(c);
 }
 
 }  // namespace g2o

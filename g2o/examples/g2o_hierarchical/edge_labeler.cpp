@@ -190,7 +190,7 @@ bool EdgeLabeler::labelEdge(const SparseBlockMatrix<MatrixX>& spinv,
       vr->push();
     }
 
-    number_t* sample_ptr = incrementPoints[i]._sample.data();
+    double* sample_ptr = incrementPoints[i]._sample.data();
     for (auto& j : e->vertices()) {
       auto vr = std::static_pointer_cast<OptimizableGraph::Vertex>(j);
       int tj = vr->hessianIndex();

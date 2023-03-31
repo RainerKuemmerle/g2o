@@ -52,8 +52,8 @@ class LinearSolverDense : public LinearSolver<MatrixType> {
     return true;
   }
 
-  bool solve(const SparseBlockMatrix<MatrixType>& A, number_t* x,
-             number_t* b) override {
+  bool solve(const SparseBlockMatrix<MatrixType>& A, double* x,
+             double* b) override {
     const int n = A.cols();
     const int m = A.cols();
 
