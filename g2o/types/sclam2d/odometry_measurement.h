@@ -43,16 +43,16 @@ class G2O_TYPES_SCLAM2D_API VelocityMeasurement {
   VelocityMeasurement();
   VelocityMeasurement(double vl, double vr, double dt);
 
-  double vl() const { return measurement_(0); }
+  [[nodiscard]] double vl() const { return measurement_(0); }
   void setVl(double v) { measurement_(0) = v; }
 
-  double vr() const { return measurement_(1); }
+  [[nodiscard]] double vr() const { return measurement_(1); }
   void setVr(double v) { measurement_(1) = v; }
 
-  double dt() const { return dt_; }
+  [[nodiscard]] double dt() const { return dt_; }
   void setDt(double t) { dt_ = t; }
 
-  const Vector2& measurement() const { return measurement_; }
+  [[nodiscard]] const Vector2& measurement() const { return measurement_; }
 
  protected:
   Vector2 measurement_;

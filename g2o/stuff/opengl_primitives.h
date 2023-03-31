@@ -43,8 +43,7 @@
 #define G2O_OPENGL_API
 #endif
 
-namespace g2o {
-namespace opengl {
+namespace g2o::opengl {
 
 /**
  * draw a box that is centered in the current coordinate frame
@@ -150,7 +149,6 @@ void G2O_OPENGL_API drawPoint(float pointSize);
 #define LANDMARK_EDGE_COLOR 0.7f, 0.4f, 0.2f
 #define LANDMARK_EDGE_GHOST_COLOR 0.7f, 0.4f, 0.2f
 
-}  // namespace opengl
-}  // namespace g2o
+}  // namespace g2o::opengl
 
 #endif

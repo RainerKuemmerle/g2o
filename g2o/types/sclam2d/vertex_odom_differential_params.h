@@ -39,7 +39,7 @@ class G2O_TYPES_SCLAM2D_API VertexOdomDifferentialParams
   void setToOriginImpl() override { estimate_ << 1., 1., 1.; }
 
   void oplusImpl(const VectorX::MapType& update) override {
-    for (int i = 0; i < 3; i++) estimate_(i) += update[i];
+    estimate_ += update.head<3>();
   }
 
   bool read(std::istream& is) override;

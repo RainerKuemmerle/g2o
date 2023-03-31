@@ -42,13 +42,13 @@ namespace g2o {
  * \brief Internal structure of the tictoc profiling
  */
 struct TicTocElement {
-  double ticTime = 0.;      ///< the time of the last tic
-  double totalTime = 0.;    ///< the total time of this part of the algorithm
-  int numCalls = 0;         ///< the number of calls
+  double ticTime = 0.;    ///< the time of the last tic
+  double totalTime = 0.;  ///< the total time of this part of the algorithm
+  int numCalls = 0;       ///< the number of calls
   double minTime;
   double maxTime = 0.;
   double exponentialMovingAverage =
-      0.;                       ///< exponential moving average with alpha = 0.01
+      0.;                     ///< exponential moving average with alpha = 0.01
   std::string algorithmPart;  ///< name / description of the code block
   bool clockIsRunning = true;
   TicTocElement() : minTime(std::numeric_limits<double>::max()) {}
@@ -76,8 +76,7 @@ struct TicTocInitializer {
       // sort the elements according to the total time and print a table
       std::vector<TicTocElement> sortedElements;
       sortedElements.reserve(tictocElements.size());
-      for (TicTocMap::const_iterator it = tictocElements.begin();
-           it != tictocElements.end(); ++it) {
+      for (auto it = tictocElements.begin(); it != tictocElements.end(); ++it) {
         if (it->second.numCalls == 0) continue;
         longestName = std::max(longestName, static_cast<int>(it->first.size()));
         sortedElements.push_back(it->second);
@@ -91,8 +90,7 @@ struct TicTocInitializer {
       printf("|          TICTOC STATISTICS             |\n");
       printf("------------------------------------------\n");
       for (const auto& sortedElement : sortedElements) {
-        const double avgTime =
-            sortedElement.totalTime / sortedElement.numCalls;
+        const double avgTime = sortedElement.totalTime / sortedElement.numCalls;
         printf("%s", sortedElement.algorithmPart.c_str());
         for (int i = sortedElement.algorithmPart.size(); i < longestName; ++i)
           putchar(' ');

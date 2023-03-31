@@ -46,12 +46,12 @@ class G2O_TYPES_DATA_API DataQueue {
 
   void add(RobotDataPtr rd);
 
-  RobotDataPtr findClosestData(double timestamp) const;
+  [[nodiscard]] RobotDataPtr findClosestData(double timestamp) const;
 
-  RobotDataPtr before(double timestamp) const;
-  RobotDataPtr after(double timestamp) const;
+  [[nodiscard]] RobotDataPtr before(double timestamp) const;
+  [[nodiscard]] RobotDataPtr after(double timestamp) const;
 
-  const Buffer& buffer() const { return buffer_; }
+  [[nodiscard]] const Buffer& buffer() const { return buffer_; }
 
  protected:
   Buffer buffer_;

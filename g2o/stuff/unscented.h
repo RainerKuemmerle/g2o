@@ -52,15 +52,15 @@ bool sampleUnscented(std::vector<SigmaPoint<SampleType>>& sigmaPoints,
   const int numPoints = 2 * dim + 1;
   assert(covariance.rows() == covariance.cols() &&
          covariance.cols() == mean.size() && "Dimension Mismatch");
-  const double alpha = cst(1e-3);
-  const double beta = 2;
-  const double lambda = alpha * alpha * dim;
-  const double wi = cst(1) / (2 * (dim + lambda));
+  constexpr double kAlpha = 1e-3;
+  constexpr double kBeta = 2;
+  const double lambda = kAlpha * kAlpha * dim;
+  const double wi = 1. / (2. * (dim + lambda));
 
   sigmaPoints.resize(numPoints);
   sigmaPoints[0] = SigmaPoint<SampleType>(
       mean, lambda / (dim + lambda),
-      lambda / (dim + lambda) + (1. - alpha * alpha + beta));
+      lambda / (dim + lambda) + (1. - kAlpha * kAlpha + kBeta));
   Eigen::LLT<CovarianceType> cholDecomp;
   cholDecomp.compute(covariance * (dim + lambda));
   if (cholDecomp.info() == Eigen::NumericalIssue) return false;

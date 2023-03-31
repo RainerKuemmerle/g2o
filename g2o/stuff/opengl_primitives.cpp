@@ -27,8 +27,7 @@
 #include <GL/glu.h>
 #endif
 
-namespace g2o {
-namespace opengl {
+namespace g2o::opengl {
 
 /**
  * \brief handle the GLU quadratic
@@ -232,7 +231,8 @@ void drawRangeRing(GLfloat range, GLfloat fov, GLfloat range_width) {
 void drawSlice(GLfloat radius, GLfloat height, GLfloat fov,
                int slices_per_circle) {
   double fov_rad = fov / 180. * M_PI;  // convert to rad
-  int num_slices = static_cast<int>(slices_per_circle * (fov_rad / (2 * M_PI))) + 1;
+  int num_slices =
+      static_cast<int>(slices_per_circle * (fov_rad / (2 * M_PI))) + 1;
   double angle_step = fov_rad / num_slices;
   double angle_step_half = angle_step * 0.5;
 
@@ -305,5 +305,5 @@ void drawPoint(float pointSize) {
   glVertex3f(0, 0, 0);
   glEnd();
 }
-}  // namespace opengl
-}  // namespace g2o
+
+}  // namespace g2o::opengl

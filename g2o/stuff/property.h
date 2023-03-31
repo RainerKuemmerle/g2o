@@ -43,7 +43,7 @@ class G2O_STUFF_API BaseProperty {
   explicit BaseProperty(std::string name_);
   virtual ~BaseProperty() = default;
   const std::string& name() { return name_; }
-  virtual std::string toString() const = 0;
+  [[nodiscard]] virtual std::string toString() const = 0;
   virtual bool fromString(const std::string& s) = 0;
 
  protected:
@@ -59,7 +59,7 @@ class Property : public BaseProperty {
       : BaseProperty(name_), value_(std::move(v)) {}
   void setValue(const T& v) { value_ = v; }
   const T& value() const { return value_; }
-  std::string toString() const override {
+  [[nodiscard]] std::string toString() const override {
     std::stringstream sstr;
     sstr << value_;
     return sstr.str();
