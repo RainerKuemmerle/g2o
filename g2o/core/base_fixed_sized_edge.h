@@ -230,7 +230,7 @@ class BaseFixedSizedEdge : public BaseEdge<D, E> {
 
   template <std::size_t... Ints>
   bool allVerticesFixedNs(std::index_sequence<Ints...>) const;
-  bool allVerticesFixed() const override;
+  [[nodiscard]] bool allVerticesFixed() const override;
 
   void linearizeOplus(JacobianWorkspace& jacobianWorkspace) override;
   template <std::size_t... Ints>

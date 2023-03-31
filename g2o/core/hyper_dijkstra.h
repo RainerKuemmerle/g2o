@@ -60,12 +60,11 @@ struct G2O_CORE_API HyperDijkstra {
         std::shared_ptr<HyperGraph::Vertex> parent = nullptr,
         std::shared_ptr<HyperGraph::Edge> edge = nullptr,
         double distance = std::numeric_limits<double>::max());
-    std::shared_ptr<HyperGraph::Vertex> child() const { return child_; }
-    std::shared_ptr<HyperGraph::Vertex> parent() const { return parent_; }
-    std::shared_ptr<HyperGraph::Edge> edge() const { return edge_; }
-    double distance() const { return distance_; }
-    HyperGraph::VertexSet& children() { return children_; }
-    const HyperGraph::VertexSet& children() const { return children_; }
+    [[nodiscard]] std::shared_ptr<HyperGraph::Vertex> child() const { return child_; }
+    [[nodiscard]] std::shared_ptr<HyperGraph::Vertex> parent() const { return parent_; }
+    [[nodiscard]] std::shared_ptr<HyperGraph::Edge> edge() const { return edge_; }
+    [[nodiscard]] double distance() const { return distance_; }
+    [[nodiscard]] const HyperGraph::VertexSet& children() const { return children_; }
 
    protected:
     std::shared_ptr<HyperGraph::Vertex> child_;
@@ -80,10 +79,10 @@ struct G2O_CORE_API HyperDijkstra {
 
   explicit HyperDijkstra(std::shared_ptr<HyperGraph> g);
   HyperGraph::VertexSet& visited() { return visited_; }
-  const HyperGraph::VertexSet& visited() const { return visited_; }
+  [[nodiscard]] const HyperGraph::VertexSet& visited() const { return visited_; }
   AdjacencyMap& adjacencyMap() { return adjacencyMap_; }
-  const AdjacencyMap& adjacencyMap() const { return adjacencyMap_; }
-  std::shared_ptr<HyperGraph> graph() const { return graph_; }
+  [[nodiscard]] const AdjacencyMap& adjacencyMap() const { return adjacencyMap_; }
+  [[nodiscard]] std::shared_ptr<HyperGraph> graph() const { return graph_; }
 
   void shortestPaths(const std::shared_ptr<HyperGraph::Vertex>& v,
       HyperDijkstra::CostFunction& cost,

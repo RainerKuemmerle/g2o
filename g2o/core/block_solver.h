@@ -141,9 +141,11 @@ class BlockSolver : public BlockSolverBase {
   LinearSolver<PoseMatrixType>& linearSolver() const { return *linearSolver_; }
 
   void setWriteDebug(bool writeDebug) override;
-  bool writeDebug() const override { return linearSolver_->writeDebug(); }
+  [[nodiscard]] bool writeDebug() const override {
+    return linearSolver_->writeDebug();
+  }
 
-  bool saveHessian(const std::string& fileName) const override;
+  [[nodiscard]] bool saveHessian(const std::string& fileName) const override;
 
   void multiplyHessian(double* dest, const double* src) const override {
     Hpp_->multiplySymmetricUpperTriangle(dest, src);

@@ -65,7 +65,7 @@ class G2O_CORE_API RobustKernel {
    * considered as outlier in the data.
    */
   virtual void setDelta(double delta);
-  double delta() const { return delta_; }
+  [[nodiscard]] double delta() const { return delta_; }
 
  protected:
   double delta_{1.};

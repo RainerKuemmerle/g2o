@@ -544,26 +544,6 @@ bool SparseOptimizer::computeMarginals(SparseBlockMatrix<MatrixX>& spinv,
     return false;
   }
   std::vector<std::pair<int, int> > index{
-      std::make_pair<int, int>(vertex->hessianIndex(), vertex->hessianIndex())};
-  return computeMarginals(spinv, index);
-}
-
-bool SparseOptimizer::computeMarginals(SparseBlockMatrix<MatrixX>& spinv,
-                                       const VertexContainer& vertices) {
-  std::vector<std::pair<int, int> > indices;
-  indices.reserve(vertices.size());
-  for (auto it = vertices.begin(); it != vertices.end(); ++it) {
-    indices.emplace_back((*it)->hessianIndex(), (*it)->hessianIndex());
-  }
-  return computeMarginals(spinv, indices);
-}
-
-bool SparseOptimizer::computeMarginals(SparseBlockMatrix<MatrixX>& spinv,
-                                       const Vertex* vertex) {
-  if (vertex->hessianIndex() < 0) {
-    return false;
-  }
-  std::vector<std::pair<int, int> > index{
       std::make_pair(vertex->hessianIndex(), vertex->hessianIndex())};
   return computeMarginals(spinv, index);
 }

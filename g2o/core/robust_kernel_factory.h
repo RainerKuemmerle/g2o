@@ -92,12 +92,14 @@ class G2O_CORE_API RobustKernelFactory {
   /**
    * construct a robust kernel based on its tag
    */
-  std::shared_ptr<RobustKernel> construct(const std::string& tag) const;
+  [[nodiscard]] std::shared_ptr<RobustKernel> construct(
+      const std::string& tag) const;
 
   /**
    * return the creator for a specific tag
    */
-  AbstractRobustKernelCreator::Ptr creator(const std::string& tag) const;
+  [[nodiscard]] AbstractRobustKernelCreator::Ptr creator(
+      const std::string& tag) const;
 
   /**
    * get a list of all known robust kernels

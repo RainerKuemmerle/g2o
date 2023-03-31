@@ -63,7 +63,7 @@ class G2O_CORE_API OptimizationAlgorithmWithHessian
    * write debug output of the Hessian if system is not positive definite
    */
   virtual void setWriteDebug(bool writeDebug);
-  virtual bool writeDebug() const { return writeDebug_->value(); }
+  [[nodiscard]] virtual bool writeDebug() const;
 
  protected:
   Solver& solver_;

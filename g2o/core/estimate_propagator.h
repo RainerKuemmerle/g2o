@@ -119,11 +119,17 @@ class G2O_CORE_API EstimatePropagator {
     friend class PriorityQueue;
     AdjacencyMapEntry();
     void reset();
-    std::shared_ptr<OptimizableGraph::Vertex> child() const { return child_; }
-    const OptimizableGraph::VertexSet& parent() const { return parent_; }
-    std::shared_ptr<OptimizableGraph::Edge> edge() const { return edge_; }
-    double distance() const { return distance_; }
-    int frontierLevel() const { return frontierLevel_; }
+    [[nodiscard]] std::shared_ptr<OptimizableGraph::Vertex> child() const {
+      return child_;
+    }
+    [[nodiscard]] const OptimizableGraph::VertexSet& parent() const {
+      return parent_;
+    }
+    [[nodiscard]] std::shared_ptr<OptimizableGraph::Edge> edge() const {
+      return edge_;
+    }
+    [[nodiscard]] double distance() const { return distance_; }
+    [[nodiscard]] int frontierLevel() const { return frontierLevel_; }
 
    protected:
     std::shared_ptr<OptimizableGraph::Vertex> child_;

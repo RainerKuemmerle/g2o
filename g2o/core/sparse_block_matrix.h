@@ -67,11 +67,11 @@ class SparseBlockMatrix {
   using SparseMatrixBlock = MatrixType;
 
   //! columns of the matrix
-  inline int cols() const {
+  [[nodiscard]] inline int cols() const {
     return !colBlockIndices_.empty() ? colBlockIndices_.back() : 0;
   }
   //! rows of the matrix
-  inline int rows() const {
+  [[nodiscard]] inline int rows() const {
     return !rowBlockIndices_.empty() ? rowBlockIndices_.back() : 0;
   }
 
@@ -109,31 +109,31 @@ class SparseBlockMatrix {
   const SparseMatrixBlock* block(int r, int c) const;
 
   //! how many rows does the block at block-row r has?
-  inline int rowsOfBlock(int r) const {
+  [[nodiscard]] inline int rowsOfBlock(int r) const {
     return r ? rowBlockIndices_[r] - rowBlockIndices_[r - 1]
              : rowBlockIndices_[0];
   }
 
   //! how many cols does the block at block-col c has?
-  inline int colsOfBlock(int c) const {
+  [[nodiscard]] inline int colsOfBlock(int c) const {
     return c ? colBlockIndices_[c] - colBlockIndices_[c - 1]
              : colBlockIndices_[0];
   }
 
   //! where does the row at block-row r starts?
-  inline int rowBaseOfBlock(int r) const {
+  [[nodiscard]] inline int rowBaseOfBlock(int r) const {
     return r ? rowBlockIndices_[r - 1] : 0;
   }
 
   //! where does the col at block-col r starts?
-  inline int colBaseOfBlock(int c) const {
+  [[nodiscard]] inline int colBaseOfBlock(int c) const {
     return c ? colBlockIndices_[c - 1] : 0;
   }
 
   //! number of non-zero elements
-  size_t nonZeros() const;
+  [[nodiscard]] size_t nonZeros() const;
   //! number of allocated blocks
-  size_t nonZeroBlocks() const;
+  [[nodiscard]] size_t nonZeroBlocks() const;
 
   //! deep copy of a sparse-block-matrix;
   SparseBlockMatrix* clone() const;
@@ -212,11 +212,11 @@ class SparseBlockMatrix {
   std::vector<IntBlockMap>& blockCols() { return blockCols_; }
 
   //! indices of the row blocks
-  const std::vector<int>& rowBlockIndices() const { return rowBlockIndices_; }
+  [[nodiscard]] const std::vector<int>& rowBlockIndices() const { return rowBlockIndices_; }
   std::vector<int>& rowBlockIndices() { return rowBlockIndices_; }
 
   //! indices of the column blocks
-  const std::vector<int>& colBlockIndices() const { return colBlockIndices_; }
+  [[nodiscard]] const std::vector<int>& colBlockIndices() const { return colBlockIndices_; }
   std::vector<int>& colBlockIndices() { return colBlockIndices_; }
 
   /**

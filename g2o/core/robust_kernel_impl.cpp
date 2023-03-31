@@ -40,8 +40,8 @@ RobustKernelScaleDelta::RobustKernelScaleDelta(RobustKernelPtr kernel,
 RobustKernelScaleDelta::RobustKernelScaleDelta(double delta)
     : RobustKernel(delta) {}
 
-void RobustKernelScaleDelta::setKernel(const RobustKernelPtr& ptr) {
-  kernel_ = ptr;
+void RobustKernelScaleDelta::setKernel(RobustKernelPtr ptr) {
+  kernel_ = std::move(ptr);
 }
 
 void RobustKernelScaleDelta::robustify(double error, Vector3& rho) const {
@@ -64,8 +64,8 @@ void RobustKernelHuber::robustify(double e, Vector3& rho) const {
     rho[0] = e;
     rho[1] = 1.;
     rho[2] = 0.;
-  } else {                           // outlier
-    const double sqrte = sqrt(e);    // absolute value of the error
+  } else {                         // outlier
+    const double sqrte = sqrt(e);  // absolute value of the error
     rho[0] =
         2 * sqrte * delta_ - dsqr;  // rho(e)   = 2 * delta * e^(1/2) - delta^2
     rho[1] = delta_ / sqrte;        // rho'(e)  = delta / sqrt(e)

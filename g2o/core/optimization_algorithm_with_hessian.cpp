@@ -84,4 +84,8 @@ void OptimizationAlgorithmWithHessian::setWriteDebug(bool writeDebug) {
   writeDebug_->setValue(writeDebug);
 }
 
+bool OptimizationAlgorithmWithHessian::writeDebug() const {
+  return writeDebug_->value();
+}
+
 }  // namespace g2o

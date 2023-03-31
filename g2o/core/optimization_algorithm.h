@@ -85,7 +85,7 @@ class G2O_CORE_API OptimizationAlgorithm {
   virtual void printVerbose(std::ostream& os) const { (void)os; };
 
   //! return the optimizer operating on
-  const SparseOptimizer* optimizer() const { return optimizer_; }
+  [[nodiscard]] const SparseOptimizer* optimizer() const { return optimizer_; }
   SparseOptimizer* optimizer() { return optimizer_; }
 
   /**
@@ -94,7 +94,7 @@ class G2O_CORE_API OptimizationAlgorithm {
   void setOptimizer(SparseOptimizer* optimizer);
 
   //! return the properties of the solver
-  const PropertyMap& properties() const { return properties_; }
+  [[nodiscard]] const PropertyMap& properties() const { return properties_; }
 
   /**
    * update the properties from a string, see PropertyMap::updateMapFromString()

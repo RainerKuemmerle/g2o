@@ -72,7 +72,7 @@ class BaseVertex : public OptimizableGraph::Vertex {
   BaseVertex& operator=(const BaseVertex&) = delete;
   BaseVertex(const BaseVertex&) = delete;
 
-  double* hessianData() const override {
+  [[nodiscard]] double* hessianData() const override {
     return const_cast<double*>(hessian_.data());
   }
 
@@ -84,7 +84,7 @@ class BaseVertex : public OptimizableGraph::Vertex {
     return vertexDim;
   }
 
-  double* bData() const override { return const_cast<double*>(b_.data()); }
+  [[nodiscard]] double* bData() const override { return const_cast<double*>(b_.data()); }
 
   void clearQuadraticForm() override { b_.setZero(); }
 
@@ -110,7 +110,7 @@ class BaseVertex : public OptimizableGraph::Vertex {
     assert(!backup_.empty());
     backup_.pop();
   }
-  int stackSize() const override { return backup_.size(); }
+  [[nodiscard]] int stackSize() const override { return backup_.size(); }
 
   //! return the current estimate of the vertex
   const EstimateType& estimate() const { return estimate_; }

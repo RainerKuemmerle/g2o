@@ -97,20 +97,20 @@ class G2O_CORE_API Solver {
 
   //! return x, the solution vector
   double* x() { return x_; }
-  const double* x() const { return x_; }
+  [[nodiscard]] const double* x() const { return x_; }
   //! return b, the right hand side of the system
   double* b() { return b_; }
-  const double* b() const { return b_; }
+  [[nodiscard]] const double* b() const { return b_; }
 
   //! return the size of the solution vector (x) and b
-  size_t vectorSize() const { return xSize_; }
+  [[nodiscard]] size_t vectorSize() const { return xSize_; }
 
   //! the optimizer (graph) on which the solver works
-  SparseOptimizer* optimizer() const { return optimizer_; }
+  [[nodiscard]] SparseOptimizer* optimizer() const { return optimizer_; }
   void setOptimizer(SparseOptimizer* optimizer);
 
   //! the system is Levenberg-Marquardt
-  bool levenberg() const { return isLevenberg_; }
+  [[nodiscard]] bool levenberg() const { return isLevenberg_; }
   void setLevenberg(bool levenberg);
 
   /**
@@ -124,25 +124,27 @@ class G2O_CORE_API Solver {
   virtual bool schur() = 0;
   virtual void setSchur(bool s) = 0;
 
-  size_t additionalVectorSpace() const { return additionalVectorSpace_; }
+  [[nodiscard]] size_t additionalVectorSpace() const {
+    return additionalVectorSpace_;
+  }
   void setAdditionalVectorSpace(size_t s);
 
   /**
    * write debug output of the Hessian if system is not positive definite
    */
   virtual void setWriteDebug(bool) = 0;
-  virtual bool writeDebug() const = 0;
+  [[nodiscard]] virtual bool writeDebug() const = 0;
 
   //! write the hessian to disk using the specified file name
-  virtual bool saveHessian(const std::string& /*fileName*/) const = 0;
+  [[nodiscard]] virtual bool saveHessian(
+      const std::string& /*fileName*/) const = 0;
 
  protected:
   SparseOptimizer* optimizer_{nullptr};
   double* x_{nullptr};
   double* b_{nullptr};
   size_t xSize_{0}, maxXSize_{0};
-  bool isLevenberg_{
-      false};  ///< the system we gonna solve is a Levenberg-Marquardt system
+  bool isLevenberg_{false};  ///< Solve the system with Levenberg-Marquardt
   size_t additionalVectorSpace_{0};
 
   void resizeVector(size_t sx);

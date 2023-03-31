@@ -51,10 +51,10 @@ class G2O_CORE_API SparseOptimizerTerminateAction : public HyperGraphAction {
       const HyperGraph& graph,
       const std::shared_ptr<Parameters>& parameters = nullptr) override;
 
-  double gainThreshold() const { return gainThreshold_; }
+  [[nodiscard]] double gainThreshold() const { return gainThreshold_; }
   void setGainThreshold(double gainThreshold);
 
-  int maxIterations() const { return maxIterations_; }
+  [[nodiscard]] int maxIterations() const { return maxIterations_; }
   void setMaxIterations(int maxit);
 
  protected:

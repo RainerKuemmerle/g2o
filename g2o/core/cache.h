@@ -48,8 +48,10 @@ class G2O_CORE_API Cache : public HyperGraph::HyperGraphElement {
 
     bool operator<(const CacheKey& c) const;
 
-    const std::string& type() const { return type_; }
-    const ParameterVector& parameters() const { return parameters_; }
+    [[nodiscard]] const std::string& type() const { return type_; }
+    [[nodiscard]] const ParameterVector& parameters() const {
+      return parameters_;
+    }
 
    protected:
     std::string type_;
@@ -59,14 +61,14 @@ class G2O_CORE_API Cache : public HyperGraph::HyperGraphElement {
   explicit Cache(CacheContainer* container = nullptr,
                  ParameterVector parameters = ParameterVector());
 
-  CacheKey key() const;
+  [[nodiscard]] CacheKey key() const;
 
-  const OptimizableGraph::Vertex& vertex() const;
-  const ParameterVector& parameters() const;
+  [[nodiscard]] const OptimizableGraph::Vertex& vertex() const;
+  [[nodiscard]] const ParameterVector& parameters() const;
 
   void update();
 
-  HyperGraph::HyperGraphElementType elementType() const override {
+  [[nodiscard]] HyperGraph::HyperGraphElementType elementType() const override {
     return HyperGraph::kHgetCache;
   }
 
@@ -84,7 +86,7 @@ class G2O_CORE_API CacheContainer
  public:
   friend OptimizableGraph::Edge;
   explicit CacheContainer(const OptimizableGraph::Vertex& vertex_);
-  const OptimizableGraph::Vertex& vertex() const;
+  [[nodiscard]] const OptimizableGraph::Vertex& vertex() const;
   std::shared_ptr<Cache> findCache(const Cache::CacheKey& key);
   void setUpdateNeeded(bool needUpdate = true);
   void update();

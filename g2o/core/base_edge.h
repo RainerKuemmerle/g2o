@@ -73,8 +73,7 @@ struct BaseEdgeTraits {
 template <>
 struct BaseEdgeTraits<-1> {
   static constexpr int kDimension = -1;
-  using ErrorVector =
-      Eigen::Matrix<double, Eigen::Dynamic, 1, Eigen::ColMajor>;
+  using ErrorVector = Eigen::Matrix<double, Eigen::Dynamic, 1, Eigen::ColMajor>;
   using InformationType =
       Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::ColMajor>;
 };
@@ -93,9 +92,13 @@ class BaseEdge : public OptimizableGraph::Edge {
   BaseEdge& operator=(const BaseEdge&) = delete;
   BaseEdge(const BaseEdge&) = delete;
 
-  double chi2() const override { return error_.dot(information() * error_); }
+  [[nodiscard]] double chi2() const override {
+    return error_.dot(information() * error_);
+  }
 
-  const double* errorData() const override { return error_.data(); }
+  [[nodiscard]] const double* errorData() const override {
+    return error_.data();
+  }
   double* errorData() override { return error_.data(); }
   const ErrorVector& error() const { return error_; }
   ErrorVector& error() { return error_; }
@@ -109,7 +112,9 @@ class BaseEdge : public OptimizableGraph::Edge {
     information_ = information;
   }
 
-  const double* informationData() const override { return information_.data(); }
+  [[nodiscard]] const double* informationData() const override {
+    return information_.data();
+  }
   double* informationData() override { return information_.data(); }
 
   //! accessor functions for the measurement represented by the edge
@@ -118,7 +123,7 @@ class BaseEdge : public OptimizableGraph::Edge {
   }
   virtual void setMeasurement(const Measurement& m) { measurement_ = m; }
 
-  virtual int rank() const { return dimension(); }
+  [[nodiscard]] virtual int rank() const { return dimension(); }
 
   void initialEstimate(const OptimizableGraph::VertexSet&,
                        OptimizableGraph::Vertex*) override {

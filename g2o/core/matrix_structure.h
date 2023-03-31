@@ -58,7 +58,7 @@ class G2O_CORE_API MatrixStructure {
    * Write the matrix pattern to a file. File is also loadable by octave, e.g.,
    * then use spy(matrix)
    */
-  bool write(std::string_view filename) const;
+  [[nodiscard]] bool write(std::string_view filename) const;
 
   int n = 0;           ///< A is m-by-n.  n must be >= 0.
   int m = 0;           ///< A is m-by-n.  m must be >= 0.
@@ -66,7 +66,7 @@ class G2O_CORE_API MatrixStructure {
   int* Aii = nullptr;  ///< row indices of A, of size nz = Ap [n]
 
   //! max number of non-zeros blocks
-  int nzMax() const { return maxNz_; }
+  [[nodiscard]] int nzMax() const { return maxNz_; }
 
  protected:
   int maxN_ = 0;   ///< size of the allocated memory

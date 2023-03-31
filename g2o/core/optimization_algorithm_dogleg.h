@@ -57,9 +57,9 @@ class G2O_CORE_API OptimizationAlgorithmDogleg
   void printVerbose(std::ostream& os) const override;
 
   //! return the type of the last step taken by the algorithm
-  int lastStep() const { return lastStep_; }
+  [[nodiscard]] int lastStep() const { return lastStep_; }
   //! return the diameter of the trust region
-  double trustRegion() const { return delta_; }
+  [[nodiscard]] double trustRegion() const { return delta_; }
 
   //! convert the type into an integer
   static const char* stepType2Str(int stepType);
@@ -76,13 +76,14 @@ class G2O_CORE_API OptimizationAlgorithmDogleg
   VectorX auxVector_;  ///< auxiliary vector used to perform multiplications or
                        ///< other stuff
 
-  double
-      currentLambda_;  ///< the damping factor to force positive definite matrix
-  double delta_;     ///< trust region
-  int lastStep_;       ///< type of the step taken by the algorithm
-  bool wasPDInAllIterations_;  ///< the matrix we solve was positive definite in
-                               ///< all iterations -> if not apply damping
-  int lastNumTries_;
+  double currentLambda_ =
+      0;          ///< the damping factor to force positive definite matrix
+  double delta_;  ///< trust region
+  int lastStep_ = kStepUndefined;  ///< type of the step taken by the algorithm
+  bool wasPDInAllIterations_ =
+      true;  ///< the matrix we solve was positive definite in
+             ///< all iterations -> if not apply damping
+  int lastNumTries_ = 0;
 
  private:
   std::unique_ptr<BlockSolverBase> m_solver_;

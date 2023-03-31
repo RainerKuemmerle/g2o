@@ -86,7 +86,7 @@ class G2O_CORE_API HyperGraph {
     /**
      * returns the type of the graph element, see HyperGraphElementType
      */
-    virtual HyperGraphElementType elementType() const = 0;
+    [[nodiscard]] virtual HyperGraphElementType elementType() const = 0;
   };
 
   /**
@@ -102,12 +102,12 @@ class G2O_CORE_API HyperGraph {
     virtual bool read(std::istream& is) = 0;
     //! write the data to a stream
     virtual bool write(std::ostream& os) const = 0;
-    HyperGraph::HyperGraphElementType elementType() const override {
+    [[nodiscard]] HyperGraph::HyperGraphElementType elementType() const override {
       return HyperGraph::kHgetData;
     }
-    std::shared_ptr<Data> next() const { return next_; }
+    [[nodiscard]] std::shared_ptr<Data> next() const { return next_; }
     void setNext(std::shared_ptr<Data> next) { next_ = std::move(next); }
-    std::shared_ptr<DataContainer> dataContainer() const {
+    [[nodiscard]] std::shared_ptr<DataContainer> dataContainer() const {
       return dataContainer_;
     }
     void setDataContainer(std::shared_ptr<DataContainer> dataContainer) {
@@ -126,7 +126,7 @@ class G2O_CORE_API HyperGraph {
   class G2O_CORE_API DataContainer {
    public:
     //! the user data associated with this vertex
-    std::shared_ptr<Data> userData() const { return userData_; }
+    [[nodiscard]] std::shared_ptr<Data> userData() const { return userData_; }
     void setUserData(const std::shared_ptr<Data>& obs) { userData_ = obs; }
     void addUserData(const std::shared_ptr<Data>& obs) {
       if (obs) {
@@ -157,13 +157,13 @@ class G2O_CORE_API HyperGraph {
     explicit Vertex(int id = kInvalidId);
     ~Vertex() override;
     //! returns the id
-    int id() const { return id_; }
+    [[nodiscard]] int id() const { return id_; }
     virtual void setId(int newId) { id_ = newId; }
     //! returns the set of hyper-edges that are leaving/entering in this vertex
-    const EdgeSetWeak& edges() const { return edges_; }
+    [[nodiscard]] const EdgeSetWeak& edges() const { return edges_; }
     //! returns the set of hyper-edges that are leaving/entering in this vertex
     EdgeSetWeak& edges() { return edges_; }
-    HyperGraphElementType elementType() const override { return kHgetVertex; }
+    [[nodiscard]] HyperGraphElementType elementType() const override { return kHgetVertex; }
 
    protected:
     int id_;
@@ -189,7 +189,7 @@ class G2O_CORE_API HyperGraph {
       returns the vector of pointers to the vertices connected by the
       hyper-edge.
       */
-    const VertexContainer& vertices() const { return vertices_; }
+    [[nodiscard]] const VertexContainer& vertices() const { return vertices_; }
     /**
       returns the vector of pointers to the vertices connected by the
       hyper-edge.
@@ -198,7 +198,7 @@ class G2O_CORE_API HyperGraph {
     /**
       returns the pointer to the ith vertex connected to the hyper-edge.
       */
-    std::shared_ptr<const Vertex> vertex(size_t i) const {
+    [[nodiscard]] std::shared_ptr<const Vertex> vertex(size_t i) const {
       assert(i < vertices_.size() && "index out of bounds");
       return vertices_[i];
     }
@@ -217,11 +217,11 @@ class G2O_CORE_API HyperGraph {
       vertices_[i] = v;
     }
 
-    int id() const { return id_; }
+    [[nodiscard]] int id() const { return id_; }
     void setId(int id);
-    HyperGraphElementType elementType() const override { return kHgetEdge; }
+    [[nodiscard]] HyperGraphElementType elementType() const override { return kHgetEdge; }
 
-    int numUndefinedVertices() const;
+    [[nodiscard]] int numUndefinedVertices() const;
 
    protected:
     VertexContainer vertices_;

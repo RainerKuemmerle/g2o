@@ -80,7 +80,7 @@ class BaseVariableSizedEdge : public BaseEdge<D, E> {
 
   void resize(size_t size) override;
 
-  bool allVerticesFixed() const override;
+  [[nodiscard]] bool allVerticesFixed() const override;
 
   void constructQuadraticForm() override;
 
@@ -102,7 +102,7 @@ class BaseVariableSizedEdge : public BaseEdge<D, E> {
   void computeQuadraticForm(const InformationType& omega,
                             const ErrorVector& weightedError);
 
-  OptimizableGraph::Vertex* vertexRaw(size_t n) const {
+  [[nodiscard]] OptimizableGraph::Vertex* vertexRaw(size_t n) const {
     assert(n < vertices_.size() && "Index out of bounds");
     return static_cast<OptimizableGraph::Vertex*>(vertices_[n].get());
   }

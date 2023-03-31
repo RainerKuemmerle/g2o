@@ -49,10 +49,6 @@ OptimizationAlgorithmDogleg::OptimizationAlgorithmDogleg(
   lamdbaFactor_ =
       properties_.makeProperty<Property<double>>("lambdaFactor", 10.);
   delta_ = userDeltaInit_->value();
-  lastStep_ = kStepUndefined;
-  wasPDInAllIterations_ = true;
-  lastNumTries_ = 0;
-  currentLambda_ = 0.;
 }
 
 OptimizationAlgorithmDogleg::~OptimizationAlgorithmDogleg() = default;

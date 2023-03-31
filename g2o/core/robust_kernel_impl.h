@@ -49,9 +49,9 @@ class G2O_CORE_API RobustKernelScaleDelta : public RobustKernel {
   explicit RobustKernelScaleDelta(double delta = 1.);
 
   //! return the underlying kernel
-  RobustKernelPtr kernel() const { return kernel_; }
+  [[nodiscard]] RobustKernelPtr kernel() const { return kernel_; }
   //! use another kernel for the underlying operation
-  void setKernel(const RobustKernelPtr& ptr);
+  void setKernel(RobustKernelPtr ptr);
 
   void robustify(double error, Vector3& rho) const override;
 

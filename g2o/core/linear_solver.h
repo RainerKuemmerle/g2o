@@ -91,7 +91,7 @@ class LinearSolver {
   }
 
   //! write a debug dump of the system matrix if it is not PSD in solve
-  bool writeDebug() const { return writeDebug_; }
+  [[nodiscard]] bool writeDebug() const { return writeDebug_; }
   void setWriteDebug(bool b) { writeDebug_ = b; }
 
   //! allocate block memory structure
@@ -172,7 +172,7 @@ class LinearSolverCCS : public LinearSolver<MatrixType> {
   }
 
   //! do the AMD ordering on the blocks or on the scalar matrix
-  bool blockOrdering() const { return blockOrdering_; }
+  [[nodiscard]] bool blockOrdering() const { return blockOrdering_; }
   void setBlockOrdering(bool blockOrdering) { blockOrdering_ = blockOrdering; }
 
  protected:

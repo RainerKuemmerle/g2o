@@ -70,7 +70,7 @@ class G2O_CORE_API Factory {
   /**
    * construct a graph element based on its tag
    */
-  std::unique_ptr<HyperGraph::HyperGraphElement> construct(
+  [[nodiscard]] std::unique_ptr<HyperGraph::HyperGraphElement> construct(
       const std::string& tag) const;
 
   /**
@@ -78,7 +78,7 @@ class G2O_CORE_API Factory {
    * bitmask) matches. A bitmask without any bit set will construct any item.
    * Otherwise a bit has to be set to allow construction of a graph element.
    */
-  std::unique_ptr<HyperGraph::HyperGraphElement> construct(
+  [[nodiscard]] std::unique_ptr<HyperGraph::HyperGraphElement> construct(
       const std::string& tag,
       const HyperGraph::GraphElemBitset& elemsToConstruct) const;
 

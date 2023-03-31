@@ -107,14 +107,14 @@ class G2O_CORE_API OptimizationAlgorithmFactory {
   void listSolvers(std::ostream& os) const;
 
   //! return the underlying list of creators
-  const CreatorList& creatorList() const { return creator_; }
+  [[nodiscard]] const CreatorList& creatorList() const { return creator_; }
 
  protected:
   OptimizationAlgorithmFactory() = default;
 
   CreatorList creator_;
 
-  CreatorList::const_iterator findSolver(const std::string& name) const;
+  [[nodiscard]] CreatorList::const_iterator findSolver(const std::string& name) const;
   CreatorList::iterator findSolver(const std::string& name);
 
  private:

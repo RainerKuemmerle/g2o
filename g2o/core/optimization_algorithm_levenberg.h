@@ -58,7 +58,7 @@ class G2O_CORE_API OptimizationAlgorithmLevenberg
   void setMaxTrialsAfterFailure(int max_trials);
 
   //! get the number of inner iterations for Levenberg-Marquardt
-  int maxTrialsAfterFailure() const { return maxTrialsAfterFailure_->value(); }
+  [[nodiscard]] int maxTrialsAfterFailure() const { return maxTrialsAfterFailure_->value(); }
 
   //! return the lambda set by the user, if < 0 the SparseOptimizer will compute
   //! the initial lambda
@@ -68,7 +68,7 @@ class G2O_CORE_API OptimizationAlgorithmLevenberg
   void setUserLambdaInit(double lambda);
 
   //! return the number of levenberg iterations performed in the last round
-  int levenbergIteration() const { return levenbergIterations_; }
+  [[nodiscard]] int levenbergIteration() const { return levenbergIterations_; }
 
  protected:
   // Levenberg parameters
@@ -88,8 +88,8 @@ class G2O_CORE_API OptimizationAlgorithmLevenberg
    * helper for Levenberg, this function computes the initial damping factor, if
    * the user did not specify an own value, see setUserLambdaInit()
    */
-  double computeLambdaInit() const;
-  double computeScale() const;
+  [[nodiscard]] double computeLambdaInit() const;
+  [[nodiscard]] double computeScale() const;
 
  private:
   std::unique_ptr<Solver> m_solver_;

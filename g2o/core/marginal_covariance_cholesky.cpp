@@ -64,7 +64,7 @@ double MarginalCovarianceCholesky::computeEntry(int r, int c)  // NOLINT
   assert(r <= c);
   const int idx = computeIndex(r, c);
 
-  const LookupMap::const_iterator foundIt = map_.find(idx);
+  const auto foundIt = map_.find(idx);
   if (foundIt != map_.end()) {
     return foundIt->second;
   }
@@ -133,7 +133,7 @@ void MarginalCovarianceCholesky::computeCovariance(
         if (r > c)  // upper triangle
           std::swap(r, c);
         const int idx = computeIndex(r, c);
-        const LookupMap::const_iterator foundIt = map_.find(idx);
+        const auto foundIt = map_.find(idx);
         assert(foundIt != map_.end());
         cov[rr * vdim + cc] = foundIt->second;
         if (rr != cc) cov[cc * vdim + rr] = foundIt->second;
@@ -200,7 +200,7 @@ void MarginalCovarianceCholesky::computeCovariance(
         int c = perm_ ? perm_[cc] : cc;
         if (r > c) std::swap(r, c);
         const int idx = computeIndex(r, c);
-        const LookupMap::const_iterator foundIt = map_.find(idx);
+        const auto foundIt = map_.find(idx);
         assert(foundIt != map_.end());
         (*block)(iRow, iCol) = foundIt->second;
       }

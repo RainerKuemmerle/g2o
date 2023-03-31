@@ -59,19 +59,19 @@ class SparseBlockMatrixDiagonal {
       : blockIndices_(blockIndices) {}
 
   //! how many rows/cols does the block at block-row / block-column r has?
-  inline int dimOfBlock(int r) const {
+  [[nodiscard]] inline int dimOfBlock(int r) const {
     return r ? blockIndices_[r] - blockIndices_[r - 1] : blockIndices_[0];
   }
 
   //! where does the row /col at block-row / block-column r starts?
-  inline int baseOfBlock(int r) const { return r ? blockIndices_[r - 1] : 0; }
+  [[nodiscard]] inline int baseOfBlock(int r) const { return r ? blockIndices_[r - 1] : 0; }
 
   //! the block matrices per block-column
   const DiagonalVector& diagonal() const { return diagonal_; }
   DiagonalVector& diagonal() { return diagonal_; }
 
   //! indices of the row blocks
-  const std::vector<int>& blockIndices() const { return blockIndices_; }
+  [[nodiscard]] const std::vector<int>& blockIndices() const { return blockIndices_; }
 
   void multiply(double*& dest, const double* src) const {
     int destSize = cols();

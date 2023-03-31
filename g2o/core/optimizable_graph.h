@@ -139,10 +139,10 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
     }
 
     //! get the mapped memory of the hessian matrix
-    virtual double* hessianData() const = 0;
+    [[nodiscard]] virtual double* hessianData() const = 0;
 
     //! return a map of the mapped Hessian
-    MatrixX::MapType hessianMap() const;
+    [[nodiscard]] MatrixX::MapType hessianMap() const;
 
     /** maps the internal matrix to some external memory location */
     virtual void mapHessianMemory(double* d) = 0;
@@ -154,10 +154,10 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
     virtual int copyB(double* b_) const = 0;
 
     //! return a pointer to the b vector associated with this vertex
-    virtual double* bData() const = 0;
+    [[nodiscard]] virtual double* bData() const = 0;
 
     //! return a map onto the b vector
-    VectorX::MapType bMap() const;
+    [[nodiscard]] VectorX::MapType bMap() const;
 
     /**
      * set the b vector part of this vertex to zero
@@ -244,7 +244,7 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
      * returns the dimension of the extended representation used by
      * get/setEstimate(double*) -1 if it is not supported
      */
-    virtual int estimateDimension() const;
+    [[nodiscard]] virtual int estimateDimension() const;
 
     /**
      * sets the initial estimate from an array of double.
@@ -319,7 +319,7 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
      * returns the dimension of the extended representation used by
      * get/setEstimate(double*) -1 if it is not supported
      */
-    virtual int minimalEstimateDimension() const;
+    [[nodiscard]] virtual int minimalEstimateDimension() const;
 
     //! backup the position of the vertex to a stack
     virtual void push() = 0;
@@ -333,7 +333,7 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
     virtual void discardTop() = 0;
 
     //! return the stack size
-    virtual int stackSize() const = 0;
+    [[nodiscard]] virtual int stackSize() const = 0;
 
     /**
      * Update the position of the node from the parameters in v.
@@ -348,22 +348,22 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
 
     //! temporary index of this node in the parameter vector obtained from
     //! linearization
-    int hessianIndex() const { return hessianIndex_; }
+    [[nodiscard]] int hessianIndex() const { return hessianIndex_; }
     //! set the temporary index of the vertex in the parameter blocks
     void setHessianIndex(int ti) { hessianIndex_ = ti; }
 
     //! true => this node is fixed during the optimization
-    bool fixed() const { return fixed_; }
+    [[nodiscard]] bool fixed() const { return fixed_; }
     //! true => this node should be considered fixed during the optimization
     void setFixed(bool fixed) { fixed_ = fixed; }
 
     //! true => this node is marginalized out during the optimization
-    bool marginalized() const { return marginalized_; }
+    [[nodiscard]] bool marginalized() const { return marginalized_; }
     //! true => this node should be marginalized out during the optimization
     void setMarginalized(bool marginalized) { marginalized_ = marginalized; }
 
     //! dimension of the estimated state belonging to this node
-    int dimension() const { return dimension_; }
+    [[nodiscard]] int dimension() const { return dimension_; }
 
     //! sets the id of the node in the graph be sure that the graph keeps
     //! consistent after changing the id
@@ -372,9 +372,9 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
     //! set the row of this vertex in the Hessian
     void setColInHessian(int c) { colInHessian_ = c; }
     //! get the row of this vertex in the Hessian
-    int colInHessian() const { return colInHessian_; }
+    [[nodiscard]] int colInHessian() const { return colInHessian_; }
 
-    const OptimizableGraph* graph() const { return graph_; }
+    [[nodiscard]] const OptimizableGraph* graph() const { return graph_; }
     OptimizableGraph* graph() { return graph_; }
 
     /**
@@ -440,7 +440,7 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
     ~Edge() override;
 
     // indicates if all vertices are fixed
-    virtual bool allVerticesFixed() const = 0;
+    [[nodiscard]] virtual bool allVerticesFixed() const = 0;
 
     // computes the error of the edge and stores it in an internal structure
     virtual void computeError() = 0;
@@ -455,7 +455,7 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
 
     //! returns the dimension of the measurement in the extended representation
     //! which is used by get/setMeasurement;
-    virtual int measurementDimension() const;
+    [[nodiscard]] virtual int measurementDimension() const;
 
     /**
      * sets the estimate to have a zero error, based on the current value of the
@@ -464,24 +464,24 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
     virtual bool setMeasurementFromState();
 
     //! if NOT NULL, error of this edge will be robustifed with the kernel
-    std::shared_ptr<RobustKernel> robustKernel() const { return robustKernel_; }
+    [[nodiscard]] std::shared_ptr<RobustKernel> robustKernel() const { return robustKernel_; }
     /**
      * specify the robust kernel to be used in this edge
      */
     void setRobustKernel(std::shared_ptr<RobustKernel> ptr);
 
     //! returns the error vector cached after calling the computeError;
-    virtual const double* errorData() const = 0;
+    [[nodiscard]] virtual const double* errorData() const = 0;
     virtual double* errorData() = 0;
 
     //! returns the memory of the information matrix, usable for example with a
     //! Eigen::Map<MatrixX>
-    virtual const double* informationData() const = 0;
+    [[nodiscard]] virtual const double* informationData() const = 0;
     virtual double* informationData() = 0;
 
     //! computes the chi2 based on the cached error value, only valid after
     //! computeError has been called.
-    virtual double chi2() const = 0;
+    [[nodiscard]] virtual double chi2() const = 0;
 
     /**
      * Linearizes the constraint in the edge.
@@ -528,12 +528,12 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
     }
 
     //! returns the level of the edge
-    int level() const { return level_; }
+    [[nodiscard]] int level() const { return level_; }
     //! sets the level of the edge
     void setLevel(int l) { level_ = l; }
 
     //! returns the dimensions of the error function
-    int dimension() const { return dimension_; }
+    [[nodiscard]] int dimension() const { return dimension_; }
 
     virtual Vertex* createVertex(int) { return nullptr; }
 
@@ -543,18 +543,18 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
     virtual bool write(std::ostream& os) const = 0;
 
     //! the internal ID of the edge
-    int64_t internalId() const { return internalId_; }
+    [[nodiscard]] int64_t internalId() const { return internalId_; }
 
     OptimizableGraph* graph();
-    const OptimizableGraph* graph() const;
+    [[nodiscard]] const OptimizableGraph* graph() const;
 
     bool setParameterId(int argNum, int paramId);
-    std::shared_ptr<Parameter> parameter(int argNo) const {
+    [[nodiscard]] std::shared_ptr<Parameter> parameter(int argNo) const {
       return parameters_.at(argNo);
     }
-    size_t numParameters() const { return parameters_.size(); }
+    [[nodiscard]] size_t numParameters() const { return parameters_.size(); }
 
-    const std::vector<int>& parameterIds() const { return parameterIds_; }
+    [[nodiscard]] const std::vector<int>& parameterIds() const { return parameterIds_; }
 
    protected:
     int dimension_ = -1;

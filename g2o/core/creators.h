@@ -47,7 +47,7 @@ class G2O_CORE_API AbstractHyperGraphElementCreator {
   /**
    * name of the class to be created. Has to implemented in derived class.
    */
-  virtual const std::string& name() const = 0;
+  [[nodiscard]] virtual const std::string& name() const = 0;
 
   virtual ~AbstractHyperGraphElementCreator() = default;
 };
@@ -67,7 +67,7 @@ class HyperGraphElementCreator : public AbstractHyperGraphElementCreator {
   construct() override {
     return std::make_unique<T>();
   }
-  const std::string& name() const override { return name_; }
+  [[nodiscard]] const std::string& name() const override { return name_; }
 
  protected:
   std::string name_;

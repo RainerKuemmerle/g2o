@@ -42,9 +42,9 @@ class G2O_CORE_API Parameter : public HyperGraph::HyperGraphElement {
   virtual bool read(std::istream& is) = 0;
   //! write the data to a stream
   virtual bool write(std::ostream& os) const = 0;
-  int id() const { return id_; }
+  [[nodiscard]] int id() const { return id_; }
   void setId(int id_);
-  HyperGraph::HyperGraphElementType elementType() const override {
+  [[nodiscard]] HyperGraph::HyperGraphElementType elementType() const override {
     return HyperGraph::kHgetParameter;
   }
 

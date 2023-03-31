@@ -41,9 +41,7 @@ void delcareHyperDijkstra(py::module& m) {
       .def("parent", &HyperDijkstra::AdjacencyMapEntry::parent)
       .def("edge", &HyperDijkstra::AdjacencyMapEntry::edge)
       .def("distance", &HyperDijkstra::AdjacencyMapEntry::distance)
-      .def("children", static_cast<HyperGraph::VertexSet& (
-                           HyperDijkstra::AdjacencyMapEntry::*)()>(
-                           &HyperDijkstra::AdjacencyMapEntry::children));
+      .def("children", &HyperDijkstra::AdjacencyMapEntry::children);
 
   cls.def(py::init<const std::shared_ptr<HyperGraph>&>(), "g"_a,
           py::keep_alive<1, 2>());

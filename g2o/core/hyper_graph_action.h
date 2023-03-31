@@ -89,10 +89,10 @@ class G2O_CORE_API HyperGraphElementAction {
   virtual ~HyperGraphElementAction();
 
   //! returns the typeid name of the action
-  const std::string& typeName() const { return typeName_; }
+  [[nodiscard]] const std::string& typeName() const { return typeName_; }
 
   //! returns the name of an action, e.g "draw"
-  const std::string& name() const { return name_; }
+  [[nodiscard]] const std::string& name() const { return name_; }
 
   //! sets the type on which an action has to operate
   void setTypeName(std::string typeName);
