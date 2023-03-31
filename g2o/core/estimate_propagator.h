@@ -29,6 +29,7 @@
 
 #include <limits>
 #include <map>
+#include <string_view>
 #include <unordered_map>
 
 #include "g2o_core_api.h"
@@ -49,7 +50,7 @@ class G2O_CORE_API EstimatePropagatorCost {
   virtual double operator()(OptimizableGraph::Edge* edge,
                             const OptimizableGraph::VertexSet& from,
                             OptimizableGraph::Vertex* to_) const;
-  virtual const char* name() const { return "spanning tree"; }
+  virtual std::string_view name() const { return "spanning tree"; }
 
  protected:
   SparseOptimizer* _graph;
@@ -65,10 +66,10 @@ class G2O_CORE_API EstimatePropagatorCostOdometry
     : public EstimatePropagatorCost {
  public:
   EstimatePropagatorCostOdometry(SparseOptimizer* graph);
-  virtual double operator()(OptimizableGraph::Edge* edge,
-                            const OptimizableGraph::VertexSet& from_,
-                            OptimizableGraph::Vertex* to_) const;
-  virtual const char* name() const { return "odometry"; }
+  double operator()(OptimizableGraph::Edge* edge,
+                    const OptimizableGraph::VertexSet& from_,
+                    OptimizableGraph::Vertex* to_) const override;
+  std::string_view name() const override { return "odometry"; }
 };
 
 /**

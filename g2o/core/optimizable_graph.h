@@ -609,8 +609,8 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
   /**
    * overridden from HyperGraph, to maintain the bookkeeping of the
    * caches/parameters and jacobian workspaces consistent upon a change in the
-   * veretx.
-   * @return false if something goes wriong.
+   * vertex.
+   * @return false if something goes wrong.
    */
   virtual bool setEdgeVertex(HyperGraph::Edge* e, int pos,
                              HyperGraph::Vertex* v);
