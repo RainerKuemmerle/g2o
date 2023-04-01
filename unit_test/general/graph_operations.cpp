@@ -24,17 +24,20 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+#include <gmock/gmock.h>
+#include <gtest/gtest.h>
+
 #include <memory>
 #include <numeric>
+#include <unordered_set>
 
 #include "allocate_optimizer.h"
 #include "g2o/core/factory.h"
+#include "g2o/core/hyper_dijkstra.h"
 #include "g2o/core/optimization_algorithm_property.h"
 #include "g2o/core/sparse_optimizer.h"
 #include "g2o/stuff/string_tools.h"
 #include "g2o/types/slam2d/types_slam2d.h"
-#include "gmock/gmock.h"
-#include "gtest/gtest.h"
 
 G2O_USE_TYPE_GROUP(slam2d);
 
@@ -597,4 +600,41 @@ TEST_F(GeneralGraphOperations, SolverSuitable) {
   EXPECT_FALSE(optimizer->isSolverSuitable(solverPropertyFix63, vertexDims));
   EXPECT_FALSE(
       optimizer->isSolverSuitable(solverPropertyFix63, vertexDimsNoMatch));
+}
+
+namespace {
+
+class TreeVisitor : public g2o::HyperDijkstra::TreeAction {
+ public:
+  double perform(g2o::HyperGraph::Vertex* v, g2o::HyperGraph::Vertex* vParent,
+                 g2o::HyperGraph::Edge* e) override {
+    visited_ids_.insert(v->id());
+    return 1.;
+  }
+
+  const std::unordered_set<int>& visitedIds() const { return visited_ids_; }
+
+ protected:
+  std::unordered_set<int> visited_ids_;
+};
+
+std::vector<int> range_helper(int range) {
+  std::vector<int> result(range);
+  std::iota(result.begin(), result.end(), 0);
+  return result;
+}
+}  // namespace
+
+TEST_F(GeneralGraphOperations, HyperDijkstraVisitor) {
+  g2o::UniformCostFunction uniformCost;
+  g2o::HyperDijkstra hyperDijkstra(optimizer.get());
+  hyperDijkstra.shortestPaths(optimizer->vertex(0), &uniformCost);
+
+  g2o::HyperDijkstra::computeTree(hyperDijkstra.adjacencyMap());
+  TreeVisitor treeVisitor;
+  g2o::HyperDijkstra::visitAdjacencyMap(hyperDijkstra.adjacencyMap(),
+                                        &treeVisitor);
+  EXPECT_THAT(treeVisitor.visitedIds(), testing::SizeIs(numVertices));
+  EXPECT_THAT(treeVisitor.visitedIds(),
+              testing::UnorderedElementsAreArray(range_helper(numVertices)));
 }

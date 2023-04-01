@@ -42,7 +42,7 @@ using namespace std;
 namespace g2o {
 
 /**
- * \brief compute the initial guess of theta while travelling along the MST
+ * \brief compute the initial guess of theta while traveling along the MST
  */
 class ThetaTreeAction : public HyperDijkstra::TreeAction {
  public:
