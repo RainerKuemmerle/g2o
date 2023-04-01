@@ -49,7 +49,7 @@ class G2O_SIMULATOR_API BaseWorldObject {
   }
   virtual ~BaseWorldObject();
   void setWorld(World* world_) { _world = world_; }
-  World* world() { return _world; }
+  World* world() const { return _world; }
   OptimizableGraph* graph();
   OptimizableGraph::Vertex* vertex() { return _vertex; }
   virtual void setVertex(OptimizableGraph::Vertex* vertex_);
@@ -87,6 +87,7 @@ class G2O_SIMULATOR_API BaseRobot {
     _name = name_;
   }
   void setWorld(World* world_) { _world = world_; }
+  World* world() const { return _world; }
   World* world() { return _world; }
   const std::string& name() const { return _name; }
   OptimizableGraph* graph();

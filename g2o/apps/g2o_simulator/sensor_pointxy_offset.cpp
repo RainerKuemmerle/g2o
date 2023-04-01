@@ -93,8 +93,8 @@ void SensorPointXYOffset::sense() {
     WorldObjectType* o = dynamic_cast<WorldObjectType*>(*it);
     if (o && isVisible(o)) {
       EdgeType* e = mkEdge(o);
-      e->setParameterId(0, _offsetParam->id());
       if (e && graph()) {
+        e->setParameterId(0, _offsetParam->id());
         graph()->addEdge(e);
         e->setMeasurementFromState();
         addNoise(e);
