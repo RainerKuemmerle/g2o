@@ -285,7 +285,9 @@ bool SparseOptimizerIncremental::updateInitialization(
       lastBlock = m;
     }
   }
-  lastBlock->diagonal().array() += 1e-6;  // HACK to get Eigen value > 0
+  if (lastBlock) {
+    lastBlock->diagonal().array() += 1e-6;  // HACK to get Eigen value > 0
+  }
 
   for (HyperGraph::EdgeSet::const_iterator it = eset.begin(); it != eset.end();
        ++it) {

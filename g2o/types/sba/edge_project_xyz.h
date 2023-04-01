@@ -42,15 +42,15 @@ class G2O_TYPES_SBA_API EdgeSE3ProjectXYZ
 
   EdgeSE3ProjectXYZ();
 
-  bool read(std::istream &is);
-  bool write(std::ostream &os) const;
+  bool read(std::istream& is);
+  bool write(std::ostream& os) const;
   void computeError();
   bool isDepthPositive();
 
   virtual void linearizeOplus();
-  Vector2 cam_project(const Vector3 &trans_xyz) const;
+  Vector2 cam_project(const Vector3& trans_xyz) const;
 
-  double fx, fy, cx, cy;
+  double fx = 1., fy = 1., cx = 0.5, cy = 0.5;
 };
 
 }  // namespace g2o

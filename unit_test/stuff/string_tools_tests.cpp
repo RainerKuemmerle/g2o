@@ -73,6 +73,20 @@ TEST(Stuff, FormatString) {
   ASSERT_EQ("Hello 42 World", g2o::formatString("Hello %d World", 42));
 }
 
+TEST(Stuff, StrPrintf) {
+  std::string output;
+  g2o::strPrintf(output, "%d", 42);
+  ASSERT_EQ("42", output);
+  g2o::strPrintf(output, "%g", 3.1415);
+  ASSERT_EQ("3.1415", output);
+  g2o::strPrintf(output, "%f", 3.1415);
+  ASSERT_EQ("3.141500", output);
+  g2o::strPrintf(output, "%.3f", 3.1415);
+  ASSERT_EQ("3.142", output);
+  g2o::strPrintf(output, "Hello %d World", 42);
+  ASSERT_EQ("Hello 42 World", output);
+}
+
 TEST(Stuff, StrSplit) {
   std::vector<std::string> tokens;
   tokens = g2o::strSplit("", ",");

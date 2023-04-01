@@ -6,7 +6,6 @@ set(G2O_PARSER_SRC
   location.hh
   position.hh
   scanner.h flex_scanner.cpp
-  stack.hh
 )
 
 if (MSVC)

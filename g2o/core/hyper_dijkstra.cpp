@@ -234,36 +234,6 @@ void HyperDijkstra::visitAdjacencyMap(AdjacencyMap& amap, TreeAction* action,
   }
 }
 
-void HyperDijkstra::connectedSubset(
-    HyperGraph::VertexSet& connected, HyperGraph::VertexSet& visited,
-    HyperGraph::VertexSet& startingSet, HyperGraph* g, HyperGraph::Vertex* v,
-    HyperDijkstra::CostFunction* cost, double distance,
-    double comparisonConditioner, double maxEdgeCost) {
-  typedef std::queue<HyperGraph::Vertex*> VertexDeque;
-  visited.clear();
-  connected.clear();
-  VertexDeque frontier;
-  HyperDijkstra dv(g);
-  connected.insert(v);
-  frontier.push(v);
-  while (!frontier.empty()) {
-    HyperGraph::Vertex* v0 = frontier.front();
-    frontier.pop();
-    dv.shortestPaths(v0, cost, distance, comparisonConditioner, false,
-                     maxEdgeCost);
-    for (HyperGraph::VertexSet::iterator it = dv.visited().begin();
-         it != dv.visited().end(); ++it) {
-      visited.insert(*it);
-      if (startingSet.find(*it) == startingSet.end()) continue;
-      std::pair<HyperGraph::VertexSet::iterator, bool> insertOutcome =
-          connected.insert(*it);
-      if (insertOutcome.second) {  // the node was not in the connectedSet;
-        frontier.push(dynamic_cast<HyperGraph::Vertex*>(*it));
-      }
-    }
-  }
-}
-
 double UniformCostFunction::operator()(HyperGraph::Edge* /*edge*/,
                                        HyperGraph::Vertex* /*from*/,
                                        HyperGraph::Vertex* /*to*/) {

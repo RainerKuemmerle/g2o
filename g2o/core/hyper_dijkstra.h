@@ -90,12 +90,6 @@ struct G2O_CORE_API HyperDijkstra {
   static void computeTree(AdjacencyMap& amap);
   static void visitAdjacencyMap(AdjacencyMap& amap, TreeAction* action,
                                 bool useDistance = false);
-  static void connectedSubset(
-      HyperGraph::VertexSet& connected, HyperGraph::VertexSet& visited,
-      HyperGraph::VertexSet& startingSet, HyperGraph* g, HyperGraph::Vertex* v,
-      HyperDijkstra::CostFunction* cost, double distance,
-      double comparisonConditioner,
-      double maxEdgeCost = std::numeric_limits<double>::max());
 
  protected:
   void reset();
