@@ -52,7 +52,7 @@ TEST(Slam2D, EdgeSE2Jacobian) {
 
   JacobianWorkspace jacobianWorkspace;
   JacobianWorkspace numericJacobianWorkspace;
-  numericJacobianWorkspace.updateSize(&e);
+  numericJacobianWorkspace.updateSize(e);
   numericJacobianWorkspace.allocate();
 
   for (int k = 0; k < 10000; ++k) {
@@ -74,7 +74,7 @@ TEST(Slam2D, EdgeSE2PriorJacobian) {
 
   JacobianWorkspace jacobianWorkspace;
   JacobianWorkspace numericJacobianWorkspace;
-  numericJacobianWorkspace.updateSize(&e);
+  numericJacobianWorkspace.updateSize(e);
   numericJacobianWorkspace.allocate();
 
   for (int k = 0; k < 10000; ++k) {
@@ -99,7 +99,7 @@ TEST(Slam2D, EdgePointXYJacobian) {
 
   JacobianWorkspace jacobianWorkspace;
   JacobianWorkspace numericJacobianWorkspace;
-  numericJacobianWorkspace.updateSize(&e);
+  numericJacobianWorkspace.updateSize(e);
   numericJacobianWorkspace.allocate();
 
   for (int k = 0; k < 10000; ++k) {
@@ -125,7 +125,7 @@ TEST(Slam2D, EdgeSE2PointXYJacobian) {
 
   JacobianWorkspace jacobianWorkspace;
   JacobianWorkspace numericJacobianWorkspace;
-  numericJacobianWorkspace.updateSize(&e);
+  numericJacobianWorkspace.updateSize(e);
   numericJacobianWorkspace.allocate();
 
   for (int k = 0; k < 10000; ++k) {
@@ -151,7 +151,7 @@ TEST(Slam2D, EdgeSE2PointXYBearingJacobian) {
 
   JacobianWorkspace jacobianWorkspace;
   JacobianWorkspace numericJacobianWorkspace;
-  numericJacobianWorkspace.updateSize(&e);
+  numericJacobianWorkspace.updateSize(e);
   numericJacobianWorkspace.allocate();
 
   for (int k = 0; k < 10000; ++k) {

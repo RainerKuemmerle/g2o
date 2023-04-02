@@ -58,7 +58,7 @@ TEST(Sim3, EdgeSim3Jacobian) {
 
   JacobianWorkspace jacobianWorkspace;
   JacobianWorkspace numericJacobianWorkspace;
-  numericJacobianWorkspace.updateSize(&e);
+  numericJacobianWorkspace.updateSize(e);
   numericJacobianWorkspace.allocate();
 
   for (int k = 0; k < 1; ++k) {

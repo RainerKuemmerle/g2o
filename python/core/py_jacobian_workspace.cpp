@@ -11,7 +11,7 @@ void declareJacobianWorkspace(py::module& m) {
       .def("allocate", &JacobianWorkspace::allocate)
       .def("update_size",
            static_cast<void (JacobianWorkspace::*)(
-               const HyperGraph::Edge*, bool)>(&JacobianWorkspace::updateSize),
+               const HyperGraph::Edge&, bool)>(&JacobianWorkspace::updateSize),
            "e"_a, "reset"_a = false)
       .def("update_size",
            static_cast<void (JacobianWorkspace::*)(

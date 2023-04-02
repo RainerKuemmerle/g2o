@@ -152,7 +152,7 @@ class AutoDifferentiation : public ::testing::Test {
     testEdge_.setVertex(1, v2_);
     testEdge_.setVertex(2, point_);
 
-    jacobianWorkspace_.updateSize(&testEdge_);
+    jacobianWorkspace_.updateSize(testEdge_);
     jacobianWorkspace_.allocate();
   }
   std::shared_ptr<VertexFlatSE2> v1_ = std::make_shared<VertexFlatSE2>();
@@ -223,13 +223,13 @@ class AutoDifferentiationEdgeSE2 : public ::testing::Test {
     testEdge_.setMeasurement(meas);
     testEdge_.setVertex(0, v1_);
     testEdge_.setVertex(1, v2_);
-    jacobianWorkspace_.updateSize(&testEdge_);
+    jacobianWorkspace_.updateSize(testEdge_);
     jacobianWorkspace_.allocate();
 
     testEdgeAd_.setMeasurement(meas);
     testEdgeAd_.setVertex(0, v1_);
     testEdgeAd_.setVertex(1, v2_);
-    jacobianWorkspaceAd_.updateSize(&testEdgeAd_);
+    jacobianWorkspaceAd_.updateSize(testEdgeAd_);
     jacobianWorkspaceAd_.allocate();
   }
   std::shared_ptr<g2o::VertexSE2> v1_ = std::make_shared<g2o::VertexSE2>();

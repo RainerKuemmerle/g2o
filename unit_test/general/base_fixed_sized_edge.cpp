@@ -93,7 +93,7 @@ class EdgeUnaryCreateVertexTester
 
   void setMeasurement(const g2o::Vector2& m) override { measurement_ = m; }
 
-  int measurementDimension() const override { return 2; }
+  [[nodiscard]] int measurementDimension() const override { return 2; }
 };
 
 TEST(General, IndexToPairToIndex) {
@@ -185,7 +185,7 @@ class EdgeTester {
     edge.setVertex(1, v2);
     edge.setVertex(2, v3);
 
-    jacobianWorkspace.updateSize(&edge);
+    jacobianWorkspace.updateSize(edge);
     jacobianWorkspace.allocate();
 
     hessian01.setZero();

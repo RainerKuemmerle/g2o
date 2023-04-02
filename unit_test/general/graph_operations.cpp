@@ -703,7 +703,9 @@ TEST_F(GeneralGraphOperations, JacWorkspace) {
   ASSERT_THAT(workspace.maxNumVertices(), testing::Le(0));
 
   auto root = optimizer_->vertex(0);
-  workspace.updateSize(root->edges().begin()->lock().get(), true);
+  std::shared_ptr<g2o::HyperGraph::Edge> first_edge =
+      root->edges().begin()->lock();
+  workspace.updateSize(*first_edge, true);
   EXPECT_THAT(workspace.maxDimension(), testing::Eq(9));
   EXPECT_THAT(workspace.maxNumVertices(), testing::Eq(2));
   EXPECT_THAT(workspace.workspace(), testing::IsEmpty());

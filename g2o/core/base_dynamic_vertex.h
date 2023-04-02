@@ -78,7 +78,7 @@ bool BaseDynamicVertex<T>::setDimension(int newDimension) {
   if ((newDimension > oldDimension) && (graph_ != nullptr)) {
     JacobianWorkspace& jacobianWorkspace = graph_->jacobianWorkspace();
     for (auto& e : edges_) {
-      jacobianWorkspace.updateSize(e.lock().get());
+      jacobianWorkspace.updateSize(*e.lock());
     }
   }
 

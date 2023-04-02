@@ -253,7 +253,7 @@ bool OptimizableGraph::addEdge(const std::shared_ptr<HyperGraph::Edge>& he) {
     return false;
   }
 
-  jacobianWorkspace_.updateSize(e);
+  jacobianWorkspace_.updateSize(*e);
 
   return true;
 }
@@ -298,7 +298,7 @@ bool OptimizableGraph::setEdgeVertex(
            << endl;
       return false;
     }
-    jacobianWorkspace_.updateSize(e.get());
+    jacobianWorkspace_.updateSize(*e);
   }
   return true;
 }

@@ -49,7 +49,7 @@ void JacobianWorkspace::setZero() {
   for (auto& wp : workspace_) wp.setZero();
 }
 
-void JacobianWorkspace::updateSize(const HyperGraph::Edge* e_, bool reset) {
+void JacobianWorkspace::updateSize(const HyperGraph::Edge& e_, bool reset) {
   if (reset) {
     maxNumVertices_ = -1;
     maxDimension_ = -1;
@@ -57,8 +57,8 @@ void JacobianWorkspace::updateSize(const HyperGraph::Edge* e_, bool reset) {
   updateSize(e_);
 }
 
-void JacobianWorkspace::updateSize(const HyperGraph::Edge* e_) {
-  const auto* e = static_cast<const OptimizableGraph::Edge*>(e_);
+void JacobianWorkspace::updateSize(const HyperGraph::Edge& e_) {
+  const auto* e = static_cast<const OptimizableGraph::Edge*>(&e_);
   const int errorDimension = e->dimension();
   const int numVertices = e->vertices().size();
   int maxDimensionForEdge = -1;
@@ -83,7 +83,7 @@ void JacobianWorkspace::updateSize(const OptimizableGraph& graph, bool reset) {
 
   for (const auto& it : graph.edges()) {
     const auto* e = static_cast<const OptimizableGraph::Edge*>(it.get());
-    updateSize(e);
+    updateSize(*e);
   }
 }
 

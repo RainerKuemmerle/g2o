@@ -65,7 +65,7 @@ TEST(Slam3D, EdgeSE3Jacobian) {
 
   JacobianWorkspace jacobianWorkspace;
   JacobianWorkspace numericJacobianWorkspace;
-  numericJacobianWorkspace.updateSize(&e);
+  numericJacobianWorkspace.updateSize(e);
   numericJacobianWorkspace.allocate();
 
   for (int k = 0; k < 10000; ++k) {
@@ -87,7 +87,7 @@ TEST(Slam3D, EdgeSE3XYZPriorJacobian) {
 
   JacobianWorkspace jacobianWorkspace;
   JacobianWorkspace numericJacobianWorkspace;
-  numericJacobianWorkspace.updateSize(&e);
+  numericJacobianWorkspace.updateSize(e);
   numericJacobianWorkspace.allocate();
 
   // test in identity pose
@@ -128,7 +128,7 @@ TEST(Slam3D, EdgeSE3PointXYZJacobian) {
 
   JacobianWorkspace jacobianWorkspace;
   JacobianWorkspace numericJacobianWorkspace;
-  numericJacobianWorkspace.updateSize(e.get());
+  numericJacobianWorkspace.updateSize(*e);
   numericJacobianWorkspace.allocate();
 
   for (int k = 0; k < 10000; ++k) {
@@ -155,7 +155,7 @@ TEST(Slam3D, EdgePointXYZJacobian) {
 
   JacobianWorkspace jacobianWorkspace;
   JacobianWorkspace numericJacobianWorkspace;
-  numericJacobianWorkspace.updateSize(&e);
+  numericJacobianWorkspace.updateSize(e);
   numericJacobianWorkspace.allocate();
 
   for (int k = 0; k < 10000; ++k) {
@@ -270,7 +270,7 @@ TEST(Slam3D, EdgeSE3PointXYZDepthJacobian) {
 
   JacobianWorkspace jacobianWorkspace;
   JacobianWorkspace numericJacobianWorkspace;
-  numericJacobianWorkspace.updateSize(e.get());
+  numericJacobianWorkspace.updateSize(*e);
   numericJacobianWorkspace.allocate();
 
   for (int k = 0; k < 10000; ++k) {
@@ -308,7 +308,7 @@ TEST(Slam3D, EdgeSE3PointXYZDisparityJacobian) {
 
   JacobianWorkspace jacobianWorkspace;
   JacobianWorkspace numericJacobianWorkspace;
-  numericJacobianWorkspace.updateSize(e.get());
+  numericJacobianWorkspace.updateSize(*e);
   numericJacobianWorkspace.allocate();
 
   for (int k = 0; k < 10000; ++k) {
