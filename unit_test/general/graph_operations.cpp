@@ -33,17 +33,27 @@
 #include <unordered_set>
 
 #include "allocate_optimizer.h"
+#include "g2o/core/eigen_types.h"
 #include "g2o/core/factory.h"
 #include "g2o/core/hyper_dijkstra.h"
 #include "g2o/core/hyper_graph.h"
+#include "g2o/core/jacobian_workspace.h"
 #include "g2o/core/optimizable_graph.h"
 #include "g2o/core/optimization_algorithm_property.h"
 #include "g2o/core/sparse_optimizer.h"
 #include "g2o/stuff/string_tools.h"
 #include "g2o/types/slam2d/types_slam2d.h"
-#include "gmock/gmock.h"
 
 G2O_USE_TYPE_GROUP(slam2d);
+
+namespace {
+class JacobianWorkspaceTestAdapter : public g2o::JacobianWorkspace {
+ public:
+  [[nodiscard]] WorkspaceVector& workspace() { return _workspace; }
+  [[nodiscard]] int maxNumVertices() const { return _maxNumVertices; }
+  [[nodiscard]] int maxDimension() const { return _maxDimension; }
+};
+}  // namespace
 
 TEST(General, BinaryEdgeConstructor) {
   g2o::EdgeSE2 e2;
@@ -640,6 +650,46 @@ TEST_F(GeneralGraphOperations, SolverSuitable) {
   EXPECT_FALSE(optimizer->isSolverSuitable(solverPropertyFix63, vertexDims));
   EXPECT_FALSE(
       optimizer->isSolverSuitable(solverPropertyFix63, vertexDimsNoMatch));
+}
+
+TEST_F(GeneralGraphOperations, JacWorkspace) {
+  JacobianWorkspaceTestAdapter workspace;
+  ASSERT_THAT(workspace.maxDimension(), testing::Le(0));
+  ASSERT_THAT(workspace.maxNumVertices(), testing::Le(0));
+
+  auto* root = optimizer->vertex(0);
+  workspace.updateSize(*root->edges().begin(), true);
+  EXPECT_THAT(workspace.maxDimension(), testing::Eq(9));
+  EXPECT_THAT(workspace.maxNumVertices(), testing::Eq(2));
+  EXPECT_THAT(workspace.workspace(), testing::IsEmpty());
+
+  workspace.updateSize(5, 23, true);
+  EXPECT_THAT(workspace.maxDimension(), testing::Eq(23));
+  EXPECT_THAT(workspace.maxNumVertices(), testing::Eq(5));
+  EXPECT_THAT(workspace.workspace(), testing::IsEmpty());
+
+  workspace.updateSize(*optimizer, true);
+  EXPECT_THAT(workspace.maxDimension(), testing::Eq(9));
+  EXPECT_THAT(workspace.maxNumVertices(), testing::Eq(2));
+  EXPECT_THAT(workspace.workspace(), testing::IsEmpty());
+
+  bool allocated = workspace.allocate();
+  EXPECT_THAT(allocated, testing::IsTrue());
+  ASSERT_THAT(workspace.workspace(), testing::SizeIs(2));
+  EXPECT_THAT(workspace.workspace(),
+              testing::Each(testing::SizeIs(workspace.maxDimension())));
+
+  for (int i = 0; i < 2; ++i) {
+    EXPECT_THAT(workspace.workspaceForVertex(i), testing::NotNull());
+  }
+
+  for (auto& wp : workspace.workspace()) wp.array() = 1;
+  workspace.setZero();
+  EXPECT_THAT(
+      workspace.workspace(),
+      testing::Each(testing::ResultOf(
+          [](const g2o::VectorX vec) { return vec.isApproxToConstant(0); },
+          testing::IsTrue())));
 }
 
 namespace {
