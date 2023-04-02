@@ -27,6 +27,7 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
+#include <algorithm>
 #include <memory>
 #include <numeric>
 #include <unordered_set>
@@ -34,10 +35,13 @@
 #include "allocate_optimizer.h"
 #include "g2o/core/factory.h"
 #include "g2o/core/hyper_dijkstra.h"
+#include "g2o/core/hyper_graph.h"
+#include "g2o/core/optimizable_graph.h"
 #include "g2o/core/optimization_algorithm_property.h"
 #include "g2o/core/sparse_optimizer.h"
 #include "g2o/stuff/string_tools.h"
 #include "g2o/types/slam2d/types_slam2d.h"
+#include "gmock/gmock.h"
 
 G2O_USE_TYPE_GROUP(slam2d);
 
@@ -240,8 +244,7 @@ class GeneralGraphOperations : public ::testing::Test {
   std::vector<std::pair<int, int>> expectedEdgeIds() const {
     std::vector<std::pair<int, int>> result;
     for (size_t i = 0; i < numVertices; ++i)
-      result.emplace_back(
-          std::make_pair((i + 0) % numVertices, (i + 1) % numVertices));
+      result.emplace_back((i + 0) % numVertices, (i + 1) % numVertices);
     return result;
   }
 
@@ -330,6 +333,43 @@ TEST_F(GeneralGraphOperations, LoadingGraph) {
                                             e->vertex(1)->id());
                                       },
                                       testing::AnyOfArray(expectedEdgeIds()))));
+}
+
+TEST_F(GeneralGraphOperations, SaveSubsetVertices) {
+  g2o::OptimizableGraph::VertexSet verticesToSave{optimizer->vertex(0),
+                                                  optimizer->vertex(1)};
+
+  std::stringstream graphData;
+  optimizer->saveSubset(graphData, verticesToSave);
+  optimizer->clear();
+
+  optimizer->load(graphData);
+  EXPECT_THAT(optimizer->vertices(), testing::SizeIs(2));
+  EXPECT_THAT(optimizer->edges(), testing::SizeIs(1));
+  EXPECT_THAT(optimizer->vertices(), testing::UnorderedElementsAreArray(
+                                         internal::VectorIntToKeys({0, 1})));
+}
+
+TEST_F(GeneralGraphOperations, SaveSubsetEdges) {
+  g2o::OptimizableGraph::EdgeSet edgesToSave;
+  std::copy_if(optimizer->edges().begin(), optimizer->edges().end(),
+               std::inserter(edgesToSave, edgesToSave.end()),
+               [](const g2o::HyperGraph::Edge* e) {
+                 return e->vertices().size() == 2 && e->vertex(0)->id() == 1 &&
+                        e->vertex(1)->id() == 2;
+               });
+
+  ASSERT_THAT(edgesToSave, testing::SizeIs(1));
+
+  std::stringstream graphData;
+  optimizer->saveSubset(graphData, edgesToSave);
+  optimizer->clear();
+
+  optimizer->load(graphData);
+  EXPECT_THAT(optimizer->vertices(), testing::SizeIs(2));
+  EXPECT_THAT(optimizer->edges(), testing::SizeIs(1));
+  EXPECT_THAT(optimizer->vertices(), testing::UnorderedElementsAreArray(
+                                         internal::VectorIntToKeys({1, 2})));
 }
 
 TEST_F(GeneralGraphOperations, PushPopActiveVertices) {
