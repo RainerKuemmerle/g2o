@@ -273,7 +273,9 @@ bool SparseOptimizerIncremental::updateInitialization(
       lastBlock = m;
     }
   }
-  lastBlock->diagonal().array() += 1e-6;  // HACK to get Eigen value > 0
+  if (lastBlock) {
+    lastBlock->diagonal().array() += 1e-6;  // HACK to get Eigen value > 0
+  }
 
   for (const auto& it : eset) {
     auto* e = static_cast<OptimizableGraph::Edge*>(it.get());

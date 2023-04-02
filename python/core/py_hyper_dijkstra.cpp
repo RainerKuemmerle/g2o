@@ -85,20 +85,6 @@ void delcareHyperDijkstra(py::module& m) {
       "action"_a, "useDistance"_a = false, py::keep_alive<1, 2>(),
       py::keep_alive<1, 3>());  // (AdjacencyMap& amap, TreeAction* action, bool
                                 // useDistance=false) -> void
-  cls.def_static(
-      "connected_subset", &HyperDijkstra::connectedSubset, "connected"_a,
-      "visited"_a, "startingSet"_a, "g"_a, "v"_a, "cost"_a, "distance"_a,
-      "comparisonConditioner"_a,
-      "maxEdgeCost"_a = std::numeric_limits<double>::max(),
-      py::keep_alive<1, 2>(), py::keep_alive<1, 3>(), py::keep_alive<1, 4>(),
-      py::keep_alive<1, 5>(), py::keep_alive<1, 6>(),
-      py::keep_alive<1, 7>());  // (HyperGraph::VertexSet& connected,
-                                // HyperGraph::VertexSet& visited, 94
-                                // HyperGraph::VertexSet& startingSet, 95
-                                // HyperGraph* g, HyperGraph::Vertex* v, 96
-                                // HyperDijkstra::CostFunction* cost, double
-                                // distance, double comparisonConditioner, 97
-                                // double maxEdgeCost) -> void
 
   py::class_<UniformCostFunction, HyperDijkstra::CostFunction>(
       m, "UniformCostFunction")

@@ -47,7 +47,7 @@ class G2O_SIMULATOR_API BaseWorldObject {
   explicit BaseWorldObject(World* world = nullptr) : world_(world) {}
   virtual ~BaseWorldObject() = default;
   void setWorld(World* world) { world_ = world; }
-  World* world() { return world_; }
+  [[nodiscard]] World* world() const { return world_; }
   OptimizableGraph* graph();
   std::shared_ptr<OptimizableGraph::Vertex> vertex() { return vertex_; }
   virtual void setVertex(
@@ -85,8 +85,9 @@ class G2O_SIMULATOR_API BaseRobot {
   BaseRobot(World* world, std::string name)
       : world_(world), name_(std::move(name)) {}
   void setWorld(World* world) { world_ = world; }
+  [[nodiscard]] World* world() const { return world_; }
   World* world() { return world_; }
-  const std::string& name() const { return name_; }
+  [[nodiscard]] const std::string& name() const { return name_; }
   OptimizableGraph* graph();
   bool addSensor(BaseSensor* sensor);
   const std::set<BaseSensor*>& sensors() { return sensors_; }

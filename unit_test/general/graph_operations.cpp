@@ -27,18 +27,34 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
+#include <algorithm>
 #include <cstddef>
+#include <memory>
 #include <numeric>
+#include <unordered_set>
 
+#include "g2o/core/eigen_types.h"
 #include "g2o/core/factory.h"
+#include "g2o/core/hyper_dijkstra.h"
 #include "g2o/core/hyper_graph.h"
+#include "g2o/core/jacobian_workspace.h"
+#include "g2o/core/optimizable_graph.h"
 #include "g2o/core/optimization_algorithm_property.h"
 #include "g2o/core/sparse_optimizer.h"
 #include "g2o/stuff/string_tools.h"
 #include "g2o/types/slam2d/types_slam2d.h"
 #include "unit_test/test_helper/allocate_optimizer.h"
 
-G2O_USE_TYPE_GROUP(slam2d);
+G2O_USE_TYPE_GROUP(slam2d);  // NOLINT
+
+namespace {
+class JacobianWorkspaceTestAdapter : public g2o::JacobianWorkspace {
+ public:
+  [[nodiscard]] WorkspaceVector& workspace() { return workspace_; }
+  [[nodiscard]] int maxNumVertices() const { return maxNumVertices_; }
+  [[nodiscard]] int maxDimension() const { return maxDimension_; }
+};
+}  // namespace
 
 TEST(General, BinaryEdgeConstructor) {
   g2o::EdgeSE2 e2;
@@ -262,7 +278,7 @@ class GeneralGraphOperations : public ::testing::Test {
     return result;
   }
 
-  std::map<int, g2o::Vector3> vertexEstimates() const {
+  [[nodiscard]] std::map<int, g2o::Vector3> vertexEstimates() const {
     std::map<int, g2o::Vector3> result;
     for (const auto& idV : optimizer_->vertices()) {
       auto* v = dynamic_cast<g2o::VertexSE2*>(idV.second.get());
@@ -272,7 +288,7 @@ class GeneralGraphOperations : public ::testing::Test {
   }
 
   //! returns the expected Vertex IDs of the fixture
-  std::vector<int> fixedIds() const {
+  [[nodiscard]] std::vector<int> fixedIds() const {
     std::vector<int> result;
     for (const auto& idV : optimizer_->vertices()) {
       auto* v = dynamic_cast<g2o::OptimizableGraph::Vertex*>(idV.second.get());
@@ -281,7 +297,7 @@ class GeneralGraphOperations : public ::testing::Test {
     return result;
   }
 
-  std::unique_ptr<g2o::SparseOptimizer> optimizer_;
+  std::shared_ptr<g2o::SparseOptimizer> optimizer_;
   static constexpr size_t kNumVertices = 3;
 };
 
@@ -306,7 +322,7 @@ TEST_F(GeneralGraphOperations, SavingGraph) {
 
 namespace internal {
 using KeyIntVector = std::vector<decltype(testing::Key(42))>;
-static KeyIntVector VectorIntToKeys(const std::vector<int>& keys) {
+static KeyIntVector VectorIntToKeys(const std::vector<int>& keys) {  // NOLINT
   KeyIntVector matchers;
   for (const auto& val : keys) matchers.push_back(testing::Key(val));
   return matchers;
@@ -349,6 +365,43 @@ TEST_F(GeneralGraphOperations, LoadingGraph) {
                                           e->vertex(1)->id());
                   },
                   testing::AnyOfArray(expectedEdgeIds()))));
+}
+
+TEST_F(GeneralGraphOperations, SaveSubsetVertices) {
+  g2o::OptimizableGraph::VertexSet verticesToSave{optimizer_->vertex(0),
+                                                  optimizer_->vertex(1)};
+
+  std::stringstream graphData;
+  optimizer_->saveSubset(graphData, verticesToSave);
+  optimizer_->clear();
+
+  optimizer_->load(graphData);
+  EXPECT_THAT(optimizer_->vertices(), testing::SizeIs(2));
+  EXPECT_THAT(optimizer_->edges(), testing::SizeIs(1));
+  EXPECT_THAT(optimizer_->vertices(), testing::UnorderedElementsAreArray(
+                                          internal::VectorIntToKeys({0, 1})));
+}
+
+TEST_F(GeneralGraphOperations, SaveSubsetEdges) {
+  g2o::OptimizableGraph::EdgeSet edgesToSave;
+  std::copy_if(optimizer_->edges().begin(), optimizer_->edges().end(),
+               std::inserter(edgesToSave, edgesToSave.end()),
+               [](const g2o::HyperGraph::EdgeSet::value_type& e) {
+                 return e->vertices().size() == 2 && e->vertex(0)->id() == 1 &&
+                        e->vertex(1)->id() == 2;
+               });
+
+  ASSERT_THAT(edgesToSave, testing::SizeIs(1));
+
+  std::stringstream graphData;
+  optimizer_->saveSubset(graphData, edgesToSave);
+  optimizer_->clear();
+
+  optimizer_->load(graphData);
+  EXPECT_THAT(optimizer_->vertices(), testing::SizeIs(2));
+  EXPECT_THAT(optimizer_->edges(), testing::SizeIs(1));
+  EXPECT_THAT(optimizer_->vertices(), testing::UnorderedElementsAreArray(
+                                          internal::VectorIntToKeys({1, 2})));
 }
 
 TEST_F(GeneralGraphOperations, PushPopActiveVertices) {
@@ -642,4 +695,83 @@ TEST_F(GeneralGraphOperations, SharedOwnerShip) {
   const Ptr singleVertex = verticesMap.begin()->second;
   verticesMap.clear();
   ASSERT_THAT(singleVertex.use_count(), testing::Eq(1));
+}
+
+TEST_F(GeneralGraphOperations, JacWorkspace) {
+  JacobianWorkspaceTestAdapter workspace;
+  ASSERT_THAT(workspace.maxDimension(), testing::Le(0));
+  ASSERT_THAT(workspace.maxNumVertices(), testing::Le(0));
+
+  auto root = optimizer_->vertex(0);
+  workspace.updateSize(root->edges().begin()->lock().get(), true);
+  EXPECT_THAT(workspace.maxDimension(), testing::Eq(9));
+  EXPECT_THAT(workspace.maxNumVertices(), testing::Eq(2));
+  EXPECT_THAT(workspace.workspace(), testing::IsEmpty());
+
+  workspace.updateSize(5, 23, true);
+  EXPECT_THAT(workspace.maxDimension(), testing::Eq(23));
+  EXPECT_THAT(workspace.maxNumVertices(), testing::Eq(5));
+  EXPECT_THAT(workspace.workspace(), testing::IsEmpty());
+
+  workspace.updateSize(*optimizer_, true);
+  EXPECT_THAT(workspace.maxDimension(), testing::Eq(9));
+  EXPECT_THAT(workspace.maxNumVertices(), testing::Eq(2));
+  EXPECT_THAT(workspace.workspace(), testing::IsEmpty());
+
+  bool allocated = workspace.allocate();
+  EXPECT_THAT(allocated, testing::IsTrue());
+  ASSERT_THAT(workspace.workspace(), testing::SizeIs(2));
+  EXPECT_THAT(workspace.workspace(),
+              testing::Each(testing::SizeIs(workspace.maxDimension())));
+
+  for (int i = 0; i < 2; ++i) {
+    EXPECT_THAT(workspace.workspaceForVertex(i), testing::NotNull());
+  }
+
+  for (auto& wp : workspace.workspace()) wp.array() = 1;
+  workspace.setZero();
+  EXPECT_THAT(
+      workspace.workspace(),
+      testing::Each(testing::ResultOf(
+          [](const g2o::VectorX& vec) { return vec.isApproxToConstant(0); },
+          testing::IsTrue())));
+}
+
+namespace {
+
+class TreeVisitor : public g2o::HyperDijkstra::TreeAction {
+ public:
+  double perform(
+      const std::shared_ptr<g2o::HyperGraph::Vertex>& v,
+      const std::shared_ptr<g2o::HyperGraph::Vertex>& /*parent*/,
+      const std::shared_ptr<g2o::HyperGraph::Edge>& /*edge*/) override {
+    visited_ids_.insert(v->id());
+    return 1.;
+  }
+
+  const std::unordered_set<int>& visitedIds() const { return visited_ids_; }
+
+ protected:
+  std::unordered_set<int> visited_ids_;
+};
+
+std::vector<int> range_helper(int range) {
+  std::vector<int> result(range);
+  std::iota(result.begin(), result.end(), 0);
+  return result;
+}
+}  // namespace
+
+TEST_F(GeneralGraphOperations, HyperDijkstraVisitor) {
+  g2o::UniformCostFunction uniformCost;
+  g2o::HyperDijkstra hyperDijkstra(optimizer_);
+  hyperDijkstra.shortestPaths(optimizer_->vertex(0), uniformCost);
+
+  g2o::HyperDijkstra::computeTree(hyperDijkstra.adjacencyMap());
+  TreeVisitor treeVisitor;
+  g2o::HyperDijkstra::visitAdjacencyMap(hyperDijkstra.adjacencyMap(),
+                                        treeVisitor);
+  EXPECT_THAT(treeVisitor.visitedIds(), testing::SizeIs(kNumVertices));
+  EXPECT_THAT(treeVisitor.visitedIds(),
+              testing::UnorderedElementsAreArray(range_helper(kNumVertices)));
 }

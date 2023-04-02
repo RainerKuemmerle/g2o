@@ -46,9 +46,9 @@ class G2O_TYPES_SBA_API EdgeSE3ProjectXYZ
   bool isDepthPositive();
 
   void linearizeOplus() override;
-  Vector2 cam_project(const Vector3 &trans_xyz) const;
+  [[nodiscard]] Vector2 cam_project(const Vector3 &trans_xyz) const;
 
-  double fx, fy, cx, cy;
+  double fx = 1., fy = 1., cx = 0.5, cy = 0.5;
 };
 
 }  // namespace g2o

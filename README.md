@@ -27,6 +27,8 @@ implementations of state-of-the-art approaches for the specific problems
 The branch [pymem](https://github.com/RainerKuemmerle/g2o/tree/pymem) contains a python wrapper and switches to smart pointer instead of RAW pointers.
 It is currently experimental but PRs and improvements are welcome - as always.
 
+See [g2o-python](https://github.com/miquelmassot/g2o-python) for the pypi release of g2o's python bindings.
+
 ## Papers Describing the Approach
 
 Rainer Kuemmerle, Giorgio Grisetti, Hauke Strasdat,

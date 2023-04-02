@@ -231,36 +231,6 @@ void HyperDijkstra::visitAdjacencyMap(AdjacencyMap& amap, TreeAction& action,
   }
 }
 
-void HyperDijkstra::connectedSubset(
-    HyperGraph::VertexSet& connected, HyperGraph::VertexSet& visited,
-    HyperGraph::VertexSet& startingSet, const std::shared_ptr<HyperGraph>& g,
-    const std::shared_ptr<HyperGraph::Vertex>& v,
-    HyperDijkstra::CostFunction& cost, double distance,
-    double comparisonConditioner, double maxEdgeCost) {
-  using VertexDeque = std::queue<std::shared_ptr<HyperGraph::Vertex>>;
-  visited.clear();
-  connected.clear();
-  VertexDeque frontier;
-  HyperDijkstra dv(g);
-  connected.insert(v);
-  frontier.push(v);
-  while (!frontier.empty()) {
-    auto v0 = frontier.front();
-    frontier.pop();
-    dv.shortestPaths(v0, cost, distance, comparisonConditioner, false,
-                     maxEdgeCost);
-    for (const auto& it : dv.visited()) {
-      visited.insert(it);
-      if (startingSet.find(it) == startingSet.end()) continue;
-      const std::pair<HyperGraph::VertexSet::iterator, bool> insertOutcome =
-          connected.insert(it);
-      if (insertOutcome.second) {  // the node was not in the connectedSet;
-        frontier.push(it);
-      }
-    }
-  }
-}
-
 double UniformCostFunction::operator()(HyperGraph::Edge* /*edge*/,
                                        HyperGraph::Vertex* /*from*/,
                                        HyperGraph::Vertex* /*to*/) {
