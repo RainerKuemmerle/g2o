@@ -62,16 +62,19 @@ void JacobianWorkspace::updateSize(const HyperGraph::Edge* e_, bool reset) {
     _maxNumVertices = -1;
     _maxDimension = -1;
   }
+  updateSize(e_);
+}
 
+void JacobianWorkspace::updateSize(const HyperGraph::Edge* e_) {
   const OptimizableGraph::Edge* e =
       static_cast<const OptimizableGraph::Edge*>(e_);
   int errorDimension = e->dimension();
   int numVertices = e->vertices().size();
   int maxDimensionForEdge = -1;
 
-  for (int i = 0; i < numVertices; ++i) {
+  for (const auto& vv : e->vertices()) {
     const OptimizableGraph::Vertex* v =
-        static_cast<const OptimizableGraph::Vertex*>(e->vertex(i));
+        static_cast<const OptimizableGraph::Vertex*>(vv);
     assert(v && "Edge has no vertex assigned");
     maxDimensionForEdge =
         max(v->dimension() * errorDimension, maxDimensionForEdge);
