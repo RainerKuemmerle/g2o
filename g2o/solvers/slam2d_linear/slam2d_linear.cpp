@@ -30,6 +30,7 @@
 #include "g2o/core/solver.h"
 #include "g2o/core/sparse_optimizer.h"
 #include "g2o/solvers/eigen/linear_solver_eigen.h"
+#include "g2o/stuff/logger.h"
 #include "g2o/stuff/macros.h"
 #include "solver_slam2d_linear.h"
 
@@ -38,8 +39,8 @@ namespace g2o {
 namespace {
 template <int p, int l, bool blockorder>
 std::unique_ptr<BlockSolverBase> AllocateSolver() {
-  std::cerr << "# Using 2dlinear poseDim " << p << " landMarkDim " << l
-            << " blockordering " << blockorder << std::endl;
+  G2O_DEBUG("Using 2dlinear poseDim {} landMarkDim {} blockordering {}", p, l,
+            blockorder);
   auto linearSolver = std::make_unique<
       LinearSolverEigen<typename BlockSolverPL<p, l>::PoseMatrixType>>();
   linearSolver->setBlockOrdering(blockorder);

@@ -52,7 +52,7 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           sudo apt update
-          sudo apt install libeigen3-dev qtdeclarative5-dev qt5-qmake libqglviewer-dev-qt5 libsuitesparse-dev lcov
+          sudo apt install libeigen3-dev qtdeclarative5-dev qt5-qmake libqglviewer-dev-qt5 libsuitesparse-dev lcov libspdlog-dev
 
       - name: Install dependencies on macOS
         if: runner.os == 'macOS'

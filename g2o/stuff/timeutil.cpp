@@ -26,6 +26,8 @@
 
 #include "timeutil.h"
 
+#include "g2o/stuff/logger.h"
+
 #include <iostream>
 
 namespace g2o {
@@ -34,8 +36,7 @@ ScopeTime::ScopeTime(const char* title)
     : _title(title), _startTime(get_monotonic_time()) {}
 
 ScopeTime::~ScopeTime() {
-  std::cerr << _title << " took " << 1000 * (get_monotonic_time() - _startTime)
-            << "ms.\n";
+  G2O_DEBUG("{} took {}ms.", _title, 1000 * (get_monotonic_time() - _startTime));
 }
 
 double get_monotonic_time() {

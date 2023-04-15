@@ -30,10 +30,11 @@
 #include "g2o/core/optimization_algorithm_gauss_newton.h"
 #include "g2o/core/optimization_algorithm_levenberg.h"
 #include "g2o/core/solver.h"
+#include "g2o/stuff/logger.h"
 #include "g2o/stuff/macros.h"
 #include "linear_solver_cholmod.h"
 
-//#define ADD_SCALAR_ORDERING
+// #define ADD_SCALAR_ORDERING
 using namespace std;
 
 namespace g2o {
@@ -41,8 +42,8 @@ namespace g2o {
 namespace {
 template <int p, int l, bool blockorder>
 std::unique_ptr<BlockSolverBase> AllocateSolver() {
-  std::cerr << "# Using CHOLMOD poseDim " << p << " landMarkDim " << l
-            << " blockordering " << blockorder << std::endl;
+  G2O_DEBUG("Using CHOLMOD poseDim {} landMarkDim {} blockordering {}", p, l,
+            blockorder);
   auto linearSolver = std::make_unique<
       LinearSolverCholmod<typename BlockSolverPL<p, l>::PoseMatrixType>>();
   linearSolver->setBlockOrdering(blockorder);

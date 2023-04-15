@@ -63,13 +63,12 @@
 #endif
 
 #ifndef MEASURE_TIME
-#define MEASURE_TIME(text, code)                                              \
-  if (1) {                                                                    \
-    double _start_time_ = g2o::get_time();                                    \
-    code;                                                                     \
-    std::cerr << text << " took " << g2o::get_time() - _start_time_ << " sec" \
-              << std::endl;                                                   \
-  } else                                                                      \
+#define MEASURE_TIME(text, code)                                       \
+  if (1) {                                                             \
+    double _start_time_ = g2o::get_time();                             \
+    code;                                                              \
+    G2O_DEBUG("{} took {} sec", text, g2o::get_time() - _start_time_); \
+  } else                                                               \
     (void)0
 #endif
 
