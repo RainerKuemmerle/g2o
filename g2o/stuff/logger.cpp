@@ -24,37 +24,50 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "edge_se2_segment2d.h"
+#include "logger.h"
 
-#include <cassert>
+#include "g2o/config.h"
 
-namespace g2o {
+#ifdef G2O_HAVE_LOGGING
+#include <spdlog/cfg/env.h>
+#include <spdlog/common.h>
+#include <spdlog/sinks/stdout_color_sinks.h>
 
-EdgeSE2Segment2D::EdgeSE2Segment2D()
-    : BaseBinaryEdge<4, Vector4, VertexSE2, VertexSegment2D>() {}
+namespace g2o::internal {
 
-bool EdgeSE2Segment2D::read(std::istream& is) {
-  internal::readVector(is, _measurement);
-  return readInformationMatrix(is);
+LoggerInterface::LoggerInterface() {
+  spdlog::cfg::load_env_levels();
+  console_ = spdlog::stdout_color_mt("g2o");
+  console_->set_pattern("%+");
 }
 
-bool EdgeSE2Segment2D::write(std::ostream& os) const {
-  internal::writeVector(os, measurement());
-  return writeInformationMatrix(os);
+LoggerInterface::~LoggerInterface() { spdlog::drop("g2o"); }
+
+}  // namespace g2o::internal
+#endif
+
+namespace g2o::logging {
+
+void setLevel(Level level) {
+#ifdef G2O_HAVE_LOGGING
+  auto toSpdLogLevel = [](Level level) {
+    switch (level) {
+      case Level::kDebug:
+        return spdlog::level::debug;
+      case Level::kInfo:
+        return spdlog::level::info;
+      case Level::kWarn:
+        return spdlog::level::warn;
+      case Level::kError:
+        return spdlog::level::err;
+      case Level::kOff:
+        return spdlog::level::off;
+    }
+  };
+  Logger::get().console().set_level(toSpdLogLevel(level));
+#else
+  (void)level;
+#endif
 }
 
-void EdgeSE2Segment2D::initialEstimate(const OptimizableGraph::VertexSet& from,
-                                       OptimizableGraph::Vertex* to) {
-  assert(from.size() == 1 && from.count(_vertices[0]) == 1 &&
-         "Can not initialize VertexSE2 position by VertexSegment2D. I could if "
-         "i wanted. Not now");
-
-  VertexSE2* vi = static_cast<VertexSE2*>(_vertices[0]);
-  VertexSegment2D* vj = static_cast<VertexSegment2D*>(_vertices[1]);
-  if (from.count(vi) > 0 && to == vj) {
-    vj->setEstimateP1(vi->estimate() * measurementP1());
-    vj->setEstimateP2(vi->estimate() * measurementP2());
-  }
-}
-
-}  // namespace g2o
+}  // namespace g2o::logging

@@ -26,8 +26,6 @@
 
 #include "edge_se3.h"
 
-#include <iostream>
-
 #include "isometry3d_gradients.h"
 
 #ifdef G2O_HAVE_OPENGL
@@ -98,7 +96,6 @@ void EdgeSE3::initialEstimate(const OptimizableGraph::VertexSet& from_,
     to->setEstimate(from->estimate() * _measurement);
   } else
     from->setEstimate(to->estimate() * _measurement.inverse());
-  // cerr << "IE" << endl;
 }
 
 EdgeSE3WriteGnuplotAction::EdgeSE3WriteGnuplotAction()
@@ -111,8 +108,6 @@ HyperGraphElementAction* EdgeSE3WriteGnuplotAction::operator()(
   WriteGnuplotAction::Parameters* params =
       static_cast<WriteGnuplotAction::Parameters*>(params_);
   if (!params->os) {
-    std::cerr << __PRETTY_FUNCTION__ << ": warning, on valid os specified"
-              << std::endl;
     return nullptr;
   }
 

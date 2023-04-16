@@ -58,8 +58,6 @@ HyperGraphElementAction* VertexSE2WriteGnuplotAction::operator()(
   WriteGnuplotAction::Parameters* params =
       static_cast<WriteGnuplotAction::Parameters*>(params_);
   if (!params || !params->os) {
-    std::cerr << __PRETTY_FUNCTION__
-              << ": warning, no valid output stream specified" << std::endl;
     return nullptr;
   }
 

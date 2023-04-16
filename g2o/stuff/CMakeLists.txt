@@ -7,7 +7,7 @@ add_library(stuff ${G2O_LIB_TYPE}
   property.cpp       property.h       tuple_tools.h
   sampler.cpp        sampler.h        unscented.h
   tictoc.cpp tictoc.h
-  logger.h
+  logger.cpp logger.h
   g2o_stuff_api.h
 )
 
@@ -17,7 +17,11 @@ target_include_directories(stuff PUBLIC
 )
 
 if (G2O_HAVE_LOGGING)
-  target_link_libraries(stuff PUBLIC spdlog::spdlog_header_only)
+  if(TARGET spdlog::spdlog)
+    target_link_libraries(stuff PUBLIC spdlog::spdlog)
+  else()
+    target_link_libraries(stuff PUBLIC spdlog::spdlog_header_only)
+  endif()
 endif()
 set_target_properties(stuff PROPERTIES OUTPUT_NAME ${LIB_PREFIX}stuff)
 set_target_properties(stuff PROPERTIES

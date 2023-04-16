@@ -46,9 +46,7 @@ class GLUWrapper {
         gluNewQuadric();  // Create A Pointer To The Quadric Object ( NEW )
     gluQuadricNormals(_quadratic, GLU_SMOOTH);  // Create Smooth Normals ( NEW )
   }
-  ~GLUWrapper() {
-    gluDeleteQuadric(_quadratic);
-  }
+  ~GLUWrapper() { gluDeleteQuadric(_quadratic); }
   GLUquadricObj* _quadratic;
 };
 

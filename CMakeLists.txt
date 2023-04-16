@@ -170,10 +170,13 @@ endif()
 find_package(QGLViewer)
 
 # Logging library
-find_package(spdlog)
-if (TARGET spdlog::spdlog_header_only)
-  set (G2O_HAVE_LOGGING 1)
-  message(STATUS "Compiling with logging support")
+option(G2O_USE_LOGGING "Try to use spdlog for logging" ON)
+if (G2O_USE_LOGGING)
+  find_package(spdlog)
+  if (TARGET spdlog::spdlog OR TARGET spdlog::spdlog_header_only)
+    set (G2O_HAVE_LOGGING 1)
+    message(STATUS "Compiling with logging support")
+  endif()
 endif()
 
 # Handle building the built in types. There is a fair degree of

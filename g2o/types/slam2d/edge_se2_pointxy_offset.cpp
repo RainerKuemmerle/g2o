@@ -26,8 +26,8 @@
 
 #include "edge_se2_pointxy_offset.h"
 
-#include <iostream>
 #include <cassert>
+#include <iostream>
 
 #include "parameter_se2_offset.h"
 
@@ -47,12 +47,12 @@ EdgeSE2PointXYOffset::EdgeSE2PointXYOffset()
 bool EdgeSE2PointXYOffset::resolveCaches() {
   ParameterVector pv(1);
   pv[0] = offsetParam;
-  resolveCache(cache, (OptimizableGraph::Vertex *)_vertices[0],
+  resolveCache(cache, (OptimizableGraph::Vertex*)_vertices[0],
                "CACHE_SE2_OFFSET", pv);
   return cache != 0;
 }
 
-bool EdgeSE2PointXYOffset::read(std::istream &is) {
+bool EdgeSE2PointXYOffset::read(std::istream& is) {
   int pId;
   is >> pId;
   setParameterId(0, pId);
@@ -65,7 +65,7 @@ bool EdgeSE2PointXYOffset::read(std::istream &is) {
   return true;
 }
 
-bool EdgeSE2PointXYOffset::write(std::ostream &os) const {
+bool EdgeSE2PointXYOffset::write(std::ostream& os) const {
   os << offsetParam->id() << " ";
   internal::writeVector(os, measurement());
   return writeInformationMatrix(os);
@@ -74,7 +74,7 @@ bool EdgeSE2PointXYOffset::write(std::ostream &os) const {
 void EdgeSE2PointXYOffset::computeError() {
   // from cam to point (track)
   // VertexSE2 *rob = static_cast<VertexSE2*>(_vertices[0]);
-  VertexPointXY *point = static_cast<VertexPointXY *>(_vertices[1]);
+  VertexPointXY* point = static_cast<VertexPointXY*>(_vertices[1]);
 
   Vector2 perr = cache->w2lMatrix() * point->estimate();
 
@@ -84,8 +84,8 @@ void EdgeSE2PointXYOffset::computeError() {
 }
 
 void EdgeSE2PointXYOffset::linearizeOplus() {
-  VertexSE2 *rob = static_cast<VertexSE2 *>(_vertices[0]);
-  VertexPointXY *point = static_cast<VertexPointXY *>(_vertices[1]);
+  VertexSE2* rob = static_cast<VertexSE2*>(_vertices[0]);
+  VertexPointXY* point = static_cast<VertexPointXY*>(_vertices[1]);
   _jacobianOplusXi.block<2, 2>(0, 0) = -cache->RpInverseRInverseMatrix();
   _jacobianOplusXi.block<2, 1>(0, 2) =
       cache->RpInverseRInversePrimeMatrix() *
@@ -94,26 +94,21 @@ void EdgeSE2PointXYOffset::linearizeOplus() {
 }
 
 bool EdgeSE2PointXYOffset::setMeasurementFromState() {
-  VertexPointXY *point = static_cast<VertexPointXY *>(_vertices[1]);
+  VertexPointXY* point = static_cast<VertexPointXY*>(_vertices[1]);
 
   _measurement = cache->w2lMatrix() * point->estimate();
   return true;
 }
 
 void EdgeSE2PointXYOffset::initialEstimate(
-    const OptimizableGraph::VertexSet &from,
-    OptimizableGraph::Vertex * /*to_*/) {
+    const OptimizableGraph::VertexSet& from,
+    OptimizableGraph::Vertex* /*to_*/) {
   (void)from;
   assert(from.size() == 1 && from.count(_vertices[0]) == 1 &&
          "Can not initialize VertexDepthCam position by VertexTrackXY");
 
-  VertexSE2 *cam = dynamic_cast<VertexSE2 *>(_vertices[0]);
-  VertexPointXY *point = dynamic_cast<VertexPointXY *>(_vertices[1]);
-  // SE2OffsetCache* vcache = (SE2OffsetCache* ) cam->getCache(_cacheIds[0]);
-  // if (! vcache){
-  //   cerr << "fatal error in retrieving cache" << endl;
-  // }
-  // SE2OffsetParameters* params=vcache->params;
+  VertexSE2* cam = dynamic_cast<VertexSE2*>(_vertices[0]);
+  VertexPointXY* point = dynamic_cast<VertexPointXY*>(_vertices[1]);
   Vector2 p = _measurement;
   point->setEstimate(cam->estimate() * (offsetParam->offsetMatrix() * p));
 }

@@ -28,6 +28,8 @@
 
 #include <cassert>
 
+#include "g2o/stuff/logger.h"
+
 using namespace std;
 
 namespace g2o {
@@ -46,8 +48,8 @@ void RobustKernelFactory::registerRobustKernel(
     const std::string& tag, const AbstractRobustKernelCreator::Ptr& c) {
   CreatorMap::const_iterator foundIt = _creator.find(tag);
   if (foundIt != _creator.end()) {
-    cerr << "RobustKernelFactory WARNING: Overwriting robust kernel tag " << tag
-         << endl;
+    G2O_WARN("RobustKernelFactory WARNING: Overwriting robust kernel tag {}",
+             tag);
     assert(0);
   }
 

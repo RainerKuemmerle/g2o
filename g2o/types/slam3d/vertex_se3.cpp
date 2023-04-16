@@ -32,8 +32,6 @@
 #include "g2o/stuff/opengl_wrapper.h"
 #endif
 
-#include <iostream>
-
 #include "g2o/core/cache.h"
 
 using namespace Eigen;
@@ -66,8 +64,6 @@ HyperGraphElementAction* VertexSE3WriteGnuplotAction::operator()(
   WriteGnuplotAction::Parameters* params =
       static_cast<WriteGnuplotAction::Parameters*>(params_);
   if (!params->os) {
-    std::cerr << __PRETTY_FUNCTION__ << ": warning, no valid os specified"
-              << std::endl;
     return nullptr;
   }
 

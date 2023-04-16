@@ -30,6 +30,7 @@
 #include <iostream>
 
 #include "batch_stats.h"
+#include "g2o/stuff/logger.h"
 #include "g2o/stuff/macros.h"
 #include "g2o/stuff/timeutil.h"
 #include "solver.h"
@@ -65,8 +66,7 @@ OptimizationAlgorithm::SolverResult OptimizationAlgorithmGaussNewton::solve(
       !online) {  // built up the CCS structure, here due to easy time measure
     ok = _solver.buildStructure();
     if (!ok) {
-      cerr << __PRETTY_FUNCTION__ << ": Failure while building CCS structure"
-           << endl;
+      G2O_WARN("{}: Failure while building CCS structure", __PRETTY_FUNCTION__);
       return OptimizationAlgorithm::Fail;
     }
   }

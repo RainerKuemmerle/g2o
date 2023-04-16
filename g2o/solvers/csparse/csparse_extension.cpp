@@ -23,6 +23,7 @@
 #include <cassert>
 #include <iostream>
 
+#include "g2o/stuff/logger.h"
 #include "g2o/stuff/macros.h"
 
 using namespace std;
@@ -38,15 +39,14 @@ int cs_cholsolsymb(const cs* A, double* b, const css* S, double* x, int* work) {
   csn* N;
   int n, ok;
   if (!CS_CSC(A) || !b || !S || !x) {
-    cerr << __PRETTY_FUNCTION__ << ": No valid input!" << endl;
+    G2O_DEBUG("{}: No valid input!", __PRETTY_FUNCTION__);
     assert(0);  // get a backtrace in debug mode
     return (0); /* check inputs */
   }
   n = A->n;
   N = cs_chol_workspace(A, S, work, x); /* numeric Cholesky factorization */
   if (!N) {
-    cerr << __PRETTY_FUNCTION__ << ": cholesky failed!" << endl;
-    /*assert(0);*/
+    G2O_DEBUG("{}: cholesky failed!", __PRETTY_FUNCTION__);
   }
   ok = (N != NULL);
   if (ok) {

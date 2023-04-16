@@ -43,8 +43,6 @@ int initialized = 0;
 
 void init() {
   if (types_icp::initialized) return;
-  // cerr << "Calling " << __FILE__ << " " << __PRETTY_FUNCTION__ << endl;
-
   Edge_V_V_GICP::dRidx << 0.0, 0.0, 0.0, 0.0, 0.0, 2.0, 0.0, -2.0, 0.0;
   Edge_V_V_GICP::dRidy << 0.0, 0.0, -2.0, 0.0, 0.0, 0.0, 2.0, 0.0, 0.0;
   Edge_V_V_GICP::dRidz << 0.0, 2.0, 0.0, -2.0, 0.0, 0.0, 0.0, 0.0, 0.0;
@@ -72,11 +70,11 @@ double VertexSCam::baseline;
 G2O_ATTRIBUTE_CONSTRUCTOR(init_icp_types) { types_icp::init(); }
 
 // Copy constructor
-Edge_V_V_GICP::Edge_V_V_GICP(const Edge_V_V_GICP *e)
+Edge_V_V_GICP::Edge_V_V_GICP(const Edge_V_V_GICP* e)
     : BaseBinaryEdge<3, EdgeGICP, VertexSE3, VertexSE3>() {
   // Temporary hack - TODO, sort out const-ness properly
-  _vertices[0] = const_cast<HyperGraph::Vertex *>(e->vertex(0));
-  _vertices[1] = const_cast<HyperGraph::Vertex *>(e->vertex(1));
+  _vertices[0] = const_cast<HyperGraph::Vertex*>(e->vertex(0));
+  _vertices[1] = const_cast<HyperGraph::Vertex*>(e->vertex(1));
 
   _measurement.pos0 = e->measurement().pos0;
   _measurement.pos1 = e->measurement().pos1;
@@ -103,7 +101,7 @@ Edge_V_V_GICP::Edge_V_V_GICP(const Edge_V_V_GICP *e)
 //
 // the measurement variable has type EdgeGICP (see types_icp.h)
 
-bool Edge_V_V_GICP::read(std::istream &is) {
+bool Edge_V_V_GICP::read(std::istream& is) {
   // measured point and normal
   for (int i = 0; i < 3; i++) is >> _measurement.pos0[i];
   for (int i = 0; i < 3; i++) is >> _measurement.normal0[i];
@@ -123,7 +121,7 @@ bool Edge_V_V_GICP::read(std::istream &is) {
   Matrix3 prec;
   double v = cst(.01);
   prec << v, 0, 0, 0, v, 0, 0, 0, 1;
-  const Matrix3 &R = measurement().R0;  // plane of the point in vp0
+  const Matrix3& R = measurement().R0;  // plane of the point in vp0
   information() = R.transpose() * prec * R;
 
   //    information().setIdentity();
@@ -145,8 +143,8 @@ bool Edge_V_V_GICP::read(std::istream &is) {
 //    df/dx0 = [-I, d[dR0.inv()]/dq0 * T01 * p1]
 //    df/dx1 = [R0, T01 * d[dR1]/dq1 * p1]
 void Edge_V_V_GICP::linearizeOplus() {
-  VertexSE3 *vp0 = static_cast<VertexSE3 *>(_vertices[0]);
-  VertexSE3 *vp1 = static_cast<VertexSE3 *>(_vertices[1]);
+  VertexSE3* vp0 = static_cast<VertexSE3*>(_vertices[0]);
+  VertexSE3* vp1 = static_cast<VertexSE3*>(_vertices[1]);
 
   // topLeftCorner<3,3>() is the rotation matrix
   Matrix3 R0T = vp0->estimate().matrix().topLeftCorner<3, 3>().transpose();
@@ -173,7 +171,7 @@ void Edge_V_V_GICP::linearizeOplus() {
 }
 #endif
 
-bool Edge_V_V_GICP::write(std::ostream &os) const {
+bool Edge_V_V_GICP::write(std::ostream& os) const {
   // first point
   for (int i = 0; i < 3; i++) os << measurement().pos0[i] << " ";
   for (int i = 0; i < 3; i++) os << measurement().normal0[i] << " ";
@@ -198,9 +196,9 @@ Edge_XYZ_VSC::Edge_XYZ_VSC() {}
  * \brief Jacobian for stereo projection
  */
 void Edge_XYZ_VSC::linearizeOplus() {
-  VertexSCam *vc = static_cast<VertexSCam *>(_vertices[1]);
+  VertexSCam* vc = static_cast<VertexSCam*>(_vertices[1]);
 
-  VertexPointXYZ *vp = static_cast<VertexPointXYZ *>(_vertices[0]);
+  VertexPointXYZ* vp = static_cast<VertexPointXYZ*>(_vertices[0]);
   Vector4 pt, trans;
   pt.head<3>() = vp->estimate();
   pt(3) = 1.0;
@@ -218,7 +216,7 @@ void Edge_XYZ_VSC::linearizeOplus() {
   double ipz2 = 1.0 / (pz * pz);
   if (isnan(ipz2)) {
     std::cout << "[SetJac] infinite jac" << std::endl;
-    *(int *)0x0 = 0;
+    *(int*)0x0 = 0;
   }
 
   double ipz2fx = ipz2 * vc->Kcam(0, 0);  // Fx
@@ -287,12 +285,12 @@ void Edge_XYZ_VSC::linearizeOplus() {
       (pz * dp(0) - (px - b) * dp(2)) * ipz2fx;  // right image px
 }
 #endif
-bool Edge_XYZ_VSC::read(std::istream &) { return false; }
+bool Edge_XYZ_VSC::read(std::istream&) { return false; }
 
-bool Edge_XYZ_VSC::write(std::ostream &) const { return false; }
+bool Edge_XYZ_VSC::write(std::ostream&) const { return false; }
 
-bool VertexSCam::read(std::istream &) { return false; }
+bool VertexSCam::read(std::istream&) { return false; }
 
-bool VertexSCam::write(std::ostream &) const { return false; }
+bool VertexSCam::write(std::ostream&) const { return false; }
 
 }  // namespace g2o

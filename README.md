@@ -93,6 +93,7 @@ following packages.
 
 ### Optional requirements
 
+-   spdlog            <https://github.com/gabime/spdlog>
 -   suitesparse       <http://faculty.cse.tamu.edu/davis/suitesparse.html>
 -   Qt5               <http://qt-project.org>
 -   libQGLViewer      <http://www.libqglviewer.com>
@@ -100,6 +101,7 @@ following packages.
 On Ubuntu / Debian these dependencies are resolved by installing the
 following packages.
 
+-   libspdlog-dev
 -   libsuitesparse-dev
 -   qtdeclarative5-dev
 -   qt5-qmake

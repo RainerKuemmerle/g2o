@@ -30,8 +30,6 @@
 #include "g2o/config.h"
 
 #ifdef G2O_HAVE_LOGGING
-#include <spdlog/cfg/env.h>
-#include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/spdlog.h>
 
 #include <memory>
@@ -44,13 +42,9 @@ namespace internal {
  */
 class LoggerInterface {
  public:
-  LoggerInterface() {
-    spdlog::cfg::load_env_levels();
-    console_ = spdlog::stdout_color_mt("g2o");
-    console_->set_pattern("%+");
-  }
+  LoggerInterface();
 
-  ~LoggerInterface() { spdlog::drop("g2o"); }
+  ~LoggerInterface();
 
   LoggerInterface(LoggerInterface&) = delete;
   void operator=(LoggerInterface&) = delete;
@@ -76,6 +70,7 @@ class Singleton {
   constexpr Singleton(const Singleton&) = delete;
   constexpr Singleton& operator=(const Singleton&) = delete;
 };
+
 }  // namespace internal
 
 using Logger = internal::Singleton<internal::LoggerInterface>;
@@ -93,8 +88,17 @@ using Logger = internal::Singleton<internal::LoggerInterface>;
 #define G2O_WARN(...)
 #define G2O_ERROR(...)
 #define G2O_DEBUG(...)
-#define G2O_TRACE(...)
 
 #endif  // G2O_HAVE_LOGGING
+
+namespace g2o::logging {
+enum class Level { kDebug, kInfo, kWarn, kError, kOff };
+/**
+ * @brief Set the Log Level
+ *
+ * @param level control which severity of log will be print
+ */
+void setLevel(Level level);
+}  // namespace g2o::logging
 
 #endif

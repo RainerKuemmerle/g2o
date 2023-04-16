@@ -33,11 +33,14 @@
 #include <iomanip>
 #include <iostream>
 #include <iterator>
+#include <sstream>
 
 #include "cache.h"
 #include "estimate_propagator.h"
 #include "factory.h"
 #include "g2o/stuff/color_macros.h"
+#include "g2o/stuff/logger.h"
+#include "g2o/stuff/logger_format.h"
 #include "g2o/stuff/macros.h"
 #include "g2o/stuff/misc.h"
 #include "g2o/stuff/string_tools.h"
@@ -49,16 +52,6 @@
 namespace g2o {
 
 using namespace std;
-
-namespace {
-std::ostream& printIdChain(std::ostream& os, const std::vector<int>& ids) {
-  for (size_t l = 0; l < ids.size(); ++l) {
-    if (l > 0) cerr << " <->";
-    cerr << " " << ids[l];
-  }
-  return os;
-}
-}  // namespace
 
 OptimizableGraph::Vertex::Vertex()
     : HyperGraph::Vertex(),
@@ -139,25 +132,22 @@ bool OptimizableGraph::Edge::setParameterId(int argNum, int paramId) {
 
 bool OptimizableGraph::Edge::resolveParameters() {
   if (!graph()) {
-    cerr << __PRETTY_FUNCTION__ << ": edge not registered with a graph" << endl;
+    G2O_ERROR("{}: edge not registered with a graph", __PRETTY_FUNCTION__);
     return false;
   }
 
   assert(_parameters.size() == _parameterIds.size());
-  // cerr << __PRETTY_FUNCTION__ << ": encountered " << _parameters.size() << "
-  // parameters" << endl;
   for (size_t i = 0; i < _parameters.size(); i++) {
     int index = _parameterIds[i];
     *_parameters[i] = graph()->parameter(index);
     auto& aux = **_parameters[i];
     if (typeid(aux).name() != _parameterTypes[i]) {
-      cerr << __PRETTY_FUNCTION__
-           << ": FATAL, parameter type mismatch - encountered "
-           << typeid(aux).name() << "; should be " << _parameterTypes[i]
-           << endl;
+      G2O_ERROR(
+          "{}: FATAL, parameter type mismatch - encountered {}; should be {}",
+          __PRETTY_FUNCTION__, typeid(aux).name(), _parameterTypes[i]);
     }
     if (!*_parameters[i]) {
-      cerr << __PRETTY_FUNCTION__ << ": FATAL, *_parameters[i] == 0" << endl;
+      G2O_ERROR("{}: FATAL, *_parameters[i] == 0", __PRETTY_FUNCTION__);
       return false;
     }
   }
@@ -192,20 +182,26 @@ OptimizableGraph::~OptimizableGraph() {
 
 bool OptimizableGraph::addVertex(OptimizableGraph::Vertex* ov, Data* userData) {
   if (ov->id() < 0) {
-    cerr << __FUNCTION__ << ": FATAL, a vertex with (negative) ID " << ov->id()
-         << " cannot be inserted in the graph" << endl;
+    G2O_ERROR(
+        "{}: FATAL, a vertex with (negative) ID {} cannot be inserted into the "
+        "graph",
+        __PRETTY_FUNCTION__, ov->id());
     assert(0 && "Invalid vertex id");
     return false;
   }
   Vertex* inserted = vertex(ov->id());
   if (inserted) {
-    cerr << __FUNCTION__ << ": FATAL, a vertex with ID " << ov->id()
-         << " has already been registered with this graph" << endl;
+    G2O_WARN(
+        "{}: a vertex with ID {} has already been registered with this "
+        "graph",
+        __PRETTY_FUNCTION__, ov->id());
     return false;
   }
   if (ov->_graph != nullptr && ov->_graph != this) {
-    cerr << __FUNCTION__ << ": FATAL, vertex with ID " << ov->id()
-         << " has already registered with another graph " << ov->_graph << endl;
+    G2O_ERROR(
+        "{}: FATAL, vertex with ID {} has already been registered with another "
+        "graph {}",
+        __PRETTY_FUNCTION__, ov->id(), static_cast<void*>(ov->_graph));
     return false;
   }
   if (userData) ov->setUserData(userData);
@@ -225,8 +221,10 @@ bool OptimizableGraph::addEdge(OptimizableGraph::Edge* e) {
   OptimizableGraph* g = e->graph();
 
   if (g != nullptr && g != this) {
-    cerr << __FUNCTION__ << ": FATAL, edge with ID " << e->id()
-         << " has already registered with another graph " << g << endl;
+    G2O_ERROR(
+        "{}: FATAL, edge with ID {} has already registered with another graph "
+        "{}",
+        __PRETTY_FUNCTION__, e->id(), static_cast<void*>(g));
     return false;
   }
 
@@ -236,13 +234,13 @@ bool OptimizableGraph::addEdge(OptimizableGraph::Edge* e) {
   e->_internalId = _nextEdgeId++;
   if (e->numUndefinedVertices()) return true;
   if (!e->resolveParameters()) {
-    cerr << __FUNCTION__ << ": FATAL, cannot resolve parameters for edge " << e
-         << endl;
+    G2O_ERROR("{}: FATAL, cannot resolve parameters for edge {}",
+              static_cast<void*>(e));
     return false;
   }
   if (!e->resolveCaches()) {
-    cerr << __FUNCTION__ << ": FATAL, cannot resolve caches for edge " << e
-         << endl;
+    G2O_ERROR("{}: FATAL, cannot resolve caches for edge {}",
+              static_cast<void*>(e));
     return false;
   }
 
@@ -271,13 +269,13 @@ bool OptimizableGraph::setEdgeVertex(HyperGraph::Edge* e, int pos,
     OptimizableGraph::Edge* ee = static_cast<OptimizableGraph::Edge*>(e);
 #endif
     if (!ee->resolveParameters()) {
-      cerr << __FUNCTION__ << ": FATAL, cannot resolve parameters for edge "
-           << e << endl;
+      G2O_ERROR("{}: FATAL, cannot resolve parameters for edge {}",
+                static_cast<void*>(e));
       return false;
     }
     if (!ee->resolveCaches()) {
-      cerr << __FUNCTION__ << ": FATAL, cannot resolve caches for edge " << e
-           << endl;
+      G2O_ERROR("{}: FATAL, cannot resolve caches for edge {}",
+                static_cast<void*>(e));
       return false;
     }
     _jacobianWorkspace.updateSize(e);
@@ -369,7 +367,6 @@ bool OptimizableGraph::load(istream& is) {
     lineNumber++;
     if (bytesRead == -1) break;
     currentLine >> token;
-    // cerr << "Token=" << token << endl;
     if (bytesRead == 0 || token.size() == 0 || token[0] == '#') continue;
 
     // handle commands encoded in the file
@@ -380,12 +377,12 @@ bool OptimizableGraph::load(istream& is) {
             static_cast<OptimizableGraph::Vertex*>(vertex(id));
         if (v) {
 #ifndef NDEBUG
-          cerr << "Fixing vertex " << v->id() << endl;
+          G2O_DEBUG("Fixing vertex {}", v->id());
 #endif
           v->setFixed(true);
         } else {
-          cerr << "Warning: Unable to fix vertex with id " << id
-               << ". Not found in the graph." << endl;
+          G2O_WARN("Unable to fix vertex with id {}. Not found in the graph.",
+                   id);
         }
       }
       continue;
@@ -403,8 +400,7 @@ bool OptimizableGraph::load(istream& is) {
     if (!factory->knowsTag(token)) {
       if (warnedUnknownTypes.count(token) != 1) {
         warnedUnknownTypes.insert(token);
-        cerr << CL_RED(__PRETTY_FUNCTION__ << " unknown type: " << token)
-             << endl;
+        G2O_ERROR("{}: Unknown type {}", __PRETTY_FUNCTION__, token);
       }
       continue;
     }
@@ -421,14 +417,14 @@ bool OptimizableGraph::load(istream& is) {
       p->setId(pid);
       bool r = p->read(currentLine);
       if (!r) {
-        cerr << __PRETTY_FUNCTION__ << ": Error reading data " << token
-             << " for parameter " << pid << " at line " << lineNumber << endl;
+        G2O_ERROR("{}: reading data {} for parameter {} at line ",
+                  __PRETTY_FUNCTION__, pid, lineNumber);
         delete p;
       } else {
         if (!_parameters.addParameter(p)) {
-          cerr << __PRETTY_FUNCTION__ << ": Parameter of type:" << token
-               << " id:" << pid << " already defined"
-               << " at line " << lineNumber << endl;
+          G2O_ERROR(
+              "{}: Parameter of type: {} id: {} already defined at line {}",
+              __PRETTY_FUNCTION__, token, pid, lineNumber);
         }
       }
       continue;
@@ -443,18 +439,17 @@ bool OptimizableGraph::load(istream& is) {
       currentLine >> id;
       bool r = v->read(currentLine);
       if (!r)
-        cerr << __PRETTY_FUNCTION__ << ": Error reading vertex " << token << " "
-             << id << " at line " << lineNumber << endl;
+        G2O_ERROR("{}: Error reading vertex {} {} at line {}",
+                  __PRETTY_FUNCTION__, token, id, lineNumber);
       v->setId(id);
       if (!addVertex(v)) {
-        cerr << __PRETTY_FUNCTION__ << ": Failure adding Vertex, " << token
-             << " " << id << " at line " << lineNumber << endl;
+        G2O_ERROR("{}: Failure adding Vertex {} {} at line {}",
+                  __PRETTY_FUNCTION__, token, id, lineNumber);
         delete v;
       } else {
         previousDataContainer = v;
       }
     } else if (dynamic_cast<Edge*>(element)) {
-      // cerr << "it is an edge" << endl;
       previousData = 0;
       Edge* e = static_cast<Edge*>(element);
       int numV = e->vertices().size();
@@ -485,17 +480,16 @@ bool OptimizableGraph::load(istream& is) {
         }
       }
       if (!vertsOkay) {
-        cerr << __PRETTY_FUNCTION__ << ": Unable to find vertices for edge "
-             << token << " at line " << lineNumber << " IDs: ";
-        printIdChain(cerr, ids) << std::endl;
+        G2O_ERROR("{}: Unable to find vertices for edge {} at line {} IDs: {}",
+                  __PRETTY_FUNCTION__, token, lineNumber, fmt::join(ids, " "));
         delete e;
         e = nullptr;
       } else {
         bool r = e->read(currentLine);
         if (!r || !addEdge(e)) {
-          cerr << __PRETTY_FUNCTION__ << ": Unable to add edge " << token
-               << " at line " << lineNumber << " IDs: ";
-          printIdChain(cerr, ids) << std::endl;
+          G2O_ERROR("{}: Unable to add edge {} at line {} IDs: {}",
+                    __PRETTY_FUNCTION__, token, lineNumber,
+                    fmt::join(ids, " "));
           delete e;
           e = nullptr;
         }
@@ -504,13 +498,11 @@ bool OptimizableGraph::load(istream& is) {
       previousDataContainer = e;
     } else if (dynamic_cast<Data*>(
                    element)) {  // reading in the data packet for the vertex
-      // cerr << "read data packet " << token << " vertex " <<
-      // previousVertex->id() << endl;
       Data* d = static_cast<Data*>(element);
       bool r = d->read(currentLine);
       if (!r) {
-        cerr << __PRETTY_FUNCTION__ << ": Error reading data " << token
-             << " at line " << lineNumber << " IDs: " << endl;
+        G2O_ERROR("{}: Error reading data {} at line {}", __PRETTY_FUNCTION__,
+                  token, lineNumber);
         delete d;
         previousData = 0;
       } else if (previousData) {
@@ -523,8 +515,8 @@ bool OptimizableGraph::load(istream& is) {
         previousData = d;
         previousDataContainer = 0;
       } else {
-        cerr << __PRETTY_FUNCTION__
-             << ": got data element, but no data container available" << endl;
+        G2O_ERROR("{}: got data element, but no data container available",
+                  __PRETTY_FUNCTION__);
         delete d;
         previousData = 0;
       }
@@ -532,7 +524,7 @@ bool OptimizableGraph::load(istream& is) {
   }  // while read line
 
 #ifndef NDEBUG
-  cerr << "Loaded " << _parameters.size() << " parameters" << endl;
+  G2O_DEBUG("Loaded {} parameters", _parameters.size());
 #endif
 
   return true;
@@ -541,7 +533,7 @@ bool OptimizableGraph::load(istream& is) {
 bool OptimizableGraph::load(const char* filename) {
   ifstream ifs(filename);
   if (!ifs) {
-    cerr << __PRETTY_FUNCTION__ << " unable to open file " << filename << endl;
+    G2O_ERROR("Unable to open file {}", filename);
     return false;
   }
   return load(ifs);
@@ -639,25 +631,25 @@ void OptimizableGraph::setRenamedTypesFromString(const std::string& types) {
   for (size_t i = 0; i < typesMap.size(); ++i) {
     vector<string> m = strSplit(typesMap[i], "=");
     if (m.size() != 2) {
-      cerr << __PRETTY_FUNCTION__ << ": unable to extract type map from "
-           << typesMap[i] << endl;
+      G2O_ERROR("{}: unable to extract type map from {}", __PRETTY_FUNCTION__,
+                typesMap[i]);
       continue;
     }
     string typeInFile = trim(m[0]);
     string loadedType = trim(m[1]);
     if (!factory->knowsTag(loadedType)) {
-      cerr << __PRETTY_FUNCTION__ << ": unknown type " << loadedType << endl;
+      G2O_ERROR("{}: unknown type {}", __PRETTY_FUNCTION__, loadedType);
       continue;
     }
 
     _renamedTypesLookup[typeInFile] = loadedType;
   }
 
-  cerr << "# load look up table" << endl;
+  G2O_DEBUG("Load look up table:");
   for (std::map<std::string, std::string>::const_iterator it =
            _renamedTypesLookup.begin();
        it != _renamedTypesLookup.end(); ++it) {
-    cerr << "#\t" << it->first << " -> " << it->second << endl;
+    G2O_DEBUG("{} -> {}", it->first, it->second);
   }
 }
 
@@ -823,15 +815,17 @@ bool OptimizableGraph::verifyInformationMatrices(bool verbose) const {
     allEdgeOk = allEdgeOk && okay;
     if (!okay) {
       if (verbose) {
-        if (!isSymmetric)
-          cerr << "Information Matrix for an edge is not symmetric:";
-        else
-          cerr << "Information Matrix for an edge is not SPD:";
+        vector<int> ids(e->vertices().size());
         for (size_t i = 0; i < e->vertices().size(); ++i)
-          cerr << " " << e->vertex(i)->id();
+          ids[i] = e->vertex(i)->id();
+        if (!isSymmetric)
+          G2O_WARN("Information Matrix for an edge is not symmetric: {}",
+                   fmt::join(ids, " "));
+        else
+          G2O_WARN("Information Matrix for an edge is not SPD: {}",
+                   fmt::join(ids, " "));
         if (isSymmetric)
-          cerr << "\teigenvalues: " << eigenSolver.eigenvalues().transpose();
-        cerr << endl;
+          G2O_WARN("eigenvalues: {}", eigenSolver.eigenvalues().transpose());
       }
     }
   }

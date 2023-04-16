@@ -29,6 +29,7 @@
 #include <iostream>
 
 #include "factory.h"
+#include "g2o/stuff/logger.h"
 #include "optimizable_graph.h"
 
 namespace g2o {
@@ -118,14 +119,15 @@ Cache* CacheContainer::createCache(const Cache::CacheKey& key) {
   Factory* f = Factory::instance();
   HyperGraph::HyperGraphElement* e = f->construct(key.type());
   if (!e) {
-    cerr << __PRETTY_FUNCTION__ << endl;
-    cerr << "fatal error in creating cache of type " << key.type() << endl;
+    G2O_ERROR("{}", __PRETTY_FUNCTION__);
+    G2O_ERROR("fatal error in creating cache of type {}", key.type());
     return nullptr;
   }
   Cache* c = dynamic_cast<Cache*>(e);
   if (!c) {
-    cerr << __PRETTY_FUNCTION__ << endl;
-    cerr << "fatal error in creating cache of type " << key.type() << endl;
+    G2O_ERROR("{}", __PRETTY_FUNCTION__);
+    G2O_ERROR("fatal error in creating cache of type {}, wrong type",
+              key.type());
     return nullptr;
   }
   c->_container = this;

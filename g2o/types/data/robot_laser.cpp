@@ -68,9 +68,7 @@ bool RobotLaser::read(std::istream& is) {
   double x, y, theta;
   is >> x >> y >> theta;
   SE2 lp(x, y, theta);
-  // cerr << "x: " << x << " y:" << y << " th:" << theta << " ";
   is >> x >> y >> theta;
-  // cerr << "x: " << x << " y:" << y << " th:" << theta;
   _odomPose = SE2(x, y, theta);
   _laserParams.laserPose = _odomPose.inverse() * lp;
   is >> _laserTv >> _laserRv >> _forwardSafetyDist >> _sideSafetyDist >>
