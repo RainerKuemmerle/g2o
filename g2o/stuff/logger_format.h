@@ -24,37 +24,26 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "edge_se2_segment2d.h"
+#ifndef G2O_LOGGER_FORMAT_H
+#define G2O_LOGGER_FORMAT_H
 
-#include <cassert>
+#include "g2o/config.h"
 
-namespace g2o {
+#ifdef G2O_HAVE_LOGGING
+#include <spdlog/fmt/fmt.h>
+#include <spdlog/fmt/ostr.h>
 
-EdgeSE2Segment2D::EdgeSE2Segment2D()
-    : BaseBinaryEdge<4, Vector4, VertexSE2, VertexSegment2D>() {}
+#if FMT_VERSION >= 90000
+// see https://fmt.dev/9.0.0/api.html#std-ostream-support
 
-bool EdgeSE2Segment2D::read(std::istream& is) {
-  internal::readVector(is, _measurement);
-  return readInformationMatrix(is);
-}
+#include <Eigen/Dense>
 
-bool EdgeSE2Segment2D::write(std::ostream& os) const {
-  internal::writeVector(os, measurement());
-  return writeInformationMatrix(os);
-}
+template <typename T>
+struct fmt::formatter<
+    T, std::enable_if_t<std::is_base_of_v<Eigen::DenseBase<T>, T>, char>>
+    : fmt::ostream_formatter {};
 
-void EdgeSE2Segment2D::initialEstimate(const OptimizableGraph::VertexSet& from,
-                                       OptimizableGraph::Vertex* to) {
-  assert(from.size() == 1 && from.count(_vertices[0]) == 1 &&
-         "Can not initialize VertexSE2 position by VertexSegment2D. I could if "
-         "i wanted. Not now");
+#endif
 
-  VertexSE2* vi = static_cast<VertexSE2*>(_vertices[0]);
-  VertexSegment2D* vj = static_cast<VertexSegment2D*>(_vertices[1]);
-  if (from.count(vi) > 0 && to == vj) {
-    vj->setEstimateP1(vi->estimate() * measurementP1());
-    vj->setEstimateP2(vi->estimate() * measurementP2());
-  }
-}
-
-}  // namespace g2o
+#endif  // G2O_HAVE_LOGGING
+#endif

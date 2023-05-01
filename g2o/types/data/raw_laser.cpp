@@ -28,6 +28,8 @@
 
 #include <iostream>
 
+#include "g2o/stuff/logger.h"
+
 using namespace std;
 
 namespace g2o {
@@ -40,8 +42,8 @@ RawLaser::RawLaser()
 RawLaser::~RawLaser() {}
 
 bool RawLaser::write(std::ostream& /*os*/) const {
-  // TODO
-  cerr << "RawLaser::write() not implemented yet." << endl;
+  // TODO(Rainer): implement writing of raw laser
+  G2O_ERROR("RawLaser::write() not implemented yet.");
   return false;
 }
 

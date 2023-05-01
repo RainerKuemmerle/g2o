@@ -32,6 +32,7 @@
 #include <queue>
 #include <vector>
 
+#include "g2o/stuff/logger.h"
 #include "g2o/stuff/macros.h"
 
 namespace g2o {
@@ -99,8 +100,8 @@ void HyperDijkstra::shortestPaths(HyperGraph::VertexSet& vset,
     assert(v != 0);
     AdjacencyMap::iterator it = _adjacencyMap.find(v);
     if (it == _adjacencyMap.end()) {
-      cerr << __PRETTY_FUNCTION__ << "Vertex " << v->id()
-           << " is not in the adjacency map" << endl;
+      G2O_WARN("{} Vertex {} is not in the adjacency map", __PRETTY_FUNCTION__,
+               v->id());
     }
     assert(it != _adjacencyMap.end());
     it->second._distance = 0.;
@@ -114,8 +115,8 @@ void HyperDijkstra::shortestPaths(HyperGraph::VertexSet& vset,
     HyperGraph::Vertex* u = entry.child();
     AdjacencyMap::iterator ut = _adjacencyMap.find(u);
     if (ut == _adjacencyMap.end()) {
-      cerr << __PRETTY_FUNCTION__ << "Vertex " << u->id()
-           << " is not in the adjacency map" << endl;
+      G2O_WARN("{} Vertex {} is not in the adjacency map", __PRETTY_FUNCTION__,
+               u->id());
     }
     assert(ut != _adjacencyMap.end());
     double uDistance = ut->second.distance();
@@ -139,7 +140,6 @@ void HyperDijkstra::shortestPaths(HyperGraph::VertexSet& vset,
             edgeDistance > maxEdgeCost)
           continue;
         double zDistance = uDistance + edgeDistance;
-        // cerr << z->id() << " " << zDistance << endl;
 
         AdjacencyMap::iterator ot = _adjacencyMap.find(z);
         assert(ot != _adjacencyMap.end());
@@ -201,7 +201,6 @@ void HyperDijkstra::visitAdjacencyMap(AdjacencyMap& amap, TreeAction* action,
     }
   }
 
-  // std::cerr << "q.size()" << q.size() << endl;
   while (!q.empty()) {
     HyperGraph::Vertex* parent = q.front();
     q.pop_front();
@@ -209,13 +208,10 @@ void HyperDijkstra::visitAdjacencyMap(AdjacencyMap& amap, TreeAction* action,
     if (parentIt == amap.end()) {
       continue;
     }
-    // cerr << "parent= " << parent << " parent id= " << parent->id() << "\t
-    // children id =";
     HyperGraph::VertexSet& childs(parentIt->second.children());
     for (HyperGraph::VertexSet::iterator childsIt = childs.begin();
          childsIt != childs.end(); ++childsIt) {
       HyperGraph::Vertex* child = *childsIt;
-      // cerr << child->id();
       AdjacencyMap::iterator adjacencyIt = amap.find(child);
       assert(adjacencyIt != amap.end());
       HyperGraph::Edge* edge = adjacencyIt->second.edge();
@@ -230,7 +226,6 @@ void HyperDijkstra::visitAdjacencyMap(AdjacencyMap& amap, TreeAction* action,
       }
       q.push_back(child);
     }
-    // cerr << endl;
   }
 }
 

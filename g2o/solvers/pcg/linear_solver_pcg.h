@@ -44,7 +44,6 @@ class LinearSolverPCG : public LinearSolver<MatrixType> {
  public:
   LinearSolverPCG() : LinearSolver<MatrixType>() {
     _tolerance = cst(1e-6);
-    _verbose = false;
     _absoluteTolerance = true;
     _residual = -1.0;
     _maxIter = -1;
@@ -73,9 +72,6 @@ class LinearSolverPCG : public LinearSolver<MatrixType> {
     _absoluteTolerance = absoluteTolerance;
   }
 
-  bool verbose() const { return _verbose; }
-  void setVerbose(bool verbose) { _verbose = verbose; }
-
  protected:
   using MatrixVector = std::vector<MatrixType>;
   using MatrixPtrVector = std::vector<const MatrixType*>;
@@ -83,7 +79,6 @@ class LinearSolverPCG : public LinearSolver<MatrixType> {
   double _tolerance;
   double _residual;
   bool _absoluteTolerance;
-  bool _verbose;
   int _maxIter;
 
   MatrixPtrVector _diag;

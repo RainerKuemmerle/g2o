@@ -29,6 +29,7 @@
 #include <iostream>
 #include <vector>
 
+#include "logger.h"
 #include "macros.h"
 #include "string_tools.h"
 using namespace std;
@@ -85,8 +86,8 @@ bool PropertyMap::updateMapFromString(const std::string& values) {
   for (size_t i = 0; i < valuesMap.size(); ++i) {
     vector<string> m = strSplit(valuesMap[i], "=");
     if (m.size() != 2) {
-      cerr << __PRETTY_FUNCTION__ << ": unable to extract name=value pair from "
-           << valuesMap[i] << endl;
+      G2O_DEBUG("{}: unable to extract name=value pair from {}",
+                __PRETTY_FUNCTION__, valuesMap[i]);
       continue;
     }
     string name = trim(m[0]);

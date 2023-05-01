@@ -73,8 +73,6 @@ HyperGraphElementAction* EdgeSE2PointXYBearingWriteGnuplotAction::operator()(
   WriteGnuplotAction::Parameters* params =
       static_cast<WriteGnuplotAction::Parameters*>(params_);
   if (!params->os) {
-    std::cerr << __PRETTY_FUNCTION__ << ": warning, on valid os specified"
-              << std::endl;
     return nullptr;
   }
 

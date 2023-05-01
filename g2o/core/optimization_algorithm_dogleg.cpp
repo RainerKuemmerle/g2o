@@ -31,6 +31,7 @@
 
 #include "batch_stats.h"
 #include "block_solver.h"
+#include "g2o/stuff/logger.h"
 #include "g2o/stuff/timeutil.h"
 #include "solver.h"
 #include "sparse_optimizer.h"
@@ -71,8 +72,7 @@ OptimizationAlgorithm::SolverResult OptimizationAlgorithmDogleg::solve(
       !online) {  // built up the CCS structure, here due to easy time measure
     bool ok = _solver.buildStructure();
     if (!ok) {
-      cerr << __PRETTY_FUNCTION__ << ": Failure while building CCS structure"
-           << endl;
+      G2O_WARN("{}: Failure while building CCS structure", __PRETTY_FUNCTION__);
       return OptimizationAlgorithm::Fail;
     }
 

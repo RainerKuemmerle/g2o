@@ -28,6 +28,8 @@
 
 #include <cassert>
 
+#include "g2o/stuff/logger.h"
+
 namespace internal {
 
 #ifdef _MSC_VER
@@ -136,8 +138,7 @@ bool LinearSolverPCG<MatrixType>::solve(const SparseBlockMatrix<MatrixType>& A,
 
   int iteration;
   for (iteration = 0; iteration < maxIter; ++iteration) {
-    if (_verbose)
-      std::cerr << "residual[" << iteration << "]: " << dn << std::endl;
+    G2O_DEBUG("residual [{}]: {}", iteration, dn);
     if (dn <= d0) break;  // done
     mult(A.colBlockIndices(), d, q);
     double a = dn / d.dot(q);
@@ -150,7 +151,6 @@ bool LinearSolverPCG<MatrixType>::solve(const SparseBlockMatrix<MatrixType>& A,
     double ba = dn / dold;
     d = s + ba * d;
   }
-  // std::cerr << "residual[" << iteration << "]: " << dn << std::endl;
   _residual = 0.5 * dn;
   G2OBatchStatistics* globalStats = G2OBatchStatistics::globalStats();
   if (globalStats) {

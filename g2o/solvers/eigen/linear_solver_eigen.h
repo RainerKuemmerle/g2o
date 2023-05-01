@@ -29,13 +29,14 @@
 
 #include <Eigen/Sparse>
 #include <Eigen/SparseCholesky>
+#include <cassert>
 #include <iostream>
 #include <vector>
-#include <cassert>
 
 #include "g2o/core/batch_stats.h"
 #include "g2o/core/linear_solver.h"
 #include "g2o/core/marginal_covariance_cholesky.h"
+#include "g2o/stuff/logger.h"
 #include "g2o/stuff/timeutil.h"
 
 namespace g2o {
@@ -126,10 +127,11 @@ class LinearSolverEigen : public LinearSolverCCS<MatrixType> {
     if (_cholesky.info() !=
         Eigen::Success) {  // the matrix is not positive definite
       if (this->writeDebug()) {
-        std::cerr << "Cholesky failure, writing debug.txt (Hessian loadable by "
-                     "Octave)"
-                  << std::endl;
+        G2O_ERROR(
+            "Cholesky failure, writing debug.txt (Hessian loadable by Octave)");
         A.writeOctave("debug.txt");
+      } else {
+        G2O_DEBUG("Cholesky failure");
       }
       return false;
     }

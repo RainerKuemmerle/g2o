@@ -33,6 +33,7 @@
 #include "g2o/core/batch_stats.h"
 #include "g2o/core/linear_solver.h"
 #include "g2o/core/marginal_covariance_cholesky.h"
+#include "g2o/stuff/logger.h"
 #include "g2o/stuff/sparse_helper.h"
 #include "g2o/stuff/timeutil.h"
 
@@ -175,10 +176,11 @@ class LinearSolverCholmod : public LinearSolverCCS<MatrixType> {
     bool factorStatus = _cholmod.factorize();
     if (!factorStatus) {
       if (this->writeDebug()) {
-        std::cerr << "Cholesky failure, writing debug.txt (Hessian loadable by "
-                     "Octave)"
-                  << std::endl;
+        G2O_ERROR(
+            "Cholesky failure, writing debug.txt (Hessian loadable by Octave)");
         saveMatrix("debug.txt");
+      } else {
+        G2O_DEBUG("Cholesky failure");
       }
       return false;
     }

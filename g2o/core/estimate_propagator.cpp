@@ -33,7 +33,10 @@
 #include <queue>
 #include <vector>
 
-//#define DEBUG_ESTIMATE_PROPAGATOR
+// #define DEBUG_ESTIMATE_PROPAGATOR
+#ifdef DEBUG_ESTIMATE_PROPAGATOR
+#include "g2o/stuff/logger.h"
+#endif
 
 using namespace std;
 
@@ -112,7 +115,6 @@ void EstimatePropagator::propagate(
     AdjacencyMapEntry* entry = frontier.pop();
     OptimizableGraph::Vertex* u = entry->child();
     double uDistance = entry->distance();
-    // cerr << "uDistance " << uDistance << endl;
 
     // initialize the vertex
     if (entry->_frontierLevel > 0) {
@@ -152,14 +154,11 @@ void EstimatePropagator::propagate(
             edgeDistance != std::numeric_limits<double>::max() &&
             edgeDistance < maxEdgeCost) {
           double zDistance = uDistance + edgeDistance;
-          // cerr << z->id() << " " << zDistance << endl;
 
           AdjacencyMap::iterator ot = _adjacencyMap.find(z);
           assert(ot != _adjacencyMap.end());
 
           if (zDistance < ot->second.distance() && zDistance < maxDistance) {
-            // if (ot->second.inQueue)
-            // cerr << "Updating" << endl;
             ot->second._distance = zDistance;
             ot->second._parent = initializedVertices;
             ot->second._edge = edge;
@@ -176,7 +175,7 @@ void EstimatePropagator::propagate(
   // writing debug information like cost for reaching each vertex and the parent
   // used to initialize
 #ifdef DEBUG_ESTIMATE_PROPAGATOR
-  cerr << "Writing cost.dat" << endl;
+  G2O_DEBUG("Writing cost.dat");
   ofstream costStream("cost.dat");
   for (AdjacencyMap::const_iterator it = _adjacencyMap.begin();
        it != _adjacencyMap.end(); ++it) {
@@ -184,7 +183,7 @@ void EstimatePropagator::propagate(
     costStream << "vertex " << u->id() << "  cost " << it->second._distance
                << endl;
   }
-  cerr << "Writing init.dat" << endl;
+  G2O_DEBUG("Writing init.dat");
   ofstream initStream("init.dat");
   vector<AdjacencyMapEntry*> frontierLevels;
   for (AdjacencyMap::iterator it = _adjacencyMap.begin();

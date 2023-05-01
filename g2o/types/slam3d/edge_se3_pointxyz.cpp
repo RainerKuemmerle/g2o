@@ -32,7 +32,6 @@
 #include "g2o/stuff/opengl_wrapper.h"
 #endif
 
-#include <iostream>
 #include <cassert>
 
 #ifdef G2O_HAVE_OPENGL
@@ -117,11 +116,6 @@ void EdgeSE3PointXYZ::linearizeOplus() {
 
   _jacobianOplusXi = Jhom.block<3, 6>(0, 0);
   _jacobianOplusXj = Jhom.block<3, 3>(0, 6);
-
-  // std::cerr << "just linearized." << std::endl;
-  // std::cerr << "_jacobianOplusXi:" << std::endl << _jacobianOplusXi <<
-  // std::endl; std::cerr << "_jacobianOplusXj:" << std::endl <<
-  // _jacobianOplusXj << std::endl;
 }
 
 bool EdgeSE3PointXYZ::setMeasurementFromState() {
@@ -130,10 +124,6 @@ bool EdgeSE3PointXYZ::setMeasurementFromState() {
 
   // calculate the projection
   const Vector3& pt = point->estimate();
-  // SE3OffsetCache* vcache = (SE3OffsetCache*) cam->getCache(_cacheIds[0]);
-  // if (! vcache){
-  //   cerr << "fatal error in retrieving cache" << endl;
-  // }
 
   Vector3 perr = cache->w2n() * pt;
   _measurement = perr;
@@ -149,11 +139,6 @@ void EdgeSE3PointXYZ::initialEstimate(const OptimizableGraph::VertexSet& from,
 
   VertexSE3* cam = dynamic_cast<VertexSE3*>(_vertices[0]);
   VertexPointXYZ* point = dynamic_cast<VertexPointXYZ*>(_vertices[1]);
-  // SE3OffsetCache* vcache = (SE3OffsetCache* ) cam->getCache(_cacheIds[0]);
-  // if (! vcache){
-  //   cerr << "fatal error in retrieving cache" << endl;
-  // }
-  // SE3OffsetParameters* params=vcache->params;
   Vector3 p = _measurement;
   point->setEstimate(cam->estimate() * (offsetParam->offset() * p));
 }

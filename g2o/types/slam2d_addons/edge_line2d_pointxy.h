@@ -79,36 +79,7 @@ class EdgeLine2DPointXY
 
   G2O_TYPES_SLAM2D_ADDONS_API virtual bool read(std::istream& is);
   G2O_TYPES_SLAM2D_ADDONS_API virtual bool write(std::ostream& os) const;
-
-  /* virtual void initialEstimate(const OptimizableGraph::VertexSet& from,
-   * OptimizableGraph::Vertex* to); */
-  /* virtual double initialEstimatePossible(const OptimizableGraph::VertexSet&
-   * from, OptimizableGraph::Vertex* to) { (void) to; return
-   * (from.count(_vertices[0]) == 1 ? 1.0 : -1.0);} */
-  /* #ifndef NUMERIC_JACOBIAN_TWO_D_TYPES */
-  /*       virtual void linearizeOplus(); */
-  /* #endif */
 };
-
-/*   class G2O_TYPES_SLAM2D_ADDONS_API EdgeLine2DPointXYWriteGnuplotAction:
- * public WriteGnuplotAction { */
-/*   public: */
-/*     EdgeLine2DPointXYWriteGnuplotAction(); */
-/*     virtual HyperGraphElementAction*
- * operator()(HyperGraph::HyperGraphElement* element,  */
-/*             HyperGraphElementAction::Parameters* params_); */
-/*   }; */
-
-/* #ifdef G2O_HAVE_OPENGL */
-/*   class G2O_TYPES_SLAM2D_ADDONS_API EdgeLine2DPointXYDrawAction: public
- * DrawAction{ */
-/*   public: */
-/*     EdgeLine2DPointXYDrawAction(); */
-/*     virtual HyperGraphElementAction*
- * operator()(HyperGraph::HyperGraphElement* element,  */
-/*             HyperGraphElementAction::Parameters* params_); */
-/*   }; */
-/* #endif */
 
 }  // namespace g2o
 
