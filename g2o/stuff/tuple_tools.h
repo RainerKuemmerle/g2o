@@ -49,9 +49,4 @@ void tuple_apply_i(F&& f, T& t, int i) {
   Tuple_apply_i<std::tuple_size<T>::value>()(f, t, i);
 }
 
-template <typename Value, typename... Ts2>
-std::tuple<Ts2...> tuple_init(const Value& value, const std::tuple<Ts2...>&) {
-  return std::tuple<Ts2...>{Ts2{value}...};
-}
-
 }  // namespace g2o
