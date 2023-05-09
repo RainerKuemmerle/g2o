@@ -25,28 +25,24 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <tuple>
+#include <utility>
+#include <type_traits>
+
 namespace g2o {
 
-template <int I>
-struct Tuple_apply_i {
-  template <typename F, typename T>
-  void operator()(F&& f, T& t, int i) {
-    if (i == I - 1)
-      f(std::get<I - 1>(t));
-    else
-      Tuple_apply_i<I - 1>()(f, t, i);
-  }
-};
+template<typename F, typename T, std::size_t... I>
+void tuple_apply_i_(F&& f, T& t, int i, std::index_sequence<I...>)
+{
+  (...,
+    ( I == i ? f(std::get<I>(t)) : void() )
+  );
+}
 
-template <>
-struct Tuple_apply_i<0> {
-  template <typename F, typename T>
-  void operator()(F&&, T&, int) {}
-};
-
-template <typename F, typename T>
-void tuple_apply_i(F&& f, T& t, int i) {
-  Tuple_apply_i<std::tuple_size<T>::value>()(f, t, i);
+template<typename F, typename T>
+void tuple_apply_i(F&& f, T& t, int i)
+{
+  tuple_apply_i_(f, t, i,
+    std::make_index_sequence<std::tuple_size_v<std::decay_t<T>>>());
 }
 
 }  // namespace g2o
