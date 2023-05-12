@@ -696,8 +696,9 @@ namespace {
 
 class TreeVisitor : public g2o::HyperDijkstra::TreeAction {
  public:
-  double perform(g2o::HyperGraph::Vertex* v, g2o::HyperGraph::Vertex* vParent,
-                 g2o::HyperGraph::Edge* e) override {
+  double perform(g2o::HyperGraph::Vertex* v,
+                 g2o::HyperGraph::Vertex* /*vParent*/,
+                 g2o::HyperGraph::Edge* /*e*/) override {
     visited_ids_.insert(v->id());
     return 1.;
   }

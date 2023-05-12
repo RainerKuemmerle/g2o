@@ -63,6 +63,8 @@ void setLevel(Level level) {
       case Level::kOff:
         return spdlog::level::off;
     }
+    assert(false && "Unexpected level passed to the function");
+    return spdlog::level::off;
   };
   Logger::get().console().set_level(toSpdLogLevel(level));
 #else
