@@ -201,8 +201,7 @@ class AutoDifferentiation {
         "Dynamically sized vertices are not supported");
     // all vertices are fixed, no need to compute anything here
     if (that->allVerticesFixed()) {
-      int unused[] = {(that->template jacobianOplusXn<Ints>().setZero(), 0)...};
-      (void)unused;
+      (void(that->template jacobianOplusXn<Ints>().setZero()), ...);
       return;
     }
 
@@ -236,18 +235,16 @@ class AutoDifferentiation {
 
     assert(diffState && "Error during Automatic Differentiation");
     if (!diffState) {  // something went wrong during AD
-      int unused[] = {(std::get<Ints>(ad_jacobians).setZero(), 0)...};
-      (void)unused;
+      (void(std::get<Ints>(ad_jacobians).setZero()), ...);
       return;
     }
     // copy over the Jacobians (convert row-major -> column-major) for non-fixed
     // vertices
-    int unused[] = {that->template vertexXn<Ints>()->fixed()
-                        ? (that->template jacobianOplusXn<Ints>().setZero(), 0)
-                        : (assign(that->template jacobianOplusXn<Ints>(),
-                                  std::get<Ints>(ad_jacobians)),
-                           0)...};
-    (void)unused;
+    (void(that->template vertexXn<Ints>()->fixed()
+              ? (that->template jacobianOplusXn<Ints>().setZero(), 0)
+              : (assign(that->template jacobianOplusXn<Ints>(),
+                        std::get<Ints>(ad_jacobians)), 0)),
+          ...);
   }
 
   //! helper function to perform a = b
