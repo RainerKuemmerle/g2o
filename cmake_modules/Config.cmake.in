@@ -1,6 +1,6 @@
 include(CMakeFindDependencyMacro)
 
-if(G2O_USE_OPENGL)
+if (@G2O_HAVE_OPENGL@)
   find_dependency(OpenGL)
 endif()
 find_dependency(Eigen3)
