@@ -29,12 +29,12 @@
 namespace g2o {
 
 // point to camera projection, stereo
-bool EdgeProjectP2SC::read(std::istream &is) {
+bool EdgeProjectP2SC::read(std::istream& is) {
   internal::readVector(is, measurement_);
   return readInformationMatrix(is);
 }
 
-bool EdgeProjectP2SC::write(std::ostream &os) const {
+bool EdgeProjectP2SC::write(std::ostream& os) const {
   internal::writeVector(os, measurement());
   writeInformationMatrix(os);
   return os.good();
@@ -43,15 +43,15 @@ bool EdgeProjectP2SC::write(std::ostream &os) const {
 // return the error estimate as a 2-vector
 void EdgeProjectP2SC::computeError() {
   // from <Point> to <Cam>
-  const VertexPointXYZ *point = vertexXnRaw<0>();
-  VertexCam *cam = vertexXnRaw<1>();
+  const VertexPointXYZ* point = vertexXnRaw<0>();
+  VertexCam* cam = vertexXnRaw<1>();
 
   // calculate the projection
   Vector3 kp;
   Vector4 pt;
   pt.head<3>() = point->estimate();
   pt(3) = 1;
-  const SBACam &nd = cam->estimate();
+  const SBACam& nd = cam->estimate();
   // these should be already ok
   /* nd.setTransform(); */
   /* nd.setProjection(); */
@@ -81,10 +81,10 @@ void EdgeProjectP2SC::computeError() {
 }
 
 void EdgeProjectP2SC::linearizeOplus() {
-  VertexCam *vc = vertexXnRaw<1>();
-  const SBACam &cam = vc->estimate();
+  VertexCam* vc = vertexXnRaw<1>();
+  const SBACam& cam = vc->estimate();
 
-  VertexPointXYZ *vp = vertexXnRaw<0>();
+  VertexPointXYZ* vp = vertexXnRaw<0>();
   Vector4 pt;
   Vector4 trans;
   pt.head<3>() = vp->estimate();

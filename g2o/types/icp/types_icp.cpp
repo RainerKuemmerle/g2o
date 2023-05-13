@@ -140,8 +140,8 @@ bool EdgeVVGicp::read(std::istream& is) {
 //    df/dx0 = [-I, d[dR0.inv()]/dq0 * T01 * p1]
 //    df/dx1 = [R0, T01 * d[dR1]/dq1 * p1]
 void EdgeVVGicp::linearizeOplus() {
-  VertexSE3 *vp0 = vertexXnRaw<0>();
-  VertexSE3 *vp1 = vertexXnRaw<1>();
+  VertexSE3* vp0 = vertexXnRaw<0>();
+  VertexSE3* vp1 = vertexXnRaw<1>();
 
   // topLeftCorner<3,3>() is the rotation matrix
   Matrix3 R0T = vp0->estimate().matrix().topLeftCorner<3, 3>().transpose();

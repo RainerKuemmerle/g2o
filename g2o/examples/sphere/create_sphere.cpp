@@ -106,7 +106,7 @@ static int create_sphere(int argc, char** argv) {
       v->setId(id++);
 
       const Eigen::AngleAxisd rotz(-M_PI + 2 * n * M_PI / nodesPerLevel,
-                             Eigen::Vector3d::UnitZ());
+                                   Eigen::Vector3d::UnitZ());
       const Eigen::AngleAxisd roty(
           -0.5 * M_PI + id * M_PI / (numLaps * nodesPerLevel),
           Eigen::Vector3d::UnitY());
@@ -171,7 +171,8 @@ static int create_sphere(int argc, char** argv) {
 
   // noise for all the edges
   for (auto& e : edges) {
-    const Eigen::Quaterniond gtQuat = Eigen::Quaterniond(e->measurement().linear());
+    const Eigen::Quaterniond gtQuat =
+        Eigen::Quaterniond(e->measurement().linear());
     const Eigen::Vector3d gtTrans = e->measurement().translation();
 
     const Eigen::Vector3d quatXYZ = rotSampler.generateSample();

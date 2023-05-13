@@ -88,20 +88,28 @@ class SparseBlockMatrixCCS {
   }
 
   //! where does the row at block-row r start?
-  [[nodiscard]] int rowBaseOfBlock(int r) const { return r ? rowBlockIndices_[r - 1] : 0; }
+  [[nodiscard]] int rowBaseOfBlock(int r) const {
+    return r ? rowBlockIndices_[r - 1] : 0;
+  }
 
   //! where does the col at block-col r start?
-  [[nodiscard]] int colBaseOfBlock(int c) const { return c ? colBlockIndices_[c - 1] : 0; }
+  [[nodiscard]] int colBaseOfBlock(int c) const {
+    return c ? colBlockIndices_[c - 1] : 0;
+  }
 
   //! the block matrices per block-column
   const std::vector<SparseColumn>& blockCols() const { return blockCols_; }
   std::vector<SparseColumn>& blockCols() { return blockCols_; }
 
   //! indices of the row blocks
-  [[nodiscard]] const std::vector<int>& rowBlockIndices() const { return rowBlockIndices_; }
+  [[nodiscard]] const std::vector<int>& rowBlockIndices() const {
+    return rowBlockIndices_;
+  }
 
   //! indices of the column blocks
-  [[nodiscard]] const std::vector<int>& colBlockIndices() const { return colBlockIndices_; }
+  [[nodiscard]] const std::vector<int>& colBlockIndices() const {
+    return colBlockIndices_;
+  }
 
   void rightMultiply(double*& dest, const double* src) const {
     int destSize = cols();
@@ -244,20 +252,28 @@ class SparseBlockMatrixHashMap {
   }
 
   //! where does the row at block-row r start?
-  [[nodiscard]] int rowBaseOfBlock(int r) const { return r ? rowBlockIndices_[r - 1] : 0; }
+  [[nodiscard]] int rowBaseOfBlock(int r) const {
+    return r ? rowBlockIndices_[r - 1] : 0;
+  }
 
   //! where does the col at block-col r start?
-  [[nodiscard]] int colBaseOfBlock(int c) const { return c ? colBlockIndices_[c - 1] : 0; }
+  [[nodiscard]] int colBaseOfBlock(int c) const {
+    return c ? colBlockIndices_[c - 1] : 0;
+  }
 
   //! the block matrices per block-column
   const std::vector<SparseColumn>& blockCols() const { return blockCols_; }
   std::vector<SparseColumn>& blockCols() { return blockCols_; }
 
   //! indices of the row blocks
-  [[nodiscard]] const std::vector<int>& rowBlockIndices() const { return rowBlockIndices_; }
+  [[nodiscard]] const std::vector<int>& rowBlockIndices() const {
+    return rowBlockIndices_;
+  }
 
   //! indices of the column blocks
-  [[nodiscard]] const std::vector<int>& colBlockIndices() const { return colBlockIndices_; }
+  [[nodiscard]] const std::vector<int>& colBlockIndices() const {
+    return colBlockIndices_;
+  }
 
   /**
    * add a block to the pattern, return a pointer to the added block

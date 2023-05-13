@@ -68,13 +68,15 @@ class EdgeSE2Segment2DLine
     error_[0] = normalize_theta(error_[0]);
   }
 
-  G2O_TYPES_SLAM2D_ADDONS_API bool setMeasurementData(const double* d) override {
+  G2O_TYPES_SLAM2D_ADDONS_API bool setMeasurementData(
+      const double* d) override {
     Eigen::Map<const Vector2> data(d);
     measurement_ = data;
     return true;
   }
 
-  G2O_TYPES_SLAM2D_ADDONS_API bool getMeasurementData(double* d) const override {
+  G2O_TYPES_SLAM2D_ADDONS_API bool getMeasurementData(
+      double* d) const override {
     Eigen::Map<Vector2> data(d);
     data = measurement_;
     return true;

@@ -28,18 +28,18 @@
 
 namespace g2o {
 
-bool EdgeSE3ProjectXYZOnlyPose::read(std::istream &is) {
+bool EdgeSE3ProjectXYZOnlyPose::read(std::istream& is) {
   internal::readVector(is, measurement_);
   return readInformationMatrix(is);
 }
 
-bool EdgeSE3ProjectXYZOnlyPose::write(std::ostream &os) const {
+bool EdgeSE3ProjectXYZOnlyPose::write(std::ostream& os) const {
   internal::writeVector(os, measurement());
   return writeInformationMatrix(os);
 }
 
 void EdgeSE3ProjectXYZOnlyPose::linearizeOplus() {
-  VertexSE3Expmap *vi = vertexXnRaw<0>();
+  VertexSE3Expmap* vi = vertexXnRaw<0>();
   Vector3 xyz_trans = vi->estimate().map(Xw);
 
   double x = xyz_trans[0];
@@ -62,7 +62,7 @@ void EdgeSE3ProjectXYZOnlyPose::linearizeOplus() {
   jacobianOplusXi_(1, 5) = y * invz_2 * fy;
 }
 
-Vector2 EdgeSE3ProjectXYZOnlyPose::cam_project(const Vector3 &trans_xyz) const {
+Vector2 EdgeSE3ProjectXYZOnlyPose::cam_project(const Vector3& trans_xyz) const {
   Vector2 proj = project(trans_xyz);
   Vector2 res;
   res[0] = proj[0] * fx + cx;
@@ -71,13 +71,13 @@ Vector2 EdgeSE3ProjectXYZOnlyPose::cam_project(const Vector3 &trans_xyz) const {
 }
 
 void EdgeSE3ProjectXYZOnlyPose::computeError() {
-  const VertexSE3Expmap *v1 = vertexXnRaw<0>();
+  const VertexSE3Expmap* v1 = vertexXnRaw<0>();
   Vector2 obs(measurement_);
   error_ = obs - cam_project(v1->estimate().map(Xw));
 }
 
 bool EdgeSE3ProjectXYZOnlyPose::isDepthPositive() {
-  const VertexSE3Expmap *v1 = vertexXnRaw<0>();
+  const VertexSE3Expmap* v1 = vertexXnRaw<0>();
   return (v1->estimate().map(Xw))(2) > 0;
 }
 

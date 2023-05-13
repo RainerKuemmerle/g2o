@@ -28,7 +28,7 @@
 #define G2O_TYPES_ICP
 
 #define GICP_ANALYTIC_JACOBIANS
-//#define SCAM_ANALYTIC_JACOBIANS
+// #define SCAM_ANALYTIC_JACOBIANS
 
 #include <Eigen/Geometry>
 #include <iostream>
@@ -144,21 +144,21 @@ class G2O_TYPES_ICP_API EdgeVVGicp
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
   EdgeVVGicp() = default;
-  explicit EdgeVVGicp(const EdgeVVGicp *e);
+  explicit EdgeVVGicp(const EdgeVVGicp* e);
 
   // switch to go between point-plane and plane-plane
   bool pl_pl = false;
   Matrix3 cov0, cov1;
 
   // I/O functions
-  bool read(std::istream &is) override;
-  bool write(std::ostream &os) const override;
+  bool read(std::istream& is) override;
+  bool write(std::ostream& os) const override;
 
   // return the error estimate as a 3-vector
   void computeError() override {
     // from <ViewPoint> to <Point>
-    const VertexSE3 *vp0 = vertexXnRaw<0>();
-    const VertexSE3 *vp1 = vertexXnRaw<1>();
+    const VertexSE3* vp0 = vertexXnRaw<0>();
+    const VertexSE3* vp1 = vertexXnRaw<1>();
 
     // get vp1 point into vp0 frame
     // could be more efficient if we computed this transform just once
@@ -229,8 +229,8 @@ class G2O_TYPES_ICP_API VertexSCam : public VertexSE3 {
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
   // I/O
-  bool read(std::istream &is) override;
-  bool write(std::ostream &os) const override;
+  bool read(std::istream& is) override;
+  bool write(std::ostream& os) const override;
 
   // capture the update function to reset aux transforms
   void oplusImpl(const VectorX::MapType& update) override {
@@ -308,7 +308,7 @@ class G2O_TYPES_ICP_API VertexSCam : public VertexSE3 {
   }
 
   // calculate stereo projection
-  void mapPoint(Vector3 &res, const Vector3 &pt3) {
+  void mapPoint(Vector3& res, const Vector3& pt3) {
     Vector4 pt;
     pt.head<3>() = pt3;
     pt(3) = cst(1.0);
@@ -340,14 +340,14 @@ class G2O_TYPES_ICP_API EdgeXyzVsc
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
-  bool read(std::istream &is) override;
-  bool write(std::ostream &os) const override;
+  bool read(std::istream& is) override;
+  bool write(std::ostream& os) const override;
 
   // return the error estimate as a 2-vector
   void computeError() override {
     // from <Point> to <Cam>
-    VertexPointXYZ *point = vertexXnRaw<0>();
-    VertexSCam *cam = vertexXnRaw<1>();
+    VertexPointXYZ* point = vertexXnRaw<0>();
+    VertexSCam* cam = vertexXnRaw<1>();
     // cam->setAll();
 
     // calculate the projection

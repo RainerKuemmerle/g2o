@@ -29,9 +29,9 @@
 #include <cassert>
 #include <iostream>
 #include <typeinfo>
+#include <utility>
 
 #include "g2o/stuff/logger.h"
-#include <utility>
 
 namespace g2o {
 

@@ -69,7 +69,7 @@ bool EdgeSE2PointXYOffset::write(std::ostream& os) const {
 void EdgeSE2PointXYOffset::computeError() {
   // from cam to point (track)
   // VertexSE2 *rob = static_cast<VertexSE2*>(vertices_[0]);
-  VertexPointXY *point = vertexXnRaw<1>();
+  VertexPointXY* point = vertexXnRaw<1>();
 
   Vector2 perr = cache_->w2lMatrix() * point->estimate();
 
@@ -79,8 +79,8 @@ void EdgeSE2PointXYOffset::computeError() {
 }
 
 void EdgeSE2PointXYOffset::linearizeOplus() {
-  VertexSE2 *rob = vertexXnRaw<0>();
-  VertexPointXY *point = vertexXnRaw<1>();
+  VertexSE2* rob = vertexXnRaw<0>();
+  VertexPointXY* point = vertexXnRaw<1>();
   jacobianOplusXi_.block<2, 2>(0, 0) = -cache_->RpInverseRInverseMatrix();
   jacobianOplusXi_.block<2, 1>(0, 2) =
       cache_->RpInverseRInversePrimeMatrix() *
@@ -89,7 +89,7 @@ void EdgeSE2PointXYOffset::linearizeOplus() {
 }
 
 bool EdgeSE2PointXYOffset::setMeasurementFromState() {
-  VertexPointXY *point = vertexXnRaw<1>();
+  VertexPointXY* point = vertexXnRaw<1>();
 
   measurement_ = cache_->w2lMatrix() * point->estimate();
   return true;
@@ -102,8 +102,8 @@ void EdgeSE2PointXYOffset::initialEstimate(
   assert(from.size() == 1 && from.count(vertices_[0]) == 1 &&
          "Can not initialize VertexDepthCam position by VertexTrackXY");
 
-  VertexSE2 *cam = vertexXnRaw<0>();
-  VertexPointXY *point = vertexXnRaw<1>();
+  VertexSE2* cam = vertexXnRaw<0>();
+  VertexPointXY* point = vertexXnRaw<1>();
   // SE2OffsetCache* vcache = (SE2OffsetCache* ) cam->getCache(_cacheIds[0]);
   // if (! vcache){
   //   cerr << "fatal error in retrieving cache" << endl;

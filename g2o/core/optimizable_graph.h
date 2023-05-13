@@ -260,7 +260,8 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
      */
     bool setMinimalEstimateData(const std::vector<double>& estimate) {
       int dim = minimalEstimateDimension();
-      if ((dim == -1) || (estimate.size() != static_cast<std::size_t>(dim))) return false;
+      if ((dim == -1) || (estimate.size() != static_cast<std::size_t>(dim)))
+        return false;
       return setMinimalEstimateData(estimate.data());
     };
 
@@ -464,7 +465,9 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
     virtual bool setMeasurementFromState();
 
     //! if NOT NULL, error of this edge will be robustifed with the kernel
-    [[nodiscard]] std::shared_ptr<RobustKernel> robustKernel() const { return robustKernel_; }
+    [[nodiscard]] std::shared_ptr<RobustKernel> robustKernel() const {
+      return robustKernel_;
+    }
     /**
      * specify the robust kernel to be used in this edge
      */
@@ -554,7 +557,9 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
     }
     [[nodiscard]] size_t numParameters() const { return parameters_.size(); }
 
-    [[nodiscard]] const std::vector<int>& parameterIds() const { return parameterIds_; }
+    [[nodiscard]] const std::vector<int>& parameterIds() const {
+      return parameterIds_;
+    }
 
    protected:
     int dimension_ = -1;

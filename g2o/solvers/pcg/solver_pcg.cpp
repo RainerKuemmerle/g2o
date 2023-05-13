@@ -44,9 +44,8 @@ std::unique_ptr<g2o::Solver> AllocateSolver() {
       std::make_unique<
           LinearSolverPCG<typename BlockSolverPL<P, L>::PoseMatrixType>>());
 }
-}  // namespace
 
-static OptimizationAlgorithm* createSolver(const std::string& fullSolverName) {
+OptimizationAlgorithm* createSolver(const std::string& fullSolverName) {
   static const std::map<std::string,
                         std::function<std::unique_ptr<g2o::Solver>()>>
       kSolverFactories{
@@ -71,6 +70,7 @@ static OptimizationAlgorithm* createSolver(const std::string& fullSolverName) {
 
   return nullptr;
 }
+}  // namespace
 
 class PCGSolverCreator : public AbstractOptimizationAlgorithmCreator {
  public:

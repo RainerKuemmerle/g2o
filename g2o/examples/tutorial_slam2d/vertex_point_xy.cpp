@@ -29,9 +29,7 @@
 namespace g2o {
 namespace tutorial {
 
-VertexPointXY::VertexPointXY()  {
-  estimate_.setZero();
-}
+VertexPointXY::VertexPointXY() { estimate_.setZero(); }
 
 bool VertexPointXY::read(std::istream& is) {
   is >> estimate_[0] >> estimate_[1];

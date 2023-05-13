@@ -69,7 +69,7 @@ class G2O_TYPES_SLAM3D_API EdgeSE3PointXYZDepth
   bool setMeasurementFromState() override;
 
   double initialEstimatePossible(const OptimizableGraph::VertexSet& from,
-                                   OptimizableGraph::Vertex* to) override {
+                                 OptimizableGraph::Vertex* to) override {
     (void)to;
     return (from.count(vertices_[0]) == 1 ? 1.0 : -1.0);
   }

@@ -69,7 +69,7 @@ class G2O_TYPES_SLAM3D_API EdgeXYZPrior
   bool setMeasurementFromState() override;
 
   double initialEstimatePossible(const OptimizableGraph::VertexSet& /*from*/,
-                                   OptimizableGraph::Vertex* /*to*/) override {
+                                 OptimizableGraph::Vertex* /*to*/) override {
     return 0;
   }
 };

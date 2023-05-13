@@ -234,9 +234,9 @@ static int run_sclam_odom_laser(int argc, char** argv) {
         // apply calibration
         VelocityMeasurement calibratedVelocityMeasurement = velocityMeasurement;
         calibratedVelocityMeasurement.setVl(odomCalib(0) *
-                                           calibratedVelocityMeasurement.vl());
+                                            calibratedVelocityMeasurement.vl());
         calibratedVelocityMeasurement.setVr(odomCalib(1) *
-                                           calibratedVelocityMeasurement.vr());
+                                            calibratedVelocityMeasurement.vr());
         const MotionMeasurement mm = OdomConvert::convertToMotion(
             calibratedVelocityMeasurement, odomCalib(2));
 

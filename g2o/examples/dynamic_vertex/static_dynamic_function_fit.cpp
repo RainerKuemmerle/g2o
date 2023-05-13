@@ -129,7 +129,8 @@ class MultipleValueEdge
   MultipleValueEdge(const FunctionObservation& obs, double omega) : x_(obs.x) {
     setDimension(obs.z.size());
     setMeasurement(obs.z);
-    const InformationType I = Eigen::MatrixXd::Identity(x_.size(), x_.size()) * omega;
+    const InformationType I =
+        Eigen::MatrixXd::Identity(x_.size(), x_.size()) * omega;
     setInformation(I);
   }
 

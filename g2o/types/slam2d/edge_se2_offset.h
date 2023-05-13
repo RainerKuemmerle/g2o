@@ -75,7 +75,7 @@ class G2O_TYPES_SLAM2D_API EdgeSE2Offset
   bool setMeasurementFromState() override;
 
   double initialEstimatePossible(const OptimizableGraph::VertexSet& /*from*/,
-                                   OptimizableGraph::Vertex* /*to*/) override {
+                                 OptimizableGraph::Vertex* /*to*/) override {
     return 1.;
   }
 

@@ -67,7 +67,7 @@ class OpenMPMutex {
   void lock() {  // NOLINT
     assert(++cnt_ == 1 && "Locking already locked mutex");
   }
-  void unlock() { // NOLINT
+  void unlock() {  // NOLINT
     assert(--cnt_ == 0 && "Trying to unlock a mutex which is not locked");
   }
 

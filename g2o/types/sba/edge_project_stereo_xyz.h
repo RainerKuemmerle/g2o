@@ -40,25 +40,25 @@ class G2O_TYPES_SBA_API EdgeStereoSE3ProjectXYZ
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
-  bool read(std::istream &is) override;
-  bool write(std::ostream &os) const override;
+  bool read(std::istream& is) override;
+  bool write(std::ostream& os) const override;
 
   void computeError() override {
-    const VertexSE3Expmap *v1 = vertexXnRaw<1>();
-    const VertexPointXYZ *v2 = vertexXnRaw<0>();
+    const VertexSE3Expmap* v1 = vertexXnRaw<1>();
+    const VertexPointXYZ* v2 = vertexXnRaw<0>();
     Vector3 obs(measurement_);
     error_ = obs - cam_project(v1->estimate().map(v2->estimate()), bf);
   }
 
   bool isDepthPositive() {
-    const VertexSE3Expmap *v1 = vertexXnRaw<1>();
-    const VertexPointXYZ *v2 = vertexXnRaw<0>();
+    const VertexSE3Expmap* v1 = vertexXnRaw<1>();
+    const VertexPointXYZ* v2 = vertexXnRaw<0>();
     return (v1->estimate().map(v2->estimate()))(2) > 0;
   }
 
   void linearizeOplus() override;
 
-  Vector3 cam_project(const Vector3 &trans_xyz, const float &bf) const;
+  Vector3 cam_project(const Vector3& trans_xyz, const float& bf) const;
 
   double fx = 1., fy = 1., cx = 0.5, cy = 0.5, bf = 0;
 };

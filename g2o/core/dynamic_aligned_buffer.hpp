@@ -26,7 +26,7 @@ struct DynamicAlignedBuffer {
   explicit DynamicAlignedBuffer(size_t size) { allocate(size); }
 
   DynamicAlignedBuffer(DynamicAlignedBuffer const&) = delete;
-  DynamicAlignedBuffer  & operator=(DynamicAlignedBuffer const&) = delete;
+  DynamicAlignedBuffer& operator=(DynamicAlignedBuffer const&) = delete;
 
   ~DynamicAlignedBuffer() { free(); }
 

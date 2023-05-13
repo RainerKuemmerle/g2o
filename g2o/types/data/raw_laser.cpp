@@ -87,7 +87,8 @@ RawLaser::Point2DVector RawLaser::cartesian() const {
   for (size_t i = 0; i < ranges_.size(); ++i) {
     const double& r = ranges_[i];
     if (r < laserParams_.maxRange && r > laserParams_.minRange) {
-      const double alpha = laserParams_.firstBeamAngle + i * laserParams_.angularStep;
+      const double alpha =
+          laserParams_.firstBeamAngle + i * laserParams_.angularStep;
       points.push_back(Vector2(std::cos(alpha) * r, std::sin(alpha) * r));
     }
   }

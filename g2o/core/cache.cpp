@@ -97,7 +97,9 @@ std::shared_ptr<Cache> CacheContainer::createCache(const Cache::CacheKey& key) {
   return c;
 }
 
-const OptimizableGraph::Vertex& CacheContainer::vertex() const { return vertex_; }
+const OptimizableGraph::Vertex& CacheContainer::vertex() const {
+  return vertex_;
+}
 
 void CacheContainer::update() {
   for (auto& it : *this) {

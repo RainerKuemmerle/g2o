@@ -102,7 +102,8 @@ class G2O_CORE_API HyperGraph {
     virtual bool read(std::istream& is) = 0;
     //! write the data to a stream
     virtual bool write(std::ostream& os) const = 0;
-    [[nodiscard]] HyperGraph::HyperGraphElementType elementType() const override {
+    [[nodiscard]] HyperGraph::HyperGraphElementType elementType()
+        const override {
       return HyperGraph::kHgetData;
     }
     [[nodiscard]] std::shared_ptr<Data> next() const { return next_; }
@@ -163,7 +164,9 @@ class G2O_CORE_API HyperGraph {
     [[nodiscard]] const EdgeSetWeak& edges() const { return edges_; }
     //! returns the set of hyper-edges that are leaving/entering in this vertex
     EdgeSetWeak& edges() { return edges_; }
-    [[nodiscard]] HyperGraphElementType elementType() const override { return kHgetVertex; }
+    [[nodiscard]] HyperGraphElementType elementType() const override {
+      return kHgetVertex;
+    }
 
    protected:
     int id_;
@@ -219,7 +222,9 @@ class G2O_CORE_API HyperGraph {
 
     [[nodiscard]] int id() const { return id_; }
     void setId(int id);
-    [[nodiscard]] HyperGraphElementType elementType() const override { return kHgetEdge; }
+    [[nodiscard]] HyperGraphElementType elementType() const override {
+      return kHgetEdge;
+    }
 
     [[nodiscard]] int numUndefinedVertices() const;
 

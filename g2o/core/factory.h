@@ -38,7 +38,7 @@
 #include "hyper_graph.h"
 
 // define to get some verbose output
-//#define G2O_DEBUG_FACTORY
+// #define G2O_DEBUG_FACTORY
 
 namespace g2o {
 

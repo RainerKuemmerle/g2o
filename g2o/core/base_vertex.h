@@ -84,7 +84,9 @@ class BaseVertex : public OptimizableGraph::Vertex {
     return vertexDim;
   }
 
-  [[nodiscard]] double* bData() const override { return const_cast<double*>(b_.data()); }
+  [[nodiscard]] double* bData() const override {
+    return const_cast<double*>(b_.data());
+  }
 
   void clearQuadraticForm() override { b_.setZero(); }
 

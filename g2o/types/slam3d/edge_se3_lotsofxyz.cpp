@@ -33,12 +33,12 @@ namespace g2o {
 EdgeSE3LotsOfXYZ::EdgeSE3LotsOfXYZ() { resize(0); }
 
 bool EdgeSE3LotsOfXYZ::setMeasurementFromState() {
-  auto *pose = static_cast<VertexSE3 *>(vertexRaw(0));
+  auto* pose = static_cast<VertexSE3*>(vertexRaw(0));
 
   Eigen::Transform<double, 3, 1> poseinv = pose->estimate().inverse();
 
   for (unsigned int i = 0; i < observedPoints_; i++) {
-    auto *xyz = static_cast<VertexPointXYZ *>(vertexRaw(1 + i));
+    auto* xyz = static_cast<VertexPointXYZ*>(vertexRaw(1 + i));
     //      const Vector3 &pt = xyz->estimate();
     Vector3 m = poseinv * xyz->estimate();
 
@@ -51,10 +51,10 @@ bool EdgeSE3LotsOfXYZ::setMeasurementFromState() {
 }
 
 void EdgeSE3LotsOfXYZ::computeError() {
-  auto *pose = static_cast<VertexSE3 *>(vertexRaw(0));
+  auto* pose = static_cast<VertexSE3*>(vertexRaw(0));
 
   for (unsigned int i = 0; i < observedPoints_; i++) {
-    auto *xyz = static_cast<VertexPointXYZ *>(vertexRaw(1 + i));
+    auto* xyz = static_cast<VertexPointXYZ*>(vertexRaw(1 + i));
     Vector3 m = pose->estimate().inverse() * xyz->estimate();
 
     unsigned int index = 3 * i;
@@ -65,7 +65,7 @@ void EdgeSE3LotsOfXYZ::computeError() {
 }
 
 void EdgeSE3LotsOfXYZ::linearizeOplus() {
-  auto *pose = static_cast<g2o::VertexSE3 *>(vertexRaw(0));
+  auto* pose = static_cast<g2o::VertexSE3*>(vertexRaw(0));
 
   // initialize Ji matrix
   MatrixX Ji;
@@ -76,7 +76,7 @@ void EdgeSE3LotsOfXYZ::linearizeOplus() {
   Matrix3 poseRot = pose->estimate().inverse().rotation();
 
   for (unsigned int i = 1; i < vertices_.size(); i++) {
-    auto *point = static_cast<g2o::VertexPointXYZ *>(vertexRaw(i));
+    auto* point = static_cast<g2o::VertexPointXYZ*>(vertexRaw(i));
     Vector3 Zcam = pose->estimate().inverse() * point->estimate();
 
     unsigned int index = 3 * (i - 1);
@@ -107,7 +107,7 @@ void EdgeSE3LotsOfXYZ::linearizeOplus() {
   jacobianOplus_[0] = Ji;
 }
 
-bool EdgeSE3LotsOfXYZ::read(std::istream &is) {
+bool EdgeSE3LotsOfXYZ::read(std::istream& is) {
   is >> observedPoints_;
 
   setSize(observedPoints_ + 1);
@@ -134,7 +134,7 @@ bool EdgeSE3LotsOfXYZ::read(std::istream &is) {
   return true;
 }
 
-bool EdgeSE3LotsOfXYZ::write(std::ostream &os) const {
+bool EdgeSE3LotsOfXYZ::write(std::ostream& os) const {
   // write number of observed points
   os << "|| " << observedPoints_;
 
@@ -154,14 +154,14 @@ bool EdgeSE3LotsOfXYZ::write(std::ostream &os) const {
   return os.good();
 }
 
-void EdgeSE3LotsOfXYZ::initialEstimate(const OptimizableGraph::VertexSet &fixed,
-                                       OptimizableGraph::Vertex *toEstimate) {
+void EdgeSE3LotsOfXYZ::initialEstimate(const OptimizableGraph::VertexSet& fixed,
+                                       OptimizableGraph::Vertex* toEstimate) {
   (void)toEstimate;
 
   assert(initialEstimatePossible(fixed, toEstimate) &&
          "Bad vertices specified");
 
-  auto *pose = static_cast<VertexSE3 *>(vertexRaw(0));
+  auto* pose = static_cast<VertexSE3*>(vertexRaw(0));
 
 #ifdef _MSC_VER
   std::vector<bool> estimate_this(observedPoints_, true);
@@ -172,9 +172,9 @@ void EdgeSE3LotsOfXYZ::initialEstimate(const OptimizableGraph::VertexSet &fixed,
   }
 #endif
 
-  for (const auto &it : fixed) {
+  for (const auto& it : fixed) {
     for (unsigned int i = 1; i < vertices_.size(); i++) {
-      auto *vert = static_cast<VertexPointXYZ *>(vertexRaw(i));
+      auto* vert = static_cast<VertexPointXYZ*>(vertexRaw(i));
       if (vert->id() == it->id()) estimate_this[i - 1] = false;
     }
   }
@@ -184,7 +184,7 @@ void EdgeSE3LotsOfXYZ::initialEstimate(const OptimizableGraph::VertexSet &fixed,
       unsigned int index = 3 * (i - 1);
       Vector3 submeas(measurement_[index], measurement_[index + 1],
                       measurement_[index + 2]);
-      auto *vert = static_cast<VertexPointXYZ *>(vertexRaw(i));
+      auto* vert = static_cast<VertexPointXYZ*>(vertexRaw(i));
       vert->setEstimate(pose->estimate() * submeas);
     }
   }
@@ -195,7 +195,7 @@ double EdgeSE3LotsOfXYZ::initialEstimatePossible(
     OptimizableGraph::Vertex* toEstimate) {
   (void)toEstimate;
 
-  for (const auto &it : fixed) {
+  for (const auto& it : fixed) {
     if (vertexRaw(0)->id() == it->id()) {
       return 1.0;
     }

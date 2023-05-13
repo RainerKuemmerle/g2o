@@ -53,12 +53,14 @@ class EdgeLine2DPointXY
     error_[0] = prediction - measurement_;
   }
 
-  G2O_TYPES_SLAM2D_ADDONS_API bool setMeasurementData(const double* d) override {
+  G2O_TYPES_SLAM2D_ADDONS_API bool setMeasurementData(
+      const double* d) override {
     measurement_ = *d;
     return true;
   }
 
-  G2O_TYPES_SLAM2D_ADDONS_API bool getMeasurementData(double* d) const override {
+  G2O_TYPES_SLAM2D_ADDONS_API bool getMeasurementData(
+      double* d) const override {
     *d = measurement_;
     return true;
   }

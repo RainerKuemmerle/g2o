@@ -161,7 +161,7 @@ int readLine(std::istream& is, std::stringstream& currentLine) {
   is.get(*currentLine.rdbuf());
   if (is.fail())  // fail is set on empty lines
     is.clear();
-  skipLine(is);   // read \n not read by get()
+  skipLine(is);  // read \n not read by get()
   if (currentLine.str().empty() && is.eof()) {
     return -1;
   }

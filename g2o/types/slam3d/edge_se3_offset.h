@@ -51,7 +51,7 @@ class G2O_TYPES_SLAM3D_API EdgeSE3Offset : public EdgeSE3 {
   bool setMeasurementFromState() override;
 
   double initialEstimatePossible(const OptimizableGraph::VertexSet& /*from*/,
-                                   OptimizableGraph::Vertex* /*to*/) override {
+                                 OptimizableGraph::Vertex* /*to*/) override {
     return 1.;
   }
 

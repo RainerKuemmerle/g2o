@@ -17,7 +17,7 @@
 // along with g2o.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "main_window.h"
-//#include "moc_main_window.cpp"
+// #include "moc_main_window.cpp"
 
 #include <QFileDialog>
 #include <fstream>
@@ -52,8 +52,8 @@ void MainWindow::on_actionLoad_triggered(bool) {
 }
 
 void MainWindow::on_actionSave_triggered(bool) {
-  const QString filename = QFileDialog::getSaveFileName(this, "Save g2o file", "",
-                                                  "g2o files (*.g2o)");
+  const QString filename = QFileDialog::getSaveFileName(
+      this, "Save g2o file", "", "g2o files (*.g2o)");
   if (!filename.isNull()) {
     std::ofstream fout(filename.toStdString().c_str());
     viewer->graph->save(fout);

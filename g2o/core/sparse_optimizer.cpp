@@ -72,7 +72,7 @@ void SparseOptimizer::computeActiveErrors() {
   }
 
 #ifndef NDEBUG
-  for (auto & activeEdge : activeEdges_) {
+  for (auto& activeEdge : activeEdges_) {
     OptimizableGraph::Edge* e = activeEdge.get();
     bool hasNan = arrayHasNaN(e->errorData(), e->dimension());
     if (hasNan) {

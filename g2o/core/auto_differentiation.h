@@ -243,8 +243,9 @@ class AutoDifferentiation {
     (void(that->template vertexXn<Ints>()->fixed()
               ? (that->template jacobianOplusXn<Ints>().setZero(), 0)
               : (assign(that->template jacobianOplusXn<Ints>(),
-                        std::get<Ints>(ad_jacobians)), 0)),
-          ...);
+                        std::get<Ints>(ad_jacobians)),
+                 0)),
+     ...);
   }
 
   //! helper function to perform a = b

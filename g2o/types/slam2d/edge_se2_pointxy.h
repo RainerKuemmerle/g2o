@@ -74,7 +74,7 @@ class G2O_TYPES_SLAM2D_API EdgeSE2PointXY
   void initialEstimate(const OptimizableGraph::VertexSet& from,
                        OptimizableGraph::Vertex* to) override;
   double initialEstimatePossible(const OptimizableGraph::VertexSet& from,
-                                   OptimizableGraph::Vertex* to) override {
+                                 OptimizableGraph::Vertex* to) override {
     (void)to;
     return (from.count(vertices_[0]) == 1 ? 1.0 : -1.0);
   }

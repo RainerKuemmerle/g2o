@@ -40,13 +40,13 @@ class G2O_TYPES_SBA_API EdgeSE3ProjectXYZOnlyPose
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
-  bool read(std::istream &is) override;
-  bool write(std::ostream &os) const override;
+  bool read(std::istream& is) override;
+  bool write(std::ostream& os) const override;
   void computeError() override;
   bool isDepthPositive();
   void linearizeOplus() override;
 
-  Vector2 cam_project(const Vector3 &trans_xyz) const;
+  Vector2 cam_project(const Vector3& trans_xyz) const;
 
   Vector3 Xw;
   double fx, fy, cx, cy;

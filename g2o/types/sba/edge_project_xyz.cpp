@@ -28,33 +28,33 @@
 
 namespace g2o {
 
-bool EdgeSE3ProjectXYZ::read(std::istream &is) {
+bool EdgeSE3ProjectXYZ::read(std::istream& is) {
   internal::readVector(is, measurement_);
   return readInformationMatrix(is);
 }
 
-bool EdgeSE3ProjectXYZ::write(std::ostream &os) const {
+bool EdgeSE3ProjectXYZ::write(std::ostream& os) const {
   internal::writeVector(os, measurement());
   return writeInformationMatrix(os);
 }
 
 void EdgeSE3ProjectXYZ::computeError() {
-  const VertexSE3Expmap *v1 = vertexXnRaw<1>();
-  const VertexPointXYZ *v2 = vertexXnRaw<0>();
+  const VertexSE3Expmap* v1 = vertexXnRaw<1>();
+  const VertexPointXYZ* v2 = vertexXnRaw<0>();
   Vector2 obs(measurement_);
   error_ = obs - cam_project(v1->estimate().map(v2->estimate()));
 }
 
 bool EdgeSE3ProjectXYZ::isDepthPositive() {
-  const VertexSE3Expmap *v1 = vertexXnRaw<1>();
-  const VertexPointXYZ *v2 = vertexXnRaw<0>();
+  const VertexSE3Expmap* v1 = vertexXnRaw<1>();
+  const VertexPointXYZ* v2 = vertexXnRaw<0>();
   return (v1->estimate().map(v2->estimate()))(2) > 0.0;
 }
 
 void EdgeSE3ProjectXYZ::linearizeOplus() {
-  VertexSE3Expmap *vj = vertexXnRaw<1>();
+  VertexSE3Expmap* vj = vertexXnRaw<1>();
   SE3Quat T(vj->estimate());
-  VertexPointXYZ *vi = vertexXnRaw<0>();
+  VertexPointXYZ* vi = vertexXnRaw<0>();
   Vector3 xyz = vi->estimate();
   Vector3 xyz_trans = T.map(xyz);
 
@@ -89,7 +89,7 @@ void EdgeSE3ProjectXYZ::linearizeOplus() {
   jacobianOplusXj_(1, 5) = y / z_2 * fy;
 }
 
-Vector2 EdgeSE3ProjectXYZ::cam_project(const Vector3 &trans_xyz) const {
+Vector2 EdgeSE3ProjectXYZ::cam_project(const Vector3& trans_xyz) const {
   Vector2 proj = project(trans_xyz);
   Vector2 res;
   res[0] = proj[0] * fx + cx;

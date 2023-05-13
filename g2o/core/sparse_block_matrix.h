@@ -212,11 +212,15 @@ class SparseBlockMatrix {
   std::vector<IntBlockMap>& blockCols() { return blockCols_; }
 
   //! indices of the row blocks
-  [[nodiscard]] const std::vector<int>& rowBlockIndices() const { return rowBlockIndices_; }
+  [[nodiscard]] const std::vector<int>& rowBlockIndices() const {
+    return rowBlockIndices_;
+  }
   std::vector<int>& rowBlockIndices() { return rowBlockIndices_; }
 
   //! indices of the column blocks
-  [[nodiscard]] const std::vector<int>& colBlockIndices() const { return colBlockIndices_; }
+  [[nodiscard]] const std::vector<int>& colBlockIndices() const {
+    return colBlockIndices_;
+  }
   std::vector<int>& colBlockIndices() { return colBlockIndices_; }
 
   /**

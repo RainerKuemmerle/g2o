@@ -1457,7 +1457,7 @@ static const SFG_StrokeStrip kCh127st[] = {{2, kCh127st0}, {17, kCh127st1}};
 
 static const SFG_StrokeChar kCh127 = {104.762F, 2, kCh127st};
 
-static const SFG_StrokeChar *chars[] = {
+static const SFG_StrokeChar* chars[] = {
     nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
     nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
     nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
@@ -1475,7 +1475,7 @@ static const SFG_StrokeChar *chars[] = {
     &kCh112, &kCh113, &kCh114, &kCh115, &kCh116, &kCh117, &kCh118, &kCh119,
     &kCh120, &kCh121, &kCh122, &kCh123, &kCh124, &kCh125, &kCh126, &kCh127};
 
-const SFG_StrokeFont kFgStrokeMonoRoman = {const_cast<char *>("MonoRoman"), 128,
+const SFG_StrokeFont kFgStrokeMonoRoman = {const_cast<char*>("MonoRoman"), 128,
                                            152.381F, chars};
 
 }  // namespace freeglut_minimal

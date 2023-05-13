@@ -53,8 +53,7 @@ bool ParameterSE2Offset::write(std::ostream& os) const {
 
 void CacheSE2Offset::updateImpl() {
 #ifndef NDEBUG
-  auto* offsetParam =
-      dynamic_cast<ParameterSE2Offset*>(parameters_[0].get());
+  auto* offsetParam = dynamic_cast<ParameterSE2Offset*>(parameters_[0].get());
 #else
   auto* offsetParam = static_cast<ParameterSE2Offset*>(parameters_[0].get());
 #endif

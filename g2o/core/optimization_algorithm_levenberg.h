@@ -58,7 +58,9 @@ class G2O_CORE_API OptimizationAlgorithmLevenberg
   void setMaxTrialsAfterFailure(int max_trials);
 
   //! get the number of inner iterations for Levenberg-Marquardt
-  [[nodiscard]] int maxTrialsAfterFailure() const { return maxTrialsAfterFailure_->value(); }
+  [[nodiscard]] int maxTrialsAfterFailure() const {
+    return maxTrialsAfterFailure_->value();
+  }
 
   //! return the lambda set by the user, if < 0 the SparseOptimizer will compute
   //! the initial lambda

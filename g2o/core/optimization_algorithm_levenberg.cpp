@@ -109,7 +109,7 @@ OptimizationAlgorithm::SolverResult OptimizationAlgorithmLevenberg::solve(
 
     optimizer_->computeActiveErrors();
     const double tempChi = ok2 ? optimizer_->activeRobustChi2()
-                                 : std::numeric_limits<double>::max();
+                               : std::numeric_limits<double>::max();
 
     rho = (currentChi - tempChi);
     double scale =

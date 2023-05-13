@@ -38,7 +38,7 @@
 #include "optimization_algorithm_property.h"
 
 // define to get some verbose output
-//#define G2O_DEBUG_OPTIMIZATION_ALGORITHM_FACTORY
+// #define G2O_DEBUG_OPTIMIZATION_ALGORITHM_FACTORY
 
 namespace g2o {
 
@@ -114,7 +114,8 @@ class G2O_CORE_API OptimizationAlgorithmFactory {
 
   CreatorList creator_;
 
-  [[nodiscard]] CreatorList::const_iterator findSolver(const std::string& name) const;
+  [[nodiscard]] CreatorList::const_iterator findSolver(
+      const std::string& name) const;
   CreatorList::iterator findSolver(const std::string& name);
 
  private:

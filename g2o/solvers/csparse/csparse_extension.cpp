@@ -33,15 +33,15 @@ namespace csparse_extension {
  * Originally from CSparse, avoid memory re-allocations by giving workspace
  * pointers CSparse: Copyright (c) 2006-2011, Timothy A. Davis.
  */
-int cs_cholsolsymb(const cs *A, double *b, const css *S, double *x,
-                   int *work) {
+int cs_cholsolsymb(const cs* A, double* b, const css* S, double* x, int* work) {
   if (!CS_CSC(A) || !b || !S || !x) {
     G2O_DEBUG("{}: No valid input!", __PRETTY_FUNCTION__);
     assert(0);  // get a backtrace in debug mode
     return (0); /* check inputs */
   }
   const int n = A->n;
-  csn* N = cs_chol_workspace(A, S, work, x); /* numeric Cholesky factorization */
+  csn* N =
+      cs_chol_workspace(A, S, work, x); /* numeric Cholesky factorization */
   if (!N) {
     G2O_DEBUG("{}: cholesky failed!", __PRETTY_FUNCTION__);
   }
@@ -61,38 +61,38 @@ int cs_cholsolsymb(const cs *A, double *b, const css *S, double *x,
  * pointers CSparse: Copyright (c) 2006-2011, Timothy A. Davis.
  */
 /* L = chol (A, [pinv parent cp]), pinv is optional */
-csn *cs_chol_workspace(const cs *A, const css *S, int *cin, double *xin) {
+csn* cs_chol_workspace(const cs* A, const css* S, int* cin, double* xin) {
   double lki;
-  double *Lx;
-  double *x;
-  double *Cx;
+  double* Lx;
+  double* x;
+  double* Cx;
   int top;
   int i;
   int p;
   int k;
   int n;
-  int *Li;
-  int *Lp;
-  int *cp;
-  int *pinv;
-  int *s;
-  int *c;
-  int *parent;
-  int *Cp;
-  int *Ci;
-  cs *L;
-  cs *C;
-  cs *E;
-  csn *N;
+  int* Li;
+  int* Lp;
+  int* cp;
+  int* pinv;
+  int* s;
+  int* c;
+  int* parent;
+  int* Cp;
+  int* Ci;
+  cs* L;
+  cs* C;
+  cs* E;
+  csn* N;
   if (!CS_CSC(A) || !S || !S->cp || !S->parent) return (nullptr);
   n = A->n;
-  N = static_cast<csn *>(cs_calloc(1, sizeof(csn))); /* allocate result */
-  c = cin;                                           /* get int workspace */
-  x = xin; /* get double workspace */
+  N = static_cast<csn*>(cs_calloc(1, sizeof(csn))); /* allocate result */
+  c = cin;                                          /* get int workspace */
+  x = xin;                                          /* get double workspace */
   cp = S->cp;
   pinv = S->pinv;
   parent = S->parent;
-  C = pinv ? cs_symperm(A, pinv, 1) : const_cast<cs *>(A);
+  C = pinv ? cs_symperm(A, pinv, 1) : const_cast<cs*>(A);
   E = pinv ? C : nullptr; /* E is alias for A, or a copy E=A(p,p) */
   if (!N || !c || !x || !C) return (cs_ndone(N, E, nullptr, nullptr, 0));
   s = c + n;
@@ -117,7 +117,7 @@ csn *cs_chol_workspace(const cs *A, const css *S, int *cin, double *xin) {
     double d = x[k]; /* d = C(k,k) */
     x[k] = 0;        /* clear x for k+1st iteration */
     /* --- Triangular solve --------------------------------------------- */
-    for (; top < n; top++)    /* solve L(0:k-1,0:k-1) * x = C(:,k) */
+    for (; top < n; top++) /* solve L(0:k-1,0:k-1) * x = C(:,k) */
     {
       i = s[top];             /* s [top..n-1] is pattern of L(k,:) */
       lki = x[i] / Lx[Lp[i]]; /* L(k,i) = x (i) / L(i,i) */
@@ -127,7 +127,7 @@ csn *cs_chol_workspace(const cs *A, const css *S, int *cin, double *xin) {
       }
       d -= lki * lki; /* d = d - L(k,i)*L(k,i) */
       p = c[i]++;
-      Li[p] = k;      /* store L(k,i) in column i */
+      Li[p] = k; /* store L(k,i) in column i */
       Lx[p] = lki;
     }
     /* --- Compute L(k,k) ----------------------------------------------- */

@@ -35,24 +35,24 @@ EdgeProjectPSI2UV::EdgeProjectPSI2UV() {
   installParameter<CameraParameters>(0);
 }
 
-bool EdgeProjectPSI2UV::write(std::ostream &os) const {
+bool EdgeProjectPSI2UV::write(std::ostream& os) const {
   writeParamIds(os);
   internal::writeVector(os, measurement());
   return writeInformationMatrix(os);
 }
 
-bool EdgeProjectPSI2UV::read(std::istream &is) {
+bool EdgeProjectPSI2UV::read(std::istream& is) {
   readParamIds(is);
   internal::readVector(is, measurement_);
   return readInformationMatrix(is);
 }
 
 void EdgeProjectPSI2UV::computeError() {
-  const VertexPointXYZ *psi = vertexXnRaw<0>();
-  const VertexSE3Expmap *T_p_from_world = vertexXnRaw<1>();
-  const VertexSE3Expmap *T_anchor_from_world = vertexXnRaw<2>();
-  const CameraParameters *cam =
-      static_cast<const CameraParameters *>(parameter(0).get());
+  const VertexPointXYZ* psi = vertexXnRaw<0>();
+  const VertexSE3Expmap* T_p_from_world = vertexXnRaw<1>();
+  const VertexSE3Expmap* T_anchor_from_world = vertexXnRaw<2>();
+  const CameraParameters* cam =
+      static_cast<const CameraParameters*>(parameter(0).get());
 
   Vector2 obs(measurement_);
   error_ = obs - cam->cam_map(T_p_from_world->estimate() *
@@ -61,13 +61,13 @@ void EdgeProjectPSI2UV::computeError() {
 }
 
 void EdgeProjectPSI2UV::linearizeOplus() {
-  VertexPointXYZ *vpoint = vertexXnRaw<0>();
+  VertexPointXYZ* vpoint = vertexXnRaw<0>();
   Vector3 psi_a = vpoint->estimate();
-  VertexSE3Expmap *vpose = vertexXnRaw<1>();
+  VertexSE3Expmap* vpose = vertexXnRaw<1>();
   SE3Quat T_cw = vpose->estimate();
-  VertexSE3Expmap *vanchor = vertexXnRaw<2>();
-  const CameraParameters *cam =
-      static_cast<const CameraParameters *>(parameter(0).get());
+  VertexSE3Expmap* vanchor = vertexXnRaw<2>();
+  const CameraParameters* cam =
+      static_cast<const CameraParameters*>(parameter(0).get());
 
   SE3Quat A_aw = vanchor->estimate();
   SE3Quat T_ca = T_cw * A_aw.inverse();
@@ -76,9 +76,9 @@ void EdgeProjectPSI2UV::linearizeOplus() {
   Eigen::Matrix<double, 2, 3, Eigen::ColMajor> Jcam =
       internal::d_proj_d_y(cam->focal_length, y);
 
-  auto &jacobianOplus0 = std::get<0>(this->jacobianOplus_);
-  auto &jacobianOplus1 = std::get<1>(this->jacobianOplus_);
-  auto &jacobianOplus2 = std::get<2>(this->jacobianOplus_);
+  auto& jacobianOplus0 = std::get<0>(this->jacobianOplus_);
+  auto& jacobianOplus1 = std::get<1>(this->jacobianOplus_);
+  auto& jacobianOplus2 = std::get<2>(this->jacobianOplus_);
   jacobianOplus0 = -Jcam * internal::d_Tinvpsi_d_psi(T_ca, psi_a);
   jacobianOplus1 = -Jcam * internal::d_expy_d_y(y);
   jacobianOplus2 =

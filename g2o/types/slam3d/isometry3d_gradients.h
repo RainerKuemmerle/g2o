@@ -66,10 +66,10 @@ void skew(Eigen::MatrixBase<Derived>& Sx, Eigen::MatrixBase<Derived>& Sy,
   const double r11 = 2 * R(0, 0);
   const double r12 = 2 * R(0, 1);
   const double r13 = 2 * R(0, 2);
-const double r21 = 2 * R(1, 0);
+  const double r21 = 2 * R(1, 0);
   const double r22 = 2 * R(1, 1);
   const double r23 = 2 * R(1, 2);
-const double r31 = 2 * R(2, 0);
+  const double r31 = 2 * R(2, 0);
   const double r32 = 2 * R(2, 1);
   const double r33 = 2 * R(2, 2);
   if (Transposed) {

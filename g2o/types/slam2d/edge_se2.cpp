@@ -89,7 +89,8 @@ bool EdgeSE2WriteGnuplotAction::operator()(
     HyperGraph::HyperGraphElement& element,
     const std::shared_ptr<HyperGraphElementAction::Parameters>& params_) {
   if (typeid(element).name() != typeName_) return false;
-  auto params = std::static_pointer_cast<WriteGnuplotAction::Parameters>(params_);
+  auto params =
+      std::static_pointer_cast<WriteGnuplotAction::Parameters>(params_);
   if (!params->os) {
     return false;
   }

@@ -59,7 +59,7 @@ class G2O_TYPES_SCLAM2D_API EdgeSE2SensorCalib
   }
 
   double initialEstimatePossible(const OptimizableGraph::VertexSet& from,
-                                   OptimizableGraph::Vertex* to) override {
+                                 OptimizableGraph::Vertex* to) override {
     if (from.count(vertices_[2]) == 1  // need the laser offset
         && ((from.count(vertices_[0]) == 1 && to == vertices_[1].get()) ||
             ((from.count(vertices_[1]) == 1 && to == vertices_[0].get())))) {

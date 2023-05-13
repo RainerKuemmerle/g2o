@@ -59,7 +59,8 @@ bool VertexPointXYWriteGnuplotAction::operator()(
     const std::shared_ptr<HyperGraphElementAction::Parameters>& params) {
   if (typeid(element).name() != typeName_) return false;
 
-  auto* gnuplot_params = static_cast<WriteGnuplotAction::Parameters*>(params.get());
+  auto* gnuplot_params =
+      static_cast<WriteGnuplotAction::Parameters*>(params.get());
   if (!gnuplot_params->os) {
     return false;
   }

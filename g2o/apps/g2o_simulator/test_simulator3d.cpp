@@ -33,8 +33,8 @@
 #include "g2o/stuff/sampler.h"
 #include "simulator3d.h"
 
-//#define _POSE_SENSOR_OFFSET
-//#define _POSE_PRIOR_SENSOR
+// #define _POSE_SENSOR_OFFSET
+// #define _POSE_PRIOR_SENSOR
 
 using std::cerr;
 

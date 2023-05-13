@@ -72,7 +72,7 @@ class G2O_TYPES_SLAM2D_API EdgeSE2PointXYBearing
   bool write(std::ostream& os) const override;
 
   double initialEstimatePossible(const OptimizableGraph::VertexSet& from,
-                                   OptimizableGraph::Vertex*) override {
+                                 OptimizableGraph::Vertex*) override {
     return (from.count(vertices_[0]) == 1 ? 1.0 : -1.0);
   }
   void initialEstimate(const OptimizableGraph::VertexSet& from,

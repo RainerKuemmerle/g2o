@@ -33,7 +33,7 @@
 #include <queue>
 #include <vector>
 
-//#define DEBUG_ESTIMATE_PROPAGATOR
+// #define DEBUG_ESTIMATE_PROPAGATOR
 
 namespace g2o {
 

@@ -28,8 +28,8 @@
 
 namespace g2o {
 
-Vector3 EdgeStereoSE3ProjectXYZ::cam_project(const Vector3 &trans_xyz,
-                                             const float &bf) const {
+Vector3 EdgeStereoSE3ProjectXYZ::cam_project(const Vector3& trans_xyz,
+                                             const float& bf) const {
   const double invz = 1.0F / trans_xyz[2];
   Vector3 res;
   res[0] = trans_xyz[0] * invz * fx + cx;
@@ -38,20 +38,20 @@ Vector3 EdgeStereoSE3ProjectXYZ::cam_project(const Vector3 &trans_xyz,
   return res;
 }
 
-bool EdgeStereoSE3ProjectXYZ::read(std::istream &is) {
+bool EdgeStereoSE3ProjectXYZ::read(std::istream& is) {
   internal::readVector(is, measurement_);
   return readInformationMatrix(is);
 }
 
-bool EdgeStereoSE3ProjectXYZ::write(std::ostream &os) const {
+bool EdgeStereoSE3ProjectXYZ::write(std::ostream& os) const {
   internal::writeVector(os, measurement());
   return writeInformationMatrix(os);
 }
 
 void EdgeStereoSE3ProjectXYZ::linearizeOplus() {
-  VertexSE3Expmap *vj = vertexXnRaw<1>();
+  VertexSE3Expmap* vj = vertexXnRaw<1>();
   SE3Quat T(vj->estimate());
-  VertexPointXYZ *vi = vertexXnRaw<0>();
+  VertexPointXYZ* vi = vertexXnRaw<0>();
   Vector3 xyz = vi->estimate();
   Vector3 xyz_trans = T.map(xyz);
 

@@ -48,7 +48,7 @@ class ThetaTreeAction : public HyperDijkstra::TreeAction {
   explicit ThetaTreeAction(VectorX& theta)
       : HyperDijkstra::TreeAction(), thetaGuess_(theta) {}
   double perform(const std::shared_ptr<HyperGraph::Vertex>& v,
-                   const std::shared_ptr<HyperGraph::Vertex>& vParent,
+                 const std::shared_ptr<HyperGraph::Vertex>& vParent,
                  const std::shared_ptr<HyperGraph::Edge>& e) override {
     if (!vParent) return 0.;
     auto* odom = static_cast<EdgeSE2*>(e.get());
@@ -170,8 +170,8 @@ bool SolverSLAM2DLinear::solveOrientation() {
         from->hessianIndex() < 0 ? 0. : thetaGuess[from->hessianIndex()];
     const double toThetaGuess =
         to->hessianIndex() < 0 ? 0. : thetaGuess[to->hessianIndex()];
-    const double error = normalize_theta(
-        -e->measurement().rotation().angle() + toThetaGuess - fromThetaGuess);
+    const double error = normalize_theta(-e->measurement().rotation().angle() +
+                                         toThetaGuess - fromThetaGuess);
 
     const bool fromNotFixed = !(from->fixed());
     const bool toNotFixed = !(to->fixed());
