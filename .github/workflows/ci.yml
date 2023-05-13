@@ -58,6 +58,12 @@ jobs:
         if: runner.os == 'macOS'
         run: brew install cmake eigen
 
+      - name: Configure ccache for macOS
+        if: runner.os == 'macOS'
+        run: |
+          # See https://github.com/hendrikmuhs/ccache-action/issues/146
+          ccache --set-config=compiler_check=content
+
       - name: Configure CMake
         run: |
           cmake --version
