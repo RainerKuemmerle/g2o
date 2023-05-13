@@ -111,11 +111,6 @@ void EdgeSE3PointXYZ::linearizeOplus() {
 
   jacobianOplusXi_ = Jhom.block<3, 6>(0, 0);
   jacobianOplusXj_ = Jhom.block<3, 3>(0, 6);
-
-  // std::cerr << "just linearized." << std::endl;
-  // std::cerr << "jacobianOplusXi_:" << std::endl << jacobianOplusXi_ <<
-  // std::endl; std::cerr << "jacobianOplusXj_:" << std::endl <<
-  // jacobianOplusXj_ << std::endl;
 }
 
 bool EdgeSE3PointXYZ::setMeasurementFromState() {
@@ -124,10 +119,6 @@ bool EdgeSE3PointXYZ::setMeasurementFromState() {
 
   // calculate the projection
   const Vector3& pt = point->estimate();
-  // SE3OffsetCache* vcache = (SE3OffsetCache*) cam->getCache(_cacheIds[0]);
-  // if (! vcache){
-  //   cerr << "fatal error in retrieving cache" << endl;
-  // }
 
   const Vector3 perr = cache_->w2n() * pt;
   measurement_ = perr;
@@ -143,11 +134,6 @@ void EdgeSE3PointXYZ::initialEstimate(const OptimizableGraph::VertexSet& from,
 
   VertexSE3* cam = vertexXnRaw<0>();
   VertexPointXYZ* point = vertexXnRaw<1>();
-  // SE3OffsetCache* vcache = (SE3OffsetCache* ) cam->getCache(_cacheIds[0]);
-  // if (! vcache){
-  //   cerr << "fatal error in retrieving cache" << endl;
-  // }
-  // SE3OffsetParameters* params=vcache->params;
   const Vector3 p = measurement_;
   point->setEstimate(cam->estimate() * (cache_->offsetParam()->offset() * p));
 }

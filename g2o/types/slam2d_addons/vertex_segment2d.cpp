@@ -60,8 +60,6 @@ bool VertexSegment2DWriteGnuplotAction::operator()(
 
   auto* params = static_cast<WriteGnuplotAction::Parameters*>(params_.get());
   if (!params->os) {
-    std::cerr << __PRETTY_FUNCTION__ << ": warning, no valid os specified"
-              << std::endl;
     return false;
   }
 

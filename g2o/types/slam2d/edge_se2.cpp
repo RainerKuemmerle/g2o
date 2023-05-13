@@ -91,8 +91,6 @@ bool EdgeSE2WriteGnuplotAction::operator()(
   if (typeid(element).name() != typeName_) return false;
   auto params = std::static_pointer_cast<WriteGnuplotAction::Parameters>(params_);
   if (!params->os) {
-    std::cerr << __PRETTY_FUNCTION__ << ": warning, on valid os specified"
-              << std::endl;
     return false;
   }
 

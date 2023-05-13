@@ -41,8 +41,6 @@ int initialized = 0;
 
 void init() {
   if (types_icp::initialized) return;
-  // cerr << "Calling " << __FILE__ << " " << __PRETTY_FUNCTION__ << endl;
-
   EdgeVVGicp::dRidx_ << 0.0, 0.0, 0.0, 0.0, 0.0, 2.0, 0.0, -2.0, 0.0;
   EdgeVVGicp::dRidy_ << 0.0, 0.0, -2.0, 0.0, 0.0, 0.0, 2.0, 0.0, 0.0;
   EdgeVVGicp::dRidz_ << 0.0, 2.0, 0.0, -2.0, 0.0, 0.0, 0.0, 0.0, 0.0;
@@ -68,7 +66,7 @@ double VertexSCam::baseline_;
 G2O_ATTRIBUTE_CONSTRUCTOR(init_icp_types) { types_icp::init(); }
 
 // Copy constructor
-EdgeVVGicp::EdgeVVGicp(const EdgeVVGicp *e)
+EdgeVVGicp::EdgeVVGicp(const EdgeVVGicp* e)
 
 {
   // Temporary hack - TODO, sort out const-ness properly
@@ -100,7 +98,7 @@ EdgeVVGicp::EdgeVVGicp(const EdgeVVGicp *e)
 //
 // the measurement variable has type EdgeGICP (see types_icp.h)
 
-bool EdgeVVGicp::read(std::istream &is) {
+bool EdgeVVGicp::read(std::istream& is) {
   // measured point and normal
   for (int i = 0; i < 3; i++) is >> measurement_.pos0[i];
   for (int i = 0; i < 3; i++) is >> measurement_.normal0[i];
@@ -120,7 +118,7 @@ bool EdgeVVGicp::read(std::istream &is) {
   Matrix3 prec;
   double v = cst(.01);
   prec << v, 0, 0, 0, v, 0, 0, 0, 1;
-  const Matrix3 &R = measurement().R0;  // plane of the point in vp0
+  const Matrix3& R = measurement().R0;  // plane of the point in vp0
   information() = R.transpose() * prec * R;
 
   //    information().setIdentity();
@@ -170,7 +168,7 @@ void EdgeVVGicp::linearizeOplus() {
 }
 #endif
 
-bool EdgeVVGicp::write(std::ostream &os) const {
+bool EdgeVVGicp::write(std::ostream& os) const {
   // first point
   for (int i = 0; i < 3; i++) os << measurement().pos0[i] << " ";
   for (int i = 0; i < 3; i++) os << measurement().normal0[i] << " ";
@@ -191,9 +189,9 @@ bool EdgeVVGicp::write(std::ostream &os) const {
  * \brief Jacobian for stereo projection
  */
 void Edge_XYZ_VSC::linearizeOplus() {
-  VertexSCam *vc = static_cast<VertexSCam *>(vertices_[1]);
+  VertexSCam* vc = static_cast<VertexSCam*>(vertices_[1]);
 
-  VertexPointXYZ *vp = static_cast<VertexPointXYZ *>(vertices_[0]);
+  VertexPointXYZ* vp = static_cast<VertexPointXYZ*>(vertices_[0]);
   Vector4 pt, trans;
   pt.head<3>() = vp->estimate();
   pt(3) = 1.0;
@@ -211,7 +209,7 @@ void Edge_XYZ_VSC::linearizeOplus() {
   double ipz2 = 1.0 / (pz * pz);
   if (isnan(ipz2)) {
     std::cout << "[SetJac] infinite jac" << std::endl;
-    *(int *)0x0 = 0;
+    *(int*)0x0 = 0;
   }
 
   double ipz2fx = ipz2 * vc->Kcam(0, 0);  // Fx
@@ -280,12 +278,12 @@ void Edge_XYZ_VSC::linearizeOplus() {
       (pz * dp(0) - (px - b) * dp(2)) * ipz2fx;  // right image px
 }
 #endif
-bool EdgeXyzVsc::read(std::istream &) { return false; }
+bool EdgeXyzVsc::read(std::istream&) { return false; }
 
-bool EdgeXyzVsc::write(std::ostream &) const { return false; }
+bool EdgeXyzVsc::write(std::ostream&) const { return false; }
 
-bool VertexSCam::read(std::istream &) { return false; }
+bool VertexSCam::read(std::istream&) { return false; }
 
-bool VertexSCam::write(std::ostream &) const { return false; }
+bool VertexSCam::write(std::ostream&) const { return false; }
 
 }  // namespace g2o

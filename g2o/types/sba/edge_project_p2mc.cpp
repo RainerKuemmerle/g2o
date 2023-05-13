@@ -31,13 +31,13 @@ namespace g2o {
 // point to camera projection, monocular
 EdgeProjectP2MC::EdgeProjectP2MC() { information().setIdentity(); }
 
-bool EdgeProjectP2MC::read(std::istream &is) {
+bool EdgeProjectP2MC::read(std::istream& is) {
   // measured keypoint
   internal::readVector(is, measurement_);
   return readInformationMatrix(is);
 }
 
-bool EdgeProjectP2MC::write(std::ostream &os) const {
+bool EdgeProjectP2MC::write(std::ostream& os) const {
   internal::writeVector(os, measurement());
   writeInformationMatrix(os);
   return os.good();
@@ -49,22 +49,15 @@ void EdgeProjectP2MC::computeError() {
   const VertexCam *cam = vertexXnRaw<1>();
 
   // calculate the projection
-  const Vector3 &pt = point->estimate();
+  const Vector3& pt = point->estimate();
   Vector4 ppt(pt(0), pt(1), pt(2), 1);
   Vector3 p = cam->estimate().w2i * ppt;
   Vector2 perr;
   perr = p.head<2>() / p(2);
-  //      std::cout << std::endl << "CAM   " << cam->estimate() << std::endl;
-  //      std::cout << "POINT " << pt.transpose() << std::endl;
-  //      std::cout << "PROJ  " << p.transpose() << std::endl;
-  //      std::cout << "CPROJ " << perr.transpose() << std::endl;
-  //      std::cout << "MEAS  " << measurement_.transpose() << std::endl;
 
   // error, which is backwards from the normal observed - calculated
   // measurement_ is the measured projection
   error_ = perr - measurement_;
-  // std::cerr << error_.x() << " " << error_.y() <<  " " << chi2() <<
-  // std::endl;
 }
 
 void EdgeProjectP2MC::linearizeOplus() {

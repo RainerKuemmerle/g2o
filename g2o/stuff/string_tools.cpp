@@ -35,6 +35,7 @@
 #include <iterator>
 #include <string>
 
+#include "logger.h"
 #include "macros.h"
 #include "os_specific.h"
 
@@ -92,8 +93,7 @@ std::string formatString(const char* fmt, ...) {
   if (numChar != -1)
     retString = auxPtr;
   else {
-    std::cerr << __PRETTY_FUNCTION__ << ": Error while allocating memory"
-              << std::endl;
+    G2O_ERROR("{}: Error while allocating memory", __PRETTY_FUNCTION__);
   }
   free(auxPtr);
   return retString;
@@ -123,8 +123,7 @@ std::string strExpandFilename(const std::string& filename) {
   return result;
 #else
   (void)filename;
-  std::cerr << "WARNING: " << __PRETTY_FUNCTION__ << " not implemented"
-            << std::endl;
+  G2O_WARN("{} not implemented", __PRETTY_FUNCTION__);
   return std::string();
 #endif
 }

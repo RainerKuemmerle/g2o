@@ -31,6 +31,7 @@
 
 #include "factory.h"
 #include "g2o/stuff/color_macros.h"
+#include "g2o/stuff/logger.h"
 #include "g2o/stuff/macros.h"
 #include "g2o/stuff/string_tools.h"
 #include "parameter.h"
@@ -105,12 +106,12 @@ bool ParameterContainer::read(
     p->setId(pid);
     const bool r = p->read(currentLine);
     if (!r) {
-      std::cerr << __PRETTY_FUNCTION__ << ": Error reading data " << token
-                << " for parameter " << pid << std::endl;
+      G2O_ERROR("{}: Error reading data {} for parameter {}",
+                __PRETTY_FUNCTION__, token, pid);
     } else {
       if (!addParameter(p)) {
-        std::cerr << __PRETTY_FUNCTION__ << ": Parameter of type:" << token
-                  << " id:" << pid << " already defined" << std::endl;
+        G2O_ERROR("{}: Parameter of type: {} id: {} already defined",
+                  __PRETTY_FUNCTION__, token, pid);
       }
     }
   }  // while read line

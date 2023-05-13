@@ -29,6 +29,7 @@
 #include <fstream>
 #include <iomanip>
 
+#include "g2o/stuff/logger.h"
 #include "g2o/stuff/macros.h"
 #include "g2o/stuff/misc.h"
 #include "g2o/stuff/timeutil.h"
@@ -270,7 +271,7 @@ bool BlockSolver<Traits>::updateStructure(
       PoseMatrixType* m = Hpp_->block(ind, ind, true);
       v->mapHessianMemory(m->data());
     } else {
-      std::cerr << "updateStructure(): Schur not supported" << std::endl;
+      G2O_ERROR("updateStructure(): Schur not supported");
       abort();
     }
   }
@@ -299,7 +300,7 @@ bool BlockSolver<Traits>::updateStructure(
           auto* ee = static_cast<OptimizableGraph::Edge*>(e.get());
           ee->mapHessianMemory(m->data(), viIdx, vjIdx, transposedBlock);
         } else {
-          std::cerr << __PRETTY_FUNCTION__ << ": not supported" << std::endl;
+          G2O_ERROR("{}: not supported", __PRETTY_FUNCTION__);
         }
       }
     }
@@ -310,7 +311,6 @@ bool BlockSolver<Traits>::updateStructure(
 
 template <typename Traits>
 bool BlockSolver<Traits>::solve() {
-  // cerr << __PRETTY_FUNCTION__ << endl;
   if (!doSchur_) {
     double t = get_monotonic_time();
     bool ok = linearSolver_->solve(*Hpp_, x_, b_);
@@ -402,7 +402,6 @@ bool BlockSolver<Traits>::solve() {
       }
     }
   }
-  // cerr << "Solve [marginalize] = " <<  get_monotonic_time()-t << endl;
 
   // _bschur = _b for calling solver, and not touching _b
   memcpy(bschur_.get(), b_, sizePoses_ * sizeof(double));
@@ -424,8 +423,6 @@ bool BlockSolver<Traits>::solve() {
     globalStats->hessianDimension = globalStats->hessianPoseDimension +
                                     globalStats->hessianLandmarkDimension;
   }
-  // cerr << "Solve [decompose and solve] = " <<  get_monotonic_time()-t <<
-  // endl;
 
   if (!solvedPoses) return false;
 
@@ -452,7 +449,6 @@ bool BlockSolver<Traits>::solve() {
   memset(xl, 0, sizeLandmarks_ * sizeof(double));
   DInvSchur_->multiply(xl, cl);
   //_DInvSchur->rightMultiply(xl,cl);
-  // cerr << "Solve [landmark delta] = " <<  get_monotonic_time()-t << endl;
 
   return true;
 }
@@ -475,7 +471,7 @@ bool BlockSolver<Traits>::buildSystem() {
   // clear b vector
 #ifdef G2O_OPENMP
 #pragma omp parallel for default( \
-    shared) if (optimizer_->indexMapping().size() > 1000)
+        shared) if (optimizer_->indexMapping().size() > 1000)
 #endif
   for (auto* v : optimizer_->indexMapping()) {
     assert(v);
@@ -498,7 +494,7 @@ bool BlockSolver<Traits>::buildSystem() {
   // thread
   JacobianWorkspace jacobianWorkspace = optimizer_->jacobianWorkspace();
 #pragma omp parallel for default(shared) firstprivate( \
-    jacobianWorkspace) if (optimizer_->activeEdges().size() > 100)
+        jacobianWorkspace) if (optimizer_->activeEdges().size() > 100)
 #endif
   for (const auto& e : optimizer_->activeEdges()) {
     e->linearizeOplus(
@@ -512,8 +508,9 @@ bool BlockSolver<Traits>::buildSystem() {
         bool hasANan = arrayHasNaN(jacobianWorkspace.workspaceForVertex(i),
                                    e->dimension() * v->dimension());
         if (hasANan) {
-          std::cerr << "buildSystem(): NaN within Jacobian for edge " << e
-                    << " for vertex " << i << std::endl;
+          G2O_WARN(
+              "buildSystem(): NaN within Jacobian for edge {} for vertex {}",
+              static_cast<void*>(e.get()), i);
           break;
         }
       }
@@ -524,7 +521,7 @@ bool BlockSolver<Traits>::buildSystem() {
   // flush the current system in a sparse block matrix
 #ifdef G2O_OPENMP
 #pragma omp parallel for default( \
-    shared) if (optimizer_->indexMapping().size() > 1000)
+        shared) if (optimizer_->indexMapping().size() > 1000)
 #endif
   for (auto* v : optimizer_->indexMapping()) {
     int iBase = v->colInHessian();

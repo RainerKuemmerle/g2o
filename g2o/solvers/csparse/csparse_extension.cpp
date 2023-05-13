@@ -23,6 +23,7 @@
 #include <cassert>
 #include <iostream>
 
+#include "g2o/stuff/logger.h"
 #include "g2o/stuff/macros.h"
 
 namespace g2o {
@@ -35,15 +36,14 @@ namespace csparse_extension {
 int cs_cholsolsymb(const cs *A, double *b, const css *S, double *x,
                    int *work) {
   if (!CS_CSC(A) || !b || !S || !x) {
-    std::cerr << __PRETTY_FUNCTION__ << ": No valid input!" << std::endl;
+    G2O_DEBUG("{}: No valid input!", __PRETTY_FUNCTION__);
     assert(0);  // get a backtrace in debug mode
     return (0); /* check inputs */
   }
   const int n = A->n;
   csn* N = cs_chol_workspace(A, S, work, x); /* numeric Cholesky factorization */
   if (!N) {
-    std::cerr << __PRETTY_FUNCTION__ << ": cholesky failed!" << std::endl;
-    /*assert(0);*/
+    G2O_DEBUG("{}: cholesky failed!", __PRETTY_FUNCTION__);
   }
   const int ok = static_cast<int>(N != nullptr);
   if (ok) {

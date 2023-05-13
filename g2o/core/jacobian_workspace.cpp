@@ -34,8 +34,6 @@
 namespace g2o {
 
 bool JacobianWorkspace::allocate() {
-  // cerr << __PRETTY_FUNCTION__ << " " << PVAR(this) << " " <<
-  // PVAR(_maxNumVertices) << " " << PVAR(_maxDimension) << endl;
   if (maxNumVertices_ <= 0 || maxDimension_ <= 0) return false;
   workspace_.resize(maxNumVertices_);
   for (auto& it : workspace_) {
@@ -71,8 +69,6 @@ void JacobianWorkspace::updateSize(const HyperGraph::Edge& e_) {
   }
   maxNumVertices_ = std::max(numVertices, maxNumVertices_);
   maxDimension_ = std::max(maxDimensionForEdge, maxDimension_);
-  // cerr << __PRETTY_FUNCTION__ << " " << PVAR(this) << " " <<
-  // PVAR(_maxNumVertices) << " " << PVAR(_maxDimension) << endl;
 }
 
 void JacobianWorkspace::updateSize(const OptimizableGraph& graph, bool reset) {

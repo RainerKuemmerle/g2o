@@ -34,6 +34,7 @@
 #include "g2o/core/batch_stats.h"
 #include "g2o/core/linear_solver.h"
 #include "g2o/core/marginal_covariance_cholesky.h"
+#include "g2o/stuff/logger.h"
 #include "g2o/stuff/timeutil.h"
 #include "g2o_csparse_api.h"
 
@@ -65,10 +66,11 @@ class LinearSolverCSparse : public LinearSolverCCS<MatrixType> {
     const double t = get_monotonic_time();
     bool ok = csparse_.solve(x, b);
     if (!ok && this->writeDebug()) {
-      std::cerr
-          << "Cholesky failure, writing debug.txt (Hessian loadable by Octave)"
-          << std::endl;
+      G2O_ERROR(
+          "Cholesky failure, writing debug.txt (Hessian loadable by Octave)");
       csparse_.writeSparse("debug.txt");
+    } else {
+      G2O_DEBUG("Cholesky failure");
     }
 
     G2OBatchStatistics* globalStats = G2OBatchStatistics::globalStats();
@@ -180,7 +182,7 @@ class LinearSolverCSparse : public LinearSolverCCS<MatrixType> {
                             factor.pinv);
       compute(mcc);
     } else {
-      std::cerr << "inverse fail (numeric decomposition)" << std::endl;
+      G2O_WARN("inverse fail (numeric decomposition)");
     }
     csparse_.freeFactor();
     G2OBatchStatistics* globalStats = G2OBatchStatistics::globalStats();

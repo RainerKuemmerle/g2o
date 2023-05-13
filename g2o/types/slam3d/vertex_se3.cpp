@@ -32,8 +32,6 @@
 #include "g2o/stuff/opengl_wrapper.h"
 #endif
 
-#include <iostream>
-
 #include "g2o/core/cache.h"
 
 namespace g2o {
@@ -63,8 +61,6 @@ bool VertexSE3WriteGnuplotAction::operator()(
   if (typeid(element).name() != typeName_) return false;
   auto* params = static_cast<WriteGnuplotAction::Parameters*>(params_.get());
   if (!params->os) {
-    std::cerr << __PRETTY_FUNCTION__ << ": warning, no valid os specified"
-              << std::endl;
     return false;
   }
 

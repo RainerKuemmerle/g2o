@@ -36,9 +36,7 @@ template <int D, typename E, typename... VertexTypes>
 template <std::size_t... Ints>
 bool BaseFixedSizedEdge<D, E, VertexTypes...>::allVerticesFixedNs(
     std::index_sequence<Ints...>) const {
-  bool fixed[] = {vertexXn<Ints>()->fixed()...};
-  return std::all_of(std::begin(fixed), std::end(fixed),
-                     [](bool value) { return value; });
+  return (... && vertexXn<Ints>()->fixed());
 }
 
 template <int D, typename E, typename... VertexTypes>
@@ -68,8 +66,7 @@ template <std::size_t... Ints>
 void BaseFixedSizedEdge<D, E, VertexTypes...>::constructQuadraticFormNs(
     const InformationType& omega, const ErrorVector& weightedError,
     std::index_sequence<Ints...>) {
-  int unused[] = {(constructQuadraticFormN<Ints>(omega, weightedError), 0)...};
-  (void)unused;
+  (void(constructQuadraticFormN<Ints>(omega, weightedError)), ...);
 }
 
 // overloading constructOffDiagonalQuadraticFormMs to
@@ -85,9 +82,7 @@ template <int N, std::size_t... Ints, typename AtOType>
 void BaseFixedSizedEdge<D, E, VertexTypes...>::
     constructOffDiagonalQuadraticFormMs(const AtOType& AtO,
                                         std::index_sequence<Ints...>) {
-  int unused[] = {
-      (constructOffDiagonalQuadraticFormM<N, Ints, AtOType>(AtO), 0)...};
-  (void)unused;
+  (void(constructOffDiagonalQuadraticFormM<N, Ints, AtOType>(AtO)), ...);
 }
 
 template <int D, typename E, typename... VertexTypes>
@@ -145,15 +140,12 @@ template <int D, typename E, typename... VertexTypes>
 template <std::size_t... Ints>
 void BaseFixedSizedEdge<D, E, VertexTypes...>::linearizeOplus_allocate(
     JacobianWorkspace& jacobianWorkspace, std::index_sequence<Ints...>) {
-  int unused[] = {
-      (new (&std::get<Ints>(jacobianOplus_))
-           JacobianType<D, VertexDimension<Ints>()>(
-               jacobianWorkspace.workspaceForVertex(Ints),
-               D < 0 ? dimension_ : D,
-               VertexDimension<Ints>() < 0 ? vertexXn<Ints>()->dimension()
-                                           : VertexDimension<Ints>()),
-       0)...};
-  (void)unused;
+  (new (&std::get<Ints>(jacobianOplus_))
+       JacobianType<D, VertexDimension<Ints>()>(
+           jacobianWorkspace.workspaceForVertex(Ints), D < 0 ? dimension_ : D,
+           VertexDimension<Ints>() < 0 ? vertexXn<Ints>()->dimension()
+                                       : VertexDimension<Ints>()),
+   ...);
 }
 
 template <int D, typename E, typename... VertexTypes>
@@ -202,8 +194,7 @@ template <int D, typename E, typename... VertexTypes>
 template <std::size_t... Ints>
 void BaseFixedSizedEdge<D, E, VertexTypes...>::linearizeOplusNs(
     std::index_sequence<Ints...>) {
-  int unused[] = {(linearizeOplusN<Ints>(), 0)...};
-  (void)unused;
+  (void(linearizeOplusN<Ints>()), ...);
 }
 
 template <int D, typename E, typename... VertexTypes>

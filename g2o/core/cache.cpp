@@ -30,6 +30,7 @@
 #include <utility>
 
 #include "factory.h"
+#include "g2o/stuff/logger.h"
 #include "optimizable_graph.h"
 
 namespace g2o {
@@ -78,16 +79,15 @@ std::shared_ptr<Cache> CacheContainer::createCache(const Cache::CacheKey& key) {
   Factory* f = Factory::instance();
   std::unique_ptr<HyperGraph::HyperGraphElement> e = f->construct(key.type());
   if (!e) {
-    std::cerr << __PRETTY_FUNCTION__ << std::endl;
-    std::cerr << "fatal error in creating cache of type " << key.type()
-              << std::endl;
+    G2O_ERROR("{}", __PRETTY_FUNCTION__);
+    G2O_ERROR("fatal error in creating cache of type {}", key.type());
     return nullptr;
   }
   auto c = std::shared_ptr<Cache>(dynamic_cast<Cache*>(e.release()));
   if (!c) {
-    std::cerr << __PRETTY_FUNCTION__ << std::endl;
-    std::cerr << "fatal error in creating cache of type " << key.type()
-              << std::endl;
+    G2O_ERROR("{}", __PRETTY_FUNCTION__);
+    G2O_ERROR("fatal error in creating cache of type {}, wrong type",
+              key.type());
     return nullptr;
   }
   c->container_ = this;

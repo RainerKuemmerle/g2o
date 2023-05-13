@@ -108,7 +108,6 @@ void EstimatePropagator::propagate(
     AdjacencyMapEntry* entry = frontier.pop();
     const auto& u = entry->child();
     const double uDistance = entry->distance();
-    // cerr << "uDistance " << uDistance << endl;
 
     // initialize the vertex
     if (entry->frontierLevel_ > 0) {
@@ -149,14 +148,11 @@ void EstimatePropagator::propagate(
             edgeDistance != std::numeric_limits<double>::max() &&
             edgeDistance < maxEdgeCost) {
           const double zDistance = uDistance + edgeDistance;
-          // cerr << z->id() << " " << zDistance << endl;
 
           auto ot = adjacencyMap_.find(z);
           assert(ot != adjacencyMap_.end());
 
           if (zDistance < ot->second.distance() && zDistance < maxDistance) {
-            // if (ot->second.inQueue)
-            // cerr << "Updating" << endl;
             ot->second.distance_ = zDistance;
             ot->second.parent_ = initializedVertices;
             ot->second.edge_ = edge;
@@ -173,7 +169,7 @@ void EstimatePropagator::propagate(
   // writing debug information like cost for reaching each vertex and the parent
   // used to initialize
 #ifdef DEBUG_ESTIMATE_PROPAGATOR
-  cerr << "Writing cost.dat" << endl;
+  G2O_DEBUG("Writing cost.dat");
   ofstream costStream("cost.dat");
   for (AdjacencyMap::const_iterator it = adjacencyMap_.begin();
        it != adjacencyMap_.end(); ++it) {
@@ -181,7 +177,7 @@ void EstimatePropagator::propagate(
     costStream << "vertex " << u->id() << "  cost " << it->second._distance
                << endl;
   }
-  cerr << "Writing init.dat" << endl;
+  G2O_DEBUG("Writing init.dat");
   ofstream initStream("init.dat");
   vector<AdjacencyMapEntry*> frontierLevels;
   for (AdjacencyMap::iterator it = adjacencyMap_.begin();

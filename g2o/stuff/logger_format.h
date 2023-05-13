@@ -24,24 +24,26 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "timeutil.h"
+#ifndef G2O_LOGGER_FORMAT_H
+#define G2O_LOGGER_FORMAT_H
 
-#include <iostream>
+#include "g2o/config.h"
 
-#include "g2o/stuff/logger.h"
+#ifdef G2O_HAVE_LOGGING
+#include <spdlog/fmt/fmt.h>
+#include <spdlog/fmt/ostr.h>
 
-namespace g2o {
+#if FMT_VERSION >= 90000
+// see https://fmt.dev/9.0.0/api.html#std-ostream-support
 
-ScopeTime::ScopeTime(const char* title)
-    : title_(title), startTime_(get_monotonic_time()) {}
+#include <Eigen/Dense>
 
-ScopeTime::~ScopeTime() {
-  G2O_DEBUG("{} took {}ms.", title_,
-            1000 * (get_monotonic_time() - startTime_));
-}
+template <typename T>
+struct fmt::formatter<
+    T, std::enable_if_t<std::is_base_of_v<Eigen::DenseBase<T>, T>, char>>
+    : fmt::ostream_formatter {};
 
-double get_monotonic_time() {
-  return seconds{std::chrono::steady_clock::now().time_since_epoch()}.count();
-}
+#endif
 
-}  // namespace g2o
+#endif  // G2O_HAVE_LOGGING
+#endif

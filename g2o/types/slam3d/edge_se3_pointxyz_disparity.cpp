@@ -27,8 +27,6 @@
 #include "edge_se3_pointxyz_disparity.h"
 
 #include <cassert>
-#include <iomanip>
-#include <iostream>
 
 #ifdef G2O_HAVE_OPENGL
 #include "g2o/stuff/opengl_primitives.h"
@@ -131,11 +129,6 @@ bool EdgeSE3PointXYZDisparity::setMeasurementFromState() {
   VertexPointXYZ* point = vertexXnRaw<1>();
   const Vector3& pt = point->estimate();
 
-  // VertexCameraCache* vcache = (VertexCameraCache*)
-  // cam->getCache(_cacheIds[0]); if (! vcache){
-  //   cerr << "fatal error in retrieving cache" << endl;
-  // }
-
   Vector3 p = cache_->w2i() * pt;
 
   Vector3 perr;
@@ -156,11 +149,6 @@ void EdgeSE3PointXYZDisparity::initialEstimate(
   VertexSE3* cam = vertexXnRaw<0>();
   VertexPointXYZ* point = vertexXnRaw<1>();
 
-  // VertexCameraCache* vcache = (VertexCameraCache* )
-  // cam->getCache(_cacheIds[0]); if (! vcache){
-  //   cerr << "fatal error in retrieving cache" << endl;
-  // }
-  // ParameterCamera* params=vcache->params;
   const Eigen::Matrix<double, 3, 3, Eigen::ColMajor>& invKcam =
       cache_->camParams()->invKcam();
   Vector3 p;

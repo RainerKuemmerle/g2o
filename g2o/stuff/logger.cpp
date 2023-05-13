@@ -24,24 +24,52 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "timeutil.h"
+#include "logger.h"
 
-#include <iostream>
+#include "g2o/config.h"
 
-#include "g2o/stuff/logger.h"
+#ifdef G2O_HAVE_LOGGING
+#include <spdlog/cfg/env.h>
+#include <spdlog/common.h>
+#include <spdlog/sinks/stdout_color_sinks.h>
 
-namespace g2o {
+namespace g2o::internal {
 
-ScopeTime::ScopeTime(const char* title)
-    : title_(title), startTime_(get_monotonic_time()) {}
-
-ScopeTime::~ScopeTime() {
-  G2O_DEBUG("{} took {}ms.", title_,
-            1000 * (get_monotonic_time() - startTime_));
+LoggerInterface::LoggerInterface() {
+  spdlog::cfg::load_env_levels();
+  console_ = spdlog::stdout_color_mt("g2o");
+  console_->set_pattern("%+");
 }
 
-double get_monotonic_time() {
-  return seconds{std::chrono::steady_clock::now().time_since_epoch()}.count();
+LoggerInterface::~LoggerInterface() { spdlog::drop("g2o"); }
+
+}  // namespace g2o::internal
+#endif
+
+namespace g2o::logging {
+
+void setLevel(Level level) {
+#ifdef G2O_HAVE_LOGGING
+  auto toSpdLogLevel = [](Level level) {
+    switch (level) {
+      case Level::kDebug:
+        return spdlog::level::debug;
+      case Level::kInfo:
+        return spdlog::level::info;
+      case Level::kWarn:
+        return spdlog::level::warn;
+      case Level::kError:
+        return spdlog::level::err;
+      case Level::kOff:
+        return spdlog::level::off;
+    }
+    assert(false && "Unexpected level passed to the function");
+    return spdlog::level::off;
+  };
+  Logger::get().console().set_level(toSpdLogLevel(level));
+#else
+  (void)level;
+#endif
 }
 
-}  // namespace g2o
+}  // namespace g2o::logging

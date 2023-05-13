@@ -464,7 +464,6 @@ bool SparseBlockMatrix<MatrixType>::symmPermutation(
   }
   // now ready to permute the columns
   for (size_t i = 0; i < n; ++i) {
-    // cerr << PVAR(i) <<  " ";
     int pi = pinv[i];
     for (const auto& block : blockCols_[i]) {
       int pj = pinv[block.first];
@@ -484,7 +483,6 @@ bool SparseBlockMatrix<MatrixType>::symmPermutation(
         *b = s->transpose();
       }
     }
-    // cerr << endl;
     //  within each row,
   }
   return true;

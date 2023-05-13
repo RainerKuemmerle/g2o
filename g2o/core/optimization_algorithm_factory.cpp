@@ -29,6 +29,8 @@
 #include <cassert>
 #include <iostream>
 #include <typeinfo>
+
+#include "g2o/stuff/logger.h"
 #include <utility>
 
 namespace g2o {
@@ -53,8 +55,7 @@ void OptimizationAlgorithmFactory::registerSolver(
   auto foundIt = findSolver(name);
   if (foundIt != creator_.end()) {
     creator_.erase(foundIt);
-    std::cerr << "SOLVER FACTORY WARNING: Overwriting Solver creator " << name
-              << std::endl;
+    G2O_WARN("SOLVER FACTORY: Overwriting Solver creator {}", name);
     assert(0);
   }
   creator_.push_back(c);
@@ -77,8 +78,7 @@ std::unique_ptr<OptimizationAlgorithm> OptimizationAlgorithmFactory::construct(
     solverProperty = (*foundIt)->property();
     return (*foundIt)->construct();
   }
-  std::cerr << "SOLVER FACTORY WARNING: Unable to create solver " << name
-            << std::endl;
+  G2O_WARN("SOLVER FACTORY: Unable to create solver {}", name);
   return std::unique_ptr<OptimizationAlgorithm>();
 }
 

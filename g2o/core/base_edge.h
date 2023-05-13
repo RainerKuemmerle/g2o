@@ -32,6 +32,7 @@
 #include <limits>
 #include <type_traits>
 
+#include "g2o/stuff/logger.h"
 #include "optimizable_graph.h"
 
 namespace g2o {
@@ -127,9 +128,9 @@ class BaseEdge : public OptimizableGraph::Edge {
 
   void initialEstimate(const OptimizableGraph::VertexSet&,
                        OptimizableGraph::Vertex*) override {
-    std::cerr << "initialEstimate() is not implemented, please give "
-                 "implementation in your derived class"
-              << std::endl;
+    G2O_WARN(
+        "inititialEstimate() is not implemented, please give implementation in "
+        "your derived class");
   }
 
   /**

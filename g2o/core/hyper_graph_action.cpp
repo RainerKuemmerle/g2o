@@ -31,6 +31,7 @@
 #include <utility>
 
 #include "cache.h"
+#include "g2o/stuff/logger.h"
 #include "g2o/stuff/macros.h"
 #include "optimizable_graph.h"
 
@@ -84,14 +85,14 @@ bool HyperGraphElementActionCollection::operator()(
 bool HyperGraphElementActionCollection::registerAction(
     const HyperGraphElementAction::HyperGraphElementActionPtr& action) {
 #ifdef G2O_DEBUG_ACTIONLIB
-  cerr << __PRETTY_FUNCTION__ << " " << action->name() << " "
-       << action->typeName() << endl;
+  G2O_DEBUG("{} {} {}", __PRETTY_FUNCTION__, action->name(),
+            action->typeName());
 #endif
   if (action->name() != name()) {
-    std::cerr << __PRETTY_FUNCTION__
-              << ": invalid attempt to register an action in a collection with "
-                 "a different name "
-              << name() << " " << action->name() << std::endl;
+    G2O_ERROR(
+        "{}: invalid attempt to register an action in a collection with a "
+        "different name {} {}",
+        __PRETTY_FUNCTION__, name(), action->name());
   }
   actionMap_.insert(make_pair(action->typeName(), action));
   return true;
@@ -137,17 +138,17 @@ bool HyperGraphActionLibrary::registerAction(
     collection =
         std::dynamic_pointer_cast<HyperGraphElementActionCollection>(oldAction);
     if (!collection) {
-      std::cerr << __PRETTY_FUNCTION__
-                << ": fatal error, a collection is not at the first level in "
-                   "the library"
-                << std::endl;
+      G2O_ERROR(
+          "{}: : fatal error, a collection is not at the first level in the "
+          "library",
+          __PRETTY_FUNCTION__);
       return false;
     }
     return collection->registerAction(action);
   }
 #ifdef G2O_DEBUG_ACTIONLIB
-  cerr << __PRETTY_FUNCTION__ << ": creating collection for \""
-       << action->name() << "\"" << endl;
+  G2O_DEBUG("{}: creating collection for {}", __PRETTY_FUNCTION__,
+            action->name());
 #endif
   collection =
       std::make_shared<HyperGraphElementActionCollection>(action->name());

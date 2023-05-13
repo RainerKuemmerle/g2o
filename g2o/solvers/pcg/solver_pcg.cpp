@@ -31,6 +31,7 @@
 #include "g2o/core/optimization_algorithm_gauss_newton.h"
 #include "g2o/core/optimization_algorithm_levenberg.h"
 #include "g2o/core/solver.h"
+#include "g2o/stuff/logger.h"
 #include "g2o/stuff/macros.h"
 #include "linear_solver_pcg.h"
 
@@ -38,8 +39,7 @@ namespace g2o {
 namespace {
 template <int P, int L>
 std::unique_ptr<g2o::Solver> AllocateSolver() {
-  std::cerr << "# Using PCG poseDim " << P << " landMarkDim " << L << std::endl;
-
+  G2O_DEBUG("Using PCG poseDim {} landMarkDim {}", P, L);
   return std::make_unique<BlockSolverPL<P, L>>(
       std::make_unique<
           LinearSolverPCG<typename BlockSolverPL<P, L>::PoseMatrixType>>());

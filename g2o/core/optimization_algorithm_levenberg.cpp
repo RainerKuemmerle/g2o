@@ -31,6 +31,7 @@
 #include <iostream>
 
 #include "batch_stats.h"
+#include "g2o/stuff/logger.h"
 #include "g2o/stuff/timeutil.h"
 #include "solver.h"
 #include "sparse_optimizer.h"
@@ -56,8 +57,7 @@ OptimizationAlgorithm::SolverResult OptimizationAlgorithmLevenberg::solve(
       !online) {  // built up the CCS structure, here due to easy time measure
     const bool ok = solver_.buildStructure();
     if (!ok) {
-      std::cerr << __PRETTY_FUNCTION__
-                << ": Failure while building CCS structure" << std::endl;
+      G2O_WARN("{}: Failure while building CCS structure", __PRETTY_FUNCTION__);
       return OptimizationAlgorithm::kFail;
     }
   }
@@ -112,7 +112,8 @@ OptimizationAlgorithm::SolverResult OptimizationAlgorithmLevenberg::solve(
                                  : std::numeric_limits<double>::max();
 
     rho = (currentChi - tempChi);
-    double scale = ok2 ? computeScale() + cst(1e-3) : 1; // make sure it's non-zero :)
+    double scale =
+        ok2 ? computeScale() + cst(1e-3) : 1;  // make sure it's non-zero :)
     rho /= scale;
 
     if (rho > 0 && g2o_isfinite(tempChi) && ok2) {  // last step was good

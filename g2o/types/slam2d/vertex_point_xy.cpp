@@ -61,8 +61,6 @@ bool VertexPointXYWriteGnuplotAction::operator()(
 
   auto* gnuplot_params = static_cast<WriteGnuplotAction::Parameters*>(params.get());
   if (!gnuplot_params->os) {
-    std::cerr << __PRETTY_FUNCTION__ << ": warning, on valid os specified"
-              << std::endl;
     return false;
   }
 

@@ -47,7 +47,7 @@ bool EdgeSE2PointXYOffset::resolveCaches() {
   return cache_ != nullptr;
 }
 
-bool EdgeSE2PointXYOffset::read(std::istream &is) {
+bool EdgeSE2PointXYOffset::read(std::istream& is) {
   int pId;
   is >> pId;
   setParameterId(0, pId);
@@ -60,7 +60,7 @@ bool EdgeSE2PointXYOffset::read(std::istream &is) {
   return true;
 }
 
-bool EdgeSE2PointXYOffset::write(std::ostream &os) const {
+bool EdgeSE2PointXYOffset::write(std::ostream& os) const {
   os << parameters_[0]->id() << " ";
   internal::writeVector(os, measurement());
   return writeInformationMatrix(os);
@@ -96,8 +96,8 @@ bool EdgeSE2PointXYOffset::setMeasurementFromState() {
 }
 
 void EdgeSE2PointXYOffset::initialEstimate(
-    const OptimizableGraph::VertexSet &from,
-    OptimizableGraph::Vertex * /*to_*/) {
+    const OptimizableGraph::VertexSet& from,
+    OptimizableGraph::Vertex* /*to_*/) {
   (void)from;
   assert(from.size() == 1 && from.count(vertices_[0]) == 1 &&
          "Can not initialize VertexDepthCam position by VertexTrackXY");

@@ -38,6 +38,7 @@
 #include "g2o/config.h"
 #include "g2o/core/eigen_types.h"
 #include "g2o/core/optimizable_graph.h"
+#include "g2o/stuff/logger.h"
 #include "g2o/stuff/macros.h"
 #include "g2o/stuff/misc.h"
 #include "g2o/stuff/timeutil.h"
@@ -75,8 +76,8 @@ void SparseOptimizer::computeActiveErrors() {
     OptimizableGraph::Edge* e = activeEdge.get();
     bool hasNan = arrayHasNaN(e->errorData(), e->dimension());
     if (hasNan) {
-      std::cerr << "computeActiveErrors(): found NaN in error for edge " << e
-                << std::endl;
+      G2O_WARN("computeActiveErrors(): found NaN in error for edge {}",
+               static_cast<void*>(e));
     }
   }
 #endif
@@ -185,8 +186,7 @@ bool SparseOptimizer::initializeOptimization(int level) {
 bool SparseOptimizer::initializeOptimization(HyperGraph::VertexSet& vset,
                                              int level) {
   if (edges().empty()) {
-    std::cerr << __PRETTY_FUNCTION__ << ": Attempt to initialize an empty graph"
-              << std::endl;
+    G2O_WARN("Attempt to initialize an empty graph");
     return false;
   }
   preIteration(-1);
@@ -232,8 +232,8 @@ bool SparseOptimizer::initializeOptimization(HyperGraph::VertexSet& vset,
           int k;
           bool hasNan = arrayHasNaN(estimateData.data(), estimateDim, &k);
           if (hasNan)
-            std::cerr << __PRETTY_FUNCTION__ << ": Vertex " << v->id()
-                      << " contains a nan entry at index " << k << std::endl;
+            G2O_WARN("{}: Vertex {} contains a nan entry at index {}",
+                     __PRETTY_FUNCTION__, v->id(), k);
         }
       }
 #endif
@@ -311,7 +311,6 @@ void SparseOptimizer::computeInitialGuess(EstimatePropagatorCost& propagator) {
               std::static_pointer_cast<OptimizableGraph::Edge>(vedgeIt->lock());
           if (vedge->vertices().size() == 1 &&
               vedge->initialEstimatePossible(emptySet, v.get()) > 0.) {
-            // cerr << "Initialize with prior for " << v->id() << endl;
             vedge->initialEstimate(emptySet, v.get());
             fixedVertices.insert(v);
           }
@@ -345,10 +344,10 @@ void SparseOptimizer::computeInitialGuess(EstimatePropagatorCost& propagator) {
 
 int SparseOptimizer::optimize(int iterations, bool online) {
   if (ivMap_.empty()) {
-    std::cerr << __PRETTY_FUNCTION__
-              << ": 0 vertices to optimize, maybe forgot to call "
-                 "initializeOptimization()"
-              << std::endl;
+    G2O_WARN(
+        "{}: 0 vertices to optimize, maybe forgot to call "
+        "initializeOptimization()",
+        __PRETTY_FUNCTION__);
     return -1;
   }
 
@@ -358,8 +357,7 @@ int SparseOptimizer::optimize(int iterations, bool online) {
 
   ok = algorithm_->init(online);
   if (!ok) {
-    std::cerr << __PRETTY_FUNCTION__ << " Error while initializing"
-              << std::endl;
+    G2O_ERROR("{}: Error while initializing", __PRETTY_FUNCTION__);
     return -1;
   }
 
@@ -417,8 +415,8 @@ void SparseOptimizer::update(double* update) {
 #ifndef NDEBUG
     bool hasNan = arrayHasNaN(update, v->dimension());
     if (hasNan)
-      std::cerr << __PRETTY_FUNCTION__ << ": Update contains a nan for vertex "
-                << v->id() << std::endl;
+      G2O_WARN("{}: Update contains a nan for vertex {}", __PRETTY_FUNCTION__,
+               v->id());
 #endif
     new (&updateMap) VectorX::MapType(update, v->dimension());
     v->oplus(updateMap);
@@ -463,9 +461,10 @@ bool SparseOptimizer::updateInitialization(HyperGraph::VertexSet& vset,
     }
   }
 
-  // if (newVertices.size() != vset.size())
-  // cerr << __PRETTY_FUNCTION__ << ": something went wrong " <<
-  // PVAR(vset.size()) << " " << PVAR(newVertices.size()) << endl;
+  if (newVertices.size() != vset.size()) {
+    G2O_ERROR("{}: something went wrong, size mismatch {} != {}", vset.size(),
+              newVertices.size());
+  }
   return algorithm_->updateStructure(newVertices, eset);
 }
 

@@ -41,17 +41,12 @@ class GLUWrapper {
 
  protected:
   GLUWrapper() {
-    // std::cerr << __PRETTY_FUNCTION__ << std::endl;
     quadratic_ =
         gluNewQuadric();  // Create A Pointer To The Quadric Object ( NEW )
     gluQuadricNormals(quadratic_, GLU_SMOOTH);  // Create Smooth Normals ( NEW )
   }
-  ~GLUWrapper() {
-    // std::cerr << __PRETTY_FUNCTION__ << std::endl;
-    gluDeleteQuadric(quadratic_);
-  }
+  ~GLUWrapper() { gluDeleteQuadric(quadratic_); }
   GLUquadricObj* quadratic_;
-  ;
 };
 
 void drawArrow2D(float len, float head_width, float head_len) {

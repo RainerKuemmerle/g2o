@@ -56,8 +56,6 @@ bool VertexSE2WriteGnuplotAction::operator()(
   auto params =
       std::static_pointer_cast<WriteGnuplotAction::Parameters>(parameters);
   if (!params || !params->os) {
-    std::cerr << __PRETTY_FUNCTION__
-              << ": warning, no valid output stream specified" << std::endl;
     return false;
   }
 

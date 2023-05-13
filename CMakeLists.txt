@@ -169,6 +169,16 @@ endif()
 # For building the GUI
 find_package(QGLViewer)
 
+# Logging library
+option(G2O_USE_LOGGING "Try to use spdlog for logging" ON)
+if (G2O_USE_LOGGING)
+  find_package(spdlog)
+  if (TARGET spdlog::spdlog OR TARGET spdlog::spdlog_header_only)
+    set (G2O_HAVE_LOGGING 1)
+    message(STATUS "Compiling with logging support")
+  endif()
+endif()
+
 # Handle building the built in types. There is a fair degree of
 # granularity and dependency in the types supported.
 
@@ -465,7 +475,7 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${g2o_C_FLAGS}")
 # Find Eigen3. If it defines the target, this is used. If not,
 # fall back to the using the module form.
 # See https://eigen.tuxfamily.org/dox/TopicCMakeGuide.html for details
-find_package(Eigen3 3.4 REQUIRED)
+find_package(Eigen3 3.3 REQUIRED)
 if (TARGET Eigen3::Eigen)
   set(G2O_EIGEN3_EIGEN_TARGET Eigen3::Eigen)
 else()
