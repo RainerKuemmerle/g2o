@@ -3,5 +3,9 @@ include(CMakeFindDependencyMacro)
 find_dependency(Eigen3)
 find_dependency(OpenGL)
 
-include("${CMAKE_CURRENT_LIST_DIR}/@G2O_TARGETS_EXPORT_NAME@.cmake")
+# Find spdlog if g2o was build with support for it
+if (@G2O_HAVE_LOGGING@)
+  find_dependency(spdlog)
+endif()
 
+include("${CMAKE_CURRENT_LIST_DIR}/@G2O_TARGETS_EXPORT_NAME@.cmake")
