@@ -19,6 +19,7 @@
 #ifndef SLAM2D_VIEWER_H
 #define SLAM2D_VIEWER_H
 
+#include "g2o/core/sparse_block_matrix.h"
 #include "qglviewer.h"
 
 namespace g2o {
@@ -35,6 +36,7 @@ class Slam2DViewer : public QGLViewer {
  public:
   SparseOptimizer* graph;
   bool drawCovariance;
+  g2o::SparseBlockMatrix<g2o::MatrixX> covariances;
 };
 
 }  // namespace g2o
