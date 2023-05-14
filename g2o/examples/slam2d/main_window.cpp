@@ -17,19 +17,16 @@
 // along with g2o.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "main_window.h"
-// #include "moc_main_window.cpp"
 
 #include <QFileDialog>
 #include <fstream>
 #include <iostream>
 
 #include "g2o/core/block_solver.h"
-#include "g2o/core/estimate_propagator.h"
 #include "g2o/core/optimization_algorithm_gauss_newton.h"
 #include "g2o/core/optimization_algorithm_levenberg.h"
 #include "g2o/core/sparse_optimizer.h"
 #include "g2o/solvers/eigen/linear_solver_eigen.h"
-
 using SlamBlockSolver = g2o::BlockSolver<g2o::BlockSolverTraits<-1, -1> >;
 using SlamLinearSolver =
     g2o::LinearSolverEigen<SlamBlockSolver::PoseMatrixType>;
@@ -91,11 +88,23 @@ void MainWindow::on_btnOptimize_clicked() {
   }
 
   if (cbCovariances->isChecked()) {
-    // TODO(Rainer): implementation of covariance estimates
-    // viewer->graph->solver()->computeMarginals();
+    std::vector<std::pair<int, int> > cov_vertices;
+    for (const auto& vertex_index : viewer->graph->vertices()) {
+      auto* vertex = static_cast<g2o::OptimizableGraph::Vertex*>(
+          vertex_index.second.get());
+      if (!vertex->fixed())
+        cov_vertices.emplace_back(vertex->hessianIndex(),
+                                  vertex->hessianIndex());
+    }
+    viewer->covariances.clear(true);
+    std::cerr << "Compute covariance matrices" << std::endl;
+    bool cov_result =
+        viewer->graph->computeMarginals(viewer->covariances, cov_vertices);
+    viewer->drawCovariance = cov_result;
+    std::cerr << (cov_result ? "Done." : "Failed") << std::endl;
+  } else {
+    viewer->drawCovariance = false;
   }
-  viewer->drawCovariance = cbCovariances->isChecked();
-
   viewer->update();
 }
 

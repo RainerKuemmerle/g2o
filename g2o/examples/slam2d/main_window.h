@@ -22,10 +22,6 @@
 #include "g2o/core/optimization_algorithm.h"
 #include "ui_base_main_window.h"
 
-namespace g2o {
-class OptimizationAlgorithm;
-}
-
 class MainWindow : public QMainWindow, public Ui::BaseMainWindow {
   Q_OBJECT
  public:

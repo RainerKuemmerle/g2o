@@ -151,12 +151,13 @@ void Slam2DViewer::draw() {
   glPointSize(1.F);
 
   if (drawCovariance) {
-    for (auto& v_ptr : graph->vertices()) {
-      auto* v = dynamic_cast<VertexSE2*>(v_ptr.second.get());
-      if (v) {
-        // TODO(Rainer): Implement draw function for covariance.
-        // drawCov(v->estimate().translation(), v->uncertainty());
-      }
+    for (const auto& vertex_index : graph->vertices()) {
+      auto* v = dynamic_cast<VertexSE2*>(vertex_index.second.get());
+      if (!v || v->fixed()) continue;
+      const g2o::MatrixX* covariance =
+          covariances.block(v->hessianIndex(), v->hessianIndex());
+      if (!covariance) continue;
+      drawCov(v->estimate().translation(), *covariance);
     }
   }
 }

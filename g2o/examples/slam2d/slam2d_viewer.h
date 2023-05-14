@@ -21,6 +21,7 @@
 
 #include <memory>
 
+#include "g2o/core/sparse_block_matrix.h"
 #include "qglviewer.h"
 
 namespace g2o {
@@ -37,6 +38,7 @@ class Slam2DViewer : public QGLViewer {
 
   std::unique_ptr<SparseOptimizer> graph;
   bool drawCovariance = false;
+  g2o::SparseBlockMatrix<g2o::MatrixX> covariances;
 };
 
 }  // namespace g2o
