@@ -17,15 +17,40 @@
 // along with g2o.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "main_window.h"
-//#include "moc_main_window.cpp"
 
 #include <QFileDialog>
 #include <fstream>
 #include <iostream>
 
-#include "g2o/core/estimate_propagator.h"
+#include "g2o/core/block_solver.h"
+#include "g2o/core/optimization_algorithm_gauss_newton.h"
+#include "g2o/core/optimization_algorithm_levenberg.h"
 #include "g2o/core/sparse_optimizer.h"
+#include "g2o/solvers/eigen/linear_solver_eigen.h"
 using namespace std;
+
+namespace {
+using SlamBlockSolver = g2o::BlockSolver<g2o::BlockSolverTraits<-1, -1> >;
+using SlamLinearSolver =
+    g2o::LinearSolverEigen<SlamBlockSolver::PoseMatrixType>;
+
+// Gauss Newton
+g2o::OptimizationAlgorithm* createGauss() {
+  auto linearSolverGN = std::make_unique<SlamLinearSolver>();
+  linearSolverGN->setBlockOrdering(false);
+  return new g2o::OptimizationAlgorithmGaussNewton(
+      std::make_unique<SlamBlockSolver>(std::move(linearSolverGN)));
+}
+
+// Levenberg
+g2o::OptimizationAlgorithm* createLevenberg() {
+  auto linearSolverLM = std::make_unique<SlamLinearSolver>();
+  linearSolverLM->setBlockOrdering(false);
+  return new g2o::OptimizationAlgorithmLevenberg(
+      std::make_unique<SlamBlockSolver>(std::move(linearSolverLM)));
+}
+
+}  // namespace
 
 MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) { setupUi(this); }
 
@@ -71,11 +96,11 @@ void MainWindow::on_btnOptimize_clicked() {
   viewer->graph->initializeOptimization();
 
   if (rbGauss->isChecked())
-    viewer->graph->setAlgorithm(solverGaussNewton);
+    viewer->graph->setAlgorithm(createGauss());
   else if (rbLevenberg->isChecked())
-    viewer->graph->setAlgorithm(solverLevenberg);
+    viewer->graph->setAlgorithm(createLevenberg());
   else
-    viewer->graph->setAlgorithm(solverGaussNewton);
+    viewer->graph->setAlgorithm(createGauss());
 
   int maxIterations = spIterations->value();
   int iter = viewer->graph->optimize(maxIterations);
@@ -84,11 +109,23 @@ void MainWindow::on_btnOptimize_clicked() {
   }
 
   if (cbCovariances->isChecked()) {
-    // TODO implementation of covariance estimates
-    // viewer->graph->solver()->computeMarginals();
+    std::vector<std::pair<int, int> > cov_vertices;
+    for (const auto& vertex_index : viewer->graph->vertices()) {
+      auto* vertex =
+          static_cast<g2o::OptimizableGraph::Vertex*>(vertex_index.second);
+      if (!vertex->fixed())
+        cov_vertices.emplace_back(vertex->hessianIndex(),
+                                  vertex->hessianIndex());
+    }
+    viewer->covariances.clear(true);
+    std::cerr << "Compute covariance matrices" << std::endl;
+    bool cov_result =
+        viewer->graph->computeMarginals(viewer->covariances, cov_vertices);
+    viewer->drawCovariance = cov_result;
+    std::cerr << (cov_result ? "Done." : "Failed") << std::endl;
+  } else {
+    viewer->drawCovariance = false;
   }
-  viewer->drawCovariance = cbCovariances->isChecked();
-
   viewer->update();
 }
 
