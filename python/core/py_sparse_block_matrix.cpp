@@ -17,7 +17,7 @@ void templatedSparseBlockMatrix(py::module& m, const std::string& suffix) {
       .def("cols", &CLS::cols)
       .def("rows", &CLS::rows)
       .def("block", (const MatrixType* (CLS::*)(int, int) const) & CLS::block,
-           "r"_a, "c"_a)
+           "r"_a, "c"_a, pybind11::return_value_policy::reference_internal)
       // TODO(goki): IMplement the remaining functions of SparseBlockMatrix
       ;
 }

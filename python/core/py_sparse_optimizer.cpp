@@ -10,6 +10,8 @@
 #include <g2o/core/optimization_algorithm_with_hessian.h>
 #include <g2o/core/sparse_optimizer.h>
 
+#include <utility>
+
 namespace g2o {
 
 void declareSparseOptimizer(py::module& m) {
@@ -45,43 +47,26 @@ void declareSparseOptimizer(py::module& m) {
 
       .def("optimize", &CLS::optimize, "iterations"_a,
            "online"_a = false)  // -> int
-
-      // .def("compute_marginals", (bool (CLS::*) (SparseBlockMatrix<MatrixXD>&,
-      // const std::vector<std::pair<int, int> >&))
-      //         &CLS::computeMarginals, "spinv"_a, "block_indices"_a)
-      // .def("compute_marginals", (bool (CLS::*) (SparseBlockMatrix<MatrixXD>&,
-      // const OptimizableGraph::Vertex*))
-      //         &CLS::computeMarginals, "spinv"_a, "vertex"_a)
-      // .def("compute_marginals", (bool (CLS::*) (SparseBlockMatrix<MatrixXD>&,
-      // const OptimizableGraph::VertexContainer&))
-      //         &CLS::computeMarginals, "spinv"_a, "vertices"_a)
-
-      // segfault (一︿一)
-      // .def("compute_marginals", [](CLS& optimizer, const
-      // std::vector<std::pair<int, int> >& block_indices){
-      //         SparseBlockMatrix<MatrixXD> spinv;
-      //         optimizer.computeMarginals(spinv, block_indices);
-      // 		return spinv;},
-      // 		py::return_value_policy::copy)
-      // .def("compute_marginals", [](CLS& optimizer, const
-      // OptimizableGraph::Vertex* vertex){
-      //         SparseBlockMatrix<MatrixXD> spinv;
-      //         optimizer.computeMarginals(spinv, vertex);
-      // 		return spinv;},
-      // 		py::return_value_policy::copy)
-      // .def("compute_marginals", [](CLS& optimizer, size_t vertex_id){
-      //         SparseBlockMatrix<MatrixXD> spinv;
-      // 		const g2o::OptimizableGraph::Vertex* vertex =
-      // optimizer.vertex(vertex_id);
-      //         optimizer.computeMarginals(spinv, vertex);
-      // 		return spinv;},
-      // 		py::return_value_policy::copy)
-      // .def("compute_marginals", [](CLS& optimizer, const
-      // OptimizableGraph::VertexContainer& vertices){
-      //         SparseBlockMatrix<MatrixXD> spinv;
-      //         optimizer.computeMarginals(spinv, vertices);
-      // 		return spinv;},
-      // 		py::return_value_policy::copy)
+      .def("compute_marginals",
+           [](CLS& optimizer,
+              const std::vector<std::pair<int, int> >& block_indices) {
+             auto* spinv = new SparseBlockMatrix<MatrixX>();
+             bool result = optimizer.computeMarginals(*spinv, block_indices);
+             return std::make_pair(spinv, result);
+           })
+      .def("compute_marginals",
+           [](CLS& optimizer, const OptimizableGraph::Vertex* vertex) {
+             auto* spinv = new SparseBlockMatrix<MatrixX>();
+             bool result = optimizer.computeMarginals(*spinv, vertex);
+             return std::make_pair(spinv, result);
+           })
+      .def("compute_marginals",
+           [](CLS& optimizer,
+              const OptimizableGraph::VertexContainer& vertices) {
+             auto* spinv = new SparseBlockMatrix<MatrixX>();
+             bool result = optimizer.computeMarginals(*spinv, vertices);
+             return std::make_pair(spinv, result);
+           })
 
       // The gauge should be fixed() and then the optimization can work (if no
       // additional dof are in the system. The default implementation returns a
