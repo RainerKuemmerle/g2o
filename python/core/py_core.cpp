@@ -9,6 +9,7 @@
 #include "py_block_solver.h"
 #include "py_eigen_types.h"
 #include "py_estimate_propagator.h"
+#include "py_factory.h"
 #include "py_hyper_dijkstra.h"
 #include "py_hyper_graph.h"
 #include "py_hyper_graph_action.h"
@@ -34,6 +35,8 @@ void declareCore(py::module& m) {
   delcareHyperDijkstra(m);
   delcareEstimatePropagator(m);
   delcareSparseBlockMatrix(m);
+
+  declareFactory(m);
 
   declareEigenTypes(m);
   declareParameter(m);

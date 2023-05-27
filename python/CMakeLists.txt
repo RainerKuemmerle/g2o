@@ -21,6 +21,7 @@ pybind11_add_module(g2opy
     core/py_core.cpp
     core/py_eigen_types.cpp
     core/py_estimate_propagator.cpp
+    core/py_factory.cpp
     core/py_hyper_dijkstra.cpp
     core/py_hyper_graph.cpp
     core/py_jacobian_workspace.cpp
