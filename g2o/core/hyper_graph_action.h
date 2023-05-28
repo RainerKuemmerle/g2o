@@ -237,8 +237,10 @@ class RegisterActionProxy {
 
 }  // namespace g2o
 
-#define G2O_REGISTER_ACTION(classname)            \
-  extern "C" void g2o_action_##classname(void) {} \
-  static g2o::RegisterActionProxy<classname> g_action_proxy_##classname;
+#define G2O_REGISTER_ACTION(classname)                            \
+  extern "C" void g2o_action_##classname(void) {}                 \
+  namespace {                                                     \
+  g2o::RegisterActionProxy<classname> g_action_proxy_##classname; \
+  }
 
 #endif
