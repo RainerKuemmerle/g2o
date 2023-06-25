@@ -33,6 +33,8 @@
 #include <spdlog/common.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 
+#include <cassert>
+
 namespace g2o::internal {
 
 LoggerInterface::LoggerInterface() {
