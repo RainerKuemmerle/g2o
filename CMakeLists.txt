@@ -172,7 +172,7 @@ find_package(QGLViewer)
 # Logging library
 option(G2O_USE_LOGGING "Try to use spdlog for logging" ON)
 if (G2O_USE_LOGGING)
-  find_package(spdlog 1.6)
+  find_package(spdlog 1.6 QUIET)
   if (TARGET spdlog::spdlog OR TARGET spdlog::spdlog_header_only)
     set (G2O_HAVE_LOGGING 1)
     message(STATUS "Compiling with logging support")
