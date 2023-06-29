@@ -4,3 +4,5 @@
 \.vs
 \.vscode
 \.cache
+\.idea
+\cmake-build-debug
