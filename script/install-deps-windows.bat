@@ -16,7 +16,7 @@ pushd %VcPkgDir%
 rem ==============================
 rem Upgrade and Install packages.
 rem ==============================
-set "VcPkgLibs=eigen3 suitesparse lapack-reference openblas ceres"
+set "VcPkgLibs=cmake eigen3 suitesparse lapack-reference openblas ceres"
 
 echo vcpkg found at %VcPkgDir%...
 echo installing %VcPkgLibs% for triplet %VcPkgTriplet%...

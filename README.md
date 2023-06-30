@@ -2,7 +2,7 @@
 
 Linux/Mac: [![CI](https://github.com/RainerKuemmerle/g2o/actions/workflows/ci.yml/badge.svg?event=push)](https://github.com/RainerKuemmerle/g2o/actions/workflows/ci.yml)
 Windows: [![win64](https://github.com/RainerKuemmerle/g2o/actions/workflows/windows.yml/badge.svg?event=push)](https://github.com/RainerKuemmerle/g2o/actions/workflows/windows.yml)
-[![Codacy Badge](https://app.codacy.com/project/badge/Grade/280c5eed95ed4059ad5d003d59e72704)](https://www.codacy.com/gh/RainerKuemmerle/g2o/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=RainerKuemmerle/g2o&amp;utm_campaign=Badge_Grade)
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/280c5eed95ed4059ad5d003d59e72704)](https://www.codacy.com/gh/RainerKuemmerle/g2o/dashboard?utm_source=github.com&utm_medium=referral&utm_content=RainerKuemmerle/g2o&utm_campaign=Badge_Grade)
 
 g2o is an open-source C++ framework for optimizing graph-based nonlinear error
 functions. g2o has been designed to be easily extensible to a wide range of
@@ -24,6 +24,7 @@ implementations of state-of-the-art approaches for the specific problems
 (02/2011).
 
 ## Python and updated memory management
+
 The branch [pymem](https://github.com/RainerKuemmerle/g2o/tree/pymem) contains a python wrapper and switches to smart pointer instead of RAW pointers.
 It is currently experimental but PRs and improvements are welcome - as always.
 
@@ -48,13 +49,13 @@ under different license terms. See below.
 
 The following parts are licensed under LGPL3+:
 
--   csparse_extension
+- csparse_extension
 
 The following parts are licensed under GPL3+:
 
--   g2o_viewer
--   g2o_incremental
--   slam2d_g2o (example for 2D SLAM with a QGLviewer GUI)
+- g2o_viewer
+- g2o_incremental
+- slam2d_g2o (example for 2D SLAM with a QGLviewer GUI)
 
 Please note that some features of CHOLMOD (which may be used by g2o, see
 libsuitesparse below) are licensed under the GPL. To avoid the GPL, you may
@@ -66,46 +67,46 @@ available.
 Within the folder g2o/EXTERNAL we include software not written by us to
 guarantee easy compilation.
 
--   ceres: BSD (see g2o/EXTERNAL/ceres/LICENSE)
-    Headers to perform Automatic Differentiation
+- ceres: BSD (see g2o/EXTERNAL/ceres/LICENSE)
+  Headers to perform Automatic Differentiation
 
--   freeglut: X Consortium (Copyright (c) 1999-2000 Pawel W. Olszta)
-    We use a stripped down version for drawing text in OpenGL.
+- freeglut: X Consortium (Copyright (c) 1999-2000 Pawel W. Olszta)
+  We use a stripped down version for drawing text in OpenGL.
 
 See the doc folder for the full text of the licenses.
 
 g2o is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 licenses for more details.
 
 ## Requirements
 
--   C++17 compiler (CI pipeline runs with gcc, clang and MSVC)
--   cmake             <http://www.cmake.org>
--   Eigen3            <http://eigen.tuxfamily.org>
+- C++17 compiler (CI pipeline runs with gcc, clang and MSVC)
+- cmake <http://www.cmake.org>
+- Eigen3 <http://eigen.tuxfamily.org>
 
 On Ubuntu / Debian these dependencies are resolved by installing the
 following packages.
 
--   cmake
--   libeigen3-dev
+- cmake
+- libeigen3-dev
 
 ### Optional requirements
 
--   spdlog            <https://github.com/gabime/spdlog>
--   suitesparse       <http://faculty.cse.tamu.edu/davis/suitesparse.html>
--   Qt5               <http://qt-project.org>
--   libQGLViewer      <http://www.libqglviewer.com>
+- spdlog <https://github.com/gabime/spdlog>
+- suitesparse <http://faculty.cse.tamu.edu/davis/suitesparse.html>
+- Qt5 <http://qt-project.org>
+- libQGLViewer <http://www.libqglviewer.com>
 
 On Ubuntu / Debian these dependencies are resolved by installing the
 following packages.
 
--   libspdlog-dev
--   libsuitesparse-dev
--   qtdeclarative5-dev
--   qt5-qmake
--   libqglviewer-dev-qt5
+- libspdlog-dev
+- libsuitesparse-dev
+- qtdeclarative5-dev
+- qt5-qmake
+- libqglviewer-dev-qt5
 
 ## Mac OS X
 
@@ -121,7 +122,11 @@ If using [vcpkg](https://github.com/Microsoft/vcpkg), then
 
 `script\install-deps-windows.bat`
 
-will build and install the required dependencies. The location of `vcpkg` and required triplet are determined by the environment variables `VCPKG_ROOT_DIR` and `VCPKG_DEFAULT_TRIPLET`.
+Or for full dependencies installation
+
+`script\install-additional-deps-windows.bat`
+
+Will build and install the dependencies. The location of `vcpkg` and required triplet can be passed as cli arguments respectively, note the usually the vcpkg auto detect the triplet so set it only if your are not using the default build for your OS.
 
 ## Compilation
 
@@ -130,50 +135,51 @@ Mac OS X, Android and Windows (MinGW or MSVC).
 We recommend a so-called out of source build which can be achieved
 by the following command sequence.
 
--   `mkdir build`
--   `cd build`
--   `cmake ../`
--   `make`
+- `mkdir build`
+- `cd build`
+- `cmake ../`
+- `make`
 
 The binaries will be placed in bin and the libraries in lib which
 are both located in the top-level folder.
 
-On Windows with `vcpkg` the following two commands will generate build scripts for Visual Studio 2017 MSVC 15 tool set (please change the Visual Studio version number in accordance with your system):
+On Windows with `vcpkg` the following two commands will generate build scripts (please change the Visual Studio version number in accordance with your system):
 
--   `mkdir build`
--   `cd build`
--   `cmake -G "Visual Studio 15 2017 Win64" -DG2O_BUILD_APPS=ON -DG2O_BUILD_EXAMPLES=ON -DVCPKG_TARGET_TRIPLET="%VCPKG_DEFAULT_TRIPLET%" -DCMAKE_TOOLCHAIN_FILE="%VCPKG_ROOT_DIR%\scripts\buildsystems\vcpkg.cmake" ..`
+- `mkdir build`
+- `cd build`
+- `cmake -DG2O_BUILD_APPS=ON -DG2O_BUILD_EXAMPLES=ON -DVCPKG_TARGET_TRIPLET="%VCPKG_DEFAULT_TRIPLET%" -DCMAKE_TOOLCHAIN_FILE="%VCPKG_ROOT_DIR%\scripts\buildsystems\vcpkg.cmake" ..`
+- ` cmake --build . --target ALL_BUILD`
 
 If you are compiling on Windows and you are for some reasons **not** using `vcpkg` please download Eigen3 and extract it.
 Within cmake-gui set the variable EIGEN3_INCLUDE_DIR to that directory.
 
--   `mkdir build`
--   `cd build`
--   `cmake .. -G "Visual Studio 15 2017 Win64" -DG2O_BUILD_APPS=ON -DG2O_BUILD_EXAMPLES=ON -DEIGEN3_INCLUDE_DIR="<THE_PATH_WHERE_YOU_PLACED_EIGEN3_AND_THE_EIGEN3_CMakeLists.txt>"
+- `mkdir build`
+- `cd build`
+- `cmake .. -DG2O_BUILD_APPS=ON -DG2O_BUILD_EXAMPLES=ON -DEIGEN3_INCLUDE_DIR="<THE_PATH_WHERE_YOU_PLACED_EIGEN3_AND_THE_EIGEN3_CMakeLists.txt>"
 
 ## Cross-Compiling for Android
 
--   `mkdir build`
--   `cd build`
--   `cmake -DCMAKE_TOOLCHAIN_FILE=../script/android.toolchain.cmake -DANDROID_NDK=<YOUR_PATH_TO_ANDROID_NDK_r10d+> -DCMAKE_BUILD_TYPE=Release -DANDROID_ABI="armeabi-v7a with NEON" -DEIGEN3_INCLUDE_DIR="<YOUR_PATH_TO_EIGEN>" -DEIGEN3_VERSION_OK=ON .. && cmake --build .`
+- `mkdir build`
+- `cd build`
+- `cmake -DCMAKE_TOOLCHAIN_FILE=../script/android.toolchain.cmake -DANDROID_NDK=<YOUR_PATH_TO_ANDROID_NDK_r10d+> -DCMAKE_BUILD_TYPE=Release -DANDROID_ABI="armeabi-v7a with NEON" -DEIGEN3_INCLUDE_DIR="<YOUR_PATH_TO_EIGEN>" -DEIGEN3_VERSION_OK=ON .. && cmake --build .`
 
 ## Acknowledgments
 
 We thank the following contributors for providing patches:
 
--   Simon J. Julier: patches to achieve compatibility with Mac OS X and others.
--   Michael A. Eriksen for submitting patches to compile with MSVC.
--   Mark Pupilli for submitting patches to compile with MSVC.
+- Simon J. Julier: patches to achieve compatibility with Mac OS X and others.
+- Michael A. Eriksen for submitting patches to compile with MSVC.
+- Mark Pupilli for submitting patches to compile with MSVC.
 
 ## Projects using g2o
 
--   [g2opy](https://github.com/uoip/g2opy): Python binding
--   [.Net wrapper](https://github.com/fugro/g2o)
+- [g2opy](https://github.com/uoip/g2opy): Python binding
+- [.Net wrapper](https://github.com/fugro/g2o)
 
 ## Contact information
 
--   [Rainer Kuemmerle](mailto:kuemmerl@informatik.uni-freiburg.de)
--   [Giorgio Grisetti](mailto:grisetti@dis.uniroma1.it)
--   [Hauke Strasdat](mailto:strasdat@gmail.com)
--   [Kurt Konolige](mailto:konolige@willowgarage.com)
--   [Wolfram Burgard](mailto:burgard@informatik.uni-freiburg.de)
+- [Rainer Kuemmerle](mailto:kuemmerl@informatik.uni-freiburg.de)
+- [Giorgio Grisetti](mailto:grisetti@dis.uniroma1.it)
+- [Hauke Strasdat](mailto:strasdat@gmail.com)
+- [Kurt Konolige](mailto:konolige@willowgarage.com)
+- [Wolfram Burgard](mailto:burgard@informatik.uni-freiburg.de)
