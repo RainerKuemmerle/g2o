@@ -49,13 +49,13 @@ under different license terms. See below.
 
 The following parts are licensed under LGPL3+:
 
-- csparse_extension
+-   csparse_extension
 
 The following parts are licensed under GPL3+:
 
-- g2o_viewer
-- g2o_incremental
-- slam2d_g2o (example for 2D SLAM with a QGLviewer GUI)
+-   g2o_viewer
+-   g2o_incremental
+-   slam2d_g2o (example for 2D SLAM with a QGLviewer GUI)
 
 Please note that some features of CHOLMOD (which may be used by g2o, see
 libsuitesparse below) are licensed under the GPL. To avoid the GPL, you may
@@ -67,11 +67,11 @@ available.
 Within the folder g2o/EXTERNAL we include software not written by us to
 guarantee easy compilation.
 
-- ceres: BSD (see g2o/EXTERNAL/ceres/LICENSE)
-  Headers to perform Automatic Differentiation
+-   ceres: BSD (see g2o/EXTERNAL/ceres/LICENSE)
+    Headers to perform Automatic Differentiation
 
-- freeglut: X Consortium (Copyright (c) 1999-2000 Pawel W. Olszta)
-  We use a stripped down version for drawing text in OpenGL.
+-   freeglut: X Consortium (Copyright (c) 1999-2000 Pawel W. Olszta)
+    We use a stripped down version for drawing text in OpenGL.
 
 See the doc folder for the full text of the licenses.
 
@@ -82,31 +82,31 @@ licenses for more details.
 
 ## Requirements
 
-- C++17 compiler (CI pipeline runs with gcc, clang and MSVC)
-- cmake <http://www.cmake.org>
-- Eigen3 <http://eigen.tuxfamily.org>
+-   C++17 compiler (CI pipeline runs with gcc, clang and MSVC)
+-   cmake <http://www.cmake.org>
+-   Eigen3 <http://eigen.tuxfamily.org>
 
 On Ubuntu / Debian these dependencies are resolved by installing the
 following packages.
 
-- cmake
-- libeigen3-dev
+-   cmake
+-   libeigen3-dev
 
 ### Optional requirements
 
-- spdlog <https://github.com/gabime/spdlog>
-- suitesparse <http://faculty.cse.tamu.edu/davis/suitesparse.html>
-- Qt5 <http://qt-project.org>
-- libQGLViewer <http://www.libqglviewer.com>
+-   spdlog <https://github.com/gabime/spdlog>
+-   suitesparse <http://faculty.cse.tamu.edu/davis/suitesparse.html>
+-   Qt5 <http://qt-project.org>
+-   libQGLViewer <http://www.libqglviewer.com>
 
 On Ubuntu / Debian these dependencies are resolved by installing the
 following packages.
 
-- libspdlog-dev
-- libsuitesparse-dev
-- qtdeclarative5-dev
-- qt5-qmake
-- libqglviewer-dev-qt5
+-   libspdlog-dev
+-   libsuitesparse-dev
+-   qtdeclarative5-dev
+-   qt5-qmake
+-   libqglviewer-dev-qt5
 
 ## Mac OS X
 
@@ -135,51 +135,51 @@ Mac OS X, Android and Windows (MinGW or MSVC).
 We recommend a so-called out of source build which can be achieved
 by the following command sequence.
 
-- `mkdir build`
-- `cd build`
-- `cmake ../`
-- `make`
+-   `mkdir build`
+-   `cd build`
+-   `cmake ../`
+-   `make`
 
 The binaries will be placed in bin and the libraries in lib which
 are both located in the top-level folder.
 
 On Windows with `vcpkg` the following two commands will generate build scripts (please change the Visual Studio version number in accordance with your system):
 
-- `mkdir build`
-- `cd build`
-- `cmake -DG2O_BUILD_APPS=ON -DG2O_BUILD_EXAMPLES=ON -DVCPKG_TARGET_TRIPLET="%VCPKG_DEFAULT_TRIPLET%" -DCMAKE_TOOLCHAIN_FILE="%VCPKG_ROOT_DIR%\scripts\buildsystems\vcpkg.cmake" ..`
-- ` cmake --build . --target ALL_BUILD`
+-   `mkdir build`
+-   `cd build`
+-   `cmake -DG2O_BUILD_APPS=ON -DG2O_BUILD_EXAMPLES=ON -DVCPKG_TARGET_TRIPLET="%VCPKG_DEFAULT_TRIPLET%" -DCMAKE_TOOLCHAIN_FILE="%VCPKG_ROOT_DIR%\scripts\buildsystems\vcpkg.cmake" ..`
+-   ` cmake --build . --target ALL_BUILD`
 
 If you are compiling on Windows and you are for some reasons **not** using `vcpkg` please download Eigen3 and extract it.
 Within cmake-gui set the variable EIGEN3_INCLUDE_DIR to that directory.
 
-- `mkdir build`
-- `cd build`
-- `cmake .. -DG2O_BUILD_APPS=ON -DG2O_BUILD_EXAMPLES=ON -DEIGEN3_INCLUDE_DIR="<THE_PATH_WHERE_YOU_PLACED_EIGEN3_AND_THE_EIGEN3_CMakeLists.txt>"
+-   `mkdir build`
+-   `cd build`
+-   `cmake .. -DG2O_BUILD_APPS=ON -DG2O_BUILD_EXAMPLES=ON -DEIGEN3_INCLUDE_DIR="<THE_PATH_WHERE_YOU_PLACED_EIGEN3_AND_THE_EIGEN3_CMakeLists.txt>"
 
 ## Cross-Compiling for Android
 
-- `mkdir build`
-- `cd build`
-- `cmake -DCMAKE_TOOLCHAIN_FILE=../script/android.toolchain.cmake -DANDROID_NDK=<YOUR_PATH_TO_ANDROID_NDK_r10d+> -DCMAKE_BUILD_TYPE=Release -DANDROID_ABI="armeabi-v7a with NEON" -DEIGEN3_INCLUDE_DIR="<YOUR_PATH_TO_EIGEN>" -DEIGEN3_VERSION_OK=ON .. && cmake --build .`
+-   `mkdir build`
+-   `cd build`
+-   `cmake -DCMAKE_TOOLCHAIN_FILE=../script/android.toolchain.cmake -DANDROID_NDK=<YOUR_PATH_TO_ANDROID_NDK_r10d+> -DCMAKE_BUILD_TYPE=Release -DANDROID_ABI="armeabi-v7a with NEON" -DEIGEN3_INCLUDE_DIR="<YOUR_PATH_TO_EIGEN>" -DEIGEN3_VERSION_OK=ON .. && cmake --build .`
 
 ## Acknowledgments
 
 We thank the following contributors for providing patches:
 
-- Simon J. Julier: patches to achieve compatibility with Mac OS X and others.
-- Michael A. Eriksen for submitting patches to compile with MSVC.
-- Mark Pupilli for submitting patches to compile with MSVC.
+-   Simon J. Julier: patches to achieve compatibility with Mac OS X and others.
+-   Michael A. Eriksen for submitting patches to compile with MSVC.
+-   Mark Pupilli for submitting patches to compile with MSVC.
 
 ## Projects using g2o
 
-- [g2opy](https://github.com/uoip/g2opy): Python binding
-- [.Net wrapper](https://github.com/fugro/g2o)
+-   [g2opy](https://github.com/uoip/g2opy): Python binding
+-   [.Net wrapper](https://github.com/fugro/g2o)
 
 ## Contact information
 
-- [Rainer Kuemmerle](mailto:kuemmerl@informatik.uni-freiburg.de)
-- [Giorgio Grisetti](mailto:grisetti@dis.uniroma1.it)
-- [Hauke Strasdat](mailto:strasdat@gmail.com)
-- [Kurt Konolige](mailto:konolige@willowgarage.com)
-- [Wolfram Burgard](mailto:burgard@informatik.uni-freiburg.de)
+-   [Rainer Kuemmerle](mailto:kuemmerl@informatik.uni-freiburg.de)
+-   [Giorgio Grisetti](mailto:grisetti@dis.uniroma1.it)
+-   [Hauke Strasdat](mailto:strasdat@gmail.com)
+-   [Kurt Konolige](mailto:konolige@willowgarage.com)
+-   [Wolfram Burgard](mailto:burgard@informatik.uni-freiburg.de)
