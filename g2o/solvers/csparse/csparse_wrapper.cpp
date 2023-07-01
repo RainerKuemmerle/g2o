@@ -35,8 +35,7 @@
 #include "csparse_helper.h"
 #include "g2o/core/eigen_types.h"
 
-namespace g2o {
-namespace csparse {
+namespace g2o::csparse {
 
 /**
  * \brief Our C++ version of the csparse struct
@@ -46,9 +45,9 @@ struct CSparseExt : public cs {
     nzmax = 0;
     m = 0;
     n = 0;
-    p = 0;
-    i = 0;
-    x = 0;
+    p = nullptr;
+    i = nullptr;
+    x = nullptr;
     nz = -1;  // tag as CCS formatted matrix
   }
   CSparseExt(CSparseExt const&) = delete;
@@ -89,7 +88,7 @@ class CSparse::Impl {
       delete[] csWorkspace;
       csWorkspace = new double[csWorkspaceSize];
       delete[] csIntWorkspace;
-      csIntWorkspace = new int[2 * csWorkspaceSize];
+      csIntWorkspace = new int[2L * csWorkspaceSize];
     }
   }
 
@@ -217,5 +216,4 @@ bool CSparse::writeSparse(const std::string& filename) const {
                                            true);
 }
 
-}  // namespace csparse
-}  // namespace g2o
+}  // namespace g2o::csparse

@@ -28,6 +28,7 @@
 #include <Eigen/Geometry>
 #include <cassert>
 #include <iostream>
+#include <string_view>
 
 #include "g2o/autodiff/autodiff.h"
 #include "g2o/core/auto_differentiation.h"
@@ -222,15 +223,6 @@ int main(int argc, char** argv) {
   arg.parseArgs(argc, argv);
 
   using BalBlockSolver = g2o::BlockSolver<g2o::BlockSolverTraits<9, 3>>;
-#ifdef G2O_HAVE_CHOLMOD
-  const std::string choleskySolverName = "CHOLMOD";
-  using BalLinearSolver =
-      g2o::LinearSolverCholmod<BalBlockSolver::PoseMatrixType>;
-#else
-  const std::string choleskySolverName = "Eigen";
-  using BalLinearSolver =
-      g2o::LinearSolverEigen<BalBlockSolver::PoseMatrixType>;
-#endif
   using BalLinearSolverPCG =
       g2o::LinearSolverPCG<BalBlockSolver::PoseMatrixType>;
 
@@ -241,6 +233,15 @@ int main(int argc, char** argv) {
     std::cout << "Using PCG" << std::endl;
     linearSolver = std::make_unique<BalLinearSolverPCG>();
   } else {
+#ifdef G2O_HAVE_CHOLMOD
+    std::string_view choleskySolverName = "CHOLMOD";
+    using BalLinearSolver =
+        g2o::LinearSolverCholmod<BalBlockSolver::PoseMatrixType>;
+#else
+    std::string_view choleskySolverName = "Eigen";
+    using BalLinearSolver =
+        g2o::LinearSolverEigen<BalBlockSolver::PoseMatrixType>;
+#endif
     std::cout << "Using Cholesky: " << choleskySolverName << std::endl;
     auto cholesky = std::make_unique<BalLinearSolver>();
     cholesky->setBlockOrdering(true);

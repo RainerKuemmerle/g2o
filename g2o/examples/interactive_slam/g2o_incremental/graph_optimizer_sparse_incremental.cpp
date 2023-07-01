@@ -50,6 +50,21 @@ struct VertexBackup {
     return hessianIndex < other.hessianIndex;
   }
 };
+
+std::unique_ptr<OptimizationAlgorithm> createSolver(
+    const std::string& solverName) {
+  std::unique_ptr<g2o::Solver> s;
+
+  if (solverName == "fix3_2_cholmod") {
+    s = AllocateCholmodSolver<3, 2>();
+  } else if (solverName == "fix6_3_cholmod") {
+    s = AllocateCholmodSolver<6, 3>();
+  }
+
+  std::unique_ptr<OptimizationAlgorithm> gaussNewton(
+      new OptimizationAlgorithmGaussNewton(std::move(s)));
+  return gaussNewton;
+}
 }  // namespace
 
 SparseOptimizerIncremental::SparseOptimizerIncremental() {
@@ -447,21 +462,6 @@ bool SparseOptimizerIncremental::computeCholeskyUpdate() {
   const int change_status = cholmod_change_factor(
       CHOLMOD_REAL, 1, 0, 1, 1, cholmodFactor_, &cholmodCommon_);
   return change_status != 0;
-}
-
-static std::unique_ptr<OptimizationAlgorithm> createSolver(
-    const std::string& solverName) {
-  std::unique_ptr<g2o::Solver> s;
-
-  if (solverName == "fix3_2_cholmod") {
-    s = AllocateCholmodSolver<3, 2>();
-  } else if (solverName == "fix6_3_cholmod") {
-    s = AllocateCholmodSolver<6, 3>();
-  }
-
-  std::unique_ptr<OptimizationAlgorithm> gaussNewton(
-      new OptimizationAlgorithmGaussNewton(std::move(s)));
-  return gaussNewton;
 }
 
 bool SparseOptimizerIncremental::initSolver(int dimension, int batchEveryN) {

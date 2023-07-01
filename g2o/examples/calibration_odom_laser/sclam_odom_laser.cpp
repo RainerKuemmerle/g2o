@@ -143,9 +143,9 @@ static int run_sclam_odom_laser(int argc, char** argv) {
          << endl;
     cerr << "visited: " << d.visited().size() << endl;
     cerr << "vertices: " << optimizer.vertices().size() << endl;
-    for (const auto& it : optimizer.vertices()) {
+    for (auto& it : optimizer.vertices()) {
+      auto* v = static_cast<OptimizableGraph::Vertex*>(it.second.get());
       if (d.visited().count(it.second) == 0) {
-        auto* v = static_cast<OptimizableGraph::Vertex*>(it.second.get());
         cerr << "\t unvisited vertex " << it.first << " "
              << static_cast<void*>(v) << endl;
         v->setFixed(true);
@@ -237,7 +237,7 @@ static int run_sclam_odom_laser(int argc, char** argv) {
                                             calibratedVelocityMeasurement.vl());
         calibratedVelocityMeasurement.setVr(odomCalib(1) *
                                             calibratedVelocityMeasurement.vr());
-        const MotionMeasurement mm = OdomConvert::convertToMotion(
+        MotionMeasurement mm = OdomConvert::convertToMotion(
             calibratedVelocityMeasurement, odomCalib(2));
 
         // combine calibrated odometry with the previous pose

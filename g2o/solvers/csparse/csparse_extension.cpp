@@ -26,15 +26,14 @@
 #include "g2o/stuff/logger.h"
 #include "g2o/stuff/macros.h"
 
-namespace g2o {
-namespace csparse_extension {
+namespace g2o::csparse_extension {
 
 /**
  * Originally from CSparse, avoid memory re-allocations by giving workspace
  * pointers CSparse: Copyright (c) 2006-2011, Timothy A. Davis.
  */
 int cs_cholsolsymb(const cs* A, double* b, const css* S, double* x, int* work) {
-  if (!CS_CSC(A) || !b || !S || !x) {
+  if (!A || (A->nz != -1) || !b || !S || !x) {
     G2O_DEBUG("{}: No valid input!", __PRETTY_FUNCTION__);
     assert(0);  // get a backtrace in debug mode
     return (0); /* check inputs */
@@ -66,7 +65,6 @@ csn* cs_chol_workspace(const cs* A, const css* S, int* cin, double* xin) {
   double* Lx;
   double* x;
   double* Cx;
-  int top;
   int i;
   int p;
   int k;
@@ -84,7 +82,7 @@ csn* cs_chol_workspace(const cs* A, const css* S, int* cin, double* xin) {
   cs* C;
   cs* E;
   csn* N;
-  if (!CS_CSC(A) || !S || !S->cp || !S->parent) return (nullptr);
+  if (!A || (A->nz != -1) || !S || !S->cp || !S->parent) return (nullptr);
   n = A->n;
   N = static_cast<csn*>(cs_calloc(1, sizeof(csn))); /* allocate result */
   c = cin;                                          /* get int workspace */
@@ -108,9 +106,9 @@ csn* cs_chol_workspace(const cs* A, const css* S, int* cin, double* xin) {
   for (k = 0; k < n; k++) /* compute L(k,:) for L*L' = C */
   {
     /* --- Nonzero pattern of L(k,:) ------------------------------------ */
-    top = cs_ereach(C, k, parent, s, c); /* find pattern of L(k,:) */
-    x[k] = 0;                            /* x (0:k) is now zero */
-    for (p = Cp[k]; p < Cp[k + 1]; p++)  /* x = full(triu(C(:,k))) */
+    int top = cs_ereach(C, k, parent, s, c); /* find pattern of L(k,:) */
+    x[k] = 0;                                /* x (0:k) is now zero */
+    for (p = Cp[k]; p < Cp[k + 1]; p++)      /* x = full(triu(C(:,k))) */
     {
       if (Ci[p] <= k) x[Ci[p]] = Cx[p];
     }
@@ -141,5 +139,4 @@ csn* cs_chol_workspace(const cs* A, const css* S, int* cin, double* xin) {
       cs_ndone(N, E, nullptr, nullptr, 1)); /* success: free E,s,x; return N */
 }
 
-}  // namespace csparse_extension
-}  // namespace g2o
+}  // namespace g2o::csparse_extension

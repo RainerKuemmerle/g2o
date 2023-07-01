@@ -46,8 +46,11 @@ extern "C" {
 #endif
 
 inline void strreverse(char* begin, char* end) {
-  char aux;
-  while (end > begin) aux = *end, *end-- = *begin, *begin++ = aux;
+  while (end > begin) {
+    char aux = *end;
+    *end-- = *begin;
+    *begin++ = aux;
+  }
 }
 
 inline int modp_dtoa(double value, char* str, int prec) {
