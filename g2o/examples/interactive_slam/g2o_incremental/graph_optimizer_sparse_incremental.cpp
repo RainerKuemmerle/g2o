@@ -347,12 +347,12 @@ bool SparseOptimizerIncremental::updateInitialization(
   _permutedUpdate->nnz = 0;
   _permutedUpdate->nrow = _permutedUpdate->ncol = _L->n;
   {
-    int* Ap = (int*)updateAsSparseFactor->p;
-    int* Ai = (int*)updateAsSparseFactor->i;
-    double* Ax = (double*)updateAsSparseFactor->x;
-    int* Bj = (int*)_permutedUpdate->j;
-    int* Bi = (int*)_permutedUpdate->i;
-    double* Bx = (double*)_permutedUpdate->x;
+    int* Ap = static_cast<int*>(updateAsSparseFactor->p);
+    int* Ai = static_cast<int*>(updateAsSparseFactor->i);
+    double* Ax = static_cast<double*>(updateAsSparseFactor->x);
+    int* Bj = static_cast<int*>(_permutedUpdate->j);
+    int* Bi = static_cast<int*>(_permutedUpdate->i);
+    double* Bx = static_cast<double*>(_permutedUpdate->x);
     for (size_t c = 0; c < updateAsSparseFactor->ncol; ++c) {
       const int& rbeg = Ap[c];
       const int& rend = Ap[c + 1];
@@ -414,7 +414,7 @@ bool SparseOptimizerIncremental::computeCholeskyUpdate() {
         _cholmodSparse->columnsAllocated == 0
             ? n
             : 2 * n;  // pre-allocate more space if re-allocating
-    delete[] (int*)_cholmodSparse->p;
+    delete[] static_cast<int*>(_cholmodSparse->p);
     _cholmodSparse->p = new int[_cholmodSparse->columnsAllocated + 1];
   }
   size_t nzmax = A.nonZeros();
@@ -425,16 +425,17 @@ bool SparseOptimizerIncremental::computeCholeskyUpdate() {
         _cholmodSparse->nzmax == 0
             ? nzmax
             : 2 * nzmax;  // pre-allocate more space if re-allocating
-    delete[] (double*)_cholmodSparse->x;
-    delete[] (int*)_cholmodSparse->i;
+    delete[] static_cast<double*>(_cholmodSparse->x);
+    delete[] static_cast<int*>(_cholmodSparse->i);
     _cholmodSparse->i = new int[_cholmodSparse->nzmax];
     _cholmodSparse->x = new double[_cholmodSparse->nzmax];
   }
   _cholmodSparse->ncol = n;
   _cholmodSparse->nrow = m;
 
-  A.fillCCS((int*)_cholmodSparse->p, (int*)_cholmodSparse->i,
-            (double*)_cholmodSparse->x, true);
+  A.fillCCS(static_cast<int*>(_cholmodSparse->p),
+            static_cast<int*>(_cholmodSparse->i),
+            static_cast<double*>(_cholmodSparse->x), true);
   // writeCCSMatrix("updatesparse.txt", _cholmodSparse->nrow,
   // _cholmodSparse->ncol, (int*)_cholmodSparse->p, (int*)_cholmodSparse->i,
   // (double*)_cholmodSparse->x, true);
@@ -535,15 +536,15 @@ void SparseOptimizerIncremental::convertTripletUpdateToSparse() {
   // reallocate num-zeros
   if (_permutedUpdateAsSparse->nzmax < _permutedUpdate->nzmax) {
     _permutedUpdateAsSparse->nzmax = _permutedUpdate->nzmax;
-    delete[] (int*)_permutedUpdateAsSparse->i;
-    delete[] (double*)_permutedUpdateAsSparse->x;
+    delete[] static_cast<int*>(_permutedUpdateAsSparse->i);
+    delete[] static_cast<double*>(_permutedUpdateAsSparse->x);
     _permutedUpdateAsSparse->x = new double[_permutedUpdateAsSparse->nzmax];
     _permutedUpdateAsSparse->i = new int[_permutedUpdateAsSparse->nzmax];
   }
 
   if (_permutedUpdateAsSparse->columnsAllocated < _permutedUpdate->ncol) {
     _permutedUpdateAsSparse->columnsAllocated = 2 * _permutedUpdate->ncol;
-    delete[] (int*)_permutedUpdateAsSparse->p;
+    delete[] static_cast<int*>(_permutedUpdateAsSparse->p);
     _permutedUpdateAsSparse->p =
         new int[_permutedUpdateAsSparse->columnsAllocated + 1];
   }
@@ -554,13 +555,13 @@ void SparseOptimizerIncremental::convertTripletUpdateToSparse() {
   int* w = _tripletWorkspace.data();
   memset(w, 0, sizeof(int) * _permutedUpdate->ncol);
 
-  int* Ti = (int*)_permutedUpdate->i;
-  int* Tj = (int*)_permutedUpdate->j;
-  double* Tx = (double*)_permutedUpdate->x;
+  int* Ti = static_cast<int*>(_permutedUpdate->i);
+  int* Tj = static_cast<int*>(_permutedUpdate->j);
+  double* Tx = static_cast<double*>(_permutedUpdate->x);
 
-  int* Cp = (int*)_permutedUpdateAsSparse->p;
-  int* Ci = (int*)_permutedUpdateAsSparse->i;
-  double* Cx = (double*)_permutedUpdateAsSparse->x;
+  int* Cp = static_cast<int*>(_permutedUpdateAsSparse->p);
+  int* Ci = static_cast<int*>(_permutedUpdateAsSparse->i);
+  double* Cx = static_cast<double*>(_permutedUpdateAsSparse->x);
 
   for (size_t k = 0; k < _permutedUpdate->nnz; ++k) /* column counts */
     w[Tj[k]]++;

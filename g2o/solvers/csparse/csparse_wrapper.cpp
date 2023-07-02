@@ -165,7 +165,7 @@ bool CSparse::analyze() {
 
 bool CSparse::analyze_p(int* permutation) {
   freeSymbolic();
-  pImpl->symbolicDecomposition = (css*)cs_calloc(1, sizeof(css));
+  pImpl->symbolicDecomposition = static_cast<css*>(cs_calloc(1, sizeof(css)));
   int n = pImpl->ccsA.n;
   pImpl->symbolicDecomposition->pinv = cs_pinv(permutation, n);
   cs* C = cs_symperm(&pImpl->ccsA, pImpl->symbolicDecomposition->pinv, 0);
@@ -174,7 +174,8 @@ bool CSparse::analyze_p(int* permutation) {
   int* c = cs_counts(C, pImpl->symbolicDecomposition->parent, post, 0);
   cs_free(post);
   cs_spfree(C);
-  pImpl->symbolicDecomposition->cp = (int*)cs_malloc(n + 1, sizeof(int));
+  pImpl->symbolicDecomposition->cp =
+      static_cast<int*>(cs_malloc(n + 1, sizeof(int)));
   pImpl->symbolicDecomposition->unz = pImpl->symbolicDecomposition->lnz =
       cs_cumsum(pImpl->symbolicDecomposition->cp, c, n);
   cs_free(c);

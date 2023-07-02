@@ -73,15 +73,17 @@ std::string trimRight(const std::string& s) {
 
 std::string strToLower(const std::string& s) {
   string ret;
+  ret.reserve(s.size());
   std::transform(s.begin(), s.end(), back_inserter(ret),
-                 (int (*)(int))std::tolower);
+                 [](unsigned char c) { return std::tolower(c); });
   return ret;
 }
 
 std::string strToUpper(const std::string& s) {
   string ret;
+  ret.reserve(s.size());
   std::transform(s.begin(), s.end(), back_inserter(ret),
-                 (int (*)(int))std::toupper);
+                 [](unsigned char c) { return std::toupper(c); });
   return ret;
 }
 
@@ -163,7 +165,7 @@ int readLine(std::istream& is, std::stringstream& currentLine) {
   is.get(*currentLine.rdbuf());
   if (is.fail())  // fail is set on empty lines
     is.clear();
-  skipLine(is);   // read \n not read by get()
+  skipLine(is);  // read \n not read by get()
   if (currentLine.str().empty() && is.eof()) {
     return -1;
   }

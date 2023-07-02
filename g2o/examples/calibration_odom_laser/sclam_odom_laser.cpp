@@ -145,8 +145,8 @@ int main(int argc, char** argv) {
         OptimizableGraph::Vertex* v =
             static_cast<OptimizableGraph::Vertex*>(it->second);
         if (d.visited().count(v) == 0) {
-          cerr << "\t unvisited vertex " << it->first << " " << (void*)v
-               << endl;
+          cerr << "\t unvisited vertex " << it->first << " "
+               << static_cast<void*>(v) << endl;
           v->setFixed(true);
         }
       }
@@ -238,9 +238,9 @@ int main(int argc, char** argv) {
         // apply calibration
         VelocityMeasurement calibratedVelocityMeasurement = velocityMeasurement;
         calibratedVelocityMeasurement.setVl(odomCalib(0) *
-                                           calibratedVelocityMeasurement.vl());
+                                            calibratedVelocityMeasurement.vl());
         calibratedVelocityMeasurement.setVr(odomCalib(1) *
-                                           calibratedVelocityMeasurement.vr());
+                                            calibratedVelocityMeasurement.vr());
         MotionMeasurement mm = OdomConvert::convertToMotion(
             calibratedVelocityMeasurement, odomCalib(2));
 

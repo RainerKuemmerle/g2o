@@ -66,18 +66,18 @@ int cs_cholsolsymb(const cs* A, double* b, const css* S, double* x, int* work) {
 /* L = chol (A, [pinv parent cp]), pinv is optional */
 csn* cs_chol_workspace(const cs* A, const css* S, int* cin, double* xin) {
   double lki, *Lx, *x, *Cx;
-  int top, i, p, k, n, *Li, *Lp, *cp, *pinv, *s, *c, *parent, *Cp, *Ci;
+  int i, p, k, n, *Li, *Lp, *cp, *pinv, *s, *c, *parent, *Cp, *Ci;
   cs *L, *C, *E;
   csn* N;
   if (!CS_CSC(A) || !S || !S->cp || !S->parent) return (NULL);
   n = A->n;
-  N = (csn*)cs_calloc(1, sizeof(csn)); /* allocate result */
-  c = cin;                             /* get int workspace */
-  x = xin;                             /* get double workspace */
+  N = static_cast<csn*>(cs_calloc(1, sizeof(csn))); /* allocate result */
+  c = cin;                                          /* get int workspace */
+  x = xin;                                          /* get double workspace */
   cp = S->cp;
   pinv = S->pinv;
   parent = S->parent;
-  C = pinv ? cs_symperm(A, pinv, 1) : ((cs*)A);
+  C = pinv ? cs_symperm(A, pinv, 1) : const_cast<cs*>(A);
   E = pinv ? C : NULL; /* E is alias for A, or a copy E=A(p,p) */
   if (!N || !c || !x || !C) return (cs_ndone(N, E, NULL, NULL, 0));
   s = c + n;
@@ -93,16 +93,16 @@ csn* cs_chol_workspace(const cs* A, const css* S, int* cin, double* xin) {
   for (k = 0; k < n; k++) /* compute L(k,:) for L*L' = C */
   {
     /* --- Nonzero pattern of L(k,:) ------------------------------------ */
-    top = cs_ereach(C, k, parent, s, c); /* find pattern of L(k,:) */
-    x[k] = 0;                            /* x (0:k) is now zero */
-    for (p = Cp[k]; p < Cp[k + 1]; p++)  /* x = full(triu(C(:,k))) */
+    int top = cs_ereach(C, k, parent, s, c); /* find pattern of L(k,:) */
+    x[k] = 0;                                /* x (0:k) is now zero */
+    for (p = Cp[k]; p < Cp[k + 1]; p++)      /* x = full(triu(C(:,k))) */
     {
       if (Ci[p] <= k) x[Ci[p]] = Cx[p];
     }
     double d = x[k]; /* d = C(k,k) */
     x[k] = 0;        /* clear x for k+1st iteration */
     /* --- Triangular solve --------------------------------------------- */
-    for (; top < n; top++)    /* solve L(0:k-1,0:k-1) * x = C(:,k) */
+    for (; top < n; top++) /* solve L(0:k-1,0:k-1) * x = C(:,k) */
     {
       i = s[top];             /* s [top..n-1] is pattern of L(k,:) */
       lki = x[i] / Lx[Lp[i]]; /* L(k,i) = x (i) / L(i,i) */
@@ -112,7 +112,7 @@ csn* cs_chol_workspace(const cs* A, const css* S, int* cin, double* xin) {
       }
       d -= lki * lki; /* d = d - L(k,i)*L(k,i) */
       p = c[i]++;
-      Li[p] = k;      /* store L(k,i) in column i */
+      Li[p] = k; /* store L(k,i) in column i */
       Lx[p] = lki;
     }
     /* --- Compute L(k,k) ----------------------------------------------- */
