@@ -111,16 +111,23 @@ void RobustKernelWelsch::robustify(double e2, Vector3& rho) const {
 
 void RobustKernelFair::robustify(double e2, Vector3& rho) const {
   const double sqrte = sqrt(e2);
+  const double dsqr = delta_ * delta_;
   const double aux = sqrte / delta_;
-  rho[0] = 2. * delta_ * delta_ * (aux - log1p(aux));
+  rho[0] = 2. * dsqr * (aux - log1p(aux));
   rho[1] = 1. / (1. + aux);
-  rho[2] = -0.5 / (sqrte * (1. + aux));
+
+  const double drec = 1. / delta_;
+  const double e_3_2 = 1. / (sqrte * e2);
+  const double aux2 = drec * sqrte + 1;
+
+  rho[2] = 2 * dsqr *
+           (1 / (4 * dsqr * aux2 * aux2 * e2) + (drec * e_3_2) / (4 * aux2) -
+            (drec * e_3_2) / 4);
 }
 
 void RobustKernelTukey::robustify(double e2, Vector3& rho) const {
-  const double e = sqrt(e2);
   const double delta2 = delta_ * delta_;
-  if (e <= delta_) {
+  if (e2 <= delta2) {
     const double aux = e2 / delta2;
     rho[0] = delta2 * (1. - std::pow((1. - aux), 3)) / 3.;
     rho[1] = std::pow((1. - aux), 2);

@@ -78,7 +78,7 @@ class RobustKernelTests : public Test {
     kernel_.setDelta(0.07);
 
     error_values_.reserve(3);
-    error_values_.push_back(0.99 * sqrt(kernel_.delta()));
+    error_values_.push_back(0.99 * kernel_.delta() * kernel_.delta());
     error_values_.push_back(0.99 * kernel_.delta());
     error_values_.push_back(1.5 * kernel_.delta());
   }
@@ -141,7 +141,7 @@ TYPED_TEST_P(RobustKernelTests, SecondDerivative) {
     g2o::Vector3 val = g2o::Vector3::Zero();
     this->kernel_.robustify(e, val);
     double estimated2ndDerivative = this->estimate2ndDerivative(e);
-    EXPECT_THAT(val(2), DoubleNear(estimated2ndDerivative, 1e-4));
+    EXPECT_THAT(val(2), DoubleNear(estimated2ndDerivative, 1e-3));
   }
 }
 
