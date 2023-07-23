@@ -94,9 +94,9 @@ void RobustKernelCauchy::robustify(double e2, Vector3& rho) const {
 }
 
 void RobustKernelGemanMcClure::robustify(double e2, Vector3& rho) const {
-  const double aux = delta_ / (delta_ + e2);
-  rho[0] = e2 * aux;
-  rho[1] = aux * aux;
+  const double aux = 1. / (delta_ + e2);
+  rho[0] = delta_ * e2 * aux;
+  rho[1] = delta_ * delta_ * aux * aux;
   rho[2] = -2. * rho[1] * aux;
 }
 
