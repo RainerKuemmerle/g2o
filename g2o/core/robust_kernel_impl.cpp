@@ -63,8 +63,8 @@ void RobustKernelHuber::robustify(double e, Vector3& rho) const {
     rho[0] = e;
     rho[1] = 1.;
     rho[2] = 0.;
-  } else {                     // outlier
-    double sqrte = sqrt(e);    // absolute value of the error
+  } else {                   // outlier
+    double sqrte = sqrt(e);  // absolute value of the error
     rho[0] =
         2 * sqrte * _delta - dsqr;  // rho(e)   = 2 * delta * e^(1/2) - delta^2
     rho[1] = _delta / sqrte;        // rho'(e)  = delta / sqrt(e)
@@ -93,9 +93,9 @@ void RobustKernelCauchy::robustify(double e2, Vector3& rho) const {
 }
 
 void RobustKernelGemanMcClure::robustify(double e2, Vector3& rho) const {
-  const double aux = _delta / (_delta + e2);
-  rho[0] = e2 * aux;
-  rho[1] = aux * aux;
+  const double aux = 1. / (_delta + e2);
+  rho[0] = _delta * e2 * aux;
+  rho[1] = _delta * _delta * aux * aux;
   rho[2] = -2. * rho[1] * aux;
 }
 
@@ -110,16 +110,23 @@ void RobustKernelWelsch::robustify(double e2, Vector3& rho) const {
 
 void RobustKernelFair::robustify(double e2, Vector3& rho) const {
   const double sqrte = sqrt(e2);
+  const double dsqr = _delta * _delta;
   const double aux = sqrte / _delta;
-  rho[0] = 2. * _delta * _delta * (aux - log1p(aux));
+  rho[0] = 2. * dsqr * (aux - log1p(aux));
   rho[1] = 1. / (1. + aux);
-  rho[2] = -0.5 / (sqrte * (1. + aux));
+
+  const double drec = 1. / _delta;
+  const double e_3_2 = 1. / (sqrte * e2);
+  const double aux2 = drec * sqrte + 1;
+
+  rho[2] = 2 * dsqr *
+           (1 / (4 * dsqr * aux2 * aux2 * e2) + (drec * e_3_2) / (4 * aux2) -
+            (drec * e_3_2) / 4);
 }
 
 void RobustKernelTukey::robustify(double e2, Vector3& rho) const {
-  const double e = sqrt(e2);
   const double delta2 = _delta * _delta;
-  if (e <= _delta) {
+  if (e2 <= delta2) {
     const double aux = e2 / delta2;
     rho[0] = delta2 * (1. - std::pow((1. - aux), 3)) / 3.;
     rho[1] = std::pow((1. - aux), 2);
