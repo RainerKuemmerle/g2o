@@ -82,8 +82,9 @@ struct Sim3 {
         A = cst(1. / 2.);
         B = cst(1. / 6.);
         R = (I + Omega +
-             Omega * Omega / 2);  // R=I+(1-cos(theta))*a^a^+sin(theta)*a^~=(omit
-                                  // O(theta^3))=I+theta^2/2*a^a^+theta*a^
+             Omega * Omega /
+                 2);  // R=I+(1-cos(theta))*a^a^+sin(theta)*a^~=(omit
+                      // O(theta^3))=I+theta^2/2*a^a^+theta*a^
       } else {
         double theta2 = theta * theta;
         A = (1 - std::cos(theta)) / (theta2);
@@ -97,8 +98,9 @@ struct Sim3 {
         double sigma2 = sigma * sigma;
         A = ((sigma - 1) * s + 1) / sigma2;
         B = ((cst(0.5) * sigma2 - sigma + 1) * s - 1) /
-            (sigma2 * sigma);  // B=[C-((s*cos(theta)-1)*sigma+s*sin(theta)*theta)/(sigma^2+theta^2)]/theta^2~=(omit
-                               // O(theta^2))=
+            (sigma2 *
+             sigma);  // B=[C-((s*cos(theta)-1)*sigma+s*sin(theta)*theta)/(sigma^2+theta^2)]/theta^2~=(omit
+                      // O(theta^2))=
         //(1/2*s*sigma-s)/(sigma^2)+[C-(s-1)*sigma/(sigma^2+theta^2)]/theta^2~=(0.5*sigma^2*s-s*sigma)/sigma^3+[s-1]/sigma^3=[s*(0.5*sigma^2-sigma+1)-1]/sigma^3
         R = (I + Omega +
              Omega2 /

@@ -42,14 +42,14 @@ namespace g2o {
  * \brief Internal structure of the tictoc profiling
  */
 struct TicTocElement {
-  double ticTime;      ///< the time of the last tic
-  double totalTime;    ///< the total time of this part of the algorithm
-  int numCalls;        ///< the number of calls
+  double ticTime;    ///< the time of the last tic
+  double totalTime;  ///< the total time of this part of the algorithm
+  int numCalls;      ///< the number of calls
   double minTime;
   double maxTime;
-  double exponentialMovingAverage;    ///< exponential moving average with alpha
-                                      ///< = 0.01
-  std::string algorithmPart;          ///< name / description of the code block
+  double exponentialMovingAverage;  ///< exponential moving average with alpha
+                                    ///< = 0.01
+  std::string algorithmPart;        ///< name / description of the code block
   bool clockIsRunning;
   TicTocElement()
       : ticTime(0.),

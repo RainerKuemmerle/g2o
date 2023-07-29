@@ -8,4 +8,3 @@ if(CHOLMOD_FOUND)
 else()
   target_link_libraries(ba_anchored_inverse_depth_demo solver_eigen)
 endif()
-

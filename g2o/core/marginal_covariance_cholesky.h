@@ -79,10 +79,10 @@ class G2O_CORE_API MarginalCovarianceCholesky {
 
  protected:
   // information about the cholesky factor (lower triangle)
-  int _n;         ///< L is an n X n matrix
-  int* _Ap;       ///< column pointer of the CCS storage
-  int* _Ai;       ///< row indices of the CCS storage
-  double* _Ax;    ///< values of the cholesky factor
+  int _n;       ///< L is an n X n matrix
+  int* _Ap;     ///< column pointer of the CCS storage
+  int* _Ai;     ///< row indices of the CCS storage
+  double* _Ax;  ///< values of the cholesky factor
   int* _perm;  ///< permutation of the cholesky factor. Variable re-ordering for
                ///< better fill-in
 

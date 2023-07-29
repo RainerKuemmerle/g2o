@@ -46,10 +46,10 @@ struct G2O_CORE_API G2OBatchStatistics {
 
   /** timings **/
   // nonlinear part
-  double timeResiduals;        ///< residuals
-  double timeLinearize;        ///< jacobians
-  double timeQuadraticForm;    ///< construct the quadratic form in the graph
-  int levenbergIterations;     ///< number of iterations performed by LM
+  double timeResiduals;      ///< residuals
+  double timeLinearize;      ///< jacobians
+  double timeQuadraticForm;  ///< construct the quadratic form in the graph
+  int levenbergIterations;   ///< number of iterations performed by LM
   // block_solver (constructs Ax=b, plus maybe schur)
   double timeSchurComplement;  ///< compute schur complement (0 if not done)
 
@@ -58,11 +58,11 @@ struct G2O_CORE_API G2OBatchStatistics {
   double timeNumericDecomposition;   ///< numeric decomposition  (0 if not done)
   double timeLinearSolution;         ///< total time for solving Ax=b (including
                                      ///< detup for schur)
-  double timeLinearSolver;       ///< time for solving, excluding Schur setup
-  int iterationsLinearSolver;    ///< iterations of PCG, (0 if not used, i.e.,
-                                 ///< Cholesky)
-  double timeUpdate;             ///< time to apply the update
-  double timeIteration;          ///< total time;
+  double timeLinearSolver;     ///< time for solving, excluding Schur setup
+  int iterationsLinearSolver;  ///< iterations of PCG, (0 if not used, i.e.,
+                               ///< Cholesky)
+  double timeUpdate;           ///< time to apply the update
+  double timeIteration;        ///< total time;
 
   double timeMarginals;  ///< computing the inverse elements (solve blocks)
                          ///< and thus the marginal covariances

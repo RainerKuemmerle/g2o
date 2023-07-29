@@ -41,7 +41,7 @@ macro(FIND_G2O_LIBRARY MYLIBRARY MYLIBRARYNAME)
     /sw/local/lib
     /sw/lib
     )
-  
+
   find_library(${MYLIBRARY}
     NAMES "g2o_${MYLIBRARYNAME}"
     PATHS
@@ -65,13 +65,13 @@ macro(FIND_G2O_LIBRARY MYLIBRARY MYLIBRARYNAME)
     /sw/local/lib
     /sw/lib
     )
-  
+
   if(NOT ${MYLIBRARY}_DEBUG)
     if(MYLIBRARY)
       set(${MYLIBRARY}_DEBUG ${MYLIBRARY})
     endif(MYLIBRARY)
   endif( NOT ${MYLIBRARY}_DEBUG)
-  
+
 endmacro(FIND_G2O_LIBRARY LIBRARY LIBRARYNAME)
 
 # Find the core elements

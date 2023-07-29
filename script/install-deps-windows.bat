@@ -10,7 +10,7 @@ set "VcPkgDir=%USERPROFILE%\.vcpkg\vcpkg"
 set "VcPkgTriplet=x64-windows"
 if defined VCPKG_ROOT_DIR if /i not "%VCPKG_ROOT_DIR%"=="" set "VcPkgDir=%VCPKG_ROOT_DIR%"
 if defined VCPKG_DEFAULT_TRIPLET if /i not "%VCPKG_DEFAULT_TRIPLET%"=="" set "VcPkgTriplet=%VCPKG_DEFAULT_TRIPLET%"
-    
+
 pushd %VcPkgDir%
 
 rem ==============================

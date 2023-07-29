@@ -31,7 +31,7 @@
 #include <iostream>
 using namespace std;
 
-StreamRedirect::StreamRedirect(std::ostream &stream, QPlainTextEdit *te)
+StreamRedirect::StreamRedirect(std::ostream& stream, QPlainTextEdit* te)
     : _stream(stream), _te(te) {
   _old_buf = stream.rdbuf();
   _stream.rdbuf(this);
@@ -54,7 +54,7 @@ std::char_traits<char>::int_type StreamRedirect::overflow(int_type v) {
   return v;
 }
 
-std::streamsize StreamRedirect::xsputn(const char *p, std::streamsize n) {
+std::streamsize StreamRedirect::xsputn(const char* p, std::streamsize n) {
   _mutex.lock();
   _buffer.append(p, p + n);
 

@@ -175,7 +175,7 @@
 #else
 #define SLAMPARSERDEBUG 0
 #endif
-#else  /* ! defined YYDEBUG */
+#else /* ! defined YYDEBUG */
 #define SLAMPARSERDEBUG 0
 #endif /* ! defined YYDEBUG */
 #endif /* ! defined SLAMPARSERDEBUG */
@@ -258,7 +258,7 @@ class Parser {
   /// Symbol kinds.
   struct symbol_kind {
     enum symbol_kind_type {
-      YYNTOKENS = 16,      ///< Number of tokens.
+      YYNTOKENS = 16,  ///< Number of tokens.
       S_YYEMPTY = -2,
       S_YYEOF = 0,         // "end of file"
       S_YYerror = 1,       // error

@@ -37,7 +37,7 @@ template <int D, typename E, typename... VertexTypes>
 template <std::size_t... Ints>
 bool BaseFixedSizedEdge<D, E, VertexTypes...>::allVerticesFixedNs(
     std::index_sequence<Ints...>) const {
-  return ( ... && vertexXn<Ints>()->fixed());
+  return (... && vertexXn<Ints>()->fixed());
 }
 
 template <int D, typename E, typename... VertexTypes>

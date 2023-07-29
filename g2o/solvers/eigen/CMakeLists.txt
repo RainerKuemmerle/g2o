@@ -27,4 +27,3 @@ install(TARGETS solver_eigen
 
 file(GLOB headers "${CMAKE_CURRENT_SOURCE_DIR}/*.h" "${CMAKE_CURRENT_SOURCE_DIR}/*.hpp")
 install(FILES ${headers} DESTINATION ${INCLUDES_INSTALL_DIR}/solvers/eigen)
-
