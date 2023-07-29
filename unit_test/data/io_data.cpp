@@ -31,7 +31,7 @@
 #include "g2o/stuff/sampler.h"
 #include "g2o/types/data/robot_laser.h"
 
-using namespace testing; // NOLINT
+using namespace testing;  // NOLINT
 
 MATCHER(NearEq, "") { return fabs(std::get<0>(arg) - std::get<1>(arg)) < 0.01; }
 

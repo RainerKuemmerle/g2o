@@ -33,8 +33,8 @@
 #include "g2o/types/data/robot_data.h"
 
 class MyTrivialRobotData : public g2o::RobotData {
-   bool write(std::ostream&) const override { return false; }
-   bool read(std::istream&) override { return false; }
+  bool write(std::ostream&) const override { return false; }
+  bool read(std::istream&) override { return false; }
 };
 
 TEST(Data, DataQueue) {

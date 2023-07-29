@@ -37,13 +37,13 @@ class CommandArgsTest : public ::testing::Test {
     arg_.param(argumentNames_[1], valueDouble_, 1e-6, "double value");
     arg_.param(argumentNames_[2], valueBool_, false, "boolean");
     arg_.param(argumentNames_[3], valueVectorInt_, std::vector<int>(),
-              "vector of int");
+               "vector of int");
     arg_.param(argumentNames_[4], valueVectorDouble_, std::vector<double>(),
-              "vector of double");
+               "vector of double");
     arg_.param(argumentNames_[5], valueString_, "", "string value");
     arg_.param(argumentNames_[6], valueFloat_, 1e4, "float value");
     arg_.paramLeftOver("input", valueStringLeftOverOptional_, "",
-                      "optional param", true);
+                       "optional param", true);
   }
 
   void call(const std::vector<std::string>& arguments) {
@@ -70,7 +70,7 @@ class CommandArgsTest : public ::testing::Test {
   g2o::CommandArgs arg_;
 
   std::vector<std::string> argumentNames_ = {"i",  "d",      "b", "vi",
-                                            "vd", "string", "f"};
+                                             "vd", "string", "f"};
 
   int valueInt_;
   double valueDouble_;

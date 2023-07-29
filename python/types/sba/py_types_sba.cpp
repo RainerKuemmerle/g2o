@@ -12,8 +12,7 @@ void declareTypesSBA(py::module& m) {
              BaseVertex<4, Eigen::Matrix<double, 5, 1, Eigen::ColMajor>>,
              std::shared_ptr<VertexIntrinsics>>(m, "VertexIntrinsics")
       .def(py::init<>())
-      .def("set_to_origin_impl", &VertexIntrinsics::setToOriginImpl)
-      ;
+      .def("set_to_origin_impl", &VertexIntrinsics::setToOriginImpl);
 
   templatedBaseVertex<6, SBACam>(m, "_6_SBACam");
   py::class_<VertexCam, BaseVertex<6, SBACam>, std::shared_ptr<VertexCam>>(

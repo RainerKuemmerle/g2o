@@ -13,7 +13,7 @@ point clouds or graph, you can give
 C++ library [Pangolin](http://github.com/stevenlovegrove/Pangolin).
 
 For convenience, some frequently used Eigen types (Quaternion, Rotation2d,
-Isometry3d, Isometry2d, AngleAxis) are packed into this library.  
+Isometry3d, Isometry2d, AngleAxis) are packed into this library.
 
 ## Requirements
 * ([pybind11](https://github.com/pybind/pybind11)
@@ -59,7 +59,7 @@ class BundleAdjustment(g2o.SparseOptimizer):
         v_se3.set_id(pose_id * 2)   # internal id
         v_se3.set_estimate(sbacam)
         v_se3.set_fixed(fixed)
-        super().add_vertex(v_se3) 
+        super().add_vertex(v_se3)
 
     def add_point(self, point_id, point, fixed=False, marginalized=True):
         v_p = g2o.VertexSBAPointXYZ()
@@ -69,7 +69,7 @@ class BundleAdjustment(g2o.SparseOptimizer):
         v_p.set_fixed(fixed)
         super().add_vertex(v_p)
 
-    def add_edge(self, point_id, pose_id, 
+    def add_edge(self, point_id, pose_id,
             measurement,
             information=np.identity(2),
             robust_kernel=g2o.RobustKernelHuber(np.sqrt(5.991))):   # 95% CI
@@ -114,7 +114,7 @@ class PoseGraphOptimization(g2o.SparseOptimizer):
         v_se3.set_fixed(fixed)
         super().add_vertex(v_se3)
 
-    def add_edge(self, vertices, measurement, 
+    def add_edge(self, vertices, measurement,
             information=np.identity(6),
             robust_kernel=None):
 
@@ -136,7 +136,7 @@ class PoseGraphOptimization(g2o.SparseOptimizer):
 
 For more details, checkout [python examples](python/examples).  Thanks to
 [pybind11](https://github.com/pybind/pybind11), g2opy works seamlessly between
-numpy and underlying Eigen.  
+numpy and underlying Eigen.
 
 ## License
-* The binding code and python example code is licensed under BSD License.  
+* The binding code and python example code is licensed under BSD License.

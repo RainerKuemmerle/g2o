@@ -43,7 +43,7 @@
 #include "unit_test/test_helper/io.h"
 #include "unit_test/test_helper/random_state.h"
 
-using namespace g2o; //NOLINT
+using namespace g2o;  // NOLINT
 
 class IoSlam3dParam : public ::testing::Test {
  protected:

@@ -25,6 +25,7 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <Eigen/Geometry>
+
 #include "g2o/config.h"
 #include "g2o/core/eigen_types.h"
 #include "g2o/stuff/sampler.h"
@@ -33,7 +34,8 @@
 namespace g2o {
 namespace internal {
 inline Isometry3 randomIsometry3() {
-  const g2o::Vector3 rotAxisAngle = g2o::Vector3::Random() + g2o::Vector3::Random();
+  const g2o::Vector3 rotAxisAngle =
+      g2o::Vector3::Random() + g2o::Vector3::Random();
   const g2o::AngleAxis rotation(rotAxisAngle.norm(), rotAxisAngle.normalized());
   return g2o::Translation3(g2o::Vector3::Random()) * rotation;
 }

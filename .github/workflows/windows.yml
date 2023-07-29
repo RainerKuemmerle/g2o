@@ -66,4 +66,3 @@ jobs:
           $Env:PATH += ";${{github.workspace}}\build\bin\${{matrix.config.build_type}}"
           $Env:PATH += ";${{github.workspace}}\build\lib\${{matrix.config.build_type}}"
           ctest -C ${{matrix.config.build_type}} --extra-verbose --output-on-failure
-

@@ -93,7 +93,7 @@ TYPED_TEST_P(LS, Solve) {
   for (int solve_iter = 0; solve_iter < 2; ++solve_iter) {
     solver_solution.setZero(this->b_vector_.size());
     this->linearsolver_->solve(this->sparse_matrix_, solver_solution.data(),
-                              this->b_vector_.data());
+                               this->b_vector_.data());
 
     ASSERT_TRUE(solver_solution.isApprox(this->x_vector_, 1e-6))
         << "Solution differs on iteration " << solve_iter;
@@ -104,7 +104,7 @@ TYPED_TEST_P(LS, SolvePattern) {
   this->ordering_.setOrdering(*this->linearsolver_);
 
   g2o::SparseBlockMatrixX spinv;
-  std::vector<std::pair<int, int> > blockIndices;
+  std::vector<std::pair<int, int>> blockIndices;
   blockIndices.reserve(
       static_cast<int>(this->sparse_matrix_.rowBlockIndices().size()));
   for (int i = 0;
@@ -112,7 +112,7 @@ TYPED_TEST_P(LS, SolvePattern) {
     blockIndices.emplace_back(i, i);
 
   bool state = this->linearsolver_->solvePattern(spinv, blockIndices,
-                                                this->sparse_matrix_);
+                                                 this->sparse_matrix_);
   ASSERT_TRUE(!state || spinv.rowBlockIndices().size() == blockIndices.size());
   if (!state) {  // solver does not implement solving for a pattern return in
                  // this case

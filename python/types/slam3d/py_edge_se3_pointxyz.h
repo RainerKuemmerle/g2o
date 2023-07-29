@@ -1,10 +1,10 @@
 #pragma once
 
-#include "python/core/py_base_binary_edge.h"
 #include "g2o/types/slam3d/edge_se3_pointxyz.h"
 #include "g2o/types/slam3d/edge_se3_pointxyz_depth.h"
 #include "g2o/types/slam3d/edge_se3_pointxyz_disparity.h"
 #include "g2opy.h"
+#include "python/core/py_base_binary_edge.h"
 
 namespace g2o {
 
