@@ -58,7 +58,8 @@ class G2O_TYPES_SBA_API EdgeStereoSE3ProjectXYZ
 
   void linearizeOplus() override;
 
-  Vector3 cam_project(const Vector3& trans_xyz, const float& bf) const;
+  [[nodiscard]] Vector3 cam_project(const Vector3& trans_xyz,
+                                    const float& bf) const;
 
   double fx = 1., fy = 1., cx = 0.5, cy = 0.5, bf = 0;
 };

@@ -27,6 +27,7 @@
 #include "simulator.h"
 
 #include <cassert>
+#include <cstddef>
 #include <iostream>
 namespace g2o {
 
@@ -42,7 +43,7 @@ void BaseWorldObject::setVertex(
 }
 
 // BaseRobot
-OptimizableGraph* BaseRobot::graph() {
+OptimizableGraph* BaseRobot::graph() const {
   if (world_) return world_->graph();
   return nullptr;
 }
@@ -65,12 +66,12 @@ void BaseRobot::sense() {
 }
 
 // Sensor
-World* BaseSensor::world() {
+World* BaseSensor::world() const {
   if (!robot_) return nullptr;
   return robot_->world();
 }
 
-OptimizableGraph* BaseSensor::graph() {
+OptimizableGraph* BaseSensor::graph() const {
   if (!robot_) return nullptr;
   return robot_->graph();
 }

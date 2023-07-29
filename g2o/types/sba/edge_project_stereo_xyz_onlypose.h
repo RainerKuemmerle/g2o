@@ -48,7 +48,7 @@ class G2O_TYPES_SBA_API EdgeStereoSE3ProjectXYZOnlyPose
 
   bool isDepthPositive();
 
-  Vector3 cam_project(const Vector3& trans_xyz) const;
+  [[nodiscard]] Vector3 cam_project(const Vector3& trans_xyz) const;
 
   Vector3 Xw;
   double fx, fy, cx, cy, bf;

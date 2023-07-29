@@ -76,10 +76,11 @@ struct TicTocInitializer {
       // sort the elements according to the total time and print a table
       std::vector<TicTocElement> sortedElements;
       sortedElements.reserve(tictocElements.size());
-      for (auto it = tictocElements.begin(); it != tictocElements.end(); ++it) {
-        if (it->second.numCalls == 0) continue;
-        longestName = std::max(longestName, static_cast<int>(it->first.size()));
-        sortedElements.push_back(it->second);
+      for (auto& tictocElement : tictocElements) {
+        if (tictocElement.second.numCalls == 0) continue;
+        longestName =
+            std::max(longestName, static_cast<int>(tictocElement.first.size()));
+        sortedElements.push_back(tictocElement.second);
       }
       std::sort(sortedElements.begin(), sortedElements.end());
 

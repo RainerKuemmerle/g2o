@@ -82,13 +82,14 @@ class WorldObject : public BaseWorldObject, VertexTypeT {
 
 class G2O_SIMULATOR_API BaseRobot {
  public:
-  BaseRobot(World* world, std::string name)
-      : world_(world), name_(std::move(name)) {}
+  BaseRobot(World* world, const std::string& name) {
+    world_ = world;
+    name_ = name;
+  }
   void setWorld(World* world) { world_ = world; }
   [[nodiscard]] World* world() const { return world_; }
-  World* world() { return world_; }
   [[nodiscard]] const std::string& name() const { return name_; }
-  OptimizableGraph* graph();
+  [[nodiscard]] OptimizableGraph* graph() const;
   bool addSensor(BaseSensor* sensor);
   const std::set<BaseSensor*>& sensors() { return sensors_; }
   virtual void sense();
@@ -153,12 +154,14 @@ class Robot : public BaseRobot {
 
 class G2O_SIMULATOR_API BaseSensor {
  public:
-  explicit BaseSensor(std::string name) : name_(std::move(name)) {}
+  explicit BaseSensor(const std::string& name) { name_ = name; }
   inline BaseRobot* robot() { return robot_; }
   inline void setRobot(BaseRobot* robot) { robot_ = robot; }
-  World* world();
-  OptimizableGraph* graph();
-  std::vector<Parameter*> parameters() { return parameters_; }
+  [[nodiscard]] World* world() const;
+  [[nodiscard]] OptimizableGraph* graph() const;
+  [[nodiscard]] const std::vector<Parameter*>& parameters() const {
+    return parameters_;
+  }
   virtual void sense() = 0;
   virtual void addParameters() {}
 

@@ -37,11 +37,12 @@
 
 namespace freeglut_minimal {
 
+namespace {
 /*
  * Matches a font ID with a SFG_StrokeFont structure pointer.
  * This was changed to match the GLUT header style.
  */
-static SFG_StrokeFont* fghStrokeByID(FontID font) {
+SFG_StrokeFont* fghStrokeByID(FontID font) {
   if (font == kGlutStrokeRoman)
     return const_cast<SFG_StrokeFont*>(&kFgStrokeRoman);
   if (font == kGlutStrokeMonoRoman)
@@ -51,6 +52,7 @@ static SFG_StrokeFont* fghStrokeByID(FontID font) {
             << std::endl;
   return nullptr;
 }
+}  // namespace
 
 void glutStrokeString(FontID fontID, const char* string_) {
   const auto* string = reinterpret_cast<const unsigned char*>(string_);

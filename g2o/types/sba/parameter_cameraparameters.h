@@ -42,8 +42,8 @@ class G2O_TYPES_SBA_API CameraParameters : public g2o::Parameter {
   CameraParameters(double focalLength, const Vector2& principlePoint,
                    double baseLine);
 
-  Vector2 cam_map(const Vector3& trans_xyz) const;
-  Vector3 stereocam_uvu_map(const Vector3& trans_xyz) const;
+  [[nodiscard]] Vector2 cam_map(const Vector3& trans_xyz) const;
+  [[nodiscard]] Vector3 stereocam_uvu_map(const Vector3& trans_xyz) const;
   bool read(std::istream& is) override;
   bool write(std::ostream& os) const override;
 

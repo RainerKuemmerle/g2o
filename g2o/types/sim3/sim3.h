@@ -127,9 +127,11 @@ struct Sim3 {
     t_ = W * upsilon;
   }
 
-  Vector3 map(const Vector3& xyz) const { return s_ * (r_ * xyz) + t_; }
+  [[nodiscard]] Vector3 map(const Vector3& xyz) const {
+    return s_ * (r_ * xyz) + t_;
+  }
 
-  Vector7 log() const {
+  [[nodiscard]] Vector7 log() const {
     Vector7 res;
     double sigma = std::log(s_);
 
@@ -203,7 +205,7 @@ struct Sim3 {
     return res;
   }
 
-  Sim3 inverse() const {
+  [[nodiscard]] Sim3 inverse() const {
     return Sim3(r_.conjugate(), r_.conjugate() * ((-1 / s_) * t_), 1 / s_);
   }
 
@@ -248,17 +250,17 @@ struct Sim3 {
     }
     r_.normalize();
   }
-  inline const Vector3& translation() const { return t_; }
+  [[nodiscard]] const Vector3& translation() const { return t_; }
 
-  inline Vector3& translation() { return t_; }
+  Vector3& translation() { return t_; }
 
-  inline const Quaternion& rotation() const { return r_; }
+  [[nodiscard]] const Quaternion& rotation() const { return r_; }
 
-  inline Quaternion& rotation() { return r_; }
+  Quaternion& rotation() { return r_; }
 
-  inline const double& scale() const { return s_; }
+  [[nodiscard]] const double& scale() const { return s_; }
 
-  inline double& scale() { return s_; }
+  double& scale() { return s_; }
 };
 
 inline std::ostream& operator<<(std::ostream& out_str, const Sim3& sim3) {
