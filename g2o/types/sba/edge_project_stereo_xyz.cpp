@@ -31,8 +31,8 @@ namespace g2o {
 EdgeStereoSE3ProjectXYZ::EdgeStereoSE3ProjectXYZ()
     : BaseBinaryEdge<3, Vector3, VertexPointXYZ, VertexSE3Expmap>() {}
 
-Vector3 EdgeStereoSE3ProjectXYZ::cam_project(const Vector3 &trans_xyz,
-                                             const float &bf) const {
+Vector3 EdgeStereoSE3ProjectXYZ::cam_project(const Vector3& trans_xyz,
+                                             const float& bf) const {
   const double invz = 1.0f / trans_xyz[2];
   Vector3 res;
   res[0] = trans_xyz[0] * invz * fx + cx;
@@ -41,20 +41,20 @@ Vector3 EdgeStereoSE3ProjectXYZ::cam_project(const Vector3 &trans_xyz,
   return res;
 }
 
-bool EdgeStereoSE3ProjectXYZ::read(std::istream &is) {
+bool EdgeStereoSE3ProjectXYZ::read(std::istream& is) {
   internal::readVector(is, _measurement);
   return readInformationMatrix(is);
 }
 
-bool EdgeStereoSE3ProjectXYZ::write(std::ostream &os) const {
+bool EdgeStereoSE3ProjectXYZ::write(std::ostream& os) const {
   internal::writeVector(os, measurement());
   return writeInformationMatrix(os);
 }
 
 void EdgeStereoSE3ProjectXYZ::linearizeOplus() {
-  VertexSE3Expmap *vj = static_cast<VertexSE3Expmap *>(_vertices[1]);
+  VertexSE3Expmap* vj = static_cast<VertexSE3Expmap*>(_vertices[1]);
   SE3Quat T(vj->estimate());
-  VertexPointXYZ *vi = static_cast<VertexPointXYZ *>(_vertices[0]);
+  VertexPointXYZ* vi = static_cast<VertexPointXYZ*>(_vertices[0]);
   Vector3 xyz = vi->estimate();
   Vector3 xyz_trans = T.map(xyz);
 

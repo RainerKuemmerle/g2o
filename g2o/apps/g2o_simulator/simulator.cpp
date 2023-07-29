@@ -43,7 +43,7 @@ void BaseWorldObject::setVertex(OptimizableGraph::Vertex* vertex_) {
 }
 
 // BaseRobot
-OptimizableGraph* BaseRobot::graph() {
+OptimizableGraph* BaseRobot::graph() const {
   if (_world) return _world->graph();
   return 0;
 }
@@ -68,12 +68,12 @@ void BaseRobot::sense() {
 }
 
 // Sensor
-World* BaseSensor::world() {
+World* BaseSensor::world() const {
   if (!_robot) return 0;
   return _robot->world();
 }
 
-OptimizableGraph* BaseSensor::graph() {
+OptimizableGraph* BaseSensor::graph() const {
   if (!_robot) return 0;
   return _robot->graph();
 }

@@ -41,8 +41,8 @@ class G2O_TYPES_SBA_API EdgeProjectP2MC
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   EdgeProjectP2MC();
-  virtual bool read(std::istream &is);
-  virtual bool write(std::ostream &os) const;
+  virtual bool read(std::istream& is);
+  virtual bool write(std::ostream& os) const;
 
   //! return the error estimate as a 2-vector
   virtual void computeError();

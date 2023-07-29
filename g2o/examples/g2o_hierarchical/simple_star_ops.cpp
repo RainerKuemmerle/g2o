@@ -29,8 +29,8 @@
 #include <Eigen/Cholesky>
 #include <Eigen/Eigenvalues>
 #include <Eigen/LU>
-#include <iostream>
 #include <cassert>
+#include <iostream>
 
 #include "backbone_tree_action.h"
 #include "edge_types_cost_function.h"

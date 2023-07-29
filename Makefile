@@ -20,4 +20,3 @@ build/Makefile:
 	cd build; \
 	cmake ../; \
 	cd -
-

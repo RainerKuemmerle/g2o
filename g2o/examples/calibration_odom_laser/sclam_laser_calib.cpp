@@ -140,8 +140,8 @@ int main(int argc, char** argv) {
         OptimizableGraph::Vertex* v =
             static_cast<OptimizableGraph::Vertex*>(it->second);
         if (d.visited().count(v) == 0) {
-          cerr << "\t unvisited vertex " << it->first << " " << (void*)v
-               << endl;
+          cerr << "\t unvisited vertex " << it->first << " "
+               << static_cast<void*>(v) << endl;
           v->setFixed(true);
         }
       }

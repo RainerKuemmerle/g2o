@@ -36,12 +36,12 @@ EdgeSE3LotsOfXYZ::EdgeSE3LotsOfXYZ()
 }
 
 bool EdgeSE3LotsOfXYZ::setMeasurementFromState() {
-  VertexSE3 *pose = static_cast<VertexSE3 *>(_vertices[0]);
+  VertexSE3* pose = static_cast<VertexSE3*>(_vertices[0]);
 
   Eigen::Transform<double, 3, 1> poseinv = pose->estimate().inverse();
 
   for (unsigned int i = 0; i < _observedPoints; i++) {
-    VertexPointXYZ *xyz = static_cast<VertexPointXYZ *>(_vertices[1 + i]);
+    VertexPointXYZ* xyz = static_cast<VertexPointXYZ*>(_vertices[1 + i]);
     //      const Vector3 &pt = xyz->estimate();
     Vector3 m = poseinv * xyz->estimate();
 
@@ -54,10 +54,10 @@ bool EdgeSE3LotsOfXYZ::setMeasurementFromState() {
 }
 
 void EdgeSE3LotsOfXYZ::computeError() {
-  VertexSE3 *pose = static_cast<VertexSE3 *>(_vertices[0]);
+  VertexSE3* pose = static_cast<VertexSE3*>(_vertices[0]);
 
   for (unsigned int i = 0; i < _observedPoints; i++) {
-    VertexPointXYZ *xyz = static_cast<VertexPointXYZ *>(_vertices[1 + i]);
+    VertexPointXYZ* xyz = static_cast<VertexPointXYZ*>(_vertices[1 + i]);
     Vector3 m = pose->estimate().inverse() * xyz->estimate();
 
     unsigned int index = 3 * i;
@@ -68,7 +68,7 @@ void EdgeSE3LotsOfXYZ::computeError() {
 }
 
 void EdgeSE3LotsOfXYZ::linearizeOplus() {
-  g2o::VertexSE3 *pose = (g2o::VertexSE3 *)(_vertices[0]);
+  g2o::VertexSE3* pose = (g2o::VertexSE3*)(_vertices[0]);
 
   // initialize Ji matrix
   MatrixX Ji;
@@ -79,7 +79,7 @@ void EdgeSE3LotsOfXYZ::linearizeOplus() {
   Matrix3 poseRot = pose->estimate().inverse().rotation();
 
   for (unsigned int i = 1; i < _vertices.size(); i++) {
-    g2o::VertexPointXYZ *point = (g2o::VertexPointXYZ *)(_vertices[i]);
+    g2o::VertexPointXYZ* point = (g2o::VertexPointXYZ*)(_vertices[i]);
     Vector3 Zcam = pose->estimate().inverse() * point->estimate();
 
     unsigned int index = 3 * (i - 1);
@@ -110,7 +110,7 @@ void EdgeSE3LotsOfXYZ::linearizeOplus() {
   _jacobianOplus[0] = Ji;
 }
 
-bool EdgeSE3LotsOfXYZ::read(std::istream &is) {
+bool EdgeSE3LotsOfXYZ::read(std::istream& is) {
   is >> _observedPoints;
 
   setSize(_observedPoints + 1);
@@ -137,7 +137,7 @@ bool EdgeSE3LotsOfXYZ::read(std::istream &is) {
   return true;
 }
 
-bool EdgeSE3LotsOfXYZ::write(std::ostream &os) const {
+bool EdgeSE3LotsOfXYZ::write(std::ostream& os) const {
   // write number of observed points
   os << "|| " << _observedPoints;
 
@@ -157,14 +157,14 @@ bool EdgeSE3LotsOfXYZ::write(std::ostream &os) const {
   return os.good();
 }
 
-void EdgeSE3LotsOfXYZ::initialEstimate(const OptimizableGraph::VertexSet &fixed,
-                                       OptimizableGraph::Vertex *toEstimate) {
+void EdgeSE3LotsOfXYZ::initialEstimate(const OptimizableGraph::VertexSet& fixed,
+                                       OptimizableGraph::Vertex* toEstimate) {
   (void)toEstimate;
 
   assert(initialEstimatePossible(fixed, toEstimate) &&
          "Bad vertices specified");
 
-  VertexSE3 *pose = static_cast<VertexSE3 *>(_vertices[0]);
+  VertexSE3* pose = static_cast<VertexSE3*>(_vertices[0]);
 
 #ifdef _MSC_VER
   std::vector<bool> estimate_this(_observedPoints, true);
@@ -175,10 +175,10 @@ void EdgeSE3LotsOfXYZ::initialEstimate(const OptimizableGraph::VertexSet &fixed,
   }
 #endif
 
-  for (std::set<HyperGraph::Vertex *>::iterator it = fixed.begin();
+  for (std::set<HyperGraph::Vertex*>::iterator it = fixed.begin();
        it != fixed.end(); ++it) {
     for (unsigned int i = 1; i < _vertices.size(); i++) {
-      VertexPointXYZ *vert = static_cast<VertexPointXYZ *>(_vertices[i]);
+      VertexPointXYZ* vert = static_cast<VertexPointXYZ*>(_vertices[i]);
       if (vert->id() == (*it)->id()) estimate_this[i - 1] = false;
     }
   }
@@ -188,7 +188,7 @@ void EdgeSE3LotsOfXYZ::initialEstimate(const OptimizableGraph::VertexSet &fixed,
       unsigned int index = 3 * (i - 1);
       Vector3 submeas(_measurement[index], _measurement[index + 1],
                       _measurement[index + 2]);
-      VertexPointXYZ *vert = static_cast<VertexPointXYZ *>(_vertices[i]);
+      VertexPointXYZ* vert = static_cast<VertexPointXYZ*>(_vertices[i]);
       vert->setEstimate(pose->estimate() * submeas);
     }
   }
@@ -199,7 +199,7 @@ double EdgeSE3LotsOfXYZ::initialEstimatePossible(
     OptimizableGraph::Vertex* toEstimate) {
   (void)toEstimate;
 
-  for (std::set<HyperGraph::Vertex *>::iterator it = fixed.begin();
+  for (std::set<HyperGraph::Vertex*>::iterator it = fixed.begin();
        it != fixed.end(); ++it) {
     if (_vertices[0]->id() == (*it)->id()) {
       return 1.0;

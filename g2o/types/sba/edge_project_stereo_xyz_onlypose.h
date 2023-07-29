@@ -42,9 +42,9 @@ class G2O_TYPES_SBA_API EdgeStereoSE3ProjectXYZOnlyPose
 
   EdgeStereoSE3ProjectXYZOnlyPose() {}
 
-  bool read(std::istream &is);
+  bool read(std::istream& is);
 
-  bool write(std::ostream &os) const;
+  bool write(std::ostream& os) const;
 
   void computeError();
 
@@ -52,7 +52,7 @@ class G2O_TYPES_SBA_API EdgeStereoSE3ProjectXYZOnlyPose
 
   virtual void linearizeOplus();
 
-  Vector3 cam_project(const Vector3 &trans_xyz) const;
+  Vector3 cam_project(const Vector3& trans_xyz) const;
 
   Vector3 Xw;
   double fx, fy, cx, cy, bf;

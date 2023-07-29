@@ -28,7 +28,7 @@
 #define G2O_TYPES_ICP
 
 #define GICP_ANALYTIC_JACOBIANS
-//#define SCAM_ANALYTIC_JACOBIANS
+// #define SCAM_ANALYTIC_JACOBIANS
 
 #include <Eigen/Geometry>
 #include <iostream>
@@ -145,21 +145,21 @@ class G2O_TYPES_ICP_API Edge_V_V_GICP
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
   Edge_V_V_GICP() : pl_pl(false) {}
-  Edge_V_V_GICP(const Edge_V_V_GICP *e);
+  Edge_V_V_GICP(const Edge_V_V_GICP* e);
 
   // switch to go between point-plane and plane-plane
   bool pl_pl;
   Matrix3 cov0, cov1;
 
   // I/O functions
-  virtual bool read(std::istream &is);
-  virtual bool write(std::ostream &os) const;
+  virtual bool read(std::istream& is);
+  virtual bool write(std::ostream& os) const;
 
   // return the error estimate as a 3-vector
   void computeError() {
     // from <ViewPoint> to <Point>
-    const VertexSE3 *vp0 = static_cast<const VertexSE3 *>(_vertices[0]);
-    const VertexSE3 *vp1 = static_cast<const VertexSE3 *>(_vertices[1]);
+    const VertexSE3* vp0 = static_cast<const VertexSE3*>(_vertices[0]);
+    const VertexSE3* vp1 = static_cast<const VertexSE3*>(_vertices[1]);
 
     // get vp1 point into vp0 frame
     // could be more efficient if we computed this transform just once
@@ -232,8 +232,8 @@ class G2O_TYPES_ICP_API VertexSCam : public VertexSE3 {
   VertexSCam();
 
   // I/O
-  virtual bool read(std::istream &is);
-  virtual bool write(std::ostream &os) const;
+  virtual bool read(std::istream& is);
+  virtual bool write(std::ostream& os) const;
 
   // capture the update function to reset aux transforms
   virtual void oplusImpl(const double* update) {
@@ -311,7 +311,7 @@ class G2O_TYPES_ICP_API VertexSCam : public VertexSE3 {
   }
 
   // calculate stereo projection
-  void mapPoint(Vector3 &res, const Vector3 &pt3) {
+  void mapPoint(Vector3& res, const Vector3& pt3) {
     Vector4 pt;
     pt.head<3>() = pt3;
     pt(3) = cst(1.0);
@@ -345,15 +345,15 @@ class G2O_TYPES_ICP_API Edge_XYZ_VSC
 
   Edge_XYZ_VSC();
 
-  virtual bool read(std::istream &is);
-  virtual bool write(std::ostream &os) const;
+  virtual bool read(std::istream& is);
+  virtual bool write(std::ostream& os) const;
 
   // return the error estimate as a 2-vector
   void computeError() {
     // from <Point> to <Cam>
-    const VertexPointXYZ *point =
-        static_cast<const VertexPointXYZ *>(_vertices[0]);
-    VertexSCam *cam = static_cast<VertexSCam *>(_vertices[1]);
+    const VertexPointXYZ* point =
+        static_cast<const VertexPointXYZ*>(_vertices[0]);
+    VertexSCam* cam = static_cast<VertexSCam*>(_vertices[1]);
     // cam->setAll();
 
     // calculate the projection

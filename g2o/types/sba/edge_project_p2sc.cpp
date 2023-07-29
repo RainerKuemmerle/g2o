@@ -32,12 +32,12 @@ namespace g2o {
 EdgeProjectP2SC::EdgeProjectP2SC()
     : BaseBinaryEdge<3, Vector3, VertexPointXYZ, VertexCam>() {}
 
-bool EdgeProjectP2SC::read(std::istream &is) {
+bool EdgeProjectP2SC::read(std::istream& is) {
   internal::readVector(is, _measurement);
   return readInformationMatrix(is);
 }
 
-bool EdgeProjectP2SC::write(std::ostream &os) const {
+bool EdgeProjectP2SC::write(std::ostream& os) const {
   internal::writeVector(os, measurement());
   writeInformationMatrix(os);
   return os.good();
@@ -46,16 +46,16 @@ bool EdgeProjectP2SC::write(std::ostream &os) const {
 // return the error estimate as a 2-vector
 void EdgeProjectP2SC::computeError() {
   // from <Point> to <Cam>
-  const VertexPointXYZ *point =
-      static_cast<const VertexPointXYZ *>(_vertices[0]);
-  VertexCam *cam = static_cast<VertexCam *>(_vertices[1]);
+  const VertexPointXYZ* point =
+      static_cast<const VertexPointXYZ*>(_vertices[0]);
+  VertexCam* cam = static_cast<VertexCam*>(_vertices[1]);
 
   // calculate the projection
   Vector3 kp;
   Vector4 pt;
   pt.head<3>() = point->estimate();
   pt(3) = 1;
-  const SBACam &nd = cam->estimate();
+  const SBACam& nd = cam->estimate();
   // these should be already ok
   /* nd.setTransform(); */
   /* nd.setProjection(); */
@@ -85,10 +85,10 @@ void EdgeProjectP2SC::computeError() {
 }
 
 void EdgeProjectP2SC::linearizeOplus() {
-  VertexCam *vc = static_cast<VertexCam *>(_vertices[1]);
-  const SBACam &cam = vc->estimate();
+  VertexCam* vc = static_cast<VertexCam*>(_vertices[1]);
+  const SBACam& cam = vc->estimate();
 
-  VertexPointXYZ *vp = static_cast<VertexPointXYZ *>(_vertices[0]);
+  VertexPointXYZ* vp = static_cast<VertexPointXYZ*>(_vertices[0]);
   Vector4 pt, trans;
   pt.head<3>() = vp->estimate();
   pt(3) = 1.0;

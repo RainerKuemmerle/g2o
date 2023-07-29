@@ -26,8 +26,8 @@
 
 #include "edge_se2_offset.h"
 
-#include <iostream>
 #include <cassert>
+#include <iostream>
 
 #include "parameter_se2_offset.h"
 

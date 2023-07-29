@@ -88,9 +88,8 @@ class G2O_SIMULATOR_API BaseRobot {
   }
   void setWorld(World* world_) { _world = world_; }
   World* world() const { return _world; }
-  World* world() { return _world; }
   const std::string& name() const { return _name; }
-  OptimizableGraph* graph();
+  OptimizableGraph* graph() const;
   bool addSensor(BaseSensor* sensor);
   const std::set<BaseSensor*> sensors() { return _sensors; }
   virtual void sense();
@@ -162,9 +161,9 @@ class G2O_SIMULATOR_API BaseSensor {
   BaseSensor(const std::string& name_) { _name = name_; }
   inline BaseRobot* robot() { return _robot; }
   inline void setRobot(BaseRobot* robot_) { _robot = robot_; }
-  World* world();
-  OptimizableGraph* graph();
-  std::vector<Parameter*> parameters() { return _parameters; }
+  World* world() const;
+  OptimizableGraph* graph() const;
+  const std::vector<Parameter*>& parameters() { return _parameters; }
   virtual void sense() = 0;
   virtual void addParameters() {}
 

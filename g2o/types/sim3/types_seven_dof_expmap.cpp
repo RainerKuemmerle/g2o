@@ -58,7 +58,7 @@ VertexSim3Expmap::VertexSim3Expmap() : BaseVertex<7, Sim3>() {
 EdgeSim3::EdgeSim3()
     : BaseBinaryEdge<7, Sim3, VertexSim3Expmap, VertexSim3Expmap>() {}
 
-bool VertexSim3Expmap::read(std::istream &is) {
+bool VertexSim3Expmap::read(std::istream& is) {
   Vector7 cam2world;
   bool state = true;
   state &= internal::readVector(is, cam2world);
@@ -68,7 +68,7 @@ bool VertexSim3Expmap::read(std::istream &is) {
   return state;
 }
 
-bool VertexSim3Expmap::write(std::ostream &os) const {
+bool VertexSim3Expmap::write(std::ostream& os) const {
   Sim3 cam2world(estimate().inverse());
   Vector7 lv = cam2world.log();
   internal::writeVector(os, lv);
@@ -77,7 +77,7 @@ bool VertexSim3Expmap::write(std::ostream &os) const {
   return os.good();
 }
 
-bool EdgeSim3::read(std::istream &is) {
+bool EdgeSim3::read(std::istream& is) {
   Vector7 v7;
   internal::readVector(is, v7);
   Sim3 cam2world(v7);
@@ -85,7 +85,7 @@ bool EdgeSim3::read(std::istream &is) {
   return readInformationMatrix(is);
 }
 
-bool EdgeSim3::write(std::ostream &os) const {
+bool EdgeSim3::write(std::ostream& os) const {
   Sim3 cam2world(measurement().inverse());
   internal::writeVector(os, cam2world.log());
   return writeInformationMatrix(os);
@@ -93,12 +93,12 @@ bool EdgeSim3::write(std::ostream &os) const {
 
 #if G2O_SIM3_JACOBIAN
 void EdgeSim3::linearizeOplus() {
-  VertexSim3Expmap *v1 = static_cast<VertexSim3Expmap *>(_vertices[0]);
-  VertexSim3Expmap *v2 = static_cast<VertexSim3Expmap *>(_vertices[1]);
+  VertexSim3Expmap* v1 = static_cast<VertexSim3Expmap*>(_vertices[0]);
+  VertexSim3Expmap* v2 = static_cast<VertexSim3Expmap*>(_vertices[1]);
   const Sim3 Si(v1->estimate());  // Siw
   const Sim3 Sj(v2->estimate());
 
-  const Sim3 &Sji = _measurement;
+  const Sim3& Sji = _measurement;
 
   // error in Lie Algebra
   const Eigen::Matrix<double, 7, 1> error = (Sji * Si * Sj.inverse()).log();
@@ -146,12 +146,12 @@ void EdgeSim3::linearizeOplus() {
 EdgeSim3ProjectXYZ::EdgeSim3ProjectXYZ()
     : BaseBinaryEdge<2, Vector2, VertexPointXYZ, VertexSim3Expmap>() {}
 
-bool EdgeSim3ProjectXYZ::read(std::istream &is) {
+bool EdgeSim3ProjectXYZ::read(std::istream& is) {
   internal::readVector(is, _measurement);
   return readInformationMatrix(is);
 }
 
-bool EdgeSim3ProjectXYZ::write(std::ostream &os) const {
+bool EdgeSim3ProjectXYZ::write(std::ostream& os) const {
   internal::writeVector(os, _measurement);
   return writeInformationMatrix(os);
 }
@@ -159,12 +159,12 @@ bool EdgeSim3ProjectXYZ::write(std::ostream &os) const {
 EdgeInverseSim3ProjectXYZ::EdgeInverseSim3ProjectXYZ()
     : BaseBinaryEdge<2, Vector2, VertexPointXYZ, VertexSim3Expmap>() {}
 
-bool EdgeInverseSim3ProjectXYZ::read(std::istream &is) {
+bool EdgeInverseSim3ProjectXYZ::read(std::istream& is) {
   internal::readVector(is, _measurement);
   return readInformationMatrix(is);
 }
 
-bool EdgeInverseSim3ProjectXYZ::write(std::ostream &os) const {
+bool EdgeInverseSim3ProjectXYZ::write(std::ostream& os) const {
   internal::writeVector(os, _measurement);
   return writeInformationMatrix(os);
 }

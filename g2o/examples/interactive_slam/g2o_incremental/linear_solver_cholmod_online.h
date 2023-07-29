@@ -19,6 +19,7 @@
 
 #include <camd.h>
 #include <cholmod.h>
+
 #include <cassert>
 
 #include "g2o/core/batch_stats.h"

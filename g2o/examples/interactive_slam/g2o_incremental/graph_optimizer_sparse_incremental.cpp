@@ -150,7 +150,7 @@ int SparseOptimizerIncremental::optimize(int iterations, bool online) {
     // get the current cholesky factor along with the permutation
     _L = _solverInterface->L();
     if (_perm.size() < (int)_L->n) _perm.resize(2 * _L->n);
-    int* p = (int*)_L->Perm;
+    int* p = static_cast<int*>(_L->Perm);
     for (size_t i = 0; i < _L->n; ++i) _perm[p[i]] = i;
 
   } else {

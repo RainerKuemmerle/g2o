@@ -623,7 +623,7 @@ YY_DECL {
 
       YY_DO_BEFORE_ACTION;
 
-    do_action:          /* This label is used only to access EOF actions. */
+    do_action: /* This label is used only to access EOF actions. */
 
       switch (yy_act) { /* beginning of action switch */
         case 0:         /* must back up */

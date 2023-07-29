@@ -26,9 +26,9 @@
 
 #include "gm2dl_io.h"
 
+#include <cassert>
 #include <fstream>
 #include <iostream>
-#include <cassert>
 
 #include "g2o/core/factory.h"
 #include "g2o/core/sparse_optimizer.h"
