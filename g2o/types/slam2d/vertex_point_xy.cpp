@@ -51,26 +51,6 @@ bool VertexPointXY::write(std::ostream& os) const {
   return internal::writeVector(os, estimate());
 }
 
-VertexPointXYWriteGnuplotAction::VertexPointXYWriteGnuplotAction()
-    : WriteGnuplotAction(typeid(VertexPointXY).name()) {}
-
-bool VertexPointXYWriteGnuplotAction::operator()(
-    HyperGraph::HyperGraphElement& element,
-    const std::shared_ptr<HyperGraphElementAction::Parameters>& params) {
-  if (typeid(element).name() != typeName_) return false;
-
-  auto* gnuplot_params =
-      static_cast<WriteGnuplotAction::Parameters*>(params.get());
-  if (!gnuplot_params->os) {
-    return false;
-  }
-
-  auto* v = static_cast<VertexPointXY*>(&element);
-  *(gnuplot_params->os) << v->estimate().x() << " " << v->estimate().y()
-                        << std::endl;
-  return true;
-}
-
 #ifdef G2O_HAVE_OPENGL
 VertexPointXYDrawAction::VertexPointXYDrawAction()
     : DrawAction(typeid(VertexPointXY).name()), pointSize_(nullptr) {}

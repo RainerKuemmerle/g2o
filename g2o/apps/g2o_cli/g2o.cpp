@@ -53,9 +53,21 @@
 #include "g2o/stuff/string_tools.h"
 #include "g2o/stuff/timeutil.h"
 #include "g2o_common.h"
-#include "output_helper.h"
 
-static bool hasToStop = false;
+namespace {
+bool hasToStop = false;
+
+void sigquit_handler(int sig) {
+  if (sig == SIGINT) {
+    hasToStop = true;
+    static int cnt = 0;
+    if (cnt++ == 2) {
+      std::cerr << __PRETTY_FUNCTION__ << " forcing exit" << std::endl;
+      exit(1);
+    }
+  }
+}
+}  // namespace
 
 using g2o::HyperGraph;
 using g2o::OptimizableGraph;
@@ -93,23 +105,11 @@ struct IncrementalEdgesCompare {
   }
 };
 
-void sigquit_handler(int sig) {
-  if (sig == SIGINT) {
-    hasToStop = true;
-    static int cnt = 0;
-    if (cnt++ == 2) {
-      cerr << __PRETTY_FUNCTION__ << " forcing exit" << endl;
-      exit(1);
-    }
-  }
-}
-
 int main(int argc, char** argv) {
   OptimizableGraph::initMultiThreading();
   int maxIterations;
   bool verbose;
   string inputFilename;
-  string gnudump;
   string outputfilename;
   string solverProperties;
   string strSolver;
@@ -121,7 +121,6 @@ int main(int argc, char** argv) {
   bool listSolvers;
   bool listRobustKernels;
   bool incremental;
-  bool guiOut;
   int gaugeId;
   string robustKernel;
   bool computeMarginals;
@@ -149,14 +148,12 @@ int main(int argc, char** argv) {
             "initial guess based on odometry");
   arg.param("inc", incremental, false, "run incremetally");
   arg.param("update", updateGraphEachN, 10, "updates after x odometry nodes");
-  arg.param("guiout", guiOut, false, "gui output while running incrementally");
   arg.param("marginalize", marginalize, false, "on or off");
   arg.param("printSolverProperties", printSolverProperties, false,
             "print the properties of the solver");
   arg.param("solverProperties", solverProperties, "",
             "set the internal properties of a solver,\n\te.g., "
             "initialLambda=0.0001,maxTrialsAfterFailure=2");
-  arg.param("gnudump", gnudump, "", "dump to gnuplot data file");
   arg.param("robustKernel", robustKernel, "", "use this robust error function");
   arg.param("robustKernelWidth", huberWidth, -1.,
             "width for the robust Kernel (only if robustKernel)");
@@ -416,7 +413,6 @@ int main(int argc, char** argv) {
       cerr << "# Setting default number of iterations" << endl;
       incIterations = 1;
     }
-    int updateDisplayEveryN = updateGraphEachN;
     int maxDim = 0;
 
     cerr << "# incremental settings" << endl;
@@ -444,7 +440,6 @@ int main(int argc, char** argv) {
     double cumTime = 0.;
     int vertexCount = 0;
     int lastOptimizedVertexCount = 0;
-    int lastVisUpdateVertexCount = 0;
     bool freshlyOptimized = false;
     bool firstRound = true;
     HyperGraph::VertexSet verticesAdded;
@@ -565,13 +560,6 @@ int main(int argc, char** argv) {
           }
           lastOptimizedVertexCount = vertexCount;
           freshlyOptimized = true;
-
-          if (guiOut) {
-            if (vertexCount - lastVisUpdateVertexCount >= updateDisplayEveryN) {
-              dumpEdges(cout, optimizer);
-              lastVisUpdateVertexCount = vertexCount;
-            }
-          }
         }
 
         if (!verbose) cerr << ".";
@@ -704,14 +692,6 @@ int main(int argc, char** argv) {
         os << bsc[i] << endl;
       }
       cerr << "done." << endl;
-    }
-  }
-
-  // saving again
-  if (!gnudump.empty()) {
-    bool gnuPlotStatus = saveGnuplot(gnudump, optimizer);
-    if (!gnuPlotStatus) {
-      cerr << "Error while writing gnuplot files" << endl;
     }
   }
 

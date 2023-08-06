@@ -86,31 +86,6 @@ void EdgeSE2PointXY::linearizeOplus() {
 }
 #endif
 
-EdgeSE2PointXYWriteGnuplotAction::EdgeSE2PointXYWriteGnuplotAction()
-    : WriteGnuplotAction(typeid(EdgeSE2PointXY).name()) {}
-
-bool EdgeSE2PointXYWriteGnuplotAction::operator()(
-    HyperGraph::HyperGraphElement& element,
-    const std::shared_ptr<HyperGraphElementAction::Parameters>& params_) {
-  if (typeid(element).name() != typeName_) return false;
-  auto* params = static_cast<WriteGnuplotAction::Parameters*>(params_.get());
-  if (!params->os) {
-    return false;
-  }
-
-  auto* e = static_cast<EdgeSE2PointXY*>(&element);
-  if (e->numUndefinedVertices()) return true;
-  auto fromEdge = e->vertexXn<0>();
-  auto toEdge = e->vertexXn<1>();
-  *(params->os) << fromEdge->estimate().translation().x() << " "
-                << fromEdge->estimate().translation().y() << " "
-                << fromEdge->estimate().rotation().angle() << std::endl;
-  *(params->os) << toEdge->estimate().x() << " " << toEdge->estimate().y()
-                << std::endl;
-  *(params->os) << std::endl;
-  return true;
-}
-
 #ifdef G2O_HAVE_OPENGL
 EdgeSE2PointXYDrawAction::EdgeSE2PointXYDrawAction()
     : DrawAction(typeid(EdgeSE2PointXY).name()) {}

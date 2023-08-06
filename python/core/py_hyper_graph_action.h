@@ -12,7 +12,6 @@ inline void delcareHyperGraphAction(py::module& m) {
   // class G2O_CORE_API HyperGraphElementAction{
   // class G2O_CORE_API HyperGraphElementActionCollection: public
   // HyperGraphElementAction{ class G2O_CORE_API HyperGraphActionLibrary{ class
-  // G2O_CORE_API WriteGnuplotAction: public HyperGraphElementAction{ class
   // G2O_CORE_API DrawAction : public HyperGraphElementAction{ class
   // RegisterActionProxy void G2O_CORE_API applyAction
 }

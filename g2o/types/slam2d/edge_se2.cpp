@@ -82,32 +82,6 @@ void EdgeSE2::linearizeOplus() {
 }
 #endif
 
-EdgeSE2WriteGnuplotAction::EdgeSE2WriteGnuplotAction()
-    : WriteGnuplotAction(typeid(EdgeSE2).name()) {}
-
-bool EdgeSE2WriteGnuplotAction::operator()(
-    HyperGraph::HyperGraphElement& element,
-    const std::shared_ptr<HyperGraphElementAction::Parameters>& params_) {
-  if (typeid(element).name() != typeName_) return false;
-  auto params =
-      std::static_pointer_cast<WriteGnuplotAction::Parameters>(params_);
-  if (!params->os) {
-    return false;
-  }
-
-  auto* e = static_cast<EdgeSE2*>(&element);
-  auto fromEdge = e->vertexXn<0>();
-  auto toEdge = e->vertexXn<1>();
-  *(params->os) << fromEdge->estimate().translation().x() << " "
-                << fromEdge->estimate().translation().y() << " "
-                << fromEdge->estimate().rotation().angle() << std::endl;
-  *(params->os) << toEdge->estimate().translation().x() << " "
-                << toEdge->estimate().translation().y() << " "
-                << toEdge->estimate().rotation().angle() << std::endl;
-  *(params->os) << std::endl;
-  return true;
-}
-
 #ifdef G2O_HAVE_OPENGL
 EdgeSE2DrawAction::EdgeSE2DrawAction()
     : DrawAction(typeid(EdgeSE2).name()),

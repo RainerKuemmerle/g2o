@@ -72,7 +72,7 @@ class G2O_TYPES_SLAM2D_API EdgeSE2
     return true;
   }
 
-  int measurementDimension() const override { return 3; }
+  [[nodiscard]] int measurementDimension() const override { return 3; }
 
   bool setMeasurementFromState() override {
     const VertexSE2* v1 = vertexXnRaw<0>();
@@ -93,15 +93,6 @@ class G2O_TYPES_SLAM2D_API EdgeSE2
 #endif
  protected:
   SE2 inverseMeasurement_;
-};
-
-class G2O_TYPES_SLAM2D_API EdgeSE2WriteGnuplotAction
-    : public WriteGnuplotAction {
- public:
-  EdgeSE2WriteGnuplotAction();
-  bool operator()(HyperGraph::HyperGraphElement& element,
-                  const std::shared_ptr<HyperGraphElementAction::Parameters>&
-                      params_) override;
 };
 
 #ifdef G2O_HAVE_OPENGL

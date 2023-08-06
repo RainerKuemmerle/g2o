@@ -1,6 +1,5 @@
 add_library(g2o_cli_library ${G2O_LIB_TYPE}
   dl_wrapper.cpp dl_wrapper.h
-  output_helper.cpp output_helper.h
   g2o_common.cpp g2o_common.h
   g2o_cli_api.h
 )

@@ -64,7 +64,7 @@ class G2O_TYPES_SLAM2D_API VertexSE2 : public BaseVertex<3, SE2> {
     return true;
   }
 
-  int estimateDimension() const override { return 3; }
+  [[nodiscard]] int estimateDimension() const override { return 3; }
 
   bool setMinimalEstimateDataImpl(const double* est) override {
     return setEstimateData(est);
@@ -74,19 +74,10 @@ class G2O_TYPES_SLAM2D_API VertexSE2 : public BaseVertex<3, SE2> {
     return getEstimateData(est);
   }
 
-  int minimalEstimateDimension() const override { return 3; }
+  [[nodiscard]] int minimalEstimateDimension() const override { return 3; }
 
   bool read(std::istream& is) override;
   bool write(std::ostream& os) const override;
-};
-
-class G2O_TYPES_SLAM2D_API VertexSE2WriteGnuplotAction
-    : public WriteGnuplotAction {
- public:
-  VertexSE2WriteGnuplotAction();
-  bool operator()(HyperGraph::HyperGraphElement& element,
-                  const std::shared_ptr<HyperGraphElementAction::Parameters>&
-                      parameters) override;
 };
 
 #ifdef G2O_HAVE_OPENGL

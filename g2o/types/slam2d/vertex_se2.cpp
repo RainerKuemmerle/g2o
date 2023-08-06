@@ -46,26 +46,6 @@ bool VertexSE2::write(std::ostream& os) const {
   return internal::writeVector(os, estimate().toVector());
 }
 
-VertexSE2WriteGnuplotAction::VertexSE2WriteGnuplotAction()
-    : WriteGnuplotAction(typeid(VertexSE2).name()) {}
-
-bool VertexSE2WriteGnuplotAction::operator()(
-    HyperGraph::HyperGraphElement& element,
-    const std::shared_ptr<HyperGraphElementAction::Parameters>& parameters) {
-  if (typeid(element).name() != typeName_) return false;
-  auto params =
-      std::static_pointer_cast<WriteGnuplotAction::Parameters>(parameters);
-  if (!params || !params->os) {
-    return false;
-  }
-
-  auto* v = static_cast<VertexSE2*>(&element);
-  *(params->os) << v->estimate().translation().x() << " "
-                << v->estimate().translation().y() << " "
-                << v->estimate().rotation().angle() << std::endl;
-  return true;
-}
-
 #ifdef G2O_HAVE_OPENGL
 VertexSE2DrawAction::VertexSE2DrawAction()
     : DrawAction(typeid(VertexSE2).name()),

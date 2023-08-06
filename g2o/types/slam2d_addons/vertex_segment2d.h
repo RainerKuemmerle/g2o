@@ -42,10 +42,10 @@ class G2O_TYPES_SLAM2D_ADDONS_API VertexSegment2D
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
   VertexSegment2D();
 
-  Vector2 estimateP1() const {
+  [[nodiscard]] Vector2 estimateP1() const {
     return Eigen::Map<const Vector2>(estimate_.data());
   }
-  Vector2 estimateP2() const {
+  [[nodiscard]] Vector2 estimateP2() const {
     return Eigen::Map<const Vector2>(&(estimate_[2]));
   }
   void setEstimateP1(const Vector2& p1) {
@@ -71,7 +71,7 @@ class G2O_TYPES_SLAM2D_ADDONS_API VertexSegment2D
     return true;
   }
 
-  int estimateDimension() const override { return 4; }
+  [[nodiscard]] int estimateDimension() const override { return 4; }
 
   bool setMinimalEstimateDataImpl(const double* est) override {
     return setEstimateData(est);
@@ -81,7 +81,7 @@ class G2O_TYPES_SLAM2D_ADDONS_API VertexSegment2D
     return getEstimateData(est);
   }
 
-  int minimalEstimateDimension() const override { return 4; }
+  [[nodiscard]] int minimalEstimateDimension() const override { return 4; }
 
   void oplusImpl(const VectorX::MapType& update) override {
     estimate_ += update.head<kDimension>();
@@ -89,15 +89,6 @@ class G2O_TYPES_SLAM2D_ADDONS_API VertexSegment2D
 
   bool read(std::istream& is) override;
   bool write(std::ostream& os) const override;
-};
-
-class G2O_TYPES_SLAM2D_ADDONS_API VertexSegment2DWriteGnuplotAction
-    : public WriteGnuplotAction {
- public:
-  VertexSegment2DWriteGnuplotAction();
-  bool operator()(HyperGraph::HyperGraphElement& element,
-                  const std::shared_ptr<HyperGraphElementAction::Parameters>&
-                      params_) override;
 };
 
 #ifdef G2O_HAVE_OPENGL

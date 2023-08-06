@@ -87,22 +87,4 @@ bool VertexPointXYZDrawAction::operator()(
 }
 #endif
 
-VertexPointXYZWriteGnuplotAction::VertexPointXYZWriteGnuplotAction()
-    : WriteGnuplotAction(typeid(VertexPointXYZ).name()) {}
-
-bool VertexPointXYZWriteGnuplotAction::operator()(
-    HyperGraph::HyperGraphElement& element,
-    const std::shared_ptr<HyperGraphElementAction::Parameters>& params_) {
-  if (typeid(element).name() != typeName_) return false;
-  auto* params = static_cast<WriteGnuplotAction::Parameters*>(params_.get());
-  if (!params->os) {
-    return false;
-  }
-
-  auto* v = static_cast<VertexPointXYZ*>(&element);
-  *(params->os) << v->estimate().x() << " " << v->estimate().y() << " "
-                << v->estimate().z() << " " << std::endl;
-  return true;
-}
-
 }  // namespace g2o

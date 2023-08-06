@@ -41,13 +41,14 @@ class EdgeSE2Segment2DLine
                                               // in MSVC
 {
  public:
-  G2O_TYPES_SLAM2D_ADDONS_API EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+  G2O_TYPES_SLAM2D_ADDONS_API EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
 
-      G2O_TYPES_SLAM2D_ADDONS_API double
-      theta() const {
+  G2O_TYPES_SLAM2D_ADDONS_API [[nodiscard]] double theta() const {
     return measurement_[0];
   }
-  G2O_TYPES_SLAM2D_ADDONS_API double rho() const { return measurement_[1]; }
+  G2O_TYPES_SLAM2D_ADDONS_API [[nodiscard]] double rho() const {
+    return measurement_[1];
+  }
 
   G2O_TYPES_SLAM2D_ADDONS_API void setTheta(double t) { measurement_[0] = t; }
   G2O_TYPES_SLAM2D_ADDONS_API void setRho(double r) { measurement_[1] = r; }
@@ -82,7 +83,8 @@ class EdgeSE2Segment2DLine
     return true;
   }
 
-  G2O_TYPES_SLAM2D_ADDONS_API int measurementDimension() const override {
+  G2O_TYPES_SLAM2D_ADDONS_API [[nodiscard]] int measurementDimension()
+      const override {
     return 2;
   }
 
@@ -108,26 +110,6 @@ class EdgeSE2Segment2DLine
   /*       virtual void linearizeOplus(); */
   /* #endif */
 };
-
-/*   class G2O_TYPES_SLAM2D_ADDONS_API EdgeSE2Segment2DLineWriteGnuplotAction:
- * public WriteGnuplotAction { */
-/*   public: */
-/*     EdgeSE2Segment2DLineWriteGnuplotAction(); */
-/*     virtual HyperGraphElementAction*
- * operator()(HyperGraph::HyperGraphElement* element,  */
-/*             HyperGraphElementAction::Parameters* params_); */
-/*   }; */
-
-/* #ifdef G2O_HAVE_OPENGL */
-/*   class G2O_TYPES_SLAM2D_ADDONS_API EdgeSE2Segment2DLineDrawAction: public
- * DrawAction{ */
-/*   public: */
-/*     EdgeSE2Segment2DLineDrawAction(); */
-/*     virtual HyperGraphElementAction*
- * operator()(HyperGraph::HyperGraphElement* element,  */
-/*             HyperGraphElementAction::Parameters* params_); */
-/*   }; */
-/* #endif */
 
 }  // namespace g2o
 

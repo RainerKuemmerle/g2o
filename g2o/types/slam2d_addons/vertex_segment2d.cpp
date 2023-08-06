@@ -50,28 +50,6 @@ bool VertexSegment2D::write(std::ostream& os) const {
   return internal::writeVector(os, estimate());
 }
 
-VertexSegment2DWriteGnuplotAction::VertexSegment2DWriteGnuplotAction()
-    : WriteGnuplotAction(typeid(VertexSegment2D).name()) {}
-
-bool VertexSegment2DWriteGnuplotAction::operator()(
-    HyperGraph::HyperGraphElement& element,
-    const std::shared_ptr<HyperGraphElementAction::Parameters>& params_) {
-  if (typeid(element).name() != typeName_) return false;
-
-  auto* params = static_cast<WriteGnuplotAction::Parameters*>(params_.get());
-  if (!params->os) {
-    return false;
-  }
-
-  auto* v = static_cast<VertexSegment2D*>(&element);
-  *(params->os) << v->estimateP1().x() << " " << v->estimateP1().y()
-                << std::endl;
-  *(params->os) << v->estimateP2().x() << " " << v->estimateP2().y()
-                << std::endl;
-  *(params->os) << std::endl;
-  return true;
-}
-
 #ifdef G2O_HAVE_OPENGL
 VertexSegment2DDrawAction::VertexSegment2DDrawAction()
     : DrawAction(typeid(VertexSegment2D).name()), pointSize_(nullptr) {}

@@ -39,7 +39,6 @@
 #include "edge_labeler.h"
 #include "g2o/apps/g2o_cli/dl_wrapper.h"
 #include "g2o/apps/g2o_cli/g2o_common.h"
-#include "g2o/apps/g2o_cli/output_helper.h"
 #include "g2o/core/eigen_types.h"
 #include "g2o/core/estimate_propagator.h"
 #include "g2o/core/factory.h"

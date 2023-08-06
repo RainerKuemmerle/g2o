@@ -73,7 +73,7 @@ class G2O_TYPES_SLAM3D_API VertexSE3 : public BaseVertex<6, Isometry3> {
     return true;
   }
 
-  int estimateDimension() const override { return 7; }
+  [[nodiscard]] int estimateDimension() const override { return 7; }
 
   bool setMinimalEstimateDataImpl(const double* est) override {
     Eigen::Map<const Vector6> v(est);
@@ -87,7 +87,7 @@ class G2O_TYPES_SLAM3D_API VertexSE3 : public BaseVertex<6, Isometry3> {
     return true;
   }
 
-  int minimalEstimateDimension() const override { return 6; }
+  [[nodiscard]] int minimalEstimateDimension() const override { return 6; }
 
   /**
    * update the position of this vertex. The update is in the form
@@ -118,17 +118,6 @@ class G2O_TYPES_SLAM3D_API VertexSE3 : public BaseVertex<6, Isometry3> {
  protected:
   int numOplusCalls_ = 0;  ///< store how often opluse was called to trigger
                            ///< orthogonaliation of the rotation matrix
-};
-
-/**
- * \brief write the vertex to some Gnuplot data file
- */
-class VertexSE3WriteGnuplotAction : public WriteGnuplotAction {
- public:
-  VertexSE3WriteGnuplotAction();
-  bool operator()(HyperGraph::HyperGraphElement& element,
-                  const std::shared_ptr<HyperGraphElementAction::Parameters>&
-                      params_) override;
 };
 
 #ifdef G2O_HAVE_OPENGL

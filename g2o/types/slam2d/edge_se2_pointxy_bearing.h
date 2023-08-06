@@ -58,7 +58,7 @@ class G2O_TYPES_SLAM2D_API EdgeSE2PointXYBearing
     return true;
   }
 
-  int measurementDimension() const override { return 1; }
+  [[nodiscard]] int measurementDimension() const override { return 1; }
 
   bool setMeasurementFromState() override {
     const VertexSE2* v1 = vertexXnRaw<0>();
@@ -77,15 +77,6 @@ class G2O_TYPES_SLAM2D_API EdgeSE2PointXYBearing
   }
   void initialEstimate(const OptimizableGraph::VertexSet& from,
                        OptimizableGraph::Vertex* to) override;
-};
-
-class G2O_TYPES_SLAM2D_API EdgeSE2PointXYBearingWriteGnuplotAction
-    : public WriteGnuplotAction {
- public:
-  EdgeSE2PointXYBearingWriteGnuplotAction();
-  bool operator()(HyperGraph::HyperGraphElement& element,
-                  const std::shared_ptr<HyperGraphElementAction::Parameters>&
-                      params_) override;
 };
 
 #ifdef G2O_HAVE_OPENGL

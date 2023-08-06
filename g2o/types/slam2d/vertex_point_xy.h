@@ -55,7 +55,7 @@ class G2O_TYPES_SLAM2D_API VertexPointXY : public BaseVertex<2, Vector2> {
     return true;
   }
 
-  int estimateDimension() const override { return 2; }
+  [[nodiscard]] int estimateDimension() const override { return 2; }
 
   bool setMinimalEstimateDataImpl(const double* est) override {
     return setEstimateData(est);
@@ -65,7 +65,7 @@ class G2O_TYPES_SLAM2D_API VertexPointXY : public BaseVertex<2, Vector2> {
     return getEstimateData(est);
   }
 
-  int minimalEstimateDimension() const override { return 2; }
+  [[nodiscard]] int minimalEstimateDimension() const override { return 2; }
 
   void oplusImpl(const VectorX::MapType& update) override {
     estimate_ += update.head<2>();
@@ -73,15 +73,6 @@ class G2O_TYPES_SLAM2D_API VertexPointXY : public BaseVertex<2, Vector2> {
 
   bool read(std::istream& is) override;
   bool write(std::ostream& os) const override;
-};
-
-class G2O_TYPES_SLAM2D_API VertexPointXYWriteGnuplotAction
-    : public WriteGnuplotAction {
- public:
-  VertexPointXYWriteGnuplotAction();
-  bool operator()(HyperGraph::HyperGraphElement& element,
-                  const std::shared_ptr<HyperGraphElementAction::Parameters>&
-                      params) override;
 };
 
 #ifdef G2O_HAVE_OPENGL

@@ -38,7 +38,6 @@
 #include "edge_types_cost_function.h"
 #include "g2o/apps/g2o_cli/dl_wrapper.h"
 #include "g2o/apps/g2o_cli/g2o_common.h"
-#include "g2o/apps/g2o_cli/output_helper.h"
 #include "g2o/core/estimate_propagator.h"
 #include "g2o/core/factory.h"
 #include "g2o/core/hyper_dijkstra.h"
@@ -65,7 +64,8 @@ using std::cerr;
 using std::endl;
 using std::string;
 
-static bool hasToStop = false;
+namespace {
+bool hasToStop = false;
 
 void sigquit_handler(int sig) {
   if (sig == SIGINT) {
@@ -77,6 +77,7 @@ void sigquit_handler(int sig) {
     }
   }
 }
+}  // namespace
 
 /*
 // string newTypesMapping=

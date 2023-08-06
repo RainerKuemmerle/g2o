@@ -52,13 +52,15 @@ class G2O_TYPES_SLAM2D_API ParameterSE2Offset : public Parameter {
    */
   void setOffset(const SE2& offset_ = SE2());
 
-  const SE2& offset() const { return offset_; }
+  [[nodiscard]] const SE2& offset() const { return offset_; }
 
   //! rotation of the offset as 2x2 rotation matrix
-  const Isometry2& offsetMatrix() const { return offsetMatrix_; }
+  [[nodiscard]] const Isometry2& offsetMatrix() const { return offsetMatrix_; }
 
   //! rotation of the inverse offset as 2x2 rotation matrix
-  const Isometry2& inverseOffsetMatrix() const { return inverseOffsetMatrix_; }
+  [[nodiscard]] const Isometry2& inverseOffsetMatrix() const {
+    return inverseOffsetMatrix_;
+  }
 
  protected:
   SE2 offset_;
@@ -77,19 +79,21 @@ class G2O_TYPES_SLAM2D_API CacheSE2Offset : public Cache {
   CacheSE2Offset() = default;
   void updateImpl() override;
 
-  std::shared_ptr<ParameterSE2Offset> offsetParam() const {
+  [[nodiscard]] std::shared_ptr<ParameterSE2Offset> offsetParam() const {
     return std::static_pointer_cast<ParameterSE2Offset>(parameters_[0]);
   }
 
-  const SE2& w2n() const { return se2_w2n_; }
-  const SE2& n2w() const { return se2_n2w_; }
+  [[nodiscard]] const SE2& w2n() const { return se2_w2n_; }
+  [[nodiscard]] const SE2& n2w() const { return se2_n2w_; }
 
-  const Isometry2& w2nMatrix() const { return w2n_; }
-  const Isometry2& n2wMatrix() const { return n2w_; }
-  const Isometry2& w2lMatrix() const { return w2l_; }
+  [[nodiscard]] const Isometry2& w2nMatrix() const { return w2n_; }
+  [[nodiscard]] const Isometry2& n2wMatrix() const { return n2w_; }
+  [[nodiscard]] const Isometry2& w2lMatrix() const { return w2l_; }
 
-  Matrix2 RpInverseRInverseMatrix() const { return RpInverse_RInverse_; }
-  Matrix2 RpInverseRInversePrimeMatrix() const {
+  [[nodiscard]] Matrix2 RpInverseRInverseMatrix() const {
+    return RpInverse_RInverse_;
+  }
+  [[nodiscard]] Matrix2 RpInverseRInversePrimeMatrix() const {
     return RpInverse_RInversePrime_;
   }
 

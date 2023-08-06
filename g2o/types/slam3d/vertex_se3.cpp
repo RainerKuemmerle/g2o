@@ -52,25 +52,6 @@ bool VertexSE3::write(std::ostream& os) const {
   return internal::writeVector(os, internal::toVectorQT(estimate()));
 }
 
-VertexSE3WriteGnuplotAction::VertexSE3WriteGnuplotAction()
-    : WriteGnuplotAction(typeid(VertexSE3).name()) {}
-
-bool VertexSE3WriteGnuplotAction::operator()(
-    HyperGraph::HyperGraphElement& element,
-    const std::shared_ptr<HyperGraphElementAction::Parameters>& params_) {
-  if (typeid(element).name() != typeName_) return false;
-  auto* params = static_cast<WriteGnuplotAction::Parameters*>(params_.get());
-  if (!params->os) {
-    return false;
-  }
-
-  auto* v = static_cast<VertexSE3*>(&element);
-  Vector6 est = internal::toVectorMQT(v->estimate());
-  for (int i = 0; i < 6; i++) *(params->os) << est[i] << " ";
-  *(params->os) << std::endl;
-  return true;
-}
-
 #ifdef G2O_HAVE_OPENGL
 void drawTriangle(float xSize, float ySize) {
   Vector3F p[3];

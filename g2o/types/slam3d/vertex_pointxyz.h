@@ -60,7 +60,7 @@ class G2O_TYPES_SLAM3D_API VertexPointXYZ : public BaseVertex<3, Vector3> {
     return true;
   }
 
-  int estimateDimension() const override { return kDimension; }
+  [[nodiscard]] int estimateDimension() const override { return kDimension; }
 
   bool setMinimalEstimateDataImpl(const double* est) override {
     estimate_ = Eigen::Map<const Vector3>(est);
@@ -73,16 +73,9 @@ class G2O_TYPES_SLAM3D_API VertexPointXYZ : public BaseVertex<3, Vector3> {
     return true;
   }
 
-  int minimalEstimateDimension() const override { return kDimension; }
-};
-
-class G2O_TYPES_SLAM3D_API VertexPointXYZWriteGnuplotAction
-    : public WriteGnuplotAction {
- public:
-  VertexPointXYZWriteGnuplotAction();
-  bool operator()(HyperGraph::HyperGraphElement& element,
-                  const std::shared_ptr<HyperGraphElementAction::Parameters>&
-                      params_) override;
+  [[nodiscard]] int minimalEstimateDimension() const override {
+    return kDimension;
+  }
 };
 
 #ifdef G2O_HAVE_OPENGL

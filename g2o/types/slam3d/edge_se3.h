@@ -69,7 +69,7 @@ class G2O_TYPES_SLAM3D_API EdgeSE3
 
   void linearizeOplus() override;
 
-  int measurementDimension() const override { return 7; }
+  [[nodiscard]] int measurementDimension() const override { return 7; }
 
   bool setMeasurementFromState() override;
 
@@ -83,18 +83,6 @@ class G2O_TYPES_SLAM3D_API EdgeSE3
 
  protected:
   Isometry3 inverseMeasurement_;
-};
-
-/**
- * \brief Output the pose-pose constraint to Gnuplot data file
- */
-class G2O_TYPES_SLAM3D_API EdgeSE3WriteGnuplotAction
-    : public WriteGnuplotAction {
- public:
-  EdgeSE3WriteGnuplotAction();
-  bool operator()(HyperGraph::HyperGraphElement& element,
-                  const std::shared_ptr<HyperGraphElementAction::Parameters>&
-                      params_) override;
 };
 
 #ifdef G2O_HAVE_OPENGL

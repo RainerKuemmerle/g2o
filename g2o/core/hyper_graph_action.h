@@ -181,20 +181,8 @@ void G2O_CORE_API applyAction(
     const std::string& typeName = "");
 
 /**
- * brief write into gnuplot
- */
-class G2O_CORE_API WriteGnuplotAction : public HyperGraphElementAction {
- public:
-  struct G2O_CORE_API Parameters : public HyperGraphElementAction::Parameters {
-    std::ostream* os;
-  };
-  explicit WriteGnuplotAction(const std::string& typeName_);
-};
-
-/**
  * \brief draw actions
  */
-
 class G2O_CORE_API DrawAction : public HyperGraphElementAction {
  public:
   class G2O_CORE_API Parameters : public HyperGraphElementAction::Parameters,

@@ -92,35 +92,6 @@ void EdgeSE3::initialEstimate(const OptimizableGraph::VertexSet& from_,
     from->setEstimate(to->estimate() * measurement_.inverse());
 }
 
-EdgeSE3WriteGnuplotAction::EdgeSE3WriteGnuplotAction()
-    : WriteGnuplotAction(typeid(EdgeSE3).name()) {}
-
-bool EdgeSE3WriteGnuplotAction::operator()(
-    HyperGraph::HyperGraphElement& element,
-    const std::shared_ptr<HyperGraphElementAction::Parameters>& params_) {
-  if (typeid(element).name() != typeName_) return false;
-  auto* params = static_cast<WriteGnuplotAction::Parameters*>(params_.get());
-  if (!params->os) {
-    return false;
-  }
-
-  auto* e = static_cast<EdgeSE3*>(&element);
-  auto* fromEdge = static_cast<VertexSE3*>(e->vertices()[0].get());
-  auto* toEdge = static_cast<VertexSE3*>(e->vertices()[1].get());
-  Vector6 fromV;
-  Vector6 toV;
-  fromV = internal::toVectorMQT(fromEdge->estimate());
-  toV = internal::toVectorMQT(toEdge->estimate());
-  for (int i = 0; i < 6; i++) {
-    *(params->os) << fromV[i] << " ";
-  }
-  for (int i = 0; i < 6; i++) {
-    *(params->os) << toV[i] << " ";
-  }
-  *(params->os) << std::endl;
-  return true;
-}
-
 #ifdef G2O_HAVE_OPENGL
 EdgeSE3DrawAction::EdgeSE3DrawAction() : DrawAction(typeid(EdgeSE3).name()) {}
 

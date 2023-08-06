@@ -184,11 +184,6 @@ bool HyperGraphActionLibrary::unregisterAction(
   return true;
 }
 
-WriteGnuplotAction::WriteGnuplotAction(const std::string& typeName_)
-    : HyperGraphElementAction(typeName_) {
-  name_ = "writeGnuplot";
-}
-
 DrawAction::Parameters::Parameters() = default;
 
 DrawAction::DrawAction(const std::string& typeName_)
