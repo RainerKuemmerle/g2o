@@ -526,6 +526,9 @@ if(BUILD_UNITTESTS)
   add_subdirectory(unit_test)
 endif()
 
+# Include the subdirectories
+add_subdirectory(g2o)
+
 # Benchmarks
 option(G2O_BUILD_BENCHMARKS "build benchmarks" OFF)
 if(G2O_BUILD_BENCHMARKS)
@@ -533,9 +536,6 @@ if(G2O_BUILD_BENCHMARKS)
   if(${benchmark_FOUND})
     add_subdirectory(benchmarks)
   else()
-    message(WARNING G2O_BUILD_BENCHMARKS was set to true, but the benchmark library cannot be found)
+    message(WARNING "G2O_BUILD_BENCHMARKS was set to true, but the benchmark library cannot be found")
   endif()
 endif()
-
-# Include the subdirectories
-add_subdirectory(g2o)
