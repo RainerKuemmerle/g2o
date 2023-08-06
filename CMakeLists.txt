@@ -12,8 +12,9 @@ set(LIB_PREFIX g2o_)
 set(g2o_C_FLAGS)
 set(g2o_CXX_FLAGS)
 
-set(G2O_LIB_VERSION   "1.1.0" CACHE STRING "g2o library version")
-set(G2O_LIB_SOVERSION "1.1"   CACHE STRING "g2o library soversion")
+set(G2O_LIB_VERSION   "2.1.0" CACHE STRING "g2o library version")
+set(G2O_LIB_SOVERSION "2.1"   CACHE STRING "g2o library soversion")
+set(G2O_VERSION 2.1.0)
 
 # manually check for top-level project if CMake is older than 3.21
 if(CMAKE_VERSION VERSION_LESS 3.21)
@@ -503,7 +504,6 @@ set(G2O_TARGETS_EXPORT_NAME "${PROJECT_NAME}Targets")
 set(G2O_CONFIG_INSTALL_DIR "lib/cmake/${PROJECT_NAME}")
 set(G2O_NAMESPACE "${PROJECT_NAME}::")
 set(G2O_SRC_DIR "${PROJECT_SOURCE_DIR}")
-set(G2O_VERSION 2.0.0)
 
 include(CMakePackageConfigHelpers)
 WRITE_BASIC_PACKAGE_VERSION_FILE(
@@ -532,6 +532,9 @@ if(BUILD_UNITTESTS)
   add_subdirectory(unit_test)
 endif()
 
+# Include the subdirectories
+add_subdirectory(g2o)
+
 # Benchmarks
 option(G2O_BUILD_BENCHMARKS "build benchmarks" OFF)
 if(G2O_BUILD_BENCHMARKS)
@@ -539,7 +542,7 @@ if(G2O_BUILD_BENCHMARKS)
   if(${benchmark_FOUND})
     add_subdirectory(benchmarks)
   else()
-    message(WARNING G2O_BUILD_BENCHMARKS was set to true, but the benchmark library cannot be found)
+    message(WARNING "G2O_BUILD_BENCHMARKS was set to true, but the benchmark library cannot be found")
   endif()
 endif()
 
@@ -549,6 +552,3 @@ if(G2O_BUILD_PYTHON)
   message(STATUS "Compiling g2o's python wrapper")
   add_subdirectory(python)
 endif(G2O_BUILD_PYTHON)
-
-# Include the subdirectories
-add_subdirectory(g2o)
