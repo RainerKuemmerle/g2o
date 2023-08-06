@@ -57,7 +57,7 @@ void BM_VariableArrayPointer(benchmark::State& state) {
     const int d = state.range(0);
     Number add_vi[d];
 
-    std::fill(add_vi, add_vi + d, Number(0.0));
+    std::fill(add_vi, add_vi + d, static_cast<Number>(0.0));
 
     Number* v = &add_vi[0];
 
@@ -127,9 +127,9 @@ template <typename Number>
 void BM_DynamicAlignedBuffer(benchmark::State& state) {
   while (state.KeepRunning()) {
     const int d = state.range(0);
-    static g2o::dynamic_aligned_buffer<Number> buffer{size_t(d)};
+    static g2o::DynamicAlignedBuffer<Number> buffer{static_cast<size_t>(d)};
     Number* add_vi = buffer.request(d);
-    std::fill(add_vi, add_vi + d, Number(0.0));
+    std::fill(add_vi, add_vi + d, static_cast<Number>(0.0));
     for (int i = 0; i < d; ++i) {
       benchmark::DoNotOptimize(add_vi[i] = 1);
       benchmark::DoNotOptimize(add_vi[i] = -1);
@@ -142,9 +142,9 @@ template <typename Number>
 void BM_DynamicAlignedBufferPointer(benchmark::State& state) {
   while (state.KeepRunning()) {
     const int d = state.range(0);
-    static g2o::dynamic_aligned_buffer<Number> buffer{size_t(d)};
+    static g2o::DynamicAlignedBuffer<Number> buffer{static_cast<size_t>(d)};
     Number* add_vi = buffer.request(d);
-    std::fill(add_vi, add_vi + d, Number(0.0));
+    std::fill(add_vi, add_vi + d, static_cast<Number>(0.0));
     Number* v = add_vi;
 
     for (int i = 0; i < d; ++i) {
@@ -167,9 +167,9 @@ void BM_StaticDynamicDynamicAlignedBufferHybrid(benchmark::State& state) {
         benchmark::DoNotOptimize(add_vi[i] = 0);
       }
     } else {
-      static g2o::dynamic_aligned_buffer<Number> buffer{size_t(d)};
+      static g2o::DynamicAlignedBuffer<Number> buffer{static_cast<size_t>(d)};
       Number* add_vi = buffer.request(d);
-      std::fill(add_vi, add_vi + d, Number(0.0));
+      std::fill(add_vi, add_vi + d, static_cast<Number>(0.0));
       for (int i = 0; i < d; ++i) {
         benchmark::DoNotOptimize(add_vi[i] = 1);
         benchmark::DoNotOptimize(add_vi[i] = -1);
