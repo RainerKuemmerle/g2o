@@ -1,5 +1,5 @@
 // g2o - General Graph Optimization
-// Copyright (C) 2011 R. Kuemmerle, G. Grisetti, H. Strasdat, W. Burgard
+// Copyright (C) 2011 R. Kuemmerle, G. Grisetti, W. Burgard
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -24,43 +24,43 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include <signal.h>
+#include <gmock/gmock.h>
 
-#include <Eigen/Core>
-#include <Eigen/Dense>
-#include <algorithm>
-#include <cassert>
-#include <fstream>
-#include <iomanip>
-#include <iostream>
-#include <sstream>
-#include <string>
-
-#include "edge_creator.h"
-#include "edge_labeler.h"
-#include "g2o/apps/g2o_cli/dl_wrapper.h"
-#include "g2o/apps/g2o_cli/g2o_common.h"
-#include "g2o/apps/g2o_cli/output_helper.h"
-#include "g2o/core/estimate_propagator.h"
-#include "g2o/core/factory.h"
-#include "g2o/core/hyper_dijkstra.h"
-#include "g2o/core/optimization_algorithm_factory.h"
-#include "g2o/core/sparse_optimizer.h"
-#include "g2o/stuff/color_macros.h"
-#include "g2o/stuff/command_args.h"
-#include "g2o/stuff/filesys_tools.h"
-#include "g2o/stuff/macros.h"
-#include "g2o/stuff/string_tools.h"
-#include "g2o/stuff/timeutil.h"
+#include "g2o/core/eigen_types.h"
 #include "g2o/stuff/unscented.h"
-#include "star.h"
+#include "gmock/gmock.h"
+#include "unit_test/test_helper/eigen_matcher.h"
 
-using namespace std;
-using namespace g2o;
-using namespace Eigen;
+namespace {
+using MySigmaPoint = g2o::SigmaPoint<g2o::VectorX>;
+}
 
-typedef SigmaPoint<VectorXd> MySigmaPoint;
+TEST(Unscented, SampleUnscented) {
+  constexpr int kDim = 6;
 
+  g2o::MatrixX covariance = g2o::MatrixX::Zero(kDim, kDim);
+  for (int i = 0; i < kDim; i++) {
+    for (int j = i; j < kDim; j++) {
+      covariance(i, j) = covariance(j, i) = i * j + 1;
+    }
+  }
+  covariance += g2o::MatrixX::Identity(kDim, kDim);
+  g2o::VectorX mean = g2o::VectorX::Ones(kDim);
+
+  std::vector<MySigmaPoint> spts;
+  sampleUnscented(spts, mean, covariance);
+  EXPECT_THAT(spts, testing::SizeIs(2 * kDim + 1));
+
+  g2o::VectorX rec_mean(kDim);
+  g2o::MatrixX rec_covariance(kDim, kDim);
+  reconstructGaussian(rec_mean, rec_covariance, spts);
+
+  EXPECT_THAT(print_wrap(mean), EigenApproxEqual(print_wrap(rec_mean), 1e-6));
+  EXPECT_THAT(print_wrap(covariance),
+              EigenApproxEqual(print_wrap(rec_covariance), 1e-6));
+}
+
+#if 0
 void testMarginals(SparseOptimizer& optimizer) {
   cerr << "Projecting marginals" << endl;
   std::vector<std::pair<int, int> > blockIndices;
@@ -130,37 +130,4 @@ void testMarginals(SparseOptimizer& optimizer) {
     }
   }
 }
-
-int unscentedTest() {
-  MatrixXd m = MatrixXd(6, 6);
-  for (int i = 0; i < 6; i++) {
-    for (int j = i; j < 6; j++) {
-      m(i, j) = m(j, i) = i * j + 1;
-    }
-  }
-  m += MatrixXd::Identity(6, 6);
-  cerr << m;
-  VectorXd mean(6);
-  mean.fill(1);
-
-  std::vector<MySigmaPoint> spts;
-  sampleUnscented(spts, mean, m);
-  for (size_t i = 0; i < spts.size(); i++) {
-    cerr << "Point " << i << " " << endl
-         << "wi=" << spts[i]._wi << " wp=" << spts[i]._wp << " " << endl;
-    cerr << spts[i]._sample << endl;
-  }
-
-  VectorXd recMean(6);
-  MatrixXd recCov(6, 6);
-
-  reconstructGaussian(recMean, recCov, spts);
-
-  cerr << "recMean" << endl;
-  cerr << recMean << endl;
-
-  cerr << "recCov" << endl;
-  cerr << recCov << endl;
-
-  return 0;
-}
+#endif

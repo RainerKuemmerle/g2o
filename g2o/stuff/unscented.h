@@ -51,10 +51,10 @@ bool sampleUnscented(std::vector<SigmaPoint<SampleType>>& sigmaPoints,
   const int numPoints = 2 * dim + 1;
   assert(covariance.rows() == covariance.cols() &&
          covariance.cols() == mean.size() && "Dimension Mismatch");
-  const double alpha = cst(1e-3);
-  const double beta = 2;
+  constexpr double alpha = 1e-3;
+  constexpr double beta = 2.;
   const double lambda = alpha * alpha * dim;
-  const double wi = cst(1) / (2 * (dim + lambda));
+  const double wi = 1. / (2. * (dim + lambda));
 
   sigmaPoints.resize(numPoints);
   sigmaPoints[0] = SigmaPoint<SampleType>(

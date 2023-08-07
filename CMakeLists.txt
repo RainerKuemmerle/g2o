@@ -14,6 +14,7 @@ set(g2o_CXX_FLAGS)
 
 set(G2O_LIB_VERSION   "0.1.0" CACHE STRING "g2o library version")
 set(G2O_LIB_SOVERSION "0.1"   CACHE STRING "g2o library soversion")
+set(G2O_VERSION 1.0.0)
 
 # manually check for top-level project if CMake is older than 3.21
 if(CMAKE_VERSION VERSION_LESS 3.21)
@@ -497,7 +498,6 @@ set(G2O_TARGETS_EXPORT_NAME "${PROJECT_NAME}Targets")
 set(G2O_CONFIG_INSTALL_DIR "lib/cmake/${PROJECT_NAME}")
 set(G2O_NAMESPACE "${PROJECT_NAME}::")
 set(G2O_SRC_DIR "${PROJECT_SOURCE_DIR}")
-set(G2O_VERSION 1.0.0)
 
 include(CMakePackageConfigHelpers)
 WRITE_BASIC_PACKAGE_VERSION_FILE(
