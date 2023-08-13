@@ -32,6 +32,7 @@
 #include <cassert>
 
 #include "g2o/core/eigen_types.h"
+#include "g2o/core/type_traits.h"
 #include "g2o/stuff/misc.h"
 #include "g2o_types_slam2d_api.h"
 
@@ -54,22 +55,22 @@ class G2O_TYPES_SLAM2D_API SE2 {
   SE2(double x, double y, double theta) : R_(theta), t_(x, y) {}
 
   //! translational component
-  inline const Vector2& translation() const { return t_; }
+  [[nodiscard]] const Vector2& translation() const { return t_; }
   void setTranslation(const Vector2& t) { t_ = t; }
 
   //! rotational component
-  inline const Rotation2D& rotation() const { return R_; }
+  [[nodiscard]] const Rotation2D& rotation() const { return R_; }
   void setRotation(const Rotation2D& R) { R_ = R; }
 
   //! concatenate two SE2 elements (motion composition)
-  inline SE2 operator*(const SE2& tr2) const {
+  SE2 operator*(const SE2& tr2) const {
     SE2 result(*this);
     result *= tr2;
     return result;
   }
 
   //! motion composition operator
-  inline SE2& operator*=(const SE2& tr2) {
+  SE2& operator*=(const SE2& tr2) {
     t_ += R_ * tr2.t_;
     R_.angle() += tr2.R_.angle();
     R_.angle() = normalize_theta(R_.angle());
@@ -77,10 +78,10 @@ class G2O_TYPES_SLAM2D_API SE2 {
   }
 
   //! project a 2D vector
-  inline Vector2 operator*(const Vector2& v) const { return t_ + R_ * v; }
+  Vector2 operator*(const Vector2& v) const { return t_ + R_ * v; }
 
   //! invert :-)
-  inline SE2 inverse() const {
+  [[nodiscard]] SE2 inverse() const {
     SE2 ret;
     ret.R_ = R_.inverse();
     ret.R_.angle() = normalize_theta(ret.R_.angle());
@@ -102,11 +103,11 @@ class G2O_TYPES_SLAM2D_API SE2 {
   inline void fromVector(const Vector3& v) { *this = SE2(v[0], v[1], v[2]); }
 
   //! convert to a 3D vector (x, y, theta)
-  inline Vector3 toVector() const {
+  [[nodiscard]] Vector3 toVector() const {
     return Vector3(t_.x(), t_.y(), R_.angle());
   }
 
-  inline Isometry2 toIsometry() const {
+  [[nodiscard]] Isometry2 toIsometry() const {
     Isometry2 iso = Isometry2::Identity();
     iso.linear() = R_.toRotationMatrix();
     iso.translation() = t_;
@@ -116,6 +117,45 @@ class G2O_TYPES_SLAM2D_API SE2 {
  protected:
   Rotation2D R_;
   Vector2 t_;
+};
+
+template <>
+struct TypeTraits<SE2> {
+  enum {
+    kVectorDimension = 3,
+    kMinimalVectorDimension = 3,
+    kIsVector = 0,
+    kIsScalar = 0,
+  };
+  using Type = SE2;
+  using VectorType = VectorN<kVectorDimension>;
+  using MinimalVectorType = VectorN<kMinimalVectorDimension>;
+
+  static VectorType toVector(const Type& t) { return t.toVector(); }
+  static void toData(const Type& t, double* data) {
+    typename VectorType::MapType v(data, kVectorDimension);
+    v = t.toVector();
+  }
+
+  static MinimalVectorType toMinimalVector(const Type& t) {
+    return t.toVector();
+  }
+  static void toMinimalData(const Type& t, double* data) {
+    typename MinimalVectorType::MapType v(data, kMinimalVectorDimension);
+    v = t.toVector();
+  }
+
+  template <typename Derived>
+  static Type fromVector(const Eigen::DenseBase<Derived>& v) {
+    return SE2(v[0], v[1], v[2]);
+  }
+
+  template <typename Derived>
+  static Type fromMinimalVector(const Eigen::DenseBase<Derived>& v) {
+    return SE2(v[0], v[1], v[2]);
+  }
+
+  static Type Identity() { return SE2(); }
 };
 
 }  // namespace g2o
