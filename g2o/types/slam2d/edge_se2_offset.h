@@ -57,21 +57,6 @@ class G2O_TYPES_SLAM2D_API EdgeSE2Offset
     inverseMeasurement_ = m.inverse();
   }
 
-  bool setMeasurementData(const double* d) override {
-    Eigen::Map<const Vector3> v(d);
-    measurement_.fromVector(v);
-    inverseMeasurement_ = measurement_.inverse();
-    return true;
-  }
-
-  bool getMeasurementData(double* d) const override {
-    Eigen::Map<Vector3> v(d);
-    v = measurement_.toVector();
-    return true;
-  }
-
-  int measurementDimension() const override { return 3; }
-
   bool setMeasurementFromState() override;
 
   double initialEstimatePossible(const OptimizableGraph::VertexSet& /*from*/,

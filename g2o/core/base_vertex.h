@@ -36,6 +36,7 @@
 #include "creators.h"
 #include "g2o/config.h"
 #include "g2o/core/eigen_types.h"
+#include "g2o/core/type_traits.h"
 #include "g2o/stuff/macros.h"
 #include "optimizable_graph.h"
 
@@ -72,23 +73,23 @@ class BaseVertex : public OptimizableGraph::Vertex {
   BaseVertex& operator=(const BaseVertex&) = delete;
   BaseVertex(const BaseVertex&) = delete;
 
-  [[nodiscard]] double* hessianData() const override {
+  [[nodiscard]] double* hessianData() const final {
     return const_cast<double*>(hessian_.data());
   }
 
-  void mapHessianMemory(double* d) override;
+  void mapHessianMemory(double* d) final;
 
-  int copyB(double* b) const override {
+  int copyB(double* b) const final {
     const int vertexDim = G2O_VERTEX_DIM;
     memcpy(b, b_.data(), vertexDim * sizeof(double));
     return vertexDim;
   }
 
-  [[nodiscard]] double* bData() const override {
+  [[nodiscard]] double* bData() const final {
     return const_cast<double*>(b_.data());
   }
 
-  void clearQuadraticForm() override { b_.setZero(); }
+  void clearQuadraticForm() final { b_.setZero(); }
 
   //! updates the current vertex with the direct solution x += H_ii\b_ii
   //! @returns the determinant of the inverted hessian
@@ -101,18 +102,18 @@ class BaseVertex : public OptimizableGraph::Vertex {
   HessianBlockType& A() { return hessian_; }
   const HessianBlockType& A() const { return hessian_; }
 
-  void push() override { backup_.push(estimate_); }
-  void pop() override {
+  void push() final { backup_.push(estimate_); }
+  void pop() final {
     assert(!backup_.empty());
     estimate_ = backup_.top();
     backup_.pop();
     updateCache();
   }
-  void discardTop() override {
+  void discardTop() final {
     assert(!backup_.empty());
     backup_.pop();
   }
-  [[nodiscard]] int stackSize() const override { return backup_.size(); }
+  [[nodiscard]] int stackSize() const final { return backup_.size(); }
 
   //! return the current estimate of the vertex
   const EstimateType& estimate() const { return estimate_; }
@@ -120,6 +121,69 @@ class BaseVertex : public OptimizableGraph::Vertex {
   void setEstimate(const EstimateType& et) {
     estimate_ = et;
     updateCache();
+  }
+
+  //! generic read based on Trait reading a vector
+  bool read(std::istream& is) override {
+    typename TypeTraits<EstimateType>::VectorType estimate_data;
+    bool state = internal::readVector(is, estimate_data);
+    setEstimate(TypeTraits<EstimateType>::fromVector(estimate_data));
+    return state;
+  }
+
+  //! generic write  based on Trait reading a vector
+  bool write(std::ostream& os) const override {
+    return internal::writeVector(
+        os, TypeTraits<EstimateType>::toVector(estimate()));
+  }
+
+  // methods based on the traits interface
+  void setToOriginImpl() final {
+    setEstimate(TypeTraits<EstimateType>::Identity());
+  }
+
+  bool setEstimateDataImpl(const double* est) final {
+    static_assert(TypeTraits<EstimateType>::kVectorDimension != INT_MIN,
+                  "Forgot to implement TypeTrait for your Estimate");
+    typename TypeTraits<EstimateType>::VectorType::ConstMapType aux(
+        est, DimensionTraits<EstimateType>::dimension(estimate_));
+    estimate_ = TypeTraits<EstimateType>::fromVector(aux);
+    return true;
+  }
+
+  bool getEstimateData(double* est) const final {
+    static_assert(TypeTraits<EstimateType>::kVectorDimension != INT_MIN,
+                  "Forgot to implement TypeTrait for your Estimate");
+    TypeTraits<EstimateType>::toData(estimate_, est);
+    return true;
+  }
+
+  [[nodiscard]] int estimateDimension() const final {
+    static_assert(TypeTraits<EstimateType>::kVectorDimension != INT_MIN,
+                  "Forgot to implement TypeTrait for your Estimate");
+    return TypeTraits<EstimateType>::kVectorDimension;
+  }
+
+  bool setMinimalEstimateDataImpl(const double* est) final {
+    static_assert(TypeTraits<EstimateType>::kMinimalVectorDimension != INT_MIN,
+                  "Forgot to implement TypeTrait for your Estimate");
+    typename TypeTraits<EstimateType>::MinimalVectorType::ConstMapType aux(
+        est, DimensionTraits<EstimateType>::minimalDimension(estimate_));
+    estimate_ = TypeTraits<EstimateType>::fromMinimalVector(aux);
+    return true;
+  }
+
+  bool getMinimalEstimateData(double* est) const final {
+    static_assert(TypeTraits<EstimateType>::kMinimalVectorDimension != INT_MIN,
+                  "Forgot to implement TypeTrait for your Estimate");
+    TypeTraits<EstimateType>::toMinimalData(estimate_, est);
+    return true;
+  }
+
+  [[nodiscard]] int minimalEstimateDimension() const final {
+    static_assert(TypeTraits<EstimateType>::kMinimalVectorDimension != INT_MIN,
+                  "Forgot to implement TypeTrait for your Estimate");
+    return TypeTraits<EstimateType>::kMinimalVectorDimension;
   }
 
  protected:

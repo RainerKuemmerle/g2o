@@ -44,20 +44,6 @@ class G2O_TYPES_SLAM3D_API EdgeSE3XYZPrior
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   EdgeSE3XYZPrior();
 
-  bool setMeasurementData(const double* d) override {
-    Eigen::Map<const Vector3> v(d);
-    measurement_ = v;
-    return true;
-  }
-
-  bool getMeasurementData(double* d) const override {
-    Eigen::Map<Vector3> v(d);
-    v = measurement_;
-    return true;
-  }
-
-  int measurementDimension() const override { return kDimension; }
-
   bool read(std::istream& is) override;
   bool write(std::ostream& os) const override;
   void computeError() override;

@@ -76,13 +76,13 @@ struct Sim3 {
     I.setIdentity();
     Matrix3 R;
 
-    double eps = cst(0.00001);
+    constexpr double kEps = cst(0.00001);
     double A;
     double B;
     double C;
-    if (fabs(sigma) < eps) {
+    if (fabs(sigma) < kEps) {
       C = 1;
-      if (theta < eps) {
+      if (theta < kEps) {
         A = cst(1. / 2.);
         B = cst(1. / 6.);
         R = (I + Omega +
@@ -98,7 +98,7 @@ struct Sim3 {
       }
     } else {
       C = (s_ - 1) / sigma;
-      if (theta < eps) {
+      if (theta < kEps) {
         double sigma2 = sigma * sigma;
         A = ((sigma - 1) * s_ + 1) / sigma2;
         B = ((cst(0.5) * sigma2 - sigma + 1) * s_ - 1) /
@@ -143,15 +143,15 @@ struct Sim3 {
 
     Matrix3 Omega;
 
-    double eps = cst(0.00001);
+    constexpr double kEps = cst(0.00001);
     Matrix3 I = Matrix3::Identity();
 
     double A;
     double B;
     double C;
-    if (fabs(sigma) < eps) {
+    if (fabs(sigma) < kEps) {
       C = 1;
-      if (d > 1 - eps) {
+      if (d > 1 - kEps) {
         omega = 0.5 * deltaR(R);
         Omega = skew(omega);
         A = cst(1. / 2.);
@@ -166,7 +166,7 @@ struct Sim3 {
       }
     } else {
       C = (s_ - 1) / sigma;
-      if (d > 1 - eps) {
+      if (d > 1 - kEps) {
         double sigma2 = sigma * sigma;
         omega = cst(0.5) * deltaR(R);
         Omega = skew(omega);

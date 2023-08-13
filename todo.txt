@@ -1,0 +1,2 @@
+- resolveCache should return unique_ptr
+- read write methods based on type traits conversion to vector

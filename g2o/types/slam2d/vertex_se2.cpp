@@ -35,15 +35,12 @@
 
 namespace g2o {
 
-bool VertexSE2::read(std::istream& is) {
-  Vector3 p;
-  bool state = internal::readVector(is, p);
-  setEstimate(SE2(p));
-  return state;
-}
-
-bool VertexSE2::write(std::ostream& os) const {
-  return internal::writeVector(os, estimate().toVector());
+void VertexSE2::oplusImpl(const VectorX::MapType& update) {
+  Vector2 t = estimate_.translation();
+  t += update.head<2>();
+  double angle = normalize_theta(estimate_.rotation().angle() + update[2]);
+  estimate_.setTranslation(t);
+  estimate_.setRotation(Rotation2D(angle));
 }
 
 #ifdef G2O_HAVE_OPENGL

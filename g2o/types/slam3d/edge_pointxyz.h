@@ -50,19 +50,6 @@ class G2O_TYPES_SLAM3D_API EdgePointXYZ
 
   void setMeasurement(const Vector3& m) override { measurement_ = m; }
 
-  bool setMeasurementData(const double* d) override {
-    measurement_ = Vector3(d[0], d[1], d[2]);
-    return true;
-  }
-
-  bool getMeasurementData(double* d) const override {
-    Eigen::Map<Vector3> m(d);
-    m = measurement_;
-    return true;
-  }
-
-  int measurementDimension() const override { return 3; }
-
   bool setMeasurementFromState() override {
     const VertexPointXYZ* v1 = vertexXnRaw<0>();
     const VertexPointXYZ* v2 = vertexXnRaw<1>();
