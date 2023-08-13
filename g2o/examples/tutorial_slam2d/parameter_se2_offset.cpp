@@ -28,8 +28,7 @@
 
 #include "vertex_se2.h"
 
-namespace g2o {
-namespace tutorial {
+namespace g2o::tutorial {
 
 void ParameterSE2Offset::setOffset(const SE2& offset) {
   offset_ = offset;
@@ -62,5 +61,4 @@ void CacheSE2Offset::updateImpl() {
   w2n_ = n2w_.inverse();
 }
 
-}  // end namespace tutorial
-}  // namespace g2o
+}  // namespace g2o::tutorial

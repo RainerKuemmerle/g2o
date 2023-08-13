@@ -35,8 +35,6 @@ namespace g2o {
 
 /**
  * @brief TypeTraits specialization for an Isometry3
- *
- * @tparam
  */
 template <>
 struct TypeTraits<Isometry3> {

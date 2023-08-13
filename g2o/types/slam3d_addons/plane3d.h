@@ -30,6 +30,8 @@
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 
+#include "g2o/core/eigen_types.h"
+#include "g2o/core/type_traits.h"
 #include "g2o/stuff/misc.h"
 #include "g2o_types_slam3d_addons_api.h"
 
@@ -45,9 +47,9 @@ class G2O_TYPES_SLAM3D_ADDONS_API Plane3D {
 
   explicit Plane3D(const Vector4& v) { fromVector(v); }
 
-  inline Vector4 toVector() const { return coeffs_; }
+  [[nodiscard]] inline Vector4 toVector() const { return coeffs_; }
 
-  inline const Vector4& coeffs() const { return coeffs_; }
+  [[nodiscard]] inline const Vector4& coeffs() const { return coeffs_; }
 
   inline void fromVector(const Vector4& coeffs) {
     coeffs_ = coeffs;
@@ -60,9 +62,9 @@ class G2O_TYPES_SLAM3D_ADDONS_API Plane3D {
     return std::atan2(v(2), v.head<2>().norm());
   }
 
-  double distance() const { return -coeffs_(3); }
+  [[nodiscard]] double distance() const { return -coeffs_(3); }
 
-  Vector3 normal() const { return coeffs_.head<3>(); }
+  [[nodiscard]] Vector3 normal() const { return coeffs_.head<3>(); }
 
   static Matrix3 rotation(const Vector3& v) {
     double _azimuth = azimuth(v);
@@ -88,7 +90,7 @@ class G2O_TYPES_SLAM3D_ADDONS_API Plane3D {
     normalize(coeffs_);
   }
 
-  inline Vector3 ominus(const Plane3D& plane) const {
+  [[nodiscard]] inline Vector3 ominus(const Plane3D& plane) const {
     // construct the rotation that would bring the plane normal in (1 0 0)
     Matrix3 R = rotation(normal()).transpose();
     Vector3 n = R * plane.normal();
@@ -112,6 +114,46 @@ inline Plane3D operator*(const Isometry3& t, const Plane3D& plane) {
   v2.head<3>() = R * v.head<3>();
   v2(3) = v(3) - t.translation().dot(v2.head<3>());
   return Plane3D(v2);
+};
+
+/**
+ * @brief TypeTraits specialization for a Plane3D
+ */
+template <>
+struct TypeTraits<Plane3D> {
+  enum {
+    kVectorDimension = 4,
+    kMinimalVectorDimension = 4,
+    kIsVector = 0,
+    kIsScalar = 0,
+  };
+  using Type = Plane3D;
+  using VectorType = VectorN<kVectorDimension>;
+  using MinimalVectorType = VectorN<kMinimalVectorDimension>;
+
+  static VectorType toVector(const Type& t) { return t.coeffs(); }
+  static void toData(const Type& t, double* data) {
+    typename VectorType::MapType v(data, kVectorDimension);
+    v = t.coeffs();
+  }
+
+  static MinimalVectorType toMinimalVector(const Type& t) { return t.coeffs(); }
+  static void toMinimalData(const Type& t, double* data) {
+    typename MinimalVectorType::MapType v(data, kMinimalVectorDimension);
+    v = t.coeffs();
+  }
+
+  template <typename Derived>
+  static Type fromVector(const Eigen::DenseBase<Derived>& v) {
+    return Plane3D(v);
+  }
+
+  template <typename Derived>
+  static Type fromMinimalVector(const Eigen::DenseBase<Derived>& v) {
+    return Plane3D(v);
+  }
+
+  static Type Identity() { return Plane3D(); }
 };
 
 }  // namespace g2o

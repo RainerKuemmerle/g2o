@@ -42,39 +42,8 @@ class G2O_TYPES_SLAM3D_API VertexPointXYZ : public BaseVertex<3, Vector3> {
   bool read(std::istream& is) override;
   bool write(std::ostream& os) const override;
 
-  void setToOriginImpl() override { estimate_.fill(0.); }
-
   void oplusImpl(const VectorX::MapType& update) override {
     estimate_ += update.head<kDimension>();
-  }
-
-  bool setEstimateDataImpl(const double* est) override {
-    Eigen::Map<const Vector3> estMap(est);
-    estimate_ = estMap;
-    return true;
-  }
-
-  bool getEstimateData(double* est) const override {
-    Eigen::Map<Vector3> estMap(est);
-    estMap = estimate_;
-    return true;
-  }
-
-  [[nodiscard]] int estimateDimension() const override { return kDimension; }
-
-  bool setMinimalEstimateDataImpl(const double* est) override {
-    estimate_ = Eigen::Map<const Vector3>(est);
-    return true;
-  }
-
-  bool getMinimalEstimateData(double* est) const override {
-    Eigen::Map<Vector3> v(est);
-    v = estimate_;
-    return true;
-  }
-
-  [[nodiscard]] int minimalEstimateDimension() const override {
-    return kDimension;
   }
 };
 

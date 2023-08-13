@@ -43,25 +43,9 @@ class G2O_TYPES_SLAM3D_ADDONS_API VertexLine3D : public BaseVertex<4, Line3D> {
   bool read(std::istream& is) override;
   bool write(std::ostream& os) const override;
 
-  void setToOriginImpl() override { estimate_ = Line3D(); }
-
   void oplusImpl(const VectorX::MapType& update) override {
     estimate_.oplus(update);
   }
-
-  bool setEstimateDataImpl(const double* est) override {
-    Eigen::Map<const Vector6> _est(est);
-    estimate_ = Line3D(_est);
-    return true;
-  }
-
-  bool getEstimateData(double* est) const override {
-    Eigen::Map<Vector6> _est(est);
-    _est = estimate_;
-    return true;
-  }
-
-  int estimateDimension() const override { return 6; }
 
   Vector3 color;
 };

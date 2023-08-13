@@ -47,9 +47,9 @@ class G2O_TYPES_DATA_API VertexTag : public RobotData {
   bool write(std::ostream& os) const override;
   bool read(std::istream& is) override;
 
-  const std::string& name() const { return name_; }
+  [[nodiscard]] const std::string& name() const { return name_; }
   void setName(const std::string& name) { name_ = name; }
-  const Vector3F& position() const { return position_; }
+  [[nodiscard]] const Vector3F& position() const { return position_; }
   void setPosition(const Vector3F& p) { position_ = p; }
 
  protected:

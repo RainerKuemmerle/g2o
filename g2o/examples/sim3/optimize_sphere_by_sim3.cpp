@@ -48,6 +48,7 @@
 G2O_USE_TYPE_GROUP(slam3d);
 
 namespace g2o {
+namespace {
 
 // Convert SE3 Vertex to Sim3 Vertex
 void ToVertexSim3(const g2o::VertexSE3& v_se3,
@@ -89,7 +90,7 @@ void ToEdgeSim3(const g2o::EdgeSE3& e_se3, g2o::EdgeSim3* const e_sim3) {
 // interface and Sim is used for optimization.
 // g2o_viewer is available to the result.
 
-static int optimize_by_sim3(int argc, char** argv) {
+int optimize_by_sim3(int argc, char** argv) {
   if (argc != 2) {
     std::cout << "Usage: pose_graph_g2o_SE3 sphere.g2o" << std::endl;
     return 1;
@@ -167,6 +168,8 @@ static int optimize_by_sim3(int argc, char** argv) {
   interface.save("result.g2o");
   return 0;
 }
+}  // namespace
+
 }  // namespace g2o
 
 int main(int argc, char** argv) { return g2o::optimize_by_sim3(argc, argv); }

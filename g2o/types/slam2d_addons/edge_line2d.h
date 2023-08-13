@@ -29,7 +29,6 @@
 
 #include "g2o/config.h"
 #include "g2o/core/base_binary_edge.h"
-#include "types_slam2d_addons.h"
 #include "vertex_line2d.h"
 
 namespace g2o {
@@ -51,20 +50,6 @@ class G2O_TYPES_SLAM2D_ADDONS_API EdgeLine2D
   void setMeasurement(const Line2D& m) override { measurement_ = m; }
 
   virtual void setMeasurement(const Vector2& m) { measurement_ = Line2D(m); }
-
-  bool setMeasurementData(const double* d) override {
-    Eigen::Map<const Vector2> m(d);
-    measurement_ = Line2D(m);
-    return true;
-  }
-
-  bool getMeasurementData(double* d) const override {
-    Eigen::Map<Vector2> m(d);
-    m = measurement_;
-    return true;
-  }
-
-  int measurementDimension() const override { return 2; }
 
   bool setMeasurementFromState() override {
     const VertexLine2D* v1 = vertexXnRaw<0>();

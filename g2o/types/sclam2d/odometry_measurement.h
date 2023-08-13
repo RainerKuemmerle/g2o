@@ -30,6 +30,7 @@
 #include <Eigen/Core>
 
 #include "g2o/core/eigen_types.h"
+#include "g2o/core/type_traits.h"
 #include "g2o_types_sclam2d_api.h"
 
 namespace g2o {
@@ -60,6 +61,50 @@ class G2O_TYPES_SCLAM2D_API VelocityMeasurement {
 };
 
 /**
+ * @brief TypeTraits specialization for a SE2
+ */
+template <>
+struct TypeTraits<VelocityMeasurement> {
+  enum {
+    kVectorDimension = 3,
+    kMinimalVectorDimension = 3,
+    kIsVector = 0,
+    kIsScalar = 0,
+  };
+  using Type = VelocityMeasurement;
+  using VectorType = VectorN<kVectorDimension>;
+  using MinimalVectorType = VectorN<kMinimalVectorDimension>;
+
+  static VectorType toVector(const Type& t) {
+    VectorType res;
+    res.head<2>() = t.measurement();
+    res(2) = t.dt();
+    return res;
+  }
+  static void toData(const Type& t, double* data) {
+    typename VectorType::MapType v(data, kVectorDimension);
+    v = toVector(t);
+  }
+
+  static MinimalVectorType toMinimalVector(const Type& t) {
+    return toVector(t);
+  }
+  static void toMinimalData(const Type& t, double* data) { toData(t, data); }
+
+  template <typename Derived>
+  static Type fromVector(const Eigen::DenseBase<Derived>& v) {
+    return VelocityMeasurement(v[0], v[1], v[2]);
+  }
+
+  template <typename Derived>
+  static Type fromMinimalVector(const Eigen::DenseBase<Derived>& v) {
+    return VelocityMeasurement(v[0], v[1], v[2]);
+  }
+
+  static Type Identity() { return VelocityMeasurement(); }
+};
+
+/**
  * \brief A 2D odometry measurement expressed as a transformation
  */
 class G2O_TYPES_SCLAM2D_API MotionMeasurement {
@@ -69,19 +114,19 @@ class G2O_TYPES_SCLAM2D_API MotionMeasurement {
   MotionMeasurement(double x, double y, double theta, double dt);
   MotionMeasurement(Vector3 m, double dt);
 
-  double x() const { return measurement_(0); }
+  [[nodiscard]] double x() const { return measurement_(0); }
   void setX(double v) { measurement_(0) = v; }
 
-  double y() const { return measurement_(1); }
+  [[nodiscard]] double y() const { return measurement_(1); }
   void setY(double v) { measurement_(1) = v; }
 
-  double theta() const { return measurement_(2); }
+  [[nodiscard]] double theta() const { return measurement_(2); }
   void setTheta(double v) { measurement_(2) = v; }
 
-  double dt() const { return dt_; }
+  [[nodiscard]] double dt() const { return dt_; }
   void setDt(double t) { dt_ = t; }
 
-  const Vector3& measurement() const { return measurement_; }
+  [[nodiscard]] const Vector3& measurement() const { return measurement_; }
 
  protected:
   Vector3 measurement_;

@@ -28,6 +28,7 @@
 #define EDGE_SE2_PURE_CALIB_H
 
 #include "g2o/core/base_binary_edge.h"
+#include "g2o/core/type_traits.h"
 #include "g2o/types/sclam2d/odometry_measurement.h"
 #include "g2o/types/sclam2d/vertex_odom_differential_params.h"
 #include "g2o/types/slam2d/vertex_se2.h"
@@ -39,6 +40,57 @@ struct G2O_CALIBRATION_ODOM_LASER_API OdomAndLaserMotion {
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
   VelocityMeasurement velocityMeasurement;
   SE2 laserMotion;
+};
+
+/**
+ * @brief TypeTraits specialization for a SE2
+ */
+template <>
+struct TypeTraits<OdomAndLaserMotion> {
+  enum {
+    kVectorDimension = 6,
+    kMinimalVectorDimension = 6,
+    kIsVector = 0,
+    kIsScalar = 0,
+  };
+  using Type = OdomAndLaserMotion;
+  using VectorType = VectorN<kVectorDimension>;
+  using MinimalVectorType = VectorN<kMinimalVectorDimension>;
+
+  static VectorType toVector(const Type& t) {
+    VectorType res;
+    res << TypeTraits<VelocityMeasurement>::toVector(t.velocityMeasurement),
+        TypeTraits<SE2>::toVector(t.laserMotion);
+    return res;
+  }
+  static void toData(const Type& t, double* data) {
+    typename VectorType::MapType v(data, kVectorDimension);
+    v = toVector(t);
+  }
+
+  static MinimalVectorType toMinimalVector(const Type& t) {
+    return toVector(t);
+  }
+  static void toMinimalData(const Type& t, double* data) {
+    typename MinimalVectorType::MapType v(data, kMinimalVectorDimension);
+    v = toVector(t);
+  }
+
+  template <typename Derived>
+  static Type fromVector(const Eigen::DenseBase<Derived>& v) {
+    OdomAndLaserMotion res;
+    res.velocityMeasurement =
+        TypeTraits<VelocityMeasurement>::fromVector(v.template head<3>());
+    res.laserMotion = TypeTraits<SE2>::fromVector(v.template tail<3>());
+    return res;
+  }
+
+  template <typename Derived>
+  static Type fromMinimalVector(const Eigen::DenseBase<Derived>& v) {
+    return fromVector(v);
+  }
+
+  static Type Identity() { return OdomAndLaserMotion(); }
 };
 
 /**

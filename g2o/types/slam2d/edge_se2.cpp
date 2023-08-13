@@ -37,7 +37,6 @@ bool EdgeSE2::read(std::istream& is) {
   Vector3 p;
   internal::readVector(is, p);
   setMeasurement(SE2(p));
-  inverseMeasurement_ = measurement().inverse();
   readInformationMatrix(is);
   return is.good() || is.eof();
 }

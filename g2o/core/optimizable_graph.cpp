@@ -51,7 +51,9 @@
 
 namespace g2o {
 
-static std::shared_ptr<OptimizableGraph::Vertex> kNonExistantVertex(nullptr);
+namespace {
+std::shared_ptr<OptimizableGraph::Vertex> kNonExistantVertex(nullptr);
+}
 
 using std::endl;
 using std::string;

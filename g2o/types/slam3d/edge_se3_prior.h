@@ -60,21 +60,6 @@ class G2O_TYPES_SLAM3D_API EdgeSE3Prior
     inverseMeasurement_ = m.inverse();
   }
 
-  bool setMeasurementData(const double* d) override {
-    Eigen::Map<const Vector7> v(d);
-    measurement_ = internal::fromVectorQT(v);
-    inverseMeasurement_ = measurement_.inverse();
-    return true;
-  }
-
-  bool getMeasurementData(double* d) const override {
-    Eigen::Map<Vector7> v(d);
-    v = internal::toVectorQT(measurement_);
-    return true;
-  }
-
-  int measurementDimension() const override { return 7; }
-
   bool setMeasurementFromState() override;
 
   double initialEstimatePossible(const OptimizableGraph::VertexSet& /*from*/,

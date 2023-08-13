@@ -74,7 +74,6 @@ class VertexNotDefaultCtor : public g2o::BaseVertex<2, g2o::Vector2> {
     estimate_ += update.head<2>();
   }
 
-  void setToOriginImpl() override { estimate_.setZero(); }
   bool read(std::istream& /*is*/) override { return false; };
   bool write(std::ostream& /*os*/) const override { return false; };
 };
@@ -92,8 +91,6 @@ class EdgeUnaryCreateVertexTester
   bool write(std::ostream& /*os*/) const override { return false; };
 
   void setMeasurement(const g2o::Vector2& m) override { measurement_ = m; }
-
-  [[nodiscard]] int measurementDimension() const override { return 2; }
 };
 
 TEST(General, IndexToPairToIndex) {

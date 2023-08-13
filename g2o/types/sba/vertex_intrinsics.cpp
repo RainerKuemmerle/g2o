@@ -31,23 +31,19 @@
 namespace g2o {
 
 VertexIntrinsics::VertexIntrinsics() {
-  estimate_ << cst(1.), cst(1.), cst(.5), cst(.5), cst(.1);
+  estimate_.values << cst(1.), cst(1.), cst(.5), cst(.5), cst(.1);
 }
 
 bool VertexIntrinsics::read(std::istream& is) {
-  return internal::readVector(is, estimate_);
+  return internal::readVector(is, estimate_.values);
 }
 
 bool VertexIntrinsics::write(std::ostream& os) const {
-  return internal::writeVector(os, estimate());
-}
-
-void VertexIntrinsics::setToOriginImpl() {
-  estimate_ << cst(1.), cst(1.), cst(0.5), cst(0.5), cst(0.1);
+  return internal::writeVector(os, estimate().values);
 }
 
 void VertexIntrinsics::oplusImpl(const VectorX::MapType& update) {
-  estimate_.head<4>() += update.head<kDimension>();
+  estimate_.values.head<4>() += update.head<kDimension>();
 }
 
 }  // namespace g2o

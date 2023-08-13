@@ -119,6 +119,9 @@ class G2O_TYPES_SLAM2D_API SE2 {
   Vector2 t_;
 };
 
+/**
+ * @brief TypeTraits specialization for a SE2
+ */
 template <>
 struct TypeTraits<SE2> {
   enum {

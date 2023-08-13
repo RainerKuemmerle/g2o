@@ -1,0 +1,8 @@
+- resolveCache should return unique_ptr
+- read write methods based on type traits conversion to vector
+- setEstimateDataImpl wrapper needed?
+
+- split sim3 into h/cpp
+- split types_seven_dof_expmap
+
+- update py_base_vertex/edge to map now common methods

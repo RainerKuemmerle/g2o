@@ -68,10 +68,6 @@ class VertexCircle : public g2o::BaseVertex<3, Eigen::Vector3d> {
 
   bool write(std::ostream& /*os*/) const override { return false; }
 
-  void setToOriginImpl() override {
-    std::cerr << __PRETTY_FUNCTION__ << " not implemented yet" << std::endl;
-  }
-
   void oplusImpl(const g2o::VectorX::MapType& update) override {
     estimate_ += update.head<kDimension>();
   }

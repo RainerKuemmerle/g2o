@@ -54,7 +54,9 @@ using std::cerr;
 using std::endl;
 using std::string;
 
-static Eigen::Vector2d linearSolution;
+namespace {
+Eigen::Vector2d linearSolution;
+}
 
 namespace g2o {
 
@@ -62,7 +64,6 @@ class VertexBaseline : public BaseVertex<1, double> {
  public:
   VertexBaseline() = default;
 
-  void setToOriginImpl() override { estimate_ = 1.; }
   void oplusImpl(const VectorX::MapType& update) override {
     estimate_ += update[0];
   }
@@ -103,7 +104,9 @@ class EdgeCalib
   bool write(std::ostream&) const override { return false; }
 };
 
-static int run_sclam_pure_calibration(int argc, char** argv) {
+namespace {
+
+int run_sclam_pure_calibration(int argc, char** argv) {
   bool fixLaser;
   int maxIterations;
   bool verbose;
@@ -330,7 +333,7 @@ static int run_sclam_pure_calibration(int argc, char** argv) {
           testRobotLaserQueue.buffer().begin()->second);
       SE2 prevCalibratedPose = prev->odomPose();
 
-      for (auto it : testRobotLaserQueue.buffer()) {
+      for (const auto& it : testRobotLaserQueue.buffer()) {
         auto cur = std::dynamic_pointer_cast<RobotLaser>(it.second);
         assert(cur);
 
@@ -374,6 +377,7 @@ static int run_sclam_pure_calibration(int argc, char** argv) {
 
   return 0;
 }
+}  // namespace
 }  // namespace g2o
 
 int main(int argc, char** argv) {

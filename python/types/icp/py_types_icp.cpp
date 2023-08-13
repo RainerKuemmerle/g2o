@@ -42,7 +42,6 @@ void declareTypesICP(py::module& m) {
   py::class_<EdgeVVGicp, BaseBinaryEdge<3, EdgeGICP, VertexSE3, VertexSE3>,
              std::shared_ptr<EdgeVVGicp>>(m, "EdgeVVGicp")
       .def(py::init<>())
-      .def(py::init<const EdgeVVGicp*>())
 
       .def("compute_error", &EdgeVVGicp::computeError)
 #ifdef GICP_ANALYTIC_JACOBIANS

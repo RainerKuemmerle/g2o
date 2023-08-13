@@ -54,20 +54,6 @@ class G2O_TYPES_SLAM3D_ADDONS_API EdgeSE3Line3D
 
   void setMeasurement(const Line3D& m) override { measurement_ = Line3D(m); }
 
-  bool setMeasurementData(const double* d) override {
-    Eigen::Map<const Vector6> v(d);
-    measurement_ = Line3D(v);
-    return true;
-  }
-
-  bool getMeasurementData(double* d) const override {
-    Eigen::Map<Vector6> v(d);
-    v = measurement_;
-    return true;
-  }
-
-  int measurementDimension() const override { return 6; }
-
   Vector3 color;
 
  private:

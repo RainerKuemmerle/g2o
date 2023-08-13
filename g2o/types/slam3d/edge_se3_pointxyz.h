@@ -54,20 +54,6 @@ class G2O_TYPES_SLAM3D_API EdgeSE3PointXYZ
 
   void setMeasurement(const Vector3& m) override { measurement_ = m; }
 
-  bool setMeasurementData(const double* d) override {
-    const Eigen::Map<const Vector3> v(d);
-    measurement_ = v;
-    return true;
-  }
-
-  bool getMeasurementData(double* d) const override {
-    Eigen::Map<Vector3> v(d);
-    v = measurement_;
-    return true;
-  }
-
-  int measurementDimension() const override { return 3; }
-
   bool setMeasurementFromState() override;
 
   double initialEstimatePossible(const OptimizableGraph::VertexSet& from,

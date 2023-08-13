@@ -31,13 +31,12 @@
 #include <Eigen/Geometry>
 #include <cassert>
 
+#include "g2o/core/type_traits.h"
 #include "g2o/stuff/macros.h"
 #include "g2o/stuff/misc.h"
 #include "g2o_tutorial_slam2d_api.h"
 
-namespace g2o {
-
-namespace tutorial {
+namespace g2o::tutorial {
 
 class G2O_TUTORIAL_SLAM2D_API SE2 {
  public:
@@ -46,11 +45,11 @@ class G2O_TUTORIAL_SLAM2D_API SE2 {
 
   SE2(double x, double y, double theta) : R_(theta), t_(x, y) {}
 
-  const Eigen::Vector2d& translation() const { return t_; }
+  [[nodiscard]] const Eigen::Vector2d& translation() const { return t_; }
 
   Eigen::Vector2d& translation() { return t_; }
 
-  const Eigen::Rotation2Dd& rotation() const { return R_; }
+  [[nodiscard]] const Eigen::Rotation2Dd& rotation() const { return R_; }
 
   Eigen::Rotation2Dd& rotation() { return R_; }
 
@@ -73,7 +72,7 @@ class G2O_TUTORIAL_SLAM2D_API SE2 {
     return t_ + R_ * v;
   }
 
-  SE2 inverse() const {
+  [[nodiscard]] SE2 inverse() const {
     SE2 ret;
     ret.R_ = R_.inverse();
     ret.R_.angle() = normalize_theta(ret.R_.angle());
@@ -95,7 +94,7 @@ class G2O_TUTORIAL_SLAM2D_API SE2 {
 
   void fromVector(const Eigen::Vector3d& v) { *this = SE2(v[0], v[1], v[2]); }
 
-  Eigen::Vector3d toVector() const {
+  [[nodiscard]] Eigen::Vector3d toVector() const {
     Eigen::Vector3d ret;
     for (int i = 0; i < 3; i++) {
       ret(i) = (*this)[i];
@@ -108,7 +107,50 @@ class G2O_TUTORIAL_SLAM2D_API SE2 {
   Eigen::Vector2d t_;
 };
 
-}  // namespace tutorial
+}  // namespace g2o::tutorial
+
+namespace g2o {
+/**
+ * @brief TypeTraits specialization for a SE2 in our tutorial
+ */
+template <>
+struct g2o::TypeTraits<tutorial::SE2> {
+  enum {
+    kVectorDimension = 3,
+    kMinimalVectorDimension = 3,
+    kIsVector = 0,
+    kIsScalar = 0,
+  };
+  using Type = tutorial::SE2;
+  using VectorType = VectorN<kVectorDimension>;
+  using MinimalVectorType = VectorN<kMinimalVectorDimension>;
+
+  static VectorType toVector(const Type& t) { return t.toVector(); }
+  static void toData(const Type& t, double* data) {
+    typename VectorType::MapType v(data, kVectorDimension);
+    v = t.toVector();
+  }
+
+  static MinimalVectorType toMinimalVector(const Type& t) {
+    return t.toVector();
+  }
+  static void toMinimalData(const Type& t, double* data) {
+    typename MinimalVectorType::MapType v(data, kMinimalVectorDimension);
+    v = t.toVector();
+  }
+
+  template <typename Derived>
+  static Type fromVector(const Eigen::DenseBase<Derived>& v) {
+    return Type(v[0], v[1], v[2]);
+  }
+
+  template <typename Derived>
+  static Type fromMinimalVector(const Eigen::DenseBase<Derived>& v) {
+    return Type(v[0], v[1], v[2]);
+  }
+
+  static Type Identity() { return Type(); }
+};
 }  // namespace g2o
 
 #endif

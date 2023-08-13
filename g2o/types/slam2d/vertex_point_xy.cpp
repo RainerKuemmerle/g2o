@@ -37,19 +37,7 @@
 
 namespace g2o {
 
-VertexPointXY::VertexPointXY()
-
-{
-  estimate_.setZero();
-}
-
-bool VertexPointXY::read(std::istream& is) {
-  return internal::readVector(is, estimate_);
-}
-
-bool VertexPointXY::write(std::ostream& os) const {
-  return internal::writeVector(os, estimate());
-}
+VertexPointXY::VertexPointXY() { estimate_.setZero(); }
 
 #ifdef G2O_HAVE_OPENGL
 VertexPointXYDrawAction::VertexPointXYDrawAction()

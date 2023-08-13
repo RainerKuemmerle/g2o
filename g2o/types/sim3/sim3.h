@@ -31,10 +31,13 @@
 #include <cassert>
 #include <utility>
 
+#include "g2o/core/eigen_types.h"
+#include "g2o/core/type_traits.h"
 #include "g2o/stuff/misc.h"
 #include "g2o/types/slam3d/se3_ops.h"
 
 namespace g2o {
+
 struct Sim3 {
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
@@ -76,13 +79,13 @@ struct Sim3 {
     I.setIdentity();
     Matrix3 R;
 
-    double eps = cst(0.00001);
+    constexpr double kEps = cst(0.00001);
     double A;
     double B;
     double C;
-    if (fabs(sigma) < eps) {
+    if (fabs(sigma) < kEps) {
       C = 1;
-      if (theta < eps) {
+      if (theta < kEps) {
         A = cst(1. / 2.);
         B = cst(1. / 6.);
         R = (I + Omega +
@@ -98,7 +101,7 @@ struct Sim3 {
       }
     } else {
       C = (s_ - 1) / sigma;
-      if (theta < eps) {
+      if (theta < kEps) {
         double sigma2 = sigma * sigma;
         A = ((sigma - 1) * s_ + 1) / sigma2;
         B = ((cst(0.5) * sigma2 - sigma + 1) * s_ - 1) /
@@ -143,15 +146,15 @@ struct Sim3 {
 
     Matrix3 Omega;
 
-    double eps = cst(0.00001);
+    constexpr double kEps = cst(0.00001);
     Matrix3 I = Matrix3::Identity();
 
     double A;
     double B;
     double C;
-    if (fabs(sigma) < eps) {
+    if (fabs(sigma) < kEps) {
       C = 1;
-      if (d > 1 - eps) {
+      if (d > 1 - kEps) {
         omega = 0.5 * deltaR(R);
         Omega = skew(omega);
         A = cst(1. / 2.);
@@ -166,7 +169,7 @@ struct Sim3 {
       }
     } else {
       C = (s_ - 1) / sigma;
-      if (d > 1 - eps) {
+      if (d > 1 - kEps) {
         double sigma2 = sigma * sigma;
         omega = cst(0.5) * deltaR(R);
         Omega = skew(omega);
@@ -270,6 +273,53 @@ inline std::ostream& operator<<(std::ostream& out_str, const Sim3& sim3) {
 
   return out_str;
 }
+
+/**
+ * @brief TypeTraits specialization for a Sim3
+ */
+template <>
+struct TypeTraits<Sim3> {
+  enum {
+    kVectorDimension = 8,
+    kMinimalVectorDimension = 7,
+    kIsVector = 0,
+    kIsScalar = 0,
+  };
+  using Type = Sim3;
+  using VectorType = VectorN<kVectorDimension>;
+  using MinimalVectorType = VectorN<kMinimalVectorDimension>;
+
+  static VectorType toVector(const Type& t) {
+    VectorN<8> v;
+    for (int i = 0; i < 8; ++i) v[i] = t[i];
+    return v;
+  }
+  static void toData(const Type& t, double* data) {
+    typename VectorType::MapType v(data, kVectorDimension);
+    for (int i = 0; i < 8; ++i) v[i] = t[i];
+  }
+
+  static MinimalVectorType toMinimalVector(const Type& t) { return t.log(); }
+  static void toMinimalData(const Type& t, double* data) {
+    typename MinimalVectorType::MapType v(data, kMinimalVectorDimension);
+    v = t.log();
+  }
+
+  template <typename Derived>
+  static Type fromVector(const Eigen::DenseBase<Derived>& v) {
+    Sim3 aux;
+    for (int i = 0; i < 8; ++i) aux[i] = v[i];
+    aux.normalizeRotation();
+    return aux;
+  }
+
+  template <typename Derived>
+  static Type fromMinimalVector(const Eigen::DenseBase<Derived>& v) {
+    return Sim3(v);
+  }
+
+  static Type Identity() { return Sim3(); }
+};
 
 }  // namespace g2o
 

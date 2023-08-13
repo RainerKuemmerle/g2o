@@ -43,41 +43,7 @@ class G2O_TYPES_SLAM2D_API VertexSE2 : public BaseVertex<3, SE2> {
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   VertexSE2() = default;
 
-  void setToOriginImpl() override { estimate_ = SE2(); }
-
-  void oplusImpl(const VectorX::MapType& update) override {
-    Vector2 t = estimate_.translation();
-    t += update.head<2>();
-    double angle = normalize_theta(estimate_.rotation().angle() + update[2]);
-    estimate_.setTranslation(t);
-    estimate_.setRotation(Rotation2D(angle));
-  }
-
-  bool setEstimateDataImpl(const double* est) override {
-    estimate_ = SE2(est[0], est[1], est[2]);
-    return true;
-  }
-
-  bool getEstimateData(double* est) const override {
-    Eigen::Map<Vector3> v(est);
-    v = estimate_.toVector();
-    return true;
-  }
-
-  [[nodiscard]] int estimateDimension() const override { return 3; }
-
-  bool setMinimalEstimateDataImpl(const double* est) override {
-    return setEstimateData(est);
-  }
-
-  bool getMinimalEstimateData(double* est) const override {
-    return getEstimateData(est);
-  }
-
-  [[nodiscard]] int minimalEstimateDimension() const override { return 3; }
-
-  bool read(std::istream& is) override;
-  bool write(std::ostream& os) const override;
+  void oplusImpl(const VectorX::MapType& update) override;
 };
 
 #ifdef G2O_HAVE_OPENGL

@@ -52,20 +52,6 @@ class G2O_TYPES_SLAM2D_API EdgeSE2PointXYOffset
 
   void setMeasurement(const Vector2& m) override { measurement_ = m; }
 
-  bool setMeasurementData(const double* d) override {
-    Eigen::Map<const Vector2> v(d);
-    measurement_ = v;
-    return true;
-  }
-
-  bool getMeasurementData(double* d) const override {
-    Eigen::Map<Vector2> v(d);
-    v = measurement_;
-    return true;
-  }
-
-  int measurementDimension() const override { return 3; }
-
   bool setMeasurementFromState() override;
 
   double initialEstimatePossible(const OptimizableGraph::VertexSet& from,

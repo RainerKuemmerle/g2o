@@ -54,9 +54,6 @@ class PolynomialCoefficientVertex
     return g2o::internal::writeVector(os, estimate_);
   }
 
-  // Reset to zero
-  void setToOriginImpl() override { estimate_.setZero(); }
-
   // Direct linear add
   void oplusImpl(const g2o::VectorX::MapType& update) override {
     estimate_ += update;

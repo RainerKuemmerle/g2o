@@ -26,17 +26,30 @@
 
 #include <sstream>
 
+#include "g2o/core/eigen_types.h"
 #include "g2o/types/sba/types_sba.h"
 #include "gtest/gtest.h"
 #include "unit_test/test_helper/io.h"
 #include "unit_test/test_helper/random_state.h"
 
-using namespace std;
 using namespace g2o;
 
 namespace {
+
+struct RandomIntrinsics {
+  static VertexIntrinsicsEstimate create() {
+    VertexIntrinsicsEstimate res;
+    res.values = VectorN<5>::Random();
+    return res;
+  }
+  static bool isApprox(const VertexIntrinsicsEstimate& a,
+                       const VertexIntrinsicsEstimate& b) {
+    return a.values.isApprox(b.values, 1e-5);
+  }
+};
+
 struct RandomSBACam {
-  static SBACam create() { return SBACam(); }  // TODO Randomize
+  static SBACam create() { return SBACam(); }  // TODO(goki): Randomize
   static bool isApprox(const SBACam& a, const SBACam& b) {
     return a.toVector().isApprox(b.toVector(), 1e-5) &&
            a.Kcam.isApprox(b.Kcam, 1e-5);
@@ -44,7 +57,7 @@ struct RandomSBACam {
 };
 
 struct RandomSE3Quat {
-  static SE3Quat create() { return SE3Quat(); }  // TODO Randomize
+  static SE3Quat create() { return SE3Quat(); }  // TODO(goki): Randomize
   static bool isApprox(const SE3Quat& a, const SE3Quat& b) {
     return a.toVector().isApprox(b.toVector(), 1e-5);
   }
@@ -55,7 +68,7 @@ struct RandomSE3Quat {
  * VERTEX Tests
  */
 TEST(IoSba, ReadWriteVertexIntrinsics) {
-  readWriteVectorBasedVertex<VertexIntrinsics>();
+  readWriteVectorBasedVertex<VertexIntrinsics, RandomIntrinsics>();
 }
 
 TEST(IoSba, ReadWriteVertexCam) {

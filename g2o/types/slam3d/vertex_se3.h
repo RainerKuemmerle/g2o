@@ -32,6 +32,7 @@
 #include "g2o/core/hyper_graph_action.h"
 #include "g2o_types_slam3d_api.h"
 #include "isometry3d_mappings.h"
+#include "type_traits_isometry3.h"
 
 namespace g2o {
 
@@ -56,38 +57,8 @@ class G2O_TYPES_SLAM3D_API VertexSE3 : public BaseVertex<6, Isometry3> {
 
   VertexSE3();
 
-  void setToOriginImpl() override { estimate_ = Isometry3::Identity(); }
-
   bool read(std::istream& is) override;
   bool write(std::ostream& os) const override;
-
-  bool setEstimateDataImpl(const double* est) override {
-    Eigen::Map<const Vector7> v(est);
-    estimate_ = internal::fromVectorQT(v);
-    return true;
-  }
-
-  bool getEstimateData(double* est) const override {
-    Eigen::Map<Vector7> v(est);
-    v = internal::toVectorQT(estimate_);
-    return true;
-  }
-
-  [[nodiscard]] int estimateDimension() const override { return 7; }
-
-  bool setMinimalEstimateDataImpl(const double* est) override {
-    Eigen::Map<const Vector6> v(est);
-    estimate_ = internal::fromVectorMQT(v);
-    return true;
-  }
-
-  bool getMinimalEstimateData(double* est) const override {
-    Eigen::Map<Vector6> v(est);
-    v = internal::toVectorMQT(estimate_);
-    return true;
-  }
-
-  [[nodiscard]] int minimalEstimateDimension() const override { return 6; }
 
   /**
    * update the position of this vertex. The update is in the form
@@ -116,7 +87,7 @@ class G2O_TYPES_SLAM3D_API VertexSE3 : public BaseVertex<6, Isometry3> {
   }
 
  protected:
-  int numOplusCalls_ = 0;  ///< store how often opluse was called to trigger
+  int numOplusCalls_ = 0;  ///< store how often oplus was called to trigger
                            ///< orthogonaliation of the rotation matrix
 };
 

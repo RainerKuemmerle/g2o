@@ -32,6 +32,7 @@
 #include <limits>
 #include <type_traits>
 
+#include "g2o/core/type_traits.h"
 #include "g2o/stuff/logger.h"
 #include "optimizable_graph.h"
 
@@ -97,10 +98,8 @@ class BaseEdge : public OptimizableGraph::Edge {
     return error_.dot(information() * error_);
   }
 
-  [[nodiscard]] const double* errorData() const override {
-    return error_.data();
-  }
-  double* errorData() override { return error_.data(); }
+  [[nodiscard]] const double* errorData() const final { return error_.data(); }
+  double* errorData() final { return error_.data(); }
   const ErrorVector& error() const { return error_; }
   ErrorVector& error() { return error_; }
 
@@ -143,6 +142,29 @@ class BaseEdge : public OptimizableGraph::Edge {
     dimension_ = dim;
     information_.resize(dim, dim);
     error_.resize(dim, 1);
+  }
+
+  // methods based on the traits interface
+  bool setMeasurementData(const double* d) final {
+    static_assert(TypeTraits<Measurement>::kVectorDimension != INT_MIN,
+                  "Forgot to implement TypeTrait for your Measurement");
+    typename TypeTraits<Measurement>::VectorType::ConstMapType aux(
+        d, DimensionTraits<Measurement>::dimension(measurement_));
+    setMeasurement(TypeTraits<Measurement>::fromVector(aux));
+    return true;
+  }
+
+  bool getMeasurementData(double* d) const final {
+    static_assert(TypeTraits<Measurement>::kVectorDimension != INT_MIN,
+                  "Forgot to implement TypeTrait for your Measurement");
+    typename TypeTraits<Measurement>::VectorType::MapType aux(
+        d, DimensionTraits<Measurement>::dimension(measurement_));
+    TypeTraits<Measurement>::toData(measurement_, d);
+    return true;
+  }
+
+  [[nodiscard]] int measurementDimension() const final {
+    return TypeTraits<Measurement>::kVectorDimension;
   }
 
  protected:

@@ -44,10 +44,10 @@ class G2O_TYPES_SBA_API VertexCam : public BaseVertex<6, SBACam> {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
 
+  //! reimplement reading VertexCam to support custom format
   bool read(std::istream& is) override;
+  //! reimplement writing VertexCam to support custom format
   bool write(std::ostream& os) const override;
-
-  void setToOriginImpl() override { estimate_ = SBACam(); }
 
   virtual void setEstimate(const SBACam& cam) {
     BaseVertex<6, SBACam>::setEstimate(cam);
@@ -62,34 +62,6 @@ class G2O_TYPES_SBA_API VertexCam : public BaseVertex<6, SBACam> {
     estimate_.setProjection();
     estimate_.setDr();
   }
-
-  bool setEstimateDataImpl(const double* est) override {
-    Eigen::Map<const Vector7> v(est);
-    estimate_.fromVector(v);
-    return true;
-  }
-
-  bool getEstimateData(double* est) const override {
-    Eigen::Map<Vector7> v(est);
-    v = estimate().toVector();
-    return true;
-  }
-
-  int estimateDimension() const override { return 7; }
-
-  bool setMinimalEstimateDataImpl(const double* est) override {
-    Eigen::Map<const Vector6> v(est);
-    estimate_.fromMinimalVector(v);
-    return true;
-  }
-
-  bool getMinimalEstimateData(double* est) const override {
-    Eigen::Map<Vector6> v(est);
-    v = estimate_.toMinimalVector();
-    return true;
-  }
-
-  int minimalEstimateDimension() const override { return 6; }
 };
 }  // namespace g2o
 

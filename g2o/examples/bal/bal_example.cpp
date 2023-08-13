@@ -78,10 +78,6 @@ class VertexCameraBAL : public g2o::BaseVertex<9, g2o::bal::Vector9> {
     return false;
   }
 
-  void setToOriginImpl() override {
-    std::cerr << __PRETTY_FUNCTION__ << " not implemented yet" << std::endl;
-  }
-
   void oplusImpl(const g2o::VectorX::MapType& update) override {
     estimate_ += update;
   }
@@ -105,10 +101,6 @@ class VertexPointBAL : public g2o::BaseVertex<3, g2o::Vector3> {
   bool write(std::ostream& /*os*/) const override {
     std::cerr << __PRETTY_FUNCTION__ << " not implemented yet" << std::endl;
     return false;
-  }
-
-  void setToOriginImpl() override {
-    std::cerr << __PRETTY_FUNCTION__ << " not implemented yet" << std::endl;
   }
 
   void oplusImpl(const g2o::VectorX::MapType& update) override {

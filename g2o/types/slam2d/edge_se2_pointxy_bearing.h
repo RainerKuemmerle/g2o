@@ -48,18 +48,6 @@ class G2O_TYPES_SLAM2D_API EdgeSE2PointXYBearing
     error_[0] = normalize_theta(measurement_ - angle);
   }
 
-  bool setMeasurementData(const double* d) override {
-    measurement_ = d[0];
-    return true;
-  }
-
-  bool getMeasurementData(double* d) const override {
-    d[0] = measurement_;
-    return true;
-  }
-
-  [[nodiscard]] int measurementDimension() const override { return 1; }
-
   bool setMeasurementFromState() override {
     const VertexSE2* v1 = vertexXnRaw<0>();
     const VertexPointXY* l2 = vertexXnRaw<1>();

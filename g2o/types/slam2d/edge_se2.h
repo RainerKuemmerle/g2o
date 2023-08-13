@@ -58,27 +58,10 @@ class G2O_TYPES_SLAM2D_API EdgeSE2
     inverseMeasurement_ = m.inverse();
   }
 
-  bool setMeasurementData(const double* d) override {
-    measurement_ = SE2(d[0], d[1], d[2]);
-    inverseMeasurement_ = measurement_.inverse();
-    return true;
-  }
-
-  bool getMeasurementData(double* d) const override {
-    Vector3 v = measurement_.toVector();
-    d[0] = v[0];
-    d[1] = v[1];
-    d[2] = v[2];
-    return true;
-  }
-
-  [[nodiscard]] int measurementDimension() const override { return 3; }
-
   bool setMeasurementFromState() override {
     const VertexSE2* v1 = vertexXnRaw<0>();
     const VertexSE2* v2 = vertexXnRaw<1>();
-    measurement_ = v1->estimate().inverse() * v2->estimate();
-    inverseMeasurement_ = measurement_.inverse();
+    setMeasurement(v1->estimate().inverse() * v2->estimate());
     return true;
   }
 

@@ -30,6 +30,8 @@
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 
+#include "g2o/core/eigen_types.h"
+#include "g2o/core/type_traits.h"
 #include "g2o/types/slam2d/se2.h"
 #include "g2o_types_slam2d_addons_api.h"
 
@@ -52,6 +54,43 @@ inline Line2D operator*(const SE2& t, const Line2D& l) {
   est[1] += n.dot(t.translation());
   return est;
 }
+
+template <>
+struct TypeTraits<Line2D> {
+  enum {
+    kVectorDimension = 2,
+    kMinimalVectorDimension = 2,
+    kIsVector = 1,
+    kIsScalar = 0,
+  };
+  using Type = Line2D;
+  using VectorType = VectorN<kVectorDimension>;
+  using MinimalVectorType = VectorN<kMinimalVectorDimension>;
+
+  static VectorType toVector(const Type& t) { return t; }
+  static void toData(const Type& t, double* data) {  // NOLINT
+    typename VectorType::MapType v(data, kVectorDimension);
+    v = t;
+  }
+
+  static MinimalVectorType toMinimalVector(const Type& t) { return t; }
+  static void toMinimalData(const Type& t, double* data) {  // NOLINT
+    typename MinimalVectorType::MapType v(data, kMinimalVectorDimension);
+    v = t;
+  }
+
+  template <typename Derived>
+  static Type fromVector(const Eigen::DenseBase<Derived>& v) {
+    return Line2D(v);
+  }
+
+  template <typename Derived>
+  static Type fromMinimalVector(const Eigen::DenseBase<Derived>& v) {
+    return Line2D(v);
+  }
+
+  static Type Identity() { return Type(); }
+};
 
 }  // namespace g2o
 

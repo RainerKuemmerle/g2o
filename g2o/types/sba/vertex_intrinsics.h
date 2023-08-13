@@ -28,24 +28,75 @@
 #define G2O_SBA_VERTEX_INTRINSICS_H
 
 #include "g2o/core/base_vertex.h"
+#include "g2o/core/eigen_types.h"
 #include "g2o_types_sba_api.h"
 
 namespace g2o {
+
+struct VertexIntrinsicsEstimate {
+  VectorN<5> values;
+};
 
 /**
  * \brief Vertex encoding the intrinsics of the camera fx, fy, cx, xy, baseline;
  */
 class G2O_TYPES_SBA_API VertexIntrinsics
-    : public BaseVertex<4, Eigen::Matrix<double, 5, 1, Eigen::ColMajor> > {
+    : public BaseVertex<4, VertexIntrinsicsEstimate> {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   VertexIntrinsics();
   bool read(std::istream& is) override;
   bool write(std::ostream& os) const override;
 
-  void setToOriginImpl() override;
-
   void oplusImpl(const VectorX::MapType& update) override;
+};
+
+template <>
+struct TypeTraits<VertexIntrinsicsEstimate> {
+  enum {
+    kVectorDimension = 5,
+    kMinimalVectorDimension = 4,
+    kIsVector = 0,
+    kIsScalar = 0,
+  };
+  using Type = VertexIntrinsicsEstimate;
+  using VectorType = VectorN<kVectorDimension>;
+  using MinimalVectorType = VectorN<kMinimalVectorDimension>;
+
+  static VectorType toVector(const Type& t) { return t.values; }
+  static void toData(const Type& t, double* data) {
+    typename VectorType::MapType v(data, kVectorDimension);
+    v = t.values;
+  }
+
+  static MinimalVectorType toMinimalVector(const Type& t) {
+    return t.values.head<4>();
+  }
+  static void toMinimalData(const Type& t, double* data) {
+    typename MinimalVectorType::MapType v(data, kMinimalVectorDimension);
+    v = t.values.head<4>();
+  }
+
+  template <typename Derived>
+  static Type fromVector(const Eigen::DenseBase<Derived>& v) {
+    Type res;
+    res.values = v;
+    return res;
+  }
+
+  template <typename Derived>
+  static Type fromMinimalVector(const Eigen::DenseBase<Derived>& v) {
+    Type res;
+    res.values.head<4>() = v;
+    res.values(4) = 0.1;
+    return res;
+  }
+
+  static Type Identity() {
+    Type res;
+    res.values << 1., 1., .5, .5, .1;
+    return res;
+  }
 };
 
 }  // namespace g2o

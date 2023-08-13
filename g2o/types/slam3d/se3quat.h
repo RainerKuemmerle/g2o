@@ -32,6 +32,7 @@
 #include <cassert>
 #include <utility>
 
+#include "g2o/core/type_traits.h"
 #include "g2o/stuff/misc.h"
 #include "se3_ops.h"
 
@@ -62,8 +63,8 @@ class G2O_TYPES_SLAM3D_API SE3Quat {
   }
 
   /**
-   * templaized constructor which allows v to be an arbitrary Eigen Vector type,
-   * e.g., Vector6 or Map<Vector6>
+   * templatized constructor which allows v to be an arbitrary Eigen Vector
+   * type, e.g., Vector6 or Map<Vector6>
    */
   template <typename Derived>
   explicit SE3Quat(const Eigen::MatrixBase<Derived>& v) {
@@ -89,15 +90,15 @@ class G2O_TYPES_SLAM3D_API SE3Quat {
     }
   }
 
-  inline const Vector3& translation() const { return t_; }
+  [[nodiscard]] const Vector3& translation() const { return t_; }
 
-  inline void setTranslation(const Vector3& t) { t_ = t; }
+  void setTranslation(const Vector3& t) { t_ = t; }
 
-  inline const Quaternion& rotation() const { return r_; }
+  [[nodiscard]] const Quaternion& rotation() const { return r_; }
 
   void setRotation(const Quaternion& r) { r_ = r; }
 
-  inline SE3Quat operator*(const SE3Quat& tr2) const {
+  SE3Quat operator*(const SE3Quat& tr2) const {
     SE3Quat result(*this);
     result.t_ += r_ * tr2.t_;
     result.r_ *= tr2.r_;
@@ -105,29 +106,29 @@ class G2O_TYPES_SLAM3D_API SE3Quat {
     return result;
   }
 
-  inline SE3Quat& operator*=(const SE3Quat& tr2) {
+  SE3Quat& operator*=(const SE3Quat& tr2) {
     t_ += r_ * tr2.t_;
     r_ *= tr2.r_;
     normalizeRotation();
     return *this;
   }
 
-  inline Vector3 operator*(const Vector3& v) const { return t_ + r_ * v; }
+  Vector3 operator*(const Vector3& v) const { return t_ + r_ * v; }
 
-  inline SE3Quat inverse() const {
+  [[nodiscard]] SE3Quat inverse() const {
     SE3Quat ret;
     ret.r_ = r_.conjugate();
     ret.t_ = ret.r_ * (t_ * -cst(1.));
     return ret;
   }
 
-  inline double operator[](int i) const {
+  double operator[](int i) const {
     assert(i < 7);
     if (i < 3) return t_[i];
     return r_.coeffs()[i - 3];
   }
 
-  inline Vector7 toVector() const {
+  [[nodiscard]] Vector7 toVector() const {
     Vector7 v;
     v[0] = t_(0);
     v[1] = t_(1);
@@ -139,12 +140,12 @@ class G2O_TYPES_SLAM3D_API SE3Quat {
     return v;
   }
 
-  inline void fromVector(const Vector7& v) {
+  void fromVector(const Vector7& v) {
     r_ = Quaternion(v[6], v[3], v[4], v[5]);
     t_ = Vector3(v[0], v[1], v[2]);
   }
 
-  inline Vector6 toMinimalVector() const {
+  [[nodiscard]] Vector6 toMinimalVector() const {
     Vector6 v;
     v[0] = t_(0);
     v[1] = t_(1);
@@ -155,7 +156,7 @@ class G2O_TYPES_SLAM3D_API SE3Quat {
     return v;
   }
 
-  inline void fromMinimalVector(const Vector6& v) {
+  void fromMinimalVector(const Vector6& v) {
     double w = cst(1.) - v[3] * v[3] - v[4] * v[4] - v[5] * v[5];
     if (w > 0) {
       r_ = Quaternion(std::sqrt(w), v[3], v[4], v[5]);
@@ -165,7 +166,7 @@ class G2O_TYPES_SLAM3D_API SE3Quat {
     t_ = Vector3(v[0], v[1], v[2]);
   }
 
-  Vector6 log() const {
+  [[nodiscard]] Vector6 log() const {
     Vector6 res;
     Matrix3 R = r_.toRotationMatrix();
     double d = cst(0.5) * (R(0, 0) + R(1, 1) + R(2, 2) - 1);
@@ -200,7 +201,7 @@ class G2O_TYPES_SLAM3D_API SE3Quat {
     return res;
   }
 
-  Vector3 map(const Vector3& xyz) const { return r_ * xyz + t_; }
+  [[nodiscard]] Vector3 map(const Vector3& xyz) const { return r_ * xyz + t_; }
 
   static SE3Quat exp(const Vector6& update) {
     Vector3 omega;
@@ -232,7 +233,7 @@ class G2O_TYPES_SLAM3D_API SE3Quat {
     return SE3Quat(Quaternion(R), V * upsilon);
   }
 
-  Eigen::Matrix<double, 6, 6, Eigen::ColMajor> adj() const {
+  [[nodiscard]] Eigen::Matrix<double, 6, 6, Eigen::ColMajor> adj() const {
     Matrix3 R = r_.toRotationMatrix();
     Eigen::Matrix<double, 6, 6, Eigen::ColMajor> res;
     res.block(0, 0, 3, 3) = R;
@@ -242,7 +243,8 @@ class G2O_TYPES_SLAM3D_API SE3Quat {
     return res;
   }
 
-  Eigen::Matrix<double, 4, 4, Eigen::ColMajor> to_homogeneous_matrix() const {
+  [[nodiscard]] Eigen::Matrix<double, 4, 4, Eigen::ColMajor>
+  to_homogeneous_matrix() const {
     Eigen::Matrix<double, 4, 4, Eigen::ColMajor> homogeneous_matrix;
     homogeneous_matrix.setIdentity();
     homogeneous_matrix.block(0, 0, 3, 3) = r_.toRotationMatrix();
@@ -273,11 +275,51 @@ inline std::ostream& operator<<(std::ostream& out_str, const SE3Quat& se3) {
   return out_str;
 }
 
-// G2O_TYPES_SLAM3D_API Quaternion euler_to_quat(double yaw, double pitch,
-// double roll); G2O_TYPES_SLAM3D_API void quat_to_euler(const Quaternion& q,
-// double& yaw, double& pitch, double& roll); G2O_TYPES_SLAM3D_API void
-// jac_quat3_euler3(Eigen::Matrix<double, 6, 6, Eigen::ColMajor>& J, const
-// SE3Quat& t);
+/**
+ * @brief TypeTraits specialization for a SE3Quat
+ *
+ * @tparam
+ */
+template <>
+struct TypeTraits<SE3Quat> {
+  enum {
+    kVectorDimension = 7,
+    kMinimalVectorDimension = 6,
+    kIsVector = 0,
+    kIsScalar = 0,
+  };
+  using Type = SE3Quat;
+  using VectorType = VectorN<kVectorDimension>;
+  using MinimalVectorType = VectorN<kMinimalVectorDimension>;
+
+  static VectorType toVector(const Type& t) { return t.toVector(); }
+  static void toData(const Type& t, double* data) {
+    typename VectorType::MapType v(data, kVectorDimension);
+    v = t.toVector();
+  }
+
+  static VectorType toMinimalVector(const Type& t) { return t.toVector(); }
+  static void toMinimalData(const Type& t, double* data) {
+    typename MinimalVectorType::MapType v(data, kMinimalVectorDimension);
+    v = t.toMinimalVector();
+  }
+
+  template <typename Derived>
+  static Type fromVector(const Eigen::DenseBase<Derived>& v) {
+    Type res;
+    res.fromVector(v);
+    return res;
+  }
+
+  template <typename Derived>
+  static Type fromMinimalVector(const Eigen::DenseBase<Derived>& v) {
+    Type res;
+    res.fromMinimalVector(v);
+    return res;
+  }
+
+  static Type Identity() { return Type(); }
+};
 
 }  // namespace g2o
 

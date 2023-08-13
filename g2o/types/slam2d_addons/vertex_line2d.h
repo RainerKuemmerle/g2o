@@ -42,37 +42,11 @@ class G2O_TYPES_SLAM2D_ADDONS_API VertexLine2D : public BaseVertex<2, Line2D> {
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
   VertexLine2D();
 
-  double theta() const { return estimate_[0]; }
+  [[nodiscard]] double theta() const { return estimate_[0]; }
   void setTheta(double t) { estimate_[0] = t; }
 
-  double rho() const { return estimate_[1]; }
+  [[nodiscard]] double rho() const { return estimate_[1]; }
   void setRho(double r) { estimate_[1] = r; }
-
-  void setToOriginImpl() override { estimate_.setZero(); }
-
-  bool setEstimateDataImpl(const double* est) override {
-    Eigen::Map<const Vector2> v(est);
-    estimate_ = Line2D(v);
-    return true;
-  }
-
-  bool getEstimateData(double* est) const override {
-    Eigen::Map<Vector2> v(est);
-    v = estimate_;
-    return true;
-  }
-
-  int estimateDimension() const override { return 2; }
-
-  bool setMinimalEstimateDataImpl(const double* est) override {
-    return setEstimateData(est);
-  }
-
-  bool getMinimalEstimateData(double* est) const override {
-    return getEstimateData(est);
-  }
-
-  int minimalEstimateDimension() const override { return 2; }
 
   void oplusImpl(const VectorX::MapType& update) override {
     estimate_ += update.head<kDimension>();

@@ -19,8 +19,6 @@ class VertexPosition3D : public g2o::BaseVertex<3, Eigen::Vector3d> {
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   VertexPosition3D() = default;
 
-  void setToOriginImpl() override { estimate_.setZero(); }
-
   void oplusImpl(const g2o::VectorX::MapType& update) override {
     estimate_ += update;
   }
@@ -36,8 +34,6 @@ class VertexPositionVelocity3D : public g2o::BaseVertex<6, Vector6d> {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   VertexPositionVelocity3D() = default;
-
-  void setToOriginImpl() override { estimate_.setZero(); }
 
   void oplusImpl(const g2o::VectorX::MapType& update) override {
     estimate_ += update;

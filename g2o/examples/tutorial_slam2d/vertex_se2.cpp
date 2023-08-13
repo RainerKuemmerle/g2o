@@ -26,8 +26,7 @@
 
 #include "vertex_se2.h"
 
-namespace g2o {
-namespace tutorial {
+namespace g2o::tutorial {
 
 VertexSE2::VertexSE2() = default;
 
@@ -44,5 +43,4 @@ bool VertexSE2::write(std::ostream& os) const {
   return os.good();
 }
 
-}  // namespace tutorial
-}  // namespace g2o
+}  // namespace g2o::tutorial

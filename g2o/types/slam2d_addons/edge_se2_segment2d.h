@@ -70,24 +70,6 @@ class EdgeSE2Segment2D
     error_ = error_ - measurement_;
   }
 
-  G2O_TYPES_SLAM2D_ADDONS_API bool setMeasurementData(
-      const double* d) override {
-    Eigen::Map<const Vector4> data(d);
-    measurement_ = data;
-    return true;
-  }
-
-  G2O_TYPES_SLAM2D_ADDONS_API bool getMeasurementData(
-      double* d) const override {
-    Eigen::Map<Vector4> data(d);
-    data = measurement_;
-    return true;
-  }
-
-  G2O_TYPES_SLAM2D_ADDONS_API int measurementDimension() const override {
-    return 4;
-  }
-
   G2O_TYPES_SLAM2D_ADDONS_API bool setMeasurementFromState() override {
     const VertexSE2* v1 = vertexXnRaw<0>();
     const VertexSegment2D* l2 = vertexXnRaw<1>();

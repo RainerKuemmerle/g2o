@@ -41,8 +41,6 @@ bool VertexSE3Expmap::write(std::ostream& os) const {
   return internal::writeVector(os, estimate().inverse().toVector());
 }
 
-void VertexSE3Expmap::setToOriginImpl() { estimate_ = SE3Quat(); }
-
 void VertexSE3Expmap::oplusImpl(const VectorX::MapType& update) {
   setEstimate(SE3Quat::exp(update.head<kDimension>()) * estimate());
 }

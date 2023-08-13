@@ -31,8 +31,7 @@
 #include "g2o_tutorial_slam2d_api.h"
 #include "se2.h"
 
-namespace g2o {
-namespace tutorial {
+namespace g2o::tutorial {
 
 class G2O_TUTORIAL_SLAM2D_API ParameterSE2Offset : public Parameter {
  public:
@@ -41,8 +40,8 @@ class G2O_TUTORIAL_SLAM2D_API ParameterSE2Offset : public Parameter {
 
   void setOffset(const SE2& offset = SE2());
 
-  const SE2& offset() const { return offset_; }
-  const SE2& inverseOffset() const { return inverseOffset_; }
+  [[nodiscard]] const SE2& offset() const { return offset_; }
+  [[nodiscard]] const SE2& inverseOffset() const { return inverseOffset_; }
 
   bool read(std::istream& is) override;
   bool write(std::ostream& os) const override;
@@ -57,8 +56,8 @@ class G2O_TUTORIAL_SLAM2D_API CacheSE2Offset : public Cache {
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
   using ParameterType = ParameterSE2Offset;
 
-  const SE2& w2n() const { return w2n_; }
-  const SE2& n2w() const { return n2w_; }
+  [[nodiscard]] const SE2& w2n() const { return w2n_; }
+  [[nodiscard]] const SE2& n2w() const { return n2w_; }
 
  protected:
   void updateImpl() override;
@@ -66,7 +65,6 @@ class G2O_TUTORIAL_SLAM2D_API CacheSE2Offset : public Cache {
   SE2 w2n_, n2w_;
 };
 
-}  // end namespace tutorial
-}  // namespace g2o
+}  // namespace g2o::tutorial
 
 #endif

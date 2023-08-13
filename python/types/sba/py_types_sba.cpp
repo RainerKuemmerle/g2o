@@ -8,17 +8,14 @@
 namespace g2o {
 
 void declareTypesSBA(py::module& m) {
-  py::class_<VertexIntrinsics,
-             BaseVertex<4, Eigen::Matrix<double, 5, 1, Eigen::ColMajor>>,
+  py::class_<VertexIntrinsics, BaseVertex<4, VertexIntrinsicsEstimate>,
              std::shared_ptr<VertexIntrinsics>>(m, "VertexIntrinsics")
-      .def(py::init<>())
-      .def("set_to_origin_impl", &VertexIntrinsics::setToOriginImpl);
+      .def(py::init<>());
 
   templatedBaseVertex<6, SBACam>(m, "_6_SBACam");
   py::class_<VertexCam, BaseVertex<6, SBACam>, std::shared_ptr<VertexCam>>(
       m, "VertexCam")
       .def(py::init<>())
-      .def("set_to_origin_impl", &VertexCam::setToOriginImpl)
       .def("set_estimate", &VertexCam::setEstimate)  // const SBACam& -> void
       .def("set_estimate_data_impl", &VertexCam::setEstimateDataImpl)
       .def("get_estimate_data", &VertexCam::getEstimateData)

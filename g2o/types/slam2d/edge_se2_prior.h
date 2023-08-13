@@ -56,15 +56,6 @@ class G2O_TYPES_SLAM2D_API EdgeSE2Prior
   }
 
   void setMeasurement(const SE2& m) override;
-  bool setMeasurementData(const double* d) override;
-
-  bool getMeasurementData(double* d) const override {
-    Eigen::Map<Vector3> v(d);
-    v = measurement_.toVector();
-    return true;
-  }
-
-  int measurementDimension() const override { return 3; }
 
   bool read(std::istream& is) override;
   bool write(std::ostream& os) const override;

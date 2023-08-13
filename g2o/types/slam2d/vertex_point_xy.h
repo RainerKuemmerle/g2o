@@ -41,38 +41,9 @@ class G2O_TYPES_SLAM2D_API VertexPointXY : public BaseVertex<2, Vector2> {
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
   VertexPointXY();
 
-  void setToOriginImpl() override { estimate_.setZero(); }
-
-  bool setEstimateDataImpl(const double* est) override {
-    estimate_[0] = est[0];
-    estimate_[1] = est[1];
-    return true;
-  }
-
-  bool getEstimateData(double* est) const override {
-    est[0] = estimate_[0];
-    est[1] = estimate_[1];
-    return true;
-  }
-
-  [[nodiscard]] int estimateDimension() const override { return 2; }
-
-  bool setMinimalEstimateDataImpl(const double* est) override {
-    return setEstimateData(est);
-  }
-
-  bool getMinimalEstimateData(double* est) const override {
-    return getEstimateData(est);
-  }
-
-  [[nodiscard]] int minimalEstimateDimension() const override { return 2; }
-
   void oplusImpl(const VectorX::MapType& update) override {
     estimate_ += update.head<2>();
   }
-
-  bool read(std::istream& is) override;
-  bool write(std::ostream& os) const override;
 };
 
 #ifdef G2O_HAVE_OPENGL
