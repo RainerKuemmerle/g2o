@@ -1,13 +1,26 @@
 #include "py_types_sba.h"
 
 #include "g2o/types/sba/types_sba.h"
+#include "g2o/types/sba/vertex_intrinsics.h"
 #include "g2opy.h"
 #include "python/core/py_base_binary_edge.h"
 #include "python/core/py_base_vertex.h"
 
 namespace g2o {
 
+namespace {
+void declareVertexIntrinsics(py::module& m) {
+  py::class_<VertexIntrinsicsEstimate>(m, "VertexIntrinsicsEstimate")
+      .def(py::init<>())
+
+      .def_readwrite("values", &VertexIntrinsicsEstimate::values);
+
+  templatedBaseVertex<4, VertexIntrinsicsEstimate>(m, "_4_Vertextrinsics");
+}
+}  // namespace
+
 void declareTypesSBA(py::module& m) {
+  declareVertexIntrinsics(m);
   py::class_<VertexIntrinsics, BaseVertex<4, VertexIntrinsicsEstimate>,
              std::shared_ptr<VertexIntrinsics>>(m, "VertexIntrinsics")
       .def(py::init<>());
