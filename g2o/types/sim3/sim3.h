@@ -31,10 +31,13 @@
 #include <cassert>
 #include <utility>
 
+#include "g2o/core/eigen_types.h"
+#include "g2o/core/type_traits.h"
 #include "g2o/stuff/misc.h"
 #include "g2o/types/slam3d/se3_ops.h"
 
 namespace g2o {
+
 struct Sim3 {
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
@@ -270,6 +273,53 @@ inline std::ostream& operator<<(std::ostream& out_str, const Sim3& sim3) {
 
   return out_str;
 }
+
+/**
+ * @brief TypeTraits specialization for a Sim3
+ */
+template <>
+struct TypeTraits<Sim3> {
+  enum {
+    kVectorDimension = 8,
+    kMinimalVectorDimension = 7,
+    kIsVector = 0,
+    kIsScalar = 0,
+  };
+  using Type = Sim3;
+  using VectorType = VectorN<kVectorDimension>;
+  using MinimalVectorType = VectorN<kMinimalVectorDimension>;
+
+  static VectorType toVector(const Type& t) {
+    VectorN<8> v;
+    for (int i = 0; i < 8; ++i) v[i] = t[i];
+    return v;
+  }
+  static void toData(const Type& t, double* data) {
+    typename VectorType::MapType v(data, kVectorDimension);
+    for (int i = 0; i < 8; ++i) v[i] = t[i];
+  }
+
+  static MinimalVectorType toMinimalVector(const Type& t) { return t.log(); }
+  static void toMinimalData(const Type& t, double* data) {
+    typename MinimalVectorType::MapType v(data, kMinimalVectorDimension);
+    v = t.log();
+  }
+
+  template <typename Derived>
+  static Type fromVector(const Eigen::DenseBase<Derived>& v) {
+    Sim3 aux;
+    for (int i = 0; i < 8; ++i) aux[i] = v[i];
+    aux.normalizeRotation();
+    return aux;
+  }
+
+  template <typename Derived>
+  static Type fromMinimalVector(const Eigen::DenseBase<Derived>& v) {
+    return Sim3(v);
+  }
+
+  static Type Identity() { return Sim3(); }
+};
 
 }  // namespace g2o
 

@@ -63,30 +63,7 @@ Matrix3 VertexSCam::kcam_;
 double VertexSCam::baseline_;
 
 // global initialization
-G2O_ATTRIBUTE_CONSTRUCTOR(init_icp_types) { types_icp::init(); }
-
-// Copy constructor
-EdgeVVGicp::EdgeVVGicp(const EdgeVVGicp* e)
-
-{
-  // Temporary hack - TODO, sort out const-ness properly
-  vertices_[0] = std::const_pointer_cast<HyperGraph::Vertex>(e->vertex(0));
-  vertices_[1] = std::const_pointer_cast<HyperGraph::Vertex>(e->vertex(1));
-
-  measurement_.pos0 = e->measurement().pos0;
-  measurement_.pos1 = e->measurement().pos1;
-  measurement_.normal0 = e->measurement().normal0;
-  measurement_.normal1 = e->measurement().normal1;
-  measurement_.R0 = e->measurement().R0;
-  measurement_.R1 = e->measurement().R1;
-
-  pl_pl = e->pl_pl;
-  cov0 = e->cov0;
-  cov1 = e->cov1;
-
-  // TODO(goki): the robust kernel is not correctly copied
-  //_robustKernel = e->_robustKernel;
-}
+G2O_ATTRIBUTE_CONSTRUCTOR(init_icp_types) { types_icp::init(); }  // NOLINT
 
 //
 // Rigid 3D constraint between poses, given fixed point offsets
@@ -106,9 +83,6 @@ bool EdgeVVGicp::read(std::istream& is) {
   // measured point and normal
   for (int i = 0; i < 3; i++) is >> measurement_.pos1[i];
   for (int i = 0; i < 3; i++) is >> measurement_.normal1[i];
-
-  // don't need this if we don't use it in error calculation (???)
-  //    inverseMeasurement() = -measurement();
 
   measurement_.makeRot0();  // set up rotation matrices
 

@@ -67,10 +67,10 @@ class G2O_TYPES_SIM3_API VertexSim3Expmap : public BaseVertex<7, Sim3> {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
   VertexSim3Expmap();
+  //! custom read function
   bool read(std::istream& is) override;
+  //! custom write function
   bool write(std::ostream& os) const override;
-
-  void setToOriginImpl() override { estimate_ = Sim3(); }
 
   void oplusImpl(const VectorX::MapType& update) override {
     if (_fix_scale) {
@@ -85,14 +85,14 @@ class G2O_TYPES_SIM3_API VertexSim3Expmap : public BaseVertex<7, Sim3> {
   Vector2 _principle_point1, _principle_point2;
   Vector2 _focal_length1, _focal_length2;
 
-  Vector2 cam_map1(const Vector2& v) const {
+  [[nodiscard]] Vector2 cam_map1(const Vector2& v) const {
     Vector2 res;
     res[0] = v[0] * _focal_length1[0] + _principle_point1[0];
     res[1] = v[1] * _focal_length1[1] + _principle_point1[1];
     return res;
   }
 
-  Vector2 cam_map2(const Vector2& v) const {
+  [[nodiscard]] Vector2 cam_map2(const Vector2& v) const {
     Vector2 res;
     res[0] = v[0] * _focal_length2[0] + _principle_point2[0];
     res[1] = v[1] * _focal_length2[1] + _principle_point2[1];

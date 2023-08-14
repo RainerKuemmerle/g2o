@@ -27,6 +27,7 @@
 #ifndef G2O_TYPES_ICP
 #define G2O_TYPES_ICP
 
+#include "g2o/core/eigen_types.h"
 #define GICP_ANALYTIC_JACOBIANS
 // #define SCAM_ANALYTIC_JACOBIANS
 
@@ -36,6 +37,7 @@
 #include "g2o/core/base_binary_edge.h"
 #include "g2o/core/base_variable_sized_edge.h"
 #include "g2o/core/base_vertex.h"
+#include "g2o/core/type_traits.h"
 #include "g2o/types/sba/types_sba.h"
 #include "g2o/types/slam3d/types_slam3d.h"
 #include "g2o_types_icp_api.h"
@@ -135,6 +137,69 @@ class G2O_TYPES_ICP_API EdgeGICP {
   }
 };
 
+/**
+ * @brief TypeTraits specialization for a SE2
+ */
+template <>
+struct TypeTraits<EdgeGICP> {
+  enum {
+    kVectorDimension = 12,
+    kMinimalVectorDimension = 12,
+    kIsVector = 0,
+    kIsScalar = 0,
+  };
+  using Type = EdgeGICP;
+  using VectorType = VectorN<kVectorDimension>;
+  using MinimalVectorType = VectorN<kMinimalVectorDimension>;
+
+  static VectorType toVector(const Type& t) {
+    VectorType res;
+    int idx = 0;
+    // first point
+    for (int i = 0; i < 3; i++) res[idx++] = t.pos0[i];
+    for (int i = 0; i < 3; i++) res[idx++] = t.normal0[i];
+
+    // second point
+    for (int i = 0; i < 3; i++) res[idx++] = t.pos1[i];
+    for (int i = 0; i < 3; i++) res[idx++] = t.normal1[i];
+    return res;
+  }
+  static void toData(const Type& t, double* data) {
+    typename VectorType::MapType v(data, kVectorDimension);
+    v = toVector(t);
+  }
+
+  static MinimalVectorType toMinimalVector(const Type& t) {
+    return toVector(t);
+  }
+  static void toMinimalData(const Type& t, double* data) { toData(t, data); }
+
+  template <typename Derived>
+  static Type fromVector(const Eigen::DenseBase<Derived>& v) {
+    Type t;
+    int idx = 0;
+    // first point
+    for (int i = 0; i < 3; i++) t.pos0[i] = v[idx++];
+    for (int i = 0; i < 3; i++) t.normal0[i] = v[idx++];
+
+    // second point
+    for (int i = 0; i < 3; i++) t.pos1[i] = v[idx++];
+    for (int i = 0; i < 3; i++) t.normal1[i] = v[idx++];
+
+    t.makeRot0();
+    t.makeRot1();
+
+    return t;
+  }
+
+  template <typename Derived>
+  static Type fromMinimalVector(const Eigen::DenseBase<Derived>& v) {
+    return fromVector(v);
+  }
+
+  static Type Identity() { return Type(); }
+};
+
 // 3D rigid constraint
 //    3 values for position wrt frame
 //    3 values for normal wrt frame, not used here
@@ -144,13 +209,12 @@ class G2O_TYPES_ICP_API EdgeVVGicp
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
   EdgeVVGicp() = default;
-  explicit EdgeVVGicp(const EdgeVVGicp* e);
 
   // switch to go between point-plane and plane-plane
   bool pl_pl = false;
   Matrix3 cov0, cov1;
 
-  // I/O functions
+  // Custom I/O functions
   bool read(std::istream& is) override;
   bool write(std::ostream& os) const override;
 
@@ -164,38 +228,12 @@ class G2O_TYPES_ICP_API EdgeVVGicp
     // could be more efficient if we computed this transform just once
     Vector3 p1;
 
-#if 0
-      if (_cnum >= 0 && 0)      // using global cache
-        {
-          if (_tainted[_cnum])  // set up transform
-            {
-              _transforms[_cnum] = vp0->estimate().inverse() * vp1->estimate();
-              _tainted[_cnum] = 0;
-              cout << _transforms[_cnum] << endl;
-            }
-          p1 = _transforms[_cnum].map(measurement().pos1); // do the transform
-        }
-      else
-#endif
-    {
-      p1 = vp1->estimate() * measurement().pos1;
-      p1 = vp0->estimate().inverse() * p1;
-    }
-
-    //      cout << endl << "Error computation; points are: " << endl;
-    //      cout << p0.transpose() << endl;
-    //      cout << p1.transpose() << endl;
+    p1 = vp1->estimate() * measurement().pos1;
+    p1 = vp0->estimate().inverse() * p1;
 
     // get their difference
     // this is simple Euclidean distance, for now
     error_ = p1 - measurement().pos0;
-
-#if 0
-      cout << "vp0" << endl << vp0->estimate() << endl;
-      cout << "vp1" << endl << vp1->estimate() << endl;
-      cout << "e Jac Xj" << endl <<  jacobianOplusXj_ << endl << endl;
-      cout << "e Jac Xi" << endl << jacobianOplusXi_ << endl << endl;
-#endif
 
     if (!pl_pl) return;
 
@@ -353,13 +391,6 @@ class G2O_TYPES_ICP_API EdgeXyzVsc
     // calculate the projection
     Vector3 kp;
     cam->mapPoint(kp, point->estimate());
-
-    // std::cout << std::endl << "CAM   " << cam->estimate() << std::endl;
-    // std::cout << "POINT " << pt.transpose() << std::endl;
-    // std::cout << "PROJ  " << p1.transpose() << std::endl;
-    // std::cout << "PROJ  " << p2.transpose() << std::endl;
-    // std::cout << "CPROJ " << kp.transpose() << std::endl;
-    // std::cout << "MEAS  " << measurement_.transpose() << std::endl;
 
     // error, which is backwards from the normal observed - calculated
     // measurement_ is the measured projection
