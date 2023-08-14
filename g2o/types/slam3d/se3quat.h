@@ -306,12 +306,16 @@ struct TypeTraits<SE3Quat> {
 
   template <typename Derived>
   static Type fromVector(const Eigen::DenseBase<Derived>& v) {
-    return Type(v);
+    Type res;
+    res.fromVector(v);
+    return res;
   }
 
   template <typename Derived>
   static Type fromMinimalVector(const Eigen::DenseBase<Derived>& v) {
-    return Type(v);
+    Type res;
+    res.fromMinimalVector(v);
+    return res;
   }
 
   static Type Identity() { return Type(); }

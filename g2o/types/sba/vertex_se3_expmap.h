@@ -42,9 +42,10 @@ class G2O_TYPES_SBA_API VertexSE3Expmap : public BaseVertex<6, SE3Quat> {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
+  //! special implementation of reading
   bool read(std::istream& is) override;
+  //! special implementation of writing
   bool write(std::ostream& os) const override;
-  void setToOriginImpl() override;
   void oplusImpl(const VectorX::MapType& update) override;
 };
 

@@ -38,6 +38,7 @@
 #ifndef G2O_SBACam_H
 #define G2O_SBACam_H
 
+#include "g2o/core/type_traits.h"
 #include "g2o/types/slam3d/se3quat.h"
 #include "g2o_types_sba_api.h"
 
@@ -93,6 +94,52 @@ class G2O_TYPES_SBA_API SBACam : public SE3Quat {
 
 // human-readable SBACam object
 std::ostream& operator<<(std::ostream& out_str, const SBACam& cam);
+
+/**
+ * @brief TypeTraits specialization for a SBACam
+ */
+template <>
+struct TypeTraits<SBACam> {
+  enum {
+    kVectorDimension = 7,
+    kMinimalVectorDimension = 6,
+    kIsVector = 0,
+    kIsScalar = 0,
+  };
+  using Type = SBACam;
+  using VectorType = VectorN<kVectorDimension>;
+  using MinimalVectorType = VectorN<kMinimalVectorDimension>;
+
+  static VectorType toVector(const Type& t) { return t.toVector(); }
+  static void toData(const Type& t, double* data) {
+    typename VectorType::MapType v(data, kVectorDimension);
+    v = t.toVector();
+  }
+
+  static MinimalVectorType toMinimalVector(const Type& t) {
+    return t.toMinimalVector();
+  }
+  static void toMinimalData(const Type& t, double* data) {
+    typename MinimalVectorType::MapType v(data, kMinimalVectorDimension);
+    v = t.toMinimalVector();
+  }
+
+  template <typename Derived>
+  static Type fromVector(const Eigen::DenseBase<Derived>& v) {
+    Type res;
+    res.fromVector(v);
+    return res;
+  }
+
+  template <typename Derived>
+  static Type fromMinimalVector(const Eigen::DenseBase<Derived>& v) {
+    Type res;
+    res.fromMinimalVector(v);
+    return res;
+  }
+
+  static Type Identity() { return SBACam(); }
+};
 
 }  // namespace g2o
 
