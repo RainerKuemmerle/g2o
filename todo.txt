@@ -1,8 +1,14 @@
 - resolveCache should return unique_ptr
-- read write methods based on type traits conversion to vector
-- setEstimateDataImpl wrapper needed?
+
+- add test for type traits
+- add test for setData / getData on the graph
 
 - split sim3 into h/cpp
 - split types_seven_dof_expmap
 
 - update py_base_vertex/edge to map now common methods
+
+- autodiff with type_traits
+
+- read write methods based on type traits conversion to vector
+  - how to handle params?

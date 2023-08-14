@@ -172,14 +172,12 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
 
     /**
      * sets the initial estimate from an array of double
-     * Implement setEstimateDataImpl()
      * @return true on success
      */
-    bool setEstimateData(const double* estimate);
+    virtual bool setEstimateData(const double* estimate) = 0;
 
     /**
      * sets the initial estimate from an array of double
-     * Implement setEstimateDataImpl()
      * @return true on success
      */
     bool setEstimateData(const std::vector<double>& estimate) {
@@ -190,8 +188,7 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
     };
 
     /**
-     * sets the initial estimate from an array of double
-     * Implement setEstimateDataImpl()
+     * sets the initial estimate from an Eigen Vector type
      * @return true on success
      */
     template <typename Derived>
@@ -205,7 +202,7 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
      * writes the estimates to an array of double
      * @returns true on success
      */
-    virtual bool getEstimateData(double* estimate) const;
+    virtual bool getEstimateData(double* estimate) const = 0;
 
     /**
      * writes the estimate to an array of double
@@ -244,14 +241,14 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
      * returns the dimension of the extended representation used by
      * get/setEstimate(double*) -1 if it is not supported
      */
-    [[nodiscard]] virtual int estimateDimension() const;
+    [[nodiscard]] virtual int estimateDimension() const = 0;
 
     /**
      * sets the initial estimate from an array of double.
      * Implement setMinimalEstimateDataImpl()
      * @return true on success
      */
-    bool setMinimalEstimateData(const double* estimate);
+    virtual bool setMinimalEstimateData(const double* estimate) = 0;
 
     /**
      * sets the initial estimate from an array of double.
@@ -281,7 +278,7 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
      * writes the estimate to an array of double
      * @returns true on success
      */
-    virtual bool getMinimalEstimateData(double* estimate) const;
+    virtual bool getMinimalEstimateData(double* estimate) const = 0;
 
     /**
      * writes the estimate to an array of double
@@ -320,7 +317,7 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
      * returns the dimension of the extended representation used by
      * get/setEstimate(double*) -1 if it is not supported
      */
-    [[nodiscard]] virtual int minimalEstimateDimension() const;
+    [[nodiscard]] virtual int minimalEstimateDimension() const = 0;
 
     //! backup the position of the vertex to a stack
     virtual void push() = 0;
@@ -417,12 +414,6 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
 
     //! sets the node to the origin (used in the multilevel stuff)
     virtual void setToOriginImpl() = 0;
-
-    /**
-     * writes the estimate to an array of double
-     * @returns true on success
-     */
-    virtual bool setEstimateDataImpl(const double*) { return false; }
 
     /**
      * sets the initial estimate from an array of double
