@@ -101,11 +101,11 @@ template <typename CacheType>
 std::shared_ptr<CacheType> OptimizableGraph::Edge::resolveCache(
     const std::shared_ptr<OptimizableGraph::Vertex>& v, const std::string& type,
     const ParameterVector& parameters_) {
-  std::shared_ptr<CacheContainer> container = v->cacheContainer();
+  CacheContainer& container = v->cacheContainer();
   Cache::CacheKey key(type, parameters_);
-  std::shared_ptr<Cache> c = container->findCache(key);
+  std::shared_ptr<Cache> c = container.findCache(key);
   if (!c) {
-    c = container->createCache(key);
+    c = container.createCache(key);
   }
   return std::dynamic_pointer_cast<CacheType>(c);
 }

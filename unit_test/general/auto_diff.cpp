@@ -109,7 +109,8 @@ class EdgeSE2AD : public g2o::EdgeSE2 {
 
   using g2o::BaseBinaryEdge<3, g2o::SE2, g2o::VertexSE2,
                             g2o::VertexSE2>::linearizeOplus;
-  G2O_MAKE_AUTO_AD_LINEARIZEOPLUS_BY_GET
+  // G2O_MAKE_AUTO_AD_LINEARIZEOPLUS_BY_GET
+  G2O_MAKE_AUTO_AD_LINEARIZEOPLUS
 
  protected:
   template <typename T>
