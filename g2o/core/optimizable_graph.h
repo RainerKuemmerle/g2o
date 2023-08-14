@@ -29,6 +29,7 @@
 
 #include <functional>
 #include <iostream>
+#include <memory>
 #include <set>
 #include <typeinfo>
 
@@ -129,8 +130,8 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
     friend struct OptimizableGraph;
 
    public:
-    Vertex() = default;
-    ~Vertex() override = default;
+    Vertex();
+    ~Vertex() override;
 
     //! sets the node to the origin (used in the multilevel stuff)
     void setToOrigin() {
@@ -393,7 +394,7 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
 
     virtual void updateCache();
 
-    std::shared_ptr<CacheContainer> cacheContainer();
+    CacheContainer& cacheContainer();
 
    protected:
     OptimizableGraph* graph_{nullptr};
@@ -404,7 +405,7 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
     int colInHessian_{-1};
     OpenMPMutex quadraticFormMutex_;
 
-    std::shared_ptr<CacheContainer> cacheContainer_{nullptr};
+    std::unique_ptr<CacheContainer> cacheContainer_{nullptr};
 
     /**
      * update the position of the node from the parameters in v.

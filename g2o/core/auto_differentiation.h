@@ -30,24 +30,76 @@
 #include <algorithm>
 #include <cassert>
 #include <type_traits>
+#include <unordered_map>
 
 #include "eigen_types.h"
 #include "g2o/autodiff/autodiff.h"
+#include "g2o/core/type_traits.h"
 #include "g2o/stuff/misc.h"
 #include "g2o_core_api.h"
 
 namespace g2o {
+
+namespace internal {
+template <int...>
+struct IntPack;
+}  // namespace internal
 
 /**
  * functor object to access the estimate data of an edge.
  * Here, we call estimate().data() on each vertex to obtain the raw pointer.
  */
 template <typename Edge>
-struct EstimateAccessor {
-  template <int K>
-  EIGEN_STRONG_INLINE double* data(Edge* that) {
+class EstimateAccessor {
+ public:
+  //! VertexXnType's estimate is a vector type
+  template <int K, int IsVector = TypeTraits<
+                       typename Edge::template VertexXnType<K>>::kIsVector>
+  typename std::enable_if<IsVector != 0, double*>::type data(Edge* that) {
+    std::cerr << "   Raw " << K << std::endl;
     return const_cast<double*>(that->template vertexXn<K>()->estimate().data());
   }
+
+  /**
+   * VertexXnType's estimate is not a vector type. In this fallback method, we
+   * buffer the estimates into a unordered map.
+   */
+  template <int K, int IsVector = TypeTraits<
+                       typename Edge::template VertexXnType<K>>::kIsVector>
+  typename std::enable_if<IsVector == 0, double*>::type data(Edge* that) {
+    std::cerr << "NonRaw " << K << std::endl;
+    auto found_it = buffer_.find(K);
+    if (found_it != buffer_.end()) {
+      return found_it->second.data();
+    }
+    auto insert_pair = buffer_.emplace(K, that->template vertexDimension<K>());
+    VectorX& buffer = insert_pair.first->second;
+    bool gotData = that->template vertexXn<K>()->getEstimateData(buffer.data());
+    (void)gotData;
+    assert(gotData && "Called getEstimateData, but seems unimplemented");
+    return buffer.data();
+  }
+
+ private:
+  template <typename>
+  struct AnyNonRawPack;
+
+  template <std::size_t... Ints>
+  struct AnyNonRawPack<std::index_sequence<Ints...>> {
+    using type = typename std::is_same<
+        internal::IntPack<TypeTraits<typename Edge::template VertexXnType<
+                              Ints>>::kIsVector...,
+                          0>,
+        internal::IntPack<0, TypeTraits<typename Edge::template VertexXnType<
+                                 Ints>>::kIsVector...>>;
+  };
+  using AnyNonRaw = typename AnyNonRawPack<
+      std::make_index_sequence<Edge::kNrOfVertices>>::type;
+
+  using Buffer =
+      typename std::conditional<AnyNonRaw::type::value,
+                                std::unordered_map<int, VectorX>, void>::type;
+  Buffer buffer_;
 };
 
 /**
@@ -63,12 +115,12 @@ template <typename Edge>
 class EstimateAccessorGet {
  public:
   template <int K>
-  EIGEN_STRONG_INLINE double* data(Edge* that) {
+  double* data(Edge* that) {
     auto& buffer = std::get<K>(estimateBuffer_);
     buffer.resize(that->template vertexDimension<K>());
     auto* rawBuffer = const_cast<double*>(buffer.data());
     bool gotData = that->template vertexXn<K>()->getEstimateData(rawBuffer);
-    assert(gotData && "Called getEstimateData, but seems unimplmented");
+    assert(gotData && "Called getEstimateData, but seems unimplemented");
     return gotData ? rawBuffer : nullptr;
   }
 
@@ -114,31 +166,33 @@ class EstimateAccessorGet {
  * raw-pointer should point to memory that is either owned by the functor itself
  * or is owned by the edge, the vertex, or sth else. It has to to be valid
  * throughout the lifetime of the functor object. See, for example, the functor
- * EstimateAccessorGet which uses the potentially implemented method
- * getEstimateData() on vertices to obtain the estimate in a raw array. This
- * array is then buffered and passed on to compute the error or its Jacobian.
+ * EstimateAccessorGet which uses the type traits to convert the estimate of the
+ * vertices into a raw array. This array is then buffered and passed on to
+ * compute the error or its Jacobian. Note that EstimateAccessor provides a
+ * fallback to also support a mix of get and access to raw-pointers.
  *
  * To use automatic differentiation on your own edge you need to implement the
  * following steps:
  * 1. Implement an operator() that computes your error function:
  *    The function is required to have the following declaration
  *    template <typename T>
- *    bool operator()(const T* v1Estimate, const T* v2Estimate, T* error) const
- * {} The example above assumes a binary edge. If your edge has more or less
- * vertices, the number of vEstimate parameters differs. Let's assume that your
- * edge connects N vertices, then your operator() will consume N+1 pointers.
- * Whereas the last pointer is the output of your error function. Note the
- * template on the operator(). This is required to be able to evaluate your
- * error function with double pointer, i.e., to purely evaluate the error. But
- * also we will pass a more complex class to it during the numerical computation
- * of the Jacobian.
+ *    bool operator()(const T* v1Estimate, const T* v2Estimate, T* error) const;
+ *    The example above assumes a binary edge. If your edge has more or less
+ *    vertices, the number of vEstimate parameters differs. Let's assume that
+ *    your edge connects N vertices, then your operator() will consume N+1
+ *    pointers. Whereas the last pointer is the output of your error function.
+ *    Note the template on the operator(). This is required to be able to
+ *    evaluate your error function with double pointer, i.e., to purely evaluate
+ *    the error. But also we will pass a more complex class to it during the
+ *    numerical computation of the Jacobian.
  * 2. Integrate the operator():
  *    To this end, we provide the macro "G2O_MAKE_AUTO_AD_FUNCTIONS" which you
- * can include into the public section of your edge class. See below for the
- * macro. If you use the macro, you do not need to implement computeError() and
- * linearizeOPlus() in your edge. Both methods will be ready for integration
- * into the g2o framework. You may, however, decide against the macro and
- * provide the implementation on your own if this suits your edge class better.
+ *    can include into the public section of your edge class. See below for the
+ *    macro. If you use the macro, you do not need to implement computeError()
+ *    and linearizeOPlus() in your edge. Both methods will be ready for
+ *    integration into the g2o framework. You may, however, decide against the
+ *    macro and provide the implementation on your own if this suits your edge
+ *    class better.
  *
  * Example integration: g2o/examples/bal/bal_example.cpp
  * This provides a self-contained example for integration of AD into an

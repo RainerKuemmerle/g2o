@@ -216,13 +216,11 @@ void DrawAction::initializeDrawActionsCache() {
 }
 
 void DrawAction::drawCache(
-    const std::shared_ptr<CacheContainer>& caches,
+    const CacheContainer& caches,
     const std::shared_ptr<HyperGraphElementAction::Parameters>& params) {
-  if (caches) {
-    for (auto& cache : *caches) {
-      Cache* c = cache.second.get();
-      (*cacheDrawActions_)(*c, params);
-    }
+  for (const auto& cache : caches) {
+    Cache* c = cache.second.get();
+    (*cacheDrawActions_)(*c, params);
   }
 }
 

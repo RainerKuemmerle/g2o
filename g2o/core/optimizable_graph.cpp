@@ -33,6 +33,7 @@
 #include <iomanip>
 #include <iostream>
 #include <iterator>
+#include <memory>
 #include <sstream>
 #include <utility>
 
@@ -59,11 +60,15 @@ using std::endl;
 using std::string;
 using std::vector;
 
-std::shared_ptr<CacheContainer> OptimizableGraph::Vertex::cacheContainer() {
+// Here to destruct forward declared types
+OptimizableGraph::Vertex::Vertex() = default;
+OptimizableGraph::Vertex::~Vertex() = default;
+
+CacheContainer& OptimizableGraph::Vertex::cacheContainer() {
   if (!cacheContainer_) {
-    cacheContainer_ = std::make_shared<CacheContainer>(*this);
+    cacheContainer_ = std::make_unique<CacheContainer>(*this);
   }
-  return cacheContainer_;
+  return *cacheContainer_;
 }
 
 MatrixX::MapType OptimizableGraph::Vertex::hessianMap() const {
