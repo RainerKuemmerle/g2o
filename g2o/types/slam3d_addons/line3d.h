@@ -30,12 +30,11 @@
 #include <Eigen/Core>
 
 #include "g2o/core/eigen_types.h"
+#include "g2o/core/type_traits.h"
 #include "g2o_types_slam3d_addons_api.h"
 
 namespace g2o {
 
-using Vector6 = Eigen::Matrix<double, 6, 1>;
-using Matrix6 = Eigen::Matrix<double, 6, 6>;
 using Matrix6x4 = Eigen::Matrix<double, 6, 4>;
 
 struct OrthonormalLine3D {
@@ -65,11 +64,15 @@ class Line3D : public Vector6 {
     static_cast<Vector6&>(*this) = v;
   }
 
-  G2O_TYPES_SLAM3D_ADDONS_API Vector6 toCartesian() const;
+  G2O_TYPES_SLAM3D_ADDONS_API [[nodiscard]] Vector6 toCartesian() const;
 
-  G2O_TYPES_SLAM3D_ADDONS_API inline Vector3 w() const { return head<3>(); }
+  G2O_TYPES_SLAM3D_ADDONS_API [[nodiscard]] inline Vector3 w() const {
+    return head<3>();
+  }
 
-  G2O_TYPES_SLAM3D_ADDONS_API inline Vector3 d() const { return tail<3>(); }
+  G2O_TYPES_SLAM3D_ADDONS_API [[nodiscard]] inline Vector3 d() const {
+    return tail<3>();
+  }
 
   G2O_TYPES_SLAM3D_ADDONS_API inline void setW(const Vector3& w_) {
     head<3>() = w_;
@@ -137,7 +140,7 @@ class Line3D : public Vector6 {
     (*this) *= n;
   }
 
-  G2O_TYPES_SLAM3D_ADDONS_API inline Line3D normalized() const {
+  G2O_TYPES_SLAM3D_ADDONS_API [[nodiscard]] inline Line3D normalized() const {
     return Line3D(Vector6(*this) * (1.0 / d().norm()));
   }
 
@@ -157,7 +160,8 @@ class Line3D : public Vector6 {
     this->normalize();
   }
 
-  G2O_TYPES_SLAM3D_ADDONS_API inline Vector4 ominus(const Line3D& line) const {
+  G2O_TYPES_SLAM3D_ADDONS_API [[nodiscard]] inline Vector4 ominus(
+      const Line3D& line) const {
     OrthonormalLine3D ortho_estimate = toOrthonormal(*this);
     OrthonormalLine3D ortho_line = toOrthonormal(line);
 
@@ -200,6 +204,43 @@ G2O_TYPES_SLAM3D_ADDONS_API inline double getElevation(
 }
 
 }  // namespace internal
+
+template <>
+struct TypeTraits<Line3D> {
+  enum {
+    kVectorDimension = 6,
+    kMinimalVectorDimension = 6,
+    kIsVector = 1,
+    kIsScalar = 0,
+  };
+  using Type = Line3D;
+  using VectorType = VectorN<kVectorDimension>;
+  using MinimalVectorType = VectorN<kMinimalVectorDimension>;
+
+  static VectorType toVector(const Type& t) { return t; }
+  static void toData(const Type& t, double* data) {  // NOLINT
+    typename VectorType::MapType v(data, kVectorDimension);
+    v = t;
+  }
+
+  static MinimalVectorType toMinimalVector(const Type& t) { return t; }
+  static void toMinimalData(const Type& t, double* data) {  // NOLINT
+    typename MinimalVectorType::MapType v(data, kMinimalVectorDimension);
+    v = t;
+  }
+
+  template <typename Derived>
+  static Type fromVector(const Eigen::DenseBase<Derived>& v) {
+    return Line3D(v);
+  }
+
+  template <typename Derived>
+  static Type fromMinimalVector(const Eigen::DenseBase<Derived>& v) {
+    return Line3D(v);
+  }
+
+  static Type Identity() { return Type(); }
+};
 
 }  // namespace g2o
 

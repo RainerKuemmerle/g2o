@@ -72,6 +72,7 @@ using MatrixN = Eigen::Matrix<T, N, N, Eigen::ColMajor>;
 using Matrix2 = MatrixN<2>;
 using Matrix3 = MatrixN<3>;
 using Matrix4 = MatrixN<4>;
+using Matrix6 = MatrixN<6>;
 using MatrixX = MatrixN<Eigen::Dynamic>;
 
 using Isometry2 = Eigen::Transform<double, 2, Eigen::Isometry, Eigen::ColMajor>;

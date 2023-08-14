@@ -39,8 +39,8 @@ class G2O_TYPES_SLAM2D_ADDONS_API EdgeSE2Segment2DPointLine
     : public BaseBinaryEdge<3, Vector3, VertexSE2, VertexSegment2D> {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-  double theta() const { return measurement_[2]; }
-  Vector2 point() const {
+  [[nodiscard]] double theta() const { return measurement_[2]; }
+  [[nodiscard]] Vector2 point() const {
     Eigen::Map<const Vector2> p(measurement_.data());
     return p;
   }
@@ -51,7 +51,7 @@ class G2O_TYPES_SLAM2D_ADDONS_API EdgeSE2Segment2DPointLine
     p = p_;
   }
 
-  int pointNum() const { return pointNum_; }
+  [[nodiscard]] int pointNum() const { return pointNum_; }
   void setPointNum(int pn) { pointNum_ = pn; }
 
   void computeError() override {
@@ -71,20 +71,6 @@ class G2O_TYPES_SLAM2D_ADDONS_API EdgeSE2Segment2DPointLine
     error_[2] = normalize_theta(error_[2]);
   }
 
-  bool setMeasurementData(const double* d) override {
-    Eigen::Map<const Vector3> data(d);
-    measurement_ = data;
-    return true;
-  }
-
-  bool getMeasurementData(double* d) const override {
-    Eigen::Map<Vector3> data(d);
-    data = measurement_;
-    return true;
-  }
-
-  int measurementDimension() const override { return 3; }
-
   bool setMeasurementFromState() override {
     const VertexSE2* v1 = vertexXnRaw<0>();
     const VertexSegment2D* l2 = vertexXnRaw<1>();
@@ -102,7 +88,9 @@ class G2O_TYPES_SLAM2D_ADDONS_API EdgeSE2Segment2DPointLine
     return true;
   }
 
+  //! custom read function
   bool read(std::istream& is) override;
+  //! custom write function
   bool write(std::ostream& os) const override;
 
  protected:

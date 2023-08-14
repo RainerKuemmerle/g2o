@@ -53,22 +53,6 @@ class EdgeLine2DPointXY
     error_[0] = prediction - measurement_;
   }
 
-  G2O_TYPES_SLAM2D_ADDONS_API bool setMeasurementData(
-      const double* d) override {
-    measurement_ = *d;
-    return true;
-  }
-
-  G2O_TYPES_SLAM2D_ADDONS_API bool getMeasurementData(
-      double* d) const override {
-    *d = measurement_;
-    return true;
-  }
-
-  G2O_TYPES_SLAM2D_ADDONS_API int measurementDimension() const override {
-    return 1;
-  }
-
   G2O_TYPES_SLAM2D_ADDONS_API bool setMeasurementFromState() override {
     const VertexLine2D* l = vertexXnRaw<0>();
     const VertexPointXY* p = vertexXnRaw<1>();

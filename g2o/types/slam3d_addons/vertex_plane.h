@@ -40,28 +40,13 @@ class G2O_TYPES_SLAM3D_ADDONS_API VertexPlane : public BaseVertex<3, Plane3D> {
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
   VertexPlane();
 
+  //! Custom IO
   bool read(std::istream& is) override;
   bool write(std::ostream& os) const override;
-
-  void setToOriginImpl() override { estimate_ = Plane3D(); }
 
   void oplusImpl(const VectorX::MapType& update) override {
     estimate_.oplus(update);
   }
-
-  bool setEstimateDataImpl(const double* est) override {
-    Eigen::Map<const Vector4> _est(est);
-    estimate_.fromVector(_est);
-    return true;
-  }
-
-  bool getEstimateData(double* est) const override {
-    Eigen::Map<Vector4> _est(est);
-    _est = estimate_.toVector();
-    return true;
-  }
-
-  int estimateDimension() const override { return 4; }
 
   Vector3 color;
 };
