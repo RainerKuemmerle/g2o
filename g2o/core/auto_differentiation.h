@@ -47,59 +47,67 @@ struct IntPack;
 
 /**
  * functor object to access the estimate data of an edge.
- * Here, we call estimate().data() on each vertex to obtain the raw pointer.
+ * Here, we call estimate().data() if EstimateType is a vector or convert to
+ * vector on the fly otherwise on each vertex to obtain the raw pointer.
  */
 template <typename Edge>
 class EstimateAccessor {
  public:
-  //! VertexXnType's estimate is a vector type
-  template <int K, int IsVector = TypeTraits<
-                       typename Edge::template VertexXnType<K>>::kIsVector>
-  typename std::enable_if<IsVector != 0, double*>::type data(Edge* that) {
-    std::cerr << "   Raw " << K << std::endl;
+  //! VertexXnType's EstimateType is a vector type
+  template <int K>
+  typename std::enable_if<TypeTraits<typename Edge::template VertexXnType<
+                              K>::EstimateType>::kIsVector != 0,
+                          double*>::type
+  data(Edge* that) {
     return const_cast<double*>(that->template vertexXn<K>()->estimate().data());
   }
 
   /**
-   * VertexXnType's estimate is not a vector type. In this fallback method, we
-   * buffer the estimates into a unordered map.
+   * VertexXnType's EstimateType is not a vector type. In this fallback method,
+   * we buffer the estimates into a unordered map.
    */
-  template <int K, int IsVector = TypeTraits<
-                       typename Edge::template VertexXnType<K>>::kIsVector>
-  typename std::enable_if<IsVector == 0, double*>::type data(Edge* that) {
-    std::cerr << "NonRaw " << K << std::endl;
-    auto found_it = buffer_.find(K);
-    if (found_it != buffer_.end()) {
-      return found_it->second.data();
+  template <int K>
+  typename std::enable_if<TypeTraits<typename Edge::template VertexXnType<
+                              K>::EstimateType>::kIsVector == 0,
+                          double*>::type
+  data(Edge* that) {
+    VectorX& data_buffer = buffer_[K];
+    if (data_buffer.size() > 0) {  // trivial caching
+      return data_buffer.data();
     }
-    auto insert_pair = buffer_.emplace(K, that->template vertexDimension<K>());
-    VectorX& buffer = insert_pair.first->second;
-    bool gotData = that->template vertexXn<K>()->getEstimateData(buffer.data());
-    (void)gotData;
-    assert(gotData && "Called getEstimateData, but seems unimplemented");
-    return buffer.data();
+    data_buffer =
+        TypeTraits<typename Edge::template VertexXnType<K>::EstimateType>::
+            toVector(that->template vertexXn<K>()->estimate());
+    return data_buffer.data();
   }
 
  private:
+  //! An empty struct
+  struct EmptyBuffer {};
+  //! Array for storing the estimates as vector
+  using Buffer = std::array<VectorX, Edge::kNrOfVertices>;
+
   template <typename>
-  struct AnyNonRawPack;
+  struct AnyNonVectorEstimateTypePack;
 
   template <std::size_t... Ints>
-  struct AnyNonRawPack<std::index_sequence<Ints...>> {
-    using type = typename std::is_same<
+  struct AnyNonVectorEstimateTypePack<std::index_sequence<Ints...>> {
+    // kValue = true iff kIsVector == 0 for all EstimateType
+    static constexpr bool kValue = std::is_same<
         internal::IntPack<TypeTraits<typename Edge::template VertexXnType<
-                              Ints>>::kIsVector...,
+                              Ints>::EstimateType>::kIsVector...,
                           0>,
         internal::IntPack<0, TypeTraits<typename Edge::template VertexXnType<
-                                 Ints>>::kIsVector...>>;
+                                 Ints>::EstimateType>::kIsVector...>>::value;
   };
-  using AnyNonRaw = typename AnyNonRawPack<
-      std::make_index_sequence<Edge::kNrOfVertices>>::type;
+  static constexpr bool kAnyNonVectorEstimateType =
+      AnyNonVectorEstimateTypePack<
+          std::make_index_sequence<Edge::kNrOfVertices>>::kValue;
 
-  using Buffer =
-      typename std::conditional<AnyNonRaw::type::value,
-                                std::unordered_map<int, VectorX>, void>::type;
-  Buffer buffer_;
+  // An array for buffering the data or an empty struct
+  using StorageType = typename std::conditional<kAnyNonVectorEstimateType,
+                                                Buffer, EmptyBuffer>::type;
+  StorageType buffer_;
 };
 
 /**
