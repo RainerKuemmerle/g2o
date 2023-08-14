@@ -4,3 +4,5 @@
 
 - split sim3 into h/cpp
 - split types_seven_dof_expmap
+
+- update py_base_vertex/edge to map now common methods

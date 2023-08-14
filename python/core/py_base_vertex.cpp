@@ -1,6 +1,6 @@
 #include "py_base_vertex.h"
 
-#include <Eigen/src/Core/util/Constants.h>
+#include "g2o/types/slam3d/type_traits_isometry3.h"
 
 namespace g2o {
 

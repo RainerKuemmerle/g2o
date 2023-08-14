@@ -94,7 +94,7 @@ class BaseEdge : public OptimizableGraph::Edge {
   BaseEdge& operator=(const BaseEdge&) = delete;
   BaseEdge(const BaseEdge&) = delete;
 
-  [[nodiscard]] double chi2() const final {
+  [[nodiscard]] double chi2() const override {
     return error_.dot(information() * error_);
   }
 

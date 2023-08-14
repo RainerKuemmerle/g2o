@@ -46,8 +46,6 @@ class VectorXVertex : public BaseDynamicVertex<VectorX> {
     return true;
   }
 
-  void setToOriginImpl() override { estimate_.setZero(); }
-
   // oplusImpl for python consuming a vector
   virtual void oplus_impl(const VectorX& v) = 0;
   void oplusImpl(const VectorX::MapType& update) override {

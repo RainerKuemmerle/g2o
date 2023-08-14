@@ -1,5 +1,7 @@
 #include "py_base_edge.h"
 
+#include "g2o/types/slam3d/type_traits_isometry3.h"
+
 namespace g2o {
 
 void declareBaseEdge(py::module& m) {

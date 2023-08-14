@@ -33,8 +33,7 @@
 #include "g2o_tutorial_slam2d_api.h"
 #include "se2.h"
 
-namespace g2o {
-namespace tutorial {
+namespace g2o::tutorial {
 
 class G2O_TUTORIAL_SLAM2D_API Simulator {
  public:
@@ -93,10 +92,10 @@ class G2O_TUTORIAL_SLAM2D_API Simulator {
 
   void simulate(int numPoses, const SE2& sensorOffset = SE2());
 
-  const PosesVector& poses() const { return poses_; }
-  const LandmarkVector& landmarks() const { return landmarks_; }
-  const GridEdgeVector& odometry() const { return odometry_; }
-  const LandmarkEdgeVector& landmarkObservations() const {
+  [[nodiscard]] const PosesVector& poses() const { return poses_; }
+  [[nodiscard]] const LandmarkVector& landmarks() const { return landmarks_; }
+  [[nodiscard]] const GridEdgeVector& odometry() const { return odometry_; }
+  [[nodiscard]] const LandmarkEdgeVector& landmarkObservations() const {
     return landmarkObservations_;
   }
 
@@ -115,7 +114,6 @@ class G2O_TUTORIAL_SLAM2D_API Simulator {
                                   double rotNoise);
 };
 
-}  // namespace tutorial
-}  // namespace g2o
+}  // namespace g2o::tutorial
 
 #endif

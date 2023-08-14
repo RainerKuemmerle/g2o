@@ -74,7 +74,7 @@ class G2O_INTERACTIVE_API OnlineEdgeSE2 : public EdgeSE2 {
     }
   }
 
-  double chi2() const override {
+  [[nodiscard]] double chi2() const override {
     const auto* v1 = static_cast<const OnlineVertexSE2*>(vertexXnRaw<0>());
     const auto* v2 = static_cast<const OnlineVertexSE2*>(vertexXnRaw<1>());
     SE2 delta = inverseMeasurement_ *

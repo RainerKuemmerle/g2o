@@ -71,7 +71,7 @@ class G2O_INTERACTIVE_API OnlineEdgeSE3 : public EdgeSE3 {
     }
   }
 
-  double chi2() const override {
+  [[nodiscard]] double chi2() const override {
     auto* from = static_cast<OnlineVertexSE3*>(vertexXnRaw<0>());
     auto* to = static_cast<OnlineVertexSE3*>(vertexXnRaw<1>());
     Eigen::Isometry3d delta =

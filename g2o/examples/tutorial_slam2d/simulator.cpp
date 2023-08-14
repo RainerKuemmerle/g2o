@@ -35,8 +35,7 @@
 using std::cerr;
 using std::endl;
 
-namespace g2o {
-namespace tutorial {
+namespace g2o::tutorial {
 
 #ifdef _MSC_VER
 inline double round(double number) {
@@ -52,7 +51,7 @@ Simulator::Simulator() {
 }
 
 void Simulator::simulate(int numPoses, const SE2& sensorOffset) {
-  // simulate a robot observing landmarks while travelling on a grid
+  // simulate a robot observing landmarks while traveling on a grid
   const int steps = 5;
   const double stepLen = 1.0;
   const int boundArea = 50;
@@ -210,7 +209,7 @@ void Simulator::simulate(int numPoses, const SE2& sensorOffset) {
     const GridPose& prev = poses[i - 1];
     const GridPose& p = poses[i];
 
-    odometry_.push_back(GridEdge());
+    odometry_.emplace_back();
     GridEdge& edge = odometry_.back();
 
     edge.from = prev.id;
@@ -258,7 +257,7 @@ void Simulator::simulate(int numPoses, const SE2& sensorOffset) {
           observation[1] += Sampler::gaussRand(0., landmarkNoise[1]);
         }
 
-        landmarkObservations_.push_back(LandmarkEdge());
+        landmarkObservations_.emplace_back();
         LandmarkEdge& le = landmarkObservations_.back();
 
         le.from = p.id;
@@ -275,7 +274,7 @@ void Simulator::simulate(int numPoses, const SE2& sensorOffset) {
   for (auto& it : grid) {
     for (auto& itt : it.second) {
       const Simulator::LandmarkPtrVector& landmarks = itt.second;
-      for (auto& landmark : landmarks) delete landmark;
+      for (const auto& landmark : landmarks) delete landmark;
     }
   }
 }
@@ -314,5 +313,4 @@ SE2 Simulator::sampleTransformation(const SE2& trueMotion_,
   return noiseMotion;
 }
 
-}  // namespace tutorial
-}  // namespace g2o
+}  // namespace g2o::tutorial

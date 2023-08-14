@@ -26,8 +26,7 @@
 
 #include "vertex_point_xy.h"
 
-namespace g2o {
-namespace tutorial {
+namespace g2o::tutorial {
 
 VertexPointXY::VertexPointXY() { estimate_.setZero(); }
 
@@ -41,5 +40,4 @@ bool VertexPointXY::write(std::ostream& os) const {
   return os.good();
 }
 
-}  // namespace tutorial
-}  // namespace g2o
+}  // namespace g2o::tutorial

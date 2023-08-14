@@ -56,7 +56,9 @@ class G2O_CORE_API AbstractOptimizationAlgorithmCreator {
   //! allocate a solver operating on optimizer, re-implement for your creator
   virtual std::unique_ptr<OptimizationAlgorithm> construct() = 0;
   //! return the properties of the solver
-  const OptimizationAlgorithmProperty& property() const { return property_; }
+  [[nodiscard]] const OptimizationAlgorithmProperty& property() const {
+    return property_;
+  }
 
  protected:
   OptimizationAlgorithmProperty property_;
@@ -169,10 +171,12 @@ class RegisterOptimizationAlgorithmProxy {
  * should enforce that the library is actually linked with the binary.
  */
 #define G2O_USE_OPTIMIZATION_LIBRARY(libraryname)                              \
+  namespace {                                                                  \
   extern "C" void G2O_OAF_IMPORT g2o_optimization_library_##libraryname(void); \
   static g2o::ForceLinker                                                      \
       g2o_force_optimization_algorithm_library_##libraryname(                  \
-          g2o_optimization_library_##libraryname);
+          g2o_optimization_library_##libraryname);                             \
+  }
 
 /**
  * Similarly to G2O_OAF_IMPORT this macro allows to register a singla
