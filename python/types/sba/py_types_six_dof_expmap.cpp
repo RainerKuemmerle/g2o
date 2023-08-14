@@ -31,9 +31,7 @@ void declareTypesSixDofExpmap(py::module& m) {
 
   py::class_<VertexSE3Expmap, BaseVertex<6, SE3Quat>,
              std::shared_ptr<VertexSE3Expmap>>(m, "VertexSE3Expmap")
-      .def(py::init<>())
-      //.def(py::init([]() {return new VertexSE3Expmap();}))
-      .def("set_to_origin_impl", &VertexSE3Expmap::setToOriginImpl);
+      .def(py::init<>());
 
   templatedBaseBinaryEdge<6, SE3Quat, VertexSE3Expmap, VertexSE3Expmap>(
       m, "_6_SE3Quat_VertexSE3Expmap_VertexSE3Expmap");

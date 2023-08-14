@@ -41,39 +41,31 @@ void declareOptimizableGraph(py::module& m) {
              std::shared_ptr<CLS::Vertex>>(cls, "OptimizableGraph_Vertex")
       //.def(py::init<>())   // invalid new-expression of abstract class
       .def("set_to_origin", &CLS::Vertex::setToOrigin)  // -> void
-      .def("set_estimate_data",
-           static_cast<bool (CLS::Vertex::*)(const double*)>(
-               &CLS::Vertex::setEstimateData),
-           "estimate"_a, py::keep_alive<1, 2>())
-      .def("set_estimate_data",
-           static_cast<bool (CLS::Vertex::*)(const std::vector<double>&)>(
-               &CLS::Vertex::setEstimateData),
-           "estimate"_a, py::keep_alive<1, 2>())
+      .def(
+          "set_estimate_data",
+          [](CLS::Vertex& v, const VectorX& data) {
+            return v.setEstimateData(data);
+          },
+          "estimate"_a)
       .def("get_estimate_data",
-           static_cast<bool (CLS::Vertex::*)(double*) const>(
-               &CLS::Vertex::getEstimateData),
-           "estimate"_a, py::keep_alive<1, 2>())
-      .def("get_estimate_data",
-           static_cast<bool (CLS::Vertex::*)(std::vector<double>&) const>(
-               &CLS::Vertex::getEstimateData),
-           "estimate"_a, py::keep_alive<1, 2>())
+           [](const CLS::Vertex& v) {
+             VectorX data;
+             const bool status = v.getEstimateData(data);
+             return status ? data : VectorX();
+           })
 
-      .def("set_minimal_estimate_data",
-           static_cast<bool (CLS::Vertex::*)(const double*)>(
-               &CLS::Vertex::setMinimalEstimateData),
-           "estimate"_a, py::keep_alive<1, 2>())
-      .def("set_minimal_estimate_data",
-           static_cast<bool (CLS::Vertex::*)(const std::vector<double>&)>(
-               &CLS::Vertex::setMinimalEstimateData),
-           "estimate"_a, py::keep_alive<1, 2>())
+      .def(
+          "set_minimal_estimate_data",
+          [](CLS::Vertex& v, const VectorX& data) {
+            return v.setMinimalEstimateData(data);
+          },
+          "estimate"_a, py::keep_alive<1, 2>())
       .def("get_minimal_estimate_data",
-           static_cast<bool (CLS::Vertex::*)(double*) const>(
-               &CLS::Vertex::getMinimalEstimateData),
-           "estimate"_a)
-      .def("get_minimal_estimate_data",
-           static_cast<bool (CLS::Vertex::*)(std::vector<double>&) const>(
-               &CLS::Vertex::getMinimalEstimateData),
-           "estimate"_a)
+           [](const CLS::Vertex& v) {
+             VectorX data;
+             const bool status = v.getMinimalEstimateData(data);
+             return status ? data : VectorX();
+           })
 
       .def("estimate_dimension",
            &CLS::Vertex::estimateDimension)  // virtual, -> int
@@ -118,10 +110,17 @@ void declareOptimizableGraph(py::module& m) {
   py::class_<CLS::Edge, HyperGraph::Edge, HyperGraph::DataContainer,
              std::shared_ptr<CLS::Edge>>(cls, "OptimizableGraph_Edge")
       //.def(py::init<>())
-      .def("set_measurement_data", &CLS::Edge::setMeasurementData,
-           "m"_a)  // const double* -> bool
-      .def("get_measurement_data", &CLS::Edge::getMeasurementData,
-           "m"_a)  // double * -> bool
+      .def("set_measurement_data",
+           [](CLS::Edge& e, const VectorX& data) {
+             if (data.size() != e.measurementDimension()) return false;
+             return e.setMeasurementData(data.data());
+           })  // const double* -> bool
+      .def("get_measurement_data",
+           [](const CLS::Edge& e) {
+             VectorX data(e.measurementDimension());
+             const bool status = e.getMeasurementData(data.data());
+             return status ? data : VectorX();
+           })  // double * -> bool
       .def("measurement_dimension", &CLS::Edge::measurementDimension)  // -> int
       .def("set_measurement_from_state",
            &CLS::Edge::setMeasurementFromState)        // -> bool

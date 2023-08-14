@@ -10,9 +10,7 @@ inline void declareVertexOdomDifferentialParams(py::module& m) {
   py::class_<VertexOdomDifferentialParams, BaseVertex<3, Vector3>,
              std::shared_ptr<VertexOdomDifferentialParams>>(
       m, "VertexOdomDifferentialParams")
-      .def(py::init<>())
-      .def("set_to_origin_impl",
-           &VertexOdomDifferentialParams::setToOriginImpl);
+      .def(py::init<>());
 }
 
 }  // namespace g2o

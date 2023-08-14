@@ -12,7 +12,6 @@ namespace {
 void declareVertexIntrinsics(py::module& m) {
   py::class_<VertexIntrinsicsEstimate>(m, "VertexIntrinsicsEstimate")
       .def(py::init<>())
-
       .def_readwrite("values", &VertexIntrinsicsEstimate::values);
 
   templatedBaseVertex<4, VertexIntrinsicsEstimate>(m, "_4_Vertextrinsics");
@@ -28,15 +27,7 @@ void declareTypesSBA(py::module& m) {
   templatedBaseVertex<6, SBACam>(m, "_6_SBACam");
   py::class_<VertexCam, BaseVertex<6, SBACam>, std::shared_ptr<VertexCam>>(
       m, "VertexCam")
-      .def(py::init<>())
-      .def("set_estimate", &VertexCam::setEstimate)  // const SBACam& -> void
-      .def("set_estimate_data_impl", &VertexCam::setEstimateDataImpl)
-      .def("get_estimate_data", &VertexCam::getEstimateData)
-      .def("estimate_dimension", &VertexCam::estimateDimension)
-      .def("set_minimal_estimate_data_impl",
-           &VertexCam::setMinimalEstimateDataImpl)
-      .def("get_minimal_estimate_data", &VertexCam::getMinimalEstimateData)
-      .def("minimal_estimate_dimension", &VertexCam::minimalEstimateDimension);
+      .def(py::init<>());
 
   // monocular projection
   // first two args are the measurement type, second two the connection classes

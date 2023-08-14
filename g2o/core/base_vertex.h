@@ -142,19 +142,20 @@ class BaseVertex : public OptimizableGraph::Vertex {
     setEstimate(TypeTraits<EstimateType>::Identity());
   }
 
-  bool setEstimateDataImpl(const double* est) final {
+  bool setEstimateData(const double* est) final {
     static_assert(TypeTraits<EstimateType>::kVectorDimension != INT_MIN,
                   "Forgot to implement TypeTrait for your Estimate");
     typename TypeTraits<EstimateType>::VectorType::ConstMapType aux(
         est, DimensionTraits<EstimateType>::dimension(estimate_));
     estimate_ = TypeTraits<EstimateType>::fromVector(aux);
+    updateCache();
     return true;
   }
 
   bool getEstimateData(double* est) const final {
     static_assert(TypeTraits<EstimateType>::kVectorDimension != INT_MIN,
                   "Forgot to implement TypeTrait for your Estimate");
-    TypeTraits<EstimateType>::toData(estimate_, est);
+    TypeTraits<EstimateType>::toData(estimate(), est);
     return true;
   }
 
@@ -164,19 +165,19 @@ class BaseVertex : public OptimizableGraph::Vertex {
     return TypeTraits<EstimateType>::kVectorDimension;
   }
 
-  bool setMinimalEstimateDataImpl(const double* est) final {
+  bool setMinimalEstimateData(const double* est) final {
     static_assert(TypeTraits<EstimateType>::kMinimalVectorDimension != INT_MIN,
                   "Forgot to implement TypeTrait for your Estimate");
     typename TypeTraits<EstimateType>::MinimalVectorType::ConstMapType aux(
-        est, DimensionTraits<EstimateType>::minimalDimension(estimate_));
-    estimate_ = TypeTraits<EstimateType>::fromMinimalVector(aux);
+        est, DimensionTraits<EstimateType>::minimalDimension(estimate()));
+    setEstimate(TypeTraits<EstimateType>::fromMinimalVector(aux));
     return true;
   }
 
   bool getMinimalEstimateData(double* est) const final {
     static_assert(TypeTraits<EstimateType>::kMinimalVectorDimension != INT_MIN,
                   "Forgot to implement TypeTrait for your Estimate");
-    TypeTraits<EstimateType>::toMinimalData(estimate_, est);
+    TypeTraits<EstimateType>::toMinimalData(estimate(), est);
     return true;
   }
 

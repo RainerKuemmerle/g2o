@@ -83,28 +83,6 @@ void OptimizableGraph::Vertex::updateCache() {
   }
 }
 
-bool OptimizableGraph::Vertex::setEstimateData(const double* estimate) {
-  const bool ret = setEstimateDataImpl(estimate);
-  updateCache();
-  return ret;
-}
-
-bool OptimizableGraph::Vertex::getEstimateData(double*) const { return false; }
-
-int OptimizableGraph::Vertex::estimateDimension() const { return -1; }
-
-bool OptimizableGraph::Vertex::setMinimalEstimateData(const double* estimate) {
-  const bool ret = setMinimalEstimateDataImpl(estimate);
-  updateCache();
-  return ret;
-}
-
-bool OptimizableGraph::Vertex::getMinimalEstimateData(double*) const {
-  return false;
-}
-
-int OptimizableGraph::Vertex::minimalEstimateDimension() const { return -1; }
-
 OptimizableGraph::Edge::Edge() : robustKernel_(nullptr) {}
 
 OptimizableGraph::Edge::~Edge() = default;

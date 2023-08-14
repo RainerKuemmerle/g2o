@@ -101,13 +101,10 @@ class EstimateAccessorGet {
  *
  * class VertexFlatSE2 : public g2o::BaseVertex<3, g2o::Vector3> {
  *  public:
- *   virtual void setToOriginImpl() { _estimate.setZero(); }
  *   virtual void oplusImpl(const double* update) {
  *    _estimate += Eigen::Map<const g2o::Vector3>(update);
  *    _estimate(2) = g2o::normalize_theta(_estimate(2));
  *   }
- *   virtual bool read(std::istream&) { return false; }
- *   virtual bool write(std::ostream&) const { return false; }
  * };
  *
  * If this is not the case for your edge, then you can provide a functor object
