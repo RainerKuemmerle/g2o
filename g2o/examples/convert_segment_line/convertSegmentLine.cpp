@@ -33,7 +33,6 @@
 #include <sstream>
 #include <string>
 
-#include "g2o/apps/g2o_simulator/simutils.h"
 #include "g2o/core/batch_stats.h"
 #include "g2o/core/estimate_propagator.h"
 #include "g2o/core/factory.h"
@@ -55,11 +54,23 @@ using namespace std;
 using namespace g2o;
 using namespace Eigen;
 
+namespace {
+
+Eigen::Vector2d computeLine(const Eigen::Vector2d& p1,
+                            const Eigen::Vector2d& p2) {
+  Eigen::Vector2d lp;
+  Eigen::Vector2d dp = p2 - p1;
+  lp[0] = atan2(-dp.x(), dp.y());
+  Eigen::Vector2d n(cos(lp[0]), sin(lp[0]));
+  lp[1] = n.dot(p1 + p2) * .5;
+  return lp;
+}
+
 struct LineInfo {
   explicit LineInfo(VertexSegment2D* s) {
     line = new VertexLine2D();
     line->setId(s->id());
-    line->setEstimate(computeLineParameters(s->estimateP1(), s->estimateP2()));
+    line->setEstimate(computeLine(s->estimateP1(), s->estimateP2()));
     p1 = 0;
     p2 = 0;
   }
@@ -67,6 +78,8 @@ struct LineInfo {
   VertexPointXY* p1;
   VertexPointXY* p2;
 };
+
+}  // namespace
 
 typedef std::map<int, LineInfo> LineInfoMap;
 
@@ -180,7 +193,7 @@ int main(int argc, char** argv) {
       }
       if (es) {
         el2->setMeasurement(
-            computeLineParameters(es->measurementP1(), es->measurementP2()));
+            computeLine(es->measurementP1(), es->measurementP2()));
         Matrix2d el2info;
         el2info << 10000, 0, 0, 1000;
         el2->setInformation(el2info);
