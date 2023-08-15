@@ -39,7 +39,6 @@ namespace g2o {
  */
 class G2O_TYPES_SLAM3D_ADDONS_API EdgeSE3Euler : public EdgeSE3 {
  public:
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   bool read(std::istream& is) override;
   bool write(std::ostream& os) const override;
 };

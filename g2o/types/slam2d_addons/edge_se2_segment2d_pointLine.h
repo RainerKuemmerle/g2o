@@ -38,7 +38,6 @@ namespace g2o {
 class G2O_TYPES_SLAM2D_ADDONS_API EdgeSE2Segment2DPointLine
     : public BaseBinaryEdge<3, Vector3, VertexSE2, VertexSegment2D> {
  public:
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   [[nodiscard]] double theta() const { return measurement_[2]; }
   [[nodiscard]] Vector2 point() const {
     Eigen::Map<const Vector2> p(measurement_.data());

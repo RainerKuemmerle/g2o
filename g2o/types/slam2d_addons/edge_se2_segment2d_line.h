@@ -41,8 +41,6 @@ class EdgeSE2Segment2DLine
                                               // in MSVC
 {
  public:
-  G2O_TYPES_SLAM2D_ADDONS_API EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
-
   G2O_TYPES_SLAM2D_ADDONS_API [[nodiscard]] double theta() const {
     return measurement_[0];
   }

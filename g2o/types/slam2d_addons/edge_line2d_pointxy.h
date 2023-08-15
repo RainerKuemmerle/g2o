@@ -42,10 +42,7 @@ class EdgeLine2DPointXY
                                             // MSVC
 {
  public:
-  G2O_TYPES_SLAM2D_ADDONS_API EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-
-      G2O_TYPES_SLAM2D_ADDONS_API void
-      computeError() override {
+  G2O_TYPES_SLAM2D_ADDONS_API void computeError() override {
     const VertexLine2D* l = vertexXnRaw<0>();
     const VertexPointXY* p = vertexXnRaw<1>();
     Vector2 n(std::cos(l->theta()), std::sin(l->theta()));

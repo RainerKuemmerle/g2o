@@ -31,10 +31,11 @@
 
 #include "g2o/core/eigen_types.h"
 #include "g2o/core/type_traits.h"
+#include "types_seven_dof_expmap_api.h"
 
 namespace g2o {
 
-struct Sim3 {
+struct G2O_TYPES_SIM3_API Sim3 {
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
  protected:
@@ -81,7 +82,8 @@ struct Sim3 {
   double& scale() { return s_; }
 };
 
-std::ostream& operator<<(std::ostream& out_str, const Sim3& sim3);
+G2O_TYPES_SIM3_API std::ostream& operator<<(std::ostream& out_str,
+                                            const Sim3& sim3);
 
 /**
  * @brief TypeTraits specialization for a Sim3

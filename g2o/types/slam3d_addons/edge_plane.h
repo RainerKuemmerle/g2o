@@ -37,7 +37,6 @@ namespace g2o {
 class G2O_TYPES_SLAM3D_ADDONS_API EdgePlane
     : public BaseBinaryEdge<4, Vector4, VertexPlane, VertexPlane> {
  public:
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   EdgePlane();
 
   void computeError() override {
