@@ -114,7 +114,7 @@ namespace g2o {
  * @brief TypeTraits specialization for a SE2 in our tutorial
  */
 template <>
-struct g2o::TypeTraits<tutorial::SE2> {
+struct TypeTraits<tutorial::SE2> {
   enum {
     kVectorDimension = 3,
     kMinimalVectorDimension = 3,
