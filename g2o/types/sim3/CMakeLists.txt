@@ -1,4 +1,5 @@
 add_library(types_sim3 ${G2O_LIB_TYPE}
+  sim3.cpp sim3.h
   types_seven_dof_expmap.cpp
   types_seven_dof_expmap.h
 )
