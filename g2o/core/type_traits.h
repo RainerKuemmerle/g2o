@@ -111,6 +111,15 @@ struct TypeTraits<VectorN<N>> {
   static Type Identity() { return Type::Zero(kVectorDimension); }
 };
 
+// explicitly instantiate
+template struct TypeTraits<VectorN<1>>;
+template struct TypeTraits<VectorN<2>>;
+template struct TypeTraits<VectorN<3>>;
+template struct TypeTraits<VectorN<4>>;
+template struct TypeTraits<VectorN<5>>;
+template struct TypeTraits<VectorN<6>>;
+template struct TypeTraits<VectorN<7>>;
+
 /**
  * @brief TypeTrait specialization for a scalar type.
  *

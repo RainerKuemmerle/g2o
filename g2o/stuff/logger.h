@@ -84,10 +84,10 @@ using Logger = internal::Singleton<internal::LoggerInterface>;
 
 #else
 
-#define G2O_INFO(...)
-#define G2O_WARN(...)
-#define G2O_ERROR(...)
-#define G2O_DEBUG(...)
+#define G2O_INFO(...) (void)0
+#define G2O_WARN(...) (void)0
+#define G2O_ERROR(...) (void)0
+#define G2O_DEBUG(...) (void)0
 
 #endif  // G2O_HAVE_LOGGING
 
