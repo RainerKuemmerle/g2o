@@ -82,7 +82,8 @@ struct G2O_TYPES_SIM3_API Sim3 {
   double& scale() { return s_; }
 };
 
-std::ostream& operator<<(std::ostream& out_str, const Sim3& sim3);
+G2O_TYPES_SIM3_API std::ostream& operator<<(std::ostream& out_str,
+                                            const Sim3& sim3);
 
 /**
  * @brief TypeTraits specialization for a Sim3
