@@ -39,7 +39,6 @@ namespace g2o {
 
 class G2O_TYPES_SLAM2D_ADDONS_API VertexLine2D : public BaseVertex<2, Line2D> {
  public:
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
   VertexLine2D();
 
   [[nodiscard]] double theta() const { return estimate_[0]; }

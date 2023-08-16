@@ -39,7 +39,6 @@ namespace g2o {
 class G2O_TYPES_SLAM2D_ADDONS_API EdgeSE2Line2D
     : public BaseBinaryEdge<2, Line2D, VertexSE2, VertexLine2D> {
  public:
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   void computeError() override {
     const VertexSE2* v1 = vertexXnRaw<0>();
     const VertexLine2D* l2 = vertexXnRaw<1>();

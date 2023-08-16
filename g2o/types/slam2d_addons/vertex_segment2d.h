@@ -39,7 +39,6 @@ namespace g2o {
 class G2O_TYPES_SLAM2D_ADDONS_API VertexSegment2D
     : public BaseVertex<4, Vector4> {
  public:
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
   VertexSegment2D();
 
   [[nodiscard]] Vector2 estimateP1() const {
