@@ -74,11 +74,8 @@ struct TypeTraits {
  *
  * @tparam N The dimension of the vector
  */
-#ifdef _MSC_VER
-template <>
-#endif
-template <int N>
-struct TypeTraits<VectorN<N>> {
+template <typename T, int N>
+struct TypeTraits<VectorN<N, T>> {
   enum {
     kVectorDimension = N,
     kMinimalVectorDimension = N,
