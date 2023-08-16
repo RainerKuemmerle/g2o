@@ -31,23 +31,8 @@
 #include "g2o/core/base_vertex.h"
 #include "g2o/types/sba/types_six_dof_expmap.h"
 #include "sim3.h"
+#include "types_seven_dof_expmap_api.h"
 
-#ifdef _MSC_VER
-// We are using a Microsoft compiler:
-#ifdef G2O_SHARED_LIBS
-#ifdef types_sim3_EXPORTS
-#define G2O_TYPES_SIM3_API __declspec(dllexport)
-#else
-#define G2O_TYPES_SIM3_API __declspec(dllimport)
-#endif
-#else
-#define G2O_TYPES_SIM3_API
-#endif
-
-#else
-// Not Microsoft compiler so set empty definition:
-#define G2O_TYPES_SIM3_API
-#endif
 namespace g2o {
 
 // explicit instantiation of BaseVertex, if not instantiated causes already
