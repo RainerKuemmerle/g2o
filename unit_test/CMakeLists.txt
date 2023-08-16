@@ -9,7 +9,7 @@ set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 
 macro(create_test target)
-  target_link_libraries(${target} gmock_main)
+  target_link_libraries(${target} gtest gmock gtest_main)
   add_test (NAME ${target} COMMAND $<TARGET_FILE:${target}>)
 endmacro(create_test)
 
