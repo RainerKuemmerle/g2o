@@ -41,8 +41,6 @@ namespace g2o {
 class G2O_TYPES_SLAM3D_ADDONS_API EdgeSE3Line3D
     : public BaseBinaryEdge<4, Line3D, VertexSE3, VertexLine3D> {
  public:
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
-
   EdgeSE3Line3D();
 
   bool read(std::istream& is) override;

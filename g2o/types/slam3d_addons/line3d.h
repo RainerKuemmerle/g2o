@@ -51,8 +51,6 @@ using OrthonormalLine3D = struct OrthonormalLine3D;
 
 class Line3D : public Vector6 {
  public:
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
-
   G2O_TYPES_SLAM3D_ADDONS_API friend Line3D operator*(const Isometry3& t,
                                                       const Line3D& line);
 
