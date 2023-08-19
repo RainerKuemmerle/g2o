@@ -25,9 +25,12 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "g2o/types/slam2d/se2.h"
+#include "gmock/gmock.h"
 #include "gtest/gtest.h"
+#include "unit_test/test_helper/eigen_matcher.h"
 
-using namespace g2o;  // NOLINT
+using namespace g2o;      // NOLINT
+using namespace testing;  // NOLINT
 
 TEST(MappingsSlam2D, SE2) {
   // constructor from 3 values
@@ -50,4 +53,31 @@ TEST(MappingsSlam2D, SE2) {
   EXPECT_DOUBLE_EQ(0., s3.translation()(0));
   EXPECT_DOUBLE_EQ(0., s3.translation()(1));
   EXPECT_DOUBLE_EQ(1., s3.rotation().angle());
+}
+
+TEST(MappingsSlam2D, TraitsSE2) {
+  using Traits = TypeTraits<SE2>;
+  EXPECT_THAT(Traits::kVectorDimension, Eq(3));
+  EXPECT_THAT(Traits::kMinimalVectorDimension, Eq(3));
+  EXPECT_THAT(Traits::kIsVector, Eq(0));
+  EXPECT_THAT(Traits::kIsScalar, Eq(0));
+  EXPECT_THAT(print_wrap(Traits::toVector(SE2())),
+              EigenEqual(print_wrap(Vector3::Zero())));
+  Vector3 data;
+  Traits::toData(SE2(1, 2, 3), data.data());
+  EXPECT_THAT(print_wrap(Traits::toVector(SE2(1, 2, 3))),
+              EigenEqual(print_wrap(data)));
+  EXPECT_THAT(print_wrap(Traits::toMinimalVector(SE2(1, 1, 1))),
+              EigenEqual(print_wrap(Vector3::Ones())));
+  Traits::toMinimalData(SE2(0, 1, 2), data.data());
+  EXPECT_THAT(print_wrap(Traits::toVector(SE2(0, 1, 2))),
+              EigenEqual(print_wrap(data)));
+  EXPECT_THAT(print_wrap(Traits::fromVector(Vector3(0, 1, 2)).translation()),
+              EigenEqual(print_wrap(Vector2(0, 1))));
+  EXPECT_THAT(Traits::fromVector(Vector3(0, 1, 2)).rotation().angle(), Eq(2.));
+  EXPECT_THAT(
+      print_wrap(Traits::fromMinimalVector(Vector3(0, 1, 2)).translation()),
+      EigenEqual(print_wrap(Vector2(0, 1))));
+  EXPECT_THAT(print_wrap(Traits::Identity().toVector()),
+              EigenEqual(print_wrap(Vector3::Zero())));
 }

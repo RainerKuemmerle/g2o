@@ -1,4 +1,3 @@
-- add test for type traits
 - add test for setData / getData on the graph
 
 - split types_seven_dof_expmap
