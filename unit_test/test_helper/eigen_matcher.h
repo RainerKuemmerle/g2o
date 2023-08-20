@@ -28,6 +28,8 @@
 
 #include <Eigen/Core>
 
+namespace g2o::internal {
+
 MATCHER_P(EigenEqual, expect,
           std::string(negation ? "isn't" : "is") + " equal to" +
               ::testing::PrintToString(expect)) {
@@ -57,3 +59,5 @@ template <class Base>
 const EigenPrintWrap<Base>& print_wrap(const Base& base) {
   return static_cast<const EigenPrintWrap<Base>&>(base);
 }
+
+}  // namespace g2o::internal

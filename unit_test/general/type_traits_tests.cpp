@@ -39,23 +39,28 @@ TEST(TypeTraits, VectorFixed) {
   EXPECT_THAT(Traits::kMinimalVectorDimension, Eq(3));
   EXPECT_THAT(Traits::kIsVector, Eq(1));
   EXPECT_THAT(Traits::kIsScalar, Eq(0));
-  EXPECT_THAT(print_wrap(Traits::toVector(g2o::Vector3::Ones())),
-              EigenEqual(print_wrap(g2o::Vector3::Ones())));
+  EXPECT_THAT(g2o::internal::print_wrap(Traits::toVector(g2o::Vector3::Ones())),
+              EigenEqual(g2o::internal::print_wrap(g2o::Vector3::Ones())));
   g2o::Vector3 data;
   Traits::toData(g2o::Vector3(1, 2, 3), data.data());
-  EXPECT_THAT(print_wrap(Traits::toVector(g2o::Vector3(1, 2, 3))),
-              EigenEqual(print_wrap(data)));
-  EXPECT_THAT(print_wrap(Traits::toMinimalVector(g2o::Vector3::Ones())),
-              EigenEqual(print_wrap(g2o::Vector3::Ones())));
+  EXPECT_THAT(
+      g2o::internal::print_wrap(Traits::toVector(g2o::Vector3(1, 2, 3))),
+      EigenEqual(g2o::internal::print_wrap(data)));
+  EXPECT_THAT(
+      g2o::internal::print_wrap(Traits::toMinimalVector(g2o::Vector3::Ones())),
+      EigenEqual(g2o::internal::print_wrap(g2o::Vector3::Ones())));
   Traits::toMinimalData(g2o::Vector3(0, 1, 2), data.data());
-  EXPECT_THAT(print_wrap(Traits::toVector(g2o::Vector3(0, 1, 2))),
-              EigenEqual(print_wrap(data)));
-  EXPECT_THAT(print_wrap(Traits::fromVector(g2o::Vector3(0, 1, 2))),
-              EigenEqual(print_wrap(g2o::Vector3(0, 1, 2))));
-  EXPECT_THAT(print_wrap(Traits::fromMinimalVector(g2o::Vector3(0, 1, 2))),
-              EigenEqual(print_wrap(g2o::Vector3(0, 1, 2))));
-  EXPECT_THAT(print_wrap(Traits::Identity()),
-              EigenEqual(print_wrap(g2o::Vector3::Zero())));
+  EXPECT_THAT(
+      g2o::internal::print_wrap(Traits::toVector(g2o::Vector3(0, 1, 2))),
+      EigenEqual(g2o::internal::print_wrap(data)));
+  EXPECT_THAT(
+      g2o::internal::print_wrap(Traits::fromVector(g2o::Vector3(0, 1, 2))),
+      EigenEqual(g2o::internal::print_wrap(g2o::Vector3(0, 1, 2))));
+  EXPECT_THAT(g2o::internal::print_wrap(
+                  Traits::fromMinimalVector(g2o::Vector3(0, 1, 2))),
+              EigenEqual(g2o::internal::print_wrap(g2o::Vector3(0, 1, 2))));
+  EXPECT_THAT(g2o::internal::print_wrap(Traits::Identity()),
+              EigenEqual(g2o::internal::print_wrap(g2o::Vector3::Zero())));
 }
 
 TEST(TypeTraits, Double) {
@@ -65,15 +70,17 @@ TEST(TypeTraits, Double) {
   EXPECT_THAT(Traits::kMinimalVectorDimension, Eq(1));
   EXPECT_THAT(Traits::kIsVector, Eq(0));
   EXPECT_THAT(Traits::kIsScalar, Eq(1));
-  EXPECT_THAT(print_wrap(Traits::toVector(42.)),
-              EigenEqual(print_wrap(Vec1(42.))));
+  EXPECT_THAT(g2o::internal::print_wrap(Traits::toVector(42.)),
+              EigenEqual(g2o::internal::print_wrap(Vec1(42.))));
   Vec1 data;
   Traits::toData(3., data.data());
-  EXPECT_THAT(print_wrap(Traits::toVector(3.)), EigenEqual(print_wrap(data)));
-  EXPECT_THAT(print_wrap(Traits::toMinimalVector(5.)),
-              EigenEqual(print_wrap(Vec1(5.))));
+  EXPECT_THAT(g2o::internal::print_wrap(Traits::toVector(3.)),
+              EigenEqual(g2o::internal::print_wrap(data)));
+  EXPECT_THAT(g2o::internal::print_wrap(Traits::toMinimalVector(5.)),
+              EigenEqual(g2o::internal::print_wrap(Vec1(5.))));
   Traits::toMinimalData(1., data.data());
-  EXPECT_THAT(print_wrap(Traits::toVector(1.)), EigenEqual(print_wrap(data)));
+  EXPECT_THAT(g2o::internal::print_wrap(Traits::toVector(1.)),
+              EigenEqual(g2o::internal::print_wrap(data)));
   EXPECT_THAT(Traits::fromVector(Vec1(2.)), Eq(2.));
   EXPECT_THAT(Traits::fromMinimalVector(Vec1(3.)), Eq(3.));
   EXPECT_THAT(Traits::Identity(), Eq(0.));

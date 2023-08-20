@@ -27,13 +27,15 @@
 #ifndef EVALUATE_JACOBIAN_H
 #define EVALUATE_JACOBIAN_H
 
-#include <gtest/gtest.h>
+#include <gmock/gmock.h>
 
 #include <Eigen/Core>
 #include <functional>
 
+#include "eigen_matcher.h"
 #include "g2o/core/base_binary_edge.h"
 #include "g2o/core/base_unary_edge.h"
+#include "g2o/core/eigen_types.h"
 
 namespace g2o {
 
@@ -43,6 +45,21 @@ namespace internal {
 static EpsilonFunction epsilon = [](const double, const double) {
   return 1e-6;
 };
+
+/**
+ * @brief Matcher for testing Numeric and Analytic Jacobian to be approximately
+ * equal.
+ */
+MATCHER_P2(JacobianApproxEqual, expect, prec,
+           std::string(negation ? "isn't" : "is") + " approx equal to" +
+               ::testing::PrintToString(expect)) {
+  if (arg.size() != expect.size()) return false;
+  for (int j = 0; j < arg.size(); ++j) {
+    double diff = std::abs(arg(j) - expect(j));
+    if (diff > prec(arg(j), expect(j))) return false;
+  }
+  return true;
+}
 }  // namespace internal
 
 template <typename EdgeType>
@@ -62,19 +79,19 @@ void evaluateJacobianUnary(EdgeType& e, JacobianWorkspace& jacobianWorkspace,
                   typename EdgeType::VertexXiType>::linearizeOplus();
 
   // compare the Jacobians
-  double* n = numericJacobianWorkspace.workspaceForVertex(0);
-  double* a = jacobianWorkspace.workspaceForVertex(0);
   int numElems = EdgeType::kDimension;
   numElems *= EdgeType::VertexXiType::kDimension;
-  for (int j = 0; j < numElems; ++j) {
-    EXPECT_NEAR(n[j], a[j], eps(n[j], a[j]));
-  }
+  VectorX::ConstMapType n(numericJacobianWorkspace.workspaceForVertex(0),
+                          numElems);
+  VectorX::ConstMapType a(jacobianWorkspace.workspaceForVertex(0), numElems);
+  EXPECT_THAT(internal::print_wrap(a),
+              internal::JacobianApproxEqual(internal::print_wrap(n), eps));
 }
 
 template <typename EdgeType>
 void evaluateJacobian(EdgeType& e, JacobianWorkspace& jacobianWorkspace,
                       JacobianWorkspace& numericJacobianWorkspace,
-                      EpsilonFunction eps = internal::epsilon) {
+                      const EpsilonFunction& eps = internal::epsilon) {
   // calling the analytic Jacobian but writing to the numeric workspace
   e.BaseBinaryEdge<EdgeType::kDimension, typename EdgeType::Measurement,
                    typename EdgeType::VertexXiType,
@@ -91,14 +108,14 @@ void evaluateJacobian(EdgeType& e, JacobianWorkspace& jacobianWorkspace,
 
   // compare the two Jacobians
   for (int i = 0; i < 2; ++i) {
-    double* n = numericJacobianWorkspace.workspaceForVertex(i);
-    double* a = jacobianWorkspace.workspaceForVertex(i);
     int numElems = EdgeType::kDimension;
     numElems *= i == 0 ? EdgeType::VertexXiType::kDimension
                        : EdgeType::VertexXjType::kDimension;
-    for (int j = 0; j < numElems; ++j) {
-      EXPECT_NEAR(n[j], a[j], eps(n[j], a[j]));
-    }
+    VectorX::ConstMapType n(numericJacobianWorkspace.workspaceForVertex(i),
+                            numElems);
+    VectorX::ConstMapType a(jacobianWorkspace.workspaceForVertex(i), numElems);
+    EXPECT_THAT(internal::print_wrap(a),
+                internal::JacobianApproxEqual(internal::print_wrap(n), eps));
   }
 }
 

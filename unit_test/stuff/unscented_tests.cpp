@@ -54,9 +54,11 @@ TEST(Unscented, SampleUnscented) {
   g2o::MatrixX rec_covariance(kDim, kDim);
   reconstructGaussian(rec_mean, rec_covariance, spts);
 
-  EXPECT_THAT(print_wrap(mean), EigenApproxEqual(print_wrap(rec_mean), 1e-6));
-  EXPECT_THAT(print_wrap(covariance),
-              EigenApproxEqual(print_wrap(rec_covariance), 1e-6));
+  EXPECT_THAT(g2o::internal::print_wrap(mean),
+              EigenApproxEqual(g2o::internal::print_wrap(rec_mean), 1e-6));
+  EXPECT_THAT(
+      g2o::internal::print_wrap(covariance),
+      EigenApproxEqual(g2o::internal::print_wrap(rec_covariance), 1e-6));
 }
 
 #if 0

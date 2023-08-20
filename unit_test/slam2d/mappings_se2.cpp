@@ -31,6 +31,8 @@
 
 using namespace g2o;      // NOLINT
 using namespace testing;  // NOLINT
+using g2o::internal::EigenEqual;
+using g2o::internal::print_wrap;
 
 TEST(MappingsSlam2D, SE2) {
   // constructor from 3 values
