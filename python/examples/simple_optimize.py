@@ -1,8 +1,8 @@
-import numpy as np
-import g2opy
+import argparse
 import os
 
-import argparse
+import g2opy
+import numpy as np
 
 parser = argparse.ArgumentParser()
 parser.add_argument(

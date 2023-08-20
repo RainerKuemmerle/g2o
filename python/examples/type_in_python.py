@@ -1,7 +1,8 @@
+import random
 from typing import List
+
 import g2opy as g2o
 import numpy as np
-import random
 import plotly.graph_objects as go
 
 

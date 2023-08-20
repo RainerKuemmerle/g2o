@@ -1,10 +1,10 @@
 # https://github.com/RainerKuemmerle/g2o/blob/master/g2o/examples/sba/sba_demo.cpp
 
-import numpy as np
-import g2opy as g2o
-
-from collections import defaultdict
 import argparse
+from collections import defaultdict
+
+import g2opy as g2o
+import numpy as np
 
 parser = argparse.ArgumentParser()
 parser.add_argument(
@@ -111,7 +111,7 @@ def main():
         if inlier:
             inliers[point_id] = i
             error = vp.estimate() - true_points[i]
-            sse[0] += np.sum(error ** 2)
+            sse[0] += np.sum(error**2)
         point_id += 1
 
     print("Performing full BA:")
@@ -122,7 +122,7 @@ def main():
     for i in inliers:
         vp = optimizer.vertex(i)
         error = vp.estimate() - true_points[inliers[i]]
-        sse[1] += np.sum(error ** 2)
+        sse[1] += np.sum(error**2)
 
     print("\nRMSE (inliers only):")
     print("before optimization:", np.sqrt(sse[0] / len(inliers)))

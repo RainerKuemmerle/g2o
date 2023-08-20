@@ -1,9 +1,9 @@
 # https://github.com/RainerKuemmerle/g2o/blob/master/g2o/examples/icp/gicp_demo.cpp
 
-import numpy as np
-import g2opy as g2o
-
 import argparse
+
+import g2opy as g2o
+import numpy as np
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--noise", type=float, help="noise in position", default=0.02)
