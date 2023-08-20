@@ -1,10 +1,8 @@
 - add test for setData / getData on the graph
 
-- split types_seven_dof_expmap
-- split ICP types
-  - can there be less hacks in this?
-
 - update py_base_vertex/edge to map now common methods
 
 - read write methods based on type traits conversion to vector
   - how to handle params?
+
+- investigate binary format for save/load

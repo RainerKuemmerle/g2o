@@ -56,6 +56,16 @@ VertexSim3Expmap::VertexSim3Expmap() {
   _focal_length2[1] = 1;
 }
 
+void VertexSim3Expmap::oplusImpl(const VectorX::MapType& update) {
+  if (_fix_scale) {
+    auto& update_non_const = const_cast<VectorX::MapType&>(update);
+    update_non_const[6] = 0;
+  }
+
+  Sim3 s(update);
+  setEstimate(s * estimate());
+}
+
 bool VertexSim3Expmap::read(std::istream& is) {
   Vector7 cam2world;
   bool state = true;
@@ -75,6 +85,20 @@ bool VertexSim3Expmap::write(std::ostream& os) const {
   return os.good();
 }
 
+Vector2 VertexSim3Expmap::cam_map1(const Vector2& v) const {
+  Vector2 res;
+  res[0] = v[0] * _focal_length1[0] + _principle_point1[0];
+  res[1] = v[1] * _focal_length1[1] + _principle_point1[1];
+  return res;
+}
+
+Vector2 VertexSim3Expmap::cam_map2(const Vector2& v) const {
+  Vector2 res;
+  res[0] = v[0] * _focal_length2[0] + _principle_point2[0];
+  res[1] = v[1] * _focal_length2[1] + _principle_point2[1];
+  return res;
+}
+
 bool EdgeSim3::read(std::istream& is) {
   Vector7 v7;
   internal::readVector(is, v7);
@@ -87,6 +111,29 @@ bool EdgeSim3::write(std::ostream& os) const {
   Sim3 cam2world(measurement().inverse());
   internal::writeVector(os, cam2world.log());
   return writeInformationMatrix(os);
+}
+
+void EdgeSim3::computeError() {
+  const VertexSim3Expmap* v1 = vertexXnRaw<0>();
+  const VertexSim3Expmap* v2 = vertexXnRaw<1>();
+
+  Sim3 C(measurement_);
+  Sim3 err = C * v1->estimate() * v2->estimate().inverse();
+  error_ = err.log();
+}
+
+double EdgeSim3::initialEstimatePossible(const OptimizableGraph::VertexSet&,
+                                         OptimizableGraph::Vertex*) {
+  return 1.;
+}
+void EdgeSim3::initialEstimate(const OptimizableGraph::VertexSet& from,
+                               OptimizableGraph::Vertex* /*to*/) {
+  auto v1 = vertexXn<0>();
+  auto v2 = vertexXn<1>();
+  if (from.count(v1) > 0)
+    v2->setEstimate(measurement() * v1->estimate());
+  else
+    v1->setEstimate(measurement().inverse() * v2->estimate());
 }
 
 #if G2O_SIM3_JACOBIAN
@@ -151,6 +198,14 @@ bool EdgeSim3ProjectXYZ::write(std::ostream& os) const {
   return writeInformationMatrix(os);
 }
 
+void EdgeSim3ProjectXYZ::computeError() {
+  const VertexSim3Expmap* v1 = vertexXnRaw<1>();
+  const VertexPointXYZ* v2 = vertexXnRaw<0>();
+
+  Vector2 obs(measurement_);
+  error_ = obs - v1->cam_map1(project(v1->estimate().map(v2->estimate())));
+}
+
 bool EdgeInverseSim3ProjectXYZ::read(std::istream& is) {
   internal::readVector(is, measurement_);
   return readInformationMatrix(is);
@@ -159,6 +214,15 @@ bool EdgeInverseSim3ProjectXYZ::read(std::istream& is) {
 bool EdgeInverseSim3ProjectXYZ::write(std::ostream& os) const {
   internal::writeVector(os, measurement_);
   return writeInformationMatrix(os);
+}
+
+void EdgeInverseSim3ProjectXYZ::computeError() {
+  const VertexSim3Expmap* v1 = vertexXnRaw<1>();
+  const VertexPointXYZ* v2 = vertexXnRaw<0>();
+
+  Vector2 obs(measurement_);
+  error_ =
+      obs - v1->cam_map2(project(v1->estimate().inverse().map(v2->estimate())));
 }
 
 //  void EdgeSim3ProjectXYZ::linearizeOplus()

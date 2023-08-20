@@ -57,32 +57,14 @@ class G2O_TYPES_SIM3_API VertexSim3Expmap : public BaseVertex<7, Sim3> {
   //! custom write function
   bool write(std::ostream& os) const override;
 
-  void oplusImpl(const VectorX::MapType& update) override {
-    if (_fix_scale) {
-      auto& update_non_const = const_cast<VectorX::MapType&>(update);
-      update_non_const[6] = 0;
-    }
-
-    Sim3 s(update);
-    setEstimate(s * estimate());
-  }
+  void oplusImpl(const VectorX::MapType& update) override;
 
   Vector2 _principle_point1, _principle_point2;
   Vector2 _focal_length1, _focal_length2;
 
-  [[nodiscard]] Vector2 cam_map1(const Vector2& v) const {
-    Vector2 res;
-    res[0] = v[0] * _focal_length1[0] + _principle_point1[0];
-    res[1] = v[1] * _focal_length1[1] + _principle_point1[1];
-    return res;
-  }
+  [[nodiscard]] Vector2 cam_map1(const Vector2& v) const;
 
-  [[nodiscard]] Vector2 cam_map2(const Vector2& v) const {
-    Vector2 res;
-    res[0] = v[0] * _focal_length2[0] + _principle_point2[0];
-    res[1] = v[1] * _focal_length2[1] + _principle_point2[1];
-    return res;
-  }
+  [[nodiscard]] Vector2 cam_map2(const Vector2& v) const;
 
   bool _fix_scale;
 
@@ -98,28 +80,12 @@ class G2O_TYPES_SIM3_API EdgeSim3
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   bool read(std::istream& is) override;
   bool write(std::ostream& os) const override;
-  void computeError() override {
-    const VertexSim3Expmap* v1 = vertexXnRaw<0>();
-    const VertexSim3Expmap* v2 = vertexXnRaw<1>();
-
-    Sim3 C(measurement_);
-    Sim3 err = C * v1->estimate() * v2->estimate().inverse();
-    error_ = err.log();
-  }
+  void computeError() override;
 
   double initialEstimatePossible(const OptimizableGraph::VertexSet&,
-                                 OptimizableGraph::Vertex*) override {
-    return 1.;
-  }
+                                 OptimizableGraph::Vertex*) override;
   void initialEstimate(const OptimizableGraph::VertexSet& from,
-                       OptimizableGraph::Vertex* /*to*/) override {
-    auto v1 = vertexXn<0>();
-    auto v2 = vertexXn<1>();
-    if (from.count(v1) > 0)
-      v2->setEstimate(measurement() * v1->estimate());
-    else
-      v1->setEstimate(measurement().inverse() * v2->estimate());
-  }
+                       OptimizableGraph::Vertex* /*to*/) override;
 #if G2O_SIM3_JACOBIAN
   virtual void linearizeOplus();
 #endif
@@ -133,13 +99,7 @@ class G2O_TYPES_SIM3_API EdgeSim3ProjectXYZ
   bool read(std::istream& is) override;
   bool write(std::ostream& os) const override;
 
-  void computeError() override {
-    const VertexSim3Expmap* v1 = vertexXnRaw<1>();
-    const VertexPointXYZ* v2 = vertexXnRaw<0>();
-
-    Vector2 obs(measurement_);
-    error_ = obs - v1->cam_map1(project(v1->estimate().map(v2->estimate())));
-  }
+  void computeError() override;
 
   // virtual void linearizeOplus();
 };
@@ -152,14 +112,7 @@ class G2O_TYPES_SIM3_API EdgeInverseSim3ProjectXYZ
   bool read(std::istream& is) override;
   bool write(std::ostream& os) const override;
 
-  void computeError() override {
-    const VertexSim3Expmap* v1 = vertexXnRaw<1>();
-    const VertexPointXYZ* v2 = vertexXnRaw<0>();
-
-    Vector2 obs(measurement_);
-    error_ = obs - v1->cam_map2(
-                       project(v1->estimate().inverse().map(v2->estimate())));
-  }
+  void computeError() override;
 
   // virtual void linearizeOplus();
 };
