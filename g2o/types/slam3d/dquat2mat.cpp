@@ -28,11 +28,11 @@
 
 #include <iostream>
 
-namespace g2o {
-namespace internal {
+namespace g2o::internal {
 
 #include "dquat2mat_maxima_generated.cpp"  // NOLINT
 
+namespace {
 int q2m(double& S, double& qw, const double& r00, const double& r10,
         const double& r20, const double& r01, const double& r11,
         const double& r21, const double& r02, const double& r12,
@@ -68,6 +68,7 @@ int q2m(double& S, double& qw, const double& r00, const double& r10,
   // qz = 0.25 * S;
   return 3;
 }
+}  // namespace
 
 void compute_dq_dR(Eigen::Matrix<double, 3, 9, Eigen::ColMajor>& dq_dR,
                    const double& r11, const double& r21, const double& r31,
@@ -96,5 +97,4 @@ void compute_dq_dR(Eigen::Matrix<double, 3, 9, Eigen::ColMajor>& dq_dR,
   // clang-format on
   if (qw <= 0) dq_dR *= -1;
 }
-}  // namespace internal
-}  // namespace g2o
+}  // namespace g2o::internal

@@ -24,7 +24,10 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+#include <memory>
+
 #include "g2o/autodiff/autodiff.h"
+#include "g2o/core/eigen_types.h"
 #include "g2o/core/jacobian_workspace.h"
 #include "g2o/core/optimizable_graph.h"
 #include "g2o/types/slam3d/dquat2mat.h"
@@ -33,6 +36,7 @@
 #include "g2o/types/slam3d/edge_se3_pointxyz.h"
 #include "g2o/types/slam3d/edge_se3_pointxyz_depth.h"
 #include "g2o/types/slam3d/edge_se3_pointxyz_disparity.h"
+#include "g2o/types/slam3d/edge_se3_prior.h"
 #include "g2o/types/slam3d/edge_se3_xyzprior.h"
 #include "gtest/gtest.h"
 #include "unit_test/test_helper/evaluate_jacobian.h"
@@ -47,9 +51,8 @@ auto depth_epsilon = [](const double x, const double y) {
 
 }
 
-using namespace std;
-using namespace g2o;
-using namespace g2o::internal;
+using namespace g2o;            // NOLINT
+using namespace g2o::internal;  // NOLINT
 
 TEST(Slam3D, EdgeSE3Jacobian) {
   auto v1 = std::make_shared<VertexSE3>();
@@ -74,6 +77,42 @@ TEST(Slam3D, EdgeSE3Jacobian) {
     e.setMeasurement(internal::randomIsometry3());
 
     evaluateJacobian(e, jacobianWorkspace, numericJacobianWorkspace);
+  }
+}
+
+TEST(Slam3D, EdgeSE3PriorJacobian) {
+  OptimizableGraph graph;
+
+  auto v1 = std::make_shared<VertexSE3>();
+  v1->setId(0);
+  graph.addVertex(v1);
+
+  auto paramOffset = std::make_shared<ParameterSE3Offset>();
+  paramOffset->setId(0);
+  graph.addParameter(paramOffset);
+
+  auto e = std::make_shared<EdgeSE3Prior>();
+  e->setVertex(0, v1);
+  e->setInformation(EdgeSE3Prior::InformationType::Identity());
+  e->setParameterId(0, paramOffset->id());
+  graph.addEdge(e);
+
+  JacobianWorkspace jacobianWorkspace;
+  JacobianWorkspace numericJacobianWorkspace;
+  numericJacobianWorkspace.updateSize(*e);
+  numericJacobianWorkspace.allocate();
+
+  // test in identity pose
+  v1->setEstimate(Isometry3::Identity());
+  e->setMeasurement(internal::randomIsometry3());
+  evaluateJacobianUnary(*e, jacobianWorkspace, numericJacobianWorkspace);
+
+  // test in random pose
+  for (int k = 0; k < 100; ++k) {
+    v1->setEstimate(internal::randomIsometry3());
+    e->setMeasurement(internal::randomIsometry3());
+
+    evaluateJacobianUnary(*e, jacobianWorkspace, numericJacobianWorkspace);
   }
 }
 

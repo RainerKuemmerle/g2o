@@ -26,6 +26,7 @@
 
 #include "edge_se3_pointxyz.h"
 
+#include "g2o/core/eigen_types.h"
 #include "parameter_se3_offset.h"
 
 #ifdef G2O_HAVE_OPENGL
@@ -90,7 +91,7 @@ void EdgeSE3PointXYZ::linearizeOplus() {
   using JacType = Eigen::Matrix<double, 3, 9>;
 
   JacType Jprime = JacType::Zero();
-  Jprime.block<3, 3>(0, 0) = -Matrix3::Identity();
+  Jprime.diagonal().head<3>() = -Vector3::Ones();
 
   //  J(0,3) = -0.0;
   Jprime(0, 4) = -2 * Zcam(2);

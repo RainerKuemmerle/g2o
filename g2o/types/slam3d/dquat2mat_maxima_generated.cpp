@@ -24,6 +24,7 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+namespace {
 void compute_dq_dR_w(Eigen::Matrix<double, 3, 9>& dq_dR_w,
                      const double& qw,  // NOLINT
                      const double& r00, const double& r10, const double& r20,
@@ -205,6 +206,8 @@ void compute_dq_dR_z(Eigen::Matrix<double, 3, 9>& dq_dR_z,  // NOLINT
   dq_dR_z(2, 7) = 0;
   dq_dR_z(2, 8) = 0.125 * _aux4;
 }
+}  // namespace
+
 void compute_dR_dq(Eigen::Matrix<double, 9, 3>& dR_dq,
                    const double& qx,  // NOLINT
                    const double& qy, const double& qz, const double& qw) {

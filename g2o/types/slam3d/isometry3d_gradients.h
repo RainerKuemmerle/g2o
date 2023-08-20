@@ -32,8 +32,7 @@
 #include "dquat2mat.h"
 #include "isometry3d_mappings.h"
 
-namespace g2o {
-namespace internal {
+namespace g2o::internal {
 // forward declaration
 /* void G2O_TYPES_SLAM3D_API compute_dq_dR (Eigen::Matrix<double, 3 , 9,
  * Eigen::ColMajor>&  dq_dR , const double&  r11 , const double&  r21 ,
@@ -323,35 +322,17 @@ void computeEdgeSE3PriorGradient(Isometry3& E,
 
   // dre/dq
   {
-    double buf[27];
-    Eigen::Map<Eigen::Matrix<double, 9, 3, Eigen::ColMajor> > M(buf);
+    Eigen::Matrix<double, 9, 3> M;
     Matrix3 Sx;
     Matrix3 Sy;
     Matrix3 Sz;
     internal::skew(Sx, Sy, Sz, Rb);
-#ifdef __clang__
-    Matrix3 temp = Ra * Sx;
-    Eigen::Map<Matrix3> M2(temp.data());
-    Eigen::Map<Matrix3> Mx(buf);
-    Mx = M2;
-    temp = Ra * Sy;
-    Eigen::Map<Matrix3> My(buf + 9);
-    My = M2;
-    temp = Ra * Sz;
-    Eigen::Map<Matrix3> Mz(buf + 18);
-    Mz = M2;
-#else
-    Eigen::Map<Matrix3> Mx(buf);
-    Mx = Ra * Sx;
-    Eigen::Map<Matrix3> My(buf + 9);
-    My = Ra * Sy;
-    Eigen::Map<Matrix3> Mz(buf + 18);
-    Mz = Ra * Sz;
-#endif
+    M.col(0) = (Ra * Sx).reshaped<Eigen::ColMajor>();
+    M.col(1) = (Ra * Sy).reshaped<Eigen::ColMajor>();
+    M.col(2) = (Ra * Sz).reshaped<Eigen::ColMajor>();
     J.template block<3, 3>(3, 3) = dq_dR * M;
   }
 }
 
-}  // end namespace internal
-}  // end namespace g2o
+}  // namespace g2o::internal
 #endif
