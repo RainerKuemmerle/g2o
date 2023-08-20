@@ -32,8 +32,9 @@
 // #define SCAM_ANALYTIC_JACOBIANS
 
 #include <Eigen/Geometry>
-#include <iostream>
+#include <iosfwd>
 
+#include "edge_gicp.h"
 #include "g2o/core/base_binary_edge.h"
 #include "g2o/core/base_variable_sized_edge.h"
 #include "g2o/core/base_vertex.h"
@@ -43,162 +44,6 @@
 #include "g2o_types_icp_api.h"
 
 namespace g2o {
-
-namespace types_icp {
-void init();
-}
-//
-// GICP-type edges
-// Each measurement is between two rigid points on each 6DOF vertex
-//
-
-//
-// class for edges between two points rigidly attached to vertices
-//
-
-class G2O_TYPES_ICP_API EdgeGICP {
- public:
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
-  // point positions
-  Vector3 pos0, pos1;
-
-  // unit normals
-  Vector3 normal0, normal1;
-
-  // rotation matrix for normal
-  Matrix3 R0, R1;
-
-  // initialize an object
-  EdgeGICP() {
-    pos0.setZero();
-    pos1.setZero();
-    normal0 << 0, 0, 1;
-    normal1 << 0, 0, 1;
-    // makeRot();
-    R0.setIdentity();
-    R1.setIdentity();
-  }
-
-  // set up rotation matrix for pos0
-  void makeRot0() {
-    Vector3 y;
-    y << 0, 1, 0;
-    R0.row(2) = normal0;
-    y = y - normal0(1) * normal0;
-    y.normalize();  // need to check if y is close to 0
-    R0.row(1) = y;
-    R0.row(0) = normal0.cross(R0.row(1));
-    //      cout << normal.transpose() << endl;
-    //      cout << R0 << endl << endl;
-    //      cout << R0*R0.transpose() << endl << endl;
-  }
-
-  // set up rotation matrix for pos1
-  void makeRot1() {
-    Vector3 y;
-    y << 0, 1, 0;
-    R1.row(2) = normal1;
-    y = y - normal1(1) * normal1;
-    y.normalize();  // need to check if y is close to 0
-    R1.row(1) = y;
-    R1.row(0) = normal1.cross(R1.row(1));
-  }
-
-  // returns a precision matrix for point-plane
-  Matrix3 prec0(double e) {
-    makeRot0();
-    Matrix3 prec;
-    prec << e, 0, 0, 0, e, 0, 0, 0, 1;
-    return R0.transpose() * prec * R0;
-  }
-
-  // returns a precision matrix for point-plane
-  Matrix3 prec1(double e) {
-    makeRot1();
-    Matrix3 prec;
-    prec << e, 0, 0, 0, e, 0, 0, 0, 1;
-    return R1.transpose() * prec * R1;
-  }
-
-  // return a covariance matrix for plane-plane
-  Matrix3 cov0(double e) {
-    makeRot0();
-    Matrix3 cov;
-    cov << 1, 0, 0, 0, 1, 0, 0, 0, e;
-    return R0.transpose() * cov * R0;
-  }
-
-  // return a covariance matrix for plane-plane
-  Matrix3 cov1(double e) {
-    makeRot1();
-    Matrix3 cov;
-    cov << 1, 0, 0, 0, 1, 0, 0, 0, e;
-    return R1.transpose() * cov * R1;
-  }
-};
-
-/**
- * @brief TypeTraits specialization for a SE2
- */
-template <>
-struct TypeTraits<EdgeGICP> {
-  enum {
-    kVectorDimension = 12,
-    kMinimalVectorDimension = 12,
-    kIsVector = 0,
-    kIsScalar = 0,
-  };
-  using Type = EdgeGICP;
-  using VectorType = VectorN<kVectorDimension>;
-  using MinimalVectorType = VectorN<kMinimalVectorDimension>;
-
-  static VectorType toVector(const Type& t) {
-    VectorType res;
-    int idx = 0;
-    // first point
-    for (int i = 0; i < 3; i++) res[idx++] = t.pos0[i];
-    for (int i = 0; i < 3; i++) res[idx++] = t.normal0[i];
-
-    // second point
-    for (int i = 0; i < 3; i++) res[idx++] = t.pos1[i];
-    for (int i = 0; i < 3; i++) res[idx++] = t.normal1[i];
-    return res;
-  }
-  static void toData(const Type& t, double* data) {
-    typename VectorType::MapType v(data, kVectorDimension);
-    v = toVector(t);
-  }
-
-  static MinimalVectorType toMinimalVector(const Type& t) {
-    return toVector(t);
-  }
-  static void toMinimalData(const Type& t, double* data) { toData(t, data); }
-
-  template <typename Derived>
-  static Type fromVector(const Eigen::DenseBase<Derived>& v) {
-    Type t;
-    int idx = 0;
-    // first point
-    for (int i = 0; i < 3; i++) t.pos0[i] = v[idx++];
-    for (int i = 0; i < 3; i++) t.normal0[i] = v[idx++];
-
-    // second point
-    for (int i = 0; i < 3; i++) t.pos1[i] = v[idx++];
-    for (int i = 0; i < 3; i++) t.normal1[i] = v[idx++];
-
-    t.makeRot0();
-    t.makeRot1();
-
-    return t;
-  }
-
-  template <typename Derived>
-  static Type fromMinimalVector(const Eigen::DenseBase<Derived>& v) {
-    return fromVector(v);
-  }
-
-  static Type Identity() { return Type(); }
-};
 
 // 3D rigid constraint
 //    3 values for position wrt frame
@@ -219,41 +64,18 @@ class G2O_TYPES_ICP_API EdgeVVGicp
   bool write(std::ostream& os) const override;
 
   // return the error estimate as a 3-vector
-  void computeError() override {
-    // from <ViewPoint> to <Point>
-    const VertexSE3* vp0 = vertexXnRaw<0>();
-    const VertexSE3* vp1 = vertexXnRaw<1>();
-
-    // get vp1 point into vp0 frame
-    // could be more efficient if we computed this transform just once
-    Vector3 p1;
-
-    p1 = vp1->estimate() * measurement().pos1;
-    p1 = vp0->estimate().inverse() * p1;
-
-    // get their difference
-    // this is simple Euclidean distance, for now
-    error_ = p1 - measurement().pos0;
-
-    if (!pl_pl) return;
-
-    // re-define the information matrix
-    // topLeftCorner<3,3>() is the rotation()
-    const Matrix3 transform = (vp0->estimate().inverse() * vp1->estimate())
-                                  .matrix()
-                                  .topLeftCorner<3, 3>();
-    information() = (cov0 + transform * cov1 * transform.transpose()).inverse();
-  }
+  void computeError() override;
 
   // try analytic jacobians
 #ifdef GICP_ANALYTIC_JACOBIANS
   void linearizeOplus() override;
 #endif
 
+ protected:
   // global derivative matrices
-  static Matrix3 dRidx_;
-  static Matrix3 dRidy_;
-  static Matrix3 dRidz_;  // differential quat matrices
+  static const Matrix3 kDRidx;
+  static const Matrix3 kDRidy;
+  static const Matrix3 kDRidz;  // differential quat matrices
 };
 
 /**
@@ -271,10 +93,7 @@ class G2O_TYPES_ICP_API VertexSCam : public VertexSE3 {
   bool write(std::ostream& os) const override;
 
   // capture the update function to reset aux transforms
-  void oplusImpl(const VectorX::MapType& update) override {
-    VertexSE3::oplusImpl(update);
-    setAll();
-  }
+  void oplusImpl(const VectorX::MapType& update) override;
 
   // camera matrix and stereo baseline
   static Matrix3 kcam_;
@@ -292,79 +111,34 @@ class G2O_TYPES_ICP_API VertexSCam : public VertexSE3 {
 
   // transforms
   static void transformW2F(Eigen::Matrix<double, 3, 4, Eigen::ColMajor>& m,
-                           const Vector3& trans, const Quaternion& qrot) {
-    m.block<3, 3>(0, 0) = qrot.toRotationMatrix().transpose();
-    m.col(3).setZero();  // make sure there's no translation
-    Vector4 tt;
-    tt.head(3) = trans;
-    tt[3] = 1.0;
-    m.col(3) = -m * tt;
-  }
+                           const Vector3& trans, const Quaternion& qrot);
 
   static void transformF2W(Eigen::Matrix<double, 3, 4, Eigen::ColMajor>& m,
-                           const Vector3& trans, const Quaternion& qrot) {
-    m.block<3, 3>(0, 0) = qrot.toRotationMatrix();
-    m.col(3) = trans;
-  }
+                           const Vector3& trans, const Quaternion& qrot);
 
   // set up camera matrix
-  static void setKcam(double fx, double fy, double cx, double cy, double tx) {
-    kcam_.setZero();
-    kcam_(0, 0) = fx;
-    kcam_(1, 1) = fy;
-    kcam_(0, 2) = cx;
-    kcam_(1, 2) = cy;
-    kcam_(2, 2) = 1.0;
-    baseline_ = tx;
-  }
+  static void setKcam(double fx, double fy, double cx, double cy, double tx);
 
   // set transform from world to cam coords
-  void setTransform() {
-    w2n = estimate().inverse().matrix().block<3, 4>(0, 0);
-    // transformW2F(w2n,estimate().translation(), estimate().rotation());
-  }
+  void setTransform();
 
   // Set up world-to-image projection matrix (w2i), assumes camera parameters
   // are filled.
-  void setProjection() { w2i = kcam_ * w2n; }
+  void setProjection();
 
   // sets angle derivatives
-  void setDr() {
-    // inefficient, just for testing
-    // use simple multiplications and additions for production code in
-    // calculating dRdx,y,z for dS'*R', with dS the incremental change
-    dRdx = dRidx_ * w2n.block<3, 3>(0, 0);
-    dRdy = dRidy_ * w2n.block<3, 3>(0, 0);
-    dRdz = dRidz_ * w2n.block<3, 3>(0, 0);
-  }
+  void setDr();
 
   // set all aux transforms
-  void setAll() {
-    setTransform();
-    setProjection();
-    setDr();
-  }
+  void setAll();
 
   // calculate stereo projection
-  void mapPoint(Vector3& res, const Vector3& pt3) {
-    Vector4 pt;
-    pt.head<3>() = pt3;
-    pt(3) = cst(1.0);
-    Vector3 p1 = w2i * pt;
-    Vector3 p2 = w2n * pt;
-    Vector3 pb(baseline_, 0, 0);
+  void mapPoint(Vector3& res, const Vector3& pt3) const;
 
-    double invp1 = cst(1.0) / p1(2);
-    res.head<2>() = p1.head<2>() * invp1;
-
-    // right camera px
-    p2 = kcam_ * (p2 - pb);
-    res(2) = p2(0) / p2(2);
-  }
-
-  static Matrix3 dRidx_;
-  static Matrix3 dRidy_;
-  static Matrix3 dRidz_;
+ protected:
+  static const Matrix3 kDRidx;
+  static const Matrix3 kDRidy;
+  static const Matrix3 kDRidz;
 };
 
 /**
@@ -381,21 +155,9 @@ class G2O_TYPES_ICP_API EdgeXyzVsc
   bool read(std::istream& is) override;
   bool write(std::ostream& os) const override;
 
-  // return the error estimate as a 2-vector
-  void computeError() override {
-    // from <Point> to <Cam>
-    VertexPointXYZ* point = vertexXnRaw<0>();
-    VertexSCam* cam = vertexXnRaw<1>();
-    // cam->setAll();
+  // return the error estimate as a 3-vector
+  void computeError() override;
 
-    // calculate the projection
-    Vector3 kp;
-    cam->mapPoint(kp, point->estimate());
-
-    // error, which is backwards from the normal observed - calculated
-    // measurement_ is the measured projection
-    error_ = kp - measurement_;
-  }
 #ifdef SCAM_ANALYTIC_JACOBIANS
   // jacobian
   virtual void linearizeOplus();

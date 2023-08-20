@@ -50,11 +50,7 @@ void declareTypesICP(py::module& m) {
 
       .def_readwrite("pl_pl", &EdgeVVGicp::pl_pl)
       .def_readwrite("cov0", &EdgeVVGicp::cov0)
-      .def_readwrite("cov1", &EdgeVVGicp::cov1)
-
-      .def_readwrite_static("dRidx", &EdgeVVGicp::dRidx_)
-      .def_readwrite_static("dRidy", &EdgeVVGicp::dRidy_)
-      .def_readwrite_static("dRidz", &EdgeVVGicp::dRidz_);
+      .def_readwrite("cov1", &EdgeVVGicp::cov1);
 
   py::class_<VertexSCam, VertexSE3, std::shared_ptr<VertexSCam>>(m,
                                                                  "VertexSCam")
@@ -116,11 +112,7 @@ void declareTypesICP(py::module& m) {
       // for calculating Jacobian wrt pose of a projection.
       .def_readwrite("dRdx", &VertexSCam::dRdx)
       .def_readwrite("dRdy", &VertexSCam::dRdy)
-      .def_readwrite("dRdz", &VertexSCam::dRdz)
-
-      .def_readwrite_static("dRidx", &VertexSCam::dRidx_)
-      .def_readwrite_static("dRidy", &VertexSCam::dRidy_)
-      .def_readwrite_static("dRidz", &VertexSCam::dRidz_);
+      .def_readwrite("dRdz", &VertexSCam::dRdz);
 
   templatedBaseBinaryEdge<3, Vector3, VertexPointXYZ, VertexSCam>(
       m, "_3_Vector3_VertexSBAPointXYZ_VertexSCam");

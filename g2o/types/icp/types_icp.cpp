@@ -28,6 +28,7 @@
 
 #include <iostream>
 
+#include "g2o/core/eigen_types.h"
 #include "g2o/core/factory.h"
 #include "g2o/stuff/macros.h"
 
@@ -36,34 +37,27 @@ namespace g2o {
 G2O_REGISTER_TYPE_GROUP(icp);
 G2O_REGISTER_TYPE(EDGE_V_V_GICP, EdgeVVGicp);
 
-namespace types_icp {
-int initialized = 0;
+const Matrix3 EdgeVVGicp::kDRidx =
+    (Matrix3() << 0.0, 0.0, 0.0, 0.0, 0.0, 2.0, 0.0, -2.0, 0.0)
+        .finished();  // differential quat matrices
+const Matrix3 EdgeVVGicp::kDRidy =
+    (Matrix3() << 0.0, 0.0, -2.0, 0.0, 0.0, 0.0, 2.0, 0.0, 0.0)
+        .finished();  // differential quat matrices
+const Matrix3 EdgeVVGicp::kDRidz =
+    (Matrix3() << 0.0, 2.0, 0.0, -2.0, 0.0, 0.0, 0.0, 0.0, 0.0)
+        .finished();  // differential quat matrices
+const Matrix3 VertexSCam::kDRidx =
+    (Matrix3() << 0.0, 0.0, 0.0, 0.0, 0.0, 2.0, 0.0, -2.0, 0.0)
+        .finished();  // differential quat matrices
+const Matrix3 VertexSCam::kDRidy =
+    (Matrix3() << 0.0, 0.0, -2.0, 0.0, 0.0, 0.0, 2.0, 0.0, 0.0)
+        .finished();  // differential quat matrices
+const Matrix3 VertexSCam::kDRidz =
+    (Matrix3() << 0.0, 2.0, 0.0, -2.0, 0.0, 0.0, 0.0, 0.0, 0.0)
+        .finished();  // differential quat matrices
 
-void init() {
-  if (types_icp::initialized) return;
-  EdgeVVGicp::dRidx_ << 0.0, 0.0, 0.0, 0.0, 0.0, 2.0, 0.0, -2.0, 0.0;
-  EdgeVVGicp::dRidy_ << 0.0, 0.0, -2.0, 0.0, 0.0, 0.0, 2.0, 0.0, 0.0;
-  EdgeVVGicp::dRidz_ << 0.0, 2.0, 0.0, -2.0, 0.0, 0.0, 0.0, 0.0, 0.0;
-
-  VertexSCam::dRidx_ << 0.0, 0.0, 0.0, 0.0, 0.0, 2.0, 0.0, -2.0, 0.0;
-  VertexSCam::dRidy_ << 0.0, 0.0, -2.0, 0.0, 0.0, 0.0, 2.0, 0.0, 0.0;
-  VertexSCam::dRidz_ << 0.0, 2.0, 0.0, -2.0, 0.0, 0.0, 0.0, 0.0, 0.0;
-
-  types_icp::initialized = 1;
-}
-}  // namespace types_icp
-
-Matrix3 EdgeVVGicp::dRidx_;  // differential quat matrices
-Matrix3 EdgeVVGicp::dRidy_;  // differential quat matrices
-Matrix3 EdgeVVGicp::dRidz_;  // differential quat matrices
-Matrix3 VertexSCam::dRidx_;  // differential quat matrices
-Matrix3 VertexSCam::dRidy_;  // differential quat matrices
-Matrix3 VertexSCam::dRidz_;  // differential quat matrices
 Matrix3 VertexSCam::kcam_;
 double VertexSCam::baseline_;
-
-// global initialization
-G2O_ATTRIBUTE_CONSTRUCTOR(init_icp_types) { types_icp::init(); }  // NOLINT
 
 //
 // Rigid 3D constraint between poses, given fixed point offsets
@@ -103,6 +97,33 @@ bool EdgeVVGicp::read(std::istream& is) {
   return true;
 }
 
+// return the error estimate as a 3-vector
+void EdgeVVGicp::computeError() {
+  // from <ViewPoint> to <Point>
+  const VertexSE3* vp0 = vertexXnRaw<0>();
+  const VertexSE3* vp1 = vertexXnRaw<1>();
+
+  // get vp1 point into vp0 frame
+  // could be more efficient if we computed this transform just once
+  Vector3 p1;
+
+  p1 = vp1->estimate() * measurement().pos1;
+  p1 = vp0->estimate().inverse() * p1;
+
+  // get their difference
+  // this is simple Euclidean distance, for now
+  error_ = p1 - measurement().pos0;
+
+  if (!pl_pl) return;
+
+  // re-define the information matrix
+  // topLeftCorner<3,3>() is the rotation()
+  const Matrix3 transform = (vp0->estimate().inverse() * vp1->estimate())
+                                .matrix()
+                                .topLeftCorner<3, 3>();
+  information() = (cov0 + transform * cov1 * transform.transpose()).inverse();
+}
+
 // Jacobian
 // [ -R0'*R1 | R0 * dRdx/ddx * 0p1 ]
 // [  R0'*R1 | R0 * dR'dx/ddx * 0p1 ]
@@ -118,26 +139,25 @@ void EdgeVVGicp::linearizeOplus() {
   VertexSE3* vp1 = vertexXnRaw<1>();
 
   // topLeftCorner<3,3>() is the rotation matrix
-  Matrix3 R0T = vp0->estimate().matrix().topLeftCorner<3, 3>().transpose();
-  Vector3 p1 = measurement().pos1;
+  const Vector3& p1 = measurement().pos1;
 
   // this could be more efficient
   if (!vp0->fixed()) {
-    Isometry3 T01 = vp0->estimate().inverse() * vp1->estimate();
-    Vector3 p1t = T01 * p1;
+    const Vector3 p1t = vp0->estimate().inverse() * vp1->estimate() * p1;
     jacobianOplusXi_.block<3, 3>(0, 0) = -Matrix3::Identity();
-    jacobianOplusXi_.block<3, 1>(0, 3) = dRidx_ * p1t;
-    jacobianOplusXi_.block<3, 1>(0, 4) = dRidy_ * p1t;
-    jacobianOplusXi_.block<3, 1>(0, 5) = dRidz_ * p1t;
+    jacobianOplusXi_.block<3, 1>(0, 3) = kDRidx * p1t;
+    jacobianOplusXi_.block<3, 1>(0, 4) = kDRidy * p1t;
+    jacobianOplusXi_.block<3, 1>(0, 5) = kDRidz * p1t;
   }
 
   if (!vp1->fixed()) {
-    Matrix3 R1 = vp1->estimate().matrix().topLeftCorner<3, 3>();
-    R0T = R0T * R1;
+    const Matrix3 R0T =
+        vp0->estimate().matrix().topLeftCorner<3, 3>().transpose() *
+        vp1->estimate().matrix().topLeftCorner<3, 3>();
     jacobianOplusXj_.block<3, 3>(0, 0) = R0T;
-    jacobianOplusXj_.block<3, 1>(0, 3) = R0T * dRidx_.transpose() * p1;
-    jacobianOplusXj_.block<3, 1>(0, 4) = R0T * dRidy_.transpose() * p1;
-    jacobianOplusXj_.block<3, 1>(0, 5) = R0T * dRidz_.transpose() * p1;
+    jacobianOplusXj_.block<3, 1>(0, 3) = R0T * kDRidx.transpose() * p1;
+    jacobianOplusXj_.block<3, 1>(0, 4) = R0T * kDRidy.transpose() * p1;
+    jacobianOplusXj_.block<3, 1>(0, 5) = R0T * kDRidz.transpose() * p1;
   }
 }
 #endif
@@ -256,8 +276,93 @@ bool EdgeXyzVsc::read(std::istream&) { return false; }
 
 bool EdgeXyzVsc::write(std::ostream&) const { return false; }
 
+void EdgeXyzVsc::computeError() {
+  // from <Point> to <Cam>
+  VertexPointXYZ* point = vertexXnRaw<0>();
+  VertexSCam* cam = vertexXnRaw<1>();
+  // cam->setAll();
+
+  // calculate the projection
+  Vector3 kp;
+  cam->mapPoint(kp, point->estimate());
+
+  // error, which is backwards from the normal observed - calculated
+  // measurement_ is the measured projection
+  error_ = kp - measurement_;
+}
+
 bool VertexSCam::read(std::istream&) { return false; }
 
 bool VertexSCam::write(std::ostream&) const { return false; }
+
+void VertexSCam::oplusImpl(const VectorX::MapType& update) {
+  VertexSE3::oplusImpl(update);
+  setAll();
+}
+
+void VertexSCam::transformW2F(Eigen::Matrix<double, 3, 4, Eigen::ColMajor>& m,
+                              const Vector3& trans, const Quaternion& qrot) {
+  m.block<3, 3>(0, 0) = qrot.toRotationMatrix().transpose();
+  m.col(3).setZero();  // make sure there's no translation
+  Vector4 tt;
+  tt.head(3) = trans;
+  tt[3] = 1.0;
+  m.col(3) = -m * tt;
+}
+
+void VertexSCam::transformF2W(Eigen::Matrix<double, 3, 4, Eigen::ColMajor>& m,
+                              const Vector3& trans, const Quaternion& qrot) {
+  m.block<3, 3>(0, 0) = qrot.toRotationMatrix();
+  m.col(3) = trans;
+}
+
+void VertexSCam::setKcam(double fx, double fy, double cx, double cy,
+                         double tx) {
+  kcam_.setZero();
+  kcam_(0, 0) = fx;
+  kcam_(1, 1) = fy;
+  kcam_(0, 2) = cx;
+  kcam_(1, 2) = cy;
+  kcam_(2, 2) = 1.0;
+  baseline_ = tx;
+}
+
+void VertexSCam::setTransform() {
+  w2n = estimate().inverse().matrix().block<3, 4>(0, 0);
+  // transformW2F(w2n,estimate().translation(), estimate().rotation());
+}
+
+void VertexSCam::setProjection() { w2i = kcam_ * w2n; }
+
+void VertexSCam::setDr() {
+  // inefficient, just for testing
+  // use simple multiplications and additions for production code in
+  // calculating dRdx,y,z for dS'*R', with dS the incremental change
+  dRdx = kDRidx * w2n.block<3, 3>(0, 0);
+  dRdy = kDRidy * w2n.block<3, 3>(0, 0);
+  dRdz = kDRidz * w2n.block<3, 3>(0, 0);
+}
+
+void VertexSCam::setAll() {
+  setTransform();
+  setProjection();
+  setDr();
+}
+
+void VertexSCam::mapPoint(Vector3& res, const Vector3& pt3) const {
+  Vector4 pt;
+  pt.head<3>() = pt3;
+  pt(3) = cst(1.0);
+  Vector3 p1 = w2i * pt;
+  Vector3 p2 = w2n * pt;
+  Vector3 pb(baseline_, 0, 0);
+
+  double invp1 = cst(1.0) / p1(2);
+  res.head<2>() = p1.head<2>() * invp1;
+
+  // right camera px
+  p2 = kcam_ * (p2 - pb);
+  res(2) = p2(0) / p2(2);
+}
 
 }  // namespace g2o

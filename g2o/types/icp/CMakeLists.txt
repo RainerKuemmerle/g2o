@@ -1,4 +1,5 @@
 add_library(types_icp ${G2O_LIB_TYPE}
+  edge_gicp.cpp edge_gicp.h
   types_icp.cpp  types_icp.h
   g2o_types_icp_api.h
 )
