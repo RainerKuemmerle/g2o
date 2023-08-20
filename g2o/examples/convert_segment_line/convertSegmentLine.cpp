@@ -33,7 +33,6 @@
 #include <sstream>
 #include <string>
 
-#include "g2o/apps/g2o_simulator/simutils.h"
 #include "g2o/core/batch_stats.h"
 #include "g2o/core/estimate_propagator.h"
 #include "g2o/core/factory.h"
@@ -57,12 +56,23 @@ using std::string;
 
 namespace g2o {
 
+namespace {
+
+Eigen::Vector2d computeLine(const Eigen::Vector2d& p1,
+                            const Eigen::Vector2d& p2) {
+  Eigen::Vector2d lp;
+  Eigen::Vector2d dp = p2 - p1;
+  lp[0] = atan2(-dp.x(), dp.y());
+  Eigen::Vector2d n(cos(lp[0]), sin(lp[0]));
+  lp[1] = n.dot(p1 + p2) * .5;
+  return lp;
+}
+
 struct LineInfo {
   explicit LineInfo(VertexSegment2D* s) {
     line = std::make_shared<VertexLine2D>();
     line->setId(s->id());
-    line->setEstimate(
-        Line2D(computeLineParameters(s->estimateP1(), s->estimateP2())));
+    line->setEstimate(Line2D(computeLine(s->estimateP1(), s->estimateP2())));
   }
   std::shared_ptr<VertexLine2D> line;
   std::shared_ptr<VertexPointXY> p1;
@@ -71,7 +81,7 @@ struct LineInfo {
 
 using LineInfoMap = std::map<int, LineInfo>;
 
-static int run_main(int argc, char** argv) {
+int run_main(int argc, char** argv) {
   string outputfilename;
   string inputFilename;
   CommandArgs arg;
@@ -178,8 +188,8 @@ static int run_main(int argc, char** argv) {
         outGraph.addEdge(el2);
       }
       if (es) {
-        el2->setMeasurement(Line2D(
-            computeLineParameters(es->measurementP1(), es->measurementP2())));
+        el2->setMeasurement(
+            Line2D(computeLine(es->measurementP1(), es->measurementP2())));
         Matrix2 el2info;
         el2info << 10000, 0, 0, 1000;
         el2->setInformation(el2info);
@@ -303,6 +313,8 @@ static int run_main(int argc, char** argv) {
 
   return 0;
 }
+
+}  // namespace
 
 }  // namespace g2o
 
