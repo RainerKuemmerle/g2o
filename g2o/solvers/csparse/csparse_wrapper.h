@@ -27,13 +27,11 @@
 #ifndef G2O_CSPARSE_WRAPPER_H
 #define G2O_CSPARSE_WRAPPER_H
 
-#include <cstddef>
 #include <memory>
 
 #include "g2o/core/eigen_types.h"
 
-namespace g2o {
-namespace csparse {
+namespace g2o::csparse {
 
 class CSparse {
  public:
@@ -72,31 +70,30 @@ class CSparse {
   };
 
   bool factorize();
-  bool hasFactor() const;
+  [[nodiscard]] bool hasFactor() const;
   void freeFactor();
   FactorView factor();
 
   //! compute AMD ordering on the given SparseView, store into result
   static bool amd(const SparseView& sparseView, VectorXI& result);
 
-  int choleskyNz() const;
+  [[nodiscard]] int choleskyNz() const;
 
   bool solve(double* x, double* b) const;
 
   bool analyze();
   bool analyze_p(int* permutation);
 
-  bool hasSymbolic() const;
+  [[nodiscard]] bool hasSymbolic() const;
   void freeSymbolic();
 
   SparseView sparseView();
-  bool writeSparse(const std::string& filename) const;
+  [[nodiscard]] bool writeSparse(const std::string& filename) const;
 
  private:
   class Impl;
   std::unique_ptr<Impl> pImpl_;
 };
 
-}  // namespace csparse
-}  // namespace g2o
+}  // namespace g2o::csparse
 #endif

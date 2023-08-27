@@ -28,8 +28,7 @@
 
 #include "g2o/stuff/sparse_helper.h"
 
-namespace g2o {
-namespace csparse_extension {
+namespace g2o::csparse_extension {
 
 bool writeCs2Octave(const char* filename, const cs* A, bool upperTriangular) {
   const int cols = A->n;
@@ -49,5 +48,4 @@ bool writeCs2Octave(const char* filename, const cs* A, bool upperTriangular) {
                             upperTriangular);
 }
 
-}  // namespace csparse_extension
-}  // namespace g2o
+}  // namespace g2o::csparse_extension

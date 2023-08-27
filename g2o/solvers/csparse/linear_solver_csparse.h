@@ -68,7 +68,8 @@ class LinearSolverCSparse : public LinearSolverCCS<MatrixType> {
     if (!ok && this->writeDebug()) {
       G2O_ERROR(
           "Cholesky failure, writing debug.txt (Hessian loadable by Octave)");
-      csparse_.writeSparse("debug.txt");
+      const bool write_status = csparse_.writeSparse("debug.txt");
+      if (!write_status) G2O_ERROR("Failed to write debug.txt");
     } else {
       G2O_DEBUG("Cholesky failure");
     }

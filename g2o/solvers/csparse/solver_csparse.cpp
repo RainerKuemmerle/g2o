@@ -39,12 +39,11 @@ std::unique_ptr<BlockSolverBase> AllocateSolver() {
   linearSolver->setBlockOrdering(Blockorder);
   return std::make_unique<BlockSolverPL<P, L>>(std::move(linearSolver));
 }
-}  // namespace
 
 /**
  * helper function for allocating
  */
-static OptimizationAlgorithm* createSolver(const std::string& fullSolverName) {
+OptimizationAlgorithm* createSolver(const std::string& fullSolverName) {
   static const std::map<std::string,
                         std::function<std::unique_ptr<BlockSolverBase>()>>
       kSolverFactories{
@@ -75,6 +74,8 @@ static OptimizationAlgorithm* createSolver(const std::string& fullSolverName) {
 
   return nullptr;
 }
+
+}  // namespace
 
 class CSparseSolverCreator : public AbstractOptimizationAlgorithmCreator {
  public:

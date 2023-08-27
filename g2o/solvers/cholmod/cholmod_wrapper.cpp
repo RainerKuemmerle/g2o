@@ -34,8 +34,7 @@
 
 #include "cholmod_ext.h"
 
-namespace g2o {
-namespace cholmod {
+namespace g2o::cholmod {
 
 class Cholmod::Impl {
  public:
@@ -166,5 +165,4 @@ bool Cholmod::simplifyFactor() {
   return change_status != 0;
 }
 
-}  // namespace cholmod
-}  // namespace g2o
+}  // namespace g2o::cholmod

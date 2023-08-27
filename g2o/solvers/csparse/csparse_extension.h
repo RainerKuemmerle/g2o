@@ -28,9 +28,7 @@
 
 #include "g2o_csparse_extension_api.h"
 
-namespace g2o {
-
-namespace csparse_extension {
+namespace g2o::csparse_extension {
 
 // our extensions to csparse
 // Copyright (C) 2011 R. Kuemmerle, G. Grisetti, W. Burgard
@@ -44,7 +42,6 @@ G2O_CSPARSE_EXTENSION_API int cs_cholsolsymb(const cs* A, double* b,
                                              const css* S, double* x,
                                              int* work);
 
-}  // namespace csparse_extension
-}  // namespace g2o
+}  // namespace g2o::csparse_extension
 
 #endif

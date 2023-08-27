@@ -30,9 +30,7 @@
 #include "csparse_extension.h"
 #include "g2o_csparse_extension_api.h"
 
-namespace g2o {
-
-namespace csparse_extension {
+namespace g2o::csparse_extension {
 
 /**
  * write the sparse matrix to a file loadable with ocatve
@@ -40,7 +38,6 @@ namespace csparse_extension {
 G2O_CSPARSE_EXTENSION_API bool writeCs2Octave(const char* filename, const cs* A,
                                               bool upperTriangular = true);
 
-}  // namespace csparse_extension
-}  // namespace g2o
+}  // namespace g2o::csparse_extension
 
 #endif
