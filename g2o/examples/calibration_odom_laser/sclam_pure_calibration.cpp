@@ -74,7 +74,6 @@ class VertexBaseline : public BaseVertex<1, double> {
 class EdgeCalib
     : public BaseBinaryEdge<3, OdomAndLaserMotion, VertexSE2, VertexBaseline> {
  public:
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
   EdgeCalib() = default;
 
   void computeError() override {

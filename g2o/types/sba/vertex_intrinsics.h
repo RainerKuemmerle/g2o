@@ -43,7 +43,6 @@ struct VertexIntrinsicsEstimate {
 class G2O_TYPES_SBA_API VertexIntrinsics
     : public BaseVertex<4, VertexIntrinsicsEstimate> {
  public:
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   VertexIntrinsics();
   bool read(std::istream& is) override;
   bool write(std::ostream& os) const override;

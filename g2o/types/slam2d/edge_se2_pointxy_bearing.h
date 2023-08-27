@@ -38,7 +38,6 @@ namespace g2o {
 class G2O_TYPES_SLAM2D_API EdgeSE2PointXYBearing
     : public BaseBinaryEdge<1, double, VertexSE2, VertexPointXY> {
  public:
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   EdgeSE2PointXYBearing() = default;
   void computeError() override {
     const VertexSE2* v1 = vertexXnRaw<0>();

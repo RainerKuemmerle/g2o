@@ -40,8 +40,6 @@ namespace g2o {
 
 class G2O_TYPES_SLAM3D_API SE3Quat {
  public:
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
-
  protected:
   Quaternion r_;
   Vector3 t_;

@@ -38,7 +38,6 @@ namespace g2o {
  */
 class G2O_TYPES_SLAM3D_API ParameterSE3Offset : public Parameter {
  public:
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
   ParameterSE3Offset();
 
   bool read(std::istream& is) override;
@@ -66,7 +65,6 @@ class G2O_TYPES_SLAM3D_API ParameterSE3Offset : public Parameter {
  */
 class G2O_TYPES_SLAM3D_API CacheSE3Offset : public Cache {
  public:
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
   using ParameterType = ParameterSE3Offset;
 
   void updateImpl() override;

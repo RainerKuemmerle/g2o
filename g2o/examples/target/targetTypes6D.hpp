@@ -16,7 +16,6 @@ using Matrix6d = Eigen::Matrix<double, 6, 6>;
 
 class VertexPosition3D : public g2o::BaseVertex<3, Eigen::Vector3d> {
  public:
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   VertexPosition3D() = default;
 
   void oplusImpl(const g2o::VectorX::MapType& update) override {
@@ -32,7 +31,6 @@ class PositionVelocity3DEdge {};
 
 class VertexPositionVelocity3D : public g2o::BaseVertex<6, Vector6d> {
  public:
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   VertexPositionVelocity3D() = default;
 
   void oplusImpl(const g2o::VectorX::MapType& update) override {

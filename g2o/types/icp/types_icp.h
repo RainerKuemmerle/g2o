@@ -52,7 +52,6 @@ namespace g2o {
 class G2O_TYPES_ICP_API EdgeVVGicp
     : public BaseBinaryEdge<3, EdgeGICP, VertexSE3, VertexSE3> {
  public:
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
   EdgeVVGicp() = default;
 
   // switch to go between point-plane and plane-plane
@@ -86,8 +85,6 @@ class G2O_TYPES_ICP_API EdgeVVGicp
  */
 class G2O_TYPES_ICP_API VertexSCam : public VertexSE3 {
  public:
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-
   // I/O
   bool read(std::istream& is) override;
   bool write(std::ostream& os) const override;
@@ -150,8 +147,6 @@ class G2O_TYPES_ICP_API VertexSCam : public VertexSE3 {
 class G2O_TYPES_ICP_API EdgeXyzVsc
     : public BaseBinaryEdge<3, Vector3, VertexPointXYZ, VertexSCam> {
  public:
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-
   bool read(std::istream& is) override;
   bool write(std::ostream& os) const override;
 

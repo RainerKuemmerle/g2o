@@ -36,7 +36,6 @@ class G2O_SIMULATOR_API SensorPose3D
     : public PointSensorParameters,
       public BinarySensor<Robot3D, EdgeSE3, WorldObjectSE3> {
  public:
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   explicit SensorPose3D(const std::string& name);
   void sense() override;
   int stepsToIgnore() const { return stepsToIgnore_; }

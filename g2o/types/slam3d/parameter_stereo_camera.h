@@ -37,7 +37,6 @@ namespace g2o {
  */
 class G2O_TYPES_SLAM3D_API ParameterStereoCamera : public ParameterCamera {
  public:
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
   ParameterStereoCamera();
 
   bool read(std::istream& is) override;

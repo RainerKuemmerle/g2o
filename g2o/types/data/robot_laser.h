@@ -42,8 +42,6 @@ namespace g2o {
  */
 class G2O_TYPES_DATA_API RobotLaser : public RawLaser {
  public:
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
-
   bool write(std::ostream& os) const override;
   bool read(std::istream& is) override;
 

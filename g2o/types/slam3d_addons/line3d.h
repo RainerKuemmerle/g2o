@@ -38,7 +38,6 @@ namespace g2o {
 using Matrix6x4 = Eigen::Matrix<double, 6, 4>;
 
 struct OrthonormalLine3D {
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
   Matrix2 W;
   Matrix3 U;
 

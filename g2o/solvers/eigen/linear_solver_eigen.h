@@ -82,7 +82,6 @@ class LinearSolverEigen : public LinearSolverCCS<MatrixType> {
     using CholeskyDecompositionBase::analyzePattern_preordered;
   };
 
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
   LinearSolverEigen() : LinearSolverCCS<MatrixType>() {}
 
   bool init() override {

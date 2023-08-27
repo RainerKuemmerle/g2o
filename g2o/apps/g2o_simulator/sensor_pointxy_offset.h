@@ -37,7 +37,6 @@ class G2O_SIMULATOR_API SensorPointXYOffset
     : public PointSensorParameters,
       public BinarySensor<Robot2D, EdgeSE2PointXYOffset, WorldObjectPointXY> {
  public:
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   using RobotPoseType = PoseVertexType::EstimateType;
   explicit SensorPointXYOffset(const std::string& name);
   void sense() override;

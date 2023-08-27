@@ -11,7 +11,6 @@
 
 class VertexPosition3D : public g2o::BaseVertex<3, Eigen::Vector3d> {
  public:
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   VertexPosition3D() = default;
 
   void oplusImpl(const g2o::VectorX::MapType& update) override {
@@ -26,7 +25,6 @@ class VertexPosition3D : public g2o::BaseVertex<3, Eigen::Vector3d> {
 // Store velocity separately from position?
 class VertexVelocity3D : public g2o::BaseVertex<3, Eigen::Vector3d> {
  public:
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   VertexVelocity3D() = default;
 
   void oplusImpl(const g2o::VectorX::MapType& update) override {

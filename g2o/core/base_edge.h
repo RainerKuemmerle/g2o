@@ -219,7 +219,6 @@ class BaseEdge : public OptimizableGraph::Edge {
   }
 
  public:
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 };
 
 }  // end namespace g2o

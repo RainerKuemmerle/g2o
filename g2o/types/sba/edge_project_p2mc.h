@@ -39,7 +39,6 @@ namespace g2o {
 class G2O_TYPES_SBA_API EdgeProjectP2MC
     : public BaseBinaryEdge<2, Vector2, VertexPointXYZ, VertexCam> {
  public:
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   EdgeProjectP2MC();
   bool read(std::istream& is) override;
   bool write(std::ostream& os) const override;

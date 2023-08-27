@@ -43,7 +43,6 @@ class G2O_TUTORIAL_SLAM2D_API Simulator {
    * \brief simulated landmark
    */
   struct G2O_TUTORIAL_SLAM2D_API Landmark {
-    EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
     int id = -1;
     Eigen::Vector2d truePose;
     Eigen::Vector2d simulatedPose;
@@ -57,7 +56,6 @@ class G2O_TUTORIAL_SLAM2D_API Simulator {
    * simulated pose of the robot
    */
   struct G2O_TUTORIAL_SLAM2D_API GridPose {
-    EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
     int id;
     SE2 truePose;
     SE2 simulatorPose;
@@ -74,7 +72,6 @@ class G2O_TUTORIAL_SLAM2D_API Simulator {
     SE2 trueTransf;
     SE2 simulatorTransf;
     Eigen::Matrix3d information;
-    EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
   };
   using GridEdgeVector = std::vector<GridEdge>;
 
@@ -84,7 +81,6 @@ class G2O_TUTORIAL_SLAM2D_API Simulator {
     Eigen::Vector2d trueMeas;
     Eigen::Vector2d simulatorMeas;
     Eigen::Matrix2d information;
-    EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
   };
   using LandmarkEdgeVector = std::vector<LandmarkEdge>;
 

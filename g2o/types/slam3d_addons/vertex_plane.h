@@ -37,7 +37,6 @@ namespace g2o {
 
 class G2O_TYPES_SLAM3D_ADDONS_API VertexPlane : public BaseVertex<3, Plane3D> {
  public:
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
   VertexPlane();
 
   //! Custom IO

@@ -36,7 +36,6 @@ namespace g2o {
 
 class G2O_INTERACTIVE_API OnlineVertexSE2 : public VertexSE2 {
  public:
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
   OnlineVertexSE2() = default;
 
   void oplusImpl(const VectorX::MapType& update) override {
@@ -58,7 +57,6 @@ class G2O_INTERACTIVE_API OnlineVertexSE2 : public VertexSE2 {
 
 class G2O_INTERACTIVE_API OnlineEdgeSE2 : public EdgeSE2 {
  public:
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
   OnlineEdgeSE2() = default;
 
   void initialEstimate(const OptimizableGraph::VertexSet& from,

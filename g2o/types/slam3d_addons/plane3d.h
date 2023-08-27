@@ -39,8 +39,6 @@ namespace g2o {
 
 class G2O_TYPES_SLAM3D_ADDONS_API Plane3D {
  public:
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
-
   friend Plane3D operator*(const Isometry3& t, const Plane3D& plane);
 
   Plane3D() { fromVector(Vector4(1., 0., 0., -1.)); }

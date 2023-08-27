@@ -50,7 +50,6 @@ template class BaseVertex<7, Sim3>;
  */
 class G2O_TYPES_SIM3_API VertexSim3Expmap : public BaseVertex<7, Sim3> {
  public:
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
   VertexSim3Expmap();
   //! custom read function
   bool read(std::istream& is) override;
@@ -77,7 +76,6 @@ class G2O_TYPES_SIM3_API VertexSim3Expmap : public BaseVertex<7, Sim3> {
 class G2O_TYPES_SIM3_API EdgeSim3
     : public BaseBinaryEdge<7, Sim3, VertexSim3Expmap, VertexSim3Expmap> {
  public:
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   bool read(std::istream& is) override;
   bool write(std::ostream& os) const override;
   void computeError() override;
@@ -95,7 +93,6 @@ class G2O_TYPES_SIM3_API EdgeSim3
 class G2O_TYPES_SIM3_API EdgeSim3ProjectXYZ
     : public BaseBinaryEdge<2, Vector2, VertexPointXYZ, VertexSim3Expmap> {
  public:
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   bool read(std::istream& is) override;
   bool write(std::ostream& os) const override;
 
@@ -108,7 +105,6 @@ class G2O_TYPES_SIM3_API EdgeSim3ProjectXYZ
 class G2O_TYPES_SIM3_API EdgeInverseSim3ProjectXYZ
     : public BaseBinaryEdge<2, Vector2, VertexPointXYZ, VertexSim3Expmap> {
  public:
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   bool read(std::istream& is) override;
   bool write(std::ostream& os) const override;
 

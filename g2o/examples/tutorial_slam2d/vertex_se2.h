@@ -39,7 +39,6 @@ namespace g2o::tutorial {
  */
 class G2O_TUTORIAL_SLAM2D_API VertexSE2 : public BaseVertex<3, SE2> {
  public:
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
   VertexSE2();
 
   void oplusImpl(const g2o::VectorX::MapType& update) override {

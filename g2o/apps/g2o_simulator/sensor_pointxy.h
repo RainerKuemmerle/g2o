@@ -37,7 +37,6 @@ class G2O_SIMULATOR_API SensorPointXY
     : public PointSensorParameters,
       public BinarySensor<Robot2D, EdgeSE2PointXY, WorldObjectPointXY> {
  public:
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   explicit SensorPointXY(const std::string& name);
   void sense() override;
   void addNoise(EdgeType* e) override;

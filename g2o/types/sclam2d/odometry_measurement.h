@@ -40,7 +40,6 @@ namespace g2o {
  */
 class G2O_TYPES_SCLAM2D_API VelocityMeasurement {
  public:
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
   VelocityMeasurement();
   VelocityMeasurement(double vl, double vr, double dt);
 
@@ -109,7 +108,6 @@ struct TypeTraits<VelocityMeasurement> {
  */
 class G2O_TYPES_SCLAM2D_API MotionMeasurement {
  public:
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
   MotionMeasurement();
   MotionMeasurement(double x, double y, double theta, double dt);
   MotionMeasurement(Vector3 m, double dt);

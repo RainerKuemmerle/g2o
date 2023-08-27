@@ -34,8 +34,6 @@
 class FPolynomialCoefficientVertex
     : public g2o::BaseVertex<3, Eigen::Vector3d> {
  public:
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
-
   // Create the vertex
   FPolynomialCoefficientVertex() { setToOrigin(); }
 
@@ -62,8 +60,6 @@ class FPolynomialCoefficientVertex
 class PPolynomialCoefficientVertex
     : public g2o::BaseDynamicVertex<Eigen::VectorXd> {
  public:
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
-
   // Create the vertex
   PPolynomialCoefficientVertex() = default;
 
@@ -118,8 +114,6 @@ class MultipleValueEdge
                                  FPolynomialCoefficientVertex,
                                  PPolynomialCoefficientVertex> {
  public:
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
-
   MultipleValueEdge(const FunctionObservation& obs, double omega) : x_(obs.x) {
     setDimension(obs.z.size());
     setMeasurement(obs.z);

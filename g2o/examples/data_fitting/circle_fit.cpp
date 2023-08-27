@@ -62,8 +62,6 @@ double errorOfSolution(const PointVector& points,
  */
 class VertexCircle : public g2o::BaseVertex<3, Eigen::Vector3d> {
  public:
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
-
   bool read(std::istream& /*is*/) override { return false; }
 
   bool write(std::ostream& /*os*/) const override { return false; }
@@ -83,7 +81,6 @@ class VertexCircle : public g2o::BaseVertex<3, Eigen::Vector3d> {
 class EdgePointOnCircle
     : public g2o::BaseUnaryEdge<1, Eigen::Vector2d, VertexCircle> {
  public:
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   bool read(std::istream& /*is*/) override { return false; }
   bool write(std::ostream& /*os*/) const override { return false; }
 

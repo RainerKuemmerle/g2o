@@ -46,7 +46,6 @@ namespace g2o {
 
 class G2O_TYPES_SBA_API SBACam : public SE3Quat {
  public:
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   // camera matrix and stereo baseline
   Matrix3 Kcam;
   double baseline;

@@ -43,8 +43,6 @@ G2O_USE_OPTIMIZATION_LIBRARY(dense);
  */
 class VertexParams : public g2o::BaseVertex<3, Eigen::Vector3d> {
  public:
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
-
   bool read(std::istream& /*is*/) override { return false; }
 
   bool write(std::ostream& /*os*/) const override { return false; }
@@ -64,7 +62,6 @@ class VertexParams : public g2o::BaseVertex<3, Eigen::Vector3d> {
 class EdgePointOnCurve
     : public g2o::BaseUnaryEdge<1, Eigen::Vector2d, VertexParams> {
  public:
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   bool read(std::istream& /*is*/) override {
     std::cerr << __PRETTY_FUNCTION__ << " not implemented yet" << std::endl;
     return false;

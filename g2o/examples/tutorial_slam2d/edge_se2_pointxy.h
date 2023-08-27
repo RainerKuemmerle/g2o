@@ -44,7 +44,6 @@ class CacheSE2Offset;
 class G2O_TUTORIAL_SLAM2D_API EdgeSE2PointXY
     : public BaseBinaryEdge<2, Eigen::Vector2d, VertexSE2, VertexPointXY> {
  public:
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
   EdgeSE2PointXY();
 
   void computeError() override;

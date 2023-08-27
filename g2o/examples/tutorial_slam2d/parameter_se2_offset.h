@@ -35,7 +35,6 @@ namespace g2o::tutorial {
 
 class G2O_TUTORIAL_SLAM2D_API ParameterSE2Offset : public Parameter {
  public:
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
   ParameterSE2Offset() = default;
 
   void setOffset(const SE2& offset = SE2());
@@ -53,7 +52,6 @@ class G2O_TUTORIAL_SLAM2D_API ParameterSE2Offset : public Parameter {
 
 class G2O_TUTORIAL_SLAM2D_API CacheSE2Offset : public Cache {
  public:
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
   using ParameterType = ParameterSE2Offset;
 
   [[nodiscard]] const SE2& w2n() const { return w2n_; }

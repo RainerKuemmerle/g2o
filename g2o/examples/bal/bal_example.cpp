@@ -65,7 +65,6 @@ using Vector9 = VectorN<9>;
  */
 class VertexCameraBAL : public g2o::BaseVertex<9, g2o::bal::Vector9> {
  public:
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
   VertexCameraBAL() = default;
 
   bool read(std::istream& /*is*/) override {
@@ -90,7 +89,6 @@ class VertexCameraBAL : public g2o::BaseVertex<9, g2o::bal::Vector9> {
  */
 class VertexPointBAL : public g2o::BaseVertex<3, g2o::Vector3> {
  public:
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
   VertexPointBAL() = default;
 
   bool read(std::istream& /*is*/) override {
@@ -134,7 +132,6 @@ class EdgeObservationBAL
     : public g2o::BaseBinaryEdge<2, g2o::Vector2, VertexCameraBAL,
                                  VertexPointBAL> {
  public:
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
   EdgeObservationBAL() = default;
   bool read(std::istream& /*is*/) override {
     std::cerr << __PRETTY_FUNCTION__ << " not implemented yet" << std::endl;

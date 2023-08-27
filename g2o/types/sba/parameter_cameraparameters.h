@@ -37,7 +37,6 @@ namespace g2o {
 
 class G2O_TYPES_SBA_API CameraParameters : public g2o::Parameter {
  public:
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
   CameraParameters();
   CameraParameters(double focalLength, const Vector2& principlePoint,
                    double baseLine);

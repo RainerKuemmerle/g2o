@@ -41,7 +41,6 @@ class G2O_TYPES_SLAM3D_API EdgeSE3LotsOfXYZ
   unsigned int observedPoints_ = 0;
 
  public:
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
   EdgeSE3LotsOfXYZ();
 
   void setSize(int vertices) {

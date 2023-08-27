@@ -42,7 +42,6 @@ namespace g2o {
 class G2O_TYPES_SLAM3D_API EdgeSE3PointXYZ
     : public BaseBinaryEdge<3, Vector3, VertexSE3, VertexPointXYZ> {
  public:
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   EdgeSE3PointXYZ();
   bool read(std::istream& is) override;
   bool write(std::ostream& os) const override;

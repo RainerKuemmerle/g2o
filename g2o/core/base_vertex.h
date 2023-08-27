@@ -194,7 +194,6 @@ class BaseVertex : public OptimizableGraph::Vertex {
   BackupStackType backup_;
 
  public:
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 };
 
 #include "base_vertex.hpp"

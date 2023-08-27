@@ -36,8 +36,6 @@
 namespace g2o {
 
 struct G2O_TYPES_SIM3_API Sim3 {
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-
  protected:
   Quaternion r_;
   Vector3 t_;

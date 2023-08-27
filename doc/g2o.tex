@@ -1235,7 +1235,6 @@ Listing~\ref{lst:se2}.
 \begin{lstlisting}[float,label=lst:se2,caption=\text{Helper class to represent $SE(2)$}.]
 class SE2 {
   public:
-    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
     SE2():_R(0),_t(0,0){}
 
     SE2(double x, double y, double theta):_R(theta),_t(x,y){}
@@ -1306,7 +1305,6 @@ you can look it up yourself in the code.
 class VertexSE2 : public BaseVertex<3, SE2>
 {
   public:
-    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
     VertexSE2();
 
     virtual void setToOriginImpl() {
@@ -1334,7 +1332,6 @@ classes defined in Eigen. This class is reported in Listing~\ref{lst:vertexxy}.
 class VertexPointXY : public BaseVertex<2, Eigen::Vector2d>
 {
   public:
-    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
       VertexPointXY();
 
     virtual void setToOriginImpl() {
@@ -1377,7 +1374,6 @@ code after everything works, you are warmly invited to redefine the
 class EdgeSE2 : public BaseBinaryEdge<3, SE2, VertexSE2, VertexSE2>
 {
   public:
-    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
       EdgeSE2();
 
     void computeError()
@@ -1404,7 +1400,6 @@ tell the system that it connects a \verb+VertexSE2+ with a
 class EdgeSE2PointXY : public BaseBinaryEdge<2, Eigen::Vector2d, VertexSE2, VertexPointXY>
 {
   public:
-    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
       EdgeSE2PointXY();
 
     void computeError()

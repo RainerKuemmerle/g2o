@@ -35,8 +35,6 @@ namespace g2o {
 class G2O_TYPES_SCLAM2D_API VertexOdomDifferentialParams
     : public BaseVertex<3, Vector3> {
  public:
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
-
   void oplusImpl(const VectorX::MapType& update) override {
     estimate_ += update.head<3>();
   }

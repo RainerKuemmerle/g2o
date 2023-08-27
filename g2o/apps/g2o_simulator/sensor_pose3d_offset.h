@@ -36,7 +36,6 @@ class SensorPose3DOffset
     : public PointSensorParameters,
       public BinarySensor<Robot3D, EdgeSE3Offset, WorldObjectSE3> {
  public:
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   explicit SensorPose3DOffset(const std::string& name);
   void sense() override;
   int stepsToIgnore() const { return stepsToIgnore_; }

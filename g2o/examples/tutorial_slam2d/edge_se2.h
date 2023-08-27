@@ -41,7 +41,6 @@ namespace tutorial {
 class G2O_TUTORIAL_SLAM2D_API EdgeSE2
     : public BaseBinaryEdge<3, SE2, VertexSE2, VertexSE2> {
  public:
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
   EdgeSE2() = default;
 
   void computeError() override {

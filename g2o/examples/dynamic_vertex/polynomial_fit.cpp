@@ -26,8 +26,6 @@
 class PolynomialCoefficientVertex
     : public g2o::BaseDynamicVertex<Eigen::VectorXd> {
  public:
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
-
   // Create the vertex
   PolynomialCoefficientVertex() = default;
 
@@ -91,8 +89,6 @@ class PolynomialCoefficientVertex
 class PolynomialSingleValueEdge
     : public g2o::BaseUnaryEdge<1, double, PolynomialCoefficientVertex> {
  public:
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
-
   PolynomialSingleValueEdge(
       double x, double z,
       const PolynomialSingleValueEdge::InformationType& omega)

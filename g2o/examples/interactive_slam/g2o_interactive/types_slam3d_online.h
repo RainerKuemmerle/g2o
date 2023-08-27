@@ -36,7 +36,6 @@ namespace g2o {
 
 class G2O_INTERACTIVE_API OnlineVertexSE3 : public VertexSE3 {
  public:
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
   OnlineVertexSE3() : updatedEstimate(Eigen::Isometry3d::Identity()) {}
 
   void oplusImpl(const VectorX::MapType& update) override {
@@ -55,7 +54,6 @@ class G2O_INTERACTIVE_API OnlineVertexSE3 : public VertexSE3 {
 
 class G2O_INTERACTIVE_API OnlineEdgeSE3 : public EdgeSE3 {
  public:
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
   OnlineEdgeSE3() = default;
 
   void initialEstimate(const OptimizableGraph::VertexSet& from,

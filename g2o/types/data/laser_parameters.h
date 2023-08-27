@@ -36,7 +36,6 @@ namespace g2o {
  * \brief parameters for a 2D range finder
  */
 struct G2O_TYPES_DATA_API LaserParameters {
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
   LaserParameters(int type, int beams, double firstBeamAngle,
                   double angularStep, double maxRange, double accuracy,
                   int remissionMode, double minRange = 0);

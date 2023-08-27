@@ -42,7 +42,6 @@ namespace g2o {
 class G2O_TYPES_SLAM3D_API EdgeXYZPrior
     : public BaseUnaryEdge<3, Vector3, VertexPointXYZ> {
  public:
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   EdgeXYZPrior();
   bool read(std::istream& is) override;
   bool write(std::ostream& os) const override;

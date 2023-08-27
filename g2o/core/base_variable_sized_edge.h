@@ -108,7 +108,6 @@ class BaseVariableSizedEdge : public BaseEdge<D, E> {
   }
 
  public:
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 };
 
 #include "base_variable_sized_edge.hpp"

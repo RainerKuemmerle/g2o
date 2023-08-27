@@ -37,7 +37,6 @@
 namespace g2o {
 
 struct G2O_CALIBRATION_ODOM_LASER_API OdomAndLaserMotion {
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
   VelocityMeasurement velocityMeasurement;
   SE2 laserMotion;
 };
@@ -100,7 +99,6 @@ class G2O_CALIBRATION_ODOM_LASER_API EdgeSE2PureCalib
     : public BaseBinaryEdge<3, OdomAndLaserMotion, VertexSE2,
                             VertexOdomDifferentialParams> {
  public:
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
   EdgeSE2PureCalib() = default;
 
   void computeError() override;

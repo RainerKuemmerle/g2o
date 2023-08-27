@@ -36,7 +36,6 @@ namespace g2o {
 
 template <class SampleType>
 struct SigmaPoint {
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
   SigmaPoint(SampleType sample, double wi, double wp)
       : _sample(std::move(sample)), _wi(wi), _wp(wp) {}
   SigmaPoint() = default;

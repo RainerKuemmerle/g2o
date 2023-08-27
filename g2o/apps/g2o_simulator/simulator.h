@@ -62,7 +62,6 @@ class G2O_SIMULATOR_API BaseWorldObject {
 template <class VertexTypeT>
 class WorldObject : public BaseWorldObject, VertexTypeT {
  public:
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
   using VertexType = VertexTypeT;
   using EstimateType = typename VertexType::EstimateType;
   explicit WorldObject(World* world = nullptr) : BaseWorldObject(world) {
@@ -122,7 +121,6 @@ class G2O_SIMULATOR_API World {
 template <class RobotPoseObject>
 class Robot : public BaseRobot {
  public:
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
   using PoseObject = RobotPoseObject;
   using TrajectoryType = std::list<PoseObject*>;
   using VertexType = typename PoseObject::VertexType;
@@ -174,7 +172,6 @@ class G2O_SIMULATOR_API BaseSensor {
 template <class RobotTypeT, class EdgeTypeT>
 class UnarySensor : public BaseSensor {
  public:
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
   using RobotType = RobotTypeT;
   using PoseObject = typename RobotTypeT::PoseObject;
   using TrajectoryType = typename RobotTypeT::TrajectoryType;
@@ -231,7 +228,6 @@ class UnarySensor : public BaseSensor {
 template <class RobotTypeT, class EdgeTypeT, class WorldObjectTypeT>
 class BinarySensor : public BaseSensor {
  public:
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
   using RobotType = RobotTypeT;
   using PoseObject = typename RobotType::PoseObject;
   using TrajectoryType = typename RobotType::TrajectoryType;

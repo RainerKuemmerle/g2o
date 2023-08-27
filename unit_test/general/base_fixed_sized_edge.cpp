@@ -39,7 +39,6 @@ class Edge3Constant
     : public g2o::BaseFixedSizedEdge<2, g2o::Vector2, g2o::VertexSE2,
                                      g2o::VertexSE2, g2o::VertexPointXY> {
  public:
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
   Edge3Constant() = default;
   void computeError() override {
     const auto a = vertexXnRaw<0>()->estimate();
@@ -53,7 +52,6 @@ class Edge3Constant
 
 class Edge3Dynamic : public g2o::BaseVariableSizedEdge<2, g2o::Vector2> {
  public:
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
   Edge3Dynamic() { resize(3); };
   void computeError() override {
     const auto a = static_cast<const g2o::VertexSE2*>(vertexRaw(0))->estimate();

@@ -36,7 +36,6 @@ class G2O_SIMULATOR_API SensorPointXYZDepth
     : public PointSensorParameters,
       public BinarySensor<Robot3D, EdgeSE3PointXYZDepth, WorldObjectTrackXYZ> {
  public:
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   using RobotPoseType = PoseVertexType::EstimateType;
   explicit SensorPointXYZDepth(const std::string& name);
   void sense() override;

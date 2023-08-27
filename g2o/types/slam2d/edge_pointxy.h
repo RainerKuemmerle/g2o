@@ -37,7 +37,6 @@ namespace g2o {
 class G2O_TYPES_SLAM2D_API EdgePointXY
     : public BaseBinaryEdge<2, Vector2, VertexPointXY, VertexPointXY> {
  public:
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
   EdgePointXY();
 
   void computeError() override {

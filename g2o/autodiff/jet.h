@@ -249,7 +249,6 @@ struct Jet {
 
   // This struct needs to have an Eigen aligned operator new as it contains
   // fixed-size Eigen types.
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 };
 
 // Unary +

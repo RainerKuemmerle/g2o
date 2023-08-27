@@ -36,7 +36,6 @@ class G2O_SIMULATOR_API SensorLine3D
     : public PointSensorParameters,
       public BinarySensor<Robot3D, EdgeSE3Line3D, WorldObjectLine3D> {
  public:
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   typedef PoseVertexType::EstimateType RobotPoseType;
   SensorLine3D(const std::string& name_);
   virtual void sense();

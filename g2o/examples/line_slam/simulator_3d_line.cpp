@@ -77,8 +77,6 @@ struct Sensor {
 using SensorVector = std::vector<Sensor*>;
 
 struct Robot : public WorldItem {
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
-
   explicit Robot(OptimizableGraph* graph) : WorldItem(graph) {
     planarMotion = false;
     position = Isometry3::Identity();
@@ -173,8 +171,6 @@ struct LineItem : public WorldItem {
 };
 
 struct LineSensor : public Sensor {
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
-
   LineSensor(Robot* r, int offsetId, const Isometry3& offset_) : Sensor(r) {
     offsetVertex = std::make_shared<VertexSE3>();
     offsetVertex->setId(offsetId);

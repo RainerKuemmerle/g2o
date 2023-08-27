@@ -40,7 +40,6 @@ namespace g2o {
  */
 class G2O_TYPES_SLAM2D_API VertexSE2 : public BaseVertex<3, SE2> {
  public:
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   VertexSE2() = default;
 
   void oplusImpl(const VectorX::MapType& update) override;

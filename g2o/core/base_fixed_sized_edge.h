@@ -315,7 +315,6 @@ class BaseFixedSizedEdge : public BaseEdge<D, E> {
   }
 
  public:
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 };
 
 #include "base_fixed_sized_edge.hpp"

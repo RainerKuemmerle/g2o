@@ -39,7 +39,6 @@ class G2O_SIMULATOR_API SensorSegment2DPointLine
       public BinarySensor<Robot2D, EdgeSE2Segment2DPointLine,
                           WorldObjectSegment2D> {
  public:
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   explicit SensorSegment2DPointLine(const std::string& name);
   void sense() override;
   void addNoise(EdgeType* e) override;
