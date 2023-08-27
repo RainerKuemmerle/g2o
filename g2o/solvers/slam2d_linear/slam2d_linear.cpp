@@ -52,10 +52,12 @@ std::unique_ptr<BlockSolverBase> AllocateSolver() {
 /**
  * helper function for allocating
  */
-OptimizationAlgorithm* createSolver(const std::string& fullSolverName) {
+std::unique_ptr<OptimizationAlgorithm> createSolver(
+    const std::string& fullSolverName) {
   if (fullSolverName != "2dlinear") return nullptr;
 
-  return new SolverSLAM2DLinear{AllocateSolver<3, 2, true>()};
+  return std::unique_ptr<OptimizationAlgorithm>(
+      new SolverSLAM2DLinear{AllocateSolver<3, 2, true>()});
 }
 
 }  // namespace
@@ -65,8 +67,7 @@ class SLAM2DLinearSolverCreator : public AbstractOptimizationAlgorithmCreator {
   explicit SLAM2DLinearSolverCreator(const OptimizationAlgorithmProperty& p)
       : AbstractOptimizationAlgorithmCreator(p) {}
   std::unique_ptr<OptimizationAlgorithm> construct() override {
-    return std::unique_ptr<OptimizationAlgorithm>(
-        createSolver(property().name));
+    return createSolver(property().name);
   }
 };
 

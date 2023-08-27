@@ -27,11 +27,8 @@
 #include <memory>
 
 #include "g2o/core/block_solver.h"
-#include "g2o/core/optimization_algorithm_dogleg.h"
+#include "g2o/core/optimization_algorithm_allocator.h"
 #include "g2o/core/optimization_algorithm_factory.h"
-#include "g2o/core/optimization_algorithm_gauss_newton.h"
-#include "g2o/core/optimization_algorithm_levenberg.h"
-#include "g2o/core/solver.h"
 #include "g2o/stuff/logger.h"
 #include "g2o/stuff/macros.h"
 #include "linear_solver_cholmod.h"
@@ -51,33 +48,17 @@ std::unique_ptr<BlockSolverBase> AllocateSolver() {
   return std::make_unique<BlockSolverPL<P, L>>(std::move(linearSolver));
 }
 
-OptimizationAlgorithm* createSolver(const std::string& fullSolverName) {
-  static const std::map<std::string,
-                        std::function<std::unique_ptr<BlockSolverBase>()>>
-      kSolverFactories{
-          {"var_cholmod", &AllocateSolver<-1, -1, true>},
-          {"fix3_2_cholmod", &AllocateSolver<3, 2, true>},
-          {"fix6_3_cholmod", &AllocateSolver<6, 3, true>},
-          {"fix7_3_cholmod", &AllocateSolver<7, 3, true>},
-      };
+std::unique_ptr<OptimizationAlgorithm> createSolver(
+    const std::string& fullSolverName) {
+  static const OptimizationAlgorithmAllocator::AllocateMap kSolverFactories{
+      {"var_cholmod", &AllocateSolver<-1, -1, true>},
+      {"fix3_2_cholmod", &AllocateSolver<3, 2, true>},
+      {"fix6_3_cholmod", &AllocateSolver<6, 3, true>},
+      {"fix7_3_cholmod", &AllocateSolver<7, 3, true>},
+  };
 
-  std::string solverName = fullSolverName.substr(3);
-  auto solverf = kSolverFactories.find(solverName);
-  if (solverf == kSolverFactories.end()) return nullptr;
-
-  std::string methodName = fullSolverName.substr(0, 2);
-
-  if (methodName == "gn") {
-    return new OptimizationAlgorithmGaussNewton(solverf->second());
-  }
-  if (methodName == "lm") {
-    return new OptimizationAlgorithmLevenberg(solverf->second());
-  }
-  if (methodName == "dl") {
-    return new OptimizationAlgorithmDogleg(solverf->second());
-  }
-
-  return nullptr;
+  return OptimizationAlgorithmAllocator::allocate(fullSolverName,
+                                                  kSolverFactories);
 }
 }  // namespace
 
@@ -86,8 +67,7 @@ class CholmodSolverCreator : public AbstractOptimizationAlgorithmCreator {
   explicit CholmodSolverCreator(const OptimizationAlgorithmProperty& p)
       : AbstractOptimizationAlgorithmCreator(p) {}
   std::unique_ptr<OptimizationAlgorithm> construct() override {
-    return std::unique_ptr<OptimizationAlgorithm>(
-        createSolver(property().name));
+    return createSolver(property().name);
   }
 };
 

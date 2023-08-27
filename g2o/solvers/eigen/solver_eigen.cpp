@@ -27,10 +27,8 @@
 #include <memory>
 
 #include "g2o/core/block_solver.h"
-#include "g2o/core/optimization_algorithm_dogleg.h"
+#include "g2o/core/optimization_algorithm_allocator.h"
 #include "g2o/core/optimization_algorithm_factory.h"
-#include "g2o/core/optimization_algorithm_gauss_newton.h"
-#include "g2o/core/optimization_algorithm_levenberg.h"
 #include "g2o/core/solver.h"
 #include "g2o/core/sparse_optimizer.h"
 #include "g2o/stuff/logger.h"
@@ -54,36 +52,20 @@ std::unique_ptr<BlockSolverBase> AllocateSolver() {
 /**
  * helper function for allocating
  */
-OptimizationAlgorithm* createSolver(const std::string& fullSolverName) {
-  static const std::map<std::string,
-                        std::function<std::unique_ptr<BlockSolverBase>()>>
-      kSolverFactories{
-          {"var", &AllocateSolver<-1, -1, true>},
-          {"fix3_2", &AllocateSolver<3, 2, true>},
-          {"fix6_3", &AllocateSolver<6, 3, true>},
-          {"fix7_3", &AllocateSolver<7, 3, true>},
-          {"fix3_2_scalar", &AllocateSolver<3, 2, false>},
-          {"fix6_3_scalar", &AllocateSolver<6, 3, false>},
-          {"fix7_3_scalar", &AllocateSolver<7, 3, false>},
-      };
+std::unique_ptr<OptimizationAlgorithm> createSolver(
+    const std::string& fullSolverName) {
+  static const OptimizationAlgorithmAllocator::AllocateMap kSolverFactories{
+      {"var", &AllocateSolver<-1, -1, true>},
+      {"fix3_2", &AllocateSolver<3, 2, true>},
+      {"fix6_3", &AllocateSolver<6, 3, true>},
+      {"fix7_3", &AllocateSolver<7, 3, true>},
+      {"fix3_2_scalar", &AllocateSolver<3, 2, false>},
+      {"fix6_3_scalar", &AllocateSolver<6, 3, false>},
+      {"fix7_3_scalar", &AllocateSolver<7, 3, false>},
+  };
 
-  const std::string solverName = fullSolverName.substr(3);
-  auto solverf = kSolverFactories.find(solverName);
-  if (solverf == kSolverFactories.end()) return nullptr;
-
-  const std::string methodName = fullSolverName.substr(0, 2);
-
-  if (methodName == "gn") {
-    return new OptimizationAlgorithmGaussNewton(solverf->second());
-  }
-  if (methodName == "lm") {
-    return new OptimizationAlgorithmLevenberg(solverf->second());
-  }
-  if (methodName == "dl") {
-    return new OptimizationAlgorithmDogleg(solverf->second());
-  }
-
-  return nullptr;
+  return OptimizationAlgorithmAllocator::allocate(fullSolverName,
+                                                  kSolverFactories);
 }
 }  // namespace
 
@@ -92,8 +74,7 @@ class EigenSolverCreator : public AbstractOptimizationAlgorithmCreator {
   explicit EigenSolverCreator(const OptimizationAlgorithmProperty& p)
       : AbstractOptimizationAlgorithmCreator(p) {}
   std::unique_ptr<OptimizationAlgorithm> construct() override {
-    return std::unique_ptr<OptimizationAlgorithm>(
-        createSolver(property().name));
+    return createSolver(property().name);
   }
 };
 

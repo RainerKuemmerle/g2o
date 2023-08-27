@@ -60,4 +60,23 @@ std::unique_ptr<OptimizationAlgorithm> OptimizationAlgorithmAllocator::allocate(
   return nullptr;
 }
 
+std::unique_ptr<OptimizationAlgorithm> OptimizationAlgorithmAllocator::allocate(
+    std::string_view fullSolverName, const AllocateSolverMap& allocate_map) {
+  const std::string solverName(fullSolverName.substr(3));
+  auto solver_allocator = allocate_map.find(solverName);
+  if (solver_allocator == allocate_map.end()) return nullptr;
+
+  const std::string_view methodName = fullSolverName.substr(0, 2);
+
+  if (methodName == "gn") {
+    return std::unique_ptr<OptimizationAlgorithm>(
+        new OptimizationAlgorithmGaussNewton(solver_allocator->second()));
+  }
+  if (methodName == "lm") {
+    return std::unique_ptr<OptimizationAlgorithm>(
+        new OptimizationAlgorithmLevenberg(solver_allocator->second()));
+  }
+  return nullptr;
+}
+
 }  // namespace g2o

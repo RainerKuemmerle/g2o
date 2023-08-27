@@ -37,14 +37,13 @@ namespace {
 /**
  * helper function for allocating
  */
-OptimizationAlgorithm* createSolver(const std::string& fullSolverName) {
+std::unique_ptr<OptimizationAlgorithm> createSolver(
+    const std::string& fullSolverName) {
   if (fullSolverName == "structure_only_2") {
-    OptimizationAlgorithm* optimizationAlgo = new StructureOnlySolver<2>;
-    return optimizationAlgo;
+    return std::unique_ptr<OptimizationAlgorithm>(new StructureOnlySolver<2>);
   }
   if (fullSolverName == "structure_only_3") {
-    OptimizationAlgorithm* optimizationAlgo = new StructureOnlySolver<3>;
-    return optimizationAlgo;
+    return std::unique_ptr<OptimizationAlgorithm>(new StructureOnlySolver<3>);
   }
   return nullptr;
 }
@@ -55,8 +54,7 @@ class StructureOnlyCreator : public AbstractOptimizationAlgorithmCreator {
   explicit StructureOnlyCreator(const OptimizationAlgorithmProperty& p)
       : AbstractOptimizationAlgorithmCreator(p) {}
   std::unique_ptr<OptimizationAlgorithm> construct() override {
-    return std::unique_ptr<OptimizationAlgorithm>(
-        createSolver(property().name));
+    return createSolver(property().name);
   }
 };
 

@@ -1,30 +1,35 @@
 // g2o - General Graph Optimization
 // Copyright (C) 2011 R. Kuemmerle, G. Grisetti, W. Burgard
+// All rights reserved.
 //
-// g2o is free software: you can redistribute it and/or modify
-// it under the terms of the GNU Lesser General Public License as published
-// by the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted provided that the following conditions are
+// met:
 //
-// g2o is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU Lesser General Public License for more details.
+// * Redistributions of source code must retain the above copyright notice,
+//   this list of conditions and the following disclaimer.
+// * Redistributions in binary form must reproduce the above copyright
+//   notice, this list of conditions and the following disclaimer in the
+//   documentation and/or other materials provided with the distribution.
 //
-// You should have received a copy of the GNU Lesser General Public License
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS
+// IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+// TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+// PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+// HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+// SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
+// TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+// PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+// LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+// NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+// SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <memory>
 
 #include "g2o/core/block_solver.h"
-#include "g2o/core/optimization_algorithm_dogleg.h"
+#include "g2o/core/optimization_algorithm_allocator.h"
 #include "g2o/core/optimization_algorithm_factory.h"
-#include "g2o/core/optimization_algorithm_gauss_newton.h"
-#include "g2o/core/optimization_algorithm_levenberg.h"
-#include "g2o/core/solver.h"
 #include "g2o/core/sparse_optimizer.h"
-#include "g2o/stuff/logger.h"
-#include "g2o/stuff/macros.h"
 #include "linear_solver_csparse.h"
 
 namespace g2o {
@@ -43,36 +48,20 @@ std::unique_ptr<BlockSolverBase> AllocateSolver() {
 /**
  * helper function for allocating
  */
-OptimizationAlgorithm* createSolver(const std::string& fullSolverName) {
-  static const std::map<std::string,
-                        std::function<std::unique_ptr<BlockSolverBase>()>>
-      kSolverFactories{
-          {"var_csparse", &AllocateSolver<-1, -1, true>},
-          {"fix3_2_csparse", &AllocateSolver<3, 2, true>},
-          {"fix6_3_csparse", &AllocateSolver<6, 3, true>},
-          {"fix7_3_csparse", &AllocateSolver<7, 3, true>},
-          {"fix3_2_scalar_csparse", &AllocateSolver<3, 2, false>},
-          {"fix6_3_scalar_csparse", &AllocateSolver<6, 3, false>},
-          {"fix7_3_scalar_csparse", &AllocateSolver<7, 3, false>},
-      };
+std::unique_ptr<OptimizationAlgorithm> createSolver(
+    const std::string& fullSolverName) {
+  static const OptimizationAlgorithmAllocator::AllocateMap kSolverFactories{
+      {"var_csparse", &AllocateSolver<-1, -1, true>},
+      {"fix3_2_csparse", &AllocateSolver<3, 2, true>},
+      {"fix6_3_csparse", &AllocateSolver<6, 3, true>},
+      {"fix7_3_csparse", &AllocateSolver<7, 3, true>},
+      {"fix3_2_scalar_csparse", &AllocateSolver<3, 2, false>},
+      {"fix6_3_scalar_csparse", &AllocateSolver<6, 3, false>},
+      {"fix7_3_scalar_csparse", &AllocateSolver<7, 3, false>},
+  };
 
-  const std::string solverName = fullSolverName.substr(3);
-  auto solverf = kSolverFactories.find(solverName);
-  if (solverf == kSolverFactories.end()) return nullptr;
-
-  const std::string methodName = fullSolverName.substr(0, 2);
-
-  if (methodName == "gn") {
-    return new OptimizationAlgorithmGaussNewton(solverf->second());
-  }
-  if (methodName == "lm") {
-    return new OptimizationAlgorithmLevenberg(solverf->second());
-  }
-  if (methodName == "dl") {
-    return new OptimizationAlgorithmDogleg(solverf->second());
-  }
-
-  return nullptr;
+  return OptimizationAlgorithmAllocator::allocate(fullSolverName,
+                                                  kSolverFactories);
 }
 
 }  // namespace
@@ -82,8 +71,7 @@ class CSparseSolverCreator : public AbstractOptimizationAlgorithmCreator {
   explicit CSparseSolverCreator(const OptimizationAlgorithmProperty& p)
       : AbstractOptimizationAlgorithmCreator(p) {}
   std::unique_ptr<OptimizationAlgorithm> construct() override {
-    return std::unique_ptr<OptimizationAlgorithm>(
-        createSolver(property().name));
+    return createSolver(property().name);
   }
 };
 

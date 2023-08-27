@@ -51,7 +51,7 @@ class G2O_CORE_API OptimizationAlgorithmLevenberg
   void printVerbose(std::ostream& os) const override;
 
   //! return the currently used damping factor
-  double currentLambda() const { return currentLambda_; }
+  [[nodiscard]] double currentLambda() const { return currentLambda_; }
 
   //! the number of internal iteration if an update step increases chi^2 within
   //! Levenberg-Marquardt

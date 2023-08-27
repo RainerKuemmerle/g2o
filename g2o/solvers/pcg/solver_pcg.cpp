@@ -27,9 +27,8 @@
 #include <memory>
 
 #include "g2o/core/block_solver.h"
+#include "g2o/core/optimization_algorithm_allocator.h"
 #include "g2o/core/optimization_algorithm_factory.h"
-#include "g2o/core/optimization_algorithm_gauss_newton.h"
-#include "g2o/core/optimization_algorithm_levenberg.h"
 #include "g2o/core/solver.h"
 #include "g2o/stuff/logger.h"
 #include "g2o/stuff/macros.h"
@@ -45,9 +44,9 @@ std::unique_ptr<g2o::Solver> AllocateSolver() {
           LinearSolverPCG<typename BlockSolverPL<P, L>::PoseMatrixType>>());
 }
 
-OptimizationAlgorithm* createSolver(const std::string& fullSolverName) {
-  static const std::map<std::string,
-                        std::function<std::unique_ptr<g2o::Solver>()>>
+std::unique_ptr<OptimizationAlgorithm> createSolver(
+    const std::string& fullSolverName) {
+  static const OptimizationAlgorithmAllocator::AllocateSolverMap
       kSolverFactories{
           {"pcg", &AllocateSolver<-1, -1>},
           {"pcg3_2", &AllocateSolver<3, 2>},
@@ -55,20 +54,8 @@ OptimizationAlgorithm* createSolver(const std::string& fullSolverName) {
           {"pcg7_3", &AllocateSolver<7, 3>},
       };
 
-  const std::string solverName = fullSolverName.substr(3);
-  auto solverf = kSolverFactories.find(solverName);
-  if (solverf == kSolverFactories.end()) return nullptr;
-
-  const std::string methodName = fullSolverName.substr(0, 2);
-
-  if (methodName == "gn") {
-    return new OptimizationAlgorithmGaussNewton(solverf->second());
-  }
-  if (methodName == "lm") {
-    return new OptimizationAlgorithmLevenberg(solverf->second());
-  }
-
-  return nullptr;
+  return OptimizationAlgorithmAllocator::allocate(fullSolverName,
+                                                  kSolverFactories);
 }
 }  // namespace
 
@@ -77,8 +64,7 @@ class PCGSolverCreator : public AbstractOptimizationAlgorithmCreator {
   explicit PCGSolverCreator(const OptimizationAlgorithmProperty& p)
       : AbstractOptimizationAlgorithmCreator(p) {}
   std::unique_ptr<OptimizationAlgorithm> construct() override {
-    return std::unique_ptr<OptimizationAlgorithm>(
-        createSolver(property().name));
+    return createSolver(property().name);
   }
 };
 
