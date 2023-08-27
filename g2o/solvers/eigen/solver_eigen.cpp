@@ -97,19 +97,68 @@ class EigenSolverCreator : public AbstractOptimizationAlgorithmCreator {
   }
 };
 
-// clang-format off
-  G2O_REGISTER_OPTIMIZATION_LIBRARY(eigen);
+G2O_REGISTER_OPTIMIZATION_LIBRARY(eigen);
 
-  G2O_REGISTER_OPTIMIZATION_ALGORITHM(gn_var, new EigenSolverCreator(OptimizationAlgorithmProperty("gn_var", "Gauss-Newton: Cholesky solver using Eigen's Sparse Cholesky methods (variable blocksize)", "Eigen", false, Eigen::Dynamic, Eigen::Dynamic)));
-  G2O_REGISTER_OPTIMIZATION_ALGORITHM(gn_fix3_2, new EigenSolverCreator(OptimizationAlgorithmProperty("gn_fix3_2", "Gauss-Newton: Cholesky solver using  Eigen's Sparse Cholesky (fixed blocksize)", "Eigen", true, 3, 2)));
-  G2O_REGISTER_OPTIMIZATION_ALGORITHM(gn_fix6_3, new EigenSolverCreator(OptimizationAlgorithmProperty("gn_fix6_3", "Gauss-Newton: Cholesky solver using  Eigen's Sparse Cholesky (fixed blocksize)", "Eigen", true, 6, 3)));
-  G2O_REGISTER_OPTIMIZATION_ALGORITHM(gn_fix7_3, new EigenSolverCreator(OptimizationAlgorithmProperty("gn_fix7_3", "Gauss-Newton: Cholesky solver using  Eigen's Sparse Cholesky (fixed blocksize)", "Eigen", true, 7, 3)));
+G2O_REGISTER_OPTIMIZATION_ALGORITHM(
+    gn_var, std::make_shared<EigenSolverCreator>(OptimizationAlgorithmProperty(
+                "gn_var",
+                "Gauss-Newton: Cholesky solver using Eigen's Sparse Cholesky "
+                "methods (variable blocksize)",
+                "Eigen", false, Eigen::Dynamic, Eigen::Dynamic)));
+G2O_REGISTER_OPTIMIZATION_ALGORITHM(
+    gn_fix3_2,
+    std::make_shared<EigenSolverCreator>(OptimizationAlgorithmProperty(
+        "gn_fix3_2",
+        "Gauss-Newton: Cholesky solver using  Eigen's Sparse Cholesky (fixed "
+        "blocksize)",
+        "Eigen", true, 3, 2)));
+G2O_REGISTER_OPTIMIZATION_ALGORITHM(
+    gn_fix6_3,
+    std::make_shared<EigenSolverCreator>(OptimizationAlgorithmProperty(
+        "gn_fix6_3",
+        "Gauss-Newton: Cholesky solver using  Eigen's Sparse Cholesky (fixed "
+        "blocksize)",
+        "Eigen", true, 6, 3)));
+G2O_REGISTER_OPTIMIZATION_ALGORITHM(
+    gn_fix7_3,
+    std::make_shared<EigenSolverCreator>(OptimizationAlgorithmProperty(
+        "gn_fix7_3",
+        "Gauss-Newton: Cholesky solver using  Eigen's Sparse Cholesky (fixed "
+        "blocksize)",
+        "Eigen", true, 7, 3)));
 
-  G2O_REGISTER_OPTIMIZATION_ALGORITHM(lm_var, new EigenSolverCreator(OptimizationAlgorithmProperty("lm_var", "Levenberg: Cholesky solver using Eigen's Sparse Cholesky methods (variable blocksize)", "Eigen", false, Eigen::Dynamic, Eigen::Dynamic)));
-  G2O_REGISTER_OPTIMIZATION_ALGORITHM(lm_fix3_2, new EigenSolverCreator(OptimizationAlgorithmProperty("lm_fix3_2", "Levenberg: Cholesky solver using  Eigen's Sparse Cholesky (fixed blocksize)", "Eigen", true, 3, 2)));
-  G2O_REGISTER_OPTIMIZATION_ALGORITHM(lm_fix6_3, new EigenSolverCreator(OptimizationAlgorithmProperty("lm_fix6_3", "Levenberg: Cholesky solver using  Eigen's Sparse Cholesky (fixed blocksize)", "Eigen", true, 6, 3)));
-  G2O_REGISTER_OPTIMIZATION_ALGORITHM(lm_fix7_3, new EigenSolverCreator(OptimizationAlgorithmProperty("lm_fix7_3", "Levenberg: Cholesky solver using  Eigen's Sparse Cholesky (fixed blocksize)", "Eigen", true, 7, 3)));
+G2O_REGISTER_OPTIMIZATION_ALGORITHM(
+    lm_var, std::make_shared<EigenSolverCreator>(OptimizationAlgorithmProperty(
+                "lm_var",
+                "Levenberg: Cholesky solver using Eigen's Sparse Cholesky "
+                "methods (variable blocksize)",
+                "Eigen", false, Eigen::Dynamic, Eigen::Dynamic)));
+G2O_REGISTER_OPTIMIZATION_ALGORITHM(
+    lm_fix3_2,
+    std::make_shared<EigenSolverCreator>(OptimizationAlgorithmProperty(
+        "lm_fix3_2",
+        "Levenberg: Cholesky solver using  Eigen's Sparse Cholesky (fixed "
+        "blocksize)",
+        "Eigen", true, 3, 2)));
+G2O_REGISTER_OPTIMIZATION_ALGORITHM(
+    lm_fix6_3,
+    std::make_shared<EigenSolverCreator>(OptimizationAlgorithmProperty(
+        "lm_fix6_3",
+        "Levenberg: Cholesky solver using  Eigen's Sparse Cholesky (fixed "
+        "blocksize)",
+        "Eigen", true, 6, 3)));
+G2O_REGISTER_OPTIMIZATION_ALGORITHM(
+    lm_fix7_3,
+    std::make_shared<EigenSolverCreator>(OptimizationAlgorithmProperty(
+        "lm_fix7_3",
+        "Levenberg: Cholesky solver using  Eigen's Sparse Cholesky (fixed "
+        "blocksize)",
+        "Eigen", true, 7, 3)));
 
-  G2O_REGISTER_OPTIMIZATION_ALGORITHM(dl_var, new EigenSolverCreator(OptimizationAlgorithmProperty("dl_var", "Dogleg: Cholesky solver using Eigen's Sparse Cholesky methods (variable blocksize)", "Eigen", false, Eigen::Dynamic, Eigen::Dynamic)));
-// clang-format on
+G2O_REGISTER_OPTIMIZATION_ALGORITHM(
+    dl_var, std::make_shared<EigenSolverCreator>(OptimizationAlgorithmProperty(
+                "dl_var",
+                "Dogleg: Cholesky solver using Eigen's Sparse Cholesky methods "
+                "(variable blocksize)",
+                "Eigen", false, Eigen::Dynamic, Eigen::Dynamic)));
 }  // namespace g2o

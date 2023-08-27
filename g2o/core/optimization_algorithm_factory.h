@@ -127,14 +127,7 @@ class G2O_CORE_API OptimizationAlgorithmFactory {
 class RegisterOptimizationAlgorithmProxy {
  public:
   explicit RegisterOptimizationAlgorithmProxy(
-      AbstractOptimizationAlgorithmCreator* c) {
-    creator_.reset(c);
-#ifdef G2O_DEBUG_OPTIMIZATION_ALGORITHM_FACTORY
-    std::cout << __FUNCTION__ << ": Registering " << _creator->property().name
-              << " of type " << typeid(*_creator).name() << std::endl;
-#endif
-    OptimizationAlgorithmFactory::instance()->registerSolver(creator_);
-  }
+      std::shared_ptr<AbstractOptimizationAlgorithmCreator> c);
 
  private:
   std::shared_ptr<AbstractOptimizationAlgorithmCreator> creator_;
@@ -186,8 +179,10 @@ class RegisterOptimizationAlgorithmProxy {
 #define G2O_REGISTER_OPTIMIZATION_ALGORITHM(optimizername, instance)         \
   extern "C" void G2O_OAF_EXPORT g2o_optimization_algorithm_##optimizername( \
       void) {}                                                               \
-  static g2o::RegisterOptimizationAlgorithmProxy                             \
-      g_optimization_algorithm_proxy_##optimizername(instance);
+  namespace {                                                                \
+  g2o::RegisterOptimizationAlgorithmProxy                                    \
+      g_optimization_algorithm_proxy_##optimizername(instance);              \
+  }
 
 /**
  * see the documentation of the macros above.

@@ -28,6 +28,7 @@
 #define G2O_OPTIMIZATION_ALGORITHM_PROPERTY_H
 
 #include <string>
+#include <string_view>
 #include <utility>
 
 #include "g2o_core_api.h"
@@ -47,12 +48,13 @@ struct G2O_CORE_API OptimizationAlgorithmProperty {
   int landmarkDim =
       -1;  ///< dimension of the landmark vertices (-1 if variable)
   OptimizationAlgorithmProperty() = default;
-  OptimizationAlgorithmProperty(std::string name_, std::string desc_,
-                                std::string type_, bool requiresMarginalize_,
-                                int poseDim_, int landmarkDim_)
-      : name(std::move(name_)),
-        desc(std::move(desc_)),
-        type(std::move(type_)),
+  OptimizationAlgorithmProperty(std::string_view name_, std::string_view desc_,
+                                std::string_view type_,
+                                bool requiresMarginalize_, int poseDim_,
+                                int landmarkDim_)
+      : name(name_),
+        desc(desc_),
+        type(type_),
         requiresMarginalize(requiresMarginalize_),
         poseDim(poseDim_),
         landmarkDim(landmarkDim_) {}

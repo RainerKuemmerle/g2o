@@ -85,49 +85,49 @@ class PCGSolverCreator : public AbstractOptimizationAlgorithmCreator {
 G2O_REGISTER_OPTIMIZATION_LIBRARY(pcg);
 
 G2O_REGISTER_OPTIMIZATION_ALGORITHM(
-    gn_pcg, new PCGSolverCreator(OptimizationAlgorithmProperty(
+    gn_pcg, std::make_shared<PCGSolverCreator>(OptimizationAlgorithmProperty(
                 "gn_pcg",
                 "Gauss-Newton: PCG solver using block-Jacobi pre-conditioner "
                 "(variable blocksize)",
                 "PCG", false, Eigen::Dynamic, Eigen::Dynamic)));
 G2O_REGISTER_OPTIMIZATION_ALGORITHM(
-    gn_pcg3_2, new PCGSolverCreator(OptimizationAlgorithmProperty(
+    gn_pcg3_2, std::make_shared<PCGSolverCreator>(OptimizationAlgorithmProperty(
                    "gn_pcg3_2",
                    "Gauss-Newton: PCG solver using block-Jacobi "
                    "pre-conditioner (fixed blocksize)",
                    "PCG", true, 3, 2)));
 G2O_REGISTER_OPTIMIZATION_ALGORITHM(
-    gn_pcg6_3, new PCGSolverCreator(OptimizationAlgorithmProperty(
+    gn_pcg6_3, std::make_shared<PCGSolverCreator>(OptimizationAlgorithmProperty(
                    "gn_pcg6_3",
                    "Gauss-Newton: PCG solver using block-Jacobi "
                    "pre-conditioner (fixed blocksize)",
                    "PCG", true, 6, 3)));
 G2O_REGISTER_OPTIMIZATION_ALGORITHM(
-    gn_pcg7_3, new PCGSolverCreator(OptimizationAlgorithmProperty(
+    gn_pcg7_3, std::make_shared<PCGSolverCreator>(OptimizationAlgorithmProperty(
                    "gn_pcg7_3",
                    "Gauss-Newton: PCG solver using block-Jacobi "
                    "pre-conditioner (fixed blocksize)",
                    "PCG", true, 7, 3)));
 G2O_REGISTER_OPTIMIZATION_ALGORITHM(
-    lm_pcg, new PCGSolverCreator(OptimizationAlgorithmProperty(
+    lm_pcg, std::make_shared<PCGSolverCreator>(OptimizationAlgorithmProperty(
                 "lm_pcg",
                 "Levenberg: PCG solver using block-Jacobi pre-conditioner "
                 "(variable blocksize)",
                 "PCG", false, Eigen::Dynamic, Eigen::Dynamic)));
 G2O_REGISTER_OPTIMIZATION_ALGORITHM(
-    lm_pcg3_2, new PCGSolverCreator(OptimizationAlgorithmProperty(
+    lm_pcg3_2, std::make_shared<PCGSolverCreator>(OptimizationAlgorithmProperty(
                    "lm_pcg3_2",
                    "Levenberg: PCG solver using block-Jacobi pre-conditioner "
                    "(fixed blocksize)",
                    "PCG", true, 3, 2)));
 G2O_REGISTER_OPTIMIZATION_ALGORITHM(
-    lm_pcg6_3, new PCGSolverCreator(OptimizationAlgorithmProperty(
+    lm_pcg6_3, std::make_shared<PCGSolverCreator>(OptimizationAlgorithmProperty(
                    "lm_pcg6_3",
                    "Levenberg: PCG solver using block-Jacobi pre-conditioner "
                    "(fixed blocksize)",
                    "PCG", true, 6, 3)));
 G2O_REGISTER_OPTIMIZATION_ALGORITHM(
-    lm_pcg7_3, new PCGSolverCreator(OptimizationAlgorithmProperty(
+    lm_pcg7_3, std::make_shared<PCGSolverCreator>(OptimizationAlgorithmProperty(
                    "lm_pcg7_3",
                    "Levenberg: PCG solver using block-Jacobi pre-conditioner "
                    "(fixed blocksize)",

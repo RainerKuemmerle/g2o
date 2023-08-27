@@ -44,9 +44,8 @@ std::unique_ptr<g2o::Solver> AllocateSolver() {
       std::make_unique<
           LinearSolverDense<typename BlockSolverPL<P, L>::PoseMatrixType>>());
 }
-}  // namespace
 
-static OptimizationAlgorithm* createSolver(const std::string& fullSolverName) {
+OptimizationAlgorithm* createSolver(const std::string& fullSolverName) {
   static const std::map<std::string,
                         std::function<std::unique_ptr<g2o::Solver>()>>
       kSolverFactories{
@@ -72,6 +71,8 @@ static OptimizationAlgorithm* createSolver(const std::string& fullSolverName) {
   return nullptr;
 }
 
+}  // namespace
+
 class DenseSolverCreator : public AbstractOptimizationAlgorithmCreator {
  public:
   explicit DenseSolverCreator(const OptimizationAlgorithmProperty& p)
@@ -85,39 +86,44 @@ class DenseSolverCreator : public AbstractOptimizationAlgorithmCreator {
 G2O_REGISTER_OPTIMIZATION_LIBRARY(dense);
 
 G2O_REGISTER_OPTIMIZATION_ALGORITHM(
-    gn_dense, new DenseSolverCreator(OptimizationAlgorithmProperty(
-                  "gn_dense", "Gauss-Newton: Dense solver (variable blocksize)",
-                  "Dense", false, Eigen::Dynamic, Eigen::Dynamic)));
+    gn_dense,
+    std::make_shared<DenseSolverCreator>(OptimizationAlgorithmProperty(
+        "gn_dense", "Gauss-Newton: Dense solver (variable blocksize)", "Dense",
+        false, Eigen::Dynamic, Eigen::Dynamic)));
 G2O_REGISTER_OPTIMIZATION_ALGORITHM(
     gn_dense3_2,
-    new DenseSolverCreator(OptimizationAlgorithmProperty(
+    std::make_shared<DenseSolverCreator>(OptimizationAlgorithmProperty(
         "gn_dense3_2", "Gauss-Newton: Dense solver (fixed blocksize)", "Dense",
         true, 3, 2)));
 G2O_REGISTER_OPTIMIZATION_ALGORITHM(
     gn_dense6_3,
-    new DenseSolverCreator(OptimizationAlgorithmProperty(
+    std::make_shared<DenseSolverCreator>(OptimizationAlgorithmProperty(
         "gn_dense6_3", "Gauss-Newton: Dense solver (fixed blocksize)", "Dense",
         true, 6, 3)));
 G2O_REGISTER_OPTIMIZATION_ALGORITHM(
     gn_dense7_3,
-    new DenseSolverCreator(OptimizationAlgorithmProperty(
+    std::make_shared<DenseSolverCreator>(OptimizationAlgorithmProperty(
         "gn_dense7_3", "Gauss-Newton: Dense solver (fixed blocksize)", "Dense",
         true, 7, 3)));
 G2O_REGISTER_OPTIMIZATION_ALGORITHM(
-    lm_dense, new DenseSolverCreator(OptimizationAlgorithmProperty(
-                  "lm_dense", "Levenberg: Dense solver (variable blocksize)",
-                  "Dense", false, -1, -1)));
+    lm_dense,
+    std::make_shared<DenseSolverCreator>(OptimizationAlgorithmProperty(
+        "lm_dense", "Levenberg: Dense solver (variable blocksize)", "Dense",
+        false, -1, -1)));
 G2O_REGISTER_OPTIMIZATION_ALGORITHM(
-    lm_dense3_2, new DenseSolverCreator(OptimizationAlgorithmProperty(
-                     "lm_dense3_2", "Levenberg: Dense solver (fixed blocksize)",
-                     "Dense", true, 3, 2)));
+    lm_dense3_2,
+    std::make_shared<DenseSolverCreator>(OptimizationAlgorithmProperty(
+        "lm_dense3_2", "Levenberg: Dense solver (fixed blocksize)", "Dense",
+        true, 3, 2)));
 G2O_REGISTER_OPTIMIZATION_ALGORITHM(
-    lm_dense6_3, new DenseSolverCreator(OptimizationAlgorithmProperty(
-                     "lm_dense6_3", "Levenberg: Dense solver (fixed blocksize)",
-                     "Dense", true, 6, 3)));
+    lm_dense6_3,
+    std::make_shared<DenseSolverCreator>(OptimizationAlgorithmProperty(
+        "lm_dense6_3", "Levenberg: Dense solver (fixed blocksize)", "Dense",
+        true, 6, 3)));
 G2O_REGISTER_OPTIMIZATION_ALGORITHM(
-    lm_dense7_3, new DenseSolverCreator(OptimizationAlgorithmProperty(
-                     "lm_dense7_3", "Levenberg: Dense solver (fixed blocksize)",
-                     "Dense", true, 7, 3)));
+    lm_dense7_3,
+    std::make_shared<DenseSolverCreator>(OptimizationAlgorithmProperty(
+        "lm_dense7_3", "Levenberg: Dense solver (fixed blocksize)", "Dense",
+        true, 7, 3)));
 
 }  // namespace g2o

@@ -48,16 +48,17 @@ std::unique_ptr<BlockSolverBase> AllocateSolver() {
   linearSolver->setBlockOrdering(Blockorder);
   return std::make_unique<BlockSolverPL<P, L>>(std::move(linearSolver));
 }
-}  // namespace
 
 /**
  * helper function for allocating
  */
-static OptimizationAlgorithm* createSolver(const std::string& fullSolverName) {
+OptimizationAlgorithm* createSolver(const std::string& fullSolverName) {
   if (fullSolverName != "2dlinear") return nullptr;
 
   return new SolverSLAM2DLinear{AllocateSolver<3, 2, true>()};
 }
+
+}  // namespace
 
 class SLAM2DLinearSolverCreator : public AbstractOptimizationAlgorithmCreator {
  public:
@@ -73,7 +74,7 @@ G2O_REGISTER_OPTIMIZATION_LIBRARY(slam2d_linear);
 
 G2O_REGISTER_OPTIMIZATION_ALGORITHM(
     2dlinear,
-    new SLAM2DLinearSolverCreator(OptimizationAlgorithmProperty(
+    std::make_shared<SLAM2DLinearSolverCreator>(OptimizationAlgorithmProperty(
         "2dlinear",
         "Solve Orientation + Gauss-Newton: Works only on 2D pose graphs!!",
         "Eigen", false, 3, 3)));

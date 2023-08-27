@@ -120,4 +120,13 @@ OptimizationAlgorithmFactory::findSolver(const std::string& name) {
   return creator_.end();
 }
 
+RegisterOptimizationAlgorithmProxy::RegisterOptimizationAlgorithmProxy(
+    std::shared_ptr<AbstractOptimizationAlgorithmCreator> c)
+    : creator_(std::move(c)) {
+  const AbstractOptimizationAlgorithmCreator* ptr = creator_.get();
+  G2O_DEBUG("Registering optimization algorithm {} of type {}",
+            creator_->property().name, typeid(*ptr).name());
+  OptimizationAlgorithmFactory::instance()->registerSolver(creator_);
+}
+
 }  // namespace g2o
