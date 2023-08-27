@@ -53,7 +53,9 @@
 #define _GNU_SOURCE
 #endif
 #include <dlfcn.h>
-static Dl_info info;
+namespace {
+Dl_info info;
+}
 #endif
 #define PATH_SEPARATOR ":"
 #else  // WINDOWS
@@ -85,9 +87,9 @@ static const std::string kSolversPattern =
 
 namespace g2o {
 
-static void findArguments(const std::string& option,
-                          std::vector<std::string>& args, int argc,
-                          char** argv) {
+namespace {
+void findArguments(const std::string& option, std::vector<std::string>& args,
+                   int argc, char** argv) {
   args.clear();
   for (int i = 0; i < argc; ++i) {
     if (argv[i] == option && i + 1 < argc) {
@@ -95,6 +97,7 @@ static void findArguments(const std::string& option,
     }
   }
 }
+}  // namespace
 
 void loadStandardTypes(DlWrapper& dlWrapper, int argc, char** argv) {
   char* envTypesPath = getenv("G2O_TYPES_DIR");
