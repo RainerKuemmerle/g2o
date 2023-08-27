@@ -34,6 +34,11 @@
 
 #include "g2o/core/cache.h"
 
+namespace {
+constexpr int kOrthogonalizeAfter =
+    1000;  //< orthogonalize the rotation matrix after N updates
+}
+
 namespace g2o {
 
 VertexSE3::VertexSE3() {
@@ -50,6 +55,16 @@ bool VertexSE3::read(std::istream& is) {
 
 bool VertexSE3::write(std::ostream& os) const {
   return internal::writeVector(os, internal::toVectorQT(estimate()));
+}
+
+void VertexSE3::oplusImpl(const VectorX::MapType& update) {
+  const Isometry3 increment = internal::fromVectorMQT(update);
+  estimate_ = estimate_ * increment;
+  if (++numOplusCalls_ > kOrthogonalizeAfter) {
+    numOplusCalls_ = 0;
+    internal::approximateNearestOrthogonalMatrix(
+        estimate_.matrix().topLeftCorner<3, 3>());
+  }
 }
 
 #ifdef G2O_HAVE_OPENGL

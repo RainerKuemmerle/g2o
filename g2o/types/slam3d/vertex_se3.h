@@ -50,11 +50,6 @@ namespace g2o {
  */
 class G2O_TYPES_SLAM3D_API VertexSE3 : public BaseVertex<6, Isometry3> {
  public:
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
-
-  static const int kOrthogonalizeAfter =
-      1000;  //< orthogonalize the rotation matrix after N updates
-
   VertexSE3();
 
   bool read(std::istream& is) override;
@@ -67,24 +62,7 @@ class G2O_TYPES_SLAM3D_API VertexSE3 : public BaseVertex<6, Isometry3> {
    * element qw of the quaternion is recovred by
    * || (qw,qx,qy,qz) || == 1 => qw = sqrt(1 - || (qx,qy,qz) ||
    */
-  void oplusImpl(const VectorX::MapType& update) override {
-    const Isometry3 increment = internal::fromVectorMQT(update);
-    estimate_ = estimate_ * increment;
-    if (++numOplusCalls_ > kOrthogonalizeAfter) {
-      numOplusCalls_ = 0;
-      internal::approximateNearestOrthogonalMatrix(
-          estimate_.matrix().topLeftCorner<3, 3>());
-    }
-  }
-
-  //! wrapper function to use the old SE3 type
-  SE3Quat G2O_ATTRIBUTE_DEPRECATED(estimateAsSE3Quat() const) {
-    return internal::toSE3Quat(estimate());
-  }
-  //! wrapper function to use the old SE3 type
-  void G2O_ATTRIBUTE_DEPRECATED(setEstimateFromSE3Quat(const SE3Quat& se3)) {
-    setEstimate(internal::fromSE3Quat(se3));
-  }
+  void oplusImpl(const VectorX::MapType& update) override;
 
  protected:
   int numOplusCalls_ = 0;  ///< store how often oplus was called to trigger
