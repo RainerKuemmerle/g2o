@@ -27,6 +27,7 @@ sparse_optimizer.h
 hyper_dijkstra.cpp hyper_dijkstra.h
 parameter_container.cpp     parameter_container.h
 optimization_algorithm.cpp optimization_algorithm.h
+optimization_algorithm_allocator.cpp optimization_algorithm_allocator.h
 optimization_algorithm_with_hessian.cpp optimization_algorithm_with_hessian.h
 optimization_algorithm_gauss_newton.cpp optimization_algorithm_gauss_newton.h
 optimization_algorithm_levenberg.cpp optimization_algorithm_levenberg.h
