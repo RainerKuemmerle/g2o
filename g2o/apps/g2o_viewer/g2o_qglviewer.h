@@ -19,6 +19,8 @@
 #ifndef G2O_QGL_GRAPH_VIEWER_H
 #define G2O_QGL_GRAPH_VIEWER_H
 
+#include <memory>
+
 #include "g2o/core/hyper_graph_action.h"
 #include "g2o_viewer_api.h"
 #include "qglviewer.h"
@@ -33,7 +35,7 @@ class SparseOptimizer;
 class G2O_VIEWER_API G2oQGLViewer : public QGLViewer {
  public:
   explicit G2oQGLViewer(QWidget* parent = nullptr,
-                        const QGLWidget* shareWidget = nullptr);
+                        Qt::WindowFlags flags = Qt::WindowFlags());
   G2oQGLViewer(const G2oQGLViewer&) = delete;
   G2oQGLViewer& operator=(const G2oQGLViewer&) = delete;
 
@@ -45,14 +47,14 @@ class G2O_VIEWER_API G2oQGLViewer : public QGLViewer {
    * the viewer uses a display list to cache the drawing, use setUpdateDisplay()
    * to force the creation of an updated display list.
    */
-  bool updateDisplay() const { return updateDisplay_; }
+  [[nodiscard]] bool updateDisplay() const { return updateDisplay_; }
   void setUpdateDisplay(bool updateDisplay);
 
-  std::shared_ptr<DrawAction::Parameters> parameters() const {
+  [[nodiscard]] std::shared_ptr<DrawAction::Parameters> parameters() const {
     return drawActionParameters_;
   }
 
-  SparseOptimizer* graph = nullptr;
+  std::shared_ptr<SparseOptimizer> graph;
 
  protected:
   HyperGraphElementAction::HyperGraphElementActionPtr drawActions_;

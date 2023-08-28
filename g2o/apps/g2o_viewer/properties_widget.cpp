@@ -18,110 +18,22 @@
 
 #include "properties_widget.h"
 
-#include <QLineEdit>
-#include <cassert>
-#include <iostream>
-
+#include "g2o/core/optimization_algorithm.h"
 #include "g2o/stuff/property.h"
 
 PropertiesWidget::PropertiesWidget(QWidget* parent)
-    : QDialog(parent)
-
-{
-  setupUi(this);
-  connect(btnApply, &QPushButton::clicked, this,
-          &PropertiesWidget::on_btnApply_clicked);
-  connect(btnOK, &QPushButton::clicked, this,
-          &PropertiesWidget::on_btnOK_clicked);
+    : AbstractPropertiesWidget(parent) {
+  std::cerr << "Created Prop widget" << std::endl;
 }
 
-void PropertiesWidget::updateDisplayedProperties() {
-  tableWidget->clear();
-  propNames_.clear();
-
-  tableWidget->setColumnCount(2);
-
-  QStringList horizontalHeaders;
-  horizontalHeaders.append("Name");
-  horizontalHeaders.append("Value");
-  tableWidget->setHorizontalHeaderLabels(horizontalHeaders);
-
-  tableWidget->verticalHeader()->hide();
-
-  g2o::PropertyMap* properties = properties_;
-  if (!properties) return;
-  tableWidget->setRowCount(properties->size());
-
-  int r = 0;
-  for (auto it = properties->begin(); it != properties->end(); ++it, ++r) {
-    auto* textItem = new QTableWidgetItem;
-    textItem->setText(QString::fromStdString(humanReadablePropName(it->first)));
-    textItem->setFlags(textItem->flags() & ~Qt::ItemIsEditable);
-    tableWidget->setItem(r, 0, textItem);
-    propNames_.push_back(it->first);
-
-    if (dynamic_cast<g2o::Property<bool>*>(it->second.get())) {
-      auto* prop = static_cast<g2o::Property<bool>*>(it->second.get());
-      auto* checkItem = new QTableWidgetItem;
-      checkItem->setText("enabled");
-      checkItem->setFlags(checkItem->flags() | Qt::ItemIsUserCheckable);
-      if (prop->value())
-        checkItem->setCheckState(Qt::Checked);
-      else
-        checkItem->setCheckState(Qt::Unchecked);
-      tableWidget->setItem(r, 1, checkItem);
-    } else {
-      auto* editor = new QLineEdit(tableWidget);
-      editor->setText(QString::fromStdString(it->second->toString()));
-      if (dynamic_cast<g2o::Property<int>*>(it->second.get())) {
-        editor->setValidator(new QIntValidator(editor));
-      } else if (dynamic_cast<g2o::Property<float>*>(it->second.get()) ||
-                 dynamic_cast<g2o::Property<double>*>(it->second.get())) {
-        editor->setValidator(new QDoubleValidator(editor));
-      }
-      tableWidget->setCellWidget(r, 1, editor);
-    }
-  }
-  tableWidget->resizeColumnToContents(0);
-}
-
-void PropertiesWidget::applyProperties() {
-  assert(tableWidget->rowCount() == (int)propNames_.size());
-  g2o::PropertyMap* properties = properties_;
-  for (int r = 0; r < tableWidget->rowCount(); ++r) {
-    const std::string& propName = propNames_[r];
-    std::shared_ptr<g2o::BaseProperty> baseProp =
-        properties->getProperty<g2o::BaseProperty>(propName);
-    if (!baseProp) continue;
-
-    if (dynamic_cast<g2o::Property<bool>*>(baseProp.get())) {
-      auto* prop = static_cast<g2o::Property<bool>*>(baseProp.get());
-      QTableWidgetItem* checkItem = tableWidget->item(r, 1);
-      prop->setValue(checkItem->checkState() == Qt::Checked);
-    } else {
-      auto* editor = dynamic_cast<QLineEdit*>(tableWidget->cellWidget(r, 1));
-      bool status = baseProp->fromString(editor->text().toStdString());
-      if (!status) {
-        std::cerr << "Warning: unable to set property " << baseProp->name()
-                  << std::endl;
-      }
-    }
-  }
-}
-
-void PropertiesWidget::on_btnApply_clicked() { applyProperties(); }
-
-void PropertiesWidget::on_btnOK_clicked() {
-  applyProperties();
-  close();
-}
-
-std::string PropertiesWidget::humanReadablePropName(
-    const std::string& propertyName) const {
-  return propertyName;
-}
-
-void PropertiesWidget::setProperties(g2o::PropertyMap* properties) {
-  properties_ = properties;
+void PropertiesWidget::setSolver(
+    std::shared_ptr<g2o::OptimizationAlgorithm> solver) {
+  solver_ = std::move(solver);
   updateDisplayedProperties();
+}
+
+g2o::PropertyMap* PropertiesWidget::propertyMap() {
+  if (!solver_) return nullptr;
+  // HACK cast away the constness of the property map
+  return const_cast<g2o::PropertyMap*>(&solver_->properties());
 }

@@ -19,38 +19,26 @@
 #ifndef G2O_PROPERTIES_WINDOW_H
 #define G2O_PROPERTIES_WINDOW_H
 
-#include <QDialog>
-#include <string>
-#include <vector>
-
-#include "g2o_viewer_api.h"
-#include "ui_base_properties_widget.h"
+#include "abstract_properties_widget.h"
 
 namespace g2o {
-class G2oQGLViewer;
-class PropertyMap;
+class OptimizationAlgorithm;
 }  // namespace g2o
 
-class G2O_VIEWER_API PropertiesWidget : public QDialog,
-                                        public Ui::BasePropertiesWidget {
-  Q_OBJECT
+/**
+ * @brief Widget for displaying properties of an OptimizationAlgorithm
+ */
+class G2O_VIEWER_API PropertiesWidget : public AbstractPropertiesWidget {
  public:
   explicit PropertiesWidget(QWidget* parent = nullptr);
   ~PropertiesWidget() override = default;
 
-  void setProperties(g2o::PropertyMap* properties);
+  g2o::PropertyMap* propertyMap() override;
 
-  void on_btnApply_clicked();
-  void on_btnOK_clicked();
+  void setSolver(std::shared_ptr<g2o::OptimizationAlgorithm> solver);
 
  protected:
-  std::vector<std::string> propNames_;
-  g2o::PropertyMap* properties_ = nullptr;
-
-  virtual void updateDisplayedProperties();
-  virtual void applyProperties();
-  virtual std::string humanReadablePropName(
-      const std::string& propertyName) const;
+  std::shared_ptr<g2o::OptimizationAlgorithm> solver_;
 };
 
 #endif

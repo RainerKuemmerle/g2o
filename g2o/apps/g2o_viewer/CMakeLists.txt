@@ -1,7 +1,7 @@
 # Qt5 was been find_package'd() by FindQGLViewer.cmake
 if(Qt5_FOUND)
   QT5_WRAP_UI(UI_HEADERS base_main_window.ui base_properties_widget.ui)
-  QT5_WRAP_CPP(UI_SOURCES main_window.h properties_widget.h)
+  QT5_WRAP_CPP(UI_SOURCES main_window.h abstract_properties_widget.h)
 
   include_directories(${Qt5Core_INCLUDE_DIRS} ${Qt5Xml_INCLUDE_DIRS} ${Qt5Gui_INCLUDE_DIRS} ${Qt5Widgets_INCLUDE_DIRS} ${Qt5OpenGL_INCLUDE_DIRS})
   string(APPEND qt5_includes_dirs "${Qt5Core_INCLUDE_DIRS} ${Qt5Xml_INCLUDE_DIRS} ${Qt5Gui_INCLUDE_DIRS} ${Qt5Widgets_INCLUDE_DIRS} ${Qt5OpenGL_INCLUDE_DIRS}")
@@ -17,6 +17,7 @@ add_library(viewer_library ${G2O_LIB_TYPE}
   main_window.cpp main_window.h
   stream_redirect.cpp stream_redirect.h
   gui_hyper_graph_action.cpp gui_hyper_graph_action.h
+  abstract_properties_widget.cpp abstract_properties_widget.h
   properties_widget.cpp properties_widget.h
   viewer_properties_widget.cpp viewer_properties_widget.h
   run_g2o_viewer.cpp run_g2o_viewer.h

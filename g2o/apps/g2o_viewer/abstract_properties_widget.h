@@ -16,34 +16,44 @@
 // You should have received a copy of the GNU General Public License
 // along with g2o.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef G2O_VIEWER_PROPERTIES_WIDGET_H
-#define G2O_VIEWER_PROPERTIES_WIDGET_H
+#ifndef G2O_ABSTRACT_PROPERTIES_WINDOW_H
+#define G2O_ABSTRACT_PROPERTIES_WINDOW_H
 
+#include <QDialog>
 #include <memory>
+#include <string>
+#include <vector>
 
-#include "abstract_properties_widget.h"
 #include "g2o_viewer_api.h"
+#include "ui_base_properties_widget.h"
 
 namespace g2o {
-class G2oQGLViewer;
 class PropertyMap;
 }  // namespace g2o
 
-class G2O_VIEWER_API ViewerPropertiesWidget : public AbstractPropertiesWidget {
+/**
+ * @brief Widget for displaying properties
+ */
+class G2O_VIEWER_API AbstractPropertiesWidget
+    : public QDialog,
+      public Ui::BasePropertiesWidget {
+  Q_OBJECT
  public:
-  explicit ViewerPropertiesWidget(QWidget* parent = nullptr);
-  ~ViewerPropertiesWidget() override = default;
+  explicit AbstractPropertiesWidget(QWidget* parent = nullptr);
+  ~AbstractPropertiesWidget() override = default;
 
-  void setViewer(g2o::G2oQGLViewer* viewer);
-  g2o::PropertyMap* propertyMap() override;
+  virtual g2o::PropertyMap* propertyMap() = 0;
+
+  void on_btnApply_clicked();
+  void on_btnOK_clicked();
 
  protected:
-  g2o::G2oQGLViewer* viewer_ = nullptr;
-  std::shared_ptr<g2o::PropertyMap> properties_;
+  std::vector<std::string> propNames_;
 
-  void applyProperties() override;
-  [[nodiscard]] std::string humanReadablePropName(
-      const std::string& propertyName) const override;
+  virtual void updateDisplayedProperties();
+  virtual void applyProperties();
+  [[nodiscard]] virtual std::string humanReadablePropName(
+      const std::string& propertyName) const;
 };
 
 #endif

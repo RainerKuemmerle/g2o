@@ -20,6 +20,7 @@
 
 #include <QApplication>
 #include <QThread>
+#include <memory>
 
 #include "g2o/apps/g2o_cli/dl_wrapper.h"
 #include "g2o/config.h"
@@ -65,18 +66,16 @@ int RunG2OViewer::run(int argc, char** argv, CommandArgs& arg) {
   StreamRedirect redirect(std::cerr, mw.plainTextEdit);
 
   // setting up the optimizer
-  auto* optimizer = new SparseOptimizer();
+  mw.viewer->graph = std::make_shared<SparseOptimizer>();
   // Loading the input data
   if (!loadLookup.empty()) {
-    optimizer->setRenamedTypesFromString(loadLookup);
+    mw.viewer->graph->setRenamedTypesFromString(loadLookup);
   }
-  mw.viewer->graph = optimizer;
 
   // set up the GUI action
   auto guiHyperGraphAction = std::make_shared<GuiHyperGraphAction>();
   guiHyperGraphAction->viewer = mw.viewer;
-  // optimizer->addPostIterationAction(&guiHyperGraphAction);
-  optimizer->addPreIterationAction(guiHyperGraphAction);
+  mw.viewer->graph->addPreIterationAction(guiHyperGraphAction);
 
   if (!inputFilename.empty()) {
     mw.loadFromFile(QString::fromStdString(inputFilename));
@@ -84,12 +83,12 @@ int RunG2OViewer::run(int argc, char** argv, CommandArgs& arg) {
 
   QCoreApplication* myapp = QApplication::instance();
   while (mw.isVisible()) {
+    // TODO(Rainer): Can this be moved to some qt event handling instead?
     guiHyperGraphAction->dumpScreenshots = mw.actionDump_Images->isChecked();
     if (myapp) QCoreApplication::processEvents();
     SleepThread::msleep(10);
   }
 
-  delete optimizer;
   return 0;
 }
 

@@ -29,10 +29,11 @@
 #include <cxxabi.h>
 #endif
 
+namespace {
 /**
  * demangle the name of a type, depends on the used compiler
  */
-static std::string demangleName(const std::string& fullPropName) {
+std::string demangleName(const std::string& fullPropName) {
 #ifdef __GNUC__
   // find :: and extract the mangled class name from the whole string
   std::string mangledName;
@@ -60,12 +61,13 @@ static std::string demangleName(const std::string& fullPropName) {
   return fullPropName;
 #endif
 }
+}  // namespace
 
 ViewerPropertiesWidget::ViewerPropertiesWidget(QWidget* parent)
-    : PropertiesWidget(parent) {}
+    : AbstractPropertiesWidget(parent) {}
 
 void ViewerPropertiesWidget::applyProperties() {
-  PropertiesWidget::applyProperties();
+  AbstractPropertiesWidget::applyProperties();
 
   // draw with the new properties
   viewer_->setUpdateDisplay(true);
@@ -74,10 +76,15 @@ void ViewerPropertiesWidget::applyProperties() {
 
 void ViewerPropertiesWidget::setViewer(g2o::G2oQGLViewer* viewer) {
   viewer_ = viewer;
-  setProperties(viewer->parameters().get());
+  updateDisplayedProperties();
 }
 
 std::string ViewerPropertiesWidget::humanReadablePropName(
     const std::string& propertyName) const {
   return demangleName(propertyName);
+}
+
+g2o::PropertyMap* ViewerPropertiesWidget::propertyMap() {
+  if (!viewer_) return nullptr;
+  return viewer_->parameters().get();
 }

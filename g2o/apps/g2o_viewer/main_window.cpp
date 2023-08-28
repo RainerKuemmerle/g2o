@@ -33,6 +33,7 @@
 #include "g2o/core/robust_kernel.h"
 #include "g2o/core/robust_kernel_factory.h"
 #include "g2o/core/sparse_optimizer.h"
+#include "properties_widget.h"
 #include "viewer_properties_widget.h"
 
 using std::cerr;
@@ -121,7 +122,7 @@ void MainWindow::on_btnInitialGuess_clicked() {
     case 1:
       // odometry
       {
-        g2o::EstimatePropagatorCostOdometry costFunction(viewer->graph);
+        g2o::EstimatePropagatorCostOdometry costFunction(viewer->graph.get());
         viewer->graph->computeInitialGuess(costFunction);
       }
       break;
@@ -242,7 +243,7 @@ bool MainWindow::load(const QString& filename) {
   if (!loadStatus) return false;
   lastSolver_ = -1;
   viewer->setUpdateDisplay(true);
-  g2o::SparseOptimizer* optimizer = viewer->graph;
+  g2o::SparseOptimizer* optimizer = viewer->graph.get();
 
   // update the solvers which are suitable for this graph
   const std::set<int> vertDims = optimizer->dimensions();
@@ -289,7 +290,7 @@ bool MainWindow::allocateSolver(bool& allocatedNewSolver) {
 }
 
 bool MainWindow::prepare() {
-  g2o::SparseOptimizer* optimizer = viewer->graph;
+  g2o::SparseOptimizer* optimizer = viewer->graph.get();
   if (currentOptimizationAlgorithmProperty_.requiresMarginalize) {
     cerr << "Marginalizing Landmarks" << endl;
     for (const auto& it : optimizer->vertices()) {
@@ -310,7 +311,7 @@ bool MainWindow::prepare() {
 }
 
 void MainWindow::setRobustKernel() {
-  g2o::SparseOptimizer* optimizer = viewer->graph;
+  g2o::SparseOptimizer* optimizer = viewer->graph.get();
   const bool robustKernel = cbRobustKernel->isChecked();
   const double huberWidth = leKernelWidth->text().toDouble();
   // odometry edges are those whose node ids differ by 1
@@ -396,12 +397,7 @@ void MainWindow::on_btnOptimizerParameters_clicked() {
     return;
   }
   if (allocatedNewSolver) prepare();
-  if (viewer->graph->solver()) {
-    optimizerPropertiesWidget_->setProperties(
-        const_cast<g2o::PropertyMap*>(&viewer->graph->solver()->properties()));
-  } else {
-    optimizerPropertiesWidget_->setProperties(nullptr);
-  }
+  optimizerPropertiesWidget_->setSolver(viewer->graph->solver());
   optimizerPropertiesWidget_->show();
 }
 

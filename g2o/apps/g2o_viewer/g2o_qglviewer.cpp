@@ -78,8 +78,8 @@ class StandardCamera : public qglviewer::Camera {
 
 }  // end anonymous namespace
 
-G2oQGLViewer::G2oQGLViewer(QWidget* parent, const QGLWidget* shareWidget)
-    : QGLViewer(parent, shareWidget), drawActions_(nullptr) {
+G2oQGLViewer::G2oQGLViewer(QWidget* parent, Qt::WindowFlags flags)
+    : QGLViewer(parent, flags), drawActions_(nullptr) {
   setAxisIsDrawn(false);
   drawActionParameters_ = std::make_shared<DrawAction::Parameters>();
 }
