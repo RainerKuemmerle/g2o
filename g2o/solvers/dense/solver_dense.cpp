@@ -46,13 +46,12 @@ std::unique_ptr<g2o::Solver> AllocateSolver() {
 
 std::unique_ptr<OptimizationAlgorithm> createSolver(
     const std::string& fullSolverName) {
-  static const OptimizationAlgorithmAllocator::AllocateSolverMap
-      kSolverFactories{
-          {"dense", &AllocateSolver<-1, -1>},
-          {"dense3_2", &AllocateSolver<3, 2>},
-          {"dense6_3", &AllocateSolver<6, 3>},
-          {"dense7_3", &AllocateSolver<7, 3>},
-      };
+  static const OptimizationAlgorithmAllocator::AllocateMap kSolverFactories{
+      {"dense", &AllocateSolver<-1, -1>},
+      {"dense3_2", &AllocateSolver<3, 2>},
+      {"dense6_3", &AllocateSolver<6, 3>},
+      {"dense7_3", &AllocateSolver<7, 3>},
+  };
 
   return OptimizationAlgorithmAllocator::allocate(fullSolverName,
                                                   kSolverFactories);

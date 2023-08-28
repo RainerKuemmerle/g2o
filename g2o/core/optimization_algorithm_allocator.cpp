@@ -32,6 +32,8 @@
 #include "g2o/core/optimization_algorithm_dogleg.h"
 #include "g2o/core/optimization_algorithm_gauss_newton.h"
 #include "g2o/core/optimization_algorithm_levenberg.h"
+#include "g2o/core/solver.h"
+#include "g2o/stuff/logger.h"
 #include "optimization_algorithm.h"
 
 namespace g2o {
@@ -53,29 +55,19 @@ std::unique_ptr<OptimizationAlgorithm> OptimizationAlgorithmAllocator::allocate(
         new OptimizationAlgorithmLevenberg(solver_allocator->second()));
   }
   if (methodName == "dl") {
+    std::unique_ptr<Solver> solver = solver_allocator->second();
+    if (!dynamic_cast<BlockSolverBase*>(solver.get())) {
+      G2O_ERROR(
+          "Requested Dogleg algorithm but no suitable linear solver provided");
+      return nullptr;
+    }
+    // cast to BlockSolver to construct the dogleg solver
+    auto block_solver = std::unique_ptr<BlockSolverBase>(
+        static_cast<BlockSolverBase*>(solver.release()));
     return std::unique_ptr<OptimizationAlgorithm>(
-        new OptimizationAlgorithmDogleg(solver_allocator->second()));
+        new OptimizationAlgorithmDogleg(std::move(block_solver)));
   }
 
-  return nullptr;
-}
-
-std::unique_ptr<OptimizationAlgorithm> OptimizationAlgorithmAllocator::allocate(
-    std::string_view fullSolverName, const AllocateSolverMap& allocate_map) {
-  const std::string solverName(fullSolverName.substr(3));
-  auto solver_allocator = allocate_map.find(solverName);
-  if (solver_allocator == allocate_map.end()) return nullptr;
-
-  const std::string_view methodName = fullSolverName.substr(0, 2);
-
-  if (methodName == "gn") {
-    return std::unique_ptr<OptimizationAlgorithm>(
-        new OptimizationAlgorithmGaussNewton(solver_allocator->second()));
-  }
-  if (methodName == "lm") {
-    return std::unique_ptr<OptimizationAlgorithm>(
-        new OptimizationAlgorithmLevenberg(solver_allocator->second()));
-  }
   return nullptr;
 }
 

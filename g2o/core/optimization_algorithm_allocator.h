@@ -45,14 +45,9 @@ class OptimizationAlgorithm;
  */
 struct G2O_CORE_API OptimizationAlgorithmAllocator {
   using AllocateMap =
-      std::unordered_map<std::string,
-                         std::function<std::unique_ptr<BlockSolverBase>()>>;
-  using AllocateSolverMap =
       std::unordered_map<std::string, std::function<std::unique_ptr<Solver>()>>;
   static std::unique_ptr<OptimizationAlgorithm> allocate(
       std::string_view fullSolverName, const AllocateMap& allocate_map);
-  static std::unique_ptr<OptimizationAlgorithm> allocate(
-      std::string_view fullSolverName, const AllocateSolverMap& allocate_map);
 };
 
 }  // namespace g2o
