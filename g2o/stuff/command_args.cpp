@@ -33,7 +33,6 @@
 #include <functional>
 
 #include "misc.h"
-#include "os_specific.h"
 #include "string_tools.h"
 
 namespace g2o {

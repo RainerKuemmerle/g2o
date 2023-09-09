@@ -2,8 +2,8 @@ add_library(stuff ${G2O_LIB_TYPE}
   filesys_tools.h    string_tools.h
   color_macros.h     macros.h         timeutil.cpp
   command_args.cpp   misc.h           sparse_helper.cpp  timeutil.h
-  command_args.h     os_specific.c    sparse_helper.h
-  filesys_tools.cpp  os_specific.h    string_tools.cpp
+  command_args.h     sparse_helper.h
+  filesys_tools.cpp  string_tools.cpp
   property.cpp       property.h       tuple_tools.h
   sampler.cpp        sampler.h        unscented.h
   tictoc.cpp tictoc.h

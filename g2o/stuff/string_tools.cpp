@@ -37,11 +37,43 @@
 
 #include "logger.h"
 #include "macros.h"
-#include "os_specific.h"
 
 #if (defined(UNIX) || defined(CYGWIN)) && !defined(ANDROID)
 #include <wordexp.h>
 #endif
+
+namespace {
+
+int my_vasprintf(char** strp, const char* fmt, va_list ap) {
+  int size = 100;
+
+  char* p = static_cast<char*>(malloc(size * sizeof(char)));
+  if (p == nullptr) return -1;
+
+  while (true) {
+#ifdef _MSC_VER
+    int n = vsnprintf_s(p, size, size - 1, fmt, ap);
+#else
+    int n = vsnprintf(p, size, fmt, ap);
+#endif
+    if (n > -1 && n < size) {
+      *strp = p;
+      return n;
+    }
+    if (n > -1)
+      size = n + 1;
+    else
+      size *= 2;
+    char* np = static_cast<char*>(realloc(p, size * sizeof(char)));
+    if (np == nullptr) {
+      free(p);
+      return -1;
+    }
+    p = np;
+  }
+}
+
+}  // namespace
 
 namespace g2o {
 
@@ -89,7 +121,7 @@ std::string formatString(const char* fmt, ...) {
   char* auxPtr = nullptr;
   va_list arg_list;
   va_start(arg_list, fmt);
-  const int numChar = vasprintf(&auxPtr, fmt, arg_list);
+  const int numChar = my_vasprintf(&auxPtr, fmt, arg_list);
   va_end(arg_list);
   std::string retString;
   if (numChar != -1)
@@ -105,7 +137,7 @@ int strPrintf(std::string& str, const char* fmt, ...) {
   char* auxPtr = nullptr;
   va_list arg_list;
   va_start(arg_list, fmt);
-  const int numChars = vasprintf(&auxPtr, fmt, arg_list);
+  const int numChars = my_vasprintf(&auxPtr, fmt, arg_list);
   va_end(arg_list);
   str = auxPtr;
   free(auxPtr);

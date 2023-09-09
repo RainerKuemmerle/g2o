@@ -26,7 +26,7 @@
 
 #include <gtest/gtest.h>
 
-#include "g2o/stuff/os_specific.h"
+#include "g2o/stuff/sampler.h"
 #include "g2o/types/slam2d/edge_pointxy.h"
 #include "g2o/types/slam2d/edge_se2.h"
 #include "g2o/types/slam2d/edge_se2_pointxy.h"
@@ -36,7 +36,9 @@
 
 using namespace g2o;  // NOLINT
 
-static SE2 randomSE2() { return SE2(Vector3::Random()); }
+namespace {
+SE2 randomSE2() { return SE2(Vector3::Random()); }
+}  // namespace
 
 TEST(Slam2D, EdgeSE2Jacobian) {
   auto v1 = std::make_shared<VertexSE2>();
@@ -157,7 +159,7 @@ TEST(Slam2D, EdgeSE2PointXYBearingJacobian) {
   for (int k = 0; k < 10000; ++k) {
     v1->setEstimate(randomSE2());
     v2->setEstimate(Eigen::Vector2d::Random());
-    e.setMeasurement(drand48() * M_PI);
+    e.setMeasurement(sampleUniform(0., 1.) * M_PI);
 
     evaluateJacobian(e, jacobianWorkspace, numericJacobianWorkspace);
   }
