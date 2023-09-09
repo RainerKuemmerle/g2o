@@ -121,7 +121,7 @@ bool OptimizableGraph::Edge::resolveParameters() {
   }
 
   assert(parameters_.size() == parameterIds_.size());
-  for (size_t i = 0; i < parameters_.size(); i++) {
+  for (decltype(parameters_)::size_type i = 0; i < parameters_.size(); i++) {
     const int index = parameterIds_[i];
     parameters_[i] = graph()->parameter(index);
 #ifndef NDEBUG
@@ -454,14 +454,16 @@ bool OptimizableGraph::load(std::istream& is) {
       } else {
         string buff;  // reading the IDs of a dynamically sized edge
         while (currentLine >> buff) {
+          // TODO(rainer): reading/writing multi dynamically sized edges is a
+          // bad design. Get rid of writing || in the edges
           if (buff == "||") break;
-          ids.push_back(atoi(buff.c_str()));
+          ids.push_back(stoi(buff));
           currentLine >> buff;
         }
         e->resize(numV);
       }
       bool vertsOkay = true;
-      for (size_t l = 0; l < ids.size(); ++l) {
+      for (vector<int>::size_type l = 0; l < ids.size(); ++l) {
         const int vertexId = ids[l];
         if (vertexId != HyperGraph::kUnassignedId) {
           auto v = vertex(vertexId);
@@ -802,9 +804,9 @@ bool OptimizableGraph::verifyInformationMatrices(bool verbose) const {
     allEdgeOk = allEdgeOk && okay;
     if (!okay) {
       if (verbose) {
-        vector<int> ids(e->vertices().size());
-        for (size_t i = 0; i < e->vertices().size(); ++i)
-          ids[i] = e->vertex(i)->id();
+        vector<int> ids;
+        ids.reserve(e->vertices().size());
+        for (const auto& v : e->vertices()) ids.push_back(v->id());
         if (!isSymmetric)
           G2O_WARN("Information Matrix for an edge is not symmetric: {}",
                    fmt::join(ids, " "));
