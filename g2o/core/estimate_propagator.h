@@ -27,8 +27,10 @@
 #ifndef G2O_ESTIMATE_PROPAGATOR_H
 #define G2O_ESTIMATE_PROPAGATOR_H
 
+#include <cstddef>
 #include <limits>
 #include <map>
+#include <memory>
 #include <string_view>
 #include <unordered_map>
 
@@ -37,6 +39,7 @@
 #include "sparse_optimizer.h"
 
 namespace g2o {
+class SparseOptimizer;
 
 /**
  * \brief cost for traversing along active edges in the optimizer

@@ -27,14 +27,14 @@
 #include "hyper_dijkstra.h"
 
 #include <cassert>
+#include <cstddef>
 #include <deque>
-#include <iostream>
 #include <queue>
+#include <unordered_map>
 #include <utility>
-#include <vector>
 
+#include "g2o/core/hyper_graph.h"
 #include "g2o/stuff/logger.h"
-#include "g2o/stuff/macros.h"
 
 namespace g2o {
 

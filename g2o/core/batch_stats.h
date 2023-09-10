@@ -27,6 +27,7 @@
 #ifndef G2O_BATCH_STATS_H_
 #define G2O_BATCH_STATS_H_
 
+#include <cstddef>
 #include <iostream>
 #include <vector>
 

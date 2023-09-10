@@ -26,9 +26,12 @@
 
 #include "jacobian_workspace.h"
 
+#include <algorithm>
 #include <cassert>
-#include <cmath>
+#include <map>
+#include <memory>
 
+#include "g2o/core/hyper_graph.h"
 #include "optimizable_graph.h"
 
 namespace g2o {

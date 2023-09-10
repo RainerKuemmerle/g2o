@@ -19,7 +19,6 @@
 #include "opengl_primitives.h"
 
 #include <cmath>
-#include <cstdlib>
 
 #ifdef __APPLE__
 #include <OpenGL/glu.h>

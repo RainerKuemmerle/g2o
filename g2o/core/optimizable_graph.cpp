@@ -26,29 +26,26 @@
 
 #include "optimizable_graph.h"
 
-#include <Eigen/Dense>
+#include <Eigen/Eigenvalues>
 #include <algorithm>
 #include <cassert>
-#include <fstream>
-#include <iomanip>
 #include <iostream>
 #include <iterator>
 #include <memory>
-#include <sstream>
+#include <unordered_map>
 #include <utility>
 
 #include "cache.h"
-#include "estimate_propagator.h"
 #include "factory.h"
-#include "g2o/stuff/color_macros.h"
+#include "g2o/core/hyper_graph.h"
+#include "g2o/core/jacobian_workspace.h"
+#include "g2o/core/parameter.h"
+#include "g2o/core/parameter_container.h"
 #include "g2o/stuff/logger.h"
 #include "g2o/stuff/logger_format.h"
-#include "g2o/stuff/macros.h"
-#include "g2o/stuff/misc.h"
 #include "g2o/stuff/string_tools.h"
 #include "hyper_graph_action.h"
 #include "optimization_algorithm_property.h"
-#include "robust_kernel.h"
 
 namespace g2o {
 

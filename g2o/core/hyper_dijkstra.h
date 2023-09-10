@@ -29,8 +29,10 @@
 
 #include <limits>
 #include <map>
+#include <memory>
 #include <set>
 
+#include "g2o/core/g2o_core_api.h"
 #include "hyper_graph.h"
 
 namespace g2o {

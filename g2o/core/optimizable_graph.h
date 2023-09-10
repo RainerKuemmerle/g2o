@@ -27,11 +27,17 @@
 #ifndef G2O_AIS_OPTIMIZABLE_GRAPH_HH_
 #define G2O_AIS_OPTIMIZABLE_GRAPH_HH_
 
+#include <Eigen/Core>
+#include <cstddef>
+#include <cstdint>
 #include <functional>
 #include <iostream>
+#include <map>
 #include <memory>
 #include <set>
+#include <string>
 #include <typeinfo>
+#include <vector>
 
 #include "g2o/core/eigen_types.h"
 #include "g2o/stuff/macros.h"

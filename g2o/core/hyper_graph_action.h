@@ -29,6 +29,7 @@
 
 #include <iosfwd>
 #include <iostream>
+#include <map>
 #include <memory>
 #include <string>
 #include <typeinfo>
@@ -43,6 +44,7 @@
 namespace g2o {
 
 class CacheContainer;
+
 /**
  * \brief Abstract action that operates on an entire graph
  */

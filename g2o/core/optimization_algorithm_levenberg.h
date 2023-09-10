@@ -27,8 +27,12 @@
 #ifndef G2O_SOLVER_LEVENBERG_H
 #define G2O_SOLVER_LEVENBERG_H
 
+#include <iosfwd>
 #include <memory>
 
+#include "g2o/core/solver.h"
+#include "g2o/stuff/misc.h"
+#include "g2o/stuff/property.h"
 #include "g2o_core_api.h"
 #include "optimization_algorithm_with_hessian.h"
 

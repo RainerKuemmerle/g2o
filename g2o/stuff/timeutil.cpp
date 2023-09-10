@@ -26,8 +26,6 @@
 
 #include "timeutil.h"
 
-#include <iostream>
-
 #include "g2o/stuff/logger.h"
 
 namespace g2o {

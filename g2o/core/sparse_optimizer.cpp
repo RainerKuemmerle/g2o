@@ -26,18 +26,24 @@
 
 #include "sparse_optimizer.h"
 
+#include <stdlib.h>
+
+#include <Eigen/Core>
 #include <algorithm>
 #include <cassert>
-#include <iomanip>
 #include <iostream>
-#include <iterator>
+#include <new>
+#include <set>
+#include <string_view>
+#include <unordered_map>
 #include <utility>
 
 #include "batch_stats.h"
 #include "estimate_propagator.h"
-#include "g2o/config.h"
 #include "g2o/core/eigen_types.h"
+#include "g2o/core/jacobian_workspace.h"
 #include "g2o/core/optimizable_graph.h"
+#include "g2o/core/sparse_block_matrix.h"
 #include "g2o/stuff/logger.h"
 #include "g2o/stuff/macros.h"
 #include "g2o/stuff/misc.h"

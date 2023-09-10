@@ -30,6 +30,7 @@
 #include <bitset>
 #include <cassert>
 #include <cstddef>
+#include <iosfwd>
 #include <memory>
 #include <set>
 #include <unordered_map>

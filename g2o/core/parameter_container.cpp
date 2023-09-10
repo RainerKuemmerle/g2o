@@ -28,11 +28,11 @@
 
 #include <cassert>
 #include <iostream>
+#include <utility>
 
 #include "factory.h"
-#include "g2o/stuff/color_macros.h"
+#include "g2o/core/hyper_graph.h"
 #include "g2o/stuff/logger.h"
-#include "g2o/stuff/macros.h"
 #include "g2o/stuff/string_tools.h"
 #include "parameter.h"
 

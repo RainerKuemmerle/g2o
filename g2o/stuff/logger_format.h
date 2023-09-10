@@ -36,7 +36,7 @@
 #if FMT_VERSION >= 90000
 // see https://fmt.dev/9.0.0/api.html#std-ostream-support
 
-#include <Eigen/Dense>
+#include <Eigen/Core>
 
 template <typename T>
 struct fmt::formatter<

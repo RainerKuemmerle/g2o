@@ -31,9 +31,11 @@
 #include <map>
 #include <memory>
 #include <string>
+#include <vector>
 
 #include "creators.h"
 #include "g2o/config.h"
+#include "g2o/core/g2o_core_api.h"
 #include "g2o/stuff/misc.h"  // ForceLinker for the macros
 #include "hyper_graph.h"
 

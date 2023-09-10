@@ -26,7 +26,6 @@
 
 #include "solver.h"
 
-#include <algorithm>
 #include <cstring>
 
 #include "dynamic_aligned_buffer.hpp"

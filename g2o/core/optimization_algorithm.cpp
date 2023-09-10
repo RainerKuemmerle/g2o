@@ -26,6 +26,10 @@
 
 #include "optimization_algorithm.h"
 
+#include <map>
+#include <memory>
+#include <ostream>
+
 namespace g2o {
 
 void OptimizationAlgorithm::printProperties(std::ostream& os) const {

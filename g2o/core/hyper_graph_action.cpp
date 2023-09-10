@@ -26,14 +26,14 @@
 
 #include "hyper_graph_action.h"
 
-#include <iostream>
 #include <list>
+#include <typeinfo>
+#include <unordered_map>
 #include <utility>
 
 #include "cache.h"
+#include "g2o/core/hyper_graph.h"
 #include "g2o/stuff/logger.h"
-#include "g2o/stuff/macros.h"
-#include "optimizable_graph.h"
 
 namespace g2o {
 

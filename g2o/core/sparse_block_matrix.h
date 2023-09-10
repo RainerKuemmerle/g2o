@@ -275,6 +275,6 @@ using SparseBlockMatrixX = SparseBlockMatrix<MatrixX>;
 
 }  // namespace g2o
 
-#include "sparse_block_matrix.hpp"
+#include "sparse_block_matrix.hpp"  // IWYU pragma: export
 
 #endif

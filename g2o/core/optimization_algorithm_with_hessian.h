@@ -27,12 +27,21 @@
 #ifndef G2O_OPTIMIZATION_ALGORITHM_WITH_HESSIAN_H
 #define G2O_OPTIMIZATION_ALGORITHM_WITH_HESSIAN_H
 
+#include <memory>
+#include <utility>
+#include <vector>
+
+#include "g2o/core/eigen_types.h"
+#include "g2o/core/hyper_graph.h"
+#include "g2o/core/sparse_block_matrix.h"
 #include "g2o_core_api.h"
 #include "optimization_algorithm.h"
 
 namespace g2o {
 
 class Solver;
+template <typename T>
+class Property;
 
 /**
  * \brief Base for solvers operating on the approximated Hessian, e.g.,

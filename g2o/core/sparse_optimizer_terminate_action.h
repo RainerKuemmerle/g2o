@@ -27,12 +27,15 @@
 #ifndef SPARSE_OPTIMIZER_TERMINATE_ACTION_H
 #define SPARSE_OPTIMIZER_TERMINATE_ACTION_H
 
+#include <memory>
+
 #include "g2o_core_api.h"
 #include "hyper_graph_action.h"
 
 namespace g2o {
 
 class SparseOptimizer;
+class HyperGraph;
 
 /**
  * \brief stop iterating based on the gain which is (oldChi - currentChi) /

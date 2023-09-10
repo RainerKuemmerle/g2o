@@ -29,13 +29,11 @@
 #include <cassert>
 #include <iostream>
 #include <typeinfo>
+#include <utility>
 
-#include "cache.h"
 #include "creators.h"
-#include "g2o/stuff/color_macros.h"
 #include "g2o/stuff/logger.h"
-#include "optimizable_graph.h"
-#include "parameter.h"
+#include "hyper_graph.h"
 
 namespace g2o {
 

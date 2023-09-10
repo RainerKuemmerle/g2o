@@ -30,6 +30,7 @@
 #include <iostream>
 #include <list>
 #include <memory>
+#include <string>
 
 #include "g2o/config.h"
 #include "g2o/stuff/misc.h"  // ForceLinker for the macros
@@ -41,6 +42,7 @@
 // #define G2O_DEBUG_OPTIMIZATION_ALGORITHM_FACTORY
 
 namespace g2o {
+class OptimizationAlgorithm;
 
 /**
  * \brief base for allocating an optimization algorithm

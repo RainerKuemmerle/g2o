@@ -28,9 +28,7 @@
 
 #include <algorithm>
 #include <cstdlib>
-#include <cstring>
-#include <fstream>
-#include <functional>
+#include <utility>
 
 #include "misc.h"
 #include "string_tools.h"

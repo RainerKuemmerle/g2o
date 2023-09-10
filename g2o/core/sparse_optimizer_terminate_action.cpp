@@ -29,6 +29,9 @@
 #include <cassert>
 #include <limits>
 
+#include "g2o/core/hyper_graph.h"
+#include "g2o/core/hyper_graph_action.h"
+#include "g2o/stuff/misc.h"
 #include "sparse_optimizer.h"
 
 namespace g2o {

@@ -26,11 +26,15 @@
 
 #include "optimization_algorithm_factory.h"
 
+#include <algorithm>
 #include <cassert>
+#include <cstddef>
 #include <iostream>
 #include <typeinfo>
 #include <utility>
 
+#include "g2o/core/optimization_algorithm.h"
+#include "g2o/core/optimization_algorithm_property.h"
 #include "g2o/stuff/logger.h"
 
 namespace g2o {

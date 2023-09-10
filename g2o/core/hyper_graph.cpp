@@ -28,8 +28,6 @@
 
 #include <algorithm>
 #include <cassert>
-#include <iterator>
-#include <queue>
 #include <unordered_set>
 
 namespace g2o {

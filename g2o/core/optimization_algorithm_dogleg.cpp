@@ -26,12 +26,20 @@
 
 #include "optimization_algorithm_dogleg.h"
 
+#include <Eigen/Core>
+#include <algorithm>
 #include <cassert>
+#include <cmath>
 #include <iostream>
+#include <utility>
 
 #include "batch_stats.h"
 #include "block_solver.h"
+#include "g2o/core/optimization_algorithm.h"
+#include "g2o/core/optimization_algorithm_with_hessian.h"
 #include "g2o/stuff/logger.h"
+#include "g2o/stuff/misc.h"
+#include "g2o/stuff/property.h"
 #include "g2o/stuff/timeutil.h"
 #include "solver.h"
 #include "sparse_optimizer.h"

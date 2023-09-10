@@ -29,6 +29,7 @@
 
 #include <Eigen/Core>
 #include <cassert>
+#include <cstddef>
 #include <vector>
 
 #include "g2o/core/eigen_types.h"

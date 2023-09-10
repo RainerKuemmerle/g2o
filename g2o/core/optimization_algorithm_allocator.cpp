@@ -27,8 +27,9 @@
 #include "optimization_algorithm_allocator.h"
 
 #include <memory>
+#include <utility>
 
-#include "block_solver.h"
+#include "block_solver.h"  // IWYU pragma: keep
 #include "g2o/core/optimization_algorithm_dogleg.h"
 #include "g2o/core/optimization_algorithm_gauss_newton.h"
 #include "g2o/core/optimization_algorithm_levenberg.h"

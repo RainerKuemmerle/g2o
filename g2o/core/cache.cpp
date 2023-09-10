@@ -26,7 +26,7 @@
 
 #include "cache.h"
 
-#include <iostream>
+#include <algorithm>
 #include <utility>
 
 #include "factory.h"

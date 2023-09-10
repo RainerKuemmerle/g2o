@@ -40,19 +40,9 @@
 // clang-format on
 
 #include <sys/stat.h>
-#include <sys/types.h>
-
-#include <cstdio>
-#include <ctime>
-#include <iostream>
 
 #if (defined(UNIX) || defined(CYGWIN)) && !defined(ANDROID)
 #include <wordexp.h>
-#endif
-
-#ifdef __APPLE__
-// #include <chrono>
-// #include <thread>
 #endif
 
 namespace g2o {

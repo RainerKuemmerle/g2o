@@ -26,10 +26,13 @@
 
 #include "marginal_covariance_cholesky.h"
 
+#include <Eigen/Core>
 #include <algorithm>
 #include <cassert>
+#include <cstddef>
 
 #include "g2o/core/eigen_types.h"
+#include "g2o/core/sparse_block_matrix.h"
 
 namespace g2o {
 

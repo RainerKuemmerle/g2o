@@ -27,11 +27,22 @@
 
 #include "optimization_algorithm_levenberg.h"
 
+#include <Eigen/Core>
+#include <algorithm>
 #include <cassert>
+#include <cmath>
+#include <cstddef>
 #include <iostream>
+#include <limits>
+#include <utility>
+#include <vector>
 
 #include "batch_stats.h"
+#include "g2o/core/eigen_types.h"
+#include "g2o/core/optimization_algorithm.h"
+#include "g2o/core/optimization_algorithm_with_hessian.h"
 #include "g2o/stuff/logger.h"
+#include "g2o/stuff/macros.h"
 #include "g2o/stuff/timeutil.h"
 #include "solver.h"
 #include "sparse_optimizer.h"

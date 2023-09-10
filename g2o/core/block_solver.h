@@ -203,6 +203,6 @@ using BlockSolver_3_2 = BlockSolverPL<3, 2>;
 
 }  // namespace g2o
 
-#include "block_solver.hpp"
+#include "block_solver.hpp"  // IWYU pragma: export
 
 #endif

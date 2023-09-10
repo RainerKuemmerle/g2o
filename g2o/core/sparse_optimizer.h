@@ -28,8 +28,12 @@
 #define G2O_GRAPH_OPTIMIZER_CHOL_H_
 
 #include <memory>
+#include <utility>
+#include <vector>
 
 #include "batch_stats.h"
+#include "g2o/core/eigen_types.h"
+#include "g2o/core/hyper_graph.h"
 #include "g2o/stuff/macros.h"
 #include "g2o_core_api.h"
 #include "optimizable_graph.h"
@@ -40,6 +44,7 @@ namespace g2o {
 // forward declaration
 class OptimizationAlgorithm;
 class EstimatePropagatorCost;
+class HyperGraphAction;
 
 class G2O_CORE_API SparseOptimizer : public OptimizableGraph {
  public:

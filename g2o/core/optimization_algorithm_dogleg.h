@@ -27,14 +27,18 @@
 #ifndef G2O_OPTIMIZATION_ALGORITHM_DOGLEG_H
 #define G2O_OPTIMIZATION_ALGORITHM_DOGLEG_H
 
+#include <iosfwd>
 #include <memory>
 
+#include "g2o/core/eigen_types.h"
 #include "g2o_core_api.h"
 #include "optimization_algorithm_with_hessian.h"
 
 namespace g2o {
 
 class BlockSolverBase;
+template <typename T>
+class Property;
 
 /**
  * \brief Implementation of Powell's Dogleg Algorithm

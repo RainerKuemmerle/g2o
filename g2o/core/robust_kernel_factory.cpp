@@ -27,6 +27,7 @@
 #include "robust_kernel_factory.h"
 
 #include <cassert>
+#include <utility>
 
 #include "g2o/stuff/logger.h"
 

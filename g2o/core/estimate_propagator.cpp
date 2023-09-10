@@ -28,10 +28,13 @@
 
 #include <algorithm>
 #include <cassert>
-#include <fstream>
-#include <iostream>
-#include <queue>
+#include <cmath>
+#include <cstdlib>
+#include <utility>
 #include <vector>
+
+#include "g2o/core/optimizable_graph.h"
+#include "g2o/core/sparse_optimizer.h"
 
 // #define DEBUG_ESTIMATE_PROPAGATOR
 

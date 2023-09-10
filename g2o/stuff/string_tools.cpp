@@ -30,13 +30,10 @@
 #include <cctype>
 #include <cstdarg>
 #include <cstdio>
-#include <cstring>
-#include <iostream>
 #include <iterator>
 #include <string>
 
 #include "logger.h"
-#include "macros.h"
 
 #if (defined(UNIX) || defined(CYGWIN)) && !defined(ANDROID)
 #include <wordexp.h>

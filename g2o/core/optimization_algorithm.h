@@ -28,9 +28,11 @@
 #define G2O_OPTIMIZATION_ALGORITHM_H
 
 #include <iosfwd>
+#include <string>
 #include <utility>
 #include <vector>
 
+#include "g2o/core/eigen_types.h"
 #include "g2o/stuff/property.h"
 #include "g2o_core_api.h"
 #include "hyper_graph.h"

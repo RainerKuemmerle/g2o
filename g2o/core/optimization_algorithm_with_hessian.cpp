@@ -27,9 +27,8 @@
 #include "optimization_algorithm_with_hessian.h"
 
 #include <cassert>
-#include <iostream>
 
-#include "optimizable_graph.h"
+#include "g2o/stuff/property.h"
 #include "solver.h"
 #include "sparse_optimizer.h"
 

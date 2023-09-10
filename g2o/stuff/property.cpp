@@ -26,11 +26,9 @@
 
 #include "property.h"
 
-#include <iostream>
 #include <vector>
 
 #include "logger.h"
-#include "macros.h"
 #include "string_tools.h"
 
 namespace g2o {

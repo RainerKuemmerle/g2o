@@ -29,7 +29,9 @@
 
 #include <iosfwd>
 #include <memory>
+#include <vector>
 
+#include "g2o/core/g2o_core_api.h"
 #include "hyper_graph.h"
 
 namespace g2o {

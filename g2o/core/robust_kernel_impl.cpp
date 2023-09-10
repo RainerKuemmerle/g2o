@@ -26,9 +26,12 @@
 
 #include "robust_kernel_impl.h"
 
+#include <Eigen/Core>
 #include <cmath>
+#include <memory>
 #include <utility>
 
+#include "g2o/core/robust_kernel.h"
 #include "robust_kernel_factory.h"
 
 namespace g2o {
