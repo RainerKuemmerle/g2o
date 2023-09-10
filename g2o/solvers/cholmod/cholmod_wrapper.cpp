@@ -26,7 +26,9 @@
 
 #include "cholmod_wrapper.h"
 
-#include <cholmod.h>
+#include <cholmod.h>  // IWYU pragma: keep
+#include <cholmod_cholesky.h>
+#include <cholmod_core.h>
 
 #include <cassert>
 #include <cstring>

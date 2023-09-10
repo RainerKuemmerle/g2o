@@ -26,10 +26,17 @@
 
 #include "solver_slam2d_linear.h"
 
+#include <stddef.h>
+
 #include <Eigen/Core>
 #include <cassert>
+#include <map>
+#include <utility>
+#include <vector>
 
+#include "g2o/core/eigen_types.h"
 #include "g2o/core/hyper_dijkstra.h"
+#include "g2o/core/hyper_graph.h"
 #include "g2o/core/solver.h"
 #include "g2o/core/sparse_block_matrix.h"
 #include "g2o/core/sparse_optimizer.h"
@@ -37,6 +44,8 @@
 #include "g2o/stuff/logger.h"
 #include "g2o/stuff/misc.h"
 #include "g2o/types/slam2d/edge_se2.h"
+#include "se2.h"
+#include "vertex_se2.h"
 
 namespace g2o {
 

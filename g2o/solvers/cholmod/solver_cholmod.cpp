@@ -25,17 +25,20 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <memory>
+#include <string>
+#include <utility>
 
 #include "g2o/core/block_solver.h"
 #include "g2o/core/optimization_algorithm_allocator.h"
 #include "g2o/core/optimization_algorithm_factory.h"
+#include "g2o/core/optimization_algorithm_property.h"
 #include "g2o/stuff/logger.h"
-#include "g2o/stuff/macros.h"
-#include "linear_solver_cholmod.h"
+#include "linear_solver_cholmod.h"  // IWYU pragma: keep
 
 // #define ADD_SCALAR_ORDERING
 
 namespace g2o {
+class OptimizationAlgorithm;
 
 namespace {
 template <int P, int L, bool Blockorder>
@@ -78,7 +81,7 @@ G2O_REGISTER_OPTIMIZATION_ALGORITHM(
     std::make_shared<CholmodSolverCreator>(OptimizationAlgorithmProperty(
         "gn_var_cholmod",
         "Gauss-Newton: Cholesky solver using CHOLMOD (variable blocksize)",
-        "CHOLMOD", false, Eigen::Dynamic, Eigen::Dynamic)));
+        "CHOLMOD", false, -1, -1)));
 G2O_REGISTER_OPTIMIZATION_ALGORITHM(
     gn_fix3_2_cholmod,
     std::make_shared<CholmodSolverCreator>(OptimizationAlgorithmProperty(
@@ -102,7 +105,7 @@ G2O_REGISTER_OPTIMIZATION_ALGORITHM(
     std::make_shared<CholmodSolverCreator>(OptimizationAlgorithmProperty(
         "lm_var_cholmod",
         "Levenberg: Cholesky solver using CHOLMOD (variable blocksize)",
-        "CHOLMOD", false, Eigen::Dynamic, Eigen::Dynamic)));
+        "CHOLMOD", false, -1, -1)));
 G2O_REGISTER_OPTIMIZATION_ALGORITHM(
     lm_fix3_2_cholmod,
     std::make_shared<CholmodSolverCreator>(OptimizationAlgorithmProperty(
@@ -126,5 +129,5 @@ G2O_REGISTER_OPTIMIZATION_ALGORITHM(
     std::make_shared<CholmodSolverCreator>(OptimizationAlgorithmProperty(
         "dl_var_cholmod",
         "Dogleg: Cholesky solver using CHOLMOD (variable blocksize)", "CHOLMOD",
-        false, Eigen::Dynamic, Eigen::Dynamic)));
+        false, -1, -1)));
 }  // namespace g2o

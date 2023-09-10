@@ -25,15 +25,16 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <memory>
+#include <string>
+#include <utility>
 
 #include "g2o/core/block_solver.h"
 #include "g2o/core/optimization_algorithm.h"
 #include "g2o/core/optimization_algorithm_factory.h"
+#include "g2o/core/optimization_algorithm_property.h"
 #include "g2o/core/solver.h"
-#include "g2o/core/sparse_optimizer.h"
-#include "g2o/solvers/eigen/linear_solver_eigen.h"
+#include "g2o/solvers/eigen/linear_solver_eigen.h"  // IWYU pragma: keep
 #include "g2o/stuff/logger.h"
-#include "g2o/stuff/macros.h"
 #include "solver_slam2d_linear.h"
 
 namespace g2o {

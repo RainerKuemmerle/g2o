@@ -26,8 +26,7 @@
 
 #include "csparse_wrapper.h"
 
-#include <cassert>
-#include <cstddef>
+#include <Eigen/Core>
 #include <cstring>
 #include <memory>
 

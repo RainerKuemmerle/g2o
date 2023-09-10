@@ -24,15 +24,20 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+#include <Eigen/Core>
 #include <memory>
+#include <string>
+#include <utility>
 
 #include "g2o/core/block_solver.h"
 #include "g2o/core/optimization_algorithm_allocator.h"
 #include "g2o/core/optimization_algorithm_factory.h"
-#include "g2o/core/sparse_optimizer.h"
-#include "linear_solver_csparse.h"
+#include "g2o/core/optimization_algorithm_property.h"
+#include "g2o/stuff/logger.h"
+#include "linear_solver_csparse.h"  // IWYU pragma: keep
 
 namespace g2o {
+class OptimizationAlgorithm;
 
 namespace {
 template <int P, int L, bool Blockorder>

@@ -20,11 +20,12 @@
 
 #include "csparse_extension.h"
 
+#include <cs.h>
+
 #include <cassert>
-#include <iostream>
+#include <cmath>
 
 #include "g2o/stuff/logger.h"
-#include "g2o/stuff/macros.h"
 
 namespace g2o::csparse_extension {
 

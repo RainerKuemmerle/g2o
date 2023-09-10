@@ -24,17 +24,21 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+#include <Eigen/Core>
 #include <memory>
+#include <string>
 
 #include "g2o/core/block_solver.h"
 #include "g2o/core/optimization_algorithm_allocator.h"
 #include "g2o/core/optimization_algorithm_factory.h"
-#include "g2o/core/solver.h"
+#include "g2o/core/optimization_algorithm_property.h"
 #include "g2o/stuff/logger.h"
-#include "g2o/stuff/macros.h"
-#include "linear_solver_pcg.h"
+#include "linear_solver_pcg.h"  // IWYU pragma: keep
 
 namespace g2o {
+class OptimizationAlgorithm;
+class Solver;
+
 namespace {
 template <int P, int L>
 std::unique_ptr<g2o::Solver> AllocateSolver() {

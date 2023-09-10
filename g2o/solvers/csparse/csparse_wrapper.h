@@ -28,6 +28,7 @@
 #define G2O_CSPARSE_WRAPPER_H
 
 #include <memory>
+#include <string>
 
 #include "g2o/core/eigen_types.h"
 
@@ -92,6 +93,7 @@ class CSparse {
 
  private:
   class Impl;
+
   std::unique_ptr<Impl> pImpl_;
 };
 

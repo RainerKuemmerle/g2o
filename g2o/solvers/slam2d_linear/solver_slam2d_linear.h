@@ -27,10 +27,14 @@
 #ifndef G2O_SOLVER_SLAM2D_LINEAR
 #define G2O_SOLVER_SLAM2D_LINEAR
 
+#include <memory>
+
+#include "g2o/core/optimization_algorithm.h"
 #include "g2o/core/optimization_algorithm_gauss_newton.h"
 #include "g2o_slam2d_linear_api.h"
 
 namespace g2o {
+class Solver;
 
 /**
  * \brief Implementation of a linear approximation for 2D pose graph SLAM
