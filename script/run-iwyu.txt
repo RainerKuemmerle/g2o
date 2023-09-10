@@ -1,0 +1,7 @@
+Using iwyu-tool
+
+~/workspace/include-what-you-use/iwyu_tool.py -p . ../g2o  -- -Xiwyu --mapping_file=/home/goki/workspace/g2o/script/iwyu-mapping.imp 2>&1 | tee /tmp/iwyu.txt
+
+Applying the fixes
+
+~/workspace/include-what-you-use/fix_includes.py --nocomments < /tmp/iwyu.txt
