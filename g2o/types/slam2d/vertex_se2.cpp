@@ -26,7 +26,12 @@
 
 #include "vertex_se2.h"
 
+#include <Eigen/Core>
+#include <string>
 #include <typeinfo>
+
+#include "g2o/stuff/macros.h"
+#include "g2o/stuff/misc.h"
 
 #ifdef G2O_HAVE_OPENGL
 #include "g2o/stuff/opengl_primitives.h"

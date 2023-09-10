@@ -27,11 +27,16 @@
 #include "edge_se2_lotsofxy.h"
 
 #include <cassert>
+#include <cmath>
+#include <map>
+#include <memory>
+#include <ostream>
+#include <vector>
 
-#ifdef G2O_HAVE_OPENGL
-#include "g2o/stuff/opengl_primitives.h"
-#include "g2o/stuff/opengl_wrapper.h"
-#endif
+#include "g2o/config.h"
+#include "se2.h"
+#include "vertex_point_xy.h"
+#include "vertex_se2.h"
 
 namespace g2o {
 

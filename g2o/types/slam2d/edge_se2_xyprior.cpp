@@ -26,6 +26,8 @@
 
 #include "edge_se2_xyprior.h"
 
+#include "g2o/core/io_helper.h"
+
 namespace g2o {
 
 bool EdgeSE2XYPrior::read(std::istream& is) {

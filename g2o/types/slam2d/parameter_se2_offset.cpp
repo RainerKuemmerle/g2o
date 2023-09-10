@@ -26,6 +26,10 @@
 
 #include "parameter_se2_offset.h"
 
+#include <Eigen/Core>
+#include <Eigen/Geometry>
+#include <cmath>
+
 #include "g2o/core/io_helper.h"
 #include "vertex_se2.h"
 

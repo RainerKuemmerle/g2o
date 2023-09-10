@@ -27,8 +27,15 @@
 #ifndef G2O_EDGE_SE2_PRIOR_H
 #define G2O_EDGE_SE2_PRIOR_H
 
+#include <Eigen/Core>
+#include <iosfwd>
+#include <memory>
+#include <tuple>
+
 #include "g2o/core/base_unary_edge.h"
+#include "g2o/core/optimizable_graph.h"
 #include "g2o_types_slam2d_api.h"
+#include "se2.h"
 #include "vertex_se2.h"
 
 namespace g2o {

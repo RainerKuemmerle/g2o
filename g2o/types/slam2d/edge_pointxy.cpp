@@ -26,10 +26,8 @@
 
 #include "edge_pointxy.h"
 
-#ifdef G2O_HAVE_OPENGL
-#include "g2o/stuff/opengl_primitives.h"
-#include "g2o/stuff/opengl_wrapper.h"
-#endif
+#include "g2o/config.h"
+#include "g2o/core/io_helper.h"
 
 namespace g2o {
 

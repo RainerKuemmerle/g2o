@@ -317,7 +317,7 @@ class BaseFixedSizedEdge : public BaseEdge<D, E> {
  public:
 };
 
-#include "base_fixed_sized_edge.hpp"
+#include "base_fixed_sized_edge.hpp"  // IWYU pragma: export
 
 }  // end namespace g2o
 

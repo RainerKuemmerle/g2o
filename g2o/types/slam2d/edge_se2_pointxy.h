@@ -27,9 +27,19 @@
 #ifndef G2O_EDGE_SE2_POINT_XY_H
 #define G2O_EDGE_SE2_POINT_XY_H
 
+#include <Eigen/Core>
+#include <iosfwd>
+#include <memory>
+#include <tuple>
+
 #include "g2o/config.h"
 #include "g2o/core/base_binary_edge.h"
+#include "g2o/core/eigen_types.h"
+#include "g2o/core/hyper_graph.h"
+#include "g2o/core/hyper_graph_action.h"
+#include "g2o/core/optimizable_graph.h"
 #include "g2o_types_slam2d_api.h"
+#include "se2.h"
 #include "vertex_point_xy.h"
 #include "vertex_se2.h"
 

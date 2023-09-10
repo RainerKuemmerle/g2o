@@ -27,8 +27,13 @@
 #ifndef G2O_EDGE_SE2_TWOPOINTS_XY_H
 #define G2O_EDGE_SE2_TWOPOINTS_XY_H
 
+#include <Eigen/Core>
+#include <iosfwd>
+
 #include "g2o/config.h"
 #include "g2o/core/base_variable_sized_edge.h"
+#include "g2o/core/eigen_types.h"
+#include "g2o/core/optimizable_graph.h"
 #include "g2o_types_slam2d_api.h"
 #include "vertex_point_xy.h"
 #include "vertex_se2.h"

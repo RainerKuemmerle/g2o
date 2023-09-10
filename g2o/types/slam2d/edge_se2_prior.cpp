@@ -28,6 +28,9 @@
 
 #include <cassert>
 
+#include "g2o/core/eigen_types.h"
+#include "g2o/core/io_helper.h"
+
 namespace g2o {
 
 void EdgeSE2Prior::initialEstimate(const OptimizableGraph::VertexSet& from,

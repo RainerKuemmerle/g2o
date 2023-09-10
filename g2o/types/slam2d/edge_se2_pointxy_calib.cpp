@@ -28,6 +28,8 @@
 
 #include <cassert>
 
+#include "g2o/core/io_helper.h"
+
 namespace g2o {
 
 EdgeSE2PointXYCalib::EdgeSE2PointXYCalib()

@@ -26,9 +26,12 @@
 
 #include "edge_se2_offset.h"
 
-#include <cassert>
 #include <iostream>
 
+#include "g2o/core/cache.h"
+#include "g2o/core/eigen_types.h"
+#include "g2o/core/io_helper.h"
+#include "g2o/core/parameter.h"
 #include "parameter_se2_offset.h"
 
 namespace g2o {

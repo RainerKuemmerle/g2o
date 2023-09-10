@@ -27,6 +27,12 @@
 #include "edge_se2_pointxy.h"
 
 #include <cassert>
+#include <cmath>
+#include <string>
+#include <typeinfo>
+
+#include "g2o/core/io_helper.h"
+#include "g2o/stuff/property.h"
 
 #ifdef G2O_HAVE_OPENGL
 #include "g2o/stuff/opengl_primitives.h"

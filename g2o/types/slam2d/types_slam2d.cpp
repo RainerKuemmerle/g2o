@@ -26,10 +26,26 @@
 
 #include "types_slam2d.h"
 
-#include <iostream>
+#include <memory>
 
+#include "edge_pointxy.h"
+#include "edge_se2.h"
+#include "edge_se2_lotsofxy.h"
+#include "edge_se2_offset.h"
+#include "edge_se2_pointxy.h"
+#include "edge_se2_pointxy_bearing.h"
+#include "edge_se2_pointxy_calib.h"
+#include "edge_se2_pointxy_offset.h"
+#include "edge_se2_prior.h"
+#include "edge_se2_twopointsxy.h"
+#include "edge_se2_xyprior.h"
+#include "edge_xy_prior.h"
+#include "g2o/config.h"
 #include "g2o/core/factory.h"
-#include "g2o/stuff/macros.h"
+#include "g2o/core/hyper_graph_action.h"
+#include "parameter_se2_offset.h"
+#include "vertex_point_xy.h"
+#include "vertex_se2.h"
 
 namespace g2o {
 

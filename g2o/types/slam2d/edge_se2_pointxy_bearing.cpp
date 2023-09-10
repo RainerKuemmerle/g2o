@@ -27,6 +27,11 @@
 #include "edge_se2_pointxy_bearing.h"
 
 #include <cassert>
+#include <ostream>
+#include <string>
+#include <typeinfo>
+
+#include "g2o/stuff/property.h"
 
 #ifdef G2O_HAVE_OPENGL
 #include "g2o/stuff/opengl_primitives.h"

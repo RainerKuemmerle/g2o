@@ -196,7 +196,7 @@ class BaseVertex : public OptimizableGraph::Vertex {
  public:
 };
 
-#include "base_vertex.hpp"
+#include "base_vertex.hpp"  // IWYU pragma: export
 
 #undef G2O_VERTEX_DIM
 

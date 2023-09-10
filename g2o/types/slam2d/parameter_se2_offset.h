@@ -27,7 +27,12 @@
 #ifndef G2O_VERTEX_SE2_OFFSET_PARAMETERS_H_
 #define G2O_VERTEX_SE2_OFFSET_PARAMETERS_H_
 
+#include <iosfwd>
+#include <memory>
+
 #include "g2o/core/cache.h"
+#include "g2o/core/eigen_types.h"
+#include "g2o/core/parameter.h"
 #include "g2o_types_slam2d_api.h"
 #include "se2.h"
 
