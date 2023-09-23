@@ -151,14 +151,14 @@ On Windows with `vcpkg` the following commands will generate build scripts (plea
 -   `mkdir build`
 -   `cd build`
 -   `cmake -DG2O_BUILD_APPS=ON -DG2O_BUILD_EXAMPLES=ON -DVCPKG_TARGET_TRIPLET="%VCPKG_DEFAULT_TRIPLET%" -DCMAKE_TOOLCHAIN_FILE="%VCPKG_ROOT_DIR%\scripts\buildsystems\vcpkg.cmake" ..`
--   ` cmake --build . --target ALL_BUILD`
+-   `cmake --build . --target ALL_BUILD`
 
 If you are compiling on Windows and you are for some reasons **not** using `vcpkg` please download Eigen3 and extract it.
 Within cmake-gui set the variable EIGEN3_INCLUDE_DIR to that directory.
 
 -   `mkdir build`
 -   `cd build`
--   `cmake .. -DG2O_BUILD_APPS=ON -DG2O_BUILD_EXAMPLES=ON -DEIGEN3_INCLUDE_DIR="<THE_PATH_WHERE_YOU_PLACED_EIGEN3_AND_THE_EIGEN3_CMakeLists.txt>"
+-   `cmake .. -DG2O_BUILD_APPS=ON -DG2O_BUILD_EXAMPLES=ON -DEIGEN3_INCLUDE_DIR="<THE_PATH_WHERE_YOU_PLACED_EIGEN3_AND_THE_EIGEN3_CMakeLists.txt>"`
 
 ## Cross-Compiling for Android
 
