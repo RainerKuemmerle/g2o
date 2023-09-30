@@ -27,7 +27,15 @@
 #ifndef G2O_VERTEX_TAG_H
 #define G2O_VERTEX_TAG_H
 
+#include <iosfwd>
+#include <memory>
+#include <string>
+
+#include "g2o/config.h"
+#include "g2o/core/eigen_types.h"
+#include "g2o/core/hyper_graph.h"
 #include "g2o/core/hyper_graph_action.h"
+#include "g2o/stuff/property.h"
 #include "g2o_types_data_api.h"
 #include "robot_data.h"
 

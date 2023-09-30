@@ -1,7 +1,7 @@
 add_library(solver_pcg ${G2O_LIB_TYPE}
   solver_pcg.cpp
   linear_solver_pcg.h
-  linear_solver_pcg.hpp
+  linear_solver_pcg.cpp
 )
 
 set_target_properties(solver_pcg PROPERTIES OUTPUT_NAME ${LIB_PREFIX}solver_pcg)
@@ -16,7 +16,6 @@ target_compile_features(solver_pcg PUBLIC cxx_std_17)
 target_link_libraries(solver_pcg core)
 
 target_include_directories(solver_pcg PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
   $<INSTALL_INTERFACE:include/g2o/solvers/pcg>)
 
 install(TARGETS solver_pcg

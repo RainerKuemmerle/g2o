@@ -26,17 +26,18 @@
 
 #include "vertex_ellipse.h"
 
-#include "g2o/stuff/macros.h"
 #include "g2o/stuff/misc.h"
 
 #ifdef G2O_HAVE_OPENGL
-#include "g2o/EXTERNAL/freeglut/freeglut_minimal.h"
-#include "g2o/stuff/opengl_primitives.h"
 #include "g2o/stuff/opengl_wrapper.h"
 #endif
 
+#include <Eigen/Core>
 #include <Eigen/Eigenvalues>
-#include <iomanip>
+#include <cmath>
+#include <istream>
+#include <string>
+#include <typeinfo>
 
 namespace g2o {
 

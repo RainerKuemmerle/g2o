@@ -13,7 +13,6 @@ target_compile_features(solver_eigen PUBLIC cxx_std_17)
 target_link_libraries(solver_eigen core)
 
 target_include_directories(solver_eigen PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
   $<INSTALL_INTERFACE:include/g2o/solvers/eigen>
 )
 

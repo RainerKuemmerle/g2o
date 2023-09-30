@@ -26,7 +26,6 @@ if(G2O_HAVE_OPENGL)
 endif()
 
 target_include_directories(types_data PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
   $<INSTALL_INTERFACE:include/g2o/types/data>)
 
 install(TARGETS types_data

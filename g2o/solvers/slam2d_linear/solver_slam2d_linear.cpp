@@ -26,10 +26,9 @@
 
 #include "solver_slam2d_linear.h"
 
-#include <stddef.h>
-
 #include <Eigen/Core>
 #include <cassert>
+#include <cstddef>
 #include <map>
 #include <utility>
 #include <vector>
@@ -44,8 +43,8 @@
 #include "g2o/stuff/logger.h"
 #include "g2o/stuff/misc.h"
 #include "g2o/types/slam2d/edge_se2.h"
-#include "se2.h"
-#include "vertex_se2.h"
+#include "g2o/types/slam2d/se2.h"
+#include "g2o/types/slam2d/vertex_se2.h"
 
 namespace g2o {
 

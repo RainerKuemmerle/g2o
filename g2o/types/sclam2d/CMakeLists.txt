@@ -21,7 +21,6 @@ if(G2O_HAVE_OPENGL)
 endif()
 
 target_include_directories(types_sclam2d PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
   $<INSTALL_INTERFACE:include/g2o/types/sclam2d>)
 
 install(TARGETS types_sclam2d

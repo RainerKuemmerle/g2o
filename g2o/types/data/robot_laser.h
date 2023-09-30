@@ -27,8 +27,16 @@
 #ifndef G2O_ROBOT_LASER_H
 #define G2O_ROBOT_LASER_H
 
+#include <iosfwd>
+#include <memory>
+
+#include "g2o/config.h"
+#include "g2o/core/hyper_graph.h"
 #include "g2o/core/hyper_graph_action.h"
+#include "g2o/stuff/property.h"
+#include "g2o/types/slam2d/se2.h"
 #include "g2o_types_data_api.h"
+#include "laser_parameters.h"
 #include "raw_laser.h"
 
 namespace g2o {
@@ -45,8 +53,10 @@ class G2O_TYPES_DATA_API RobotLaser : public RawLaser {
   bool write(std::ostream& os) const override;
   bool read(std::istream& is) override;
 
-  SE2 laserPose() const { return odomPose_ * laserParams_.laserPose; }
-  const SE2& odomPose() const { return odomPose_; }
+  [[nodiscard]] SE2 laserPose() const {
+    return odomPose_ * laserParams_.laserPose;
+  }
+  [[nodiscard]] const SE2& odomPose() const { return odomPose_; }
   void setOdomPose(const SE2& odomPose);
 
  protected:

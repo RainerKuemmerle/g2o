@@ -26,9 +26,15 @@
 
 #include "raw_laser.h"
 
+#include <stddef.h>
+
+#include <cmath>
 #include <iostream>
+#include <string>
 
 #include "g2o/stuff/logger.h"
+#include "g2o/stuff/misc.h"
+#include "g2o/types/data/laser_parameters.h"
 
 namespace g2o {
 

@@ -26,6 +26,8 @@
 
 #include "laser_parameters.h"
 
+#include "g2o/types/slam2d/se2.h"
+
 namespace g2o {
 
 LaserParameters::LaserParameters(int t, int nbeams, double _firstBeamAngle,

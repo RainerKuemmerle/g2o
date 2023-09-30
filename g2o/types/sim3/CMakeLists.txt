@@ -15,7 +15,6 @@ target_compile_features(types_sim3 PUBLIC cxx_std_17)
 target_link_libraries(types_sim3 PUBLIC types_sba)
 
 target_include_directories(types_sim3 PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
   $<INSTALL_INTERFACE:include/g2o/types/sim3>)
 
 install(TARGETS types_sim3

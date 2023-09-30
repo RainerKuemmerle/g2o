@@ -24,44 +24,6 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "data_queue.h"
+// helpers for doing fixed or variable size operations on the matrices
 
-#include <cmath>
-#include <iterator>
-#include <utility>
-
-#include "g2o/types/data/robot_data.h"
-
-namespace g2o {
-
-DataQueue::RobotDataPtr DataQueue::findClosestData(double timestamp) const {
-  if (buffer_.rbegin()->first < timestamp) return buffer_.rbegin()->second;
-  if (buffer_.begin()->first > timestamp) return buffer_.begin()->second;
-
-  auto ub = buffer_.upper_bound(timestamp);
-  auto lb = ub;
-  --lb;
-  if (fabs(lb->first - timestamp) < fabs(ub->first - timestamp))
-    return lb->second;
-  return ub->second;
-}
-
-DataQueue::RobotDataPtr DataQueue::before(double timestamp) const {
-  if (buffer_.empty() || buffer_.begin()->first >= timestamp) return nullptr;
-  auto lb = buffer_.upper_bound(timestamp);
-  --lb;  // now it's the lower bound
-  return lb->second;
-}
-
-DataQueue::RobotDataPtr DataQueue::after(double timestamp) const {
-  if (buffer_.empty() || buffer_.rbegin()->first < timestamp) return nullptr;
-  auto ub = buffer_.upper_bound(timestamp);
-  if (ub == buffer_.end()) return nullptr;
-  return ub->second;
-}
-
-void DataQueue::add(DataQueue::RobotDataPtr rd) {
-  buffer_.emplace(rd->timestamp(), rd);
-}
-
-}  // namespace g2o
+#include "linear_solver_pcg.h"

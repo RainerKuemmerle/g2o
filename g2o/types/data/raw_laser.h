@@ -28,8 +28,10 @@
 #define G2O_RAW_LASER_H
 
 #include <Eigen/Core>
+#include <iosfwd>
 #include <vector>
 
+#include "g2o/core/eigen_types.h"
 #include "g2o_types_data_api.h"
 #include "laser_parameters.h"
 #include "robot_data.h"

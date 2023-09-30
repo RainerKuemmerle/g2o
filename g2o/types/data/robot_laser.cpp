@@ -26,13 +26,23 @@
 
 #include "robot_laser.h"
 
+#include <Eigen/Core>
+#include <cmath>
+#include <cstddef>
+#include <iomanip>  // IWYU pragma: keep
+#include <istream>
+#include <string>
+#include <typeinfo>
+#include <vector>
+
+#include "g2o/core/eigen_types.h"
 #include "g2o/stuff/macros.h"
+#include "g2o/types/data/laser_parameters.h"
+#include "g2o/types/data/raw_laser.h"
 
 #ifdef G2O_HAVE_OPENGL
 #include "g2o/stuff/opengl_wrapper.h"
 #endif
-
-#include <iomanip>
 
 namespace g2o {
 
@@ -143,14 +153,13 @@ bool RobotLaserDrawAction::operator()(
   RawLaser::Point2DVector points = that->cartesian();
   if (maxRange_ && maxRange_->value() >= 0) {
     // prune the cartesian points;
-    RawLaser::Point2DVector npoints(points.size());
-    int k = 0;
+    RawLaser::Point2DVector npoints;
+    npoints.reserve(points.size());
     auto r2 = std::pow(maxRange_->value(), 2);
-    for (auto& point : points) {
-      if (point.squaredNorm() < r2) npoints[k++] = point;
+    for (const auto& point : points) {
+      if (point.squaredNorm() < r2) npoints.push_back(point);
     }
     points = npoints;
-    npoints.resize(k);
   }
 
   glPushMatrix();

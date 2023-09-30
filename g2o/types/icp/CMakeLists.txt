@@ -15,7 +15,6 @@ target_compile_features(types_icp PUBLIC cxx_std_17)
 target_link_libraries(types_icp types_sba types_slam3d)
 
 target_include_directories(types_icp PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
   $<INSTALL_INTERFACE:include/g2o/types/icp>)
 
 install(TARGETS types_icp
