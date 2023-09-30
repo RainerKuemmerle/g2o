@@ -30,7 +30,6 @@
 #include <chrono>
 #include <string>
 
-#include "g2o/stuff/misc.h"
 #include "g2o_stuff_api.h"
 
 /** @addtogroup utils **/

@@ -29,7 +29,6 @@
 
 #include <string>
 
-#include "g2o/config.h"
 #include "g2o_stuff_api.h"
 
 namespace g2o {
