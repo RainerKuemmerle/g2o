@@ -3,16 +3,16 @@ dynamic_aligned_buffer.hpp
 base_edge.h
 base_multi_edge.h
 base_fixed_sized_edge.h        hyper_graph_action.cpp
-base_fixed_sized_edge.hpp      hyper_graph_action.h
+base_fixed_sized_edge.cpp      hyper_graph_action.h
 base_variable_sized_edge.h     hyper_graph.cpp
-base_variable_sized_edge.hpp   hyper_graph.h
+base_variable_sized_edge.cpp   hyper_graph.h
 base_unary_edge.h           linear_solver.h
 base_binary_edge.h          marginal_covariance_cholesky.cpp
 base_vertex.h               marginal_covariance_cholesky.h
-base_vertex.hpp             matrix_structure.cpp
+base_vertex.cpp             matrix_structure.cpp
 batch_stats.cpp             matrix_structure.h
 batch_stats.h               openmp_mutex.h
-block_solver.h              block_solver.hpp
+block_solver.h              block_solver.cpp
 parameter.cpp               parameter.h
 cache.cpp                   cache.h
 optimizable_graph.cpp       optimizable_graph.h
@@ -22,7 +22,7 @@ estimate_propagator.cpp     optimization_algorithm_factory.h
 estimate_propagator.h
 factory.cpp                 optimization_algorithm_property.h
 factory.h                   sparse_block_matrix.h
-sparse_optimizer.cpp  sparse_block_matrix.hpp
+sparse_optimizer.cpp  sparse_block_matrix.cpp
 sparse_optimizer.h
 hyper_dijkstra.cpp hyper_dijkstra.h
 parameter_container.cpp     parameter_container.h

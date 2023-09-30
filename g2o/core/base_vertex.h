@@ -31,16 +31,25 @@
 #include <Eigen/Core>
 #include <Eigen/Dense>
 #include <cassert>
+#include <climits>
+#include <cstring>
+#include <iosfwd>
+#include <limits>
+#include <new>
 #include <stack>
+#include <vector>
 
 #include "creators.h"
 #include "g2o/config.h"
 #include "g2o/core/eigen_types.h"
+#include "g2o/core/io_helper.h"
 #include "g2o/core/type_traits.h"
 #include "g2o/stuff/macros.h"
 #include "optimizable_graph.h"
 
 namespace g2o {
+template <int D, typename T>
+class BaseVertex;
 
 #define G2O_VERTEX_DIM ((D == Eigen::Dynamic) ? dimension_ : D)
 
@@ -196,7 +205,31 @@ class BaseVertex : public OptimizableGraph::Vertex {
  public:
 };
 
-#include "base_vertex.hpp"  // IWYU pragma: export
+template <int D, typename T>
+BaseVertex<D, T>::BaseVertex()
+    : OptimizableGraph::Vertex(), hessian_(nullptr, D, D) {
+  dimension_ = D;
+}
+
+template <int D, typename T>
+double BaseVertex<D, T>::solveDirect(double lambda) {
+  Eigen::Matrix<double, D, D, Eigen::ColMajor> tempA =
+      hessian_ + Eigen::Matrix<double, D, D, Eigen::ColMajor>::Identity(
+                     G2O_VERTEX_DIM, G2O_VERTEX_DIM) *
+                     lambda;
+  double det = tempA.determinant();
+  if (g2o_isnan(det) || det < std::numeric_limits<double>::epsilon())
+    return det;
+  BVector dx = tempA.llt().solve(b_);
+  oplus(VectorX::MapType(dx.data(), dx.size()));
+  return det;
+}
+
+template <int D, typename T>
+void BaseVertex<D, T>::mapHessianMemory(double* d) {
+  const int vertexDim = G2O_VERTEX_DIM;
+  new (&hessian_) HessianBlockType(d, vertexDim, vertexDim);
+}
 
 #undef G2O_VERTEX_DIM
 

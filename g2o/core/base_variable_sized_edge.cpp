@@ -1,5 +1,5 @@
 // g2o - General Graph Optimization
-// Copyright (C) 2011 R. Kuemmerle, G. Grisetti, W. Burgard
+// Copyright (C) 2011 R. Kuemmerle, G. Grisetti, H. Strasdat, W. Burgard
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -24,28 +24,4 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-template <int D, typename T>
-BaseVertex<D, T>::BaseVertex()
-    : OptimizableGraph::Vertex(), hessian_(nullptr, D, D) {
-  dimension_ = D;
-}
-
-template <int D, typename T>
-double BaseVertex<D, T>::solveDirect(double lambda) {
-  Eigen::Matrix<double, D, D, Eigen::ColMajor> tempA =
-      hessian_ + Eigen::Matrix<double, D, D, Eigen::ColMajor>::Identity(
-                     G2O_VERTEX_DIM, G2O_VERTEX_DIM) *
-                     lambda;
-  double det = tempA.determinant();
-  if (g2o_isnan(det) || det < std::numeric_limits<double>::epsilon())
-    return det;
-  BVector dx = tempA.llt().solve(b_);
-  oplus(VectorX::MapType(dx.data(), dx.size()));
-  return det;
-}
-
-template <int D, typename T>
-void BaseVertex<D, T>::mapHessianMemory(double* d) {
-  const int vertexDim = G2O_VERTEX_DIM;
-  new (&hessian_) HessianBlockType(d, vertexDim, vertexDim);
-}
+#include "base_variable_sized_edge.h"
