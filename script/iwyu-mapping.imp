@@ -8,6 +8,7 @@
   { "include": ["@<Eigen/src/Eigenvalues/.*>", "private", "<Eigen/Eigenvalues>", "public"] },
   { "include": ["@<Eigen/src/Householder/.*>", "private", "<Eigen/Householder>", "public"] },
   { "include": ["@<Eigen/src/Jacobi/.*>", "private", "<Eigen/Jacobi>", "public"] },
+  { "include": ["@<Eigen/src/SVD/.*>", "private", "<Eigen/SVD>", "public"] },
   { "include": ["@<Eigen/src/Sparse/.*>", "private", "<Eigen/Sparse>", "public"] },
   { "include": ["@<Eigen/src/SparseCore/.*>", "private", "<Eigen/SparseCore>", "public"] },
   { "include": ["@<Eigen/src/SparseCholesky/.*>", "private", "<Eigen/SparseCholesky>", "public"] },
@@ -48,4 +49,5 @@
   { include: [ "<uchar.h>", public, "<cuchar>", public ] },
   { include: [ "<wchar.h>", public, "<cwchar>", public ] },
   { include: [ "<wctype.h>", public, "<cwctype>", public ] },
+  { ref: "qt5.imp" },
 ]
