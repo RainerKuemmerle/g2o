@@ -26,6 +26,14 @@
 
 #include "edge_se3.h"
 
+#include <Eigen/Core>
+#include <string>
+#include <typeinfo>
+
+#include "g2o/core/io_helper.h"
+#include "g2o/stuff/property.h"
+#include "g2o/types/slam3d/isometry3d_mappings.h"
+#include "g2o/types/slam3d/vertex_se3.h"
 #include "isometry3d_gradients.h"
 
 #ifdef G2O_HAVE_OPENGL

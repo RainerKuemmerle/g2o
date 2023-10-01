@@ -27,9 +27,15 @@
 #ifndef G2O_VERTEX_SE3_
 #define G2O_VERTEX_SE3_
 
+#include <iosfwd>
+#include <memory>
+
 #include "g2o/config.h"
 #include "g2o/core/base_vertex.h"
+#include "g2o/core/eigen_types.h"
+#include "g2o/core/hyper_graph.h"
 #include "g2o/core/hyper_graph_action.h"
+#include "g2o/stuff/property.h"
 #include "g2o_types_slam3d_api.h"
 #include "isometry3d_mappings.h"
 #include "type_traits_isometry3.h"

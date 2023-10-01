@@ -24,11 +24,14 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+#include <memory>
+
 #include "edge_se2_odom_differential_calib.h"
 #include "edge_se2_sensor_calib.h"
 #include "g2o/config.h"
 #include "g2o/core/factory.h"
-#include "g2o/stuff/macros.h"
+#include "g2o/core/hyper_graph_action.h"
+#include "g2o/types/slam2d/se2.h"
 #include "vertex_odom_differential_params.h"
 
 namespace g2o {

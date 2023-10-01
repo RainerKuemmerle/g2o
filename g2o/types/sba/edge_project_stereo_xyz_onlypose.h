@@ -27,7 +27,11 @@
 #ifndef G2O_SBA_EDGEPROJECTSTEREOXYZ_ONLYPOSE_H
 #define G2O_SBA_EDGEPROJECTSTEREOXYZ_ONLYPOSE_H
 
+#include <iosfwd>
+#include <tuple>
+
 #include "g2o/core/base_unary_edge.h"
+#include "g2o/core/eigen_types.h"
 #include "g2o_types_sba_api.h"
 #include "vertex_se3_expmap.h"
 

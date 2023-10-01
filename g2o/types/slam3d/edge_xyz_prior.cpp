@@ -26,7 +26,11 @@
 
 #include "edge_xyz_prior.h"
 
+#include <Eigen/Core>
 #include <iostream>
+
+#include "g2o/core/io_helper.h"
+#include "g2o/types/slam3d/vertex_pointxyz.h"
 
 namespace g2o {
 

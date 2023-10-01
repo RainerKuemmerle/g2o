@@ -13,6 +13,7 @@
   { "include": ["@<Eigen/src/SparseCholesky/.*>", "private", "<Eigen/SparseCholesky>", "public"] },
   { "include": ["@<Eigen/src/SparseLU/.*>", "private", "<Eigen/SparseLU>", "public"] },
   { "include": ["@<Eigen/src/SparseQR/.*>", "private", "<Eigen/SparseQR>", "public"] },
+  { "include": ["@<Eigen/src/SVD/.*>", "private", "<Eigen/SVD>", "public"] },
   # No pickup of private Gcc headers
   { "include": ["<bits/chrono.h>", "private", "<chrono>", "public"] },
   { "include": ["<bits/std_abs.h>", "private", "<cmath>", "public"] },

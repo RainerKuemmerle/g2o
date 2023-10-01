@@ -32,6 +32,8 @@
 #include "g2o/core/cache.h"
 #include "g2o/core/io_helper.h"
 #include "g2o/core/parameter.h"
+#include "g2o/types/slam2d/vertex_point_xy.h"
+#include "g2o/types/slam2d/vertex_se2.h"
 #include "parameter_se2_offset.h"
 #include "se2.h"
 

@@ -26,7 +26,18 @@
 
 #include "edge_se3_line.h"
 
+#include <Eigen/Core>
+#include <Eigen/Geometry>
+#include <string>
+#include <typeinfo>
+
+#include "g2o/core/cache.h"
+#include "g2o/core/io_helper.h"
+#include "g2o/core/parameter.h"
 #include "g2o/stuff/opengl_wrapper.h"
+#include "g2o/types/slam3d/parameter_se3_offset.h"
+#include "g2o/types/slam3d_addons/line3d.h"
+#include "g2o/types/slam3d_addons/vertex_line3d.h"
 
 namespace g2o {
 

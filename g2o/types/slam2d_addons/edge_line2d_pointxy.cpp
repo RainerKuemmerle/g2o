@@ -26,9 +26,9 @@
 
 #include "edge_line2d_pointxy.h"
 
-#ifdef G2O_HAVE_OPENGL
-#include "g2o/stuff/opengl_wrapper.h"
-#endif
+#include <ostream>
+
+#include "g2o/config.h"
 
 namespace g2o {
 

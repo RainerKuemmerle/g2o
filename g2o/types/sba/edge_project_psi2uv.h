@@ -27,15 +27,20 @@
 #ifndef G2O_SBA_EDGEPROJECTPSI2UV_H
 #define G2O_SBA_EDGEPROJECTPSI2UV_H
 
+#include <iosfwd>
 #include <memory>
 
 #include "g2o/core/base_fixed_sized_edge.h"
+#include "g2o/core/eigen_types.h"
 #include "g2o/types/slam3d/vertex_pointxyz.h"
 #include "g2o_types_sba_api.h"
 #include "parameter_cameraparameters.h"
 #include "vertex_se3_expmap.h"
 
 namespace g2o {
+class CameraParameters;
+class VertexPointXYZ;
+class VertexSE3Expmap;
 
 class G2O_TYPES_SBA_API EdgeProjectPSI2UV
     : public g2o::BaseFixedSizedEdge<2, Vector2, VertexPointXYZ,

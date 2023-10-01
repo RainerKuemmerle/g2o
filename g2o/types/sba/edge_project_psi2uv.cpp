@@ -26,6 +26,14 @@
 
 #include "edge_project_psi2uv.h"
 
+#include <Eigen/Core>
+#include <tuple>
+
+#include "g2o/core/io_helper.h"
+#include "g2o/types/sba/parameter_cameraparameters.h"
+#include "g2o/types/sba/vertex_se3_expmap.h"
+#include "g2o/types/slam3d/se3quat.h"
+#include "g2o/types/slam3d/vertex_pointxyz.h"
 #include "sba_utils.h"
 
 namespace g2o {

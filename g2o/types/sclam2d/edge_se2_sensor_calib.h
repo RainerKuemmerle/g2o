@@ -27,7 +27,15 @@
 #ifndef G2O_EDGE_SE2_SENSOR_CALIB_H
 #define G2O_EDGE_SE2_SENSOR_CALIB_H
 
+#include <iosfwd>
+#include <memory>
+
+#include "g2o/config.h"
 #include "g2o/core/base_fixed_sized_edge.h"
+#include "g2o/core/hyper_graph.h"
+#include "g2o/core/hyper_graph_action.h"
+#include "g2o/core/optimizable_graph.h"
+#include "g2o/types/slam2d/se2.h"
 #include "g2o/types/slam2d/vertex_se2.h"
 #include "g2o_types_sclam2d_api.h"
 

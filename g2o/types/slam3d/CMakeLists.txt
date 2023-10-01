@@ -32,7 +32,7 @@ add_library(types_slam3d ${G2O_LIB_TYPE}
   edge_xyz_prior.cpp
   edge_xyz_prior.h
   se3quat.h
-  se3_ops.h se3_ops.hpp
+  se3_ops.h
   edge_pointxyz.cpp edge_pointxyz.h
   types_slam3d.cpp
   types_slam3d.h

@@ -26,6 +26,9 @@
 
 #include "edge_plane.h"
 
+#include "g2o/core/io_helper.h"
+#include "g2o/types/slam3d_addons/vertex_plane.h"
+
 namespace g2o {
 
 EdgePlane::EdgePlane() {

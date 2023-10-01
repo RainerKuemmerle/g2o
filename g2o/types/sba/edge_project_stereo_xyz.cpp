@@ -26,6 +26,9 @@
 
 #include "edge_project_stereo_xyz.h"
 
+#include "g2o/core/io_helper.h"
+#include "g2o/types/sba/vertex_se3_expmap.h"
+
 namespace g2o {
 
 Vector3 EdgeStereoSE3ProjectXYZ::cam_project(const Vector3& trans_xyz,

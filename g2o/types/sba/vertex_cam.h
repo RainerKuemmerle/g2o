@@ -27,7 +27,10 @@
 #ifndef G2O_SBA_VERTEX_CAM_H
 #define G2O_SBA_VERTEX_CAM_H
 
+#include <iosfwd>
+
 #include "g2o/core/base_vertex.h"
+#include "g2o/core/eigen_types.h"
 #include "g2o_types_sba_api.h"
 #include "sbacam.h"
 

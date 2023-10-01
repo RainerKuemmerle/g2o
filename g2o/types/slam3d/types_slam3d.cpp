@@ -26,10 +26,26 @@
 
 #include "types_slam3d.h"
 
-#include <iostream>
+#include <memory>
 
+#include "g2o/config.h"
 #include "g2o/core/factory.h"
-#include "g2o/stuff/macros.h"
+#include "g2o/core/hyper_graph_action.h"
+#include "g2o/types/slam3d/edge_pointxyz.h"
+#include "g2o/types/slam3d/edge_se3.h"
+#include "g2o/types/slam3d/edge_se3_lotsofxyz.h"
+#include "g2o/types/slam3d/edge_se3_offset.h"
+#include "g2o/types/slam3d/edge_se3_pointxyz.h"
+#include "g2o/types/slam3d/edge_se3_pointxyz_depth.h"
+#include "g2o/types/slam3d/edge_se3_pointxyz_disparity.h"
+#include "g2o/types/slam3d/edge_se3_prior.h"
+#include "g2o/types/slam3d/edge_se3_xyzprior.h"
+#include "g2o/types/slam3d/edge_xyz_prior.h"
+#include "g2o/types/slam3d/parameter_camera.h"
+#include "g2o/types/slam3d/parameter_se3_offset.h"
+#include "g2o/types/slam3d/parameter_stereo_camera.h"
+#include "g2o/types/slam3d/vertex_pointxyz.h"
+#include "g2o/types/slam3d/vertex_se3.h"
 
 namespace g2o {
 

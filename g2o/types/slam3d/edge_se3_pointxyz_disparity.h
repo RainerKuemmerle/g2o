@@ -27,11 +27,24 @@
 #ifndef G2O_EDGE_SE3_POINTXYZ_DISPARITY_H_
 #define G2O_EDGE_SE3_POINTXYZ_DISPARITY_H_
 
+#include <iosfwd>
+#include <memory>
+#include <tuple>
+
+#include "g2o/config.h"
 #include "g2o/core/base_binary_edge.h"
+#include "g2o/core/eigen_types.h"
+#include "g2o/core/hyper_graph.h"
 #include "g2o/core/hyper_graph_action.h"
+#include "g2o/core/optimizable_graph.h"
+#include "g2o/types/slam3d/g2o_types_slam3d_api.h"
 #include "parameter_camera.h"
 #include "vertex_pointxyz.h"
 #include "vertex_se3.h"
+
+namespace g2o {
+class CacheCamera;
+}  // namespace g2o
 
 #define EDGE_PROJECT_DISPARITY_ANALYTIC_JACOBIAN
 namespace g2o {

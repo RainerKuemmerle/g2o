@@ -27,7 +27,11 @@
 #ifndef G2O_EDGE_SE3_OFFSET_H_
 #define G2O_EDGE_SE3_OFFSET_H_
 
+#include <iosfwd>
+#include <memory>
+
 #include "edge_se3.h"
+#include "g2o/core/optimizable_graph.h"
 #include "g2o_types_slam3d_api.h"
 
 namespace g2o {

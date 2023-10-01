@@ -26,12 +26,12 @@
 
 #include "edge_se2_twopointsxy.h"
 
+#include <Eigen/Core>
 #include <cassert>
 #include <map>
 #include <memory>
 #include <ostream>
 
-#include "g2o/config.h"
 #include "se2.h"
 #include "vertex_point_xy.h"
 #include "vertex_se2.h"

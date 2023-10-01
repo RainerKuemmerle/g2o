@@ -26,7 +26,19 @@
 
 #include "types_six_dof_expmap.h"
 
+#include <memory>
+
 #include "g2o/core/factory.h"
+#include "g2o/types/sba/edge_project_stereo_xyz.h"
+#include "g2o/types/sba/edge_project_stereo_xyz_onlypose.h"
+#include "g2o/types/sba/edge_project_xyz.h"
+#include "g2o/types/sba/edge_project_xyz2uv.h"
+#include "g2o/types/sba/edge_project_xyz2uvu.h"
+#include "g2o/types/sba/edge_project_xyz_onlypose.h"
+#include "g2o/types/sba/edge_se3_expmap.h"
+#include "g2o/types/sba/parameter_cameraparameters.h"
+#include "g2o/types/sba/vertex_se3_expmap.h"
+#include "g2o/types/slam3d/se3quat.h"
 
 namespace g2o {
 

@@ -26,6 +26,8 @@
 
 #include "vertex_odom_differential_params.h"
 
+#include "g2o/core/io_helper.h"
+
 namespace g2o {
 
 bool VertexOdomDifferentialParams::read(std::istream& is) {

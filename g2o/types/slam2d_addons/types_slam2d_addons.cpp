@@ -26,10 +26,20 @@
 
 #include "types_slam2d_addons.h"
 
-#include <iostream>
+#include <memory>
 
+#include "g2o/config.h"
 #include "g2o/core/factory.h"
-#include "g2o/stuff/macros.h"
+#include "g2o/core/hyper_graph_action.h"
+#include "g2o/types/slam2d_addons/edge_line2d.h"
+#include "g2o/types/slam2d_addons/edge_line2d_pointxy.h"
+#include "g2o/types/slam2d_addons/edge_se2_line2d.h"
+#include "g2o/types/slam2d_addons/edge_se2_segment2d.h"
+#include "g2o/types/slam2d_addons/edge_se2_segment2d_line.h"
+#include "g2o/types/slam2d_addons/edge_se2_segment2d_pointLine.h"
+#include "g2o/types/slam2d_addons/line_2d.h"
+#include "g2o/types/slam2d_addons/vertex_line2d.h"
+#include "g2o/types/slam2d_addons/vertex_segment2d.h"
 
 namespace g2o {
 

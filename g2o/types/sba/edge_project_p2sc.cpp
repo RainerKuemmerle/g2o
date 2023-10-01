@@ -26,6 +26,17 @@
 
 #include "edge_project_p2sc.h"
 
+#include <stdlib.h>
+
+#include <Eigen/Core>
+#include <iostream>
+
+#include "g2o/core/io_helper.h"
+#include "g2o/stuff/macros.h"
+#include "g2o/stuff/misc.h"
+#include "g2o/types/sba/sbacam.h"
+#include "g2o/types/sba/vertex_cam.h"
+
 namespace g2o {
 
 // point to camera projection, stereo

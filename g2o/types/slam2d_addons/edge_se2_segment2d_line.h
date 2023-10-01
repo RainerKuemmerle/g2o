@@ -27,8 +27,15 @@
 #ifndef G2O_EDGE_SE2_SEGMENT2D_LINE_H
 #define G2O_EDGE_SE2_SEGMENT2D_LINE_H
 
+#include <Eigen/Core>
+#include <cmath>
+#include <iosfwd>
+
 #include "g2o/config.h"
 #include "g2o/core/base_binary_edge.h"
+#include "g2o/core/eigen_types.h"
+#include "g2o/stuff/misc.h"
+#include "g2o/types/slam2d/se2.h"
 #include "g2o/types/slam2d/vertex_se2.h"
 #include "g2o_types_slam2d_addons_api.h"
 #include "vertex_segment2d.h"

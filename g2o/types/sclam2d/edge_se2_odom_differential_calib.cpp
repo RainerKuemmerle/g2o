@@ -26,6 +26,12 @@
 
 #include "edge_se2_odom_differential_calib.h"
 
+#include <ostream>
+#include <string>
+#include <typeinfo>
+
+#include "g2o/types/sclam2d/odometry_measurement.h"
+
 #ifdef G2O_HAVE_OPENGL
 #include "g2o/stuff/opengl_wrapper.h"
 #endif

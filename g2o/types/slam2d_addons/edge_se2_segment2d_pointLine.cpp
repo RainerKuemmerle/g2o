@@ -26,6 +26,10 @@
 
 #include "edge_se2_segment2d_pointLine.h"
 
+#include <istream>
+
+#include "g2o/core/io_helper.h"
+
 namespace g2o {
 
 bool EdgeSE2Segment2DPointLine::read(std::istream& is) {

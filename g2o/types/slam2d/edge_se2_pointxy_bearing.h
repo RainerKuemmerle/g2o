@@ -31,7 +31,6 @@
 #include <cmath>
 #include <iosfwd>
 #include <memory>
-#include <tuple>
 
 #include "g2o/config.h"
 #include "g2o/core/base_binary_edge.h"

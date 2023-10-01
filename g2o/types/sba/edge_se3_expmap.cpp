@@ -26,6 +26,12 @@
 
 #include "edge_se3_expmap.h"
 
+#include <Eigen/Core>
+
+#include "g2o/core/eigen_types.h"
+#include "g2o/core/io_helper.h"
+#include "g2o/types/sba/vertex_se3_expmap.h"
+
 namespace g2o {
 
 bool EdgeSE3Expmap::read(std::istream& is) {

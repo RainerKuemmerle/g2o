@@ -26,6 +26,10 @@
 
 #include "edge_pointxyz.h"
 
+#include <ostream>
+
+#include "g2o/types/slam3d/vertex_pointxyz.h"
+
 namespace g2o {
 
 EdgePointXYZ::EdgePointXYZ()

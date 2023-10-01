@@ -26,7 +26,12 @@
 
 #include "parameter_se3_offset.h"
 
-#include "isometry3d_gradients.h"
+#include <Eigen/Geometry>
+#include <string>
+#include <typeinfo>
+
+#include "g2o/core/io_helper.h"
+#include "g2o/types/slam3d/isometry3d_mappings.h"
 #include "vertex_se3.h"
 
 #ifdef G2O_HAVE_OPENGL

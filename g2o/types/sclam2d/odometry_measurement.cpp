@@ -28,6 +28,7 @@
 
 #include <Eigen/Core>
 #include <Eigen/Geometry>
+#include <cmath>
 #include <utility>
 
 namespace g2o {

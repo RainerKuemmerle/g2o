@@ -28,11 +28,16 @@
 #define G2O_TYPES_ICP
 
 #include "g2o/core/eigen_types.h"
+#include "g2o/types/slam3d/vertex_pointxyz.h"
+#include "g2o/types/slam3d/vertex_se3.h"
+
 #define GICP_ANALYTIC_JACOBIANS
 // #define SCAM_ANALYTIC_JACOBIANS
 
+#include <Eigen/Core>
 #include <Eigen/Geometry>
 #include <iosfwd>
+#include <tuple>
 
 #include "edge_gicp.h"
 #include "g2o/core/base_binary_edge.h"

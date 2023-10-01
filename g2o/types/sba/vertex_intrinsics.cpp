@@ -26,6 +26,7 @@
 
 #include "vertex_intrinsics.h"
 
+#include "g2o/core/io_helper.h"
 #include "g2o/stuff/misc.h"
 
 namespace g2o {

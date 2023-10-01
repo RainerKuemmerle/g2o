@@ -32,6 +32,7 @@
 
 #include "g2o/stuff/macros.h"
 #include "g2o/stuff/misc.h"
+#include "g2o/types/slam2d/se2.h"
 
 #ifdef G2O_HAVE_OPENGL
 #include "g2o/stuff/opengl_primitives.h"

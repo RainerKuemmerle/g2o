@@ -26,7 +26,15 @@
 
 #include "edge_se3_lotsofxyz.h"
 
+#include <Eigen/Geometry>
 #include <cassert>
+#include <map>
+#include <memory>
+#include <ostream>
+#include <vector>
+
+#include "g2o/types/slam3d/vertex_pointxyz.h"
+#include "g2o/types/slam3d/vertex_se3.h"
 
 namespace g2o {
 

@@ -26,7 +26,8 @@
 
 #include "parameter_cameraparameters.h"
 
-#include <utility>
+#include <Eigen/Core>
+#include <ostream>
 
 #include "g2o/types/slam3d/se3_ops.h"
 
@@ -34,9 +35,9 @@ namespace g2o {
 
 CameraParameters::CameraParameters() : principle_point(Vector2(0., 0.)) {}
 
-CameraParameters::CameraParameters(double focalLength,
-                                   const Vector2& principlePoint,
-                                   double baseLine)
+CameraParameters::CameraParameters(
+    double focalLength, const Eigen::Ref<const Vector2>& principlePoint,
+    double baseLine)
     : focal_length(focalLength),
       principle_point(principlePoint),
       baseline(baseLine) {}

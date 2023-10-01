@@ -26,7 +26,13 @@
 
 #include "edge_se3_pointxyz.h"
 
+#include "g2o/core/cache.h"
 #include "g2o/core/eigen_types.h"
+#include "g2o/core/io_helper.h"
+#include "g2o/core/parameter.h"
+#include "g2o/stuff/property.h"
+#include "g2o/types/slam3d/vertex_pointxyz.h"
+#include "g2o/types/slam3d/vertex_se3.h"
 #include "parameter_se3_offset.h"
 
 #ifdef G2O_HAVE_OPENGL
@@ -34,8 +40,11 @@
 #include "g2o/stuff/opengl_wrapper.h"
 #endif
 
+#include <Eigen/Geometry>
 #include <cassert>
 #include <iostream>
+#include <string>
+#include <typeinfo>
 
 namespace g2o {
 

@@ -27,9 +27,19 @@
 #ifndef G2O_EDGE_SE3_PLANE_CALIB_H
 #define G2O_EDGE_SE3_PLANE_CALIB_H
 
+#include <Eigen/Geometry>
+#include <iosfwd>
+#include <memory>
+
 #include "g2o/config.h"
 #include "g2o/core/base_variable_sized_edge.h"
+#include "g2o/core/eigen_types.h"
+#include "g2o/core/hyper_graph.h"
+#include "g2o/core/hyper_graph_action.h"
+#include "g2o/stuff/property.h"
 #include "g2o/types/slam3d/vertex_se3.h"
+#include "g2o/types/slam3d_addons/g2o_types_slam3d_addons_api.h"
+#include "g2o/types/slam3d_addons/plane3d.h"
 #include "vertex_plane.h"
 
 namespace g2o {

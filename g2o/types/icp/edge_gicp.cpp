@@ -26,6 +26,8 @@
 
 #include "edge_gicp.h"
 
+#include <Eigen/Geometry>
+
 namespace g2o {
 
 EdgeGICP::EdgeGICP() {

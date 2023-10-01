@@ -1,10 +1,9 @@
 #include "py_types_pure.h"
 
-#include <Eigen/src/Core/Matrix.h>
-#include <Eigen/src/Core/util/Constants.h>
 #include <pybind11/cast.h>
 #include <pybind11/pytypes.h>
 
+#include <Eigen/Core>
 #include <stdexcept>
 
 #include "g2o/config.h"

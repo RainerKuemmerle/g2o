@@ -26,10 +26,9 @@
 
 #include "edge_line2d.h"
 
-#ifdef G2O_HAVE_OPENGL
-#include "g2o/stuff/opengl_primitives.h"
-#include "g2o/stuff/opengl_wrapper.h"
-#endif
+#include "g2o/config.h"
+#include "g2o/core/io_helper.h"
+#include "g2o/types/slam2d_addons/vertex_line2d.h"
 
 namespace g2o {
 

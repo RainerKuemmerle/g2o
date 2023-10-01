@@ -27,7 +27,11 @@
 #ifndef G2O_SBA_EDGEPROJECTP2SC_H
 #define G2O_SBA_EDGEPROJECTP2SC_H
 
+#include <iosfwd>
+#include <tuple>
+
 #include "g2o/core/base_binary_edge.h"
+#include "g2o/core/eigen_types.h"
 #include "g2o/types/slam3d/vertex_pointxyz.h"
 #include "g2o_types_sba_api.h"
 #include "vertex_cam.h"

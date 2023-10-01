@@ -26,9 +26,13 @@
 
 #include "edge_se3_euler.h"
 
+#include <Eigen/Core>
+#include <Eigen/LU>
 #include <iostream>
 
-#include "g2o/core/factory.h"
+#include "g2o/core/eigen_types.h"
+#include "g2o/stuff/misc.h"
+#include "g2o/types/slam3d/isometry3d_mappings.h"
 
 namespace g2o {
 

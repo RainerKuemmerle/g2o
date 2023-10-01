@@ -27,13 +27,24 @@
 #ifndef G2O_EDGE_SE3_POINT_XYZ_H_
 #define G2O_EDGE_SE3_POINT_XYZ_H_
 
+#include <Eigen/Core>
+#include <iosfwd>
+#include <memory>
+#include <tuple>
+
+#include "g2o/config.h"
 #include "g2o/core/base_binary_edge.h"
+#include "g2o/core/eigen_types.h"
+#include "g2o/core/hyper_graph.h"
+#include "g2o/core/hyper_graph_action.h"
+#include "g2o/core/optimizable_graph.h"
 #include "g2o_types_slam3d_api.h"
 #include "parameter_se3_offset.h"
 #include "vertex_pointxyz.h"
 #include "vertex_se3.h"
 
 namespace g2o {
+class CacheSE3Offset;
 
 /*! \class EdgeSE3PointXYZ
  * \brief g2o edge from a track to a point node

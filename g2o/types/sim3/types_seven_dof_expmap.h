@@ -26,10 +26,17 @@
 
 #ifndef G2O_SEVEN_DOF_EXPMAP_TYPES
 #define G2O_SEVEN_DOF_EXPMAP_TYPES
+#include <iosfwd>
+#include <tuple>
+
 #include "g2o/config.h"
 #include "g2o/core/base_binary_edge.h"
 #include "g2o/core/base_vertex.h"
+#include "g2o/core/eigen_types.h"
+#include "g2o/core/optimizable_graph.h"
 #include "g2o/types/sba/types_six_dof_expmap.h"
+#include "g2o/types/sim3/types_seven_dof_expmap.h"
+#include "g2o/types/slam3d/vertex_pointxyz.h"
 #include "sim3.h"
 #include "types_seven_dof_expmap_api.h"
 

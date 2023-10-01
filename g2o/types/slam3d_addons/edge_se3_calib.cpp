@@ -26,6 +26,10 @@
 
 #include "edge_se3_calib.h"
 
+#include <Eigen/Geometry>
+
+#include "g2o/core/io_helper.h"
+#include "g2o/types/slam3d/isometry3d_mappings.h"
 #include "g2o/types/slam3d/vertex_se3.h"
 
 namespace g2o {

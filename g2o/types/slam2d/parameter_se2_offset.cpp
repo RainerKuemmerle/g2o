@@ -31,6 +31,7 @@
 #include <cmath>
 
 #include "g2o/core/io_helper.h"
+#include "g2o/types/slam2d/se2.h"
 #include "vertex_se2.h"
 
 namespace g2o {

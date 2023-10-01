@@ -26,11 +26,15 @@
 
 #include "types_icp.h"
 
+#include <Eigen/Geometry>
+#include <Eigen/LU>
 #include <iostream>
+#include <memory>
 
 #include "g2o/core/eigen_types.h"
 #include "g2o/core/factory.h"
-#include "g2o/stuff/macros.h"
+#include "g2o/stuff/misc.h"
+#include "g2o/types/icp/edge_gicp.h"
 
 namespace g2o {
 

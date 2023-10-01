@@ -26,8 +26,8 @@
 
 #include "edge_pointxy.h"
 
-#include "g2o/config.h"
 #include "g2o/core/io_helper.h"
+#include "g2o/types/slam2d/vertex_point_xy.h"
 
 namespace g2o {
 

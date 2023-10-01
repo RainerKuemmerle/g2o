@@ -26,7 +26,10 @@
 
 #include "parameter_stereo_camera.h"
 
+#include <ostream>
+
 #include "g2o/stuff/misc.h"
+#include "g2o/types/slam3d/parameter_camera.h"
 
 namespace g2o {
 

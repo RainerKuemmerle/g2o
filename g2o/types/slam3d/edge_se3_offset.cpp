@@ -26,9 +26,16 @@
 
 #include "edge_se3_offset.h"
 
-#include <cassert>
+#include <Eigen/Core>
+#include <Eigen/Geometry>
 #include <iostream>
 
+#include "g2o/core/cache.h"
+#include "g2o/core/eigen_types.h"
+#include "g2o/core/io_helper.h"
+#include "g2o/core/parameter.h"
+#include "g2o/types/slam3d/isometry3d_mappings.h"
+#include "g2o/types/slam3d/vertex_se3.h"
 #include "isometry3d_gradients.h"
 #include "parameter_se3_offset.h"
 

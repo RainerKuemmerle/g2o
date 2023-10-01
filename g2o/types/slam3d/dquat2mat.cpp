@@ -26,7 +26,7 @@
 
 #include "dquat2mat.h"
 
-#include <iostream>
+#include <math.h>
 
 namespace g2o::internal {
 

@@ -26,8 +26,13 @@
 
 #include "types_seven_dof_expmap.h"
 
+#include <Eigen/Core>
+#include <memory>
+
 #include "g2o/core/factory.h"
-#include "g2o/stuff/macros.h"
+#include "g2o/core/io_helper.h"
+#include "g2o/types/sim3/sim3.h"
+#include "g2o/types/slam3d/se3_ops.h"
 
 namespace g2o {
 

@@ -26,6 +26,15 @@
 
 #include "vertex_line2d.h"
 
+#include <cmath>
+#include <istream>
+#include <string>
+#include <typeinfo>
+
+#include "g2o/core/optimizable_graph.h"
+#include "g2o/types/slam2d/vertex_point_xy.h"
+#include "g2o/types/slam2d_addons/line_2d.h"
+
 #ifdef G2O_HAVE_OPENGL
 #include "g2o/stuff/opengl_wrapper.h"
 #endif

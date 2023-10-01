@@ -26,6 +26,7 @@
 
 #include "edge_se2.h"
 
+#include <Eigen/Core>
 #include <cmath>
 #include <string>
 #include <typeinfo>
@@ -34,6 +35,8 @@
 #include "g2o/core/io_helper.h"
 #include "g2o/stuff/macros.h"
 #include "g2o/stuff/misc.h"
+#include "g2o/types/slam2d/se2.h"
+#include "g2o/types/slam2d/vertex_se2.h"
 
 #ifdef G2O_HAVE_OPENGL
 #include "g2o/stuff/opengl_primitives.h"

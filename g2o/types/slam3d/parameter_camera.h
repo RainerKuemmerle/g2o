@@ -27,7 +27,14 @@
 #ifndef G2O_CAMERA_PARAMETERS_H_
 #define G2O_CAMERA_PARAMETERS_H_
 
+#include <iosfwd>
+#include <memory>
+
+#include "g2o/config.h"
+#include "g2o/core/eigen_types.h"
+#include "g2o/core/hyper_graph.h"
 #include "g2o/core/hyper_graph_action.h"
+#include "g2o/stuff/property.h"
 #include "g2o_types_slam3d_api.h"
 #include "parameter_se3_offset.h"
 

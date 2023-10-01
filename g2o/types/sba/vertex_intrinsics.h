@@ -27,11 +27,16 @@
 #ifndef G2O_SBA_VERTEX_INTRINSICS_H
 #define G2O_SBA_VERTEX_INTRINSICS_H
 
+#include <Eigen/Core>
+#include <iosfwd>
+
 #include "g2o/core/base_vertex.h"
 #include "g2o/core/eigen_types.h"
 #include "g2o_types_sba_api.h"
 
 namespace g2o {
+template <typename T>
+struct TypeTraits;
 
 struct VertexIntrinsicsEstimate {
   VectorN<5> values;

@@ -26,7 +26,10 @@
 
 #include "isometry3d_mappings.h"
 
+#include <cmath>
+
 #include "g2o/stuff/misc.h"
+#include "g2o/types/slam3d/se3quat.h"
 
 namespace g2o {
 namespace internal {

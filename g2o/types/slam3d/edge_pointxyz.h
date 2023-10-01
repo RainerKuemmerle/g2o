@@ -27,8 +27,14 @@
 #ifndef G2O_EDGE_POINTXYZ_H
 #define G2O_EDGE_POINTXYZ_H
 
+#include <Eigen/Core>
+#include <iosfwd>
+#include <tuple>
+
 #include "g2o/config.h"
 #include "g2o/core/base_binary_edge.h"
+#include "g2o/core/eigen_types.h"
+#include "g2o/core/optimizable_graph.h"
 #include "g2o_types_slam3d_api.h"
 #include "vertex_pointxyz.h"
 

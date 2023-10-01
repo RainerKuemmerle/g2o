@@ -27,15 +27,19 @@
 #ifndef G2O_SBA_EDGEPROJECTXYZ2UVU_H
 #define G2O_SBA_EDGEPROJECTXYZ2UVU_H
 
+#include <iosfwd>
 #include <memory>
+#include <tuple>
 
 #include "g2o/core/base_binary_edge.h"
+#include "g2o/core/eigen_types.h"
 #include "g2o/types/slam3d/vertex_pointxyz.h"
 #include "g2o_types_sba_api.h"
 #include "parameter_cameraparameters.h"
 #include "vertex_se3_expmap.h"
 
 namespace g2o {
+class CameraParameters;
 
 // Stereo Observations
 // U: left u

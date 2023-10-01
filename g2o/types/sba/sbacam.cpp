@@ -26,10 +26,12 @@
 
 #include "sbacam.h"
 
+#include <math.h>
+
 #include <Eigen/Core>
 #include <Eigen/Geometry>
+#include <ostream>
 
-#include "g2o/stuff/macros.h"
 #include "g2o/stuff/misc.h"
 
 namespace g2o {

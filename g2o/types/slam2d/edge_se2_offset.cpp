@@ -26,12 +26,14 @@
 
 #include "edge_se2_offset.h"
 
-#include <iostream>
+#include <Eigen/Core>
 
 #include "g2o/core/cache.h"
 #include "g2o/core/eigen_types.h"
 #include "g2o/core/io_helper.h"
 #include "g2o/core/parameter.h"
+#include "g2o/types/slam2d/se2.h"
+#include "g2o/types/slam2d/vertex_se2.h"
 #include "parameter_se2_offset.h"
 
 namespace g2o {

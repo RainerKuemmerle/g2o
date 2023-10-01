@@ -35,14 +35,57 @@
 
 namespace g2o {
 
-inline G2O_TYPES_SLAM3D_API Matrix3 skew(const Vector3& v);
-inline G2O_TYPES_SLAM3D_API Vector3 deltaR(const Matrix3& R);
-inline G2O_TYPES_SLAM3D_API Vector2 project(const Vector3&);
-inline G2O_TYPES_SLAM3D_API Vector3 project(const Vector4&);
-inline G2O_TYPES_SLAM3D_API Vector3 unproject(const Vector2&);
-inline G2O_TYPES_SLAM3D_API Vector4 unproject(const Vector3&);
+inline G2O_TYPES_SLAM3D_API Matrix3 skew(const Eigen::Ref<const Vector3>& v) {
+  Matrix3 m;
+  m.fill(0.);
+  m(0, 1) = -v(2);
+  m(0, 2) = v(1);
+  m(1, 2) = -v(0);
+  m(1, 0) = v(2);
+  m(2, 0) = -v(1);
+  m(2, 1) = v(0);
+  return m;
+}
 
-#include "se3_ops.hpp"
+inline G2O_TYPES_SLAM3D_API Vector3 deltaR(const Eigen::Ref<const Matrix3>& R) {
+  Vector3 v;
+  v(0) = R(2, 1) - R(1, 2);
+  v(1) = R(0, 2) - R(2, 0);
+  v(2) = R(1, 0) - R(0, 1);
+  return v;
+}
+
+inline G2O_TYPES_SLAM3D_API Vector2 project(const Vector3& v) {
+  Vector2 res;
+  res(0) = v(0) / v(2);
+  res(1) = v(1) / v(2);
+  return res;
+}
+
+inline G2O_TYPES_SLAM3D_API Vector3 project(const Vector4& v) {
+  Vector3 res;
+  res(0) = v(0) / v(3);
+  res(1) = v(1) / v(3);
+  res(2) = v(2) / v(3);
+  return res;
+}
+
+inline G2O_TYPES_SLAM3D_API Vector3 unproject(const Vector2& v) {
+  Vector3 res;
+  res(0) = v(0);
+  res(1) = v(1);
+  res(2) = 1;
+  return res;
+}
+
+inline G2O_TYPES_SLAM3D_API Vector4 unproject(const Vector3& v) {
+  Vector4 res;
+  res(0) = v(0);
+  res(1) = v(1);
+  res(2) = v(2);
+  res(3) = 1;
+  return res;
+}
 
 }  // namespace g2o
 

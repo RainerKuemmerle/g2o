@@ -26,10 +26,16 @@
 
 #include "types_sba.h"
 
-#include <iostream>
+#include <memory>
 
 #include "g2o/core/factory.h"
-#include "g2o/stuff/macros.h"
+#include "g2o/types/sba/edge_project_p2mc.h"
+#include "g2o/types/sba/edge_project_p2sc.h"
+#include "g2o/types/sba/edge_sba_cam.h"
+#include "g2o/types/sba/edge_sba_scale.h"
+#include "g2o/types/sba/vertex_cam.h"
+#include "g2o/types/sba/vertex_intrinsics.h"
+#include "g2o/types/slam3d/se3quat.h"
 
 namespace g2o {
 

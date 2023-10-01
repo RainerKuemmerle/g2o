@@ -29,12 +29,10 @@
 
 #include "g2o/config.h"
 #include "g2o/types/slam2d/types_slam2d.h"
-
 // line slam ver 1
 #include "edge_se2_segment2d.h"
 #include "edge_se2_segment2d_line.h"
 #include "edge_se2_segment2d_pointLine.h"
-
 // line slam ver 2
 #include "edge_line2d.h"
 #include "edge_line2d_pointxy.h"

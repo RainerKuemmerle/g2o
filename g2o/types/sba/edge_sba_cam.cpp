@@ -26,6 +26,14 @@
 
 #include "edge_sba_cam.h"
 
+#include <Eigen/Core>
+#include <memory>
+
+#include "g2o/core/eigen_types.h"
+#include "g2o/core/io_helper.h"
+#include "g2o/types/sba/sbacam.h"
+#include "g2o/types/sba/vertex_cam.h"
+
 namespace g2o {
 
 bool EdgeSBACam::read(std::istream& is) {

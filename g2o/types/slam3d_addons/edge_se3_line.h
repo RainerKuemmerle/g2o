@@ -27,9 +27,16 @@
 #ifndef G2O_EDGE_SE3_LINE_H_
 #define G2O_EDGE_SE3_LINE_H_
 
+#include <iosfwd>
 #include <memory>
+#include <tuple>
 
+#include "g2o/config.h"
 #include "g2o/core/base_binary_edge.h"
+#include "g2o/core/eigen_types.h"
+#include "g2o/core/hyper_graph.h"
+#include "g2o/core/hyper_graph_action.h"
+#include "g2o/stuff/property.h"
 #include "g2o/types/slam3d/parameter_se3_offset.h"
 #include "g2o/types/slam3d/vertex_se3.h"
 #include "g2o_types_slam3d_addons_api.h"
@@ -37,6 +44,7 @@
 #include "vertex_line3d.h"
 
 namespace g2o {
+class CacheSE3Offset;
 
 class G2O_TYPES_SLAM3D_ADDONS_API EdgeSE3Line3D
     : public BaseBinaryEdge<4, Line3D, VertexSE3, VertexLine3D> {

@@ -33,7 +33,6 @@
 #include <ostream>
 #include <vector>
 
-#include "g2o/config.h"
 #include "se2.h"
 #include "vertex_point_xy.h"
 #include "vertex_se2.h"

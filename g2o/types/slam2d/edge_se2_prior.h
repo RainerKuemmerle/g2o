@@ -30,7 +30,6 @@
 #include <Eigen/Core>
 #include <iosfwd>
 #include <memory>
-#include <tuple>
 
 #include "g2o/core/base_unary_edge.h"
 #include "g2o/core/optimizable_graph.h"

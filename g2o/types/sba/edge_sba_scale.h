@@ -27,7 +27,12 @@
 #ifndef G2O_SBA_EDGESBASCALE_H
 #define G2O_SBA_EDGESBASCALE_H
 
+#include <iosfwd>
+#include <tuple>
+
 #include "g2o/core/base_binary_edge.h"
+#include "g2o/core/optimizable_graph.h"
+#include "g2o/stuff/misc.h"
 #include "g2o_types_sba_api.h"
 #include "vertex_cam.h"
 

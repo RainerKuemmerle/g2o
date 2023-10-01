@@ -26,7 +26,7 @@
 
 #include "vertex_se3_expmap.h"
 
-#include "g2o/stuff/misc.h"
+#include "g2o/core/io_helper.h"
 
 namespace g2o {
 

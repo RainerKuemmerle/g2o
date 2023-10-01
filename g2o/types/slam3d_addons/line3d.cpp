@@ -26,6 +26,8 @@
 
 #include "line3d.h"
 
+#include <Eigen/Cholesky>
+
 #include "g2o/stuff/misc.h"
 
 namespace g2o {

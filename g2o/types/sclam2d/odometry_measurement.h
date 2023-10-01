@@ -34,6 +34,8 @@
 #include "g2o_types_sclam2d_api.h"
 
 namespace g2o {
+template <typename T>
+struct TypeTraits;
 
 /**
  * \brief velocity measurement of a differential robot

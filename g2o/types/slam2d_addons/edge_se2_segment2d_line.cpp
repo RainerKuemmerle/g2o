@@ -26,6 +26,8 @@
 
 #include "edge_se2_segment2d_line.h"
 
+#include "g2o/core/io_helper.h"
+
 namespace g2o {
 
 bool EdgeSE2Segment2DLine::read(std::istream& is) {

@@ -28,6 +28,7 @@
 #define G2O_SBA_CAMERAPARAMETERS_H
 
 #include <Eigen/Core>
+#include <iosfwd>
 
 #include "g2o/core/eigen_types.h"
 #include "g2o/core/parameter.h"
@@ -38,7 +39,8 @@ namespace g2o {
 class G2O_TYPES_SBA_API CameraParameters : public g2o::Parameter {
  public:
   CameraParameters();
-  CameraParameters(double focalLength, const Vector2& principlePoint,
+  CameraParameters(double focalLength,
+                   const Eigen::Ref<const Vector2>& principlePoint,
                    double baseLine);
 
   [[nodiscard]] Vector2 cam_map(const Vector3& trans_xyz) const;

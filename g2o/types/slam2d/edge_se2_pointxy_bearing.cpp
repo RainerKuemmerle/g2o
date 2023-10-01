@@ -32,6 +32,9 @@
 #include <typeinfo>
 
 #include "g2o/stuff/property.h"
+#include "g2o/types/slam2d/se2.h"
+#include "g2o/types/slam2d/vertex_point_xy.h"
+#include "g2o/types/slam2d/vertex_se2.h"
 
 #ifdef G2O_HAVE_OPENGL
 #include "g2o/stuff/opengl_primitives.h"

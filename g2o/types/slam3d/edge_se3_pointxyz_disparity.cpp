@@ -26,7 +26,19 @@
 
 #include "edge_se3_pointxyz_disparity.h"
 
+#include <Eigen/Core>
+#include <Eigen/Geometry>
 #include <cassert>
+#include <string>
+#include <typeinfo>
+
+#include "g2o/core/cache.h"
+#include "g2o/core/io_helper.h"
+#include "g2o/core/parameter.h"
+#include "g2o/stuff/property.h"
+#include "g2o/types/slam3d/parameter_camera.h"
+#include "g2o/types/slam3d/vertex_pointxyz.h"
+#include "g2o/types/slam3d/vertex_se3.h"
 
 #ifdef G2O_HAVE_OPENGL
 #include "g2o/stuff/opengl_primitives.h"

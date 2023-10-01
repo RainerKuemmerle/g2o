@@ -27,14 +27,20 @@
 #ifndef G2O_EDGE_SE3_PRIOR_XYZ_H
 #define G2O_EDGE_SE3_PRIOR_XYZ_H
 
+#include <iosfwd>
 #include <memory>
+#include <tuple>
 
 #include "g2o/core/base_unary_edge.h"
+#include "g2o/core/eigen_types.h"
+#include "g2o/core/optimizable_graph.h"
 #include "g2o_types_slam3d_api.h"
 #include "parameter_se3_offset.h"
 #include "vertex_se3.h"
 
 namespace g2o {
+class CacheSE3Offset;
+
 /**
  * \brief Prior for a 3D pose with constraints only in xyz direction
  */

@@ -26,7 +26,15 @@
 
 #include "parameter_camera.h"
 
-#include "isometry3d_gradients.h"
+#include <Eigen/Core>
+#include <Eigen/Geometry>
+#include <Eigen/LU>
+#include <ostream>
+#include <string>
+#include <typeinfo>
+
+#include "g2o/core/io_helper.h"
+#include "g2o/types/slam3d/parameter_se3_offset.h"
 #include "isometry3d_mappings.h"
 
 #ifdef G2O_HAVE_OPENGL

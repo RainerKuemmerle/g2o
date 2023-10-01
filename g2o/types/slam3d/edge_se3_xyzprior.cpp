@@ -26,7 +26,15 @@
 
 #include "edge_se3_xyzprior.h"
 
+#include <Eigen/Core>
+#include <Eigen/Geometry>
 #include <cassert>
+
+#include "g2o/core/cache.h"
+#include "g2o/core/io_helper.h"
+#include "g2o/core/parameter.h"
+#include "g2o/types/slam3d/parameter_se3_offset.h"
+#include "g2o/types/slam3d/vertex_se3.h"
 
 namespace g2o {
 

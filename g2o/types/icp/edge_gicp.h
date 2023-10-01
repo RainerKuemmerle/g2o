@@ -27,11 +27,15 @@
 #ifndef G2O_TYPES_ICP_EDGE_GICP_H
 #define G2O_TYPES_ICP_EDGE_GICP_H
 
+#include <Eigen/Core>
+
 #include "g2o/core/eigen_types.h"
 #include "g2o/core/type_traits.h"
 #include "g2o_types_icp_api.h"
 
 namespace g2o {
+template <typename T>
+struct TypeTraits;
 
 /**
  * @brief class for edges between two points rigidly attached to vertices

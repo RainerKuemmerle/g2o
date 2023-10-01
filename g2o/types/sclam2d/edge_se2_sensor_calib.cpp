@@ -25,6 +25,12 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "edge_se2_sensor_calib.h"
+
+#include <string>
+#include <typeinfo>
+
+#include "g2o/core/eigen_types.h"
+#include "g2o/core/io_helper.h"
 #ifdef G2O_HAVE_OPENGL
 #include "g2o/stuff/opengl_wrapper.h"
 #endif

@@ -27,7 +27,13 @@
 #ifndef G2O_SBA_EDGEPROJECTSTEREOXYZ_H
 #define G2O_SBA_EDGEPROJECTSTEREOXYZ_H
 
+#include <Eigen/Core>
+#include <iosfwd>
+#include <tuple>
+
 #include "g2o/core/base_binary_edge.h"
+#include "g2o/core/eigen_types.h"
+#include "g2o/types/slam3d/se3quat.h"
 #include "g2o/types/slam3d/vertex_pointxyz.h"
 #include "g2o_types_sba_api.h"
 #include "vertex_se3_expmap.h"

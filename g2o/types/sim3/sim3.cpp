@@ -26,7 +26,10 @@
 
 #include "sim3.h"
 
+#include <Eigen/LU>
 #include <cassert>
+#include <cmath>
+#include <ostream>
 #include <utility>
 
 #include "g2o/stuff/misc.h"

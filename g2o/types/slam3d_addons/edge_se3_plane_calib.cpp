@@ -26,8 +26,14 @@
 
 #include "edge_se3_plane_calib.h"
 
+#include <Eigen/Core>
 #include <iostream>
+#include <string>
+#include <typeinfo>
 
+#include "g2o/core/io_helper.h"
+#include "g2o/stuff/macros.h"
+#include "g2o/stuff/misc.h"
 #include "g2o/stuff/opengl_wrapper.h"
 
 namespace g2o {

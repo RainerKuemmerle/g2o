@@ -27,6 +27,8 @@
 #ifndef G2O_VERTEX_SE3_EULER_
 #define G2O_VERTEX_SE3_EULER_
 
+#include <iosfwd>
+
 #include "g2o/types/slam3d/vertex_se3.h"
 #include "g2o_types_slam3d_addons_api.h"
 

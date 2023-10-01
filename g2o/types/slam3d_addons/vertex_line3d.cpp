@@ -26,8 +26,13 @@
 
 #include "vertex_line3d.h"
 
-#include "g2o/stuff/misc.h"
+#include <Eigen/Geometry>
+#include <string>
+#include <typeinfo>
+
+#include "g2o/core/io_helper.h"
 #include "g2o/stuff/opengl_wrapper.h"
+#include "g2o/types/slam3d_addons/line3d.h"
 
 namespace g2o {
 

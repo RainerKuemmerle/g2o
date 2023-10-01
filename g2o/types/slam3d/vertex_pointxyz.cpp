@@ -31,7 +31,10 @@
 #include "g2o/stuff/opengl_wrapper.h"
 #endif
 
+#include <string>
 #include <typeinfo>
+
+#include "g2o/core/io_helper.h"
 
 namespace g2o {
 

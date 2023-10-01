@@ -26,7 +26,13 @@
 
 #include "vertex_cam.h"
 
+#include <Eigen/Core>
+#include <ostream>
+
+#include "g2o/core/io_helper.h"
 #include "g2o/stuff/logger.h"
+#include "g2o/stuff/misc.h"
+#include "g2o/types/sba/sbacam.h"
 
 namespace g2o {
 
