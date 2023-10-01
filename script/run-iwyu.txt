@@ -1,5 +1,7 @@
 Using iwyu-tool
 
+export PATH=/home/goki/workspace/include-what-you-use/build/bin:$PATH
+
 ~/workspace/include-what-you-use/iwyu_tool.py -p . ../g2o  -- -Xiwyu --mapping_file=/home/goki/workspace/g2o/script/iwyu-mapping.imp 2>&1 | tee /tmp/iwyu.txt
 
 Applying the fixes
