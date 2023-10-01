@@ -28,7 +28,7 @@
 
 #include <cstring>
 
-#include "dynamic_aligned_buffer.hpp"
+#include "dynamic_aligned_buffer.h"
 
 namespace g2o {
 

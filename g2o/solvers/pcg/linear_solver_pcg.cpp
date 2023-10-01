@@ -24,6 +24,4 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-// helpers for doing fixed or variable size operations on the matrices
-
 #include "linear_solver_pcg.h"
