@@ -158,7 +158,7 @@ class AutoDifferentiation {
   template <int EdgeDimension, int VertexDimension>
   using ADJacobianType =
       typename Eigen::Matrix<double, EdgeDimension, VertexDimension,
-                             Eigen::RowMajor>;
+                             (EdgeDimension > 1 && VertexDimension == 1) ? Eigen::ColMajor : Eigen::RowMajor>;
 
   //! helper for computing the error based on the functor in the edge
   static void computeError(Edge* that) {
