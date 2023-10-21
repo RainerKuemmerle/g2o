@@ -30,7 +30,8 @@
 #include "g2o/core/optimization_algorithm_levenberg.h"
 #include "g2o/solvers/eigen/linear_solver_eigen.h"
 #include "g2o/types/slam3d/edge_se3.h"
-#include "gtest/gtest.h"
+#include "gmock/gmock.h"
+#include "unit_test/test_helper/eigen_matcher.h"
 
 using namespace std;
 using namespace g2o;
@@ -91,10 +92,10 @@ TYPED_TEST_P(Slam3DOptimization, Translation) {
 
   g2o::VertexSE3* v2AfterOpti =
       dynamic_cast<g2o::VertexSE3*>(this->optimizer.vertex(1));
-  ASSERT_TRUE(
-      v2AfterOpti->estimate().translation().isApprox(g2o::Vector3::Zero()));
-  ASSERT_TRUE(v2AfterOpti->estimate().rotation().diagonal().isApprox(
-      g2o::Vector3::Ones()));
+  EXPECT_THAT(print_wrap(v2AfterOpti->estimate().translation()),
+              EigenMaxDiff(print_wrap(g2o::Vector3::Zero()), 1e-3));
+  EXPECT_THAT(print_wrap(v2AfterOpti->estimate().rotation().diagonal()),
+              EigenMaxDiff(print_wrap(g2o::Vector3::Ones()), 1e-3));
 }
 
 TYPED_TEST_P(Slam3DOptimization, Rotation) {
@@ -130,10 +131,10 @@ TYPED_TEST_P(Slam3DOptimization, Rotation) {
 
   g2o::VertexSE3* v2AfterOpti =
       dynamic_cast<g2o::VertexSE3*>(this->optimizer.vertex(1));
-  ASSERT_TRUE(
-      v2AfterOpti->estimate().translation().isApprox(g2o::Vector3::Zero()));
-  ASSERT_TRUE(v2AfterOpti->estimate().rotation().diagonal().isApprox(
-      g2o::Vector3::Ones()));
+  EXPECT_THAT(print_wrap(v2AfterOpti->estimate().translation()),
+              EigenMaxDiff(print_wrap(g2o::Vector3::Zero()), 1e-3));
+  EXPECT_THAT(print_wrap(v2AfterOpti->estimate().rotation().diagonal()),
+              EigenMaxDiff(print_wrap(g2o::Vector3::Ones()), 1e-3));
 }
 
 // registering the test suite and all the types to be tested
