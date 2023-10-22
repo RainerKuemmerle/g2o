@@ -31,7 +31,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <functional>
-#include <iostream>
+#include <iosfwd>
 #include <map>
 #include <memory>
 #include <set>
@@ -40,10 +40,8 @@
 #include <vector>
 
 #include "g2o/core/eigen_types.h"
-#include "g2o/stuff/macros.h"
 #include "g2o_core_api.h"
 #include "hyper_graph.h"
-#include "io_helper.h"
 #include "jacobian_workspace.h"
 #include "openmp_mutex.h"
 #include "parameter.h"

@@ -25,7 +25,6 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <cassert>
-#include <cstdint>
 #include <iostream>
 #include <unordered_set>
 
@@ -34,7 +33,7 @@
 #include "g2o/core/sparse_optimizer.h"
 #include "g2o/solvers/structure_only/structure_only_solver.h"
 #include "g2o/stuff/sampler.h"
-#include "g2o/types/sba/types_six_dof_expmap.h"
+#include "g2o/types/sba/types_six_dof_expmap.h"  // IWYU pragma: keep
 
 #if defined G2O_HAVE_CHOLMOD
 G2O_USE_OPTIMIZATION_LIBRARY(cholmod);
@@ -45,7 +44,6 @@ G2O_USE_OPTIMIZATION_LIBRARY(eigen);
 G2O_USE_OPTIMIZATION_LIBRARY(dense);
 
 using std::cout;
-using std::endl;
 
 class Sample {
  public:
@@ -56,27 +54,27 @@ class Sample {
 
 int main(int argc, const char* argv[]) {
   if (argc < 2) {
-    cout << endl;
-    cout << "Please type: " << endl;
+    cout << '\n';
+    cout << "Please type: \n";
     cout << "ba_demo [PIXEL_NOISE] [OUTLIER RATIO] [ROBUST_KERNEL] "
             "[STRUCTURE_ONLY] [DENSE]"
-         << endl;
-    cout << endl;
-    cout << "PIXEL_NOISE: noise in image space (E.g.: 1)" << endl;
+         << '\n';
+    cout << '\n';
+    cout << "PIXEL_NOISE: noise in image space (E.g.: 1)\n";
     cout << "OUTLIER_RATIO: probability of spurious observation  (default: 0.0)"
-         << endl;
+         << '\n';
     cout << "ROBUST_KERNEL: use robust kernel (0 or 1; default: 0==false)"
-         << endl;
+         << '\n';
     cout << "STRUCTURE_ONLY: performed structure-only BA to get better point "
             "initializations (0 or "
             "1; default: 0==false)"
-         << endl;
-    cout << "DENSE: Use dense solver (0 or 1; default: 0==false)" << endl;
-    cout << endl;
+         << '\n';
+    cout << "DENSE: Use dense solver (0 or 1; default: 0==false)\n";
+    cout << '\n';
     cout << "Note, if OUTLIER_RATIO is above 0, ROBUST_KERNEL should be set to "
             "1==true."
-         << endl;
-    cout << endl;
+         << '\n';
+    cout << '\n';
     exit(0);
   }
 
@@ -101,11 +99,11 @@ int main(int argc, const char* argv[]) {
     DENSE = atoi(argv[5]) != 0;
   }
 
-  cout << "PIXEL_NOISE: " << PIXEL_NOISE << endl;
-  cout << "OUTLIER_RATIO: " << OUTLIER_RATIO << endl;
-  cout << "ROBUST_KERNEL: " << ROBUST_KERNEL << endl;
-  cout << "STRUCTURE_ONLY: " << STRUCTURE_ONLY << endl;
-  cout << "DENSE: " << DENSE << endl;
+  cout << "PIXEL_NOISE: " << PIXEL_NOISE << '\n';
+  cout << "OUTLIER_RATIO: " << OUTLIER_RATIO << '\n';
+  cout << "ROBUST_KERNEL: " << ROBUST_KERNEL << '\n';
+  cout << "STRUCTURE_ONLY: " << STRUCTURE_ONLY << '\n';
+  cout << "DENSE: " << DENSE << '\n';
 
   g2o::SparseOptimizer optimizer;
   optimizer.setVerbose(false);
@@ -164,7 +162,7 @@ int main(int argc, const char* argv[]) {
   int point_id = vertex_id;
   double sum_diff2 = 0;
 
-  cout << endl;
+  cout << '\n';
   std::unordered_map<int, int> pointid_2_trueid;
   std::unordered_set<int> inliers;
 
@@ -221,12 +219,12 @@ int main(int argc, const char* argv[]) {
       ++point_id;
     }
   }
-  cout << endl;
+  cout << '\n';
   optimizer.initializeOptimization();
   optimizer.setVerbose(true);
   if (STRUCTURE_ONLY) {
     g2o::StructureOnlySolver<3> structure_only_ba;
-    cout << "Performing structure-only BA:" << endl;
+    cout << "Performing structure-only BA:\n";
     g2o::OptimizableGraph::VertexContainer points;
     for (const auto& it : optimizer.vertices()) {
       auto v =
@@ -236,22 +234,22 @@ int main(int argc, const char* argv[]) {
     structure_only_ba.calc(points, 10);
   }
   // optimizer.save("test.g2o");
-  cout << endl;
-  cout << "Performing full BA:" << endl;
+  cout << '\n';
+  cout << "Performing full BA:\n";
   optimizer.optimize(10);
-  cout << endl;
+  cout << '\n';
   cout << "Point error before optimisation (inliers only): "
-       << sqrt(sum_diff2 / inliers.size()) << endl;
+       << sqrt(sum_diff2 / inliers.size()) << '\n';
   sum_diff2 = 0;
   for (auto& it : pointid_2_trueid) {
     auto v_it = optimizer.vertices().find(it.first);
     if (v_it == optimizer.vertices().end()) {
-      std::cerr << "Vertex " << it.first << " not in graph!" << endl;
+      std::cerr << "Vertex " << it.first << " not in graph!\n";
       exit(-1);
     }
     auto* v_p = dynamic_cast<g2o::VertexPointXYZ*>(v_it->second.get());
     if (v_p == nullptr) {
-      std::cerr << "Vertex " << it.first << "is not a PointXYZ!" << endl;
+      std::cerr << "Vertex " << it.first << "is not a PointXYZ!\n";
       exit(-1);
     }
     g2o::Vector3 diff = v_p->estimate() - true_points[it.second];
@@ -259,6 +257,6 @@ int main(int argc, const char* argv[]) {
     sum_diff2 += diff.dot(diff);
   }
   cout << "Point error after optimisation (inliers only): "
-       << sqrt(sum_diff2 / inliers.size()) << endl;
-  cout << endl;
+       << sqrt(sum_diff2 / inliers.size()) << '\n';
+  cout << '\n';
 }

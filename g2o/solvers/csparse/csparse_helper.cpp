@@ -26,8 +26,6 @@
 
 #include "csparse_helper.h"
 
-#include <memory>
-
 #include "g2o/stuff/sparse_helper.h"
 
 namespace g2o::csparse_extension {

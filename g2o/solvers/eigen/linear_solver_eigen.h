@@ -30,8 +30,6 @@
 #include <Eigen/Sparse>
 #include <Eigen/SparseCholesky>
 #include <cassert>
-#include <iostream>
-#include <vector>
 
 #include "g2o/core/batch_stats.h"
 #include "g2o/core/linear_solver.h"

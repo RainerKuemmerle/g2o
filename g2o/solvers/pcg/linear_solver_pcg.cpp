@@ -24,4 +24,4 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "linear_solver_pcg.h"
+#include "linear_solver_pcg.h"  // IWYU pragma: keep

@@ -48,8 +48,7 @@ SFG_StrokeFont* fghStrokeByID(FontID font) {
   if (font == kGlutStrokeMonoRoman)
     return const_cast<SFG_StrokeFont*>(&kFgStrokeMonoRoman);
 
-  std::cerr << "stroke font " << static_cast<int>(font) << " not found"
-            << std::endl;
+  std::cerr << "stroke font " << static_cast<int>(font) << " not found\n";
   return nullptr;
 }
 }  // namespace

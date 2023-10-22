@@ -27,12 +27,14 @@
 #include <cstdlib>
 #include <fstream>
 #include <iostream>
-#include <sstream>
 
 #include "g2o/core/optimizable_graph.h"
 #include "g2o/stuff/command_args.h"
-#include "g2o/types/slam2d/types_slam2d.h"
-#include "g2o/types/slam3d/types_slam3d.h"
+#include "g2o/types/slam2d/edge_se2.h"
+#include "g2o/types/slam2d/edge_se2_offset.h"
+#include "g2o/types/slam2d/edge_se2_pointxy.h"
+#include "g2o/types/slam2d/edge_se2_pointxy_bearing.h"
+#include "g2o/types/slam2d/edge_se2_pointxy_offset.h"
 
 namespace g2o {
 
@@ -79,24 +81,24 @@ int main(int argc, char** argv) {
   g2o::OptimizableGraph graph;
 
   if (inputFilename.empty()) {
-    std::cerr << "No input data specified" << std::endl;
+    std::cerr << "No input data specified\n";
     return 0;
   }
   if (inputFilename == "-") {
-    std::cerr << "Read input from stdin" << std::endl;
+    std::cerr << "Read input from stdin\n";
     if (!graph.load(std::cin)) {
-      std::cerr << "Error loading graph" << std::endl;
+      std::cerr << "Error loading graph\n";
       return 2;
     }
   } else {
-    std::cerr << "Read input from " << inputFilename << std::endl;
+    std::cerr << "Read input from " << inputFilename << '\n';
     std::ifstream ifs(inputFilename.c_str());
     if (!ifs) {
-      std::cerr << "Failed to open file" << std::endl;
+      std::cerr << "Failed to open file\n";
       return 1;
     }
     if (!graph.load(ifs)) {
-      std::cerr << "Error loading graph" << std::endl;
+      std::cerr << "Error loading graph\n";
       return 2;
     }
   }

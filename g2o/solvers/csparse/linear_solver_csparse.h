@@ -28,7 +28,6 @@
 #define G2O_LINEAR_SOLVERCSPARSE_H
 
 #include <cassert>
-#include <iostream>
 
 #include "csparse_wrapper.h"
 #include "g2o/core/batch_stats.h"
@@ -36,7 +35,6 @@
 #include "g2o/core/marginal_covariance_cholesky.h"
 #include "g2o/stuff/logger.h"
 #include "g2o/stuff/timeutil.h"
-#include "g2o_csparse_api.h"
 
 namespace g2o {
 

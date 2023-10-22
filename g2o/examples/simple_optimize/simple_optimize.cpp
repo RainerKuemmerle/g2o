@@ -64,7 +64,7 @@ int main(int argc, char** argv) {
 
   std::ifstream ifs(inputFilename.c_str());
   if (!ifs) {
-    std::cerr << "unable to open " << inputFilename << std::endl;
+    std::cerr << "unable to open " << inputFilename << '\n';
     return 1;
   }
   optimizer.load(ifs);
@@ -79,7 +79,7 @@ int main(int argc, char** argv) {
       std::cerr << "saving " << outputFilename << " ... ";
       optimizer.save(outputFilename.c_str());
     }
-    std::cerr << "done." << std::endl;
+    std::cerr << "done.\n";
   }
   return 0;
 }

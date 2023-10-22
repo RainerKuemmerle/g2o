@@ -32,16 +32,13 @@
 #include <cassert>
 #include <cstdlib>
 #include <cstring>
-#include <fstream>
-#include <iomanip>
-#include <map>
 #include <memory>
 #include <string>
 #include <utility>
 #include <vector>
 
 #include "dynamic_aligned_buffer.h"
-#include "g2o/config.h"
+#include "g2o/config.h"  // IWYU pragma: keep
 #include "g2o/core/batch_stats.h"
 #include "g2o/core/eigen_types.h"
 #include "g2o/core/hyper_graph.h"
@@ -49,8 +46,6 @@
 #include "g2o/core/optimizable_graph.h"
 #include "g2o/core/sparse_block_matrix_ccs.h"
 #include "g2o/stuff/logger.h"
-#include "g2o/stuff/macros.h"
-#include "g2o/stuff/misc.h"
 #include "g2o/stuff/timeutil.h"
 #include "linear_solver.h"
 #include "solver.h"

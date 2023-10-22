@@ -31,10 +31,7 @@
 #include <Eigen/Cholesky>
 #include <Eigen/Core>
 #include <cassert>
-#include <utility>
-#include <vector>
 
-#include "g2o/core/batch_stats.h"
 #include "g2o/core/linear_solver.h"
 
 namespace g2o {

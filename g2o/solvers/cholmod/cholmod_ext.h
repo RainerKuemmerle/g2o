@@ -29,8 +29,7 @@
 
 #include <cholmod.h>
 
-namespace g2o {
-namespace cholmod {
+namespace g2o::cholmod {
 
 /**
  * \brief Our extension of the CHOLMOD matrix struct
@@ -53,16 +52,16 @@ struct CholmodExt : public cholmod_sparse {
     packed = 1;
   }
   ~CholmodExt() {
-    delete[] (int*)p;
+    delete[] static_cast<int*>(p);
     p = nullptr;
-    delete[] (double*)x;
+    delete[] static_cast<double*>(x);
     x = nullptr;
-    delete[] (int*)i;
+    delete[] static_cast<int*>(i);
     i = nullptr;
   }
   size_t columnsAllocated = 0;
 };
 
-}  // namespace cholmod
-}  // namespace g2o
+}  // namespace g2o::cholmod
+
 #endif

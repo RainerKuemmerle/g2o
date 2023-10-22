@@ -30,8 +30,7 @@
 #include <cstddef>
 #include <memory>
 
-namespace g2o {
-namespace cholmod {
+namespace g2o::cholmod {
 
 class Cholmod {
  public:
@@ -92,6 +91,6 @@ class Cholmod {
   std::unique_ptr<Impl> pImpl_;
 };
 
-}  // namespace cholmod
-}  // namespace g2o
+}  // namespace g2o::cholmod
+
 #endif

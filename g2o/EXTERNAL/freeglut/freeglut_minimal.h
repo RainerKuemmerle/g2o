@@ -28,7 +28,7 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include "g2o/config.h"
+#include "g2o/config.h"  // IWYU pragma: keep
 
 #ifdef WINDOWS
 #include <windows.h>

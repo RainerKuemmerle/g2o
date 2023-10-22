@@ -318,15 +318,15 @@ class AutoDifferentiation {
 }  // namespace g2o
 
 // helper macros for fine-grained integration into own types
-#define G2O_MAKE_AUTO_AD_COMPUTEERROR                                      \
-  void computeError() override {                                           \
-    g2o::AutoDifferentiation<                                              \
-        std::remove_reference<decltype(*this)>::type>::computeError(this); \
+#define G2O_MAKE_AUTO_AD_COMPUTEERROR                                  \
+  void computeError() override {                                       \
+    g2o::AutoDifferentiation<                                          \
+        std::remove_reference_t<decltype(*this)>>::computeError(this); \
   }
-#define G2O_MAKE_AUTO_AD_LINEARIZEOPLUS                                 \
-  void linearizeOplus() override {                                      \
-    g2o::AutoDifferentiation<                                           \
-        std::remove_reference<decltype(*this)>::type>::linearize(this); \
+#define G2O_MAKE_AUTO_AD_LINEARIZEOPLUS                             \
+  void linearizeOplus() override {                                  \
+    g2o::AutoDifferentiation<                                       \
+        std::remove_reference_t<decltype(*this)>>::linearize(this); \
   }
 
 /**
@@ -340,14 +340,14 @@ class AutoDifferentiation {
 // EstimateAccessorGet
 #define G2O_MAKE_AUTO_AD_COMPUTEERROR_BY_GET                               \
   void computeError() override {                                           \
-    using EdgeType = std::remove_reference<decltype(*this)>::type;         \
+    using EdgeType = std::remove_reference_t<decltype(*this)>;             \
     g2o::AutoDifferentiation<                                              \
         EdgeType, g2o::EstimateAccessorGet<EdgeType>>::computeError(this); \
   }
 
 #define G2O_MAKE_AUTO_AD_LINEARIZEOPLUS_BY_GET                          \
   void linearizeOplus() override {                                      \
-    using EdgeType = std::remove_reference<decltype(*this)>::type;      \
+    using EdgeType = std::remove_reference_t<decltype(*this)>;          \
     g2o::AutoDifferentiation<                                           \
         EdgeType, g2o::EstimateAccessorGet<EdgeType>>::linearize(this); \
   }

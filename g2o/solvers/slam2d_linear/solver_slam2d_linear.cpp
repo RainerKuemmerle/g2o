@@ -29,7 +29,6 @@
 #include <Eigen/Core>
 #include <cassert>
 #include <cstddef>
-#include <map>
 #include <utility>
 #include <vector>
 

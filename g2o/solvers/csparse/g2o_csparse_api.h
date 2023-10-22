@@ -36,7 +36,7 @@
 #ifndef G2O_SOLVER_CSPARSE_API_H
 #define G2O_SOLVER_CSPARSE_API_H
 
-#include "g2o/config.h"
+#include "g2o/config.h"  // IWYU pragma: keep
 
 #ifdef _MSC_VER
 // We are using a Microsoft compiler:
