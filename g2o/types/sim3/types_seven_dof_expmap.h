@@ -42,11 +42,13 @@
 
 namespace g2o {
 
+#ifdef _MSC_VER
 // explicit instantiation of BaseVertex, if not instantiated causes already
 // defined error in some cases (msvc debug only) see links below
 // https://stackoverflow.com/questions/44960760/msvc-dll-exporting-class-that-inherits-from-template-cause-lnk2005-already-defin
 // https://developercommunity.visualstudio.com/content/problem/224597/linker-failing-because-of-multiple-definitions-of.html
 template class BaseVertex<7, Sim3>;
+#endif
 
 /**
  * \brief Sim3 Vertex, (x,y,z,qw,qx,qy,qz)

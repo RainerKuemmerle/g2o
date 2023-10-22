@@ -1,6 +1,4 @@
 \build*
-\lib
-\bin
 \.vs
 \.vscode
 \.cache
