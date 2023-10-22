@@ -158,7 +158,7 @@ bool CommandArgs::parseArgs(int argc, char** argv, bool exitOnError) {
   }  // for argv[i]
 
   if (static_cast<int>(leftOvers_.size()) > argc - i) {
-    std::cerr << "Error: program requires parameters" << std::endl;
+    std::cerr << "Error: program requires parameters\n";
     printHelp(std::cerr);
     if (exitOnError) exit(1);
     return false;
@@ -266,7 +266,7 @@ void CommandArgs::param(const std::string& name, std::vector<double>& p,
 }
 
 void CommandArgs::printHelp(std::ostream& os) {
-  if (!banner_.empty()) os << banner_ << std::endl;
+  if (!banner_.empty()) os << banner_ << '\n';
   os << "Usage: " << progName_ << (args_.empty() ? " " : " [options] ");
   for (size_t i = 0; i < leftOvers_.size(); ++i) {
     if (i > 0) os << " ";
@@ -279,13 +279,13 @@ void CommandArgs::printHelp(std::ostream& os) {
       os << "[" << leftOversOptional_[i].name << "]";
     }
   }
-  os << std::endl << std::endl;
-  os << "General options:" << std::endl;
-  os << "-------------------------------------------" << std::endl;
-  os << "-help / -h           Displays this help." << std::endl << std::endl;
+  os << '\n' << '\n';
+  os << "General options:\n";
+  os << "-------------------------------------------\n";
+  os << "-help / -h           Displays this help.\n\n";
   if (!args_.empty()) {
-    os << "Program Options:" << std::endl;
-    os << "-------------------------------------------" << std::endl;
+    os << "Program Options:\n";
+    os << "-------------------------------------------\n";
     // build up option string to print as table
     std::vector<std::pair<std::string, std::string> > tableStrings;
     tableStrings.reserve(args_.size());
@@ -310,7 +310,7 @@ void CommandArgs::printHelp(std::ostream& os) {
     for (const auto& tableString : tableStrings) {
       os << "-" << tableString.first;
       for (size_t l = tableString.first.size(); l < maxArgLen; ++l) os << " ";
-      os << tableString.second << std::endl;
+      os << tableString.second << '\n';
     }
     // TODO(goki): should output description for leftOver params
   }
@@ -336,7 +336,7 @@ void CommandArgs::paramLeftOver(const std::string& name, std::string& p,
 }
 
 const char* CommandArgs::type2str(int t) {
-  switch (t) {
+  switch (static_cast<CommandArgumentType>(t)) {
     case kCatDouble:
       return "<double>";
     case kCatFloat:
@@ -356,7 +356,7 @@ const char* CommandArgs::type2str(int t) {
 }
 
 void CommandArgs::str2arg(const std::string& input, CommandArgument& ca) {
-  switch (ca.type) {
+  switch (static_cast<CommandArgumentType>(ca.type)) {
     case kCatFloat:
       parseArgument<float>(input, ca);
       break;
@@ -383,7 +383,7 @@ void CommandArgs::str2arg(const std::string& input, CommandArgument& ca) {
 }
 
 std::string CommandArgs::arg2str(const CommandArgument& ca) {
-  switch (ca.type) {
+  switch (static_cast<CommandArgumentType>(ca.type)) {
     case kCatFloat:
       return argument2String<float>(ca);
     case kCatDouble:

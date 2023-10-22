@@ -30,8 +30,8 @@
 #include "g2o/config.h"
 
 #ifdef G2O_HAVE_LOGGING
-#include <spdlog/fmt/fmt.h>
-#include <spdlog/fmt/ostr.h>
+#include <spdlog/fmt/fmt.h>   // IWYU pragma: export
+#include <spdlog/fmt/ostr.h>  // IWYU pragma: export
 
 #if FMT_VERSION >= 90000
 // see https://fmt.dev/9.0.0/api.html#std-ostream-support

@@ -61,12 +61,12 @@ void PropertyMap::writeToCSV(std::ostream& os) const {
     if (it != cbegin()) os << ",";
     os << it->second->name();
   }
-  os << std::endl;
+  os << '\n';
   for (auto it = cbegin(); it != cend(); ++it) {
     if (it != cbegin()) os << ",";
     os << it->second->toString();
   }
-  os << std::endl;
+  os << '\n';
 }
 
 bool PropertyMap::updateMapFromString(const std::string& values) {

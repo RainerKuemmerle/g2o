@@ -34,8 +34,9 @@
 
 namespace g2o {
 
-static bool writeTripletEntries(const std::string& filename, int rows, int cols,
-                                const std::vector<TripletEntry>& triplets) {
+namespace {
+bool writeTripletEntries(const std::string& filename, int rows, int cols,
+                         const std::vector<TripletEntry>& triplets) {
   const std::string name = [&filename]() {
     const std::string::size_type lastDot = filename.find_last_of('.');
     if (lastDot != std::string::npos) return filename.substr(0, lastDot);
@@ -43,23 +44,24 @@ static bool writeTripletEntries(const std::string& filename, int rows, int cols,
   }();
 
   std::ofstream fout(filename.c_str());
-  fout << "# name: " << name << std::endl;
-  fout << "# type: sparse matrix" << std::endl;
-  fout << "# nnz: " << triplets.size() << std::endl;
-  fout << "# rows: " << rows << std::endl;
-  fout << "# columns: " << cols << std::endl;
+  fout << "# name: " << name << '\n';
+  fout << "# type: sparse matrix\n";
+  fout << "# nnz: " << triplets.size() << '\n';
+  fout << "# rows: " << rows << '\n';
+  fout << "# columns: " << cols << '\n';
   // fout << fixed;
-  fout << std::setprecision(9) << std::endl;
+  fout << std::setprecision(9) << '\n';
   for (const TripletEntry& entry : triplets) {
-    fout << entry.r + 1 << " " << entry.c + 1 << " " << entry.x << std::endl;
+    fout << entry.r + 1 << " " << entry.c + 1 << " " << entry.x << '\n';
   }
   return fout.good();
 }
+}  // namespace
 
 bool writeVector(const std::string& filename, const double* v, int n) {
   std::ofstream os(filename.c_str());
   os << std::fixed;
-  for (int i = 0; i < n; i++) os << *v++ << std::endl;
+  for (int i = 0; i < n; i++) os << *v++ << '\n';
   return os.good();
 }
 
