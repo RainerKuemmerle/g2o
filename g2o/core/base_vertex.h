@@ -35,12 +35,9 @@
 #include <cstring>
 #include <iosfwd>
 #include <limits>
-#include <new>
 #include <stack>
 #include <vector>
 
-#include "creators.h"
-#include "g2o/config.h"
 #include "g2o/core/eigen_types.h"
 #include "g2o/core/io_helper.h"
 #include "g2o/core/type_traits.h"

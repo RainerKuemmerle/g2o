@@ -30,13 +30,10 @@
 #include <algorithm>
 #include <cassert>
 #include <type_traits>
-#include <unordered_map>
 
 #include "eigen_types.h"
 #include "g2o/autodiff/autodiff.h"
 #include "g2o/core/type_traits.h"
-#include "g2o/stuff/misc.h"
-#include "g2o_core_api.h"
 
 namespace g2o {
 
@@ -105,8 +102,8 @@ class EstimateAccessor {
           std::make_index_sequence<Edge::kNrOfVertices>>::kValue;
 
   // An array for buffering the data or an empty struct
-  using StorageType = typename std::conditional<kAnyNonVectorEstimateType,
-                                                Buffer, EmptyBuffer>::type;
+  using StorageType = typename std::conditional_t<kAnyNonVectorEstimateType,
+                                                  Buffer, EmptyBuffer>;
   StorageType buffer_;
 };
 

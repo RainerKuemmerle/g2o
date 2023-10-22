@@ -26,18 +26,16 @@
 
 #include "optimization_algorithm.h"
 
-#include <map>
-#include <memory>
 #include <ostream>
 
 namespace g2o {
 
 void OptimizationAlgorithm::printProperties(std::ostream& os) const {
-  os << "------------- Algorithm Properties -------------" << std::endl;
+  os << "------------- Algorithm Properties -------------\n";
   for (const auto& property : properties_) {
-    os << property.first << "\t" << property.second->toString() << std::endl;
+    os << property.first << "\t" << property.second->toString() << '\n';
   }
-  os << "------------------------------------------------" << std::endl;
+  os << "------------------------------------------------\n";
 }
 
 bool OptimizationAlgorithm::updatePropertiesFromString(

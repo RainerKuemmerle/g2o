@@ -24,4 +24,4 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "base_fixed_sized_edge.h"
+#include "base_fixed_sized_edge.h"  // IWYU pragma: keep

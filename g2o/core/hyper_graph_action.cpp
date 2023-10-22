@@ -28,7 +28,6 @@
 
 #include <list>
 #include <typeinfo>
-#include <unordered_map>
 #include <utility>
 
 #include "cache.h"

@@ -28,7 +28,6 @@
 
 #include <algorithm>
 #include <cassert>
-#include <map>
 #include <memory>
 
 #include "g2o/core/hyper_graph.h"

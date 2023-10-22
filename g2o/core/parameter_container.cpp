@@ -66,7 +66,7 @@ bool ParameterContainer::write(std::ostream& os) const {
     os << factory->tag(it.second.get()) << " ";
     os << it.second->id() << " ";
     it.second->write(os);
-    os << std::endl;
+    os << '\n';
   }
   return true;
 }

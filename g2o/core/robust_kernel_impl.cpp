@@ -28,7 +28,6 @@
 
 #include <Eigen/Core>
 #include <cmath>
-#include <memory>
 #include <utility>
 
 #include "g2o/core/robust_kernel.h"

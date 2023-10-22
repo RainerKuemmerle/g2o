@@ -26,16 +26,13 @@
 
 #include "sparse_optimizer.h"
 
-#include <stdlib.h>
-
 #include <Eigen/Core>
 #include <algorithm>
 #include <cassert>
+#include <cstdlib>
 #include <iostream>
-#include <new>
 #include <set>
 #include <string_view>
-#include <unordered_map>
 #include <utility>
 
 #include "batch_stats.h"
@@ -50,7 +47,7 @@
 #include "g2o/stuff/timeutil.h"
 #include "hyper_graph_action.h"
 #include "optimization_algorithm.h"
-#include "robust_kernel.h"
+#include "robust_kernel.h"  // IWYU pragma: keep
 
 namespace g2o {
 
@@ -343,8 +340,7 @@ void SparseOptimizer::computeInitialGuess(EstimatePropagatorCost& propagator) {
     computeActiveErrors();
     std::cerr << "iteration= -1\t chi2= " << activeChi2() << "\t time= 0.0"
               << "\t cumTime= 0.0"
-              << "\t (using initial guess from " << propagator.name() << ")"
-              << std::endl;
+              << "\t (using initial guess from " << propagator.name() << ")\n";
   }
 }
 
@@ -403,7 +399,7 @@ int SparseOptimizer::optimize(int iterations, bool online) {
                 << "\t time= " << dts << "\t cumTime= " << cumTime
                 << "\t edges= " << activeEdges_.size();
       algorithm_->printVerbose(std::cerr);
-      std::cerr << std::endl;
+      std::cerr << '\n';
     }
     ++cjIterations;
     postIteration(i);

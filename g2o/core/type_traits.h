@@ -27,8 +27,6 @@
 #ifndef G2O_TYPE_TRAITS_H
 #define G2O_TYPE_TRAITS_H
 
-#include <climits>
-
 #include "eigen_types.h"
 
 namespace g2o {
@@ -169,7 +167,7 @@ struct DimensionTraits {
   //! for a statically known type
   template <int IsVector = TypeTraits<T>::kIsVector,
             int IsScalar = TypeTraits<T>::kIsScalar>
-  static typename std::enable_if<IsVector == 0 && IsScalar == 0, int>::type
+  static typename std::enable_if_t<IsVector == 0 && IsScalar == 0, int>
   dimension(const T&) {
     return TypeTraits<T>::kVectorDimension;
   }
@@ -177,7 +175,7 @@ struct DimensionTraits {
   //! for a vector type
   template <int IsVector = TypeTraits<T>::kIsVector,
             int IsScalar = TypeTraits<T>::kIsScalar>
-  static typename std::enable_if<IsVector != 0 && IsScalar == 0, int>::type
+  static typename std::enable_if_t<IsVector != 0 && IsScalar == 0, int>
   dimension(const T& t) {
     return t.size();
   }

@@ -30,20 +30,14 @@
 #include <Eigen/Core>
 #include <cassert>
 #include <cstddef>
-#include <iomanip>
-#include <iostream>
-#include <limits>
-#include <new>
 #include <vector>
 
 #include "base_edge.h"
-#include "g2o/autodiff/fixed_array.h"
-#include "g2o/config.h"
 #include "g2o/core/eigen_types.h"
 #include "g2o/core/jacobian_workspace.h"
 #include "g2o/core/optimizable_graph.h"
 #include "g2o/stuff/misc.h"
-#include "robust_kernel.h"
+#include "robust_kernel.h"  // IWYU pragma: keep
 
 namespace g2o {
 

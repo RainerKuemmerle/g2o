@@ -35,7 +35,6 @@
 #include <iostream>
 #include <limits>
 #include <utility>
-#include <vector>
 
 #include "batch_stats.h"
 #include "g2o/core/eigen_types.h"

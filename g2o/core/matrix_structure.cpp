@@ -101,14 +101,14 @@ bool MatrixStructure::write(std::string_view filename) const {
 
   const std::string output_filename(filename);
   std::ofstream fout(output_filename);
-  fout << "# name: " << name << std::endl;
-  fout << "# type: sparse matrix" << std::endl;
-  fout << "# nnz: " << entries.size() << std::endl;
-  fout << "# rows: " << rows << std::endl;
-  fout << "# columns: " << cols << std::endl;
+  fout << "# name: " << name << '\n';
+  fout << "# type: sparse matrix" << '\n';
+  fout << "# nnz: " << entries.size() << '\n';
+  fout << "# rows: " << rows << '\n';
+  fout << "# columns: " << cols << '\n';
   for (const auto& entry : entries) {
-    fout << entry.first << " " << entry.second << " 0"
-         << std::endl;  // write a constant value of 0
+    fout << entry.first << " " << entry.second
+         << " 0\n";  // write a constant value of 0
   }
 
   return fout.good();

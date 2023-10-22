@@ -33,7 +33,7 @@
 #include <string>
 
 #include "g2o/config.h"
-#include "g2o/stuff/misc.h"  // ForceLinker for the macros
+#include "g2o/stuff/misc.h"  // IWYU pragma: keep // ForceLinker for the macros
 #include "g2o_core_api.h"
 #include "optimization_algorithm.h"
 #include "optimization_algorithm_property.h"

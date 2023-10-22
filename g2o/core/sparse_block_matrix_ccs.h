@@ -32,7 +32,7 @@
 #include <unordered_map>
 #include <vector>
 
-#include "g2o/config.h"
+#include "g2o/config.h"  // IWYU pragma: keep // OPENMP
 #include "matrix_operations.h"
 
 namespace g2o {

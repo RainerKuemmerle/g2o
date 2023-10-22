@@ -31,24 +31,19 @@
 #include <array>
 #include <cassert>
 #include <cstddef>
-#include <iostream>
-#include <limits>
 #include <memory>
-#include <new>
 #include <tuple>
 #include <type_traits>
 #include <utility>
 
 #include "base_edge.h"
-#include "g2o/autodiff/fixed_array.h"
-#include "g2o/config.h"
 #include "g2o/core/eigen_types.h"
 #include "g2o/core/hyper_graph.h"
 #include "g2o/core/jacobian_workspace.h"
 #include "g2o/core/optimizable_graph.h"
 #include "g2o/stuff/misc.h"
 #include "g2o/stuff/tuple_tools.h"
-#include "robust_kernel.h"
+#include "robust_kernel.h"  // IWYU pragma: keep
 
 namespace g2o {
 

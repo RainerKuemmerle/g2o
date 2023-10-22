@@ -27,12 +27,9 @@
 #ifndef G2O_HYPER_GRAPH_ACTION_H
 #define G2O_HYPER_GRAPH_ACTION_H
 
-#include <iosfwd>
-#include <iostream>
 #include <map>
 #include <memory>
 #include <string>
-#include <typeinfo>
 
 #include "g2o/stuff/property.h"
 #include "g2o_core_api.h"

@@ -31,8 +31,7 @@
 
 #include "g2o/core/eigen_types.h"
 
-namespace g2o {
-namespace internal {
+namespace g2o::internal {
 
 template <typename MatrixType>
 inline void axpy(const MatrixType& A, const Eigen::Map<const VectorX>& x,
@@ -78,7 +77,6 @@ inline void atxpy<MatrixX>(const MatrixX& A, const Eigen::Map<const VectorX>& x,
   y.segment(yoff, A.cols()) += A.transpose() * x.segment(xoff, A.rows());
 }
 
-}  // end namespace internal
-}  // end namespace g2o
+}  // namespace g2o::internal
 
 #endif

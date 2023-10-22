@@ -30,7 +30,6 @@
 #include <cstddef>
 #include <deque>
 #include <queue>
-#include <unordered_map>
 #include <utility>
 
 #include "g2o/core/hyper_graph.h"

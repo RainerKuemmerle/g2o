@@ -1,3 +1,5 @@
+- use cmakedefine01 for compile flags in config
+
 - add test for setData / getData on the graph
 
 - update py_base_vertex/edge to map now common methods

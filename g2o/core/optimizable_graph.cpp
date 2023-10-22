@@ -32,7 +32,6 @@
 #include <iostream>
 #include <iterator>
 #include <memory>
-#include <unordered_map>
 #include <utility>
 
 #include "cache.h"
@@ -42,7 +41,7 @@
 #include "g2o/core/parameter.h"
 #include "g2o/core/parameter_container.h"
 #include "g2o/stuff/logger.h"
-#include "g2o/stuff/logger_format.h"
+#include "g2o/stuff/logger_format.h"  // IWYU pragma: keep
 #include "g2o/stuff/string_tools.h"
 #include "hyper_graph_action.h"
 #include "optimization_algorithm_property.h"
@@ -53,7 +52,6 @@ namespace {
 std::shared_ptr<OptimizableGraph::Vertex> kNonExistantVertex(nullptr);
 }
 
-using std::endl;
 using std::string;
 using std::vector;
 
@@ -717,7 +715,7 @@ bool OptimizableGraph::saveUserData(std::ostream& os, HyperGraph::Data* d) {
     if (!tag.empty()) {
       os << tag << " ";
       d->write(os);
-      os << endl;
+      os << '\n';
     }
     d = d->next().get();
   }
@@ -731,10 +729,10 @@ bool OptimizableGraph::saveVertex(std::ostream& os,
   if (!tag.empty()) {
     os << tag << " " << v->id() << " ";
     v->write(os);
-    os << endl;
+    os << '\n';
     saveUserData(os, v->userData().get());
     if (v->fixed()) {
-      os << "FIX " << v->id() << endl;
+      os << "FIX " << v->id() << '\n';
     }
     return os.good();
   }
@@ -747,7 +745,7 @@ bool OptimizableGraph::saveParameter(std::ostream& os, Parameter* p) {
   if (!tag.empty()) {
     os << tag << " " << p->id() << " ";
     p->write(os);
-    os << endl;
+    os << '\n';
   }
   return os.good();
 }
@@ -762,7 +760,7 @@ bool OptimizableGraph::saveEdge(std::ostream& os, OptimizableGraph::Edge* e) {
       os << vertexId << " ";
     }
     e->write(os);
-    os << endl;
+    os << '\n';
     saveUserData(os, e->userData().get());
     return os.good();
   }

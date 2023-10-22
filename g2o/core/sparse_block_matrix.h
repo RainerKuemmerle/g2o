@@ -40,7 +40,7 @@
 #include <utility>
 #include <vector>
 
-#include "g2o/config.h"
+#include "g2o/config.h"  // IWYU pragma: keep
 #include "g2o/core/eigen_types.h"
 #include "g2o/stuff/misc.h"
 #include "g2o/stuff/sparse_helper.h"
@@ -659,19 +659,19 @@ std::ostream& operator<<(std::ostream& os,
   os << "RBI: " << m.rowBlockIndices().size();
   for (size_t i = 0; i < m.rowBlockIndices().size(); ++i)
     os << " " << m.rowBlockIndices()[i];
-  os << std::endl;
+  os << '\n';
   os << "CBI: " << m.colBlockIndices().size();
   for (size_t i = 0; i < m.colBlockIndices().size(); ++i)
     os << " " << m.colBlockIndices()[i];
-  os << std::endl;
+  os << '\n';
 
   for (size_t i = 0; i < m.blockCols().size(); ++i) {
     for (auto it = m.blockCols()[i].begin(); it != m.blockCols()[i].end();
          ++it) {
       const typename SparseBlockMatrix<MatrixType>::SparseMatrixBlock* b =
           it->second;
-      os << "BLOCK: " << it->first << " " << i << std::endl;
-      os << *b << std::endl;
+      os << "BLOCK: " << it->first << " " << i << '\n';
+      os << *b << '\n';
     }
   }
   return os;
@@ -845,15 +845,15 @@ bool SparseBlockMatrix<MatrixType>::writeOctave(const char* filename,
   std::sort(entries.begin(), entries.end(), TripletColSort());
 
   std::ofstream fout(filename);
-  fout << "# name: " << name << std::endl;
-  fout << "# type: sparse matrix" << std::endl;
-  fout << "# nnz: " << nz << std::endl;
-  fout << "# rows: " << rows() << std::endl;
-  fout << "# columns: " << cols() << std::endl;
-  fout << std::setprecision(9) << std::fixed << std::endl;
+  fout << "# name: " << name << '\n';
+  fout << "# type: sparse matrix\n";
+  fout << "# nnz: " << nz << '\n';
+  fout << "# rows: " << rows() << '\n';
+  fout << "# columns: " << cols() << '\n';
+  fout << std::setprecision(9) << std::fixed << '\n';
 
   for (auto entry : entries) {
-    fout << entry.r + 1 << " " << entry.c + 1 << " " << entry.x << std::endl;
+    fout << entry.r + 1 << " " << entry.c + 1 << " " << entry.x << '\n';
   }
   return fout.good();
 }
