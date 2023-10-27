@@ -1,5 +1,6 @@
 #include "py_types_six_dof_expmap.h"
 
+#include "g2o/types/sba/edge_project_xyz.h"
 #include "g2o/types/sba/types_six_dof_expmap.h"
 #include "g2o/types/slam3d/se3quat.h"
 #include "g2opy.h"
@@ -79,7 +80,11 @@ void declareTypesSixDofExpmap(py::module& m) {
       .def("compute_error", &EdgeSE3ProjectXYZ::computeError)
       .def("is_depth_positive", &EdgeSE3ProjectXYZ::isDepthPositive)
       .def("linearize_oplus", &EdgeSE3ProjectXYZ::linearizeOplus)
-      .def("cam_project", &EdgeSE3ProjectXYZ::cam_project);
+      .def("cam_project", &EdgeSE3ProjectXYZ::cam_project)
+      .def_readwrite("fx", &EdgeSE3ProjectXYZ::fx)
+      .def_readwrite("fy", &EdgeSE3ProjectXYZ::fy)
+      .def_readwrite("cx", &EdgeSE3ProjectXYZ::cx)
+      .def_readwrite("cy", &EdgeSE3ProjectXYZ::cy);
 
   // Edge to optimize only the camera pose
   templatedBaseUnaryEdge<2, Vector2, VertexSE3Expmap>(
