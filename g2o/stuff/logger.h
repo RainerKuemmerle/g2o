@@ -28,6 +28,7 @@
 #define G2O_LOGGER_H
 
 #include "g2o/config.h"
+#include "g2o/stuff/g2o_stuff_api.h"
 
 #ifdef G2O_HAVE_LOGGING
 #include <spdlog/spdlog.h>
@@ -40,7 +41,7 @@ namespace internal {
 /**
  * @brief Interface class to the underlying logging library
  */
-class LoggerInterface {
+class G2O_STUFF_API LoggerInterface {
  public:
   LoggerInterface();
 
@@ -77,17 +78,35 @@ using Logger = internal::Singleton<internal::LoggerInterface>;
 
 }  // namespace g2o
 
-#define G2O_INFO(...) g2o::Logger::get().console().info(__VA_ARGS__)
-#define G2O_WARN(...) g2o::Logger::get().console().warn(__VA_ARGS__)
-#define G2O_ERROR(...) g2o::Logger::get().console().error(__VA_ARGS__)
-#define G2O_DEBUG(...) g2o::Logger::get().console().debug(__VA_ARGS__)
+// TODO(Rainer): Switch to std::source_location with c++20
+#define G2O_DEBUG(...)                                      \
+  g2o::Logger::get().console().log(                         \
+      spdlog::source_loc(__FILE__, __LINE__, __FUNCTION__), \
+      spdlog::level::debug, __VA_ARGS__)
+#define G2O_INFO(...)                                       \
+  g2o::Logger::get().console().log(                         \
+      spdlog::source_loc(__FILE__, __LINE__, __FUNCTION__), \
+      spdlog::level::info, __VA_ARGS__)
+#define G2O_WARN(...)                                       \
+  g2o::Logger::get().console().log(                         \
+      spdlog::source_loc(__FILE__, __LINE__, __FUNCTION__), \
+      spdlog::level::warn, __VA_ARGS__)
+#define G2O_ERROR(...)                                      \
+  g2o::Logger::get().console().log(                         \
+      spdlog::source_loc(__FILE__, __LINE__, __FUNCTION__), \
+      spdlog::level::err, __VA_ARGS__)
+#define G2O_CRITICAL(...)                                   \
+  g2o::Logger::get().console().log(                         \
+      spdlog::source_loc(__FILE__, __LINE__, __FUNCTION__), \
+      spdlog::level::critical, __VA_ARGS__)
 
 #else
 
+#define G2O_DEBUG(...)
 #define G2O_INFO(...)
 #define G2O_WARN(...)
 #define G2O_ERROR(...)
-#define G2O_DEBUG(...)
+#define G2O_CRITICAL(...)
 
 #endif  // G2O_HAVE_LOGGING
 
