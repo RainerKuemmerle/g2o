@@ -28,6 +28,7 @@
 #define G2O_LOGGER_H
 
 #include "g2o/config.h"
+#include "g2o/stuff/g2o_stuff_api.h"
 
 #ifdef G2O_HAVE_LOGGING
 #include <spdlog/spdlog.h>
@@ -37,10 +38,34 @@
 namespace g2o {
 namespace internal {
 
+// TODO(Rainer): Switch to std::source_location with c++20
+struct G2O_STUFF_API SourceLocation {
+  static constexpr SourceLocation current(const int line,
+                                          const char* const file,
+                                          const char* const function) noexcept {
+    SourceLocation result;
+    result.line_ = line;
+    result.file_ = file;
+    result.function_ = function;
+    return result;
+  }
+
+  constexpr SourceLocation() noexcept = default;
+
+  constexpr int line() const noexcept { return line_; }
+  constexpr const char* file_name() const noexcept { return file_; }
+  constexpr const char* function_name() const noexcept { return function_; }
+
+ private:
+  int line_{};
+  const char* file_ = "";
+  const char* function_ = "";
+};
+
 /**
  * @brief Interface class to the underlying logging library
  */
-class LoggerInterface {
+class G2O_STUFF_API LoggerInterface {
  public:
   LoggerInterface();
 
@@ -50,6 +75,14 @@ class LoggerInterface {
   void operator=(LoggerInterface&) = delete;
 
   spdlog::logger& console() { return *console_; }
+
+  template <typename... Args>
+  void log(SourceLocation loc, spdlog::level::level_enum lvl,
+           spdlog::format_string_t<Args...> fmt, Args&&... args) {
+    console_->log(
+        spdlog::source_loc(loc.file_name(), loc.line(), loc.function_name()),
+        lvl, fmt, std::forward<Args>(args)...);
+  }
 
  protected:
   std::shared_ptr<spdlog::logger> console_;
@@ -77,17 +110,34 @@ using Logger = internal::Singleton<internal::LoggerInterface>;
 
 }  // namespace g2o
 
-#define G2O_INFO(...) g2o::Logger::get().console().info(__VA_ARGS__)
-#define G2O_WARN(...) g2o::Logger::get().console().warn(__VA_ARGS__)
-#define G2O_ERROR(...) g2o::Logger::get().console().error(__VA_ARGS__)
-#define G2O_DEBUG(...) g2o::Logger::get().console().debug(__VA_ARGS__)
+#define G2O_DEBUG(...)                                           \
+  g2o::Logger::get().log(g2o::internal::SourceLocation::current( \
+                             __LINE__, __FILE__, __FUNCTION__),  \
+                         spdlog::level::debug, __VA_ARGS__)
+#define G2O_INFO(...)                                            \
+  g2o::Logger::get().log(g2o::internal::SourceLocation::current( \
+                             __LINE__, __FILE__, __FUNCTION__),  \
+                         spdlog::level::info, __VA_ARGS__)
+#define G2O_WARN(...)                                            \
+  g2o::Logger::get().log(g2o::internal::SourceLocation::current( \
+                             __LINE__, __FILE__, __FUNCTION__),  \
+                         spdlog::level::warn, __VA_ARGS__)
+#define G2O_ERROR(...)                                           \
+  g2o::Logger::get().log(g2o::internal::SourceLocation::current( \
+                             __LINE__, __FILE__, __FUNCTION__),  \
+                         spdlog::level::err, __VA_ARGS__)
+#define G2O_CRITICAL(...)                                        \
+  g2o::Logger::get().log(g2o::internal::SourceLocation::current( \
+                             __LINE__, __FILE__, __FUNCTION__),  \
+                         spdlog::level::critical, __VA_ARGS__)
 
 #else
 
+#define G2O_DEBUG(...)
 #define G2O_INFO(...)
 #define G2O_WARN(...)
 #define G2O_ERROR(...)
-#define G2O_DEBUG(...)
+#define G2O_CRITICAL(...)
 
 #endif  // G2O_HAVE_LOGGING
 
