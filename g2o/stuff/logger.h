@@ -82,6 +82,10 @@ using Logger = internal::Singleton<internal::LoggerInterface>;
 }  // namespace g2o
 
 // TODO(Rainer): Switch to std::source_location with c++20
+#define G2O_TRACE(...)                                      \
+  g2o::Logger::get().console().log(                         \
+      spdlog::source_loc(__FILE__, __LINE__, __FUNCTION__), \
+      spdlog::level::trace, __VA_ARGS__)
 #define G2O_DEBUG(...)                                      \
   g2o::Logger::get().console().log(                         \
       spdlog::source_loc(__FILE__, __LINE__, __FUNCTION__), \
@@ -105,6 +109,7 @@ using Logger = internal::Singleton<internal::LoggerInterface>;
 
 #else
 
+#define G2O_TRACE(...) (void)0
 #define G2O_DEBUG(...) (void)0
 #define G2O_INFO(...) (void)0
 #define G2O_WARN(...) (void)0
@@ -114,7 +119,7 @@ using Logger = internal::Singleton<internal::LoggerInterface>;
 #endif  // G2O_HAVE_LOGGING
 
 namespace g2o::logging {
-enum class Level { kDebug, kInfo, kWarn, kError, kOff };
+enum class Level { kTrace, kDebug, kInfo, kWarn, kError, kOff };
 /**
  * @brief Set the Log Level
  *
