@@ -77,7 +77,7 @@ def main():
         if len(visible) < 2:
             continue
 
-        vp = g2o.VertexSBAPointXYZ()
+        vp = g2o.VertexPointXYZ()
         vp.set_id(point_id)
         vp.set_marginalized(True)
         vp.set_estimate(point + np.random.randn(3))
@@ -97,7 +97,7 @@ def main():
                 z[2] = z[0] - z[2]
             z += np.random.randn(3) * args.pixel_noise * [1, 1, 1 / 16.0]
 
-            edge = g2o.Edge_XYZ_VSC()
+            edge = g2o.EdgeXyzVsc()
             edge.set_vertex(0, vp)
             edge.set_vertex(1, optimizer.vertex(j))
             edge.set_measurement(z)
