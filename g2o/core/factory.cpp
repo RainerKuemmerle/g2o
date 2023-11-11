@@ -37,17 +37,13 @@
 
 namespace g2o {
 
-using std::endl;
-
 std::unique_ptr<Factory> Factory::factoryInstance_;
 
 Factory* Factory::instance() {
   if (factoryInstance_ == nullptr) {
     factoryInstance_.reset(new Factory);
-#ifdef G2O_DEBUG_FACTORY
-    G2O_DEBUG("Factory allocated {}",
-              static_cast<void*>(factoryInstance.get()));
-#endif
+    G2O_TRACE("Factory allocated {}",
+              static_cast<void*>(factoryInstance_.get()));
   }
 
   return factoryInstance_.get();
@@ -161,10 +157,10 @@ void Factory::destroy() {
 
 void Factory::printRegisteredTypes(std::ostream& os, bool comment) const {
   if (comment) os << "# ";
-  os << "types:" << endl;
+  os << "types:\n";
   for (const auto& it : creator_) {
     if (comment) os << "#";
-    os << "\t" << it.first << endl;
+    os << "\t" << it.first << "\n";
   }
 }
 
