@@ -26,8 +26,6 @@
 
 #include "logger.h"
 
-#include <spdlog/spdlog.h>
-
 #include <string_view>
 
 #include "g2o/config.h"
@@ -36,6 +34,7 @@
 #include <spdlog/cfg/env.h>
 #include <spdlog/common.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
+#include <spdlog/spdlog.h>
 
 #include <cassert>
 
