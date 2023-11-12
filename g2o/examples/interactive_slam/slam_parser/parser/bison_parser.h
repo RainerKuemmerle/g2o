@@ -195,7 +195,7 @@ class Parser {
 #else
   /// Symbol semantic values.
   union value_type {
-#line 53 "parser.yy"
+#line 52 "parser.yy"
 
     int integerVal;
     double doubleVal;
