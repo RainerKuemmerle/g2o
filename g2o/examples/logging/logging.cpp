@@ -26,7 +26,8 @@
 
 #include "g2o/stuff/logger.h"
 
-int main(int argc, char** argv) {
+int main() {
+  G2O_TRACE("TRACE Hello World");
   G2O_DEBUG("DEBUG Hello World");
   G2O_WARN("WARN Hello World");
   G2O_ERROR("ERROR Hello World");
