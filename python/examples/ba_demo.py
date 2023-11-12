@@ -50,13 +50,12 @@ def main():
         ]
     )
 
-    true_poses = []
+    # pose here means transform points from world coordinates to camera coordinates
     num_pose = 15
-    for i in range(num_pose):
-        # pose here means transform points from world coordinates to camera coordinates
-        pose = g2o.SE3Quat(np.identity(3), [i * 0.04 - 1, 0, 0])
-        true_poses.append(pose)
-
+    true_poses = [
+        g2o.SE3Quat(np.identity(3), [i * 0.04 - 1, 0, 0]) for i in range(num_pose)
+    ]
+    for i, pose in enumerate(true_poses):
         v_se3 = g2o.VertexSE3Expmap()
         v_se3.set_id(i)
         v_se3.set_estimate(pose)
@@ -68,14 +67,14 @@ def main():
 
     point_id = num_pose
     inliers = dict()
-    sse = defaultdict(float)
+    sse = [0.0, 0.0]
 
     for i, point in enumerate(true_points):
-        visible = []
-        for j, pose in enumerate(true_poses):
-            z = cam.cam_map(pose * point)
-            if 0 <= z[0] < 640 and 0 <= z[1] < 480:
-                visible.append((j, z))
+        visible = [
+            (j, z)
+            for j, z in enumerate(cam.cam_map(pose * point) for pose in true_poses)
+            if 0 <= z[0] < 640 and 0 <= z[1] < 480
+        ]
         if len(visible) < 2:
             continue
 
@@ -117,10 +116,10 @@ def main():
     optimizer.set_verbose(True)
     optimizer.optimize(10)
 
-    for i in inliers:
-        vp = optimizer.vertex(i)
-        error = vp.estimate() - true_points[inliers[i]]
-        sse[1] += np.sum(error**2)
+    sse[1] = sum(
+        np.sum((optimizer.vertex(i).estimate() - true_points[inliers[i]]) ** 2)
+        for i in inliers
+    )
 
     print("\nRMSE (inliers only):")
     print("before optimization:", np.sqrt(sse[0] / len(inliers)))
