@@ -42,8 +42,6 @@ namespace g2o {
 int DlWrapper::openLibraries(const std::string& directory,
                              const std::string& pattern) {
   G2O_TRACE("Loading libraries from {} pattern {}", directory, pattern);
-  // cerr << "# loading libraries from " << directory << "\t pattern: " <<
-  // pattern << endl;
   const std::string searchPattern =
       pattern.empty() ? directory + "/*" : directory + "/" + pattern;
   const std::vector<std::string> matchingFiles =

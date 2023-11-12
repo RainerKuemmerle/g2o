@@ -27,6 +27,7 @@
 #include "g2o_common.h"
 
 #include <cstdlib>
+#include <string>
 #include <string_view>
 #include <vector>
 
@@ -58,9 +59,9 @@ namespace {
 Dl_info info;
 }
 #endif
-#define PATH_SEPARATOR ":"
+constexpr std::string_view kPathSeparator = ":";
 #else  // WINDOWS
-#define PATH_SEPARATOR ";"
+constexpr std::string_view kPathSeparator = ";";
 
 static void fakeFunctionForWindows() {}
 
@@ -109,7 +110,8 @@ void loadStandardTypes(DlWrapper& dlTypesWrapper, int argc, char** argv) {
 #endif
   }
 
-  std::vector<std::string> paths = strSplit(typesPath, PATH_SEPARATOR);
+  const std::vector<std::string> paths =
+      strSplit(typesPath, std::string(kPathSeparator));
   for (const auto& path : paths) {
     if (!path.empty())
       dlTypesWrapper.openLibraries(path, std::string(kTypesPattern));
@@ -143,7 +145,8 @@ void loadStandardSolver(DlWrapper& dlSolverWrapper, int argc, char** argv) {
 #endif
   }
 
-  std::vector<std::string> paths = strSplit(solversPath, PATH_SEPARATOR);
+  const std::vector<std::string> paths =
+      strSplit(solversPath, std::string(kPathSeparator));
   for (const auto& path : paths) {
     if (!path.empty())
       dlSolverWrapper.openLibraries(path, std::string(kSolversPattern));
