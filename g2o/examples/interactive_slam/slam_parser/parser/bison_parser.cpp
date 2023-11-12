@@ -53,7 +53,7 @@
 #include "bison_parser.h"
 
 // Second part of user prologue.
-#line 85 "parser.yy"
+#line 84 "parser.yy"
 
 #include "driver.h"
 #include "scanner.h"
@@ -302,7 +302,7 @@ void Parser::yy_destroy_(const char* yymsg, basic_symbol<Base>& yysym) const {
   // User destructor.
   switch (yysym.kind()) {
     case symbol_kind::S_STRING:  // "string"
-#line 79 "parser.yy"
+#line 78 "parser.yy"
     {
       delete (yysym.value.stringVal);
     }
@@ -310,7 +310,7 @@ void Parser::yy_destroy_(const char* yymsg, basic_symbol<Base>& yysym) const {
     break;
 
     case symbol_kind::S_add_se2:  // add_se2
-#line 80 "parser.yy"
+#line 79 "parser.yy"
     {
       delete (yysym.value.commandNode);
     }
@@ -318,7 +318,7 @@ void Parser::yy_destroy_(const char* yymsg, basic_symbol<Base>& yysym) const {
     break;
 
     case symbol_kind::S_add_se3:  // add_se3
-#line 80 "parser.yy"
+#line 79 "parser.yy"
     {
       delete (yysym.value.commandNode);
     }
@@ -326,7 +326,7 @@ void Parser::yy_destroy_(const char* yymsg, basic_symbol<Base>& yysym) const {
     break;
 
     case symbol_kind::S_fix_node:  // fix_node
-#line 80 "parser.yy"
+#line 79 "parser.yy"
     {
       delete (yysym.value.commandNode);
     }
@@ -334,7 +334,7 @@ void Parser::yy_destroy_(const char* yymsg, basic_symbol<Base>& yysym) const {
     break;
 
     case symbol_kind::S_solve_state:  // solve_state
-#line 80 "parser.yy"
+#line 79 "parser.yy"
     {
       delete (yysym.value.commandNode);
     }
@@ -342,7 +342,7 @@ void Parser::yy_destroy_(const char* yymsg, basic_symbol<Base>& yysym) const {
     break;
 
     case symbol_kind::S_query_state:  // query_state
-#line 80 "parser.yy"
+#line 79 "parser.yy"
     {
       delete (yysym.value.commandNode);
     }
@@ -350,7 +350,7 @@ void Parser::yy_destroy_(const char* yymsg, basic_symbol<Base>& yysym) const {
     break;
 
     case symbol_kind::S_command:  // command
-#line 80 "parser.yy"
+#line 79 "parser.yy"
     {
       delete (yysym.value.commandNode);
     }
@@ -431,6 +431,7 @@ int Parser::parse() {
   int yylen = 0;
 
   // Error handling.
+  int yynerrs_ = 0;
   int yyerrstatus_ = 0;
 
   /// The lookahead symbol.
@@ -449,7 +450,7 @@ int Parser::parse() {
     YYCDEBUG << "Starting parse\n";
 
     // User initialization code.
-#line 38 "parser.yy"
+#line 37 "parser.yy"
     {
       // initialize the initial location object
       yyla.location.begin.filename = yyla.location.end.filename =
@@ -577,7 +578,7 @@ int Parser::parse() {
       {
         switch (yyn) {
           case 2:  // int_list: "integer"
-#line 104 "parser.yy"
+#line 103 "parser.yy"
           {
             (yylhs.value.intList) = new std::vector<int>;
             (yylhs.value.intList)->push_back((yystack_[0].value.integerVal));
@@ -586,7 +587,7 @@ int Parser::parse() {
           break;
 
           case 3:  // int_list: int_list "integer"
-#line 109 "parser.yy"
+#line 108 "parser.yy"
           {
             (yystack_[1].value.intList)
                 ->push_back((yystack_[0].value.integerVal));
@@ -596,7 +597,7 @@ int Parser::parse() {
           break;
 
           case 4:  // NUMBER: "integer"
-#line 115 "parser.yy"
+#line 114 "parser.yy"
           {
             (yylhs.value.doubleVal) = (yystack_[0].value.integerVal);
           }
@@ -604,7 +605,7 @@ int Parser::parse() {
           break;
 
           case 5:  // NUMBER: "double"
-#line 119 "parser.yy"
+#line 118 "parser.yy"
           {
             (yylhs.value.doubleVal) = (yystack_[0].value.doubleVal);
           }
@@ -612,7 +613,7 @@ int Parser::parse() {
           break;
 
           case 6:  // add_se2: "ADD" "Vertex SE2" "integer"
-#line 124 "parser.yy"
+#line 123 "parser.yy"
           {
             (yylhs.value.commandNode) =
                 new AddNode(*(yystack_[1].value.stringVal),
@@ -623,7 +624,7 @@ int Parser::parse() {
           break;
 
           case 7:  // add_se2: "ADD" "Vertex SE2" "integer" NUMBER NUMBER NUMBER
-#line 129 "parser.yy"
+#line 128 "parser.yy"
           {
             std::vector<double> values;
             values.push_back((yystack_[2].value.doubleVal));
@@ -640,7 +641,7 @@ int Parser::parse() {
           case 8:  // add_se2: "ADD" "Edge SE2" "integer" "integer" "integer"
                    // NUMBER NUMBER NUMBER NUMBER NUMBER NUMBER NUMBER NUMBER
                    // NUMBER
-#line 138 "parser.yy"
+#line 137 "parser.yy"
           {
             std::vector<double> values;
             values.push_back((yystack_[8].value.doubleVal));
@@ -664,7 +665,7 @@ int Parser::parse() {
           break;
 
           case 9:  // add_se3: "ADD" "Vertex SE3" "integer"
-#line 155 "parser.yy"
+#line 154 "parser.yy"
           {
             (yylhs.value.commandNode) =
                 new AddNode(*(yystack_[1].value.stringVal),
@@ -676,7 +677,7 @@ int Parser::parse() {
 
           case 10:  // add_se3: "ADD" "Vertex SE3" "integer" NUMBER NUMBER
                     // NUMBER NUMBER NUMBER NUMBER
-#line 160 "parser.yy"
+#line 159 "parser.yy"
           {
             (yylhs.value.commandNode) =
                 new AddNode(*(yystack_[7].value.stringVal),
@@ -691,7 +692,7 @@ int Parser::parse() {
                     // NUMBER NUMBER NUMBER NUMBER NUMBER NUMBER NUMBER NUMBER
                     // NUMBER NUMBER NUMBER NUMBER NUMBER NUMBER NUMBER NUMBER
                     // NUMBER NUMBER NUMBER
-#line 165 "parser.yy"
+#line 164 "parser.yy"
           {
             std::vector<double> values;
             values.push_back((yystack_[26].value.doubleVal));
@@ -733,7 +734,7 @@ int Parser::parse() {
           break;
 
           case 12:  // fix_node: "Fix" "integer"
-#line 200 "parser.yy"
+#line 199 "parser.yy"
           {
             std::vector<int> values;
             values.push_back((yystack_[0].value.integerVal));
@@ -743,7 +744,7 @@ int Parser::parse() {
           break;
 
           case 13:  // solve_state: "Solve State"
-#line 207 "parser.yy"
+#line 206 "parser.yy"
           {
             (yylhs.value.commandNode) = new SolveSate("SOLVE_STATE");
           }
@@ -751,7 +752,7 @@ int Parser::parse() {
           break;
 
           case 14:  // query_state: "Query State"
-#line 212 "parser.yy"
+#line 211 "parser.yy"
           {
             (yylhs.value.commandNode) = new QueryState("QUERY_STATE");
           }
@@ -759,7 +760,7 @@ int Parser::parse() {
           break;
 
           case 15:  // query_state: "Query State" int_list
-#line 216 "parser.yy"
+#line 215 "parser.yy"
           {
             (yylhs.value.commandNode) =
                 new QueryState("QUERY_STATE", *(yystack_[0].value.intList));
@@ -769,7 +770,7 @@ int Parser::parse() {
           break;
 
           case 16:  // command: add_se2
-#line 222 "parser.yy"
+#line 221 "parser.yy"
           {
             (yylhs.value.commandNode) = (yystack_[0].value.commandNode);
           }
@@ -777,7 +778,7 @@ int Parser::parse() {
           break;
 
           case 17:  // command: add_se3
-#line 226 "parser.yy"
+#line 225 "parser.yy"
           {
             (yylhs.value.commandNode) = (yystack_[0].value.commandNode);
           }
@@ -785,7 +786,7 @@ int Parser::parse() {
           break;
 
           case 18:  // command: fix_node
-#line 230 "parser.yy"
+#line 229 "parser.yy"
           {
             (yylhs.value.commandNode) = (yystack_[0].value.commandNode);
           }
@@ -793,7 +794,7 @@ int Parser::parse() {
           break;
 
           case 19:  // command: solve_state
-#line 234 "parser.yy"
+#line 233 "parser.yy"
           {
             (yylhs.value.commandNode) = (yystack_[0].value.commandNode);
           }
@@ -801,7 +802,7 @@ int Parser::parse() {
           break;
 
           case 20:  // command: query_state
-#line 238 "parser.yy"
+#line 237 "parser.yy"
           {
             (yylhs.value.commandNode) = (yystack_[0].value.commandNode);
           }
@@ -809,7 +810,7 @@ int Parser::parse() {
           break;
 
           case 23:  // start: start command ';'
-#line 245 "parser.yy"
+#line 244 "parser.yy"
           {
             driver.slamContext.process((yystack_[1].value.commandNode));
             delete (yystack_[1].value.commandNode);
@@ -845,6 +846,7 @@ int Parser::parse() {
   yyerrlab:
     // If not already recovering from an error, report this error.
     if (!yyerrstatus_) {
+      ++yynerrs_;
       context yyctx(*this, yyla);
       std::string msg = yysyntax_error_(yyctx);
       error(yyla.location, YY_MOVE(msg));
@@ -1199,8 +1201,8 @@ const char* const Parser::yytname_[] = {"\"end of file\"",
 
 #if SLAMPARSERDEBUG
 const unsigned char Parser::yyrline_[] = {
-    0,   103, 103, 108, 114, 118, 123, 128, 137, 154, 159, 164,
-    199, 206, 211, 215, 221, 225, 229, 233, 237, 242, 243, 244};
+    0,   102, 102, 107, 113, 117, 122, 127, 136, 153, 158, 163,
+    198, 205, 210, 214, 220, 224, 228, 232, 236, 241, 242, 243};
 
 void Parser::yy_stack_print_() const {
   *yycdebug_ << "Stack now";
@@ -1252,7 +1254,7 @@ Parser::symbol_kind_type Parser::yytranslate_(int t) YY_NOEXCEPT {
 }  // namespace SlamParser
 #line 1458 "bison_parser.cpp"
 
-#line 252 "parser.yy"
+#line 251 "parser.yy"
 /*** Additional Code ***/
 
 void SlamParser::Parser::error(const Parser::location_type& l,
