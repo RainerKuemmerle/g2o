@@ -61,7 +61,7 @@ def main():
         meas.normal0 = nm0
         meas.normal1 = nm1
 
-        edge = g2o.Edge_V_V_GICP()
+        edge = g2o.EdgeVVGicp()
         edge.set_vertex(0, optimizer.vertex(0))
         edge.set_vertex(1, optimizer.vertex(1))
         edge.set_measurement(meas)

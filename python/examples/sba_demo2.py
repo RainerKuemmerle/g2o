@@ -77,7 +77,7 @@ def main():
         if len(visible) < 2:
             continue
 
-        vp = g2o.VertexSBAPointXYZ()
+        vp = g2o.VertexPointXYZ()
         vp.set_id(point_id)
         vp.set_marginalized(True)
         vp.set_estimate(point + np.random.randn(3))

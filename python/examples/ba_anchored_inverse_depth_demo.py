@@ -90,7 +90,7 @@ def main():
         if len(visible) < 2:
             continue
 
-        v_p = g2o.VertexSBAPointXYZ()
+        v_p = g2o.VertexPointXYZ()
         v_p.set_id(point_id)
         v_p.set_marginalized(args.schur_trick)
 

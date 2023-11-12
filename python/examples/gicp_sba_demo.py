@@ -69,7 +69,7 @@ def main():
         meas.normal0 = nm0
         meas.normal1 = nm1
 
-        edge = g2o.Edge_V_V_GICP()
+        edge = g2o.EdgeVVGicp()
         edge.set_vertex(0, optimizer.vertex(0))
         edge.set_vertex(1, optimizer.vertex(1))
         edge.set_measurement(meas)
@@ -89,7 +89,7 @@ def main():
 
         cam_num = 2
         for i, point in enumerate(true_points):
-            vp = g2o.VertexSBAPointXYZ()
+            vp = g2o.VertexPointXYZ()
             vp.set_id(cam_num + i)
             vp.set_marginalized(True)
             vp.set_estimate(point + np.random.randn(3))
@@ -100,7 +100,7 @@ def main():
                 if 0 <= z[0] < 640 and 0 <= z[1] < 480:
                     z += np.random.randn(3) * args.pixel_noise * [1, 1, 1 / 16.0]
 
-                    edge = g2o.Edge_XYZ_VSC()
+                    edge = g2o.EdgeXyzVsc()
                     edge.set_vertex(0, vp)
                     edge.set_vertex(1, optimizer.vertex(j))
                     edge.set_measurement(z)
