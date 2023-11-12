@@ -27,13 +27,13 @@
 #include "g2o_common.h"
 
 #include <cstdlib>
-#include <iostream>
+#include <string_view>
 #include <vector>
 
 #include "dl_wrapper.h"
 #include "g2o/stuff/filesys_tools.h"
+#include "g2o/stuff/logger.h"
 #include "g2o/stuff/string_tools.h"
-using namespace ::std;
 
 /*
  * setting up the library filename patterns for the different OS
@@ -71,23 +71,13 @@ HMODULE getMyInstance() {
 }
 #endif
 
-// This can occur if we are doing a release build, and the release
-// postfix is empty
-#ifndef G2O_LIBRARY_POSTFIX
-#define G2O_LIBRARY_POSTFIX ""
-#endif
-
-static const string TYPES_PATTERN = string("*_types_*") +
-                                    string(G2O_LIBRARY_POSTFIX) + string(".") +
-                                    string(SO_EXT);
-static const string SOLVERS_PATTERN = string("*_solver_*") +
-                                      string(G2O_LIBRARY_POSTFIX) +
-                                      string(".") + string(SO_EXT);
+static constexpr std::string_view TYPES_PATTERN = "*_types_*." SO_EXT;
+static constexpr std::string_view SOLVERS_PATTERN = "*_solver_*." SO_EXT;
 
 namespace g2o {
 
-void findArguments(const std::string& option, vector<string>& args, int argc,
-                   char** argv) {
+void findArguments(const std::string& option, std::vector<std::string>& args,
+                   int argc, char** argv) {
   args.clear();
   for (int i = 0; i < argc; ++i) {
     if (argv[i] == option && i + 1 < argc) {
@@ -98,7 +88,7 @@ void findArguments(const std::string& option, vector<string>& args, int argc,
 
 void loadStandardTypes(DlWrapper& dlTypesWrapper, int argc, char** argv) {
   char* envTypesPath = getenv("G2O_TYPES_DIR");
-  string typesPath;
+  std::string typesPath;
 
   if (envTypesPath != NULL) {
     typesPath = envTypesPath;
@@ -117,24 +107,23 @@ void loadStandardTypes(DlWrapper& dlTypesWrapper, int argc, char** argv) {
 #endif
   }
 
-  vector<string> paths = strSplit(typesPath, PATH_SEPARATOR);
-  for (vector<string>::const_iterator it = paths.begin(); it != paths.end();
-       ++it) {
-    if (it->size() > 0) dlTypesWrapper.openLibraries(*it, TYPES_PATTERN);
+  std::vector<std::string> paths = strSplit(typesPath, PATH_SEPARATOR);
+  for (const auto& path : paths) {
+    if (!path.empty())
+      dlTypesWrapper.openLibraries(path, std::string(TYPES_PATTERN));
   }
 
-  vector<string> libs;
+  std::vector<std::string> libs;
   if (argc > 0 && argv != 0) findArguments("-typeslib", libs, argc, argv);
-  for (vector<string>::const_iterator it = libs.begin(); it != libs.end();
-       ++it) {
-    cerr << "Loading types " << *it << endl;
-    dlTypesWrapper.openLibrary(*it);
+  for (const auto& lib : libs) {
+    G2O_INFO("Loading types {}", lib);
+    dlTypesWrapper.openLibrary(lib);
   }
 }
 
 void loadStandardSolver(DlWrapper& dlSolverWrapper, int argc, char** argv) {
   char* envSolversPath = getenv("G2O_SOLVERS_DIR");
-  string solversPath = G2O_DEFAULT_SOLVERS_DIR_;
+  std::string solversPath = G2O_DEFAULT_SOLVERS_DIR_;
 
   if (envSolversPath != NULL) {
     solversPath = envSolversPath;
@@ -152,18 +141,17 @@ void loadStandardSolver(DlWrapper& dlSolverWrapper, int argc, char** argv) {
 #endif
   }
 
-  vector<string> paths = strSplit(solversPath, PATH_SEPARATOR);
-  for (vector<string>::const_iterator it = paths.begin(); it != paths.end();
-       ++it) {
-    if (it->size() > 0) dlSolverWrapper.openLibraries(*it, SOLVERS_PATTERN);
+  std::vector<std::string> paths = strSplit(solversPath, PATH_SEPARATOR);
+  for (const auto& path : paths) {
+    if (!path.empty())
+      dlSolverWrapper.openLibraries(path, std::string(SOLVERS_PATTERN));
   }
 
-  vector<string> libs;
+  std::vector<std::string> libs;
   if (argc > 0 && argv != 0) findArguments("-solverlib", libs, argc, argv);
-  for (vector<string>::const_iterator it = libs.begin(); it != libs.end();
-       ++it) {
-    cerr << "Loading solver " << *it << endl;
-    dlSolverWrapper.openLibrary(*it);
+  for (const auto& lib : libs) {
+    G2O_INFO("Loading solver {}", lib);
+    dlSolverWrapper.openLibrary(lib);
   }
 }
 

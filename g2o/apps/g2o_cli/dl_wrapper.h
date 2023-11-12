@@ -49,6 +49,12 @@ class G2O_CLI_API DlWrapper {
   virtual ~DlWrapper();
 
   /**
+   * it's not allowed to draw a copy of the wrapper
+   */
+  DlWrapper(const DlWrapper&) = delete;
+  DlWrapper& operator=(const DlWrapper&) = delete;
+
+  /**
    * open all libs from a directory matching a specific pattern.
    * @return number of loaded libs
    */
@@ -72,13 +78,6 @@ class G2O_CLI_API DlWrapper {
   std::vector<HMODULE> _handles;
 #endif
   std::vector<std::string> _filenames;
-
- private:
-  /**
-   * it's not allowed to draw a copy of the wrapper
-   */
-  DlWrapper(const DlWrapper&);
-  DlWrapper& operator=(const DlWrapper&);
 };
 
 }  // namespace g2o
