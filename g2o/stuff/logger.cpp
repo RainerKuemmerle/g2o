@@ -26,24 +26,31 @@
 
 #include "logger.h"
 
+#include <string_view>
+
 #include "g2o/config.h"
 
 #ifdef G2O_HAVE_LOGGING
 #include <spdlog/cfg/env.h>
 #include <spdlog/common.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
+#include <spdlog/spdlog.h>
 
 #include <cassert>
 
 namespace g2o::internal {
 
+constexpr std::string_view kLoggerName = "g2o";
+
 LoggerInterface::LoggerInterface() {
   spdlog::cfg::load_env_levels();
-  console_ = spdlog::stdout_color_mt("g2o");
+  console_ = spdlog::get(std::string(kLoggerName));
+  if (console_) return;
+  console_ = spdlog::stdout_color_mt(std::string(kLoggerName));
   console_->set_pattern("%+");
 }
 
-LoggerInterface::~LoggerInterface() { spdlog::drop("g2o"); }
+LoggerInterface::~LoggerInterface() { spdlog::drop(std::string(kLoggerName)); }
 
 }  // namespace g2o::internal
 #endif
@@ -54,6 +61,8 @@ void setLevel(Level level) {
 #ifdef G2O_HAVE_LOGGING
   auto toSpdLogLevel = [](Level level) {
     switch (level) {
+      case Level::kTrace:
+        return spdlog::level::trace;
       case Level::kDebug:
         return spdlog::level::debug;
       case Level::kInfo:
