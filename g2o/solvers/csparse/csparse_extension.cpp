@@ -7,7 +7,7 @@
 // CSparse is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
-// version 1.1 of the License, or (at your option) any later version.
+// version 2.1 of the License, or (at your option) any later version.
 //
 // CSparse is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -21,15 +21,10 @@
 #include "csparse_extension.h"
 
 #include <cassert>
-#include <iostream>
 
 #include "g2o/stuff/logger.h"
-#include "g2o/stuff/macros.h"
 
-using namespace std;
-
-namespace g2o {
-namespace csparse_extension {
+namespace g2o::csparse_extension {
 
 /**
  * Originally from CSparse, avoid memory re-allocations by giving workspace
@@ -125,5 +120,4 @@ csn* cs_chol_workspace(const cs* A, const css* S, int* cin, double* xin) {
   return (cs_ndone(N, E, NULL, NULL, 1)); /* success: free E,s,x; return N */
 }
 
-}  // namespace csparse_extension
-}  // namespace g2o
+}  // namespace g2o::csparse_extension
