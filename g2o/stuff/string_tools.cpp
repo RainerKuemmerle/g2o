@@ -28,16 +28,9 @@
 
 #include <algorithm>
 #include <cctype>
-#include <cstdarg>
-#include <cstdio>
-#include <cstring>
 #include <iostream>
 #include <iterator>
 #include <string>
-
-#include "logger.h"
-#include "macros.h"
-#include "os_specific.h"
 
 #if (defined(UNIX) || defined(CYGWIN)) && !defined(ANDROID)
 #include <wordexp.h>
@@ -85,33 +78,6 @@ std::string strToUpper(const std::string& s) {
   std::transform(s.begin(), s.end(), back_inserter(ret),
                  [](unsigned char c) { return std::toupper(c); });
   return ret;
-}
-
-std::string formatString(const char* fmt, ...) {
-  char* auxPtr = NULL;
-  va_list arg_list;
-  va_start(arg_list, fmt);
-  int numChar = vasprintf(&auxPtr, fmt, arg_list);
-  va_end(arg_list);
-  string retString;
-  if (numChar != -1)
-    retString = auxPtr;
-  else {
-    G2O_ERROR("{}: Error while allocating memory", __PRETTY_FUNCTION__);
-  }
-  free(auxPtr);
-  return retString;
-}
-
-int strPrintf(std::string& str, const char* fmt, ...) {
-  char* auxPtr = NULL;
-  va_list arg_list;
-  va_start(arg_list, fmt);
-  int numChars = vasprintf(&auxPtr, fmt, arg_list);
-  va_end(arg_list);
-  str = auxPtr;
-  free(auxPtr);
-  return numChars;
 }
 
 std::string strExpandFilename(const std::string& filename) {

@@ -42,8 +42,6 @@
   static void func(void)
 
 #define G2O_ATTRIBUTE_UNUSED __attribute__((unused))
-#define G2O_ATTRIBUTE_FORMAT12 __attribute__((format(printf, 1, 2)))
-#define G2O_ATTRIBUTE_FORMAT23 __attribute__((format(printf, 2, 3)))
 #define G2O_ATTRIBUTE_WARNING(func) func __attribute__((warning))
 #define G2O_ATTRIBUTE_DEPRECATED(func) func __attribute__((deprecated))
 
@@ -73,8 +71,6 @@ for static C++ objects. For GCC, uses a constructor attribute."
   static void __cdecl f(void)
 
 #define G2O_ATTRIBUTE_UNUSED
-#define G2O_ATTRIBUTE_FORMAT12
-#define G2O_ATTRIBUTE_FORMAT23
 #define G2O_ATTRIBUTE_WARNING(func) func
 #define G2O_ATTRIBUTE_DEPRECATED(func) func
 
@@ -91,8 +87,6 @@ for static C++ objects. For GCC, uses a constructor attribute."
 #endif
 #define G2O_ATTRIBUTE_CONSTRUCTOR(func) func
 #define G2O_ATTRIBUTE_UNUSED
-#define G2O_ATTRIBUTE_FORMAT12
-#define G2O_ATTRIBUTE_FORMAT23
 #define G2O_ATTRIBUTE_WARNING(func) func
 #define G2O_ATTRIBUTE_DEPRECATED(func) func
 
