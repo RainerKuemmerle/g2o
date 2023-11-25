@@ -29,31 +29,19 @@
 #include <sys/types.h>
 
 #include <algorithm>
-#include <cstdio>
-#include <iostream>
 
 #include "g2o/stuff/filesys_tools.h"
-#include "g2o/stuff/macros.h"
+#include "g2o/stuff/logger.h"
 
 #if defined(UNIX) || defined(CYGWIN)
 #include <dlfcn.h>
-#endif
-
-#ifdef __APPLE__
-#define SO_EXT "dylib"
-#define SO_EXT_LEN 5
-#elif defined(WINDOWS) || defined(CYGWIN)
-#define SO_EXT "dll"
-#define SO_EXT_LEN 3
-#else  // Linux
-#define SO_EXT "so"
-#define SO_EXT_LEN 2
 #endif
 
 namespace g2o {
 
 int DlWrapper::openLibraries(const std::string& directory,
                              const std::string& pattern) {
+  G2O_TRACE("Loading libraries from {} pattern {}", directory, pattern);
   // cerr << "# loading libraries from " << directory << "\t pattern: " <<
   // pattern << endl;
   const std::string searchPattern =
@@ -67,23 +55,8 @@ int DlWrapper::openLibraries(const std::string& directory,
         filenames_.end())
       continue;
 
-      // If we are doing a release build, the wildcards will pick up the
-      // suffixes; unfortunately the "_rd" extension means that we
-      // don't seem to be able to filter out the incompatible files using a
-      // wildcard expansion to wordexp.
-
-#ifndef G2O_LIBRARY_POSTFIX
-    if ((filename.rfind(std::string("_d.") + SO_EXT) ==
-         filename.length() - 3 - SO_EXT_LEN) ||
-        (filename.rfind(std::string("_rd.") + SO_EXT) ==
-         filename.length() - 4 - SO_EXT_LEN) ||
-        (filename.rfind(std::string("_s.") + SO_EXT) ==
-         filename.length() - 3 - SO_EXT_LEN))
-      continue;
-#endif
-
     // open the lib
-    // cerr << "loading " << filename << endl;
+    G2O_TRACE("Loading {}", filename);
     if (openLibrary(filename)) numLibs++;
   }
 
@@ -106,16 +79,18 @@ bool DlWrapper::openLibrary(const std::string& filename) {
 #if defined(UNIX) || defined(CYGWIN)
   void* handle = dlopen(filename.c_str(), RTLD_LAZY);
   if (!handle) {
-    std::cerr << __PRETTY_FUNCTION__ << " Cannot open library: " << dlerror()
-              << '\n';
+    G2O_ERROR("Cannot open library: {} Error: {}", filename, dlerror());
     return false;
   }
 #elif defined(WINDOWS)
   HMODULE handle = LoadLibrary(filename.c_str());
   if (!handle) {
-    std::cerr << __PRETTY_FUNCTION__ << " Cannot open library." << std::endl;
+    G2O_ERROR("Cannot open library: {}", filename);
     return false;
   }
+#else
+#warning "No implementation for openLibrary found"
+  return false;
 #endif
 
   // cerr << "loaded " << filename << endl;

@@ -37,7 +37,7 @@ class DlSolverWrapper;
 /**
  * will also look for -typeslib in (argc, argv) and load that types
  */
-G2O_CLI_API void loadStandardTypes(DlWrapper& dlWrapper, int argc = 0,
+G2O_CLI_API void loadStandardTypes(DlWrapper& dlTypesWrapper, int argc = 0,
                                    char** argv = nullptr);
 
 /**

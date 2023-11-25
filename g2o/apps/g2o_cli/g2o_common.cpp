@@ -27,11 +27,12 @@
 #include "g2o_common.h"
 
 #include <cstdlib>
-#include <iostream>
+#include <string_view>
 #include <vector>
 
 #include "dl_wrapper.h"
 #include "g2o/stuff/filesys_tools.h"
+#include "g2o/stuff/logger.h"
 #include "g2o/stuff/string_tools.h"
 
 /*
@@ -72,22 +73,11 @@ HMODULE getMyInstance() {
 }
 #endif
 
-// This can occur if we are doing a release build, and the release
-// postfix is empty
-#ifndef G2O_LIBRARY_POSTFIX
-#define G2O_LIBRARY_POSTFIX ""
-#endif
-
-static const std::string kTypesPattern = std::string("*_types_*") +
-                                         std::string(G2O_LIBRARY_POSTFIX) +
-                                         std::string(".") + std::string(SO_EXT);
-static const std::string kSolversPattern =
-    std::string("*_solver_*") + std::string(G2O_LIBRARY_POSTFIX) +
-    std::string(".") + std::string(SO_EXT);
+static constexpr std::string_view kTypesPattern = "*_types_*." SO_EXT;
+static constexpr std::string_view kSolversPattern = "*_solver_*." SO_EXT;
 
 namespace g2o {
 
-namespace {
 void findArguments(const std::string& option, std::vector<std::string>& args,
                    int argc, char** argv) {
   args.clear();
@@ -97,9 +87,8 @@ void findArguments(const std::string& option, std::vector<std::string>& args,
     }
   }
 }
-}  // namespace
 
-void loadStandardTypes(DlWrapper& dlWrapper, int argc, char** argv) {
+void loadStandardTypes(DlWrapper& dlTypesWrapper, int argc, char** argv) {
   char* envTypesPath = getenv("G2O_TYPES_DIR");
   std::string typesPath;
 
@@ -120,16 +109,17 @@ void loadStandardTypes(DlWrapper& dlWrapper, int argc, char** argv) {
 #endif
   }
 
-  const std::vector<std::string> paths = strSplit(typesPath, PATH_SEPARATOR);
+  std::vector<std::string> paths = strSplit(typesPath, PATH_SEPARATOR);
   for (const auto& path : paths) {
-    if (!path.empty()) dlWrapper.openLibraries(path, kTypesPattern);
+    if (!path.empty())
+      dlTypesWrapper.openLibraries(path, std::string(kTypesPattern));
   }
 
   std::vector<std::string> libs;
-  if (argc > 0 && argv != nullptr) findArguments("-typeslib", libs, argc, argv);
+  if (argc > 0 && argv != 0) findArguments("-typeslib", libs, argc, argv);
   for (const auto& lib : libs) {
-    std::cerr << "Loading types " << lib << std::endl;
-    dlWrapper.openLibrary(lib);
+    G2O_INFO("Loading types {}", lib);
+    dlTypesWrapper.openLibrary(lib);
   }
 }
 
@@ -153,16 +143,16 @@ void loadStandardSolver(DlWrapper& dlSolverWrapper, int argc, char** argv) {
 #endif
   }
 
-  const std::vector<std::string> paths = strSplit(solversPath, PATH_SEPARATOR);
+  std::vector<std::string> paths = strSplit(solversPath, PATH_SEPARATOR);
   for (const auto& path : paths) {
-    if (!path.empty()) dlSolverWrapper.openLibraries(path, kSolversPattern);
+    if (!path.empty())
+      dlSolverWrapper.openLibraries(path, std::string(kSolversPattern));
   }
 
   std::vector<std::string> libs;
-  if (argc > 0 && argv != nullptr)
-    findArguments("-solverlib", libs, argc, argv);
+  if (argc > 0 && argv != 0) findArguments("-solverlib", libs, argc, argv);
   for (const auto& lib : libs) {
-    std::cerr << "Loading solver " << lib << std::endl;
+    G2O_INFO("Loading solver {}", lib);
     dlSolverWrapper.openLibrary(lib);
   }
 }

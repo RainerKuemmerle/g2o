@@ -45,6 +45,10 @@ class G2O_CLI_API DlWrapper {
  public:
   DlWrapper() = default;
   virtual ~DlWrapper() = default;
+
+  /**
+   * it's not allowed to draw a copy of the wrapper
+   */
   DlWrapper(const DlWrapper&) = delete;
   DlWrapper& operator=(const DlWrapper&) = delete;
 
