@@ -104,7 +104,7 @@ void AbstractPropertiesWidget::applyProperties() {
       bool status = baseProp->fromString(editor->text().toStdString());
       if (!status) {
         std::cerr << "Warning: unable to set property " << baseProp->name()
-                  << std::endl;
+                  << '\n';
       }
     }
   }

@@ -26,6 +26,9 @@
 
 #include "stream_redirect.h"
 
+#include <qmutex.h>
+
+#include <QMutexLocker>
 #include <QPlainTextEdit>
 #include <QString>
 #include <iostream>
@@ -42,19 +45,17 @@ StreamRedirect::~StreamRedirect() {
 }
 
 std::char_traits<char>::int_type StreamRedirect::overflow(int_type v) {
-  mutex_.lock();
+  QMutexLocker lock(&mutex_);
   if (v == '\n') {
     te_->appendPlainText(QString::fromLatin1(buffer_.c_str(), buffer_.size()));
     buffer_.clear();
   } else
     buffer_.push_back(v);
-
-  mutex_.unlock();
   return v;
 }
 
 std::streamsize StreamRedirect::xsputn(const char* p, std::streamsize n) {
-  mutex_.lock();
+  QMutexLocker lock(&mutex_);
   buffer_.append(p, p + n);
 
   while (true) {
@@ -65,7 +66,5 @@ std::streamsize StreamRedirect::xsputn(const char* p, std::streamsize n) {
     } else
       break;
   }
-
-  mutex_.unlock();
   return n;
 }

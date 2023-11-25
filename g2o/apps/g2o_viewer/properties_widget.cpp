@@ -23,7 +23,7 @@
 
 PropertiesWidget::PropertiesWidget(QWidget* parent)
     : AbstractPropertiesWidget(parent) {
-  std::cerr << "Created Prop widget" << std::endl;
+  std::cerr << "Created Prop widget\n";
 }
 
 void PropertiesWidget::setSolver(

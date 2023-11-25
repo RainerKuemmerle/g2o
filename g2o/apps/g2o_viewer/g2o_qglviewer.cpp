@@ -22,7 +22,6 @@
 
 #include "g2o/core/hyper_graph_action.h"
 #include "g2o/core/sparse_optimizer.h"
-#include "g2o/stuff/opengl_primitives.h"
 
 // some macro helpers for identifying the version number of QGLViewer
 // QGLViewer changed some parts of its API in version 2.6.
@@ -99,7 +98,8 @@ void G2oQGLViewer::draw() {
   if (updateDisplay_) {
     updateDisplay_ = false;
     glNewList(drawList_, GL_COMPILE_AND_EXECUTE);
-    applyAction(*graph, *drawActions_, drawActionParameters_);
+    SparseOptimizer& optimizer = *graph;
+    applyAction(optimizer, *drawActions_, drawActionParameters_);
     glEndList();
   } else {
     glCallList(drawList_);

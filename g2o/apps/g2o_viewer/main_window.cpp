@@ -36,14 +36,7 @@
 #include "properties_widget.h"
 #include "viewer_properties_widget.h"
 
-using std::cerr;
-using std::endl;
-using std::string;
-
-MainWindow::MainWindow(QWidget* parent)
-    : QMainWindow(parent)
-
-{
+MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
   setupUi(this);
   leKernelWidth->setValidator(
       new QDoubleValidator(-std::numeric_limits<double>::max(),
@@ -69,22 +62,22 @@ void MainWindow::on_actionSave_triggered(bool) {
     std::ofstream fout(filename.toStdString().c_str());
     viewer->graph->save(fout);
     if (fout.good())
-      cerr << "Saved " << filename.toStdString() << endl;
+      std::cerr << "Saved " << filename.toStdString() << '\n';
     else
-      cerr << "Error while saving file" << endl;
+      std::cerr << "Error while saving file\n";
   }
 }
 
 void MainWindow::on_btnOptimize_clicked() {
   if (viewer->graph->vertices().empty() || viewer->graph->edges().empty()) {
-    cerr << "Graph has no vertices / edges" << endl;
+    std::cerr << "Graph has no vertices / edges\n";
     return;
   }
 
   bool allocatedNewSolver;
   const bool allocateStatus = allocateSolver(allocatedNewSolver);
   if (!allocateStatus) {
-    cerr << "Error while allocating solver" << endl;
+    std::cerr << "Error while allocating solver\n";
     return;
   }
   if (allocatedNewSolver) prepare();
@@ -99,7 +92,7 @@ void MainWindow::on_btnOptimize_clicked() {
   const int maxIterations = spIterations->value();
   const int iter = viewer->graph->optimize(maxIterations);
   if (maxIterations > 0 && !iter) {
-    cerr << "Optimization failed, result might be invalid" << endl;
+    std::cerr << "Optimization failed, result might be invalid\n";
   }
 
   btnOptimize->show();
@@ -127,7 +120,7 @@ void MainWindow::on_btnInitialGuess_clicked() {
       }
       break;
     default:
-      cerr << __PRETTY_FUNCTION__ << " Unknown initialization method" << endl;
+      std::cerr << __PRETTY_FUNCTION__ << " Unknown initialization method\n";
       break;
   }
 
@@ -146,7 +139,7 @@ void MainWindow::on_btnSetZero_clicked() {
 
 void MainWindow::on_btnReload_clicked() {
   if (filename_.length() > 0) {
-    cerr << "reloading " << filename_ << endl;
+    std::cerr << "reloading " << filename_ << '\n';
     viewer->graph->clear();
     viewer->graph->load(filename_.c_str());
     viewer->setUpdateDisplay(true);
@@ -164,14 +157,14 @@ void MainWindow::fixGraph() {
   auto gauge = viewer->graph->findGauge();
   if (gaugeFreedom) {
     if (!gauge) {
-      cerr << "cannot find a vertex to fix in this thing" << endl;
+      std::cerr << "cannot find a vertex to fix in this thing\n";
       return;
     }
-    cerr << "graph is fixed by node " << gauge->id() << endl;
+    std::cerr << "graph is fixed by node " << gauge->id() << '\n';
     gauge->setFixed(true);
 
   } else {
-    cerr << "graph is fixed by priors or nodes are already fixed" << endl;
+    std::cerr << "graph is fixed by priors or nodes are already fixed\n";
   }
 
   viewer->graph->setVerbose(true);
@@ -187,7 +180,7 @@ void MainWindow::updateDisplayedSolvers() {
       g2o::OptimizationAlgorithmFactory::instance()->creatorList();
 
   bool varFound = false;
-  string varType;
+  std::string varType;
   for (const auto& knownSolver : knownSolvers) {
     const g2o::OptimizationAlgorithmProperty& sp = knownSolver->property();
     if (sp.name == "gn_var" || sp.name == "gn_var_cholmod") {
@@ -207,7 +200,7 @@ void MainWindow::updateDisplayedSolvers() {
     }
   }
 
-  std::map<string, std::vector<g2o::OptimizationAlgorithmProperty> >
+  std::map<std::string, std::vector<g2o::OptimizationAlgorithmProperty> >
       solverLookUp;
 
   for (const auto& knownSolver : knownSolvers) {
@@ -233,7 +226,7 @@ bool MainWindow::load(const QString& filename) {
   viewer->graph->clear();
   bool loadStatus = false;
   if (filename == "-") {
-    cerr << "reading stdin" << endl;
+    std::cerr << "reading stdin\n";
     loadStatus = viewer->graph->load(std::cin);
   } else {
     std::ifstream ifs(filename.toStdString().c_str());
@@ -261,7 +254,7 @@ bool MainWindow::load(const QString& filename) {
 
 bool MainWindow::allocateSolver(bool& allocatedNewSolver) {
   if (coOptimizer->count() == 0) {
-    cerr << "No solvers available" << endl;
+    std::cerr << "No solvers available\n";
     return false;
   }
   const int currentIndex = coOptimizer->currentIndex();
@@ -270,7 +263,7 @@ bool MainWindow::allocateSolver(bool& allocatedNewSolver) {
                            ->isEnabled();
 
   if (!enabled) {
-    cerr << "selected solver is not enabled" << endl;
+    std::cerr << "selected solver is not enabled\n";
     return false;
   }
 
@@ -292,7 +285,7 @@ bool MainWindow::allocateSolver(bool& allocatedNewSolver) {
 bool MainWindow::prepare() {
   g2o::SparseOptimizer* optimizer = viewer->graph.get();
   if (currentOptimizationAlgorithmProperty_.requiresMarginalize) {
-    cerr << "Marginalizing Landmarks" << endl;
+    std::cerr << "Marginalizing Landmarks\n";
     for (const auto& it : optimizer->vertices()) {
       auto* v = static_cast<g2o::OptimizableGraph::Vertex*>(it.second.get());
       const int vdim = v->dimension();
@@ -300,7 +293,7 @@ bool MainWindow::prepare() {
           (vdim == currentOptimizationAlgorithmProperty_.landmarkDim));
     }
   } else {
-    cerr << "Preparing (no marginalization of Landmarks)" << endl;
+    std::cerr << "Preparing (no marginalization of Landmarks)\n";
     for (const auto& it : optimizer->vertices()) {
       auto* v = static_cast<g2o::OptimizableGraph::Vertex*>(it.second.get());
       v->setMarginalized(false);
@@ -323,8 +316,8 @@ void MainWindow::setRobustKernel() {
         g2o::RobustKernelFactory::instance()->creator(
             strRobustKernel.toStdString());
     if (!creator) {
-      cerr << strRobustKernel.toStdString() << " is not a valid robust kernel"
-           << endl;
+      std::cerr << strRobustKernel.toStdString()
+                << " is not a valid robust kernel\n";
       return;
     }
     const g2o::RobustKernelPtr robustKernel = creator->construct();
@@ -357,9 +350,9 @@ bool MainWindow::loadFromFile(const QString& filename) {
   if (loadStatus) {
     filename_ = filename.toStdString();
   }
-  cerr << "loaded " << filename.toStdString() << " with "
-       << viewer->graph->vertices().size() << " vertices and "
-       << viewer->graph->edges().size() << " measurements" << endl;
+  std::cerr << "loaded " << filename.toStdString() << " with "
+            << viewer->graph->vertices().size() << " vertices and "
+            << viewer->graph->edges().size() << " measurements\n";
   viewer->update();
   fixGraph();
   return loadStatus;
@@ -393,7 +386,7 @@ void MainWindow::on_btnOptimizerParameters_clicked() {
   bool allocatedNewSolver;
   bool allocateStatus = allocateSolver(allocatedNewSolver);
   if (!allocateStatus) {
-    cerr << "Error while allocating solver" << endl;
+    std::cerr << "Error while allocating solver\n";
     return;
   }
   if (allocatedNewSolver) prepare();
@@ -417,8 +410,8 @@ void MainWindow::on_actionSave_Screenshot_triggered(bool) {
     viewer->setSnapshotQuality(format == "JPG" ? 90 : -1);
     viewer->setSnapshotFormat(format);
     viewer->saveSnapshot(filename);
-    cerr << "saved snapshot " << filename.toStdString() << "("
-         << format.toStdString() << ")" << endl;
+    std::cerr << "saved snapshot " << filename.toStdString() << "("
+              << format.toStdString() << ")\n";
   }
 }
 
@@ -430,7 +423,7 @@ void MainWindow::on_actionLoad_Viewer_State_triggered(bool) {
     viewer->restoreStateFromFile();
     viewer->setStateFileName(QString());
     viewer->update();
-    cerr << "Loaded state from " << filename.toStdString() << endl;
+    std::cerr << "Loaded state from " << filename.toStdString() << '\n';
   }
 }
 
@@ -441,7 +434,7 @@ void MainWindow::on_actionSave_Viewer_State_triggered(bool) {
     viewer->setStateFileName(filename);
     viewer->saveStateToFile();
     viewer->setStateFileName(QString());
-    cerr << "Saved state to " << filename.toStdString() << endl;
+    std::cerr << "Saved state to " << filename.toStdString() << '\n';
   }
 }
 

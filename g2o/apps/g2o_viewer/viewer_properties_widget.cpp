@@ -18,10 +18,6 @@
 
 #include "viewer_properties_widget.h"
 
-#include <QLineEdit>
-#include <cassert>
-#include <iostream>
-
 #include "g2o/stuff/property.h"
 #include "g2o_qglviewer.h"
 
