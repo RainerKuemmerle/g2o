@@ -29,11 +29,8 @@
 #include <algorithm>
 #include <cstdlib>
 #include <cstring>
-#include <fstream>
-#include <functional>
 
 #include "misc.h"
-#include "os_specific.h"
 #include "string_tools.h"
 using namespace std;
 
