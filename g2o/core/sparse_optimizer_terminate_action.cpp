@@ -31,14 +31,13 @@
 
 #include "g2o/core/hyper_graph.h"
 #include "g2o/core/hyper_graph_action.h"
-#include "g2o/stuff/misc.h"
 #include "sparse_optimizer.h"
 
 namespace g2o {
 
 SparseOptimizerTerminateAction::SparseOptimizerTerminateAction()
     : HyperGraphAction(),
-      gainThreshold_(cst(1e-6)),
+      gainThreshold_(1e-6),
       maxIterations_(std::numeric_limits<int>::max()) {}
 
 void SparseOptimizerTerminateAction::setGainThreshold(double gainThreshold) {

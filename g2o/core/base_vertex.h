@@ -32,6 +32,7 @@
 #include <Eigen/Dense>
 #include <cassert>
 #include <climits>
+#include <cmath>
 #include <cstring>
 #include <iosfwd>
 #include <limits>
@@ -41,7 +42,6 @@
 #include "g2o/core/eigen_types.h"
 #include "g2o/core/io_helper.h"
 #include "g2o/core/type_traits.h"
-#include "g2o/stuff/macros.h"
 #include "optimizable_graph.h"
 
 namespace g2o {
@@ -215,7 +215,7 @@ double BaseVertex<D, T>::solveDirect(double lambda) {
                      G2O_VERTEX_DIM, G2O_VERTEX_DIM) *
                      lambda;
   double det = tempA.determinant();
-  if (g2o_isnan(det) || det < std::numeric_limits<double>::epsilon())
+  if (std::isnan(det) || det < std::numeric_limits<double>::epsilon())
     return det;
   BVector dx = tempA.llt().solve(b_);
   oplus(VectorX::MapType(dx.data(), dx.size()));

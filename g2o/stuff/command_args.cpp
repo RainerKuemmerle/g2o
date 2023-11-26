@@ -28,9 +28,8 @@
 
 #include <algorithm>
 #include <cstdlib>
-#include <utility>
+#include <cstring>
 
-#include "misc.h"
 #include "string_tools.h"
 
 namespace g2o {
@@ -304,8 +303,9 @@ void CommandArgs::printHelp(std::ostream& os) {
         tableStrings.emplace_back(arg.name, arg.description);
       maxArgLen = (std::max)(maxArgLen, tableStrings.back().first.size());
     }
-    sort(tableStrings.begin(), tableStrings.end(),
-         CmpPairFirst<std::string, std::string>());
+    sort(
+        tableStrings.begin(), tableStrings.end(),
+        [](const auto& lhs, const auto& rhs) { return lhs.first < rhs.first; });
     maxArgLen += 3;
     for (const auto& tableString : tableStrings) {
       os << "-" << tableString.first;

@@ -42,7 +42,6 @@
 
 #include "g2o/config.h"  // IWYU pragma: keep
 #include "g2o/core/eigen_types.h"
-#include "g2o/stuff/misc.h"
 #include "g2o/stuff/sparse_helper.h"
 #include "matrix_operations.h"
 #include "matrix_structure.h"
@@ -914,8 +913,9 @@ void SparseBlockMatrix<MatrixType>::takePatternFromHash(
     for (typename HashSparseColumn::const_iterator it = column.begin();
          it != column.end(); ++it)
       sparseRowSorted.push_back(*it);
-    std::sort(sparseRowSorted.begin(), sparseRowSorted.end(),
-              CmpPairFirst<int, MatrixType*>());
+    std::sort(
+        sparseRowSorted.begin(), sparseRowSorted.end(),
+        [](const auto& lhs, const auto& rhs) { return lhs.first < rhs.first; });
     // try to free some memory early
     HashSparseColumn aux;
     std::swap(aux, column);

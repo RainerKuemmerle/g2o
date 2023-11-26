@@ -37,17 +37,31 @@
 
 #include "batch_stats.h"
 #include "estimate_propagator.h"
+#include "g2o/config.h"  // IWYU pragma: keep
 #include "g2o/core/eigen_types.h"
-#include "g2o/core/jacobian_workspace.h"
+#include "g2o/core/jacobian_workspace.h"  // IWYU pragma: keep
 #include "g2o/core/optimizable_graph.h"
 #include "g2o/core/sparse_block_matrix.h"
 #include "g2o/stuff/logger.h"
 #include "g2o/stuff/macros.h"
-#include "g2o/stuff/misc.h"
 #include "g2o/stuff/timeutil.h"
 #include "hyper_graph_action.h"
 #include "optimization_algorithm.h"
 #include "robust_kernel.h"  // IWYU pragma: keep
+
+namespace {
+/**
+ * tests whether there is a NaN in the array
+ */
+bool arrayHasNaN(const double* array, int size, int* nanIndex = 0) {
+  for (int i = 0; i < size; ++i)
+    if (std::isnan(array[i])) {
+      if (nanIndex) *nanIndex = i;
+      return true;
+    }
+  return false;
+}
+}  // namespace
 
 namespace g2o {
 

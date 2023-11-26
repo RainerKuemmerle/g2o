@@ -28,49 +28,15 @@
 
 #include <algorithm>
 #include <cctype>
-#include <cstdarg>
-#include <cstdio>
+#include <iostream>
 #include <iterator>
 #include <string>
 
-#include "logger.h"
-
 #if (defined(UNIX) || defined(CYGWIN)) && !defined(ANDROID)
 #include <wordexp.h>
-#endif
-
-namespace {
-
-int my_vasprintf(char** strp, const char* fmt, va_list ap) {
-  int size = 100;
-
-  char* p = static_cast<char*>(malloc(size * sizeof(char)));
-  if (p == nullptr) return -1;
-
-  while (true) {
-#ifdef _MSC_VER
-    int n = vsnprintf_s(p, size, size - 1, fmt, ap);
 #else
-    int n = vsnprintf(p, size, fmt, ap);
+#include "g2o/stuff/logger.h"
 #endif
-    if (n > -1 && n < size) {
-      *strp = p;
-      return n;
-    }
-    if (n > -1)
-      size = n + 1;
-    else
-      size *= 2;
-    char* np = static_cast<char*>(realloc(p, size * sizeof(char)));
-    if (np == nullptr) {
-      free(p);
-      return -1;
-    }
-    p = np;
-  }
-}
-
-}  // namespace
 
 namespace g2o {
 
@@ -114,33 +80,6 @@ std::string strToUpper(const std::string& s) {
   return ret;
 }
 
-std::string formatString(const char* fmt, ...) {
-  char* auxPtr = nullptr;
-  va_list arg_list;
-  va_start(arg_list, fmt);
-  const int numChar = my_vasprintf(&auxPtr, fmt, arg_list);
-  va_end(arg_list);
-  std::string retString;
-  if (numChar != -1)
-    retString = auxPtr;
-  else {
-    G2O_ERROR("{}: Error while allocating memory", __PRETTY_FUNCTION__);
-  }
-  free(auxPtr);
-  return retString;
-}
-
-int strPrintf(std::string& str, const char* fmt, ...) {
-  char* auxPtr = nullptr;
-  va_list arg_list;
-  va_start(arg_list, fmt);
-  const int numChars = my_vasprintf(&auxPtr, fmt, arg_list);
-  va_end(arg_list);
-  str = auxPtr;
-  free(auxPtr);
-  return numChars;
-}
-
 std::string strExpandFilename(const std::string& filename) {
 #if (defined(UNIX) || defined(CYGWIN)) && !defined(ANDROID)
   std::string result = filename;
@@ -154,7 +93,7 @@ std::string strExpandFilename(const std::string& filename) {
   return result;
 #else
   (void)filename;
-  G2O_WARN("{} not implemented", __PRETTY_FUNCTION__);
+  G2O_WARN("not implemented");
   return std::string();
 #endif
 }

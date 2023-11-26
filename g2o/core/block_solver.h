@@ -30,6 +30,7 @@
 #include <Eigen/Core>
 #include <Eigen/LU>
 #include <cassert>
+#include <cstddef>
 #include <cstdlib>
 #include <cstring>
 #include <memory>
@@ -673,8 +674,13 @@ bool BlockSolver<Traits>::buildSystem() {
       auto v = std::static_pointer_cast<const OptimizableGraph::Vertex>(
           e->vertex(i));
       if (!v->fixed()) {
-        bool hasANan = arrayHasNaN(jacobianWorkspace.workspaceForVertex(i),
-                                   e->dimension() * v->dimension());
+        bool hasANan =
+            VectorX::MapType(
+                jacobianWorkspace.workspaceForVertex(i),
+                static_cast<Eigen::Index>(e->dimension() * v->dimension()))
+                .array()
+                .isNaN()
+                .any();
         if (hasANan) {
           G2O_WARN(
               "buildSystem(): NaN within Jacobian for edge {} for vertex {}",

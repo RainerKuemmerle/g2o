@@ -26,13 +26,12 @@
 
 #include "edge_project_p2sc.h"
 
-#include <stdlib.h>
-
 #include <Eigen/Core>
+#include <cmath>
 #include <iostream>
 
 #include "g2o/core/io_helper.h"
-#include "g2o/stuff/macros.h"
+#include "g2o/stuff/logger.h"
 #include "g2o/stuff/misc.h"
 #include "g2o/types/sba/sbacam.h"
 #include "g2o/types/sba/vertex_cam.h"
@@ -112,8 +111,8 @@ void EdgeProjectP2SC::linearizeOplus() {
   double py = pc(1);
   double pz = pc(2);
   double ipz2 = 1.0 / (pz * pz);
-  if (g2o_isnan(ipz2)) {
-    std::cout << "[SetJac] infinite jac" << std::endl;
+  if (std::isnan(ipz2)) {
+    G2O_ERROR("[SetJac] infinite jac");
     abort();
   }
 

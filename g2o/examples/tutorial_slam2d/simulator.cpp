@@ -33,14 +33,15 @@
 #include "g2o/stuff/sampler.h"
 
 using std::cerr;
-using std::endl;
 
 namespace g2o::tutorial {
 
 #ifdef _MSC_VER
+namespace {
 inline double round(double number) {
   return number < 0.0 ? ceil(number - 0.5) : floor(number + 0.5);
 }
+}  // namespace
 #endif
 
 using LandmarkGrid = std::map<int, std::map<int, Simulator::LandmarkPtrVector>>;
@@ -132,7 +133,7 @@ void Simulator::simulate(int numPoses, const SE2& sensorOffset) {
 
     poses.push_back(nextGridPose);
   }
-  cerr << "done." << endl;
+  cerr << "done.\n";
 
   // creating landmarks along the trajectory
   cerr << "Simulator: Creating landmarks ... ";
@@ -153,7 +154,7 @@ void Simulator::simulate(int numPoses, const SE2& sensorOffset) {
             do {
               offx = Sampler::uniformRand(-0.5 * stepLen, 0.5 * stepLen);
               offy = Sampler::uniformRand(-0.5 * stepLen, 0.5 * stepLen);
-            } while (hypot_sqr(offx, offy) < 0.25 * 0.25);
+            } while (std::hypot(offx, offy) < 0.25);
             l->truePose[0] = cx + offx;
             l->truePose[1] = cy + offy;
             landmarksForCell.push_back(l);
@@ -161,7 +162,7 @@ void Simulator::simulate(int numPoses, const SE2& sensorOffset) {
         }
       }
   }
-  cerr << "done." << endl;
+  cerr << "done.\n";
 
   cerr << "Simulator: Simulating landmark observations for the poses ... ";
   const double maxSensorSqr = maxSensorRangeLandmarks * maxSensorRangeLandmarks;
@@ -181,8 +182,7 @@ void Simulator::simulate(int numPoses, const SE2& sensorOffset) {
         if (landmarksForCell.empty()) continue;
         for (auto* l : landmarksForCell) {
           const double dSqr =
-              hypot_sqr(pv.truePose.translation().x() - l->truePose.x(),
-                        pv.truePose.translation().y() - l->truePose.y());
+              (pv.truePose.translation() - l->truePose).squaredNorm();
           if (dSqr > maxSensorSqr) continue;
           const double obs = Sampler::uniformRand(0.0, 1.0);
           if (obs > observationProb)  // we do not see this one...
@@ -200,7 +200,7 @@ void Simulator::simulate(int numPoses, const SE2& sensorOffset) {
         }
       }
   }
-  cerr << "done." << endl;
+  cerr << "done.\n";
 
   // add the odometry measurements
   odometry_.clear();
@@ -218,7 +218,7 @@ void Simulator::simulate(int numPoses, const SE2& sensorOffset) {
     edge.simulatorTransf = prev.simulatorPose.inverse() * p.simulatorPose;
     edge.information = information;
   }
-  cerr << "done." << endl;
+  cerr << "done.\n";
 
   landmarks_.clear();
   landmarkObservations_.clear();
@@ -267,7 +267,7 @@ void Simulator::simulate(int numPoses, const SE2& sensorOffset) {
         le.information = information;
       }
     }
-    cerr << "done." << endl;
+    cerr << "done.\n";
   }
 
   // cleaning up
@@ -298,7 +298,7 @@ SE2 Simulator::getMotion(int motionDirection, double stepLen) {
     case kMoRight:
       return SE2(stepLen, 0, -0.5 * M_PI);
     default:
-      cerr << "Unknown motion direction" << endl;
+      cerr << "Unknown motion direction\n";
       return SE2(stepLen, 0, -0.5 * M_PI);
   }
 }

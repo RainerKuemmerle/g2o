@@ -47,7 +47,7 @@ The API documentation can be generated as described in doc/doxygen/readme.txt
 g2o is licensed under the BSD License. However, some libraries are available
 under different license terms. See below.
 
-The following parts are licensed under LGPL3+:
+The following parts are licensed under LGPL v2.1+:
 
 -   csparse_extension
 

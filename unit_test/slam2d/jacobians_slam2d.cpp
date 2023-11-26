@@ -159,7 +159,7 @@ TEST(Slam2D, EdgeSE2PointXYBearingJacobian) {
   for (int k = 0; k < 10000; ++k) {
     v1->setEstimate(randomSE2());
     v2->setEstimate(Eigen::Vector2d::Random());
-    e.setMeasurement(sampleUniform(0., 1.) * M_PI);
+    e.setMeasurement(g2o::Sampler::uniformRand(0., 1.) * M_PI);
 
     evaluateJacobian(e, jacobianWorkspace, numericJacobianWorkspace);
   }

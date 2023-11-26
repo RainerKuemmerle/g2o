@@ -126,7 +126,7 @@ OptimizationAlgorithm::SolverResult OptimizationAlgorithmLevenberg::solve(
         ok2 ? computeScale() + cst(1e-3) : 1;  // make sure it's non-zero :)
     rho /= scale;
 
-    if (rho > 0 && g2o_isfinite(tempChi) && ok2) {  // last step was good
+    if (rho > 0 && std::isfinite(tempChi) && ok2) {  // last step was good
       double alpha = 1. - pow((2 * rho - 1), 3);
       // crop lambda between minimum and maximum factors
       alpha = (std::min)(alpha, goodStepUpperScale_);
@@ -139,14 +139,14 @@ OptimizationAlgorithm::SolverResult OptimizationAlgorithmLevenberg::solve(
       currentLambda_ *= ni_;
       ni_ *= 2;
       optimizer_->pop();  // restore the last state before trying to optimize
-      if (!g2o_isfinite(currentLambda_)) break;
+      if (!std::isfinite(currentLambda_)) break;
     }
     qmax++;
   } while (rho < 0 && qmax < maxTrialsAfterFailure_->value() &&
            !optimizer_->terminate());
 
   if (qmax == maxTrialsAfterFailure_->value() || rho == 0 ||
-      !g2o_isfinite(currentLambda_))
+      !std::isfinite(currentLambda_))
     return kTerminate;
   return kOk;
 }

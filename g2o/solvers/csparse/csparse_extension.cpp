@@ -7,7 +7,7 @@
 // CSparse is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
-// version 1.1 of the License, or (at your option) any later version.
+// version 2.1 of the License, or (at your option) any later version.
 //
 // CSparse is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -35,7 +35,7 @@ namespace g2o::csparse_extension {
  */
 int cs_cholsolsymb(const cs* A, double* b, const css* S, double* x, int* work) {
   if (!A || (A->nz != -1) || !b || !S || !x) {
-    G2O_DEBUG("{}: No valid input!", __PRETTY_FUNCTION__);
+    G2O_DEBUG("No valid input!");
     assert(0);  // get a backtrace in debug mode
     return (0); /* check inputs */
   }
@@ -43,7 +43,7 @@ int cs_cholsolsymb(const cs* A, double* b, const css* S, double* x, int* work) {
   csn* N =
       cs_chol_workspace(A, S, work, x); /* numeric Cholesky factorization */
   if (!N) {
-    G2O_DEBUG("{}: cholesky failed!", __PRETTY_FUNCTION__);
+    G2O_DEBUG("cholesky failed!");
   }
   const int ok = static_cast<int>(N != nullptr);
   if (ok) {

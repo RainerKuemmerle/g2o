@@ -27,13 +27,11 @@
 #ifndef G2O_STRING_TOOLS_H
 #define G2O_STRING_TOOLS_H
 
-#include <cstdlib>
 #include <sstream>
 #include <string>
 #include <vector>
 
 #include "g2o_stuff_api.h"
-#include "macros.h"
 
 namespace g2o {
 
@@ -68,53 +66,6 @@ G2O_STUFF_API std::string strToLower(const std::string& s);
  * convert a string to upper case
  */
 G2O_STUFF_API std::string strToUpper(const std::string& s);
-
-/**
- * read integer values (separated by spaces) from a string and store
- * them in the given OutputIterator.
- */
-template <typename OutputIterator>
-OutputIterator readInts(const char* str, OutputIterator out) {
-  char* cl = const_cast<char*>(str);
-  char* cle = cl;
-  while (true) {
-    auto id = strtol(cl, &cle, 10);
-    if (cl == cle) break;
-    *out++ = id;
-    cl = cle;
-  }
-  return out;
-}
-
-/**
- * read float values (separated by spaces) from a string and store
- * them in the given OutputIterator.
- */
-template <typename OutputIterator>
-OutputIterator readFloats(const char* str, OutputIterator out) {
-  char* cl = const_cast<char*>(str);
-  char* cle = cl;
-  while (true) {
-    double val = strtod(cl, &cle);
-    if (cl == cle) break;
-    *out++ = val;
-    cl = cle;
-  }
-  return out;
-}
-
-/**
- * format a string and return a std::string.
- * Format is just like printf, see man 3 printf
- */
-G2O_STUFF_API std::string formatString(const char* fmt,
-                                       ...) G2O_ATTRIBUTE_FORMAT12;
-
-/**
- * replacement function for sprintf which fills a std::string instead of a char*
- */
-G2O_STUFF_API int strPrintf(std::string& str, const char* fmt,
-                            ...) G2O_ATTRIBUTE_FORMAT23;
 
 /**
  * convert a string into an other type.

@@ -29,7 +29,8 @@
 #define G2O_STRUCTURE_ONLY_SOLVER_H
 
 #include <cassert>
-#include <memory>
+#include <cmath>
+#include <vector>
 
 #include "g2o/core/optimization_algorithm.h"
 #include "g2o/core/robust_kernel.h"
@@ -80,7 +81,7 @@ class StructureOnlySolver : public OptimizationAlgorithm {
       assert(track.size() >= 2);
       double chi2 = 0;
       // TODO(Rainer): make these parameters
-      double mu = cst(0.01);
+      double mu = 0.01;
       double nu = 2;
 
       for (const auto& it_t : track) {
@@ -174,9 +175,9 @@ class StructureOnlySolver : public OptimizationAlgorithm {
                   new_chi2 += e->chi2();
                 }
               }
-              assert(g2o_isnan(new_chi2) == false && "Chi is NaN");
+              assert(std::isnan(new_chi2) == false && "Chi is NaN");
               const double rho = (chi2 - new_chi2);
-              if (rho > 0 && g2o_isfinite(new_chi2)) {
+              if (rho > 0 && std::isfinite(new_chi2)) {
                 goodStep = true;
                 chi2 = new_chi2;
                 v->discardTop();
@@ -189,7 +190,7 @@ class StructureOnlySolver : public OptimizationAlgorithm {
             // update the damping factor based on the result of the last
             // increment
             if (goodStep) {
-              mu *= cst(1. / 3.);
+              mu *= 1. / 3.;
               nu = 2.;
               trial = 0;
               break;  // TODO(Rainer): Revisit the rule to break here

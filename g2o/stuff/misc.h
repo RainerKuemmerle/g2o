@@ -28,10 +28,6 @@
 #define G2O_STUFF_MISC_H
 
 #include <cmath>
-#include <memory>
-
-#include "g2o/config.h"
-#include "macros.h"
 
 /** @addtogroup utils **/
 // @{
@@ -44,15 +40,6 @@
 
 namespace g2o {
 
-/** Helper class to sort pair based on first elem */
-template <class T1, class T2, class Pred = std::less<T1> >
-struct CmpPairFirst {
-  bool operator()(const std::pair<T1, T2>& left,
-                  const std::pair<T1, T2>& right) {
-    return Pred()(left.first, right.first);
-  }
-};
-
 /**
  * converts a number constant to a double constant at compile time
  * to avoid having to cast everything to avoid warnings.
@@ -62,30 +49,6 @@ inline constexpr double cst(long double value) {
 }
 
 constexpr double const_pi() { return cst(3.14159265358979323846); }
-
-/**
- * return the square value
- */
-template <typename T>
-inline T square(T value) {
-  return value * value;
-}
-
-/**
- * return the hypot of x and y
- */
-template <typename T>
-inline T hypot(T x, T y) {  // NOLINT
-  return static_cast<T>(std::sqrt(x * x + y * y));
-}
-
-/**
- * return the squared hypot of x and y
- */
-template <typename T>
-inline T hypot_sqr(T x, T y) {  // NOLINT
-  return x * x + y * y;
-}
 
 /**
  * convert from degree to radian
@@ -106,69 +69,6 @@ inline double normalize_theta(double theta) {
   const double result = fmod(theta + const_pi(), 2.0 * const_pi());
   if (result <= 0.0) return result + const_pi();
   return result - const_pi();
-}
-
-/**
- * inverse of an angle, i.e., +180 degree
- */
-inline double inverse_theta(double theta) {
-  return normalize_theta(theta + const_pi());
-}
-
-/**
- * average two angles
- */
-inline double average_angle(double theta1, double theta2) {
-  double x_coord = std::cos(theta1) + std::cos(theta2);
-  double y_coord = std::sin(theta1) + std::sin(theta2);
-  if (x_coord == 0 && y_coord == 0) return 0;
-  return std::atan2(y_coord, x_coord);
-}
-
-/**
- * sign function.
- * @return the sign of value. +1 for value > 0, -1 for value < 0, 0 for value ==
- * 0
- */
-template <typename T>
-inline int sign(T value) {
-  if (value > 0) return 1;
-  if (value < 0) return -1;
-  return 0;
-}
-
-/**
- * clamp value to the interval [lower, upper]
- */
-template <typename T>
-inline T clamp(T lower, T value, T upper) {
-  if (value < lower) return lower;
-  if (value > upper) return upper;
-  return value;
-}
-
-/**
- * wrap value to be in the interval [lower, upper]
- */
-template <typename T>
-inline T wrap(T lower, T value, T upper) {
-  T intervalWidth = upper - lower;
-  while (value < lower) value += intervalWidth;
-  while (value > upper) value -= intervalWidth;
-  return value;
-}
-
-/**
- * tests whether there is a NaN in the array
- */
-inline bool arrayHasNaN(const double* array, int size,
-                        int* nanIndex = nullptr) {
-  for (int i = 0; i < size; ++i)
-    if (g2o_isnan(array[i])) {
-      if (nanIndex) *nanIndex = i;
-      return true;
-    }
-  return false;
 }
 
 /**
