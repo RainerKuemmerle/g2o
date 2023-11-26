@@ -49,6 +49,7 @@
 #include "optimization_algorithm.h"
 #include "robust_kernel.h"  // IWYU pragma: keep
 
+#ifndef NDEBUG
 namespace {
 /**
  * tests whether there is a NaN in the array
@@ -62,6 +63,7 @@ bool arrayHasNaN(const double* array, int size, int* nanIndex = 0) {
   return false;
 }
 }  // namespace
+#endif
 
 namespace g2o {
 
