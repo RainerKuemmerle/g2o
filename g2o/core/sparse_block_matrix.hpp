@@ -700,8 +700,9 @@ void SparseBlockMatrix<MatrixType>::takePatternFromHash(
     for (typename HashSparseColumn::const_iterator it = column.begin();
          it != column.end(); ++it)
       sparseRowSorted.push_back(*it);
-    std::sort(sparseRowSorted.begin(), sparseRowSorted.end(),
-              CmpPairFirst<int, MatrixType*>());
+    std::sort(
+        sparseRowSorted.begin(), sparseRowSorted.end(),
+        [](const auto& lhs, const auto& rhs) { return lhs.first < rhs.first; });
     // try to free some memory early
     HashSparseColumn aux;
     std::swap(aux, column);

@@ -28,7 +28,6 @@
 #define G2O_STUFF_MISC_H
 
 #include <cmath>
-#include <functional>
 
 /** @addtogroup utils **/
 // @{
@@ -40,18 +39,6 @@
  **/
 
 namespace g2o {
-
-/** Helper class to sort pair based on first elem */
-template <class T1, class T2, class Pred = std::less<T1> >
-struct CmpPairFirst {
-  bool operator()(const std::pair<T1, T2>& left,
-                  const std::pair<T1, T2>& right) {
-    return pred_(left.first, right.first);
-  }
-
- private:
-  Pred pred_;
-};
 
 /**
  * converts a number constant to a double constant at compile time
