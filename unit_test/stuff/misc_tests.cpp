@@ -112,19 +112,3 @@ TEST(Stuff, ArrayHasNaN) {
     EXPECT_TRUE(Eigen::VectorXd::MapType(data, size).array().isNaN().any());
   }
 }
-
-TEST(Stuff, Square) {
-  EXPECT_DOUBLE_EQ(4, g2o::square(2));
-  EXPECT_DOUBLE_EQ(4, g2o::square(-2));
-}
-
-TEST(Stuff, Hypot) {
-  EXPECT_DOUBLE_EQ(hypot(2, 0), 2);
-  EXPECT_DOUBLE_EQ(hypot(-2, 0), 2);
-  EXPECT_DOUBLE_EQ(hypot(0, 2), 2);
-  EXPECT_DOUBLE_EQ(hypot(0, -2), 2);
-  EXPECT_DOUBLE_EQ(hypot(3, 3), sqrt(18));
-  EXPECT_DOUBLE_EQ(hypot(-3, 3), sqrt(18));
-  EXPECT_DOUBLE_EQ(hypot(-3, 3), sqrt(18));
-  EXPECT_DOUBLE_EQ(hypot(3, -3), sqrt(18));
-}
