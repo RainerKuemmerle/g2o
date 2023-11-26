@@ -28,10 +28,7 @@
 #define G2O_STUFF_MISC_H
 
 #include <cmath>
-#include <memory>
-
-#include "g2o/config.h"
-#include "macros.h"
+#include <functional>
 
 /** @addtogroup utils **/
 // @{
@@ -49,8 +46,11 @@ template <class T1, class T2, class Pred = std::less<T1> >
 struct CmpPairFirst {
   bool operator()(const std::pair<T1, T2>& left,
                   const std::pair<T1, T2>& right) {
-    return Pred()(left.first, right.first);
+    return pred_(left.first, right.first);
   }
+
+ private:
+  Pred pred_;
 };
 
 /**
@@ -160,18 +160,6 @@ inline T wrap(T l, T x, T u) {
   while (x < l) x += intervalWidth;
   while (x > u) x -= intervalWidth;
   return x;
-}
-
-/**
- * tests whether there is a NaN in the array
- */
-inline bool arrayHasNaN(const double* array, int size, int* nanIndex = 0) {
-  for (int i = 0; i < size; ++i)
-    if (g2o_isnan(array[i])) {
-      if (nanIndex) *nanIndex = i;
-      return true;
-    }
-  return false;
 }
 
 /**

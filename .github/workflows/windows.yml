@@ -58,7 +58,7 @@ jobs:
           type ${{github.workspace}}/build/g2o/config.h
 
       - name: Build
-        run: cmake --build ${{github.workspace}}/build -j 2
+        run: cmake --build ${{github.workspace}}/build -j 2 --config ${{matrix.config.build_type}}
 
       - name: Test
         run: |

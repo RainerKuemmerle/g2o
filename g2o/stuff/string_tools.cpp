@@ -34,6 +34,8 @@
 
 #if (defined(UNIX) || defined(CYGWIN)) && !defined(ANDROID)
 #include <wordexp.h>
+#else
+#include "g2o/stuff/logger.h"
 #endif
 
 namespace g2o {
@@ -93,7 +95,7 @@ std::string strExpandFilename(const std::string& filename) {
   return result;
 #else
   (void)filename;
-  G2O_WARN("{} not implemented", __PRETTY_FUNCTION__);
+  G2O_WARN("not implemented");
   return std::string();
 #endif
 }

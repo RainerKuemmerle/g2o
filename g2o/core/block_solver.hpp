@@ -29,6 +29,7 @@
 #include <fstream>
 #include <iomanip>
 
+#include "g2o/core/eigen_types.h"
 #include "g2o/stuff/logger.h"
 #include "g2o/stuff/macros.h"
 #include "g2o/stuff/misc.h"
@@ -530,8 +531,12 @@ bool BlockSolver<Traits>::buildSystem() {
       const OptimizableGraph::Vertex* v =
           static_cast<const OptimizableGraph::Vertex*>(e->vertex(i));
       if (!v->fixed()) {
-        bool hasANan = arrayHasNaN(jacobianWorkspace.workspaceForVertex(i),
-                                   e->dimension() * v->dimension());
+        bool hasANan =
+            g2o::VectorX::MapType(jacobianWorkspace.workspaceForVertex(i),
+                                  e->dimension() * v->dimension())
+                .array()
+                .isNaN()
+                .any();
         if (hasANan) {
           G2O_WARN(
               "buildSystem(): NaN within Jacobian for edge {} for vertex {}",

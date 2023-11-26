@@ -45,10 +45,6 @@
 #define G2O_ATTRIBUTE_WARNING(func) func __attribute__((warning))
 #define G2O_ATTRIBUTE_DEPRECATED(func) func __attribute__((deprecated))
 
-#define g2o_isnan(x) std::isnan(x)
-#define g2o_isinf(x) std::isinf(x)
-#define g2o_isfinite(x) std::isfinite(x)
-
 // MSVC on Windows
 #elif defined _MSC_VER
 #define __PRETTY_FUNCTION__ __FUNCTION__
@@ -76,10 +72,6 @@ for static C++ objects. For GCC, uses a constructor attribute."
 
 #include <float.h>
 
-#define g2o_isnan(x) _isnan(x)
-#define g2o_isinf(x) (_finite(x) == 0)
-#define g2o_isfinite(x) (_finite(x) != 0)
-
 // unknown compiler
 #else
 #ifndef __PRETTY_FUNCTION__
@@ -89,11 +81,6 @@ for static C++ objects. For GCC, uses a constructor attribute."
 #define G2O_ATTRIBUTE_UNUSED
 #define G2O_ATTRIBUTE_WARNING(func) func
 #define G2O_ATTRIBUTE_DEPRECATED(func) func
-
-#include <math.h>
-#define g2o_isnan(x) isnan(x)
-#define g2o_isinf(x) isinf(x)
-#define g2o_isfinite(x) isfinite(x)
 
 #endif
 
