@@ -33,8 +33,6 @@
 #include <cassert>
 #include <stack>
 
-#include "creators.h"
-#include "g2o/stuff/macros.h"
 #include "optimizable_graph.h"
 
 namespace g2o {

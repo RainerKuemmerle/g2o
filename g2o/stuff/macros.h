@@ -42,14 +42,8 @@
   static void func(void)
 
 #define G2O_ATTRIBUTE_UNUSED __attribute__((unused))
-#define G2O_ATTRIBUTE_FORMAT12 __attribute__((format(printf, 1, 2)))
-#define G2O_ATTRIBUTE_FORMAT23 __attribute__((format(printf, 2, 3)))
 #define G2O_ATTRIBUTE_WARNING(func) func __attribute__((warning))
 #define G2O_ATTRIBUTE_DEPRECATED(func) func __attribute__((deprecated))
-
-#define g2o_isnan(x) std::isnan(x)
-#define g2o_isinf(x) std::isinf(x)
-#define g2o_isfinite(x) std::isfinite(x)
 
 // MSVC on Windows
 #elif defined _MSC_VER
@@ -73,16 +67,10 @@ for static C++ objects. For GCC, uses a constructor attribute."
   static void __cdecl f(void)
 
 #define G2O_ATTRIBUTE_UNUSED
-#define G2O_ATTRIBUTE_FORMAT12
-#define G2O_ATTRIBUTE_FORMAT23
 #define G2O_ATTRIBUTE_WARNING(func) func
 #define G2O_ATTRIBUTE_DEPRECATED(func) func
 
 #include <float.h>
-
-#define g2o_isnan(x) _isnan(x)
-#define g2o_isinf(x) (_finite(x) == 0)
-#define g2o_isfinite(x) (_finite(x) != 0)
 
 // unknown compiler
 #else
@@ -91,15 +79,8 @@ for static C++ objects. For GCC, uses a constructor attribute."
 #endif
 #define G2O_ATTRIBUTE_CONSTRUCTOR(func) func
 #define G2O_ATTRIBUTE_UNUSED
-#define G2O_ATTRIBUTE_FORMAT12
-#define G2O_ATTRIBUTE_FORMAT23
 #define G2O_ATTRIBUTE_WARNING(func) func
 #define G2O_ATTRIBUTE_DEPRECATED(func) func
-
-#include <math.h>
-#define g2o_isnan(x) isnan(x)
-#define g2o_isinf(x) isinf(x)
-#define g2o_isfinite(x) isfinite(x)
 
 #endif
 

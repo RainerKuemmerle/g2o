@@ -29,11 +29,7 @@
 #include <algorithm>
 #include <cstdlib>
 #include <cstring>
-#include <fstream>
-#include <functional>
 
-#include "misc.h"
-#include "os_specific.h"
 #include "string_tools.h"
 using namespace std;
 
@@ -313,8 +309,9 @@ void CommandArgs::printHelp(std::ostream& os) {
         tableStrings.push_back(make_pair(_args[i].name, _args[i].description));
       maxArgLen = (std::max)(maxArgLen, tableStrings.back().first.size());
     }
-    sort(tableStrings.begin(), tableStrings.end(),
-         CmpPairFirst<string, string>());
+    sort(
+        tableStrings.begin(), tableStrings.end(),
+        [](const auto& lhs, const auto& rhs) { return lhs.first < rhs.first; });
     maxArgLen += 3;
     for (size_t i = 0; i < tableStrings.size(); ++i) {
       os << "-" << tableStrings[i].first;

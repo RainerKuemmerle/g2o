@@ -35,7 +35,7 @@ namespace g2o {
 
 SparseOptimizerTerminateAction::SparseOptimizerTerminateAction()
     : HyperGraphAction(),
-      _gainThreshold(cst(1e-6)),
+      _gainThreshold(1e-6),
       _lastChi(0),
       _auxTerminateFlag(false),
       _maxIterations(std::numeric_limits<int>::max()) {}

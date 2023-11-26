@@ -24,7 +24,7 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "g2o/stuff/os_specific.h"
+#include "g2o/stuff/sampler.h"
 #include "g2o/types/slam2d/edge_pointxy.h"
 #include "g2o/types/slam2d/edge_se2.h"
 #include "g2o/types/slam2d/edge_se2_pointxy.h"
@@ -158,7 +158,7 @@ TEST(Slam2D, EdgeSE2PointXYBearingJacobian) {
   for (int k = 0; k < 10000; ++k) {
     v1.setEstimate(randomSE2());
     v2.setEstimate(Eigen::Vector2d::Random());
-    e.setMeasurement(drand48() * M_PI);
+    e.setMeasurement(g2o::Sampler::uniformRand(0., 1.) * M_PI);
 
     evaluateJacobian(e, jacobianWorkspace, numericJacobianWorkspace);
   }

@@ -157,7 +157,7 @@ void Simulator::simulate(int numNodes, const SE2& sensorOffset) {
             do {
               offx = Sampler::uniformRand(-0.5 * stepLen, 0.5 * stepLen);
               offy = Sampler::uniformRand(-0.5 * stepLen, 0.5 * stepLen);
-            } while (hypot_sqr(offx, offy) < 0.25 * 0.25);
+            } while (std::hypot(offx, offy) < 0.25);
             l->truePose[0] = cx + offx;
             l->truePose[1] = cy + offy;
             landmarksForCell.push_back(l);
@@ -185,9 +185,7 @@ void Simulator::simulate(int numNodes, const SE2& sensorOffset) {
         if (landmarksForCell.size() == 0) continue;
         for (size_t i = 0; i < landmarksForCell.size(); ++i) {
           Landmark* l = landmarksForCell[i];
-          double dSqr =
-              hypot_sqr(pv.truePose.translation().x() - l->truePose.x(),
-                        pv.truePose.translation().y() - l->truePose.y());
+          double dSqr = (pv.truePose.translation() - l->truePose).squaredNorm();
           if (dSqr > maxSensorSqr) continue;
           double obs = Sampler::uniformRand(0.0, 1.0);
           if (obs > observationProb)  // we do not see this one...

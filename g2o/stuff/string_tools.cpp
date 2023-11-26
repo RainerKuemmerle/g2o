@@ -28,19 +28,14 @@
 
 #include <algorithm>
 #include <cctype>
-#include <cstdarg>
-#include <cstdio>
-#include <cstring>
 #include <iostream>
 #include <iterator>
 #include <string>
 
-#include "logger.h"
-#include "macros.h"
-#include "os_specific.h"
-
 #if (defined(UNIX) || defined(CYGWIN)) && !defined(ANDROID)
 #include <wordexp.h>
+#else
+#include "g2o/stuff/logger.h"
 #endif
 
 namespace g2o {
@@ -87,33 +82,6 @@ std::string strToUpper(const std::string& s) {
   return ret;
 }
 
-std::string formatString(const char* fmt, ...) {
-  char* auxPtr = NULL;
-  va_list arg_list;
-  va_start(arg_list, fmt);
-  int numChar = vasprintf(&auxPtr, fmt, arg_list);
-  va_end(arg_list);
-  string retString;
-  if (numChar != -1)
-    retString = auxPtr;
-  else {
-    G2O_ERROR("{}: Error while allocating memory", __PRETTY_FUNCTION__);
-  }
-  free(auxPtr);
-  return retString;
-}
-
-int strPrintf(std::string& str, const char* fmt, ...) {
-  char* auxPtr = NULL;
-  va_list arg_list;
-  va_start(arg_list, fmt);
-  int numChars = vasprintf(&auxPtr, fmt, arg_list);
-  va_end(arg_list);
-  str = auxPtr;
-  free(auxPtr);
-  return numChars;
-}
-
 std::string strExpandFilename(const std::string& filename) {
 #if (defined(UNIX) || defined(CYGWIN)) && !defined(ANDROID)
   string result = filename;
@@ -127,7 +95,7 @@ std::string strExpandFilename(const std::string& filename) {
   return result;
 #else
   (void)filename;
-  G2O_WARN("{} not implemented", __PRETTY_FUNCTION__);
+  G2O_WARN("not implemented");
   return std::string();
 #endif
 }

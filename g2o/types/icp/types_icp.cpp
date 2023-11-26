@@ -214,7 +214,7 @@ void Edge_XYZ_VSC::linearizeOplus() {
   double py = pc(1);
   double pz = pc(2);
   double ipz2 = 1.0 / (pz * pz);
-  if (isnan(ipz2)) {
+  if (std::isnan(ipz2)) {
     std::cout << "[SetJac] infinite jac" << std::endl;
     *(int*)0x0 = 0;
   }

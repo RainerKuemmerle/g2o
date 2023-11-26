@@ -27,6 +27,7 @@
 #include "optimization_algorithm_levenberg.h"
 
 #include <cassert>
+#include <cmath>
 #include <iostream>
 
 #include "batch_stats.h"
@@ -126,7 +127,7 @@ OptimizationAlgorithm::SolverResult OptimizationAlgorithmLevenberg::solve(
         ok2 ? computeScale() + cst(1e-3) : 1;  // make sure it's non-zero :)
     rho /= scale;
 
-    if (rho > 0 && g2o_isfinite(tempChi) && ok2) {  // last step was good
+    if (rho > 0 && std::isfinite(tempChi) && ok2) {  // last step was good
       double alpha = 1. - pow((2 * rho - 1), 3);
       // crop lambda between minimum and maximum factors
       alpha = (std::min)(alpha, _goodStepUpperScale);
@@ -139,14 +140,14 @@ OptimizationAlgorithm::SolverResult OptimizationAlgorithmLevenberg::solve(
       _currentLambda *= _ni;
       _ni *= 2;
       _optimizer->pop();  // restore the last state before trying to optimize
-      if (!g2o_isfinite(_currentLambda)) break;
+      if (!std::isfinite(_currentLambda)) break;
     }
     qmax++;
   } while (rho < 0 && qmax < _maxTrialsAfterFailure->value() &&
            !_optimizer->terminate());
 
   if (qmax == _maxTrialsAfterFailure->value() || rho == 0 ||
-      !g2o_isfinite(_currentLambda))
+      !std::isfinite(_currentLambda))
     return Terminate;
   return OK;
 }
