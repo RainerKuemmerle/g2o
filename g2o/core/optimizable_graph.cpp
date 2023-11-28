@@ -31,6 +31,7 @@
 #include <cassert>
 #include <iostream>
 #include <iterator>
+#include <fstream>
 #include <memory>
 #include <utility>
 
