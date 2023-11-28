@@ -29,9 +29,9 @@
 #include <Eigen/Eigenvalues>
 #include <algorithm>
 #include <cassert>
+#include <fstream>
 #include <iostream>
 #include <iterator>
-#include <fstream>
 #include <memory>
 #include <utility>
 
