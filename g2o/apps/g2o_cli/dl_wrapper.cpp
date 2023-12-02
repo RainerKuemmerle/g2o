@@ -28,8 +28,8 @@
 
 #include <sys/types.h>
 
-#include <algorithm>
 #include <cstdio>
+#include <regex>
 
 #include "g2o/stuff/filesys_tools.h"
 #include "g2o/stuff/logger.h"
@@ -37,19 +37,6 @@
 #if defined(UNIX) || defined(CYGWIN)
 #include <dlfcn.h>
 #endif
-
-#ifdef __APPLE__
-#define SO_EXT "dylib"
-#define SO_EXT_LEN 5
-#elif defined(WINDOWS) || defined(CYGWIN)
-#define SO_EXT "dll"
-#define SO_EXT_LEN 3
-#else  // Linux
-#define SO_EXT "so"
-#define SO_EXT_LEN 2
-#endif
-
-using namespace std;
 
 namespace g2o {
 
@@ -62,18 +49,12 @@ DlWrapper::~DlWrapper() {
 int DlWrapper::openLibraries(const std::string& directory,
                              const std::string& pattern) {
   G2O_TRACE("Loading libraries from {} pattern {}", directory, pattern);
-  // cerr << "# loading libraries from " << directory << "\t pattern: " <<
-  // pattern << endl;
-  string searchPattern = directory + "/" + pattern;
-  if (pattern == "") searchPattern = directory + "/*";
-  vector<string> matchingFiles = getFilesByPattern(searchPattern.c_str());
+  std::vector<std::string> matchingFiles =
+      getFilesByPattern(directory, std::regex(pattern));
 
   int numLibs = 0;
-  for (size_t i = 0; i < matchingFiles.size(); ++i) {
-    const string& filename = matchingFiles[i];
-    if (find(_filenames.begin(), _filenames.end(), filename) !=
-        _filenames.end())
-      continue;
+  for (const std::string& filename : matchingFiles) {
+    if (_filenames.count(filename) != 0) continue;
 
     // open the lib
     G2O_TRACE("Loading {}", filename);
@@ -117,7 +98,7 @@ bool DlWrapper::openLibrary(const std::string& filename) {
 
   // cerr << "loaded " << filename << endl;
 
-  _filenames.push_back(filename);
+  _filenames.insert(filename);
   _handles.push_back(handle);
   return true;
 }
