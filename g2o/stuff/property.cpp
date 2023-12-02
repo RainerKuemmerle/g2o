@@ -86,8 +86,7 @@ bool PropertyMap::updateMapFromString(const std::string& values) {
   for (size_t i = 0; i < valuesMap.size(); ++i) {
     vector<string> m = strSplit(valuesMap[i], "=");
     if (m.size() != 2) {
-      G2O_DEBUG("{}: unable to extract name=value pair from {}",
-                __PRETTY_FUNCTION__, valuesMap[i]);
+      G2O_DEBUG("unable to extract name=value pair from {}", valuesMap[i]);
       continue;
     }
     string name = trim(m[0]);

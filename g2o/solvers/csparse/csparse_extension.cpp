@@ -34,14 +34,14 @@ int cs_cholsolsymb(const cs* A, double* b, const css* S, double* x, int* work) {
   csn* N;
   int n, ok;
   if (!CS_CSC(A) || !b || !S || !x) {
-    G2O_DEBUG("{}: No valid input!", __PRETTY_FUNCTION__);
+    G2O_DEBUG("No valid input!");
     assert(0);  // get a backtrace in debug mode
     return (0); /* check inputs */
   }
   n = A->n;
   N = cs_chol_workspace(A, S, work, x); /* numeric Cholesky factorization */
   if (!N) {
-    G2O_DEBUG("{}: cholesky failed!", __PRETTY_FUNCTION__);
+    G2O_DEBUG("cholesky failed!");
   }
   ok = (N != NULL);
   if (ok) {

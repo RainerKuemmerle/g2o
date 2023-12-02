@@ -27,7 +27,6 @@
 #include "optimization_algorithm_dogleg.h"
 
 #include <cassert>
-#include <iostream>
 
 #include "batch_stats.h"
 #include "block_solver.h"
@@ -72,7 +71,7 @@ OptimizationAlgorithm::SolverResult OptimizationAlgorithmDogleg::solve(
       !online) {  // built up the CCS structure, here due to easy time measure
     bool ok = _solver.buildStructure();
     if (!ok) {
-      G2O_WARN("{}: Failure while building CCS structure", __PRETTY_FUNCTION__);
+      G2O_WARN("Failure while building CCS structure");
       return OptimizationAlgorithm::Fail;
     }
 

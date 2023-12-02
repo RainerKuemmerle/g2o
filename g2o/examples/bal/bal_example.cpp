@@ -41,6 +41,7 @@
 #include "g2o/core/sparse_optimizer.h"
 #include "g2o/solvers/pcg/linear_solver_pcg.h"
 #include "g2o/stuff/command_args.h"
+#include "g2o/stuff/logger.h"
 
 #if defined G2O_HAVE_CHOLMOD
 #include "g2o/solvers/cholmod/linear_solver_cholmod.h"
@@ -72,18 +73,16 @@ class VertexCameraBAL : public g2o::BaseVertex<9, g2o::bal::Vector9> {
   VertexCameraBAL() {}
 
   bool read(std::istream& /*is*/) override {
-    cerr << __PRETTY_FUNCTION__ << " not implemented yet" << endl;
+    G2O_ERROR("not implemented yet");
     return false;
   }
 
   bool write(std::ostream& /*os*/) const override {
-    cerr << __PRETTY_FUNCTION__ << " not implemented yet" << endl;
+    G2O_ERROR("not implemented yet");
     return false;
   }
 
-  void setToOriginImpl() override {
-    cerr << __PRETTY_FUNCTION__ << " not implemented yet" << endl;
-  }
+  void setToOriginImpl() override { G2O_ERROR("not implemented yet"); }
 
   void oplusImpl(const double* update) override {
     g2o::bal::Vector9::ConstMapType v(update, VertexCameraBAL::Dimension);
@@ -102,18 +101,16 @@ class VertexPointBAL : public g2o::BaseVertex<3, g2o::Vector3> {
   VertexPointBAL() {}
 
   bool read(std::istream& /*is*/) override {
-    cerr << __PRETTY_FUNCTION__ << " not implemented yet" << endl;
+    G2O_ERROR("not implemented yet");
     return false;
   }
 
   bool write(std::ostream& /*os*/) const override {
-    cerr << __PRETTY_FUNCTION__ << " not implemented yet" << endl;
+    G2O_ERROR("not implemented yet");
     return false;
   }
 
-  void setToOriginImpl() override {
-    cerr << __PRETTY_FUNCTION__ << " not implemented yet" << endl;
-  }
+  void setToOriginImpl() override { G2O_ERROR("not implemented yet"); }
 
   void oplusImpl(const double* update) override {
     g2o::Vector3::ConstMapType v(update);
@@ -150,11 +147,11 @@ class EdgeObservationBAL
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
   EdgeObservationBAL() {}
   bool read(std::istream& /*is*/) override {
-    cerr << __PRETTY_FUNCTION__ << " not implemented yet" << endl;
+    G2O_ERROR("not implemented yet");
     return false;
   }
   bool write(std::ostream& /*os*/) const override {
-    cerr << __PRETTY_FUNCTION__ << " not implemented yet" << endl;
+    G2O_ERROR("not implemented yet");
     return false;
   }
 

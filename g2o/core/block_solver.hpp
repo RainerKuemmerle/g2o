@@ -319,7 +319,7 @@ bool BlockSolver<Traits>::updateStructure(
           PoseMatrixType* m = _Hpp->block(ind1, ind2, true);
           e->mapHessianMemory(m->data(), viIdx, vjIdx, transposedBlock);
         } else {
-          G2O_ERROR("{}: not supported", __PRETTY_FUNCTION__);
+          G2O_ERROR("not supported");
         }
       }
     }
