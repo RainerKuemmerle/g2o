@@ -24,78 +24,74 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include <cstdlib>
+#include <filesystem>
+#include <regex>
 
 #include "g2o/config.h"
 #include "g2o/stuff/filesys_tools.h"
 #include "gmock/gmock.h"
 
-namespace {
-#ifdef WINDOWS
-static const std::string pathSep = "\\";
-#else
-static const std::string pathSep = "/";
-#endif
-}  // namespace
-
 TEST(Stuff, GetFileExtension) {
-  ASSERT_EQ("txt", g2o::getFileExtension("test.txt"));
-  ASSERT_EQ("txt", g2o::getFileExtension("/home/g2o/test.txt"));
-  ASSERT_EQ("", g2o::getFileExtension("/home/g2o/test"));
-  ASSERT_EQ("", g2o::getFileExtension(""));
+  EXPECT_EQ("txt", g2o::getFileExtension("test.txt"));
+  EXPECT_EQ("txt", g2o::getFileExtension("/home/g2o/test.txt"));
+  EXPECT_EQ("", g2o::getFileExtension("/home/g2o/test"));
+  EXPECT_EQ("", g2o::getFileExtension(""));
 }
 
 TEST(Stuff, GetPureFilename) {
-  ASSERT_EQ("test", g2o::getPureFilename("test.txt"));
-  ASSERT_EQ("test", g2o::getPureFilename("test"));
-  ASSERT_EQ("/home/g2o/test", g2o::getPureFilename("/home/g2o/test.txt"));
-  ASSERT_EQ("", g2o::getPureFilename(""));
+  EXPECT_EQ("test", g2o::getPureFilename("test.txt"));
+  EXPECT_EQ("test", g2o::getPureFilename("test"));
+  EXPECT_EQ("/home/g2o/test", g2o::getPureFilename("/home/g2o/test.txt"));
+  EXPECT_EQ("", g2o::getPureFilename(""));
 }
 
 TEST(Stuff, ChangeFileExtension) {
-  ASSERT_EQ("test.dat", g2o::changeFileExtension("test.txt", "dat", false));
-  ASSERT_EQ("test.dat", g2o::changeFileExtension("test.txt", ".dat", true));
-  ASSERT_EQ("test", g2o::changeFileExtension("test", "dat", false));
-  ASSERT_EQ("test", g2o::changeFileExtension("test", ".dat", true));
+  EXPECT_EQ("test.dat", g2o::changeFileExtension("test.txt", "dat"));
+  EXPECT_EQ("test.dat", g2o::changeFileExtension("test.txt", ".dat"));
+  EXPECT_EQ("test", g2o::changeFileExtension("test", "dat"));
+  EXPECT_EQ("test", g2o::changeFileExtension("test", ".dat"));
 }
 
 TEST(Stuff, GetBasename) {
-  ASSERT_EQ("test.txt", g2o::getBasename("test.txt"));
-  ASSERT_EQ("test", g2o::getBasename("test"));
+  EXPECT_EQ("test.txt", g2o::getBasename("test.txt"));
+  EXPECT_EQ("test", g2o::getBasename("test"));
 #ifdef WINDOWS
-  ASSERT_EQ("test.txt", g2o::getBasename("C:\\users\\g2o\\test.txt"));
+  EXPECT_EQ("test.txt", g2o::getBasename("C:\\users\\g2o\\test.txt"));
 #else
-  ASSERT_EQ("test.txt", g2o::getBasename("/home/g2o/test.txt"));
+  EXPECT_EQ("test.txt", g2o::getBasename("/home/g2o/test.txt"));
 #endif
-  ASSERT_EQ("", g2o::getBasename(""));
+  EXPECT_EQ("", g2o::getBasename(""));
 }
 
 TEST(Stuff, GetDirname) {
-  ASSERT_EQ("", g2o::getDirname("test.txt"));
-  ASSERT_EQ("", g2o::getDirname("test"));
+  EXPECT_EQ("", g2o::getDirname("test.txt"));
+  EXPECT_EQ("", g2o::getDirname("test"));
 #ifdef WINDOWS
-  ASSERT_EQ("C:\\users\\g2o", g2o::getDirname("C:\\users\\g2o\\test.txt"));
+  EXPECT_EQ("C:\\users\\g2o", g2o::getDirname("C:\\users\\g2o\\test.txt"));
 #else
-  ASSERT_EQ("/home/g2o", g2o::getDirname("/home/g2o/test.txt"));
+  EXPECT_EQ("/home/g2o", g2o::getDirname("/home/g2o/test.txt"));
 #endif
-  ASSERT_EQ("", g2o::getDirname(""));
+  EXPECT_EQ("", g2o::getDirname(""));
 }
 
 TEST(Stuff, FileExists) {
-  ASSERT_FALSE(g2o::fileExists("test12345.txt"));
-  ASSERT_FALSE(g2o::fileExists("test12345"));
+  namespace fs = std::filesystem;
 
-  ASSERT_TRUE(g2o::fileExists(G2O_SRC_DIR));
-  ASSERT_TRUE(g2o::fileExists(
-      (std::string(G2O_SRC_DIR) + pathSep + "CMakeLists.txt").c_str()));
+  EXPECT_FALSE(g2o::fileExists("test12345.txt"));
+  EXPECT_FALSE(g2o::fileExists("test12345"));
+
+  EXPECT_TRUE(g2o::fileExists(G2O_SRC_DIR));
+  EXPECT_TRUE(g2o::fileExists(
+      (fs::path(G2O_SRC_DIR) / fs::path("CMakeLists.txt")).string()));
 }
 
 TEST(Stuff, GetFilesByPattern) {
   using namespace testing;
-  std::string pattern =
-      std::string(G2O_SRC_DIR) + pathSep + "doc" + pathSep + "license*.txt";
-  std::vector<std::string> licenseFiles =
-      g2o::getFilesByPattern(pattern.c_str());
-  ASSERT_THAT(licenseFiles, SizeIs(3));
-  ASSERT_THAT(licenseFiles, Each(ContainsRegex("license.*\\.txt$")));
+  namespace fs = std::filesystem;
+  const std::string directory = fs::path(G2O_SRC_DIR) / fs::path("doc");
+  const std::regex pattern("^license.*\\.txt$");
+  const std::vector<std::string> licenseFiles =
+      g2o::getFilesByPattern(directory, pattern);
+  EXPECT_THAT(licenseFiles, SizeIs(3));
+  EXPECT_THAT(licenseFiles, Each(ContainsRegex("license.*\\.txt$")));
 }
