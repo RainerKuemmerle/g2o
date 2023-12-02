@@ -34,8 +34,7 @@ class SparseOptimizer;
  */
 class G2O_VIEWER_API G2oQGLViewer : public QGLViewer {
  public:
-  explicit G2oQGLViewer(QWidget* parent = nullptr,
-                        Qt::WindowFlags flags = Qt::WindowFlags());
+  explicit G2oQGLViewer(QWidget* parent = nullptr);
   G2oQGLViewer(const G2oQGLViewer&) = delete;
   G2oQGLViewer& operator=(const G2oQGLViewer&) = delete;
 
