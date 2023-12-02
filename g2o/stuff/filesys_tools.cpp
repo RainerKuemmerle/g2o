@@ -34,7 +34,7 @@ namespace g2o {
 
 std::string getFileExtension(std::string_view filename) {
   const std::filesystem::path path(filename);
-  const std::string result = path.extension();
+  const std::string result = path.extension().string();
   if (!result.empty() && result.front() == '.') return result.substr(1);
   return result;
 }
@@ -42,29 +42,29 @@ std::string getFileExtension(std::string_view filename) {
 std::string getPureFilename(std::string_view filename) {
   const std::filesystem::path path(filename);
   if (path.has_parent_path()) {
-    return path.parent_path() / path.stem();
+    return (path.parent_path() / path.stem()).string();
   }
-  return path.stem();
+  return path.stem().string();
 }
 
 std::string getBasename(std::string_view filename) {
   const std::filesystem::path path(filename);
-  return path.filename();
+  return path.filename().string();
 }
 
 std::string getDirname(std::string_view filename) {
   const std::filesystem::path path(filename);
-  return path.parent_path();
+  return path.parent_path().string();
 }
 
 std::string changeFileExtension(std::string_view filename,
                                 std::string_view newExt) {
   std::filesystem::path path(filename);
   if (!path.has_extension()) {
-    return path;
+    return path.string();
   }
   path.replace_extension(std::filesystem::path(newExt));
-  return path;
+  return path.string();
 }
 
 bool fileExists(std::string_view filename) {
@@ -82,14 +82,14 @@ std::vector<std::string> getFilesByPattern(std::string_view directory,
   for (const auto& dir_entry :
        std::filesystem::directory_iterator(std::filesystem::path(directory))) {
     if (dir_entry.is_regular_file() && match(dir_entry)) {
-      result.emplace_back(dir_entry.path());
+      result.emplace_back(dir_entry.path().string());
       continue;
     }
     if (dir_entry.is_symlink() &&
         std::filesystem::is_regular_file(
             std::filesystem::read_symlink(dir_entry)) &&
         match(dir_entry)) {
-      result.emplace_back(dir_entry.path());
+      result.emplace_back(dir_entry.path().string());
       continue;
     }
   }
