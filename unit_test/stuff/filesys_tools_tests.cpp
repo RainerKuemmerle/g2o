@@ -88,7 +88,8 @@ TEST(Stuff, FileExists) {
 TEST(Stuff, GetFilesByPattern) {
   using namespace testing;
   namespace fs = std::filesystem;
-  const std::string directory = fs::path(G2O_SRC_DIR) / fs::path("doc");
+  const std::string directory =
+      (fs::path(G2O_SRC_DIR) / fs::path("doc")).string();
   const std::regex pattern("^license.*\\.txt$");
   const std::vector<std::string> licenseFiles =
       g2o::getFilesByPattern(directory, pattern);
