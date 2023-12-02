@@ -28,7 +28,7 @@
 
 #include <sys/types.h>
 
-#include <algorithm>
+#include <regex>
 
 #include "g2o/stuff/filesys_tools.h"
 #include "g2o/stuff/logger.h"
@@ -42,16 +42,12 @@ namespace g2o {
 int DlWrapper::openLibraries(const std::string& directory,
                              const std::string& pattern) {
   G2O_TRACE("Loading libraries from {} pattern {}", directory, pattern);
-  const std::string searchPattern =
-      pattern.empty() ? directory + "/*" : directory + "/" + pattern;
-  const std::vector<std::string> matchingFiles =
-      getFilesByPattern(searchPattern.c_str());
+  std::vector<std::string> matchingFiles =
+      getFilesByPattern(directory, std::regex(pattern));
 
   int numLibs = 0;
-  for (const auto& filename : matchingFiles) {
-    if (find(filenames_.begin(), filenames_.end(), filename) !=
-        filenames_.end())
-      continue;
+  for (const std::string& filename : matchingFiles) {
+    if (filenames_.count(filename) != 0) continue;
 
     // open the lib
     G2O_TRACE("Loading {}", filename);
@@ -93,7 +89,7 @@ bool DlWrapper::openLibrary(const std::string& filename) {
 
   // cerr << "loaded " << filename << endl;
 
-  filenames_.push_back(filename);
+  filenames_.insert(filename);
   handles_.push_back(handle);
   return true;
 }

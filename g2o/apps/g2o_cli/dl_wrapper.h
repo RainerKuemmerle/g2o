@@ -27,12 +27,14 @@
 #ifndef G2O_DL_WRAPPER_H
 #define G2O_DL_WRAPPER_H
 
-#include <string>
-#include <vector>
-
 #ifdef WINDOWS
 #include <windows.h>
 #endif
+// clang-format on
+
+#include <string>
+#include <unordered_set>
+#include <vector>
 
 #include "g2o_cli_api.h"
 
@@ -75,7 +77,7 @@ class G2O_CLI_API DlWrapper {
 #elif defined(WINDOWS)
   std::vector<HMODULE> handles_;
 #endif
-  std::vector<std::string> filenames_;
+  std::unordered_set<std::string> filenames_;
 };
 
 }  // namespace g2o
