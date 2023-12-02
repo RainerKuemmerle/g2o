@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - master
+      - pymem
   pull_request:
 
   release:
