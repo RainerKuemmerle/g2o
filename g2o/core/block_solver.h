@@ -469,7 +469,7 @@ bool BlockSolver<Traits>::updateStructure(
           auto* ee = static_cast<OptimizableGraph::Edge*>(e.get());
           ee->mapHessianMemory(m->data(), viIdx, vjIdx, transposedBlock);
         } else {
-          G2O_ERROR("{}: not supported", __PRETTY_FUNCTION__);
+          G2O_ERROR("not supported");
         }
       }
     }

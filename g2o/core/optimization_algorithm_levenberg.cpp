@@ -67,7 +67,7 @@ OptimizationAlgorithm::SolverResult OptimizationAlgorithmLevenberg::solve(
       !online) {  // built up the CCS structure, here due to easy time measure
     const bool ok = solver_.buildStructure();
     if (!ok) {
-      G2O_WARN("{}: Failure while building CCS structure", __PRETTY_FUNCTION__);
+      G2O_WARN("Failure while building CCS structure");
       return OptimizationAlgorithm::kFail;
     }
   }
@@ -123,7 +123,7 @@ OptimizationAlgorithm::SolverResult OptimizationAlgorithmLevenberg::solve(
 
     rho = (currentChi - tempChi);
     double scale =
-        ok2 ? computeScale() + cst(1e-3) : 1;  // make sure it's non-zero :)
+        ok2 ? computeScale() + 1e-3 : 1;  // make sure it's non-zero :)
     rho /= scale;
 
     if (rho > 0 && std::isfinite(tempChi) && ok2) {  // last step was good

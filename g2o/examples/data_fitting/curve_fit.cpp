@@ -27,13 +27,13 @@
 #include <Eigen/Core>
 #include <iostream>
 
-#include "g2o/config.h"
 #include "g2o/core/auto_differentiation.h"
 #include "g2o/core/base_unary_edge.h"
 #include "g2o/core/base_vertex.h"
 #include "g2o/core/optimization_algorithm_factory.h"
 #include "g2o/core/sparse_optimizer.h"
 #include "g2o/stuff/command_args.h"
+#include "g2o/stuff/logger.h"
 #include "g2o/stuff/sampler.h"
 
 G2O_USE_OPTIMIZATION_LIBRARY(dense);
@@ -63,11 +63,11 @@ class EdgePointOnCurve
     : public g2o::BaseUnaryEdge<1, Eigen::Vector2d, VertexParams> {
  public:
   bool read(std::istream& /*is*/) override {
-    std::cerr << __PRETTY_FUNCTION__ << " not implemented yet" << std::endl;
+    G2O_ERROR("not implemented yet");
     return false;
   }
   bool write(std::ostream& /*os*/) const override {
-    std::cerr << __PRETTY_FUNCTION__ << " not implemented yet" << std::endl;
+    G2O_ERROR("not implemented yet");
     return false;
   }
 
@@ -118,7 +118,7 @@ int main(int argc, char** argv) {
   if (!dumpFilename.empty()) {
     std::ofstream fout(dumpFilename.c_str());
     for (const auto& point : points) {
-      fout << point.transpose() << std::endl;
+      fout << point.transpose() << '\n';
     }
   }
 
@@ -153,16 +153,16 @@ int main(int argc, char** argv) {
   optimizer.setVerbose(verbose);
   optimizer.optimize(maxIterations);
 
-  if (verbose) std::cout << std::endl;
+  if (verbose) std::cout << '\n';
 
   // print out the result
-  std::cout << "Target curve" << std::endl;
-  std::cout << "a * exp(-lambda * x) + b" << std::endl;
-  std::cout << "Iterative least squares solution" << std::endl;
-  std::cout << "a      = " << params->estimate()(0) << std::endl;
-  std::cout << "b      = " << params->estimate()(1) << std::endl;
-  std::cout << "lambda = " << params->estimate()(2) << std::endl;
-  std::cout << std::endl;
+  std::cout << "Target curve\n";
+  std::cout << "a * exp(-lambda * x) + b\n";
+  std::cout << "Iterative least squares solution\n";
+  std::cout << "a      = " << params->estimate()(0) << '\n';
+  std::cout << "b      = " << params->estimate()(1) << '\n';
+  std::cout << "lambda = " << params->estimate()(2) << '\n';
+  std::cout << '\n';
 
   return 0;
 }

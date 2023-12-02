@@ -84,14 +84,13 @@ bool HyperGraphElementActionCollection::operator()(
 bool HyperGraphElementActionCollection::registerAction(
     const HyperGraphElementAction::HyperGraphElementActionPtr& action) {
 #ifdef G2O_DEBUG_ACTIONLIB
-  G2O_DEBUG("{} {} {}", __PRETTY_FUNCTION__, action->name(),
-            action->typeName());
+  G2O_DEBUG("{} {}", action->name(), action->typeName());
 #endif
   if (action->name() != name()) {
     G2O_ERROR(
-        "{}: invalid attempt to register an action in a collection with a "
+        "invalid attempt to register an action in a collection with a "
         "different name {} {}",
-        __PRETTY_FUNCTION__, name(), action->name());
+        name(), action->name());
   }
   actionMap_.insert(make_pair(action->typeName(), action));
   return true;
@@ -138,16 +137,14 @@ bool HyperGraphActionLibrary::registerAction(
         std::dynamic_pointer_cast<HyperGraphElementActionCollection>(oldAction);
     if (!collection) {
       G2O_ERROR(
-          "{}: : fatal error, a collection is not at the first level in the "
-          "library",
-          __PRETTY_FUNCTION__);
+          "fatal error, a collection is not at the first level in the "
+          "library");
       return false;
     }
     return collection->registerAction(action);
   }
 #ifdef G2O_DEBUG_ACTIONLIB
-  G2O_DEBUG("{}: creating collection for {}", __PRETTY_FUNCTION__,
-            action->name());
+  G2O_DEBUG("creating collection for {}", action->name());
 #endif
   collection =
       std::make_shared<HyperGraphElementActionCollection>(action->name());

@@ -26,14 +26,12 @@
 
 #include "graph_optimizer_sparse_online.h"
 
-#include <fstream>
-#include <iomanip>
 #include <iostream>
 
 #include "g2o/core/block_solver.h"
 #include "g2o/core/optimization_algorithm_factory.h"
 #include "g2o/core/optimization_algorithm_gauss_newton.h"
-#include "g2o/solvers/cholmod/linear_solver_cholmod.h"
+#include "g2o/solvers/cholmod/linear_solver_cholmod.h"  // IWYU pragma: keep
 #include "g2o/solvers/pcg/linear_solver_pcg.h"
 #include "g2o/stuff/macros.h"
 #include "types_slam2d_online.h"
@@ -80,8 +78,7 @@ int SparseOptimizerOnline::optimize(int iterations, bool online) {
   if (!online) {
     ok = underlyingSolver_->buildStructure();
     if (!ok) {
-      std::cerr << __PRETTY_FUNCTION__
-                << ": Failure while building CCS structure" << std::endl;
+      G2O_ERROR("Failure while building CCS structure");
       return 0;
     }
   }

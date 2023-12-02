@@ -25,6 +25,7 @@
 #include "g2o/core/batch_stats.h"
 #include "g2o/core/linear_solver.h"
 #include "g2o/solvers/cholmod/cholmod_ext.h"
+#include "g2o/stuff/logger.h"
 #include "g2o/stuff/timeutil.h"
 #include "g2o_incremental_api.h"
 
@@ -98,8 +99,7 @@ class LinearSolverCholmodOnline : public LinearSolver<MatrixType>,
     cholmod_factorize(cholmodSparse_, cholmodFactor_, &cholmodCommon_);
     if (cholmodCommon_.status == CHOLMOD_NOT_POSDEF) {
       std::cerr << "solve(): Cholesky failure, writing debug.txt (Hessian "
-                   "loadable by Octave)"
-                << std::endl;
+                   "loadable by Octave)\n";
       writeCCSMatrix("debug.txt", cholmodSparse_->nrow, cholmodSparse_->ncol,
                      reinterpret_cast<int*>(cholmodSparse_->p),
                      reinterpret_cast<int*>(cholmodSparse_->i),
@@ -140,11 +140,10 @@ class LinearSolverCholmodOnline : public LinearSolver<MatrixType>,
 
   int choleskyUpdate(cholmod_sparse* update) override {
     int result = cholmod_updown(1, update, cholmodFactor_, &cholmodCommon_);
-    // std::cerr << __PRETTY_FUNCTION__ << " " << result << std::endl;
+    G2O_TRACE("result {}", result);
     if (cholmodCommon_.status == CHOLMOD_NOT_POSDEF) {
-      std::cerr
-          << "Cholesky failure, writing debug.txt (Hessian loadable by Octave)"
-          << std::endl;
+      std::cerr << "Cholesky failure, writing debug.txt (Hessian loadable by "
+                   "Octave)\n";
       writeCCSMatrix("debug.txt", cholmodSparse_->nrow, cholmodSparse_->ncol,
                      reinterpret_cast<int*>(cholmodSparse_->p),
                      reinterpret_cast<int*>(cholmodSparse_->i),
@@ -197,7 +196,7 @@ class LinearSolverCholmodOnline : public LinearSolver<MatrixType>,
                                matrixStructure_.Aii, blockPermutation_.data(),
                                nullptr, nullptr, cmember->data());
     if (amdStatus != CAMD_OK) {
-      std::cerr << "Error while computing ordering" << std::endl;
+      std::cerr << "Error while computing ordering\n";
     }
 
     // blow up the permutation to the scalar matrix and extend to include the
@@ -240,8 +239,7 @@ class LinearSolverCholmodOnline : public LinearSolver<MatrixType>,
     size_t n = A.cols() + additionalSpace;
 
     if (cholmodSparse_->columnsAllocated < n) {
-      // std::cerr << __PRETTY_FUNCTION__ << ": reallocating columns" <<
-      // std::endl;
+      G2O_DEBUG("reallocating columns");
       cholmodSparse_->columnsAllocated =
           cholmodSparse_->columnsAllocated == 0
               ? n
@@ -252,8 +250,7 @@ class LinearSolverCholmodOnline : public LinearSolver<MatrixType>,
     if (!onlyValues) {
       size_t nzmax = A.nonZeros() + additionalSpace;
       if (cholmodSparse_->nzmax < nzmax) {
-        // std::cerr << __PRETTY_FUNCTION__ << ": reallocating row + values" <<
-        // std::endl;
+        G2O_DEBUG("reallocating row + values");
         cholmodSparse_->nzmax =
             cholmodSparse_->nzmax == 0
                 ? nzmax

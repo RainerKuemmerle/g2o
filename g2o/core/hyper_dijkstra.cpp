@@ -99,8 +99,7 @@ void HyperDijkstra::shortestPaths(HyperGraph::VertexSet& vset,
     assert(v != nullptr);
     auto it = adjacencyMap_.find(v);
     if (it == adjacencyMap_.end()) {
-      G2O_WARN("{} Vertex {} is not in the adjacency map", __PRETTY_FUNCTION__,
-               v->id());
+      G2O_WARN("Vertex {} is not in the adjacency map", v->id());
     }
     assert(it != adjacencyMap_.end());
     it->second.distance_ = 0.;
@@ -114,8 +113,7 @@ void HyperDijkstra::shortestPaths(HyperGraph::VertexSet& vset,
     auto u = entry.child();
     auto ut = adjacencyMap_.find(u);
     if (ut == adjacencyMap_.end()) {
-      G2O_WARN("{} Vertex {} is not in the adjacency map", __PRETTY_FUNCTION__,
-               u->id());
+      G2O_WARN("Vertex {} is not in the adjacency map", u->id());
     }
     assert(ut != adjacencyMap_.end());
     const double uDistance = ut->second.distance();

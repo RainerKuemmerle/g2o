@@ -106,12 +106,16 @@ bool ParameterContainer::read(
     p->setId(pid);
     const bool r = p->read(currentLine);
     if (!r) {
+<<<<<<< HEAD
       G2O_ERROR("{}: Error reading data {} for parameter {}",
                 __PRETTY_FUNCTION__, token, pid);
+=======
+      G2O_ERROR("Error reading data {} for parameter {}", token, pid);
+      delete p;
+>>>>>>> master
     } else {
       if (!addParameter(p)) {
-        G2O_ERROR("{}: Parameter of type: {} id: {} already defined",
-                  __PRETTY_FUNCTION__, token, pid);
+        G2O_ERROR("Parameter of type: {} id: {} already defined", token, pid);
       }
     }
   }  // while read line

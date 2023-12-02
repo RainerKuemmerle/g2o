@@ -27,7 +27,6 @@
 #include "optimization_algorithm_gauss_newton.h"
 
 #include <cassert>
-#include <iostream>
 #include <utility>
 
 #include "batch_stats.h"
@@ -63,7 +62,7 @@ OptimizationAlgorithm::SolverResult OptimizationAlgorithmGaussNewton::solve(
       !online) {  // built up the CCS structure, here due to easy time measure
     ok = solver_.buildStructure();
     if (!ok) {
-      G2O_WARN("{}: Failure while building CCS structure", __PRETTY_FUNCTION__);
+      G2O_WARN("Failure while building CCS structure");
       return OptimizationAlgorithm::kFail;
     }
   }

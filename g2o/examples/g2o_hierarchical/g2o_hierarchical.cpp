@@ -24,12 +24,8 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include <algorithm>
-#include <cassert>
 #include <csignal>
 #include <fstream>
-#include <iomanip>
-#include <iostream>
 #include <sstream>
 #include <string>
 
@@ -38,7 +34,6 @@
 #include "edge_types_cost_function.h"
 #include "g2o/apps/g2o_cli/dl_wrapper.h"
 #include "g2o/apps/g2o_cli/g2o_common.h"
-#include "g2o/core/estimate_propagator.h"
 #include "g2o/core/factory.h"
 #include "g2o/core/hyper_dijkstra.h"
 #include "g2o/core/optimization_algorithm_factory.h"
@@ -47,10 +42,8 @@
 #include "g2o/core/sparse_optimizer.h"
 #include "g2o/stuff/color_macros.h"
 #include "g2o/stuff/command_args.h"
-#include "g2o/stuff/filesys_tools.h"
+#include "g2o/stuff/logger.h"
 #include "g2o/stuff/macros.h"
-#include "g2o/stuff/string_tools.h"
-#include "g2o/stuff/timeutil.h"
 #include "star.h"
 // #include "backbone_tree_action.h"
 #include "g2o/types/slam3d/parameter_camera.h"
@@ -72,7 +65,7 @@ void sigquit_handler(int sig) {
     hasToStop = true;
     static int cnt = 0;
     if (cnt++ == 2) {
-      cerr << __PRETTY_FUNCTION__ << " forcing exit" << endl;
+      G2O_WARN("forcing exit");
       exit(1);
     }
   }

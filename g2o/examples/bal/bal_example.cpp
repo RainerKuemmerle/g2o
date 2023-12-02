@@ -42,6 +42,7 @@
 #include "g2o/core/sparse_optimizer.h"
 #include "g2o/solvers/pcg/linear_solver_pcg.h"
 #include "g2o/stuff/command_args.h"
+#include "g2o/stuff/logger.h"
 
 #if defined G2O_HAVE_CHOLMOD
 #include "g2o/solvers/cholmod/linear_solver_cholmod.h"
@@ -68,12 +69,12 @@ class VertexCameraBAL : public g2o::BaseVertex<9, g2o::bal::Vector9> {
   VertexCameraBAL() = default;
 
   bool read(std::istream& /*is*/) override {
-    std::cerr << __PRETTY_FUNCTION__ << " not implemented yet\n";
+    G2O_ERROR("not implemented yet");
     return false;
   }
 
   bool write(std::ostream& /*os*/) const override {
-    std::cerr << __PRETTY_FUNCTION__ << " not implemented yet\n";
+    G2O_ERROR("not implemented yet");
     return false;
   }
 
@@ -92,12 +93,12 @@ class VertexPointBAL : public g2o::BaseVertex<3, g2o::Vector3> {
   VertexPointBAL() = default;
 
   bool read(std::istream& /*is*/) override {
-    std::cerr << __PRETTY_FUNCTION__ << " not implemented yet\n";
+    G2O_ERROR("not implemented yet");
     return false;
   }
 
   bool write(std::ostream& /*os*/) const override {
-    std::cerr << __PRETTY_FUNCTION__ << " not implemented yet\n";
+    G2O_ERROR("not implemented yet");
     return false;
   }
 
@@ -134,11 +135,11 @@ class EdgeObservationBAL
  public:
   EdgeObservationBAL() = default;
   bool read(std::istream& /*is*/) override {
-    std::cerr << __PRETTY_FUNCTION__ << " not implemented yet\n";
+    G2O_ERROR("not implemented yet");
     return false;
   }
   bool write(std::ostream& /*os*/) const override {
-    std::cerr << __PRETTY_FUNCTION__ << " not implemented yet\n";
+    G2O_ERROR("not implemented yet");
     return false;
   }
 

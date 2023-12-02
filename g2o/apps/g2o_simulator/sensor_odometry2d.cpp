@@ -26,8 +26,7 @@
 
 #include "sensor_odometry2d.h"
 
-#include <cassert>
-#include <iostream>
+#include "g2o/stuff/logger.h"
 
 // Robot2D
 namespace g2o {
@@ -53,8 +52,7 @@ void SensorOdometry2D::sense() {
     ++it;
   }
   if (!(pcurr && pprev)) {
-    std::cerr << __PRETTY_FUNCTION__ << ": fatal, trajectory empty"
-              << std::endl;
+    G2O_ERROR("fatal, trajectory empty");
     return;
   }
   robotPoseObject_ = pprev;

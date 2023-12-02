@@ -23,6 +23,7 @@
 #include "g2o/examples/interactive_slam/g2o_interactive/types_slam2d_online.h"
 #include "g2o/examples/interactive_slam/g2o_interactive/types_slam3d_online.h"
 #include "g2o/examples/target/targetTypes6D.hpp"
+#include "g2o/stuff/logger.h"
 #include "g2o/stuff/macros.h"
 
 namespace g2o {
@@ -109,8 +110,7 @@ int SparseOptimizerIncremental::optimize(int iterations, bool online) {
     if (!online) {
       ok = underlyingSolver_->buildStructure();
       if (!ok) {
-        std::cerr << __PRETTY_FUNCTION__
-                  << ": Failure while building CCS structure" << std::endl;
+        G2O_ERROR("Failure while building CCS structure");
         return 0;
       }
     }
@@ -408,8 +408,7 @@ bool SparseOptimizerIncremental::computeCholeskyUpdate() {
   const size_t n = A.cols();
 
   if (cholmodSparse_->columnsAllocated < n) {
-    // std::cerr << __PRETTY_FUNCTION__ << ": reallocating columns" <<
-    // std::endl;
+    G2O_DEBUG("reallocating columns");
     cholmodSparse_->columnsAllocated =
         cholmodSparse_->columnsAllocated == 0
             ? n
@@ -419,8 +418,7 @@ bool SparseOptimizerIncremental::computeCholeskyUpdate() {
   }
   const size_t nzmax = A.nonZeros();
   if (cholmodSparse_->nzmax < nzmax) {
-    // std::cerr << __PRETTY_FUNCTION__ << ": reallocating row + values" <<
-    // std::endl;
+    G2O_DEBUG("reallocating row + values");
     cholmodSparse_->nzmax =
         cholmodSparse_->nzmax == 0
             ? nzmax
@@ -465,7 +463,7 @@ bool SparseOptimizerIncremental::computeCholeskyUpdate() {
 }
 
 bool SparseOptimizerIncremental::initSolver(int dimension, int batchEveryN) {
-  // cerr << __PRETTY_FUNCTION__ << endl;
+  G2O_TRACE("init solver");
   slamDimension = dimension;
   if (dimension == 3) {
     setAlgorithm(createSolver("fix3_2_cholmod"));

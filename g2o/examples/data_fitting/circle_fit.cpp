@@ -151,16 +151,15 @@ int main(int argc, char** argv) {
   optimizer.setVerbose(verbose);
   optimizer.optimize(maxIterations);
 
-  if (verbose) std::cout << std::endl;
+  if (verbose) std::cout << '\n';
 
   // print out the result
-  std::cout << "Iterative least squares solution" << std::endl;
+  std::cout << "Iterative least squares solution\n";
   std::cout << "center of the circle "
-            << circle->estimate().head<2>().transpose() << std::endl;
-  std::cout << "radius of the circle " << circle->estimate()(2) << std::endl;
-  std::cout << "error " << errorOfSolution(points, circle->estimate())
-            << std::endl;
-  std::cout << std::endl;
+            << circle->estimate().head<2>().transpose() << '\n';
+  std::cout << "radius of the circle " << circle->estimate()(2) << '\n';
+  std::cout << "error " << errorOfSolution(points, circle->estimate()) << '\n';
+  std::cout << '\n';
 
   // solve by linear least squares
   // Let (a, b) be the center of the circle and r the radius of the circle.
@@ -184,11 +183,11 @@ int main(int argc, char** argv) {
       (A.transpose() * A).ldlt().solve(A.transpose() * b);
   // calculate the radius of the circle given the solution so far
   solution(2) = sqrt(pow(solution(0), 2) + pow(solution(1), 2) - solution(2));
-  std::cout << "Linear least squares solution" << std::endl;
+  std::cout << "Linear least squares solution\n";
   std::cout << "center of the circle " << solution.head<2>().transpose()
-            << std::endl;
-  std::cout << "radius of the circle " << solution(2) << std::endl;
-  std::cout << "error " << errorOfSolution(points, solution) << std::endl;
+            << '\n';
+  std::cout << "radius of the circle " << solution(2) << '\n';
+  std::cout << "error " << errorOfSolution(points, solution) << '\n';
 
   return 0;
 }

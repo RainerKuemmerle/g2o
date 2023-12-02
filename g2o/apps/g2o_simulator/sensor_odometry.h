@@ -27,6 +27,7 @@
 #ifndef G2O_ODOMETRY_SENSOR_
 #define G2O_ODOMETRY_SENSOR_
 
+#include "g2o/stuff/logger.h"
 #include "simulator.h"
 namespace g2o {
 
@@ -52,7 +53,7 @@ class SensorOdometry : public BinarySensor<R, E, O> {
       ++it;
     }
     if (!(pcurr && pprev)) {
-      cerr << __PRETTY_FUNCTION__ << ": fatal, trajectory empty" << endl;
+      G2O_ERROR("fatal, trajectory empty");
       return;
     }
     _robotPoseObject = pprev;

@@ -46,6 +46,7 @@
 #include "g2o/core/sparse_optimizer_terminate_action.h"
 #include "g2o/stuff/color_macros.h"
 #include "g2o/stuff/command_args.h"
+#include "g2o/stuff/logger.h"
 #include "g2o/stuff/macros.h"
 #include "g2o/stuff/timeutil.h"
 #include "g2o_common.h"
@@ -58,7 +59,7 @@ void sigquit_handler(int sig) {
     hasToStop = true;
     static int cnt = 0;
     if (cnt++ == 2) {
-      std::cerr << __PRETTY_FUNCTION__ << " forcing exit\n";
+      G2O_WARN("forcing exit");
       exit(1);
     }
   }

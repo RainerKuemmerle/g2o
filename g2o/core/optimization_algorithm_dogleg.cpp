@@ -30,7 +30,6 @@
 #include <algorithm>
 #include <cassert>
 #include <cmath>
-#include <iostream>
 #include <utility>
 
 #include "batch_stats.h"
@@ -74,7 +73,7 @@ OptimizationAlgorithm::SolverResult OptimizationAlgorithmDogleg::solve(
       !online) {  // built up the CCS structure, here due to easy time measure
     const bool ok = solver_.buildStructure();
     if (!ok) {
-      G2O_WARN("{}: Failure while building CCS structure", __PRETTY_FUNCTION__);
+      G2O_WARN("Failure while building CCS structure");
       return OptimizationAlgorithm::kFail;
     }
 

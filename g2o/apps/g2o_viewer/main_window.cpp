@@ -120,7 +120,7 @@ void MainWindow::on_btnInitialGuess_clicked() {
       }
       break;
     default:
-      std::cerr << __PRETTY_FUNCTION__ << " Unknown initialization method\n";
+      std::cerr << " Unknown initialization method\n";
       break;
   }
 
