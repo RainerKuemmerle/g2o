@@ -170,13 +170,16 @@ TEST(Slam3D, EdgeSE3PointXYZJacobian) {
   numericJacobianWorkspace.updateSize(*e);
   numericJacobianWorkspace.allocate();
 
+  auto my_epsilon = [](const double, const double) { return 1e-3; };
+
   for (int k = 0; k < 10000; ++k) {
     paramOffset->setOffset(internal::randomIsometry3());
     v1->setEstimate(internal::randomIsometry3());
     v2->setEstimate(Eigen::Vector3d::Random());
     e->setMeasurement(Eigen::Vector3d::Random());
 
-    evaluateJacobian(*e, jacobianWorkspace, numericJacobianWorkspace);
+    evaluateJacobian(*e, jacobianWorkspace, numericJacobianWorkspace,
+                     my_epsilon);
   }
 }
 

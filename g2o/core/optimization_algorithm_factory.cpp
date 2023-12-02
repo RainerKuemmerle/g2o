@@ -102,7 +102,7 @@ void OptimizationAlgorithmFactory::listSolvers(std::ostream& os) const {
     const OptimizationAlgorithmProperty& sp = it->property();
     os << sp.name;
     for (size_t i = sp.name.size(); i < solverNameColumnLength; ++i) os << ' ';
-    os << sp.type << " \t" << sp.desc << std::endl;
+    os << sp.type << " \t" << sp.desc << '\n';
   }
 }
 
@@ -128,6 +128,7 @@ RegisterOptimizationAlgorithmProxy::RegisterOptimizationAlgorithmProxy(
     std::shared_ptr<AbstractOptimizationAlgorithmCreator> c)
     : creator_(std::move(c)) {
   const AbstractOptimizationAlgorithmCreator* ptr = creator_.get();
+  (void)ptr;
   G2O_DEBUG("Registering optimization algorithm {} of type {}",
             creator_->property().name, typeid(*ptr).name());
   OptimizationAlgorithmFactory::instance()->registerSolver(creator_);

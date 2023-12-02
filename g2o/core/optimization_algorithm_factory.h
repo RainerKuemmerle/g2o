@@ -126,7 +126,7 @@ class G2O_CORE_API OptimizationAlgorithmFactory {
   static std::unique_ptr<OptimizationAlgorithmFactory> factoryInstance_;
 };
 
-class RegisterOptimizationAlgorithmProxy {
+class G2O_CORE_API RegisterOptimizationAlgorithmProxy {
  public:
   explicit RegisterOptimizationAlgorithmProxy(
       std::shared_ptr<AbstractOptimizationAlgorithmCreator> c);
