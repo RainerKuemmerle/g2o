@@ -28,12 +28,11 @@
 
 #include <Eigen/Core>
 #include <fstream>
-#include <iostream>
 
 #include "g2o/core/hyper_graph_action.h"
 #include "g2o/core/optimizable_graph.h"
 #include "g2o/stuff/filesys_tools.h"
-#include "g2o/stuff/string_tools.h"
+#include "g2o/stuff/logger.h"
 using namespace std;
 
 namespace g2o {
@@ -65,8 +64,7 @@ bool saveGnuplot(const std::string& gnudump,
   HyperGraphElementAction* saveGnuplot =
       HyperGraphActionLibrary::instance()->actionByName("writeGnuplot");
   if (!saveGnuplot) {
-    cerr << __PRETTY_FUNCTION__ << ": no action \"writeGnuplot\" registered"
-         << endl;
+    G2O_ERROR("no action \"writeGnuplot\" registered");
     return false;
   }
   WriteGnuplotAction::Parameters params;
@@ -187,8 +185,7 @@ bool dumpEdges(std::ostream& os, const OptimizableGraph& optimizer) {
   HyperGraphElementAction* saveGnuplot =
       HyperGraphActionLibrary::instance()->actionByName("writeGnuplot");
   if (!saveGnuplot) {
-    cerr << __PRETTY_FUNCTION__ << ": no action \"writeGnuplot\" registered"
-         << endl;
+    G2O_ERROR("no action \"writeGnuplot\" registered");
     return false;
   }
   WriteGnuplotAction::Parameters params;

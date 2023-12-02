@@ -28,12 +28,9 @@
 
 #include <cassert>
 #include <deque>
-#include <iostream>
 #include <queue>
-#include <vector>
 
 #include "g2o/stuff/logger.h"
-#include "g2o/stuff/macros.h"
 
 namespace g2o {
 
@@ -100,8 +97,7 @@ void HyperDijkstra::shortestPaths(HyperGraph::VertexSet& vset,
     assert(v != 0);
     AdjacencyMap::iterator it = _adjacencyMap.find(v);
     if (it == _adjacencyMap.end()) {
-      G2O_WARN("{} Vertex {} is not in the adjacency map", __PRETTY_FUNCTION__,
-               v->id());
+      G2O_WARN("Vertex {} is not in the adjacency map", v->id());
     }
     assert(it != _adjacencyMap.end());
     it->second._distance = 0.;
@@ -115,8 +111,7 @@ void HyperDijkstra::shortestPaths(HyperGraph::VertexSet& vset,
     HyperGraph::Vertex* u = entry.child();
     AdjacencyMap::iterator ut = _adjacencyMap.find(u);
     if (ut == _adjacencyMap.end()) {
-      G2O_WARN("{} Vertex {} is not in the adjacency map", __PRETTY_FUNCTION__,
-               u->id());
+      G2O_WARN("Vertex {} is not in the adjacency map", u->id());
     }
     assert(ut != _adjacencyMap.end());
     double uDistance = ut->second.distance();

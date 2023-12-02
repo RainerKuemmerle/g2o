@@ -47,7 +47,6 @@
 
 // MSVC on Windows
 #elif defined _MSC_VER
-#define __PRETTY_FUNCTION__ __FUNCTION__
 
 /**
 Modified by Mark Pupilli from:
@@ -74,9 +73,6 @@ for static C++ objects. For GCC, uses a constructor attribute."
 
 // unknown compiler
 #else
-#ifndef __PRETTY_FUNCTION__
-#define __PRETTY_FUNCTION__ ""
-#endif
 #define G2O_ATTRIBUTE_CONSTRUCTOR(func) func
 #define G2O_ATTRIBUTE_UNUSED
 #define G2O_ATTRIBUTE_WARNING(func) func

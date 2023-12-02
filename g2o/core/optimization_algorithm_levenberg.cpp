@@ -42,11 +42,11 @@ namespace g2o {
 OptimizationAlgorithmLevenberg::OptimizationAlgorithmLevenberg(
     std::unique_ptr<Solver> solver)
     : OptimizationAlgorithmWithHessian(*solver.get()),
-      _currentLambda(cst(-1.)),
-      _tau(cst(1e-5)),
-      _goodStepLowerScale(cst(1. / 3.)),
-      _goodStepUpperScale(cst(2. / 3.)),
-      _ni(cst(2.)),
+      _currentLambda(-1),
+      _tau(1e5),
+      _goodStepLowerScale(1. / 3.),
+      _goodStepUpperScale(2. / 3.),
+      _ni(2.),
       _levenbergIterations(0),
       m_solver{std::move(solver)} {
   _userLambdaInit =
@@ -67,7 +67,7 @@ OptimizationAlgorithm::SolverResult OptimizationAlgorithmLevenberg::solve(
       !online) {  // built up the CCS structure, here due to easy time measure
     bool ok = _solver.buildStructure();
     if (!ok) {
-      G2O_WARN("{}: Failure while building CCS structure", __PRETTY_FUNCTION__);
+      G2O_WARN("Failure while building CCS structure");
       return OptimizationAlgorithm::Fail;
     }
   }
@@ -124,7 +124,7 @@ OptimizationAlgorithm::SolverResult OptimizationAlgorithmLevenberg::solve(
 
     rho = (currentChi - tempChi);
     double scale =
-        ok2 ? computeScale() + cst(1e-3) : 1;  // make sure it's non-zero :)
+        ok2 ? computeScale() + 1e-3 : 1;  // make sure it's non-zero :)
     rho /= scale;
 
     if (rho > 0 && std::isfinite(tempChi) && ok2) {  // last step was good
