@@ -30,7 +30,6 @@
 #include <memory>
 
 #include "g2o/core/io_helper.h"
-#include "g2o/types/slam2d_addons/vertex_segment2d.h"
 
 namespace g2o {
 

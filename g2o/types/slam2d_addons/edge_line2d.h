@@ -30,7 +30,6 @@
 #include <Eigen/Core>
 #include <iosfwd>
 
-#include "g2o/config.h"
 #include "g2o/core/base_binary_edge.h"
 #include "g2o/core/eigen_types.h"
 #include "g2o/core/optimizable_graph.h"

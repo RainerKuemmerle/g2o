@@ -26,17 +26,18 @@
 
 #include "dquat2mat.h"
 
-#include <math.h>
+#include <cmath>
 
 namespace g2o::internal {
 
 #include "dquat2mat_maxima_generated.cpp"  // NOLINT
 
 namespace {
-int q2m(double& S, double& qw, const double& r00, const double& r10,
-        const double& r20, const double& r01, const double& r11,
-        const double& r21, const double& r02, const double& r12,
-        const double& r22) {  // NOLINT
+enum class Q2M_Type { kDefault, kOne, kTwo, kThree };
+Q2M_Type q2m(double& S, double& qw, const double& r00, const double& r10,
+             const double& r20, const double& r01, const double& r11,
+             const double& r21, const double& r02, const double& r12,
+             const double& r22) {  // NOLINT
   double tr = r00 + r11 + r22;
   if (tr > 0) {
     S = sqrt(tr + 1.0) * 2;  // S=4*qw
@@ -44,7 +45,7 @@ int q2m(double& S, double& qw, const double& r00, const double& r10,
     // qx = (r21 - r12) / S;
     // qy = (r02 - r20) / S;
     // qz = (r10 - r01) / S;
-    return 0;
+    return Q2M_Type::kDefault;
   }
   if ((r00 > r11) && (r00 > r22)) {
     S = sqrt(1.0 + r00 - r11 - r22) * 2;  // S=4*qx
@@ -52,21 +53,21 @@ int q2m(double& S, double& qw, const double& r00, const double& r10,
     // qx = 0.25 * S;
     // qy = (r01 + r10) / S;
     // qz = (r02 + r20) / S;
-    return 1;
+    return Q2M_Type::kOne;
   }
   if (r11 > r22) {
     S = sqrt(1.0 + r11 - r00 - r22) * 2;  // S=4*qy
     qw = (r02 - r20) / S;
     // qx = (r01 + r10) / S;
     // qy = 0.25 * S;
-    return 2;
+    return Q2M_Type::kTwo;
   }
   S = sqrt(1.0 + r22 - r00 - r11) * 2;  // S=4*qz
   qw = (r10 - r01) / S;
   // qx = (r02 + r20) / S;
   // qy = (r12 + r21) / S;
   // qz = 0.25 * S;
-  return 3;
+  return Q2M_Type::kThree;
 }
 }  // namespace
 
@@ -76,21 +77,21 @@ void compute_dq_dR(Eigen::Matrix<double, 3, 9, Eigen::ColMajor>& dq_dR,
                    const double& r13, const double& r23, const double& r33) {
   double qw;
   double S;
-  int whichCase =
+  Q2M_Type whichCase =
       q2m(S, qw, r11, r21, r31, r12, r22, r32, r13, r23, r33);  // NOLINT
   S *= .25;
   // clang-format off
   switch (whichCase) {
-    case 0:
+    case Q2M_Type::kDefault:
       compute_dq_dR_w(dq_dR, S, r11, r21, r31, r12, r22, r32, r13, r23, r33);  // NOLINT
       break;
-    case 1:
+    case Q2M_Type::kOne:
       compute_dq_dR_x(dq_dR, S, r11, r21, r31, r12, r22, r32, r13, r23, r33);  // NOLINT
       break;
-    case 2:
+    case Q2M_Type::kTwo:
       compute_dq_dR_y(dq_dR, S, r11, r21, r31, r12, r22, r32, r13, r23, r33);  // NOLINT
       break;
-    case 3:
+    case Q2M_Type::kThree:
       compute_dq_dR_z(dq_dR, S, r11, r21, r31, r12, r22, r32, r13, r23, r33);  // NOLINT
       break;
   }

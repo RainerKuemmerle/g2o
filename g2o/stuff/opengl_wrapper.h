@@ -29,6 +29,7 @@
 
 #include "g2o/config.h"
 
+// IWYU pragma: begin_exports
 #ifdef WINDOWS
 #include <windows.h>
 #endif
@@ -40,5 +41,6 @@
 #include <GL/gl.h>
 #endif
 #endif
+// IWYU pragma: end_exports
 
 #endif

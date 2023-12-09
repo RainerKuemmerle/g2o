@@ -30,7 +30,6 @@
 
 #include <cmath>
 #include <iostream>
-#include <string>
 
 #include "g2o/stuff/logger.h"
 #include "g2o/stuff/misc.h"
@@ -95,7 +94,7 @@ RawLaser::Point2DVector RawLaser::cartesian() const {
     if (r < laserParams_.maxRange && r > laserParams_.minRange) {
       const double alpha =
           laserParams_.firstBeamAngle + i * laserParams_.angularStep;
-      points.push_back(Vector2(std::cos(alpha) * r, std::sin(alpha) * r));
+      points.emplace_back(std::cos(alpha) * r, std::sin(alpha) * r);
     }
   }
   return points;
