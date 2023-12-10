@@ -27,7 +27,6 @@
 #include "edge_se2_line2d.h"
 
 #include <cassert>
-#include <memory>
 
 #include "g2o/core/io_helper.h"
 #include "g2o/types/slam2d_addons/vertex_line2d.h"
