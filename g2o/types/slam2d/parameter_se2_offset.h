@@ -43,7 +43,7 @@ class VertexSE2;
 /**
  * \brief offset for an SE2
  */
-class G2O_TYPES_SLAM2D_API ParameterSE2Offset : public Parameter {
+class G2O_TYPES_SLAM2D_API ParameterSE2Offset : public BaseParameter<SE2> {
  public:
   ParameterSE2Offset();
 
@@ -54,9 +54,9 @@ class G2O_TYPES_SLAM2D_API ParameterSE2Offset : public Parameter {
    * update the offset to a new value.
    * re-calculates the different representations, e.g., the rotation matrix
    */
-  void setOffset(const SE2& offset_ = SE2());
+  void setOffset(const SE2& offset = SE2());
 
-  [[nodiscard]] const SE2& offset() const { return offset_; }
+  [[nodiscard]] const SE2& offset() const { return parameter_; }
 
   //! rotation of the offset as 2x2 rotation matrix
   [[nodiscard]] const Isometry2& offsetMatrix() const { return offsetMatrix_; }
@@ -67,7 +67,6 @@ class G2O_TYPES_SLAM2D_API ParameterSE2Offset : public Parameter {
   }
 
  protected:
-  SE2 offset_;
   Isometry2 offsetMatrix_;
   Isometry2 inverseOffsetMatrix_;
 };

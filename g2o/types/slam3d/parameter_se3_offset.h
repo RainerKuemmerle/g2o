@@ -38,13 +38,15 @@
 #include "g2o/core/parameter.h"
 #include "g2o/stuff/property.h"
 #include "g2o_types_slam3d_api.h"
+#include "type_traits_isometry3.h"  // IWYU pragma: keep
 
 namespace g2o {
 
 /**
  * \brief offset for an SE3
  */
-class G2O_TYPES_SLAM3D_API ParameterSE3Offset : public Parameter {
+class G2O_TYPES_SLAM3D_API ParameterSE3Offset
+    : public BaseParameter<Isometry3> {
  public:
   ParameterSE3Offset();
 
@@ -55,17 +57,18 @@ class G2O_TYPES_SLAM3D_API ParameterSE3Offset : public Parameter {
    * update the offset to a new value.
    * re-calculates the different representations, e.g., the rotation matrix
    */
-  void setOffset(const Isometry3& offset_ = Isometry3::Identity());
+  void setOffset(const Isometry3& offset = Isometry3::Identity());
 
   //! rotation of the offset as 3x3 rotation matrix
-  const Isometry3& offset() const { return offset_; }
+  [[nodiscard]] const Isometry3& offset() const { return parameter_; }
 
   //! rotation of the inverse offset as 3x3 rotation matrix
-  const Isometry3& inverseOffset() const { return inverseOffset_; }
+  [[nodiscard]] const Isometry3& inverseOffset() const {
+    return inverseOffset_;
+  }
 
  protected:
-  Isometry3 offset_;
-  Isometry3 inverseOffset_;
+  ParameterType inverseOffset_;
 };
 
 /**
@@ -77,14 +80,14 @@ class G2O_TYPES_SLAM3D_API CacheSE3Offset : public Cache {
 
   void updateImpl() override;
 
-  std::shared_ptr<ParameterType> offsetParam() const {
+  [[nodiscard]] std::shared_ptr<ParameterType> offsetParam() const {
     return std::static_pointer_cast<ParameterType>(parameters_[0]);
   }
   void setOffsetParam(ParameterSE3Offset* offsetParam);
 
-  const Isometry3& w2n() const { return w2n_; }
-  const Isometry3& n2w() const { return n2w_; }
-  const Isometry3& w2l() const { return w2l_; }
+  [[nodiscard]] const Isometry3& w2n() const { return w2n_; }
+  [[nodiscard]] const Isometry3& n2w() const { return n2w_; }
+  [[nodiscard]] const Isometry3& w2l() const { return w2l_; }
 
  protected:
   Isometry3 w2n_;

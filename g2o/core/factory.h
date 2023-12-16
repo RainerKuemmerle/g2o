@@ -107,6 +107,8 @@ class G2O_CORE_API Factory {
    public:
     std::unique_ptr<AbstractHyperGraphElementCreator> creator;
     int elementTypeBit = -1;
+    int minimal_dimension = -1;
+    int dimension = -1;
   };
 
   using CreatorMap = std::map<std::string, std::unique_ptr<CreatorInformation>>;

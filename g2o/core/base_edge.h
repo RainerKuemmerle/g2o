@@ -28,6 +28,7 @@
 #define G2O_BASE_EDGE_H
 
 #include <Eigen/Core>
+#include <climits>
 #include <iostream>
 #include <type_traits>
 
@@ -164,6 +165,10 @@ class BaseEdge : public OptimizableGraph::Edge {
 
   [[nodiscard]] int measurementDimension() const final {
     return TypeTraits<Measurement>::kVectorDimension;
+  }
+
+  [[nodiscard]] int minimalMeasurementDimension() const final {
+    return TypeTraits<Measurement>::kMinimalVectorDimension;
   }
 
   //! Return the identity information matrix of this edge type

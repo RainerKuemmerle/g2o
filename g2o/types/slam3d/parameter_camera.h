@@ -51,9 +51,11 @@ class G2O_TYPES_SLAM3D_API ParameterCamera : public ParameterSE3Offset {
   bool read(std::istream& is) override;
   bool write(std::ostream& os) const override;
 
-  const Matrix3& Kcam() const { return Kcam_; }
-  const Matrix3& invKcam() const { return invKcam_; }
-  const Matrix3& Kcam_inverseOffsetR() const { return Kcam_inverseOffsetR_; }
+  [[nodiscard]] const Matrix3& Kcam() const { return Kcam_; }
+  [[nodiscard]] const Matrix3& invKcam() const { return invKcam_; }
+  [[nodiscard]] const Matrix3& Kcam_inverseOffsetR() const {
+    return Kcam_inverseOffsetR_;
+  }
 
  protected:
   Matrix3 Kcam_;
@@ -66,12 +68,12 @@ class G2O_TYPES_SLAM3D_API CacheCamera : public CacheSE3Offset {
   using ParameterType = ParameterCamera;
 
   //! parameters of the camera
-  std::shared_ptr<ParameterType> camParams() const {
+  [[nodiscard]] std::shared_ptr<ParameterType> camParams() const {
     return std::static_pointer_cast<ParameterType>(parameters_[0]);
   }
 
   //! return the world to image transform
-  const Affine3& w2i() const { return w2i_; }
+  [[nodiscard]] const Affine3& w2i() const { return w2i_; }
 
  protected:
   void updateImpl() override;

@@ -27,7 +27,6 @@
 #include "edge_project_psi2uv.h"
 
 #include <Eigen/Core>
-#include <tuple>
 
 #include "g2o/core/io_helper.h"
 #include "g2o/types/sba/parameter_cameraparameters.h"
@@ -74,15 +73,15 @@ void EdgeProjectPSI2UV::linearizeOplus() {
   VertexSE3Expmap* vpose = vertexXnRaw<1>();
   SE3Quat T_cw = vpose->estimate();
   VertexSE3Expmap* vanchor = vertexXnRaw<2>();
-  const CameraParameters* cam =
-      static_cast<const CameraParameters*>(parameter(0).get());
+  const StereoCameraParameters& cam =
+      static_cast<const CameraParameters*>(parameter(0).get())->param();
 
   SE3Quat A_aw = vanchor->estimate();
   SE3Quat T_ca = T_cw * A_aw.inverse();
   Vector3 x_a = internal::invert_depth(psi_a);
   Vector3 y = T_ca * x_a;
   Eigen::Matrix<double, 2, 3, Eigen::ColMajor> Jcam =
-      internal::d_proj_d_y(cam->focal_length, y);
+      internal::d_proj_d_y(cam.focal_length, y);
 
   auto& jacobianOplus0 = std::get<0>(this->jacobianOplus_);
   auto& jacobianOplus1 = std::get<1>(this->jacobianOplus_);

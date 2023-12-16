@@ -30,7 +30,6 @@
 
 #include "g2o/core/io_helper.h"
 #include "g2o/types/sba/vertex_se3_expmap.h"
-#include "g2o/types/slam3d/se3quat.h"
 
 namespace g2o {
 

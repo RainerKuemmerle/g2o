@@ -50,8 +50,8 @@ ParameterCamera::ParameterCamera() {
   setOffset();
 }
 
-void ParameterCamera::setOffset(const Isometry3& offset_) {
-  ParameterSE3Offset::setOffset(offset_);
+void ParameterCamera::setOffset(const Isometry3& offset) {
+  ParameterSE3Offset::setOffset(offset);
   Kcam_inverseOffsetR_ = Kcam_ * inverseOffset().rotation();
 }
 
@@ -83,7 +83,7 @@ bool ParameterCamera::read(std::istream& is) {
 }
 
 bool ParameterCamera::write(std::ostream& os) const {
-  internal::writeVector(os, internal::toVectorQT(offset_));
+  internal::writeVector(os, internal::toVectorQT(parameter_));
   os << Kcam_(0, 0) << " ";
   os << Kcam_(1, 1) << " ";
   os << Kcam_(0, 2) << " ";

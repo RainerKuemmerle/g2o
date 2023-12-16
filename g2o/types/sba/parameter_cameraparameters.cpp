@@ -27,49 +27,49 @@
 #include "parameter_cameraparameters.h"
 
 #include <Eigen/Core>
-#include <ostream>
+#include <iostream>
 
 #include "g2o/types/slam3d/se3_ops.h"
 
 namespace g2o {
 
-CameraParameters::CameraParameters() : principle_point(Vector2(0., 0.)) {}
-
 CameraParameters::CameraParameters(
     double focalLength, const Eigen::Ref<const Vector2>& principlePoint,
-    double baseLine)
-    : focal_length(focalLength),
-      principle_point(principlePoint),
-      baseline(baseLine) {}
+    double baseLine) {
+  parameter_.focal_length = focalLength;
+  parameter_.principle_point = principlePoint;
+  parameter_.baseline = baseLine;
+}
 
 bool CameraParameters::read(std::istream& is) {
-  is >> focal_length;
-  is >> principle_point[0];
-  is >> principle_point[1];
-  is >> baseline;
+  is >> parameter_.focal_length;
+  is >> parameter_.principle_point[0];
+  is >> parameter_.principle_point[1];
+  is >> parameter_.baseline;
   return true;
 }
 
 bool CameraParameters::write(std::ostream& os) const {
-  os << focal_length << " ";
-  os << principle_point.x() << " ";
-  os << principle_point.y() << " ";
-  os << baseline << " ";
+  os << parameter_.focal_length << " ";
+  os << parameter_.principle_point.x() << " ";
+  os << parameter_.principle_point.y() << " ";
+  os << parameter_.baseline << " ";
   return true;
 }
 
 Vector2 CameraParameters::cam_map(const Vector3& trans_xyz) const {
   Vector2 proj = project(trans_xyz);
   Vector2 res;
-  res[0] = proj[0] * focal_length + principle_point[0];
-  res[1] = proj[1] * focal_length + principle_point[1];
+  res[0] = proj[0] * parameter_.focal_length + parameter_.principle_point[0];
+  res[1] = proj[1] * parameter_.focal_length + parameter_.principle_point[1];
   return res;
 }
 
 Vector3 CameraParameters::stereocam_uvu_map(const Vector3& trans_xyz) const {
   Vector2 uv_left = cam_map(trans_xyz);
-  double proj_x_right = (trans_xyz[0] - baseline) / trans_xyz[2];
-  double u_right = proj_x_right * focal_length + principle_point[0];
+  double proj_x_right = (trans_xyz[0] - parameter_.baseline) / trans_xyz[2];
+  double u_right =
+      proj_x_right * parameter_.focal_length + parameter_.principle_point[0];
   return Vector3(uv_left[0], uv_left[1], u_right);
 }
 

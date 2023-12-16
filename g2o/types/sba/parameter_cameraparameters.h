@@ -32,13 +32,66 @@
 
 #include "g2o/core/eigen_types.h"
 #include "g2o/core/parameter.h"
+#include "g2o/core/type_traits.h"
 #include "g2o_types_sba_api.h"
 
 namespace g2o {
 
-class G2O_TYPES_SBA_API CameraParameters : public g2o::Parameter {
+struct StereoCameraParameters {
+  double focal_length = 1.;
+  Vector2 principle_point;
+  double baseline = 0.5;
+};
+
+template <>
+struct TypeTraits<StereoCameraParameters> {
+  enum {
+    kVectorDimension = 4,
+    kMinimalVectorDimension = 4,
+    kIsVector = 0,
+    kIsScalar = 0,
+  };
+  using Type = StereoCameraParameters;
+  using VectorType = VectorN<kVectorDimension>;
+  using MinimalVectorType = VectorN<kMinimalVectorDimension>;
+
+  static VectorType toVector(const Type& t) {
+    VectorType result;
+    result << t.focal_length, t.principle_point(0), t.principle_point(1),
+        t.baseline;
+    return result;
+  }
+  static void toData(const Type& t, double* data) {
+    typename VectorType::MapType v(data, kVectorDimension);
+    v = toVector(t);
+  }
+
+  static MinimalVectorType toMinimalVector(const Type& t) {
+    return toVector(t);
+  }
+  static void toMinimalData(const Type& t, double* data) { toData(t, data); }
+
+  template <typename Derived>
+  static Type fromVector(const Eigen::DenseBase<Derived>& v) {
+    Type result;
+    result.focal_length = v(0);
+    result.principle_point(0) = v(1);
+    result.principle_point(1) = v(2);
+    result.baseline = v(3);
+  }
+
+  template <typename Derived>
+  static Type fromMinimalVector(const Eigen::DenseBase<Derived>& v) {
+    return fromVector(v);
+  }
+
+  static Type Identity() { return Type(); }
+};
+
+class G2O_TYPES_SBA_API CameraParameters
+    : public g2o::BaseParameter<StereoCameraParameters> {
  public:
-  CameraParameters();
+  CameraParameters() = default;
   CameraParameters(double focalLength,
                    const Eigen::Ref<const Vector2>& principlePoint,
                    double baseLine);
@@ -47,10 +100,6 @@ class G2O_TYPES_SBA_API CameraParameters : public g2o::Parameter {
   [[nodiscard]] Vector3 stereocam_uvu_map(const Vector3& trans_xyz) const;
   bool read(std::istream& is) override;
   bool write(std::ostream& os) const override;
-
-  double focal_length = 1.;
-  Vector2 principle_point;
-  double baseline = 0.5;
 };
 
 }  // namespace g2o

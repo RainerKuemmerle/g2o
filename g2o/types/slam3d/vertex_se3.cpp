@@ -29,7 +29,6 @@
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 #include <string>
-#include <typeinfo>
 
 #include "g2o/core/io_helper.h"
 #include "g2o/types/slam3d/isometry3d_mappings.h"

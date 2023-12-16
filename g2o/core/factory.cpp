@@ -32,6 +32,8 @@
 #include <utility>
 
 #include "creators.h"
+#include "g2o/core/optimizable_graph.h"
+#include "g2o/core/parameter.h"
 #include "g2o/stuff/logger.h"
 #include "hyper_graph.h"
 
@@ -74,10 +76,10 @@ void Factory::registerType(
   G2O_DEBUG("Factory {} registering {}", static_cast<void*>(this), tag);
   G2O_DEBUG("{}", static_cast<void*>(c));
   switch (element->elementType()) {
-    case HyperGraph::HGET_VERTEX:
+    case HyperGraph::kHgetVertex:
       G2O_DEBUG(" -> Vertex");
       break;
-    case HyperGraph::HGET_EDGE:
+    case HyperGraph::kHgetEdge:
       G2O_DEBUG(" -> Edge");
       break;
     case HyperGraph::HGET_PARAMETER:
@@ -99,6 +101,27 @@ void Factory::registerType(
       std::make_unique<CreatorInformation>();
   ci->elementTypeBit = element->elementType();
   ci->creator = std::move(c);
+  // TODO(rainer): simplify storing dimension information
+  switch (element->elementType()) {
+    case HyperGraph::kHgetVertex: {
+      auto* v = static_cast<OptimizableGraph::Vertex*>(element.get());
+      ci->dimension = v->estimateDimension();
+      ci->minimal_dimension = v->minimalEstimateDimension();
+    } break;
+    case HyperGraph::kHgetEdge: {
+      auto* e = static_cast<OptimizableGraph::Edge*>(element.get());
+      ci->dimension = e->measurementDimension();
+      ci->minimal_dimension = e->minimalMeasurementDimension();
+    } break;
+    case HyperGraph::kHgetParameter: {
+      auto* p = static_cast<Parameter*>(element.get());
+      ci->dimension = p->parameterDimension();
+      ci->minimal_dimension = p->minimalParameterDimension();
+    } break;
+    default:  // not handled on purpose
+      break;
+  }
+
   tagLookup_[ci->creator->name()] = tag;
   creator_[tag] = std::move(ci);
 }

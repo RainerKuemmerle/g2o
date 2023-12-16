@@ -24,31 +24,30 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef G2O_STEREO_CAMERA_PARAMETERS_H_
-#define G2O_STEREO_CAMERA_PARAMETERS_H_
+#include "abstract_graph.h"
 
-#include <iosfwd>
-
-#include "g2o_types_slam3d_api.h"
-#include "parameter_camera.h"
+#include <fstream>
 
 namespace g2o {
-/**
- * \brief parameters for a camera
- */
-class G2O_TYPES_SLAM3D_API ParameterStereoCamera : public ParameterCamera {
- public:
-  ParameterStereoCamera();
 
-  bool read(std::istream& is) override;
-  bool write(std::ostream& os) const override;
+bool AbstractGraph::load(const std::string& filename, Format format) {
+  std::ifstream file_input(filename);
+  return load(file_input, format);
+}
 
-  void setBaseline(double baseline) { baseline_ = baseline; }
-  [[nodiscard]] double baseline() const { return baseline_; }
+bool AbstractGraph::load(std::istream& input, Format format) {}
 
- protected:
-  double baseline_;
-};
+bool AbstractGraph::save(const std::string& filename, Format format) {
+  std::ofstream file_output(filename);
+  return save(file_output, format);
+}
+bool AbstractGraph::save(std::ostream& output, Format format) {}
+
+void AbstractGraph::clear() {
+  fixed_.clear();
+  parameters_.clear();
+  vertices_.clear();
+  edges_.clear();
+}
+
 }  // namespace g2o
-
-#endif

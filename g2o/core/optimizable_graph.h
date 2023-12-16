@@ -455,6 +455,12 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
     [[nodiscard]] virtual int measurementDimension() const;
 
     /**
+     * returns the minimal dimension of the measurement which corresponds to the
+     * dimension of the information matrix.
+     */
+    [[nodiscard]] virtual int minimalMeasurementDimension() const = 0;
+
+    /**
      * sets the estimate to have a zero error, based on the current value of the
      * state variables returns false if not supported.
      */

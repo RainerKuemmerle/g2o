@@ -32,6 +32,7 @@
 #include <vector>
 
 #include "g2o/core/g2o_core_api.h"
+#include "g2o/core/type_traits.h"
 #include "hyper_graph.h"
 
 namespace g2o {
@@ -46,12 +47,39 @@ class G2O_CORE_API Parameter : public HyperGraph::HyperGraphElement {
   virtual bool write(std::ostream& os) const = 0;
   [[nodiscard]] int id() const { return id_; }
   void setId(int id_);
-  [[nodiscard]] HyperGraph::HyperGraphElementType elementType() const override {
+  [[nodiscard]] HyperGraph::HyperGraphElementType elementType() const final {
     return HyperGraph::kHgetParameter;
   }
 
+  [[nodiscard]] virtual int parameterDimension() const = 0;
+  [[nodiscard]] virtual int minimalParameterDimension() const = 0;
+
  protected:
   int id_ = -1;
+};
+
+template <typename T>
+class BaseParameter : public Parameter {
+ public:
+  using ParameterType = T;
+
+  [[nodiscard]] int parameterDimension() const final {
+    static_assert(TypeTraits<ParameterType>::kMinimalVectorDimension != INT_MIN,
+                  "Forgot to implement TypeTrait for your Estimate");
+    return TypeTraits<ParameterType>::kVectorDimension;
+  }
+
+  [[nodiscard]] int minimalParameterDimension() const final {
+    static_assert(TypeTraits<ParameterType>::kMinimalVectorDimension != INT_MIN,
+                  "Forgot to implement TypeTrait for your Estimate");
+    return TypeTraits<ParameterType>::kMinimalVectorDimension;
+  }
+
+  const ParameterType& param() const { return parameter_; }
+  ParameterType& param() { return parameter_; }
+
+ protected:
+  ParameterType parameter_;
 };
 
 using ParameterVector = std::vector<std::shared_ptr<Parameter>>;

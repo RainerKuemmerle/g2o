@@ -32,7 +32,6 @@
 #include <cassert>
 
 #include "g2o/core/type_traits.h"
-#include "g2o/stuff/macros.h"
 #include "g2o/stuff/misc.h"
 #include "g2o_tutorial_slam2d_api.h"
 

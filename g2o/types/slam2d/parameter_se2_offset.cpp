@@ -39,9 +39,9 @@ namespace g2o {
 ParameterSE2Offset::ParameterSE2Offset() { setOffset(); }
 
 void ParameterSE2Offset::setOffset(const SE2& offset) {
-  offset_ = offset;
-  offsetMatrix_ = offset_.rotation().toRotationMatrix();
-  offsetMatrix_.translation() = offset_.translation();
+  parameter_ = offset;
+  offsetMatrix_ = parameter_.rotation().toRotationMatrix();
+  offsetMatrix_.translation() = parameter_.translation();
   inverseOffsetMatrix_ = offsetMatrix_.inverse();
 }
 

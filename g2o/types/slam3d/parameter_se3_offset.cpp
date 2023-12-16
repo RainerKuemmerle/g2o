@@ -44,8 +44,8 @@ namespace g2o {
 ParameterSE3Offset::ParameterSE3Offset() { setOffset(); }
 
 void ParameterSE3Offset::setOffset(const Isometry3& offset) {
-  offset_ = offset;
-  inverseOffset_ = offset_.inverse();
+  parameter_ = offset;
+  inverseOffset_ = parameter_.inverse();
 }
 
 bool ParameterSE3Offset::read(std::istream& is) {
@@ -59,7 +59,7 @@ bool ParameterSE3Offset::read(std::istream& is) {
 }
 
 bool ParameterSE3Offset::write(std::ostream& os) const {
-  return internal::writeVector(os, internal::toVectorQT(offset_));
+  return internal::writeVector(os, internal::toVectorQT(parameter_));
 }
 
 void CacheSE3Offset::updateImpl() {
