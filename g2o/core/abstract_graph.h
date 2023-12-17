@@ -51,26 +51,27 @@ class AbstractGraph {
     std::string data;  ///< the serialized data as a string
   };
 
-  struct AbstractVertex {
-    std::string tag;                 ///< the tag of this vertex
-    int id;                          ///< its ID
-    std::vector<double> estimate;    ///< the estimate as a vector
-    std::vector<AbstractData> data;  ///< the associated data
-  };
-
   struct AbstractParameter {
     std::string tag;            ///< the tag of this parameter
     int id;                     ///< its ID
     std::vector<double> value;  ///< its value as a vector
   };
 
-  struct AbstractEdge {
+  struct AbstractGraphElement {
     std::string tag;
+    std::vector<AbstractData> data;  ///< the associated data
+  };
+
+  struct AbstractVertex : public AbstractGraphElement {
+    int id;                        ///< its ID
+    std::vector<double> estimate;  ///< the estimate as a vector
+  };
+
+  struct AbstractEdge : public AbstractGraphElement {
     std::vector<int> ids;  ///< the ids of the vertices connected by this edge
     std::vector<double> measurement;  ///< the measurement as a vector
     std::vector<double>
         information;  ///< upper triangular part of the information matrix
-    std::vector<AbstractData> data;  ///< the associated data
   };
 
   //! Possible formats for loading and saving

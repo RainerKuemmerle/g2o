@@ -32,11 +32,11 @@
 #include <cstdint>
 #include <functional>
 #include <iosfwd>
-#include <map>
 #include <memory>
 #include <set>
 #include <string>
 #include <typeinfo>
+#include <unordered_map>
 #include <vector>
 
 #include "g2o/core/eigen_types.h"
@@ -782,7 +782,7 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
       const std::function<void(OptimizableGraph::Vertex*)>& fn);
 
  protected:
-  std::map<std::string, std::string> renamedTypesLookup_;
+  std::unordered_map<std::string, std::string> renamedTypesLookup_;
   int64_t nextEdgeId_;
   std::vector<HyperGraphActionSet> graphActions_;
 

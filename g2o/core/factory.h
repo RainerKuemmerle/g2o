@@ -49,6 +49,12 @@ namespace g2o {
  */
 class G2O_CORE_API Factory {
  public:
+  struct TypeInfo {
+    int elementTypeBit = -1;
+    int minimal_dimension = -1;
+    int dimension = -1;
+    int number_vertices = -1;
+  };
   //! return the instance
   static Factory* instance();
 
@@ -89,6 +95,8 @@ class G2O_CORE_API Factory {
    */
   bool knowsTag(const std::string& tag, int* elementType = nullptr) const;
 
+  [[nodiscard]] TypeInfo typeInfo(const std::string& tag) const;
+
   //! return the TAG given a vertex
   const std::string& tag(const HyperGraph::HyperGraphElement* e) const;
 
@@ -106,9 +114,7 @@ class G2O_CORE_API Factory {
   class CreatorInformation {
    public:
     std::unique_ptr<AbstractHyperGraphElementCreator> creator;
-    int elementTypeBit = -1;
-    int minimal_dimension = -1;
-    int dimension = -1;
+    TypeInfo type_info;
   };
 
   using CreatorMap = std::map<std::string, std::unique_ptr<CreatorInformation>>;
