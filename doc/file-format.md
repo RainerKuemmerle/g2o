@@ -23,29 +23,30 @@ We have the following trivially copyable types which we need to handle.
 - Int, the unique ID of the parameter
 - [Float], the value of the parameter
 
+## Data
+- String, the tag of the data
+- [String], the data in serialized form
+
 ## Vertex / Dynamic Vertex
 - String, the tag of the vertex
 - Int, the unique ID of the vertex
+- bool, true iff the vertex is fixed
 - [Float], the estimate of the vertex
+- [Data], the data associated to the vertex
 
 ## Edge / Dynamic Edge
 - String, the tag of the vertex
 - [Int], the unique IDs of the edge's vertices
 - [Float], the measurement of the edge
 - [Float], the information matrix of the edge
-
-## Data
-- String, the tag of the data
-- [String], the data in serialized form
+- [Data], the data associated to the edge
 
 A Data element belongs to a vertex or an edge in a parent/child relation.
 
 # A graph
 
-A graph comprises above information. And we will save it in a specific order. In addition, we will store which vertices are set to be fixed.
+A graph comprises above information. And we will save it in a specific order.
 
-- "Fixed"
-  - [Int]
 - "Parameters"
   - [Parameter]
 - "Vertices"
