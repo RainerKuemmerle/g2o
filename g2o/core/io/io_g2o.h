@@ -47,6 +47,9 @@ class IoInterface {
     return renamed_types_;
   }
 
+  virtual AbstractGraph load(std::istream& input) = 0;
+  virtual bool save(std::ostream& output, const AbstractGraph& graph) = 0;
+
  protected:
   std::unordered_map<std::string, std::string> renamed_types_;
 
@@ -60,8 +63,8 @@ class IoInterface {
 
 class IoG2O : public IoInterface {
  public:
-  AbstractGraph load(std::istream& input);
-  bool save(std::ostream& output);
+  AbstractGraph load(std::istream& input) override;
+  bool save(std::ostream& output, const AbstractGraph& graph) override;
 
  protected:
 };

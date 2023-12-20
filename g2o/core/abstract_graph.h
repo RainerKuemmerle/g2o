@@ -85,8 +85,9 @@ class AbstractGraph {
   bool load(std::istream& input, Format format = AbstractGraph::Format::kG2O);
 
   bool save(const std::string& filename,
-            Format format = AbstractGraph::Format::kG2O);
-  bool save(std::ostream& output, Format format = AbstractGraph::Format::kG2O);
+            Format format = AbstractGraph::Format::kG2O) const;
+  bool save(std::ostream& output,
+            Format format = AbstractGraph::Format::kG2O) const;
 
   std::vector<int>& fixed() { return fixed_; };
   [[nodiscard]] const std::vector<int>& fixed() const { return fixed_; };

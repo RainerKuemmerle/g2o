@@ -27,6 +27,26 @@
 #include "abstract_graph.h"
 
 #include <fstream>
+#include <memory>
+
+#include "g2o/stuff/logger.h"
+#include "io/io_g2o.h"
+
+namespace {
+std::unique_ptr<g2o::IoInterface> allocate(g2o::AbstractGraph::Format format) {
+  switch (format) {
+    case g2o::AbstractGraph::Format::kG2O:
+      return std::make_unique<g2o::IoG2O>();
+      break;
+    case g2o::AbstractGraph::Format::kBinary:
+    case g2o::AbstractGraph::Format::kJson:
+    case g2o::AbstractGraph::Format::kXML:
+      break;
+  }
+  G2O_CRITICAL("Failed to create graph loader interface for format {}", format);
+  return nullptr;
+}
+}  // namespace
 
 namespace g2o {
 
@@ -35,13 +55,23 @@ bool AbstractGraph::load(const std::string& filename, Format format) {
   return load(file_input, format);
 }
 
-bool AbstractGraph::load(std::istream& input, Format format) {}
+bool AbstractGraph::load(std::istream& input, Format format) {
+  std::unique_ptr<g2o::IoInterface> loader_interface = allocate(format);
+  if (!loader_interface) return false;
+  *this = loader_interface->load(input);
+  return true;
+}
 
-bool AbstractGraph::save(const std::string& filename, Format format) {
+bool AbstractGraph::save(const std::string& filename, Format format) const {
   std::ofstream file_output(filename);
   return save(file_output, format);
 }
-bool AbstractGraph::save(std::ostream& output, Format format) {}
+
+bool AbstractGraph::save(std::ostream& output, Format format) const {
+  std::unique_ptr<g2o::IoInterface> loader_interface = allocate(format);
+  if (!loader_interface) return false;
+  return loader_interface->save(output, *this);
+}
 
 void AbstractGraph::clear() {
   fixed_.clear();

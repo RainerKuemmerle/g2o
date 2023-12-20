@@ -34,8 +34,26 @@
 #include "g2o/core/abstract_graph.h"
 #include "g2o/core/factory.h"
 #include "g2o/stuff/logger.h"
-#include "g2o/stuff/logger_format.h"
+#include "g2o/stuff/logger_format.h"  // IWYU pragma: keep
 #include "g2o/stuff/string_tools.h"
+
+namespace {
+std::ostream& operator<<(std::ostream& os, const std::vector<double>& v) {
+  for (size_t i = 0; i < v.size(); ++i) {
+    if (i > 0) os << " ";
+    os << v[i];
+  }
+  return os;
+}
+
+std::ostream& operator<<(std::ostream& os, const std::vector<int>& v) {
+  for (size_t i = 0; i < v.size(); ++i) {
+    if (i > 0) os << " ";
+    os << v[i];
+  }
+  return os;
+}
+}  // namespace
 
 namespace g2o {
 
@@ -157,6 +175,34 @@ AbstractGraph IoG2O::load(std::istream& input) {
   return result;
 }
 
-bool IoG2O::save(std::ostream& output) { return true; }
+bool IoG2O::save(std::ostream& output, const AbstractGraph& graph) {
+  if (!graph.fixed().empty()) {
+    output << "FIX" << graph.fixed() << '\n';
+  }
+
+  for (const auto& param : graph.parameters()) {
+    output << param.tag << " " << param.id << " " << param.value << '\n';
+  }
+
+  auto printData = [](std::ostream& output,
+                      const std::vector<AbstractGraph::AbstractData>& data) {
+    for (const auto& d : data) {
+      output << d.tag << " " << d.data << '\n';
+    }
+  };
+
+  for (const auto& vertex : graph.vertices()) {
+    output << vertex.tag << " " << vertex.id << " " << vertex.estimate << '\n';
+    printData(output, vertex.data);
+  }
+
+  for (const auto& edge : graph.edges()) {
+    output << edge.tag << " " << edge.ids << " " << edge.measurement << " "
+           << edge.information;
+    printData(output, edge.data);
+  }
+
+  return output.good();
+}
 
 }  // namespace g2o
