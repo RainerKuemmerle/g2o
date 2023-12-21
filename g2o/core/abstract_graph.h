@@ -29,6 +29,7 @@
 
 #include <istream>
 #include <string>
+#include <utility>
 #include <vector>
 
 namespace g2o {
@@ -49,22 +50,37 @@ class AbstractGraph {
   struct AbstractData {
     std::string tag;   ///< the tag of this data
     std::string data;  ///< the serialized data as a string
+    AbstractData() = default;
+    AbstractData(std::string tag, std::string data)
+        : tag(std::move(tag)), data(std::move(data)) {}
   };
 
   struct AbstractParameter {
     std::string tag;            ///< the tag of this parameter
     int id;                     ///< its ID
     std::vector<double> value;  ///< its value as a vector
+    AbstractParameter() = default;
+    AbstractParameter(std::string tag, int id, std::vector<double> value)
+        : tag(std::move(tag)), id(id), value(std::move(value)) {}
   };
 
   struct AbstractGraphElement {
     std::string tag;
     std::vector<AbstractData> data;  ///< the associated data
+    AbstractGraphElement() = default;
+    AbstractGraphElement(std::string tag, std::vector<AbstractData> data)
+        : tag(std::move(tag)), data(std::move(data)) {}
   };
 
   struct AbstractVertex : public AbstractGraphElement {
     int id;                        ///< its ID
     std::vector<double> estimate;  ///< the estimate as a vector
+    AbstractVertex() = default;
+    AbstractVertex(std::string tag, int id, std::vector<double> estimate,
+                   std::vector<AbstractData> data = {})
+        : AbstractGraphElement(std::move(tag), std::move(data)),
+          id(id),
+          estimate(std::move(estimate)) {}
   };
 
   struct AbstractEdge : public AbstractGraphElement {
@@ -72,6 +88,15 @@ class AbstractGraph {
     std::vector<double> measurement;  ///< the measurement as a vector
     std::vector<double>
         information;  ///< upper triangular part of the information matrix
+    AbstractEdge() = default;
+    AbstractEdge(std::string tag, std::vector<int> ids,
+                 std::vector<double> measurement,
+                 std::vector<double> information,
+                 std::vector<AbstractData> data = {})
+        : AbstractGraphElement(std::move(tag), std::move(data)),
+          ids(std::move(ids)),
+          measurement(std::move(measurement)),
+          information(std::move(information)) {}
   };
 
   //! Possible formats for loading and saving
@@ -84,10 +109,10 @@ class AbstractGraph {
             Format format = AbstractGraph::Format::kG2O);
   bool load(std::istream& input, Format format = AbstractGraph::Format::kG2O);
 
-  bool save(const std::string& filename,
-            Format format = AbstractGraph::Format::kG2O) const;
-  bool save(std::ostream& output,
-            Format format = AbstractGraph::Format::kG2O) const;
+  [[nodiscard]] bool save(const std::string& filename,
+                          Format format = AbstractGraph::Format::kG2O) const;
+  [[nodiscard]] bool save(std::ostream& output,
+                          Format format = AbstractGraph::Format::kG2O) const;
 
   std::vector<int>& fixed() { return fixed_; };
   [[nodiscard]] const std::vector<int>& fixed() const { return fixed_; };

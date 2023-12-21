@@ -165,12 +165,6 @@ class AutoDifferentiation : public ::testing::Test {
 TEST_F(AutoDifferentiation, ComputesSomething) {
   testEdge_.linearizeOplus(jacobianWorkspace_);
 
-#if 0
-  std::cerr << PVAR(testEdge.jacobianOplusXn<0>()) << std::endl;
-  std::cerr << PVAR(testEdge.jacobianOplusXn<1>()) << std::endl;
-  std::cerr << PVAR(testEdge.jacobianOplusXn<2>()) << std::endl;
-#endif
-
   ASSERT_FALSE(testEdge_.jacobianOplusXn<0>().array().isNaN().any())
       << "Jacobian contains NaN";
   ASSERT_FALSE(testEdge_.jacobianOplusXn<1>().array().isNaN().any())
@@ -241,11 +235,6 @@ class AutoDifferentiationEdgeSE2 : public ::testing::Test {
 
 TEST_F(AutoDifferentiationEdgeSE2, AdComputesSomething) {
   testEdgeAd_.linearizeOplus(jacobianWorkspaceAd_);
-
-#if 0
-  std::cerr << PVAR(testEdgeAd.jacobianOplusXn<0>()) << std::endl;
-  std::cerr << PVAR(testEdgeAd.jacobianOplusXn<1>()) << std::endl;
-#endif
 
   ASSERT_FALSE(testEdgeAd_.jacobianOplusXn<0>().array().isNaN().any())
       << "Jacobian contains NaN";

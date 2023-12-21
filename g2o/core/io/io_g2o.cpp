@@ -177,7 +177,7 @@ AbstractGraph IoG2O::load(std::istream& input) {
 
 bool IoG2O::save(std::ostream& output, const AbstractGraph& graph) {
   if (!graph.fixed().empty()) {
-    output << "FIX" << graph.fixed() << '\n';
+    output << "FIX " << graph.fixed() << '\n';
   }
 
   for (const auto& param : graph.parameters()) {

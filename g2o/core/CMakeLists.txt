@@ -40,6 +40,7 @@ robust_kernel_factory.cpp robust_kernel_factory.h
 io_helper.h
 g2o_core_api.h
 # IO
+abstract_graph.cpp abstract_graph.h
 io/io_g2o.cpp io/io_g2o.h
 )
 

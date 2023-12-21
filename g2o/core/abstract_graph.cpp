@@ -43,7 +43,8 @@ std::unique_ptr<g2o::IoInterface> allocate(g2o::AbstractGraph::Format format) {
     case g2o::AbstractGraph::Format::kXML:
       break;
   }
-  G2O_CRITICAL("Failed to create graph loader interface for format {}", format);
+  G2O_CRITICAL("Failed to create graph loader interface for format {}",
+               static_cast<int>(format));
   return nullptr;
 }
 }  // namespace
