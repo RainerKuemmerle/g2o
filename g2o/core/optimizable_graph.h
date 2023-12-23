@@ -53,6 +53,7 @@ class HyperGraphAction;
 struct OptimizationAlgorithmProperty;
 class CacheContainer;
 class RobustKernel;
+class AbstractGraph;
 
 /**
    @addtogroup g2o
@@ -65,7 +66,8 @@ class RobustKernel;
    also provides basic functionalities to handle the backup/restore
    of portions of the vertices.
  */
-struct G2O_CORE_API OptimizableGraph : public HyperGraph {
+class G2O_CORE_API OptimizableGraph : public HyperGraph {
+ public:
   enum ActionType {
     kAtPreiteration,
     kAtPostiteration,
@@ -131,7 +133,7 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
   class G2O_CORE_API Vertex : public HyperGraph::Vertex,
                               public HyperGraph::DataContainer {
    private:
-    friend struct OptimizableGraph;
+    friend class OptimizableGraph;
 
    public:
     Vertex();
@@ -368,6 +370,8 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
     //! dimension of the estimated state belonging to this node
     [[nodiscard]] int dimension() const { return dimension_; }
 
+    virtual bool setDimension(int /*dimension*/) { return false; }
+
     //! sets the id of the node in the graph be sure that the graph keeps
     //! consistent after changing the id
     void setId(int id) override { id_ = id; }
@@ -430,7 +434,7 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
   class G2O_CORE_API Edge : public HyperGraph::Edge,
                             public HyperGraph::DataContainer {
    private:
-    friend struct OptimizableGraph;
+    friend class OptimizableGraph;
 
    public:
     Edge();
@@ -792,16 +796,10 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
   void performActions(int iter, HyperGraphActionSet& actions);
 
   // helper functions to save an individual vertex
-  static bool saveVertex(std::ostream& os, Vertex* v);
-
-  // helper function to save an individual parameter
-  static bool saveParameter(std::ostream& os, Parameter* p);
+  static bool saveVertex(AbstractGraph& abstract_graph, Vertex* v);
 
   // helper functions to save an individual edge
-  static bool saveEdge(std::ostream& os, Edge* e);
-
-  // helper functions to save the data packets
-  static bool saveUserData(std::ostream& os, HyperGraph::Data* d);
+  static bool saveEdge(AbstractGraph& abstract_graph, Edge* e);
 };
 
 /**

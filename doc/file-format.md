@@ -37,6 +37,7 @@ We have the following trivially copyable types which we need to handle.
 ## Edge / Dynamic Edge
 - String, the tag of the vertex
 - [Int], the unique IDs of the edge's vertices
+- [Int], the unique IDs of the edge's parameters
 - [Float], the measurement of the edge
 - [Float], the information matrix of the edge
 - [Data], the data associated to the edge

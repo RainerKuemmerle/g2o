@@ -85,6 +85,7 @@ class AbstractGraph {
 
   struct AbstractEdge : public AbstractGraphElement {
     std::vector<int> ids;  ///< the ids of the vertices connected by this edge
+    std::vector<int> param_ids;  ///< the ids of the parameters of this edge
     std::vector<double> measurement;  ///< the measurement as a vector
     std::vector<double>
         information;  ///< upper triangular part of the information matrix
@@ -92,9 +93,11 @@ class AbstractGraph {
     AbstractEdge(std::string tag, std::vector<int> ids,
                  std::vector<double> measurement,
                  std::vector<double> information,
+                 std::vector<int> param_ids = {},
                  std::vector<AbstractData> data = {})
         : AbstractGraphElement(std::move(tag), std::move(data)),
           ids(std::move(ids)),
+          param_ids(std::move(param_ids)),
           measurement(std::move(measurement)),
           information(std::move(information)) {}
   };

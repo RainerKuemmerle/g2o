@@ -30,6 +30,7 @@
 #include <sstream>
 #include <string>
 #include <unordered_set>
+#include <vector>
 
 #include "g2o/core/abstract_graph.h"
 #include "g2o/core/factory.h"
@@ -136,6 +137,11 @@ AbstractGraph IoG2O::load(std::istream& input) {
           edge.ids.push_back(stoi(buff));
         }
       }
+      // read the parameter ids
+      if (type_info.number_parameters > 0) {
+        edge.param_ids.resize(type_info.number_parameters);
+        for (auto& param_id : edge.param_ids) current_line >> param_id;
+      }
       // read measurement vector
       edge.measurement.resize(type_info.dimension);
       for (auto& v : edge.measurement) current_line >> v;
@@ -197,8 +203,10 @@ bool IoG2O::save(std::ostream& output, const AbstractGraph& graph) {
   }
 
   for (const auto& edge : graph.edges()) {
-    output << edge.tag << " " << edge.ids << " " << edge.measurement << " "
-           << edge.information;
+    output << edge.tag << " ";
+    if (!edge.param_ids.empty()) output << edge.param_ids << " ";
+    output << edge.ids << " " << edge.measurement << " " << edge.information
+           << "\n";
     printData(output, edge.data);
   }
 

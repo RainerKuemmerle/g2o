@@ -78,6 +78,7 @@ struct TypeTraits<StereoCameraParameters> {
     result.principle_point(0) = v(1);
     result.principle_point(1) = v(2);
     result.baseline = v(3);
+    return result;
   }
 
   template <typename Derived>

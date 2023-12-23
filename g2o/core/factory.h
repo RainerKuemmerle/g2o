@@ -54,6 +54,7 @@ class G2O_CORE_API Factory {
     int minimal_dimension = -1;
     int dimension = -1;
     int number_vertices = -1;
+    int number_parameters = -1;
   };
   //! return the instance
   static Factory* instance();

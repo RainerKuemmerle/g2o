@@ -113,6 +113,7 @@ void Factory::registerType(
       ci->type_info.dimension = e->measurementDimension();
       ci->type_info.minimal_dimension = e->minimalMeasurementDimension();
       ci->type_info.number_vertices = e->vertices().size();
+      ci->type_info.number_parameters = e->numParameters();
     } break;
     case HyperGraph::kHgetParameter: {
       auto* p = static_cast<Parameter*>(element.get());

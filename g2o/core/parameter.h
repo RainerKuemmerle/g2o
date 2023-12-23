@@ -31,6 +31,7 @@
 #include <memory>
 #include <vector>
 
+#include "g2o/core/eigen_types.h"
 #include "g2o/core/g2o_core_api.h"
 #include "g2o/core/type_traits.h"
 #include "hyper_graph.h"
@@ -54,6 +55,10 @@ class G2O_CORE_API Parameter : public HyperGraph::HyperGraphElement {
   [[nodiscard]] virtual int parameterDimension() const = 0;
   [[nodiscard]] virtual int minimalParameterDimension() const = 0;
 
+  virtual bool getParameterData(std::vector<double>& data) const = 0;
+  [[nodiscard]] virtual bool setParameterData(
+      const std::vector<double>& data) = 0;
+
  protected:
   int id_ = -1;
 };
@@ -74,6 +79,20 @@ class BaseParameter : public Parameter {
                   "Forgot to implement TypeTrait for your Estimate");
     return TypeTraits<ParameterType>::kMinimalVectorDimension;
   }
+
+  bool getParameterData(std::vector<double>& data) const override {
+    int dim = parameterDimension();
+    if (dim < 0) return false;
+    data.resize(dim);
+    TypeTraits<ParameterType>::toData(param(), data.data());
+    return true;
+  };
+
+  bool setParameterData(const std::vector<double>& data) override {
+    VectorX::ConstMapType data_vector(data.data(), data.size());
+    param() = TypeTraits<ParameterType>::fromVector(data_vector);
+    return true;
+  };
 
   const ParameterType& param() const { return parameter_; }
   ParameterType& param() { return parameter_; }

@@ -63,7 +63,9 @@ class ParameterContainer : protected std::map<int, std::shared_ptr<Parameter>> {
   virtual bool write(std::ostream& os) const;
 
   // stuff of the base class that should re-appear
+  using BaseClass::begin;
   using BaseClass::clear;
+  using BaseClass::end;
   using BaseClass::size;
 };
 

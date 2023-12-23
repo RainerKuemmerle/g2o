@@ -35,7 +35,7 @@ namespace g2o {
 template <typename T>
 class BaseDynamicVertex : public BaseVertex<-1, T> {
  public:
-  inline virtual bool setDimension(int newDimension);
+  bool setDimension(int newDimension) override;
 
  protected:
   // This method is responsible for actually changing the dimension of the state
