@@ -413,11 +413,11 @@ void OptimizableGraph::forEachVertex(
   }
 }
 
-bool OptimizableGraph::load(std::istream& is) {
+bool OptimizableGraph::load(std::istream& is, io::Format format) {
   Factory* factory = Factory::instance();
 
   g2o::AbstractGraph abstract_graph;
-  bool load_status = abstract_graph.load(is);
+  bool load_status = abstract_graph.load(is, format);
   if (!load_status) {
     G2O_ERROR("Failed to load graph");
     return false;
@@ -542,22 +542,24 @@ bool OptimizableGraph::load(std::istream& is) {
   return true;
 }
 
-bool OptimizableGraph::load(const char* filename) {
+bool OptimizableGraph::load(const char* filename, io::Format format) {
   std::ifstream ifs(filename);
   if (!ifs) {
     G2O_ERROR("Unable to open file {}", filename);
     return false;
   }
-  return load(ifs);
+  return load(ifs, format);
 }
 
-bool OptimizableGraph::save(const char* filename, int level) const {
+bool OptimizableGraph::save(const char* filename, io::Format format,
+                            int level) const {
   std::ofstream ofs(filename);
   if (!ofs) return false;
-  return save(ofs, level);
+  return save(ofs, format, level);
 }
 
-bool OptimizableGraph::save(std::ostream& os, int level) const {
+bool OptimizableGraph::save(std::ostream& os, io::Format format,
+                            int level) const {
   g2o::AbstractGraph abstract_graph;
   bool status = saveParameters(abstract_graph, parameters_);
 
@@ -586,11 +588,11 @@ bool OptimizableGraph::save(std::ostream& os, int level) const {
   for (const auto& e : edgesToSave)
     status &= saveEdge(abstract_graph, static_cast<Edge*>(e.get()));
 
-  return abstract_graph.save(os) && status;
+  return abstract_graph.save(os, format) && status;
 }
 
 bool OptimizableGraph::saveSubset(std::ostream& os, HyperGraph::VertexSet& vset,
-                                  int level) {
+                                  io::Format format, int level) {
   g2o::AbstractGraph abstract_graph;
   bool status = saveParameters(abstract_graph, parameters_);
 
@@ -610,10 +612,11 @@ bool OptimizableGraph::saveSubset(std::ostream& os, HyperGraph::VertexSet& vset,
     if (!verticesInEdge) continue;
     status &= saveEdge(abstract_graph, e);
   }
-  return abstract_graph.save(os) && status;
+  return abstract_graph.save(os, format) && status;
 }
 
-bool OptimizableGraph::saveSubset(std::ostream& os, HyperGraph::EdgeSet& eset) {
+bool OptimizableGraph::saveSubset(std::ostream& os, HyperGraph::EdgeSet& eset,
+                                  io::Format format) {
   g2o::AbstractGraph abstract_graph;
   bool status = saveParameters(abstract_graph, parameters_);
   if (!parameters_.write(os)) return false;
@@ -626,7 +629,7 @@ bool OptimizableGraph::saveSubset(std::ostream& os, HyperGraph::EdgeSet& eset) {
     status &= saveVertex(abstract_graph, static_cast<Vertex*>(v.get()));
   for (const auto& e : eset)
     status &= saveEdge(abstract_graph, static_cast<Edge*>(e.get()));
-  return abstract_graph.save(os) && status;
+  return abstract_graph.save(os, format) && status;
 }
 
 int OptimizableGraph::maxDimension() const {

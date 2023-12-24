@@ -34,6 +34,7 @@
 
 #ifdef G2O_HAVE_CEREAL
 #include <cereal/archives/json.hpp>
+#include <cereal/cereal.hpp>
 
 #include "io_wrapper_cereal.h"  // IWYU pragma: keep
 #endif                          // HAVE CEREAL
@@ -45,13 +46,13 @@ namespace g2o {
 std::optional<AbstractGraph> IoJson::load(std::istream& input) {
   cereal::JSONInputArchive archive(input);
   AbstractGraph result;
-  archive(result);
+  archive(cereal::make_nvp("graph", result));
   return result;
 }
 
 bool IoJson::save(std::ostream& output, const AbstractGraph& graph) {
   cereal::JSONOutputArchive archive(output);
-  archive(graph);
+  archive(cereal::make_nvp("graph", graph));
   return true;
 }
 

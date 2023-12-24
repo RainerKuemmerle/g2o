@@ -160,15 +160,14 @@ class OptimizableGraphIO : public TestWithParam<g2o::io::Format> {
 
 TEST_P(OptimizableGraphIO, SaveAndLoad) {
   g2o::io::Format format = GetParam();
-  (void)format;
 
   std::stringstream buffer;
-  bool save_result = optimizer_ptr_->save(buffer);
+  bool save_result = optimizer_ptr_->save(buffer, format);
   ASSERT_THAT(save_result, IsTrue());
   EXPECT_THAT(buffer.str(), Not(IsEmpty()));
 
   auto loaded_optimizer = g2o::internal::createOptimizerForTests();
-  loaded_optimizer->load(buffer);
+  loaded_optimizer->load(buffer, format);
 
   EXPECT_THAT(loaded_optimizer->vertices(),
               SizeIs(optimizer_ptr_->vertices().size()));

@@ -67,14 +67,18 @@ void serialize(Archive& archive, AbstractGraph::AbstractGraphElement& elem) {
 
 template <class Archive>
 void serialize(Archive& archive, AbstractGraph::AbstractVertex& vertex) {
-  archive(cereal::base_class<AbstractGraph::AbstractGraphElement>(&vertex),
+  archive(cereal::make_nvp(
+              "elem",
+              cereal::base_class<AbstractGraph::AbstractGraphElement>(&vertex)),
           cereal::make_nvp("id", vertex.id),
           cereal::make_nvp("estimate", vertex.estimate));
 }
 
 template <class Archive>
 void serialize(Archive& archive, AbstractGraph::AbstractEdge& edge) {
-  archive(cereal::base_class<AbstractGraph::AbstractGraphElement>(&edge),
+  archive(cereal::make_nvp(
+              "elem",
+              cereal::base_class<AbstractGraph::AbstractGraphElement>(&edge)),
           cereal::make_nvp("ids", edge.ids),
           cereal::make_nvp("param_ids", edge.param_ids),
           cereal::make_nvp("measurement", edge.measurement),

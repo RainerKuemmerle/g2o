@@ -40,6 +40,7 @@
 #include <vector>
 
 #include "g2o/core/eigen_types.h"
+#include "g2o/core/io/io_format.h"
 #include "g2o_core_api.h"
 #include "hyper_graph.h"
 #include "jacobian_workspace.h"
@@ -697,18 +698,22 @@ class G2O_CORE_API OptimizableGraph : public HyperGraph {
 
   //! load the graph from a stream. Uses the Factory singleton for creating the
   //! vertices and edges.
-  virtual bool load(std::istream& is);
-  bool load(const char* filename);
+  virtual bool load(std::istream& is, io::Format format = io::Format::kG2O);
+  bool load(const char* filename, io::Format format = io::Format::kG2O);
   //! save the graph to a stream. Again uses the Factory system.
-  virtual bool save(std::ostream& os, int level = 0) const;
+  virtual bool save(std::ostream& os, io::Format format = io::Format::kG2O,
+                    int level = 0) const;
   //! function provided for convenience, see save() above
-  bool save(const char* filename, int level = 0) const;
+  bool save(const char* filename, io::Format format = io::Format::kG2O,
+            int level = 0) const;
 
   //! save a subgraph to a stream. Again uses the Factory system.
-  bool saveSubset(std::ostream& os, HyperGraph::VertexSet& vset, int level = 0);
+  bool saveSubset(std::ostream& os, HyperGraph::VertexSet& vset,
+                  io::Format format = io::Format::kG2O, int level = 0);
 
   //! save a subgraph to a stream. Again uses the Factory system.
-  bool saveSubset(std::ostream& os, HyperGraph::EdgeSet& eset);
+  bool saveSubset(std::ostream& os, HyperGraph::EdgeSet& eset,
+                  io::Format format = io::Format::kG2O);
 
   //! push the estimate of a subset of the variables onto a stack
   virtual void push(HyperGraph::VertexSet& vset);
