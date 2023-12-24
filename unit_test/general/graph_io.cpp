@@ -52,6 +52,38 @@ MATCHER(ParamEqual, "") {
       that, result_listener);
 }
 
+MATCHER(VertexEqual, "") {
+  const auto& that = std::get<0>(arg);
+  const auto& expected = std::get<1>(arg);
+  // TODO(Rainer): compare data vector
+  return ExplainMatchResult(
+      AllOf(
+          Field("tag", &g2o::AbstractGraph::AbstractVertex::tag,
+                Eq(expected.tag)),
+          Field("id", &g2o::AbstractGraph::AbstractVertex::id, Eq(expected.id)),
+          Field("estimate", &g2o::AbstractGraph::AbstractVertex::estimate,
+                ElementsAreArray(expected.estimate))),
+      that, result_listener);
+}
+
+MATCHER(EdgeEqual, "") {
+  const auto& that = std::get<0>(arg);
+  const auto& expected = std::get<1>(arg);
+  // TODO(Rainer): compare data vector
+  return ExplainMatchResult(
+      AllOf(Field("tag", &g2o::AbstractGraph::AbstractEdge::tag,
+                  Eq(expected.tag)),
+            Field("ids", &g2o::AbstractGraph::AbstractEdge::ids,
+                  ElementsAreArray(expected.ids)),
+            Field("param_ids", &g2o::AbstractGraph::AbstractEdge::param_ids,
+                  ElementsAreArray(expected.param_ids)),
+            Field("measurement", &g2o::AbstractGraph::AbstractEdge::measurement,
+                  ElementsAreArray(expected.measurement)),
+            Field("information", &g2o::AbstractGraph::AbstractEdge::information,
+                  ElementsAreArray(expected.information))),
+      that, result_listener);
+}
+
 namespace {
 auto KeyMatch(const std::vector<int>& keys) {
   std::vector<decltype(Key(keys[0]))> matchers;
@@ -115,7 +147,10 @@ TEST_P(AbstractGraphIO, SaveAndLoad) {
               ElementsAreArray(abstract_graph_.fixed()));
   EXPECT_THAT(load_save_graph.parameters(),
               Pointwise(ParamEqual(), abstract_graph_.parameters()));
-  // TODO(Rainer): compare vertices and edges
+  EXPECT_THAT(load_save_graph.vertices(),
+              Pointwise(VertexEqual(), abstract_graph_.vertices()));
+  EXPECT_THAT(load_save_graph.edges(),
+              Pointwise(EdgeEqual(), abstract_graph_.edges()));
 }
 
 /**
@@ -197,6 +232,15 @@ TEST_P(OptimizableGraphIO, SaveAndLoad) {
 
   EXPECT_THAT(loaded_optimizer->edges(),
               SizeIs(optimizer_ptr_->edges().size()));
+  // TODO(Rainer): Compare estimates of vertices
+  // TODO(Rainer): Compare measurement of edges
+  // TODO(Rainer): Compare information of edges
+
+  // Brutally check that serialization result is the same
+  std::stringstream buffer_after_loading;
+  save_result = loaded_optimizer->save(buffer_after_loading, format);
+  ASSERT_THAT(save_result, IsTrue());
+  EXPECT_THAT(buffer.str(), Eq(buffer_after_loading.str()));
 }
 
 namespace {
