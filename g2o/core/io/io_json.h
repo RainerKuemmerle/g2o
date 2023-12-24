@@ -24,8 +24,8 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef G2O_CORE_IO_G2O_FORMAT_H
-#define G2O_CORE_IO_G2O_FORMAT_H
+#ifndef G2O_CORE_IO_JSON_FORMAT_H
+#define G2O_CORE_IO_JSON_FORMAT_H
 
 #include "io_interface.h"
 
@@ -33,7 +33,7 @@ namespace g2o {
 
 class AbstractGraph;
 
-class IoG2O : public IoInterface {
+class IoJson : public IoInterface {
  public:
   std::optional<AbstractGraph> load(std::istream& input) override;
   bool save(std::ostream& output, const AbstractGraph& graph) override;

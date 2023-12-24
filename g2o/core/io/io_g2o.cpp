@@ -58,7 +58,7 @@ std::ostream& operator<<(std::ostream& os, const std::vector<int>& v) {
 
 namespace g2o {
 
-AbstractGraph IoG2O::load(std::istream& input) {
+std::optional<AbstractGraph> IoG2O::load(std::istream& input) {
   Factory* factory = Factory::instance();
   std::unordered_set<std::string> warned_unknown_types;
 

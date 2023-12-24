@@ -1,0 +1,88 @@
+// g2o - General Graph Optimization
+// Copyright (C) 2011 R. Kuemmerle, G. Grisetti, W. Burgard
+// All rights reserved.
+//
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted provided that the following conditions are
+// met:
+//
+// * Redistributions of source code must retain the above copyright notice,
+//   this list of conditions and the following disclaimer.
+// * Redistributions in binary form must reproduce the above copyright
+//   notice, this list of conditions and the following disclaimer in the
+//   documentation and/or other materials provided with the distribution.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS
+// IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+// TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+// PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+// HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+// SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
+// TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+// PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+// LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+// NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+// SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+#ifndef G2O_CORE_IO_WARPPER_CEREAL_H
+#define G2O_CORE_IO_WARPPER_CEREAL_H
+
+#include "g2o/config.h"
+
+#ifdef G2O_HAVE_CEREAL
+
+#include <cereal/types/polymorphic.hpp>
+#include <cereal/types/string.hpp>
+#include <cereal/types/vector.hpp>
+
+#include "g2o/core/abstract_graph.h"
+
+namespace g2o {
+
+template <class Archive>
+void serialize(Archive& archive, AbstractGraph& graph) {
+  archive(cereal::make_nvp("fixed", graph.fixed()),
+          cereal::make_nvp("params", graph.parameters()),
+          cereal::make_nvp("vertices", graph.vertices()),
+          cereal::make_nvp("edges", graph.edges()));
+}
+
+template <class Archive>
+void serialize(Archive& archive, AbstractGraph::AbstractData& data) {
+  archive(cereal::make_nvp("tag", data.tag),
+          cereal::make_nvp("data", data.data));
+}
+
+template <class Archive>
+void serialize(Archive& archive, AbstractGraph::AbstractParameter& param) {
+  archive(cereal::make_nvp("tag", param.tag), cereal::make_nvp("id", param.id),
+          cereal::make_nvp("value", param.value));
+}
+
+template <class Archive>
+void serialize(Archive& archive, AbstractGraph::AbstractGraphElement& elem) {
+  archive(cereal::make_nvp("tag", elem.tag),
+          cereal::make_nvp("data", elem.data));
+}
+
+template <class Archive>
+void serialize(Archive& archive, AbstractGraph::AbstractVertex& vertex) {
+  archive(cereal::base_class<AbstractGraph::AbstractGraphElement>(&vertex),
+          cereal::make_nvp("id", vertex.id),
+          cereal::make_nvp("estimate", vertex.estimate));
+}
+
+template <class Archive>
+void serialize(Archive& archive, AbstractGraph::AbstractEdge& edge) {
+  archive(cereal::base_class<AbstractGraph::AbstractGraphElement>(&edge),
+          cereal::make_nvp("ids", edge.ids),
+          cereal::make_nvp("param_ids", edge.param_ids),
+          cereal::make_nvp("measurement", edge.measurement),
+          cereal::make_nvp("information", edge.information));
+}
+
+}  // namespace g2o
+
+#endif  // HAVE_CEREAL
+
+#endif

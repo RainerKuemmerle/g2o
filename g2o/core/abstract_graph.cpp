@@ -28,47 +28,70 @@
 
 #include <fstream>
 #include <memory>
+#include <optional>
 
+#include "g2o/core/io/io_format.h"
+#include "g2o/core/io/io_json.h"
 #include "g2o/stuff/logger.h"
 #include "io/io_g2o.h"
 
 namespace {
-std::unique_ptr<g2o::IoInterface> allocate(g2o::AbstractGraph::Format format) {
+std::string_view to_string(g2o::io::Format format) {
   switch (format) {
-    case g2o::AbstractGraph::Format::kG2O:
+    case g2o::io::Format::kG2O:
+      return "G2O";
+    case g2o::io::Format::kBinary:
+      return "Binary";
+    case g2o::io::Format::kJson:
+      return "JSON";
+    case g2o::io::Format::kXML:
+      return "XML";
+  }
+}
+
+std::unique_ptr<g2o::IoInterface> allocate(g2o::io::Format format) {
+  switch (format) {
+    case g2o::io::Format::kG2O:
       return std::make_unique<g2o::IoG2O>();
+    case g2o::io::Format::kBinary:
       break;
-    case g2o::AbstractGraph::Format::kBinary:
-    case g2o::AbstractGraph::Format::kJson:
-    case g2o::AbstractGraph::Format::kXML:
+    case g2o::io::Format::kJson:
+      return std::make_unique<g2o::IoJson>();
+    case g2o::io::Format::kXML:
       break;
   }
-  G2O_CRITICAL("Failed to create graph loader interface for format {}",
-               static_cast<int>(format));
+  G2O_CRITICAL("Failed to create graph IO interface for format {}",
+               to_string(format));
   return nullptr;
 }
+
 }  // namespace
 
 namespace g2o {
 
-bool AbstractGraph::load(const std::string& filename, Format format) {
+bool AbstractGraph::load(const std::string& filename, io::Format format) {
   std::ifstream file_input(filename);
   return load(file_input, format);
 }
 
-bool AbstractGraph::load(std::istream& input, Format format) {
+bool AbstractGraph::load(std::istream& input, io::Format format) {
   std::unique_ptr<g2o::IoInterface> loader_interface = allocate(format);
   if (!loader_interface) return false;
-  *this = loader_interface->load(input);
+  std::optional<AbstractGraph> load_result = loader_interface->load(input);
+  if (!load_result.has_value()) {
+    G2O_ERROR("Failure while loading graph, result will be empty");
+    return false;
+  }
+  *this = std::move(load_result.value());
   return true;
 }
 
-bool AbstractGraph::save(const std::string& filename, Format format) const {
+bool AbstractGraph::save(const std::string& filename, io::Format format) const {
   std::ofstream file_output(filename);
   return save(file_output, format);
 }
 
-bool AbstractGraph::save(std::ostream& output, Format format) const {
+bool AbstractGraph::save(std::ostream& output, io::Format format) const {
   std::unique_ptr<g2o::IoInterface> loader_interface = allocate(format);
   if (!loader_interface) return false;
   return loader_interface->save(output, *this);

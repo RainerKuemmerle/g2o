@@ -24,21 +24,13 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef G2O_CORE_IO_G2O_FORMAT_H
-#define G2O_CORE_IO_G2O_FORMAT_H
+#ifndef G2O_CORE_IO_FORMAT_H
+#define G2O_CORE_IO_FORMAT_H
 
-#include "io_interface.h"
+namespace g2o::io {
 
-namespace g2o {
+enum class Format { kG2O = 0, kBinary = 1, kJson = 2, kXML = 3 };
 
-class AbstractGraph;
-
-class IoG2O : public IoInterface {
- public:
-  std::optional<AbstractGraph> load(std::istream& input) override;
-  bool save(std::ostream& output, const AbstractGraph& graph) override;
-};
-
-}  // namespace g2o
+}  // namespace g2o::io
 
 #endif

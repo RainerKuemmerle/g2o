@@ -32,6 +32,8 @@
 #include <utility>
 #include <vector>
 
+#include "io/io_format.h"
+
 namespace g2o {
 
 class OptimizableGraph;
@@ -102,20 +104,16 @@ class AbstractGraph {
           information(std::move(information)) {}
   };
 
-  //! Possible formats for loading and saving
-  enum class Format { kG2O = 0, kBinary = 1, kJson = 2, kXML = 3 };
-
   AbstractGraph() = default;
   ~AbstractGraph() = default;
 
-  bool load(const std::string& filename,
-            Format format = AbstractGraph::Format::kG2O);
-  bool load(std::istream& input, Format format = AbstractGraph::Format::kG2O);
+  bool load(const std::string& filename, io::Format format = io::Format::kG2O);
+  bool load(std::istream& input, io::Format format = io::Format::kG2O);
 
   [[nodiscard]] bool save(const std::string& filename,
-                          Format format = AbstractGraph::Format::kG2O) const;
+                          io::Format format = io::Format::kG2O) const;
   [[nodiscard]] bool save(std::ostream& output,
-                          Format format = AbstractGraph::Format::kG2O) const;
+                          io::Format format = io::Format::kG2O) const;
 
   std::vector<int>& fixed() { return fixed_; };
   [[nodiscard]] const std::vector<int>& fixed() const { return fixed_; };

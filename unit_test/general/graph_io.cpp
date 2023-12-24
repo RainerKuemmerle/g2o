@@ -27,6 +27,7 @@
 #include <sstream>
 #include <vector>
 
+#include "g2o/config.h"  // IWYU pragma: keep
 #include "g2o/core/abstract_graph.h"
 #include "g2o/core/optimizable_graph.h"
 #include "g2o/core/sparse_optimizer.h"
@@ -63,7 +64,7 @@ auto KeyMatch(const std::vector<int>& keys) {
 /**
  * @brief Test fixture for IO with the abstract graph.
  */
-class AbstractGraphIO : public TestWithParam<g2o::AbstractGraph::Format> {
+class AbstractGraphIO : public TestWithParam<g2o::io::Format> {
  protected:
   void SetUp() override {
     abstract_graph_.fixed() = {1};
@@ -93,12 +94,13 @@ class AbstractGraphIO : public TestWithParam<g2o::AbstractGraph::Format> {
 };
 
 TEST_P(AbstractGraphIO, SaveAndLoad) {
-  g2o::AbstractGraph::Format format = GetParam();
+  g2o::io::Format format = GetParam();
   g2o::AbstractGraph load_save_graph(abstract_graph_);
 
   std::stringstream buffer;
   bool save_result = load_save_graph.save(buffer, format);
   ASSERT_THAT(save_result, IsTrue());
+  EXPECT_THAT(buffer.str(), Not(IsEmpty()));
 
   load_save_graph.clear();
   EXPECT_THAT(load_save_graph.fixed(), IsEmpty());
@@ -119,7 +121,7 @@ TEST_P(AbstractGraphIO, SaveAndLoad) {
 /**
  * @brief Test fixture for IO with the abstract graph.
  */
-class OptimizableGraphIO : public TestWithParam<g2o::AbstractGraph::Format> {
+class OptimizableGraphIO : public TestWithParam<g2o::io::Format> {
  protected:
   void SetUp() override {
     optimizer_ptr_ = g2o::internal::createOptimizerForTests();
@@ -157,12 +159,13 @@ class OptimizableGraphIO : public TestWithParam<g2o::AbstractGraph::Format> {
 };
 
 TEST_P(OptimizableGraphIO, SaveAndLoad) {
-  g2o::AbstractGraph::Format format = GetParam();
+  g2o::io::Format format = GetParam();
   (void)format;
 
   std::stringstream buffer;
   bool save_result = optimizer_ptr_->save(buffer);
   ASSERT_THAT(save_result, IsTrue());
+  EXPECT_THAT(buffer.str(), Not(IsEmpty()));
 
   auto loaded_optimizer = g2o::internal::createOptimizerForTests();
   loaded_optimizer->load(buffer);
@@ -198,8 +201,13 @@ TEST_P(OptimizableGraphIO, SaveAndLoad) {
 }
 
 namespace {
-const auto kFileformatsToTest = Values(g2o::AbstractGraph::Format::kG2O);
-}
+const auto kFileformatsToTest = Values(g2o::io::Format::kG2O
+#ifdef G2O_HAVE_CEREAL
+                                       ,
+                                       g2o::io::Format::kJson
+#endif
+);
+}  // namespace
 
 INSTANTIATE_TEST_SUITE_P(AbstractGraph, AbstractGraphIO, kFileformatsToTest);
 INSTANTIATE_TEST_SUITE_P(OptimizableGraphGraph, OptimizableGraphIO,

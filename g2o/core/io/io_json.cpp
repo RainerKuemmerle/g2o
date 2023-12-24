@@ -24,21 +24,45 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef G2O_CORE_IO_G2O_FORMAT_H
-#define G2O_CORE_IO_G2O_FORMAT_H
+#include "io_json.h"
 
-#include "io_interface.h"
+#include <iostream>
+#include <optional>
+
+#include "g2o/config.h"
+#include "g2o/core/abstract_graph.h"
+
+#ifdef G2O_HAVE_CEREAL
+#include <cereal/archives/json.hpp>
+
+#include "io_wrapper_cereal.h"  // IWYU pragma: keep
+#endif                          // HAVE CEREAL
 
 namespace g2o {
 
-class AbstractGraph;
+#ifdef G2O_HAVE_CEREAL
 
-class IoG2O : public IoInterface {
- public:
-  std::optional<AbstractGraph> load(std::istream& input) override;
-  bool save(std::ostream& output, const AbstractGraph& graph) override;
-};
+std::optional<AbstractGraph> IoJson::load(std::istream& input) {
+  cereal::JSONInputArchive archive(input);
+  AbstractGraph result;
+  archive(result);
+  return result;
+}
 
-}  // namespace g2o
+bool IoJson::save(std::ostream& output, const AbstractGraph& graph) {
+  cereal::JSONOutputArchive archive(output);
+  archive(graph);
+  return true;
+}
+
+#else
+
+std::optional<AbstractGraph> IoJson::load(std::istream&) {
+  return std::nullopt;
+}
+
+bool IoJson::save(std::ostream&, const AbstractGraph&) { return false; }
 
 #endif
+
+}  // namespace g2o

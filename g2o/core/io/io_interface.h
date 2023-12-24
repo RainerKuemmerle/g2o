@@ -24,19 +24,58 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef G2O_CORE_IO_G2O_FORMAT_H
-#define G2O_CORE_IO_G2O_FORMAT_H
+#ifndef G2O_CORE_IO_INTERFACE_H
+#define G2O_CORE_IO_INTERFACE_H
 
-#include "io_interface.h"
+#include <iosfwd>
+#include <optional>
+#include <string>
+#include <unordered_map>
 
 namespace g2o {
 
 class AbstractGraph;
 
-class IoG2O : public IoInterface {
+/**
+ * @brief Base interface class for IO of a g2o graph
+ */
+class IoInterface {
  public:
-  std::optional<AbstractGraph> load(std::istream& input) override;
-  bool save(std::ostream& output, const AbstractGraph& graph) override;
+  virtual ~IoInterface() = default;
+
+  /**
+   * @brief Set the Renamed Types lookup table
+   *
+   * @param mapping the map containing the name mapping for types
+   */
+  void setRenamedTypes(
+      const std::unordered_map<std::string, std::string>& mapping) {
+    renamed_types_ = mapping;
+  }
+
+  /**
+   * @brief Return the mapping for renaming types
+   *
+   * @return const std::unordered_map<std::string, std::string>&
+   */
+  const std::unordered_map<std::string, std::string>& renamedTypes() const {
+    return renamed_types_;
+  }
+
+  //! abstract method loading a graph
+  virtual std::optional<AbstractGraph> load(std::istream& input) = 0;
+  //! abstract method for saving a graph
+  virtual bool save(std::ostream& output, const AbstractGraph& graph) = 0;
+
+ protected:
+  std::unordered_map<std::string, std::string> renamed_types_;
+
+  std::string mapType(const std::string& token) {
+    if (renamed_types_.empty()) return token;
+    auto foundIt = renamed_types_.find(token);
+    if (foundIt == renamed_types_.end()) return token;
+    return foundIt->second;
+  }
 };
 
 }  // namespace g2o
