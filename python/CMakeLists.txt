@@ -24,6 +24,7 @@ pybind11_add_module(g2opy
     core/py_factory.cpp
     core/py_hyper_dijkstra.cpp
     core/py_hyper_graph.cpp
+    core/py_io_format.cpp
     core/py_jacobian_workspace.cpp
     core/py_optimizable_graph.cpp
     core/py_optimization_algorithm.cpp

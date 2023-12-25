@@ -6,7 +6,7 @@
   - Data
 
 The above list gives an overview about the data to be saved.
-Each kind of element has a set of data which has agnostic to the concrete instance and we have data specific to the instance.
+Each kind of element has a set of data which is agnostic to the concrete instance and we have data specific to the instance.
 
 The agnostic data contains, for example, a single ID or a list of IDs. For a vertex and a parameter we will have an ID followed by the specific payload.
 
@@ -30,7 +30,6 @@ We have the following trivially copyable types which we need to handle.
 ## Vertex / Dynamic Vertex
 - String, the tag of the vertex
 - Int, the unique ID of the vertex
-- bool, true iff the vertex is fixed
 - [Float], the estimate of the vertex
 - [Data], the data associated to the vertex
 
@@ -44,10 +43,15 @@ We have the following trivially copyable types which we need to handle.
 
 A Data element belongs to a vertex or an edge in a parent/child relation.
 
+## Fixed vertices
+- [Int], the vertex IDs which are fixed
+
 # A graph
 
 A graph comprises above information. And we will save it in a specific order.
 
+- "Fixed"
+  - [Int]
 - "Parameters"
   - [Parameter]
 - "Vertices"
@@ -57,7 +61,7 @@ A graph comprises above information. And we will save it in a specific order.
 
 # File formats to support
 
-We want to save the original g2o file format but also support potentially new file formats like JSON/Yaml.
+We want to save the original g2o file format but also support potentially new file formats like JSON or a binary format.
 
 ## Challenges
 

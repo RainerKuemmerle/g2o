@@ -7,6 +7,7 @@
 #include <g2o/core/optimizable_graph.h>
 
 #include "g2o/core/eigen_types.h"
+#include "g2o/core/io/io_format.h"
 
 namespace g2o {
 
@@ -208,11 +209,13 @@ void declareOptimizableGraph(py::module& m) {
   cls.def("discard_top",
           static_cast<void (CLS::*)(HyperGraph::VertexSet&)>(&CLS::discardTop));
 
-  cls.def("load", static_cast<bool (CLS::*)(const char*)>(&CLS::load),
-          "filename"_a);
+  cls.def("load",
+          static_cast<bool (CLS::*)(const char*, io::Format)>(&CLS::load),
+          "filename"_a, "format"_a = io::Format::kG2O);
   cls.def("save",
-          static_cast<bool (CLS::*)(const char*, int) const>(&CLS::save),
-          "filename"_a, "level"_a = 0);
+          static_cast<bool (CLS::*)(const char*, io::Format, int) const>(
+              &CLS::save),
+          "filename"_a, "format"_a = io::Format::kG2O, "level"_a = 0);
 
   cls.def("set_fixed", &CLS::setFixed, "vset"_a, "fixes"_a,
           py::keep_alive<1, 2>());  // (HyperGraph::VertexSet&, bool) -> void

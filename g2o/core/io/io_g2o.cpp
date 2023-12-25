@@ -182,10 +182,6 @@ std::optional<AbstractGraph> IoG2O::load(std::istream& input) {
 }
 
 bool IoG2O::save(std::ostream& output, const AbstractGraph& graph) {
-  if (!graph.fixed().empty()) {
-    output << "FIX " << graph.fixed() << '\n';
-  }
-
   for (const auto& param : graph.parameters()) {
     output << param.tag << " " << param.id << " " << param.value << '\n';
   }
@@ -208,6 +204,11 @@ bool IoG2O::save(std::ostream& output, const AbstractGraph& graph) {
     output << edge.ids << " " << edge.measurement << " " << edge.information
            << "\n";
     printData(output, edge.data);
+  }
+
+  // After the vertices to be backward compatible
+  if (!graph.fixed().empty()) {
+    output << "FIX " << graph.fixed() << '\n';
   }
 
   return output.good();

@@ -1,5 +1,6 @@
 #include "py_core.h"
 
+#include "core/py_io_format.h"
 #include "py_base_binary_edge.h"
 #include "py_base_edge.h"
 #include "py_base_unary_edge.h"
@@ -13,6 +14,7 @@
 #include "py_hyper_dijkstra.h"
 #include "py_hyper_graph.h"
 #include "py_hyper_graph_action.h"
+#include "py_io_format.h"
 #include "py_jacobian_workspace.h"
 #include "py_linear_solver.h"
 #include "py_optimizable_graph.h"
@@ -27,6 +29,7 @@
 namespace g2o {
 
 void declareCore(py::module& m) {
+  declareIOFormat(m);
   declareHyperGraph(m);
   declareOptimizableGraph(m);
   declareSparseOptimizer(m);

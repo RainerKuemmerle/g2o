@@ -244,6 +244,7 @@ TEST_P(OptimizableGraphIO, SaveAndLoad) {
 }
 
 namespace {
+// We can always test G2O format, others depend on libraries
 const auto kFileformatsToTest = Values(g2o::io::Format::kG2O
 #ifdef G2O_HAVE_CEREAL
                                        ,

@@ -1,3 +1,5 @@
+[x] update python optimizable graph wrapper (save/load) with format
+[ ] add version number for file format
 [ ] test save/load of dynamic vertex
 [ ] test save/load of dynamic edge
 [ ] binary format for save/load
