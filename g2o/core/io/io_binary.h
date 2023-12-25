@@ -27,11 +27,12 @@
 #ifndef G2O_CORE_IO_BINARY_FORMAT_H
 #define G2O_CORE_IO_BINARY_FORMAT_H
 
+#include "g2o/core/g2o_core_api.h"
 #include "io_interface.h"
 
 namespace g2o {
 
-class IoBinary : public IoInterface {
+class G2O_CORE_API IoBinary : public IoInterface {
  public:
   std::optional<AbstractGraph> load(std::istream& input) override;
   bool save(std::ostream& output, const AbstractGraph& graph) override;

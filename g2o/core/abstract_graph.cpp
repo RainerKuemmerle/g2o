@@ -49,6 +49,7 @@ std::string_view to_string(g2o::io::Format format) {
     case g2o::io::Format::kXML:
       return "XML";
   }
+  return "";
 }
 
 /**

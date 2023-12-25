@@ -32,6 +32,8 @@
 #include <string>
 #include <unordered_map>
 
+#include "g2o/core/g2o_core_api.h"
+
 namespace g2o {
 
 class AbstractGraph;
@@ -39,7 +41,7 @@ class AbstractGraph;
 /**
  * @brief Base interface class for IO of a g2o graph
  */
-class IoInterface {
+class G2O_CORE_API IoInterface {
  public:
   virtual ~IoInterface() = default;
 

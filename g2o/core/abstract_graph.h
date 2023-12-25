@@ -32,6 +32,7 @@
 #include <utility>
 #include <vector>
 
+#include "g2o_core_api.h"
 #include "io/io_format.h"
 
 namespace g2o {
@@ -47,9 +48,9 @@ class OptimizableGraph;
  * stored. Whereas a parameter represents an agnostic part of the optimization
  * problem such as parameters of a camera.
  */
-class AbstractGraph {
+class G2O_CORE_API AbstractGraph {
  public:
-  struct AbstractData {
+  struct G2O_CORE_API AbstractData {
     std::string tag;   ///< the tag of this data
     std::string data;  ///< the serialized data as a string
     AbstractData() = default;
@@ -57,7 +58,7 @@ class AbstractGraph {
         : tag(std::move(tag)), data(std::move(data)) {}
   };
 
-  struct AbstractParameter {
+  struct G2O_CORE_API AbstractParameter {
     std::string tag;            ///< the tag of this parameter
     int id;                     ///< its ID
     std::vector<double> value;  ///< its value as a vector
@@ -66,7 +67,7 @@ class AbstractGraph {
         : tag(std::move(tag)), id(id), value(std::move(value)) {}
   };
 
-  struct AbstractGraphElement {
+  struct G2O_CORE_API AbstractGraphElement {
     std::string tag;
     std::vector<AbstractData> data;  ///< the associated data
     AbstractGraphElement() = default;
@@ -74,7 +75,7 @@ class AbstractGraph {
         : tag(std::move(tag)), data(std::move(data)) {}
   };
 
-  struct AbstractVertex : public AbstractGraphElement {
+  struct G2O_CORE_API AbstractVertex : public AbstractGraphElement {
     int id;                        ///< its ID
     std::vector<double> estimate;  ///< the estimate as a vector
     AbstractVertex() = default;
@@ -85,7 +86,7 @@ class AbstractGraph {
           estimate(std::move(estimate)) {}
   };
 
-  struct AbstractEdge : public AbstractGraphElement {
+  struct G2O_CORE_API AbstractEdge : public AbstractGraphElement {
     std::vector<int> ids;  ///< the ids of the vertices connected by this edge
     std::vector<int> param_ids;  ///< the ids of the parameters of this edge
     std::vector<double> measurement;  ///< the measurement as a vector

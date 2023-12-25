@@ -27,9 +27,10 @@
 #ifndef G2O_CORE_IO_FORMAT_H
 #define G2O_CORE_IO_FORMAT_H
 
+#include "g2o/core/g2o_core_api.h"
 namespace g2o::io {
 
-enum class Format { kG2O = 0, kBinary = 1, kJson = 2, kXML = 3 };
+enum class G2O_CORE_API Format { kG2O = 0, kBinary = 1, kJson = 2, kXML = 3 };
 
 }  // namespace g2o::io
 

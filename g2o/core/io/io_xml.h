@@ -27,11 +27,12 @@
 #ifndef G2O_CORE_IO_XML_FORMAT_H
 #define G2O_CORE_IO_XML_FORMAT_H
 
+#include "g2o/core/g2o_core_api.h"
 #include "io_interface.h"
 
 namespace g2o {
 
-class IoXml : public IoInterface {
+class G2O_CORE_API IoXml : public IoInterface {
  public:
   std::optional<AbstractGraph> load(std::istream& input) override;
   bool save(std::ostream& output, const AbstractGraph& graph) override;
