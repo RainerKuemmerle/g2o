@@ -1,5 +1,5 @@
 // g2o - General Graph Optimization
-// Copyright (C) 2014 R. Kuemmerle, G. Grisetti, W. Burgard
+// Copyright (C) 2011 R. Kuemmerle, G. Grisetti, W. Burgard
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -24,44 +24,61 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "g2o/types/slam2d_addons/edge_line2d.h"
-#include "g2o/types/slam2d_addons/edge_se2_line2d.h"
-#include "g2o/types/slam2d_addons/edge_se2_segment2d.h"
-#include "g2o/types/slam2d_addons/edge_se2_segment2d_line.h"
-#include "g2o/types/slam2d_addons/edge_se2_segment2d_pointLine.h"
-#include "g2o/types/slam2d_addons/vertex_segment2d.h"
-#include "gtest/gtest.h"
-#include "unit_test/test_helper/io.h"
+#include "io_xml.h"
 
-using namespace g2o;  // NOLINT
+#include <optional>
 
-struct RandomLine2D {
-  static Line2D create() { return Line2D(g2o::Vector2::Random()); }
-  static bool isApprox(const Line2D& a, const Line2D& b) {
-    return a.isApprox(b, 1e-5);
+#include "g2o/config.h"
+#include "g2o/core/abstract_graph.h"
+#include "g2o/stuff/logger.h"
+
+#ifdef G2O_HAVE_CEREAL
+#include <cereal/archives/xml.hpp>
+#include <cereal/cereal.hpp>
+#include <exception>
+
+#include "io_wrapper_cereal.h"  // IWYU pragma: keep
+#endif                          // HAVE CEREAL
+
+namespace g2o {
+
+#ifdef G2O_HAVE_CEREAL
+
+std::optional<AbstractGraph> IoXml::load(std::istream& input) {
+  try {
+    cereal::XMLInputArchive archive(input);
+    AbstractGraph result;
+    archive(cereal::make_nvp("graph", result));
+    return result;
+  } catch (const std::exception& e) {
+    G2O_ERROR("Exception while loading JSON: {}", e.what());
   }
-};
-
-TEST(IoSlam2dAddOns, ReadWriteVertexSegment2D) {
-  readWriteVectorBasedVertex<VertexSegment2D>();
+  return std::nullopt;
 }
 
-TEST(IoSlam2dAddOns, ReadWriteEdgeLine2D) {
-  readWriteVectorBasedEdge<EdgeLine2D, RandomLine2D>();
+bool IoXml::save(std::ostream& output, const AbstractGraph& graph) {
+  try {
+    cereal::XMLOutputArchive archive(output);
+    archive(cereal::make_nvp("graph", graph));
+    return true;
+  } catch (const std::exception& e) {
+    G2O_ERROR("Exception while saving JSON: {}", e.what());
+  }
+  return false;
 }
 
-TEST(IoSlam2dAddOns, ReadWriteEdgeSE2Line2D) {
-  readWriteVectorBasedEdge<EdgeSE2Line2D, RandomLine2D>();
+#else
+
+std::optional<AbstractGraph> IoXml::load(std::istream&) {
+  G2O_WARN("Loading XML is not supported");
+  return std::nullopt;
 }
 
-TEST(IoSlam2dAddOns, ReadWriteEdgeSE2Segment2D) {
-  readWriteVectorBasedEdge<EdgeSE2Segment2D>();
+bool IoXml::save(std::ostream&, const AbstractGraph&) {
+  G2O_WARN("Saving XML is not supported");
+  return false;
 }
 
-TEST(IoSlam2dAddOns, ReadWriteEdgeSE2Segment2DLine) {
-  readWriteVectorBasedEdge<EdgeSE2Segment2DLine>();
-}
+#endif
 
-TEST(IoSlam2dAddOns, ReadWriteEdgeSE2Segment2DPointLine) {
-  readWriteVectorBasedEdge<EdgeSE2Segment2DPointLine>();
-}
+}  // namespace g2o

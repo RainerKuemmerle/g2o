@@ -24,11 +24,13 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+#include <ios>
 #include <sstream>
 #include <vector>
 
 #include "g2o/config.h"  // IWYU pragma: keep
 #include "g2o/core/abstract_graph.h"
+#include "g2o/core/io/io_format.h"
 #include "g2o/core/optimizable_graph.h"
 #include "g2o/core/sparse_optimizer.h"
 #include "g2o/types/slam2d/edge_se2.h"
@@ -129,7 +131,10 @@ TEST_P(AbstractGraphIO, SaveAndLoad) {
   g2o::io::Format format = GetParam();
   g2o::AbstractGraph load_save_graph(abstract_graph_);
 
-  std::stringstream buffer;
+  std::stringstream buffer(format == g2o::io::Format::kBinary
+                               ? std::ios_base::binary | std::ios_base::in |
+                                     std::ios_base::out
+                               : std::ios_base::in | std::ios_base::out);
   bool save_result = load_save_graph.save(buffer, format);
   ASSERT_THAT(save_result, IsTrue());
   EXPECT_THAT(buffer.str(), Not(IsEmpty()));
@@ -196,7 +201,10 @@ class OptimizableGraphIO : public TestWithParam<g2o::io::Format> {
 TEST_P(OptimizableGraphIO, SaveAndLoad) {
   g2o::io::Format format = GetParam();
 
-  std::stringstream buffer;
+  std::stringstream buffer(format == g2o::io::Format::kBinary
+                               ? std::ios_base::binary | std::ios_base::in |
+                                     std::ios_base::out
+                               : std::ios_base::in | std::ios_base::out);
   bool save_result = optimizer_ptr_->save(buffer, format);
   ASSERT_THAT(save_result, IsTrue());
   EXPECT_THAT(buffer.str(), Not(IsEmpty()));
@@ -245,10 +253,11 @@ TEST_P(OptimizableGraphIO, SaveAndLoad) {
 
 namespace {
 // We can always test G2O format, others depend on libraries
-const auto kFileformatsToTest = Values(g2o::io::Format::kG2O
+const auto kFileformatsToTest = Values(
+    g2o::io::Format::kG2O
 #ifdef G2O_HAVE_CEREAL
-                                       ,
-                                       g2o::io::Format::kJson
+    ,
+    g2o::io::Format::kJson, g2o::io::Format::kXML, g2o::io::Format::kBinary
 #endif
 );
 }  // namespace

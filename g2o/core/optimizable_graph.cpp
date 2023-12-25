@@ -42,6 +42,7 @@
 #include "g2o/core/abstract_graph.h"
 #include "g2o/core/eigen_types.h"
 #include "g2o/core/hyper_graph.h"
+#include "g2o/core/io/io_format.h"
 #include "g2o/core/jacobian_workspace.h"
 #include "g2o/core/parameter.h"
 #include "g2o/core/parameter_container.h"
@@ -543,7 +544,9 @@ bool OptimizableGraph::load(std::istream& is, io::Format format) {
 }
 
 bool OptimizableGraph::load(const char* filename, io::Format format) {
-  std::ifstream ifs(filename);
+  std::ifstream ifs(filename, format == io::Format::kBinary
+                                  ? std::ios_base::in | std::ios::binary
+                                  : std::ios_base::in);
   if (!ifs) {
     G2O_ERROR("Unable to open file {}", filename);
     return false;
@@ -553,7 +556,9 @@ bool OptimizableGraph::load(const char* filename, io::Format format) {
 
 bool OptimizableGraph::save(const char* filename, io::Format format,
                             int level) const {
-  std::ofstream ofs(filename);
+  std::ofstream ofs(filename, format == io::Format::kBinary
+                                  ? std::ios_base::out | std::ios::binary
+                                  : std::ios_base::out);
   if (!ofs) return false;
   return save(ofs, format, level);
 }

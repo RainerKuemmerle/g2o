@@ -1,9 +1,9 @@
 [x] update python optimizable graph wrapper (save/load) with format
-[ ] add version number for file format
+[x] add version number for file format
 [ ] test save/load of dynamic vertex
 [ ] test save/load of dynamic edge
-[ ] binary format for save/load
-[ ] XML format for save/load
+[x] binary format for save/load
+[x] XML format for save/load
 [ ] wrap abstract graph to python and update save wrapper
 [ ] ParameterContainer remove read/write
 [ ] remove read/write methods for vertex / edge

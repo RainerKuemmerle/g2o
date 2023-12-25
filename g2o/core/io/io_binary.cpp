@@ -24,19 +24,61 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef G2O_CORE_IO_JSON_FORMAT_H
-#define G2O_CORE_IO_JSON_FORMAT_H
+#include "io_binary.h"
 
-#include "io_interface.h"
+#include <optional>
+
+#include "g2o/config.h"
+#include "g2o/core/abstract_graph.h"
+#include "g2o/stuff/logger.h"
+
+#ifdef G2O_HAVE_CEREAL
+#include <cereal/archives/portable_binary.hpp>
+#include <cereal/cereal.hpp>
+#include <exception>
+
+#include "io_wrapper_cereal.h"  // IWYU pragma: keep
+#endif                          // HAVE CEREAL
 
 namespace g2o {
 
-class IoJson : public IoInterface {
- public:
-  std::optional<AbstractGraph> load(std::istream& input) override;
-  bool save(std::ostream& output, const AbstractGraph& graph) override;
-};
+#ifdef G2O_HAVE_CEREAL
 
-}  // namespace g2o
+std::optional<AbstractGraph> IoBinary::load(std::istream& input) {
+  try {
+    cereal::PortableBinaryInputArchive archive(input);
+    AbstractGraph result;
+    archive(cereal::make_nvp("graph", result));
+    return result;
+  } catch (const std::exception& e) {
+    G2O_ERROR("Exception while loading JSON: {}", e.what());
+  }
+  return std::nullopt;
+}
+
+bool IoBinary::save(std::ostream& output, const AbstractGraph& graph) {
+  try {
+    cereal::PortableBinaryOutputArchive archive(output);
+    archive(cereal::make_nvp("graph", graph));
+    return true;
+  } catch (const std::exception& e) {
+    G2O_ERROR("Exception while saving JSON: {}", e.what());
+  }
+  return false;
+}
+
+#else
+
+std::optional<AbstractGraph> IoBinary::load(std::istream&) {
+  G2O_WARN("Loading BINARY is not supported");
+  return std::nullopt;
+}
+
+bool IoBinary::save(std::ostream&, const AbstractGraph&) {
+  G2O_WARN("Saving BINARY is not supported");
+  return false;
+}
 
 #endif
+
+}  // namespace g2o

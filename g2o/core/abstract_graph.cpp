@@ -30,8 +30,10 @@
 #include <memory>
 #include <optional>
 
+#include "g2o/core/io/io_binary.h"
 #include "g2o/core/io/io_format.h"
 #include "g2o/core/io/io_json.h"
+#include "g2o/core/io/io_xml.h"
 #include "g2o/stuff/logger.h"
 #include "io/io_g2o.h"
 
@@ -49,16 +51,22 @@ std::string_view to_string(g2o::io::Format format) {
   }
 }
 
+/**
+ * @brief Allocate an g2o::IoInterface to load/save data of the graph.
+ *
+ * @param format see g2o::io::Format
+ * @return std::unique_ptr<g2o::IoInterface> or nullptr for unsupported format.
+ */
 std::unique_ptr<g2o::IoInterface> allocate(g2o::io::Format format) {
   switch (format) {
     case g2o::io::Format::kG2O:
       return std::make_unique<g2o::IoG2O>();
     case g2o::io::Format::kBinary:
-      break;
+      return std::make_unique<g2o::IoBinary>();
     case g2o::io::Format::kJson:
       return std::make_unique<g2o::IoJson>();
     case g2o::io::Format::kXML:
-      break;
+      return std::make_unique<g2o::IoXml>();
   }
   G2O_CRITICAL("Failed to create graph IO interface for format {}",
                to_string(format));

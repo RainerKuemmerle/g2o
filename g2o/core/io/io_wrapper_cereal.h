@@ -31,6 +31,7 @@
 
 #ifdef G2O_HAVE_CEREAL
 
+#include <cereal/cereal.hpp>
 #include <cereal/types/polymorphic.hpp>
 #include <cereal/types/string.hpp>
 #include <cereal/types/vector.hpp>
@@ -39,8 +40,22 @@
 
 namespace g2o {
 
+/**
+ * @brief Versions of the IO API for the graph using cereal.
+ */
+enum class IoVersions {
+  kGraph = 0,
+  kData = 0,
+  kParameter = 0,
+  kGraphElement = 0,
+  kVertex = 0,
+  kEdge = 0,
+};
+
 template <class Archive>
-void serialize(Archive& archive, AbstractGraph& graph) {
+void serialize(Archive& archive, AbstractGraph& graph,
+               const std::uint32_t version) {
+  (void)version;
   archive(cereal::make_nvp("fixed", graph.fixed()),
           cereal::make_nvp("params", graph.parameters()),
           cereal::make_nvp("vertices", graph.vertices()),
@@ -48,25 +63,33 @@ void serialize(Archive& archive, AbstractGraph& graph) {
 }
 
 template <class Archive>
-void serialize(Archive& archive, AbstractGraph::AbstractData& data) {
+void serialize(Archive& archive, AbstractGraph::AbstractData& data,
+               const std::uint32_t version) {
+  (void)version;
   archive(cereal::make_nvp("tag", data.tag),
           cereal::make_nvp("data", data.data));
 }
 
 template <class Archive>
-void serialize(Archive& archive, AbstractGraph::AbstractParameter& param) {
+void serialize(Archive& archive, AbstractGraph::AbstractParameter& param,
+               const std::uint32_t version) {
+  (void)version;
   archive(cereal::make_nvp("tag", param.tag), cereal::make_nvp("id", param.id),
           cereal::make_nvp("value", param.value));
 }
 
 template <class Archive>
-void serialize(Archive& archive, AbstractGraph::AbstractGraphElement& elem) {
+void serialize(Archive& archive, AbstractGraph::AbstractGraphElement& elem,
+               const std::uint32_t version) {
+  (void)version;
   archive(cereal::make_nvp("tag", elem.tag),
           cereal::make_nvp("data", elem.data));
 }
 
 template <class Archive>
-void serialize(Archive& archive, AbstractGraph::AbstractVertex& vertex) {
+void serialize(Archive& archive, AbstractGraph::AbstractVertex& vertex,
+               const std::uint32_t version) {
+  (void)version;
   archive(cereal::make_nvp(
               "elem",
               cereal::base_class<AbstractGraph::AbstractGraphElement>(&vertex)),
@@ -75,7 +98,9 @@ void serialize(Archive& archive, AbstractGraph::AbstractVertex& vertex) {
 }
 
 template <class Archive>
-void serialize(Archive& archive, AbstractGraph::AbstractEdge& edge) {
+void serialize(Archive& archive, AbstractGraph::AbstractEdge& edge,
+               const std::uint32_t version) {
+  (void)version;
   archive(cereal::make_nvp(
               "elem",
               cereal::base_class<AbstractGraph::AbstractGraphElement>(&edge)),
@@ -86,6 +111,21 @@ void serialize(Archive& archive, AbstractGraph::AbstractEdge& edge) {
 }
 
 }  // namespace g2o
+
+// Register Version numbers
+CEREAL_CLASS_VERSION(g2o::AbstractGraph,
+                     static_cast<std::uint32_t>(g2o::IoVersions::kGraph));
+CEREAL_CLASS_VERSION(g2o::AbstractGraph::AbstractData,
+                     static_cast<std::uint32_t>(g2o::IoVersions::kData));
+CEREAL_CLASS_VERSION(g2o::AbstractGraph::AbstractParameter,
+                     static_cast<std::uint32_t>(g2o::IoVersions::kParameter));
+CEREAL_CLASS_VERSION(
+    g2o::AbstractGraph::AbstractGraphElement,
+    static_cast<std::uint32_t>(g2o::IoVersions::kGraphElement));
+CEREAL_CLASS_VERSION(g2o::AbstractGraph::AbstractVertex,
+                     static_cast<std::uint32_t>(g2o::IoVersions::kVertex));
+CEREAL_CLASS_VERSION(g2o::AbstractGraph::AbstractEdge,
+                     static_cast<std::uint32_t>(g2o::IoVersions::kEdge));
 
 #endif  // HAVE_CEREAL
 

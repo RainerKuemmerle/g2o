@@ -700,7 +700,16 @@ class G2O_CORE_API OptimizableGraph : public HyperGraph {
   //! vertices and edges.
   virtual bool load(std::istream& is, io::Format format = io::Format::kG2O);
   bool load(const char* filename, io::Format format = io::Format::kG2O);
-  //! save the graph to a stream. Again uses the Factory system.
+  /**
+   * @brief Save the graph into a stream
+   *
+   * @param os Output stream. Note: Has to be opened with std::ios::binary for
+   * writing in binary format.
+   * @param format Format for saving the data, see also io::Format
+   * @param level Level of the graph to save
+   * @return true if successful
+   * @return false otherwise.
+   */
   virtual bool save(std::ostream& os, io::Format format = io::Format::kG2O,
                     int level = 0) const;
   //! function provided for convenience, see save() above

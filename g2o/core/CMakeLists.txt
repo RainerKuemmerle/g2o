@@ -41,8 +41,10 @@ io_helper.h
 g2o_core_api.h
 # IO
 abstract_graph.cpp abstract_graph.h
-io/io_g2o.cpp io/io_g2o.h
+io/io_binary.cpp io/io_binary.h
 io/io_json.cpp io/io_json.h
+io/io_g2o.cpp io/io_g2o.h
+io/io_xml.cpp io/io_xml.h
 )
 
 target_include_directories(core PUBLIC
