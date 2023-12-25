@@ -26,15 +26,16 @@
 
 #include "io_json.h"
 
-#include <iostream>
 #include <optional>
 
 #include "g2o/config.h"
 #include "g2o/core/abstract_graph.h"
+#include "g2o/stuff/logger.h"
 
 #ifdef G2O_HAVE_CEREAL
 #include <cereal/archives/json.hpp>
 #include <cereal/cereal.hpp>
+#include <exception>
 
 #include "io_wrapper_cereal.h"  // IWYU pragma: keep
 #endif                          // HAVE CEREAL
@@ -44,25 +45,39 @@ namespace g2o {
 #ifdef G2O_HAVE_CEREAL
 
 std::optional<AbstractGraph> IoJson::load(std::istream& input) {
-  cereal::JSONInputArchive archive(input);
-  AbstractGraph result;
-  archive(cereal::make_nvp("graph", result));
-  return result;
+  try {
+    cereal::JSONInputArchive archive(input);
+    AbstractGraph result;
+    archive(cereal::make_nvp("graph", result));
+    return result;
+  } catch (const std::exception& e) {
+    G2O_ERROR("Exception while loading JSON: {}", e.what());
+  }
+  return std::nullopt;
 }
 
 bool IoJson::save(std::ostream& output, const AbstractGraph& graph) {
-  cereal::JSONOutputArchive archive(output);
-  archive(cereal::make_nvp("graph", graph));
-  return true;
+  try {
+    cereal::JSONOutputArchive archive(output);
+    archive(cereal::make_nvp("graph", graph));
+    return true;
+  } catch (const std::exception& e) {
+    G2O_ERROR("Exception while saving JSON: {}", e.what());
+  }
+  return false;
 }
 
 #else
 
 std::optional<AbstractGraph> IoJson::load(std::istream&) {
+  G2O_WARN("Loading JSON is not supported");
   return std::nullopt;
 }
 
-bool IoJson::save(std::ostream&, const AbstractGraph&) { return false; }
+bool IoJson::save(std::ostream&, const AbstractGraph&) {
+  G2O_WARN("Saving JSON is not supported");
+  return false;
+}
 
 #endif
 
