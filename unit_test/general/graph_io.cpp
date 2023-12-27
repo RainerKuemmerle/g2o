@@ -26,6 +26,7 @@
 
 #include <algorithm>
 #include <ios>
+#include <memory>
 #include <sstream>
 #include <string>
 #include <unordered_map>
@@ -36,6 +37,7 @@
 #include "g2o/core/io/io_format.h"
 #include "g2o/core/optimizable_graph.h"
 #include "g2o/core/sparse_optimizer.h"
+#include "g2o/types/data/vertex_tag.h"
 #include "g2o/types/slam2d/edge_se2.h"
 #include "g2o/types/slam2d/vertex_se2.h"
 #include "gmock/gmock.h"
@@ -211,6 +213,11 @@ class OptimizableGraphIO : public TestWithParam<g2o::io::Format> {
     v0->setId(0);
     optimizer_ptr_->addVertex(v0);
 
+    auto data = std::make_shared<g2o::VertexTag>();
+    data->setName("vertex_foobar");
+    data->setHostname("my_robot");
+    v0->setUserData(data);
+
     auto v1 = std::make_shared<g2o::VertexSE2>();
     v1->setId(1);
     optimizer_ptr_->addVertex(v1);
@@ -226,6 +233,11 @@ class OptimizableGraphIO : public TestWithParam<g2o::io::Format> {
     e1->setMeasurement(g2o::SE2(1, 0, 0));
     e1->setInformation(g2o::MatrixN<3>::Identity());
     optimizer_ptr_->addEdge(e1);
+
+    auto edge_data = std::make_shared<g2o::VertexTag>();
+    edge_data->setName("foobar");
+    edge_data->setHostname("my_robot");
+    e1->setUserData(edge_data);
 
     auto e2 = std::make_shared<g2o::EdgeSE2>();
     e2->vertices()[0] = optimizer_ptr_->vertex(1);

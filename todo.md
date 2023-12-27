@@ -2,6 +2,7 @@
 [ ] Create parameter type for ParameterStereoCamera to support load/save
 [ ] Re-work python wrapping for parameters
 [ ] Test load/save for VertexCam (camera and baseline seem missing from traits)
+[ ] Refactor Data container. Can it be a container instead of linked list?
 [x] update python optimizable graph wrapper (save/load) with format
 [x] add version number for file format
 [x] fix core API with exports for MSVC
