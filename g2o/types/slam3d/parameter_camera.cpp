@@ -51,7 +51,9 @@ ParameterCamera::ParameterCamera() {
 }
 
 void ParameterCamera::update() {
+  ParameterSE3Offset::update();
   Kcam_inverseOffsetR_ = Kcam_ * inverseOffset().rotation();
+  invKcam_ = Kcam_.inverse();
 }
 
 void ParameterCamera::setKcam(double fx, double fy, double cx, double cy) {
@@ -61,8 +63,6 @@ void ParameterCamera::setKcam(double fx, double fy, double cx, double cy) {
   Kcam_(0, 2) = cx;
   Kcam_(1, 2) = cy;
   Kcam_(2, 2) = 1.0;
-  invKcam_ = Kcam_.inverse();
-  Kcam_inverseOffsetR_ = Kcam_ * inverseOffset().rotation();
 }
 
 // bool ParameterCamera::read(std::istream& is) {
