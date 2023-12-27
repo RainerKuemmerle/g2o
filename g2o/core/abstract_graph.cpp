@@ -26,7 +26,6 @@
 
 #include "abstract_graph.h"
 
-#include <fstream>
 #include <memory>
 #include <optional>
 
@@ -78,11 +77,6 @@ std::unique_ptr<g2o::IoInterface> allocate(g2o::io::Format format) {
 
 namespace g2o {
 
-bool AbstractGraph::load(const std::string& filename, io::Format format) {
-  std::ifstream file_input(filename);
-  return load(file_input, format);
-}
-
 bool AbstractGraph::load(std::istream& input, io::Format format) {
   std::unique_ptr<g2o::IoInterface> loader_interface = allocate(format);
   if (!loader_interface) return false;
@@ -93,11 +87,6 @@ bool AbstractGraph::load(std::istream& input, io::Format format) {
   }
   *this = std::move(load_result.value());
   return true;
-}
-
-bool AbstractGraph::save(const std::string& filename, io::Format format) const {
-  std::ofstream file_output(filename);
-  return save(file_output, format);
 }
 
 bool AbstractGraph::save(std::ostream& output, io::Format format) const {

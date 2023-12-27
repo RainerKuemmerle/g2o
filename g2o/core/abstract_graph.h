@@ -109,10 +109,8 @@ class G2O_CORE_API AbstractGraph {
   AbstractGraph() = default;
   ~AbstractGraph() = default;
 
-  bool load(const std::string& filename, io::Format format);
   bool load(std::istream& input, io::Format format);
 
-  [[nodiscard]] bool save(const std::string& filename, io::Format format) const;
   [[nodiscard]] bool save(std::ostream& output, io::Format format) const;
 
   std::vector<int>& fixed() { return fixed_; };
