@@ -30,41 +30,26 @@
 
 #include "g2o/config.h"
 #include "g2o/core/abstract_graph.h"
-#include "g2o/stuff/logger.h"
 
 #ifdef G2O_HAVE_CEREAL
 #include <cereal/archives/xml.hpp>
 #include <cereal/cereal.hpp>
-#include <exception>
 
 #include "io_wrapper_cereal.h"  // IWYU pragma: keep
-#endif                          // HAVE CEREAL
+#else
+#include "g2o/stuff/logger.h"
+#endif  // HAVE CEREAL
 
 namespace g2o {
 
 #ifdef G2O_HAVE_CEREAL
 
 std::optional<AbstractGraph> IoXml::load(std::istream& input) {
-  try {
-    cereal::XMLInputArchive archive(input);
-    AbstractGraph result;
-    archive(cereal::make_nvp("graph", result));
-    return result;
-  } catch (const std::exception& e) {
-    G2O_ERROR("Exception while loading JSON: {}", e.what());
-  }
-  return std::nullopt;
+  return io::load<cereal::XMLInputArchive>(input, "XML");
 }
 
 bool IoXml::save(std::ostream& output, const AbstractGraph& graph) {
-  try {
-    cereal::XMLOutputArchive archive(output);
-    archive(cereal::make_nvp("graph", graph));
-    return true;
-  } catch (const std::exception& e) {
-    G2O_ERROR("Exception while saving JSON: {}", e.what());
-  }
-  return false;
+  return io::save<cereal::XMLOutputArchive>(output, graph, "XML");
 }
 
 #else

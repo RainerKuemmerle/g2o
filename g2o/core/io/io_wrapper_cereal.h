@@ -35,8 +35,12 @@
 #include <cereal/types/polymorphic.hpp>
 #include <cereal/types/string.hpp>
 #include <cereal/types/vector.hpp>
+#include <exception>
+#include <optional>
+#include <string_view>
 
 #include "g2o/core/abstract_graph.h"
+#include "g2o/stuff/logger.h"
 
 namespace g2o {
 
@@ -109,6 +113,35 @@ void serialize(Archive& archive, AbstractGraph::AbstractEdge& edge,
           cereal::make_nvp("measurement", edge.measurement),
           cereal::make_nvp("information", edge.information));
 }
+
+namespace io {
+template <typename ArchiveType>
+std::optional<AbstractGraph> load(std::istream& input, std::string_view name) {
+  try {
+    ArchiveType archive(input);
+    AbstractGraph result;
+    archive(cereal::make_nvp("graph", result));
+    return result;
+  } catch (const std::exception& e) {
+    G2O_ERROR("Exception while loading {}: {}", name, e.what());
+  }
+  return std::nullopt;
+}
+
+template <typename ArchiveType>
+bool save(std::ostream& output, const AbstractGraph& graph,
+          std::string_view name) {
+  try {
+    ArchiveType archive(output);
+    archive(cereal::make_nvp("graph", graph));
+    return true;
+  } catch (const std::exception& e) {
+    G2O_ERROR("Exception while saving {}: {}", name, e.what());
+  }
+  return false;
+}
+
+}  // namespace io
 
 }  // namespace g2o
 
