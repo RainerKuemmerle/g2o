@@ -27,9 +27,6 @@
 #ifndef G2O_EDGE_SE2_XY_CALIB_H
 #define G2O_EDGE_SE2_XY_CALIB_H
 
-#include <Eigen/Core>
-#include <iosfwd>
-
 #include "g2o/core/base_variable_sized_edge.h"
 #include "g2o/core/eigen_types.h"
 #include "g2o/core/optimizable_graph.h"
@@ -56,9 +53,6 @@ class G2O_TYPES_SLAM2D_API EdgeSE2PointXYCalib
     error_ = ((v1->estimate() * calib->estimate()).inverse() * l2->estimate()) -
              measurement_;
   }
-
-  bool read(std::istream& is) override;
-  bool write(std::ostream& os) const override;
 
   double initialEstimatePossible(const OptimizableGraph::VertexSet& from,
                                  OptimizableGraph::Vertex* to) override {

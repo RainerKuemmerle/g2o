@@ -29,7 +29,6 @@
 
 #include <Eigen/Core>
 #include <cmath>
-#include <iosfwd>
 
 #include "g2o/core/base_binary_edge.h"
 #include "g2o/core/eigen_types.h"
@@ -71,9 +70,6 @@ class G2O_TYPES_SLAM2D_ADDONS_API EdgeSE2Line2D
     measurement_ = Line2D(prediction);
     return true;
   }
-
-  bool read(std::istream& is) override;
-  bool write(std::ostream& os) const override;
 
   void initialEstimate(const OptimizableGraph::VertexSet& from,
                        OptimizableGraph::Vertex* to) override;

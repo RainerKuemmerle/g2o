@@ -28,7 +28,6 @@
 #define G2O_TUTORIAL_VERTEX_SE2_H
 
 #include "g2o/core/base_vertex.h"
-#include "g2o/core/hyper_graph_action.h"
 #include "g2o_tutorial_slam2d_api.h"
 #include "se2.h"
 
@@ -39,15 +38,7 @@ namespace g2o::tutorial {
  */
 class G2O_TUTORIAL_SLAM2D_API VertexSE2 : public BaseVertex<3, SE2> {
  public:
-  VertexSE2();
-
-  void oplusImpl(const g2o::VectorX::MapType& update) override {
-    SE2 up(update[0], update[1], update[2]);
-    estimate_ *= up;
-  }
-
-  bool read(std::istream& is) override;
-  bool write(std::ostream& os) const override;
+  void oplusImpl(const g2o::VectorX::MapType& update) override;
 };
 
 }  // namespace g2o::tutorial

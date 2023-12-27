@@ -27,8 +27,6 @@
 #ifndef G2O_SBA_VERTEX_CAM_H
 #define G2O_SBA_VERTEX_CAM_H
 
-#include <iosfwd>
-
 #include "g2o/core/base_vertex.h"
 #include "g2o/core/eigen_types.h"
 #include "g2o_types_sba_api.h"
@@ -45,24 +43,8 @@ namespace g2o {
  */
 class G2O_TYPES_SBA_API VertexCam : public BaseVertex<6, SBACam> {
  public:
-  //! reimplement reading VertexCam to support custom format
-  bool read(std::istream& is) override;
-  //! reimplement writing VertexCam to support custom format
-  bool write(std::ostream& os) const override;
-
-  virtual void setEstimate(const SBACam& cam) {
-    BaseVertex<6, SBACam>::setEstimate(cam);
-    estimate_.setTransform();
-    estimate_.setProjection();
-    estimate_.setDr();
-  }
-
-  void oplusImpl(const VectorX::MapType& update) override {
-    estimate_.update(update.head<kDimension>());
-    estimate_.setTransform();
-    estimate_.setProjection();
-    estimate_.setDr();
-  }
+  virtual void setEstimate(const SBACam& cam);
+  void oplusImpl(const VectorX::MapType& update) override;
 };
 }  // namespace g2o
 

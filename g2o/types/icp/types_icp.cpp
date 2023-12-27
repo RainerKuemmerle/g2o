@@ -28,13 +28,10 @@
 
 #include <Eigen/Geometry>
 #include <Eigen/LU>
-#include <iostream>
-#include <memory>
 
 #include "g2o/core/eigen_types.h"
 #include "g2o/core/factory.h"
 #include "g2o/stuff/misc.h"
-#include "g2o/types/icp/edge_gicp.h"
 
 namespace g2o {
 
@@ -66,40 +63,6 @@ double VertexSCam::baseline_;
 //
 // Rigid 3D constraint between poses, given fixed point offsets
 //
-
-// input two matched points between the frames
-// first point belongs to the first frame, position and normal
-// second point belongs to the second frame, position and normal
-//
-// the measurement variable has type EdgeGICP (see types_icp.h)
-
-bool EdgeVVGicp::read(std::istream& is) {
-  // measured point and normal
-  for (int i = 0; i < 3; i++) is >> measurement_.pos0[i];
-  for (int i = 0; i < 3; i++) is >> measurement_.normal0[i];
-
-  // measured point and normal
-  for (int i = 0; i < 3; i++) is >> measurement_.pos1[i];
-  for (int i = 0; i < 3; i++) is >> measurement_.normal1[i];
-
-  measurement_.makeRot0();  // set up rotation matrices
-
-  // GICP info matrices
-
-  // point-plane only
-  Matrix3 prec;
-  double v = cst(.01);
-  prec << v, 0, 0, 0, v, 0, 0, 0, 1;
-  const Matrix3& R = measurement().R0;  // plane of the point in vp0
-  information() = R.transpose() * prec * R;
-
-  //    information().setIdentity();
-
-  //    setRobustKernel(true);
-  // setHuberWidth(0.01);      // units? m?
-
-  return true;
-}
 
 // return the error estimate as a 3-vector
 void EdgeVVGicp::computeError() {
@@ -165,18 +128,6 @@ void EdgeVVGicp::linearizeOplus() {
   }
 }
 #endif
-
-bool EdgeVVGicp::write(std::ostream& os) const {
-  // first point
-  for (int i = 0; i < 3; i++) os << measurement().pos0[i] << " ";
-  for (int i = 0; i < 3; i++) os << measurement().normal0[i] << " ";
-
-  // second point
-  for (int i = 0; i < 3; i++) os << measurement().pos1[i] << " ";
-  for (int i = 0; i < 3; i++) os << measurement().normal1[i] << " ";
-
-  return os.good();
-}
 
 //
 // stereo camera functions
@@ -276,9 +227,6 @@ void Edge_XYZ_VSC::linearizeOplus() {
       (pz * dp(0) - (px - b) * dp(2)) * ipz2fx;  // right image px
 }
 #endif
-bool EdgeXyzVsc::read(std::istream&) { return false; }
-
-bool EdgeXyzVsc::write(std::ostream&) const { return false; }
 
 void EdgeXyzVsc::computeError() {
   // from <Point> to <Cam>
@@ -294,10 +242,6 @@ void EdgeXyzVsc::computeError() {
   // measurement_ is the measured projection
   error_ = kp - measurement_;
 }
-
-bool VertexSCam::read(std::istream&) { return false; }
-
-bool VertexSCam::write(std::ostream&) const { return false; }
 
 void VertexSCam::oplusImpl(const VectorX::MapType& update) {
   VertexSE3::oplusImpl(update);

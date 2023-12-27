@@ -32,10 +32,7 @@
 #include <string>
 #include <typeinfo>
 
-#include "g2o/core/cache.h"
-#include "g2o/core/io_helper.h"
 #include "g2o/core/parameter.h"
-#include "g2o/stuff/property.h"
 #include "g2o/types/slam3d/parameter_camera.h"
 #include "g2o/types/slam3d/vertex_pointxyz.h"
 #include "g2o/types/slam3d/vertex_se3.h"
@@ -60,18 +57,6 @@ bool EdgeSE3PointXYZDisparity::resolveCaches() {
   pv[0] = parameters_[0];
   cache_ = resolveCache<CacheCamera>(vertexXn<0>(), "CACHE_CAMERA", pv);
   return cache_ != nullptr;
-}
-
-bool EdgeSE3PointXYZDisparity::read(std::istream& is) {
-  readParamIds(is);
-  internal::readVector(is, measurement_);
-  return readInformationMatrix(is);
-}
-
-bool EdgeSE3PointXYZDisparity::write(std::ostream& os) const {
-  writeParamIds(os);
-  internal::writeVector(os, measurement());
-  return writeInformationMatrix(os);
 }
 
 void EdgeSE3PointXYZDisparity::computeError() {
@@ -168,7 +153,7 @@ void EdgeSE3PointXYZDisparity::initialEstimate(
   p.head<2>() = measurement_.head<2>() * w;
   p(2) = w;
   p = invKcam * p;
-  p = cam->estimate() * (cache_->camParams()->offset() * p);
+  p = cam->estimate() * (cache_->camParams()->param() * p);
   point->setEstimate(p);
 }
 
@@ -190,7 +175,7 @@ bool EdgeProjectDisparityDrawAction::operator()(
   if (!fromEdge || !toEdge) return true;
   ParameterCamera* camParam =
       static_cast<ParameterCamera*>(e->parameter(0).get());
-  Isometry3 fromTransform = fromEdge->estimate() * camParam->offset();
+  Isometry3 fromTransform = fromEdge->estimate() * camParam->param();
   glColor3f(LANDMARK_EDGE_COLOR);
   glPushAttrib(GL_ENABLE_BIT);
   glDisable(GL_LIGHTING);

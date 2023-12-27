@@ -30,8 +30,6 @@
 #include <Eigen/Geometry>
 #include <cassert>
 
-#include "g2o/core/cache.h"
-#include "g2o/core/io_helper.h"
 #include "g2o/core/parameter.h"
 #include "g2o/types/slam3d/parameter_camera.h"
 #include "g2o/types/slam3d/vertex_pointxyz.h"
@@ -52,18 +50,6 @@ bool EdgeSE3PointXYZDepth::resolveCaches() {
   pv[0] = parameters_[0];
   cache_ = resolveCache<CacheCamera>(vertexXn<0>(), "CACHE_CAMERA", pv);
   return cache_ != nullptr;
-}
-
-bool EdgeSE3PointXYZDepth::read(std::istream& is) {
-  readParamIds(is);
-  internal::readVector(is, measurement_);  // measured keypoint
-  return readInformationMatrix(is);
-}
-
-bool EdgeSE3PointXYZDepth::write(std::ostream& os) const {
-  writeParamIds(os);
-  internal::writeVector(os, measurement());
-  return writeInformationMatrix(os);
 }
 
 void EdgeSE3PointXYZDepth::computeError() {
@@ -151,7 +137,7 @@ void EdgeSE3PointXYZDepth::initialEstimate(
   p(2) = measurement_(2);
   p.head<2>() = measurement_.head<2>() * p(2);
   p = invKcam * p;
-  point->setEstimate(cam->estimate() * (cache_->camParams()->offset() * p));
+  point->setEstimate(cam->estimate() * (cache_->camParams()->param() * p));
 }
 
 }  // namespace g2o

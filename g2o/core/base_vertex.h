@@ -34,13 +34,11 @@
 #include <climits>
 #include <cmath>
 #include <cstring>
-#include <iosfwd>
 #include <limits>
 #include <stack>
 #include <vector>
 
 #include "g2o/core/eigen_types.h"
-#include "g2o/core/io_helper.h"
 #include "g2o/core/type_traits.h"
 #include "optimizable_graph.h"
 
@@ -129,20 +127,6 @@ class BaseVertex : public OptimizableGraph::Vertex {
     updateCache();
   }
 
-  //! generic read based on Trait reading a vector
-  bool read(std::istream& is) override {
-    typename TypeTraits<EstimateType>::VectorType estimate_data;
-    bool state = internal::readVector(is, estimate_data);
-    setEstimate(TypeTraits<EstimateType>::fromVector(estimate_data));
-    return state;
-  }
-
-  //! generic write  based on Trait reading a vector
-  bool write(std::ostream& os) const override {
-    return internal::writeVector(
-        os, TypeTraits<EstimateType>::toVector(estimate()));
-  }
-
   // methods based on the traits interface
   void setToOriginImpl() final {
     setEstimate(TypeTraits<EstimateType>::Identity());
@@ -157,6 +141,7 @@ class BaseVertex : public OptimizableGraph::Vertex {
     updateCache();
     return true;
   }
+  using OptimizableGraph::Vertex::setEstimateData;
 
   bool getEstimateData(double* est) const final {
     static_assert(TypeTraits<EstimateType>::kVectorDimension != INT_MIN,
@@ -164,6 +149,7 @@ class BaseVertex : public OptimizableGraph::Vertex {
     TypeTraits<EstimateType>::toData(estimate(), est);
     return true;
   }
+  using OptimizableGraph::Vertex::getEstimateData;
 
   [[nodiscard]] int estimateDimension() const final {
     static_assert(TypeTraits<EstimateType>::kVectorDimension != INT_MIN,

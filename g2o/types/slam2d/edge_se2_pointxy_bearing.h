@@ -29,7 +29,6 @@
 
 #include <Eigen/Core>
 #include <cmath>
-#include <iosfwd>
 #include <memory>
 
 #include "g2o/config.h"
@@ -65,9 +64,6 @@ class G2O_TYPES_SLAM2D_API EdgeSE2PointXYBearing
     measurement_ = std::atan2(delta[1], delta[0]);
     return true;
   }
-
-  bool read(std::istream& is) override;
-  bool write(std::ostream& os) const override;
 
   double initialEstimatePossible(const OptimizableGraph::VertexSet& from,
                                  OptimizableGraph::Vertex*) override {

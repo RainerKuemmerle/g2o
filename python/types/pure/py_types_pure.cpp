@@ -3,10 +3,6 @@
 #include <pybind11/cast.h>
 #include <pybind11/pytypes.h>
 
-#include <Eigen/Core>
-#include <stdexcept>
-
-#include "g2o/config.h"
 #include "g2o/core/base_dynamic_vertex.h"
 #include "g2o/core/base_variable_sized_edge.h"
 #include "g2o/core/eigen_types.h"
@@ -16,21 +12,6 @@ namespace g2o {
 class VectorXVertex : public BaseDynamicVertex<VectorX> {
  public:
   VectorXVertex() = default;
-
-  bool read(std::istream& is) override {
-    int dimension;
-    is >> dimension;
-    if (!is.good()) {
-      return false;
-    }
-    setDimension(dimension);
-    return g2o::internal::readVector(is, estimate_);
-  }
-
-  bool write(std::ostream& os) const override {
-    os << estimate_.size() << " ";
-    return g2o::internal::writeVector(os, estimate_);
-  }
 
   bool setDimensionImpl(int newDimension) override {
     const int oldDimension = dimension();
@@ -74,9 +55,6 @@ class VariableVectorXEdge
   VariableVectorXEdge() { resize(0); }
 
   void computeError() override { error_ = compute_error(); }
-
-  bool read(std::istream&) override { return false; }
-  bool write(std::ostream&) const override { return false; }
 
   // python trampoline
   virtual VectorX compute_error() = 0;

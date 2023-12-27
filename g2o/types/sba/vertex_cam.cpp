@@ -27,62 +27,72 @@
 #include "vertex_cam.h"
 
 #include <Eigen/Core>
-#include <ostream>
 
-#include "g2o/core/io_helper.h"
-#include "g2o/stuff/logger.h"
-#include "g2o/stuff/misc.h"
 #include "g2o/types/sba/sbacam.h"
 
 namespace g2o {
 
-bool VertexCam::read(std::istream& is) {
-  // first the position and orientation (vector3 and quaternion)
-  Vector3 t;
-  internal::readVector(is, t);
-  Quaternion r;
-  internal::readVector(is, r.coeffs());
-  r.normalize();  // recover nummeric precision
-
-  // form the camera object
-  SBACam cam(r, t);
-
-  // now fx, fy, cx, cy, baseline
-  double fx;
-
-  // try to read one value
-  is >> fx;
-  if (is.good()) {
-    double fy;
-    double cx;
-    double cy;
-    double tx;
-    is >> fy >> cx >> cy >> tx;
-    cam.setKcam(fx, fy, cx, cy, tx);
-  } else {
-    is.clear();
-    G2O_WARN("cam not defined, using defaults");
-    cam.setKcam(300, 300, 320, 320, cst(0.1));
-  }
-
-  setEstimate(cam);
-  return true;
+void VertexCam::setEstimate(const SBACam& cam) {
+  BaseVertex<6, SBACam>::setEstimate(cam);
+  estimate_.setTransform();
+  estimate_.setProjection();
+  estimate_.setDr();
 }
 
-bool VertexCam::write(std::ostream& os) const {
-  const SBACam& cam = estimate();
-
-  // first the position and orientation (vector3 and quaternion)
-  internal::writeVector(os, cam.translation());
-  internal::writeVector(os, cam.rotation().coeffs());
-
-  // now fx, fy, cx, cy, baseline
-  os << cam.Kcam(0, 0) << " ";
-  os << cam.Kcam(1, 1) << " ";
-  os << cam.Kcam(0, 2) << " ";
-  os << cam.Kcam(1, 2) << " ";
-  os << cam.baseline << " ";
-  return os.good();
+void VertexCam::oplusImpl(const VectorX::MapType& update) {
+  estimate_.update(update.head<kDimension>());
+  estimate_.setTransform();
+  estimate_.setProjection();
+  estimate_.setDr();
 }
+
+// bool VertexCam::read(std::istream& is) {
+//   // first the position and orientation (vector3 and quaternion)
+//   Vector3 t;
+//   internal::readVector(is, t);
+//   Quaternion r;
+//   internal::readVector(is, r.coeffs());
+//   r.normalize();  // recover nummeric precision
+
+//   // form the camera object
+//   SBACam cam(r, t);
+
+//   // now fx, fy, cx, cy, baseline
+//   double fx;
+
+//   // try to read one value
+//   is >> fx;
+//   if (is.good()) {
+//     double fy;
+//     double cx;
+//     double cy;
+//     double tx;
+//     is >> fy >> cx >> cy >> tx;
+//     cam.setKcam(fx, fy, cx, cy, tx);
+//   } else {
+//     is.clear();
+//     G2O_WARN("cam not defined, using defaults");
+//     cam.setKcam(300, 300, 320, 320, cst(0.1));
+//   }
+
+//   setEstimate(cam);
+//   return true;
+// }
+
+// bool VertexCam::write(std::ostream& os) const {
+//   const SBACam& cam = estimate();
+
+//   // first the position and orientation (vector3 and quaternion)
+//   internal::writeVector(os, cam.translation());
+//   internal::writeVector(os, cam.rotation().coeffs());
+
+//   // now fx, fy, cx, cy, baseline
+//   os << cam.Kcam(0, 0) << " ";
+//   os << cam.Kcam(1, 1) << " ";
+//   os << cam.Kcam(0, 2) << " ";
+//   os << cam.Kcam(1, 2) << " ";
+//   os << cam.baseline << " ";
+//   return os.good();
+// }
 
 }  // namespace g2o

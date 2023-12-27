@@ -27,9 +27,7 @@
 #ifndef G2O_EDGE_SE3_LINE_H_
 #define G2O_EDGE_SE3_LINE_H_
 
-#include <iosfwd>
 #include <memory>
-#include <tuple>
 
 #include "g2o/config.h"
 #include "g2o/core/base_binary_edge.h"
@@ -50,9 +48,6 @@ class G2O_TYPES_SLAM3D_ADDONS_API EdgeSE3Line3D
     : public BaseBinaryEdge<4, Line3D, VertexSE3, VertexLine3D> {
  public:
   EdgeSE3Line3D();
-
-  bool read(std::istream& is) override;
-  bool write(std::ostream& os) const override;
 
   void computeError() override;
 

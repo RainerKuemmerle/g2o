@@ -67,7 +67,7 @@ void SensorSE3Prior::sense() {
     count++;
   }
   if (!robotPoseObject_) return;
-  sensorPose_ = robotPoseObject_->vertex()->estimate() * offsetParam_->offset();
+  sensorPose_ = robotPoseObject_->vertex()->estimate() * offsetParam_->param();
   auto e = mkEdge();
   if (e && graph()) {
     e->setParameterId(0, offsetParam_->id());

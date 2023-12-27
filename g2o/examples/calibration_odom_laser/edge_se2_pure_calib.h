@@ -102,9 +102,6 @@ class G2O_CALIBRATION_ODOM_LASER_API EdgeSE2PureCalib
   EdgeSE2PureCalib() = default;
 
   void computeError() override;
-
-  bool read(std::istream& is) override;
-  bool write(std::ostream& os) const override;
 };
 
 }  // namespace g2o

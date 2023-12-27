@@ -27,13 +27,9 @@
 #ifndef G2O_EDGE_SE3_CALIB_H
 #define G2O_EDGE_SE3_CALIB_H
 
-#include <iosfwd>
-
 #include "g2o/core/base_variable_sized_edge.h"
 #include "g2o/core/eigen_types.h"
-#include "g2o/types/slam3d/isometry3d_mappings.h"
-#include "g2o/types/slam3d/type_traits_isometry3.h"
-#include "g2o/types/slam3d/vertex_se3.h"
+#include "g2o/types/slam3d/type_traits_isometry3.h"  // IWYU pragma: keep
 #include "g2o_types_slam3d_addons_api.h"
 
 namespace g2o {
@@ -50,8 +46,6 @@ class EdgeSE3Calib
   EdgeSE3Calib();
 
   G2O_TYPES_SLAM3D_ADDONS_API void computeError() override;
-  G2O_TYPES_SLAM3D_ADDONS_API bool read(std::istream& is) override;
-  G2O_TYPES_SLAM3D_ADDONS_API bool write(std::ostream& os) const override;
 };
 
 }  // namespace g2o

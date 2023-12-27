@@ -28,7 +28,6 @@
 #define G2O_EDGE_SE2_POINT_XY_H
 
 #include <Eigen/Core>
-#include <iosfwd>
 #include <memory>
 
 #include "g2o/config.h"
@@ -61,9 +60,6 @@ class G2O_TYPES_SLAM2D_API EdgeSE2PointXY
     measurement_ = v1->estimate().inverse() * l2->estimate();
     return true;
   }
-
-  bool read(std::istream& is) override;
-  bool write(std::ostream& os) const override;
 
   void initialEstimate(const OptimizableGraph::VertexSet& from,
                        OptimizableGraph::Vertex* to) override;

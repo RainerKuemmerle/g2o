@@ -27,7 +27,6 @@
 #ifndef G2O_VERTEX_SE3_
 #define G2O_VERTEX_SE3_
 
-#include <iosfwd>
 #include <memory>
 
 #include "g2o/config.h"
@@ -56,9 +55,6 @@ namespace g2o {
 class G2O_TYPES_SLAM3D_API VertexSE3 : public BaseVertex<6, Isometry3> {
  public:
   VertexSE3();
-
-  bool read(std::istream& is) override;
-  bool write(std::ostream& os) const override;
 
   /**
    * update the position of this vertex. The update is in the form

@@ -220,7 +220,7 @@ TEST(Slam3D, EdgeSE3PointXYZJacobian) {
   auto my_epsilon = [](const double, const double) { return 1e-3; };
 
   for (int k = 0; k < 10000; ++k) {
-    paramOffset->setOffset(internal::randomIsometry3());
+    paramOffset->setParam(internal::randomIsometry3());
     v1->setEstimate(internal::randomIsometry3());
     v2->setEstimate(Eigen::Vector3d::Random());
     e->setMeasurement(Eigen::Vector3d::Random());
@@ -359,7 +359,7 @@ TEST(Slam3D, EdgeSE3PointXYZDepthJacobian) {
   numericJacobianWorkspace.allocate();
 
   for (int k = 0; k < 10000; ++k) {
-    paramOffset->setOffset(internal::randomIsometry3());
+    paramOffset->setParam(internal::randomIsometry3());
     v1->setEstimate(internal::randomIsometry3());
     v2->setEstimate(Eigen::Vector3d::Random());
     e->setMeasurement(Eigen::Vector3d::Random());
@@ -397,7 +397,7 @@ TEST(Slam3D, EdgeSE3PointXYZDisparityJacobian) {
   numericJacobianWorkspace.allocate();
 
   for (int k = 0; k < 10000; ++k) {
-    paramOffset->setOffset(internal::randomIsometry3());
+    paramOffset->setParam(internal::randomIsometry3());
     v1->setEstimate(internal::randomIsometry3());
     v2->setEstimate(Eigen::Vector3d::Random());
     e->setMeasurement(Eigen::Vector3d::Random());

@@ -27,15 +27,11 @@
 #include "edge_se2_pointxy_offset.h"
 
 #include <cassert>
-#include <iostream>
 
-#include "g2o/core/cache.h"
-#include "g2o/core/io_helper.h"
 #include "g2o/core/parameter.h"
 #include "g2o/types/slam2d/vertex_point_xy.h"
 #include "g2o/types/slam2d/vertex_se2.h"
 #include "parameter_se2_offset.h"
-#include "se2.h"
 
 namespace g2o {
 
@@ -51,25 +47,6 @@ bool EdgeSE2PointXYOffset::resolveCaches() {
   pv[0] = parameters_[0];
   cache_ = resolveCache<CacheSE2Offset>(vertexXn<0>(), "CACHE_SE2_OFFSET", pv);
   return cache_ != nullptr;
-}
-
-bool EdgeSE2PointXYOffset::read(std::istream& is) {
-  int pId;
-  is >> pId;
-  setParameterId(0, pId);
-  // measured keypoint
-  internal::readVector(is, measurement_);
-  if (is.bad()) return false;
-  readInformationMatrix(is);
-  //  we overwrite the information matrix in case of read errors
-  if (is.bad()) information().setIdentity();
-  return true;
-}
-
-bool EdgeSE2PointXYOffset::write(std::ostream& os) const {
-  os << parameters_[0]->id() << " ";
-  internal::writeVector(os, measurement());
-  return writeInformationMatrix(os);
 }
 
 void EdgeSE2PointXYOffset::computeError() {

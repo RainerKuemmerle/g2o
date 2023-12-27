@@ -26,12 +26,8 @@
 
 #include "edge_se3_plane_calib.h"
 
-#include <Eigen/Core>
-#include <iostream>
 #include <string>
-#include <typeinfo>
 
-#include "g2o/core/io_helper.h"
 #include "g2o/stuff/macros.h"
 #include "g2o/stuff/misc.h"
 #include "g2o/stuff/opengl_wrapper.h"
@@ -41,21 +37,6 @@ namespace g2o {
 EdgeSE3PlaneSensorCalib::EdgeSE3PlaneSensorCalib()
     : color(cst(0.1), cst(0.1), cst(0.1)) {
   resize(3);
-}
-
-bool EdgeSE3PlaneSensorCalib::read(std::istream& is) {
-  Vector4 v;
-  bool state = internal::readVector(is, v);
-  setMeasurement(Plane3D(v));
-  state &= internal::readVector(is, color);
-  state &= readInformationMatrix(is);
-  return state;
-}
-
-bool EdgeSE3PlaneSensorCalib::write(std::ostream& os) const {
-  internal::writeVector(os, measurement().toVector());
-  internal::writeVector(os, color);
-  return writeInformationMatrix(os);
 }
 
 #ifdef G2O_HAVE_OPENGL

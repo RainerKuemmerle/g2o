@@ -28,10 +28,8 @@
 
 #include <Eigen/Core>
 
-#include "g2o/core/io_helper.h"
 #include "g2o/types/sba/parameter_cameraparameters.h"
 #include "g2o/types/sba/vertex_se3_expmap.h"
-#include "g2o/types/slam3d/se3quat.h"
 
 namespace g2o {
 
@@ -46,18 +44,6 @@ void EdgeProjectXYZ2UVU::computeError() {
   auto cam = std::static_pointer_cast<CameraParameters>(parameter(0));
   error_ = measurement() -
            cam->stereocam_uvu_map(v1->estimate().map(v2->estimate()));
-}
-
-bool EdgeProjectXYZ2UVU::read(std::istream& is) {
-  readParamIds(is);
-  internal::readVector(is, measurement_);
-  return readInformationMatrix(is);
-}
-
-bool EdgeProjectXYZ2UVU::write(std::ostream& os) const {
-  writeParamIds(os);
-  internal::writeVector(os, measurement());
-  return writeInformationMatrix(os);
 }
 
 }  // namespace g2o

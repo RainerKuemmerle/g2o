@@ -26,7 +26,6 @@
 
 #include "edge_project_stereo_xyz.h"
 
-#include "g2o/core/io_helper.h"
 #include "g2o/types/sba/vertex_se3_expmap.h"
 
 namespace g2o {
@@ -39,16 +38,6 @@ Vector3 EdgeStereoSE3ProjectXYZ::cam_project(const Vector3& trans_xyz,
   res[1] = trans_xyz[1] * invz * fy + cy;
   res[2] = res[0] - bf * invz;
   return res;
-}
-
-bool EdgeStereoSE3ProjectXYZ::read(std::istream& is) {
-  internal::readVector(is, measurement_);
-  return readInformationMatrix(is);
-}
-
-bool EdgeStereoSE3ProjectXYZ::write(std::ostream& os) const {
-  internal::writeVector(os, measurement());
-  return writeInformationMatrix(os);
 }
 
 void EdgeStereoSE3ProjectXYZ::linearizeOplus() {

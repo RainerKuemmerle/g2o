@@ -26,25 +26,22 @@
 
 #include "parameter_stereo_camera.h"
 
-#include <ostream>
-
 #include "g2o/stuff/misc.h"
-#include "g2o/types/slam3d/parameter_camera.h"
 
 namespace g2o {
 
 ParameterStereoCamera::ParameterStereoCamera() : baseline_(cst(0.075)) {}
 
-bool ParameterStereoCamera::read(std::istream& is) {
-  bool state = ParameterCamera::read(is);
-  is >> baseline_;
-  return is.good() && state;
-}
+// bool ParameterStereoCamera::read(std::istream& is) {
+//   bool state = ParameterCamera::read(is);
+//   is >> baseline_;
+//   return is.good() && state;
+// }
 
-bool ParameterStereoCamera::write(std::ostream& os) const {
-  bool state = ParameterCamera::write(os);
-  os << baseline() << " ";
-  return state && os.good();
-}
+// bool ParameterStereoCamera::write(std::ostream& os) const {
+//   bool state = ParameterCamera::write(os);
+//   os << baseline() << " ";
+//   return state && os.good();
+// }
 
 }  // namespace g2o

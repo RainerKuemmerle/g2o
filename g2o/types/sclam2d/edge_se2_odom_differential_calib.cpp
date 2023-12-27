@@ -26,9 +26,7 @@
 
 #include "edge_se2_odom_differential_calib.h"
 
-#include <ostream>
 #include <string>
-#include <typeinfo>
 
 #include "g2o/types/sclam2d/odometry_measurement.h"
 
@@ -38,20 +36,24 @@
 
 namespace g2o {
 
-bool EdgeSE2OdomDifferentialCalib::read(std::istream& is) {
-  double vl;
-  double vr;
-  double dt;
-  is >> vl >> vr >> dt;
-  VelocityMeasurement vm(vl, vr, dt);
-  setMeasurement(vm);
-  return readInformationMatrix(is);
-}
+void EdgeSE2OdomDifferentialCalib::computeError() {
+  const VertexSE2* v1 = vertexXnRaw<0>();
+  const VertexSE2* v2 = vertexXnRaw<1>();
+  const VertexOdomDifferentialParams* params = vertexXnRaw<2>();
+  const SE2& x1 = v1->estimate();
+  const SE2& x2 = v2->estimate();
 
-bool EdgeSE2OdomDifferentialCalib::write(std::ostream& os) const {
-  os << measurement().vl() << " " << measurement().vr() << " "
-     << measurement().dt() << " ";
-  return writeInformationMatrix(os);
+  // get the calibrated motion given by the odometry
+  VelocityMeasurement calibratedVelocityMeasurement(
+      measurement().vl() * params->estimate()(0),
+      measurement().vr() * params->estimate()(1), measurement().dt());
+  MotionMeasurement mm = OdomConvert::convertToMotion(
+      calibratedVelocityMeasurement, params->estimate()(2));
+  SE2 Ku_ij;
+  Ku_ij.fromVector(mm.measurement());
+
+  SE2 delta = Ku_ij.inverse() * x1.inverse() * x2;
+  error_ = delta.toVector();
 }
 
 #ifdef G2O_HAVE_OPENGL

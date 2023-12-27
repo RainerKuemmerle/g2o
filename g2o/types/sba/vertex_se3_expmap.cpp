@@ -26,20 +26,7 @@
 
 #include "vertex_se3_expmap.h"
 
-#include "g2o/core/io_helper.h"
-
 namespace g2o {
-
-bool VertexSE3Expmap::read(std::istream& is) {
-  Vector7 est;
-  internal::readVector(is, est);
-  setEstimate(SE3Quat(est).inverse());
-  return true;
-}
-
-bool VertexSE3Expmap::write(std::ostream& os) const {
-  return internal::writeVector(os, estimate().inverse().toVector());
-}
 
 void VertexSE3Expmap::oplusImpl(const VectorX::MapType& update) {
   setEstimate(SE3Quat::exp(update.head<kDimension>()) * estimate());

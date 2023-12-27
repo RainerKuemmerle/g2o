@@ -27,16 +27,10 @@
 #ifndef G2O_SE3_LOTSOF_XYZ
 #define G2O_SE3_LOTSOF_XYZ
 
-#include <Eigen/Core>
-#include <iosfwd>
-
-#include "g2o/config.h"
 #include "g2o/core/base_variable_sized_edge.h"
 #include "g2o/core/eigen_types.h"
 #include "g2o/core/optimizable_graph.h"
 #include "g2o_types_slam3d_api.h"
-#include "vertex_pointxyz.h"
-#include "vertex_se3.h"
 
 namespace g2o {
 
@@ -48,6 +42,7 @@ class G2O_TYPES_SLAM3D_API EdgeSE3LotsOfXYZ
  public:
   EdgeSE3LotsOfXYZ();
 
+  // TODO(Rainer): Remove setSize function and observedPoints member
   void setSize(int vertices) {
     resize(vertices);
     observedPoints_ = vertices - 1;
@@ -56,9 +51,6 @@ class G2O_TYPES_SLAM3D_API EdgeSE3LotsOfXYZ
   }
 
   void computeError() override;
-
-  bool read(std::istream& is) override;
-  bool write(std::ostream& os) const override;
 
   bool setMeasurementFromState() override;
 

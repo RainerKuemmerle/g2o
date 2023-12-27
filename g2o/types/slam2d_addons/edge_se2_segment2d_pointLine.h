@@ -28,14 +28,9 @@
 #define G2O_EDGE_SE2_SEGMENT2D_POINTLINE_H
 
 #include <Eigen/Core>
-#include <cmath>
-#include <iosfwd>
 
-#include "g2o/config.h"
 #include "g2o/core/base_binary_edge.h"
 #include "g2o/core/eigen_types.h"
-#include "g2o/stuff/misc.h"
-#include "g2o/types/slam2d/se2.h"
 #include "g2o/types/slam2d/vertex_se2.h"
 #include "g2o_types_slam2d_addons_api.h"
 #include "vertex_segment2d.h"
@@ -60,44 +55,9 @@ class G2O_TYPES_SLAM2D_ADDONS_API EdgeSE2Segment2DPointLine
   [[nodiscard]] int pointNum() const { return pointNum_; }
   void setPointNum(int pn) { pointNum_ = pn; }
 
-  void computeError() override {
-    const VertexSE2* v1 = vertexXnRaw<0>();
-    const VertexSegment2D* l2 = vertexXnRaw<1>();
-    SE2 iEst = v1->estimate().inverse();
-    Vector2 predP1 = iEst * l2->estimateP1();
-    Vector2 predP2 = iEst * l2->estimateP2();
-    Vector2 dP = predP2 - predP1;
-    Vector2 normal(dP.y(), -dP.x());
-    normal.normalize();
-    Vector3 prediction;
-    prediction[2] = std::atan2(normal.y(), normal.x());
-    Eigen::Map<Vector2> pt(prediction.data());
-    pt = (pointNum_ == 0) ? predP1 : predP2;
-    error_ = prediction - measurement_;
-    error_[2] = normalize_theta(error_[2]);
-  }
+  void computeError() override;
 
-  bool setMeasurementFromState() override {
-    const VertexSE2* v1 = vertexXnRaw<0>();
-    const VertexSegment2D* l2 = vertexXnRaw<1>();
-    SE2 iEst = v1->estimate().inverse();
-    Vector2 predP1 = iEst * l2->estimateP1();
-    Vector2 predP2 = iEst * l2->estimateP2();
-    Vector2 dP = predP2 - predP1;
-    Vector2 normal(dP.y(), -dP.x());
-    normal.normalize();
-    Vector3 prediction;
-    prediction[2] = std::atan2(normal.y(), normal.x());
-    Eigen::Map<Vector2> pt(prediction.data());
-    pt = (pointNum_ == 0) ? predP1 : predP2;
-    setMeasurement(prediction);
-    return true;
-  }
-
-  //! custom read function
-  bool read(std::istream& is) override;
-  //! custom write function
-  bool write(std::ostream& os) const override;
+  bool setMeasurementFromState() override;
 
  protected:
   int pointNum_ = 0;

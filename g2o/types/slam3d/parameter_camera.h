@@ -27,7 +27,6 @@
 #ifndef G2O_CAMERA_PARAMETERS_H_
 #define G2O_CAMERA_PARAMETERS_H_
 
-#include <iosfwd>
 #include <memory>
 
 #include "g2o/config.h"
@@ -46,10 +45,7 @@ class G2O_TYPES_SLAM3D_API ParameterCamera : public ParameterSE3Offset {
  public:
   ParameterCamera();
   void setKcam(double fx, double fy, double cx, double cy);
-  void setOffset(const Isometry3& offset_ = Isometry3::Identity());
-
-  bool read(std::istream& is) override;
-  bool write(std::ostream& os) const override;
+  void update() override;
 
   [[nodiscard]] const Matrix3& Kcam() const { return Kcam_; }
   [[nodiscard]] const Matrix3& invKcam() const { return invKcam_; }

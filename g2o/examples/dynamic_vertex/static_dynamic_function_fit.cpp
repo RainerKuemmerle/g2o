@@ -18,7 +18,6 @@
 
 #include "g2o/core/base_binary_edge.h"
 #include "g2o/core/base_dynamic_vertex.h"
-#include "g2o/core/base_unary_edge.h"
 #include "g2o/core/base_vertex.h"
 #include "g2o/core/block_solver.h"
 #include "g2o/core/optimization_algorithm_levenberg.h"
@@ -37,17 +36,6 @@ class FPolynomialCoefficientVertex
   // Create the vertex
   FPolynomialCoefficientVertex() { setToOrigin(); }
 
-  // Read the vertex
-  bool read(std::istream& is) override {
-    // Read the state
-    return g2o::internal::readVector(is, estimate_);
-  }
-
-  // Write the vertex
-  bool write(std::ostream& os) const override {
-    return g2o::internal::writeVector(os, estimate_);
-  }
-
   // Direct linear add
   void oplusImpl(const g2o::VectorX::MapType& update) override {
     estimate_ += update;
@@ -62,29 +50,6 @@ class PPolynomialCoefficientVertex
  public:
   // Create the vertex
   PPolynomialCoefficientVertex() = default;
-
-  // Read the vertex
-  bool read(std::istream& is) override {
-    // Read the dimension
-    int dimension;
-    is >> dimension;
-    if (!is.good()) {
-      return false;
-    }
-
-    // Set the dimension; we call the method here to ensure stuff like
-    // cache and the workspace is setup
-    setDimension(dimension);
-
-    // Read the state
-    return g2o::internal::readVector(is, estimate_);
-  }
-
-  // Write the vertex
-  bool write(std::ostream& os) const override {
-    os << estimate_.size() << " ";
-    return g2o::internal::writeVector(os, estimate_);
-  }
 
   // Direct linear add
   void oplusImpl(const g2o::VectorX::MapType& update) override {
@@ -120,21 +85,6 @@ class MultipleValueEdge
     const InformationType I =
         Eigen::MatrixXd::Identity(x_.size(), x_.size()) * omega;
     setInformation(I);
-  }
-
-  bool read(std::istream& is) override {
-    Eigen::VectorXd z;
-    g2o::internal::readVector(is, x_);
-    g2o::internal::readVector(is, z);
-    setMeasurement(z);
-
-    return readInformationMatrix(is);
-  }
-
-  bool write(std::ostream& os) const override {
-    g2o::internal::writeVector(os, x_);
-    g2o::internal::writeVector(os, measurement_);
-    return writeInformationMatrix(os);
   }
 
   // Compute the measurement from the eigen polynomial module
@@ -177,7 +127,7 @@ int main(int argc, const char* argv[]) {
   }
 
   std::cout << "Ground truth vectors f=" << f.transpose()
-            << "; p=" << p.transpose() << std::endl;
+            << "; p=" << p.transpose() << '\n';
 
   // The number of observations in the polynomial; the default is 6
   int obs = 6;
@@ -258,7 +208,7 @@ int main(int argc, const char* argv[]) {
     optimizer->initializeOptimization();
     optimizer->optimize(10);
     std::cout << "Computed parameters: f=" << pf->estimate().transpose()
-              << "; p=" << pv->estimate().transpose() << std::endl;
+              << "; p=" << pv->estimate().transpose() << '\n';
   }
   for (int testDimension = polynomialDimension - 1; testDimension >= 1;
        --testDimension) {
@@ -266,6 +216,6 @@ int main(int argc, const char* argv[]) {
     optimizer->initializeOptimization();
     optimizer->optimize(10);
     std::cout << "Computed parameters: f= " << pf->estimate().transpose()
-              << "; p=" << pv->estimate().transpose() << std::endl;
+              << "; p=" << pv->estimate().transpose() << '\n';
   }
 }

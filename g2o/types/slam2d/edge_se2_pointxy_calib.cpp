@@ -28,8 +28,6 @@
 
 #include <cassert>
 
-#include "g2o/core/io_helper.h"
-#include "g2o/types/slam2d/se2.h"
 #include "g2o/types/slam2d/vertex_point_xy.h"
 #include "g2o/types/slam2d/vertex_se2.h"
 
@@ -50,17 +48,6 @@ void EdgeSE2PointXYCalib::initialEstimate(
   auto* vi = static_cast<VertexSE2*>(vertexRaw(0));
   auto* vj = static_cast<VertexPointXY*>(vertexRaw(1));
   vj->setEstimate(vi->estimate() * measurement_);
-}
-
-bool EdgeSE2PointXYCalib::read(std::istream& is) {
-  internal::readVector(is, measurement_);
-  readInformationMatrix(is);
-  return true;
-}
-
-bool EdgeSE2PointXYCalib::write(std::ostream& os) const {
-  internal::writeVector(os, measurement());
-  return writeInformationMatrix(os);
 }
 
 }  // namespace g2o

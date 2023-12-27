@@ -396,11 +396,6 @@ class G2O_CORE_API OptimizableGraph : public HyperGraph {
      */
     void unlockQuadraticForm() { quadraticFormMutex_.unlock(); }
 
-    //! read the vertex from a stream, i.e., the internal state of the vertex
-    virtual bool read(std::istream& is) = 0;
-    //! write the vertex to a stream
-    virtual bool write(std::ostream& os) const = 0;
-
     virtual void updateCache();
 
     CacheContainer& cacheContainer();
@@ -546,11 +541,6 @@ class G2O_CORE_API OptimizableGraph : public HyperGraph {
     [[nodiscard]] int dimension() const { return dimension_; }
 
     virtual Vertex* createVertex(int) { return nullptr; }
-
-    //! read the vertex from a stream, i.e., the internal state of the vertex
-    virtual bool read(std::istream& is) = 0;
-    //! write the vertex to a stream
-    virtual bool write(std::ostream& os) const = 0;
 
     //! the internal ID of the edge
     [[nodiscard]] int64_t internalId() const { return internalId_; }

@@ -26,9 +26,6 @@
 
 #include "parameter_cameraparameters.h"
 
-#include <Eigen/Core>
-#include <iostream>
-
 #include "g2o/types/slam3d/se3_ops.h"
 
 namespace g2o {
@@ -39,22 +36,6 @@ CameraParameters::CameraParameters(
   parameter_.focal_length = focalLength;
   parameter_.principle_point = principlePoint;
   parameter_.baseline = baseLine;
-}
-
-bool CameraParameters::read(std::istream& is) {
-  is >> parameter_.focal_length;
-  is >> parameter_.principle_point[0];
-  is >> parameter_.principle_point[1];
-  is >> parameter_.baseline;
-  return true;
-}
-
-bool CameraParameters::write(std::ostream& os) const {
-  os << parameter_.focal_length << " ";
-  os << parameter_.principle_point.x() << " ";
-  os << parameter_.principle_point.y() << " ";
-  os << parameter_.baseline << " ";
-  return true;
 }
 
 Vector2 CameraParameters::cam_map(const Vector3& trans_xyz) const {
@@ -72,5 +53,7 @@ Vector3 CameraParameters::stereocam_uvu_map(const Vector3& trans_xyz) const {
       proj_x_right * parameter_.focal_length + parameter_.principle_point[0];
   return Vector3(uv_left[0], uv_left[1], u_right);
 }
+
+void CameraParameters::update() {}
 
 }  // namespace g2o

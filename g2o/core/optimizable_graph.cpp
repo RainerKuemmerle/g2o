@@ -628,7 +628,6 @@ bool OptimizableGraph::saveSubset(std::ostream& os, HyperGraph::EdgeSet& eset,
                                   io::Format format) {
   g2o::AbstractGraph abstract_graph;
   bool status = saveParameters(abstract_graph, parameters_);
-  if (!parameters_.write(os)) return false;
   HyperGraph::VertexSet vset;
   for (const auto& e : eset)
     for (const auto& v : e->vertices())

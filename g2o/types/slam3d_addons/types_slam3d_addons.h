@@ -29,7 +29,6 @@
 
 #include "edge_plane.h"
 #include "edge_se3_calib.h"
-#include "edge_se3_euler.h"
 #include "edge_se3_line.h"
 #include "edge_se3_plane_calib.h"
 #include "g2o/config.h"
@@ -39,6 +38,5 @@
 #include "g2o/types//slam3d/types_slam3d.h"
 #include "vertex_line3d.h"
 #include "vertex_plane.h"
-#include "vertex_se3_euler.h"
 
 #endif

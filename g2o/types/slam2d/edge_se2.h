@@ -27,8 +27,6 @@
 #ifndef G2O_EDGE_SE2_H
 #define G2O_EDGE_SE2_H
 
-#include <Eigen/Core>
-#include <iosfwd>
 #include <memory>
 
 #include "g2o/config.h"
@@ -58,8 +56,6 @@ class G2O_TYPES_SLAM2D_API EdgeSE2
         inverseMeasurement_ * (v1->estimate().inverse() * v2->estimate());
     error_ = delta.toVector();
   }
-  bool read(std::istream& is) override;
-  bool write(std::ostream& os) const override;
 
   void setMeasurement(const SE2& m) override {
     measurement_ = m;

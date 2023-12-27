@@ -28,9 +28,6 @@
 
 #include <cassert>
 #include <cmath>
-#include <map>
-#include <memory>
-#include <ostream>
 #include <vector>
 
 #include "se2.h"
@@ -52,52 +49,6 @@ void EdgeSE2LotsOfXY::computeError() {
     error_[index] = m[0] - measurement_[index];
     error_[index + 1] = m[1] - measurement_[index + 1];
   }
-}
-
-bool EdgeSE2LotsOfXY::read(std::istream& is) {
-  is >> observedPoints_;
-  setSize(observedPoints_ + 1);
-
-  // read the measurements
-  for (unsigned int i = 0; i < observedPoints_; i++) {
-    unsigned int index = 2 * i;
-    is >> measurement_[index] >> measurement_[index + 1];
-  }
-
-  // read the information matrix
-  for (unsigned int i = 0; i < observedPoints_ * 2; i++) {
-    // fill the "upper triangle" part of the matrix
-    for (unsigned int j = i; j < observedPoints_ * 2; j++) {
-      is >> information()(i, j);
-    }
-
-    // fill the lower triangle part
-    for (unsigned int j = 0; j < i; j++) {
-      information()(i, j) = information()(j, i);
-    }
-  }
-
-  return true;
-}
-
-bool EdgeSE2LotsOfXY::write(std::ostream& os) const {
-  // write number of observed points
-  os << "|| " << observedPoints_;
-
-  // write measurements
-  for (unsigned int i = 0; i < observedPoints_; i++) {
-    unsigned int index = 2 * i;
-    os << " " << measurement_[index] << " " << measurement_[index + 1];
-  }
-
-  // write information matrix
-  for (unsigned int i = 0; i < observedPoints_ * 2; i++) {
-    for (unsigned int j = i; j < observedPoints_ * 2; j++) {
-      os << " " << information()(i, j);
-    }
-  }
-
-  return os.good();
 }
 
 void EdgeSE2LotsOfXY::linearizeOplus() {

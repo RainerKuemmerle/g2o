@@ -35,9 +35,7 @@
 #include "vertex_point_xy.h"
 #include "vertex_se2.h"
 
-namespace g2o {
-
-namespace tutorial {
+namespace g2o::tutorial {
 
 class CacheSE2Offset;
 
@@ -48,16 +46,12 @@ class G2O_TUTORIAL_SLAM2D_API EdgeSE2PointXY
 
   void computeError() override;
 
-  bool read(std::istream& is) override;
-  bool write(std::ostream& os) const override;
-
  protected:
   std::shared_ptr<CacheSE2Offset> sensorCache_;
 
   bool resolveCaches() override;
 };
 
-}  // namespace tutorial
-}  // namespace g2o
+}  // namespace g2o::tutorial
 
 #endif

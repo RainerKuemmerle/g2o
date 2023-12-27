@@ -27,8 +27,6 @@
 #ifndef G2O_VERTEX_PLANE_H_
 #define G2O_VERTEX_PLANE_H_
 
-#include <Eigen/Core>
-#include <iosfwd>
 #include <memory>
 
 #include "g2o/config.h"
@@ -45,10 +43,6 @@ namespace g2o {
 class G2O_TYPES_SLAM3D_ADDONS_API VertexPlane : public BaseVertex<3, Plane3D> {
  public:
   VertexPlane();
-
-  //! Custom IO
-  bool read(std::istream& is) override;
-  bool write(std::ostream& os) const override;
 
   void oplusImpl(const VectorX::MapType& update) override {
     estimate_.oplus(update);

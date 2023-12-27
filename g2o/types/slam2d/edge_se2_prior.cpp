@@ -26,10 +26,6 @@
 
 #include "edge_se2_prior.h"
 
-#include <cassert>
-
-#include "g2o/core/eigen_types.h"
-#include "g2o/core/io_helper.h"
 #include "g2o/types/slam2d/se2.h"
 #include "g2o/types/slam2d/vertex_se2.h"
 
@@ -42,20 +38,6 @@ void EdgeSE2Prior::initialEstimate(const OptimizableGraph::VertexSet& from,
   (void)to;
   VertexSE2* v1 = vertexXnRaw<0>();
   v1->setEstimate(measurement_);
-}
-
-bool EdgeSE2Prior::read(std::istream& is) {
-  Vector3 p;
-  internal::readVector(is, p);
-  setMeasurement(SE2(p));
-  inverseMeasurement_ = measurement_.inverse();
-  readInformationMatrix(is);
-  return true;
-}
-
-bool EdgeSE2Prior::write(std::ostream& os) const {
-  internal::writeVector(os, measurement().toVector());
-  return writeInformationMatrix(os);
 }
 
 void EdgeSE2Prior::setMeasurement(const SE2& m) {

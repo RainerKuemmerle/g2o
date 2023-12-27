@@ -27,9 +27,7 @@
 #ifndef G2O_EDGE_PROJECT_DEPTH_H_
 #define G2O_EDGE_PROJECT_DEPTH_H_
 
-#include <iosfwd>
 #include <memory>
-#include <tuple>
 
 #include "g2o/core/base_binary_edge.h"
 #include "g2o/core/eigen_types.h"
@@ -50,8 +48,6 @@ class G2O_TYPES_SLAM3D_API EdgeSE3PointXYZDepth
     : public BaseBinaryEdge<3, Vector3, VertexSE3, VertexPointXYZ> {
  public:
   EdgeSE3PointXYZDepth();
-  bool read(std::istream& is) override;
-  bool write(std::ostream& os) const override;
 
   // return the error estimate as a 3-vector
   void computeError() override;

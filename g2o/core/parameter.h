@@ -27,7 +27,6 @@
 #ifndef G2O_GRAPH_PARAMETER_HH_
 #define G2O_GRAPH_PARAMETER_HH_
 
-#include <iosfwd>
 #include <memory>
 #include <vector>
 
@@ -42,15 +41,14 @@ class G2O_CORE_API Parameter : public HyperGraph::HyperGraphElement {
  public:
   Parameter() = default;
   ~Parameter() override = default;
-  //! read the data from a stream
-  virtual bool read(std::istream& is) = 0;
-  //! write the data to a stream
-  virtual bool write(std::ostream& os) const = 0;
+
   [[nodiscard]] int id() const { return id_; }
   void setId(int id_);
   [[nodiscard]] HyperGraph::HyperGraphElementType elementType() const final {
     return HyperGraph::kHgetParameter;
   }
+
+  virtual void update() = 0;
 
   [[nodiscard]] virtual int parameterDimension() const = 0;
   [[nodiscard]] virtual int minimalParameterDimension() const = 0;
@@ -90,12 +88,15 @@ class BaseParameter : public Parameter {
 
   bool setParameterData(const std::vector<double>& data) override {
     VectorX::ConstMapType data_vector(data.data(), data.size());
-    param() = TypeTraits<ParameterType>::fromVector(data_vector);
+    setParam(TypeTraits<ParameterType>::fromVector(data_vector));
     return true;
   };
 
   const ParameterType& param() const { return parameter_; }
-  ParameterType& param() { return parameter_; }
+  void setParam(const ParameterType& param) {
+    parameter_ = param;
+    update();
+  }
 
  protected:
   ParameterType parameter_;

@@ -28,7 +28,6 @@
 #define G2O_SBA_VERTEX_INTRINSICS_H
 
 #include <Eigen/Core>
-#include <iosfwd>
 
 #include "g2o/core/base_vertex.h"
 #include "g2o/core/eigen_types.h"
@@ -49,8 +48,6 @@ class G2O_TYPES_SBA_API VertexIntrinsics
     : public BaseVertex<4, VertexIntrinsicsEstimate> {
  public:
   VertexIntrinsics();
-  bool read(std::istream& is) override;
-  bool write(std::ostream& os) const override;
 
   void oplusImpl(const VectorX::MapType& update) override;
 };

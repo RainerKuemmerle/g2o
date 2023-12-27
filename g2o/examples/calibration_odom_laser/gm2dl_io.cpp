@@ -54,7 +54,7 @@ bool Gm2dlIO::readGm2dl(const std::string& filename, SparseOptimizer& optimizer,
   // laserOffset->fixed() = true;
   laserOffset->setId(kIdLaserpose);
   if (!optimizer.addVertex(laserOffset)) {
-    std::cerr << "Unable to add laser offset" << std::endl;
+    std::cerr << "Unable to add laser offset\n";
     return false;
   }
 
@@ -76,7 +76,7 @@ bool Gm2dlIO::readGm2dl(const std::string& filename, SparseOptimizer& optimizer,
       // std::cerr << "Read vertex id " << id << std::endl;
       if (!optimizer.addVertex(v)) {
         std::cerr << "vertex " << id << " is already in the graph, reassigning "
-                  << std::endl;
+                  << '\n';
         v = std::dynamic_pointer_cast<VertexSE2>(optimizer.vertex(id));
         assert(v);
       }
@@ -85,7 +85,7 @@ bool Gm2dlIO::readGm2dl(const std::string& filename, SparseOptimizer& optimizer,
 
     } else if (tag == "EDGE" || tag == "EDGE2" || tag == "EDGE_SE2") {
       if (!laserOffsetInitDone) {
-        std::cerr << "Error: need laser offset" << std::endl;
+        std::cerr << "Error: need laser offset\n";
         return false;
       }
       int id1;
@@ -112,12 +112,12 @@ bool Gm2dlIO::readGm2dl(const std::string& filename, SparseOptimizer& optimizer,
       auto v2 = std::dynamic_pointer_cast<VertexSE2>(optimizer.vertex(id2));
       if (!v1) {
         std::cerr << "vertex " << id1 << " is not existing, cannot add edge ("
-                  << id1 << "," << id2 << ")" << std::endl;
+                  << id1 << "," << id2 << ")\n";
         continue;
       }
       if (!v2) {
         std::cerr << "vertex " << id2 << " is not existing, cannot add edge ("
-                  << id1 << "," << id2 << ")" << std::endl;
+                  << id1 << "," << id2 << ")\n";
         continue;
       }
 
@@ -137,7 +137,7 @@ bool Gm2dlIO::readGm2dl(const std::string& filename, SparseOptimizer& optimizer,
       e->setVertex(1, v2);
       e->setVertex(2, laserOffset);
       if (!optimizer.addEdge(e)) {
-        std::cerr << "error in adding edge " << id1 << "," << id2 << std::endl;
+        std::cerr << "error in adding edge " << id1 << "," << id2 << '\n';
       }
       // std::cerr << PVAR(e->inverseMeasurement().toVector().transpose()) <<
       // std::endl; std::cerr << PVAR(e->information()) << std::endl;
@@ -171,16 +171,18 @@ bool Gm2dlIO::writeGm2dl(const std::string& filename,
 
   for (const auto& it : optimizer.vertices()) {
     auto* v = static_cast<OptimizableGraph::Vertex*>(it.second.get());
-    fout << "VERTEX2 " << v->id() << " ";
-    v->write(fout);
-    fout << std::endl;
+    fout << "VERTEX2 " << v->id();
+    std::vector<double> vertex_estimate;
+    v->getEstimateData(vertex_estimate);
+    for (const auto value : vertex_estimate) fout << " " << value;
+    fout << '\n';
     auto data = v->userData();
     if (data) {  // writing the data via the factory
       const std::string tag = factory->tag(data.get());
       if (!tag.empty()) {
         fout << tag << " ";
         data->write(fout);
-        fout << std::endl;
+        fout << '\n';
       }
     }
   }
@@ -205,7 +207,7 @@ bool Gm2dlIO::writeGm2dl(const std::string& filename,
       const Eigen::Matrix3d& m = calibEdge->information();
       fout << " " << m(0, 0) << " " << m(0, 1) << " " << m(1, 1) << " "
            << m(2, 2) << " " << m(0, 2) << " " << m(1, 2);
-      fout << std::endl;
+      fout << '\n';
     } else {
       // std::cerr << "Strange Edge Type: " << factory->tag(e) << std::endl;
     }
@@ -218,7 +220,7 @@ bool Gm2dlIO::updateLaserData(SparseOptimizer& optimizer) {
   auto laserOffset =
       std::dynamic_pointer_cast<VertexSE2>(optimizer.vertex(kIdLaserpose));
   if (!laserOffset) {
-    std::cerr << "Laser offset not found" << std::endl;
+    std::cerr << "Laser offset not found\n";
     return false;
   }
 

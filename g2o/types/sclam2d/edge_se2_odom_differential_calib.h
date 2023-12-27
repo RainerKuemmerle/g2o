@@ -27,15 +27,12 @@
 #ifndef G2O_EDGE_SE2_ODOM_CALIB_DIFFERENTIAL_H
 #define G2O_EDGE_SE2_ODOM_CALIB_DIFFERENTIAL_H
 
-#include <Eigen/Core>
-#include <iosfwd>
 #include <memory>
 
 #include "g2o/config.h"
 #include "g2o/core/base_fixed_sized_edge.h"
 #include "g2o/core/hyper_graph.h"
 #include "g2o/core/hyper_graph_action.h"
-#include "g2o/types/slam2d/se2.h"
 #include "g2o/types/slam2d/vertex_se2.h"
 #include "g2o_types_sclam2d_api.h"
 #include "odometry_measurement.h"
@@ -47,28 +44,7 @@ class G2O_TYPES_SCLAM2D_API EdgeSE2OdomDifferentialCalib
     : public BaseFixedSizedEdge<3, VelocityMeasurement, VertexSE2, VertexSE2,
                                 VertexOdomDifferentialParams> {
  public:
-  void computeError() override {
-    const VertexSE2* v1 = vertexXnRaw<0>();
-    const VertexSE2* v2 = vertexXnRaw<1>();
-    const VertexOdomDifferentialParams* params = vertexXnRaw<2>();
-    const SE2& x1 = v1->estimate();
-    const SE2& x2 = v2->estimate();
-
-    // get the calibrated motion given by the odometry
-    VelocityMeasurement calibratedVelocityMeasurement(
-        measurement().vl() * params->estimate()(0),
-        measurement().vr() * params->estimate()(1), measurement().dt());
-    MotionMeasurement mm = OdomConvert::convertToMotion(
-        calibratedVelocityMeasurement, params->estimate()(2));
-    SE2 Ku_ij;
-    Ku_ij.fromVector(mm.measurement());
-
-    SE2 delta = Ku_ij.inverse() * x1.inverse() * x2;
-    error_ = delta.toVector();
-  }
-
-  bool read(std::istream& is) override;
-  bool write(std::ostream& os) const override;
+  void computeError() override;
 };
 
 #ifdef G2O_HAVE_OPENGL

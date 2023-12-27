@@ -28,11 +28,7 @@
 
 #include <Eigen/Core>
 #include <cassert>
-#include <map>
-#include <memory>
-#include <ostream>
 
-#include "se2.h"
 #include "vertex_point_xy.h"
 #include "vertex_se2.h"
 
@@ -52,33 +48,6 @@ void EdgeSE2TwoPointsXY::computeError() {
   error_[1] = m1[1] - measurement_[1];
   error_[2] = m2[0] - measurement_[2];
   error_[3] = m2[1] - measurement_[3];
-}
-
-bool EdgeSE2TwoPointsXY::read(std::istream& is) {
-  is >> measurement_[0] >> measurement_[1] >> measurement_[2] >>
-      measurement_[3];
-  is >> information()(0, 0) >> information()(0, 1) >> information()(0, 2) >>
-      information()(0, 3) >> information()(1, 1) >> information()(1, 2) >>
-      information()(1, 3) >> information()(2, 2) >> information()(2, 3) >>
-      information()(3, 3);
-  information()(1, 0) = information()(0, 1);
-  information()(2, 0) = information()(0, 2);
-  information()(2, 1) = information()(1, 2);
-  information()(3, 0) = information()(0, 3);
-  information()(3, 1) = information()(1, 3);
-  information()(3, 2) = information()(2, 3);
-  return true;
-}
-
-bool EdgeSE2TwoPointsXY::write(std::ostream& os) const {
-  os << measurement()[0] << " " << measurement()[1] << " " << measurement()[2]
-     << " " << measurement()[3] << " ";
-  os << information()(0, 0) << " " << information()(0, 1) << " "
-     << information()(0, 2) << " " << information()(0, 3) << " "
-     << information()(1, 1) << " " << information()(1, 2) << " "
-     << information()(1, 3) << " " << information()(2, 2) << " "
-     << information()(2, 3) << " " << information()(3, 3);
-  return os.good();
 }
 
 void EdgeSE2TwoPointsXY::initialEstimate(

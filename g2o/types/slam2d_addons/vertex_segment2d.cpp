@@ -33,23 +33,9 @@
 #include <string>
 #include <typeinfo>
 
-#include "g2o/core/io_helper.h"
-
 namespace g2o {
 
-VertexSegment2D::VertexSegment2D()
-
-{
-  estimate_.setZero();
-}
-
-bool VertexSegment2D::read(std::istream& is) {
-  return internal::readVector(is, estimate_);
-}
-
-bool VertexSegment2D::write(std::ostream& os) const {
-  return internal::writeVector(os, estimate());
-}
+VertexSegment2D::VertexSegment2D() { estimate_.setZero(); }
 
 #ifdef G2O_HAVE_OPENGL
 VertexSegment2DDrawAction::VertexSegment2DDrawAction()

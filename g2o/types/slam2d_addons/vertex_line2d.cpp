@@ -27,9 +27,7 @@
 #include "vertex_line2d.h"
 
 #include <cmath>
-#include <istream>
 #include <string>
-#include <typeinfo>
 
 #include "g2o/core/optimizable_graph.h"
 #include "g2o/types/slam2d/vertex_point_xy.h"
@@ -41,16 +39,6 @@
 namespace g2o {
 
 VertexLine2D::VertexLine2D() { estimate_.setZero(); }
-
-bool VertexLine2D::read(std::istream& is) {
-  is >> estimate_[0] >> estimate_[1] >> p1Id >> p2Id;
-  return true;
-}
-
-bool VertexLine2D::write(std::ostream& os) const {
-  os << estimate()(0) << " " << estimate()(1) << " " << p1Id << " " << p2Id;
-  return os.good();
-}
 
 #ifdef G2O_HAVE_OPENGL
 VertexLine2DDrawAction::VertexLine2DDrawAction()

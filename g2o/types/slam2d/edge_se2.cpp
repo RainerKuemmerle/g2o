@@ -26,13 +26,10 @@
 
 #include "edge_se2.h"
 
-#include <Eigen/Core>
 #include <cmath>
 #include <string>
-#include <typeinfo>
 
 #include "g2o/core/eigen_types.h"
-#include "g2o/core/io_helper.h"
 #include "g2o/stuff/macros.h"
 #include "g2o/stuff/misc.h"
 #include "g2o/types/slam2d/se2.h"
@@ -44,19 +41,6 @@
 #endif
 
 namespace g2o {
-
-bool EdgeSE2::read(std::istream& is) {
-  Vector3 p;
-  internal::readVector(is, p);
-  setMeasurement(SE2(p));
-  readInformationMatrix(is);
-  return is.good() || is.eof();
-}
-
-bool EdgeSE2::write(std::ostream& os) const {
-  internal::writeVector(os, measurement().toVector());
-  return writeInformationMatrix(os);
-}
 
 void EdgeSE2::initialEstimate(const OptimizableGraph::VertexSet& from,
                               OptimizableGraph::Vertex* /* to */) {

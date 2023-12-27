@@ -27,8 +27,6 @@
 #ifndef G2O_STEREO_CAMERA_PARAMETERS_H_
 #define G2O_STEREO_CAMERA_PARAMETERS_H_
 
-#include <iosfwd>
-
 #include "g2o_types_slam3d_api.h"
 #include "parameter_camera.h"
 
@@ -39,9 +37,6 @@ namespace g2o {
 class G2O_TYPES_SLAM3D_API ParameterStereoCamera : public ParameterCamera {
  public:
   ParameterStereoCamera();
-
-  bool read(std::istream& is) override;
-  bool write(std::ostream& os) const override;
 
   void setBaseline(double baseline) { baseline_ = baseline; }
   [[nodiscard]] double baseline() const { return baseline_; }

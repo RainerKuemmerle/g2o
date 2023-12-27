@@ -26,28 +26,14 @@
 
 #include "vertex_line3d.h"
 
-#include <Eigen/Geometry>
 #include <string>
-#include <typeinfo>
 
-#include "g2o/core/io_helper.h"
 #include "g2o/stuff/opengl_wrapper.h"
 #include "g2o/types/slam3d_addons/line3d.h"
 
 namespace g2o {
 
 VertexLine3D::VertexLine3D() : color(1., 0.5, 0.) {}
-
-bool VertexLine3D::read(std::istream& is) {
-  Vector6 lv;
-  bool state = internal::readVector(is, lv);
-  setEstimate(Line3D(lv));
-  return state;
-}
-
-bool VertexLine3D::write(std::ostream& os) const {
-  return internal::writeVector(os, estimate_);
-}
 
 #ifdef G2O_HAVE_OPENGL
 VertexLine3DDrawAction::VertexLine3DDrawAction()

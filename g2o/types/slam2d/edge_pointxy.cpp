@@ -26,9 +26,6 @@
 
 #include "edge_pointxy.h"
 
-#include "g2o/config.h"
-#include "g2o/core/io_helper.h"
-
 namespace g2o {
 
 EdgePointXY::EdgePointXY()
@@ -36,19 +33,6 @@ EdgePointXY::EdgePointXY()
 {
   information_.setIdentity();
   error_.setZero();
-}
-
-bool EdgePointXY::read(std::istream& is) {
-  Vector2 p;
-  internal::readVector(is, p);
-  setMeasurement(p);
-  readInformationMatrix(is);
-  return true;
-}
-
-bool EdgePointXY::write(std::ostream& os) const {
-  internal::writeVector(os, measurement());
-  return writeInformationMatrix(os);
 }
 
 #ifndef NUMERIC_JACOBIAN_TWO_D_TYPES

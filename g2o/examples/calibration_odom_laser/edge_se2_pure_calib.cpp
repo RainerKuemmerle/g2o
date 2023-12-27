@@ -28,16 +28,6 @@
 
 namespace g2o {
 
-bool EdgeSE2PureCalib::read(std::istream& is) {
-  (void)is;
-  return false;
-}
-
-bool EdgeSE2PureCalib::write(std::ostream& os) const {
-  (void)os;
-  return false;
-}
-
 void EdgeSE2PureCalib::computeError() {
   const VertexSE2* laserOffset = vertexXnRaw<0>();
   const VertexOdomDifferentialParams* odomParams = vertexXnRaw<1>();

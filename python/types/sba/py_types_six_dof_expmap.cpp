@@ -31,10 +31,6 @@ void declareTypesSixDofExpmap(py::module& m) {
       .def("cam_map", &CameraParameters::cam_map, "trans_xyz"_a)
       .def("stereocam_uvu_map", &CameraParameters::stereocam_uvu_map,
            "trans_xyz"_a)
-      .def("param",
-           static_cast<StereoCameraParameters& (CameraParameters::*)()>(
-               &CameraParameters::param),
-           py::return_value_policy::reference)
       // read
       // write
       ;

@@ -31,8 +31,6 @@
 #include <string>
 #include <typeinfo>
 
-#include "g2o/core/cache.h"
-#include "g2o/core/io_helper.h"
 #include "g2o/core/parameter.h"
 #include "g2o/stuff/opengl_wrapper.h"
 #include "g2o/types/slam3d/parameter_se3_offset.h"
@@ -46,19 +44,6 @@ EdgeSE3Line3D::EdgeSE3Line3D() {
   resizeParameters(1);
   installParameter<CacheSE3Offset::ParameterType>(0);
   color << 0.0, 0.5, 1.0;
-}
-
-bool EdgeSE3Line3D::read(std::istream& is) {
-  bool state = readParamIds(is);
-  state &= internal::readVector(is, measurement_);
-  state &= readInformationMatrix(is);
-  return state;
-}
-
-bool EdgeSE3Line3D::write(std::ostream& os) const {
-  writeParamIds(os);
-  internal::writeVector(os, measurement());
-  return writeInformationMatrix(os);
 }
 
 void EdgeSE3Line3D::computeError() {

@@ -30,14 +30,8 @@ namespace g2o::tutorial {
 
 VertexPointXY::VertexPointXY() { estimate_.setZero(); }
 
-bool VertexPointXY::read(std::istream& is) {
-  is >> estimate_[0] >> estimate_[1];
-  return true;
-}
-
-bool VertexPointXY::write(std::ostream& os) const {
-  os << estimate()(0) << " " << estimate()(1);
-  return os.good();
+void VertexPointXY::oplusImpl(const g2o::VectorX::MapType& update) {
+  estimate_ += update;
 }
 
 }  // namespace g2o::tutorial

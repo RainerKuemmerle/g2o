@@ -28,9 +28,7 @@
 #define G2O_EDGE_SE3_POINT_XYZ_H_
 
 #include <Eigen/Core>
-#include <iosfwd>
 #include <memory>
-#include <tuple>
 
 #include "g2o/config.h"
 #include "g2o/core/base_binary_edge.h"
@@ -54,8 +52,6 @@ class G2O_TYPES_SLAM3D_API EdgeSE3PointXYZ
     : public BaseBinaryEdge<3, Vector3, VertexSE3, VertexPointXYZ> {
  public:
   EdgeSE3PointXYZ();
-  bool read(std::istream& is) override;
-  bool write(std::ostream& os) const override;
 
   // return the error estimate as a 3-vector
   void computeError() override;

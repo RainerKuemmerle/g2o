@@ -46,8 +46,6 @@ class Edge3Constant
     const auto c = vertexXnRaw<2>()->estimate();
     error_ = (a * b * c - measurement_).eval();
   }
-  bool read(std::istream&) override { return false; };
-  bool write(std::ostream&) const override { return false; };
 };
 
 class Edge3Dynamic : public g2o::BaseVariableSizedEdge<2, g2o::Vector2> {
@@ -60,8 +58,6 @@ class Edge3Dynamic : public g2o::BaseVariableSizedEdge<2, g2o::Vector2> {
         static_cast<const g2o::VertexPointXY*>(vertexRaw(2))->estimate();
     error_ = (a * b * c - measurement_).eval();
   }
-  bool read(std::istream&) override { return false; };
-  bool write(std::ostream&) const override { return false; };
 };
 
 class VertexNotDefaultCtor : public g2o::BaseVertex<2, g2o::Vector2> {
@@ -71,9 +67,6 @@ class VertexNotDefaultCtor : public g2o::BaseVertex<2, g2o::Vector2> {
   void oplusImpl(const g2o::VectorX::MapType& update) override {
     estimate_ += update.head<2>();
   }
-
-  bool read(std::istream& /*is*/) override { return false; };
-  bool write(std::ostream& /*os*/) const override { return false; };
 };
 
 class EdgeUnaryCreateVertexTester
@@ -85,8 +78,6 @@ class EdgeUnaryCreateVertexTester
     const VertexNotDefaultCtor* v = vertexXnRaw<0>();
     error_ = v->estimate() - measurement_;
   }
-  bool read(std::istream& /*is*/) override { return false; };
-  bool write(std::ostream& /*os*/) const override { return false; };
 
   void setMeasurement(const g2o::Vector2& m) override { measurement_ = m; }
 };

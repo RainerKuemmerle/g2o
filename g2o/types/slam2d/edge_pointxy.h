@@ -27,11 +27,6 @@
 #ifndef G2O_EDGE_POINTXY_H
 #define G2O_EDGE_POINTXY_H
 
-#include <Eigen/Core>
-#include <iosfwd>
-#include <memory>
-
-#include "g2o/config.h"
 #include "g2o/core/base_binary_edge.h"
 #include "g2o/core/eigen_types.h"
 #include "g2o/core/optimizable_graph.h"
@@ -50,8 +45,6 @@ class G2O_TYPES_SLAM2D_API EdgePointXY
     const VertexPointXY* v2 = vertexXnRaw<1>();
     error_ = (v2->estimate() - v1->estimate()) - measurement_;
   }
-  bool read(std::istream& is) override;
-  bool write(std::ostream& os) const override;
 
   void setMeasurement(const Vector2& m) override { measurement_ = m; }
 

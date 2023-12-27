@@ -28,12 +28,8 @@
 
 #include <Eigen/Core>
 
-#include "g2o/core/cache.h"
 #include "g2o/core/eigen_types.h"
-#include "g2o/core/io_helper.h"
-#include "g2o/core/parameter.h"
 #include "g2o/types/slam2d/se2.h"
-#include "g2o/types/slam2d/vertex_se2.h"
 #include "parameter_se2_offset.h"
 
 namespace g2o {
@@ -56,22 +52,6 @@ bool EdgeSE2Offset::resolveCaches() {
   return (cacheFrom_ && cacheTo_);
 }
 
-bool EdgeSE2Offset::read(std::istream& is) {
-  bool state = readParamIds(is);
-
-  Vector3 meas;
-  state &= internal::readVector(is, meas);
-  setMeasurement(SE2(meas));
-  state &= readInformationMatrix(is);
-  return state;
-}
-
-bool EdgeSE2Offset::write(std::ostream& os) const {
-  writeParamIds(os);
-  internal::writeVector(os, measurement().toVector());
-  return writeInformationMatrix(os);
-}
-
 void EdgeSE2Offset::computeError() {
   SE2 delta = inverseMeasurement_ * cacheFrom_->w2n() * cacheTo_->n2w();
   error_.head<2>() = delta.translation();
@@ -89,8 +69,8 @@ void EdgeSE2Offset::initialEstimate(const OptimizableGraph::VertexSet& from_,
   auto from = vertexXn<0>();
   auto to = vertexXn<1>();
 
-  SE2 virtualMeasurement = cacheFrom_->offsetParam()->offset() * measurement() *
-                           cacheTo_->offsetParam()->offset().inverse();
+  SE2 virtualMeasurement = cacheFrom_->offsetParam()->param() * measurement() *
+                           cacheTo_->offsetParam()->param().inverse();
 
   if (from_.count(from) > 0)
     to->setEstimate(from->estimate() * virtualMeasurement);

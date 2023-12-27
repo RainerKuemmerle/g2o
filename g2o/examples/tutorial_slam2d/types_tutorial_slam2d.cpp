@@ -24,15 +24,14 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "types_tutorial_slam2d.h"
-
-#include <iostream>
-
 #include "g2o/core/factory.h"
-#include "g2o/stuff/macros.h"
+#include "g2o/examples/tutorial_slam2d/edge_se2.h"
+#include "g2o/examples/tutorial_slam2d/edge_se2_pointxy.h"
+#include "g2o/examples/tutorial_slam2d/parameter_se2_offset.h"
+#include "g2o/examples/tutorial_slam2d/vertex_point_xy.h"
+#include "g2o/examples/tutorial_slam2d/vertex_se2.h"
 
-namespace g2o {
-namespace tutorial {
+namespace g2o::tutorial {
 
 G2O_REGISTER_TYPE_GROUP(tutorial_slam2d);
 
@@ -45,5 +44,4 @@ G2O_REGISTER_TYPE(TUTORIAL_CACHE_SE2_OFFSET, CacheSE2Offset);
 
 G2O_REGISTER_TYPE(TUTORIAL_EDGE_SE2, EdgeSE2);
 G2O_REGISTER_TYPE(TUTORIAL_EDGE_SE2_POINT_XY, EdgeSE2PointXY);
-}  // namespace tutorial
-}  // namespace g2o
+}  // namespace g2o::tutorial

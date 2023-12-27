@@ -26,16 +26,15 @@
 
 #include "parameter_camera.h"
 
+#include <Eigen/src/Geometry/Transform.h>
+
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 #include <Eigen/LU>
-#include <ostream>
 #include <string>
 #include <typeinfo>
 
-#include "g2o/core/io_helper.h"
 #include "g2o/types/slam3d/parameter_se3_offset.h"
-#include "isometry3d_mappings.h"
 
 #ifdef G2O_HAVE_OPENGL
 #include "g2o/stuff/opengl_primitives.h"
@@ -45,13 +44,13 @@
 namespace g2o {
 
 ParameterCamera::ParameterCamera() {
+  setParam(Isometry3::Identity());
   setId(-1);
   setKcam(1, 1, 0.5, 0.5);
-  setOffset();
+  update();
 }
 
-void ParameterCamera::setOffset(const Isometry3& offset) {
-  ParameterSE3Offset::setOffset(offset);
+void ParameterCamera::update() {
   Kcam_inverseOffsetR_ = Kcam_ * inverseOffset().rotation();
 }
 
@@ -66,30 +65,31 @@ void ParameterCamera::setKcam(double fx, double fy, double cx, double cy) {
   Kcam_inverseOffsetR_ = Kcam_ * inverseOffset().rotation();
 }
 
-bool ParameterCamera::read(std::istream& is) {
-  Vector7 off;
-  internal::readVector(is, off);
-  // normalize the quaternion to recover numerical precision lost by storing as
-  // human readable text
-  Vector4::MapType(off.data() + 3).normalize();
-  setOffset(internal::fromVectorQT(off));
-  double fx;
-  double fy;
-  double cx;
-  double cy;
-  is >> fx >> fy >> cx >> cy;
-  setKcam(fx, fy, cx, cy);
-  return is.good();
-}
+// bool ParameterCamera::read(std::istream& is) {
+//   Vector7 off;
+//   internal::readVector(is, off);
+//   // normalize the quaternion to recover numerical precision lost by storing
+//   as
+//   // human readable text
+//   Vector4::MapType(off.data() + 3).normalize();
+//   setOffset(internal::fromVectorQT(off));
+//   double fx;
+//   double fy;
+//   double cx;
+//   double cy;
+//   is >> fx >> fy >> cx >> cy;
+//   setKcam(fx, fy, cx, cy);
+//   return is.good();
+// }
 
-bool ParameterCamera::write(std::ostream& os) const {
-  internal::writeVector(os, internal::toVectorQT(parameter_));
-  os << Kcam_(0, 0) << " ";
-  os << Kcam_(1, 1) << " ";
-  os << Kcam_(0, 2) << " ";
-  os << Kcam_(1, 2) << " ";
-  return os.good();
-}
+// bool ParameterCamera::write(std::ostream& os) const {
+//   internal::writeVector(os, internal::toVectorQT(parameter_));
+//   os << Kcam_(0, 0) << " ";
+//   os << Kcam_(1, 1) << " ";
+//   os << Kcam_(0, 2) << " ";
+//   os << Kcam_(1, 2) << " ";
+//   return os.good();
+// }
 
 void CacheCamera::updateImpl() {
   CacheSE3Offset::updateImpl();
@@ -131,7 +131,7 @@ bool CacheCameraDrawAction::operator()(
   glPushAttrib(GL_COLOR);
   glColor3f(POSE_PARAMETER_COLOR);
   glPushMatrix();
-  glMultMatrixd(that->camParams()->offset().cast<double>().data());
+  glMultMatrixd(that->camParams()->param().cast<double>().data());
   glRotatef(180.0F, 0.0F, 1.0F, 0.0F);
   opengl::drawPyramid(cameraSide_->value(), cameraZ_->value());
   glPopMatrix();

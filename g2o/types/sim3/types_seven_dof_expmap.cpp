@@ -27,10 +27,8 @@
 #include "types_seven_dof_expmap.h"
 
 #include <Eigen/Core>
-#include <memory>
 
 #include "g2o/core/factory.h"
-#include "g2o/core/io_helper.h"
 #include "g2o/types/sim3/sim3.h"
 #include "g2o/types/slam3d/se3_ops.h"
 
@@ -71,25 +69,6 @@ void VertexSim3Expmap::oplusImpl(const VectorX::MapType& update) {
   setEstimate(s * estimate());
 }
 
-bool VertexSim3Expmap::read(std::istream& is) {
-  Vector7 cam2world;
-  bool state = true;
-  state &= internal::readVector(is, cam2world);
-  state &= internal::readVector(is, _focal_length1);
-  state &= internal::readVector(is, _principle_point1);
-  setEstimate(Sim3(cam2world).inverse());
-  return state;
-}
-
-bool VertexSim3Expmap::write(std::ostream& os) const {
-  Sim3 cam2world(estimate().inverse());
-  Vector7 lv = cam2world.log();
-  internal::writeVector(os, lv);
-  internal::writeVector(os, _focal_length1);
-  internal::writeVector(os, _principle_point1);
-  return os.good();
-}
-
 Vector2 VertexSim3Expmap::cam_map1(const Vector2& v) const {
   Vector2 res;
   res[0] = v[0] * _focal_length1[0] + _principle_point1[0];
@@ -102,20 +81,6 @@ Vector2 VertexSim3Expmap::cam_map2(const Vector2& v) const {
   res[0] = v[0] * _focal_length2[0] + _principle_point2[0];
   res[1] = v[1] * _focal_length2[1] + _principle_point2[1];
   return res;
-}
-
-bool EdgeSim3::read(std::istream& is) {
-  Vector7 v7;
-  internal::readVector(is, v7);
-  Sim3 cam2world(v7);
-  setMeasurement(cam2world.inverse());
-  return readInformationMatrix(is);
-}
-
-bool EdgeSim3::write(std::ostream& os) const {
-  Sim3 cam2world(measurement().inverse());
-  internal::writeVector(os, cam2world.log());
-  return writeInformationMatrix(os);
 }
 
 void EdgeSim3::computeError() {
@@ -193,32 +158,12 @@ void EdgeSim3::linearizeOplus() {
 
 /**Sim3ProjectXYZ*/
 
-bool EdgeSim3ProjectXYZ::read(std::istream& is) {
-  internal::readVector(is, measurement_);
-  return readInformationMatrix(is);
-}
-
-bool EdgeSim3ProjectXYZ::write(std::ostream& os) const {
-  internal::writeVector(os, measurement_);
-  return writeInformationMatrix(os);
-}
-
 void EdgeSim3ProjectXYZ::computeError() {
   const VertexSim3Expmap* v1 = vertexXnRaw<1>();
   const VertexPointXYZ* v2 = vertexXnRaw<0>();
 
   Vector2 obs(measurement_);
   error_ = obs - v1->cam_map1(project(v1->estimate().map(v2->estimate())));
-}
-
-bool EdgeInverseSim3ProjectXYZ::read(std::istream& is) {
-  internal::readVector(is, measurement_);
-  return readInformationMatrix(is);
-}
-
-bool EdgeInverseSim3ProjectXYZ::write(std::ostream& os) const {
-  internal::writeVector(os, measurement_);
-  return writeInformationMatrix(os);
 }
 
 void EdgeInverseSim3ProjectXYZ::computeError() {

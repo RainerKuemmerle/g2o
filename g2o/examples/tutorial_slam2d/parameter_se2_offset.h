@@ -38,13 +38,10 @@ class G2O_TUTORIAL_SLAM2D_API ParameterSE2Offset : public BaseParameter<SE2> {
  public:
   ParameterSE2Offset() = default;
 
-  void setOffset(const SE2& offset = SE2());
-
   [[nodiscard]] const SE2& offset() const { return parameter_; }
   [[nodiscard]] const SE2& inverseOffset() const { return inverseOffset_; }
 
-  bool read(std::istream& is) override;
-  bool write(std::ostream& os) const override;
+  void update() override;
 
  protected:
   SE2 inverseOffset_;

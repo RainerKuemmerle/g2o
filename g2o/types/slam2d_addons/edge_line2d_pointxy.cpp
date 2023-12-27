@@ -26,22 +26,23 @@
 
 #include "edge_line2d_pointxy.h"
 
-#include <ostream>
-
-#include "g2o/config.h"
-
 namespace g2o {
 
-bool EdgeLine2DPointXY::read(std::istream& is) {
-  is >> measurement_;
-  is >> information()(0, 0);
-  return true;
+void EdgeLine2DPointXY::computeError() {
+  const VertexLine2D* l = vertexXnRaw<0>();
+  const VertexPointXY* p = vertexXnRaw<1>();
+  Vector2 n(std::cos(l->theta()), std::sin(l->theta()));
+  double prediction = n.dot(p->estimate()) - l->rho();
+  error_[0] = prediction - measurement_;
 }
 
-bool EdgeLine2DPointXY::write(std::ostream& os) const {
-  os << measurement() << " ";
-  os << information()(0, 0);
-  return os.good();
+bool EdgeLine2DPointXY::setMeasurementFromState() {
+  const VertexLine2D* l = vertexXnRaw<0>();
+  const VertexPointXY* p = vertexXnRaw<1>();
+  Vector2 n(std::cos(l->theta()), std::sin(l->theta()));
+  double prediction = n.dot(p->estimate()) - l->rho();
+  measurement_ = prediction;
+  return true;
 }
 
 }  // namespace g2o

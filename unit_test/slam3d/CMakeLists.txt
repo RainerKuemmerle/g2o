@@ -1,5 +1,4 @@
 add_executable(unittest_slam3d
-  io_slam3d.cpp
   jacobians_slam3d.cpp
   mappings_slam3d.cpp
   orthogonal_matrix.cpp

@@ -27,24 +27,12 @@
 #include "edge_xyz_prior.h"
 
 #include <Eigen/Core>
-#include <iostream>
 
-#include "g2o/core/io_helper.h"
 #include "g2o/types/slam3d/vertex_pointxyz.h"
 
 namespace g2o {
 
 EdgeXYZPrior::EdgeXYZPrior() { information().setIdentity(); }
-
-bool EdgeXYZPrior::read(std::istream& is) {
-  internal::readVector(is, measurement_);
-  return readInformationMatrix(is);
-}
-
-bool EdgeXYZPrior::write(std::ostream& os) const {
-  internal::writeVector(os, measurement());
-  return writeInformationMatrix(os);
-}
 
 void EdgeXYZPrior::computeError() {
   const VertexPointXYZ* v = vertexXnRaw<0>();

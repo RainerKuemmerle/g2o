@@ -29,7 +29,6 @@
 #include <string>
 #include <typeinfo>
 
-#include "g2o/core/io_helper.h"
 #include "g2o/stuff/macros.h"
 #include "g2o/stuff/misc.h"
 #include "g2o/stuff/opengl_wrapper.h"
@@ -38,20 +37,6 @@
 namespace g2o {
 
 VertexPlane::VertexPlane() { color << cst(.2), cst(.2), cst(.2); }
-
-bool VertexPlane::read(std::istream& is) {
-  Vector4 lv;
-  bool state = internal::readVector(is, lv);
-  setEstimate(Plane3D(lv));
-  state &= internal::readVector(is, color);
-  return state;
-}
-
-bool VertexPlane::write(std::ostream& os) const {
-  bool state = internal::writeVector(os, estimate_.toVector());
-  state &= internal::writeVector(os, color);
-  return state;
-}
 
 #ifdef G2O_HAVE_OPENGL
 

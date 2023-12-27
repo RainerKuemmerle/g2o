@@ -30,11 +30,36 @@
 #include <typeinfo>
 
 #include "g2o/core/eigen_types.h"
-#include "g2o/core/io_helper.h"
 #ifdef G2O_HAVE_OPENGL
 #include "g2o/stuff/opengl_wrapper.h"
 #endif
 namespace g2o {
+
+void EdgeSE2SensorCalib::computeError() {
+  const VertexSE2* v1 = vertexXnRaw<0>();
+  const VertexSE2* v2 = vertexXnRaw<1>();
+  const VertexSE2* laserOffset = vertexXnRaw<2>();
+  const SE2& x1 = v1->estimate();
+  const SE2& x2 = v2->estimate();
+  SE2 delta = inverseMeasurement_ * ((x1 * laserOffset->estimate()).inverse() *
+                                     x2 * laserOffset->estimate());
+  error_ = delta.toVector();
+}
+
+void EdgeSE2SensorCalib::setMeasurement(const SE2& m) {
+  measurement_ = m;
+  inverseMeasurement_ = m.inverse();
+}
+
+double EdgeSE2SensorCalib::initialEstimatePossible(
+    const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to) {
+  if (from.count(vertices_[2]) == 1  // need the laser offset
+      && ((from.count(vertices_[0]) == 1 && to == vertices_[1].get()) ||
+          ((from.count(vertices_[1]) == 1 && to == vertices_[0].get())))) {
+    return 1.0;
+  }
+  return -1.0;
+}
 
 void EdgeSE2SensorCalib::initialEstimate(
     const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to) {
@@ -50,19 +75,6 @@ void EdgeSE2SensorCalib::initialEstimate(
     vi->setEstimate(vj->estimate() * l->estimate() * inverseMeasurement_ *
                     l->estimate().inverse());
   }
-}
-
-bool EdgeSE2SensorCalib::read(std::istream& is) {
-  Vector3 p;
-  internal::readVector(is, p);
-  measurement_.fromVector(p);
-  inverseMeasurement_ = measurement().inverse();
-  return readInformationMatrix(is);
-}
-
-bool EdgeSE2SensorCalib::write(std::ostream& os) const {
-  internal::writeVector(os, measurement().toVector());
-  return writeInformationMatrix(os);
 }
 
 #ifdef G2O_HAVE_OPENGL

@@ -27,11 +27,9 @@
 #include "edge_se2_pointxy_bearing.h"
 
 #include <cassert>
-#include <ostream>
 #include <string>
 #include <typeinfo>
 
-#include "g2o/stuff/property.h"
 #include "g2o/types/slam2d/se2.h"
 #include "g2o/types/slam2d/vertex_point_xy.h"
 #include "g2o/types/slam2d/vertex_se2.h"
@@ -56,16 +54,6 @@ void EdgeSE2PointXYBearing::initialEstimate(
   t.setRotation(t.rotation() * Rotation2D(measurement_));
   Vector2 vr(r, 0.);
   l2->setEstimate(t * vr);
-}
-
-bool EdgeSE2PointXYBearing::read(std::istream& is) {
-  is >> measurement_ >> information()(0, 0);
-  return true;
-}
-
-bool EdgeSE2PointXYBearing::write(std::ostream& os) const {
-  os << measurement() << " " << information()(0, 0);
-  return os.good();
 }
 
 #ifdef G2O_HAVE_OPENGL

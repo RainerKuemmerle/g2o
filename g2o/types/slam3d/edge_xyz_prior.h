@@ -27,9 +27,6 @@
 #ifndef G2O_EDGE_XYZ_PRIOR_H_
 #define G2O_EDGE_XYZ_PRIOR_H_
 
-#include <iosfwd>
-#include <tuple>
-
 #include "g2o/core/base_unary_edge.h"
 #include "g2o/core/eigen_types.h"
 #include "g2o/core/optimizable_graph.h"
@@ -48,8 +45,6 @@ class G2O_TYPES_SLAM3D_API EdgeXYZPrior
     : public BaseUnaryEdge<3, Vector3, VertexPointXYZ> {
  public:
   EdgeXYZPrior();
-  bool read(std::istream& is) override;
-  bool write(std::ostream& os) const override;
 
   void computeError() override;
 

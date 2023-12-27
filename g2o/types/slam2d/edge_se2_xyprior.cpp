@@ -26,20 +26,7 @@
 
 #include "edge_se2_xyprior.h"
 
-#include "g2o/core/io_helper.h"
-
 namespace g2o {
-
-bool EdgeSE2XYPrior::read(std::istream& is) {
-  internal::readVector(is, measurement_);
-  readInformationMatrix(is);
-  return true;
-}
-
-bool EdgeSE2XYPrior::write(std::ostream& os) const {
-  internal::writeVector(os, measurement());
-  return writeInformationMatrix(os);
-}
 
 void EdgeSE2XYPrior::linearizeOplus() { jacobianOplusXi_ << 1, 0, 0, 0, 1, 0; }
 

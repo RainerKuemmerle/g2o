@@ -24,7 +24,6 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include <cstdlib>
 #include <fstream>
 #include <iostream>
 
@@ -106,7 +105,7 @@ int main(int argc, char** argv) {
     pointSensor->setMaxRange(2.);
     cameraPose = R;
     cameraPose.translation() = g2o::Vector3(0., 0., 0.3);
-    pointSensor->offsetParam()->setOffset(cameraPose);
+    pointSensor->offsetParam()->setParam(cameraPose);
     ss << "-pointXYZ";
   }
 
@@ -121,7 +120,7 @@ int main(int argc, char** argv) {
     R << 0, 0, 1, -1, 0, 0, 0, -1, 0;
     cameraPose = R;
     cameraPose.translation() = g2o::Vector3(0., 0., 0.3);
-    disparitySensor->offsetParam()->setOffset(cameraPose);
+    disparitySensor->offsetParam()->setParam(cameraPose);
     ss << "-disparity";
   }
 
@@ -136,7 +135,7 @@ int main(int argc, char** argv) {
     R << 0, 0, 1, -1, 0, 0, 0, -1, 0;
     cameraPose = R;
     cameraPose.translation() = g2o::Vector3(0., 0., 0.3);
-    depthSensor->offsetParam()->setOffset(cameraPose);
+    depthSensor->offsetParam()->setParam(cameraPose);
     ss << "-depth";
   }
 

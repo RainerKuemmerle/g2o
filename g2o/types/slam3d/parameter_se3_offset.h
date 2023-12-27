@@ -27,7 +27,6 @@
 #ifndef G2O_VERTEX_SE3_OFFSET_PARAMETERS_H_
 #define G2O_VERTEX_SE3_OFFSET_PARAMETERS_H_
 
-#include <iosfwd>
 #include <memory>
 
 #include "g2o/config.h"
@@ -50,17 +49,11 @@ class G2O_TYPES_SLAM3D_API ParameterSE3Offset
  public:
   ParameterSE3Offset();
 
-  bool read(std::istream& is) override;
-  bool write(std::ostream& os) const override;
-
   /**
    * update the offset to a new value.
    * re-calculates the different representations, e.g., the rotation matrix
    */
-  void setOffset(const Isometry3& offset = Isometry3::Identity());
-
-  //! rotation of the offset as 3x3 rotation matrix
-  [[nodiscard]] const Isometry3& offset() const { return parameter_; }
+  void update() override;
 
   //! rotation of the inverse offset as 3x3 rotation matrix
   [[nodiscard]] const Isometry3& inverseOffset() const {

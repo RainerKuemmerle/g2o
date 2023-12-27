@@ -81,7 +81,7 @@ void SensorPointXYZ::sense() {
     count++;
   }
   if (!robotPoseObject_) return;
-  sensorPose_ = robotPoseObject_->vertex()->estimate() * offsetParam_->offset();
+  sensorPose_ = robotPoseObject_->vertex()->estimate() * offsetParam_->param();
   for (auto* it : world()->objects()) {
     auto* o = dynamic_cast<WorldObjectType*>(it);
     if (o && isVisible(o)) {

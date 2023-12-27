@@ -28,7 +28,6 @@
 #define G2O_SBA_CAMERAPARAMETERS_H
 
 #include <Eigen/Core>
-#include <iosfwd>
 
 #include "g2o/core/eigen_types.h"
 #include "g2o/core/parameter.h"
@@ -99,8 +98,8 @@ class G2O_TYPES_SBA_API CameraParameters
 
   [[nodiscard]] Vector2 cam_map(const Vector3& trans_xyz) const;
   [[nodiscard]] Vector3 stereocam_uvu_map(const Vector3& trans_xyz) const;
-  bool read(std::istream& is) override;
-  bool write(std::ostream& os) const override;
+
+  void update() override;
 };
 
 }  // namespace g2o

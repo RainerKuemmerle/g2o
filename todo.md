@@ -1,3 +1,7 @@
+[ ] Create parameter type for ParameterCamera to support load/save
+[ ] Create parameter type for ParameterStereoCamera to support load/save
+[ ] Re-work python wrapping for parameters
+[ ] Test load/save for VertexCam (camera and baseline seem missing from traits)
 [x] update python optimizable graph wrapper (save/load) with format
 [x] add version number for file format
 [x] fix core API with exports for MSVC
@@ -6,7 +10,7 @@
 [x] binary format for save/load
 [x] XML format for save/load
 [ ] wrap abstract graph to python and update save wrapper
-[ ] ParameterContainer remove read/write
+[x] ParameterContainer remove read/write
 [ ] remove read/write methods for vertex / edge
 
 [ ] use cmakedefine01 for compile flags in config

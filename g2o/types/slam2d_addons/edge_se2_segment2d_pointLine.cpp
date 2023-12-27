@@ -26,22 +26,42 @@
 
 #include "edge_se2_segment2d_pointLine.h"
 
-#include <istream>
-
-#include "g2o/core/io_helper.h"
+#include <cmath>
 
 namespace g2o {
 
-bool EdgeSE2Segment2DPointLine::read(std::istream& is) {
-  is >> pointNum_;
-  internal::readVector(is, measurement_);
-  return readInformationMatrix(is);
+void EdgeSE2Segment2DPointLine::computeError() {
+  const VertexSE2* v1 = vertexXnRaw<0>();
+  const VertexSegment2D* l2 = vertexXnRaw<1>();
+  SE2 iEst = v1->estimate().inverse();
+  Vector2 predP1 = iEst * l2->estimateP1();
+  Vector2 predP2 = iEst * l2->estimateP2();
+  Vector2 dP = predP2 - predP1;
+  Vector2 normal(dP.y(), -dP.x());
+  normal.normalize();
+  Vector3 prediction;
+  prediction[2] = std::atan2(normal.y(), normal.x());
+  Eigen::Map<Vector2> pt(prediction.data());
+  pt = (pointNum_ == 0) ? predP1 : predP2;
+  error_ = prediction - measurement_;
+  error_[2] = normalize_theta(error_[2]);
 }
 
-bool EdgeSE2Segment2DPointLine::write(std::ostream& os) const {
-  os << pointNum_ << " ";
-  internal::writeVector(os, measurement());
-  return writeInformationMatrix(os);
+bool EdgeSE2Segment2DPointLine::setMeasurementFromState() {
+  const VertexSE2* v1 = vertexXnRaw<0>();
+  const VertexSegment2D* l2 = vertexXnRaw<1>();
+  SE2 iEst = v1->estimate().inverse();
+  Vector2 predP1 = iEst * l2->estimateP1();
+  Vector2 predP2 = iEst * l2->estimateP2();
+  Vector2 dP = predP2 - predP1;
+  Vector2 normal(dP.y(), -dP.x());
+  normal.normalize();
+  Vector3 prediction;
+  prediction[2] = std::atan2(normal.y(), normal.x());
+  Eigen::Map<Vector2> pt(prediction.data());
+  pt = (pointNum_ == 0) ? predP1 : predP2;
+  setMeasurement(prediction);
+  return true;
 }
 
 }  // namespace g2o

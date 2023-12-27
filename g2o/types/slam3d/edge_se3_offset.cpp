@@ -28,11 +28,8 @@
 
 #include <Eigen/Core>
 #include <Eigen/Geometry>
-#include <iostream>
 
-#include "g2o/core/cache.h"
 #include "g2o/core/eigen_types.h"
-#include "g2o/core/io_helper.h"
 #include "g2o/core/parameter.h"
 #include "g2o/types/slam3d/isometry3d_mappings.h"
 #include "g2o/types/slam3d/vertex_se3.h"
@@ -59,27 +56,6 @@ bool EdgeSE3Offset::resolveCaches() {
   return (cacheFrom_ && cacheTo_);
 }
 
-bool EdgeSE3Offset::read(std::istream& is) {
-  bool state = readParamIds(is);
-
-  Vector7 meas;
-  state &= internal::readVector(is, meas);
-  // normalize the quaternion to recover numerical precision lost by storing as
-  // human readable text
-  Vector4::MapType(meas.data() + 3).normalize();
-  setMeasurement(internal::fromVectorQT(meas));
-
-  state &= readInformationMatrix(is);
-  return state;
-}
-
-bool EdgeSE3Offset::write(std::ostream& os) const {
-  writeParamIds(os);
-  internal::writeVector(os, internal::toVectorQT(measurement_));
-  writeInformationMatrix(os);
-  return os.good();
-}
-
 void EdgeSE3Offset::computeError() {
   Isometry3 delta = inverseMeasurement_ * cacheFrom_->w2n() * cacheTo_->n2w();
   error_ = internal::toVectorMQT(delta);
@@ -100,8 +76,8 @@ void EdgeSE3Offset::linearizeOplus() {
   Isometry3 E;
   const Isometry3& Xi = from->estimate();
   const Isometry3& Xj = to->estimate();
-  const Isometry3& Pi = cacheFrom_->offsetParam()->offset();
-  const Isometry3& Pj = cacheTo_->offsetParam()->offset();
+  const Isometry3& Pi = cacheFrom_->offsetParam()->param();
+  const Isometry3& Pj = cacheTo_->offsetParam()->param();
   const Isometry3& Z = measurement_;
   internal::computeEdgeSE3Gradient(E, jacobianOplusXi_, jacobianOplusXj_, Z, Xi,
                                    Xj, Pi, Pj);
@@ -112,9 +88,9 @@ void EdgeSE3Offset::initialEstimate(const OptimizableGraph::VertexSet& from_,
   VertexSE3* from = vertexXnRaw<0>();
   VertexSE3* to = vertexXnRaw<1>();
 
-  Isometry3 virtualMeasurement = cacheFrom_->offsetParam()->offset() *
+  Isometry3 virtualMeasurement = cacheFrom_->offsetParam()->param() *
                                  measurement() *
-                                 cacheTo_->offsetParam()->offset().inverse();
+                                 cacheTo_->offsetParam()->param().inverse();
 
   if (from_.count(vertexXn<0>()) > 0) {
     to->setEstimate(from->estimate() * virtualMeasurement);

@@ -28,7 +28,6 @@
 
 #include <Eigen/Core>
 
-#include "g2o/core/io_helper.h"
 #include "g2o/types/sba/parameter_cameraparameters.h"
 #include "g2o/types/sba/vertex_se3_expmap.h"
 #include "g2o/types/slam3d/se3quat.h"
@@ -38,18 +37,6 @@ namespace g2o {
 EdgeProjectXYZ2UV::EdgeProjectXYZ2UV() {
   resizeParameters(1);
   installParameter<CameraParameters>(0);
-}
-
-bool EdgeProjectXYZ2UV::read(std::istream& is) {
-  readParamIds(is);
-  internal::readVector(is, measurement_);
-  return readInformationMatrix(is);
-}
-
-bool EdgeProjectXYZ2UV::write(std::ostream& os) const {
-  writeParamIds(os);
-  internal::writeVector(os, measurement());
-  return writeInformationMatrix(os);
 }
 
 void EdgeProjectXYZ2UV::computeError() {

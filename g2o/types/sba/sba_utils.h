@@ -28,11 +28,9 @@
 #define G2O_SBA_UTILS_H
 
 #include "g2o/types/slam3d/se3_ops.h"
-#include "g2o_types_sba_api.h"
+#include "g2o/types/slam3d/se3quat.h"
 
-namespace g2o {
-
-namespace internal {
+namespace g2o::internal {
 
 inline Vector3 invert_depth(const Vector3& x) {
   Vector2 aux = x.head<2>();
@@ -69,7 +67,6 @@ inline Matrix3 d_Tinvpsi_d_psi(const SE3Quat& T, const Vector3& psi) {
   return J;
 }
 
-}  // namespace internal
-}  // namespace g2o
+}  // namespace g2o::internal
 
 #endif

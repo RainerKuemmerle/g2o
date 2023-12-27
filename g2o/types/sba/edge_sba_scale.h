@@ -27,9 +27,6 @@
 #ifndef G2O_SBA_EDGESBASCALE_H
 #define G2O_SBA_EDGESBASCALE_H
 
-#include <iosfwd>
-#include <tuple>
-
 #include "g2o/core/base_binary_edge.h"
 #include "g2o/core/optimizable_graph.h"
 #include "g2o/stuff/misc.h"
@@ -44,8 +41,6 @@ namespace g2o {
 class G2O_TYPES_SBA_API EdgeSBAScale
     : public BaseBinaryEdge<1, double, VertexCam, VertexCam> {
  public:
-  bool read(std::istream& is) override;
-  bool write(std::ostream& os) const override;
   void computeError() override;
   void setMeasurement(const double& m) override { measurement_ = m; }
   double initialEstimatePossible(const OptimizableGraph::VertexSet&,

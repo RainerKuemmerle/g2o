@@ -30,7 +30,6 @@
 #include <Eigen/Core>
 
 #include "g2o/core/base_vertex.h"
-#include "g2o/core/hyper_graph_action.h"
 #include "g2o_tutorial_slam2d_api.h"
 
 namespace g2o::tutorial {
@@ -40,12 +39,7 @@ class G2O_TUTORIAL_SLAM2D_API VertexPointXY
  public:
   VertexPointXY();
 
-  void oplusImpl(const g2o::VectorX::MapType& update) override {
-    estimate_ += update;
-  }
-
-  bool read(std::istream& is) override;
-  bool write(std::ostream& os) const override;
+  void oplusImpl(const g2o::VectorX::MapType& update) override;
 };
 
 }  // namespace g2o::tutorial

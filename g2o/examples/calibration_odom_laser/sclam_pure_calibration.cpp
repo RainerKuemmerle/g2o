@@ -25,22 +25,15 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <cassert>
-#include <csignal>
 #include <fstream>
 #include <iostream>
-#include <map>
 #include <memory>
 
 #include "closed_form_calibration.h"
 #include "edge_se2_pure_calib.h"
-#include "g2o/core/hyper_dijkstra.h"
 #include "g2o/core/sparse_optimizer.h"
-#include "g2o/stuff/color_macros.h"
 #include "g2o/stuff/command_args.h"
-#include "g2o/stuff/filesys_tools.h"
 #include "g2o/stuff/macros.h"
-#include "g2o/stuff/string_tools.h"
-#include "g2o/stuff/timeutil.h"
 #include "g2o/types/data/data_queue.h"
 #include "g2o/types/data/robot_laser.h"
 #include "g2o/types/sclam2d/odometry_measurement.h"
@@ -51,7 +44,6 @@
 #include "sclam_helpers.h"
 
 using std::cerr;
-using std::endl;
 using std::string;
 
 namespace {
@@ -67,8 +59,6 @@ class VertexBaseline : public BaseVertex<1, double> {
   void oplusImpl(const VectorX::MapType& update) override {
     estimate_ += update[0];
   }
-  bool read(std::istream&) override { return false; }
-  bool write(std::ostream&) const override { return false; }
 };
 
 class EdgeCalib
@@ -98,9 +88,6 @@ class EdgeCalib
     const SE2 delta = Ku_ij.inverse() * laserMotionInRobotFrame;
     error_ = delta.toVector();
   }
-
-  bool read(std::istream&) override { return false; }
-  bool write(std::ostream&) const override { return false; }
 };
 
 namespace {
@@ -143,10 +130,10 @@ int run_sclam_pure_calibration(int argc, char** argv) {
   DataQueue odometryQueue;
   const int numLaserOdom = Gm2dlIO::readRobotLaser(rawFilename, odometryQueue);
   if (numLaserOdom == 0) {
-    cerr << "No raw information read" << endl;
+    cerr << "No raw information read\n";
     return 0;
   }
-  cerr << "Read " << numLaserOdom << " laser readings from file" << endl;
+  cerr << "Read " << numLaserOdom << " laser readings from file\n";
 
   Eigen::Vector3d odomCalib(1., 1., 1.);
   SE2 initialLaserPose;
@@ -154,14 +141,14 @@ int run_sclam_pure_calibration(int argc, char** argv) {
   const int numRobotLaser =
       Gm2dlIO::readRobotLaser(inputFilename, robotLaserQueue);
   if (numRobotLaser == 0) {
-    cerr << "No robot laser read" << endl;
+    cerr << "No robot laser read\n";
     return 0;
   }
   {
     auto rl = std::dynamic_pointer_cast<RobotLaser>(
         robotLaserQueue.buffer().begin()->second);
     initialLaserPose = rl->odomPose().inverse() * rl->laserPose();
-    cerr << PVAR(initialLaserPose.toVector().transpose()) << endl;
+    cerr << PVAR(initialLaserPose.toVector().transpose()) << '\n';
   }
 
   // adding the measurements
@@ -212,24 +199,24 @@ int run_sclam_pure_calibration(int argc, char** argv) {
       calibEdge->setInformation(Eigen::Matrix3d::Identity());
       calibEdge->setMeasurement(meas);
       if (!optimizer.addEdge(calibEdge)) {
-        cerr << "Error adding calib edge" << endl;
+        cerr << "Error adding calib edge\n";
       }
     }
 
     if (fixLaser) {
-      cerr << "Fix position of the laser offset" << endl;
+      cerr << "Fix position of the laser offset\n";
       laserOffset->setFixed(true);
     }
 
-    cerr << "\nPerforming full non-linear estimation" << endl;
+    cerr << "\nPerforming full non-linear estimation\n";
     optimizer.initializeOptimization();
     optimizer.computeActiveErrors();
     optimizer.optimize(maxIterations);
     cerr << "Calibrated laser offset (x, y, theta):"
-         << laserOffset->estimate().toVector().transpose() << endl;
+         << laserOffset->estimate().toVector().transpose() << '\n';
     odomCalib = odomParamsVertex->estimate();
     cerr << "Odometry parameters (scaling factors (v_l, v_r, b)): "
-         << odomParamsVertex->estimate().transpose() << endl;
+         << odomParamsVertex->estimate().transpose() << '\n';
     optimizer.clear();
   }
 
@@ -251,7 +238,7 @@ int run_sclam_pure_calibration(int argc, char** argv) {
     }
     // linearSolution = (A.transpose() * A).inverse() * A.transpose() * x;
     linearSolution = A.colPivHouseholderQr().solve(x);
-    // cout << PVAR(linearSolution.transpose()) << endl;
+    // cout << PVAR(linearSolution.transpose()) << '\n';
   }
 
   // constructing non-linear least squares
@@ -280,42 +267,42 @@ int run_sclam_pure_calibration(int argc, char** argv) {
     calibEdge->setInformation(Eigen::Matrix3d::Identity());
     calibEdge->setMeasurement(meas);
     if (!optimizer.addEdge(calibEdge)) {
-      cerr << "Error adding calib edge" << endl;
+      cerr << "Error adding calib edge\n";
     }
   }
 
   if (fixLaser) {
-    cerr << "Fix position of the laser offset" << endl;
+    cerr << "Fix position of the laser offset\n";
     laserOffset->setFixed(true);
   }
 
-  cerr << "\nPerforming partial non-linear estimation" << endl;
+  cerr << "\nPerforming partial non-linear estimation\n";
   optimizer.initializeOptimization();
   optimizer.computeActiveErrors();
   optimizer.optimize(maxIterations);
   cerr << "Calibrated laser offset (x, y, theta):"
-       << laserOffset->estimate().toVector().transpose() << endl;
+       << laserOffset->estimate().toVector().transpose() << '\n';
   odomCalib(0) = -1. * linearSolution(0) * odomParamsVertex->estimate();
   odomCalib(1) = linearSolution(1) * odomParamsVertex->estimate();
   odomCalib(2) = odomParamsVertex->estimate();
   cerr << "Odometry parameters (scaling factors (v_l, v_r, b)): "
-       << odomCalib.transpose() << endl;
+       << odomCalib.transpose() << '\n';
 
   {
     SE2 closedFormLaser;
     Eigen::Vector3d closedFormOdom;
     ClosedFormCalibration::calibrate(motions, closedFormLaser, closedFormOdom);
-    cerr << "\nObtaining closed form solution" << endl;
+    cerr << "\nObtaining closed form solution\n";
     cerr << "Calibrated laser offset (x, y, theta):"
-         << closedFormLaser.toVector().transpose() << endl;
+         << closedFormLaser.toVector().transpose() << '\n';
     cerr << "Odometry parameters (scaling factors (v_l, v_r, b)): "
-         << closedFormOdom.transpose() << endl;
+         << closedFormOdom.transpose() << '\n';
   }
 
   if (!dumpGraphFilename.empty()) {
     cerr << "Writing " << dumpGraphFilename << " ... ";
     optimizer.save(dumpGraphFilename.c_str());
-    cerr << "done." << endl;
+    cerr << "done.\n";
   }
 
   // optional input of a separate file for applying the odometry calibration
@@ -324,7 +311,7 @@ int run_sclam_pure_calibration(int argc, char** argv) {
     const int numTestOdom =
         Gm2dlIO::readRobotLaser(odomTestFilename, testRobotLaserQueue);
     if (numTestOdom == 0) {
-      cerr << "Unable to read test data" << endl;
+      cerr << "Unable to read test data\n";
     } else {
       std::ofstream rawStream("odometry_raw.txt");
       std::ofstream calibratedStream("odometry_calibrated.txt");
@@ -363,14 +350,16 @@ int run_sclam_pure_calibration(int argc, char** argv) {
         // write output
         rawStream << prev->odomPose().translation().x() << " "
                   << prev->odomPose().translation().y() << " "
-                  << prev->odomPose().rotation().angle() << endl;
+                  << prev->odomPose().rotation().angle() << '\n';
         calibratedStream << calOdomPose.translation().x() << " "
                          << calOdomPose.translation().y() << " "
-                         << calOdomPose.rotation().angle() << endl;
+                         << calOdomPose.rotation().angle() << '\n';
 
         prevCalibratedPose = calOdomPose;
         prev = cur;
       }
+      rawStream.close();
+      calibratedStream.close();
     }
   }
 

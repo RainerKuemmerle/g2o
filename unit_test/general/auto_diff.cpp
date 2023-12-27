@@ -38,9 +38,6 @@ class VertexFlatSE2 : public g2o::BaseVertex<3, g2o::Vector3> {
     estimate_ += update.head<kDimension>();
     estimate_(2) = g2o::normalize_theta(estimate_(2));
   }
-
-  bool read(std::istream&) override { return false; }
-  bool write(std::ostream&) const override { return false; }
 };
 
 /**
@@ -78,10 +75,6 @@ class Edge3ADTester
 
   // add the AD interface
   G2O_MAKE_AUTO_AD_FUNCTIONS
-
-  // NOOPs
-  bool read(std::istream&) override { return false; };
-  bool write(std::ostream&) const override { return false; };
 };
 
 /**

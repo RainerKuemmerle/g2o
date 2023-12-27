@@ -12,8 +12,9 @@ inline void declareSalm3dParameter(py::module& m) {
              std::shared_ptr<ParameterSE3Offset>>(m, "ParameterSE3Offset")
       .def(py::init<>())
 
-      .def("set_offset", &ParameterSE3Offset::setOffset)
-      .def("offset", &ParameterSE3Offset::offset)
+      .def("set_param", &ParameterSE3Offset::setParam)
+      .def("set_param_data", &ParameterSE3Offset::setParameterData)
+      .def("param", &ParameterSE3Offset::param)
       .def("inverse_offset", &ParameterSE3Offset::inverseOffset);
 
   // class G2O_TYPES_SLAM3D_API CacheSE3Offset: public Cache
@@ -23,7 +24,7 @@ inline void declareSalm3dParameter(py::module& m) {
              std::shared_ptr<ParameterCamera>>(m, "ParameterCamera")
       .def(py::init<>())
       .def("setKcam", &ParameterCamera::setKcam)
-      .def("setOffset", &ParameterCamera::setOffset)
+      .def("set_param", &ParameterCamera::setParam)
       .def("Kcam", &ParameterCamera::Kcam)
       .def("invKcam", &ParameterCamera::invKcam)
       .def("Kcam_inverseOffsetR", &ParameterCamera::Kcam_inverseOffsetR);
