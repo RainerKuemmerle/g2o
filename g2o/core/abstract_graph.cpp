@@ -113,4 +113,23 @@ void AbstractGraph::clear() {
   edges_.clear();
 }
 
+void AbstractGraph::renameTags(
+    const std::unordered_map<std::string, std::string>& tag_mapping) {
+  auto map_tag = [&tag_mapping](const std::string& tag) {
+    auto it = tag_mapping.find(tag);
+    if (it == tag_mapping.end()) return tag;
+    return it->second;
+  };
+
+  for (auto& entry : vertices_) {
+    entry.tag = map_tag(entry.tag);
+    for (auto& c : entry.data) c.tag = map_tag(c.tag);
+  }
+  for (auto& entry : edges_) {
+    entry.tag = map_tag(entry.tag);
+    for (auto& c : entry.data) c.tag = map_tag(c.tag);
+  }
+  for (auto& entry : parameters_) entry.tag = map_tag(entry.tag);
+}
+
 }  // namespace g2o

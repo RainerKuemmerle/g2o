@@ -24,8 +24,11 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+#include <algorithm>
 #include <ios>
 #include <sstream>
+#include <string>
+#include <unordered_map>
 #include <vector>
 
 #include "g2o/config.h"  // IWYU pragma: keep
@@ -126,6 +129,42 @@ class AbstractGraphIO : public TestWithParam<g2o::io::Format> {
   }
   g2o::AbstractGraph abstract_graph_;
 };
+
+TEST_F(AbstractGraphIO, RenameTags) {
+  EXPECT_THAT(abstract_graph_.vertices(),
+              Contains(testing::Field(&g2o::AbstractGraph::AbstractVertex::tag,
+                                      Eq("VERTEX_SE2")))
+                  .Times(Ge(1)));
+
+  auto v3_it = std::find_if(
+      abstract_graph_.vertices().begin(), abstract_graph_.vertices().end(),
+      [](const g2o::AbstractGraph::AbstractVertex& v) { return v.id == 3; });
+  EXPECT_THAT(v3_it->data,
+              Contains(testing::Field(&g2o::AbstractGraph::AbstractData::tag,
+                                      Eq("VERTEX_TAG")))
+                  .Times(Ge(1)));
+
+  std::unordered_map<std::string, std::string> tag_map = {
+      {"VERTEX_SE2", "VERTEX_BAR"}, {"VERTEX_TAG", "TAG_FOO"}};
+  abstract_graph_.renameTags(tag_map);
+
+  EXPECT_THAT(abstract_graph_.vertices(),
+              Contains(testing::Field(&g2o::AbstractGraph::AbstractVertex::tag,
+                                      Eq("VERTEX_SE2")))
+                  .Times(0));
+  EXPECT_THAT(abstract_graph_.vertices(),
+              Contains(testing::Field(&g2o::AbstractGraph::AbstractVertex::tag,
+                                      Eq("VERTEX_BAR")))
+                  .Times(Ge(1)));
+  EXPECT_THAT(v3_it->data,
+              Contains(testing::Field(&g2o::AbstractGraph::AbstractData::tag,
+                                      Eq("VERTEX_TAG")))
+                  .Times(0));
+  EXPECT_THAT(v3_it->data,
+              Contains(testing::Field(&g2o::AbstractGraph::AbstractData::tag,
+                                      Eq("TAG_FOO")))
+                  .Times(Ge(1)));
+}
 
 TEST_P(AbstractGraphIO, SaveAndLoad) {
   g2o::io::Format format = GetParam();

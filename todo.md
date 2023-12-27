@@ -1,6 +1,6 @@
 [x] update python optimizable graph wrapper (save/load) with format
 [x] add version number for file format
-[ ] fix core API with exports for MSVC
+[x] fix core API with exports for MSVC
 [ ] test save/load of dynamic vertex
 [ ] test save/load of dynamic edge
 [x] binary format for save/load

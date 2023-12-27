@@ -176,6 +176,34 @@ TEST(General, GraphChangeId) {
   EXPECT_EQ(v2->id(), 1);
 }
 
+class PublicRenamedTypesGraph : public g2o::OptimizableGraph {
+ public:
+  const std::unordered_map<std::string, std::string>& renamedTypesLookup()
+      const {
+    return renamedTypesLookup_;
+  }
+};
+
+TEST(General, RenamedTypesFromString) {
+  using namespace testing;  // NOLINT
+  PublicRenamedTypesGraph optimizer;
+
+  EXPECT_THAT(optimizer.renamedTypesLookup(), IsEmpty());
+
+  optimizer.setRenamedTypesFromString("VERTEX_SE2:foobar");
+  ASSERT_THAT(optimizer.renamedTypesLookup(), IsEmpty());
+
+  optimizer.setRenamedTypesFromString("VERTEX_SE2:foobar=DoesNotExist");
+  ASSERT_THAT(optimizer.renamedTypesLookup(), IsEmpty());
+
+  optimizer.setRenamedTypesFromString("VERTEX_SE2:foobar=VERTEX_SE2");
+  EXPECT_THAT(optimizer.renamedTypesLookup(), SizeIs(1));
+  EXPECT_THAT(optimizer.renamedTypesLookup(),
+              Contains(Key("VERTEX_SE2:foobar")));
+  EXPECT_THAT(optimizer.renamedTypesLookup(),
+              Contains(Pair("VERTEX_SE2:foobar", "VERTEX_SE2")));
+}
+
 /**
  * Fixture to test saving and loading of a graph.
  * Here, we will have a simple graph with N nodes and N edges.

@@ -29,6 +29,7 @@
 
 #include <istream>
 #include <string>
+#include <unordered_map>
 #include <utility>
 #include <vector>
 
@@ -133,6 +134,9 @@ class G2O_CORE_API AbstractGraph {
   };
 
   void clear();
+
+  void renameTags(
+      const std::unordered_map<std::string, std::string>& tag_mapping);
 
  protected:
   std::vector<int> fixed_;

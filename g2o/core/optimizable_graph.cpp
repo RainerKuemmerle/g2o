@@ -424,6 +424,10 @@ bool OptimizableGraph::load(std::istream& is, io::Format format) {
     return false;
   }
 
+  if (!renamedTypesLookup_.empty()) {
+    abstract_graph.renameTags(renamedTypesLookup_);
+  }
+
   // Create the parameters of the graph
   HyperGraph::GraphElemBitset elemParamBitset;
   elemParamBitset[HyperGraph::kHgetParameter] = true;
