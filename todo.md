@@ -1,13 +1,14 @@
 [ ] Create parameter type for ParameterCamera to support load/save
 [ ] Create parameter type for ParameterStereoCamera to support load/save
-[ ] Re-work python wrapping for parameters
+[ ] Re-work python wrapping for parameters, templated base param
 [ ] Test load/save for VertexCam (camera and baseline seem missing from traits)
 [ ] Refactor Data container. Can it be a container instead of linked list?
+[ ] support saving VectorX and MatrixX in G2O format
 [x] update python optimizable graph wrapper (save/load) with format
 [x] add version number for file format
 [x] fix core API with exports for MSVC
 [ ] test save/load of dynamic vertex
-[ ] test save/load of dynamic edge
+[x] test save/load of dynamic edge
 [x] binary format for save/load
 [x] XML format for save/load
 [ ] wrap abstract graph to python and update save wrapper

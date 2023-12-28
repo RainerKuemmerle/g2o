@@ -133,6 +133,7 @@ class BaseVertex : public OptimizableGraph::Vertex {
   }
 
   bool setEstimateData(const double* est) final {
+    if (est == nullptr) return false;
     static_assert(TypeTraits<EstimateType>::kVectorDimension != INT_MIN,
                   "Forgot to implement TypeTrait for your Estimate");
     typename TypeTraits<EstimateType>::VectorType::ConstMapType aux(
@@ -154,10 +155,11 @@ class BaseVertex : public OptimizableGraph::Vertex {
   [[nodiscard]] int estimateDimension() const final {
     static_assert(TypeTraits<EstimateType>::kVectorDimension != INT_MIN,
                   "Forgot to implement TypeTrait for your Estimate");
-    return TypeTraits<EstimateType>::kVectorDimension;
+    return DimensionTraits<EstimateType>::dimension(estimate_);
   }
 
   bool setMinimalEstimateData(const double* est) final {
+    if (est == nullptr) return false;
     static_assert(TypeTraits<EstimateType>::kMinimalVectorDimension != INT_MIN,
                   "Forgot to implement TypeTrait for your Estimate");
     typename TypeTraits<EstimateType>::MinimalVectorType::ConstMapType aux(
@@ -176,7 +178,7 @@ class BaseVertex : public OptimizableGraph::Vertex {
   [[nodiscard]] int minimalEstimateDimension() const final {
     static_assert(TypeTraits<EstimateType>::kMinimalVectorDimension != INT_MIN,
                   "Forgot to implement TypeTrait for your Estimate");
-    return TypeTraits<EstimateType>::kMinimalVectorDimension;
+    return DimensionTraits<EstimateType>::minimalDimension(estimate_);
   }
 
  protected:

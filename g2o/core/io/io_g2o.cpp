@@ -182,6 +182,8 @@ std::optional<AbstractGraph> IoG2O::load(std::istream& input) {
 }
 
 bool IoG2O::save(std::ostream& output, const AbstractGraph& graph) {
+  Factory* factory = Factory::instance();
+
   for (const auto& param : graph.parameters()) {
     output << param.tag << " " << param.id << " " << param.value << '\n';
   }
@@ -199,10 +201,11 @@ bool IoG2O::save(std::ostream& output, const AbstractGraph& graph) {
   }
 
   for (const auto& edge : graph.edges()) {
+    Factory::TypeInfo type_info = factory->typeInfo(edge.tag);
     output << edge.tag << " ";
     if (!edge.param_ids.empty()) output << edge.param_ids << " ";
-    output << edge.ids << " " << edge.measurement << " " << edge.information
-           << "\n";
+    output << edge.ids << (type_info.number_vertices <= 0 ? " || " : " ")
+           << edge.measurement << " " << edge.information << "\n";
     printData(output, edge.data);
   }
 

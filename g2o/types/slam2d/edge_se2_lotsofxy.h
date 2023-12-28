@@ -36,19 +36,24 @@
 
 namespace g2o {
 
+/**
+ * @brief A pose observing multiple points.
+ *
+ * vertex(0) = VertexSE2
+ * vertex(1) = VertexPointXY
+ * ...
+ * vertex(N) = VertexPointXY
+ */
 class G2O_TYPES_SLAM2D_API EdgeSE2LotsOfXY
     : public BaseVariableSizedEdge<-1, VectorX> {
- protected:
-  unsigned int observedPoints_ = 0;
-
  public:
   EdgeSE2LotsOfXY();
 
-  void setSize(int vertices) {
-    resize(vertices);
-    observedPoints_ = vertices - 1;
-    measurement_.resize(observedPoints_ * 2L, 1);
-    setDimension(observedPoints_ * 2);
+  void resize(size_t size) override {
+    BaseVariableSizedEdge<-1, VectorX>::resize(size);
+    int observed_points = size > 0 ? size - 1 : 0;
+    measurement_.resize(observed_points * 2L, 1);
+    setDimension(observed_points * 2);
   }
 
   void computeError() override;

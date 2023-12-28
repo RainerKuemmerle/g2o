@@ -86,13 +86,13 @@ struct TypeTraits<VectorN<N, T>> {
 
   static VectorType toVector(const Type& t) { return t; }
   static void toData(const Type& t, double* data) {  // NOLINT
-    typename VectorType::MapType v(data, kVectorDimension);
+    typename VectorType::MapType v(data, t.size());
     v = t;
   }
 
   static MinimalVectorType toMinimalVector(const Type& t) { return t; }
   static void toMinimalData(const Type& t, double* data) {  // NOLINT
-    typename MinimalVectorType::MapType v(data, kMinimalVectorDimension);
+    typename MinimalVectorType::MapType v(data, t.size());
     v = t;
   }
 
@@ -182,30 +182,29 @@ struct DimensionTraits {
 
   //! for a scalar value
   template <int IsScalar = TypeTraits<T>::kIsScalar>
-  static typename std::enable_if<IsScalar != 0, int>::type dimension(const T&) {
+  static std::enable_if_t<IsScalar != 0, int> dimension(const T&) {
     return 1;
   }
 
   //! for a statically known type
   template <int IsVector = TypeTraits<T>::kIsVector,
             int IsScalar = TypeTraits<T>::kIsScalar>
-  static typename std::enable_if<IsVector == 0 && IsScalar == 0, int>::type
-  minimalDimension(const T&) {
+  static std::enable_if_t<IsVector == 0 && IsScalar == 0, int> minimalDimension(
+      const T&) {
     return TypeTraits<T>::kMinimalVectorDimension;
   }
 
   //! for a vector type
   template <int IsVector = TypeTraits<T>::kIsVector,
             int IsScalar = TypeTraits<T>::kIsScalar>
-  static typename std::enable_if<IsVector != 0 && IsScalar == 0, int>::type
-  minimalDimension(const T& t) {
+  static std::enable_if_t<IsVector != 0 && IsScalar == 0, int> minimalDimension(
+      const T& t) {
     return t.size();
   }
 
   //! for a scalar value
   template <int IsScalar = TypeTraits<T>::kIsScalar>
-  static typename std::enable_if<IsScalar != 0, int>::type minimalDimension(
-      const T&) {
+  static std::enable_if_t<IsScalar != 0, int> minimalDimension(const T&) {
     return 1;
   }
 };

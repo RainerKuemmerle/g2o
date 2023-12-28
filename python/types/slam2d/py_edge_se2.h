@@ -32,7 +32,7 @@ inline void declareEdgeSE2(py::module& m) {
              std::shared_ptr<EdgeSE2LotsOfXY>>(m, "EdgeSE2LotsOfXY")
       .def(py::init<>())
       .def("set_dimension", &EdgeSE2LotsOfXY::setDimension<-1>)
-      .def("set_size", &EdgeSE2LotsOfXY::setSize)
+      .def("resize", &EdgeSE2LotsOfXY::resize)
 
       .def("compute_error", &EdgeSE2LotsOfXY::computeError)
       .def("set_measurement_from_state",

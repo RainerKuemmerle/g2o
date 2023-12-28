@@ -147,6 +147,7 @@ class BaseEdge : public OptimizableGraph::Edge {
 
   // methods based on the traits interface
   bool setMeasurementData(const double* d) final {
+    if (d == nullptr) return false;
     static_assert(TypeTraits<Measurement>::kVectorDimension != INT_MIN,
                   "Forgot to implement TypeTraits for your Measurement");
     typename TypeTraits<Measurement>::VectorType::ConstMapType aux(
@@ -165,11 +166,11 @@ class BaseEdge : public OptimizableGraph::Edge {
   }
 
   [[nodiscard]] int measurementDimension() const final {
-    return TypeTraits<Measurement>::kVectorDimension;
+    return DimensionTraits<Measurement>::dimension(measurement_);
   }
 
   [[nodiscard]] int minimalMeasurementDimension() const final {
-    return TypeTraits<Measurement>::kMinimalVectorDimension;
+    return DimensionTraits<Measurement>::minimalDimension(measurement_);
   }
 
   //! Return the identity information matrix of this edge type

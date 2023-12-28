@@ -36,18 +36,14 @@ namespace g2o {
 
 class G2O_TYPES_SLAM3D_API EdgeSE3LotsOfXYZ
     : public BaseVariableSizedEdge<-1, VectorX> {
- protected:
-  unsigned int observedPoints_ = 0;
-
  public:
   EdgeSE3LotsOfXYZ();
 
-  // TODO(Rainer): Remove setSize function and observedPoints member
-  void setSize(int vertices) {
-    resize(vertices);
-    observedPoints_ = vertices - 1;
-    measurement_.resize(observedPoints_ * 3L, 1);
-    setDimension(observedPoints_ * 3);
+  void resize(size_t size) override {
+    BaseVariableSizedEdge<-1, VectorX>::resize(size);
+    int observed_points = size > 0 ? size - 1 : 0;
+    measurement_.resize(observed_points * 3L, 1);
+    setDimension(observed_points * 3);
   }
 
   void computeError() override;

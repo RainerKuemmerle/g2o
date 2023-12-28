@@ -41,11 +41,12 @@ EdgeSE2LotsOfXY::EdgeSE2LotsOfXY() { resize(0); }
 void EdgeSE2LotsOfXY::computeError() {
   auto* pose = static_cast<VertexSE2*>(vertexRaw(0));
 
-  for (unsigned int i = 0; i < observedPoints_; i++) {
+  int observed_points = measurement_.size() / 2;
+  for (int i = 0; i < observed_points; i++) {
     auto* xy = static_cast<VertexPointXY*>(vertexRaw(1 + i));
     Vector2 m = pose->estimate().inverse() * xy->estimate();
 
-    unsigned int index = 2 * i;
+    const int index = 2 * i;
     error_[index] = m[0] - measurement_[index];
     error_[index + 1] = m[1] - measurement_[index + 1];
   }
@@ -102,11 +103,12 @@ void EdgeSE2LotsOfXY::initialEstimate(const OptimizableGraph::VertexSet& fixed,
 
   auto* pose = static_cast<VertexSE2*>(vertexRaw(0));
 
+  int observed_points = measurement_.size() / 2;
 #ifdef _MSC_VER
-  std::vector<bool> estimate_this(observedPoints_, true);
+  std::vector<bool> estimate_this(observed_points, true);
 #else
-  bool estimate_this[observedPoints_];
-  for (unsigned int i = 0; i < observedPoints_; i++) {
+  bool estimate_this[observed_points];
+  for (int i = 0; i < observed_points; i++) {
     estimate_this[i] = true;
   }
 #endif
@@ -145,7 +147,8 @@ double EdgeSE2LotsOfXY::initialEstimatePossible(
 bool EdgeSE2LotsOfXY::setMeasurementFromState() {
   auto* pose = static_cast<VertexSE2*>(vertexRaw(0));
 
-  for (unsigned int i = 0; i < observedPoints_; i++) {
+  int observed_points = measurement_.size() / 2;
+  for (int i = 0; i < observed_points; i++) {
     auto* xy = static_cast<VertexPointXY*>(vertexRaw(1 + i));
     Vector2 m = pose->estimate().inverse() * xy->estimate();
 

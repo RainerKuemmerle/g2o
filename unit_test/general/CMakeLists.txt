@@ -2,6 +2,7 @@ add_executable(unittest_general
   auto_diff.cpp
   batch_statistics.cpp
   graph_io.cpp
+  graph_io_dynamic.cpp
   graph_operations.cpp
   clear_and_redo.cpp
   base_fixed_sized_edge.cpp
