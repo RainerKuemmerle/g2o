@@ -20,6 +20,7 @@
 #include "g2o/core/base_dynamic_vertex.h"
 #include "g2o/core/base_vertex.h"
 #include "g2o/core/block_solver.h"
+#include "g2o/core/eigen_types.h"
 #include "g2o/core/optimization_algorithm_levenberg.h"
 #include "g2o/core/sparse_optimizer.h"
 #include "g2o/solvers/eigen/linear_solver_eigen.h"
@@ -30,11 +31,10 @@
 // This vertex stores the coefficients of the f(x) polynomial. This is
 // quadratic, and always has a degree of three.
 
-class FPolynomialCoefficientVertex
-    : public g2o::BaseVertex<3, Eigen::Vector3d> {
+class FPolynomialCoefficientVertex : public g2o::BaseVertex<3, g2o::Vector3> {
  public:
   // Create the vertex
-  FPolynomialCoefficientVertex() { setToOrigin(); }
+  FPolynomialCoefficientVertex() { setEstimate(g2o::Vector3::Zero()); }
 
   // Direct linear add
   void oplusImpl(const g2o::VectorX::MapType& update) override {

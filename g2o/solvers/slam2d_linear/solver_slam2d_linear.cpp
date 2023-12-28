@@ -214,7 +214,7 @@ bool SolverSLAM2DLinear::solveOrientation() {
 
   // update the orientation of the 2D poses and set translation to 0, GN shall
   // solve that
-  root->setToOrigin();
+  root->setEstimate(SE2());
   for (auto* vv : optimizer_->indexMapping()) {
     auto* v = static_cast<VertexSE2*>(vv);
     const int poseIdx = v->hessianIndex();

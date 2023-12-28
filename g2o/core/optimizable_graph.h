@@ -140,12 +140,6 @@ class G2O_CORE_API OptimizableGraph : public HyperGraph {
     Vertex();
     ~Vertex() override;
 
-    //! sets the node to the origin (used in the multilevel stuff)
-    void setToOrigin() {
-      setToOriginImpl();
-      updateCache();
-    }
-
     //! get the mapped memory of the hessian matrix
     [[nodiscard]] virtual double* hessianData() const = 0;
 
@@ -416,9 +410,6 @@ class G2O_CORE_API OptimizableGraph : public HyperGraph {
      * Implement in your class!
      */
     virtual void oplusImpl(const VectorX::MapType& v) = 0;
-
-    //! sets the node to the origin (used in the multilevel stuff)
-    virtual void setToOriginImpl() = 0;
 
     /**
      * sets the initial estimate from an array of double

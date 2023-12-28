@@ -181,13 +181,6 @@
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="btnSetZero">
-         <property name="text">
-          <string>SetZero</string>
-         </property>
-        </widget>
-       </item>
-       <item>
         <widget class="QPushButton" name="btnOptimize">
          <property name="text">
           <string>Optimize</string>

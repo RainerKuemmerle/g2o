@@ -92,12 +92,6 @@ struct TypeTraits<VertexIntrinsicsEstimate> {
     res.values(4) = 0.1;
     return res;
   }
-
-  static Type Identity() {
-    Type res;
-    res.values << 1., 1., .5, .5, .1;
-    return res;
-  }
 };
 
 }  // namespace g2o

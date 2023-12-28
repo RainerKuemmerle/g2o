@@ -49,7 +49,8 @@ static constexpr double kInformationScalingOdometry = 100;
 void addOdometryCalibLinksDifferential(SparseOptimizer& optimizer,
                                        const DataQueue& odomData) {
   auto odomParamsVertex = std::make_shared<VertexOdomDifferentialParams>();
-  odomParamsVertex->setToOrigin();
+  odomParamsVertex->setEstimate(
+      VertexOdomDifferentialParams::EstimateType::Ones());
   odomParamsVertex->setId(Gm2dlIO::kIdOdomcalib);
   optimizer.addVertex(odomParamsVertex);
 
@@ -74,14 +75,13 @@ void addOdometryCalibLinksDifferential(SparseOptimizer& optimizer,
         odomData.findClosestData(rl2->timestamp()));
 
     if (fabs(rl1->timestamp() - rl2->timestamp()) < 1e-7) {
-      std::cerr << "strange edge " << r1->id() << " <-> " << r2->id()
-                << std::endl;
+      std::cerr << "strange edge " << r1->id() << " <-> " << r2->id() << '\n';
       std::cerr << FIXED(PVAR(rl1->timestamp())
                          << "\t " << PVAR(rl2->timestamp()))
-                << std::endl;
+                << '\n';
       std::cerr << FIXED(PVAR(odom1->timestamp())
                          << "\t " << PVAR(odom2->timestamp()))
-                << std::endl;
+                << '\n';
     }
 
     // cerr << PVAR(odom1->odomPose().toVector().transpose()) << endl;

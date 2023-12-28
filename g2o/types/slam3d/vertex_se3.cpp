@@ -44,7 +44,7 @@ constexpr int kOrthogonalizeAfter =
 namespace g2o {
 
 VertexSE3::VertexSE3() {
-  setToOriginImpl();
+  setEstimate(Eigen::Isometry3d::Identity());
   updateCache();
 }
 

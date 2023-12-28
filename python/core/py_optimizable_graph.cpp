@@ -41,7 +41,6 @@ void declareOptimizableGraph(py::module& m) {
   py::class_<CLS::Vertex, HyperGraph::Vertex, HyperGraph::DataContainer,
              std::shared_ptr<CLS::Vertex>>(cls, "OptimizableGraph_Vertex")
       //.def(py::init<>())   // invalid new-expression of abstract class
-      .def("set_to_origin", &CLS::Vertex::setToOrigin)  // -> void
       .def(
           "set_estimate_data",
           [](CLS::Vertex& v, const VectorX& data) {

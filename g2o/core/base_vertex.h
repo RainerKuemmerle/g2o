@@ -127,24 +127,19 @@ class BaseVertex : public OptimizableGraph::Vertex {
     updateCache();
   }
 
-  // methods based on the traits interface
-  void setToOriginImpl() final {
-    setEstimate(TypeTraits<EstimateType>::Identity());
-  }
-
   bool setEstimateData(const double* est) final {
     if (est == nullptr) return false;
     static_assert(TypeTraits<EstimateType>::kVectorDimension != INT_MIN,
                   "Forgot to implement TypeTrait for your Estimate");
     typename TypeTraits<EstimateType>::VectorType::ConstMapType aux(
         est, DimensionTraits<EstimateType>::dimension(estimate_));
-    estimate_ = TypeTraits<EstimateType>::fromVector(aux);
-    updateCache();
+    setEstimate(TypeTraits<EstimateType>::fromVector(aux));
     return true;
   }
   using OptimizableGraph::Vertex::setEstimateData;
 
   bool getEstimateData(double* est) const final {
+    if (est == nullptr) return false;
     static_assert(TypeTraits<EstimateType>::kVectorDimension != INT_MIN,
                   "Forgot to implement TypeTrait for your Estimate");
     TypeTraits<EstimateType>::toData(estimate(), est);
@@ -169,6 +164,7 @@ class BaseVertex : public OptimizableGraph::Vertex {
   }
 
   bool getMinimalEstimateData(double* est) const final {
+    if (est == nullptr) return false;
     static_assert(TypeTraits<EstimateType>::kMinimalVectorDimension != INT_MIN,
                   "Forgot to implement TypeTrait for your Estimate");
     TypeTraits<EstimateType>::toMinimalData(estimate(), est);
@@ -186,8 +182,6 @@ class BaseVertex : public OptimizableGraph::Vertex {
   BVector b_;
   EstimateType estimate_;
   BackupStackType backup_;
-
- public:
 };
 
 template <int D, typename T>

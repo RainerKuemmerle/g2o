@@ -24,7 +24,7 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include <cmath>
+#include <Eigen/Core>
 
 #include "g2o/core/eigen_types.h"
 #include "g2o/core/type_traits.h"
@@ -59,8 +59,36 @@ TEST(TypeTraits, VectorFixed) {
   EXPECT_THAT(g2o::internal::print_wrap(
                   Traits::fromMinimalVector(g2o::Vector3(0, 1, 2))),
               EigenEqual(g2o::internal::print_wrap(g2o::Vector3(0, 1, 2))));
-  EXPECT_THAT(g2o::internal::print_wrap(Traits::Identity()),
-              EigenEqual(g2o::internal::print_wrap(g2o::Vector3::Zero())));
+}
+
+TEST(TypeTraits, VectorDynamic) {
+  using Traits = g2o::TypeTraits<g2o::VectorX>;
+  EXPECT_THAT(Traits::kVectorDimension, Eq(Eigen::Dynamic));
+  EXPECT_THAT(Traits::kMinimalVectorDimension, Eq(Eigen::Dynamic));
+  EXPECT_THAT(Traits::kIsVector, Eq(1));
+  EXPECT_THAT(Traits::kIsScalar, Eq(0));
+  EXPECT_THAT(
+      g2o::internal::print_wrap(Traits::toVector(g2o::VectorX::Ones(4))),
+      EigenEqual(g2o::internal::print_wrap(g2o::VectorX::Ones(4))));
+  g2o::VectorX data(3);
+  g2o::VectorX input(3);
+  input << 1, 2, 3;
+  Traits::toData(input, data.data());
+  EXPECT_THAT(g2o::internal::print_wrap(input),
+              EigenEqual(g2o::internal::print_wrap(data)));
+  EXPECT_THAT(
+      g2o::internal::print_wrap(Traits::toMinimalVector(g2o::VectorX::Ones(4))),
+      EigenEqual(g2o::internal::print_wrap(g2o::VectorX::Ones(4))));
+  input << 0, 1, 2;
+  Traits::toMinimalData(input, data.data());
+  EXPECT_THAT(g2o::internal::print_wrap(Traits::toVector(input)),
+              EigenEqual(g2o::internal::print_wrap(data)));
+  EXPECT_THAT(
+      g2o::internal::print_wrap(Traits::fromVector(g2o::Vector3(0, 1, 2))),
+      EigenEqual(g2o::internal::print_wrap(input)));
+  EXPECT_THAT(g2o::internal::print_wrap(
+                  Traits::fromMinimalVector(g2o::Vector3(0, 1, 2))),
+              EigenEqual(g2o::internal::print_wrap(input)));
 }
 
 TEST(TypeTraits, Double) {
@@ -83,7 +111,6 @@ TEST(TypeTraits, Double) {
               EigenEqual(g2o::internal::print_wrap(data)));
   EXPECT_THAT(Traits::fromVector(Vec1(2.)), Eq(2.));
   EXPECT_THAT(Traits::fromMinimalVector(Vec1(3.)), Eq(3.));
-  EXPECT_THAT(Traits::Identity(), Eq(0.));
 }
 
 TEST(TypeTraits, Dimension) {

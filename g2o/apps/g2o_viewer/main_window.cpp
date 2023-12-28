@@ -128,15 +128,6 @@ void MainWindow::on_btnInitialGuess_clicked() {
   viewer->update();
 }
 
-void MainWindow::on_btnSetZero_clicked() {
-  if (viewer->graph->activeEdges().empty())
-    viewer->graph->initializeOptimization();
-
-  viewer->graph->setToOrigin();
-  viewer->setUpdateDisplay(true);
-  viewer->update();
-}
-
 void MainWindow::on_btnReload_clicked() {
   if (filename_.length() > 0) {
     std::cerr << "reloading " << filename_ << '\n';

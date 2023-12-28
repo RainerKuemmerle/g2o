@@ -84,8 +84,6 @@ struct TypeTraits<StereoCameraParameters> {
   static Type fromMinimalVector(const Eigen::DenseBase<Derived>& v) {
     return fromVector(v);
   }
-
-  static Type Identity() { return Type(); }
 };
 
 class G2O_TYPES_SBA_API CameraParameters

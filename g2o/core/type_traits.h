@@ -63,8 +63,6 @@ struct TypeTraits {
 
   // template <typename Derived>
   // static Type fromMinimalVector(const Eigen::DenseBase<Derived>& v);
-
-  // static Type Identity();
 };
 
 /**
@@ -105,8 +103,6 @@ struct TypeTraits<VectorN<N, T>> {
   static Type fromMinimalVector(const Eigen::DenseBase<Derived>& v) {
     return v;
   }
-
-  static Type Identity() { return Type::Zero(kVectorDimension); }
 };
 
 /**
@@ -153,8 +149,6 @@ struct TypeTraits<double> {
   static Type fromMinimalVector(const Eigen::DenseBase<Derived>& v) {
     return v[0];
   }
-
-  static Type Identity() { return 0.; }
 };
 
 /**

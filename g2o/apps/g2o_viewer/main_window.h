@@ -71,7 +71,6 @@ class G2O_VIEWER_API MainWindow : public QMainWindow,
 
   void on_btnOptimize_clicked();
   void on_btnInitialGuess_clicked();
-  void on_btnSetZero_clicked();
   void on_btnForceStop_clicked();
   void on_btnOptimizerParameters_clicked();
   void on_btnReload_clicked();

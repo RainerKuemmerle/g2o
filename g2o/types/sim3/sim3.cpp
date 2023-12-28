@@ -239,10 +239,10 @@ void Sim3::normalizeRotation() {
   r_.normalize();
 }
 
-inline std::ostream& operator<<(std::ostream& out_str, const Sim3& sim3) {
-  out_str << sim3.rotation().coeffs() << std::endl;
-  out_str << sim3.translation() << std::endl;
-  out_str << sim3.scale() << std::endl;
+std::ostream& operator<<(std::ostream& out_str, const Sim3& sim3) {
+  out_str << sim3.rotation().coeffs() << '\n';
+  out_str << sim3.translation() << '\n';
+  out_str << sim3.scale() << '\n';
 
   return out_str;
 }

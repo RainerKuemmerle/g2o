@@ -42,8 +42,7 @@ void declareSparseOptimizer(py::module& m) {
       .def("compute_initial_guess",
            static_cast<void (CLS::*)(EstimatePropagatorCost&)>(
                &CLS::computeInitialGuess),
-           "propagator"_a)                      // virtual
-      .def("set_to_origin", &CLS::setToOrigin)  // virtual
+           "propagator"_a)  // virtual
 
       .def("optimize", &CLS::optimize, "iterations"_a,
            "online"_a = false)  // -> int
