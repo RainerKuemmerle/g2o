@@ -539,6 +539,7 @@ class G2O_CORE_API OptimizableGraph : public HyperGraph {
 
     //! returns the dimensions of the error function
     [[nodiscard]] int dimension() const { return dimension_; }
+    virtual int dimensionAtCompileTime() const = 0;
 
     virtual Vertex* createVertex(int) { return nullptr; }
 

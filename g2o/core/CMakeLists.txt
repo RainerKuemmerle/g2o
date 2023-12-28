@@ -37,7 +37,6 @@ jacobian_workspace.cpp jacobian_workspace.h
 robust_kernel.cpp robust_kernel.h
 robust_kernel_impl.cpp robust_kernel_impl.h
 robust_kernel_factory.cpp robust_kernel_factory.h
-io_helper.h
 g2o_core_api.h
 # IO
 abstract_graph.cpp abstract_graph.h
