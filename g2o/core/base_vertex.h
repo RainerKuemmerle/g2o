@@ -153,6 +153,10 @@ class BaseVertex : public OptimizableGraph::Vertex {
     return DimensionTraits<EstimateType>::dimension(estimate_);
   }
 
+  [[nodiscard]] int estimateDimensionAtCompileTime() const override {
+    return TypeTraits<EstimateType>::kVectorDimension;
+  }
+
   bool setMinimalEstimateData(const double* est) final {
     if (est == nullptr) return false;
     static_assert(TypeTraits<EstimateType>::kMinimalVectorDimension != INT_MIN,

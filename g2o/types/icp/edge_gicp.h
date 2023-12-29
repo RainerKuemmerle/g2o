@@ -133,8 +133,6 @@ struct TypeTraits<EdgeGICP> {
   static Type fromMinimalVector(const Eigen::DenseBase<Derived>& v) {
     return fromVector(v);
   }
-
-  static Type Identity() { return Type(); }
 };
 
 }  // namespace g2o

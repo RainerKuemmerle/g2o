@@ -40,29 +40,13 @@ namespace g2o {
  */
 template <typename T>
 struct TypeTraits {
-  // enum {
-  //   kVectorDimension = INT_MIN,  ///< dimension of the type as vector
-  //   kMinimalVectorDimension =
-  //       INT_MIN,    ///< dimension of the type as minimal vector
-  //   kIsVector = 0,  ///< type is a vector
-  //   kIsScalar = 0,  ///< type is a scalar value
-  // };
-
-  // using Type = T;
-  // using VectorType = VectorN<kVectorDimension>;
-  // using MinimalVectorType = VectorN<kMinimalVectorDimension>;
-
-  // static VectorType toVector(const Type& t);
-  // static void toData(const Type& t, double* data);
-
-  // static VectorType toMinimalVector(const Type& t);
-  // static void toMinimalData(const Type& t, double* data);
-
-  // template <typename Derived>
-  // static Type fromVector(const Eigen::DenseBase<Derived>& v);
-
-  // template <typename Derived>
-  // static Type fromMinimalVector(const Eigen::DenseBase<Derived>& v);
+  enum {
+    kVectorDimension = INT_MIN,  ///< dimension of the type as vector
+    kMinimalVectorDimension =
+        INT_MIN,    ///< dimension of the type as minimal vector
+    kIsVector = 0,  ///< type is a vector
+    kIsScalar = 0,  ///< type is a scalar value
+  };
 };
 
 /**

@@ -114,7 +114,12 @@ std::optional<AbstractGraph> IoG2O::load(std::istream& input) {
       vertex.tag = token;
       current_line >> vertex.id;
       // read estimate vector
-      vertex.estimate.resize(type_info.dimension);
+      if (type_info.dimension_at_compile_time < 0) {
+        int estimate_size = 0;
+        current_line >> estimate_size;
+        vertex.estimate.resize(estimate_size);
+      } else
+        vertex.estimate.resize(type_info.dimension);
       for (auto& v : vertex.estimate) current_line >> v;
       if (!current_line) {
         G2O_ERROR("Error reading vertex {} at line {}", token, line_number);
@@ -127,27 +132,37 @@ std::optional<AbstractGraph> IoG2O::load(std::istream& input) {
     } else if (type_info.elementTypeBit == HyperGraph::kHgetEdge) {
       AbstractGraph::AbstractEdge edge;
       edge.tag = token;
-      if (type_info.number_vertices > 0) {
-        edge.ids.resize(type_info.number_vertices);
-        for (auto& id : edge.ids) current_line >> id;
-      } else {  // reading the IDs of a dynamically sized edge
-        std::string buff;
-        while (current_line >> buff) {
-          if (buff == "||") break;
-          edge.ids.push_back(stoi(buff));
-        }
+      if (type_info.number_vertices_at_compile_time < 0) {
+        // reading the IDs of a dynamically sized edge
+        int number_of_vertices = 0;
+        current_line >> number_of_vertices;
+        edge.ids.resize(number_of_vertices);
+      } else {
+        edge.ids.resize(type_info.number_vertices_at_compile_time);
       }
+      for (auto& id : edge.ids) current_line >> id;
       // read the parameter ids
       if (type_info.number_parameters > 0) {
         edge.param_ids.resize(type_info.number_parameters);
         for (auto& param_id : edge.param_ids) current_line >> param_id;
       }
       // read measurement vector
-      edge.measurement.resize(type_info.dimension);
+      if (type_info.dimension_at_compile_time < 0) {
+        int measurement_size = 0;
+        current_line >> measurement_size;
+        edge.measurement.resize(measurement_size);
+      } else
+        edge.measurement.resize(type_info.dimension);
       for (auto& v : edge.measurement) current_line >> v;
       // read upper triangle of the information matrix
-      const int& min_dim = type_info.minimal_dimension;
-      edge.information.resize((min_dim * (min_dim + 1)) / 2);
+      if (type_info.error_dimension_at_compile_time < 0) {
+        int information_size = 0;
+        current_line >> information_size;
+        edge.information.resize(information_size);
+      } else {
+        const int& min_dim = type_info.error_dimension;
+        edge.information.resize((min_dim * (min_dim + 1)) / 2);
+      }
       for (auto& v : edge.information) current_line >> v;
 
       if (!current_line) {
@@ -196,16 +211,27 @@ bool IoG2O::save(std::ostream& output, const AbstractGraph& graph) {
   };
 
   for (const auto& vertex : graph.vertices()) {
-    output << vertex.tag << " " << vertex.id << " " << vertex.estimate << '\n';
+    const Factory::TypeInfo type_info = factory->typeInfo(vertex.tag);
+    output << vertex.tag << " " << vertex.id << " ";
+    if (type_info.dimension_at_compile_time < 0)
+      output << vertex.estimate.size() << " ";
+    output << vertex.estimate << '\n';
     printData(output, vertex.data);
   }
 
   for (const auto& edge : graph.edges()) {
-    Factory::TypeInfo type_info = factory->typeInfo(edge.tag);
+    const Factory::TypeInfo type_info = factory->typeInfo(edge.tag);
     output << edge.tag << " ";
     if (!edge.param_ids.empty()) output << edge.param_ids << " ";
-    output << edge.ids << (type_info.number_vertices <= 0 ? " || " : " ")
-           << edge.measurement << " " << edge.information << "\n";
+    if (type_info.number_vertices_at_compile_time < 0)
+      output << edge.ids.size() << " ";
+    output << edge.ids << " ";
+    if (type_info.dimension_at_compile_time < 0)
+      output << edge.measurement.size() << " ";
+    output << edge.measurement << " ";
+    if (type_info.error_dimension_at_compile_time < 0)
+      output << edge.information.size() << " ";
+    output << edge.information << "\n";
     printData(output, edge.data);
   }
 

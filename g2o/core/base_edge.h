@@ -169,6 +169,10 @@ class BaseEdge : public OptimizableGraph::Edge {
     return DimensionTraits<Measurement>::dimension(measurement_);
   }
 
+  [[nodiscard]] int measurementDimensionAtCompileTime() const override {
+    return TypeTraits<Measurement>::kVectorDimension;
+  }
+
   [[nodiscard]] int minimalMeasurementDimension() const final {
     return DimensionTraits<Measurement>::minimalDimension(measurement_);
   }

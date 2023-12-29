@@ -26,8 +26,6 @@
 
 #include "types_slam2d.h"
 
-#include <memory>
-
 #include "edge_pointxy.h"
 #include "edge_se2.h"
 #include "edge_se2_lotsofxy.h"

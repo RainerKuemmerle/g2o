@@ -106,14 +106,25 @@ void Factory::registerType(
     case HyperGraph::kHgetVertex: {
       auto* v = static_cast<OptimizableGraph::Vertex*>(element.get());
       ci->type_info.dimension = v->estimateDimension();
+      ci->type_info.dimension_at_compile_time =
+          v->estimateDimensionAtCompileTime();
+      ci->type_info.minimal_dimension = v->minimalEstimateDimension();
       ci->type_info.minimal_dimension = v->minimalEstimateDimension();
     } break;
     case HyperGraph::kHgetEdge: {
       auto* e = static_cast<OptimizableGraph::Edge*>(element.get());
       ci->type_info.dimension = e->measurementDimension();
+      ci->type_info.dimension_at_compile_time =
+          e->measurementDimensionAtCompileTime();
       ci->type_info.minimal_dimension = e->minimalMeasurementDimension();
       ci->type_info.number_vertices = e->vertices().size();
+      ci->type_info.number_vertices_at_compile_time =
+          e->numVerticesAtCompileTime();
       ci->type_info.number_parameters = e->numParameters();
+      ci->type_info.error_dimension = e->dimension();
+      ci->type_info.error_dimension_at_compile_time =
+          e->dimensionAtCompileTime();
+
     } break;
     case HyperGraph::kHgetParameter: {
       auto* p = static_cast<Parameter*>(element.get());

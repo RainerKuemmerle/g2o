@@ -30,7 +30,10 @@
 #include <tuple>
 
 #include "g2o/config.h"  // IWYU pragma: keep
+#include "g2o/core/base_dynamic_vertex.h"
+#include "g2o/core/base_unary_edge.h"
 #include "g2o/core/eigen_types.h"
+#include "g2o/core/factory.h"
 #include "g2o/core/io/io_format.h"
 #include "g2o/core/sparse_optimizer.h"
 #include "g2o/types/slam2d/edge_se2_lotsofxy.h"
@@ -42,6 +45,27 @@
 
 using namespace testing;  // NOLINT
 
+class DynamicVertex : public g2o::BaseDynamicVertex<g2o::VectorX> {
+ public:
+  DynamicVertex() = default;
+
+  void oplusImpl(const g2o::VectorX::MapType& update) override {
+    estimate_ += update;
+  }
+
+ protected:
+  bool setDimensionImpl(int newDimension) override {
+    estimate_.resize(newDimension);
+    return true;
+  }
+};
+
+class EdgeForDynamicVertex
+    : public g2o::BaseUnaryEdge<2, g2o::Vector2, DynamicVertex> {
+ public:
+  void computeError() override { error_.setZero(); }
+};
+
 /**
  * @brief Test fixture for IO with the abstract graph.
  */
@@ -49,6 +73,20 @@ class OptimizableGraphDynamicEdgeIO
     : public TestWithParam<std::tuple<g2o::io::Format, bool>> {
  protected:
   void SetUp() override {
+    // Register the specific types of the test once
+    g2o::Factory* factory = g2o::Factory::instance();
+    if (!factory->knowsTag("TEST_DYN_VERTEX")) {
+      factory->registerType(
+          "TEST_DYN_VERTEX",
+          std::make_unique<g2o::HyperGraphElementCreator<DynamicVertex>>());
+    }
+    if (!factory->knowsTag("TEST_EDGE_FOR_DYN")) {
+      factory->registerType(
+          "TEST_EDGE_FOR_DYN",
+          std::make_unique<
+              g2o::HyperGraphElementCreator<EdgeForDynamicVertex>>());
+    }
+
     optimizer_ptr_ = g2o::internal::createOptimizerForTests();
 
     // Add vertices
@@ -72,6 +110,14 @@ class OptimizableGraphDynamicEdgeIO
     point2->setEstimate(g2o::Vector2::Random());
     optimizer_ptr_->addVertex(point2);
 
+    // Add dynamically sized vertex
+    constexpr int kDynVertexSize = 5;
+    auto dyn_vertex = std::make_shared<DynamicVertex>();
+    dyn_vertex->setId(4);
+    dyn_vertex->setDimension(kDynVertexSize);
+    dyn_vertex->setEstimate(g2o::VectorX::Random(kDynVertexSize));
+    optimizer_ptr_->addVertex(dyn_vertex);
+
     auto edge = std::make_shared<g2o::EdgeSE2LotsOfXY>();
     edge->resize(4);
     edge->vertices()[0] = pose;
@@ -82,6 +128,12 @@ class OptimizableGraphDynamicEdgeIO
         g2o::VectorX::Ones(edge->information().cols()).asDiagonal());
     edge->setMeasurementFromState();
     optimizer_ptr_->addEdge(edge);
+
+    auto edge_for_dyn = std::make_shared<EdgeForDynamicVertex>();
+    edge_for_dyn->setInformation(
+        EdgeForDynamicVertex::InformationType::Identity() * 5.);
+    edge_for_dyn->setVertex(0, dyn_vertex);
+    optimizer_ptr_->addEdge(edge_for_dyn);
   }
   std::unique_ptr<g2o::SparseOptimizer> optimizer_ptr_;
 };
@@ -109,7 +161,7 @@ TEST_P(OptimizableGraphDynamicEdgeIO, SaveAndLoad) {
               SizeIs(optimizer_ptr_->vertices().size()));
 
   EXPECT_THAT(loaded_optimizer->vertices(),
-              UnorderedElementsAre(Key(0), Key(1), Key(2), Key(3)));
+              UnorderedElementsAre(Key(0), Key(1), Key(2), Key(3), Key(4)));
 
   EXPECT_THAT(loaded_optimizer->edges(),
               SizeIs(optimizer_ptr_->edges().size()));
@@ -124,7 +176,7 @@ TEST_P(OptimizableGraphDynamicEdgeIO, SaveAndLoad) {
 namespace {
 // We can always test G2O format, others depend on libraries
 const auto kFileformatsToTest =
-    Values(std::make_tuple(g2o::io::Format::kG2O, false)
+    Values(std::make_tuple(g2o::io::Format::kG2O, true)
 #ifdef G2O_HAVE_CEREAL
                ,
            std::make_tuple(g2o::io::Format::kJson, true),

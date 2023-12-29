@@ -68,6 +68,6 @@ We want to save the original g2o file format but also support potentially new fi
 To support the original g2o file format, we need to handle the special case of a dynamic edge. However, we can assume that not many files with dynamically sized edges in the g2o format exist.
 To support the original g2o format, we need anyhow to implement a custom reader for the data. Hence, we can handle in there the special format to separate IDs, estimate and information matrix.
 
-As we assume only a very limited number of files have been written with dynamically sized edges, we will break compatibility for reading those. This allows as a smooth bath forward.
+As we assume only a very limited number of files have been written with dynamically sized edges, we will break compatibility for reading those. This allows as a smooth path forward.
 
 Currently, g2o can only implicitly differentiate if a edge is dynamic. To this end, an edge with zero vertices upon construction is assumed to be a dynamic edge. The same holds for a vertex.

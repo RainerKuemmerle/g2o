@@ -244,6 +244,10 @@ class G2O_CORE_API OptimizableGraph : public HyperGraph {
      * get/setEstimate(double*) -1 if it is not supported
      */
     [[nodiscard]] virtual int estimateDimension() const = 0;
+    /**
+     * Returns the dimension of the estimate at compile time.
+     */
+    [[nodiscard]] virtual int estimateDimensionAtCompileTime() const = 0;
 
     /**
      * sets the initial estimate from an array of double.
@@ -435,15 +439,20 @@ class G2O_CORE_API OptimizableGraph : public HyperGraph {
 
     //! sets the measurement from an array of double
     //! @returns true on success
-    virtual bool setMeasurementData(const double* m);
+    virtual bool setMeasurementData(const double* m) = 0;
 
     //! writes the measurement to an array of double
     //! @returns true on success
-    virtual bool getMeasurementData(double* m) const;
+    virtual bool getMeasurementData(double* m) const = 0;
 
     //! returns the dimension of the measurement in the extended representation
     //! which is used by get/setMeasurement;
-    [[nodiscard]] virtual int measurementDimension() const;
+    [[nodiscard]] virtual int measurementDimension() const = 0;
+
+    /**
+     * @brief Returns the measurement's dimension at compile time.
+     */
+    [[nodiscard]] virtual int measurementDimensionAtCompileTime() const = 0;
 
     /**
      * returns the minimal dimension of the measurement which corresponds to the
@@ -530,7 +539,7 @@ class G2O_CORE_API OptimizableGraph : public HyperGraph {
 
     //! returns the dimensions of the error function
     [[nodiscard]] int dimension() const { return dimension_; }
-    virtual int dimensionAtCompileTime() const = 0;
+    [[nodiscard]] virtual int dimensionAtCompileTime() const = 0;
 
     virtual Vertex* createVertex(int) { return nullptr; }
 
@@ -549,6 +558,9 @@ class G2O_CORE_API OptimizableGraph : public HyperGraph {
     [[nodiscard]] const std::vector<int>& parameterIds() const {
       return parameterIds_;
     }
+
+    //! return the number of vertices at compile time
+    [[nodiscard]] virtual int numVerticesAtCompileTime() const { return -1; }
 
    protected:
     int dimension_ = -1;

@@ -219,12 +219,6 @@ void OptimizableGraph::Edge::setRobustKernel(
 
 bool OptimizableGraph::Edge::resolveCaches() { return true; }
 
-bool OptimizableGraph::Edge::setMeasurementData(const double*) { return false; }
-
-bool OptimizableGraph::Edge::getMeasurementData(double*) const { return false; }
-
-int OptimizableGraph::Edge::measurementDimension() const { return -1; }
-
 bool OptimizableGraph::Edge::setMeasurementFromState() { return false; }
 
 OptimizableGraph::OptimizableGraph() {
@@ -466,6 +460,7 @@ bool OptimizableGraph::load(std::istream& is, io::Format format) {
            "Should be a vertex");
     auto vertex = std::static_pointer_cast<Vertex>(graph_element);
     vertex->setId(abstract_vertex.id);
+    vertex->setDimension(abstract_vertex.estimate.size());
     if (!vertex->setEstimateData(abstract_vertex.estimate)) {
       G2O_WARN("{} could not set estimate", abstract_vertex.tag);
       continue;
@@ -756,7 +751,10 @@ bool OptimizableGraph::saveVertex(AbstractGraph& abstract_graph,
                                   OptimizableGraph::Vertex* v) {
   Factory* factory = Factory::instance();
   const string tag = factory->tag(v);
-  if (tag.empty()) return false;
+  if (tag.empty()) {
+    G2O_WARN("Got empty tag for vertex {} while saving", v->id());
+    return false;
+  }
   std::vector<double> vertex_estimate;
   v->getEstimateData(vertex_estimate);
   abstract_graph.vertices().emplace_back(tag, v->id(), vertex_estimate);
@@ -771,7 +769,10 @@ bool OptimizableGraph::saveEdge(AbstractGraph& abstract_graph,
                                 OptimizableGraph::Edge* e) {
   Factory* factory = Factory::instance();
   const string tag = factory->tag(e);
-  if (tag.empty()) return false;
+  if (tag.empty()) {
+    G2O_WARN("Got empty tag for edge while saving");
+    return false;
+  }
   std::vector<int> ids;
   ids.reserve(e->vertices().size());
   for (const auto& vertex : e->vertices()) {
