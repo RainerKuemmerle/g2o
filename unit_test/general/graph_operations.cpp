@@ -32,6 +32,7 @@
 #include <memory>
 #include <numeric>
 #include <unordered_set>
+#include <vector>
 
 #include "g2o/core/eigen_types.h"
 #include "g2o/core/factory.h"
@@ -42,8 +43,14 @@
 #include "g2o/core/optimization_algorithm_property.h"
 #include "g2o/core/sparse_optimizer.h"
 #include "g2o/stuff/string_tools.h"
-#include "g2o/types/slam2d/types_slam2d.h"
+#include "g2o/types/slam2d/edge_se2.h"
+#include "g2o/types/slam2d/vertex_point_xy.h"
+#include "g2o/types/slam2d/vertex_se2.h"
 #include "unit_test/test_helper/allocate_optimizer.h"
+#include "unit_test/test_helper/eigen_matcher.h"
+
+using g2o::internal::print_wrap;
+using namespace testing;  // NOLINT
 
 G2O_USE_TYPE_GROUP(slam2d);  // NOLINT
 
@@ -204,6 +211,53 @@ TEST(General, RenamedTypesFromString) {
               Contains(Pair("VERTEX_SE2:foobar", "VERTEX_SE2")));
 }
 
+TEST(General, SetEstimateData) {
+  g2o::VertexSE2 vertex;
+
+  std::vector<double> data_vector = {1., 2., 3.};
+  vertex.setEstimateData(data_vector.data());
+  EXPECT_THAT(
+      print_wrap(vertex.estimate().toVector()),
+      g2o::internal::EigenApproxEqual(print_wrap(g2o::Vector3(1, 2, 3)), 1e-3));
+
+  vertex.setEstimateData(g2o::Vector3(3, 2, 1));
+  EXPECT_THAT(
+      print_wrap(vertex.estimate().toVector()),
+      g2o::internal::EigenApproxEqual(print_wrap(g2o::Vector3(3, 2, 1)), 1e-3));
+
+  vertex.setEstimateData(std::vector<double>({0.1, 0.2, 0.3}));
+  EXPECT_THAT(print_wrap(vertex.estimate().toVector()),
+              g2o::internal::EigenApproxEqual(
+                  print_wrap(g2o::Vector3(0.1, 0.2, 0.3)), 1e-3));
+
+  g2o::VectorX estimate_data;
+  ASSERT_THAT(vertex.getEstimateData(estimate_data), IsTrue());
+  EXPECT_THAT(print_wrap(estimate_data),
+              g2o::internal::EigenApproxEqual(
+                  print_wrap(g2o::Vector3(0.1, 0.2, 0.3)), 1e-3));
+
+  vertex.setMinimalEstimateData(data_vector.data());
+  EXPECT_THAT(
+      print_wrap(vertex.estimate().toVector()),
+      g2o::internal::EigenApproxEqual(print_wrap(g2o::Vector3(1, 2, 3)), 1e-3));
+
+  vertex.setMinimalEstimateData(g2o::Vector3(3, 2, 1));
+  EXPECT_THAT(
+      print_wrap(vertex.estimate().toVector()),
+      g2o::internal::EigenApproxEqual(print_wrap(g2o::Vector3(3, 2, 1)), 1e-3));
+
+  vertex.setMinimalEstimateData(std::vector<double>({0.1, 0.2, 0.3}));
+  EXPECT_THAT(print_wrap(vertex.estimate().toVector()),
+              g2o::internal::EigenApproxEqual(
+                  print_wrap(g2o::Vector3(0.1, 0.2, 0.3)), 1e-3));
+
+  estimate_data.setZero();
+  ASSERT_THAT(vertex.getMinimalEstimateData(estimate_data), IsTrue());
+  EXPECT_THAT(print_wrap(estimate_data),
+              g2o::internal::EigenApproxEqual(
+                  print_wrap(g2o::Vector3(0.1, 0.2, 0.3)), 1e-3));
+}
+
 /**
  * Fixture to test saving and loading of a graph.
  * Here, we will have a simple graph with N nodes and N edges.
@@ -348,14 +402,14 @@ TEST_F(GeneralGraphOperations, SavingGraph) {
   EXPECT_THAT(edgeIds, testing::ElementsAreArray(expectedEdgeIds()));
 }
 
-namespace internal {
+namespace {
 using KeyIntVector = std::vector<decltype(testing::Key(42))>;
 static KeyIntVector VectorIntToKeys(const std::vector<int>& keys) {  // NOLINT
   KeyIntVector matchers;
   for (const auto& val : keys) matchers.push_back(testing::Key(val));
   return matchers;
 }
-}  // namespace internal
+}  // namespace
 
 TEST_F(GeneralGraphOperations, LoadingGraph) {
   std::stringstream graphData;
@@ -372,9 +426,8 @@ TEST_F(GeneralGraphOperations, LoadingGraph) {
   ASSERT_THAT(optimizer_->edges(), testing::SizeIs(kNumVertices));
   ASSERT_THAT(optimizer_->dimensions(), testing::ElementsAre(3));
 
-  ASSERT_THAT(optimizer_->vertices(),
-              testing::UnorderedElementsAreArray(
-                  internal::VectorIntToKeys(expectedIds())));
+  ASSERT_THAT(optimizer_->vertices(), testing::UnorderedElementsAreArray(
+                                          VectorIntToKeys(expectedIds())));
   ASSERT_THAT(
       optimizer_->edges(),
       testing::Each(testing::Pointee(testing::Property(
@@ -406,8 +459,8 @@ TEST_F(GeneralGraphOperations, SaveSubsetVertices) {
   optimizer_->load(graphData);
   EXPECT_THAT(optimizer_->vertices(), testing::SizeIs(2));
   EXPECT_THAT(optimizer_->edges(), testing::SizeIs(1));
-  EXPECT_THAT(optimizer_->vertices(), testing::UnorderedElementsAreArray(
-                                          internal::VectorIntToKeys({0, 1})));
+  EXPECT_THAT(optimizer_->vertices(),
+              testing::UnorderedElementsAreArray(VectorIntToKeys({0, 1})));
 }
 
 TEST_F(GeneralGraphOperations, SaveSubsetEdges) {
@@ -428,8 +481,8 @@ TEST_F(GeneralGraphOperations, SaveSubsetEdges) {
   optimizer_->load(graphData);
   EXPECT_THAT(optimizer_->vertices(), testing::SizeIs(2));
   EXPECT_THAT(optimizer_->edges(), testing::SizeIs(1));
-  EXPECT_THAT(optimizer_->vertices(), testing::UnorderedElementsAreArray(
-                                          internal::VectorIntToKeys({1, 2})));
+  EXPECT_THAT(optimizer_->vertices(),
+              testing::UnorderedElementsAreArray(VectorIntToKeys({1, 2})));
 }
 
 TEST_F(GeneralGraphOperations, PushPopActiveVertices) {

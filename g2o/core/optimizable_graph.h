@@ -168,9 +168,9 @@ class G2O_CORE_API OptimizableGraph : public HyperGraph {
 
     /**
      * updates the current vertex with the direct solution x += H_ii\b_ii
-     * @return the determinant of the inverted hessian
+     * @return True, iff solution was possible
      */
-    virtual double solveDirect(double lambda = 0) = 0;
+    virtual bool solveDirect(double lambda = 0) = 0;
 
     /**
      * sets the initial estimate from an array of double
