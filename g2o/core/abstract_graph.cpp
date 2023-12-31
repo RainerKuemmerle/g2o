@@ -37,6 +37,7 @@
 #include "io/io_g2o.h"
 
 namespace {
+#ifdef G2O_HAVE_LOGGING
 std::string_view to_string(g2o::io::Format format) {
   switch (format) {
     case g2o::io::Format::kG2O:
@@ -50,6 +51,7 @@ std::string_view to_string(g2o::io::Format format) {
   }
   return "";
 }
+#endif
 
 /**
  * @brief Allocate an g2o::IoInterface to load/save data of the graph.
