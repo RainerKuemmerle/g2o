@@ -27,6 +27,7 @@
 #include <gtest/gtest.h>
 
 #include "g2o/core/eigen_types.h"
+#include "g2o/core/factory.h"
 #include "g2o/types/sba/edge_project_p2mc.h"
 #include "g2o/types/sba/edge_project_p2sc.h"
 #include "g2o/types/sba/edge_project_stereo_xyz.h"
@@ -38,6 +39,8 @@
 #include "g2o/types/sba/edge_se3_expmap.h"
 #include "g2o/types/sba/sbacam.h"
 #include "unit_test/test_helper/typed_io.h"
+
+G2O_USE_TYPE_GROUP(slam3d)
 
 template <>
 struct g2o::internal::RandomValue<g2o::SBACam> {
@@ -54,5 +57,5 @@ using SBAIoTypes =
                      g2o::EdgeStereoSE3ProjectXYZ,
                      g2o::EdgeStereoSE3ProjectXYZOnlyPose, g2o::EdgeProjectP2SC,
                      g2o::EdgeProjectP2MC>;
-INSTANTIATE_TYPED_TEST_SUITE_P(Slam3D, FixedSizeEdgeIO, SBAIoTypes,
+INSTANTIATE_TYPED_TEST_SUITE_P(SBA, FixedSizeEdgeIO, SBAIoTypes,
                                g2o::internal::DefaultTypeNames);
