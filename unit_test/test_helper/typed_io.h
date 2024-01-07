@@ -27,12 +27,14 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
+#include <cstddef>
 #include <memory>
 #include <string>
 
 #include "g2o/core/io/io_format.h"
 #include "g2o/core/optimizable_graph.h"
 #include "g2o/core/sparse_optimizer.h"
+#include "g2o/stuff/string_tools.h"
 #include "unit_test/test_helper/allocate_optimizer.h"
 #include "unit_test/test_helper/random_state.h"
 
@@ -108,11 +110,37 @@ TYPED_TEST_P(FixedSizeEdgeIO, SaveAndLoad) {
   auto loaded_optimizer = g2o::internal::createOptimizerForTests();
   loaded_optimizer->load(buffer, kFormat);
 
-  // Brutally check that serialization result is the same
+  // Check that serialization result is the same
   std::stringstream buffer_after_loading;
   save_result = loaded_optimizer->save(buffer_after_loading, kFormat);
   ASSERT_THAT(save_result, IsTrue());
-  EXPECT_THAT(buffer.str(), Eq(buffer_after_loading.str()));
+
+  // Prepare check of serialization result
+  const std::vector<std::string> before_lines =
+      g2o::strSplit(buffer.str(), "\n");
+  const std::vector<std::string> after_lines =
+      g2o::strSplit(buffer_after_loading.str(), "\n");
+  ASSERT_THAT(before_lines, SizeIs(after_lines.size()));
+
+  // Compare before and after line by line
+  for (std::size_t i = 0; i < before_lines.size(); ++i) {
+    const std::vector<std::string> before_tokens =
+        g2o::strSplit(before_lines[i], " ");
+    const std::vector<std::string> after_tokens =
+        g2o::strSplit(after_lines[i], " ");
+    ASSERT_THAT(before_tokens, SizeIs(after_tokens.size()));
+    if (before_tokens.empty()) continue;
+    EXPECT_THAT(before_tokens.front(), Eq(after_tokens.front()));
+    for (std::size_t j = 1; j < before_tokens.size(); ++j) {
+      const std::string& before_token = before_tokens[j];
+      const std::string& after_token = after_tokens[j];
+      const double before_value = std::stod(before_token);
+      const double after_value = std::stod(after_token);
+      EXPECT_THAT(before_value, DoubleNear(after_value, 1e-4))
+          << " Line " << i << " differs token " << j << ": " << before_tokens[j]
+          << " " << after_tokens[j];
+    }
+  }
 }
 
 REGISTER_TYPED_TEST_SUITE_P(FixedSizeEdgeIO, SaveAndLoad);

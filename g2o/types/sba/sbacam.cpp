@@ -127,11 +127,11 @@ void SBACam::setDr() {
 
 // human-readable SBACam object
 std::ostream& operator<<(std::ostream& out_str, const SBACam& cam) {
-  out_str << cam.translation().transpose() << std::endl;
-  out_str << cam.rotation().coeffs().transpose() << std::endl << std::endl;
-  out_str << cam.Kcam << std::endl << std::endl;
-  out_str << cam.w2n << std::endl << std::endl;
-  out_str << cam.w2i << std::endl << std::endl;
+  out_str << cam.translation().transpose() << '\n';
+  out_str << cam.rotation().coeffs().transpose() << '\n' << '\n';
+  out_str << cam.Kcam << '\n' << '\n';
+  out_str << cam.w2n << '\n' << '\n';
+  out_str << cam.w2i << '\n' << '\n';
   return out_str;
 }
 

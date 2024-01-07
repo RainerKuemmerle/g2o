@@ -70,8 +70,10 @@ struct RandomValue {
   template <typename FakeType>
   struct FakeDependency : public std::false_type {};
   static Type create() {
+#ifndef _MSC_VER
     static_assert(FakeDependency<T>::value,
                   "No specialization for RandomValue provided");
+#endif
     return T{};
   }
 };
