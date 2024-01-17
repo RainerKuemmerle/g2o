@@ -58,6 +58,14 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${g2o_LIBRARY_OUTPUT_DIRECTORY})
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${g2o_LIBRARY_OUTPUT_DIRECTORY})
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${g2o_RUNTIME_OUTPUT_DIRECTORY})
 
+# # Disable the --enable-new-dtags option for all targets, so that RPATH can be set.
+# # Many modern linkers, like Ninja, use the --enable-new-dtags option by default. 
+# # When this option is enabled, the -Wl,-rpath flag sets RUNPATH instead of RPATH. 
+# # This behavior is part of the ELF dynamic tags (DT_RUNPATH vs. DT_RPATH) and is intended 
+# # to give LD_LIBRARY_PATH precedence over RPATH, which was not the case with older linkers.
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,--disable-new-dtags")
+set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,--disable-new-dtags")
+
 # Set standard installation directories
 set(RUNTIME_DESTINATION ${CMAKE_INSTALL_BINDIR})
 set(LIBRARY_DESTINATION ${CMAKE_INSTALL_LIBDIR})
