@@ -77,8 +77,9 @@ static int convert_sba_slam3d(int argc, char** argv) {
         const SBACam& c = v->estimate();
         baseline = c.baseline;
         fx = c.Kcam(0, 0);
-        camParams->setKcam(c.Kcam(0, 0), c.Kcam(1, 1), c.Kcam(0, 2),
-                           c.Kcam(1, 2));
+        CameraWithOffset cam;
+        cam.setKcam(c.Kcam(0, 0), c.Kcam(1, 1), c.Kcam(0, 2), c.Kcam(1, 2));
+        camParams->setParam(cam);
         outputGraph.addParameter(camParams);
       }
 

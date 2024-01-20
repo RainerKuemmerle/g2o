@@ -36,13 +36,15 @@ namespace g2o {
 class G2O_SIMULATOR_API PointSensorParameters {
  public:
   PointSensorParameters() = default;
-  double maxRange() const { return sqrt(maxRange2_); }
+  [[nodiscard]] double maxRange() const { return sqrt(maxRange2_); }
   void setMaxRange(double maxRange);
-  double minRange() const { return sqrt(minRange2_); }
+  [[nodiscard]] double minRange() const { return sqrt(minRange2_); }
   void setMinRange(double minRange);
-  double fov() const { return fov_; }
+  [[nodiscard]] double fov() const { return fov_; }
   void setFov(double fov);
-  double maxAngularDifference() const { return maxAngularDifference_; }
+  [[nodiscard]] double maxAngularDifference() const {
+    return maxAngularDifference_;
+  }
   void setMaxAngularDifference(double angularDifference);
 
  protected:

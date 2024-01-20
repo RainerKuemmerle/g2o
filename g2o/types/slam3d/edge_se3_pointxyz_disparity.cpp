@@ -105,7 +105,7 @@ void EdgeSE3PointXYZDisparity::linearizeOplus() {
 
   // Eigen::Matrix<double,3,9,Eigen::ColMajor> Jprime =
   // vcache->params->Kcam_inverseOffsetR  * J;
-  Jprime = cache_->camParams()->Kcam_inverseOffsetR() * Jprime;
+  Jprime = cache_->camParams()->param().KcamInverseOffsetR() * Jprime;
   JacType Jhom;
   Vector3 Zprime = cache_->w2i() * pt;
 
@@ -146,14 +146,13 @@ void EdgeSE3PointXYZDisparity::initialEstimate(
   VertexSE3* cam = vertexXnRaw<0>();
   VertexPointXYZ* point = vertexXnRaw<1>();
 
-  const Eigen::Matrix<double, 3, 3, Eigen::ColMajor>& invKcam =
-      cache_->camParams()->invKcam();
+  const Matrix3& invKcam = cache_->camParams()->param().invKcam();
   Vector3 p;
   double w = 1. / measurement_(2);
   p.head<2>() = measurement_.head<2>() * w;
   p(2) = w;
   p = invKcam * p;
-  p = cam->estimate() * (cache_->camParams()->param() * p);
+  p = cam->estimate() * (cache_->camParams()->param().offset() * p);
   point->setEstimate(p);
 }
 
@@ -175,7 +174,7 @@ bool EdgeProjectDisparityDrawAction::operator()(
   if (!fromEdge || !toEdge) return true;
   ParameterCamera* camParam =
       static_cast<ParameterCamera*>(e->parameter(0).get());
-  Isometry3 fromTransform = fromEdge->estimate() * camParam->param();
+  Isometry3 fromTransform = fromEdge->estimate() * camParam->param().offset();
   glColor3f(LANDMARK_EDGE_COLOR);
   glPushAttrib(GL_ENABLE_BIT);
   glDisable(GL_LIGHTING);

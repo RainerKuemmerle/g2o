@@ -26,6 +26,7 @@
 
 #ifndef G2O_SENSOR_POINTXYZ_DEPTH_H_
 #define G2O_SENSOR_POINTXYZ_DEPTH_H_
+#include "g2o/types/slam3d/parameter_camera.h"
 #include "g2o_simulator_api.h"
 #include "pointsensorparameters.h"
 #include "simulator3d_base.h"
@@ -40,13 +41,13 @@ class G2O_SIMULATOR_API SensorPointXYZDepth
   explicit SensorPointXYZDepth(const std::string& name);
   void sense() override;
   void addParameters() override;
-  std::shared_ptr<ParameterSE3Offset> offsetParam() { return offsetParam_; };
+  std::shared_ptr<ParameterCamera> offsetParam() { return offsetParam_; };
   void addNoise(EdgeType* e) override;
 
  protected:
   bool isVisible(WorldObjectType* to);
   RobotPoseType sensorPose_;
-  std::shared_ptr<ParameterSE3Offset> offsetParam_;
+  std::shared_ptr<ParameterCamera> offsetParam_;
 };
 }  // namespace g2o
 

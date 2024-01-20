@@ -34,7 +34,7 @@
 #include <string>
 #include <typeinfo>
 
-#include "g2o/types/slam3d/parameter_se3_offset.h"
+#include "g2o/types/slam3d/vertex_se3.h"
 
 #ifdef G2O_HAVE_OPENGL
 #include "g2o/stuff/opengl_primitives.h"
@@ -43,62 +43,25 @@
 
 namespace g2o {
 
-ParameterCamera::ParameterCamera() {
-  setParam(Isometry3::Identity());
-  setId(-1);
-  setKcam(1, 1, 0.5, 0.5);
-  update();
-}
-
-void ParameterCamera::update() {
-  ParameterSE3Offset::update();
-  Kcam_inverseOffsetR_ = Kcam_ * inverseOffset().rotation();
-  invKcam_ = Kcam_.inverse();
-}
-
-void ParameterCamera::setKcam(double fx, double fy, double cx, double cy) {
-  Kcam_.setZero();
-  Kcam_(0, 0) = fx;
-  Kcam_(1, 1) = fy;
-  Kcam_(0, 2) = cx;
-  Kcam_(1, 2) = cy;
-  Kcam_(2, 2) = 1.0;
-}
-
-// bool ParameterCamera::read(std::istream& is) {
-//   Vector7 off;
-//   internal::readVector(is, off);
-//   // normalize the quaternion to recover numerical precision lost by storing
-//   as
-//   // human readable text
-//   Vector4::MapType(off.data() + 3).normalize();
-//   setOffset(internal::fromVectorQT(off));
-//   double fx;
-//   double fy;
-//   double cx;
-//   double cy;
-//   is >> fx >> fy >> cx >> cy;
-//   setKcam(fx, fy, cx, cy);
-//   return is.good();
-// }
-
-// bool ParameterCamera::write(std::ostream& os) const {
-//   internal::writeVector(os, internal::toVectorQT(parameter_));
-//   os << Kcam_(0, 0) << " ";
-//   os << Kcam_(1, 1) << " ";
-//   os << Kcam_(0, 2) << " ";
-//   os << Kcam_(1, 2) << " ";
-//   return os.good();
-// }
+void ParameterCamera::update() {}
 
 void CacheCamera::updateImpl() {
-  CacheSE3Offset::updateImpl();
+#ifndef NDEBUG
+  auto* offsetParam = dynamic_cast<ParameterCamera*>(parameters_[0].get());
+#else
+  auto* offsetParam = static_cast<ParameterCamera*>(parameters_[0].get());
+#endif
+
+  const auto& v = static_cast<const VertexSE3&>(vertex());
+  n2w_ = v.estimate() * offsetParam->param().offset();
+  w2n_ = n2w_.inverse();
+  w2l_ = v.estimate().inverse();
+
   w2i_.matrix().topLeftCorner<3, 4>() =
-      camParams()->Kcam() * w2n().matrix().topLeftCorner<3, 4>();
+      offsetParam->param().Kcam() * w2n().matrix().topLeftCorner<3, 4>();
 }
 
 #ifdef G2O_HAVE_OPENGL
-
 CacheCameraDrawAction::CacheCameraDrawAction()
     : DrawAction(typeid(CacheCamera).name()) {}
 
@@ -128,10 +91,12 @@ bool CacheCameraDrawAction::operator()(
 
   if (show_ && !show_->value()) return true;
 
+  auto* offsetParam =
+      static_cast<ParameterCamera*>(that->parameters()[0].get());
   glPushAttrib(GL_COLOR);
   glColor3f(POSE_PARAMETER_COLOR);
   glPushMatrix();
-  glMultMatrixd(that->camParams()->param().cast<double>().data());
+  glMultMatrixd(offsetParam->param().offset().data());
   glRotatef(180.0F, 0.0F, 1.0F, 0.0F);
   opengl::drawPyramid(cameraSide_->value(), cameraZ_->value());
   glPopMatrix();

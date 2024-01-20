@@ -75,5 +75,7 @@ install(TARGETS core
 )
 
 file(GLOB headers "${CMAKE_CURRENT_SOURCE_DIR}/*.h" "${CMAKE_CURRENT_SOURCE_DIR}/*.hpp")
-
 install(FILES ${headers} DESTINATION ${INCLUDES_INSTALL_DIR}/core)
+
+file(GLOB io_headers "${CMAKE_CURRENT_SOURCE_DIR}/io/*.h" "${CMAKE_CURRENT_SOURCE_DIR}/io/*.hpp")
+install(FILES ${io_headers} DESTINATION ${INCLUDES_INSTALL_DIR}/core/io)

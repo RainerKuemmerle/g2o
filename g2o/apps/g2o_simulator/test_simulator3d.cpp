@@ -30,7 +30,8 @@
 #include "g2o/core/optimizable_graph.h"
 #include "g2o/stuff/command_args.h"
 #include "g2o/stuff/sampler.h"
-#include "simulator3d.h"
+#include "g2o/types/slam3d/parameter_camera.h"
+#include "simulator3d.h"  // IWYU pragma: keep
 
 // #define _POSE_SENSOR_OFFSET
 // #define _POSE_PRIOR_SENSOR
@@ -115,11 +116,9 @@ int main(int argc, char** argv) {
     disparitySensor->setMinRange(0.5);
     disparitySensor->setMaxRange(2.);
     robot.addSensor(disparitySensor);
-    Eigen::Isometry3d cameraPose;
-    Eigen::Matrix3d R;
-    R << 0, 0, 1, -1, 0, 0, 0, -1, 0;
-    cameraPose = R;
-    cameraPose.translation() = g2o::Vector3(0., 0., 0.3);
+    g2o::CameraWithOffset cameraPose;
+    cameraPose.offset().linear() << 0, 0, 1, -1, 0, 0, 0, -1, 0;
+    cameraPose.offset().translation() = g2o::Vector3(0., 0., 0.3);
     disparitySensor->offsetParam()->setParam(cameraPose);
     ss << "-disparity";
   }
@@ -130,11 +129,9 @@ int main(int argc, char** argv) {
     depthSensor->setMinRange(0.5);
     depthSensor->setMaxRange(2.);
     robot.addSensor(depthSensor);
-    Eigen::Isometry3d cameraPose;
-    Eigen::Matrix3d R;
-    R << 0, 0, 1, -1, 0, 0, 0, -1, 0;
-    cameraPose = R;
-    cameraPose.translation() = g2o::Vector3(0., 0., 0.3);
+    g2o::CameraWithOffset cameraPose;
+    cameraPose.offset().linear() << 0, 0, 1, -1, 0, 0, 0, -1, 0;
+    cameraPose.offset().translation() = g2o::Vector3(0., 0., 0.3);
     depthSensor->offsetParam()->setParam(cameraPose);
     ss << "-depth";
   }
