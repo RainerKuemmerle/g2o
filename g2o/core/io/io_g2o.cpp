@@ -222,10 +222,10 @@ bool IoG2O::save(std::ostream& output, const AbstractGraph& graph) {
   for (const auto& edge : graph.edges()) {
     const Factory::TypeInfo type_info = factory->typeInfo(edge.tag);
     output << edge.tag << " ";
-    if (!edge.param_ids.empty()) output << edge.param_ids << " ";
     if (type_info.number_vertices_at_compile_time < 0)
       output << edge.ids.size() << " ";
     output << edge.ids << " ";
+    if (!edge.param_ids.empty()) output << edge.param_ids << " ";
     if (type_info.dimension_at_compile_time < 0)
       output << edge.measurement.size() << " ";
     output << edge.measurement << " ";
