@@ -51,11 +51,12 @@ struct g2o::internal::RandomValue<g2o::SBACam> {
   }
 };
 
-using SBAIoTypes =
-    ::testing::Types<g2o::EdgeSE3Expmap, g2o::EdgeSBAScale, g2o::EdgeSBACam,
-                     g2o::EdgeSE3ProjectXYZ, g2o::EdgeSE3ProjectXYZOnlyPose,
-                     g2o::EdgeStereoSE3ProjectXYZ,
-                     g2o::EdgeStereoSE3ProjectXYZOnlyPose, g2o::EdgeProjectP2SC,
-                     g2o::EdgeProjectP2MC>;
+using SBAIoTypes = ::testing::Types<
+    std::tuple<g2o::EdgeSE3Expmap>, std::tuple<g2o::EdgeSBAScale>,
+    std::tuple<g2o::EdgeSBACam>, std::tuple<g2o::EdgeSE3ProjectXYZ>,
+    std::tuple<g2o::EdgeSE3ProjectXYZOnlyPose>,
+    std::tuple<g2o::EdgeStereoSE3ProjectXYZ>,
+    std::tuple<g2o::EdgeStereoSE3ProjectXYZOnlyPose>,
+    std::tuple<g2o::EdgeProjectP2SC>, std::tuple<g2o::EdgeProjectP2MC>>;
 INSTANTIATE_TYPED_TEST_SUITE_P(SBA, FixedSizeEdgeIO, SBAIoTypes,
                                g2o::internal::DefaultTypeNames);

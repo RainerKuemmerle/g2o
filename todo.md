@@ -1,4 +1,5 @@
 [x] Create parameter type for ParameterCamera to support load/save
+[ ] Add typing for parameters to template?
 [ ] Re-work python wrapping for parameters, templated base param
 [ ] Test load/save for VertexCam (camera and baseline seem missing from traits)
 [ ] Refactor Data container. Can it be a container instead of linked list?

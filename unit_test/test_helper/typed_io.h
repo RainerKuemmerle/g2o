@@ -24,12 +24,15 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+#pragma once
+
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
 #include <cstddef>
 #include <memory>
 #include <string>
+#include <tuple>
 
 #include "g2o/core/io/io_format.h"
 #include "g2o/core/optimizable_graph.h"
@@ -37,20 +40,29 @@
 #include "g2o/stuff/string_tools.h"
 #include "unit_test/test_helper/allocate_optimizer.h"
 #include "unit_test/test_helper/random_state.h"
+#include "unit_test/test_helper/utils.h"
 
+/**
+ * @brief A typed test for Edges.
+ *
+ * @tparam T A tuple like type whereas the first type gives the type of the Edge
+ * and the second determines the type of a parameter. Providing the type of a
+ * parameter is optional.
+ */
 template <typename T>
 struct FixedSizeEdgeIO : public ::testing::Test {
  public:
   FixedSizeEdgeIO() = default;
 
   void SetUp() override {
-    using EdgeType = T;
+    constexpr std::size_t kTupleSize = std::tuple_size_v<T>;
+    using EdgeType = typename std::tuple_element<0, T>::type;
 
     // Construct a small graph
     auto edge = std::make_shared<EdgeType>();
 
     // Initialize the vertices of the edge to a random state
-    for (size_t i = 0; i < edge->vertices().size(); ++i) {
+    for (std::size_t i = 0; i < edge->vertices().size(); ++i) {
       auto v =
           std::shared_ptr<g2o::OptimizableGraph::Vertex>(edge->createVertex(i));
       edge->vertices()[i] = v;
@@ -58,6 +70,15 @@ struct FixedSizeEdgeIO : public ::testing::Test {
       v->setFixed(i == 0);
       initializeNthVertex<EdgeType::kNrOfVertices - 1>(i, *edge);
       this->optimizer_ptr_->addVertex(v);
+    }
+
+    // Add the parameter types if required
+    if constexpr (kTupleSize > 1) {
+      using ParamTuple = typename TupleTypes<T>::Tail;
+      constexpr std::size_t kParamSize = std::tuple_size_v<ParamTuple>;
+      for (std::size_t i = 0; i < kParamSize; ++i) {
+        addNthParameter<kParamSize - 1, ParamTuple, EdgeType>(i, *edge);
+      }
     }
 
     // Generate a random information matrix
@@ -80,8 +101,7 @@ struct FixedSizeEdgeIO : public ::testing::Test {
       g2o::internal::createOptimizerForTests();
 
   template <int I, typename EdgeType>
-  static std::enable_if_t<I == -1, void> initializeNthVertex(int /*i*/,
-                                                             EdgeType& /*t*/) {}
+  static std::enable_if_t<I == -1, void> initializeNthVertex(int, EdgeType&) {}
 
   template <int I, typename EdgeType>
   static std::enable_if_t<I != -1, void> initializeNthVertex(int i,
@@ -95,6 +115,31 @@ struct FixedSizeEdgeIO : public ::testing::Test {
     }
     initializeNthVertex<I - 1, EdgeType>(i, t);
   }
+
+  template <int I, typename ParameterTuple, typename EdgeType>
+  std::enable_if_t<I == -1, void> addNthParameter(int, EdgeType&) {}
+
+  template <int I, typename ParameterTuple, typename EdgeType>
+  std::enable_if_t<I != -1, void> addNthParameter(int i, EdgeType& edge) {
+    if (i != I) {
+      addNthParameter<I - 1, ParameterTuple, EdgeType>(i, edge);
+    }
+    using ParameterType = typename std::tuple_element<I, ParameterTuple>::type;
+    auto param = std::make_shared<ParameterType>();
+    param->setId(i + 100);
+    // TODO(Rainer): Modify the parameter to a random value
+    this->optimizer_ptr_->addParameter(param);
+    edge.setParameterId(i, param->id());
+  }
+
+  template <class TupleType>
+  struct TupleTypes;
+
+  template <class HeadType, class... TailTypes>
+  struct TupleTypes<std::tuple<HeadType, TailTypes...>> {
+    using Head = HeadType;
+    using Tail = std::tuple<TailTypes...>;
+  };
 };
 TYPED_TEST_SUITE_P(FixedSizeEdgeIO);
 
@@ -150,7 +195,7 @@ class DefaultTypeNames {
  public:
   template <typename T>
   static std::string GetName(int) {
-    return testing::internal::GetTypeName<T>();
+    return ExtractTupleHead(testing::internal::GetTypeName<T>());
   }
 };
 
