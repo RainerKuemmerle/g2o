@@ -30,14 +30,17 @@
 
 #include "g2o/core/sparse_optimizer.h"
 #include "g2o/stuff/command_args.h"
-#include "g2o/stuff/macros.h"
 #include "g2o/stuff/sampler.h"
-#include "g2o/types/slam3d/types_slam3d.h"
-#include "g2o/types/slam3d_addons/types_slam3d_addons.h"
+#include "g2o/types/slam3d/edge_se3.h"
+#include "g2o/types/slam3d/edge_se3_prior.h"
+#include "g2o/types/slam3d/vertex_se3.h"
+#include "g2o/types/slam3d_addons/edge_se3_plane_calib.h"
+#include "g2o/types/slam3d_addons/vertex_plane.h"
 
 namespace g2o {
+namespace {
 
-static Isometry3 sample_noise_from_se3(const Vector6& cov) {
+Isometry3 sample_noise_from_se3(const Vector6& cov) {
   double nx = g2o::Sampler::gaussRand(0., cov(0));
   double ny = g2o::Sampler::gaussRand(0., cov(1));
   double nz = g2o::Sampler::gaussRand(0., cov(2));
@@ -56,7 +59,7 @@ static Isometry3 sample_noise_from_se3(const Vector6& cov) {
   return retval;
 }
 
-static Vector3 sample_noise_from_plane(const Vector3& cov) {
+Vector3 sample_noise_from_plane(const Vector3& cov) {
   return Vector3(g2o::Sampler::gaussRand(0., cov(0)),
                  g2o::Sampler::gaussRand(0., cov(1)),
                  g2o::Sampler::gaussRand(0., cov(2)));
@@ -250,14 +253,14 @@ struct PlaneSensor : public Sensor {
   Vector3 _nplane;
 };
 
-static int simulator_3d_plane(int argc, char** argv) {
+int simulator_3d_plane(int argc, char** argv) {
   CommandArgs arg;
   bool fixSensor;
   bool fixPlanes;
   bool fixFirstPose;
   bool fixTrajectory;
   bool planarMotion;
-  std::cerr << "graph" << std::endl;
+  std::cerr << "graph\n";
   arg.param("fixSensor", fixSensor, false,
             "fix the sensor position on the robot");
   arg.param("fixTrajectory", fixTrajectory, false, "fix the trajectory");
@@ -272,13 +275,13 @@ static int simulator_3d_plane(int argc, char** argv) {
   odomOffset->setId(0);
   g->addParameter(odomOffset);
 
-  std::cerr << "sim" << std::endl;
+  std::cerr << "sim\n";
   auto* sim = new Simulator(g);
 
-  std::cerr << "robot" << std::endl;
+  std::cerr << "robot\n";
   auto* r = new Robot(g);
 
-  std::cerr << "planeSensor" << std::endl;
+  std::cerr << "planeSensor\n";
   Matrix3 R = Matrix3::Identity();
   R << 0, 0, 1, -1, 0, 0, 0, -1, 0;
 
@@ -290,7 +293,7 @@ static int simulator_3d_plane(int argc, char** argv) {
   r->sensors.push_back(ps);
   sim->robots.push_back(r);
 
-  std::cerr << "p1" << std::endl;
+  std::cerr << "p1\n";
   Plane3D plane;
   auto* pi = new PlaneItem(g, 1);
   plane.fromVector(Eigen::Vector4d(0., 0., 1., 5.));
@@ -304,7 +307,7 @@ static int simulator_3d_plane(int argc, char** argv) {
   pi->vertex()->setFixed(fixPlanes);
   sim->world.insert(pi);
 
-  std::cerr << "p2" << std::endl;
+  std::cerr << "p2\n";
   pi = new PlaneItem(g, 3);
   plane.fromVector(Eigen::Vector4d(0., 1., 0., 5.));
   static_cast<VertexPlane*>(pi->vertex().get())->setEstimate(plane);
@@ -407,7 +410,7 @@ static int simulator_3d_plane(int argc, char** argv) {
 
   return 0;
 }
-
+}  // namespace
 }  // namespace g2o
 
 int main(int argc, char** argv) { return g2o::simulator_3d_plane(argc, argv); }

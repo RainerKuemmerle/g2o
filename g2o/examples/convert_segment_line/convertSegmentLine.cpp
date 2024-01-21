@@ -48,7 +48,17 @@
 #include "g2o/stuff/macros.h"
 #include "g2o/stuff/string_tools.h"
 #include "g2o/stuff/timeutil.h"
-#include "g2o/types/slam2d_addons/types_slam2d_addons.h"
+#include "g2o/types/slam2d/edge_se2.h"
+#include "g2o/types/slam2d/edge_se2_pointxy.h"
+#include "g2o/types/slam2d/vertex_point_xy.h"
+#include "g2o/types/slam2d/vertex_se2.h"
+#include "g2o/types/slam2d_addons/edge_line2d_pointxy.h"
+#include "g2o/types/slam2d_addons/edge_se2_line2d.h"
+#include "g2o/types/slam2d_addons/edge_se2_segment2d.h"
+#include "g2o/types/slam2d_addons/edge_se2_segment2d_line.h"
+#include "g2o/types/slam2d_addons/edge_se2_segment2d_pointLine.h"
+#include "g2o/types/slam2d_addons/vertex_line2d.h"
+#include "g2o/types/slam2d_addons/vertex_segment2d.h"
 
 using std::cerr;
 using std::endl;

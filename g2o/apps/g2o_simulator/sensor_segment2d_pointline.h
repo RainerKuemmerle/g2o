@@ -28,8 +28,8 @@
 #define G2O_SENSOR_SEGMENT2D_POINTLINE_H_
 
 #include "g2o/apps/g2o_simulator/pointsensorparameters.h"
-#include "g2o/types/slam2d_addons/types_slam2d_addons.h"
-#include "simulator2d.h"
+#include "g2o/apps/g2o_simulator/simulator2d_base.h"
+#include "g2o/types/slam2d_addons/edge_se2_segment2d_pointLine.h"
 
 namespace g2o {
 

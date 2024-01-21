@@ -4,14 +4,17 @@
 
 #include "g2o/core/sparse_optimizer.h"
 #include "g2o/stuff/command_args.h"
-#include "g2o/stuff/macros.h"
 #include "g2o/stuff/sampler.h"
-#include "g2o/types/slam3d/types_slam3d.h"
-#include "g2o/types/slam3d_addons/types_slam3d_addons.h"
+#include "g2o/types/slam3d/edge_se3.h"
+#include "g2o/types/slam3d/edge_se3_prior.h"
+#include "g2o/types/slam3d/vertex_se3.h"
+#include "g2o/types/slam3d_addons/edge_se3_line.h"
+#include "g2o/types/slam3d_addons/vertex_line3d.h"
 
 namespace g2o {
+namespace {
 
-static Isometry3 sample_noise_from_se3(const Vector6& cov) {
+Isometry3 sample_noise_from_se3(const Vector6& cov) {
   double nx = Sampler::gaussRand(0., cov(0));
   double ny = Sampler::gaussRand(0., cov(1));
   double nz = Sampler::gaussRand(0., cov(2));
@@ -30,7 +33,7 @@ static Isometry3 sample_noise_from_se3(const Vector6& cov) {
   return retval;
 }
 
-static Vector4 sample_noise_from_line(const Vector4& cov) {
+Vector4 sample_noise_from_line(const Vector4& cov) {
   return Vector4(Sampler::gaussRand(0., cov(0)), Sampler::gaussRand(0., cov(1)),
                  Sampler::gaussRand(0., cov(2)),
                  Sampler::gaussRand(0., cov(3)));
@@ -226,7 +229,7 @@ struct LineSensor : public Sensor {
   Vector4 nline;
 };
 
-static int simulator_3d_line(int argc, char** argv) {
+int simulator_3d_line(int argc, char** argv) {
   bool fixLines;
   bool planarMotion;
   CommandArgs arg;
@@ -240,13 +243,13 @@ static int simulator_3d_line(int argc, char** argv) {
   odomOffset->setId(0);
   g->addParameter(odomOffset);
 
-  std::cout << "Creating simulator" << std::endl;
+  std::cout << "Creating simulator\n";
   auto* sim = new Simulator(g);
 
-  std::cout << "Creating robot" << std::endl;
+  std::cout << "Creating robot\n";
   auto* r = new Robot(g);
 
-  std::cout << "Creating line sensor" << std::endl;
+  std::cout << "Creating line sensor\n";
   Isometry3 sensorPose = Isometry3::Identity();
   auto* ls = new LineSensor(r, 0, sensorPose);
   ls->nline = Vector4(0.001, 0.001, 0.001, 0.0001);
@@ -255,7 +258,7 @@ static int simulator_3d_line(int argc, char** argv) {
   sim->robots.push_back(r);
 
   Line3D line;
-  std::cout << "Creating landmark line 1" << std::endl;
+  std::cout << "Creating landmark line 1\n";
   auto* li = new LineItem(g, 1);
   Vector6 liv;
   liv << 0.0, 0.0, 5.0, 0.0, 1.0, 0.0;
@@ -264,7 +267,7 @@ static int simulator_3d_line(int argc, char** argv) {
   li->vertex()->setFixed(fixLines);
   sim->world.insert(li);
 
-  std::cout << "Creating landmark line 2" << std::endl;
+  std::cout << "Creating landmark line 2\n";
   liv << 5.0, 0.0, 0.0, 0.0, 0.0, 1.0;
   line = Line3D::fromCartesian(liv);
   li = new LineItem(g, 2);
@@ -272,7 +275,7 @@ static int simulator_3d_line(int argc, char** argv) {
   li->vertex()->setFixed(fixLines);
   sim->world.insert(li);
 
-  std::cout << "Creating landmark line 3" << std::endl;
+  std::cout << "Creating landmark line 3\n";
   liv << 0.0, 5.0, 0.0, 1.0, 0.0, 0.0;
   line = Line3D::fromCartesian(liv);
   li = new LineItem(g, 3);
@@ -331,7 +334,7 @@ static int simulator_3d_line(int argc, char** argv) {
       }
     }
   }
-  std::cout << std::endl;
+  std::cout << '\n';
 
   ls->offsetVertex->setFixed(true);
   auto gauge = g->vertex(4);
@@ -341,11 +344,12 @@ static int simulator_3d_line(int argc, char** argv) {
 
   std::ofstream osp("line3d.g2o");
   g->save(osp);
-  std::cout << "Saved graph on file line3d.g2o, use g2o_viewer to work with it."
-            << std::endl;
+  std::cout
+      << "Saved graph on file line3d.g2o, use g2o_viewer to work with it.\n";
 
   return 0;
 }
+}  // namespace
 }  // namespace g2o
 
 int main(int argc, char** argv) { return g2o::simulator_3d_line(argc, argv); }

@@ -3,7 +3,7 @@ add_library(types_sclam2d ${G2O_LIB_TYPE}
   vertex_odom_differential_params.cpp vertex_odom_differential_params.h
   edge_se2_odom_differential_calib.cpp edge_se2_odom_differential_calib.h
   odometry_measurement.cpp odometry_measurement.h
-  types_sclam2d.cpp types_sclam2d.h
+  types_sclam2d.cpp
   g2o_types_sclam2d_api.h
 )
 

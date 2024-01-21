@@ -26,6 +26,7 @@
 
 #ifndef G2O_SENSOR_SE3_PRIOR_H_
 #define G2O_SENSOR_SE3_PRIOR_H_
+#include "g2o/types/slam3d/edge_se3_prior.h"
 #include "g2o_simulator_api.h"
 #include "pointsensorparameters.h"
 #include "simulator3d_base.h"

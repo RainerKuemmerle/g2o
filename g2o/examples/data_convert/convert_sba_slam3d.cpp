@@ -25,24 +25,22 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <cassert>
-#include <fstream>
 #include <iostream>
 
 #include "g2o/core/optimizable_graph.h"
 #include "g2o/stuff/command_args.h"
-#include "g2o/stuff/macros.h"
-#include "g2o/types/sba/types_sba.h"
+#include "g2o/types/sba/edge_project_p2sc.h"
+#include "g2o/types/sba/vertex_cam.h"
 #include "g2o/types/slam3d/edge_se3_pointxyz_disparity.h"
 #include "g2o/types/slam3d/parameter_camera.h"
 
 using std::cerr;
 using std::cout;
-using std::endl;
 using std::string;
 
 namespace g2o {
-
-static int convert_sba_slam3d(int argc, char** argv) {
+namespace {
+int convert_sba_slam3d(int argc, char** argv) {
   string inputFilename;
   string outputFilename;
   // command line parsing
@@ -57,7 +55,7 @@ static int convert_sba_slam3d(int argc, char** argv) {
   OptimizableGraph inputGraph;
   const bool loadStatus = inputGraph.load(inputFilename.c_str());
   if (!loadStatus) {
-    cerr << "Error while loading input data" << endl;
+    cerr << "Error while loading input data\n";
     return 1;
   }
 
@@ -127,15 +125,16 @@ static int convert_sba_slam3d(int argc, char** argv) {
   }
 
   cout << "Vertices in/out:\t" << inputGraph.vertices().size() << " "
-       << outputGraph.vertices().size() << endl;
+       << outputGraph.vertices().size() << '\n';
   cout << "Edges in/out:\t" << inputGraph.edges().size() << " "
-       << outputGraph.edges().size() << endl;
+       << outputGraph.edges().size() << '\n';
 
   cout << "Writing output ... " << std::flush;
   outputGraph.save(outputFilename.c_str());
-  cout << "done." << endl;
+  cout << "done.\n";
   return 0;
 }
+}  // namespace
 }  // namespace g2o
 
 int main(int argc, char** argv) { return g2o::convert_sba_slam3d(argc, argv); }

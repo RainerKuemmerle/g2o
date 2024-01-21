@@ -27,6 +27,7 @@
 #ifndef G2O_SENSOR_POSE2D_H_
 #define G2O_SENSOR_POSE2D_H_
 
+#include "g2o/types/slam2d/edge_se2.h"
 #include "g2o_simulator_api.h"
 #include "pointsensorparameters.h"
 #include "simulator2d_base.h"

@@ -26,6 +26,7 @@
 
 #ifndef G2O_SENSOR_POINTXYZ_DISPARITY_H_
 #define G2O_SENSOR_POINTXYZ_DISPARITY_H_
+#include "g2o/types/slam3d/edge_se3_pointxyz_disparity.h"
 #include "g2o/types/slam3d/parameter_camera.h"
 #include "g2o_simulator_api.h"
 #include "pointsensorparameters.h"
