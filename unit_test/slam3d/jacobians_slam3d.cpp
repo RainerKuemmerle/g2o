@@ -33,6 +33,7 @@
 #include "g2o/types/slam3d/dquat2mat.h"
 #include "g2o/types/slam3d/edge_pointxyz.h"
 #include "g2o/types/slam3d/edge_se3.h"
+#include "g2o/types/slam3d/edge_se3_offset.h"
 #include "g2o/types/slam3d/edge_se3_pointxyz.h"
 #include "g2o/types/slam3d/edge_se3_pointxyz_depth.h"
 #include "g2o/types/slam3d/edge_se3_pointxyz_disparity.h"
@@ -49,7 +50,10 @@ auto depth_epsilon = [](const double x, const double y) {
       2e-4, std::numeric_limits<double>::epsilon() * std::abs(x + y) * kUlp);
 };
 
-}
+auto conservative_depth_epsilon = [](const double x, const double y) {
+  return std::max(0.01, depth_epsilon(x, y));
+};
+}  // namespace
 
 using namespace g2o;            // NOLINT
 using namespace g2o::internal;  // NOLINT
@@ -113,6 +117,49 @@ TEST(Slam3D, EdgeSE3PriorJacobian) {
     e->setMeasurement(internal::randomIsometry3());
 
     evaluateJacobianUnary(*e, jacobianWorkspace, numericJacobianWorkspace);
+  }
+}
+
+TEST(Slam3D, EdgeSE3OffsetJacobian) {
+  OptimizableGraph graph;
+
+  auto v1 = std::make_shared<VertexSE3>();
+  v1->setId(0);
+  graph.addVertex(v1);
+
+  auto v2 = std::make_shared<VertexSE3>();
+  v2->setId(1);
+  graph.addVertex(v2);
+
+  auto paramOffset1 = std::make_shared<ParameterSE3Offset>();
+  paramOffset1->setId(0);
+  paramOffset1->setOffset(internal::randomIsometry3());
+  graph.addParameter(paramOffset1);
+  auto paramOffset2 = std::make_shared<ParameterSE3Offset>();
+  paramOffset2->setId(1);
+  paramOffset2->setOffset(internal::randomIsometry3());
+  graph.addParameter(paramOffset2);
+
+  auto e = std::make_shared<EdgeSE3Offset>();
+  e->setVertex(0, v1);
+  e->setVertex(1, v2);
+  e->setInformation(EdgeSE3Offset::InformationType::Identity());
+  e->setParameterId(0, paramOffset1->id());
+  e->setParameterId(1, paramOffset2->id());
+  graph.addEdge(e);
+
+  JacobianWorkspace jacobianWorkspace;
+  JacobianWorkspace numericJacobianWorkspace;
+  numericJacobianWorkspace.updateSize(*e);
+  numericJacobianWorkspace.allocate();
+
+  // test in random pose
+  for (int k = 0; k < 100; ++k) {
+    v1->setEstimate(internal::randomIsometry3());
+    v2->setEstimate(internal::randomIsometry3());
+    e->setMeasurement(internal::randomIsometry3());
+
+    evaluateJacobian(*e, jacobianWorkspace, numericJacobianWorkspace);
   }
 }
 
@@ -306,10 +353,6 @@ TEST(Slam3D, EdgeSE3PointXYZDepthJacobian) {
   e->setParameterId(0, paramOffset->id());
   graph.addEdge(e);
 
-  auto conservative_depth_epsilon = [](const double x, const double y) {
-    return std::max(0.01, depth_epsilon(x, y));
-  };
-
   JacobianWorkspace jacobianWorkspace;
   JacobianWorkspace numericJacobianWorkspace;
   numericJacobianWorkspace.updateSize(*e);
@@ -360,6 +403,6 @@ TEST(Slam3D, EdgeSE3PointXYZDisparityJacobian) {
     e->setMeasurement(Eigen::Vector3d::Random());
 
     evaluateJacobian(*e, jacobianWorkspace, numericJacobianWorkspace,
-                     depth_epsilon);
+                     conservative_depth_epsilon);
   }
 }

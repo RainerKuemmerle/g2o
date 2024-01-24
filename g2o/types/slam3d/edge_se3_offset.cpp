@@ -55,7 +55,7 @@ bool EdgeSE3Offset::resolveCaches() {
       resolveCache<CacheSE3Offset>(vertexXn<0>(), "CACHE_SE3_OFFSET", pv);
   pv[0] = parameters_[1];
   cacheTo_ =
-      resolveCache<CacheSE3Offset>(vertexXn<0>(), "CACHE_SE3_OFFSET", pv);
+      resolveCache<CacheSE3Offset>(vertexXn<1>(), "CACHE_SE3_OFFSET", pv);
   return (cacheFrom_ && cacheTo_);
 }
 
@@ -92,7 +92,8 @@ bool EdgeSE3Offset::setMeasurementFromState() {
 }
 
 void EdgeSE3Offset::linearizeOplus() {
-  // BaseBinaryEdge<6, SE3Quat, VertexSE3, VertexSE3>::linearizeOplus();
+  // BaseBinaryEdge<6, Isometry3, VertexSE3, VertexSE3>::linearizeOplus();
+  // return;
 
   VertexSE3* from = vertexXnRaw<0>();
   VertexSE3* to = vertexXnRaw<1>();

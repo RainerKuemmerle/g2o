@@ -33,6 +33,11 @@
 #include "isometry3d_mappings.h"
 
 namespace g2o::internal {
+
+namespace {
+using ColMajor33 = Eigen::Matrix<double, 3, 3, Eigen::ColMajor>;
+}
+
 // forward declaration
 /* void G2O_TYPES_SLAM3D_API compute_dq_dR (Eigen::Matrix<double, 3 , 9,
  * Eigen::ColMajor>&  dq_dR , const double&  r11 , const double&  r21 ,
@@ -150,61 +155,33 @@ void computeEdgeSE3Gradient(Isometry3& E,
 
   // dre/dqi
   {
-    double buf[27];
-    Eigen::Map<Eigen::Matrix<double, 9, 3, Eigen::ColMajor> > M(buf);
+    Eigen::Matrix<double, 9, 3, Eigen::ColMajor> M;
     Matrix3 Sxt;
     Matrix3 Syt;
     Matrix3 Szt;
     internal::skewT(Sxt, Syt, Szt, Rbc);
-#ifdef __clang__
-    Matrix3 temp = Rab * Sxt;
-    Eigen::Map<Matrix3> M2(temp.data());
-    Eigen::Map<Matrix3> Mx(buf);
-    Mx = M2;
-    temp = Ra * Syt;
-    Eigen::Map<Matrix3> My(buf + 9);
-    My = M2;
-    temp = Ra * Szt;
-    Eigen::Map<Matrix3> Mz(buf + 18);
-    Mz = M2;
-#else
-    Eigen::Map<Matrix3> Mx(buf);
+    ColMajor33::MapType Mx(M.data());
     Mx = Ra * Sxt;
-    Eigen::Map<Matrix3> My(buf + 9);
+    ColMajor33::MapType My(M.data() + 9);
     My = Ra * Syt;
-    Eigen::Map<Matrix3> Mz(buf + 18);
+    ColMajor33::MapType Mz(M.data() + 18);
     Mz = Ra * Szt;
-#endif
     Ji.template block<3, 3>(3, 3) = dq_dR * M;
   }
 
   // dre/dqj
   {
-    double buf[27];
-    Eigen::Map<Eigen::Matrix<double, 9, 3, Eigen::ColMajor> > M(buf);
+    Eigen::Matrix<double, 9, 3, Eigen::ColMajor> M;
     Matrix3 Sx;
     Matrix3 Sy;
     Matrix3 Sz;
     internal::skew(Sx, Sy, Sz, Rc);
-#ifdef __clang__
-    Matrix3 temp = Rab * Sx;
-    Eigen::Map<Matrix3> M2(temp.data());
-    Eigen::Map<Matrix3> Mx(buf);
-    Mx = M2;
-    temp = Rab * Sy;
-    Eigen::Map<Matrix3> My(buf + 9);
-    My = M2;
-    temp = Rab * Sz;
-    Eigen::Map<Matrix3> Mz(buf + 18);
-    Mz = M2;
-#else
-    Eigen::Map<Matrix3> Mx(buf);
+    ColMajor33::MapType Mx(M.data());
     Mx = Rab * Sx;
-    Eigen::Map<Matrix3> My(buf + 9);
+    ColMajor33::MapType My(M.data() + 9);
     My = Rab * Sy;
-    Eigen::Map<Matrix3> Mz(buf + 18);
+    ColMajor33::MapType Mz(M.data() + 18);
     Mz = Rab * Sz;
-#endif
     Jj.template block<3, 3>(3, 3) = dq_dR * M;
   }
 }
@@ -252,19 +229,18 @@ void computeEdgeSE3Gradient(Isometry3& E,
 
   // dte/dqj: this is zero
 
-  double buf[27];
-  Eigen::Map<Eigen::Matrix<double, 9, 3, Eigen::ColMajor> > M(buf);
+  Eigen::Matrix<double, 9, 3, Eigen::ColMajor> M;
   Matrix3 Sxt;
   Matrix3 Syt;
   Matrix3 Szt;
   // dre/dqi
   {
     skewT(Sxt, Syt, Szt, Rb);
-    Eigen::Map<Matrix3> Mx(buf);
+    ColMajor33::MapType Mx(M.data());
     Mx.noalias() = Ra * Sxt;
-    Eigen::Map<Matrix3> My(buf + 9);
+    ColMajor33::MapType My(M.data() + 9);
     My.noalias() = Ra * Syt;
-    Eigen::Map<Matrix3> Mz(buf + 18);
+    ColMajor33::MapType Mz(M.data() + 18);
     Mz.noalias() = Ra * Szt;
     Ji.template block<3, 3>(3, 3) = dq_dR * M;
   }
@@ -275,11 +251,11 @@ void computeEdgeSE3Gradient(Isometry3& E,
     Matrix3& Sy = Syt;
     Matrix3& Sz = Szt;
     skew(Sx, Sy, Sz, Matrix3::Identity());
-    Eigen::Map<Matrix3> Mx(buf);
+    ColMajor33::MapType Mx(M.data());
     Mx.noalias() = Re * Sx;
-    Eigen::Map<Matrix3> My(buf + 9);
+    ColMajor33::MapType My(M.data() + 9);
     My.noalias() = Re * Sy;
-    Eigen::Map<Matrix3> Mz(buf + 18);
+    ColMajor33::MapType Mz(M.data() + 18);
     Mz.noalias() = Re * Sz;
     Jj.template block<3, 3>(3, 3) = dq_dR * M;
   }
@@ -322,14 +298,17 @@ void computeEdgeSE3PriorGradient(Isometry3& E,
 
   // dre/dq
   {
-    Eigen::Matrix<double, 9, 3> M;
+    Eigen::Matrix<double, 9, 3, Eigen::ColMajor> M;
     Matrix3 Sx;
     Matrix3 Sy;
     Matrix3 Sz;
     internal::skew(Sx, Sy, Sz, Rb);
-    M.col(0) = (Ra * Sx).reshaped<Eigen::ColMajor>();
-    M.col(1) = (Ra * Sy).reshaped<Eigen::ColMajor>();
-    M.col(2) = (Ra * Sz).reshaped<Eigen::ColMajor>();
+    ColMajor33::MapType Mx(M.data() + M.rows() * 0);
+    Mx = (Ra * Sx);
+    ColMajor33::MapType My(M.data() + M.rows() * 1);
+    My = (Ra * Sy);
+    ColMajor33::MapType Mz(M.data() + M.rows() * 2);
+    Mz = (Ra * Sz);
     J.template block<3, 3>(3, 3) = dq_dR * M;
   }
 }
