@@ -25,8 +25,10 @@ void templatedBaseEdge(py::module& m, const std::string& suffix) {
       //-> data*
       .def("information", static_cast<InformationType& (CLS::*)()>(
                               &CLS::information))  // -> InformationType
-      .def("set_information", &CLS::setInformation, "information"_a,
-           py::keep_alive<1, 2>())  // InformationType ->
+      .def(
+          "set_information",
+          [](CLS& edge, const MatrixX& info) { edge.setInformation(info); },
+          "information"_a, py::keep_alive<1, 2>())  // InformationType ->
 
       .def("measurement", &CLS::measurement)  // -> E
       .def("set_measurement", &CLS::setMeasurement, "m"_a,
@@ -57,8 +59,12 @@ void templatedDynamicBaseEdge(py::module& m, const std::string& suffix) {
       //-> data*
       .def("information", static_cast<InformationType& (CLS::*)()>(
                               &CLS::information))  // -> InformationType
-      .def("set_information", &CLS::setInformation, "information"_a,
-           py::keep_alive<1, 2>())  // InformationType ->
+      .def(
+          "set_information",
+          [](CLS& edge, const InformationType& info) {
+            edge.setInformation(info);
+          },
+          "information"_a, py::keep_alive<1, 2>())  // InformationType ->
 
       .def("measurement", &CLS::measurement)  // -> E
       .def("set_measurement", &CLS::setMeasurement, "m"_a,
