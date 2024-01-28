@@ -107,7 +107,8 @@ class BaseEdge : public OptimizableGraph::Edge {
     return information_;
   }
   EIGEN_STRONG_INLINE InformationType& information() { return information_; }
-  void setInformation(const InformationType& information) {
+  template <typename Derived>
+  void setInformation(const Eigen::EigenBase<Derived>& information) {
     information_ = information;
   }
 
