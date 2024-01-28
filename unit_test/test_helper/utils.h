@@ -28,8 +28,10 @@
 
 #include <string>
 
+#include "unit_test/test_helper/g2o_test_helper_api.h"
+
 namespace g2o::internal {
 
-std::string ExtractTupleHead(const std::string& input);
+G2O_TEST_HELPER_API std::string ExtractTupleHead(const std::string& input);
 
 }  // namespace g2o::internal

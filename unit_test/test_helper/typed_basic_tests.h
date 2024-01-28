@@ -49,7 +49,7 @@ namespace g2o::internal::testing {
  * equal.
  */
 MATCHER_P2(JacobianApproxEqual, expect, prec,
-           std::string(negation ? "isn't" : "is") + " approx equal to" +
+           std::string(negation ? "isn't" : "is") + " approx equal to " +
                ::testing::PrintToString(expect)) {
   if (arg.size() != expect.size()) return false;
   for (int j = 0; j < arg.size(); ++j) {
