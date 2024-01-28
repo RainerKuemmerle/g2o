@@ -134,11 +134,11 @@ TEST(Slam3D, EdgeSE3OffsetJacobian) {
 
   auto paramOffset1 = std::make_shared<ParameterSE3Offset>();
   paramOffset1->setId(0);
-  paramOffset1->setOffset(internal::randomIsometry3());
+  paramOffset1->setParam(internal::randomIsometry3());
   graph.addParameter(paramOffset1);
   auto paramOffset2 = std::make_shared<ParameterSE3Offset>();
   paramOffset2->setId(1);
-  paramOffset2->setOffset(internal::randomIsometry3());
+  paramOffset2->setParam(internal::randomIsometry3());
   graph.addParameter(paramOffset2);
 
   auto e = std::make_shared<EdgeSE3Offset>();
