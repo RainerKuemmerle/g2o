@@ -41,7 +41,8 @@ class G2O_TYPES_SBA_API EdgeSE3Expmap
     : public BaseBinaryEdge<6, SE3Quat, VertexSE3Expmap, VertexSE3Expmap> {
  public:
   void computeError() override;
-  void linearizeOplus() override;
+  // TODO(Rainer): Jacobian seems wrong, see #505 (but PR seems also wrong)
+  // void linearizeOplus() override;
 };
 
 }  // namespace g2o

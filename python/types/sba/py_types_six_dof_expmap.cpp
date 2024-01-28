@@ -30,10 +30,7 @@ void declareTypesSixDofExpmap(py::module& m) {
       }))
       .def("cam_map", &CameraParameters::cam_map, "trans_xyz"_a)
       .def("stereocam_uvu_map", &CameraParameters::stereocam_uvu_map,
-           "trans_xyz"_a)
-      // read
-      // write
-      ;
+           "trans_xyz"_a);
 
   py::class_<VertexSE3Expmap, BaseVertex<6, SE3Quat>,
              std::shared_ptr<VertexSE3Expmap>>(m, "VertexSE3Expmap")
@@ -45,8 +42,7 @@ void declareTypesSixDofExpmap(py::module& m) {
              BaseBinaryEdge<6, SE3Quat, VertexSE3Expmap, VertexSE3Expmap>,
              std::shared_ptr<EdgeSE3Expmap>>(m, "EdgeSE3Expmap")
       .def(py::init<>())
-      .def("compute_error", &EdgeSE3Expmap::computeError)
-      .def("linearize_oplus", &EdgeSE3Expmap::linearizeOplus);
+      .def("compute_error", &EdgeSE3Expmap::computeError);
 
   templatedBaseBinaryEdge<2, Vector2, VertexPointXYZ, VertexSE3Expmap>(
       m, "_2_Vector2_VertexPointXYZ_VertexSE3Expmap");
