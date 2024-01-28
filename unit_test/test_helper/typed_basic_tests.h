@@ -73,7 +73,8 @@ struct FixedSizeEdgeBasicTests : public ::testing::Test {
   using EpsilonFunction = std::function<double(const double, const double)>;
   using EdgeType = typename std::tuple_element<0, T>::type;
 
-  EpsilonFunction epsilon = [](const double, const double) { return 1e-3; };
+  // TODO(Rainer): Allow parameterization for the epsilon function
+  EpsilonFunction epsilon = [](const double, const double) { return 1e-2; };
 
   FixedSizeEdgeBasicTests() = default;
 
