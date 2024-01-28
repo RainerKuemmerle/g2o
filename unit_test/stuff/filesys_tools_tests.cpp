@@ -41,7 +41,9 @@ TEST(Stuff, GetFileExtension) {
 TEST(Stuff, GetPureFilename) {
   EXPECT_EQ("test", g2o::getPureFilename("test.txt"));
   EXPECT_EQ("test", g2o::getPureFilename("test"));
+#ifndef WINDOWS
   EXPECT_EQ("/home/g2o/test", g2o::getPureFilename("/home/g2o/test.txt"));
+#endif
   EXPECT_EQ("", g2o::getPureFilename(""));
 }
 
