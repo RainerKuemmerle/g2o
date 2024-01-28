@@ -6,7 +6,7 @@
 [ ] Use FakeDependency in Traits
 [ ] EdgeSE2TwoPointsXY, EdgeSE2PointXYCalib can be fixed size edges -> IO test
 [ ] IO test fixture including parameter
-[ ] Type Based Tests for Jacobian possible?
+[x] Type Based Tests for Jacobian
 [x] support saving VectorX and MatrixX in G2O format
 [x] update python optimizable graph wrapper (save/load) with format
 [x] add version number for file format

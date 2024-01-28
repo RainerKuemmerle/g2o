@@ -39,8 +39,26 @@
 #include "g2o/core/sparse_optimizer.h"
 #include "g2o/stuff/string_tools.h"
 #include "unit_test/test_helper/allocate_optimizer.h"
+#include "unit_test/test_helper/eigen_matcher.h"
 #include "unit_test/test_helper/random_state.h"
 #include "unit_test/test_helper/utils.h"
+
+namespace g2o::internal::testing {
+/**
+ * @brief Matcher for testing Numeric and Analytic Jacobian to be approximately
+ * equal.
+ */
+MATCHER_P2(JacobianApproxEqual, expect, prec,
+           std::string(negation ? "isn't" : "is") + " approx equal to" +
+               ::testing::PrintToString(expect)) {
+  if (arg.size() != expect.size()) return false;
+  for (int j = 0; j < arg.size(); ++j) {
+    double diff = std::abs(arg(j) - expect(j));
+    if (diff > prec(arg(j), expect(j))) return false;
+  }
+  return true;
+}
+}  // namespace g2o::internal::testing
 
 /**
  * @brief A typed test for Edges.
@@ -50,25 +68,28 @@
  * parameter is optional.
  */
 template <typename T>
-struct FixedSizeEdgeIO : public ::testing::Test {
+struct FixedSizeEdgeBasicTests : public ::testing::Test {
  public:
-  FixedSizeEdgeIO() = default;
+  using EpsilonFunction = std::function<double(const double, const double)>;
+  using EdgeType = typename std::tuple_element<0, T>::type;
+
+  EpsilonFunction epsilon = [](const double, const double) { return 1e-3; };
+
+  FixedSizeEdgeBasicTests() = default;
 
   void SetUp() override {
     constexpr std::size_t kTupleSize = std::tuple_size_v<T>;
-    using EdgeType = typename std::tuple_element<0, T>::type;
 
     // Construct a small graph
-    auto edge = std::make_shared<EdgeType>();
+    edge_ = std::make_shared<EdgeType>();
 
     // Initialize the vertices of the edge to a random state
-    for (std::size_t i = 0; i < edge->vertices().size(); ++i) {
-      auto v =
-          std::shared_ptr<g2o::OptimizableGraph::Vertex>(edge->createVertex(i));
-      edge->vertices()[i] = v;
+    for (std::size_t i = 0; i < edge_->vertices().size(); ++i) {
+      auto v = std::shared_ptr<g2o::OptimizableGraph::Vertex>(
+          edge_->createVertex(i));
+      edge_->vertices()[i] = v;
       v->setId(i);
-      v->setFixed(i == 0);
-      initializeNthVertex<EdgeType::kNrOfVertices - 1>(i, *edge);
+      initializeNthVertex<EdgeType::kNrOfVertices - 1>(i, *edge_);
       this->optimizer_ptr_->addVertex(v);
     }
 
@@ -77,7 +98,7 @@ struct FixedSizeEdgeIO : public ::testing::Test {
       using ParamTuple = typename TupleTypes<T>::Tail;
       constexpr std::size_t kParamSize = std::tuple_size_v<ParamTuple>;
       for (std::size_t i = 0; i < kParamSize; ++i) {
-        addNthParameter<kParamSize - 1, ParamTuple, EdgeType>(i, *edge);
+        addNthParameter<kParamSize - 1, ParamTuple, EdgeType>(i, *edge_);
       }
     }
 
@@ -90,13 +111,18 @@ struct FixedSizeEdgeIO : public ::testing::Test {
       return result;
     }();
 
-    edge->setInformation(information_matrix);
-    edge->setMeasurement(
+    edge_->setInformation(information_matrix);
+    edge_->setMeasurement(
         g2o::internal::RandomValue<typename EdgeType::Measurement>::create());
-    this->optimizer_ptr_->addEdge(edge);
+    this->optimizer_ptr_->addEdge(edge_);
+
+    this->numeric_jacobian_workspace_.updateSize(*edge_);
+    this->numeric_jacobian_workspace_.allocate();
   }
 
  protected:
+  std::shared_ptr<EdgeType> edge_;
+
   std::unique_ptr<g2o::SparseOptimizer> optimizer_ptr_ =
       g2o::internal::createOptimizerForTests();
 
@@ -140,10 +166,37 @@ struct FixedSizeEdgeIO : public ::testing::Test {
     using Head = HeadType;
     using Tail = std::tuple<TailTypes...>;
   };
-};
-TYPED_TEST_SUITE_P(FixedSizeEdgeIO);
 
-TYPED_TEST_P(FixedSizeEdgeIO, SaveAndLoad) {
+  /**
+   * @brief Helper template to compute the Jacobian numerically and by the
+   * implementation of the Edge class.
+   *
+   * @tparam Ints Index sequence over the EdgeType::kNrOfVertices
+   */
+  template <std::size_t... Ints>
+  void compute(EdgeType& edge, std::index_sequence<Ints...> /*unused*/) {
+    // calling the analytic Jacobian but writing to the numeric workspace
+    edge.template BaseFixedSizedEdge<
+        EdgeType::kDimension, typename EdgeType::Measurement,
+        typename EdgeType::template VertexXnType<Ints>...>::
+        linearizeOplus(this->numeric_jacobian_workspace_);
+    // copy result into analytic workspace
+    this->jacobian_workspace_ = this->numeric_jacobian_workspace_;
+    this->numeric_jacobian_workspace_.setZero();
+
+    // compute the numeric Jacobian into the this->numeric_jacobian_workspace_
+    // workspace as setup by the previous call
+    edge.template BaseFixedSizedEdge<
+        EdgeType::kDimension, typename EdgeType::Measurement,
+        typename EdgeType::template VertexXnType<Ints>...>::linearizeOplus();
+  }
+
+  g2o::JacobianWorkspace jacobian_workspace_;
+  g2o::JacobianWorkspace numeric_jacobian_workspace_;
+};
+TYPED_TEST_SUITE_P(FixedSizeEdgeBasicTests);
+
+TYPED_TEST_P(FixedSizeEdgeBasicTests, SaveAndLoad) {
   using namespace testing;  // NOLINT
   constexpr g2o::io::Format kFormat = g2o::io::Format::kG2O;
 
@@ -188,14 +241,36 @@ TYPED_TEST_P(FixedSizeEdgeIO, SaveAndLoad) {
   }
 }
 
-REGISTER_TYPED_TEST_SUITE_P(FixedSizeEdgeIO, SaveAndLoad);
+TYPED_TEST_P(FixedSizeEdgeBasicTests, Jacobian) {
+  using EdgeType = typename std::tuple_element<0, TypeParam>::type;
+
+  this->compute(*(this->edge_),
+                std::make_index_sequence<EdgeType::kNrOfVertices>());
+
+  // compare the two Jacobians
+  for (std::size_t i = 0; i < this->edge_->vertices().size(); ++i) {
+    int numElems = EdgeType::kDimension;
+    auto* vertex = static_cast<g2o::OptimizableGraph::Vertex*>(
+        this->edge_->vertex(i).get());
+    numElems *= vertex->dimension();
+    g2o::VectorX::ConstMapType n(
+        this->numeric_jacobian_workspace_.workspaceForVertex(i), numElems);
+    g2o::VectorX::ConstMapType a(
+        this->jacobian_workspace_.workspaceForVertex(i), numElems);
+    EXPECT_THAT(g2o::internal::print_wrap(a),
+                g2o::internal::testing::JacobianApproxEqual(
+                    g2o::internal::print_wrap(n), this->epsilon));
+  }
+}
+
+REGISTER_TYPED_TEST_SUITE_P(FixedSizeEdgeBasicTests, SaveAndLoad, Jacobian);
 
 namespace g2o::internal {
 class DefaultTypeNames {
  public:
   template <typename T>
   static std::string GetName(int) {
-    return ExtractTupleHead(testing::internal::GetTypeName<T>());
+    return ExtractTupleHead(::testing::internal::GetTypeName<T>());
   }
 };
 

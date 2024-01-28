@@ -26,26 +26,35 @@
 
 #include <gtest/gtest.h>
 
-#include <tuple>
+#include "g2o/core/factory.h"
+#include "g2o/types/sba/edge_project_p2mc.h"
+#include "g2o/types/sba/edge_project_p2sc.h"
+#include "g2o/types/sba/edge_project_stereo_xyz.h"
+#include "g2o/types/sba/edge_project_stereo_xyz_onlypose.h"
+#include "g2o/types/sba/edge_project_xyz.h"
+#include "g2o/types/sba/edge_project_xyz_onlypose.h"
+#include "g2o/types/sba/edge_sba_cam.h"
+#include "g2o/types/sba/edge_sba_scale.h"
+#include "g2o/types/sba/edge_se3_expmap.h"
+#include "unit_test/test_helper/typed_basic_tests.h"
 
-#include "g2o/types/slam2d/edge_se2.h"
-#include "g2o/types/slam2d/edge_se2_offset.h"
-#include "g2o/types/slam2d/edge_se2_pointxy.h"
-#include "g2o/types/slam2d/edge_se2_pointxy_bearing.h"
-#include "g2o/types/slam2d/edge_se2_pointxy_offset.h"
-#include "g2o/types/slam2d/edge_se2_prior.h"
-#include "g2o/types/slam2d/edge_xy_prior.h"
-#include "g2o/types/slam2d/parameter_se2_offset.h"
-#include "unit_test/test_helper/typed_io.h"
+G2O_USE_TYPE_GROUP(slam3d)
 
-using Slam2DIoTypes = ::testing::Types<
-    // without parameters
-    std::tuple<g2o::EdgeSE2>, std::tuple<g2o::EdgeSE2PointXY>,
-    std::tuple<g2o::EdgeSE2PointXYBearing>, std::tuple<g2o::EdgeSE2Prior>,
-    std::tuple<g2o::EdgeXYPrior>,
-    // with parameters
-    std::tuple<g2o::EdgeSE2Offset, g2o::ParameterSE2Offset,
-               g2o::ParameterSE2Offset>,
-    std::tuple<g2o::EdgeSE2PointXYOffset, g2o::ParameterSE2Offset> >;
-INSTANTIATE_TYPED_TEST_SUITE_P(Slam2D, FixedSizeEdgeIO, Slam2DIoTypes,
+template <>
+struct g2o::internal::RandomValue<g2o::SBACam> {
+  using Type = g2o::SBACam;
+  static Type create() {
+    g2o::SBACam result(g2o::Quaternion::UnitRandom(), g2o::Vector3::Random());
+    return result;
+  }
+};
+
+using SBAIoTypes = ::testing::Types<
+    std::tuple<g2o::EdgeSE3Expmap>, std::tuple<g2o::EdgeSBAScale>,
+    std::tuple<g2o::EdgeSBACam>, std::tuple<g2o::EdgeSE3ProjectXYZ>,
+    std::tuple<g2o::EdgeSE3ProjectXYZOnlyPose>,
+    std::tuple<g2o::EdgeStereoSE3ProjectXYZ>,
+    std::tuple<g2o::EdgeStereoSE3ProjectXYZOnlyPose>,
+    std::tuple<g2o::EdgeProjectP2SC>, std::tuple<g2o::EdgeProjectP2MC>>;
+INSTANTIATE_TYPED_TEST_SUITE_P(SBA, FixedSizeEdgeBasicTests, SBAIoTypes,
                                g2o::internal::DefaultTypeNames);

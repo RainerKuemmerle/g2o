@@ -28,30 +28,24 @@
 
 #include <tuple>
 
-#include "g2o/types/slam3d/edge_pointxyz.h"
-#include "g2o/types/slam3d/edge_se3.h"
-#include "g2o/types/slam3d/edge_se3_offset.h"
-#include "g2o/types/slam3d/edge_se3_pointxyz.h"
-#include "g2o/types/slam3d/edge_se3_pointxyz_depth.h"
-#include "g2o/types/slam3d/edge_se3_pointxyz_disparity.h"
-#include "g2o/types/slam3d/edge_se3_prior.h"
-#include "g2o/types/slam3d/edge_se3_xyzprior.h"
-#include "g2o/types/slam3d/edge_xyz_prior.h"
-#include "g2o/types/slam3d/parameter_camera.h"
-#include "g2o/types/slam3d/parameter_se3_offset.h"
-#include "unit_test/test_helper/typed_io.h"
+#include "g2o/types/slam2d/edge_se2.h"
+#include "g2o/types/slam2d/edge_se2_offset.h"
+#include "g2o/types/slam2d/edge_se2_pointxy.h"
+#include "g2o/types/slam2d/edge_se2_pointxy_bearing.h"
+#include "g2o/types/slam2d/edge_se2_pointxy_offset.h"
+#include "g2o/types/slam2d/edge_se2_prior.h"
+#include "g2o/types/slam2d/edge_xy_prior.h"
+#include "g2o/types/slam2d/parameter_se2_offset.h"
+#include "unit_test/test_helper/typed_basic_tests.h"
 
-using Slam3DIoTypes = ::testing::Types<
+using Slam2DIoTypes = ::testing::Types<
     // without parameters
-    std::tuple<g2o::EdgeSE3>, std::tuple<g2o::EdgePointXYZ>,
-    std::tuple<g2o::EdgeXYZPrior>,
+    std::tuple<g2o::EdgeSE2>, std::tuple<g2o::EdgeSE2PointXY>,
+    std::tuple<g2o::EdgeSE2PointXYBearing>, std::tuple<g2o::EdgeSE2Prior>,
+    std::tuple<g2o::EdgeXYPrior>,
     // with parameters
-    std::tuple<g2o::EdgeSE3Offset, g2o::ParameterSE3Offset,
-               g2o::ParameterSE3Offset>,
-    std::tuple<g2o::EdgeSE3PointXYZDepth, g2o::ParameterCamera>,
-    std::tuple<g2o::EdgeSE3PointXYZDisparity, g2o::ParameterCamera>,
-    std::tuple<g2o::EdgeSE3PointXYZ, g2o::ParameterSE3Offset>,
-    std::tuple<g2o::EdgeSE3Prior, g2o::ParameterSE3Offset>,
-    std::tuple<g2o::EdgeSE3XYZPrior, g2o::ParameterSE3Offset> >;
-INSTANTIATE_TYPED_TEST_SUITE_P(Slam3D, FixedSizeEdgeIO, Slam3DIoTypes,
+    std::tuple<g2o::EdgeSE2Offset, g2o::ParameterSE2Offset,
+               g2o::ParameterSE2Offset>,
+    std::tuple<g2o::EdgeSE2PointXYOffset, g2o::ParameterSE2Offset> >;
+INSTANTIATE_TYPED_TEST_SUITE_P(Slam2D, FixedSizeEdgeBasicTests, Slam2DIoTypes,
                                g2o::internal::DefaultTypeNames);

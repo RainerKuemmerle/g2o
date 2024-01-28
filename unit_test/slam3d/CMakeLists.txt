@@ -3,7 +3,7 @@ add_executable(unittest_slam3d
   mappings_slam3d.cpp
   orthogonal_matrix.cpp
   optimization_slam3d.cpp
-  slam3d_io.cpp
+  slam3d_basic_tests.cpp
 )
 target_link_libraries(unittest_slam3d unittest_helper types_slam3d)
 create_test(unittest_slam3d)

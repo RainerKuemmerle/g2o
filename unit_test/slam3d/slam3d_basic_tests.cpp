@@ -26,37 +26,32 @@
 
 #include <gtest/gtest.h>
 
-#include "g2o/core/eigen_types.h"
-#include "g2o/core/factory.h"
-#include "g2o/types/sba/edge_project_p2mc.h"
-#include "g2o/types/sba/edge_project_p2sc.h"
-#include "g2o/types/sba/edge_project_stereo_xyz.h"
-#include "g2o/types/sba/edge_project_stereo_xyz_onlypose.h"
-#include "g2o/types/sba/edge_project_xyz.h"
-#include "g2o/types/sba/edge_project_xyz_onlypose.h"
-#include "g2o/types/sba/edge_sba_cam.h"
-#include "g2o/types/sba/edge_sba_scale.h"
-#include "g2o/types/sba/edge_se3_expmap.h"
-#include "g2o/types/sba/sbacam.h"
-#include "unit_test/test_helper/typed_io.h"
+#include <tuple>
 
-G2O_USE_TYPE_GROUP(slam3d)
+#include "g2o/types/slam3d/edge_pointxyz.h"
+#include "g2o/types/slam3d/edge_se3.h"
+#include "g2o/types/slam3d/edge_se3_offset.h"
+#include "g2o/types/slam3d/edge_se3_pointxyz.h"
+#include "g2o/types/slam3d/edge_se3_pointxyz_depth.h"
+#include "g2o/types/slam3d/edge_se3_pointxyz_disparity.h"
+#include "g2o/types/slam3d/edge_se3_prior.h"
+#include "g2o/types/slam3d/edge_se3_xyzprior.h"
+#include "g2o/types/slam3d/edge_xyz_prior.h"
+#include "g2o/types/slam3d/parameter_camera.h"
+#include "g2o/types/slam3d/parameter_se3_offset.h"
+#include "unit_test/test_helper/typed_basic_tests.h"
 
-template <>
-struct g2o::internal::RandomValue<g2o::SBACam> {
-  using Type = g2o::SBACam;
-  static Type create() {
-    g2o::SBACam result(g2o::Quaternion::UnitRandom(), g2o::Vector3::Random());
-    return result;
-  }
-};
-
-using SBAIoTypes = ::testing::Types<
-    std::tuple<g2o::EdgeSE3Expmap>, std::tuple<g2o::EdgeSBAScale>,
-    std::tuple<g2o::EdgeSBACam>, std::tuple<g2o::EdgeSE3ProjectXYZ>,
-    std::tuple<g2o::EdgeSE3ProjectXYZOnlyPose>,
-    std::tuple<g2o::EdgeStereoSE3ProjectXYZ>,
-    std::tuple<g2o::EdgeStereoSE3ProjectXYZOnlyPose>,
-    std::tuple<g2o::EdgeProjectP2SC>, std::tuple<g2o::EdgeProjectP2MC>>;
-INSTANTIATE_TYPED_TEST_SUITE_P(SBA, FixedSizeEdgeIO, SBAIoTypes,
+using Slam3DIoTypes = ::testing::Types<
+    // without parameters
+    std::tuple<g2o::EdgeSE3>, std::tuple<g2o::EdgePointXYZ>,
+    std::tuple<g2o::EdgeXYZPrior>,
+    // with parameters
+    std::tuple<g2o::EdgeSE3Offset, g2o::ParameterSE3Offset,
+               g2o::ParameterSE3Offset>,
+    std::tuple<g2o::EdgeSE3PointXYZDepth, g2o::ParameterCamera>,
+    std::tuple<g2o::EdgeSE3PointXYZDisparity, g2o::ParameterCamera>,
+    std::tuple<g2o::EdgeSE3PointXYZ, g2o::ParameterSE3Offset>,
+    std::tuple<g2o::EdgeSE3Prior, g2o::ParameterSE3Offset>,
+    std::tuple<g2o::EdgeSE3XYZPrior, g2o::ParameterSE3Offset> >;
+INSTANTIATE_TYPED_TEST_SUITE_P(Slam3D, FixedSizeEdgeBasicTests, Slam3DIoTypes,
                                g2o::internal::DefaultTypeNames);
