@@ -267,12 +267,11 @@ TYPED_TEST_P(FixedSizeEdgeBasicTests, Jacobian) {
 }
 #endif
 
-REGISTER_TYPED_TEST_SUITE_P(FixedSizeEdgeBasicTests, SaveAndLoad
-#ifndef WINDOWS
-                            ,
-                            Jacobian
+#ifdef WINDOWS
+REGISTER_TYPED_TEST_SUITE_P(FixedSizeEdgeBasicTests, SaveAndLoad);
+#else
+REGISTER_TYPED_TEST_SUITE_P(FixedSizeEdgeBasicTests, SaveAndLoad, Jacobian);
 #endif
-);
 
 namespace g2o::internal {
 class DefaultTypeNames {
