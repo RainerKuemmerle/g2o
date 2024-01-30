@@ -55,8 +55,10 @@ inline void declareEdgeSE2PointXY(py::module& m) {
   // WriteGnuplotAction class G2O_TYPES_SLAM2D_API
   // EdgeSE2PointXYBearingDrawAction: public DrawAction
 
-  py::class_<EdgeSE2PointXYCalib, BaseVariableSizedEdge<2, Vector2>,
-             std::shared_ptr<EdgeSE2PointXYCalib>>(m, "EdgeSE2PointXYCalib")
+  py::class_<
+      EdgeSE2PointXYCalib,
+      BaseFixedSizedEdge<2, Vector2, VertexSE2, VertexPointXY, VertexSE2>,
+      std::shared_ptr<EdgeSE2PointXYCalib>>(m, "EdgeSE2PointXYCalib")
       .def(py::init<>())
       .def("compute_error", &EdgeSE2PointXYCalib::computeError)
       .def("initial_estimate_possible",

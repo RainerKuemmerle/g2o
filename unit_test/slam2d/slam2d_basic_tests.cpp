@@ -32,8 +32,10 @@
 #include "g2o/types/slam2d/edge_se2_offset.h"
 #include "g2o/types/slam2d/edge_se2_pointxy.h"
 #include "g2o/types/slam2d/edge_se2_pointxy_bearing.h"
+#include "g2o/types/slam2d/edge_se2_pointxy_calib.h"
 #include "g2o/types/slam2d/edge_se2_pointxy_offset.h"
 #include "g2o/types/slam2d/edge_se2_prior.h"
+#include "g2o/types/slam2d/edge_se2_twopointsxy.h"
 #include "g2o/types/slam2d/edge_xy_prior.h"
 #include "g2o/types/slam2d/parameter_se2_offset.h"
 #include "unit_test/test_helper/typed_basic_tests.h"
@@ -42,7 +44,8 @@ using Slam2DIoTypes = ::testing::Types<
     // without parameters
     std::tuple<g2o::EdgeSE2>, std::tuple<g2o::EdgeSE2PointXY>,
     std::tuple<g2o::EdgeSE2PointXYBearing>, std::tuple<g2o::EdgeSE2Prior>,
-    std::tuple<g2o::EdgeXYPrior>,
+    std::tuple<g2o::EdgeXYPrior>, std::tuple<g2o::EdgeSE2TwoPointsXY>,
+    std::tuple<g2o::EdgeSE2PointXYCalib>,
     // with parameters
     std::tuple<g2o::EdgeSE2Offset, g2o::ParameterSE2Offset,
                g2o::ParameterSE2Offset>,

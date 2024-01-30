@@ -27,18 +27,18 @@
 #ifndef G2O_EDGE_SE2_TWOPOINTS_XY_H
 #define G2O_EDGE_SE2_TWOPOINTS_XY_H
 
-#include "g2o/core/base_variable_sized_edge.h"
+#include "g2o/core/base_fixed_sized_edge.h"
 #include "g2o/core/eigen_types.h"
-#include "g2o/core/optimizable_graph.h"
+#include "g2o/types/slam2d/vertex_point_xy.h"
+#include "g2o/types/slam2d/vertex_se2.h"
 #include "g2o_types_slam2d_api.h"
 
 namespace g2o {
 
 class G2O_TYPES_SLAM2D_API EdgeSE2TwoPointsXY
-    : public BaseVariableSizedEdge<4, Vector4> {
+    : public BaseFixedSizedEdge<4, Vector4, VertexSE2, VertexPointXY,
+                                VertexPointXY> {
  public:
-  EdgeSE2TwoPointsXY();
-
   void computeError() override;
 
   bool setMeasurementFromState() override;

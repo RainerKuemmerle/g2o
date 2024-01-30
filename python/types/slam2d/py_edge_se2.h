@@ -67,8 +67,10 @@ inline void declareEdgeSE2(py::module& m) {
       .def("initial_estimate_possible", &EdgeSE2Prior::initialEstimatePossible)
       .def("initial_estimate", &EdgeSE2Prior::initialEstimate);
 
-  py::class_<EdgeSE2TwoPointsXY, BaseVariableSizedEdge<4, Vector4>,
-             std::shared_ptr<EdgeSE2TwoPointsXY>>(m, "EdgeSE2TwoPointsXY")
+  py::class_<
+      EdgeSE2TwoPointsXY,
+      BaseFixedSizedEdge<4, Vector4, VertexSE2, VertexPointXY, VertexPointXY>>(
+      m, "EdgeSE2TwoPointsXY")
       .def(py::init<>())
       .def("compute_error", &EdgeSE2TwoPointsXY::computeError)
       .def("set_measurement_from_state",

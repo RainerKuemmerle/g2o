@@ -4,8 +4,8 @@
 [ ] Test load/save for VertexCam (camera and baseline seem missing from traits)
 [ ] Refactor Data container. Can it be a container instead of linked list?
 [ ] Use FakeDependency in Traits
-[ ] EdgeSE2TwoPointsXY, EdgeSE2PointXYCalib can be fixed size edges -> IO test
-[ ] IO test fixture including parameter
+[x] EdgeSE2TwoPointsXY, EdgeSE2PointXYCalib can be fixed size edges -> IO test
+[x] IO test fixture including parameter
 [x] Type Based Tests for Jacobian
 [x] support saving VectorX and MatrixX in G2O format
 [x] update python optimizable graph wrapper (save/load) with format

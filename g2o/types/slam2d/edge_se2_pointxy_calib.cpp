@@ -33,10 +33,18 @@
 
 namespace g2o {
 
-EdgeSE2PointXYCalib::EdgeSE2PointXYCalib()
+void EdgeSE2PointXYCalib::computeError() {
+  const auto* v1 = vertexXnRaw<0>();
+  const auto* l2 = vertexXnRaw<1>();
+  const auto* calib = vertexXnRaw<2>();
+  error_ = ((v1->estimate() * calib->estimate()).inverse() * l2->estimate()) -
+           measurement_;
+}
 
-{
-  resize(3);
+double EdgeSE2PointXYCalib::initialEstimatePossible(
+    const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to) {
+  (void)to;
+  return (from.count(vertices_[0]) == 1 ? 1.0 : -1.0);
 }
 
 void EdgeSE2PointXYCalib::initialEstimate(
@@ -45,8 +53,8 @@ void EdgeSE2PointXYCalib::initialEstimate(
          "Can not initialize VertexSE2 position by VertexPointXY");
 
   if (from.count(vertices_[0]) != 1) return;
-  auto* vi = static_cast<VertexSE2*>(vertexRaw(0));
-  auto* vj = static_cast<VertexPointXY*>(vertexRaw(1));
+  auto* vi = vertexXnRaw<0>();
+  auto* vj = vertexXnRaw<1>();
   vj->setEstimate(vi->estimate() * measurement_);
 }
 
