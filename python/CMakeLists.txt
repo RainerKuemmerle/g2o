@@ -65,4 +65,4 @@ target_link_libraries(g2opy PRIVATE
     types_slam3d_addons
 )
 target_include_directories(g2opy PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
-install(TARGETS g2opy LIBRARY DESTINATION g2opy)
+install(TARGETS g2opy LIBRARY DESTINATION g2o)
