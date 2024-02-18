@@ -43,7 +43,7 @@ OptimizationAlgorithmLevenberg::OptimizationAlgorithmLevenberg(
     std::unique_ptr<Solver> solver)
     : OptimizationAlgorithmWithHessian(*solver.get()),
       _currentLambda(-1),
-      _tau(1e5),
+      _tau(1e-5),
       _goodStepLowerScale(1. / 3.),
       _goodStepUpperScale(2. / 3.),
       _ni(2.),
