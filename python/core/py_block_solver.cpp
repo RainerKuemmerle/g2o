@@ -23,9 +23,13 @@ void templatedPyLinearSolver(py::module& m, const std::string& suffix) {
 
   py::class_<CLS>(m, ("LinearSolver" + suffix).c_str())
       .def(py::init<>())
-      .def("set_block_ordering", [](CLS& ls, bool blockOrdering) {
-        ls.solver->setBlockOrdering(blockOrdering);
-      });
+      .def("set_block_ordering",
+           [](CLS& ls, bool blockOrdering) {
+             ls.solver->setBlockOrdering(blockOrdering);
+           })
+      .def("set_write_debug",
+           [](CLS& ls, bool debug) { ls.solver->setWriteDebug(debug); })
+      .def("write_debug", [](CLS& ls) { return ls.solver->writeDebug(); });
 }
 
 template <typename LinearSolverT, typename BlockSolverT>
@@ -99,7 +103,11 @@ void templatedPyBlockSolver(py::module& m, const std::string& suffix) {
       .def(py::init<PyLinearSolver<g2o::LinearSolverDense<PoseMatrixType>,
                                    BlockSolverT>&>())
       .def(py::init<PyLinearSolver<g2o::LinearSolverPCG<PoseMatrixType>,
-                                   BlockSolverT>&>());
+                                   BlockSolverT>&>())
+      .def("set_write_debug",
+           [](CLS& ls, bool debug) { ls.block_solver->setWriteDebug(debug); })
+      .def("write_debug",
+           [](CLS& ls) { return ls.block_solver->writeDebug(); });
 }
 
 }  // namespace
