@@ -2,10 +2,13 @@
 
 #include <g2o/types/icp/types_icp.h>
 
+#include "g2o/core/factory.h"
 #include "g2opy.h"
 #include "python/core/py_base_binary_edge.h"
 #include "python/core/py_base_edge.h"
 #include "python/core/py_base_vertex.h"
+
+G2O_USE_TYPE_GROUP(icp)
 
 namespace g2o {
 

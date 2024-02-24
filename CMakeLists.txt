@@ -35,6 +35,8 @@ option (BUILD_SHARED_LIBS "Build Shared Libraries (preferred and required for th
 set (G2O_LIB_TYPE STATIC)
 if (BUILD_SHARED_LIBS)
   set (G2O_LIB_TYPE SHARED)
+else()
+  set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 endif()
 
 # On the Mac platform, configure the RPATH as per the INSTALL, to
