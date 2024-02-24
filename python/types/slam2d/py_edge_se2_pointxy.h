@@ -54,7 +54,8 @@ inline void declareEdgeSE2PointXY(py::module& m) {
   // class G2O_TYPES_SLAM2D_API EdgeSE2PointXYBearingWriteGnuplotAction: public
   // WriteGnuplotAction class G2O_TYPES_SLAM2D_API
   // EdgeSE2PointXYBearingDrawAction: public DrawAction
-
+  templatedBaseFixedSizedEdge<2, Vector2, VertexSE2, VertexPointXY, VertexSE2>(
+      m, "_2_Vector2_VertexSE2_VertexPointXY_VertexSE2");
   py::class_<
       EdgeSE2PointXYCalib,
       BaseFixedSizedEdge<2, Vector2, VertexSE2, VertexPointXY, VertexSE2>,
