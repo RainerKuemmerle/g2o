@@ -37,7 +37,9 @@ namespace g2o {
 OptimizationAlgorithmWithHessian::OptimizationAlgorithmWithHessian(
     Solver& solver)
     : solver_(solver) {
-  writeDebug_ = properties_.makeProperty<Property<bool> >("writeDebug", true);
+  const bool write_debug = solver_.writeDebug();
+  writeDebug_ =
+      properties_.makeProperty<Property<bool> >("writeDebug", write_debug);
 }
 
 bool OptimizationAlgorithmWithHessian::init(bool online) {
