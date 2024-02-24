@@ -1,10 +1,13 @@
 #include "py_types_sba.h"
 
+#include "g2o/core/factory.h"
 #include "g2o/types/sba/types_sba.h"
 #include "g2o/types/sba/vertex_intrinsics.h"
 #include "g2opy.h"
 #include "python/core/py_base_binary_edge.h"
 #include "python/core/py_base_vertex.h"
+
+G2O_USE_TYPE_GROUP(sba)
 
 namespace g2o {
 

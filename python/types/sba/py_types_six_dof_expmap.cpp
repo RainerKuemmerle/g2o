@@ -1,5 +1,6 @@
 #include "py_types_six_dof_expmap.h"
 
+#include "g2o/core/factory.h"
 #include "g2o/types/sba/edge_project_xyz.h"
 #include "g2o/types/sba/types_six_dof_expmap.h"
 #include "g2o/types/slam3d/se3quat.h"
@@ -8,6 +9,8 @@
 #include "python/core/py_base_fixed_sized_edge.h"
 #include "python/core/py_base_unary_edge.h"
 #include "python/core/py_base_variable_sized_edge.h"
+
+G2O_USE_TYPE_GROUP(expmap)
 
 namespace g2o {
 

@@ -1,9 +1,12 @@
 #include "py_types_seven_dof_expmap.h"
 
+#include "g2o/core/factory.h"
 #include "g2o/types/sim3/types_seven_dof_expmap.h"
 #include "g2opy.h"
 #include "py_sim3.h"
 #include "python/core/py_base_binary_edge.h"
+
+G2O_USE_TYPE_GROUP(sim3)
 
 namespace g2o {
 
