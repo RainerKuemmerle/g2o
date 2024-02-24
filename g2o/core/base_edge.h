@@ -29,7 +29,6 @@
 
 #include <Eigen/Core>
 #include <iostream>
-#include <limits>
 #include <type_traits>
 
 #include "g2o/core/type_traits.h"
@@ -138,7 +137,7 @@ class BaseEdge : public OptimizableGraph::Edge {
    * time.
    */
   template <int Dim = D>
-  typename std::enable_if<Dim == -1, void>::type setDimension(int dim) {
+  std::enable_if_t<Dim == -1, void> setDimension(int dim) {
     dimension_ = dim;
     information_.resize(dim, dim);
     error_.resize(dim, 1);
@@ -167,10 +166,21 @@ class BaseEdge : public OptimizableGraph::Edge {
     return TypeTraits<Measurement>::kVectorDimension;
   }
 
+  //! Return the identity information matrix of this edge type
+  InformationType informationIdentity() const {
+    if constexpr (D != Eigen::Dynamic) {
+      return InformationType::Identity();
+    } else {
+      const int dim_to_use = std::max(0, dimension_);
+      return InformationType::Identity(dim_to_use, dim_to_use);
+    }
+  }
+
  protected:
-  Measurement measurement_;      ///< the measurement of the edge
-  InformationType information_;  ///< information matrix of the edge.
-                                 ///< Information = inv(covariance)
+  Measurement measurement_;  ///< the measurement of the edge
+  InformationType information_ =
+      informationIdentity();  ///< information matrix of the edge.
+                              ///< Information = inv(covariance)
   ErrorVector error_;  ///< error vector, stores the result after computeError()
                        ///< is called
 
