@@ -141,7 +141,7 @@ class LinearSolver {
   }
 
  protected:
-  bool writeDebug_ = true;
+  bool writeDebug_ = false;
 };
 
 /**
