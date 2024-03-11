@@ -43,7 +43,7 @@ class EdgeLine2DPointXY
 {
  public:
   G2O_TYPES_SLAM2D_ADDONS_API EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-      EdgeLine2DPointXY();
+  EdgeLine2DPointXY();
 
   G2O_TYPES_SLAM2D_ADDONS_API void computeError() {
     const VertexLine2D* l = static_cast<const VertexLine2D*>(_vertices[0]);
