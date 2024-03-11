@@ -42,7 +42,7 @@ class EdgeSE2Segment2DLine
 {
  public:
   G2O_TYPES_SLAM2D_ADDONS_API EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-      EdgeSE2Segment2DLine();
+  EdgeSE2Segment2DLine();
 
   G2O_TYPES_SLAM2D_ADDONS_API double theta() const { return _measurement[0]; }
   G2O_TYPES_SLAM2D_ADDONS_API double rho() const { return _measurement[1]; }
