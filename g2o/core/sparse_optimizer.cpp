@@ -384,9 +384,8 @@ void SparseOptimizer::computeInitialGuess(
   if (verbose()) {
     computeActiveErrors();
     cerr << "iteration= -1\t chi2= " << activeChi2() << "\t time= 0.0"
-         << "\t cumTime= 0.0"
-         << "\t (using initial guess from " << costFunction.name() << ")"
-         << endl;
+         << "\t cumTime= 0.0" << "\t (using initial guess from "
+         << costFunction.name() << ")" << endl;
   }
 }
 
