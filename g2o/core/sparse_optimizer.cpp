@@ -354,8 +354,8 @@ void SparseOptimizer::computeInitialGuess(EstimatePropagatorCost& propagator) {
   if (verbose()) {
     computeActiveErrors();
     std::cerr << "iteration= -1\t chi2= " << activeChi2() << "\t time= 0.0"
-              << "\t cumTime= 0.0"
-              << "\t (using initial guess from " << propagator.name() << ")\n";
+              << "\t cumTime= 0.0" << "\t (using initial guess from "
+              << propagator.name() << ")\n";
   }
 }
 

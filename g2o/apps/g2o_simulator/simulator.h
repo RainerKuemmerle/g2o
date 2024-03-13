@@ -222,7 +222,7 @@ class UnarySensor : public BaseSensor {
     return e;
   }
   GaussianSampler<typename EdgeType::ErrorVector, InformationType> sampler_;
-  virtual void addNoise(EdgeType*){};
+  virtual void addNoise(EdgeType*) {};
 };
 
 template <class RobotTypeT, class EdgeTypeT, class WorldObjectTypeT>
@@ -288,7 +288,7 @@ class BinarySensor : public BaseSensor {
     return e;
   }
   GaussianSampler<typename EdgeType::ErrorVector, InformationType> sampler_;
-  virtual void addNoise(EdgeType*){};
+  virtual void addNoise(EdgeType*) {};
 };
 
 }  // namespace g2o

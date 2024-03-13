@@ -160,7 +160,7 @@ static int create_sphere(int argc, char** argv) {
   if (randomSeed) {
     std::random_device r;
     std::seed_seq seedSeq{r(), r(), r(), r(), r()};
-    std::vector<int> seeds(2);
+    std::vector<unsigned int> seeds(2);
     seedSeq.generate(seeds.begin(), seeds.end());
     std::cerr << "using seeds:";
     for (const int seed : seeds) std::cerr << " " << seed;
