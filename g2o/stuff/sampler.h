@@ -69,7 +69,7 @@ class GaussianSampler {
   }
   //! seed the random number generator, returns false if not having an own
   //! generator.
-  bool seed(int s) {
+  bool seed(unsigned int s) {
     if (!_generator) return false;
     _generator->seed(s);
     return true;

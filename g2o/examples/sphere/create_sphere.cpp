@@ -161,7 +161,7 @@ int main(int argc, char** argv) {
   if (randomSeed) {
     std::random_device r;
     std::seed_seq seedSeq{r(), r(), r(), r(), r()};
-    vector<int> seeds(2);
+    vector<unsigned int> seeds(2);
     seedSeq.generate(seeds.begin(), seeds.end());
     cerr << "using seeds:";
     for (size_t i = 0; i < seeds.size(); ++i) cerr << " " << seeds[i];
