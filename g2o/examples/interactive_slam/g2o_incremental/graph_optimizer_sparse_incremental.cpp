@@ -46,9 +46,9 @@ std::unique_ptr<g2o::Solver> AllocateCholmodSolver() {
  * \brief backing up some information about the vertex
  */
 struct VertexBackup {
-  int hessianIndex;
-  OptimizableGraph::Vertex* vertex;
-  double* hessianData;
+  int hessianIndex = 0;
+  OptimizableGraph::Vertex* vertex = nullptr;
+  double* hessianData = nullptr;
   bool operator<(const VertexBackup& other) const {
     return hessianIndex < other.hessianIndex;
   }
@@ -235,12 +235,7 @@ bool SparseOptimizerIncremental::updateInitialization(
   // cerr << "updating index mapping done." << endl;
 
   // backup the tempindex and prepare sorting structure
-#ifdef _MSC_VER
-  VertexBackup* backupIdx = new VertexBackup[_touchedVertices.size()];
-#else
-  VertexBackup backupIdx[_touchedVertices.size()];
-#endif
-  memset(backupIdx, 0, sizeof(VertexBackup) * _touchedVertices.size());
+  std::vector<VertexBackup> backupIdx(_touchedVertices.size());
   int idx = 0;
   for (HyperGraph::VertexSet::iterator it = _touchedVertices.begin();
        it != _touchedVertices.end(); ++it) {
@@ -250,10 +245,8 @@ bool SparseOptimizerIncremental::updateInitialization(
     backupIdx[idx].hessianData = v->hessianData();
     ++idx;
   }
-  sort(backupIdx,
-       backupIdx +
-           _touchedVertices
-               .size());  // sort according to the hessianIndex which is the
+  sort(backupIdx.begin(),
+       backupIdx.end());  // sort according to the hessianIndex which is the
                           // same order as used later by the optimizer
   for (int i = 0; i < idx; ++i) {
     backupIdx[i].vertex->setHessianIndex(i);
@@ -380,9 +373,6 @@ bool SparseOptimizerIncremental::updateInitialization(
     }
   }
   cholmod_free_sparse(&updateAsSparseFactor, &_cholmodCommon);
-#ifdef _MSC_VER
-  delete[] backupIdx;
-#endif
 
 #if 0
     cholmod_sparse* updatePermuted = cholmod_triplet_to_sparse(_permutedUpdate, _permutedUpdate->nnz, &_cholmodCommon);
