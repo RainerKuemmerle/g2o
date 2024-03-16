@@ -1,5 +1,5 @@
 add_library(types_slam2d_addons ${G2O_LIB_TYPE}
-  line_2d.h
+  line_2d.h line_2d.cpp
   types_slam2d_addons.cpp
   vertex_segment2d.cpp         vertex_segment2d.h
   edge_se2_segment2d.cpp       edge_se2_segment2d.h

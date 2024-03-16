@@ -27,14 +27,10 @@
 #ifndef G2O_EDGE_SE2_LINE2D_H
 #define G2O_EDGE_SE2_LINE2D_H
 
-#include <Eigen/Core>
 #include <cmath>
 
 #include "g2o/core/base_binary_edge.h"
-#include "g2o/core/eigen_types.h"
 #include "g2o/core/optimizable_graph.h"
-#include "g2o/stuff/misc.h"
-#include "g2o/types/slam2d/se2.h"
 #include "g2o/types/slam2d/vertex_se2.h"
 #include "g2o/types/slam2d_addons/line_2d.h"
 #include "g2o_types_slam2d_addons_api.h"
@@ -45,31 +41,9 @@ namespace g2o {
 class G2O_TYPES_SLAM2D_ADDONS_API EdgeSE2Line2D
     : public BaseBinaryEdge<2, Line2D, VertexSE2, VertexLine2D> {
  public:
-  void computeError() override {
-    const VertexSE2* v1 = vertexXnRaw<0>();
-    const VertexLine2D* l2 = vertexXnRaw<1>();
-    Vector2 prediction = l2->estimate();
-    SE2 iT = v1->estimate().inverse();
-    prediction[0] += iT.rotation().angle();
-    prediction[0] = normalize_theta(prediction[0]);
-    Vector2 n(std::cos(prediction[0]), std::sin(prediction[0]));
-    prediction[1] += n.dot(iT.translation());
-    error_ = prediction - measurement_;
-    error_[0] = normalize_theta(error_[0]);
-  }
+  void computeError() override;
 
-  bool setMeasurementFromState() override {
-    const VertexSE2* v1 = vertexXnRaw<0>();
-    const VertexLine2D* l2 = vertexXnRaw<1>();
-    Vector2 prediction = l2->estimate();
-    SE2 iT = v1->estimate().inverse();
-    prediction[0] += iT.rotation().angle();
-    prediction[0] = normalize_theta(prediction[0]);
-    Vector2 n(std::cos(prediction[0]), std::sin(prediction[0]));
-    prediction[1] += n.dot(iT.translation());
-    measurement_ = Line2D(prediction);
-    return true;
-  }
+  bool setMeasurementFromState() override;
 
   void initialEstimate(const OptimizableGraph::VertexSet& from,
                        OptimizableGraph::Vertex* to) override;

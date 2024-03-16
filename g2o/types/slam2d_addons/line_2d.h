@@ -33,48 +33,54 @@
 #include "g2o/core/eigen_types.h"
 #include "g2o/core/type_traits.h"
 #include "g2o/types/slam2d/se2.h"
+#include "g2o_types_slam2d_addons_api.h"
 
 namespace g2o {
 
-struct Line2D : public Vector2 {
-  Line2D() { setZero(); }
-  explicit Line2D(const Vector2& v) {
-    (*this)(0) = v(0);
-    (*this)(1) = v(1);
-  }
+class G2O_TYPES_SLAM2D_ADDONS_API Line2D {
+ public:
+  Line2D();
+  explicit Line2D(const Vector2& v);
+
+  void setZero();
+
+  const double& operator[](int idx) const { return values_[idx]; }
+  double& operator[](int idx) { return values_[idx]; }
+
+ protected:
+  double values_[2];
 };
 
-inline Line2D operator*(const SE2& t, const Line2D& l) {
-  Line2D est = l;
-  est[0] += t.rotation().angle();
-  est[0] = normalize_theta(est[0]);
-  Vector2 n(std::cos(est[0]), std::sin(est[0]));
-  est[1] += n.dot(t.translation());
-  return est;
-}
+G2O_TYPES_SLAM2D_ADDONS_API Line2D operator*(const SE2& t, const Line2D& l);
 
 template <>
 struct TypeTraits<Line2D> {
   enum {
     kVectorDimension = 2,
     kMinimalVectorDimension = 2,
-    kIsVector = 1,
+    kIsVector = 0,
     kIsScalar = 0,
   };
   using Type = Line2D;
   using VectorType = VectorN<kVectorDimension>;
   using MinimalVectorType = VectorN<kMinimalVectorDimension>;
 
-  static VectorType toVector(const Type& t) { return t; }
-  static void toData(const Type& t, double* data) {  // NOLINT
-    typename VectorType::MapType v(data, kVectorDimension);
-    v = t;
+  static VectorType toVector(const Type& t) {
+    VectorType result;
+    result(0) = t[0];
+    result(1) = t[1];
+    return result;
+  }
+  static void toData(const Type& t, double* data) {
+    data[0] = t[0];
+    data[1] = t[1];
   }
 
-  static MinimalVectorType toMinimalVector(const Type& t) { return t; }
-  static void toMinimalData(const Type& t, double* data) {  // NOLINT
-    typename MinimalVectorType::MapType v(data, kMinimalVectorDimension);
-    v = t;
+  static MinimalVectorType toMinimalVector(const Type& t) {
+    return TypeTraits<Line2D>::toVector(t);
+  }
+  static void toMinimalData(const Type& t, double* data) {
+    TypeTraits<Line2D>::toData(t, data);
   }
 
   template <typename Derived>

@@ -26,9 +26,36 @@
 
 #include "edge_se2_line2d.h"
 
+#include "g2o/types/slam2d_addons/line_2d.h"
 #include "g2o/types/slam2d_addons/vertex_line2d.h"
 
 namespace g2o {
+
+void EdgeSE2Line2D::computeError() {
+  const VertexSE2* v1 = vertexXnRaw<0>();
+  const VertexLine2D* l2 = vertexXnRaw<1>();
+  Vector2 prediction = TypeTraits<Line2D>::toVector(l2->estimate());
+  SE2 iT = v1->estimate().inverse();
+  prediction[0] += iT.rotation().angle();
+  prediction[0] = normalize_theta(prediction[0]);
+  Vector2 n(std::cos(prediction[0]), std::sin(prediction[0]));
+  prediction[1] += n.dot(iT.translation());
+  error_ = prediction - TypeTraits<Line2D>::toVector(measurement_);
+  error_[0] = normalize_theta(error_[0]);
+}
+
+bool EdgeSE2Line2D::setMeasurementFromState() {
+  const VertexSE2* v1 = vertexXnRaw<0>();
+  const VertexLine2D* l2 = vertexXnRaw<1>();
+  Vector2 prediction = TypeTraits<Line2D>::toVector(l2->estimate());
+  SE2 iT = v1->estimate().inverse();
+  prediction[0] += iT.rotation().angle();
+  prediction[0] = normalize_theta(prediction[0]);
+  Vector2 n(std::cos(prediction[0]), std::sin(prediction[0]));
+  prediction[1] += n.dot(iT.translation());
+  measurement_ = Line2D(prediction);
+  return true;
+}
 
 void EdgeSE2Line2D::initialEstimate(const OptimizableGraph::VertexSet& from,
                                     OptimizableGraph::Vertex* to) {
@@ -39,7 +66,7 @@ void EdgeSE2Line2D::initialEstimate(const OptimizableGraph::VertexSet& from,
   VertexLine2D* vj = vertexXnRaw<1>();
   if (from.count(vi) > 0 && to == vj) {
     SE2 T = vi->estimate();
-    Vector2 est = measurement_;
+    Vector2 est = TypeTraits<Line2D>::toVector(measurement_);
     est[0] += T.rotation().angle();
     est[0] = normalize_theta(est[0]);
     Vector2 n(std::cos(est[0]), std::sin(est[0]));

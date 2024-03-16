@@ -24,32 +24,28 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef G2O_EDGE_LINE2D_H
-#define G2O_EDGE_LINE2D_H
-
-#include "g2o/core/base_binary_edge.h"
-#include "g2o/core/eigen_types.h"
-#include "g2o/types/slam2d_addons/g2o_types_slam2d_addons_api.h"
-#include "g2o/types/slam2d_addons/line_2d.h"
-#include "vertex_line2d.h"
+#include "line_2d.h"
 
 namespace g2o {
 
-class G2O_TYPES_SLAM2D_ADDONS_API EdgeLine2D
-    : public BaseBinaryEdge<2, Line2D, VertexLine2D, VertexLine2D> {
- public:
-  EdgeLine2D();
+Line2D::Line2D() { setZero(); }
+Line2D::Line2D(const Vector2& v) {
+  (*this)[0] = v(0);
+  (*this)[1] = v(1);
+}
 
-  void computeError() override;
+void Line2D::setZero() {
+  values_[0] = 0.;
+  values_[1] = 0.;
+}
 
-  void setMeasurement(const Line2D& m) override { measurement_ = m; }
-
-  virtual void setMeasurement(const Vector2& m) { measurement_ = Line2D(m); }
-
-  bool setMeasurementFromState() override;
-
-  void linearizeOplus() override;
-};
+Line2D operator*(const SE2& t, const Line2D& l) {
+  Line2D est = l;
+  est[0] += t.rotation().angle();
+  est[0] = normalize_theta(est[0]);
+  Vector2 n(std::cos(est[0]), std::sin(est[0]));
+  est[1] += n.dot(t.translation());
+  return est;
+}
 
 }  // namespace g2o
-#endif
