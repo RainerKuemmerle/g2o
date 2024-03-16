@@ -36,13 +36,9 @@
 namespace g2o {
 
 class EdgeSE2Segment2DLine
-    : public BaseBinaryEdge<2, Vector2, VertexSE2,
-                            VertexSegment2D>  // Avoid redefinition of BaseEdge
-                                              // in MSVC
-{
+    : public BaseBinaryEdge<2, Vector2, VertexSE2, VertexSegment2D> {
  public:
-  G2O_TYPES_SLAM2D_ADDONS_API EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-  EdgeSE2Segment2DLine();
+  G2O_TYPES_SLAM2D_ADDONS_API EdgeSE2Segment2DLine();
 
   G2O_TYPES_SLAM2D_ADDONS_API double theta() const { return _measurement[0]; }
   G2O_TYPES_SLAM2D_ADDONS_API double rho() const { return _measurement[1]; }
@@ -101,31 +97,7 @@ class EdgeSE2Segment2DLine
 
   G2O_TYPES_SLAM2D_ADDONS_API virtual bool read(std::istream& is);
   G2O_TYPES_SLAM2D_ADDONS_API virtual bool write(std::ostream& os) const;
-
-  /* #ifndef NUMERIC_JACOBIAN_TWO_D_TYPES */
-  /*       virtual void linearizeOplus(); */
-  /* #endif */
 };
-
-/*   class G2O_TYPES_SLAM2D_ADDONS_API EdgeSE2Segment2DLineWriteGnuplotAction:
- * public WriteGnuplotAction { */
-/*   public: */
-/*     EdgeSE2Segment2DLineWriteGnuplotAction(); */
-/*     virtual HyperGraphElementAction*
- * operator()(HyperGraph::HyperGraphElement* element,  */
-/*             HyperGraphElementAction::Parameters* params_); */
-/*   }; */
-
-/* #ifdef G2O_HAVE_OPENGL */
-/*   class G2O_TYPES_SLAM2D_ADDONS_API EdgeSE2Segment2DLineDrawAction: public
- * DrawAction{ */
-/*   public: */
-/*     EdgeSE2Segment2DLineDrawAction(); */
-/*     virtual HyperGraphElementAction*
- * operator()(HyperGraph::HyperGraphElement* element,  */
-/*             HyperGraphElementAction::Parameters* params_); */
-/*   }; */
-/* #endif */
 
 }  // namespace g2o
 

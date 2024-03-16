@@ -36,13 +36,9 @@
 namespace g2o {
 
 class EdgeSE2Segment2D
-    : public BaseBinaryEdge<4, Vector4, VertexSE2,
-                            VertexSegment2D>  // Avoid redefinition of BaseEdge
-                                              // in MSVC
-{
+    : public BaseBinaryEdge<4, Vector4, VertexSE2, VertexSegment2D> {
  public:
-  G2O_TYPES_SLAM2D_ADDONS_API EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-  EdgeSE2Segment2D();
+  G2O_TYPES_SLAM2D_ADDONS_API EdgeSE2Segment2D();
 
   G2O_TYPES_SLAM2D_ADDONS_API Vector2 measurementP1() {
     return Eigen::Map<const Vector2>(&(_measurement[0]));
