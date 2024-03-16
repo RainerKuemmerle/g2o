@@ -42,8 +42,7 @@ class EdgeSE3Calib
                                                   // BaseEdge in MSVC
 {
  public:
-  G2O_TYPES_SLAM3D_ADDONS_API
-  EdgeSE3Calib();
+  G2O_TYPES_SLAM3D_ADDONS_API EdgeSE3Calib();
 
   G2O_TYPES_SLAM3D_ADDONS_API void computeError() override;
 };

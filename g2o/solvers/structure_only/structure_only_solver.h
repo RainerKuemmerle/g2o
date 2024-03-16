@@ -112,11 +112,7 @@ class StructureOnlySolver : public OptimizationAlgorithm {
                 std::static_pointer_cast<OptimizableGraph::Edge>(it_t.lock());
 
             // fix all the other vertices and remember their fix value
-#ifdef WINDOWS
             std::vector<bool> remember_fix_status(e->vertices().size());
-#else
-            bool remember_fix_status[e->vertices().size()];
-#endif
             for (size_t k = 0; k < e->vertices().size(); ++k) {
               auto otherV = std::static_pointer_cast<OptimizableGraph::Vertex>(
                   e->vertex(k));

@@ -35,10 +35,7 @@
 namespace g2o {
 
 class EdgeLine2DPointXY
-    : public BaseBinaryEdge<1, double, VertexLine2D,
-                            VertexPointXY>  // Avoid redefinition of BaseEdge in
-                                            // MSVC
-{
+    : public BaseBinaryEdge<1, double, VertexLine2D, VertexPointXY> {
  public:
   G2O_TYPES_SLAM2D_ADDONS_API void computeError() override;
 

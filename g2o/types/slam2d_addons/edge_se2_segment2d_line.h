@@ -38,10 +38,7 @@
 namespace g2o {
 
 class EdgeSE2Segment2DLine
-    : public BaseBinaryEdge<2, Vector2, VertexSE2,
-                            VertexSegment2D>  // Avoid redefinition of BaseEdge
-                                              // in MSVC
-{
+    : public BaseBinaryEdge<2, Vector2, VertexSE2, VertexSegment2D> {
  public:
   G2O_TYPES_SLAM2D_ADDONS_API [[nodiscard]] double theta() const {
     return measurement_[0];
@@ -56,10 +53,6 @@ class EdgeSE2Segment2DLine
   G2O_TYPES_SLAM2D_ADDONS_API void computeError() override;
 
   G2O_TYPES_SLAM2D_ADDONS_API bool setMeasurementFromState() override;
-
-  /* #ifndef NUMERIC_JACOBIAN_TWO_D_TYPES */
-  /*       virtual void linearizeOplus(); */
-  /* #endif */
 };
 
 }  // namespace g2o
