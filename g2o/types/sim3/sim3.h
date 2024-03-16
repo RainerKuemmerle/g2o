@@ -130,8 +130,6 @@ struct TypeTraits<Sim3> {
   static Type fromMinimalVector(const Eigen::DenseBase<Derived>& v) {
     return Sim3(v);
   }
-
-  static Type Identity() { return Sim3(); }
 };
 
 }  // namespace g2o

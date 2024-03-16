@@ -26,11 +26,8 @@
 
 #include "edge_se3_pointxyz.h"
 
-#include "g2o/core/cache.h"
 #include "g2o/core/eigen_types.h"
-#include "g2o/core/io_helper.h"
 #include "g2o/core/parameter.h"
-#include "g2o/stuff/property.h"
 #include "g2o/types/slam3d/vertex_pointxyz.h"
 #include "g2o/types/slam3d/vertex_se3.h"
 #include "parameter_se3_offset.h"
@@ -42,7 +39,6 @@
 
 #include <Eigen/Geometry>
 #include <cassert>
-#include <iostream>
 #include <string>
 #include <typeinfo>
 
@@ -60,22 +56,6 @@ bool EdgeSE3PointXYZ::resolveCaches() {
   pv[0] = parameters_[0];
   cache_ = resolveCache<CacheSE3Offset>(vertexXn<0>(), "CACHE_SE3_OFFSET", pv);
   return cache_ != nullptr;
-}
-
-bool EdgeSE3PointXYZ::read(std::istream& is) {
-  readParamIds(is);
-  Vector3 meas;
-  internal::readVector(is, meas);
-  setMeasurement(meas);
-  readInformationMatrix(is);
-  return is.good() || is.eof();
-}
-
-bool EdgeSE3PointXYZ::write(std::ostream& os) const {
-  bool state = writeParamIds(os);
-  state &= internal::writeVector(os, measurement());
-  state &= writeInformationMatrix(os);
-  return state;
 }
 
 void EdgeSE3PointXYZ::computeError() {
@@ -145,7 +125,7 @@ void EdgeSE3PointXYZ::initialEstimate(const OptimizableGraph::VertexSet& from,
   VertexSE3* cam = vertexXnRaw<0>();
   VertexPointXYZ* point = vertexXnRaw<1>();
   const Vector3 p = measurement_;
-  point->setEstimate(cam->estimate() * (cache_->offsetParam()->offset() * p));
+  point->setEstimate(cam->estimate() * (cache_->offsetParam()->param() * p));
 }
 
 #ifdef G2O_HAVE_OPENGL
@@ -167,7 +147,7 @@ bool EdgeSE3PointXYZDrawAction::operator()(
   if (!fromEdge || !toEdge) return true;
   ParameterSE3Offset* offsetParam =
       static_cast<ParameterSE3Offset*>(e->parameter(0).get());
-  Isometry3 fromTransform = fromEdge->estimate() * offsetParam->offset();
+  Isometry3 fromTransform = fromEdge->estimate() * offsetParam->param();
   glColor3f(LANDMARK_EDGE_COLOR);
   glPushAttrib(GL_ENABLE_BIT);
   glDisable(GL_LIGHTING);

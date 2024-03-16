@@ -27,9 +27,7 @@
 #ifndef G2O_SBA_EDGEPROJECTXYZ2UV_H
 #define G2O_SBA_EDGEPROJECTXYZ2UV_H
 
-#include <iosfwd>
 #include <memory>
-#include <tuple>
 
 #include "g2o/core/base_binary_edge.h"
 #include "g2o/core/eigen_types.h"
@@ -45,8 +43,6 @@ class G2O_TYPES_SBA_API EdgeProjectXYZ2UV
     : public BaseBinaryEdge<2, Vector2, VertexPointXYZ, VertexSE3Expmap> {
  public:
   EdgeProjectXYZ2UV();
-  bool read(std::istream& is) override;
-  bool write(std::ostream& os) const override;
   void computeError() override;
   void linearizeOplus() override;
 

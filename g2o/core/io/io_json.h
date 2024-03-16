@@ -24,10 +24,20 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef G2O_TYPES_SCLAM_H
-#define G2O_TYPES_SCLAM_H
+#ifndef G2O_CORE_IO_JSON_FORMAT_H
+#define G2O_CORE_IO_JSON_FORMAT_H
 
-#include "edge_se2_odom_differential_calib.h"
-#include "edge_se2_sensor_calib.h"
+#include "g2o/core/g2o_core_api.h"
+#include "io_interface.h"
+
+namespace g2o {
+
+class G2O_CORE_API IoJson : public IoInterface {
+ public:
+  std::optional<AbstractGraph> load(std::istream& input) override;
+  bool save(std::ostream& output, const AbstractGraph& graph) override;
+};
+
+}  // namespace g2o
 
 #endif

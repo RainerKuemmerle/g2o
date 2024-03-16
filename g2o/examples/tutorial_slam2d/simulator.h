@@ -27,7 +27,6 @@
 #ifndef G2O_SIMULATOR_H
 #define G2O_SIMULATOR_H
 
-#include <map>
 #include <vector>
 
 #include "g2o_tutorial_slam2d_api.h"

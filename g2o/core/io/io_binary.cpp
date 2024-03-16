@@ -1,5 +1,5 @@
 // g2o - General Graph Optimization
-// Copyright (C) 2011 G. Grisetti, R. Kuemmerle, W. Burgard
+// Copyright (C) 2011 R. Kuemmerle, G. Grisetti, W. Burgard
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -24,17 +24,46 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef G2O_SIMULATOR2D_
-#define G2O_SIMULATOR2D_
+#include "io_binary.h"
 
-#include "sensor_odometry2d.h"
-#include "sensor_pointxy.h"
-#include "sensor_pointxy_bearing.h"
-#include "sensor_pointxy_offset.h"
-#include "sensor_pose2d.h"
-#include "sensor_segment2d.h"
-#include "sensor_segment2d_line.h"
-#include "sensor_segment2d_pointline.h"
-#include "simulator2d_base.h"
+#include <optional>
+
+#include "g2o/config.h"
+#include "g2o/core/abstract_graph.h"
+
+#ifdef G2O_HAVE_CEREAL
+#include <cereal/archives/portable_binary.hpp>
+#include <cereal/cereal.hpp>
+
+#include "io_wrapper_cereal.h"  // IWYU pragma: keep
+#else
+#include "g2o/stuff/logger.h"
+#endif  // HAVE CEREAL
+
+namespace g2o {
+
+#ifdef G2O_HAVE_CEREAL
+
+std::optional<AbstractGraph> IoBinary::load(std::istream& input) {
+  return io::load<cereal::PortableBinaryInputArchive>(input, "BINARY");
+}
+
+bool IoBinary::save(std::ostream& output, const AbstractGraph& graph) {
+  return io::save<cereal::PortableBinaryOutputArchive>(output, graph, "BINARY");
+}
+
+#else
+
+std::optional<AbstractGraph> IoBinary::load(std::istream&) {
+  G2O_WARN("Loading BINARY is not supported");
+  return std::nullopt;
+}
+
+bool IoBinary::save(std::ostream&, const AbstractGraph&) {
+  G2O_WARN("Saving BINARY is not supported");
+  return false;
+}
 
 #endif
+
+}  // namespace g2o

@@ -27,8 +27,6 @@
 #include "edge_sba_scale.h"
 
 #include <Eigen/Core>
-#include <memory>
-#include <ostream>
 
 #include "g2o/core/eigen_types.h"
 #include "g2o/types/sba/sbacam.h"
@@ -36,20 +34,6 @@
 #include "g2o/types/slam3d/se3quat.h"
 
 namespace g2o {
-
-bool EdgeSBAScale::read(std::istream& is) {
-  double meas;
-  is >> meas;
-  setMeasurement(meas);
-  information().setIdentity();
-  is >> information()(0, 0);
-  return true;
-}
-
-bool EdgeSBAScale::write(std::ostream& os) const {
-  os << measurement() << " " << information()(0, 0);
-  return os.good();
-}
 
 void EdgeSBAScale::initialEstimate(const OptimizableGraph::VertexSet& from_,
                                    OptimizableGraph::Vertex* /*to_*/) {

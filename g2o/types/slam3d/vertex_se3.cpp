@@ -29,9 +29,7 @@
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 #include <string>
-#include <typeinfo>
 
-#include "g2o/core/io_helper.h"
 #include "g2o/types/slam3d/isometry3d_mappings.h"
 #ifdef G2O_HAVE_OPENGL
 #include "g2o/stuff/opengl_primitives.h"
@@ -46,19 +44,8 @@ constexpr int kOrthogonalizeAfter =
 namespace g2o {
 
 VertexSE3::VertexSE3() {
-  setToOriginImpl();
+  setEstimate(Eigen::Isometry3d::Identity());
   updateCache();
-}
-
-bool VertexSE3::read(std::istream& is) {
-  Vector7 est;
-  bool state = internal::readVector(is, est);
-  setEstimate(internal::fromVectorQT(est));
-  return state;
-}
-
-bool VertexSE3::write(std::ostream& os) const {
-  return internal::writeVector(os, internal::toVectorQT(estimate()));
 }
 
 void VertexSE3::oplusImpl(const VectorX::MapType& update) {

@@ -28,14 +28,12 @@
 #define G2O_EDGE_SE3_PRIOR_H_
 
 #include <Eigen/Geometry>
-#include <iosfwd>
 #include <memory>
-#include <tuple>
 
 #include "g2o/core/base_unary_edge.h"
 #include "g2o/core/eigen_types.h"
 #include "g2o/core/optimizable_graph.h"
-#include "g2o/types/slam3d/type_traits_isometry3.h"
+#include "g2o/types/slam3d/type_traits_isometry3.h"  // IWYU pragma: keep
 #include "g2o_types_slam3d_api.h"
 #include "parameter_se3_offset.h"
 #include "vertex_se3.h"
@@ -53,8 +51,6 @@ class G2O_TYPES_SLAM3D_API EdgeSE3Prior
     : public BaseUnaryEdge<6, Isometry3, VertexSE3> {
  public:
   EdgeSE3Prior();
-  bool read(std::istream& is) override;
-  bool write(std::ostream& os) const override;
 
   // return the error estimate as a 3-vector
   void computeError() override;

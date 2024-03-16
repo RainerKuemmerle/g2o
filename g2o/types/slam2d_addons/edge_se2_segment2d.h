@@ -28,12 +28,10 @@
 #define G2O_EDGE_SE2_SEGMENT2D_H
 
 #include <Eigen/Core>
-#include <iosfwd>
 
 #include "g2o/core/base_binary_edge.h"
 #include "g2o/core/eigen_types.h"
 #include "g2o/core/optimizable_graph.h"
-#include "g2o/types/slam2d/se2.h"
 #include "g2o/types/slam2d/vertex_se2.h"
 #include "g2o_types_slam2d_addons_api.h"
 #include "vertex_segment2d.h"
@@ -61,28 +59,9 @@ class EdgeSE2Segment2D
     v = p2;
   }
 
-  G2O_TYPES_SLAM2D_ADDONS_API void computeError() override {
-    const VertexSE2* v1 = vertexXnRaw<0>();
-    const VertexSegment2D* l2 = vertexXnRaw<1>();
-    Eigen::Map<Vector2> error1(&error_(0));
-    Eigen::Map<Vector2> error2(&error_(2));
-    SE2 iEst = v1->estimate().inverse();
-    error1 = (iEst * l2->estimateP1());
-    error2 = (iEst * l2->estimateP2());
-    error_ = error_ - measurement_;
-  }
+  G2O_TYPES_SLAM2D_ADDONS_API void computeError() override;
 
-  G2O_TYPES_SLAM2D_ADDONS_API bool setMeasurementFromState() override {
-    const VertexSE2* v1 = vertexXnRaw<0>();
-    const VertexSegment2D* l2 = vertexXnRaw<1>();
-    SE2 iEst = v1->estimate().inverse();
-    setMeasurementP1(iEst * l2->estimateP1());
-    setMeasurementP2(iEst * l2->estimateP2());
-    return true;
-  }
-
-  G2O_TYPES_SLAM2D_ADDONS_API bool read(std::istream& is) override;
-  G2O_TYPES_SLAM2D_ADDONS_API bool write(std::ostream& os) const override;
+  G2O_TYPES_SLAM2D_ADDONS_API bool setMeasurementFromState() override;
 
   G2O_TYPES_SLAM2D_ADDONS_API void initialEstimate(
       const OptimizableGraph::VertexSet& from,

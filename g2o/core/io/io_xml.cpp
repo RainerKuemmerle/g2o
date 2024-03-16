@@ -24,27 +24,46 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "parameter_stereo_camera.h"
+#include "io_xml.h"
 
-#include <ostream>
+#include <optional>
 
-#include "g2o/stuff/misc.h"
-#include "g2o/types/slam3d/parameter_camera.h"
+#include "g2o/config.h"
+#include "g2o/core/abstract_graph.h"
+
+#ifdef G2O_HAVE_CEREAL
+#include <cereal/archives/xml.hpp>
+#include <cereal/cereal.hpp>
+
+#include "io_wrapper_cereal.h"  // IWYU pragma: keep
+#else
+#include "g2o/stuff/logger.h"
+#endif  // HAVE CEREAL
 
 namespace g2o {
 
-ParameterStereoCamera::ParameterStereoCamera() : baseline_(cst(0.075)) {}
+#ifdef G2O_HAVE_CEREAL
 
-bool ParameterStereoCamera::read(std::istream& is) {
-  bool state = ParameterCamera::read(is);
-  is >> baseline_;
-  return is.good() && state;
+std::optional<AbstractGraph> IoXml::load(std::istream& input) {
+  return io::load<cereal::XMLInputArchive>(input, "XML");
 }
 
-bool ParameterStereoCamera::write(std::ostream& os) const {
-  bool state = ParameterCamera::write(os);
-  os << baseline() << " ";
-  return state && os.good();
+bool IoXml::save(std::ostream& output, const AbstractGraph& graph) {
+  return io::save<cereal::XMLOutputArchive>(output, graph, "XML");
 }
+
+#else
+
+std::optional<AbstractGraph> IoXml::load(std::istream&) {
+  G2O_WARN("Loading XML is not supported");
+  return std::nullopt;
+}
+
+bool IoXml::save(std::ostream&, const AbstractGraph&) {
+  G2O_WARN("Saving XML is not supported");
+  return false;
+}
+
+#endif
 
 }  // namespace g2o

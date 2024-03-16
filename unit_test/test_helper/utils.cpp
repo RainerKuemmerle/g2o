@@ -24,40 +24,22 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include <sstream>
+#include "utils.h"
 
-#include "g2o/types/sim3/types_seven_dof_expmap.h"
-#include "gtest/gtest.h"
-#include "unit_test/test_helper/io.h"
+#include <regex>
 
-using namespace std;
-using namespace g2o;
+#include "g2o/stuff/string_tools.h"
 
-struct RandomSim3 {
-  static Sim3 create() {
-    Vector3 randomPosition = Vector3::Random();
-    Quaternion randomOrientation(Vector4::Random().normalized());
-    return Sim3(randomOrientation, randomPosition, 1.0);
+namespace g2o::internal {
+std::string ExtractTupleHead(const std::string& input) {
+  const std::regex tuple_regex(".*tuple<([^,>]+)[,>].*");
+  std::smatch match;
+  if (!std::regex_match(input, match, tuple_regex)) return input;
+  if (match.size() != 2) return input;
+  std::string result = match[1].str();
+  if (strStartsWith(result, "g2o::")) {
+    return result.substr(5);
   }
-  static bool isApprox(const Sim3& a, const Sim3& b) {
-    return a.translation().isApprox(b.translation(), 1e-5) &&
-           a.rotation().isApprox(b.rotation(), 1e-5) &&
-           fabs(a.scale() - b.scale()) < 1e-5;
-  }
-};
-
-TEST(IoSim3, ReadWriteVertexSim3Expmap) {
-  readWriteVectorBasedVertex<VertexSim3Expmap, RandomSim3>();
+  return result;
 }
-
-TEST(IoSim3, ReadWriteEdgeSim3) {
-  readWriteVectorBasedEdge<EdgeSim3, RandomSim3>();
-}
-
-TEST(IoSim3, ReadWriteEdgeSim3ProjectXYZ) {
-  readWriteVectorBasedEdge<EdgeSim3ProjectXYZ>();
-}
-
-TEST(IoSim3, ReadWriteEdgeInverseSim3ProjectXYZ) {
-  readWriteVectorBasedEdge<EdgeInverseSim3ProjectXYZ>();
-}
+}  // namespace g2o::internal

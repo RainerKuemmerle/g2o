@@ -26,25 +26,11 @@
 
 #include "edge_line2d.h"
 
-#include "g2o/config.h"
-#include "g2o/core/io_helper.h"
-#include "g2o/types/slam2d_addons/vertex_line2d.h"
-
 namespace g2o {
 
 EdgeLine2D::EdgeLine2D() {
   information_.setIdentity();
   error_.setZero();
-}
-
-bool EdgeLine2D::read(std::istream& is) {
-  internal::readVector(is, measurement_);
-  return readInformationMatrix(is);
-}
-
-bool EdgeLine2D::write(std::ostream& os) const {
-  internal::writeVector(os, measurement());
-  return writeInformationMatrix(os);
 }
 
 void EdgeLine2D::linearizeOplus() {

@@ -71,8 +71,6 @@ struct TypeTraits<Isometry3> {
   static Type fromMinimalVector(const Eigen::DenseBase<Derived>& v) {
     return internal::fromVectorMQT(v);
   }
-
-  static Type Identity() { return Type::Identity(); }
 };
 
 }  // namespace g2o

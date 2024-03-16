@@ -27,8 +27,8 @@
 #include "g2o/types/sim3/types_seven_dof_expmap.h"
 #include "gtest/gtest.h"
 
-TEST(Sim3, VertexSE3ExpmapCtor) {
-  auto* v = new g2o::VertexSE3Expmap();
+TEST(Sim3, VertexSim3ExpmapCtor) {
+  auto* v = new g2o::VertexSim3Expmap();
   ASSERT_NE(nullptr, v);
   delete v;
   SUCCEED();

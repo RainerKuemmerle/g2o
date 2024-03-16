@@ -80,6 +80,4 @@ TEST(MappingsSlam2D, TraitsSE2) {
   EXPECT_THAT(
       print_wrap(Traits::fromMinimalVector(Vector3(0, 1, 2)).translation()),
       EigenEqual(print_wrap(Vector2(0, 1))));
-  EXPECT_THAT(print_wrap(Traits::Identity().toVector()),
-              EigenEqual(print_wrap(Vector3::Zero())));
 }

@@ -37,8 +37,13 @@ jacobian_workspace.cpp jacobian_workspace.h
 robust_kernel.cpp robust_kernel.h
 robust_kernel_impl.cpp robust_kernel_impl.h
 robust_kernel_factory.cpp robust_kernel_factory.h
-io_helper.h
 g2o_core_api.h
+# IO
+abstract_graph.cpp abstract_graph.h
+io/io_binary.cpp io/io_binary.h
+io/io_json.cpp io/io_json.h
+io/io_g2o.cpp io/io_g2o.h
+io/io_xml.cpp io/io_xml.h
 )
 
 target_include_directories(core PUBLIC
@@ -52,6 +57,9 @@ set_target_properties(core PROPERTIES
   SOVERSION ${G2O_LIB_SOVERSION})
 target_link_libraries(core PUBLIC stuff ${G2O_EIGEN3_EIGEN_TARGET})
 target_link_libraries(core PUBLIC g2o_ceres_ad)
+if (TARGET cereal::cereal)
+target_link_libraries(core PUBLIC cereal::cereal)
+endif()
 target_compile_features(core PUBLIC cxx_std_17)
 
 if (APPLE)
@@ -67,5 +75,7 @@ install(TARGETS core
 )
 
 file(GLOB headers "${CMAKE_CURRENT_SOURCE_DIR}/*.h" "${CMAKE_CURRENT_SOURCE_DIR}/*.hpp")
-
 install(FILES ${headers} DESTINATION ${INCLUDES_INSTALL_DIR}/core)
+
+file(GLOB io_headers "${CMAKE_CURRENT_SOURCE_DIR}/io/*.h" "${CMAKE_CURRENT_SOURCE_DIR}/io/*.hpp")
+install(FILES ${io_headers} DESTINATION ${INCLUDES_INSTALL_DIR}/core/io)

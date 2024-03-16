@@ -27,9 +27,7 @@
 #ifndef G2O_EDGE_SE3_PRIOR_XYZ_H
 #define G2O_EDGE_SE3_PRIOR_XYZ_H
 
-#include <iosfwd>
 #include <memory>
-#include <tuple>
 
 #include "g2o/core/base_unary_edge.h"
 #include "g2o/core/eigen_types.h"
@@ -49,8 +47,6 @@ class G2O_TYPES_SLAM3D_API EdgeSE3XYZPrior
  public:
   EdgeSE3XYZPrior();
 
-  bool read(std::istream& is) override;
-  bool write(std::ostream& os) const override;
   void computeError() override;
   void linearizeOplus() override;
   bool setMeasurementFromState() override;

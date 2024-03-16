@@ -24,24 +24,14 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef G2O_TYPES_SLAM2D_
-#define G2O_TYPES_SLAM2D_
+#ifndef G2O_CORE_IO_FORMAT_H
+#define G2O_CORE_IO_FORMAT_H
 
-#include "edge_pointxy.h"
-#include "edge_se2.h"
-#include "edge_se2_lotsofxy.h"
-#include "edge_se2_offset.h"
-#include "edge_se2_pointxy.h"
-#include "edge_se2_pointxy_bearing.h"
-#include "edge_se2_pointxy_calib.h"
-#include "edge_se2_pointxy_offset.h"
-#include "edge_se2_prior.h"
-#include "edge_se2_twopointsxy.h"
-#include "edge_se2_xyprior.h"
-#include "edge_xy_prior.h"
-#include "g2o/config.h"
-#include "parameter_se2_offset.h"
-#include "vertex_point_xy.h"
-#include "vertex_se2.h"
+#include "g2o/core/g2o_core_api.h"
+namespace g2o::io {
+
+enum class G2O_CORE_API Format { kG2O = 0, kBinary = 1, kJson = 2, kXML = 3 };
+
+}  // namespace g2o::io
 
 #endif

@@ -28,7 +28,6 @@
 #define G2O_VERTEX_LINE3D_H_
 
 #include <Eigen/Core>
-#include <iosfwd>
 #include <memory>
 
 #include "g2o/config.h"
@@ -45,8 +44,6 @@ namespace g2o {
 class G2O_TYPES_SLAM3D_ADDONS_API VertexLine3D : public BaseVertex<4, Line3D> {
  public:
   VertexLine3D();
-  bool read(std::istream& is) override;
-  bool write(std::ostream& os) const override;
 
   void oplusImpl(const VectorX::MapType& update) override {
     estimate_.oplus(update);

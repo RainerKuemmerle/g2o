@@ -24,10 +24,6 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "types_slam3d.h"
-
-#include <memory>
-
 #include "g2o/config.h"
 #include "g2o/core/factory.h"
 #include "g2o/core/hyper_graph_action.h"
@@ -43,7 +39,6 @@
 #include "g2o/types/slam3d/edge_xyz_prior.h"
 #include "g2o/types/slam3d/parameter_camera.h"
 #include "g2o/types/slam3d/parameter_se3_offset.h"
-#include "g2o/types/slam3d/parameter_stereo_camera.h"
 #include "g2o/types/slam3d/vertex_pointxyz.h"
 #include "g2o/types/slam3d/vertex_se3.h"
 
@@ -66,7 +61,6 @@ G2O_REGISTER_TYPE(CACHE_SE3_OFFSET, CacheSE3Offset);
 G2O_REGISTER_TYPE(EDGE_SE3_OFFSET, EdgeSE3Offset);
 
 G2O_REGISTER_TYPE(PARAMS_CAMERACALIB, ParameterCamera);
-G2O_REGISTER_TYPE(PARAMS_STEREOCAMERACALIB, ParameterStereoCamera);
 G2O_REGISTER_TYPE(CACHE_CAMERA, CacheCamera);
 G2O_REGISTER_TYPE(EDGE_PROJECT_DISPARITY, EdgeSE3PointXYZDisparity);
 G2O_REGISTER_TYPE(EDGE_PROJECT_DEPTH, EdgeSE3PointXYZDepth);

@@ -24,15 +24,16 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+#pragma once
+
 #include <Eigen/Geometry>
 
-#include "g2o/config.h"
 #include "g2o/core/eigen_types.h"
 #include "g2o/stuff/sampler.h"
+#include "g2o/types/slam2d/se2.h"
 #include "g2o/types/slam3d/se3quat.h"
 
-namespace g2o {
-namespace internal {
+namespace g2o::internal {
 inline Isometry3 randomIsometry3() {
   const g2o::Vector3 rotAxisAngle =
       g2o::Vector3::Random() + g2o::Vector3::Random();
@@ -65,5 +66,48 @@ struct RandomDouble {
   }
 };
 
-}  // namespace internal
-}  // namespace g2o
+template <typename T>
+struct RandomValue {
+  using Type = T;
+  template <typename FakeType>
+  struct FakeDependency : public std::false_type {};
+  static Type create() {
+#ifndef _MSC_VER
+    static_assert(FakeDependency<T>::value,
+                  "No specialization for RandomValue provided");
+#endif
+    return T{};
+  }
+};
+
+template <>
+struct RandomValue<double> {
+  using Type = double;
+  static Type create() { return RandomDouble::create(); }
+};
+
+template <>
+struct RandomValue<g2o::SE2> {
+  using Type = g2o::SE2;
+  static Type create() { return Type(g2o::Vector3::Random()); }
+};
+
+template <>
+struct RandomValue<g2o::SE3Quat> {
+  using Type = g2o::SE3Quat;
+  static Type create() { return RandomSE3Quat::create(); }
+};
+
+template <>
+struct RandomValue<g2o::Isometry3> {
+  using Type = g2o::Isometry3;
+  static Type create() { return RandomIsometry3::create(); }
+};
+
+template <int N>
+struct RandomValue<g2o::VectorN<N>> {
+  using Type = g2o::VectorN<N>;
+  static Type create() { return g2o::VectorN<N>::Random(); }
+};
+
+}  // namespace g2o::internal

@@ -30,30 +30,17 @@
 #include <Eigen/Geometry>
 #include <cmath>
 
-#include "g2o/core/io_helper.h"
 #include "g2o/types/slam2d/se2.h"
 #include "vertex_se2.h"
 
 namespace g2o {
 
-ParameterSE2Offset::ParameterSE2Offset() { setOffset(); }
+ParameterSE2Offset::ParameterSE2Offset() { update(); }
 
-void ParameterSE2Offset::setOffset(const SE2& offset) {
-  offset_ = offset;
-  offsetMatrix_ = offset_.rotation().toRotationMatrix();
-  offsetMatrix_.translation() = offset_.translation();
+void ParameterSE2Offset::update() {
+  offsetMatrix_ = parameter_.rotation().toRotationMatrix();
+  offsetMatrix_.translation() = parameter_.translation();
   inverseOffsetMatrix_ = offsetMatrix_.inverse();
-}
-
-bool ParameterSE2Offset::read(std::istream& is) {
-  Vector3 off;
-  bool state = g2o::internal::readVector(is, off);
-  setOffset(SE2(off));
-  return state;
-}
-
-bool ParameterSE2Offset::write(std::ostream& os) const {
-  return internal::writeVector(os, offset().toVector());
 }
 
 void CacheSE2Offset::updateImpl() {
@@ -64,7 +51,7 @@ void CacheSE2Offset::updateImpl() {
 #endif
 
   const auto& v = static_cast<const VertexSE2&>(vertex());
-  se2_n2w_ = v.estimate() * offsetParam->offset();
+  se2_n2w_ = v.estimate() * offsetParam->param();
 
   n2w_ = se2_n2w_.rotation().toRotationMatrix();
   n2w_.translation() = se2_n2w_.translation();
@@ -83,7 +70,7 @@ void CacheSE2Offset::updateImpl() {
   Matrix2 RInversePrime;
   RInversePrime << -s, c, -c, -s;
   RpInverse_RInversePrime_ =
-      offsetParam->offset().rotation().toRotationMatrix().transpose() *
+      offsetParam->param().rotation().toRotationMatrix().transpose() *
       RInversePrime;
   RpInverse_RInverse_ = w2l.rotation();
 }

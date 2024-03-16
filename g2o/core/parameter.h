@@ -27,11 +27,12 @@
 #ifndef G2O_GRAPH_PARAMETER_HH_
 #define G2O_GRAPH_PARAMETER_HH_
 
-#include <iosfwd>
 #include <memory>
 #include <vector>
 
+#include "g2o/core/eigen_types.h"
 #include "g2o/core/g2o_core_api.h"
+#include "g2o/core/type_traits.h"
 #include "hyper_graph.h"
 
 namespace g2o {
@@ -40,18 +41,65 @@ class G2O_CORE_API Parameter : public HyperGraph::HyperGraphElement {
  public:
   Parameter() = default;
   ~Parameter() override = default;
-  //! read the data from a stream
-  virtual bool read(std::istream& is) = 0;
-  //! write the data to a stream
-  virtual bool write(std::ostream& os) const = 0;
+
   [[nodiscard]] int id() const { return id_; }
   void setId(int id_);
-  [[nodiscard]] HyperGraph::HyperGraphElementType elementType() const override {
+  [[nodiscard]] HyperGraph::HyperGraphElementType elementType() const final {
     return HyperGraph::kHgetParameter;
   }
 
+  virtual void update() = 0;
+
+  [[nodiscard]] virtual int parameterDimension() const = 0;
+  [[nodiscard]] virtual int minimalParameterDimension() const = 0;
+
+  virtual bool getParameterData(std::vector<double>& data) const = 0;
+  [[nodiscard]] virtual bool setParameterData(
+      const std::vector<double>& data) = 0;
+
  protected:
   int id_ = -1;
+};
+
+template <typename T>
+class BaseParameter : public Parameter {
+ public:
+  using ParameterType = T;
+
+  [[nodiscard]] int parameterDimension() const final {
+    static_assert(TypeTraits<ParameterType>::kMinimalVectorDimension != INT_MIN,
+                  "Forgot to implement TypeTrait for your Estimate");
+    return TypeTraits<ParameterType>::kVectorDimension;
+  }
+
+  [[nodiscard]] int minimalParameterDimension() const final {
+    static_assert(TypeTraits<ParameterType>::kMinimalVectorDimension != INT_MIN,
+                  "Forgot to implement TypeTrait for your Estimate");
+    return TypeTraits<ParameterType>::kMinimalVectorDimension;
+  }
+
+  bool getParameterData(std::vector<double>& data) const override {
+    int dim = parameterDimension();
+    if (dim < 0) return false;
+    data.resize(dim);
+    TypeTraits<ParameterType>::toData(param(), data.data());
+    return true;
+  };
+
+  bool setParameterData(const std::vector<double>& data) override {
+    VectorX::ConstMapType data_vector(data.data(), data.size());
+    setParam(TypeTraits<ParameterType>::fromVector(data_vector));
+    return true;
+  };
+
+  const ParameterType& param() const { return parameter_; }
+  void setParam(const ParameterType& param) {
+    parameter_ = param;
+    update();
+  }
+
+ protected:
+  ParameterType parameter_;
 };
 
 using ParameterVector = std::vector<std::shared_ptr<Parameter>>;

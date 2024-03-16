@@ -1,5 +1,5 @@
 // g2o - General Graph Optimization
-// Copyright (C) 2014 R. Kuemmerle, G. Grisetti, W. Burgard
+// Copyright (C) 2011 R. Kuemmerle, G. Grisetti, W. Burgard
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -24,46 +24,22 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include <sstream>
+#ifndef G2O_CORE_IO_G2O_FORMAT_H
+#define G2O_CORE_IO_G2O_FORMAT_H
 
-#include "g2o/types/slam2d_addons/edge_line2d.cpp"
-#include "g2o/types/slam2d_addons/edge_se2_line2d.h"
-#include "g2o/types/slam2d_addons/edge_se2_segment2d.h"
-#include "g2o/types/slam2d_addons/edge_se2_segment2d_line.h"
-#include "g2o/types/slam2d_addons/edge_se2_segment2d_pointLine.h"
-#include "g2o/types/slam2d_addons/vertex_segment2d.h"
-#include "gtest/gtest.h"
-#include "unit_test/test_helper/io.h"
+#include "g2o/core/g2o_core_api.h"
+#include "io_interface.h"
 
-using namespace g2o;  // NOLINT
+namespace g2o {
 
-struct RandomLine2D {
-  static Line2D create() { return Line2D(g2o::Vector2::Random()); }
-  static bool isApprox(const Line2D& a, const Line2D& b) {
-    return a.isApprox(b, 1e-5);
-  }
+class AbstractGraph;
+
+class G2O_CORE_API IoG2O : public IoInterface {
+ public:
+  std::optional<AbstractGraph> load(std::istream& input) override;
+  bool save(std::ostream& output, const AbstractGraph& graph) override;
 };
 
-TEST(IoSlam2dAddOns, ReadWriteVertexSegment2D) {
-  readWriteVectorBasedVertex<VertexSegment2D>();
-}
+}  // namespace g2o
 
-TEST(IoSlam2dAddOns, ReadWriteEdgeLine2D) {
-  readWriteVectorBasedEdge<EdgeLine2D, RandomLine2D>();
-}
-
-TEST(IoSlam2dAddOns, ReadWriteEdgeSE2Line2D) {
-  readWriteVectorBasedEdge<EdgeSE2Line2D, RandomLine2D>();
-}
-
-TEST(IoSlam2dAddOns, ReadWriteEdgeSE2Segment2D) {
-  readWriteVectorBasedEdge<EdgeSE2Segment2D>();
-}
-
-TEST(IoSlam2dAddOns, ReadWriteEdgeSE2Segment2DLine) {
-  readWriteVectorBasedEdge<EdgeSE2Segment2DLine>();
-}
-
-TEST(IoSlam2dAddOns, ReadWriteEdgeSE2Segment2DPointLine) {
-  readWriteVectorBasedEdge<EdgeSE2Segment2DPointLine>();
-}
+#endif

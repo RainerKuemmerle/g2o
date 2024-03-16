@@ -27,9 +27,6 @@
 #ifndef G2O_EDGE_LINE2D_H
 #define G2O_EDGE_LINE2D_H
 
-#include <Eigen/Core>
-#include <iosfwd>
-
 #include "g2o/core/base_binary_edge.h"
 #include "g2o/core/eigen_types.h"
 #include "g2o/core/optimizable_graph.h"
@@ -49,8 +46,6 @@ class G2O_TYPES_SLAM2D_ADDONS_API EdgeLine2D
     const VertexLine2D* v2 = vertexXnRaw<1>();
     error_ = (v2->estimate() - v1->estimate()) - measurement_;
   }
-  bool read(std::istream& is) override;
-  bool write(std::ostream& os) const override;
 
   void setMeasurement(const Line2D& m) override { measurement_ = m; }
 

@@ -9,8 +9,9 @@ inline void declareParameterSE2Offset(py::module& m) {
   py::class_<ParameterSE2Offset, Parameter,
              std::shared_ptr<ParameterSE2Offset>>(m, "ParameterSE2Offset")
       .def(py::init<>())
-      .def("set_offset", &ParameterSE2Offset::setOffset)
-      .def("offset", &ParameterSE2Offset::offset)
+      .def("set_param", &ParameterSE2Offset::setParam)
+      .def("set_param_data", &ParameterSE2Offset::setParameterData)
+      .def("param", &ParameterSE2Offset::param)
       .def("offset_matrix", &ParameterSE2Offset::offsetMatrix)
       .def("inverse_offset_matrix", &ParameterSE2Offset::inverseOffsetMatrix);
 

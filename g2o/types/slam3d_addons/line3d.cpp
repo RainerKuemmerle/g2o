@@ -32,11 +32,13 @@
 
 namespace g2o {
 
-static inline Matrix3 skew(const Vector3& t) {
+namespace {
+inline Matrix3 skew(const Vector3& t) {
   Matrix3 S;
   S << 0, -t.z(), t.y(), t.z(), 0, -t.x(), -t.y(), t.x(), 0;
   return S;
 }
+}  // namespace
 
 Vector6 Line3D::toCartesian() const {
   Vector6 cartesian;

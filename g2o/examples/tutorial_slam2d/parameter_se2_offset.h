@@ -28,25 +28,22 @@
 #define G2O_TUTORIAL_PARAMETER_SE2_OFFSET_H
 
 #include "g2o/core/cache.h"
+#include "g2o/core/parameter.h"
 #include "g2o_tutorial_slam2d_api.h"
 #include "se2.h"
 
 namespace g2o::tutorial {
 
-class G2O_TUTORIAL_SLAM2D_API ParameterSE2Offset : public Parameter {
+class G2O_TUTORIAL_SLAM2D_API ParameterSE2Offset : public BaseParameter<SE2> {
  public:
   ParameterSE2Offset() = default;
 
-  void setOffset(const SE2& offset = SE2());
-
-  [[nodiscard]] const SE2& offset() const { return offset_; }
+  [[nodiscard]] const SE2& offset() const { return parameter_; }
   [[nodiscard]] const SE2& inverseOffset() const { return inverseOffset_; }
 
-  bool read(std::istream& is) override;
-  bool write(std::ostream& os) const override;
+  void update() override;
 
  protected:
-  SE2 offset_;
   SE2 inverseOffset_;
 };
 

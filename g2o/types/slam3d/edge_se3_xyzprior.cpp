@@ -30,8 +30,6 @@
 #include <Eigen/Geometry>
 #include <cassert>
 
-#include "g2o/core/cache.h"
-#include "g2o/core/io_helper.h"
 #include "g2o/core/parameter.h"
 #include "g2o/types/slam3d/parameter_se3_offset.h"
 #include "g2o/types/slam3d/vertex_se3.h"
@@ -50,18 +48,6 @@ bool EdgeSE3XYZPrior::resolveCaches() {
   pv[0] = parameters_[0];
   cache_ = resolveCache<CacheSE3Offset>(vertexXn<0>(), "CACHE_SE3_OFFSET", pv);
   return cache_ != nullptr;
-}
-
-bool EdgeSE3XYZPrior::read(std::istream& is) {
-  readParamIds(is);
-  internal::readVector(is, measurement_);
-  return readInformationMatrix(is);
-}
-
-bool EdgeSE3XYZPrior::write(std::ostream& os) const {
-  writeParamIds(os);
-  internal::writeVector(os, measurement());
-  return writeInformationMatrix(os);
 }
 
 void EdgeSE3XYZPrior::computeError() {
@@ -87,7 +73,7 @@ void EdgeSE3XYZPrior::initialEstimate(
   VertexSE3* v = vertexXnRaw<0>();
   assert(v && "Vertex for the Prior edge is not set");
 
-  Isometry3 newEstimate = cache_->offsetParam()->offset().inverse() *
+  Isometry3 newEstimate = cache_->offsetParam()->param().inverse() *
                           Eigen::Translation3d(measurement());
   if (information_.block<3, 3>(0, 0).array().abs().sum() ==
       0) {  // do not set translation, as that part of the information is all

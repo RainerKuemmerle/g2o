@@ -24,23 +24,37 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "vertex_se3_euler.h"
+#include <gtest/gtest.h>
 
-#include "g2o/core/eigen_types.h"
-#include "g2o/core/io_helper.h"
-#include "g2o/types/slam3d/isometry3d_mappings.h"
+#include "g2o/core/factory.h"
+#include "g2o/types/sba/edge_project_p2mc.h"
+#include "g2o/types/sba/edge_project_p2sc.h"
+#include "g2o/types/sba/edge_project_stereo_xyz.h"
+#include "g2o/types/sba/edge_project_stereo_xyz_onlypose.h"
+#include "g2o/types/sba/edge_project_xyz.h"
+#include "g2o/types/sba/edge_project_xyz_onlypose.h"
+#include "g2o/types/sba/edge_sba_cam.h"
+#include "g2o/types/sba/edge_sba_scale.h"
+#include "g2o/types/sba/edge_se3_expmap.h"
+#include "unit_test/test_helper/typed_basic_tests.h"
 
-namespace g2o {
+G2O_USE_TYPE_GROUP(slam3d)
 
-bool VertexSE3Euler::read(std::istream& is) {
-  Vector6 est;
-  bool state = internal::readVector(is, est);
-  setEstimate(internal::fromVectorET(est));
-  return state;
-}
+template <>
+struct g2o::internal::RandomValue<g2o::SBACam> {
+  using Type = g2o::SBACam;
+  static Type create() {
+    g2o::SBACam result(g2o::Quaternion::UnitRandom(), g2o::Vector3::Random());
+    return result;
+  }
+};
 
-bool VertexSE3Euler::write(std::ostream& os) const {
-  return internal::writeVector(os, internal::toVectorET(estimate()));
-}
-
-}  // namespace g2o
+using SBAIoTypes = ::testing::Types<
+    std::tuple<g2o::EdgeSE3Expmap>, std::tuple<g2o::EdgeSBAScale>,
+    std::tuple<g2o::EdgeSBACam>, std::tuple<g2o::EdgeSE3ProjectXYZ>,
+    std::tuple<g2o::EdgeSE3ProjectXYZOnlyPose>,
+    std::tuple<g2o::EdgeStereoSE3ProjectXYZ>,
+    std::tuple<g2o::EdgeStereoSE3ProjectXYZOnlyPose>,
+    std::tuple<g2o::EdgeProjectP2SC>, std::tuple<g2o::EdgeProjectP2MC>>;
+INSTANTIATE_TYPED_TEST_SUITE_P(SBA, FixedSizeEdgeBasicTests, SBAIoTypes,
+                               g2o::internal::DefaultTypeNames);

@@ -28,7 +28,6 @@
 
 #include <Eigen/Geometry>
 
-#include "g2o/core/io_helper.h"
 #include "g2o/types/slam3d/isometry3d_mappings.h"
 #include "g2o/types/slam3d/vertex_se3.h"
 
@@ -43,21 +42,6 @@ void EdgeSE3Calib::computeError() {
   error_ = g2o::internal::toVectorMQT(
       measurement_.inverse() * calib->estimate().inverse() *
       v1->estimate().inverse() * v2->estimate() * calib->estimate());
-}
-
-bool EdgeSE3Calib::write(std::ostream& os) const {
-  internal::writeVector(os, internal::toVectorQT(measurement_));
-  return writeInformationMatrix(os);
-}
-
-bool EdgeSE3Calib::read(std::istream& is) {
-  Vector7 meas;
-  internal::readVector(is, meas);
-  // normalize the quaternion to recover numerical precision lost by storing as
-  // human readable text
-  Vector4::MapType(meas.data() + 3).normalize();
-  setMeasurement(g2o::internal::fromVectorQT(meas));
-  return readInformationMatrix(is);
 }
 
 }  // namespace g2o

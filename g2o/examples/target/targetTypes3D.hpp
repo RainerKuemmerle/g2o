@@ -16,10 +16,6 @@ class VertexPosition3D : public g2o::BaseVertex<3, Eigen::Vector3d> {
   void oplusImpl(const g2o::VectorX::MapType& update) override {
     estimate_ += update;
   }
-
-  bool read(std::istream& /*is*/) override { return false; }
-
-  bool write(std::ostream& /*os*/) const override { return false; }
 };
 
 // Store velocity separately from position?
@@ -30,10 +26,6 @@ class VertexVelocity3D : public g2o::BaseVertex<3, Eigen::Vector3d> {
   void oplusImpl(const g2o::VectorX::MapType& update) override {
     estimate_ += update;
   }
-
-  bool read(std::istream& /*is*/) override { return false; }
-
-  bool write(std::ostream& /*os*/) const override { return false; }
 };
 
 // The idealised GPS measurement; this is 3D and linear
@@ -46,10 +38,6 @@ class GPSObservationPosition3DEdge
     const VertexPosition3D* v = vertexXnRaw<0>();
     error_ = v->estimate() - measurement_;
   }
-
-  bool read(std::istream& /*is*/) override { return false; }
-
-  bool write(std::ostream& /*os*/) const override { return false; }
 };
 
 #endif  //  __TARGET_TYPES_3D_HPP__

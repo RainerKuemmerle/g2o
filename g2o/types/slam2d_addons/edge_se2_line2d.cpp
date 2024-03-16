@@ -26,22 +26,9 @@
 
 #include "edge_se2_line2d.h"
 
-#include <cassert>
-
-#include "g2o/core/io_helper.h"
 #include "g2o/types/slam2d_addons/vertex_line2d.h"
 
 namespace g2o {
-
-bool EdgeSE2Line2D::read(std::istream& is) {
-  internal::readVector(is, measurement_);
-  return readInformationMatrix(is);
-}
-
-bool EdgeSE2Line2D::write(std::ostream& os) const {
-  internal::writeVector(os, measurement());
-  return writeInformationMatrix(os);
-}
 
 void EdgeSE2Line2D::initialEstimate(const OptimizableGraph::VertexSet& from,
                                     OptimizableGraph::Vertex* to) {

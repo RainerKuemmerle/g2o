@@ -32,6 +32,8 @@
 #include <utility>
 
 #include "creators.h"
+#include "g2o/core/optimizable_graph.h"
+#include "g2o/core/parameter.h"
 #include "g2o/stuff/logger.h"
 #include "hyper_graph.h"
 
@@ -74,10 +76,10 @@ void Factory::registerType(
   G2O_DEBUG("Factory {} registering {}", static_cast<void*>(this), tag);
   G2O_DEBUG("{}", static_cast<void*>(c));
   switch (element->elementType()) {
-    case HyperGraph::HGET_VERTEX:
+    case HyperGraph::kHgetVertex:
       G2O_DEBUG(" -> Vertex");
       break;
-    case HyperGraph::HGET_EDGE:
+    case HyperGraph::kHgetEdge:
       G2O_DEBUG(" -> Edge");
       break;
     case HyperGraph::HGET_PARAMETER:
@@ -97,8 +99,42 @@ void Factory::registerType(
 
   std::unique_ptr<CreatorInformation> ci =
       std::make_unique<CreatorInformation>();
-  ci->elementTypeBit = element->elementType();
+  ci->type_info.elementTypeBit = element->elementType();
   ci->creator = std::move(c);
+  // TODO(rainer): simplify storing dimension information
+  switch (element->elementType()) {
+    case HyperGraph::kHgetVertex: {
+      auto* v = static_cast<OptimizableGraph::Vertex*>(element.get());
+      ci->type_info.dimension = v->estimateDimension();
+      ci->type_info.dimension_at_compile_time =
+          v->estimateDimensionAtCompileTime();
+      ci->type_info.minimal_dimension = v->minimalEstimateDimension();
+      ci->type_info.minimal_dimension = v->minimalEstimateDimension();
+    } break;
+    case HyperGraph::kHgetEdge: {
+      auto* e = static_cast<OptimizableGraph::Edge*>(element.get());
+      ci->type_info.dimension = e->measurementDimension();
+      ci->type_info.dimension_at_compile_time =
+          e->measurementDimensionAtCompileTime();
+      ci->type_info.minimal_dimension = e->minimalMeasurementDimension();
+      ci->type_info.number_vertices = e->vertices().size();
+      ci->type_info.number_vertices_at_compile_time =
+          e->numVerticesAtCompileTime();
+      ci->type_info.number_parameters = e->numParameters();
+      ci->type_info.error_dimension = e->dimension();
+      ci->type_info.error_dimension_at_compile_time =
+          e->dimensionAtCompileTime();
+
+    } break;
+    case HyperGraph::kHgetParameter: {
+      auto* p = static_cast<Parameter*>(element.get());
+      ci->type_info.dimension = p->parameterDimension();
+      ci->type_info.minimal_dimension = p->minimalParameterDimension();
+    } break;
+    default:  // not handled on purpose
+      break;
+  }
+
   tagLookup_[ci->creator->name()] = tag;
   creator_[tag] = std::move(ci);
 }
@@ -146,8 +182,14 @@ bool Factory::knowsTag(const std::string& tag, int* elementType) const {
     if (elementType) *elementType = -1;
     return false;
   }
-  if (elementType) *elementType = foundIt->second->elementTypeBit;
+  if (elementType) *elementType = foundIt->second->type_info.elementTypeBit;
   return true;
+}
+
+Factory::TypeInfo Factory::typeInfo(const std::string& tag) const {
+  auto foundIt = creator_.find(tag);
+  if (foundIt == creator_.end()) return TypeInfo();
+  return foundIt->second->type_info;
 }
 
 void Factory::destroy() {
@@ -171,8 +213,9 @@ std::unique_ptr<HyperGraph::HyperGraphElement> Factory::construct(
     return construct(tag);
   }
   auto foundIt = creator_.find(tag);
-  if (foundIt != creator_.end() && foundIt->second->elementTypeBit >= 0 &&
-      elemsToConstruct.test(foundIt->second->elementTypeBit)) {
+  if (foundIt != creator_.end() &&
+      foundIt->second->type_info.elementTypeBit >= 0 &&
+      elemsToConstruct.test(foundIt->second->type_info.elementTypeBit)) {
     return foundIt->second->creator->construct();
   }
   return nullptr;

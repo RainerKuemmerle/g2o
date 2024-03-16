@@ -28,14 +28,9 @@
 #define G2O_EDGE_SE2_SEGMENT2D_LINE_H
 
 #include <Eigen/Core>
-#include <cmath>
-#include <iosfwd>
 
-#include "g2o/config.h"
 #include "g2o/core/base_binary_edge.h"
 #include "g2o/core/eigen_types.h"
-#include "g2o/stuff/misc.h"
-#include "g2o/types/slam2d/se2.h"
 #include "g2o/types/slam2d/vertex_se2.h"
 #include "g2o_types_slam2d_addons_api.h"
 #include "vertex_segment2d.h"
@@ -58,39 +53,9 @@ class EdgeSE2Segment2DLine
   G2O_TYPES_SLAM2D_ADDONS_API void setTheta(double t) { measurement_[0] = t; }
   G2O_TYPES_SLAM2D_ADDONS_API void setRho(double r) { measurement_[1] = r; }
 
-  G2O_TYPES_SLAM2D_ADDONS_API void computeError() override {
-    const VertexSE2* v1 = vertexXnRaw<0>();
-    const VertexSegment2D* l2 = vertexXnRaw<1>();
-    SE2 iEst = v1->estimate().inverse();
-    Vector2 predP1 = iEst * l2->estimateP1();
-    Vector2 predP2 = iEst * l2->estimateP2();
-    Vector2 dP = predP2 - predP1;
-    Vector2 normal(dP.y(), -dP.x());
-    normal.normalize();
-    Vector2 prediction(std::atan2(normal.y(), normal.x()),
-                       predP1.dot(normal) * .5 + predP2.dot(normal) * .5);
+  G2O_TYPES_SLAM2D_ADDONS_API void computeError() override;
 
-    error_ = prediction - measurement_;
-    error_[0] = normalize_theta(error_[0]);
-  }
-
-  G2O_TYPES_SLAM2D_ADDONS_API bool setMeasurementFromState() override {
-    const VertexSE2* v1 = vertexXnRaw<0>();
-    const VertexSegment2D* l2 = vertexXnRaw<1>();
-    SE2 iEst = v1->estimate().inverse();
-    Vector2 predP1 = iEst * l2->estimateP1();
-    Vector2 predP2 = iEst * l2->estimateP2();
-    Vector2 dP = predP2 - predP1;
-    Vector2 normal(dP.y(), -dP.x());
-    normal.normalize();
-    Vector2 prediction(std::atan2(normal.y(), normal.x()),
-                       predP1.dot(normal) * .5 + predP2.dot(normal) * .5);
-    measurement_ = prediction;
-    return true;
-  }
-
-  G2O_TYPES_SLAM2D_ADDONS_API bool read(std::istream& is) override;
-  G2O_TYPES_SLAM2D_ADDONS_API bool write(std::ostream& os) const override;
+  G2O_TYPES_SLAM2D_ADDONS_API bool setMeasurementFromState() override;
 
   /* #ifndef NUMERIC_JACOBIAN_TWO_D_TYPES */
   /*       virtual void linearizeOplus(); */

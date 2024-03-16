@@ -29,18 +29,26 @@
 #include <cassert>
 #include <memory>
 
-#include "g2o/core/io_helper.h"
-
 namespace g2o {
 
-bool EdgeSE2Segment2D::read(std::istream& is) {
-  internal::readVector(is, measurement_);
-  return readInformationMatrix(is);
+void EdgeSE2Segment2D::computeError() {
+  const VertexSE2* v1 = vertexXnRaw<0>();
+  const VertexSegment2D* l2 = vertexXnRaw<1>();
+  Eigen::Map<Vector2> error1(&error_(0));
+  Eigen::Map<Vector2> error2(&error_(2));
+  SE2 iEst = v1->estimate().inverse();
+  error1 = (iEst * l2->estimateP1());
+  error2 = (iEst * l2->estimateP2());
+  error_ = error_ - measurement_;
 }
 
-bool EdgeSE2Segment2D::write(std::ostream& os) const {
-  internal::writeVector(os, measurement());
-  return writeInformationMatrix(os);
+bool EdgeSE2Segment2D::setMeasurementFromState() {
+  const VertexSE2* v1 = vertexXnRaw<0>();
+  const VertexSegment2D* l2 = vertexXnRaw<1>();
+  SE2 iEst = v1->estimate().inverse();
+  setMeasurementP1(iEst * l2->estimateP1());
+  setMeasurementP2(iEst * l2->estimateP2());
+  return true;
 }
 
 void EdgeSE2Segment2D::initialEstimate(const OptimizableGraph::VertexSet& from,

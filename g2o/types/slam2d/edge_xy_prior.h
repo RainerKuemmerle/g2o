@@ -28,10 +28,7 @@
 #define G2O_EDGE_XY_PRIOR_H
 
 #include <Eigen/Core>
-#include <iosfwd>
-#include <memory>
 
-#include "g2o/config.h"
 #include "g2o/core/base_unary_edge.h"
 #include "g2o/core/eigen_types.h"
 #include "g2o/core/optimizable_graph.h"
@@ -48,8 +45,6 @@ class G2O_TYPES_SLAM2D_API EdgeXYPrior
   void computeError() override {
     error_ = vertexXnRaw<0>()->estimate() - measurement_;
   }
-  bool read(std::istream& is) override;
-  bool write(std::ostream& os) const override;
 
   void setMeasurement(const Vector2& m) override { measurement_ = m; }
 

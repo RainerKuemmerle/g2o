@@ -9,7 +9,6 @@
 
 #include <unsupported/Eigen/Polynomials>
 
-#include "g2o/core/base_binary_edge.h"
 #include "g2o/core/base_dynamic_vertex.h"
 #include "g2o/core/base_unary_edge.h"
 #include "g2o/core/block_solver.h"
@@ -28,29 +27,6 @@ class PolynomialCoefficientVertex
  public:
   // Create the vertex
   PolynomialCoefficientVertex() = default;
-
-  // Read the vertex
-  bool read(std::istream& is) override {
-    // Read the dimension
-    int dimension;
-    is >> dimension;
-    if (!is.good()) {
-      return false;
-    }
-
-    // Set the dimension; we call the method here to ensure stuff like
-    // cache and the workspace is setup
-    setDimension(dimension);
-
-    // Read the state
-    return g2o::internal::readVector(is, estimate_);
-  }
-
-  // Write the vertex
-  bool write(std::ostream& os) const override {
-    os << estimate_.size() << " ";
-    return g2o::internal::writeVector(os, estimate_);
-  }
 
   // Direct linear add
   void oplusImpl(const g2o::VectorX::MapType& update) override {
@@ -98,18 +74,6 @@ class PolynomialSingleValueEdge
     setInformation(omega);
   }
 
-  bool read(std::istream& is) override {
-    double z;
-    is >> x_ >> z;
-    setMeasurement(z);
-    return readInformationMatrix(is);
-  }
-
-  bool write(std::ostream& os) const override {
-    os << x_ << " " << measurement_;
-    return writeInformationMatrix(os);
-  }
-
   // Compute the measurement from the eigen polynomial module
   void computeError() override {
     const PolynomialCoefficientVertex* vertex = vertexXnRaw<0>();
@@ -134,7 +98,7 @@ int main(int argc, const char* argv[]) {
     p[i] = g2o::sampleUniform(-1, 1);
   }
 
-  std::cout << "Ground truth vector=" << p.transpose() << std::endl;
+  std::cout << "Ground truth vector=" << p.transpose() << '\n';
 
   // The number of observations in the polynomial; the default is 6
   int obs = 6;
@@ -199,15 +163,13 @@ int main(int argc, const char* argv[]) {
     pv->setDimension(testDimension);
     optimizer->initializeOptimization();
     optimizer->optimize(10);
-    std::cout << "Computed parameters = " << pv->estimate().transpose()
-              << std::endl;
+    std::cout << "Computed parameters = " << pv->estimate().transpose() << '\n';
   }
   for (int testDimension = polynomialDimension - 1; testDimension >= 1;
        --testDimension) {
     pv->setDimension(testDimension);
     optimizer->initializeOptimization();
     optimizer->optimize(10);
-    std::cout << "Computed parameters = " << pv->estimate().transpose()
-              << std::endl;
+    std::cout << "Computed parameters = " << pv->estimate().transpose() << '\n';
   }
 }

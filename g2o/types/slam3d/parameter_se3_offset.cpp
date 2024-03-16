@@ -30,8 +30,7 @@
 #include <string>
 #include <typeinfo>
 
-#include "g2o/core/io_helper.h"
-#include "g2o/types/slam3d/isometry3d_mappings.h"
+#include "g2o/core/eigen_types.h"
 #include "vertex_se3.h"
 
 #ifdef G2O_HAVE_OPENGL
@@ -41,26 +40,9 @@
 
 namespace g2o {
 
-ParameterSE3Offset::ParameterSE3Offset() { setOffset(); }
+ParameterSE3Offset::ParameterSE3Offset() { setParam(Isometry3::Identity()); }
 
-void ParameterSE3Offset::setOffset(const Isometry3& offset) {
-  offset_ = offset;
-  inverseOffset_ = offset_.inverse();
-}
-
-bool ParameterSE3Offset::read(std::istream& is) {
-  Vector7 off;
-  bool state = internal::readVector(is, off);
-  // normalize the quaternion to recover numerical precision lost by storing as
-  // human readable text
-  Vector4::MapType(off.data() + 3).normalize();
-  setOffset(internal::fromVectorQT(off));
-  return state;
-}
-
-bool ParameterSE3Offset::write(std::ostream& os) const {
-  return internal::writeVector(os, internal::toVectorQT(offset_));
-}
+void ParameterSE3Offset::update() { inverseOffset_ = parameter_.inverse(); }
 
 void CacheSE3Offset::updateImpl() {
 #ifndef NDEBUG
@@ -70,7 +52,7 @@ void CacheSE3Offset::updateImpl() {
 #endif
 
   const auto& v = static_cast<const VertexSE3&>(vertex());
-  n2w_ = v.estimate() * offsetParam->offset();
+  n2w_ = v.estimate() * offsetParam->param();
   w2n_ = n2w_.inverse();
   w2l_ = v.estimate().inverse();
 }
@@ -104,7 +86,7 @@ bool CacheSE3OffsetDrawAction::operator()(
   glPushAttrib(GL_COLOR);
   glColor3f(POSE_PARAMETER_COLOR);
   glPushMatrix();
-  glMultMatrixd(that->offsetParam()->offset().cast<double>().data());
+  glMultMatrixd(that->offsetParam()->param().cast<double>().data());
   opengl::drawBox(cs, cs, cs);
   glPopMatrix();
   glPopAttrib();

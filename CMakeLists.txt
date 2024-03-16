@@ -490,10 +490,17 @@ else()
   include_directories(${EIGEN3_INCLUDE_DIR})
 endif ()
 
+find_package(cereal)
+
 # Generate config.h
 set(G2O_OPENGL_FOUND ${OPENGL_FOUND})
 set(G2O_HAVE_CHOLMOD ${CHOLMOD_FOUND})
 set(G2O_HAVE_CSPARSE ${G2O_USE_CSPARSE})
+if (TARGET cereal::cereal)
+  set(G2O_HAVE_CEREAL 1)
+else()
+  set(G2O_HAVE_CEREAL 0)
+endif()
 set(G2O_SHARED_LIBS ${BUILD_SHARED_LIBS})
 set(G2O_LGPL_SHARED_LIBS ${BUILD_LGPL_SHARED_LIBS})
 set(G2O_CXX_COMPILER "${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER}")

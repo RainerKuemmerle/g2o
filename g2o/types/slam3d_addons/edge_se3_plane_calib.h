@@ -27,8 +27,6 @@
 #ifndef G2O_EDGE_SE3_PLANE_CALIB_H
 #define G2O_EDGE_SE3_PLANE_CALIB_H
 
-#include <Eigen/Geometry>
-#include <iosfwd>
 #include <memory>
 
 #include "g2o/config.h"
@@ -64,9 +62,6 @@ class G2O_TYPES_SLAM3D_ADDONS_API EdgeSE3PlaneSensorCalib
   }
 
   void setMeasurement(const Plane3D& m) override { measurement_ = m; }
-
-  bool read(std::istream& is) override;
-  bool write(std::ostream& os) const override;
 };
 
 #ifdef G2O_HAVE_OPENGL

@@ -24,33 +24,21 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "types_slam3d_addons.h"
-
-#include <memory>
-#include <typeinfo>
-
 #include "g2o/config.h"
 #include "g2o/core/factory.h"
 #include "g2o/core/hyper_graph_action.h"
-#include "g2o/stuff/macros.h"
-#include "g2o/types/slam3d/edge_se3.h"
 #include "g2o/types/slam3d/parameter_camera.h"
-#include "g2o/types/slam3d/vertex_se3.h"
 #include "g2o/types/slam3d_addons/edge_plane.h"
 #include "g2o/types/slam3d_addons/edge_se3_calib.h"
-#include "g2o/types/slam3d_addons/edge_se3_euler.h"
 #include "g2o/types/slam3d_addons/edge_se3_line.h"
 #include "g2o/types/slam3d_addons/edge_se3_plane_calib.h"
 #include "g2o/types/slam3d_addons/vertex_line3d.h"
 #include "g2o/types/slam3d_addons/vertex_plane.h"
-#include "g2o/types/slam3d_addons/vertex_se3_euler.h"
 
 namespace g2o {
 
 G2O_REGISTER_TYPE_GROUP(slam3d_addons);
 
-G2O_REGISTER_TYPE(VERTEX3, VertexSE3Euler);
-G2O_REGISTER_TYPE(EDGE3, EdgeSE3Euler);
 G2O_REGISTER_TYPE(VERTEX_PLANE, VertexPlane);
 G2O_REGISTER_TYPE(EDGE_SE3_PLANE_CALIB, EdgeSE3PlaneSensorCalib);
 
@@ -66,24 +54,5 @@ G2O_REGISTER_ACTION(EdgeSE3PlaneSensorCalibDrawAction);
 G2O_REGISTER_ACTION(VertexLine3DDrawAction);
 G2O_REGISTER_ACTION(EdgeSE3Line3DDrawAction);
 #endif
-
-G2O_ATTRIBUTE_CONSTRUCTOR(init_slam3d_addons_types) {
-  static bool initialized = false;
-  if (initialized) return;
-  initialized = true;
-
-#ifdef G2O_HAVE_OPENGL
-  HyperGraphActionLibrary* actionLib = HyperGraphActionLibrary::instance();
-  HyperGraphElementAction::HyperGraphElementActionPtr vertexse3eulerdraw(
-      new g2o::VertexSE3DrawAction);
-  vertexse3eulerdraw->setTypeName(typeid(VertexSE3Euler).name());
-  actionLib->registerAction(vertexse3eulerdraw);
-
-  HyperGraphElementAction::HyperGraphElementActionPtr edgese3eulerdraw(
-      new g2o::EdgeSE3DrawAction);
-  edgese3eulerdraw->setTypeName(typeid(EdgeSE3Euler).name());
-  actionLib->registerAction(edgese3eulerdraw);
-#endif
-}
 
 }  // namespace g2o

@@ -27,10 +27,7 @@
 #ifndef G2O_EDGE_SE2_XY_CALIB_H
 #define G2O_EDGE_SE2_XY_CALIB_H
 
-#include <Eigen/Core>
-#include <iosfwd>
-
-#include "g2o/core/base_variable_sized_edge.h"
+#include "g2o/core/base_fixed_sized_edge.h"
 #include "g2o/core/eigen_types.h"
 #include "g2o/core/optimizable_graph.h"
 #include "g2o_types_slam2d_api.h"
@@ -45,26 +42,12 @@ namespace g2o {
  * measurement
  */
 class G2O_TYPES_SLAM2D_API EdgeSE2PointXYCalib
-    : public BaseVariableSizedEdge<2, Vector2> {
+    : public BaseFixedSizedEdge<2, Vector2, VertexSE2, VertexPointXY,
+                                VertexSE2> {
  public:
-  EdgeSE2PointXYCalib();
-
-  void computeError() override {
-    const auto* v1 = static_cast<const VertexSE2*>(vertexRaw(0));
-    const auto* l2 = static_cast<const VertexPointXY*>(vertexRaw(1));
-    const auto* calib = static_cast<const VertexSE2*>(vertexRaw(2));
-    error_ = ((v1->estimate() * calib->estimate()).inverse() * l2->estimate()) -
-             measurement_;
-  }
-
-  bool read(std::istream& is) override;
-  bool write(std::ostream& os) const override;
-
+  void computeError() override;
   double initialEstimatePossible(const OptimizableGraph::VertexSet& from,
-                                 OptimizableGraph::Vertex* to) override {
-    (void)to;
-    return (from.count(vertices_[0]) == 1 ? 1.0 : -1.0);
-  }
+                                 OptimizableGraph::Vertex* to) override;
   void initialEstimate(const OptimizableGraph::VertexSet& from,
                        OptimizableGraph::Vertex* to) override;
 };

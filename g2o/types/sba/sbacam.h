@@ -142,8 +142,6 @@ struct TypeTraits<SBACam> {
     res.fromMinimalVector(v);
     return res;
   }
-
-  static Type Identity() { return SBACam(); }
 };
 
 }  // namespace g2o

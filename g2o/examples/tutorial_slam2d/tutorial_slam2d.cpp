@@ -24,29 +24,25 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include <cmath>
 #include <iostream>
 
 #include "edge_se2.h"
 #include "edge_se2_pointxy.h"
 #include "g2o/core/block_solver.h"
-#include "g2o/core/factory.h"
 #include "g2o/core/optimization_algorithm_factory.h"
 #include "g2o/core/optimization_algorithm_gauss_newton.h"
 #include "g2o/core/sparse_optimizer.h"
 #include "g2o/solvers/eigen/linear_solver_eigen.h"
 #include "simulator.h"
-#include "types_tutorial_slam2d.h"
 #include "vertex_point_xy.h"
 #include "vertex_se2.h"
 
 using std::cerr;
-using std::endl;
 
-namespace g2o {
-namespace tutorial {
+namespace g2o::tutorial {
 
-static int run_slam2d_tutorial() {
+namespace {
+int run_slam2d_tutorial() {
   // TODO(Rainer): simulate different sensor offset
   // simulate a robot observing landmarks while traveling on a grid
   const SE2 sensorOffsetTransf(0.2, 0.1, -0.1);
@@ -73,7 +69,7 @@ static int run_slam2d_tutorial() {
 
   // add the parameter representing the sensor offset
   auto sensorOffset = std::make_shared<ParameterSE2Offset>();
-  sensorOffset->setOffset(sensorOffsetTransf);
+  sensorOffset->setParam(sensorOffsetTransf);
   sensorOffset->setId(0);
   optimizer.addParameter(sensorOffset);
 
@@ -87,7 +83,7 @@ static int run_slam2d_tutorial() {
     robot->setEstimate(t);
     optimizer.addVertex(robot);
   }
-  cerr << "done." << endl;
+  cerr << "done.\n";
 
   // second add the odometry constraints
   cerr << "Optimization: Adding odometry measurements ... ";
@@ -99,7 +95,7 @@ static int run_slam2d_tutorial() {
     odometry->setInformation(simEdge.information);
     optimizer.addEdge(odometry);
   }
-  cerr << "done." << endl;
+  cerr << "done.\n";
 
   // add the landmark observations
   cerr << "Optimization: add landmark vertices ... ";
@@ -109,7 +105,7 @@ static int run_slam2d_tutorial() {
     landmark->setEstimate(l.simulatedPose);
     optimizer.addVertex(landmark);
   }
-  cerr << "done." << endl;
+  cerr << "done.\n";
 
   cerr << "Optimization: add landmark observations ... ";
   for (const auto& simEdge : simulator.landmarkObservations()) {
@@ -121,7 +117,7 @@ static int run_slam2d_tutorial() {
     landmarkObservation->setParameterId(0, sensorOffset->id());
     optimizer.addEdge(landmarkObservation);
   }
-  cerr << "done." << endl;
+  cerr << "done.\n";
 
   /*********************************************************************************
    * optimization
@@ -137,10 +133,10 @@ static int run_slam2d_tutorial() {
   firstRobotPose->setFixed(true);
   optimizer.setVerbose(true);
 
-  cerr << "Optimizing" << endl;
+  cerr << "Optimizing\n";
   optimizer.initializeOptimization();
   optimizer.optimize(10);
-  cerr << "done." << endl;
+  cerr << "done.\n";
 
   optimizer.save("tutorial_after.g2o");
 
@@ -149,8 +145,8 @@ static int run_slam2d_tutorial() {
 
   return 0;
 }
+}  // namespace
 
-}  // namespace tutorial
-}  // namespace g2o
+}  // namespace g2o::tutorial
 
 int main() { return g2o::tutorial::run_slam2d_tutorial(); }

@@ -27,9 +27,6 @@
 #ifndef G2O_SBA_EDGE_SE3_EXPMAP_H
 #define G2O_SBA_EDGE_SE3_EXPMAP_H
 
-#include <iosfwd>
-#include <tuple>
-
 #include "g2o/core/base_binary_edge.h"
 #include "g2o/types/slam3d/se3quat.h"
 #include "g2o_types_sba_api.h"
@@ -43,10 +40,9 @@ namespace g2o {
 class G2O_TYPES_SBA_API EdgeSE3Expmap
     : public BaseBinaryEdge<6, SE3Quat, VertexSE3Expmap, VertexSE3Expmap> {
  public:
-  bool read(std::istream& is) override;
-  bool write(std::ostream& os) const override;
   void computeError() override;
-  void linearizeOplus() override;
+  // TODO(Rainer): Jacobian seems wrong, see #505 (but PR seems also wrong)
+  // void linearizeOplus() override;
 };
 
 }  // namespace g2o

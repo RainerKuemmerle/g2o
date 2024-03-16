@@ -27,8 +27,6 @@
 #ifndef G2O_VERTEX_LINE2D_H
 #define G2O_VERTEX_LINE2D_H
 
-#include <Eigen/Core>
-#include <iosfwd>
 #include <memory>
 
 #include "g2o/config.h"
@@ -58,8 +56,7 @@ class G2O_TYPES_SLAM2D_ADDONS_API VertexLine2D : public BaseVertex<2, Line2D> {
     estimate_(0) = normalize_theta(estimate_(0));
   }
 
-  bool read(std::istream& is) override;
-  bool write(std::ostream& os) const override;
+  // TODO(Rainer): below only used in visualization, currently not serialized
   int p1Id = -1, p2Id = -1;
 };
 

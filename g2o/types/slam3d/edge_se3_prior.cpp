@@ -28,10 +28,7 @@
 
 #include <Eigen/Core>
 #include <cassert>
-#include <iostream>
 
-#include "g2o/core/cache.h"
-#include "g2o/core/io_helper.h"
 #include "g2o/core/parameter.h"
 #include "g2o/types/slam3d/isometry3d_mappings.h"
 #include "g2o/types/slam3d/parameter_se3_offset.h"
@@ -55,22 +52,6 @@ bool EdgeSE3Prior::resolveCaches() {
   return cache_ != nullptr;
 }
 
-bool EdgeSE3Prior::read(std::istream& is) {
-  bool state = readParamIds(is);
-  Vector7 meas;
-  state &= internal::readVector(is, meas);
-  setMeasurement(internal::fromVectorQT(meas));
-  state &= readInformationMatrix(is);
-  return state;
-}
-
-bool EdgeSE3Prior::write(std::ostream& os) const {
-  writeParamIds(os);
-  internal::writeVector(os, internal::toVectorQT(measurement()));
-  writeInformationMatrix(os);
-  return os.good();
-}
-
 void EdgeSE3Prior::computeError() {
   Isometry3 delta = inverseMeasurement_ * cache_->n2w();
   error_ = internal::toVectorMQT(delta);
@@ -83,7 +64,7 @@ void EdgeSE3Prior::linearizeOplus() {
   Isometry3 X;
   Isometry3 P;
   X = from->estimate();
-  P = cache_->offsetParam()->offset();
+  P = cache_->offsetParam()->param();
   Z = measurement_;
   internal::computeEdgeSE3PriorGradient(E, jacobianOplusXi_, Z, X, P);
 }
@@ -99,7 +80,7 @@ void EdgeSE3Prior::initialEstimate(const OptimizableGraph::VertexSet& /*from_*/,
   assert(v && "Vertex for the Prior edge is not set");
 
   Isometry3 newEstimate =
-      cache_->offsetParam()->offset().inverse() * measurement();
+      cache_->offsetParam()->param().inverse() * measurement();
   // do not set translation, as that part of the information is all zero
   if (information_.block<3, 3>(0, 0).array().abs().sum() == 0) {
     newEstimate.translation() = v->estimate().translation();

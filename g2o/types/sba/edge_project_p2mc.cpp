@@ -26,13 +26,7 @@
 
 #include "edge_project_p2mc.h"
 
-#include <stdlib.h>
-
-#include <Eigen/Core>
-#include <iostream>
-
-#include "g2o/core/io_helper.h"
-#include "g2o/stuff/macros.h"
+#include "g2o/stuff/logger.h"
 #include "g2o/types/sba/sbacam.h"
 #include "g2o/types/sba/vertex_cam.h"
 
@@ -40,18 +34,6 @@ namespace g2o {
 
 // point to camera projection, monocular
 EdgeProjectP2MC::EdgeProjectP2MC() { information().setIdentity(); }
-
-bool EdgeProjectP2MC::read(std::istream& is) {
-  // measured keypoint
-  internal::readVector(is, measurement_);
-  return readInformationMatrix(is);
-}
-
-bool EdgeProjectP2MC::write(std::ostream& os) const {
-  internal::writeVector(os, measurement());
-  writeInformationMatrix(os);
-  return os.good();
-}
 
 void EdgeProjectP2MC::computeError() {
   // from <Point> to <Cam>
@@ -92,7 +74,7 @@ void EdgeProjectP2MC::linearizeOplus() {
   double pz = pc(2);
   double ipz2 = 1.0 / (pz * pz);
   if (std::isnan(ipz2)) {
-    std::cout << "[SetJac] infinite jac" << std::endl;
+    G2O_CRITICAL("[SetJac] infinite jac");
     abort();
   }
 

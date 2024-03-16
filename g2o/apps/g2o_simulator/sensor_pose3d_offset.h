@@ -27,6 +27,8 @@
 #ifndef G2O_SENSOR_POSE3D_OFFSET_H_
 #define G2O_SENSOR_POSE3D_OFFSET_H_
 
+#include "g2o/types/slam3d/edge_se3_offset.h"
+#include "g2o/types/slam3d/parameter_se3_offset.h"
 #include "pointsensorparameters.h"
 #include "simulator3d_base.h"
 
@@ -38,7 +40,7 @@ class SensorPose3DOffset
  public:
   explicit SensorPose3DOffset(const std::string& name);
   void sense() override;
-  int stepsToIgnore() const { return stepsToIgnore_; }
+  [[nodiscard]] int stepsToIgnore() const { return stepsToIgnore_; }
   void setStepsToIgnore(int stepsToIgnore) { stepsToIgnore_ = stepsToIgnore; }
   void addNoise(EdgeType* e) override;
   void addParameters() override;

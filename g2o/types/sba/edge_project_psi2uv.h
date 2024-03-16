@@ -27,7 +27,6 @@
 #ifndef G2O_SBA_EDGEPROJECTPSI2UV_H
 #define G2O_SBA_EDGEPROJECTPSI2UV_H
 
-#include <iosfwd>
 #include <memory>
 
 #include "g2o/core/base_fixed_sized_edge.h"
@@ -48,8 +47,6 @@ class G2O_TYPES_SBA_API EdgeProjectPSI2UV
  public:
   EdgeProjectPSI2UV();
 
-  bool read(std::istream& is) override;
-  bool write(std::ostream& os) const override;
   void computeError() override;
   void linearizeOplus() override;
 

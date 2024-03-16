@@ -26,27 +26,11 @@
 
 #include "edge_xy_prior.h"
 
-#include "g2o/core/io_helper.h"
-#include "g2o/types/slam2d/vertex_point_xy.h"
-
 namespace g2o {
 
-EdgeXYPrior::EdgeXYPrior()
-
-{
+EdgeXYPrior::EdgeXYPrior() {
   information_.setIdentity();
   error_.setZero();
-}
-
-bool EdgeXYPrior::read(std::istream& is) {
-  internal::readVector(is, measurement_);
-  readInformationMatrix(is);
-  return true;
-}
-
-bool EdgeXYPrior::write(std::ostream& os) const {
-  internal::writeVector(os, measurement());
-  return writeInformationMatrix(os);
 }
 
 #ifndef NUMERIC_JACOBIAN_TWO_D_TYPES

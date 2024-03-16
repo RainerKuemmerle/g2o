@@ -27,54 +27,142 @@
 #ifndef G2O_CAMERA_PARAMETERS_H_
 #define G2O_CAMERA_PARAMETERS_H_
 
-#include <iosfwd>
 #include <memory>
+#include <utility>
 
 #include "g2o/config.h"
+#include "g2o/core/cache.h"
 #include "g2o/core/eigen_types.h"
 #include "g2o/core/hyper_graph.h"
 #include "g2o/core/hyper_graph_action.h"
+#include "g2o/core/parameter.h"
+#include "g2o/core/type_traits.h"
 #include "g2o/stuff/property.h"
 #include "g2o_types_slam3d_api.h"
-#include "parameter_se3_offset.h"
+#include "type_traits_isometry3.h"
 
 namespace g2o {
-/**
- * \brief parameters for a camera
- */
-class G2O_TYPES_SLAM3D_API ParameterCamera : public ParameterSE3Offset {
+
+class CameraWithOffset {
  public:
-  ParameterCamera();
-  void setKcam(double fx, double fy, double cx, double cy);
-  void setOffset(const Isometry3& offset_ = Isometry3::Identity());
+  CameraWithOffset() : offset_(Isometry3::Identity()) {
+    setKcam(1, 1, 0.5, 0.5);
+  }
 
-  bool read(std::istream& is) override;
-  bool write(std::ostream& os) const override;
+  CameraWithOffset(Isometry3 offset, double fx, double fy, double cx, double cy)
+      : offset_(std::move(offset)) {
+    setKcam(fx, fy, cx, cy);
+  }
 
-  const Matrix3& Kcam() const { return Kcam_; }
-  const Matrix3& invKcam() const { return invKcam_; }
-  const Matrix3& Kcam_inverseOffsetR() const { return Kcam_inverseOffsetR_; }
+  [[nodiscard]] const Matrix3& Kcam() const { return Kcam_; }
+  void setKcam(double fx, double fy, double cx, double cy) {
+    Kcam_.setZero();
+    Kcam_(0, 0) = fx;
+    Kcam_(1, 1) = fy;
+    Kcam_(0, 2) = cx;
+    Kcam_(1, 2) = cy;
+    Kcam_(2, 2) = 1.0;
+    update();
+  }
+
+  [[nodiscard]] const Isometry3& offset() const { return offset_; }
+  [[nodiscard]] Isometry3& offset() { return offset_; }
+  void setOffset(const Isometry3& offset) {
+    offset_ = offset;
+    update();
+  }
+
+  [[nodiscard]] const Matrix3& invKcam() const { return invKcam_; }
+  [[nodiscard]] const Matrix3& KcamInverseOffsetR() const {
+    return Kcam_inverseOffsetR_;
+  }
 
  protected:
+  virtual void update() {
+    invKcam_ = Kcam_.inverse();
+    Kcam_inverseOffsetR_ = Kcam_ * offset_.inverse().rotation();
+  }
+
+  Isometry3 offset_;
   Matrix3 Kcam_;
   Matrix3 invKcam_;
   Matrix3 Kcam_inverseOffsetR_;
 };
 
-class G2O_TYPES_SLAM3D_API CacheCamera : public CacheSE3Offset {
+template <>
+struct TypeTraits<CameraWithOffset> {
+  enum {
+    kVectorDimension = 11,
+    kMinimalVectorDimension = 11,
+    kIsVector = 0,
+    kIsScalar = 0,
+  };
+  using Type = CameraWithOffset;
+  using VectorType = VectorN<kVectorDimension>;
+  using MinimalVectorType = VectorN<kMinimalVectorDimension>;
+
+  static VectorType toVector(const Type& t) {
+    VectorType result;
+    result << TypeTraits<Isometry3>::toVector(t.offset()), t.Kcam()(0, 0),
+        t.Kcam()(1, 1), t.Kcam()(0, 2), t.Kcam()(1, 2);
+    return result;
+  }
+  static void toData(const Type& t, double* data) {
+    typename VectorType::MapType v(data, kVectorDimension);
+    v = toVector(t);
+  }
+
+  static MinimalVectorType toMinimalVector(const Type& t) {
+    return toVector(t);
+  }
+  static void toMinimalData(const Type& t, double* data) { toData(t, data); }
+
+  template <typename Derived>
+  static Type fromVector(const Eigen::DenseBase<Derived>& v) {
+    Isometry3 offset = TypeTraits<Isometry3>::fromVector(v.template head<7>());
+    Vector4 cam_params = v.template tail<4>();
+    return Type(offset, cam_params(0), cam_params(1), cam_params(2),
+                cam_params(3));
+  }
+
+  template <typename Derived>
+  static Type fromMinimalVector(const Eigen::DenseBase<Derived>& v) {
+    return fromVector(v);
+  }
+};
+
+/**
+ * \brief parameters for a camera
+ */
+class G2O_TYPES_SLAM3D_API ParameterCamera
+    : public BaseParameter<CameraWithOffset> {
+ public:
+  ParameterCamera() = default;
+
+  void update() override;
+};
+
+class G2O_TYPES_SLAM3D_API CacheCamera : public Cache {
  public:
   using ParameterType = ParameterCamera;
 
   //! parameters of the camera
-  std::shared_ptr<ParameterType> camParams() const {
-    return std::static_pointer_cast<ParameterType>(parameters_[0]);
+  [[nodiscard]] const ParameterType* camParams() const {
+    return static_cast<ParameterType*>(parameters_[0].get());
   }
 
+  [[nodiscard]] const Isometry3& w2n() const { return w2n_; }
+  [[nodiscard]] const Isometry3& n2w() const { return n2w_; }
+  [[nodiscard]] const Isometry3& w2l() const { return w2l_; }
+
   //! return the world to image transform
-  const Affine3& w2i() const { return w2i_; }
+  [[nodiscard]] const Affine3& w2i() const { return w2i_; }
 
  protected:
   void updateImpl() override;
+  Isometry3 w2n_;
+  Isometry3 n2w_;
+  Isometry3 w2l_;
   Affine3 w2i_;  ///< world to image transform
 };
 

@@ -24,27 +24,34 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef G2O_VERTEX_SE3_EULER_
-#define G2O_VERTEX_SE3_EULER_
+#include <gtest/gtest.h>
 
-#include <iosfwd>
+#include <tuple>
 
-#include "g2o/types/slam3d/vertex_se3.h"
-#include "g2o_types_slam3d_addons_api.h"
+#include "g2o/types/slam3d/edge_pointxyz.h"
+#include "g2o/types/slam3d/edge_se3.h"
+#include "g2o/types/slam3d/edge_se3_offset.h"
+#include "g2o/types/slam3d/edge_se3_pointxyz.h"
+#include "g2o/types/slam3d/edge_se3_pointxyz_depth.h"
+#include "g2o/types/slam3d/edge_se3_pointxyz_disparity.h"
+#include "g2o/types/slam3d/edge_se3_prior.h"
+#include "g2o/types/slam3d/edge_se3_xyzprior.h"
+#include "g2o/types/slam3d/edge_xyz_prior.h"
+#include "g2o/types/slam3d/parameter_camera.h"
+#include "g2o/types/slam3d/parameter_se3_offset.h"
+#include "unit_test/test_helper/typed_basic_tests.h"
 
-namespace g2o {
-
-/**
- * \brief 3D pose Vertex, (x,y,z,roll,pitch,yaw)
- * the internal parameterization is the same as vertex_se3_quat.
- * Only the read/write operations are rewritten to input/output euler angles.
- */
-class G2O_TYPES_SLAM3D_ADDONS_API VertexSE3Euler : public VertexSE3 {
- public:
-  bool read(std::istream& is) override;
-  bool write(std::ostream& os) const override;
-};
-
-}  // namespace g2o
-
-#endif
+using Slam3DIoTypes = ::testing::Types<
+    // without parameters
+    std::tuple<g2o::EdgeSE3>, std::tuple<g2o::EdgePointXYZ>,
+    std::tuple<g2o::EdgeXYZPrior>,
+    // with parameters
+    std::tuple<g2o::EdgeSE3Offset, g2o::ParameterSE3Offset,
+               g2o::ParameterSE3Offset>,
+    std::tuple<g2o::EdgeSE3PointXYZDepth, g2o::ParameterCamera>,
+    std::tuple<g2o::EdgeSE3PointXYZDisparity, g2o::ParameterCamera>,
+    std::tuple<g2o::EdgeSE3PointXYZ, g2o::ParameterSE3Offset>,
+    std::tuple<g2o::EdgeSE3Prior, g2o::ParameterSE3Offset>,
+    std::tuple<g2o::EdgeSE3XYZPrior, g2o::ParameterSE3Offset> >;
+INSTANTIATE_TYPED_TEST_SUITE_P(Slam3D, FixedSizeEdgeBasicTests, Slam3DIoTypes,
+                               g2o::internal::DefaultTypeNames);

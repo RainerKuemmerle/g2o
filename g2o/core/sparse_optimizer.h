@@ -118,11 +118,6 @@ class G2O_CORE_API SparseOptimizer : public OptimizableGraph {
   virtual void computeInitialGuess(EstimatePropagatorCost& propagator);
 
   /**
-   * sets all vertices to their origin.
-   */
-  virtual void setToOrigin();
-
-  /**
    * starts one optimization run given the current configuration of the graph,
    * and the current settings stored in the class instance.
    * It can be called only after initializeOptimization

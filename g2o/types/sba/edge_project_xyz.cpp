@@ -28,22 +28,11 @@
 
 #include <Eigen/Core>
 
-#include "g2o/core/io_helper.h"
 #include "g2o/types/sba/vertex_se3_expmap.h"
 #include "g2o/types/slam3d/se3_ops.h"
 #include "g2o/types/slam3d/se3quat.h"
 
 namespace g2o {
-
-bool EdgeSE3ProjectXYZ::read(std::istream& is) {
-  internal::readVector(is, measurement_);
-  return readInformationMatrix(is);
-}
-
-bool EdgeSE3ProjectXYZ::write(std::ostream& os) const {
-  internal::writeVector(os, measurement());
-  return writeInformationMatrix(os);
-}
 
 void EdgeSE3ProjectXYZ::computeError() {
   const VertexSE3Expmap* v1 = vertexXnRaw<1>();

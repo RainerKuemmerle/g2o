@@ -28,17 +28,23 @@
 
 #include <cassert>
 
-#include "g2o/core/io_helper.h"
-#include "g2o/types/slam2d/se2.h"
 #include "g2o/types/slam2d/vertex_point_xy.h"
 #include "g2o/types/slam2d/vertex_se2.h"
 
 namespace g2o {
 
-EdgeSE2PointXYCalib::EdgeSE2PointXYCalib()
+void EdgeSE2PointXYCalib::computeError() {
+  const auto* v1 = vertexXnRaw<0>();
+  const auto* l2 = vertexXnRaw<1>();
+  const auto* calib = vertexXnRaw<2>();
+  error_ = ((v1->estimate() * calib->estimate()).inverse() * l2->estimate()) -
+           measurement_;
+}
 
-{
-  resize(3);
+double EdgeSE2PointXYCalib::initialEstimatePossible(
+    const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to) {
+  (void)to;
+  return (from.count(vertices_[0]) == 1 ? 1.0 : -1.0);
 }
 
 void EdgeSE2PointXYCalib::initialEstimate(
@@ -47,20 +53,9 @@ void EdgeSE2PointXYCalib::initialEstimate(
          "Can not initialize VertexSE2 position by VertexPointXY");
 
   if (from.count(vertices_[0]) != 1) return;
-  auto* vi = static_cast<VertexSE2*>(vertexRaw(0));
-  auto* vj = static_cast<VertexPointXY*>(vertexRaw(1));
+  auto* vi = vertexXnRaw<0>();
+  auto* vj = vertexXnRaw<1>();
   vj->setEstimate(vi->estimate() * measurement_);
-}
-
-bool EdgeSE2PointXYCalib::read(std::istream& is) {
-  internal::readVector(is, measurement_);
-  readInformationMatrix(is);
-  return true;
-}
-
-bool EdgeSE2PointXYCalib::write(std::ostream& os) const {
-  internal::writeVector(os, measurement());
-  return writeInformationMatrix(os);
 }
 
 }  // namespace g2o

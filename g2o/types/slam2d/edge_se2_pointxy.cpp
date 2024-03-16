@@ -31,9 +31,7 @@
 #include <string>
 #include <typeinfo>
 
-#include "g2o/core/io_helper.h"
-#include "g2o/stuff/property.h"
-#include "g2o/types/slam2d/se2.h"
+#include "g2o/config.h"
 #include "g2o/types/slam2d/vertex_point_xy.h"
 #include "g2o/types/slam2d/vertex_se2.h"
 
@@ -43,17 +41,6 @@
 #endif
 
 namespace g2o {
-
-bool EdgeSE2PointXY::read(std::istream& is) {
-  internal::readVector(is, measurement_);
-  readInformationMatrix(is);
-  return true;
-}
-
-bool EdgeSE2PointXY::write(std::ostream& os) const {
-  internal::writeVector(os, measurement());
-  return writeInformationMatrix(os);
-}
 
 void EdgeSE2PointXY::initialEstimate(const OptimizableGraph::VertexSet& from,
                                      OptimizableGraph::Vertex* to) {

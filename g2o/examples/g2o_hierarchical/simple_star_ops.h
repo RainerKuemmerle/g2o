@@ -27,12 +27,10 @@
 #ifndef G2O_SIMPLE_STAR_OPS_
 #define G2O_SIMPLE_STAR_OPS_
 
-#include <map>
 #include <string>
 
 #include "edge_creator.h"
 #include "edge_labeler.h"
-#include "g2o/core/hyper_dijkstra.h"
 #include "g2o/core/sparse_optimizer.h"
 #include "g2o_hierarchical_api.h"
 #include "star.h"

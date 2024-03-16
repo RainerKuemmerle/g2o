@@ -27,26 +27,12 @@
 #include "edge_sba_cam.h"
 
 #include <Eigen/Core>
-#include <memory>
 
 #include "g2o/core/eigen_types.h"
-#include "g2o/core/io_helper.h"
 #include "g2o/types/sba/sbacam.h"
 #include "g2o/types/sba/vertex_cam.h"
 
 namespace g2o {
-
-bool EdgeSBACam::read(std::istream& is) {
-  Vector7 meas;
-  internal::readVector(is, meas);
-  setMeasurement(SE3Quat(meas));
-  return readInformationMatrix(is);
-}
-
-bool EdgeSBACam::write(std::ostream& os) const {
-  internal::writeVector(os, measurement().toVector());
-  return writeInformationMatrix(os);
-}
 
 void EdgeSBACam::initialEstimate(const OptimizableGraph::VertexSet& from_,
                                  OptimizableGraph::Vertex* /*to_*/) {

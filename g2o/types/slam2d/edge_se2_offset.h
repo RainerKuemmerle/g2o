@@ -28,7 +28,6 @@
 #define G2O_EDGE_SE2_OFFSET_H_
 
 #include <Eigen/Core>
-#include <iosfwd>
 #include <memory>
 
 #include "g2o/core/base_binary_edge.h"
@@ -49,8 +48,6 @@ class G2O_TYPES_SLAM2D_API EdgeSE2Offset
     : public BaseBinaryEdge<3, SE2, VertexSE2, VertexSE2> {
  public:
   EdgeSE2Offset();
-  bool read(std::istream& is) override;
-  bool write(std::ostream& os) const override;
 
   void computeError() override;
 

@@ -33,7 +33,6 @@
 #include "g2o/core/optimization_algorithm_factory.h"
 #include "g2o/core/sparse_optimizer.h"
 #include "g2o/stuff/command_args.h"
-#include "g2o/stuff/logger.h"
 #include "g2o/stuff/sampler.h"
 
 G2O_USE_OPTIMIZATION_LIBRARY(dense);
@@ -43,10 +42,6 @@ G2O_USE_OPTIMIZATION_LIBRARY(dense);
  */
 class VertexParams : public g2o::BaseVertex<3, Eigen::Vector3d> {
  public:
-  bool read(std::istream& /*is*/) override { return false; }
-
-  bool write(std::ostream& /*os*/) const override { return false; }
-
   void oplusImpl(const g2o::VectorX::MapType& update) override {
     estimate_ += update.head<kDimension>();
   }
@@ -62,15 +57,6 @@ class VertexParams : public g2o::BaseVertex<3, Eigen::Vector3d> {
 class EdgePointOnCurve
     : public g2o::BaseUnaryEdge<1, Eigen::Vector2d, VertexParams> {
  public:
-  bool read(std::istream& /*is*/) override {
-    G2O_ERROR("not implemented yet");
-    return false;
-  }
-  bool write(std::ostream& /*os*/) const override {
-    G2O_ERROR("not implemented yet");
-    return false;
-  }
-
   template <typename T>
   bool operator()(const T* params, T* error) const {
     const T& a = params[0];

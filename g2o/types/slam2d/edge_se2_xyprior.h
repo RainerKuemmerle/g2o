@@ -27,14 +27,9 @@
 #ifndef G2O_EDGE_SE2_PRIOR_XY_H
 #define G2O_EDGE_SE2_PRIOR_XY_H
 
-#include <Eigen/Core>
-#include <iosfwd>
-#include <memory>
-
 #include "g2o/core/base_unary_edge.h"
 #include "g2o/core/eigen_types.h"
 #include "g2o_types_slam2d_api.h"
-#include "se2.h"
 #include "vertex_se2.h"
 
 namespace g2o {
@@ -49,9 +44,6 @@ class G2O_TYPES_SLAM2D_API EdgeSE2XYPrior
   EdgeSE2XYPrior() = default;
 
   void linearizeOplus() override;
-
-  bool read(std::istream& is) override;
-  bool write(std::ostream& os) const override;
 
   void computeError() override {
     const VertexSE2* v = vertexXnRaw<0>();

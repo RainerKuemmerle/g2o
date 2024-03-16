@@ -38,9 +38,6 @@ class VertexFlatSE2 : public g2o::BaseVertex<3, g2o::Vector3> {
     estimate_ += update.head<kDimension>();
     estimate_(2) = g2o::normalize_theta(estimate_(2));
   }
-
-  bool read(std::istream&) override { return false; }
-  bool write(std::ostream&) const override { return false; }
 };
 
 /**
@@ -78,10 +75,6 @@ class Edge3ADTester
 
   // add the AD interface
   G2O_MAKE_AUTO_AD_FUNCTIONS
-
-  // NOOPs
-  bool read(std::istream&) override { return false; };
-  bool write(std::ostream&) const override { return false; };
 };
 
 /**
@@ -165,12 +158,6 @@ class AutoDifferentiation : public ::testing::Test {
 TEST_F(AutoDifferentiation, ComputesSomething) {
   testEdge_.linearizeOplus(jacobianWorkspace_);
 
-#if 0
-  std::cerr << PVAR(testEdge.jacobianOplusXn<0>()) << std::endl;
-  std::cerr << PVAR(testEdge.jacobianOplusXn<1>()) << std::endl;
-  std::cerr << PVAR(testEdge.jacobianOplusXn<2>()) << std::endl;
-#endif
-
   ASSERT_FALSE(testEdge_.jacobianOplusXn<0>().array().isNaN().any())
       << "Jacobian contains NaN";
   ASSERT_FALSE(testEdge_.jacobianOplusXn<1>().array().isNaN().any())
@@ -241,11 +228,6 @@ class AutoDifferentiationEdgeSE2 : public ::testing::Test {
 
 TEST_F(AutoDifferentiationEdgeSE2, AdComputesSomething) {
   testEdgeAd_.linearizeOplus(jacobianWorkspaceAd_);
-
-#if 0
-  std::cerr << PVAR(testEdgeAd.jacobianOplusXn<0>()) << std::endl;
-  std::cerr << PVAR(testEdgeAd.jacobianOplusXn<1>()) << std::endl;
-#endif
 
   ASSERT_FALSE(testEdgeAd_.jacobianOplusXn<0>().array().isNaN().any())
       << "Jacobian contains NaN";

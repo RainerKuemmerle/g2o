@@ -27,7 +27,6 @@
 #ifndef G2O_VERTEX_SE2_OFFSET_PARAMETERS_H_
 #define G2O_VERTEX_SE2_OFFSET_PARAMETERS_H_
 
-#include <iosfwd>
 #include <memory>
 
 #include "g2o/core/cache.h"
@@ -43,20 +42,15 @@ class VertexSE2;
 /**
  * \brief offset for an SE2
  */
-class G2O_TYPES_SLAM2D_API ParameterSE2Offset : public Parameter {
+class G2O_TYPES_SLAM2D_API ParameterSE2Offset : public BaseParameter<SE2> {
  public:
   ParameterSE2Offset();
-
-  bool read(std::istream& is) override;
-  bool write(std::ostream& os) const override;
 
   /**
    * update the offset to a new value.
    * re-calculates the different representations, e.g., the rotation matrix
    */
-  void setOffset(const SE2& offset_ = SE2());
-
-  [[nodiscard]] const SE2& offset() const { return offset_; }
+  void update() override;
 
   //! rotation of the offset as 2x2 rotation matrix
   [[nodiscard]] const Isometry2& offsetMatrix() const { return offsetMatrix_; }
@@ -67,7 +61,6 @@ class G2O_TYPES_SLAM2D_API ParameterSE2Offset : public Parameter {
   }
 
  protected:
-  SE2 offset_;
   Isometry2 offsetMatrix_;
   Isometry2 inverseOffsetMatrix_;
 };

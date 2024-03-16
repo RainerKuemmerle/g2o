@@ -32,19 +32,8 @@
 #endif
 
 #include <string>
-#include <typeinfo>
-
-#include "g2o/core/io_helper.h"
 
 namespace g2o {
-
-bool VertexPointXYZ::read(std::istream& is) {
-  return internal::readVector(is, estimate_);
-}
-
-bool VertexPointXYZ::write(std::ostream& os) const {
-  return internal::writeVector(os, estimate());
-}
 
 #ifdef G2O_HAVE_OPENGL
 VertexPointXYZDrawAction::VertexPointXYZDrawAction()

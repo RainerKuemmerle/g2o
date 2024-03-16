@@ -32,7 +32,7 @@ inline void declareEdgeSE2(py::module& m) {
              std::shared_ptr<EdgeSE2LotsOfXY>>(m, "EdgeSE2LotsOfXY")
       .def(py::init<>())
       .def("set_dimension", &EdgeSE2LotsOfXY::setDimension<-1>)
-      .def("set_size", &EdgeSE2LotsOfXY::setSize)
+      .def("resize", &EdgeSE2LotsOfXY::resize)
 
       .def("compute_error", &EdgeSE2LotsOfXY::computeError)
       .def("set_measurement_from_state",
@@ -67,8 +67,13 @@ inline void declareEdgeSE2(py::module& m) {
       .def("initial_estimate_possible", &EdgeSE2Prior::initialEstimatePossible)
       .def("initial_estimate", &EdgeSE2Prior::initialEstimate);
 
-  py::class_<EdgeSE2TwoPointsXY, BaseVariableSizedEdge<4, Vector4>,
-             std::shared_ptr<EdgeSE2TwoPointsXY>>(m, "EdgeSE2TwoPointsXY")
+  templatedBaseFixedSizedEdge<4, Vector4, VertexSE2, VertexPointXY,
+                              VertexPointXY>(
+      m, "_4_Vector4_VertexSE2_VertexPointXY_VertexPointXY");
+  py::class_<
+      EdgeSE2TwoPointsXY,
+      BaseFixedSizedEdge<4, Vector4, VertexSE2, VertexPointXY, VertexPointXY>,
+      std::shared_ptr<EdgeSE2TwoPointsXY>>(m, "EdgeSE2TwoPointsXY")
       .def(py::init<>())
       .def("compute_error", &EdgeSE2TwoPointsXY::computeError)
       .def("set_measurement_from_state",

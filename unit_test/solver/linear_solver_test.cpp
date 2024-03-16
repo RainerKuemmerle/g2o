@@ -116,7 +116,7 @@ TYPED_TEST_P(LS, SolvePattern) {
   ASSERT_TRUE(!state || spinv.rowBlockIndices().size() == blockIndices.size());
   if (!state) {  // solver does not implement solving for a pattern return in
                  // this case
-    std::cerr << "Solver does not support solvePattern()" << std::endl;
+    std::cerr << "Solver does not support solvePattern()\n";
     SUCCEED();
     return;
   }
@@ -144,7 +144,7 @@ TYPED_TEST_P(LS, SolveBlocks) {
   ASSERT_TRUE(!state || blocks != nullptr);
   if (!state) {  // solver does not implement solving for a pattern return in
                  // this case
-    std::cerr << "Solver does not support solveBlocks()" << std::endl;
+    std::cerr << "Solver does not support solveBlocks()\n";
     SUCCEED();
     return;
   }

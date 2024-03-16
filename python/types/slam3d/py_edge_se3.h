@@ -36,7 +36,7 @@ inline void declareEdgeSE3(py::module& m) {
       .def(py::init<>())
 
       .def("set_dimension", &EdgeSE3LotsOfXYZ::setDimension<-1>)
-      .def("set_size", &EdgeSE3LotsOfXYZ::setSize)
+      .def("resize", &EdgeSE3LotsOfXYZ::resize)
       .def("compute_error", &EdgeSE3LotsOfXYZ::computeError)
       .def("set_measurement_from_state",
            &EdgeSE3LotsOfXYZ::setMeasurementFromState)

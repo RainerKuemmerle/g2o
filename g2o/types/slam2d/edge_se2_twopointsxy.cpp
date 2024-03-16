@@ -28,22 +28,16 @@
 
 #include <Eigen/Core>
 #include <cassert>
-#include <map>
-#include <memory>
-#include <ostream>
 
-#include "se2.h"
 #include "vertex_point_xy.h"
 #include "vertex_se2.h"
 
 namespace g2o {
 
-EdgeSE2TwoPointsXY::EdgeSE2TwoPointsXY() { resize(3); }
-
 void EdgeSE2TwoPointsXY::computeError() {
-  auto* pose = static_cast<VertexSE2*>(vertexRaw(0));
-  auto* xy1 = static_cast<VertexPointXY*>(vertexRaw(1));
-  auto* xy2 = static_cast<VertexPointXY*>(vertexRaw(2));
+  auto* pose = vertexXnRaw<0>();
+  auto* xy1 = vertexXnRaw<1>();
+  auto* xy2 = vertexXnRaw<2>();
 
   Vector2 m1 = pose->estimate().inverse() * xy1->estimate();
   Vector2 m2 = pose->estimate().inverse() * xy2->estimate();
@@ -54,33 +48,6 @@ void EdgeSE2TwoPointsXY::computeError() {
   error_[3] = m2[1] - measurement_[3];
 }
 
-bool EdgeSE2TwoPointsXY::read(std::istream& is) {
-  is >> measurement_[0] >> measurement_[1] >> measurement_[2] >>
-      measurement_[3];
-  is >> information()(0, 0) >> information()(0, 1) >> information()(0, 2) >>
-      information()(0, 3) >> information()(1, 1) >> information()(1, 2) >>
-      information()(1, 3) >> information()(2, 2) >> information()(2, 3) >>
-      information()(3, 3);
-  information()(1, 0) = information()(0, 1);
-  information()(2, 0) = information()(0, 2);
-  information()(2, 1) = information()(1, 2);
-  information()(3, 0) = information()(0, 3);
-  information()(3, 1) = information()(1, 3);
-  information()(3, 2) = information()(2, 3);
-  return true;
-}
-
-bool EdgeSE2TwoPointsXY::write(std::ostream& os) const {
-  os << measurement()[0] << " " << measurement()[1] << " " << measurement()[2]
-     << " " << measurement()[3] << " ";
-  os << information()(0, 0) << " " << information()(0, 1) << " "
-     << information()(0, 2) << " " << information()(0, 3) << " "
-     << information()(1, 1) << " " << information()(1, 2) << " "
-     << information()(1, 3) << " " << information()(2, 2) << " "
-     << information()(2, 3) << " " << information()(3, 3);
-  return os.good();
-}
-
 void EdgeSE2TwoPointsXY::initialEstimate(
     const OptimizableGraph::VertexSet& fixed,
     OptimizableGraph::Vertex* toEstimate) {
@@ -89,9 +56,9 @@ void EdgeSE2TwoPointsXY::initialEstimate(
   assert(initialEstimatePossible(fixed, toEstimate) &&
          "Bad vertices specified");
 
-  auto* pose = static_cast<VertexSE2*>(vertexRaw(0));
-  auto* v1 = static_cast<VertexPointXY*>(vertexRaw(1));
-  auto* v2 = static_cast<VertexPointXY*>(vertexRaw(2));
+  auto* pose = vertexXnRaw<0>();
+  auto* v1 = vertexXnRaw<1>();
+  auto* v2 = vertexXnRaw<2>();
 
   bool estimatev1 = true;
   bool estimatev2 = true;
@@ -129,9 +96,9 @@ double EdgeSE2TwoPointsXY::initialEstimatePossible(
 }
 
 bool EdgeSE2TwoPointsXY::setMeasurementFromState() {
-  auto* pose = static_cast<VertexSE2*>(vertexRaw(0));
-  auto* xy1 = static_cast<VertexPointXY*>(vertexRaw(1));
-  auto* xy2 = static_cast<VertexPointXY*>(vertexRaw(2));
+  auto* pose = vertexXnRaw<0>();
+  auto* xy1 = vertexXnRaw<1>();
+  auto* xy2 = vertexXnRaw<2>();
 
   Vector2 m1 = pose->estimate().inverse() * xy1->estimate();
   Vector2 m2 = pose->estimate().inverse() * xy2->estimate();

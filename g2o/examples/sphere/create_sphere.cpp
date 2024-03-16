@@ -30,7 +30,10 @@
 #include <iostream>
 #include <vector>
 
+#include "g2o/core/abstract_graph.h"
+#include "g2o/core/eigen_types.h"
 #include "g2o/core/factory.h"
+#include "g2o/core/io/io_format.h"
 #include "g2o/stuff/command_args.h"
 #include "g2o/stuff/sampler.h"
 #include "g2o/types/slam3d/edge_se3.h"
@@ -38,7 +41,8 @@
 
 namespace g2o {
 
-static int create_sphere(int argc, char** argv) {
+namespace {
+int create_sphere(int argc, char** argv) {
   // command line parsing
   int nodesPerLevel;
   int numLaps;
@@ -67,23 +71,23 @@ static int create_sphere(int argc, char** argv) {
   arg.parseArgs(argc, argv);
 
   if (noiseTranslation.empty()) {
-    std::cerr << "using default noise for the translation" << std::endl;
+    std::cerr << "using default noise for the translation\n";
     noiseTranslation.push_back(0.01);
     noiseTranslation.push_back(0.01);
     noiseTranslation.push_back(0.01);
   }
   std::cerr << "Noise for the translation:";
   for (const double i : noiseTranslation) std::cerr << " " << i;
-  std::cerr << std::endl;
+  std::cerr << '\n';
   if (noiseRotation.empty()) {
-    std::cerr << "using default noise for the rotation" << std::endl;
+    std::cerr << "using default noise for the rotation\n";
     noiseRotation.push_back(0.005);
     noiseRotation.push_back(0.005);
     noiseRotation.push_back(0.005);
   }
   std::cerr << "Noise for the rotation:";
   for (const double i : noiseRotation) std::cerr << " " << i;
-  std::cerr << std::endl;
+  std::cerr << '\n';
 
   Eigen::Matrix3d transNoise = Eigen::Matrix3d::Zero();
   for (int i = 0; i < 3; ++i)
@@ -164,7 +168,7 @@ static int create_sphere(int argc, char** argv) {
     seedSeq.generate(seeds.begin(), seeds.end());
     std::cerr << "using seeds:";
     for (const int seed : seeds) std::cerr << " " << seed;
-    std::cerr << std::endl;
+    std::cerr << '\n';
     transSampler.seed(seeds[0]);
     rotSampler.seed(seeds[1]);
   }
@@ -187,7 +191,7 @@ static int create_sphere(int argc, char** argv) {
     rot = gtQuat * rot;
     trans = gtTrans + trans;
 
-    Eigen::Isometry3d noisyMeasurement = Eigen::Isometry3d(rot);
+    Eigen::Isometry3d noisyMeasurement(rot);
     noisyMeasurement.translation() = trans;
     e->setMeasurement(noisyMeasurement);
   }
@@ -201,35 +205,52 @@ static int create_sphere(int argc, char** argv) {
     e->initialEstimate(aux, to.get());
   }
 
-  // write output
-  std::ofstream fileOutputStream;
-  if (outFilename != "-") {
-    std::cerr << "Writing into " << outFilename << std::endl;
-    fileOutputStream.open(outFilename.c_str());
-  } else {
-    std::cerr << "writing to stdout" << std::endl;
-  }
-
   const std::string vertexTag = Factory::instance()->tag(vertices[0].get());
   const std::string edgeTag = Factory::instance()->tag(edges[0].get());
 
-  std::ostream& fout = outFilename != "-" ? fileOutputStream : std::cout;
+  g2o::AbstractGraph output;
   for (auto& vertex : vertices) {
-    fout << vertexTag << " " << vertex->id() << " ";
-    vertex->write(fout);
-    fout << std::endl;
+    std::vector<double> vertex_estimate;
+    vertex->getEstimateData(vertex_estimate);
+    g2o::AbstractGraph output;
+    output.vertices().emplace_back(vertexTag, vertex->id(), vertex_estimate);
   }
 
   for (auto& edge : edges) {
     auto from = edge->vertexXn<0>();
     auto to = edge->vertexXn<1>();
-    fout << edgeTag << " " << from->id() << " " << to->id() << " ";
-    edge->write(fout);
-    fout << std::endl;
+
+    std::vector<int> ids = {from->id(), to->id()};
+    std::vector<double> data(edge->measurementDimension());
+    edge->getMeasurementData(data.data());
+    MatrixX::MapType information(edge->informationData(), edge->dimension(),
+                                 edge->dimension());
+    std::vector<double> upper_triangle;
+    upper_triangle.reserve((edge->dimension() * (edge->dimension() + 1)) / 2);
+    for (int r = 0; r < edge->dimension(); ++r)
+      for (int c = r; c < edge->dimension(); ++c)
+        upper_triangle.push_back(information(r, c));
+    output.edges().emplace_back(edgeTag, ids, data, upper_triangle,
+                                edge->parameterIds());
+  }
+
+  // write output
+  std::ofstream fileOutputStream;
+  if (outFilename != "-") {
+    std::cerr << "Writing into " << outFilename << '\n';
+    fileOutputStream.open(outFilename.c_str());
+  } else {
+    std::cerr << "writing to stdout\n";
+  }
+
+  std::ostream& fout = outFilename != "-" ? fileOutputStream : std::cout;
+  if (!output.save(fout, g2o::io::Format::kG2O)) {
+    std::cerr << "Error while writing\n";
   }
 
   return 0;
 }
+}  // namespace
 }  // namespace g2o
 
 int main(int argc, char** argv) { return g2o::create_sphere(argc, argv); }

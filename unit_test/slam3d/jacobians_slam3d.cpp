@@ -39,6 +39,7 @@
 #include "g2o/types/slam3d/edge_se3_pointxyz_disparity.h"
 #include "g2o/types/slam3d/edge_se3_prior.h"
 #include "g2o/types/slam3d/edge_se3_xyzprior.h"
+#include "g2o/types/slam3d/parameter_camera.h"
 #include "gtest/gtest.h"
 #include "unit_test/test_helper/evaluate_jacobian.h"
 #include "unit_test/test_helper/random_state.h"
@@ -133,11 +134,11 @@ TEST(Slam3D, EdgeSE3OffsetJacobian) {
 
   auto paramOffset1 = std::make_shared<ParameterSE3Offset>();
   paramOffset1->setId(0);
-  paramOffset1->setOffset(internal::randomIsometry3());
+  paramOffset1->setParam(internal::randomIsometry3());
   graph.addParameter(paramOffset1);
   auto paramOffset2 = std::make_shared<ParameterSE3Offset>();
   paramOffset2->setId(1);
-  paramOffset2->setOffset(internal::randomIsometry3());
+  paramOffset2->setParam(internal::randomIsometry3());
   graph.addParameter(paramOffset2);
 
   auto e = std::make_shared<EdgeSE3Offset>();
@@ -220,7 +221,7 @@ TEST(Slam3D, EdgeSE3PointXYZJacobian) {
   auto my_epsilon = [](const double, const double) { return 1e-3; };
 
   for (int k = 0; k < 10000; ++k) {
-    paramOffset->setOffset(internal::randomIsometry3());
+    paramOffset->setParam(internal::randomIsometry3());
     v1->setEstimate(internal::randomIsometry3());
     v2->setEstimate(Eigen::Vector3d::Random());
     e->setMeasurement(Eigen::Vector3d::Random());
@@ -359,7 +360,9 @@ TEST(Slam3D, EdgeSE3PointXYZDepthJacobian) {
   numericJacobianWorkspace.allocate();
 
   for (int k = 0; k < 10000; ++k) {
-    paramOffset->setOffset(internal::randomIsometry3());
+    g2o::CameraWithOffset cam_param(internal::randomIsometry3(), 1, 1, 0.5,
+                                    0.5);
+    paramOffset->setParam(cam_param);
     v1->setEstimate(internal::randomIsometry3());
     v2->setEstimate(Eigen::Vector3d::Random());
     e->setMeasurement(Eigen::Vector3d::Random());
@@ -397,7 +400,9 @@ TEST(Slam3D, EdgeSE3PointXYZDisparityJacobian) {
   numericJacobianWorkspace.allocate();
 
   for (int k = 0; k < 10000; ++k) {
-    paramOffset->setOffset(internal::randomIsometry3());
+    g2o::CameraWithOffset cam_param(internal::randomIsometry3(), 1, 1, 0.5,
+                                    0.5);
+    paramOffset->setParam(cam_param);
     v1->setEstimate(internal::randomIsometry3());
     v2->setEstimate(Eigen::Vector3d::Random());
     e->setMeasurement(Eigen::Vector3d::Random());

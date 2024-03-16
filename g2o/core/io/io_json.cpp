@@ -24,12 +24,46 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef G2O_TYPES_TUTORIAL_SLAM2D_
-#define G2O_TYPES_TUTORIAL_SLAM2D_
+#include "io_json.h"
 
-#include "edge_se2.h"
-#include "edge_se2_pointxy.h"
-#include "parameter_se2_offset.h"
-#include "vertex_se2.h"
+#include <optional>
+
+#include "g2o/config.h"
+#include "g2o/core/abstract_graph.h"
+
+#ifdef G2O_HAVE_CEREAL
+#include <cereal/archives/json.hpp>
+#include <cereal/cereal.hpp>
+
+#include "io_wrapper_cereal.h"  // IWYU pragma: keep
+#else
+#include "g2o/stuff/logger.h"
+#endif  // HAVE CEREAL
+
+namespace g2o {
+
+#ifdef G2O_HAVE_CEREAL
+
+std::optional<AbstractGraph> IoJson::load(std::istream& input) {
+  return io::load<cereal::JSONInputArchive>(input, "JSON");
+}
+
+bool IoJson::save(std::ostream& output, const AbstractGraph& graph) {
+  return io::save<cereal::JSONOutputArchive>(output, graph, "JSON");
+}
+
+#else
+
+std::optional<AbstractGraph> IoJson::load(std::istream&) {
+  G2O_WARN("Loading JSON is not supported");
+  return std::nullopt;
+}
+
+bool IoJson::save(std::ostream&, const AbstractGraph&) {
+  G2O_WARN("Saving JSON is not supported");
+  return false;
+}
 
 #endif
+
+}  // namespace g2o

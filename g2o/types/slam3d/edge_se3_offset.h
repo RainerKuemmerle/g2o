@@ -27,7 +27,6 @@
 #ifndef G2O_EDGE_SE3_OFFSET_H_
 #define G2O_EDGE_SE3_OFFSET_H_
 
-#include <iosfwd>
 #include <memory>
 
 #include "edge_se3.h"
@@ -44,8 +43,6 @@ class CacheSE3Offset;
 class G2O_TYPES_SLAM3D_API EdgeSE3Offset : public EdgeSE3 {
  public:
   EdgeSE3Offset();
-  bool read(std::istream& is) override;
-  bool write(std::ostream& os) const override;
 
   void computeError() override;
 

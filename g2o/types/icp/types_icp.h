@@ -36,16 +36,9 @@
 
 #include <Eigen/Core>
 #include <Eigen/Geometry>
-#include <iosfwd>
-#include <tuple>
 
 #include "edge_gicp.h"
 #include "g2o/core/base_binary_edge.h"
-#include "g2o/core/base_variable_sized_edge.h"
-#include "g2o/core/base_vertex.h"
-#include "g2o/core/type_traits.h"
-#include "g2o/types/sba/types_sba.h"
-#include "g2o/types/slam3d/types_slam3d.h"
 #include "g2o_types_icp_api.h"
 
 namespace g2o {
@@ -62,10 +55,6 @@ class G2O_TYPES_ICP_API EdgeVVGicp
   // switch to go between point-plane and plane-plane
   bool pl_pl = false;
   Matrix3 cov0, cov1;
-
-  // Custom I/O functions
-  bool read(std::istream& is) override;
-  bool write(std::ostream& os) const override;
 
   // return the error estimate as a 3-vector
   void computeError() override;
@@ -90,10 +79,6 @@ class G2O_TYPES_ICP_API EdgeVVGicp
  */
 class G2O_TYPES_ICP_API VertexSCam : public VertexSE3 {
  public:
-  // I/O
-  bool read(std::istream& is) override;
-  bool write(std::ostream& os) const override;
-
   // capture the update function to reset aux transforms
   void oplusImpl(const VectorX::MapType& update) override;
 
@@ -152,9 +137,6 @@ class G2O_TYPES_ICP_API VertexSCam : public VertexSE3 {
 class G2O_TYPES_ICP_API EdgeXyzVsc
     : public BaseBinaryEdge<3, Vector3, VertexPointXYZ, VertexSCam> {
  public:
-  bool read(std::istream& is) override;
-  bool write(std::ostream& os) const override;
-
   // return the error estimate as a 3-vector
   void computeError() override;
 

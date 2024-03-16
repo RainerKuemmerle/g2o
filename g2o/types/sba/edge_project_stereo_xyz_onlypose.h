@@ -27,9 +27,6 @@
 #ifndef G2O_SBA_EDGEPROJECTSTEREOXYZ_ONLYPOSE_H
 #define G2O_SBA_EDGEPROJECTSTEREOXYZ_ONLYPOSE_H
 
-#include <iosfwd>
-#include <tuple>
-
 #include "g2o/core/base_unary_edge.h"
 #include "g2o/core/eigen_types.h"
 #include "g2o_types_sba_api.h"
@@ -42,9 +39,6 @@ namespace g2o {
 class G2O_TYPES_SBA_API EdgeStereoSE3ProjectXYZOnlyPose
     : public BaseUnaryEdge<3, Vector3, VertexSE3Expmap> {
  public:
-  bool read(std::istream& is) override;
-  bool write(std::ostream& os) const override;
-
   void computeError() override;
   void linearizeOplus() override;
 

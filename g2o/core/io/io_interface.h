@@ -24,21 +24,62 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef G2O_TYPES_SLAM3D_ADDONS_
-#define G2O_TYPES_SLAM3D_ADDONS_
+#ifndef G2O_CORE_IO_INTERFACE_H
+#define G2O_CORE_IO_INTERFACE_H
 
-#include "edge_plane.h"
-#include "edge_se3_calib.h"
-#include "edge_se3_euler.h"
-#include "edge_se3_line.h"
-#include "edge_se3_plane_calib.h"
-#include "g2o/config.h"
-#include "g2o/core/base_binary_edge.h"
-#include "g2o/core/base_vertex.h"
-#include "g2o/core/hyper_graph_action.h"
-#include "g2o/types//slam3d/types_slam3d.h"
-#include "vertex_line3d.h"
-#include "vertex_plane.h"
-#include "vertex_se3_euler.h"
+#include <iosfwd>
+#include <optional>
+#include <string>
+#include <unordered_map>
+
+#include "g2o/core/g2o_core_api.h"
+
+namespace g2o {
+
+class AbstractGraph;
+
+/**
+ * @brief Base interface class for IO of a g2o graph
+ */
+class G2O_CORE_API IoInterface {
+ public:
+  virtual ~IoInterface() = default;
+
+  /**
+   * @brief Set the Renamed Types lookup table
+   *
+   * @param mapping the map containing the name mapping for types
+   */
+  void setRenamedTypes(
+      const std::unordered_map<std::string, std::string>& mapping) {
+    renamed_types_ = mapping;
+  }
+
+  /**
+   * @brief Return the mapping for renaming types
+   *
+   * @return const std::unordered_map<std::string, std::string>&
+   */
+  const std::unordered_map<std::string, std::string>& renamedTypes() const {
+    return renamed_types_;
+  }
+
+  //! abstract method loading a graph
+  virtual std::optional<AbstractGraph> load(std::istream& input) = 0;
+  //! abstract method for saving a graph
+  virtual bool save(std::ostream& output, const AbstractGraph& graph) = 0;
+
+ protected:
+  std::unordered_map<std::string, std::string> renamed_types_;
+
+  std::string mapType(const std::string& token) {
+    if (renamed_types_.empty()) return token;
+    auto foundIt = renamed_types_.find(token);
+    if (foundIt == renamed_types_.end()) return token;
+    return foundIt->second;
+  }
+};
+
+}  // namespace g2o
 
 #endif

@@ -27,7 +27,6 @@
 #ifndef G2O_EDGE_SE2_SENSOR_CALIB_H
 #define G2O_EDGE_SE2_SENSOR_CALIB_H
 
-#include <iosfwd>
 #include <memory>
 
 #include "g2o/config.h"
@@ -47,37 +46,14 @@ namespace g2o {
 class G2O_TYPES_SCLAM2D_API EdgeSE2SensorCalib
     : public BaseFixedSizedEdge<3, SE2, VertexSE2, VertexSE2, VertexSE2> {
  public:
-  void computeError() override {
-    const VertexSE2* v1 = vertexXnRaw<0>();
-    const VertexSE2* v2 = vertexXnRaw<1>();
-    const VertexSE2* laserOffset = vertexXnRaw<2>();
-    const SE2& x1 = v1->estimate();
-    const SE2& x2 = v2->estimate();
-    SE2 delta =
-        inverseMeasurement_ * ((x1 * laserOffset->estimate()).inverse() * x2 *
-                               laserOffset->estimate());
-    error_ = delta.toVector();
-  }
+  void computeError() override;
 
-  void setMeasurement(const SE2& m) override {
-    measurement_ = m;
-    inverseMeasurement_ = m.inverse();
-  }
+  void setMeasurement(const SE2& m) override;
 
   double initialEstimatePossible(const OptimizableGraph::VertexSet& from,
-                                 OptimizableGraph::Vertex* to) override {
-    if (from.count(vertices_[2]) == 1  // need the laser offset
-        && ((from.count(vertices_[0]) == 1 && to == vertices_[1].get()) ||
-            ((from.count(vertices_[1]) == 1 && to == vertices_[0].get())))) {
-      return 1.0;
-    }
-    return -1.0;
-  }
+                                 OptimizableGraph::Vertex* to) override;
   void initialEstimate(const OptimizableGraph::VertexSet& from,
                        OptimizableGraph::Vertex* to) override;
-
-  bool read(std::istream& is) override;
-  bool write(std::ostream& os) const override;
 
  protected:
   SE2 inverseMeasurement_;

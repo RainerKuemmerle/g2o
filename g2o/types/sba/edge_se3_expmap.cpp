@@ -26,25 +26,9 @@
 
 #include "edge_se3_expmap.h"
 
-#include <Eigen/Core>
-
-#include "g2o/core/eigen_types.h"
-#include "g2o/core/io_helper.h"
 #include "g2o/types/sba/vertex_se3_expmap.h"
 
 namespace g2o {
-
-bool EdgeSE3Expmap::read(std::istream& is) {
-  Vector7 meas;
-  internal::readVector(is, meas);
-  setMeasurement(SE3Quat(meas).inverse());
-  return readInformationMatrix(is);
-}
-
-bool EdgeSE3Expmap::write(std::ostream& os) const {
-  internal::writeVector(os, measurement().inverse().toVector());
-  return writeInformationMatrix(os);
-}
 
 void EdgeSE3Expmap::computeError() {
   const VertexSE3Expmap* v1 = vertexXnRaw<0>();
@@ -55,21 +39,21 @@ void EdgeSE3Expmap::computeError() {
   error_ = err.log();
 }
 
-void EdgeSE3Expmap::linearizeOplus() {
-  VertexSE3Expmap* vi = vertexXnRaw<0>();
-  SE3Quat Ti(vi->estimate());
+// void EdgeSE3Expmap::linearizeOplus() {
+//   VertexSE3Expmap* vi = vertexXnRaw<0>();
+//   SE3Quat Ti(vi->estimate());
 
-  VertexSE3Expmap* vj = vertexXnRaw<1>();
-  SE3Quat Tj(vj->estimate());
+//   VertexSE3Expmap* vj = vertexXnRaw<1>();
+//   SE3Quat Tj(vj->estimate());
 
-  const SE3Quat& Tij = measurement_;
-  SE3Quat invTij = Tij.inverse();
+//   const SE3Quat& Tij = measurement_;
+//   SE3Quat invTij = Tij.inverse();
 
-  SE3Quat invTj_Tij = Tj.inverse() * Tij;
-  SE3Quat infTi_invTij = Ti.inverse() * invTij;
+//   SE3Quat invTj_Tij = Tj.inverse() * Tij;
+//   SE3Quat infTi_invTij = Ti.inverse() * invTij;
 
-  jacobianOplusXi_ = invTj_Tij.adj();
-  jacobianOplusXj_ = -infTi_invTij.adj();
-}
+//   jacobianOplusXi_ = invTj_Tij.adj();
+//   jacobianOplusXj_ = -infTi_invTij.adj();
+// }
 
 }  // namespace g2o

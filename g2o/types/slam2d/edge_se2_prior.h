@@ -27,10 +27,6 @@
 #ifndef G2O_EDGE_SE2_PRIOR_H
 #define G2O_EDGE_SE2_PRIOR_H
 
-#include <Eigen/Core>
-#include <iosfwd>
-#include <memory>
-
 #include "g2o/core/base_unary_edge.h"
 #include "g2o/core/optimizable_graph.h"
 #include "g2o_types_slam2d_api.h"
@@ -61,9 +57,6 @@ class G2O_TYPES_SLAM2D_API EdgeSE2Prior
   }
 
   void setMeasurement(const SE2& m) override;
-
-  bool read(std::istream& is) override;
-  bool write(std::ostream& os) const override;
 
   double initialEstimatePossible(const OptimizableGraph::VertexSet&,
                                  OptimizableGraph::Vertex*) override {

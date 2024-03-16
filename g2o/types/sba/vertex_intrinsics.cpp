@@ -26,21 +26,12 @@
 
 #include "vertex_intrinsics.h"
 
-#include "g2o/core/io_helper.h"
 #include "g2o/stuff/misc.h"
 
 namespace g2o {
 
 VertexIntrinsics::VertexIntrinsics() {
   estimate_.values << cst(1.), cst(1.), cst(.5), cst(.5), cst(.1);
-}
-
-bool VertexIntrinsics::read(std::istream& is) {
-  return internal::readVector(is, estimate_.values);
-}
-
-bool VertexIntrinsics::write(std::ostream& os) const {
-  return internal::writeVector(os, estimate().values);
 }
 
 void VertexIntrinsics::oplusImpl(const VectorX::MapType& update) {

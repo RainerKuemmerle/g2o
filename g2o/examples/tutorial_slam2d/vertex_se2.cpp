@@ -28,19 +28,9 @@
 
 namespace g2o::tutorial {
 
-VertexSE2::VertexSE2() = default;
-
-bool VertexSE2::read(std::istream& is) {
-  Eigen::Vector3d p;
-  is >> p[0] >> p[1] >> p[2];
-  estimate_.fromVector(p);
-  return true;
-}
-
-bool VertexSE2::write(std::ostream& os) const {
-  const Eigen::Vector3d p = estimate().toVector();
-  os << p[0] << " " << p[1] << " " << p[2];
-  return os.good();
+void VertexSE2::oplusImpl(const g2o::VectorX::MapType& update) {
+  SE2 up(update[0], update[1], update[2]);
+  estimate_ *= up;
 }
 
 }  // namespace g2o::tutorial

@@ -28,9 +28,6 @@
 
 #include <Eigen/Geometry>
 #include <cassert>
-#include <map>
-#include <memory>
-#include <ostream>
 #include <vector>
 
 #include "g2o/types/slam3d/vertex_pointxyz.h"
@@ -45,12 +42,13 @@ bool EdgeSE3LotsOfXYZ::setMeasurementFromState() {
 
   Eigen::Transform<double, 3, 1> poseinv = pose->estimate().inverse();
 
-  for (unsigned int i = 0; i < observedPoints_; i++) {
+  int observed_points = measurement_.size() / 3;
+  for (int i = 0; i < observed_points; i++) {
     auto* xyz = static_cast<VertexPointXYZ*>(vertexRaw(1 + i));
     //      const Vector3 &pt = xyz->estimate();
     Vector3 m = poseinv * xyz->estimate();
 
-    unsigned int index = 3 * i;
+    const int index = 3 * i;
     measurement_[index] = m[0];
     measurement_[index + 1] = m[1];
     measurement_[index + 2] = m[2];
@@ -61,11 +59,12 @@ bool EdgeSE3LotsOfXYZ::setMeasurementFromState() {
 void EdgeSE3LotsOfXYZ::computeError() {
   auto* pose = static_cast<VertexSE3*>(vertexRaw(0));
 
-  for (unsigned int i = 0; i < observedPoints_; i++) {
+  int observed_points = measurement_.size() / 3;
+  for (int i = 0; i < observed_points; i++) {
     auto* xyz = static_cast<VertexPointXYZ*>(vertexRaw(1 + i));
     Vector3 m = pose->estimate().inverse() * xyz->estimate();
 
-    unsigned int index = 3 * i;
+    const int index = 3 * i;
     error_[index] = m[0] - measurement_[index];
     error_[index + 1] = m[1] - measurement_[index + 1];
     error_[index + 2] = m[2] - measurement_[index + 2];
@@ -115,53 +114,6 @@ void EdgeSE3LotsOfXYZ::linearizeOplus() {
   jacobianOplus_[0] = Ji;
 }
 
-bool EdgeSE3LotsOfXYZ::read(std::istream& is) {
-  is >> observedPoints_;
-
-  setSize(observedPoints_ + 1);
-
-  // read the measurements
-  for (unsigned int i = 0; i < observedPoints_; i++) {
-    unsigned int index = 3 * i;
-    is >> measurement_[index] >> measurement_[index + 1] >>
-        measurement_[index + 2];
-  }
-
-  // read the information matrix
-  for (unsigned int i = 0; i < observedPoints_ * 3; i++) {
-    // fill the "upper triangle" part of the matrix
-    for (unsigned int j = i; j < observedPoints_ * 3; j++) {
-      is >> information()(i, j);
-    }
-
-    // fill the lower triangle part
-    for (unsigned int j = 0; j < i; j++) {
-      information()(i, j) = information()(j, i);
-    }
-  }
-  return true;
-}
-
-bool EdgeSE3LotsOfXYZ::write(std::ostream& os) const {
-  // write number of observed points
-  os << "|| " << observedPoints_;
-
-  // write measurements
-  for (unsigned int i = 0; i < observedPoints_; i++) {
-    unsigned int index = 3 * i;
-    os << " " << measurement_[index] << " " << measurement_[index + 1] << " "
-       << measurement_[index + 2];
-  }
-
-  // write information matrix
-  for (unsigned int i = 0; i < observedPoints_ * 3; i++) {
-    for (unsigned int j = i; j < observedPoints_ * 3; j++) {
-      os << " " << information()(i, j);
-    }
-  }
-  return os.good();
-}
-
 void EdgeSE3LotsOfXYZ::initialEstimate(const OptimizableGraph::VertexSet& fixed,
                                        OptimizableGraph::Vertex* toEstimate) {
   (void)toEstimate;
@@ -171,11 +123,12 @@ void EdgeSE3LotsOfXYZ::initialEstimate(const OptimizableGraph::VertexSet& fixed,
 
   auto* pose = static_cast<VertexSE3*>(vertexRaw(0));
 
+  int observed_points = measurement_.size() / 3;
 #ifdef _MSC_VER
-  std::vector<bool> estimate_this(observedPoints_, true);
+  std::vector<bool> estimate_this(observed_points, true);
 #else
-  bool estimate_this[observedPoints_];
-  for (unsigned int i = 0; i < observedPoints_; i++) {
+  bool estimate_this[observed_points];
+  for (int i = 0; i < observed_points; i++) {
     estimate_this[i] = true;
   }
 #endif

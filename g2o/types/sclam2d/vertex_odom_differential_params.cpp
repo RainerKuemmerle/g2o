@@ -26,16 +26,10 @@
 
 #include "vertex_odom_differential_params.h"
 
-#include "g2o/core/io_helper.h"
-
 namespace g2o {
 
-bool VertexOdomDifferentialParams::read(std::istream& is) {
-  return internal::readVector(is, estimate_);
-}
-
-bool VertexOdomDifferentialParams::write(std::ostream& os) const {
-  return internal::writeVector(os, estimate());
+void VertexOdomDifferentialParams::oplusImpl(const VectorX::MapType& update) {
+  estimate_ += update.head<3>();
 }
 
 }  // namespace g2o

@@ -29,7 +29,6 @@
 #include <Eigen/Cholesky>
 #include <Eigen/Eigenvalues>
 #include <Eigen/LU>
-#include <cassert>
 #include <iostream>
 
 #include "backbone_tree_action.h"
@@ -37,7 +36,6 @@
 #include "g2o/core/optimization_algorithm_with_hessian.h"
 
 using std::cerr;
-using std::endl;
 
 namespace g2o {
 
@@ -234,7 +232,7 @@ void computeSimpleStars(StarSet& stars, SparseOptimizer* optimizer,
     HyperGraph::EdgeSet& backboneEdges = s->lowLevelEdges();
     if (backboneEdges.empty()) continue;
 
-    // cerr << "optimizing backbone" << endl;
+    // cerr << "optimizing backbone\n";
     // one of these  should be the gauge, to be simple we select the first one
     // in the backbone
     OptimizableGraph::VertexSet gauge;
@@ -247,7 +245,7 @@ void computeSimpleStars(StarSet& stars, SparseOptimizer* optimizer,
     s->optimizer()->optimize(backboneIterations);
     s->optimizer()->setFixed(backboneVertices, true);
 
-    // cerr << "assignind edges.vertices not in bbone" << endl;
+    // cerr << "assignind edges.vertices not in bbone\n";
     HyperGraph::EdgeSet otherEdges;
     HyperGraph::VertexSet otherVertices;
     for (auto bit = backboneVertices.begin(); bit != backboneVertices.end();
@@ -275,27 +273,26 @@ void computeSimpleStars(StarSet& stars, SparseOptimizer* optimizer,
             s->optimizer()->solver().get());
     if (solverWithHessian) {
       s->optimizer()->push(otherVertices);
-      // cerr << "optimizing vertices out of bbone" << endl;
-      // cerr << "push" << endl;
-      // cerr << "init" << endl;
+      // cerr << "optimizing vertices out of bbone\n";
+      // cerr << "push\n";
+      // cerr << "init\n";
       s->optimizer()->initializeOptimization(otherEdges);
-      // cerr << "guess" << endl;
+      // cerr << "guess\n";
       s->optimizer()->computeInitialGuess();
-      // cerr << "solver init" << endl;
+      // cerr << "solver init\n";
       s->optimizer()->solver()->init();
-      // cerr << "structure" << endl;
+      // cerr << "structure\n";
       if (!solverWithHessian->buildLinearStructure())
-        cerr << "FATAL: failure while building linear structure" << endl;
-      // cerr << "errors" << endl;
+        cerr << "FATAL: failure while building linear structure\n";
+      // cerr << "errors\n";
       s->optimizer()->computeActiveErrors();
-      // cerr << "system" << endl;
+      // cerr << "system\n";
       solverWithHessian->updateLinearSystem();
-      // cerr << "directSolove" << endl;
+      // cerr << "directSolove\n";
     } else {
       cerr << "FATAL: hierarchical thing cannot be used with a solver that "
               "does not support the system structure "
-              "construction"
-           << endl;
+              "construction\n";
     }
 
     // // then optimize the vertices one at a time to check if a solution is
@@ -316,24 +313,23 @@ void computeSimpleStars(StarSet& stars, SparseOptimizer* optimizer,
     // cerr <<  endl;
 
     // relax the backbone and optimize it all
-    // cerr << "relax bbone" << endl;
+    // cerr << "relax bbone\n";
     s->optimizer()->setFixed(backboneVertices, false);
-    // cerr << "fox gauge bbone" << endl;
+    // cerr << "fox gauge bbone\n";
     s->optimizer()->setFixed(s->gauge(), true);
 
-    // cerr << "opt init" << endl;
+    // cerr << "opt init\n";
     s->optimizer()->initializeOptimization(s->lowLevelEdges());
     optimizer->computeActiveErrors();
     const int starOptResult = s->optimizer()->optimize(starIterations);
-    // cerr << starOptResult << "(" << starIterations << ")  " << endl;
+    // cerr << starOptResult << "(" << starIterations << ")  \n";
 
     if (!starIterations || starOptResult > 0) {
       optimizer->computeActiveErrors();
 
 #if 1
-
       s->optimizer()->computeActiveErrors();
-      // cerr << "system" << endl;
+      // cerr << "system\n";
       if (solverWithHessian) solverWithHessian->updateLinearSystem();
       HyperGraph::EdgeSet prunedStarEdges = backboneEdges;
       HyperGraph::VertexSet prunedStarVertices = backboneVertices;
@@ -370,9 +366,9 @@ void computeSimpleStars(StarSet& stars, SparseOptimizer* optimizer,
       }
       s->lowLevelEdges() = prunedStarEdges;
       s->lowLevelVertices() = prunedStarVertices;
-
 #endif
-      // cerr << "addHedges" << endl;
+
+      // cerr << "addHedges\n";
       // now add to the star the hierarchical edges
       OptimizableGraph::VertexContainer vertices(2);
       vertices[0] = std::static_pointer_cast<OptimizableGraph::Vertex>(

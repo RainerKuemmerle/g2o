@@ -27,8 +27,6 @@
 #ifndef G2O_EDGE_SE2_POINT_XY_OFFSET_H_
 #define G2O_EDGE_SE2_POINT_XY_OFFSET_H_
 
-#include <Eigen/Core>
-#include <iosfwd>
 #include <memory>
 
 #include "g2o/core/base_binary_edge.h"
@@ -50,8 +48,6 @@ class G2O_TYPES_SLAM2D_API EdgeSE2PointXYOffset
     : public BaseBinaryEdge<2, Vector2, VertexSE2, VertexPointXY> {
  public:
   EdgeSE2PointXYOffset();
-  bool read(std::istream& is) override;
-  bool write(std::ostream& os) const override;
 
   void computeError() override;
   void linearizeOplus() override;

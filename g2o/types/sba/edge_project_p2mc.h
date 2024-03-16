@@ -27,9 +27,6 @@
 #ifndef G2O_SBA_EDGEPROJECTP2MC_H
 #define G2O_SBA_EDGEPROJECTP2MC_H
 
-#include <iosfwd>
-#include <tuple>
-
 #include "g2o/core/base_binary_edge.h"
 #include "g2o/core/eigen_types.h"
 #include "g2o/types/slam3d/vertex_pointxyz.h"
@@ -44,8 +41,6 @@ class G2O_TYPES_SBA_API EdgeProjectP2MC
     : public BaseBinaryEdge<2, Vector2, VertexPointXYZ, VertexCam> {
  public:
   EdgeProjectP2MC();
-  bool read(std::istream& is) override;
-  bool write(std::ostream& os) const override;
 
   //! return the error estimate as a 2-vector
   void computeError() override;

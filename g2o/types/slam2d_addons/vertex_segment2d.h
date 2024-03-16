@@ -28,7 +28,6 @@
 #define G2O_VERTEX_SEGMENT_2D_H
 
 #include <Eigen/Core>
-#include <iosfwd>
 #include <memory>
 
 #include "g2o/config.h"
@@ -64,9 +63,6 @@ class G2O_TYPES_SLAM2D_ADDONS_API VertexSegment2D
   void oplusImpl(const VectorX::MapType& update) override {
     estimate_ += update.head<kDimension>();
   }
-
-  bool read(std::istream& is) override;
-  bool write(std::ostream& os) const override;
 };
 
 #ifdef G2O_HAVE_OPENGL

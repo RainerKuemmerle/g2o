@@ -21,10 +21,6 @@ class VertexPosition3D : public g2o::BaseVertex<3, Eigen::Vector3d> {
   void oplusImpl(const g2o::VectorX::MapType& update) override {
     estimate_ += update;
   }
-
-  bool read(std::istream& /*is*/) override { return false; }
-
-  bool write(std::ostream& /*os*/) const override { return false; }
 };
 
 class PositionVelocity3DEdge {};
@@ -36,10 +32,6 @@ class VertexPositionVelocity3D : public g2o::BaseVertex<6, Vector6d> {
   void oplusImpl(const g2o::VectorX::MapType& update) override {
     estimate_ += update;
   }
-
-  bool read(std::istream& /*is*/) override { return false; }
-
-  bool write(std::ostream& /*os*/) const override { return false; }
 };
 
 // The odometry which links pairs of nodes together
@@ -112,10 +104,6 @@ class TargetOdometry3DEdge
     }
   }
 
-  bool read(std::istream& /*is*/) override { return false; }
-
-  bool write(std::ostream& /*os*/) const override { return false; }
-
  private:
   double dt_;
 };
@@ -134,10 +122,6 @@ class GPSObservationEdgePositionVelocity3D
     const VertexPositionVelocity3D* v = vertexXnRaw<0>();
     error_ = v->estimate().head<3>() - measurement_;
   }
-
-  bool read(std::istream& /*is*/) override { return false; }
-
-  bool write(std::ostream& /*os*/) const override { return false; }
 };
 
 #endif  //  __TARGET_TYPES_6D_HPP__

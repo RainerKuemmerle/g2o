@@ -24,18 +24,24 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include <cstdlib>
 #include <fstream>
 #include <iostream>
 #include <sstream>
 
+#include "g2o/apps/g2o_simulator/sensor_odometry2d.h"
+#include "g2o/apps/g2o_simulator/sensor_pointxy.h"
+#include "g2o/apps/g2o_simulator/sensor_pointxy_bearing.h"
+#include "g2o/apps/g2o_simulator/sensor_pose2d.h"
+#include "g2o/apps/g2o_simulator/sensor_segment2d.h"
+#include "g2o/apps/g2o_simulator/sensor_segment2d_line.h"
+#include "g2o/apps/g2o_simulator/sensor_segment2d_pointline.h"
+#include "g2o/apps/g2o_simulator/simulator.h"
+#include "g2o/apps/g2o_simulator/simulator2d_base.h"
 #include "g2o/core/optimizable_graph.h"
 #include "g2o/stuff/command_args.h"
 #include "g2o/stuff/sampler.h"
-#include "simulator2d.h"
 
 using std::cerr;
-using std::endl;
 
 int main(int argc, char** argv) {
   g2o::CommandArgs arg;
@@ -94,7 +100,7 @@ int main(int argc, char** argv) {
     world.addWorldObject(landmark);
   }
 
-  cerr << "nSegments = " << nSegments << endl;
+  cerr << "nSegments = " << nSegments << '\n';
 
   for (int i = 0; i < nSegments; i++) {
     auto* segment = new g2o::WorldObjectSegment2D;
@@ -168,9 +174,9 @@ int main(int argc, char** argv) {
   }
 
   if (hasSegmentSensor) {
-    cerr << "creating Segment Sensor" << endl;
+    cerr << "creating Segment Sensor\n";
     auto* segmentSensor = new g2o::SensorSegment2D("segmentSensor");
-    cerr << "segmentSensorCreated" << endl;
+    cerr << "segmentSensorCreated\n";
     segmentSensor->setMaxRange(3);
     segmentSensor->setMinRange(.1);
     robot.addSensor(segmentSensor);

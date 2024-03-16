@@ -2,36 +2,35 @@
 
 #include "g2o/core/factory.h"
 #include "g2o/types/sba/edge_project_xyz.h"
-#include "g2o/types/sba/types_six_dof_expmap.h"
+#include "g2o/types/sba/parameter_cameraparameters.h"
+#include "g2o/types/sba/types_six_dof_expmap.h"  // IWYU pragma: keep
 #include "g2o/types/slam3d/se3quat.h"
 #include "g2opy.h"
 #include "python/core/py_base_binary_edge.h"
 #include "python/core/py_base_fixed_sized_edge.h"
 #include "python/core/py_base_unary_edge.h"
-#include "python/core/py_base_variable_sized_edge.h"
 
 G2O_USE_TYPE_GROUP(expmap)
 
 namespace g2o {
 
 void declareTypesSixDofExpmap(py::module& m) {
+  py::class_<StereoCameraParameters>(m, "StereoCameraParameters")
+      .def(py::init<>())
+      .def_readwrite("focal_length", &StereoCameraParameters::focal_length)
+      .def_readwrite("principle_point",
+                     &StereoCameraParameters::principle_point)
+      .def_readwrite("baseline", &StereoCameraParameters::baseline);
+
   py::class_<CameraParameters, Parameter, std::shared_ptr<CameraParameters>>(
       m, "CameraParameters")
       .def(py::init<>())
       .def(py::init([](double f, const Eigen::Ref<const Vector2>& p, double b) {
         return CameraParameters(f, p, b);
       }))
-
       .def("cam_map", &CameraParameters::cam_map, "trans_xyz"_a)
       .def("stereocam_uvu_map", &CameraParameters::stereocam_uvu_map,
-           "trans_xyz"_a)
-      .def_readwrite("focal_length", &CameraParameters::focal_length)
-      .def_readwrite("principal_point", &CameraParameters::principle_point)
-      .def_readwrite("principle_point", &CameraParameters::principle_point)
-      .def_readwrite("baseline", &CameraParameters::baseline)
-      // read
-      // write
-      ;
+           "trans_xyz"_a);
 
   py::class_<VertexSE3Expmap, BaseVertex<6, SE3Quat>,
              std::shared_ptr<VertexSE3Expmap>>(m, "VertexSE3Expmap")
@@ -43,8 +42,7 @@ void declareTypesSixDofExpmap(py::module& m) {
              BaseBinaryEdge<6, SE3Quat, VertexSE3Expmap, VertexSE3Expmap>,
              std::shared_ptr<EdgeSE3Expmap>>(m, "EdgeSE3Expmap")
       .def(py::init<>())
-      .def("compute_error", &EdgeSE3Expmap::computeError)
-      .def("linearize_oplus", &EdgeSE3Expmap::linearizeOplus);
+      .def("compute_error", &EdgeSE3Expmap::computeError);
 
   templatedBaseBinaryEdge<2, Vector2, VertexPointXYZ, VertexSE3Expmap>(
       m, "_2_Vector2_VertexPointXYZ_VertexSE3Expmap");

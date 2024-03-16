@@ -31,9 +31,7 @@
 #include "g2o_tutorial_slam2d_api.h"
 #include "vertex_se2.h"
 
-namespace g2o {
-
-namespace tutorial {
+namespace g2o::tutorial {
 
 /**
  * \brief 2D edge between two Vertex2, i.e., the odometry
@@ -43,28 +41,14 @@ class G2O_TUTORIAL_SLAM2D_API EdgeSE2
  public:
   EdgeSE2() = default;
 
-  void computeError() override {
-    const VertexSE2* v1 = vertexXnRaw<0>();
-    const VertexSE2* v2 = vertexXnRaw<1>();
-    SE2 delta =
-        inverseMeasurement_ * (v1->estimate().inverse() * v2->estimate());
-    error_ = delta.toVector();
-  }
+  void computeError() override;
 
-  void setMeasurement(const SE2& m) override {
-    measurement_ = m;
-    inverseMeasurement_ = m.inverse();
-  }
-
-  bool read(std::istream& is) override;
-  bool write(std::ostream& os) const override;
+  void setMeasurement(const SE2& m) override;
 
  protected:
   SE2 inverseMeasurement_;
 };
 
-}  // namespace tutorial
-
-}  // namespace g2o
+}  // namespace g2o::tutorial
 
 #endif

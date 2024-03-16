@@ -26,29 +26,18 @@
 
 #include "edge_se2.h"
 
-namespace g2o {
-namespace tutorial {
+namespace g2o::tutorial {
 
-bool EdgeSE2::read(std::istream& is) {
-  Vector3 p;
-  is >> p[0] >> p[1] >> p[2];
-  measurement_.fromVector(p);
-  inverseMeasurement_ = measurement().inverse();
-  for (int i = 0; i < 3; ++i)
-    for (int j = i; j < 3; ++j) {
-      is >> information()(i, j);
-      if (i != j) information()(j, i) = information()(i, j);
-    }
-  return true;
+void EdgeSE2::computeError() {
+  const VertexSE2* v1 = vertexXnRaw<0>();
+  const VertexSE2* v2 = vertexXnRaw<1>();
+  SE2 delta = inverseMeasurement_ * (v1->estimate().inverse() * v2->estimate());
+  error_ = delta.toVector();
 }
 
-bool EdgeSE2::write(std::ostream& os) const {
-  Vector3 p = measurement().toVector();
-  os << p.x() << " " << p.y() << " " << p.z();
-  for (int i = 0; i < 3; ++i)
-    for (int j = i; j < 3; ++j) os << " " << information()(i, j);
-  return os.good();
+void EdgeSE2::setMeasurement(const SE2& m) {
+  measurement_ = m;
+  inverseMeasurement_ = m.inverse();
 }
 
-}  // namespace tutorial
-}  // namespace g2o
+}  // namespace g2o::tutorial

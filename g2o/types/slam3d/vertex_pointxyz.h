@@ -27,8 +27,6 @@
 #ifndef G2O_VERTEX_TRACKXYZ_H_
 #define G2O_VERTEX_TRACKXYZ_H_
 
-#include <Eigen/Core>
-#include <iosfwd>
 #include <memory>
 
 #include "g2o/config.h"
@@ -46,8 +44,6 @@ namespace g2o {
 class G2O_TYPES_SLAM3D_API VertexPointXYZ : public BaseVertex<3, Vector3> {
  public:
   VertexPointXYZ() = default;
-  bool read(std::istream& is) override;
-  bool write(std::ostream& os) const override;
 
   void oplusImpl(const VectorX::MapType& update) override {
     estimate_ += update.head<kDimension>();

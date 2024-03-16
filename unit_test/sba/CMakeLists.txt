@@ -1,6 +1,5 @@
 add_executable(unittest_sba
-  io_sba.cpp
-  io_six_dof_expmap.cpp
+sba_basic_tests.cpp
 )
-target_link_libraries(unittest_sba types_sba)
+target_link_libraries(unittest_sba unittest_helper types_sba)
 create_test(unittest_sba)

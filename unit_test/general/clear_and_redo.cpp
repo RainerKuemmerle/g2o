@@ -28,7 +28,8 @@
 
 #include "g2o/core/sparse_optimizer.h"
 #include "g2o/core/sparse_optimizer_terminate_action.h"
-#include "g2o/types/slam3d/types_slam3d.h"
+#include "g2o/types/slam3d/edge_se3.h"
+#include "g2o/types/slam3d/vertex_se3.h"
 #include "unit_test/test_helper/allocate_optimizer.h"
 
 TEST(General, ClearAndRedo) {

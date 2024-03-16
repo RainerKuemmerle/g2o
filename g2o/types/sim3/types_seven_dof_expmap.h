@@ -26,16 +26,11 @@
 
 #ifndef G2O_SEVEN_DOF_EXPMAP_TYPES
 #define G2O_SEVEN_DOF_EXPMAP_TYPES
-#include <iosfwd>
-#include <tuple>
 
-#include "g2o/config.h"
 #include "g2o/core/base_binary_edge.h"
 #include "g2o/core/base_vertex.h"
 #include "g2o/core/eigen_types.h"
 #include "g2o/core/optimizable_graph.h"
-#include "g2o/types/sba/types_six_dof_expmap.h"
-#include "g2o/types/sim3/types_seven_dof_expmap.h"
 #include "g2o/types/slam3d/vertex_pointxyz.h"
 #include "sim3.h"
 #include "types_seven_dof_expmap_api.h"
@@ -60,10 +55,6 @@ template class BaseVertex<7, Sim3>;
 class G2O_TYPES_SIM3_API VertexSim3Expmap : public BaseVertex<7, Sim3> {
  public:
   VertexSim3Expmap();
-  //! custom read function
-  bool read(std::istream& is) override;
-  //! custom write function
-  bool write(std::ostream& os) const override;
 
   void oplusImpl(const VectorX::MapType& update) override;
 
@@ -85,8 +76,6 @@ class G2O_TYPES_SIM3_API VertexSim3Expmap : public BaseVertex<7, Sim3> {
 class G2O_TYPES_SIM3_API EdgeSim3
     : public BaseBinaryEdge<7, Sim3, VertexSim3Expmap, VertexSim3Expmap> {
  public:
-  bool read(std::istream& is) override;
-  bool write(std::ostream& os) const override;
   void computeError() override;
 
   double initialEstimatePossible(const OptimizableGraph::VertexSet&,
@@ -102,9 +91,6 @@ class G2O_TYPES_SIM3_API EdgeSim3
 class G2O_TYPES_SIM3_API EdgeSim3ProjectXYZ
     : public BaseBinaryEdge<2, Vector2, VertexPointXYZ, VertexSim3Expmap> {
  public:
-  bool read(std::istream& is) override;
-  bool write(std::ostream& os) const override;
-
   void computeError() override;
 
   // virtual void linearizeOplus();
@@ -114,9 +100,6 @@ class G2O_TYPES_SIM3_API EdgeSim3ProjectXYZ
 class G2O_TYPES_SIM3_API EdgeInverseSim3ProjectXYZ
     : public BaseBinaryEdge<2, Vector2, VertexPointXYZ, VertexSim3Expmap> {
  public:
-  bool read(std::istream& is) override;
-  bool write(std::ostream& os) const override;
-
   void computeError() override;
 
   // virtual void linearizeOplus();

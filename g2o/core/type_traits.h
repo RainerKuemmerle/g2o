@@ -40,31 +40,13 @@ namespace g2o {
  */
 template <typename T>
 struct TypeTraits {
-  // enum {
-  //   kVectorDimension = INT_MIN,  ///< dimension of the type as vector
-  //   kMinimalVectorDimension =
-  //       INT_MIN,    ///< dimension of the type as minimal vector
-  //   kIsVector = 0,  ///< type is a vector
-  //   kIsScalar = 0,  ///< type is a scalar value
-  // };
-
-  // using Type = T;
-  // using VectorType = VectorN<kVectorDimension>;
-  // using MinimalVectorType = VectorN<kMinimalVectorDimension>;
-
-  // static VectorType toVector(const Type& t);
-  // static void toData(const Type& t, double* data);
-
-  // static VectorType toMinimalVector(const Type& t);
-  // static void toMinimalData(const Type& t, double* data);
-
-  // template <typename Derived>
-  // static Type fromVector(const Eigen::DenseBase<Derived>& v);
-
-  // template <typename Derived>
-  // static Type fromMinimalVector(const Eigen::DenseBase<Derived>& v);
-
-  // static Type Identity();
+  enum {
+    kVectorDimension = INT_MIN,  ///< dimension of the type as vector
+    kMinimalVectorDimension =
+        INT_MIN,    ///< dimension of the type as minimal vector
+    kIsVector = 0,  ///< type is a vector
+    kIsScalar = 0,  ///< type is a scalar value
+  };
 };
 
 /**
@@ -86,13 +68,13 @@ struct TypeTraits<VectorN<N, T>> {
 
   static VectorType toVector(const Type& t) { return t; }
   static void toData(const Type& t, double* data) {  // NOLINT
-    typename VectorType::MapType v(data, kVectorDimension);
+    typename VectorType::MapType v(data, t.size());
     v = t;
   }
 
   static MinimalVectorType toMinimalVector(const Type& t) { return t; }
   static void toMinimalData(const Type& t, double* data) {  // NOLINT
-    typename MinimalVectorType::MapType v(data, kMinimalVectorDimension);
+    typename MinimalVectorType::MapType v(data, t.size());
     v = t;
   }
 
@@ -105,8 +87,6 @@ struct TypeTraits<VectorN<N, T>> {
   static Type fromMinimalVector(const Eigen::DenseBase<Derived>& v) {
     return v;
   }
-
-  static Type Identity() { return Type::Zero(kVectorDimension); }
 };
 
 /**
@@ -153,8 +133,6 @@ struct TypeTraits<double> {
   static Type fromMinimalVector(const Eigen::DenseBase<Derived>& v) {
     return v[0];
   }
-
-  static Type Identity() { return 0.; }
 };
 
 /**
@@ -182,30 +160,29 @@ struct DimensionTraits {
 
   //! for a scalar value
   template <int IsScalar = TypeTraits<T>::kIsScalar>
-  static typename std::enable_if<IsScalar != 0, int>::type dimension(const T&) {
+  static std::enable_if_t<IsScalar != 0, int> dimension(const T&) {
     return 1;
   }
 
   //! for a statically known type
   template <int IsVector = TypeTraits<T>::kIsVector,
             int IsScalar = TypeTraits<T>::kIsScalar>
-  static typename std::enable_if<IsVector == 0 && IsScalar == 0, int>::type
-  minimalDimension(const T&) {
+  static std::enable_if_t<IsVector == 0 && IsScalar == 0, int> minimalDimension(
+      const T&) {
     return TypeTraits<T>::kMinimalVectorDimension;
   }
 
   //! for a vector type
   template <int IsVector = TypeTraits<T>::kIsVector,
             int IsScalar = TypeTraits<T>::kIsScalar>
-  static typename std::enable_if<IsVector != 0 && IsScalar == 0, int>::type
-  minimalDimension(const T& t) {
+  static std::enable_if_t<IsVector != 0 && IsScalar == 0, int> minimalDimension(
+      const T& t) {
     return t.size();
   }
 
   //! for a scalar value
   template <int IsScalar = TypeTraits<T>::kIsScalar>
-  static typename std::enable_if<IsScalar != 0, int>::type minimalDimension(
-      const T&) {
+  static std::enable_if_t<IsScalar != 0, int> minimalDimension(const T&) {
     return 1;
   }
 };

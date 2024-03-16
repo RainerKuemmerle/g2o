@@ -1,5 +1,5 @@
 // g2o - General Graph Optimization
-// Copyright (C) 2011 G. Grisetti, R. Kuemmerle, W. Burgard
+// Copyright (C) 2011 R. Kuemmerle, G. Grisetti, W. Burgard
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -24,15 +24,20 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef G2O_SIMULATOR3D_
-#define G2O_SIMULATOR3D_
+#ifndef G2O_CORE_IO_XML_FORMAT_H
+#define G2O_CORE_IO_XML_FORMAT_H
 
-#include "sensor_odometry3d.h"
-#include "sensor_pointxyz.h"
-#include "sensor_pointxyz_depth.h"
-#include "sensor_pointxyz_disparity.h"
-#include "sensor_pose3d.h"
-#include "sensor_pose3d_offset.h"
-#include "sensor_se3_prior.h"
+#include "g2o/core/g2o_core_api.h"
+#include "io_interface.h"
+
+namespace g2o {
+
+class G2O_CORE_API IoXml : public IoInterface {
+ public:
+  std::optional<AbstractGraph> load(std::istream& input) override;
+  bool save(std::ostream& output, const AbstractGraph& graph) override;
+};
+
+}  // namespace g2o
 
 #endif

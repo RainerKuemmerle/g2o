@@ -24,25 +24,18 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef G2O_EDGE_SE3_EULER_
-#define G2O_EDGE_SE3_EULER_
+#ifndef G2O_CORE_IO_BINARY_FORMAT_H
+#define G2O_CORE_IO_BINARY_FORMAT_H
 
-#include <iosfwd>
-
-#include "g2o/types/slam3d/edge_se3.h"
-#include "g2o/types/slam3d/vertex_se3.h"
-#include "g2o_types_slam3d_addons_api.h"
+#include "g2o/core/g2o_core_api.h"
+#include "io_interface.h"
 
 namespace g2o {
 
-/**
- * \brief 3D edge between two VertexSE3, uses the euler angle parameterization
- * for the read/write functions *only*.
- */
-class G2O_TYPES_SLAM3D_ADDONS_API EdgeSE3Euler : public EdgeSE3 {
+class G2O_CORE_API IoBinary : public IoInterface {
  public:
-  bool read(std::istream& is) override;
-  bool write(std::ostream& os) const override;
+  std::optional<AbstractGraph> load(std::istream& input) override;
+  bool save(std::ostream& output, const AbstractGraph& graph) override;
 };
 
 }  // namespace g2o

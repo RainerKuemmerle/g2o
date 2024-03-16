@@ -28,9 +28,6 @@
 
 #include <cassert>
 #include <cmath>
-#include <map>
-#include <memory>
-#include <ostream>
 #include <vector>
 
 #include "se2.h"
@@ -44,60 +41,15 @@ EdgeSE2LotsOfXY::EdgeSE2LotsOfXY() { resize(0); }
 void EdgeSE2LotsOfXY::computeError() {
   auto* pose = static_cast<VertexSE2*>(vertexRaw(0));
 
-  for (unsigned int i = 0; i < observedPoints_; i++) {
+  int observed_points = measurement_.size() / 2;
+  for (int i = 0; i < observed_points; i++) {
     auto* xy = static_cast<VertexPointXY*>(vertexRaw(1 + i));
     Vector2 m = pose->estimate().inverse() * xy->estimate();
 
-    unsigned int index = 2 * i;
+    const int index = 2 * i;
     error_[index] = m[0] - measurement_[index];
     error_[index + 1] = m[1] - measurement_[index + 1];
   }
-}
-
-bool EdgeSE2LotsOfXY::read(std::istream& is) {
-  is >> observedPoints_;
-  setSize(observedPoints_ + 1);
-
-  // read the measurements
-  for (unsigned int i = 0; i < observedPoints_; i++) {
-    unsigned int index = 2 * i;
-    is >> measurement_[index] >> measurement_[index + 1];
-  }
-
-  // read the information matrix
-  for (unsigned int i = 0; i < observedPoints_ * 2; i++) {
-    // fill the "upper triangle" part of the matrix
-    for (unsigned int j = i; j < observedPoints_ * 2; j++) {
-      is >> information()(i, j);
-    }
-
-    // fill the lower triangle part
-    for (unsigned int j = 0; j < i; j++) {
-      information()(i, j) = information()(j, i);
-    }
-  }
-
-  return true;
-}
-
-bool EdgeSE2LotsOfXY::write(std::ostream& os) const {
-  // write number of observed points
-  os << "|| " << observedPoints_;
-
-  // write measurements
-  for (unsigned int i = 0; i < observedPoints_; i++) {
-    unsigned int index = 2 * i;
-    os << " " << measurement_[index] << " " << measurement_[index + 1];
-  }
-
-  // write information matrix
-  for (unsigned int i = 0; i < observedPoints_ * 2; i++) {
-    for (unsigned int j = i; j < observedPoints_ * 2; j++) {
-      os << " " << information()(i, j);
-    }
-  }
-
-  return os.good();
 }
 
 void EdgeSE2LotsOfXY::linearizeOplus() {
@@ -151,11 +103,12 @@ void EdgeSE2LotsOfXY::initialEstimate(const OptimizableGraph::VertexSet& fixed,
 
   auto* pose = static_cast<VertexSE2*>(vertexRaw(0));
 
+  int observed_points = measurement_.size() / 2;
 #ifdef _MSC_VER
-  std::vector<bool> estimate_this(observedPoints_, true);
+  std::vector<bool> estimate_this(observed_points, true);
 #else
-  bool estimate_this[observedPoints_];
-  for (unsigned int i = 0; i < observedPoints_; i++) {
+  bool estimate_this[observed_points];
+  for (int i = 0; i < observed_points; i++) {
     estimate_this[i] = true;
   }
 #endif
@@ -194,7 +147,8 @@ double EdgeSE2LotsOfXY::initialEstimatePossible(
 bool EdgeSE2LotsOfXY::setMeasurementFromState() {
   auto* pose = static_cast<VertexSE2*>(vertexRaw(0));
 
-  for (unsigned int i = 0; i < observedPoints_; i++) {
+  int observed_points = measurement_.size() / 2;
+  for (int i = 0; i < observed_points; i++) {
     auto* xy = static_cast<VertexPointXY*>(vertexRaw(1 + i));
     Vector2 m = pose->estimate().inverse() * xy->estimate();
 

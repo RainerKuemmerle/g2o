@@ -32,7 +32,6 @@
 #include <cassert>
 
 #include "g2o/core/type_traits.h"
-#include "g2o/stuff/macros.h"
 #include "g2o/stuff/misc.h"
 #include "g2o_tutorial_slam2d_api.h"
 
@@ -147,8 +146,6 @@ struct TypeTraits<tutorial::SE2> {
   static Type fromMinimalVector(const Eigen::DenseBase<Derived>& v) {
     return Type(v[0], v[1], v[2]);
   }
-
-  static Type Identity() { return Type(); }
 };
 }  // namespace g2o
 

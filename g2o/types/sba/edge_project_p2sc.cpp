@@ -26,29 +26,14 @@
 
 #include "edge_project_p2sc.h"
 
-#include <Eigen/Core>
 #include <cmath>
-#include <iostream>
 
-#include "g2o/core/io_helper.h"
 #include "g2o/stuff/logger.h"
 #include "g2o/stuff/misc.h"
 #include "g2o/types/sba/sbacam.h"
 #include "g2o/types/sba/vertex_cam.h"
 
 namespace g2o {
-
-// point to camera projection, stereo
-bool EdgeProjectP2SC::read(std::istream& is) {
-  internal::readVector(is, measurement_);
-  return readInformationMatrix(is);
-}
-
-bool EdgeProjectP2SC::write(std::ostream& os) const {
-  internal::writeVector(os, measurement());
-  writeInformationMatrix(os);
-  return os.good();
-}
 
 // return the error estimate as a 2-vector
 void EdgeProjectP2SC::computeError() {

@@ -32,14 +32,15 @@
 #include <cstdint>
 #include <functional>
 #include <iosfwd>
-#include <map>
 #include <memory>
 #include <set>
 #include <string>
 #include <typeinfo>
+#include <unordered_map>
 #include <vector>
 
 #include "g2o/core/eigen_types.h"
+#include "g2o/core/io/io_format.h"
 #include "g2o_core_api.h"
 #include "hyper_graph.h"
 #include "jacobian_workspace.h"
@@ -53,6 +54,7 @@ class HyperGraphAction;
 struct OptimizationAlgorithmProperty;
 class CacheContainer;
 class RobustKernel;
+class AbstractGraph;
 
 /**
    @addtogroup g2o
@@ -65,7 +67,8 @@ class RobustKernel;
    also provides basic functionalities to handle the backup/restore
    of portions of the vertices.
  */
-struct G2O_CORE_API OptimizableGraph : public HyperGraph {
+class G2O_CORE_API OptimizableGraph : public HyperGraph {
+ public:
   enum ActionType {
     kAtPreiteration,
     kAtPostiteration,
@@ -131,17 +134,11 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
   class G2O_CORE_API Vertex : public HyperGraph::Vertex,
                               public HyperGraph::DataContainer {
    private:
-    friend struct OptimizableGraph;
+    friend class OptimizableGraph;
 
    public:
     Vertex();
     ~Vertex() override;
-
-    //! sets the node to the origin (used in the multilevel stuff)
-    void setToOrigin() {
-      setToOriginImpl();
-      updateCache();
-    }
 
     //! get the mapped memory of the hessian matrix
     [[nodiscard]] virtual double* hessianData() const = 0;
@@ -171,9 +168,9 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
 
     /**
      * updates the current vertex with the direct solution x += H_ii\b_ii
-     * @return the determinant of the inverted hessian
+     * @return True, iff solution was possible
      */
-    virtual double solveDirect(double lambda = 0) = 0;
+    virtual bool solveDirect(double lambda = 0) = 0;
 
     /**
      * sets the initial estimate from an array of double
@@ -247,6 +244,10 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
      * get/setEstimate(double*) -1 if it is not supported
      */
     [[nodiscard]] virtual int estimateDimension() const = 0;
+    /**
+     * Returns the dimension of the estimate at compile time.
+     */
+    [[nodiscard]] virtual int estimateDimensionAtCompileTime() const = 0;
 
     /**
      * sets the initial estimate from an array of double.
@@ -368,6 +369,8 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
     //! dimension of the estimated state belonging to this node
     [[nodiscard]] int dimension() const { return dimension_; }
 
+    virtual bool setDimension(int /*dimension*/) { return false; }
+
     //! sets the id of the node in the graph be sure that the graph keeps
     //! consistent after changing the id
     void setId(int id) override { id_ = id; }
@@ -391,11 +394,6 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
      */
     void unlockQuadraticForm() { quadraticFormMutex_.unlock(); }
 
-    //! read the vertex from a stream, i.e., the internal state of the vertex
-    virtual bool read(std::istream& is) = 0;
-    //! write the vertex to a stream
-    virtual bool write(std::ostream& os) const = 0;
-
     virtual void updateCache();
 
     CacheContainer& cacheContainer();
@@ -417,9 +415,6 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
      */
     virtual void oplusImpl(const VectorX::MapType& v) = 0;
 
-    //! sets the node to the origin (used in the multilevel stuff)
-    virtual void setToOriginImpl() = 0;
-
     /**
      * sets the initial estimate from an array of double
      * @return true on success
@@ -430,7 +425,7 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
   class G2O_CORE_API Edge : public HyperGraph::Edge,
                             public HyperGraph::DataContainer {
    private:
-    friend struct OptimizableGraph;
+    friend class OptimizableGraph;
 
    public:
     Edge();
@@ -444,15 +439,26 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
 
     //! sets the measurement from an array of double
     //! @returns true on success
-    virtual bool setMeasurementData(const double* m);
+    virtual bool setMeasurementData(const double* m) = 0;
 
     //! writes the measurement to an array of double
     //! @returns true on success
-    virtual bool getMeasurementData(double* m) const;
+    virtual bool getMeasurementData(double* m) const = 0;
 
     //! returns the dimension of the measurement in the extended representation
     //! which is used by get/setMeasurement;
-    [[nodiscard]] virtual int measurementDimension() const;
+    [[nodiscard]] virtual int measurementDimension() const = 0;
+
+    /**
+     * @brief Returns the measurement's dimension at compile time.
+     */
+    [[nodiscard]] virtual int measurementDimensionAtCompileTime() const = 0;
+
+    /**
+     * returns the minimal dimension of the measurement which corresponds to the
+     * dimension of the information matrix.
+     */
+    [[nodiscard]] virtual int minimalMeasurementDimension() const = 0;
 
     /**
      * sets the estimate to have a zero error, based on the current value of the
@@ -533,13 +539,9 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
 
     //! returns the dimensions of the error function
     [[nodiscard]] int dimension() const { return dimension_; }
+    [[nodiscard]] virtual int dimensionAtCompileTime() const = 0;
 
     virtual Vertex* createVertex(int) { return nullptr; }
-
-    //! read the vertex from a stream, i.e., the internal state of the vertex
-    virtual bool read(std::istream& is) = 0;
-    //! write the vertex to a stream
-    virtual bool write(std::ostream& os) const = 0;
 
     //! the internal ID of the edge
     [[nodiscard]] int64_t internalId() const { return internalId_; }
@@ -556,6 +558,9 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
     [[nodiscard]] const std::vector<int>& parameterIds() const {
       return parameterIds_;
     }
+
+    //! return the number of vertices at compile time
+    [[nodiscard]] virtual int numVerticesAtCompileTime() const { return -1; }
 
    protected:
     int dimension_ = -1;
@@ -687,18 +692,31 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
 
   //! load the graph from a stream. Uses the Factory singleton for creating the
   //! vertices and edges.
-  virtual bool load(std::istream& is);
-  bool load(const char* filename);
-  //! save the graph to a stream. Again uses the Factory system.
-  virtual bool save(std::ostream& os, int level = 0) const;
+  virtual bool load(std::istream& is, io::Format format = io::Format::kG2O);
+  bool load(const char* filename, io::Format format = io::Format::kG2O);
+  /**
+   * @brief Save the graph into a stream
+   *
+   * @param os Output stream. Note: Has to be opened with std::ios::binary for
+   * writing in binary format.
+   * @param format Format for saving the data, see also io::Format
+   * @param level Level of the graph to save
+   * @return true if successful
+   * @return false otherwise.
+   */
+  virtual bool save(std::ostream& os, io::Format format = io::Format::kG2O,
+                    int level = 0) const;
   //! function provided for convenience, see save() above
-  bool save(const char* filename, int level = 0) const;
+  bool save(const char* filename, io::Format format = io::Format::kG2O,
+            int level = 0) const;
 
   //! save a subgraph to a stream. Again uses the Factory system.
-  bool saveSubset(std::ostream& os, HyperGraph::VertexSet& vset, int level = 0);
+  bool saveSubset(std::ostream& os, HyperGraph::VertexSet& vset,
+                  io::Format format = io::Format::kG2O, int level = 0);
 
   //! save a subgraph to a stream. Again uses the Factory system.
-  bool saveSubset(std::ostream& os, HyperGraph::EdgeSet& eset);
+  bool saveSubset(std::ostream& os, HyperGraph::EdgeSet& eset,
+                  io::Format format = io::Format::kG2O);
 
   //! push the estimate of a subset of the variables onto a stack
   virtual void push(HyperGraph::VertexSet& vset);
@@ -776,7 +794,7 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
       const std::function<void(OptimizableGraph::Vertex*)>& fn);
 
  protected:
-  std::map<std::string, std::string> renamedTypesLookup_;
+  std::unordered_map<std::string, std::string> renamedTypesLookup_;
   int64_t nextEdgeId_;
   std::vector<HyperGraphActionSet> graphActions_;
 
@@ -786,16 +804,10 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
   void performActions(int iter, HyperGraphActionSet& actions);
 
   // helper functions to save an individual vertex
-  static bool saveVertex(std::ostream& os, Vertex* v);
-
-  // helper function to save an individual parameter
-  static bool saveParameter(std::ostream& os, Parameter* p);
+  static bool saveVertex(AbstractGraph& abstract_graph, Vertex* v);
 
   // helper functions to save an individual edge
-  static bool saveEdge(std::ostream& os, Edge* e);
-
-  // helper functions to save the data packets
-  static bool saveUserData(std::ostream& os, HyperGraph::Data* d);
+  static bool saveEdge(AbstractGraph& abstract_graph, Edge* e);
 };
 
 /**

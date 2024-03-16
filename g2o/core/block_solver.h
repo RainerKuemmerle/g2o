@@ -601,7 +601,7 @@ bool BlockSolver<Traits>::solve() {
   double* cp = coefficients_.get();
 
   double* xl = x_ + sizePoses_;
-  double* cl = coefficients_.get() + sizePoses_;
+  double* cl = cp + sizePoses_;
   double* bl = b_ + sizePoses_;
 
   // cp = -xp

@@ -30,6 +30,7 @@
 #include <iostream>
 #include <map>
 
+#include "g2o/stuff/macros.h"
 #include "g2o/stuff/sampler.h"
 
 using std::cerr;

@@ -269,7 +269,7 @@ class G2O_TYPES_SLAM3D_API SE3Quat {
 };
 
 inline std::ostream& operator<<(std::ostream& out_str, const SE3Quat& se3) {
-  out_str << se3.to_homogeneous_matrix() << std::endl;
+  out_str << se3.to_homogeneous_matrix() << '\n';
   return out_str;
 }
 
@@ -315,8 +315,6 @@ struct TypeTraits<SE3Quat> {
     res.fromMinimalVector(v);
     return res;
   }
-
-  static Type Identity() { return Type(); }
 };
 
 }  // namespace g2o

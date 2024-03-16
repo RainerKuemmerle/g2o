@@ -25,24 +25,17 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <Eigen/Core>
-#include <Eigen/StdVector>
-#include <cmath>
 #include <fstream>
 #include <iostream>
-#include <vector>
 
 #include "g2o/core/block_solver.h"
 #include "g2o/core/factory.h"
-#include "g2o/core/optimization_algorithm_gauss_newton.h"
 #include "g2o/core/optimization_algorithm_levenberg.h"
-#include "g2o/core/robust_kernel_impl.h"
 #include "g2o/core/solver.h"
 #include "g2o/core/sparse_optimizer.h"
-#include "g2o/solvers/dense/linear_solver_dense.h"
 #include "g2o/solvers/eigen/linear_solver_eigen.h"
 #include "g2o/types/sim3/types_seven_dof_expmap.h"
 #include "g2o/types/slam3d/edge_se3.h"
-#include "g2o/types/slam3d/types_slam3d.h"
 #include "g2o/types/slam3d/vertex_se3.h"
 
 G2O_USE_TYPE_GROUP(slam3d);
@@ -74,7 +67,7 @@ void ToVertexSE3(const g2o::VertexSim3Expmap& v_sim3,
   v_se3->setEstimate(se3);
 }
 
-// Converte EdgeSE3 to EdgeSim3
+// Convert EdgeSE3 to EdgeSim3
 void ToEdgeSim3(const g2o::EdgeSE3& e_se3, g2o::EdgeSim3* const e_sim3) {
   Eigen::Isometry3d se3 = e_se3.measurement().inverse();
   Eigen::Matrix3d r = se3.rotation();
@@ -86,18 +79,18 @@ void ToEdgeSim3(const g2o::EdgeSE3& e_se3, g2o::EdgeSim3* const e_sim3) {
 
 // Using VertexSim3 and EdgeSim3 is the core of this example.
 // This example optimize the data created by create_sphere.
-// Because the data is recore by VertexSE3 and EdgeSE3, SE3 is used for
+// Because the data is recorded by VertexSE3 and EdgeSE3, SE3 is used for
 // interface and Sim is used for optimization.
 // g2o_viewer is available to the result.
 
 int optimize_by_sim3(int argc, char** argv) {
   if (argc != 2) {
-    std::cout << "Usage: pose_graph_g2o_SE3 sphere.g2o" << std::endl;
+    std::cout << "Usage: pose_graph_g2o_SE3 sphere.g2o\n";
     return 1;
   }
   std::ifstream fin(argv[1]);
   if (!fin) {
-    std::cout << "file " << argv[1] << " does not exist." << std::endl;
+    std::cout << "file " << argv[1] << " does not exist.\n";
     return 1;
   }
 
@@ -149,11 +142,11 @@ int optimize_by_sim3(int argc, char** argv) {
     optimizer.addEdge(e_sim3);
   }
 
-  std::cout << "optimizing ..." << std::endl;
+  std::cout << "optimizing ...\n";
   optimizer.initializeOptimization();
   optimizer.optimize(30);
 
-  std::cout << "saving optimization results in VertexSE3..." << std::endl;
+  std::cout << "saving optimization results in VertexSE3...\n";
   auto vertices_sim3 = optimizer.vertices();
   auto vertices_se3 = interface.vertices();
 

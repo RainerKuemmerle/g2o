@@ -30,8 +30,6 @@
 #include <Eigen/Geometry>
 #include <cassert>
 
-#include "g2o/core/cache.h"
-#include "g2o/core/io_helper.h"
 #include "g2o/core/parameter.h"
 #include "g2o/types/slam3d/parameter_camera.h"
 #include "g2o/types/slam3d/vertex_pointxyz.h"
@@ -52,18 +50,6 @@ bool EdgeSE3PointXYZDepth::resolveCaches() {
   pv[0] = parameters_[0];
   cache_ = resolveCache<CacheCamera>(vertexXn<0>(), "CACHE_CAMERA", pv);
   return cache_ != nullptr;
-}
-
-bool EdgeSE3PointXYZDepth::read(std::istream& is) {
-  readParamIds(is);
-  internal::readVector(is, measurement_);  // measured keypoint
-  return readInformationMatrix(is);
-}
-
-bool EdgeSE3PointXYZDepth::write(std::ostream& os) const {
-  writeParamIds(os);
-  internal::writeVector(os, measurement());
-  return writeInformationMatrix(os);
 }
 
 void EdgeSE3PointXYZDepth::computeError() {
@@ -108,7 +94,7 @@ void EdgeSE3PointXYZDepth::linearizeOplus() {
 
   Jprime.block<3, 3>(0, 6) = cache_->w2l().rotation();
 
-  Jprime = cache_->camParams()->Kcam_inverseOffsetR() * Jprime;
+  Jprime = cache_->camParams()->param().KcamInverseOffsetR() * Jprime;
   Vector3 Zprime = cache_->w2i() * pt;
 
   JacType Jhom;
@@ -145,13 +131,13 @@ void EdgeSE3PointXYZDepth::initialEstimate(
 
   VertexSE3* cam = vertexXnRaw<0>();
   VertexPointXYZ* point = vertexXnRaw<1>();
-  const Eigen::Matrix<double, 3, 3, Eigen::ColMajor>& invKcam =
-      cache_->camParams()->invKcam();
+  const Matrix3& invKcam = cache_->camParams()->param().invKcam();
   Vector3 p;
   p(2) = measurement_(2);
   p.head<2>() = measurement_.head<2>() * p(2);
   p = invKcam * p;
-  point->setEstimate(cam->estimate() * (cache_->camParams()->offset() * p));
+  point->setEstimate(cam->estimate() *
+                     (cache_->camParams()->param().offset() * p));
 }
 
 }  // namespace g2o

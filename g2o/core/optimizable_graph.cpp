@@ -33,11 +33,16 @@
 #include <iostream>
 #include <iterator>
 #include <memory>
+#include <sstream>
 #include <utility>
+#include <vector>
 
 #include "cache.h"
 #include "factory.h"
+#include "g2o/core/abstract_graph.h"
+#include "g2o/core/eigen_types.h"
 #include "g2o/core/hyper_graph.h"
+#include "g2o/core/io/io_format.h"
 #include "g2o/core/jacobian_workspace.h"
 #include "g2o/core/parameter.h"
 #include "g2o/core/parameter_container.h"
@@ -51,7 +56,79 @@ namespace g2o {
 
 namespace {
 std::shared_ptr<OptimizableGraph::Vertex> kNonExistantVertex(nullptr);
+
+void saveUserData(AbstractGraph::AbstractGraphElement& graph_element,
+                  HyperGraph::Data* d) {
+  Factory* factory = Factory::instance();
+  while (d) {  // write the data packet for the vertex
+    const std::string tag = factory->tag(d);
+    if (!tag.empty()) {
+      std::stringstream buffer;
+      d->write(buffer);
+      graph_element.data.emplace_back(tag, buffer.str());
+    }
+    d = d->next().get();
+  }
 }
+
+bool saveParameter(AbstractGraph& abstract_graph, Parameter* p) {
+  Factory* factory = Factory::instance();
+  const std::string tag = factory->tag(p);
+  if (tag.empty()) return false;
+  std::vector<double> data;
+  p->getParameterData(data);
+  abstract_graph.parameters().emplace_back(tag, p->id(), data);
+  return true;
+}
+
+bool saveParameters(g2o::AbstractGraph& abstract_graph,
+                    const g2o::ParameterContainer& params) {
+  bool status = true;
+  for (const auto& param : params) {
+    status = saveParameter(abstract_graph, param.second.get()) && status;
+  }
+  return status;
+}
+
+// helper to add data to the graph
+void addDataToGraphElement(
+    std::shared_ptr<HyperGraph::DataContainer> previousDataContainer,
+    const std::vector<AbstractGraph::AbstractData>& data_vector) {
+  Factory* factory = Factory::instance();
+
+  HyperGraph::GraphElemBitset elemDataBitset;
+  elemDataBitset[HyperGraph::kHgetData] = true;
+  OptimizableGraph::Data* previousData = nullptr;
+  for (const auto& abstract_data : data_vector) {
+    const std::shared_ptr<HyperGraph::HyperGraphElement> element =
+        factory->construct(abstract_data.tag, elemDataBitset);
+    if (!element) {
+      G2O_WARN("{} could not be constructed as data", abstract_data.tag);
+      continue;
+    }
+    assert(element->elementType() == HyperGraph::kHgetData && "Should be data");
+    auto d = std::static_pointer_cast<OptimizableGraph::Data>(element);
+    std::stringstream buffer(abstract_data.data);
+    const bool r = d->read(buffer);
+    if (!r) {
+      G2O_ERROR("Error reading data {}", abstract_data.tag);
+      previousData = nullptr;
+    } else if (previousData) {
+      previousData->setNext(d);
+      d->setDataContainer(previousData->dataContainer());
+      previousData = d.get();
+    } else if (previousDataContainer) {
+      previousDataContainer->setUserData(d);
+      d->setDataContainer(previousDataContainer);
+      previousData = d.get();
+      previousDataContainer = nullptr;
+    } else {
+      G2O_ERROR("got data element, but no data container available");
+      previousData = nullptr;
+    }
+  }
+};
+}  // namespace
 
 using std::string;
 using std::vector;
@@ -141,12 +218,6 @@ void OptimizableGraph::Edge::setRobustKernel(
 }
 
 bool OptimizableGraph::Edge::resolveCaches() { return true; }
-
-bool OptimizableGraph::Edge::setMeasurementData(const double*) { return false; }
-
-bool OptimizableGraph::Edge::getMeasurementData(double*) const { return false; }
-
-int OptimizableGraph::Edge::measurementDimension() const { return -1; }
 
 bool OptimizableGraph::Edge::setMeasurementFromState() { return false; }
 
@@ -337,198 +408,166 @@ void OptimizableGraph::forEachVertex(
   }
 }
 
-bool OptimizableGraph::load(std::istream& is) {
-  std::set<string> warnedUnknownTypes;
-  std::stringstream currentLine;
-  string token;
-
+bool OptimizableGraph::load(std::istream& is, io::Format format) {
   Factory* factory = Factory::instance();
-  HyperGraph::GraphElemBitset elemBitset;
-  elemBitset[HyperGraph::kHgetParameter] = true;
-  elemBitset.flip();
 
+  g2o::AbstractGraph abstract_graph;
+  bool load_status = abstract_graph.load(is, format);
+  if (!load_status) {
+    G2O_ERROR("Failed to load graph");
+    return false;
+  }
+
+  if (!renamedTypesLookup_.empty()) {
+    abstract_graph.renameTags(renamedTypesLookup_);
+  }
+
+  // Create the parameters of the graph
   HyperGraph::GraphElemBitset elemParamBitset;
   elemParamBitset[HyperGraph::kHgetParameter] = true;
-
-  std::shared_ptr<HyperGraph::DataContainer> previousDataContainer;
-  Data* previousData = nullptr;
-
-  int lineNumber = 0;
-  while (true) {
-    const int bytesRead = readLine(is, currentLine);
-    lineNumber++;
-    if (bytesRead == -1) break;
-    currentLine >> token;
-    if (bytesRead == 0 || token.empty() || token[0] == '#') continue;
-
-    // handle commands encoded in the file
-    if (token == "FIX") {
-      int id;
-      while (currentLine >> id) {
-        auto v = vertex(id);
-        if (v) {
-#ifndef NDEBUG
-          G2O_DEBUG("Fixing vertex {}", v->id());
-#endif
-          v->setFixed(true);
-        } else {
-          G2O_WARN("Unable to fix vertex with id {}. Not found in the graph.",
-                   id);
-        }
-      }
-      continue;
-    }
-
-    // do the mapping to an internal type if it matches
-    if (!renamedTypesLookup_.empty()) {
-      auto foundIt = renamedTypesLookup_.find(token);
-      if (foundIt != renamedTypesLookup_.end()) {
-        token = foundIt->second;
-      }
-    }
-
-    if (!factory->knowsTag(token)) {
-      if (warnedUnknownTypes.count(token) != 1) {
-        warnedUnknownTypes.insert(token);
-        G2O_ERROR("Unknown type {}", token);
-      }
-      continue;
-    }
-
-    // first handle the parameters
+  for (const auto& abstract_param : abstract_graph.parameters()) {
     const std::shared_ptr<HyperGraph::HyperGraphElement> pelement =
-        factory->construct(token, elemParamBitset);
-    if (pelement) {  // not a parameter or otherwise unknown tag
-      assert(pelement->elementType() == HyperGraph::kHgetParameter &&
-             "Should be a param");
-      auto p = std::static_pointer_cast<Parameter>(pelement);
-      int pid;
-      currentLine >> pid;
-      p->setId(pid);
-      const bool r = p->read(currentLine);
-      if (!r) {
-        G2O_ERROR("reading data {} for parameter {} at line ", pid, lineNumber);
-      } else {
-        if (!parameters_.addParameter(p)) {
-          G2O_ERROR("Parameter of type: {} id: {} already defined at line {}",
-                    token, pid, lineNumber);
-        }
-      }
+        factory->construct(abstract_param.tag, elemParamBitset);
+    if (!pelement) {
+      G2O_WARN("{} could not be constructed as parameter", abstract_param.tag);
       continue;
     }
+    assert(pelement->elementType() == HyperGraph::kHgetParameter &&
+           "Should be a param");
+    auto p = std::static_pointer_cast<Parameter>(pelement);
+    p->setId(abstract_param.id);
+    if (!p->setParameterData(abstract_param.value)) {
+      G2O_WARN("{} could not set parameter data", abstract_param.tag);
+      continue;
+    }
+    if (!parameters_.addParameter(p)) {
+      G2O_ERROR("Parameter of type: {} id: {} already defined",
+                abstract_param.tag, abstract_param.id);
+    }
+  }
 
-    const std::shared_ptr<HyperGraph::HyperGraphElement> element =
-        factory->construct(token, elemBitset);
-    if (dynamic_cast<Vertex*>(element.get())) {  // it's a vertex type
-      previousData = nullptr;
-      auto v = std::static_pointer_cast<Vertex>(element);
-      int id;
-      currentLine >> id;
-      const bool r = v->read(currentLine);
-      if (!r)
-        G2O_ERROR("Error reading vertex {} {} at line {}", token, id,
-                  lineNumber);
-      v->setId(id);
-      if (!addVertex(v)) {
-        G2O_ERROR("Failure adding Vertex {} {} at line {}", token, id,
-                  lineNumber);
-      } else {
-        previousDataContainer = v;
-      }
-    } else if (dynamic_cast<Edge*>(element.get())) {
-      previousData = nullptr;
-      auto e = std::static_pointer_cast<Edge>(element);
-      const int numV = e->vertices().size();
+  // Create the vertices of the graph
+  HyperGraph::GraphElemBitset elemVertexBitset;
+  elemVertexBitset[HyperGraph::kHgetVertex] = true;
+  for (const auto& abstract_vertex : abstract_graph.vertices()) {
+    const std::shared_ptr<HyperGraph::HyperGraphElement> graph_element =
+        factory->construct(abstract_vertex.tag, elemVertexBitset);
+    if (!graph_element) {
+      G2O_WARN("{} could not be constructed as vertex", abstract_vertex.tag);
+      continue;
+    }
+    assert(graph_element->elementType() == HyperGraph::kHgetVertex &&
+           "Should be a vertex");
+    auto vertex = std::static_pointer_cast<Vertex>(graph_element);
+    vertex->setId(abstract_vertex.id);
+    vertex->setDimension(abstract_vertex.estimate.size());
+    if (!vertex->setEstimateData(abstract_vertex.estimate)) {
+      G2O_WARN("{} could not set estimate", abstract_vertex.tag);
+      continue;
+    }
+    if (!addVertex(vertex)) {
+      G2O_ERROR("Failure adding Vertex {} {}", abstract_vertex.tag,
+                abstract_vertex.id);
+    }
+    if (!abstract_vertex.data.empty())
+      addDataToGraphElement(vertex, abstract_vertex.data);
+  }
 
-      vector<int> ids;
-      if (!e->vertices().empty()) {
-        ids.resize(e->vertices().size());
-        for (int l = 0; l < numV; ++l) currentLine >> ids[l];
-      } else {
-        string buff;  // reading the IDs of a dynamically sized edge
-        while (currentLine >> buff) {
-          // TODO(rainer): reading/writing multi dynamically sized edges is a
-          // bad design. Get rid of writing || in the edges
-          if (buff == "||") break;
-          ids.push_back(stoi(buff));
-          currentLine >> buff;
+  // Create the edges of the graph
+  HyperGraph::GraphElemBitset elemEdgeBitset;
+  elemEdgeBitset[HyperGraph::kHgetEdge] = true;
+  for (const auto& abstract_edge : abstract_graph.edges()) {
+    const std::shared_ptr<HyperGraph::HyperGraphElement> graph_element =
+        factory->construct(abstract_edge.tag, elemEdgeBitset);
+    if (!graph_element) {
+      G2O_WARN("{} could not be constructed as edge", abstract_edge.tag);
+      continue;
+    }
+    assert(graph_element->elementType() == HyperGraph::kHgetEdge &&
+           "Should be an edge");
+    auto edge = std::static_pointer_cast<Edge>(graph_element);
+    edge->resize(abstract_edge.ids.size());
+    bool vertsOkay = true;
+    for (vector<int>::size_type l = 0; l < abstract_edge.ids.size(); ++l) {
+      const int vertexId = abstract_edge.ids[l];
+      if (vertexId != HyperGraph::kUnassignedId) {
+        auto v = vertex(vertexId);
+        if (!v) {
+          vertsOkay = false;
+          break;
         }
-        e->resize(numV);
-      }
-      bool vertsOkay = true;
-      for (vector<int>::size_type l = 0; l < ids.size(); ++l) {
-        const int vertexId = ids[l];
-        if (vertexId != HyperGraph::kUnassignedId) {
-          auto v = vertex(vertexId);
-          if (!v) {
-            vertsOkay = false;
-            break;
-          }
-          e->setVertex(l, v);
-        }
-      }
-      if (!vertsOkay) {
-        G2O_ERROR("Unable to find vertices for edge {} at line {} IDs: {}",
-                  token, lineNumber, fmt::join(ids, " "));
-        e = nullptr;
-      } else {
-        const bool r = e->read(currentLine);
-        if (!r || !addEdge(e)) {
-          G2O_ERROR("Unable to add edge {} at line {} IDs: {}", token,
-                    lineNumber, fmt::join(ids, " "));
-          e = nullptr;
-        }
-      }
-
-      previousDataContainer = e;
-    } else if (dynamic_cast<Data*>(element.get())) {  // reading in the data
-                                                      // packet for the vertex
-      auto d = std::static_pointer_cast<Data>(element);
-      const bool r = d->read(currentLine);
-      if (!r) {
-        G2O_ERROR("Error reading data {} at line {}", token, lineNumber);
-        previousData = nullptr;
-      } else if (previousData) {
-        previousData->setNext(d);
-        d->setDataContainer(previousData->dataContainer());
-        previousData = d.get();
-      } else if (previousDataContainer) {
-        previousDataContainer->setUserData(d);
-        d->setDataContainer(previousDataContainer);
-        previousData = d.get();
-        previousDataContainer = nullptr;
-      } else {
-        G2O_ERROR("got data element, but no data container available");
-        previousData = nullptr;
+        edge->setVertex(l, v);
       }
     }
-  }  // while read line
+    if (!vertsOkay) {
+      G2O_ERROR("Unable to find vertices for edge {} IDs: {}",
+                abstract_edge.tag, fmt::join(abstract_edge.ids, " "));
+      continue;
+    }
+    for (size_t i = 0; i < abstract_edge.param_ids.size(); ++i) {
+      edge->setParameterId(i, abstract_edge.param_ids[i]);
+    }
+    if (!edge->setMeasurementData(abstract_edge.measurement.data())) {
+      G2O_WARN("{} could not set measurement", abstract_edge.tag);
+      continue;
+    }
+    MatrixX::MapType information(edge->informationData(), edge->dimension(),
+                                 edge->dimension());
+    for (int r = 0, idx = 0; r < information.rows(); ++r)
+      for (int c = r; c < information.cols(); ++c) {
+        information(r, c) = abstract_edge.information[idx++];
+        if (r != c) information(c, r) = information(r, c);
+      }
+    if (!addEdge(edge)) {
+      G2O_ERROR("Failure adding Edge {} IDs {}", abstract_edge.tag,
+                fmt::join(abstract_edge.ids, " "));
+    }
+    if (!abstract_edge.data.empty())
+      addDataToGraphElement(edge, abstract_edge.data);
+  }
 
-#ifndef NDEBUG
-  G2O_DEBUG("Loaded {} parameters", parameters_.size());
-#endif
+  for (const auto fixed_vertex_id : abstract_graph.fixed()) {
+    auto v = vertex(fixed_vertex_id);
+    if (!v) {
+      G2O_WARN("Cannot fix vertex {}", fixed_vertex_id);
+      continue;
+    }
+    v->setFixed(true);
+  }
+
+  G2O_TRACE("Loaded {} parameters", parameters_.size());
+  G2O_TRACE("Loaded {} vertices", vertices_.size());
+  G2O_TRACE("Loaded {} edges", edges_.size());
 
   return true;
 }
 
-bool OptimizableGraph::load(const char* filename) {
-  std::ifstream ifs(filename);
+bool OptimizableGraph::load(const char* filename, io::Format format) {
+  std::ifstream ifs(filename, format == io::Format::kBinary
+                                  ? std::ios_base::in | std::ios::binary
+                                  : std::ios_base::in);
   if (!ifs) {
     G2O_ERROR("Unable to open file {}", filename);
     return false;
   }
-  return load(ifs);
+  return load(ifs, format);
 }
 
-bool OptimizableGraph::save(const char* filename, int level) const {
-  std::ofstream ofs(filename);
+bool OptimizableGraph::save(const char* filename, io::Format format,
+                            int level) const {
+  std::ofstream ofs(filename, format == io::Format::kBinary
+                                  ? std::ios_base::out | std::ios::binary
+                                  : std::ios_base::out);
   if (!ofs) return false;
-  return save(ofs, level);
+  return save(ofs, format, level);
 }
 
-bool OptimizableGraph::save(std::ostream& os, int level) const {
+bool OptimizableGraph::save(std::ostream& os, io::Format format,
+                            int level) const {
+  g2o::AbstractGraph abstract_graph;
+  bool status = saveParameters(abstract_graph, parameters_);
+
   // write the parameters to the top of the file
-  if (!parameters_.write(os)) return false;
   std::set<Vertex*, VertexIDCompare> verticesToSave;  // set sorted by ID
   for (const auto& it : edges()) {
     auto* e = static_cast<OptimizableGraph::Edge*>(it.get());
@@ -541,7 +580,7 @@ bool OptimizableGraph::save(std::ostream& os, int level) const {
     }
   }
 
-  for (auto* v : verticesToSave) saveVertex(os, v);
+  for (auto* v : verticesToSave) status &= saveVertex(abstract_graph, v);
 
   std::vector<std::shared_ptr<HyperGraph::Edge>> edgesToSave;
   std::copy_if(edges().begin(), edges().end(), std::back_inserter(edgesToSave),
@@ -550,16 +589,19 @@ bool OptimizableGraph::save(std::ostream& os, int level) const {
                  return (e->level() == level);
                });
   sort(edgesToSave.begin(), edgesToSave.end(), EdgeIDCompare());
-  for (const auto& e : edgesToSave) saveEdge(os, static_cast<Edge*>(e.get()));
+  for (const auto& e : edgesToSave)
+    status &= saveEdge(abstract_graph, static_cast<Edge*>(e.get()));
 
-  return os.good();
+  return abstract_graph.save(os, format) && status;
 }
 
 bool OptimizableGraph::saveSubset(std::ostream& os, HyperGraph::VertexSet& vset,
-                                  int level) {
-  if (!parameters_.write(os)) return false;
+                                  io::Format format, int level) {
+  g2o::AbstractGraph abstract_graph;
+  bool status = saveParameters(abstract_graph, parameters_);
 
-  for (const auto& v : vset) saveVertex(os, static_cast<Vertex*>(v.get()));
+  for (const auto& v : vset)
+    saveVertex(abstract_graph, static_cast<Vertex*>(v.get()));
 
   for (const auto& it : edges()) {
     auto* e = dynamic_cast<OptimizableGraph::Edge*>(it.get());
@@ -572,22 +614,25 @@ bool OptimizableGraph::saveSubset(std::ostream& os, HyperGraph::VertexSet& vset,
       }
     }
     if (!verticesInEdge) continue;
-    saveEdge(os, e);
+    status &= saveEdge(abstract_graph, e);
   }
-
-  return os.good();
+  return abstract_graph.save(os, format) && status;
 }
 
-bool OptimizableGraph::saveSubset(std::ostream& os, HyperGraph::EdgeSet& eset) {
-  if (!parameters_.write(os)) return false;
+bool OptimizableGraph::saveSubset(std::ostream& os, HyperGraph::EdgeSet& eset,
+                                  io::Format format) {
+  g2o::AbstractGraph abstract_graph;
+  bool status = saveParameters(abstract_graph, parameters_);
   HyperGraph::VertexSet vset;
   for (const auto& e : eset)
     for (const auto& v : e->vertices())
       if (v) vset.insert(v);
 
-  for (const auto& v : vset) saveVertex(os, static_cast<Vertex*>(v.get()));
-  for (const auto& e : eset) saveEdge(os, static_cast<Edge*>(e.get()));
-  return os.good();
+  for (const auto& v : vset)
+    status &= saveVertex(abstract_graph, static_cast<Vertex*>(v.get()));
+  for (const auto& e : eset)
+    status &= saveEdge(abstract_graph, static_cast<Edge*>(e.get()));
+  return abstract_graph.save(os, format) && status;
 }
 
 int OptimizableGraph::maxDimension() const {
@@ -702,63 +747,50 @@ bool OptimizableGraph::removePostIterationAction(
   return graphActions_[kAtPostiteration].erase(action) > 0;
 }
 
-bool OptimizableGraph::saveUserData(std::ostream& os, HyperGraph::Data* d) {
-  Factory* factory = Factory::instance();
-  while (d) {  // write the data packet for the vertex
-    const string tag = factory->tag(d);
-    if (!tag.empty()) {
-      os << tag << " ";
-      d->write(os);
-      os << '\n';
-    }
-    d = d->next().get();
-  }
-  return os.good();
-}
-
-bool OptimizableGraph::saveVertex(std::ostream& os,
+bool OptimizableGraph::saveVertex(AbstractGraph& abstract_graph,
                                   OptimizableGraph::Vertex* v) {
   Factory* factory = Factory::instance();
   const string tag = factory->tag(v);
-  if (!tag.empty()) {
-    os << tag << " " << v->id() << " ";
-    v->write(os);
-    os << '\n';
-    saveUserData(os, v->userData().get());
-    if (v->fixed()) {
-      os << "FIX " << v->id() << '\n';
-    }
-    return os.good();
+  if (tag.empty()) {
+    G2O_WARN("Got empty tag for vertex {} while saving", v->id());
+    return false;
   }
-  return false;
+  std::vector<double> vertex_estimate;
+  v->getEstimateData(vertex_estimate);
+  abstract_graph.vertices().emplace_back(tag, v->id(), vertex_estimate);
+  saveUserData(abstract_graph.vertices().back(), v->userData().get());
+  if (v->fixed()) {
+    abstract_graph.fixed().push_back(v->id());
+  }
+  return true;
 }
 
-bool OptimizableGraph::saveParameter(std::ostream& os, Parameter* p) {
-  Factory* factory = Factory::instance();
-  const string tag = factory->tag(p);
-  if (!tag.empty()) {
-    os << tag << " " << p->id() << " ";
-    p->write(os);
-    os << '\n';
-  }
-  return os.good();
-}
-
-bool OptimizableGraph::saveEdge(std::ostream& os, OptimizableGraph::Edge* e) {
+bool OptimizableGraph::saveEdge(AbstractGraph& abstract_graph,
+                                OptimizableGraph::Edge* e) {
   Factory* factory = Factory::instance();
   const string tag = factory->tag(e);
-  if (!tag.empty()) {
-    os << tag << " ";
-    for (auto& it : e->vertices()) {
-      const int vertexId = it ? it->id() : HyperGraph::kUnassignedId;
-      os << vertexId << " ";
-    }
-    e->write(os);
-    os << '\n';
-    saveUserData(os, e->userData().get());
-    return os.good();
+  if (tag.empty()) {
+    G2O_WARN("Got empty tag for edge while saving");
+    return false;
   }
-  return false;
+  std::vector<int> ids;
+  ids.reserve(e->vertices().size());
+  for (const auto& vertex : e->vertices()) {
+    ids.push_back(vertex ? vertex->id() : HyperGraph::kUnassignedId);
+  }
+  std::vector<double> data(e->measurementDimension());
+  e->getMeasurementData(data.data());
+  MatrixX::MapType information(e->informationData(), e->dimension(),
+                               e->dimension());
+  std::vector<double> upper_triangle;
+  upper_triangle.reserve((e->dimension() * (e->dimension() + 1)) / 2);
+  for (int r = 0; r < e->dimension(); ++r)
+    for (int c = r; c < e->dimension(); ++c)
+      upper_triangle.push_back(information(r, c));
+  abstract_graph.edges().emplace_back(tag, ids, data, upper_triangle,
+                                      e->parameterIds());
+  saveUserData(abstract_graph.edges().back(), e->userData().get());
+  return true;
 }
 
 void OptimizableGraph::clear() {

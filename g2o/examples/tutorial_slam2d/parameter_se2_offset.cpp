@@ -30,25 +30,7 @@
 
 namespace g2o::tutorial {
 
-void ParameterSE2Offset::setOffset(const SE2& offset) {
-  offset_ = offset;
-  inverseOffset_ = offset.inverse();
-}
-
-bool ParameterSE2Offset::read(std::istream& is) {
-  double x;
-  double y;
-  double th;
-  is >> x >> y >> th;
-  setOffset(SE2(x, y, th));
-  return true;
-}
-
-bool ParameterSE2Offset::write(std::ostream& os) const {
-  os << offset_.translation().x() << " " << offset_.translation().y() << " "
-     << offset_.rotation().angle();
-  return os.good();
-}
+void ParameterSE2Offset::update() { inverseOffset_ = param().inverse(); }
 
 void CacheSE2Offset::updateImpl() {
 #ifndef NDEBUG

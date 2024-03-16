@@ -26,14 +26,8 @@
 
 #include "parameter_container.h"
 
-#include <cassert>
-#include <iostream>
 #include <utility>
 
-#include "factory.h"
-#include "g2o/core/hyper_graph.h"
-#include "g2o/stuff/logger.h"
-#include "g2o/stuff/string_tools.h"
 #include "parameter.h"
 
 namespace g2o {
@@ -58,63 +52,6 @@ std::shared_ptr<Parameter> ParameterContainer::detachParameter(int id) {
   std::shared_ptr<Parameter> p = std::move(it->second);
   erase(it);
   return p;
-}
-
-bool ParameterContainer::write(std::ostream& os) const {
-  Factory* factory = Factory::instance();
-  for (const auto& it : *this) {
-    os << factory->tag(it.second.get()) << " ";
-    os << it.second->id() << " ";
-    it.second->write(os);
-    os << '\n';
-  }
-  return true;
-}
-
-bool ParameterContainer::read(
-    std::istream& is,
-    const std::map<std::string, std::string>* renamedTypesLookup) {
-  std::stringstream currentLine;
-  std::string token;
-
-  Factory* factory = Factory::instance();
-  HyperGraph::GraphElemBitset elemBitset;
-  elemBitset[HyperGraph::kHgetParameter] = true;
-
-  while (true) {
-    const int bytesRead = readLine(is, currentLine);
-    if (bytesRead == -1) break;
-    currentLine >> token;
-    if (bytesRead == 0 || token.empty() || token[0] == '#') continue;
-    if (renamedTypesLookup && !renamedTypesLookup->empty()) {
-      auto foundIt = renamedTypesLookup->find(token);
-      if (foundIt != renamedTypesLookup->end()) {
-        token = foundIt->second;
-      }
-    }
-
-    const std::shared_ptr<HyperGraph::HyperGraphElement> element =
-        factory->construct(token, elemBitset);
-    if (!element)  // not a parameter or otherwise unknown tag
-      continue;
-    assert(element->elementType() == HyperGraph::kHgetParameter &&
-           "Should be a param");
-
-    auto p = std::static_pointer_cast<Parameter>(element);
-    int pid;
-    currentLine >> pid;
-    p->setId(pid);
-    const bool r = p->read(currentLine);
-    if (!r) {
-      G2O_ERROR("Error reading data {} for parameter {}", token, pid);
-    } else {
-      if (!addParameter(p)) {
-        G2O_ERROR("Parameter of type: {} id: {} already defined", token, pid);
-      }
-    }
-  }  // while read line
-
-  return true;
 }
 
 }  // namespace g2o

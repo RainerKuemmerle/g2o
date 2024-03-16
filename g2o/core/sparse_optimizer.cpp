@@ -298,13 +298,6 @@ bool SparseOptimizer::initializeOptimization(HyperGraph::EdgeSet& eset) {
   return indexMappingStatus;
 }
 
-void SparseOptimizer::setToOrigin() {
-  for (auto& it : vertices()) {
-    auto* v = static_cast<OptimizableGraph::Vertex*>(it.second.get());
-    v->setToOrigin();
-  }
-}
-
 void SparseOptimizer::computeInitialGuess() {
   EstimatePropagator::PropagateCost costFunction(this);
   computeInitialGuess(costFunction);

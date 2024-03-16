@@ -34,20 +34,14 @@
 #include <climits>
 #include <cmath>
 #include <cstring>
-#include <iosfwd>
-#include <limits>
 #include <stack>
 #include <vector>
 
 #include "g2o/core/eigen_types.h"
-#include "g2o/core/io_helper.h"
 #include "g2o/core/type_traits.h"
 #include "optimizable_graph.h"
 
 namespace g2o {
-template <int D, typename T>
-class BaseVertex;
-
 #define G2O_VERTEX_DIM ((D == Eigen::Dynamic) ? dimension_ : D)
 
 /**
@@ -64,7 +58,7 @@ template <int D, typename T>
 class BaseVertex : public OptimizableGraph::Vertex {
  public:
   using EstimateType = T;
-  using BackupStackType = std::stack<EstimateType, std::vector<EstimateType> >;
+  using BackupStackType = std::stack<EstimateType, std::vector<EstimateType>>;
 
   static const int kDimension =
       D;  ///< dimension of the estimate (minimal) in the manifold space
@@ -97,9 +91,7 @@ class BaseVertex : public OptimizableGraph::Vertex {
 
   void clearQuadraticForm() final { b_.setZero(); }
 
-  //! updates the current vertex with the direct solution x += H_ii\b_ii
-  //! @returns the determinant of the inverted hessian
-  double solveDirect(double lambda = 0) override;
+  bool solveDirect(double lambda = 0) override;
 
   //! return right hand side b of the constructed linear system
   BVector& b() { return b_; }
@@ -129,49 +121,38 @@ class BaseVertex : public OptimizableGraph::Vertex {
     updateCache();
   }
 
-  //! generic read based on Trait reading a vector
-  bool read(std::istream& is) override {
-    typename TypeTraits<EstimateType>::VectorType estimate_data;
-    bool state = internal::readVector(is, estimate_data);
-    setEstimate(TypeTraits<EstimateType>::fromVector(estimate_data));
-    return state;
-  }
-
-  //! generic write  based on Trait reading a vector
-  bool write(std::ostream& os) const override {
-    return internal::writeVector(
-        os, TypeTraits<EstimateType>::toVector(estimate()));
-  }
-
-  // methods based on the traits interface
-  void setToOriginImpl() final {
-    setEstimate(TypeTraits<EstimateType>::Identity());
-  }
-
   bool setEstimateData(const double* est) final {
+    if (est == nullptr) return false;
     static_assert(TypeTraits<EstimateType>::kVectorDimension != INT_MIN,
                   "Forgot to implement TypeTrait for your Estimate");
     typename TypeTraits<EstimateType>::VectorType::ConstMapType aux(
         est, DimensionTraits<EstimateType>::dimension(estimate_));
-    estimate_ = TypeTraits<EstimateType>::fromVector(aux);
-    updateCache();
+    setEstimate(TypeTraits<EstimateType>::fromVector(aux));
     return true;
   }
+  using OptimizableGraph::Vertex::setEstimateData;
 
   bool getEstimateData(double* est) const final {
+    if (est == nullptr) return false;
     static_assert(TypeTraits<EstimateType>::kVectorDimension != INT_MIN,
                   "Forgot to implement TypeTrait for your Estimate");
     TypeTraits<EstimateType>::toData(estimate(), est);
     return true;
   }
+  using OptimizableGraph::Vertex::getEstimateData;
 
   [[nodiscard]] int estimateDimension() const final {
     static_assert(TypeTraits<EstimateType>::kVectorDimension != INT_MIN,
                   "Forgot to implement TypeTrait for your Estimate");
+    return DimensionTraits<EstimateType>::dimension(estimate_);
+  }
+
+  [[nodiscard]] int estimateDimensionAtCompileTime() const override {
     return TypeTraits<EstimateType>::kVectorDimension;
   }
 
   bool setMinimalEstimateData(const double* est) final {
+    if (est == nullptr) return false;
     static_assert(TypeTraits<EstimateType>::kMinimalVectorDimension != INT_MIN,
                   "Forgot to implement TypeTrait for your Estimate");
     typename TypeTraits<EstimateType>::MinimalVectorType::ConstMapType aux(
@@ -179,18 +160,21 @@ class BaseVertex : public OptimizableGraph::Vertex {
     setEstimate(TypeTraits<EstimateType>::fromMinimalVector(aux));
     return true;
   }
+  using OptimizableGraph::Vertex::setMinimalEstimateData;
 
   bool getMinimalEstimateData(double* est) const final {
+    if (est == nullptr) return false;
     static_assert(TypeTraits<EstimateType>::kMinimalVectorDimension != INT_MIN,
                   "Forgot to implement TypeTrait for your Estimate");
     TypeTraits<EstimateType>::toMinimalData(estimate(), est);
     return true;
   }
+  using OptimizableGraph::Vertex::getMinimalEstimateData;
 
   [[nodiscard]] int minimalEstimateDimension() const final {
     static_assert(TypeTraits<EstimateType>::kMinimalVectorDimension != INT_MIN,
                   "Forgot to implement TypeTrait for your Estimate");
-    return TypeTraits<EstimateType>::kMinimalVectorDimension;
+    return DimensionTraits<EstimateType>::minimalDimension(estimate_);
   }
 
  protected:
@@ -198,8 +182,6 @@ class BaseVertex : public OptimizableGraph::Vertex {
   BVector b_;
   EstimateType estimate_;
   BackupStackType backup_;
-
- public:
 };
 
 template <int D, typename T>
@@ -209,17 +191,19 @@ BaseVertex<D, T>::BaseVertex()
 }
 
 template <int D, typename T>
-double BaseVertex<D, T>::solveDirect(double lambda) {
-  Eigen::Matrix<double, D, D, Eigen::ColMajor> tempA =
-      hessian_ + Eigen::Matrix<double, D, D, Eigen::ColMajor>::Identity(
-                     G2O_VERTEX_DIM, G2O_VERTEX_DIM) *
-                     lambda;
-  double det = tempA.determinant();
-  if (std::isnan(det) || det < std::numeric_limits<double>::epsilon())
-    return det;
-  BVector dx = tempA.llt().solve(b_);
+bool BaseVertex<D, T>::solveDirect(double lambda) {
+  const MatrixN<D> tempA =
+      (abs(lambda) < 1e-10)
+          ? hessian_
+          : (hessian_ +
+             MatrixN<D>(
+                 VectorN<D>::Constant(G2O_VERTEX_DIM, lambda).asDiagonal()))
+                .eval();
+  Eigen::LLT<MatrixN<D>> cholesky(tempA);
+  if (cholesky.info() != Eigen::ComputationInfo::Success) return false;
+  BVector dx = cholesky.solve(b_);
   oplus(VectorX::MapType(dx.data(), dx.size()));
-  return det;
+  return true;
 }
 
 template <int D, typename T>

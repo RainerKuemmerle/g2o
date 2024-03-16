@@ -156,8 +156,6 @@ struct TypeTraits<SE2> {
   static Type fromMinimalVector(const Eigen::DenseBase<Derived>& v) {
     return SE2(v[0], v[1], v[2]);
   }
-
-  static Type Identity() { return SE2(); }
 };
 
 }  // namespace g2o

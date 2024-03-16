@@ -27,8 +27,6 @@
 #ifndef G2O_SBA_VERTEXSE3EXPMAP_H
 #define G2O_SBA_VERTEXSE3EXPMAP_H
 
-#include <iosfwd>
-
 #include "g2o/core/base_vertex.h"
 #include "g2o/core/eigen_types.h"
 #include "g2o/types/slam3d/se3quat.h"
@@ -42,10 +40,6 @@ namespace g2o {
  */
 class G2O_TYPES_SBA_API VertexSE3Expmap : public BaseVertex<6, SE3Quat> {
  public:
-  //! special implementation of reading
-  bool read(std::istream& is) override;
-  //! special implementation of writing
-  bool write(std::ostream& os) const override;
   void oplusImpl(const VectorX::MapType& update) override;
 };
 

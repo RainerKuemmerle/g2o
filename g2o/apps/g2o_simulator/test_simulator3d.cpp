@@ -24,14 +24,20 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include <cstdlib>
 #include <fstream>
 #include <iostream>
 
+#include "g2o/apps/g2o_simulator/sensor_odometry3d.h"
+#include "g2o/apps/g2o_simulator/sensor_pointxyz.h"
+#include "g2o/apps/g2o_simulator/sensor_pointxyz_depth.h"
+#include "g2o/apps/g2o_simulator/sensor_pointxyz_disparity.h"
+#include "g2o/apps/g2o_simulator/sensor_pose3d.h"
+#include "g2o/apps/g2o_simulator/simulator.h"
+#include "g2o/apps/g2o_simulator/simulator3d_base.h"
 #include "g2o/core/optimizable_graph.h"
 #include "g2o/stuff/command_args.h"
 #include "g2o/stuff/sampler.h"
-#include "simulator3d.h"
+#include "g2o/types/slam3d/parameter_camera.h"
 
 // #define _POSE_SENSOR_OFFSET
 // #define _POSE_PRIOR_SENSOR
@@ -106,7 +112,7 @@ int main(int argc, char** argv) {
     pointSensor->setMaxRange(2.);
     cameraPose = R;
     cameraPose.translation() = g2o::Vector3(0., 0., 0.3);
-    pointSensor->offsetParam()->setOffset(cameraPose);
+    pointSensor->offsetParam()->setParam(cameraPose);
     ss << "-pointXYZ";
   }
 
@@ -116,12 +122,10 @@ int main(int argc, char** argv) {
     disparitySensor->setMinRange(0.5);
     disparitySensor->setMaxRange(2.);
     robot.addSensor(disparitySensor);
-    Eigen::Isometry3d cameraPose;
-    Eigen::Matrix3d R;
-    R << 0, 0, 1, -1, 0, 0, 0, -1, 0;
-    cameraPose = R;
-    cameraPose.translation() = g2o::Vector3(0., 0., 0.3);
-    disparitySensor->offsetParam()->setOffset(cameraPose);
+    g2o::CameraWithOffset cameraPose;
+    cameraPose.offset().linear() << 0, 0, 1, -1, 0, 0, 0, -1, 0;
+    cameraPose.offset().translation() = g2o::Vector3(0., 0., 0.3);
+    disparitySensor->offsetParam()->setParam(cameraPose);
     ss << "-disparity";
   }
 
@@ -131,12 +135,10 @@ int main(int argc, char** argv) {
     depthSensor->setMinRange(0.5);
     depthSensor->setMaxRange(2.);
     robot.addSensor(depthSensor);
-    Eigen::Isometry3d cameraPose;
-    Eigen::Matrix3d R;
-    R << 0, 0, 1, -1, 0, 0, 0, -1, 0;
-    cameraPose = R;
-    cameraPose.translation() = g2o::Vector3(0., 0., 0.3);
-    depthSensor->offsetParam()->setOffset(cameraPose);
+    g2o::CameraWithOffset cameraPose;
+    cameraPose.offset().linear() << 0, 0, 1, -1, 0, 0, 0, -1, 0;
+    cameraPose.offset().translation() = g2o::Vector3(0., 0., 0.3);
+    depthSensor->offsetParam()->setParam(cameraPose);
     ss << "-depth";
   }
 
