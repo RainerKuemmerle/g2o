@@ -26,6 +26,8 @@
 
 #include <cassert>
 
+#include "g2o/core/eigen_types.h"
+
 namespace g2o {
 
 template <class MatrixType>
@@ -364,15 +366,15 @@ void SparseBlockMatrix<MatrixType>::scale(double a_) {
 template <class MatrixType>
 SparseBlockMatrix<MatrixType>* SparseBlockMatrix<MatrixType>::slice(
     int rmin, int rmax, int cmin, int cmax, bool alloc) const {
-  int m = rmax - rmin;
-  int n = cmax - cmin;
-  int rowIdx[m];
+  const int m = rmax - rmin;
+  const int n = cmax - cmin;
+  VectorX rowIdx(m);
   rowIdx[0] = rowsOfBlock(rmin);
   for (int i = 1; i < m; ++i) {
     rowIdx[i] = rowIdx[i - 1] + rowsOfBlock(rmin + i);
   }
 
-  int colIdx[n];
+  VectorX colIdx(n);
   colIdx[0] = colsOfBlock(cmin);
   for (int i = 1; i < n; ++i) {
     colIdx[i] = colIdx[i - 1] + colsOfBlock(cmin + i);
