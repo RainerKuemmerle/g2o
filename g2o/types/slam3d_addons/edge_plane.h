@@ -41,22 +41,11 @@ class G2O_TYPES_SLAM3D_ADDONS_API EdgePlane
  public:
   EdgePlane();
 
-  void computeError() override {
-    auto* v1 = vertexXnRaw<0>();
-    auto* v2 = vertexXnRaw<1>();
-    error_ =
-        (v2->estimate().toVector() - v1->estimate().toVector()) - measurement_;
-  }
+  void computeError() override;
 
-  void setMeasurement(const Vector4& m) override { measurement_ = m; }
+  void setMeasurement(const Vector4& m) override;
 
-  bool setMeasurementFromState() override {
-    auto* v1 = vertexXnRaw<0>();
-    auto* v2 = vertexXnRaw<1>();
-    measurement_ = (v2->estimate().toVector()) - v1->estimate().toVector();
-
-    return true;
-  }
+  bool setMeasurementFromState() override;
 
 #if 0
     virtual void linearizeOplus();

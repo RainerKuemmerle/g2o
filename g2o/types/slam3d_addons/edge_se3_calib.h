@@ -27,9 +27,10 @@
 #ifndef G2O_EDGE_SE3_CALIB_H
 #define G2O_EDGE_SE3_CALIB_H
 
-#include "g2o/core/base_variable_sized_edge.h"
+#include "g2o/core/base_fixed_sized_edge.h"
 #include "g2o/core/eigen_types.h"
 #include "g2o/types/slam3d/type_traits_isometry3.h"  // IWYU pragma: keep
+#include "g2o/types/slam3d/vertex_se3.h"
 #include "g2o_types_slam3d_addons_api.h"
 
 namespace g2o {
@@ -38,12 +39,8 @@ namespace g2o {
  * measurement
  */
 class EdgeSE3Calib
-    : public BaseVariableSizedEdge<6, Isometry3>  // Avoid redefinition of
-                                                  // BaseEdge in MSVC
-{
+    : public BaseFixedSizedEdge<6, Isometry3, VertexSE3, VertexSE3, VertexSE3> {
  public:
-  G2O_TYPES_SLAM3D_ADDONS_API EdgeSE3Calib();
-
   G2O_TYPES_SLAM3D_ADDONS_API void computeError() override;
 };
 

@@ -29,16 +29,13 @@
 #include <Eigen/Geometry>
 
 #include "g2o/types/slam3d/isometry3d_mappings.h"
-#include "g2o/types/slam3d/vertex_se3.h"
 
 namespace g2o {
 
-EdgeSE3Calib::EdgeSE3Calib() { resize(3); }
-
 void EdgeSE3Calib::computeError() {
-  const auto* v1 = static_cast<const VertexSE3*>(vertexRaw(0));
-  const auto* v2 = static_cast<const VertexSE3*>(vertexRaw(1));
-  const auto* calib = static_cast<const VertexSE3*>(vertexRaw(2));
+  const VertexSE3* v1 = vertexXnRaw<0>();
+  const VertexSE3* v2 = vertexXnRaw<1>();
+  const VertexSE3* calib = vertexXnRaw<2>();
   error_ = g2o::internal::toVectorMQT(
       measurement_.inverse() * calib->estimate().inverse() *
       v1->estimate().inverse() * v2->estimate() * calib->estimate());
