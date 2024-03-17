@@ -36,8 +36,6 @@
 #include "g2o_types_slam3d_addons_api.h"
 
 namespace g2o {
-template <typename T>
-struct TypeTraits;
 
 using Matrix6x4 = Eigen::Matrix<double, 6, 4>;
 
@@ -50,135 +48,34 @@ struct OrthonormalLine3D {
     U = Matrix3::Identity();
   }
 };
-using OrthonormalLine3D = struct OrthonormalLine3D;
 
-class Line3D : public Vector6 {
+class G2O_TYPES_SLAM3D_ADDONS_API Line3D {
  public:
-  G2O_TYPES_SLAM3D_ADDONS_API friend Line3D operator*(const Isometry3& t,
-                                                      const Line3D& line);
+  Vector6 line;
 
-  G2O_TYPES_SLAM3D_ADDONS_API Line3D() {
-    *this << 0.0, 0.0, 0.0, 1.0, 0.0, 0.0;
-  }
+  friend Line3D operator*(const Isometry3& t, const Line3D& line);
 
-  G2O_TYPES_SLAM3D_ADDONS_API explicit Line3D(const Vector6& v) {
-    static_cast<Vector6&>(*this) = v;
-  }
+  Line3D();
 
-  G2O_TYPES_SLAM3D_ADDONS_API [[nodiscard]] Vector6 toCartesian() const;
+  explicit Line3D(const Vector6& v);
 
-  G2O_TYPES_SLAM3D_ADDONS_API [[nodiscard]] inline Vector3 w() const {
-    return head<3>();
-  }
+  [[nodiscard]] Vector6 toCartesian() const;
+  static Line3D fromCartesian(const Vector6& cart);
 
-  G2O_TYPES_SLAM3D_ADDONS_API [[nodiscard]] inline Vector3 d() const {
-    return tail<3>();
-  }
+  [[nodiscard]] Vector3 w() const { return line.head<3>(); }
+  void setW(const Vector3& w_);
 
-  G2O_TYPES_SLAM3D_ADDONS_API inline void setW(const Vector3& w_) {
-    head<3>() = w_;
-  }
+  [[nodiscard]] Vector3 d() const { return line.tail<3>(); }
+  void setD(const Vector3& d_);
 
-  G2O_TYPES_SLAM3D_ADDONS_API inline void setD(const Vector3& d_) {
-    tail<3>() = d_;
-  }
+  [[nodiscard]] OrthonormalLine3D toOrthonormal() const;
+  static Line3D fromOrthonormal(const OrthonormalLine3D& ortho);
 
-  G2O_TYPES_SLAM3D_ADDONS_API static inline Line3D fromCartesian(
-      const Vector6& cart) {
-    Line3D l;
-    Vector3 _p = cart.head<3>();
-    Vector3 _d = cart.tail<3>() * 1.0 / cart.tail<3>().norm();
-    _p -= _d * (_d.dot(_p));
-    l.setW(_p.cross(_p + _d));
-    l.setD(_d);
-    return l;
-  }
+  void normalize();
+  [[nodiscard]] Line3D normalized() const;
 
-  G2O_TYPES_SLAM3D_ADDONS_API static inline Line3D fromOrthonormal(
-      const OrthonormalLine3D& ortho) {
-    Vector3 w;
-    w.x() = ortho.U(0, 0) * ortho.W(0, 0);
-    w.y() = ortho.U(1, 0) * ortho.W(0, 0);
-    w.z() = ortho.U(2, 0) * ortho.W(0, 0);
-
-    Vector3 d;
-    d.x() = ortho.U(0, 1) * ortho.W(1, 0);
-    d.y() = ortho.U(1, 1) * ortho.W(1, 0);
-    d.z() = ortho.U(2, 1) * ortho.W(1, 0);
-
-    Line3D l;
-    l.setW(w);
-    l.setD(d);
-    l.normalize();
-
-    return l;
-  }
-
-  G2O_TYPES_SLAM3D_ADDONS_API static inline OrthonormalLine3D toOrthonormal(
-      const Line3D& line) {
-    OrthonormalLine3D ortho;
-
-    Vector2 mags;
-    mags << line.d().norm(), line.w().norm();
-
-    double wn = 1.0 / mags.norm();
-    ortho.W << mags.y() * wn, -mags.x() * wn, mags.x() * wn, mags.y() * wn;
-
-    double mn = 1.0 / mags.y();
-    double dn = 1.0 / mags.x();
-    Vector3 mdcross;
-    mdcross = line.w().cross(line.d());
-    double mdcrossn = 1.0 / mdcross.norm();
-    ortho.U << line.w().x() * mn, line.d().x() * dn, mdcross.x() * mdcrossn,
-        line.w().y() * mn, line.d().y() * dn, mdcross.y() * mdcrossn,
-        line.w().z() * mn, line.d().z() * dn, mdcross.z() * mdcrossn;
-
-    return ortho;
-  }
-
-  G2O_TYPES_SLAM3D_ADDONS_API inline void normalize() {
-    double n = 1.0 / d().norm();
-    (*this) *= n;
-  }
-
-  G2O_TYPES_SLAM3D_ADDONS_API [[nodiscard]] inline Line3D normalized() const {
-    return Line3D(Vector6(*this) * (1.0 / d().norm()));
-  }
-
-  G2O_TYPES_SLAM3D_ADDONS_API inline void oplus(const Vector4& v) {
-    OrthonormalLine3D ortho_estimate = toOrthonormal(*this);
-    OrthonormalLine3D ortho_update;
-    ortho_update.W << std::cos(v[3]), -std::sin(v[3]), std::sin(v[3]),
-        std::cos(v[3]);
-    Quaternion quat(std::sqrt(1 - v.head<3>().squaredNorm()), v[0], v[1], v[2]);
-    quat.normalize();
-    ortho_update.U = quat.toRotationMatrix();
-
-    ortho_estimate.U = ortho_estimate.U * ortho_update.U;
-    ortho_estimate.W = ortho_estimate.W * ortho_update.W;
-
-    *this = fromOrthonormal(ortho_estimate);
-    this->normalize();
-  }
-
-  G2O_TYPES_SLAM3D_ADDONS_API [[nodiscard]] inline Vector4 ominus(
-      const Line3D& line) const {
-    OrthonormalLine3D ortho_estimate = toOrthonormal(*this);
-    OrthonormalLine3D ortho_line = toOrthonormal(line);
-
-    Matrix2 W_delta = ortho_estimate.W.transpose() * ortho_line.W;
-    Matrix3 U_delta = ortho_estimate.U.transpose() * ortho_line.U;
-
-    Vector4 delta;
-    Quaternion q(U_delta);
-    q.normalize();
-    delta[0] = q.x();
-    delta[1] = q.y();
-    delta[2] = q.z();
-    delta[3] = std::atan2(W_delta(1, 0), W_delta(0, 0));
-
-    return delta;
-  }
+  void oplus(const Vector4& v);
+  [[nodiscard]] Vector4 ominus(const Line3D& line) const;
 };
 
 G2O_TYPES_SLAM3D_ADDONS_API Line3D operator*(const Isometry3& t,
@@ -191,18 +88,11 @@ G2O_TYPES_SLAM3D_ADDONS_API Vector6 transformCartesianLine(const Isometry3& t,
 
 G2O_TYPES_SLAM3D_ADDONS_API Vector6 normalizeCartesianLine(const Vector6& line);
 
-static inline double mline_elevation(const double v[3]) {
-  return std::atan2(v[2], sqrt(v[0] * v[0] + v[1] * v[1]));
-}
+G2O_TYPES_SLAM3D_ADDONS_API double mline_elevation(const double v[3]);
 
-G2O_TYPES_SLAM3D_ADDONS_API inline double getAzimuth(const Vector3& direction) {
-  return std::atan2(direction.y(), direction.x());
-}
+G2O_TYPES_SLAM3D_ADDONS_API double getAzimuth(const Vector3& direction);
 
-G2O_TYPES_SLAM3D_ADDONS_API inline double getElevation(
-    const Vector3& direction) {
-  return std::atan2(direction.z(), direction.head<2>().norm());
-}
+G2O_TYPES_SLAM3D_ADDONS_API double getElevation(const Vector3& direction);
 
 }  // namespace internal
 
@@ -211,23 +101,23 @@ struct TypeTraits<Line3D> {
   enum {
     kVectorDimension = 6,
     kMinimalVectorDimension = 6,
-    kIsVector = 1,
+    kIsVector = 0,
     kIsScalar = 0,
   };
   using Type = Line3D;
   using VectorType = VectorN<kVectorDimension>;
   using MinimalVectorType = VectorN<kMinimalVectorDimension>;
 
-  static VectorType toVector(const Type& t) { return t; }
+  static VectorType toVector(const Type& t) { return t.line; }
   static void toData(const Type& t, double* data) {  // NOLINT
     typename VectorType::MapType v(data, kVectorDimension);
-    v = t;
+    v = t.line;
   }
 
-  static MinimalVectorType toMinimalVector(const Type& t) { return t; }
+  static MinimalVectorType toMinimalVector(const Type& t) { return t.line; }
   static void toMinimalData(const Type& t, double* data) {  // NOLINT
     typename MinimalVectorType::MapType v(data, kMinimalVectorDimension);
-    v = t;
+    v = t.line;
   }
 
   template <typename Derived>
