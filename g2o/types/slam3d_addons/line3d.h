@@ -53,8 +53,6 @@ class G2O_TYPES_SLAM3D_ADDONS_API Line3D {
  public:
   Vector6 line;
 
-  friend Line3D operator*(const Isometry3& t, const Line3D& line);
-
   Line3D();
 
   explicit Line3D(const Vector6& v);
