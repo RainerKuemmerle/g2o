@@ -27,8 +27,6 @@
 #ifndef G2O_EDGE_SE2_SEGMENT2D_H
 #define G2O_EDGE_SE2_SEGMENT2D_H
 
-#include <Eigen/Core>
-
 #include "g2o/core/base_binary_edge.h"
 #include "g2o/core/eigen_types.h"
 #include "g2o/core/optimizable_graph.h"
@@ -41,20 +39,10 @@ namespace g2o {
 class G2O_TYPES_SLAM2D_ADDONS_API EdgeSE2Segment2D
     : public BaseBinaryEdge<4, Vector4, VertexSE2, VertexSegment2D> {
  public:
-  Vector2 measurementP1() {
-    return Eigen::Map<const Vector2>(measurement_.data());
-  }
-  Vector2 measurementP2() {
-    return Eigen::Map<const Vector2>(&(measurement_[2]));
-  }
-  void setMeasurementP1(const Vector2& p1) {
-    Eigen::Map<Vector2> v(measurement_.data());
-    v = p1;
-  }
-  void setMeasurementP2(const Vector2& p2) {
-    Eigen::Map<Vector2> v(&measurement_[2]);
-    v = p2;
-  }
+  [[nodiscard]] Vector2 measurementP1() const;
+  [[nodiscard]] Vector2 measurementP2() const;
+  void setMeasurementP1(const Vector2& p1);
+  void setMeasurementP2(const Vector2& p2);
 
   void computeError() override;
 
@@ -63,10 +51,7 @@ class G2O_TYPES_SLAM2D_ADDONS_API EdgeSE2Segment2D
   void initialEstimate(const OptimizableGraph::VertexSet& from,
                        OptimizableGraph::Vertex* to) override;
   double initialEstimatePossible(const OptimizableGraph::VertexSet& from,
-                                 OptimizableGraph::Vertex* to) override {
-    (void)to;
-    return (from.count(vertices_[0]) == 1 ? 1.0 : -1.0);
-  }
+                                 OptimizableGraph::Vertex* to) override;
 };
 
 }  // namespace g2o

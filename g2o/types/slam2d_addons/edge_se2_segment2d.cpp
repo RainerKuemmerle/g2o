@@ -51,6 +51,27 @@ bool EdgeSE2Segment2D::setMeasurementFromState() {
   return true;
 }
 
+Vector2 EdgeSE2Segment2D::measurementP1() const {
+  return Vector2::ConstMapType(measurement_.data());
+}
+Vector2 EdgeSE2Segment2D::measurementP2() const {
+  return Vector2::ConstMapType(&(measurement_[2]));
+}
+void EdgeSE2Segment2D::setMeasurementP1(const Vector2& p1) {
+  Vector2::MapType v(measurement_.data());
+  v = p1;
+}
+void EdgeSE2Segment2D::setMeasurementP2(const Vector2& p2) {
+  Vector2::MapType v(&measurement_[2]);
+  v = p2;
+}
+
+double EdgeSE2Segment2D::initialEstimatePossible(
+    const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to) {
+  (void)to;
+  return (from.count(vertices_[0]) == 1 ? 1.0 : -1.0);
+}
+
 void EdgeSE2Segment2D::initialEstimate(const OptimizableGraph::VertexSet& from,
                                        OptimizableGraph::Vertex* to) {
   assert(from.size() == 1 && from.count(vertices_[0]) == 1 &&
