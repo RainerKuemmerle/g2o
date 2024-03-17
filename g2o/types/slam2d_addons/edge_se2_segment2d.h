@@ -38,34 +38,32 @@
 
 namespace g2o {
 
-class EdgeSE2Segment2D
+class G2O_TYPES_SLAM2D_ADDONS_API EdgeSE2Segment2D
     : public BaseBinaryEdge<4, Vector4, VertexSE2, VertexSegment2D> {
  public:
-  G2O_TYPES_SLAM2D_ADDONS_API Vector2 measurementP1() {
+  Vector2 measurementP1() {
     return Eigen::Map<const Vector2>(measurement_.data());
   }
-  G2O_TYPES_SLAM2D_ADDONS_API Vector2 measurementP2() {
+  Vector2 measurementP2() {
     return Eigen::Map<const Vector2>(&(measurement_[2]));
   }
-  G2O_TYPES_SLAM2D_ADDONS_API void setMeasurementP1(const Vector2& p1) {
+  void setMeasurementP1(const Vector2& p1) {
     Eigen::Map<Vector2> v(measurement_.data());
     v = p1;
   }
-  G2O_TYPES_SLAM2D_ADDONS_API void setMeasurementP2(const Vector2& p2) {
+  void setMeasurementP2(const Vector2& p2) {
     Eigen::Map<Vector2> v(&measurement_[2]);
     v = p2;
   }
 
-  G2O_TYPES_SLAM2D_ADDONS_API void computeError() override;
+  void computeError() override;
 
-  G2O_TYPES_SLAM2D_ADDONS_API bool setMeasurementFromState() override;
+  bool setMeasurementFromState() override;
 
-  G2O_TYPES_SLAM2D_ADDONS_API void initialEstimate(
-      const OptimizableGraph::VertexSet& from,
-      OptimizableGraph::Vertex* to) override;
-  G2O_TYPES_SLAM2D_ADDONS_API double initialEstimatePossible(
-      const OptimizableGraph::VertexSet& from,
-      OptimizableGraph::Vertex* to) override {
+  void initialEstimate(const OptimizableGraph::VertexSet& from,
+                       OptimizableGraph::Vertex* to) override;
+  double initialEstimatePossible(const OptimizableGraph::VertexSet& from,
+                                 OptimizableGraph::Vertex* to) override {
     (void)to;
     return (from.count(vertices_[0]) == 1 ? 1.0 : -1.0);
   }

@@ -34,12 +34,12 @@
 
 namespace g2o {
 
-class EdgeLine2DPointXY
+class G2O_TYPES_SLAM2D_ADDONS_API EdgeLine2DPointXY
     : public BaseBinaryEdge<1, double, VertexLine2D, VertexPointXY> {
  public:
-  G2O_TYPES_SLAM2D_ADDONS_API void computeError() override;
+  void computeError() override;
 
-  G2O_TYPES_SLAM2D_ADDONS_API bool setMeasurementFromState() override;
+  bool setMeasurementFromState() override;
 };
 
 }  // namespace g2o

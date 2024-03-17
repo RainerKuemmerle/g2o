@@ -37,22 +37,18 @@
 
 namespace g2o {
 
-class EdgeSE2Segment2DLine
+class G2O_TYPES_SLAM2D_ADDONS_API EdgeSE2Segment2DLine
     : public BaseBinaryEdge<2, Vector2, VertexSE2, VertexSegment2D> {
  public:
-  G2O_TYPES_SLAM2D_ADDONS_API [[nodiscard]] double theta() const {
-    return measurement_[0];
-  }
-  G2O_TYPES_SLAM2D_ADDONS_API [[nodiscard]] double rho() const {
-    return measurement_[1];
-  }
+  [[nodiscard]] double theta() const { return measurement_[0]; }
+  [[nodiscard]] double rho() const { return measurement_[1]; }
 
-  G2O_TYPES_SLAM2D_ADDONS_API void setTheta(double t) { measurement_[0] = t; }
-  G2O_TYPES_SLAM2D_ADDONS_API void setRho(double r) { measurement_[1] = r; }
+  void setTheta(double t) { measurement_[0] = t; }
+  void setRho(double r) { measurement_[1] = r; }
 
-  G2O_TYPES_SLAM2D_ADDONS_API void computeError() override;
+  void computeError() override;
 
-  G2O_TYPES_SLAM2D_ADDONS_API bool setMeasurementFromState() override;
+  bool setMeasurementFromState() override;
 };
 
 }  // namespace g2o
