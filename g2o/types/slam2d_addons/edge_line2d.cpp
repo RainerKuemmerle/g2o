@@ -33,6 +33,21 @@ EdgeLine2D::EdgeLine2D() {
   error_.setZero();
 }
 
+void EdgeLine2D::computeError() {
+  const VertexLine2D* v1 = vertexXnRaw<0>();
+  const VertexLine2D* v2 = vertexXnRaw<1>();
+  for (int i = 0; i < 2; ++i)
+    error_[i] = (v2->estimate()[i] - v1->estimate()[i]) - measurement_[i];
+}
+
+bool EdgeLine2D::setMeasurementFromState() {
+  const VertexLine2D* v1 = vertexXnRaw<0>();
+  const VertexLine2D* v2 = vertexXnRaw<1>();
+  measurement_ = Line2D(TypeTraits<Line2D>::toVector(v2->estimate()) -
+                        TypeTraits<Line2D>::toVector(v1->estimate()));
+  return true;
+}
+
 void EdgeLine2D::linearizeOplus() {
   jacobianOplusXi_ = -Matrix2::Identity();
   jacobianOplusXj_ = Matrix2::Identity();
