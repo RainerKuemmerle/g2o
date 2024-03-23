@@ -34,7 +34,6 @@
 #include <utility>
 
 #include "g2o_stuff_api.h"
-#include "string_tools.h"
 
 namespace g2o {
 
@@ -65,7 +64,8 @@ class Property : public BaseProperty {
     return sstr.str();
   }
   bool fromString(const std::string& s) override {
-    bool status = convertString(s, value_);
+    std::istringstream input(s);
+    const bool status = static_cast<bool>(input >> value_);
     return status;
   }
 

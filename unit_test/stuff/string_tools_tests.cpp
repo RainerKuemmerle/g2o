@@ -118,17 +118,3 @@ TEST(Stuff, ReadLine) {
   ASSERT_EQ(currentLine.str(), "foobar");
   ASSERT_EQ(g2o::readLine(content, currentLine), -1);
 }
-
-#if defined(UNIX) && !defined(ANDROID)
-TEST(Stuff, StrExpand) {
-  char* envVar = getenv("HOME");
-  if (envVar == nullptr) {
-    std::cerr << "HOME not defined" << std::endl;
-    SUCCEED();
-    return;
-  }
-  const std::string expanded = g2o::strExpandFilename("$HOME/filename.txt");
-  const std::string expected = std::string(envVar) + "/filename.txt";
-  EXPECT_EQ(expanded, expected);
-}
-#endif

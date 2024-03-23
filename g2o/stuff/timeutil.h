@@ -27,7 +27,6 @@
 #ifndef G2O_TIMEUTIL_H
 #define G2O_TIMEUTIL_H
 
-#include <chrono>
 #include <string>
 
 #include "g2o_stuff_api.h"
@@ -39,48 +38,11 @@
  * \brief utility functions for handling time related stuff
  */
 
-/// Executes code, only if secs are gone since last exec.
-/// extended version, in which the current time is given, e.g., timestamp of IPC
-/// message
-#ifndef DO_EVERY_TS
-#define DO_EVERY_TS(secs, currentTime, code)        \
-  if (1) {                                          \
-    static double s_lastDone_ = (currentTime);      \
-    double s_now_ = (currentTime);                  \
-    if (s_lastDone_ > s_now_) s_lastDone_ = s_now_; \
-    if (s_now_ - s_lastDone_ > (secs)) {            \
-      code;                                         \
-      s_lastDone_ = s_now_;                         \
-    }                                               \
-  } else                                            \
-    (void)0
-#endif
-
-/// Executes code, only if secs are gone since last exec.
-#ifndef DO_EVERY
-#define DO_EVERY(secs, code) DO_EVERY_TS(secs, g2o::get_time(), code)
-#endif
-
-#ifndef MEASURE_TIME
-#define MEASURE_TIME(text, code)                                       \
-  if (1) {                                                             \
-    double _start_time_ = g2o::get_time();                             \
-    code;                                                              \
-    G2O_DEBUG("{} took {} sec", text, g2o::get_time() - _start_time_); \
-  } else                                                               \
-    (void)0
-#endif
-
 namespace g2o {
-
-using seconds = std::chrono::duration<double>;
-
 /**
  * return the current time in seconds since 1. Jan 1970
  */
-inline double get_time() {
-  return seconds{std::chrono::system_clock::now().time_since_epoch()}.count();
-}
+G2O_STUFF_API double get_time();
 
 /**
  * return a monotonic increasing time which basically does not need to

@@ -36,6 +36,17 @@ namespace g2o {
 
 namespace {
 
+/**
+ * convert a string into an other type.
+ * Return the converted value. Throw error if parsing is wrong.
+ */
+template <typename T>
+T stringToType(const std::string& s, bool failIfLeftoverChars = true) {
+  T x;
+  convertString(s, x, failIfLeftoverChars);
+  return x;
+}
+
 template <typename T>
 void readVector(const std::string& s, std::vector<T>& v) {
   v.clear();

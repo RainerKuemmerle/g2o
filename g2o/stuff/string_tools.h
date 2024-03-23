@@ -53,7 +53,7 @@ G2O_STUFF_API std::string trim(const std::string& s);
 G2O_STUFF_API std::string trimLeft(const std::string& s);
 
 /**
- * remove whitespaced from the right side of the string
+ * remove whitespaces from the right side of the string
  */
 G2O_STUFF_API std::string trimRight(const std::string& s);
 
@@ -79,17 +79,6 @@ bool convertString(const std::string& s, T& x,
 }
 
 /**
- * convert a string into an other type.
- * Return the converted value. Throw error if parsing is wrong.
- */
-template <typename T>
-T stringToType(const std::string& s, bool failIfLeftoverChars = true) {
-  T x;
-  convertString(s, x, failIfLeftoverChars);
-  return x;
-}
-
-/**
  * return true, if str starts with start
  */
 G2O_STUFF_API bool strStartsWith(const std::string& str,
@@ -99,13 +88,6 @@ G2O_STUFF_API bool strStartsWith(const std::string& str,
  * return true, if str ends with end
  */
 G2O_STUFF_API bool strEndsWith(const std::string& str, const std::string& end);
-
-/**
- * expand the given filename like a posix shell, e.g., ~ $CARMEN_HOME and other
- * will get expanded. Also command substitution, e.g. `pwd` will give the
- * current directory.
- */
-G2O_STUFF_API std::string strExpandFilename(const std::string& filename);
 
 /**
  * split a string into token based on the characters given in delim

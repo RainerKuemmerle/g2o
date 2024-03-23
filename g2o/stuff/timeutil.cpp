@@ -26,9 +26,12 @@
 
 #include "timeutil.h"
 
+#include <chrono>
+
 #include "g2o/stuff/logger.h"
 
 namespace g2o {
+using seconds = std::chrono::duration<double>;
 
 ScopeTime::ScopeTime(const char* title)
     : title_(title), startTime_(get_monotonic_time()) {}
@@ -36,6 +39,10 @@ ScopeTime::ScopeTime(const char* title)
 ScopeTime::~ScopeTime() {
   G2O_DEBUG("{} took {}ms.", title_,
             1000 * (get_monotonic_time() - startTime_));
+}
+
+double get_time() {
+  return seconds{std::chrono::system_clock::now().time_since_epoch()}.count();
 }
 
 double get_monotonic_time() {

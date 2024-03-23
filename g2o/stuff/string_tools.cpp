@@ -32,12 +32,6 @@
 #include <iterator>
 #include <string>
 
-#if (defined(UNIX) || defined(CYGWIN)) && !defined(ANDROID)
-#include <wordexp.h>
-#else
-#include "g2o/stuff/logger.h"
-#endif
-
 namespace g2o {
 
 std::string trim(const std::string& s) {
@@ -78,24 +72,6 @@ std::string strToUpper(const std::string& s) {
   std::transform(s.begin(), s.end(), std::back_inserter(ret),
                  [](unsigned char c) { return std::toupper(c); });
   return ret;
-}
-
-std::string strExpandFilename(const std::string& filename) {
-#if (defined(UNIX) || defined(CYGWIN)) && !defined(ANDROID)
-  std::string result = filename;
-  wordexp_t p;
-
-  wordexp(filename.c_str(), &p, 0);
-  if (p.we_wordc > 0) {
-    result = p.we_wordv[0];
-  }
-  wordfree(&p);
-  return result;
-#else
-  (void)filename;
-  G2O_WARN("not implemented");
-  return std::string();
-#endif
 }
 
 std::vector<std::string> strSplit(const std::string& str,
