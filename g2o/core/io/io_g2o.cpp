@@ -182,6 +182,7 @@ std::optional<AbstractGraph> IoG2O::load(std::istream& input) {
             "Error reading data {} at line {}: got data element, but no data "
             "container available",
             token, line_number);
+        continue;
       }
       AbstractGraph::AbstractData data;
       data.tag = token;
