@@ -31,18 +31,16 @@ void declareHyperGraph(py::module& m) {
       //.def(py::init<>())   // invalid new-expression of abstract class
       .def("element_type",
            &HyperGraph::Data::elementType)  // virtual, -> HyperGraphElementType
-      .def("next", &HyperGraph::Data::next)
-      .def("set_next", &HyperGraph::Data::setNext, "next"_a,
-           py::keep_alive<1, 2>())  // -> void
-      .def("data_container", &HyperGraph::Data::dataContainer)
-      .def("set_data_container", &HyperGraph::Data::setDataContainer,
-           "data_container"_a, py::keep_alive<1, 2>())  // -> void
       ;
 
   py::class_<HyperGraph::DataContainer,
              std::shared_ptr<HyperGraph::DataContainer>>(cls, "DataContainer")
       .def(py::init<>())
-      .def("user_data", &HyperGraph::DataContainer::userData)
+      .def("user_data",
+           static_cast<HyperGraph::DataContainer::DataVector& (
+               HyperGraph::DataContainer::*)()>(
+               &HyperGraph::DataContainer::userData),
+           py::return_value_policy::reference)
       .def("set_user_data", &HyperGraph::DataContainer::setUserData, "obs"_a,
            py::keep_alive<1, 2>())  // Data* -> void
       .def("add_user_data", &HyperGraph::DataContainer::addUserData, "obs"_a,

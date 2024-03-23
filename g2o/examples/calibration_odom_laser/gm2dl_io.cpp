@@ -176,14 +176,13 @@ bool Gm2dlIO::writeGm2dl(const std::string& filename,
     v->getEstimateData(vertex_estimate);
     for (const auto value : vertex_estimate) fout << " " << value;
     fout << '\n';
-    auto data = v->userData();
-    if (data) {  // writing the data via the factory
+    for (const auto& data : v->userData()) {
+      // writing the data via the factory
       const std::string tag = factory->tag(data.get());
-      if (!tag.empty()) {
-        fout << tag << " ";
-        data->write(fout);
-        fout << '\n';
-      }
+      if (tag.empty()) continue;
+      fout << tag << " ";
+      data->write(fout);
+      fout << '\n';
     }
   }
 
@@ -228,7 +227,7 @@ bool Gm2dlIO::updateLaserData(SparseOptimizer& optimizer) {
     auto* v = dynamic_cast<VertexSE2*>(it.second.get());
     if (!v) continue;
     if (v->id() == kIdLaserpose) continue;
-    RobotLaser* robotLaser = dynamic_cast<RobotLaser*>(v->userData().get());
+    auto* robotLaser = dynamic_cast<RobotLaser*>(v->userData().front().get());
     if (robotLaser) {  // writing the data via the factory
       robotLaser->setOdomPose(v->estimate());
       LaserParameters params = robotLaser->laserParams();

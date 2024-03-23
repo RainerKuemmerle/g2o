@@ -67,8 +67,8 @@ void addOdometryCalibLinksDifferential(SparseOptimizer& optimizer,
       continue;
     }
 
-    auto rl1 = std::dynamic_pointer_cast<RobotLaser>(r1->userData());
-    auto rl2 = std::dynamic_pointer_cast<RobotLaser>(r2->userData());
+    auto rl1 = std::dynamic_pointer_cast<RobotLaser>(r1->userData().front());
+    auto rl2 = std::dynamic_pointer_cast<RobotLaser>(r2->userData().front());
     auto odom1 = std::dynamic_pointer_cast<RobotLaser>(
         odomData.findClosestData(rl1->timestamp()));
     auto odom2 = std::dynamic_pointer_cast<RobotLaser>(

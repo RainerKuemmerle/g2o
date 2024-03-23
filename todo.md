@@ -2,7 +2,7 @@
 [ ] Add typing for parameters to template?
 [ ] Re-work python wrapping for parameters, templated base param
 [ ] Test load/save for VertexCam (camera and baseline seem missing from traits)
-[ ] Refactor Data container. Can it be a container instead of linked list?
+[x] Refactor Data container. Can it be a container instead of linked list?
 [ ] Use FakeDependency in Traits
 [x] EdgeSE2TwoPointsXY, EdgeSE2PointXYCalib can be fixed size edges -> IO test
 [x] IO test fixture including parameter

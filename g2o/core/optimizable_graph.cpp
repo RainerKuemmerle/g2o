@@ -58,16 +58,18 @@ namespace {
 std::shared_ptr<OptimizableGraph::Vertex> kNonExistantVertex(nullptr);
 
 void saveUserData(AbstractGraph::AbstractGraphElement& graph_element,
-                  HyperGraph::Data* d) {
+                  const HyperGraph::DataContainer::DataVector& data) {
+  if (data.empty()) return;
   Factory* factory = Factory::instance();
-  while (d) {  // write the data packet for the vertex
-    const std::string tag = factory->tag(d);
+
+  // write the data packet for the vertex
+  for (const auto& d : data) {
+    const std::string tag = factory->tag(d.get());
     if (!tag.empty()) {
       std::stringstream buffer;
       d->write(buffer);
       graph_element.data.emplace_back(tag, buffer.str());
     }
-    d = d->next().get();
   }
 }
 
@@ -92,13 +94,12 @@ bool saveParameters(g2o::AbstractGraph& abstract_graph,
 
 // helper to add data to the graph
 void addDataToGraphElement(
-    std::shared_ptr<HyperGraph::DataContainer> previousDataContainer,
+    HyperGraph::DataContainer& dataContainer,
     const std::vector<AbstractGraph::AbstractData>& data_vector) {
   Factory* factory = Factory::instance();
 
   HyperGraph::GraphElemBitset elemDataBitset;
   elemDataBitset[HyperGraph::kHgetData] = true;
-  OptimizableGraph::Data* previousData = nullptr;
   for (const auto& abstract_data : data_vector) {
     const std::shared_ptr<HyperGraph::HyperGraphElement> element =
         factory->construct(abstract_data.tag, elemDataBitset);
@@ -112,20 +113,9 @@ void addDataToGraphElement(
     const bool r = d->read(buffer);
     if (!r) {
       G2O_ERROR("Error reading data {}", abstract_data.tag);
-      previousData = nullptr;
-    } else if (previousData) {
-      previousData->setNext(d);
-      d->setDataContainer(previousData->dataContainer());
-      previousData = d.get();
-    } else if (previousDataContainer) {
-      previousDataContainer->setUserData(d);
-      d->setDataContainer(previousDataContainer);
-      previousData = d.get();
-      previousDataContainer = nullptr;
-    } else {
-      G2O_ERROR("got data element, but no data container available");
-      previousData = nullptr;
+      continue;
     }
+    dataContainer.addUserData(d);
   }
 };
 }  // namespace
@@ -258,7 +248,7 @@ bool OptimizableGraph::addVertex(
         ov->id(), static_cast<void*>(ov->graph_));
     return false;
   }
-  if (userData) ov->setUserData(userData);
+  if (userData) ov->addUserData(userData);
   ov->graph_ = this;
   return HyperGraph::addVertex(v);
 }
@@ -470,7 +460,7 @@ bool OptimizableGraph::load(std::istream& is, io::Format format) {
                 abstract_vertex.id);
     }
     if (!abstract_vertex.data.empty())
-      addDataToGraphElement(vertex, abstract_vertex.data);
+      addDataToGraphElement(*vertex, abstract_vertex.data);
   }
 
   // Create the edges of the graph
@@ -523,7 +513,7 @@ bool OptimizableGraph::load(std::istream& is, io::Format format) {
                 fmt::join(abstract_edge.ids, " "));
     }
     if (!abstract_edge.data.empty())
-      addDataToGraphElement(edge, abstract_edge.data);
+      addDataToGraphElement(*edge, abstract_edge.data);
   }
 
   for (const auto fixed_vertex_id : abstract_graph.fixed()) {
@@ -758,7 +748,7 @@ bool OptimizableGraph::saveVertex(AbstractGraph& abstract_graph,
   std::vector<double> vertex_estimate;
   v->getEstimateData(vertex_estimate);
   abstract_graph.vertices().emplace_back(tag, v->id(), vertex_estimate);
-  saveUserData(abstract_graph.vertices().back(), v->userData().get());
+  saveUserData(abstract_graph.vertices().back(), v->userData());
   if (v->fixed()) {
     abstract_graph.fixed().push_back(v->id());
   }
@@ -789,7 +779,7 @@ bool OptimizableGraph::saveEdge(AbstractGraph& abstract_graph,
       upper_triangle.push_back(information(r, c));
   abstract_graph.edges().emplace_back(tag, ids, data, upper_triangle,
                                       e->parameterIds());
-  saveUserData(abstract_graph.edges().back(), e->userData().get());
+  saveUserData(abstract_graph.edges().back(), e->userData());
   return true;
 }
 

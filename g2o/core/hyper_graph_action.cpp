@@ -221,12 +221,11 @@ void DrawAction::drawCache(
 }
 
 void DrawAction::drawUserData(
-    const std::shared_ptr<HyperGraph::Data>& data,
+    const HyperGraph::DataContainer::DataVector& data,
     const std::shared_ptr<HyperGraphElementAction::Parameters>& params) {
-  HyperGraph::Data* dataPtr = data.get();
-  while (data && cacheDrawActions_) {
-    (*cacheDrawActions_)(*dataPtr, params);
-    dataPtr = dataPtr->next().get();
+  if (!cacheDrawActions_) return;
+  for (const auto& d : data) {
+    (*cacheDrawActions_)(*d, params);
   }
 }
 
