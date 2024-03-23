@@ -199,7 +199,7 @@ class G2O_CORE_API DrawAction : public HyperGraphElementAction {
       const CacheContainer& caches,
       const std::shared_ptr<HyperGraphElementAction::Parameters>& params);
   void drawUserData(
-      const std::shared_ptr<HyperGraph::Data>& data,
+      const HyperGraph::DataContainer::DataVector& data,
       const std::shared_ptr<HyperGraphElementAction::Parameters>& params);
   std::shared_ptr<Parameters> previousParams_;
   std::shared_ptr<BoolProperty> show_;

@@ -28,16 +28,10 @@
 
 #include <algorithm>
 #include <cassert>
+#include <memory>
 #include <unordered_set>
 
 namespace g2o {
-
-HyperGraph::Data::Data() {
-  next_ = nullptr;
-  dataContainer_ = nullptr;
-}
-
-HyperGraph::Data::~Data() = default;
 
 HyperGraph::Vertex::Vertex(int id) : id_(id) {}
 
@@ -56,6 +50,34 @@ int HyperGraph::Edge::numUndefinedVertices() const {
 void HyperGraph::Edge::resize(size_t size) { vertices_.resize(size, nullptr); }
 
 void HyperGraph::Edge::setId(int id) { id_ = id; }
+
+const HyperGraph::DataContainer::DataVector&
+HyperGraph::DataContainer::userData() const {
+  static HyperGraph::DataContainer::DataVector kEmptyDataContainer;
+  return container_.get() ? *container_ : kEmptyDataContainer;
+}
+
+HyperGraph::DataContainer::DataVector& HyperGraph::DataContainer::userData() {
+  allocate();
+  return *container_;
+}
+
+void HyperGraph::DataContainer::setUserData(const std::shared_ptr<Data>& obs) {
+  allocate();
+  container_->clear();
+  addUserData(obs);
+  container_->shrink_to_fit();
+}
+
+void HyperGraph::DataContainer::addUserData(const std::shared_ptr<Data>& obs) {
+  allocate();
+  container_->emplace_back(obs);
+}
+
+void HyperGraph::DataContainer::allocate() {
+  if (container_) return;
+  container_ = std::make_unique<HyperGraph::DataContainer::DataVector>();
+}
 
 std::shared_ptr<HyperGraph::Vertex> HyperGraph::vertex(int id) {
   auto it = vertices_.find(id);

@@ -34,7 +34,6 @@
 #include <memory>
 #include <set>
 #include <unordered_map>
-#include <utility>
 #include <vector>
 
 #include "g2o_core_api.h"
@@ -97,8 +96,6 @@ class G2O_CORE_API HyperGraph {
    */
   class G2O_CORE_API Data : public HyperGraph::HyperGraphElement {
    public:
-    Data();
-    ~Data() override;
     //! read the data from a stream
     virtual bool read(std::istream& is) = 0;
     //! write the data to a stream
@@ -106,38 +103,29 @@ class G2O_CORE_API HyperGraph {
     [[nodiscard]] HyperGraph::HyperGraphElementType elementType() const final {
       return HyperGraph::kHgetData;
     }
-    [[nodiscard]] std::shared_ptr<Data> next() const { return next_; }
-    void setNext(std::shared_ptr<Data> next) { next_ = std::move(next); }
-    [[nodiscard]] std::shared_ptr<DataContainer> dataContainer() const {
-      return dataContainer_;
-    }
-    void setDataContainer(std::shared_ptr<DataContainer> dataContainer) {
-      dataContainer_ = std::move(dataContainer);
-    }
-
-   protected:
-    std::shared_ptr<Data> next_;  // linked list of multiple data;
-    std::shared_ptr<DataContainer> dataContainer_;
   };
 
   /**
    * \brief Container class that implements an interface for adding/removing
-   Data elements in a linked list
+   Data elements in a vector.
    */
   class G2O_CORE_API DataContainer {
    public:
+    using DataVector = std::vector<std::shared_ptr<Data>>;
+    using DataVectorPtr = std::unique_ptr<DataVector>;
+
     //! the user data associated with this vertex
-    [[nodiscard]] std::shared_ptr<Data> userData() const { return userData_; }
-    void setUserData(const std::shared_ptr<Data>& obs) { userData_ = obs; }
-    void addUserData(const std::shared_ptr<Data>& obs) {
-      if (obs) {
-        obs->setNext(userData_);
-        userData_ = obs;
-      }
-    }
+    [[nodiscard]] const DataVector& userData() const;
+    DataVector& userData();
+    //! set the single user data of this container
+    void setUserData(const std::shared_ptr<Data>& obs);
+    //! add additional user data
+    void addUserData(const std::shared_ptr<Data>& obs);
 
    protected:
-    std::shared_ptr<Data> userData_;
+    DataVectorPtr container_;
+
+    void allocate();  ///< allocates the container if not done
   };
 
   using EdgeSet = std::set<std::shared_ptr<Edge>>;
