@@ -37,21 +37,16 @@
 #include "g2o/core/factory.h"
 #include "g2o/core/hyper_dijkstra.h"
 #include "g2o/core/optimization_algorithm_factory.h"
-#include "g2o/core/robust_kernel.h"
+#include "g2o/core/robust_kernel.h"  // IWYU pragma: keep
 #include "g2o/core/robust_kernel_factory.h"
 #include "g2o/core/sparse_optimizer.h"
-#include "g2o/stuff/color_macros.h"
 #include "g2o/stuff/command_args.h"
 #include "g2o/stuff/logger.h"
 #include "g2o/stuff/macros.h"
 #include "star.h"
 // #include "backbone_tree_action.h"
-#include "g2o/types/slam3d/parameter_camera.h"
 #include "g2o/types/slam3d/parameter_se3_offset.h"
 #include "simple_star_ops.h"
-
-// #include "g2o/types/slam3d_new/parameter_camera.h"
-// #include "g2o/types/slam3d_new/parameter_se3_offset.h"
 
 using std::cerr;
 using std::endl;
@@ -357,8 +352,7 @@ int run_hierarchical(int argc, char** argv) {
   // cerr << PVAR(d.visited().size()) << endl;
 
   if (d.visited().size() != optimizer.vertices().size()) {
-    cerr << CL_RED("Warning: d.visited().size() != optimizer.vertices().size()")
-         << endl;
+    cerr << "Warning: d.visited().size() != optimizer.vertices().size()\n";
     cerr << "visited: " << d.visited().size() << endl;
     cerr << "vertices: " << optimizer.vertices().size() << endl;
   }

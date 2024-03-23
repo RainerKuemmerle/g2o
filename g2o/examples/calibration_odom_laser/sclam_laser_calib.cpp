@@ -32,7 +32,6 @@
 #include "g2o/core/hyper_dijkstra.h"
 #include "g2o/core/optimization_algorithm_factory.h"
 #include "g2o/core/sparse_optimizer.h"
-#include "g2o/stuff/color_macros.h"
 #include "g2o/stuff/command_args.h"
 #include "g2o/stuff/logger.h"
 #include "g2o/stuff/macros.h"
@@ -128,8 +127,7 @@ int main(int argc, char** argv) {
   // cerr << PVAR(d.visited().size()) << endl;
 
   if (d.visited().size() != optimizer.vertices().size()) {
-    cerr << CL_RED("Warning: d.visited().size() != optimizer.vertices().size()")
-         << endl;
+    cerr << "Warning: d.visited().size() != optimizer.vertices().size()\n";
     cerr << "visited: " << d.visited().size() << endl;
     cerr << "vertices: " << optimizer.vertices().size() << endl;
     for (auto& it : optimizer.vertices()) {

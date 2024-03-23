@@ -44,7 +44,6 @@
 #include "g2o/core/robust_kernel_factory.h"
 #include "g2o/core/sparse_optimizer.h"
 #include "g2o/core/sparse_optimizer_terminate_action.h"
-#include "g2o/stuff/color_macros.h"
 #include "g2o/stuff/command_args.h"
 #include "g2o/stuff/logger.h"
 #include "g2o/stuff/macros.h"
@@ -388,19 +387,17 @@ int main(int argc, char** argv) {
   // cerr << PVAR(d.visited().size()) << '\n';
 
   if (d.visited().size() != optimizer.vertices().size()) {
-    cerr << CL_RED("Warning: d.visited().size() != optimizer.vertices().size()")
+    cerr << "Warning: d.visited().size() != optimizer.vertices().size()"
          << '\n';
     cerr << "visited: " << d.visited().size() << '\n';
     cerr << "vertices: " << optimizer.vertices().size() << '\n';
   }
 
   if (incremental) {
-    cerr << CL_RED(
-                "# Note: this variant performs batch steps in each time step")
+    cerr << "# Note: this variant performs batch steps in each time step"
          << '\n';
-    cerr << CL_RED(
-                "#       For a variant which updates the Cholesky factor use "
-                "the binary g2o_incremental")
+    cerr << "#       For a variant which updates the Cholesky factor use "
+            "the binary g2o_incremental"
          << '\n';
     int incIterations = maxIterations;
     if (!arg.parsedParam("i")) {

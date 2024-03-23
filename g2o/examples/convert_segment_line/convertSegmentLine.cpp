@@ -24,30 +24,13 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include <algorithm>
 #include <cassert>
 #include <csignal>
 #include <fstream>
-#include <iomanip>
 #include <iostream>
-#include <sstream>
 #include <string>
 
-#include "g2o/core/batch_stats.h"
-#include "g2o/core/estimate_propagator.h"
-#include "g2o/core/factory.h"
-#include "g2o/core/hyper_dijkstra.h"
-#include "g2o/core/hyper_graph_action.h"
-#include "g2o/core/optimization_algorithm.h"
-#include "g2o/core/optimization_algorithm_factory.h"
-#include "g2o/core/sparse_optimizer.h"
-#include "g2o/core/sparse_optimizer_terminate_action.h"
-#include "g2o/stuff/color_macros.h"
 #include "g2o/stuff/command_args.h"
-#include "g2o/stuff/filesys_tools.h"
-#include "g2o/stuff/macros.h"
-#include "g2o/stuff/string_tools.h"
-#include "g2o/stuff/timeutil.h"
 #include "g2o/types/slam2d/edge_se2.h"
 #include "g2o/types/slam2d/edge_se2_pointxy.h"
 #include "g2o/types/slam2d/vertex_point_xy.h"
