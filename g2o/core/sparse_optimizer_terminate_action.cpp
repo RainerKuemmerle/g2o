@@ -53,8 +53,8 @@ bool SparseOptimizerTerminateAction::operator()(
       "error casting parameters");
 
   const auto* optimizer = static_cast<const SparseOptimizer*>(&graph);
-  auto params = std::static_pointer_cast<HyperGraphAction::ParametersIteration>(
-      parameters);
+  auto* params =
+      static_cast<HyperGraphAction::ParametersIteration*>(parameters.get());
 
   const_cast<SparseOptimizer*>(optimizer)->computeActiveErrors();
   if (params->iteration < 0) {

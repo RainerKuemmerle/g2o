@@ -30,7 +30,7 @@
 #include <Eigen/Core>
 #include <vector>
 
-#include "g2o/config.h"
+#include "g2o/config.h"  // IWYU pragma: keep
 #include "matrix_operations.h"
 
 namespace g2o {
@@ -49,9 +49,13 @@ class SparseBlockMatrixDiagonal {
   using SparseMatrixBlock = MatrixType;
 
   //! columns of the matrix
-  int cols() const { return !blockIndices_.empty() ? blockIndices_.back() : 0; }
+  [[nodiscard]] int cols() const {
+    return !blockIndices_.empty() ? blockIndices_.back() : 0;
+  }
   //! rows of the matrix
-  int rows() const { return !blockIndices_.empty() ? blockIndices_.back() : 0; }
+  [[nodiscard]] int rows() const {
+    return !blockIndices_.empty() ? blockIndices_.back() : 0;
+  }
 
   using DiagonalVector = std::vector<MatrixType>;
 
