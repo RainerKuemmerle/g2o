@@ -4,4 +4,4 @@ target_include_directories(benchmark_jacobian_timing PUBLIC
   "$<BUILD_INTERFACE:${g2o_SOURCE_DIR};${PROJECT_BINARY_DIR}>"
 )
 
-target_link_libraries(benchmark_jacobian_timing benchmark::benchmark ${G2O_EIGEN3_EIGEN_TARGET})
+target_link_libraries(benchmark_jacobian_timing benchmark::benchmark Eigen3::Eigen)

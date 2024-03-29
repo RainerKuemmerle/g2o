@@ -1,6 +1,6 @@
 add_library(g2o_ceres_ad INTERFACE)
 
-target_link_libraries(g2o_ceres_ad INTERFACE ${G2O_EIGEN3_EIGEN_TARGET})
+target_link_libraries(g2o_ceres_ad INTERFACE Eigen3::Eigen)
 
 install(TARGETS g2o_ceres_ad
   EXPORT ${G2O_TARGETS_EXPORT_NAME}
