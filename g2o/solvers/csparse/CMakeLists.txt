@@ -15,8 +15,9 @@ if (APPLE)
   set_target_properties(csparse_extension PROPERTIES INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
 endif()
 
+target_include_directories(csparse_extension SYSTEM PUBLIC
+  $<BUILD_INTERFACE:${CSPARSE_INCLUDE_DIR}>)
 target_include_directories(csparse_extension PUBLIC
-  $<BUILD_INTERFACE:${CSPARSE_INCLUDE_DIR}>
   $<INSTALL_INTERFACE:include/g2o/solvers/csparse>)
 target_link_libraries(csparse_extension PUBLIC stuff ${CSPARSE_LIBRARY} Eigen3::Eigen)
 
@@ -35,7 +36,6 @@ if (APPLE)
 endif()
 
 target_include_directories(solver_csparse PUBLIC
-  $<BUILD_INTERFACE:${CSPARSE_INCLUDE_DIR}>
   $<INSTALL_INTERFACE:include/g2o/solvers/csparse>)
 target_compile_features(solver_csparse PUBLIC cxx_std_17)
 target_link_libraries(solver_csparse
