@@ -139,7 +139,7 @@ class BaseFixedSizedEdge : public BaseEdge<D, E> {
   template <int VertexN>
   static constexpr int VertexDimension() {
     return VertexXnType<VertexN>::kDimension;
-  };
+  }
   /**
    * Get the size of a given Vertex.
    * If the vertex dimension is static and by this known at compile time, we
@@ -149,11 +149,11 @@ class BaseFixedSizedEdge : public BaseEdge<D, E> {
   template <int VertexN>
   constexpr  std::enable_if_t<VertexXnType<VertexN>::kDimension != -1, int> vertexDimension() const {
     return VertexXnType<VertexN>::kDimension;
-  };
+  }
   template <int VertexN>
    std::enable_if_t<VertexXnType<VertexN>::kDimension == -1, int> vertexDimension() const {
     return vertexXn<VertexN>()->dimension();
-  };
+  }
   // clang-format on
   /**
    * Return a pointer to the N-th vertex, directly casted to the correct type
@@ -230,7 +230,7 @@ class BaseFixedSizedEdge : public BaseEdge<D, E> {
     return internal::createNthVertexType<
         sizeof...(VertexTypes) - 1, std::remove_reference_t<decltype(*this)>,
         CtorArgs...>(i, *this, args...);
-  };
+  }
 
   void resize(size_t size) override;
 
