@@ -55,7 +55,7 @@ set_target_properties(core PROPERTIES OUTPUT_NAME ${LIB_PREFIX}core)
 set_target_properties(core PROPERTIES
   VERSION ${G2O_LIB_VERSION}
   SOVERSION ${G2O_LIB_SOVERSION})
-target_link_libraries(core PUBLIC stuff ${G2O_EIGEN3_EIGEN_TARGET})
+target_link_libraries(core PUBLIC stuff Eigen3::Eigen)
 target_link_libraries(core PUBLIC g2o_ceres_ad)
 if (TARGET cereal::cereal)
 target_link_libraries(core PUBLIC cereal::cereal)

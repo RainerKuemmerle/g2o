@@ -76,10 +76,16 @@ jobs:
           # See https://github.com/hendrikmuhs/ccache-action/issues/146
           ccache --set-config=compiler_check=content
 
+      - name: Coverage Configure Build
+        if: matrix.config.do_coverage == 'ON'
+        run: |
+          echo "CFLAGS=--coverage" >> $GITHUB_ENV
+          echo "CXXFLAGS=--coverage" >> $GITHUB_ENV
+
       - name: Configure CMake
         run: |
           cmake --version
-          cmake -B ${{github.workspace}}/build -DBUILD_UNITTESTS=ON -DBUILD_CODE_COVERAGE=${{matrix.config.do_coverage}} -DCMAKE_BUILD_TYPE=${{matrix.config.build_type}} -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
+          cmake -B ${{github.workspace}}/build -DBUILD_UNITTESTS=ON -DCMAKE_BUILD_TYPE=${{matrix.config.build_type}} -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
 
       - name: Build Introspection
         shell: bash
@@ -96,6 +102,6 @@ jobs:
         working-directory: ${{github.workspace}}/build
         run: ctest -C ${{matrix.config.build_type}} --extra-verbose --output-on-failure
 
-      - name: Coverage
+      - name: Coverage Results
         if: matrix.config.do_coverage == 'ON'
         run: bash ${{github.workspace}}/build/codecov.sh
