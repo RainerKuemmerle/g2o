@@ -38,9 +38,7 @@
 #include "fixed_array.h"
 #include "types.h"
 
-namespace g2o {
-namespace ceres {
-namespace internal {
+namespace g2o::ceres::internal {
 
 // StaticFixedArray selects the best array implementation based on template
 // arguments. If the size is not known at compile-time, pass
@@ -82,8 +80,6 @@ struct ArraySelector<T, NumElements, MaxNumElementsOnStack, false, false>
   explicit ArraySelector(int s) : std::vector<T>(s) {}
 };
 
-}  // namespace internal
-}  // namespace ceres
-}  // namespace g2o
+}  // namespace g2o::ceres::internal
 
 #endif  // G2O_CERES_PUBLIC_INTERNAL_ARRAY_SELECTOR_H_

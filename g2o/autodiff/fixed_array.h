@@ -40,9 +40,7 @@
 
 #include "memory.h"
 
-namespace g2o {
-namespace ceres {
-namespace internal {
+namespace g2o::ceres::internal {
 
 constexpr static auto kFixedArrayUseDefault = static_cast<size_t>(-1);
 
@@ -449,8 +447,6 @@ template <typename T, size_t N, typename A>
 constexpr typename FixedArray<T, N, A>::size_type
     FixedArray<T, N, A>::kInlineElements;
 
-}  // namespace internal
-}  // namespace ceres
-}  // namespace g2o
+}  // namespace g2o::ceres::internal
 
 #endif  // G2O_CERES_PUBLIC_INTERNAL_FIXED_ARRAY_H_

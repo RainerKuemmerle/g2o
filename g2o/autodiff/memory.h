@@ -40,9 +40,7 @@
   } while (false)
 #endif  // G2O_CERES_HAVE_EXCEPTIONS
 
-namespace g2o {
-namespace ceres {
-namespace internal {
+namespace g2o::ceres::internal {
 
 template <typename Allocator, typename Iterator, typename... Args>
 void ConstructRange(Allocator& alloc, Iterator first, Iterator last,
@@ -81,8 +79,6 @@ void CopyRange(Allocator& alloc, Iterator destination, InputIterator first,
   }
 }
 
-}  // namespace internal
-}  // namespace ceres
-}  // namespace g2o
+}  // namespace g2o::ceres::internal
 
 #endif  // G2O_CERES_PUBLIC_INTERNAL_MEMORY_H_

@@ -141,12 +141,10 @@
 #define G2O_CERES_PUBLIC_INTERNAL_AUTODIFF_H_
 
 #include <array>
-#include <cstddef>
 #include <utility>
 
 #include "array_selector.h"
 #include "eigen.h"
-#include "fixed_array.h"
 #include "jet.h"
 #include "parameter_dims.h"
 #include "types.h"
