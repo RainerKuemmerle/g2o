@@ -187,7 +187,7 @@ class G2O_CORE_API OptimizableGraph : public HyperGraph {
       if ((dim == -1) || (estimate.size() != static_cast<std::size_t>(dim)))
         return false;
       return setEstimateData(estimate.data());
-    };
+    }
 
     /**
      * sets the initial estimate from an Eigen Vector type
@@ -198,7 +198,7 @@ class G2O_CORE_API OptimizableGraph : public HyperGraph {
       int dim = estimateDimension();
       if ((dim == -1) || (estimate.size() != dim)) return false;
       return setEstimateData(estimate.derived().data());
-    };
+    }
 
     /**
      * writes the estimates to an array of double
@@ -215,7 +215,7 @@ class G2O_CORE_API OptimizableGraph : public HyperGraph {
       if (dim < 0) return false;
       estimate.resize(dim);
       return getEstimateData(estimate.data());
-    };
+    }
 
     /**
      * writes the estimate to an array of double
@@ -237,7 +237,7 @@ class G2O_CORE_API OptimizableGraph : public HyperGraph {
           return false;
       }
       return getEstimateData(estimate.derived().data());
-    };
+    }
 
     /**
      * returns the dimension of the extended representation used by
@@ -266,7 +266,7 @@ class G2O_CORE_API OptimizableGraph : public HyperGraph {
       if ((dim == -1) || (estimate.size() != static_cast<std::size_t>(dim)))
         return false;
       return setMinimalEstimateData(estimate.data());
-    };
+    }
 
     /**
      * sets the initial estimate from an eigen type of double.
@@ -278,7 +278,7 @@ class G2O_CORE_API OptimizableGraph : public HyperGraph {
       int dim = minimalEstimateDimension();
       if ((dim == -1) || (estimate.size() != dim)) return false;
       return setMinimalEstimateData(estimate.derived().data());
-    };
+    }
 
     /**
      * writes the estimate to an array of double
@@ -295,7 +295,7 @@ class G2O_CORE_API OptimizableGraph : public HyperGraph {
       if (dim < 0) return false;
       estimate.resize(dim);
       return getMinimalEstimateData(estimate.data());
-    };
+    }
 
     /**
      * writes the estimate to an eigen type double
@@ -317,7 +317,7 @@ class G2O_CORE_API OptimizableGraph : public HyperGraph {
           return false;
       }
       return getMinimalEstimateData(estimate.derived().data());
-    };
+    }
 
     /**
      * returns the dimension of the extended representation used by
