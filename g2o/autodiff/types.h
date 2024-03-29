@@ -37,12 +37,7 @@
 #ifndef G2O_CERES_PUBLIC_TYPES_H_
 #define G2O_CERES_PUBLIC_TYPES_H_
 
-#include <string>
-
-#include "disable_warnings.h"
-
-namespace g2o {
-namespace ceres {
+namespace g2o::ceres {
 
 // For SizedCostFunction and AutoDiffCostFunction, DYNAMIC can be
 // specified for the number of residuals. If specified, then the
@@ -58,9 +53,6 @@ enum DimensionType {
 // did not write to that memory location.
 const double kImpossibleValue = 1e302;
 
-}  // namespace ceres
-}  // namespace g2o
-
-#include "reenable_warnings.h"
+}  // namespace g2o::ceres
 
 #endif  // G2O_CERES_PUBLIC_TYPES_H_

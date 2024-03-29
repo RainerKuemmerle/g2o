@@ -162,7 +162,6 @@
 #include <iosfwd>
 #include <iostream>  // NOLINT
 #include <limits>
-#include <string>
 
 namespace g2o::ceres {
 

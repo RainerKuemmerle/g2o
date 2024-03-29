@@ -36,9 +36,7 @@
 
 #include "integer_sequence_algorithm.h"
 
-namespace g2o {
-namespace ceres {
-namespace internal {
+namespace g2o::ceres::internal {
 
 // Checks, whether the given parameter block sizes are valid. Valid means every
 // dimension is bigger than zero.
@@ -119,8 +117,6 @@ template <int... Ns>
 using StaticParameterDims = ParameterDims<false, Ns...>;
 using DynamicParameterDims = ParameterDims<true>;
 
-}  // namespace internal
-}  // namespace ceres
-}  // namespace g2o
+}  // namespace g2o::ceres::internal
 
 #endif  // G2O_CERES_PUBLIC_INTERNAL_PARAMETER_DIMS_H_

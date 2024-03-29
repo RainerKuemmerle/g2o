@@ -39,9 +39,9 @@
 namespace g2o {
 
 /**
- * \brief Raw laser measuerement
+ * \brief Raw laser measurement
  *
- * A raw laser measuerement. The read/write function correspond to the format of
+ * A raw laser measurement. The read/write function correspond to the format of
  * CARMEN.
  */
 class G2O_TYPES_DATA_API RawLaser : public RobotData {

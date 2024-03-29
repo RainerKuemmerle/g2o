@@ -33,11 +33,8 @@
 #ifndef G2O_CERES_PUBLIC_INTERNAL_VARIADIC_EVALUATE_H_
 #define G2O_CERES_PUBLIC_INTERNAL_VARIADIC_EVALUATE_H_
 
-#include <cstddef>
 #include <type_traits>
 #include <utility>
-
-#include "parameter_dims.h"
 
 namespace g2o::ceres::internal {
 

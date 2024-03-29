@@ -28,10 +28,6 @@
 #define G2O_GAUSSIAN_SAMPLER_
 
 #include <Eigen/Core>
-#include <cassert>
-#include <cmath>
-#include <cstdlib>
-#include <ctime>
 #include <memory>
 #include <random>
 
@@ -50,14 +46,13 @@ class GaussianSampler {
   GaussianSampler& operator=(const GaussianSampler&) = delete;
   explicit GaussianSampler(bool hasGenerator = true)
       : generator_(hasGenerator ? new std::mt19937 : nullptr) {}
-  void setDistribution(const CovarianceType& cov) {
+  bool setDistribution(const CovarianceType& cov) {
     Eigen::LLT<CovarianceType> cholDecomp;
     cholDecomp.compute(cov);
-    if (cholDecomp.info() == Eigen::NumericalIssue) {
-      assert(false && "Cholesky decomposition on the covariance matrix failed");
-      return;
-    }
+    const bool status = cholDecomp.info() != Eigen::Success;
+    if (!status) return false;
     cholesky_ = cholDecomp.matrixL();
+    return true;
   }
   //! return a sample of the Gaussian distribution
   SampleType generateSample() {
@@ -86,33 +81,20 @@ class G2O_STUFF_API Sampler {
    * Gaussian random with a mean and standard deviation. Uses the
    * Polar method of Marsaglia.
    */
-  static double gaussRand(double mean, double sigma) {
-    double y;
-    double r2;
-    do {
-      double x = -1.0 + 2.0 * uniformRand(0.0, 1.0);
-      y = -1.0 + 2.0 * uniformRand(0.0, 1.0);
-      r2 = x * x + y * y;
-    } while (r2 > 1.0 || r2 == 0.0);
-    return mean + sigma * y * std::sqrt(-2.0 * log(r2) / r2);
-  }
+  static double gaussRand(double mean, double sigma);
 
   /**
    * sample a number from a uniform distribution
    */
-  static double uniformRand(double lowerBndr, double upperBndr) {
-    return lowerBndr + (static_cast<double>(std::rand()) / (RAND_MAX + 1.0)) *
-                           (upperBndr - lowerBndr);
-  }
+  static double uniformRand(double lowerBndr, double upperBndr);
+
   /**
    * default seed function using the current time in seconds
    */
-  static void seedRand() {
-    seedRand(static_cast<unsigned int>(std::time(nullptr)));
-  }
+  static void seedRand();
 
   /** seed the random number generator */
-  static void seedRand(unsigned int seed) { std::srand(seed); }
+  static void seedRand(unsigned int seed);
 };
 
 }  // namespace g2o
