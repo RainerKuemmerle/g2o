@@ -149,7 +149,7 @@ class BaseFixedSizedEdge : public BaseEdge<D, E> {
   template <int VertexN>
   constexpr  std::enable_if_t<VertexXnType<VertexN>::kDimension != -1, int> vertexDimension() const {
     return VertexXnType<VertexN>::kDimension;
-  };
+  }
   template <int VertexN>
    std::enable_if_t<VertexXnType<VertexN>::kDimension == -1, int> vertexDimension() const {
     return vertexXn<VertexN>()->dimension();
