@@ -393,6 +393,7 @@ if(MSVC)
     add_definitions("/wd4251")
   endif()
 
+  add_definitions("/bigobj") # Avoid C1128
   # Fix other stupid warnings:
   add_definitions(-D_CRT_SECURE_NO_WARNINGS=1)  # Avoid deprecated fprintf(), etc.
   add_definitions("/nologo")
