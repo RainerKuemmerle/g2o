@@ -49,7 +49,7 @@ class GaussianSampler {
   bool setDistribution(const CovarianceType& cov) {
     Eigen::LLT<CovarianceType> cholDecomp;
     cholDecomp.compute(cov);
-    const bool status = cholDecomp.info() != Eigen::Success;
+    const bool status = cholDecomp.info() == Eigen::Success;
     if (!status) return false;
     cholesky_ = cholDecomp.matrixL();
     return true;
