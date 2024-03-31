@@ -39,10 +39,10 @@ class G2O_SIMULATOR_API SensorPointXYOffset
       public BinarySensor<Robot2D, EdgeSE2PointXYOffset, WorldObjectPointXY> {
  public:
   using RobotPoseType = PoseVertexType::EstimateType;
-  explicit SensorPointXYOffset(const std::string& name);
-  void sense() override;
+  explicit SensorPointXYOffset(std::string name);
+  void sense(BaseRobot& robot, World& world) override;
   void addNoise(EdgeType* e) override;
-  void addParameters() override;
+  void addParameters(World& world) override;
 
  protected:
   bool isVisible(WorldObjectType* to);

@@ -27,13 +27,15 @@
 #include "sensor_segment2d_line.h"
 
 #include <cassert>
+#include <utility>
 
 #include "g2o/apps/g2o_simulator/simutils.h"
 
 namespace g2o {
 
-SensorSegment2DLine::SensorSegment2DLine(const std::string& name)
-    : BinarySensor<Robot2D, EdgeSE2Segment2DLine, WorldObjectSegment2D>(name) {}
+SensorSegment2DLine::SensorSegment2DLine(std::string name)
+    : BinarySensor<Robot2D, EdgeSE2Segment2DLine, WorldObjectSegment2D>(
+          std::move(name)) {}
 
 void SensorSegment2DLine::addNoise(EdgeType* e) {
   EdgeType::ErrorVector n = sampler_.generateSample();
@@ -42,14 +44,14 @@ void SensorSegment2DLine::addNoise(EdgeType* e) {
 }
 
 bool SensorSegment2DLine::isVisible(SensorSegment2DLine::WorldObjectType* to) {
-  if (!robotPoseObject_) return false;
+  if (!robotPoseVertex_) return false;
 
   assert(to && to->vertex());
   VertexType* v = to->vertex().get();
 
   Vector2 p1;
   Vector2 p2;
-  SE2 iRobot = robotPoseObject_->vertex()->estimate().inverse();
+  SE2 iRobot = robotPoseVertex_->estimate().inverse();
   p1 = iRobot * v->estimateP1();
   p2 = iRobot * v->estimateP2();
 
@@ -97,26 +99,16 @@ bool SensorSegment2DLine::isVisible(SensorSegment2DLine::WorldObjectType* to) {
          clip2;  // only if both endpoints have been clipped do something
 }
 
-void SensorSegment2DLine::sense() {
-  robotPoseObject_ = nullptr;
-  auto* r = dynamic_cast<RobotType*>(robot());
-  auto it = r->trajectory().rbegin();
-  int count = 0;
-  while (it != r->trajectory().rend() && count < 1) {
-    if (!robotPoseObject_) robotPoseObject_ = *it;
-    ++it;
-    count++;
-  }
-  for (auto* it : world()->objects()) {
-    auto* o = dynamic_cast<WorldObjectType*>(it);
-    if (o && isVisible(o)) {
-      auto e = mkEdge(o);
-      if (e && graph()) {
-        e->setMeasurementFromState();
-        addNoise(e.get());
-        graph()->addEdge(e);
-      }
-    }
+void SensorSegment2DLine::sense(BaseRobot& robot, World& world) {
+  robotPoseVertex_ = robotPoseVertex<PoseVertexType>(robot, world);
+  for (const auto& it : world.objects()) {
+    auto* o = dynamic_cast<WorldObjectType*>(it.get());
+    if (!o || isVisible(o)) continue;
+    auto e = mkEdge(o);
+    if (!e) continue;
+    e->setMeasurementFromState();
+    addNoise(e.get());
+    world.graph().addEdge(e);
   }
 }
 

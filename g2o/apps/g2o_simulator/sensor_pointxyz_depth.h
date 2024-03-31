@@ -40,8 +40,8 @@ class G2O_SIMULATOR_API SensorPointXYZDepth
  public:
   using RobotPoseType = PoseVertexType::EstimateType;
   explicit SensorPointXYZDepth(const std::string& name);
-  void sense() override;
-  void addParameters() override;
+  void sense(BaseRobot& robot, World& world) override;
+  void addParameters(World& world) override;
   std::shared_ptr<ParameterCamera> offsetParam() { return offsetParam_; };
   void addNoise(EdgeType* e) override;
 

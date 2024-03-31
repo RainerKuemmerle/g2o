@@ -36,8 +36,8 @@ namespace g2o {
 class G2O_SIMULATOR_API SensorOdometry3D
     : public BinarySensor<Robot3D, EdgeSE3, WorldObjectSE3> {
  public:
-  explicit SensorOdometry3D(const std::string& name);
-  void sense() override;
+  explicit SensorOdometry3D(std::string name);
+  void sense(BaseRobot& robot, World& world) override;
   void addNoise(EdgeType* e) override;
 };
 

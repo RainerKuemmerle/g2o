@@ -38,18 +38,16 @@ class G2O_SIMULATOR_API SensorPose2D
     : public PointSensorParameters,
       public BinarySensor<Robot2D, EdgeSE2, WorldObjectSE2> {
  public:
-  explicit SensorPose2D(const std::string& name);
-  void sense() override;
+  explicit SensorPose2D(std::string name);
+  void sense(BaseRobot& robot, World& world) override;
   void addNoise(EdgeType* e) override;
 
-  int stepsToIgnore() const { return stepsToIgnore_; }
+  [[nodiscard]] int stepsToIgnore() const { return stepsToIgnore_; }
   void setStepsToIgnore(int stepsToIgnore) { stepsToIgnore_ = stepsToIgnore; }
 
  protected:
   bool isVisible(WorldObjectType* to);
   int stepsToIgnore_;
-  // these are temporaries
-  std::set<PoseObject*> posesToIgnore_;
 };
 
 }  // namespace g2o

@@ -38,8 +38,8 @@ class G2O_SIMULATOR_API SensorSegment2DLine
     : public PointSensorParameters,
       public BinarySensor<Robot2D, EdgeSE2Segment2DLine, WorldObjectSegment2D> {
  public:
-  explicit SensorSegment2DLine(const std::string& name);
-  void sense() override;
+  explicit SensorSegment2DLine(std::string name);
+  void sense(BaseRobot& robot, World& world) override;
   void addNoise(EdgeType* e) override;
 
  protected:

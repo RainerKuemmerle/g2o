@@ -27,14 +27,15 @@
 #include "sensor_segment2d_pointline.h"
 
 #include <cassert>
+#include <utility>
 
 #include "g2o/apps/g2o_simulator/simutils.h"
 
 namespace g2o {
 
-SensorSegment2DPointLine::SensorSegment2DPointLine(const std::string& name)
+SensorSegment2DPointLine::SensorSegment2DPointLine(std::string name)
     : BinarySensor<Robot2D, EdgeSE2Segment2DPointLine, WorldObjectSegment2D>(
-          name) {}
+          std::move(name)) {}
 
 void SensorSegment2DPointLine::addNoise(EdgeType* e) {
   EdgeType::ErrorVector n = sampler_.generateSample();
@@ -44,16 +45,14 @@ void SensorSegment2DPointLine::addNoise(EdgeType* e) {
 
 bool SensorSegment2DPointLine::isVisible(
     SensorSegment2DPointLine::WorldObjectType* to) {
-  if (!robotPoseObject_) return false;
+  if (!robotPoseVertex_) return false;
 
   assert(to && to->vertex());
   VertexType* v = to->vertex().get();
 
-  Vector2 p1;
-  Vector2 p2;
-  SE2 iRobot = robotPoseObject_->vertex()->estimate().inverse();
-  p1 = iRobot * v->estimateP1();
-  p2 = iRobot * v->estimateP2();
+  const SE2 iRobot = robotPoseVertex_->estimate().inverse();
+  Vector2 p1 = iRobot * v->estimateP1();
+  Vector2 p2 = iRobot * v->estimateP2();
 
   Vector3 vp1(p1.x(), p1.y(), 0.);
   Vector3 vp2(p2.x(), p2.y(), 0.);
@@ -106,27 +105,17 @@ bool SensorSegment2DPointLine::isVisible(
   return false;
 }
 
-void SensorSegment2DPointLine::sense() {
-  robotPoseObject_ = nullptr;
-  auto* r = dynamic_cast<RobotType*>(robot());
-  auto it = r->trajectory().rbegin();
-  int count = 0;
-  while (it != r->trajectory().rend() && count < 1) {
-    if (!robotPoseObject_) robotPoseObject_ = *it;
-    ++it;
-    count++;
-  }
-  for (auto* it : world()->objects()) {
-    auto* o = dynamic_cast<WorldObjectType*>(it);
-    if (o && isVisible(o)) {
-      auto e = mkEdge(o);
-      if (e && graph()) {
-        e->setPointNum(visiblePoint_);
-        e->setMeasurementFromState();
-        addNoise(e.get());
-        graph()->addEdge(e);
-      }
-    }
+void SensorSegment2DPointLine::sense(BaseRobot& robot, World& world) {
+  robotPoseVertex_ = robotPoseVertex<PoseVertexType>(robot, world);
+  for (const auto& it : world.objects()) {
+    auto* o = dynamic_cast<WorldObjectType*>(it.get());
+    if (!o || isVisible(o)) continue;
+    auto e = mkEdge(o);
+    if (!e) continue;
+    e->setPointNum(visiblePoint_);
+    e->setMeasurementFromState();
+    addNoise(e.get());
+    world.graph().addEdge(e);
   }
 }
 

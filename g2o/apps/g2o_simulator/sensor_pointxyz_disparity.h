@@ -26,6 +26,7 @@
 
 #ifndef G2O_SENSOR_POINTXYZ_DISPARITY_H_
 #define G2O_SENSOR_POINTXYZ_DISPARITY_H_
+#include "g2o/apps/g2o_simulator/simulator.h"
 #include "g2o/types/slam3d/edge_se3_pointxyz_disparity.h"
 #include "g2o/types/slam3d/parameter_camera.h"
 #include "g2o_simulator_api.h"
@@ -41,8 +42,8 @@ class G2O_SIMULATOR_API SensorPointXYZDisparity
  public:
   using RobotPoseType = PoseVertexType::EstimateType;
   explicit SensorPointXYZDisparity(const std::string& name);
-  void sense() override;
-  void addParameters() override;
+  void sense(BaseRobot& robot, World& world) override;
+  void addParameters(World& world) override;
   std::shared_ptr<ParameterCamera> offsetParam() { return offsetParam_; };
   void addNoise(EdgeType* e) override;
 

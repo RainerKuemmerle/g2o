@@ -26,6 +26,8 @@
 
 #include <fstream>
 #include <iostream>
+#include <memory>
+#include <optional>
 
 #include "g2o/apps/g2o_simulator/sensor_odometry3d.h"
 #include "g2o/apps/g2o_simulator/sensor_pointxyz.h"
@@ -34,6 +36,7 @@
 #include "g2o/apps/g2o_simulator/sensor_pose3d.h"
 #include "g2o/apps/g2o_simulator/simulator.h"
 #include "g2o/apps/g2o_simulator/simulator3d_base.h"
+#include "g2o/core/eigen_types.h"
 #include "g2o/core/optimizable_graph.h"
 #include "g2o/stuff/command_args.h"
 #include "g2o/stuff/sampler.h"
@@ -78,162 +81,176 @@ int main(int argc, char** argv) {
   arg.parseArgs(argc, argv);
 
   std::mt19937 generator;
-  g2o::OptimizableGraph graph;
-  g2o::World world(&graph);
+  g2o::World world;
   for (int i = 0; i < nlandmarks; i++) {
-    auto* landmark = new g2o::WorldObjectTrackXYZ;
+    auto landmark = std::make_unique<g2o::WorldObjectTrackXYZ>();
     double x = g2o::sampleUniform(-.5, .5, &generator) * worldSize;
     double y = g2o::sampleUniform(-.5, .5, &generator) * worldSize;
     double z = g2o::sampleUniform(-.5, .5);
     landmark->vertex()->setEstimate(g2o::Vector3(x, y, z));
-    world.addWorldObject(landmark);
-  }
-  g2o::Robot3D robot(&world, "myRobot");
-  world.addRobot(&robot);
-
-  std::stringstream ss;
-  ss << "-ws" << worldSize;
-  ss << "-nl" << nlandmarks;
-  ss << "-steps" << simSteps;
-
-  if (hasOdom) {
-    auto* odometrySensor = new g2o::SensorOdometry3D("odometry");
-    robot.addSensor(odometrySensor);
-    ss << "-odom";
+    world.addWorldObject(std::move(landmark));
   }
 
-  if (hasPointSensor) {
-    auto* pointSensor = new g2o::SensorPointXYZ("pointSensor");
-    pointSensor->setFov(M_PI / 4);
-    robot.addSensor(pointSensor);
-    Eigen::Isometry3d cameraPose;
-    Eigen::Matrix3d R;
-    R << 0, 0, 1, -1, 0, 0, 0, -1, 0;
-    pointSensor->setMaxRange(2.);
-    cameraPose = R;
-    cameraPose.translation() = g2o::Vector3(0., 0., 0.3);
-    pointSensor->offsetParam()->setParam(cameraPose);
-    ss << "-pointXYZ";
-  }
+  {
+    auto robot = std::make_unique<g2o::Robot3D>("myRobot");
 
-  if (hasPointDisparitySensor) {
-    auto* disparitySensor = new g2o::SensorPointXYZDisparity("disparitySensor");
-    disparitySensor->setFov(M_PI / 4);
-    disparitySensor->setMinRange(0.5);
-    disparitySensor->setMaxRange(2.);
-    robot.addSensor(disparitySensor);
-    g2o::CameraWithOffset cameraPose;
-    cameraPose.offset().linear() << 0, 0, 1, -1, 0, 0, 0, -1, 0;
-    cameraPose.offset().translation() = g2o::Vector3(0., 0., 0.3);
-    disparitySensor->offsetParam()->setParam(cameraPose);
-    ss << "-disparity";
-  }
+    if (hasOdom) {
+      auto odometrySensor = std::make_unique<g2o::SensorOdometry3D>("odometry");
+      robot->addSensor(std::move(odometrySensor), world);
+    }
 
-  if (hasPointDepthSensor) {
-    auto* depthSensor = new g2o::SensorPointXYZDepth("depthSensor");
-    depthSensor->setFov(M_PI / 4);
-    depthSensor->setMinRange(0.5);
-    depthSensor->setMaxRange(2.);
-    robot.addSensor(depthSensor);
-    g2o::CameraWithOffset cameraPose;
-    cameraPose.offset().linear() << 0, 0, 1, -1, 0, 0, 0, -1, 0;
-    cameraPose.offset().translation() = g2o::Vector3(0., 0., 0.3);
-    depthSensor->offsetParam()->setParam(cameraPose);
-    ss << "-depth";
-  }
+    if (hasPointSensor) {
+      auto pointSensor = std::make_unique<g2o::SensorPointXYZ>("pointSensor");
+      pointSensor->setFov(M_PI / 4);
+      Eigen::Isometry3d cameraPose;
+      Eigen::Matrix3d R;
+      R << 0, 0, 1, -1, 0, 0, 0, -1, 0;
+      pointSensor->setMaxRange(2.);
+      cameraPose = R;
+      cameraPose.translation() = g2o::Vector3(0., 0., 0.3);
+      pointSensor->offsetParam()->setParam(cameraPose);
+      robot->addSensor(std::move(pointSensor), world);
+    }
 
-  if (hasPoseSensor) {
-    auto* poseSensor = new g2o::SensorPose3D("poseSensor");
-    robot.addSensor(poseSensor);
-    poseSensor->setMaxRange(5);
-    ss << "-pose";
-  }
+    if (hasPointDisparitySensor) {
+      auto disparitySensor =
+          std::make_unique<g2o::SensorPointXYZDisparity>("disparitySensor");
+      disparitySensor->setFov(M_PI / 4);
+      disparitySensor->setMinRange(0.5);
+      disparitySensor->setMaxRange(2.);
+      g2o::CameraWithOffset cameraPose;
+      cameraPose.offset().linear() << 0, 0, 1, -1, 0, 0, 0, -1, 0;
+      cameraPose.offset().translation() = g2o::Vector3(0., 0., 0.3);
+      disparitySensor->offsetParam()->setParam(cameraPose);
+      robot->addSensor(std::move(disparitySensor), world);
+    }
+
+    if (hasPointDepthSensor) {
+      auto depthSensor =
+          std::make_unique<g2o::SensorPointXYZDepth>("depthSensor");
+      depthSensor->setFov(M_PI / 4);
+      depthSensor->setMinRange(0.5);
+      depthSensor->setMaxRange(2.);
+      g2o::CameraWithOffset cameraPose;
+      cameraPose.offset().linear() << 0, 0, 1, -1, 0, 0, 0, -1, 0;
+      cameraPose.offset().translation() = g2o::Vector3(0., 0., 0.3);
+      depthSensor->offsetParam()->setParam(cameraPose);
+      robot->addSensor(std::move(depthSensor), world);
+    }
+
+    if (hasPoseSensor) {
+      auto poseSensor = std::make_unique<g2o::SensorPose3D>("poseSensor");
+      poseSensor->setMaxRange(5);
+      robot->addSensor(std::move(poseSensor), world);
+    }
 
 #ifdef _POSE_PRIOR_SENSOR
-  SensorSE3Prior posePriorSensor("posePriorSensor");
-  robot.addSensor(&posePriorSensor);
-  {
-    Eigen::Isometry3d cameraPose;
-    Eigen::Matrix3d R;
-    R << 0, 0, 1, -1, 0, 0, 0, -1, 0;
-    cameraPose = R;
-    cameraPose.translation() = Vector3d(0., 0., 0.3);
-    posePriorSensor.offsetParam()->setOffset(cameraPose);
-  }
+    SensorSE3Prior posePriorSensor("posePriorSensor");
+    robot->addSensor(&posePriorSensor);
+    {
+      Eigen::Isometry3d cameraPose;
+      Eigen::Matrix3d R;
+      R << 0, 0, 1, -1, 0, 0, 0, -1, 0;
+      cameraPose = R;
+      cameraPose.translation() = Vector3d(0., 0., 0.3);
+      posePriorSensor.offsetParam()->setOffset(cameraPose);
+    }
 #endif
 
 #ifdef _POSE_SENSOR_OFFSET
-  SensorPose3DOffset poseSensor("poseSensor");
-  poseSensor.setFov(M_PI / 4);
-  poseSensor.setMinRange(0.5);
-  poseSensor.setMaxRange(5);
-  robot.addSensor(&poseSensor);
-  if (0) {
-    Eigen::Isometry3d cameraPose;
-    Eigen::Matrix3d R;
-    R << 0, 0, 1, -1, 0, 0, 0, -1, 0;
-    cameraPose = R;
-    cameraPose.translation() = Vector3d(0., 0., 0.3);
-    poseSensor.offsetParam1()->setOffset(cameraPose);
-    poseSensor.offsetParam2()->setOffset(cameraPose);
-  }
+    SensorPose3DOffset poseSensor("poseSensor");
+    poseSensor.setFov(M_PI / 4);
+    poseSensor.setMinRange(0.5);
+    poseSensor.setMaxRange(5);
+    robot->addSensor(&poseSensor);
+    if (0) {
+      Eigen::Isometry3d cameraPose;
+      Eigen::Matrix3d R;
+      R << 0, 0, 1, -1, 0, 0, 0, -1, 0;
+      cameraPose = R;
+      cameraPose.translation() = Vector3d(0., 0., 0.3);
+      poseSensor.offsetParam1()->setOffset(cameraPose);
+      poseSensor.offsetParam2()->setOffset(cameraPose);
+    }
 #endif
-
-  robot.move(Eigen::Isometry3d::Identity());
-  double pStraight = 0.7;
-  Eigen::Isometry3d moveStraight = Eigen::Isometry3d::Identity();
-  moveStraight.translation() = g2o::Vector3(1., 0., 0.);
-  double pLeft = 0.15;
-  Eigen::Isometry3d moveLeft = Eigen::Isometry3d::Identity();
-  moveLeft = g2o::AngleAxis(M_PI / 2, g2o::Vector3::UnitZ());
-  // double pRight=0.15;
-  Eigen::Isometry3d moveRight = Eigen::Isometry3d::Identity();
-  moveRight = g2o::AngleAxis(-M_PI / 2, g2o::Vector3::UnitZ());
-
-  Eigen::Matrix3d dtheta = Eigen::Matrix3d::Identity();
-  for (int i = 0; i < simSteps; i++) {
-    bool boundariesReached = true;
-    cerr << "m";
-    g2o::Vector3 dt;
-    const Eigen::Isometry3d& pose = robot.pose();
-    if (pose.translation().x() < -.5 * worldSize) {
-      dtheta = g2o::AngleAxis(0, g2o::Vector3::UnitZ());
-    } else if (pose.translation().x() > .5 * worldSize) {
-      dtheta = g2o::AngleAxis(-M_PI, g2o::Vector3::UnitZ());
-    } else if (pose.translation().y() < -.5 * worldSize) {
-      dtheta = g2o::AngleAxis(M_PI / 2, g2o::Vector3::UnitZ());
-    } else if (pose.translation().y() > .5 * worldSize) {
-      dtheta = g2o::AngleAxis(-M_PI / 2, g2o::Vector3::UnitZ());
-    } else {
-      boundariesReached = false;
-    }
-
-    Eigen::Isometry3d move = Eigen::Isometry3d::Identity();
-    if (boundariesReached) {
-      Eigen::Matrix3d mTheta = pose.rotation().inverse() * dtheta;
-      move = mTheta;
-      g2o::AngleAxis aa(mTheta);
-      if (aa.angle() < std::numeric_limits<double>::epsilon()) {
-        move.translation() = g2o::Vector3(1., 0., 0.);
-      }
-    } else {
-      double sampled = g2o::sampleUniform();
-      if (sampled < pStraight)
-        move = moveStraight;
-      else if (sampled < pStraight + pLeft)
-        move = moveLeft;
-      else
-        move = moveRight;
-    }
-
-    // select a random move of the robot
-    robot.relativeMove(move);
-    // do a sense
-    cerr << "s";
-    robot.sense();
+    world.addRobot(std::move(robot));
   }
-  // string fname=outputFilename + ss.str() + ".g2o";
-  // ofstream testStream(fname.c_str());
+
+  for (const auto& robot : world.robots()) {
+    auto* rob2d = dynamic_cast<g2o::Robot3D*>(robot.get());
+    if (!rob2d) continue;
+    rob2d->move(world, Eigen::Isometry3d::Identity());
+  }
+
+  auto moveStraight = []() {
+    Eigen::Isometry3d result;
+    result = g2o::Translation3(1., 0., 0.);
+    return result;
+  };
+  auto moveLeft = []() {
+    Eigen::Isometry3d result;
+    result = g2o::AngleAxis(M_PI / 2, g2o::Vector3::UnitZ());
+    return result;
+  };
+  auto moveRight = []() {
+    Eigen::Isometry3d result;
+    result = g2o::AngleAxis(-M_PI / 2, g2o::Vector3::UnitZ());
+    return result;
+  };
+
+  for (const auto& base_robot : world.robots()) {
+    auto* robot = dynamic_cast<g2o::Robot3D*>(base_robot.get());
+    if (!robot) continue;
+    for (int i = 0; i < simSteps; i++) {
+      cerr << "m";
+      g2o::Vector3 dt;
+      const Eigen::Isometry3d& pose = robot->pose();
+
+      const std::optional<Eigen::Matrix3d> dtheta =
+          [&]() -> std::optional<Eigen::Matrix3d> {
+        if (pose.translation().x() < -.5 * worldSize) {
+          return g2o::AngleAxis(0, g2o::Vector3::UnitZ()).toRotationMatrix();
+        }
+        if (pose.translation().x() > .5 * worldSize) {
+          return g2o::AngleAxis(-M_PI, g2o::Vector3::UnitZ())
+              .toRotationMatrix();
+        }
+        if (pose.translation().y() < -.5 * worldSize) {
+          return g2o::AngleAxis(M_PI / 2, g2o::Vector3::UnitZ())
+              .toRotationMatrix();
+        }
+        if (pose.translation().y() > .5 * worldSize) {
+          return g2o::AngleAxis(-M_PI / 2, g2o::Vector3::UnitZ())
+              .toRotationMatrix();
+        }
+        return std::nullopt;
+      }();
+
+      const Eigen::Isometry3d move = [&]() {
+        if (dtheta.has_value()) {
+          Eigen::Isometry3d result;
+          result.linear() = pose.rotation().inverse() * dtheta.value();
+          g2o::AngleAxis aa(result.linear());
+          if (std::abs(aa.angle()) < std::numeric_limits<double>::epsilon()) {
+            result.translation() = g2o::Vector3(1., 0., 0.);
+          }
+          return result;
+        }
+        constexpr double kPStraight = 0.7;
+        constexpr double kPLeft = 0.15;
+        const double sampled = g2o::sampleUniform();
+        if (sampled < kPStraight) return moveStraight();
+        if (sampled < kPStraight + kPLeft) return moveLeft();
+        return moveRight();
+      }();
+
+      // select a random move of the robot
+      robot->relativeMove(world, move);
+      // do a sense
+      cerr << "s";
+      robot->sense(world);
+    }
+  }
   std::ofstream testStream(outputFilename.c_str());
-  graph.save(testStream);
+  world.graph().save(testStream);
 }

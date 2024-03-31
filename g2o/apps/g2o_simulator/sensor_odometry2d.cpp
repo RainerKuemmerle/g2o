@@ -26,6 +26,7 @@
 
 #include "sensor_odometry2d.h"
 
+#include "g2o/apps/g2o_simulator/simulator2d_base.h"
 #include "g2o/stuff/logger.h"
 
 // Robot2D
@@ -34,41 +35,27 @@ namespace g2o {
 SensorOdometry2D::SensorOdometry2D(const std::string& name)
     : BinarySensor<Robot2D, EdgeSE2, WorldObjectSE2>(name) {}
 
-void SensorOdometry2D::sense() {
-  if (!robot()) return;
-
-  auto* r = dynamic_cast<RobotType*>(robot());
-  if (!r) return;
-
-  PoseObject* pprev = nullptr;
-  PoseObject* pcurr = nullptr;
-  auto it = r->trajectory().rbegin();
-  if (it != r->trajectory().rend()) {
-    pcurr = *it;
-    ++it;
-  }
-  if (it != r->trajectory().rend()) {
-    pprev = *it;
-    ++it;
-  }
-  if (!(pcurr && pprev)) {
+void SensorOdometry2D::sense(BaseRobot& robot, World& world) {
+  const int traj_size = robot.trajectory().size();
+  if (traj_size < 2) {
     G2O_ERROR("fatal, trajectory empty");
     return;
   }
-  robotPoseObject_ = pprev;
-  auto e = mkEdge(pcurr);
-  if (e) {
-    e->setMeasurementFromState();
-    addNoise(e.get());
-    if (graph()) graph()->addEdge(e);
-  }
-  robotPoseObject_ = pcurr;
+  robotPoseVertex_ = robotPoseVertex<Robot2D::VertexType>(robot, world);
+
+  auto e = mkEdge(nullptr);
+  if (!e) return;
+  const int prev_robot_id = robot.trajectory()[traj_size - 2];
+  e->vertices()[0] =
+      robotPoseVertexForId<Robot2D::VertexType>(prev_robot_id, world);
+  e->vertices()[1] = robotPoseVertex_;
+  e->setMeasurementFromState();
+  addNoise(e.get());
+  world.graph().addEdge(e);
 }
 
 void SensorOdometry2D::addNoise(EdgeType* e) {
-  EdgeType::ErrorVector noise = sampler_.generateSample();
-  EdgeType::Measurement n;
-  n.fromVector(noise);
+  const EdgeType::Measurement n(sampler_.generateSample());
   e->setMeasurement(e->measurement() * n);
   e->setInformation(information());
 }
