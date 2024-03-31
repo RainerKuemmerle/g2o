@@ -28,6 +28,8 @@
 
 #include <cassert>
 
+#include "g2o/apps/g2o_simulator/simulator.h"
+
 namespace g2o {
 
 // SensorPointXYZDisparity
@@ -42,7 +44,7 @@ SensorPointXYZDisparity::SensorPointXYZDisparity(const std::string& name)
 
 bool SensorPointXYZDisparity::isVisible(
     SensorPointXYZDisparity::WorldObjectType* to) {
-  if (!robotPoseObject_) return false;
+  if (!robotPoseVertex_) return false;
   assert(to && to->vertex());
   VertexType::EstimateType pose = to->vertex()->estimate();
   VertexType::EstimateType delta = sensorPose_.inverse() * pose;
@@ -56,10 +58,9 @@ bool SensorPointXYZDisparity::isVisible(
   return fabs(bearing) <= fov_;
 }
 
-void SensorPointXYZDisparity::addParameters() {
+void SensorPointXYZDisparity::addParameters(World& world) {
   if (!offsetParam_) offsetParam_ = std::make_shared<ParameterCamera>();
-  assert(world());
-  world()->addParameter(offsetParam_);
+  world.addParameter(offsetParam_);
 }
 
 void SensorPointXYZDisparity::addNoise(EdgeType* e) {
@@ -68,33 +69,22 @@ void SensorPointXYZDisparity::addNoise(EdgeType* e) {
   e->setInformation(information());
 }
 
-void SensorPointXYZDisparity::sense() {
+void SensorPointXYZDisparity::sense(BaseRobot& robot, World& world) {
   if (!offsetParam_) {
     return;
   }
-  robotPoseObject_ = nullptr;
-  auto* r = dynamic_cast<RobotType*>(robot());
-  auto it = r->trajectory().rbegin();
-  int count = 0;
-  while (it != r->trajectory().rend() && count < 1) {
-    if (!robotPoseObject_) robotPoseObject_ = *it;
-    ++it;
-    count++;
-  }
-  if (!robotPoseObject_) return;
-  sensorPose_ =
-      robotPoseObject_->vertex()->estimate() * offsetParam_->param().offset();
-  for (auto* it : world()->objects()) {
-    auto* o = dynamic_cast<WorldObjectType*>(it);
-    if (o && isVisible(o)) {
-      auto e = mkEdge(o);
-      if (e && graph()) {
-        e->setParameterId(0, offsetParam_->id());
-        graph()->addEdge(e);
-        e->setMeasurementFromState();
-        addNoise(e.get());
-      }
-    }
+  robotPoseVertex_ = robotPoseVertex<PoseVertexType>(robot, world);
+  if (!robotPoseVertex_) return;
+  sensorPose_ = robotPoseVertex_->estimate() * offsetParam_->param().offset();
+  for (const auto& it : world.objects()) {
+    auto* o = dynamic_cast<WorldObjectType*>(it.get());
+    if (!o || !isVisible(o)) continue;
+    auto e = mkEdge(o);
+    if (!e) continue;
+    e->setParameterId(0, offsetParam_->id());
+    world.graph().addEdge(e);
+    e->setMeasurementFromState();
+    addNoise(e.get());
   }
 }
 }  // namespace g2o

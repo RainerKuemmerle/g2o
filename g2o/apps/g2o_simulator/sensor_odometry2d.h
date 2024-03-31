@@ -37,7 +37,7 @@ class G2O_SIMULATOR_API SensorOdometry2D
  public:
   using PoseObject = Robot2D::PoseObject;
   explicit SensorOdometry2D(const std::string& name);
-  void sense() override;
+  void sense(BaseRobot& robot, World& world) override;
   void addNoise(EdgeType* e) override;
 };
 

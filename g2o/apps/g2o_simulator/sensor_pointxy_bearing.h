@@ -38,9 +38,9 @@ class G2O_SIMULATOR_API SensorPointXYBearing
     : public PointSensorParameters,
       public BinarySensor<Robot2D, EdgeSE2PointXYBearing, WorldObjectPointXY> {
  public:
-  explicit SensorPointXYBearing(const std::string& name);
+  explicit SensorPointXYBearing(std::string name);
   void addNoise(EdgeType* e) override;
-  void sense() override;
+  void sense(BaseRobot& robot, World& world) override;
 
  protected:
   bool isVisible(WorldObjectType* to);

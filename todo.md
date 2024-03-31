@@ -1,3 +1,7 @@
+[ ] wrap simulator into library
+[ ] add python wrapper for simulator
+[ ] add tests for simulator
+[ ] add python wrapper for simulator
 [x] Create parameter type for ParameterCamera to support load/save
 [ ] Add typing for parameters to template?
 [ ] Re-work python wrapping for parameters, templated base param

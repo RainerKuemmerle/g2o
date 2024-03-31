@@ -37,7 +37,7 @@ class G2O_SIMULATOR_API SensorLine3D
       public BinarySensor<Robot3D, EdgeSE3Line3D, WorldObjectLine3D> {
  public:
   typedef PoseVertexType::EstimateType RobotPoseType;
-  SensorLine3D(const std::string& name_);
+  explicit SensorLine3D(const std::string& name_);
   virtual void sense();
   virtual void addParameters();
   std::shared_ptr<ParameterSE3Offset> offsetParam() { return _offsetParam; };

@@ -364,8 +364,8 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   message(STATUS "Compiling with Clang")
 
   # activate all warnings
-  set(g2o_C_FLAGS "${g2o_C_FLAGS} -Wall -Wextra -Wpedantic")
-  set(g2o_CXX_FLAGS "${g2o_CXX_FLAGS} -Wall -Wextra -Wpedantic")
+  set(g2o_C_FLAGS "${g2o_C_FLAGS} -Wall -Wextra -pedantic")
+  set(g2o_CXX_FLAGS "${g2o_CXX_FLAGS} -Wall -Wextra -pedantic")
 endif()
 
 if(MSVC)

@@ -38,8 +38,8 @@ class G2O_SIMULATOR_API SensorPointXY
     : public PointSensorParameters,
       public BinarySensor<Robot2D, EdgeSE2PointXY, WorldObjectPointXY> {
  public:
-  explicit SensorPointXY(const std::string& name);
-  void sense() override;
+  explicit SensorPointXY(std::string name);
+  void sense(BaseRobot& robot, World& world) override;
   void addNoise(EdgeType* e) override;
 
  protected:

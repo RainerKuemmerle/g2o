@@ -27,11 +27,13 @@
 #include "sensor_pointxy_bearing.h"
 
 #include <cassert>
+#include <utility>
 
 namespace g2o {
 
-SensorPointXYBearing::SensorPointXYBearing(const std::string& name)
-    : BinarySensor<Robot2D, EdgeSE2PointXYBearing, WorldObjectPointXY>(name) {
+SensorPointXYBearing::SensorPointXYBearing(std::string name)
+    : BinarySensor<Robot2D, EdgeSE2PointXYBearing, WorldObjectPointXY>(
+          std::move(name)) {
   information_(0, 0) = 180.0 / M_PI;
 }
 
@@ -43,41 +45,29 @@ void SensorPointXYBearing::addNoise(EdgeType* e) {
 
 bool SensorPointXYBearing::isVisible(
     SensorPointXYBearing::WorldObjectType* to) {
-  if (!robotPoseObject_) return false;
+  if (!robotPoseVertex_) return false;
 
   assert(to && to->vertex());
-  VertexType::EstimateType pose = to->vertex()->estimate();
-  VertexType::EstimateType delta =
-      robotPoseObject_->vertex()->estimate().inverse() * pose;
-  Vector2 translation = delta;
-  double range2 = translation.squaredNorm();
+  const VertexType::EstimateType pose = to->vertex()->estimate();
+  const VertexType::EstimateType delta =
+      robotPoseVertex_->estimate().inverse() * pose;
+  const double range2 = delta.squaredNorm();
   if (range2 > maxRange2_) return false;
   if (range2 < minRange2_) return false;
-  translation.normalize();
-  double bearing = acos(translation.x());
-  return fabs(bearing) <= fov_;
+  double bearing = acos(delta.normalized().x());
+  return std::abs(bearing) <= fov_;
 }
 
-void SensorPointXYBearing::sense() {
-  robotPoseObject_ = nullptr;
-  auto* r = dynamic_cast<RobotType*>(robot());
-  auto it = r->trajectory().rbegin();
-  int count = 0;
-  while (it != r->trajectory().rend() && count < 1) {
-    if (!robotPoseObject_) robotPoseObject_ = *it;
-    ++it;
-    count++;
-  }
-  for (auto* it : world()->objects()) {
-    auto* o = dynamic_cast<WorldObjectType*>(it);
-    if (o && isVisible(o)) {
-      auto e = mkEdge(o);
-      if (e && graph()) {
-        e->setMeasurementFromState();
-        addNoise(e.get());
-        graph()->addEdge(e);
-      }
-    }
+void SensorPointXYBearing::sense(BaseRobot& robot, World& world) {
+  robotPoseVertex_ = robotPoseVertex<PoseVertexType>(robot, world);
+  for (const auto& it : world.objects()) {
+    auto* o = dynamic_cast<WorldObjectType*>(it.get());
+    if (!o || !isVisible(o)) continue;
+    auto e = mkEdge(o);
+    if (!e) continue;
+    e->setMeasurementFromState();
+    addNoise(e.get());
+    world.graph().addEdge(e);
   }
 }
 

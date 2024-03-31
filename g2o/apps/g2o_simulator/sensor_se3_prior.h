@@ -38,9 +38,9 @@ class G2O_SIMULATOR_API SensorSE3Prior
       public UnarySensor<Robot3D, EdgeSE3Prior> {
  public:
   using RobotPoseType = PoseVertexType::EstimateType;
-  explicit SensorSE3Prior(const std::string& name);
-  void sense() override;
-  void addParameters() override;
+  explicit SensorSE3Prior(std::string name);
+  void sense(BaseRobot& robot, World& world) override;
+  void addParameters(World& world) override;
   std::shared_ptr<ParameterSE3Offset> offsetParam() { return offsetParam_; };
   void addNoise(EdgeType* e) override;
 

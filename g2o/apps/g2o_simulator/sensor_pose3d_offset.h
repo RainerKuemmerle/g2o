@@ -27,6 +27,7 @@
 #ifndef G2O_SENSOR_POSE3D_OFFSET_H_
 #define G2O_SENSOR_POSE3D_OFFSET_H_
 
+#include "g2o/apps/g2o_simulator/simulator.h"
 #include "g2o/types/slam3d/edge_se3_offset.h"
 #include "g2o/types/slam3d/parameter_se3_offset.h"
 #include "pointsensorparameters.h"
@@ -38,12 +39,12 @@ class SensorPose3DOffset
     : public PointSensorParameters,
       public BinarySensor<Robot3D, EdgeSE3Offset, WorldObjectSE3> {
  public:
-  explicit SensorPose3DOffset(const std::string& name);
-  void sense() override;
+  explicit SensorPose3DOffset(std::string name);
+  void sense(BaseRobot& robot, World& world) override;
   [[nodiscard]] int stepsToIgnore() const { return stepsToIgnore_; }
   void setStepsToIgnore(int stepsToIgnore) { stepsToIgnore_ = stepsToIgnore; }
   void addNoise(EdgeType* e) override;
-  void addParameters() override;
+  void addParameters(World& world) override;
   std::shared_ptr<ParameterSE3Offset> offsetParam1() { return offsetParam1_; };
   std::shared_ptr<ParameterSE3Offset> offsetParam2() { return offsetParam2_; };
 
@@ -51,9 +52,6 @@ class SensorPose3DOffset
   bool isVisible(WorldObjectType* to);
   int stepsToIgnore_;
   std::shared_ptr<ParameterSE3Offset> offsetParam1_, offsetParam2_;
-
-  // these are temporaries
-  std::set<PoseObject*> posesToIgnore_;
 };
 
 }  // namespace g2o

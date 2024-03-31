@@ -26,6 +26,7 @@
 
 #ifndef G2O_SENSOR_POINTXYZ_H_
 #define G2O_SENSOR_POINTXYZ_H_
+#include "g2o/apps/g2o_simulator/simulator.h"
 #include "g2o/types/slam3d/edge_se3_pointxyz.h"
 #include "g2o_simulator_api.h"
 #include "pointsensorparameters.h"
@@ -38,9 +39,9 @@ class G2O_SIMULATOR_API SensorPointXYZ
       public BinarySensor<Robot3D, EdgeSE3PointXYZ, WorldObjectTrackXYZ> {
  public:
   using RobotPoseType = PoseVertexType::EstimateType;
-  explicit SensorPointXYZ(const std::string& name);
-  void sense() override;
-  void addParameters() override;
+  explicit SensorPointXYZ(std::string name);
+  void sense(BaseRobot& robot, World& world) override;
+  void addParameters(World& world) override;
   std::shared_ptr<ParameterSE3Offset> offsetParam() { return offsetParam_; };
   void addNoise(EdgeType* e) override;
 

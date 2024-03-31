@@ -27,22 +27,23 @@
 #include "sensor_pose2d.h"
 
 #include <cassert>
+#include <unordered_set>
+#include <utility>
 
 namespace g2o {
 
-SensorPose2D::SensorPose2D(const std::string& name)
-    : BinarySensor<Robot2D, EdgeSE2, WorldObjectSE2>(name) {
+SensorPose2D::SensorPose2D(std::string name)
+    : BinarySensor<Robot2D, EdgeSE2, WorldObjectSE2>(std::move(name)) {
   stepsToIgnore_ = 10;
 }
 
 bool SensorPose2D::isVisible(SensorPose2D::WorldObjectType* to) {
-  if (!robotPoseObject_) return false;
-  if (posesToIgnore_.find(to) != posesToIgnore_.end()) return false;
+  if (!robotPoseVertex_) return false;
 
   assert(to && to->vertex());
   VertexType::EstimateType pose = to->vertex()->estimate();
   VertexType::EstimateType delta =
-      robotPoseObject_->vertex()->estimate().inverse() * pose;
+      robotPoseVertex_->estimate().inverse() * pose;
   Vector2 translation = delta.translation();
   double range2 = translation.squaredNorm();
   if (range2 > maxRange2_) return false;
@@ -56,34 +57,29 @@ bool SensorPose2D::isVisible(SensorPose2D::WorldObjectType* to) {
 
 void SensorPose2D::addNoise(EdgeType* e) {
   EdgeType::ErrorVector noise = sampler_.generateSample();
-  EdgeType::Measurement n;
-  n.fromVector(noise);
+  EdgeType::Measurement n(noise);
   e->setMeasurement(e->measurement() * n);
   e->setInformation(information());
 }
 
-void SensorPose2D::sense() {
-  robotPoseObject_ = nullptr;
-  auto* r = dynamic_cast<RobotType*>(robot());
-  auto it = r->trajectory().rbegin();
-  posesToIgnore_.clear();
+void SensorPose2D::sense(BaseRobot& robot, World& world) {
+  robotPoseVertex_ = robotPoseVertex<PoseVertexType>(robot, world);
+  std::unordered_set<int> poses_to_ignore;
   int count = 0;
-  while (it != r->trajectory().rend() && count < stepsToIgnore_) {
-    if (!robotPoseObject_) robotPoseObject_ = *it;
-    posesToIgnore_.insert(*it);
-    ++it;
+  for (auto it = robot.trajectory().rbegin();
+       it != robot.trajectory().rend() && count < stepsToIgnore_; ++it) {
+    poses_to_ignore.insert(*it);
     count++;
   }
-  for (auto* it : world()->objects()) {
-    auto* o = dynamic_cast<WorldObjectType*>(it);
-    if (o && isVisible(o)) {
-      auto e = mkEdge(o);
-      if (e && graph()) {
-        e->setMeasurementFromState();
-        addNoise(e.get());
-        graph()->addEdge(e);
-      }
-    }
+  for (const auto& it : world.objects()) {
+    auto* o = dynamic_cast<WorldObjectType*>(it.get());
+    if (!o || !isVisible(o)) continue;
+    if (poses_to_ignore.count(o->vertex()->id()) > 0) continue;
+    auto e = mkEdge(o);
+    if (!e) continue;
+    e->setMeasurementFromState();
+    addNoise(e.get());
+    world.graph().addEdge(e);
   }
 }
 

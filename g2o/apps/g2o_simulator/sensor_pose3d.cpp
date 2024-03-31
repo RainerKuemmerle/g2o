@@ -27,13 +27,15 @@
 #include "sensor_pose3d.h"
 
 #include <cassert>
+#include <unordered_set>
+#include <utility>
 
 #include "g2o/types/slam3d/isometry3d_mappings.h"
 
 namespace g2o {
 
-SensorPose3D::SensorPose3D(const std::string& name)
-    : BinarySensor<Robot3D, EdgeSE3, WorldObjectSE3>(name) {
+SensorPose3D::SensorPose3D(std::string name)
+    : BinarySensor<Robot3D, EdgeSE3, WorldObjectSE3>(std::move(name)) {
   stepsToIgnore_ = 10;
   information_.setIdentity();
   information_ *= 100;
@@ -51,46 +53,40 @@ void SensorPose3D::addNoise(EdgeType* e) {
 }
 
 bool SensorPose3D::isVisible(SensorPose3D::WorldObjectType* to) {
-  if (!robotPoseObject_) return false;
-  if (posesToIgnore_.find(to) != posesToIgnore_.end()) return false;
-
+  if (!robotPoseVertex_) return false;
   assert(to && to->vertex());
-  VertexType::EstimateType pose = to->vertex()->estimate();
-  VertexType::EstimateType delta =
-      robotPoseObject_->vertex()->estimate().inverse() * pose;
-  Vector3 translation = delta.translation();
-  double range2 = translation.squaredNorm();
+  const VertexType::EstimateType& pose = to->vertex()->estimate();
+  const VertexType::EstimateType delta =
+      robotPoseVertex_->estimate().inverse() * pose;
+  const Vector3 translation = delta.translation();
+  const double range2 = translation.squaredNorm();
   if (range2 > maxRange2_) return false;
   if (range2 < minRange2_) return false;
-  translation.normalize();
-  double bearing = acos(translation.x());
+  double bearing = acos(translation.normalized().x());
   if (fabs(bearing) > fov_) return false;
-  AngleAxis a(delta.rotation());
-  return fabs(a.angle()) <= maxAngularDifference_;
+  const AngleAxis a(delta.rotation());
+  return std::abs(a.angle()) <= maxAngularDifference_;
 }
 
-void SensorPose3D::sense() {
-  robotPoseObject_ = nullptr;
-  auto* r = dynamic_cast<RobotType*>(robot());
-  auto it = r->trajectory().rbegin();
-  posesToIgnore_.clear();
+void SensorPose3D::sense(BaseRobot& robot, World& world) {
+  robotPoseVertex_ = robotPoseVertex<PoseVertexType>(robot, world);
+
+  std::unordered_set<int> poses_to_ignore;
   int count = 0;
-  while (it != r->trajectory().rend() && count < stepsToIgnore_) {
-    if (!robotPoseObject_) robotPoseObject_ = *it;
-    posesToIgnore_.insert(*it);
-    ++it;
+  for (auto it = robot.trajectory().rbegin();
+       it != robot.trajectory().rend() && count < stepsToIgnore_; ++it) {
+    poses_to_ignore.insert(*it);
     count++;
   }
-  for (auto* it : world()->objects()) {
-    auto* o = dynamic_cast<WorldObjectType*>(it);
-    if (o && isVisible(o)) {
-      auto e = mkEdge(o);
-      if (e && graph()) {
-        graph()->addEdge(e);
-        e->setMeasurementFromState();
-        addNoise(e.get());
-      }
-    }
+  for (const auto& it : world.objects()) {
+    auto* o = dynamic_cast<WorldObjectType*>(it.get());
+    if (!o || !isVisible(o)) continue;
+    if (poses_to_ignore.count(o->vertex()->id()) > 0) continue;
+    auto e = mkEdge(o);
+    if (!e) continue;
+    world.graph().addEdge(e);
+    e->setMeasurementFromState();
+    addNoise(e.get());
   }
 }
 

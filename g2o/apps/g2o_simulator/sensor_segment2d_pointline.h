@@ -39,8 +39,8 @@ class G2O_SIMULATOR_API SensorSegment2DPointLine
       public BinarySensor<Robot2D, EdgeSE2Segment2DPointLine,
                           WorldObjectSegment2D> {
  public:
-  explicit SensorSegment2DPointLine(const std::string& name);
-  void sense() override;
+  explicit SensorSegment2DPointLine(std::string name);
+  void sense(BaseRobot& robot, World& world) override;
   void addNoise(EdgeType* e) override;
 
  protected:

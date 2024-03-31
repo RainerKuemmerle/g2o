@@ -31,8 +31,8 @@
 namespace g2o {
 
 // SensorSE3Prior
-SensorSE3Prior::SensorSE3Prior(const std::string& name)
-    : UnarySensor<Robot3D, EdgeSE3Prior>(name) {
+SensorSE3Prior::SensorSE3Prior(std::string name)
+    : UnarySensor<Robot3D, EdgeSE3Prior>(std::move(name)) {
   offsetParam_ = nullptr;
   information_.setIdentity();
   information_ *= 1000;
@@ -40,10 +40,9 @@ SensorSE3Prior::SensorSE3Prior(const std::string& name)
   setInformation(information_);
 }
 
-void SensorSE3Prior::addParameters() {
+void SensorSE3Prior::addParameters(World& world) {
   if (!offsetParam_) offsetParam_ = std::make_shared<ParameterSE3Offset>();
-  assert(world());
-  world()->addParameter(offsetParam_);
+  world.addParameter(offsetParam_);
 }
 
 void SensorSE3Prior::addNoise(EdgeType* e) {
@@ -53,28 +52,19 @@ void SensorSE3Prior::addNoise(EdgeType* e) {
   e->setInformation(information());
 }
 
-void SensorSE3Prior::sense() {
+void SensorSE3Prior::sense(BaseRobot& robot, World& world) {
   if (!offsetParam_) {
     return;
   }
-  robotPoseObject_ = nullptr;
-  auto* r = dynamic_cast<RobotType*>(robot());
-  auto it = r->trajectory().rbegin();
-  int count = 0;
-  while (it != r->trajectory().rend() && count < 1) {
-    if (!robotPoseObject_) robotPoseObject_ = *it;
-    ++it;
-    count++;
-  }
-  if (!robotPoseObject_) return;
-  sensorPose_ = robotPoseObject_->vertex()->estimate() * offsetParam_->param();
+  robotPoseVertex_ = robotPoseVertex<PoseVertexType>(robot, world);
+  if (!robotPoseVertex_) return;
+  sensorPose_ = robotPoseVertex_->estimate() * offsetParam_->param();
   auto e = mkEdge();
-  if (e && graph()) {
-    e->setParameterId(0, offsetParam_->id());
-    graph()->addEdge(e);
-    e->setMeasurementFromState();
-    addNoise(e.get());
-  }
+  if (!e) return;
+  e->setParameterId(0, offsetParam_->id());
+  world.graph().addEdge(e);
+  e->setMeasurementFromState();
+  addNoise(e.get());
 }
 
 }  // namespace g2o

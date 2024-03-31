@@ -26,13 +26,15 @@
 
 #include "sensor_odometry3d.h"
 
+#include <utility>
+
 #include "g2o/stuff/logger.h"
 #include "g2o/types/slam3d/isometry3d_mappings.h"
 
 namespace g2o {
 
-SensorOdometry3D::SensorOdometry3D(const std::string& name)
-    : BinarySensor<Robot3D, EdgeSE3, WorldObjectSE3>(name) {
+SensorOdometry3D::SensorOdometry3D(std::string name)
+    : BinarySensor<Robot3D, EdgeSE3, WorldObjectSE3>(std::move(name)) {
   information_.setIdentity();
   information_ *= 100;
   information_(3, 3) = 10000;
@@ -48,37 +50,23 @@ void SensorOdometry3D::addNoise(EdgeType* e) {
   e->setInformation(information());
 }
 
-void SensorOdometry3D::sense() {
-  if (!robot()) return;
-
-  auto* r = dynamic_cast<RobotType*>(robot());
-  if (!r) return;
-
-  PoseObject* pprev = nullptr;
-  PoseObject* pcurr = nullptr;
-  auto it = r->trajectory().rbegin();
-  if (it != r->trajectory().rend()) {
-    pcurr = *it;
-    ++it;
-  }
-  if (it != r->trajectory().rend()) {
-    pprev = *it;
-    ++it;
-  }
-  if (!(pcurr && pprev)) {
+void SensorOdometry3D::sense(BaseRobot& robot, World& world) {
+  const int traj_size = robot.trajectory().size();
+  if (traj_size < 2) {
     G2O_ERROR("fatal, trajectory empty");
     return;
   }
-  robotPoseObject_ = pprev;
-  auto e = mkEdge(pcurr);
-  if (e) {
-    if (graph()) {
-      graph()->addEdge(e);
-      e->setMeasurementFromState();
-      addNoise(e.get());
-    }
-  }
-  robotPoseObject_ = pcurr;
+  robotPoseVertex_ = robotPoseVertex<Robot3D::VertexType>(robot, world);
+
+  auto e = mkEdge(nullptr);
+  if (!e) return;
+  const int prev_robot_id = robot.trajectory()[traj_size - 2];
+  e->vertices()[0] =
+      robotPoseVertexForId<Robot3D::VertexType>(prev_robot_id, world);
+  e->vertices()[1] = robotPoseVertex_;
+  world.graph().addEdge(e);
+  e->setMeasurementFromState();
+  addNoise(e.get());
 }
 
 }  // namespace g2o
