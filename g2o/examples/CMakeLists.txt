@@ -48,7 +48,7 @@ if(G2O_BUILD_SLAM2D_TYPES AND G2O_BUILD_SLAM2D_ADDON_TYPES AND G2O_BUILD_SLAM3D_
   add_subdirectory(convert_segment_line)
 endif()
 
-if(Qt5_FOUND AND QGLVIEWER_FOUND)
+if(Qt5_FOUND AND QGLVIEWER_FOUND AND G2O_HAVE_OPENGL)
   add_subdirectory(slam2d)
 endif()
 
