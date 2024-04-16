@@ -55,6 +55,12 @@ int RunG2OViewer::run(int argc, char** argv, CommandArgs& arg) {
                     "graph file which will be processed", true);
   arg.parseArgs(argc, argv);
 
+  // Check if given file exists
+  if (inputFilename.size() > 0 && !std::ifstream(inputFilename)) {
+    std::cerr << "Error: unable to open file " << inputFilename << std::endl;
+    std::exit(1);
+  }
+
   MainWindow mw;
   mw.updateDisplayedSolvers();
   mw.updateRobustKernels();
