@@ -157,6 +157,7 @@ find_package(OpenGL)
 
 # If OpenGL was found, use the import target if available. If not, use old-style includes
 option(G2O_USE_OPENGL "Build g2o with OpenGL support for visualization" ON)
+set(G2O_HAVE_OPENGL 0)
 if (OPENGL_FOUND AND G2O_USE_OPENGL)
   if (TARGET OpenGL::GL)
     set(G2O_OPENGL_TARGET "OpenGL::GL;OpenGL::GLU")
@@ -164,7 +165,7 @@ if (OPENGL_FOUND AND G2O_USE_OPENGL)
     set(G2O_OPENGL_TARGET "${OPENGL_LIBRARIES}")
     include_directories(${OPENGL_INCLUDE_DIR})
   endif()
-  set (G2O_HAVE_OPENGL 1)
+  set(G2O_HAVE_OPENGL 1)
   message(STATUS "Compiling with OpenGL support")
   #message(WARNING G2O_OPENGL_TARGET=${G2O_OPENGL_TARGET})
 endif()
@@ -174,10 +175,11 @@ find_package(QGLViewer)
 
 # Logging library
 option(G2O_USE_LOGGING "Try to use spdlog for logging" ON)
+set(G2O_HAVE_LOGGING 0)
 if (G2O_USE_LOGGING)
   find_package(spdlog 1.6 QUIET)
   if (TARGET spdlog::spdlog OR TARGET spdlog::spdlog_header_only)
-    set (G2O_HAVE_LOGGING 1)
+    set(G2O_HAVE_LOGGING 1)
     message(STATUS "Compiling with logging support")
   endif()
 endif()
@@ -449,7 +451,6 @@ configure_file(config.h.in "${PROJECT_BINARY_DIR}/g2o/config.h")
 install(FILES ${PROJECT_BINARY_DIR}/g2o/config.h DESTINATION ${INCLUDES_DESTINATION}/g2o)
 
 configure_file("${g2o_SOURCE_DIR}/cmake_modules/Config.cmake.in" "${G2O_PROJECT_CONFIG}" @ONLY)
-configure_file("${g2o_SOURCE_DIR}/script/codecov.sh.in" "${CMAKE_CURRENT_BINARY_DIR}/codecov.sh" @ONLY)
 
 install(
     FILES "${G2O_PROJECT_CONFIG}" "${G2O_VERSION_CONFIG}"

@@ -104,4 +104,6 @@ jobs:
 
       - name: Coverage Results
         if: matrix.config.do_coverage == 'ON'
-        run: bash ${{github.workspace}}/build/codecov.sh
+        uses: codecov/codecov-action@v4.2.0
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}

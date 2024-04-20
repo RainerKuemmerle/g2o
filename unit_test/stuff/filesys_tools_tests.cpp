@@ -85,6 +85,9 @@ TEST(Stuff, FileExists) {
   EXPECT_TRUE(g2o::fileExists(G2O_SRC_DIR));
   EXPECT_TRUE(g2o::fileExists(
       (fs::path(G2O_SRC_DIR) / fs::path("CMakeLists.txt")).string()));
+  EXPECT_FALSE(g2o::fileExists(G2O_SRC_DIR, true));
+  EXPECT_TRUE(g2o::fileExists(
+      (fs::path(G2O_SRC_DIR) / fs::path("CMakeLists.txt")).string(), true));
 }
 
 TEST(Stuff, GetFilesByPattern) {

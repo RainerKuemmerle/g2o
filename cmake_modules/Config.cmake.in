@@ -5,6 +5,10 @@ if (@G2O_HAVE_OPENGL@)
 endif()
 find_dependency(Eigen3)
 
+if (@G2O_HAVE_OPENGL@)
+  find_dependency(OpenGL)
+endif()
+
 # Find spdlog if g2o was build with support for it
 if (@G2O_HAVE_LOGGING@)
   find_dependency(spdlog)
