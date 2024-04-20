@@ -76,8 +76,9 @@ G2O_STUFF_API std::string getDirname(std::string_view filename);
 
 /**
  * check if file exists (note a directory is also a file)
+ * @param regular to check for regular file instead
  */
-G2O_STUFF_API bool fileExists(std::string_view filename);
+G2O_STUFF_API bool fileExists(std::string_view filename, bool regular = false);
 
 /**
  * return all files that match a given regexp in the directory.

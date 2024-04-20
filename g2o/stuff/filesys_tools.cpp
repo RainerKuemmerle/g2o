@@ -67,9 +67,10 @@ std::string changeFileExtension(std::string_view filename,
   return path.string();
 }
 
-bool fileExists(std::string_view filename) {
+bool fileExists(std::string_view filename, bool regular) {
   const std::filesystem::path path(filename);
-  return std::filesystem::exists(path);
+  return std::filesystem::exists(path) &&
+         (!regular || std::filesystem::is_regular_file(path));
 }
 
 std::vector<std::string> getFilesByPattern(std::string_view directory,
