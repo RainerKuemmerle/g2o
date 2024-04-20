@@ -29,7 +29,6 @@
 #include "g2o/core/robust_kernel_factory.h"
 #include "g2o/core/robust_kernel_impl.h"
 #include "g2o/stuff/misc.h"
-#include "unit_test/test_helper/allocate_optimizer.h"
 
 using namespace testing;  // NOLINT
 

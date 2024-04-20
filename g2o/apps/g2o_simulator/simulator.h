@@ -99,6 +99,9 @@ class G2O_SIMULATOR_API BaseRobot {
 class G2O_SIMULATOR_API World {
  public:
   World() = default;
+  World(World const&) = delete;
+  World& operator=(World const&) = delete;
+
   OptimizableGraph& graph() { return graph_; }
   const OptimizableGraph& graph() const { return graph_; }
   void addRobot(std::unique_ptr<BaseRobot> robot);
