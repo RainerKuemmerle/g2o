@@ -1,5 +1,5 @@
 // g2o - General Graph Optimization
-// Copyright (C) 2011 R. Kuemmerle, G. Grisetti, H. Strasdat, W. Burgard
+// Copyright (C) 2011 G. Grisetti, R. Kuemmerle, W. Burgard
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -24,35 +24,36 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-/***************************************************************************
- *  Description: import/export macros for creating DLLS with Microsoft
- *	compiler. Any exported function needs to be declared with the
- *  appropriate G2O_XXXX_API macro. Also, there must be separate macros
- *  for each DLL (arrrrrgh!!!)
- *
- *  17 Jan 2012
- *  Email: pupilli@cs.bris.ac.uk
- ****************************************************************************/
-#ifndef G2O_SIMULATOR_API_H
-#define G2O_SIMULATOR_API_H
+#ifndef G2O_SENSOR_POINTXYZ_DISPARITY_H_
+#define G2O_SENSOR_POINTXYZ_DISPARITY_H_
 
-#include "g2o/config.h"
+#include "g2o/simulator/simulator.h"
+#include "g2o/types/slam3d/edge_se3_pointxyz_disparity.h"
+#include "g2o/types/slam3d/parameter_camera.h"
+#include "g2o_simulator_api.h"
+#include "pointsensorparameters.h"
+#include "simulator3d_base.h"
 
-#ifdef _MSC_VER
-// We are using a Microsoft compiler:
-#ifdef G2O_SHARED_LIBS
-#ifdef g2o_simulator_library_EXPORTS
-#define G2O_SIMULATOR_API __declspec(dllexport)
-#else
-#define G2O_SIMULATOR_API __declspec(dllimport)
-#endif
-#else
-#define G2O_SIMULATOR_API
-#endif
+namespace g2o {
 
-#else
-// Not Microsoft compiler so set empty definition:
-#define G2O_SIMULATOR_API
-#endif
+class G2O_SIMULATOR_API SensorPointXYZDisparity
+    : public PointSensorParameters,
+      public BinarySensor<Robot3D, EdgeSE3PointXYZDisparity,
+                          WorldObjectTrackXYZ> {
+ public:
+  using RobotPoseType = PoseVertexType::EstimateType;
+  explicit SensorPointXYZDisparity(const std::string& name);
+  void sense(BaseRobot& robot, World& world) override;
+  void addParameters(World& world) override;
+  std::shared_ptr<ParameterCamera> offsetParam() { return offsetParam_; };
+  void addNoise(EdgeType* e) override;
+
+ protected:
+  bool isVisible(WorldObjectType* to);
+  RobotPoseType sensorPose_;
+  std::shared_ptr<ParameterCamera> offsetParam_;
+};
+
+}  // namespace g2o
 
 #endif

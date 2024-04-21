@@ -27,7 +27,7 @@
 #ifndef G2O_SENSOR_POSE3D_OFFSET_H_
 #define G2O_SENSOR_POSE3D_OFFSET_H_
 
-#include "g2o/apps/g2o_simulator/simulator.h"
+#include "g2o/simulator/simulator.h"
 #include "g2o/types/slam3d/edge_se3_offset.h"
 #include "g2o/types/slam3d/parameter_se3_offset.h"
 #include "pointsensorparameters.h"

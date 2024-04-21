@@ -24,40 +24,34 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "sensor_odometry2d.h"
+#ifndef G2O_SENSOR_POINTXYZ_H_
+#define G2O_SENSOR_POINTXYZ_H_
 
-#include "g2o/apps/g2o_simulator/simulator2d_base.h"
-#include "g2o/stuff/logger.h"
+#include "g2o/simulator/simulator.h"
+#include "g2o/types/slam3d/edge_se3_pointxyz.h"
+#include "g2o_simulator_api.h"
+#include "pointsensorparameters.h"
+#include "simulator3d_base.h"
 
-// Robot2D
 namespace g2o {
 
-SensorOdometry2D::SensorOdometry2D(const std::string& name)
-    : BinarySensor<Robot2D, EdgeSE2, WorldObjectSE2>(name) {}
+class G2O_SIMULATOR_API SensorPointXYZ
+    : public PointSensorParameters,
+      public BinarySensor<Robot3D, EdgeSE3PointXYZ, WorldObjectTrackXYZ> {
+ public:
+  using RobotPoseType = PoseVertexType::EstimateType;
+  explicit SensorPointXYZ(std::string name);
+  void sense(BaseRobot& robot, World& world) override;
+  void addParameters(World& world) override;
+  std::shared_ptr<ParameterSE3Offset> offsetParam() { return offsetParam_; };
+  void addNoise(EdgeType* e) override;
 
-void SensorOdometry2D::sense(BaseRobot& robot, World& world) {
-  const int traj_size = robot.trajectory().size();
-  if (traj_size < 2) {
-    G2O_ERROR("fatal, trajectory empty");
-    return;
-  }
-  robotPoseVertex_ = robotPoseVertex<Robot2D::VertexType>(robot, world);
-
-  auto e = mkEdge(nullptr);
-  if (!e) return;
-  const int prev_robot_id = robot.trajectory()[traj_size - 2];
-  e->vertices()[0] =
-      robotPoseVertexForId<Robot2D::VertexType>(prev_robot_id, world);
-  e->vertices()[1] = robotPoseVertex_;
-  e->setMeasurementFromState();
-  addNoise(e.get());
-  world.graph().addEdge(e);
-}
-
-void SensorOdometry2D::addNoise(EdgeType* e) {
-  const EdgeType::Measurement n(sampler_.generateSample());
-  e->setMeasurement(e->measurement() * n);
-  e->setInformation(information());
-}
+ protected:
+  bool isVisible(WorldObjectType* to);
+  RobotPoseType sensorPose_;
+  std::shared_ptr<ParameterSE3Offset> offsetParam_;
+};
 
 }  // namespace g2o
+
+#endif

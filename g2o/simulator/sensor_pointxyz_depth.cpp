@@ -24,82 +24,63 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "sensor_pose3d_offset.h"
+#include "sensor_pointxyz_depth.h"
 
 #include <cassert>
-#include <unordered_set>
-#include <utility>
 
-#include "g2o/apps/g2o_simulator/simulator.h"
-#include "g2o/types/slam3d/isometry3d_mappings.h"
+#include "g2o/simulator/simulator.h"
 
 namespace g2o {
 
-SensorPose3DOffset::SensorPose3DOffset(std::string name)
-    : BinarySensor<Robot3D, EdgeSE3Offset, WorldObjectSE3>(std::move(name)) {
-  offsetParam1_ = offsetParam2_ = nullptr;
-  stepsToIgnore_ = 10;
+// SensorPointXYZDepth
+SensorPointXYZDepth::SensorPointXYZDepth(const std::string& name)
+    : BinarySensor<Robot3D, EdgeSE3PointXYZDepth, WorldObjectTrackXYZ>(name) {
+  offsetParam_ = nullptr;
   information_.setIdentity();
-  information_ *= 100;
-  information_(3, 3) = 10000;
-  information_(4, 4) = 10000;
-  information_(5, 5) = 1000;
+  information_ *= 1000;
   setInformation(information_);
 }
 
-void SensorPose3DOffset::addParameters(World& world) {
-  if (!offsetParam1_) offsetParam1_ = std::make_shared<ParameterSE3Offset>();
-  if (!offsetParam2_) offsetParam2_ = std::make_shared<ParameterSE3Offset>();
-  world.addParameter(offsetParam1_);
-  world.addParameter(offsetParam2_);
-}
-
-void SensorPose3DOffset::addNoise(EdgeType* e) {
-  EdgeType::ErrorVector noise = sampler_.generateSample();
-  EdgeType::Measurement n = internal::fromVectorMQT(noise);
-  e->setMeasurement(e->measurement() * n);
-  e->setInformation(information());
-}
-
-bool SensorPose3DOffset::isVisible(SensorPose3DOffset::WorldObjectType* to) {
+bool SensorPointXYZDepth::isVisible(SensorPointXYZDepth::WorldObjectType* to) {
   if (!robotPoseVertex_) return false;
   assert(to && to->vertex());
   VertexType::EstimateType pose = to->vertex()->estimate();
-  VertexType::EstimateType delta =
-      robotPoseVertex_->estimate().inverse() * pose;
-  Vector3 translation = delta.translation();
+  VertexType::EstimateType delta = sensorPose_.inverse() * pose;
+  Vector3 translation = delta;
   double range2 = translation.squaredNorm();
   if (range2 > maxRange2_) return false;
   if (range2 < minRange2_) return false;
   translation.normalize();
-  double bearing = acos(translation.x());
-  if (fabs(bearing) > fov_) return false;
-  AngleAxis a(delta.rotation());
-  return fabs(a.angle()) <= maxAngularDifference_;
+  // the cameras have the z in front
+  double bearing = acos(translation.z());
+  return fabs(bearing) <= fov_;
 }
 
-void SensorPose3DOffset::sense(BaseRobot& robot, World& world) {
+void SensorPointXYZDepth::addParameters(World& world) {
+  if (!offsetParam_) offsetParam_ = std::make_shared<ParameterCamera>();
+  world.addParameter(offsetParam_);
+}
+
+void SensorPointXYZDepth::addNoise(EdgeType* e) {
+  EdgeType::ErrorVector n = sampler_.generateSample();
+  e->setMeasurement(e->measurement() + n);
+  e->setInformation(information());
+}
+
+void SensorPointXYZDepth::sense(BaseRobot& robot, World& world) {
+  if (!offsetParam_) return;
   robotPoseVertex_ = robotPoseVertex<PoseVertexType>(robot, world);
 
-  std::unordered_set<int> poses_to_ignore;
-  int count = 0;
-  for (auto it = robot.trajectory().rbegin();
-       it != robot.trajectory().rend() && count < stepsToIgnore_; ++it) {
-    poses_to_ignore.insert(*it);
-    count++;
-  }
-
+  if (!robotPoseVertex_) return;
+  sensorPose_ = robotPoseVertex_->estimate() * offsetParam_->param().offset();
   for (const auto& it : world.objects()) {
     auto* o = dynamic_cast<WorldObjectType*>(it.get());
     if (!o || !isVisible(o)) continue;
-    if (poses_to_ignore.count(o->vertex()->id()) > 0) continue;
     auto e = mkEdge(o);
     if (!e) continue;
-    e->setParameterId(0, offsetParam1_->id());
-    e->setParameterId(1, offsetParam2_->id());
+    e->setParameterId(0, offsetParam_->id());
     world.graph().addEdge(e);
     e->setMeasurementFromState();
-    addNoise(e.get());
   }
 }
 

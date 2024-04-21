@@ -24,28 +24,26 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef G2O_SENSOR_SEGMENT2D_POINTLINE_H_
-#define G2O_SENSOR_SEGMENT2D_POINTLINE_H_
+#ifndef G2O_SENSOR_SEGMENT2D_LINE_H_
+#define G2O_SENSOR_SEGMENT2D_LINE_H_
 
-#include "g2o/apps/g2o_simulator/pointsensorparameters.h"
-#include "g2o/apps/g2o_simulator/simulator2d_base.h"
-#include "g2o/types/slam2d_addons/edge_se2_segment2d_pointLine.h"
+#include "g2o/simulator/pointsensorparameters.h"
+#include "g2o/simulator/simulator2d_base.h"
+#include "g2o/types/slam2d_addons/edge_se2_segment2d_line.h"
 
 namespace g2o {
 
 // sensor that senses segments, only if the extremas are visible
-class G2O_SIMULATOR_API SensorSegment2DPointLine
+class G2O_SIMULATOR_API SensorSegment2DLine
     : public PointSensorParameters,
-      public BinarySensor<Robot2D, EdgeSE2Segment2DPointLine,
-                          WorldObjectSegment2D> {
+      public BinarySensor<Robot2D, EdgeSE2Segment2DLine, WorldObjectSegment2D> {
  public:
-  explicit SensorSegment2DPointLine(std::string name);
+  explicit SensorSegment2DLine(std::string name);
   void sense(BaseRobot& robot, World& world) override;
   void addNoise(EdgeType* e) override;
 
  protected:
   bool isVisible(WorldObjectType* to);
-  int visiblePoint_ = 0;
 };
 
 }  // namespace g2o
