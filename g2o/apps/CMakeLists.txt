@@ -1,6 +1,6 @@
 add_subdirectory(g2o_cli)
 
-if (G2O_BUILD_SLAM2D_TYPES AND G2O_BUILD_SLAM3D_TYPES)
+if (TARGET simulator_lib)
   add_subdirectory(g2o_simulator)
 endif()
 

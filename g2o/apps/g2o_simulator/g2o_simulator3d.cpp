@@ -29,15 +29,15 @@
 #include <memory>
 #include <optional>
 
-#include "g2o/apps/g2o_simulator/sensor_odometry3d.h"
-#include "g2o/apps/g2o_simulator/sensor_pointxyz.h"
-#include "g2o/apps/g2o_simulator/sensor_pointxyz_depth.h"
-#include "g2o/apps/g2o_simulator/sensor_pointxyz_disparity.h"
-#include "g2o/apps/g2o_simulator/sensor_pose3d.h"
-#include "g2o/apps/g2o_simulator/simulator.h"
-#include "g2o/apps/g2o_simulator/simulator3d_base.h"
 #include "g2o/core/eigen_types.h"
 #include "g2o/core/optimizable_graph.h"
+#include "g2o/simulator/sensor_odometry3d.h"
+#include "g2o/simulator/sensor_pointxyz.h"
+#include "g2o/simulator/sensor_pointxyz_depth.h"
+#include "g2o/simulator/sensor_pointxyz_disparity.h"
+#include "g2o/simulator/sensor_pose3d.h"
+#include "g2o/simulator/simulator.h"
+#include "g2o/simulator/simulator3d_base.h"
 #include "g2o/stuff/command_args.h"
 #include "g2o/stuff/sampler.h"
 #include "g2o/types/slam3d/parameter_camera.h"

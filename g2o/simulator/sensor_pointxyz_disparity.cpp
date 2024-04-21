@@ -24,27 +24,26 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "sensor_pointxyz.h"
+#include "sensor_pointxyz_disparity.h"
 
 #include <cassert>
-#include <utility>
 
-#include "g2o/apps/g2o_simulator/simulator.h"
+#include "simulator.h"
 
 namespace g2o {
 
-// SensorPointXYZ
-SensorPointXYZ::SensorPointXYZ(std::string name)
-    : BinarySensor<Robot3D, EdgeSE3PointXYZ, WorldObjectTrackXYZ>(
-          std::move(name)) {
+// SensorPointXYZDisparity
+SensorPointXYZDisparity::SensorPointXYZDisparity(const std::string& name)
+    : BinarySensor<Robot3D, EdgeSE3PointXYZDisparity, WorldObjectTrackXYZ>(
+          name) {
   offsetParam_ = nullptr;
   information_.setIdentity();
   information_ *= 1000;
-  information_(2, 2) = 10;
   setInformation(information_);
 }
 
-bool SensorPointXYZ::isVisible(SensorPointXYZ::WorldObjectType* to) {
+bool SensorPointXYZDisparity::isVisible(
+    SensorPointXYZDisparity::WorldObjectType* to) {
   if (!robotPoseVertex_) return false;
   assert(to && to->vertex());
   VertexType::EstimateType pose = to->vertex()->estimate();
@@ -59,24 +58,24 @@ bool SensorPointXYZ::isVisible(SensorPointXYZ::WorldObjectType* to) {
   return fabs(bearing) <= fov_;
 }
 
-void SensorPointXYZ::addParameters(World& world) {
-  if (!offsetParam_) offsetParam_ = std::make_shared<ParameterSE3Offset>();
+void SensorPointXYZDisparity::addParameters(World& world) {
+  if (!offsetParam_) offsetParam_ = std::make_shared<ParameterCamera>();
   world.addParameter(offsetParam_);
 }
 
-void SensorPointXYZ::addNoise(EdgeType* e) {
+void SensorPointXYZDisparity::addNoise(EdgeType* e) {
   EdgeType::ErrorVector n = sampler_.generateSample();
   e->setMeasurement(e->measurement() + n);
   e->setInformation(information());
 }
 
-void SensorPointXYZ::sense(BaseRobot& robot, World& world) {
+void SensorPointXYZDisparity::sense(BaseRobot& robot, World& world) {
   if (!offsetParam_) {
     return;
   }
   robotPoseVertex_ = robotPoseVertex<PoseVertexType>(robot, world);
   if (!robotPoseVertex_) return;
-  sensorPose_ = robotPoseVertex_->estimate() * offsetParam_->param();
+  sensorPose_ = robotPoseVertex_->estimate() * offsetParam_->param().offset();
   for (const auto& it : world.objects()) {
     auto* o = dynamic_cast<WorldObjectType*>(it.get());
     if (!o || !isVisible(o)) continue;
@@ -88,5 +87,4 @@ void SensorPointXYZ::sense(BaseRobot& robot, World& world) {
     addNoise(e.get());
   }
 }
-
 }  // namespace g2o

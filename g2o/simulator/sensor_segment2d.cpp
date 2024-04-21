@@ -24,26 +24,26 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "sensor_segment2d_line.h"
+#include "sensor_segment2d.h"
 
 #include <cassert>
 #include <utility>
 
-#include "g2o/apps/g2o_simulator/simutils.h"
+#include "g2o/simulator/simutils.h"
 
 namespace g2o {
 
-SensorSegment2DLine::SensorSegment2DLine(std::string name)
-    : BinarySensor<Robot2D, EdgeSE2Segment2DLine, WorldObjectSegment2D>(
+SensorSegment2D::SensorSegment2D(std::string name)
+    : BinarySensor<Robot2D, EdgeSE2Segment2D, WorldObjectSegment2D>(
           std::move(name)) {}
 
-void SensorSegment2DLine::addNoise(EdgeType* e) {
+void SensorSegment2D::addNoise(EdgeType* e) {
   EdgeType::ErrorVector n = sampler_.generateSample();
   e->setMeasurement(e->measurement() + n);
   e->setInformation(information());
 }
 
-bool SensorSegment2DLine::isVisible(SensorSegment2DLine::WorldObjectType* to) {
+bool SensorSegment2D::isVisible(SensorSegment2D::WorldObjectType* to) {
   if (!robotPoseVertex_) return false;
 
   assert(to && to->vertex());
@@ -95,15 +95,15 @@ bool SensorSegment2DLine::isVisible(SensorSegment2DLine::WorldObjectType* to) {
       break;
     default:;
   }
-  return clip1 &&
-         clip2;  // only if both endpoints have been clipped do something
+  return !clip1 &&
+         !clip2;  // only if both endpoints have not been clipped do something
 }
 
-void SensorSegment2DLine::sense(BaseRobot& robot, World& world) {
+void SensorSegment2D::sense(BaseRobot& robot, World& world) {
   robotPoseVertex_ = robotPoseVertex<PoseVertexType>(robot, world);
   for (const auto& it : world.objects()) {
     auto* o = dynamic_cast<WorldObjectType*>(it.get());
-    if (!o || isVisible(o)) continue;
+    if (!o || !isVisible(o)) continue;
     auto e = mkEdge(o);
     if (!e) continue;
     e->setMeasurementFromState();

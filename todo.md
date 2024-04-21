@@ -1,13 +1,18 @@
-[ ] wrap simulator into library
-[ ] add python wrapper for simulator
+[x] wrap simulator into library
+[ ] add config types for simulation
 [ ] add tests for simulator
 [ ] add python wrapper for simulator
-[x] Create parameter type for ParameterCamera to support load/save
 [ ] Add typing for parameters to template?
+[ ] Add fixed size types for pure python problems
 [ ] Re-work python wrapping for parameters, templated base param
 [ ] Test load/save for VertexCam (camera and baseline seem missing from traits)
-[x] Refactor Data container. Can it be a container instead of linked list?
+[ ] use cmakedefine01 for compile flags in config
+[ ] add test for setData / getData on the graph
+[ ] update py_base_vertex/edge to map now common methods
 [ ] Use FakeDependency in Traits
+[ ] wrap abstract graph to python and update save wrapper
+[x] Create parameter type for ParameterCamera to support load/save
+[x] Refactor Data container. Can it be a container instead of linked list?
 [x] EdgeSE2TwoPointsXY, EdgeSE2PointXYCalib can be fixed size edges -> IO test
 [x] IO test fixture including parameter
 [x] Type Based Tests for Jacobian
@@ -19,10 +24,5 @@
 [x] test save/load of dynamic edge
 [x] binary format for save/load
 [x] XML format for save/load
-[ ] wrap abstract graph to python and update save wrapper
 [x] ParameterContainer remove read/write
 [x] remove read/write methods for vertex / edge
-
-[ ] use cmakedefine01 for compile flags in config
-[ ] add test for setData / getData on the graph
-[ ] update py_base_vertex/edge to map now common methods

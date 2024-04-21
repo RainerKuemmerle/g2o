@@ -24,91 +24,68 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "sensor_segment2d.h"
+#include "sensor_pointxyz.h"
 
 #include <cassert>
 #include <utility>
 
-#include "g2o/apps/g2o_simulator/simutils.h"
+#include "g2o/simulator/simulator.h"
 
 namespace g2o {
 
-SensorSegment2D::SensorSegment2D(std::string name)
-    : BinarySensor<Robot2D, EdgeSE2Segment2D, WorldObjectSegment2D>(
-          std::move(name)) {}
+// SensorPointXYZ
+SensorPointXYZ::SensorPointXYZ(std::string name)
+    : BinarySensor<Robot3D, EdgeSE3PointXYZ, WorldObjectTrackXYZ>(
+          std::move(name)) {
+  offsetParam_ = nullptr;
+  information_.setIdentity();
+  information_ *= 1000;
+  information_(2, 2) = 10;
+  setInformation(information_);
+}
 
-void SensorSegment2D::addNoise(EdgeType* e) {
+bool SensorPointXYZ::isVisible(SensorPointXYZ::WorldObjectType* to) {
+  if (!robotPoseVertex_) return false;
+  assert(to && to->vertex());
+  VertexType::EstimateType pose = to->vertex()->estimate();
+  VertexType::EstimateType delta = sensorPose_.inverse() * pose;
+  Vector3 translation = delta;
+  double range2 = translation.squaredNorm();
+  if (range2 > maxRange2_) return false;
+  if (range2 < minRange2_) return false;
+  translation.normalize();
+  // the cameras have the z in front
+  double bearing = acos(translation.z());
+  return fabs(bearing) <= fov_;
+}
+
+void SensorPointXYZ::addParameters(World& world) {
+  if (!offsetParam_) offsetParam_ = std::make_shared<ParameterSE3Offset>();
+  world.addParameter(offsetParam_);
+}
+
+void SensorPointXYZ::addNoise(EdgeType* e) {
   EdgeType::ErrorVector n = sampler_.generateSample();
   e->setMeasurement(e->measurement() + n);
   e->setInformation(information());
 }
 
-bool SensorSegment2D::isVisible(SensorSegment2D::WorldObjectType* to) {
-  if (!robotPoseVertex_) return false;
-
-  assert(to && to->vertex());
-  VertexType* v = to->vertex().get();
-
-  Vector2 p1;
-  Vector2 p2;
-  SE2 iRobot = robotPoseVertex_->estimate().inverse();
-  p1 = iRobot * v->estimateP1();
-  p2 = iRobot * v->estimateP2();
-
-  Vector3 vp1(p1.x(), p1.y(), 0.);
-  Vector3 vp2(p2.x(), p2.y(), 0.);
-  Vector3 cp = vp1.cross(vp2);  // visibility check
-  if (cp[2] < 0) return false;
-
-  int circleClip = clipSegmentCircle(p1, p2, sqrt(maxRange2_));
-  bool clip1 = false;
-  bool clip2 = false;
-  switch (circleClip) {
-    case -1:
-      return false;
-    case 0:
-      clip1 = true;
-      break;
-    case 1:
-      clip2 = true;
-      break;
-    case 3:
-      clip1 = true;
-      clip2 = true;
-      break;
-    default:;
+void SensorPointXYZ::sense(BaseRobot& robot, World& world) {
+  if (!offsetParam_) {
+    return;
   }
-
-  int fovClip = clipSegmentFov(p1, p2, -fov_, +fov_);
-  switch (fovClip) {
-    case -1:
-      return false;
-    case 0:
-      clip1 = true;
-      break;
-    case 1:
-      clip2 = true;
-      break;
-    case 3:
-      clip1 = true;
-      clip2 = true;
-      break;
-    default:;
-  }
-  return !clip1 &&
-         !clip2;  // only if both endpoints have not been clipped do something
-}
-
-void SensorSegment2D::sense(BaseRobot& robot, World& world) {
   robotPoseVertex_ = robotPoseVertex<PoseVertexType>(robot, world);
+  if (!robotPoseVertex_) return;
+  sensorPose_ = robotPoseVertex_->estimate() * offsetParam_->param();
   for (const auto& it : world.objects()) {
     auto* o = dynamic_cast<WorldObjectType*>(it.get());
     if (!o || !isVisible(o)) continue;
     auto e = mkEdge(o);
     if (!e) continue;
+    e->setParameterId(0, offsetParam_->id());
+    world.graph().addEdge(e);
     e->setMeasurementFromState();
     addNoise(e.get());
-    world.graph().addEdge(e);
   }
 }
 

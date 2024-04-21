@@ -10,8 +10,11 @@ endif(G2O_BUILD_APPS)
 # Pre-canned types
 add_subdirectory(types)
 
-# Solvers
 add_subdirectory(solvers)
+
+if (G2O_BUILD_SLAM2D_TYPES AND G2O_BUILD_SLAM3D_TYPES)
+  add_subdirectory(simulator)
+endif()
 
 # Examples
 if(G2O_BUILD_EXAMPLES)
