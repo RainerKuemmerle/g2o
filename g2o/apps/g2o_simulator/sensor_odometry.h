@@ -34,7 +34,7 @@ namespace g2o {
 template <class R, class E, class O>
 class SensorOdometry : public BinarySensor<R, E, O> {
  public:
-  SensorOdometry(const std::string name_) : BinarySensor<R, E, O>(name_){};
+  SensorOdometry(const std::string name_) : BinarySensor<R, E, O>(name_) {};
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   virtual void sense() {
     if (!BinarySensor<R, E, O>::robot()) return;

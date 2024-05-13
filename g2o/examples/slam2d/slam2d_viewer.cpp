@@ -53,7 +53,7 @@ namespace {
  */
 class StandardCamera : public qglviewer::Camera {
  public:
-  StandardCamera() : _standard(true){};
+  StandardCamera() : _standard(true) {};
 
   qglv_real zNear() const {
     if (_standard)
