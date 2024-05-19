@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.14)
+
 set(CMAKE_LEGACY_CYGWIN_WIN32 0)
+set(CMAKE_OSX_DEPLOYMENT_TARGET "10.15" CACHE STRING "Minimum OS X deployment target")
 
 project(g2o)
 
