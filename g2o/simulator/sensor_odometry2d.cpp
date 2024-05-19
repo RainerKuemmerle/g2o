@@ -28,6 +28,7 @@
 
 #include "g2o/simulator/simulator2d_base.h"
 #include "g2o/stuff/logger.h"
+#include "sensor_odometry2d.h"
 
 // Robot2D
 namespace g2o {
