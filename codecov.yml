@@ -6,3 +6,7 @@ coverage:
     project:
       default:
         threshold: 5%
+ignore:
+- "g2o/apps/"
+- "g2o/examples/"
+- "g2o/EXTERNAL/"
