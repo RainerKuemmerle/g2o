@@ -38,7 +38,7 @@ class BaseBinaryEdge : public BaseFixedSizedEdge<D, E, VertexXi, VertexXj> {
  public:
   using VertexXiType = VertexXi;
   using VertexXjType = VertexXj;
-  BaseBinaryEdge() : BaseFixedSizedEdge<D, E, VertexXi, VertexXj>(){};
+  BaseBinaryEdge() : BaseFixedSizedEdge<D, E, VertexXi, VertexXj>() {};
 
  protected:
   typename BaseFixedSizedEdge<D, E, VertexXi, VertexXj>::template JacobianType<

@@ -71,7 +71,6 @@ struct Sensor {
   virtual bool isVisible(const WorldItem*) const { return false; }
   virtual bool sense(WorldItem*, const Isometry3&) { return false; }
   virtual ~Sensor() = default;
-  ;
 
  protected:
   Robot* robot_;

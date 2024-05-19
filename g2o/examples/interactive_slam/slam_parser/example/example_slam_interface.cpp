@@ -55,7 +55,8 @@ bool ExampleSlamInterface::addEdge(const std::string& tag, int id,
                                    const std::vector<double>& measurement,
                                    const std::vector<double>& information) {
   cerr << "ADDING EDGE " << tag << " id=" << id << " dim=" << dimension << " ("
-       << v1 << " <-> " << v2 << ")" << " measurement=";
+       << v1 << " <-> " << v2 << ")"
+       << " measurement=";
   for (size_t i = 0; i < measurement.size(); ++i) cerr << " " << measurement[i];
   cerr << " information=";
   for (size_t i = 0; i < information.size(); ++i) cerr << " " << information[i];
