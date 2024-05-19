@@ -61,16 +61,16 @@ Please note that some features of CHOLMOD (which may be used by g2o, see
 libsuitesparse below) are licensed under the GPL. To avoid the GPL, you may
 have to re-compile CHOLMOD without including its GPL features. The CHOLMOD
 library distributed with, for example, Ubuntu or Debian includes the GPL
-features. The supernodal factorization is considered by g2o, if it is
-available.
+features. For example, the supernodal factorization that is licensed under GPL
+is considered by g2o if it is available.
 
-Within the folder g2o/EXTERNAL we include software not written by us to
-guarantee easy compilation.
+Within sub-folders we include software not written by us to guarantee easy compilation and integration into g2o itself.
 
--   ceres: BSD (see g2o/EXTERNAL/ceres/LICENSE)
-    Headers to perform Automatic Differentiation
+-   ceres: BSD (see g2o/autodiff/LICENSE)
+    Extracted headers to perform Automatic Differentiation.
 
--   freeglut: X Consortium (Copyright (c) 1999-2000 Pawel W. Olszta)
+-   freeglut: X-Consortium (see g2o/EXTERNAL/freeglut/COPYING)
+    Copyright (c) 1999-2000 Pawel W. Olszta
     We use a stripped down version for drawing text in OpenGL.
 
 See the doc folder for the full text of the licenses.
@@ -108,6 +108,11 @@ following packages.
 -   qt5-qmake
 -   libqglviewer-dev-qt5
 
+You can install those packages with the following command
+```
+sudo apt install libeigen3-dev libspdlog-dev libsuitesparse-dev qtdeclarative5-dev qt5-qmake libqglviewer-dev-qt5
+```
+
 ## Mac OS X
 
 If using [Homebrew](http://brew.sh/), then
@@ -138,33 +143,42 @@ Mac OS X, Android and Windows (MinGW or MSVC).
 We recommend a so-called out of source build which can be achieved
 by the following command sequence.
 
--   `mkdir build`
--   `cd build`
--   `cmake ../`
--   `make`
+```
+mkdir build
+cd build
+cmake ../
+make
+```
 
 The binaries will be placed in bin and the libraries in lib which
-are both located in the top-level folder.
+are both located underneath cmake's build folder.
 
 On Windows with `vcpkg` the following commands will generate build scripts (please change the Visual Studio version number in accordance with your system):
 
--   `mkdir build`
--   `cd build`
--   `cmake -DG2O_BUILD_APPS=ON -DG2O_BUILD_EXAMPLES=ON -DVCPKG_TARGET_TRIPLET="%VCPKG_DEFAULT_TRIPLET%" -DCMAKE_TOOLCHAIN_FILE="%VCPKG_ROOT_DIR%\scripts\buildsystems\vcpkg.cmake" ..`
--   `cmake --build . --target ALL_BUILD`
+```
+mkdir build
+cd build
+cmake -DG2O_BUILD_APPS=ON -DG2O_BUILD_EXAMPLES=ON-DVCPKG_TARGET_TRIPLET="%VCPKG_DEFAULT_TRIPLET%" -DCMAKE_TOOLCHAIN_FILE="%VCPKG_ROOT_DIR%\scripts\buildsystems\vcpkg.cmake" ..`
+cmake --build . --target ALL_BUILD
+```
 
 If you are compiling on Windows and you are for some reasons **not** using `vcpkg` please download Eigen3 and extract it.
 Within cmake-gui set the variable EIGEN3_INCLUDE_DIR to that directory.
 
--   `mkdir build`
--   `cd build`
--   `cmake .. -DG2O_BUILD_APPS=ON -DG2O_BUILD_EXAMPLES=ON -DEIGEN3_INCLUDE_DIR="<THE_PATH_WHERE_YOU_PLACED_EIGEN3_AND_THE_EIGEN3_CMakeLists.txt>"`
+```
+mkdir build
+cd build
+cmake .. -DG2O_BUILD_APPS=ON -DG2O_BUILD_EXAMPLES=ON -DEIGEN3_INCLUDE_DIR="<THE_PATH_WHERE_YOU_PLACED_EIGEN3_AND_THE_EIGEN3_CMakeLists.txt>"
+```
 
 ## Cross-Compiling for Android
 
--   `mkdir build`
--   `cd build`
--   `cmake -DCMAKE_TOOLCHAIN_FILE=../script/android.toolchain.cmake -DANDROID_NDK=<YOUR_PATH_TO_ANDROID_NDK_r10d+> -DCMAKE_BUILD_TYPE=Release -DANDROID_ABI="armeabi-v7a with NEON" -DEIGEN3_INCLUDE_DIR="<YOUR_PATH_TO_EIGEN>" -DEIGEN3_VERSION_OK=ON .. && cmake --build .`
+```
+mkdir build`
+cd build`
+cmake -DCMAKE_TOOLCHAIN_FILE=../script/android.toolchain.cmake -DANDROID_NDK=<YOUR_PATH_TO_ANDROID_NDK_r10d+> -DCMAKE_BUILD_TYPE=Release -DANDROID_ABI="armeabi-v7a with NEON" -DEIGEN3_INCLUDE_DIR="<YOUR_PATH_TO_EIGEN>" -DEIGEN3_VERSION_OK=ON ..
+cmake --build .
+```
 
 ## Acknowledgments
 
@@ -176,13 +190,5 @@ We thank the following contributors for providing patches:
 
 ## Projects using g2o
 
--   [g2opy](https://github.com/uoip/g2opy): Python binding
+-   [g2o-python](https://github.com/miquelmassot/g2o-python): Python binding which is also installable via `pip`
 -   [.Net wrapper](https://github.com/fugro/g2o)
-
-## Contact information
-
--   [Rainer Kuemmerle](mailto:kuemmerl@informatik.uni-freiburg.de)
--   [Giorgio Grisetti](mailto:grisetti@dis.uniroma1.it)
--   [Hauke Strasdat](mailto:strasdat@gmail.com)
--   [Kurt Konolige](mailto:konolige@willowgarage.com)
--   [Wolfram Burgard](mailto:burgard@informatik.uni-freiburg.de)
