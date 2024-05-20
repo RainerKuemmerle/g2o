@@ -42,6 +42,36 @@ using WorldObjectLine3D = WorldObject<VertexLine3D>;
 
 using Robot3D = Robot<WorldObjectSE3>;
 
+/**
+ * @brief A 3D robot simulator of a robot moving in a grid world.
+ */
+class G2O_SIMULATOR_API Simulator3D : public Simulator {
+ public:
+  /**
+   * @brief Configuration of the 3D simulator
+   */
+  struct Config {
+    double worldSize = 25.;
+    int nlandmarks = 1000;
+    int simSteps = 100;
+    bool hasOdom = false;
+    bool hasPoseSensor = false;
+    bool hasPointSensor = false;
+    bool hasPointDepthSensor = false;
+    bool hasPointDisparitySensor = false;
+    bool hasCompass = false;
+    bool hasGPS = false;
+  };
+
+  Simulator3D() = default;
+  explicit Simulator3D(Simulator3D::Config&& config);
+
+  void setup() override;
+  void simulate() override;
+
+  Config config;
+};
+
 }  // namespace g2o
 
 #endif
