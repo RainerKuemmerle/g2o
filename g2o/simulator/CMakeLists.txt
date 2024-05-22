@@ -1,7 +1,7 @@
 add_library(simulator_lib ${G2O_LIB_TYPE}
    simulator.cpp simulator.h
    pointsensorparameters.cpp  pointsensorparameters.h
-   simulator2d_base.h
+   simulator2d_base.cpp simulator2d_base.h
    sensor_odometry2d.cpp sensor_odometry2d.h
    sensor_pose2d.cpp sensor_pose2d.h
    sensor_pointxy.cpp sensor_pointxy.h
@@ -12,7 +12,7 @@ add_library(simulator_lib ${G2O_LIB_TYPE}
    sensor_segment2d_line.cpp  sensor_segment2d_line.h
    sensor_segment2d_pointline.cpp  sensor_segment2d_pointline.h
 
-   simulator3d_base.h
+   simulator3d_base.cpp simulator3d_base.h
    sensor_odometry3d.cpp sensor_odometry3d.h
    sensor_pose3d.cpp sensor_pose3d.h
    sensor_pose3d_offset.cpp sensor_pose3d_offset.h

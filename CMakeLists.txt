@@ -465,15 +465,15 @@ install(
     NAMESPACE "${G2O_NAMESPACE}"
     DESTINATION "${G2O_CONFIG_INSTALL_DIR}")
 
+# Include the subdirectories
+add_subdirectory(g2o)
+
 # building unit test framework and our tests
 option(BUILD_UNITTESTS "build unit test framework and the tests" OFF)
 if(BUILD_UNITTESTS)
   enable_testing()
   add_subdirectory(unit_test)
 endif()
-
-# Include the subdirectories
-add_subdirectory(g2o)
 
 # Benchmarks
 option(G2O_BUILD_BENCHMARKS "build benchmarks" OFF)

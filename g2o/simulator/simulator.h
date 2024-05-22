@@ -28,6 +28,7 @@
 #define G2O_SIMULATOR_
 
 #include <memory>
+#include <random>
 #include <string>
 #include <utility>
 #include <vector>
@@ -281,6 +282,28 @@ class BinarySensor : public BaseSensor {
   }
   GaussianSampler<typename EdgeType::ErrorVector, InformationType> sampler_;
   virtual void addNoise(EdgeType*) {};
+};
+
+/**
+ * @brief Base class for the simulator engine.
+ */
+class Simulator {
+ public:
+  virtual ~Simulator() = default;
+  virtual void setup() = 0;
+  virtual void simulate() = 0;
+
+  //! seed the random number generator
+  void seed(std::mt19937::result_type value = std::mt19937::default_seed) {
+    generator_.seed(value);
+  }
+
+  const g2o::World& world() const { return world_; }
+  g2o::World& world() { return world_; }
+
+ protected:
+  std::mt19937 generator_;
+  g2o::World world_;
 };
 
 }  // namespace g2o

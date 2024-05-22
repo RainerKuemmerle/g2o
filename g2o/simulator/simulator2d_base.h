@@ -27,6 +27,7 @@
 #ifndef G2O_SIMULATOR2D_BASE_H_
 #define G2O_SIMULATOR2D_BASE_H_
 
+#include "g2o/simulator/g2o_simulator_api.h"
 #include "g2o/types/slam2d/vertex_point_xy.h"
 #include "g2o/types/slam2d/vertex_se2.h"
 #include "g2o/types/slam2d_addons/vertex_segment2d.h"
@@ -41,6 +42,43 @@ using WorldObjectPointXY = WorldObject<VertexPointXY>;
 using WorldObjectSegment2D = WorldObject<VertexSegment2D>;
 
 using Robot2D = Robot<WorldObjectSE2>;
+
+/**
+ * @brief A 2D robot simulator of a robot moving in a 2D grid world.
+ */
+class G2O_SIMULATOR_API Simulator2D : public Simulator {
+ public:
+  /**
+   * @brief Configuration of the 2D simulator
+   */
+  struct Config {
+    double worldSize = 25.;
+    int nlandmarks = 100;
+    int simSteps = 100;
+    bool hasOdom = false;
+    // Poses and landmarks
+    bool hasPoseSensor = false;
+    bool hasPointSensor = false;
+    bool hasCompass = false;
+    bool hasGPS = false;
+    bool hasPointBearingSensor = false;
+
+    // Segment
+    bool hasSegmentSensor = false;
+    int nSegments = 1000;
+    int segmentGridSize = 50;
+    double minSegmentLength = 0.5;
+    double maxSegmentLength = 3.0;
+  };
+
+  Simulator2D() = default;
+  explicit Simulator2D(Simulator2D::Config&& config);
+
+  void setup() override;
+  void simulate() override;
+
+  Config config;
+};
 
 }  // namespace g2o
 

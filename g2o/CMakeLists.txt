@@ -3,10 +3,6 @@ add_subdirectory(autodiff)
 add_subdirectory(stuff)
 add_subdirectory(core)
 
-if(G2O_BUILD_APPS)
-  add_subdirectory(apps)
-endif(G2O_BUILD_APPS)
-
 # Pre-canned types
 add_subdirectory(types)
 
@@ -15,6 +11,10 @@ add_subdirectory(solvers)
 if (G2O_BUILD_SLAM2D_TYPES AND G2O_BUILD_SLAM3D_TYPES)
   add_subdirectory(simulator)
 endif()
+
+if(G2O_BUILD_APPS)
+  add_subdirectory(apps)
+endif(G2O_BUILD_APPS)
 
 # Examples
 if(G2O_BUILD_EXAMPLES)

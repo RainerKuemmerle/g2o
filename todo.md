@@ -1,5 +1,5 @@
 [x] wrap simulator into library
-[ ] add config types for simulation
+[x] add config types for simulation
 [ ] add tests for simulator
 [ ] add python wrapper for simulator
 [ ] Add typing for parameters to template?

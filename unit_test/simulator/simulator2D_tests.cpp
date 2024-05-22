@@ -1,5 +1,5 @@
 // g2o - General Graph Optimization
-// Copyright (C) 2011 G. Grisetti, R. Kuemmerle, W. Burgard
+// Copyright (C) 2014 R. Kuemmerle, G. Grisetti, W. Burgard
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -24,54 +24,29 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef G2O_SIMULATOR3D_BASE_H_
-#define G2O_SIMULATOR3D_BASE_H_
+#include <algorithm>
 
-#include "g2o/types/slam3d/vertex_pointxyz.h"
-#include "g2o/types/slam3d/vertex_se3.h"
-#include "g2o/types/slam3d_addons/vertex_line3d.h"
-#include "simulator.h"
+#include "g2o/simulator/simulator2d_base.h"
+#include "g2o/types/slam2d/edge_se2.h"
+#include "gmock/gmock.h"
+using namespace g2o;      // NOLINT
+using namespace testing;  // NOLINT
 
-namespace g2o {
+TEST(Simulator2D, Odom) {
+  Simulator2D simulator;
+  simulator.config.hasOdom = true;
 
-using WorldObjectSE3 = WorldObject<VertexSE3>;
+  simulator.setup();
+  simulator.simulate();
 
-using WorldObjectTrackXYZ = WorldObject<VertexPointXYZ>;
+  const auto& graph = simulator.world().graph();
 
-using WorldObjectLine3D = WorldObject<VertexLine3D>;
-
-using Robot3D = Robot<WorldObjectSE3>;
-
-/**
- * @brief A 3D robot simulator of a robot moving in a grid world.
- */
-class G2O_SIMULATOR_API Simulator3D : public Simulator {
- public:
-  /**
-   * @brief Configuration of the 3D simulator
-   */
-  struct Config {
-    double worldSize = 25.;
-    int nlandmarks = 1000;
-    int simSteps = 100;
-    bool hasOdom = false;
-    bool hasPoseSensor = false;
-    bool hasPointSensor = false;
-    bool hasPointDepthSensor = false;
-    bool hasPointDisparitySensor = false;
-    bool hasCompass = false;
-    bool hasGPS = false;
-  };
-
-  Simulator3D() = default;
-  explicit Simulator3D(Simulator3D::Config&& config);
-
-  void setup() override;
-  void simulate() override;
-
-  Config config;
-};
-
-}  // namespace g2o
-
-#endif
+  // count pose edges
+  const int odom_cnt =
+      std::count_if(graph.edges().begin(), graph.edges().end(),
+                    [](const OptimizableGraph::EdgeSet::key_type& edge) {
+                      auto* odom = dynamic_cast<EdgeSE2*>(edge.get());
+                      return odom;
+                    });
+  EXPECT_THAT(simulator.config.simSteps, Eq(odom_cnt));
+}
