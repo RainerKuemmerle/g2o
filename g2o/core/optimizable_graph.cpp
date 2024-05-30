@@ -832,6 +832,32 @@ bool OptimizableGraph::verifyInformationMatrices(bool verbose) const {
   return allEdgeOk;
 }
 
+void OptimizableGraph::addGraph(OptimizableGraph& other) {
+  jacobianWorkspace_.updateSize(other.jacobianWorkspace());
+  jacobianWorkspace_.allocate();
+
+  // parameters
+  for (const auto& p : other.parameters_) {
+    parameters_.emplace(p.first, p.second);
+  }
+  other.parameters_.clear();
+
+  // vertices
+  for (const auto& id_v : other.vertices_) {
+    vertices_.emplace(id_v.first, id_v.second);
+    auto* v = dynamic_cast<OptimizableGraph::Vertex*>(id_v.second.get());
+    if (!v) continue;
+    v->graph_ = this;
+  }
+  other.vertices_.clear();
+
+  // edges
+  for (const auto& e : other.edges_) {
+    edges_.emplace(e);
+  }
+  other.edges_.clear();
+}
+
 bool OptimizableGraph::initMultiThreading() {
 #if (defined G2O_OPENMP) && EIGEN_VERSION_AT_LEAST(3, 1, 0)
   Eigen::initParallel();
