@@ -35,12 +35,15 @@ using namespace testing;  // NOLINT
 TEST(Simulator3D, Odom) {
   Simulator3D simulator;
   simulator.config.hasOdom = true;
+  simulator.config.nlandmarks = 10;
 
   simulator.setup();
   simulator.simulate();
 
   const auto& graph = simulator.world().graph();
 
+  EXPECT_THAT(simulator.graph().vertices(),
+              SizeIs(simulator.config.simSteps + 1));
   // count pose edges
   const int odom_cnt =
       std::count_if(graph.edges().begin(), graph.edges().end(),

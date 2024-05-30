@@ -41,6 +41,8 @@ TEST(Simulator2D, Odom) {
 
   const auto& graph = simulator.world().graph();
 
+  EXPECT_THAT(simulator.graph().vertices(),
+              SizeIs(simulator.config.simSteps + 1));
   // count pose edges
   const int odom_cnt =
       std::count_if(graph.edges().begin(), graph.edges().end(),

@@ -212,6 +212,7 @@ void Simulator3D::simulate() {
       robot->sense(world_);
     }
   }
+  finalize();
 }
 
 }  // namespace g2o
