@@ -53,7 +53,7 @@ class G2O_SIMULATOR_API Simulator2D : public Simulator {
    */
   struct Config {
     double worldSize = 25.;
-    int nlandmarks = 100;
+    int nlandmarks = 0;
     int simSteps = 100;
     bool hasOdom = false;
     // Poses and landmarks
@@ -65,7 +65,7 @@ class G2O_SIMULATOR_API Simulator2D : public Simulator {
 
     // Segment
     bool hasSegmentSensor = false;
-    int nSegments = 1000;
+    int nSegments = 0;
     int segmentGridSize = 50;
     double minSegmentLength = 0.5;
     double maxSegmentLength = 3.0;

@@ -301,9 +301,20 @@ class Simulator {
   const g2o::World& world() const { return world_; }
   g2o::World& world() { return world_; }
 
+  const OptimizableGraph& graph() const { return world_.graph(); }
+
  protected:
   std::mt19937 generator_;
   g2o::World world_;
+
+  /**
+   * @brief Finalizes the simulation for the graph.
+   *
+   * Drops the vertices that have no edges.
+   * Runs the Estimate propagation along the odometry.
+   *
+   */
+  void finalize();
 };
 
 }  // namespace g2o

@@ -26,6 +26,8 @@
 
 #include "simulator.h"
 
+#include "g2o/core/optimizable_graph.h"
+
 namespace g2o {
 
 void BaseWorldObject::setVertex(
@@ -63,6 +65,24 @@ bool World::addParameter(const std::shared_ptr<Parameter>& param) {
   bool result = graph().addParameter(param);
   paramId_++;
   return result;
+}
+
+void Simulator::finalize() {
+  // Drop vertices without any edge
+  auto iter = world_.graph().vertices().begin();
+  for (; iter != world_.graph().vertices().end();) {
+    auto* v = static_cast<OptimizableGraph::Vertex*>(iter->second.get());
+    if (!v->edges().empty()) {
+      ++iter;
+      continue;
+    }
+    iter = world_.graph().vertices().erase(iter);
+  }
+  // TODO(Rainer): Initial estimate
+  /* Fails since only implemented on SparseOptimizer
+  EstimatePropagatorCostOdometry costFunction(&world_.graph());
+  world_.graph().computeInitialGuess(costFunction);
+  */
 }
 
 }  // namespace g2o

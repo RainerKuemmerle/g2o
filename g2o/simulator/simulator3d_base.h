@@ -52,7 +52,7 @@ class G2O_SIMULATOR_API Simulator3D : public Simulator {
    */
   struct Config {
     double worldSize = 25.;
-    int nlandmarks = 1000;
+    int nlandmarks = 0;
     int simSteps = 100;
     bool hasOdom = false;
     bool hasPoseSensor = false;
