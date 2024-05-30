@@ -95,4 +95,9 @@ void JacobianWorkspace::updateSize(int numVertices, int dimension, bool reset) {
   maxDimension_ = std::max(dimension, maxDimension_);
 }
 
+void JacobianWorkspace::updateSize(const JacobianWorkspace& other) {
+  maxNumVertices_ = std::max(other.maxNumVertices_, maxNumVertices_);
+  maxDimension_ = std::max(other.maxDimension_, maxDimension_);
+}
+
 }  // namespace g2o

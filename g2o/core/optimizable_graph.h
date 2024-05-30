@@ -631,6 +631,15 @@ class G2O_CORE_API OptimizableGraph : public HyperGraph {
   bool addEdge(const std::shared_ptr<HyperGraph::Edge>& e) override;
 
   /**
+   * @brief Adds a graph into this.
+   *
+   * Copies a graph into this graph. Id clashes will not be resolved.
+   *
+   * @param other The graph to add.
+   */
+  void addGraph(OptimizableGraph& other);
+
+  /**
    * overridden from HyperGraph, to maintain the bookkeeping of the
    * caches/parameters and jacobian workspaces consistent upon a change in the
    * vertex.

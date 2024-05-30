@@ -27,20 +27,20 @@
 #ifndef G2O_GRAPH_PARAMETER_CONTAINER_HH_
 #define G2O_GRAPH_PARAMETER_CONTAINER_HH_
 
-#include <iosfwd>
 #include <map>
 #include <memory>
-#include <string>
 
 namespace g2o {
 
 class Parameter;
+class OptimizableGraph;
 
 /**
  * \brief map id to parameters
  */
 class ParameterContainer : protected std::map<int, std::shared_ptr<Parameter>> {
  public:
+  friend OptimizableGraph;
   using BaseClass = std::map<int, std::shared_ptr<Parameter>>;
 
   /**

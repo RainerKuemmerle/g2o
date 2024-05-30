@@ -29,7 +29,6 @@
 
 #include <Eigen/Core>
 #include <cassert>
-#include <cstddef>
 #include <vector>
 
 #include "g2o/core/eigen_types.h"
@@ -82,6 +81,11 @@ class G2O_CORE_API JacobianWorkspace {
    * manually update with the given parameters
    */
   void updateSize(int numVertices, int dimension, bool reset = false);
+
+  /**
+   * Update by another workspace
+   */
+  void updateSize(const JacobianWorkspace& other);
 
   /**
    * set the full workspace to zero

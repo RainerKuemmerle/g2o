@@ -179,8 +179,10 @@ void declareOptimizableGraph(py::module& m) {
 
   cls.def("set_edge_vertex", &CLS::setEdgeVertex, "e"_a, "pos"_a, "v"_a,
           py::keep_alive<1, 2>(),
-          py::keep_alive<1, 4>());               // (HyperGraph::Edge*, int,
-                                                 // HyperGraph::Vertex*) -> bool
+          py::keep_alive<1, 4>());  // (HyperGraph::Edge*, int,
+                                    // HyperGraph::Vertex*) -> bool
+  cls.def("add_graph", &CLS::addGraph, "graph"_a,
+          py::keep_alive<1, 2>());               // -> void
   cls.def("chi2", &CLS::chi2);                   // -> double
   cls.def("max_dimension", &CLS::maxDimension);  // -> int
   cls.def("dimensions", &CLS::dimensions);       // -> std::set<int>

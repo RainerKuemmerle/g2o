@@ -32,6 +32,7 @@
 #include <memory>
 #include <numeric>
 #include <unordered_set>
+#include <utility>
 #include <vector>
 
 #include "g2o/core/eigen_types.h"
@@ -157,6 +158,62 @@ TEST(General, GraphAddVertexAndClear) {
   ASSERT_TRUE(otherOptimizer->addVertex(v1));
   ASSERT_EQ(v1->graph(), otherOptimizer.get());
   ASSERT_THAT(otherOptimizer->vertices(), testing::SizeIs(1));
+}
+
+TEST(General, GraphAddGraph) {
+  auto optimizer = g2o::internal::createOptimizerForTests();
+
+  auto v1 = std::make_shared<g2o::VertexSE2>();
+  v1->setId(0);
+  auto v2 = std::make_shared<g2o::VertexSE2>();
+  v2->setId(1);
+
+  optimizer->addVertex(v1);
+  optimizer->addVertex(v2);
+
+  auto e1 = std::make_shared<g2o::EdgeSE2>();
+  e1->setVertex(0, v1);
+  e1->setVertex(1, v2);
+  optimizer->addEdge(e1);
+
+  auto extractVertexIds = [](const g2o::SparseOptimizer& graph) {
+    std::vector<int> vertex_ids;
+    for (const auto& id_v : graph.vertices()) vertex_ids.push_back(id_v.first);
+    return vertex_ids;
+  };
+
+  auto extractEdgeIds = [](const g2o::SparseOptimizer& graph) {
+    std::vector<std::pair<int, int>> edge_ids;
+    for (const auto& e : graph.edges()) {
+      const auto* edge = dynamic_cast<g2o::SparseOptimizer::Edge*>(e.get());
+      edge_ids.emplace_back(edge->vertices()[0]->id(),
+                            edge->vertices()[1]->id());
+    }
+    return edge_ids;
+  };
+
+  auto extractParamIds = [](const g2o::SparseOptimizer& graph) {
+    std::vector<int> param_ids;
+    for (const auto& p : graph.parameters()) param_ids.push_back(p.first);
+    return param_ids;
+  };
+
+  const std::vector<int> param_ids = extractParamIds(*optimizer);
+  const std::vector<int> vertex_ids = extractVertexIds(*optimizer);
+  const std::vector<std::pair<int, int>> edge_ids = extractEdgeIds(*optimizer);
+
+  g2o::SparseOptimizer fresh_graph;
+  fresh_graph.addGraph(*optimizer);
+
+  EXPECT_THAT(optimizer->vertices(), IsEmpty());
+  EXPECT_THAT(optimizer->edges(), IsEmpty());
+  EXPECT_THAT(extractParamIds(*optimizer), IsEmpty());
+
+  EXPECT_THAT(extractParamIds(fresh_graph),
+              UnorderedElementsAreArray(param_ids));
+  EXPECT_THAT(extractVertexIds(fresh_graph),
+              UnorderedElementsAreArray(vertex_ids));
+  EXPECT_THAT(extractEdgeIds(fresh_graph), UnorderedElementsAreArray(edge_ids));
 }
 
 TEST(General, GraphChangeId) {
