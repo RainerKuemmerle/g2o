@@ -9,6 +9,12 @@ FetchContent_Declare(
 set(PYBIND11_FINDPYTHON ON)
 FetchContent_MakeAvailable(pybind11)
 
+if (TARGET simulator_lib)
+set(PYSIM_SRC "simulator/py_simulator.cpp")
+else()
+set(PYSIM_SRC "")
+endif()
+
 ###################################################
 # python wrapper library
 pybind11_add_module(g2opy
@@ -40,8 +46,15 @@ pybind11_add_module(g2opy
     types/slam3d/py_types_slam3d.cpp
     types/sba/py_types_sba.cpp
     types/sba/py_types_six_dof_expmap.cpp
+    # simulator
+    ${PYSIM_SRC}
     # module main
     g2opy.cpp)
+
+if (TARGET simulator_lib)
+    target_compile_definitions(g2opy PUBLIC HAVE_G2O_SIMULATOR=1)
+    target_link_libraries(g2opy PRIVATE simulator_lib)
+endif()
 
 set(SOLVER_LIBRARIES solver_eigen solver_dense solver_pcg solver_slam2d_linear solver_structure_only)
 if(CHOLMOD_FOUND)
