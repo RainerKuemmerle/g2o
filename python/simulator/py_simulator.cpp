@@ -7,6 +7,7 @@
 #include "g2o/core/optimizable_graph.h"
 #include "g2o/simulator/simulator.h"
 #include "g2o/simulator/simulator2d_base.h"
+#include "g2o/simulator/simulator3d_base.h"
 
 namespace g2o {
 
@@ -53,6 +54,31 @@ void declareSimulator(py::module& m) {
       .def_readwrite("config", &Simulator2D::config)
       .def("setup", &Simulator2D::setup)
       .def("simulate", &Simulator2D::simulate);
+
+  // 3D Simulator
+  py::class_<Simulator3D::Config>(m, "Simulator3DConfig")
+      .def(py::init<>())
+      .def_readwrite("world_size", &Simulator3D::Config::worldSize)
+      .def_readwrite("nlandmarks", &Simulator3D::Config::nlandmarks)
+      .def_readwrite("sim_steps", &Simulator3D::Config::simSteps)
+      .def_readwrite("has_odom", &Simulator3D::Config::hasOdom)
+      .def_readwrite("has_pose_sensor", &Simulator3D::Config::hasPoseSensor)
+      .def_readwrite("has_point_sensor", &Simulator3D::Config::hasPointSensor)
+      .def_readwrite("has_point_depth_sensor",
+                     &Simulator3D::Config::hasPointDepthSensor)
+      .def_readwrite("has_point_disparity_sensor",
+                     &Simulator3D::Config::hasPointDisparitySensor)
+      .def_readwrite("has_compass", &Simulator3D::Config::hasCompass)
+      .def_readwrite("has_gps", &Simulator3D::Config::hasGPS);
+
+  py::class_<Simulator3D, Simulator>(m, "Simulator3D")
+      .def(py::init<>())
+      .def(py::init([](Simulator3D::Config cfg) {
+        return std::make_unique<Simulator3D>(std::move(cfg));
+      }))
+      .def_readwrite("config", &Simulator3D::config)
+      .def("setup", &Simulator3D::setup)
+      .def("simulate", &Simulator3D::simulate);
 }
 
 }  // namespace g2o
