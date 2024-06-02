@@ -1,5 +1,5 @@
 // g2o - General Graph Optimization
-// Copyright (C) 2011 R. Kuemmerle, G. Grisetti, W. Burgard
+// Copyright (C) 2011 G. Grisetti, R. Kuemmerle, W. Burgard
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -24,30 +24,37 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "edge_se2_prior.h"
+#include "sensor_se2_prior.h"
 
-#include "g2o/types/slam2d/se2.h"
-#include "g2o/types/slam2d/vertex_se2.h"
+#include <cassert>
+
+#include "g2o/core/eigen_types.h"
 
 namespace g2o {
 
-void EdgeSE2Prior::initialEstimate(const OptimizableGraph::VertexSet& from,
-                                   OptimizableGraph::Vertex* to) {
-  assert(from.empty());
-  (void)from;
-  (void)to;
-  VertexSE2* v1 = vertexXnRaw<0>();
-  v1->setEstimate(measurement_);
+// SensorSE2Prior
+SensorSE2Prior::SensorSE2Prior(std::string name)
+    : UnarySensor<Robot2D, EdgeSE2Prior>(std::move(name)) {
+  information_ = Vector3(100., 100., 1000.).asDiagonal();
+  setInformation(information_);
 }
 
-void EdgeSE2Prior::setMeasurement(const SE2& m) {
-  measurement_ = m;
-  inverseMeasurement_ = m.inverse();
+void SensorSE2Prior::addNoise(EdgeType* e) {
+  EdgeType::ErrorVector _n = sampler_.generateSample();
+  EdgeType::Measurement n(_n);
+  e->setMeasurement(e->measurement() * n);
+  e->setInformation(information());
 }
 
-bool EdgeSE2Prior::setMeasurementFromState() {
-  setMeasurement(vertexXnRaw<0>()->estimate());
-  return true;
+void SensorSE2Prior::sense(BaseRobot& robot, World& world) {
+  robotPoseVertex_ = robotPoseVertex<PoseVertexType>(robot, world);
+  if (!robotPoseVertex_) return;
+  sensorPose_ = robotPoseVertex_->estimate();
+  auto e = mkEdge();
+  if (!e) return;
+  world.graph().addEdge(e);
+  e->setMeasurementFromState();
+  addNoise(e.get());
 }
 
 }  // namespace g2o

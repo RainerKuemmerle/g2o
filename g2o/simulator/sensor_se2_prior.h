@@ -1,5 +1,5 @@
 // g2o - General Graph Optimization
-// Copyright (C) 2011 R. Kuemmerle, G. Grisetti, W. Burgard
+// Copyright (C) 2011 G. Grisetti, R. Kuemmerle, W. Burgard
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -24,30 +24,29 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "edge_se2_prior.h"
+#ifndef G2O_SENSOR_SE2_PRIOR_H_
+#define G2O_SENSOR_SE2_PRIOR_H_
 
-#include "g2o/types/slam2d/se2.h"
-#include "g2o/types/slam2d/vertex_se2.h"
+#include "g2o/types/slam2d/edge_se2_prior.h"
+#include "g2o_simulator_api.h"
+#include "pointsensorparameters.h"
+#include "simulator2d_base.h"
 
 namespace g2o {
 
-void EdgeSE2Prior::initialEstimate(const OptimizableGraph::VertexSet& from,
-                                   OptimizableGraph::Vertex* to) {
-  assert(from.empty());
-  (void)from;
-  (void)to;
-  VertexSE2* v1 = vertexXnRaw<0>();
-  v1->setEstimate(measurement_);
-}
+class G2O_SIMULATOR_API SensorSE2Prior
+    : public PointSensorParameters,
+      public UnarySensor<Robot2D, EdgeSE2Prior> {
+ public:
+  using RobotPoseType = PoseVertexType::EstimateType;
+  explicit SensorSE2Prior(std::string name);
+  void sense(BaseRobot& robot, World& world) override;
+  void addNoise(EdgeType* e) override;
 
-void EdgeSE2Prior::setMeasurement(const SE2& m) {
-  measurement_ = m;
-  inverseMeasurement_ = m.inverse();
-}
-
-bool EdgeSE2Prior::setMeasurementFromState() {
-  setMeasurement(vertexXnRaw<0>()->estimate());
-  return true;
-}
+ protected:
+  RobotPoseType sensorPose_;
+};
 
 }  // namespace g2o
+
+#endif

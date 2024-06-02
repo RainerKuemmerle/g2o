@@ -35,6 +35,7 @@
 #include "g2o/simulator/sensor_pointxy.h"
 #include "g2o/simulator/sensor_pointxy_bearing.h"
 #include "g2o/simulator/sensor_pose2d.h"
+#include "g2o/simulator/sensor_se2_prior.h"
 #include "g2o/simulator/sensor_segment2d.h"
 #include "g2o/simulator/sensor_segment2d_line.h"
 #include "g2o/simulator/sensor_segment2d_pointline.h"
@@ -85,6 +86,7 @@ void Simulator2D::setup() {
   auto robot = std::make_unique<Robot2D>("myRobot");
 
   if (config.hasOdom) {
+    G2O_DEBUG("Adding odometry sensor");
     auto odometrySensor = std::make_unique<SensorOdometry2D>("odometry");
     const Vector3 diagonal(500, 500, 5000);
     odometrySensor->setInformation(diagonal.asDiagonal());
@@ -92,6 +94,7 @@ void Simulator2D::setup() {
   }
 
   if (config.hasPoseSensor) {
+    G2O_DEBUG("Adding pose sensor");
     auto poseSensor = std::make_unique<SensorPose2D>("poseSensor");
     Matrix3 poseInfo = poseSensor->information();
     poseInfo.setIdentity();
@@ -101,7 +104,14 @@ void Simulator2D::setup() {
     robot->addSensor(std::move(poseSensor), world_);
   }
 
+  if (config.hasGPS) {
+    G2O_DEBUG("Adding GPS sensor");
+    auto gpsSensor = std::make_unique<SensorSE2Prior>("gpsSensor");
+    robot->addSensor(std::move(gpsSensor), world_);
+  }
+
   if (config.hasPointSensor) {
+    G2O_DEBUG("Adding point sensor");
     auto pointSensor = std::make_unique<SensorPointXY>("pointSensor");
     Matrix2 pointInfo = pointSensor->information();
     pointInfo.setIdentity();
@@ -112,6 +122,7 @@ void Simulator2D::setup() {
   }
 
   if (config.hasPointBearingSensor) {
+    G2O_DEBUG("Adding point bearing sensor");
     auto bearingSensor =
         std::make_unique<SensorPointXYBearing>("bearingSensor");
     bearingSensor->setInformation(bearingSensor->information() * 1000);
@@ -119,9 +130,8 @@ void Simulator2D::setup() {
   }
 
   if (config.hasSegmentSensor) {
-    G2O_TRACE("creating Segment Sensor");
+    G2O_DEBUG("Adding segment sensor");
     auto segmentSensor = std::make_unique<SensorSegment2D>("segmentSensor");
-    G2O_TRACE("segmentSensorCreated");
     segmentSensor->setMaxRange(3);
     segmentSensor->setMinRange(.1);
     segmentSensor->setInformation(segmentSensor->information() * 1000);
