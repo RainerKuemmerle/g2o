@@ -59,13 +59,10 @@ void EdgeSE3Prior::computeError() {
 
 void EdgeSE3Prior::linearizeOplus() {
   VertexSE3* from = vertexXnRaw<0>();
+  const Isometry3& X = from->estimate();
+  const Isometry3& P = cache_->offsetParam()->param();
+  const Isometry3& Z = measurement_;
   Isometry3 E;
-  Isometry3 Z;
-  Isometry3 X;
-  Isometry3 P;
-  X = from->estimate();
-  P = cache_->offsetParam()->param();
-  Z = measurement_;
   internal::computeEdgeSE3PriorGradient(E, jacobianOplusXi_, Z, X, P);
 }
 
