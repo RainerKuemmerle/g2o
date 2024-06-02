@@ -165,6 +165,9 @@ void Simulator2D::simulate() {
   const Config& sim_conf = config;
   std::mt19937& generator = generator_;
 
+  G2O_DEBUG("Simulate {} steps in world size {}", sim_conf.simSteps,
+            sim_conf.worldSize);
+
   for (const auto& robot : world_.robots()) {
     auto* rob2d = dynamic_cast<Robot2D*>(robot.get());
     if (!rob2d) continue;
