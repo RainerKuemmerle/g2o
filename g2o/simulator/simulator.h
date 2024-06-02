@@ -289,6 +289,18 @@ class BinarySensor : public BaseSensor {
  */
 class Simulator {
  public:
+  struct Config {
+    double worldSize = 25.;
+    int nlandmarks = 0;
+    int simSteps = 100;
+    bool hasOdom = false;
+    // Poses and landmarks
+    bool hasPoseSensor = false;
+    bool hasPointSensor = false;
+    bool hasCompass = false;
+    bool hasGPS = false;
+  };
+
   virtual ~Simulator() = default;
   virtual void setup() = 0;
   virtual void simulate() = 0;

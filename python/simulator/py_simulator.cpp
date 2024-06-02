@@ -24,17 +24,20 @@ void declareSimulator(py::module& m) {
            static_cast<g2o::World& (Simulator::*)()>(&Simulator::world),
            py::return_value_policy::reference);
 
-  // 2D Simulator
-  py::class_<Simulator2D::Config>(m, "Simulator2DConfig")
+  py::class_<Simulator::Config>(m, "SimulatorConfig")
       .def(py::init<>())
-      .def_readwrite("world_size", &Simulator2D::Config::worldSize)
-      .def_readwrite("nlandmarks", &Simulator2D::Config::nlandmarks)
-      .def_readwrite("sim_steps", &Simulator2D::Config::simSteps)
-      .def_readwrite("has_odom", &Simulator2D::Config::hasOdom)
-      .def_readwrite("has_pose_sensor", &Simulator2D::Config::hasPoseSensor)
-      .def_readwrite("has_point_sensor", &Simulator2D::Config::hasPointSensor)
-      .def_readwrite("has_compass", &Simulator2D::Config::hasCompass)
-      .def_readwrite("has_gps", &Simulator2D::Config::hasGPS)
+      .def_readwrite("world_size", &Simulator::Config::worldSize)
+      .def_readwrite("nlandmarks", &Simulator::Config::nlandmarks)
+      .def_readwrite("sim_steps", &Simulator::Config::simSteps)
+      .def_readwrite("has_odom", &Simulator::Config::hasOdom)
+      .def_readwrite("has_pose_sensor", &Simulator::Config::hasPoseSensor)
+      .def_readwrite("has_point_sensor", &Simulator::Config::hasPointSensor)
+      .def_readwrite("has_compass", &Simulator::Config::hasCompass)
+      .def_readwrite("has_gps", &Simulator::Config::hasGPS);
+
+  // 2D Simulator
+  py::class_<Simulator2D::Config, Simulator::Config>(m, "Simulator2DConfig")
+      .def(py::init<>())
       .def_readwrite("has_point_bearing_sensor",
                      &Simulator2D::Config::hasPointBearingSensor)
       .def_readwrite("has_segment_sensor",
@@ -56,20 +59,12 @@ void declareSimulator(py::module& m) {
       .def("simulate", &Simulator2D::simulate);
 
   // 3D Simulator
-  py::class_<Simulator3D::Config>(m, "Simulator3DConfig")
+  py::class_<Simulator3D::Config, Simulator::Config>(m, "Simulator3DConfig")
       .def(py::init<>())
-      .def_readwrite("world_size", &Simulator3D::Config::worldSize)
-      .def_readwrite("nlandmarks", &Simulator3D::Config::nlandmarks)
-      .def_readwrite("sim_steps", &Simulator3D::Config::simSteps)
-      .def_readwrite("has_odom", &Simulator3D::Config::hasOdom)
-      .def_readwrite("has_pose_sensor", &Simulator3D::Config::hasPoseSensor)
-      .def_readwrite("has_point_sensor", &Simulator3D::Config::hasPointSensor)
       .def_readwrite("has_point_depth_sensor",
                      &Simulator3D::Config::hasPointDepthSensor)
       .def_readwrite("has_point_disparity_sensor",
-                     &Simulator3D::Config::hasPointDisparitySensor)
-      .def_readwrite("has_compass", &Simulator3D::Config::hasCompass)
-      .def_readwrite("has_gps", &Simulator3D::Config::hasGPS);
+                     &Simulator3D::Config::hasPointDisparitySensor);
 
   py::class_<Simulator3D, Simulator>(m, "Simulator3D")
       .def(py::init<>())

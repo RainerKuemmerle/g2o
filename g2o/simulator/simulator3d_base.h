@@ -50,17 +50,9 @@ class G2O_SIMULATOR_API Simulator3D : public Simulator {
   /**
    * @brief Configuration of the 3D simulator
    */
-  struct Config {
-    double worldSize = 25.;
-    int nlandmarks = 0;
-    int simSteps = 100;
-    bool hasOdom = false;
-    bool hasPoseSensor = false;
-    bool hasPointSensor = false;
+  struct Config : public Simulator::Config {
     bool hasPointDepthSensor = false;
     bool hasPointDisparitySensor = false;
-    bool hasCompass = false;
-    bool hasGPS = false;
   };
 
   Simulator3D() = default;

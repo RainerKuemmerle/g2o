@@ -51,16 +51,7 @@ class G2O_SIMULATOR_API Simulator2D : public Simulator {
   /**
    * @brief Configuration of the 2D simulator
    */
-  struct Config {
-    double worldSize = 25.;
-    int nlandmarks = 0;
-    int simSteps = 100;
-    bool hasOdom = false;
-    // Poses and landmarks
-    bool hasPoseSensor = false;
-    bool hasPointSensor = false;
-    bool hasCompass = false;
-    bool hasGPS = false;
+  struct Config : public Simulator::Config {
     bool hasPointBearingSensor = false;
 
     // Segment
