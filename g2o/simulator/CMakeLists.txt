@@ -20,6 +20,7 @@ add_library(simulator_lib ${G2O_LIB_TYPE}
    sensor_pointxyz_disparity.cpp sensor_pointxyz_disparity.h
    sensor_pointxyz_depth.cpp sensor_pointxyz_depth.h
    sensor_se3_prior.cpp sensor_se3_prior.h
+   sensor_se2_prior.cpp sensor_se2_prior.h
 
    g2o_simulator_api.h
 )
