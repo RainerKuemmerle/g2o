@@ -26,6 +26,7 @@
 
 #include "simulator3d_base.h"
 
+#include <memory>
 #include <optional>
 
 #include "g2o/core/eigen_types.h"
@@ -34,11 +35,11 @@
 #include "g2o/simulator/sensor_pointxyz_depth.h"
 #include "g2o/simulator/sensor_pointxyz_disparity.h"
 #include "g2o/simulator/sensor_pose3d.h"
+#include "g2o/simulator/sensor_se3_prior.h"
 #include "g2o/stuff/logger.h"
 
 // TODO(Rainer): Figure out if this makes sense
 // #define POSE_SENSOR_OFFSET
-// #define POSE_PRIOR_SENSOR
 
 namespace g2o {
 
@@ -108,18 +109,15 @@ void Simulator3D::setup() {
     robot->addSensor(std::move(poseSensor), world_);
   }
 
-#ifdef POSE_PRIOR_SENSOR
-  SensorSE3Prior posePriorSensor("posePriorSensor");
-  robot->addSensor(&posePriorSensor);
-  {
-    Isometry3 cameraPose;
-    Matrix3 R;
-    R << 0, 0, 1, -1, 0, 0, 0, -1, 0;
-    cameraPose = R;
-    cameraPose.translation() = Vector3d(0., 0., 0.3);
-    posePriorSensor.offsetParam()->setOffset(cameraPose);
+  if (config.hasGPS) {
+    auto gpsSensor = std::make_unique<SensorSE3Prior>("posePriorSensor");
+    Isometry3 cameraPose = Isometry3::Identity();
+    cameraPose.linear() << 0, 0, 1, -1, 0, 0, 0, -1, 0;
+    cameraPose.translation() = Vector3(0., 0., 0.3);
+    gpsSensor->addParameters(world_);
+    gpsSensor->offsetParam()->setParam(cameraPose);
+    robot->addSensor(std::move(gpsSensor), world_);
   }
-#endif
 
 #ifdef POSE_SENSOR_OFFSET
   SensorPose3DOffset poseSensor("poseSensor");
