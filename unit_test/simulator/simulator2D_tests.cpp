@@ -139,7 +139,9 @@ TEST_P(Simulator2DTests, Simulate) {
 }
 
 namespace {
-Simulator2D::Config FromWords(const std::unordered_set<std::string>& words) {
+using std::unordered_set;
+
+Simulator2D::Config FromWords(const unordered_set<std::string>& words) {
   Simulator2D::Config result;
   result.hasOdom = words.count("hasOdom") != 0;
   result.hasPoseSensor = words.count("hasPoseSensor") != 0;
@@ -162,7 +164,7 @@ std::vector<Simulator2D::Config> ConfigsToTest() {
   result.push_back(FromWords({"hasSegmentSensor"}));
   // multiple
   result.push_back(FromWords({"hasOdom", "hasPoseSensor"}));
-  result.push_back(FromWords({"hasOdom", "hasPoseSensor", "hasGps"}));
+  result.push_back(FromWords({"hasOdom", "hasPoseSensor", "hasGPS"}));
   result.push_back(FromWords({"hasOdom", "hasPointSensor"}));
   return result;
 }
