@@ -60,6 +60,7 @@ class ParameterContainer : protected std::map<int, std::shared_ptr<Parameter>> {
   using BaseClass::begin;
   using BaseClass::clear;
   using BaseClass::end;
+  using BaseClass::erase;
   using BaseClass::size;
 };
 

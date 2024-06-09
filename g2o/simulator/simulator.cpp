@@ -26,6 +26,8 @@
 
 #include "simulator.h"
 
+#include <unordered_set>
+
 #include "g2o/core/optimizable_graph.h"
 
 namespace g2o {
@@ -69,14 +71,30 @@ bool World::addParameter(const std::shared_ptr<Parameter>& param) {
 
 void Simulator::finalize() {
   // Drop vertices without any edge
-  auto iter = world_.graph().vertices().begin();
-  for (; iter != world_.graph().vertices().end();) {
+  for (auto iter = world_.graph().vertices().begin();
+       iter != world_.graph().vertices().end();) {
     auto* v = static_cast<OptimizableGraph::Vertex*>(iter->second.get());
     if (!v->edges().empty()) {
       ++iter;
       continue;
     }
     iter = world_.graph().vertices().erase(iter);
+  }
+  // Drop parameters without any edge
+  std::unordered_set<int> connected_parameters;
+  for (const auto& edge_ptr : world_.graph().edges()) {
+    auto* edge = static_cast<OptimizableGraph::Edge*>(edge_ptr.get());
+    for (const auto& p_id : edge->parameterIds()) {
+      connected_parameters.insert(p_id);
+    }
+  }
+  for (auto iter = world_.graph().parameters().begin();
+       iter != world_.graph().parameters().end();) {
+    if (connected_parameters.count(iter->first) > 0) {
+      ++iter;
+      continue;
+    }
+    iter = world_.graph().parameters().erase(iter);
   }
   // TODO(Rainer): Initial estimate
   /* Fails since only implemented on SparseOptimizer
