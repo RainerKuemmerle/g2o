@@ -40,29 +40,9 @@
 #include "g2o/types/slam2d_addons/edge_se2_segment2d.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
+#include "unit_test/test_helper/graph_functions.h"
 using namespace g2o;      // NOLINT
 using namespace testing;  // NOLINT
-
-namespace {
-template <typename PoseType>
-int countVerticesMatchingType(const OptimizableGraph& graph) {
-  return std::count_if(
-      graph.vertices().begin(), graph.vertices().end(),
-      [](const OptimizableGraph::VertexIDMap::value_type& elem) {
-        auto* ptr = dynamic_cast<PoseType*>(elem.second.get());
-        return ptr != nullptr;
-      });
-}
-
-template <typename EdgeType>
-int countEdgesMatchingType(const OptimizableGraph& graph) {
-  return std::count_if(graph.edges().begin(), graph.edges().end(),
-                       [](const OptimizableGraph::EdgeSet::key_type& edge) {
-                         auto* ptr = dynamic_cast<EdgeType*>(edge.get());
-                         return ptr != nullptr;
-                       });
-}
-}  // namespace
 
 TEST(Simulator2D, Empty) {
   Simulator2D simulator;
@@ -86,9 +66,9 @@ TEST(Simulator2D, Odom) {
   const OptimizableGraph& graph = simulator.world().graph();
 
   EXPECT_THAT(graph.vertices(), SizeIs(simulator.config.simSteps + 1));
-  const int poses = countVerticesMatchingType<VertexSE2>(graph);
+  const int poses = g2o::internal::countVerticesMatchingType<VertexSE2>(graph);
   EXPECT_THAT(poses, Eq(simulator.config.simSteps + 1));
-  const int odom_cnt = countEdgesMatchingType<EdgeSE2>(graph);
+  const int odom_cnt = g2o::internal::countEdgesMatchingType<EdgeSE2>(graph);
   EXPECT_THAT(simulator.config.simSteps, Eq(odom_cnt));
 }
 
@@ -126,29 +106,36 @@ TEST_P(Simulator2DTests, Simulate) {
 
   if (config.hasOdom || config.hasPoseSensor || config.hasPointSensor ||
       config.hasPointBearingSensor || config.hasCompass || config.hasGPS)
-    EXPECT_THAT(countVerticesMatchingType<VertexSE2>(graph), Gt(0));
+    EXPECT_THAT(g2o::internal::countVerticesMatchingType<VertexSE2>(graph),
+                Gt(0));
 
   if (config.hasPointSensor || config.hasPointBearingSensor)
-    EXPECT_THAT(countVerticesMatchingType<VertexPointXY>(graph), Gt(0));
+    EXPECT_THAT(g2o::internal::countVerticesMatchingType<VertexPointXY>(graph),
+                Gt(0));
 
   // Base configuration
   if (config.hasOdom || config.hasPoseSensor)
-    EXPECT_THAT(countEdgesMatchingType<EdgeSE2>(graph), Gt(0));
+    EXPECT_THAT(g2o::internal::countEdgesMatchingType<EdgeSE2>(graph), Gt(0));
   if (config.hasPointSensor)
-    EXPECT_THAT(countEdgesMatchingType<EdgeSE2PointXY>(graph), Gt(0));
+    EXPECT_THAT(g2o::internal::countEdgesMatchingType<EdgeSE2PointXY>(graph),
+                Gt(0));
 
   /* TODO(Rainer): Add simulation of a compass
     if (config.hasCompass)
       EXPECT_THAT(countEdgesMatchingType<EdgeSE2PointXY>(graph), Gt(0));
   */
   if (config.hasGPS)
-    EXPECT_THAT(countEdgesMatchingType<EdgeSE2Prior>(graph), Gt(0));
+    EXPECT_THAT(g2o::internal::countEdgesMatchingType<EdgeSE2Prior>(graph),
+                Gt(0));
 
   // 2D specific configuration
   if (config.hasPointBearingSensor)
-    EXPECT_THAT(countEdgesMatchingType<EdgeSE2PointXYBearing>(graph), Gt(0));
+    EXPECT_THAT(
+        g2o::internal::countEdgesMatchingType<EdgeSE2PointXYBearing>(graph),
+        Gt(0));
   if (config.hasSegmentSensor)
-    EXPECT_THAT(countEdgesMatchingType<EdgeSE2Segment2D>(graph), Gt(0));
+    EXPECT_THAT(g2o::internal::countEdgesMatchingType<EdgeSE2Segment2D>(graph),
+                Gt(0));
 }
 
 namespace {
