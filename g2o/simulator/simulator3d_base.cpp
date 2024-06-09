@@ -70,6 +70,7 @@ void Simulator3D::setup() {
     pointSensor->setMaxRange(2.);
     cameraPose = R;
     cameraPose.translation() = Vector3(0., 0., 0.3);
+    pointSensor->addParameters(world_);
     pointSensor->offsetParam()->setParam(cameraPose);
     robot->addSensor(std::move(pointSensor), world_);
   }
@@ -83,6 +84,7 @@ void Simulator3D::setup() {
     CameraWithOffset cameraPose;
     cameraPose.offset().linear() << 0, 0, 1, -1, 0, 0, 0, -1, 0;
     cameraPose.offset().translation() = Vector3(0., 0., 0.3);
+    disparitySensor->addParameters(world_);
     disparitySensor->offsetParam()->setParam(cameraPose);
     robot->addSensor(std::move(disparitySensor), world_);
   }
@@ -95,6 +97,7 @@ void Simulator3D::setup() {
     CameraWithOffset cameraPose;
     cameraPose.offset().linear() << 0, 0, 1, -1, 0, 0, 0, -1, 0;
     cameraPose.offset().translation() = Vector3(0., 0., 0.3);
+    depthSensor->addParameters(world_);
     depthSensor->offsetParam()->setParam(cameraPose);
     robot->addSensor(std::move(depthSensor), world_);
   }

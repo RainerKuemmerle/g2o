@@ -32,6 +32,18 @@
 using namespace g2o;      // NOLINT
 using namespace testing;  // NOLINT
 
+TEST(Simulator3D, Empty) {
+  Simulator3D simulator;
+  simulator.setup();
+  simulator.simulate();
+
+  const auto& graph = simulator.world().graph();
+
+  EXPECT_THAT(graph.vertices(), SizeIs(0));
+  EXPECT_THAT(graph.edges(), IsEmpty());
+  EXPECT_THAT(graph.parameters(), SizeIs(0));
+}
+
 TEST(Simulator3D, Odom) {
   Simulator3D simulator;
   simulator.config.hasOdom = true;
@@ -52,4 +64,18 @@ TEST(Simulator3D, Odom) {
                       return odom;
                     });
   EXPECT_THAT(simulator.config.simSteps, Eq(odom_cnt));
+}
+
+TEST(Simulator3D, NoLandmarks) {
+  Simulator3D simulator;
+  simulator.config.hasPointSensor = true;
+
+  simulator.setup();
+  simulator.simulate();
+
+  const OptimizableGraph& graph = simulator.world().graph();
+
+  EXPECT_THAT(graph.vertices(), SizeIs(0));
+  EXPECT_THAT(graph.edges(), IsEmpty());
+  EXPECT_THAT(graph.parameters(), SizeIs(0));
 }
