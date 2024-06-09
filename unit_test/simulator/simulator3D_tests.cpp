@@ -106,39 +106,46 @@ TEST_P(Simulator3DTests, Simulate) {
   const Simulator3D::Config& config = simulator_.config;
 
   if (config.hasOdom || config.hasPoseSensor || config.hasPointSensor ||
-      config.hasCompass || config.hasGPS)
+      config.hasCompass || config.hasGPS) {
     EXPECT_THAT(g2o::internal::countVerticesMatchingType<VertexSE3>(graph),
                 Gt(0));
+  }
 
   if (config.hasPointSensor || config.hasPointDepthSensor ||
-      config.hasPointDisparitySensor)
+      config.hasPointDisparitySensor) {
     EXPECT_THAT(g2o::internal::countVerticesMatchingType<VertexPointXYZ>(graph),
                 Gt(0));
+  }
 
   // Base configuration
-  if (config.hasOdom || config.hasPoseSensor)
+  if (config.hasOdom || config.hasPoseSensor) {
     EXPECT_THAT(g2o::internal::countEdgesMatchingType<EdgeSE3>(graph), Gt(0));
-  if (config.hasPointSensor)
+  }
+  if (config.hasPointSensor) {
     EXPECT_THAT(g2o::internal::countEdgesMatchingType<EdgeSE3PointXYZ>(graph),
                 Gt(0));
+  }
 
   /* TODO(Rainer): Add simulation of a compass
     if (config.hasCompass)
       EXPECT_THAT(countEdgesMatchingType<EdgeSE2PointXY>(graph), Gt(0));
   */
-  if (config.hasGPS)
+  if (config.hasGPS) {
     EXPECT_THAT(g2o::internal::countEdgesMatchingType<EdgeSE3Prior>(graph),
                 Gt(0));
+  }
 
   // 2D specific configuration
-  if (config.hasPointDisparitySensor)
+  if (config.hasPointDisparitySensor) {
     EXPECT_THAT(
         g2o::internal::countEdgesMatchingType<EdgeSE3PointXYZDisparity>(graph),
         Gt(0));
-  if (config.hasPointDepthSensor)
+  }
+  if (config.hasPointDepthSensor) {
     EXPECT_THAT(
         g2o::internal::countEdgesMatchingType<EdgeSE3PointXYZDepth>(graph),
         Gt(0));
+  }
 }
 
 namespace {
