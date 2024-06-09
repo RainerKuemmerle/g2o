@@ -26,6 +26,8 @@
 
 #ifndef G2O_SENSOR_LINE3D_H_
 #define G2O_SENSOR_LINE3D_H_
+#include "g2o/types/slam3d/parameter_se3_offset.h"
+#include "g2o/types/slam3d_addons/edge_se3_line.h"
 #include "g2o_simulator_api.h"
 #include "pointsensorparameters.h"
 #include "simulator3d_base.h"
@@ -36,17 +38,18 @@ class G2O_SIMULATOR_API SensorLine3D
     : public PointSensorParameters,
       public BinarySensor<Robot3D, EdgeSE3Line3D, WorldObjectLine3D> {
  public:
-  typedef PoseVertexType::EstimateType RobotPoseType;
+  using RobotPoseType = PoseVertexType::EstimateType;
   explicit SensorLine3D(const std::string& name_);
-  virtual void sense();
-  virtual void addParameters();
-  std::shared_ptr<ParameterSE3Offset> offsetParam() { return _offsetParam; };
-  void addNoise(EdgeType* e);
+  void sense(BaseRobot& robot, World& world) override;
+  void addNoise(EdgeType* e) override;
+  std::shared_ptr<ParameterSE3Offset> offsetParam() { return offsetParam_; };
+
+  void addParameters(World& world) override;
 
  protected:
   bool isVisible(WorldObjectType* to);
-  RobotPoseType _sensorPose;
-  std::shared_ptr<ParameterSE3Offset> _offsetParam;
+  RobotPoseType sensorPose_;
+  std::shared_ptr<ParameterSE3Offset> offsetParam_;
 };
 
 }  // namespace g2o

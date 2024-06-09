@@ -50,12 +50,12 @@ namespace g2o {
 
 OptimizationAlgorithmLevenberg::OptimizationAlgorithmLevenberg(
     std::unique_ptr<Solver> solver)
-    : OptimizationAlgorithmWithHessian(*solver), m_solver_{std::move(solver)} {
-  userLambdaInit_ =
-      properties_.makeProperty<Property<double> >("initialLambda", 0.);
-  maxTrialsAfterFailure_ =
-      properties_.makeProperty<Property<int> >("maxTrialsAfterFailure", 10);
-}
+    : OptimizationAlgorithmWithHessian(*solver),
+      maxTrialsAfterFailure_(properties_.makeProperty<Property<int> >(
+          "maxTrialsAfterFailure", 10)),
+      userLambdaInit_(
+          properties_.makeProperty<Property<double> >("initialLambda", 0.)),
+      m_solver_{std::move(solver)} {}
 
 OptimizationAlgorithm::SolverResult OptimizationAlgorithmLevenberg::solve(
     int iteration, bool online) {

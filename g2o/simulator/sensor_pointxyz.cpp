@@ -37,7 +37,6 @@ namespace g2o {
 SensorPointXYZ::SensorPointXYZ(std::string name)
     : BinarySensor<Robot3D, EdgeSE3PointXYZ, WorldObjectTrackXYZ>(
           std::move(name)) {
-  offsetParam_ = nullptr;
   information_.setIdentity();
   information_ *= 1000;
   information_(2, 2) = 10;

@@ -50,7 +50,7 @@ class SensorPose3DOffset
 
  protected:
   bool isVisible(WorldObjectType* to);
-  int stepsToIgnore_;
+  int stepsToIgnore_ = 10;
   std::shared_ptr<ParameterSE3Offset> offsetParam1_, offsetParam2_;
 };
 

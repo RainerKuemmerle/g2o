@@ -37,8 +37,6 @@ namespace g2o {
 
 SensorPose3DOffset::SensorPose3DOffset(std::string name)
     : BinarySensor<Robot3D, EdgeSE3Offset, WorldObjectSE3>(std::move(name)) {
-  offsetParam1_ = offsetParam2_ = nullptr;
-  stepsToIgnore_ = 10;
   information_.setIdentity();
   information_ *= 100;
   information_(3, 3) = 10000;

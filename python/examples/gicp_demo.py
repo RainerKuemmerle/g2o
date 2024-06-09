@@ -40,16 +40,16 @@ def main():
     trans1 = optimizer.vertex(1).estimate().inverse()
 
     # set up point matches
-    for i in range(len(true_points)):
+    for i, pt in enumerate(true_points):
         # calculate the relative 3d position of the point
-        pt0 = trans0 * true_points[i]
-        pt1 = trans1 * true_points[i]
+        pt0 = trans0 * pt
+        pt1 = trans1 * pt
 
         # add noise
         pt0 += np.random.randn(3) * args.noise
         pt1 += np.random.randn(3) * args.noise
 
-        # form edge, with normals in varioius positions
+        # form edge, with normals in various positions
         nm0 = np.array([0, i, 1])
         nm0 = nm0 / np.linalg.norm(nm0)
         nm1 = np.array([0, i, 1])
