@@ -29,23 +29,23 @@
 #include <cassert>
 
 namespace g2o {
-using namespace std;
 
 // SensorLine3D
 SensorLine3D::SensorLine3D(const std::string& name_)
     : BinarySensor<Robot3D, EdgeSE3Line3D, WorldObjectLine3D>(name_) {
-  _offsetParam = 0;
-  _information.setIdentity();
-  _information *= 1e9;
-  //_information(2,2)=10;
-  setInformation(_information);
+  information_.setIdentity();
+  information_ *= 1e9;
+  // information_(2,2)=10;
+  setInformation(information_);
 }
 
-bool SensorLine3D::isVisible(SensorLine3D::WorldObjectType* to) {
-  if (!_robotPoseObject) return false;
+bool SensorLine3D::isVisible(SensorLine3D::WorldObjectType* /*to*/) {
+  return false;
+  /* TODO(Rainer): implement
+  if (!robotPoseVertex_) return false;
   assert(to && to->vertex());
   VertexType::EstimateType pose = to->vertex()->estimate();
-  VertexType::EstimateType delta = _sensorPose.inverse() * pose;
+  VertexType::EstimateType delta = sensorPose_.inverse() * pose;
   Vector3 translation = delta.translation();
   double range2 = translation.squaredNorm();
   if (range2 > _maxRange2) return false;
@@ -53,49 +53,39 @@ bool SensorLine3D::isVisible(SensorLine3D::WorldObjectType* to) {
   translation.normalize();
   // the cameras have the z in front
   double bearing = acos(translation.z());
-  if (fabs(bearing) > _fov) return false;
-  return true;
+  return fabs(bearing) <= _fov;
+  */
 }
 
-void SensorLine3D::addParameters() {
-  if (!_offsetParam) _offsetParam = std::make_shared<ParameterSE3Offset>();
-  assert(world());
-  world()->addParameter(_offsetParam);
+void SensorLine3D::addParameters(World& world) {
+  if (!offsetParam_) offsetParam_ = std::make_shared<ParameterSE3Offset>();
+  world.addParameter(offsetParam_);
 }
 
-void SensorLine3D::addNoise(EdgeType* e) {
-  EdgeType::ErrorVector n = _sampler.generateSample();
+void SensorLine3D::addNoise(EdgeType* /*e*/) {
+  /* TODO(Rainer): implement
+  EdgeType::ErrorVector n = sampler_.generateSample();
   e->setMeasurement(e->measurement() + n);
   e->setInformation(information());
+  */
 }
 
-void SensorLine3D::sense() {
-  if (!_offsetParam) {
+void SensorLine3D::sense(BaseRobot& robot, World& world) {
+  if (!offsetParam_) {
     return;
   }
-  _robotPoseObject = 0;
-  RobotType* r = dynamic_cast<RobotType*>(robot());
-  std::list<PoseObject*>::reverse_iterator it = r->trajectory().rbegin();
-  int count = 0;
-  while (it != r->trajectory().rend() && count < 1) {
-    if (!_robotPoseObject) _robotPoseObject = *it;
-    ++it;
-    count++;
-  }
-  if (!_robotPoseObject) return;
-  _sensorPose = _robotPoseObject->vertex()->estimate() * _offsetParam->offset();
-  for (std::set<BaseWorldObject*>::iterator it = world()->objects().begin();
-       it != world()->objects().end(); ++it) {
-    WorldObjectType* o = dynamic_cast<WorldObjectType*>(*it);
-    if (o && isVisible(o)) {
-      auto e = mkEdge(o);
-      if (e && graph()) {
-        e->setParameterId(0, _offsetParam->id());
-        graph()->addEdge(e);
-        e->setMeasurementFromState();
-        addNoise(e.get());
-      }
-    }
+  robotPoseVertex_ = robotPoseVertex<PoseVertexType>(robot, world);
+  if (!robotPoseVertex_) return;
+  sensorPose_ = robotPoseVertex_->estimate() * offsetParam_->param();
+  for (const auto& it : world.objects()) {
+    auto* o = dynamic_cast<WorldObjectType*>(it.get());
+    if (!o || !isVisible(o)) continue;
+    auto e = mkEdge(o);
+    if (!e) continue;
+    e->setParameterId(0, offsetParam_->id());
+    world.graph().addEdge(e);
+    e->setMeasurementFromState();
+    addNoise(e.get());
   }
 }
 

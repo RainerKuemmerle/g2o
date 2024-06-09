@@ -566,7 +566,7 @@ class G2O_CORE_API OptimizableGraph : public HyperGraph {
     int dimension_ = -1;
     int level_ = 0;
     std::shared_ptr<RobustKernel> robustKernel_;
-    int64_t internalId_;
+    int64_t internalId_ = -1;
 
     void resizeParameters(size_t newSize) {
       parameters_.resize(newSize, nullptr);

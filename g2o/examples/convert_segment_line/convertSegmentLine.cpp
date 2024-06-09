@@ -62,8 +62,8 @@ Eigen::Vector2d computeLine(const Eigen::Vector2d& p1,
 }
 
 struct LineInfo {
-  explicit LineInfo(VertexSegment2D* s) {
-    line = std::make_shared<VertexLine2D>();
+  explicit LineInfo(VertexSegment2D* s)
+      : line(std::make_shared<VertexLine2D>()) {
     line->setId(s->id());
     line->setEstimate(Line2D(computeLine(s->estimateP1(), s->estimateP2())));
   }

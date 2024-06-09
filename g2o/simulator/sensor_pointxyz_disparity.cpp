@@ -36,7 +36,6 @@ namespace g2o {
 SensorPointXYZDisparity::SensorPointXYZDisparity(const std::string& name)
     : BinarySensor<Robot3D, EdgeSE3PointXYZDisparity, WorldObjectTrackXYZ>(
           name) {
-  offsetParam_ = nullptr;
   information_.setIdentity();
   information_ *= 1000;
   setInformation(information_);

@@ -47,19 +47,17 @@ namespace g2o {
 
 OptimizationAlgorithmDogleg::OptimizationAlgorithmDogleg(
     std::unique_ptr<BlockSolverBase> solver)
-    : OptimizationAlgorithmWithHessian(*solver), m_solver_{std::move(solver)} {
-  userDeltaInit_ = properties_.makeProperty<Property<double>>(
-      "initialDelta", static_cast<double>(1e4));
-  maxTrialsAfterFailure_ =
-      properties_.makeProperty<Property<int>>("maxTrialsAfterFailure", 100);
-  initialLambda_ = properties_.makeProperty<Property<double>>(
-      "initialLambda", static_cast<double>(1e-7));
-  lamdbaFactor_ =
-      properties_.makeProperty<Property<double>>("lambdaFactor", 10.);
-  delta_ = userDeltaInit_->value();
-}
-
-OptimizationAlgorithmDogleg::~OptimizationAlgorithmDogleg() = default;
+    : OptimizationAlgorithmWithHessian(*solver),
+      maxTrialsAfterFailure_(properties_.makeProperty<Property<int>>(
+          "maxTrialsAfterFailure", 100)),
+      userDeltaInit_(properties_.makeProperty<Property<double>>(
+          "initialDelta", static_cast<double>(1e4))),
+      initialLambda_(properties_.makeProperty<Property<double>>(
+          "initialLambda", static_cast<double>(1e-7))),
+      lamdbaFactor_(
+          properties_.makeProperty<Property<double>>("lambdaFactor", 10.)),
+      delta_(userDeltaInit_->value()),
+      m_solver_{std::move(solver)} {}
 
 OptimizationAlgorithm::SolverResult OptimizationAlgorithmDogleg::solve(
     int iteration, bool online) {

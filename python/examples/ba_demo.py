@@ -1,7 +1,6 @@
 # https://github.com/RainerKuemmerle/g2o/blob/master/g2o/examples/ba/ba_demo.cpp
 
 import argparse
-from collections import defaultdict
 
 import g2opy as g2o
 import numpy as np

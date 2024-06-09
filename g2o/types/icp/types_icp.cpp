@@ -156,10 +156,7 @@ void Edge_XYZ_VSC::linearizeOplus() {
   double py = pc(1);
   double pz = pc(2);
   double ipz2 = 1.0 / (pz * pz);
-  if (std::isnan(ipz2)) {
-    std::cout << "[SetJac] infinite jac" << std::endl;
-    *(int*)0x0 = 0;
-  }
+  assert(!std::isnan(ipz2) && "[SetJac] infinite jac");
 
   double ipz2fx = ipz2 * vc->Kcam(0, 0);  // Fx
   double ipz2fy = ipz2 * vc->Kcam(1, 1);  // Fy

@@ -43,7 +43,7 @@ inline Matrix3 skew(const Vector3& t) {
 
 Line3D::Line3D() { line << 0.0, 0.0, 0.0, 1.0, 0.0, 0.0; }
 
-Line3D::Line3D(const Vector6& v) { line = v; }
+Line3D::Line3D(const Vector6& v) : line(v) {}  // NOLINT
 
 void Line3D::setW(const Vector3& w_) { line.head<3>() = w_; }
 

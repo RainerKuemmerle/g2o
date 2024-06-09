@@ -54,7 +54,7 @@ class G2O_CORE_API OptimizationAlgorithmDogleg
    * the linearized system.
    */
   explicit OptimizationAlgorithmDogleg(std::unique_ptr<BlockSolverBase> solver);
-  ~OptimizationAlgorithmDogleg() override;
+  ~OptimizationAlgorithmDogleg() = default;
 
   SolverResult solve(int iteration, bool online = false) override;
 
