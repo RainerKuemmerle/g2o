@@ -94,7 +94,7 @@ class G2O_TYPES_DATA_API VertexEllipseDrawAction : public DrawAction {
   bool refreshPropertyPtrs(
       const std::shared_ptr<HyperGraphElementAction::Parameters>& params_)
       override;
-  std::shared_ptr<DoubleProperty> scaleFactor_;
+  std::shared_ptr<DoubleProperty> scaleFactor_ = nullptr;
 };
 #endif
 

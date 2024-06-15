@@ -46,7 +46,7 @@ class G2O_SIMULATOR_API SensorSE3Prior
 
  protected:
   RobotPoseType sensorPose_;
-  std::shared_ptr<ParameterSE3Offset> offsetParam_;
+  std::shared_ptr<ParameterSE3Offset> offsetParam_ = nullptr;
 };
 
 }  // namespace g2o

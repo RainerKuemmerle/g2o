@@ -48,7 +48,7 @@ class G2O_SIMULATOR_API SensorPointXYZDepth
  protected:
   bool isVisible(WorldObjectType* to);
   RobotPoseType sensorPose_;
-  std::shared_ptr<ParameterCamera> offsetParam_;
+  std::shared_ptr<ParameterCamera> offsetParam_ = nullptr;
 };
 }  // namespace g2o
 

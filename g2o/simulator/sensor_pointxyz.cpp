@@ -29,6 +29,7 @@
 #include <cassert>
 #include <utility>
 
+#include "g2o/core/eigen_types.h"
 #include "g2o/simulator/simulator.h"
 
 namespace g2o {
@@ -37,24 +38,19 @@ namespace g2o {
 SensorPointXYZ::SensorPointXYZ(std::string name)
     : BinarySensor<Robot3D, EdgeSE3PointXYZ, WorldObjectTrackXYZ>(
           std::move(name)) {
-  information_.setIdentity();
-  information_ *= 1000;
-  information_(2, 2) = 10;
-  setInformation(information_);
+  setInformation(Vector3(1000., 1000., 10.).asDiagonal());
 }
 
 bool SensorPointXYZ::isVisible(SensorPointXYZ::WorldObjectType* to) {
   if (!robotPoseVertex_) return false;
   assert(to && to->vertex());
-  VertexType::EstimateType pose = to->vertex()->estimate();
-  VertexType::EstimateType delta = sensorPose_.inverse() * pose;
-  Vector3 translation = delta;
-  double range2 = translation.squaredNorm();
+  const VertexType::EstimateType& pose = to->vertex()->estimate();
+  const VertexType::EstimateType delta = sensorPose_.inverse() * pose;
+  const double range2 = delta.squaredNorm();
   if (range2 > maxRange2_) return false;
   if (range2 < minRange2_) return false;
-  translation.normalize();
   // the cameras have the z in front
-  double bearing = acos(translation.z());
+  double bearing = acos(delta.normalized().z());
   return fabs(bearing) <= fov_;
 }
 

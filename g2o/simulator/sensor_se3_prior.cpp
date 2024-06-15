@@ -33,7 +33,6 @@ namespace g2o {
 // SensorSE3Prior
 SensorSE3Prior::SensorSE3Prior(std::string name)
     : UnarySensor<Robot3D, EdgeSE3Prior>(std::move(name)) {
-  offsetParam_ = nullptr;
   information_.setIdentity();
   information_ *= 1000;
   information_(2, 2) = 10;

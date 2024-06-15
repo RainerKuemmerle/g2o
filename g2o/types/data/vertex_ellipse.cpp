@@ -100,9 +100,7 @@ bool VertexEllipse::write(std::ostream& os) const {
 
 #ifdef G2O_HAVE_OPENGL
 VertexEllipseDrawAction::VertexEllipseDrawAction()
-    : DrawAction(typeid(VertexEllipse).name()) {
-  scaleFactor_ = nullptr;
-}
+    : DrawAction(typeid(VertexEllipse).name()) {}
 
 bool VertexEllipseDrawAction::refreshPropertyPtrs(
     const std::shared_ptr<HyperGraphElementAction::Parameters>& params_) {

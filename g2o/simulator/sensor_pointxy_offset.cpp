@@ -37,7 +37,6 @@ namespace g2o {
 SensorPointXYOffset::SensorPointXYOffset(std::string name)
     : BinarySensor<Robot2D, EdgeSE2PointXYOffset, WorldObjectPointXY>(
           std::move(name)) {
-  offsetParam_ = nullptr;
   information_.setIdentity();
   information_ *= 1000.;
   setInformation(information_);

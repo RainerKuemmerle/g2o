@@ -46,7 +46,7 @@ class G2O_SIMULATOR_API SensorPointXYOffset
 
  protected:
   bool isVisible(WorldObjectType* to);
-  std::shared_ptr<ParameterSE2Offset> offsetParam_;
+  std::shared_ptr<ParameterSE2Offset> offsetParam_ = nullptr;
   RobotPoseType sensorPose_;
 };
 
