@@ -57,7 +57,7 @@ jobs:
 
       - name: Install dependencies on macOS
         if: runner.os == 'macOS'
-        run: brew install cmake eigen
+        run: brew install cmake eigen coreutils
 
       - name: Configure ccache for macOS
         if: runner.os == 'macOS'
@@ -67,6 +67,7 @@ jobs:
 
       - name: Configure CMake
         run: |
+          echo "number of cores: $(nproc) $(nproc --all)"
           cmake --version
           cmake -B ${{github.workspace}}/build -DBUILD_UNITTESTS=ON -DBUILD_CODE_COVERAGE=${{matrix.config.do_coverage}} -DCMAKE_BUILD_TYPE=${{matrix.config.build_type}} -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
 
@@ -79,7 +80,7 @@ jobs:
           env | sort
 
       - name: Build
-        run: cmake --build ${{github.workspace}}/build --config ${{matrix.config.build_type}} -j 2
+        run: cmake --build ${{github.workspace}}/build --config ${{matrix.config.build_type}} -j $(nproc)
 
       - name: Test
         working-directory: ${{github.workspace}}/build
