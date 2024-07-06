@@ -76,7 +76,6 @@ TEST(General, GraphAddVertex) {
   auto v1 = std::make_shared<g2o::VertexSE2>();
   v1->setId(0);
   ASSERT_TRUE(optimizer->addVertex(v1));
-  ASSERT_EQ(optimizer.get(), v1->graph());
   ASSERT_EQ(size_t(1), optimizer->vertices().size());
   ASSERT_FALSE(optimizer->addVertex(v1));
   ASSERT_EQ(size_t(1), optimizer->vertices().size());
@@ -89,13 +88,11 @@ TEST(General, GraphAddVertex) {
     v2->setId(0);
     ASSERT_FALSE(optimizer->addVertex(v2));
     ASSERT_EQ(size_t(1), optimizer->vertices().size());
-    ASSERT_EQ(nullptr, v2->graph());
   }
 
   // removing vertex
   const bool removed = optimizer->removeVertex(v1, true);
   ASSERT_TRUE(removed);
-  ASSERT_EQ(nullptr, v1->graph());
   ASSERT_THAT(optimizer->vertices(), testing::SizeIs(0));
 }
 
@@ -114,7 +111,6 @@ TEST(General, GraphAddEdge) {
   e1->setVertex(0, v1);
   e1->setVertex(1, v2);
   ASSERT_TRUE(optimizer->addEdge(e1));
-  ASSERT_EQ(optimizer.get(), e1->graph());
   ASSERT_FALSE(optimizer->addEdge(e1));
   ASSERT_EQ(size_t(1), optimizer->edges().size());
   ASSERT_EQ(size_t(1), v1->edges().size());
@@ -126,7 +122,6 @@ TEST(General, GraphAddEdge) {
   ASSERT_FALSE(optimizer->addEdge(e2))
       << "Adding edge with unset vertices was possible";
   ASSERT_EQ(size_t(1), optimizer->edges().size());
-  ASSERT_EQ(nullptr, e2->graph());
 
   auto e3 = std::make_shared<g2o::EdgeSE2>();
   e3->setVertex(0, v1);
@@ -151,12 +146,10 @@ TEST(General, GraphAddVertexAndClear) {
   // clearing
   optimizer->clear();
   ASSERT_THAT(optimizer->vertices(), testing::SizeIs(0));
-  ASSERT_EQ(nullptr, v1->graph());
 
   // re-add the same other optimizer again
   auto otherOptimizer = g2o::internal::createOptimizerForTests();
   ASSERT_TRUE(otherOptimizer->addVertex(v1));
-  ASSERT_EQ(v1->graph(), otherOptimizer.get());
   ASSERT_THAT(otherOptimizer->vertices(), testing::SizeIs(1));
 }
 
@@ -489,13 +482,6 @@ TEST_F(GeneralGraphOperations, LoadingGraph) {
       optimizer_->edges(),
       testing::Each(testing::Pointee(testing::Property(
           &g2o::OptimizableGraph::Edge::vertices, testing::SizeIs(2)))));
-  ASSERT_THAT(
-      optimizer_->edges(),
-      testing::Each(testing::ResultOf(
-          [](const std::shared_ptr<g2o::HyperGraph::Edge>& e) {
-            return static_cast<g2o::OptimizableGraph::Edge*>(e.get())->graph();
-          },
-          testing::Eq(static_cast<g2o::OptimizableGraph*>(optimizer_.get())))));
   ASSERT_THAT(optimizer_->edges(),
               testing::Each(testing::ResultOf(
                   [](const std::shared_ptr<g2o::HyperGraph::Edge>& e) {

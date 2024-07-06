@@ -27,6 +27,7 @@
 #include "cache.h"
 
 #include <algorithm>
+#include <memory>
 #include <utility>
 
 #include "factory.h"
@@ -35,11 +36,8 @@
 
 namespace g2o {
 
-Cache::CacheKey::CacheKey(std::string type_, ParameterVector parameters_)
-    : type_(std::move(type_)), parameters_(std::move(parameters_)) {}
-
-Cache::Cache(CacheContainer* container, ParameterVector parameters)
-    : parameters_(std::move(parameters)), container_(container) {}
+Cache::CacheKey::CacheKey(std::string type, ParameterVector parameters)
+    : type_(std::move(type)), parameters_(std::move(parameters)) {}
 
 bool Cache::CacheKey::operator<(const Cache::CacheKey& c) const {
   if (type_ < c.type_) return true;
@@ -54,11 +52,6 @@ const OptimizableGraph::Vertex& Cache::vertex() const {
 }
 
 const ParameterVector& Cache::parameters() const { return parameters_; }
-
-Cache::CacheKey Cache::key() const {
-  Factory* factory = Factory::instance();
-  return CacheKey(factory->tag(this), parameters_);
-};
 
 void Cache::update() {
   if (!updateNeeded_) return;
@@ -77,22 +70,22 @@ std::shared_ptr<Cache> CacheContainer::findCache(const Cache::CacheKey& key) {
 
 std::shared_ptr<Cache> CacheContainer::createCache(const Cache::CacheKey& key) {
   Factory* f = Factory::instance();
-  std::unique_ptr<HyperGraph::HyperGraphElement> e = f->construct(key.type());
+  std::shared_ptr<HyperGraph::HyperGraphElement> e = f->construct(key.type());
   if (!e) {
     G2O_ERROR("fatal error in creating cache of type {}", key.type());
     return nullptr;
   }
-  auto c = std::shared_ptr<Cache>(dynamic_cast<Cache*>(e.release()));
-  if (!c) {
+  auto cache = std::dynamic_pointer_cast<Cache>(e);
+  if (!cache) {
     G2O_ERROR("fatal error in creating cache of type {}, wrong type",
               key.type());
     return nullptr;
   }
-  c->container_ = this;
-  c->parameters_ = key.parameters_;
-  insert(make_pair(key, c));
-  c->update();
-  return c;
+  cache->container_ = this;
+  cache->parameters_ = key.parameters_;
+  insert(make_pair(key, cache));
+  cache->update();
+  return cache;
 }
 
 const OptimizableGraph::Vertex& CacheContainer::vertex() const {

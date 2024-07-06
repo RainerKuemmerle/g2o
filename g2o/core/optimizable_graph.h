@@ -380,9 +380,6 @@ class G2O_CORE_API OptimizableGraph : public HyperGraph {
     //! get the row of this vertex in the Hessian
     [[nodiscard]] int colInHessian() const { return colInHessian_; }
 
-    [[nodiscard]] const OptimizableGraph* graph() const { return graph_; }
-    OptimizableGraph* graph() { return graph_; }
-
     /**
      * lock for the block of the hessian and the b vector associated with this
      * vertex, to avoid race-conditions if multi-threaded.
@@ -399,7 +396,6 @@ class G2O_CORE_API OptimizableGraph : public HyperGraph {
     CacheContainer& cacheContainer();
 
    protected:
-    OptimizableGraph* graph_{nullptr};
     int hessianIndex_{-1};
     bool fixed_{false};
     bool marginalized_{false};
@@ -546,9 +542,6 @@ class G2O_CORE_API OptimizableGraph : public HyperGraph {
     //! the internal ID of the edge
     [[nodiscard]] int64_t internalId() const { return internalId_; }
 
-    OptimizableGraph* graph();
-    [[nodiscard]] const OptimizableGraph* graph() const;
-
     bool setParameterId(int argNum, int paramId);
     [[nodiscard]] std::shared_ptr<Parameter> parameter(int argNo) const {
       return parameters_.at(argNo);
@@ -587,7 +580,7 @@ class G2O_CORE_API OptimizableGraph : public HyperGraph {
         const std::shared_ptr<OptimizableGraph::Vertex>& v,
         const std::string& type, const ParameterVector& parameters);
 
-    bool resolveParameters();
+    bool resolveParameters(const OptimizableGraph& graph);
     virtual bool resolveCaches();
 
     std::vector<std::string> parameterTypes_;
@@ -614,11 +607,6 @@ class G2O_CORE_API OptimizableGraph : public HyperGraph {
     auto noData = std::shared_ptr<HyperGraph::Data>();
     return addVertex(v, noData);
   }
-
-  //! removes a vertex from the graph. Returns true on success (vertex was
-  //! present)
-  bool removeVertex(const std::shared_ptr<HyperGraph::Vertex>& v,
-                    bool detach = false) override;
 
   /**
    * adds a new edge.
@@ -766,7 +754,7 @@ class G2O_CORE_API OptimizableGraph : public HyperGraph {
     return parameters_.addParameter(p);
   }
 
-  std::shared_ptr<Parameter> parameter(int id) {
+  std::shared_ptr<Parameter> parameter(int id) const {
     return parameters_.getParameter(id);
   }
 

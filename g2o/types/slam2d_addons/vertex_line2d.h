@@ -27,15 +27,9 @@
 #ifndef G2O_VERTEX_LINE2D_H
 #define G2O_VERTEX_LINE2D_H
 
-#include <memory>
-
-#include "g2o/config.h"
 #include "g2o/core/base_vertex.h"
 #include "g2o/core/eigen_types.h"
-#include "g2o/core/hyper_graph.h"
-#include "g2o/core/hyper_graph_action.h"
 #include "g2o/stuff/misc.h"
-#include "g2o/stuff/property.h"
 #include "g2o_types_slam2d_addons_api.h"
 #include "line_2d.h"
 
@@ -56,26 +50,7 @@ class G2O_TYPES_SLAM2D_ADDONS_API VertexLine2D : public BaseVertex<2, Line2D> {
     estimate_[1] += update(1);
     estimate_[0] = normalize_theta(estimate_[0]);
   }
-
-  // TODO(Rainer): below only used in visualization, currently not serialized
-  int p1Id = -1, p2Id = -1;
 };
-
-#ifdef G2O_HAVE_OPENGL
-class G2O_TYPES_SLAM2D_ADDONS_API VertexLine2DDrawAction : public DrawAction {
- public:
-  VertexLine2DDrawAction();
-  bool operator()(HyperGraph::HyperGraphElement& element,
-                  const std::shared_ptr<HyperGraphElementAction::Parameters>&
-                      params_) override;
-
- protected:
-  std::shared_ptr<FloatProperty> pointSize_;
-  bool refreshPropertyPtrs(
-      const std::shared_ptr<HyperGraphElementAction::Parameters>& params_)
-      override;
-};
-#endif
 
 }  // namespace g2o
 

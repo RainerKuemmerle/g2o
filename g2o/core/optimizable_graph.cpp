@@ -120,9 +120,6 @@ void addDataToGraphElement(
 };
 }  // namespace
 
-using std::string;
-using std::vector;
-
 // Here to destruct forward declared types
 OptimizableGraph::Vertex::Vertex() = default;
 OptimizableGraph::Vertex::~Vertex() = default;
@@ -155,20 +152,6 @@ OptimizableGraph::Edge::Edge() : robustKernel_(nullptr) {}
 
 OptimizableGraph::Edge::~Edge() = default;
 
-OptimizableGraph* OptimizableGraph::Edge::graph() {
-  if (vertices_.empty()) return nullptr;
-  auto& v = vertices_[0];
-  if (!v) return nullptr;
-  return static_cast<OptimizableGraph::Vertex*>(v.get())->graph();
-}
-
-const OptimizableGraph* OptimizableGraph::Edge::graph() const {
-  if (vertices_.empty()) return nullptr;
-  const auto& v = vertices_[0];
-  if (!v) return nullptr;
-  return static_cast<OptimizableGraph::Vertex*>(v.get())->graph();
-}
-
 bool OptimizableGraph::Edge::setParameterId(int argNum, int paramId) {
   if (static_cast<int>(parameters_.size()) <= argNum) return false;
   if (argNum < 0) return false;
@@ -177,16 +160,11 @@ bool OptimizableGraph::Edge::setParameterId(int argNum, int paramId) {
   return true;
 }
 
-bool OptimizableGraph::Edge::resolveParameters() {
-  if (!graph()) {
-    G2O_ERROR("edge not registered with a graph");
-    return false;
-  }
-
+bool OptimizableGraph::Edge::resolveParameters(const OptimizableGraph& graph) {
   assert(parameters_.size() == parameterIds_.size());
   for (decltype(parameters_)::size_type i = 0; i < parameters_.size(); i++) {
     const int index = parameterIds_[i];
-    parameters_[i] = graph()->parameter(index);
+    parameters_[i] = graph.parameter(index);
 #ifndef NDEBUG
     auto& aux = *parameters_[i];
     if (typeid(aux).name() != parameterTypes_[i]) {
@@ -241,44 +219,20 @@ bool OptimizableGraph::addVertex(
         ov->id());
     return false;
   }
-  if (ov->graph_ != nullptr && ov->graph_ != this) {
-    G2O_ERROR(
-        "FATAL, vertex with ID {} has already been registered with another "
-        "graph {}",
-        ov->id(), static_cast<void*>(ov->graph_));
-    return false;
-  }
   if (userData) ov->addUserData(userData);
-  ov->graph_ = this;
   return HyperGraph::addVertex(v);
-}
-
-bool OptimizableGraph::removeVertex(
-    const std::shared_ptr<HyperGraph::Vertex>& v, bool detach) {
-  auto* ov = dynamic_cast<OptimizableGraph::Vertex*>(v.get());
-  if (ov && ov->graph_ == this) ov->graph_ = nullptr;
-  return HyperGraph::removeVertex(v, detach);
 }
 
 bool OptimizableGraph::addEdge(const std::shared_ptr<HyperGraph::Edge>& he) {
   auto* e = dynamic_cast<OptimizableGraph::Edge*>(he.get());
   if (!e) return false;
-  OptimizableGraph* g = e->graph();
-
-  if (g != nullptr && g != this) {
-    G2O_ERROR(
-        "FATAL, edge with ID {} has already registered with another graph "
-        "{}",
-        e->id(), static_cast<void*>(g));
-    return false;
-  }
 
   const bool eresult = HyperGraph::addEdge(he);
   if (!eresult) return false;
 
   e->internalId_ = nextEdgeId_++;
   if (e->numUndefinedVertices()) return true;
-  if (!e->resolveParameters()) {
+  if (!e->resolveParameters(*this)) {
     G2O_ERROR("{}: FATAL, cannot resolve parameters for edge {}",
               static_cast<void*>(e));
     return false;
@@ -324,7 +278,7 @@ bool OptimizableGraph::setEdgeVertex(
 #else
     auto ee = std::static_pointer_cast<OptimizableGraph::Edge>(e);
 #endif
-    if (!ee->resolveParameters()) {
+    if (!ee->resolveParameters(*this)) {
       G2O_ERROR("{}: FATAL, cannot resolve parameters for edge {}",
                 static_cast<void*>(e.get()));
       return false;
@@ -478,7 +432,7 @@ bool OptimizableGraph::load(std::istream& is, io::Format format) {
     auto edge = std::static_pointer_cast<Edge>(graph_element);
     edge->resize(abstract_edge.ids.size());
     bool vertsOkay = true;
-    for (vector<int>::size_type l = 0; l < abstract_edge.ids.size(); ++l) {
+    for (std::vector<int>::size_type l = 0; l < abstract_edge.ids.size(); ++l) {
       const int vertexId = abstract_edge.ids[l];
       if (vertexId != HyperGraph::kUnassignedId) {
         auto v = vertex(vertexId);
@@ -637,15 +591,15 @@ int OptimizableGraph::maxDimension() const {
 
 void OptimizableGraph::setRenamedTypesFromString(const std::string& types) {
   Factory* factory = Factory::instance();
-  const vector<string> typesMap = strSplit(types, ",");
+  const std::vector<std::string> typesMap = strSplit(types, ",");
   for (const auto& i : typesMap) {
-    vector<string> m = strSplit(i, "=");
+    std::vector<std::string> m = strSplit(i, "=");
     if (m.size() != 2) {
       G2O_ERROR("unable to extract type map from {}", i);
       continue;
     }
-    const string typeInFile = trim(m[0]);
-    const string loadedType = trim(m[1]);
+    const std::string typeInFile = trim(m[0]);
+    const std::string loadedType = trim(m[1]);
     if (!factory->knowsTag(loadedType)) {
       G2O_ERROR("unknown type {}", loadedType);
       continue;
@@ -740,7 +694,7 @@ bool OptimizableGraph::removePostIterationAction(
 bool OptimizableGraph::saveVertex(AbstractGraph& abstract_graph,
                                   OptimizableGraph::Vertex* v) {
   Factory* factory = Factory::instance();
-  const string tag = factory->tag(v);
+  const std::string tag = factory->tag(v);
   if (tag.empty()) {
     G2O_WARN("Got empty tag for vertex {} while saving", v->id());
     return false;
@@ -758,7 +712,7 @@ bool OptimizableGraph::saveVertex(AbstractGraph& abstract_graph,
 bool OptimizableGraph::saveEdge(AbstractGraph& abstract_graph,
                                 OptimizableGraph::Edge* e) {
   Factory* factory = Factory::instance();
-  const string tag = factory->tag(e);
+  const std::string tag = factory->tag(e);
   if (tag.empty()) {
     G2O_WARN("Got empty tag for edge while saving");
     return false;
@@ -783,13 +737,7 @@ bool OptimizableGraph::saveEdge(AbstractGraph& abstract_graph,
   return true;
 }
 
-void OptimizableGraph::clear() {
-  for (auto& vptr : vertices_) {
-    auto* v = static_cast<OptimizableGraph::Vertex*>(vptr.second.get());
-    v->graph_ = nullptr;
-  }
-  HyperGraph::clear();
-}
+void OptimizableGraph::clear() { HyperGraph::clear(); }
 
 void OptimizableGraph::clearParameters() {
   clear();
@@ -815,7 +763,7 @@ bool OptimizableGraph::verifyInformationMatrices(bool verbose) const {
     allEdgeOk = allEdgeOk && okay;
     if (!okay) {
       if (verbose) {
-        vector<int> ids;
+        std::vector<int> ids;
         ids.reserve(e->vertices().size());
         for (const auto& v : e->vertices()) ids.push_back(v->id());
         if (!isSymmetric)
@@ -845,9 +793,6 @@ void OptimizableGraph::addGraph(OptimizableGraph& other) {
   // vertices
   for (const auto& id_v : other.vertices_) {
     vertices_.emplace(id_v.first, id_v.second);
-    auto* v = dynamic_cast<OptimizableGraph::Vertex*>(id_v.second.get());
-    if (!v) continue;
-    v->graph_ = this;
   }
   other.vertices_.clear();
 

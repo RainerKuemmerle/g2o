@@ -52,7 +52,6 @@ G2O_REGISTER_TYPE(EDGE_LINE2D_POINTXY, EdgeLine2DPointXY);
 
 #ifdef G2O_HAVE_OPENGL
 G2O_REGISTER_ACTION(VertexSegment2DDrawAction);
-G2O_REGISTER_ACTION(VertexLine2DDrawAction);
 #endif
 
 }  // namespace g2o
