@@ -41,7 +41,6 @@ class BaseDynamicVertex : public BaseVertex<-1, T> {
   // This method is responsible for actually changing the dimension of the state
   virtual bool setDimensionImpl(int newDimension) = 0;
 
-  using BaseVertex<-1, T>::graph_;
   using BaseVertex<-1, T>::dimension_;
   using BaseVertex<-1, T>::b_;
   using BaseVertex<-1, T>::edges_;
@@ -62,8 +61,6 @@ bool BaseDynamicVertex<T>::setDimension(int newDimension) {
   // Change the state to the requested dimension
   if (!static_cast<bool>(setDimensionImpl(newDimension))) return false;
 
-  // Store the old dimension and assign the new
-  int oldDimension = dimension_;
   dimension_ = newDimension;
 
   // Reset the allocation associated with this vertex and update the cache
@@ -71,16 +68,6 @@ bool BaseDynamicVertex<T>::setDimension(int newDimension) {
   mapHessianMemory(nullptr);
   b_.resize(dimension_);
   updateCache();
-
-  // If the dimension is being increased and this vertex is in a
-  // graph, update the size of the Jacobian workspace just in case it
-  // needs to grow.
-  if ((newDimension > oldDimension) && (graph_ != nullptr)) {
-    JacobianWorkspace& jacobianWorkspace = graph_->jacobianWorkspace();
-    for (auto& e : edges_) {
-      jacobianWorkspace.updateSize(*e.lock());
-    }
-  }
 
   return true;
 }

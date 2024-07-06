@@ -98,11 +98,6 @@ void declareOptimizableGraph(py::module& m) {
       .def("set_col_in_hessian", &CLS::Vertex::setColInHessian,
            "c"_a)  // int -> void
 
-      .def("graph",
-           static_cast<OptimizableGraph* (CLS::Vertex::*)()>(
-               &CLS::Vertex::graph),
-           py::return_value_policy::reference)
-
       .def("lock_quadratic_form", &CLS::Vertex::lockQuadraticForm)
       .def("unlock_quadratic_form", &CLS::Vertex::unlockQuadraticForm)
       .def("update_cache", &CLS::Vertex::updateCache);
@@ -139,9 +134,6 @@ void declareOptimizableGraph(py::module& m) {
 
       .def("create_vertex", &CLS::Edge::createVertex)
       .def("internal_id", &CLS::Edge::internalId)  // -> long long
-      .def("graph",
-           static_cast<OptimizableGraph* (CLS::Edge::*)()>(&CLS::Edge::graph),
-           py::return_value_policy::reference)
 
       .def("set_parameter_id", &CLS::Edge::setParameterId, "arg_num"_a,
            "param_id"_a)  // (int, int) -> bool
@@ -233,6 +225,8 @@ void declareOptimizableGraph(py::module& m) {
   cls.def_static("init_multi_threading", &CLS::initMultiThreading);
   cls.def("jacobian_workspace",
           static_cast<JacobianWorkspace& (CLS::*)()>(&CLS::jacobianWorkspace));
+  cls.def("recompute_jacobian_workspace_size",
+          &CLS::recomputeJacobianWorkspaceSize);
   // cls.def("parameters", (ParameterContainer& (CLS::*) ()) &CLS::parameters);
 
   // saveSubset

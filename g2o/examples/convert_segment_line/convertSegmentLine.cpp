@@ -193,7 +193,6 @@ int run_main(int argc, char** argv) {
           p1->setEstimate(segment->estimateP1());
           p1->setId(currentId++);
           outGraph.addVertex(p1);
-          line->p1Id = p1->id();
 
           auto p1e = std::make_shared<EdgeLine2DPointXY>();
           p1e->vertices()[0] = line;
@@ -209,7 +208,6 @@ int run_main(int argc, char** argv) {
           p2->setEstimate(segment->estimateP2());
           p2->setId(currentId++);
           outGraph.addVertex(p2);
-          line->p2Id = p2->id();
 
           auto p2e = std::make_shared<EdgeLine2DPointXY>();
           p2e->vertices()[0] = line;
@@ -260,10 +258,8 @@ int run_main(int argc, char** argv) {
           Vector2 estPx;
           if (espl->pointNum()) {
             estPx = segment->estimateP1();
-            line->p1Id = pX->id();
           } else {
             estPx = segment->estimateP2();
-            line->p2Id = pX->id();
           }
           pX->setEstimate(estPx);
 

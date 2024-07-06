@@ -39,23 +39,6 @@ using std::cerr;
 
 namespace g2o {
 
-double activeVertexChi(const OptimizableGraph::Vertex* v) {
-  const auto* s = dynamic_cast<const SparseOptimizer*>(v->graph());
-  const OptimizableGraph::EdgeContainer& av = s->activeEdges();
-  double chi = 0;
-  int ne = 0;
-  for (const auto& it : v->edges()) {
-    auto e = std::dynamic_pointer_cast<OptimizableGraph::Edge>(it.lock());
-    if (!e) continue;
-    if (s->findActiveEdge(e.get()) != av.end()) {
-      chi += e->chi2();
-      ne++;
-    }
-  }
-  if (!ne) return -1;
-  return chi / ne;
-}
-
 void constructEdgeStarMap(EdgeStarMap& esmap, StarSet& stars, bool low) {
   esmap.clear();
   for (const auto& s : stars) {

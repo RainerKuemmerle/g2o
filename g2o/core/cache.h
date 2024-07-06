@@ -47,7 +47,7 @@ class G2O_CORE_API Cache : public HyperGraph::HyperGraphElement {
    public:
     friend class CacheContainer;
     CacheKey() = default;
-    CacheKey(std::string type_, ParameterVector parameters_);
+    CacheKey(std::string type, ParameterVector parameters);
 
     bool operator<(const CacheKey& c) const;
 
@@ -60,11 +60,6 @@ class G2O_CORE_API Cache : public HyperGraph::HyperGraphElement {
     std::string type_;
     ParameterVector parameters_;
   };
-
-  explicit Cache(CacheContainer* container = nullptr,
-                 ParameterVector parameters = ParameterVector());
-
-  [[nodiscard]] CacheKey key() const;
 
   [[nodiscard]] const OptimizableGraph::Vertex& vertex() const;
   [[nodiscard]] const ParameterVector& parameters() const;
