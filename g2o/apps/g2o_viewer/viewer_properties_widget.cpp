@@ -19,6 +19,7 @@
 #include "viewer_properties_widget.h"
 
 #include "g2o/core/hyper_graph_action.h"
+#include "g2o/stuff/logger.h"
 #include "g2o_qglviewer.h"
 
 #ifdef __GNUC__
@@ -60,7 +61,9 @@ std::string demangleName(const std::string& fullPropName) {
 }  // namespace
 
 ViewerPropertiesWidget::ViewerPropertiesWidget(QWidget* parent)
-    : AbstractPropertiesWidget(parent) {}
+    : AbstractPropertiesWidget(parent) {
+  G2O_TRACE("Created Prop widget for drawing options");
+}
 
 void ViewerPropertiesWidget::applyProperties() {
   AbstractPropertiesWidget::applyProperties();
