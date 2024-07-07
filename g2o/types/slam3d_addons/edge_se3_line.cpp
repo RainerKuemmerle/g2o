@@ -67,26 +67,21 @@ EdgeSE3Line3DDrawAction::EdgeSE3Line3DDrawAction()
       lineLength_(nullptr),
       lineWidth_(nullptr) {}
 
-bool EdgeSE3Line3DDrawAction::refreshPropertyPtrs(
-    const std::shared_ptr<HyperGraphElementAction::Parameters>& params_) {
-  if (!DrawAction::refreshPropertyPtrs(params_)) {
-    return false;
+DrawAction::Parameters* EdgeSE3Line3DDrawAction::refreshPropertyPtrs(
+    HyperGraphElementAction::Parameters& params_) {
+  DrawAction::Parameters* params = DrawAction::refreshPropertyPtrs(params_);
+  if (params) {
+    lineLength_ =
+        params->makeProperty<FloatProperty>(typeName_ + "::LINE_LENGTH", 4.0F);
+    lineWidth_ =
+        params->makeProperty<FloatProperty>(typeName_ + "::LINE_WIDTH", 2.0F);
   }
-  if (previousParams_) {
-    lineLength_ = previousParams_->makeProperty<FloatProperty>(
-        typeName_ + "::LINE_LENGTH", 4.0F);
-    lineWidth_ = previousParams_->makeProperty<FloatProperty>(
-        typeName_ + "::LINE_WIDTH", 2.0F);
-  } else {
-    lineLength_ = nullptr;
-    lineWidth_ = nullptr;
-  }
-  return true;
+  return params;
 }
 
 bool EdgeSE3Line3DDrawAction::operator()(
     HyperGraph::HyperGraphElement& element,
-    const std::shared_ptr<HyperGraphElementAction::Parameters>& params_) {
+    HyperGraphElementAction::Parameters& params_) {
   if (typeid(element).name() != typeName_) return false;
 
   refreshPropertyPtrs(params_);

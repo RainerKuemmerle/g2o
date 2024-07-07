@@ -81,8 +81,7 @@ class EdgeSE3PointXYZDrawAction : public DrawAction {
  public:
   EdgeSE3PointXYZDrawAction();
   bool operator()(HyperGraph::HyperGraphElement& element,
-                  const std::shared_ptr<HyperGraphElementAction::Parameters>&
-                      params_) override;
+                  HyperGraphElementAction::Parameters& params_) override;
 };
 #endif
 

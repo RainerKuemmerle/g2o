@@ -57,13 +57,11 @@ class VertexLine3DDrawAction : public DrawAction {
  public:
   VertexLine3DDrawAction();
   bool operator()(HyperGraph::HyperGraphElement& element,
-                  const std::shared_ptr<HyperGraphElementAction::Parameters>&
-                      params_) override;
+                  HyperGraphElementAction::Parameters& params_) override;
 
  protected:
-  bool refreshPropertyPtrs(
-      const std::shared_ptr<HyperGraphElementAction::Parameters>& params_)
-      override;
+  DrawAction::Parameters* refreshPropertyPtrs(
+      HyperGraphElementAction::Parameters& params_) override;
   std::shared_ptr<FloatProperty> lineLength_, lineWidth_;
 };
 #endif

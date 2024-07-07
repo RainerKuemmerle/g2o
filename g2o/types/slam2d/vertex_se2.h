@@ -55,14 +55,12 @@ class G2O_TYPES_SLAM2D_API VertexSE2DrawAction : public DrawAction {
  public:
   VertexSE2DrawAction();
   bool operator()(HyperGraph::HyperGraphElement& element,
-                  const std::shared_ptr<HyperGraphElementAction::Parameters>&
-                      parameters) override;
+                  HyperGraphElementAction::Parameters& parameters) override;
 
  protected:
   HyperGraphElementAction* drawActions_ = nullptr;
-  bool refreshPropertyPtrs(
-      const std::shared_ptr<HyperGraphElementAction::Parameters>& parameters)
-      override;
+  DrawAction::Parameters* refreshPropertyPtrs(
+      HyperGraphElementAction::Parameters& parameters) override;
   std::shared_ptr<FloatProperty> triangleX_, triangleY_;
 };
 #endif

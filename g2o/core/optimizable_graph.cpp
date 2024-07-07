@@ -148,10 +148,6 @@ void OptimizableGraph::Vertex::updateCache() {
   }
 }
 
-OptimizableGraph::Edge::Edge() : robustKernel_(nullptr) {}
-
-OptimizableGraph::Edge::~Edge() = default;
-
 bool OptimizableGraph::Edge::setParameterId(int argNum, int paramId) {
   if (static_cast<int>(parameters_.size()) <= argNum) return false;
   if (argNum < 0) return false;
@@ -165,15 +161,10 @@ bool OptimizableGraph::Edge::resolveParameters(const OptimizableGraph& graph) {
   for (decltype(parameters_)::size_type i = 0; i < parameters_.size(); i++) {
     const int index = parameterIds_[i];
     parameters_[i] = graph.parameter(index);
-#ifndef NDEBUG
-    auto& aux = *parameters_[i];
-    if (typeid(aux).name() != parameterTypes_[i]) {
-      G2O_CRITICAL("parameter type mismatch - encountered {}; should be {}",
-                   typeid(aux).name(), parameterTypes_[i]);
-    }
-#endif
     if (!parameters_[i]) {
-      G2O_CRITICAL("_parameters[i] == nullptr");
+      G2O_CRITICAL(
+          "Parameter {} with expected Id {} not contained in the graph", i,
+          index);
       return false;
     }
   }
@@ -189,10 +180,7 @@ bool OptimizableGraph::Edge::resolveCaches() { return true; }
 
 bool OptimizableGraph::Edge::setMeasurementFromState() { return false; }
 
-OptimizableGraph::OptimizableGraph() {
-  nextEdgeId_ = 0;
-  graphActions_.resize(kAtNumElements);
-}
+OptimizableGraph::OptimizableGraph() : graphActions_(kAtNumElements) {}
 
 OptimizableGraph::~OptimizableGraph() {
   clear();
@@ -651,11 +639,10 @@ std::set<int> OptimizableGraph::dimensions() const {
 }
 
 void OptimizableGraph::performActions(int iter, HyperGraphActionSet& actions) {
-  if (!actions.empty()) {
-    auto params = std::make_shared<HyperGraphAction::ParametersIteration>(iter);
-    for (const auto& action : actions) {
-      (*action)(*this, params);
-    }
+  if (actions.empty()) return;
+  HyperGraphAction::ParametersIteration params(iter);
+  for (const auto& action : actions) {
+    (*action)(*this, params);
   }
 }
 

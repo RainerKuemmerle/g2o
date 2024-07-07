@@ -71,14 +71,12 @@ class G2O_TYPES_SLAM2D_ADDONS_API VertexSegment2DDrawAction
  public:
   VertexSegment2DDrawAction();
   bool operator()(HyperGraph::HyperGraphElement& element,
-                  const std::shared_ptr<HyperGraphElementAction::Parameters>&
-                      params_) override;
+                  HyperGraphElementAction::Parameters& params_) override;
 
  protected:
   std::shared_ptr<FloatProperty> pointSize_;
-  bool refreshPropertyPtrs(
-      const std::shared_ptr<HyperGraphElementAction::Parameters>& params_)
-      override;
+  DrawAction::Parameters* refreshPropertyPtrs(
+      HyperGraphElementAction::Parameters& params_) override;
 };
 #endif
 

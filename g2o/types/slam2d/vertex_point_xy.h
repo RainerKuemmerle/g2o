@@ -54,14 +54,12 @@ class G2O_TYPES_SLAM2D_API VertexPointXYDrawAction : public DrawAction {
  public:
   VertexPointXYDrawAction();
   bool operator()(HyperGraph::HyperGraphElement& element,
-                  const std::shared_ptr<HyperGraphElementAction::Parameters>&
-                      params) override;
+                  HyperGraphElementAction::Parameters& params) override;
 
  protected:
   std::shared_ptr<FloatProperty> pointSize_;
-  bool refreshPropertyPtrs(
-      const std::shared_ptr<HyperGraphElementAction::Parameters>& params)
-      override;
+  DrawAction::Parameters* refreshPropertyPtrs(
+      HyperGraphElementAction::Parameters& params) override;
 };
 #endif
 

@@ -62,7 +62,7 @@ EdgeSE2OdomDifferentialCalibDrawAction::EdgeSE2OdomDifferentialCalibDrawAction()
 
 bool EdgeSE2OdomDifferentialCalibDrawAction::operator()(
     HyperGraph::HyperGraphElement& element,
-    const std::shared_ptr<HyperGraphElementAction::Parameters>&) {
+    HyperGraphElementAction::Parameters&) {
   if (typeid(element).name() != typeName_) return false;
   auto* e = static_cast<EdgeSE2OdomDifferentialCalib*>(&element);
   auto fromEdge = e->vertexXn<0>();

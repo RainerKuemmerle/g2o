@@ -83,24 +83,21 @@ EdgeSE2DrawAction::EdgeSE2DrawAction()
       triangleX_(nullptr),
       triangleY_(nullptr) {}
 
-bool EdgeSE2DrawAction::refreshPropertyPtrs(
-    const std::shared_ptr<HyperGraphElementAction::Parameters>& params_) {
-  if (!DrawAction::refreshPropertyPtrs(params_)) return false;
-  if (previousParams_) {
-    triangleX_ = previousParams_->makeProperty<FloatProperty>(
+DrawAction::Parameters* EdgeSE2DrawAction::refreshPropertyPtrs(
+    HyperGraphElementAction::Parameters& params_) {
+  DrawAction::Parameters* params = DrawAction::refreshPropertyPtrs(params_);
+  if (params) {
+    triangleX_ = params->makeProperty<FloatProperty>(
         typeName_ + "::GHOST_TRIANGLE_X", .2F);
-    triangleY_ = previousParams_->makeProperty<FloatProperty>(
+    triangleY_ = params->makeProperty<FloatProperty>(
         typeName_ + "::GHOST_TRIANGLE_Y", .05F);
-  } else {
-    triangleX_ = nullptr;
-    triangleY_ = nullptr;
   }
-  return true;
+  return params;
 }
 
 bool EdgeSE2DrawAction::operator()(
     HyperGraph::HyperGraphElement& element,
-    const std::shared_ptr<HyperGraphElementAction::Parameters>& params_) {
+    HyperGraphElementAction::Parameters& params_) {
   if (typeid(element).name() != typeName_) return false;
 
   refreshPropertyPtrs(params_);

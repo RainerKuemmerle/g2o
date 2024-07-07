@@ -35,7 +35,6 @@
 #include <memory>
 #include <set>
 #include <string>
-#include <typeinfo>
 #include <unordered_map>
 #include <vector>
 
@@ -424,9 +423,6 @@ class G2O_CORE_API OptimizableGraph : public HyperGraph {
     friend class OptimizableGraph;
 
    public:
-    Edge();
-    ~Edge() override;
-
     // indicates if all vertices are fixed
     [[nodiscard]] virtual bool allVerticesFixed() const = 0;
 
@@ -558,20 +554,18 @@ class G2O_CORE_API OptimizableGraph : public HyperGraph {
    protected:
     int dimension_ = -1;
     int level_ = 0;
-    std::shared_ptr<RobustKernel> robustKernel_;
+    std::shared_ptr<RobustKernel> robustKernel_ = nullptr;
     int64_t internalId_ = -1;
 
     void resizeParameters(size_t newSize) {
       parameters_.resize(newSize, nullptr);
       parameterIds_.resize(newSize, -1);
-      parameterTypes_.resize(newSize, typeid(void*).name());
     }
 
     template <typename ParameterType>
     bool installParameter(size_t argNo, int paramId = -1) {
       if (argNo >= parameters_.size()) return false;
       parameterIds_[argNo] = paramId;
-      parameterTypes_[argNo] = typeid(ParameterType).name();
       return true;
     }
 
@@ -583,7 +577,6 @@ class G2O_CORE_API OptimizableGraph : public HyperGraph {
     bool resolveParameters(const OptimizableGraph& graph);
     virtual bool resolveCaches();
 
-    std::vector<std::string> parameterTypes_;
     ParameterVector parameters_;
     std::vector<int> parameterIds_;
   };
@@ -792,7 +785,7 @@ class G2O_CORE_API OptimizableGraph : public HyperGraph {
 
  protected:
   std::unordered_map<std::string, std::string> renamedTypesLookup_;
-  int64_t nextEdgeId_;
+  int64_t nextEdgeId_ = 0;
   std::vector<HyperGraphActionSet> graphActions_;
 
   ParameterContainer parameters_;

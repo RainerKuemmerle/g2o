@@ -28,7 +28,6 @@
 #define G2O_EDGE_SE3_H_
 
 #include <Eigen/Geometry>
-#include <memory>
 
 #include "g2o/config.h"
 #include "g2o/core/base_binary_edge.h"
@@ -85,8 +84,7 @@ class G2O_TYPES_SLAM3D_API EdgeSE3DrawAction : public DrawAction {
  public:
   EdgeSE3DrawAction();
   bool operator()(HyperGraph::HyperGraphElement& element,
-                  const std::shared_ptr<HyperGraphElementAction::Parameters>&
-                      params_) override;
+                  HyperGraphElementAction::Parameters& params_) override;
 };
 #endif
 

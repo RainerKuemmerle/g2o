@@ -25,16 +25,15 @@
 
 namespace g2o {
 
-bool GuiHyperGraphAction::operator()(
-    const HyperGraph& graph,
-    const std::shared_ptr<HyperGraphAction::Parameters>& parameters) {
+bool GuiHyperGraphAction::operator()(const HyperGraph& graph,
+                                     HyperGraphAction::Parameters& parameters) {
   (void)graph;
   if (viewer) {
     viewer->setUpdateDisplay(true);
     viewer->update();
 
     if (dumpScreenshots) {
-      auto p = std::dynamic_pointer_cast<ParametersIteration>(parameters);
+      const auto* p = dynamic_cast<ParametersIteration*>(&parameters);
       if (p) {
         viewer->setSnapshotFormat(QString("PNG"));
         viewer->setSnapshotQuality(-1);

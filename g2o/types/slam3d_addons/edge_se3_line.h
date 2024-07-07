@@ -32,6 +32,7 @@
 #include "g2o/config.h"
 #include "g2o/core/base_binary_edge.h"
 #include "g2o/core/eigen_types.h"
+#include "g2o/core/hyper_graph_action.h"
 #include "g2o/types/slam3d/vertex_se3.h"
 #include "g2o_types_slam3d_addons_api.h"
 #include "line3d.h"
@@ -63,13 +64,11 @@ class G2O_TYPES_SLAM3D_ADDONS_API EdgeSE3Line3DDrawAction : public DrawAction {
  public:
   EdgeSE3Line3DDrawAction();
   bool operator()(HyperGraph::HyperGraphElement& element,
-                  const std::shared_ptr<HyperGraphElementAction::Parameters>&
-                      params_) override;
+                  HyperGraphElementAction::Parameters& params_) override;
 
  protected:
-  bool refreshPropertyPtrs(
-      const std::shared_ptr<HyperGraphElementAction::Parameters>& params_)
-      override;
+  DrawAction::Parameters* refreshPropertyPtrs(
+      HyperGraphElementAction::Parameters& params_) override;
   std::shared_ptr<FloatProperty> lineLength_, lineWidth_;
 };
 #endif

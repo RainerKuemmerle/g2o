@@ -49,7 +49,7 @@ class G2O_VIEWER_API G2oQGLViewer : public QGLViewer {
   [[nodiscard]] bool updateDisplay() const { return updateDisplay_; }
   void setUpdateDisplay(bool updateDisplay);
 
-  [[nodiscard]] std::shared_ptr<DrawAction::Parameters> parameters() const {
+  [[nodiscard]] const DrawAction::Parameters& parameters() const {
     return drawActionParameters_;
   }
 
@@ -59,7 +59,7 @@ class G2O_VIEWER_API G2oQGLViewer : public QGLViewer {
   HyperGraphElementAction::HyperGraphElementActionPtr drawActions_;
   GLuint drawList_ = 0;
   bool updateDisplay_ = true;
-  std::shared_ptr<DrawAction::Parameters> drawActionParameters_;
+  DrawAction::Parameters drawActionParameters_;
 };
 
 }  // namespace g2o

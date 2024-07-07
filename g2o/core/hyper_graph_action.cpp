@@ -39,33 +39,16 @@ namespace g2o {
 std::unique_ptr<HyperGraphActionLibrary>
     HyperGraphActionLibrary::actionLibInstance_;
 
-HyperGraphAction::Parameters::~Parameters() = default;
-
 HyperGraphAction::ParametersIteration::ParametersIteration(int iter)
     : HyperGraphAction::Parameters(), iteration(iter) {}
 
-HyperGraphAction::~HyperGraphAction() = default;
-
-bool HyperGraphAction::operator()(const HyperGraph&,
-                                  const std::shared_ptr<Parameters>&) {
-  return false;
-}
-
-HyperGraphElementAction::Parameters::~Parameters() = default;
-
-HyperGraphElementAction::HyperGraphElementAction(std::string typeName)
-    : typeName_(std::move(typeName)) {}
+HyperGraphElementAction::HyperGraphElementAction(std::string typeName,
+                                                 std::string name)
+    : typeName_(std::move(typeName)), name_(std::move(name)) {}
 
 void HyperGraphElementAction::setTypeName(std::string typeName) {
   typeName_ = std::move(typeName);
 }
-
-bool HyperGraphElementAction::operator()(HyperGraph::HyperGraphElement&,
-                                         const std::shared_ptr<Parameters>&) {
-  return false;
-}
-
-HyperGraphElementAction::~HyperGraphElementAction() = default;
 
 HyperGraphElementActionCollection::HyperGraphElementActionCollection(
     const std::string& name) {
@@ -73,8 +56,7 @@ HyperGraphElementActionCollection::HyperGraphElementActionCollection(
 }
 
 bool HyperGraphElementActionCollection::operator()(
-    HyperGraph::HyperGraphElement& element,
-    const std::shared_ptr<Parameters>& parameters) {
+    HyperGraph::HyperGraphElement& element, Parameters& parameters) {
   auto it = actionMap_.find(typeid(element).name());
   if (it == actionMap_.end()) return false;
   HyperGraphElementAction* action = it->second.get();
@@ -83,9 +65,8 @@ bool HyperGraphElementActionCollection::operator()(
 
 bool HyperGraphElementActionCollection::registerAction(
     const HyperGraphElementAction::HyperGraphElementActionPtr& action) {
-#ifdef G2O_DEBUG_ACTIONLIB
-  G2O_DEBUG("{} {}", action->name(), action->typeName());
-#endif
+  G2O_TRACE("Register action name: {} type: {}", action->name(),
+            action->typeName());
   if (action->name() != name()) {
     G2O_ERROR(
         "invalid attempt to register an action in a collection with a "
@@ -143,9 +124,7 @@ bool HyperGraphActionLibrary::registerAction(
     }
     return collection->registerAction(action);
   }
-#ifdef G2O_DEBUG_ACTIONLIB
-  G2O_DEBUG("creating collection for {}", action->name());
-#endif
+  G2O_TRACE("creating collection for {}", action->name());
   collection =
       std::make_shared<HyperGraphElementActionCollection>(action->name());
   actionMap_.insert(std::make_pair(action->name(), collection));
@@ -185,23 +164,20 @@ DrawAction::Parameters::Parameters() = default;
 DrawAction::DrawAction(const std::string& typeName_)
     : HyperGraphElementAction(typeName_) {
   name_ = "draw";
-  // previousParams_.reset(reinterpret_cast<Parameters*>(0x42));
-  refreshPropertyPtrs(nullptr);
-  cacheDrawActions_ = nullptr;
 }
 
-bool DrawAction::refreshPropertyPtrs(
-    const std::shared_ptr<HyperGraphElementAction::Parameters>& params) {
-  if (previousParams_ == params) return false;
-  auto p = std::dynamic_pointer_cast<DrawAction::Parameters>(params);
+DrawAction::Parameters* DrawAction::refreshPropertyPtrs(
+    HyperGraphElementAction::Parameters& params) {
+  if (previousParams_ == &params) return nullptr;
+  auto* p = dynamic_cast<DrawAction::Parameters*>(&params);
   if (!p) {
     previousParams_ = nullptr;
     show_ = nullptr;
   } else {
-    previousParams_ = p;
+    previousParams_ = &p;
     show_ = p->makeProperty<BoolProperty>(typeName_ + "::SHOW", true);
   }
-  return true;
+  return p;
 }
 
 void DrawAction::initializeDrawActionsCache() {
@@ -211,38 +187,19 @@ void DrawAction::initializeDrawActionsCache() {
   }
 }
 
-void DrawAction::drawCache(
-    const CacheContainer& caches,
-    const std::shared_ptr<HyperGraphElementAction::Parameters>& params) {
+void DrawAction::drawCache(const CacheContainer& caches,
+                           HyperGraphElementAction::Parameters& params) {
   for (const auto& cache : caches) {
     Cache* c = cache.second.get();
     (*cacheDrawActions_)(*c, params);
   }
 }
 
-void DrawAction::drawUserData(
-    const HyperGraph::DataContainer::DataVector& data,
-    const std::shared_ptr<HyperGraphElementAction::Parameters>& params) {
+void DrawAction::drawUserData(const HyperGraph::DataContainer::DataVector& data,
+                              HyperGraphElementAction::Parameters& params) {
   if (!cacheDrawActions_) return;
   for (const auto& d : data) {
     (*cacheDrawActions_)(*d, params);
-  }
-}
-
-void applyAction(
-    HyperGraph& graph, HyperGraphElementAction& action,
-    const std::shared_ptr<HyperGraphElementAction::Parameters>& parameters,
-    const std::string& typeName) {
-  for (auto& it : graph.vertices()) {
-    auto& aux = *it.second;
-    if (typeName.empty() || typeid(aux).name() == typeName) {
-      (action)(*it.second, parameters);
-    }
-  }
-  for (const auto& it : graph.edges()) {
-    auto& aux = *it;
-    if (typeName.empty() || typeid(aux).name() == typeName)
-      (action)(aux, parameters);
   }
 }
 

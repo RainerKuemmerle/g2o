@@ -27,8 +27,6 @@
 #ifndef SPARSE_OPTIMIZER_TERMINATE_ACTION_H
 #define SPARSE_OPTIMIZER_TERMINATE_ACTION_H
 
-#include <memory>
-
 #include "g2o_core_api.h"
 #include "hyper_graph_action.h"
 
@@ -50,9 +48,7 @@ class HyperGraph;
 class G2O_CORE_API SparseOptimizerTerminateAction : public HyperGraphAction {
  public:
   SparseOptimizerTerminateAction();
-  bool operator()(
-      const HyperGraph& graph,
-      const std::shared_ptr<Parameters>& parameters = nullptr) override;
+  bool operator()(const HyperGraph& graph, Parameters& parameters) override;
 
   [[nodiscard]] double gainThreshold() const { return gainThreshold_; }
   void setGainThreshold(double gainThreshold);

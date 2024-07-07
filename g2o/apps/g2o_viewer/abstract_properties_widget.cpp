@@ -21,6 +21,7 @@
 #include <QLineEdit>
 #include <cassert>
 #include <iostream>
+#include <memory>
 
 #include "g2o/stuff/property.h"
 
@@ -87,12 +88,14 @@ void AbstractPropertiesWidget::updateDisplayedProperties() {
 
 void AbstractPropertiesWidget::applyProperties() {
   assert(tableWidget->rowCount() == (int)propNames_.size());
-  g2o::PropertyMap* properties = propertyMap();
+  const g2o::PropertyMap* properties = propertyMap();
   if (!properties) return;
   for (int r = 0; r < tableWidget->rowCount(); ++r) {
     const std::string& propName = propNames_[r];
+    // HACK cast away the const
     std::shared_ptr<g2o::BaseProperty> baseProp =
-        properties->getProperty<g2o::BaseProperty>(propName);
+        std::const_pointer_cast<g2o::BaseProperty>(
+            properties->getProperty<g2o::BaseProperty>(propName));
     if (!baseProp) continue;
 
     if (dynamic_cast<g2o::Property<bool>*>(baseProp.get())) {

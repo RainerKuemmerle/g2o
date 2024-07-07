@@ -41,26 +41,21 @@ VertexLine3DDrawAction::VertexLine3DDrawAction()
       lineLength_(nullptr),
       lineWidth_(nullptr) {}
 
-bool VertexLine3DDrawAction::refreshPropertyPtrs(
-    const std::shared_ptr<HyperGraphElementAction::Parameters>& params_) {
-  if (!DrawAction::refreshPropertyPtrs(params_)) {
-    return false;
+DrawAction::Parameters* VertexLine3DDrawAction::refreshPropertyPtrs(
+    HyperGraphElementAction::Parameters& params_) {
+  DrawAction::Parameters* params = DrawAction::refreshPropertyPtrs(params_);
+  if (params) {
+    lineLength_ =
+        params->makeProperty<FloatProperty>(typeName_ + "::LINE_LENGTH", 15);
+    lineWidth_ =
+        params->makeProperty<FloatProperty>(typeName_ + "::LINE_WIDTH", 5);
   }
-  if (previousParams_) {
-    lineLength_ = previousParams_->makeProperty<FloatProperty>(
-        typeName_ + "::LINE_LENGTH", 15);
-    lineWidth_ = previousParams_->makeProperty<FloatProperty>(
-        typeName_ + "::LINE_WIDTH", 5);
-  } else {
-    lineLength_ = nullptr;
-    lineWidth_ = nullptr;
-  }
-  return true;
+  return params;
 }
 
 bool VertexLine3DDrawAction::operator()(
     HyperGraph::HyperGraphElement& element,
-    const std::shared_ptr<HyperGraphElementAction::Parameters>& params_) {
+    HyperGraphElementAction::Parameters& params_) {
   if (typeid(element).name() != typeName_) {
     return false;
   }

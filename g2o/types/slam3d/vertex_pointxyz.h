@@ -58,14 +58,12 @@ class VertexPointXYZDrawAction : public DrawAction {
  public:
   VertexPointXYZDrawAction();
   bool operator()(HyperGraph::HyperGraphElement& element,
-                  const std::shared_ptr<HyperGraphElementAction::Parameters>&
-                      params_) override;
+                  HyperGraphElementAction::Parameters& params_) override;
 
  protected:
   std::shared_ptr<FloatProperty> pointSize_;
-  bool refreshPropertyPtrs(
-      const std::shared_ptr<HyperGraphElementAction::Parameters>& params_)
-      override;
+  DrawAction::Parameters* refreshPropertyPtrs(
+      HyperGraphElementAction::Parameters& params_) override;
 };
 #endif
 

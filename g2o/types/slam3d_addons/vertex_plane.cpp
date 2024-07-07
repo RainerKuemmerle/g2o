@@ -29,6 +29,7 @@
 #include <string>
 #include <typeinfo>
 
+#include "g2o/core/hyper_graph_action.h"
 #include "g2o/stuff/macros.h"
 #include "g2o/stuff/misc.h"
 #include "g2o/stuff/opengl_wrapper.h"
@@ -45,24 +46,21 @@ VertexPlaneDrawAction::VertexPlaneDrawAction()
       planeWidth_(nullptr),
       planeHeight_(nullptr) {}
 
-bool VertexPlaneDrawAction::refreshPropertyPtrs(
-    const std::shared_ptr<HyperGraphElementAction::Parameters>& params_) {
-  if (!DrawAction::refreshPropertyPtrs(params_)) return false;
-  if (previousParams_) {
-    planeWidth_ = previousParams_->makeProperty<FloatProperty>(
-        typeName_ + "::PLANE_WIDTH", 3);
-    planeHeight_ = previousParams_->makeProperty<FloatProperty>(
-        typeName_ + "::PLANE_HEIGHT", 3);
-  } else {
-    planeWidth_ = nullptr;
-    planeHeight_ = nullptr;
+DrawAction::Parameters* VertexPlaneDrawAction::refreshPropertyPtrs(
+    HyperGraphElementAction::Parameters& params_) {
+  DrawAction::Parameters* params = DrawAction::refreshPropertyPtrs(params_);
+  if (params) {
+    planeWidth_ =
+        params->makeProperty<FloatProperty>(typeName_ + "::PLANE_WIDTH", 3);
+    planeHeight_ =
+        params->makeProperty<FloatProperty>(typeName_ + "::PLANE_HEIGHT", 3);
   }
-  return true;
+  return params;
 }
 
 bool VertexPlaneDrawAction::operator()(
     HyperGraph::HyperGraphElement& element,
-    const std::shared_ptr<HyperGraphElementAction::Parameters>& params_) {
+    HyperGraphElementAction::Parameters& params_) {
   if (typeid(element).name() != typeName_) return false;
   refreshPropertyPtrs(params_);
   if (!previousParams_) return true;

@@ -39,21 +39,19 @@ namespace g2o {
 VertexPointXYZDrawAction::VertexPointXYZDrawAction()
     : DrawAction(typeid(VertexPointXYZ).name()), pointSize_(nullptr) {}
 
-bool VertexPointXYZDrawAction::refreshPropertyPtrs(
-    const std::shared_ptr<HyperGraphElementAction::Parameters>& params_) {
-  if (!DrawAction::refreshPropertyPtrs(params_)) return false;
-  if (previousParams_) {
-    pointSize_ = previousParams_->makeProperty<FloatProperty>(
-        typeName_ + "::POINT_SIZE", 1.);
-  } else {
-    pointSize_ = nullptr;
+DrawAction::Parameters* VertexPointXYZDrawAction::refreshPropertyPtrs(
+    HyperGraphElementAction::Parameters& params_) {
+  DrawAction::Parameters* params = DrawAction::refreshPropertyPtrs(params_);
+  if (params) {
+    pointSize_ =
+        params->makeProperty<FloatProperty>(typeName_ + "::POINT_SIZE", 1.);
   }
-  return true;
+  return params;
 }
 
 bool VertexPointXYZDrawAction::operator()(
     HyperGraph::HyperGraphElement& element,
-    const std::shared_ptr<HyperGraphElementAction::Parameters>& params) {
+    HyperGraphElementAction::Parameters& params) {
   if (typeid(element).name() != typeName_) return false;
   initializeDrawActionsCache();
   refreshPropertyPtrs(params);
