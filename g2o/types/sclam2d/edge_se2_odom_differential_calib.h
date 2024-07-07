@@ -27,8 +27,6 @@
 #ifndef G2O_EDGE_SE2_ODOM_CALIB_DIFFERENTIAL_H
 #define G2O_EDGE_SE2_ODOM_CALIB_DIFFERENTIAL_H
 
-#include <memory>
-
 #include "g2o/config.h"
 #include "g2o/core/base_fixed_sized_edge.h"
 #include "g2o/core/hyper_graph.h"
@@ -53,8 +51,7 @@ class G2O_TYPES_SCLAM2D_API EdgeSE2OdomDifferentialCalibDrawAction
  public:
   EdgeSE2OdomDifferentialCalibDrawAction();
   bool operator()(HyperGraph::HyperGraphElement& element,
-                  const std::shared_ptr<HyperGraphElementAction::Parameters>&
-                      params_) override;
+                  HyperGraphElementAction::Parameters& params_) override;
 };
 #endif
 

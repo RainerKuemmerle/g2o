@@ -87,13 +87,11 @@ class G2O_TYPES_SLAM2D_API EdgeSE2DrawAction : public DrawAction {
  public:
   EdgeSE2DrawAction();
   bool operator()(HyperGraph::HyperGraphElement& element,
-                  const std::shared_ptr<HyperGraphElementAction::Parameters>&
-                      params_) override;
+                  HyperGraphElementAction::Parameters& params) override;
 
  protected:
-  bool refreshPropertyPtrs(
-      const std::shared_ptr<HyperGraphElementAction::Parameters>& params_)
-      override;
+  DrawAction::Parameters* refreshPropertyPtrs(
+      HyperGraphElementAction::Parameters& params_) override;
   std::shared_ptr<FloatProperty> triangleX_, triangleY_;
 };
 #endif

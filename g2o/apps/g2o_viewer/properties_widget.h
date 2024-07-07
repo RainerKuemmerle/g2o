@@ -33,7 +33,7 @@ class G2O_VIEWER_API PropertiesWidget : public AbstractPropertiesWidget {
   explicit PropertiesWidget(QWidget* parent = nullptr);
   ~PropertiesWidget() override = default;
 
-  g2o::PropertyMap* propertyMap() override;
+  const g2o::PropertyMap* propertyMap() override;
 
   void setSolver(std::shared_ptr<g2o::OptimizationAlgorithm> solver);
 

@@ -26,6 +26,8 @@
 
 #include "vertex_point_xy.h"
 
+#include "g2o/core/hyper_graph_action.h"
+
 #ifdef G2O_HAVE_OPENGL
 #include "g2o/stuff/opengl_primitives.h"
 #include "g2o/stuff/opengl_wrapper.h"
@@ -42,21 +44,19 @@ VertexPointXY::VertexPointXY() { estimate_.setZero(); }
 VertexPointXYDrawAction::VertexPointXYDrawAction()
     : DrawAction(typeid(VertexPointXY).name()), pointSize_(nullptr) {}
 
-bool VertexPointXYDrawAction::refreshPropertyPtrs(
-    const std::shared_ptr<HyperGraphElementAction::Parameters>& params) {
-  if (!DrawAction::refreshPropertyPtrs(params)) return false;
-  if (previousParams_) {
-    pointSize_ = previousParams_->makeProperty<FloatProperty>(
-        typeName_ + "::POINT_SIZE", 1.);
-  } else {
-    pointSize_ = nullptr;
+DrawAction::Parameters* VertexPointXYDrawAction::refreshPropertyPtrs(
+    HyperGraphElementAction::Parameters& p) {
+  DrawAction::Parameters* params = DrawAction::refreshPropertyPtrs(p);
+  if (params) {
+    pointSize_ =
+        params->makeProperty<FloatProperty>(typeName_ + "::POINT_SIZE", 1.);
   }
-  return true;
+  return params;
 }
 
 bool VertexPointXYDrawAction::operator()(
     HyperGraph::HyperGraphElement& element,
-    const std::shared_ptr<HyperGraphElementAction::Parameters>& params) {
+    HyperGraphElementAction::Parameters& params) {
   if (typeid(element).name() != typeName_) return false;
   initializeDrawActionsCache();
   refreshPropertyPtrs(params);

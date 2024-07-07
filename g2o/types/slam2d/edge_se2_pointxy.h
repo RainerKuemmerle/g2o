@@ -28,7 +28,6 @@
 #define G2O_EDGE_SE2_POINT_XY_H
 
 #include <Eigen/Core>
-#include <memory>
 
 #include "g2o/config.h"
 #include "g2o/core/base_binary_edge.h"
@@ -78,8 +77,7 @@ class G2O_TYPES_SLAM2D_API EdgeSE2PointXYDrawAction : public DrawAction {
  public:
   EdgeSE2PointXYDrawAction();
   bool operator()(HyperGraph::HyperGraphElement& element,
-                  const std::shared_ptr<HyperGraphElementAction::Parameters>&
-                      params_) override;
+                  HyperGraphElementAction::Parameters& params_) override;
 };
 #endif
 

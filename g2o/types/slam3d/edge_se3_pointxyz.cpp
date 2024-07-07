@@ -134,7 +134,7 @@ EdgeSE3PointXYZDrawAction::EdgeSE3PointXYZDrawAction()
 
 bool EdgeSE3PointXYZDrawAction::operator()(
     HyperGraph::HyperGraphElement& element,
-    const std::shared_ptr<HyperGraphElementAction::Parameters>& params_) {
+    HyperGraphElementAction::Parameters& params_) {
   if (typeid(element).name() != typeName_) return false;
   refreshPropertyPtrs(params_);
   if (!previousParams_) return true;

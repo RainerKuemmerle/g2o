@@ -31,6 +31,7 @@
 #include <typeinfo>
 
 #include "g2o/core/eigen_types.h"
+#include "g2o/core/hyper_graph_action.h"
 #include "vertex_se3.h"
 
 #ifdef G2O_HAVE_OPENGL
@@ -61,21 +62,19 @@ void CacheSE3Offset::updateImpl() {
 CacheSE3OffsetDrawAction::CacheSE3OffsetDrawAction()
     : DrawAction(typeid(CacheSE3Offset).name()) {}
 
-bool CacheSE3OffsetDrawAction::refreshPropertyPtrs(
-    const std::shared_ptr<HyperGraphElementAction::Parameters>& params_) {
-  if (!DrawAction::refreshPropertyPtrs(params_)) return false;
+DrawAction::Parameters* CacheSE3OffsetDrawAction::refreshPropertyPtrs(
+    HyperGraphElementAction::Parameters& params_) {
+  DrawAction::Parameters* params = DrawAction::refreshPropertyPtrs(params_);
   if (previousParams_) {
-    cubeSide_ = previousParams_->makeProperty<FloatProperty>(
-        typeName_ + "::CUBE_SIDE", .05F);
-  } else {
-    cubeSide_ = nullptr;
+    cubeSide_ =
+        params->makeProperty<FloatProperty>(typeName_ + "::CUBE_SIDE", .05F);
   }
-  return true;
+  return params;
 }
 
 bool CacheSE3OffsetDrawAction::operator()(
     HyperGraph::HyperGraphElement& element,
-    const std::shared_ptr<HyperGraphElementAction::Parameters>& params_) {
+    HyperGraphElementAction::Parameters& params_) {
   if (typeid(element).name() != typeName_) return false;
   auto* that = static_cast<CacheSE3Offset*>(&element);
   refreshPropertyPtrs(params_);

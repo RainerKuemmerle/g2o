@@ -18,7 +18,7 @@
 
 #include "viewer_properties_widget.h"
 
-#include "g2o/stuff/property.h"
+#include "g2o/core/hyper_graph_action.h"
 #include "g2o_qglviewer.h"
 
 #ifdef __GNUC__
@@ -80,7 +80,9 @@ std::string ViewerPropertiesWidget::humanReadablePropName(
   return demangleName(propertyName);
 }
 
-g2o::PropertyMap* ViewerPropertiesWidget::propertyMap() {
+const g2o::PropertyMap* ViewerPropertiesWidget::propertyMap() {
   if (!viewer_) return nullptr;
-  return viewer_->parameters().get();
+  const auto* params =
+      dynamic_cast<const g2o::DrawAction::Parameters*>(&viewer_->parameters());
+  return params;
 }

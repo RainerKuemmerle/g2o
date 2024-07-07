@@ -27,8 +27,6 @@
 #ifndef G2O_EDGE_SE2_SENSOR_CALIB_H
 #define G2O_EDGE_SE2_SENSOR_CALIB_H
 
-#include <memory>
-
 #include "g2o/config.h"
 #include "g2o/core/base_fixed_sized_edge.h"
 #include "g2o/core/hyper_graph.h"
@@ -64,8 +62,7 @@ class EdgeSE2SensorCalibDrawAction : public DrawAction {
  public:
   EdgeSE2SensorCalibDrawAction();
   bool operator()(HyperGraph::HyperGraphElement& element,
-                  const std::shared_ptr<HyperGraphElementAction::Parameters>&
-                      params_) override;
+                  HyperGraphElementAction::Parameters& params_) override;
 };
 #endif
 

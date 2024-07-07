@@ -30,6 +30,7 @@
 #include <ostream>
 #include <typeinfo>
 
+#include "g2o/core/hyper_graph_action.h"
 #include "g2o/stuff/macros.h"
 
 #ifdef G2O_HAVE_OPENGL
@@ -64,21 +65,19 @@ bool VertexTag::write(std::ostream& os) const {
 VertexTagDrawAction::VertexTagDrawAction()
     : DrawAction(typeid(VertexTag).name()), textSize_(nullptr) {}
 
-bool VertexTagDrawAction::refreshPropertyPtrs(
-    const std::shared_ptr<HyperGraphElementAction::Parameters>& params_) {
-  if (!DrawAction::refreshPropertyPtrs(params_)) return false;
-  if (previousParams_) {
-    textSize_ = previousParams_->makeProperty<DoubleProperty>(
-        typeName_ + "::TEXT_SIZE", 1);
-  } else {
-    textSize_ = nullptr;
+DrawAction::Parameters* VertexTagDrawAction::refreshPropertyPtrs(
+    HyperGraphElementAction::Parameters& params_) {
+  DrawAction::Parameters* params = DrawAction::refreshPropertyPtrs(params_);
+  if (params) {
+    textSize_ =
+        params->makeProperty<DoubleProperty>(typeName_ + "::TEXT_SIZE", 1);
   }
-  return true;
+  return params;
 }
 
 bool VertexTagDrawAction::operator()(
     HyperGraph::HyperGraphElement& element,
-    const std::shared_ptr<HyperGraphElementAction::Parameters>& params_) {
+    HyperGraphElementAction::Parameters& params_) {
   if (typeid(element).name() != typeName_) return false;
 
   refreshPropertyPtrs(params_);

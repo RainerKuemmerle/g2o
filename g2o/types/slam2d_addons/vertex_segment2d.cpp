@@ -26,6 +26,8 @@
 
 #include "vertex_segment2d.h"
 
+#include "g2o/core/hyper_graph_action.h"
+
 #ifdef G2O_HAVE_OPENGL
 #include "g2o/stuff/opengl_wrapper.h"
 #endif
@@ -41,21 +43,19 @@ VertexSegment2D::VertexSegment2D() { estimate_.setZero(); }
 VertexSegment2DDrawAction::VertexSegment2DDrawAction()
     : DrawAction(typeid(VertexSegment2D).name()), pointSize_(nullptr) {}
 
-bool VertexSegment2DDrawAction::refreshPropertyPtrs(
-    const std::shared_ptr<HyperGraphElementAction::Parameters>& params_) {
-  if (!DrawAction::refreshPropertyPtrs(params_)) return false;
-  if (previousParams_) {
-    pointSize_ = previousParams_->makeProperty<FloatProperty>(
-        typeName_ + "::POINT_SIZE", 1.);
-  } else {
-    pointSize_ = nullptr;
+DrawAction::Parameters* VertexSegment2DDrawAction::refreshPropertyPtrs(
+    HyperGraphElementAction::Parameters& params_) {
+  DrawAction::Parameters* params = DrawAction::refreshPropertyPtrs(params_);
+  if (params) {
+    pointSize_ =
+        params->makeProperty<FloatProperty>(typeName_ + "::POINT_SIZE", 1.);
   }
-  return true;
+  return params;
 }
 
 bool VertexSegment2DDrawAction::operator()(
     HyperGraph::HyperGraphElement& element,
-    const std::shared_ptr<HyperGraphElementAction::Parameters>& params_) {
+    HyperGraphElementAction::Parameters& params_) {
   if (typeid(element).name() != typeName_) return false;
 
   refreshPropertyPtrs(params_);

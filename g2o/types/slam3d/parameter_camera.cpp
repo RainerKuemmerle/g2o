@@ -34,6 +34,7 @@
 #include <string>
 #include <typeinfo>
 
+#include "g2o/core/hyper_graph_action.h"
 #include "g2o/types/slam3d/vertex_se3.h"
 
 #ifdef G2O_HAVE_OPENGL
@@ -65,25 +66,21 @@ void CacheCamera::updateImpl() {
 CacheCameraDrawAction::CacheCameraDrawAction()
     : DrawAction(typeid(CacheCamera).name()) {}
 
-bool CacheCameraDrawAction::refreshPropertyPtrs(
-    const std::shared_ptr<HyperGraphElementAction::Parameters>& params_) {
-  if (!DrawAction::refreshPropertyPtrs(params_)) return false;
-  if (previousParams_) {
-    cameraZ_ = previousParams_->makeProperty<FloatProperty>(
-        typeName_ + "::CAMERA_Z", .05F);
-    cameraSide_ = previousParams_->makeProperty<FloatProperty>(
-        typeName_ + "::CAMERA_SIDE", .05F);
-
-  } else {
-    cameraZ_ = nullptr;
-    cameraSide_ = nullptr;
+DrawAction::Parameters* CacheCameraDrawAction::refreshPropertyPtrs(
+    HyperGraphElementAction::Parameters& params_) {
+  DrawAction::Parameters* params = DrawAction::refreshPropertyPtrs(params_);
+  if (params) {
+    cameraZ_ =
+        params->makeProperty<FloatProperty>(typeName_ + "::CAMERA_Z", .05F);
+    cameraSide_ =
+        params->makeProperty<FloatProperty>(typeName_ + "::CAMERA_SIDE", .05F);
   }
-  return true;
+  return params;
 }
 
 bool CacheCameraDrawAction::operator()(
     HyperGraph::HyperGraphElement& element,
-    const std::shared_ptr<HyperGraphElementAction::Parameters>& params) {
+    HyperGraphElementAction::Parameters& params) {
   if (typeid(element).name() != typeName_) return false;
   auto* that = static_cast<CacheCamera*>(&element);
   refreshPropertyPtrs(params);

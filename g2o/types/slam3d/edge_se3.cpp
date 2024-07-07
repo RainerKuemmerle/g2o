@@ -86,7 +86,7 @@ EdgeSE3DrawAction::EdgeSE3DrawAction() : DrawAction(typeid(EdgeSE3).name()) {}
 
 bool EdgeSE3DrawAction::operator()(
     HyperGraph::HyperGraphElement& element,
-    const std::shared_ptr<HyperGraphElementAction::Parameters>& params_) {
+    HyperGraphElementAction::Parameters& params_) {
   if (typeid(element).name() != typeName_) return false;
   refreshPropertyPtrs(params_);
   if (!previousParams_) return true;

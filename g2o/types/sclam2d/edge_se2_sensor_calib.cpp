@@ -83,7 +83,7 @@ EdgeSE2SensorCalibDrawAction::EdgeSE2SensorCalibDrawAction()
 
 bool EdgeSE2SensorCalibDrawAction::operator()(
     HyperGraph::HyperGraphElement& element,
-    const std::shared_ptr<HyperGraphElementAction::Parameters>&) {
+    HyperGraphElementAction::Parameters&) {
   if (typeid(element).name() != typeName_) return false;
   auto* e = static_cast<EdgeSE2SensorCalib*>(&element);
   auto fromEdge = e->vertexXn<0>();

@@ -30,6 +30,7 @@
 #include <Eigen/Geometry>
 #include <string>
 
+#include "g2o/core/hyper_graph_action.h"
 #include "g2o/types/slam3d/isometry3d_mappings.h"
 #ifdef G2O_HAVE_OPENGL
 #include "g2o/stuff/opengl_primitives.h"
@@ -82,24 +83,21 @@ VertexSE3DrawAction::VertexSE3DrawAction()
   cacheDrawActions_ = nullptr;
 }
 
-bool VertexSE3DrawAction::refreshPropertyPtrs(
-    const std::shared_ptr<HyperGraphElementAction::Parameters>& params_) {
-  if (!DrawAction::refreshPropertyPtrs(params_)) return false;
-  if (previousParams_) {
-    triangleX_ = previousParams_->makeProperty<FloatProperty>(
-        typeName_ + "::TRIANGLE_X", .2F);
-    triangleY_ = previousParams_->makeProperty<FloatProperty>(
-        typeName_ + "::TRIANGLE_Y", .05F);
-  } else {
-    triangleX_ = nullptr;
-    triangleY_ = nullptr;
+DrawAction::Parameters* VertexSE3DrawAction::refreshPropertyPtrs(
+    HyperGraphElementAction::Parameters& params_) {
+  DrawAction::Parameters* params = DrawAction::refreshPropertyPtrs(params_);
+  if (params) {
+    triangleX_ =
+        params->makeProperty<FloatProperty>(typeName_ + "::TRIANGLE_X", .2F);
+    triangleY_ =
+        params->makeProperty<FloatProperty>(typeName_ + "::TRIANGLE_Y", .05F);
   }
-  return true;
+  return params;
 }
 
 bool VertexSE3DrawAction::operator()(
     HyperGraph::HyperGraphElement& element,
-    const std::shared_ptr<HyperGraphElementAction::Parameters>& params_) {
+    HyperGraphElementAction::Parameters& params_) {
   if (typeid(element).name() != typeName_) return false;
   initializeDrawActionsCache();
   refreshPropertyPtrs(params_);

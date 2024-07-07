@@ -35,7 +35,7 @@ class G2O_VIEWER_API ViewerPropertiesWidget : public AbstractPropertiesWidget {
   ~ViewerPropertiesWidget() override = default;
 
   void setViewer(g2o::G2oQGLViewer* viewer);
-  g2o::PropertyMap* propertyMap() override;
+  const g2o::PropertyMap* propertyMap() override;
 
  protected:
   g2o::G2oQGLViewer* viewer_ = nullptr;

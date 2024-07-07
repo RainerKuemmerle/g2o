@@ -62,7 +62,7 @@ EdgeSE2PointXYBearingDrawAction::EdgeSE2PointXYBearingDrawAction()
 
 bool EdgeSE2PointXYBearingDrawAction::operator()(
     HyperGraph::HyperGraphElement& element,
-    const std::shared_ptr<HyperGraphElementAction::Parameters>& params_) {
+    HyperGraphElementAction::Parameters& params_) {
   if (typeid(element).name() != typeName_) return false;
 
   refreshPropertyPtrs(params_);

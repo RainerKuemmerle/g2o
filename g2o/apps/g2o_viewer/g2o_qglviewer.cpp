@@ -51,6 +51,16 @@ namespace g2o {
 
 namespace {
 
+void applyAction(HyperGraph& graph, HyperGraphElementAction& action,
+                 HyperGraphElementAction::Parameters& parameters) {
+  for (auto& it : graph.vertices()) {
+    (action)(*it.second, parameters);
+  }
+  for (const auto& it : graph.edges()) {
+    (action)(*it, parameters);
+  }
+}
+
 /**
  * \brief helper for setting up a camera for qglviewer
  */
@@ -80,7 +90,6 @@ class StandardCamera : public qglviewer::Camera {
 G2oQGLViewer::G2oQGLViewer(QWidget* parent)
     : QGLViewer(parent), drawActions_(nullptr) {
   setAxisIsDrawn(false);
-  drawActionParameters_ = std::make_shared<DrawAction::Parameters>();
 }
 
 G2oQGLViewer::~G2oQGLViewer() { glDeleteLists(drawList_, 1); }

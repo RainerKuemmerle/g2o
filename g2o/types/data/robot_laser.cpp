@@ -36,6 +36,7 @@
 #include <vector>
 
 #include "g2o/core/eigen_types.h"
+#include "g2o/core/hyper_graph_action.h"
 #include "g2o/stuff/macros.h"
 #include "g2o/types/data/laser_parameters.h"
 #include "g2o/types/data/raw_laser.h"
@@ -120,27 +121,23 @@ RobotLaserDrawAction::RobotLaserDrawAction()
       pointSize_(nullptr),
       maxRange_(nullptr) {}
 
-bool RobotLaserDrawAction::refreshPropertyPtrs(
-    const std::shared_ptr<HyperGraphElementAction::Parameters>& params_) {
-  if (!DrawAction::refreshPropertyPtrs(params_)) return false;
-  if (previousParams_) {
-    beamsDownsampling_ = previousParams_->makeProperty<IntProperty>(
+DrawAction::Parameters* RobotLaserDrawAction::refreshPropertyPtrs(
+    HyperGraphElementAction::Parameters& params_) {
+  DrawAction::Parameters* params = DrawAction::refreshPropertyPtrs(params_);
+  if (params) {
+    beamsDownsampling_ = params->makeProperty<IntProperty>(
         typeName_ + "::BEAMS_DOWNSAMPLING", 1);
-    pointSize_ = previousParams_->makeProperty<FloatProperty>(
-        typeName_ + "::POINT_SIZE", 1.0F);
-    maxRange_ = previousParams_->makeProperty<FloatProperty>(
-        typeName_ + "::MAX_RANGE", -1.);
-  } else {
-    beamsDownsampling_ = nullptr;
-    pointSize_ = nullptr;
-    maxRange_ = nullptr;
+    pointSize_ =
+        params->makeProperty<FloatProperty>(typeName_ + "::POINT_SIZE", 1.0F);
+    maxRange_ =
+        params->makeProperty<FloatProperty>(typeName_ + "::MAX_RANGE", -1.);
   }
-  return true;
+  return params;
 }
 
 bool RobotLaserDrawAction::operator()(
     HyperGraph::HyperGraphElement& element,
-    const std::shared_ptr<HyperGraphElementAction::Parameters>& params_) {
+    HyperGraphElementAction::Parameters& params_) {
   if (typeid(element).name() != typeName_) return false;
 
   refreshPropertyPtrs(params_);

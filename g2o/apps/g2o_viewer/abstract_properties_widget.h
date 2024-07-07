@@ -20,7 +20,6 @@
 #define G2O_ABSTRACT_PROPERTIES_WINDOW_H
 
 #include <QDialog>
-#include <memory>
 #include <string>
 #include <vector>
 
@@ -42,7 +41,7 @@ class G2O_VIEWER_API AbstractPropertiesWidget
   explicit AbstractPropertiesWidget(QWidget* parent = nullptr);
   ~AbstractPropertiesWidget() override = default;
 
-  virtual g2o::PropertyMap* propertyMap() = 0;
+  virtual const g2o::PropertyMap* propertyMap() = 0;
 
   void on_btnApply_clicked();
   void on_btnOK_clicked();

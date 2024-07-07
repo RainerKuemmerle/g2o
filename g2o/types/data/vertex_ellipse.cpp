@@ -26,6 +26,7 @@
 
 #include "vertex_ellipse.h"
 
+#include "g2o/core/hyper_graph_action.h"
 #include "g2o/stuff/misc.h"
 
 #ifdef G2O_HAVE_OPENGL
@@ -102,21 +103,18 @@ bool VertexEllipse::write(std::ostream& os) const {
 VertexEllipseDrawAction::VertexEllipseDrawAction()
     : DrawAction(typeid(VertexEllipse).name()) {}
 
-bool VertexEllipseDrawAction::refreshPropertyPtrs(
-    const std::shared_ptr<HyperGraphElementAction::Parameters>& params_) {
-  if (!DrawAction::refreshPropertyPtrs(params_)) return false;
-  if (previousParams_) {
-    scaleFactor_ =
-        previousParams_->makeProperty<DoubleProperty>(typeName_ + "::", 1);
-  } else {
-    scaleFactor_ = nullptr;
+DrawAction::Parameters* VertexEllipseDrawAction::refreshPropertyPtrs(
+    HyperGraphElementAction::Parameters& params_) {
+  DrawAction::Parameters* params = DrawAction::refreshPropertyPtrs(params_);
+  if (params) {
+    scaleFactor_ = params->makeProperty<DoubleProperty>(typeName_ + "::", 1);
   }
-  return true;
+  return params;
 }
 
 bool VertexEllipseDrawAction::operator()(
     HyperGraph::HyperGraphElement& element,
-    const std::shared_ptr<HyperGraphElementAction::Parameters>& params_) {
+    HyperGraphElementAction::Parameters& params_) {
   if (typeid(element).name() != typeName_) return false;
 
   refreshPropertyPtrs(params_);

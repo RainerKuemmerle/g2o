@@ -54,24 +54,21 @@ VertexSE2DrawAction::VertexSE2DrawAction()
       triangleX_(nullptr),
       triangleY_(nullptr) {}
 
-bool VertexSE2DrawAction::refreshPropertyPtrs(
-    const std::shared_ptr<HyperGraphElementAction::Parameters>& parameters) {
-  if (!DrawAction::refreshPropertyPtrs(parameters)) return false;
-  if (previousParams_) {
-    triangleX_ = previousParams_->makeProperty<FloatProperty>(
-        typeName_ + "::TRIANGLE_X", .2F);
-    triangleY_ = previousParams_->makeProperty<FloatProperty>(
-        typeName_ + "::TRIANGLE_Y", .05F);
-  } else {
-    triangleX_ = nullptr;
-    triangleY_ = nullptr;
+DrawAction::Parameters* VertexSE2DrawAction::refreshPropertyPtrs(
+    HyperGraphElementAction::Parameters& parameters) {
+  DrawAction::Parameters* params = DrawAction::refreshPropertyPtrs(parameters);
+  if (params) {
+    triangleX_ =
+        params->makeProperty<FloatProperty>(typeName_ + "::TRIANGLE_X", .2F);
+    triangleY_ =
+        params->makeProperty<FloatProperty>(typeName_ + "::TRIANGLE_Y", .05F);
   }
-  return true;
+  return params;
 }
 
 bool VertexSE2DrawAction::operator()(
     HyperGraph::HyperGraphElement& element,
-    const std::shared_ptr<HyperGraphElementAction::Parameters>& parameters) {
+    HyperGraphElementAction::Parameters& parameters) {
   if (typeid(element).name() != typeName_) return false;
   initializeDrawActionsCache();
   refreshPropertyPtrs(parameters);

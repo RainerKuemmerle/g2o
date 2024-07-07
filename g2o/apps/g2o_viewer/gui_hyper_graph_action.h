@@ -36,8 +36,7 @@ class G2O_VIEWER_API GuiHyperGraphAction : public HyperGraphAction {
    * iteration
    */
   bool operator()(const HyperGraph& graph,
-                  const std::shared_ptr<HyperGraphAction::Parameters>&
-                      parameters = nullptr) override;
+                  HyperGraphAction::Parameters& parameters) override;
 
   G2oQGLViewer* viewer = nullptr;  ///< the viewer which visualizes the graph
   bool dumpScreenshots = false;

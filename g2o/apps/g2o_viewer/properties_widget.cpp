@@ -32,8 +32,7 @@ void PropertiesWidget::setSolver(
   updateDisplayedProperties();
 }
 
-g2o::PropertyMap* PropertiesWidget::propertyMap() {
+const g2o::PropertyMap* PropertiesWidget::propertyMap() {
   if (!solver_) return nullptr;
-  // HACK cast away the constness of the property map
-  return const_cast<g2o::PropertyMap*>(&solver_->properties());
+  return &solver_->properties();
 }
