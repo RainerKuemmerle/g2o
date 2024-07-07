@@ -33,6 +33,7 @@
 #include "g2o/core/robust_kernel.h"
 #include "g2o/core/robust_kernel_factory.h"
 #include "g2o/core/sparse_optimizer.h"
+#include "g2o/stuff/logger.h"
 #include "properties_widget.h"
 #include "viewer_properties_widget.h"
 
@@ -170,21 +171,21 @@ void MainWindow::updateDisplayedSolvers() {
   const g2o::OptimizationAlgorithmFactory::CreatorList& knownSolvers =
       g2o::OptimizationAlgorithmFactory::instance()->creatorList();
 
-  bool varFound = false;
-  std::string varType;
+  std::string varName;
   for (const auto& knownSolver : knownSolvers) {
     const g2o::OptimizationAlgorithmProperty& sp = knownSolver->property();
+    G2O_DEBUG("Available Solver {}", sp.name);
     if (sp.name == "gn_var" || sp.name == "gn_var_cholmod") {
-      varType = sp.type;
-      varFound = true;
+      G2O_INFO("Found variable solver {}", sp.name);
+      varName = sp.name;
       break;
     }
   }
 
-  if (varFound) {
+  if (!varName.empty()) {
     for (const auto& knownSolver : knownSolvers) {
       const g2o::OptimizationAlgorithmProperty& sp = knownSolver->property();
-      if (sp.type == varType) {
+      if (sp.name == varName) {
         coOptimizer->addItem(QString::fromStdString(sp.name));
         knownSolvers_.push_back(sp);
       }
@@ -196,7 +197,7 @@ void MainWindow::updateDisplayedSolvers() {
 
   for (const auto& knownSolver : knownSolvers) {
     const g2o::OptimizationAlgorithmProperty& sp = knownSolver->property();
-    if (varFound && varType == sp.type) continue;
+    if (!varName.empty() && varName == sp.type) continue;
     solverLookUp[sp.type].push_back(sp);
   }
 

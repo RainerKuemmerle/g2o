@@ -19,11 +19,12 @@
 #include "properties_widget.h"
 
 #include "g2o/core/optimization_algorithm.h"
+#include "g2o/stuff/logger.h"
 #include "g2o/stuff/property.h"
 
 PropertiesWidget::PropertiesWidget(QWidget* parent)
     : AbstractPropertiesWidget(parent) {
-  std::cerr << "Created Prop widget\n";
+  G2O_TRACE("Created Prop widget for solver");
 }
 
 void PropertiesWidget::setSolver(
