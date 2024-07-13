@@ -52,7 +52,6 @@ void EdgeSE2PointXYBearing::initialEstimate(
   l2->setEstimate(t * vr);
 }
 
-
 #ifndef NUMERIC_JACOBIAN_TWO_D_TYPES
 void EdgeSE2PointXYBearing::linearizeOplus() {
   const VertexSE2* vi = static_cast<const VertexSE2*>(_vertices[0]);
@@ -70,7 +69,6 @@ void EdgeSE2PointXYBearing::linearizeOplus() {
 
   _jacobianOplusXj(0, 0) = (y2 - y1) / aux;
   _jacobianOplusXj(0, 1) = (x1 - x2) / aux;
-
 }
 #endif
 
