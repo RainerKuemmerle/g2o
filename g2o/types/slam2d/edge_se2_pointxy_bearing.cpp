@@ -59,7 +59,6 @@ void EdgeSE2PointXYBearing::linearizeOplus() {
   const VertexPointXY* vj = static_cast<const VertexPointXY*>(_vertices[1]);
   const double& x1 = vi->estimate().translation()[0];
   const double& y1 = vi->estimate().translation()[1];
-  // const double& th1 = vi->estimate().rotation().angle();
   const double& x2 = vj->estimate()[0];
   const double& y2 = vj->estimate()[1];
 
