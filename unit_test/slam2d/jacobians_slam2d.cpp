@@ -156,8 +156,8 @@ TEST(Slam2D, EdgeSE2PointXYBearingJacobian) {
   numericJacobianWorkspace.allocate();
 
   for (int k = 0; k < 10000; ++k) {
-    /* Generate random estimate states, but don't evaluate those that are too close to error
-     * function singularity. */
+    /* Generate random estimate states, but don't evaluate those that are too
+     * close to error function singularity. */
     do {
       v1.setEstimate(randomSE2());
       v2.setEstimate(Eigen::Vector2d::Random());
