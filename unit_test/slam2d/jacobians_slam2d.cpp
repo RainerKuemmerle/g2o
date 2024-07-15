@@ -164,8 +164,9 @@ TEST(Slam2D, EdgeSE2PointXYBearingJacobian) {
       e.setMeasurement(g2o::Sampler::uniformRand(-1., 1.) * M_PI);
     } while ((v1.estimate().inverse() * v2.estimate()).norm() < 1e-6);
 
-    /* Note a larger tolerance versus the default of 1e-6 must be used due to poor behaviour
-     * of the numerical difference function that is used to provide golden data. */
+    /* Note a larger tolerance versus the default of 1e-6 must be used due to
+     * poor behaviour of the numerical difference function that is used to
+     * provide golden data. */
     evaluateJacobian(e, jacobianWorkspace, numericJacobianWorkspace, 1e-5);
   }
 }
