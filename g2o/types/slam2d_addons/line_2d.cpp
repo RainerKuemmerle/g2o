@@ -29,10 +29,7 @@
 namespace g2o {
 
 Line2D::Line2D() { setZero(); }
-Line2D::Line2D(const Vector2& v) {
-  (*this)[0] = v(0);
-  (*this)[1] = v(1);
-}
+Line2D::Line2D(const Vector2& v) : values_{v[0], v[1]} {}
 
 void Line2D::setZero() {
   values_[0] = 0.;

@@ -48,7 +48,7 @@ class G2O_TYPES_SLAM2D_ADDONS_API Line2D {
   double& operator[](int idx) { return values_[idx]; }
 
  protected:
-  double values_[2];
+  Vector2 values_;
 };
 
 G2O_TYPES_SLAM2D_ADDONS_API Line2D operator*(const SE2& t, const Line2D& l);
