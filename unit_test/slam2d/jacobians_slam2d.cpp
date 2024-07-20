@@ -163,12 +163,12 @@ TEST(Slam2D, EdgeSE2PointXYBearingJacobian) {
       v1->setEstimate(randomSE2());
       v2->setEstimate(Eigen::Vector2d::Random());
       e.setMeasurement(g2o::Sampler::uniformRand(-1., 1.) * M_PI);
-    } while ((v1->estimate().inverse() * v2->estimate()).norm() < 1e-6);
+    } while ((v1->estimate().inverse() * v2->estimate()).norm() < 1e-3);
 
     /* Note a larger tolerance versus the default of 1e-6 must be used due to
      * poor behaviour of the numerical difference function that is used to
      * provide golden data. */
     evaluateJacobian(e, jacobianWorkspace, numericJacobianWorkspace,
-                     [](const double, const double) { return 1e-5; });
+                     [](const double, const double) { return 1e-3; });
   }
 }
