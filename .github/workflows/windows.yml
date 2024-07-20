@@ -25,7 +25,7 @@ jobs:
           }
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
             fetch-depth: 25
 
@@ -55,11 +55,12 @@ jobs:
 
       - name: Build Introspection
         run: |
+          echo "Number of processors: $Env:NUMBER_OF_PROCESSORS"
           echo "g2o config.h"
           type ${{github.workspace}}/build/g2o/config.h
 
       - name: Build
-        run: cmake --build ${{github.workspace}}/build -j 2 --config ${{matrix.config.build_type}}
+        run: cmake --build ${{github.workspace}}/build -j $Env:NUMBER_OF_PROCESSORS --config ${{matrix.config.build_type}}
 
       - name: Test
         run: |

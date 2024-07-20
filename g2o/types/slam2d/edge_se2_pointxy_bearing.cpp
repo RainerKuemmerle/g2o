@@ -56,6 +56,26 @@ void EdgeSE2PointXYBearing::initialEstimate(
   l2->setEstimate(t * vr);
 }
 
+#ifndef NUMERIC_JACOBIAN_TWO_D_TYPES
+void EdgeSE2PointXYBearing::linearizeOplus() {
+  const VertexSE2* vi = vertexXnRaw<0>();
+  const VertexPointXY* vj = vertexXnRaw<1>();
+  const double& x1 = vi->estimate().translation()[0];
+  const double& y1 = vi->estimate().translation()[1];
+  const double& x2 = vj->estimate()[0];
+  const double& y2 = vj->estimate()[1];
+
+  double aux = (std::pow(x2 - x1, 2) + std::pow(y2 - y1, 2));
+
+  jacobianOplusXi_(0, 0) = (y1 - y2) / aux;
+  jacobianOplusXi_(0, 1) = (x2 - x1) / aux;
+  jacobianOplusXi_(0, 2) = 1;
+
+  jacobianOplusXj_(0, 0) = (y2 - y1) / aux;
+  jacobianOplusXj_(0, 1) = (x1 - x2) / aux;
+}
+#endif
+
 #ifdef G2O_HAVE_OPENGL
 EdgeSE2PointXYBearingDrawAction::EdgeSE2PointXYBearingDrawAction()
     : DrawAction(typeid(EdgeSE2PointXYBearing).name()) {}
