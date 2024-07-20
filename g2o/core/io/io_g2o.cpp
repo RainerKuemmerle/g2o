@@ -29,6 +29,7 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <type_traits>
 #include <unordered_set>
 #include <vector>
 
@@ -39,15 +40,10 @@
 #include "g2o/stuff/string_tools.h"
 
 namespace {
-std::ostream& operator<<(std::ostream& os, const std::vector<double>& v) {
-  for (size_t i = 0; i < v.size(); ++i) {
-    if (i > 0) os << " ";
-    os << v[i];
-  }
-  return os;
-}
-
-std::ostream& operator<<(std::ostream& os, const std::vector<int>& v) {
+template <typename T>
+std::ostream& operator<<(std::ostream& os, const std::vector<T>& v) {
+  static_assert(std::is_integral_v<T> || std::is_floating_point_v<T>,
+                "Type has to be integral or floating point");
   for (size_t i = 0; i < v.size(); ++i) {
     if (i > 0) os << " ";
     os << v[i];

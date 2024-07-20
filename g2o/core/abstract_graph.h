@@ -109,30 +109,51 @@ class G2O_CORE_API AbstractGraph {
   AbstractGraph() = default;
   ~AbstractGraph() = default;
 
+  /**
+   * @brief Load from the input assuming given format
+   *
+   * @param input The input stream for reading data.
+   * @param format The output format.
+   * @return true iff loading was successful
+   */
   bool load(std::istream& input, io::Format format);
 
   [[nodiscard]] bool save(std::ostream& output, io::Format format) const;
 
+  //! The ids of fixed vertices
   std::vector<int>& fixed() { return fixed_; };
   [[nodiscard]] const std::vector<int>& fixed() const { return fixed_; };
 
+  //! The parameters of the graph
   std::vector<AbstractParameter>& parameters() { return parameters_; };
   [[nodiscard]] const std::vector<AbstractParameter>& parameters() const {
     return parameters_;
   };
 
+  //! The vertices of the graph
   std::vector<AbstractVertex>& vertices() { return vertices_; };
   [[nodiscard]] const std::vector<AbstractVertex>& vertices() const {
     return vertices_;
   };
 
+  //! The edges of the graph
   std::vector<AbstractEdge>& edges() { return edges_; };
   [[nodiscard]] const std::vector<AbstractEdge>& edges() const {
     return edges_;
   };
 
+  /**
+   * @brief Clear all structures of the graph.
+   *
+   * Clear all vertices, edges, and parameters of the graph.
+   */
   void clear();
 
+  /**
+   * @brief Set a mapping for renaming tags.
+   *
+   * @param tag_mapping mapping from -> to for renaming types in the graph.
+   */
   void renameTags(
       const std::unordered_map<std::string, std::string>& tag_mapping);
 
