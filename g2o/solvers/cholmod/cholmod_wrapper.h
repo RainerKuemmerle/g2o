@@ -69,14 +69,14 @@ class Cholmod {
   };
 
   bool factorize();
-  bool hasFactor() const;
+  [[nodiscard]] bool hasFactor() const;
   void freeFactor();
   bool simplifyFactor();
 
   //! compute AMD ordering on the given SparseView, store into result
   bool amd(SparseView& sparseView, int* result);
 
-  int choleskyNz() const;
+  [[nodiscard]] int choleskyNz() const;
 
   void solve(double* x, double* b) const;
 
