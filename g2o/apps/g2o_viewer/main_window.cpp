@@ -25,14 +25,17 @@
 #include <cassert>
 #include <fstream>
 #include <iostream>
+#include <string>
 
 #include "g2o/core/estimate_propagator.h"
+#include "g2o/core/io/io_format.h"
 #include "g2o/core/optimization_algorithm.h"
 #include "g2o/core/optimization_algorithm_factory.h"
 #include "g2o/core/optimization_algorithm_property.h"
 #include "g2o/core/robust_kernel.h"
 #include "g2o/core/robust_kernel_factory.h"
 #include "g2o/core/sparse_optimizer.h"
+#include "g2o/stuff/filesys_tools.h"
 #include "g2o/stuff/logger.h"
 #include "properties_widget.h"
 #include "viewer_properties_widget.h"
@@ -221,9 +224,16 @@ bool MainWindow::load(const QString& filename) {
     std::cerr << "reading stdin\n";
     loadStatus = viewer->graph->load(std::cin);
   } else {
-    std::ifstream ifs(filename.toStdString().c_str());
+    const std::string filename_as_std = filename.toStdString();
+    const std::string filename_extension =
+        g2o::getFileExtension(filename_as_std);
+    std::optional<g2o::io::Format> file_format =
+        g2o::io::formatForFileExtension(filename_extension);
+    std::ifstream ifs(filename_as_std);
     if (!ifs) return false;
-    loadStatus = viewer->graph->load(ifs);
+    loadStatus = file_format.has_value()
+                     ? viewer->graph->load(ifs, file_format.value())
+                     : viewer->graph->load(ifs);
   }
   if (!loadStatus) return false;
   lastSolver_ = -1;

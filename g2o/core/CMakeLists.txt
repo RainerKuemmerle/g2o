@@ -40,6 +40,7 @@ robust_kernel_factory.cpp robust_kernel_factory.h
 g2o_core_api.h
 # IO
 abstract_graph.cpp abstract_graph.h
+io/io_format.cpp
 io/io_binary.cpp io/io_binary.h
 io/io_json.cpp io/io_json.h
 io/io_g2o.cpp io/io_g2o.h

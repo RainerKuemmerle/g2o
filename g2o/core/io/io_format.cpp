@@ -24,27 +24,19 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef G2O_CORE_IO_FORMAT_H
-#define G2O_CORE_IO_FORMAT_H
+#include "io_format.h"
 
 #include <optional>
 #include <string_view>
 
-#include "g2o/core/g2o_core_api.h"
 namespace g2o::io {
 
-enum class G2O_CORE_API Format { kG2O = 0, kBinary = 1, kJson = 2, kXML = 3 };
-
-/**
- * @brief Maps a file extension to a format value
- *
- * @param extension Filename extension, e.g., json, g2o, xml, bin
- * @return std::optional<Format> of the corresponding format, nullopt if cannot
- * match
- */
-G2O_CORE_API std::optional<Format> formatForFileExtension(
-    std::string_view extension);
+std::optional<Format> formatForFileExtension(std::string_view extension) {
+  if (extension == "g2o" || extension == "G2O") return Format::kG2O;
+  if (extension == "json" || extension == "JSON") return Format::kJson;
+  if (extension == "xml" || extension == "XML") return Format::kXML;
+  if (extension == "bin" || extension == "BIN") return Format::kBinary;
+  return std::nullopt;
+}
 
 }  // namespace g2o::io
-
-#endif
