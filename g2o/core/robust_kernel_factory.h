@@ -82,7 +82,7 @@ class G2O_CORE_API RobustKernelFactory {
    * register a tag for a specific creator
    */
   void registerRobustKernel(const std::string& tag,
-                            const AbstractRobustKernelCreator::Ptr& c);
+                            AbstractRobustKernelCreator::Ptr c);
 
   /**
    * unregister a tag for a specific creator

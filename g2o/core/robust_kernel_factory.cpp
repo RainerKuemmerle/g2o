@@ -44,7 +44,7 @@ RobustKernelFactory* RobustKernelFactory::instance() {
 }
 
 void RobustKernelFactory::registerRobustKernel(
-    const std::string& tag, const AbstractRobustKernelCreator::Ptr& c) {
+    const std::string& tag, AbstractRobustKernelCreator::Ptr c) {
   const auto foundIt = creator_.find(tag);
   if (foundIt != creator_.end()) {
     G2O_WARN("RobustKernelFactory WARNING: Overwriting robust kernel tag {}",
@@ -52,7 +52,7 @@ void RobustKernelFactory::registerRobustKernel(
     assert(0 && "Overwriting robust kernel tag");
   }
 
-  creator_[tag] = c;
+  creator_[tag] = std::move(c);
 }
 
 void RobustKernelFactory::unregisterType(const std::string& tag) {
