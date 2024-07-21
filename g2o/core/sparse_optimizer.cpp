@@ -33,6 +33,7 @@
 #include <iostream>
 #include <set>
 #include <string_view>
+#include <unordered_set>
 #include <utility>
 
 #include "batch_stats.h"
@@ -173,19 +174,22 @@ bool SparseOptimizer::buildIndexMapping(
 
   ivMap_.resize(vlist.size());
   size_t i = 0;
-  for (int k = 0; k < 2; k++)
+  for (int k = 0; k < 2; k++) {
+    const bool expected_marginalized = k != 0;
     for (auto& it : vlist) {
       OptimizableGraph::Vertex* v = it.get();
-      if (!v->fixed()) {
-        if (static_cast<int>(v->marginalized()) == k) {
-          v->setHessianIndex(i);
-          ivMap_[i] = v;
-          i++;
-        }
-      } else {
+      if (v->fixed()) {
         v->setHessianIndex(-1);
+        continue;
       }
+      if (v->marginalized() != expected_marginalized) {
+        continue;
+      }
+      v->setHessianIndex(i);
+      ivMap_[i] = v;
+      ++i;
     }
+  }
   ivMap_.resize(i);
   return true;
 }
@@ -261,7 +265,7 @@ bool SparseOptimizer::initializeOptimization(HyperGraph::VertexSet& vset,
 
   activeEdges_.reserve(auxEdgeSet.size());
   for (const auto& it : auxEdgeSet)
-    activeEdges_.push_back(std::static_pointer_cast<Edge>(it));
+    activeEdges_.emplace_back(std::static_pointer_cast<Edge>(it));
 
   sortVectorContainers();
   bool indexMappingStatus = buildIndexMapping(activeVertices_);
@@ -306,7 +310,7 @@ void SparseOptimizer::computeInitialGuess() {
 
 void SparseOptimizer::computeInitialGuess(EstimatePropagatorCost& propagator) {
   OptimizableGraph::VertexSet emptySet;
-  std::set<Vertex*> backupVertices;
+  std::unordered_set<Vertex*> backupVertices;
   OptimizableGraph::VertexSet fixedVertices;  // these are the root nodes where
                                               // to start the initialization
   for (auto& e : activeEdges_) {

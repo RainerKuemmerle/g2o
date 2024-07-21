@@ -44,6 +44,7 @@
 #include "g2o/core/optimization_algorithm_property.h"
 #include "g2o/core/sparse_optimizer.h"
 #include "g2o/stuff/string_tools.h"
+#include "g2o/types/slam2d/edge_pointxy.h"
 #include "g2o/types/slam2d/edge_se2.h"
 #include "g2o/types/slam2d/vertex_point_xy.h"
 #include "g2o/types/slam2d/vertex_se2.h"
@@ -133,6 +134,65 @@ TEST(General, GraphAddEdge) {
   const bool removed = optimizer->removeEdge(e1);
   ASSERT_TRUE(removed);
   ASSERT_TRUE(optimizer->edges().empty());
+}
+
+TEST(General, GraphIndexMapping) {
+  auto optimizer = g2o::internal::createOptimizerForTests();
+
+  int id = 0;
+  auto p1 = std::make_shared<g2o::VertexPointXY>();
+  p1->setId(id++);
+  p1->setMarginalized(true);
+
+  auto v0 = std::make_shared<g2o::VertexSE2>();
+  v0->setId(id++);
+  v0->setFixed(true);
+  auto v1 = std::make_shared<g2o::VertexSE2>();
+  v1->setId(id++);
+  auto v2 = std::make_shared<g2o::VertexSE2>();
+  v2->setId(id++);
+
+  ASSERT_TRUE(optimizer->addVertex(p1));
+  ASSERT_TRUE(optimizer->addVertex(v1));
+  ASSERT_TRUE(optimizer->addVertex(v2));
+
+  auto e0 = std::make_shared<g2o::EdgeSE2>();
+  e0->setVertex(0, v0);
+  e0->setVertex(1, v1);
+  ASSERT_TRUE(optimizer->addEdge(e0));
+
+  auto e1 = std::make_shared<g2o::EdgeSE2>();
+  e1->setVertex(0, v1);
+  e1->setVertex(1, v2);
+  ASSERT_TRUE(optimizer->addEdge(e1));
+
+  auto e2 = std::make_shared<g2o::EdgePointXY>();
+  e2->setVertex(0, v1);
+  e2->setVertex(1, p1);
+  ASSERT_TRUE(optimizer->addEdge(e2));
+
+  optimizer->initializeOptimization();
+
+  // Check Hessian index
+  EXPECT_NE(p1->hessianIndex(), -1);
+  EXPECT_EQ(v0->hessianIndex(), -1);
+  EXPECT_NE(v1->hessianIndex(), -1);
+  EXPECT_NE(v2->hessianIndex(), -1);
+  EXPECT_LE(v1->hessianIndex(), p1->hessianIndex());
+  EXPECT_LE(v2->hessianIndex(), p1->hessianIndex());
+
+  // Check order in index mapping
+  ASSERT_THAT(optimizer->indexMapping(),
+              UnorderedElementsAre(p1.get(), v1.get(), v2.get()));
+  auto findVertex = [&optimizer](g2o::OptimizableGraph::Vertex* vertex) {
+    return std::find(optimizer->indexMapping().begin(),
+                     optimizer->indexMapping().end(), vertex);
+  };
+  auto p1_it = findVertex(p1.get());
+  auto v1_it = findVertex(v1.get());
+  auto v2_it = findVertex(v2.get());
+  EXPECT_LE(v1_it, p1_it);
+  EXPECT_LE(v2_it, p1_it);
 }
 
 TEST(General, GraphAddVertexAndClear) {

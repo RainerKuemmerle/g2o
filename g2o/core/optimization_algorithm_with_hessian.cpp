@@ -52,11 +52,7 @@ bool OptimizationAlgorithmWithHessian::init(bool online) {
       break;
     }
   }
-  if (useSchur) {
-    if (solver_.supportsSchur()) solver_.setSchur(true);
-  } else {
-    if (solver_.supportsSchur()) solver_.setSchur(false);
-  }
+  if (solver_.supportsSchur()) solver_.setSchur(useSchur);
 
   const bool initState = solver_.init(optimizer_, online);
   return initState;
