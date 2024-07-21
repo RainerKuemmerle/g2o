@@ -49,9 +49,9 @@ def main():
     trans0 = optimizer.vertex(0).estimate().inverse()
     trans1 = optimizer.vertex(1).estimate().inverse()
 
-    for i in range(len(true_points)):
-        pt0 = trans0 * true_points[i]
-        pt1 = trans1 * true_points[i]
+    for i, true_pt in enumerate(true_points):
+        pt0 = trans0 * true_pt
+        pt1 = trans1 * true_pt
 
         # add noise
         pt0 += np.random.randn(3) * args.pos_noise
