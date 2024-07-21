@@ -28,6 +28,7 @@
 #include <iostream>
 #include <utility>
 
+#include "g2o/core/eigen_types.h"
 #include "g2o/core/sparse_optimizer.h"
 #include "g2o/stuff/command_args.h"
 #include "g2o/stuff/sampler.h"
@@ -106,10 +107,7 @@ struct Sensor {
 using SensorVector = std::vector<Sensor*>;
 
 struct Robot : public WorldItem {
-  explicit Robot(OptimizableGraph* graph_) : WorldItem(graph_) {
-    planarMotion = false;
-    position = Isometry3::Identity();
-  }
+  explicit Robot(OptimizableGraph* graph_) : WorldItem(graph_) {}
 
   void move(const Isometry3& newPosition, int& id) {
     Isometry3 delta = position.inverse() * newPosition;
@@ -158,10 +156,10 @@ struct Robot : public WorldItem {
     }
   }
 
-  Isometry3 position;
+  Isometry3 position = Isometry3::Identity();
   SensorVector sensors;
-  Vector6 nmovecov;
-  bool planarMotion;
+  Vector6 nmovecov = Vector6::Ones();
+  bool planarMotion = false;
 };
 
 using RobotVector = std::vector<Robot*>;
@@ -200,8 +198,8 @@ struct PlaneItem : public WorldItem {
 };
 
 struct PlaneSensor : public Sensor {
-  PlaneSensor(Robot* r, int offsetId, const Isometry3& offset_) : Sensor(r) {
-    _offsetVertex = std::make_shared<VertexSE3>();
+  PlaneSensor(Robot* r, int offsetId, const Isometry3& offset_)
+      : Sensor(r), _offsetVertex(std::make_shared<VertexSE3>()) {
     _offsetVertex->setId(offsetId);
     _offsetVertex->setEstimate(offset_);
     robot()->graph()->addVertex(_offsetVertex);
