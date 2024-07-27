@@ -22,9 +22,11 @@
 #include <QDoubleValidator>
 #include <QFileDialog>
 #include <QStandardItemModel>
+#include <algorithm>
 #include <cassert>
 #include <fstream>
 #include <iostream>
+#include <iterator>
 #include <string>
 
 #include "g2o/core/estimate_propagator.h"
@@ -40,10 +42,56 @@
 #include "properties_widget.h"
 #include "viewer_properties_widget.h"
 
+namespace {
+/**
+ * @brief Join into a string using a delimeter
+ *
+ * @tparam Iterator
+ * @tparam std::iterator_traits<Iterator>::value_type
+ * @param b begin of the range for output
+ * @param e end of the range for output
+ * @param delimiter will be inserted in between elements
+ * @return std::string joined string
+ */
+template <typename Iterator,
+          typename Value = typename std::iterator_traits<Iterator>::value_type>
+std::string strJoin(Iterator b, Iterator e, const std::string& delimiter) {
+  std::ostringstream os;
+  if (b != e) {
+    std::copy(b, std::prev(e),
+              std::ostream_iterator<Value>(os, delimiter.c_str()));
+    b = std::prev(e);
+  }
+  if (b != e) {
+    os << *b;
+  }
+  return os.str();
+}
+
+QString prepareFilter(const std::vector<g2o::io::FileFilter>& filters) {
+  std::vector<std::string> filter_patterns;
+  filter_patterns.reserve(filters.size());
+  std::transform(filters.begin(), filters.end(),
+                 std::back_inserter(filter_patterns),
+                 [](const g2o::io::FileFilter& f) { return f.filter; });
+  return QString::fromStdString(
+      strJoin(filter_patterns.begin(), filter_patterns.end(), ";;"));
+}
+
+g2o::io::Format extractFileFormat(
+    const std::vector<g2o::io::FileFilter>& filters,
+    const std::string& file_pattern) {
+  for (const auto& f : filters) {
+    if (f.filter == file_pattern) return f.format;
+  }
+  return g2o::io::Format::kUndefined;
+}
+}  // namespace
+
 MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
   setupUi(this);
   leKernelWidth->setValidator(
-      new QDoubleValidator(-std::numeric_limits<double>::max(),
+      new QDoubleValidator(std::numeric_limits<double>::lowest(),
                            std::numeric_limits<double>::max(), 7, this));
   plainTextEdit->setMaximumBlockCount(1000);
   btnForceStop->hide();
@@ -52,19 +100,34 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
 }
 
 void MainWindow::on_actionLoad_triggered(bool) {
+  const std::vector<g2o::io::FileFilter> file_filters =
+      g2o::io::getFileFilter(true /*open*/);
+  QString selectedFilter;
   const QString filename = QFileDialog::getOpenFileName(
-      this, "Load g2o file", "", "g2o files (*.g2o);;All Files (*)");
+      this, "Load g2o file", "", prepareFilter(file_filters), &selectedFilter);
   if (!filename.isNull()) {
-    loadFromFile(filename);
+    const g2o::io::Format file_format =
+        extractFileFormat(file_filters, selectedFilter.toStdString());
+    G2O_DEBUG("Selected filter {} with format {}", selectedFilter.toStdString(),
+              g2o::io::to_string(file_format));
+    loadFromFile(filename, file_format);
   }
 }
 
 void MainWindow::on_actionSave_triggered(bool) {
+  const std::vector<g2o::io::FileFilter> file_filters =
+      g2o::io::getFileFilter(false /*open*/);
+  QString selectedFilter;
+
   const QString filename = QFileDialog::getSaveFileName(
-      this, "Save g2o file", "", "g2o files (*.g2o)");
+      this, "Save g2o file", "", prepareFilter(file_filters), &selectedFilter);
   if (!filename.isNull()) {
+    const g2o::io::Format file_format =
+        extractFileFormat(file_filters, selectedFilter.toStdString());
+    G2O_DEBUG("Selected filter {} with format {}", selectedFilter.toStdString(),
+              g2o::io::to_string(file_format));
     std::ofstream fout(filename.toStdString().c_str());
-    viewer->graph->save(fout);
+    viewer->graph->save(fout, file_format);
     if (fout.good())
       std::cerr << "Saved " << filename.toStdString() << '\n';
     else
@@ -217,18 +280,20 @@ void MainWindow::updateDisplayedSolvers() {
   }
 }
 
-bool MainWindow::load(const QString& filename) {
+bool MainWindow::load(const QString& filename, g2o::io::Format format) {
   viewer->graph->clear();
   bool loadStatus = false;
   if (filename == "-") {
     std::cerr << "reading stdin\n";
-    loadStatus = viewer->graph->load(std::cin);
+    loadStatus = viewer->graph->load(std::cin, format);
   } else {
     const std::string filename_as_std = filename.toStdString();
     const std::string filename_extension =
         g2o::getFileExtension(filename_as_std);
-    std::optional<g2o::io::Format> file_format =
-        g2o::io::formatForFileExtension(filename_extension);
+    const std::optional<g2o::io::Format> file_format =
+        format != g2o::io::Format::kUndefined
+            ? format
+            : g2o::io::formatForFileExtension(filename_extension);
     std::ifstream ifs(filename_as_std);
     if (!ifs) return false;
     loadStatus = file_format.has_value()
@@ -346,9 +411,9 @@ void MainWindow::setRobustKernel() {
 
 void MainWindow::on_btnForceStop_clicked() { forceStopFlag_ = true; }
 
-bool MainWindow::loadFromFile(const QString& filename) {
+bool MainWindow::loadFromFile(const QString& filename, g2o::io::Format format) {
   viewer->graph->clear();
-  bool loadStatus = load(filename);
+  bool loadStatus = load(filename, format);
   if (loadStatus) {
     filename_ = filename.toStdString();
   }
