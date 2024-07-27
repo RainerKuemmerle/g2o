@@ -21,6 +21,7 @@
 
 #include <vector>
 
+#include "g2o/core/io/io_format.h"
 #include "g2o/core/optimization_algorithm_property.h"
 #include "g2o_viewer_api.h"
 #include "ui_base_main_window.h"
@@ -56,7 +57,8 @@ class G2O_VIEWER_API MainWindow : public QMainWindow,
   /**
    * load a graph on which we will operate from a file
    */
-  bool loadFromFile(const QString& filename);
+  bool loadFromFile(const QString& filename,
+                    g2o::io::Format format = g2o::io::Format::kUndefined);
 
  public slots:  // NOLINT
   void on_actionLoad_triggered(bool);
@@ -80,7 +82,8 @@ class G2O_VIEWER_API MainWindow : public QMainWindow,
   bool allocateSolver(bool& allocatedNewSolver);
   bool prepare();
   void setRobustKernel();
-  bool load(const QString& filename);
+  bool load(const QString& filename,
+            g2o::io::Format format = g2o::io::Format::kUndefined);
 
   std::vector<g2o::OptimizationAlgorithmProperty> knownSolvers_;
   int lastSolver_ = -1;

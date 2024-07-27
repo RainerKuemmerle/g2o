@@ -316,3 +316,21 @@ const auto kFileformatsToTest = Values(
 INSTANTIATE_TEST_SUITE_P(AbstractGraph, AbstractGraphIO, kFileformatsToTest);
 INSTANTIATE_TEST_SUITE_P(OptimizableGraphGraph, OptimizableGraphIO,
                          kFileformatsToTest);
+
+TEST(OptimizableGraphIO, FileFilter) {
+  EXPECT_THAT(g2o::io::getFileFilter(false), Not(IsEmpty()));
+  EXPECT_THAT(g2o::io::getFileFilter(true), Not(IsEmpty()));
+  EXPECT_THAT(g2o::io::getFileFilter(false),
+              IsSubsetOf(g2o::io::getFileFilter(true)));
+}
+
+TEST(OptimizableGraphIO, FormatToString) {
+  static constexpr g2o::io::Format kAllFormats[] = {
+      g2o::io::Format::kUndefined, g2o::io::Format::kG2O,
+      g2o::io::Format::kBinary, g2o::io::Format::kJson, g2o::io::Format::kXML};
+  for (const auto& f : kAllFormats)
+    EXPECT_THAT(g2o::io::to_string(f), Not(IsEmpty()));
+
+  EXPECT_THAT(g2o::io::to_string(static_cast<g2o::io::Format>(1 << 31)),
+              IsEmpty());
+}

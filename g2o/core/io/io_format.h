@@ -28,12 +28,33 @@
 #define G2O_CORE_IO_FORMAT_H
 
 #include <optional>
+#include <string>
 #include <string_view>
+#include <vector>
 
 #include "g2o/core/g2o_core_api.h"
 namespace g2o::io {
 
-enum class G2O_CORE_API Format { kG2O = 0, kBinary = 1, kJson = 2, kXML = 3 };
+enum class G2O_CORE_API Format {
+  kUndefined = -1,
+  kG2O = 0,
+  kBinary = 1,
+  kJson = 2,
+  kXML = 3
+};
+
+G2O_CORE_API std::string_view to_string(g2o::io::Format format);
+
+/**
+ * @brief FileFilter information for Open/Save Dialog
+ *
+ */
+struct G2O_CORE_API FileFilter {
+  FileFilter(std::string filter, Format format);
+  std::string filter;  ///< filter string
+  Format format;       ///< IO format
+  bool operator==(const FileFilter& other) const;
+};
 
 /**
  * @brief Maps a file extension to a format value
@@ -44,6 +65,14 @@ enum class G2O_CORE_API Format { kG2O = 0, kBinary = 1, kJson = 2, kXML = 3 };
  */
 G2O_CORE_API std::optional<Format> formatForFileExtension(
     std::string_view extension);
+
+/**
+ * @brief Get the filters for file open dialogs.
+ *
+ * @param open true, if opening files, false for save
+ * @return std::vector<std::string> Filters
+ */
+G2O_CORE_API std::vector<FileFilter> getFileFilter(bool open);
 
 }  // namespace g2o::io
 

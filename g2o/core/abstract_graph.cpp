@@ -37,22 +37,6 @@
 #include "io/io_g2o.h"
 
 namespace {
-#ifdef G2O_HAVE_LOGGING
-std::string_view to_string(g2o::io::Format format) {
-  switch (format) {
-    case g2o::io::Format::kG2O:
-      return "G2O";
-    case g2o::io::Format::kBinary:
-      return "Binary";
-    case g2o::io::Format::kJson:
-      return "JSON";
-    case g2o::io::Format::kXML:
-      return "XML";
-  }
-  return "";
-}
-#endif
-
 /**
  * @brief Allocate an g2o::IoInterface to load/save data of the graph.
  *
@@ -61,6 +45,9 @@ std::string_view to_string(g2o::io::Format format) {
  */
 std::unique_ptr<g2o::IoInterface> allocate(g2o::io::Format format) {
   switch (format) {
+    case g2o::io::Format::kUndefined:
+      G2O_WARN("Cannot allocate IO interface for undefined format");
+      return nullptr;
     case g2o::io::Format::kG2O:
       return std::make_unique<g2o::IoG2O>();
     case g2o::io::Format::kBinary:
@@ -71,7 +58,7 @@ std::unique_ptr<g2o::IoInterface> allocate(g2o::io::Format format) {
       return std::make_unique<g2o::IoXml>();
   }
   G2O_CRITICAL("Failed to create graph IO interface for format {}",
-               to_string(format));
+               g2o::io::to_string(format));
   return nullptr;
 }
 
