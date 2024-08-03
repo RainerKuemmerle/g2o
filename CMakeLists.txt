@@ -7,7 +7,6 @@ set(CMAKE_OSX_DEPLOYMENT_TARGET "10.15" CACHE STRING "Minimum OS X deployment ta
 
 project(g2o)
 
-include(CPack)
 include(GNUInstallDirs)
 
 # The library prefix
@@ -464,6 +463,11 @@ install(
     EXPORT "${G2O_TARGETS_EXPORT_NAME}"
     NAMESPACE "${G2O_NAMESPACE}"
     DESTINATION "${G2O_CONFIG_INSTALL_DIR}")
+
+option(G2O_BUILD_PACKAGE "Include package build config for cpack" OFF)
+if(G2O_BUILD_PACKAGE)
+  include(Packaging)
+endif()
 
 # Include the subdirectories
 add_subdirectory(g2o)
