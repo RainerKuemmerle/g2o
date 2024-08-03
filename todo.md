@@ -11,6 +11,7 @@
 [ ] update py_base_vertex/edge to map now common methods
 [ ] Use FakeDependency in Traits
 [ ] wrap abstract graph to python and update save wrapper
+[x] CPack config
 [x] Create parameter type for ParameterCamera to support load/save
 [x] Refactor Data container. Can it be a container instead of linked list?
 [x] EdgeSE2TwoPointsXY, EdgeSE2PointXYCalib can be fixed size edges -> IO test
