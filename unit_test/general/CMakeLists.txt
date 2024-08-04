@@ -9,6 +9,7 @@ add_executable(unittest_general
   robust_kernel_tests.cpp
   sparse_block_matrix.cpp
   type_traits_tests.cpp
+  optimization_basics.cpp
 )
 target_link_libraries(unittest_general unittest_helper)
 target_link_libraries(unittest_general types_slam3d types_slam2d types_data)

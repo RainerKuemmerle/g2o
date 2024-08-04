@@ -100,18 +100,18 @@ class BaseVertex : public OptimizableGraph::Vertex {
   HessianBlockType& A() { return hessian_; }
   const HessianBlockType& A() const { return hessian_; }
 
-  void push() final { backup_.push(estimate_); }
-  void pop() final {
+  void push() override { backup_.push(estimate_); }
+  void pop() override {
     assert(!backup_.empty());
     estimate_ = backup_.top();
     backup_.pop();
     updateCache();
   }
-  void discardTop() final {
+  void discardTop() override {
     assert(!backup_.empty());
     backup_.pop();
   }
-  [[nodiscard]] int stackSize() const final { return backup_.size(); }
+  [[nodiscard]] int stackSize() const override { return backup_.size(); }
 
   //! return the current estimate of the vertex
   const EstimateType& estimate() const { return estimate_; }

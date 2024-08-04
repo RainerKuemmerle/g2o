@@ -31,8 +31,7 @@
 #include "g2o/core/optimization_algorithm_levenberg.h"
 #include "g2o/solvers/eigen/linear_solver_eigen.h"
 
-namespace g2o {
-namespace internal {
+namespace g2o::internal {
 
 using SlamBlockSolver = g2o::BlockSolver<g2o::BlockSolverTraits<-1, -1>>;
 using SlamLinearSolver =
@@ -64,5 +63,4 @@ std::unique_ptr<g2o::SparseOptimizer> createLmOptimizerForTests() {
   return create(true);
 }
 
-}  // namespace internal
-}  // namespace g2o
+}  // namespace g2o::internal
