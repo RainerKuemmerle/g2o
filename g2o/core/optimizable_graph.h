@@ -743,8 +743,8 @@ class G2O_CORE_API OptimizableGraph : public HyperGraph {
    */
   virtual void clearParameters();
 
-  bool addParameter(const std::shared_ptr<Parameter>& p) {
-    return parameters_.addParameter(p);
+  bool addParameter(std::shared_ptr<Parameter> p) {
+    return parameters_.addParameter(std::move(p));
   }
 
   std::shared_ptr<Parameter> parameter(int id) const {
