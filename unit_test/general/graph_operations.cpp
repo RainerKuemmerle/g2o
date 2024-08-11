@@ -490,7 +490,7 @@ class GeneralGraphOperations : public ::testing::Test {
   }
 
   std::shared_ptr<g2o::SparseOptimizer> optimizer_;
-  static constexpr size_t kNumVertices = 3;
+  static constexpr size_t kNumVertices = 5;
 };
 
 constexpr size_t GeneralGraphOperations::kNumVertices;
@@ -921,6 +921,64 @@ TEST_F(GeneralGraphOperations, JacWorkspace) {
       testing::Each(testing::ResultOf(
           [](const g2o::VectorX& vec) { return vec.isApproxToConstant(0); },
           testing::IsTrue())));
+}
+
+TEST_F(GeneralGraphOperations, MergeVertices) {
+  auto extractVertexIds = [this]() {
+    std::vector<int> vertex_ids;
+    for (const auto& v : optimizer_->vertices()) {
+      vertex_ids.push_back(v.first);
+    }
+    std::sort(vertex_ids.begin(), vertex_ids.end());
+    return vertex_ids;
+  };
+
+  const std::vector<int> vertex_ids = extractVertexIds();
+  const int size_before = optimizer_->vertices().size();
+  auto v_small = std::static_pointer_cast<g2o::HyperGraph::Vertex>(
+      optimizer_->vertex(vertex_ids.back()));
+  auto v_big = std::static_pointer_cast<g2o::HyperGraph::Vertex>(
+      optimizer_->vertex(vertex_ids[1]));
+  const int v_small_edges_before = v_small->edges().size();
+  const int v_big_edges_before = v_big->edges().size();
+
+  bool merge_result = optimizer_->mergeVertices(v_big, v_small, true /*erase*/);
+
+  const std::vector<int> vertex_ids_after = extractVertexIds();
+
+  ASSERT_TRUE(merge_result);
+  EXPECT_THAT(optimizer_->vertices(), SizeIs(size_before - 1));
+  EXPECT_THAT(v_small->edges(), IsEmpty());
+  EXPECT_THAT(v_big->edges(),
+              SizeIs(v_big_edges_before + v_small_edges_before));
+  EXPECT_THAT(vertex_ids_after, Not(Contains(v_small->id())));
+  EXPECT_THAT(vertex_ids_after, Not(Contains(v_small->id())));
+  EXPECT_THAT(optimizer_->vertex(v_small->id()), IsNull());
+}
+
+TEST_F(GeneralGraphOperations, DetachVertex) {
+  auto vertex_not_in_graph = std::make_shared<g2o::VertexSE2>();
+  vertex_not_in_graph->setId(kNumVertices + 10);
+
+  EXPECT_FALSE(optimizer_->detachVertex(vertex_not_in_graph));
+
+  const int target_id = kNumVertices / 2;
+  auto vertex_in_graph = optimizer_->vertex(target_id);
+  ASSERT_THAT(vertex_in_graph, NotNull());
+  EXPECT_TRUE(optimizer_->detachVertex(vertex_in_graph));
+  EXPECT_THAT(optimizer_->vertex(target_id), NotNull());
+  EXPECT_THAT(vertex_in_graph->edges(), IsEmpty());
+}
+
+TEST_F(GeneralGraphOperations, HyperGraphVertex) {
+  const int target_id = kNumVertices / 2;
+
+  std::shared_ptr<g2o::OptimizableGraph::Vertex> vertex =
+      optimizer_->vertex(target_id);
+  std::shared_ptr<g2o::HyperGraph::Vertex> hg_vertex =
+      optimizer_->HyperGraph::vertex(target_id);
+
+  EXPECT_THAT(vertex.get(), Eq(hg_vertex.get()));
 }
 
 namespace {
