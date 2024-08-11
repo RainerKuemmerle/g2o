@@ -30,6 +30,7 @@
 #include <cstddef>
 #include <memory>
 
+#include "g2o/core/eigen_types.h"
 #include "g2o/core/factory.h"
 #include "g2o/core/hyper_graph.h"
 #include "g2o/core/hyper_graph_action.h"
@@ -122,7 +123,7 @@ TEST(OptimizationBasics, ActionCalls) {
   // Add vertices
   for (size_t i = 0; i < kNumVertices; ++i) {
     auto v = std::make_shared<MockVertexSE2>();
-    v->setEstimate(g2o::SE2());
+    v->setEstimate(g2o::SE2(g2o::Vector3::Random()));
     v->setId(i);
     v->setFixed(i == 0);  // fix the first vertex
     optimizer->addVertex(v);
@@ -133,7 +134,7 @@ TEST(OptimizationBasics, ActionCalls) {
     auto e1 = std::make_shared<g2o::EdgeSE2>();
     e1->vertices()[0] = optimizer->vertex((i + 0) % kNumVertices);
     e1->vertices()[1] = optimizer->vertex((i + 1) % kNumVertices);
-    e1->setMeasurement(g2o::SE2(1., 0., 0.));
+    e1->setMeasurement(g2o::SE2(g2o::Vector3::Random()));
     e1->setInformation(g2o::EdgeSE2::InformationType::Identity());
     optimizer->addEdge(e1);
   }
