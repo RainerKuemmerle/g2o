@@ -132,14 +132,11 @@ class CommandArgsTestAdapter : public g2o::CommandArgs {
 };
 }  // namespace
 
-class CommandArgsTypeToStr : public testing::TestWithParam<int> {
- protected:
-  CommandArgsTestAdapter command_args;
-};
+class CommandArgsTypeToStr : public testing::TestWithParam<int> {};
 
 TEST_P(CommandArgsTypeToStr, type2str) {
   const int type = GetParam();
-  const std::string type_str = command_args.type2str(type);
+  const std::string type_str = CommandArgsTestAdapter::type2str(type);
   EXPECT_FALSE(type_str.empty());
 }
 
