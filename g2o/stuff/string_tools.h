@@ -27,6 +27,8 @@
 #ifndef G2O_STRING_TOOLS_H
 #define G2O_STRING_TOOLS_H
 
+#include <algorithm>
+#include <iterator>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -94,6 +96,30 @@ G2O_STUFF_API bool strEndsWith(const std::string& str, const std::string& end);
  */
 G2O_STUFF_API std::vector<std::string> strSplit(const std::string& s,
                                                 const std::string& delim);
+
+/**
+ * @brief Join into a string using a delimeter
+ *
+ * @tparam Iterator
+ * @tparam std::iterator_traits<Iterator>::value_type
+ * @param b begin of the range for output
+ * @param e end of the range for output
+ * @param delimiter will be inserted in between elements
+ * @return std::string joined string
+ */
+template <typename Iterator,
+          typename Value = typename std::iterator_traits<Iterator>::value_type>
+std::string strJoin(Iterator b, Iterator e, const std::string& delimiter = "") {
+  if (b == e) return "";
+  std::ostringstream os;
+  std::copy(b, std::prev(e),
+            std::ostream_iterator<Value>(os, delimiter.c_str()));
+  b = std::prev(e);
+  if (b != e) {
+    os << *b;
+  }
+  return os.str();
+}
 
 /**
  * read a line from is into currentLine.

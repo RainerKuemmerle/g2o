@@ -79,6 +79,14 @@ TEST(Stuff, StrSplit) {
     ASSERT_EQ(std::to_string(i + 1), tokens[i]);
 }
 
+TEST(Stuff, StrJoin) {
+  std::vector<int> int_data = {1, 2, 3};
+  EXPECT_EQ("123", g2o::strJoin(int_data.begin(), int_data.end()));
+  EXPECT_EQ("1", g2o::strJoin(int_data.begin(), std::next(int_data.begin())));
+  EXPECT_EQ("", g2o::strJoin(int_data.begin(), int_data.begin()));
+  EXPECT_EQ("1, 2, 3", g2o::strJoin(int_data.begin(), int_data.end(), ", "));
+}
+
 TEST(Stuff, StrStartsWith) {
   ASSERT_FALSE(g2o::strStartsWith("Hello World!", "World!"));
   ASSERT_TRUE(g2o::strStartsWith("Hello World!", "Hello"));
