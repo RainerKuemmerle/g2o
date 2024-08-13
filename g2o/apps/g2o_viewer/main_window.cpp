@@ -39,35 +39,11 @@
 #include "g2o/core/sparse_optimizer.h"
 #include "g2o/stuff/filesys_tools.h"
 #include "g2o/stuff/logger.h"
+#include "g2o/stuff/string_tools.h"
 #include "properties_widget.h"
 #include "viewer_properties_widget.h"
 
 namespace {
-/**
- * @brief Join into a string using a delimeter
- *
- * @tparam Iterator
- * @tparam std::iterator_traits<Iterator>::value_type
- * @param b begin of the range for output
- * @param e end of the range for output
- * @param delimiter will be inserted in between elements
- * @return std::string joined string
- */
-template <typename Iterator,
-          typename Value = typename std::iterator_traits<Iterator>::value_type>
-std::string strJoin(Iterator b, Iterator e, const std::string& delimiter) {
-  std::ostringstream os;
-  if (b != e) {
-    std::copy(b, std::prev(e),
-              std::ostream_iterator<Value>(os, delimiter.c_str()));
-    b = std::prev(e);
-  }
-  if (b != e) {
-    os << *b;
-  }
-  return os.str();
-}
-
 QString prepareFilter(const std::vector<g2o::io::FileFilter>& filters) {
   std::vector<std::string> filter_patterns;
   filter_patterns.reserve(filters.size());
@@ -75,7 +51,7 @@ QString prepareFilter(const std::vector<g2o::io::FileFilter>& filters) {
                  std::back_inserter(filter_patterns),
                  [](const g2o::io::FileFilter& f) { return f.filter; });
   return QString::fromStdString(
-      strJoin(filter_patterns.begin(), filter_patterns.end(), ";;"));
+      g2o::strJoin(filter_patterns.begin(), filter_patterns.end(), ";;"));
 }
 
 g2o::io::Format extractFileFormat(

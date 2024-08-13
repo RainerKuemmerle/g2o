@@ -432,8 +432,9 @@ bool OptimizableGraph::load(std::istream& is, io::Format format) {
       }
     }
     if (!vertsOkay) {
-      G2O_ERROR("Unable to find vertices for edge {} IDs: {}",
-                abstract_edge.tag, fmt::join(abstract_edge.ids, " "));
+      G2O_ERROR(
+          "Unable to find vertices for edge {} IDs: {}", abstract_edge.tag,
+          strJoin(abstract_edge.ids.begin(), abstract_edge.ids.end(), " "));
       continue;
     }
     for (size_t i = 0; i < abstract_edge.param_ids.size(); ++i) {
@@ -451,8 +452,9 @@ bool OptimizableGraph::load(std::istream& is, io::Format format) {
         if (r != c) information(c, r) = information(r, c);
       }
     if (!addEdge(edge)) {
-      G2O_ERROR("Failure adding Edge {} IDs {}", abstract_edge.tag,
-                fmt::join(abstract_edge.ids, " "));
+      G2O_ERROR(
+          "Failure adding Edge {} IDs {}", abstract_edge.tag,
+          strJoin(abstract_edge.ids.begin(), abstract_edge.ids.end(), " "));
     }
     if (!abstract_edge.data.empty())
       addDataToGraphElement(*edge, abstract_edge.data);
@@ -755,10 +757,10 @@ bool OptimizableGraph::verifyInformationMatrices(bool verbose) const {
         for (const auto& v : e->vertices()) ids.push_back(v->id());
         if (!isSymmetric)
           G2O_WARN("Information Matrix for an edge is not symmetric: {}",
-                   fmt::join(ids, " "));
+                   strJoin(ids.begin(), ids.end(), " "));
         else
           G2O_WARN("Information Matrix for an edge is not SPD: {}",
-                   fmt::join(ids, " "));
+                   strJoin(ids.begin(), ids.end(), " "));
         if (isSymmetric)
           G2O_WARN("eigenvalues: {}", eigenSolver.eigenvalues().transpose());
       }

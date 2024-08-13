@@ -123,7 +123,7 @@ std::optional<AbstractGraph> IoG2O::load(std::istream& input) {
       }
       result.vertices().emplace_back(vertex);
       G2O_TRACE("Read vertex {} with estimate [{}]", vertex.tag,
-                fmt::join(vertex.estimate, ","));
+                strJoin(vertex.estimate.begin(), vertex.estimate.end(), ", "));
       last_data_container = &result.vertices().back();
     } else if (type_info.elementTypeBit == HyperGraph::kHgetEdge) {
       AbstractGraph::AbstractEdge edge;
@@ -169,8 +169,9 @@ std::optional<AbstractGraph> IoG2O::load(std::istream& input) {
       G2O_TRACE(
           "Read edge {} connecting [{}] with measurement [{}] and information "
           "[{}]",
-          edge.tag, fmt::join(edge.ids, ","), fmt::join(edge.measurement, ","),
-          fmt::join(edge.information, ","));
+          edge.tag, strJoin(edge.ids.begin(), edge.ids.end(), ", "),
+          strJoin(edge.measurement.begin(), edge.measurement.end(), ", "),
+          strJoin(edge.information.begin(), edge.information.end(), ", "));
       last_data_container = &result.edges().back();
     } else if (type_info.elementTypeBit == HyperGraph::kHgetData) {
       if (!last_data_container) {
