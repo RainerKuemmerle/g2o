@@ -473,14 +473,14 @@ bool OptimizableGraph::load(istream& is) {
       }
       if (!vertsOkay) {
         G2O_ERROR("Unable to find vertices for edge {} at line {} IDs: {}",
-                  token, lineNumber, fmt::join(ids, " "));
+                  token, lineNumber, strJoin(ids.begin(), ids.end(), " "));
         delete e;
         e = nullptr;
       } else {
         bool r = e->read(currentLine);
         if (!r || !addEdge(e)) {
           G2O_ERROR("Unable to add edge {} at line {} IDs: {}", token,
-                    lineNumber, fmt::join(ids, " "));
+                    lineNumber, strJoin(ids.begin(), ids.end(), " "));
           delete e;
           e = nullptr;
         }
