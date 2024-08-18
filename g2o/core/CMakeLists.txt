@@ -57,11 +57,8 @@ set_target_properties(core PROPERTIES
   SOVERSION ${G2O_LIB_SOVERSION})
 target_link_libraries(core PUBLIC stuff Eigen3::Eigen)
 target_link_libraries(core PUBLIC g2o_ceres_ad)
-if (TARGET cereal::cereal)
-target_link_libraries(core PUBLIC cereal::cereal)
-endif()
 if (TARGET nlohmann_json::nlohmann_json)
-target_link_libraries(core PRIVATE nlohmann_json::nlohmann_json)
+  target_link_libraries(core PRIVATE nlohmann_json::nlohmann_json)
 endif()
 target_compile_features(core PUBLIC cxx_std_17)
 
