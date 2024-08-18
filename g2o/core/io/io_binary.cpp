@@ -30,26 +30,35 @@
 
 #include "g2o/config.h"
 #include "g2o/core/abstract_graph.h"
-
-#ifdef G2O_HAVE_CEREAL
-#include <cereal/archives/portable_binary.hpp>
-#include <cereal/cereal.hpp>
-
-#include "io_wrapper_cereal.h"  // IWYU pragma: keep
-#else
 #include "g2o/stuff/logger.h"
-#endif  // HAVE CEREAL
+
+#ifdef G2O_HAVE_JSON
+#include "io_wrapper_json.h"
+#endif  // HAVE_JSON
 
 namespace g2o {
 
-#ifdef G2O_HAVE_CEREAL
+#ifdef G2O_HAVE_JSON
 
 std::optional<AbstractGraph> IoBinary::load(std::istream& input) {
-  return io::load<cereal::PortableBinaryInputArchive>(input, "BINARY");
+  try {
+    return json::fromJson(nlohmann::json::from_cbor(input));
+  } catch (const std::exception& e) {
+    G2O_ERROR("Exception while loading: {}", e.what());
+  }
+  return std::nullopt;
 }
 
 bool IoBinary::save(std::ostream& output, const AbstractGraph& graph) {
-  return io::save<cereal::PortableBinaryOutputArchive>(output, graph, "BINARY");
+  try {
+    std::vector<std::uint8_t> binary =
+        nlohmann::json::to_cbor(json::toJson(graph));
+    output.write(reinterpret_cast<char*>(binary.data()), binary.size());
+    return output.good();
+  } catch (const std::exception& e) {
+    G2O_ERROR("Exception while saving: {}", e.what());
+  }
+  return false;
 }
 
 #else

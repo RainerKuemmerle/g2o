@@ -306,7 +306,7 @@ namespace {
 // We can always test G2O format, others depend on libraries
 const auto kFileformatsToTest =
     Values(g2o::io::Format::kG2O
-#ifdef G2O_HAVE_CEREAL
+#ifdef G2O_HAVE_JSON
            ,
            g2o::io::Format::kJson, g2o::io::Format::kBinary
 #endif

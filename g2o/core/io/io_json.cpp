@@ -35,35 +35,19 @@
 
 #ifdef G2O_HAVE_JSON
 #include <nlohmann/json.hpp>
-#endif  // HAVE CEREAL
+
+#include "io_wrapper_json.h"
+#endif  // HAVE_JSON
 
 namespace g2o {
 
 #ifdef G2O_HAVE_JSON
 
-NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(AbstractGraph::AbstractParameter, tag, id,
-                                   value);
-NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(AbstractGraph::AbstractData, tag, data);
-NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(AbstractGraph::AbstractVertex, tag, id,
-                                   estimate, data);
-NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(AbstractGraph::AbstractEdge, tag, ids,
-                                   param_ids, measurement, information, data);
-
 std::optional<AbstractGraph> IoJson::load(std::istream& input) {
-  nlohmann::json json;
   try {
+    nlohmann::json json;
     input >> json;
-    const nlohmann::json& json_graph = json["graph"];
-    AbstractGraph graph;
-    graph.fixed() = json_graph["fixed"].get<std::vector<int>>();
-    graph.parameters() =
-        json_graph["params"]
-            .get<std::vector<AbstractGraph::AbstractParameter>>();
-    graph.vertices() = json_graph["vertices"]
-                           .get<std::vector<AbstractGraph::AbstractVertex>>();
-    graph.edges() =
-        json_graph["edges"].get<std::vector<AbstractGraph::AbstractEdge>>();
-    return graph;
+    return json::fromJson(json);
   } catch (const std::exception& e) {
     G2O_ERROR("Exception while saving: {}", e.what());
   }
@@ -71,14 +55,8 @@ std::optional<AbstractGraph> IoJson::load(std::istream& input) {
 }
 
 bool IoJson::save(std::ostream& output, const AbstractGraph& graph) {
-  nlohmann::json json;
   try {
-    nlohmann::json& json_graph = json["graph"];
-    json_graph["fixed"] = graph.fixed();
-    json_graph["params"] = graph.parameters();
-    json_graph["vertices"] = graph.vertices();
-    json_graph["edges"] = graph.edges();
-    output << json;
+    output << json::toJson(graph);
   } catch (const std::exception& e) {
     G2O_ERROR("Exception while saving: {}", e.what());
     return false;
