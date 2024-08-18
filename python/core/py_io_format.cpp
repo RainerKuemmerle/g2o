@@ -8,8 +8,7 @@ void declareIOFormat(py::module& m) {
   py::enum_<io::Format>(m, "IoFormat")
       .value("G2O", io::Format::kG2O, "G2O's custom ASCII IO format")
       .value("JSON", io::Format::kJson, "JSON IO format")
-      .value("BINARY", io::Format::kBinary, "G2O's custom binary format")
-      .value("XML", io::Format::kXML, "XML IO format");
+      .value("BINARY", io::Format::kBinary, "G2O's custom binary format");
 }
 
 }  // end namespace g2o

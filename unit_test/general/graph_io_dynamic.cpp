@@ -180,7 +180,6 @@ const auto kFileformatsToTest =
 #ifdef G2O_HAVE_CEREAL
                ,
            std::make_tuple(g2o::io::Format::kJson, true),
-           std::make_tuple(g2o::io::Format::kXML, true),
            std::make_tuple(g2o::io::Format::kBinary, true)
 #endif
     );

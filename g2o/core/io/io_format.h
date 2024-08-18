@@ -40,7 +40,6 @@ enum class G2O_CORE_API Format {
   kG2O = 0,
   kBinary = 1,
   kJson = 2,
-  kXML = 3
 };
 
 G2O_CORE_API std::string_view to_string(g2o::io::Format format);
