@@ -44,6 +44,10 @@
 #include "gtest/gtest.h"
 #include "unit_test/test_helper/allocate_optimizer.h"
 
+#ifdef G2O_HAVE_JSON
+#include "g2o/core/io/io_json.h"
+#endif
+
 using namespace testing;  // NOLINT
 
 MATCHER(ParamEqual, "") {
@@ -316,6 +320,20 @@ const auto kFileformatsToTest =
 INSTANTIATE_TEST_SUITE_P(AbstractGraph, AbstractGraphIO, kFileformatsToTest);
 INSTANTIATE_TEST_SUITE_P(OptimizableGraphGraph, OptimizableGraphIO,
                          kFileformatsToTest);
+
+TEST(OptimizableGraphIO, IllegalJson) {
+#ifdef G2O_HAVE_JSON
+  std::istringstream input(R"({"name": "Joe", "age": 42})");
+  g2o::IoJson json;
+#ifdef NDEBUG
+  EXPECT_FALSE(json.load(input).has_value());
+#else
+  EXPECT_DEBUG_DEATH(json.load(input), "file json.hpp");
+#endif
+#else
+  SUCCEED();
+#endif
+}
 
 TEST(OptimizableGraphIO, FileFilter) {
   EXPECT_THAT(g2o::io::getFileFilter(false), Not(IsEmpty()));

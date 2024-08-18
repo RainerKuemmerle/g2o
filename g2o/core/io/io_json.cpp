@@ -49,7 +49,7 @@ std::optional<AbstractGraph> IoJson::load(std::istream& input) {
     input >> json;
     return json::fromJson(json);
   } catch (const std::exception& e) {
-    G2O_ERROR("Exception while saving: {}", e.what());
+    G2O_ERROR("Exception while loading: {}", e.what());
   }
   return std::nullopt;
 }
