@@ -1,3 +1,4 @@
+[ ] drop cereal (replace with json directly, drop xml) simdjson
 [x] wrap simulator into library
 [x] add config types for simulation
 [ ] add tests for simulator
