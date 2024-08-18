@@ -1,4 +1,5 @@
-[ ] drop cereal (replace with json directly, drop xml) simdjson
+[ ] drop cereal (replace with json directly, drop xml)
+[ ] install json on Windows CI
 [x] wrap simulator into library
 [x] add config types for simulation
 [ ] add tests for simulator
