@@ -41,8 +41,6 @@ std::string_view to_string(g2o::io::Format format) {
       return "Binary";
     case g2o::io::Format::kJson:
       return "JSON";
-    case g2o::io::Format::kXML:
-      return "XML";
   }
   return "";
 }
@@ -50,7 +48,6 @@ std::string_view to_string(g2o::io::Format format) {
 std::optional<Format> formatForFileExtension(std::string_view extension) {
   if (extension == "g2o" || extension == "G2O") return Format::kG2O;
   if (extension == "json" || extension == "JSON") return Format::kJson;
-  if (extension == "xml" || extension == "XML") return Format::kXML;
   if (extension == "bin" || extension == "BIN") return Format::kBinary;
   return std::nullopt;
 }
@@ -66,7 +63,6 @@ std::vector<FileFilter> getFileFilter(bool open) {
   std::vector<FileFilter> result;
   result.emplace_back("g2o Ascii files (*.g2o)", Format::kG2O);
   result.emplace_back("g2o Json files (*.json)", Format::kJson);
-  result.emplace_back("g2o XML files (*.xml)", Format::kXML);
   result.emplace_back("g2o BIN files (*.bin)", Format::kBinary);
   if (open) {
     result.emplace_back("All Files (*)", Format::kUndefined);

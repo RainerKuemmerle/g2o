@@ -304,13 +304,13 @@ TEST_P(OptimizableGraphIO, SaveAndLoad) {
 
 namespace {
 // We can always test G2O format, others depend on libraries
-const auto kFileformatsToTest = Values(
-    g2o::io::Format::kG2O
+const auto kFileformatsToTest =
+    Values(g2o::io::Format::kG2O
 #ifdef G2O_HAVE_CEREAL
-    ,
-    g2o::io::Format::kJson, g2o::io::Format::kXML, g2o::io::Format::kBinary
+           ,
+           g2o::io::Format::kJson, g2o::io::Format::kBinary
 #endif
-);
+    );
 }  // namespace
 
 INSTANTIATE_TEST_SUITE_P(AbstractGraph, AbstractGraphIO, kFileformatsToTest);
@@ -327,7 +327,7 @@ TEST(OptimizableGraphIO, FileFilter) {
 TEST(OptimizableGraphIO, FormatToString) {
   static constexpr g2o::io::Format kAllFormats[] = {
       g2o::io::Format::kUndefined, g2o::io::Format::kG2O,
-      g2o::io::Format::kBinary, g2o::io::Format::kJson, g2o::io::Format::kXML};
+      g2o::io::Format::kBinary, g2o::io::Format::kJson};
   for (const auto& f : kAllFormats)
     EXPECT_THAT(g2o::io::to_string(f), Not(IsEmpty()));
 
