@@ -100,9 +100,9 @@ following packages.
 
 -   spdlog <https://github.com/gabime/spdlog>
 -   suitesparse <http://faculty.cse.tamu.edu/davis/suitesparse.html>
--   cereal <https://uscilab.github.io/cereal/index.html>
 -   Qt5 <http://qt-project.org>
 -   libQGLViewer <http://www.libqglviewer.com>
+-   JSON for Modern C++ <https://github.com/nlohmann/json>
 
 On Ubuntu / Debian these dependencies are resolved by installing the
 following packages.

@@ -47,7 +47,7 @@ NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(AbstractGraph::AbstractEdge, tag, ids,
 namespace json {
 
 /**
- * @brief Versions of the IO API for the graph using cereal.
+ * @brief Versions of the IO API for the graph. Currently not stored.
  */
 enum class IoVersions {
   kGraph = 0,
