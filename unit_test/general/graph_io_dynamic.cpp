@@ -177,7 +177,7 @@ namespace {
 // We can always test G2O format, others depend on libraries
 const auto kFileformatsToTest =
     Values(std::make_tuple(g2o::io::Format::kG2O, true)
-#ifdef G2O_HAVE_CEREAL
+#ifdef G2O_HAVE_JSON
                ,
            std::make_tuple(g2o::io::Format::kJson, true),
            std::make_tuple(g2o::io::Format::kBinary, true)

@@ -421,18 +421,12 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${g2o_CXX_FLAGS}")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${g2o_C_FLAGS}")
 
 find_package(Eigen3 3.3 REQUIRED)
-find_package(cereal)
 find_package(nlohmann_json 3.2.0)
 
 # Generate config.h
 set(G2O_OPENGL_FOUND ${OPENGL_FOUND})
 set(G2O_HAVE_CHOLMOD ${CHOLMOD_FOUND})
 set(G2O_HAVE_CSPARSE ${G2O_USE_CSPARSE})
-if (TARGET cereal::cereal)
-  set(G2O_HAVE_CEREAL 1)
-else()
-  set(G2O_HAVE_CEREAL 0)
-endif()
 if (TARGET nlohmann_json::nlohmann_json)
   set(G2O_HAVE_JSON 1)
 else()

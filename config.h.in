@@ -7,7 +7,6 @@
 #cmakedefine G2O_SHARED_LIBS 1
 #cmakedefine G2O_LGPL_SHARED_LIBS 1
 
-#cmakedefine G2O_HAVE_CEREAL 1
 #cmakedefine G2O_HAVE_JSON 1
 
 // available sparse matrix libraries
