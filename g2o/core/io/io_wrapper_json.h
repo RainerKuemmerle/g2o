@@ -35,14 +35,77 @@
 #include "g2o/core/abstract_graph.h"
 
 namespace g2o {
+namespace internal {
+/**
+ * @brief Get the object from the JSON if key exists
+ *
+ * @tparam T type of the target value
+ * @param j a JSON
+ * @param key key for retrieving the value
+ * @param target Where to store the value
+ */
+template <typename T>
+void get_to_if_exists(const nlohmann::json& j, const char* key, T& target) {
+  auto it = j.find(key);
+  if (it == j.end()) return;
+  it->get_to(target);
+}
+
+/**
+ * @brief Store a container into the JSON if not empty
+ *
+ * @tparam T type of the container
+ * @param j a JSON
+ * @param key key for storing the container
+ * @param value the container to store
+ */
+template <typename T>
+void store_if_not_empty(nlohmann::json& j, const char* key, const T& value) {
+  if (value.empty()) return;
+  j[key] = value;
+}
+}  // namespace internal
 
 NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(AbstractGraph::AbstractParameter, tag, id,
                                    value);
 NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(AbstractGraph::AbstractData, tag, data);
-NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(AbstractGraph::AbstractVertex, tag, id,
-                                   estimate, data);
-NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(AbstractGraph::AbstractEdge, tag, ids,
-                                   param_ids, measurement, information, data);
+
+// VERTEX
+inline void to_json(nlohmann::json& j,
+                    const AbstractGraph::AbstractVertex& vertex) {
+  j = nlohmann::json{
+      {"tag", vertex.tag}, {"id", vertex.id}, {"estimate", vertex.estimate}};
+  internal::store_if_not_empty(j, "data", vertex.data);
+}
+
+inline void from_json(const nlohmann::json& j,
+                      AbstractGraph::AbstractVertex& vertex) {
+  j.at("tag").get_to(vertex.tag);
+  j.at("id").get_to(vertex.id);
+  j.at("estimate").get_to(vertex.estimate);
+  internal::get_to_if_exists(j, "data", vertex.data);
+}
+
+// EDGE
+inline void to_json(nlohmann::json& j,
+                    const AbstractGraph::AbstractEdge& edge) {
+  j = nlohmann::json{{"tag", edge.tag},
+                     {"ids", edge.ids},
+                     {"measurement", edge.measurement},
+                     {"information", edge.information}};
+  internal::store_if_not_empty(j, "data", edge.data);
+  internal::store_if_not_empty(j, "param_ids", edge.param_ids);
+}
+
+inline void from_json(const nlohmann::json& j,
+                      AbstractGraph::AbstractEdge& edge) {
+  j.at("tag").get_to(edge.tag);
+  j.at("ids").get_to(edge.ids);
+  j.at("measurement").get_to(edge.measurement);
+  j.at("information").get_to(edge.information);
+  internal::get_to_if_exists(j, "data", edge.data);
+  internal::get_to_if_exists(j, "param_ids", edge.param_ids);
+}
 
 namespace json {
 
