@@ -124,23 +124,20 @@ enum class IoVersions {
 inline AbstractGraph fromJson(const nlohmann::json& json) {
   const nlohmann::json& json_graph = json["graph"];
   AbstractGraph graph;
-  graph.fixed() = json_graph["fixed"].get<std::vector<int>>();
-  graph.parameters() =
-      json_graph["params"].get<std::vector<AbstractGraph::AbstractParameter>>();
-  graph.vertices() =
-      json_graph["vertices"].get<std::vector<AbstractGraph::AbstractVertex>>();
-  graph.edges() =
-      json_graph["edges"].get<std::vector<AbstractGraph::AbstractEdge>>();
+  json_graph["vertices"].get_to(graph.vertices());
+  json_graph["edges"].get_to(graph.edges());
+  internal::get_to_if_exists(json_graph, "fixed", graph.fixed());
+  internal::get_to_if_exists(json_graph, "params", graph.parameters());
   return graph;
 }
 
 inline nlohmann::json toJson(const AbstractGraph& graph) {
   nlohmann::json json;
   nlohmann::json& json_graph = json["graph"];
-  json_graph["fixed"] = graph.fixed();
-  json_graph["params"] = graph.parameters();
   json_graph["vertices"] = graph.vertices();
   json_graph["edges"] = graph.edges();
+  g2o::internal::store_if_not_empty(json_graph, "fixed", graph.fixed());
+  g2o::internal::store_if_not_empty(json_graph, "params", graph.parameters());
   return json;
 }
 
