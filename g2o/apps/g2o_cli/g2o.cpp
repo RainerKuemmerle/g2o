@@ -31,6 +31,7 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <string_view>
 
 #include "dl_wrapper.h"
 #include "g2o/config.h"
@@ -64,6 +65,15 @@ void sigquit_handler(int sig) {
       exit(1);
     }
   }
+}
+
+g2o::io::Format guessIOFormat(const std::string_view filename) {
+  const std::string file_extension = g2o::getFileExtension(filename);
+  if (file_extension.empty()) {
+    return g2o::io::Format::kG2O;
+  }
+  return g2o::io::formatForFileExtension(file_extension)
+      .value_or(g2o::io::Format::kG2O);
 }
 }  // namespace
 
@@ -274,13 +284,15 @@ int main(int argc, char** argv) {
       return 2;
     }
   } else {
-    cerr << "Read input from " << inputFilename << '\n';
+    const g2o::io::Format input_format = guessIOFormat(inputFilename);
+    cerr << "Read input from " << inputFilename << " as "
+         << g2o::io::to_string(input_format) << '\n';
     std::ifstream ifs(inputFilename.c_str());
     if (!ifs) {
       cerr << "Failed to open file\n";
       return 1;
     }
-    if (!optimizer.load(ifs)) {
+    if (!optimizer.load(ifs, input_format)) {
       cerr << "Error loading graph\n";
       return 2;
     }
@@ -693,12 +705,7 @@ int main(int argc, char** argv) {
       cerr << "saving to stdout";
       optimizer.save(cout);
     } else {
-      const std::string file_extension = g2o::getFileExtension(outputfilename);
-      g2o::io::Format output_format = g2o::io::Format::kG2O;
-      if (!file_extension.empty()) {
-        output_format = g2o::io::formatForFileExtension(file_extension)
-                            .value_or(output_format);
-      }
+      const g2o::io::Format output_format = guessIOFormat(outputfilename);
       cerr << "saving " << outputfilename << " in "
            << g2o::io::to_string(output_format) << " ... ";
       optimizer.save(outputfilename.c_str(), output_format);
