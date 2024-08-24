@@ -38,6 +38,7 @@
 #include "g2o/core/estimate_propagator.h"
 #include "g2o/core/factory.h"
 #include "g2o/core/hyper_dijkstra.h"
+#include "g2o/core/io/io_format.h"
 #include "g2o/core/optimization_algorithm.h"
 #include "g2o/core/optimization_algorithm_factory.h"
 #include "g2o/core/robust_kernel.h"
@@ -45,6 +46,7 @@
 #include "g2o/core/sparse_optimizer.h"
 #include "g2o/core/sparse_optimizer_terminate_action.h"
 #include "g2o/stuff/command_args.h"
+#include "g2o/stuff/filesys_tools.h"
 #include "g2o/stuff/logger.h"
 #include "g2o/stuff/macros.h"
 #include "g2o/stuff/timeutil.h"
@@ -691,8 +693,15 @@ int main(int argc, char** argv) {
       cerr << "saving to stdout";
       optimizer.save(cout);
     } else {
-      cerr << "saving " << outputfilename << " ... ";
-      optimizer.save(outputfilename.c_str());
+      const std::string file_extension = g2o::getFileExtension(outputfilename);
+      g2o::io::Format output_format = g2o::io::Format::kG2O;
+      if (!file_extension.empty()) {
+        output_format = g2o::io::formatForFileExtension(file_extension)
+                            .value_or(output_format);
+      }
+      cerr << "saving " << outputfilename << " in "
+           << g2o::io::to_string(output_format) << " ... ";
+      optimizer.save(outputfilename.c_str(), output_format);
     }
     cerr << "done.\n";
   }
