@@ -27,6 +27,7 @@
 #include "io_json.h"
 
 #include <exception>
+#include <iomanip>
 #include <optional>
 
 #include "g2o/config.h"
@@ -56,6 +57,7 @@ std::optional<AbstractGraph> IoJson::load(std::istream& input) {
 
 bool IoJson::save(std::ostream& output, const AbstractGraph& graph) {
   try {
+    output << std::setw(2);
     output << json::toJson(graph);
   } catch (const std::exception& e) {
     G2O_ERROR("Exception while saving: {}", e.what());

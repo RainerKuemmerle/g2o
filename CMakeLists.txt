@@ -421,7 +421,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${g2o_CXX_FLAGS}")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${g2o_C_FLAGS}")
 
 find_package(Eigen3 3.3 REQUIRED)
-find_package(nlohmann_json 3.2.0)
+find_package(nlohmann_json 3.3.0)
 
 # Generate config.h
 set(G2O_OPENGL_FOUND ${OPENGL_FOUND})
