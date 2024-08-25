@@ -124,7 +124,8 @@ class AbstractGraphIO : public TestWithParam<g2o::io::Format> {
         "EDGE_SE2", std::vector<int>{1, 2}, std::vector<double>{0.1, 0.2, 0.3},
         std::vector<double>{1., 2., 3., 4., 5., 6.}, std::vector<int>(),
         std::vector<g2o::AbstractGraph::AbstractData>{
-            {"VERTEX_TAG", "more fancy data"}});
+            {"VERTEX_TAG", "more fancy data"},
+            {"VERTEX_TAG", "even more fancy data"}});
     abstract_graph_.edges().emplace_back(
         "EDGE_SE2", std::vector<int>{2, 3}, std::vector<double>{0.4, 0.5, 0.6},
         std::vector<double>{1.1, 2.1, 3.1, 4.1, 5.1, 6.1});
@@ -169,7 +170,7 @@ TEST_F(AbstractGraphIO, RenameTags) {
 }
 
 TEST_P(AbstractGraphIO, SaveAndLoad) {
-  g2o::io::Format format = GetParam();
+  const g2o::io::Format format = GetParam();
   g2o::AbstractGraph load_save_graph(abstract_graph_);
 
   std::stringstream buffer(format == g2o::io::Format::kBinary
