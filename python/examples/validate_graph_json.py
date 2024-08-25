@@ -1,12 +1,11 @@
 #!/usr/bin/env python3
 
 import argparse
-import errno
 import json
 import sys
 from typing import Any, Optional
 
-from jsonschema import ValidationError, validate
+import jsonschema
 
 
 def read_json(filename) -> Optional[Any]:
@@ -34,20 +33,18 @@ def main():
 
     schema = read_json(args.schema)
     if schema is None:
-        print("Error while reading schema")
-        sys.exit(errno.EIO)
+        sys.exit("Error while reading schema")
 
     json_data = read_json(args.input)
     if json_data is None:
-        print("Error while graph input for validation")
-        sys.exit(errno.EIO)
+        sys.exit("Error while graph input for validation")
 
     try:
-        validate(instance=json_data, schema=schema)
+        jsonschema.validate(instance=json_data, schema=schema)
         print("Success")
-    except ValidationError as ex:
-        print("Validation failed")
+    except jsonschema.ValidationError as ex:
         print(ex)
+        sys.exit("Validation failed")
 
 
 if __name__ == "__main__":
