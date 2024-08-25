@@ -1,4 +1,7 @@
 # Content to be saved
+
+A graph inside the g2o framework consists of the following entities.
+
 - Parameters
 - Vertex / Dynamic
   - Data
@@ -18,7 +21,7 @@ We have the following trivially copyable types which we need to handle.
 - Int: An integer number
 - Float:  A floating point
 
-## Paramater
+## Parameter
 - String, the tag of the parameter
 - Int, the unique ID of the parameter
 - [Float], the value of the parameter
@@ -31,15 +34,17 @@ We have the following trivially copyable types which we need to handle.
 - String, the tag of the vertex
 - Int, the unique ID of the vertex
 - [Float], the estimate of the vertex
-- [Data], the data associated to the vertex
+- Optional:
+  - [Data], the data associated to the vertex
 
 ## Edge / Dynamic Edge
 - String, the tag of the vertex
 - [Int], the unique IDs of the edge's vertices
-- [Int], the unique IDs of the edge's parameters
 - [Float], the measurement of the edge
 - [Float], the information matrix of the edge
-- [Data], the data associated to the edge
+- Optional:
+  - [Int], the unique IDs of the edge's parameters
+  - [Data], the data associated to the edge
 
 A Data element belongs to a vertex or an edge in a parent/child relation.
 
@@ -48,22 +53,34 @@ A Data element belongs to a vertex or an edge in a parent/child relation.
 
 # A graph
 
-A graph comprises above information. And we will save it in a specific order.
+A graph comprises above information.
 
-- "Fixed"
-  - [Int]
-- "Parameters"
-  - [Parameter]
 - "Vertices"
   - [Vertex]
 - "Edges"
   - [Edge]
+- Optional:
+  - "Fixed"
+    - [Int]
+  - "Parameters"
+    - [Parameter]
+
+See [file-format-jsonschema.json](file-format-jsonschema.json) for a Json schema representation of this.
 
 # File formats to support
 
 We want to save the original g2o file format but also support potentially new file formats like JSON or a binary format.
 
-## Challenges
+## Backwards compatible g2o Ascii file
+
+The original g2o Ascii file format was a line based human readable file.
+The graph content has references in between the elements, e.g., an edge depends on vertices, an edge depends on parameters.
+To accommodate those references, the data is saved in a specific order.
+
+- Fixed
+- Parameters
+- Vertices
+- Edges
 
 To support the original g2o file format, we need to handle the special case of a dynamic edge. However, we can assume that not many files with dynamically sized edges in the g2o format exist.
 To support the original g2o format, we need anyhow to implement a custom reader for the data. Hence, we can handle in there the special format to separate IDs, estimate and information matrix.
