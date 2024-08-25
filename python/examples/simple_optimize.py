@@ -1,10 +1,13 @@
+#!/usr/bin/env python3
+
 import argparse
 
 import g2opy as g2o
 
 
 def to_io_format(value: str) -> g2o.IoFormat:
-    return g2o.IoFormat.__members__[value.upper()]
+    format = g2o.IoWrapper.format_for_file_extension(value)
+    return format if format is not None else g2o.IoFormat.G2O
 
 
 def main():
@@ -19,7 +22,7 @@ def main():
     parser.add_argument(
         "--output-format",
         type=str,
-        choices=["g2o", "json", "xml", "binary"],
+        choices=["g2o", "json", "bin"],
         default=g2o.IoFormat.G2O.name,
         help="define the output format",
     )
@@ -51,8 +54,9 @@ def main():
         print(f"Final chi2: {optimizer.chi2()}")
 
     if len(args.output) > 0:
-        print(f"Saving to {args.output}")
-        optimizer.save(args.output, to_io_format(args.output_format))
+        io_output_format = to_io_format(args.output_format)
+        print(f"Saving to {args.output} as {g2o.IoWrapper.to_string(io_output_format)}")
+        optimizer.save(args.output, io_output_format)
 
 
 if __name__ == "__main__":

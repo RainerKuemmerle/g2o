@@ -7,9 +7,6 @@ namespace g2o {
 
 void declareRobustKernel(py::module& m) {
   py::class_<RobustKernel, std::shared_ptr<RobustKernel>>(m, "BaseRobustKernel")
-      //.def(py::init<>())
-      //.def(py::init<double>(),
-      //        "delta"_a)
       .def("robustify", &RobustKernel::robustify, "squared_error"_a,
            "rho"_a)  // (double, Vector3&) -> void
       .def("set_delta", &RobustKernel::setDelta,
@@ -24,7 +21,6 @@ void declareRobustKernel(py::module& m) {
       .def(py::init<double>(), "delta"_a = 1.)
       .def(py::init<const RobustKernelPtr&, double>(), "kernel"_a,
            "delta"_a = 1., py::keep_alive<1, 2>())
-      .def(py::init<double>(), "delta"_a)
       .def("kernel", &RobustKernelScaleDelta::kernel)  // -> RobustKernelPtr&
       .def("set_kernel", &RobustKernelScaleDelta::setKernel, "ptr"_a,
            py::keep_alive<1, 2>())  // const RobustKernelPtr& ->
