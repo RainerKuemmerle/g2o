@@ -1,0 +1,146 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "Tag": {
+      "title": "Tag",
+      "type": "string",
+      "pattern": "^[\\S]*$"
+    },
+    "Data": {
+      "title": "Data",
+      "type": "array",
+      "default": [],
+      "items": {
+        "type": "object",
+        "required": [
+          "data",
+          "tag"
+        ],
+        "properties": {
+          "data": {
+            "type": "string"
+          },
+          "tag": {
+            "$ref": "#/definitions/Tag"
+          }
+        }
+      }
+    },
+    "Ids": {
+      "title": "Ids",
+      "type": "array",
+      "items": {
+        "title": "Items",
+        "type": "integer"
+      }
+    },
+    "Vector": {
+      "title": "Vector",
+      "type": "array",
+      "default": [],
+      "items": {
+        "title": "Items",
+        "type": "number"
+      }
+    }
+  },
+  "type": "object",
+  "required": [
+    "graph"
+  ],
+  "properties": {
+    "graph": {
+      "title": "Graph",
+      "type": "object",
+      "required": [
+        "edges",
+        "vertices"
+      ],
+      "properties": {
+        "vertices": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "estimate",
+              "id",
+              "tag"
+            ],
+            "properties": {
+              "tag": {
+                "$ref": "#/definitions/Tag"
+              },
+              "id": {
+                "type": "integer"
+              },
+              "estimate": {
+                "$ref": "#/definitions/Vector"
+              },
+              "data": {
+                "$ref": "#/definitions/Data"
+              }
+            }
+          }
+        },
+        "edges": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "ids",
+              "information",
+              "measurement",
+              "tag"
+            ],
+            "properties": {
+              "tag": {
+                "$ref": "#/definitions/Tag"
+              },
+              "ids": {
+                "$ref": "#/definitions/Ids"
+              },
+              "information": {
+                "$ref": "#/definitions/Vector"
+              },
+              "measurement": {
+                "$ref": "#/definitions/Vector"
+              },
+              "data": {
+                "$ref": "#/definitions/Data"
+              },
+              "param_ids": {
+                "$ref": "#/definitions/Ids"
+              }
+            }
+          }
+        },
+        "fixed": {
+          "$ref": "#/definitions/Ids"
+        },
+        "params": {
+          "type": "array",
+          "items": {
+            "title": "Items",
+            "type": "object",
+            "required": [
+              "id",
+              "tag",
+              "value"
+            ],
+            "properties": {
+              "tag": {
+                "$ref": "#/definitions/Tag"
+              },
+              "id": {
+                "$ref": "#/definitions/Ids"
+              },
+              "value": {
+                "$ref": "#/definitions/Vector"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
