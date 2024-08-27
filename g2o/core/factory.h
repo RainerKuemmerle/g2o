@@ -145,9 +145,17 @@ class RegisterTypeProxy {
 #endif
 
 // These macros are used to automate registering types and forcing linkage
-#define G2O_REGISTER_TYPE(name, classname)                         \
-  extern "C" void G2O_FACTORY_EXPORT g2o_type_##classname(void) {} \
-  static g2o::RegisterTypeProxy<classname> g_type_proxy_##classname(#name);
+#define G2O_REGISTER_TYPE_NAME(name, classname)                        \
+  static_assert(std::string_view(name).find_first_of(" \f\n\r\t\v") == \
+                    std::string_view::npos,                            \
+                "name contains whitespace");                           \
+  extern "C" void G2O_FACTORY_EXPORT g2o_type_##classname(void) {}     \
+  static g2o::RegisterTypeProxy<classname> g_type_proxy_##classname(name);
+
+// This form is deprecated, because it lets clang-format introduce whitespace
+// into the type name.  Kept for backward compatibility.
+#define G2O_REGISTER_TYPE(name, classname) \
+  G2O_REGISTER_TYPE_NAME(#name, classname)
 
 #define G2O_USE_TYPE_BY_CLASS_NAME(classname)                    \
   extern "C" void G2O_FACTORY_IMPORT g2o_type_##classname(void); \
