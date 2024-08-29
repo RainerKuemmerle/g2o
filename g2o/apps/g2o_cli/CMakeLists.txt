@@ -27,12 +27,15 @@ target_link_libraries(g2o_cli_application g2o_cli_library)
 
 set_target_properties(g2o_cli_application PROPERTIES OUTPUT_NAME g2o)
 
-install(TARGETS g2o_cli_library g2o_cli_application
+install(TARGETS g2o_cli_library
   EXPORT ${G2O_TARGETS_EXPORT_NAME}
   RUNTIME DESTINATION ${RUNTIME_DESTINATION}
   LIBRARY DESTINATION ${LIBRARY_DESTINATION}
   ARCHIVE DESTINATION ${ARCHIVE_DESTINATION}
   INCLUDES DESTINATION ${INCLUDES_DESTINATION}
+)
+install(TARGETS g2o_cli_application
+  RUNTIME DESTINATION ${RUNTIME_DESTINATION}
 )
 
 file(GLOB headers "${CMAKE_CURRENT_SOURCE_DIR}/*.h" "${CMAKE_CURRENT_SOURCE_DIR}/*.hpp")
