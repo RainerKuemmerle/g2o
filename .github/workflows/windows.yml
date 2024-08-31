@@ -42,7 +42,7 @@ jobs:
 
       - name: Install libraries with vcpkg
         run: |
-          vcpkg --triplet x64-windows install eigen3
+          vcpkg --triplet x64-windows install eigen3 nlohmann-json
 
       - name: Eigen Introspection
         run: |

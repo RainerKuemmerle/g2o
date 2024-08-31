@@ -1,5 +1,5 @@
 [x] drop cereal (replace with json directly, drop xml)
-[ ] install json on Windows CI
+[x] install json on Windows CI
 [x] wrap io_format.h to python
 [x] wrap simulator into library
 [x] add config types for simulation
