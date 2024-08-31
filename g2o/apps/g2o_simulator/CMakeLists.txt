@@ -11,9 +11,8 @@ target_link_libraries(g2o_simulator3d_application simulator_lib types_slam3d_add
 set_target_properties(g2o_simulator3d_application PROPERTIES OUTPUT_NAME g2o_simulator3d)
 
 install(TARGETS g2o_simulator2d_application g2o_simulator3d_application
-  EXPORT ${G2O_TARGETS_EXPORT_NAME}
   RUNTIME DESTINATION ${RUNTIME_DESTINATION}
-  LIBRARY DESTINATION ${LIBRARY_DESTINATION}
-  ARCHIVE DESTINATION ${ARCHIVE_DESTINATION}
-  INCLUDES DESTINATION ${INCLUDES_DESTINATION}
 )
+
+file(GLOB headers "${CMAKE_CURRENT_SOURCE_DIR}/*.h" "${CMAKE_CURRENT_SOURCE_DIR}/*.hpp")
+install(FILES ${headers} DESTINATION ${INCLUDES_INSTALL_DIR}/apps/g2o_simulator)

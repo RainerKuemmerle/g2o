@@ -36,7 +36,7 @@
 namespace g2o {
 
 G2O_REGISTER_TYPE_GROUP(icp);
-G2O_REGISTER_TYPE(EDGE_V_V_GICP, EdgeVVGicp);
+G2O_REGISTER_TYPE_NAME("EDGE_V_V_GICP", EdgeVVGicp);
 
 const Matrix3 EdgeVVGicp::kDRidx =
     (Matrix3() << 0.0, 0.0, 0.0, 0.0, 0.0, 2.0, 0.0, -2.0, 0.0)

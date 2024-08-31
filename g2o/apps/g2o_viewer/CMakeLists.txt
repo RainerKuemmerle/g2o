@@ -41,12 +41,15 @@ target_link_libraries(viewer_library core g2o_cli_library ${QGLVIEWER_LIBRARY} $
 target_link_libraries(viewer_library core opengl_helper)
 target_link_libraries(g2o_viewer viewer_library)
 
-install(TARGETS g2o_viewer viewer_library
+install(TARGETS viewer_library
   EXPORT ${G2O_TARGETS_EXPORT_NAME}
   RUNTIME DESTINATION ${RUNTIME_DESTINATION}
   LIBRARY DESTINATION ${LIBRARY_DESTINATION}
   ARCHIVE DESTINATION ${ARCHIVE_DESTINATION}
   INCLUDES DESTINATION ${INCLUDES_DESTINATION} ${qt5_includes_dirs} ${QGLVIEWER_INCLUDE_DIR}
+)
+install(TARGETS g2o_viewer
+  RUNTIME DESTINATION ${RUNTIME_DESTINATION}
 )
 
 file(GLOB headers "${CMAKE_CURRENT_SOURCE_DIR}/*.h" "${CMAKE_CURRENT_SOURCE_DIR}/*.hpp")
