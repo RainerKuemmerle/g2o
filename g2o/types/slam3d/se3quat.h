@@ -224,7 +224,7 @@ class G2O_TYPES_SLAM3D_API SE3Quat {
 
       V = (Matrix3::Identity() +
            (1 - std::cos(theta)) / (theta * theta) * Omega +
-           (theta - std::sin(theta)) / (std::pow(theta, 3)) * Omega2);
+           (theta - std::sin(theta)) / (std::pow(theta, 3))*Omega2);
     }
     return SE3Quat(Quaternion(R), V * upsilon);
   }
