@@ -44,28 +44,34 @@ void declareSparseOptimizer(py::module& m) {
                &CLS::computeInitialGuess),
            "propagator"_a)  // virtual
 
-      .def("optimize", &CLS::optimize, "iterations"_a,
-           "online"_a = false)  // -> int
-      .def("compute_marginals",
-           [](CLS& optimizer,
-              const std::vector<std::pair<int, int> >& block_indices) {
-             auto* spinv = new SparseBlockMatrix<MatrixX>();
-             bool result = optimizer.computeMarginals(*spinv, block_indices);
-             return std::make_pair(spinv, result);
-           })
-      .def("compute_marginals",
-           [](CLS& optimizer, const OptimizableGraph::Vertex* vertex) {
-             auto* spinv = new SparseBlockMatrix<MatrixX>();
-             bool result = optimizer.computeMarginals(*spinv, vertex);
-             return std::make_pair(spinv, result);
-           })
-      .def("compute_marginals",
-           [](CLS& optimizer,
-              const OptimizableGraph::VertexContainer& vertices) {
-             auto* spinv = new SparseBlockMatrix<MatrixX>();
-             bool result = optimizer.computeMarginals(*spinv, vertices);
-             return std::make_pair(spinv, result);
-           })
+      .def("optimize", &CLS::optimize, "iterations"_a, "online"_a = false,
+           py::call_guard<py::gil_scoped_release>())  // -> int
+      .def(
+          "compute_marginals",
+          [](CLS& optimizer,
+             const std::vector<std::pair<int, int> >& block_indices) {
+            auto* spinv = new SparseBlockMatrix<MatrixX>();
+            bool result = optimizer.computeMarginals(*spinv, block_indices);
+            return std::make_pair(spinv, result);
+          },
+          py::call_guard<py::gil_scoped_release>())
+      .def(
+          "compute_marginals",
+          [](CLS& optimizer, const OptimizableGraph::Vertex* vertex) {
+            auto* spinv = new SparseBlockMatrix<MatrixX>();
+            bool result = optimizer.computeMarginals(*spinv, vertex);
+            return std::make_pair(spinv, result);
+          },
+          py::call_guard<py::gil_scoped_release>())
+      .def(
+          "compute_marginals",
+          [](CLS& optimizer,
+             const OptimizableGraph::VertexContainer& vertices) {
+            auto* spinv = new SparseBlockMatrix<MatrixX>();
+            bool result = optimizer.computeMarginals(*spinv, vertices);
+            return std::make_pair(spinv, result);
+          },
+          py::call_guard<py::gil_scoped_release>())
 
       // The gauge should be fixed() and then the optimization can work (if no
       // additional dof are in the system. The default implementation returns a
