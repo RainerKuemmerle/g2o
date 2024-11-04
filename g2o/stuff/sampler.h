@@ -80,39 +80,37 @@ class GaussianSampler {
   std::unique_ptr<std::mt19937> _generator;
 };
 
-class G2O_STUFF_API Sampler {
- public:
-  /**
-   * Gaussian random with a mean and standard deviation. Uses the
-   * Polar method of Marsaglia.
-   */
-  static double gaussRand(double mean, double sigma) {
-    double y, r2;
-    do {
-      double x = -1.0 + 2.0 * uniformRand(0.0, 1.0);
-      y = -1.0 + 2.0 * uniformRand(0.0, 1.0);
-      r2 = x * x + y * y;
-    } while (r2 > 1.0 || r2 == 0.0);
-    return mean + sigma * y * std::sqrt(-2.0 * log(r2) / r2);
-  }
+class G2O_STUFF_API
+Sampler{public :
+            /**
+             * Gaussian random with a mean and standard deviation. Uses the
+             * Polar method of Marsaglia.
+             */
+            static double gaussRand(double mean, double sigma){double y, r2;
+do {
+  double x = -1.0 + 2.0 * uniformRand(0.0, 1.0);
+  y = -1.0 + 2.0 * uniformRand(0.0, 1.0);
+  r2 = x * x + y * y;
+} while (r2 > 1.0 || r2 == 0.0);
+return mean + sigma * y * std::sqrt(-2.0 * log(r2) / r2);
+}  // namespace g2o
 
-  /**
-   * sample a number from a uniform distribution
-   */
-  static double uniformRand(double lowerBndr, double upperBndr) {
-    return lowerBndr +
-           ((double)std::rand() / (RAND_MAX + 1.0)) * (upperBndr - lowerBndr);
-  }
-  /**
-   * default seed function using the current time in seconds
-   */
-  static void seedRand() {
-    seedRand(static_cast<unsigned int>(std::time(NULL)));
-  }
+/**
+ * sample a number from a uniform distribution
+ */
+static double uniformRand(double lowerBndr, double upperBndr) {
+  return lowerBndr +
+         ((double)std::rand() / (RAND_MAX + 1.0)) * (upperBndr - lowerBndr);
+}
+/**
+ * default seed function using the current time in seconds
+ */
+static void seedRand() { seedRand(static_cast<unsigned int>(std::time(NULL))); }
 
-  /** seed the random number generator */
-  static void seedRand(unsigned int seed) { std::srand(seed); }
-};
+/** seed the random number generator */
+static void seedRand(unsigned int seed) { std::srand(seed); }
+}
+;
 
 }  // namespace g2o
 
