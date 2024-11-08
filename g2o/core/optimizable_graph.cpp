@@ -808,10 +808,10 @@ bool OptimizableGraph::verifyInformationMatrices(bool verbose) const {
           ids[i] = e->vertex(i)->id();
         if (!isSymmetric)
           G2O_WARN("Information Matrix for an edge is not symmetric: {}",
-                   fmt::join(ids, " "));
+                   strJoin(ids.begin(), ids.end(), " "));
         else
           G2O_WARN("Information Matrix for an edge is not SPD: {}",
-                   fmt::join(ids, " "));
+                   strJoin(ids.begin(), ids.end(), " "));
         if (isSymmetric)
           G2O_WARN("eigenvalues: {}", eigenSolver.eigenvalues().transpose());
       }
