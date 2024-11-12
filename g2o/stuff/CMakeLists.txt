@@ -18,9 +18,9 @@ target_include_directories(stuff PUBLIC
 
 if (G2O_HAVE_LOGGING)
   if(TARGET spdlog::spdlog)
-    target_link_libraries(stuff PUBLIC spdlog::spdlog)
+    target_link_libraries(stuff PUBLIC spdlog::spdlog fmt::fmt-header-only)
   else()
-    target_link_libraries(stuff PUBLIC spdlog::spdlog_header_only)
+    target_link_libraries(stuff PUBLIC spdlog::spdlog_header_only fmt::fmt-header-only)
   endif()
 endif()
 set_target_properties(stuff PROPERTIES OUTPUT_NAME ${LIB_PREFIX}stuff)
