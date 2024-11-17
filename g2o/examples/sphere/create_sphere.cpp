@@ -109,10 +109,10 @@ int create_sphere(int argc, char** argv) {
       auto v = std::make_shared<VertexSE3>();
       v->setId(id++);
 
-      const Eigen::AngleAxisd rotz(-M_PI + 2 * n * M_PI / nodesPerLevel,
+      const Eigen::AngleAxisd rotz(-M_PI + (2 * n * M_PI / nodesPerLevel),
                                    Eigen::Vector3d::UnitZ());
       const Eigen::AngleAxisd roty(
-          -0.5 * M_PI + id * M_PI / (numLaps * nodesPerLevel),
+          (-0.5 * M_PI) + (id * M_PI / (numLaps * nodesPerLevel)),
           Eigen::Vector3d::UnitY());
       const Eigen::Matrix3d rot = (rotz * roty).toRotationMatrix();
 
@@ -141,10 +141,10 @@ int create_sphere(int argc, char** argv) {
   // generate loop closure edges
   for (int f = 1; f < numLaps; ++f) {
     for (int nn = 0; nn < nodesPerLevel; ++nn) {
-      const auto& from = vertices[(f - 1) * nodesPerLevel + nn];
+      const auto& from = vertices[((f - 1) * nodesPerLevel) + nn];
       for (int n = -1; n <= 1; ++n) {
         if (f == numLaps - 1 && n == 1) continue;
-        const auto& to = vertices[f * nodesPerLevel + nn + n];
+        const auto& to = vertices[(f * nodesPerLevel) + nn + n];
         const Eigen::Isometry3d t = from->estimate().inverse() * to->estimate();
         auto e = std::make_shared<EdgeSE3>();
         e->setVertex(0, from);
