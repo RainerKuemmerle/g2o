@@ -98,7 +98,12 @@ void declareTypesSixDofExpmap(py::module& m) {
       .def("compute_error", &EdgeSE3ProjectXYZOnlyPose::computeError)
       .def("is_depth_positive", &EdgeSE3ProjectXYZOnlyPose::isDepthPositive)
       .def("linearize_oplus", &EdgeSE3ProjectXYZOnlyPose::linearizeOplus)
-      .def("cam_project", &EdgeSE3ProjectXYZOnlyPose::cam_project);
+      .def("cam_project", &EdgeSE3ProjectXYZOnlyPose::cam_project)
+      .def_readwrite("fx", &EdgeSE3ProjectXYZOnlyPose::fx)
+      .def_readwrite("fy", &EdgeSE3ProjectXYZOnlyPose::fy)
+      .def_readwrite("cx", &EdgeSE3ProjectXYZOnlyPose::cx)
+      .def_readwrite("cy", &EdgeSE3ProjectXYZOnlyPose::cy)
+      .def_readwrite("Xw", &EdgeSE3ProjectXYZOnlyPose::Xw);
 
   // Projection using focal_length in x and y directions stereo
   py::class_<EdgeStereoSE3ProjectXYZ,
@@ -109,7 +114,12 @@ void declareTypesSixDofExpmap(py::module& m) {
       .def("compute_error", &EdgeStereoSE3ProjectXYZ::computeError)
       .def("is_depth_positive", &EdgeStereoSE3ProjectXYZ::isDepthPositive)
       .def("linearize_oplus", &EdgeStereoSE3ProjectXYZ::linearizeOplus)
-      .def("cam_project", &EdgeStereoSE3ProjectXYZ::cam_project);
+      .def("cam_project", &EdgeStereoSE3ProjectXYZ::cam_project)
+      .def_readwrite("fx", &EdgeStereoSE3ProjectXYZ::fx)
+      .def_readwrite("fy", &EdgeStereoSE3ProjectXYZ::fy)
+      .def_readwrite("cx", &EdgeStereoSE3ProjectXYZ::cx)
+      .def_readwrite("cy", &EdgeStereoSE3ProjectXYZ::cy)
+      .def_readwrite("bf", &EdgeStereoSE3ProjectXYZ::bf);
 
   // Edge to optimize only the camera pose stereo
   templatedBaseUnaryEdge<3, Vector3, VertexSE3Expmap>(
