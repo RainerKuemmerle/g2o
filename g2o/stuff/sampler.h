@@ -94,7 +94,7 @@ class G2O_STUFF_API Sampler {
       r2 = x * x + y * y;
     } while (r2 > 1.0 || r2 == 0.0);
     return mean + sigma * y * std::sqrt(-2.0 * log(r2) / r2);
-  }
+  }  // namespace g2o
 
   /**
    * sample a number from a uniform distribution

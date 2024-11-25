@@ -79,7 +79,7 @@ struct G2O_CORE_API OptimizableGraph : public HyperGraph {
     bool operator()(const Vertex* v1, const Vertex* v2) const {
       return v1->id() < v2->id();
     }
-  };
+  };  // namespace g2o
 
   /**
    * \brief order edges based on the internal ID, which is assigned to the edge
