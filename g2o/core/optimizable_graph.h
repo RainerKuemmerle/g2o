@@ -88,7 +88,7 @@ class G2O_CORE_API OptimizableGraph : public HyperGraph {
     bool operator()(const VertexPtrType1& v1, const VertexPtrType2& v2) const {
       return v1->id() < v2->id();
     }
-  };
+  };  // namespace g2o
 
   /**
    * \brief order edges based on the internal ID, which is assigned to the edge
