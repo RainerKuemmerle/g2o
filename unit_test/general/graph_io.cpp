@@ -46,6 +46,8 @@
 
 using namespace testing;  // NOLINT
 
+namespace {
+
 MATCHER(ParamEqual, "") {
   const auto& that = std::get<0>(arg);
   const auto& expected = std::get<1>(arg);
@@ -91,13 +93,13 @@ MATCHER(EdgeEqual, "") {
       that, result_listener);
 }
 
-namespace {
 auto KeyMatch(const std::vector<int>& keys) {
   std::vector<decltype(Key(keys[0]))> matchers;
   matchers.reserve(keys.size());
   for (const auto& val : keys) matchers.push_back(Key(val));
   return UnorderedElementsAreArray(matchers);
 };
+
 }  // namespace
 
 /**
@@ -332,6 +334,5 @@ TEST(OptimizableGraphIO, FormatToString) {
   for (const auto& f : kAllFormats)
     EXPECT_THAT(g2o::io::to_string(f), Not(IsEmpty()));
 
-  EXPECT_THAT(g2o::io::to_string(static_cast<g2o::io::Format>(1 << 31)),
-              IsEmpty());
+  EXPECT_THAT(g2o::io::to_string(static_cast<g2o::io::Format>(120)), IsEmpty());
 }

@@ -71,11 +71,11 @@ class SparseBlockMatrix {
   using SparseMatrixBlock = MatrixType;
 
   //! columns of the matrix
-  [[nodiscard]] inline int cols() const {
+  [[nodiscard]] int cols() const {
     return !colBlockIndices_.empty() ? colBlockIndices_.back() : 0;
   }
   //! rows of the matrix
-  [[nodiscard]] inline int rows() const {
+  [[nodiscard]] int rows() const {
     return !rowBlockIndices_.empty() ? rowBlockIndices_.back() : 0;
   }
 
@@ -113,24 +113,24 @@ class SparseBlockMatrix {
   const SparseMatrixBlock* block(int r, int c) const;
 
   //! how many rows does the block at block-row r has?
-  [[nodiscard]] inline int rowsOfBlock(int r) const {
+  [[nodiscard]] int rowsOfBlock(int r) const {
     return r ? rowBlockIndices_[r] - rowBlockIndices_[r - 1]
              : rowBlockIndices_[0];
   }
 
   //! how many cols does the block at block-col c has?
-  [[nodiscard]] inline int colsOfBlock(int c) const {
+  [[nodiscard]] int colsOfBlock(int c) const {
     return c ? colBlockIndices_[c] - colBlockIndices_[c - 1]
              : colBlockIndices_[0];
   }
 
   //! where does the row at block-row r starts?
-  [[nodiscard]] inline int rowBaseOfBlock(int r) const {
+  [[nodiscard]] int rowBaseOfBlock(int r) const {
     return r ? rowBlockIndices_[r - 1] : 0;
   }
 
   //! where does the col at block-col r starts?
-  [[nodiscard]] inline int colBaseOfBlock(int c) const {
+  [[nodiscard]] int colBaseOfBlock(int c) const {
     return c ? colBlockIndices_[c - 1] : 0;
   }
 
@@ -751,7 +751,7 @@ int SparseBlockMatrix<MatrixType>::fillCCS(double* Cx,
 
         int elemsToCopy = b->rows();
         if (upperTriangle && rstart == cstart) elemsToCopy = c + 1;
-        memcpy(Cx, b->data() + c * b->rows(), elemsToCopy * sizeof(double));
+        memcpy(Cx, b->data() + (c * b->rows()), elemsToCopy * sizeof(double));
         Cx += elemsToCopy;
       }
     }

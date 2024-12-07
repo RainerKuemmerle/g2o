@@ -105,7 +105,7 @@ std::ostream& operator<<(std::ostream& out_str, const SBACam& cam);
  */
 template <>
 struct TypeTraits<SBACam> {
-  enum {
+  enum {  // NOLINT
     kVectorDimension = 7,
     kMinimalVectorDimension = 6,
     kIsVector = 0,

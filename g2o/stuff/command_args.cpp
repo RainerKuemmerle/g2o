@@ -27,6 +27,7 @@
 #include "command_args.h"
 
 #include <algorithm>
+#include <cstdint>
 #include <cstdlib>
 #include <cstring>
 
@@ -97,7 +98,7 @@ std::string argument2String(const CommandArgs::CommandArgument& ca) {
 
 }  // namespace
 
-enum CommandArgumentType {
+enum CommandArgumentType : std::uint8_t {
   kCatDouble,
   kCatFloat,
   kCatInt,

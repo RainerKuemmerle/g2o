@@ -33,12 +33,12 @@
 
 namespace g2o {
 
-struct TripletEntry {
+struct G2O_STUFF_API TripletEntry {
   int r, c;
   double x;
   TripletEntry(int r_, int c_, double x_) : r(r_), c(c_), x(x_) {}
 };
-struct TripletColSort {
+struct G2O_STUFF_API TripletColSort {
   bool operator()(const TripletEntry& e1, const TripletEntry& e2) const {
     return e1.c < e2.c || (e1.c == e2.c && e1.r < e2.r);
   }

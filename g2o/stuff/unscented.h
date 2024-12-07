@@ -48,7 +48,7 @@ template <class SampleType, class CovarianceType>
 bool sampleUnscented(std::vector<SigmaPoint<SampleType>>& sigmaPoints,
                      const SampleType& mean, const CovarianceType& covariance) {
   const int dim = mean.size();
-  const int numPoints = 2 * dim + 1;
+  const int numPoints = (2 * dim) + 1;
   assert(covariance.rows() == covariance.cols() &&
          covariance.cols() == mean.size() && "Dimension Mismatch");
   constexpr double kAlpha = 1e-3;
@@ -59,7 +59,7 @@ bool sampleUnscented(std::vector<SigmaPoint<SampleType>>& sigmaPoints,
   sigmaPoints.resize(numPoints);
   sigmaPoints[0] = SigmaPoint<SampleType>(
       mean, lambda / (dim + lambda),
-      lambda / (dim + lambda) + (1. - kAlpha * kAlpha + kBeta));
+      (lambda / (dim + lambda)) + (1. - kAlpha * kAlpha + kBeta));
   Eigen::LLT<CovarianceType> cholDecomp;
   cholDecomp.compute(covariance * (dim + lambda));
   if (cholDecomp.info() == Eigen::NumericalIssue) return false;

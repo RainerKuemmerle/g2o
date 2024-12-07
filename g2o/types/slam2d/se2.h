@@ -92,14 +92,14 @@ class G2O_TYPES_SLAM2D_API SE2 {
     return ret;
   }
 
-  inline double operator[](int i) const {
+  double operator[](int i) const {
     assert(i >= 0 && i < 3);
     if (i < 2) return t_(i);
     return R_.angle();
   }
 
   //! assign from a 3D vector (x, y, theta)
-  inline void fromVector(const Vector3& v) { *this = SE2(v[0], v[1], v[2]); }
+  void fromVector(const Vector3& v) { *this = SE2(v[0], v[1], v[2]); }
 
   //! convert to a 3D vector (x, y, theta)
   [[nodiscard]] Vector3 toVector() const {
@@ -123,7 +123,7 @@ class G2O_TYPES_SLAM2D_API SE2 {
  */
 template <>
 struct TypeTraits<SE2> {
-  enum {
+  enum {  // NOLINT
     kVectorDimension = 3,
     kMinimalVectorDimension = 3,
     kIsVector = 0,

@@ -44,7 +44,7 @@ struct StereoCameraParameters {
 
 template <>
 struct TypeTraits<StereoCameraParameters> {
-  enum {
+  enum {  // NOLINT
     kVectorDimension = 4,
     kMinimalVectorDimension = 4,
     kIsVector = 0,

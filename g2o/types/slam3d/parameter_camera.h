@@ -91,7 +91,7 @@ class CameraWithOffset {
 
 template <>
 struct TypeTraits<CameraWithOffset> {
-  enum {
+  enum {  // NOLINT
     kVectorDimension = 11,
     kMinimalVectorDimension = 11,
     kIsVector = 0,

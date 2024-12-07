@@ -130,7 +130,7 @@ std::ostream& operator<<(std::ostream& out_str, const SE3Quat& se3);
  */
 template <>
 struct TypeTraits<SE3Quat> {
-  enum {
+  enum {  // NOLINT
     kVectorDimension = 7,
     kMinimalVectorDimension = 6,
     kIsVector = 0,

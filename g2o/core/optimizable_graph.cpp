@@ -180,7 +180,8 @@ bool OptimizableGraph::Edge::resolveCaches() { return true; }
 
 bool OptimizableGraph::Edge::setMeasurementFromState() { return false; }
 
-OptimizableGraph::OptimizableGraph() : graphActions_(kAtNumElements) {}
+OptimizableGraph::OptimizableGraph()
+    : graphActions_(static_cast<int>(ActionType::kAtNumElements)) {}
 
 OptimizableGraph::~OptimizableGraph() {
   clear();
@@ -649,35 +650,41 @@ void OptimizableGraph::performActions(int iter, HyperGraphActionSet& actions) {
 }
 
 void OptimizableGraph::preIteration(int iter) {
-  performActions(iter, graphActions_[kAtPreiteration]);
+  performActions(iter,
+                 graphActions_[static_cast<int>(ActionType::kAtPreiteration)]);
 }
 
 void OptimizableGraph::postIteration(int iter) {
-  performActions(iter, graphActions_[kAtPostiteration]);
+  performActions(iter,
+                 graphActions_[static_cast<int>(ActionType::kAtPostiteration)]);
 }
 
 bool OptimizableGraph::addPostIterationAction(
     std::shared_ptr<HyperGraphAction> action) {
   const std::pair<HyperGraphActionSet::iterator, bool> insertResult =
-      graphActions_[kAtPostiteration].emplace(action);
+      graphActions_[static_cast<int>(ActionType::kAtPostiteration)].emplace(
+          action);
   return insertResult.second;
 }
 
 bool OptimizableGraph::addPreIterationAction(
     std::shared_ptr<HyperGraphAction> action) {
   const std::pair<HyperGraphActionSet::iterator, bool> insertResult =
-      graphActions_[kAtPreiteration].emplace(action);
+      graphActions_[static_cast<int>(ActionType::kAtPreiteration)].emplace(
+          action);
   return insertResult.second;
 }
 
 bool OptimizableGraph::removePreIterationAction(
     const std::shared_ptr<HyperGraphAction>& action) {
-  return graphActions_[kAtPreiteration].erase(action) > 0;
+  return graphActions_[static_cast<int>(ActionType::kAtPreiteration)].erase(
+             action) > 0;
 }
 
 bool OptimizableGraph::removePostIterationAction(
     const std::shared_ptr<HyperGraphAction>& action) {
-  return graphActions_[kAtPostiteration].erase(action) > 0;
+  return graphActions_[static_cast<int>(ActionType::kAtPostiteration)].erase(
+             action) > 0;
 }
 
 bool OptimizableGraph::saveVertex(AbstractGraph& abstract_graph,

@@ -54,7 +54,7 @@ class G2O_TYPES_SBA_API VertexIntrinsics
 
 template <>
 struct TypeTraits<VertexIntrinsicsEstimate> {
-  enum {
+  enum {  // NOLINT
     kVectorDimension = 5,
     kMinimalVectorDimension = 4,
     kIsVector = 0,

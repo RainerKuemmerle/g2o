@@ -44,11 +44,11 @@ class G2O_TYPES_SLAM3D_ADDONS_API Plane3D {
 
   explicit Plane3D(const Vector4& v) { fromVector(v); }
 
-  [[nodiscard]] inline Vector4 toVector() const { return coeffs_; }
+  [[nodiscard]] Vector4 toVector() const { return coeffs_; }
 
-  [[nodiscard]] inline const Vector4& coeffs() const { return coeffs_; }
+  [[nodiscard]] const Vector4& coeffs() const { return coeffs_; }
 
-  inline void fromVector(const Vector4& coeffs) {
+  void fromVector(const Vector4& coeffs) {
     coeffs_ = coeffs;
     normalize(coeffs_);
   }
@@ -71,7 +71,7 @@ class G2O_TYPES_SLAM3D_ADDONS_API Plane3D {
         .toRotationMatrix();
   }
 
-  inline void oplus(const Vector3& v) {
+  void oplus(const Vector3& v) {
     // construct a normal from azimuth and elevation;
     double _azimuth = v[0];
     double _elevation = v[1];
@@ -87,7 +87,7 @@ class G2O_TYPES_SLAM3D_ADDONS_API Plane3D {
     normalize(coeffs_);
   }
 
-  [[nodiscard]] inline Vector3 ominus(const Plane3D& plane) const {
+  [[nodiscard]] Vector3 ominus(const Plane3D& plane) const {
     // construct the rotation that would bring the plane normal in (1 0 0)
     Matrix3 R = rotation(normal()).transpose();
     Vector3 n = R * plane.normal();
@@ -96,7 +96,7 @@ class G2O_TYPES_SLAM3D_ADDONS_API Plane3D {
   }
 
  protected:
-  static inline void normalize(Vector4& coeffs) {
+  static void normalize(Vector4& coeffs) {
     double n = coeffs.head<3>().norm();
     coeffs = coeffs * (1. / n);
   }
@@ -118,7 +118,7 @@ inline Plane3D operator*(const Isometry3& t, const Plane3D& plane) {
  */
 template <>
 struct TypeTraits<Plane3D> {
-  enum {
+  enum {  // NOLINT
     kVectorDimension = 4,
     kMinimalVectorDimension = 4,
     kIsVector = 0,

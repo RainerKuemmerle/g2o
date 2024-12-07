@@ -196,7 +196,7 @@ class SparseBlockMatrixCCS {
 
           int elemsToCopy = b->rows();
           if (upperTriangle && rstart == cstart) elemsToCopy = c + 1;
-          memcpy(Cx, b->data() + c * b->rows(), elemsToCopy * sizeof(double));
+          memcpy(Cx, b->data() + (c * b->rows()), elemsToCopy * sizeof(double));
           Cx += elemsToCopy;
         }
       }

@@ -92,7 +92,7 @@ G2O_TYPES_SIM3_API std::ostream& operator<<(std::ostream& out_str,
  */
 template <>
 struct TypeTraits<Sim3> {
-  enum {
+  enum {  // NOLINT
     kVectorDimension = 8,
     kMinimalVectorDimension = 7,
     kIsVector = 0,

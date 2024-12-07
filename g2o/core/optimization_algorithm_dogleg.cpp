@@ -50,10 +50,10 @@ OptimizationAlgorithmDogleg::OptimizationAlgorithmDogleg(
     : OptimizationAlgorithmWithHessian(*solver),
       maxTrialsAfterFailure_(properties_.makeProperty<Property<int>>(
           "maxTrialsAfterFailure", 100)),
-      userDeltaInit_(properties_.makeProperty<Property<double>>(
-          "initialDelta", static_cast<double>(1e4))),
-      initialLambda_(properties_.makeProperty<Property<double>>(
-          "initialLambda", static_cast<double>(1e-7))),
+      userDeltaInit_(
+          properties_.makeProperty<Property<double>>("initialDelta", 1e4)),
+      initialLambda_(
+          properties_.makeProperty<Property<double>>("initialLambda", 1e-7)),
       lamdbaFactor_(
           properties_.makeProperty<Property<double>>("lambdaFactor", 10.)),
       delta_(userDeltaInit_->value()),
@@ -156,28 +156,28 @@ OptimizationAlgorithm::SolverResult OptimizationAlgorithmDogleg::solve(
 
     if (hgnNorm < delta_) {
       hdl_ = hgn;
-      lastStep_ = kStepGn;
+      lastStep_ = Step::kStepGn;
     } else if (hsdNorm > delta_) {
       hdl_ = delta_ / hsdNorm * hsd_;
-      lastStep_ = kStepSd;
+      lastStep_ = Step::kStepSd;
     } else {
       auxVector_ = hgn - hsd_;  // b - a
       const double c = hsd_.dot(auxVector_);
       const double bmaSquaredNorm = auxVector_.squaredNorm();
       double beta;
       if (c <= 0.)
-        beta = (-c + sqrt(c * c + bmaSquaredNorm *
-                                      (delta_ * delta_ - hsd_.squaredNorm()))) /
+        beta = (-c + sqrt((c * c) + (bmaSquaredNorm *
+                                     (delta_ * delta_ - hsd_.squaredNorm())))) /
                bmaSquaredNorm;
       else {
         const double hsdSqrNorm = hsd_.squaredNorm();
-        beta =
-            (delta_ * delta_ - hsdSqrNorm) /
-            (c + sqrt(c * c + bmaSquaredNorm * (delta_ * delta_ - hsdSqrNorm)));
+        beta = (delta_ * delta_ - hsdSqrNorm) /
+               (c + sqrt((c * c) +
+                         (bmaSquaredNorm * (delta_ * delta_ - hsdSqrNorm))));
       }
       assert(beta > 0. && beta < 1 && "Error while computing beta");
       hdl_ = hsd_ + beta * (hgn - hsd_);
-      lastStep_ = kStepDl;
+      lastStep_ = Step::kStepDl;
       assert(hdl_.norm() < delta_ + 1e-5 &&
              "Computed step does not correspond to the trust region");
     }
@@ -185,7 +185,7 @@ OptimizationAlgorithm::SolverResult OptimizationAlgorithmDogleg::solve(
     // compute the linear gain
     auxVector_.setZero();
     blockSolver.multiplyHessian(auxVector_.data(), hdl_.data());
-    double linearGain = -1 * (auxVector_.dot(hdl_)) + 2 * (b.dot(hdl_));
+    double linearGain = (2. * b.dot(hdl_)) - (auxVector_.dot(hdl_));
 
     // apply the update and see what happens
     optimizer_->push();
@@ -219,13 +219,13 @@ void OptimizationAlgorithmDogleg::printVerbose(std::ostream& os) const {
   if (!wasPDInAllIterations_) os << "\t lambda= " << currentLambda_;
 }
 
-const char* OptimizationAlgorithmDogleg::stepType2Str(int stepType) {
+const char* OptimizationAlgorithmDogleg::stepType2Str(Step stepType) {
   switch (stepType) {
-    case kStepSd:
+    case Step::kStepSd:
       return "Descent";
-    case kStepGn:
+    case Step::kStepGn:
       return "GN";
-    case kStepDl:
+    case Step::kStepDl:
       return "Dogleg";
     default:
       return "Undefined";

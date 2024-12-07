@@ -248,7 +248,7 @@ void drawSlice(GLfloat radius, GLfloat height, GLfloat fov,
   glVertex3f(last_x, last_y, lower_z);
   glVertex3f(0.F, 0.F, lower_z);
 
-  double start_angle = -0.5 * fov_rad + angle_step;
+  double start_angle = (-0.5 * fov_rad) + angle_step;
   double angle = start_angle;
   for (int i = 0; i < num_slices; ++i) {
     auto x = static_cast<float>(std::cos(angle) * radius);

@@ -48,8 +48,9 @@ class HyperGraphAction;
 
 class G2O_CORE_API SparseOptimizer : public OptimizableGraph {
  public:
-  enum {
-    kAtComputeactiverror = OptimizableGraph::kAtNumElements,
+  enum class G2O_CORE_API ActionType : std::uint8_t {
+    kAtComputeactiverror =
+        static_cast<std::uint8_t>(OptimizableGraph::ActionType::kAtNumElements),
     kAtNumElements,  // keep as last element
   };
 

@@ -83,18 +83,20 @@ void HyperDijkstra::reset() {
   visited_.clear();
 }
 
-bool operator<(const HyperDijkstra::AdjacencyMapEntry& a,
-               const HyperDijkstra::AdjacencyMapEntry& b) {
-  return a.distance() > b.distance();
-}
-
 void HyperDijkstra::shortestPaths(HyperGraph::VertexSet& vset,
                                   HyperDijkstra::CostFunction& cost,
                                   double maxDistance,
                                   double comparisonConditioner, bool directed,
                                   double maxEdgeCost) {
+  auto less_map_entry = [](const HyperDijkstra::AdjacencyMapEntry& a,
+                           const HyperDijkstra::AdjacencyMapEntry& b) {
+    return a.distance() > b.distance();
+  };
+
   reset();
-  std::priority_queue<AdjacencyMapEntry> frontier;
+  std::priority_queue<AdjacencyMapEntry, std::vector<AdjacencyMapEntry>,
+                      decltype(less_map_entry)>
+      frontier(less_map_entry);
   for (const auto& v : vset) {
     assert(v != nullptr);
     auto it = adjacencyMap_.find(v);

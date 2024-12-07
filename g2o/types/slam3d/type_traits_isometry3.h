@@ -38,7 +38,7 @@ namespace g2o {
  */
 template <>
 struct TypeTraits<Isometry3> {
-  enum {
+  enum {  // NOLINT
     kVectorDimension = 7,
     kMinimalVectorDimension = 6,
     kIsVector = 0,
