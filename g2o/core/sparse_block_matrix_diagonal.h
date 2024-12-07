@@ -63,12 +63,12 @@ class SparseBlockMatrixDiagonal {
       : blockIndices_(blockIndices) {}
 
   //! how many rows/cols does the block at block-row / block-column r has?
-  [[nodiscard]] inline int dimOfBlock(int r) const {
+  [[nodiscard]] int dimOfBlock(int r) const {
     return r ? blockIndices_[r] - blockIndices_[r - 1] : blockIndices_[0];
   }
 
   //! where does the row /col at block-row / block-column r starts?
-  [[nodiscard]] inline int baseOfBlock(int r) const {
+  [[nodiscard]] int baseOfBlock(int r) const {
     return r ? blockIndices_[r - 1] : 0;
   }
 

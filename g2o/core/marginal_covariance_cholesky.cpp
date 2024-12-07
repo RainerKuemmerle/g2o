@@ -138,8 +138,8 @@ void MarginalCovarianceCholesky::computeCovariance(
         const int idx = computeIndex(r, c);
         const auto foundIt = map_.find(idx);
         assert(foundIt != map_.end());
-        cov[rr * vdim + cc] = foundIt->second;
-        if (rr != cc) cov[cc * vdim + rr] = foundIt->second;
+        cov[(rr * vdim) + cc] = foundIt->second;
+        if (rr != cc) cov[(cc * vdim) + rr] = foundIt->second;
       }
     base = nbase;
   }

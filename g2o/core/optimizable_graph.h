@@ -68,7 +68,7 @@ class AbstractGraph;
  */
 class G2O_CORE_API OptimizableGraph : public HyperGraph {
  public:
-  enum ActionType {
+  enum class G2O_CORE_API ActionType : std::uint8_t {
     kAtPreiteration,
     kAtPostiteration,
     kAtNumElements,  // keep as last element

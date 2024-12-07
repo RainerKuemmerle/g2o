@@ -96,7 +96,7 @@ G2O_TYPES_SLAM3D_ADDONS_API double getElevation(const Vector3& direction);
 
 template <>
 struct TypeTraits<Line3D> {
-  enum {
+  enum {  // NOLINT
     kVectorDimension = 6,
     kMinimalVectorDimension = 6,
     kIsVector = 0,

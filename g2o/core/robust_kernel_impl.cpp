@@ -79,7 +79,7 @@ void RobustKernelHuber::robustify(double e, Vector3& rho) const {
 void RobustKernelPseudoHuber::robustify(double e2, Vector3& rho) const {
   const double dsqr = delta_ * delta_;
   const double dsqrReci = 1. / dsqr;
-  const double aux1 = dsqrReci * e2 + 1.0;
+  const double aux1 = (dsqrReci * e2) + 1.0;
   const double aux2 = sqrt(aux1);
   rho[0] = 2 * dsqr * (aux2 - 1);
   rho[1] = 1. / aux2;
@@ -89,7 +89,7 @@ void RobustKernelPseudoHuber::robustify(double e2, Vector3& rho) const {
 void RobustKernelCauchy::robustify(double e2, Vector3& rho) const {
   const double dsqr = delta_ * delta_;
   const double dsqrReci = 1. / dsqr;
-  const double aux = dsqrReci * e2 + 1.0;
+  const double aux = (dsqrReci * e2) + 1.0;
   rho[0] = dsqr * log(aux);
   rho[1] = 1. / aux;
   rho[2] = -dsqrReci * std::pow(rho[1], 2);
@@ -120,7 +120,7 @@ void RobustKernelFair::robustify(double e2, Vector3& rho) const {
 
   const double drec = 1. / delta_;
   const double e_3_2 = 1. / (sqrte * e2);
-  const double aux2 = drec * sqrte + 1;
+  const double aux2 = (drec * sqrte) + 1;
 
   rho[2] = 2 * dsqr *
            (1 / (4 * dsqr * aux2 * aux2 * e2) + (drec * e_3_2) / (4 * aux2) -

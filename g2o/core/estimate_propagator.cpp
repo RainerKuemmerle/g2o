@@ -31,7 +31,6 @@
 #include <cmath>
 #include <cstdlib>
 #include <utility>
-#include <vector>
 
 #include "g2o/core/optimizable_graph.h"
 #include "g2o/core/sparse_optimizer.h"
@@ -233,13 +232,11 @@ EstimatePropagatorCost::EstimatePropagatorCost(SparseOptimizer* graph)
 
 double EstimatePropagatorCost::operator()(
     OptimizableGraph::Edge* edge, const OptimizableGraph::VertexSet& from,
-    OptimizableGraph::Vertex* to_) const {
-  auto* e = dynamic_cast<OptimizableGraph::Edge*>(edge);
-  auto* to = dynamic_cast<OptimizableGraph::Vertex*>(to_);
-  auto it = graph_->findActiveEdge(e);
+    OptimizableGraph::Vertex* to) const {
+  auto it = graph_->findActiveEdge(edge);
   if (it == graph_->activeEdges().end())  // it has to be an active edge
     return std::numeric_limits<double>::max();
-  return e->initialEstimatePossible(from, to);
+  return edge->initialEstimatePossible(from, to);
 }
 
 EstimatePropagatorCostOdometry::EstimatePropagatorCostOdometry(
@@ -248,18 +245,16 @@ EstimatePropagatorCostOdometry::EstimatePropagatorCostOdometry(
 
 double EstimatePropagatorCostOdometry::operator()(
     OptimizableGraph::Edge* edge, const OptimizableGraph::VertexSet& from_,
-    OptimizableGraph::Vertex* to_) const {
-  auto* e = dynamic_cast<OptimizableGraph::Edge*>(edge);
+    OptimizableGraph::Vertex* to) const {
   OptimizableGraph::Vertex* from =
       dynamic_cast<OptimizableGraph::Vertex*>(from_.begin()->get());
-  auto* to = dynamic_cast<OptimizableGraph::Vertex*>(to_);
   if (std::abs(from->id() - to->id()) !=
       1)  // simple method to identify odometry edges in a pose graph
     return std::numeric_limits<double>::max();
-  auto it = graph_->findActiveEdge(e);
+  auto it = graph_->findActiveEdge(edge);
   if (it == graph_->activeEdges().end())  // it has to be an active edge
     return std::numeric_limits<double>::max();
-  return e->initialEstimatePossible(from_, to);
+  return edge->initialEstimatePossible(from_, to);
 }
 
 }  // namespace g2o

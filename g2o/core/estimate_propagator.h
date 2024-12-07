@@ -73,8 +73,8 @@ class G2O_CORE_API EstimatePropagatorCostOdometry
  public:
   explicit EstimatePropagatorCostOdometry(SparseOptimizer* graph);
   double operator()(OptimizableGraph::Edge* edge,
-                    const OptimizableGraph::VertexSet& from_,
-                    OptimizableGraph::Vertex* to_) const override;
+                    const OptimizableGraph::VertexSet& from,
+                    OptimizableGraph::Vertex* to) const override;
   [[nodiscard]] std::string_view name() const override { return "odometry"; }
 };
 

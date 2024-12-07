@@ -96,7 +96,7 @@ struct TypeTraits<VectorN<N, T>> {
  */
 template <>
 struct TypeTraits<double> {
-  enum {
+  enum {  // NOLINT
     kVectorDimension = 1,
     kMinimalVectorDimension = 1,
     kIsVector = 0,

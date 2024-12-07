@@ -79,7 +79,7 @@ class G2O_TYPES_ICP_API EdgeGICP {
  */
 template <>
 struct TypeTraits<EdgeGICP> {
-  enum {
+  enum {  // NOLINT
     kVectorDimension = 12,
     kMinimalVectorDimension = 12,
     kIsVector = 0,

@@ -55,7 +55,7 @@ G2O_TYPES_SLAM2D_ADDONS_API Line2D operator*(const SE2& t, const Line2D& l);
 
 template <>
 struct TypeTraits<Line2D> {
-  enum {
+  enum {  // NOLINT
     kVectorDimension = 2,
     kMinimalVectorDimension = 2,
     kIsVector = 0,

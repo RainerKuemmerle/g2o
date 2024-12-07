@@ -66,7 +66,7 @@ class G2O_TYPES_SCLAM2D_API VelocityMeasurement {
  */
 template <>
 struct TypeTraits<VelocityMeasurement> {
-  enum {
+  enum {  // NOLINT
     kVectorDimension = 3,
     kMinimalVectorDimension = 3,
     kIsVector = 0,

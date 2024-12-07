@@ -27,6 +27,7 @@
 #ifndef G2O_CORE_IO_FORMAT_H
 #define G2O_CORE_IO_FORMAT_H
 
+#include <cstdint>
 #include <optional>
 #include <string>
 #include <string_view>
@@ -35,7 +36,7 @@
 #include "g2o/core/g2o_core_api.h"
 namespace g2o::io {
 
-enum class G2O_CORE_API Format {
+enum class G2O_CORE_API Format : std::int8_t {
   kUndefined = -1,
   kG2O = 0,
   kBinary = 1,

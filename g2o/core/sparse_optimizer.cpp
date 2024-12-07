@@ -69,7 +69,7 @@ bool arrayHasNaN(const double* array, int size, int* nanIndex = 0) {
 namespace g2o {
 
 SparseOptimizer::SparseOptimizer() : algorithm_(nullptr) {
-  graphActions_.resize(kAtNumElements);
+  graphActions_.resize(static_cast<int>(ActionType::kAtNumElements));
 }
 
 SparseOptimizer::~SparseOptimizer() {
@@ -78,7 +78,8 @@ SparseOptimizer::~SparseOptimizer() {
 
 void SparseOptimizer::computeActiveErrors() {
   // call the callbacks in case there is something registered
-  HyperGraphActionSet& actions = graphActions_[kAtComputeactiverror];
+  HyperGraphActionSet& actions =
+      graphActions_[static_cast<int>(ActionType::kAtComputeactiverror)];
   if (!actions.empty()) {
     HyperGraphAction::Parameters empty_params;
     for (const auto& action : actions) (*action)(*this, empty_params);
@@ -584,13 +585,15 @@ bool SparseOptimizer::removeVertex(const std::shared_ptr<HyperGraph::Vertex>& v,
 bool SparseOptimizer::addComputeErrorAction(
     const std::shared_ptr<HyperGraphAction>& action) {
   std::pair<HyperGraphActionSet::iterator, bool> insertResult =
-      graphActions_[kAtComputeactiverror].insert(action);
+      graphActions_[static_cast<int>(ActionType::kAtComputeactiverror)].insert(
+          action);
   return insertResult.second;
 }
 
 bool SparseOptimizer::removeComputeErrorAction(
     const std::shared_ptr<HyperGraphAction>& action) {
-  return graphActions_[kAtComputeactiverror].erase(action) > 0;
+  return graphActions_[static_cast<int>(ActionType::kAtComputeactiverror)]
+             .erase(action) > 0;
 }
 
 void SparseOptimizer::push() { push(activeVertices_); }

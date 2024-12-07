@@ -44,9 +44,7 @@ namespace g2o {
  * converts a number constant to a double constant at compile time
  * to avoid having to cast everything to avoid warnings.
  **/
-inline constexpr double cst(long double value) {
-  return static_cast<double>(value);
-}
+constexpr double cst(long double value) { return static_cast<double>(value); }
 
 constexpr double const_pi() { return cst(3.14159265358979323846); }
 

@@ -127,7 +127,7 @@ OptimizationAlgorithm::SolverResult OptimizationAlgorithmLevenberg::solve(
     rho /= scale;
 
     if (rho > 0 && std::isfinite(tempChi) && ok2) {  // last step was good
-      double alpha = 1. - pow((2 * rho - 1), 3);
+      double alpha = 1. - pow((2. * rho) - 1, 3);
       // crop lambda between minimum and maximum factors
       alpha = (std::min)(alpha, goodStepUpperScale_);
       const double scaleFactor = (std::max)(goodStepLowerScale_, alpha);

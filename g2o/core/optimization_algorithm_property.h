@@ -29,7 +29,6 @@
 
 #include <string>
 #include <string_view>
-#include <utility>
 
 #include "g2o_core_api.h"
 

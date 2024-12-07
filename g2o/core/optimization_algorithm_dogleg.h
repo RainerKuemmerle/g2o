@@ -47,7 +47,7 @@ class G2O_CORE_API OptimizationAlgorithmDogleg
     : public OptimizationAlgorithmWithHessian {
  public:
   /** \brief type of the step to take */
-  enum { kStepUndefined, kStepSd, kStepGn, kStepDl };
+  enum class Step : std::uint8_t { kStepUndefined, kStepSd, kStepGn, kStepDl };
 
   /**
    * construct the Dogleg algorithm, which will use the given Solver for solving
@@ -61,12 +61,12 @@ class G2O_CORE_API OptimizationAlgorithmDogleg
   void printVerbose(std::ostream& os) const override;
 
   //! return the type of the last step taken by the algorithm
-  [[nodiscard]] int lastStep() const { return lastStep_; }
+  [[nodiscard]] Step lastStep() const { return lastStep_; }
   //! return the diameter of the trust region
   [[nodiscard]] double trustRegion() const { return delta_; }
 
   //! convert the type into an integer
-  static const char* stepType2Str(int stepType);
+  static const char* stepType2Str(Step stepType);
 
  protected:
   // parameters
@@ -83,7 +83,8 @@ class G2O_CORE_API OptimizationAlgorithmDogleg
   double currentLambda_ =
       0;          ///< the damping factor to force positive definite matrix
   double delta_;  ///< trust region
-  int lastStep_ = kStepUndefined;  ///< type of the step taken by the algorithm
+  Step lastStep_ =
+      Step::kStepUndefined;  ///< type of the step taken by the algorithm
   bool wasPDInAllIterations_ =
       true;  ///< the matrix we solve was positive definite in
              ///< all iterations -> if not apply damping

@@ -389,25 +389,24 @@ bool BlockSolver<Traits>::buildStructure(bool zeroBlocks) {
   Hpl_->fillSparseBlockMatrixCCS(*HplCCS_);
 
   for (OptimizableGraph::Vertex* v : optimizer_->indexMapping()) {
-    if (v->marginalized()) {
-      const HyperGraph::EdgeSetWeak& vedges = v->edges();
-      for (auto it1 = vedges.begin(); it1 != vedges.end(); ++it1) {
-        auto e1 = it1->lock();
-        for (size_t i = 0; i < e1->vertices().size(); ++i) {
-          auto v1 =
-              std::static_pointer_cast<OptimizableGraph::Vertex>(e1->vertex(i));
-          if (v1->hessianIndex() == -1 || v1.get() == v) continue;
-          for (const auto& vedge : vedges) {
-            auto e2 = vedge.lock();
-            for (size_t j = 0; j < e2->vertices().size(); ++j) {
-              auto v2 = std::static_pointer_cast<OptimizableGraph::Vertex>(
-                  e2->vertex(j));
-              if (v2->hessianIndex() == -1 || v2.get() == v) continue;
-              int i1 = v1->hessianIndex();
-              int i2 = v2->hessianIndex();
-              if (i1 <= i2) {
-                schurMatrixLookup->addBlock(i1, i2);
-              }
+    if (!v->marginalized()) continue;
+    const HyperGraph::EdgeSetWeak& vedges = v->edges();
+    for (auto it1 = vedges.begin(); it1 != vedges.end(); ++it1) {
+      auto e1 = it1->lock();
+      for (size_t i = 0; i < e1->vertices().size(); ++i) {
+        auto v1 =
+            std::static_pointer_cast<OptimizableGraph::Vertex>(e1->vertex(i));
+        if (v1->hessianIndex() == -1 || v1.get() == v) continue;
+        for (const auto& vedge : vedges) {
+          auto e2 = vedge.lock();
+          for (size_t j = 0; j < e2->vertices().size(); ++j) {
+            auto v2 = std::static_pointer_cast<OptimizableGraph::Vertex>(
+                e2->vertex(j));
+            if (v2->hessianIndex() == -1 || v2.get() == v) continue;
+            int i1 = v1->hessianIndex();
+            int i2 = v2->hessianIndex();
+            if (i1 <= i2) {
+              schurMatrixLookup->addBlock(i1, i2);
             }
           }
         }
