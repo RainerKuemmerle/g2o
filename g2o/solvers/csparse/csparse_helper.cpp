@@ -35,16 +35,11 @@ bool writeCs2Octave(const char* filename, const cs* A, bool upperTriangular) {
   const int rows = A->m;
 
   if (A->nz == -1) {  // CCS matrix
-    const int* Ap = A->p;
-    const int* Ai = A->i;
-    const double* Ax = A->x;
-    return writeCCSMatrix(filename, rows, cols, Ap, Ai, Ax, upperTriangular);
+    return writeCCSMatrix(filename, rows, cols, A->p, A->i, A->x,
+                          upperTriangular);
   }
   // Triplet matrix
-  const int* Aj = A->p;
-  const int* Ai = A->i;
-  const double* Ax = A->x;
-  return writeTripletMatrix(filename, A->nz, rows, cols, Ai, Aj, Ax,
+  return writeTripletMatrix(filename, A->nz, rows, cols, A->i, A->p, A->x,
                             upperTriangular);
 }
 
