@@ -27,7 +27,7 @@
 #ifndef G2O_OPENMP_MUTEX
 #define G2O_OPENMP_MUTEX
 
-#include "g2o/config.h"
+#include "g2o/config.h"  // IWYU pragma: keep
 
 #ifdef G2O_OPENMP
 #include <omp.h>

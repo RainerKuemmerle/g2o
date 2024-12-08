@@ -39,6 +39,7 @@
 
 #include "cache.h"
 #include "factory.h"
+#include "g2o/config.h"  // IWYU pragma: keep
 #include "g2o/core/abstract_graph.h"
 #include "g2o/core/eigen_types.h"
 #include "g2o/core/hyper_graph.h"
@@ -65,11 +66,10 @@ void saveUserData(AbstractGraph::AbstractGraphElement& graph_element,
   // write the data packet for the vertex
   for (const auto& d : data) {
     const std::string tag = factory->tag(d.get());
-    if (!tag.empty()) {
-      std::stringstream buffer;
-      d->write(buffer);
-      graph_element.data.emplace_back(tag, buffer.str());
-    }
+    if (tag.empty()) continue;
+    std::stringstream buffer;
+    d->write(buffer);
+    graph_element.data.emplace_back(tag, buffer.str());
   }
 }
 
@@ -246,13 +246,6 @@ std::shared_ptr<const OptimizableGraph::Vertex> OptimizableGraph::vertex(
   return std::static_pointer_cast<const OptimizableGraph::Vertex>(
       HyperGraph::vertex(id));
 }
-
-// bool OptimizableGraph::addEdge(const std::shared_ptr<HyperGraph::Edge>& e_) {
-//   std::shared_ptr<OptimizableGraph::Edge> e =
-//   dynamic_pointer_cast<OptimizableGraph::Edge>(e_); assert(e && "Edge does
-//   not inherit from OptimizableGraph::Edge"); if (!e) return false; return
-//   addEdge(e);
-// }
 
 bool OptimizableGraph::setEdgeVertex(
     const std::shared_ptr<HyperGraph::Edge>& e, int pos,
