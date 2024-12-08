@@ -112,13 +112,6 @@ class BaseVariableSizedEdge : public BaseEdge<D, E> {
  public:
 };
 
-namespace internal {
-inline int computeUpperTriangleIndex(int i, int j) {
-  int elemsUpToCol = ((j - 1) * j) / 2;
-  return elemsUpToCol + i;
-}
-}  // namespace internal
-
 template <int D, typename E>
 void BaseVariableSizedEdge<D, E>::constructQuadraticForm() {
   if (this->robustKernel()) {
@@ -199,7 +192,7 @@ void BaseVariableSizedEdge<D, E>::linearizeOplus() {
 template <int D, typename E>
 void BaseVariableSizedEdge<D, E>::mapHessianMemory(double* d, int i, int j,
                                                    bool rowMajor) {
-  int idx = internal::computeUpperTriangleIndex(i, j);
+  const int idx = internal::pair_to_index(i, j);
   assert(idx < (int)hessian_.size());
   OptimizableGraph::Vertex* vi = vertexRaw(i);
   OptimizableGraph::Vertex* vj = vertexRaw(j);
@@ -241,42 +234,37 @@ void BaseVariableSizedEdge<D, E>::computeQuadraticForm(
     const InformationType& omega, const ErrorVector& weightedError) {
   for (size_t i = 0; i < vertices_.size(); ++i) {
     OptimizableGraph::Vertex* from = vertexRaw(i);
-    bool istatus = !(from->fixed());
+    if (from->fixed()) continue;
 
-    if (istatus) {
-      const JacobianType& A = jacobianOplus_[i];
+    const JacobianType& A = jacobianOplus_[i];
+    MatrixX AtO = A.transpose() * omega;
+    int fromDim = from->dimension();
+    assert(fromDim >= 0);
+    Eigen::Map<MatrixX> fromMap(from->hessianData(), fromDim, fromDim);
+    Eigen::Map<VectorX> fromB(from->bData(), fromDim);
 
-      MatrixX AtO = A.transpose() * omega;
-      int fromDim = from->dimension();
-      assert(fromDim >= 0);
-      Eigen::Map<MatrixX> fromMap(from->hessianData(), fromDim, fromDim);
-      Eigen::Map<VectorX> fromB(from->bData(), fromDim);
+    // ii block in the hessian
+    {
+      internal::QuadraticFormLock lck(*from);
+      fromMap.noalias() += AtO * A;
+      fromB.noalias() += A.transpose() * weightedError;
+    }
 
-      // ii block in the hessian
-      {
-        internal::QuadraticFormLock lck(*from);
-        fromMap.noalias() += AtO * A;
-        fromB.noalias() += A.transpose() * weightedError;
-      }
+    // compute the off-diagonal blocks ij for all j
+    for (size_t j = i + 1; j < vertices_.size(); ++j) {
+      OptimizableGraph::Vertex* to = vertexRaw(j);
+      if (to->fixed()) continue;
 
-      // compute the off-diagonal blocks ij for all j
-      for (size_t j = i + 1; j < vertices_.size(); ++j) {
-        OptimizableGraph::Vertex* to = vertexRaw(j);
-
-        bool jstatus = !(to->fixed());
-        if (jstatus) {
-          internal::QuadraticFormLock lck(*to);
-          const JacobianType& B = jacobianOplus_[j];
-          int idx = internal::computeUpperTriangleIndex(i, j);
-          assert(idx < (int)hessian_.size());
-          HessianHelper& hhelper = hessian_[idx];
-          if (hhelper
-                  .transposed) {  // we have to write to the block as transposed
-            hhelper.matrix.noalias() += B.transpose() * AtO.transpose();
-          } else {
-            hhelper.matrix.noalias() += AtO * B;
-          }
-        }
+      internal::QuadraticFormLock lck(*to);
+      const JacobianType& B = jacobianOplus_[j];
+      const int idx = internal::pair_to_index(i, j);
+      assert(idx < (int)hessian_.size());
+      HessianHelper& hhelper = hessian_[idx];
+      if (hhelper.transposed) {
+        // we have to write to the block as transposed
+        hhelper.matrix.noalias() += B.transpose() * AtO.transpose();
+      } else {
+        hhelper.matrix.noalias() += AtO * B;
       }
     }
   }

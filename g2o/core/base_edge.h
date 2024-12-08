@@ -31,6 +31,7 @@
 #include <climits>
 #include <type_traits>
 
+#include "g2o/config.h"  // IWYU pragma: keep
 #include "g2o/core/type_traits.h"
 #include "g2o/stuff/logger.h"
 #include "optimizable_graph.h"
@@ -55,6 +56,11 @@ struct QuadraticFormLock {
   explicit QuadraticFormLock(OptimizableGraph::Vertex&) {}
 };
 #endif
+
+// assumes i < j
+constexpr int pair_to_index(const int i, const int j) {
+  return ((j * (j - 1)) / 2) + i;
+}
 
 /**
  * Declaring the types for the error vector and the information matrix depending

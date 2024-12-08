@@ -60,13 +60,6 @@ inline std::array<bool, 0> createBoolArray<0>() {
   return std::array<bool, 0>();
 }
 
-// assumes i < j
-// duplication of internal::computeUpperTriangleIndex in
-// g2o/core/base_variable_sized_edge.hpp
-constexpr int pair_to_index(const int i, const int j) {
-  return j * (j - 1) / 2 + i;
-}
-
 /**
  * A trivial pair that has a constexpr c'tor.
  * std::pair in C++11 has not a constexpr c'tor.
