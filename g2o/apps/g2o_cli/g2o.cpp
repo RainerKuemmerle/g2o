@@ -34,7 +34,6 @@
 #include <string_view>
 
 #include "dl_wrapper.h"
-#include "g2o/config.h"
 #include "g2o/core/batch_stats.h"
 #include "g2o/core/estimate_propagator.h"
 #include "g2o/core/factory.h"
@@ -198,10 +197,6 @@ int main(int argc, char** argv) {
             "apply the robust kernel only on loop closures and not odometries");
 
   arg.parseArgs(argc, argv);
-
-  if (verbose) {
-    cout << "# Used Compiler: " << G2O_CXX_COMPILER << "\n";
-  }
 
 #ifndef G2O_DISABLE_DYNAMIC_LOADING_OF_LIBRARIES
   // registering all the types from the libraries

@@ -16,7 +16,6 @@
 // logging framework available
 #cmakedefine G2O_HAVE_LOGGING
 
-#cmakedefine G2O_CXX_COMPILER "@G2O_CXX_COMPILER@"
 #cmakedefine G2O_SRC_DIR "@G2O_SRC_DIR@"
 
 #endif
