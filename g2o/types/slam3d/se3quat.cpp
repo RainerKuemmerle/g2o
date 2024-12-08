@@ -165,7 +165,7 @@ SE3Quat SE3Quat::exp(const Vector6& update) {
     R = (Matrix3::Identity() + std::sin(theta) / theta * Omega +
          (1 - std::cos(theta)) / (theta * theta) * Omega2);
     V = (Matrix3::Identity() + (1 - std::cos(theta)) / (theta * theta) * Omega +
-         (theta - std::sin(theta)) / (std::pow(theta, 3)) * Omega2);
+         (theta - std::sin(theta)) / (std::pow(theta, 3))*Omega2);
   }
   return SE3Quat(Quaternion(R), V * upsilon);
 }
