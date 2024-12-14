@@ -135,14 +135,16 @@ bool OptimizableGraph::Edge::resolveParameters() {
   for (size_t i = 0; i < _parameters.size(); i++) {
     int index = _parameterIds[i];
     *_parameters[i] = graph()->parameter(index);
+    if (!*_parameters[i]) {
+      G2O_CRITICAL(
+          "parameter {} is NULL. Check setParameterId() calls for the edge.",
+          i);
+      return false;
+    }
     auto& aux = **_parameters[i];
     if (typeid(aux).name() != _parameterTypes[i]) {
       G2O_CRITICAL("parameter type mismatch - encountered {}; should be {}",
                    typeid(aux).name(), _parameterTypes[i]);
-    }
-    if (!*_parameters[i]) {
-      G2O_CRITICAL("*_parameters[i] == 0");
-      return false;
     }
   }
   return true;
@@ -228,12 +230,12 @@ bool OptimizableGraph::addEdge(OptimizableGraph::Edge* e) {
   e->_internalId = _nextEdgeId++;
   if (e->numUndefinedVertices()) return true;
   if (!e->resolveParameters()) {
-    G2O_ERROR("{}: FATAL, cannot resolve parameters for edge {}",
+    G2O_ERROR("FATAL, cannot resolve parameters for edge {}",
               static_cast<void*>(e));
     return false;
   }
   if (!e->resolveCaches()) {
-    G2O_ERROR("{}: FATAL, cannot resolve caches for edge {}",
+    G2O_ERROR("FATAL, cannot resolve caches for edge {}",
               static_cast<void*>(e));
     return false;
   }
@@ -263,12 +265,12 @@ bool OptimizableGraph::setEdgeVertex(HyperGraph::Edge* e, int pos,
     OptimizableGraph::Edge* ee = static_cast<OptimizableGraph::Edge*>(e);
 #endif
     if (!ee->resolveParameters()) {
-      G2O_ERROR("{}: FATAL, cannot resolve parameters for edge {}",
+      G2O_ERROR("FATAL, cannot resolve parameters for edge {}",
                 static_cast<void*>(e));
       return false;
     }
     if (!ee->resolveCaches()) {
-      G2O_ERROR("{}: FATAL, cannot resolve caches for edge {}",
+      G2O_ERROR("FATAL, cannot resolve caches for edge {}",
                 static_cast<void*>(e));
       return false;
     }
