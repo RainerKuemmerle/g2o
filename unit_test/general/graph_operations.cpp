@@ -48,6 +48,9 @@
 #include "g2o/types/slam2d/edge_se2.h"
 #include "g2o/types/slam2d/vertex_point_xy.h"
 #include "g2o/types/slam2d/vertex_se2.h"
+#include "g2o/types/slam3d/edge_se3_pointxyz.h"
+#include "g2o/types/slam3d/vertex_pointxyz.h"
+#include "g2o/types/slam3d/vertex_se3.h"
 #include "unit_test/test_helper/allocate_optimizer.h"
 #include "unit_test/test_helper/eigen_matcher.h"
 
@@ -269,6 +272,26 @@ TEST(General, GraphAddGraph) {
   EXPECT_THAT(extractEdgeIds(fresh_graph), UnorderedElementsAreArray(edge_ids));
 }
 
+TEST(General, GraphAddEdgeNoRequiredParam) {
+  auto optimizer = g2o::internal::createOptimizerForTests();
+
+  auto poseVertex = std::make_shared<g2o::VertexSE3>();
+  poseVertex->setId(0);
+  optimizer->addVertex(poseVertex);
+
+  auto pointVertex = std::make_shared<g2o::VertexPointXYZ>();
+  pointVertex->setId(1);
+  optimizer->addVertex(pointVertex);
+
+  auto edge = std::make_shared<g2o::EdgeSE3PointXYZ>();
+  edge->setVertex(0, poseVertex);
+  edge->setVertex(1, pointVertex);
+
+  EXPECT_FALSE(optimizer->addEdge(edge));
+
+  optimizer->clear();
+}
+
 TEST(General, GraphChangeId) {
   std::unique_ptr<g2o::SparseOptimizer> optimizer(
       g2o::internal::createOptimizerForTests());
@@ -465,6 +488,7 @@ class GeneralGraphOperations : public ::testing::Test {
   //! returns the expected Vertex IDs of the edges of the fixture
   static std::vector<std::pair<int, int>> expectedEdgeIds() {
     std::vector<std::pair<int, int>> result;
+    result.reserve(kNumVertices);
     for (size_t i = 0; i < kNumVertices; ++i)
       result.emplace_back((i + 0) % kNumVertices, (i + 1) % kNumVertices);
     return result;

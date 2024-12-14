@@ -163,8 +163,9 @@ bool OptimizableGraph::Edge::resolveParameters(const OptimizableGraph& graph) {
     parameters_[i] = graph.parameter(index);
     if (!parameters_[i]) {
       G2O_CRITICAL(
-          "Parameter {} with expected Id {} not contained in the graph", i,
-          index);
+          "Parameter {} with expected Id {} not contained in the graph. Check "
+          "setParameterId() calls for the edge.",
+          i, index);
       return false;
     }
   }
@@ -222,12 +223,12 @@ bool OptimizableGraph::addEdge(const std::shared_ptr<HyperGraph::Edge>& he) {
   e->internalId_ = nextEdgeId_++;
   if (e->numUndefinedVertices()) return true;
   if (!e->resolveParameters(*this)) {
-    G2O_ERROR("{}: FATAL, cannot resolve parameters for edge {}",
+    G2O_ERROR("FATAL, cannot resolve parameters for edge {}",
               static_cast<void*>(e));
     return false;
   }
   if (!e->resolveCaches()) {
-    G2O_ERROR("{}: FATAL, cannot resolve caches for edge {}",
+    G2O_ERROR("FATAL, cannot resolve caches for edge {}",
               static_cast<void*>(e));
     return false;
   }
