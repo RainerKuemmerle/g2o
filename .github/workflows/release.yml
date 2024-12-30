@@ -28,13 +28,15 @@ jobs:
       run: |
           cd doc
           make
+
+    - name: Check PDF output
+      run: |
           ls -l ${{github.workspace}}/doc/*.pdf
 
-
-    # - name: Create github Release
-    #   uses: softprops/action-gh-release@v2
-    #   if: startsWith(github.ref, 'refs/tags/')
-    #   with:
-    #     generate_release_notes: false
-    #     files: |
-    #       ${{github.workspace}}/doc/*.pdf
+    - name: Create github Release
+      uses: softprops/action-gh-release@v2
+      if: startsWith(github.ref, 'refs/tags/')
+      with:
+        generate_release_notes: false
+        files: |
+          ${{github.workspace}}/doc/*.pdf
