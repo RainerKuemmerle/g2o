@@ -72,6 +72,7 @@ bool HyperGraphElementActionCollection::registerAction(
         "invalid attempt to register an action in a collection with a "
         "different name {} {}",
         name(), action->name());
+    return false;
   }
   actionMap_.insert(make_pair(action->typeName(), action));
   return true;
@@ -174,7 +175,7 @@ DrawAction::Parameters* DrawAction::refreshPropertyPtrs(
     previousParams_ = nullptr;
     show_ = nullptr;
   } else {
-    previousParams_ = &p;
+    previousParams_ = p;
     show_ = p->makeProperty<BoolProperty>(typeName_ + "::SHOW", true);
   }
   return p;
