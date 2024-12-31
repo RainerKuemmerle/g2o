@@ -1,4 +1,3 @@
-import random
 from typing import List
 
 import g2opy as g2o
@@ -48,12 +47,13 @@ def main():
     # generate random data
     center: np.ndarray = np.array([4.0, 2.0])
     radius: float = 2.0
-    points: List[np.array] = []
 
-    for _ in range(num_points):
-        r = random.gauss(radius, 0.05)
-        angle = random.uniform(0.0, 2.0 * np.pi)
-        points.append(center + np.array([r * np.cos(angle), r * np.sin(angle)]))
+    def gen_point() -> np.array:
+        r = np.random.normal(radius, 0.05)
+        angle = np.random.random() * 2.0 * np.pi
+        return center + np.array([r * np.cos(angle), r * np.sin(angle)])
+
+    points: List[np.array] = [gen_point() for _ in range(num_points)]
 
     # build the optimization problem given the points
     # 1. add the circle vertex
@@ -85,10 +85,10 @@ def main():
 
     # print out the result
     print("Iterative least squares solution")
-    print(f"center of the circle: {circle.estimate()[0:2]}")
-    print(f"radius of the circle: {circle.estimate()[2]}")
-
-    # TODO compute error of the solution
+    print(f"Center of the circle: {circle.estimate()[0:2]}")
+    print(f"Radius of the circle: {circle.estimate()[2]}")
+    optimizer.compute_active_errors()
+    print(f"Final chi2: {optimizer.chi2()}")
 
     # plot the solution
     fig = go.Figure()
