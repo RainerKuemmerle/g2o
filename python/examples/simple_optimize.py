@@ -6,8 +6,8 @@ import g2opy as g2o
 
 
 def to_io_format(value: str) -> g2o.IoFormat:
-    format = g2o.IoWrapper.format_for_file_extension(value)
-    return format if format is not None else g2o.IoFormat.G2O
+    guessed_format = g2o.IoWrapper.format_for_file_extension(value)
+    return guessed_format if guessed_format is not None else g2o.IoFormat.G2O
 
 
 def main():
