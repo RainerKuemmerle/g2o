@@ -28,37 +28,32 @@
 
 #include <cmath>
 
+#include "g2o/core/eigen_types.h"
+
 namespace g2o {
 
 void EdgeSE2Segment2DLine::computeError() {
-  const VertexSE2* v1 = vertexXnRaw<0>();
-  const VertexSegment2D* l2 = vertexXnRaw<1>();
-  SE2 iEst = v1->estimate().inverse();
-  Vector2 predP1 = iEst * l2->estimateP1();
-  Vector2 predP2 = iEst * l2->estimateP2();
-  Vector2 dP = predP2 - predP1;
-  Vector2 normal(dP.y(), -dP.x());
-  normal.normalize();
-  Vector2 prediction(std::atan2(normal.y(), normal.x()),
-                     predP1.dot(normal) * .5 + predP2.dot(normal) * .5);
-
-  error_ = prediction - measurement_;
+  const Vector2 prediction_vec = prediction();
+  error_ = prediction_vec - measurement_;
   error_[0] = normalize_theta(error_[0]);
 }
 
 bool EdgeSE2Segment2DLine::setMeasurementFromState() {
+  measurement_ = prediction();
+  return true;
+}
+
+Vector2 EdgeSE2Segment2DLine::prediction() const {
   const VertexSE2* v1 = vertexXnRaw<0>();
   const VertexSegment2D* l2 = vertexXnRaw<1>();
-  SE2 iEst = v1->estimate().inverse();
-  Vector2 predP1 = iEst * l2->estimateP1();
-  Vector2 predP2 = iEst * l2->estimateP2();
-  Vector2 dP = predP2 - predP1;
-  Vector2 normal(dP.y(), -dP.x());
-  normal.normalize();
+  const SE2 iEst = v1->estimate().inverse();
+  const Vector2 predP1 = iEst * l2->estimateP1();
+  const Vector2 predP2 = iEst * l2->estimateP2();
+  const Vector2 dP = predP2 - predP1;
+  const Vector2 normal = Vector2(dP.y(), -dP.x()).normalized();
   Vector2 prediction(std::atan2(normal.y(), normal.x()),
-                     predP1.dot(normal) * .5 + predP2.dot(normal) * .5);
-  measurement_ = prediction;
-  return true;
+                     (predP1.dot(normal) * .5) + (predP2.dot(normal) * .5));
+  return prediction;
 }
 
 }  // namespace g2o
