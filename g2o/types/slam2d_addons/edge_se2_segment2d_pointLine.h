@@ -47,10 +47,7 @@ class G2O_TYPES_SLAM2D_ADDONS_API EdgeSE2Segment2DPointLine
   }
 
   void setTheta(double t) { measurement_[2] = t; }
-  void setPoint(const Vector2& p_) {
-    Eigen::Map<Vector2> p(measurement_.data());
-    p = p_;
-  }
+  void setPoint(const Vector2& p) { measurement_.head<2>() = p; }
 
   [[nodiscard]] int pointNum() const { return pointNum_; }
   void setPointNum(int pn) { pointNum_ = pn; }
@@ -62,9 +59,7 @@ class G2O_TYPES_SLAM2D_ADDONS_API EdgeSE2Segment2DPointLine
  protected:
   int pointNum_ = 0;
 
-  /* #ifndef NUMERIC_JACOBIAN_TWO_D_TYPES */
-  /*       virtual void linearizeOplus(); */
-  /* #endif */
+  [[nodiscard]] Vector3 prediction() const;
 };
 
 }  // namespace g2o

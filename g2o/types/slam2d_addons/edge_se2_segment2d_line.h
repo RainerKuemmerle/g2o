@@ -49,6 +49,9 @@ class G2O_TYPES_SLAM2D_ADDONS_API EdgeSE2Segment2DLine
   void computeError() override;
 
   bool setMeasurementFromState() override;
+
+ protected:
+  [[nodiscard]] Vector2 prediction() const;
 };
 
 }  // namespace g2o

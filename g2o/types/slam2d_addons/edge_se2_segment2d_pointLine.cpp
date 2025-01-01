@@ -28,40 +28,33 @@
 
 #include <cmath>
 
+#include "g2o/core/eigen_types.h"
+
 namespace g2o {
 
 void EdgeSE2Segment2DPointLine::computeError() {
-  const VertexSE2* v1 = vertexXnRaw<0>();
-  const VertexSegment2D* l2 = vertexXnRaw<1>();
-  SE2 iEst = v1->estimate().inverse();
-  Vector2 predP1 = iEst * l2->estimateP1();
-  Vector2 predP2 = iEst * l2->estimateP2();
-  Vector2 dP = predP2 - predP1;
-  Vector2 normal(dP.y(), -dP.x());
-  normal.normalize();
-  Vector3 prediction;
-  prediction[2] = std::atan2(normal.y(), normal.x());
-  Eigen::Map<Vector2> pt(prediction.data());
-  pt = (pointNum_ == 0) ? predP1 : predP2;
-  error_ = prediction - measurement_;
+  const Vector3 prediction_vec = prediction();
+  error_ = prediction_vec - measurement_;
   error_[2] = normalize_theta(error_[2]);
 }
 
 bool EdgeSE2Segment2DPointLine::setMeasurementFromState() {
+  setMeasurement(prediction());
+  return true;
+}
+
+[[nodiscard]] Vector3 EdgeSE2Segment2DPointLine::prediction() const {
   const VertexSE2* v1 = vertexXnRaw<0>();
   const VertexSegment2D* l2 = vertexXnRaw<1>();
-  SE2 iEst = v1->estimate().inverse();
-  Vector2 predP1 = iEst * l2->estimateP1();
-  Vector2 predP2 = iEst * l2->estimateP2();
-  Vector2 dP = predP2 - predP1;
-  Vector2 normal(dP.y(), -dP.x());
-  normal.normalize();
+  const SE2 iEst = v1->estimate().inverse();
+  const Vector2 predP1 = iEst * l2->estimateP1();
+  const Vector2 predP2 = iEst * l2->estimateP2();
+  const Vector2 dP = predP2 - predP1;
+  const Vector2 normal = Vector2(dP.y(), -dP.x()).normalized();
   Vector3 prediction;
-  prediction[2] = std::atan2(normal.y(), normal.x());
-  Eigen::Map<Vector2> pt(prediction.data());
-  pt = (pointNum_ == 0) ? predP1 : predP2;
-  setMeasurement(prediction);
-  return true;
+  prediction << ((pointNum_ == 0) ? predP1 : predP2),
+      std::atan2(normal.y(), normal.x());
+  return prediction;
 }
 
 }  // namespace g2o
