@@ -30,6 +30,7 @@
 
 #include "g2o/solvers/dense/linear_solver_dense.h"
 #include "g2o/solvers/eigen/linear_solver_eigen.h"
+#include "g2o/solvers/pcg/linear_solver_pcg.h"
 #ifdef G2O_HAVE_CSPARSE
 #include "g2o/solvers/csparse/linear_solver_csparse.h"
 #endif
@@ -181,3 +182,24 @@ using LinearSolverTypes = ::testing::Types<
     std::pair<g2o::LinearSolverEigen<g2o::MatrixX>, BlockOrdering>,
     std::pair<g2o::LinearSolverDense<g2o::MatrixX>, NoopOrdering>>;
 INSTANTIATE_TYPED_TEST_SUITE_P(LinearSolver, LS, LinearSolverTypes);
+
+// A single test for PCG
+TEST(LS, LinearSolverPCGSolve) {
+  g2o::LinearSolverPCG<g2o::MatrixX> solver;
+
+  // test data
+  g2o::SparseBlockMatrixX sparse_matrix;
+  g2o::internal::fillTestMatrix(sparse_matrix);
+  g2o::VectorX x_vector = g2o::internal::createTestVectorX();
+  g2o::VectorX b_vector = g2o::internal::createTestVectorB();
+
+  g2o::VectorX solver_solution;
+  for (int solve_iter = 0; solve_iter < 2; ++solve_iter) {
+    solver.init();
+    solver_solution.setZero(b_vector.size());
+    solver.solve(sparse_matrix, solver_solution.data(), b_vector.data());
+
+    EXPECT_TRUE(solver_solution.isApprox(x_vector, 1e-3))
+        << "Solution differs on iteration " << solve_iter;
+  }
+}

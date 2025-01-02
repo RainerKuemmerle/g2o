@@ -30,6 +30,7 @@
 #include <Eigen/Core>
 #include <cassert>
 #include <cstddef>
+#include <functional>
 #include <utility>
 #include <vector>
 
@@ -77,7 +78,7 @@ class LinearSolverPCG : public LinearSolver<MatrixType> {
 
  protected:
   using MatrixVector = std::vector<MatrixType>;
-  using MatrixPtrVector = std::vector<const MatrixType*>;
+  using MatrixPtrVector = std::vector<std::reference_wrapper<const MatrixType>>;
 
   double tolerance_ = cst(1e-6);
   double residual_ = -1.;
@@ -88,12 +89,11 @@ class LinearSolverPCG : public LinearSolver<MatrixType> {
   MatrixPtrVector diag_;
   MatrixVector J_;
 
-  std::vector<std::pair<int, int> > indices_;
+  std::vector<std::pair<int, int>> indices_;
   MatrixPtrVector sparseMat_;
 
-  void multDiag(const std::vector<int>& colBlockIndices, MatrixVector& A,
-                const VectorX& src, VectorX& dest);
-  void multDiag(const std::vector<int>& colBlockIndices, MatrixPtrVector& A,
+  template <typename T>
+  void multDiag(const std::vector<int>& colBlockIndices, std::vector<T>& A,
                 const VectorX& src, VectorX& dest);
   void mult(const std::vector<int>& colBlockIndices, const VectorX& src,
             VectorX& dest);
@@ -165,40 +165,32 @@ bool LinearSolverPCG<MatrixType>::solve(const SparseBlockMatrix<MatrixType>& A,
   for (size_t i = 0; i < A.blockCols().size(); ++i) {
     const typename SparseBlockMatrix<MatrixType>::IntBlockMap& col =
         A.blockCols()[i];
-    if (col.size() > 0) {
-      typename SparseBlockMatrix<MatrixType>::IntBlockMap::const_iterator it;
-      for (it = col.begin(); it != col.end(); ++it) {
-        // only the upper triangular block is needed
-        if (it->first == static_cast<int>(i)) {
-          diag_.push_back(it->second);
-          J_.push_back(it->second->inverse());
-          break;
-        }
-        if (indexRequired) {
-          indices_.push_back(std::make_pair(
-              it->first > 0 ? A.rowBlockIndices()[it->first - 1] : 0, colIdx));
-          sparseMat_.push_back(it->second);
-        }
+    for (const auto& elem : col) {
+      // only the upper triangular block is needed
+      if (elem.first == static_cast<int>(i)) {
+        diag_.push_back(std::cref(*elem.second));
+        J_.push_back(elem.second->inverse());
+        break;
+      }
+      if (indexRequired) {
+        indices_.emplace_back(
+            elem.first > 0 ? A.rowBlockIndices()[elem.first - 1] : 0, colIdx);
+        sparseMat_.push_back(std::cref(*elem.second));
       }
     }
     colIdx = A.colBlockIndices()[i];
   }
 
-  int n = A.rows();
+  const int n = A.rows();
   assert(n > 0 && "Hessian has 0 rows/cols");
   VectorX::MapType xvec(x, A.cols());
-  const VectorX::ConstMapType bvec(b, n);
   xvec.setZero();
 
-  VectorX r;
-  VectorX d;
-  VectorX q;
-  VectorX s;
-  d.setZero(n);
-  q.setZero(n);
-  s.setZero(n);
+  VectorX r = VectorX::ConstMapType(b, n);
+  VectorX d = VectorX::Zero(n);
+  VectorX q = VectorX::Zero(n);
+  VectorX s = VectorX::Zero(n);
 
-  r = bvec;
   multDiag(A.colBlockIndices(), J_, r, d);
   double dn = r.dot(d);
   double d0 = tolerance_ * dn;
@@ -214,14 +206,14 @@ bool LinearSolverPCG<MatrixType>::solve(const SparseBlockMatrix<MatrixType>& A,
     G2O_DEBUG("residual [{}]: {}", iteration, dn);
     if (dn <= d0) break;  // done
     mult(A.colBlockIndices(), d, q);
-    double a = dn / d.dot(q);
-    xvec += a * d;
+    const double a = dn / d.dot(q);
+    xvec.noalias() += a * d;
     // TODO(goki): reset residual here every 50 iterations
-    r -= a * q;
+    r.noalias() -= a * q;
     multDiag(A.colBlockIndices(), J_, r, s);
-    double dold = dn;
+    const double dold = dn;
     dn = r.dot(s);
-    double ba = dn / dold;
+    const double ba = dn / dold;
     d = s + ba * d;
   }
   residual_ = 0.5 * dn;
@@ -234,23 +226,14 @@ bool LinearSolverPCG<MatrixType>::solve(const SparseBlockMatrix<MatrixType>& A,
 }
 
 template <typename MatrixType>
+template <typename T>
 void LinearSolverPCG<MatrixType>::multDiag(
-    const std::vector<int>& colBlockIndices, MatrixVector& A,
+    const std::vector<int>& colBlockIndices, std::vector<T>& A,
     const VectorX& src, VectorX& dest) {
   int row = 0;
   for (size_t i = 0; i < A.size(); ++i) {
-    internal::pcg_axy(A[i], src, row, dest, row);
-    row = colBlockIndices[i];
-  }
-}
-
-template <typename MatrixType>
-void LinearSolverPCG<MatrixType>::multDiag(
-    const std::vector<int>& colBlockIndices, MatrixPtrVector& A,
-    const VectorX& src, VectorX& dest) {
-  int row = 0;
-  for (size_t i = 0; i < A.size(); ++i) {
-    internal::pcg_axy(*A[i], src, row, dest, row);
+    const MatrixType& mat = A[i];
+    internal::pcg_axy(mat, src, row, dest, row);
     row = colBlockIndices[i];
   }
 }
@@ -268,12 +251,11 @@ void LinearSolverPCG<MatrixType>::mult(const std::vector<int>& colBlockIndices,
     const int& destOffset = indices_[i].first;
     const int& srcOffsetT = destOffset;
 
-    const typename SparseBlockMatrix<MatrixType>::SparseMatrixBlock* a =
-        sparseMat_[i];
+    const MatrixType& a = sparseMat_[i];
     // destVec += *a * srcVec (according to the sub-vector parts)
-    internal::pcg_axpy(*a, src, srcOffset, dest, destOffset);
+    internal::pcg_axpy(a, src, srcOffset, dest, destOffset);
     // destVec += *a.transpose() * srcVec (according to the sub-vector parts)
-    internal::pcg_atxpy(*a, src, srcOffsetT, dest, destOffsetT);
+    internal::pcg_atxpy(a, src, srcOffsetT, dest, destOffsetT);
   }
 }
 
