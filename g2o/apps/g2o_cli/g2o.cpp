@@ -300,7 +300,7 @@ int main(int argc, char** argv) {
     return 1;
   }
 
-  std::set<int> vertexDimensions = optimizer.dimensions();
+  std::unordered_set<int> vertexDimensions = optimizer.dimensions();
   if (!optimizer.isSolverSuitable(solverProperty, vertexDimensions)) {
     cerr << "The selected solver is not suitable for optimizing the given "
             "graph\n";
@@ -346,8 +346,10 @@ int main(int argc, char** argv) {
 
   // if schur, we wanna marginalize the landmarks...
   if (marginalize || solverProperty.requiresMarginalize) {
-    int maxDim = *vertexDimensions.rbegin();
-    int minDim = *vertexDimensions.begin();
+    const int maxDim =
+        *std::max_element(vertexDimensions.begin(), vertexDimensions.end());
+    const int minDim =
+        *std::min_element(vertexDimensions.begin(), vertexDimensions.end());
     if (maxDim != minDim) {
       cerr << "# Preparing Marginalization of the Landmarks ... ";
       for (auto& it : optimizer.vertices()) {
@@ -420,9 +422,9 @@ int main(int argc, char** argv) {
     cerr << "#\t iterations  " << incIterations << '\n';
 
     SparseOptimizer::VertexIDMap vertices = optimizer.vertices();
-    for (auto& vertice : vertices) {
-      auto v =
-          std::static_pointer_cast<SparseOptimizer::Vertex>(vertice.second);
+    for (auto& vertex : vertices) {
+      const auto* v =
+          static_cast<SparseOptimizer::Vertex*>(vertex.second.get());
       maxDim = std::max(maxDim, v->dimension());
     }
 
@@ -649,7 +651,8 @@ int main(int argc, char** argv) {
 
       int nLandmarks = 0;
       int nPoses = 0;
-      int maxDim = *vertexDimensions.rbegin();
+      const int maxDim =
+          *std::max_element(vertexDimensions.begin(), vertexDimensions.end());
       for (auto& it : optimizer.vertices()) {
         auto v = std::static_pointer_cast<OptimizableGraph::Vertex>(it.second);
         if (v->dimension() != maxDim) {

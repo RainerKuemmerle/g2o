@@ -51,6 +51,7 @@
 #include "g2o/types/slam3d/edge_se3_pointxyz.h"
 #include "g2o/types/slam3d/vertex_pointxyz.h"
 #include "g2o/types/slam3d/vertex_se3.h"
+#include "gmock/gmock.h"
 #include "unit_test/test_helper/allocate_optimizer.h"
 #include "unit_test/test_helper/eigen_matcher.h"
 
@@ -558,7 +559,7 @@ TEST_F(GeneralGraphOperations, LoadingGraph) {
   optimizer_->load(graphData);
   ASSERT_THAT(optimizer_->vertices(), testing::SizeIs(kNumVertices));
   ASSERT_THAT(optimizer_->edges(), testing::SizeIs(kNumVertices));
-  ASSERT_THAT(optimizer_->dimensions(), testing::ElementsAre(3));
+  ASSERT_THAT(optimizer_->dimensions(), testing::UnorderedElementsAre(3));
 
   ASSERT_THAT(optimizer_->vertices(), testing::UnorderedElementsAreArray(
                                           VectorIntToKeys(expectedIds())));
@@ -810,14 +811,14 @@ TEST_F(GeneralGraphOperations, Dimensions) {
   optimizer_->initializeOptimization();
 
   EXPECT_EQ(optimizer_->maxDimension(), 3);
-  EXPECT_THAT(optimizer_->dimensions(), testing::ElementsAre(3));
+  EXPECT_THAT(optimizer_->dimensions(), testing::UnorderedElementsAre(3));
 
   auto point = std::make_shared<g2o::VertexPointXY>();
   point->setId(kNumVertices + 1);
   optimizer_->addVertex(point);
 
   EXPECT_EQ(optimizer_->maxDimension(), 3);
-  EXPECT_THAT(optimizer_->dimensions(), testing::ElementsAre(2, 3));
+  EXPECT_THAT(optimizer_->dimensions(), testing::UnorderedElementsAre(2, 3));
 }
 
 TEST_F(GeneralGraphOperations, VerifyInformationMatrices) {
@@ -861,8 +862,8 @@ TEST_F(GeneralGraphOperations, SolverSuitable) {
   solverPropertyFix63.poseDim = 6;
   solverPropertyFix63.landmarkDim = 3;
 
-  const std::set<int> vertexDims = {2, 3};
-  const std::set<int> vertexDimsNoMatch = {1, 5};
+  const std::unordered_set<int> vertexDims = {2, 3};
+  const std::unordered_set<int> vertexDimsNoMatch = {1, 5};
 
   EXPECT_TRUE(optimizer_->isSolverSuitable(solverPropertyVar));
   EXPECT_TRUE(optimizer_->isSolverSuitable(solverPropertyVar, vertexDims));
