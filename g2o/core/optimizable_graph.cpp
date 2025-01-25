@@ -89,7 +89,7 @@ bool saveParameter(AbstractGraph& abstract_graph, Parameter* p) {
   if (tag.empty()) return false;
   std::vector<double> data;
   p->getParameterData(data);
-  abstract_graph.parameters().emplace_back(tag, p->id(), data);
+  abstract_graph.parameters().emplace_back(tag, p->id(), std::move(data));
   return true;
 }
 
@@ -108,8 +108,7 @@ void addDataToGraphElement(
     const std::vector<AbstractGraph::AbstractData>& data_vector) {
   Factory* factory = Factory::instance();
 
-  HyperGraph::GraphElemBitset elemDataBitset;
-  elemDataBitset[HyperGraph::kHgetData] = true;
+  const HyperGraph::GraphElemBitset elemDataBitset(1 << HyperGraph::kHgetData);
   for (const auto& abstract_data : data_vector) {
     const std::shared_ptr<HyperGraph::HyperGraphElement> element =
         factory->construct(abstract_data.tag, elemDataBitset);
@@ -355,13 +354,11 @@ bool OptimizableGraph::load(std::istream& is, io::Format format) {
     return false;
   }
 
-  if (!renamedTypesLookup_.empty()) {
-    abstract_graph.renameTags(renamedTypesLookup_);
-  }
+  abstract_graph.renameTags(renamedTypesLookup_);
 
   // Create the parameters of the graph
-  HyperGraph::GraphElemBitset elemParamBitset;
-  elemParamBitset[HyperGraph::kHgetParameter] = true;
+  const HyperGraph::GraphElemBitset elemParamBitset(
+      1 << HyperGraph::kHgetParameter);
   for (const auto& abstract_param : abstract_graph.parameters()) {
     const std::shared_ptr<HyperGraph::HyperGraphElement> pelement =
         factory->construct(abstract_param.tag, elemParamBitset);
@@ -384,8 +381,8 @@ bool OptimizableGraph::load(std::istream& is, io::Format format) {
   }
 
   // Create the vertices of the graph
-  HyperGraph::GraphElemBitset elemVertexBitset;
-  elemVertexBitset[HyperGraph::kHgetVertex] = true;
+  const HyperGraph::GraphElemBitset elemVertexBitset(
+      1 << HyperGraph::kHgetVertex);
   for (const auto& abstract_vertex : abstract_graph.vertices()) {
     const std::shared_ptr<HyperGraph::HyperGraphElement> graph_element =
         factory->construct(abstract_vertex.tag, elemVertexBitset);
@@ -411,8 +408,7 @@ bool OptimizableGraph::load(std::istream& is, io::Format format) {
   }
 
   // Create the edges of the graph
-  HyperGraph::GraphElemBitset elemEdgeBitset;
-  elemEdgeBitset[HyperGraph::kHgetEdge] = true;
+  const HyperGraph::GraphElemBitset elemEdgeBitset(1 << HyperGraph::kHgetEdge);
   for (const auto& abstract_edge : abstract_graph.edges()) {
     const std::shared_ptr<HyperGraph::HyperGraphElement> graph_element =
         factory->construct(abstract_edge.tag, elemEdgeBitset);

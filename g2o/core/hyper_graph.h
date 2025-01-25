@@ -34,6 +34,7 @@
 #include <memory>
 #include <set>
 #include <unordered_map>
+#include <utility>
 #include <vector>
 
 #include "g2o_core_api.h"
@@ -153,7 +154,7 @@ class G2O_CORE_API HyperGraph {
     //! returns the set of hyper-edges that are leaving/entering in this vertex
     EdgeSetWeak& edges() { return edges_; }
     [[nodiscard]] HyperGraphElementType elementType() const final {
-      return kHgetVertex;
+      return HyperGraphElementType::kHgetVertex;
     }
 
    protected:
@@ -203,15 +204,15 @@ class G2O_CORE_API HyperGraph {
     /**
       set the ith vertex on the hyper-edge to the pointer supplied
       */
-    void setVertex(size_t i, const std::shared_ptr<Vertex>& v) {
+    void setVertex(size_t i, std::shared_ptr<Vertex> v) {
       assert(i < vertices_.size() && "index out of bounds");
-      vertices_[i] = v;
+      vertices_[i] = std::move(v);
     }
 
     [[nodiscard]] int id() const { return id_; }
     void setId(int id);
     [[nodiscard]] HyperGraphElementType elementType() const final {
-      return kHgetEdge;
+      return HyperGraphElementType::kHgetEdge;
     }
 
     [[nodiscard]] int numUndefinedVertices() const;

@@ -51,7 +51,6 @@
 #include "g2o/types/slam3d/edge_se3_pointxyz.h"
 #include "g2o/types/slam3d/vertex_pointxyz.h"
 #include "g2o/types/slam3d/vertex_se3.h"
-#include "gmock/gmock.h"
 #include "unit_test/test_helper/allocate_optimizer.h"
 #include "unit_test/test_helper/eigen_matcher.h"
 
@@ -80,6 +79,16 @@ TEST(General, BinaryEdgeConstructor) {
   ASSERT_THAT(e2.vertices(), SizeIs(2));
   ASSERT_EQ(nullptr, e2.vertices()[0]);
   ASSERT_EQ(nullptr, e2.vertices()[1]);
+}
+
+TEST(General, GraphElemBitset) {
+  g2o::HyperGraph::GraphElemBitset elemParamBitset;
+  elemParamBitset[g2o::HyperGraph::kHgetParameter] = true;
+
+  const g2o::HyperGraph::GraphElemBitset elemParamFromInt(
+      1 << g2o::HyperGraph::kHgetParameter);
+
+  EXPECT_EQ(elemParamBitset, elemParamFromInt);
 }
 
 TEST(General, GraphAddVertex) {

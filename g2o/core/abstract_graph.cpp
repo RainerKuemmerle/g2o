@@ -90,6 +90,8 @@ void AbstractGraph::clear() {
 
 void AbstractGraph::renameTags(
     const std::unordered_map<std::string, std::string>& tag_mapping) {
+  if (tag_mapping.empty()) return;
+
   auto map_tag = [&tag_mapping](const std::string& tag) {
     auto it = tag_mapping.find(tag);
     if (it == tag_mapping.end()) return tag;
