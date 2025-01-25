@@ -33,6 +33,7 @@
 #include <iostream>
 #include <iterator>
 #include <memory>
+#include <mutex>
 #include <sstream>
 #include <unordered_set>
 #include <utility>
@@ -57,6 +58,14 @@
 namespace g2o {
 
 namespace {
+std::once_flag calledMultiThreadInit;
+
+void initThreading() {
+#if (defined G2O_OPENMP) && EIGEN_VERSION_AT_LEAST(3, 1, 0)
+  Eigen::initParallel();
+#endif
+}
+
 std::shared_ptr<OptimizableGraph::Vertex> kNonExistantVertex(nullptr);
 
 void saveUserData(AbstractGraph::AbstractGraphElement& graph_element,
@@ -791,9 +800,7 @@ void OptimizableGraph::addGraph(OptimizableGraph& other) {
 }
 
 bool OptimizableGraph::initMultiThreading() {
-#if (defined G2O_OPENMP) && EIGEN_VERSION_AT_LEAST(3, 1, 0)
-  Eigen::initParallel();
-#endif
+  std::call_once(calledMultiThreadInit, initThreading);
   return true;
 }
 

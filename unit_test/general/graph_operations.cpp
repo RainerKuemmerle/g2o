@@ -69,8 +69,15 @@ class JacobianWorkspaceTestAdapter : public g2o::JacobianWorkspace {
 };
 }  // namespace
 
+TEST(General, InitMultiThreading) {
+  bool init = false;
+  EXPECT_NO_THROW({ init = g2o::OptimizableGraph::initMultiThreading(); });
+  EXPECT_TRUE(init);
+}
+
 TEST(General, BinaryEdgeConstructor) {
   g2o::EdgeSE2 e2;
+  ASSERT_THAT(e2.vertices(), SizeIs(2));
   ASSERT_EQ(nullptr, e2.vertices()[0]);
   ASSERT_EQ(nullptr, e2.vertices()[1]);
 }
