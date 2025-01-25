@@ -282,7 +282,7 @@ bool MainWindow::load(const QString& filename, g2o::io::Format format) {
   g2o::SparseOptimizer* optimizer = viewer->graph.get();
 
   // update the solvers which are suitable for this graph
-  const std::set<int> vertDims = optimizer->dimensions();
+  const std::unordered_set<int> vertDims = optimizer->dimensions();
   for (size_t i = 0; i < knownSolvers_.size(); ++i) {
     const g2o::OptimizationAlgorithmProperty& sp = knownSolvers_[i];
     if (sp.name.empty() && sp.desc.empty()) continue;

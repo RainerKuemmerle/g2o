@@ -34,6 +34,7 @@
 #include <iterator>
 #include <memory>
 #include <sstream>
+#include <unordered_set>
 #include <utility>
 #include <vector>
 
@@ -578,7 +579,7 @@ void OptimizableGraph::setRenamedTypesFromString(const std::string& types) {
   Factory* factory = Factory::instance();
   const std::vector<std::string> typesMap = strSplit(types, ",");
   for (const auto& i : typesMap) {
-    std::vector<std::string> m = strSplit(i, "=");
+    const std::vector<std::string> m = strSplit(i, "=");
     if (m.size() != 2) {
       G2O_ERROR("unable to extract type map from {}", i);
       continue;
@@ -594,20 +595,16 @@ void OptimizableGraph::setRenamedTypesFromString(const std::string& types) {
   }
 
   G2O_DEBUG("Load look up table:");
-  for (auto it = renamedTypesLookup_.begin(); it != renamedTypesLookup_.end();
-       ++it) {
-    G2O_DEBUG("{} -> {}", it->first, it->second);
+  for (const auto& rtl : renamedTypesLookup_) {
+    G2O_DEBUG("{} -> {}", rtl.first, rtl.second);
   }
 }
 
 bool OptimizableGraph::isSolverSuitable(
     const OptimizationAlgorithmProperty& solverProperty,
-    const std::set<int>& vertDims_) const {
-  std::set<int> auxDims;
-  if (vertDims_.empty()) {
-    auxDims = dimensions();
-  }
-  const std::set<int>& vertDims = vertDims_.empty() ? auxDims : vertDims_;
+    const std::unordered_set<int>& vertDims_) const {
+  const std::unordered_set<int>& vertDims =
+      vertDims_.empty() ? dimensions() : vertDims_;
   bool suitableSolver = true;
   if (vertDims.size() == 2) {
     if (solverProperty.requiresMarginalize) {
@@ -626,13 +623,13 @@ bool OptimizableGraph::isSolverSuitable(
   return suitableSolver;
 }
 
-std::set<int> OptimizableGraph::dimensions() const {
-  std::set<int> auxDims;
-  for (const auto& it : vertices()) {
-    auto* v = static_cast<OptimizableGraph::Vertex*>(it.second.get());
-    auxDims.insert(v->dimension());
+std::unordered_set<int> OptimizableGraph::dimensions() const {
+  std::unordered_set<int> result;
+  for (const auto& id_v : vertices()) {
+    auto* v = static_cast<OptimizableGraph::Vertex*>(id_v.second.get());
+    result.insert(v->dimension());
   }
-  return auxDims;
+  return result;
 }
 
 void OptimizableGraph::performActions(int iter, HyperGraphActionSet& actions) {
@@ -657,7 +654,7 @@ bool OptimizableGraph::addPostIterationAction(
     std::shared_ptr<HyperGraphAction> action) {
   const std::pair<HyperGraphActionSet::iterator, bool> insertResult =
       graphActions_[static_cast<int>(ActionType::kAtPostiteration)].emplace(
-          action);
+          std::move(action));
   return insertResult.second;
 }
 
@@ -665,7 +662,7 @@ bool OptimizableGraph::addPreIterationAction(
     std::shared_ptr<HyperGraphAction> action) {
   const std::pair<HyperGraphActionSet::iterator, bool> insertResult =
       graphActions_[static_cast<int>(ActionType::kAtPreiteration)].emplace(
-          action);
+          std::move(action));
   return insertResult.second;
 }
 

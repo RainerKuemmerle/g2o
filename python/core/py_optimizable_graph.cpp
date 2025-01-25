@@ -177,7 +177,7 @@ void declareOptimizableGraph(py::module& m) {
           py::keep_alive<1, 2>());               // -> void
   cls.def("chi2", &CLS::chi2);                   // -> double
   cls.def("max_dimension", &CLS::maxDimension);  // -> int
-  cls.def("dimensions", &CLS::dimensions);       // -> std::set<int>
+  cls.def("dimensions", &CLS::dimensions);       // -> std::unordered_set<int>
 
   cls.def("optimize", &CLS::optimize, "iterations"_a,
           "online"_a = false);                     // (int, bool) -> int

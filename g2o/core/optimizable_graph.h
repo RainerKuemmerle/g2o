@@ -33,9 +33,9 @@
 #include <functional>
 #include <iosfwd>
 #include <memory>
-#include <set>
 #include <string>
 #include <unordered_map>
+#include <unordered_set>
 #include <vector>
 
 #include "g2o/core/eigen_types.h"
@@ -74,7 +74,8 @@ class G2O_CORE_API OptimizableGraph : public HyperGraph {
     kAtNumElements,  // keep as last element
   };
 
-  using HyperGraphActionSet = std::set<std::shared_ptr<HyperGraphAction>>;
+  using HyperGraphActionSet =
+      std::unordered_set<std::shared_ptr<HyperGraphAction>>;
 
   // forward declarations
   class G2O_CORE_API Vertex;
@@ -645,7 +646,7 @@ class G2O_CORE_API OptimizableGraph : public HyperGraph {
    * iterates over all vertices and returns a set of all the vertex dimensions
    * in the graph
    */
-  std::set<int> dimensions() const;
+  std::unordered_set<int> dimensions() const;
 
   /**
    * carry out n iterations
@@ -734,7 +735,8 @@ class G2O_CORE_API OptimizableGraph : public HyperGraph {
    * re-evaluating.
    */
   bool isSolverSuitable(const OptimizationAlgorithmProperty& solverProperty,
-                        const std::set<int>& vertDims = std::set<int>()) const;
+                        const std::unordered_set<int>& vertDims =
+                            std::unordered_set<int>()) const;
 
   //! remove all edges and vertices
   void clear() override;

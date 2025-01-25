@@ -24,10 +24,12 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+#include <algorithm>
 #include <csignal>
 #include <fstream>
 #include <sstream>
 #include <string>
+#include <unordered_set>
 
 #include "edge_creator.h"
 #include "edge_labeler.h"
@@ -270,30 +272,31 @@ int run_hierarchical(int argc, char** argv) {
       solverFactory->construct(strHSolver, hsolverProperty);
   if (!solver) {
     cerr << "Error allocating solver. Allocating \"" << strSolver
-         << "\" failed!" << endl;
+         << "\" failed!\n";
     return 0;
   }
   if (!hsolver) {
     cerr << "Error allocating hsolver. Allocating \"" << strHSolver
-         << "\" failed!" << endl;
+         << "\" failed!\n";
     return 0;
   }
 
-  std::set<int> vertexDimensions = optimizer.dimensions();
+  const std::unordered_set<int> vertexDimensions = optimizer.dimensions();
   if (!optimizer.isSolverSuitable(solverProperty, vertexDimensions)) {
-    cerr << "The selected solver is not suitable for optimizing the given graph"
-         << endl;
+    cerr << "The selected solver is not suitable for optimizing the given "
+            "graph\n";
     return 3;
   }
   if (!optimizer.isSolverSuitable(hsolverProperty, vertexDimensions)) {
-    cerr << "The selected solver is not suitable for optimizing the given graph"
-         << endl;
+    cerr << "The selected solver is not suitable for optimizing the given "
+            "graph\n";
     return 3;
   }
 
   optimizer.setAlgorithm(solver);
 
-  int poseDim = *vertexDimensions.rbegin();
+  const int poseDim =
+      *std::max_element(vertexDimensions.begin(), vertexDimensions.end());
   string backboneVertexType;
   string backboneEdgeType;
   switch (poseDim) {
@@ -320,8 +323,7 @@ int run_hierarchical(int argc, char** argv) {
       break;
     default:
       cerr << "Fatal: unknown backbone type. The largest vertex dimension is: "
-           << poseDim << "." << endl
-           << "Exiting." << endl;
+           << poseDim << ".\nExiting.\n";
       return -1;
   }
 
@@ -519,7 +521,8 @@ int run_hierarchical(int argc, char** argv) {
 
     int nLandmarks = 0;
     int nPoses = 0;
-    int maxDim = *vertexDimensions.rbegin();
+    const int maxDim =
+        *std::max_element(vertexDimensions.begin(), vertexDimensions.end());
     for (auto& it : optimizer.vertices()) {
       auto* v = static_cast<OptimizableGraph::Vertex*>(it.second.get());
       if (v->dimension() != maxDim) {
