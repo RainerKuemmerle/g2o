@@ -43,7 +43,7 @@ namespace g2o {
 
 // forward declaration
 class OptimizationAlgorithm;
-class EstimatePropagatorCost;
+class EstimatePropagatorCostBase;
 class HyperGraphAction;
 
 class G2O_CORE_API SparseOptimizer : public OptimizableGraph {
@@ -116,7 +116,7 @@ class G2O_CORE_API SparseOptimizer : public OptimizableGraph {
   /**
    * Same as above but using a specific propagator
    */
-  virtual void computeInitialGuess(EstimatePropagatorCost& propagator);
+  virtual void computeInitialGuess(EstimatePropagatorCostBase& propagator);
 
   /**
    * starts one optimization run given the current configuration of the graph,

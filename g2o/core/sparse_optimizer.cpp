@@ -305,11 +305,12 @@ bool SparseOptimizer::initializeOptimization(HyperGraph::EdgeSet& eset) {
 }
 
 void SparseOptimizer::computeInitialGuess() {
-  EstimatePropagator::PropagateCost costFunction(this);
+  EstimatePropagatorCost costFunction(this);
   computeInitialGuess(costFunction);
 }
 
-void SparseOptimizer::computeInitialGuess(EstimatePropagatorCost& propagator) {
+void SparseOptimizer::computeInitialGuess(
+    EstimatePropagatorCostBase& propagator) {
   OptimizableGraph::VertexSet emptySet;
   std::unordered_set<Vertex*> backupVertices;
   OptimizableGraph::VertexSet fixedVertices;  // these are the root nodes where
