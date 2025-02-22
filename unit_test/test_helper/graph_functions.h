@@ -47,4 +47,14 @@ int countEdgesMatchingType(const OptimizableGraph& graph) {
                          return ptr != nullptr;
                        });
 }
+
+inline int countFixed(const OptimizableGraph& graph) {
+  return std::count_if(
+      graph.vertices().begin(), graph.vertices().end(),
+      [](const OptimizableGraph::VertexIDMap::value_type& elem) {
+        auto* ptr = dynamic_cast<OptimizableGraph::Vertex*>(elem.second.get());
+        return ptr != nullptr && ptr->fixed();
+      });
+}
+
 }  // namespace g2o::internal

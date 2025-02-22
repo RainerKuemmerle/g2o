@@ -142,6 +142,7 @@ class Robot : public BaseRobot {
     pose_ = pose;
     auto po = std::make_unique<PoseObject>();
     po->vertex()->setEstimate(pose_);
+    po->vertex()->setFixed(trajectory_.empty());
     const int pose_id = world.addWorldObject(std::move(po));
     trajectory_.emplace_back(pose_id);
   }
