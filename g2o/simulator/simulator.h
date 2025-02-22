@@ -208,11 +208,10 @@ class UnarySensor : public BaseSensor {
     robotPoseVertex_ = robotPoseVertex<PoseVertexType>(robot, world);
 
     auto e = mkEdge();
-    if (e) {
-      e->setMeasurementFromState();
-      addNoise(e.get());
-      world.graph().addEdge(e);
-    }
+    if (!e) return;
+    e->setMeasurementFromState();
+    addNoise(e.get());
+    world.graph().addEdge(e);
   }
 
  protected:
