@@ -26,11 +26,27 @@
 
 #include "simulator.h"
 
+#include <memory>
 #include <unordered_set>
 
+#include "g2o/core/estimate_propagator.h"
 #include "g2o/core/optimizable_graph.h"
 
 namespace g2o {
+
+namespace {
+class SimulationEstimatePropagatorCost : public EstimatePropagatorCostBase {
+ public:
+  double operator()(OptimizableGraph::Edge* edge,
+                    const OptimizableGraph::VertexSet& from,
+                    OptimizableGraph::Vertex* to) const override {
+    return edge->initialEstimatePossible(from, to);
+  }
+  [[nodiscard]] std::string_view name() const override {
+    return "simulation spanning tree";
+  }
+};
+}  // namespace
 
 void BaseWorldObject::setVertex(
     const std::shared_ptr<OptimizableGraph::Vertex>& vertex) {
@@ -96,11 +112,18 @@ void Simulator::finalize() {
     }
     iter = world_.graph().parameters().erase(iter);
   }
-  // TODO(Rainer): Initial estimate
-  /* Fails since only implemented on SparseOptimizer
-  EstimatePropagatorCostOdometry costFunction(&world_.graph());
-  world_.graph().computeInitialGuess(costFunction);
-  */
+
+  // Initial estimate
+  OptimizableGraph::VertexSet fixedVertices;
+  for (const auto& id_v : world_.graph().vertices()) {
+    auto v = std::dynamic_pointer_cast<OptimizableGraph::Vertex>(id_v.second);
+    if (!v || !v->fixed()) continue;
+    fixedVertices.emplace(std::move(v));
+  }
+
+  SimulationEstimatePropagatorCost propagator;
+  EstimatePropagator estimatePropagator(&world_.graph());
+  estimatePropagator.propagate(fixedVertices, propagator);
 }
 
 }  // namespace g2o

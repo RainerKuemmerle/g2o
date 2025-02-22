@@ -66,6 +66,8 @@ TEST(Simulator2D, Odom) {
   const OptimizableGraph& graph = simulator.world().graph();
 
   EXPECT_THAT(graph.vertices(), SizeIs(simulator.config.simSteps + 1));
+  int count_fixed = g2o::internal::countFixed(graph);
+  EXPECT_THAT(count_fixed, Eq(1));
   const int poses = g2o::internal::countVerticesMatchingType<VertexSE2>(graph);
   EXPECT_THAT(poses, Eq(simulator.config.simSteps + 1));
   const int odom_cnt = g2o::internal::countEdgesMatchingType<EdgeSE2>(graph);
