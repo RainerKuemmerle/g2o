@@ -80,7 +80,7 @@ void EstimatePropagator::reset() {
 
 void EstimatePropagator::propagate(
     const std::shared_ptr<OptimizableGraph::Vertex>& v,
-    const EstimatePropagator::PropagateCost& cost,
+    const EstimatePropagatorCostBase& cost,
     const EstimatePropagator::PropagateAction& action, double maxDistance,
     double maxEdgeCost) {
   OptimizableGraph::VertexSet vset;
@@ -89,8 +89,7 @@ void EstimatePropagator::propagate(
 }
 
 void EstimatePropagator::propagate(
-    OptimizableGraph::VertexSet& vset,
-    const EstimatePropagator::PropagateCost& cost,
+    OptimizableGraph::VertexSet& vset, const EstimatePropagatorCostBase& cost,
     const EstimatePropagator::PropagateAction& action, double maxDistance,
     double maxEdgeCost) {
   reset();
@@ -241,7 +240,7 @@ double EstimatePropagatorCost::operator()(
 
 EstimatePropagatorCostOdometry::EstimatePropagatorCostOdometry(
     SparseOptimizer* graph)
-    : EstimatePropagatorCost(graph) {}
+    : graph_(graph) {}
 
 double EstimatePropagatorCostOdometry::operator()(
     OptimizableGraph::Edge* edge, const OptimizableGraph::VertexSet& from_,

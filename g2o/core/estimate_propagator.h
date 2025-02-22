@@ -36,25 +36,32 @@
 
 #include "g2o_core_api.h"
 #include "optimizable_graph.h"
-#include "sparse_optimizer.h"
 
 namespace g2o {
 class SparseOptimizer;
 
-/**
- * \brief cost for traversing along active edges in the optimizer
- *
- * You may derive an own one, if necessary. The default is to return
- * initialEstimatePossible(from, to) for the edge.
- */
-class G2O_CORE_API EstimatePropagatorCost {
+class G2O_CORE_API EstimatePropagatorCostBase {
  public:
-  virtual ~EstimatePropagatorCost() = default;
-  explicit EstimatePropagatorCost(SparseOptimizer* graph);
+  virtual ~EstimatePropagatorCostBase() = default;
   virtual double operator()(OptimizableGraph::Edge* edge,
                             const OptimizableGraph::VertexSet& from,
-                            OptimizableGraph::Vertex* to_) const;
-  [[nodiscard]] virtual std::string_view name() const {
+                            OptimizableGraph::Vertex* to) const = 0;
+  [[nodiscard]] virtual std::string_view name() const = 0;
+};
+
+/**
+ * \brief cost for traversing along active edges in the SparseOptimizer
+ *
+ * You may derive an own one, if necessary. Here, we return
+ * initialEstimatePossible(from, to) as cost for the edge.
+ */
+class G2O_CORE_API EstimatePropagatorCost : public EstimatePropagatorCostBase {
+ public:
+  explicit EstimatePropagatorCost(SparseOptimizer* graph);
+  double operator()(OptimizableGraph::Edge* edge,
+                    const OptimizableGraph::VertexSet& from,
+                    OptimizableGraph::Vertex* to) const override;
+  [[nodiscard]] std::string_view name() const override {
     return "spanning tree";
   }
 
@@ -69,13 +76,16 @@ class G2O_CORE_API EstimatePropagatorCost {
  * connect vertices whose IDs only differs by one.
  */
 class G2O_CORE_API EstimatePropagatorCostOdometry
-    : public EstimatePropagatorCost {
+    : public EstimatePropagatorCostBase {
  public:
   explicit EstimatePropagatorCostOdometry(SparseOptimizer* graph);
   double operator()(OptimizableGraph::Edge* edge,
                     const OptimizableGraph::VertexSet& from,
                     OptimizableGraph::Vertex* to) const override;
   [[nodiscard]] std::string_view name() const override { return "odometry"; }
+
+ protected:
+  SparseOptimizer* graph_;
 };
 
 /**
@@ -98,8 +108,6 @@ class G2O_CORE_API EstimatePropagator {
       if (!to->fixed()) e->initialEstimate(from, to);
     }
   };
-
-  using PropagateCost = EstimatePropagatorCost;
 
   class AdjacencyMapEntry;
 
@@ -173,7 +181,7 @@ class G2O_CORE_API EstimatePropagator {
    */
   void propagate(
       const std::shared_ptr<OptimizableGraph::Vertex>& v,
-      const EstimatePropagator::PropagateCost& cost,
+      const EstimatePropagatorCostBase& cost,
       const EstimatePropagator::PropagateAction& action = PropagateAction(),
       double maxDistance = std::numeric_limits<double>::max(),
       double maxEdgeCost = std::numeric_limits<double>::max());
@@ -183,8 +191,7 @@ class G2O_CORE_API EstimatePropagator {
    * just a single one.
    */
   void propagate(
-      OptimizableGraph::VertexSet& vset,
-      const EstimatePropagator::PropagateCost& cost,
+      OptimizableGraph::VertexSet& vset, const EstimatePropagatorCostBase& cost,
       const EstimatePropagator::PropagateAction& action = PropagateAction(),
       double maxDistance = std::numeric_limits<double>::max(),
       double maxEdgeCost = std::numeric_limits<double>::max());

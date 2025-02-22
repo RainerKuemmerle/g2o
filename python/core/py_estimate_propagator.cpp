@@ -1,11 +1,52 @@
 #include "py_estimate_propagator.h"
 
+#include <pybind11/pybind11.h>
+
 #include "g2o/core/estimate_propagator.h"
+#include "g2o/core/sparse_optimizer.h"
 
 namespace g2o {
 
+class PyEstimatePropagatorCostBase : public EstimatePropagatorCostBase {
+ public:
+  /* Inherit the constructors */
+  using EstimatePropagatorCostBase::EstimatePropagatorCostBase;
+
+  // Trampoline (need one for each virtual function)
+  double operator()(OptimizableGraph::Edge* edge,
+                    const OptimizableGraph::VertexSet& from,
+                    OptimizableGraph::Vertex* to) const override {
+    PYBIND11_OVERRIDE_PURE_NAME(double,                     /* Return type */
+                                EstimatePropagatorCostBase, /* Parent class */
+                                "__call__", /* Name of function in Python */
+                                operator(), /* Name of function in C++ */
+                                edge,       /* Argument(s) */
+                                from, to);
+  }
+
+  // Trampoline (need one for each virtual function)
+  [[nodiscard]] std::string_view name() const override {
+    PYBIND11_OVERRIDE_PURE(std::string_view,           /* Return type */
+                           EstimatePropagatorCostBase, /* Parent class */
+                           name, /* Name of function in C++ */
+    );
+  }
+};
+
 void delcareEstimatePropagator(py::module& m) {
-  py::class_<EstimatePropagatorCost>(m, "EstimatePropagatorCost")
+  py::class_<EstimatePropagatorCostBase,
+             PyEstimatePropagatorCostBase /* <--- trampoline*/>(
+      m, "EstimatePropagatorCostBase")
+      .def(py::init<>())
+      .def("__call__", &EstimatePropagatorCostBase::operator(), "edge"_a,
+           "from"_a, "to"_a, py::keep_alive<1, 2>(), py::keep_alive<1, 3>(),
+           py::keep_alive<1, 4>())  // (OptimizableGraph::Edge* edge, const
+      // OptimizableGraph::VertexSet& from,
+      // OptimizableGraph::Vertex* to_) -> double
+      .def("name", &EstimatePropagatorCostBase::name);
+
+  py::class_<EstimatePropagatorCost, EstimatePropagatorCostBase>(
+      m, "EstimatePropagatorCost")
       .def(py::init<SparseOptimizer*>(), "graph"_a, py::keep_alive<1, 2>())
       .def("__call__", &EstimatePropagatorCost::operator(), "edge"_a, "from"_a,
            "to"_a, py::keep_alive<1, 2>(), py::keep_alive<1, 3>(),
@@ -14,15 +55,15 @@ void delcareEstimatePropagator(py::module& m) {
                                     // OptimizableGraph::Vertex* to_) -> double
       .def("name", &EstimatePropagatorCost::name);
 
-  py::class_<EstimatePropagatorCostOdometry, EstimatePropagatorCost>(
+  py::class_<EstimatePropagatorCostOdometry, EstimatePropagatorCostBase>(
       m, "EstimatePropagatorCostOdometry")
       .def(py::init<SparseOptimizer*>(), "graph"_a, py::keep_alive<1, 2>())
-      .def("__call__", &EstimatePropagatorCost::operator(), "edge"_a, "from"_a,
-           "to"_a, py::keep_alive<1, 2>(), py::keep_alive<1, 3>(),
+      .def("__call__", &EstimatePropagatorCostOdometry::operator(), "edge"_a,
+           "from"_a, "to"_a, py::keep_alive<1, 2>(), py::keep_alive<1, 3>(),
            py::keep_alive<1, 4>())  // (OptimizableGraph::Edge* edge, const
                                     // OptimizableGraph::VertexSet& from,
                                     // OptimizableGraph::Vertex* to_) -> double
-      .def("name", &EstimatePropagatorCost::name);
+      .def("name", &EstimatePropagatorCostOdometry::name);
 
   py::class_<EstimatePropagator> cls(m, "EstimatePropagator");
   py::class_<EstimatePropagator::PropagateAction>(cls,
@@ -62,7 +103,7 @@ void delcareEstimatePropagator(py::module& m) {
   cls.def("propagate",
           static_cast<void (EstimatePropagator::*)(
               const std::shared_ptr<OptimizableGraph::Vertex>&,
-              const EstimatePropagator::PropagateCost&,
+              const EstimatePropagatorCostBase&,
               const EstimatePropagator::PropagateAction&, double, double)>(
               &EstimatePropagator::propagate),
           "v"_a, "cost"_a, "action"_a,
@@ -73,8 +114,7 @@ void delcareEstimatePropagator(py::module& m) {
 
   cls.def("propagate",
           static_cast<void (EstimatePropagator::*)(
-              OptimizableGraph::VertexSet&,
-              const EstimatePropagator::PropagateCost&,
+              OptimizableGraph::VertexSet&, const EstimatePropagatorCostBase&,
               const EstimatePropagator::PropagateAction&, double, double)>(
               &EstimatePropagator::propagate),
           "vset"_a, "cost"_a, "action"_a,
