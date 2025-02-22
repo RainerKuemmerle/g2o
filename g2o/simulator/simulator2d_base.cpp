@@ -31,6 +31,7 @@
 #include <optional>
 #include <random>
 
+#include "g2o/core/eigen_types.h"
 #include "g2o/simulator/sensor_odometry2d.h"
 #include "g2o/simulator/sensor_pointxy.h"
 #include "g2o/simulator/sensor_pointxy_bearing.h"
@@ -40,6 +41,7 @@
 #include "g2o/simulator/sensor_segment2d_line.h"
 #include "g2o/simulator/sensor_segment2d_pointline.h"
 #include "g2o/stuff/logger.h"
+#include "g2o/stuff/misc.h"
 #include "g2o/stuff/sampler.h"
 #include "g2o/types/slam2d/se2.h"
 
@@ -51,8 +53,10 @@ void Simulator2D::setup() {
   G2O_DEBUG("nlandmarks = {}", config.nlandmarks);
   for (int i = 0; i < config.nlandmarks; i++) {
     auto landmark = std::make_unique<WorldObjectPointXY>();
-    double x = sampleUniform(-.5, .5, &generator_) * (config.worldSize + 5);
-    double y = sampleUniform(-.5, .5, &generator_) * (config.worldSize + 5);
+    const double x =
+        sampleUniform(-.5, .5, &generator_) * (config.worldSize + 5);
+    const double y =
+        sampleUniform(-.5, .5, &generator_) * (config.worldSize + 5);
     landmark->vertex()->setEstimate(Vector2(x, y));
     world_.addWorldObject(std::move(landmark));
   }
@@ -60,26 +64,22 @@ void Simulator2D::setup() {
   G2O_DEBUG("nSegments = {}", config.nSegments);
   for (int i = 0; i < config.nSegments; i++) {
     auto segment = std::make_unique<WorldObjectSegment2D>();
-    int ix = sampleUniform(-config.segmentGridSize, config.segmentGridSize,
-                           &generator_);
-    int iy = sampleUniform(-config.segmentGridSize, config.segmentGridSize,
-                           &generator_);
-    int ith = sampleUniform(0, 3, &generator_);
-    double th = (M_PI / 2) * ith;
-    th = atan2(sin(th), cos(th));
-    double xc = ix * (config.worldSize / config.segmentGridSize);
-    double yc = iy * (config.worldSize / config.segmentGridSize);
+    const int ix = sampleUniform(-config.segmentGridSize,
+                                 config.segmentGridSize, &generator_);
+    const int iy = sampleUniform(-config.segmentGridSize,
+                                 config.segmentGridSize, &generator_);
+    const int ith = sampleUniform(0, 3, &generator_);
+    const Matrix2 rot_theta = Rotation2D((M_PI / 2) * ith).toRotationMatrix();
+    const Vector2 center_coords(
+        ix * (config.worldSize / config.segmentGridSize),
+        iy * (config.worldSize / config.segmentGridSize));
+    const Vector2 len_offset(
+        sampleUniform(config.minSegmentLength, config.maxSegmentLength,
+                      &generator_),
+        0.);
 
-    double l2 = sampleUniform(config.minSegmentLength, config.maxSegmentLength,
-                              &generator_);
-
-    double x1 = xc + cos(th) * l2;
-    double y1 = yc + sin(th) * l2;
-    double x2 = xc - cos(th) * l2;
-    double y2 = yc - sin(th) * l2;
-
-    segment->vertex()->setEstimateP1(Vector2(x1, y1));
-    segment->vertex()->setEstimateP2(Vector2(x2, y2));
+    segment->vertex()->setEstimateP1(center_coords + rot_theta * len_offset);
+    segment->vertex()->setEstimateP2(center_coords - rot_theta * len_offset);
     world_.addWorldObject(std::move(segment));
   }
 
@@ -96,10 +96,7 @@ void Simulator2D::setup() {
   if (config.hasPoseSensor) {
     G2O_DEBUG("Adding pose sensor");
     auto poseSensor = std::make_unique<SensorPose2D>("poseSensor");
-    Matrix3 poseInfo = poseSensor->information();
-    poseInfo.setIdentity();
-    poseInfo *= 500;
-    poseInfo(2, 2) = 5000;
+    const Matrix3 poseInfo = Vector3(500, 500, 5000).asDiagonal();
     poseSensor->setInformation(poseInfo);
     robot->addSensor(std::move(poseSensor), world_);
   }
@@ -113,9 +110,7 @@ void Simulator2D::setup() {
   if (config.hasPointSensor) {
     G2O_DEBUG("Adding point sensor");
     auto pointSensor = std::make_unique<SensorPointXY>("pointSensor");
-    Matrix2 pointInfo = pointSensor->information();
-    pointInfo.setIdentity();
-    pointInfo *= 1000;
+    const Matrix2 pointInfo = Vector2(1000., 1000.).asDiagonal();
     pointSensor->setInformation(pointInfo);
     pointSensor->setFov(0.75 * M_PI);
     robot->addSensor(std::move(pointSensor), world_);
@@ -141,9 +136,7 @@ void Simulator2D::setup() {
         std::make_unique<SensorSegment2DLine>("segmentSensorSensorLine");
     segmentSensorLine->setMaxRange(3);
     segmentSensorLine->setMinRange(.1);
-    Matrix2 m = segmentSensorLine->information();
-    m = m * 1000;
-    m(0, 0) *= 10;
+    const Matrix2 m = Vector2(10000, 1000).asDiagonal();
     segmentSensorLine->setInformation(m);
     robot->addSensor(std::move(segmentSensorLine), world_);
 
@@ -151,9 +144,7 @@ void Simulator2D::setup() {
         "segmentSensorSensorPointLine");
     segmentSensorPointLine->setMaxRange(3);
     segmentSensorPointLine->setMinRange(.1);
-    Matrix3 m3 = segmentSensorPointLine->information();
-    m3 = m3 * 1000;
-    m3(2, 2) *= 10;
+    const Matrix3 m3 = Vector3(10000, 1000, 1000).asDiagonal();
     segmentSensorPointLine->setInformation(m3);
     robot->addSensor(std::move(segmentSensorPointLine), world_);
   }
