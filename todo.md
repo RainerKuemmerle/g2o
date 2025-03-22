@@ -1,3 +1,5 @@
+[ ] build only one library instead of multiple
+[ ] remove dynamic loading of wildcard libs from g2o/g2o_viewer
 [ ] update ID to int64
 [x] drop cereal (replace with json directly, drop xml)
 [x] install json on Windows CI

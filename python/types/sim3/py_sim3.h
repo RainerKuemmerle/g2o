@@ -27,7 +27,7 @@ inline void declareSim3(py::module& m) {
 
       .def("translation", (Eigen::Vector3d & (Sim3::*)()) & Sim3::translation)
       .def("rotation", (Eigen::Quaterniond & (Sim3::*)()) & Sim3::rotation)
-      .def("scale", (double& (Sim3::*)()) & Sim3::scale);
+      .def("scale", (double& (Sim3::*)())&Sim3::scale);
 
   templatedBaseVertex<7, Sim3>(m, "_7_Sim3");
   templatedBaseEdge<7, Sim3>(m, "_7_Sim3");
