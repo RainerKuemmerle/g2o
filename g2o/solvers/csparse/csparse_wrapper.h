@@ -31,10 +31,11 @@
 #include <string>
 
 #include "g2o/core/eigen_types.h"
+#include "g2o_csparse_api.h"
 
 namespace g2o::csparse {
 
-class CSparse {
+class G2O_SOLVER_CSPARSE_API CSparse {
  public:
   CSparse();
   ~CSparse();

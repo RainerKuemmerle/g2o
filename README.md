@@ -5,7 +5,11 @@ Windows: [![win64](https://github.com/RainerKuemmerle/g2o/actions/workflows/wind
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/280c5eed95ed4059ad5d003d59e72704)](https://app.codacy.com/gh/RainerKuemmerle/g2o/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade) [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit)](https://github.com/pre-commit/pre-commit)
 
 <p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" width="250" srcset="doc/pics/g2o-logo-dark.svg">
+    <source media="(prefers-color-scheme: light)" width="250" srcset="doc/pics/g2o-logo.svg">
     <img alt="g2o logo" width="250" src="doc/pics/g2o-logo.svg">
+  </picture>
 </p>
 
 g2o is an open-source C++ framework for optimizing graph-based nonlinear error
