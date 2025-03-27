@@ -3,6 +3,9 @@
 #include <pybind11/cast.h>
 #include <pybind11/pytypes.h>
 
+#include <sstream>
+#include <stdexcept>
+
 #include "g2o/core/base_dynamic_vertex.h"
 #include "g2o/core/base_variable_sized_edge.h"
 #include "g2o/core/eigen_types.h"
@@ -27,7 +30,7 @@ class VectorXVertex : public BaseDynamicVertex<VectorX> {
   }
 
   // oplusImpl for python consuming a vector
-  virtual void oplus_impl(const VectorX& v) = 0;
+  virtual void oplus_impl(const Eigen::Ref<VectorX>& v) = 0;
   void oplusImpl(const VectorX::MapType& update) override {
     // TODO(goki): Can we use the MapType directly
     oplus_impl(update);
@@ -39,7 +42,7 @@ class PyVectorXVertex : public VectorXVertex {
   PyVectorXVertex() = default;
 
   /* Trampoline for oplusImpl */
-  void oplus_impl(const VectorX& v) override {
+  void oplus_impl(const Eigen::Ref<VectorX>& v) override {
     PYBIND11_OVERRIDE_PURE(
         void,          /* Return type */
         VectorXVertex, /* Parent class */
@@ -58,6 +61,18 @@ class VariableVectorXEdge
 
   // python trampoline
   virtual VectorX compute_error() = 0;
+
+  void setJacobian(int i, const MatrixX& jacobian) {
+    OptimizableGraph::Vertex* vi = vertexRaw(i);
+    if (jacobian.rows() != dimension_ || jacobian.cols() != vi->dimension()) {
+      std::stringstream ex_reason;
+      ex_reason << "Jacobian dimension mismatching. Expected " << dimension_
+                << "x" << vi->dimension() << " got " << jacobian.rows() << "x"
+                << jacobian.cols();
+      throw std::runtime_error(ex_reason.str());
+    }
+    jacobianOplus_[i] = jacobian;
+  }
 };
 
 class PyVariableVectorXEdge : public VariableVectorXEdge {
@@ -70,6 +85,14 @@ class PyVariableVectorXEdge : public VariableVectorXEdge {
         VectorX,             /* Return type */
         VariableVectorXEdge, /* Parent class */
         compute_error /* Name of function in C++ (must match Python name) */
+    );
+  }
+
+  void linearizeOplus() override {
+    PYBIND11_OVERRIDE_NAME(void,                /* Return type */
+                           VariableVectorXEdge, /* Parent class */
+                           "linearize_oplus",   /* Name of function in Python */
+                           linearizeOplus,      /* function in C++ */
     );
   }
 };
@@ -97,6 +120,10 @@ void declareTypesPure(py::module& m) {
                                                  // in python
       .def("set_measurement", &VariableVectorXEdge::setMeasurement)
       .def("set_dimension", &VariableVectorXEdge::setDimension<-1>)  // int ->
+      .def(
+          "linearize_oplus",
+          py::overload_cast<>(&VariableVectorXEdge::linearizeOplus))  // void ->
+      .def("set_jacobian", &VariableVectorXEdge::setJacobian)  // int, Matrix ->
       // .def("set_measurement_data", &EdgeSE2::setMeasurementData)
       // .def("get_measurement_data", &EdgeSE2::getMeasurementData)
       // .def("measurement_dimension", &EdgeSE2::measurementDimension)

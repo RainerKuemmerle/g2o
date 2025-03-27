@@ -31,6 +31,22 @@ class EdgePointOnCircle(g2o.VariableVectorXEdge):
         error = np.linalg.norm(self.measurement() - circle[0:2]) - radius
         return [error]
 
+    # if not implemented, will be numerically estimated
+    def linearize_oplus(self):
+        circle = self.vertex(0).estimate()
+        expected_radius = np.linalg.norm(self.measurement() - circle[0:2])
+        m = np.array(
+            [
+                [
+                    -(self.measurement()[0] - circle[0]) / expected_radius,
+                    -(self.measurement()[1] - circle[1]) / expected_radius,
+                    -1.0,
+                ]
+            ],
+            dtype=np.float64,
+        )
+        self.set_jacobian(0, m)
+
 
 def main():
     num_points: int = 100
@@ -40,7 +56,7 @@ def main():
 
     # Setup the optimizer
     optimizer = g2o.SparseOptimizer()
-    solver = g2o.BlockSolverSE3(g2o.LinearSolverCholmodSE3())
+    solver = g2o.BlockSolverSE3(g2o.LinearSolverEigenSE3())
     solver = g2o.OptimizationAlgorithmLevenberg(solver)
     optimizer.set_algorithm(solver)
 
