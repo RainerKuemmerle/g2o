@@ -3,6 +3,7 @@
 #include "g2o/types/slam3d/edge_pointxyz.h"
 #include "g2opy.h"
 #include "python/core/py_base_binary_edge.h"
+#include "trampoline/py_edge_trampoline.h"
 
 namespace g2o {
 
@@ -12,7 +13,8 @@ inline void declareEdgePointXYZ(py::module& m) {
 
   py::class_<EdgePointXYZ,
              BaseBinaryEdge<3, Vector3, VertexPointXYZ, VertexPointXYZ>,
-             std::shared_ptr<EdgePointXYZ>>(m, "EdgePointXYZ")
+             PyEdgeTrampoline<EdgePointXYZ>, std::shared_ptr<EdgePointXYZ>>(
+      m, "EdgePointXYZ")
       .def(py::init<>())
 
       .def("compute_error", &EdgePointXYZ::computeError)

@@ -7,6 +7,7 @@
 #include "g2opy.h"
 #include "python/core/py_base_binary_edge.h"
 #include "python/core/py_base_unary_edge.h"
+#include "trampoline/py_edge_trampoline.h"
 
 namespace g2o {
 
@@ -14,7 +15,7 @@ inline void declareEdgeSE3(py::module& m) {
   templatedBaseBinaryEdge<6, Isometry3, VertexSE3, VertexSE3>(
       m, "_6_Isometry3_VertexSE3_VertexSE3");
   py::class_<EdgeSE3, BaseBinaryEdge<6, Isometry3, VertexSE3, VertexSE3>,
-             std::shared_ptr<EdgeSE3>>(m, "EdgeSE3")
+             PyEdgeTrampoline<EdgeSE3>, std::shared_ptr<EdgeSE3>>(m, "EdgeSE3")
       .def(py::init<>())
 
       .def("compute_error", &EdgeSE3::computeError)
@@ -32,6 +33,7 @@ inline void declareEdgeSE3(py::module& m) {
   // DrawAction
 
   py::class_<EdgeSE3LotsOfXYZ, BaseVariableSizedEdge<-1, VectorX>,
+             PyEdgeTrampoline<EdgeSE3LotsOfXYZ>,
              std::shared_ptr<EdgeSE3LotsOfXYZ>>(m, "EdgeSE3LotsOfXYZ")
       .def(py::init<>())
 
@@ -45,8 +47,8 @@ inline void declareEdgeSE3(py::module& m) {
            &EdgeSE3LotsOfXYZ::initialEstimatePossible)
       .def("linearize_oplus", &EdgeSE3LotsOfXYZ::linearizeOplus);
 
-  py::class_<EdgeSE3Offset, EdgeSE3, std::shared_ptr<EdgeSE3Offset>>(
-      m, "EdgeSE3Offset")
+  py::class_<EdgeSE3Offset, EdgeSE3, PyEdgeTrampoline<EdgeSE3Offset>,
+             std::shared_ptr<EdgeSE3Offset>>(m, "EdgeSE3Offset")
       .def(py::init<>())
 
       .def("compute_error", &EdgeSE3Offset::computeError)
@@ -58,7 +60,8 @@ inline void declareEdgeSE3(py::module& m) {
 
   templatedBaseUnaryEdge<6, Isometry3, VertexSE3>(m, "_6_Isometry3_VertexSE3");
   py::class_<EdgeSE3Prior, BaseUnaryEdge<6, Isometry3, VertexSE3>,
-             std::shared_ptr<EdgeSE3Prior>>(m, "EdgeSE3Prior")
+             PyEdgeTrampoline<EdgeSE3Prior>, std::shared_ptr<EdgeSE3Prior>>(
+      m, "EdgeSE3Prior")
       .def(py::init<>())
 
       .def("compute_error", &EdgeSE3Prior::computeError)

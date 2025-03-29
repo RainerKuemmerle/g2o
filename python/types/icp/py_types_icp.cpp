@@ -7,6 +7,7 @@
 #include "python/core/py_base_binary_edge.h"
 #include "python/core/py_base_edge.h"
 #include "python/core/py_base_vertex.h"
+#include "trampoline/py_edge_trampoline.h"
 
 G2O_USE_TYPE_GROUP(icp)
 
@@ -43,7 +44,8 @@ void declareTypesICP(py::module& m) {
   templatedBaseBinaryEdge<3, EdgeGICP, VertexSE3, VertexSE3>(
       m, "_3_EdgeGICP_VertexSE3_VertexSE3");
   py::class_<EdgeVVGicp, BaseBinaryEdge<3, EdgeGICP, VertexSE3, VertexSE3>,
-             std::shared_ptr<EdgeVVGicp>>(m, "EdgeVVGicp")
+             PyEdgeTrampoline<EdgeVVGicp>, std::shared_ptr<EdgeVVGicp>>(
+      m, "EdgeVVGicp")
       .def(py::init<>())
 
       .def("compute_error", &EdgeVVGicp::computeError)
@@ -120,7 +122,8 @@ void declareTypesICP(py::module& m) {
   templatedBaseBinaryEdge<3, Vector3, VertexPointXYZ, VertexSCam>(
       m, "_3_Vector3_VertexSBAPointXYZ_VertexSCam");
   py::class_<EdgeXyzVsc, BaseBinaryEdge<3, Vector3, VertexPointXYZ, VertexSCam>,
-             std::shared_ptr<EdgeXyzVsc>>(m, "EdgeXyzVsc")
+             PyEdgeTrampoline<EdgeXyzVsc>, std::shared_ptr<EdgeXyzVsc>>(
+      m, "EdgeXyzVsc")
       .def(py::init<>())
       .def("compute_error", &EdgeXyzVsc::computeError)
 

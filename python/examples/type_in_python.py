@@ -28,8 +28,7 @@ class EdgePointOnCircle(g2o.VariableVectorXEdge):
     def compute_error(self):
         circle = self.vertex(0).estimate()
         radius = circle[2]
-        error = np.linalg.norm(self.measurement() - circle[0:2]) - radius
-        return [error]
+        self.error = [np.linalg.norm(self.measurement() - circle[0:2]) - radius]
 
     # if not implemented, will be numerically estimated
     def linearize_oplus(self):
@@ -125,6 +124,7 @@ def main():
         y1=circle.estimate()[1] + circle.estimate()[2],
         line_color="LightSeaGreen",
     )
+    fig.update_yaxes(scaleanchor="x", scaleratio=1)
     fig.show()
 
 

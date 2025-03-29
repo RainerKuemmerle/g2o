@@ -5,6 +5,7 @@
 #include "g2opy.h"
 #include "py_sim3.h"
 #include "python/core/py_base_binary_edge.h"
+#include "trampoline/py_edge_trampoline.h"
 
 G2O_USE_TYPE_GROUP(sim3)
 
@@ -24,7 +25,8 @@ void declareTypesSevenDofExpmap(py::module& m) {
 
   py::class_<EdgeSim3,
              BaseBinaryEdge<7, Sim3, VertexSim3Expmap, VertexSim3Expmap>,
-             std::shared_ptr<EdgeSim3>>(m, "EdgeSim3")
+             PyEdgeTrampoline<EdgeSim3>, std::shared_ptr<EdgeSim3>>(m,
+                                                                    "EdgeSim3")
       .def(py::init<>())
       .def("compute_error", &EdgeSim3::computeError)
       .def("initial_estimate_possible", &EdgeSim3::initialEstimatePossible)
@@ -35,12 +37,14 @@ void declareTypesSevenDofExpmap(py::module& m) {
 
   py::class_<EdgeSim3ProjectXYZ,
              BaseBinaryEdge<2, Vector2, VertexPointXYZ, VertexSim3Expmap>,
+             PyEdgeTrampoline<EdgeSim3ProjectXYZ>,
              std::shared_ptr<EdgeSim3ProjectXYZ>>(m, "EdgeSim3ProjectXYZ")
       .def(py::init<>())
       .def("compute_error", &EdgeSim3ProjectXYZ::computeError);
 
   py::class_<EdgeInverseSim3ProjectXYZ,
              BaseBinaryEdge<2, Vector2, VertexPointXYZ, VertexSim3Expmap>,
+             PyEdgeTrampoline<EdgeInverseSim3ProjectXYZ>,
              std::shared_ptr<EdgeInverseSim3ProjectXYZ>>(
       m, "EdgeInverseSim3ProjectXYZ")
       .def(py::init<>())
