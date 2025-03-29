@@ -26,12 +26,14 @@
 
 #include <gtest/gtest.h>
 
+#include "g2o/core/eigen_types.h"
 #include "g2o/stuff/sampler.h"
 #include "g2o/types/slam2d/edge_pointxy.h"
 #include "g2o/types/slam2d/edge_se2.h"
 #include "g2o/types/slam2d/edge_se2_pointxy.h"
 #include "g2o/types/slam2d/edge_se2_pointxy_bearing.h"
 #include "g2o/types/slam2d/edge_se2_prior.h"
+#include "unit_test/test_helper/eigen_matcher.h"
 #include "unit_test/test_helper/evaluate_jacobian.h"
 
 using namespace g2o;  // NOLINT
@@ -39,6 +41,40 @@ using namespace g2o;  // NOLINT
 namespace {
 SE2 randomSE2() { return SE2(Vector3::Random()); }
 }  // namespace
+
+TEST(Slam2D, EdgeSE2JacobianAccess) {
+  using g2o::internal::EigenEqual;
+  using g2o::internal::print_wrap;
+
+  auto v1 = std::make_shared<VertexSE2>();
+  v1->setId(0);
+
+  auto v2 = std::make_shared<VertexSE2>();
+  v2->setId(1);
+
+  EdgeSE2 e;
+  e.setVertex(0, v1);
+  e.setVertex(1, v2);
+  e.setInformation(EdgeSE2::InformationType::Identity());
+
+  JacobianWorkspace jacobianWorkspace;
+  jacobianWorkspace.updateSize(e);
+  jacobianWorkspace.allocate();
+
+  v1->setEstimate(randomSE2());
+  v2->setEstimate(randomSE2());
+  e.setMeasurement(randomSE2());
+
+  e.BaseBinaryEdge<EdgeSE2::kDimension, EdgeSE2::Measurement,
+                   EdgeSE2::VertexXiType,
+                   EdgeSE2::VertexXjType>::linearizeOplus(jacobianWorkspace);
+
+  const MatrixX j0 = e.jacobianOplusXn<0>();
+  const MatrixX j1 = e.jacobianOplusXn<1>();
+
+  EXPECT_THAT(print_wrap(e.jacobian(0)), EigenEqual(print_wrap(j0)));
+  EXPECT_THAT(print_wrap(e.jacobian(1)), EigenEqual(print_wrap(j1)));
+}
 
 TEST(Slam2D, EdgeSE2Jacobian) {
   auto v1 = std::make_shared<VertexSE2>();

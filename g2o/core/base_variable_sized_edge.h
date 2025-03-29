@@ -30,6 +30,8 @@
 #include <Eigen/Core>
 #include <cassert>
 #include <cstddef>
+#include <sstream>
+#include <stdexcept>
 #include <vector>
 
 #include "base_edge.h"
@@ -89,6 +91,20 @@ class BaseVariableSizedEdge : public BaseEdge<D, E> {
   void mapHessianMemory(double* d, int i, int j, bool rowMajor) override;
 
   using BaseEdge<D, E>::computeError;
+
+  [[nodiscard]] MatrixX jacobian(int i) const { return jacobianOplus_.at(i); }
+
+  void setJacobian(int i, const Eigen::Ref<MatrixX>& jacobian) {
+    OptimizableGraph::Vertex* vi = vertexRaw(i);
+    if (jacobian.rows() != dimension_ || jacobian.cols() != vi->dimension()) {
+      std::stringstream ex_reason;
+      ex_reason << "Jacobian dimension mismatching. Expected " << dimension_
+                << "x" << vi->dimension() << " got " << jacobian.rows() << "x"
+                << jacobian.cols();
+      throw std::runtime_error(ex_reason.str());
+    }
+    jacobianOplus_.at(i) = jacobian;
+  }
 
  protected:
   using BaseEdge<D, E>::measurement_;

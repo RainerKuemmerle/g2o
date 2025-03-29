@@ -40,12 +40,34 @@ template <typename F, typename T, std::size_t... I>
 void tuple_apply_i_impl(F&& f, T& t, int i, std::index_sequence<I...>) {
   (..., (I == i ? f(std::get<I>(t)) : void()));
 }
+
+template <typename S, typename T, std::size_t... I>
+void tuple_set_i_impl(const S& s, T& t, int i, std::index_sequence<I...>) {
+  (..., (I == i ? void(std::get<I>(t) = s) : void()));
+}
+
+template <typename S, typename T, std::size_t... I>
+void tuple_get_i_impl(S& s, T& t, int i, std::index_sequence<I...>) {
+  (..., (I == i ? void(s = std::get<I>(t)) : void()));
+}
 }  // namespace internal
 
 template <typename F, typename T>
 void tuple_apply_i(F&& f, T& t, int i) {
   internal::tuple_apply_i_impl(
       f, t, i, std::make_index_sequence<std::tuple_size_v<std::decay_t<T>>>());
+}
+
+template <typename S, typename T>
+void tuple_set_i(const S& s, T& t, int i) {
+  internal::tuple_set_i_impl(
+      s, t, i, std::make_index_sequence<std::tuple_size_v<std::decay_t<T>>>());
+}
+
+template <typename S, typename T>
+void tuple_get_i(S& s, T& t, int i) {
+  internal::tuple_get_i_impl(
+      s, t, i, std::make_index_sequence<std::tuple_size_v<std::decay_t<T>>>());
 }
 
 template <typename T, typename... Ts>

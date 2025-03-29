@@ -34,7 +34,26 @@ TEST(Stuff, TupleApply) {
   ASSERT_EQ(3, std::get<2>(t));
   auto plus_one = [](int& i) { ++i; };
   g2o::tuple_apply_i(plus_one, t, 1);
-  ASSERT_EQ(1, std::get<0>(t));
-  ASSERT_EQ(3, std::get<1>(t));
-  ASSERT_EQ(3, std::get<2>(t));
+  EXPECT_EQ(1, std::get<0>(t));
+  EXPECT_EQ(3, std::get<1>(t));
+  EXPECT_EQ(3, std::get<2>(t));
+}
+
+TEST(Stuff, TupleSetI) {
+  auto t = std::make_tuple(1, 2, 3);
+  g2o::tuple_set_i(5, t, 0);
+  EXPECT_EQ(5, std::get<0>(t));
+  EXPECT_EQ(2, std::get<1>(t));
+  EXPECT_EQ(3, std::get<2>(t));
+}
+
+TEST(Stuff, TupleGetI) {
+  auto t = std::make_tuple(1, 2, 3);
+  int i0, i1, i2;  // NOLINT
+  g2o::tuple_get_i(i0, t, 0);
+  g2o::tuple_get_i(i1, t, 1);
+  g2o::tuple_get_i(i2, t, 2);
+  EXPECT_EQ(i0, std::get<0>(t));
+  EXPECT_EQ(i1, std::get<1>(t));
+  EXPECT_EQ(i2, std::get<2>(t));
 }

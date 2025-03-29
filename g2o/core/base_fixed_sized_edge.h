@@ -263,6 +263,16 @@ class BaseFixedSizedEdge : public BaseEdge<D, E> {
     return std::get<N>(jacobianOplus_);
   }
 
+  [[nodiscard]] MatrixX jacobian(int i) const {
+    MatrixX result;
+    tuple_get_i(result, jacobianOplus_, i);
+    return result;
+  }
+
+  void setJacobian(int i, const Eigen::Ref<MatrixX>& jacobian) {
+    tuple_set_i(jacobian, jacobianOplus_, i);
+  }
+
   /**
    * computes the (block) elements of the Hessian matrix of the linearized least
    * squares.
