@@ -5,15 +5,17 @@
 #include "g2o/types/slam3d/edge_se3_pointxyz_disparity.h"
 #include "g2opy.h"
 #include "python/core/py_base_binary_edge.h"
+#include "trampoline/py_edge_trampoline.h"
 
 namespace g2o {
 
 inline void declareEdgeSE3PointXYZ(py::module& m) {
   templatedBaseBinaryEdge<3, Vector3, VertexSE3, VertexPointXYZ>(
       m, "_3_Vector3_VertexSE3_VertexPointXYZ");
-  py::class_<EdgeSE3PointXYZ,
-             BaseBinaryEdge<3, Vector3, VertexSE3, VertexPointXYZ>,
-             std::shared_ptr<EdgeSE3PointXYZ>>(m, "EdgeSE3PointXYZ")
+  py::class_<
+      EdgeSE3PointXYZ, BaseBinaryEdge<3, Vector3, VertexSE3, VertexPointXYZ>,
+      PyEdgeTrampoline<EdgeSE3PointXYZ>, std::shared_ptr<EdgeSE3PointXYZ>>(
+      m, "EdgeSE3PointXYZ")
       .def(py::init<>())
 
       .def("compute_error", &EdgeSE3PointXYZ::computeError)
@@ -32,6 +34,7 @@ inline void declareEdgeSE3PointXYZ(py::module& m) {
 
   py::class_<EdgeSE3PointXYZDepth,
              BaseBinaryEdge<3, Vector3, VertexSE3, VertexPointXYZ>,
+             PyEdgeTrampoline<EdgeSE3PointXYZDepth>,
              std::shared_ptr<EdgeSE3PointXYZDepth>>(m, "EdgeSE3PointXYZDepth")
       .def(py::init<>())
 
@@ -49,6 +52,7 @@ inline void declareEdgeSE3PointXYZ(py::module& m) {
 
   py::class_<EdgeSE3PointXYZDisparity,
              BaseBinaryEdge<3, Vector3, VertexSE3, VertexPointXYZ>,
+             PyEdgeTrampoline<EdgeSE3PointXYZDisparity>,
              std::shared_ptr<EdgeSE3PointXYZDisparity>>(
       m, "EdgeSE3PointXYZDisparity")
       .def(py::init<>())

@@ -3,6 +3,7 @@
 #include "g2o/types/sclam2d/edge_se2_sensor_calib.h"
 #include "g2opy.h"
 #include "python/core/py_base_fixed_sized_edge.h"
+#include "trampoline/py_edge_trampoline.h"
 
 namespace g2o {
 
@@ -12,6 +13,7 @@ inline void declareEdgeSE2SensorCalib(py::module& m) {
 
   py::class_<EdgeSE2SensorCalib,
              BaseFixedSizedEdge<3, SE2, VertexSE2, VertexSE2, VertexSE2>,
+             PyEdgeTrampoline<EdgeSE2SensorCalib>,
              std::shared_ptr<EdgeSE2SensorCalib>>(m, "EdgeSE2SensorCalib")
       .def(py::init<>())
       .def("compute_error", &EdgeSE2SensorCalib::computeError)

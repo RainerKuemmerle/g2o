@@ -1,7 +1,13 @@
 #include "py_types_six_dof_expmap.h"
 
 #include "g2o/core/factory.h"
+#include "g2o/types/sba/edge_project_psi2uv.h"
+#include "g2o/types/sba/edge_project_stereo_xyz.h"
+#include "g2o/types/sba/edge_project_stereo_xyz_onlypose.h"
 #include "g2o/types/sba/edge_project_xyz.h"
+#include "g2o/types/sba/edge_project_xyz2uv.h"
+#include "g2o/types/sba/edge_project_xyz2uvu.h"
+#include "g2o/types/sba/edge_se3_expmap.h"
 #include "g2o/types/sba/parameter_cameraparameters.h"
 #include "g2o/types/sba/types_six_dof_expmap.h"  // IWYU pragma: keep
 #include "g2o/types/slam3d/se3quat.h"
@@ -9,6 +15,7 @@
 #include "python/core/py_base_binary_edge.h"
 #include "python/core/py_base_fixed_sized_edge.h"
 #include "python/core/py_base_unary_edge.h"
+#include "trampoline/py_edge_trampoline.h"
 
 G2O_USE_TYPE_GROUP(expmap)
 
@@ -40,7 +47,8 @@ void declareTypesSixDofExpmap(py::module& m) {
       m, "_6_SE3Quat_VertexSE3Expmap_VertexSE3Expmap");
   py::class_<EdgeSE3Expmap,
              BaseBinaryEdge<6, SE3Quat, VertexSE3Expmap, VertexSE3Expmap>,
-             std::shared_ptr<EdgeSE3Expmap>>(m, "EdgeSE3Expmap")
+             PyEdgeTrampoline<EdgeSE3Expmap>, std::shared_ptr<EdgeSE3Expmap>>(
+      m, "EdgeSE3Expmap")
       .def(py::init<>())
       .def("compute_error", &EdgeSE3Expmap::computeError);
 
@@ -48,6 +56,7 @@ void declareTypesSixDofExpmap(py::module& m) {
       m, "_2_Vector2_VertexPointXYZ_VertexSE3Expmap");
   py::class_<EdgeProjectXYZ2UV,
              BaseBinaryEdge<2, Vector2, VertexPointXYZ, VertexSE3Expmap>,
+             PyEdgeTrampoline<EdgeProjectXYZ2UV>,
              std::shared_ptr<EdgeProjectXYZ2UV>>(m, "EdgeProjectXYZ2UV")
       .def(py::init<>())
       .def("compute_error", &EdgeProjectXYZ2UV::computeError)
@@ -59,6 +68,7 @@ void declareTypesSixDofExpmap(py::module& m) {
   py::class_<EdgeProjectPSI2UV,
              g2o::BaseFixedSizedEdge<2, Vector2, VertexPointXYZ,
                                      VertexSE3Expmap, VertexSE3Expmap>,
+             PyEdgeTrampoline<EdgeProjectPSI2UV>,
              std::shared_ptr<EdgeProjectPSI2UV>>(m, "EdgeProjectPSI2UV")
       .def(py::init())
       .def("compute_error", &EdgeProjectPSI2UV::computeError)
@@ -69,6 +79,7 @@ void declareTypesSixDofExpmap(py::module& m) {
       m, "_3_Vector3_VertexPointXYZ_VertexSE3Expmap");
   py::class_<EdgeProjectXYZ2UVU,
              BaseBinaryEdge<3, Vector3, VertexPointXYZ, VertexSE3Expmap>,
+             PyEdgeTrampoline<EdgeProjectXYZ2UVU>,
              std::shared_ptr<EdgeProjectXYZ2UVU>>(m, "EdgeProjectXYZ2UVU")
       .def(py::init<>())
       .def("compute_error", &EdgeProjectXYZ2UVU::computeError);
@@ -76,6 +87,7 @@ void declareTypesSixDofExpmap(py::module& m) {
   // Projection using focal_length in x and y directions
   py::class_<EdgeSE3ProjectXYZ,
              BaseBinaryEdge<2, Vector2, VertexPointXYZ, VertexSE3Expmap>,
+             PyEdgeTrampoline<EdgeSE3ProjectXYZ>,
              std::shared_ptr<EdgeSE3ProjectXYZ>>(m, "EdgeSE3ProjectXYZ")
       .def(py::init<>())
       .def("compute_error", &EdgeSE3ProjectXYZ::computeError)
@@ -92,6 +104,7 @@ void declareTypesSixDofExpmap(py::module& m) {
       m, "BaseUnaryEdge_2_Vector2_VertexSE3Expmap");
   py::class_<EdgeSE3ProjectXYZOnlyPose,
              BaseUnaryEdge<2, Vector2, VertexSE3Expmap>,
+             PyEdgeTrampoline<EdgeSE3ProjectXYZOnlyPose>,
              std::shared_ptr<EdgeSE3ProjectXYZOnlyPose>>(
       m, "EdgeSE3ProjectXYZOnlyPose")
       .def(py::init<>())
@@ -108,6 +121,7 @@ void declareTypesSixDofExpmap(py::module& m) {
   // Projection using focal_length in x and y directions stereo
   py::class_<EdgeStereoSE3ProjectXYZ,
              BaseBinaryEdge<3, Vector3, VertexPointXYZ, VertexSE3Expmap>,
+             PyEdgeTrampoline<EdgeStereoSE3ProjectXYZ>,
              std::shared_ptr<EdgeStereoSE3ProjectXYZ>>(
       m, "EdgeStereoSE3ProjectXYZ")
       .def(py::init<>())
@@ -126,6 +140,7 @@ void declareTypesSixDofExpmap(py::module& m) {
       m, "BaseUnaryEdge_3_Vector3_VertexSE3Expmap");
   py::class_<EdgeStereoSE3ProjectXYZOnlyPose,
              BaseUnaryEdge<3, Vector3, VertexSE3Expmap>,
+             PyEdgeTrampoline<EdgeStereoSE3ProjectXYZOnlyPose>,
              std::shared_ptr<EdgeStereoSE3ProjectXYZOnlyPose>>(
       m, "EdgeStereoSE3ProjectXYZOnlyPose")
       .def(py::init<>())

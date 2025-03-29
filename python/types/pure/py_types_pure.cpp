@@ -1,10 +1,8 @@
 #include "py_types_pure.h"
 
 #include <pybind11/cast.h>
+#include <pybind11/pybind11.h>
 #include <pybind11/pytypes.h>
-
-#include <sstream>
-#include <stdexcept>
 
 #include "g2o/core/base_dynamic_vertex.h"
 #include "g2o/core/base_variable_sized_edge.h"
@@ -56,23 +54,6 @@ class VariableVectorXEdge
     : public BaseVariableSizedEdge<Eigen::Dynamic, VectorX> {
  public:
   VariableVectorXEdge() { resize(0); }
-
-  void computeError() override { error_ = compute_error(); }
-
-  // python trampoline
-  virtual VectorX compute_error() = 0;
-
-  void setJacobian(int i, const MatrixX& jacobian) {
-    OptimizableGraph::Vertex* vi = vertexRaw(i);
-    if (jacobian.rows() != dimension_ || jacobian.cols() != vi->dimension()) {
-      std::stringstream ex_reason;
-      ex_reason << "Jacobian dimension mismatching. Expected " << dimension_
-                << "x" << vi->dimension() << " got " << jacobian.rows() << "x"
-                << jacobian.cols();
-      throw std::runtime_error(ex_reason.str());
-    }
-    jacobianOplus_[i] = jacobian;
-  }
 };
 
 class PyVariableVectorXEdge : public VariableVectorXEdge {
@@ -80,11 +61,12 @@ class PyVariableVectorXEdge : public VariableVectorXEdge {
   PyVariableVectorXEdge() = default;
 
   // Trampoline for compute_error
-  VectorX compute_error() override {
-    PYBIND11_OVERRIDE_PURE(
-        VectorX,             /* Return type */
+  void computeError() override {
+    PYBIND11_OVERRIDE_PURE_NAME(
+        void,                /* Return type */
         VariableVectorXEdge, /* Parent class */
-        compute_error /* Name of function in C++ (must match Python name) */
+        "compute_error",     /* Name of function in Python */
+        computeError,        /* function in C++ */
     );
   }
 
@@ -116,14 +98,13 @@ void declareTypesPure(py::module& m) {
              std::shared_ptr<VariableVectorXEdge>>(m, "VariableVectorXEdge")
       .def(py::init<>())
       .def("compute_error",
-           &VariableVectorXEdge::compute_error)  // -> vector, to be implemented
-                                                 // in python
+           &VariableVectorXEdge::computeError)  // -> vector, to be implemented
+                                                // in python
       .def("set_measurement", &VariableVectorXEdge::setMeasurement)
       .def("set_dimension", &VariableVectorXEdge::setDimension<-1>)  // int ->
       .def(
           "linearize_oplus",
           py::overload_cast<>(&VariableVectorXEdge::linearizeOplus))  // void ->
-      .def("set_jacobian", &VariableVectorXEdge::setJacobian)  // int, Matrix ->
       // .def("set_measurement_data", &EdgeSE2::setMeasurementData)
       // .def("get_measurement_data", &EdgeSE2::getMeasurementData)
       // .def("measurement_dimension", &EdgeSE2::measurementDimension)

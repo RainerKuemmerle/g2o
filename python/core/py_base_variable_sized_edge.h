@@ -29,12 +29,9 @@ void templatedBaseVariableSizedEdge(py::module& m, const std::string& suffix) {
 template <typename E>
 void templatedDynamicBaseVariableSizedEdge(py::module& m,
                                            const std::string& suffix) {
-  using CLS = BaseVariableSizedEdge<-1, E>;
+  using CLS = BaseVariableSizedEdge<Eigen::Dynamic, E>;
 
-  // typedef typename BaseEdge<-1,E>::ErrorVector ErrorVector;
-  // typedef typename BaseEdge<-1,E>::InformationType InformationType;
-
-  py::class_<CLS, BaseEdge<-1, E>, std::shared_ptr<CLS>>(
+  py::class_<CLS, BaseEdge<Eigen::Dynamic, E>, std::shared_ptr<CLS>>(
       m, ("DynamicBaseVariableSizedEdge" + suffix).c_str())
       .def("resize", &CLS::resize, "size"_a)              // size_t ->
       .def("all_vertices_fixed", &CLS::allVerticesFixed)  // -> bool
@@ -45,6 +42,9 @@ void templatedDynamicBaseVariableSizedEdge(py::module& m,
            static_cast<void (CLS::*)()>(&CLS::linearizeOplus))
       .def("mapHessianMemory", &CLS::mapHessianMemory, "d"_a, "i"_a, "j"_a,
            "row_major"_a)  // (double*, i, j, bool) ->
+      .def("jacobian", &CLS::jacobian, "vertex_index"_a)  // int -> Matrix
+      .def("set_jacobian", &CLS::setJacobian, "vertex_index"_a,
+           "jacobian"_a)  // int, Matrix ->
       ;
 }
 

@@ -14,11 +14,12 @@ void templatedBaseUnaryEdge(py::module& m, const std::string& suffix) {
 
   py::class_<CLS, BaseFixedSizedEdge<D, E, VertexXiType>, BaseEdge<D, E>,
              std::shared_ptr<CLS>>(m, ("BaseUnaryEdge" + suffix).c_str())
-      /*
-      .def_readwrite("jacobian_oplus_xi",
-                     &CLS::template jacobianOplusXn<0>())  // ->
-      JacobianXiOplusType&
-      */
+      .def_property(
+          "jacobian_oplus_xi",
+          [](CLS& cls) { return cls.template jacobianOplusXn<0>(); },
+          [](CLS& cls, const MatrixX& m) {
+            cls.template jacobianOplusXn<0>() = m;
+          })  // -> JacobianXiOplusType&
       ;
 }
 

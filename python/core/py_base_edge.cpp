@@ -1,6 +1,6 @@
 #include "py_base_edge.h"
 
-#include "g2o/types/slam3d/type_traits_isometry3.h"
+#include "g2o/types/slam3d/type_traits_isometry3.h"  // IWYU pragma: keep
 
 namespace g2o {
 
@@ -13,7 +13,7 @@ void declareBaseEdge(py::module& m) {
 
   templatedBaseEdge<6, Isometry3>(m, "_6_Isometry3");
 
-  templatedDynamicBaseEdge<VectorX>(m, "_VectorX");
+  templatedBaseEdge<Eigen::Dynamic, VectorX>(m, "_Dyn_VectorX");
 }
 
 }  // end namespace g2o

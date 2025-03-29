@@ -1,5 +1,6 @@
 #pragma once
 #include "g2o/core/base_binary_edge.h"
+#include "g2o/core/eigen_types.h"
 #include "g2opy.h"
 #include "python/core/py_base_fixed_sized_edge.h"
 
@@ -14,13 +15,18 @@ void templatedBaseBinaryEdge(pybind11::module& m, const std::string& suffix) {
   pybind11::class_<CLS, BaseFixedSizedEdge<D, E, VertexXi, VertexXj>,
                    BaseEdge<D, E>, std::shared_ptr<CLS>>(
       m, ("BaseBinaryEdge" + suffix).c_str())
-      //.def(pybind11::init<>())    // lead to "error:
-      /*
-      .def_readwrite("jacobian_oplus_xi",
-                     &CLS::template jacobianOplusXn<0>())  // ->
-      JacobianXiOplusType& .def_readwrite("jacobian_oplus_xj", &CLS::template
-      jacobianOplusXn<1>())  //-> JacobianXjOplusType&
-      */
+      .def_property(
+          "jacobian_oplus_xi",
+          [](CLS& cls) { return cls.template jacobianOplusXn<0>(); },
+          [](CLS& cls, const MatrixX& m) {
+            cls.template jacobianOplusXn<0>() = m;
+          })  // -> JacobianXiOplusType&
+      .def_property(
+          "jacobian_oplus_xj",
+          [](const CLS& cls) { return cls.template jacobianOplusXn<1>(); },
+          [](CLS& cls, const MatrixX& m) {
+            cls.template jacobianOplusXn<0>() = m;
+          })  //-> JacobianXjOplusType&;
       ;
 }
 

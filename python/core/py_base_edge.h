@@ -17,10 +17,9 @@ void templatedBaseEdge(py::module& m, const std::string& suffix) {
       m, ("BaseEdge" + suffix).c_str())
       //.def(py::init<>())
       .def("chi2", &CLS::chi2)
-      //.def("error_data", (double* (CLS::*) ()) &CLS::errorData) // -> data*
-      .def("error",
-           static_cast<ErrorVector& (CLS::*)()>(&CLS::error))  // -> ErrorVector
-
+      .def_property(
+          "error", [](const CLS& cls) { return cls.error(); },
+          [](CLS& cls, ErrorVector& v) { cls.error() = v; })
       //.def("information_data", (double* (CLS::*) ()) &CLS::informationData) //
       //-> data*
       .def("information", static_cast<InformationType& (CLS::*)()>(
@@ -28,47 +27,10 @@ void templatedBaseEdge(py::module& m, const std::string& suffix) {
       .def(
           "set_information",
           [](CLS& edge, const MatrixX& info) { edge.setInformation(info); },
-          "information"_a, py::keep_alive<1, 2>())  // InformationType ->
+          "information"_a)  // InformationType ->
 
-      .def("measurement", &CLS::measurement)  // -> E
-      .def("set_measurement", &CLS::setMeasurement, "m"_a,
-           py::keep_alive<1, 2>())  // E ->
-
-      .def("rank", &CLS::rank)  // -> int
-      .def("initial_estimate",
-           &CLS::initialEstimate)  // (const OptimizableGraph::VertexSet&,
-                                   // OptimizableGraph::Vertex*) ->
-      ;
-}
-
-template <typename E>
-void templatedDynamicBaseEdge(py::module& m, const std::string& suffix) {
-  using CLS = BaseEdge<-1, E>;
-
-  using ErrorVector = typename CLS::ErrorVector;
-  using InformationType = typename CLS::InformationType;
-
-  py::class_<CLS, OptimizableGraph::Edge, std::shared_ptr<CLS>>(
-      m, ("DynamicBaseEdge" + suffix).c_str())
-      .def("chi2", &CLS::chi2)
-      //.def("error_data", (double* (CLS::*) ()) &CLS::errorData) // -> data*
-      .def("error",
-           static_cast<ErrorVector& (CLS::*)()>(&CLS::error))  // -> ErrorVector
-
-      //.def("information_data", (double* (CLS::*) ()) &CLS::informationData) //
-      //-> data*
-      .def("information", static_cast<InformationType& (CLS::*)()>(
-                              &CLS::information))  // -> InformationType
-      .def(
-          "set_information",
-          [](CLS& edge, const InformationType& info) {
-            edge.setInformation(info);
-          },
-          "information"_a, py::keep_alive<1, 2>())  // InformationType ->
-
-      .def("measurement", &CLS::measurement)  // -> E
-      .def("set_measurement", &CLS::setMeasurement, "m"_a,
-           py::keep_alive<1, 2>())  // E ->
+      .def("measurement", &CLS::measurement)                // -> E
+      .def("set_measurement", &CLS::setMeasurement, "m"_a)  // E ->
 
       .def("rank", &CLS::rank)  // -> int
       .def("initial_estimate",
