@@ -68,6 +68,7 @@ std::optional<AbstractGraph> IoG2O::load(std::istream& input) {
   while (true) {
     const int bytesRead = readLine(input, current_line);
     line_number++;
+    (void)line_number;
     if (bytesRead == -1) break;
     current_line >> token;
     if (bytesRead == 0 || token.empty() || token[0] == '#') continue;

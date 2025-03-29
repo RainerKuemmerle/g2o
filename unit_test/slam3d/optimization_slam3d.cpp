@@ -146,4 +146,4 @@ using OptimizationAlgorithmTypes =
                      OptimizationAlgorithmLevenberg,
                      OptimizationAlgorithmDogleg>;
 INSTANTIATE_TYPED_TEST_SUITE_P(Slam3D, Slam3DOptimization,
-                               OptimizationAlgorithmTypes);
+                               OptimizationAlgorithmTypes, );

@@ -181,7 +181,7 @@ using LinearSolverTypes = ::testing::Types<
     std::pair<g2o::LinearSolverEigen<g2o::MatrixX>, NoBlockOrdering>,
     std::pair<g2o::LinearSolverEigen<g2o::MatrixX>, BlockOrdering>,
     std::pair<g2o::LinearSolverDense<g2o::MatrixX>, NoopOrdering>>;
-INSTANTIATE_TYPED_TEST_SUITE_P(LinearSolver, LS, LinearSolverTypes);
+INSTANTIATE_TYPED_TEST_SUITE_P(LinearSolver, LS, LinearSolverTypes, );
 
 // A single test for PCG
 TEST(LS, LinearSolverPCGSolve) {

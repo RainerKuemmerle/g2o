@@ -601,6 +601,7 @@ void OptimizableGraph::setRenamedTypesFromString(const std::string& types) {
 
   G2O_DEBUG("Load look up table:");
   for (const auto& rtl : renamedTypesLookup_) {
+    (void)rtl;  // avoid unused warning in case of build without logging
     G2O_DEBUG("{} -> {}", rtl.first, rtl.second);
   }
 }
