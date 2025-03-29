@@ -157,5 +157,5 @@ using RobustKernelTypes = ::testing::Types<
   g2o::RobustKernelSaturated,
   g2o::RobustKernelDCS
 >;
-INSTANTIATE_TYPED_TEST_SUITE_P(General, RobustKernelTests, RobustKernelTypes);
+INSTANTIATE_TYPED_TEST_SUITE_P(General, RobustKernelTests, RobustKernelTypes, );
 // clang-format on
