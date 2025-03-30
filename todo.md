@@ -1,4 +1,6 @@
-[ ] build only one library instead of multiple
+[ ] update py_base_vertex/edge to map now common methods
+[ ] common functions to wrap edge/vertex possible?
+[ ] build only one library instead of multiple?
 [ ] remove dynamic loading of wildcard libs from g2o/g2o_viewer
 [ ] update ID to int64
 [x] drop cereal (replace with json directly, drop xml)
@@ -14,7 +16,6 @@
 [ ] Test load/save for VertexCam (camera and baseline seem missing from traits)
 [ ] use cmakedefine01 for compile flags in config
 [ ] add test for setData / getData on the graph
-[ ] update py_base_vertex/edge to map now common methods
 [ ] Use FakeDependency in Traits
 [ ] wrap abstract graph to python and update save wrapper
 [x] CPack config
