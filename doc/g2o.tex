@@ -1,11 +1,9 @@
 \documentclass[a4paper]{article}
 \usepackage{graphicx}
-\usepackage{fullpage}
 \usepackage{graphicx} % for pdf, bitmapped graphics files
 \usepackage{amsmath} % assumes amsmath package installed
 \usepackage{amssymb}  % assumes amsmath package installed\ref
 \usepackage{psfrag}
-\usepackage{algorithmic}
 \usepackage{algorithm}
 \usepackage{color}
 \usepackage{xcolor}
@@ -108,12 +106,12 @@ efforts might be required.
 \gopt\ stands for General (Hyper) Graph Optimization. The purposes of
 this framework are the following:
 \begin{itemize}
-\item To provide an easy-to-extend and easy-to-use general library for 
+\item To provide an easy-to-extend and easy-to-use general library for
   graph optimization that can be easily applied to different problems,
 \item To provide people who want to understand SLAM or BA with an
   easy-to-read implementation that focuses on the relevant details of
   the problem specification.
-\item Achieve state-of-the-art performances, 
+\item Achieve state-of-the-art performances,
   while being as general as possible.
 \end{itemize}
 
@@ -132,8 +130,8 @@ simple example.\\
   \vspace{.5cm}
 \noindent Please cite this when using \gopt:\\
 R. K\"ummerle, G. Grisetti, H. Strasdat, K. Konolige, and W. Burgard.
-g2o: A General Framework for Graph Optimization. 
-In Proc. of the IEEE Int. Conf. on Robotics and Automation (ICRA). Shanghai, China, May 2011. 
+g2o: A General Framework for Graph Optimization.
+In Proc. of the IEEE Int. Conf. on Robotics and Automation (ICRA). Shanghai, China, May 2011.
 
 \section{(Hyper)Graph-Embeddable Optimization Problems}
 A least squares minimization problem can be described by the following equation:
@@ -150,8 +148,8 @@ Here
     parameters, where each $\bx_i$ represents a generic parameter block.
   \item $\bx_k=(\bx_{k_1}^T,\;\ldots\;,\bx_{k_q}^T)^T \subset
     (\bx_1^T,\;\ldots\;,\bx_n^T)^T$ is the subset of the parameters
-    involved in the $k^\mathrm{th}$ constraint.  
-  \item $\bz_{k}$ and $\bOmega_{k}$ represent 
+    involved in the $k^\mathrm{th}$ constraint.
+  \item $\bz_{k}$ and $\bOmega_{k}$ represent
     respectively the mean and the information matrix of a constraint
     relating the parameters in $\bx_k$.
   \item $\be_k(\bx_k \bz_{k})$ is a vector error function
@@ -192,7 +190,7 @@ example of mapping between a hyper-graph and an objective function.
 \psfrag{u0}{$\bu_{0}$}
 \psfrag{u1}{$\bu_{1}$}
 \psfrag{ui1}{$\bu_{i-1}$}
-\includegraphics{pics/hgraph.eps}
+\includegraphics{pics/hgraph.pdf}
 \caption{This example illustrates how to represent an objective
   function by a hyper-graph. Here we illustrate a portion of a small
   SLAM problem~\cite{konolige10iros}. In this example we assume that
@@ -241,18 +239,18 @@ Substituting \eqref{eq:taylor} in the error terms $\bF_{k}$ of
              &=&\mathrm{c}_{k} + 2 \bb_{k} \bDeltax + \bDeltax^T \bH_{k} \bDeltax
 \label{eq:errorQuad}
 \end{eqnarray}
-} 
+}
 With this local approximation, we can rewrite the function
 $\bF(\bx)$ given in \eqref{eq:sumOfFactors} as
 
 \vspace{-3.5mm}
 {\small
 \begin{eqnarray}
-\bF(\breve{\bx} + \bDeltax) &=& \sum_{k \in\mathcal{C}} \bF_{k}(\breve{\bx} + \bDeltax) 
+\bF(\breve{\bx} + \bDeltax) &=& \sum_{k \in\mathcal{C}} \bF_{k}(\breve{\bx} + \bDeltax)
 \label{eq:optNetwork0}\\
                       &\simeq& \sum_{k \in\mathcal{C}} \mathrm{c}_{k} + 2 \bb_{k} \bDeltax + \bDeltax^T \bH_{k} \bDeltax
 \label{eq:optNetwork1}\\
-                      &=&\mathrm{c} + 2 \bb^T \bDeltax + \bDeltax^T \bH \bDeltax. 
+                      &=&\mathrm{c} + 2 \bb^T \bDeltax + \bDeltax^T \bH \bDeltax.
 \label{eq:optNetwork2}
 \end{eqnarray}
 } The quadratic form in \eqref{eq:optNetwork2} is obtained from
@@ -260,7 +258,7 @@ $\bF(\bx)$ given in \eqref{eq:sumOfFactors} as
 $\bb=\sum \bb_{k}$ and $\bH=\sum \bH_{k}$. It can be minimized in
 $\bDeltax$ by solving the linear system
 \begin{eqnarray}
-       \bH\,\bDeltax^* &=& - \bb. 
+       \bH\,\bDeltax^* &=& - \bb.
 \label{eq:oneLinearIteration}
 \end{eqnarray}
 The matrix $\bH$ is the information matrix of the system and is sparse
@@ -283,12 +281,12 @@ and the update step in \eqref{eq:linearPropagation}. In every
 iteration, the previous solution is used as linearization point and as
 initial guess.
 
-The Levenberg-Marquardt (LM) algorithm is a nonlinear variant to Gauss-Newton that introduces 
+The Levenberg-Marquardt (LM) algorithm is a nonlinear variant to Gauss-Newton that introduces
 a damping factor and backup actions to control the convergence.
 Instead of solving directly Eq.~\ref{eq:oneLinearIteration}
 LM solves a damped version of it
 \begin{eqnarray}
-       (\bH +\lambda \bI)\,\bDeltax^* &=& - \bb. 
+       (\bH +\lambda \bI)\,\bDeltax^* &=& - \bb.
 \label{eq:oneLinearIterationLevenberg}
 \end{eqnarray}
 Here $\lambda$ is a damping factor: the larger $\lambda$ is the
@@ -317,7 +315,7 @@ for every constraint.  If we set $\bb_{k}=\bJ_{k}^T \bOmega_{k}
 \ec_{k}$ and $\bH_{k}= \bJ_{k}^T \bOmega_{k}\bJ_{k}$ we can
 rewrite $\bH$ and $\bb$ as
 \begin{eqnarray}
-  \bb&=&\sum_{k \in\mathcal{C}} \bb_{ij}\\ 
+  \bb&=&\sum_{k \in\mathcal{C}} \bb_{ij}\\
   \bH&=&\sum_{k \in\mathcal{C}} \bH_{ij}. \label{eq:addendTerm}
 \end{eqnarray}
 Every constraint will contribute to the system with an addend
@@ -357,7 +355,7 @@ From \eqref{eq:errorQuad2} we obtain the following structure for the block matri
 \bJ_{k_q}^T \bOmega_{k} \ec_{k}\\
 \vdots\\
 \end{array}
-\right) 
+\right)
 \end{eqnarray}
 For simplicity of notation we omitted the zero blocks.  The reader
 might notice that the block structure of the matrix $\bH$ is the
@@ -430,8 +428,8 @@ encapsulated by the $\boxplus$ operator.  The Jacobian $\tilde
 \end{eqnarray}
 Since in the previous equation $\breve{\be}$ depends only on $\bTDeltax_{k_i} \in \bTDeltax_{k}$ we can further expand it as follows:
 \begin{eqnarray}
-\tilde \bJ_{k} &=& 
-\left. 
+\tilde \bJ_{k} &=&
+\left.
 \frac{\partial \be_{k}(\breve{\bx} \boxplus \bTDeltax)} {\partial \bTDeltax} \right|_{\bTDeltax=\bZero}\\
 &=& \left(\bZero \cdots \bZero \; \tilde \bJ_{k_1} \; \cdots \; \tilde \bJ_{k_i} \;\cdots \bZero\; \cdots\;  \tilde \bJ_{k_q} \bZero \cdots \bZero \right).
 \label{eq:manifoldJacobianSparse}
@@ -445,8 +443,8 @@ With a straightforward extension of notation, we set
 %% that the Jacobian is evaluated in $\bTDeltax=\bZero$, the non-zero
 %% blocks become:
 %% \begin{eqnarray}
-%% \frac{\partial \be_{k}(\breve{\bx_k} \boxplus \bTDeltax_k)} {\partial \bTDeltax_i} &=& 
-%% \underbrace{\frac{\partial \be_{k}(\breve{\bx})} {\partial \breve{\bx}_i}}_{\bJ_{k_i}} 
+%% \frac{\partial \be_{k}(\breve{\bx_k} \boxplus \bTDeltax_k)} {\partial \bTDeltax_i} &=&
+%% \underbrace{\frac{\partial \be_{k}(\breve{\bx})} {\partial \breve{\bx}_i}}_{\bJ_{k_i}}
 %% \cdot
 %% \left.
 %% \underbrace{
@@ -458,10 +456,10 @@ With a straightforward extension of notation, we set
 %% Accordingly, one can easily derive from the a Jacobian \emph{not} defined on a manifold
 %% of Eq.~\ref{eq:jacExpanded} a Jacobian on a manifold just by multiplying its non-zero blocks
 %% by the derivative of the $\boxplus$ operator computed in $\breve{\bx_i}$ and $\breve{\bx_j}$.
-%% Let the Jacobians of $\boxplus$ be denoted by $\bM_{k_i}$. By using the notation in 
+%% Let the Jacobians of $\boxplus$ be denoted by $\bM_{k_i}$. By using the notation in
 %% Eq.~\ref{eq:jacExpanded} we can rewrite Eq.~\ref{eq:manifoldJacobian} as
 %% \begin{eqnarray}
-%% \tilde \bJ_{ij} &=& 
+%% \tilde \bJ_{ij} &=&
 %% \left(\bZero \cdots \bZero \; \bJ_{k_1} \bM_{k_1} \; \cdots \; \bJ_{k_i} \bM_{k_i} \;\cdots \bZero\; \cdots\; \bJ_{k_q}\bM_{k_q} \bZero \cdots \bZero \right).
 %% \label{eq:jacManExpanded}
 %% \end{eqnarray}
@@ -507,10 +505,10 @@ Note, that the error terms in Eq.~\ref{eq:sumOfFactors}  have the following form
 \begin{eqnarray}
 \bF_k = \be_k^T\Omega_k \be_k = \rho_2\left(\sqrt{\be_k^T\Omega_k \be_k}\right) \quad \text{with} \quad \rho_2(x):=x^2.
 \end{eqnarray}
-Thus, the error vector $\be_k$ has quadratic influence on $\bF$, 
+Thus, the error vector $\be_k$ has quadratic influence on $\bF$,
 so that a single potential outlier would have major negative impact.
 In order be more outlier robust, the quadratic error function $\rho_2$
-can be replaced by a more robust cost function which weighs large errors less. 
+can be replaced by a more robust cost function which weighs large errors less.
 In \gopt, the Huber cost function $\rho_H$ can be used
 \begin{eqnarray}
 \rho_H(x) := \begin{cases}
@@ -521,9 +519,9 @@ In \gopt, the Huber cost function $\rho_H$ can be used
 which is quadratic for small $|x|$ but linear for large $|x|$. Compared to other,
 even more robust cost functions, the Huber kernel has to advantage that it is
 still convex and thus does not introduce new local minima in $\bF$~\cite[pp.616]{Hartley:Zisserman:Book2004}.
-In practice, we do not need to modify Eq.~$\ref{eq:sumOfFactors}$. Instead, the following scheme 
-is applied. First the  error $\be_k$ is computed as usual. Then, $\be_k$ is replaced by 
-a weighted version $w_k\be_k$ such that 
+In practice, we do not need to modify Eq.~$\ref{eq:sumOfFactors}$. Instead, the following scheme
+is applied. First the  error $\be_k$ is computed as usual. Then, $\be_k$ is replaced by
+a weighted version $w_k\be_k$ such that
 \begin{eqnarray}
 (w_k\be_k)^T\Omega_k (w_k\be_k) = \rho_H\left(\sqrt{\be_k^T\Omega_k \be_k}\right).
 \end{eqnarray}
@@ -539,12 +537,12 @@ In \gopt, the user has fine-grained control and can enable/disable the robust co
 \section{Library Overview}
 From the above sections it should be clear that a graph-optimization problem is entirely defined by:
 \begin{itemize}
-\item The types of the vertices in the graph (that are the parameters blocks $\{\bx_i\}$. 
+\item The types of the vertices in the graph (that are the parameters blocks $\{\bx_i\}$.
   For each of those one has to specify:
   \begin{itemize}
-    \item the domain $\Dom(\bx_i)$ of the internal parameterization, 
+    \item the domain $\Dom(\bx_i)$ of the internal parameterization,
     \item the domain $\Dom(\bDeltax_i)$ of the increments $\bDeltax_i$,
-    \item $\boxplus: \Dom(\bx_i) \times \Dom(\bDeltax_i) \rightarrow \Dom(\bx_i)$ that 
+    \item $\boxplus: \Dom(\bx_i) \times \Dom(\bDeltax_i) \rightarrow \Dom(\bx_i)$ that
       applies the increment $\bDeltax_i$ to the previous solution $\bx_i$.
   \end{itemize}
 \item the error function for every type of hyper-edge
@@ -564,7 +562,7 @@ documentation. To better visualize the interplay of the components of
 \gopt{} we refer to the class diagram of Figure~\ref{fig:classes}.
 \begin{figure}
 \centering
-\includegraphics[width=0.7\columnwidth]{pics/classes.eps}
+\includegraphics[width=0.7\columnwidth]{pics/classes.pdf}
 \caption{Class diagram of \gopt{}.}
 %% TODO update by adding OptimizationAlgorithm
 \label{fig:classes}
@@ -585,10 +583,10 @@ specialization that implements automatically most of the methods that
 are mandatory for the system to work.
 
 These classes are \verb+BaseVertex+ and \verb+BaseUnaryEdge+,
-\verb+BaseBinaryEdge+ and \verb+BaseMultiEdge+. 
+\verb+BaseBinaryEdge+ and \verb+BaseMultiEdge+.
 \begin{description}
 \item \verb+BaseVertex+ templatizes the dimension of a parameter block
-  $\bx_i$ and of the corresponding manifold $\bDeltax_i$, thus it can 
+  $\bx_i$ and of the corresponding manifold $\bDeltax_i$, thus it can
   use blocks of memory whose layout is known at compile-time (means
   efficiency). Furthermore, it implements some mapping operators to
   store the Hessian and the parameter blocks of the linearized
@@ -604,7 +602,7 @@ These classes are \verb+BaseVertex+ and \verb+BaseUnaryEdge+,
   hyper-edge, which can be used to represent a prior. It offers for
   free the calculation of the Jacobians, via an implementation of the
   \verb+linearizeOplus+ method. It requires to specify the types of
-  the (single) vertex $\bx_i$, and type and dimension of the error 
+  the (single) vertex $\bx_i$, and type and dimension of the error
   $\be(\bx_k)$ as template parameters.  The function
   \verb+computeError+ that stores the result of the error $\be(\bx_k)$ in the
   member \verb+Eigen::Matrix _error+ should be implemented.
@@ -613,7 +611,7 @@ These classes are \verb+BaseVertex+ and \verb+BaseUnaryEdge+,
   constraint, namely an error function in the form $\be_k(\bx_{k_1},
   \bx_{k_2})$. It offers the same facilities of \verb+BaseUnaryEdge+, and it
   requires to specify the following template parameters: the type of the nodes
-  $\bx_{k_1}$ and $\bx_{k_2}$  and the  type and the dimension of the measurement. 
+  $\bx_{k_1}$ and $\bx_{k_2}$  and the  type and the dimension of the measurement.
   Again, it implements the numeric Jacobians via
   a default implementation of the \verb+linearizeOplus+ method.
   Again, the \verb+computeError+ should be implemented in a derived class.
@@ -646,8 +644,8 @@ problem, like the one described in many SLAM papers.
 namespace g2o {
   G2O_REGISTER_TYPE_GROUP(slam2d);
 
-  G2O_REGISTER_TYPE(VERTEX_SE2, VertexSE2);
-  G2O_REGISTER_TYPE(VERTEX_XY, VertexPointXY);
+  G2O_REGISTER_TYPE_NAME("VERTEX_SE2", VertexSE2);
+  G2O_REGISTER_TYPE_NAME("VERTEX_XY", VertexPointXY);
 
   // ...
 }
@@ -713,17 +711,17 @@ setting the \verb+_fixed+ attribute of a vertex.
 The \verb+computeActiveErrors()+ function takes the current estimate of
 the active vertices and for each active edge calls
 \verb+computeError()+ for computing the current error vector. Using
-the base edge classes described in Section~\ref{sec:representation} 
+the base edge classes described in Section~\ref{sec:representation}
 the error should be cached in the member variable \verb+_error+.
 
  If \verb+robustKernel()+ is set to true for a particular active edge,
-\verb+robustifyError()+ is called and \verb+_error+ is robustified 
+\verb+robustifyError()+ is called and \verb+_error+ is robustified
 as described in Section~\ref{sec:robust_kernel}.
 
 \subsubsection{Linearizing the system}
 Each active edge is linearized by calling its
 \verb+linearizeOplus()+ function. Again the Jacobians can be cached by
-member variables provided by the templatized base classes described in 
+member variables provided by the templatized base classes described in
 Section~\ref{sec:representation}. If the \verb+linearizeOplus()+
 function is not re-implemented the Jacobian will be computed
 numerically as follows:
@@ -769,7 +767,7 @@ from the solution of the linear system.
 The construction of the linear problem from the Jacobian matrices and the error vectors
 in the hyper-graph elements are controlled by a so-called \verb+Solver+ class.
 To use a specific factorization of the system, the user has to extend the
-\verb+Solver+ class, and to implement the virtual functions. 
+\verb+Solver+ class, and to implement the virtual functions.
 Namely a solver should be able to extract from an
 hyper-graph the linear system, and to return a solution.  This is
 done in several steps: at the beginning of the optimization the
@@ -849,7 +847,7 @@ which \verb+g2o+ can be applied.
 
 \begin{figure}
   \centering
-  \includegraphics[width=0.7\columnwidth]{pics/viewer}
+  \includegraphics[width=0.7\columnwidth]{pics/viewer.png}
   \caption{Graphical interface to \gopt. The GUI allows to select
   different suitable optimizers and perform the optimization.}
   \label{fig:viewer}
@@ -864,7 +862,7 @@ parameters of the algorithms can be controlled.
 \gopt{} includes an experimental binary for performing optimization in
 an incremental fashion, i.e., optimizing after inserting one or several
 nodes along with their measurements. In this case, \gopt{} performs
-ranke updates on the Hessian matrix to update the linear system. Please
+rank updates on the Hessian matrix to update the linear system. Please
 see the \verb+README+ in the \verb+g2o_incremental+ sub-folder for
 additional information.
 
@@ -1020,7 +1018,7 @@ formally, the nodes of a 2D SLAM graph are of two types
 \psfrag{lti1}{$\bz^\mathrm{l}_{t,i-1}$}
 \psfrag{lt1i}{$\bz^\mathrm{l}_{t-1,i-1}$}
 \centering
-\includegraphics[width=0.8\columnwidth]{pics/slam.eps}
+\includegraphics[width=0.8\columnwidth]{pics/slam.pdf}
 \caption{Graphical representation of a SLAM process. The vertices of
   the graph, depicted with circular nodes, denote either robot poses
   $\bx^\mathrm{s}_*$ or landmarks $\bx^\mathrm{l}_*$. The measurement
@@ -1108,8 +1106,8 @@ longitudinal displacement (i.e. in direction of the heading of the robot),
 $\Delta y$ the lateral displacement and $\Delta \theta$ the rotational
 change, the operator can be defined as follows:
 \begin{eqnarray}
-    \bx^\mathrm{s}_t \boxplus \bTDeltax^\mathrm{s}_t   & \doteq & 
-    \left( 
+    \bx^\mathrm{s}_t \boxplus \bTDeltax^\mathrm{s}_t   & \doteq &
+    \left(
     \begin{array}{c}
       x + \Delta x \cos \theta - \Delta y \sin \theta \\
       y + \Delta x \sin \theta + \Delta y \cos \theta \\
@@ -1123,8 +1121,8 @@ In  the previous equation we introduced the motion composition operator $\oplus$
 Similarly to $\oplus$ there is the $\ominus$ operator that performs the opposite operation
 and is defined as follows:
 \begin{eqnarray}
-    \bx^\mathrm{s}_a \ominus \bx^\mathrm{s}_b   & \doteq & 
-    \left( 
+    \bx^\mathrm{s}_a \ominus \bx^\mathrm{s}_b   & \doteq &
+    \left(
     \begin{array}{c}
         (x_a - x_b)  \cos \theta_b + (y_a - y_b) \sin \theta_b \\
       - (x_a - x_b)  \sin \theta_b + (y_a - y_b) \cos \theta_b \\
@@ -1159,8 +1157,8 @@ following:
     \bh^\mathrm{l}_{t,i}(\bx^\mathrm{s}_t, \bx^\mathrm{l}_i)   & \doteq &
     \left(
     \begin{array}{c}
-        (x^\mathrm{s}_t - x_i)  \cos \theta^\mathrm{s}_t + (y^\mathrm{s}_t - y_i) \sin \theta^\mathrm{s}_t \\
-      - (x^\mathrm{s}_t - x_i)  \sin \theta^\mathrm{s}_t + (y^\mathrm{s}_t - y_i) \cos \theta^\mathrm{s}_t
+        (x^\mathrm{s}_t - x^\mathrm{l}_i)  \cos \theta^\mathrm{s}_t + (y^\mathrm{s}_t - y^\mathrm{l}_i) \sin \theta^\mathrm{s}_t \\
+      - (x^\mathrm{s}_t - x^\mathrm{l}_i)  \sin \theta^\mathrm{s}_t + (y^\mathrm{s}_t - y^\mathrm{l}_i) \cos \theta^\mathrm{s}_t
     \end{array}
     \right)
 \end{eqnarray}
@@ -1179,7 +1177,7 @@ landmarks.
 In a similar way, we can define the error functions of an odometry
 edge connecting two robot poses $\bx^\mathrm{s}_t$ and
 $\bx^\mathrm{s}_{t+1}$. As stated before, an odometry measurement lives in $SE(2)$.
-By using the $\oplus$ operator we can write a synthetic measurement function:
+By using the $\ominus$ operator we can write a synthetic measurement function:
 \begin{eqnarray}
     \bh^\mathrm{s}_{t,t+1}(\bx^\mathrm{s}_t, \bx^\mathrm{s}_{t+1})   & \doteq & \bx^\mathrm{s}_{t+1} \ominus \bx^\mathrm{s}_{t}.
 \end{eqnarray}
@@ -1356,7 +1354,7 @@ Now we are done with the vertices. We should go for the edges.  Since
 both edges are binary edges we, extend the class
 \verb+BaseBinaryEdge<>+.
 To represent an odometry edge (see Listing~\ref{lst:edgese2}) that
-connects two \verb+VertexSE2+, we need to extend 
+connects two \verb+VertexSE2+, we need to extend
 \verb+BaseBinaryEdge<>+,  specialized with the types of the
 connected vertices (the order matters), where the measurement itself
 is represented by an \verb+SE2+ that has dimension 3. The second

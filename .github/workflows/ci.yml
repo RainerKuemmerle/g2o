@@ -1,0 +1,93 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+      - pymem
+  pull_request:
+
+  release:
+
+jobs:
+  build:
+    name: ${{ matrix.config.name }}
+    runs-on: ${{ matrix.config.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+        - {
+            name: "Ubuntu Latest GCC",
+            os: ubuntu-latest,
+            build_type: "Debug",
+            do_coverage: "ON",
+          }
+        - {
+            name: "macOS Latest Clang",
+            os: macos-latest,
+            build_type: "Debug",
+            do_coverage: "OFF",
+          }
+
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+            fetch-depth: 25
+
+      - name: Print env
+        run: |
+          echo github.ref: ${{github.ref}}
+          echo github.event.action: ${{github.event.action}}
+          echo github.event_name: ${{github.event_name}}
+          echo runner.os: ${{runner.os}}
+
+      - name: ccache
+        uses: hendrikmuhs/ccache-action@v1.2
+        with:
+          key: ${{ matrix.config.os }}-${{ matrix.config.build_type }}
+          max-size: 2000M
+
+      - name: Install dependencies on Ubuntu
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt update
+          sudo apt install libeigen3-dev qtdeclarative5-dev qt5-qmake libqglviewer-dev-qt5 libsuitesparse-dev lcov libspdlog-dev
+
+      - name: Install dependencies on macOS
+        if: runner.os == 'macOS'
+        run: brew install cmake eigen coreutils
+
+      - name: Configure ccache for macOS
+        if: runner.os == 'macOS'
+        run: |
+          # See https://github.com/hendrikmuhs/ccache-action/issues/146
+          ccache --set-config=compiler_check=content
+
+      - name: Configure CMake
+        run: |
+          echo "number of cores: $(nproc) $(nproc --all)"
+          cmake --version
+          cmake -B ${{github.workspace}}/build -DBUILD_UNITTESTS=ON -DBUILD_CODE_COVERAGE=${{matrix.config.do_coverage}} -DCMAKE_BUILD_TYPE=${{matrix.config.build_type}} -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
+
+      - name: Build Introspection
+        shell: bash
+        run: |
+          echo "g2o config.h"
+          cat ${{github.workspace}}/build/g2o/config.h
+          echo "ENV"
+          env | sort
+
+      - name: Build
+        run: cmake --build ${{github.workspace}}/build --config ${{matrix.config.build_type}} -j $(nproc)
+
+      - name: Test
+        working-directory: ${{github.workspace}}/build
+        run: ctest -C ${{matrix.config.build_type}} --extra-verbose --output-on-failure
+
+      - name: Coverage
+        if: matrix.config.do_coverage == 'ON'
+        uses: codecov/codecov-action@v4.2.0
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}

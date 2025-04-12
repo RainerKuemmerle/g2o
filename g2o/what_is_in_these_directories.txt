@@ -1,10 +1,10 @@
 stuff:		is a general library containing utilities to manipulate
-       		strings, to open files and other unsorted components.  
+       		strings, to open files and other unsorted components.
 
 core:  		this is the base library of g2o
 
-math_groups:	classes to represent some domainsfor variables used by 
-		the types. These are for example SE2, SE3, Sim3, 
+math_groups:	classes to represent some domainsfor variables used by
+		the types. These are for example SE2, SE3, Sim3,
 		ProjectiveCamera.
 
 types: 		Here are some types plugins for g2o, organized as
@@ -15,11 +15,11 @@ types: 		Here are some types plugins for g2o, organized as
 		represent pose-pose constraints, pose-landmark
 		constraints, and pose-landmark (bearing only)
 		constraints.
-			
+
 		slam3d: types for 3D slam. The vertices can represent
 		robot poses with 6dof and the constraints can
 		represent pose-pose constraint.
-		
+
 		sim3: types for representing an unknown-scale SLAM
 		problem.  the vertices represent elements of sim3 (3d
 		pose + scale), and the edges represent constraints
@@ -38,16 +38,16 @@ types: 		Here are some types plugins for g2o, organized as
 solvers:	Here are the linear solver plugins: PCG, colamd, and CHOLMOD.
 
 examples: 	Application examples. These dirs build executables
-		
+
 		ba: a simple demo on bundle adjustment that constructs
 		a simulated scene and optimizes it
-		
+
 		tutorial_slam2d: a complete tutorial on how to build a
 		slam2d subsystem. It does not require the types
 		plugins, as it defines everything from scratch.
 
 		icp: ???
-		
+
 apps: 		here are the main applications that use g2o. they
 		include a command line interface and a gui
-		application.  
+		application.

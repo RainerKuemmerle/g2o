@@ -25,6 +25,8 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "parameter_se2_offset.h"
+
+#include "g2o/core/io_helper.h"
 #include "vertex_se2.h"
 
 #ifdef G2O_HAVE_OPENGL
@@ -33,73 +35,60 @@
 
 namespace g2o {
 
-  ParameterSE2Offset::ParameterSE2Offset(){
-    setOffset();
-  }
+ParameterSE2Offset::ParameterSE2Offset() { setOffset(); }
 
-  void ParameterSE2Offset::setOffset(const SE2& offset_){
-    _offset = offset_;
-    _offsetMatrix= _offset.rotation().toRotationMatrix();
-    _offsetMatrix.translation() = _offset.translation();
-    _inverseOffsetMatrix = _offsetMatrix.inverse();
-  }
+void ParameterSE2Offset::setOffset(const SE2& offset_) {
+  _offset = offset_;
+  _offsetMatrix = _offset.rotation().toRotationMatrix();
+  _offsetMatrix.translation() = _offset.translation();
+  _inverseOffsetMatrix = _offsetMatrix.inverse();
+}
 
-  bool ParameterSE2Offset::read(std::istream& is) {
-    Vector3 off;
-    for (int i=0; i<3; i++) {
-      is >> off[i];
-      std::cerr << off[i] << " " ;
-    }
-    std::cerr <<  std::endl;
-    setOffset(SE2(off));
-    return is.good() || is.eof();
-  }
-  
-  bool ParameterSE2Offset::write(std::ostream& os) const {
-    Vector3 off = _offset.toVector();
-    for (int i=0; i<3; i++)
-      os << off[i] << " ";
-    return os.good();
-  }
+bool ParameterSE2Offset::read(std::istream& is) {
+  Vector3 off;
+  bool state = g2o::internal::readVector(is, off);
+  setOffset(SE2(off));
+  return state;
+}
 
-  CacheSE2Offset::CacheSE2Offset() :
-    Cache(),
-    _offsetParam(0)
-  {
-  }
+bool ParameterSE2Offset::write(std::ostream& os) const {
+  return internal::writeVector(os, offset().toVector());
+}
 
-  bool CacheSE2Offset::resolveDependancies(){
-    _offsetParam = dynamic_cast <ParameterSE2Offset*> (_parameters[0]);
-    return _offsetParam != 0;
-  }
+CacheSE2Offset::CacheSE2Offset() : Cache(), _offsetParam(0) {}
 
-  void CacheSE2Offset::updateImpl(){
-    const VertexSE2* v = static_cast<const VertexSE2*>(vertex());
-    _se2_n2w = v->estimate() * _offsetParam->offset();
+bool CacheSE2Offset::resolveDependencies() {
+  _offsetParam = dynamic_cast<ParameterSE2Offset*>(_parameters[0]);
+  return _offsetParam != 0;
+}
 
-    _n2w = _se2_n2w.rotation().toRotationMatrix();
-    _n2w.translation() = _se2_n2w.translation();
+void CacheSE2Offset::updateImpl() {
+  const VertexSE2* v = static_cast<const VertexSE2*>(vertex());
+  _se2_n2w = v->estimate() * _offsetParam->offset();
 
-    _se2_w2n = _se2_n2w.inverse();
-    _w2n = _se2_w2n.rotation().toRotationMatrix();
-    _w2n.translation() = _se2_w2n.translation();
+  _n2w = _se2_n2w.rotation().toRotationMatrix();
+  _n2w.translation() = _se2_n2w.translation();
 
-    SE2 w2l = v->estimate().inverse();
-    _w2l = w2l.rotation().toRotationMatrix();
-    _w2l.translation() = w2l.translation();
+  _se2_w2n = _se2_n2w.inverse();
+  _w2n = _se2_w2n.rotation().toRotationMatrix();
+  _w2n.translation() = _se2_w2n.translation();
 
-    number_t alpha=v->estimate().rotation().angle();
-    number_t c=std::cos(alpha), s=std::sin(alpha);
-    Matrix2 RInversePrime;
-    RInversePrime << -s, c, -c, -s;
-    _RpInverse_RInversePrime = _offsetParam->offset().rotation().toRotationMatrix().transpose()*RInversePrime;
-    _RpInverse_RInverse=w2l.rotation();
-  }  
+  SE2 w2l = v->estimate().inverse();
+  _w2l = w2l.rotation().toRotationMatrix();
+  _w2l.translation() = w2l.translation();
 
-  void CacheSE2Offset::setOffsetParam(ParameterSE2Offset* offsetParam)
-  {
-    _offsetParam = offsetParam;
-  }
+  double alpha = v->estimate().rotation().angle();
+  double c = std::cos(alpha), s = std::sin(alpha);
+  Matrix2 RInversePrime;
+  RInversePrime << -s, c, -c, -s;
+  _RpInverse_RInversePrime =
+      _offsetParam->offset().rotation().toRotationMatrix().transpose() *
+      RInversePrime;
+  _RpInverse_RInverse = w2l.rotation();
+}
 
+void CacheSE2Offset::setOffsetParam(ParameterSE2Offset* offsetParam) {
+  _offsetParam = offsetParam;
+}
 
-} // end namespace
+}  // namespace g2o

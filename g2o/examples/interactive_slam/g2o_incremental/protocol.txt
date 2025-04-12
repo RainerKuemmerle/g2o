@@ -2,9 +2,9 @@ Protocol
 
 The SLAM executable accepts actions, such as adding (ADD) a constraint, solving
 the system (SOLVE), and retrieving estimates (QUERY). The executable responds
-to a query by returning the data enclosed in a BEGIN...END block. 
+to a query by returning the data enclosed in a BEGIN...END block.
 
-Variables, or vertices in the graph, explicitly state the reprensentation. 2D
+Variables, or vertices in the graph, explicitly state the representation. 2D
 poses are represented by VERTEX_XYT, 3D poses by VERTEX_XYZRPY. In the future,
 Quaternions and other representations could be supported, but note that it is
 up to the SLAM algorithm to choose the internal representation of the angles.
@@ -49,7 +49,7 @@ decision on when to solve. QUERY_STATE without arguments expects all variables
 to be returned. ADD VERTEX is provided as declaration of the variable and can
 optionally include an initialization (not used for now). The automated
 evaluation system is expected to eventually include additional features such as
-evaluation of covariances. 
+evaluation of covariances.
 
 The SLAM executable responds to "QUERY_STATE" by providing a list of all
 requested vertices, ordered by the vertex ID, and enclosed between a

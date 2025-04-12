@@ -47,4 +47,4 @@
 #define G2O_VIEWER_API
 #endif
 
-#endif // G2O_STUFF_API_H
+#endif  // G2O_STUFF_API_H

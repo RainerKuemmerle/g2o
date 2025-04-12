@@ -19,7 +19,7 @@ double& opertor[];                // we disabled the write access to se3 element
 				  // people like to introduce inconsistencies in the representation.
 
 SE2 class:
-Vector2d& SE2::translation();     // use SE2::setTranslation(...) instead. 
+Vector2d& SE2::translation();     // use SE2::setTranslation(...) instead.
 Rotation2Dd& SE2::rotation();     // use SE2::setRotation(...) instead. This ensures that the orientation is normalized
 double& opertor[];                // removed, same as in the list before.
 
@@ -57,7 +57,7 @@ The parameters are always saved at the beginning of a graph file
 
 
 3) to insert parameters in a graph you have to
- 
+
 // create the parameters
 MyParams* p=new MyParams();
 
@@ -71,7 +71,7 @@ if (opt->addParameters(p)){
    cerr << "fail" << endl;
 }
 
-4) to access the parameters by id you can use the 
+4) to access the parameters by id you can use the
 OptimizableGraph::parameters(int id) function;
 
 MyParams* p = dynamic_cast<MyParams*>opt->(parameters(id));
@@ -79,29 +79,29 @@ MyParams* p = dynamic_cast<MyParams*>opt->(parameters(id));
 
 *CACHE*
 
-   A cache is some structure that contains intermediate 
+   A cache is some structure that contains intermediate
    calculations that depend on the estimate stored in a vertex.
    Cache stores some intermediate result that would be computer
    over and over again, during the computeError() of edges that involve the same vertex.
    g2o now supports the caches, however it is good practice to use them
    only when an initial system is running well, to get faster computation.
 
-   For instance a cache of an SE3 can contain a rotation matrix, 
+   For instance a cache of an SE3 can contain a rotation matrix,
    its opposite, a useful quantity to compute the Jacobian and so on.
 
-   Each vertex can have zero or more cache blocks, 
-   whose pointers are stored in a vector within the vertex 
+   Each vertex can have zero or more cache blocks,
+   whose pointers are stored in a vector within the vertex
    (in _cacheVector).
-   Thus each cache block is indexed within a vertex by a unique 
+   Thus each cache block is indexed within a vertex by a unique
    id   (VertexCache::_id), that corresponds to its position in the
    _cacheVector.
 
-   Cache blocks are dynamic, in the sense that they are created 
-   only by those edges that require them, when they are inserted 
-   in a graph (addEdge.) 
+   Cache blocks are dynamic, in the sense that they are created
+   only by those edges that require them, when they are inserted
+   in a graph (addEdge.)
    To construct a cache, an edge should:
-   -  tell which cache_id is associated to each of the 
-      connected vertices.  These ids are stored in a vector 
+   -  tell which cache_id is associated to each of the
+      connected vertices.  These ids are stored in a vector
       stored inside the edge (_cacheIds).
    - implement a function that "creates" a cache for a certain vertex
      VertexCache* createCache(int vertexNum, OptimizableGraph* g).
@@ -110,45 +110,45 @@ MyParams* p = dynamic_cast<MyParams*>opt->(parameters(id));
    So in short, if you want to use a cache you should:
    1) Extend the VertexCache class to do the right things
       In this class you have to implement the update() method,
-      that will be called whenever the estimate of the 
+      that will be called whenever the estimate of the
       corresponding vertex changes.
 
    2) In an edge where you want to use a cache, you should
-      define a createCache(int vertexNum) function that creates a 
-      new instance of cache for the vertex at position 
-      vertexNum withing Edge::_vertices.
+      define a createCache(int vertexNum) function that creates a
+      new instance of cache for the vertex at position
+      vertexNum within Edge::_vertices.
 
    3) Before inserting an edge that uses a cache in a graph,
-      you should tell the system which cache id is associated to 
+      you should tell the system which cache id is associated to
       each vertex of the edge. This is done by filling the _cacheIds
       vector with the ids. An id of -1 means no cache.
-   
-   4) Each method that changes the estimate of a vertex 
+
+   4) Each method that changes the estimate of a vertex
       (e.g. oplus) should update the cache accordingly.
 
 
 As an example:
 
 class MyCache: public VertexCache{
-	MyCache(Vertex*v, int id): VertexCache(v, id);	
+	MyCache(Vertex*v, int id): VertexCache(v, id);
 	virtual void update(){
-	// update here the cache 
+	// update here the cache
 	//contents based on the vertex estimate
 	}
 };
 
 class EdgeThatUsesACache: public EdgeThatDoesNotUseACache{
 	EdgeThatUsesACache(): EdgeThatDoesNotUseACache{
-		// resize the cahce vector, all empty caches
+		// resize the cache vector, all empty caches
 		_cacheIds.resize(vertices().size(), -1);
 	}
-	
-	
+
+
 	virtual VertexCache* createCache(int vertexNum) {
-		OptimizableGraph::Vertex*v 
+		OptimizableGraph::Vertex*v
 		= (OptimizableGraph::Vertex*)vertices()[vertexNum];
-		
-		if (vertexNum==0){	
+
+		if (vertexNum==0){
 			return new MyCache(v, _cacheIds[0]);
 		}
 		if (vertexNum==1){
@@ -159,11 +159,11 @@ class EdgeThatUsesACache: public EdgeThatDoesNotUseACache{
 
 	void computeError() {
 		// get the cache of the first vertex
-		OptimizableGraph::Vertex*v = 	
-		  (OptimizableGraph::Vertex*v) 
+		OptimizableGraph::Vertex*v =
+		  (OptimizableGraph::Vertex*v)
 		     vertices[0];
-		MyCache*  c1= 
-		  static_cast<MyCache*>  
+		MyCache*  c1=
+		  static_cast<MyCache*>
 		  (v->getCache(_cacheIds[0]));
 
 		// do things with the cache....
@@ -188,7 +188,7 @@ e->setCacheId(0,first_cache_id);
 e->setCacheId(1,second_cache_id);
 e->setCacheId(2,third_cache_id);
 
-3) Add the edge in the graph. This will take care of all necessary bookeeping.
+3) Add the edge in the graph. This will take care of all necessary bookkeeping.
 
 g.addEdge(e);
 
@@ -196,7 +196,7 @@ g.addEdge(e);
 The cache id is the position of a cache in the _vertexCache vector.
 If you have multiple edges that leave from a vertex and use the same cache id,
 only one cache block will be allocated for that id, and it will be shared among
-all edges. 
+all edges.
 
 
 CACHE VERY IMPORTANT
@@ -209,7 +209,7 @@ class MyVertexThatUsesACache {
       //
       void oplus(double* u){
       	   // do the oplus things here
-	   
+
 	   updateCache(); // update the cache vector when the estimate is changes
       }
 

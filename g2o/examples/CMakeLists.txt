@@ -1,33 +1,58 @@
+# Self-contained examples which declare their own types
 add_subdirectory(data_fitting)
+add_subdirectory(dynamic_vertex)
+add_subdirectory(bal)
+add_subdirectory(logging)
+add_subdirectory(target)
+add_subdirectory(tutorial_slam2d)
 
-add_subdirectory(sphere)
+# 2D SLAM examples
 
-# The condition on cholmod is required here because the cholmod solver
-# is explicitly used in these examples.
-if(CHOLMOD_FOUND)
-  add_subdirectory(target)
+if(G2O_BUILD_SCLAM2D_TYPES AND G2O_BUILD_DATA_TYPES)
+  add_subdirectory(calibration_odom_laser)
+endif()
+
+# 3D examples
+if(G2O_BUILD_SBA_TYPES)
   add_subdirectory(ba)
   add_subdirectory(ba_anchored_inverse_depth)
-endif(CHOLMOD_FOUND)
+  add_subdirectory(data_convert)
+endif()
 
-# Examples which explicitly use CSparse
-if(CSPARSE_FOUND)
-  add_subdirectory(tutorial_slam2d)
+if (G2O_BUILD_ICP_TYPES)
   add_subdirectory(icp)
-  add_subdirectory(calibration_odom_laser)
-  add_subdirectory(simple_optimize)
-  add_subdirectory(plane_slam)
-  add_subdirectory(line_slam)
-endif()
-
-if(CSPARSE_FOUND OR CHOLMOD_FOUND)
   add_subdirectory(sba)
-  add_subdirectory(bal)
 endif()
 
-if(Qt5_FOUND AND QGLVIEWER_FOUND AND CSPARSE_FOUND)
+if (G2O_BUILD_SLAM3D_ADDON_TYPES)
+  add_subdirectory(line_slam)
+  add_subdirectory(plane_slam)
+endif()
+
+if (G2O_BUILD_SIM3_TYPES)
+  add_subdirectory(sim3)
+endif()
+
+# slam 3d
+if (G2O_BUILD_SLAM3D_TYPES)
+  add_subdirectory(sphere)
+endif()
+
+if(G2O_BUILD_SLAM2D_TYPES AND G2O_BUILD_SLAM3D_TYPES)
+  add_subdirectory(anonymize_observations)
+  add_subdirectory(interactive_slam)
+  add_subdirectory(simple_optimize)
+endif()
+
+if(G2O_BUILD_SLAM2D_TYPES AND G2O_BUILD_SLAM2D_ADDON_TYPES AND G2O_BUILD_SLAM3D_TYPES)
+  add_subdirectory(convert_segment_line)
+endif()
+
+if(Qt5_FOUND AND QGLVIEWER_FOUND AND G2O_HAVE_OPENGL)
   add_subdirectory(slam2d)
 endif()
 
-add_subdirectory(data_convert)
-add_subdirectory(interactive_slam)
+# complex example of hierarchical optimization
+if (G2O_BUILD_SLAM3D_TYPES)
+  add_subdirectory(g2o_hierarchical)
+endif()

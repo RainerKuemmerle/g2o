@@ -24,25 +24,26 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef G2O_MATH_STUFF
-#define G2O_MATH_STUFF
+#ifndef G2O_SE3_OPS_H
+#define G2O_SE3_OPS_H
 
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 
+#include "g2o/core/eigen_types.h"
 #include "g2o_types_slam3d_api.h"
 
 namespace g2o {
 
-  inline G2O_TYPES_SLAM3D_API Matrix3 skew(const Vector3&v);
-  inline G2O_TYPES_SLAM3D_API Vector3 deltaR(const Matrix3& R);
-  inline G2O_TYPES_SLAM3D_API Vector2 project(const Vector3&);
-  inline G2O_TYPES_SLAM3D_API Vector3 project(const Vector4&);
-  inline G2O_TYPES_SLAM3D_API Vector3 unproject(const Vector2&);
-  inline G2O_TYPES_SLAM3D_API Vector4 unproject(const Vector3&);
+inline G2O_TYPES_SLAM3D_API Matrix3 skew(const Vector3& v);
+inline G2O_TYPES_SLAM3D_API Vector3 deltaR(const Matrix3& R);
+inline G2O_TYPES_SLAM3D_API Vector2 project(const Vector3&);
+inline G2O_TYPES_SLAM3D_API Vector3 project(const Vector4&);
+inline G2O_TYPES_SLAM3D_API Vector3 unproject(const Vector2&);
+inline G2O_TYPES_SLAM3D_API Vector4 unproject(const Vector3&);
 
-  #include "se3_ops.hpp"
+#include "se3_ops.hpp"
 
-}
+}  // namespace g2o
 
-#endif //MATH_STUFF
+#endif  // MATH_STUFF

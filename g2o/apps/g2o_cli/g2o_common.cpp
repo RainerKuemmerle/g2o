@@ -26,77 +26,71 @@
 
 #include "g2o_common.h"
 
-#include "dl_wrapper.h"
-#include "g2o/stuff/string_tools.h"
-#include "g2o/stuff/filesys_tools.h"
-
-#include <vector>
-#include <iostream>
 #include <cstdlib>
-using namespace ::std;
+#include <string_view>
+#include <vector>
+
+#include "dl_wrapper.h"
+#include "g2o/stuff/filesys_tools.h"
+#include "g2o/stuff/logger.h"
+#include "g2o/stuff/string_tools.h"
 
 /*
  * setting up the library filename patterns for the different OS
  */
 #ifdef __APPLE__
 #define SO_EXT "dylib"
-#elif defined (WINDOWS) || defined (CYGWIN)
+#elif defined(WINDOWS) || defined(CYGWIN)
 #define SO_EXT "dll"
-#else // Linux
+#else  // Linux
 #define SO_EXT "so"
 #endif
 
 // This is used to determine where this library is
-#if defined (UNIX) || defined(CYGWIN)
-# if (defined UNIX)
-   // dladdr is not available on a recent installation of Cygwin
-#  ifndef _GNU_SOURCE
-#    define _GNU_SOURCE
-#  endif
-#  include <dlfcn.h>
-   static Dl_info info;
-#  endif
-# define PATH_SEPARATOR ":"
-#else // WINDOWS
+#if defined(UNIX) || defined(CYGWIN)
+#if (defined UNIX)
+// dladdr is not available on a recent installation of Cygwin
+#ifndef _GNU_SOURCE
+#define _GNU_SOURCE
+#endif
+#include <dlfcn.h>
+static Dl_info info;
+#endif
+#define PATH_SEPARATOR ":"
+#else  // WINDOWS
 #define PATH_SEPARATOR ";"
 
 static void fakeFunctionForWindows() {}
 
-HMODULE getMyInstance()
-{
+HMODULE getMyInstance() {
   MEMORY_BASIC_INFORMATION mbi;
-  if (VirtualQuery((const void *)&fakeFunctionForWindows, &mbi, sizeof(mbi))) {
-    return (HMODULE) mbi.AllocationBase;
+  if (VirtualQuery((const void*)&fakeFunctionForWindows, &mbi, sizeof(mbi))) {
+    return (HMODULE)mbi.AllocationBase;
   }
   return NULL;
 }
 #endif
 
-// This can occur if we are doing a release build, and the release
-// postfix is empty
-#ifndef G2O_LIBRARY_POSTFIX
-#define G2O_LIBRARY_POSTFIX ""
-#endif
-
-static const string TYPES_PATTERN=string("*_types_*")+string(G2O_LIBRARY_POSTFIX)+string(".")+string(SO_EXT);
-static const string SOLVERS_PATTERN=string("*_solver_*")+string(G2O_LIBRARY_POSTFIX)+string(".")+string(SO_EXT);
+static constexpr std::string_view TYPES_PATTERN =
+    "^.*g2o_types_.*\\." SO_EXT "$";
+static constexpr std::string_view SOLVERS_PATTERN =
+    "^.*g2o_solver_.*\\." SO_EXT "$";
 
 namespace g2o {
 
-void findArguments(const std::string& option, vector<string>& args, int argc, char** argv)
-{
+void findArguments(const std::string& option, std::vector<std::string>& args,
+                   int argc, char** argv) {
   args.clear();
   for (int i = 0; i < argc; ++i) {
     if (argv[i] == option && i + 1 < argc) {
-      args.push_back(argv[i+1]);
+      args.push_back(argv[i + 1]);
     }
   }
 }
 
-void loadStandardTypes(DlWrapper& dlTypesWrapper, int argc, char** argv)
-{
-  char * envTypesPath = getenv("G2O_TYPES_DIR");
-  string typesPath;
+void loadStandardTypes(DlWrapper& dlTypesWrapper, int argc, char** argv) {
+  char* envTypesPath = getenv("G2O_TYPES_DIR");
+  std::string typesPath;
 
   if (envTypesPath != NULL) {
     typesPath = envTypesPath;
@@ -115,28 +109,26 @@ void loadStandardTypes(DlWrapper& dlTypesWrapper, int argc, char** argv)
 #endif
   }
 
-  vector<string> paths = strSplit(typesPath, PATH_SEPARATOR);
-  for (vector<string>::const_iterator it = paths.begin(); it != paths.end(); ++it) {
-    if (it->size() > 0)
-      dlTypesWrapper.openLibraries(*it, TYPES_PATTERN);
+  std::vector<std::string> paths = strSplit(typesPath, PATH_SEPARATOR);
+  for (const auto& path : paths) {
+    if (!path.empty())
+      dlTypesWrapper.openLibraries(path, std::string(TYPES_PATTERN));
   }
 
-  vector<string> libs;
-  if (argc > 0 && argv != 0)
-    findArguments("-typeslib", libs, argc, argv);
-  for (vector<string>::const_iterator it = libs.begin(); it != libs.end(); ++it) {
-    cerr << "Loading types " << *it << endl;
-    dlTypesWrapper.openLibrary(*it);
+  std::vector<std::string> libs;
+  if (argc > 0 && argv != 0) findArguments("-typeslib", libs, argc, argv);
+  for (const auto& lib : libs) {
+    G2O_INFO("Loading types {}", lib);
+    dlTypesWrapper.openLibrary(lib);
   }
 }
 
-void loadStandardSolver(DlWrapper& dlSolverWrapper, int argc, char** argv)
-{
-  char * envSolversPath = getenv("G2O_SOLVERS_DIR");
-  string solversPath = G2O_DEFAULT_SOLVERS_DIR_;
+void loadStandardSolver(DlWrapper& dlSolverWrapper, int argc, char** argv) {
+  char* envSolversPath = getenv("G2O_SOLVERS_DIR");
+  std::string solversPath = G2O_DEFAULT_SOLVERS_DIR_;
 
   if (envSolversPath != NULL) {
-      solversPath = envSolversPath;
+    solversPath = envSolversPath;
   } else {
 #if (defined UNIX)
     if (dladdr(&info, &info) != 0) {
@@ -151,19 +143,18 @@ void loadStandardSolver(DlWrapper& dlSolverWrapper, int argc, char** argv)
 #endif
   }
 
-  vector<string> paths = strSplit(solversPath, PATH_SEPARATOR);
-  for (vector<string>::const_iterator it = paths.begin(); it != paths.end(); ++it) {
-    if (it->size() > 0)
-      dlSolverWrapper.openLibraries(*it, SOLVERS_PATTERN);
+  std::vector<std::string> paths = strSplit(solversPath, PATH_SEPARATOR);
+  for (const auto& path : paths) {
+    if (!path.empty())
+      dlSolverWrapper.openLibraries(path, std::string(SOLVERS_PATTERN));
   }
 
-  vector<string> libs;
-  if (argc > 0 && argv != 0)
-    findArguments("-solverlib", libs, argc, argv);
-  for (vector<string>::const_iterator it = libs.begin(); it != libs.end(); ++it) {
-    cerr << "Loading solver " << *it << endl;
-    dlSolverWrapper.openLibrary(*it);
+  std::vector<std::string> libs;
+  if (argc > 0 && argv != 0) findArguments("-solverlib", libs, argc, argv);
+  for (const auto& lib : libs) {
+    G2O_INFO("Loading solver {}", lib);
+    dlSolverWrapper.openLibrary(lib);
   }
 }
 
-} // end namespace
+}  // namespace g2o

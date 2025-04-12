@@ -6,7 +6,6 @@ set(G2O_PARSER_SRC
   location.hh
   position.hh
   scanner.h flex_scanner.cpp
-  stack.hh
 )
 
 if (MSVC)
@@ -21,11 +20,15 @@ endif()
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
+target_compile_features(parser_library PUBLIC cxx_std_17)
 set_target_properties(parser_library PROPERTIES OUTPUT_NAME ${LIB_PREFIX}parser)
+set_target_properties(parser_library PROPERTIES
+  VERSION ${G2O_LIB_VERSION}
+  SOVERSION ${G2O_LIB_SOVERSION})
 
 #add_executable(test_slam_parser test_slam_parser.cpp)
 #target_link_libraries(test_slam_parser parser_library)
-#set_target_properties(test_slam_parser PROPERTIES OUTPUT_NAME test_slam_parser${EXE_POSTFIX})
+#set_target_properties(test_slam_parser PROPERTIES OUTPUT_NAME test_slam_parser)
 
 install(TARGETS parser_library
   RUNTIME DESTINATION ${RUNTIME_DESTINATION}

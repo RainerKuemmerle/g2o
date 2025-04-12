@@ -2,24 +2,25 @@ add_library(core ${G2O_LIB_TYPE}
 dynamic_aligned_buffer.hpp
 ownership.h
 base_edge.h
-base_binary_edge.h          hyper_graph_action.cpp
-base_binary_edge.hpp        hyper_graph_action.h
-base_multi_edge.h           hyper_graph.cpp
-base_multi_edge.hpp         hyper_graph.h
+base_multi_edge.h
+base_fixed_sized_edge.h        hyper_graph_action.cpp
+base_fixed_sized_edge.hpp      hyper_graph_action.h
+base_variable_sized_edge.h     hyper_graph.cpp
+base_variable_sized_edge.hpp   hyper_graph.h
 base_unary_edge.h           linear_solver.h
-base_unary_edge.hpp         marginal_covariance_cholesky.cpp
+base_binary_edge.h          marginal_covariance_cholesky.cpp
 base_vertex.h               marginal_covariance_cholesky.h
 base_vertex.hpp             matrix_structure.cpp
 batch_stats.cpp             matrix_structure.h
 batch_stats.h               openmp_mutex.h
-block_solver.h              block_solver.hpp            
-parameter.cpp               parameter.h                 
+block_solver.h              block_solver.hpp
+parameter.cpp               parameter.h
 cache.cpp                   cache.h
-optimizable_graph.cpp       optimizable_graph.h         
+optimizable_graph.cpp       optimizable_graph.h
 solver.cpp                  solver.h
 creators.h                  optimization_algorithm_factory.cpp
 estimate_propagator.cpp     optimization_algorithm_factory.h
-estimate_propagator.h       
+estimate_propagator.h
 factory.cpp                 optimization_algorithm_property.h
 factory.h                   sparse_block_matrix.h
 sparse_optimizer.cpp  sparse_block_matrix.hpp
@@ -36,14 +37,25 @@ jacobian_workspace.cpp jacobian_workspace.h
 robust_kernel.cpp robust_kernel.h
 robust_kernel_impl.cpp robust_kernel_impl.h
 robust_kernel_factory.cpp robust_kernel_factory.h
+io_helper.h
 g2o_core_api.h
 )
 
+target_include_directories(core PUBLIC
+  "$<BUILD_INTERFACE:${g2o_SOURCE_DIR};${PROJECT_BINARY_DIR}>"
+  $<INSTALL_INTERFACE:include/g2o/core>
+)
+
 set_target_properties(core PROPERTIES OUTPUT_NAME ${LIB_PREFIX}core)
+set_target_properties(core PROPERTIES
+  VERSION ${G2O_LIB_VERSION}
+  SOVERSION ${G2O_LIB_SOVERSION})
 target_link_libraries(core PUBLIC stuff ${G2O_EIGEN3_EIGEN_TARGET})
+target_link_libraries(core PUBLIC g2o_ceres_ad)
+target_compile_features(core PUBLIC cxx_std_17)
 
 if (APPLE)
-  set_target_properties(core PROPERTIES INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib")
+  set_target_properties(core PROPERTIES INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
 endif()
 
 install(TARGETS core

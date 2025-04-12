@@ -30,13 +30,11 @@
 #include "slam_parser/interface/parser_interface.h"
 using namespace std;
 
-int main()
-{
+int main() {
   ExampleSlamInterface slamInterface;
   SlamParser::ParserInterface parserInterface(&slamInterface);
 
-  while (parserInterface.parseCommand(cin))
-  {
+  while (parserInterface.parseCommand(cin)) {
     // do something additional if needed
   }
 

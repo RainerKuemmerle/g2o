@@ -3,10 +3,14 @@ add_library(solver_dense ${G2O_LIB_TYPE}
 )
 
 set_target_properties(solver_dense PROPERTIES OUTPUT_NAME ${LIB_PREFIX}solver_dense)
+set_target_properties(solver_dense PROPERTIES
+  VERSION ${G2O_LIB_VERSION}
+  SOVERSION ${G2O_LIB_SOVERSION})
 if (APPLE)
-  set_target_properties(solver_dense PROPERTIES INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib")
+  set_target_properties(solver_dense PROPERTIES INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
 endif()
 
+target_compile_features(solver_dense PUBLIC cxx_std_17)
 target_link_libraries(solver_dense core)
 
 install(TARGETS solver_dense

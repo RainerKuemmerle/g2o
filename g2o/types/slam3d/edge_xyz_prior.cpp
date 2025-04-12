@@ -25,53 +25,36 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "edge_xyz_prior.h"
+
 #include <iostream>
 
 namespace g2o {
-  using namespace std;
+using namespace std;
 
-  EdgeXYZPrior::EdgeXYZPrior() : BaseUnaryEdge<3, Vector3, VertexPointXYZ>() {
-    information().setIdentity();
-  }
-
-  bool EdgeXYZPrior::read(std::istream& is) {
-    // read measurement
-    Vector3 meas;
-    for (int i=0; i<3; i++) is >> meas[i];
-    setMeasurement(meas);
-    // read covariance matrix (upper triangle)
-    if (is.good()) {
-      for ( int i=0; i<information().rows(); i++)
-        for (int j=i; j<information().cols(); j++){
-          is >> information()(i,j);
-          if (i!=j)
-            information()(j,i)=information()(i,j);
-        }
-    }
-    return !is.fail();
-  }
-
-  bool EdgeXYZPrior::write(std::ostream& os) const {
-    for (int i = 0; i<3; i++) os << measurement()[i] << " ";
-    for (int i=0; i<information().rows(); i++)
-      for (int j=i; j<information().cols(); j++) {
-        os << information()(i,j) << " ";
-      }
-    return os.good();
-  }
-
-  void EdgeXYZPrior::computeError() {
-    const VertexPointXYZ* v = static_cast<const VertexPointXYZ*>(_vertices[0]);
-    _error = v->estimate() - _measurement;
-  }
-
-  void EdgeXYZPrior::linearizeOplus(){
-      _jacobianOplusXi = Matrix3::Identity();
-  }
-
-  bool EdgeXYZPrior::setMeasurementFromState(){
-      const VertexPointXYZ* v = static_cast<const VertexPointXYZ*>(_vertices[0]);
-      _measurement = v->estimate();
-      return true;
-  }
+EdgeXYZPrior::EdgeXYZPrior() : BaseUnaryEdge<3, Vector3, VertexPointXYZ>() {
+  information().setIdentity();
 }
+
+bool EdgeXYZPrior::read(std::istream& is) {
+  internal::readVector(is, _measurement);
+  return readInformationMatrix(is);
+}
+
+bool EdgeXYZPrior::write(std::ostream& os) const {
+  internal::writeVector(os, measurement());
+  return writeInformationMatrix(os);
+}
+
+void EdgeXYZPrior::computeError() {
+  const VertexPointXYZ* v = static_cast<const VertexPointXYZ*>(_vertices[0]);
+  _error = v->estimate() - _measurement;
+}
+
+void EdgeXYZPrior::linearizeOplus() { _jacobianOplusXi = Matrix3::Identity(); }
+
+bool EdgeXYZPrior::setMeasurementFromState() {
+  const VertexPointXYZ* v = static_cast<const VertexPointXYZ*>(_vertices[0]);
+  _measurement = v->estimate();
+  return true;
+}
+}  // namespace g2o

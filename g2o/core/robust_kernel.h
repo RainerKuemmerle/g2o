@@ -29,49 +29,49 @@
 
 #include <memory>
 
+#include "g2o/core/eigen_types.h"
 #include "g2o_core_api.h"
 
 namespace g2o {
 
+/**
+ * \brief base for all robust cost functions
+ *
+ * Note in all the implementations for the other cost functions the e in the
+ * functions corresponds to the squared errors, i.e., the robustification
+ * functions gets passed the squared error.
+ *
+ * e.g. the robustified least squares function is
+ *
+ * chi^2 = sum_{e} rho( e^T Omega e )
+ */
+class G2O_CORE_API RobustKernel {
+ public:
+  RobustKernel();
+  explicit RobustKernel(double delta);
+  virtual ~RobustKernel() {}
   /**
-   * \brief base for all robust cost functions
-   *
-   * Note in all the implementations for the other cost functions the e in the
-   * funtions corresponds to the sqaured errors, i.e., the robustification
-   * functions gets passed the squared error.
-   *
-   * e.g. the robustified least squares function is
-   *
-   * chi^2 = sum_{e} rho( e^T Omega e )
+   * compute the scaling factor for a error:
+   * The error is e^T Omega e
+   * The output rho is
+   * rho[0]: The actual scaled error value
+   * rho[1]: First derivative of the scaling function
+   * rho[2]: Second derivative of the scaling function
    */
-  class G2O_CORE_API RobustKernel
-  {
-    public:
-      RobustKernel();
-      explicit RobustKernel(number_t delta);
-      virtual ~RobustKernel() {}
-      /**
-       * compute the scaling factor for a error:
-       * The error is e^T Omega e
-       * The output rho is
-       * rho[0]: The actual scaled error value
-       * rho[1]: First derivative of the scaling function
-       * rho[2]: Second derivative of the scaling function
-       */
-      virtual void robustify(number_t squaredError, Vector3& rho) const = 0;
+  virtual void robustify(double squaredError, Vector3& rho) const = 0;
 
-      /**
-       * set the window size of the error. A squared error above delta^2 is considered
-       * as outlier in the data.
-       */
-      virtual void setDelta(number_t delta);
-      number_t delta() const { return _delta;}
+  /**
+   * set the window size of the error. A squared error above delta^2 is
+   * considered as outlier in the data.
+   */
+  virtual void setDelta(double delta);
+  double delta() const { return _delta; }
 
-    protected:
-      number_t _delta;
-  };
-  typedef std::shared_ptr<RobustKernel> RobustKernelPtr;
+ protected:
+  double _delta;
+};
+typedef std::shared_ptr<RobustKernel> RobustKernelPtr;
 
-} // end namespace g2o
+}  // end namespace g2o
 
 #endif

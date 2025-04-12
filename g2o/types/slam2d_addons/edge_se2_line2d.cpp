@@ -26,136 +26,39 @@
 
 #include "edge_se2_line2d.h"
 
-#ifdef WINDOWS
-#include <windows.h>
-#endif
-
-#ifdef G2O_HAVE_OPENGL
-#ifdef __APPLE__
-#include <OpenGL/gl.h>
-#else
-#include <GL/gl.h>
-#endif
-#endif
+#include <cassert>
 
 namespace g2o {
 
-  EdgeSE2Line2D::EdgeSE2Line2D() :
-    BaseBinaryEdge<2, Line2D, VertexSE2, VertexLine2D>()
-  {
+EdgeSE2Line2D::EdgeSE2Line2D()
+    : BaseBinaryEdge<2, Line2D, VertexSE2, VertexLine2D>() {}
+
+bool EdgeSE2Line2D::read(std::istream& is) {
+  internal::readVector(is, _measurement);
+  return readInformationMatrix(is);
+}
+
+bool EdgeSE2Line2D::write(std::ostream& os) const {
+  internal::writeVector(os, measurement());
+  return writeInformationMatrix(os);
+}
+
+void EdgeSE2Line2D::initialEstimate(const OptimizableGraph::VertexSet& from,
+                                    OptimizableGraph::Vertex* to) {
+  assert(from.size() == 1 && from.count(_vertices[0]) == 1 &&
+         "Can not initialize VertexSE2 position by VertexLine2D");
+
+  VertexSE2* vi = static_cast<VertexSE2*>(_vertices[0]);
+  VertexLine2D* vj = static_cast<VertexLine2D*>(_vertices[1]);
+  if (from.count(vi) > 0 && to == vj) {
+    SE2 T = vi->estimate();
+    Vector2 est = _measurement;
+    est[0] += T.rotation().angle();
+    est[0] = normalize_theta(est[0]);
+    Vector2 n(std::cos(est[0]), std::sin(est[0]));
+    est[1] += n.dot(T.translation());
+    vj->setEstimate(est);
   }
+}
 
-  bool EdgeSE2Line2D::read(std::istream& is)
-  {
-    is >> _measurement[0] >> _measurement[1];
-    is >> information()(0,0) >> information()(0,1) >> information()(1,1);
-    information()(1,0) = information()(0,1);
-    return true;
-  }
-
-  bool EdgeSE2Line2D::write(std::ostream& os) const
-  {
-    os << measurement()[0] << " " << measurement()[1] << " ";
-    os << information()(0,0) << " " << information()(0,1) << " " << information()(1,1);
-    return os.good();
-  }
-
-  void EdgeSE2Line2D::initialEstimate(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to)
-  {
-    assert(from.size() == 1 && from.count(_vertices[0]) == 1 && "Can not initialize VertexSE2 position by VertexLine2D");
-
-    VertexSE2* vi     = static_cast<VertexSE2*>(_vertices[0]);
-    VertexLine2D* vj = static_cast<VertexLine2D*>(_vertices[1]);
-    if (from.count(vi) > 0 && to == vj) {
-      SE2 T=vi->estimate();
-      Vector2 est=_measurement;
-      est[0] += T.rotation().angle();
-      est[0] = normalize_theta(est[0]);
-      Vector2 n(std::cos(est[0]), std::sin(est[0]));
-      est[1] += n.dot(T.translation());
-      vj->setEstimate(est);
-    }
-  }
-
-// #ifndef NUMERIC_JACOBIAN_TWO_D_TYPES
-//   void EdgeSE2Line2D::linearizeOplus()
-//   {
-//     const VertexSE2* vi     = static_cast<const VertexSE2*>(_vertices[0]);
-//     const VertexLine2D* vj = static_cast<const VertexLine2D*>(_vertices[1]);
-//     const number_t& x1        = vi->estimate().translation()[0];
-//     const number_t& y1        = vi->estimate().translation()[1];
-//     const number_t& th1       = vi->estimate().rotation().angle();
-//     const number_t& x2        = vj->estimate()[0];
-//     const number_t& y2        = vj->estimate()[1];
-
-//     number_t aux_1 = cos(th1) ;
-//     number_t aux_2 = -aux_1 ;
-//     number_t aux_3 = sin(th1) ;
-
-//     _jacobianOplusXi( 0 , 0 ) = aux_2 ;
-//     _jacobianOplusXi( 0 , 1 ) = -aux_3 ;
-//     _jacobianOplusXi( 0 , 2 ) = aux_1*y2-aux_1*y1-aux_3*x2+aux_3*x1 ;
-//     _jacobianOplusXi( 1 , 0 ) = aux_3 ;
-//     _jacobianOplusXi( 1 , 1 ) = aux_2 ;
-//     _jacobianOplusXi( 1 , 2 ) = -aux_3*y2+aux_3*y1-aux_1*x2+aux_1*x1 ;
-
-//     _jacobianOplusXj( 0 , 0 ) = aux_1 ;
-//     _jacobianOplusXj( 0 , 1 ) = aux_3 ;
-//     _jacobianOplusXj( 1 , 0 ) = -aux_3 ;
-//     _jacobianOplusXj( 1 , 1 ) = aux_1 ;
-//   }
-// #endif
-
-//   EdgeSE2Line2DWriteGnuplotAction::EdgeSE2Line2DWriteGnuplotAction(): WriteGnuplotAction(typeid(EdgeSE2Line2D).name()){}
-
-//   HyperGraphElementAction* EdgeSE2Line2DWriteGnuplotAction::operator()(HyperGraph::HyperGraphElement* element, HyperGraphElementAction::Parameters* params_){
-//     if (typeid(*element).name()!=_typeName)
-//       return nullptr;
-//     WriteGnuplotAction::Parameters* params=static_cast<WriteGnuplotAction::Parameters*>(params_);
-//     if (!params->os){
-//       std::cerr << __PRETTY_FUNCTION__ << ": warning, on valid os specified" << std::endl;
-//       return nullptr;
-//     }
-
-//     EdgeSE2Line2D* e =  static_cast<EdgeSE2Line2D*>(element);
-//     VertexSE2* fromEdge = static_cast<VertexSE2*>(e->vertex(0));
-//     VertexLine2D* toEdge   = static_cast<VertexLine2D*>(e->vertex(1));
-//     *(params->os) << fromEdge->estimate().translation().x() << " " << fromEdge->estimate().translation().y()
-//       << " " << fromEdge->estimate().rotation().angle() << std::endl;
-//     *(params->os) << toEdge->estimate().x() << " " << toEdge->estimate().y() << std::endl;
-//     *(params->os) << std::endl;
-//     return this;
-//   }
-
-// #ifdef G2O_HAVE_OPENGL
-//   EdgeSE2Line2DDrawAction::EdgeSE2Line2DDrawAction(): DrawAction(typeid(EdgeSE2Line2D).name()){}
-
-//   HyperGraphElementAction* EdgeSE2Line2DDrawAction::operator()(HyperGraph::HyperGraphElement* element,
-//                 HyperGraphElementAction::Parameters*  params_){
-//     if (typeid(*element).name()!=_typeName)
-//       return nullptr;
-
-//     refreshPropertyPtrs(params_);
-//     if (! _previousParams)
-//       return this;
-
-//     if (_show && !_show->value())
-//       return this;
-
-
-//     EdgeSE2Line2D* e =  static_cast<EdgeSE2Line2D*>(element);
-//     VertexSE2* fromEdge = static_cast<VertexSE2*>(e->vertex(0));
-//     VertexLine2D* toEdge   = static_cast<VertexLine2D*>(e->vertex(1));
-//     glColor3f(0.4f,0.4f,0.2f);
-//     glPushAttrib(GL_ENABLE_BIT);
-//     glDisable(GL_LIGHTING);
-//     glBegin(GL_LINES);
-//     glVertex3f((float)fromEdge->estimate().translation().x(),(float)fromEdge->estimate().translation().y(),0.f);
-//     glVertex3f((float)toEdge->estimate().x(),(float)toEdge->estimate().y(),0.f);
-//     glEnd();
-//     glPopAttrib();
-//     return this;
-//   }
-// #endif
-
-} // end namespace
+}  // namespace g2o

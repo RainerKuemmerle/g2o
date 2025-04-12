@@ -24,14 +24,6 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-/***************************************************************************
- *            filesysTools.h
- *
- *  Fr 02 Mär 2007 23:14:21 CET
- *  Copyright 2007 Rainer Kümmerle
- *  Email rk@raikue.net
- ****************************************************************************/
-
 #ifndef G2O_FILESYS_TOOLS_H
 #define G2O_FILESYS_TOOLS_H
 
@@ -44,7 +36,9 @@
  * \brief utility functions for handling files, directory on Linux/Unix
  */
 
+#include <regex>
 #include <string>
+#include <string_view>
 #include <vector>
 
 namespace g2o {
@@ -53,42 +47,45 @@ namespace g2o {
  * get filename extension (the part after the last .), e.g.
  * the extension of file.txt is txt
  */
-G2O_STUFF_API std::string getFileExtension(const std::string& filename);
+G2O_STUFF_API std::string getFileExtension(std::string_view filename);
 
 /**
  * get the filename without the extension.
  * file.txt -> file
  */
-G2O_STUFF_API std::string getPureFilename(const std::string& filename);
+G2O_STUFF_API std::string getPureFilename(std::string_view filename);
 
 /**
  * change the fileextension of a given filename.
  * Only if filename contains an extension, otherwise filename is returned.
  */
-G2O_STUFF_API std::string changeFileExtension(const std::string& filename, const std::string& newExt, bool stripDot = false);
+G2O_STUFF_API std::string changeFileExtension(std::string_view filename,
+                                              std::string_view newExt);
 
 /**
  * return the basename of the given filename
  * /etc/fstab -> fstab
  */
-G2O_STUFF_API std::string getBasename(const std::string& filename);
+G2O_STUFF_API std::string getBasename(std::string_view filename);
 
 /**
  * return the directory of a given filename
  * /etc/fstab -> /etc
  */
-G2O_STUFF_API std::string getDirname(const std::string& filename);
+G2O_STUFF_API std::string getDirname(std::string_view filename);
 
 /**
  * check if file exists (note a directory is also a file)
+ * @param regular to check for regular file instead
  */
-G2O_STUFF_API bool fileExists(const char* filename);
+G2O_STUFF_API bool fileExists(std::string_view filename, bool regular = false);
 
 /**
- * return all files that match a given pattern, e.g., ~/blaa*.txt, /tmp/a*
+ * return all files that match a given regexp in the directory.
  */
-G2O_STUFF_API std::vector<std::string> getFilesByPattern(const char* pattern);
+G2O_STUFF_API std::vector<std::string> getFilesByPattern(
+    std::string_view directory, const std::regex& pattern);
 
-} // end namespace
+}  // namespace g2o
 // @}
 #endif

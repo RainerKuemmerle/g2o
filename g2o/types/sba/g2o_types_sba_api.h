@@ -55,4 +55,4 @@
 #define G2O_TYPES_SBA_API
 #endif
 
-#endif // G2O_TYPES_SBA_API_H
+#endif  // G2O_TYPES_SBA_API_H

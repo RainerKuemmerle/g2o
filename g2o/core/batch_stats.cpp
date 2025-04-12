@@ -25,66 +25,67 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "batch_stats.h"
+
 #include <cstring>
 
 namespace g2o {
-  using namespace std;
+using namespace std;
 
-  G2OBatchStatistics* G2OBatchStatistics::_globalStats=0;
+G2OBatchStatistics* G2OBatchStatistics::_globalStats = 0;
 
-  #ifndef PTHING
-  #define PTHING(s) \
-    #s << "= " << (st.s) << "\t "
-  #endif
+#ifndef PTHING
+#define PTHING(s) #s << "= " << (st.s) << "\t "
+#endif
 
-  G2OBatchStatistics::G2OBatchStatistics(){
-    // zero all.
-    memset (this, 0, sizeof(G2OBatchStatistics));
+G2OBatchStatistics::G2OBatchStatistics() {
+  // zero all.
+  memset(this, 0, sizeof(G2OBatchStatistics));
 
-    // set the iteration to -1 to show that it isn't valid
-    iteration = -1;
-  }
+  // set the iteration to -1 to show that it isn't valid
+  iteration = -1;
+}
 
-  std::ostream& operator << (std::ostream& os , const G2OBatchStatistics& st)
-  {
-    os << PTHING(iteration);
+std::ostream& operator<<(std::ostream& os, const G2OBatchStatistics& st) {
+  os << PTHING(iteration);
 
-    os << PTHING( numVertices ); // how many vertices are involved
-    os << PTHING( numEdges ); // hoe many edges
-    os << PTHING(  chi2 );  // total chi2
-    
-    /** timings **/
-    // nonlinear part
-    os << PTHING(  timeResiduals );  
-    os << PTHING(  timeLinearize );   // jacobians
-    os << PTHING(  timeQuadraticForm ); // construct the quadratic form in the graph
-    
-    // block_solver (constructs Ax=b, plus maybe schur);
-    os << PTHING(  timeSchurComplement ); // compute schur complement (0 if not done);
-    
-    // linear solver (computes Ax=b); );
-    os << PTHING(  timeSymbolicDecomposition ); // symbolic decomposition (0 if not done);
-    os << PTHING(  timeNumericDecomposition ); // numeric decomposition  (0 if not done);
-    os << PTHING(  timeLinearSolution );             // total time for solving Ax=b
-    os << PTHING(  iterationsLinearSolver );  // iterations of PCG
-    os << PTHING(  timeUpdate ); // oplus
-    os << PTHING(  timeIteration ); // total time );
+  os << PTHING(numVertices);  // how many vertices are involved
+  os << PTHING(numEdges);     // hoe many edges
+  os << PTHING(chi2);         // total chi2
 
-    os << PTHING( levenbergIterations );
-    os << PTHING( timeLinearSolver);
+  /** timings **/
+  // nonlinear part
+  os << PTHING(timeResiduals);
+  os << PTHING(timeLinearize);      // jacobians
+  os << PTHING(timeQuadraticForm);  // construct the quadratic form in the graph
 
-    os << PTHING(hessianDimension);
-    os << PTHING(hessianPoseDimension);
-    os << PTHING(hessianLandmarkDimension);
-    os << PTHING(choleskyNNZ);
-    os << PTHING(timeMarginals);
+  // block_solver (constructs Ax=b, plus maybe schur);
+  os << PTHING(
+      timeSchurComplement);  // compute schur complement (0 if not done);
 
-    return os;
-  };
+  // linear solver (computes Ax=b); );
+  os << PTHING(
+      timeSymbolicDecomposition);  // symbolic decomposition (0 if not done);
+  os << PTHING(
+      timeNumericDecomposition);     // numeric decomposition  (0 if not done);
+  os << PTHING(timeLinearSolution);  // total time for solving Ax=b
+  os << PTHING(iterationsLinearSolver);  // iterations of PCG
+  os << PTHING(timeUpdate);              // oplus
+  os << PTHING(timeIteration);           // total time );
 
-  void G2OBatchStatistics::setGlobalStats(G2OBatchStatistics* b)
-  {
-    _globalStats = b;
-  }
+  os << PTHING(levenbergIterations);
+  os << PTHING(timeLinearSolver);
 
-} // end namespace
+  os << PTHING(hessianDimension);
+  os << PTHING(hessianPoseDimension);
+  os << PTHING(hessianLandmarkDimension);
+  os << PTHING(choleskyNNZ);
+  os << PTHING(timeMarginals);
+
+  return os;
+};
+
+void G2OBatchStatistics::setGlobalStats(G2OBatchStatistics* b) {
+  _globalStats = b;
+}
+
+}  // namespace g2o

@@ -35,7 +35,7 @@ typedef SlamParser::Parser::token_type token_type;
 /*%option debug*/
 
 /* no support for include files is planned */
-%option yywrap nounput 
+%option yywrap nounput
 
 /* enables the use of start condition stacks */
 %option stack

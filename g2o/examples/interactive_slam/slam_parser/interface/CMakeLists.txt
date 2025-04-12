@@ -19,6 +19,9 @@ endif()
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../../)
 
 set_target_properties(interface_library PROPERTIES OUTPUT_NAME ${LIB_PREFIX}interface)
+set_target_properties(interface_library PROPERTIES
+  VERSION ${G2O_LIB_VERSION}
+  SOVERSION ${G2O_LIB_SOVERSION})
 target_link_libraries(interface_library parser_library)
 
 install(TARGETS interface_library

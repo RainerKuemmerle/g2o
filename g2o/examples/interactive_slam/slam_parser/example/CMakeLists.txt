@@ -9,7 +9,7 @@ target_link_libraries(example_library parser_library interface_library)
 
 add_executable(test_slam_interface test_slam_interface.cpp)
 target_link_libraries(test_slam_interface example_library)
-set_target_properties(test_slam_interface PROPERTIES OUTPUT_NAME test_slam_interface${EXE_POSTFIX})
+set_target_properties(test_slam_interface PROPERTIES OUTPUT_NAME test_slam_interface)
 
 #install(TARGETS example_library
   #RUNTIME DESTINATION ${RUNTIME_DESTINATION}

@@ -25,20 +25,21 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 template <int D, typename T>
-BaseVertex<D, T>::BaseVertex() :
-  OptimizableGraph::Vertex(),
-  _hessian(0, D, D)
-{
+BaseVertex<D, T>::BaseVertex()
+    : OptimizableGraph::Vertex(), _hessian(nullptr, D, D) {
   _dimension = D;
 }
 
 template <int D, typename T>
-number_t BaseVertex<D, T>::solveDirect(number_t lambda) {
-  Eigen::Matrix<number_t, D, D, Eigen::ColMajor> tempA=_hessian + Eigen::Matrix<number_t, D, D, Eigen::ColMajor>::Identity()*lambda;
-  number_t det=tempA.determinant();
-  if (g2o_isnan(det) || det < std::numeric_limits<number_t>::epsilon())
+double BaseVertex<D, T>::solveDirect(double lambda) {
+  Eigen::Matrix<double, D, D, Eigen::ColMajor> tempA =
+      _hessian + Eigen::Matrix<double, D, D, Eigen::ColMajor>::Identity(
+                     G2O_VERTEX_DIM, G2O_VERTEX_DIM) *
+                     lambda;
+  double det = tempA.determinant();
+  if (std::isnan(det) || det < std::numeric_limits<double>::epsilon())
     return det;
-  Eigen::Matrix<number_t, D, 1, Eigen::ColMajor> dx=tempA.llt().solve(_b);
+  Eigen::Matrix<double, D, 1, Eigen::ColMajor> dx = tempA.llt().solve(_b);
   oplus(&dx[0]);
   return det;
 }
@@ -49,7 +50,7 @@ void BaseVertex<D, T>::clearQuadraticForm() {
 }
 
 template <int D, typename T>
-void BaseVertex<D, T>::mapHessianMemory(number_t* d)
-{
-  new (&_hessian) HessianBlockType(d, D, D);
+void BaseVertex<D, T>::mapHessianMemory(double* d) {
+  const int vertexDim = G2O_VERTEX_DIM;
+  new (&_hessian) HessianBlockType(d, vertexDim, vertexDim);
 }

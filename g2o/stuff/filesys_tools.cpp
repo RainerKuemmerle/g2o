@@ -24,141 +24,78 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-/***************************************************************************
- *            filesysTools.cpp
- *
- *  Fr 02 Mär 2007 23:14:08 CET
- *  Copyright 2007 Rainer Kümmerle
- *  Email rk@raikue.net
- ****************************************************************************/
 #include "filesys_tools.h"
 
-#include <sys/stat.h>
-#include <ctime>
-#include <sys/types.h>
-#include <cstdio>
-#include <iostream>
-
-#ifdef WINDOWS
-#include <windows.h>
-#include <winbase.h>
-#endif
-
-#if (defined (UNIX) || defined(CYGWIN)) && !defined(ANDROID)
-#include <wordexp.h>
-#endif
-
-#ifdef __APPLE__
-//#include <chrono>
-//#include <thread>
-#endif
-
-using namespace ::std;
+#include <filesystem>
+#include <regex>
+#include <string_view>
 
 namespace g2o {
 
-std::string getFileExtension(const std::string& filename)
-{
-  std::string::size_type lastDot = filename.find_last_of('.');
-  if (lastDot != std::string::npos)
-    return filename.substr(lastDot + 1);
-  else
-    return "";
+std::string getFileExtension(std::string_view filename) {
+  const std::filesystem::path path(filename);
+  const std::string result = path.extension().string();
+  if (!result.empty() && result.front() == '.') return result.substr(1);
+  return result;
 }
 
-std::string getPureFilename(const std::string& filename)
-{
-  std::string::size_type lastDot = filename.find_last_of('.');
-  if (lastDot != std::string::npos)
-    return filename.substr(0, lastDot);
-  else
-    return filename;
+std::string getPureFilename(std::string_view filename) {
+  const std::filesystem::path path(filename);
+  if (path.has_parent_path()) {
+    return (path.parent_path() / path.stem()).string();
+  }
+  return path.stem().string();
 }
 
-std::string getBasename(const std::string& filename)
-{
-#ifdef WINDOWS
-  std::string::size_type lastSlash = filename.find_last_of('\\');
-#else
-  std::string::size_type lastSlash = filename.find_last_of('/');
-#endif
-  if (lastSlash != std::string::npos)
-    return filename.substr(lastSlash + 1);
-  else
-    return filename;
+std::string getBasename(std::string_view filename) {
+  const std::filesystem::path path(filename);
+  return path.filename().string();
 }
 
-std::string getDirname(const std::string& filename)
-{
-#ifdef WINDOWS
-  std::string::size_type lastSlash = filename.find_last_of('\\');
-#else
-  std::string::size_type lastSlash = filename.find_last_of('/');
-#endif
-  if (lastSlash != std::string::npos)
-    return filename.substr(0, lastSlash);
-  else
-    return "";
+std::string getDirname(std::string_view filename) {
+  const std::filesystem::path path(filename);
+  return path.parent_path().string();
 }
 
-std::string changeFileExtension(const std::string& filename, const std::string& newExt, bool stripDot)
-{
-  std::string::size_type lastDot = filename.find_last_of('.');
-  if (lastDot != std::string::npos) {
-    if (stripDot)
-      return filename.substr(0, lastDot) + newExt;
-    else
-      return filename.substr(0, lastDot + 1) + newExt;
-  } else
-    return filename;
+std::string changeFileExtension(std::string_view filename,
+                                std::string_view newExt) {
+  std::filesystem::path path(filename);
+  if (!path.has_extension()) {
+    return path.string();
+  }
+  path.replace_extension(std::filesystem::path(newExt));
+  return path.string();
 }
 
-bool fileExists(const char* filename)
-{
-  struct stat statInfo;
-  return (stat(filename, &statInfo) == 0);
+bool fileExists(std::string_view filename, bool regular) {
+  const std::filesystem::path path(filename);
+  return std::filesystem::exists(path) &&
+         (!regular || std::filesystem::is_regular_file(path));
 }
 
-std::vector<std::string> getFilesByPattern(const char* pattern)
-{
+std::vector<std::string> getFilesByPattern(std::string_view directory,
+                                           const std::regex& pattern) {
+  auto match = [&pattern](const std::filesystem::path& entry) {
+    return std::regex_search(entry.filename().string(), pattern);
+  };
+
   std::vector<std::string> result;
-
-#ifdef WINDOWS
-
-  HANDLE hFind;
-  WIN32_FIND_DATA FData;
-  if ((hFind = FindFirstFile(pattern, &FData)) != INVALID_HANDLE_VALUE) {
-    do {
-      result.push_back(FData.cFileName);
-    } while (FindNextFile(hFind, &FData));
-    FindClose(hFind);
+  for (const auto& dir_entry :
+       std::filesystem::directory_iterator(std::filesystem::path(directory))) {
+    if (dir_entry.is_regular_file() && match(dir_entry)) {
+      result.emplace_back(dir_entry.path().string());
+      continue;
+    }
+    if (dir_entry.is_symlink() &&
+        std::filesystem::is_regular_file(
+            std::filesystem::read_symlink(dir_entry)) &&
+        match(dir_entry)) {
+      result.emplace_back(dir_entry.path().string());
+      continue;
+    }
   }
-  
-#elif (defined (UNIX) || defined (CYGWIN)) && !defined(ANDROID)
-
-  wordexp_t p;
-  wordexp(pattern, &p, 0);
-
-  // For some reason, wordexp sometimes fails on an APPLE machine to
-  // return anything; therefore, run it several times until we do find
-  // something - or give up
-#ifdef __APPLE__
-  for (int k = 0; (k < 100) && (p.we_wordc == 0); k++) {
-    //chrono::milliseconds duration(20);
-    //this_thread::sleep_for(duration);
-    wordexp(pattern, &p, WRDE_APPEND);
-  }
-#endif
-
-  result.reserve(p.we_wordc);
-  for (size_t i = 0; i < p.we_wordc; ++i)
-    result.push_back(p.we_wordv[i]);
-  
-  wordfree(&p);
-
-#endif
 
   return result;
 }
 
-}
+}  // namespace g2o

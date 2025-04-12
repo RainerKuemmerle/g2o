@@ -1,21 +1,19 @@
-if(NOT G2O_USE_CSPARSE)
-  return()
-endif()
-
 add_library(solver_slam2d_linear ${G2O_LIB_TYPE}
   slam2d_linear.cpp
   solver_slam2d_linear.h solver_slam2d_linear.cpp
   g2o_slam2d_linear_api.h
 )
 
-include_directories(${CSPARSE_INCLUDE_DIR})
-
 set_target_properties(solver_slam2d_linear PROPERTIES OUTPUT_NAME ${LIB_PREFIX}solver_slam2d_linear)
+set_target_properties(solver_slam2d_linear PROPERTIES
+  VERSION ${G2O_LIB_VERSION}
+  SOVERSION ${G2O_LIB_SOVERSION})
 if (APPLE)
-  set_target_properties(solver_slam2d_linear PROPERTIES INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib")
+  set_target_properties(solver_slam2d_linear PROPERTIES INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
 endif()
 
-target_link_libraries(solver_slam2d_linear solver_csparse types_slam2d)
+target_compile_features(solver_slam2d_linear PUBLIC cxx_std_17)
+target_link_libraries(solver_slam2d_linear solver_eigen types_slam2d)
 
 install(TARGETS solver_slam2d_linear
   EXPORT ${G2O_TARGETS_EXPORT_NAME}

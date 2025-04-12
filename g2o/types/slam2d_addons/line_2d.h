@@ -27,33 +27,32 @@
 #ifndef G2O_LINE2D_H
 #define G2O_LINE2D_H
 
-#include "g2o/types/slam2d/se2.h"
-
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 
+#include "g2o/types/slam2d/se2.h"
+#include "g2o_types_slam2d_addons_api.h"
+
 namespace g2o {
 
-  struct Line2D : public Vector2{
-    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-    Line2D() {
-      setZero();
-    }
-    Line2D(const Vector2& v) {
-      (*this)(0) = v(0);
-      (*this)(1) = v(1);
-    }
-  };
-
-  inline Line2D operator * (const SE2 & t, const Line2D& l){
-    Line2D est = l;
-    est[0] += t.rotation().angle();
-    est[0] = normalize_theta(est[0]);
-    Vector2 n(std::cos(est[0]), std::sin(est[0]));
-    est[1] += n.dot(t.translation());
-    return est;
+struct Line2D : public Vector2 {
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+  Line2D() { setZero(); }
+  Line2D(const Vector2& v) {
+    (*this)(0) = v(0);
+    (*this)(1) = v(1);
   }
+};
 
+inline Line2D operator*(const SE2& t, const Line2D& l) {
+  Line2D est = l;
+  est[0] += t.rotation().angle();
+  est[0] = normalize_theta(est[0]);
+  Vector2 n(std::cos(est[0]), std::sin(est[0]));
+  est[1] += n.dot(t.translation());
+  return est;
 }
+
+}  // namespace g2o
 
 #endif

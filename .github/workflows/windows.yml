@@ -1,0 +1,70 @@
+name: win64
+
+on:
+  push:
+    branches:
+      - master
+      - pymem
+  pull_request:
+
+  release:
+
+jobs:
+  build:
+    name: ${{ matrix.config.name }}
+    runs-on: ${{ matrix.config.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+        - {
+            name: "Windows 2022 MSVC",
+            os: windows-2022,
+            build_type: "Debug",
+            generators: "Ninja"
+          }
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+            fetch-depth: 25
+
+      - name: Setup VS Environment
+        uses: ilammy/msvc-dev-cmd@v1
+
+      - name: Print env
+        run: |
+          echo github.ref: ${{github.ref}}
+          echo github.event.action: ${{github.event.action}}
+          echo github.event_name: ${{github.event_name}}
+          echo runner.os: ${{runner.os}}
+          Get-ChildItem Env:
+
+      - name: Install libraries with vcpkg
+        run: |
+          vcpkg --triplet x64-windows install eigen3
+
+      - name: Eigen Introspection
+        run: |
+          type C:/vcpkg/packages/eigen3_x64-windows/debug/lib/pkgconfig/eigen3.pc
+
+      - name: Configure CMake
+        run: |
+          cmake --version
+          cmake -B ${{github.workspace}}/build -G "${{matrix.config.generators}}" -DBUILD_UNITTESTS=ON -DG2O_BUILD_EXAMPLES=OFF -DCMAKE_BUILD_TYPE=${{matrix.config.build_type}} -DCMAKE_TOOLCHAIN_FILE=C:\vcpkg\scripts\buildsystems\vcpkg.cmake
+
+      - name: Build Introspection
+        run: |
+          echo "Number of processors: $Env:NUMBER_OF_PROCESSORS"
+          echo "g2o config.h"
+          type ${{github.workspace}}/build/g2o/config.h
+
+      - name: Build
+        run: cmake --build ${{github.workspace}}/build -j $Env:NUMBER_OF_PROCESSORS --config ${{matrix.config.build_type}}
+
+      - name: Test
+        run: |
+          cd ${{github.workspace}}/build
+          $Env:PATH += ";${{github.workspace}}\build\bin"
+          $Env:PATH += ";${{github.workspace}}\build\lib"
+          ctest -C ${{matrix.config.build_type}} --extra-verbose --output-on-failure

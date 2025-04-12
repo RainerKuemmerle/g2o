@@ -1,0 +1,42 @@
+name: Release
+
+on:
+  push:
+    tags:
+    - 'v[0-9]+.[0-9]+.[0-9]+'
+    - 'git$'
+  pull_request:
+    branches: [ "master" ]
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 25
+
+    - name: Install dependencies
+      run: |
+          sudo apt install fig2dev texlive-latex-recommended texlive-science
+
+    - name: Build PDF doc
+      run: |
+          cd doc
+          make
+
+    - name: Check PDF output
+      run: |
+          ls -l ${{github.workspace}}/doc/*.pdf
+
+    - name: Create github Release
+      uses: softprops/action-gh-release@v2
+      if: startsWith(github.ref, 'refs/tags/')
+      with:
+        generate_release_notes: false
+        files: |
+          ${{github.workspace}}/doc/*.pdf

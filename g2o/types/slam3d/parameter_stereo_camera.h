@@ -28,26 +28,27 @@
 #define G2O_STEREO_CAMERA_PARAMETERS_H_
 
 #include "g2o/core/hyper_graph_action.h"
-#include "parameter_camera.h"
 #include "g2o_types_slam3d_api.h"
+#include "parameter_camera.h"
 
 namespace g2o {
-  /**
-   * \brief parameters for a camera
-   */
-  class G2O_TYPES_SLAM3D_API ParameterStereoCamera: public ParameterCamera {
-    public:
-      EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
-      ParameterStereoCamera();
+/**
+ * \brief parameters for a camera
+ */
+class G2O_TYPES_SLAM3D_API ParameterStereoCamera : public ParameterCamera {
+ public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
+  ParameterStereoCamera();
 
-      virtual bool read(std::istream& is);
-      virtual bool write(std::ostream& os) const;
+  virtual bool read(std::istream& is);
+  virtual bool write(std::ostream& os) const;
 
-      void  setBaseline(number_t baseline_) { _baseline = baseline_;}
-      number_t baseline() const {return _baseline;}
-    protected:
-      number_t _baseline;
-  };
+  void setBaseline(double baseline_) { _baseline = baseline_; }
+  double baseline() const { return _baseline; }
+
+ protected:
+  double _baseline;
 };
+}  // namespace g2o
 
 #endif

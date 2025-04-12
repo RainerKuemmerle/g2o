@@ -24,26 +24,18 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+#include "g2o/core/factory.h"
 #include "types_slam2d_online.h"
 #include "types_slam3d_online.h"
-#include "g2o/core/factory.h"
-#include "g2o/stuff/macros.h"
-
-#include <iostream>
 
 namespace g2o {
-  using namespace std;
 
-  G2O_ATTRIBUTE_CONSTRUCTOR(init_types_interactive_online)
-  {
-    Factory* factory = Factory::instance();
-    //cerr << "Calling " << __FILE__ << " " << __PRETTY_FUNCTION__ << endl;
+G2O_REGISTER_TYPE_GROUP(online);
 
-    factory->registerType("ONLINE_EDGE_SE2", new HyperGraphElementCreator<OnlineEdgeSE2>);
-    factory->registerType("ONLINE_VERTEX_SE2", new HyperGraphElementCreator<OnlineVertexSE2>);
+G2O_REGISTER_TYPE_NAME("ONLINE_EDGE_SE2", OnlineEdgeSE2);
+G2O_REGISTER_TYPE_NAME("ONLINE_VERTEX_SE2", OnlineVertexSE2);
 
-    factory->registerType("ONLINE_VERTEX_SE3:QUAT", new HyperGraphElementCreator<OnlineVertexSE3>);
-    factory->registerType("ONLINE_EDGE_SE3:QUAT", new HyperGraphElementCreator<OnlineEdgeSE3>);
-  }
+G2O_REGISTER_TYPE_NAME("ONLINE_VERTEX_SE3:QUAT", OnlineVertexSE3);
+G2O_REGISTER_TYPE_NAME("ONLINE_EDGE_SE3:QUAT", OnlineEdgeSE3);
 
-} // end namespace
+}  // namespace g2o
