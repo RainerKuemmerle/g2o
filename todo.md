@@ -1,5 +1,5 @@
-[ ] update py_base_vertex/edge to map now common methods
-[ ] common functions to wrap edge/vertex possible?
+[x] update py_base_vertex/edge to map now common methods
+[x] common functions to wrap edge/vertex possible?
 [ ] build only one library instead of multiple?
 [ ] remove dynamic loading of wildcard libs from g2o/g2o_viewer
 [ ] update ID to int64

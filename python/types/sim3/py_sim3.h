@@ -2,8 +2,6 @@
 
 #include "g2o/types/sim3/sim3.h"
 #include "g2opy.h"
-#include "python/core/py_base_edge.h"
-#include "python/core/py_base_vertex.h"
 
 namespace g2o {
 
@@ -28,9 +26,6 @@ inline void declareSim3(py::module& m) {
       .def("translation", (Eigen::Vector3d & (Sim3::*)()) & Sim3::translation)
       .def("rotation", (Eigen::Quaterniond & (Sim3::*)()) & Sim3::rotation)
       .def("scale", (double& (Sim3::*)())&Sim3::scale);
-
-  templatedBaseVertex<7, Sim3>(m, "_7_Sim3");
-  templatedBaseEdge<7, Sim3>(m, "_7_Sim3");
 }
 
 }  // namespace g2o

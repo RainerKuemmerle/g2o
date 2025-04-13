@@ -69,6 +69,8 @@ void declareOptimizableGraph(py::module& m) {
 
       .def("estimate_dimension",
            &CLS::Vertex::estimateDimension)  // virtual, -> int
+      .def("estimate_dimension_at_compile_time",
+           &CLS::Vertex::estimateDimensionAtCompileTime)  // -> int
       .def("minimal_estimate_dimension",
            &CLS::Vertex::minimalEstimateDimension)  // virtual, -> int
 
@@ -91,13 +93,21 @@ void declareOptimizableGraph(py::module& m) {
       .def("set_marginalized", &CLS::Vertex::setMarginalized,
            "marginalized"_a)  // bool -> void
 
-      .def("dimension", &CLS::Vertex::dimension)  // -> int
+      .def("dimension", &CLS::Vertex::dimension)         // -> int
+      .def("set_dimension", &CLS::Vertex::setDimension)  // -> int
       .def("set_id", &CLS::Vertex::setId,
            "id"_a)                                        // int -> void
       .def("col_in_hessian", &CLS::Vertex::colInHessian)  // -> int
       .def("set_col_in_hessian", &CLS::Vertex::setColInHessian,
            "c"_a)  // int -> void
 
+      .def("push", &CLS::Vertex::push)
+      .def("pop", &CLS::Vertex::pop)
+      .def("discard_top", &CLS::Vertex::discardTop)
+      .def("stack_size", &CLS::Vertex::stackSize)  // -> int
+
+      .def("solve_direct", &CLS::Vertex::solveDirect)
+      .def("clear_quadratic_form", &CLS::Vertex::clearQuadraticForm)
       .def("lock_quadratic_form", &CLS::Vertex::lockQuadraticForm)
       .def("unlock_quadratic_form", &CLS::Vertex::unlockQuadraticForm)
       .def("update_cache", &CLS::Vertex::updateCache);
@@ -117,16 +127,28 @@ void declareOptimizableGraph(py::module& m) {
              return status ? data : VectorX();
            })  // double * -> bool
       .def("measurement_dimension", &CLS::Edge::measurementDimension)  // -> int
+      .def("measurement_dimension_at_compile_time",
+           &CLS::Edge::measurementDimensionAtCompileTime)
+      .def("minimal_measurement_dimension",
+           &CLS::Edge::minimalMeasurementDimension)
+      .def("construct_quadratic_form", &CLS::Edge::constructQuadraticForm)
+      .def("compute_error", &CLS::Edge::computeError)
+      .def("all_vertices_fixed", &CLS::Edge::allVerticesFixed)
+
       .def("set_measurement_from_state",
            &CLS::Edge::setMeasurementFromState)        // -> bool
       .def("robust_kernel", &CLS::Edge::robustKernel)  // -> RobustKernelPtr
-      .def("set_robust_kernel", &CLS::Edge::setRobustKernel,
-           "ptr"_a)  // RobustKernel* -> void
+      .def("set_robust_kernel", &CLS::Edge::setRobustKernel, "ptr"_a,
+           py::keep_alive<1, 2>())  // RobustKernel* -> void
 
       .def("initial_estimate_possible", &CLS::Edge::initialEstimatePossible,
            "from"_a,
            "to"_a)  // (const OptimizableGraph::VertexSet&,
                     // OptimizableGraph::VertexSet&) -> double
+      .def("initial_estimate", &CLS::Edge::initialEstimate, "from"_a, "to"_a)
+      .def("map_hessian_memory", &CLS::Edge::mapHessianMemory, "d"_a, "i"_a,
+           "j"_a, "row_mayor"_a)
+
       .def("level", &CLS::Edge::level)  // -> int
       .def("set_level", &CLS::Edge::setLevel,
            "l"_a)                               // int -> void
@@ -194,13 +216,8 @@ void declareOptimizableGraph(py::module& m) {
           "action"_a);  // HyperGraphAction* -> bool
 
   cls.def("push", static_cast<void (CLS::*)()>(&CLS::push));
-  cls.def("push",
-          static_cast<void (CLS::*)(HyperGraph::VertexSet&)>(&CLS::push));
   cls.def("pop", static_cast<void (CLS::*)()>(&CLS::pop));
-  cls.def("pop", static_cast<void (CLS::*)(HyperGraph::VertexSet&)>(&CLS::pop));
   cls.def("discard_top", static_cast<void (CLS::*)()>(&CLS::discardTop));
-  cls.def("discard_top",
-          static_cast<void (CLS::*)(HyperGraph::VertexSet&)>(&CLS::discardTop));
 
   cls.def("load",
           static_cast<bool (CLS::*)(const char*, io::Format)>(&CLS::load),

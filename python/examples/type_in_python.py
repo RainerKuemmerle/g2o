@@ -9,7 +9,7 @@ class VertexCircle(g2o.VectorXVertex):
     """A circle parameterized by position x,y with radius r"""
 
     def __init__(self) -> None:
-        g2o.VectorXVertex.__init__(self)
+        super().__init__()
         self.set_dimension(3)
         self.set_estimate([0] * 3)
 
@@ -19,7 +19,7 @@ class VertexCircle(g2o.VectorXVertex):
 
 class EdgePointOnCircle(g2o.VariableVectorXEdge):
     def __init__(self) -> None:
-        g2o.VariableVectorXEdge.__init__(self)
+        super().__init__()
         self.set_dimension(1)  # dimension of the error function
         self.information()
         self.resize(1)  # number of vertices

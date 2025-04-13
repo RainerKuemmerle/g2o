@@ -1,15 +1,12 @@
 #pragma once
 
+#include "detail/registry.h"
 #include "g2o/types/slam3d/se3quat.h"
-#include "g2opy.h"
-#include "python/core/py_base_edge.h"
-#include "python/core/py_base_variable_sized_edge.h"
-#include "python/core/py_base_vertex.h"
 
 namespace g2o {
 
-inline void declareSE3Quat(py::module& m) {
-  py::class_<SE3Quat>(m, "SE3Quat")
+inline void declareSE3Quat(detail::Registry& registry) {
+  py::class_<SE3Quat>(registry.mod(), "SE3Quat")
       .def(py::init<>())
       .def(py::init<const Eigen::Ref<const Matrix3>&,
                     const Eigen::Ref<const Vector3>&>(),
@@ -51,15 +48,11 @@ inline void declareSE3Quat(py::module& m) {
       .def("normalize_rotation", &SE3Quat::normalizeRotation)
 
       // operator Isometry3() const
-      .def("Isometry3d", [](const SE3Quat& p) {
-        Isometry3 result = (Isometry3)p.rotation();
+      .def("to_isometry3d", [](const SE3Quat& p) {
+        Isometry3 result(p.rotation());
         result.translation() = p.translation();
         return result;
       });
-
-  templatedBaseVertex<6, SE3Quat>(m, "_6_SE3Quat");
-  templatedBaseEdge<6, SE3Quat>(m, "_6_SE3Quat");
-  templatedBaseVariableSizedEdge<6, SE3Quat>(m, "_6_SE3Quat");
 }
 
 }  // end namespace g2o
