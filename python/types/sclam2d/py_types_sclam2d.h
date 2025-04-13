@@ -1,9 +1,9 @@
 #pragma once
 
-#include "g2opy.h"
+#include "detail/registry.h"
 
 namespace g2o {
 
-void declareTypesSclam2d(py::module& m);
+void declareTypesSclam2d(detail::Registry& registry);
 
 }  // namespace g2o

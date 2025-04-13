@@ -77,7 +77,7 @@ class BaseVariableSizedEdge : public BaseEdge<D, E> {
   void linearizeOplus(JacobianWorkspace& jacobianWorkspace) override;
 
   /**
-   * Linearizes the oplus operator in the vertex, and stores
+   * Linearize the oplus operator in the vertex, and stores
    * the result in temporary variable vector _jacobianOplus
    */
   virtual void linearizeOplus();

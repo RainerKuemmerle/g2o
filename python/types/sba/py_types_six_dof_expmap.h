@@ -1,8 +1,8 @@
 #pragma once
 
-#include "g2opy.h"
+#include "detail/registry.h"
 namespace g2o {
 
-void declareTypesSixDofExpmap(py::module& m);
+void declareTypesSixDofExpmap(detail::Registry& registry);
 
 }  // end namespace g2o
