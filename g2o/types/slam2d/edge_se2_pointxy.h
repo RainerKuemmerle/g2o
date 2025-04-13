@@ -67,9 +67,7 @@ class G2O_TYPES_SLAM2D_API EdgeSE2PointXY
     (void)to;
     return (from.count(vertices_[0]) == 1 ? 1.0 : -1.0);
   }
-#ifndef NUMERIC_JACOBIAN_TWO_D_TYPES
   void linearizeOplus() override;
-#endif
 };
 
 #ifdef G2O_HAVE_OPENGL
