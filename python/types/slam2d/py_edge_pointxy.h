@@ -21,10 +21,7 @@ inline void declareEdgePointXY(py::module& m) {
       .def("measurement_dimension", &EdgePointXY::measurementDimension)
       .def("set_measurement_from_state", &EdgePointXY::setMeasurementFromState)
       .def("initial_estimate_possible", &EdgePointXY::initialEstimatePossible)
-#ifndef NUMERIC_JACOBIAN_TWO_D_TYPES
-      .def("linearize_oplus", &EdgePointXY::linearizeOplus)
-#endif
-      ;
+      .def("linearize_oplus", &EdgePointXY::linearizeOplus);
 }
 
 }  // end namespace g2o

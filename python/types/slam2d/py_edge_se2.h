@@ -1,5 +1,6 @@
 #pragma once
 
+#include "detail/register_edge.h"
 #include "g2o/types/slam2d/edge_se2.h"
 #include "g2o/types/slam2d/edge_se2_lotsofxy.h"
 #include "g2o/types/slam2d/edge_se2_offset.h"
@@ -14,6 +15,8 @@
 namespace g2o {
 
 inline void declareEdgeSE2(py::module& m) {
+  registerEdgeBinary<EdgeSE2>(m, "EdgeSE2");
+
   templatedBaseBinaryEdge<3, SE2, VertexSE2, VertexSE2>(
       m, "_3_SE2_VertexSE2_VertexSE2");
   py::class_<EdgeSE2, BaseBinaryEdge<3, SE2, VertexSE2, VertexSE2>,
