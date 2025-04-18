@@ -13,16 +13,17 @@ G2O_USE_TYPE_GROUP(slam3d)
 
 namespace g2o {
 
-void declareTypesSlam3d(py::module& m) {
-  declareSalm3dParameter(m);
+void declareTypesSlam3d(detail::Registry& registry) {
+  declareSalm3dParameter(registry);
 
-  declareSE3Quat(m);
-  declareVertexSE3(m);
-  declareVertexPointXYZ(m);
+  declareSE3Quat(registry);
 
-  declareEdgePointXYZ(m);
-  declareEdgeSE3(m);
-  declareEdgeSE3PointXYZ(m);
+  declareVertexSE3(registry);
+  declareVertexPointXYZ(registry);
+
+  declareEdgePointXYZ(registry);
+  declareEdgeSE3(registry);
+  declareEdgeSE3PointXYZ(registry);
 }
 
 }  // namespace g2o

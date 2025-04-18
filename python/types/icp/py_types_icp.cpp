@@ -2,19 +2,16 @@
 
 #include <g2o/types/icp/types_icp.h>
 
+#include "detail/registry.h"
 #include "g2o/core/factory.h"
 #include "g2opy.h"
-#include "python/core/py_base_binary_edge.h"
-#include "python/core/py_base_edge.h"
-#include "python/core/py_base_vertex.h"
-#include "trampoline/py_edge_trampoline.h"
 
 G2O_USE_TYPE_GROUP(icp)
 
 namespace g2o {
 
-void declareTypesICP(py::module& m) {
-  py::class_<EdgeGICP>(m, "EdgeGICP")
+void declareTypesICP(detail::Registry& registry) {
+  py::class_<EdgeGICP>(registry.mod(), "EdgeGICP")
       .def(py::init<>())
 
       .def("make_rot0", &EdgeGICP::makeRot0, "set up rotation matrix for pos0")
@@ -40,27 +37,12 @@ void declareTypesICP(py::module& m) {
       .def_readwrite("R0", &EdgeGICP::R0)
       .def_readwrite("R1", &EdgeGICP::R1);
 
-  templatedBaseEdge<3, EdgeGICP>(m, "_3_EdgeGICP");
-  templatedBaseBinaryEdge<3, EdgeGICP, VertexSE3, VertexSE3>(
-      m, "_3_EdgeGICP_VertexSE3_VertexSE3");
-  py::class_<EdgeVVGicp, BaseBinaryEdge<3, EdgeGICP, VertexSE3, VertexSE3>,
-             PyEdgeTrampoline<EdgeVVGicp>, std::shared_ptr<EdgeVVGicp>>(
-      m, "EdgeVVGicp")
-      .def(py::init<>())
-
-      .def("compute_error", &EdgeVVGicp::computeError)
-#ifdef GICP_ANALYTIC_JACOBIANS
-      .def("linearize_oplus", &EdgeVVGicp::linearizeOplus)
-#endif
-
+  registry.registerEdgeFixed<EdgeVVGicp>("EdgeVVGicp")
       .def_readwrite("pl_pl", &EdgeVVGicp::pl_pl)
       .def_readwrite("cov0", &EdgeVVGicp::cov0)
       .def_readwrite("cov1", &EdgeVVGicp::cov1);
 
-  py::class_<VertexSCam, VertexSE3, std::shared_ptr<VertexSCam>>(m,
-                                                                 "VertexSCam")
-      .def(py::init<>())
-
+  registry.registerVertex<VertexSCam>("VertexSCam")
       .def("oplus_impl",
            [](VertexSCam& v, const VectorX& update) {
              const VectorX::MapType updateMap(
@@ -119,19 +101,7 @@ void declareTypesICP(py::module& m) {
       .def_readwrite("dRdy", &VertexSCam::dRdy)
       .def_readwrite("dRdz", &VertexSCam::dRdz);
 
-  templatedBaseBinaryEdge<3, Vector3, VertexPointXYZ, VertexSCam>(
-      m, "_3_Vector3_VertexSBAPointXYZ_VertexSCam");
-  py::class_<EdgeXyzVsc, BaseBinaryEdge<3, Vector3, VertexPointXYZ, VertexSCam>,
-             PyEdgeTrampoline<EdgeXyzVsc>, std::shared_ptr<EdgeXyzVsc>>(
-      m, "EdgeXyzVsc")
-      .def(py::init<>())
-      .def("compute_error", &EdgeXyzVsc::computeError)
-
-#ifdef SCAM_ANALYTIC_JACOBIANS
-      .def("linearize_oplus", &EdgeXyzVsc::linearizeOplus)
-#endif
-
-      ;
+  registry.registerEdgeFixed<EdgeXyzVsc>("EdgeXyzVsc");
 }
 
 }  // namespace g2o

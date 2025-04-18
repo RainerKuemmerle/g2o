@@ -1,14 +1,16 @@
 #pragma once
 
+#include "detail/registry.h"
 #include "g2o/types/slam3d/parameter_camera.h"
 #include "g2o/types/slam3d/parameter_se3_offset.h"
 #include "g2opy.h"
 
 namespace g2o {
 
-inline void declareSalm3dParameter(py::module& m) {
+inline void declareSalm3dParameter(detail::Registry& registry) {
   py::class_<ParameterSE3Offset, Parameter,
-             std::shared_ptr<ParameterSE3Offset>>(m, "ParameterSE3Offset")
+             std::shared_ptr<ParameterSE3Offset>>(registry.mod(),
+                                                  "ParameterSE3Offset")
       .def(py::init<>())
 
       .def("set_param", &ParameterSE3Offset::setParam)
@@ -20,7 +22,7 @@ inline void declareSalm3dParameter(py::module& m) {
   // class G2O_TYPES_SLAM3D_API CacheSE3OffsetDrawAction: public DrawAction
 
   py::class_<ParameterCamera, Parameter, std::shared_ptr<ParameterCamera>>(
-      m, "ParameterCamera")
+      registry.mod(), "ParameterCamera")
       .def(py::init<>())
       .def("set_param", &ParameterCamera::setParam)
       .def("param", &ParameterCamera::param);

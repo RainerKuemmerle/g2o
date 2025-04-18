@@ -1,11 +1,9 @@
 #pragma once
 
-#include "g2o/types/sim3/types_seven_dof_expmap.h"
-#include "g2opy.h"
-#include "python/core/py_base_binary_edge.h"
+#include "detail/registry.h"
 
 namespace g2o {
 
-void declareTypesSevenDofExpmap(py::module& m);
+void declareTypesSevenDofExpmap(detail::Registry& registry);
 
 }  // namespace g2o
