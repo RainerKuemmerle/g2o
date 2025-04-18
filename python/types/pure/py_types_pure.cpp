@@ -1,6 +1,5 @@
 #include "py_types_pure.h"
 
-#include <Eigen/src/Core/util/Constants.h>
 #include <pybind11/cast.h>
 #include <pybind11/pybind11.h>
 #include <pybind11/pytypes.h>
