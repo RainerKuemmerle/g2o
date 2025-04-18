@@ -2,9 +2,6 @@
 
 #include "g2o/types/slam2d/se2.h"
 #include "g2opy.h"
-#include "python/core/py_base_edge.h"
-#include "python/core/py_base_variable_sized_edge.h"
-#include "python/core/py_base_vertex.h"
 
 namespace g2o {
 
@@ -29,10 +26,6 @@ inline void declareSE2(py::module& m) {
       .def("vector", &SE2::toVector)
       .def("to_isometry", &SE2::toIsometry)
       .def("Isometry2", &SE2::toIsometry);
-
-  templatedBaseVertex<3, SE2>(m, "_3_SE2");
-  templatedBaseEdge<3, SE2>(m, "_3_SE2");
-  templatedBaseVariableSizedEdge<3, SE2>(m, "_3_SE2");
 }
 
 }  // namespace g2o

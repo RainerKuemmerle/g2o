@@ -19,9 +19,7 @@ endif()
 # python wrapper library
 pybind11_add_module(g2opy
     # core
-    core/py_base_edge.cpp
     core/py_base_variable_sized_edge.cpp
-    core/py_base_vertex.cpp
     core/py_batch_stats.cpp
     core/py_block_solver.cpp
     core/py_core.cpp
@@ -38,14 +36,14 @@ pybind11_add_module(g2opy
     core/py_sparse_block_matrix.cpp
     core/py_sparse_optimizer.cpp
     # types
-    types/icp/py_types_icp.cpp
-    types/pure/py_types_pure.cpp
-    types/sclam2d/py_types_sclam2d.cpp
-    types/sim3/py_types_seven_dof_expmap.cpp
+    #types/icp/py_types_icp.cpp
+    #types/pure/py_types_pure.cpp
+    #types/sclam2d/py_types_sclam2d.cpp
+    #types/sim3/py_types_seven_dof_expmap.cpp
     types/slam2d/py_types_slam2d.cpp
-    types/slam3d/py_types_slam3d.cpp
-    types/sba/py_types_sba.cpp
-    types/sba/py_types_six_dof_expmap.cpp
+    #types/slam3d/py_types_slam3d.cpp
+    #types/sba/py_types_sba.cpp
+    #types/sba/py_types_six_dof_expmap.cpp
     # simulator
     ${PYSIM_SRC}
     # module main
