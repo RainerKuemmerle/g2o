@@ -19,7 +19,6 @@ endif()
 # python wrapper library
 pybind11_add_module(g2opy
     # core
-    core/py_base_variable_sized_edge.cpp
     core/py_batch_stats.cpp
     core/py_block_solver.cpp
     core/py_core.cpp

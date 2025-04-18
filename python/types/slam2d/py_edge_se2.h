@@ -12,31 +12,12 @@ namespace g2o {
 
 inline void declareEdgeSE2(detail::Registry& registry) {
   registry.registerEdgeFixed<EdgeSE2>("EdgeSE2");
-
-#if 0
-  py::class_<EdgeSE2LotsOfXY, BaseVariableSizedEdge<-1, VectorX>,
-             PyEdgeTrampoline<EdgeSE2LotsOfXY>,
-             std::shared_ptr<EdgeSE2LotsOfXY>>(m, "EdgeSE2LotsOfXY")
-      .def(py::init<>())
-      .def("set_dimension", &EdgeSE2LotsOfXY::setDimension<-1>)
-      .def("resize", &EdgeSE2LotsOfXY::resize)
-
-      .def("compute_error", &EdgeSE2LotsOfXY::computeError)
-      .def("set_measurement_from_state",
-           &EdgeSE2LotsOfXY::setMeasurementFromState)
-      .def("initial_estimate_possible",
-           &EdgeSE2LotsOfXY::initialEstimatePossible)
-      .def("initial_estimate", &EdgeSE2LotsOfXY::initialEstimate)
-      .def("linearize_oplus", &EdgeSE2LotsOfXY::linearizeOplus);
-#endif
-
   registry.registerEdgeFixed<EdgeSE2Offset>("EdgeSE2Offset");
-
   registry.registerEdgeFixed<EdgeSE2Prior>("EdgeSE2Prior");
-
   registry.registerEdgeFixed<EdgeSE2TwoPointsXY>("EdgeSE2TwoPointsXY");
-
   registry.registerEdgeFixed<EdgeSE2XYPrior>("EdgeSE2XYPrior");
+
+  registry.registerVariableEdge<EdgeSE2LotsOfXY>("EdgeSE2LotsOfXY");
 }
 
 }  // end namespace g2o

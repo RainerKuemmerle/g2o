@@ -11,6 +11,7 @@
 #include "g2o/core/base_binary_edge.h"
 #include "g2o/core/base_fixed_sized_edge.h"
 #include "g2o/core/base_unary_edge.h"
+#include "g2o/core/base_variable_sized_edge.h"
 #include "g2o/core/base_vertex.h"
 #include "g2opy.h"
 #include "python/trampoline/py_edge_trampoline.h"
@@ -63,6 +64,18 @@ class Registry {
     } else {
       static_assert(false, "Not implemented size of fixed edge");
     }
+  }
+
+  template <typename EdgeType>
+  void registerVariableEdge(const char* name) {
+    this->registerBaseVariableEdge<EdgeType::kDimension,
+                                   typename EdgeType::Measurement>();
+    py::class_<EdgeType,
+               BaseVariableSizedEdge<EdgeType::kDimension,
+                                     typename EdgeType::Measurement>,
+               PyEdgeTrampoline<EdgeType>, std::shared_ptr<EdgeType>>(mod_,
+                                                                      name)
+        .def(py::init<>());
   }
 
   template <typename VertexType>
@@ -231,6 +244,51 @@ class Registry {
 
     py::class_<CLS, BaseEdge<D, E>, std::shared_ptr<CLS>>(
         mod_, base_fixed_size_edge_name.c_str())
+        // abstract class type ..."
+        // TODO(Rainer): Fix binding of create_vertex
+        //  .def("create_vertex", &CLS::createVertex,
+        //       "i"_a)  // -> OptimizableGraph::Vertex*
+        .def("resize", &CLS::resize)
+        .def("all_vertices_fixed", &CLS::allVerticesFixed)
+        .def("compute_error", &CLS::computeError)
+        .def("linearize_oplus", static_cast<void (CLS::*)(JacobianWorkspace&)>(
+                                    &CLS::linearizeOplus))
+        .def("linearize_oplus",
+             static_cast<void (CLS::*)()>(&CLS::linearizeOplus))
+        .def("set_measurement_data", &CLS::setMeasurementData)
+        .def("get_measurement_data", &CLS::getMeasurementData)
+        .def("measurement_dimension", &CLS::measurementDimension)
+        .def("set_measurement_from_state", &CLS::setMeasurementFromState)
+        .def("initial_estimate_possible", &CLS::initialEstimatePossible)
+        .def("initial_estimate", &CLS::initialEstimate)
+        .def("construct_quadratic_form", &CLS::constructQuadraticForm)
+        .def("map_hessian_memory", &CLS::mapHessianMemory, "d"_a, "i"_a, "j"_a,
+             "row_mayor"_a)
+        .def("jacobian", &CLS::jacobian, "vertex_index"_a)  // int -> Matrix
+        .def("set_jacobian", &CLS::setJacobian, "vertex_index"_a,
+             "jacobian"_a)  // int, Matrix ->
+        ;
+  }
+
+  template <int D, typename E, typename... VertexTypes>
+  void registerBaseVariableEdge() {
+    this->registerBaseEdge<D, E>();
+
+    using CLS = BaseVariableSizedEdge<D, E>;
+
+    const std::string dim_str = D > 0 ? std::to_string(D) : "Dyn";
+    const std::string measurement_str = pybind11::type_id<E>();
+
+    std::stringstream base_variable_edge_name;
+    base_variable_edge_name << "BaseVariableEdge_" << dim_str << '_'
+                            << measurement_str;
+    if (registered_edges_.count(base_variable_edge_name.str()) > 0) {
+      return;
+    }
+    registered_edges_.insert(base_variable_edge_name.str());
+
+    py::class_<CLS, BaseEdge<D, E>, std::shared_ptr<CLS>>(
+        mod_, base_variable_edge_name.str().c_str())
         // abstract class type ..."
         // TODO(Rainer): Fix binding of create_vertex
         //  .def("create_vertex", &CLS::createVertex,

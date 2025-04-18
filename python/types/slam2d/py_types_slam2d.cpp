@@ -5,7 +5,9 @@
 #include "py_parameter_se2_offset.h"
 #include "py_vertex_point_xy.h"
 #include "py_vertex_se2.h"
+#include "types/slam2d/py_edge_pointxy.h"
 #include "types/slam2d/py_edge_se2.h"
+#include "types/slam2d/py_edge_se2_pointxy.h"
 #include "types/slam2d/py_se2.h"
 
 G2O_USE_TYPE_GROUP(slam2d)
@@ -21,8 +23,8 @@ void declareTypesSlam2d(detail::Registry& registry) {
   declareVertexSE2(registry);
 
   declareEdgeSE2(registry);
-  // declareEdgePointXY(registry);
-  // declareEdgeSE2PointXY(registry);
+  declareEdgePointXY(registry);
+  declareEdgeSE2PointXY(registry);
 }
 
 }  // namespace g2o
