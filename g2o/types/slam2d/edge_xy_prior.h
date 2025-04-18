@@ -57,9 +57,7 @@ class G2O_TYPES_SLAM2D_API EdgeXYPrior
                                  OptimizableGraph::Vertex*) override {
     return 0.;
   }
-#ifndef NUMERIC_JACOBIAN_TWO_D_TYPES
   void linearizeOplus() override;
-#endif
 };
 
 }  // namespace g2o

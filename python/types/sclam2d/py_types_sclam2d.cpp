@@ -10,11 +10,11 @@ G2O_USE_TYPE_GROUP(sclam)
 
 namespace g2o {
 
-void declareTypesSclam2d(py::module& m) {
-  declareOdometryMeasurement(m);
-  declareVertexOdomDifferentialParams(m);
-  declareEdgeSE2SensorCalib(m);
-  declareEdgeSE2OdomDifferentialCalib(m);
+void declareTypesSclam2d(detail::Registry& registry) {
+  declareOdometryMeasurement(registry);
+  declareVertexOdomDifferentialParams(registry);
+  declareEdgeSE2SensorCalib(registry);
+  declareEdgeSE2OdomDifferentialCalib(registry);
 }
 
 }  // namespace g2o

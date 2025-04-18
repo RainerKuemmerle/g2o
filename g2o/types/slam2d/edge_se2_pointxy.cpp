@@ -54,7 +54,6 @@ void EdgeSE2PointXY::initialEstimate(const OptimizableGraph::VertexSet& from,
   }
 }
 
-#ifndef NUMERIC_JACOBIAN_TWO_D_TYPES
 void EdgeSE2PointXY::linearizeOplus() {
   const VertexSE2* vi = vertexXnRaw<0>();
   const VertexPointXY* vj = vertexXnRaw<1>();
@@ -80,7 +79,6 @@ void EdgeSE2PointXY::linearizeOplus() {
   jacobianOplusXj_(1, 0) = -aux_3;
   jacobianOplusXj_(1, 1) = aux_1;
 }
-#endif
 
 #ifdef G2O_HAVE_OPENGL
 EdgeSE2PointXYDrawAction::EdgeSE2PointXYDrawAction()

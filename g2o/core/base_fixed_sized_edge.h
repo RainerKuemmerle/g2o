@@ -123,11 +123,12 @@ std::enable_if_t<I != -1, OptimizableGraph::Vertex*> createNthVertexType(
 template <int D, typename E, typename... VertexTypes>
 class BaseFixedSizedEdge : public BaseEdge<D, E> {
  public:
-  template <int N, typename... Types>
-  using NthType = typename std::tuple_element<N, std::tuple<Types...>>::type;
+  using VertexTypeTuple = std::tuple<VertexTypes...>;
+  template <int N>
+  using NthType = typename std::tuple_element<N, VertexTypeTuple>::type;
   //! The type of the N-th vertex
   template <int VertexN>
-  using VertexXnType = NthType<VertexN, VertexTypes...>;
+  using VertexXnType = NthType<VertexN>;
   //! Size of the N-th vertex at compile time
   template <int VertexN>
   static constexpr int VertexDimension() {

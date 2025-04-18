@@ -1,11 +1,6 @@
 #include "py_core.h"
 
 #include "core/py_io_format.h"
-#include "py_base_binary_edge.h"
-#include "py_base_edge.h"
-#include "py_base_unary_edge.h"
-#include "py_base_variable_sized_edge.h"
-#include "py_base_vertex.h"
 #include "py_batch_stats.h"
 #include "py_block_solver.h"
 #include "py_eigen_types.h"
@@ -16,7 +11,6 @@
 #include "py_hyper_graph_action.h"
 #include "py_io_format.h"
 #include "py_jacobian_workspace.h"
-#include "py_linear_solver.h"
 #include "py_optimizable_graph.h"
 #include "py_optimization_algorithm.h"
 #include "py_parameter.h"
@@ -46,9 +40,9 @@ void declareCore(py::module& m) {
   declareG2OBatchStatistics(m);
 
   declareJacobianWorkspace(m);
-  declareBaseVertex(m);
-  declareBaseEdge(m);
-  declareBaseVariableSizedEdge(m);
+  // declareBaseVertex(m);
+  // declareBaseEdge(m);
+  // declareBaseVariableSizedEdge(m);
 
   declareRobustKernel(m);
   declareSolver(m);

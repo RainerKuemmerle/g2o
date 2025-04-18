@@ -4,6 +4,7 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/pytypes.h>
 
+#include "detail/registry.h"
 #include "g2o/core/base_dynamic_vertex.h"
 #include "g2o/core/base_variable_sized_edge.h"
 #include "g2o/core/eigen_types.h"
@@ -79,40 +80,19 @@ class PyVariableVectorXEdge : public VariableVectorXEdge {
   }
 };
 
-void declareTypesPure(py::module& m) {
+void declareTypesPure(detail::Registry& registry) {
+  registry.registerBaseVertex<Eigen::Dynamic, VectorX>();
+
   py::class_<VectorXVertex, PyVectorXVertex,
              BaseVertex<Eigen::Dynamic, VectorX>,
-             std::shared_ptr<VectorXVertex>>(m, "VectorXVertex")
+             std::shared_ptr<VectorXVertex>>(registry.mod(), "VectorXVertex")
       .def(py::init<>())
-      .def("estimate", &VectorXVertex::estimate,
-           py::return_value_policy::reference)                   // -> T&
-      .def("set_estimate", &VectorXVertex::setEstimate, "et"_a)  // T& -> void;
-      .def("dimension", &VectorXVertex::dimension)
-      .def("set_dimension", &VectorXVertex::setDimension)
       .def("oplus_impl",
            &VectorXVertex::oplus_impl)  // -> void, to be implemented in python
       ;
 
-  py::class_<VariableVectorXEdge, PyVariableVectorXEdge,
-             BaseVariableSizedEdge<Eigen::Dynamic, VectorX>,
-             std::shared_ptr<VariableVectorXEdge>>(m, "VariableVectorXEdge")
-      .def(py::init<>())
-      .def("compute_error",
-           &VariableVectorXEdge::computeError)  // -> vector, to be implemented
-                                                // in python
-      .def("set_measurement", &VariableVectorXEdge::setMeasurement)
-      .def("set_dimension", &VariableVectorXEdge::setDimension<-1>)  // int ->
-      .def(
-          "linearize_oplus",
-          py::overload_cast<>(&VariableVectorXEdge::linearizeOplus))  // void ->
-      // .def("set_measurement_data", &EdgeSE2::setMeasurementData)
-      // .def("get_measurement_data", &EdgeSE2::getMeasurementData)
-      // .def("measurement_dimension", &EdgeSE2::measurementDimension)
-      // .def("set_measurement_from_state", &EdgeSE2::setMeasurementFromState)
-      // .def("initial_estimate_possible", &EdgeSE2::initialEstimatePossible)
-      // .def("initial_estimate", &EdgeSE2::initialEstimate)
-      // .def("linearize_oplus", &EdgeSE2::linearizeOplus)
-      ;
+  registry.registerVariableEdge<VariableVectorXEdge, PyVariableVectorXEdge>(
+      "VariableVectorXEdge");
 }
 
 }  // namespace g2o

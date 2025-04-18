@@ -1,6 +1,6 @@
 #pragma once
 
-#include "g2opy.h"
+#include "detail/registry.h"
 #include "icp/py_types_icp.h"
 #include "pure/py_types_pure.h"
 #include "sba/py_sbacam.h"
@@ -13,29 +13,29 @@
 
 namespace g2o {
 
-inline void declareTypes(py::module& m) {
+inline void declareTypes(detail::Registry& registry) {
   // slam2d
-  declareTypesSlam2d(m);
+  declareTypesSlam2d(registry);
 
   // slam3d
-  declareTypesSlam3d(m);
+  declareTypesSlam3d(registry);
 
   // sba
-  declareTypesSBA(m);
-  declareTypesSixDofExpmap(m);
-  declareSBACam(m);
+  declareSBACam(registry.mod());
+  declareTypesSBA(registry);
+  declareTypesSixDofExpmap(registry);
 
   // sim3
-  declareTypesSevenDofExpmap(m);
+  declareTypesSevenDofExpmap(registry);
 
   // icp
-  declareTypesICP(m);
+  declareTypesICP(registry);
 
   // sclam2d
-  declareTypesSclam2d(m);
+  declareTypesSclam2d(registry);
 
   // pure python types
-  declareTypesPure(m);
+  declareTypesPure(registry);
 }
 
 }  // end namespace g2o

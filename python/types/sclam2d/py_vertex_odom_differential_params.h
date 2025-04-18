@@ -2,15 +2,13 @@
 
 #include <g2o/types/sclam2d/vertex_odom_differential_params.h>
 
-#include "g2opy.h"
+#include "detail/registry.h"
 
 namespace g2o {
 
-inline void declareVertexOdomDifferentialParams(py::module& m) {
-  py::class_<VertexOdomDifferentialParams, BaseVertex<3, Vector3>,
-             std::shared_ptr<VertexOdomDifferentialParams>>(
-      m, "VertexOdomDifferentialParams")
-      .def(py::init<>());
+inline void declareVertexOdomDifferentialParams(detail::Registry& registry) {
+  registry.registerVertex<VertexOdomDifferentialParams>(
+      "VertexOdomDifferentialParams");
 }
 
 }  // namespace g2o

@@ -52,7 +52,6 @@ void EdgeSE2::initialEstimate(const OptimizableGraph::VertexSet& from,
     fromEdge->setEstimate(toEdge->estimate() * inverseMeasurement_);
 }
 
-#ifndef NUMERIC_JACOBIAN_TWO_D_TYPES
 void EdgeSE2::linearizeOplus() {
   const VertexSE2* vi = vertexXnRaw<0>();
   const VertexSE2* vj = vertexXnRaw<1>();
@@ -75,7 +74,6 @@ void EdgeSE2::linearizeOplus() {
   jacobianOplusXi_ = z * jacobianOplusXi_;
   jacobianOplusXj_ = z * jacobianOplusXj_;
 }
-#endif
 
 #ifdef G2O_HAVE_OPENGL
 EdgeSE2DrawAction::EdgeSE2DrawAction()

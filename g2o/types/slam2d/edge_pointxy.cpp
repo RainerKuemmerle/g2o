@@ -35,11 +35,9 @@ EdgePointXY::EdgePointXY()
   error_.setZero();
 }
 
-#ifndef NUMERIC_JACOBIAN_TWO_D_TYPES
 void EdgePointXY::linearizeOplus() {
   jacobianOplusXi_ = -Matrix2::Identity();
   jacobianOplusXj_ = Matrix2::Identity();
 }
-#endif
 
 }  // namespace g2o

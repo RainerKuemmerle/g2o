@@ -1,90 +1,36 @@
 #include "py_types_sba.h"
 
+#include "detail/registry.h"
 #include "g2o/core/factory.h"
 #include "g2o/types/sba/edge_project_p2mc.h"
 #include "g2o/types/sba/edge_project_p2sc.h"
 #include "g2o/types/sba/edge_sba_cam.h"
 #include "g2o/types/sba/edge_sba_scale.h"
-#include "g2o/types/sba/types_sba.h"
 #include "g2o/types/sba/vertex_intrinsics.h"
 #include "g2opy.h"
-#include "python/core/py_base_binary_edge.h"
-#include "python/core/py_base_vertex.h"
-#include "trampoline/py_edge_trampoline.h"
 
 G2O_USE_TYPE_GROUP(sba)
 
 namespace g2o {
 
 namespace {
-void declareVertexIntrinsics(py::module& m) {
-  py::class_<VertexIntrinsicsEstimate>(m, "VertexIntrinsicsEstimate")
+void declareVertexIntrinsics(detail::Registry& registry) {
+  py::class_<VertexIntrinsicsEstimate>(registry.mod(),
+                                       "VertexIntrinsicsEstimate")
       .def(py::init<>())
       .def_readwrite("values", &VertexIntrinsicsEstimate::values);
-
-  templatedBaseVertex<4, VertexIntrinsicsEstimate>(m, "_4_Vertextrinsics");
 }
 }  // namespace
 
-void declareTypesSBA(py::module& m) {
-  declareVertexIntrinsics(m);
-  py::class_<VertexIntrinsics, BaseVertex<4, VertexIntrinsicsEstimate>,
-             std::shared_ptr<VertexIntrinsics>>(m, "VertexIntrinsics")
-      .def(py::init<>());
+void declareTypesSBA(detail::Registry& registry) {
+  declareVertexIntrinsics(registry);
+  registry.registerVertex<VertexIntrinsics>("VertexIntrinsics");
+  registry.registerVertex<VertexCam>("VertexCam");
 
-  templatedBaseVertex<6, SBACam>(m, "_6_SBACam");
-  py::class_<VertexCam, BaseVertex<6, SBACam>, std::shared_ptr<VertexCam>>(
-      m, "VertexCam")
-      .def(py::init<>());
-
-  // monocular projection
-  // first two args are the measurement type, second two the connection classes
-  templatedBaseBinaryEdge<2, Vector2, VertexPointXYZ, VertexCam>(
-      m, "_2_Vector2_VertexPointXYZ_VertexCam");
-  py::class_<
-      EdgeProjectP2MC, BaseBinaryEdge<2, Vector2, VertexPointXYZ, VertexCam>,
-      PyEdgeTrampoline<EdgeProjectP2MC>, std::shared_ptr<EdgeProjectP2MC>>(
-      m, "EdgeProjectP2MC")
-      .def(py::init<>())
-      .def("compute_error", &EdgeProjectP2MC::computeError)  // () -> void
-      .def("linearize_oplus", &EdgeProjectP2MC::linearizeOplus);
-
-  // stereo projection
-  // first two args are the measurement type, second two the connection classes
-  templatedBaseBinaryEdge<3, Vector3, VertexPointXYZ, VertexCam>(
-      m, "_3_Vector3_VertexPointXYZ_VertexCam");
-  py::class_<
-      EdgeProjectP2SC, BaseBinaryEdge<3, Vector3, VertexPointXYZ, VertexCam>,
-      PyEdgeTrampoline<EdgeProjectP2SC>, std::shared_ptr<EdgeProjectP2SC>>(
-      m, "EdgeProjectP2SC")
-      .def(py::init<>())
-      .def("compute_error", &EdgeProjectP2SC::computeError)  // () -> void
-      .def("linearize_oplus", &EdgeProjectP2SC::linearizeOplus);
-
-  templatedBaseBinaryEdge<6, SE3Quat, VertexCam, VertexCam>(
-      m, "_6_SE3Quat_VertexCam_VertexCam");
-  py::class_<EdgeSBACam, BaseBinaryEdge<6, SE3Quat, VertexCam, VertexCam>,
-             PyEdgeTrampoline<EdgeSBACam>, std::shared_ptr<EdgeSBACam>>(
-      m, "EdgeSBACam")
-      .def(py::init<>())
-      .def("compute_error", &EdgeSBACam::computeError)
-      .def("set_measurement", &EdgeSBACam::setMeasurement)
-      .def("initial_estimate_possible", &EdgeSBACam::initialEstimatePossible)
-      .def("set_measurement_data", &EdgeSBACam::setMeasurementData)
-      .def("get_measurement_data", &EdgeSBACam::getMeasurementData)
-      .def("measurement_dimension", &EdgeSBACam::measurementDimension)
-      .def("set_measurement_from_state", &EdgeSBACam::setMeasurementFromState);
-
-  templatedBaseBinaryEdge<1, double, VertexCam, VertexCam>(
-      m, "_1_double_VertexCam_VertexCam");
-  py::class_<EdgeSBAScale, BaseBinaryEdge<1, double, VertexCam, VertexCam>,
-             PyEdgeTrampoline<EdgeSBAScale>, std::shared_ptr<EdgeSBAScale>>(
-      m, "EdgeSBAScale")
-      .def(py::init<>())
-      .def("compute_error", &EdgeSBAScale::computeError)
-      .def("set_measurement", &EdgeSBAScale::setMeasurement)
-      .def("initial_estimate_possible", &EdgeSBAScale::initialEstimatePossible)
-      .def("initial_estimate", &EdgeSBAScale::initialEstimate);
+  registry.registerEdgeFixed<EdgeProjectP2MC>("EdgeProjectP2MC");
+  registry.registerEdgeFixed<EdgeProjectP2SC>("EdgeProjectP2SC");
+  registry.registerEdgeFixed<EdgeSBACam>("EdgeSBACam");
+  registry.registerEdgeFixed<EdgeSBAScale>("EdgeSBAScale");
 }
 
 }  // end namespace g2o
