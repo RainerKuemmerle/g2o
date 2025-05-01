@@ -1,0 +1,20 @@
+[build-system]
+requires = ["scikit-build-core", "pybind11"]
+build-backend = "scikit_build_core.build"
+
+[project]
+name = "g2opy"
+version = "2.1.0"
+
+[tool.scikit-build]
+cmake.args = [
+  "-DBUILD_SHARED_LIBS:=Off",
+  "-DG2O_BUILD_PYTHON:=On",
+  "-DG2O_BUILD_APPS:=Off",
+  "-DG2O_BUILD_EXAMPLES:=Off",
+  "-DG2O_USE_OPENGL:=Off"
+]
+wheel.packages = ["python/g2opy"]
+messages.after-failure = "Build failed."
+build.targets = ["g2opy"]
+#build-dir = "/tmp/g2opy"
