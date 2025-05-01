@@ -37,6 +37,7 @@ The branch [pymem](https://github.com/RainerKuemmerle/g2o/tree/pymem) contains a
 It is currently experimental but PRs and improvements are welcome - as always.
 
 See [g2o-python](https://github.com/miquelmassot/g2o-python) for the pypi release of g2o's python bindings.
+See below for how to install the python bindings from this repository directly.
 
 ## Papers Describing the Approach
 
@@ -189,6 +190,23 @@ cd build`
 cmake -DCMAKE_TOOLCHAIN_FILE=../script/android.toolchain.cmake -DANDROID_NDK=<YOUR_PATH_TO_ANDROID_NDK_r10d+> -DCMAKE_BUILD_TYPE=Release -DANDROID_ABI="armeabi-v7a with NEON" -DEIGEN3_INCLUDE_DIR="<YOUR_PATH_TO_EIGEN>" -DEIGEN3_VERSION_OK=ON ..
 cmake --build .
 ```
+
+## Installing the python wrapper
+
+If you want to install `g2opy`, i.e., the python bindings for g2o, you can use `pip` preferably in a virtual env.
+
+#### Preparing the virtual env
+```
+python3 -m venv ~/.venvs/g2opy
+source ~/.venvs/g2opy/bin/activate
+```
+
+#### Installing via pip
+```
+pip install -v .
+```
+
+Afterwards you should be able to run the examples. For example, by running `python3 python/examples/ba_demo.py`.
 
 ## Acknowledgments
 
