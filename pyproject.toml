@@ -17,4 +17,7 @@ cmake.args = [
 wheel.packages = ["python/g2opy"]
 messages.after-failure = "Build failed."
 build.targets = ["g2opy"]
-#build-dir = "/tmp/g2opy"
+
+[[tool.scikit-build.overrides]]
+if.env.G2O_CACHE_BUILD = true
+build-dir = "/tmp/g2opy"
