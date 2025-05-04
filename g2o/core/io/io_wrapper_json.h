@@ -66,9 +66,31 @@ void store_if_not_empty(nlohmann::json& j, const char* key, const T& value) {
 }
 }  // namespace internal
 
-NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(AbstractGraph::AbstractParameter, tag, id,
-                                   value);
-NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(AbstractGraph::AbstractData, tag, data);
+// PARAMETER
+inline void to_json(nlohmann::json& j,
+                    const AbstractGraph::AbstractParameter& param) {
+  j = nlohmann::json{
+      {"tag", param.tag}, {"id", param.id}, {"value", param.value}};
+}
+
+inline void from_json(const nlohmann::json& j,
+                      AbstractGraph::AbstractParameter& param) {
+  j.at("tag").get_to(param.tag);
+  j.at("id").get_to(param.id);
+  j.at("value").get_to(param.value);
+}
+
+// DATA
+inline void to_json(nlohmann::json& j,
+                    const AbstractGraph::AbstractData& param) {
+  j = nlohmann::json{{"tag", param.tag}, {"data", param.data}};
+}
+
+inline void from_json(const nlohmann::json& j,
+                      AbstractGraph::AbstractData& param) {
+  j.at("tag").get_to(param.tag);
+  j.at("data").get_to(param.data);
+}
 
 // VERTEX
 inline void to_json(nlohmann::json& j,
