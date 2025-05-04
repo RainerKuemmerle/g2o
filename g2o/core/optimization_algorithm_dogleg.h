@@ -27,6 +27,7 @@
 #ifndef G2O_OPTIMIZATION_ALGORITHM_DOGLEG_H
 #define G2O_OPTIMIZATION_ALGORITHM_DOGLEG_H
 
+#include <cstdint>
 #include <iosfwd>
 #include <memory>
 
