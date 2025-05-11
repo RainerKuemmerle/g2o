@@ -1,12 +1,12 @@
 name: Wheel
 
 on:
-  #push:
-  #  branches:
-  #    - pymem
-  #pull_request:
-  #  branches:
-  #    - pymem
+#  push:
+#    branches:
+#      - pymem
+#  pull_request:
+#    branches:
+#      - pymem
   workflow_dispatch:
     inputs:
       upload_pypi:
@@ -42,7 +42,7 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          ## Window 64 bit
+          # Window 64 bit
           - os: windows-latest
             python: 310
             platform_id: win_amd64
@@ -74,23 +74,23 @@ jobs:
             platform_id: manylinux_x86_64
             manylinux_image: manylinux_2_28
 
-          ## Linux 64 bit manylinux_2_28
-          #- os: ubuntu-24.04-arm
-          #  python: 310
-          #  platform_id: manylinux_aarch64
-          #  manylinux_image: manylinux_2_28
-          #- os: ubuntu-24.04-arm
-          #  python: 311
-          #  platform_id: manylinux_aarch64
-          #  manylinux_image: manylinux_2_28
-          #- os: ubuntu-24.04-arm
-          #  python: 312
-          #  platform_id: manylinux_aarch64
-          #  manylinux_image: manylinux_2_28
-          #- os: ubuntu-24.04-arm
-          #  python: 313
-          #  platform_id: manylinux_aarch64
-          #  manylinux_image: manylinux_2_28
+          # Linux 64 bit manylinux_2_28
+          - os: ubuntu-24.04-arm
+            python: 310
+            platform_id: manylinux_aarch64
+            manylinux_image: manylinux_2_28
+          - os: ubuntu-24.04-arm
+            python: 311
+            platform_id: manylinux_aarch64
+            manylinux_image: manylinux_2_28
+          - os: ubuntu-24.04-arm
+            python: 312
+            platform_id: manylinux_aarch64
+            manylinux_image: manylinux_2_28
+          - os: ubuntu-24.04-arm
+            python: 313
+            platform_id: manylinux_aarch64
+            manylinux_image: manylinux_2_28
 
           ## MacOS x86_64
           #- os: macos-13
@@ -136,6 +136,7 @@ jobs:
           CIBW_ARCHS: all
           CIBW_MANYLINUX_X86_64_IMAGE: ${{ matrix.manylinux_image }}
           CIBW_MANYLINUX_I686_IMAGE: ${{ matrix.manylinux_image }}
+          CIBW_MANYLINUX_AARCH64_IMAGE: ${{ matrix.manylinux_image }}
 
       - uses: actions/upload-artifact@v4
         with:
