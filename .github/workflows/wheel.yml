@@ -8,6 +8,11 @@ on:
   #  branches:
   #    - pymem
   workflow_dispatch:
+    inputs:
+      upload_pypi:
+        description: 'True to upload to pypi'
+        required: true
+        type: boolean
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -38,18 +43,18 @@ jobs:
       matrix:
         include:
           ## Window 64 bit
-          #- os: windows-latest
-          #  python: 310
-          #  platform_id: win_amd64
-          #- os: windows-latest
-          #  python: 311
-          #  platform_id: win_amd64
-          #- os: windows-latest
-          #  python: 312
-          #  platform_id: win_amd64
-          #- os: windows-latest
-          #  python: 313
-          #  platform_id: win_amd64
+          - os: windows-latest
+            python: 310
+            platform_id: win_amd64
+          - os: windows-latest
+            python: 311
+            platform_id: win_amd64
+          - os: windows-latest
+            python: 312
+            platform_id: win_amd64
+          - os: windows-latest
+            python: 313
+            platform_id: win_amd64
 
           # Linux 64 bit manylinux_2_28
           - os: ubuntu-latest
@@ -100,9 +105,6 @@ jobs:
           #- os: macos-13
           #  python: 313
           #  platform_id: macosx_x86_64
-          #- os: macos-13
-          #  python: 313t
-          #  platform_id: macosx_x86_64
 
           ## MacOS arm64
           #- os: macos-14
@@ -116,9 +118,6 @@ jobs:
           #  platform_id: macosx_arm64
           #- os: macos-14
           #  python: 313
-          #  platform_id: macosx_arm64
-          #- os: macos-14
-          #  python: 313t
           #  platform_id: macosx_arm64
 
     steps:
@@ -146,6 +145,7 @@ jobs:
   upload_all:
     needs: [build_wheels, make_sdist]
     runs-on: ubuntu-latest
+    if: ${{ inputs.upload_pypi }}
     steps:
     - uses: actions/download-artifact@v4
       with:
