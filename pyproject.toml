@@ -23,6 +23,7 @@ cmake.args = [
 wheel.packages = ["python/g2opy"]
 messages.after-failure = "Build failed."
 build.targets = ["g2opy"]
+build.tool-args = ["-j4"]
 
 [[tool.scikit-build.overrides]]
 if.env.G2O_CACHE_BUILD = true
@@ -39,3 +40,16 @@ before-build = "yum install -y eigen3-devel"
 select = "*-musllinux*"
 before-all = "apk add eigen"
 # nlohmann-json
+
+# windows
+[[tool.scikit-build.overrides]]
+if.platform-system = "^win32"
+inherit.cmake.args = "append"
+cmake.args = [
+ "-DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake"
+]
+build.tool-args = ["-maxcpucount:4"]
+
+[[tool.cibuildwheel.overrides]]
+select = "*win*"
+before-all = "vcpkg --triplet x64-windows install eigen3 nlohmann-json"
