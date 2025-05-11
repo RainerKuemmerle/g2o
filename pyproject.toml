@@ -33,13 +33,12 @@ build-dir = "/tmp/g2opy"
 build-frontend = "build[uv]"
 
 [tool.cibuildwheel.linux]
-before-build = "yum install -y eigen3-devel"
-#TODO install json-devel
+before-build = "yum install -y eigen3-devel json-devel"
 
 [[tool.cibuildwheel.overrides]]
 select = "*-musllinux*"
 before-all = "apk add eigen"
-# nlohmann-json
+# TODO install nlohmann-json
 
 # windows
 [[tool.scikit-build.overrides]]
