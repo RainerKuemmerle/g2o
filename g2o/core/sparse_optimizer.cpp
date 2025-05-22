@@ -507,8 +507,8 @@ bool SparseOptimizer::updateInitialization(HyperGraph::VertexSet& vset,
   }
 
   if (newVertices.size() != vset.size()) {
-    G2O_ERROR(fmt::runtime("{}: something went wrong, size mismatch {} != {}"), vset.size(),
-              newVertices.size());
+    G2O_ERROR(fmt::runtime("{}: something went wrong, size mismatch {} != {}"),
+              vset.size(), newVertices.size());
   }
   return _algorithm->updateStructure(newVertices, eset);
 }
