@@ -10,6 +10,7 @@ add_executable(unittest_general
   sparse_block_matrix.cpp
   type_traits_tests.cpp
   optimization_basics.cpp
+  partially_initialize.cpp
 )
 target_link_libraries(unittest_general unittest_helper)
 target_link_libraries(unittest_general types_slam3d types_slam2d types_data)

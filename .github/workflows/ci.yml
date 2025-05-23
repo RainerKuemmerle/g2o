@@ -98,6 +98,6 @@ jobs:
 
       - name: Coverage Results
         if: matrix.config.do_coverage == 'ON'
-        uses: codecov/codecov-action@v4.2.0
+        uses: codecov/codecov-action@v5.4.3
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
