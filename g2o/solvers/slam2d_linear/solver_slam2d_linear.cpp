@@ -158,7 +158,7 @@ bool SolverSLAM2DLinear::solveOrientation() {
   // walk along the Minimal Spanning Tree to compute the guess for the robot
   // orientation
   if (fixedSet.size() != 1) {
-    G2O_WARN("Number of fixed vertices is not 1 but {}", fixedSet.size());
+    G2O_ERROR("Number of fixed vertices is not 1 but {}", fixedSet.size());
     return false;
   }
   auto root = std::static_pointer_cast<VertexSE2>(*fixedSet.begin());

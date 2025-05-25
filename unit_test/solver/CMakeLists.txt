@@ -1,7 +1,14 @@
-add_executable(unittest_solver
+set(UNITTEST_SOLVER_SRC
   sparse_system_helper.cpp sparse_system_helper.h
   allocate_algorithm_test.cpp
-  linear_solver_test.cpp
+  linear_solver_test.cpp)
+
+if (TARGET solver_slam2d_linear)
+  list(APPEND UNITTEST_SOLVER_SRC solver_slam2d_linear_test.cpp)
+endif()
+
+add_executable(unittest_solver
+  ${UNITTEST_SOLVER_SRC}
 )
 
 # setting up linking of the test based on the available solvers
