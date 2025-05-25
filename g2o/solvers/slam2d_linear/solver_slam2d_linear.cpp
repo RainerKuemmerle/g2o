@@ -35,6 +35,7 @@
 #include "g2o/core/eigen_types.h"
 #include "g2o/core/hyper_dijkstra.h"
 #include "g2o/core/hyper_graph.h"
+#include "g2o/core/optimization_algorithm.h"
 #include "g2o/core/solver.h"
 #include "g2o/core/sparse_block_matrix.h"
 #include "g2o/core/sparse_optimizer.h"
@@ -81,21 +82,27 @@ class ThetaTreeAction : public HyperDijkstra::TreeAction {
 SolverSLAM2DLinear::SolverSLAM2DLinear(std::unique_ptr<Solver> solver)
     : OptimizationAlgorithmGaussNewton(std::move(solver)) {}
 
+bool SolverSLAM2DLinear::init(bool online) {
+  require_orientation_solution_ = true;
+  return OptimizationAlgorithmGaussNewton::init(online);
+}
+
 OptimizationAlgorithm::SolverResult SolverSLAM2DLinear::solve(int iteration,
                                                               bool online) {
-  if (iteration == 0) {
+  if (require_orientation_solution_) {
     const bool status = solveOrientation();
     if (!status) return OptimizationAlgorithm::kFail;
+    require_orientation_solution_ = false;
   }
 
   return OptimizationAlgorithmGaussNewton::solve(iteration, online);
 }
 
 bool SolverSLAM2DLinear::solveOrientation() {
-  assert(optimizer_->indexMapping().size() + 1 ==
-             optimizer_->vertices().size() &&
-         "Needs to operate on full graph");
-  assert(optimizer_->vertex(0)->fixed() && "Graph is not fixed by vertex 0");
+  if (optimizer_->activeVertices().size() != optimizer_->vertices().size()) {
+    G2O_ERROR("Needs to operate on full graph");
+    return false;
+  }
   VectorX b;
   VectorX x;  // will be used for theta and x/y update
   b.setZero(optimizer_->indexMapping().size());
@@ -150,7 +157,10 @@ bool SolverSLAM2DLinear::solveOrientation() {
 
   // walk along the Minimal Spanning Tree to compute the guess for the robot
   // orientation
-  assert(fixedSet.size() == 1);
+  if (fixedSet.size() != 1) {
+    G2O_WARN("Number of fixed vertices is not 1 but {}", fixedSet.size());
+    return false;
+  }
   auto root = std::static_pointer_cast<VertexSE2>(*fixedSet.begin());
   VectorX thetaGuess;
   thetaGuess.setZero(optimizer_->indexMapping().size());

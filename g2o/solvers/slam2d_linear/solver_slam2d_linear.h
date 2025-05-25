@@ -60,11 +60,14 @@ class G2O_SLAM2D_LINEAR_API SolverSLAM2DLinear
    */
   explicit SolverSLAM2DLinear(std::unique_ptr<Solver> solver);
 
+  bool init(bool online = false) override;
+
   OptimizationAlgorithm::SolverResult solve(int iteration,
                                             bool online = false) override;
 
  protected:
   bool solveOrientation();
+  bool require_orientation_solution_ = true;
 };
 
 }  // namespace g2o
