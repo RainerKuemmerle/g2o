@@ -12,7 +12,7 @@ add_library(stuff ${G2O_LIB_TYPE}
 )
 
 target_include_directories(stuff PUBLIC
-  "$<BUILD_INTERFACE:${g2o_SOURCE_DIR};${PROJECT_BINARY_DIR}>"
+  "$<BUILD_INTERFACE:${g2o_SOURCE_DIR};${g2o_BINARY_DIR}>"
   $<INSTALL_INTERFACE:include/g2o/stuff>
 )
 
@@ -60,7 +60,7 @@ if(OPENGL_FOUND AND G2O_HAVE_OPENGL)
     )
 
   target_include_directories(opengl_helper PUBLIC
-    "$<BUILD_INTERFACE:${g2o_SOURCE_DIR};${PROJECT_BINARY_DIR}>"
+    "$<BUILD_INTERFACE:${g2o_SOURCE_DIR};${g2o_BINARY_DIR}>"
     $<INSTALL_INTERFACE:include/g2o/stuff>
   )
 

@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.14)
 set(CMAKE_LEGACY_CYGWIN_WIN32 0)
 set(CMAKE_OSX_DEPLOYMENT_TARGET "10.15" CACHE STRING "Minimum OS X deployment target")
 
-project(g2o)
+project(g2o LANGUAGES CXX C)
 
 include(CPack)
 include(GNUInstallDirs)
@@ -39,26 +39,35 @@ if (BUILD_SHARED_LIBS)
   set (G2O_LIB_TYPE SHARED)
 endif()
 
-# On the Mac platform, configure the RPATH as per the INSTALL, to
-# avoid the problem of loading both the built and INSTALLed versions
-# of the shared targets
-if(APPLE)
-  set(CMAKE_INSTALL_RPATH "")
-  set(CMAKE_MACOSX_RPATH TRUE)
-  # ignore deprecated GL
-  add_definitions(-DGL_SILENCE_DEPRECATION)
-endif(APPLE)
+# Option to control installation of cmake config files when used as subdirectory
+option(G2O_INSTALL_CMAKE_CONFIG "Install CMake configuration files even when used as subdirectory" OFF)
 
-# Set the output directory for the build executables and libraries
-set(g2o_RUNTIME_OUTPUT_DIRECTORY ${g2o_BINARY_DIR}/bin CACHE PATH "Target for the binaries")
-if(WIN32)
-  set(g2o_LIBRARY_OUTPUT_DIRECTORY ${g2o_BINARY_DIR}/bin CACHE PATH "Target for the libraries")
-else(WIN32)
-  set(g2o_LIBRARY_OUTPUT_DIRECTORY ${g2o_BINARY_DIR}/lib CACHE PATH "Target for the libraries")
-endif(WIN32)
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${g2o_LIBRARY_OUTPUT_DIRECTORY})
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${g2o_LIBRARY_OUTPUT_DIRECTORY})
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${g2o_RUNTIME_OUTPUT_DIRECTORY})
+# Only set output directories and options when this is the top-level project
+if(PROJECT_IS_TOP_LEVEL)
+  # On the Mac platform, configure the RPATH as per the INSTALL, to
+  # avoid the problem of loading both the built and INSTALLed versions
+  # of the shared targets
+  if(APPLE)
+    set(CMAKE_INSTALL_RPATH "")
+    set(CMAKE_MACOSX_RPATH TRUE)
+    # ignore deprecated GL
+    add_definitions(-DGL_SILENCE_DEPRECATION)
+  endif(APPLE)
+endif()
+
+# Only set output directories when this is the top-level project
+if(PROJECT_IS_TOP_LEVEL)
+  # Set the output directory for the build executables and libraries
+  set(g2o_RUNTIME_OUTPUT_DIRECTORY ${g2o_BINARY_DIR}/bin CACHE PATH "Target for the binaries")
+  if(WIN32)
+    set(g2o_LIBRARY_OUTPUT_DIRECTORY ${g2o_BINARY_DIR}/bin CACHE PATH "Target for the libraries")
+  else(WIN32)
+    set(g2o_LIBRARY_OUTPUT_DIRECTORY ${g2o_BINARY_DIR}/lib CACHE PATH "Target for the libraries")
+  endif(WIN32)
+  set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${g2o_LIBRARY_OUTPUT_DIRECTORY})
+  set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${g2o_LIBRARY_OUTPUT_DIRECTORY})
+  set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${g2o_RUNTIME_OUTPUT_DIRECTORY})
+endif()
 
 # Set standard installation directories
 set(RUNTIME_DESTINATION ${CMAKE_INSTALL_BINDIR})
@@ -262,7 +271,14 @@ else()
 endif()
 
 # shall we build the core apps using the library
-option(G2O_BUILD_APPS "Build g2o apps" ON)
+if(PROJECT_IS_TOP_LEVEL)
+  option(G2O_BUILD_APPS "Build g2o apps" ON)
+  option(G2O_BUILD_EXAMPLES "Build g2o examples" ON)
+else()
+  option(G2O_BUILD_APPS "Build g2o apps" OFF)
+  option(G2O_BUILD_EXAMPLES "Build g2o examples" OFF)
+endif()
+
 if(G2O_BUILD_APPS)
   message(STATUS "Compiling g2o apps")
 endif(G2O_BUILD_APPS)
@@ -272,7 +288,6 @@ CMAKE_DEPENDENT_OPTION(G2O_BUILD_LINKED_APPS "Build apps linked with the librari
   "G2O_BUILD_APPS" OFF)
 
 # shall we build the examples
-option(G2O_BUILD_EXAMPLES "Build g2o examples" ON)
 if(G2O_BUILD_EXAMPLES)
   message(STATUS "Compiling g2o examples")
 endif(G2O_BUILD_EXAMPLES)
@@ -508,22 +523,28 @@ WRITE_BASIC_PACKAGE_VERSION_FILE(
     "${G2O_VERSION_CONFIG}" VERSION ${G2O_VERSION} COMPATIBILITY SameMajorVersion
 )
 
-configure_file(config.h.in "${PROJECT_BINARY_DIR}/g2o/config.h")
-install(FILES ${PROJECT_BINARY_DIR}/g2o/config.h DESTINATION ${INCLUDES_DESTINATION}/g2o)
+configure_file(config.h.in "${CMAKE_CURRENT_BINARY_DIR}/g2o/config.h")
+# Only install config.h when this is the top-level project or when explicitly requested
+if(PROJECT_IS_TOP_LEVEL OR G2O_INSTALL_CMAKE_CONFIG)
+  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/g2o/config.h DESTINATION ${INCLUDES_DESTINATION}/g2o)
+endif()
 
 configure_file("${g2o_SOURCE_DIR}/cmake_modules/Config.cmake.in" "${G2O_PROJECT_CONFIG}" @ONLY)
 
-install(
-    FILES "${G2O_PROJECT_CONFIG}" "${G2O_VERSION_CONFIG}"
-    DESTINATION "${G2O_CONFIG_INSTALL_DIR}")
+# Only install cmake config files when this is the top-level project or when explicitly requested
+if(PROJECT_IS_TOP_LEVEL OR G2O_INSTALL_CMAKE_CONFIG)
+  install(
+      FILES "${G2O_PROJECT_CONFIG}" "${G2O_VERSION_CONFIG}"
+      DESTINATION "${G2O_CONFIG_INSTALL_DIR}")
 
-install(
-    EXPORT "${G2O_TARGETS_EXPORT_NAME}"
-    NAMESPACE "${G2O_NAMESPACE}"
-    DESTINATION "${G2O_CONFIG_INSTALL_DIR}")
+  install(
+      EXPORT "${G2O_TARGETS_EXPORT_NAME}"
+      NAMESPACE "${G2O_NAMESPACE}"
+      DESTINATION "${G2O_CONFIG_INSTALL_DIR}")
+endif()
 
-# building unit test framework and our tests
 option(BUILD_UNITTESTS "build unit test framework and the tests" OFF)
+
 if(BUILD_UNITTESTS)
   enable_testing()
   add_subdirectory(unit_test)
@@ -532,8 +553,78 @@ endif()
 # Include the subdirectories
 add_subdirectory(g2o)
 
-# Benchmarks
+# Create alias targets for easier usage when included as subdirectory
+# Core libraries
+if(TARGET core)
+  add_library(g2o::core ALIAS core)
+endif()
+if(TARGET stuff)
+  add_library(g2o::stuff ALIAS stuff)
+endif()
+if(TARGET g2o_ceres_ad)
+  add_library(g2o::g2o_ceres_ad ALIAS g2o_ceres_ad)
+endif()
+if(TARGET opengl_helper)
+  add_library(g2o::opengl_helper ALIAS opengl_helper)
+endif()
+
+# Type libraries
+if(TARGET types_data)
+  add_library(g2o::types_data ALIAS types_data)
+endif()
+if(TARGET types_icp)
+  add_library(g2o::types_icp ALIAS types_icp)
+endif()
+if(TARGET types_sba)
+  add_library(g2o::types_sba ALIAS types_sba)
+endif()
+if(TARGET types_sclam2d)
+  add_library(g2o::types_sclam2d ALIAS types_sclam2d)
+endif()
+if(TARGET types_sim3)
+  add_library(g2o::types_sim3 ALIAS types_sim3)
+endif()
+if(TARGET types_slam2d)
+  add_library(g2o::types_slam2d ALIAS types_slam2d)
+endif()
+if(TARGET types_slam2d_addons)
+  add_library(g2o::types_slam2d_addons ALIAS types_slam2d_addons)
+endif()
+if(TARGET types_slam3d)
+  add_library(g2o::types_slam3d ALIAS types_slam3d)
+endif()
+if(TARGET types_slam3d_addons)
+  add_library(g2o::types_slam3d_addons ALIAS types_slam3d_addons)
+endif()
+
+# Solver libraries
+if(TARGET solver_cholmod)
+  add_library(g2o::solver_cholmod ALIAS solver_cholmod)
+endif()
+if(TARGET csparse_extension)
+  add_library(g2o::csparse_extension ALIAS csparse_extension)
+endif()
+if(TARGET solver_csparse)
+  add_library(g2o::solver_csparse ALIAS solver_csparse)
+endif()
+if(TARGET solver_dense)
+  add_library(g2o::solver_dense ALIAS solver_dense)
+endif()
+if(TARGET solver_eigen)
+  add_library(g2o::solver_eigen ALIAS solver_eigen)
+endif()
+if(TARGET solver_pcg)
+  add_library(g2o::solver_pcg ALIAS solver_pcg)
+endif()
+if(TARGET solver_slam2d_linear)
+  add_library(g2o::solver_slam2d_linear ALIAS solver_slam2d_linear)
+endif()
+if(TARGET solver_structure_only)
+  add_library(g2o::solver_structure_only ALIAS solver_structure_only)
+endif()
+
 option(G2O_BUILD_BENCHMARKS "build benchmarks" OFF)
+
 if(G2O_BUILD_BENCHMARKS)
   find_package(benchmark)
   if(${benchmark_FOUND})

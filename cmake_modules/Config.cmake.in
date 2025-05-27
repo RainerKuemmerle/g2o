@@ -11,4 +11,7 @@ if (@G2O_HAVE_LOGGING@)
   find_dependency(spdlog)
 endif()
 
-include("${CMAKE_CURRENT_LIST_DIR}/@G2O_TARGETS_EXPORT_NAME@.cmake")
+# Only include the targets export file if it exists (for installed builds)
+if(EXISTS "${CMAKE_CURRENT_LIST_DIR}/@G2O_TARGETS_EXPORT_NAME@.cmake")
+  include("${CMAKE_CURRENT_LIST_DIR}/@G2O_TARGETS_EXPORT_NAME@.cmake")
+endif()

@@ -42,7 +42,7 @@ g2o_core_api.h
 )
 
 target_include_directories(core PUBLIC
-  "$<BUILD_INTERFACE:${g2o_SOURCE_DIR};${PROJECT_BINARY_DIR}>"
+  "$<BUILD_INTERFACE:${g2o_SOURCE_DIR};${g2o_BINARY_DIR}>"
   $<INSTALL_INTERFACE:include/g2o/core>
 )
 
