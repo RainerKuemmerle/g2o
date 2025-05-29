@@ -2,9 +2,9 @@
 #include <iostream>
 #include <utility>
 
+#include "CLI/CLI.hpp"
 #include "g2o/core/eigen_types.h"
 #include "g2o/core/sparse_optimizer.h"
-#include "g2o/stuff/command_args.h"
 #include "g2o/stuff/sampler.h"
 #include "g2o/types/slam3d/edge_se3.h"
 #include "g2o/types/slam3d/edge_se3_prior.h"
@@ -229,11 +229,11 @@ struct LineSensor : public Sensor {
 int simulator_3d_line(int argc, char** argv) {
   bool fixLines;
   bool planarMotion;
-  CommandArgs arg;
-  arg.param("fixLines", fixLines, false,
-            "fix the lines (do localization only)");
-  arg.param("planarMotion", planarMotion, false, "robot moves on a plane");
-  arg.parseArgs(argc, argv);
+  CLI::App app{"g2o Simulator 3D Line"};
+  argv = app.ensure_utf8(argv);
+  app.add_flag("--fix_lines", fixLines, "fix the lines (do localization only)");
+  app.add_flag("--planar_motion", planarMotion, "robot moves on a plane");
+  CLI11_PARSE(app, argc, argv);
 
   auto* g = new SparseOptimizer();
   auto odomOffset = std::make_shared<ParameterSE3Offset>();

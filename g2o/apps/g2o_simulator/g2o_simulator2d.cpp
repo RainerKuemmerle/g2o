@@ -28,58 +28,77 @@
 #include <fstream>
 #include <iostream>
 
+#include "CLI/CLI.hpp"
 #include "g2o/core/optimizable_graph.h"
 #include "g2o/simulator/simulator.h"
 #include "g2o/simulator/simulator2d_base.h"
-#include "g2o/stuff/command_args.h"
 #include "g2o/stuff/logger.h"
 
 int main(int argc, char** argv) {
-  g2o::CommandArgs arg;
   g2o::Simulator2D::Config simulator_config;
+  // Setting up default
+  simulator_config.nlandmarks = 100;
+  simulator_config.nSegments = 1000;
+  simulator_config.segmentGridSize = 50;
+  simulator_config.minSegmentLength = 0.5;
+  simulator_config.maxSegmentLength = 3;
+  simulator_config.simSteps = 100;
+  simulator_config.worldSize = 25.0;
 
-  G2O_INFO("Running 2D simulator");
+  CLI::App app{"g2o Simulator 2D"};
+  argv = app.ensure_utf8(argv);
 
   std::string outputFilename;
-  arg.param("nlandmarks", simulator_config.nlandmarks, 100,
-            "number of landmarks in the map");
-  arg.param("nSegments", simulator_config.nSegments, 1000,
-            "number of segments");
-  arg.param("segmentGridSize", simulator_config.segmentGridSize, 50,
-            "number of cells of the grid where to align the segments");
-  arg.param("minSegmentLength", simulator_config.minSegmentLength, 0.5,
-            "minimal Length of a segment in the world");
-  arg.param("maxSegmentLength", simulator_config.maxSegmentLength, 3,
-            "maximal Length of a segment in the world");
+  app.add_option("--num_landmarks", simulator_config.nlandmarks,
+                 "number of landmarks in the map")
+      ->check(CLI::NonNegativeNumber);
+  app.add_option("--num_segments", simulator_config.nSegments,
+                 "number of segments")
+      ->check(CLI::NonNegativeNumber);
+  app.add_option("--segment_grid_size", simulator_config.segmentGridSize,
+                 "number of cells of the grid where to align the segments")
+      ->check(CLI::PositiveNumber);
+  app.add_option("--min_segment_length", simulator_config.minSegmentLength,
+                 "minimal Length of a segment in the world")
+      ->check(CLI::NonNegativeNumber);
+  app.add_option("--max_segment_length", simulator_config.maxSegmentLength,
+                 "maximal Length of a segment in the world")
+      ->check(CLI::NonNegativeNumber);
 
-  arg.param("simSteps", simulator_config.simSteps, 100,
-            "number of simulation steps");
-  arg.param("worldSize", simulator_config.worldSize, 25.0, "size of the world");
-  arg.param("hasOdom", simulator_config.hasOdom, false,
-            "the robot has an odometry");
-  arg.param("hasPointSensor", simulator_config.hasPointSensor, false,
-            "the robot has a point sensor");
-  arg.param("hasPointBearingSensor", simulator_config.hasPointBearingSensor,
-            false, "the robot has a point bearing sensor");
-  arg.param("hasPoseSensor", simulator_config.hasPoseSensor, false,
-            "the robot has a pose sensor");
-  arg.param("hasCompass", simulator_config.hasCompass, false,
-            "the robot has a compass");
-  arg.param("hasGPS", simulator_config.hasGPS, false, "the robot has a GPS");
-  arg.param("hasSegmentSensor", simulator_config.hasSegmentSensor, false,
-            "the robot has a segment sensor");
-  arg.paramLeftOver("graph-output", outputFilename, "",
-                    "graph file which will be written", true);
+  app.add_option("--sim_steps", simulator_config.simSteps,
+                 "number of simulation steps")
+      ->check(CLI::PositiveNumber);
+  app.add_option("--world_size", simulator_config.worldSize,
+                 "size of the world")
+      ->check(CLI::PositiveNumber);
+  app.add_flag("--has_odom", simulator_config.hasOdom,
+               "the robot has an odometry");
+  app.add_flag("--has_point_sensor", simulator_config.hasPointSensor,
+               "the robot has a point sensor");
+  app.add_flag("--has_point_bearing_sensor",
+               simulator_config.hasPointBearingSensor,
+               "the robot has a point bearing sensor");
+  app.add_flag("--has_pose_sensor", simulator_config.hasPoseSensor,
+               "the robot has a pose sensor");
+  app.add_flag("--has_compass", simulator_config.hasCompass,
+               "the robot has a compass");
+  app.add_flag("--has_gps", simulator_config.hasGPS, "the robot has a GPS");
+  app.add_flag("--has_segment_sensor", simulator_config.hasSegmentSensor,
+               "the robot has a segment sensor");
+  app.add_option("graph-output", outputFilename,
+                 "graph file which will be written ('-' for stdout)")
+      ->required();
 
-  arg.parseArgs(argc, argv);
+  CLI11_PARSE(app, argc, argv);
 
+  G2O_INFO("Running 2D simulator");
   g2o::Simulator2D simulator(std::move(simulator_config));
   G2O_INFO("Setting up");
   simulator.setup();
   G2O_INFO("Simulate");
   simulator.simulate();
 
-  if (outputFilename.empty()) {
+  if (outputFilename == "-") {
     G2O_INFO("Saving to stdout");
     simulator.world().graph().save(std::cout);
   } else {

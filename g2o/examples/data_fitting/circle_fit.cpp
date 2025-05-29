@@ -28,13 +28,13 @@
 #include <Eigen/Geometry>
 #include <iostream>
 
+#include "CLI/CLI.hpp"
 #include "g2o/core/auto_differentiation.h"
 #include "g2o/core/base_unary_edge.h"
 #include "g2o/core/base_vertex.h"
 #include "g2o/core/eigen_types.h"
 #include "g2o/core/optimization_algorithm_factory.h"
 #include "g2o/core/sparse_optimizer.h"
-#include "g2o/stuff/command_args.h"
 #include "g2o/stuff/sampler.h"
 
 G2O_USE_OPTIMIZATION_LIBRARY(dense);
@@ -90,15 +90,17 @@ class EdgePointOnCircle
 };
 
 int main(int argc, char** argv) {
-  int numPoints;
-  int maxIterations;
+  int numPoints = 100;
+  int maxIterations = 10;
   bool verbose;
-  g2o::CommandArgs arg;
-  arg.param("numPoints", numPoints, 100,
-            "number of points sampled from the circle");
-  arg.param("i", maxIterations, 10, "perform n iterations");
-  arg.param("v", verbose, false, "verbose output of the optimization process");
-  arg.parseArgs(argc, argv);
+  CLI::App app{"g2o: Fit a circle"};
+  app.add_option("--num_points", numPoints,
+                 "number of points sampled from the circle")
+      ->capture_default_str();
+  app.add_option("-i,--iterations", maxIterations, "perform n iterations")
+      ->capture_default_str();
+  app.add_flag("-v", verbose, "verbose output of the optimization process");
+  CLI11_PARSE(app, argc, argv);
 
   // generate random data
   const Eigen::Vector2d center(4.0, 2.0);

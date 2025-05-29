@@ -22,7 +22,8 @@ endif(UNIX)
 add_executable(g2o_cli_application
   g2o.cpp)
 
-target_link_libraries(g2o_cli_application g2o_cli_library)
+target_link_libraries(g2o_cli_application PUBLIC g2o_cli_library)
+target_link_libraries(g2o_cli_application PRIVATE CLI11::CLI11)
 
 set_target_properties(g2o_cli_application PROPERTIES OUTPUT_NAME g2o)
 

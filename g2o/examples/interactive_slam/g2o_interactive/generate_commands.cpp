@@ -29,34 +29,33 @@
 #include <csignal>
 #include <fstream>
 #include <iostream>
+#include <memory>
 #include <string>
 
+#include "CLI/CLI.hpp"
 #include "g2o/core/factory.h"
 #include "g2o/core/sparse_optimizer.h"
-#include "g2o/stuff/command_args.h"
-#include "g2o/stuff/logger.h"
 
-static bool hasToStop = false;
-
-using namespace std;
-using namespace g2o;
+namespace {
 
 // sort according to max id, dimension, min id
 struct IncrementalEdgesCompare {
-  bool operator()(SparseOptimizer::Edge* const& e1,
-                  SparseOptimizer::Edge* const& e2) {
-    const SparseOptimizer::Vertex* to1 =
-        static_cast<const SparseOptimizer::Vertex*>(e1->vertices()[0]);
-    const SparseOptimizer::Vertex* to2 =
-        static_cast<const SparseOptimizer::Vertex*>(e2->vertices()[0]);
+  bool operator()(std::shared_ptr<g2o::SparseOptimizer::Edge> const& e1,
+                  std::shared_ptr<g2o::SparseOptimizer::Edge> const& e2) {
+    const auto* to1 = static_cast<const g2o::SparseOptimizer::Vertex*>(
+        e1->vertices()[0].get());
+    const auto* to2 = static_cast<const g2o::SparseOptimizer::Vertex*>(
+        e2->vertices()[0].get());
 
-    int i11 = e1->vertices()[0]->id(), i12 = e1->vertices()[1]->id();
+    int i11 = e1->vertices()[0]->id();
+    int i12 = e1->vertices()[1]->id();
     if (i11 > i12) {
-      swap(i11, i12);
+      std::swap(i11, i12);
     }
-    int i21 = e2->vertices()[0]->id(), i22 = e2->vertices()[1]->id();
+    int i21 = e2->vertices()[0]->id();
+    int i22 = e2->vertices()[1]->id();
     if (i21 > i22) {
-      swap(i21, i22);
+      std::swap(i21, i22);
     }
     if (i12 < i22) return true;
     if (i12 > i22) return false;
@@ -67,96 +66,89 @@ struct IncrementalEdgesCompare {
     return (i11 < i21);
   }
 };
-
-void sigquit_handler(int sig) {
-  if (sig == SIGINT) {
-    hasToStop = 1;
-    static int cnt = 0;
-    if (cnt++ == 2) {
-      G2O_WARN("forcing exit");
-      exit(1);
-    }
-  }
-}
+}  // namespace
 
 int main(int argc, char** argv) {
-  string inputFilename;
-  string loadLookup;
+  std::string inputFilename;
+  std::string loadLookup;
   bool listTypes;
   int updateGraphEachN = 10;
-  string dummy;
   // command line parsing
-  CommandArgs arg;
-  arg.param("update", updateGraphEachN, 10,
-            "updates after x odometry nodes, (default: 10)");
-  arg.param("listTypes", listTypes, false, "list the registered types");
-  arg.param("renameTypes", loadLookup, "",
-            "create a lookup for loading types into other types,\n\t "
-            "TAG_IN_FILE=INTERNAL_TAG_FOR_TYPE,TAG2=INTERNAL2\n\t e.g., "
-            "VERTEX_CAM=VERTEX_SE3:EXPMAP");
-  arg.paramLeftOver("graph-input", inputFilename, "",
-                    "graph file which will be processed", true);
+  CLI::App app{"g2o Generate Incremental Commands"};
+  argv = app.ensure_utf8(argv);
+  app.add_option("--update", updateGraphEachN, "updates after x odometry nodes")
+      ->capture_default_str()
+      ->check(CLI::PositiveNumber);
+  app.add_flag("--list_types", listTypes, "list the registered types");
+  app.add_option("--rename_types", loadLookup,
+                 "create a lookup for loading types into other types,\n\t "
+                 "TAG_IN_FILE=INTERNAL_TAG_FOR_TYPE,TAG2=INTERNAL2\n\t e.g., "
+                 "VERTEX_CAM=VERTEX_SE3:EXPMAP");
+  app.add_option("graph-input", inputFilename,
+                 "graph file which will be processed ('-' for stdin)")
+      ->required()
+      ->check(CLI::ExistingFile);
 
-  arg.parseArgs(argc, argv);
+  CLI11_PARSE(app, argc, argv);
 
   if (listTypes) {
-    Factory::instance()->printRegisteredTypes(cout, true);
+    g2o::Factory::instance()->printRegisteredTypes(std::cout, true);
   }
 
-  SparseOptimizer optimizer;
+  g2o::SparseOptimizer optimizer;
 
   // Loading the input data
   if (loadLookup.size() > 0) {
     optimizer.setRenamedTypesFromString(loadLookup);
   }
-  if (inputFilename.size() == 0) {
-    cerr << "No input data specified" << endl;
+  if (inputFilename.empty()) {
+    std::cerr << "No input data specified\n";
     return 0;
-  } else if (inputFilename == "-") {
-    cerr << "Read input from stdin" << endl;
-    if (!optimizer.load(cin)) {
-      cerr << "Error loading graph" << endl;
+  }
+
+  if (inputFilename == "-") {
+    std::cerr << "Read input from stdin\n";
+    if (!optimizer.load(std::cin)) {
+      std::cerr << "Error loading graph\n";
       return 2;
     }
   } else {
-    cerr << "Read input from " << inputFilename << endl;
-    ifstream ifs(inputFilename.c_str());
+    std::cerr << "Read input from " << inputFilename << '\n';
+    std::ifstream ifs(inputFilename.c_str());
     if (!ifs) {
-      cerr << "Failed to open file" << endl;
+      std::cerr << "Failed to open file\n";
       return 1;
     }
     if (!optimizer.load(ifs)) {
-      cerr << "Error loading graph" << endl;
+      std::cerr << "Error loading graph\n";
       return 2;
     }
   }
-  cerr << "Loaded " << optimizer.vertices().size() << " vertices" << endl;
-  cerr << "Loaded " << optimizer.edges().size() << " edges" << endl;
+  std::cerr << "Loaded " << optimizer.vertices().size() << " vertices\n";
+  std::cerr << "Loaded " << optimizer.edges().size() << " edges\n";
 
   if (optimizer.vertices().size() == 0) {
-    cerr << "Graph contains no vertices" << endl;
+    std::cerr << "Graph contains no vertices\n";
     return 1;
   }
 
-  if (1) {
+  {
     int maxDim = 0;
 
-    cerr << "# incremental settings" << endl;
-    cerr << "#\t solve every " << updateGraphEachN << endl;
+    std::cerr << "# incremental settings\n";
+    std::cerr << "#\t solve every " << updateGraphEachN << '\n';
 
-    SparseOptimizer::VertexIDMap vertices = optimizer.vertices();
-    for (SparseOptimizer::VertexIDMap::const_iterator it = vertices.begin();
-         it != vertices.end(); ++it) {
-      const SparseOptimizer::Vertex* v =
-          static_cast<const SparseOptimizer::Vertex*>(it->second);
-      maxDim = (max)(maxDim, v->dimension());
+    g2o::SparseOptimizer::VertexIDMap vertices = optimizer.vertices();
+    for (auto& vertex : vertices) {
+      const auto* v =
+          static_cast<const g2o::SparseOptimizer::Vertex*>(vertex.second.get());
+      maxDim = (std::max)(maxDim, v->dimension());
     }
 
-    vector<SparseOptimizer::Edge*> edges;
-    for (SparseOptimizer::EdgeSet::iterator it = optimizer.edges().begin();
-         it != optimizer.edges().end(); ++it) {
-      SparseOptimizer::Edge* e = dynamic_cast<SparseOptimizer::Edge*>(*it);
-      edges.push_back(e);
+    std::vector<std::shared_ptr<g2o::SparseOptimizer::Edge>> edges;
+    for (const auto& edge : optimizer.edges()) {
+      auto e = std::dynamic_pointer_cast<g2o::SparseOptimizer::Edge>(edge);
+      if (e) edges.emplace_back(std::move(e));
     }
     optimizer.edges().clear();
     optimizer.vertices().clear();
@@ -169,15 +161,14 @@ int main(int argc, char** argv) {
     int lastOptimizedVertexCount = 0;
     bool addNextEdge = true;
     bool freshlyOptimized = false;
-    HyperGraph::VertexSet verticesAdded;
+    g2o::HyperGraph::VertexSet verticesAdded;
     int maxInGraph = -1;
-    for (vector<SparseOptimizer::Edge*>::iterator it = edges.begin();
-         it != edges.end(); ++it) {
-      SparseOptimizer::Edge* e = *it;
+    for (auto it = edges.begin(); it != edges.end(); ++it) {
+      const std::shared_ptr<g2o::SparseOptimizer::Edge>& e = *it;
       bool optimize = false;
 
       if (addNextEdge && !optimizer.vertices().empty()) {
-        int idMax = (max)(e->vertices()[0]->id(), e->vertices()[1]->id());
+        int idMax = (std::max)(e->vertices()[0]->id(), e->vertices()[1]->id());
         if (maxInGraph < idMax && !freshlyOptimized) {
           addNextEdge = false;
           optimize = true;
@@ -187,47 +178,51 @@ int main(int argc, char** argv) {
         }
       }
 
-      SparseOptimizer::Vertex* v1 = optimizer.vertex(e->vertices()[0]->id());
-      SparseOptimizer::Vertex* v2 = optimizer.vertex(e->vertices()[1]->id());
+      std::shared_ptr<g2o::SparseOptimizer::Vertex> v1 =
+          optimizer.vertex(e->vertices()[0]->id());
+      std::shared_ptr<g2o::SparseOptimizer::Vertex> v2 =
+          optimizer.vertex(e->vertices()[1]->id());
       if (!v1 && addNextEdge) {
         // cerr << " adding vertex " << it->id1 << endl;
-        SparseOptimizer::Vertex* v =
-            dynamic_cast<SparseOptimizer::Vertex*>(e->vertices()[0]);
+        auto v = std::dynamic_pointer_cast<g2o::SparseOptimizer::Vertex>(
+            e->vertices()[0]);
         bool v1Added = optimizer.addVertex(v);
-        maxInGraph = (max)(maxInGraph, v->id());
-        // cerr << "adding" << v->id() << "(" << v->dimension() << ")" << endl;
+        maxInGraph = (std::max)(maxInGraph, v->id());
+        // cerr << "adding" << v->id() << "(" << v->dimension() << ")" <<
+        // endl;
         assert(v1Added);
         if (!v1Added)
-          cerr << "Error adding vertex " << v->id() << endl;
+          std::cerr << "Error adding vertex " << v->id() << '\n';
         else
           verticesAdded.insert(v);
         if (v->dimension() == maxDim) vertexCount++;
 
         if (v->dimension() == 3) {
-          cout << "ADD VERTEX_XYT " << v->id() << ";" << endl;
+          std::cout << "ADD VERTEX_XYT " << v->id() << ";\n";
         } else if (v->dimension() == 6) {
-          cout << "ADD VERTEX_XYZRPY " << v->id() << ";" << endl;
+          std::cout << "ADD VERTEX_XYZRPY " << v->id() << ";\n";
         }
       }
 
       if (!v2 && addNextEdge) {
-        SparseOptimizer::Vertex* v =
-            dynamic_cast<SparseOptimizer::Vertex*>(e->vertices()[1]);
+        auto v = std::dynamic_pointer_cast<g2o::SparseOptimizer::Vertex>(
+            e->vertices()[1]);
         // cerr << " adding vertex " << v->id() << endl;
         bool v2Added = optimizer.addVertex(v);
-        maxInGraph = (max)(maxInGraph, v->id());
-        // cerr << "adding" << v->id() << "(" << v->dimension() << ")" << endl;
+        maxInGraph = (std::max)(maxInGraph, v->id());
+        // cerr << "adding" << v->id() << "(" << v->dimension() << ")" <<
+        // endl;
         assert(v2Added);
         if (!v2Added)
-          cerr << "Error adding vertex " << v->id() << endl;
+          std::cerr << "Error adding vertex " << v->id() << '\n';
         else
           verticesAdded.insert(v);
         if (v->dimension() == maxDim) vertexCount++;
 
         if (v->dimension() == 3) {
-          cout << "ADD VERTEX_XYT " << v->id() << ";" << endl;
+          std::cout << "ADD VERTEX_XYT " << v->id() << ";\n";
         } else if (v->dimension() == 6) {
-          cout << "ADD VERTEX_XYZRPY " << v->id() << ";" << endl;
+          std::cout << "ADD VERTEX_XYZRPY " << v->id() << ";\n";
         }
       }
 
@@ -238,27 +233,28 @@ int main(int argc, char** argv) {
           double meas[3];
           e->getMeasurementData(meas);
           // ADD EDGE_XYT 1 1 2 .1 .2 .3 1 0 0 1 0 1;
-          cout << "ADD EDGE_XYT " << edgeCnt++ << " " << e->vertices()[0]->id()
-               << " " << e->vertices()[1]->id() << " " << meas[0] << " "
-               << meas[1] << " " << meas[2];
+          std::cout << "ADD EDGE_XYT " << edgeCnt++ << " "
+                    << e->vertices()[0]->id() << " " << e->vertices()[1]->id()
+                    << " " << meas[0] << " " << meas[1] << " " << meas[2];
           for (int i = 0; i < 3; ++i)
-            for (int j = i; j < 3; ++j) cout << " " << information[i * 3 + j];
-          cout << ";" << endl;
+            for (int j = i; j < 3; ++j)
+              std::cout << " " << information[(i * 3) + j];
+          std::cout << ";\n";
         } else if (e->dimension() == 6) {
-          // TODO convert to EULER angles
-          cerr << "NOT IMPLEMENTED YET" << endl;
+          // TODO(Rainer) convert to EULER angles
+          std::cerr << "NOT IMPLEMENTED YET\n";
         }
         static bool firstEdge = true;
         if (firstEdge) {
           firstEdge = false;
-          cout << "FIX 0;" << endl;
+          std::cout << "FIX 0;\n";
         }
 
         // cerr << " adding edge " << e->vertices()[0]->id() <<  " " <<
         // e->vertices()[1]->id() << endl;
         if (!optimizer.addEdge(e)) {
-          cerr << "Unable to add edge " << e->vertices()[0]->id() << " -> "
-               << e->vertices()[1]->id() << endl;
+          std::cerr << "Unable to add edge " << e->vertices()[0]->id() << " -> "
+                    << e->vertices()[1]->id() << '\n';
         }
       }
 
@@ -266,8 +262,8 @@ int main(int argc, char** argv) {
       if (optimize) {
         // cerr << "Optimize" << endl;
         if (vertexCount - lastOptimizedVertexCount >= updateGraphEachN) {
-          cout << "SOLVE_STATE;" << endl;
-          cout << "QUERY_STATE;" << endl;
+          std::cout << "SOLVE_STATE;\n";
+          std::cout << "QUERY_STATE;\n";
           lastOptimizedVertexCount = vertexCount;
         }
 

@@ -120,7 +120,8 @@ void loadStandardTypes(DlWrapper& dlTypesWrapper, int argc, char** argv) {
   }
 
   std::vector<std::string> libs;
-  if (argc > 0 && argv != nullptr) findArguments("-typeslib", libs, argc, argv);
+  if (argc > 0 && argv != nullptr)
+    findArguments("--typeslib", libs, argc, argv);
   for (const auto& lib : libs) {
     G2O_INFO("Loading types {}", lib);
     dlTypesWrapper.openLibrary(lib);
@@ -156,7 +157,7 @@ void loadStandardSolver(DlWrapper& dlSolverWrapper, int argc, char** argv) {
 
   std::vector<std::string> libs;
   if (argc > 0 && argv != nullptr)
-    findArguments("-solverlib", libs, argc, argv);
+    findArguments("--solverlib", libs, argc, argv);
   for (const auto& lib : libs) {
     G2O_INFO("Loading solver {}", lib);
     dlSolverWrapper.openLibrary(lib);

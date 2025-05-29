@@ -1,3 +1,4 @@
 add_executable(convertSegmentLine_application convertSegmentLine.cpp)
-target_link_libraries(convertSegmentLine_application types_slam2d_addons types_slam3d types_slam2d core stuff)
+target_link_libraries(convertSegmentLine_application PRIVATE types_slam2d_addons types_slam3d types_slam2d core stuff)
+target_link_libraries(convertSegmentLine_application PRIVATE CLI11::CLI11)
 set_target_properties(convertSegmentLine_application PROPERTIES OUTPUT_NAME convertSegmentLine)

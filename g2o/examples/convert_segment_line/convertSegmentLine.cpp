@@ -30,7 +30,7 @@
 #include <iostream>
 #include <string>
 
-#include "g2o/stuff/command_args.h"
+#include "CLI/CLI.hpp"
 #include "g2o/types/slam2d/edge_se2.h"
 #include "g2o/types/slam2d/edge_se2_pointxy.h"
 #include "g2o/types/slam2d/vertex_point_xy.h"
@@ -77,42 +77,45 @@ using LineInfoMap = std::map<int, LineInfo>;
 int run_main(int argc, char** argv) {
   string outputfilename;
   string inputFilename;
-  CommandArgs arg;
-  arg.param("o", outputfilename, "", "output final version of the graph");
-  arg.paramLeftOver("graph-input", inputFilename, "",
-                    "graph file which will be processed", true);
+  CLI::App app{"g2o' Convert Segment Line"};
+  argv = app.ensure_utf8(argv);
+  app.add_option("-o,--output", outputfilename,
+                 "output final version of the graph");
+  app.add_option("graph-input", inputFilename,
+                 "graph file which will be processed ('-' for stdin)")
+      ->required();
 
-  arg.parseArgs(argc, argv);
+  CLI11_PARSE(app, argc, argv);
   OptimizableGraph inGraph;
 
   // registering all the types from the libraries
 
   if (inputFilename.empty()) {
-    cerr << "No input data specified" << endl;
+    cerr << "No input data specified\n";
     return 0;
   }
   if (inputFilename == "-") {
-    cerr << "Read input from stdin" << endl;
+    cerr << "Read input from stdin\n";
     if (!inGraph.load(std::cin)) {
-      cerr << "Error loading graph" << endl;
+      cerr << "Error loading graph\n";
       return 2;
     }
   } else {
-    cerr << "Read input from " << inputFilename << endl;
+    cerr << "Read input from " << inputFilename << '\n';
     std::ifstream ifs(inputFilename.c_str());
     if (!ifs) {
-      cerr << "Failed to open file" << endl;
+      cerr << "Failed to open file\n";
       return 1;
     }
     if (!inGraph.load(ifs)) {
-      cerr << "Error loading graph" << endl;
+      cerr << "Error loading graph\n";
       return 2;
     }
   }
-  cerr << "Loaded " << inGraph.vertices().size() << " vertices" << endl;
-  cerr << "Loaded " << inGraph.edges().size() << " edges" << endl;
+  cerr << "Loaded " << inGraph.vertices().size() << " vertices\n";
+  cerr << "Loaded " << inGraph.edges().size() << " edges\n";
 
-  cerr << "filling in linfoMap and odoms" << endl;
+  cerr << "filling in linfoMap and odoms\n";
   LineInfoMap lmap;
   OptimizableGraph outGraph;
   // insert all lines in the infomap
@@ -292,7 +295,7 @@ int run_main(int argc, char** argv) {
       cerr << "saving " << outputfilename << " ... ";
       outGraph.save(outputfilename.c_str());
     }
-    cerr << "done." << endl;
+    cerr << "done.\n";
   }
 
   // destroy all the singletons

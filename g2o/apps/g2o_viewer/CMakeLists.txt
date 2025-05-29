@@ -37,8 +37,9 @@ add_executable(g2o_viewer
 
 set_target_properties(g2o_viewer PROPERTIES OUTPUT_NAME g2o_viewer)
 
-target_link_libraries(viewer_library core g2o_cli_library ${QGLVIEWER_LIBRARY} ${MY_QT_LIBRARIES} ${OPENGL_LIBRARY})
-target_link_libraries(viewer_library core opengl_helper)
+target_link_libraries(viewer_library PUBLIC core g2o_cli_library ${QGLVIEWER_LIBRARY} ${MY_QT_LIBRARIES} ${OPENGL_LIBRARY})
+target_link_libraries(viewer_library PUBLIC opengl_helper)
+target_link_libraries(viewer_library PRIVATE CLI11::CLI11)
 target_link_libraries(g2o_viewer viewer_library)
 
 install(TARGETS viewer_library

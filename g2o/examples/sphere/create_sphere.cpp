@@ -30,11 +30,11 @@
 #include <iostream>
 #include <vector>
 
+#include "CLI/CLI.hpp"
 #include "g2o/core/abstract_graph.h"
 #include "g2o/core/eigen_types.h"
 #include "g2o/core/factory.h"
 #include "g2o/core/io/io_format.h"
-#include "g2o/stuff/command_args.h"
 #include "g2o/stuff/sampler.h"
 #include "g2o/types/slam3d/edge_se3.h"
 #include "g2o/types/slam3d/vertex_se3.h"
@@ -44,47 +44,44 @@ namespace g2o {
 namespace {
 int create_sphere(int argc, char** argv) {
   // command line parsing
-  int nodesPerLevel;
-  int numLaps;
-  bool randomSeed;
-  double radius;
-  std::vector<double> noiseTranslation;
-  std::vector<double> noiseRotation;
-  std::string outFilename;
-  CommandArgs arg;
-  arg.param("o", outFilename, "-", "output filename");
-  arg.param("nodesPerLevel", nodesPerLevel, 50,
-            "how many nodes per lap on the sphere");
-  arg.param("laps", numLaps, 50,
-            "how many times the robot travels around the sphere");
-  arg.param("radius", radius, 100., "radius of the sphere");
-  arg.param("noiseTranslation", noiseTranslation, std::vector<double>(),
-            "set the noise level for the translation, separated by semicolons "
-            "without spaces e.g: "
-            "\"0.1;0.1;0.1\"");
-  arg.param("noiseRotation", noiseRotation, std::vector<double>(),
-            "set the noise level for the rotation, separated by semicolons "
-            "without spaces e.g: "
-            "\"0.001;0.001;0.001\"");
-  arg.param("randomSeed", randomSeed, false,
-            "use a randomized seed for generating the sphere");
-  arg.parseArgs(argc, argv);
+  int nodesPerLevel = 50;
+  int numLaps = 50;
+  bool randomSeed = false;
+  double radius = 100.;
+  std::vector<double> noiseTranslation = {0.01, 0.01, 0.01};
+  std::vector<double> noiseRotation = {0.005, 0.005, 0.005};
+  std::string outFilename = "-";
 
-  if (noiseTranslation.empty()) {
-    std::cerr << "using default noise for the translation\n";
-    noiseTranslation.push_back(0.01);
-    noiseTranslation.push_back(0.01);
-    noiseTranslation.push_back(0.01);
-  }
+  CLI::App app{"g2o: Create a randomized sphere"};
+  app.add_option("-o,--output", outFilename,
+                 "output filename (use - for stdout)")
+      ->capture_default_str();
+  app.add_option("--nodes_per_Level", nodesPerLevel,
+                 "how many nodes per lap on the sphere")
+      ->capture_default_str()
+      ->check(CLI::PositiveNumber);
+  app.add_option("--laps", numLaps,
+                 "how many times the robot travels around the sphere")
+      ->capture_default_str()
+      ->check(CLI::PositiveNumber);
+  app.add_option("--radius", radius, "radius of the sphere")
+      ->capture_default_str()
+      ->check(CLI::PositiveNumber);
+  app.add_option("--noise_translation", noiseTranslation,
+                 "set the noise level for the translation")
+      ->expected(3)
+      ->capture_default_str();
+  app.add_option("--noise_rotation", noiseRotation,
+                 "set the noise level for the rotation")
+      ->capture_default_str()
+      ->expected(3);
+  app.add_flag("--random_seed", randomSeed,
+               "use a randomized seed for generating the sphere");
+  CLI11_PARSE(app, argc, argv);
+
   std::cerr << "Noise for the translation:";
   for (const double i : noiseTranslation) std::cerr << " " << i;
   std::cerr << '\n';
-  if (noiseRotation.empty()) {
-    std::cerr << "using default noise for the rotation\n";
-    noiseRotation.push_back(0.005);
-    noiseRotation.push_back(0.005);
-    noiseRotation.push_back(0.005);
-  }
   std::cerr << "Noise for the rotation:";
   for (const double i : noiseRotation) std::cerr << " " << i;
   std::cerr << '\n';

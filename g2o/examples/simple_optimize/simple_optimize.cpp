@@ -26,10 +26,10 @@
 
 #include <iostream>
 
+#include "CLI/CLI.hpp"
 #include "g2o/core/factory.h"
 #include "g2o/core/optimization_algorithm_factory.h"
 #include "g2o/core/sparse_optimizer.h"
-#include "g2o/stuff/command_args.h"
 
 // we use the 2D and 3D SLAM types here
 G2O_USE_TYPE_GROUP(slam2d);
@@ -38,23 +38,30 @@ G2O_USE_OPTIMIZATION_LIBRARY(eigen);
 
 int main(int argc, char** argv) {
   // Command line parsing
-  int maxIterations;
+  bool verbose = false;
+  int maxIterations = 10;
   std::string outputFilename;
   std::string inputFilename;
-  g2o::CommandArgs arg;
-  arg.param("i", maxIterations, 10,
-            "perform n iterations, if negative consider the gain");
-  arg.param("o", outputFilename, "", "output final version of the graph");
-  arg.paramLeftOver("graph-input", inputFilename, "",
-                    "graph file which will be processed");
-  arg.parseArgs(argc, argv);
+
+  CLI::App app{"g2o's: Optimize input data"};
+  app.add_option("-i,--iterations", maxIterations,
+                 "perform n iterations, if negative consider the gain")
+      ->check(CLI::Range(-1, 100000))
+      ->capture_default_str();
+  app.add_flag("-v", verbose, "verbose output of the optimization process");
+  app.add_option("-o,--output", outputFilename,
+                 "output final version of the graph");
+  app.add_option("input", inputFilename, "graph file which will be processed")
+      ->check(CLI::ExistingFile)
+      ->required();
+  CLI11_PARSE(app, argc, argv);
 
   // NOTE: We skip to fix a vertex here, either this is stored in the file
   // itself or Levenberg will handle it.
 
   // create the optimizer to load the data and carry out the optimization
   g2o::SparseOptimizer optimizer;
-  optimizer.setVerbose(true);
+  optimizer.setVerbose(verbose);
 
   // allocate the solver
   g2o::OptimizationAlgorithmProperty solverProperty;

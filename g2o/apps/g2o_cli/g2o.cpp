@@ -33,6 +33,7 @@
 #include <string>
 #include <string_view>
 
+#include "CLI/CLI.hpp"
 #include "dl_wrapper.h"
 #include "g2o/core/batch_stats.h"
 #include "g2o/core/estimate_propagator.h"
@@ -45,7 +46,6 @@
 #include "g2o/core/robust_kernel_factory.h"
 #include "g2o/core/sparse_optimizer.h"
 #include "g2o/core/sparse_optimizer_terminate_action.h"
-#include "g2o/stuff/command_args.h"
 #include "g2o/stuff/filesys_tools.h"
 #include "g2o/stuff/logger.h"
 #include "g2o/stuff/macros.h"
@@ -112,91 +112,34 @@ struct IncrementalEdgesCompare {
 
 int main(int argc, char** argv) {
   OptimizableGraph::initMultiThreading();
-  int maxIterations;
-  bool verbose;
+  int maxIterations = 5;
+  bool verbose = false;
   std::string inputFilename;
   std::string outputfilename;
   std::string solverProperties;
-  std::string strSolver;
+  std::string strSolver = "gn_var";
   std::string loadLookup;
-  bool initialGuess;
-  bool initialGuessOdometry;
-  bool marginalize;
-  bool listTypes;
-  bool listSolvers;
-  bool listRobustKernels;
-  bool incremental;
-  int gaugeId;
+  bool initialGuess = false;
+  bool initialGuessOdometry = false;
+  bool marginalize = false;
+  bool listTypes = false;
+  bool listSolvers = false;
+  bool listRobustKernels = false;
+  bool incremental = false;
+  int gaugeId = -1;
   std::string robustKernel;
-  bool computeMarginals;
-  bool printSolverProperties;
-  double huberWidth;
-  double gain;
-  int maxIterationsWithGain;
+  bool computeMarginals = false;
+  bool printSolverProperties = false;
+  double huberWidth = -1.;
+  double gain = 1e-6;
+  int maxIterationsWithGain = std::numeric_limits<int>::max();
   // double lambdaInit;
   int updateGraphEachN = 10;
   std::string statsFile;
   std::string summaryFile;
-  bool nonSequential;
+  bool nonSequential = false;
   // command line parsing
   std::vector<int> gaugeList;
-  g2o::CommandArgs arg;
-  arg.param("i", maxIterations, 5,
-            "perform n iterations, if negative consider the gain");
-  arg.param("gain", gain, 1e-6, "the gain used to stop optimization");
-  arg.param("ig", maxIterationsWithGain, std::numeric_limits<int>::max(),
-            "Maximum number of iterations with gain enabled");
-  arg.param("v", verbose, false, "verbose output of the optimization process");
-  arg.param("guess", initialGuess, false,
-            "initial guess based on spanning tree");
-  arg.param("guessOdometry", initialGuessOdometry, false,
-            "initial guess based on odometry");
-  arg.param("inc", incremental, false, "run incremetally");
-  arg.param("update", updateGraphEachN, 10, "updates after x odometry nodes");
-  arg.param("marginalize", marginalize, false, "on or off");
-  arg.param("printSolverProperties", printSolverProperties, false,
-            "print the properties of the solver");
-  arg.param("solverProperties", solverProperties, "",
-            "set the internal properties of a solver,\n\te.g., "
-            "initialLambda=0.0001,maxTrialsAfterFailure=2");
-  arg.param("robustKernel", robustKernel, "", "use this robust error function");
-  arg.param("robustKernelWidth", huberWidth, -1.,
-            "width for the robust Kernel (only if robustKernel)");
-  arg.param("computeMarginals", computeMarginals, false,
-            "computes the marginal covariances of something. FOR TESTING ONLY");
-  arg.param("gaugeId", gaugeId, -1, "force the gauge");
-  arg.param("o", outputfilename, "", "output final version of the graph");
-  arg.param("solver", strSolver, "gn_var",
-            "specify which solver to use underneat\n\t {gn_var, lm_fix3_2, "
-            "gn_fix6_3, lm_fix7_3}");
-#ifndef G2O_DISABLE_DYNAMIC_LOADING_OF_LIBRARIES
-  std::string dummy;
-  arg.param("solverlib", dummy, "",
-            "specify a solver library which will be loaded");
-  arg.param("typeslib", dummy, "",
-            "specify a types library which will be loaded");
-#endif
-  arg.param("stats", statsFile, "", "specify a file for the statistics");
-  arg.param("listTypes", listTypes, false, "list the registered types");
-  arg.param("listRobustKernels", listRobustKernels, false,
-            "list the registered robust kernels");
-  arg.param("listSolvers", listSolvers, false, "list the available solvers");
-  arg.param("renameTypes", loadLookup, "",
-            "create a lookup for loading types into other types,\n\t "
-            "TAG_IN_FILE=INTERNAL_TAG_FOR_TYPE,TAG2=INTERNAL2\n\t e.g., "
-            "VERTEX_CAM=VERTEX_SE3:EXPMAP");
-  arg.param("gaugeList", gaugeList, std::vector<int>(),
-            "set the list of gauges separated by commas without spaces \n  "
-            "e.g: 1,2,3,4,5 ");
-  arg.param("summary", summaryFile, "",
-            "append a summary of this optimization run to the summary file "
-            "passed as argument");
-  arg.paramLeftOver("graph-input", inputFilename, "",
-                    "graph file which will be processed", true);
-  arg.param("nonSequential", nonSequential, false,
-            "apply the robust kernel only on loop closures and not odometries");
-
-  arg.parseArgs(argc, argv);
 
 #ifndef G2O_DISABLE_DYNAMIC_LOADING_OF_LIBRARIES
   // registering all the types from the libraries
@@ -208,6 +151,84 @@ int main(int argc, char** argv) {
 #else
   if (verbose) cout << "# linked version of g2o\n";
 #endif
+
+  const std::vector<std::string> available_solvers = []() {
+    std::vector<std::string> solvers;
+    solvers.reserve(
+        OptimizationAlgorithmFactory::instance()->creatorList().size());
+    for (const auto& creator :
+         OptimizationAlgorithmFactory::instance()->creatorList()) {
+      solvers.emplace_back(creator->property().name);
+    }
+    return solvers;
+  }();
+
+  CLI::App app{"g2o's CLI"};
+  argv = app.ensure_utf8(argv);
+
+  app.add_option("-i,--iterations", maxIterations,
+                 "perform n iterations, if negative consider the gain")
+      ->check(CLI::Range(-1, 100000))
+      ->capture_default_str();
+  app.add_option("--gain", gain, "the gain used to stop optimization");
+  app.add_option("--iterations_gain", maxIterationsWithGain,
+                 "Maximum number of iterations with gain enabled");
+  app.add_flag("-v", verbose, "verbose output of the optimization process");
+  app.add_flag("--guess", initialGuess, "initial guess based on spanning tree");
+  app.add_flag("--guess_odometry", initialGuessOdometry,
+               "initial guess based on odometry");
+  app.add_flag("--inc", incremental, "run incrementally");
+  app.add_option("--update", updateGraphEachN,
+                 "updates after x odometry nodes");
+  app.add_flag("--marginalize", marginalize, "marginalize landmarks");
+  app.add_flag("--print_solver_properties", printSolverProperties,
+               "print the properties of the solver");
+  app.add_option("--solver_properties", solverProperties,
+                 "set the internal properties of a solver, e.g., "
+                 "initialLambda=0.0001,maxTrialsAfterFailure=2");
+  app.add_option("--robust_kernel", robustKernel,
+                 "use this robust error function");
+  app.add_option("--robust_kernel_width", huberWidth,
+                 "width for the robust Kernel (only if robustKernel)");
+  app.add_flag(
+      "--compute_marginals", computeMarginals,
+      "computes the marginal covariances of something. FOR TESTING ONLY");
+  app.add_option("--gauge_id", gaugeId, "force the gauge");
+  app.add_option("-o,--output", outputfilename,
+                 "output final version of the graph");
+  app.add_option("--solver", strSolver,
+                 "specify which solver to use underneath")
+      ->check(CLI::IsMember(available_solvers));
+#ifndef G2O_DISABLE_DYNAMIC_LOADING_OF_LIBRARIES
+  std::string dummy;
+  app.add_option("--solverlib", dummy,
+                 "specify a solver library which will be loaded");
+  app.add_option("--typeslib", dummy,
+                 "specify a types library which will be loaded");
+#endif
+  app.add_option("--stats", statsFile, "specify a file for the statistics");
+  app.add_flag("--list_types", listTypes, "list the registered types");
+  app.add_flag("--list_robust_kernels", listRobustKernels,
+               "list the registered robust kernels");
+  app.add_flag("--list_solvers", listSolvers, "list the available solvers");
+  app.add_option("--rename_types", loadLookup,
+                 "create a lookup for loading types into other types, "
+                 "TAG_IN_FILE=INTERNAL_TAG_FOR_TYPE,TAG2=INTERNAL2, e.g., "
+                 "VERTEX_CAM=VERTEX_SE3:EXPMAP");
+  app.add_option("--gauge_list", gaugeList,
+                 "set the list of gauges separated by commas without spaces, "
+                 "e.g: 1 2 3 4 5");
+  app.add_option(
+      "--summary", summaryFile,
+      "append a summary of this optimization run to the summary file "
+      "passed as argument");
+  app.add_flag(
+      "--non_sequential", nonSequential,
+      "apply the robust kernel only on loop closures and not odometries");
+  app.add_option("input", inputFilename, "graph file which will be processed")
+      ->check(CLI::ExistingFile);
+
+  CLI11_PARSE(app, argc, argv);
 
   OptimizationAlgorithmFactory* solverFactory =
       OptimizationAlgorithmFactory::instance();
@@ -411,10 +432,6 @@ int main(int argc, char** argv) {
             "the binary g2o_incremental"
          << '\n';
     int incIterations = maxIterations;
-    if (!arg.parsedParam("i")) {
-      cerr << "# Setting default number of iterations\n";
-      incIterations = 1;
-    }
     int maxDim = 0;
 
     cerr << "# incremental settings\n";

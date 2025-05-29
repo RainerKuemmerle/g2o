@@ -13,12 +13,14 @@ set_target_properties(g2o_interactive_library PROPERTIES
 target_link_libraries(g2o_interactive_library core types_slam2d types_slam3d solver_cholmod parser_library interface_library)
 
 add_executable(g2o_online_application g2o_online.cpp)
-target_link_libraries(g2o_online_application g2o_interactive_library)
+target_link_libraries(g2o_online_application PRIVATE g2o_interactive_library)
+target_link_libraries(g2o_online_application PRIVATE CLI11::CLI11)
 set_target_properties(g2o_online_application PROPERTIES OUTPUT_NAME g2o_online)
 
-#add_executable(generate_commands_application generate_commands.cpp)
-#target_link_libraries(generate_commands_application g2o_interactive_library)
-#set_target_properties(generate_commands_application PROPERTIES OUTPUT_NAME generate_commands)
+add_executable(generate_commands_application generate_commands.cpp)
+target_link_libraries(generate_commands_application PRIVATE g2o_interactive_library)
+target_link_libraries(generate_commands_application PRIVATE CLI11::CLI11)
+set_target_properties(generate_commands_application PROPERTIES OUTPUT_NAME generate_commands)
 
 install(TARGETS g2o_interactive_library g2o_online_application
   RUNTIME DESTINATION ${RUNTIME_DESTINATION}

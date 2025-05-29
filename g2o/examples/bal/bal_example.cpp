@@ -30,6 +30,7 @@
 #include <iostream>
 #include <string_view>
 
+#include "CLI/CLI.hpp"
 #include "g2o/autodiff/autodiff.h"  // IWYU pragma: keep
 #include "g2o/core/auto_differentiation.h"
 #include "g2o/core/base_binary_edge.h"
@@ -41,7 +42,6 @@
 #include "g2o/core/solver.h"
 #include "g2o/core/sparse_optimizer.h"
 #include "g2o/solvers/pcg/linear_solver_pcg.h"
-#include "g2o/stuff/command_args.h"
 
 #if defined G2O_HAVE_CHOLMOD
 #include "g2o/solvers/cholmod/linear_solver_cholmod.h"
@@ -152,7 +152,7 @@ class EdgeObservationBAL
     const T& f = camera(6);
     const T& k1 = camera(7);
     const T& k2 = camera(8);
-    T r_p = T{1} + k1 * radiusSqr + k2 * radiusSqr * radiusSqr;
+    T r_p = T{1} + (k1 * radiusSqr) + (k2 * radiusSqr * radiusSqr);
     g2o::VectorN<2, T> prediction = f * r_p * projectedPoint;
 
     // compute the error
@@ -166,22 +166,28 @@ class EdgeObservationBAL
 };
 
 int main(int argc, char** argv) {
-  int maxIterations;
+  int maxIterations = 5;
   bool verbose;
   bool usePCG;
   std::string outputFilename;
   std::string inputFilename;
   std::string statsFilename;
-  g2o::CommandArgs arg;
-  arg.param("i", maxIterations, 5, "perform n iterations");
-  arg.param("o", outputFilename, "", "write points into a vrml file");
-  arg.param("pcg", usePCG, false, "use PCG instead of the Cholesky");
-  arg.param("v", verbose, false, "verbose output of the optimization process");
-  arg.param("stats", statsFilename, "", "specify a file for the statistics");
-  arg.paramLeftOver("graph-input", inputFilename, "",
-                    "file which will be processed");
+  CLI::App app{"g2o's CLI"};
+  argv = app.ensure_utf8(argv);
+  app.add_option("-i,--iterations", maxIterations,
+                 "perform n iterations, if negative consider the gain")
+      ->check(CLI::Range(-1, 100000))
+      ->capture_default_str();
+  app.add_option("-o,--output", outputFilename,
+                 "output final version of the graph");
+  app.add_flag("--pcg", usePCG, "use PCG instead of the Cholesky");
+  app.add_flag("-v", verbose, "verbose output of the optimization process");
+  app.add_option("--stats", statsFilename, "specify a file for the statistics");
+  app.add_option("graph-input", inputFilename, "file which will be processed")
+      ->check(CLI::ExistingFile)
+      ->required();
 
-  arg.parseArgs(argc, argv);
+  CLI11_PARSE(app, argc, argv);
 
   using BalBlockSolver = g2o::BlockSolver<g2o::BlockSolverTraits<9, 3>>;
   using BalLinearSolverPCG =

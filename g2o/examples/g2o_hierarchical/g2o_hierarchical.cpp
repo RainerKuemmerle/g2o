@@ -31,6 +31,7 @@
 #include <string>
 #include <unordered_set>
 
+#include "CLI/CLI.hpp"
 #include "edge_creator.h"
 #include "edge_labeler.h"
 #include "edge_types_cost_function.h"
@@ -42,7 +43,6 @@
 #include "g2o/core/robust_kernel.h"  // IWYU pragma: keep
 #include "g2o/core/robust_kernel_factory.h"
 #include "g2o/core/sparse_optimizer.h"
-#include "g2o/stuff/command_args.h"
 #include "g2o/stuff/logger.h"
 #include "g2o/stuff/macros.h"
 #include "star.h"
@@ -51,7 +51,6 @@
 #include "simple_star_ops.h"
 
 using std::cerr;
-using std::endl;
 using std::string;
 
 namespace {
@@ -85,19 +84,20 @@ void sigquit_handler(int sig) {
 */
 
 namespace g2o {
+namespace {
 
 int run_hierarchical(int argc, char** argv) {
-  int starIterations;
-  int highIterations;
-  int lowIterations;
+  int starIterations = 30;
+  int highIterations = 100;
+  int lowIterations = 100;
   bool verbose;
   // bool useNewTypes;
   string inputFilename;
   string gnudump;
   string outputfilename;
   // string strMethod;
-  string strSolver;
-  string strHSolver;
+  string strSolver = "lm_var_cholmod";
+  string strHSolver = "gn_var_cholmod";
   string loadLookup;
   bool initialGuess;
   bool listTypes;
@@ -105,68 +105,72 @@ int run_hierarchical(int argc, char** argv) {
   bool listRobustKernels;
   bool guiOut;
   bool computeMarginals;
-  double huberWidth;
+  double huberWidth = -1;
   bool debug;
-  double uThreshold;
+  double uThreshold = -1.;
   string robustKernel;
   // double lambdaInit;
-  int hierarchicalDiameter;
+  int hierarchicalDiameter = -1;
   int updateGraphEachN = 10;
   string summaryFile;
   string dummy;
   // command line parsing
-  CommandArgs arg;
-  arg.param("si", starIterations, 30,
-            "perform n iterations to build the stars");
-  arg.param("hi", highIterations, 100,
-            "perform n iterations to construct the hierarchy");
-  arg.param("li", lowIterations, 100, "perform n iterations on the low level");
-  arg.param("v", verbose, false, "verbose output of the optimization process");
-  arg.param("uThreshold", uThreshold, -1.,
-            "rejection threshold for underdetermined vertices");
-  arg.param("hierarchicalDiameter", hierarchicalDiameter, -1,
-            "selects the diameter of the stars in the hierarchical graph");
-  arg.param("guess", initialGuess, false,
-            "initial guess based on spanning tree");
+  CLI::App app{"g2o's CLI"};
+  argv = app.ensure_utf8(argv);
+  app.add_option("--si", starIterations,
+                 "perform n iterations to build the stars");
+  app.add_option("--hi", highIterations,
+                 "perform n iterations to construct the hierarchy");
+  app.add_option("--li", lowIterations,
+                 "perform n iterations on the low level");
+  app.add_flag("-v", verbose, "verbose output of the optimization process");
+  app.add_option("--u_threshold", uThreshold,
+                 "rejection threshold for underdetermined vertices");
+  app.add_option("--hierarchical_diameter", hierarchicalDiameter,
+                 "selects the diameter of the stars in the hierarchical graph");
+  app.add_flag("--guess", initialGuess, "initial guess based on spanning tree");
   // arg.param("useNewTypes", useNewTypes, false, "if true remaps the slam3d old
   // types into the new ones");
-  arg.param("debug", debug, false, "print shit load of things for debugging");
-  arg.param("update", updateGraphEachN, 10,
-            "updates after x odometry nodes, (default: 10)");
-  arg.param("guiout", guiOut, false, "gui output while running incrementally");
-  arg.param("gnudump", gnudump, "", "dump to gnuplot data file");
-  arg.param("robustKernel", robustKernel, "", "use this robust error function");
-  arg.param("robustKernelWidth", huberWidth, -1.,
-            "width for the robust Kernel (only if robustKernel)");
-  arg.param("computeMarginals", computeMarginals, false,
-            "computes the marginal covariances of something. FOR TESTING ONLY");
-  arg.param("huberWidth", huberWidth, -1.,
-            "width for the robust Huber Kernel (only if robustKernel)");
-  arg.param("o", outputfilename, "", "output final version of the graph");
-  arg.param("solver", strSolver, "lm_var_cholmod",
-            "specify which solver to use underneat");
-  arg.param("hsolver", strHSolver, "gn_var_cholmod",
-            "specify which solver to use for the high level");
-  arg.param("solverlib", dummy, "",
-            "specify a solver library which will be loaded");
-  arg.param("typeslib", dummy, "",
-            "specify a types library which will be loaded");
-  arg.param("listTypes", listTypes, false, "list the registered types");
-  arg.param("listSolvers", listSolvers, false, "list the available solvers");
-  arg.param("listRobustKernels", listRobustKernels, false,
-            "list the registered robust kernels");
+  app.add_flag("--debug", debug, "print shit load of things for debugging");
+  app.add_option("--update", updateGraphEachN,
+                 "updates after x odometry nodes, (default: 10)");
+  app.add_flag("--guiout", guiOut, "gui output while running incrementally");
+  app.add_option("--gnudump", gnudump, "dump to gnuplot data file");
+  app.add_option("--robust_kernel", robustKernel,
+                 "use this robust error function");
+  app.add_option("--robust_kernel_width", huberWidth,
+                 "width for the robust Kernel (only if robustKernel)");
+  app.add_option(
+      "--compute_marginals", computeMarginals,
+      "computes the marginal covariances of something. FOR TESTING ONLY");
+  app.add_option("-o,--output", outputfilename,
+                 "output final version of the graph");
+  app.add_option("--solver", strSolver,
+                 "specify which solver to use underneat");
+  app.add_option("--hsolver", strHSolver,
+                 "specify which solver to use for the high level");
+  app.add_option("--solverlib", dummy,
+                 "specify a solver library which will be loaded");
+  app.add_option("--typeslib", dummy,
+                 "specify a types library which will be loaded");
+  app.add_flag("--list_types", listTypes, "list the registered types");
+  app.add_flag("--list_solvers", listSolvers, "list the available solvers");
+  app.add_flag("--list_robust_kernels", listRobustKernels,
+               "list the registered robust kernels");
 
-  arg.param("renameTypes", loadLookup, "",
-            "create a lookup for loading types into other types,\n\t "
-            "TAG_IN_FILE=INTERNAL_TAG_FOR_TYPE,TAG2=INTERNAL2\n\t e.g., "
-            "VERTEX_CAM=VERTEX_SE3:EXPMAP");
-  arg.param("summary", summaryFile, "",
-            "append a summary of this optimization run to the summary file "
-            "passed as argument");
-  arg.paramLeftOver("graph-input", inputFilename, "",
-                    "graph file which will be processed", true);
+  app.add_option("--rename_types", loadLookup,
+                 "create a lookup for loading types into other types, "
+                 "TAG_IN_FILE=INTERNAL_TAG_FOR_TYPE,TAG2=INTERNAL2, e.g., "
+                 "VERTEX_CAM=VERTEX_SE3:EXPMAP");
+  app.add_option(
+      "--summary", summaryFile,
+      "append a summary of this optimization run to the summary file "
+      "passed as argument");
+  app.add_option("graph-input", inputFilename,
+                 "graph file which will be processed ('-' for stdin)")
+      ->required();
 
-  arg.parseArgs(argc, argv);
+  CLI11_PARSE(app, argc, argv);
 
   // if (useNewTypes){
   //   loadLookup=newTypesMapping+loadLookup;
@@ -189,9 +193,9 @@ int run_hierarchical(int argc, char** argv) {
   if (listRobustKernels) {
     std::vector<std::string> kernels;
     RobustKernelFactory::instance()->fillKnownKernels(kernels);
-    std::cout << "Robust Kernels:" << endl;
+    std::cout << "Robust Kernels:\n";
     for (auto& kernel : kernels) {
-      std::cout << kernel << endl;
+      std::cout << kernel << '\n';
     }
   }
 
@@ -209,29 +213,29 @@ int run_hierarchical(int argc, char** argv) {
     optimizer.setRenamedTypesFromString(loadLookup);
   }
   if (inputFilename.empty()) {
-    cerr << "No input data specified" << endl;
+    cerr << "No input data specified\n";
     return 0;
   }
   if (inputFilename == "-") {
-    cerr << "Read input from stdin" << endl;
+    cerr << "Read input from stdin\n";
     if (!optimizer.load(std::cin)) {
-      cerr << "Error loading graph" << endl;
+      cerr << "Error loading graph\n";
       return 2;
     }
   } else {
-    cerr << "Read input from " << inputFilename << endl;
+    cerr << "Read input from " << inputFilename << '\n';
     std::ifstream ifs(inputFilename.c_str());
     if (!ifs) {
-      cerr << "Failed to open file" << endl;
+      cerr << "Failed to open file\n";
       return 1;
     }
     if (!optimizer.load(ifs)) {
-      cerr << "Error loading graph" << endl;
+      cerr << "Error loading graph\n";
       return 2;
     }
   }
-  cerr << "Loaded " << optimizer.vertices().size() << " vertices" << endl;
-  cerr << "Loaded " << optimizer.edges().size() << " edges" << endl;
+  cerr << "Loaded " << optimizer.vertices().size() << " vertices\n";
+  cerr << "Loaded " << optimizer.edges().size() << " edges\n";
 
   OptimizableGraph::EdgeSet originalEdges = optimizer.edges();
 
@@ -245,7 +249,7 @@ int run_hierarchical(int argc, char** argv) {
   if (p0) {
     auto* originalParams = dynamic_cast<ParameterSE3Offset*>(p0.get());
     if (originalParams) {
-      cerr << "ORIGINAL PARAMS" << endl;
+      cerr << "ORIGINAL PARAMS\n";
       auto se3OffsetParam = std::make_shared<ParameterSE3Offset>();
       se3OffsetParam->setId(100);
       optimizer.addParameter(se3OffsetParam);
@@ -259,7 +263,7 @@ int run_hierarchical(int argc, char** argv) {
   EdgeLabeler labeler(&optimizer);
 
   if (optimizer.vertices().empty()) {
-    cerr << "Graph contains no vertices" << endl;
+    cerr << "Graph contains no vertices\n";
     return 1;
   }
 
@@ -335,14 +339,14 @@ int run_hierarchical(int argc, char** argv) {
 
   if (gaugeFreedom) {
     if (!gauge) {
-      cerr << "# cannot find a vertex to fix in this thing" << endl;
+      cerr << "# cannot find a vertex to fix in this thing\n";
       return 2;
     }
-    cerr << "# graph is fixed by node " << gauge->id() << endl;
+    cerr << "# graph is fixed by node " << gauge->id() << '\n';
     gauge->setFixed(true);
 
   } else {
-    cerr << "# graph is fixed by priors" << endl;
+    cerr << "# graph is fixed by priors\n";
   }
 
   // sanity check
@@ -355,8 +359,8 @@ int run_hierarchical(int argc, char** argv) {
 
   if (d.visited().size() != optimizer.vertices().size()) {
     cerr << "Warning: d.visited().size() != optimizer.vertices().size()\n";
-    cerr << "visited: " << d.visited().size() << endl;
-    cerr << "vertices: " << optimizer.vertices().size() << endl;
+    cerr << "visited: " << d.visited().size() << '\n';
+    cerr << "vertices: " << optimizer.vertices().size() << '\n';
   }
 
   // BATCH optimization
@@ -366,7 +370,7 @@ int run_hierarchical(int argc, char** argv) {
   optimizer.computeActiveErrors();
   double loadChi = optimizer.activeChi2();
 
-  cerr << "Initial chi2 = " << FIXED(loadChi) << endl;
+  cerr << "Initial chi2 = " << FIXED(loadChi) << '\n';
 
   if (initialGuess) optimizer.computeInitialGuess();
   signal(SIGINT, sigquit_handler);
@@ -394,9 +398,9 @@ int run_hierarchical(int argc, char** argv) {
                      hierarchicalDiameter, 1, starIterations, uThreshold,
                      debug);
 
-  cerr << "stars computed, stars.size()= " << stars.size() << endl;
+  cerr << "stars computed, stars.size()= " << stars.size() << '\n';
 
-  cerr << "hierarchy done, determining border" << endl;
+  cerr << "hierarchy done, determining border\n";
   EdgeStarMap hesmap;
   constructEdgeStarMap(hesmap, stars, false);
   computeBorder(stars, hesmap);
@@ -423,8 +427,8 @@ int run_hierarchical(int argc, char** argv) {
       heset.insert(iit);
     }
   }
-  cerr << "eset.size()= " << eset.size() << endl;
-  cerr << "heset.size()= " << heset.size() << endl;
+  cerr << "eset.size()= " << eset.size() << '\n';
+  cerr << "heset.size()= " << heset.size() << '\n';
 
   std::ofstream starStream("stars.g2o");
   optimizer.saveSubset(starStream, eset);
@@ -434,9 +438,9 @@ int run_hierarchical(int argc, char** argv) {
   optimizer.saveSubset(hstarStream, heset);
   hstarStream.close();
 
-  cerr << "stars done!" << endl;
+  cerr << "stars done!\n";
 
-  cerr << "optimizing the high layer" << endl;
+  cerr << "optimizing the high layer\n";
   for (const auto& it : hgauge) {
     auto* g = dynamic_cast<OptimizableGraph::Vertex*>(it.get());
     g->setFixed(true);
@@ -454,7 +458,7 @@ int run_hierarchical(int argc, char** argv) {
   optimizer.computeActiveErrors();
   double hFinalChi = optimizer.activeChi2();
 
-  cerr << "done" << endl;
+  cerr << "done\n";
 
   if (!kernelCreator) {
     cerr << "# Robust error function disabled ";
@@ -462,12 +466,12 @@ int run_hierarchical(int argc, char** argv) {
       auto* e = dynamic_cast<SparseOptimizer::Edge*>(it.get());
       e->setRobustKernel(nullptr);
     }
-    cerr << "done." << endl;
+    cerr << "done.\n";
   } else {
     cerr << "# Preparing robust error function ay low level done";
   }
 
-  cerr << "fixing the hstructure, and optimizing the floating nodes" << endl;
+  cerr << "fixing the hstructure, and optimizing the floating nodes\n";
   for (const auto& it : hvset) {
     auto* g = dynamic_cast<OptimizableGraph::Vertex*>(it.get());
     g->setFixed(true);
@@ -475,15 +479,14 @@ int run_hierarchical(int argc, char** argv) {
   optimizer.initializeOptimization(eset);
   optimizer.computeInitialGuess();
   optimizer.optimize(1);
-  cerr << "done" << endl;
+  cerr << "done\n";
   if (debug) {
     std::ofstream os("debug_low_level.g2o");
     optimizer.saveSubset(os, eset);
   }
 
   cerr << "adding the original constraints, locking hierarchical solution and "
-          "optimizing the free variables"
-       << endl;
+          "optimizing the free variables\n";
   for (const auto& it : vset) {
     auto* g = dynamic_cast<OptimizableGraph::Vertex*>(it.get());
     g->setFixed(true);
@@ -497,7 +500,7 @@ int run_hierarchical(int argc, char** argv) {
   optimizer.computeInitialGuess();
   optimizer.optimize(lowIterations);
 
-  cerr << "relaxing the full problem" << endl;
+  cerr << "relaxing the full problem\n";
   for (const auto& it : vset) {
     auto* g = dynamic_cast<OptimizableGraph::Vertex*>(it.get());
     g->setFixed(false);
@@ -508,7 +511,7 @@ int run_hierarchical(int argc, char** argv) {
   }
   optimizer.initializeOptimization(0);
   int result = optimizer.optimize(lowIterations);
-  if (result < 0) cerr << "failure in low level optimization" << endl;
+  if (result < 0) cerr << "failure in low level optimization\n";
 
   optimizer.computeActiveErrors();
   double finalChi = optimizer.activeChi2();
@@ -576,7 +579,7 @@ int run_hierarchical(int argc, char** argv) {
       std::ofstream os(outputfilename.c_str());
       optimizer.saveSubset(os, originalEdges);
     }
-    cerr << "done." << endl;
+    cerr << "done.\n";
   }
 
   // destroy all the singletons
@@ -586,6 +589,7 @@ int run_hierarchical(int argc, char** argv) {
 
   return 0;
 }
+}  // namespace
 
 }  // namespace g2o
 

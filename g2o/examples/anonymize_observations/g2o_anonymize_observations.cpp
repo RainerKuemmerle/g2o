@@ -28,8 +28,8 @@
 #include <fstream>
 #include <iostream>
 
+#include "CLI/CLI.hpp"
 #include "g2o/core/optimizable_graph.h"
-#include "g2o/stuff/command_args.h"
 #include "g2o/types/slam2d/edge_se2.h"
 #include "g2o/types/slam2d/edge_se2_offset.h"
 #include "g2o/types/slam2d/edge_se2_pointxy.h"
@@ -37,6 +37,8 @@
 #include "g2o/types/slam2d/edge_se2_pointxy_offset.h"
 
 namespace g2o {
+
+namespace {
 
 template <typename T>
 bool anonymizeLandmarkEdge(const std::shared_ptr<HyperGraph::Edge>& e_,
@@ -68,16 +70,21 @@ bool anonymizePoseEdge(const std::shared_ptr<HyperGraph::Edge>& e_,
   return false;
 }
 
+}  // namespace
+
 }  // namespace g2o
 
 int main(int argc, char** argv) {
-  g2o::CommandArgs arg;
-  std::string outputFilename;
+  CLI::App app{"g2o's Anonymizer"};
+  argv = app.ensure_utf8(argv);
+  std::string outputFilename = "anon.g2o";
   std::string inputFilename;
-  arg.param("o", outputFilename, "anon.g2o", "output file");
-  arg.paramLeftOver("graph-output", inputFilename, "",
-                    "graph file which will be read", true);
-  arg.parseArgs(argc, argv);
+  app.add_option("-o,--output", outputFilename,
+                 "output final version of the graph");
+  app.add_option("graph-input", inputFilename, "graph file which will be read")
+      ->required();
+  CLI11_PARSE(app, argc, argv);
+
   g2o::OptimizableGraph graph;
 
   if (inputFilename.empty()) {

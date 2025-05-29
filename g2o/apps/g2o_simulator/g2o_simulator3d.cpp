@@ -28,46 +28,57 @@
 #include <fstream>
 #include <iostream>
 
+#include "CLI/CLI.hpp"
 #include "g2o/core/optimizable_graph.h"
 #include "g2o/simulator/simulator3d_base.h"
-#include "g2o/stuff/command_args.h"
 #include "g2o/stuff/logger.h"
 
 int main(int argc, char** argv) {
-  g2o::CommandArgs arg;
   g2o::Simulator3D::Config simulator_config;
+  simulator_config.simSteps = 100;
+  simulator_config.nlandmarks = 1000;
+  simulator_config.worldSize = 25.0;
+
+  CLI::App app{"g2o Simulator 3D"};
+  argv = app.ensure_utf8(argv);
 
   std::string outputFilename;
-  arg.param("simSteps", simulator_config.simSteps, 100,
-            "number of simulation steps");
-  arg.param("nLandmarks", simulator_config.nlandmarks, 1000,
-            "number of landmarks");
-  arg.param("worldSize", simulator_config.worldSize, 25.0, "size of the world");
-  arg.param("hasOdom", simulator_config.hasOdom, false,
-            "the robot has an odometry");
-  arg.param("hasPointSensor", simulator_config.hasPointSensor, false,
-            "the robot has a point sensor");
-  arg.param("hasPointDepthSensor", simulator_config.hasPointDepthSensor, false,
-            "the robot has a point sensor");
-  arg.param("hasPointDisparitySensor", simulator_config.hasPointDisparitySensor,
-            false, "the robot has a point sensor");
-  arg.param("hasPoseSensor", simulator_config.hasPoseSensor, false,
-            "the robot has a pose sensor");
-  arg.param("hasCompass", simulator_config.hasCompass, false,
-            "the robot has a compass");
-  arg.param("hasGPS", simulator_config.hasGPS, false, "the robot has a GPS");
-  arg.paramLeftOver("graph-output", outputFilename, "",
-                    "graph file which will be written", true);
+  app.add_flag("--sim_steps", simulator_config.simSteps,
+               "number of simulation steps")
+      ->check(CLI::PositiveNumber);
+  app.add_flag("--num_landmarks", simulator_config.nlandmarks,
+               "number of landmarks")
+      ->check(CLI::NonNegativeNumber);
+  app.add_flag("--world_size", simulator_config.worldSize, "size of the world")
+      ->check(CLI::NonNegativeNumber);
+  app.add_flag("--has_odom", simulator_config.hasOdom,
+               "the robot has an odometry");
+  app.add_flag("--has_point_sensor", simulator_config.hasPointSensor,
+               "the robot has a point sensor");
+  app.add_flag("--has_point_depth_sensor", simulator_config.hasPointDepthSensor,
+               "the robot has a point sensor");
+  app.add_flag("--has_point_disparity_sensor",
+               simulator_config.hasPointDisparitySensor,
+               "the robot has a point sensor");
+  app.add_flag("has_pose_sensor", simulator_config.hasPoseSensor,
+               "the robot has a pose sensor");
+  app.add_flag("--has_compass", simulator_config.hasCompass,
+               "the robot has a compass");
+  app.add_flag("--has_gps", simulator_config.hasGPS, "the robot has a GPS");
+  app.add_option("graph-output", outputFilename,
+                 "graph file which will be written ('-' for stdout)")
+      ->required();
 
-  arg.parseArgs(argc, argv);
+  CLI11_PARSE(app, argc, argv);
 
+  G2O_INFO("Running 3D simulator");
   g2o::Simulator3D simulator(std::move(simulator_config));
   G2O_INFO("Setting up");
   simulator.setup();
   G2O_INFO("Simulate");
   simulator.simulate();
 
-  if (outputFilename.empty()) {
+  if (outputFilename == "-") {
     G2O_INFO("Saving to stdout");
     simulator.world().graph().save(std::cout);
   } else {

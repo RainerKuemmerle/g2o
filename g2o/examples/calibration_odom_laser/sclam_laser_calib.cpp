@@ -28,24 +28,24 @@
 #include <fstream>
 #include <iostream>
 
+#include "CLI/CLI.hpp"
 #include "g2o/core/factory.h"
 #include "g2o/core/hyper_dijkstra.h"
 #include "g2o/core/optimization_algorithm_factory.h"
 #include "g2o/core/sparse_optimizer.h"
-#include "g2o/stuff/command_args.h"
 #include "g2o/stuff/logger.h"
 #include "g2o/stuff/macros.h"
 #include "g2o/types/slam2d/vertex_se2.h"
 #include "gm2dl_io.h"
 
-static bool hasToStop = false;
-
 G2O_USE_OPTIMIZATION_LIBRARY(eigen);
 G2O_USE_TYPE_GROUP(slam2d);
 
 using std::cerr;
-using std::endl;
 using std::string;
+
+namespace {
+bool hasToStop = false;
 
 void sigquit_handler(int sig) {
   if (sig == SIGINT) {
@@ -57,29 +57,29 @@ void sigquit_handler(int sig) {
     }
   }
 }
+}  // namespace
 
 int main(int argc, char** argv) {
-  int maxIterations;
+  int maxIterations = 10;
   bool verbose;
   string inputFilename;
   string gnudump;
   string outputfilename;
   bool initialGuess;
   // command line parsing
-  g2o::CommandArgs commandLineArguments;
-  commandLineArguments.param("i", maxIterations, 10, "perform n iterations");
-  commandLineArguments.param("v", verbose, false,
-                             "verbose output of the optimization process");
-  commandLineArguments.param("guess", initialGuess, false,
-                             "initial guess based on spanning tree");
-  commandLineArguments.param("gnudump", gnudump, "",
-                             "dump to gnuplot data file");
-  commandLineArguments.param("o", outputfilename, "",
-                             "output final version of the graph");
-  commandLineArguments.paramLeftOver("gm2dl-input", inputFilename, "",
-                                     "gm2dl file which will be processed");
+  CLI::App app{"g2o SCLAM Laser Calibration"};
+  app.add_option("-i,--iterations", maxIterations, "perform n iterations");
+  app.add_flag("-v", verbose, "verbose output of the optimization process");
+  app.add_flag("--guess", initialGuess, "initial guess based on spanning tree");
+  app.add_option("--gnudump", gnudump, "dump to gnuplot data file");
+  app.add_option("-o,--output", outputfilename,
+                 "output final version of the graph");
+  app.add_option("gm2dl-input", inputFilename,
+                 "gm2dl file which will be processed")
+      ->check(CLI::ExistingFile)
+      ->required();
 
-  commandLineArguments.parseArgs(argc, argv);
+  CLI11_PARSE(app, argc, argv);
 
   g2o::OptimizationAlgorithmFactory* solverFactory =
       g2o::OptimizationAlgorithmFactory::instance();
@@ -93,7 +93,7 @@ int main(int argc, char** argv) {
 
   // loading
   if (!g2o::Gm2dlIO::readGm2dl(inputFilename, optimizer, false)) {
-    cerr << "Error while loading gm2dl file" << endl;
+    cerr << "Error while loading gm2dl file\n";
   }
 
   auto laserOffset = std::dynamic_pointer_cast<g2o::VertexSE2>(
@@ -101,21 +101,21 @@ int main(int argc, char** argv) {
   // laserOffset->setEstimate(SE2()); // set to Identity
   if (laserOffset) {
     cerr << "Initial laser offset "
-         << laserOffset->estimate().toVector().transpose() << endl;
+         << laserOffset->estimate().toVector().transpose() << '\n';
   }
   bool gaugeFreedom = optimizer.gaugeFreedom();
 
   auto gauge = optimizer.findGauge();
   if (gaugeFreedom) {
     if (!gauge) {
-      cerr << "# cannot find a vertex to fix in this thing" << endl;
+      cerr << "# cannot find a vertex to fix in this thing\n";
       return 2;
     }
-    cerr << "# graph is fixed by node " << gauge->id() << endl;
+    cerr << "# graph is fixed by node " << gauge->id() << '\n';
     gauge->setFixed(true);
 
   } else {
-    cerr << "# graph is fixed by priors" << endl;
+    cerr << "# graph is fixed by priors\n";
   }
 
   // sanity check
@@ -128,13 +128,13 @@ int main(int argc, char** argv) {
 
   if (d.visited().size() != optimizer.vertices().size()) {
     cerr << "Warning: d.visited().size() != optimizer.vertices().size()\n";
-    cerr << "visited: " << d.visited().size() << endl;
-    cerr << "vertices: " << optimizer.vertices().size() << endl;
+    cerr << "visited: " << d.visited().size() << '\n';
+    cerr << "vertices: " << optimizer.vertices().size() << '\n';
     for (auto& it : optimizer.vertices()) {
       if (d.visited().count(it.second) == 0) {
         auto* v = static_cast<g2o::OptimizableGraph::Vertex*>(it.second.get());
         cerr << "\t unvisited vertex " << it.first << " "
-             << static_cast<void*>(v) << endl;
+             << static_cast<void*>(v) << '\n';
         v->setFixed(true);
       }
     }
@@ -142,7 +142,7 @@ int main(int argc, char** argv) {
 
   optimizer.initializeOptimization();
   optimizer.computeActiveErrors();
-  cerr << "Initial chi2 = " << FIXED(optimizer.chi2()) << endl;
+  cerr << "Initial chi2 = " << FIXED(optimizer.chi2()) << '\n';
 
   // if (guessCostFunction)
   // optimizer.computeInitialGuess(guessCostFunction);
@@ -151,26 +151,26 @@ int main(int argc, char** argv) {
 
   int i = optimizer.optimize(maxIterations);
   if (maxIterations > 0 && !i) {
-    cerr << "optimize failed, result might be invalid" << endl;
+    cerr << "optimize failed, result might be invalid\n";
   }
 
   if (laserOffset) {
     cerr << "Calibrated laser offset "
-         << laserOffset->estimate().toVector().transpose() << endl;
+         << laserOffset->estimate().toVector().transpose() << '\n';
   }
 
   if (!outputfilename.empty()) {
     g2o::Gm2dlIO::updateLaserData(optimizer);
     cerr << "Writing " << outputfilename << " ... ";
     bool writeStatus = g2o::Gm2dlIO::writeGm2dl(outputfilename, optimizer);
-    cerr << (writeStatus ? "done." : "failed") << endl;
+    cerr << (writeStatus ? "done." : "failed") << '\n';
   }
 
   if (!gnudump.empty()) {
     std::ofstream fout(gnudump.c_str());
     for (const auto& it : optimizer.vertices()) {
       auto* v = dynamic_cast<g2o::VertexSE2*>(it.second.get());
-      fout << v->estimate().toVector().transpose() << endl;
+      fout << v->estimate().toVector().transpose() << '\n';
     }
   }
 

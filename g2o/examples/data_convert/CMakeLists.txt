@@ -2,4 +2,5 @@ add_executable(convert_sba_slam3d
   convert_sba_slam3d.cpp
 )
 set_target_properties(convert_sba_slam3d PROPERTIES OUTPUT_NAME convert_sba_slam3d)
-target_link_libraries(convert_sba_slam3d core types_slam3d types_sba)
+target_link_libraries(convert_sba_slam3d PRIVATE core types_slam3d types_sba)
+target_link_libraries(convert_sba_slam3d PRIVATE CLI11::CLI11)
