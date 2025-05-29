@@ -27,8 +27,8 @@
 #include <cassert>
 #include <iostream>
 
+#include "CLI/CLI.hpp"
 #include "g2o/core/optimizable_graph.h"
-#include "g2o/stuff/command_args.h"
 #include "g2o/types/sba/edge_project_p2sc.h"
 #include "g2o/types/sba/vertex_cam.h"
 #include "g2o/types/slam3d/edge_se3_pointxyz_disparity.h"
@@ -44,13 +44,15 @@ int convert_sba_slam3d(int argc, char** argv) {
   string inputFilename;
   string outputFilename;
   // command line parsing
-  CommandArgs commandLineArguments;
-  commandLineArguments.paramLeftOver("gm2dl-input", inputFilename, "",
-                                     "gm2dl file which will be processed");
-  commandLineArguments.paramLeftOver("gm2dl-output", outputFilename, "",
-                                     "name of the output file");
+  CLI::App app{"g2o Convert SBA SLAM3D"};
+  argv = app.ensure_utf8(argv);
+  app.add_option("input", inputFilename, "file which will be processed")
+      ->check(CLI::ExistingFile)
+      ->required();
+  app.add_option("output", outputFilename, "name of the output file")
+      ->required();
 
-  commandLineArguments.parseArgs(argc, argv);
+  CLI11_PARSE(app, argc, argv);
 
   OptimizableGraph inputGraph;
   const bool loadStatus = inputGraph.load(inputFilename.c_str());

@@ -27,43 +27,30 @@
 #include <csignal>
 #include <cstdlib>
 
-#include "g2o/stuff/command_args.h"
-#include "g2o/stuff/logger.h"
+#include "CLI/CLI.hpp"
 #include "g2o_slam_interface.h"
 #include "graph_optimizer_sparse_online.h"
 #include "slam_parser/interface/parser_interface.h"
 
-static bool hasToStop = false;
-
-void sigquit_handler(int sig) {
-  if (sig == SIGINT) {
-    hasToStop = true;
-    static int cnt = 0;
-    if (cnt++ == 2) {
-      G2O_WARN("forcing exit");
-      exit(1);
-    }
-  }
-}
-
 int main(int argc, char** argv) {
   bool pcg;
-  int updateEachN;
+  int updateEachN = 10;
   bool vis;
   bool verbose;
   // command line parsing
-  g2o::CommandArgs arg;
-  arg.param("update", updateEachN, 10,
-            "update the graph after inserting N nodes");
-  arg.param("pcg", pcg, false, "use PCG instead of Cholesky");
-  arg.param("v", verbose, false, "verbose output of the optimization process");
-  arg.param("g", vis, false, "gnuplot visualization");
+  CLI::App app{"g2o Online"};
+  argv = app.ensure_utf8(argv);
+  app.add_option("--update", updateEachN,
+                 "update the graph after inserting N nodes")
+      ->check(CLI::PositiveNumber);
+  app.add_flag("--pcg", pcg, "use PCG instead of Cholesky");
+  app.add_flag("-v", verbose, "verbose output of the optimization process");
+  app.add_flag("-g", vis, "gnuplot visualization");
 
-  arg.parseArgs(argc, argv);
+  CLI11_PARSE(app, argc, argv);
 
   g2o::SparseOptimizerOnline optimizer(pcg);
   optimizer.setVerbose(verbose);
-  optimizer.setForceStopFlag(&hasToStop);
   optimizer.vizWithGnuplot = vis;
 
   g2o::G2oSlamInterface slamInterface(&optimizer);

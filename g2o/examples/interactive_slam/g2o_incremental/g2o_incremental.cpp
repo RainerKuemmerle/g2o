@@ -18,14 +18,14 @@
 #include <csignal>
 #include <iostream>
 
+#include "CLI/CLI.hpp"
 #include "g2o/examples/interactive_slam/g2o_interactive/g2o_slam_interface.h"
-#include "g2o/stuff/command_args.h"
 #include "g2o/stuff/string_tools.h"
 #include "g2o/stuff/tictoc.h"
 #include "graph_optimizer_sparse_incremental.h"
 #include "slam_parser/interface/parser_interface.h"
 
-static bool hasToStop = false;
+namespace {
 
 /**
  * \brief Store the information parsed from a g2o file
@@ -54,7 +54,7 @@ struct IncrementalEdgesCompare {
   }
 };
 
-inline void solveAndPrint(g2o::G2oSlamInterface& slamInterface, bool verbose) {
+void solveAndPrint(g2o::G2oSlamInterface& slamInterface, bool verbose) {
   g2o::G2oSlamInterface::SolveResult solverState = slamInterface.solve();
   if (!verbose) {
     switch (solverState) {
@@ -63,7 +63,8 @@ inline void solveAndPrint(g2o::G2oSlamInterface& slamInterface, bool verbose) {
         break;
       case g2o::G2oSlamInterface::kSolvedBatch:
         std::cout << "b " << slamInterface.optimizer()->vertices().size()
-                  << std::endl;
+                  << '\n'
+                  << std::flush;
         break;
       default:
         break;
@@ -71,49 +72,44 @@ inline void solveAndPrint(g2o::G2oSlamInterface& slamInterface, bool verbose) {
   }
 }
 
-void sigquit_handler(int sig) {
-  if (sig == SIGINT) {
-    hasToStop = true;
-    static int cnt = 0;
-    if (cnt++ == 2) {
-      G2O_WARN("forcing exit");
-      exit(1);
-    }
-  }
-}
+}  // namespace
 
 int main(int argc, char** argv) {
   std::string inputFilename;
   std::string outputFilename;
-  int updateEachN;
-  int batchEachN;
+  int updateEachN = 10;
+  int batchEachN = 100;
   bool verbose;
   bool vis;
   // command line parsing
-  g2o::CommandArgs arg;
-  arg.param("batch", batchEachN, 100,
-            "solve by a batch Cholesky after inserting N nodes");
-  arg.param("update", updateEachN, 10,
-            "update the graph after inserting N nodes");
-  arg.param("v", verbose, false, "verbose output of the optimization process");
-  arg.param("g", vis, false, "gnuplot visualization");
-  arg.param("o", outputFilename, "", "output the final graph");
-  arg.param("i", inputFilename, "",
-            "input file (default g2o format), if not given read via stdin");
+  CLI::App app{"g2o Incremental"};
+  argv = app.ensure_utf8(argv);
+  app.add_option("--batch", batchEachN,
+                 "solve by a batch Cholesky after inserting N nodes")
+      ->check(CLI::PositiveNumber);
+  app.add_option("--update", updateEachN,
+                 "update the graph after inserting N nodes")
+      ->check(CLI::PositiveNumber);
+  app.add_flag("-v", verbose, "verbose output of the optimization process");
+  app.add_flag("-g", vis, "gnuplot visualization");
+  app.add_option("-o,--output", outputFilename,
+                 "output final version of the graph");
+  app.add_option(
+      "input", inputFilename,
+      "input file (default g2o format), if not given read via stdin");
 
-  arg.parseArgs(argc, argv);
+  CLI11_PARSE(app, argc, argv);
 
   g2o::SparseOptimizerIncremental optimizer;
   optimizer.setVerbose(verbose);
-  optimizer.setForceStopFlag(&hasToStop);
   optimizer.vizWithGnuplot = vis;
 
   g2o::G2oSlamInterface slamInterface(&optimizer);
   slamInterface.setUpdateGraphEachN(updateEachN);
   slamInterface.setBatchSolveEachN(batchEachN);
 
-  std::cerr << "Updating every " << updateEachN << std::endl;
-  std::cerr << "Batch step every " << batchEachN << std::endl;
+  std::cerr << "Updating every " << updateEachN << '\n';
+  std::cerr << "Batch step every " << batchEachN << '\n';
 
   if (!inputFilename.empty()) {  // operating on a file
     std::vector<EdgeInformation> edgesFromGraph;
@@ -131,7 +127,7 @@ int main(int argc, char** argv) {
     g2o::tictoc("parsing");
     std::ifstream ifs(inputFilename.c_str());
     if (!ifs) {
-      std::cerr << "Failure to open " << inputFilename << std::endl;
+      std::cerr << "Failure to open " << inputFilename << '\n';
       return 1;
     }
     std::stringstream currentLine;
@@ -163,7 +159,7 @@ int main(int argc, char** argv) {
     std::sort(edgesFromGraph.begin(), edgesFromGraph.end(),
               IncrementalEdgesCompare());
     g2o::tictoc("parsing");
-    std::cerr << "done." << std::endl;
+    std::cerr << "done." << '\n';
 
     // adding edges to the graph. Add all edges connecting a node and then call
     // optimize
@@ -191,7 +187,7 @@ int main(int argc, char** argv) {
   }
 
   if (!outputFilename.empty()) {
-    std::cerr << "Saving " << outputFilename << std::endl;
+    std::cerr << "Saving " << outputFilename << '\n';
     optimizer.save(outputFilename.c_str());
   }
 

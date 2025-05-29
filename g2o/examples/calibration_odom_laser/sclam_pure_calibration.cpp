@@ -29,10 +29,10 @@
 #include <iostream>
 #include <memory>
 
+#include "CLI/CLI.hpp"
 #include "closed_form_calibration.h"
 #include "edge_se2_pure_calib.h"
 #include "g2o/core/sparse_optimizer.h"
-#include "g2o/stuff/command_args.h"
 #include "g2o/stuff/macros.h"
 #include "g2o/types/data/data_queue.h"
 #include "g2o/types/data/robot_laser.h"
@@ -94,7 +94,7 @@ namespace {
 
 int run_sclam_pure_calibration(int argc, char** argv) {
   bool fixLaser;
-  int maxIterations;
+  int maxIterations = 10;
   bool verbose;
   string inputFilename;
   string outputfilename;
@@ -102,24 +102,25 @@ int run_sclam_pure_calibration(int argc, char** argv) {
   string odomTestFilename;
   string dumpGraphFilename;
   // command line parsing
-  CommandArgs commandLineArguments;
-  commandLineArguments.param("i", maxIterations, 10, "perform n iterations");
-  commandLineArguments.param("v", verbose, false,
-                             "verbose output of the optimization process");
-  commandLineArguments.param("o", outputfilename, "",
-                             "output final version of the graph");
-  commandLineArguments.param("test", odomTestFilename, "",
-                             "apply odometry calibration to some test data");
-  commandLineArguments.param("dump", dumpGraphFilename, "",
-                             "write the graph to the disk");
-  commandLineArguments.param("fixLaser", fixLaser, false,
-                             "keep the laser offset fixed during optimization");
-  commandLineArguments.paramLeftOver("gm2dl-input", inputFilename, "",
-                                     "gm2dl file which will be processed");
-  commandLineArguments.paramLeftOver("raw-log", rawFilename, "",
-                                     "raw log file containing the odometry");
+  CLI::App app{"g2o SCLAM Pure Calibration"};
+  app.add_option("-i,--iterations", maxIterations, "perform n iterations");
+  app.add_flag("-v", verbose, "verbose output of the optimization process");
+  app.add_option("-o,--output", outputfilename,
+                 "output final version of the graph");
+  app.add_option("--test", odomTestFilename,
+                 "apply odometry calibration to some test data");
+  app.add_option("--dump", dumpGraphFilename, "write the graph to the disk");
+  app.add_flag("--fix_laser", fixLaser,
+               "keep the laser offset fixed during optimization");
+  app.add_option("gm2dl-input", inputFilename,
+                 "gm2dl file which will be processed")
+      ->check(CLI::ExistingFile)
+      ->required();
+  app.add_option("raw-log", rawFilename, "raw log file containing the odometry")
+      ->check(CLI::ExistingFile)
+      ->required();
 
-  commandLineArguments.parseArgs(argc, argv);
+  CLI11_PARSE(app, argc, argv);
 
   SparseOptimizer optimizer;
   optimizer.setVerbose(verbose);

@@ -28,9 +28,9 @@
 #include <iostream>
 #include <utility>
 
+#include "CLI/CLI.hpp"
 #include "g2o/core/eigen_types.h"
 #include "g2o/core/sparse_optimizer.h"
-#include "g2o/stuff/command_args.h"
 #include "g2o/stuff/sampler.h"
 #include "g2o/types/slam3d/edge_se3.h"
 #include "g2o/types/slam3d/edge_se3_prior.h"
@@ -251,21 +251,22 @@ struct PlaneSensor : public Sensor {
 };
 
 int simulator_3d_plane(int argc, char** argv) {
-  CommandArgs arg;
+  CLI::App app{"g2o Simulator 3D Plane"};
+  argv = app.ensure_utf8(argv);
   bool fixSensor;
   bool fixPlanes;
   bool fixFirstPose;
   bool fixTrajectory;
   bool planarMotion;
   std::cerr << "graph\n";
-  arg.param("fixSensor", fixSensor, false,
-            "fix the sensor position on the robot");
-  arg.param("fixTrajectory", fixTrajectory, false, "fix the trajectory");
-  arg.param("fixFirstPose", fixFirstPose, false, "fix the first robot pose");
-  arg.param("fixPlanes", fixPlanes, false,
-            "fix the planes (do localization only)");
-  arg.param("planarMotion", planarMotion, false, "robot moves on a plane");
-  arg.parseArgs(argc, argv);
+  app.add_flag("--fix_sensor", fixSensor,
+               "fix the sensor position on the robot");
+  app.add_flag("--fix_trajectory", fixTrajectory, "fix the trajectory");
+  app.add_flag("--fix_first_pose", fixFirstPose, "fix the first robot pose");
+  app.add_flag("--fix_planes", fixPlanes,
+               "fix the planes (do localization only)");
+  app.add_flag("--planar_motion", planarMotion, "robot moves on a plane");
+  CLI11_PARSE(app, argc, argv);
 
   auto* g = new SparseOptimizer();
   auto odomOffset = std::make_shared<ParameterSE3Offset>();

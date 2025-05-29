@@ -11,7 +11,8 @@ set_target_properties(g2o_incremental_library PROPERTIES
 target_link_libraries(g2o_incremental_library g2o_interactive_library solver_cholmod ${CAMD_LIBRARY} SuiteSparse::CHOLMOD)
 
 add_executable(g2o_incremental_application g2o_incremental.cpp)
-target_link_libraries(g2o_incremental_application g2o_incremental_library)
+target_link_libraries(g2o_incremental_application PRIVATE g2o_incremental_library)
+target_link_libraries(g2o_incremental_application PRIVATE CLI11::CLI11)
 set_target_properties(g2o_incremental_application PROPERTIES OUTPUT_NAME g2o_incremental)
 
 install(TARGETS g2o_incremental_library g2o_incremental_application

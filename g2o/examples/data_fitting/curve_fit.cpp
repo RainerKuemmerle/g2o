@@ -27,12 +27,12 @@
 #include <Eigen/Core>
 #include <iostream>
 
+#include "CLI/CLI.hpp"
 #include "g2o/core/auto_differentiation.h"
 #include "g2o/core/base_unary_edge.h"
 #include "g2o/core/base_vertex.h"
 #include "g2o/core/optimization_algorithm_factory.h"
 #include "g2o/core/sparse_optimizer.h"
-#include "g2o/stuff/command_args.h"
 #include "g2o/stuff/sampler.h"
 
 G2O_USE_OPTIMIZATION_LIBRARY(dense);
@@ -62,7 +62,7 @@ class EdgePointOnCurve
     const T& a = params[0];
     const T& b = params[1];
     const T& lambda = params[2];
-    T fval = a * exp(-lambda * T{measurement()(0)}) + b;
+    T fval = (a * exp(-lambda * T{measurement()(0)})) + b;
     error[0] = fval - T{measurement()(1)};
     return true;
   }
@@ -71,18 +71,20 @@ class EdgePointOnCurve
 };
 
 int main(int argc, char** argv) {
-  int numPoints;
-  int maxIterations;
+  int numPoints = 50;
+  int maxIterations = 10;
   bool verbose;
   std::string dumpFilename;
-  g2o::CommandArgs arg;
-  arg.param("dump", dumpFilename, "", "dump the points into a file");
-  arg.param("numPoints", numPoints, 50,
-            "number of points sampled from the curve");
-  arg.param("i", maxIterations, 10, "perform n iterations");
-  arg.param("v", verbose, false, "verbose output of the optimization process");
+  CLI::App app{"g2o: Fit a curve"};
 
-  arg.parseArgs(argc, argv);
+  app.add_option("--num_points", numPoints,
+                 "number of points sampled from the circle")
+      ->capture_default_str();
+  app.add_option("-o,--output", dumpFilename, "output filename");
+  app.add_option("-i,--iterations", maxIterations, "perform n iterations")
+      ->capture_default_str();
+  app.add_flag("-v", verbose, "verbose output of the optimization process");
+  CLI11_PARSE(app, argc, argv);
 
   // generate random data
   g2o::Sampler::seedRand();
@@ -93,7 +95,7 @@ int main(int argc, char** argv) {
     constexpr double kB = 0.4;
     constexpr double kLambda = 0.2;
     const double x = g2o::Sampler::uniformRand(0, 10);
-    const double y = kA * exp(-kLambda * x) +
+    const double y = (kA * exp(-kLambda * x)) +
                      kB
                      // add Gaussian noise
                      + g2o::Sampler::gaussRand(0, 0.02);

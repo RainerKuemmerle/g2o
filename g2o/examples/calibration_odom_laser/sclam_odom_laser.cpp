@@ -30,9 +30,9 @@
 #include <iostream>
 #include <memory>
 
+#include "CLI/CLI.hpp"
 #include "g2o/core/hyper_dijkstra.h"
 #include "g2o/core/sparse_optimizer.h"
-#include "g2o/stuff/command_args.h"
 #include "g2o/stuff/macros.h"
 #include "g2o/types/data/data_queue.h"
 #include "g2o/types/data/robot_laser.h"
@@ -43,27 +43,28 @@
 #include "sclam_helpers.h"
 
 using std::cerr;
-using std::endl;
 using std::string;
 
-static bool hasToStop = false;
+namespace g2o {
+
+namespace {
+
+bool hasToStop = false;
 
 void sigquit_handler(int sig) {
   if (sig == SIGINT) {
     hasToStop = true;
     static int cnt = 0;
     if (cnt++ == 2) {
-      cerr << " forcing exit" << endl;
+      cerr << " forcing exit\n";
       exit(1);
     }
   }
 }
 
-namespace g2o {
-
-static int run_sclam_odom_laser(int argc, char** argv) {
+int run_sclam_odom_laser(int argc, char** argv) {
   bool fixLaser;
-  int maxIterations;
+  int maxIterations = 10;
   bool verbose;
   string inputFilename;
   string outputfilename;
@@ -71,24 +72,25 @@ static int run_sclam_odom_laser(int argc, char** argv) {
   string odomTestFilename;
   string dumpGraphFilename;
   // command line parsing
-  CommandArgs commandLineArguments;
-  commandLineArguments.param("i", maxIterations, 10, "perform n iterations");
-  commandLineArguments.param("v", verbose, false,
-                             "verbose output of the optimization process");
-  commandLineArguments.param("o", outputfilename, "",
-                             "output final version of the graph");
-  commandLineArguments.param("test", odomTestFilename, "",
-                             "apply odometry calibration to some test data");
-  commandLineArguments.param("dump", dumpGraphFilename, "",
-                             "write the graph to the disk");
-  commandLineArguments.param("fixLaser", fixLaser, false,
-                             "keep the laser offset fixed during optimization");
-  commandLineArguments.paramLeftOver("gm2dl-input", inputFilename, "",
-                                     "gm2dl file which will be processed");
-  commandLineArguments.paramLeftOver("raw-log", rawFilename, "",
-                                     "raw log file containing the odometry");
+  CLI::App app{"g2o SCLAM Odom Laser"};
+  app.add_option("-i,--iterations", maxIterations, "perform n iterations");
+  app.add_flag("-v", verbose, "verbose output of the optimization process");
+  app.add_option("-o,--output", outputfilename,
+                 "output final version of the graph");
+  app.add_option("--test", odomTestFilename,
+                 "apply odometry calibration to some test data");
+  app.add_option("--dump", dumpGraphFilename, "write the graph to the disk");
+  app.add_flag("--fixLaser", fixLaser,
+               "keep the laser offset fixed during optimization");
+  app.add_option("gm2dl-input", inputFilename,
+                 "gm2dl file which will be processed")
+      ->check(CLI::ExistingFile)
+      ->required();
+  app.add_option("raw-log", rawFilename, "raw log file containing the odometry")
+      ->check(CLI::ExistingFile)
+      ->required();
 
-  commandLineArguments.parseArgs(argc, argv);
+  CLI11_PARSE(app, argc, argv);
 
   SparseOptimizer optimizer;
   optimizer.setVerbose(verbose);
@@ -98,30 +100,30 @@ static int run_sclam_odom_laser(int argc, char** argv) {
 
   // loading
   if (!Gm2dlIO::readGm2dl(inputFilename, optimizer, false)) {
-    cerr << "Error while loading gm2dl file" << endl;
+    cerr << "Error while loading gm2dl file\n";
   }
   DataQueue robotLaserQueue;
   const int numLaserOdom =
       Gm2dlIO::readRobotLaser(rawFilename, robotLaserQueue);
   if (numLaserOdom == 0) {
-    cerr << "No raw information read" << endl;
+    cerr << "No raw information read\n";
     return 0;
   }
-  cerr << "Read " << numLaserOdom << " laser readings from file" << endl;
+  cerr << "Read " << numLaserOdom << " laser readings from file\n";
 
   const bool gaugeFreedom = optimizer.gaugeFreedom();
 
   auto gauge = optimizer.findGauge();
   if (gaugeFreedom) {
     if (!gauge) {
-      cerr << "# cannot find a vertex to fix in this thing" << endl;
+      cerr << "# cannot find a vertex to fix in this thing\n";
       return 2;
     }
-    cerr << "# graph is fixed by node " << gauge->id() << endl;
+    cerr << "# graph is fixed by node " << gauge->id() << '\n';
     gauge->setFixed(true);
 
   } else {
-    cerr << "# graph is fixed by priors" << endl;
+    cerr << "# graph is fixed by priors\n";
   }
 
   addOdometryCalibLinksDifferential(optimizer, robotLaserQueue);
@@ -135,13 +137,13 @@ static int run_sclam_odom_laser(int argc, char** argv) {
 
   if (d.visited().size() != optimizer.vertices().size()) {
     cerr << "Warning: d.visited().size() != optimizer.vertices().size()\n";
-    cerr << "visited: " << d.visited().size() << endl;
-    cerr << "vertices: " << optimizer.vertices().size() << endl;
+    cerr << "visited: " << d.visited().size() << '\n';
+    cerr << "vertices: " << optimizer.vertices().size() << '\n';
     for (auto& it : optimizer.vertices()) {
       auto* v = static_cast<OptimizableGraph::Vertex*>(it.second.get());
       if (d.visited().count(it.second) == 0) {
         cerr << "\t unvisited vertex " << it.first << " "
-             << static_cast<void*>(v) << endl;
+             << static_cast<void*>(v) << '\n';
         v->setFixed(true);
       }
     }
@@ -150,7 +152,7 @@ static int run_sclam_odom_laser(int argc, char** argv) {
   for (const auto& it : optimizer.vertices()) {
     auto* v = static_cast<OptimizableGraph::Vertex*>(it.second.get());
     if (v->fixed()) {
-      cerr << "\t fixed vertex " << it.first << endl;
+      cerr << "\t fixed vertex " << it.first << '\n';
     }
   }
 
@@ -161,38 +163,38 @@ static int run_sclam_odom_laser(int argc, char** argv) {
           optimizer.vertex(Gm2dlIO::kIdOdomcalib));
 
   if (fixLaser) {
-    cerr << "Fix position of the laser offset" << endl;
+    cerr << "Fix position of the laser offset" << '\n';
     laserOffset->setFixed(true);
   }
 
   signal(SIGINT, sigquit_handler);
-  cerr << "Doing full estimation" << endl;
+  cerr << "Doing full estimation\n";
   optimizer.initializeOptimization();
   optimizer.computeActiveErrors();
-  cerr << "Initial chi2 = " << FIXED(optimizer.chi2()) << endl;
+  cerr << "Initial chi2 = " << FIXED(optimizer.chi2()) << '\n';
 
   const int i = optimizer.optimize(maxIterations);
   if (maxIterations > 0 && !i) {
-    cerr << "optimize failed, result might be invalid" << endl;
+    cerr << "optimize failed, result might be invalid\n";
   }
 
   if (laserOffset) {
     cerr << "Calibrated laser offset (x, y, theta):"
-         << laserOffset->estimate().toVector().transpose() << endl;
+         << laserOffset->estimate().toVector().transpose() << '\n';
   }
 
   if (odomParamsVertex) {
     cerr << "Odometry parameters (scaling factors (v_l, v_r, b)): "
-         << odomParamsVertex->estimate().transpose() << endl;
+         << odomParamsVertex->estimate().transpose() << '\n';
   }
 
-  cerr << "vertices: " << optimizer.vertices().size() << endl;
-  cerr << "edges: " << optimizer.edges().size() << endl;
+  cerr << "vertices: " << optimizer.vertices().size() << '\n';
+  cerr << "edges: " << optimizer.edges().size() << '\n';
 
   if (!dumpGraphFilename.empty()) {
     cerr << "Writing " << dumpGraphFilename << " ... ";
     optimizer.save(dumpGraphFilename.c_str());
-    cerr << "done." << endl;
+    cerr << "done.\n";
   }
 
   // optional input of a separate file for applying the odometry calibration
@@ -201,7 +203,7 @@ static int run_sclam_odom_laser(int argc, char** argv) {
     const int numTestOdom =
         Gm2dlIO::readRobotLaser(odomTestFilename, testRobotLaserQueue);
     if (numTestOdom == 0) {
-      cerr << "Unable to read test data" << endl;
+      cerr << "Unable to read test data\n";
     } else {
       std::ofstream rawStream("odometry_raw.txt");
       std::ofstream calibratedStream("odometry_calibrated.txt");
@@ -242,10 +244,10 @@ static int run_sclam_odom_laser(int argc, char** argv) {
         // write output
         rawStream << prev->odomPose().translation().x() << " "
                   << prev->odomPose().translation().y() << " "
-                  << prev->odomPose().rotation().angle() << endl;
+                  << prev->odomPose().rotation().angle() << '\n';
         calibratedStream << calOdomPose.translation().x() << " "
                          << calOdomPose.translation().y() << " "
-                         << calOdomPose.rotation().angle() << endl;
+                         << calOdomPose.rotation().angle() << '\n';
 
         prevCalibratedPose = calOdomPose;
         prev = cur;
@@ -257,11 +259,14 @@ static int run_sclam_odom_laser(int argc, char** argv) {
     Gm2dlIO::updateLaserData(optimizer);
     cerr << "Writing " << outputfilename << " ... ";
     const bool writeStatus = Gm2dlIO::writeGm2dl(outputfilename, optimizer);
-    cerr << (writeStatus ? "done." : "failed") << endl;
+    cerr << (writeStatus ? "done." : "failed") << '\n';
   }
 
   return 0;
 }
+
+}  // namespace
+
 }  // namespace g2o
 
 int main(int argc, char** argv) {

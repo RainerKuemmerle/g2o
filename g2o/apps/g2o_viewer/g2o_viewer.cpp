@@ -18,31 +18,13 @@
 
 #include <QApplication>
 
-#include "g2o/apps/g2o_cli/dl_wrapper.h"
-#include "g2o/apps/g2o_cli/g2o_common.h"
 #include "g2o/core/optimizable_graph.h"
-#include "g2o/stuff/command_args.h"
 #include "run_g2o_viewer.h"
 
 int main(int argc, char** argv) {
   g2o::OptimizableGraph::initMultiThreading();
   QApplication qapp(argc, argv);
 
-  g2o::CommandArgs arg;
-#ifndef G2O_DISABLE_DYNAMIC_LOADING_OF_LIBRARIES
-  std::string dummy;
-  arg.param("solverlib", dummy, "",
-            "specify a solver library which will be loaded");
-  arg.param("typeslib", dummy, "",
-            "specify a types library which will be loaded");
-  // loading the standard solver /  types
-  g2o::DlWrapper dlTypesWrapper;
-  g2o::loadStandardTypes(dlTypesWrapper, argc, argv);
-  // register all the solvers
-  g2o::DlWrapper dlSolverWrapper;
-  g2o::loadStandardSolver(dlSolverWrapper, argc, argv);
-#endif
-
   // run the viewer
-  return g2o::RunG2OViewer::run(argc, argv, arg);
+  return g2o::RunG2OViewer::run(argc, argv);
 }

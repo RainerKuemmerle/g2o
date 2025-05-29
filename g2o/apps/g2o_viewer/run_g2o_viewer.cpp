@@ -23,8 +23,10 @@
 #include <cstdlib>
 #include <memory>
 
+#include "CLI/CLI.hpp"
+#include "g2o/apps/g2o_cli/dl_wrapper.h"
+#include "g2o/apps/g2o_cli/g2o_common.h"
 #include "g2o/core/sparse_optimizer.h"
-#include "g2o/stuff/command_args.h"
 #include "gui_hyper_graph_action.h"
 #include "main_window.h"
 #include "stream_redirect.h"
@@ -40,20 +42,38 @@ class SleepThread : public QThread {
   using QThread::usleep;
 };
 
-int RunG2OViewer::run(int argc, char** argv, CommandArgs& arg) {
+int RunG2OViewer::run(int argc, char** argv) {
   std::string inputFilename;
   std::string loadLookup;
-  arg.param("renameTypes", loadLookup, "",
-            "create a lookup for loading types into other types,\n\t "
-            "TAG_IN_FILE=INTERNAL_TAG_FOR_TYPE,TAG2=INTERNAL2\n\t e.g., "
-            "VERTEX_CAM=VERTEX_SE3:EXPMAP");
-  arg.paramLeftOver("graph-input", inputFilename, "",
-                    "graph file which will be processed", true);
-  arg.parseArgs(argc, argv);
+
+  CLI::App app{"g2o Viewer"};
+  argv = app.ensure_utf8(argv);
+
+#ifndef G2O_DISABLE_DYNAMIC_LOADING_OF_LIBRARIES
+  std::string dummy;
+  app.add_option("--solverlib", dummy,
+                 "specify a solver library which will be loaded");
+  app.add_option("--typeslib", dummy,
+                 "specify a types library which will be loaded");
+  // loading the standard solver /  types
+  g2o::DlWrapper dlTypesWrapper;
+  g2o::loadStandardTypes(dlTypesWrapper, argc, argv);
+  // register all the solvers
+  g2o::DlWrapper dlSolverWrapper;
+  g2o::loadStandardSolver(dlSolverWrapper, argc, argv);
+#endif
+
+  app.add_option("--rename_types", loadLookup,
+                 "create a lookup for loading types into other types, "
+                 "TAG_IN_FILE=INTERNAL_TAG_FOR_TYPE,TAG2=INTERNAL2, e.g., "
+                 "VERTEX_CAM=VERTEX_SE3:EXPMAP");
+  app.add_option("input", inputFilename, "graph file which will be processed")
+      ->check(CLI::ExistingFile);
+  CLI11_PARSE(app, argc, argv);
 
   // Check if given file exists
-  if (inputFilename.size() > 0 && !std::ifstream(inputFilename)) {
-    std::cerr << "Error: unable to open file " << inputFilename << std::endl;
+  if (!inputFilename.empty() && !std::ifstream(inputFilename)) {
+    std::cerr << "Error: unable to open file " << inputFilename << '\n';
     return EXIT_FAILURE;
   }
 

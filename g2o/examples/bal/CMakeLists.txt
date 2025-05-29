@@ -1,7 +1,8 @@
 add_executable(bal_example bal_example.cpp)
 
-if(CHOLMOD_FOUND)
-  target_link_libraries(bal_example solver_cholmod)
+if(TARGET solver_cholmod)
+  target_link_libraries(bal_example PRIVATE solver_cholmod)
 else()
-  target_link_libraries(bal_example solver_eigen)
+  target_link_libraries(bal_example PRIVATE solver_eigen)
 endif()
+target_link_libraries(bal_example PRIVATE CLI11::CLI11)

@@ -3,4 +3,5 @@ add_executable(create_sphere
 )
 
 set_target_properties(create_sphere PROPERTIES OUTPUT_NAME create_sphere)
-target_link_libraries(create_sphere core types_slam3d)
+target_link_libraries(create_sphere PRIVATE core types_slam3d)
+target_link_libraries(create_sphere PRIVATE CLI11::CLI11)

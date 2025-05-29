@@ -28,7 +28,8 @@ target_link_libraries(g2o_hierarchical_library core)
 add_executable(g2o_hierarchical_application
   g2o_hierarchical.cpp)
 
-target_link_libraries(g2o_hierarchical_application g2o_hierarchical_library g2o_cli_library types_slam3d ) #types_slam3d_new
+target_link_libraries(g2o_hierarchical_application PRIVATE g2o_hierarchical_library g2o_cli_library types_slam3d ) #types_slam3d_new
+target_link_libraries(g2o_hierarchical_application PRIVATE CLI11::CLI11)
 
 set_target_properties(g2o_hierarchical_application PROPERTIES OUTPUT_NAME g2o_hierarchical)
 
