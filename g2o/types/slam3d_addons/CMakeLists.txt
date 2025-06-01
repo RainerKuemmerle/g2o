@@ -42,5 +42,8 @@ install(TARGETS types_slam3d_addons
   INCLUDES DESTINATION ${INCLUDES_DESTINATION}
 )
 
+# Create alias target for easier usage when included as subdirectory
+add_library(g2o::types_slam3d_addons ALIAS types_slam3d_addons)
+
 file(GLOB headers "${CMAKE_CURRENT_SOURCE_DIR}/*.h" "${CMAKE_CURRENT_SOURCE_DIR}/*.hpp")
 install(FILES ${headers} DESTINATION ${INCLUDES_INSTALL_DIR}/types/slam3d_addons)
