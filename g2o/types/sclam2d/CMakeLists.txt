@@ -31,5 +31,8 @@ install(TARGETS types_sclam2d
   ARCHIVE DESTINATION ${ARCHIVE_DESTINATION}
 )
 
+# Create alias target for easier usage when included as subdirectory
+add_library(g2o::types_sclam2d ALIAS types_sclam2d)
+
 file(GLOB headers "${CMAKE_CURRENT_SOURCE_DIR}/*.h" "${CMAKE_CURRENT_SOURCE_DIR}/*.hpp")
 install(FILES ${headers} DESTINATION ${INCLUDES_INSTALL_DIR}/types/sclam2d)
