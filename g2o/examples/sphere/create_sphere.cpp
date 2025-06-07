@@ -232,5 +232,10 @@ int main(int argc, char** argv) {
     fout << endl;
   }
 
+  for (auto* e : edges) delete e;
+  edges.clear();
+  for (auto* v : vertices) delete v;
+  vertices.clear();
+
   return 0;
 }
