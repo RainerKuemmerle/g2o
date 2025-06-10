@@ -32,7 +32,12 @@
 #include <iterator>
 #include <string>
 
-#if (defined(UNIX) || defined(CYGWIN)) && !defined(ANDROID)
+#ifdef __APPLE__
+#include <TargetConditionals.h>
+#endif
+
+#if (defined(UNIX) || defined(CYGWIN)) && !(defined(ANDROID) || TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#define HAS_WORDEXP
 #include <wordexp.h>
 #else
 #include "g2o/stuff/logger.h"
@@ -83,7 +88,7 @@ std::string strToUpper(const std::string& s) {
 }
 
 std::string strExpandFilename(const std::string& filename) {
-#if (defined(UNIX) || defined(CYGWIN)) && !defined(ANDROID)
+#ifdef HAS_WORDEXP
   string result = filename;
   wordexp_t p;
 
