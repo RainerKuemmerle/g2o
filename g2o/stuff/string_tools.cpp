@@ -36,7 +36,8 @@
 #include <TargetConditionals.h>
 #endif
 
-#if (defined(UNIX) || defined(CYGWIN)) && !(defined(ANDROID) || TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#if (defined(UNIX) || defined(CYGWIN)) && \
+    !(defined(ANDROID) || TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
 #define HAS_WORDEXP
 #include <wordexp.h>
 #else
