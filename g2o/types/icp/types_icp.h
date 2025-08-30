@@ -88,19 +88,49 @@ class G2O_TYPES_ICP_API EdgeGICP {
     R0.row(1) = y;
     R0.row(0) = normal0.cross(R0.row(1));
     //      cout << normal.transpose() << endl;
+    std::cout << "n0 = "<<normal0.transpose() << std::endl;
+    std::cout << "R0:\n"<<R0 << std::endl << std::endl;
+    std::cout << "R0.norm:\n"<<R0*R0.transpose() << std::endl << std::endl;
+
+      Matrix3 RR0;
+      RR0.row(2) = normal0;
+      //} else {
+      Vector3 x;
+      x<< -1, 0, 0;
+      x = x - normal0(0) * normal0;
+      RR0.row(0) = x;
+      RR0.row(1) = normal0.cross(R1.row(0));
+
+    std::cout << "n0 = "<<normal0.transpose() << std::endl;
+    std::cout << "R0:\n"<<RR0 << std::endl << std::endl;
+    std::cout << "R0.norm:\n"<<RR0*RR0.transpose() << std::endl << std::endl;
+
+    std::cout<<"diff: \n"<<R0 - RR0<<std::endl;
+    double dd = (R0 - RR0).squaredNorm();
+    std::cout<<"diff = "<<dd<<std::endl;
+    assert(dd < 1e-15);
     //      cout << R0 << endl << endl;
     //      cout << R0*R0.transpose() << endl << endl;
   }
 
   // set up rotation matrix for pos1
   void makeRot1() {
+    assert(false);
     Vector3 y;
     y << 0, 1, 0;
     R1.row(2) = normal1;
     y = y - normal1(1) * normal1;
+    if(y.squaredNorm() >= 0.1) {
     y.normalize();  // need to check if y is close to 0
     R1.row(1) = y;
     R1.row(0) = normal1.cross(R1.row(1));
+    } else {
+      Vector3 x;
+      x<< 1, 0, 0;
+      x = x - normal1(0) * normal1;
+      R1.row(0) = x;
+      R1.row(1) = -normal1.cross(R1.row(0));
+    }
   }
 
   // returns a precision matrix for point-plane
