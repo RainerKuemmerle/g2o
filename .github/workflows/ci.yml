@@ -57,7 +57,7 @@ jobs:
 
       - name: Install dependencies on macOS
         if: runner.os == 'macOS'
-        run: brew install cmake eigen coreutils
+        run: brew install eigen coreutils
 
       - name: Configure ccache for macOS
         if: runner.os == 'macOS'
