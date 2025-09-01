@@ -11,7 +11,7 @@ repos:
 
 # C++
 -   repo: https://github.com/pre-commit/mirrors-clang-format
-    rev: v20.1.8
+    rev: v21.1.0
     hooks:
     -   id: clang-format
 
