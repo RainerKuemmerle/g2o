@@ -179,8 +179,8 @@ void declareOptimizableGraph(py::module& m) {
       static_cast<bool (CLS::*)(const std::shared_ptr<HyperGraph::Vertex>&)>(
           &CLS::addVertex),
       "v"_a, py::keep_alive<1, 2>());
-  cls.def("remove_vertex", &CLS::removeVertex, "v"_a,
-          "detach"_a);  // virtual, (Vertex*, bool) -> bool
+  cls.def("remove_vertex", &CLS::removeVertex,
+          "v"_a);  // virtual, (Vertex*) -> bool
 
   //   cls.def(
   //       "add_edge",
@@ -244,6 +244,7 @@ void declareOptimizableGraph(py::module& m) {
           static_cast<JacobianWorkspace& (CLS::*)()>(&CLS::jacobianWorkspace));
   cls.def("recompute_jacobian_workspace_size",
           &CLS::recomputeJacobianWorkspaceSize);
+  cls.def("hash", &CLS::hash, "include_estimates"_a);
   // cls.def("parameters", (ParameterContainer& (CLS::*) ()) &CLS::parameters);
 
   // saveSubset

@@ -35,6 +35,7 @@
 #include "g2o/core/optimization_algorithm.h"
 #include "g2o/core/robust_kernel.h"
 #include "g2o/core/sparse_optimizer.h"
+#include "g2o/stuff/logger.h"
 
 namespace g2o {
 
@@ -74,10 +75,19 @@ class StructureOnlySolver : public OptimizationAlgorithm {
     auxWorkspace.updateSize(2, 50);
     auxWorkspace.allocate();
 
+    auto vertex_id_edge_lookup = optimizer()->createVertexEdgeLookup();
+
     for (auto& v : vertices) {
       bool stop = false;
       assert(v->dimension() == PointDoF);
-      const g2o::HyperGraph::EdgeSetWeak& track = v->edges();
+
+      auto v_edges = vertex_id_edge_lookup.lookup(v->id());
+      if (!v_edges.second) {
+        G2O_CRITICAL("Vertex {} not found for edges lookup", v->id());
+        continue;
+      }
+      const auto& track = v_edges.first->second;
+
       assert(track.size() >= 2);
       double chi2 = 0;
       // TODO(Rainer): make these parameters
@@ -85,7 +95,7 @@ class StructureOnlySolver : public OptimizationAlgorithm {
       double nu = 2;
 
       for (const auto& it_t : track) {
-        auto e = std::static_pointer_cast<OptimizableGraph::Edge>(it_t.lock());
+        auto e = std::static_pointer_cast<OptimizableGraph::Edge>(it_t);
         e->computeError();
         if (e->robustKernel()) {
           Vector3 rho;
@@ -104,12 +114,9 @@ class StructureOnlySolver : public OptimizationAlgorithm {
           H_pp.setZero();
           v->clearQuadraticForm();
 
-          const g2o::HyperGraph::EdgeSetWeak& track = v->edges();
           assert(!track.empty());
-
           for (const auto& it_t : track) {
-            auto e =
-                std::static_pointer_cast<OptimizableGraph::Edge>(it_t.lock());
+            auto e = std::static_pointer_cast<OptimizableGraph::Edge>(it_t);
 
             // fix all the other vertices and remember their fix value
             std::vector<bool> remember_fix_status(e->vertices().size());
@@ -159,8 +166,7 @@ class StructureOnlySolver : public OptimizationAlgorithm {
               v->oplus(VectorX::MapType(delta_p.data(), delta_p.size()));
               double new_chi2 = 0;
               for (const auto& it_t : track) {
-                auto e = std::static_pointer_cast<OptimizableGraph::Edge>(
-                    it_t.lock());
+                auto e = std::static_pointer_cast<OptimizableGraph::Edge>(it_t);
                 e->computeError();
                 std::shared_ptr<RobustKernel> robust_kernel = e->robustKernel();
                 if (robust_kernel) {

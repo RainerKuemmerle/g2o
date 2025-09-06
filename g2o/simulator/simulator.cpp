@@ -86,11 +86,14 @@ bool World::addParameter(const std::shared_ptr<Parameter>& param) {
 }
 
 void Simulator::finalize() {
+  auto vertex_id_edge_lookup = world_.graph().createVertexEdgeLookup();
+
   // Drop vertices without any edge
   for (auto iter = world_.graph().vertices().begin();
        iter != world_.graph().vertices().end();) {
     auto* v = static_cast<OptimizableGraph::Vertex*>(iter->second.get());
-    if (!v->edges().empty()) {
+    auto v_edges = vertex_id_edge_lookup.lookup(v->id());
+    if (v_edges.second && !v_edges.first->second.empty()) {
       ++iter;
       continue;
     }

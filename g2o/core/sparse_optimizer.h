@@ -198,8 +198,7 @@ class G2O_CORE_API SparseOptimizer : public OptimizableGraph {
    * index mapping is erased. In case you need the index mapping for
    * manipulating the graph, you have to store it in your own copy.
    */
-  bool removeVertex(const std::shared_ptr<HyperGraph::Vertex>& v,
-                    bool detach = false) override;
+  bool removeVertex(const std::shared_ptr<HyperGraph::Vertex>& v) override;
 
   /**
    * search for an edge in _activeVertices and return the iterator pointing to

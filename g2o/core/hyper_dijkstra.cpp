@@ -109,6 +109,8 @@ void HyperDijkstra::shortestPaths(HyperGraph::VertexSet& vset,
     frontier.push(it->second);
   }
 
+  auto vertex_id_edge_lookup = graph_->createVertexEdgeLookup();
+
   while (!frontier.empty()) {
     const AdjacencyMapEntry entry = frontier.top();
     frontier.pop();
@@ -123,11 +125,14 @@ void HyperDijkstra::shortestPaths(HyperGraph::VertexSet& vset,
     const std::pair<HyperGraph::VertexSet::iterator, bool> insertResult =
         visited_.insert(u);
     (void)insertResult;
-    auto et = u->edges().begin();
-    while (et != u->edges().end()) {
-      auto edge = et->lock();
-      ++et;
 
+    auto u_edges = vertex_id_edge_lookup.lookup(u->id());
+    if (!u_edges.second) {
+      G2O_CRITICAL("Vertex {} not found for edges lookup", u->id());
+      continue;
+    }
+
+    for (const auto& edge : u_edges.first->second) {
       if (directed && edge->vertex(0) != u) continue;
 
       for (size_t i = 0; i < edge->vertices().size(); ++i) {

@@ -30,6 +30,9 @@
 #include <cassert>
 #include <memory>
 #include <unordered_set>
+#include <utility>
+
+#include "g2o/stuff/hash_combine.h"
 
 namespace g2o {
 
@@ -77,6 +80,13 @@ void HyperGraph::DataContainer::addUserData(const std::shared_ptr<Data>& obs) {
 void HyperGraph::DataContainer::allocate() {
   if (container_) return;
   container_ = std::make_unique<HyperGraph::DataContainer::DataVector>();
+}
+
+HyperGraph::VertexIDEdges::LookupResult HyperGraph::VertexIDEdges::lookup(
+    int id) const {
+  auto found = lookup_.find(id);
+  const bool found_state = found != lookup_.end();
+  return std::make_pair(found, found_state);
 }
 
 std::shared_ptr<HyperGraph::Vertex> HyperGraph::vertex(int id) {
@@ -129,80 +139,18 @@ bool HyperGraph::addEdge(const std::shared_ptr<Edge>& e) {
   }
 
   const std::pair<EdgeSet::iterator, bool> result = edges_.emplace(e);
-  if (!result.second) return false;
-
-  for (auto& v : e->vertices()) {  // connect the vertices to this edge
-    v->edges().emplace(e);
-  }
-
-  return true;
+  return result.second;
 }
 
 bool HyperGraph::setEdgeVertex(const std::shared_ptr<Edge>& e, int pos,
                                const std::shared_ptr<Vertex>& v) {
-  auto vOld = e->vertex(pos);
-  if (vOld) vOld->edges().erase(e);
   e->setVertex(pos, v);
-  if (v) v->edges().emplace(e);
   return true;
 }
 
-bool HyperGraph::mergeVertices(std::shared_ptr<Vertex>& vBig,
-                               std::shared_ptr<Vertex>& vSmall, bool erase) {
-  auto it = vertices_.find(vBig->id());
-  if (it == vertices_.end()) return false;
-
-  it = vertices_.find(vSmall->id());
-  if (it == vertices_.end()) return false;
-
-  const EdgeSetWeak tmp = vSmall->edges();
-  bool ok = true;
-  for (const auto& it : tmp) {
-    const std::shared_ptr<HyperGraph::Edge> e = it.lock();
-    for (size_t i = 0; i < e->vertices().size(); i++) {
-      if (e->vertex(i) == vSmall) {
-        ok &= setEdgeVertex(e, i, vBig);
-      }
-    }
-  }
-  if (erase) removeVertex(vSmall);
-  return ok;
-}
-
-bool HyperGraph::detachVertex(const std::shared_ptr<Vertex>& v) {
+bool HyperGraph::removeVertex(const std::shared_ptr<Vertex>& v) {
   auto it = vertices_.find(v->id());
   if (it == vertices_.end()) return false;
-  assert(it->second == v);
-  const EdgeSetWeak tmp = v->edges();
-  for (const auto& it : tmp) {
-    const std::shared_ptr<HyperGraph::Edge> e = it.lock();
-    for (size_t i = 0; i < e->vertices().size(); i++) {
-      if (v == e->vertex(i)) {
-        const std::shared_ptr<Vertex> nonExistantVertex;
-        setEdgeVertex(e, i, nonExistantVertex);
-      }
-    }
-  }
-  return true;
-}
-
-bool HyperGraph::removeVertex(const std::shared_ptr<Vertex>& v, bool detach) {
-  if (detach) {
-    const bool result = detachVertex(v);
-    if (!result) {
-      assert(0 && "inconsistency in detaching vertex");
-    }
-  }
-  auto it = vertices_.find(v->id());
-  if (it == vertices_.end()) return false;
-  assert(it->second == v);
-  // remove all edges which are entering or leaving v;
-  const EdgeSetWeak tmp = v->edges();
-  for (const auto& it : tmp) {
-    if (!removeEdge(it.lock())) {
-      assert(0 && "error in erasing vertex");
-    }
-  }
   vertices_.erase(it);
   return true;
 }
@@ -211,13 +159,6 @@ bool HyperGraph::removeEdge(const std::shared_ptr<Edge>& e) {
   auto it = edges_.find(e);
   if (it == edges_.end()) return false;
   edges_.erase(it);
-  for (auto vit = e->vertices().begin(); vit != e->vertices().end(); ++vit) {
-    auto& v = *vit;
-    if (!v) continue;
-    auto foundIt = v->edges().find(e);
-    assert(foundIt != v->edges().end());
-    v->edges().erase(foundIt);
-  }
   return true;
 }
 
@@ -229,5 +170,32 @@ void HyperGraph::clear() {
 }
 
 HyperGraph::~HyperGraph() { HyperGraph::clear(); }
+
+HyperGraph::VertexIDEdges HyperGraph::createVertexEdgeLookup() const {
+  HyperGraph::VertexIDEdges result;
+  result.hash_ = hash();
+  for (const auto& e : edges_) {
+    auto oe = std::static_pointer_cast<Edge>(e);
+    for (const auto& v : e->vertices()) {
+      result.lookup_[v->id()].push_back(oe);
+    }
+  }
+  return result;
+}
+
+std::size_t HyperGraph::hash() const {
+  std::size_t result = 0x42;
+  for (const auto& v : vertices_) {
+    hash_combine(result, v.first);
+    hash_combine(result, v.second.get());
+  }
+  for (const auto& e : edges_) {
+    hash_combine(result, e.get());
+    for (const auto& v : e->vertices()) {
+      hash_combine(result, v.get());
+    }
+  }
+  return result;
+}
 
 }  // namespace g2o

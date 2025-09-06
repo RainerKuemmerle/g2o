@@ -130,15 +130,10 @@ class G2O_CORE_API HyperGraph {
   };
 
   using EdgeSet = std::set<std::shared_ptr<Edge>>;
-  using EdgeSetWeak =
-      std::set<std::weak_ptr<Edge>, std::owner_less<std::weak_ptr<Edge>>>;
   using VertexSet = std::set<std::shared_ptr<Vertex>>;
-  using VertexSetWeak =
-      std::set<std::weak_ptr<Vertex>, std::owner_less<std::weak_ptr<Vertex>>>;
 
   using VertexIDMap = std::unordered_map<int, std::shared_ptr<Vertex>>;
   using VertexContainer = std::vector<std::shared_ptr<Vertex>>;
-  using VertexContainerWeak = std::vector<std::weak_ptr<Vertex>>;
 
   //! abstract Vertex, your types must derive from that one
   class G2O_CORE_API Vertex : public HyperGraphElement {
@@ -149,17 +144,12 @@ class G2O_CORE_API HyperGraph {
     //! returns the id
     [[nodiscard]] int id() const { return id_; }
     virtual void setId(int newId) { id_ = newId; }
-    //! returns the set of hyper-edges that are leaving/entering in this vertex
-    [[nodiscard]] const EdgeSetWeak& edges() const { return edges_; }
-    //! returns the set of hyper-edges that are leaving/entering in this vertex
-    EdgeSetWeak& edges() { return edges_; }
     [[nodiscard]] HyperGraphElementType elementType() const final {
       return HyperGraphElementType::kHgetVertex;
     }
 
    protected:
     int id_;
-    EdgeSetWeak edges_;
   };
 
   /**
@@ -222,6 +212,23 @@ class G2O_CORE_API HyperGraph {
     int id_;  ///< unique id
   };
 
+  class G2O_CORE_API VertexIDEdges {
+   public:
+    friend HyperGraph;
+    using LookupTable =
+        std::unordered_map<int, std::vector<std::shared_ptr<Edge>>>;
+    using LookupResult = std::pair<LookupTable::const_iterator, bool>;
+
+    VertexIDEdges() = default;
+
+    LookupResult lookup(int id) const;
+    std::size_t hashOfGraph() const { return hash_; }
+
+   protected:
+    LookupTable lookup_;
+    std::size_t hash_ = 0;
+  };
+
   //! constructs an empty hyper graph
   HyperGraph();
   //! destroys the hyper-graph and all the vertices of the graph
@@ -236,8 +243,7 @@ class G2O_CORE_API HyperGraph {
 
   //! removes a vertex from the graph. Returns true on success (vertex was
   //! present)
-  virtual bool removeVertex(const std::shared_ptr<Vertex>& v,
-                            bool detach = false);
+  virtual bool removeVertex(const std::shared_ptr<Vertex>& v);
   //! removes a vertex from the graph. Returns true on success (edge was
   //! present)
   virtual bool removeEdge(const std::shared_ptr<Edge>& e);
@@ -276,24 +282,17 @@ class G2O_CORE_API HyperGraph {
                              const std::shared_ptr<Vertex>& v);
 
   /**
-   * merges two (valid) vertices, adjusts the bookkeeping and relabels all
-   * edges. the observations of vSmall are retargeted to vBig. If erase = true,
-   * vSmall is deleted from the graph repeatedly calls setEdgeVertex(...)
-   */
-  virtual bool mergeVertices(std::shared_ptr<Vertex>& vBig,
-                             std::shared_ptr<Vertex>& vSmall, bool erase);
-
-  /**
-   * detaches a vertex from all connected edges
-   */
-  virtual bool detachVertex(const std::shared_ptr<Vertex>& v);
-
-  /**
    * changes the id of a vertex already in the graph, and updates the
    bookkeeping
    @ returns false if the vertex is not in the graph;
    */
   virtual bool changeId(std::shared_ptr<Vertex>& v, int newId);
+
+  /** Creates a Lookup from VertexID to the edges connecting the vertex */
+  virtual VertexIDEdges createVertexEdgeLookup() const;
+
+  //! Computes a hash of the graph
+  std::size_t hash() const;
 
  protected:
   VertexIDMap vertices_;

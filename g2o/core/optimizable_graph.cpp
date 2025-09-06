@@ -49,6 +49,7 @@
 #include "g2o/core/jacobian_workspace.h"
 #include "g2o/core/parameter.h"
 #include "g2o/core/parameter_container.h"
+#include "g2o/stuff/hash_combine.h"
 #include "g2o/stuff/logger.h"
 #include "g2o/stuff/logger_format.h"  // IWYU pragma: keep
 #include "g2o/stuff/string_tools.h"
@@ -126,7 +127,8 @@ void addDataToGraphElement(
     }
     dataContainer.addUserData(d);
   }
-};
+}
+
 }  // namespace
 
 // Here to destruct forward declared types
@@ -794,6 +796,20 @@ void OptimizableGraph::addGraph(OptimizableGraph& other) {
     edges_.emplace(e);
   }
   other.edges_.clear();
+}
+
+std::size_t OptimizableGraph::hash(bool include_estimates) const {
+  std::size_t result = HyperGraph::hash();
+  if (include_estimates) {
+    std::vector<double> estimate_data;
+    for (const auto& v : vertices_) {
+      auto* ov = static_cast<OptimizableGraph::Vertex*>(v.second.get());
+      estimate_data.clear();
+      ov->getEstimateData(estimate_data);
+      for (double val : estimate_data) hash_combine(result, val);
+    }
+  }
+  return result;
 }
 
 bool OptimizableGraph::initMultiThreading() {
