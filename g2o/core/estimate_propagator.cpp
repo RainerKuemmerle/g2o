@@ -26,14 +26,15 @@
 
 #include "estimate_propagator.h"
 
-#include <algorithm>
 #include <cassert>
 #include <cmath>
 #include <cstdlib>
+#include <memory>
 #include <utility>
 
 #include "g2o/core/optimizable_graph.h"
 #include "g2o/core/sparse_optimizer.h"
+#include "g2o/stuff/logger.h"
 
 // #define DEBUG_ESTIMATE_PROPAGATOR
 
@@ -105,6 +106,8 @@ void EstimatePropagator::propagate(
     frontier.push(&it->second);
   }
 
+  auto vertex_id_edge_lookup = graph_->createVertexEdgeLookup();
+
   while (!frontier.empty()) {
     AdjacencyMapEntry* entry = frontier.pop();
     const auto& u = entry->child();
@@ -117,11 +120,15 @@ void EstimatePropagator::propagate(
 
     /* std::pair< OptimizableGraph::VertexSet::iterator, bool> insertResult = */
     visited_.insert(u);
-    auto et = u->edges().begin();
-    while (et != u->edges().end()) {
-      auto edge = std::static_pointer_cast<OptimizableGraph::Edge>(et->lock());
-      ++et;
 
+    auto u_edges = vertex_id_edge_lookup.lookup(u->id());
+    if (!u_edges.second) {
+      G2O_CRITICAL("Vertex {} not found for edges lookup", u->id());
+      continue;
+    }
+
+    for (const auto& h_edge : u_edges.first->second) {
+      auto edge = std::static_pointer_cast<OptimizableGraph::Edge>(h_edge);
       int maxFrontier = -1;
       OptimizableGraph::VertexSet initializedVertices;
       for (size_t i = 0; i < edge->vertices().size(); ++i) {

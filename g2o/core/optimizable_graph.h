@@ -785,6 +785,15 @@ class G2O_CORE_API OptimizableGraph : public HyperGraph {
       HyperGraph::VertexSet& vset,
       const std::function<void(OptimizableGraph::Vertex*)>& fn);
 
+  /**
+   * @brief Computes a hash value of the graph
+   *
+   * @param include_estimates if true, include the state of the vertices'
+   * estimates
+   * @return std::size_t hash value for the graph
+   */
+  std::size_t hash(bool include_estimates = false) const;
+
  protected:
   std::unordered_map<std::string, std::string> renamedTypesLookup_;
   int64_t nextEdgeId_ = 0;

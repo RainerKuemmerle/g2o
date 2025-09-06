@@ -319,10 +319,11 @@ bool BlockSolver<Traits>::buildStructure(bool zeroBlocks) {
   assert(poseIdx == numPoses_ && landmarkIdx == numLandmarks_);
 
   // temporary structures for building the pattern of the Schur complement
-  SparseBlockMatrixHashMap<PoseMatrixType>* schurMatrixLookup = nullptr;
+  std::unique_ptr<SparseBlockMatrixHashMap<PoseMatrixType>> schurMatrixLookup;
   if (doSchur_) {
-    schurMatrixLookup = new SparseBlockMatrixHashMap<PoseMatrixType>(
-        Hschur_->rowBlockIndices(), Hschur_->colBlockIndices());
+    schurMatrixLookup =
+        std::make_unique<SparseBlockMatrixHashMap<PoseMatrixType>>(
+            Hschur_->rowBlockIndices(), Hschur_->colBlockIndices());
     schurMatrixLookup->blockCols().resize(Hschur_->blockCols().size());
   }
 
@@ -381,33 +382,36 @@ bool BlockSolver<Traits>::buildStructure(bool zeroBlocks) {
   }
 
   if (!doSchur_) {
-    delete schurMatrixLookup;
     return true;
   }
 
   DInvSchur_->diagonal().resize(landmarkIdx);
   Hpl_->fillSparseBlockMatrixCCS(*HplCCS_);
 
+  HyperGraph::VertexIDEdges vertex_id_to_edges =
+      optimizer_->createVertexEdgeLookup();
   for (OptimizableGraph::Vertex* v : optimizer_->indexMapping()) {
     if (!v->marginalized()) continue;
-    const HyperGraph::EdgeSetWeak& vedges = v->edges();
-    for (auto it1 = vedges.begin(); it1 != vedges.end(); ++it1) {
-      auto e1 = it1->lock();
+    auto vedges_it = vertex_id_to_edges.lookup(v->id());
+    if (!vedges_it.second) {
+      G2O_CRITICAL("Vertex ID {} not found in vertex to edges lookup", v->id());
+      continue;
+    }
+    const std::vector<std::shared_ptr<HyperGraph::Edge>>& vedges =
+        vedges_it.first->second;
+    for (const auto& e1 : vedges) {
       for (size_t i = 0; i < e1->vertices().size(); ++i) {
         auto v1 =
             std::static_pointer_cast<OptimizableGraph::Vertex>(e1->vertex(i));
         if (v1->hessianIndex() == -1 || v1.get() == v) continue;
-        for (const auto& vedge : vedges) {
-          auto e2 = vedge.lock();
+        for (const auto& e2 : vedges) {
           for (size_t j = 0; j < e2->vertices().size(); ++j) {
             auto v2 = std::static_pointer_cast<OptimizableGraph::Vertex>(
                 e2->vertex(j));
             if (v2->hessianIndex() == -1 || v2.get() == v) continue;
             int i1 = v1->hessianIndex();
             int i2 = v2->hessianIndex();
-            if (i1 <= i2) {
-              schurMatrixLookup->addBlock(i1, i2);
-            }
+            if (i1 > i2) continue;
           }
         }
       }
@@ -415,7 +419,6 @@ bool BlockSolver<Traits>::buildStructure(bool zeroBlocks) {
   }
 
   Hschur_->takePatternFromHash(*schurMatrixLookup);
-  delete schurMatrixLookup;
   Hschur_->fillSparseBlockMatrixCCSTransposed(*HschurTransposedCCS_);
 
   return true;

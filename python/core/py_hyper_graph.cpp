@@ -61,10 +61,6 @@ void declareHyperGraph(py::module& m) {
       .def("id", &HyperGraph::Vertex::id)  // -> int
       .def("set_id", &HyperGraph::Vertex::setId,
            "id"_a)  // int -> void
-      .def("edges",
-           static_cast<HyperGraph::EdgeSetWeak& (HyperGraph::Vertex::*)()>(
-               &HyperGraph::Vertex::edges),
-           py::return_value_policy::reference)
       .def("element_type",
            &HyperGraph::Vertex::elementType)  // virtual, ->
                                               // HyperGraphElementType
@@ -95,14 +91,19 @@ void declareHyperGraph(py::module& m) {
            &HyperGraph::Edge::numUndefinedVertices)  // -> int
       ;
 
+  py::class_<HyperGraph::VertexIDEdges>(cls, "VertexIDEdges")
+      .def(py::init<>())
+      .def("lookup", &HyperGraph::VertexIDEdges::lookup)
+      .def("hash_of_graph", &HyperGraph::VertexIDEdges::hashOfGraph);
+
   cls.def(py::init<>());
   cls.def("vertex",
           static_cast<std::shared_ptr<HyperGraph::Vertex> (HyperGraph::*)(int)>(
               &HyperGraph::vertex),
           "id"_a, py::return_value_policy::reference);
 
-  cls.def("remove_vertex", &HyperGraph::removeVertex, "v"_a,
-          "detach"_a);  // virtual, (Vertex*, bool) -> bool
+  cls.def("remove_vertex", &HyperGraph::removeVertex,
+          "v"_a);  // virtual, (Vertex*) -> bool
   cls.def("remove_edge", &HyperGraph::removeEdge,
           "e"_a);                        // virtual, Edge* -> bool
   cls.def("clear", &HyperGraph::clear);  // virtual, ->void
@@ -123,12 +124,9 @@ void declareHyperGraph(py::module& m) {
   cls.def("set_edge_vertex", &HyperGraph::setEdgeVertex, "e"_a, "pos"_a, "v"_a,
           py::keep_alive<1, 2>(),
           py::keep_alive<1, 4>());  // virtual, (Edge*, int, Vertex*) -> bool
-  cls.def("merge_vertices", &HyperGraph::mergeVertices, "v_big"_a, "v_small"_a,
-          "erase"_a);  // virtual, (Vertex*, Vertex*, bool) -> bool
-  cls.def("detach_vertex", &HyperGraph::detachVertex,
-          "v"_a);  // virtual, Vertex* -> bool
   cls.def("change_id", &HyperGraph::changeId, "v"_a,
           "new_id"_a);  // virtual, (Vertex*, int) -> bool
+  cls.def("hash", &HyperGraph::hash);
 }
 
 }  // end namespace g2o

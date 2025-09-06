@@ -95,8 +95,7 @@ void declareSparseOptimizer(py::module& m) {
       .def("active_vertices",
            &CLS::activeVertices)               // -> const VertexContainer&
       .def("active_edges", &CLS::activeEdges)  // -> const EdgeContainer&
-      .def("remove_vertex", &CLS::removeVertex, "v"_a,
-           "detach"_a = false)  // virtual, -> bool
+      .def("remove_vertex", &CLS::removeVertex, "v"_a)  // virtual, -> bool
 
       .def("find_active_vertex", &CLS::findActiveVertex,
            "v"_a)  // -> VertexContainer::const_iterator, const

@@ -131,6 +131,7 @@ int SparseOptimizerIncremental::optimize(int iterations, bool online) {
     SparseOptimizer::computeActiveErrors();
     // SparseOptimizer::linearizeSystem();
     underlyingSolver_->buildSystem();
+    auto vertex_id_edge_lookup = createVertexEdgeLookup();
 
     // mark vertices to be sorted as last
     const int numBlocksRequired = ivMap_.size();
@@ -140,9 +141,15 @@ int SparseOptimizerIncremental::optimize(int iterations, bool online) {
     memset(cmember_.data(), 0, numBlocksRequired * sizeof(int));
     if (ivMap_.size() > 100) {
       for (size_t i = ivMap_.size() - 20; i < ivMap_.size(); ++i) {
-        const HyperGraph::EdgeSetWeak& eset = ivMap_[i]->edges();
+        auto v_edges = vertex_id_edge_lookup.lookup(ivMap_[i]->id());
+        if (!v_edges.second) {
+          G2O_CRITICAL("Vertex {} not found for edges lookup", ivMap_[i]->id());
+          continue;
+        }
+        const auto& eset = v_edges.first->second;
+
         for (const auto& it : eset) {
-          auto e = std::static_pointer_cast<OptimizableGraph::Edge>(it.lock());
+          auto e = std::static_pointer_cast<OptimizableGraph::Edge>(it);
           auto* v1 =
               static_cast<OptimizableGraph::Vertex*>(e->vertices()[0].get());
           auto* v2 =

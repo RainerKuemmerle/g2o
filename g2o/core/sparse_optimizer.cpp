@@ -31,6 +31,7 @@
 #include <cassert>
 #include <cstdlib>
 #include <iostream>
+#include <memory>
 #include <set>
 #include <string_view>
 #include <unordered_set>
@@ -149,6 +150,8 @@ bool SparseOptimizer::gaugeFreedom() {
 
   const int maxDim = maxDimension();
 
+  auto vertex_id_edge_lookup = createVertexEdgeLookup();
+
   for (auto& it : vertices()) {
     auto* v = static_cast<OptimizableGraph::Vertex*>(it.second.get());
     if (v->dimension() == maxDim) {
@@ -157,8 +160,13 @@ bool SparseOptimizer::gaugeFreedom() {
         return false;
       }
       // test for full dimension prior
-      for (const auto& eit : v->edges()) {
-        auto e = std::static_pointer_cast<OptimizableGraph::Edge>(eit.lock());
+      auto v_edges = vertex_id_edge_lookup.lookup(v->id());
+      if (!v_edges.second) {
+        G2O_CRITICAL("Vertex {} not found for edges lookup", v->id());
+        continue;
+      }
+      for (const auto& eit : v_edges.first->second) {
+        auto e = std::static_pointer_cast<OptimizableGraph::Edge>(eit);
         if (e->vertices().size() == 1 && e->dimension() == maxDim) return false;
       }
     }
@@ -220,17 +228,21 @@ bool SparseOptimizer::initializeOptimization(HyperGraph::VertexSet& vset,
   assert(workspaceAllocated &&
          "Error while allocating memory for the Jacobians");
   clearIndexMapping();
+  auto vertex_id_edge_lookup = createVertexEdgeLookup();
   activeVertices_.clear();
   activeVertices_.reserve(vset.size());
   activeEdges_.clear();
   EdgeSet auxEdgeSet;  // temporary structure to avoid duplicates
-  for (auto it = vset.begin(); it != vset.end(); ++it) {
-    auto* v = static_cast<OptimizableGraph::Vertex*>(it->get());
-    const OptimizableGraph::EdgeSetWeak& vEdges = v->edges();
+  for (const auto& h_vertex : vset) {
+    auto v_edges_it = vertex_id_edge_lookup.lookup(h_vertex->id());
+    if (!v_edges_it.second) {
+      G2O_CRITICAL("Vertex {} not found in edges lookup");
+      continue;
+    }
     // count if there are edges in that level. If not remove from the pool
     int levelEdges = 0;
-    for (const auto& vEdge : vEdges) {
-      auto e = std::static_pointer_cast<OptimizableGraph::Edge>(vEdge.lock());
+    for (const auto& vEdge : v_edges_it.first->second) {
+      auto e = std::static_pointer_cast<OptimizableGraph::Edge>(vEdge);
       if (level < 0 || e->level() == level) {
         bool allVerticesOK = true;
         for (const auto& vit : e->vertices()) {
@@ -246,18 +258,22 @@ bool SparseOptimizer::initializeOptimization(HyperGraph::VertexSet& vset,
       }
     }
     if (levelEdges) {
-      activeVertices_.push_back(std::static_pointer_cast<Vertex>(*it));
+      activeVertices_.emplace_back(std::static_pointer_cast<Vertex>(h_vertex));
 
       // test for NANs in the current estimate if we are debugging
 #ifndef NDEBUG
-      int estimateDim = v->estimateDimension();
-      if (estimateDim > 0) {
-        VectorX estimateData(estimateDim);
-        if (v->getEstimateData(estimateData.data())) {
-          int k;
-          bool hasNan = arrayHasNaN(estimateData.data(), estimateDim, &k);
-          if (hasNan)
-            G2O_WARN("Vertex {} contains a nan entry at index {}", v->id(), k);
+      {
+        auto* v = static_cast<OptimizableGraph::Vertex*>(h_vertex.get());
+        int estimateDim = v->estimateDimension();
+        if (estimateDim > 0) {
+          VectorX estimateData(estimateDim);
+          if (v->getEstimateData(estimateData.data())) {
+            int k;
+            bool hasNan = arrayHasNaN(estimateData.data(), estimateDim, &k);
+            if (hasNan)
+              G2O_WARN("Vertex {} contains a nan entry at index {}", v->id(),
+                       k);
+          }
         }
       }
 #endif
@@ -313,6 +329,7 @@ void SparseOptimizer::computeInitialGuess(
     EstimatePropagatorCostBase& propagator) {
   OptimizableGraph::VertexSet emptySet;
   std::unordered_set<Vertex*> backupVertices;
+  auto vertex_id_edge_lookup = createVertexEdgeLookup();
   OptimizableGraph::VertexSet fixedVertices;  // these are the root nodes where
                                               // to start the initialization
   for (auto& e : activeEdges_) {
@@ -323,10 +340,15 @@ void SparseOptimizer::computeInitialGuess(
         fixedVertices.insert(v);
       else {  // check for having a prior which is able to fully initialize a
               // vertex
-        for (auto vedgeIt = v->edges().begin(); vedgeIt != v->edges().end();
-             ++vedgeIt) {
-          auto vedge =
-              std::static_pointer_cast<OptimizableGraph::Edge>(vedgeIt->lock());
+
+        auto v_edges_it = vertex_id_edge_lookup.lookup(v->id());
+        if (!v_edges_it.second) {
+          G2O_CRITICAL("Vertex {} not found in edges lookup");
+          continue;
+        }
+
+        for (const auto& h_edge : v_edges_it.first->second) {
+          auto vedge = std::static_pointer_cast<OptimizableGraph::Edge>(h_edge);
           if (vedge->vertices().size() == 1 &&
               vedge->initialEstimatePossible(emptySet, v.get()) > 0.) {
             vedge->initialEstimate(emptySet, v.get());
@@ -573,14 +595,14 @@ bool SparseOptimizer::computeMarginals(SparseBlockMatrix<MatrixX>& spinv,
 
 void SparseOptimizer::setForceStopFlag(bool* flag) { forceStopFlag_ = flag; }
 
-bool SparseOptimizer::removeVertex(const std::shared_ptr<HyperGraph::Vertex>& v,
-                                   bool detach) {
+bool SparseOptimizer::removeVertex(
+    const std::shared_ptr<HyperGraph::Vertex>& v) {
   auto* vv = static_cast<OptimizableGraph::Vertex*>(v.get());
   if (vv->hessianIndex() >= 0) {
     clearIndexMapping();
     ivMap_.clear();
   }
-  return OptimizableGraph::removeVertex(v, detach);
+  return OptimizableGraph::removeVertex(v);
 }
 
 bool SparseOptimizer::addComputeErrorAction(

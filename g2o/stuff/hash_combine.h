@@ -24,52 +24,34 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef G2O_BASE_DYNAMIC_VERTEX_H
-#define G2O_BASE_DYNAMIC_VERTEX_H
+#ifndef G2O_STUFF_HASH_COMBINE_H
+#define G2O_STUFF_HASH_COMBINE_H
 
-#include <cassert>
+#include <functional>
 
-#include "base_vertex.h"
+/** @addtogroup utils **/
+// @{
+
+/** \file misc.h
+ * \brief some general case utility functions
+ *
+ *  This file specifies some general case utility functions
+ **/
 
 namespace g2o {
-template <typename T>
-class BaseDynamicVertex : public BaseVertex<-1, T> {
- public:
-  bool setDimension(int newDimension) override;
 
- protected:
-  // This method is responsible for actually changing the dimension of the state
-  virtual bool setDimensionImpl(int newDimension) = 0;
-
-  using BaseVertex<-1, T>::dimension_;
-  using BaseVertex<-1, T>::b_;
-  using BaseVertex<-1, T>::setHessianIndex;
-  using BaseVertex<-1, T>::mapHessianMemory;
-  using BaseVertex<-1, T>::updateCache;
-};
-
-template <typename T>
-bool BaseDynamicVertex<T>::setDimension(int newDimension) {
-  // Check the dimension is non-negative.
-  assert(newDimension >= 0);
-  if (newDimension < 0) return false;
-
-  // Nothing to do if the dimension is unchanged.
-  if (newDimension == dimension_) return true;
-
-  // Change the state to the requested dimension
-  if (!static_cast<bool>(setDimensionImpl(newDimension))) return false;
-
-  dimension_ = newDimension;
-
-  // Reset the allocation associated with this vertex and update the cache
-  setHessianIndex(-1);
-  mapHessianMemory(nullptr);
-  b_.resize(dimension_);
-  updateCache();
-
-  return true;
+/**
+ * @brief Combines hash values as implemented in boost.
+ *
+ * See
+ * https://www.boost.org/doc/libs/1_36_0/doc/html/hash/reference.html#boost.hash_combine
+ */
+template <class T>
+void hash_combine(std::size_t& seed, const T& v) {
+  std::hash<T> hasher;
+  seed ^= hasher(v) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
 }
 
 }  // namespace g2o
+
 #endif

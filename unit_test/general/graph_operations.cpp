@@ -112,7 +112,7 @@ TEST(General, GraphAddVertex) {
   }
 
   // removing vertex
-  const bool removed = optimizer->removeVertex(v1, true);
+  const bool removed = optimizer->removeVertex(v1);
   ASSERT_TRUE(removed);
   ASSERT_THAT(optimizer->vertices(), testing::SizeIs(0));
 }
@@ -134,10 +134,6 @@ TEST(General, GraphAddEdge) {
   ASSERT_TRUE(optimizer->addEdge(e1));
   ASSERT_FALSE(optimizer->addEdge(e1));
   ASSERT_EQ(size_t(1), optimizer->edges().size());
-  ASSERT_EQ(size_t(1), v1->edges().size());
-  ASSERT_EQ(size_t(1), v1->edges().size());
-  ASSERT_EQ(size_t(1), v1->edges().count(e1));
-  ASSERT_EQ(size_t(1), v2->edges().count(e1));
 
   auto e2 = std::make_shared<g2o::EdgeSE2>();
   ASSERT_FALSE(optimizer->addEdge(e2))
@@ -910,13 +906,6 @@ TEST_F(GeneralGraphOperations, SharedOwnerShip) {
       testing::Each(Field(&IdVertexPair::second,
                           testing::Property(&Ptr::use_count, testing::Ge(1)))));
 
-  // clear all edges of each vertex
-  for (auto& v : verticesMap) v.second->edges().clear();
-  ASSERT_THAT(
-      verticesMap,
-      testing::Each(Field(&IdVertexPair::second,
-                          testing::Property(&Ptr::use_count, testing::Ge(1)))));
-
   const Ptr singleVertex = verticesMap.begin()->second;
   verticesMap.clear();
   ASSERT_THAT(singleVertex.use_count(), testing::Eq(1));
@@ -927,9 +916,11 @@ TEST_F(GeneralGraphOperations, JacWorkspace) {
   ASSERT_THAT(workspace.maxDimension(), testing::Le(0));
   ASSERT_THAT(workspace.maxNumVertices(), testing::Le(0));
 
+  auto vertex_id_edge_lookup = optimizer_->createVertexEdgeLookup();
+
   auto root = optimizer_->vertex(0);
   std::shared_ptr<g2o::HyperGraph::Edge> first_edge =
-      root->edges().begin()->lock();
+      vertex_id_edge_lookup.lookup(root->id()).first->second.front();
   workspace.updateSize(*first_edge, true);
   EXPECT_THAT(workspace.maxDimension(), testing::Eq(9));
   EXPECT_THAT(workspace.maxNumVertices(), testing::Eq(2));
@@ -964,53 +955,6 @@ TEST_F(GeneralGraphOperations, JacWorkspace) {
           testing::IsTrue())));
 }
 
-TEST_F(GeneralGraphOperations, MergeVertices) {
-  auto extractVertexIds = [this]() {
-    std::vector<int> vertex_ids;
-    for (const auto& v : optimizer_->vertices()) {
-      vertex_ids.push_back(v.first);
-    }
-    std::sort(vertex_ids.begin(), vertex_ids.end());
-    return vertex_ids;
-  };
-
-  const std::vector<int> vertex_ids = extractVertexIds();
-  const int size_before = optimizer_->vertices().size();
-  auto v_small = std::static_pointer_cast<g2o::HyperGraph::Vertex>(
-      optimizer_->vertex(vertex_ids.back()));
-  auto v_big = std::static_pointer_cast<g2o::HyperGraph::Vertex>(
-      optimizer_->vertex(vertex_ids[1]));
-  const int v_small_edges_before = v_small->edges().size();
-  const int v_big_edges_before = v_big->edges().size();
-
-  bool merge_result = optimizer_->mergeVertices(v_big, v_small, true /*erase*/);
-
-  const std::vector<int> vertex_ids_after = extractVertexIds();
-
-  ASSERT_TRUE(merge_result);
-  EXPECT_THAT(optimizer_->vertices(), SizeIs(size_before - 1));
-  EXPECT_THAT(v_small->edges(), IsEmpty());
-  EXPECT_THAT(v_big->edges(),
-              SizeIs(v_big_edges_before + v_small_edges_before));
-  EXPECT_THAT(vertex_ids_after, Not(Contains(v_small->id())));
-  EXPECT_THAT(vertex_ids_after, Not(Contains(v_small->id())));
-  EXPECT_THAT(optimizer_->vertex(v_small->id()), IsNull());
-}
-
-TEST_F(GeneralGraphOperations, DetachVertex) {
-  auto vertex_not_in_graph = std::make_shared<g2o::VertexSE2>();
-  vertex_not_in_graph->setId(kNumVertices + 10);
-
-  EXPECT_FALSE(optimizer_->detachVertex(vertex_not_in_graph));
-
-  const int target_id = kNumVertices / 2;
-  auto vertex_in_graph = optimizer_->vertex(target_id);
-  ASSERT_THAT(vertex_in_graph, NotNull());
-  EXPECT_TRUE(optimizer_->detachVertex(vertex_in_graph));
-  EXPECT_THAT(optimizer_->vertex(target_id), NotNull());
-  EXPECT_THAT(vertex_in_graph->edges(), IsEmpty());
-}
-
 TEST_F(GeneralGraphOperations, HyperGraphVertex) {
   const int target_id = kNumVertices / 2;
 
@@ -1020,6 +964,39 @@ TEST_F(GeneralGraphOperations, HyperGraphVertex) {
       optimizer_->HyperGraph::vertex(target_id);
 
   EXPECT_THAT(vertex.get(), Eq(hg_vertex.get()));
+}
+
+TEST_F(GeneralGraphOperations, Hash) {
+  size_t hash_initial = optimizer_->hash();
+
+  auto v = std::make_shared<g2o::VertexSE2>();
+  v->setEstimate(g2o::SE2(1, 2, 3));
+  v->setId(100);
+  optimizer_->addVertex(v);
+  size_t hash_after_vertex = optimizer_->hash();
+  EXPECT_THAT(hash_initial, Ne(hash_after_vertex));
+
+  auto e1 = std::make_shared<g2o::EdgeSE2>();
+  e1->vertices()[0] = optimizer_->vertex(1 % kNumVertices);
+  e1->vertices()[1] = optimizer_->vertex(3 % kNumVertices);
+  e1->setMeasurement(g2o::SE2(1., 0., 0.));
+  e1->setInformation(g2o::EdgeSE2::InformationType::Identity());
+  optimizer_->addEdge(e1);
+
+  size_t hash_after_edge = optimizer_->hash();
+  EXPECT_THAT(hash_after_vertex, Ne(hash_after_edge));
+  EXPECT_THAT(hash_initial, Ne(hash_after_edge));
+}
+
+TEST_F(GeneralGraphOperations, HashWithEstimate) {
+  size_t hash_initial_no_estimate = optimizer_->hash();
+  size_t hash_initial = optimizer_->hash(true);
+  EXPECT_THAT(hash_initial, Ne(hash_initial_no_estimate));
+
+  auto v = std::static_pointer_cast<g2o::VertexSE2>(optimizer_->vertex(0));
+  v->setEstimate(g2o::SE2(1, 2, 3));
+  size_t hash_after_estimate_change = optimizer_->hash(true);
+  EXPECT_THAT(hash_initial, Ne(hash_after_estimate_change));
 }
 
 namespace {
