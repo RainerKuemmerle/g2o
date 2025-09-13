@@ -12,7 +12,7 @@ add_library(stuff ${G2O_LIB_TYPE}
 )
 
 target_include_directories(stuff PUBLIC
-  "$<BUILD_INTERFACE:${g2o_SOURCE_DIR};${PROJECT_BINARY_DIR}>"
+  "$<BUILD_INTERFACE:${g2o_SOURCE_DIR};${g2o_BINARY_DIR}>"
   $<INSTALL_INTERFACE:include/g2o/stuff>
 )
 
@@ -42,6 +42,9 @@ install(TARGETS stuff
   INCLUDES DESTINATION ${INCLUDES_DESTINATION}
 )
 
+# Create alias target for easier usage when included as subdirectory
+add_library(g2o::stuff ALIAS stuff)
+
 # build our OpenGL helper library
 if(OPENGL_FOUND AND G2O_HAVE_OPENGL)
   add_library(opengl_helper ${G2O_LIB_TYPE}
@@ -60,7 +63,7 @@ if(OPENGL_FOUND AND G2O_HAVE_OPENGL)
     )
 
   target_include_directories(opengl_helper PUBLIC
-    "$<BUILD_INTERFACE:${g2o_SOURCE_DIR};${PROJECT_BINARY_DIR}>"
+    "$<BUILD_INTERFACE:${g2o_SOURCE_DIR};${g2o_BINARY_DIR}>"
     $<INSTALL_INTERFACE:include/g2o/stuff>
   )
 
@@ -70,6 +73,9 @@ if(OPENGL_FOUND AND G2O_HAVE_OPENGL)
   set_target_properties(opengl_helper PROPERTIES
     VERSION ${G2O_LIB_VERSION}
     SOVERSION ${G2O_LIB_SOVERSION})
+
+  # Create alias target for easier usage when included as subdirectory
+  add_library(g2o::opengl_helper ALIAS opengl_helper)
 endif()
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Linux" AND NOT ANDROID)

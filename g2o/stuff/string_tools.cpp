@@ -32,6 +32,18 @@
 #include <iterator>
 #include <string>
 
+#ifdef __APPLE__
+#include <TargetConditionals.h>
+#endif
+
+#if (defined(UNIX) || defined(CYGWIN)) && \
+    !(defined(ANDROID) || TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#define HAS_WORDEXP
+#include <wordexp.h>
+#else
+#include "g2o/stuff/logger.h"
+#endif
+
 namespace g2o {
 
 std::string trim(const std::string& s) {

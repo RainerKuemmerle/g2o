@@ -42,3 +42,6 @@ install(TARGETS solver_cholmod
   ARCHIVE DESTINATION ${ARCHIVE_DESTINATION}
   PUBLIC_HEADER DESTINATION ${INCLUDES_DESTINATION}/g2o/solvers/cholmod
 )
+
+# Create alias target for easier usage when included as subdirectory
+add_library(g2o::solver_cholmod ALIAS solver_cholmod)

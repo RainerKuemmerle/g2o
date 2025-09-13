@@ -51,6 +51,9 @@ install(TARGETS types_sba
   INCLUDES DESTINATION ${INCLUDES_DESTINATION}
 )
 
+# Create alias target for easier usage when included as subdirectory
+add_library(g2o::types_sba ALIAS types_sba)
+
 file(GLOB headers "${CMAKE_CURRENT_SOURCE_DIR}/*.h" "${CMAKE_CURRENT_SOURCE_DIR}/*.hpp")
 
 install(FILES ${headers} DESTINATION ${INCLUDES_INSTALL_DIR}/types/sba)
