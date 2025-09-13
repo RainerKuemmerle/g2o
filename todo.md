@@ -1,3 +1,4 @@
+[ ] unit test for Schur complement
 [x] update py_base_vertex/edge to map now common methods
 [x] common functions to wrap edge/vertex possible?
 [ ] build only one library instead of multiple?
