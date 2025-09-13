@@ -34,6 +34,7 @@
 #include <iterator>
 #include <memory>
 #include <mutex>
+#include <set>
 #include <sstream>
 #include <unordered_set>
 #include <utility>

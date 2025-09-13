@@ -32,7 +32,6 @@
 #include <cstdlib>
 #include <iostream>
 #include <memory>
-#include <set>
 #include <string_view>
 #include <unordered_set>
 #include <utility>
@@ -246,7 +245,7 @@ bool SparseOptimizer::initializeOptimization(HyperGraph::VertexSet& vset,
       if (level < 0 || e->level() == level) {
         bool allVerticesOK = true;
         for (const auto& vit : e->vertices()) {
-          if (vset.find(vit) == vset.end()) {
+          if (vset.count(vit) == 0) {
             allVerticesOK = false;
             break;
           }
@@ -257,32 +256,30 @@ bool SparseOptimizer::initializeOptimization(HyperGraph::VertexSet& vset,
         }
       }
     }
-    if (levelEdges) {
-      activeVertices_.emplace_back(std::static_pointer_cast<Vertex>(h_vertex));
+    if (levelEdges == 0) continue;
+    activeVertices_.emplace_back(std::static_pointer_cast<Vertex>(h_vertex));
 
-      // test for NANs in the current estimate if we are debugging
+    // test for NANs in the current estimate if we are debugging
 #ifndef NDEBUG
-      {
-        auto* v = static_cast<OptimizableGraph::Vertex*>(h_vertex.get());
-        int estimateDim = v->estimateDimension();
-        if (estimateDim > 0) {
-          VectorX estimateData(estimateDim);
-          if (v->getEstimateData(estimateData.data())) {
-            int k;
-            bool hasNan = arrayHasNaN(estimateData.data(), estimateDim, &k);
-            if (hasNan)
-              G2O_WARN("Vertex {} contains a nan entry at index {}", v->id(),
-                       k);
-          }
+    {
+      auto* v = static_cast<OptimizableGraph::Vertex*>(h_vertex.get());
+      int estimateDim = v->estimateDimension();
+      if (estimateDim > 0) {
+        VectorX estimateData(estimateDim);
+        if (v->getEstimateData(estimateData.data())) {
+          int k;
+          bool hasNan = arrayHasNaN(estimateData.data(), estimateDim, &k);
+          if (hasNan)
+            G2O_WARN("Vertex {} contains a nan entry at index {}", v->id(), k);
         }
       }
-#endif
     }
+#endif
   }
 
   activeEdges_.reserve(auxEdgeSet.size());
-  for (const auto& it : auxEdgeSet)
-    activeEdges_.emplace_back(std::static_pointer_cast<Edge>(it));
+  for (const auto& e : auxEdgeSet)
+    activeEdges_.emplace_back(std::static_pointer_cast<Edge>(e));
 
   sortVectorContainers();
   bool indexMappingStatus = buildIndexMapping(activeVertices_);
@@ -307,12 +304,12 @@ bool SparseOptimizer::initializeOptimization(HyperGraph::EdgeSet& eset) {
     for (auto& vit : e->vertices()) {
       auxVertexSet.insert(vit);
     }
-    activeEdges_.push_back(std::static_pointer_cast<Edge>(it));
+    activeEdges_.emplace_back(std::static_pointer_cast<Edge>(it));
   }
 
   activeVertices_.reserve(auxVertexSet.size());
-  for (const auto& it : auxVertexSet)
-    activeVertices_.push_back(std::static_pointer_cast<Vertex>(it));
+  for (const auto& v : auxVertexSet)
+    activeVertices_.emplace_back(std::static_pointer_cast<Vertex>(v));
 
   sortVectorContainers();
   bool indexMappingStatus = buildIndexMapping(activeVertices_);

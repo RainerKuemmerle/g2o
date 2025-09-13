@@ -32,8 +32,8 @@
 #include <cstddef>
 #include <iosfwd>
 #include <memory>
-#include <set>
 #include <unordered_map>
+#include <unordered_set>
 #include <utility>
 #include <vector>
 
@@ -129,8 +129,8 @@ class G2O_CORE_API HyperGraph {
     void allocate();  ///< allocates the container if not done
   };
 
-  using EdgeSet = std::set<std::shared_ptr<Edge>>;
-  using VertexSet = std::set<std::shared_ptr<Vertex>>;
+  using EdgeSet = std::unordered_set<std::shared_ptr<Edge>>;
+  using VertexSet = std::unordered_set<std::shared_ptr<Vertex>>;
 
   using VertexIDMap = std::unordered_map<int, std::shared_ptr<Vertex>>;
   using VertexContainer = std::vector<std::shared_ptr<Vertex>>;
