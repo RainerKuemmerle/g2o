@@ -5,7 +5,7 @@ set(CMAKE_LEGACY_CYGWIN_WIN32 0)
 set(CMAKE_OSX_DEPLOYMENT_TARGET "10.15" CACHE STRING "Minimum OS X deployment target")
 set(CMAKE_OSX_DEPLOYMENT_TARGET "10.15" CACHE STRING "Minimum OS X deployment target")
 
-project(g2o LANGUAGES CXX)
+project(g2o LANGUAGES CXX C)
 
 include(GNUInstallDirs)
 
@@ -42,26 +42,35 @@ else()
   set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 endif()
 
-# On the Mac platform, configure the RPATH as per the INSTALL, to
-# avoid the problem of loading both the built and INSTALLed versions
-# of the shared targets
-if(APPLE)
-  set(CMAKE_INSTALL_RPATH "")
-  set(CMAKE_MACOSX_RPATH TRUE)
-  # ignore deprecated GL
-  add_definitions(-DGL_SILENCE_DEPRECATION)
-endif(APPLE)
+# Option to control installation of cmake config files when used as subdirectory
+option(G2O_INSTALL_CMAKE_CONFIG "Install CMake configuration files even when used as subdirectory" OFF)
 
-# Set the output directory for the build executables and libraries
-set(g2o_RUNTIME_OUTPUT_DIRECTORY ${g2o_BINARY_DIR}/bin CACHE PATH "Target for the binaries")
-if(WIN32)
-  set(g2o_LIBRARY_OUTPUT_DIRECTORY ${g2o_BINARY_DIR}/bin CACHE PATH "Target for the libraries")
-else(WIN32)
-  set(g2o_LIBRARY_OUTPUT_DIRECTORY ${g2o_BINARY_DIR}/lib CACHE PATH "Target for the libraries")
-endif(WIN32)
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${g2o_LIBRARY_OUTPUT_DIRECTORY})
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${g2o_LIBRARY_OUTPUT_DIRECTORY})
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${g2o_RUNTIME_OUTPUT_DIRECTORY})
+# Only set output directories and options when this is the top-level project
+if(PROJECT_IS_TOP_LEVEL)
+  # On the Mac platform, configure the RPATH as per the INSTALL, to
+  # avoid the problem of loading both the built and INSTALLed versions
+  # of the shared targets
+  if(APPLE)
+    set(CMAKE_INSTALL_RPATH "")
+    set(CMAKE_MACOSX_RPATH TRUE)
+    # ignore deprecated GL
+    add_definitions(-DGL_SILENCE_DEPRECATION)
+  endif(APPLE)
+endif()
+
+# Only set output directories when this is the top-level project
+if(PROJECT_IS_TOP_LEVEL)
+  # Set the output directory for the build executables and libraries
+  set(g2o_RUNTIME_OUTPUT_DIRECTORY ${g2o_BINARY_DIR}/bin CACHE PATH "Target for the binaries")
+  if(WIN32)
+    set(g2o_LIBRARY_OUTPUT_DIRECTORY ${g2o_BINARY_DIR}/bin CACHE PATH "Target for the libraries")
+  else(WIN32)
+    set(g2o_LIBRARY_OUTPUT_DIRECTORY ${g2o_BINARY_DIR}/lib CACHE PATH "Target for the libraries")
+  endif(WIN32)
+  set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${g2o_LIBRARY_OUTPUT_DIRECTORY})
+  set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${g2o_LIBRARY_OUTPUT_DIRECTORY})
+  set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${g2o_RUNTIME_OUTPUT_DIRECTORY})
+endif()
 
 # Set standard installation directories
 set(RUNTIME_DESTINATION ${CMAKE_INSTALL_BINDIR})
@@ -265,7 +274,14 @@ else()
 endif()
 
 # shall we build the core apps using the library
-option(G2O_BUILD_APPS "Build g2o apps" ON)
+if(PROJECT_IS_TOP_LEVEL)
+  option(G2O_BUILD_APPS "Build g2o apps" ON)
+  option(G2O_BUILD_EXAMPLES "Build g2o examples" ON)
+else()
+  option(G2O_BUILD_APPS "Build g2o apps" OFF)
+  option(G2O_BUILD_EXAMPLES "Build g2o examples" OFF)
+endif()
+
 if(G2O_BUILD_APPS)
   message(STATUS "Compiling g2o apps")
 endif(G2O_BUILD_APPS)
@@ -275,7 +291,6 @@ CMAKE_DEPENDENT_OPTION(G2O_BUILD_LINKED_APPS "Build apps linked with the librari
   "G2O_BUILD_APPS" OFF)
 
 # shall we build the examples
-option(G2O_BUILD_EXAMPLES "Build g2o examples" ON)
 if(G2O_BUILD_EXAMPLES)
   message(STATUS "Compiling g2o examples")
 endif(G2O_BUILD_EXAMPLES)
@@ -449,19 +464,25 @@ WRITE_BASIC_PACKAGE_VERSION_FILE(
     "${G2O_VERSION_CONFIG}" VERSION ${G2O_VERSION} COMPATIBILITY SameMajorVersion
 )
 
-configure_file(config.h.in "${PROJECT_BINARY_DIR}/g2o/config.h")
-install(FILES ${PROJECT_BINARY_DIR}/g2o/config.h DESTINATION ${INCLUDES_DESTINATION}/g2o)
+configure_file(config.h.in "${CMAKE_CURRENT_BINARY_DIR}/g2o/config.h")
+# Only install config.h when this is the top-level project or when explicitly requested
+if(PROJECT_IS_TOP_LEVEL OR G2O_INSTALL_CMAKE_CONFIG)
+  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/g2o/config.h DESTINATION ${INCLUDES_DESTINATION}/g2o)
+endif()
 
 configure_file("${g2o_SOURCE_DIR}/cmake_modules/Config.cmake.in" "${G2O_PROJECT_CONFIG}" @ONLY)
 
-install(
-    FILES "${G2O_PROJECT_CONFIG}" "${G2O_VERSION_CONFIG}"
-    DESTINATION "${G2O_CONFIG_INSTALL_DIR}")
+# Only install cmake config files when this is the top-level project or when explicitly requested
+if(PROJECT_IS_TOP_LEVEL OR G2O_INSTALL_CMAKE_CONFIG)
+  install(
+      FILES "${G2O_PROJECT_CONFIG}" "${G2O_VERSION_CONFIG}"
+      DESTINATION "${G2O_CONFIG_INSTALL_DIR}")
 
-install(
-    EXPORT "${G2O_TARGETS_EXPORT_NAME}"
-    NAMESPACE "${G2O_NAMESPACE}"
-    DESTINATION "${G2O_CONFIG_INSTALL_DIR}")
+  install(
+      EXPORT "${G2O_TARGETS_EXPORT_NAME}"
+      NAMESPACE "${G2O_NAMESPACE}"
+      DESTINATION "${G2O_CONFIG_INSTALL_DIR}")
+endif()
 
 option(G2O_BUILD_PACKAGE "Include package build config for cpack" OFF)
 if(G2O_BUILD_PACKAGE)
@@ -478,7 +499,6 @@ if(BUILD_UNITTESTS)
   add_subdirectory(unit_test)
 endif()
 
-# Benchmarks
 option(G2O_BUILD_BENCHMARKS "build benchmarks" OFF)
 if(G2O_BUILD_BENCHMARKS)
   find_package(benchmark)

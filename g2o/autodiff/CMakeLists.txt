@@ -10,6 +10,9 @@ install(TARGETS g2o_ceres_ad
   INCLUDES DESTINATION ${INCLUDES_DESTINATION}
 )
 
+# Create alias target for easier usage when included as subdirectory
+add_library(g2o::g2o_ceres_ad ALIAS g2o_ceres_ad)
+
 file(GLOB headers "${CMAKE_CURRENT_SOURCE_DIR}/*.h" "${CMAKE_CURRENT_SOURCE_DIR}/*.hpp")
 install(FILES ${headers} DESTINATION ${INCLUDES_INSTALL_DIR}/autodiff)
 install(FILES LICENSE DESTINATION ${INCLUDES_INSTALL_DIR}/autodiff)
