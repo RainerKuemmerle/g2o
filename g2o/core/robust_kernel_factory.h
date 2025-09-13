@@ -139,7 +139,7 @@ class RegisterRobustKernelProxy {
 // linkage
 #define G2O_REGISTER_ROBUST_KERNEL(name, classname)                            \
   extern "C" void G2O_ROBUST_KERNEL_FACTORY_EXPORT                             \
-      g2o_robust_kernel_##classname(void) {}                                   \
+  g2o_robust_kernel_##classname(void) {}                                       \
   namespace {                                                                  \
   g2o::RegisterRobustKernelProxy<classname> g_robust_kernel_proxy_##classname( \
       #name);                                                                  \
@@ -147,7 +147,7 @@ class RegisterRobustKernelProxy {
 
 #define G2O_USE_ROBUST_KERNEL(classname)                     \
   extern "C" void G2O_ROBUST_KERNEL_FACTORY_IMPORT           \
-      g2o_robust_kernel_##classname(void);                   \
+  g2o_robust_kernel_##classname(void);                       \
   namespace {                                                \
   g2o::ForceLinker g2o_force_robust_kernel_link_##classname( \
       g2o_robust_kernel_##classname);                        \

@@ -400,18 +400,17 @@ bool BlockSolver<Traits>::buildStructure(bool zeroBlocks) {
     const std::vector<std::shared_ptr<HyperGraph::Edge>>& vedges =
         vedges_it.first->second;
     for (const auto& e1 : vedges) {
-      for (size_t i = 0; i < e1->vertices().size(); ++i) {
-        auto v1 =
-            std::static_pointer_cast<OptimizableGraph::Vertex>(e1->vertex(i));
-        if (v1->hessianIndex() == -1 || v1.get() == v) continue;
+      for (const auto& e1v : e1->vertices()) {
+        const auto* v1 = static_cast<OptimizableGraph::Vertex*>(e1v.get());
+        if (v1->hessianIndex() == -1 || v1 == v) continue;
         for (const auto& e2 : vedges) {
-          for (size_t j = 0; j < e2->vertices().size(); ++j) {
-            auto v2 = std::static_pointer_cast<OptimizableGraph::Vertex>(
-                e2->vertex(j));
-            if (v2->hessianIndex() == -1 || v2.get() == v) continue;
+          for (const auto& e2v : e2->vertices()) {
+            const auto* v2 = static_cast<OptimizableGraph::Vertex*>(e2v.get());
+            if (v2->hessianIndex() == -1 || v2 == v) continue;
             int i1 = v1->hessianIndex();
             int i2 = v2->hessianIndex();
             if (i1 > i2) continue;
+            schurMatrixLookup->addBlock(i1, i2);
           }
         }
       }

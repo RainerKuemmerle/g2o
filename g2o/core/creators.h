@@ -63,8 +63,7 @@ class HyperGraphElementCreator : public AbstractHyperGraphElementCreator {
     defined(__GNUC__)  // force stack alignment on Windows with GCC
   __attribute__((force_align_arg_pointer))
 #endif
-  std::unique_ptr<HyperGraph::HyperGraphElement>
-  construct() override {
+  std::unique_ptr<HyperGraph::HyperGraphElement> construct() override {
     return std::make_unique<T>();
   }
   [[nodiscard]] const std::string& name() const override { return name_; }
