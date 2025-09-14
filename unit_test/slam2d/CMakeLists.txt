@@ -1,6 +1,7 @@
 add_executable(unittest_slam2d
   mappings_se2.cpp
   jacobians_slam2d.cpp
+  optimization_slam2d_schur.cpp
   slam2d_basic_tests.cpp
   solve_direct_slam2d.cpp
 )
