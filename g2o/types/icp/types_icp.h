@@ -85,17 +85,17 @@ class G2O_TYPES_ICP_API EdgeGICP {
     R0.row(2) = normal0;
     y = y - normal0(1) * normal0;
     auto ysquarednorm = y.squaredNorm();
-    if(ysquarednorm >= 0.1) {
+    if (ysquarednorm >= 0.1) {
       y /= std::sqrt(ysquarednorm);
       R0.row(1) = y;
       R0.row(0) = normal0.cross(R0.row(1));
     } else {
       Vector3 x;
-      x<< -1, 0, 0;
+      x << -1, 0, 0;
       x = x - normal0(0) * normal0;
       x.normalize();
       R0.row(0) = x;
-      R0.row(1) = -normal0.cross(R0.row(0)); 
+      R0.row(1) = -normal0.cross(R0.row(0));
     }
   }
 
@@ -106,17 +106,17 @@ class G2O_TYPES_ICP_API EdgeGICP {
     R1.row(2) = normal1;
     y = y - normal1(1) * normal1;
     auto ysquarednorm = y.squaredNorm();
-    if(y.squaredNorm() >= 0.1) {
+    if (y.squaredNorm() >= 0.1) {
       y /= std::sqrt(ysquarednorm);
       R1.row(1) = y;
       R1.row(0) = normal1.cross(R1.row(1));
     } else {
       Vector3 x;
-      x<< -1, 0, 0;
+      x << -1, 0, 0;
       x = x - normal1(0) * normal1;
       x.normalize();
       R1.row(0) = x;
-      R1.row(1) = -normal1.cross(R1.row(0)); 
+      R1.row(1) = -normal1.cross(R1.row(0));
     }
   }
 
