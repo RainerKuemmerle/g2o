@@ -17,7 +17,7 @@ namespace g2o {
 void declareSparseOptimizer(py::module& m) {
   using CLS = SparseOptimizer;
 
-  py::class_<CLS, OptimizableGraph>(m, "SparseOptimizer")
+  py::classh<CLS, OptimizableGraph>(m, "SparseOptimizer")
       // ATTENTION: _solver & _statistics is own by SparseOptimizer and will be
       // deleted in its destructor.
       .def(py::init<>())
@@ -76,8 +76,7 @@ void declareSparseOptimizer(py::module& m) {
       // The gauge should be fixed() and then the optimization can work (if no
       // additional dof are in the system. The default implementation returns a
       // node with maximum dimension.
-      .def("find_gauge", &CLS::findGauge,
-           py::return_value_policy::reference)   // virtual, ->
+      .def("find_gauge", &CLS::findGauge)        // virtual, ->
                                                  // OptimizableGraph::Vertex*
       .def("gauge_freedom", &CLS::gaugeFreedom)  // -> bool
       .def("active_chi2", &CLS::activeChi2)      // -> double
@@ -102,11 +101,9 @@ void declareSparseOptimizer(py::module& m) {
       .def("find_active_edge", &CLS::findActiveEdge,
            "e"_a)  // -> EdgeContainer::const_iterator, const
 
-      .def("algorithm", &CLS::algorithm,
-           py::return_value_policy::reference)  // -> const
-                                                // OptimizationAlgorithm&, const
-      .def("solver", &CLS::solver,
-           py::return_value_policy::reference)  // -> OptimizationAlgorithm*
+      .def("algorithm", &CLS::algorithm)  // -> const
+                                          // OptimizationAlgorithm&, const
+      .def("solver", &CLS::solver)        // -> OptimizationAlgorithm*
       //.def("set_algorithm", &CLS::setAlgorithm,
       //        "algorithm"_a, py::keep_alive<1, 2>()) // -> void
 

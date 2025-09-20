@@ -36,7 +36,8 @@ class VectorXVertex : public BaseDynamicVertex<VectorX> {
   }
 };
 
-class PyVectorXVertex : public VectorXVertex {
+class PyVectorXVertex : public VectorXVertex,
+                        public py::trampoline_self_life_support {
  public:
   PyVectorXVertex() = default;
 
@@ -57,7 +58,8 @@ class VariableVectorXEdge
   VariableVectorXEdge() { resize(0); }
 };
 
-class PyVariableVectorXEdge : public VariableVectorXEdge {
+class PyVariableVectorXEdge : public VariableVectorXEdge,
+                              public py::trampoline_self_life_support {
  public:
   PyVariableVectorXEdge() = default;
 
@@ -83,9 +85,9 @@ class PyVariableVectorXEdge : public VariableVectorXEdge {
 void declareTypesPure(detail::Registry& registry) {
   registry.registerBaseVertex<Eigen::Dynamic, VectorX>();
 
-  py::class_<VectorXVertex, PyVectorXVertex,
-             BaseVertex<Eigen::Dynamic, VectorX>,
-             std::shared_ptr<VectorXVertex>>(registry.mod(), "VectorXVertex")
+  py::classh<VectorXVertex, PyVectorXVertex,
+             BaseVertex<Eigen::Dynamic, VectorX>>(registry.mod(),
+                                                  "VectorXVertex")
       .def(py::init<>())
       .def("oplus_impl",
            &VectorXVertex::oplus_impl)  // -> void, to be implemented in python

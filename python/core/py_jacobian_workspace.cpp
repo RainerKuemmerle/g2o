@@ -6,7 +6,7 @@
 namespace g2o {
 
 void declareJacobianWorkspace(py::module& m) {
-  py::class_<JacobianWorkspace>(m, "JacobianWorkspace")
+  py::classh<JacobianWorkspace>(m, "JacobianWorkspace")
       .def(py::init<>())
       .def("allocate", &JacobianWorkspace::allocate)
       .def("update_size",

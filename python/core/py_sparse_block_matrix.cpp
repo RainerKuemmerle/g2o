@@ -11,7 +11,7 @@ template <class MatrixType = MatrixX>
 void templatedSparseBlockMatrix(py::module& m, const std::string& suffix) {
   using CLS = SparseBlockMatrix<MatrixType>;
 
-  py::class_<CLS>(m, ("SparseBlockMatrix" + suffix).c_str())
+  py::classh<CLS>(m, ("SparseBlockMatrix" + suffix).c_str())
       .def(py::init<>())
       .def("clear", &CLS::clear, "dealloc"_a = false)
       .def("cols", &CLS::cols)

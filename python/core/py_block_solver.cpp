@@ -21,7 +21,7 @@ template <typename LinearSolverT, typename BlockSolverT>
 void templatedPyLinearSolver(py::module& m, const std::string& suffix) {
   using CLS = PyLinearSolver<LinearSolverT, BlockSolverT>;
 
-  py::class_<CLS>(m, ("LinearSolver" + suffix).c_str())
+  py::classh<CLS>(m, ("LinearSolver" + suffix).c_str())
       .def(py::init<>())
       .def("set_block_ordering",
            [](CLS& ls, bool blockOrdering) {
@@ -37,7 +37,7 @@ void templatedPyLinearSolverWithoutOrdering(py::module& m,
                                             const std::string& suffix) {
   using CLS = PyLinearSolver<LinearSolverT, BlockSolverT>;
 
-  py::class_<CLS>(m, ("LinearSolver" + suffix).c_str()).def(py::init<>());
+  py::classh<CLS>(m, ("LinearSolver" + suffix).c_str()).def(py::init<>());
 }
 
 template <typename BlockSolverT>
@@ -89,7 +89,7 @@ void templatedPyBlockSolver(py::module& m, const std::string& suffix) {
   using CLS = PyBlockSolver<BlockSolverT>;
   using PoseMatrixType = typename CLS::PoseMatrixType;
 
-  py::class_<CLS, PyBlockSolverBase>(m, ("BlockSolver" + suffix).c_str())
+  py::classh<CLS, PyBlockSolverBase>(m, ("BlockSolver" + suffix).c_str())
 #if G2O_HAVE_CHOLMOD
       .def(py::init<PyLinearSolver<g2o::LinearSolverCholmod<PoseMatrixType>,
                                    BlockSolverT>&>())
@@ -113,9 +113,9 @@ void templatedPyBlockSolver(py::module& m, const std::string& suffix) {
 }  // namespace
 
 void declareBlockSolver(py::module& m) {
-  py::class_<BlockSolverBase, Solver>(m, "BlockSolverBase");  // NOLINT
+  py::classh<BlockSolverBase, Solver>(m, "BlockSolverBase");  // NOLINT
 
-  py::class_<PyBlockSolverBase>(m, "PyBlockSolverBase");  // NOLINT
+  py::classh<PyBlockSolverBase>(m, "PyBlockSolverBase");  // NOLINT
 
   using MatrixSE2 = BlockSolver_3_2::PoseMatrixType;
   using MatrixSE3 = BlockSolver_6_3::PoseMatrixType;

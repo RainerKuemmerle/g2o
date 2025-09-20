@@ -5,12 +5,12 @@
 namespace g2o {
 
 void delcareHyperDijkstra(py::module& m) {
-  py::class_<HyperDijkstra> cls(m, "HyperDijkstra");
+  py::classh<HyperDijkstra> cls(m, "HyperDijkstra");
 
-  py::class_<HyperDijkstra::CostFunction>(  // NOLINT
+  py::classh<HyperDijkstra::CostFunction>(  // NOLINT
       cls, "HyperDijkstraCostFunction");
 
-  py::class_<HyperDijkstra::TreeAction>(cls, "HyperDijkstraTreeAction")
+  py::classh<HyperDijkstra::TreeAction>(cls, "HyperDijkstraTreeAction")
       .def("perform",
            static_cast<double (HyperDijkstra::TreeAction::*)(
                const std::shared_ptr<HyperGraph::Vertex>&,
@@ -28,7 +28,7 @@ void delcareHyperDijkstra(py::module& m) {
            "v"_a, "vParent"_a, "e"_a, "distance"_a, py::keep_alive<1, 2>(),
            py::keep_alive<1, 3>(), py::keep_alive<1, 4>());
 
-  py::class_<HyperDijkstra::AdjacencyMapEntry>(cls,
+  py::classh<HyperDijkstra::AdjacencyMapEntry>(cls,
                                                "HyperDijkstraAdjacencyMapEntry")
       .def(py::init<const std::shared_ptr<HyperGraph::Vertex>&,
                     const std::shared_ptr<HyperGraph::Vertex>&,
@@ -86,7 +86,7 @@ void delcareHyperDijkstra(py::module& m) {
       py::keep_alive<1, 3>());  // (AdjacencyMap& amap, TreeAction* action, bool
                                 // useDistance=false) -> void
 
-  py::class_<UniformCostFunction, HyperDijkstra::CostFunction>(
+  py::classh<UniformCostFunction, HyperDijkstra::CostFunction>(
       m, "UniformCostFunction")
       .def("__call__", &UniformCostFunction::operator(), "edge"_a, "from"_a,
            "to"_a, py::keep_alive<1, 2>(), py::keep_alive<1, 3>(),

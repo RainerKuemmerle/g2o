@@ -3,7 +3,8 @@
 #include "g2opy.h"
 
 template <class EdgeBase>
-class PyEdgeTrampoline : public EdgeBase {
+class PyEdgeTrampoline : public EdgeBase,
+                         public py::trampoline_self_life_support {
  public:
   using EdgeBase::EdgeBase;  // Inherit constructors
   void computeError() override {

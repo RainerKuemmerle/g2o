@@ -6,7 +6,7 @@
 namespace g2o {
 
 void declareRobustKernel(py::module& m) {
-  py::class_<RobustKernel, std::shared_ptr<RobustKernel>>(m, "BaseRobustKernel")
+  py::classh<RobustKernel>(m, "BaseRobustKernel")
       .def("robustify", &RobustKernel::robustify, "squared_error"_a,
            "rho"_a)  // (double, Vector3&) -> void
       .def("set_delta", &RobustKernel::setDelta,
@@ -14,9 +14,7 @@ void declareRobustKernel(py::module& m) {
       .def("delta", &RobustKernel::delta)  // -> double
       ;
 
-  py::class_<RobustKernelScaleDelta, RobustKernel,
-             std::shared_ptr<RobustKernelScaleDelta>>(m,
-                                                      "RobustKernelScaleDelta")
+  py::classh<RobustKernelScaleDelta, RobustKernel>(m, "RobustKernelScaleDelta")
       .def(py::init<>())
       .def(py::init<double>(), "delta"_a = 1.)
       .def(py::init<const RobustKernelPtr&, double>(), "kernel"_a,
@@ -28,8 +26,7 @@ void declareRobustKernel(py::module& m) {
            "rho"_a)  // (double, Vector3&) -> void
       ;
 
-  py::class_<RobustKernelHuber, RobustKernel,
-             std::shared_ptr<RobustKernelHuber>>(m, "RobustKernelHuber")
+  py::classh<RobustKernelHuber, RobustKernel>(m, "RobustKernelHuber")
       .def(py::init<>())
       //.def(py::init<double>(), "delta"_a)
       .def(py::init([](double delta) {
@@ -42,9 +39,8 @@ void declareRobustKernel(py::module& m) {
            "rho"_a)  // (double, Vector3&) -> void
       ;
 
-  py::class_<RobustKernelPseudoHuber, RobustKernel,
-             std::shared_ptr<RobustKernelPseudoHuber>>(
-      m, "RobustKernelPseudoHuber")
+  py::classh<RobustKernelPseudoHuber, RobustKernel>(m,
+                                                    "RobustKernelPseudoHuber")
       .def(py::init<>())
       //.def(py::init<double>(), "delta"_a)
       .def(py::init([](double delta) {
@@ -58,8 +54,7 @@ void declareRobustKernel(py::module& m) {
            "rho"_a)  // (double, Vector3&) -> void
       ;
 
-  py::class_<RobustKernelCauchy, RobustKernel,
-             std::shared_ptr<RobustKernelCauchy>>(m, "RobustKernelCauchy")
+  py::classh<RobustKernelCauchy, RobustKernel>(m, "RobustKernelCauchy")
       .def(py::init<>())
       //.def(py::init<double>(), "delta"_a)
       .def(py::init([](double delta) {
@@ -73,9 +68,8 @@ void declareRobustKernel(py::module& m) {
            "rho"_a)  // (double, Vector3&) -> void
       ;
 
-  py::class_<RobustKernelGemanMcClure, RobustKernel,
-             std::shared_ptr<RobustKernelGemanMcClure>>(
-      m, "RobustKernelGemanMcClure")
+  py::classh<RobustKernelGemanMcClure, RobustKernel>(m,
+                                                     "RobustKernelGemanMcClure")
       .def(py::init<>())
       //.def(py::init<double>(), "delta"_a)
       .def(py::init([](double delta) {
@@ -89,8 +83,7 @@ void declareRobustKernel(py::module& m) {
            "rho"_a)  // (double, Vector3&) -> void
       ;
 
-  py::class_<RobustKernelWelsch, RobustKernel,
-             std::shared_ptr<RobustKernelWelsch>>(m, "RobustKernelWelsch")
+  py::classh<RobustKernelWelsch, RobustKernel>(m, "RobustKernelWelsch")
       .def(py::init<>())
       //.def(py::init<double>(), "delta"_a)
       .def(py::init([](double delta) {
@@ -104,8 +97,7 @@ void declareRobustKernel(py::module& m) {
            "rho"_a)  // (double, Vector3&) -> void
       ;
 
-  py::class_<RobustKernelFair, RobustKernel, std::shared_ptr<RobustKernelFair>>(
-      m, "RobustKernelFair")
+  py::classh<RobustKernelFair, RobustKernel>(m, "RobustKernelFair")
       .def(py::init<>())
       //.def(py::init<double>(), "delta"_a)
       .def(py::init([](double delta) {
@@ -119,8 +111,7 @@ void declareRobustKernel(py::module& m) {
            "rho"_a)  // (double, Vector3&) -> void
       ;
 
-  py::class_<RobustKernelTukey, RobustKernel,
-             std::shared_ptr<RobustKernelTukey>>(m, "RobustKernelTukey")
+  py::classh<RobustKernelTukey, RobustKernel>(m, "RobustKernelTukey")
       .def(py::init<>())
       //.def(py::init<double>(), "delta"_a)
       .def(py::init([](double delta) {
@@ -134,8 +125,7 @@ void declareRobustKernel(py::module& m) {
            "rho"_a)  // (double, Vector3&) -> void
       ;
 
-  py::class_<RobustKernelSaturated, RobustKernel,
-             std::shared_ptr<RobustKernelSaturated>>(m, "RobustKernelSaturated")
+  py::classh<RobustKernelSaturated, RobustKernel>(m, "RobustKernelSaturated")
       .def(py::init<>())
       //.def(py::init<double>(), "delta"_a)
       .def(py::init([](double delta) {
@@ -149,8 +139,7 @@ void declareRobustKernel(py::module& m) {
            "rho"_a)  // (double, Vector3&) -> void
       ;
 
-  py::class_<RobustKernelDCS, RobustKernel, std::shared_ptr<RobustKernelDCS>>(
-      m, "RobustKernelDCS")
+  py::classh<RobustKernelDCS, RobustKernel>(m, "RobustKernelDCS")
       .def(py::init<>())
       //.def(py::init<double>(), "delta"_a)
       .def(py::init([](double delta) {

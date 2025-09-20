@@ -12,42 +12,37 @@
 namespace g2o {
 
 void declareOptimizationAlgorithm(py::module& m) {
-  py::class_<OptimizationAlgorithm,  // NOLINT
-             std::shared_ptr<OptimizationAlgorithm>>(m,
-                                                     "OptimizationAlgorithm");
+  py::classh<OptimizationAlgorithm>(m, "OptimizationAlgorithm");  // NOLINT
 
-  py::class_<OptimizationAlgorithmProperty>(  // NOLINT
+  py::classh<OptimizationAlgorithmProperty>(  // NOLINT
       m, "OptimizationAlgorithmProperty");
 
-  py::class_<OptimizationAlgorithmWithHessian, OptimizationAlgorithm,  // NOLINT
-             std::shared_ptr<OptimizationAlgorithmWithHessian>>(
+  py::classh<OptimizationAlgorithmWithHessian, OptimizationAlgorithm>(
       m, "OptimizationAlgorithmWithHessian");
 
-  py::class_<OptimizationAlgorithmGaussNewton, OptimizationAlgorithmWithHessian,
-             std::shared_ptr<OptimizationAlgorithmGaussNewton>>(
+  py::classh<OptimizationAlgorithmGaussNewton,
+             OptimizationAlgorithmWithHessian>(
       m, "OptimizationAlgorithmGaussNewton")
       .def(py::init([](PyBlockSolverBase& blockSolver) {
         return new OptimizationAlgorithmGaussNewton(blockSolver.solver());
       }));
 
-  py::class_<OptimizationAlgorithmLevenberg, OptimizationAlgorithmWithHessian,
-             std::shared_ptr<OptimizationAlgorithmLevenberg>>(
+  py::classh<OptimizationAlgorithmLevenberg, OptimizationAlgorithmWithHessian>(
       m, "OptimizationAlgorithmLevenberg")
       .def(py::init([](PyBlockSolverBase& blockSolver) {
         return new OptimizationAlgorithmLevenberg(blockSolver.solver());
       }));
 
-  py::class_<OptimizationAlgorithmDogleg, OptimizationAlgorithmWithHessian,
-             std::shared_ptr<OptimizationAlgorithmDogleg>>(
+  py::classh<OptimizationAlgorithmDogleg, OptimizationAlgorithmWithHessian>(
       m, "OptimizationAlgorithmDogleg")
       .def(py::init([](PyBlockSolverBase& blockSolver) {
         return new OptimizationAlgorithmDogleg(blockSolver.base_solver());
       }));
 
-  py::class_<AbstractOptimizationAlgorithmCreator>(  // NOLINT
+  py::classh<AbstractOptimizationAlgorithmCreator>(  // NOLINT
       m, "AbstractOptimizationAlgorithmCreator");
 
-  py::class_<RegisterOptimizationAlgorithmProxy>(
+  py::classh<RegisterOptimizationAlgorithmProxy>(
       m, "RegisterOptimizationAlgorithmProxy");
 }
 

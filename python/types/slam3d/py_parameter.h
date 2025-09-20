@@ -8,9 +8,8 @@
 namespace g2o {
 
 inline void declareSalm3dParameter(detail::Registry& registry) {
-  py::class_<ParameterSE3Offset, Parameter,
-             std::shared_ptr<ParameterSE3Offset>>(registry.mod(),
-                                                  "ParameterSE3Offset")
+  py::classh<ParameterSE3Offset, Parameter>(registry.mod(),
+                                            "ParameterSE3Offset")
       .def(py::init<>())
 
       .def("set_param", &ParameterSE3Offset::setParam)
@@ -21,8 +20,7 @@ inline void declareSalm3dParameter(detail::Registry& registry) {
   // class G2O_TYPES_SLAM3D_API CacheSE3Offset: public Cache
   // class G2O_TYPES_SLAM3D_API CacheSE3OffsetDrawAction: public DrawAction
 
-  py::class_<ParameterCamera, Parameter, std::shared_ptr<ParameterCamera>>(
-      registry.mod(), "ParameterCamera")
+  py::classh<ParameterCamera, Parameter>(registry.mod(), "ParameterCamera")
       .def(py::init<>())
       .def("set_param", &ParameterCamera::setParam)
       .def("param", &ParameterCamera::param);

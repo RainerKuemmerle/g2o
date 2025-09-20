@@ -12,19 +12,19 @@
 namespace g2o {
 
 void declareSimulator(py::module& m) {
-  py::class_<World>(m, "World")
+  py::classh<World>(m, "World")
       .def("graph",
            static_cast<g2o::OptimizableGraph& (World::*)()>(&World::graph),
            py::return_value_policy::reference);
 
-  py::class_<Simulator>(m, "Simulator")
+  py::classh<Simulator>(m, "Simulator")
       .def("seed", &Simulator::seed)
       .def("graph", &Simulator::graph, py::return_value_policy::reference)
       .def("world",
            static_cast<g2o::World& (Simulator::*)()>(&Simulator::world),
            py::return_value_policy::reference);
 
-  py::class_<Simulator::Config>(m, "SimulatorConfig")
+  py::classh<Simulator::Config>(m, "SimulatorConfig")
       .def(py::init<>())
       .def_readwrite("world_size", &Simulator::Config::worldSize)
       .def_readwrite("nlandmarks", &Simulator::Config::nlandmarks)
@@ -36,7 +36,7 @@ void declareSimulator(py::module& m) {
       .def_readwrite("has_gps", &Simulator::Config::hasGPS);
 
   // 2D Simulator
-  py::class_<Simulator2D::Config, Simulator::Config>(m, "Simulator2DConfig")
+  py::classh<Simulator2D::Config, Simulator::Config>(m, "Simulator2DConfig")
       .def(py::init<>())
       .def_readwrite("has_point_bearing_sensor",
                      &Simulator2D::Config::hasPointBearingSensor)
@@ -49,7 +49,7 @@ void declareSimulator(py::module& m) {
       .def_readwrite("max_segment_length",
                      &Simulator2D::Config::maxSegmentLength);
 
-  py::class_<Simulator2D, Simulator>(m, "Simulator2D")
+  py::classh<Simulator2D, Simulator>(m, "Simulator2D")
       .def(py::init<>())
       .def(py::init([](Simulator2D::Config cfg) {
         return std::make_unique<Simulator2D>(std::move(cfg));
@@ -59,14 +59,14 @@ void declareSimulator(py::module& m) {
       .def("simulate", &Simulator2D::simulate);
 
   // 3D Simulator
-  py::class_<Simulator3D::Config, Simulator::Config>(m, "Simulator3DConfig")
+  py::classh<Simulator3D::Config, Simulator::Config>(m, "Simulator3DConfig")
       .def(py::init<>())
       .def_readwrite("has_point_depth_sensor",
                      &Simulator3D::Config::hasPointDepthSensor)
       .def_readwrite("has_point_disparity_sensor",
                      &Simulator3D::Config::hasPointDisparitySensor);
 
-  py::class_<Simulator3D, Simulator>(m, "Simulator3D")
+  py::classh<Simulator3D, Simulator>(m, "Simulator3D")
       .def(py::init<>())
       .def(py::init([](Simulator3D::Config cfg) {
         return std::make_unique<Simulator3D>(std::move(cfg));
