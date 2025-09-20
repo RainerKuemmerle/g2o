@@ -6,7 +6,7 @@
 namespace g2o {
 
 void declareSBACam(py::module& m) {
-  py::class_<SBACam, SE3Quat>(m, "SBACam")
+  py::classh<SBACam, SE3Quat>(m, "SBACam")
       .def(py::init<>())
       .def(py::init<const Eigen::Quaterniond&, const Eigen::Vector3d&>(), "r"_a,
            "t"_a)

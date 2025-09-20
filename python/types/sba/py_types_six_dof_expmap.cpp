@@ -17,15 +17,14 @@ G2O_USE_TYPE_GROUP(expmap)
 namespace g2o {
 
 void declareTypesSixDofExpmap(detail::Registry& registry) {
-  py::class_<StereoCameraParameters>(registry.mod(), "StereoCameraParameters")
+  py::classh<StereoCameraParameters>(registry.mod(), "StereoCameraParameters")
       .def(py::init<>())
       .def_readwrite("focal_length", &StereoCameraParameters::focal_length)
       .def_readwrite("principle_point",
                      &StereoCameraParameters::principle_point)
       .def_readwrite("baseline", &StereoCameraParameters::baseline);
 
-  py::class_<CameraParameters, Parameter, std::shared_ptr<CameraParameters>>(
-      registry.mod(), "CameraParameters")
+  py::classh<CameraParameters, Parameter>(registry.mod(), "CameraParameters")
       .def(py::init<>())
       .def(py::init([](double f, const Eigen::Ref<const Vector2>& p, double b) {
         return CameraParameters(f, p, b);

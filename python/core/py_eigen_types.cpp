@@ -1,6 +1,6 @@
 #include "py_eigen_types.h"
 
-#include "g2o/stuff/misc.h"
+#include <pybind11/native_enum.h>
 
 namespace g2o {
 
@@ -19,7 +19,7 @@ void templatedEigenIsometry(py::module& m, const std::string& name) {
   using TranslationMatrixType =
       typename Eigen::Matrix<Scalar, CLS::Dim, Eigen::Dynamic>;
 
-  py::class_<CLS>(m, name.c_str())
+  py::classh<CLS>(m, name.c_str())
       //.def(py::init<>())
       .def(py::init([]() { return CLS::Identity(); }))
 
@@ -173,7 +173,7 @@ void templatedEigenIsometry(py::module& m, const std::string& name) {
 }  // namespace
 
 void declareEigenTypes(py::module& m) {
-  py::class_<Eigen::Quaterniond>(m, "Quaternion")
+  py::classh<Eigen::Quaterniond>(m, "Quaternion")
       //.def(py::init<>())
       .def(py::init([]() { return Eigen::Quaterniond::Identity(); }))
 
@@ -242,7 +242,7 @@ void declareEigenTypes(py::module& m) {
 
       ;
 
-  py::class_<Eigen::Rotation2Dd>(m, "Rotation2d")
+  py::classh<Eigen::Rotation2Dd>(m, "Rotation2d")
       //.def(py::init<>())
       .def(py::init([]() { return Eigen::Rotation2Dd::Identity(); }))
       .def(py::init<Eigen::Rotation2Dd&>())
@@ -273,7 +273,7 @@ void declareEigenTypes(py::module& m) {
       .def("slerp", &Eigen::Rotation2Dd::slerp)
       .def_static("ientity", &Eigen::Rotation2Dd::Identity);
 
-  py::class_<Eigen::AngleAxisd>(m, "AngleAxis")
+  py::classh<Eigen::AngleAxisd>(m, "AngleAxis")
       .def(py::init([]() { return Eigen::AngleAxisd::Identity(); }))
       .def(py::init<const double&, const Eigen::Matrix<double, 3, 1>&>())
       .def(py::init<const Eigen::AngleAxisd&>())
@@ -300,12 +300,13 @@ void declareEigenTypes(py::module& m) {
       .def_property_readonly("R", &Eigen::AngleAxisd::toRotationMatrix)
       .def_static("ientity", &Eigen::AngleAxisd::Identity);
 
-  py::enum_<Eigen::TransformTraits>(m, "TransformTraits")
+  py::native_enum<Eigen::TransformTraits>(m, "TransformTraits", "enum.Enum")
       .value("Isometry", Eigen::Isometry)
       .value("Affine", Eigen::Affine)
       .value("AffineCompact", Eigen::AffineCompact)
       .value("Projective", Eigen::Projective)
-      .export_values();
+      .export_values()
+      .finalize();
 
   templatedEigenIsometry<double, 2, Eigen::Isometry>(m, "Isometry2d");
   templatedEigenIsometry<double, 3, Eigen::Isometry>(m, "Isometry3d");

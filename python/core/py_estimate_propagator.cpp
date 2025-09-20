@@ -7,7 +7,8 @@
 
 namespace g2o {
 
-class PyEstimatePropagatorCostBase : public EstimatePropagatorCostBase {
+class PyEstimatePropagatorCostBase : public EstimatePropagatorCostBase,
+                                     public py::trampoline_self_life_support {
  public:
   /* Inherit the constructors */
   using EstimatePropagatorCostBase::EstimatePropagatorCostBase;
@@ -34,7 +35,7 @@ class PyEstimatePropagatorCostBase : public EstimatePropagatorCostBase {
 };
 
 void delcareEstimatePropagator(py::module& m) {
-  py::class_<EstimatePropagatorCostBase,
+  py::classh<EstimatePropagatorCostBase,
              PyEstimatePropagatorCostBase /* <--- trampoline*/>(
       m, "EstimatePropagatorCostBase")
       .def(py::init<>())
@@ -45,7 +46,7 @@ void delcareEstimatePropagator(py::module& m) {
       // OptimizableGraph::Vertex* to_) -> double
       .def("name", &EstimatePropagatorCostBase::name);
 
-  py::class_<EstimatePropagatorCost, EstimatePropagatorCostBase>(
+  py::classh<EstimatePropagatorCost, EstimatePropagatorCostBase>(
       m, "EstimatePropagatorCost")
       .def(py::init<SparseOptimizer*>(), "graph"_a, py::keep_alive<1, 2>())
       .def("__call__", &EstimatePropagatorCost::operator(), "edge"_a, "from"_a,
@@ -55,7 +56,7 @@ void delcareEstimatePropagator(py::module& m) {
                                     // OptimizableGraph::Vertex* to_) -> double
       .def("name", &EstimatePropagatorCost::name);
 
-  py::class_<EstimatePropagatorCostOdometry, EstimatePropagatorCostBase>(
+  py::classh<EstimatePropagatorCostOdometry, EstimatePropagatorCostBase>(
       m, "EstimatePropagatorCostOdometry")
       .def(py::init<SparseOptimizer*>(), "graph"_a, py::keep_alive<1, 2>())
       .def("__call__", &EstimatePropagatorCostOdometry::operator(), "edge"_a,
@@ -65,8 +66,8 @@ void delcareEstimatePropagator(py::module& m) {
                                     // OptimizableGraph::Vertex* to_) -> double
       .def("name", &EstimatePropagatorCostOdometry::name);
 
-  py::class_<EstimatePropagator> cls(m, "EstimatePropagator");
-  py::class_<EstimatePropagator::PropagateAction>(cls,
+  py::classh<EstimatePropagator> cls(m, "EstimatePropagator");
+  py::classh<EstimatePropagator::PropagateAction>(cls,
                                                   "EstimatePropagateAction")
       .def(py::init<>())
       .def("__call__", &EstimatePropagator::PropagateAction::operator(),
@@ -76,7 +77,7 @@ void delcareEstimatePropagator(py::module& m) {
                                     // OptimizableGraph::Vertex* to_) -> double
       ;
 
-  py::class_<EstimatePropagator::AdjacencyMapEntry>(
+  py::classh<EstimatePropagator::AdjacencyMapEntry>(
       cls, "EstimatePropagatorAdjacencyMapEntry")
       .def(py::init<>())
       .def("reset", &EstimatePropagator::AdjacencyMapEntry::reset)
@@ -87,7 +88,7 @@ void delcareEstimatePropagator(py::module& m) {
       .def("frontier_level",
            &EstimatePropagator::AdjacencyMapEntry::frontierLevel);
 
-  py::class_<EstimatePropagator::VertexIDHashFunction>(
+  py::classh<EstimatePropagator::VertexIDHashFunction>(
       cls, "EstimatePropagatorVertexIDHashFunction")
       .def("__call__", &EstimatePropagator::VertexIDHashFunction::operator(),
            "v"_a)  // (const VertexPtr v) -> size_t

@@ -11,7 +11,7 @@ G2O_USE_TYPE_GROUP(icp)
 namespace g2o {
 
 void declareTypesICP(detail::Registry& registry) {
-  py::class_<EdgeGICP>(registry.mod(), "EdgeGICP")
+  py::classh<EdgeGICP>(registry.mod(), "EdgeGICP")
       .def(py::init<>())
 
       .def("make_rot0", &EdgeGICP::makeRot0, "set up rotation matrix for pos0")

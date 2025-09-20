@@ -6,7 +6,7 @@
 namespace g2o {
 
 inline void declareSE2(py::module& m) {
-  py::class_<SE2>(m, "SE2")
+  py::classh<SE2>(m, "SE2")
       .def(py::init<>())
       .def(py::init<const Isometry2&>())
       .def(py::init<const Vector3&>())

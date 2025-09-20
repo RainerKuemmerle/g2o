@@ -5,7 +5,7 @@
 namespace g2o {
 
 void declareG2OBatchStatistics(py::module& m) {
-  py::class_<G2OBatchStatistics>(m, "G2OBatchStatistics")
+  py::classh<G2OBatchStatistics>(m, "G2OBatchStatistics")
       .def(py::init<>())
       .def_static("global_stats", &G2OBatchStatistics::globalStats)
       .def_static("set_global_stats", &G2OBatchStatistics::setGlobalStats)

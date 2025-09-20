@@ -8,7 +8,7 @@
 namespace g2o {
 
 inline void declareOdometryMeasurement(detail::Registry& registry) {
-  py::class_<VelocityMeasurement>(registry.mod(), "VelocityMeasurement")
+  py::classh<VelocityMeasurement>(registry.mod(), "VelocityMeasurement")
       .def(py::init<>())
       .def(py::init<double, double, double>(), "vl"_a, "vr"_a, "dt"_a)
 
@@ -20,7 +20,7 @@ inline void declareOdometryMeasurement(detail::Registry& registry) {
       .def("set_dt", &VelocityMeasurement::setDt)
       .def("measurement", &VelocityMeasurement::measurement);
 
-  py::class_<MotionMeasurement>(registry.mod(), "MotionMeasurement")
+  py::classh<MotionMeasurement>(registry.mod(), "MotionMeasurement")
       .def(py::init<>())
       .def(py::init<double, double, double, double>(), "x"_a, "y"_a, "theta"_a,
            "dt"_a)
@@ -36,7 +36,7 @@ inline void declareOdometryMeasurement(detail::Registry& registry) {
       .def("set_dt", &MotionMeasurement::setDt)
       .def("measurement", &MotionMeasurement::measurement);
 
-  py::class_<OdomConvert>(registry.mod(), "OdomConvert")
+  py::classh<OdomConvert>(registry.mod(), "OdomConvert")
       .def_static("convert_to_velocity", &OdomConvert::convertToVelocity)
       .def_static("convert_to_motion", &OdomConvert::convertToMotion)
       .def_static("to_velocity", &OdomConvert::convertToVelocity)

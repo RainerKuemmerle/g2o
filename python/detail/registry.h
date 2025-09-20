@@ -31,23 +31,23 @@ class Registry {
       this->registerUnaryEdge<EdgeType::kDimension,
                               typename EdgeType::Measurement,
                               typename EdgeType::VertexXiType>();
-      return py::class_<EdgeType,
+      return py::classh<EdgeType,
                         BaseUnaryEdge<EdgeType::kDimension,
                                       typename EdgeType::Measurement,
                                       typename EdgeType::VertexXiType>,
-                        Trampoline, std::shared_ptr<EdgeType>>(mod_, name)
+                        Trampoline>(mod_, name)
           .def(py::init<>());
     } else if constexpr (std::tuple_size_v<
                              typename EdgeType::VertexTypeTuple> == 2) {
       this->registerBinaryEdge<
           EdgeType::kDimension, typename EdgeType::Measurement,
           typename EdgeType::VertexXiType, typename EdgeType::VertexXjType>();
-      return py::class_<EdgeType,
+      return py::classh<EdgeType,
                         BaseBinaryEdge<EdgeType::kDimension,
                                        typename EdgeType::Measurement,
                                        typename EdgeType::VertexXiType,
                                        typename EdgeType::VertexXjType>,
-                        Trampoline, std::shared_ptr<EdgeType>>(mod_, name)
+                        Trampoline>(mod_, name)
           .def(py::init<>());
     } else if constexpr (std::tuple_size_v<
                              typename EdgeType::VertexTypeTuple> == 3) {
@@ -55,14 +55,14 @@ class Registry {
                           typename EdgeType::template NthType<0>,
                           typename EdgeType::template NthType<1>,
                           typename EdgeType::template NthType<2>>();
-      return py::class_<
+      return py::classh<
                  EdgeType,
                  BaseFixedSizedEdge<EdgeType::kDimension,
                                     typename EdgeType::Measurement,
                                     typename EdgeType::template NthType<0>,
                                     typename EdgeType::template NthType<1>,
                                     typename EdgeType::template NthType<2>>,
-                 Trampoline, std::shared_ptr<EdgeType>>(mod_, name)
+                 Trampoline>(mod_, name)
           .def(py::init<>());
     } else {
       static_assert(false, "Not implemented size of fixed edge");
@@ -74,10 +74,10 @@ class Registry {
   auto registerVariableEdge(const char* name) {
     this->registerBaseVariableEdge<EdgeType::kDimension,
                                    typename EdgeType::Measurement>();
-    return py::class_<EdgeType,
+    return py::classh<EdgeType,
                       BaseVariableSizedEdge<EdgeType::kDimension,
                                             typename EdgeType::Measurement>,
-                      Trampoline, std::shared_ptr<EdgeType>>(mod_, name)
+                      Trampoline>(mod_, name)
         .def(py::init<>());
   }
 
@@ -86,10 +86,9 @@ class Registry {
     this->registerBaseVertex<VertexType::kDimension,
                              typename VertexType::EstimateType>();
 
-    return py::class_<VertexType,
+    return py::classh<VertexType,
                       BaseVertex<VertexType::kDimension,
-                                 typename VertexType::EstimateType>,
-                      std::shared_ptr<VertexType>>(mod_, name)
+                                 typename VertexType::EstimateType>>(mod_, name)
         .def(py::init<>());
   }
 
@@ -112,20 +111,17 @@ class Registry {
     using CLS = BaseVertex<D, T>;
     using BVector = typename CLS::BVector;
 
-    py::class_<CLS, OptimizableGraph::Vertex, std::shared_ptr<CLS>>(
-        private_mod_, base_vertex_name.c_str())
+    py::classh<CLS, OptimizableGraph::Vertex>(private_mod_,
+                                              base_vertex_name.c_str())
 
         //.def(py::init<>())
         //.def_readonly_static("dimension", &BaseVertex<D, T>::Dimension)   //
         // lead to undefined
         // symbol error
         .def("hessian", [](const CLS& v) { return MatrixX(v.hessianMap()); })
-        .def("b", static_cast<BVector& (CLS::*)()>(&CLS::b),
-             py::return_value_policy::reference)
-        //.def("A", (HessianBlockType& (CLS::*) ()) &CLS::A,
-        //        py::return_value_policy::reference)
-        .def("estimate", &CLS::estimate,
-             py::return_value_policy::reference)  // -> T&
+        .def("b", static_cast<BVector& (CLS::*)()>(&CLS::b))
+        //.def("A", (HessianBlockType& (CLS::*) ()) &CLS::A)
+        .def("estimate", &CLS::estimate)  // -> T&
         .def("set_estimate", &CLS::setEstimate, "et"_a,
              py::keep_alive<1, 2>())  // T& -> void
         ;
@@ -150,8 +146,8 @@ class Registry {
     }
     registered_edges_.insert(binary_edge_name);
 
-    py::class_<CLS, BaseFixedSizedEdge<D, E, VertexXi>, BaseEdge<D, E>,
-               std::shared_ptr<CLS>>(private_mod_, binary_edge_name.c_str())
+    py::classh<CLS, BaseFixedSizedEdge<D, E, VertexXi>, BaseEdge<D, E>>(
+        private_mod_, binary_edge_name.c_str())
         .def_property(
             "jacobian_oplus_xi",
             [](CLS& cls) { return cls.template jacobianOplusXn<0>(); },
@@ -182,9 +178,8 @@ class Registry {
     }
     registered_edges_.insert(binary_edge_name);
 
-    pybind11::class_<CLS, BaseFixedSizedEdge<D, E, VertexXi, VertexXj>,
-                     std::shared_ptr<CLS>>(private_mod_,
-                                           binary_edge_name.c_str())
+    pybind11::classh<CLS, BaseFixedSizedEdge<D, E, VertexXi, VertexXj>>(
+        private_mod_, binary_edge_name.c_str())
         .def_property(
             "jacobian_oplus_xi",
             [](CLS& cls) { return cls.template jacobianOplusXn<0>(); },
@@ -229,8 +224,8 @@ class Registry {
     }
     registered_edges_.insert(base_fixed_size_edge_name);
 
-    py::class_<CLS, BaseEdge<D, E>, std::shared_ptr<CLS>>(
-        private_mod_, base_fixed_size_edge_name.c_str())
+    py::classh<CLS, BaseEdge<D, E>>(private_mod_,
+                                    base_fixed_size_edge_name.c_str())
         // abstract class type ..."
         // TODO(Rainer): Fix binding of create_vertex
         //  .def("create_vertex", &CLS::createVertex,
@@ -260,8 +255,8 @@ class Registry {
     }
     registered_edges_.insert(base_variable_edge_name.str());
 
-    py::class_<CLS, BaseEdge<D, E>, std::shared_ptr<CLS>>(
-        private_mod_, base_variable_edge_name.str().c_str())
+    py::classh<CLS, BaseEdge<D, E>>(private_mod_,
+                                    base_variable_edge_name.str().c_str())
         .def("linearize_oplus",
              static_cast<void (CLS::*)()>(&CLS::linearizeOplus))
         .def("jacobian", &CLS::jacobian, "vertex_index"_a)  // int -> Matrix
@@ -287,9 +282,8 @@ class Registry {
     using ErrorVector = typename CLS::ErrorVector;
     using InformationType = typename CLS::InformationType;
 
-    auto base_edge =
-        py::class_<CLS, OptimizableGraph::Edge, std::shared_ptr<CLS>>(
-            private_mod_, base_edge_name.str().c_str());
+    auto base_edge = py::classh<CLS, OptimizableGraph::Edge>(
+        private_mod_, base_edge_name.str().c_str());
     base_edge.def("chi2", &CLS::chi2)
         .def_property(
             "error", [](const CLS& cls) { return cls.error(); },
