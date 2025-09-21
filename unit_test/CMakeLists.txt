@@ -38,6 +38,7 @@ add_subdirectory(slam3d)
 add_subdirectory(sba)
 add_subdirectory(sim3)
 add_subdirectory(solver)
+add_subdirectory(icp)
 
 if (TARGET simulator_lib)
   add_subdirectory(simulator)
