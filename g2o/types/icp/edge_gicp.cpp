@@ -28,9 +28,43 @@
 
 #include <Eigen/Geometry>
 
+#include "g2o/core/eigen_types.h"
+
 namespace g2o {
 
-constexpr double ySquaredBnd{0.1};
+namespace {
+constexpr double kYSquaredBnd{0.1};
+
+void makeRot(Matrix3& R, const Vector3& normal) {
+  Vector3 y(0., 1., 0.);
+  R.row(2) = normal;
+  y = y - normal(1) * normal;
+  const double ysquarednorm = y.squaredNorm();
+  if (ysquarednorm >= kYSquaredBnd) {
+    y /= std::sqrt(ysquarednorm);
+    R.row(1) = y;
+    R.row(0) = normal.cross(R.row(1));
+  } else {
+    Vector3 x(-1., 0., 0.);
+    x = x + normal(0) * normal;
+    x.normalize();
+    R.row(0) = x;
+    R.row(1) = -normal.cross(R.row(0));
+  }
+}
+
+Matrix3 prec(double e, const Matrix3& R) {
+  Matrix3 prec_mat;
+  prec_mat << e, 0, 0, 0, e, 0, 0, 0, 1;
+  return R.transpose() * prec_mat * R;
+}
+
+Matrix3 cov(double e, const Matrix3& R) {
+  Matrix3 cov_mat;
+  cov_mat << 1, 0, 0, 0, 1, 0, 0, 0, e;
+  return R.transpose() * cov_mat * R;
+}
+}  // namespace
 
 EdgeGICP::EdgeGICP() {
   pos0.setZero();
@@ -42,72 +76,28 @@ EdgeGICP::EdgeGICP() {
   R1.setIdentity();
 }
 
-void EdgeGICP::makeRot0() {
-  Vector3 y;
-  y << 0, 1, 0;
-  R0.row(2) = normal0;
-  y = y - normal0(1) * normal0;
-  double ysquarednorm = y.squaredNorm();
-  if (ysquarednorm >= ySquaredBnd) {
-    y /= std::sqrt(ysquarednorm);
-    R0.row(1) = y;
-    R0.row(0) = normal0.cross(R0.row(1));
-  } else {
-    Vector3 x;
-    x << -1, 0, 0;
-    x = x + normal0(0) * normal0;
-    x.normalize();
-    R0.row(0) = x;
-    R0.row(1) = -normal0.cross(R0.row(0));
-  }
-}
+void EdgeGICP::makeRot0() { makeRot(R0, normal0); }
 
-void EdgeGICP::makeRot1() {
-  Vector3 y;
-  y << 0, 1, 0;
-  R1.row(2) = normal1;
-  y = y - normal1(1) * normal1;
-  double ysquarednorm = y.squaredNorm();
-  if (y.squaredNorm() >= ySquaredBnd) {
-    y /= std::sqrt(ysquarednorm);
-    R1.row(1) = y;
-    R1.row(0) = normal1.cross(R1.row(1));
-  } else {
-    Vector3 x;
-    x << -1, 0, 0;
-    x = x + normal1(0) * normal1;
-    x.normalize();
-    R1.row(0) = x;
-    R1.row(1) = -normal1.cross(R1.row(0));
-  }
-}
+void EdgeGICP::makeRot1() { makeRot(R1, normal1); }
 
 Matrix3 EdgeGICP::prec0(double e) {
   makeRot0();
-  Matrix3 prec;
-  prec << e, 0, 0, 0, e, 0, 0, 0, 1;
-  return R0.transpose() * prec * R0;
+  return prec(e, R0);
 }
 
 Matrix3 EdgeGICP::prec1(double e) {
   makeRot1();
-  Matrix3 prec;
-  prec << e, 0, 0, 0, e, 0, 0, 0, 1;
-  return R1.transpose() * prec * R1;
+  return prec(e, R1);
 }
 
 Matrix3 EdgeGICP::cov0(double e) {
   makeRot0();
-  Matrix3 cov;
-  cov << 1, 0, 0, 0, 1, 0, 0, 0, e;
-  return R0.transpose() * cov * R0;
+  return cov(e, R0);
 }
 
 Matrix3 EdgeGICP::cov1(double e) {
   makeRot1();
-  Matrix3 cov;
-  cov << 1, 0, 0, 0, 1, 0, 0, 0, e;
-  return R1.transpose() * cov * R1;
+  return cov(e, R1);
 }
 
 }  // namespace g2o
