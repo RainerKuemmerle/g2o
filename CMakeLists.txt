@@ -104,8 +104,8 @@ endif()
 
 # For building the CHOLMOD based solvers
 option(G2O_USE_CHOLMOD "Build g2o with CHOLMOD support" ON)
-find_package(SuiteSparse)
-if (G2O_USE_CHOLMOD AND SuiteSparse_CHOLMOD_FOUND)
+find_package(CHOLMOD)
+if (G2O_USE_CHOLMOD AND TARGET SuiteSparse::CHOLMOD)
   message(STATUS "Enable support for Cholmod")
   set(CHOLMOD_FOUND TRUE)
 else()
