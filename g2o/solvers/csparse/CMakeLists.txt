@@ -19,7 +19,7 @@ target_include_directories(csparse_extension PUBLIC
   ${CSPARSE_INCLUDE_DIR}
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
   $<INSTALL_INTERFACE:include/g2o/solvers/csparse>)
-target_link_libraries(csparse_extension PUBLIC stuff ${CSPARSE_LIBRARY} ${G2O_EIGEN3_EIGEN_TARGET})
+target_link_libraries(csparse_extension PUBLIC stuff ${CSPARSE_LIBRARY} Eigen3::Eigen)
 
 add_library(solver_csparse ${G2O_LIB_TYPE}
   solver_csparse.cpp
