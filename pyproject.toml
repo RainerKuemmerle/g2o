@@ -10,7 +10,7 @@ readme = "README.md"
 authors = [
   { name = "Rainer Kuemmerle", email = "rainer.kuemmerle@gmail.com" },
 ]
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 
 [tool.scikit-build]
 cmake.args = [
