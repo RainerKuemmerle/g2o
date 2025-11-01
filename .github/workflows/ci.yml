@@ -14,6 +14,20 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  python:
+    name: Build g2opy
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    - name: Install dependencies on Ubuntu
+      run: |
+          sudo apt update
+          sudo apt install libeigen3-dev libspdlog-dev nlohmann-json3-dev
+    - name: Build
+      run: pipx run build
+
   build:
     name: ${{ matrix.config.name }}
     runs-on: ${{ matrix.config.os }}
