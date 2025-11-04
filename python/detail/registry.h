@@ -65,7 +65,10 @@ class Registry {
                  Trampoline>(mod_, name)
           .def(py::init<>());
     } else {
-      static_assert(false, "Not implemented size of fixed edge");
+      static_assert(
+          std::tuple_size_v<typename EdgeType::VertexTypeTuple> < 0 ||
+              std::tuple_size_v<typename EdgeType::VertexTypeTuple> > 3,
+          "Not implemented size of fixed edge");
       return 0;
     }
   }
