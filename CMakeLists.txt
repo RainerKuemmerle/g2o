@@ -107,8 +107,8 @@ endif()
 
 # For building the CHOLMOD based solvers
 option(G2O_USE_CHOLMOD "Build g2o with CHOLMOD support" ON)
-find_package(SuiteSparse)
-if (G2O_USE_CHOLMOD AND SuiteSparse_CHOLMOD_FOUND)
+find_package(CHOLMOD)
+if (G2O_USE_CHOLMOD AND TARGET SuiteSparse::CHOLMOD)
   message(STATUS "Enable support for Cholmod")
   set(CHOLMOD_FOUND TRUE)
 else()
@@ -435,7 +435,9 @@ endif(MSVC)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${g2o_CXX_FLAGS}")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${g2o_C_FLAGS}")
 
-find_package(Eigen3 3.3 REQUIRED)
+# Find Eigen3
+# See https://eigen.tuxfamily.org/dox/TopicCMakeGuide.html for details
+find_package(Eigen3 REQUIRED NO_MODULE)
 find_package(nlohmann_json 3.3.0)
 
 # Generate config.h
