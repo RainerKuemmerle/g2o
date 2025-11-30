@@ -1,18 +1,12 @@
 name: Wheel
 
 on:
-#  push:
-#    branches:
-#      - pymem
-#  pull_request:
-#    branches:
-#      - pymem
-  workflow_dispatch:
-    inputs:
-      upload_pypi:
-        description: 'True to upload to pypi'
-        required: true
-        type: boolean
+  push:
+    branches:
+      - pymem-release
+  pull_request:
+    branches:
+      - pymem-release
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -23,6 +17,12 @@ jobs:
     name: Make SDist
     runs-on: ubuntu-latest
     steps:
+    - name: Print env
+      run: |
+        echo github.ref: ${{github.ref}}
+        echo github.event.action: ${{github.event.action}}
+        echo github.event_name: ${{github.event_name}}
+        echo runner.os: ${{runner.os}}
     - uses: actions/checkout@v4
       with:
         fetch-depth: 0
@@ -34,6 +34,7 @@ jobs:
         path: dist/*.tar.gz
 
   # reference https://github.com/scikit-learn/scikit-learn/blob/main/.github/workflows/wheels.yml
+  # github runners https://docs.github.com/en/actions/reference/runners/github-hosted-runners
   build_wheels:
     name: Build wheel for cp${{ matrix.python }}-${{ matrix.platform_id }}-${{ matrix.manylinux_image }}
     runs-on: ${{ matrix.os }}
@@ -42,7 +43,7 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          # Window 64 bit
+          ## Window 64 bit
           - os: windows-latest
             python: 311
             platform_id: win_amd64
@@ -56,7 +57,7 @@ jobs:
             python: 314
             platform_id: win_amd64
 
-          # Linux 64 bit manylinux_2_28
+            ## Linux manylinux_2_28
           - os: ubuntu-latest
             python: 311
             platform_id: manylinux_x86_64
@@ -74,7 +75,7 @@ jobs:
             platform_id: manylinux_x86_64
             manylinux_image: manylinux_2_28
 
-          # Linux 64 bit manylinux_2_28
+            ## Linux ARM manylinux_2_28
           - os: ubuntu-24.04-arm
             python: 311
             platform_id: manylinux_aarch64
@@ -92,36 +93,44 @@ jobs:
             platform_id: manylinux_aarch64
             manylinux_image: manylinux_2_28
 
-          ## MacOS x86_64
-          #- os: macos-13
-          #  python: 310
-          #  platform_id: macosx_x86_64
-          #- os: macos-13
-          #  python: 311
-          #  platform_id: macosx_x86_64
-          #- os: macos-13
-          #  python: 312
-          #  platform_id: macosx_x86_64
-          #- os: macos-13
-          #  python: 313
-          #  platform_id: macosx_x86_64
+            ## MacOS x86_64
+          - os: macos-15-intel
+            python: 311
+            platform_id: macosx_x86_64
+            manylinux_image: none
+          - os: macos-15-intel
+            python: 312
+            platform_id: macosx_x86_64
+            manylinux_image: none
+          - os: macos-15-intel
+            python: 313
+            platform_id: macosx_x86_64
+            manylinux_image: none
+          - os: macos-15-intel
+            python: 314
+            platform_id: macosx_x86_64
+            manylinux_image: none
 
           ## MacOS arm64
-          #- os: macos-14
-          #  python: 310
-          #  platform_id: macosx_arm64
-          #- os: macos-14
-          #  python: 311
-          #  platform_id: macosx_arm64
-          #- os: macos-14
-          #  python: 312
-          #  platform_id: macosx_arm64
-          #- os: macos-14
-          #  python: 313
-          #  platform_id: macosx_arm64
+          - os: macos-15
+            python: 311
+            platform_id: macosx_arm64
+            manylinux_image: none
+          - os: macos-15
+            python: 312
+            platform_id: macosx_arm64
+            manylinux_image: none
+          - os: macos-15
+            python: 313
+            platform_id: macosx_arm64
+            manylinux_image: none
+          - os: macos-15
+            python: 314
+            platform_id: macosx_arm64
+            manylinux_image: none
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
          fetch-depth: 25
 
@@ -130,13 +139,14 @@ jobs:
       # https://cibuildwheel.pypa.io/en/stable/
       # https://github.com/pypa/manylinux
       - name: Build wheels
-        uses: pypa/cibuildwheel@v2.23.3
+        uses: pypa/cibuildwheel@v3.3.0
         env:
           CIBW_BUILD: cp${{ matrix.python }}-${{ matrix.platform_id }}
           CIBW_ARCHS: all
           CIBW_MANYLINUX_X86_64_IMAGE: ${{ matrix.manylinux_image }}
           CIBW_MANYLINUX_I686_IMAGE: ${{ matrix.manylinux_image }}
           CIBW_MANYLINUX_AARCH64_IMAGE: ${{ matrix.manylinux_image }}
+          MACOSX_DEPLOYMENT_TARGET: 10.15
 
       - uses: actions/upload-artifact@v4
         with:
@@ -146,7 +156,7 @@ jobs:
   upload_all:
     needs: [build_wheels, make_sdist]
     runs-on: ubuntu-latest
-    if: ${{ inputs.upload_pypi }}
+    if: contains(github.ref, 'release')
     steps:
     - uses: actions/download-artifact@v4
       with:
