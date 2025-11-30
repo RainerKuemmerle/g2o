@@ -1,18 +1,12 @@
 name: Wheel
 
 on:
-#  push:
-#    branches:
-#      - pymem
-#  pull_request:
-#    branches:
-#      - pymem
-  workflow_dispatch:
-    inputs:
-      upload_pypi:
-        description: 'True to upload to pypi'
-        required: true
-        type: boolean
+  push:
+    branches:
+      - pymem-release
+  pull_request:
+    branches:
+      - pymem-release
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -93,35 +87,35 @@ jobs:
             manylinux_image: manylinux_2_28
 
           ## MacOS x86_64
-          #- os: macos-13
-          #  python: 310
-          #  platform_id: macosx_x86_64
-          #- os: macos-13
-          #  python: 311
-          #  platform_id: macosx_x86_64
-          #- os: macos-13
-          #  python: 312
-          #  platform_id: macosx_x86_64
-          #- os: macos-13
-          #  python: 313
-          #  platform_id: macosx_x86_64
+          - os: macos-13
+            python: 311
+            platform_id: macosx_x86_64
+          - os: macos-13
+            python: 312
+            platform_id: macosx_x86_64
+          - os: macos-13
+            python: 313
+            platform_id: macosx_x86_64
+          - os: macos-13
+            python: 314
+            platform_id: macosx_x86_64
 
           ## MacOS arm64
-          #- os: macos-14
-          #  python: 310
-          #  platform_id: macosx_arm64
-          #- os: macos-14
-          #  python: 311
-          #  platform_id: macosx_arm64
-          #- os: macos-14
-          #  python: 312
-          #  platform_id: macosx_arm64
-          #- os: macos-14
-          #  python: 313
-          #  platform_id: macosx_arm64
+          - os: macos-14
+            python: 311
+            platform_id: macosx_arm64
+          - os: macos-14
+            python: 312
+            platform_id: macosx_arm64
+          - os: macos-14
+            python: 313
+            platform_id: macosx_arm64
+          - os: macos-13
+            python: 314
+            platform_id: macosx_arm64
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
          fetch-depth: 25
 
@@ -130,7 +124,7 @@ jobs:
       # https://cibuildwheel.pypa.io/en/stable/
       # https://github.com/pypa/manylinux
       - name: Build wheels
-        uses: pypa/cibuildwheel@v2.23.3
+        uses: pypa/cibuildwheel@v3.3.0
         env:
           CIBW_BUILD: cp${{ matrix.python }}-${{ matrix.platform_id }}
           CIBW_ARCHS: all
@@ -146,7 +140,7 @@ jobs:
   upload_all:
     needs: [build_wheels, make_sdist]
     runs-on: ubuntu-latest
-    if: ${{ inputs.upload_pypi }}
+    if: ${{ contains(github.ref, 'release') }}
     steps:
     - uses: actions/download-artifact@v4
       with:

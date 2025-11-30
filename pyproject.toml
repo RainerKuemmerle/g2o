@@ -40,6 +40,10 @@ select = "*-musllinux*"
 before-all = "apk add eigen"
 # TODO install nlohmann-json
 
+[[tool.cibuildwheel.overrides]]
+select = "*-macosx_*"
+before-build = "brew install eigen nlohmann-json"
+
 # windows
 [[tool.scikit-build.overrides]]
 if.platform-system = "^win32"
