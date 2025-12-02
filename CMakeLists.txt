@@ -15,9 +15,9 @@ set(LIB_PREFIX g2o_)
 set(g2o_C_FLAGS)
 set(g2o_CXX_FLAGS)
 
-set(G2O_LIB_VERSION   "2.1.0" CACHE STRING "g2o library version")
-set(G2O_LIB_SOVERSION "2.1"   CACHE STRING "g2o library soversion")
-set(G2O_VERSION 2.1.0)
+set(G2O_LIB_VERSION   "2.2.0" CACHE STRING "g2o library version")
+set(G2O_LIB_SOVERSION "2.2"   CACHE STRING "g2o library soversion")
+set(G2O_VERSION 2.2.0)
 
 # manually check for top-level project if CMake is older than 3.21
 if(CMAKE_VERSION VERSION_LESS 3.21)
