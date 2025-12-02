@@ -4,7 +4,7 @@ build-backend = "scikit_build_core.build"
 
 [project]
 name = "g2opy"
-version = "2.1.0"
+version = "2.2.0"
 description="g2o: A General Framework for Graph Optimization"
 readme = "README.md"
 authors = [
@@ -37,8 +37,7 @@ before-build = "yum install -y eigen3-devel json-devel"
 
 [[tool.cibuildwheel.overrides]]
 select = "*-musllinux*"
-before-all = "apk add eigen"
-# TODO install nlohmann-json
+before-all = "apk add eigen nlohmann-json"
 
 [[tool.cibuildwheel.overrides]]
 select = "*-macosx_*"
