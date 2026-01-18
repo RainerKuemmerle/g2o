@@ -210,9 +210,15 @@ void SparseOptimizer::clearIndexMapping() {
 }
 
 bool SparseOptimizer::initializeOptimization(int level) {
-  HyperGraph::VertexSet vset;
-  for (auto& it : vertices()) vset.insert(it.second);
-  return initializeOptimization(vset, level);
+  HyperGraph::EdgeSet edges_to_optimize;
+  for (const auto& e : edges()) {
+    auto* ee = static_cast<OptimizableGraph::Edge*>(e.get());
+    if (!ee) continue;
+    if (level < 0 || ee->level() == level) {
+      edges_to_optimize.insert(e);
+    }
+  }
+  return initializeOptimization(edges_to_optimize);
 }
 
 bool SparseOptimizer::initializeOptimization(HyperGraph::VertexSet& vset,
@@ -223,9 +229,10 @@ bool SparseOptimizer::initializeOptimization(HyperGraph::VertexSet& vset,
   }
   preIteration(-1);
   bool workspaceAllocated = jacobianWorkspace_.allocate();
-  (void)workspaceAllocated;
-  assert(workspaceAllocated &&
-         "Error while allocating memory for the Jacobians");
+  if (!workspaceAllocated) {
+    G2O_ERROR("Error while allocating memory for the Jacobians");
+    return false;
+  }
   clearIndexMapping();
   auto vertex_id_edge_lookup = createVertexEdgeLookup();
   activeVertices_.clear();
@@ -290,9 +297,10 @@ bool SparseOptimizer::initializeOptimization(HyperGraph::VertexSet& vset,
 bool SparseOptimizer::initializeOptimization(HyperGraph::EdgeSet& eset) {
   preIteration(-1);
   bool workspaceAllocated = jacobianWorkspace_.allocate();
-  (void)workspaceAllocated;
-  assert(workspaceAllocated &&
-         "Error while allocating memory for the Jacobians");
+  if (!workspaceAllocated) {
+    G2O_ERROR("Error while allocating memory for the Jacobians");
+    return false;
+  }
   clearIndexMapping();
   activeVertices_.clear();
   activeEdges_.clear();
