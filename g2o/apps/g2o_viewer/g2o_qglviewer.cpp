@@ -24,20 +24,15 @@
 #include "g2o/core/sparse_optimizer.h"
 #include "g2o/stuff/opengl_primitives.h"
 
-// some macro helpers for identifying the version number of QGLViewer
-// QGLViewer changed some parts of its API in version 2.6.
-// The following preprocessor hack accounts for this. THIS SUCKS!!!
-#if (((QGLVIEWER_VERSION & 0xff0000) >> 16) >= 2 && \
-     ((QGLVIEWER_VERSION & 0x00ff00) >> 8) >= 6)
-#define qglv_real qreal
-#else
-#define qglv_real float
-#endif
+// Version comparison macro for QGLViewer
+// QGLVIEWER_VERSION format: 0xMMmmPP where MM=major, mm=minor, PP=patch
+#define QGLVIEWER_VERSION_AT_LEAST(major, minor)         \
+  ((((QGLVIEWER_VERSION & 0xff0000) >> 16) > (major)) || \
+   (((QGLVIEWER_VERSION & 0xff0000) >> 16) == (major) && \
+    ((QGLVIEWER_VERSION & 0x00ff00) >> 8) >= (minor)))
 
-// Again, some API changes in QGLViewer which produce annoying text in the
-// console if the old API is used.
-#if (((QGLVIEWER_VERSION & 0xff0000) >> 16) >= 2 && \
-     ((QGLVIEWER_VERSION & 0x00ff00) >> 8) >= 5)
+// API changes in QGLViewer which produce a warning if the old API is used.
+#if QGLVIEWER_VERSION_AT_LEAST(2, 5)
 #define QGLVIEWER_DEPRECATED_MOUSEBINDING
 #endif
 
@@ -47,9 +42,6 @@
 #include <GL/gl.h>
 #include <GL/glu.h>
 #endif
-
-#include <iostream>
-using namespace std;
 
 namespace g2o {
 
@@ -62,14 +54,16 @@ class StandardCamera : public qglviewer::Camera {
  public:
   StandardCamera() : _standard(true) {};
 
-  qglv_real zNear() const {
+  using qglv_real = decltype(qglviewer::Camera().zNear());
+
+  qglv_real zNear() const override {
     if (_standard)
       return qglv_real(0.001);
     else
       return Camera::zNear();
   }
 
-  qglv_real zFar() const {
+  qglv_real zFar() const override {
     if (_standard)
       return qglv_real(10000.0);
     else
