@@ -62,7 +62,8 @@ OptimizationAlgorithm::SolverResult OptimizationAlgorithmLevenberg::solve(
   assert(_solver.optimizer() == _optimizer &&
          "underlying linear solver operates on different graph");
 
-  if (iteration == 0 && !online) {  // built up the CCS structure, here due to easy time measure
+  if (iteration == 0 &&
+      !online) {  // built up the CCS structure, here due to easy time measure
     bool ok = _solver.buildStructure();
     if (!ok) {
       G2O_WARN("{}: Failure while building CCS structure", __PRETTY_FUNCTION__);
@@ -121,7 +122,8 @@ OptimizationAlgorithm::SolverResult OptimizationAlgorithmLevenberg::solve(
     if (!ok2) tempChi = std::numeric_limits<double>::max();
 
     rho = (currentChi - tempChi);
-    double scale = ok2 ? computeScale() + cst(1e-3) : 1;  // make sure it's non-zero :)
+    double scale =
+        ok2 ? computeScale() + cst(1e-3) : 1;  // make sure it's non-zero :)
     rho /= scale;
 
     if (rho > 0 && g2o_isfinite(tempChi) && ok2) {  // last step was good

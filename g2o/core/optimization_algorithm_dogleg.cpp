@@ -68,7 +68,8 @@ OptimizationAlgorithm::SolverResult OptimizationAlgorithmDogleg::solve(
 
   BlockSolverBase& blockSolver = static_cast<BlockSolverBase&>(_solver);
 
-  if (iteration == 0 && !online) {  // built up the CCS structure, here due to easy time measure
+  if (iteration == 0 &&
+      !online) {  // built up the CCS structure, here due to easy time measure
     bool ok = _solver.buildStructure();
     if (!ok) {
       G2O_WARN("{}: Failure while building CCS structure", __PRETTY_FUNCTION__);

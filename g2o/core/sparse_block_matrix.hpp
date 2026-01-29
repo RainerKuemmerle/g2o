@@ -643,20 +643,24 @@ bool SparseBlockMatrix<MatrixType>::writeOctave(const char* filename,
 }
 
 /// @brief SparseBlockMatrix to SparseBlockMatrixCCS
-/// @tparam MatrixType 
-/// @param blockCCS 
-/// @return 
+/// @tparam MatrixType
+/// @param blockCCS
+/// @return
 template <class MatrixType>
-int SparseBlockMatrix<MatrixType>::fillSparseBlockMatrixCCS(SparseBlockMatrixCCS<MatrixType>& blockCCS) const {
+int SparseBlockMatrix<MatrixType>::fillSparseBlockMatrixCCS(
+    SparseBlockMatrixCCS<MatrixType>& blockCCS) const {
   blockCCS.blockCols().resize(blockCols().size());
   int numblocks = 0;
   for (size_t i = 0; i < blockCols().size(); ++i) {
     const IntBlockMap& row = blockCols()[i];
-    typename SparseBlockMatrixCCS<MatrixType>::SparseColumn& dest = blockCCS.blockCols()[i];
+    typename SparseBlockMatrixCCS<MatrixType>::SparseColumn& dest =
+        blockCCS.blockCols()[i];
     dest.clear();
     dest.reserve(row.size());
-    for (typename IntBlockMap::const_iterator it = row.begin(); it != row.end(); ++it) {
-      dest.push_back(typename SparseBlockMatrixCCS<MatrixType>::RowBlock(it->first, it->second));
+    for (typename IntBlockMap::const_iterator it = row.begin(); it != row.end();
+         ++it) {
+      dest.push_back(typename SparseBlockMatrixCCS<MatrixType>::RowBlock(
+          it->first, it->second));
       ++numblocks;
     }
   }

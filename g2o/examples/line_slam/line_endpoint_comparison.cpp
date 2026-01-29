@@ -3,23 +3,23 @@
 // 方案A: Plücker + 线投影 (EdgeSE3Line3DProjection)
 // 方案B: 端点 + 点投影 (EdgeProjectXYZ2UV)
 
-#include <fstream>
-#include <iostream>
-#include <cmath>
 #include <chrono>
+#include <cmath>
+#include <fstream>
 #include <iomanip>
+#include <iostream>
 
+#include "g2o/core/base_multi_edge.h"
 #include "g2o/core/block_solver.h"
 #include "g2o/core/optimization_algorithm_factory.h"
-#include "g2o/core/sparse_optimizer.h"
 #include "g2o/core/robust_kernel_impl.h"
-#include "g2o/core/base_multi_edge.h"
+#include "g2o/core/sparse_optimizer.h"
 #include "g2o/stuff/command_args.h"
 #include "g2o/stuff/sampler.h"
-#include "g2o/types/slam3d/types_slam3d.h"
-#include "g2o/types/slam3d_addons/types_slam3d_addons.h"
-#include "g2o/types/slam3d_addons/edge_se3_line3d_projection.h"
 #include "g2o/types/sba/types_six_dof_expmap.h"
+#include "g2o/types/slam3d/types_slam3d.h"
+#include "g2o/types/slam3d_addons/edge_se3_line3d_projection.h"
+#include "g2o/types/slam3d_addons/types_slam3d_addons.h"
 
 using namespace g2o;
 using namespace std;
@@ -49,9 +49,8 @@ Eigen::Isometry3d sample_noise_from_se3(const Vector6& cov) {
 }
 
 Vector2d sample_noise_from_line2d(const Vector2d& cov) {
-  return Vector2d(
-      Sampler::gaussRand(0., cov(0)),
-      Sampler::gaussRand(0., cov(1)));
+  return Vector2d(Sampler::gaussRand(0., cov(0)),
+                  Sampler::gaussRand(0., cov(1)));
 }
 
 // ============================================================================
@@ -61,18 +60,21 @@ Vector2d sample_noise_from_line2d(const Vector2d& cov) {
 // 顶点：[0] 端点1, [1] 端点2, [2] 位姿
 // 测量：观测到的两个端点像素坐标 (u1, v1, u2, v2)
 class EdgeEndpointToLine2D : public BaseMultiEdge<2, Vector4d> {
-public:
+ public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
 
   EdgeEndpointToLine2D(double fx_, double fy_, double cx_, double cy_)
-    : fx(fx_), fy(fy_), cx(cx_), cy(cy_) {
+      : fx(fx_), fy(fy_), cx(cx_), cy(cy_) {
     resize(3);  // 3个顶点：端点1, 端点2, 位姿
   }
 
   void computeError() override {
-    const VertexPointXYZ* vp1 = static_cast<const VertexPointXYZ*>(_vertices[0]);
-    const VertexPointXYZ* vp2 = static_cast<const VertexPointXYZ*>(_vertices[1]);
-    const VertexSE3Expmap* vpose = static_cast<const VertexSE3Expmap*>(_vertices[2]);
+    const VertexPointXYZ* vp1 =
+        static_cast<const VertexPointXYZ*>(_vertices[0]);
+    const VertexPointXYZ* vp2 =
+        static_cast<const VertexPointXYZ*>(_vertices[1]);
+    const VertexSE3Expmap* vpose =
+        static_cast<const VertexSE3Expmap*>(_vertices[2]);
 
     // 3D端点（世界坐标系）
     Vector3d P1_w = vp1->estimate();
@@ -108,8 +110,10 @@ public:
     double c = -normal.dot(p1_norm);
 
     // 将观测像素坐标转换为归一化坐标
-    Vector2d obs1_norm((_measurement(0) - cx) / fx, (_measurement(1) - cy) / fy);
-    Vector2d obs2_norm((_measurement(2) - cx) / fx, (_measurement(3) - cy) / fy);
+    Vector2d obs1_norm((_measurement(0) - cx) / fx,
+                       (_measurement(1) - cy) / fy);
+    Vector2d obs2_norm((_measurement(2) - cx) / fx,
+                       (_measurement(3) - cy) / fy);
 
     // 点到线的距离（已归一化，所以分母是1）
     _error(0) = normal.dot(obs1_norm) + c;
@@ -124,8 +128,8 @@ public:
   }
 
   virtual bool write(std::ostream& os) const override {
-    os << _measurement(0) << " " << _measurement(1) << " "
-       << _measurement(2) << " " << _measurement(3) << " ";
+    os << _measurement(0) << " " << _measurement(1) << " " << _measurement(2)
+       << " " << _measurement(3) << " ";
     return writeInformationMatrix(os);
   }
 
@@ -186,22 +190,32 @@ struct SceneData {
     // 世界坐标系: X朝前, Y向左, Z向上
 
     // 区域1: 左侧墙面 (X=1.5~2.5, Y=0.5~0.8)
-    lines.push_back({Vector3d(1.5, 0.6, 0.3), Vector3d(1.5, 0.6, 1.0)});   // 垂直线1
-    lines.push_back({Vector3d(2.0, 0.7, 0.5), Vector3d(2.0, 0.7, 1.2)});   // 垂直线2
-    lines.push_back({Vector3d(1.8, 0.5, 0.8), Vector3d(2.3, 0.5, 0.8)});   // 水平线1
+    lines.push_back(
+        {Vector3d(1.5, 0.6, 0.3), Vector3d(1.5, 0.6, 1.0)});  // 垂直线1
+    lines.push_back(
+        {Vector3d(2.0, 0.7, 0.5), Vector3d(2.0, 0.7, 1.2)});  // 垂直线2
+    lines.push_back(
+        {Vector3d(1.8, 0.5, 0.8), Vector3d(2.3, 0.5, 0.8)});  // 水平线1
 
     // 区域2: 右侧墙面 (X=1.5~2.5, Y=-0.5~-0.8)
-    lines.push_back({Vector3d(1.6, -0.6, 0.4), Vector3d(1.6, -0.6, 1.1)});  // 垂直线3
-    lines.push_back({Vector3d(2.2, -0.7, 0.6), Vector3d(2.2, -0.7, 1.3)});  // 垂直线4
-    lines.push_back({Vector3d(1.7, -0.5, 0.9), Vector3d(2.4, -0.5, 0.9)});  // 水平线2
+    lines.push_back(
+        {Vector3d(1.6, -0.6, 0.4), Vector3d(1.6, -0.6, 1.1)});  // 垂直线3
+    lines.push_back(
+        {Vector3d(2.2, -0.7, 0.6), Vector3d(2.2, -0.7, 1.3)});  // 垂直线4
+    lines.push_back(
+        {Vector3d(1.7, -0.5, 0.9), Vector3d(2.4, -0.5, 0.9)});  // 水平线2
 
     // 区域3: 中央区域 (更远处的线，观测次数会更少)
-    lines.push_back({Vector3d(3.0, -0.3, 0.5), Vector3d(3.0, 0.3, 0.5)});   // 水平线3
-    lines.push_back({Vector3d(3.5, 0.0, 0.4), Vector3d(3.5, 0.0, 1.1)});    // 垂直线5
+    lines.push_back(
+        {Vector3d(3.0, -0.3, 0.5), Vector3d(3.0, 0.3, 0.5)});  // 水平线3
+    lines.push_back(
+        {Vector3d(3.5, 0.0, 0.4), Vector3d(3.5, 0.0, 1.1)});  // 垂直线5
 
     // 区域4: 斜线（窗框、门框等）
-    lines.push_back({Vector3d(2.0, -0.2, 0.3), Vector3d(2.5, 0.2, 0.9)});   // 斜线1
-    lines.push_back({Vector3d(2.1, 0.3, 0.6), Vector3d(2.6, -0.1, 1.0)});   // 斜线2
+    lines.push_back(
+        {Vector3d(2.0, -0.2, 0.3), Vector3d(2.5, 0.2, 0.9)});  // 斜线1
+    lines.push_back(
+        {Vector3d(2.1, 0.3, 0.6), Vector3d(2.6, -0.1, 1.0)});  // 斜线2
 
     generateTrajectory();
     generateNoises();
@@ -220,21 +234,19 @@ struct SceneData {
     // 预生成线端点初始化噪声（增加到0.3米，更贴合实际）
     double init_noise = 0.3;
     for (size_t i = 0; i < lines.size(); ++i) {
-      Vector3d p1_noise(
-          Sampler::gaussRand(0, init_noise),
-          Sampler::gaussRand(0, init_noise),
-          Sampler::gaussRand(0, init_noise));
-      Vector3d p2_noise(
-          Sampler::gaussRand(0, init_noise),
-          Sampler::gaussRand(0, init_noise),
-          Sampler::gaussRand(0, init_noise));
+      Vector3d p1_noise(Sampler::gaussRand(0, init_noise),
+                        Sampler::gaussRand(0, init_noise),
+                        Sampler::gaussRand(0, init_noise));
+      Vector3d p2_noise(Sampler::gaussRand(0, init_noise),
+                        Sampler::gaussRand(0, init_noise),
+                        Sampler::gaussRand(0, init_noise));
       Vector3d p1_noisy = lines[i].first + p1_noise;
       Vector3d p2_noisy = lines[i].second + p2_noise;
       lines_noisy.push_back({p1_noisy, p2_noisy});
     }
   }
 
-private:
+ private:
   void generateTrajectory() {
     Matrix3d R_wc;
     R_wc.col(0) = Vector3d(0, -1, 0);  // 相机X -> 世界-Y
@@ -251,8 +263,9 @@ private:
       Isometry3d delta = Isometry3d::Identity();
       delta.translation() = Vector3d(0.05, 0, 0.02 * cos(i * 0.4));  // 减小平移
       delta.matrix().block<3, 3>(0, 0) =
-          (AngleAxisd(0.03 * sin(i * 0.3), Vector3d::UnitZ()) *   // 减小旋转
-           AngleAxisd(0.02 * sin(i * 0.25), Vector3d::UnitY())).toRotationMatrix();
+          (AngleAxisd(0.03 * sin(i * 0.3), Vector3d::UnitZ()) *  // 减小旋转
+           AngleAxisd(0.02 * sin(i * 0.25), Vector3d::UnitY()))
+              .toRotationMatrix();
       pose = pose * delta;
       poses.push_back(pose);
     }
@@ -263,7 +276,8 @@ private:
       delta.translation() = Vector3d(-0.05, 0, -0.02 * cos(i * 0.5));
       delta.matrix().block<3, 3>(0, 0) =
           (AngleAxisd(-0.03 * sin(i * 0.3), Vector3d::UnitZ()) *
-           AngleAxisd(-0.02 * sin(i * 0.2), Vector3d::UnitY())).toRotationMatrix();
+           AngleAxisd(-0.02 * sin(i * 0.2), Vector3d::UnitY()))
+              .toRotationMatrix();
       pose = pose * delta;
       poses.push_back(pose);
     }
@@ -274,7 +288,8 @@ private:
       Isometry3d delta = Isometry3d::Identity();
       delta.translation() = Vector3d(0.02, lateral, 0);
       delta.matrix().block<3, 3>(0, 0) =
-          AngleAxisd(0.02 * ((i < 10) ? 1 : -1), Vector3d::UnitZ()).toRotationMatrix();
+          AngleAxisd(0.02 * ((i < 10) ? 1 : -1), Vector3d::UnitZ())
+              .toRotationMatrix();
       pose = pose * delta;
       poses.push_back(pose);
     }
@@ -306,8 +321,9 @@ private:
         Vector3d p2_c = T_cw * p2_w;
 
         if (debug && pose_id == 0) {
-          cout << "  [调试] pose0, line" << line_id << ": p1_c=" << p1_c.transpose()
-               << ", p2_c=" << p2_c.transpose() << endl;
+          cout << "  [调试] pose0, line" << line_id
+               << ": p1_c=" << p1_c.transpose() << ", p2_c=" << p2_c.transpose()
+               << endl;
         }
 
         // 检查深度 (点必须在相机前方)
@@ -317,17 +333,22 @@ private:
         }
 
         // 投影到像素
-        Vector2d pixel1(fx * p1_c.x() / p1_c.z() + cx, fy * p1_c.y() / p1_c.z() + cy);
-        Vector2d pixel2(fx * p2_c.x() / p2_c.z() + cx, fy * p2_c.y() / p2_c.z() + cy);
+        Vector2d pixel1(fx * p1_c.x() / p1_c.z() + cx,
+                        fy * p1_c.y() / p1_c.z() + cy);
+        Vector2d pixel2(fx * p2_c.x() / p2_c.z() + cx,
+                        fy * p2_c.y() / p2_c.z() + cy);
 
         if (debug && pose_id == 0) {
-          cout << "  [调试] pose0, line" << line_id << ": pixel1=" << pixel1.transpose()
+          cout << "  [调试] pose0, line" << line_id
+               << ": pixel1=" << pixel1.transpose()
                << ", pixel2=" << pixel2.transpose() << endl;
         }
 
         // 检查是否在图像内
-        if (pixel1.x() < 0 || pixel1.x() >= img_width || pixel1.y() < 0 || pixel1.y() >= img_height ||
-            pixel2.x() < 0 || pixel2.x() >= img_width || pixel2.y() < 0 || pixel2.y() >= img_height) {
+        if (pixel1.x() < 0 || pixel1.x() >= img_width || pixel1.y() < 0 ||
+            pixel1.y() >= img_height || pixel2.x() < 0 ||
+            pixel2.x() >= img_width || pixel2.y() < 0 ||
+            pixel2.y() >= img_height) {
           reject_fov++;
           continue;
         }
@@ -341,10 +362,12 @@ private:
         double n2 = dir_c.x() * moment_c.z() - dir_c.z() * moment_c.x();
         double d = dir_c.y() * moment_c.x() - dir_c.x() * moment_c.y();
 
-        double norm = sqrt(n1*n1 + n2*n2);
+        double norm = sqrt(n1 * n1 + n2 * n2);
         if (norm < 1e-10) continue;
 
-        n1 /= norm; n2 /= norm; d /= norm;
+        n1 /= norm;
+        n2 /= norm;
+        d /= norm;
         double theta_true = atan2(n2, n1);
         double rho_true = d;
 
@@ -360,7 +383,8 @@ private:
 
         // Plücker观测 (添加噪声)
         Vector2d noise_line = sample_noise_from_line2d(line_noise);
-        obs.line2d = Line2D(theta_true + noise_line(0), rho_true + noise_line(1));
+        obs.line2d =
+            Line2D(theta_true + noise_line(0), rho_true + noise_line(1));
 
         // 端点观测 (添加噪声)
         obs.pixel1 = pixel1 + Vector2d(Sampler::gaussRand(0, pixel_noise),
@@ -382,7 +406,8 @@ private:
 // ============================================================================
 // 辅助函数：Line3D 转端点（用于可视化）
 // ============================================================================
-pair<Vector3d, Vector3d> line3dToEndpoints(const Line3D& L, double half_length = 0.5) {
+pair<Vector3d, Vector3d> line3dToEndpoints(const Line3D& L,
+                                           double half_length = 0.5) {
   Vector6 cart = L.toCartesian();
   Vector3d point = cart.head<3>();  // 线上一点（最近原点的点）
   Vector3d dir = cart.tail<3>();    // 方向向量
@@ -397,11 +422,9 @@ pair<Vector3d, Vector3d> line3dToEndpoints(const Line3D& L, double half_length =
 // 保存线收敛历史到文件
 // ============================================================================
 void saveLineConvergenceHistory(
-    const string& filename,
-    const vector<pair<Vector3d, Vector3d>>& gt_lines,
+    const string& filename, const vector<pair<Vector3d, Vector3d>>& gt_lines,
     const vector<vector<pair<Vector3d, Vector3d>>>& line_history,
     const vector<double>& chi2_history) {
-
   ofstream ofs(filename);
   if (!ofs.is_open()) {
     cerr << "无法打开文件: " << filename << endl;
@@ -414,21 +437,22 @@ void saveLineConvergenceHistory(
   ofs << "# Ground Truth Lines (line_id p1x p1y p1z p2x p2y p2z)" << endl;
   ofs << "GT " << gt_lines.size() << endl;
   for (size_t i = 0; i < gt_lines.size(); ++i) {
-    ofs << i << " "
-        << gt_lines[i].first.x() << " " << gt_lines[i].first.y() << " " << gt_lines[i].first.z() << " "
-        << gt_lines[i].second.x() << " " << gt_lines[i].second.y() << " " << gt_lines[i].second.z() << endl;
+    ofs << i << " " << gt_lines[i].first.x() << " " << gt_lines[i].first.y()
+        << " " << gt_lines[i].first.z() << " " << gt_lines[i].second.x() << " "
+        << gt_lines[i].second.y() << " " << gt_lines[i].second.z() << endl;
   }
 
   // 写入每次迭代的线估计
-  ofs << "# Iteration History (iter chi2 line_id p1x p1y p1z p2x p2y p2z)" << endl;
+  ofs << "# Iteration History (iter chi2 line_id p1x p1y p1z p2x p2y p2z)"
+      << endl;
   ofs << "ITERATIONS " << line_history.size() << endl;
   for (size_t iter = 0; iter < line_history.size(); ++iter) {
     ofs << "ITER " << iter << " " << chi2_history[iter] << endl;
     for (size_t lid = 0; lid < line_history[iter].size(); ++lid) {
       const auto& endpoints = line_history[iter][lid];
-      ofs << lid << " "
-          << endpoints.first.x() << " " << endpoints.first.y() << " " << endpoints.first.z() << " "
-          << endpoints.second.x() << " " << endpoints.second.y() << " " << endpoints.second.z() << endl;
+      ofs << lid << " " << endpoints.first.x() << " " << endpoints.first.y()
+          << " " << endpoints.first.z() << " " << endpoints.second.x() << " "
+          << endpoints.second.y() << " " << endpoints.second.z() << endl;
     }
   }
 
@@ -439,14 +463,17 @@ void saveLineConvergenceHistory(
 // ============================================================================
 // 方案A: Plücker + 线投影
 // ============================================================================
-ExperimentResult runPluckerMethod(SceneData& data, int maxIter, bool verbose, bool saveHistory) {
+ExperimentResult runPluckerMethod(SceneData& data, int maxIter, bool verbose,
+                                  bool saveHistory) {
   auto start_time = chrono::high_resolution_clock::now();
 
   SparseOptimizer optimizer;
 
-  OptimizationAlgorithmFactory* solverFactory = OptimizationAlgorithmFactory::instance();
+  OptimizationAlgorithmFactory* solverFactory =
+      OptimizationAlgorithmFactory::instance();
   OptimizationAlgorithmProperty solverProperty;
-  OptimizationAlgorithm* solver = solverFactory->construct("lm_var", solverProperty);
+  OptimizationAlgorithm* solver =
+      solverFactory->construct("lm_var", solverProperty);
   optimizer.setAlgorithm(solver);
 
   ParameterSE3Offset* offset = new ParameterSE3Offset();
@@ -470,12 +497,12 @@ ExperimentResult runPluckerMethod(SceneData& data, int maxIter, bool verbose, bo
 
   // 添加里程计边
   for (size_t i = 1; i < data.poses.size(); ++i) {
-    Isometry3d delta = data.poses[i-1].inverse() * data.poses[i];
+    Isometry3d delta = data.poses[i - 1].inverse() * data.poses[i];
 
     EdgeSE3* e = new EdgeSE3();
-    e->vertices()[0] = pose_vertices[i-1];
+    e->vertices()[0] = pose_vertices[i - 1];
     e->vertices()[1] = pose_vertices[i];
-    e->setMeasurement(delta * data.odom_noises[i-1]);
+    e->setMeasurement(delta * data.odom_noises[i - 1]);
 
     Matrix6 info = Matrix6::Identity();
     for (int j = 0; j < 6; ++j) {
@@ -569,11 +596,13 @@ ExperimentResult runPluckerMethod(SceneData& data, int maxIter, bool verbose, bo
 
   // 保存收敛历史
   if (saveHistory) {
-    saveLineConvergenceHistory("line_convergence_plucker.txt", data.lines, line_history, chi2_history);
+    saveLineConvergenceHistory("line_convergence_plucker.txt", data.lines,
+                               line_history, chi2_history);
   }
 
   auto end_time = chrono::high_resolution_clock::now();
-  double time_ms = chrono::duration<double, milli>(end_time - start_time).count();
+  double time_ms =
+      chrono::duration<double, milli>(end_time - start_time).count();
 
   // 计算误差
   double total_trans = 0, total_rot = 0;
@@ -611,15 +640,18 @@ ExperimentResult runEndpointMethod(SceneData& data, int maxIter, bool verbose) {
 
   SparseOptimizer optimizer;
 
-  OptimizationAlgorithmFactory* solverFactory = OptimizationAlgorithmFactory::instance();
+  OptimizationAlgorithmFactory* solverFactory =
+      OptimizationAlgorithmFactory::instance();
   OptimizationAlgorithmProperty solverProperty;
-  OptimizationAlgorithm* solver = solverFactory->construct("lm_var", solverProperty);
+  OptimizationAlgorithm* solver =
+      solverFactory->construct("lm_var", solverProperty);
   optimizer.setAlgorithm(solver);
 
   // 添加相机参数
   // CameraParameters 构造函数: (focal_length, principle_point, baseline)
   // 注意: CameraParameters 假设 fx = fy = focal_length
-  CameraParameters* cam = new CameraParameters(data.fx, g2o::Vector2(data.cx, data.cy), 0);
+  CameraParameters* cam =
+      new CameraParameters(data.fx, g2o::Vector2(data.cx, data.cy), 0);
   cam->setId(0);
   optimizer.addParameter(cam);
 
@@ -648,9 +680,9 @@ ExperimentResult runEndpointMethod(SceneData& data, int maxIter, bool verbose) {
   // 添加里程计边 (EdgeSE3Expmap)
   for (size_t i = 1; i < data.poses.size(); ++i) {
     // delta_wc = T_wc_{i-1}^{-1} * T_wc_i
-    Isometry3d delta_wc = data.poses[i-1].inverse() * data.poses[i];
+    Isometry3d delta_wc = data.poses[i - 1].inverse() * data.poses[i];
     // 使用与方案A相同的预生成噪声
-    Isometry3d delta_wc_noisy = delta_wc * data.odom_noises[i-1];
+    Isometry3d delta_wc_noisy = delta_wc * data.odom_noises[i - 1];
 
     // 对于 SE3Quat: delta_cw = delta_wc^{-1}
     // 但 EdgeSE3Expmap 的测量是从 vertex[0] 到 vertex[1] 的相对变换
@@ -659,7 +691,7 @@ ExperimentResult runEndpointMethod(SceneData& data, int maxIter, bool verbose) {
     Isometry3d meas_iso = delta_wc_noisy.inverse();
 
     EdgeSE3Expmap* e = new EdgeSE3Expmap();
-    e->vertices()[0] = pose_vertices[i-1];
+    e->vertices()[0] = pose_vertices[i - 1];
     e->vertices()[1] = pose_vertices[i];
     e->setMeasurement(SE3Quat(meas_iso.rotation(), meas_iso.translation()));
 
@@ -697,9 +729,10 @@ ExperimentResult runEndpointMethod(SceneData& data, int maxIter, bool verbose) {
     auto endpoints = endpoint_vertices[obs.line_id];
 
     // 创建点到线距离边（传入相机内参）
-    EdgeEndpointToLine2D* e = new EdgeEndpointToLine2D(data.fx, data.fy, data.cx, data.cy);
-    e->vertices()[0] = endpoints.first;   // 端点1
-    e->vertices()[1] = endpoints.second;  // 端点2
+    EdgeEndpointToLine2D* e =
+        new EdgeEndpointToLine2D(data.fx, data.fy, data.cx, data.cy);
+    e->vertices()[0] = endpoints.first;             // 端点1
+    e->vertices()[1] = endpoints.second;            // 端点2
     e->vertices()[2] = pose_vertices[obs.pose_id];  // 位姿
 
     // 测量：两个观测端点的像素坐标
@@ -728,7 +761,8 @@ ExperimentResult runEndpointMethod(SceneData& data, int maxIter, bool verbose) {
   double chi2_after = optimizer.chi2();
 
   auto end_time = chrono::high_resolution_clock::now();
-  double time_ms = chrono::duration<double, milli>(end_time - start_time).count();
+  double time_ms =
+      chrono::duration<double, milli>(end_time - start_time).count();
 
   // 计算误差
   double total_trans = 0, total_rot = 0;
@@ -781,13 +815,21 @@ ExperimentResult runEndpointMethod(SceneData& data, int maxIter, bool verbose) {
 // ============================================================================
 void printComparisonTable(const vector<ExperimentResult>& results) {
   cout << "\n";
-  cout << "=====================================================================================" << endl;
-  cout << "                                  实 验 结 果 对 比                                " << endl;
-  cout << "=====================================================================================" << endl;
-  
-  printf("%-20s %12s %12s %12s %8s %8s %12s\n",
-         "Method", "Chi2_Reduce", "Trans(m)", "Rot(deg)", "Feature", "Obs", "Time(ms)");
-  cout << "-------------------------------------------------------------------------------------" << endl;
+  cout << "===================================================================="
+          "================="
+       << endl;
+  cout << "                                  实 验 结 果 对 比                 "
+          "               "
+       << endl;
+  cout << "===================================================================="
+          "================="
+       << endl;
+
+  printf("%-20s %12s %12s %12s %8s %8s %12s\n", "Method", "Chi2_Reduce",
+         "Trans(m)", "Rot(deg)", "Feature", "Obs", "Time(ms)");
+  cout << "--------------------------------------------------------------------"
+          "-----------------"
+       << endl;
 
   for (const auto& r : results) {
     double chi2_reduction = 0;
@@ -795,44 +837,43 @@ void printComparisonTable(const vector<ExperimentResult>& results) {
       chi2_reduction = (r.chi2_before - r.chi2_after) / r.chi2_before * 100.0;
     }
 
-    printf("%-20s %12f%% %12f %12f %8d %8d %12f\n",
-           r.method_name.c_str(),
-           chi2_reduction,
-           r.avg_trans_error,
-           r.avg_rot_error,
-           r.num_features,
-           r.num_observations,
-           r.computation_time_ms);
+    printf("%-20s %12f%% %12f %12f %8d %8d %12f\n", r.method_name.c_str(),
+           chi2_reduction, r.avg_trans_error, r.avg_rot_error, r.num_features,
+           r.num_observations, r.computation_time_ms);
   }
 
-  cout << "=====================================================================================" << endl;
+  cout << "===================================================================="
+          "================="
+       << endl;
 
-   // 详细对比
+  // 详细对比
   if (results.size() == 2) {
     printf("\n");
     printf("对比总结：\n");
-    printf("  观测数量: 方案A %4d  vs  方案B %4d\n", 
+    printf("  观测数量: 方案A %4d  vs  方案B %4d\n",
            results[0].num_observations, results[1].num_observations);
 
     if (results[0].avg_trans_error > 0) {
-      double trans_diff = (results[1].avg_trans_error - results[0].avg_trans_error)
-                         / results[0].avg_trans_error * 100;
-      printf("  位置精度: 方案B %s 方案A %.1f%%\n", 
+      double trans_diff =
+          (results[1].avg_trans_error - results[0].avg_trans_error) /
+          results[0].avg_trans_error * 100;
+      printf("  位置精度: 方案B %s 方案A %.1f%%\n",
              (trans_diff > 0 ? "劣于" : "优于"), abs(trans_diff));
     }
 
     if (results[0].avg_rot_error > 0) {
-      double rot_diff = (results[1].avg_rot_error - results[0].avg_rot_error)
-                       / results[0].avg_rot_error * 100;
-      printf("  旋转精度: 方案B %s 方案A %.1f%%\n", 
+      double rot_diff = (results[1].avg_rot_error - results[0].avg_rot_error) /
+                        results[0].avg_rot_error * 100;
+      printf("  旋转精度: 方案B %s 方案A %.1f%%\n",
              (rot_diff > 0 ? "劣于" : "优于"), abs(rot_diff));
     }
 
     if (results[0].computation_time_ms > 0) {
-      double time_diff = (results[1].computation_time_ms - results[0].computation_time_ms)
-                        / results[0].computation_time_ms * 100;
-      printf("  计算效率: 方案B %s %.1f%%\n", 
-             (time_diff > 0 ? "慢" : "快"), abs(time_diff));
+      double time_diff =
+          (results[1].computation_time_ms - results[0].computation_time_ms) /
+          results[0].computation_time_ms * 100;
+      printf("  计算效率: 方案B %s %.1f%%\n", (time_diff > 0 ? "慢" : "快"),
+             abs(time_diff));
     }
   }
 }
@@ -852,7 +893,8 @@ int main(int argc, char** argv) {
   arg.param("v", verbose, false, "详细输出");
   arg.param("both", runBoth, true, "运行两种方法对比");
   arg.param("useEndpoint", useEndpoint, false, "仅运行端点方法");
-  arg.param("saveConv", saveConvergence, false, "保存线收敛历史到文件(用于可视化)");
+  arg.param("saveConv", saveConvergence, false,
+            "保存线收敛历史到文件(用于可视化)");
   arg.parseArgs(argc, argv);
 
   cout << "=== 线特征表示方法对比实验 ===" << endl;
@@ -870,7 +912,8 @@ int main(int argc, char** argv) {
   if (runBoth) {
     // 运行方案A
     cout << "\n运行方案A: Plücker + 线投影..." << endl;
-    results.push_back(runPluckerMethod(data, maxIterations, verbose, saveConvergence));
+    results.push_back(
+        runPluckerMethod(data, maxIterations, verbose, saveConvergence));
 
     // 运行方案B
     cout << "\n运行方案B: 端点 + 点投影..." << endl;
@@ -884,7 +927,8 @@ int main(int argc, char** argv) {
     printComparisonTable(results);
   } else {
     cout << "\n运行方案A: Plücker + 线投影..." << endl;
-    results.push_back(runPluckerMethod(data, maxIterations, verbose, saveConvergence));
+    results.push_back(
+        runPluckerMethod(data, maxIterations, verbose, saveConvergence));
     printComparisonTable(results);
   }
 

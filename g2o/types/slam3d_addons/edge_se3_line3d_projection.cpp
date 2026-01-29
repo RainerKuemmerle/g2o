@@ -25,17 +25,16 @@ EdgeSE3Line3DProjection::EdgeSE3Line3DProjection()
 // ============================================================================
 Matrix3 EdgeSE3Line3DProjection::skew(const Vector3& v) {
   Matrix3 S;
-  S <<     0, -v.z(),  v.y(),
-       v.z(),      0, -v.x(),
-      -v.y(),  v.x(),      0;
+  S << 0, -v.z(), v.y(), v.z(), 0, -v.x(), -v.y(), v.x(), 0;
   return S;
 }
 
 // ============================================================================
 // Static helper: compute orthonormal basis perpendicular to d
 // ============================================================================
-void EdgeSE3Line3DProjection::computeOrthonormalBasis(
-    const Vector3& d, Vector3& e1, Vector3& e2) {
+void EdgeSE3Line3DProjection::computeOrthonormalBasis(const Vector3& d,
+                                                      Vector3& e1,
+                                                      Vector3& e2) {
   if (std::abs(d.x()) < std::abs(d.y()) && std::abs(d.x()) < std::abs(d.z())) {
     e1 = d.cross(Vector3::UnitX()).normalized();
   } else if (std::abs(d.y()) < std::abs(d.z())) {
@@ -49,8 +48,8 @@ void EdgeSE3Line3DProjection::computeOrthonormalBasis(
 // ============================================================================
 // Degenerate line detection
 // ============================================================================
-bool EdgeSE3Line3DProjection::isDegenerateLine(
-    const Vector3& d, const Vector3& w) const {
+bool EdgeSE3Line3DProjection::isDegenerateLine(const Vector3& d,
+                                               const Vector3& w) const {
   if (d.squaredNorm() < 1e-10) return true;
   if (w.squaredNorm() > 1e10) return true;
   return false;
@@ -98,7 +97,8 @@ Vector3 EdgeSE3Line3DProjection::projectToNormalizedPlane(
 // ============================================================================
 void EdgeSE3Line3DProjection::computeError() {
   const VertexSE3* v_pose = static_cast<const VertexSE3*>(_vertices[0]);
-  const VertexLine3DTangent* v_line = static_cast<const VertexLine3DTangent*>(_vertices[1]);
+  const VertexLine3DTangent* v_line =
+      static_cast<const VertexLine3DTangent*>(_vertices[1]);
 
   Isometry3 T_WtoC = v_pose->estimate().inverse();
   Line3D line_W = v_line->estimate();
@@ -214,7 +214,8 @@ void EdgeSE3Line3DProjection::linearizeOplus() {
 // ============================================================================
 void EdgeSE3Line3DProjection::linearizeOplus() {
   const VertexSE3* v_pose = static_cast<const VertexSE3*>(_vertices[0]);
-  const VertexLine3DTangent* v_line = static_cast<const VertexLine3DTangent*>(_vertices[1]);
+  const VertexLine3DTangent* v_line =
+      static_cast<const VertexLine3DTangent*>(_vertices[1]);
 
   Isometry3 T_CtoW = v_pose->estimate();
   Isometry3 T_WtoC = T_CtoW.inverse();
@@ -316,9 +317,18 @@ void EdgeSE3Line3DProjection::linearizeOplus() {
   // pt = (u0, v0, u1, v1)
   // ========================================================================
   Eigen::Matrix<double, 3, 4> dlraw_dpt;
-  dlraw_dpt(0, 0) = 0;    dlraw_dpt(0, 1) = 1;    dlraw_dpt(0, 2) = 0;    dlraw_dpt(0, 3) = -1;
-  dlraw_dpt(1, 0) = -1;   dlraw_dpt(1, 1) = 0;    dlraw_dpt(1, 2) = 1;    dlraw_dpt(1, 3) = 0;
-  dlraw_dpt(2, 0) = v1;   dlraw_dpt(2, 1) = -u1;  dlraw_dpt(2, 2) = -v0;  dlraw_dpt(2, 3) = u0;
+  dlraw_dpt(0, 0) = 0;
+  dlraw_dpt(0, 1) = 1;
+  dlraw_dpt(0, 2) = 0;
+  dlraw_dpt(0, 3) = -1;
+  dlraw_dpt(1, 0) = -1;
+  dlraw_dpt(1, 1) = 0;
+  dlraw_dpt(1, 2) = 1;
+  dlraw_dpt(1, 3) = 0;
+  dlraw_dpt(2, 0) = v1;
+  dlraw_dpt(2, 1) = -u1;
+  dlraw_dpt(2, 2) = -v0;
+  dlraw_dpt(2, 3) = u0;
 
   // ========================================================================
   // Layer 4: ∂(pt0,pt1)/∂(p0_C, p1_C) (4×6)
@@ -327,13 +337,21 @@ void EdgeSE3Line3DProjection::linearizeOplus() {
   Eigen::Matrix<double, 4, 6> dpt_dp;
   dpt_dp.setZero();
   // ∂u0/∂p0 = (1/z0, 0, -x0/z0²)
-  dpt_dp(0, 0) = iz0;   dpt_dp(0, 1) = 0;     dpt_dp(0, 2) = -u0 * iz0;
+  dpt_dp(0, 0) = iz0;
+  dpt_dp(0, 1) = 0;
+  dpt_dp(0, 2) = -u0 * iz0;
   // ∂v0/∂p0 = (0, 1/z0, -y0/z0²)
-  dpt_dp(1, 0) = 0;     dpt_dp(1, 1) = iz0;   dpt_dp(1, 2) = -v0 * iz0;
+  dpt_dp(1, 0) = 0;
+  dpt_dp(1, 1) = iz0;
+  dpt_dp(1, 2) = -v0 * iz0;
   // ∂u1/∂p1 = (1/z1, 0, -x1/z1²)
-  dpt_dp(2, 3) = iz1;   dpt_dp(2, 4) = 0;     dpt_dp(2, 5) = -u1 * iz1;
+  dpt_dp(2, 3) = iz1;
+  dpt_dp(2, 4) = 0;
+  dpt_dp(2, 5) = -u1 * iz1;
   // ∂v1/∂p1 = (0, 1/z1, -y1/z1²)
-  dpt_dp(3, 3) = 0;     dpt_dp(3, 4) = iz1;   dpt_dp(3, 5) = -v1 * iz1;
+  dpt_dp(3, 3) = 0;
+  dpt_dp(3, 4) = iz1;
+  dpt_dp(3, 5) = -v1 * iz1;
 
   // ========================================================================
   // Layer 5: ∂(p0_C, p1_C)/∂L_C (6×6)
@@ -347,22 +365,23 @@ void EdgeSE3Line3DProjection::linearizeOplus() {
   Matrix3 w_C_skew = skew(w_C);
   Matrix3 neg_w_skew = -w_C_skew;
 
-  dp_dLC.block<3, 3>(0, 0) = neg_w_skew;                    // ∂p0/∂d
-  dp_dLC.block<3, 3>(0, 3) = d_C_skew;                      // ∂p0/∂w
-  dp_dLC.block<3, 3>(3, 0) = neg_w_skew + Matrix3::Identity(); // ∂p1/∂d
-  dp_dLC.block<3, 3>(3, 3) = d_C_skew;                      // ∂p1/∂w
+  dp_dLC.block<3, 3>(0, 0) = neg_w_skew;                        // ∂p0/∂d
+  dp_dLC.block<3, 3>(0, 3) = d_C_skew;                          // ∂p0/∂w
+  dp_dLC.block<3, 3>(3, 0) = neg_w_skew + Matrix3::Identity();  // ∂p1/∂d
+  dp_dLC.block<3, 3>(3, 3) = d_C_skew;                          // ∂p1/∂w
 
   // Combined: ∂res/∂L_C = de_dl · dl_draw · dlraw_dpt · dpt_dp · dp_dLC
-  Eigen::Matrix<double, 2, 6> de_dLC = de_dl * dl_draw * dlraw_dpt * dpt_dp * dp_dLC;
+  Eigen::Matrix<double, 2, 6> de_dLC =
+      de_dl * dl_draw * dlraw_dpt * dpt_dp * dp_dLC;
 
   // ========================================================================
   // Pose Jacobian: ∂L_C/∂ξ_pose (6×6)
   // ========================================================================
   Eigen::Matrix<double, 6, 6> dLC_dpose;
   dLC_dpose.setZero();
-  dLC_dpose.block<3, 3>(3, 0) = d_C_skew;       // ∂w_C/∂t = [d_C]×
-  dLC_dpose.block<3, 3>(0, 3) = 2.0 * d_C_skew; // ∂d_C/∂q = 2*[d_C]×
-  dLC_dpose.block<3, 3>(3, 3) = 2.0 * w_C_skew; // ∂w_C/∂q = 2*[w_C]×
+  dLC_dpose.block<3, 3>(3, 0) = d_C_skew;        // ∂w_C/∂t = [d_C]×
+  dLC_dpose.block<3, 3>(0, 3) = 2.0 * d_C_skew;  // ∂d_C/∂q = 2*[d_C]×
+  dLC_dpose.block<3, 3>(3, 3) = 2.0 * w_C_skew;  // ∂w_C/∂q = 2*[w_C]×
 
   _jacobianOplusXi = de_dLC * dLC_dpose;
 
@@ -383,23 +402,25 @@ void EdgeSE3Line3DProjection::linearizeOplus() {
 
   Eigen::Matrix<double, 6, 4> dLW_dxi;
   dLW_dxi.setZero();
-  dLW_dxi.block<3, 1>(0, 0) = -e2_W;           // ∂d/∂u1
-  dLW_dxi.block<3, 1>(0, 1) =  e1_W;           // ∂d/∂u2
-  dLW_dxi.block<3, 1>(3, 0) = e1_W.cross(w_W); // ∂w/∂u1
-  dLW_dxi.block<3, 1>(3, 1) = e2_W.cross(w_W); // ∂w/∂u2
-  dLW_dxi.block<3, 1>(3, 2) = e1_W;            // ∂w/∂v1
-  dLW_dxi.block<3, 1>(3, 3) = e2_W;            // ∂w/∂v2
+  dLW_dxi.block<3, 1>(0, 0) = -e2_W;            // ∂d/∂u1
+  dLW_dxi.block<3, 1>(0, 1) = e1_W;             // ∂d/∂u2
+  dLW_dxi.block<3, 1>(3, 0) = e1_W.cross(w_W);  // ∂w/∂u1
+  dLW_dxi.block<3, 1>(3, 1) = e2_W.cross(w_W);  // ∂w/∂u2
+  dLW_dxi.block<3, 1>(3, 2) = e1_W;             // ∂w/∂v1
+  dLW_dxi.block<3, 1>(3, 3) = e2_W;             // ∂w/∂v2
 
   _jacobianOplusXj = de_dLW * dLW_dxi;
 
   // NaN/Inf protection
   for (int i = 0; i < 6; ++i) {
-    if (!std::isfinite(_jacobianOplusXi(0, i)) || !std::isfinite(_jacobianOplusXi(1, i))) {
+    if (!std::isfinite(_jacobianOplusXi(0, i)) ||
+        !std::isfinite(_jacobianOplusXi(1, i))) {
       _jacobianOplusXi.col(i).setZero();
     }
   }
   for (int i = 0; i < 4; ++i) {
-    if (!std::isfinite(_jacobianOplusXj(0, i)) || !std::isfinite(_jacobianOplusXj(1, i))) {
+    if (!std::isfinite(_jacobianOplusXj(0, i)) ||
+        !std::isfinite(_jacobianOplusXj(1, i))) {
       _jacobianOplusXj.col(i).setZero();
     }
   }
@@ -423,8 +444,7 @@ bool EdgeSE3Line3DProjection::read(std::istream& is) {
 bool EdgeSE3Line3DProjection::write(std::ostream& os) const {
   os << _measurement(0) << " " << _measurement(1);
   for (int i = 0; i < 2; ++i)
-    for (int j = i; j < 2; ++j)
-      os << " " << information()(i, j);
+    for (int j = i; j < 2; ++j) os << " " << information()(i, j);
   return os.good();
 }
 

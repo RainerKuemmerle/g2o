@@ -178,10 +178,10 @@ class G2O_CORE_API HyperGraphActionLibrary {
 /**
  * apply an action to all the elements of the graph.
  */
-void G2O_CORE_API
-applyAction(HyperGraph* graph, HyperGraphElementAction* action,
-            HyperGraphElementAction::Parameters* parameters = 0,
-            const std::string& typeName = "");
+void G2O_CORE_API applyAction(
+    HyperGraph* graph, HyperGraphElementAction* action,
+    HyperGraphElementAction::Parameters* parameters = 0,
+    const std::string& typeName = "");
 
 /**
  * brief write into gnuplot

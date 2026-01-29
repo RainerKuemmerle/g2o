@@ -70,7 +70,7 @@ struct Sensor {
   Robot* robot() { return _robot; }
   virtual bool isVisible(const WorldItem*) const { return false; }
   virtual bool sense(WorldItem*, const Isometry3d&) { return false; }
-  virtual ~Sensor(){};
+  virtual ~Sensor() {};
 
  protected:
   Robot* _robot;

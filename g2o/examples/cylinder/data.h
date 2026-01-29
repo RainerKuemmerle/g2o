@@ -1,18 +1,16 @@
 #ifndef VO_SIMULATE_DATA_H_
 #define VO_SIMULATE_DATA_H_
 
-#include <cmath>
-#include <random>
-#include <vector>
-#include <iostream>
-
-#include <opencv2/viz.hpp>
-#include <opencv2/opencv.hpp>
-#include <opencv2/highgui.hpp>
-#include <opencv2/core/eigen.hpp>
-
 #include <Eigen/Geometry>
 #include <Eigen/StdVector>
+#include <cmath>
+#include <iostream>
+#include <opencv2/core/eigen.hpp>
+#include <opencv2/highgui.hpp>
+#include <opencv2/opencv.hpp>
+#include <opencv2/viz.hpp>
+#include <random>
+#include <vector>
 
 void createLandmarks(std::vector<Eigen::Vector3d>& points) {
   float scale = 5;

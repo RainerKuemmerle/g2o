@@ -78,7 +78,8 @@ class G2O_TYPES_SLAM3D_ADDONS_API EdgeSE3Line3DProjection
 
   static Matrix3 skew(const Vector3& v);
 
-  static void computeOrthonormalBasis(const Vector3& d, Vector3& e1, Vector3& e2);
+  static void computeOrthonormalBasis(const Vector3& d, Vector3& e1,
+                                      Vector3& e2);
 
   bool isDegenerateLine(const Vector3& d, const Vector3& w) const;
 };

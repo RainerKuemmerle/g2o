@@ -24,7 +24,8 @@ namespace g2o {
  *
  * This parameterization allows for fully analytical Jacobians in the edge.
  */
-class G2O_TYPES_SLAM3D_ADDONS_API VertexLine3DTangent : public BaseVertex<4, Line3D> {
+class G2O_TYPES_SLAM3D_ADDONS_API VertexLine3DTangent
+    : public BaseVertex<4, Line3D> {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
 
@@ -62,8 +63,7 @@ class G2O_TYPES_SLAM3D_ADDONS_API VertexLine3DTangent : public BaseVertex<4, Lin
       // Rodrigues formula: R = I + sin(θ)[k]× + (1-cos(θ))[k]×²
       Vector3 axis = omega / theta;
       Matrix3 K = skew(axis);
-      R_delta = Matrix3::Identity() +
-                std::sin(theta) * K +
+      R_delta = Matrix3::Identity() + std::sin(theta) * K +
                 (1.0 - std::cos(theta)) * K * K;
     }
 
@@ -114,10 +114,11 @@ class G2O_TYPES_SLAM3D_ADDONS_API VertexLine3DTangent : public BaseVertex<4, Lin
   Vector3 color;
 
  private:
-  static void computeOrthonormalBasis(
-      const Vector3& d, Vector3& e1, Vector3& e2) {
+  static void computeOrthonormalBasis(const Vector3& d, Vector3& e1,
+                                      Vector3& e2) {
     // Choose axis least aligned with d for numerical stability
-    if (std::abs(d.x()) < std::abs(d.y()) && std::abs(d.x()) < std::abs(d.z())) {
+    if (std::abs(d.x()) < std::abs(d.y()) &&
+        std::abs(d.x()) < std::abs(d.z())) {
       e1 = d.cross(Vector3::UnitX()).normalized();
     } else if (std::abs(d.y()) < std::abs(d.z())) {
       e1 = d.cross(Vector3::UnitY()).normalized();
@@ -129,9 +130,7 @@ class G2O_TYPES_SLAM3D_ADDONS_API VertexLine3DTangent : public BaseVertex<4, Lin
 
   static Matrix3 skew(const Vector3& v) {
     Matrix3 S;
-    S <<     0, -v.z(),  v.y(),
-         v.z(),      0, -v.x(),
-        -v.y(),  v.x(),      0;
+    S << 0, -v.z(), v.y(), v.z(), 0, -v.x(), -v.y(), v.x(), 0;
     return S;
   }
 };

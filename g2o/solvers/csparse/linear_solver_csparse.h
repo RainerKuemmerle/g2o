@@ -49,7 +49,8 @@ class LinearSolverCSparse : public LinearSolverCCS<MatrixType> {
   LinearSolverCSparse() : LinearSolverCCS<MatrixType>() {}
 
   LinearSolverCSparse(LinearSolverCSparse<MatrixType> const&) = delete;
-  LinearSolverCSparse& operator=(LinearSolverCSparse<MatrixType> const&) = delete;
+  LinearSolverCSparse& operator=(LinearSolverCSparse<MatrixType> const&) =
+      delete;
 
   virtual ~LinearSolverCSparse() = default;
 
@@ -126,7 +127,9 @@ class LinearSolverCSparse : public LinearSolverCCS<MatrixType> {
   }
 
   void fillCSparse(const SparseBlockMatrix<MatrixType>& A, bool onlyValues) {
-    if (!onlyValues) this->initMatrixStructure(A); // convert A(SparseBlockMatrix) to _ccsMatrix(SparseBlockMatrixCCS)
+    if (!onlyValues)
+      this->initMatrixStructure(A);  // convert A(SparseBlockMatrix) to
+                                     // _ccsMatrix(SparseBlockMatrixCCS)
     int m = A.rows();
     int n = A.cols();
     assert(m > 0 && n > 0 && "Hessian has 0 rows/cols");
