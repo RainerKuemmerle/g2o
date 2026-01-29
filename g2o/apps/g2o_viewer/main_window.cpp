@@ -129,7 +129,7 @@ void MainWindow::on_btnInitialGuess_clicked() {
       }
       break;
     default:
-      cerr << " Unknown initialization method" << endl;
+      cerr << __PRETTY_FUNCTION__ << " Unknown initialization method" << endl;
       break;
   }
 

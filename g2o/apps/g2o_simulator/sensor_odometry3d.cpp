@@ -26,7 +26,6 @@
 
 #include "sensor_odometry3d.h"
 
-#include "g2o/stuff/logger.h"
 #include "g2o/types/slam3d/isometry3d_mappings.h"
 
 namespace g2o {
@@ -66,7 +65,7 @@ void SensorOdometry3D::sense() {
     ++it;
   }
   if (!(pcurr && pprev)) {
-    G2O_ERROR("fatal, trajectory empty");
+    cerr << __PRETTY_FUNCTION__ << ": fatal, trajectory empty" << endl;
     return;
   }
   _robotPoseObject = pprev;

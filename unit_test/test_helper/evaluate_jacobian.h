@@ -63,8 +63,7 @@ void evaluateJacobianUnary(EdgeType& e, JacobianWorkspace& jacobianWorkspace,
 
 template <typename EdgeType>
 void evaluateJacobian(EdgeType& e, JacobianWorkspace& jacobianWorkspace,
-                      JacobianWorkspace& numericJacobianWorkspace,
-                      double tolerance = 1e-6) {
+                      JacobianWorkspace& numericJacobianWorkspace) {
   // calling the analytic Jacobian but writing to the numeric workspace
   e.BaseBinaryEdge<EdgeType::Dimension, typename EdgeType::Measurement,
                    typename EdgeType::VertexXiType,
@@ -89,7 +88,7 @@ void evaluateJacobian(EdgeType& e, JacobianWorkspace& jacobianWorkspace,
     else
       numElems *= EdgeType::VertexXjType::Dimension;
     for (int j = 0; j < numElems; ++j) {
-      EXPECT_NEAR(n[j], a[j], tolerance);
+      EXPECT_NEAR(n[j], a[j], 1e-6);
     }
   }
 }

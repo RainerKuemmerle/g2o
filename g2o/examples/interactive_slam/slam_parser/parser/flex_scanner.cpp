@@ -149,7 +149,7 @@ typedef unsigned int flex_uint32_t;
  * to BEGIN to return to the state.  The YYSTATE alias is for lex
  * compatibility.
  */
-#define YY_START (((yy_start) - 1) / 2)
+#define YY_START (((yy_start)-1) / 2)
 #define YYSTATE YY_START
 /* Action number for EOF rule of a given start state. */
 #define YY_STATE_EOF(state) (YY_END_OF_BUFFER + state + 1)
@@ -876,8 +876,8 @@ YY_DECL {
         default:
           YY_FATAL_ERROR("fatal flex scanner internal error--no action found");
       } /* end of action switch */
-    } /* end of scanning one token */
-  } /* end of user's declarations */
+    }   /* end of scanning one token */
+  }     /* end of user's declarations */
 } /* end of yylex */
 
 /* The contents of this function are C++ specific, so the () macro is not used.
@@ -1588,7 +1588,8 @@ static void yy_flex_strncpy(char* s1, const char* s2, int n) {
 #ifdef YY_NEED_STRLEN
 static int yy_flex_strlen(const char* s) {
   int n;
-  for (n = 0; s[n]; ++n);
+  for (n = 0; s[n]; ++n)
+    ;
 
   return n;
 }

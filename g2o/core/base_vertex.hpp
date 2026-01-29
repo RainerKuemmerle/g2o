@@ -37,7 +37,7 @@ double BaseVertex<D, T>::solveDirect(double lambda) {
                      G2O_VERTEX_DIM, G2O_VERTEX_DIM) *
                      lambda;
   double det = tempA.determinant();
-  if (std::isnan(det) || det < std::numeric_limits<double>::epsilon())
+  if (g2o_isnan(det) || det < std::numeric_limits<double>::epsilon())
     return det;
   Eigen::Matrix<double, D, 1, Eigen::ColMajor> dx = tempA.llt().solve(_b);
   oplus(&dx[0]);

@@ -42,10 +42,7 @@
 #include "g2o/core/optimization_algorithm_property.h"
 #include "g2o/core/sparse_optimizer.h"
 #include "g2o/stuff/string_tools.h"
-#include "g2o/types/slam2d/types_slam2d.h"  // IWYU pragma: keep
-#include "g2o/types/slam3d/edge_se3_pointxyz.h"
-#include "g2o/types/slam3d/vertex_pointxyz.h"
-#include "g2o/types/slam3d/vertex_se3.h"
+#include "g2o/types/slam2d/types_slam2d.h"
 
 G2O_USE_TYPE_GROUP(slam2d);
 
@@ -136,27 +133,6 @@ TEST(General, GraphAddEdge) {
 
   delete e2;
   delete e3;
-  delete optimizer;
-}
-
-TEST(General, GraphAddEdgeNoRequiredParam) {
-  g2o::SparseOptimizer* optimizer = g2o::internal::createOptimizerForTests();
-
-  g2o::VertexSE3* poseVertex = new g2o::VertexSE3();
-  poseVertex->setId(0);
-  optimizer->addVertex(poseVertex);
-
-  g2o::VertexPointXYZ* pointVertex = new g2o::VertexPointXYZ();
-  pointVertex->setId(1);
-  optimizer->addVertex(pointVertex);
-
-  g2o::EdgeSE3PointXYZ* edge = new g2o::EdgeSE3PointXYZ();
-  edge->setVertex(0, poseVertex);
-  edge->setVertex(1, pointVertex);
-
-  EXPECT_FALSE(optimizer->addEdge(edge));
-
-  optimizer->clear();
   delete optimizer;
 }
 

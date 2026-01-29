@@ -29,7 +29,6 @@
 #include <fstream>
 #include <iomanip>
 
-#include "g2o/core/eigen_types.h"
 #include "g2o/stuff/logger.h"
 #include "g2o/stuff/macros.h"
 #include "g2o/stuff/misc.h"
@@ -125,12 +124,18 @@ bool BlockSolver<Traits>::buildStructure(bool zeroBlocks) {
     if (!v->marginalized()) {
       v->setColInHessian(_sizePoses);
       _sizePoses += dim;
-      blockPoseIndices[_numPoses] = _sizePoses;
+      blockPoseIndices[_numPoses] =
+          _sizePoses;  // blockPoseIndices的大小 -
+                       // _numPoses表示存储了多少个vertex，每个member
+                       // 表示了vertex的大小。
       ++_numPoses;
     } else {
       v->setColInHessian(_sizeLandmarks);
       _sizeLandmarks += dim;
-      blockLandmarkIndices[_numLandmarks] = _sizeLandmarks;
+      blockLandmarkIndices[_numLandmarks] =
+          _sizeLandmarks;  // blockLandmarkIndices的大小 -
+                           // _numLandmarks表示存储了多少个Landmark，每个member
+                           // 表示了Landmark的大小。
       ++_numLandmarks;
     }
     sparseDim += dim;
@@ -319,7 +324,7 @@ bool BlockSolver<Traits>::updateStructure(
           PoseMatrixType* m = _Hpp->block(ind1, ind2, true);
           e->mapHessianMemory(m->data(), viIdx, vjIdx, transposedBlock);
         } else {
-          G2O_ERROR("not supported");
+          G2O_ERROR("{}: not supported", __PRETTY_FUNCTION__);
         }
       }
     }
@@ -531,12 +536,8 @@ bool BlockSolver<Traits>::buildSystem() {
       const OptimizableGraph::Vertex* v =
           static_cast<const OptimizableGraph::Vertex*>(e->vertex(i));
       if (!v->fixed()) {
-        bool hasANan =
-            g2o::VectorX::MapType(jacobianWorkspace.workspaceForVertex(i),
-                                  e->dimension() * v->dimension())
-                .array()
-                .isNaN()
-                .any();
+        bool hasANan = arrayHasNaN(jacobianWorkspace.workspaceForVertex(i),
+                                   e->dimension() * v->dimension());
         if (hasANan) {
           G2O_WARN(
               "buildSystem(): NaN within Jacobian for edge {} for vertex {}",

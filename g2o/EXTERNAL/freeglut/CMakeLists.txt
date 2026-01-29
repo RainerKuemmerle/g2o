@@ -6,7 +6,7 @@ add_library(freeglut_minimal ${G2O_LIB_TYPE}
 
 target_link_libraries(freeglut_minimal PUBLIC ${G2O_OPENGL_TARGET})
 target_include_directories(freeglut_minimal PUBLIC
-  "$<BUILD_INTERFACE:${g2o_SOURCE_DIR};${g2o_BINARY_DIR}>"
+  "$<BUILD_INTERFACE:${g2o_SOURCE_DIR};${PROJECT_BINARY_DIR}>"
   $<INSTALL_INTERFACE:include/g2o/freeglut_minimal>
 )
 target_compile_features(freeglut_minimal PUBLIC cxx_std_17)

@@ -364,15 +364,15 @@ void SparseBlockMatrix<MatrixType>::scale(double a_) {
 template <class MatrixType>
 SparseBlockMatrix<MatrixType>* SparseBlockMatrix<MatrixType>::slice(
     int rmin, int rmax, int cmin, int cmax, bool alloc) const {
-  const int m = rmax - rmin;
-  const int n = cmax - cmin;
-  std::vector<int> rowIdx(m);
+  int m = rmax - rmin;
+  int n = cmax - cmin;
+  int rowIdx[m];
   rowIdx[0] = rowsOfBlock(rmin);
   for (int i = 1; i < m; ++i) {
     rowIdx[i] = rowIdx[i - 1] + rowsOfBlock(rmin + i);
   }
 
-  std::vector<int> colIdx(n);
+  int colIdx[n];
   colIdx[0] = colsOfBlock(cmin);
   for (int i = 1; i < n; ++i) {
     colIdx[i] = colIdx[i - 1] + colsOfBlock(cmin + i);
@@ -642,21 +642,21 @@ bool SparseBlockMatrix<MatrixType>::writeOctave(const char* filename,
   return fout.good();
 }
 
+/// @brief SparseBlockMatrix to SparseBlockMatrixCCS
+/// @tparam MatrixType 
+/// @param blockCCS 
+/// @return 
 template <class MatrixType>
-int SparseBlockMatrix<MatrixType>::fillSparseBlockMatrixCCS(
-    SparseBlockMatrixCCS<MatrixType>& blockCCS) const {
+int SparseBlockMatrix<MatrixType>::fillSparseBlockMatrixCCS(SparseBlockMatrixCCS<MatrixType>& blockCCS) const {
   blockCCS.blockCols().resize(blockCols().size());
   int numblocks = 0;
   for (size_t i = 0; i < blockCols().size(); ++i) {
     const IntBlockMap& row = blockCols()[i];
-    typename SparseBlockMatrixCCS<MatrixType>::SparseColumn& dest =
-        blockCCS.blockCols()[i];
+    typename SparseBlockMatrixCCS<MatrixType>::SparseColumn& dest = blockCCS.blockCols()[i];
     dest.clear();
     dest.reserve(row.size());
-    for (typename IntBlockMap::const_iterator it = row.begin(); it != row.end();
-         ++it) {
-      dest.push_back(typename SparseBlockMatrixCCS<MatrixType>::RowBlock(
-          it->first, it->second));
+    for (typename IntBlockMap::const_iterator it = row.begin(); it != row.end(); ++it) {
+      dest.push_back(typename SparseBlockMatrixCCS<MatrixType>::RowBlock(it->first, it->second));
       ++numblocks;
     }
   }
@@ -700,9 +700,8 @@ void SparseBlockMatrix<MatrixType>::takePatternFromHash(
     for (typename HashSparseColumn::const_iterator it = column.begin();
          it != column.end(); ++it)
       sparseRowSorted.push_back(*it);
-    std::sort(
-        sparseRowSorted.begin(), sparseRowSorted.end(),
-        [](const auto& lhs, const auto& rhs) { return lhs.first < rhs.first; });
+    std::sort(sparseRowSorted.begin(), sparseRowSorted.end(),
+              CmpPairFirst<int, MatrixType*>());
     // try to free some memory early
     HashSparseColumn aux;
     std::swap(aux, column);

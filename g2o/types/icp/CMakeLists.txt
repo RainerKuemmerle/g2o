@@ -25,9 +25,6 @@ install(TARGETS types_icp
   INCLUDES DESTINATION ${INCLUDES_DESTINATION}
   )
 
-# Create alias target for easier usage when included as subdirectory
-add_library(g2o::types_icp ALIAS types_icp)
-
 file(GLOB headers "${CMAKE_CURRENT_SOURCE_DIR}/*.h" "${CMAKE_CURRENT_SOURCE_DIR}/*.hpp")
 
 install(FILES ${headers} DESTINATION ${INCLUDES_INSTALL_DIR}/types/icp)

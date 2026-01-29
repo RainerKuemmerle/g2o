@@ -30,7 +30,6 @@
 #include <iostream>
 
 #include "fast_output.h"
-#include "g2o/stuff/logger.h"
 #include "g2o/types/slam3d/se3quat.h"
 #include "graph_optimizer_sparse_online.h"
 #include "types_slam2d_online.h"
@@ -318,7 +317,8 @@ bool G2oSlamInterface::addEdge(const std::string& tag, int id, int dimension,
     }
 
   } else {
-    G2O_ERROR("not implemented for this dimension {}", dimension);
+    cerr << __PRETTY_FUNCTION__ << " not implemented for this dimension"
+         << endl;
     return false;
   }
 

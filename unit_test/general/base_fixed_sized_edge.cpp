@@ -41,7 +41,7 @@ class Edge3Constant
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
   Edge3Constant()
       : g2o::BaseFixedSizedEdge<2, g2o::Vector2, g2o::VertexSE2, g2o::VertexSE2,
-                                g2o::VertexPointXY>() {};
+                                g2o::VertexPointXY>(){};
   void computeError() {
     const auto a = static_cast<const g2o::VertexSE2*>(_vertices[0])->estimate();
     const auto b = static_cast<const g2o::VertexSE2*>(_vertices[1])->estimate();

@@ -20,10 +20,15 @@
 
 #include <QApplication>
 #include <QThread>
-#include <cstdlib>
 
+#include "g2o/apps/g2o_cli/dl_wrapper.h"
+#include "g2o/config.h"
+#include "g2o/core/factory.h"
+#include "g2o/core/hyper_graph_action.h"
+#include "g2o/core/optimization_algorithm_factory.h"
 #include "g2o/core/sparse_optimizer.h"
 #include "g2o/stuff/command_args.h"
+#include "g2o/stuff/opengl_wrapper.h"
 #include "gui_hyper_graph_action.h"
 #include "main_window.h"
 #include "stream_redirect.h"
@@ -49,12 +54,6 @@ int RunG2OViewer::run(int argc, char** argv, CommandArgs& arg) {
   arg.paramLeftOver("graph-input", inputFilename, "",
                     "graph file which will be processed", true);
   arg.parseArgs(argc, argv);
-
-  // Check if given file exists
-  if (inputFilename.size() > 0 && !std::ifstream(inputFilename)) {
-    std::cerr << "Error: unable to open file " << inputFilename << std::endl;
-    return EXIT_FAILURE;
-  }
 
   MainWindow mw;
   mw.updateDisplayedSolvers();
@@ -91,7 +90,7 @@ int RunG2OViewer::run(int argc, char** argv, CommandArgs& arg) {
   }
 
   delete optimizer;
-  return EXIT_SUCCESS;
+  return 0;
 }
 
 }  // namespace g2o

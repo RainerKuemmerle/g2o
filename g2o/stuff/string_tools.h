@@ -27,13 +27,13 @@
 #ifndef G2O_STRING_TOOLS_H
 #define G2O_STRING_TOOLS_H
 
-#include <algorithm>
-#include <iterator>
+#include <cstdlib>
 #include <sstream>
 #include <string>
 #include <vector>
 
 #include "g2o_stuff_api.h"
+#include "macros.h"
 
 namespace g2o {
 
@@ -68,6 +68,53 @@ G2O_STUFF_API std::string strToLower(const std::string& s);
  * convert a string to upper case
  */
 G2O_STUFF_API std::string strToUpper(const std::string& s);
+
+/**
+ * read integer values (separated by spaces) from a string and store
+ * them in the given OutputIterator.
+ */
+template <typename OutputIterator>
+OutputIterator readInts(const char* str, OutputIterator out) {
+  char* cl = (char*)str;
+  char* cle = cl;
+  while (1) {
+    long int id = strtol(cl, &cle, 10);
+    if (cl == cle) break;
+    *out++ = id;
+    cl = cle;
+  }
+  return out;
+}
+
+/**
+ * read float values (separated by spaces) from a string and store
+ * them in the given OutputIterator.
+ */
+template <typename OutputIterator>
+OutputIterator readFloats(const char* str, OutputIterator out) {
+  char* cl = (char*)str;
+  char* cle = cl;
+  while (1) {
+    double val = strtod(cl, &cle);
+    if (cl == cle) break;
+    *out++ = val;
+    cl = cle;
+  }
+  return out;
+}
+
+/**
+ * format a string and return a std::string.
+ * Format is just like printf, see man 3 printf
+ */
+G2O_STUFF_API std::string formatString(const char* fmt,
+                                       ...) G2O_ATTRIBUTE_FORMAT12;
+
+/**
+ * replacement function for sprintf which fills a std::string instead of a char*
+ */
+G2O_STUFF_API int strPrintf(std::string& str, const char* fmt,
+                            ...) G2O_ATTRIBUTE_FORMAT23;
 
 /**
  * convert a string into an other type.
@@ -116,30 +163,6 @@ G2O_STUFF_API std::string strExpandFilename(const std::string& filename);
  */
 G2O_STUFF_API std::vector<std::string> strSplit(const std::string& s,
                                                 const std::string& delim);
-
-/**
- * @brief Join into a string using a delimeter
- *
- * @tparam Iterator
- * @tparam std::iterator_traits<Iterator>::value_type
- * @param b begin of the range for output
- * @param e end of the range for output
- * @param delimiter will be inserted in between elements
- * @return std::string joined string
- */
-template <typename Iterator,
-          typename Value = typename std::iterator_traits<Iterator>::value_type>
-std::string strJoin(Iterator b, Iterator e, const std::string& delimiter = "") {
-  if (b == e) return "";
-  std::ostringstream os;
-  std::copy(b, std::prev(e),
-            std::ostream_iterator<Value>(os, delimiter.c_str()));
-  b = std::prev(e);
-  if (b != e) {
-    os << *b;
-  }
-  return os.str();
-}
 
 /**
  * read a line from is into currentLine.

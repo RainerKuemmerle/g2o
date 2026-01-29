@@ -150,7 +150,15 @@ void EdgeSE2LotsOfXY::initialEstimate(const OptimizableGraph::VertexSet& fixed,
 
   VertexSE2* pose = static_cast<VertexSE2*>(_vertices[0]);
 
+#ifdef _MSC_VER
   std::vector<bool> estimate_this(_observedPoints, true);
+#else
+  bool estimate_this[_observedPoints];
+  for (unsigned int i = 0; i < _observedPoints; i++) {
+    estimate_this[i] = true;
+  }
+#endif
+
   for (std::set<HyperGraph::Vertex*>::iterator it = fixed.begin();
        it != fixed.end(); ++it) {
     for (unsigned int i = 1; i < _vertices.size(); i++) {

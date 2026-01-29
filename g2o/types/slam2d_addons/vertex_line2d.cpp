@@ -26,8 +26,6 @@
 
 #include "vertex_line2d.h"
 
-#include "g2o/types/slam2d/vertex_point_xy.h"
-
 #ifdef G2O_HAVE_OPENGL
 #include "g2o/stuff/opengl_wrapper.h"
 #endif

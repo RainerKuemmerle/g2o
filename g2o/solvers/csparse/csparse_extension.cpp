@@ -7,7 +7,7 @@
 // CSparse is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// version 1.1 of the License, or (at your option) any later version.
 //
 // CSparse is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -21,10 +21,15 @@
 #include "csparse_extension.h"
 
 #include <cassert>
+#include <iostream>
 
 #include "g2o/stuff/logger.h"
+#include "g2o/stuff/macros.h"
 
-namespace g2o::csparse_extension {
+using namespace std;
+
+namespace g2o {
+namespace csparse_extension {
 
 /**
  * Originally from CSparse, avoid memory re-allocations by giving workspace
@@ -34,14 +39,14 @@ int cs_cholsolsymb(const cs* A, double* b, const css* S, double* x, int* work) {
   csn* N;
   int n, ok;
   if (!CS_CSC(A) || !b || !S || !x) {
-    G2O_DEBUG("No valid input!");
+    G2O_DEBUG("{}: No valid input!", __PRETTY_FUNCTION__);
     assert(0);  // get a backtrace in debug mode
     return (0); /* check inputs */
   }
   n = A->n;
   N = cs_chol_workspace(A, S, work, x); /* numeric Cholesky factorization */
   if (!N) {
-    G2O_DEBUG("cholesky failed!");
+    G2O_DEBUG("{}: cholesky failed!", __PRETTY_FUNCTION__);
   }
   ok = (N != NULL);
   if (ok) {
@@ -120,4 +125,5 @@ csn* cs_chol_workspace(const cs* A, const css* S, int* cin, double* xin) {
   return (cs_ndone(N, E, NULL, NULL, 1)); /* success: free E,s,x; return N */
 }
 
-}  // namespace g2o::csparse_extension
+}  // namespace csparse_extension
+}  // namespace g2o

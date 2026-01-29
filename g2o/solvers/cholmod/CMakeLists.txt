@@ -5,7 +5,6 @@ endif()
 set(PUBLIC_HEADERS
 	linear_solver_cholmod.h
 	cholmod_wrapper.h
-	g2o_cholmod_api.h
 )
 
 add_library(solver_cholmod ${G2O_LIB_TYPE}
@@ -43,6 +42,3 @@ install(TARGETS solver_cholmod
   ARCHIVE DESTINATION ${ARCHIVE_DESTINATION}
   PUBLIC_HEADER DESTINATION ${INCLUDES_DESTINATION}/g2o/solvers/cholmod
 )
-
-# Create alias target for easier usage when included as subdirectory
-add_library(g2o::solver_cholmod ALIAS solver_cholmod)

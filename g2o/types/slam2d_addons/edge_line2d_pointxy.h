@@ -37,9 +37,14 @@
 namespace g2o {
 
 class EdgeLine2DPointXY
-    : public BaseBinaryEdge<1, double, VertexLine2D, VertexPointXY> {
+    : public BaseBinaryEdge<1, double, VertexLine2D,
+                            VertexPointXY>  // Avoid redefinition of BaseEdge in
+                                            // MSVC
+{
  public:
-  G2O_TYPES_SLAM2D_ADDONS_API EdgeLine2DPointXY();
+  G2O_TYPES_SLAM2D_ADDONS_API EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+      G2O_TYPES_SLAM2D_ADDONS_API
+      EdgeLine2DPointXY();
 
   G2O_TYPES_SLAM2D_ADDONS_API void computeError() {
     const VertexLine2D* l = static_cast<const VertexLine2D*>(_vertices[0]);

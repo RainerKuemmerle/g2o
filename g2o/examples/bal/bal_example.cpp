@@ -41,7 +41,6 @@
 #include "g2o/core/sparse_optimizer.h"
 #include "g2o/solvers/pcg/linear_solver_pcg.h"
 #include "g2o/stuff/command_args.h"
-#include "g2o/stuff/logger.h"
 
 #if defined G2O_HAVE_CHOLMOD
 #include "g2o/solvers/cholmod/linear_solver_cholmod.h"
@@ -73,16 +72,18 @@ class VertexCameraBAL : public g2o::BaseVertex<9, g2o::bal::Vector9> {
   VertexCameraBAL() {}
 
   bool read(std::istream& /*is*/) override {
-    G2O_ERROR("not implemented yet");
+    cerr << __PRETTY_FUNCTION__ << " not implemented yet" << endl;
     return false;
   }
 
   bool write(std::ostream& /*os*/) const override {
-    G2O_ERROR("not implemented yet");
+    cerr << __PRETTY_FUNCTION__ << " not implemented yet" << endl;
     return false;
   }
 
-  void setToOriginImpl() override { G2O_ERROR("not implemented yet"); }
+  void setToOriginImpl() override {
+    cerr << __PRETTY_FUNCTION__ << " not implemented yet" << endl;
+  }
 
   void oplusImpl(const double* update) override {
     g2o::bal::Vector9::ConstMapType v(update, VertexCameraBAL::Dimension);
@@ -101,16 +102,18 @@ class VertexPointBAL : public g2o::BaseVertex<3, g2o::Vector3> {
   VertexPointBAL() {}
 
   bool read(std::istream& /*is*/) override {
-    G2O_ERROR("not implemented yet");
+    cerr << __PRETTY_FUNCTION__ << " not implemented yet" << endl;
     return false;
   }
 
   bool write(std::ostream& /*os*/) const override {
-    G2O_ERROR("not implemented yet");
+    cerr << __PRETTY_FUNCTION__ << " not implemented yet" << endl;
     return false;
   }
 
-  void setToOriginImpl() override { G2O_ERROR("not implemented yet"); }
+  void setToOriginImpl() override {
+    cerr << __PRETTY_FUNCTION__ << " not implemented yet" << endl;
+  }
 
   void oplusImpl(const double* update) override {
     g2o::Vector3::ConstMapType v(update);
@@ -143,67 +146,70 @@ class VertexPointBAL : public g2o::BaseVertex<3, g2o::Vector3> {
 class EdgeObservationBAL
     : public g2o::BaseBinaryEdge<2, g2o::Vector2, VertexCameraBAL,
                                  VertexPointBAL> {
- public:
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
-  EdgeObservationBAL() {}
-  bool read(std::istream& /*is*/) override {
-    G2O_ERROR("not implemented yet");
-    return false;
-  }
-  bool write(std::ostream& /*os*/) const override {
-    G2O_ERROR("not implemented yet");
-    return false;
-  }
+  public:
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
 
-  /**
-   * templatized function to compute the error as described in the comment above
-   */
-  template <typename T>
-  bool operator()(const T* p_camera, const T* p_point, T* p_error) const {
-    typename g2o::VectorN<9, T>::ConstMapType camera(p_camera);
-    typename g2o::VectorN<3, T>::ConstMapType point(p_point);
+    EdgeObservationBAL() {}
 
-    typename g2o::VectorN<3, T> p;
-
-    // Rodrigues' formula for the rotation
-    T theta = camera.template head<3>().norm();
-    if (theta > T(0)) {
-      g2o::VectorN<3, T> v = camera.template head<3>() / theta;
-      T cth = cos(theta);
-      T sth = sin(theta);
-
-      g2o::VectorN<3, T> vXp = v.cross(point);
-      T vDotp = v.dot(point);
-      T oneMinusCth = T(1) - cth;
-
-      p = point * cth + vXp * sth + v * vDotp * oneMinusCth;
-    } else {
-      // taylor expansion for theta close to zero
-      p = point + camera.template head<3>().cross(point);
+    bool read(std::istream& /*is*/) override {
+      cerr << __PRETTY_FUNCTION__ << " not implemented yet" << endl;
+      return false;
     }
 
-    // translation of the camera
-    p += camera.template segment<3>(3);
+    bool write(std::ostream& /*os*/) const override {
+      cerr << __PRETTY_FUNCTION__ << " not implemented yet" << endl;
+      return false;
+    }
 
-    // perspective division
-    g2o::VectorN<2, T> projectedPoint = -p.template head<2>() / p(2);
+    /**
+     * templatized function to compute the error as described in the comment above
+     */
+    template <typename T>
+    bool operator()(const T* p_camera, const T* p_point, T* p_error) const {
+      typename g2o::VectorN<9, T>::ConstMapType camera(p_camera);
+      typename g2o::VectorN<3, T>::ConstMapType point(p_point);
 
-    // conversion to pixel coordinates
-    T radiusSqr = projectedPoint.squaredNorm();
-    const T& f = camera(6);
-    const T& k1 = camera(7);
-    const T& k2 = camera(8);
-    T r_p = T(1) + k1 * radiusSqr + k2 * radiusSqr * radiusSqr;
-    g2o::VectorN<2, T> prediction = f * r_p * projectedPoint;
+      typename g2o::VectorN<3, T> p;
 
-    // compute the error
-    typename g2o::VectorN<2, T>::MapType error(p_error);
-    error = prediction - measurement().cast<T>();
-    (void)error;
-    return true;
-  }
+      // Rodrigues' formula for the rotation
+      T theta = camera.template head<3>().norm();
+      if (theta > T(0)) {
+        g2o::VectorN<3, T> v = camera.template head<3>() / theta;
+        T cth = cos(theta);
+        T sth = sin(theta);
 
-  G2O_MAKE_AUTO_AD_FUNCTIONS
+        g2o::VectorN<3, T> vXp = v.cross(point);
+        T vDotp = v.dot(point);
+        T oneMinusCth = T(1) - cth;
+
+        p = point * cth + vXp * sth + v * vDotp * oneMinusCth;
+      } else {
+        // taylor expansion for theta close to zero
+        p = point + camera.template head<3>().cross(point);
+      }
+
+      // translation of the camera
+      p += camera.template segment<3>(3);
+
+      // perspective division
+      g2o::VectorN<2, T> projectedPoint = -p.template head<2>() / p(2);
+
+      // conversion to pixel coordinates
+      T radiusSqr = projectedPoint.squaredNorm();
+      const T& f = camera(6);
+      const T& k1 = camera(7);
+      const T& k2 = camera(8);
+      T r_p = T(1) + k1 * radiusSqr + k2 * radiusSqr * radiusSqr;
+      g2o::VectorN<2, T> prediction = f * r_p * projectedPoint;
+
+      // compute the error
+      typename g2o::VectorN<2, T>::MapType error(p_error);
+      error = prediction - measurement().cast<T>();
+      (void)error;
+      return true;
+    }
+
+    G2O_MAKE_AUTO_AD_FUNCTIONS
 };
 
 int main(int argc, char** argv) {

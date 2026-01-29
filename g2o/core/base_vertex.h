@@ -33,6 +33,8 @@
 #include <cassert>
 #include <stack>
 
+#include "creators.h"
+#include "g2o/stuff/macros.h"
 #include "optimizable_graph.h"
 
 namespace g2o {
@@ -81,7 +83,7 @@ class BaseVertex : public OptimizableGraph::Vertex {
 
   virtual int copyB(double* b_) const {
     const int vertexDim = G2O_VERTEX_DIM;
-    memcpy(b_, _b.data(), vertexDim * sizeof(double));
+    memcpy(b_, _b.data(), vertexDim * sizeof(double)); // copy from _b to b_;
     return vertexDim;
   }
 

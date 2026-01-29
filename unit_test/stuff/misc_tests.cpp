@@ -24,8 +24,6 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include <Eigen/Core>
-
 #include "g2o/stuff/misc.h"
 #include "gtest/gtest.h"
 
@@ -104,11 +102,33 @@ TEST(Stuff, ArrayHasNaN) {
   double data[size];
   std::fill_n(data, size, 0);
 
-  EXPECT_FALSE(Eigen::VectorXd::MapType(data, size).array().isNaN().any());
+  auto aux = [](const double* data, int size) {
+    int nanIndex = -1;
+    bool hasNan = g2o::arrayHasNaN(data, size, &nanIndex);
+    return std::make_pair(hasNan, nanIndex);
+  };
+
+  EXPECT_EQ(std::make_pair(false, -1), aux(data, size));
 
   for (int i = 0; i < size; ++i) {
     std::fill_n(data, size, 0);
     data[i] = std::numeric_limits<double>::quiet_NaN();
-    EXPECT_TRUE(Eigen::VectorXd::MapType(data, size).array().isNaN().any());
+    EXPECT_EQ(std::make_pair(true, i), aux(data, size));
   }
+}
+
+TEST(Stuff, Square) {
+  EXPECT_DOUBLE_EQ(4, g2o::square(2));
+  EXPECT_DOUBLE_EQ(4, g2o::square(-2));
+}
+
+TEST(Stuff, Hypot) {
+  EXPECT_DOUBLE_EQ(hypot(2, 0), 2);
+  EXPECT_DOUBLE_EQ(hypot(-2, 0), 2);
+  EXPECT_DOUBLE_EQ(hypot(0, 2), 2);
+  EXPECT_DOUBLE_EQ(hypot(0, -2), 2);
+  EXPECT_DOUBLE_EQ(hypot(3, 3), sqrt(18));
+  EXPECT_DOUBLE_EQ(hypot(-3, 3), sqrt(18));
+  EXPECT_DOUBLE_EQ(hypot(-3, 3), sqrt(18));
+  EXPECT_DOUBLE_EQ(hypot(3, -3), sqrt(18));
 }

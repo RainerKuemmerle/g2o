@@ -208,7 +208,7 @@ bool SolverSLAM2DLinear::solveOrientation() {
   linearSystemSolver.init();
   bool ok = linearSystemSolver.solve(H, x.data(), b.data());
   if (!ok) {
-    G2O_ERROR("Failure while solving linear system");
+    G2O_ERROR("{} Failure while solving linear system", __PRETTY_FUNCTION__);
     return false;
   }
 

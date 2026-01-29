@@ -21,9 +21,6 @@ install(TARGETS solver_dense
   INCLUDES DESTINATION ${INCLUDES_DESTINATION}
 )
 
-# Create alias target for easier usage when included as subdirectory
-add_library(g2o::solver_dense ALIAS solver_dense)
-
 file(GLOB headers "${CMAKE_CURRENT_SOURCE_DIR}/*.h" "${CMAKE_CURRENT_SOURCE_DIR}/*.hpp")
 
 install(FILES ${headers} DESTINATION ${INCLUDES_INSTALL_DIR}/solvers/dense)

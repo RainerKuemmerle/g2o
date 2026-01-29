@@ -1,9 +1,11 @@
 \documentclass[a4paper]{article}
 \usepackage{graphicx}
+\usepackage{fullpage}
 \usepackage{graphicx} % for pdf, bitmapped graphics files
 \usepackage{amsmath} % assumes amsmath package installed
 \usepackage{amssymb}  % assumes amsmath package installed\ref
 \usepackage{psfrag}
+\usepackage{algorithmic}
 \usepackage{algorithm}
 \usepackage{color}
 \usepackage{xcolor}
@@ -644,8 +646,8 @@ problem, like the one described in many SLAM papers.
 namespace g2o {
   G2O_REGISTER_TYPE_GROUP(slam2d);
 
-  G2O_REGISTER_TYPE_NAME("VERTEX_SE2", VertexSE2);
-  G2O_REGISTER_TYPE_NAME("VERTEX_XY", VertexPointXY);
+  G2O_REGISTER_TYPE(VERTEX_SE2, VertexSE2);
+  G2O_REGISTER_TYPE(VERTEX_XY, VertexPointXY);
 
   // ...
 }

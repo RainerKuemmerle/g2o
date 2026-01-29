@@ -62,7 +62,8 @@ class HyperGraphElementCreator : public AbstractHyperGraphElementCreator {
     defined(__GNUC__)  // force stack alignment on Windows with GCC
   __attribute__((force_align_arg_pointer))
 #endif
-  HyperGraph::HyperGraphElement* construct() {
+  HyperGraph::HyperGraphElement*
+  construct() {
     return new T;
   }
   virtual const std::string& name() const { return _name; }

@@ -33,7 +33,6 @@
 #include "g2o/core/optimization_algorithm_factory.h"
 #include "g2o/core/sparse_optimizer.h"
 #include "g2o/stuff/command_args.h"
-#include "g2o/stuff/logger.h"
 #include "g2o/stuff/sampler.h"
 
 using namespace std;
@@ -73,11 +72,11 @@ class EdgePointOnCurve
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   EdgePointOnCurve() {}
   bool read(std::istream& /*is*/) override {
-    G2O_ERROR("not implemented yet");
+    cerr << __PRETTY_FUNCTION__ << " not implemented yet" << endl;
     return false;
   }
   bool write(std::ostream& /*os*/) const override {
-    G2O_ERROR("not implemented yet");
+    cerr << __PRETTY_FUNCTION__ << " not implemented yet" << endl;
     return false;
   }
 

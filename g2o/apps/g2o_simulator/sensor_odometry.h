@@ -27,14 +27,13 @@
 #ifndef G2O_ODOMETRY_SENSOR_
 #define G2O_ODOMETRY_SENSOR_
 
-#include "g2o/stuff/logger.h"
 #include "simulator.h"
 namespace g2o {
 
 template <class R, class E, class O>
 class SensorOdometry : public BinarySensor<R, E, O> {
  public:
-  SensorOdometry(const std::string name_) : BinarySensor<R, E, O>(name_) {};
+  SensorOdometry(const std::string name_) : BinarySensor<R, E, O>(name_){};
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   virtual void sense() {
     if (!BinarySensor<R, E, O>::robot()) return;
@@ -54,7 +53,7 @@ class SensorOdometry : public BinarySensor<R, E, O> {
       ++it;
     }
     if (!(pcurr && pprev)) {
-      G2O_ERROR("fatal, trajectory empty");
+      cerr << __PRETTY_FUNCTION__ << ": fatal, trajectory empty" << endl;
       return;
     }
     _robotPoseObject = pprev;

@@ -24,7 +24,7 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "g2o/stuff/sampler.h"
+#include "g2o/stuff/os_specific.h"
 #include "g2o/types/slam2d/edge_pointxy.h"
 #include "g2o/types/slam2d/edge_se2.h"
 #include "g2o/types/slam2d/edge_se2_pointxy.h"
@@ -156,17 +156,10 @@ TEST(Slam2D, EdgeSE2PointXYBearingJacobian) {
   numericJacobianWorkspace.allocate();
 
   for (int k = 0; k < 10000; ++k) {
-    /* Generate random estimate states, but don't evaluate those that are too
-     * close to error function singularity. */
-    do {
-      v1.setEstimate(randomSE2());
-      v2.setEstimate(Eigen::Vector2d::Random());
-      e.setMeasurement(g2o::Sampler::uniformRand(-1., 1.) * M_PI);
-    } while ((v1.estimate().inverse() * v2.estimate()).norm() < 1e-6);
+    v1.setEstimate(randomSE2());
+    v2.setEstimate(Eigen::Vector2d::Random());
+    e.setMeasurement(drand48() * M_PI);
 
-    /* Note a larger tolerance versus the default of 1e-6 must be used due to
-     * poor behaviour of the numerical difference function that is used to
-     * provide golden data. */
-    evaluateJacobian(e, jacobianWorkspace, numericJacobianWorkspace, 1e-5);
+    evaluateJacobian(e, jacobianWorkspace, numericJacobianWorkspace);
   }
 }

@@ -26,10 +26,12 @@
 
 #include "hyper_graph_action.h"
 
+#include <iostream>
 #include <list>
 
 #include "cache.h"
 #include "g2o/stuff/logger.h"
+#include "g2o/stuff/macros.h"
 #include "optimizable_graph.h"
 
 namespace g2o {
@@ -97,13 +99,14 @@ HyperGraphElementAction* HyperGraphElementActionCollection::operator()(
 bool HyperGraphElementActionCollection::registerAction(
     const HyperGraphElementAction::HyperGraphElementActionPtr& action) {
 #ifdef G2O_DEBUG_ACTIONLIB
-  G2O_DEBUG("{} {}", action->name(), action->typeName());
+  G2O_DEBUG("{} {} {}", __PRETTY_FUNCTION__, action->name(),
+            action->typeName());
 #endif
   if (action->name() != name()) {
     G2O_ERROR(
-        "invalid attempt to register an action in a collection with a "
+        "{}: invalid attempt to register an action in a collection with a "
         "different name {} {}",
-        name(), action->name());
+        __PRETTY_FUNCTION__, name(), action->name());
   }
   _actionMap.insert(make_pair(action->typeName(), action));
   return true;
@@ -149,8 +152,9 @@ bool HyperGraphActionLibrary::registerAction(
     collection = dynamic_cast<HyperGraphElementActionCollection*>(oldAction);
     if (!collection) {
       G2O_ERROR(
-          "fatal error, a collection is not at the first level in the "
-          "library");
+          "{}: : fatal error, a collection is not at the first level in the "
+          "library",
+          __PRETTY_FUNCTION__);
       return false;
     }
   }
@@ -158,7 +162,8 @@ bool HyperGraphActionLibrary::registerAction(
     return collection->registerAction(action);
   }
 #ifdef G2O_DEBUG_ACTIONLIB
-  G2O_DEBUG("creating collection for {}", action->name());
+  G2O_DEBUG("{}: creating collection for {}", __PRETTY_FUNCTION__,
+            action->name());
 #endif
   collection = new HyperGraphElementActionCollection(action->name());
   _actionMap.insert(make_pair(

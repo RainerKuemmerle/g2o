@@ -42,7 +42,7 @@ g2o_core_api.h
 )
 
 target_include_directories(core PUBLIC
-  "$<BUILD_INTERFACE:${g2o_SOURCE_DIR};${g2o_BINARY_DIR}>"
+  "$<BUILD_INTERFACE:${g2o_SOURCE_DIR};${PROJECT_BINARY_DIR}>"
   $<INSTALL_INTERFACE:include/g2o/core>
 )
 
@@ -50,7 +50,7 @@ set_target_properties(core PROPERTIES OUTPUT_NAME ${LIB_PREFIX}core)
 set_target_properties(core PROPERTIES
   VERSION ${G2O_LIB_VERSION}
   SOVERSION ${G2O_LIB_SOVERSION})
-target_link_libraries(core PUBLIC stuff Eigen3::Eigen)
+target_link_libraries(core PUBLIC stuff ${G2O_EIGEN3_EIGEN_TARGET})
 target_link_libraries(core PUBLIC g2o_ceres_ad)
 target_compile_features(core PUBLIC cxx_std_17)
 
@@ -65,9 +65,6 @@ install(TARGETS core
   ARCHIVE DESTINATION ${ARCHIVE_DESTINATION}
   INCLUDES DESTINATION ${INCLUDES_DESTINATION}
 )
-
-# Create alias target for easier usage when included as subdirectory
-add_library(g2o::core ALIAS core)
 
 file(GLOB headers "${CMAKE_CURRENT_SOURCE_DIR}/*.h" "${CMAKE_CURRENT_SOURCE_DIR}/*.hpp")
 

@@ -22,7 +22,6 @@
 #include "g2o/core/optimization_algorithm_gauss_newton.h"
 #include "g2o/examples/interactive_slam/g2o_interactive/types_slam2d_online.h"
 #include "g2o/examples/interactive_slam/g2o_interactive/types_slam3d_online.h"
-#include "g2o/stuff/logger.h"
 #include "g2o/stuff/macros.h"
 
 using namespace std;
@@ -46,9 +45,9 @@ std::unique_ptr<g2o::Solver> AllocateCholmodSolver() {
  * \brief backing up some information about the vertex
  */
 struct VertexBackup {
-  int hessianIndex = 0;
-  OptimizableGraph::Vertex* vertex = nullptr;
-  double* hessianData = nullptr;
+  int hessianIndex;
+  OptimizableGraph::Vertex* vertex;
+  double* hessianData;
   bool operator<(const VertexBackup& other) const {
     return hessianIndex < other.hessianIndex;
   }
@@ -99,7 +98,8 @@ int SparseOptimizerIncremental::optimize(int iterations, bool online) {
     if (!online) {
       ok = _underlyingSolver->buildStructure();
       if (!ok) {
-        G2O_ERROR("Failure while building CCS structure");
+        cerr << __PRETTY_FUNCTION__ << ": Failure while building CCS structure"
+             << endl;
         return 0;
       }
     }
@@ -235,7 +235,12 @@ bool SparseOptimizerIncremental::updateInitialization(
   // cerr << "updating index mapping done." << endl;
 
   // backup the tempindex and prepare sorting structure
-  std::vector<VertexBackup> backupIdx(_touchedVertices.size());
+#ifdef _MSC_VER
+  VertexBackup* backupIdx = new VertexBackup[_touchedVertices.size()];
+#else
+  VertexBackup backupIdx[_touchedVertices.size()];
+#endif
+  memset(backupIdx, 0, sizeof(VertexBackup) * _touchedVertices.size());
   int idx = 0;
   for (HyperGraph::VertexSet::iterator it = _touchedVertices.begin();
        it != _touchedVertices.end(); ++it) {
@@ -245,8 +250,10 @@ bool SparseOptimizerIncremental::updateInitialization(
     backupIdx[idx].hessianData = v->hessianData();
     ++idx;
   }
-  sort(backupIdx.begin(),
-       backupIdx.end());  // sort according to the hessianIndex which is the
+  sort(backupIdx,
+       backupIdx +
+           _touchedVertices
+               .size());  // sort according to the hessianIndex which is the
                           // same order as used later by the optimizer
   for (int i = 0; i < idx; ++i) {
     backupIdx[i].vertex->setHessianIndex(i);
@@ -373,6 +380,9 @@ bool SparseOptimizerIncremental::updateInitialization(
     }
   }
   cholmod_free_sparse(&updateAsSparseFactor, &_cholmodCommon);
+#ifdef _MSC_VER
+  delete[] backupIdx;
+#endif
 
 #if 0
     cholmod_sparse* updatePermuted = cholmod_triplet_to_sparse(_permutedUpdate, _permutedUpdate->nnz, &_cholmodCommon);
@@ -398,7 +408,8 @@ bool SparseOptimizerIncremental::computeCholeskyUpdate() {
   size_t n = A.cols();
 
   if (_cholmodSparse->columnsAllocated < n) {
-    G2O_DEBUG("reallocating columns");
+    // std::cerr << __PRETTY_FUNCTION__ << ": reallocating columns" <<
+    // std::endl;
     _cholmodSparse->columnsAllocated =
         _cholmodSparse->columnsAllocated == 0
             ? n
@@ -408,7 +419,8 @@ bool SparseOptimizerIncremental::computeCholeskyUpdate() {
   }
   size_t nzmax = A.nonZeros();
   if (_cholmodSparse->nzmax < nzmax) {
-    G2O_DEBUG("reallocating row + values");
+    // std::cerr << __PRETTY_FUNCTION__ << ": reallocating row + values" <<
+    // std::endl;
     _cholmodSparse->nzmax =
         _cholmodSparse->nzmax == 0
             ? nzmax
@@ -471,7 +483,7 @@ static OptimizationAlgorithm* createSolver(const std::string& solverName) {
 }
 
 bool SparseOptimizerIncremental::initSolver(int dimension, int batchEveryN) {
-  G2O_TRACE("init solver");
+  // cerr << __PRETTY_FUNCTION__ << endl;
   slamDimension = dimension;
   if (dimension == 3) {
     setAlgorithm(createSolver("fix3_2_cholmod"));

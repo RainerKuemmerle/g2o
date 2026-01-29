@@ -37,7 +37,7 @@ template <int D, typename E, typename VertexXi>
 class BaseUnaryEdge : public BaseFixedSizedEdge<D, E, VertexXi> {
  public:
   using VertexXiType = VertexXi;
-  BaseUnaryEdge() : BaseFixedSizedEdge<D, E, VertexXi>() {};
+  BaseUnaryEdge() : BaseFixedSizedEdge<D, E, VertexXi>(){};
 
  protected:
   typename BaseFixedSizedEdge<D, E, VertexXi>::template JacobianType<

@@ -17,6 +17,7 @@
 // along with g2o.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <QApplication>
+#include <iostream>
 
 #include "g2o/apps/g2o_cli/dl_wrapper.h"
 #include "g2o/apps/g2o_cli/g2o_common.h"

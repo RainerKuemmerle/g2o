@@ -25,7 +25,6 @@
 #include "g2o/core/batch_stats.h"
 #include "g2o/core/linear_solver.h"
 #include "g2o/solvers/cholmod/cholmod_ext.h"
-#include "g2o/stuff/logger.h"
 #include "g2o/stuff/timeutil.h"
 #include "g2o_incremental_api.h"
 
@@ -139,7 +138,7 @@ class LinearSolverCholmodOnline : public LinearSolver<MatrixType>,
 
   int choleskyUpdate(cholmod_sparse* update) {
     int result = cholmod_updown(1, update, _cholmodFactor, &_cholmodCommon);
-    G2O_TRACE("result {}", result);
+    // std::cerr << __PRETTY_FUNCTION__ << " " << result << std::endl;
     if (_cholmodCommon.status == CHOLMOD_NOT_POSDEF) {
       std::cerr
           << "Cholesky failure, writing debug.txt (Hessian loadable by Octave)"
@@ -236,7 +235,8 @@ class LinearSolverCholmodOnline : public LinearSolver<MatrixType>,
     size_t n = A.cols() + additionalSpace;
 
     if (_cholmodSparse->columnsAllocated < n) {
-      G2O_DEBUG("reallocating columns");
+      // std::cerr << __PRETTY_FUNCTION__ << ": reallocating columns" <<
+      // std::endl;
       _cholmodSparse->columnsAllocated =
           _cholmodSparse->columnsAllocated == 0
               ? n
@@ -247,7 +247,8 @@ class LinearSolverCholmodOnline : public LinearSolver<MatrixType>,
     if (!onlyValues) {
       size_t nzmax = A.nonZeros() + additionalSpace;
       if (_cholmodSparse->nzmax < nzmax) {
-        G2O_DEBUG("reallocating row + values");
+        // std::cerr << __PRETTY_FUNCTION__ << ": reallocating row + values" <<
+        // std::endl;
         _cholmodSparse->nzmax =
             _cholmodSparse->nzmax == 0
                 ? nzmax

@@ -23,9 +23,6 @@ install(TARGETS solver_slam2d_linear
   INCLUDES DESTINATION ${INCLUDES_DESTINATION}
 )
 
-# Create alias target for easier usage when included as subdirectory
-add_library(g2o::solver_slam2d_linear ALIAS solver_slam2d_linear)
-
 file(GLOB headers "${CMAKE_CURRENT_SOURCE_DIR}/*.h" "${CMAKE_CURRENT_SOURCE_DIR}/*.hpp")
 
 install(FILES ${headers} DESTINATION ${INCLUDES_INSTALL_DIR}/solvers/slam2d_linear)

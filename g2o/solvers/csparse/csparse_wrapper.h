@@ -27,15 +27,15 @@
 #ifndef G2O_CSPARSE_WRAPPER_H
 #define G2O_CSPARSE_WRAPPER_H
 
+#include <cstddef>
 #include <memory>
 
 #include "g2o/core/eigen_types.h"
-#include "g2o_csparse_api.h"
 
 namespace g2o {
 namespace csparse {
 
-class G2O_SOLVER_CSPARSE_API CSparse {
+class CSparse {
  public:
   CSparse();
   ~CSparse();

@@ -26,8 +26,6 @@
 
 #include "edge_project_p2sc.h"
 
-#include <cmath>
-
 namespace g2o {
 
 // point to camera projection, stereo
@@ -106,7 +104,7 @@ void EdgeProjectP2SC::linearizeOplus() {
   double py = pc(1);
   double pz = pc(2);
   double ipz2 = 1.0 / (pz * pz);
-  if (std::isnan(ipz2)) {
+  if (g2o_isnan(ipz2)) {
     std::cout << "[SetJac] infinite jac" << std::endl;
     abort();
   }

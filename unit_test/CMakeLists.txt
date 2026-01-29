@@ -6,8 +6,6 @@ FetchContent_Declare(
 )
 # For Windows: Prevent overriding the parent project's compiler/linker settings
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-# Prevent installing gtest/gmock
-set(INSTALL_GTEST OFF CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 
 macro(create_test target)
@@ -26,4 +24,3 @@ add_subdirectory(slam3d_addons)
 add_subdirectory(sim3)
 add_subdirectory(sba)
 add_subdirectory(solver)
-add_subdirectory(icp)

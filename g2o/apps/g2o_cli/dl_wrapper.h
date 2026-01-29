@@ -34,7 +34,6 @@
 // clang-format on
 
 #include <string>
-#include <unordered_set>
 #include <vector>
 
 #include "g2o_cli_api.h"
@@ -78,7 +77,7 @@ class G2O_CLI_API DlWrapper {
 #elif defined(WINDOWS)
   std::vector<HMODULE> _handles;
 #endif
-  std::unordered_set<std::string> _filenames;
+  std::vector<std::string> _filenames;
 };
 
 }  // namespace g2o

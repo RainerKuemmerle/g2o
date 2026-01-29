@@ -42,7 +42,9 @@ class EdgeSE3Calib
                                                   // BaseEdge in MSVC
 {
  public:
-  G2O_TYPES_SLAM3D_ADDONS_API EdgeSE3Calib();
+  G2O_TYPES_SLAM3D_ADDONS_API EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+      G2O_TYPES_SLAM3D_ADDONS_API
+      EdgeSE3Calib();
 
   G2O_TYPES_SLAM3D_ADDONS_API void computeError();
   G2O_TYPES_SLAM3D_ADDONS_API virtual bool read(std::istream& is);

@@ -30,12 +30,10 @@
 #include <cstddef>
 #include <memory>
 
-#include "g2o_cholmod_api.h"
-
 namespace g2o {
 namespace cholmod {
 
-class G2O_SOLVER_CHOLMOD_API Cholmod {
+class Cholmod {
  public:
   Cholmod();
   ~Cholmod();

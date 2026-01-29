@@ -29,11 +29,10 @@
 #define G2O_STRUCTURE_ONLY_SOLVER_H
 
 #include <cassert>
-#include <cmath>
-#include <vector>
 
+#include "g2o/core/base_binary_edge.h"
+#include "g2o/core/base_vertex.h"
 #include "g2o/core/optimization_algorithm.h"
-#include "g2o/core/robust_kernel.h"
 #include "g2o/core/sparse_optimizer.h"
 
 namespace g2o {
@@ -118,7 +117,11 @@ class StructureOnlySolver : public OptimizationAlgorithm {
                 dynamic_cast<g2o::OptimizableGraph::Edge*>(*it_t);
 
             // fix all the other vertices and remember their fix value
+#ifdef WINDOWS
             std::vector<bool> remember_fix_status(e->vertices().size());
+#else
+            bool remember_fix_status[e->vertices().size()];
+#endif
             for (size_t k = 0; k < e->vertices().size(); ++k) {
               OptimizableGraph::Vertex* otherV =
                   static_cast<OptimizableGraph::Vertex*>(e->vertex(k));
@@ -179,9 +182,9 @@ class StructureOnlySolver : public OptimizationAlgorithm {
                   new_chi2 += e->chi2();
                 }
               }
-              assert(std::isnan(new_chi2) == false && "Chi is NaN");
-              const double rho = (chi2 - new_chi2);
-              if (rho > 0 && std::isfinite(new_chi2)) {
+              assert(g2o_isnan(new_chi2) == false && "Chi is NaN");
+              double rho = (chi2 - new_chi2);
+              if (rho > 0 && g2o_isfinite(new_chi2)) {
                 goodStep = true;
                 chi2 = new_chi2;
                 v->discardTop();

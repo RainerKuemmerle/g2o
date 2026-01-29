@@ -34,7 +34,6 @@
 #include "g2o/core/optimization_algorithm_factory.h"
 #include "g2o/core/sparse_optimizer.h"
 #include "g2o/stuff/command_args.h"
-#include "g2o/stuff/logger.h"
 #include "g2o/stuff/sampler.h"
 
 using namespace std;
@@ -65,7 +64,9 @@ class VertexCircle : public g2o::BaseVertex<3, Eigen::Vector3d> {
 
   bool write(std::ostream& /*os*/) const override { return false; }
 
-  void setToOriginImpl() override { G2O_ERROR("not implemented yet"); }
+  void setToOriginImpl() override {
+    cerr << __PRETTY_FUNCTION__ << " not implemented yet" << endl;
+  }
 
   void oplusImpl(const double* update) override {
     Eigen::Vector3d::ConstMapType v(update);

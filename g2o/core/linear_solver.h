@@ -46,7 +46,7 @@ namespace g2o {
 template <typename MatrixType>
 class LinearSolver {
  public:
-  LinearSolver() : _writeDebug(true) {};
+  LinearSolver() : _writeDebug(true){};
   virtual ~LinearSolver() {}
 
   /**

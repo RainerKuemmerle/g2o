@@ -36,7 +36,7 @@ using namespace Eigen;
 namespace g2o {
 
 G2O_REGISTER_TYPE_GROUP(icp);
-G2O_REGISTER_TYPE_NAME("EDGE_V_V_GICP", Edge_V_V_GICP);
+G2O_REGISTER_TYPE(EDGE_V_V_GICP, Edge_V_V_GICP);
 
 namespace types_icp {
 int initialized = 0;
@@ -214,7 +214,7 @@ void Edge_XYZ_VSC::linearizeOplus() {
   double py = pc(1);
   double pz = pc(2);
   double ipz2 = 1.0 / (pz * pz);
-  if (std::isnan(ipz2)) {
+  if (isnan(ipz2)) {
     std::cout << "[SetJac] infinite jac" << std::endl;
     *(int*)0x0 = 0;
   }

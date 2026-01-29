@@ -84,19 +84,12 @@ class G2O_TYPES_ICP_API EdgeGICP {
     y << 0, 1, 0;
     R0.row(2) = normal0;
     y = y - normal0(1) * normal0;
-    double ysquarednorm = y.squaredNorm();
-    if (ysquarednorm >= ySquaredBnd) {
-      y /= std::sqrt(ysquarednorm);
-      R0.row(1) = y;
-      R0.row(0) = normal0.cross(R0.row(1));
-    } else {
-      Vector3 x;
-      x << -1, 0, 0;
-      x = x + normal0(0) * normal0;
-      x.normalize();
-      R0.row(0) = x;
-      R0.row(1) = -normal0.cross(R0.row(0));
-    }
+    y.normalize();  // need to check if y is close to 0
+    R0.row(1) = y;
+    R0.row(0) = normal0.cross(R0.row(1));
+    //      cout << normal.transpose() << endl;
+    //      cout << R0 << endl << endl;
+    //      cout << R0*R0.transpose() << endl << endl;
   }
 
   // set up rotation matrix for pos1
@@ -105,19 +98,9 @@ class G2O_TYPES_ICP_API EdgeGICP {
     y << 0, 1, 0;
     R1.row(2) = normal1;
     y = y - normal1(1) * normal1;
-    double ysquarednorm = y.squaredNorm();
-    if (y.squaredNorm() >= ySquaredBnd) {
-      y /= std::sqrt(ysquarednorm);
-      R1.row(1) = y;
-      R1.row(0) = normal1.cross(R1.row(1));
-    } else {
-      Vector3 x;
-      x << -1, 0, 0;
-      x = x + normal1(0) * normal1;
-      x.normalize();
-      R1.row(0) = x;
-      R1.row(1) = -normal1.cross(R1.row(0));
-    }
+    y.normalize();  // need to check if y is close to 0
+    R1.row(1) = y;
+    R1.row(0) = normal1.cross(R1.row(1));
   }
 
   // returns a precision matrix for point-plane
@@ -151,9 +134,6 @@ class G2O_TYPES_ICP_API EdgeGICP {
     cov << 1, 0, 0, 0, 1, 0, 0, 0, e;
     return R1.transpose() * cov * R1;
   }
-
-  // this parameter is used by makeRot0 and makeRot1
-  static constexpr double ySquaredBnd{0.1};
 };
 
 // 3D rigid constraint

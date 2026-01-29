@@ -77,10 +77,6 @@ class G2O_TYPES_SLAM2D_API EdgeSE2PointXYBearing
   }
   virtual void initialEstimate(const OptimizableGraph::VertexSet& from,
                                OptimizableGraph::Vertex* to);
-
-#ifndef NUMERIC_JACOBIAN_TWO_D_TYPES
-  virtual void linearizeOplus();
-#endif
 };
 
 class G2O_TYPES_SLAM2D_API EdgeSE2PointXYBearingWriteGnuplotAction

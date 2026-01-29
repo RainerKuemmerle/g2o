@@ -71,10 +71,8 @@ HMODULE getMyInstance() {
 }
 #endif
 
-static constexpr std::string_view TYPES_PATTERN =
-    "^.*g2o_types_.*\\." SO_EXT "$";
-static constexpr std::string_view SOLVERS_PATTERN =
-    "^.*g2o_solver_.*\\." SO_EXT "$";
+static constexpr std::string_view TYPES_PATTERN = "*_types_*." SO_EXT;
+static constexpr std::string_view SOLVERS_PATTERN = "*_solver_*." SO_EXT;
 
 namespace g2o {
 

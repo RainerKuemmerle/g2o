@@ -20,6 +20,7 @@
 
 #include "g2o/examples/interactive_slam/g2o_interactive/g2o_slam_interface.h"
 #include "g2o/stuff/command_args.h"
+#include "g2o/stuff/macros.h"
 #include "g2o/stuff/string_tools.h"
 #include "g2o/stuff/tictoc.h"
 #include "graph_optimizer_sparse_incremental.h"
@@ -76,7 +77,7 @@ void sigquit_handler(int sig) {
     hasToStop = 1;
     static int cnt = 0;
     if (cnt++ == 2) {
-      G2O_WARN("forcing exit");
+      cerr << __PRETTY_FUNCTION__ << " forcing exit" << endl;
       exit(1);
     }
   }
