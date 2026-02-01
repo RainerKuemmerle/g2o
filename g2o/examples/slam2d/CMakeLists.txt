@@ -1,12 +1,3 @@
-# qt components used (also by qglviewer): Core Gui Xml OpenGL Widgets
-include_directories(SYSTEM
-    ${QGLVIEWER_INCLUDE_DIR}
-    ${Qt5Core_INCLUDE_DIRS}
-    ${Qt5Gui_INCLUDE_DIRS}
-    ${Qt5Xml_INCLUDE_DIRS}
-    ${Qt5Widgets_INCLUDE_DIRS}
-    ${Qt5OpenGL_INCLUDE_DIRS}
-)
 include_directories(${CMAKE_BINARY_DIR} ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
 
 QT5_WRAP_UI(UI_HEADERS base_main_window.ui)
@@ -32,10 +23,5 @@ if(Qt5_POSITION_INDEPENDENT_CODE)
 endif()
 
 target_link_libraries(slam2d_g2o core solver_eigen types_slam2d opengl_helper
-    ${QGLVIEWER_LIBRARY}
-    ${Qt5Core_LIBRARIES}
-    ${Qt5Gui_LIBRARIES}
-    ${Qt5Xml_LIBRARIES}
-    ${Qt5Widgets_LIBRARIES}
-    ${Qt5OpenGL_LIBRARIES}
+    QGLViewer::QGLViewer
 )
