@@ -22,7 +22,6 @@
 
 #include "g2o/core/hyper_graph_action.h"
 #include "g2o/core/sparse_optimizer.h"
-#include "g2o/stuff/opengl_primitives.h"
 
 // Version comparison macro for QGLViewer
 // QGLVIEWER_VERSION format: 0xMMmmPP where MM=major, mm=minor, PP=patch
@@ -67,12 +66,12 @@ class StandardCamera : public qglviewer::Camera {
   using qglv_real = decltype(qglviewer::Camera().zNear());
 
   qglv_real zNear() const override {
-    if (standard_) return qglv_real(0.001);
+    if (standard_) return static_cast<qglv_real>(0.001);
     return Camera::zNear();
   }
 
   qglv_real zFar() const override {
-    if (standard_) return qglv_real(10000.0);
+    if (standard_) return static_cast<qglv_real>(10000.0);
     return Camera::zFar();
   }
 
