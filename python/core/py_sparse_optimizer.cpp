@@ -25,15 +25,17 @@ void declareSparseOptimizer(py::module& m) {
       .def("initialize_optimization",
            static_cast<bool (CLS::*)(HyperGraph::EdgeSet&)>(
                &CLS::initializeOptimization),
-           "eset"_a)  // virtual
+           "eset"_a,
+           py::call_guard<py::gil_scoped_release>())  // virtual
       .def("initialize_optimization",
            static_cast<bool (CLS::*)(HyperGraph::VertexSet&, int)>(
                &CLS::initializeOptimization),
-           "vset"_a,
-           "level"_a = 0)  // virtual
+           "vset"_a, "level"_a = 0,
+           py::call_guard<py::gil_scoped_release>())  // virtual
       .def("initialize_optimization",
            static_cast<bool (CLS::*)(int)>(&CLS::initializeOptimization),
-           "level"_a = 0)  // virtual
+           "level"_a = 0,
+           py::call_guard<py::gil_scoped_release>())  // virtual
 
       .def("update_initialization", &CLS::updateInitialization, "vset"_a,
            "eset"_a)  // virtual, ->bool
@@ -164,9 +166,9 @@ void declareSparseOptimizer(py::module& m) {
       .def("discard_top", static_cast<void (CLS::*)()>(&CLS::discardTop))
 
       .def("clear", &CLS::clear)  // virtual, -> void
-      .def("compute_active_errors",
-           &CLS::computeActiveErrors)           // virtual, -> void
-      .def("update", &CLS::update, "update"_a)  // -> void
+      .def("compute_active_errors", &CLS::computeActiveErrors,
+           py::call_guard<py::gil_scoped_release>())  // virtual, -> void
+      .def("update", &CLS::update, "update"_a)        // -> void
 
       .def("batch_statistics",
            static_cast<const BatchStatisticsContainer& (CLS::*)() const>(
