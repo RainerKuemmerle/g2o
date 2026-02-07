@@ -6,7 +6,7 @@ build-backend = "scikit_build_core.build"
 name = "g2opy"
 version = "2.2.0"
 description="g2o: A General Framework for Graph Optimization"
-readme = "README.md"
+readme = "python/README.md"
 authors = [
   { name = "Rainer Kuemmerle", email = "rainer.kuemmerle@gmail.com" },
 ]
