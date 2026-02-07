@@ -298,7 +298,7 @@ void declareEigenTypes(py::module& m) {
       .def("rotation_matrix", &Eigen::AngleAxisd::toRotationMatrix)
       .def("matrix", &Eigen::AngleAxisd::toRotationMatrix)
       .def_property_readonly("R", &Eigen::AngleAxisd::toRotationMatrix)
-      .def_static("ientity", &Eigen::AngleAxisd::Identity);
+      .def_static("identity", &Eigen::AngleAxisd::Identity);
 
   py::native_enum<Eigen::TransformTraits>(m, "TransformTraits", "enum.Enum")
       .value("Isometry", Eigen::Isometry)

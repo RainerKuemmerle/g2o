@@ -40,6 +40,9 @@ void declareCore(py::module& m) {
   declareG2OBatchStatistics(m);
 
   declareJacobianWorkspace(m);
+  // NOTE: Base vertex/edge classes not exposed for Python subclassing
+  // due to complexity with pybind11 trampoline classes. Users can use
+  // VertexVectorX and VariableVectorXEdge for dynamic optimization variables.
   // declareBaseVertex(m);
   // declareBaseEdge(m);
   // declareBaseVariableSizedEdge(m);
