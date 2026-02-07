@@ -7,6 +7,7 @@
 #include "g2o/types/slam2d/edge_se2_prior.h"
 #include "g2o/types/slam2d/edge_se2_twopointsxy.h"
 #include "g2o/types/slam2d/edge_se2_xyprior.h"
+#include "g2o/types/slam2d/edge_xy_prior.h"
 
 namespace g2o {
 
@@ -16,6 +17,7 @@ inline void declareEdgeSE2(detail::Registry& registry) {
   registry.registerEdgeFixed<EdgeSE2Prior>("EdgeSE2Prior");
   registry.registerEdgeFixed<EdgeSE2TwoPointsXY>("EdgeSE2TwoPointsXY");
   registry.registerEdgeFixed<EdgeSE2XYPrior>("EdgeSE2XYPrior");
+  registry.registerEdgeFixed<EdgeXYPrior>("EdgeXYPrior");
 
   registry.registerVariableEdge<EdgeSE2LotsOfXY>("EdgeSE2LotsOfXY");
 }
