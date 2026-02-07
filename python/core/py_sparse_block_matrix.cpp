@@ -44,9 +44,7 @@ void templatedSparseBlockMatrix(py::module& m, const std::string& suffix) {
            static_cast<const std::vector<int>& (CLS::*)(void) const>(
                &CLS::colBlockIndices))
       .def("write_octave", &CLS::writeOctave, "filename"_a,
-           "upperTriangle"_a = false)
-      // TODO(goki): Implement the remaining functions of SparseBlockMatrix
-      ;
+           "upperTriangle"_a = false);
 }
 }  // namespace
 
