@@ -81,7 +81,7 @@ class LinearSolver {
    */
   virtual bool solvePattern(
       SparseBlockMatrix<MatrixX>& spinv,
-      const std::vector<std::pair<int, int> >& blockIndices,
+      const std::vector<std::pair<int, int>>& blockIndices,
       const SparseBlockMatrix<MatrixType>& A) {
     (void)spinv;
     (void)blockIndices;
@@ -150,7 +150,7 @@ template <typename MatrixType>
 class LinearSolverCCS : public LinearSolver<MatrixType> {
  public:
   LinearSolverCCS() : LinearSolver<MatrixType>(), ccsMatrix_(nullptr) {}
-  ~LinearSolverCCS() override { delete ccsMatrix_; }
+  ~LinearSolverCCS() override = default;
 
   bool solveBlocks(double**& blocks,
                    const SparseBlockMatrix<MatrixType>& A) override {
@@ -162,7 +162,7 @@ class LinearSolverCCS : public LinearSolver<MatrixType> {
   }
 
   bool solvePattern(SparseBlockMatrix<MatrixX>& spinv,
-                    const std::vector<std::pair<int, int> >& blockIndices,
+                    const std::vector<std::pair<int, int>>& blockIndices,
                     const SparseBlockMatrix<MatrixType>& A) override {
     auto compute = [&](MarginalCovarianceCholesky& mcc) {
       mcc.computeCovariance(spinv, A.rowBlockIndices(), blockIndices);
@@ -175,13 +175,12 @@ class LinearSolverCCS : public LinearSolver<MatrixType> {
   void setBlockOrdering(bool blockOrdering) { blockOrdering_ = blockOrdering; }
 
  protected:
-  SparseBlockMatrixCCS<MatrixType>* ccsMatrix_;
+  std::unique_ptr<SparseBlockMatrixCCS<MatrixType>> ccsMatrix_;
   bool blockOrdering_{true};
 
   void initMatrixStructure(const SparseBlockMatrix<MatrixType>& A) {
-    delete ccsMatrix_;
-    ccsMatrix_ = new SparseBlockMatrixCCS<MatrixType>(A.rowBlockIndices(),
-                                                      A.colBlockIndices());
+    ccsMatrix_ = std::make_unique<SparseBlockMatrixCCS<MatrixType>>(
+        A.rowBlockIndices(), A.colBlockIndices());
     A.fillSparseBlockMatrixCCS(*ccsMatrix_);
   }
 
