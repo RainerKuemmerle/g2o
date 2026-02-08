@@ -276,28 +276,29 @@ bool BlockSolver<Traits>::buildStructure(bool zeroBlocks) {
   numLandmarks_ = 0;
   sizePoses_ = 0;
   sizeLandmarks_ = 0;
-  int* blockPoseIndices = new int[optimizer_->indexMapping().size()];
-  int* blockLandmarkIndices = new int[optimizer_->indexMapping().size()];
 
-  for (auto* v : optimizer_->indexMapping()) {
-    int dim = v->dimension();
-    if (!v->marginalized()) {
-      v->setColInHessian(sizePoses_);
-      sizePoses_ += dim;
-      blockPoseIndices[numPoses_] = sizePoses_;
-      ++numPoses_;
-    } else {
-      v->setColInHessian(sizeLandmarks_);
-      sizeLandmarks_ += dim;
-      blockLandmarkIndices[numLandmarks_] = sizeLandmarks_;
-      ++numLandmarks_;
+  {
+    std::vector<int> blockPoseIndices(optimizer_->indexMapping().size());
+    std::vector<int> blockLandmarkIndices(optimizer_->indexMapping().size());
+
+    for (auto* v : optimizer_->indexMapping()) {
+      int dim = v->dimension();
+      if (!v->marginalized()) {
+        v->setColInHessian(sizePoses_);
+        sizePoses_ += dim;
+        blockPoseIndices[numPoses_] = sizePoses_;
+        ++numPoses_;
+      } else {
+        v->setColInHessian(sizeLandmarks_);
+        sizeLandmarks_ += dim;
+        blockLandmarkIndices[numLandmarks_] = sizeLandmarks_;
+        ++numLandmarks_;
+      }
+      sparseDim += dim;
     }
-    sparseDim += dim;
+    resize(blockPoseIndices.data(), numPoses_, blockLandmarkIndices.data(),
+           numLandmarks_, sparseDim);
   }
-  resize(blockPoseIndices, numPoses_, blockLandmarkIndices, numLandmarks_,
-         sparseDim);
-  delete[] blockLandmarkIndices;
-  delete[] blockPoseIndices;
 
   // allocate the diagonal on Hpp and Hll
   int poseIdx = 0;
