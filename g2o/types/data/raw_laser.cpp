@@ -26,12 +26,9 @@
 
 #include "raw_laser.h"
 
-#include <stddef.h>
-
 #include <cmath>
 #include <iostream>
 
-#include "g2o/stuff/logger.h"
 #include "g2o/stuff/misc.h"
 #include "g2o/types/data/laser_parameters.h"
 
@@ -41,10 +38,25 @@ RawLaser::RawLaser()
     : laserParams_(0, 180, -const_pi() / 2, const_pi() / 180, 50, cst(0.1), 0) {
 }
 
-bool RawLaser::write(std::ostream& /*os*/) const {
-  // TODO(Rainer): implement writing of raw laser
-  G2O_ERROR("RawLaser::write() not implemented yet.");
-  return false;
+bool RawLaser::write(std::ostream& os) const {
+  os << laserParams_.type << " " << laserParams_.firstBeamAngle << " "
+     << laserParams_.fov << " " << laserParams_.angularStep << " "
+     << laserParams_.maxRange << " " << laserParams_.accuracy << " "
+     << laserParams_.remissionMode << "\n";
+
+  // Write ranges
+  os << ranges_.size() << "\n";
+  for (double r : ranges_) os << r << " ";
+  if (!ranges_.empty()) os << "\n";
+
+  // Write remissions
+  os << remissions_.size() << "\n";
+  for (double rem : remissions_) os << rem << " ";
+  if (!remissions_.empty()) os << "\n";
+
+  // Write timestamps and host
+  os << timestamp_ << "\n" << hostname_ << "\n" << loggerTimestamp_ << "\n";
+  return os.good();
 }
 
 bool RawLaser::read(std::istream& is) {
@@ -93,7 +105,7 @@ RawLaser::Point2DVector RawLaser::cartesian() const {
     const double& r = ranges_[i];
     if (r < laserParams_.maxRange && r > laserParams_.minRange) {
       const double alpha =
-          laserParams_.firstBeamAngle + i * laserParams_.angularStep;
+          laserParams_.firstBeamAngle + (i * laserParams_.angularStep);
       points.emplace_back(std::cos(alpha) * r, std::sin(alpha) * r);
     }
   }

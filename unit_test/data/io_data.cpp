@@ -29,15 +29,18 @@
 #include <sstream>
 
 #include "g2o/stuff/sampler.h"
+#include "g2o/types/data/raw_laser.h"
 #include "g2o/types/data/robot_laser.h"
 
 using namespace testing;  // NOLINT
 
+namespace {
 MATCHER(NearEq, "") { return fabs(std::get<0>(arg) - std::get<1>(arg)) < 0.01; }
 
 MATCHER(PointsNearEq, "") {
   return (std::get<0>(arg) - std::get<1>(arg)).norm() < 0.01;
 }
+}  // namespace
 
 TEST(Data, ReadWriteRobotLaser) {
   constexpr int kNumBeams = 180;
@@ -69,6 +72,39 @@ TEST(Data, ReadWriteRobotLaser) {
       laser.odomPose().toVector()));
   ASSERT_TRUE(recoveredLaser.laserPose().toVector().isApprox(
       laser.laserPose().toVector()));
+
+  ASSERT_THAT(recoveredLaser.ranges(), Pointwise(NearEq(), laser.ranges()));
+  ASSERT_THAT(recoveredLaser.remissions(),
+              Pointwise(NearEq(), laser.remissions()));
+  ASSERT_THAT(recoveredLaser.cartesian(),
+              Pointwise(PointsNearEq(), laser.cartesian()));
+}
+
+TEST(Data, ReadWriteRawLaser) {
+  constexpr int kNumBeams = 180;
+
+  std::vector<double> ranges;
+  std::vector<double> remissions;
+  for (int i = 0; i < kNumBeams; ++i) {
+    ranges.push_back(i * 0.1);
+    remissions.push_back(g2o::sampleUniform(0., 1.));
+  }
+
+  const g2o::LaserParameters laserParams(kNumBeams, -M_PI_2, 1.0, 20.0);
+  g2o::RawLaser laser;
+  laser.setLaserParams(laserParams);
+  laser.setRanges(ranges);
+  laser.setRemissions(remissions);
+
+  // write the data to read again
+  std::stringstream dataStream;
+  laser.write(dataStream);
+
+  g2o::RawLaser recoveredLaser;
+  recoveredLaser.read(dataStream);
+
+  ASSERT_THAT(recoveredLaser.ranges(), SizeIs(laser.ranges().size()));
+  ASSERT_THAT(recoveredLaser.remissions(), SizeIs(laser.remissions().size()));
 
   ASSERT_THAT(recoveredLaser.ranges(), Pointwise(NearEq(), laser.ranges()));
   ASSERT_THAT(recoveredLaser.remissions(),
