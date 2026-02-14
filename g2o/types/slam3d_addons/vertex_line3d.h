@@ -53,6 +53,7 @@ class G2O_TYPES_SLAM3D_ADDONS_API VertexLine3D : public BaseVertex<4, Line3D> {
 };
 
 #ifdef G2O_HAVE_OPENGL
+// LCOV_EXCL_START
 class VertexLine3DDrawAction : public DrawAction {
  public:
   VertexLine3DDrawAction();
@@ -64,6 +65,7 @@ class VertexLine3DDrawAction : public DrawAction {
       HyperGraphElementAction::Parameters& params_) override;
   std::shared_ptr<FloatProperty> lineLength_, lineWidth_;
 };
+// LCOV_EXCL_STOP
 #endif
 
 }  // namespace g2o

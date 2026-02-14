@@ -69,6 +69,7 @@ G2O_REGISTER_TYPE_NAME("EDGE_SE3_LOTSOF_XYZ", EdgeSE3LotsOfXYZ)
 
 /*********** ACTIONS ************/
 #ifdef G2O_HAVE_OPENGL
+// LCOV_EXCL_START
 G2O_REGISTER_ACTION(VertexPointXYZDrawAction);
 G2O_REGISTER_ACTION(VertexSE3DrawAction);
 G2O_REGISTER_ACTION(EdgeSE3DrawAction);
@@ -76,6 +77,7 @@ G2O_REGISTER_ACTION(EdgeSE3PointXYZDrawAction);
 G2O_REGISTER_ACTION(EdgeProjectDisparityDrawAction);
 G2O_REGISTER_ACTION(CacheCameraDrawAction);
 G2O_REGISTER_ACTION(CacheSE3OffsetDrawAction);
+// LCOV_EXCL_STOP
 #endif
 
 }  // namespace g2o

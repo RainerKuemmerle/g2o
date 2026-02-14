@@ -77,6 +77,7 @@ class G2O_TYPES_SLAM3D_API EdgeSE3
 };
 
 #ifdef G2O_HAVE_OPENGL
+// LCOV_EXCL_START
 /**
  * \brief Visualize a 3D pose-pose constraint
  */
@@ -86,6 +87,7 @@ class G2O_TYPES_SLAM3D_API EdgeSE3DrawAction : public DrawAction {
   bool operator()(HyperGraph::HyperGraphElement& element,
                   HyperGraphElementAction::Parameters& params_) override;
 };
+// LCOV_EXCL_STOP
 #endif
 
 }  // namespace g2o

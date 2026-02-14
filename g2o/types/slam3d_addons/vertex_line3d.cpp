@@ -36,6 +36,7 @@ namespace g2o {
 VertexLine3D::VertexLine3D() : color(1., 0.5, 0.) {}
 
 #ifdef G2O_HAVE_OPENGL
+// LCOV_EXCL_START
 VertexLine3DDrawAction::VertexLine3DDrawAction()
     : DrawAction(typeid(VertexLine3D).name()),
       lineLength_(nullptr),
@@ -101,6 +102,7 @@ bool VertexLine3DDrawAction::operator()(
 
   return true;
 }
+// LCOV_EXCL_STOP
 #endif
 
 }  // namespace g2o

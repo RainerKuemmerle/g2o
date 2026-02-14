@@ -57,6 +57,7 @@ void EdgeSE2OdomDifferentialCalib::computeError() {
 }
 
 #ifdef G2O_HAVE_OPENGL
+// LCOV_EXCL_START
 EdgeSE2OdomDifferentialCalibDrawAction::EdgeSE2OdomDifferentialCalibDrawAction()
     : DrawAction(typeid(EdgeSE2OdomDifferentialCalib).name()) {}
 
@@ -80,6 +81,7 @@ bool EdgeSE2OdomDifferentialCalibDrawAction::operator()(
   glPopAttrib();
   return true;
 }
+// LCOV_EXCL_STOP
 #endif
 
 }  // namespace g2o

@@ -65,6 +65,7 @@ class G2O_TYPES_DATA_API VertexTag : public RobotData {
 };
 
 #ifdef G2O_HAVE_OPENGL
+// LCOV_EXCL_START
 class G2O_TYPES_DATA_API VertexTagDrawAction : public DrawAction {
  public:
   VertexTagDrawAction();
@@ -76,6 +77,7 @@ class G2O_TYPES_DATA_API VertexTagDrawAction : public DrawAction {
       HyperGraphElementAction::Parameters&) override;
   std::shared_ptr<DoubleProperty> textSize_;
 };
+// LCOV_EXCL_STOP
 #endif
 
 }  // namespace g2o

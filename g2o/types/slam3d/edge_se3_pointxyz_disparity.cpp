@@ -157,6 +157,7 @@ void EdgeSE3PointXYZDisparity::initialEstimate(
 }
 
 #ifdef G2O_HAVE_OPENGL
+// LCOV_EXCL_START
 EdgeProjectDisparityDrawAction::EdgeProjectDisparityDrawAction()
     : DrawAction(typeid(EdgeSE3PointXYZDisparity).name()) {}
 
@@ -189,6 +190,7 @@ bool EdgeProjectDisparityDrawAction::operator()(
   glPopAttrib();
   return true;
 }
+// LCOV_EXCL_STOP
 #endif
 
 }  // namespace g2o

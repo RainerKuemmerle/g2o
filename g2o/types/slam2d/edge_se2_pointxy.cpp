@@ -81,6 +81,7 @@ void EdgeSE2PointXY::linearizeOplus() {
 }
 
 #ifdef G2O_HAVE_OPENGL
+// LCOV_EXCL_START
 EdgeSE2PointXYDrawAction::EdgeSE2PointXYDrawAction()
     : DrawAction(typeid(EdgeSE2PointXY).name()) {}
 
@@ -122,6 +123,7 @@ bool EdgeSE2PointXYDrawAction::operator()(
   glPopAttrib();
   return true;
 }
+// LCOV_EXCL_STOP
 #endif
 
 }  // namespace g2o

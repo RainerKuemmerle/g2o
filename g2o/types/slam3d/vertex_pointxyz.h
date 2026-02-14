@@ -51,6 +51,7 @@ class G2O_TYPES_SLAM3D_API VertexPointXYZ : public BaseVertex<3, Vector3> {
 };
 
 #ifdef G2O_HAVE_OPENGL
+// LCOV_EXCL_START
 /**
  * \brief visualize a 3D point
  */
@@ -65,6 +66,7 @@ class VertexPointXYZDrawAction : public DrawAction {
   DrawAction::Parameters* refreshPropertyPtrs(
       HyperGraphElementAction::Parameters& params_) override;
 };
+// LCOV_EXCL_STOP
 #endif
 
 }  // namespace g2o

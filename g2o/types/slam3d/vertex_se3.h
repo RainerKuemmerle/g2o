@@ -71,6 +71,7 @@ class G2O_TYPES_SLAM3D_API VertexSE3 : public BaseVertex<6, Isometry3> {
 };
 
 #ifdef G2O_HAVE_OPENGL
+// LCOV_EXCL_START
 /**
  * \brief visualize the 3D pose vertex
  */
@@ -85,6 +86,7 @@ class G2O_TYPES_SLAM3D_API VertexSE3DrawAction : public DrawAction {
       HyperGraphElementAction::Parameters& params_) override;
   std::shared_ptr<FloatProperty> triangleX_, triangleY_;
 };
+// LCOV_EXCL_STOP
 #endif
 
 }  // namespace g2o

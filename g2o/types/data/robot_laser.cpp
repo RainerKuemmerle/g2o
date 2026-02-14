@@ -115,6 +115,7 @@ bool RobotLaser::write(std::ostream& os) const {
 void RobotLaser::setOdomPose(const SE2& odomPose) { odomPose_ = odomPose; }
 
 #ifdef G2O_HAVE_OPENGL
+// LCOV_EXCL_START
 RobotLaserDrawAction::RobotLaserDrawAction()
     : DrawAction(typeid(RobotLaser).name()),
       beamsDownsampling_(nullptr),
@@ -182,6 +183,7 @@ bool RobotLaserDrawAction::operator()(
 
   return true;
 }
+// LCOV_EXCL_STOP
 #endif
 
 }  // namespace g2o

@@ -40,6 +40,7 @@ namespace g2o {
 VertexPlane::VertexPlane() { color << cst(.2), cst(.2), cst(.2); }
 
 #ifdef G2O_HAVE_OPENGL
+// LCOV_EXCL_START
 
 VertexPlaneDrawAction::VertexPlaneDrawAction()
     : DrawAction(typeid(VertexPlane).name()),
@@ -91,6 +92,7 @@ bool VertexPlaneDrawAction::operator()(
 
   return true;
 }
+// LCOV_EXCL_STOP
 #endif
 
 }  // namespace g2o

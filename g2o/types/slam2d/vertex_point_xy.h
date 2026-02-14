@@ -50,6 +50,7 @@ class G2O_TYPES_SLAM2D_API VertexPointXY : public BaseVertex<2, Vector2> {
 };
 
 #ifdef G2O_HAVE_OPENGL
+// LCOV_EXCL_START
 class G2O_TYPES_SLAM2D_API VertexPointXYDrawAction : public DrawAction {
  public:
   VertexPointXYDrawAction();
@@ -61,6 +62,7 @@ class G2O_TYPES_SLAM2D_API VertexPointXYDrawAction : public DrawAction {
   DrawAction::Parameters* refreshPropertyPtrs(
       HyperGraphElementAction::Parameters& params) override;
 };
+// LCOV_EXCL_STOP
 #endif
 
 }  // namespace g2o

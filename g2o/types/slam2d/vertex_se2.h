@@ -51,6 +51,7 @@ class G2O_TYPES_SLAM2D_API VertexSE2 : public BaseVertex<3, SE2> {
 };
 
 #ifdef G2O_HAVE_OPENGL
+// LCOV_EXCL_START
 class G2O_TYPES_SLAM2D_API VertexSE2DrawAction : public DrawAction {
  public:
   VertexSE2DrawAction();
@@ -63,6 +64,7 @@ class G2O_TYPES_SLAM2D_API VertexSE2DrawAction : public DrawAction {
       HyperGraphElementAction::Parameters& parameters) override;
   std::shared_ptr<FloatProperty> triangleX_, triangleY_;
 };
+// LCOV_EXCL_STOP
 #endif
 
 }  // namespace g2o

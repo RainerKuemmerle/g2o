@@ -41,6 +41,7 @@ namespace g2o {
 VertexPointXY::VertexPointXY() { estimate_.setZero(); }
 
 #ifdef G2O_HAVE_OPENGL
+// LCOV_EXCL_START
 VertexPointXYDrawAction::VertexPointXYDrawAction()
     : DrawAction(typeid(VertexPointXY).name()), pointSize_(nullptr) {}
 
@@ -78,6 +79,7 @@ bool VertexPointXYDrawAction::operator()(
   glPopMatrix();
   return true;
 }
+// LCOV_EXCL_STOP
 #endif
 
 }  // namespace g2o

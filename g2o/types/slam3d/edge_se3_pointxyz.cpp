@@ -129,6 +129,7 @@ void EdgeSE3PointXYZ::initialEstimate(const OptimizableGraph::VertexSet& from,
 }
 
 #ifdef G2O_HAVE_OPENGL
+// LCOV_EXCL_START
 EdgeSE3PointXYZDrawAction::EdgeSE3PointXYZDrawAction()
     : DrawAction(typeid(EdgeSE3PointXYZ).name()) {}
 
@@ -162,6 +163,7 @@ bool EdgeSE3PointXYZDrawAction::operator()(
   glPopAttrib();
   return true;
 }
+// LCOV_EXCL_STOP
 #endif
 
 }  // namespace g2o

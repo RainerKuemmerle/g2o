@@ -89,6 +89,7 @@ class G2O_TYPES_SLAM3D_API CacheSE3Offset : public Cache {
 };
 
 #ifdef G2O_HAVE_OPENGL
+// LCOV_EXCL_START
 class G2O_TYPES_SLAM3D_API CacheSE3OffsetDrawAction : public DrawAction {
  public:
   CacheSE3OffsetDrawAction();
@@ -100,6 +101,7 @@ class G2O_TYPES_SLAM3D_API CacheSE3OffsetDrawAction : public DrawAction {
       HyperGraphElementAction::Parameters& params_) override;
   std::shared_ptr<FloatProperty> cubeSide_;
 };
+// LCOV_EXCL_STOP
 #endif
 
 }  // namespace g2o

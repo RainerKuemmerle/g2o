@@ -71,12 +71,14 @@ class G2O_TYPES_SLAM2D_API EdgeSE2PointXY
 };
 
 #ifdef G2O_HAVE_OPENGL
+// LCOV_EXCL_START
 class G2O_TYPES_SLAM2D_API EdgeSE2PointXYDrawAction : public DrawAction {
  public:
   EdgeSE2PointXYDrawAction();
   bool operator()(HyperGraph::HyperGraphElement& element,
                   HyperGraphElementAction::Parameters& params_) override;
 };
+// LCOV_EXCL_STOP
 #endif
 
 }  // namespace g2o

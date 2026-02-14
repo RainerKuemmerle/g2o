@@ -66,6 +66,7 @@ class G2O_TYPES_SLAM2D_ADDONS_API VertexSegment2D
 };
 
 #ifdef G2O_HAVE_OPENGL
+// LCOV_EXCL_START
 class G2O_TYPES_SLAM2D_ADDONS_API VertexSegment2DDrawAction
     : public DrawAction {
  public:
@@ -78,6 +79,7 @@ class G2O_TYPES_SLAM2D_ADDONS_API VertexSegment2DDrawAction
   DrawAction::Parameters* refreshPropertyPtrs(
       HyperGraphElementAction::Parameters& params_) override;
 };
+// LCOV_EXCL_STOP
 #endif
 
 }  // namespace g2o

@@ -49,6 +49,7 @@ void VertexSE2::oplusImpl(const VectorX::MapType& update) {
 }
 
 #ifdef G2O_HAVE_OPENGL
+// LCOV_EXCL_START
 VertexSE2DrawAction::VertexSE2DrawAction()
     : DrawAction(typeid(VertexSE2).name()),
       triangleX_(nullptr),
@@ -93,6 +94,7 @@ bool VertexSE2DrawAction::operator()(
   glPopMatrix();
   return true;
 }
+// LCOV_EXCL_STOP
 #endif
 
 }  // namespace g2o

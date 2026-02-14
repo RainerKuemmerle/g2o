@@ -60,6 +60,7 @@ class G2O_TYPES_SLAM3D_ADDONS_API EdgeSE3Line3D
 };
 
 #ifdef G2O_HAVE_OPENGL
+// LCOV_EXCL_START
 class G2O_TYPES_SLAM3D_ADDONS_API EdgeSE3Line3DDrawAction : public DrawAction {
  public:
   EdgeSE3Line3DDrawAction();
@@ -71,6 +72,7 @@ class G2O_TYPES_SLAM3D_ADDONS_API EdgeSE3Line3DDrawAction : public DrawAction {
       HyperGraphElementAction::Parameters& params_) override;
   std::shared_ptr<FloatProperty> lineLength_, lineWidth_;
 };
+// LCOV_EXCL_STOP
 #endif
 
 }  // namespace g2o

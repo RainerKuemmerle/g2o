@@ -40,6 +40,7 @@ namespace g2o {
 VertexSegment2D::VertexSegment2D() { estimate_.setZero(); }
 
 #ifdef G2O_HAVE_OPENGL
+// LCOV_EXCL_START
 VertexSegment2DDrawAction::VertexSegment2DDrawAction()
     : DrawAction(typeid(VertexSegment2D).name()), pointSize_(nullptr) {}
 
@@ -76,6 +77,7 @@ bool VertexSegment2DDrawAction::operator()(
   glEnd();
   return true;
 }
+// LCOV_EXCL_STOP
 #endif
 
 }  // namespace g2o

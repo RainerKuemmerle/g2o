@@ -40,6 +40,7 @@ EdgeSE3PlaneSensorCalib::EdgeSE3PlaneSensorCalib()
 }
 
 #ifdef G2O_HAVE_OPENGL
+// LCOV_EXCL_START
 EdgeSE3PlaneSensorCalibDrawAction::EdgeSE3PlaneSensorCalibDrawAction()
     : DrawAction(typeid(EdgeSE3PlaneSensorCalib).name()),
       planeWidth_(nullptr),
@@ -107,6 +108,7 @@ bool EdgeSE3PlaneSensorCalibDrawAction::operator()(
 
   return true;
 }
+// LCOV_EXCL_STOP
 #endif
 
 }  // namespace g2o

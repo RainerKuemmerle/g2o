@@ -60,6 +60,7 @@ void VertexSE3::oplusImpl(const VectorX::MapType& update) {
 }
 
 #ifdef G2O_HAVE_OPENGL
+// LCOV_EXCL_START
 void drawTriangle(float xSize, float ySize) {
   Vector3F p[3];
   glBegin(GL_TRIANGLES);
@@ -118,6 +119,7 @@ bool VertexSE3DrawAction::operator()(
   glPopMatrix();
   return true;
 }
+// LCOV_EXCL_STOP
 #endif
 
 }  // namespace g2o

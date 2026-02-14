@@ -76,6 +76,7 @@ void EdgeSE2::linearizeOplus() {
 }
 
 #ifdef G2O_HAVE_OPENGL
+// LCOV_EXCL_START
 EdgeSE2DrawAction::EdgeSE2DrawAction()
     : DrawAction(typeid(EdgeSE2).name()),
       triangleX_(nullptr),
@@ -148,6 +149,7 @@ bool EdgeSE2DrawAction::operator()(
   glPopAttrib();
   return true;
 }
+// LCOV_EXCL_STOP
 #endif
 
 }  // namespace g2o

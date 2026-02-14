@@ -59,6 +59,7 @@ void CacheSE3Offset::updateImpl() {
 }
 
 #ifdef G2O_HAVE_OPENGL
+// LCOV_EXCL_START
 CacheSE3OffsetDrawAction::CacheSE3OffsetDrawAction()
     : DrawAction(typeid(CacheSE3Offset).name()) {}
 
@@ -91,6 +92,7 @@ bool CacheSE3OffsetDrawAction::operator()(
   glPopAttrib();
   return true;
 }
+// LCOV_EXCL_STOP
 #endif
 
 }  // namespace g2o

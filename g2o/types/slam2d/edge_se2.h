@@ -82,6 +82,7 @@ class G2O_TYPES_SLAM2D_API EdgeSE2
 };
 
 #ifdef G2O_HAVE_OPENGL
+// LCOV_EXCL_START
 class G2O_TYPES_SLAM2D_API EdgeSE2DrawAction : public DrawAction {
  public:
   EdgeSE2DrawAction();
@@ -93,6 +94,7 @@ class G2O_TYPES_SLAM2D_API EdgeSE2DrawAction : public DrawAction {
       HyperGraphElementAction::Parameters& params_) override;
   std::shared_ptr<FloatProperty> triangleX_, triangleY_;
 };
+// LCOV_EXCL_STOP
 #endif
 
 }  // namespace g2o

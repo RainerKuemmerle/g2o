@@ -58,12 +58,14 @@ class G2O_TYPES_SCLAM2D_API EdgeSE2SensorCalib
 };
 
 #ifdef G2O_HAVE_OPENGL
+// LCOV_EXCL_START
 class EdgeSE2SensorCalibDrawAction : public DrawAction {
  public:
   EdgeSE2SensorCalibDrawAction();
   bool operator()(HyperGraph::HyperGraphElement& element,
                   HyperGraphElementAction::Parameters& params_) override;
 };
+// LCOV_EXCL_STOP
 #endif
 
 }  // namespace g2o

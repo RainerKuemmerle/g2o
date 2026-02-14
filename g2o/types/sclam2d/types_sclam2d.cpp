@@ -43,8 +43,10 @@ G2O_REGISTER_TYPE_NAME("EDGE_SE2_ODOM_DIFFERENTIAL_CALIB",
                        EdgeSE2OdomDifferentialCalib);
 
 #ifdef G2O_HAVE_OPENGL
+// LCOV_EXCL_START
 G2O_REGISTER_ACTION(EdgeSE2SensorCalibDrawAction);
 G2O_REGISTER_ACTION(EdgeSE2OdomDifferentialCalibDrawAction);
+// LCOV_EXCL_STOP
 #endif
 
 }  // namespace g2o
