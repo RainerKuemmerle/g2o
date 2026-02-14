@@ -1,14 +1,15 @@
 """Pytest fixtures for g2o Python bindings tests."""
 
+import os
 import sys
 import tempfile
 from pathlib import Path
 
-# Ensure build lib is in path BEFORE any imports - this is critical
-build_lib_path = Path(__file__).resolve().parent.parent.parent / "build" / "lib"
-build_lib_str = str(build_lib_path)
-if build_lib_str not in sys.path:
-    sys.path.insert(0, build_lib_str)
+# Ensure build lib is in path BEFORE any imports
+build_lib_dir = os.environ.get(
+    "G2O_LIB_DIR", str(Path(__file__).resolve().parent.parent.parent / "build" / "lib")
+)
+sys.path.insert(0, build_lib_dir)
 
 # This must come after path setup
 import g2opy as g2o
