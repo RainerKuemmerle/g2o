@@ -17,16 +17,50 @@ jobs:
   python:
     name: Build g2opy
     runs-on: ubuntu-latest
+    env:
+      G2O_CACHE_BUILD: true
     steps:
     - uses: actions/checkout@v4
       with:
         fetch-depth: 0
+
+    - name: Print env
+      run: |
+          echo github.ref: ${{github.ref}}
+          echo github.event.action: ${{github.event.action}}
+          echo github.event_name: ${{github.event_name}}
+          echo runner.os: ${{runner.os}}
+
+    - name: ccache
+      uses: hendrikmuhs/ccache-action@v1.2
+      with:
+          key: python-${{ runner.os }}
+          max-size: 2000M
+
     - name: Install dependencies on Ubuntu
       run: |
           sudo apt update
-          sudo apt install libeigen3-dev libspdlog-dev nlohmann-json3-dev
+          sudo apt install libeigen3-dev libspdlog-dev nlohmann-json3-dev python3-dev python3-numpy python3-pytest
+
+    - name: Configure CMake
+      run: |
+          echo "number of cores: $(nproc) $(nproc --all)"
+          cmake --version
+          cmake -B ${{github.workspace}}/build -DG2O_BUILD_PYTHON=On -DBUILD_SHARED_LIBS=Off -DG2O_BUILD_APPS=Off -DG2O_BUILD_EXAMPLES=Off -DG2O_USE_OPENGL:=Off -DBUILD_UNITTESTS=Off -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
+
+    - name: Build Introspection
+      shell: bash
+      run: |
+          echo "g2o config.h"
+          cat ${{github.workspace}}/build/g2o/config.h
+          echo "ENV"
+          env | sort
+
     - name: Build
-      run: pipx run build
+      run: cmake --build ${{github.workspace}}/build -j $(nproc) --target g2opy
+
+    - name: Test (pytest)
+      run: ${{github.workspace}}/build/pytest_helper.sh
 
   build:
     name: ${{ matrix.config.name }}

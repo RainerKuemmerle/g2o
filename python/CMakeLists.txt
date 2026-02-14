@@ -77,3 +77,11 @@ target_link_libraries(g2opy PRIVATE
 )
 target_include_directories(g2opy PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 install(TARGETS g2opy LIBRARY DESTINATION g2opy)
+
+#Write pytest helper script to build folder
+file(WRITE "${CMAKE_BINARY_DIR}/pytest_helper.sh" "#!/bin/sh
+set -e
+export G2O_LIB_DIR=\"${g2o_LIBRARY_OUTPUT_DIRECTORY}\"
+exec pytest \"${CMAKE_CURRENT_SOURCE_DIR}\"
+")
+file(CHMOD "${CMAKE_BINARY_DIR}/pytest_helper.sh" PERMISSIONS OWNER_EXECUTE OWNER_WRITE OWNER_READ GROUP_READ WORLD_READ)
