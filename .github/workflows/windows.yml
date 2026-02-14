@@ -22,8 +22,8 @@ jobs:
       matrix:
         config:
         - {
-            name: "Windows 2022 MSVC",
-            os: windows-2022,
+            name: "Windows Latest MSVC",
+            os: windows-latest,
             build_type: "Debug",
             generators: "Ninja"
           }
