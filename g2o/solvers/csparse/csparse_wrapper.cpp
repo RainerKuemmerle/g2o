@@ -78,7 +78,7 @@ class CSparse::Impl {
 
   void prepareWorkspace() {
     // re-allocate the temporary workspace for cholesky
-    if (csWorkspace.size() < ccsA.n) {
+    if (csWorkspace.size() < static_cast<size_t>(ccsA.n)) {
       const size_t desired_size = csWorkspace.empty() ? ccsA.n : 2 * ccsA.n;
       csWorkspace.resize(desired_size);
       csIntWorkspace.resize(2L * desired_size);
