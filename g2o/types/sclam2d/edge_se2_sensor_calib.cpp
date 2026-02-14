@@ -78,6 +78,7 @@ void EdgeSE2SensorCalib::initialEstimate(
 }
 
 #ifdef G2O_HAVE_OPENGL
+// LCOV_EXCL_START
 EdgeSE2SensorCalibDrawAction::EdgeSE2SensorCalibDrawAction()
     : DrawAction(typeid(EdgeSE2SensorCalib).name()) {}
 
@@ -101,6 +102,7 @@ bool EdgeSE2SensorCalibDrawAction::operator()(
   glPopAttrib();
   return true;
 }
+// LCOV_EXCL_STOP
 #endif
 
 }  // namespace g2o

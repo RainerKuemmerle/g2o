@@ -167,6 +167,7 @@ class G2O_TYPES_SLAM3D_API CacheCamera : public Cache {
 };
 
 #ifdef G2O_HAVE_OPENGL
+// LCOV_EXCL_START
 class G2O_TYPES_SLAM3D_API CacheCameraDrawAction : public DrawAction {
  public:
   CacheCameraDrawAction();
@@ -178,6 +179,7 @@ class G2O_TYPES_SLAM3D_API CacheCameraDrawAction : public DrawAction {
       HyperGraphElementAction::Parameters& params_) override;
   std::shared_ptr<FloatProperty> cameraZ_, cameraSide_;
 };
+// LCOV_EXCL_STOP
 #endif
 
 }  // namespace g2o

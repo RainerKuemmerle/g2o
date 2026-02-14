@@ -52,6 +52,7 @@ class G2O_TYPES_SLAM3D_ADDONS_API VertexPlane : public BaseVertex<3, Plane3D> {
 };
 
 #ifdef G2O_HAVE_OPENGL
+// LCOV_EXCL_START
 class VertexPlaneDrawAction : public DrawAction {
  public:
   VertexPlaneDrawAction();
@@ -63,6 +64,7 @@ class VertexPlaneDrawAction : public DrawAction {
       HyperGraphElementAction::Parameters& params_) override;
   std::shared_ptr<FloatProperty> planeWidth_, planeHeight_;
 };
+// LCOV_EXCL_STOP
 #endif
 
 }  // namespace g2o

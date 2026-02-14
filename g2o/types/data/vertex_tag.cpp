@@ -62,6 +62,7 @@ bool VertexTag::write(std::ostream& os) const {
 }
 
 #ifdef G2O_HAVE_OPENGL
+// LCOV_EXCL_START
 VertexTagDrawAction::VertexTagDrawAction()
     : DrawAction(typeid(VertexTag).name()), textSize_(nullptr) {}
 
@@ -100,6 +101,7 @@ bool VertexTagDrawAction::operator()(
   glPopMatrix();
   return true;
 }
+// LCOV_EXCL_STOP
 #endif
 
 }  // namespace g2o

@@ -67,6 +67,7 @@ class G2O_TYPES_DATA_API RobotLaser : public RawLaser {
 };
 
 #ifdef G2O_HAVE_OPENGL
+// LCOV_EXCL_START
 class G2O_TYPES_DATA_API RobotLaserDrawAction : public DrawAction {
  public:
   RobotLaserDrawAction();
@@ -80,6 +81,7 @@ class G2O_TYPES_DATA_API RobotLaserDrawAction : public DrawAction {
   std::shared_ptr<FloatProperty> pointSize_;
   std::shared_ptr<FloatProperty> maxRange_;
 };
+// LCOV_EXCL_STOP
 #endif
 
 }  // namespace g2o

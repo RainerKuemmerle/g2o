@@ -63,6 +63,7 @@ void CacheCamera::updateImpl() {
 }
 
 #ifdef G2O_HAVE_OPENGL
+// LCOV_EXCL_START
 CacheCameraDrawAction::CacheCameraDrawAction()
     : DrawAction(typeid(CacheCamera).name()) {}
 
@@ -100,6 +101,7 @@ bool CacheCameraDrawAction::operator()(
   glPopAttrib();
   return true;
 }
+// LCOV_EXCL_STOP
 #endif
 
 }  // namespace g2o

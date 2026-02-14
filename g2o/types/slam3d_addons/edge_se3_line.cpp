@@ -62,6 +62,7 @@ bool EdgeSE3Line3D::resolveCaches() {
 }
 
 #ifdef G2O_HAVE_OPENGL
+// LCOV_EXCL_START
 EdgeSE3Line3DDrawAction::EdgeSE3Line3DDrawAction()
     : DrawAction(typeid(EdgeSE3Line3D).name()),
       lineLength_(nullptr),
@@ -129,6 +130,7 @@ bool EdgeSE3Line3DDrawAction::operator()(
 
   return true;
 }
+// LCOV_EXCL_STOP
 #endif
 
 }  // namespace g2o

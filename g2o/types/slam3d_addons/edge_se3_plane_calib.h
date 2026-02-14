@@ -65,6 +65,7 @@ class G2O_TYPES_SLAM3D_ADDONS_API EdgeSE3PlaneSensorCalib
 };
 
 #ifdef G2O_HAVE_OPENGL
+// LCOV_EXCL_START
 class EdgeSE3PlaneSensorCalibDrawAction : public DrawAction {
  public:
   G2O_TYPES_SLAM3D_ADDONS_API EdgeSE3PlaneSensorCalibDrawAction();
@@ -77,6 +78,7 @@ class EdgeSE3PlaneSensorCalibDrawAction : public DrawAction {
       HyperGraphElementAction::Parameters& params_) override;
   std::shared_ptr<FloatProperty> planeWidth_, planeHeight_;
 };
+// LCOV_EXCL_STOP
 #endif
 
 }  // namespace g2o

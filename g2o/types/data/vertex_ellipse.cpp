@@ -100,6 +100,7 @@ bool VertexEllipse::write(std::ostream& os) const {
 }
 
 #ifdef G2O_HAVE_OPENGL
+// LCOV_EXCL_START
 VertexEllipseDrawAction::VertexEllipseDrawAction()
     : DrawAction(typeid(VertexEllipse).name()) {}
 
@@ -163,6 +164,7 @@ bool VertexEllipseDrawAction::operator()(
   glPopMatrix();
   return true;
 }
+// LCOV_EXCL_STOP
 #endif
 
 }  // namespace g2o
