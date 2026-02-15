@@ -52,9 +52,9 @@ class EstimateAccessor {
  public:
   //! VertexXnType's EstimateType is a vector type
   template <int K>
-  typename std::enable_if<TypeTraits<typename Edge::template VertexXnType<
-                              K>::EstimateType>::kIsVector != 0,
-                          double*>::type
+  std::enable_if_t<TypeTraits<typename Edge::template VertexXnType<
+                       K>::EstimateType>::kIsVector != 0,
+                   double*>
   data(Edge* that) {
     return const_cast<double*>(that->template vertexXn<K>()->estimate().data());
   }
@@ -64,9 +64,9 @@ class EstimateAccessor {
    * we buffer the estimates into a unordered map.
    */
   template <int K>
-  typename std::enable_if<TypeTraits<typename Edge::template VertexXnType<
-                              K>::EstimateType>::kIsVector == 0,
-                          double*>::type
+  std::enable_if_t<TypeTraits<typename Edge::template VertexXnType<
+                       K>::EstimateType>::kIsVector == 0,
+                   double*>
   data(Edge* that) {
     VectorX& data_buffer = buffer_[K];
     if (data_buffer.size() > 0) {  // trivial caching
