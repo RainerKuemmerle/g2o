@@ -4,7 +4,7 @@ if (TARGET simulator_lib)
   add_subdirectory(g2o_simulator)
 endif()
 
-if(QGLVIEWER_FOUND AND Qt5_FOUND AND G2O_HAVE_OPENGL)
+if(G2O_HAVE_OPENGL AND Qt6_FOUND)
   add_subdirectory(g2o_viewer)
 endif()
 

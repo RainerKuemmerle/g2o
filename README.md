@@ -111,23 +111,21 @@ following packages.
 
 -   spdlog <https://github.com/gabime/spdlog>
 -   suitesparse <http://faculty.cse.tamu.edu/davis/suitesparse.html>
--   Qt5 <http://qt-project.org>
--   libQGLViewer <https://gillesdebunne.github.io/libQGLViewer/>
 -   JSON for Modern C++ <https://github.com/nlohmann/json>
+-   Qt6 <http://qt-project.org>
 
 On Ubuntu / Debian these dependencies are resolved by installing the
 following packages.
 
 -   libspdlog-dev
 -   libsuitesparse-dev
--   libcereal-dev
--   qtdeclarative5-dev
--   qt5-qmake
--   libqglviewer-dev-qt5
+-   nlohmann-json3-dev
+-   qt6-declarative-dev
+-   qt6-qmake
 
 You can install those packages with the following command
 ```
-sudo apt install libeigen3-dev libspdlog-dev libsuitesparse-dev qtdeclarative5-dev qt5-qmake libqglviewer-dev-qt5
+sudo apt install libeigen3-dev libspdlog-dev libsuitesparse-dev nlohmann-json3-dev qt6-declarative-dev qt6-qmake
 ```
 
 ## Mac OS X

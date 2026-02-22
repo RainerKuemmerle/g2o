@@ -22,25 +22,8 @@
 
 #include "g2o/core/hyper_graph_action.h"
 #include "g2o/core/sparse_optimizer.h"
-
-// Version comparison macro for QGLViewer
-// QGLVIEWER_VERSION format: 0xMMmmPP where MM=major, mm=minor, PP=patch
-#define QGLVIEWER_VERSION_AT_LEAST(major, minor)         \
-  ((((QGLVIEWER_VERSION & 0xff0000) >> 16) > (major)) || \
-   (((QGLVIEWER_VERSION & 0xff0000) >> 16) == (major) && \
-    ((QGLVIEWER_VERSION & 0x00ff00) >> 8) >= (minor)))
-
-// API changes in QGLViewer which produce a warning if the old API is used.
-#if QGLVIEWER_VERSION_AT_LEAST(2, 5)
-#define QGLVIEWER_DEPRECATED_MOUSEBINDING
-#endif
-
-#ifdef __APPLE__
-#include <OpenGL/gl.h>
-#else
-#include <GL/gl.h>
-#include <GL/glu.h>
-#endif
+#include "g2o/stuff/logger.h"
+#include "g2o/stuff/opengl_wrapper.h"
 
 namespace g2o {
 
@@ -56,67 +39,57 @@ void applyAction(HyperGraph& graph, HyperGraphElementAction& action,
   }
 }
 
-/**
- * \brief helper for setting up a camera for qglviewer
- */
-class StandardCamera : public qglviewer::Camera {
- public:
-  StandardCamera() = default;
-
-  using qglv_real = decltype(qglviewer::Camera().zNear());
-
-  qglv_real zNear() const override {
-    if (standard_) return static_cast<qglv_real>(0.001);
-    return Camera::zNear();
-  }
-
-  qglv_real zFar() const override {
-    if (standard_) return static_cast<qglv_real>(10000.0);
-    return Camera::zFar();
-  }
-
-  bool standard() const { return standard_; }
-  void setStandard(bool s) { standard_ = s; }
-
- private:
-  bool standard_ = true;
-};
-
 }  // end anonymous namespace
 
 G2oQGLViewer::G2oQGLViewer(QWidget* parent)
-    : QGLViewer(parent), drawActions_(nullptr) {
+    : viewer::QGLViewerShim(parent), drawActions_(nullptr) {
   setAxisIsDrawn(false);
 }
 
-G2oQGLViewer::~G2oQGLViewer() { glDeleteLists(drawList_, 1); }
+G2oQGLViewer::~G2oQGLViewer() {
+  // Ensure we have a current GL context before deleting GL resources
+  makeCurrent();
+  if (drawList_.has_value()) {
+    glDeleteLists(drawList_.value(), 1);
+    drawList_ = std::nullopt;
+  }
+  doneCurrent();
+}
 
 void G2oQGLViewer::draw() {
   if (!graph) return;
 
   if (drawActions_ == nullptr) {
     drawActions_ = HyperGraphActionLibrary::instance()->actionByName("draw");
-    assert(drawActions_);
   }
 
-  if (!drawActions_)  // avoid segmentation fault in release build
+  if (!drawActions_) {  // avoid segmentation fault in release build
+    static bool warned = false;
+    if (!warned) {
+      G2O_ERROR(
+          "G2oQGLViewer: no draw action found in HyperGraphActionLibrary");
+      warned = true;
+    }
     return;
+  }
+
+  if (!drawList_.has_value()) {
+    drawList_ = glGenLists(1);
+    assert(drawList_ != 0);
+  }
+
   if (updateDisplay_) {
     updateDisplay_ = false;
-    glNewList(drawList_, GL_COMPILE_AND_EXECUTE);
+    glNewList(drawList_.value(), GL_COMPILE_AND_EXECUTE);
     SparseOptimizer& optimizer = *graph;
     applyAction(optimizer, *drawActions_, drawActionParameters_);
     glEndList();
   } else {
-    glCallList(drawList_);
+    glCallList(drawList_.value());
   }
 }
 
 void G2oQGLViewer::init() {
-  QGLViewer::init();
-  // glDisable(GL_LIGHT0);
-  // glDisable(GL_LIGHTING);
-
   setBackgroundColor(QColor::fromRgb(51, 51, 51));
 
   // some default settings i like
@@ -129,36 +102,8 @@ void G2oQGLViewer::init() {
   // glShadeModel(GL_SMOOTH);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-  setAxisIsDrawn();
-
-  // don't save state
-  setStateFileName(QString());
-
-  // mouse bindings
-#ifdef QGLVIEWER_DEPRECATED_MOUSEBINDING
-  setMouseBinding(Qt::NoModifier, Qt::RightButton, CAMERA, TRANSLATE);
-  setMouseBinding(Qt::NoModifier, Qt::MiddleButton, CAMERA, TRANSLATE);
-#else
-  setMouseBinding(Qt::RightButton, CAMERA, TRANSLATE);
-  setMouseBinding(Qt::MidButton, CAMERA, TRANSLATE);
-#endif
-
-  // keyboard shortcuts
-  setShortcut(CAMERA_MODE, 0);
-  setShortcut(EXIT_VIEWER, 0);
-  // setShortcut(SAVE_SCREENSHOT, 0);
-
-  // replace camera
-  qglviewer::Camera* oldcam = camera();
-  qglviewer::Camera* cam = new StandardCamera();
-  setCamera(cam);
-  cam->setPosition(qglviewer::Vec(0., 0., 75.));
-  cam->setUpVector(qglviewer::Vec(0., 1., 0.));
-  cam->lookAt(qglviewer::Vec(0., 0., 0.));
-  delete oldcam;
-
-  // getting a display list
-  drawList_ = glGenLists(1);
+  setAxisIsDrawn(true);
+  // don't save state (no-op under new API: state passed per-call)
 }
 
 void G2oQGLViewer::setUpdateDisplay(bool updateDisplay) {

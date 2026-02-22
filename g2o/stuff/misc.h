@@ -51,14 +51,16 @@ constexpr double const_pi() { return cst(3.14159265358979323846); }
 /**
  * convert from degree to radian
  */
-inline double deg2rad(double degree) {
+constexpr double deg2rad(double degree) {
   return degree * cst(0.01745329251994329576);
 }
 
 /**
  * convert from radian to degree
  */
-inline double rad2deg(double rad) { return rad * cst(57.29577951308232087721); }
+constexpr double rad2deg(double rad) {
+  return rad * cst(57.29577951308232087721);
+}
 
 /**
  * normalize the angle

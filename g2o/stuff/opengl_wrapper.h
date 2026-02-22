@@ -38,7 +38,12 @@
 #ifdef __APPLE__
 #include <OpenGL/gl.h>
 #else
+#ifdef GL_ES
+#include <GLES2/gl2.h>
+#else
 #include <GL/gl.h>
+#include <GL/glu.h>
+#endif
 #endif
 #endif
 // IWYU pragma: end_exports
