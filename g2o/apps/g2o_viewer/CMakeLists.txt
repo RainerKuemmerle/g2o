@@ -1,14 +1,13 @@
-# Qt5 was been find_package'd() by FindQGLViewer.cmake
-if(Qt5_FOUND)
-  QT5_WRAP_UI(UI_HEADERS base_main_window.ui base_properties_widget.ui)
-  QT5_WRAP_CPP(UI_SOURCES main_window.h abstract_properties_widget.h)
-endif()
+# Use CMake automoc/autouic so moc/uic are generated with the configured Qt
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTOUIC ON)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
 
 add_library(viewer_library ${G2O_LIB_TYPE}
   g2o_viewer_api.h
   g2o_qglviewer.cpp g2o_qglviewer.h
+  qglviewer_shim.cpp qglviewer_shim.h
   main_window.cpp main_window.h
   stream_redirect.cpp stream_redirect.h
   gui_hyper_graph_action.cpp gui_hyper_graph_action.h
@@ -32,7 +31,8 @@ add_executable(g2o_viewer
 
 set_target_properties(g2o_viewer PROPERTIES OUTPUT_NAME g2o_viewer)
 
-target_link_libraries(viewer_library PUBLIC core g2o_cli_library QGLViewer::QGLViewer)
+find_package(Qt6 COMPONENTS Widgets OpenGLWidgets REQUIRED)
+target_link_libraries(viewer_library PUBLIC core g2o_cli_library Qt6::Widgets Qt6::OpenGLWidgets)
 target_link_libraries(viewer_library PUBLIC opengl_helper)
 target_link_libraries(viewer_library PRIVATE CLI11::CLI11)
 target_link_libraries(g2o_viewer viewer_library)
@@ -42,7 +42,7 @@ install(TARGETS viewer_library
   RUNTIME DESTINATION ${RUNTIME_DESTINATION}
   LIBRARY DESTINATION ${LIBRARY_DESTINATION}
   ARCHIVE DESTINATION ${ARCHIVE_DESTINATION}
-  INCLUDES DESTINATION ${INCLUDES_DESTINATION} ${qt5_includes_dirs} ${QGLVIEWER_INCLUDE_DIR}
+  INCLUDES DESTINATION ${INCLUDES_DESTINATION}
 )
 install(TARGETS g2o_viewer
   RUNTIME DESTINATION ${RUNTIME_DESTINATION}

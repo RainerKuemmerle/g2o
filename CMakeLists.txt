@@ -183,7 +183,12 @@ if (OPENGL_FOUND AND G2O_USE_OPENGL)
 endif()
 
 # For building the GUI
-find_package(QGLViewer)
+# Prefer Qt6 for all GUI targets and ensure moc/uic use Qt6.
+find_package(Qt6 REQUIRED COMPONENTS Widgets OpenGLWidgets)
+set(QT_DEFAULT_MAJOR_VERSION 6)
+
+# Find QGLViewer (if present). FindQGLViewer.cmake will prefer Qt6 when available.
+find_package(QGLViewer QUIET)
 
 # Logging library
 option(G2O_USE_LOGGING "Try to use spdlog for logging" ON)

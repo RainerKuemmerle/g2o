@@ -21,17 +21,16 @@
 
 #include <memory>
 
+#include "../../apps/g2o_viewer/qglviewer_shim.h"
 #include "g2o/core/sparse_block_matrix.h"
-#include "qglviewer.h"
 
 namespace g2o {
 
 class SparseOptimizer;
 
-class Slam2DViewer : public QGLViewer {
+class Slam2DViewer : public viewer::QGLViewerShim {
  public:
-  explicit Slam2DViewer(QWidget* parent = nullptr,
-                        const QGLWidget* shareWidget = nullptr);
+  explicit Slam2DViewer(QWidget* parent = nullptr);
   ~Slam2DViewer() override = default;
   void draw() override;
   void init() override;

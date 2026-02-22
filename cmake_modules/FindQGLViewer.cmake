@@ -13,17 +13,14 @@ endif()
 
 # If pkg-config didn't find it, search manually
 if(NOT QGLVIEWER_FOUND)
-  # Try to find Qt5 (optional - QGLViewer may not be needed)
-  find_package(Qt5 COMPONENTS Core Xml OpenGL Gui Widgets QUIET)
-  if(NOT Qt5_FOUND)
+  # Try to find Qt6 (preferred). Fall back to Qt5 only if Qt6 not available.
+  find_package(Qt6 COMPONENTS Core Xml OpenGL Gui Widgets REQUIRED)
+  if(NOT Qt6_FOUND)
     if(QGLViewer_FIND_REQUIRED)
-      message(SEND_ERROR "Qt5 not found. Install it and set Qt5_DIR accordingly")
-      if(WIN32)
-        message(STATUS "  In Windows, Qt5_DIR should be something like C:/Qt/5.4/msvc2013_64_opengl/lib/cmake/Qt5")
-      endif()
+      message(SEND_ERROR "Qt6 not found. Install Qt6 and set Qt6_DIR accordingly")
       return()
     else()
-      message(STATUS "Qt5 not found. QGLViewer support will be disabled (this is optional)")
+      message(STATUS "Qt6 not found. QGLViewer support will be disabled (this is optional)")
       return()
     endif()
   endif()
@@ -122,7 +119,7 @@ if(NOT QGLVIEWER_FOUND)
     set_target_properties(QGLViewer::QGLViewer PROPERTIES
       IMPORTED_LOCATION "${QGLVIEWER_LIBRARY}"
       INTERFACE_INCLUDE_DIRECTORIES "${QGLVIEWER_INCLUDE_DIR}"
-      INTERFACE_LINK_LIBRARIES "Qt5::Core;Qt5::Xml;Qt5::OpenGL;Qt5::Gui;Qt5::Widgets"
+      INTERFACE_LINK_LIBRARIES "Qt6::Core;Qt6::Xml;Qt6::OpenGL;Qt6::Gui;Qt6::Widgets"
     )
     if(QGLVIEWER_LIBRARY_DEBUG)
       set_target_properties(QGLViewer::QGLViewer PROPERTIES

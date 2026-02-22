@@ -460,11 +460,9 @@ void MainWindow::on_actionSave_Screenshot_triggered(bool) {
 
 void MainWindow::on_actionLoad_Viewer_State_triggered(bool) {
   QString filename = QFileDialog::getOpenFileName(
-      this, "Load State", "camera.xml", "Camera/State file (*.xml)");
+      this, "Load State", "camera.json", "Camera/State file (*.json)");
   if (!filename.isEmpty()) {
-    viewer->setStateFileName(filename);
-    viewer->restoreStateFromFile();
-    viewer->setStateFileName(QString());
+    viewer->restoreStateFromFile(filename);
     viewer->update();
     std::cerr << "Loaded state from " << filename.toStdString() << '\n';
   }
@@ -472,11 +470,9 @@ void MainWindow::on_actionLoad_Viewer_State_triggered(bool) {
 
 void MainWindow::on_actionSave_Viewer_State_triggered(bool) {
   QString filename = QFileDialog::getSaveFileName(
-      this, "Save State", "camera.xml", "Camera/State file (*.xml)");
+      this, "Save State", "camera.json", "Camera/State file (*.json)");
   if (!filename.isEmpty()) {
-    viewer->setStateFileName(filename);
-    viewer->saveStateToFile();
-    viewer->setStateFileName(QString());
+    viewer->saveStateToFile(filename);
     std::cerr << "Saved state to " << filename.toStdString() << '\n';
   }
 }

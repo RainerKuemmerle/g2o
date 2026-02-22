@@ -19,24 +19,12 @@
 #include "slam2d_viewer.h"
 
 #include <Eigen/Core>
-#include <iostream>
+#include <memory>
 
 #include "g2o/core/sparse_optimizer.h"
 #include "g2o/stuff/opengl_primitives.h"
 #include "g2o/types/slam2d/vertex_point_xy.h"
 #include "g2o/types/slam2d/vertex_se2.h"
-
-// Version comparison macro for QGLViewer
-// QGLVIEWER_VERSION format: 0xMMmmPP where MM=major, mm=minor, PP=patch
-#define QGLVIEWER_VERSION_AT_LEAST(major, minor)         \
-  ((((QGLVIEWER_VERSION & 0xff0000) >> 16) > (major)) || \
-   (((QGLVIEWER_VERSION & 0xff0000) >> 16) == (major) && \
-    ((QGLVIEWER_VERSION & 0x00ff00) >> 8) >= (minor)))
-
-// API changes in QGLViewer which produce a warning if the old API is used.
-#if QGLVIEWER_VERSION_AT_LEAST(2, 5)
-#define QGLVIEWER_DEPRECATED_MOUSEBINDING
-#endif
 
 namespace g2o {
 
@@ -45,23 +33,21 @@ namespace {
 /**
  * \brief helper for setting up a camera for qglviewer
  */
-class StandardCamera : public qglviewer::Camera {
+class StandardCamera : public viewer::Camera {
  public:
   StandardCamera() = default;
 
-  using qglv_real = decltype(qglviewer::Camera().zNear());
-
-  qglv_real zNear() const override {
+  [[nodiscard]] float zNear() const override {
     if (standard_) return 0.001F;
     return Camera::zNear();
   }
 
-  qglv_real zFar() const override {
+  [[nodiscard]] float zFar() const override {
     if (standard_) return 1000.0F;
     return Camera::zFar();
   }
 
-  const bool& standard() const { return standard_; }
+  [[nodiscard]] const bool& standard() const { return standard_; }
   bool& standard() { return standard_; }
 
  private:
@@ -98,10 +84,10 @@ void drawCov(const Eigen::Vector2d& p, const Eigen::MatrixBase<Derived>& cov) {
   /* get eigen-values */
   double D = a * d - b * b;  // determinant of the matrix
   double T = a + d;          // Trace of the matrix
-  const double h = sqrt(0.25 * (T * T) - D);
+  const double h = sqrt((0.25 * (T * T)) - D);
   const double lambda1 =
-      0.5 * T + h;  // solving characteristic polynom using p-q-formula
-  const double lambda2 = 0.5 * T - h;
+      (0.5 * T) + h;  // solving characteristic polynom using p-q-formula
+  const double lambda2 = (0.5 * T) - h;
 
   const double theta = 0.5 * atan2(2.0 * b, a - d);
   const double majorAxis = 3.0 * sqrt(lambda1);
@@ -118,8 +104,8 @@ void drawCov(const Eigen::Vector2d& p, const Eigen::MatrixBase<Derived>& cov) {
 
 }  // end anonymous namespace
 
-Slam2DViewer::Slam2DViewer(QWidget* parent, const QGLWidget* shareWidget)
-    : QGLViewer(parent, shareWidget), graph(nullptr) {}
+Slam2DViewer::Slam2DViewer(QWidget* parent)
+    : viewer::QGLViewerShim(parent), graph(nullptr) {}
 
 void Slam2DViewer::draw() {
   if (!graph) return;
@@ -160,8 +146,6 @@ void Slam2DViewer::draw() {
 }
 
 void Slam2DViewer::init() {
-  QGLViewer::init();
-
   // some default settings i like
   glEnable(GL_LINE_SMOOTH);
   glEnable(GL_BLEND);
@@ -169,33 +153,16 @@ void Slam2DViewer::init() {
   glShadeModel(GL_SMOOTH);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-  setAxisIsDrawn();
+  setAxisIsDrawn(true);
 
-  // don't save state
-  setStateFileName(QString());
-
-  // mouse bindings
-#ifdef QGLVIEWER_DEPRECATED_MOUSEBINDING
-  setMouseBinding(Qt::NoModifier, Qt::RightButton, CAMERA, ZOOM);
-  setMouseBinding(Qt::NoModifier, Qt::MiddleButton, CAMERA, TRANSLATE);
-#else
-  setMouseBinding(Qt::RightButton, CAMERA, ZOOM);
-  setMouseBinding(Qt::MidButton, CAMERA, TRANSLATE);
-#endif
-
-  // keyboard shortcuts
-  setShortcut(CAMERA_MODE, 0);
-  setShortcut(EXIT_VIEWER, 0);
-  // setShortcut(SAVE_SCREENSHOT, 0);
+  // don't save state (no-op under new API: state passed per-call)
 
   // replace camera
-  qglviewer::Camera* oldcam = camera();
-  qglviewer::Camera* cam = new StandardCamera();
+  StandardCamera cam;
+  cam.setPosition(viewer::Vec(0., 0., 75.));
+  cam.setUpVector(viewer::Vec(0., 1., 0.));
+  cam.lookAt(viewer::Vec(0., 0., 0.));
   setCamera(cam);
-  cam->setPosition(qglviewer::Vec(0., 0., 75.));
-  cam->setUpVector(qglviewer::Vec(0., 1., 0.));
-  cam->lookAt(qglviewer::Vec(0., 0., 0.));
-  delete oldcam;
 }
 
 }  // namespace g2o

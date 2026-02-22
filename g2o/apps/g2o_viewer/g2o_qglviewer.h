@@ -19,11 +19,14 @@
 #ifndef G2O_QGL_GRAPH_VIEWER_H
 #define G2O_QGL_GRAPH_VIEWER_H
 
+#include <GL/gl.h>
+
 #include <memory>
+#include <optional>
 
 #include "g2o/core/hyper_graph_action.h"
 #include "g2o_viewer_api.h"
-#include "qglviewer.h"
+#include "qglviewer_shim.h"
 
 namespace g2o {
 
@@ -32,7 +35,7 @@ class SparseOptimizer;
 /**
  * \brief OpenGL based viewer for the graph
  */
-class G2O_VIEWER_API G2oQGLViewer : public QGLViewer {
+class G2O_VIEWER_API G2oQGLViewer : public viewer::QGLViewerShim {
  public:
   explicit G2oQGLViewer(QWidget* parent = nullptr);
   G2oQGLViewer(const G2oQGLViewer&) = delete;
@@ -57,7 +60,7 @@ class G2O_VIEWER_API G2oQGLViewer : public QGLViewer {
 
  protected:
   HyperGraphElementAction::HyperGraphElementActionPtr drawActions_;
-  GLuint drawList_ = 0;
+  std::optional<GLuint> drawList_;
   bool updateDisplay_ = true;
   DrawAction::Parameters drawActionParameters_;
 };
