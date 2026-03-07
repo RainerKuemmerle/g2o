@@ -35,8 +35,8 @@
 #include "isometry3d_gradients.h"
 
 #ifdef G2O_HAVE_OPENGL
+#include "g2o/stuff/opengl_interface.h"
 #include "g2o/stuff/opengl_primitives.h"
-#include "g2o/stuff/opengl_wrapper.h"
 #endif
 
 namespace g2o {
@@ -98,18 +98,20 @@ bool EdgeSE3DrawAction::operator()(
   auto* fromEdge = static_cast<VertexSE3*>(e->vertices()[0].get());
   auto* toEdge = static_cast<VertexSE3*>(e->vertices()[1].get());
   if (!fromEdge || !toEdge) return true;
-  glColor3f(POSE_EDGE_COLOR);
-  glPushAttrib(GL_ENABLE_BIT);
-  glDisable(GL_LIGHTING);
-  glBegin(GL_LINES);
-  glVertex3f(static_cast<float>(fromEdge->estimate().translation().x()),
-             static_cast<float>(fromEdge->estimate().translation().y()),
-             static_cast<float>(fromEdge->estimate().translation().z()));
-  glVertex3f(static_cast<float>(toEdge->estimate().translation().x()),
-             static_cast<float>(toEdge->estimate().translation().y()),
-             static_cast<float>(toEdge->estimate().translation().z()));
-  glEnd();
-  glPopAttrib();
+  g2o::opengl::color3f(POSE_EDGE_COLOR);
+  g2o::opengl::push_attrib(opengl::Capability::ENABLE_BIT);
+  g2o::opengl::disable(opengl::Capability::LIGHTING);
+  g2o::opengl::begin_lines();
+  g2o::opengl::vertex3f(
+      static_cast<float>(fromEdge->estimate().translation().x()),
+      static_cast<float>(fromEdge->estimate().translation().y()),
+      static_cast<float>(fromEdge->estimate().translation().z()));
+  g2o::opengl::vertex3f(
+      static_cast<float>(toEdge->estimate().translation().x()),
+      static_cast<float>(toEdge->estimate().translation().y()),
+      static_cast<float>(toEdge->estimate().translation().z()));
+  g2o::opengl::end();
+  g2o::opengl::pop_attrib();
   return true;
 }
 // LCOV_EXCL_STOP

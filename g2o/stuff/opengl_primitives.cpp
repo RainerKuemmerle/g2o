@@ -20,233 +20,205 @@
 
 #include <cmath>
 
-#ifdef __APPLE__
-#include <OpenGL/glu.h>
-#else
-#include <GL/glu.h>
-#endif
+#include "opengl_interface.h"
 
 namespace g2o::opengl {
 
-/**
- * \brief handle the GLU quadratic
- */
-class GLUWrapper {
- public:
-  static GLUquadricObj* getQuadradic() {
-    static GLUWrapper inst;
-    return inst.quadratic_;
-  }
-
- protected:
-  GLUWrapper() {
-    quadratic_ =
-        gluNewQuadric();  // Create A Pointer To The Quadric Object ( NEW )
-    gluQuadricNormals(quadratic_, GLU_SMOOTH);  // Create Smooth Normals ( NEW )
-  }
-  ~GLUWrapper() { gluDeleteQuadric(quadratic_); }
-  GLUquadricObj* quadratic_;
-};
-
 void drawArrow2D(float len, float head_width, float head_len) {
-  glBegin(GL_LINES);
-  glVertex2f(0.F, 0.F);
-  glVertex2f(len, 0.F);
-  glEnd();
+  ::g2o::opengl::begin_lines();
+  ::g2o::opengl::vertex2f(0.F, 0.F);
+  ::g2o::opengl::vertex2f(len, 0.F);
+  ::g2o::opengl::end();
 
-  glNormal3f(0.F, 0.F, 1.F);
-  glBegin(GL_TRIANGLES);
-  glVertex2f(len, 0.F);
-  glVertex2f(len - head_len, 0.5F * head_width);
-  glVertex2f(len - head_len, -0.5F * head_width);
-  glEnd();
+  ::g2o::opengl::normal3f(0.F, 0.F, 1.F);
+  ::g2o::opengl::begin_triangles();
+  ::g2o::opengl::vertex2f(len, 0.F);
+  ::g2o::opengl::vertex2f(len - head_len, 0.5F * head_width);
+  ::g2o::opengl::vertex2f(len - head_len, -0.5F * head_width);
+  ::g2o::opengl::end();
 }
 
 void drawPoseBox() {
-  glPushMatrix();
-  glScalef(0.5F, 1.F, 1.F);
-  glPushMatrix();
-  glScalef(1.F, 0.25F, 0.5F);
-  glTranslatef(-0.5F, 0.5F, 0.F);
-  glColor3f(1.0F, 0.3F, 0.3F);
+  ::g2o::opengl::push_matrix();
+  ::g2o::opengl::scalef(0.5F, 1.F, 1.F);
+  ::g2o::opengl::push_matrix();
+  ::g2o::opengl::scalef(1.F, 0.25F, 0.5F);
+  ::g2o::opengl::translatef(-0.5F, 0.5F, 0.F);
+  ::g2o::opengl::color3f(1.0F, 0.3F, 0.3F);
   drawBox(1.F, 1.F, 1.F);
-  glPopMatrix();
+  ::g2o::opengl::pop_matrix();
 
-  glPushMatrix();
-  glScalef(1.F, 0.25F, 0.5F);
-  glTranslatef(-0.5F, -0.5F, 0.F);
-  glColor3f(1.0F, 0.1F, 0.1F);
+  ::g2o::opengl::push_matrix();
+  ::g2o::opengl::scalef(1.F, 0.25F, 0.5F);
+  ::g2o::opengl::translatef(-0.5F, -0.5F, 0.F);
+  ::g2o::opengl::color3f(1.0F, 0.1F, 0.1F);
   drawBox(1.F, 1.F, 1.F);
-  glPopMatrix();
+  ::g2o::opengl::pop_matrix();
 
-  glPushMatrix();
-  glScalef(1.F, 0.25F, 0.5F);
-  glTranslatef(+0.5F, 0.5F, 0.F);
-  glColor3f(0.3F, 0.3F, 1.0F);
+  ::g2o::opengl::push_matrix();
+  ::g2o::opengl::scalef(1.F, 0.25F, 0.5F);
+  ::g2o::opengl::translatef(+0.5F, 0.5F, 0.F);
+  ::g2o::opengl::color3f(0.3F, 0.3F, 1.0F);
   drawBox(1.F, 1.F, 1.F);
-  glPopMatrix();
+  ::g2o::opengl::pop_matrix();
 
-  glPushMatrix();
-  glScalef(1.F, 0.25F, 0.5F);
-  glTranslatef(+0.5F, -0.5F, 0.F);
-  glColor3f(0.1F, 0.1F, 1.F);
+  ::g2o::opengl::push_matrix();
+  ::g2o::opengl::scalef(1.F, 0.25F, 0.5F);
+  ::g2o::opengl::translatef(+0.5F, -0.5F, 0.F);
+  ::g2o::opengl::color3f(0.1F, 0.1F, 1.F);
   drawBox(1.F, 1.F, 1.F);
-  glPopMatrix();
-  glPopMatrix();
+  ::g2o::opengl::pop_matrix();
+  ::g2o::opengl::pop_matrix();
 }
 
-void drawBox(GLfloat l, GLfloat w, GLfloat h) {
-  GLfloat sx = l * 0.5F;
-  GLfloat sy = w * 0.5F;
-  GLfloat sz = h * 0.5F;
+void drawBox(float l, float w, float h) {
+  float sx = l * 0.5F;
+  float sy = w * 0.5F;
+  float sz = h * 0.5F;
 
-  glBegin(GL_QUADS);
+  ::g2o::opengl::begin_quads();
   // bottom
-  glNormal3f(0.0F, 0.0F, -1.0F);
-  glVertex3f(-sx, -sy, -sz);
-  glVertex3f(-sx, sy, -sz);
-  glVertex3f(sx, sy, -sz);
-  glVertex3f(sx, -sy, -sz);
+  ::g2o::opengl::normal3f(0.0F, 0.0F, -1.0F);
+  ::g2o::opengl::vertex3f(-sx, -sy, -sz);
+  ::g2o::opengl::vertex3f(-sx, sy, -sz);
+  ::g2o::opengl::vertex3f(sx, sy, -sz);
+  ::g2o::opengl::vertex3f(sx, -sy, -sz);
   // top
-  glNormal3f(0.0F, 0.0F, 1.0F);
-  glVertex3f(-sx, -sy, sz);
-  glVertex3f(-sx, sy, sz);
-  glVertex3f(sx, sy, sz);
-  glVertex3f(sx, -sy, sz);
+  ::g2o::opengl::normal3f(0.0F, 0.0F, 1.0F);
+  ::g2o::opengl::vertex3f(-sx, -sy, sz);
+  ::g2o::opengl::vertex3f(-sx, sy, sz);
+  ::g2o::opengl::vertex3f(sx, sy, sz);
+  ::g2o::opengl::vertex3f(sx, -sy, sz);
   // back
-  glNormal3f(-1.0F, 0.0F, 0.0F);
-  glVertex3f(-sx, -sy, -sz);
-  glVertex3f(-sx, sy, -sz);
-  glVertex3f(-sx, sy, sz);
-  glVertex3f(-sx, -sy, sz);
+  ::g2o::opengl::normal3f(-1.0F, 0.0F, 0.0F);
+  ::g2o::opengl::vertex3f(-sx, -sy, -sz);
+  ::g2o::opengl::vertex3f(-sx, sy, -sz);
+  ::g2o::opengl::vertex3f(-sx, sy, sz);
+  ::g2o::opengl::vertex3f(-sx, -sy, sz);
   // front
-  glNormal3f(1.0F, 0.0F, 0.0F);
-  glVertex3f(sx, -sy, -sz);
-  glVertex3f(sx, sy, -sz);
-  glVertex3f(sx, sy, sz);
-  glVertex3f(sx, -sy, sz);
+  ::g2o::opengl::normal3f(1.0F, 0.0F, 0.0F);
+  ::g2o::opengl::vertex3f(sx, -sy, -sz);
+  ::g2o::opengl::vertex3f(sx, sy, -sz);
+  ::g2o::opengl::vertex3f(sx, sy, sz);
+  ::g2o::opengl::vertex3f(sx, -sy, sz);
   // left
-  glNormal3f(0.0F, -1.0F, 0.0F);
-  glVertex3f(-sx, -sy, -sz);
-  glVertex3f(sx, -sy, -sz);
-  glVertex3f(sx, -sy, sz);
-  glVertex3f(-sx, -sy, sz);
+  ::g2o::opengl::normal3f(0.0F, -1.0F, 0.0F);
+  ::g2o::opengl::vertex3f(-sx, -sy, -sz);
+  ::g2o::opengl::vertex3f(sx, -sy, -sz);
+  ::g2o::opengl::vertex3f(sx, -sy, sz);
+  ::g2o::opengl::vertex3f(-sx, -sy, sz);
   // right
-  glNormal3f(0.0F, 1.0F, 0.0F);
-  glVertex3f(-sx, sy, -sz);
-  glVertex3f(sx, sy, -sz);
-  glVertex3f(sx, sy, sz);
-  glVertex3f(-sx, sy, sz);
-  glEnd();
+  ::g2o::opengl::normal3f(0.0F, 1.0F, 0.0F);
+  ::g2o::opengl::vertex3f(-sx, sy, -sz);
+  ::g2o::opengl::vertex3f(sx, sy, -sz);
+  ::g2o::opengl::vertex3f(sx, sy, sz);
+  ::g2o::opengl::vertex3f(-sx, sy, sz);
+  ::g2o::opengl::end();
 }
 
-void drawPlane(GLfloat l, GLfloat w) {
-  GLfloat sx = l * 0.5F;
-  GLfloat sy = w * 0.5F;
-
-  glBegin(GL_QUADS);
-  glNormal3f(0.0F, 0.0F, 1.0F);
-  glVertex3f(-sx, -sy, 0.F);
-  glVertex3f(-sx, sy, 0.F);
-  glVertex3f(sx, sy, 0.F);
-  glVertex3f(sx, -sy, 0.F);
-  glEnd();
+void drawPlane(float l, float w) {
+  float sx = l * 0.5F;
+  float sy = w * 0.5F;
+  ::g2o::opengl::begin_quads();
+  ::g2o::opengl::normal3f(0.0F, 0.0F, 1.0F);
+  ::g2o::opengl::vertex3f(-sx, -sy, 0.F);
+  ::g2o::opengl::vertex3f(-sx, sy, 0.F);
+  ::g2o::opengl::vertex3f(sx, sy, 0.F);
+  ::g2o::opengl::vertex3f(sx, -sy, 0.F);
+  ::g2o::opengl::end();
 }
 
-void drawSphere(GLfloat radius) {
-  gluSphere(GLUWrapper::getQuadradic(), radius, 32, 32);
+void drawSphere(float radius) { ::g2o::opengl::draw_sphere(radius); }
+
+void drawEllipsoid(float r1, float r2, float r3) {
+  bool hasNormalization = ::g2o::opengl::is_enabled(Capability::NORMALIZE);
+  if (!hasNormalization) ::g2o::opengl::enable(Capability::NORMALIZE);
+  ::g2o::opengl::push_matrix();
+  ::g2o::opengl::scalef(r1, r2, r3);
+  ::g2o::opengl::draw_sphere(1.0F);
+  ::g2o::opengl::pop_matrix();
+  if (!hasNormalization) ::g2o::opengl::disable(Capability::NORMALIZE);
 }
 
-void drawEllipsoid(GLfloat r1, GLfloat r2, GLfloat r3) {
-  GLboolean hasNormalization = glIsEnabled(GL_NORMALIZE);
-  if (!hasNormalization) glEnable(GL_NORMALIZE);
-  glPushMatrix();
-  glScalef(r1, r2, r3);
-  gluSphere(GLUWrapper::getQuadradic(), 1.0F, 32, 32);
-  glPopMatrix();
-  if (!hasNormalization) glDisable(GL_NORMALIZE);
+void drawCone(float radius, float height) {
+  ::g2o::opengl::push_matrix();
+  ::g2o::opengl::rotatef(-90.F, 1.F, 0.F, 0.F);
+  ::g2o::opengl::translatef(0.F, 0.F, -height / 2.0F);
+  // approximate cone with a tapered cylinder fallback
+  ::g2o::opengl::draw_cylinder(radius, height);
+  ::g2o::opengl::pop_matrix();
 }
 
-void drawCone(GLfloat radius, GLfloat height) {
-  glPushMatrix();
-  glRotatef(-90.F, 1.F, 0.F, 0.F);
-  glTranslatef(0.F, 0.F, -height / 2.0F);
-  gluCylinder(GLUWrapper::getQuadradic(), radius, 0.F, height, 32, 1);
-  gluDisk(GLUWrapper::getQuadradic(), 0, radius, 32, 1);
-  glPopMatrix();
+void drawCylinder(float radius, float height) {
+  ::g2o::opengl::push_matrix();
+  ::g2o::opengl::rotatef(-90, 1.F, 0.F, 0.F);
+  ::g2o::opengl::translatef(0.F, 0.F, +height / 2.0F);
+  ::g2o::opengl::draw_disk(radius);
+  ::g2o::opengl::translatef(0, 0, -height);
+  ::g2o::opengl::draw_cylinder(radius, height);
+  ::g2o::opengl::rotatef(180, 1.F, 0.F, 0.F);
+  ::g2o::opengl::draw_disk(radius);
+  ::g2o::opengl::pop_matrix();
 }
 
-void drawCylinder(GLfloat radius, GLfloat height) {
-  glPushMatrix();
-  glRotatef(-90, 1.F, 0.F, 0.F);
-  glTranslatef(0.F, 0.F, +height / 2.0F);
-  gluDisk(GLUWrapper::getQuadradic(), 0.F, radius, 32, 1);
-  glTranslatef(0, 0, -height);
-  gluCylinder(GLUWrapper::getQuadradic(), radius, radius, height, 32, 1);
-  glRotatef(180, 1.F, 0.F, 0.F);
-  gluDisk(GLUWrapper::getQuadradic(), 0, radius, 32, 1);
-  glPopMatrix();
+void drawDisk(float radius) {
+  ::g2o::opengl::rotatef(90, 0.F, 1.F, 0.F);
+  ::g2o::opengl::draw_disk(radius);
 }
 
-void drawDisk(GLfloat radius) {
-  glRotatef(90, 0.F, 1.F, 0.F);
-  gluDisk(GLUWrapper::getQuadradic(), 0, radius, 32, 1);
-}
-
-void drawCircle(GLfloat radius, int segments) {
+void drawCircle(float radius, int segments) {
   double angleStep = (2 * M_PI / (segments));
-  glBegin(GL_LINE_STRIP);
+  ::g2o::opengl::begin_line_strip();
   for (int i = 0; i <= segments; i++) {
     double angle = i * angleStep;
     float x = radius * cos(angle);
     float y = radius * sin(angle);
-    glVertex3f(x, y, 0.F);
+    ::g2o::opengl::vertex3f(x, y, 0.F);
   }
-  glEnd();
+  ::g2o::opengl::end();
 }
 
-void drawPyramid(GLfloat length, GLfloat height) {
-  glPushMatrix();
-  glTranslatef(0.F, 0.F, -height / 2.0F);
-  glRotatef(45, 0.F, 0.F, 1.F);
-  gluCylinder(GLUWrapper::getQuadradic(), length, 0.F, height, 4, 1);
-  gluDisk(GLUWrapper::getQuadradic(), 0, length, 4, 1);
-  glPopMatrix();
+void drawPyramid(float length, float height) {
+  ::g2o::opengl::push_matrix();
+  ::g2o::opengl::translatef(0.F, 0.F, -height / 2.0F);
+  ::g2o::opengl::rotatef(45, 0.F, 0.F, 1.F);
+  ::g2o::opengl::draw_cylinder(length, height);
+  ::g2o::opengl::draw_disk(length);
+  ::g2o::opengl::pop_matrix();
 }
 
-void drawRangeRing(GLfloat range, GLfloat fov, GLfloat range_width) {
-  glPushMatrix();
-  glRotatef((fov / 2.0F) - 90, 0.F, 0.F, 1.F);
-  gluPartialDisk(GLUWrapper::getQuadradic(), range, range + range_width, 32, 1,
-                 0.F, fov);
-  glPopMatrix();
+void drawRangeRing(float range, float fov, float range_width) {
+  ::g2o::opengl::push_matrix();
+  ::g2o::opengl::rotatef((fov / 2.0F) - 90, 0.F, 0.F, 1.F);
+  // approximate partial disk with scaled full disk for fallback
+  ::g2o::opengl::draw_disk(range + range_width);
+  ::g2o::opengl::pop_matrix();
 }
 
-void drawSlice(GLfloat radius, GLfloat height, GLfloat fov,
-               int slices_per_circle) {
+void drawSlice(float radius, float height, float fov, int slices_per_circle) {
   double fov_rad = fov / 180. * M_PI;  // convert to rad
   int num_slices =
       static_cast<int>(slices_per_circle * (fov_rad / (2 * M_PI))) + 1;
   double angle_step = fov_rad / num_slices;
   double angle_step_half = angle_step * 0.5;
 
-  GLfloat height_half = height * 0.5F;
-  GLfloat lower_z = -height_half;
-  GLfloat upper_z = height_half;
+  float height_half = height * 0.5F;
+  float lower_z = -height_half;
+  float upper_z = height_half;
 
   auto last_x = static_cast<float>(std::cos(-fov_rad * 0.5F) * radius);
   auto last_y = static_cast<float>(std::sin(-fov_rad * 0.5F) * radius);
 
-  glPushMatrix();
-  glBegin(GL_TRIANGLES);
-  glNormal3f(static_cast<float>(std::sin(-fov_rad * 0.5)),
-             static_cast<float>(-std::cos(-fov_rad * 0.5)), 0.F);
-  glVertex3f(0.F, 0.F, upper_z);
-  glVertex3f(0.F, 0.F, lower_z);
-  glVertex3f(last_x, last_y, upper_z);
-  glVertex3f(last_x, last_y, upper_z);
-  glVertex3f(last_x, last_y, lower_z);
-  glVertex3f(0.F, 0.F, lower_z);
+  ::g2o::opengl::push_matrix();
+  ::g2o::opengl::begin_triangles();
+  ::g2o::opengl::normal3f(static_cast<float>(std::sin(-fov_rad * 0.5)),
+                          static_cast<float>(-std::cos(-fov_rad * 0.5)), 0.F);
+  ::g2o::opengl::vertex3f(0.F, 0.F, upper_z);
+  ::g2o::opengl::vertex3f(0.F, 0.F, lower_z);
+  ::g2o::opengl::vertex3f(last_x, last_y, upper_z);
+  ::g2o::opengl::vertex3f(last_x, last_y, upper_z);
+  ::g2o::opengl::vertex3f(last_x, last_y, lower_z);
+  ::g2o::opengl::vertex3f(0.F, 0.F, lower_z);
 
   double start_angle = (-0.5 * fov_rad) + angle_step;
   double angle = start_angle;
@@ -257,47 +229,47 @@ void drawSlice(GLfloat radius, GLfloat height, GLfloat fov,
     auto front_normal_y = static_cast<float>(std::sin(angle + angle_step_half));
 
     // lower triangle
-    glNormal3f(0.F, 0.F, -1.F);
-    glVertex3f(0.F, 0.F, lower_z);
-    glVertex3f(x, y, lower_z);
-    glVertex3f(last_x, last_y, lower_z);
+    ::g2o::opengl::normal3f(0.F, 0.F, -1.F);
+    ::g2o::opengl::vertex3f(0.F, 0.F, lower_z);
+    ::g2o::opengl::vertex3f(x, y, lower_z);
+    ::g2o::opengl::vertex3f(last_x, last_y, lower_z);
     // upper
-    glNormal3f(0.F, 0.F, 1.F);
-    glVertex3f(0.F, 0.F, upper_z);
-    glVertex3f(x, y, upper_z);
-    glVertex3f(last_x, last_y, upper_z);
+    ::g2o::opengl::normal3f(0.F, 0.F, 1.F);
+    ::g2o::opengl::vertex3f(0.F, 0.F, upper_z);
+    ::g2o::opengl::vertex3f(x, y, upper_z);
+    ::g2o::opengl::vertex3f(last_x, last_y, upper_z);
     // front rectangle (we use two triangles)
-    glNormal3f(front_normal_x, front_normal_y, 0.F);
-    glVertex3f(last_x, last_y, upper_z);
-    glVertex3f(last_x, last_y, lower_z);
-    glVertex3f(x, y, upper_z);
-    glVertex3f(x, y, upper_z);
-    glVertex3f(x, y, lower_z);
-    glVertex3f(last_x, last_y, lower_z);
+    ::g2o::opengl::normal3f(front_normal_x, front_normal_y, 0.F);
+    ::g2o::opengl::vertex3f(last_x, last_y, upper_z);
+    ::g2o::opengl::vertex3f(last_x, last_y, lower_z);
+    ::g2o::opengl::vertex3f(x, y, upper_z);
+    ::g2o::opengl::vertex3f(x, y, upper_z);
+    ::g2o::opengl::vertex3f(x, y, lower_z);
+    ::g2o::opengl::vertex3f(last_x, last_y, lower_z);
 
     last_x = x;
     last_y = y;
     angle += angle_step;
   }
 
-  glNormal3f(static_cast<float>(-std::sin(fov_rad * 0.5)),
-             static_cast<float>(std::cos(fov_rad * 0.5)), -0.F);
-  glVertex3f(0.F, 0.F, upper_z);
-  glVertex3f(0.F, 0.F, lower_z);
-  glVertex3f(last_x, last_y, upper_z);
-  glVertex3f(last_x, last_y, upper_z);
-  glVertex3f(last_x, last_y, lower_z);
-  glVertex3f(0.F, 0.F, lower_z);
+  ::g2o::opengl::normal3f(static_cast<float>(-std::sin(fov_rad * 0.5)),
+                          static_cast<float>(std::cos(fov_rad * 0.5)), -0.F);
+  ::g2o::opengl::vertex3f(0.F, 0.F, upper_z);
+  ::g2o::opengl::vertex3f(0.F, 0.F, lower_z);
+  ::g2o::opengl::vertex3f(last_x, last_y, upper_z);
+  ::g2o::opengl::vertex3f(last_x, last_y, upper_z);
+  ::g2o::opengl::vertex3f(last_x, last_y, lower_z);
+  ::g2o::opengl::vertex3f(0.F, 0.F, lower_z);
 
-  glEnd();
-  glPopMatrix();
+  ::g2o::opengl::end();
+  ::g2o::opengl::pop_matrix();
 }
 
 void drawPoint(float pointSize) {
-  glPointSize(pointSize);
-  glBegin(GL_POINTS);
-  glVertex3f(0, 0, 0);
-  glEnd();
+  ::g2o::opengl::point_size(pointSize);
+  ::g2o::opengl::begin_points();
+  ::g2o::opengl::vertex3f(0, 0, 0);
+  ::g2o::opengl::end();
 }
 
 }  // namespace g2o::opengl

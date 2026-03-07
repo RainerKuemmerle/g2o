@@ -30,7 +30,7 @@
 
 #include "g2o/stuff/logger.h"
 #include "g2o/stuff/misc.h"
-#include "g2o/stuff/opengl_wrapper.h"
+#include "g2o/stuff/opengl_interface.h"
 
 #if G2O_HAVE_JSON
 #include <nlohmann/json.hpp>
@@ -71,33 +71,34 @@ void QGLViewerShim::initializeGL() {
   const float gf = backgroundColor_.greenF();
   const float bf = backgroundColor_.blueF();
   const float af = backgroundColor_.alphaF();
-  glClearColor(rf, gf, bf, af);
+  g2o::opengl::clear_color(rf, gf, bf, af);
   // Basic default GL state similar to what g2o viewers expect
 #ifndef GL_ES
-  glEnable(GL_LINE_SMOOTH);
-  glEnable(GL_BLEND);
-  glEnable(GL_DEPTH_TEST);
-  glEnable(GL_NORMALIZE);
-  glShadeModel(GL_FLAT);
-  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  g2o::opengl::enable(GL_LINE_SMOOTH);
+  g2o::opengl::enable(GL_BLEND);
+  g2o::opengl::enable(GL_DEPTH_TEST);
+  g2o::opengl::enable(GL_NORMALIZE);
+  g2o::opengl::shade_model(GL_FLAT);
+  g2o::opengl::blend_func(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 #endif
   init();
 }
 
 void QGLViewerShim::paintGL() {
   // clear buffers
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  g2o::opengl::clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   // set up camera view
-  glMatrixMode(GL_MODELVIEW);
-  glLoadIdentity();
+  g2o::opengl::matrix_mode(GL_MODELVIEW);
+  g2o::opengl::load_identity();
   {
     const Vec pos = camera_.position();
     const Vec tgt = camera_.target();
-    gluLookAt(static_cast<GLdouble>(pos.x()), static_cast<GLdouble>(pos.y()),
-              static_cast<GLdouble>(pos.z()), static_cast<GLdouble>(tgt.x()),
-              static_cast<GLdouble>(tgt.y()), static_cast<GLdouble>(tgt.z()),
-              0.0, 1.0, 0.0);
+    g2o::opengl::glu_look_at(
+        static_cast<double>(pos.x()), static_cast<double>(pos.y()),
+        static_cast<double>(pos.z()), static_cast<double>(tgt.x()),
+        static_cast<double>(tgt.y()), static_cast<double>(tgt.z()), 0.0, 1.0,
+        0.0);
   }
 
   // draw scene
@@ -110,16 +111,16 @@ void QGLViewerShim::paintGL() {
 void QGLViewerShim::resizeGL(int w, int h) {
   viewportW_ = w;
   viewportH_ = h;
-  glViewport(0, 0, w, h);
-  glMatrixMode(GL_PROJECTION);
-  glLoadIdentity();
+  g2o::opengl::viewport(0, 0, w, h);
+  g2o::opengl::matrix_mode(GL_PROJECTION);
+  g2o::opengl::load_identity();
 #ifndef GL_ES
   if (h == 0) h = 1;
   const double aspect = static_cast<double>(w) / static_cast<double>(h);
   // use a reasonable fov
-  gluPerspective(kFovDegrees, aspect, 0.01, 10000.0);
+  g2o::opengl::glu_perspective(kFovDegrees, aspect, 0.01, 10000.0);
 #endif
-  glMatrixMode(GL_MODELVIEW);
+  g2o::opengl::matrix_mode(GL_MODELVIEW);
 }
 
 void QGLViewerShim::draw() {
@@ -127,21 +128,21 @@ void QGLViewerShim::draw() {
 }
 
 void QGLViewerShim::drawAxis() {
-  glLineWidth(2.0F);
-  glBegin(GL_LINES);
+  g2o::opengl::line_width(2.0F);
+  g2o::opengl::begin_lines();
   // X - red
-  glColor3f(1.0F, 0.0F, 0.0F);
-  glVertex3f(0.0F, 0.0F, 0.0F);
-  glVertex3f(1.0F, 0.0F, 0.0F);
+  g2o::opengl::color3f(1.0F, 0.0F, 0.0F);
+  g2o::opengl::vertex3f(0.0F, 0.0F, 0.0F);
+  g2o::opengl::vertex3f(1.0F, 0.0F, 0.0F);
   // Y - green
-  glColor3f(0.0F, 1.0F, 0.0F);
-  glVertex3f(0.0F, 0.0F, 0.0F);
-  glVertex3f(0.0F, 1.0F, 0.0F);
+  g2o::opengl::color3f(0.0F, 1.0F, 0.0F);
+  g2o::opengl::vertex3f(0.0F, 0.0F, 0.0F);
+  g2o::opengl::vertex3f(0.0F, 1.0F, 0.0F);
   // Z - blue
-  glColor3f(0.0F, 0.0F, 1.0F);
-  glVertex3f(0.0F, 0.0F, 0.0F);
-  glVertex3f(0.0F, 0.0F, 1.0F);
-  glEnd();
+  g2o::opengl::color3f(0.0F, 0.0F, 1.0F);
+  g2o::opengl::vertex3f(0.0F, 0.0F, 0.0F);
+  g2o::opengl::vertex3f(0.0F, 0.0F, 1.0F);
+  g2o::opengl::end();
 }
 
 void QGLViewerShim::init() {
@@ -245,8 +246,9 @@ void QGLViewerShim::restoreStateFromFile(const QString& name) {
       // update GL clear color if context exists
       if (context()) {
         makeCurrent();
-        glClearColor(backgroundColor_.redF(), backgroundColor_.greenF(),
-                     backgroundColor_.blueF(), backgroundColor_.alphaF());
+        g2o::opengl::clear_color(
+            backgroundColor_.redF(), backgroundColor_.greenF(),
+            backgroundColor_.blueF(), backgroundColor_.alphaF());
         doneCurrent();
       }
     }
@@ -278,7 +280,7 @@ void QGLViewerShim::setBackgroundColor(const QColor& c) {
     const float gf = backgroundColor_.greenF();
     const float bf = backgroundColor_.blueF();
     const float af = backgroundColor_.alphaF();
-    glClearColor(rf, gf, bf, af);
+    g2o::opengl::clear_color(rf, gf, bf, af);
     doneCurrent();
   }
   update();

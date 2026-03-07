@@ -30,7 +30,7 @@
 
 #include "g2o/stuff/macros.h"
 #include "g2o/stuff/misc.h"
-#include "g2o/stuff/opengl_wrapper.h"
+#include "g2o/stuff/opengl_interface.h"
 
 namespace g2o {
 
@@ -83,27 +83,29 @@ bool EdgeSE3PlaneSensorCalibDrawAction::operator()(
     double azimuth = Plane3D::azimuth(that->measurement().normal());
     double elevation = Plane3D::elevation(that->measurement().normal());
 
-    glColor3f(static_cast<float>(that->color(0)),
-              static_cast<float>(that->color(1)),
-              static_cast<float>(that->color(2)));
-    glPushMatrix();
+    g2o::opengl::color3f(static_cast<float>(that->color(0)),
+                         static_cast<float>(that->color(1)),
+                         static_cast<float>(that->color(2)));
+    g2o::opengl::push_matrix();
     Isometry3 robotAndSensor = robot->estimate() * sensor->estimate();
-    glMultMatrixd(robotAndSensor.matrix().cast<double>().eval().data());
+    g2o::opengl::mult_matrixd(
+        robotAndSensor.matrix().cast<double>().eval().data());
 
-    glRotatef(static_cast<float>(RAD2DEG(azimuth)), 0.F, 0.F, 1.F);
-    glRotatef(static_cast<float>(RAD2DEG(elevation)), 0.F, -1.F, 0.F);
-    glTranslatef(static_cast<float>(d), 0.F, 0.F);
+    g2o::opengl::rotatef(static_cast<float>(RAD2DEG(azimuth)), 0.F, 0.F, 1.F);
+    g2o::opengl::rotatef(static_cast<float>(RAD2DEG(elevation)), 0.F, -1.F,
+                         0.F);
+    g2o::opengl::translatef(static_cast<float>(d), 0.F, 0.F);
 
     float planeWidth = planeWidth_->value();
     float planeHeight = planeHeight_->value();
-    glBegin(GL_QUADS);
-    glNormal3f(-1, 0, 0);
-    glVertex3f(0, -planeWidth, -planeHeight);
-    glVertex3f(0, planeWidth, -planeHeight);
-    glVertex3f(0, planeWidth, planeHeight);
-    glVertex3f(0, -planeWidth, planeHeight);
-    glEnd();
-    glPopMatrix();
+    g2o::opengl::begin_quads();
+    g2o::opengl::normal3f(-1, 0, 0);
+    g2o::opengl::vertex3f(0, -planeWidth, -planeHeight);
+    g2o::opengl::vertex3f(0, planeWidth, -planeHeight);
+    g2o::opengl::vertex3f(0, planeWidth, planeHeight);
+    g2o::opengl::vertex3f(0, -planeWidth, planeHeight);
+    g2o::opengl::end();
+    g2o::opengl::pop_matrix();
   }
 
   return true;

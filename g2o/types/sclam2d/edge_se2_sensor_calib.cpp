@@ -31,7 +31,7 @@
 
 #include "g2o/core/eigen_types.h"
 #ifdef G2O_HAVE_OPENGL
-#include "g2o/stuff/opengl_wrapper.h"
+#include "g2o/stuff/opengl_interface.h"
 #endif
 namespace g2o {
 
@@ -90,16 +90,18 @@ bool EdgeSE2SensorCalibDrawAction::operator()(
   auto fromEdge = e->vertexXn<0>();
   auto toEdge = e->vertexXn<1>();
   if (!fromEdge.get() || !toEdge.get()) return true;
-  glColor3f(0.5, 0.5, 1.0);
-  glPushAttrib(GL_ENABLE_BIT);
-  glDisable(GL_LIGHTING);
-  glBegin(GL_LINES);
-  glVertex3f(static_cast<float>(fromEdge->estimate().translation().x()),
-             static_cast<float>(fromEdge->estimate().translation().y()), 0.F);
-  glVertex3f(static_cast<float>(toEdge->estimate().translation().x()),
-             static_cast<float>(toEdge->estimate().translation().y()), 0.F);
-  glEnd();
-  glPopAttrib();
+  opengl::color3f(0.5, 0.5, 1.0);
+  opengl::push_attrib(opengl::Capability::ENABLE_BIT);
+  opengl::disable(opengl::Capability::LIGHTING);
+  opengl::begin_lines();
+  opengl::vertex3f(static_cast<float>(fromEdge->estimate().translation().x()),
+                   static_cast<float>(fromEdge->estimate().translation().y()),
+                   0.F);
+  opengl::vertex3f(static_cast<float>(toEdge->estimate().translation().x()),
+                   static_cast<float>(toEdge->estimate().translation().y()),
+                   0.F);
+  opengl::end();
+  opengl::pop_attrib();
   return true;
 }
 // LCOV_EXCL_STOP

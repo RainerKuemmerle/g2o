@@ -33,8 +33,8 @@
 #include "g2o/core/hyper_graph_action.h"
 #include "g2o/types/slam3d/isometry3d_mappings.h"
 #ifdef G2O_HAVE_OPENGL
+#include "g2o/stuff/opengl_interface.h"
 #include "g2o/stuff/opengl_primitives.h"
-#include "g2o/stuff/opengl_wrapper.h"
 #endif
 
 namespace {
@@ -63,18 +63,18 @@ void VertexSE3::oplusImpl(const VectorX::MapType& update) {
 // LCOV_EXCL_START
 void drawTriangle(float xSize, float ySize) {
   Vector3F p[3];
-  glBegin(GL_TRIANGLES);
+  opengl::begin_triangles();
   p[0] << 0., 0., 0.;
   p[1] << -xSize, ySize, 0.;
   p[2] << -xSize, -ySize, 0.;
   for (int i = 1; i < 2; ++i) {
     Vector3F normal = (p[i] - p[0]).cross(p[i + 1] - p[0]);
-    glNormal3f(normal.x(), normal.y(), normal.z());
-    glVertex3f(p[0].x(), p[0].y(), p[0].z());
-    glVertex3f(p[i].x(), p[i].y(), p[i].z());
-    glVertex3f(p[i + 1].x(), p[i + 1].y(), p[i + 1].z());
+    opengl::normal3f(normal.x(), normal.y(), normal.z());
+    opengl::vertex3f(p[0].x(), p[0].y(), p[0].z());
+    opengl::vertex3f(p[i].x(), p[i].y(), p[i].z());
+    opengl::vertex3f(p[i + 1].x(), p[i + 1].y(), p[i + 1].z());
   }
-  glEnd();
+  opengl::end();
 }
 
 VertexSE3DrawAction::VertexSE3DrawAction()
@@ -109,14 +109,15 @@ bool VertexSE3DrawAction::operator()(
 
   auto* that = static_cast<VertexSE3*>(&element);
 
-  glColor3f(POSE_VERTEX_COLOR);
-  glPushMatrix();
-  glMultMatrixd(that->estimate().matrix().cast<double>().eval().data());
+  g2o::opengl::color3f(POSE_VERTEX_COLOR);
+  g2o::opengl::push_matrix();
+  g2o::opengl::mult_matrixd(
+      that->estimate().matrix().cast<double>().eval().data());
   opengl::drawArrow2D(triangleX_->value(), triangleY_->value(),
                       triangleX_->value() * .3F);
   drawCache(that->cacheContainer(), params_);
   drawUserData(that->userData(), params_);
-  glPopMatrix();
+  g2o::opengl::pop_matrix();
   return true;
 }
 // LCOV_EXCL_STOP

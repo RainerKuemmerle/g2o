@@ -63,19 +63,19 @@ void drawSE2(const VertexSE2* v) {
   const SE2& pose = v->estimate();
 
   Eigen::Vector2d aux = pose * kP1;
-  glVertex3f(aux[0], aux[1], 0.F);
+  opengl::vertex3f(aux[0], aux[1], 0.F);
   aux = pose * kP2;
-  glVertex3f(aux[0], aux[1], 0.F);
+  opengl::vertex3f(aux[0], aux[1], 0.F);
   aux = pose * kP3;
-  glVertex3f(aux[0], aux[1], 0.F);
+  opengl::vertex3f(aux[0], aux[1], 0.F);
 }
 
 template <typename Derived>
 void drawCov(const Eigen::Vector2d& p, const Eigen::MatrixBase<Derived>& cov) {
   const double scalingFactor = 1.;
 
-  glPushMatrix();
-  glTranslatef(p.x(), p.y(), 0.F);
+  opengl::push_matrix();
+  opengl::translatef(p.x(), p.y(), 0.F);
 
   const typename Derived::Scalar& a = cov(0, 0);
   const typename Derived::Scalar& b = cov(0, 1);
@@ -93,13 +93,13 @@ void drawCov(const Eigen::Vector2d& p, const Eigen::MatrixBase<Derived>& cov) {
   const double majorAxis = 3.0 * sqrt(lambda1);
   const double minorAxis = 3.0 * sqrt(lambda2);
 
-  glRotatef(RAD2DEG(theta), 0.F, 0.F, 1.F);
-  glScalef(majorAxis * scalingFactor, minorAxis * scalingFactor, 1.F);
-  glColor4f(1.0F, 1.F, 0.F, 0.4F);
+  opengl::rotatef(RAD2DEG(theta), 0.F, 0.F, 1.F);
+  opengl::scalef(majorAxis * scalingFactor, minorAxis * scalingFactor, 1.F);
+  opengl::color4f(1.0F, 1.F, 0.F, 0.4F);
   opengl::drawDisk(1.F);
-  glColor4f(0.F, 0.F, 0.F, 1.0F);
+  opengl::color4f(0.F, 0.F, 0.F, 1.0F);
   opengl::drawCircle(1.F);
-  glPopMatrix();
+  opengl::pop_matrix();
 }
 
 }  // end anonymous namespace
@@ -111,27 +111,27 @@ void Slam2DViewer::draw() {
   if (!graph) return;
 
   // drawing the graph
-  glColor4f(0.00F, 0.67F, 1.00F, 1.F);
-  glBegin(GL_TRIANGLES);
+  opengl::color4f(0.00F, 0.67F, 1.00F, 1.F);
+  opengl::begin_triangles();
   for (auto& v_ptr : graph->vertices()) {
     auto* v = dynamic_cast<VertexSE2*>(v_ptr.second.get());
     if (v) {
       drawSE2(v);
     }
   }
-  glEnd();
+  opengl::end();
 
-  glColor4f(1.00F, 0.67F, 0.00F, 1.F);
-  glPointSize(2.F);
-  glBegin(GL_POINTS);
+  opengl::color4f(1.00F, 0.67F, 0.00F, 1.F);
+  opengl::point_size(2.F);
+  opengl::begin_points();
   for (auto& v_ptr : graph->vertices()) {
     auto* v = dynamic_cast<VertexPointXY*>(v_ptr.second.get());
     if (v) {
-      glVertex3f(v->estimate()(0), v->estimate()(1), 0.F);
+      opengl::vertex3f(v->estimate()(0), v->estimate()(1), 0.F);
     }
   }
-  glEnd();
-  glPointSize(1.F);
+  opengl::end();
+  opengl::point_size(1.F);
 
   if (drawCovariance) {
     for (const auto& vertex_index : graph->vertices()) {
@@ -147,11 +147,11 @@ void Slam2DViewer::draw() {
 
 void Slam2DViewer::init() {
   // some default settings i like
-  glEnable(GL_LINE_SMOOTH);
-  glEnable(GL_BLEND);
-  glEnable(GL_DEPTH_TEST);
-  glShadeModel(GL_SMOOTH);
-  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  opengl::enable(GL_LINE_SMOOTH);
+  opengl::enable(GL_BLEND);
+  opengl::enable(GL_DEPTH_TEST);
+  opengl::shade_model(GL_SMOOTH);
+  opengl::blend_func(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
   setAxisIsDrawn(true);
 

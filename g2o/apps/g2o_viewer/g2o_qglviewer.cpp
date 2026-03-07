@@ -23,7 +23,7 @@
 #include "g2o/core/hyper_graph_action.h"
 #include "g2o/core/sparse_optimizer.h"
 #include "g2o/stuff/logger.h"
-#include "g2o/stuff/opengl_wrapper.h"
+#include "g2o/stuff/opengl_interface.h"
 
 namespace g2o {
 
@@ -93,14 +93,14 @@ void G2oQGLViewer::init() {
   setBackgroundColor(QColor::fromRgb(51, 51, 51));
 
   // some default settings i like
-  glEnable(GL_LINE_SMOOTH);
-  glEnable(GL_BLEND);
-  glEnable(GL_DEPTH_TEST);
-  glEnable(GL_NORMALIZE);
-  // glEnable(GL_CULL_FACE);
-  glShadeModel(GL_FLAT);
-  // glShadeModel(GL_SMOOTH);
-  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  g2o::opengl::enable(GL_LINE_SMOOTH);
+  g2o::opengl::enable(GL_BLEND);
+  g2o::opengl::enable(GL_DEPTH_TEST);
+  g2o::opengl::enable(GL_NORMALIZE);
+  // g2o::opengl::enable(GL_CULL_FACE);
+  g2o::opengl::shade_model(GL_FLAT);
+  // g2o::opengl::shade_model(GL_SMOOTH);
+  g2o::opengl::blend_func(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
   setAxisIsDrawn(true);
   // don't save state (no-op under new API: state passed per-call)

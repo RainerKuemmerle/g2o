@@ -30,7 +30,7 @@
 #include "g2o/stuff/misc.h"
 
 #ifdef G2O_HAVE_OPENGL
-#include "g2o/stuff/opengl_wrapper.h"
+#include "g2o/stuff/opengl_interface.h"
 #endif
 
 #include <Eigen/Core>
@@ -126,42 +126,42 @@ bool VertexEllipseDrawAction::operator()(
 
   auto* that = dynamic_cast<VertexEllipse*>(&element);
 
-  glPushMatrix();
+  opengl::push_matrix();
 
   const float sigmaTheta = std::sqrt(that->covariance()(2, 2));
   const float x = 0.1F * cosf(sigmaTheta);
   const float y = 0.1F * sinf(sigmaTheta);
 
-  glColor3f(1.F, 0.7F, 1.F);
-  glBegin(GL_LINE_STRIP);
-  glVertex3f(x, y, 0);
-  glVertex3f(0, 0, 0);
-  glVertex3f(x, -y, 0);
-  glEnd();
+  opengl::color3f(1.F, 0.7F, 1.F);
+  opengl::begin_line_strip();
+  opengl::vertex3f(x, y, 0);
+  opengl::vertex3f(0, 0, 0);
+  opengl::vertex3f(x, -y, 0);
+  opengl::end();
 
-  glColor3f(0.F, 1.F, 0.F);
+  opengl::color3f(0.F, 1.F, 0.F);
   for (const auto& i : that->matchingVertices()) {
-    glBegin(GL_LINES);
-    glVertex3f(0, 0, 0);
-    glVertex3f(i.x(), i.y(), 0);
-    glEnd();
+    opengl::begin_lines();
+    opengl::vertex3f(0, 0, 0);
+    opengl::vertex3f(i.x(), i.y(), 0);
+    opengl::end();
   }
 
   Matrix2F rot = that->U();
   const float angle = std::atan2(rot(1, 0), rot(0, 0));
-  glRotatef(angle * 180.0 / const_pi(), 0., 0., 1.);
+  opengl::rotatef(angle * 180.0 / const_pi(), 0., 0., 1.);
   Vector2F sv = that->singularValues();
-  glScalef(sqrt(sv(0)), sqrt(sv(1)), 1);
+  opengl::scalef(sqrt(sv(0)), sqrt(sv(1)), 1);
 
-  glColor3f(1.F, 0.7F, 1.F);
-  glBegin(GL_LINE_LOOP);
-  for (int i = 0; i < 36; i++) {
+  opengl::color3f(1.F, 0.7F, 1.F);
+  opengl::begin_line_strip();
+  for (int i = 0; i <= 36; i++) {
     const float rad = i * const_pi() / 18.0;
-    glVertex2f(std::cos(rad), std::sin(rad));
+    opengl::vertex2f(std::cos(rad), std::sin(rad));
   }
-  glEnd();
+  opengl::end();
 
-  glPopMatrix();
+  opengl::pop_matrix();
   return true;
 }
 // LCOV_EXCL_STOP

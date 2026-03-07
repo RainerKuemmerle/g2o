@@ -19,7 +19,7 @@
   { "include": ["<bits/chrono.h>", "private", "<chrono>", "public"] },
   { "include": ["<bits/std_abs.h>", "private", "<cmath>", "public"] },
   # OpenGL by our wrapper include
-  { "include": ["<GL/gl.h>", "private", "\"g2o/stuff/opengl_wrapper.h\"", "public"] },
+  { "include": ["<GL/gl.h>", "private", "\"g2o/stuff/opengl_interface.h\"", "public"] },
   # fmt by wrapper include
   { "include": ["@<fmt/.*>", "private", "\"g2o/stuff/logger_format.h\"", "public"] },
   # Prefer the C++ wrappers around C files

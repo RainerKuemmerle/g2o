@@ -167,25 +167,23 @@ endif(G2O_USE_OPENMP)
 set(OpenGL_GL_PREFERENCE "GLVND")
 find_package(OpenGL)
 
-# If OpenGL was found, use the import target if available. If not, use old-style includes
+# Option to enable OpenGL support
 option(G2O_USE_OPENGL "Build g2o with OpenGL support for visualization" ON)
 set(G2O_HAVE_OPENGL 0)
-if (OPENGL_FOUND AND G2O_USE_OPENGL)
-  if (TARGET OpenGL::GL)
-    set(G2O_OPENGL_TARGET "OpenGL::GL;OpenGL::GLU")
-  else()
-    set(G2O_OPENGL_TARGET "${OPENGL_LIBRARIES}")
-    include_directories(${OPENGL_INCLUDE_DIR})
-  endif()
-  set(G2O_HAVE_OPENGL 1)
-  message(STATUS "Compiling with OpenGL support")
-  #message(WARNING G2O_OPENGL_TARGET=${G2O_OPENGL_TARGET})
-endif()
 
-# For building the GUI
-# Prefer Qt6 for all GUI targets and ensure moc/uic use Qt6.
+# For building the GUI: prefer Qt6 and use its OpenGLWidgets as the backend
 set(QT_DEFAULT_MAJOR_VERSION 6)
 find_package(Qt6 REQUIRED COMPONENTS Widgets OpenGLWidgets)
+
+if (G2O_USE_OPENGL)
+  if (TARGET Qt6::OpenGLWidgets)
+    set(G2O_OPENGL_TARGET "Qt6::OpenGLWidgets")
+    set(G2O_HAVE_OPENGL 1)
+    message(STATUS "Using Qt6::OpenGLWidgets as OpenGL backend")
+  else()
+    message(FATAL_ERROR "G2O_USE_OPENGL is ON but Qt6::OpenGLWidgets target not found. Install Qt6 with OpenGL support.")
+  endif()
+endif()
 
 # Logging library
 option(G2O_USE_LOGGING "Try to use spdlog for logging" ON)

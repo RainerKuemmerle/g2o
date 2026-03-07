@@ -27,8 +27,8 @@
 #include "vertex_pointxyz.h"
 
 #ifdef G2O_HAVE_OPENGL
+#include "g2o/stuff/opengl_interface.h"
 #include "g2o/stuff/opengl_primitives.h"
-#include "g2o/stuff/opengl_wrapper.h"
 #endif
 
 #include <string>
@@ -61,19 +61,20 @@ bool VertexPointXYZDrawAction::operator()(
   if (show_ && !show_->value()) return true;
   auto* that = static_cast<VertexPointXYZ*>(&element);
 
-  glPushMatrix();
-  glPushAttrib(GL_ENABLE_BIT | GL_POINT_BIT);
-  glDisable(GL_LIGHTING);
-  glColor3f(LANDMARK_VERTEX_COLOR);
+  g2o::opengl::push_matrix();
+  g2o::opengl::push_attrib(
+      {opengl::Capability::ENABLE_BIT, opengl::Capability::POINT_BIT});
+  g2o::opengl::disable(opengl::Capability::LIGHTING);
+  g2o::opengl::color3f(LANDMARK_VERTEX_COLOR);
   float ps = pointSize_ ? pointSize_->value() : 1.F;
-  glTranslatef(static_cast<float>(that->estimate()(0)),
-               static_cast<float>(that->estimate()(1)),
-               static_cast<float>(that->estimate()(2)));
+  g2o::opengl::translatef(static_cast<float>(that->estimate()(0)),
+                          static_cast<float>(that->estimate()(1)),
+                          static_cast<float>(that->estimate()(2)));
   opengl::drawPoint(ps);
-  glPopAttrib();
+  g2o::opengl::pop_attrib();
   drawCache(that->cacheContainer(), params);
   drawUserData(that->userData(), params);
-  glPopMatrix();
+  opengl::pop_matrix();
   return true;
 }
 // LCOV_EXCL_STOP

@@ -28,7 +28,7 @@
 
 #include <string>
 
-#include "g2o/stuff/opengl_wrapper.h"
+#include "g2o/stuff/opengl_interface.h"
 #include "g2o/types/slam3d_addons/line3d.h"
 
 namespace g2o {
@@ -75,30 +75,33 @@ bool VertexLine3DDrawAction::operator()(
   line.normalize();
   Vector3 direction = line.d();
   Vector3 npoint = line.d().cross(line.w());
-  glPushMatrix();
-  glColor3f(static_cast<float>(that->color(0)),
-            static_cast<float>(that->color(1)),
-            static_cast<float>(that->color(2)));
+  g2o::opengl::push_matrix();
+  g2o::opengl::color3f(static_cast<float>(that->color(0)),
+                       static_cast<float>(that->color(1)),
+                       static_cast<float>(that->color(2)));
   if (lineLength_ && lineWidth_) {
-    glLineWidth(static_cast<float>(lineWidth_->value()));
-    glBegin(GL_LINES);
-    glNormal3f(static_cast<float>(npoint.x()), static_cast<float>(npoint.y()),
-               static_cast<float>(npoint.z()));
-    glVertex3f(static_cast<float>(npoint.x() -
-                                  direction.x() * lineLength_->value() / 2),
-               static_cast<float>(npoint.y() -
-                                  direction.y() * lineLength_->value() / 2),
-               static_cast<float>(npoint.z() -
-                                  direction.z() * lineLength_->value() / 2));
-    glVertex3f(static_cast<float>(npoint.x() +
-                                  direction.x() * lineLength_->value() / 2),
-               static_cast<float>(npoint.y() +
-                                  direction.y() * lineLength_->value() / 2),
-               static_cast<float>(npoint.z() +
-                                  direction.z() * lineLength_->value() / 2));
-    glEnd();
+    g2o::opengl::line_width(static_cast<float>(lineWidth_->value()));
+    g2o::opengl::begin_lines();
+    g2o::opengl::normal3f(static_cast<float>(npoint.x()),
+                          static_cast<float>(npoint.y()),
+                          static_cast<float>(npoint.z()));
+    g2o::opengl::vertex3f(
+        static_cast<float>(npoint.x() -
+                           direction.x() * lineLength_->value() / 2),
+        static_cast<float>(npoint.y() -
+                           direction.y() * lineLength_->value() / 2),
+        static_cast<float>(npoint.z() -
+                           direction.z() * lineLength_->value() / 2));
+    g2o::opengl::vertex3f(
+        static_cast<float>(npoint.x() +
+                           direction.x() * lineLength_->value() / 2),
+        static_cast<float>(npoint.y() +
+                           direction.y() * lineLength_->value() / 2),
+        static_cast<float>(npoint.z() +
+                           direction.z() * lineLength_->value() / 2));
+    g2o::opengl::end();
   }
-  glPopMatrix();
+  g2o::opengl::pop_matrix();
 
   return true;
 }
