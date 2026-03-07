@@ -80,7 +80,7 @@ set(INCLUDES_DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 set(INCLUDES_INSTALL_DIR ${INCLUDES_DESTINATION}/${PROJECT_NAME})
 
 # Set search directory for looking for our custom CMake scripts to
-# look for SuiteSparse, QGLViewer, and Eigen3.
+# look for SuiteSparse and Eigen3.
 list(APPEND CMAKE_MODULE_PATH ${g2o_SOURCE_DIR}/cmake_modules)
 
 # Detect OS and define macros appropriately
@@ -184,11 +184,8 @@ endif()
 
 # For building the GUI
 # Prefer Qt6 for all GUI targets and ensure moc/uic use Qt6.
-find_package(Qt6 REQUIRED COMPONENTS Widgets OpenGLWidgets)
 set(QT_DEFAULT_MAJOR_VERSION 6)
-
-# Find QGLViewer (if present). FindQGLViewer.cmake will prefer Qt6 when available.
-find_package(QGLViewer QUIET)
+find_package(Qt6 REQUIRED COMPONENTS Widgets OpenGLWidgets)
 
 # Logging library
 option(G2O_USE_LOGGING "Try to use spdlog for logging" ON)
