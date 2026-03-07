@@ -35,8 +35,8 @@
 #include "g2o/types/slam2d/vertex_se2.h"
 
 #ifdef G2O_HAVE_OPENGL
+#include "g2o/stuff/opengl_interface.h"
 #include "g2o/stuff/opengl_primitives.h"
-#include "g2o/stuff/opengl_wrapper.h"
 #endif
 
 namespace g2o {
@@ -96,27 +96,32 @@ bool EdgeSE2PointXYBearingDrawAction::operator()(
   double guessRange = 5;
   double theta = e->measurement();
   Vector2 p(std::cos(theta) * guessRange, std::sin(theta) * guessRange);
-  glPushAttrib(GL_ENABLE_BIT | GL_LIGHTING | GL_COLOR);
-  glDisable(GL_LIGHTING);
+  g2o::opengl::push_attrib({opengl::Capability::ENABLE_BIT,
+                            opengl::Capability::LIGHTING,
+                            opengl::Capability::COLOR_BUFFER_BIT});
+  g2o::opengl::disable(opengl::Capability::LIGHTING);
   if (!to) {
     p = from->estimate() * p;
-    glColor3f(LANDMARK_EDGE_GHOST_COLOR);
-    glPushAttrib(GL_POINT_SIZE);
-    glPointSize(3);
-    glBegin(GL_POINTS);
-    glVertex3f(static_cast<float>(p.x()), static_cast<float>(p.y()), 0.F);
-    glEnd();
-    glPopAttrib();
+    g2o::opengl::color3f(LANDMARK_EDGE_GHOST_COLOR);
+    g2o::opengl::push_attrib(opengl::Capability::POINT_BIT);
+    g2o::opengl::point_size(3);
+    g2o::opengl::begin_points();
+    g2o::opengl::vertex3f(static_cast<float>(p.x()), static_cast<float>(p.y()),
+                          0.F);
+    g2o::opengl::end();
+    g2o::opengl::pop_attrib();
   } else {
     p = to->estimate();
-    glColor3f(LANDMARK_EDGE_COLOR);
+    g2o::opengl::color3f(LANDMARK_EDGE_COLOR);
   }
-  glBegin(GL_LINES);
-  glVertex3f(static_cast<float>(from->estimate().translation().x()),
-             static_cast<float>(from->estimate().translation().y()), 0.F);
-  glVertex3f(static_cast<float>(p.x()), static_cast<float>(p.y()), 0.F);
-  glEnd();
-  glPopAttrib();
+  g2o::opengl::begin_lines();
+  g2o::opengl::vertex3f(static_cast<float>(from->estimate().translation().x()),
+                        static_cast<float>(from->estimate().translation().y()),
+                        0.F);
+  g2o::opengl::vertex3f(static_cast<float>(p.x()), static_cast<float>(p.y()),
+                        0.F);
+  g2o::opengl::end();
+  g2o::opengl::pop_attrib();
   return true;
 }
 // LCOV_EXCL_STOP

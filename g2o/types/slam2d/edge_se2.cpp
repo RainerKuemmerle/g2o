@@ -36,8 +36,8 @@
 #include "g2o/types/slam2d/vertex_se2.h"
 
 #ifdef G2O_HAVE_OPENGL
+#include "g2o/stuff/opengl_interface.h"
 #include "g2o/stuff/opengl_primitives.h"
-#include "g2o/stuff/opengl_wrapper.h"
 #endif
 
 namespace g2o {
@@ -110,43 +110,48 @@ bool EdgeSE2DrawAction::operator()(
   if (!from && !to) return true;
   SE2 fromTransform;
   SE2 toTransform;
-  glPushAttrib(GL_ENABLE_BIT | GL_LIGHTING | GL_COLOR);
-  glDisable(GL_LIGHTING);
+  g2o::opengl::push_attrib({opengl::Capability::ENABLE_BIT,
+                            opengl::Capability::LIGHTING,
+                            opengl::Capability::COLOR_BUFFER_BIT});
+  g2o::opengl::disable(opengl::Capability::LIGHTING);
   if (!from) {
-    glColor3f(POSE_EDGE_GHOST_COLOR);
+    g2o::opengl::color3f(POSE_EDGE_GHOST_COLOR);
     toTransform = to->estimate();
     fromTransform = to->estimate() * e->measurement().inverse();
     // DRAW THE FROM EDGE AS AN ARROW
-    glPushMatrix();
-    glTranslatef(fromTransform.translation().x(),
-                 fromTransform.translation().y(), 0.F);
-    glRotatef(RAD2DEG(fromTransform.rotation().angle()), 0.F, 0.F, 1.F);
+    g2o::opengl::push_matrix();
+    g2o::opengl::translatef(fromTransform.translation().x(),
+                            fromTransform.translation().y(), 0.F);
+    g2o::opengl::rotatef(RAD2DEG(fromTransform.rotation().angle()), 0.F, 0.F,
+                         1.F);
     opengl::drawArrow2D(triangleX_->value(), triangleY_->value(),
                         triangleX_->value() * .3F);
-    glPopMatrix();
+    g2o::opengl::pop_matrix();
   } else if (!to) {
-    glColor3f(POSE_EDGE_GHOST_COLOR);
+    g2o::opengl::color3f(POSE_EDGE_GHOST_COLOR);
     fromTransform = from->estimate();
     toTransform = from->estimate() * e->measurement();
     // DRAW THE TO EDGE AS AN ARROW
-    glPushMatrix();
-    glTranslatef(toTransform.translation().x(), toTransform.translation().y(),
-                 0.F);
-    glRotatef(RAD2DEG(toTransform.rotation().angle()), 0.F, 0.F, 1.F);
+    g2o::opengl::push_matrix();
+    g2o::opengl::translatef(toTransform.translation().x(),
+                            toTransform.translation().y(), 0.F);
+    g2o::opengl::rotatef(RAD2DEG(toTransform.rotation().angle()), 0.F, 0.F,
+                         1.F);
     opengl::drawArrow2D(triangleX_->value(), triangleY_->value(),
                         triangleX_->value() * .3F);
-    glPopMatrix();
+    g2o::opengl::pop_matrix();
   } else {
-    glColor3f(POSE_EDGE_COLOR);
+    g2o::opengl::color3f(POSE_EDGE_COLOR);
     fromTransform = from->estimate();
     toTransform = to->estimate();
   }
-  glBegin(GL_LINES);
-  glVertex3f(fromTransform.translation().x(), fromTransform.translation().y(),
-             0.F);
-  glVertex3f(toTransform.translation().x(), toTransform.translation().y(), 0.F);
-  glEnd();
-  glPopAttrib();
+  g2o::opengl::begin_lines();
+  g2o::opengl::vertex3f(fromTransform.translation().x(),
+                        fromTransform.translation().y(), 0.F);
+  g2o::opengl::vertex3f(toTransform.translation().x(),
+                        toTransform.translation().y(), 0.F);
+  g2o::opengl::end();
+  g2o::opengl::pop_attrib();
   return true;
 }
 // LCOV_EXCL_STOP

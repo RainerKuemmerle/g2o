@@ -35,8 +35,8 @@
 #include "vertex_se3.h"
 
 #ifdef G2O_HAVE_OPENGL
+#include "g2o/stuff/opengl_interface.h"
 #include "g2o/stuff/opengl_primitives.h"
-#include "g2o/stuff/opengl_wrapper.h"
 #endif
 
 namespace g2o {
@@ -83,13 +83,13 @@ bool CacheSE3OffsetDrawAction::operator()(
 
   if (show_ && !show_->value()) return true;
   float cs = cubeSide_ ? cubeSide_->value() : 1.0F;
-  glPushAttrib(GL_COLOR);
-  glColor3f(POSE_PARAMETER_COLOR);
-  glPushMatrix();
-  glMultMatrixd(that->offsetParam()->param().cast<double>().data());
+  g2o::opengl::push_attrib(opengl::Capability::COLOR_BUFFER_BIT);
+  g2o::opengl::color3f(POSE_PARAMETER_COLOR);
+  g2o::opengl::push_matrix();
+  g2o::opengl::mult_matrixd(that->offsetParam()->param().cast<double>().data());
   opengl::drawBox(cs, cs, cs);
-  glPopMatrix();
-  glPopAttrib();
+  g2o::opengl::pop_matrix();
+  g2o::opengl::pop_attrib();
   return true;
 }
 // LCOV_EXCL_STOP

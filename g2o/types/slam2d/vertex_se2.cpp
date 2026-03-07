@@ -34,8 +34,8 @@
 #include "g2o/stuff/misc.h"
 
 #ifdef G2O_HAVE_OPENGL
+#include "g2o/stuff/opengl_interface.h"
 #include "g2o/stuff/opengl_primitives.h"
-#include "g2o/stuff/opengl_wrapper.h"
 #endif
 
 namespace g2o {
@@ -80,18 +80,20 @@ bool VertexSE2DrawAction::operator()(
 
   auto* that = static_cast<VertexSE2*>(&element);
 
-  glColor3f(POSE_VERTEX_COLOR);
-  glPushMatrix();
-  glTranslatef(static_cast<float>(that->estimate().translation().x()),
-               static_cast<float>(that->estimate().translation().y()), 0.F);
-  glRotatef(static_cast<float> RAD2DEG(that->estimate().rotation().angle()),
-            0.F, 0.F, 1.F);
+  g2o::opengl::color3f(POSE_VERTEX_COLOR);
+  g2o::opengl::push_matrix();
+  g2o::opengl::translatef(
+      static_cast<float>(that->estimate().translation().x()),
+      static_cast<float>(that->estimate().translation().y()), 0.F);
+  g2o::opengl::rotatef(
+      static_cast<float> RAD2DEG(that->estimate().rotation().angle()), 0.F, 0.F,
+      1.F);
   opengl::drawArrow2D(static_cast<float>(triangleX_->value()),
                       static_cast<float>(triangleY_->value()),
                       static_cast<float>(triangleX_->value()) * .3F);
   drawCache(that->cacheContainer(), parameters);
   drawUserData(that->userData(), parameters);
-  glPopMatrix();
+  g2o::opengl::pop_matrix();
   return true;
 }
 // LCOV_EXCL_STOP

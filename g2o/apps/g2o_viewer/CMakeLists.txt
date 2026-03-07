@@ -35,6 +35,8 @@ find_package(Qt6 COMPONENTS Widgets OpenGLWidgets REQUIRED)
 target_link_libraries(viewer_library PUBLIC core g2o_cli_library Qt6::Widgets Qt6::OpenGLWidgets)
 target_link_libraries(viewer_library PUBLIC opengl_helper)
 target_link_libraries(viewer_library PRIVATE CLI11::CLI11)
+# No direct GLU dependency: g2o provides local GLU-like helpers in the
+# `opengl_helper` library (glu_perspective / glu_look_at).
 target_link_libraries(g2o_viewer viewer_library)
 
 install(TARGETS viewer_library
