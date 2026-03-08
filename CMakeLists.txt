@@ -173,7 +173,7 @@ set(G2O_HAVE_OPENGL 0)
 
 # For building the GUI: prefer Qt6 and use its OpenGLWidgets as the backend
 set(QT_DEFAULT_MAJOR_VERSION 6)
-find_package(Qt6 REQUIRED COMPONENTS Widgets OpenGLWidgets)
+find_package(Qt6 COMPONENTS Widgets OpenGLWidgets)
 
 if (G2O_USE_OPENGL)
   if (TARGET Qt6::OpenGLWidgets)
@@ -181,7 +181,8 @@ if (G2O_USE_OPENGL)
     set(G2O_HAVE_OPENGL 1)
     message(STATUS "Using Qt6::OpenGLWidgets as OpenGL backend")
   else()
-    message(FATAL_ERROR "G2O_USE_OPENGL is ON but Qt6::OpenGLWidgets target not found. Install Qt6 with OpenGL support.")
+    set(G2O_HAVE_OPENGL 0)
+    message(WARNING "Qt6::OpenGLWidgets not found; OpenGL support disabled. Install Qt6 with OpenGL support to enable visualization.")
   endif()
 endif()
 
