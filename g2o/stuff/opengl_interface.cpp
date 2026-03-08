@@ -2,15 +2,25 @@
 #include "opengl_interface.h"
 
 #include <QOpenGLContext>
-#ifdef __APPLE__
-#include <OpenGL/gl.h>
-#else
-#include <GL/gl.h>
-#endif
+#include <QOpenGLFunctions_1_1>
 #include <cmath>
 namespace g2o::opengl {
 
 namespace {
+// Helper to get Qt's legacy (1.1) GL function wrappers from the current
+// context.
+inline QOpenGLFunctions_1_1* glf() {
+  QOpenGLContext* ctx = QOpenGLContext::currentContext();
+  if (!ctx) return nullptr;
+  static thread_local QOpenGLFunctions_1_1 funcs;
+  static thread_local QOpenGLContext* lastCtx = nullptr;
+  if (lastCtx != ctx) {
+    funcs.initializeOpenGLFunctions();
+    lastCtx = ctx;
+  }
+  return &funcs;
+}
+
 // Mapping from our Capability enum to OpenGL constants
 GLenum to_gl_enum(Capability cap) {
   switch (cap) {
@@ -47,64 +57,121 @@ GLenum to_gl_enum(Capability cap) {
 }  // namespace
 
 void init() { /* nothing */ }
-void begin_triangles() { glBegin(GL_TRIANGLES); }
-void begin_quads() { glBegin(GL_QUADS); }
-void begin_lines() { glBegin(GL_LINES); }
-void begin_line_strip() { glBegin(GL_LINE_STRIP); }
-void begin_points() { glBegin(GL_POINTS); }
-void end() { glEnd(); }
-void vertex3f(float x, float y, float z) { glVertex3f(x, y, z); }
-void vertex2f(float x, float y) { glVertex2f(x, y); }
-void color3f(float r, float g, float b) { glColor3f(r, g, b); }
-void normal3f(float x, float y, float z) { glNormal3f(x, y, z); }
-void push_matrix() { glPushMatrix(); }
-void pop_matrix() { glPopMatrix(); }
-void mult_matrixf(const float* m) { glMultMatrixf(m); }
-void scalef(float x, float y, float z) { glScalef(x, y, z); }
-void translatef(float x, float y, float z) { glTranslatef(x, y, z); }
+void begin_triangles() {
+  if (auto* f = glf()) f->glBegin(GL_TRIANGLES);
+}
+void begin_quads() {
+  if (auto* f = glf()) f->glBegin(GL_QUADS);
+}
+void begin_lines() {
+  if (auto* f = glf()) f->glBegin(GL_LINES);
+}
+void begin_line_strip() {
+  if (auto* f = glf()) f->glBegin(GL_LINE_STRIP);
+}
+void begin_points() {
+  if (auto* f = glf()) f->glBegin(GL_POINTS);
+}
+void end() {
+  if (auto* f = glf()) f->glEnd();
+}
+void vertex3f(float x, float y, float z) {
+  if (auto* f = glf()) f->glVertex3f(x, y, z);
+}
+void vertex2f(float x, float y) {
+  if (auto* f = glf()) f->glVertex2f(x, y);
+}
+void color3f(float r, float g, float b) {
+  if (auto* f = glf()) f->glColor3f(r, g, b);
+}
+void normal3f(float x, float y, float z) {
+  if (auto* f = glf()) f->glNormal3f(x, y, z);
+}
+void push_matrix() {
+  if (auto* f = glf()) f->glPushMatrix();
+}
+void pop_matrix() {
+  if (auto* f = glf()) f->glPopMatrix();
+}
+void mult_matrixf(const float* m) {
+  if (auto* f = glf()) f->glMultMatrixf(m);
+}
+void scalef(float x, float y, float z) {
+  if (auto* f = glf()) f->glScalef(x, y, z);
+}
+void translatef(float x, float y, float z) {
+  if (auto* f = glf()) f->glTranslatef(x, y, z);
+}
 void rotatef(float angle, float x, float y, float z) {
-  glRotatef(angle, x, y, z);
+  if (auto* f = glf()) f->glRotatef(angle, x, y, z);
 }
-void point_size(float s) { glPointSize(s); }
-void line_width(float w) { glLineWidth(w); }
+void point_size(float s) {
+  if (auto* f = glf()) f->glPointSize(s);
+}
+void line_width(float w) {
+  if (auto* f = glf()) f->glLineWidth(w);
+}
 bool is_enabled(Capability cap) {
-  return glIsEnabled(to_gl_enum(cap)) == GL_TRUE;
+  if (auto* f = glf()) return f->glIsEnabled(to_gl_enum(cap)) == GL_TRUE;
+  return false;
 }
-void enable(Capability cap) { glEnable(to_gl_enum(cap)); }
-void disable(Capability cap) { glDisable(to_gl_enum(cap)); }
+void enable(Capability cap) {
+  if (auto* f = glf()) f->glEnable(to_gl_enum(cap));
+}
+void disable(Capability cap) {
+  if (auto* f = glf()) f->glDisable(to_gl_enum(cap));
+}
 
-void mult_matrixd(const double* m) { glMultMatrixd(m); }
-void matrix_mode(unsigned int mode) { glMatrixMode(static_cast<GLenum>(mode)); }
-void load_identity() { glLoadIdentity(); }
-void viewport(int x, int y, int w, int h) { glViewport(x, y, w, h); }
+void mult_matrixd(const double* m) {
+  if (auto* f = glf()) f->glMultMatrixd(m);
+}
+void matrix_mode(unsigned int mode) {
+  if (auto* f = glf()) f->glMatrixMode(static_cast<GLenum>(mode));
+}
+void load_identity() {
+  if (auto* f = glf()) f->glLoadIdentity();
+}
+void viewport(int x, int y, int w, int h) {
+  if (auto* f = glf()) f->glViewport(x, y, w, h);
+}
 void clear_color(float r, float g, float b, float a) {
-  glClearColor(r, g, b, a);
+  if (auto* f = glf()) f->glClearColor(r, g, b, a);
 }
-void clear(unsigned int mask) { glClear(static_cast<GLbitfield>(mask)); }
+void clear(unsigned int mask) {
+  if (auto* f = glf()) f->glClear(static_cast<GLbitfield>(mask));
+}
 void push_attrib(unsigned int mask) {
-  glPushAttrib(static_cast<GLbitfield>(mask));
+  if (auto* f = glf()) f->glPushAttrib(static_cast<GLbitfield>(mask));
 }
-void pop_attrib() { glPopAttrib(); }
+void pop_attrib() {
+  if (auto* f = glf()) f->glPopAttrib();
+}
 
 void push_attrib(Capability cap) {
-  glPushAttrib(static_cast<GLbitfield>(to_gl_enum(cap)));
+  if (auto* f = glf())
+    f->glPushAttrib(static_cast<GLbitfield>(to_gl_enum(cap)));
 }
 
 void push_attrib(std::initializer_list<Capability> caps) {
   unsigned int mask = 0;
   for (auto c : caps) mask |= to_gl_enum(c);
-  glPushAttrib(static_cast<GLbitfield>(mask));
+  if (auto* f = glf()) f->glPushAttrib(static_cast<GLbitfield>(mask));
 }
-void color4f(float r, float g, float b, float a) { glColor4f(r, g, b, a); }
-void shade_model(unsigned int mode) { glShadeModel(static_cast<GLenum>(mode)); }
+void color4f(float r, float g, float b, float a) {
+  if (auto* f = glf()) f->glColor4f(r, g, b, a);
+}
+void shade_model(unsigned int mode) {
+  if (auto* f = glf()) f->glShadeModel(static_cast<GLenum>(mode));
+}
 void blend_func(unsigned int sfactor, unsigned int dfactor) {
-  glBlendFunc(static_cast<GLenum>(sfactor), static_cast<GLenum>(dfactor));
+  if (auto* f = glf())
+    f->glBlendFunc(static_cast<GLenum>(sfactor), static_cast<GLenum>(dfactor));
 }
 
 // Overloads that accept Capability for convenience
 void shade_model(Capability mode) { glShadeModel(to_gl_enum(mode)); }
 void blend_func(Capability sfactor, Capability dfactor) {
-  glBlendFunc(to_gl_enum(sfactor), to_gl_enum(dfactor));
+  if (auto* f = glf()) f->glBlendFunc(to_gl_enum(sfactor), to_gl_enum(dfactor));
 }
 
 void glu_perspective(double fovy, double aspect, double zNear, double zFar) {
