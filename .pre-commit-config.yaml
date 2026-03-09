@@ -11,16 +11,16 @@ repos:
 
 # C++
 -   repo: https://github.com/pre-commit/mirrors-clang-format
-    rev: v21.1.8
+    rev: v22.1.0
     hooks:
     -   id: clang-format
 
 # python
 -   repo: https://github.com/pycqa/isort
-    rev: 7.0.0
+    rev: 8.0.1
     hooks:
       - id: isort
 -   repo: https://github.com/psf/black-pre-commit-mirror
-    rev: 26.1.0
+    rev: 26.3.0
     hooks:
     -   id: black
