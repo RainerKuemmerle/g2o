@@ -115,6 +115,9 @@ inline void to_json(nlohmann::json& j,
                      {"ids", edge.ids},
                      {"measurement", edge.measurement},
                      {"information", edge.information}};
+  if (edge.level != 0) {
+    j["level"] = edge.level;
+  }
   internal::store_if_not_empty(j, "data", edge.data);
   internal::store_if_not_empty(j, "param_ids", edge.param_ids);
 }
@@ -125,6 +128,7 @@ inline void from_json(const nlohmann::json& j,
   j.at("ids").get_to(edge.ids);
   j.at("measurement").get_to(edge.measurement);
   j.at("information").get_to(edge.information);
+  internal::get_to_if_exists(j, "level", edge.level);
   internal::get_to_if_exists(j, "data", edge.data);
   internal::get_to_if_exists(j, "param_ids", edge.param_ids);
 }
