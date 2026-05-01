@@ -2,8 +2,6 @@
 
 # g2o will be available after conftest.py sets sys.path
 import g2opy as g2o
-import numpy as np
-import pytest
 
 
 class TestSparseOptimizer:

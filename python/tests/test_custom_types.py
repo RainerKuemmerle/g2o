@@ -2,7 +2,6 @@
 
 import g2opy as g2o
 import numpy as np
-import pytest
 
 
 class TestVectorXVertex:
