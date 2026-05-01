@@ -455,6 +455,7 @@ bool OptimizableGraph::load(std::istream& is, io::Format format) {
         information(r, c) = abstract_edge.information[idx++];
         if (r != c) information(c, r) = information(r, c);
       }
+    edge->setLevel(abstract_edge.level);
     if (!addEdge(edge)) {
       G2O_ERROR(
           "Failure adding Edge {} IDs {}", abstract_edge.tag,
@@ -728,7 +729,7 @@ bool OptimizableGraph::saveEdge(AbstractGraph& abstract_graph,
     for (int c = r; c < e->dimension(); ++c)
       upper_triangle.push_back(information(r, c));
   abstract_graph.edges().emplace_back(tag, ids, data, upper_triangle,
-                                      e->parameterIds());
+                                      e->parameterIds(), e->level());
   saveUserData(abstract_graph.edges().back(), e->userData());
   return true;
 }

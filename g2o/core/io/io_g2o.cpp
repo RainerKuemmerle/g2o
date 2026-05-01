@@ -50,6 +50,8 @@ std::ostream& operator<<(std::ostream& os, const std::vector<T>& v) {
   }
   return os;
 }
+
+std::unordered_set<std::string> kInternalTokens = {"G2O_EDGE_LEVEL"};
 }  // namespace
 
 namespace g2o {
@@ -79,6 +81,27 @@ std::optional<AbstractGraph> IoG2O::load(std::istream& input) {
       while (current_line >> id) {
         result.fixed().emplace_back(id);
         G2O_TRACE("Fixing vertex {}", id);
+      }
+      continue;
+    }
+
+    if (kInternalTokens.count(token) > 0) {
+      // handle internal tokens that are not part of the graph, but control
+      // loading/saving behavior
+      if (token == "G2O_EDGE_LEVEL") {
+        int level;
+        if (!(current_line >> level)) {
+          G2O_ERROR("Error reading edge level at line {}", line_number);
+          continue;
+        }
+        G2O_TRACE("Setting edge level to {} for last edge", level);
+        if (result.edges().empty()) {
+          G2O_ERROR(
+              "Got edge level {}, but no edge has been read yet at line {}",
+              level, line_number);
+          continue;
+        }
+        result.edges().back().level = level;
       }
       continue;
     }
@@ -232,6 +255,9 @@ bool IoG2O::save(std::ostream& output, const AbstractGraph& graph) {
       output << edge.information.size() << " ";
     output << edge.information << "\n";
     printData(output, edge.data);
+    if (edge.level != 0) {
+      output << "G2O_EDGE_LEVEL " << edge.level << "\n";
+    }
   }
 
   // After the vertices to be backward compatible

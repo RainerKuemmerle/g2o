@@ -93,17 +93,20 @@ class G2O_CORE_API AbstractGraph {
     std::vector<double> measurement;  ///< the measurement as a vector
     std::vector<double>
         information;  ///< upper triangular part of the information matrix
+    int level =
+        0;  ///< the level of this edge, used for hierarchical optimization
     AbstractEdge() = default;
     AbstractEdge(std::string tag, std::vector<int> ids,
                  std::vector<double> measurement,
                  std::vector<double> information,
-                 std::vector<int> param_ids = {},
+                 std::vector<int> param_ids = {}, int level = 0,
                  std::vector<AbstractData> data = {})
         : AbstractGraphElement(std::move(tag), std::move(data)),
           ids(std::move(ids)),
           param_ids(std::move(param_ids)),
           measurement(std::move(measurement)),
-          information(std::move(information)) {}
+          information(std::move(information)),
+          level(level) {}
   };
 
   AbstractGraph() = default;

@@ -84,6 +84,8 @@ MATCHER(EdgeEqual, "") {
                   Eq(expected.tag)),
             Field("ids", &g2o::AbstractGraph::AbstractEdge::ids,
                   ElementsAreArray(expected.ids)),
+            Field("level", &g2o::AbstractGraph::AbstractEdge::level,
+                  Eq(expected.level)),
             Field("param_ids", &g2o::AbstractGraph::AbstractEdge::param_ids,
                   ElementsAreArray(expected.param_ids)),
             Field("measurement", &g2o::AbstractGraph::AbstractEdge::measurement,
@@ -124,7 +126,7 @@ class AbstractGraphIO : public TestWithParam<g2o::io::Format> {
 
     abstract_graph_.edges().emplace_back(
         "EDGE_SE2", std::vector<int>{1, 2}, std::vector<double>{0.1, 0.2, 0.3},
-        std::vector<double>{1., 2., 3., 4., 5., 6.}, std::vector<int>(),
+        std::vector<double>{1., 2., 3., 4., 5., 6.}, std::vector<int>(), 1,
         std::vector<g2o::AbstractGraph::AbstractData>{
             {"VERTEX_TAG", "more fancy data"},
             {"VERTEX_TAG", "even more fancy data"}});
@@ -247,6 +249,7 @@ class OptimizableGraphIO : public TestWithParam<g2o::io::Format> {
     e2->vertices()[1] = optimizer_ptr_->vertex(2);
     e2->setMeasurement(g2o::SE2(0, 1, 0));
     e2->setInformation(g2o::MatrixN<3>::Identity());
+    e2->setLevel(0);
     optimizer_ptr_->addEdge(e2);
   }
   std::unique_ptr<g2o::SparseOptimizer> optimizer_ptr_;
@@ -301,6 +304,44 @@ TEST_P(OptimizableGraphIO, SaveAndLoad) {
   // Brutally check that serialization result is the same
   std::stringstream buffer_after_loading;
   save_result = loaded_optimizer->save(buffer_after_loading, format);
+  ASSERT_THAT(save_result, IsTrue());
+  EXPECT_THAT(buffer.str(), Eq(buffer_after_loading.str()));
+}
+
+TEST_P(OptimizableGraphIO, SaveAndLoadWithDifferentEdgeLevels) {
+  g2o::io::Format format = GetParam();
+
+  // Manually set different levels for the edges
+  auto edge_iter = optimizer_ptr_->edges().begin();
+  static_cast<g2o::OptimizableGraph::Edge*>(edge_iter->get())->setLevel(2);
+  ++edge_iter;
+  static_cast<g2o::OptimizableGraph::Edge*>(edge_iter->get())->setLevel(5);
+
+  std::stringstream buffer(format == g2o::io::Format::kBinary
+                               ? std::ios_base::binary | std::ios_base::in |
+                                     std::ios_base::out
+                               : std::ios_base::in | std::ios_base::out);
+  constexpr int kLevelToSave = 2;
+  bool save_result = optimizer_ptr_->save(buffer, format, kLevelToSave);
+  ASSERT_THAT(save_result, IsTrue());
+  EXPECT_THAT(buffer.str(), Not(IsEmpty()));
+
+  auto loaded_optimizer = g2o::internal::createOptimizerForTests();
+  loaded_optimizer->load(buffer, format);
+
+  EXPECT_THAT(loaded_optimizer->vertices(), Not(IsEmpty()));
+  EXPECT_THAT(loaded_optimizer->edges(), Not(IsEmpty()));
+
+  for (const auto& edge_ptr : loaded_optimizer->edges()) {
+    ASSERT_NE(edge_ptr, nullptr);
+    EXPECT_THAT(
+        static_cast<g2o::OptimizableGraph::Edge*>(edge_ptr.get())->level(),
+        Eq(kLevelToSave));
+  }
+
+  std::stringstream buffer_after_loading;
+  save_result =
+      loaded_optimizer->save(buffer_after_loading, format, kLevelToSave);
   ASSERT_THAT(save_result, IsTrue());
   EXPECT_THAT(buffer.str(), Eq(buffer_after_loading.str()));
 }
