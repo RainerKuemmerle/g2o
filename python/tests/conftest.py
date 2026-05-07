@@ -4,6 +4,8 @@ import os
 import sys
 import tempfile
 from pathlib import Path
+import numpy as np
+import pytest
 
 # Ensure build lib is in path BEFORE any imports
 build_lib_dir = os.environ.get(
@@ -12,9 +14,7 @@ build_lib_dir = os.environ.get(
 sys.path.insert(0, build_lib_dir)
 
 # This must come after path setup
-import g2opy as g2o
-import numpy as np
-import pytest
+import g2opy as g2o  # noqa: E402
 
 
 def pytest_runtest_setup(item):

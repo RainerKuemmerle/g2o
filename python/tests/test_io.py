@@ -10,9 +10,6 @@ class TestIOFormats:
     def test_io_format_enum(self):
         """Test IoFormat enum."""
         assert hasattr(g2o, "IoFormat")
-        # Test that formats are available
-        formats = ["G2O", "JSON", "BINARY"]
-        # At least G2O format should be available
         assert hasattr(g2o.IoFormat, "G2O")
 
     def test_io_wrapper_format_guessing(self):
