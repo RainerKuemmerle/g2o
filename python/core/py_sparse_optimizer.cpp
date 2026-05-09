@@ -84,6 +84,9 @@ void declareSparseOptimizer(py::module& m) {
       .def("gauge_freedom", &CLS::gaugeFreedom)  // -> bool
       .def("active_chi2", &CLS::activeChi2)      // -> double
       .def("active_robust_chi2", &CLS::activeRobustChi2)  // -> double
+      .def("num_connected_components", &CLS::numConnectedComponents,
+           "level"_a = 0)
+      .def("is_connected", &CLS::isConnected, "level"_a = 0)
       .def("print_graph_summary",
            [](CLS& optimizer) {
              std::ostringstream os;

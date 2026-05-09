@@ -31,6 +31,7 @@
 #include <cassert>
 #include <cstdlib>
 #include <iostream>
+#include <limits>
 #include <memory>
 #include <string_view>
 #include <unordered_set>
@@ -40,6 +41,7 @@
 #include "estimate_propagator.h"
 #include "g2o/config.h"  // IWYU pragma: keep
 #include "g2o/core/eigen_types.h"
+#include "g2o/core/hyper_dijkstra.h"
 #include "g2o/core/jacobian_workspace.h"  // IWYU pragma: keep
 #include "g2o/core/optimizable_graph.h"
 #include "g2o/core/sparse_block_matrix.h"
@@ -164,6 +166,50 @@ void SparseOptimizer::printGraphSummary(std::ostream& os) const {
     os << "  active chi2: " << activeChi2() << "\n";
     os << "  active robust chi2: " << activeRobustChi2() << "\n";
   }
+  os << "  connected_components: " << numConnectedComponents() << "\n";
+}
+
+int SparseOptimizer::numConnectedComponents(int level) const {
+  if (vertices().empty()) return 0;
+
+  struct LevelCostFunction : public HyperDijkstra::CostFunction {
+    explicit LevelCostFunction(int level_) : level(level_) {}
+    double operator()(HyperGraph::Edge* edge, HyperGraph::Vertex* /*from*/,
+                      HyperGraph::Vertex* /*to*/) override {
+      auto oe = static_cast<OptimizableGraph::Edge*>(edge);
+      if (!oe || oe->level() != level) {
+        return std::numeric_limits<double>::max();
+      }
+      return 1.;
+    }
+    int level;
+  };
+
+  std::shared_ptr<HyperGraph> graph(const_cast<SparseOptimizer*>(this),
+                                    [](HyperGraph*) {});
+  HyperDijkstra d(graph);
+  LevelCostFunction cost(level);
+
+  HyperGraph::VertexSet remaining;
+  for (const auto& it : vertices()) {
+    remaining.insert(it.second);
+  }
+
+  int components = 0;
+  while (!remaining.empty()) {
+    auto root = *remaining.begin();
+    d.shortestPaths(root, cost);
+    const auto& visited = d.visited();
+    for (const auto& v : visited) {
+      remaining.erase(v);
+    }
+    components++;
+  }
+  return components;
+}
+
+bool SparseOptimizer::isConnected(int level) const {
+  return numConnectedComponents(level) <= 1;
 }
 
 std::shared_ptr<OptimizableGraph::Vertex> SparseOptimizer::findGauge() {

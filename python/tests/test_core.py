@@ -57,6 +57,22 @@ class TestSparseOptimizer:
         assert "vertices:" in summary
         assert "edges:" in summary
         assert "poses:" in summary
+        assert "levels:" in summary
+        assert "connected_components:" in summary
+
+    def test_connected_components(self, simple_se2_graph):
+        """Test graph connectivity diagnostics."""
+        assert simple_se2_graph.is_connected()
+        assert simple_se2_graph.num_connected_components() == 1
+
+        # Disconnect the graph by promoting one edge to a different level.
+        edge = next(iter(simple_se2_graph.edges()))
+        edge.set_level(1)
+
+        assert not simple_se2_graph.is_connected(0)
+        assert simple_se2_graph.num_connected_components(0) == 2
+        assert not simple_se2_graph.is_connected(1)
+        assert simple_se2_graph.num_connected_components(1) == 2
 
 
 class TestBlockSolvers:
