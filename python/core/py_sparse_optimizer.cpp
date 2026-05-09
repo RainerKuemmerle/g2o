@@ -10,6 +10,7 @@
 #include <g2o/core/optimization_algorithm_with_hessian.h>
 #include <g2o/core/sparse_optimizer.h>
 
+#include <sstream>
 #include <utility>
 
 namespace g2o {
@@ -83,7 +84,13 @@ void declareSparseOptimizer(py::module& m) {
       .def("gauge_freedom", &CLS::gaugeFreedom)  // -> bool
       .def("active_chi2", &CLS::activeChi2)      // -> double
       .def("active_robust_chi2", &CLS::activeRobustChi2)  // -> double
-      .def("verbose", &CLS::verbose)                      // -> bool
+      .def("print_graph_summary",
+           [](CLS& optimizer) {
+             std::ostringstream os;
+             optimizer.printGraphSummary(os);
+             return os.str();
+           })
+      .def("verbose", &CLS::verbose)  // -> bool
       .def("set_verbose", &CLS::setVerbose,
            "verbose"_a)  // -> void
 

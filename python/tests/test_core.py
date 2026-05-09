@@ -51,6 +51,13 @@ class TestSparseOptimizer:
         basic_se2_optimizer.set_verbose(False)
         # Should not raise an exception
 
+    def test_print_graph_summary(self, simple_se2_graph):
+        """Test Python binding for graph summary."""
+        summary = simple_se2_graph.print_graph_summary()
+        assert "vertices:" in summary
+        assert "edges:" in summary
+        assert "poses:" in summary
+
 
 class TestBlockSolvers:
     """Test BlockSolver configurations."""

@@ -128,6 +128,44 @@ double SparseOptimizer::activeRobustChi2() const {
   return chi;
 }
 
+void SparseOptimizer::printGraphSummary(std::ostream& os) const {
+  const size_t nVertices = vertices().size();
+  const size_t nEdges = edges().size();
+  os << "Graph summary:\n";
+  os << "  vertices: " << nVertices << "\n";
+  os << "  edges: " << nEdges << "\n";
+
+  if (nVertices > 0) {
+    const int maxDim = maxDimension();
+    int nPoses = 0;
+    int nLandmarks = 0;
+    std::unordered_set<int> levels;
+    for (const auto& it : vertices()) {
+      auto v = std::static_pointer_cast<OptimizableGraph::Vertex>(it.second);
+      if (v->dimension() == maxDim)
+        nPoses++;
+      else
+        nLandmarks++;
+    }
+    for (const auto& e : edges()) {
+      auto oe = static_cast<OptimizableGraph::Edge*>(e.get());
+      if (oe) {
+        levels.insert(oe->level());
+      }
+    }
+    os << "  poses: " << nPoses << "\n";
+    os << "  landmarks: " << nLandmarks << "\n";
+    os << "  levels: " << levels.size() << "\n";
+  }
+
+  os << "  active vertices: " << activeVertices_.size() << "\n";
+  os << "  active edges: " << activeEdges_.size() << "\n";
+  if (!activeEdges_.empty()) {
+    os << "  active chi2: " << activeChi2() << "\n";
+    os << "  active robust chi2: " << activeRobustChi2() << "\n";
+  }
+}
+
 std::shared_ptr<OptimizableGraph::Vertex> SparseOptimizer::findGauge() {
   if (vertices().empty()) return nullptr;
 
