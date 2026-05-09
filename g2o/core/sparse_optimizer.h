@@ -28,6 +28,7 @@
 #define G2O_GRAPH_OPTIMIZER_CHOL_H_
 
 #include <memory>
+#include <ostream>
 #include <utility>
 #include <vector>
 
@@ -170,6 +171,11 @@ class G2O_CORE_API SparseOptimizer : public OptimizableGraph {
    * of the error according to the robustification of the error functions.
    */
   double activeRobustChi2() const;
+
+  /**
+   * Print a short summary of the currently loaded graph.
+   */
+  void printGraphSummary(std::ostream& os = std::cout) const;
 
   //! verbose information during optimization
   bool verbose() const { return verbose_; }
