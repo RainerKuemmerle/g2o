@@ -177,6 +177,18 @@ class G2O_CORE_API SparseOptimizer : public OptimizableGraph {
    */
   void printGraphSummary(std::ostream& os = std::cout) const;
 
+  /**
+   * Returns the number of connected components in the graph.
+   * Only edges with the specified level are considered.
+   */
+  int numConnectedComponents(int level = 0) const;
+
+  /**
+   * Returns true if the graph is fully connected.
+   * Only edges with the specified level are considered.
+   */
+  bool isConnected(int level = 0) const;
+
   //! verbose information during optimization
   bool verbose() const { return verbose_; }
   void setVerbose(bool verbose);
