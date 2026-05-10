@@ -75,6 +75,30 @@ class TestSparseOptimizer:
         assert simple_se2_graph.num_connected_components(1) == 2
 
 
+class TestParameterContainer:
+    """Tests for OptimizableGraph parameter container access."""
+
+    def test_optimizer_parameters(self):
+        optimizer = g2o.SparseOptimizer()
+        parameters = optimizer.parameters()
+        assert len(parameters) == 0
+
+        camera_parameters = g2o.CameraParameters(1.0, [0.0, 0.0], 0.0)
+        camera_parameters.set_id(42)
+
+        assert optimizer.add_parameter(camera_parameters)
+        assert len(parameters) == 1
+
+        parameter = parameters.get_parameter(42)
+        assert parameter is not None
+        assert parameter.id() == 42
+
+        detached = parameters.detach_parameter(42)
+        assert detached is not None
+        assert detached.id() == 42
+        assert len(parameters) == 0
+
+
 class TestBlockSolvers:
     """Test BlockSolver configurations."""
 

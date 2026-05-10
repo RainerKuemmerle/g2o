@@ -1,6 +1,7 @@
 #pragma once
 
 #include <g2o/core/parameter.h>
+#include <g2o/core/parameter_container.h>
 
 #include "g2opy.h"
 
@@ -12,6 +13,20 @@ inline void declareParameter(py::module& m) {
       .def("id", &Parameter::id)
       .def("set_id", &Parameter::setId, "id"_a)
       .def("element_type", &Parameter::elementType);
+}
+
+inline void declareParameterContainer(py::module& m) {
+  py::classh<ParameterContainer>(m, "ParameterContainer")
+      .def(py::init<>())
+      .def("add_parameter", &ParameterContainer::addParameter, "parameter"_a,
+           py::keep_alive<1, 2>())
+      .def("get_parameter", &ParameterContainer::getParameter, "id"_a)
+      .def("detach_parameter", &ParameterContainer::detachParameter, "id"_a)
+      .def("clear", &ParameterContainer::clear)
+      .def("size", &ParameterContainer::size)
+      .def("__len__", [](const ParameterContainer& self) {
+        return static_cast<py::ssize_t>(self.size());
+      });
 }
 
 }  // end namespace g2o
