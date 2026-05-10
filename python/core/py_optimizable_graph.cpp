@@ -10,6 +10,7 @@
 #include "g2o/core/robust_kernel.h"  // IWYU pragma: keep
 
 namespace g2o {
+class ParameterContainer;
 
 void declareOptimizableGraph(py::module& m) {
   using CLS = OptimizableGraph;
@@ -235,6 +236,10 @@ void declareOptimizableGraph(py::module& m) {
           py::keep_alive<1, 2>());  // Parameter* -> bool
   cls.def("parameter", &CLS::parameter,
           "id"_a);  // int -> Parameter*
+  cls.def(
+      "parameters",
+      [](CLS& self) -> ParameterContainer& { return self.parameters(); },
+      py::return_value_policy::reference_internal);
 
   cls.def("verify_information_matrices", &CLS::verifyInformationMatrices,
           "verbose"_a = false);  // bool -> bool

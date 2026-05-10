@@ -37,6 +37,7 @@ void declareCore(py::module& m) {
 
   declareEigenTypes(m);
   declareParameter(m);
+  declareParameterContainer(m);
   declareG2OBatchStatistics(m);
 
   declareJacobianWorkspace(m);
