@@ -22,8 +22,8 @@ inline void declareParameterContainer(py::module& m) {
            py::keep_alive<1, 2>())
       .def("get_parameter", &ParameterContainer::getParameter, "id"_a)
       .def("detach_parameter", &ParameterContainer::detachParameter, "id"_a)
-      .def("clear", &ParameterContainer::clear)
-      .def("size", &ParameterContainer::size)
+      .def("clear", [](ParameterContainer& self) { self.clear(); })
+      .def("size", [](const ParameterContainer& self) { return self.size(); })
       .def("__len__", [](const ParameterContainer& self) {
         return static_cast<py::ssize_t>(self.size());
       });
