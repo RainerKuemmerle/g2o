@@ -32,7 +32,7 @@ jobs:
 
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
             fetch-depth: 25
 
@@ -88,6 +88,6 @@ jobs:
 
       - name: Coverage
         if: matrix.config.do_coverage == 'ON'
-        uses: codecov/codecov-action@v6.0.0
+        uses: codecov/codecov-action@v7.0.0
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
