@@ -50,7 +50,10 @@ def main():
     num_pose = 15
     for i in range(num_pose):
         # pose here means transform points from camera coordinates to world coordinates
-        pose = g2o.SE3Quat(np.identity(3), [i * 0.04 - 1, 0, 0])
+        pose = g2o.SE3Quat(
+            np.eye(3, order="F", dtype=np.float64),
+            np.array([i * 0.04 - 1, 0, 0], dtype=np.float64),
+        )
         sbacam = g2o.SBACam(pose)
         sbacam.set_cam(*focal_length, *principal_point, baseline)
 

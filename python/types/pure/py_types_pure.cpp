@@ -1,13 +1,10 @@
 #include "py_types_pure.h"
 
-#include <pybind11/cast.h>
-#include <pybind11/pybind11.h>
-#include <pybind11/pytypes.h>
-
 #include "detail/registry.h"
 #include "g2o/core/base_dynamic_vertex.h"
 #include "g2o/core/base_variable_sized_edge.h"
 #include "g2o/core/eigen_types.h"
+#include "g2opy.h"
 
 namespace g2o {
 
@@ -36,19 +33,14 @@ class VectorXVertex : public BaseDynamicVertex<VectorX> {
   }
 };
 
-class PyVectorXVertex : public VectorXVertex,
-                        public py::trampoline_self_life_support {
+class PyVectorXVertex : public VectorXVertex {
  public:
+  NB_TRAMPOLINE(VectorXVertex, 1);
   PyVectorXVertex() = default;
 
   /* Trampoline for oplusImpl */
   void oplus_impl(const Eigen::Ref<VectorX>& v) override {
-    PYBIND11_OVERRIDE_PURE(
-        void,          /* Return type */
-        VectorXVertex, /* Parent class */
-        oplus_impl,    /* Name of function in C++ (must match Python name) */
-        v              /* Argument(s) */
-    );
+    NB_OVERRIDE_PURE(oplus_impl, v);
   }
 };
 
@@ -58,34 +50,25 @@ class VariableVectorXEdge
   VariableVectorXEdge() { resize(0); }
 };
 
-class PyVariableVectorXEdge : public VariableVectorXEdge,
-                              public py::trampoline_self_life_support {
+class PyVariableVectorXEdge : public VariableVectorXEdge {
  public:
+  NB_TRAMPOLINE(VariableVectorXEdge, 2);
   PyVariableVectorXEdge() = default;
 
   // Trampoline for compute_error
   void computeError() override {
-    PYBIND11_OVERRIDE_PURE_NAME(
-        void,                /* Return type */
-        VariableVectorXEdge, /* Parent class */
-        "compute_error",     /* Name of function in Python */
-        computeError,        /* function in C++ */
-    );
+    NB_OVERRIDE_PURE_NAME("compute_error", computeError, );
   }
 
   void linearizeOplus() override {
-    PYBIND11_OVERRIDE_NAME(void,                /* Return type */
-                           VariableVectorXEdge, /* Parent class */
-                           "linearize_oplus",   /* Name of function in Python */
-                           linearizeOplus,      /* function in C++ */
-    );
+    NB_OVERRIDE_NAME("linearize_oplus", linearizeOplus, );
   }
 };
 
 void declareTypesPure(detail::Registry& registry) {
   registry.registerBaseVertex<Eigen::Dynamic, VectorX>();
 
-  py::classh<VectorXVertex, PyVectorXVertex,
+  py::class_<VectorXVertex, PyVectorXVertex,
              BaseVertex<Eigen::Dynamic, VectorX>>(registry.mod(),
                                                   "VectorXVertex")
       .def(py::init<>())

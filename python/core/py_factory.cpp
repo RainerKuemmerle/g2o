@@ -5,27 +5,27 @@
 
 namespace g2o {
 
-void declareFactory(py::module& m) {
+void declareFactory(py::module_& m) {
   // Wrap Factory::TypeInfo struct
   py::class_<Factory::TypeInfo>(m, "FactoryTypeInfo")
       .def(py::init<>())
-      .def_readwrite("element_type_bit", &Factory::TypeInfo::elementTypeBit)
-      .def_readwrite("dimension", &Factory::TypeInfo::dimension)
-      .def_readwrite("dimension_at_compile_time",
-                     &Factory::TypeInfo::dimension_at_compile_time)
-      .def_readwrite("minimal_dimension", &Factory::TypeInfo::minimal_dimension)
-      .def_readwrite("number_vertices", &Factory::TypeInfo::number_vertices)
-      .def_readwrite("number_vertices_at_compile_time",
-                     &Factory::TypeInfo::number_vertices_at_compile_time)
-      .def_readwrite("number_parameters", &Factory::TypeInfo::number_parameters)
-      .def_readwrite("error_dimension", &Factory::TypeInfo::error_dimension)
-      .def_readwrite("error_dimension_at_compile_time",
-                     &Factory::TypeInfo::error_dimension_at_compile_time);
+      .def_rw("element_type_bit", &Factory::TypeInfo::elementTypeBit)
+      .def_rw("dimension", &Factory::TypeInfo::dimension)
+      .def_rw("dimension_at_compile_time",
+              &Factory::TypeInfo::dimension_at_compile_time)
+      .def_rw("minimal_dimension", &Factory::TypeInfo::minimal_dimension)
+      .def_rw("number_vertices", &Factory::TypeInfo::number_vertices)
+      .def_rw("number_vertices_at_compile_time",
+              &Factory::TypeInfo::number_vertices_at_compile_time)
+      .def_rw("number_parameters", &Factory::TypeInfo::number_parameters)
+      .def_rw("error_dimension", &Factory::TypeInfo::error_dimension)
+      .def_rw("error_dimension_at_compile_time",
+              &Factory::TypeInfo::error_dimension_at_compile_time);
 
-  py::class_<Factory, std::unique_ptr<Factory, py::nodelete>>(m, "Factory")
-      .def(py::init([]() {
-        return std::unique_ptr<Factory, py::nodelete>(Factory::instance());
-      }))
+  py::class_<Factory>(m, "Factory", py::never_destruct{})
+      .def_static(
+          "instance", []() -> Factory* { return Factory::instance(); },
+          py::rv_policy::reference)
       .def(
           "knows_tag",
           [](Factory& factory, const std::string& tag) {

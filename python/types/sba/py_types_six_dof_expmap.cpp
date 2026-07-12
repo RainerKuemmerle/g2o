@@ -17,17 +17,16 @@ G2O_USE_TYPE_GROUP(expmap)
 namespace g2o {
 
 void declareTypesSixDofExpmap(detail::Registry& registry) {
-  py::classh<StereoCameraParameters>(registry.mod(), "StereoCameraParameters")
+  py::class_<StereoCameraParameters>(registry.mod(), "StereoCameraParameters")
       .def(py::init<>())
-      .def_readwrite("focal_length", &StereoCameraParameters::focal_length)
-      .def_readwrite("principle_point",
-                     &StereoCameraParameters::principle_point)
-      .def_readwrite("baseline", &StereoCameraParameters::baseline);
+      .def_rw("focal_length", &StereoCameraParameters::focal_length)
+      .def_rw("principle_point", &StereoCameraParameters::principle_point)
+      .def_rw("baseline", &StereoCameraParameters::baseline);
 
-  py::classh<CameraParameters, Parameter>(registry.mod(), "CameraParameters")
+  py::class_<CameraParameters, Parameter>(registry.mod(), "CameraParameters")
       .def(py::init<>())
-      .def(py::init([](double f, const Eigen::Ref<const Vector2>& p, double b) {
-        return CameraParameters(f, p, b);
+      .def(py::new_([](double f, const py::DRef<const Vector2>& p, double b) {
+        return new CameraParameters(f, p, b);
       }))
       .def("cam_map", &CameraParameters::cam_map, "trans_xyz"_a)
       .def("stereocam_uvu_map", &CameraParameters::stereocam_uvu_map,
@@ -46,29 +45,29 @@ void declareTypesSixDofExpmap(detail::Registry& registry) {
   registry.registerEdgeFixed<EdgeSE3ProjectXYZ>("EdgeSE3ProjectXYZ")
       .def("is_depth_positive", &EdgeSE3ProjectXYZ::isDepthPositive)
       .def("cam_project", &EdgeSE3ProjectXYZ::cam_project)
-      .def_readwrite("fx", &EdgeSE3ProjectXYZ::fx)
-      .def_readwrite("fy", &EdgeSE3ProjectXYZ::fy)
-      .def_readwrite("cx", &EdgeSE3ProjectXYZ::cx)
-      .def_readwrite("cy", &EdgeSE3ProjectXYZ::cy);
+      .def_rw("fx", &EdgeSE3ProjectXYZ::fx)
+      .def_rw("fy", &EdgeSE3ProjectXYZ::fy)
+      .def_rw("cx", &EdgeSE3ProjectXYZ::cx)
+      .def_rw("cy", &EdgeSE3ProjectXYZ::cy);
 
   registry
       .registerEdgeFixed<EdgeSE3ProjectXYZOnlyPose>("EdgeSE3ProjectXYZOnlyPose")
       .def("is_depth_positive", &EdgeSE3ProjectXYZOnlyPose::isDepthPositive)
       .def("cam_project", &EdgeSE3ProjectXYZOnlyPose::cam_project)
-      .def_readwrite("fx", &EdgeSE3ProjectXYZOnlyPose::fx)
-      .def_readwrite("fy", &EdgeSE3ProjectXYZOnlyPose::fy)
-      .def_readwrite("cx", &EdgeSE3ProjectXYZOnlyPose::cx)
-      .def_readwrite("cy", &EdgeSE3ProjectXYZOnlyPose::cy)
-      .def_readwrite("Xw", &EdgeSE3ProjectXYZOnlyPose::Xw);
+      .def_rw("fx", &EdgeSE3ProjectXYZOnlyPose::fx)
+      .def_rw("fy", &EdgeSE3ProjectXYZOnlyPose::fy)
+      .def_rw("cx", &EdgeSE3ProjectXYZOnlyPose::cx)
+      .def_rw("cy", &EdgeSE3ProjectXYZOnlyPose::cy)
+      .def_rw("Xw", &EdgeSE3ProjectXYZOnlyPose::Xw);
 
   registry.registerEdgeFixed<EdgeStereoSE3ProjectXYZ>("EdgeStereoSE3ProjectXYZ")
       .def("is_depth_positive", &EdgeStereoSE3ProjectXYZ::isDepthPositive)
       .def("cam_project", &EdgeStereoSE3ProjectXYZ::cam_project)
-      .def_readwrite("fx", &EdgeStereoSE3ProjectXYZ::fx)
-      .def_readwrite("fy", &EdgeStereoSE3ProjectXYZ::fy)
-      .def_readwrite("cx", &EdgeStereoSE3ProjectXYZ::cx)
-      .def_readwrite("cy", &EdgeStereoSE3ProjectXYZ::cy)
-      .def_readwrite("bf", &EdgeStereoSE3ProjectXYZ::bf);
+      .def_rw("fx", &EdgeStereoSE3ProjectXYZ::fx)
+      .def_rw("fy", &EdgeStereoSE3ProjectXYZ::fy)
+      .def_rw("cx", &EdgeStereoSE3ProjectXYZ::cx)
+      .def_rw("cy", &EdgeStereoSE3ProjectXYZ::cy)
+      .def_rw("bf", &EdgeStereoSE3ProjectXYZ::bf);
 
   registry
       .registerEdgeFixed<EdgeStereoSE3ProjectXYZOnlyPose>(

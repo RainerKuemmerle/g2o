@@ -99,8 +99,12 @@ def simple_se3_graph(basic_se3_optimizer):
 
     # Add 2 SE3 vertices
     poses = [
-        g2o.Isometry3d(np.eye(3), [0, 0, 0]),
-        g2o.Isometry3d(np.eye(3), [1, 0, 0]),
+        g2o.Isometry3d(
+            np.eye(3, order="F"), np.array([[0.0], [0.0], [0.0]], order="F")
+        ),
+        g2o.Isometry3d(
+            np.eye(3, order="F"), np.array([[1.0], [0.0], [0.0]], order="F")
+        ),
     ]
 
     for i, pose in enumerate(poses):
@@ -115,7 +119,9 @@ def simple_se3_graph(basic_se3_optimizer):
     edge = g2o.EdgeSE3()
     edge.set_vertex(0, optimizer.vertex(0))
     edge.set_vertex(1, optimizer.vertex(1))
-    edge.set_measurement(g2o.Isometry3d(np.eye(3), [1, 0, 0]))
+    edge.set_measurement(
+        g2o.Isometry3d(np.eye(3, order="F"), np.array([[1.0], [0.0], [0.0]], order="F"))
+    )
     edge.set_information(np.eye(6))
     optimizer.add_edge(edge)
 

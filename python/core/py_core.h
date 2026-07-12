@@ -5,7 +5,7 @@
 #include "g2opy.h"
 
 namespace g2o {
-void declareCore(py::module& m);
+void declareCore(py::module_& m);
 }
 
 #endif

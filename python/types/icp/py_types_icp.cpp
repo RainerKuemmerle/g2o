@@ -11,7 +11,7 @@ G2O_USE_TYPE_GROUP(icp)
 namespace g2o {
 
 void declareTypesICP(detail::Registry& registry) {
-  py::classh<EdgeGICP>(registry.mod(), "EdgeGICP")
+  py::class_<EdgeGICP>(registry.mod(), "EdgeGICP")
       .def(py::init<>())
 
       .def("make_rot0", &EdgeGICP::makeRot0, "set up rotation matrix for pos0")
@@ -28,19 +28,19 @@ void declareTypesICP(detail::Registry& registry) {
            "return a covariance matrix for plane-plane")
 
       // point positions
-      .def_readwrite("pos0", &EdgeGICP::pos0)
-      .def_readwrite("pos1", &EdgeGICP::pos1)
+      .def_rw("pos0", &EdgeGICP::pos0)
+      .def_rw("pos1", &EdgeGICP::pos1)
       // unit normals
-      .def_readwrite("normal0", &EdgeGICP::normal0)
-      .def_readwrite("normal1", &EdgeGICP::normal1)
+      .def_rw("normal0", &EdgeGICP::normal0)
+      .def_rw("normal1", &EdgeGICP::normal1)
       // rotation matrix for normal
-      .def_readwrite("R0", &EdgeGICP::R0)
-      .def_readwrite("R1", &EdgeGICP::R1);
+      .def_rw("R0", &EdgeGICP::R0)
+      .def_rw("R1", &EdgeGICP::R1);
 
   registry.registerEdgeFixed<EdgeVVGicp>("EdgeVVGicp")
-      .def_readwrite("pl_pl", &EdgeVVGicp::pl_pl)
-      .def_readwrite("cov0", &EdgeVVGicp::cov0)
-      .def_readwrite("cov1", &EdgeVVGicp::cov1);
+      .def_rw("pl_pl", &EdgeVVGicp::pl_pl)
+      .def_rw("cov0", &EdgeVVGicp::cov0)
+      .def_rw("cov1", &EdgeVVGicp::cov1);
 
   registry.registerVertex<VertexSCam>("VertexSCam")
       .def("oplus_impl",
@@ -86,20 +86,20 @@ void declareTypesICP(detail::Registry& registry) {
            })
 
       // camera matrix and stereo baseline
-      .def_readwrite_static("Kcam", &VertexSCam::kcam_)
-      .def_readwrite_static("baseline", &VertexSCam::baseline_)
+      .def_rw_static("Kcam", &VertexSCam::kcam_)
+      .def_rw_static("baseline", &VertexSCam::baseline_)
 
       // transformations
-      .def_readwrite(
-          "w2n", &VertexSCam::w2n)  // transform from world to node coordinates
-      .def_readwrite(
-          "w2i", &VertexSCam::w2i)  // transform from world to image coordinates
+      .def_rw("w2n",
+              &VertexSCam::w2n)  // transform from world to node coordinates
+      .def_rw("w2i",
+              &VertexSCam::w2i)  // transform from world to image coordinates
 
       // Derivatives of the rotation matrix transpose wrt quaternion xyz, used
       // for calculating Jacobian wrt pose of a projection.
-      .def_readwrite("dRdx", &VertexSCam::dRdx)
-      .def_readwrite("dRdy", &VertexSCam::dRdy)
-      .def_readwrite("dRdz", &VertexSCam::dRdz);
+      .def_rw("dRdx", &VertexSCam::dRdx)
+      .def_rw("dRdy", &VertexSCam::dRdy)
+      .def_rw("dRdz", &VertexSCam::dRdz);
 
   registry.registerEdgeFixed<EdgeXyzVsc>("EdgeXyzVsc");
 }

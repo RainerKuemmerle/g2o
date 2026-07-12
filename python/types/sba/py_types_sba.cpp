@@ -15,10 +15,10 @@ namespace g2o {
 
 namespace {
 void declareVertexIntrinsics(detail::Registry& registry) {
-  py::classh<VertexIntrinsicsEstimate>(registry.mod(),
+  py::class_<VertexIntrinsicsEstimate>(registry.mod(),
                                        "VertexIntrinsicsEstimate")
       .def(py::init<>())
-      .def_readwrite("values", &VertexIntrinsicsEstimate::values);
+      .def_rw("values", &VertexIntrinsicsEstimate::values);
 }
 }  // namespace
 

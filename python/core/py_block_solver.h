@@ -25,6 +25,6 @@ class PyBlockSolverBase {
   virtual std::unique_ptr<BlockSolverBase> base_solver() = 0;
 };
 
-void declareBlockSolver(py::module& m);
+void declareBlockSolver(py::module_& m);
 
 }  // end namespace g2o

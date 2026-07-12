@@ -6,6 +6,6 @@
 
 namespace g2o {
 
-void declareEigenTypes(py::module& m);
+void declareEigenTypes(py::module_& m);
 
 }  // end namespace g2o

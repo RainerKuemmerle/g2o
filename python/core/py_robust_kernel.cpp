@@ -5,8 +5,8 @@
 
 namespace g2o {
 
-void declareRobustKernel(py::module& m) {
-  py::classh<RobustKernel>(m, "BaseRobustKernel")
+void declareRobustKernel(py::module_& m) {
+  py::class_<RobustKernel>(m, "BaseRobustKernel")
       .def("robustify", &RobustKernel::robustify, "squared_error"_a,
            "rho"_a)  // (double, Vector3&) -> void
       .def("set_delta", &RobustKernel::setDelta,
@@ -14,7 +14,7 @@ void declareRobustKernel(py::module& m) {
       .def("delta", &RobustKernel::delta)  // -> double
       ;
 
-  py::classh<RobustKernelScaleDelta, RobustKernel>(m, "RobustKernelScaleDelta")
+  py::class_<RobustKernelScaleDelta, RobustKernel>(m, "RobustKernelScaleDelta")
       .def(py::init<>())
       .def(py::init<double>(), "delta"_a = 1.)
       .def(py::init<const RobustKernelPtr&, double>(), "kernel"_a,
@@ -26,12 +26,12 @@ void declareRobustKernel(py::module& m) {
            "rho"_a)  // (double, Vector3&) -> void
       ;
 
-  py::classh<RobustKernelHuber, RobustKernel>(m, "RobustKernelHuber")
+  py::class_<RobustKernelHuber, RobustKernel>(m, "RobustKernelHuber")
       .def(py::init<>())
       //.def(py::init<double>(), "delta"_a)
-      .def(py::init([](double delta) {
-             RobustKernelHuber kernel = RobustKernelHuber();
-             kernel.setDelta(delta);
+      .def(py::new_([](double delta) {
+             auto* kernel = new RobustKernelHuber();
+             kernel->setDelta(delta);
              return kernel;
            }),
            "delta"_a)
@@ -39,13 +39,13 @@ void declareRobustKernel(py::module& m) {
            "rho"_a)  // (double, Vector3&) -> void
       ;
 
-  py::classh<RobustKernelPseudoHuber, RobustKernel>(m,
+  py::class_<RobustKernelPseudoHuber, RobustKernel>(m,
                                                     "RobustKernelPseudoHuber")
       .def(py::init<>())
       //.def(py::init<double>(), "delta"_a)
-      .def(py::init([](double delta) {
-             RobustKernelPseudoHuber kernel = RobustKernelPseudoHuber();
-             kernel.setDelta(delta);
+      .def(py::new_([](double delta) {
+             auto* kernel = new RobustKernelPseudoHuber();
+             kernel->setDelta(delta);
              return kernel;
            }),
            "delta"_a)
@@ -54,12 +54,12 @@ void declareRobustKernel(py::module& m) {
            "rho"_a)  // (double, Vector3&) -> void
       ;
 
-  py::classh<RobustKernelCauchy, RobustKernel>(m, "RobustKernelCauchy")
+  py::class_<RobustKernelCauchy, RobustKernel>(m, "RobustKernelCauchy")
       .def(py::init<>())
       //.def(py::init<double>(), "delta"_a)
-      .def(py::init([](double delta) {
-             RobustKernelCauchy kernel = RobustKernelCauchy();
-             kernel.setDelta(delta);
+      .def(py::new_([](double delta) {
+             auto* kernel = new RobustKernelCauchy();
+             kernel->setDelta(delta);
              return kernel;
            }),
            "delta"_a)
@@ -68,13 +68,13 @@ void declareRobustKernel(py::module& m) {
            "rho"_a)  // (double, Vector3&) -> void
       ;
 
-  py::classh<RobustKernelGemanMcClure, RobustKernel>(m,
+  py::class_<RobustKernelGemanMcClure, RobustKernel>(m,
                                                      "RobustKernelGemanMcClure")
       .def(py::init<>())
       //.def(py::init<double>(), "delta"_a)
-      .def(py::init([](double delta) {
-             RobustKernelGemanMcClure kernel = RobustKernelGemanMcClure();
-             kernel.setDelta(delta);
+      .def(py::new_([](double delta) {
+             auto* kernel = new RobustKernelGemanMcClure();
+             kernel->setDelta(delta);
              return kernel;
            }),
            "delta"_a)
@@ -83,12 +83,12 @@ void declareRobustKernel(py::module& m) {
            "rho"_a)  // (double, Vector3&) -> void
       ;
 
-  py::classh<RobustKernelWelsch, RobustKernel>(m, "RobustKernelWelsch")
+  py::class_<RobustKernelWelsch, RobustKernel>(m, "RobustKernelWelsch")
       .def(py::init<>())
       //.def(py::init<double>(), "delta"_a)
-      .def(py::init([](double delta) {
-             RobustKernelWelsch kernel = RobustKernelWelsch();
-             kernel.setDelta(delta);
+      .def(py::new_([](double delta) {
+             auto* kernel = new RobustKernelWelsch();
+             kernel->setDelta(delta);
              return kernel;
            }),
            "delta"_a)
@@ -97,12 +97,12 @@ void declareRobustKernel(py::module& m) {
            "rho"_a)  // (double, Vector3&) -> void
       ;
 
-  py::classh<RobustKernelFair, RobustKernel>(m, "RobustKernelFair")
+  py::class_<RobustKernelFair, RobustKernel>(m, "RobustKernelFair")
       .def(py::init<>())
       //.def(py::init<double>(), "delta"_a)
-      .def(py::init([](double delta) {
-             RobustKernelFair kernel = RobustKernelFair();
-             kernel.setDelta(delta);
+      .def(py::new_([](double delta) {
+             auto* kernel = new RobustKernelFair();
+             kernel->setDelta(delta);
              return kernel;
            }),
            "delta"_a)
@@ -111,12 +111,12 @@ void declareRobustKernel(py::module& m) {
            "rho"_a)  // (double, Vector3&) -> void
       ;
 
-  py::classh<RobustKernelTukey, RobustKernel>(m, "RobustKernelTukey")
+  py::class_<RobustKernelTukey, RobustKernel>(m, "RobustKernelTukey")
       .def(py::init<>())
       //.def(py::init<double>(), "delta"_a)
-      .def(py::init([](double delta) {
-             RobustKernelTukey kernel = RobustKernelTukey();
-             kernel.setDelta(delta);
+      .def(py::new_([](double delta) {
+             auto* kernel = new RobustKernelTukey();
+             kernel->setDelta(delta);
              return kernel;
            }),
            "delta"_a)
@@ -125,12 +125,12 @@ void declareRobustKernel(py::module& m) {
            "rho"_a)  // (double, Vector3&) -> void
       ;
 
-  py::classh<RobustKernelSaturated, RobustKernel>(m, "RobustKernelSaturated")
+  py::class_<RobustKernelSaturated, RobustKernel>(m, "RobustKernelSaturated")
       .def(py::init<>())
       //.def(py::init<double>(), "delta"_a)
-      .def(py::init([](double delta) {
-             RobustKernelSaturated kernel = RobustKernelSaturated();
-             kernel.setDelta(delta);
+      .def(py::new_([](double delta) {
+             auto* kernel = new RobustKernelSaturated();
+             kernel->setDelta(delta);
              return kernel;
            }),
            "delta"_a)
@@ -139,12 +139,12 @@ void declareRobustKernel(py::module& m) {
            "rho"_a)  // (double, Vector3&) -> void
       ;
 
-  py::classh<RobustKernelDCS, RobustKernel>(m, "RobustKernelDCS")
+  py::class_<RobustKernelDCS, RobustKernel>(m, "RobustKernelDCS")
       .def(py::init<>())
       //.def(py::init<double>(), "delta"_a)
-      .def(py::init([](double delta) {
-             RobustKernelDCS kernel = RobustKernelDCS();
-             kernel.setDelta(delta);
+      .def(py::new_([](double delta) {
+             auto* kernel = new RobustKernelDCS();
+             kernel->setDelta(delta);
              return kernel;
            }),
            "delta"_a)

@@ -11,38 +11,41 @@
 
 namespace g2o {
 
-void declareOptimizationAlgorithm(py::module& m) {
-  py::classh<OptimizationAlgorithm>(m, "OptimizationAlgorithm");  // NOLINT
+void declareOptimizationAlgorithm(py::module_& m) {
+  py::class_<OptimizationAlgorithm>(m, "OptimizationAlgorithm");  // NOLINT
 
-  py::classh<OptimizationAlgorithmProperty>(  // NOLINT
+  py::class_<OptimizationAlgorithmProperty>(  // NOLINT
       m, "OptimizationAlgorithmProperty");
 
-  py::classh<OptimizationAlgorithmWithHessian, OptimizationAlgorithm>(
+  py::class_<OptimizationAlgorithmWithHessian, OptimizationAlgorithm>(
       m, "OptimizationAlgorithmWithHessian");
 
-  py::classh<OptimizationAlgorithmGaussNewton,
+  py::class_<OptimizationAlgorithmGaussNewton,
              OptimizationAlgorithmWithHessian>(
       m, "OptimizationAlgorithmGaussNewton")
-      .def(py::init([](PyBlockSolverBase& blockSolver) {
-        return new OptimizationAlgorithmGaussNewton(blockSolver.solver());
+      .def(py::new_([](PyBlockSolverBase& blockSolver) {
+        auto solver = blockSolver.solver();
+        return new OptimizationAlgorithmGaussNewton(std::move(solver));
       }));
 
-  py::classh<OptimizationAlgorithmLevenberg, OptimizationAlgorithmWithHessian>(
+  py::class_<OptimizationAlgorithmLevenberg, OptimizationAlgorithmWithHessian>(
       m, "OptimizationAlgorithmLevenberg")
-      .def(py::init([](PyBlockSolverBase& blockSolver) {
-        return new OptimizationAlgorithmLevenberg(blockSolver.solver());
+      .def(py::new_([](PyBlockSolverBase& blockSolver) {
+        auto solver = blockSolver.solver();
+        return new OptimizationAlgorithmLevenberg(std::move(solver));
       }));
 
-  py::classh<OptimizationAlgorithmDogleg, OptimizationAlgorithmWithHessian>(
+  py::class_<OptimizationAlgorithmDogleg, OptimizationAlgorithmWithHessian>(
       m, "OptimizationAlgorithmDogleg")
-      .def(py::init([](PyBlockSolverBase& blockSolver) {
-        return new OptimizationAlgorithmDogleg(blockSolver.base_solver());
+      .def(py::new_([](PyBlockSolverBase& blockSolver) {
+        auto solver = blockSolver.base_solver();
+        return new OptimizationAlgorithmDogleg(std::move(solver));
       }));
 
-  py::classh<AbstractOptimizationAlgorithmCreator>(  // NOLINT
+  py::class_<AbstractOptimizationAlgorithmCreator>(  // NOLINT
       m, "AbstractOptimizationAlgorithmCreator");
 
-  py::classh<RegisterOptimizationAlgorithmProxy>(
+  py::class_<RegisterOptimizationAlgorithmProxy>(
       m, "RegisterOptimizationAlgorithmProxy");
 }
 

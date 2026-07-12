@@ -5,8 +5,8 @@
 
 namespace g2o {
 
-inline void declareParameterSE2Offset(py::module& m) {
-  py::classh<ParameterSE2Offset, Parameter>(m, "ParameterSE2Offset")
+inline void declareParameterSE2Offset(py::module_& m) {
+  py::class_<ParameterSE2Offset, Parameter>(m, "ParameterSE2Offset")
       .def(py::init<>())
       .def("set_param", &ParameterSE2Offset::setParam)
       .def("set_param_data", &ParameterSE2Offset::setParameterData)

@@ -22,7 +22,7 @@
 
 namespace g2o {
 
-void declareCore(py::module& m) {
+void declareCore(py::module_& m) {
   declareIOFormat(m);
   declareHyperGraph(m);
   declareOptimizableGraph(m);

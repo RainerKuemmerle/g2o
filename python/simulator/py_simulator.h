@@ -4,6 +4,6 @@
 
 namespace g2o {
 
-void declareSimulator(py::module& m);
+void declareSimulator(py::module_& m);
 
 }  // namespace g2o
