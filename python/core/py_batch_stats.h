@@ -4,6 +4,6 @@
 
 namespace g2o {
 
-void declareG2OBatchStatistics(py::module& m);
+void declareG2OBatchStatistics(py::module_& m);
 
 }  // namespace g2o

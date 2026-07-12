@@ -1,8 +1,5 @@
 #pragma once
 
-#include <pybind11/detail/typeid.h>
-#include <pybind11/pybind11.h>
-
 #include <sstream>
 #include <string>
 #include <tuple>
@@ -20,7 +17,7 @@ namespace g2o::detail {
 
 class Registry {
  public:
-  explicit Registry(py::module& m)
+  explicit Registry(py::module_& m)
       : mod_(m),
         private_mod_(mod_.def_submodule(
             "private", "Classes private to the implementation")) {}
@@ -31,7 +28,7 @@ class Registry {
       this->registerUnaryEdge<EdgeType::kDimension,
                               typename EdgeType::Measurement,
                               typename EdgeType::VertexXiType>();
-      return py::classh<EdgeType,
+      return py::class_<EdgeType,
                         BaseUnaryEdge<EdgeType::kDimension,
                                       typename EdgeType::Measurement,
                                       typename EdgeType::VertexXiType>,
@@ -42,7 +39,7 @@ class Registry {
       this->registerBinaryEdge<
           EdgeType::kDimension, typename EdgeType::Measurement,
           typename EdgeType::VertexXiType, typename EdgeType::VertexXjType>();
-      return py::classh<EdgeType,
+      return py::class_<EdgeType,
                         BaseBinaryEdge<EdgeType::kDimension,
                                        typename EdgeType::Measurement,
                                        typename EdgeType::VertexXiType,
@@ -55,7 +52,7 @@ class Registry {
                           typename EdgeType::template NthType<0>,
                           typename EdgeType::template NthType<1>,
                           typename EdgeType::template NthType<2>>();
-      return py::classh<
+      return py::class_<
                  EdgeType,
                  BaseFixedSizedEdge<EdgeType::kDimension,
                                     typename EdgeType::Measurement,
@@ -77,7 +74,7 @@ class Registry {
   auto registerVariableEdge(const char* name) {
     this->registerBaseVariableEdge<EdgeType::kDimension,
                                    typename EdgeType::Measurement>();
-    return py::classh<EdgeType,
+    return py::class_<EdgeType,
                       BaseVariableSizedEdge<EdgeType::kDimension,
                                             typename EdgeType::Measurement>,
                       Trampoline>(mod_, name)
@@ -89,18 +86,18 @@ class Registry {
     this->registerBaseVertex<VertexType::kDimension,
                              typename VertexType::EstimateType>();
 
-    return py::classh<VertexType,
+    return py::class_<VertexType,
                       BaseVertex<VertexType::kDimension,
                                  typename VertexType::EstimateType>>(mod_, name)
         .def(py::init<>());
   }
 
-  py::module& mod() { return mod_; }
+  py::module_& mod() { return mod_; }
 
   template <int D, typename T>
   void registerBaseVertex() {
     const std::string dim_str = D > 0 ? std::to_string(D) : "Dyn";
-    const std::string estimate_str = pybind11::type_id<T>();
+    const std::string estimate_str = typeid(T).name();
 
     std::stringstream suffix;
     suffix << dim_str << '_' << estimate_str;
@@ -114,11 +111,11 @@ class Registry {
     using CLS = BaseVertex<D, T>;
     using BVector = typename CLS::BVector;
 
-    py::classh<CLS, OptimizableGraph::Vertex>(private_mod_,
+    py::class_<CLS, OptimizableGraph::Vertex>(private_mod_,
                                               base_vertex_name.c_str())
 
         //.def(py::init<>())
-        //.def_readonly_static("dimension", &BaseVertex<D, T>::Dimension)   //
+        //.def_ro_static("dimension", &BaseVertex<D, T>::Dimension)   //
         // lead to undefined
         // symbol error
         .def("hessian", [](const CLS& v) { return MatrixX(v.hessianMap()); })
@@ -135,8 +132,8 @@ class Registry {
     using CLS = BaseUnaryEdge<D, E, VertexXi>;
 
     const std::string dim_str = D > 0 ? std::to_string(D) : "Dyn";
-    const std::string measurement_str = pybind11::type_id<E>();
-    const std::string vi_str = pybind11::type_id<VertexXi>();
+    const std::string measurement_str = typeid(E).name();
+    const std::string vi_str = typeid(VertexXi).name();
 
     std::stringstream suffix;
     suffix << dim_str << '_' << measurement_str << '_' << vi_str;
@@ -149,12 +146,12 @@ class Registry {
     }
     registered_edges_.insert(binary_edge_name);
 
-    py::classh<CLS, BaseFixedSizedEdge<D, E, VertexXi>, BaseEdge<D, E>>(
+    py::class_<CLS, BaseFixedSizedEdge<D, E, VertexXi>>(
         private_mod_, binary_edge_name.c_str())
-        .def_property(
+        .def_prop_rw(
             "jacobian_oplus_xi",
             [](CLS& cls) { return cls.template jacobianOplusXn<0>(); },
-            [](CLS& cls, const MatrixX& m) {
+            [](CLS& cls, py::DRef<MatrixX> m) {
               cls.template jacobianOplusXn<0>() = m;
             })  // -> JacobianXiOplusType&
         ;
@@ -165,9 +162,9 @@ class Registry {
     using CLS = BaseBinaryEdge<D, E, VertexXi, VertexXj>;
 
     const std::string dim_str = D > 0 ? std::to_string(D) : "Dyn";
-    const std::string measurement_str = pybind11::type_id<E>();
-    const std::string vi_str = pybind11::type_id<VertexXi>();
-    const std::string vj_str = pybind11::type_id<VertexXj>();
+    const std::string measurement_str = typeid(E).name();
+    const std::string vi_str = typeid(VertexXi).name();
+    const std::string vj_str = typeid(VertexXj).name();
 
     std::stringstream suffix;
     suffix << dim_str << '_' << measurement_str << '_' << vi_str << '_'
@@ -181,19 +178,19 @@ class Registry {
     }
     registered_edges_.insert(binary_edge_name);
 
-    pybind11::classh<CLS, BaseFixedSizedEdge<D, E, VertexXi, VertexXj>>(
+    py::class_<CLS, BaseFixedSizedEdge<D, E, VertexXi, VertexXj>>(
         private_mod_, binary_edge_name.c_str())
-        .def_property(
+        .def_prop_rw(
             "jacobian_oplus_xi",
             [](CLS& cls) { return cls.template jacobianOplusXn<0>(); },
-            [](CLS& cls, const MatrixX& m) {
+            [](CLS& cls, py::DRef<MatrixX> m) {
               cls.template jacobianOplusXn<0>() = m;
             })  // -> JacobianXiOplusType&
-        .def_property(
+        .def_prop_rw(
             "jacobian_oplus_xj",
             [](const CLS& cls) { return cls.template jacobianOplusXn<1>(); },
-            [](CLS& cls, const MatrixX& m) {
-              cls.template jacobianOplusXn<0>() = m;
+            [](CLS& cls, py::DRef<MatrixX> m) {
+              cls.template jacobianOplusXn<1>() = m;
             })  //-> JacobianXjOplusType&;
         ;
   }
@@ -202,10 +199,10 @@ class Registry {
             typename VertexXk>
   void registerNEdge() {
     const std::string dim_str = D > 0 ? std::to_string(D) : "Dyn";
-    const std::string measurement_str = pybind11::type_id<E>();
-    const std::string vi_str = pybind11::type_id<VertexXi>();
-    const std::string vj_str = pybind11::type_id<VertexXj>();
-    const std::string vk_str = pybind11::type_id<VertexXk>();
+    const std::string measurement_str = typeid(E).name();
+    const std::string vi_str = typeid(VertexXi).name();
+    const std::string vj_str = typeid(VertexXj).name();
+    const std::string vk_str = typeid(VertexXk).name();
 
     std::stringstream suffix;
     suffix << dim_str << '_' << measurement_str << '_' << vi_str << '_'
@@ -227,7 +224,7 @@ class Registry {
     }
     registered_edges_.insert(base_fixed_size_edge_name);
 
-    py::classh<CLS, BaseEdge<D, E>>(private_mod_,
+    py::class_<CLS, BaseEdge<D, E>>(private_mod_,
                                     base_fixed_size_edge_name.c_str())
         // abstract class type ..."
         // TODO(Rainer): Fix binding of create_vertex
@@ -236,8 +233,13 @@ class Registry {
         .def("linearize_oplus",
              static_cast<void (CLS::*)()>(&CLS::linearizeOplus))
         .def("jacobian", &CLS::jacobian, "vertex_index"_a)  // int -> Matrix
-        .def("set_jacobian", &CLS::setJacobian, "vertex_index"_a,
-             "jacobian"_a)  // int, Matrix ->
+        .def(
+            "set_jacobian",
+            [](CLS& cls, int vertex_index, const py::DRef<const MatrixX>& m) {
+              MatrixX jacobian = m;
+              cls.setJacobian(vertex_index, jacobian);
+            },
+            "vertex_index"_a, "jacobian"_a)  // int, Matrix ->
         ;
   }
 
@@ -248,7 +250,7 @@ class Registry {
     using CLS = BaseVariableSizedEdge<D, E>;
 
     const std::string dim_str = D > 0 ? std::to_string(D) : "Dyn";
-    const std::string measurement_str = pybind11::type_id<E>();
+    const std::string measurement_str = typeid(E).name();
 
     std::stringstream base_variable_edge_name;
     base_variable_edge_name << "BaseVariableEdge_" << dim_str << '_'
@@ -258,7 +260,7 @@ class Registry {
     }
     registered_edges_.insert(base_variable_edge_name.str());
 
-    py::classh<CLS, BaseEdge<D, E>>(private_mod_,
+    py::class_<CLS, BaseEdge<D, E>>(private_mod_,
                                     base_variable_edge_name.str().c_str())
         .def("linearize_oplus",
              static_cast<void (CLS::*)()>(&CLS::linearizeOplus))
@@ -273,7 +275,7 @@ class Registry {
     using CLS = BaseEdge<D, E>;
 
     const std::string dim_str = D > 0 ? std::to_string(D) : "Dyn";
-    const std::string measurement_str = pybind11::type_id<E>();
+    const std::string measurement_str = typeid(E).name();
 
     std::stringstream base_edge_name;
     base_edge_name << "BaseEdge_" << dim_str << '_' << measurement_str;
@@ -285,17 +287,20 @@ class Registry {
     using ErrorVector = typename CLS::ErrorVector;
     using InformationType = typename CLS::InformationType;
 
-    auto base_edge = py::classh<CLS, OptimizableGraph::Edge>(
+    auto base_edge = py::class_<CLS, OptimizableGraph::Edge>(
         private_mod_, base_edge_name.str().c_str());
     base_edge.def("chi2", &CLS::chi2)
-        .def_property(
-            "error", [](const CLS& cls) { return cls.error(); },
-            [](CLS& cls, ErrorVector& v) { cls.error() = v; })
+        .def_prop_rw(
+            "error",
+            [](const CLS& cls) -> const ErrorVector& { return cls.error(); },
+            [](CLS& cls, const ErrorVector& e) { cls.error() = e; })
         .def("information", static_cast<InformationType& (CLS::*)()>(
                                 &CLS::information))  // -> InformationType
         .def(
             "set_information",
-            [](CLS& edge, const MatrixX& info) { edge.setInformation(info); },
+            [](CLS& edge, const py::DRef<const MatrixX>& info) {
+              edge.setInformation(info);
+            },
             "information"_a)  // InformationType ->
         .def("information_identity", &CLS::informationIdentity)
 
@@ -316,8 +321,8 @@ class Registry {
   }
 
  protected:
-  py::module& mod_;
-  py::module private_mod_;
+  py::module_& mod_;
+  py::module_ private_mod_;
 
   std::unordered_set<std::string> registered_edges_;
   std::unordered_set<std::string> registered_vertices_;

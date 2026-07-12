@@ -156,7 +156,7 @@ class CustomVectorEdge(g2o.VariableVectorXEdge):
         estimate = vertex.estimate()
         measurement = self.measurement()
         # Simple 1D error
-        self.error = [np.linalg.norm(estimate - measurement)]
+        self.error = np.array([np.linalg.norm(estimate - measurement)])
 
     def linearize_oplus(self):
         """Numerical Jacobian (default behavior)."""

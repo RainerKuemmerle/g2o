@@ -57,8 +57,8 @@ def main():
     )
 
     focal_length = 1000.0
-    principal_point = (320, 240)
-    cam = g2o.CameraParameters(focal_length, principal_point, 0)
+    principal_point = np.array([320.0, 240.0], dtype=np.float64)
+    cam = g2o.CameraParameters(focal_length, principal_point, 0.0)
     cam.set_id(0)
 
     optimizer.add_parameter(cam)
@@ -67,7 +67,10 @@ def main():
     num_pose = 15
     for i in range(num_pose):
         # pose here means transform points from world coordinates to camera coordinates
-        pose = g2o.SE3Quat(np.identity(3), [i * 0.04 - 1, 0, 0])
+        pose = g2o.SE3Quat(
+            np.eye(3, order="F", dtype=np.float64),
+            np.array([i * 0.04 - 1, 0, 0], dtype=np.float64),
+        )
         true_poses.append(pose)
 
         v_se3 = g2o.VertexSE3Expmap()

@@ -15,10 +15,10 @@
 
 namespace g2o {
 
-void declareSparseOptimizer(py::module& m) {
+void declareSparseOptimizer(py::module_& m) {
   using CLS = SparseOptimizer;
 
-  py::classh<CLS, OptimizableGraph>(m, "SparseOptimizer")
+  py::class_<CLS, OptimizableGraph>(m, "SparseOptimizer")
       // ATTENTION: _solver & _statistics is own by SparseOptimizer and will be
       // deleted in its destructor.
       .def(py::init<>())

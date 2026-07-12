@@ -4,6 +4,6 @@
 
 namespace g2o {
 
-void delcareHyperDijkstra(py::module& m);
+void delcareHyperDijkstra(py::module_& m);
 
 }  // namespace g2o

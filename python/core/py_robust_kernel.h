@@ -4,6 +4,6 @@
 
 namespace g2o {
 
-void declareRobustKernel(py::module& m);
+void declareRobustKernel(py::module_& m);
 
 }  // end namespace g2o

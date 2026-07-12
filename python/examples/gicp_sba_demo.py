@@ -35,8 +35,8 @@ def main():
     g2o.VertexSCam.set_cam(*focal_length, *principal_point, baseline)
 
     for i in range(2):
-        t = np.array([0, 0, i])
-        cam = g2o.Isometry3d(np.identity(3), t)
+        t = np.array([[0.0], [0.0], [float(i)]], dtype=np.float64, order="F")
+        cam = g2o.Isometry3d(np.eye(3, order="F", dtype=np.float64), t)
 
         vc = g2o.VertexSCam()
         vc.set_id(i)
@@ -58,9 +58,9 @@ def main():
         pt1 += np.random.randn(3) * args.pos_noise
 
         # form edge, with normals in varioius positions
-        nm0 = np.array([0, i, 1])
+        nm0 = np.array([0.0, float(i), 1.0], dtype=np.float64)
         nm0 = nm0 / np.linalg.norm(nm0)
-        nm1 = np.array([0, i, 1])
+        nm1 = np.array([0.0, float(i), 1.0], dtype=np.float64)
         nm1 = nm1 / np.linalg.norm(nm1)
 
         meas = g2o.EdgeGICP()
@@ -111,7 +111,10 @@ def main():
 
     # move second cam off of its true position
     vc = optimizer.vertex(1)
-    cam = g2o.Isometry3d(vc.estimate().R, np.array([-0.1, -0.1, 0.2]))
+    cam = g2o.Isometry3d(
+        vc.estimate().R,
+        np.array([[-0.1], [-0.1], [0.2]], dtype=np.float64, order="F"),
+    )
     vc.set_estimate(cam)
 
     optimizer.initialize_optimization()

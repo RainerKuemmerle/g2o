@@ -1,5 +1,7 @@
 """Tests for g2o core functionality (optimizer, solvers, algorithms)."""
 
+import numpy as np
+
 # g2o will be available after conftest.py sets sys.path
 import g2opy as g2o
 
@@ -83,7 +85,7 @@ class TestParameterContainer:
         parameters = optimizer.parameters()
         assert len(parameters) == 0
 
-        camera_parameters = g2o.CameraParameters(1.0, [0.0, 0.0], 0.0)
+        camera_parameters = g2o.CameraParameters(1.0, np.array([0.0, 0.0]), 0.0)
         camera_parameters.set_id(42)
 
         assert optimizer.add_parameter(camera_parameters)

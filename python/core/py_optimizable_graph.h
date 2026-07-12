@@ -4,6 +4,6 @@
 
 namespace g2o {
 
-void declareOptimizableGraph(py::module& m);
+void declareOptimizableGraph(py::module_& m);
 
 }  // namespace g2o

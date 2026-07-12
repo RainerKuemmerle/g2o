@@ -1,13 +1,15 @@
-# download pybind11
+# download nanobind
 include(FetchContent)
+find_package(Python 3.9 REQUIRED COMPONENTS Interpreter Development.Module)
+if(NOT DEFINED Python_INCLUDE_DIRS AND DEFINED Python_INCLUDE_DIR)
+  set(Python_INCLUDE_DIRS ${Python_INCLUDE_DIR})
+endif()
 FetchContent_Declare(
-  pybind11
-  GIT_REPOSITORY https://github.com/pybind/pybind11.git
-  GIT_TAG        v3.0.4
+  nanobind
+  GIT_REPOSITORY https://github.com/wjakob/nanobind.git
+  GIT_TAG        v2.13.0
 )
-# For Windows: Prevent overriding the parent project's compiler/linker settings
-set(PYBIND11_FINDPYTHON ON)
-FetchContent_MakeAvailable(pybind11)
+FetchContent_MakeAvailable(nanobind)
 
 if (TARGET simulator_lib)
 set(PYSIM_SRC "simulator/py_simulator.cpp")
@@ -17,7 +19,7 @@ endif()
 
 ###################################################
 # python wrapper library
-pybind11_add_module(g2opy
+nanobind_add_module(g2opy
     # core
     core/py_batch_stats.cpp
     core/py_block_solver.cpp

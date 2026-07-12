@@ -6,8 +6,8 @@
 namespace g2o {
 
 template <typename MatrixType>
-void templatedLinearSolver(py::module& m, const std::string& suffix) {
-  py::classh<LinearSolver<MatrixType>>(m, ("LinearSolver" + suffix).c_str())
+void templatedLinearSolver(py::module_& m, const std::string& suffix) {
+  py::class_<LinearSolver<MatrixType>>(m, ("LinearSolver" + suffix).c_str())
       //.def("solve_blocks", &LinearSolver<MatrixType>::solveBlocks)
       //.def("solve_pattern", &LinearSolver<MatrixType>::solvePattern)
       //.def("write_debug", &LinearSolver<MatrixType>::writeDebug)
@@ -16,10 +16,10 @@ void templatedLinearSolver(py::module& m, const std::string& suffix) {
 }
 
 template <typename MatrixType>
-void templatedLinearSolverCCS(py::module& m, const std::string& suffix) {
+void templatedLinearSolverCCS(py::module_& m, const std::string& suffix) {
   templatedLinearSolver<MatrixType>(m, suffix);
 
-  py::classh<LinearSolverCCS<MatrixType>, LinearSolver<MatrixType>>(
+  py::class_<LinearSolverCCS<MatrixType>, LinearSolver<MatrixType>>(
       m, ("LinearSolverCCS" + suffix).c_str())
       //.def(py::init<>())
       ;

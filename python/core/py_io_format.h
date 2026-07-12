@@ -4,6 +4,6 @@
 
 namespace g2o {
 
-void declareIOFormat(py::module& m);
+void declareIOFormat(py::module_& m);
 
 }  // end namespace g2o

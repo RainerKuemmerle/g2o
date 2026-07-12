@@ -1,13 +1,11 @@
 #include "py_eigen_types.h"
 
-#include <pybind11/native_enum.h>
+#include "g2opy.h"
 
 namespace g2o {
 
-namespace {
-
 template <typename Scalar, int Dim, int Mode, int Options = Eigen::AutoAlign>
-void templatedEigenIsometry(py::module& m, const std::string& name) {
+void templatedEigenIsometry(py::module_& m, const std::string& name) {
   using CLS = Eigen::Transform<Scalar, Dim, Mode, Options>;
 
   using MatrixType =
@@ -19,38 +17,40 @@ void templatedEigenIsometry(py::module& m, const std::string& name) {
   using TranslationMatrixType =
       typename Eigen::Matrix<Scalar, CLS::Dim, Eigen::Dynamic>;
 
-  py::classh<CLS>(m, name.c_str())
+  py::class_<CLS>(m, name.c_str())
       //.def(py::init<>())
-      .def(py::init([]() { return CLS::Identity(); }))
+      .def(py::new_([]() { return new CLS(CLS::Identity()); }))
 
-      .def(py::init<CLS&>(), "other"_a)
+      .def(py::init<const CLS&>(), "other"_a)
 
-      .def(py::init([](MatrixType& m) { return CLS(m); }))
+      .def(py::new_(
+          [](const py::DRef<const MatrixType>& m) { return new CLS(m); }))
 
-      .def(py::init([](CompactMatrixType& m) {
+      .def(py::new_([](const py::DRef<const CompactMatrixType>& m) {
         MatrixType matrix = MatrixType::Identity();
         matrix.block(0, 0, CLS::Dim, CLS::HDim) = m;
-        return CLS(matrix);
+        return new CLS(matrix);
       }))
 
-      .def(py::init([](RotationMatrixType& r, TranslationMatrixType& t) {
+      .def(py::new_([](const py::DRef<const RotationMatrixType>& r,
+                       const py::DRef<const TranslationMatrixType>& t) {
         MatrixType matrix = MatrixType::Identity();
         matrix.block(0, 0, CLS::Dim, CLS::Dim) = r;
         matrix.block(0, CLS::Dim, CLS::Dim, 1) = t;
-        return CLS(matrix);
+        return new CLS(matrix);
       }))
-
-      .def(py::init([](Eigen::Quaterniond& q, TranslationMatrixType& t) {
+      .def(py::new_([](const Eigen::Quaterniond& q,
+                       const py::DRef<const TranslationMatrixType>& t) {
         MatrixType matrix = MatrixType::Identity();
-        Eigen::Matrix3d r = q.toRotationMatrix();
-        matrix.block(0, 0, CLS::Dim, CLS::Dim) =
-            r.block(0, 0, CLS::Dim, CLS::Dim);
+        Eigen::Matrix<double, CLS::Dim, CLS::Dim> r =
+            q.toRotationMatrix().block(0, 0, CLS::Dim, CLS::Dim);
+        matrix.block(0, 0, CLS::Dim, CLS::Dim) = r;
         matrix.block(0, CLS::Dim, CLS::Dim, 1) = t;
-        return CLS(matrix);
+        return new CLS(matrix);
       }))
 
       .def("set_rotation",
-           [](CLS& trans, RotationMatrixType& r) {
+           [](CLS& trans, const py::DRef<const RotationMatrixType>& r) {
              trans.matrix().block(0, 0, CLS::Dim, CLS::Dim) = r;
            })
       .def("set_rotation",
@@ -59,19 +59,23 @@ void templatedEigenIsometry(py::module& m, const std::string& name) {
              trans.matrix().block(0, 0, CLS::Dim, CLS::Dim) = r;
            })
 
-      .def(
-          "set_translation",
-          [](CLS& trans, TranslationMatrixType& t) { trans.translation() = t; })
+      .def("set_translation",
+           [](CLS& trans, const py::DRef<const TranslationMatrixType>& t) {
+             trans.translation() = t;
+           })
 
       .def(py::self * py::self)
 
       .def("__mul__",
-           [](CLS& trans, Eigen::Matrix<Scalar, CLS::Dim, 1>& t) {
+           [](CLS& trans,
+              const py::DRef<const Eigen::Matrix<Scalar, CLS::Dim, 1>>& t) {
              Eigen::Matrix<Scalar, CLS::Dim, 1> result = trans * t;
              return result;
            })
       .def("__mul__",
-           [](CLS& trans, TranslationMatrixType& t) { return trans * t; })
+           [](CLS& trans, const py::DRef<const TranslationMatrixType>& t) {
+             return trans * t;
+           })
 
       .def("rows", &CLS::rows)
       .def("cols", &CLS::cols)
@@ -100,13 +104,13 @@ void templatedEigenIsometry(py::module& m, const std::string& name) {
              RotationMatrixType r = matrix.block(0, 0, CLS::Dim, CLS::Dim);
              return r;
            })
-      .def_property_readonly("R",
-                             [](CLS& trans) {
-                               MatrixType matrix = trans.matrix();
-                               RotationMatrixType r =
-                                   matrix.block(0, 0, CLS::Dim, CLS::Dim);
-                               return r;
-                             })
+      .def_prop_ro("R",
+                   [](CLS& trans) {
+                     MatrixType matrix = trans.matrix();
+                     RotationMatrixType r =
+                         matrix.block(0, 0, CLS::Dim, CLS::Dim);
+                     return r;
+                   })
 
       .def("Quaternion",
            [](CLS& trans) {
@@ -135,7 +139,7 @@ void templatedEigenIsometry(py::module& m, const std::string& name) {
                  matrix.block(0, 0, CLS::Dim, CLS::Dim);
              return Eigen::Quaterniond(r);
            })
-      // .def_property_readonly("q", [](CLS& trans) {
+      // .def_prop_ro("q", [](CLS& trans) {
       //         MatrixType matrix = trans.matrix();
       //         Eigen::Matrix<_Scalar, 3, 3> r = Eigen::Matrix<_Scalar, 3,
       //         3>::Identity(); r.block(0, 0, CLS::Dim, CLS::Dim) =
@@ -157,42 +161,36 @@ void templatedEigenIsometry(py::module& m, const std::string& name) {
                  matrix.block(0, CLS::Dim, CLS::Dim, 1);
              return t;
            })
-      .def_property_readonly("t",
-                             [](CLS& trans) {
-                               MatrixType matrix = trans.matrix();
-                               Eigen::Matrix<Scalar, CLS::Dim, 1> t =
-                                   matrix.block(0, CLS::Dim, CLS::Dim, 1);
-                               return t;
-                             })
+      .def_prop_ro("t",
+                   [](CLS& trans) {
+                     MatrixType matrix = trans.matrix();
+                     Eigen::Matrix<Scalar, CLS::Dim, 1> t =
+                         matrix.block(0, CLS::Dim, CLS::Dim, 1);
+                     return t;
+                   })
 
       .def("inverse", &CLS::inverse,
            "traits"_a = static_cast<Eigen::TransformTraits>(CLS::Mode))
       .def("make_affine", &CLS::makeAffine);
 }
 
-}  // namespace
-
-void declareEigenTypes(py::module& m) {
-  py::classh<Eigen::Quaterniond>(m, "Quaternion")
+void declareEigenTypes(py::module_& m) {
+  py::class_<Eigen::Quaterniond>(m, "Quaternion")
       //.def(py::init<>())
-      .def(py::init([]() { return Eigen::Quaterniond::Identity(); }))
+      .def(py::new_([]() { return new Eigen::Quaterniond(Eigen::Quaterniond::Identity()); }))
 
       .def(py::init<const Eigen::Quaterniond&>())
       .def(py::init<const Eigen::AngleAxisd&>())
       .def(py::init<const Eigen::Matrix<double, 3, 3>&>())
-      .def(py::init<const double&, const double&, const double&,
-                    const double&>(),
-           "w"_a, "x"_a, "y"_a, "z"_a)
+      .def(py::init<double, double, double, double>(), "w"_a, "x"_a, "y"_a,
+           "z"_a)
+      .def(py::init<const Eigen::Matrix<double, 4, 1>&>())
 
-      .def(py::init([](const Eigen::Matrix<double, 4, 1>& m) {
-        return std::make_unique<Eigen::Quaterniond>(m(0), m(1), m(2), m(3));
-      }))
-
-      .def_static(
-          "from_two_vectors",
-          [](Eigen::Matrix<double, 3, 1>& a, Eigen::Matrix<double, 3, 1>& b) {
-            return Eigen::Quaterniond::FromTwoVectors(a, b);
-          })
+      .def_static("from_two_vectors",
+                  [](const py::DRef<const Eigen::Matrix<double, 3, 1>>& a,
+                     const py::DRef<const Eigen::Matrix<double, 3, 1>>& b) {
+                    return Eigen::Quaterniond::FromTwoVectors(a, b);
+                  })
 
       .def("x", [](const Eigen::Quaterniond& q) { return q.x(); })
       .def("y", [](const Eigen::Quaterniond& q) { return q.y(); })
@@ -208,7 +206,7 @@ void declareEigenTypes(py::module& m) {
 
       .def("rotation_matrix", &Eigen::Quaterniond::toRotationMatrix)
       .def("matrix", &Eigen::Quaterniond::toRotationMatrix)
-      .def_property_readonly("R", &Eigen::Quaterniond::toRotationMatrix)
+      .def_prop_ro("R", &Eigen::Quaterniond::toRotationMatrix)
 
       .def("squared_norm", &Eigen::Quaterniond::squaredNorm)
       .def("norm", &Eigen::Quaterniond::norm)
@@ -230,8 +228,8 @@ void declareEigenTypes(py::module& m) {
                &Eigen::Quaterniond::coeffs))  // x, y, z, w
 
       .def("__mul__",
-           [](Eigen::Quaterniond& q, Eigen::Matrix<double, 3, 1>& t) {
-             // Eigen::Matrix<double,3,1> result = q * t;
+           [](Eigen::Quaterniond& q,
+              const py::DRef<const Eigen::Matrix<double, 3, 1>>& t) {
              Eigen::Matrix<double, 3, 1> result = q._transformVector(t);
              return result;
            })
@@ -242,9 +240,9 @@ void declareEigenTypes(py::module& m) {
 
       ;
 
-  py::classh<Eigen::Rotation2Dd>(m, "Rotation2d")
+  py::class_<Eigen::Rotation2Dd>(m, "Rotation2d")
       //.def(py::init<>())
-      .def(py::init([]() { return Eigen::Rotation2Dd::Identity(); }))
+      .def(py::new_([]() { return new Eigen::Rotation2Dd(Eigen::Rotation2Dd::Identity()); }))
       .def(py::init<Eigen::Rotation2Dd&>())
       .def(py::init<const double&>())
       .def(py::init<const Eigen::Matrix<double, 2, 2>&>())
@@ -263,18 +261,19 @@ void declareEigenTypes(py::module& m) {
       // &Eigen::Rotation2Dd::fromRotationMatrix)
       // TODO(goki): Figure out if below should be static
       .def("from_rotation_matrix",
-           [](Eigen::Rotation2Dd& r, const Eigen::Matrix<double, 2, 2>& R) {
+           [](Eigen::Rotation2Dd& r,
+              const py::DRef<const Eigen::Matrix<double, 2, 2>>& R) {
              r.fromRotationMatrix(R);
            })
       .def("to_rotation_matrix", &Eigen::Rotation2Dd::toRotationMatrix)
       .def("rotation_matrix", &Eigen::Rotation2Dd::toRotationMatrix)
       .def("matrix", &Eigen::Rotation2Dd::toRotationMatrix)
-      .def_property_readonly("R", &Eigen::Rotation2Dd::toRotationMatrix)
+      .def_prop_ro("R", &Eigen::Rotation2Dd::toRotationMatrix)
       .def("slerp", &Eigen::Rotation2Dd::slerp)
       .def_static("ientity", &Eigen::Rotation2Dd::Identity);
 
-  py::classh<Eigen::AngleAxisd>(m, "AngleAxis")
-      .def(py::init([]() { return Eigen::AngleAxisd::Identity(); }))
+  py::class_<Eigen::AngleAxisd>(m, "AngleAxis")
+      .def(py::new_([]() { return new Eigen::AngleAxisd(Eigen::AngleAxisd::Identity()); }))
       .def(py::init<const double&, const Eigen::Matrix<double, 3, 1>&>())
       .def(py::init<const Eigen::AngleAxisd&>())
       .def(py::init<const Eigen::Quaterniond&>())
@@ -291,22 +290,22 @@ void declareEigenTypes(py::module& m) {
       //.def("from_rotation_matrix", &Eigen::AngleAxisd::fromRotationMatrix)
       // TODO(goki): Figure out if below should be static
       .def("from_rotation_matrix",
-           [](Eigen::AngleAxisd& r, const Eigen::Matrix<double, 3, 3>& R) {
+           [](Eigen::AngleAxisd& r,
+              const py::DRef<const Eigen::Matrix<double, 3, 3>>& R) {
              r.fromRotationMatrix(R);
            })
       .def("to_rotation_matrix", &Eigen::AngleAxisd::toRotationMatrix)
       .def("rotation_matrix", &Eigen::AngleAxisd::toRotationMatrix)
       .def("matrix", &Eigen::AngleAxisd::toRotationMatrix)
-      .def_property_readonly("R", &Eigen::AngleAxisd::toRotationMatrix)
+      .def_prop_ro("R", &Eigen::AngleAxisd::toRotationMatrix)
       .def_static("identity", &Eigen::AngleAxisd::Identity);
 
-  py::native_enum<Eigen::TransformTraits>(m, "TransformTraits", "enum.Enum")
+  py::enum_<Eigen::TransformTraits>(m, "TransformTraits", "enum.Enum")
       .value("Isometry", Eigen::Isometry)
       .value("Affine", Eigen::Affine)
       .value("AffineCompact", Eigen::AffineCompact)
       .value("Projective", Eigen::Projective)
-      .export_values()
-      .finalize();
+      .export_values();
 
   templatedEigenIsometry<double, 2, Eigen::Isometry>(m, "Isometry2d");
   templatedEigenIsometry<double, 3, Eigen::Isometry>(m, "Isometry3d");

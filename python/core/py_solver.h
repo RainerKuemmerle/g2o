@@ -6,9 +6,9 @@
 
 namespace g2o {
 
-inline void declareSolver(py::module& m) {
+inline void declareSolver(py::module_& m) {
   // abstract class
-  py::classh<Solver>(m, "Solver")
+  py::class_<Solver>(m, "Solver")
       .def("x", static_cast<double* (Solver::*)()>(&Solver::x))
       .def("b", static_cast<double* (Solver::*)()>(&Solver::b))
       .def("vector_size", &Solver::vectorSize)

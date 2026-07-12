@@ -1,38 +1,36 @@
 #include "py_optimizable_graph.h"
 
-#include <pybind11/native_enum.h>
-
 #include "g2o/core/eigen_types.h"
 #include "g2o/core/hyper_graph_action.h"  // IWYU pragma: keep
 #include "g2o/core/io/io_format.h"
 #include "g2o/core/jacobian_workspace.h"
 #include "g2o/core/optimizable_graph.h"
 #include "g2o/core/robust_kernel.h"  // IWYU pragma: keep
+#include "g2opy.h"
 
 namespace g2o {
 class ParameterContainer;
 
-void declareOptimizableGraph(py::module& m) {
+void declareOptimizableGraph(py::module_& m) {
   using CLS = OptimizableGraph;
 
-  py::classh<OptimizableGraph, HyperGraph> cls(m, "OptimizableGraph");
+  py::class_<OptimizableGraph, HyperGraph> cls(m, "OptimizableGraph");
 
-  py::native_enum<CLS::ActionType>(cls, "ActionType", "enum.Enum")
+  py::enum_<CLS::ActionType>(cls, "ActionType", "enum.Enum")
       .value("AT_PREITERATION", CLS::ActionType::kAtPreiteration)
       .value("AT_POSTITERATION", CLS::ActionType::kAtPostiteration)
       .value("AT_NUM_ELEMENTS", CLS::ActionType::kAtNumElements)
-      .export_values()
-      .finalize();
+      .export_values();
 
   // typedef std::set<HyperGraphAction*>    HyperGraphActionSet;
 
-  py::classh<CLS::VertexIDCompare>(cls, "VertexIDCompare")
+  py::class_<CLS::VertexIDCompare>(cls, "VertexIDCompare")
       .def("__call__",
            [](const CLS::Vertex* v1, const CLS::Vertex* v2) -> bool {
              return v1->id() < v2->id();
            });
 
-  py::classh<CLS::EdgeIDCompare>(cls, "EdgeIDCompare")
+  py::class_<CLS::EdgeIDCompare>(cls, "EdgeIDCompare")
       .def("__call__", [](const CLS::Edge* e1, const CLS::Edge* e2) -> bool {
         return e1->internalId() < e2->internalId();
       });
@@ -40,8 +38,7 @@ void declareOptimizableGraph(py::module& m) {
   // typedef std::vector<OptimizableGraph::Vertex*>      VertexContainer;
   // typedef std::vector<OptimizableGraph::Edge*>        EdgeContainer;
 
-  py::classh<CLS::Vertex, HyperGraph::Vertex, HyperGraph::DataContainer>(
-      cls, "OptimizableGraph_Vertex")
+  py::class_<CLS::Vertex, HyperGraph::Vertex>(cls, "OptimizableGraph_Vertex")
       //.def(py::init<>())   // invalid new-expression of abstract class
       .def(
           "set_estimate_data",
@@ -114,8 +111,7 @@ void declareOptimizableGraph(py::module& m) {
       .def("unlock_quadratic_form", &CLS::Vertex::unlockQuadraticForm)
       .def("update_cache", &CLS::Vertex::updateCache);
 
-  py::classh<CLS::Edge, HyperGraph::Edge, HyperGraph::DataContainer>(
-      cls, "OptimizableGraph_Edge")
+  py::class_<CLS::Edge, HyperGraph::Edge>(cls, "OptimizableGraph_Edge")
       //.def(py::init<>())
       .def("set_measurement_data",
            [](CLS::Edge& e, const VectorX& data) {
@@ -239,7 +235,7 @@ void declareOptimizableGraph(py::module& m) {
   cls.def(
       "parameters",
       [](CLS& self) -> ParameterContainer& { return self.parameters(); },
-      py::return_value_policy::reference_internal);
+      py::rv_policy::reference_internal);
 
   cls.def("verify_information_matrices", &CLS::verifyInformationMatrices,
           "verbose"_a = false);  // bool -> bool

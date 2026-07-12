@@ -6,8 +6,8 @@
 
 namespace g2o {
 
-inline void delcareSparseOptimizerTerminateAction(py::module& m) {
-  py::classh<SparseOptimizerTerminateAction, HyperGraphAction>(
+inline void delcareSparseOptimizerTerminateAction(py::module_& m) {
+  py::class_<SparseOptimizerTerminateAction, HyperGraphAction>(
       m, "SparseOptimizerTerminateAction")
       .def(py::init<>())
       .def("__call__", &SparseOptimizerTerminateAction::operator())
