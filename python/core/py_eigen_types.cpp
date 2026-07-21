@@ -177,7 +177,9 @@ void templatedEigenIsometry(py::module_& m, const std::string& name) {
 void declareEigenTypes(py::module_& m) {
   py::class_<Eigen::Quaterniond>(m, "Quaternion")
       //.def(py::init<>())
-      .def(py::new_([]() { return new Eigen::Quaterniond(Eigen::Quaterniond::Identity()); }))
+      .def(py::new_([]() {
+        return new Eigen::Quaterniond(Eigen::Quaterniond::Identity());
+      }))
 
       .def(py::init<const Eigen::Quaterniond&>())
       .def(py::init<const Eigen::AngleAxisd&>())
@@ -242,7 +244,9 @@ void declareEigenTypes(py::module_& m) {
 
   py::class_<Eigen::Rotation2Dd>(m, "Rotation2d")
       //.def(py::init<>())
-      .def(py::new_([]() { return new Eigen::Rotation2Dd(Eigen::Rotation2Dd::Identity()); }))
+      .def(py::new_([]() {
+        return new Eigen::Rotation2Dd(Eigen::Rotation2Dd::Identity());
+      }))
       .def(py::init<Eigen::Rotation2Dd&>())
       .def(py::init<const double&>())
       .def(py::init<const Eigen::Matrix<double, 2, 2>&>())
@@ -273,7 +277,9 @@ void declareEigenTypes(py::module_& m) {
       .def_static("ientity", &Eigen::Rotation2Dd::Identity);
 
   py::class_<Eigen::AngleAxisd>(m, "AngleAxis")
-      .def(py::new_([]() { return new Eigen::AngleAxisd(Eigen::AngleAxisd::Identity()); }))
+      .def(py::new_([]() {
+        return new Eigen::AngleAxisd(Eigen::AngleAxisd::Identity());
+      }))
       .def(py::init<const double&, const Eigen::Matrix<double, 3, 1>&>())
       .def(py::init<const Eigen::AngleAxisd&>())
       .def(py::init<const Eigen::Quaterniond&>())
