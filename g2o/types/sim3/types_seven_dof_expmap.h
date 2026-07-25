@@ -83,6 +83,32 @@ class G2O_TYPES_SIM3_API VertexSim3Expmap : public BaseVertex<7, Sim3> {
     setEstimate(s * estimate());
   }
 
+  // Estimate API: 7-D Sim3 tangent (omega, upsilon, sigma) via Sim3::log().
+  // Storage and tangent dim coincide (no separate minimal representation).
+  virtual bool setEstimateDataImpl(const double* est) {
+    Eigen::Map<const Vector7> v(est);
+    setEstimate(Sim3(v));
+    return true;
+  }
+
+  virtual bool getEstimateData(double* est) const {
+    Eigen::Map<Vector7> v(est);
+    v = estimate().log();
+    return true;
+  }
+
+  virtual int estimateDimension() const { return 7; }
+
+  virtual bool setMinimalEstimateDataImpl(const double* est) {
+    return setEstimateDataImpl(est);
+  }
+
+  virtual bool getMinimalEstimateData(double* est) const {
+    return getEstimateData(est);
+  }
+
+  virtual int minimalEstimateDimension() const { return 7; }
+
   Vector2 _principle_point1, _principle_point2;
   Vector2 _focal_length1, _focal_length2;
 
@@ -115,6 +141,23 @@ class G2O_TYPES_SIM3_API EdgeSim3
   EdgeSim3();
   virtual bool read(std::istream& is);
   virtual bool write(std::ostream& os) const;
+
+  // Measurement is Sim3, exposed as the 7-D Lie tangent (omega, upsilon, sigma)
+  // via Sim3::log(). Round-trip through Sim3(Vector7).
+  virtual bool setMeasurementData(const double* m) {
+    Eigen::Map<const Vector7> v(m);
+    setMeasurement(Sim3(v));
+    return true;
+  }
+
+  virtual bool getMeasurementData(double* m) const {
+    Eigen::Map<Vector7> v(m);
+    v = measurement().log();
+    return true;
+  }
+
+  virtual int measurementDimension() const { return 7; }
+
   void computeError() {
     const VertexSim3Expmap* v1 =
         static_cast<const VertexSim3Expmap*>(_vertices[0]);
@@ -153,6 +196,20 @@ class G2O_TYPES_SIM3_API EdgeSim3ProjectXYZ
   virtual bool read(std::istream& is);
   virtual bool write(std::ostream& os) const;
 
+  virtual bool setMeasurementData(const double* m) {
+    Eigen::Map<const Vector2> v(m);
+    setMeasurement(v);
+    return true;
+  }
+
+  virtual bool getMeasurementData(double* m) const {
+    Eigen::Map<Vector2> v(m);
+    v = measurement();
+    return true;
+  }
+
+  virtual int measurementDimension() const { return 2; }
+
   void computeError() {
     const VertexSim3Expmap* v1 =
         static_cast<const VertexSim3Expmap*>(_vertices[1]);
@@ -173,6 +230,20 @@ class G2O_TYPES_SIM3_API EdgeInverseSim3ProjectXYZ
   EdgeInverseSim3ProjectXYZ();
   virtual bool read(std::istream& is);
   virtual bool write(std::ostream& os) const;
+
+  virtual bool setMeasurementData(const double* m) {
+    Eigen::Map<const Vector2> v(m);
+    setMeasurement(v);
+    return true;
+  }
+
+  virtual bool getMeasurementData(double* m) const {
+    Eigen::Map<Vector2> v(m);
+    v = measurement();
+    return true;
+  }
+
+  virtual int measurementDimension() const { return 2; }
 
   void computeError() {
     const VertexSim3Expmap* v1 =

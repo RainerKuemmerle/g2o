@@ -74,6 +74,21 @@ class G2O_TYPES_SCLAM2D_API EdgeSE2SensorCalib
   virtual bool read(std::istream& is);
   virtual bool write(std::ostream& os) const;
 
+  // Measurement is SE2 (x, y, theta) — exposed as a 3-D vector.
+  virtual bool setMeasurementData(const double* m) {
+    Eigen::Map<const Vector3> v(m);
+    setMeasurement(SE2(v));
+    return true;
+  }
+
+  virtual bool getMeasurementData(double* m) const {
+    Eigen::Map<Vector3> v(m);
+    v = measurement().toVector();
+    return true;
+  }
+
+  virtual int measurementDimension() const { return 3; }
+
  protected:
   SE2 _inverseMeasurement;
 };

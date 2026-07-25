@@ -47,6 +47,21 @@ class G2O_TYPES_SBA_API EdgeProjectXYZ2UVU
   EdgeProjectXYZ2UVU();
   bool read(std::istream& is);
   bool write(std::ostream& os) const;
+
+  virtual bool setMeasurementData(const double* m) {
+    Eigen::Map<const Vector3> v(m);
+    setMeasurement(v);
+    return true;
+  }
+
+  virtual bool getMeasurementData(double* m) const {
+    Eigen::Map<Vector3> v(m);
+    v = measurement();
+    return true;
+  }
+
+  virtual int measurementDimension() const { return 3; }
+
   void computeError();
   //  virtual void linearizeOplus();
  protected:

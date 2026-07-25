@@ -44,6 +44,25 @@ class G2O_TYPES_SBA_API EdgeSE3Expmap
 
   bool read(std::istream& is);
   bool write(std::ostream& os) const;
+
+  // Measurement is SE3, exposed as a 7-D vector (tx, ty, tz, qx, qy, qz, qw)
+  // matching SE3Quat::toVector(). The file format applies an inverse to keep
+  // the cam-to-world / world-to-cam convention; the data API exposes the
+  // in-memory measurement directly.
+  virtual bool setMeasurementData(const double* m) {
+    Eigen::Map<const Vector7> v(m);
+    setMeasurement(SE3Quat(v));
+    return true;
+  }
+
+  virtual bool getMeasurementData(double* m) const {
+    Eigen::Map<Vector7> v(m);
+    v = measurement().toVector();
+    return true;
+  }
+
+  virtual int measurementDimension() const { return 7; }
+
   void computeError();
   void linearizeOplus();
 };

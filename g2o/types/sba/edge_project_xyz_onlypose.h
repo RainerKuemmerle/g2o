@@ -42,6 +42,21 @@ class G2O_TYPES_SBA_API EdgeSE3ProjectXYZOnlyPose
 
   bool read(std::istream& is);
   bool write(std::ostream& os) const;
+
+  virtual bool setMeasurementData(const double* m) {
+    Eigen::Map<const Vector2> v(m);
+    setMeasurement(v);
+    return true;
+  }
+
+  virtual bool getMeasurementData(double* m) const {
+    Eigen::Map<Vector2> v(m);
+    v = measurement();
+    return true;
+  }
+
+  virtual int measurementDimension() const { return 2; }
+
   void computeError();
   bool isDepthPositive();
   virtual void linearizeOplus();

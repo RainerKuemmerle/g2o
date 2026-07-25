@@ -46,6 +46,36 @@ class G2O_TYPES_SBA_API VertexIntrinsics
   virtual void setToOriginImpl();
 
   virtual void oplusImpl(const double* update);
+
+  // Full estimate API: 5-D (fx, fy, cx, cy, baseline). The baseline is fixed
+  // (not part of the optimisation tangent) so the minimal API drops it.
+  virtual bool setEstimateDataImpl(const double* est) {
+    Eigen::Map<const Eigen::Matrix<double, 5, 1>> v(est);
+    _estimate = v;
+    return true;
+  }
+
+  virtual bool getEstimateData(double* est) const {
+    Eigen::Map<Eigen::Matrix<double, 5, 1>> v(est);
+    v = _estimate;
+    return true;
+  }
+
+  virtual int estimateDimension() const { return 5; }
+
+  virtual bool setMinimalEstimateDataImpl(const double* est) {
+    Eigen::Map<const Vector4> v(est);
+    _estimate.head<4>() = v;
+    return true;
+  }
+
+  virtual bool getMinimalEstimateData(double* est) const {
+    Eigen::Map<Vector4> v(est);
+    v = _estimate.head<4>();
+    return true;
+  }
+
+  virtual int minimalEstimateDimension() const { return 4; }
 };
 
 }  // namespace g2o

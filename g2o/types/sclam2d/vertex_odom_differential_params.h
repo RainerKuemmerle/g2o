@@ -45,6 +45,31 @@ class G2O_TYPES_SCLAM2D_API VertexOdomDifferentialParams
 
   virtual bool read(std::istream& is);
   virtual bool write(std::ostream& os) const;
+
+  // Estimate API: 3-D Vector3 passthrough; storage and tangent dim coincide.
+  virtual bool setEstimateDataImpl(const double* est) {
+    Eigen::Map<const Vector3> v(est);
+    _estimate = v;
+    return true;
+  }
+
+  virtual bool getEstimateData(double* est) const {
+    Eigen::Map<Vector3> v(est);
+    v = _estimate;
+    return true;
+  }
+
+  virtual int estimateDimension() const { return 3; }
+
+  virtual bool setMinimalEstimateDataImpl(const double* est) {
+    return setEstimateDataImpl(est);
+  }
+
+  virtual bool getMinimalEstimateData(double* est) const {
+    return getEstimateData(est);
+  }
+
+  virtual int minimalEstimateDimension() const { return 3; }
 };
 
 }  // namespace g2o

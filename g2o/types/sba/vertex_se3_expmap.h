@@ -47,6 +47,41 @@ class G2O_TYPES_SBA_API VertexSE3Expmap : public BaseVertex<6, SE3Quat> {
   bool write(std::ostream& os) const;
   void setToOriginImpl();
   void oplusImpl(const double* update_);
+
+  // Full estimate API: 7-D (tx, ty, tz, qx, qy, qz, qw) — same layout as
+  // SE3Quat::toVector(). Both directions use raw component access (no
+  // renormalisation) so a setEstimateData(getEstimateData()) round-trip is
+  // bit-exact even when the in-memory quaternion has accumulated tiny
+  // non-unit drift across many oplus updates. The SE3Quat(Vector7)
+  // constructor would renormalise mid-roundtrip, breaking memcmp checks.
+  virtual bool setEstimateDataImpl(const double* est) {
+    _estimate.setTranslation(Vector3(est[0], est[1], est[2]));
+    _estimate.setRotation(Quaternion(est[6], est[3], est[4], est[5]));
+    return true;
+  }
+
+  virtual bool getEstimateData(double* est) const {
+    Eigen::Map<Vector7> v(est);
+    v = estimate().toVector();
+    return true;
+  }
+
+  virtual int estimateDimension() const { return 7; }
+
+  // Minimal estimate API: 6-D Lie-algebra tangent (se(3) via SE3Quat::log()).
+  virtual bool setMinimalEstimateDataImpl(const double* est) {
+    Eigen::Map<const Vector6> v(est);
+    setEstimate(SE3Quat::exp(v));
+    return true;
+  }
+
+  virtual bool getMinimalEstimateData(double* est) const {
+    Eigen::Map<Vector6> v(est);
+    v = estimate().log();
+    return true;
+  }
+
+  virtual int minimalEstimateDimension() const { return 6; }
 };
 
 }  // namespace g2o

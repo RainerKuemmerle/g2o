@@ -47,6 +47,22 @@ class EdgeSE3Calib
   G2O_TYPES_SLAM3D_ADDONS_API void computeError();
   G2O_TYPES_SLAM3D_ADDONS_API virtual bool read(std::istream& is);
   G2O_TYPES_SLAM3D_ADDONS_API virtual bool write(std::ostream& os) const;
+
+  // Measurement is Isometry3, exposed as a 7-D (tx, ty, tz, qx, qy, qz, qw)
+  // vector matching the slam3d toVectorQT / fromVectorQT convention.
+  virtual bool setMeasurementData(const double* m) {
+    Eigen::Map<const Vector7> v(m);
+    setMeasurement(internal::fromVectorQT(v));
+    return true;
+  }
+
+  virtual bool getMeasurementData(double* m) const {
+    Eigen::Map<Vector7> v(m);
+    v = internal::toVectorQT(measurement());
+    return true;
+  }
+
+  virtual int measurementDimension() const { return 7; }
 };
 
 }  // namespace g2o

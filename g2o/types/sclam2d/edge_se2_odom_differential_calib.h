@@ -65,6 +65,22 @@ class G2O_TYPES_SCLAM2D_API EdgeSE2OdomDifferentialCalib
 
   virtual bool read(std::istream& is);
   virtual bool write(std::ostream& os) const;
+
+  // Measurement is VelocityMeasurement (vl, vr, dt) — exposed as a 3-D vector
+  // matching the on-disk format.
+  virtual bool setMeasurementData(const double* m) {
+    setMeasurement(VelocityMeasurement(m[0], m[1], m[2]));
+    return true;
+  }
+
+  virtual bool getMeasurementData(double* m) const {
+    m[0] = measurement().vl();
+    m[1] = measurement().vr();
+    m[2] = measurement().dt();
+    return true;
+  }
+
+  virtual int measurementDimension() const { return 3; }
 };
 
 #ifdef G2O_HAVE_OPENGL

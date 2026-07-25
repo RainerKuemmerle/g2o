@@ -56,6 +56,24 @@ class G2O_TYPES_SLAM2D_API EdgeSE2LotsOfXY
   virtual bool read(std::istream& is);
   virtual bool write(std::ostream& os) const;
 
+  // Variable-sized: measurement holds 2 * _observedPoints scalars.
+  // Caller must size the buffer to measurementDimension() before calling.
+  virtual bool setMeasurementData(const double* m) {
+    Eigen::Map<const VectorX> v(m, _measurement.size());
+    setMeasurement(v);
+    return true;
+  }
+
+  virtual bool getMeasurementData(double* m) const {
+    Eigen::Map<VectorX> v(m, _measurement.size());
+    v = _measurement;
+    return true;
+  }
+
+  virtual int measurementDimension() const {
+    return static_cast<int>(_measurement.size());
+  }
+
   virtual bool setMeasurementFromState();
 
   virtual void initialEstimate(const OptimizableGraph::VertexSet&,

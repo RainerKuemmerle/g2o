@@ -46,6 +46,20 @@ class G2O_TYPES_SLAM2D_API EdgeSE2TwoPointsXY
   virtual bool read(std::istream& is);
   virtual bool write(std::ostream& os) const;
 
+  virtual bool setMeasurementData(const double* m) {
+    Eigen::Map<const Vector4> v(m);
+    setMeasurement(v);
+    return true;
+  }
+
+  virtual bool getMeasurementData(double* m) const {
+    Eigen::Map<Vector4> v(m);
+    v = measurement();
+    return true;
+  }
+
+  virtual int measurementDimension() const { return 4; }
+
   virtual bool setMeasurementFromState();
 
   virtual void initialEstimate(const OptimizableGraph::VertexSet&,

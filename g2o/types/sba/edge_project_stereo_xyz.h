@@ -46,6 +46,20 @@ class G2O_TYPES_SBA_API EdgeStereoSE3ProjectXYZ
 
   bool write(std::ostream& os) const;
 
+  virtual bool setMeasurementData(const double* m) {
+    Eigen::Map<const Vector3> v(m);
+    setMeasurement(v);
+    return true;
+  }
+
+  virtual bool getMeasurementData(double* m) const {
+    Eigen::Map<Vector3> v(m);
+    v = measurement();
+    return true;
+  }
+
+  virtual int measurementDimension() const { return 3; }
+
   void computeError() {
     const VertexSE3Expmap* v1 =
         static_cast<const VertexSE3Expmap*>(_vertices[1]);

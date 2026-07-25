@@ -59,6 +59,21 @@ class G2O_TYPES_SLAM3D_ADDONS_API EdgeSE3PlaneSensorCalib
 
   virtual bool read(std::istream& is);
   virtual bool write(std::ostream& os) const;
+
+  // Measurement is Plane3D, exposed as a 4-D coefficient vector.
+  virtual bool setMeasurementData(const double* m) {
+    Eigen::Map<const Vector4> v(m);
+    setMeasurement(Plane3D(v));
+    return true;
+  }
+
+  virtual bool getMeasurementData(double* m) const {
+    Eigen::Map<Vector4> v(m);
+    v = measurement().toVector();
+    return true;
+  }
+
+  virtual int measurementDimension() const { return 4; }
 };
 
 #ifdef G2O_HAVE_OPENGL

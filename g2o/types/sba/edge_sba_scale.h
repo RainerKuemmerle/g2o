@@ -43,6 +43,19 @@ class G2O_TYPES_SBA_API EdgeSBAScale
   EdgeSBAScale();
   virtual bool read(std::istream& is);
   virtual bool write(std::ostream& os) const;
+
+  virtual bool setMeasurementData(const double* m) {
+    setMeasurement(*m);
+    return true;
+  }
+
+  virtual bool getMeasurementData(double* m) const {
+    *m = measurement();
+    return true;
+  }
+
+  virtual int measurementDimension() const { return 1; }
+
   void computeError();
   virtual void setMeasurement(const double& m) { _measurement = m; }
   virtual double initialEstimatePossible(const OptimizableGraph::VertexSet&,
