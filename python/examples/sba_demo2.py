@@ -65,7 +65,7 @@ def main():
         optimizer.add_vertex(v_cam)
 
     point_id = num_pose
-    inliers = dict()
+    inliers = {}
     sse = defaultdict(float)
 
     for i, point in enumerate(true_points):

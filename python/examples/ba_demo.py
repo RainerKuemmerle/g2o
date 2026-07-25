@@ -69,7 +69,7 @@ def main():
     print("Poses done")
 
     point_id = num_pose
-    inliers = dict()
+    inliers = {}
     sse = [0.0, 0.0]
 
     for i, point in enumerate(true_points):
