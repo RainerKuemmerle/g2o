@@ -21,7 +21,7 @@ def read_json(filename) -> Any | None:
         with open(filename) as schema_file:
             content = json.load(schema_file)
             return content
-    except Exception:
+    except (OSError, json.JSONDecodeError):
         return None
 
 

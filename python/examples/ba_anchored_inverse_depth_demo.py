@@ -81,7 +81,7 @@ def main():
         optimizer.add_vertex(v_se3)
 
     point_id = num_pose
-    inliers = dict()
+    inliers = {}
     sse = defaultdict(float)
 
     for i, point in enumerate(true_points):
