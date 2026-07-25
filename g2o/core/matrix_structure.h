@@ -28,6 +28,7 @@
 #define G2O_MATRIX_STRUCTURE_H
 
 #include <string_view>
+#include <vector>
 
 #include "g2o_core_api.h"
 
@@ -69,8 +70,10 @@ class G2O_CORE_API MatrixStructure {
   [[nodiscard]] int nzMax() const { return maxNz_; }
 
  protected:
-  int maxN_ = 0;   ///< size of the allocated memory
-  int maxNz_ = 0;  ///< size of the allocated memory
+  int maxN_ = 0;                 ///< size of the allocated memory
+  int maxNz_ = 0;                ///< size of the allocated memory
+  std::vector<int> apStorage_;   ///< owns memory behind Ap
+  std::vector<int> aiiStorage_;  ///< owns memory behind Aii
 };
 
 }  // namespace g2o

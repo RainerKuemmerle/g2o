@@ -70,6 +70,15 @@ class SparseBlockMatrix {
   //! this is the type of the elementary block, it is an Eigen::Matrix.
   using SparseMatrixBlock = MatrixType;
 
+  struct BlockDeleter {
+    bool owned = true;
+    void operator()(SparseMatrixBlock* ptr) const {
+      if (owned) delete ptr;
+    }
+  };
+  using BlockPtr = std::unique_ptr<SparseMatrixBlock, BlockDeleter>;
+  using IntBlockMap = std::map<int, BlockPtr>;
+
   //! columns of the matrix
   [[nodiscard]] int cols() const {
     return !colBlockIndices_.empty() ? colBlockIndices_.back() : 0;
@@ -78,8 +87,6 @@ class SparseBlockMatrix {
   [[nodiscard]] int rows() const {
     return !rowBlockIndices_.empty() ? rowBlockIndices_.back() : 0;
   }
-
-  using IntBlockMap = std::map<int, SparseMatrixBlock*>;
 
   /**
    * constructs a sparse block matrix having a specific layout
@@ -99,6 +106,12 @@ class SparseBlockMatrix {
                     bool hasStorage = true);
 
   SparseBlockMatrix();
+
+  SparseBlockMatrix(SparseBlockMatrix&&) noexcept = default;
+  SparseBlockMatrix& operator=(SparseBlockMatrix&&) noexcept = default;
+
+  SparseBlockMatrix(const SparseBlockMatrix&) = delete;
+  SparseBlockMatrix& operator=(const SparseBlockMatrix&) = delete;
 
   ~SparseBlockMatrix();
 
@@ -259,6 +272,7 @@ class SparseBlockMatrix {
                                       ///< along the rows.
   std::vector<int>
       colBlockIndices_;  ///< vector of the indices of the blocks along the cols
+
   //! array of maps of blocks. The index of the array represent a block column
   //! of the matrix and the block column is stored as a map row_block ->
   //! matrix_block_ptr.
@@ -296,9 +310,10 @@ void SparseBlockMatrix<MatrixType>::clear(bool dealloc) {
     for (typename SparseBlockMatrix<MatrixType>::IntBlockMap::const_iterator
              it = blockCols_[i].begin();
          it != blockCols_[i].end(); ++it) {
-      typename SparseBlockMatrix<MatrixType>::SparseMatrixBlock* b = it->second;
+      typename SparseBlockMatrix<MatrixType>::SparseMatrixBlock* b =
+          it->second.get();
       if (hasStorage_ && dealloc)
-        delete b;
+        ;
       else
         b->setZero();
     }
@@ -323,14 +338,15 @@ SparseBlockMatrix<MatrixType>::block(int r, int c, bool alloc) {
     _block =
         new typename SparseBlockMatrix<MatrixType>::SparseMatrixBlock(rb, cb);
     _block->setZero();
-    std::pair<typename SparseBlockMatrix<MatrixType>::IntBlockMap::iterator,
-              bool>
-        result = blockCols_[c].insert(std::make_pair(r, _block));
+    auto result = blockCols_[c].emplace(
+        r, typename SparseBlockMatrix<MatrixType>::BlockPtr(
+               _block, typename SparseBlockMatrix<MatrixType>::BlockDeleter{
+                           hasStorage_}));
     (void)result;
     assert(result.second);
 
   } else {
-    _block = it->second;
+    _block = it->second.get();
   }
   return _block;
 }
@@ -340,7 +356,7 @@ const typename SparseBlockMatrix<MatrixType>::SparseMatrixBlock*
 SparseBlockMatrix<MatrixType>::block(int r, int c) const {
   auto it = blockCols_[c].find(r);
   if (it == blockCols_[c].end()) return nullptr;
-  return it->second;
+  return it->second.get();
 }
 
 template <class MatrixType>
@@ -354,7 +370,10 @@ SparseBlockMatrix<MatrixType>* SparseBlockMatrix<MatrixType>::clone() const {
          it != blockCols_[i].end(); ++it) {
       auto* b = new typename SparseBlockMatrix<MatrixType>::SparseMatrixBlock(
           *it->second);
-      ret->blockCols_[i].insert(std::make_pair(it->first, b));
+      ret->blockCols_[i].insert(std::make_pair(
+          it->first,
+          typename SparseBlockMatrix<MatrixType>::BlockPtr(
+              b, typename SparseBlockMatrix<MatrixType>::BlockDeleter())));
     }
   }
   ret->hasStorage_ = true;
@@ -368,7 +387,7 @@ void SparseBlockMatrix<MatrixType>::transpose_internal(
   for (size_t i = 0; i < blockCols_.size(); ++i) {
     for (const auto& block : blockCols_[i]) {
       typename SparseBlockMatrix<MatrixType>::SparseMatrixBlock* s =
-          block.second;
+          block.second.get();
       typename SparseBlockMatrix<MatrixTransposedType>::SparseMatrixBlock* d =
           dest.block(i, block.first, true);
       *d = s->transpose();
@@ -410,7 +429,8 @@ void SparseBlockMatrix<MatrixType>::add_internal(
     SparseBlockMatrix<MatrixType>& dest) const {
   for (size_t i = 0; i < blockCols_.size(); ++i) {
     for (auto it = blockCols_[i].begin(); it != blockCols_[i].end(); ++it) {
-      typename SparseBlockMatrix<MatrixType>::SparseMatrixBlock* s = it->second;
+      typename SparseBlockMatrix<MatrixType>::SparseMatrixBlock* s =
+          it->second.get();
       typename SparseBlockMatrix<MatrixType>::SparseMatrixBlock* d =
           dest.block(it->first, i, true);
       (*d) += *s;
@@ -465,13 +485,13 @@ bool SparseBlockMatrix<MatrixType>::multiply(
     for (const auto& block : M->blockCols_[i]) {
       // look for a non-zero block in a row of column it
       int colM = i;
-      const auto* b = block.second;
+      const auto* b = block.second.get();
       auto rbt = blockCols_[block.first].begin();
       while (rbt != blockCols_[block.first].end()) {
         // int colA=block.first;
         int rowA = rbt->first;
         typename SparseBlockMatrix<MatrixType>::SparseMatrixBlock* a =
-            rbt->second;
+            rbt->second.get();
         typename SparseBlockMatrix<MatrixResultType>::SparseMatrixBlock* c =
             dest->block(rowA, colM, true);
         assert(c->rows() == a->rows());
@@ -504,7 +524,7 @@ void SparseBlockMatrix<MatrixType>::multiply(double*& dest,
              it = blockCols_[i].begin();
          it != blockCols_[i].end(); ++it) {
       const typename SparseBlockMatrix<MatrixType>::SparseMatrixBlock* a =
-          it->second;
+          it->second.get();
       int destOffset = it->first ? rowBlockIndices_[it->first - 1] : 0;
       // destVec += *a * srcVec (according to the sub-vector parts)
       internal::template axpy<
@@ -531,7 +551,7 @@ void SparseBlockMatrix<MatrixType>::multiplySymmetricUpperTriangle(
     int srcOffset = colBaseOfBlock(i);
     for (auto it = blockCols_[i].begin(); it != blockCols_[i].end(); ++it) {
       const typename SparseBlockMatrix<MatrixType>::SparseMatrixBlock* a =
-          it->second;
+          it->second.get();
       int destOffset = rowBaseOfBlock(it->first);
       if (destOffset > srcOffset)  // only upper triangle
         break;
@@ -570,7 +590,7 @@ void SparseBlockMatrix<MatrixType>::rightMultiply(double*& dest,
              it = blockCols_[i].begin();
          it != blockCols_[i].end(); ++it) {
       const typename SparseBlockMatrix<MatrixType>::SparseMatrixBlock* a =
-          it->second;
+          it->second.get();
       int srcOffset = rowBaseOfBlock(it->first);
       // destVec += *a.transpose() * srcVec (according to the sub-vector parts)
       internal::template atxpy<
@@ -586,7 +606,8 @@ void SparseBlockMatrix<MatrixType>::scale(double a_) {
     for (typename SparseBlockMatrix<MatrixType>::IntBlockMap::const_iterator
              it = blockCols_[i].begin();
          it != blockCols_[i].end(); ++it) {
-      typename SparseBlockMatrix<MatrixType>::SparseMatrixBlock* a = it->second;
+      typename SparseBlockMatrix<MatrixType>::SparseMatrixBlock* a =
+          it->second.get();
       *a *= a_;
     }
   }
@@ -608,7 +629,7 @@ SparseBlockMatrix<MatrixType>* SparseBlockMatrix<MatrixType>::slice(
   for (int i = 1; i < n; ++i) {
     colIdx[i] = colIdx[i - 1] + colsOfBlock(cmin + i);
   }
-  auto* s = new SparseBlockMatrix(rowIdx, colIdx, m, n, true);
+  auto* s = new SparseBlockMatrix(rowIdx, colIdx, m, n, alloc);
   for (int i = 0; i < n; ++i) {
     int mc = cmin + i;
     for (typename SparseBlockMatrix<MatrixType>::IntBlockMap::const_iterator
@@ -619,8 +640,12 @@ SparseBlockMatrix<MatrixType>* SparseBlockMatrix<MatrixType>::slice(
             alloc ? new
                 typename SparseBlockMatrix<MatrixType>::SparseMatrixBlock(
                     *(it->second))
-                  : it->second;
-        s->blockCols_[i].insert(std::make_pair(it->first - rmin, b));
+                  : it->second.get();
+        s->blockCols_[i].insert(std::make_pair(
+            it->first - rmin,
+            typename SparseBlockMatrix<MatrixType>::BlockPtr(
+                b,
+                typename SparseBlockMatrix<MatrixType>::BlockDeleter{alloc})));
       }
     }
   }
@@ -645,7 +670,7 @@ size_t SparseBlockMatrix<MatrixType>::nonZeros() const {
   for (size_t i = 0; i < blockCols_.size(); ++i) {
     for (auto it = blockCols_[i].begin(); it != blockCols_[i].end(); ++it) {
       const typename SparseBlockMatrix<MatrixType>::SparseMatrixBlock* a =
-          it->second;
+          it->second.get();
       count += a->cols() * a->rows();
     }
   }
@@ -668,7 +693,7 @@ std::ostream& operator<<(std::ostream& os,
     for (auto it = m.blockCols()[i].begin(); it != m.blockCols()[i].end();
          ++it) {
       const typename SparseBlockMatrix<MatrixType>::SparseMatrixBlock* b =
-          it->second;
+          it->second.get();
       os << "BLOCK: " << it->first << " " << i << '\n';
       os << *b << '\n';
     }
@@ -715,7 +740,7 @@ bool SparseBlockMatrix<MatrixType>::symmPermutation(
     for (const auto& block : blockCols_[i]) {
       int pj = pinv[block.first];
 
-      const auto* s = block.second;
+      const auto* s = block.second.get();
       typename SparseBlockMatrix<MatrixType>::SparseMatrixBlock* b = nullptr;
       if (!onlyUpper || pj <= pi) {
         b = dest->block(pj, pi, true);
@@ -746,7 +771,7 @@ int SparseBlockMatrix<MatrixType>::fillCCS(double* Cx,
     for (int c = 0; c < csize; ++c) {
       for (auto it = blockCols_[i].begin(); it != blockCols_[i].end(); ++it) {
         const typename SparseBlockMatrix<MatrixType>::SparseMatrixBlock* b =
-            it->second;
+            it->second.get();
         int rstart = it->first ? rowBlockIndices_[it->first - 1] : 0;
 
         int elemsToCopy = b->rows();
@@ -771,7 +796,7 @@ int SparseBlockMatrix<MatrixType>::fillCCS(int* Cp, int* Ci, double* Cx,
       *Cp = nz;
       for (auto it = blockCols_[i].begin(); it != blockCols_[i].end(); ++it) {
         const typename SparseBlockMatrix<MatrixType>::SparseMatrixBlock* b =
-            it->second;
+            it->second.get();
         int rstart = it->first ? rowBlockIndices_[it->first - 1] : 0;
 
         int elemsToCopy = b->rows();
@@ -827,7 +852,7 @@ bool SparseBlockMatrix<MatrixType>::writeOctave(const char* filename,
     const int& c = i;
     for (auto it = blockCols_[i].begin(); it != blockCols_[i].end(); ++it) {
       const int& r = it->first;
-      const MatrixType& m = *(it->second);
+      const MatrixType& m = *(it->second.get());
       for (int cc = 0; cc < m.cols(); ++cc)
         for (int rr = 0; rr < m.rows(); ++rr) {
           int aux_r = rowBaseOfBlock(r) + rr;
@@ -870,7 +895,7 @@ int SparseBlockMatrix<MatrixType>::fillSparseBlockMatrixCCS(
     dest.reserve(row.size());
     for (auto it = row.begin(); it != row.end(); ++it) {
       dest.push_back(typename SparseBlockMatrixCCS<MatrixType>::RowBlock(
-          it->first, it->second));
+          it->first, it->second.get()));
       ++numblocks;
     }
   }
@@ -888,8 +913,8 @@ int SparseBlockMatrix<MatrixType>::fillSparseBlockMatrixCCSTransposed(
     for (auto it = row.begin(); it != row.end(); ++it) {
       typename SparseBlockMatrixCCS<MatrixType>::SparseColumn& dest =
           blockCCS.blockCols()[it->first];
-      dest.push_back(
-          typename SparseBlockMatrixCCS<MatrixType>::RowBlock(i, it->second));
+      dest.push_back(typename SparseBlockMatrixCCS<MatrixType>::RowBlock(
+          i, it->second.get()));
       ++numblocks;
     }
   }
@@ -921,12 +946,22 @@ void SparseBlockMatrix<MatrixType>::takePatternFromHash(
     std::swap(aux, column);
     // now insert sorted vector to the std::map structure
     IntBlockMap& destColumnMap = blockCols()[i];
-    destColumnMap.insert(sparseRowSorted[0]);
+    destColumnMap.insert(std::make_pair(
+        sparseRowSorted[0].first,
+        typename SparseBlockMatrix<MatrixType>::BlockPtr(
+            sparseRowSorted[0].second,
+            typename SparseBlockMatrix<MatrixType>::BlockDeleter())));
     for (size_t j = 1; j < sparseRowSorted.size(); ++j) {
       auto hint = destColumnMap.end();
       --hint;  // cppreference says the element goes after the hint (until
                // C++11)
-      destColumnMap.insert(hint, sparseRowSorted[j]);
+      destColumnMap.insert(
+          hint,
+          std::make_pair(
+              sparseRowSorted[j].first,
+              typename SparseBlockMatrix<MatrixType>::BlockPtr(
+                  sparseRowSorted[j].second,
+                  typename SparseBlockMatrix<MatrixType>::BlockDeleter())));
     }
   }
 }
