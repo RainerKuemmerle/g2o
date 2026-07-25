@@ -4,6 +4,7 @@ import os
 import sys
 import tempfile
 from pathlib import Path
+
 import numpy as np
 import pytest
 
@@ -14,7 +15,7 @@ build_lib_dir = os.environ.get(
 sys.path.insert(0, build_lib_dir)
 
 # This must come after path setup
-import g2opy as g2o  # noqa: E402
+import g2opy as g2o
 
 
 def pytest_runtest_setup(item):

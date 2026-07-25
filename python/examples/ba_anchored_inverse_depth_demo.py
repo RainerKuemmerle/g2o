@@ -126,10 +126,7 @@ def main():
 
         if inlier:
             inliers[point_id] = (i, anchor)
-            error = (
-                true_poses[anchor].inverse() * invert_depth(v_p.estimate())
-                - true_points[i]
-            )
+            error = true_poses[anchor].inverse() * invert_depth(v_p.estimate()) - point
             sse[0] += np.sum(error**2)
         point_id += 1
 

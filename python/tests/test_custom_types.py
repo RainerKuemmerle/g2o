@@ -160,7 +160,6 @@ class CustomVectorEdge(g2o.VariableVectorXEdge):
 
     def linearize_oplus(self):
         """Numerical Jacobian (default behavior)."""
-        pass
 
 
 class TestCustomEdge:
