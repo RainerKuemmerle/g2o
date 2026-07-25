@@ -1,1 +1,1 @@
-from .g2opy import *  # noqa: F403
+from .g2opy import *

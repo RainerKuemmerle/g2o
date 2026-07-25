@@ -1,5 +1,3 @@
-from typing import List
-
 import g2opy as g2o
 import numpy as np
 import plotly.graph_objects as go
@@ -68,7 +66,7 @@ def main():
         angle = np.random.random() * 2.0 * np.pi
         return center + np.array([r * np.cos(angle), r * np.sin(angle)])
 
-    points: List[np.array] = [gen_point() for _ in range(num_points)]
+    points: list[np.array] = [gen_point() for _ in range(num_points)]
 
     # build the optimization problem given the points
     # 1. add the circle vertex

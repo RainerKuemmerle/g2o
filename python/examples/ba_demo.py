@@ -107,7 +107,7 @@ def main():
 
         if inlier:
             inliers[point_id] = i
-            error = vp.estimate() - true_points[i]
+            error = vp.estimate() - point
             sse[0] += np.sum(error**2)
         point_id += 1
 
