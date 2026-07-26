@@ -52,8 +52,6 @@ class G2O_TYPES_SLAM2D_API EdgeSE2PointXYOffset
   void computeError() override;
   void linearizeOplus() override;
 
-  void setMeasurement(const Vector2& m) override { measurement_ = m; }
-
   bool setMeasurementFromState() override;
 
   double initialEstimatePossible(const OptimizableGraph::VertexSet& from,

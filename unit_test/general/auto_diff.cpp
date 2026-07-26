@@ -32,9 +32,11 @@
 #include "g2o/types/slam2d/vertex_point_xy.h"
 #include "gtest/gtest.h"
 
-class VertexFlatSE2 : public g2o::BaseVertex<3, g2o::Vector3> {
+namespace {
+
+class VertexFlatSE2 : public g2o::BaseVertex<VertexFlatSE2, 3, g2o::Vector3> {
  public:
-  void oplusImpl(const g2o::VectorX::MapType& update) override {
+  void oplusImpl(const g2o::VectorX::MapType& update) {
     estimate_ += update.head<kDimension>();
     estimate_(2) = g2o::normalize_theta(estimate_(2));
   }
@@ -57,8 +59,8 @@ class Edge3ADTester
     T cth = cos(pose[2]);
     T sth = sin(pose[2]);
 
-    result[0] = pose[0] + cth * point[0] - sth * point[1];
-    result[1] = pose[1] + sth * point[0] + cth * point[1];
+    result[0] = pose[0] + (cth * point[0]) - (sth * point[1]);
+    result[1] = pose[1] + (sth * point[0]) + (cth * point[1]);
   }
 
   //! implementation of the templatized error function
@@ -261,3 +263,5 @@ TEST_F(AutoDifferentiationEdgeSE2, AdComputesCorrect) {
       testEdgeAd_.jacobianOplusXn<1>().isApprox(testEdge_.jacobianOplusXn<1>()))
       << "Jacobian differs";
 }
+
+}  // namespace

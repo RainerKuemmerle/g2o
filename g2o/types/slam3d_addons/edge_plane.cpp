@@ -40,8 +40,6 @@ void EdgePlane::computeError() {
       (v2->estimate().toVector() - v1->estimate().toVector()) - measurement_;
 }
 
-void EdgePlane::setMeasurement(const Vector4& m) { measurement_ = m; }
-
 bool EdgePlane::setMeasurementFromState() {
   auto* v1 = vertexXnRaw<0>();
   auto* v2 = vertexXnRaw<1>();

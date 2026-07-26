@@ -9,7 +9,6 @@
 #include "g2o/core/base_fixed_sized_edge.h"
 #include "g2o/core/base_unary_edge.h"
 #include "g2o/core/base_variable_sized_edge.h"
-#include "g2o/core/base_vertex.h"
 #include "g2opy.h"
 #include "python/trampoline/py_edge_trampoline.h"
 
@@ -83,49 +82,18 @@ class Registry {
 
   template <typename VertexType>
   auto registerVertex(const char* name) {
-    this->registerBaseVertex<VertexType::kDimension,
-                             typename VertexType::EstimateType>();
-
-    return py::class_<VertexType,
-                      BaseVertex<VertexType::kDimension,
-                                 typename VertexType::EstimateType>>(mod_, name)
-        .def(py::init<>());
+    return py::class_<VertexType, OptimizableGraph::Vertex>(mod_, name)
+        .def(py::init<>())
+        .def("hessian",
+             [](const VertexType& v) { return MatrixX(v.hessianMap()); })
+        .def("b", static_cast<typename VertexType::BVector& (VertexType::*)()>(
+                      &VertexType::b))
+        .def("estimate", &VertexType::estimate)
+        .def("set_estimate", &VertexType::setEstimate, "et"_a,
+             py::keep_alive<1, 2>());
   }
 
   py::module_& mod() { return mod_; }
-
-  template <int D, typename T>
-  void registerBaseVertex() {
-    const std::string dim_str = D > 0 ? std::to_string(D) : "Dyn";
-    const std::string estimate_str = typeid(T).name();
-
-    std::stringstream suffix;
-    suffix << dim_str << '_' << estimate_str;
-    const std::string base_vertex_name = "BaseVertex" + suffix.str();
-
-    if (registered_vertices_.count(base_vertex_name) > 0) {
-      return;
-    }
-    registered_vertices_.insert(base_vertex_name);
-
-    using CLS = BaseVertex<D, T>;
-    using BVector = typename CLS::BVector;
-
-    py::class_<CLS, OptimizableGraph::Vertex>(private_mod_,
-                                              base_vertex_name.c_str())
-
-        //.def(py::init<>())
-        //.def_ro_static("dimension", &BaseVertex<D, T>::Dimension)   //
-        // lead to undefined
-        // symbol error
-        .def("hessian", [](const CLS& v) { return MatrixX(v.hessianMap()); })
-        .def("b", static_cast<BVector& (CLS::*)()>(&CLS::b))
-        //.def("A", (HessianBlockType& (CLS::*) ()) &CLS::A)
-        .def("estimate", &CLS::estimate)  // -> T&
-        .def("set_estimate", &CLS::setEstimate, "et"_a,
-             py::keep_alive<1, 2>())  // T& -> void
-        ;
-  }
 
   template <int D, typename E, typename VertexXi>
   void registerUnaryEdge() {
@@ -233,6 +201,10 @@ class Registry {
         .def("linearize_oplus",
              static_cast<void (CLS::*)()>(&CLS::linearizeOplus))
         .def("jacobian", &CLS::jacobian, "vertex_index"_a)  // int -> Matrix
+        .def(
+            "create_vertex",
+            [](CLS& cls, int i) { return cls.createVertex(i); }, "i"_a,
+            py::rv_policy::take_ownership)
         .def(
             "set_jacobian",
             [](CLS& cls, int vertex_index, const py::DRef<const MatrixX>& m) {

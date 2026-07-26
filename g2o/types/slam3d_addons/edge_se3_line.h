@@ -44,13 +44,13 @@ class CacheSE3Offset;
 class G2O_TYPES_SLAM3D_ADDONS_API EdgeSE3Line3D
     : public BaseBinaryEdge<4, Line3D, VertexSE3, VertexLine3D> {
  public:
+  using BaseBinaryEdge<4, Line3D, VertexSE3, VertexLine3D>::setMeasurement;
+
   EdgeSE3Line3D();
 
   void computeError() override;
 
   virtual void setMeasurement(const Vector6& m) { measurement_ = Line3D(m); }
-
-  void setMeasurement(const Line3D& m) override { measurement_ = Line3D(m); }
 
   Vector3 color;
 

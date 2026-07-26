@@ -41,7 +41,7 @@
 namespace g2o {
 
 class G2O_TYPES_SLAM2D_ADDONS_API VertexSegment2D
-    : public BaseVertex<4, Vector4> {
+    : public BaseVertex<VertexSegment2D, 4, Vector4> {
  public:
   VertexSegment2D();
 
@@ -60,7 +60,7 @@ class G2O_TYPES_SLAM2D_ADDONS_API VertexSegment2D
     v = p2;
   }
 
-  void oplusImpl(const VectorX::MapType& update) override {
+  void oplusImpl(const VectorX::MapType& update) {
     estimate_ += update.head<kDimension>();
   }
 };

@@ -108,8 +108,7 @@ void declareOptimizableGraph(py::module_& m) {
       .def("solve_direct", &CLS::Vertex::solveDirect)
       .def("clear_quadratic_form", &CLS::Vertex::clearQuadraticForm)
       .def("lock_quadratic_form", &CLS::Vertex::lockQuadraticForm)
-      .def("unlock_quadratic_form", &CLS::Vertex::unlockQuadraticForm)
-      .def("update_cache", &CLS::Vertex::updateCache);
+      .def("unlock_quadratic_form", &CLS::Vertex::unlockQuadraticForm);
 
   py::class_<CLS::Edge, HyperGraph::Edge>(cls, "OptimizableGraph_Edge")
       //.def(py::init<>())
@@ -152,7 +151,6 @@ void declareOptimizableGraph(py::module_& m) {
            "l"_a)                               // int -> void
       .def("dimension", &CLS::Edge::dimension)  // -> int
 
-      .def("create_vertex", &CLS::Edge::createVertex)
       .def("internal_id", &CLS::Edge::internalId)  // -> long long
 
       .def("set_parameter_id", &CLS::Edge::setParameterId, "arg_num"_a,

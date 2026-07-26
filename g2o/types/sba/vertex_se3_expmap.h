@@ -38,9 +38,10 @@ namespace g2o {
  * \brief SE3 Vertex parameterized internally with a transformation matrix
  * and externally with its exponential map
  */
-class G2O_TYPES_SBA_API VertexSE3Expmap : public BaseVertex<6, SE3Quat> {
+class G2O_TYPES_SBA_API VertexSE3Expmap
+    : public BaseVertex<VertexSE3Expmap, 6, SE3Quat> {
  public:
-  void oplusImpl(const VectorX::MapType& update) override;
+  void oplusImpl(const VectorX::MapType& update);
 };
 
 }  // namespace g2o

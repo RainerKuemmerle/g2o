@@ -153,13 +153,6 @@ VectorX::MapType OptimizableGraph::Vertex::bMap() const {
   return VectorX::MapType(bData(), dim);
 }
 
-void OptimizableGraph::Vertex::updateCache() {
-  if (cacheContainer_) {
-    cacheContainer_->setUpdateNeeded();
-    cacheContainer_->update();
-  }
-}
-
 bool OptimizableGraph::Edge::setParameterId(int argNum, int paramId) {
   if (static_cast<int>(parameters_.size()) <= argNum) return false;
   if (argNum < 0) return false;
@@ -192,6 +185,24 @@ void OptimizableGraph::Edge::setRobustKernel(
 bool OptimizableGraph::Edge::resolveCaches() { return true; }
 
 bool OptimizableGraph::Edge::setMeasurementFromState() { return false; }
+
+void OptimizableGraph::Edge::initialEstimate(
+    const OptimizableGraph::VertexSet& /*from*/,
+    OptimizableGraph::Vertex* /*to*/) {
+  G2O_WARN(
+      "inititialEstimate() is not implemented, please give implementation in "
+      "your derived class");
+}
+
+bool OptimizableGraph::Edge::allVerticesFixed() const {
+  return std::all_of(
+      vertices_.begin(), vertices_.end(),
+      [](const std::shared_ptr<HyperGraph::Vertex>& vertex) {
+        const auto* optimizable_vertex =
+            static_cast<const OptimizableGraph::Vertex*>(vertex.get());
+        return optimizable_vertex && optimizable_vertex->fixed();
+      });
+}
 
 OptimizableGraph::OptimizableGraph()
     : graphActions_(static_cast<int>(ActionType::kAtNumElements)) {}

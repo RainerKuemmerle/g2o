@@ -45,11 +45,11 @@ struct VertexIntrinsicsEstimate {
  * \brief Vertex encoding the intrinsics of the camera fx, fy, cx, xy, baseline;
  */
 class G2O_TYPES_SBA_API VertexIntrinsics
-    : public BaseVertex<4, VertexIntrinsicsEstimate> {
+    : public BaseVertex<VertexIntrinsics, 4, VertexIntrinsicsEstimate> {
  public:
   VertexIntrinsics();
 
-  void oplusImpl(const VectorX::MapType& update) override;
+  void oplusImpl(const VectorX::MapType& update);
 };
 
 template <>

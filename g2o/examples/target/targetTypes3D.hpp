@@ -9,23 +9,21 @@
 // This header file specifies a set of types for the different
 // tracking examples; note that
 
-class VertexPosition3D : public g2o::BaseVertex<3, Eigen::Vector3d> {
+class VertexPosition3D
+    : public g2o::BaseVertex<VertexPosition3D, 3, Eigen::Vector3d> {
  public:
   VertexPosition3D() = default;
 
-  void oplusImpl(const g2o::VectorX::MapType& update) override {
-    estimate_ += update;
-  }
+  void oplusImpl(const g2o::VectorX::MapType& update) { estimate_ += update; }
 };
 
 // Store velocity separately from position?
-class VertexVelocity3D : public g2o::BaseVertex<3, Eigen::Vector3d> {
+class VertexVelocity3D
+    : public g2o::BaseVertex<VertexVelocity3D, 3, Eigen::Vector3d> {
  public:
   VertexVelocity3D() = default;
 
-  void oplusImpl(const g2o::VectorX::MapType& update) override {
-    estimate_ += update;
-  }
+  void oplusImpl(const g2o::VectorX::MapType& update) { estimate_ += update; }
 };
 
 // The idealised GPS measurement; this is 3D and linear

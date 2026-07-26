@@ -38,11 +38,11 @@ namespace g2o {
 class G2O_TYPES_SLAM2D_ADDONS_API EdgeLine2D
     : public BaseBinaryEdge<2, Line2D, VertexLine2D, VertexLine2D> {
  public:
+  using BaseBinaryEdge<2, Line2D, VertexLine2D, VertexLine2D>::setMeasurement;
+
   EdgeLine2D();
 
   void computeError() override;
-
-  void setMeasurement(const Line2D& m) override { measurement_ = m; }
 
   virtual void setMeasurement(const Vector2& m) { measurement_ = Line2D(m); }
 

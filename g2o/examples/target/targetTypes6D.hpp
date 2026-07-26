@@ -14,24 +14,22 @@ using Matrix6d = Eigen::Matrix<double, 6, 6>;
 // This header file specifies a set of types for the different
 // tracking examples; note that
 
-class VertexPosition3D : public g2o::BaseVertex<3, Eigen::Vector3d> {
+class VertexPosition3D
+    : public g2o::BaseVertex<VertexPosition3D, 3, Eigen::Vector3d> {
  public:
   VertexPosition3D() = default;
 
-  void oplusImpl(const g2o::VectorX::MapType& update) override {
-    estimate_ += update;
-  }
+  void oplusImpl(const g2o::VectorX::MapType& update) { estimate_ += update; }
 };
 
 class PositionVelocity3DEdge {};
 
-class VertexPositionVelocity3D : public g2o::BaseVertex<6, Vector6d> {
+class VertexPositionVelocity3D
+    : public g2o::BaseVertex<VertexPositionVelocity3D, 6, Vector6d> {
  public:
   VertexPositionVelocity3D() = default;
 
-  void oplusImpl(const g2o::VectorX::MapType& update) override {
-    estimate_ += update;
-  }
+  void oplusImpl(const g2o::VectorX::MapType& update) { estimate_ += update; }
 };
 
 // The odometry which links pairs of nodes together

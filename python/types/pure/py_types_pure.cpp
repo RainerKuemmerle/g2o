@@ -8,7 +8,9 @@
 
 namespace g2o {
 
-class VectorXVertex : public BaseDynamicVertex<VectorX> {
+namespace {
+
+class VectorXVertex : public BaseDynamicVertex<VectorXVertex, VectorX> {
  public:
   VectorXVertex() = default;
 
@@ -27,7 +29,7 @@ class VectorXVertex : public BaseDynamicVertex<VectorX> {
 
   // oplusImpl for python consuming a vector
   virtual void oplus_impl(const Eigen::Ref<VectorX>& v) = 0;
-  void oplusImpl(const VectorX::MapType& update) override {
+  void oplusImpl(const VectorX::MapType& update) {
     // TODO(goki): Can we use the MapType directly
     oplus_impl(update);
   }
@@ -65,13 +67,18 @@ class PyVariableVectorXEdge : public VariableVectorXEdge {
   }
 };
 
-void declareTypesPure(detail::Registry& registry) {
-  registry.registerBaseVertex<Eigen::Dynamic, VectorX>();
+}  // namespace
 
-  py::class_<VectorXVertex, PyVectorXVertex,
-             BaseVertex<Eigen::Dynamic, VectorX>>(registry.mod(),
-                                                  "VectorXVertex")
+void declareTypesPure(detail::Registry& registry) {
+  py::class_<VectorXVertex, PyVectorXVertex, OptimizableGraph::Vertex>(
+      registry.mod(), "VectorXVertex")
       .def(py::init<>())
+      .def("hessian",
+           [](const VectorXVertex& v) { return MatrixX(v.hessianMap()); })
+      .def("b", static_cast<VectorX& (VectorXVertex::*)()>(&VectorXVertex::b))
+      .def("estimate", &VectorXVertex::estimate)
+      .def("set_estimate", &VectorXVertex::setEstimate, "et"_a,
+           py::keep_alive<1, 2>())
       .def("oplus_impl",
            &VectorXVertex::oplus_impl)  // -> void, to be implemented in python
       ;

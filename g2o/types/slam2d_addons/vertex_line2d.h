@@ -35,7 +35,8 @@
 
 namespace g2o {
 
-class G2O_TYPES_SLAM2D_ADDONS_API VertexLine2D : public BaseVertex<2, Line2D> {
+class G2O_TYPES_SLAM2D_ADDONS_API VertexLine2D
+    : public BaseVertex<VertexLine2D, 2, Line2D> {
  public:
   VertexLine2D();
 
@@ -45,7 +46,7 @@ class G2O_TYPES_SLAM2D_ADDONS_API VertexLine2D : public BaseVertex<2, Line2D> {
   [[nodiscard]] double rho() const { return estimate_[1]; }
   void setRho(double r) { estimate_[1] = r; }
 
-  void oplusImpl(const VectorX::MapType& update) override {
+  void oplusImpl(const VectorX::MapType& update) {
     estimate_[0] += update(0);
     estimate_[1] += update(1);
     estimate_[0] = normalize_theta(estimate_[0]);

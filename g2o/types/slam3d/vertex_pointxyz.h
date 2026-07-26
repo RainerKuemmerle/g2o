@@ -41,11 +41,12 @@ namespace g2o {
 /**
  * \brief Vertex for a tracked point in space
  */
-class G2O_TYPES_SLAM3D_API VertexPointXYZ : public BaseVertex<3, Vector3> {
+class G2O_TYPES_SLAM3D_API VertexPointXYZ
+    : public BaseVertex<VertexPointXYZ, 3, Vector3> {
  public:
   VertexPointXYZ() = default;
 
-  void oplusImpl(const VectorX::MapType& update) override {
+  void oplusImpl(const VectorX::MapType& update) {
     estimate_ += update.head<kDimension>();
   }
 };

@@ -23,15 +23,14 @@
 // we can change it at runtime.
 
 class PolynomialCoefficientVertex
-    : public g2o::BaseDynamicVertex<Eigen::VectorXd> {
+    : public g2o::BaseDynamicVertex<PolynomialCoefficientVertex,
+                                    Eigen::VectorXd> {
  public:
   // Create the vertex
   PolynomialCoefficientVertex() = default;
 
   // Direct linear add
-  void oplusImpl(const g2o::VectorX::MapType& update) override {
-    estimate_ += update;
-  }
+  void oplusImpl(const g2o::VectorX::MapType& update) { estimate_ += update; }
 
   // Resize the vertex state. In this case, we want to preserve as much of the
   // state as we can. Therefore, we use conservativeResize and pad with zeros
