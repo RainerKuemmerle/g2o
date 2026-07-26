@@ -43,11 +43,11 @@ namespace g2o {
 /**
  * \brief 2D pose Vertex, (x,y,theta)
  */
-class G2O_TYPES_SLAM2D_API VertexSE2 : public BaseVertex<3, SE2> {
+class G2O_TYPES_SLAM2D_API VertexSE2 : public BaseVertex<VertexSE2, 3, SE2> {
  public:
   VertexSE2() = default;
 
-  void oplusImpl(const VectorX::MapType& update) override;
+  void oplusImpl(const VectorX::MapType& update);
 };
 
 #ifdef G2O_HAVE_OPENGL

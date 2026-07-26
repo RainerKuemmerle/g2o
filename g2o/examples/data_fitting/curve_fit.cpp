@@ -40,9 +40,9 @@ G2O_USE_OPTIMIZATION_LIBRARY(dense);
 /**
  * \brief the params, a, b, and lambda for a * exp(-lambda * t) + b
  */
-class VertexParams : public g2o::BaseVertex<3, Eigen::Vector3d> {
+class VertexParams : public g2o::BaseVertex<VertexParams, 3, Eigen::Vector3d> {
  public:
-  void oplusImpl(const g2o::VectorX::MapType& update) override {
+  void oplusImpl(const g2o::VectorX::MapType& update) {
     estimate_ += update.head<kDimension>();
   }
 };

@@ -35,11 +35,11 @@
 namespace g2o::tutorial {
 
 class G2O_TUTORIAL_SLAM2D_API VertexPointXY
-    : public BaseVertex<2, Eigen::Vector2d> {
+    : public BaseVertex<VertexPointXY, 2, Eigen::Vector2d> {
  public:
   VertexPointXY();
 
-  void oplusImpl(const g2o::VectorX::MapType& update) override;
+  void oplusImpl(const g2o::VectorX::MapType& update);
 };
 
 }  // namespace g2o::tutorial

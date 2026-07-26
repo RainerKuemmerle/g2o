@@ -60,8 +60,6 @@ class G2O_TYPES_SLAM3D_ADDONS_API EdgeSE3PlaneSensorCalib
     Plane3D localPlane = w2n * plane;
     error_ = localPlane.ominus(measurement_);
   }
-
-  void setMeasurement(const Plane3D& m) override { measurement_ = m; }
 };
 
 #ifdef G2O_HAVE_OPENGL

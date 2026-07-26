@@ -38,7 +38,7 @@ class G2O_INTERACTIVE_API OnlineVertexSE2 : public VertexSE2 {
  public:
   OnlineVertexSE2() = default;
 
-  void oplusImpl(const VectorX::MapType& update) override {
+  void oplusImpl(const VectorX::MapType& update) {
     VertexSE2::oplusImpl(update);
     updatedEstimate = estimate_;
   }

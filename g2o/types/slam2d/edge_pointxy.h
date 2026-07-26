@@ -46,8 +46,6 @@ class G2O_TYPES_SLAM2D_API EdgePointXY
     error_ = (v2->estimate() - v1->estimate()) - measurement_;
   }
 
-  void setMeasurement(const Vector2& m) override { measurement_ = m; }
-
   bool setMeasurementFromState() override {
     const VertexPointXY* v1 = vertexXnRaw<0>();
     const VertexPointXY* v2 = vertexXnRaw<1>();

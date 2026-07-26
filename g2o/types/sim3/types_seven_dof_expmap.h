@@ -37,14 +37,6 @@
 
 namespace g2o {
 
-#ifdef _MSC_VER
-// explicit instantiation of BaseVertex, if not instantiated causes already
-// defined error in some cases (msvc debug only) see links below
-// https://stackoverflow.com/questions/44960760/msvc-dll-exporting-class-that-inherits-from-template-cause-lnk2005-already-defin
-// https://developercommunity.visualstudio.com/content/problem/224597/linker-failing-because-of-multiple-definitions-of.html
-template class BaseVertex<7, Sim3>;
-#endif
-
 /**
  * \brief Sim3 Vertex, (x,y,z,qw,qx,qy,qz)
  * the parameterization for the increments constructed is a 7d vector
@@ -52,11 +44,12 @@ template class BaseVertex<7, Sim3>;
  *
  * Will represent relative transformation between two cameras
  */
-class G2O_TYPES_SIM3_API VertexSim3Expmap : public BaseVertex<7, Sim3> {
+class G2O_TYPES_SIM3_API VertexSim3Expmap
+    : public BaseVertex<VertexSim3Expmap, 7, Sim3> {
  public:
   VertexSim3Expmap();
 
-  void oplusImpl(const VectorX::MapType& update) override;
+  void oplusImpl(const VectorX::MapType& update);
 
   Vector2 _principle_point1, _principle_point2;
   Vector2 _focal_length1, _focal_length2;
@@ -69,6 +62,14 @@ class G2O_TYPES_SIM3_API VertexSim3Expmap : public BaseVertex<7, Sim3> {
 
  protected:
 };
+
+#ifdef _MSC_VER
+// explicit instantiation of BaseVertex, if not instantiated causes already
+// defined error in some cases (msvc debug only) see links below
+// https://stackoverflow.com/questions/44960760/msvc-dll-exporting-class-that-inherits-from-template-cause-lnk2005-already-defin
+// https://developercommunity.visualstudio.com/content/problem/224597/linker-failing-because-of-multiple-definitions-of.html
+template class BaseVertex<VertexSim3Expmap, 7, Sim3>;
+#endif
 
 /**
  * \brief 7D edge between two Vertex7

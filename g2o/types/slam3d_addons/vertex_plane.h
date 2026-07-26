@@ -40,13 +40,12 @@
 
 namespace g2o {
 
-class G2O_TYPES_SLAM3D_ADDONS_API VertexPlane : public BaseVertex<3, Plane3D> {
+class G2O_TYPES_SLAM3D_ADDONS_API VertexPlane
+    : public BaseVertex<VertexPlane, 3, Plane3D> {
  public:
   VertexPlane();
 
-  void oplusImpl(const VectorX::MapType& update) override {
-    estimate_.oplus(update);
-  }
+  void oplusImpl(const VectorX::MapType& update) { estimate_.oplus(update); }
 
   Vector3 color;
 };

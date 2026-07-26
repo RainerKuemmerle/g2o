@@ -43,8 +43,6 @@ class G2O_TYPES_SLAM3D_ADDONS_API EdgePlane
 
   void computeError() override;
 
-  void setMeasurement(const Vector4& m) override;
-
   bool setMeasurementFromState() override;
 
 #if 0

@@ -41,13 +41,12 @@
 
 namespace g2o {
 
-class G2O_TYPES_SLAM3D_ADDONS_API VertexLine3D : public BaseVertex<4, Line3D> {
+class G2O_TYPES_SLAM3D_ADDONS_API VertexLine3D
+    : public BaseVertex<VertexLine3D, 4, Line3D> {
  public:
   VertexLine3D();
 
-  void oplusImpl(const VectorX::MapType& update) override {
-    estimate_.oplus(update);
-  }
+  void oplusImpl(const VectorX::MapType& update) { estimate_.oplus(update); }
 
   Vector3 color;
 };

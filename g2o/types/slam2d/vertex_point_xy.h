@@ -40,11 +40,12 @@
 
 namespace g2o {
 
-class G2O_TYPES_SLAM2D_API VertexPointXY : public BaseVertex<2, Vector2> {
+class G2O_TYPES_SLAM2D_API VertexPointXY
+    : public BaseVertex<VertexPointXY, 2, Vector2> {
  public:
   VertexPointXY();
 
-  void oplusImpl(const VectorX::MapType& update) override {
+  void oplusImpl(const VectorX::MapType& update) {
     estimate_ += update.head<2>();
   }
 };

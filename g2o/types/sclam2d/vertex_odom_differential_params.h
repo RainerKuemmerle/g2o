@@ -34,9 +34,9 @@
 namespace g2o {
 
 class G2O_TYPES_SCLAM2D_API VertexOdomDifferentialParams
-    : public BaseVertex<3, Vector3> {
+    : public BaseVertex<VertexOdomDifferentialParams, 3, Vector3> {
  public:
-  void oplusImpl(const VectorX::MapType& update) override;
+  void oplusImpl(const VectorX::MapType& update);
 };
 
 }  // namespace g2o

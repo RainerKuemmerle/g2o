@@ -33,7 +33,7 @@
 namespace g2o {
 
 void VertexCam::setEstimate(const SBACam& cam) {
-  BaseVertex<6, SBACam>::setEstimate(cam);
+  BaseVertex<VertexCam, 6, SBACam>::setEstimate(cam);
   estimate_.setTransform();
   estimate_.setProjection();
   estimate_.setDr();

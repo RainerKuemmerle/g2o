@@ -36,9 +36,9 @@ namespace g2o::tutorial {
 /**
  * \brief 2D pose Vertex, (x,y,theta)
  */
-class G2O_TUTORIAL_SLAM2D_API VertexSE2 : public BaseVertex<3, SE2> {
+class G2O_TUTORIAL_SLAM2D_API VertexSE2 : public BaseVertex<VertexSE2, 3, SE2> {
  public:
-  void oplusImpl(const g2o::VectorX::MapType& update) override;
+  void oplusImpl(const g2o::VectorX::MapType& update);
 };
 
 }  // namespace g2o::tutorial

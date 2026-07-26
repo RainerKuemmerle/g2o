@@ -80,7 +80,7 @@ class G2O_TYPES_ICP_API EdgeVVGicp
 class G2O_TYPES_ICP_API VertexSCam : public VertexSE3 {
  public:
   // capture the update function to reset aux transforms
-  void oplusImpl(const VectorX::MapType& update) override;
+  void oplusImpl(const VectorX::MapType& update);
 
   // camera matrix and stereo baseline
   static Matrix3 kcam_;

@@ -45,13 +45,12 @@
 
 using namespace testing;  // NOLINT
 
-class DynamicVertex : public g2o::BaseDynamicVertex<g2o::VectorX> {
+class DynamicVertex
+    : public g2o::BaseDynamicVertex<DynamicVertex, g2o::VectorX> {
  public:
   DynamicVertex() = default;
 
-  void oplusImpl(const g2o::VectorX::MapType& update) override {
-    estimate_ += update;
-  }
+  void oplusImpl(const g2o::VectorX::MapType& update) { estimate_ += update; }
 
  protected:
   bool setDimensionImpl(int newDimension) override {

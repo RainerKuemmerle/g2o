@@ -63,13 +63,12 @@ using Vector9 = VectorN<9>;
  * - f the focal length of the camera
  * - k1, k2 two radial distortion parameters
  */
-class VertexCameraBAL : public g2o::BaseVertex<9, g2o::bal::Vector9> {
+class VertexCameraBAL
+    : public g2o::BaseVertex<VertexCameraBAL, 9, g2o::bal::Vector9> {
  public:
   VertexCameraBAL() = default;
 
-  void oplusImpl(const g2o::VectorX::MapType& update) override {
-    estimate_ += update;
-  }
+  void oplusImpl(const g2o::VectorX::MapType& update) { estimate_ += update; }
 };
 
 /**
@@ -77,13 +76,11 @@ class VertexCameraBAL : public g2o::BaseVertex<9, g2o::bal::Vector9> {
  *
  * A 3D point feature in the world
  */
-class VertexPointBAL : public g2o::BaseVertex<3, g2o::Vector3> {
+class VertexPointBAL : public g2o::BaseVertex<VertexPointBAL, 3, g2o::Vector3> {
  public:
   VertexPointBAL() = default;
 
-  void oplusImpl(const g2o::VectorX::MapType& update) override {
-    estimate_ += update;
-  }
+  void oplusImpl(const g2o::VectorX::MapType& update) { estimate_ += update; }
 };
 
 /**

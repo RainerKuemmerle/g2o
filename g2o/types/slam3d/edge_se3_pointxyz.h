@@ -58,8 +58,6 @@ class G2O_TYPES_SLAM3D_API EdgeSE3PointXYZ
   // jacobian
   void linearizeOplus() override;
 
-  void setMeasurement(const Vector3& m) override { measurement_ = m; }
-
   bool setMeasurementFromState() override;
 
   double initialEstimatePossible(const OptimizableGraph::VertexSet& from,

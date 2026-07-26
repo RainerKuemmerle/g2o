@@ -60,9 +60,9 @@ double errorOfSolution(const PointVector& points,
 /**
  * \brief a circle located at x,y with radius r
  */
-class VertexCircle : public g2o::BaseVertex<3, Eigen::Vector3d> {
+class VertexCircle : public g2o::BaseVertex<VertexCircle, 3, Eigen::Vector3d> {
  public:
-  void oplusImpl(const g2o::VectorX::MapType& update) override {
+  void oplusImpl(const g2o::VectorX::MapType& update) {
     estimate_ += update.head<kDimension>();
   }
 };

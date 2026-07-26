@@ -52,13 +52,11 @@ Eigen::Vector2d linearSolution;
 
 namespace g2o {
 
-class VertexBaseline : public BaseVertex<1, double> {
+class VertexBaseline : public BaseVertex<VertexBaseline, 1, double> {
  public:
   VertexBaseline() = default;
 
-  void oplusImpl(const VectorX::MapType& update) override {
-    estimate_ += update[0];
-  }
+  void oplusImpl(const VectorX::MapType& update) { estimate_ += update[0]; }
 };
 
 class EdgeCalib

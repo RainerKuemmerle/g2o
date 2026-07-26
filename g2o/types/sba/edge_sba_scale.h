@@ -42,7 +42,6 @@ class G2O_TYPES_SBA_API EdgeSBAScale
     : public BaseBinaryEdge<1, double, VertexCam, VertexCam> {
  public:
   void computeError() override;
-  void setMeasurement(const double& m) override { measurement_ = m; }
   double initialEstimatePossible(const OptimizableGraph::VertexSet&,
                                  OptimizableGraph::Vertex*) override {
     return cst(1.);
