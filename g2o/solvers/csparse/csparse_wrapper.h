@@ -31,7 +31,7 @@
 #include <string>
 
 #include "g2o/core/eigen_types.h"
-#include "g2o_csparse_api.h"
+#include "g2o/solvers/csparse/g2o_csparse_api.h"
 
 namespace g2o::csparse {
 

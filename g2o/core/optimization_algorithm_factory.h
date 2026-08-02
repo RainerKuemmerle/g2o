@@ -33,10 +33,10 @@
 #include <string>
 
 #include "g2o/config.h"
+#include "g2o/core/g2o_core_api.h"
+#include "g2o/core/optimization_algorithm.h"
+#include "g2o/core/optimization_algorithm_property.h"
 #include "g2o/stuff/misc.h"  // IWYU pragma: keep // ForceLinker for the macros
-#include "g2o_core_api.h"
-#include "optimization_algorithm.h"
-#include "optimization_algorithm_property.h"
 
 // define to get some verbose output
 // #define G2O_DEBUG_OPTIMIZATION_ALGORITHM_FACTORY

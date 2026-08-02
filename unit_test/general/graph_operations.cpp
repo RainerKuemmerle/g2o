@@ -24,9 +24,6 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include <gmock/gmock.h>
-#include <gtest/gtest.h>
-
 #include <algorithm>
 #include <cstddef>
 #include <memory>
@@ -35,6 +32,11 @@
 #include <unordered_set>
 #include <utility>
 #include <vector>
+
+#include "gmock/gmock.h"
+#include "gtest/gtest.h"
+#include "unit_test/test_helper/allocate_optimizer.h"
+#include "unit_test/test_helper/eigen_matcher.h"
 
 #include "g2o/core/eigen_types.h"
 #include "g2o/core/factory.h"
@@ -52,8 +54,6 @@
 #include "g2o/types/slam3d/edge_se3_pointxyz.h"
 #include "g2o/types/slam3d/vertex_pointxyz.h"
 #include "g2o/types/slam3d/vertex_se3.h"
-#include "unit_test/test_helper/allocate_optimizer.h"
-#include "unit_test/test_helper/eigen_matcher.h"
 
 using g2o::internal::print_wrap;
 using namespace testing;  // NOLINT

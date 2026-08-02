@@ -27,9 +27,6 @@
 #ifndef G2O_BASE_VERTEX_H
 #define G2O_BASE_VERTEX_H
 
-#include <Eigen/Cholesky>
-#include <Eigen/Core>
-#include <Eigen/Dense>
 #include <cassert>
 #include <climits>
 #include <cmath>
@@ -37,10 +34,14 @@
 #include <stack>
 #include <vector>
 
+#include "Eigen/Cholesky"
+#include "Eigen/Core"
+#include "Eigen/Dense"
+
 #include "g2o/core/cache.h"
 #include "g2o/core/eigen_types.h"
+#include "g2o/core/optimizable_graph.h"
 #include "g2o/core/type_traits.h"
-#include "optimizable_graph.h"
 
 namespace g2o {
 #define G2O_VERTEX_DIM ((D == Eigen::Dynamic) ? dimension_ : D)

@@ -30,7 +30,7 @@
 #include <iosfwd>
 #include <sstream>
 
-#include "abstract_slam_interface.h"
+#include "g2o/examples/interactive_slam/slam_parser/interface/abstract_slam_interface.h"
 
 namespace slam_parser {
 

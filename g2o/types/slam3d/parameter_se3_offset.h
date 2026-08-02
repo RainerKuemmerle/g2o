@@ -36,8 +36,8 @@
 #include "g2o/core/hyper_graph_action.h"
 #include "g2o/core/parameter.h"
 #include "g2o/stuff/property.h"
-#include "g2o_types_slam3d_api.h"
-#include "type_traits_isometry3.h"  // IWYU pragma: keep
+#include "g2o/types/slam3d/g2o_types_slam3d_api.h"
+#include "g2o/types/slam3d/type_traits_isometry3.h"  // IWYU pragma: keep
 
 namespace g2o {
 

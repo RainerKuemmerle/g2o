@@ -1,6 +1,6 @@
 #include "py_hyper_dijkstra.h"
 
-#include <g2o/core/hyper_dijkstra.h>
+#include "g2o/core/hyper_dijkstra.h"
 
 namespace g2o {
 

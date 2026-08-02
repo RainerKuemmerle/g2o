@@ -29,14 +29,15 @@
 #include <iostream>
 
 #include "CLI/CLI.hpp"
+
 #include "g2o/core/factory.h"
 #include "g2o/core/hyper_dijkstra.h"
 #include "g2o/core/optimization_algorithm_factory.h"
 #include "g2o/core/sparse_optimizer.h"
+#include "g2o/examples/calibration_odom_laser/gm2dl_io.h"
 #include "g2o/stuff/logger.h"
 #include "g2o/stuff/macros.h"
 #include "g2o/types/slam2d/vertex_se2.h"
-#include "gm2dl_io.h"
 
 G2O_USE_OPTIMIZATION_LIBRARY(eigen);
 G2O_USE_TYPE_GROUP(slam2d);

@@ -27,14 +27,15 @@
 #ifndef G2O_SE3QUAT_H_
 #define G2O_SE3QUAT_H_
 
-#include <Eigen/Core>
-#include <Eigen/Geometry>
 #include <cassert>
+
+#include "Eigen/Core"
+#include "Eigen/Geometry"
 
 #include "g2o/core/eigen_types.h"
 #include "g2o/core/type_traits.h"
 #include "g2o/stuff/misc.h"
-#include "g2o_types_slam3d_api.h"
+#include "g2o/types/slam3d/g2o_types_slam3d_api.h"
 
 namespace g2o {
 

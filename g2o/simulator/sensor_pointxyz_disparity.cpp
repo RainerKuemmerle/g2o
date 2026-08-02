@@ -24,11 +24,11 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "sensor_pointxyz_disparity.h"
+#include "g2o/simulator/sensor_pointxyz_disparity.h"
 
 #include <cassert>
 
-#include "simulator.h"
+#include "g2o/simulator/simulator.h"
 
 namespace g2o {
 

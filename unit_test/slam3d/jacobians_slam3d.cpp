@@ -26,6 +26,10 @@
 
 #include <memory>
 
+#include "gtest/gtest.h"
+#include "unit_test/test_helper/evaluate_jacobian.h"
+#include "unit_test/test_helper/random_state.h"
+
 #include "g2o/autodiff/autodiff.h"
 #include "g2o/core/eigen_types.h"
 #include "g2o/core/jacobian_workspace.h"
@@ -40,9 +44,6 @@
 #include "g2o/types/slam3d/edge_se3_prior.h"
 #include "g2o/types/slam3d/edge_se3_xyzprior.h"
 #include "g2o/types/slam3d/parameter_camera.h"
-#include "gtest/gtest.h"
-#include "unit_test/test_helper/evaluate_jacobian.h"
-#include "unit_test/test_helper/random_state.h"
 
 namespace {
 auto depth_epsilon = [](const double x, const double y) {

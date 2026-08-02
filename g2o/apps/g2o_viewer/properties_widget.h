@@ -19,7 +19,7 @@
 #ifndef G2O_PROPERTIES_WINDOW_H
 #define G2O_PROPERTIES_WINDOW_H
 
-#include "abstract_properties_widget.h"
+#include "g2o/apps/g2o_viewer/abstract_properties_widget.h"
 
 namespace g2o {
 class OptimizationAlgorithm;

@@ -29,6 +29,7 @@
 #include <iostream>
 
 #include "CLI/CLI.hpp"
+
 #include "g2o/core/optimizable_graph.h"
 #include "g2o/types/slam2d/edge_se2.h"
 #include "g2o/types/slam2d/edge_se2_offset.h"

@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "graph_optimizer_sparse_incremental.h"
+#include "g2o/examples/interactive_slam/g2o_incremental/graph_optimizer_sparse_incremental.h"
 
 #include <cassert>
 

@@ -27,8 +27,6 @@
 #ifndef G2O_BLOCK_SOLVER_H
 #define G2O_BLOCK_SOLVER_H
 
-#include <Eigen/Core>
-#include <Eigen/LU>
 #include <cassert>
 #include <cstddef>
 #include <cstdlib>
@@ -38,24 +36,27 @@
 #include <utility>
 #include <vector>
 
-#include "dynamic_aligned_buffer.h"
+#include "Eigen/Core"
+#include "Eigen/LU"
+
 #include "g2o/config.h"  // IWYU pragma: keep
 #include "g2o/core/batch_stats.h"
+#include "g2o/core/dynamic_aligned_buffer.h"
 #include "g2o/core/eigen_types.h"
 #include "g2o/core/hyper_graph.h"
 #include "g2o/core/jacobian_workspace.h"
+#include "g2o/core/linear_solver.h"
 #include "g2o/core/optimizable_graph.h"
+#include "g2o/core/solver.h"
+#include "g2o/core/sparse_block_matrix.h"
 #include "g2o/core/sparse_block_matrix_ccs.h"
+#include "g2o/core/sparse_block_matrix_diagonal.h"  // IWYU pragma: keep
+#include "g2o/core/sparse_optimizer.h"
 #include "g2o/stuff/logger.h"
 #include "g2o/stuff/timeutil.h"
-#include "linear_solver.h"
-#include "solver.h"
-#include "sparse_block_matrix.h"
-#include "sparse_block_matrix_diagonal.h"  // IWYU pragma: keep
-#include "sparse_optimizer.h"
 
 #ifdef G2O_OPENMP
-#include "openmp_mutex.h"  // IWYU pragma: keep
+#include "g2o/core/openmp_mutex.h"  // IWYU pragma: keep
 #endif
 
 namespace g2o {

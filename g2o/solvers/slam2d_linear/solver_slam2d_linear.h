@@ -31,7 +31,7 @@
 
 #include "g2o/core/optimization_algorithm.h"
 #include "g2o/core/optimization_algorithm_gauss_newton.h"
-#include "g2o_slam2d_linear_api.h"
+#include "g2o/solvers/slam2d_linear/g2o_slam2d_linear_api.h"
 
 namespace g2o {
 class Solver;

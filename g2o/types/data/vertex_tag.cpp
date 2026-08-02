@@ -24,7 +24,7 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "vertex_tag.h"
+#include "g2o/types/data/vertex_tag.h"
 
 #include <iomanip>  // IWYU pragma: keep
 #include <ostream>

@@ -24,7 +24,8 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include <gtest/gtest.h>
+#include "gtest/gtest.h"
+#include "unit_test/test_helper/typed_basic_tests.h"
 
 #include "g2o/core/factory.h"
 #include "g2o/types/sba/edge_project_p2mc.h"
@@ -36,7 +37,6 @@
 #include "g2o/types/sba/edge_sba_cam.h"
 #include "g2o/types/sba/edge_sba_scale.h"
 #include "g2o/types/sba/edge_se3_expmap.h"
-#include "unit_test/test_helper/typed_basic_tests.h"
 
 G2O_USE_TYPE_GROUP(slam3d)
 

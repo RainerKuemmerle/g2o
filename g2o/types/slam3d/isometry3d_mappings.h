@@ -27,13 +27,13 @@
 #ifndef G2O_ISOMETRY3D_MAPPINGS_H_
 #define G2O_ISOMETRY3D_MAPPINGS_H_
 
-#include <Eigen/Core>
-#include <Eigen/LU>
-#include <Eigen/SVD>
+#include "Eigen/Core"
+#include "Eigen/LU"
+#include "Eigen/SVD"
 
 #include "g2o/core/eigen_types.h"
-#include "g2o_types_slam3d_api.h"
-#include "se3quat.h"
+#include "g2o/types/slam3d/g2o_types_slam3d_api.h"
+#include "g2o/types/slam3d/se3quat.h"
 
 namespace g2o {
 

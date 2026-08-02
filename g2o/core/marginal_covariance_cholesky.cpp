@@ -24,12 +24,13 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "marginal_covariance_cholesky.h"
+#include "g2o/core/marginal_covariance_cholesky.h"
 
-#include <Eigen/Core>
 #include <algorithm>
 #include <cassert>
 #include <cstddef>
+
+#include "Eigen/Core"
 
 #include "g2o/core/eigen_types.h"
 #include "g2o/core/sparse_block_matrix.h"

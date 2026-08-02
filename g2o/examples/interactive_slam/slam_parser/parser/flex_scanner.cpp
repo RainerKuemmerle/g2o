@@ -62,7 +62,7 @@
 #define __STDC_LIMIT_MACROS 1
 #endif
 
-#include <inttypes.h>
+#include "inttypes.h"
 typedef int8_t flex_int8_t;
 typedef uint8_t flex_uint8_t;
 typedef int16_t flex_int16_t;
@@ -311,7 +311,7 @@ typedef flex_uint8_t YY_CHAR;
 
 #define yytext_ptr yytext
 
-#include <FlexLexer.h>
+#include "g2o/examples/interactive_slam/slam_parser/parser/FlexLexer.h"
 
 /* Done after the current pattern has been matched and before the
  * corresponding action - sets up yytext.
@@ -422,7 +422,7 @@ static const flex_int16_t yy_chk[220] = {
 #include <string>
 #include <vector>
 
-#include "scanner.h"
+#include "g2o/examples/interactive_slam/slam_parser/parser/scanner.h"
 
 /* import the parser's token type into a local typedef */
 typedef slam_parser::Parser::token token;
@@ -460,7 +460,7 @@ typedef slam_parser::Parser::token_type token_type;
  * down here because we want the user's section 1 to have been scanned first.
  * The user has a chance to override it with an option.
  */
-#include <unistd.h>
+#include "unistd.h"
 #endif
 
 #ifndef YY_EXTRA_TYPE

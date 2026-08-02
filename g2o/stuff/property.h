@@ -33,7 +33,7 @@
 #include <string>
 #include <utility>
 
-#include "g2o_stuff_api.h"
+#include "g2o/stuff/g2o_stuff_api.h"
 
 namespace g2o {
 

@@ -24,7 +24,7 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "gm2dl_io.h"
+#include "g2o/examples/calibration_odom_laser/gm2dl_io.h"
 
 #include <cassert>
 #include <fstream>

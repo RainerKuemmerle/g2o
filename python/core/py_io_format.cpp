@@ -1,7 +1,8 @@
 #include "py_io_format.h"
 
-#include "g2o/core/io/io_format.h"
 #include "g2opy.h"
+
+#include "g2o/core/io/io_format.h"
 
 namespace g2o {
 

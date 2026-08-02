@@ -24,13 +24,13 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "edge_se2_offset.h"
+#include "g2o/types/slam2d/edge_se2_offset.h"
 
-#include <Eigen/Core>
+#include "Eigen/Core"
 
 #include "g2o/core/eigen_types.h"
+#include "g2o/types/slam2d/parameter_se2_offset.h"
 #include "g2o/types/slam2d/se2.h"
-#include "parameter_se2_offset.h"
 
 namespace g2o {
 

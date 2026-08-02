@@ -32,8 +32,8 @@
 
 #ifdef G2O_HAVE_LOGGING
 // IWYU pragma: begin_exports
-#include <spdlog/logger.h>
-#include <spdlog/spdlog.h>
+#include "spdlog/logger.h"
+#include "spdlog/spdlog.h"
 // IWYU pragma: end_exports
 
 #include <memory>

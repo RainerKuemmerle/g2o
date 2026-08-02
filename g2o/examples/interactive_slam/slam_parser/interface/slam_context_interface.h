@@ -27,7 +27,7 @@
 #ifndef SLAM_CONTEXT_INTERFACE_H
 #define SLAM_CONTEXT_INTERFACE_H
 
-#include "slam_parser/parser/slam_context.h"
+#include "g2o/examples/interactive_slam/slam_parser/parser/slam_context.h"
 
 namespace slam_parser {
 

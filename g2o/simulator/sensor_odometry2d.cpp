@@ -24,11 +24,10 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "sensor_odometry2d.h"
+#include "g2o/simulator/sensor_odometry2d.h"
 
 #include "g2o/simulator/simulator2d_base.h"
 #include "g2o/stuff/logger.h"
-#include "sensor_odometry2d.h"
 
 // Robot2D
 namespace g2o {

@@ -24,10 +24,10 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include <Eigen/Core>
+#include "Eigen/Core"
+#include "gtest/gtest.h"
 
 #include "g2o/stuff/misc.h"
-#include "gtest/gtest.h"
 
 namespace {
 double simple_normalize_theta(double th) {

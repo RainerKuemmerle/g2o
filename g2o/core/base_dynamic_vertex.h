@@ -29,7 +29,7 @@
 
 #include <cassert>
 
-#include "base_vertex.h"
+#include "g2o/core/base_vertex.h"
 
 namespace g2o {
 template <typename Derived, typename T>

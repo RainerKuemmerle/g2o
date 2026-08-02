@@ -24,15 +24,15 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "cache.h"
+#include "g2o/core/cache.h"
 
 #include <algorithm>
 #include <memory>
 #include <utility>
 
-#include "factory.h"
+#include "g2o/core/factory.h"
+#include "g2o/core/optimizable_graph.h"
 #include "g2o/stuff/logger.h"
-#include "optimizable_graph.h"
 
 namespace g2o {
 

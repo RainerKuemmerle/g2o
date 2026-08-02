@@ -24,11 +24,12 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "vertex_se3.h"
+#include "g2o/types/slam3d/vertex_se3.h"
 
-#include <Eigen/Core>
-#include <Eigen/Geometry>
 #include <string>
+
+#include "Eigen/Core"
+#include "Eigen/Geometry"
 
 #include "g2o/core/hyper_graph_action.h"
 #include "g2o/types/slam3d/isometry3d_mappings.h"

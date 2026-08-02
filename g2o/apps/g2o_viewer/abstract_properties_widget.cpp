@@ -16,7 +16,7 @@
 // You should have received a copy of the GNU General Public License
 // along with g2o.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "abstract_properties_widget.h"
+#include "g2o/apps/g2o_viewer/abstract_properties_widget.h"
 
 #include <QLineEdit>
 #include <cassert>

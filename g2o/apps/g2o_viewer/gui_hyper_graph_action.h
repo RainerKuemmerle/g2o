@@ -19,8 +19,8 @@
 #ifndef G2O_GUI_HYPER_GRAPH_ACTION_H
 #define G2O_GUI_HYPER_GRAPH_ACTION_H
 
+#include "g2o/apps/g2o_viewer/g2o_viewer_api.h"
 #include "g2o/core/hyper_graph_action.h"
-#include "g2o_viewer_api.h"
 
 namespace g2o {
 

@@ -143,12 +143,12 @@
 #include <array>
 #include <utility>
 
-#include "array_selector.h"
-#include "eigen.h"
-#include "jet.h"
-#include "parameter_dims.h"
-#include "types.h"
-#include "variadic_evaluate.h"
+#include "g2o/autodiff/array_selector.h"
+#include "g2o/autodiff/eigen.h"
+#include "g2o/autodiff/jet.h"
+#include "g2o/autodiff/parameter_dims.h"
+#include "g2o/autodiff/types.h"
+#include "g2o/autodiff/variadic_evaluate.h"
 
 // If the number of parameters exceeds this values, the corresponding jets are
 // placed on the heap. This will reduce performance by a factor of 2-5 on

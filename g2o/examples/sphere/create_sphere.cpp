@@ -24,13 +24,14 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include <Eigen/Core>
 #include <cmath>
 #include <fstream>
 #include <iostream>
 #include <vector>
 
 #include "CLI/CLI.hpp"
+#include "Eigen/Core"
+
 #include "g2o/core/abstract_graph.h"
 #include "g2o/core/eigen_types.h"
 #include "g2o/core/factory.h"

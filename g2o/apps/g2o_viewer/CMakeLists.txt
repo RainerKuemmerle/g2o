@@ -2,8 +2,6 @@
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
-
 add_library(viewer_library ${G2O_LIB_TYPE}
   g2o_viewer_api.h
   g2o_qglviewer.cpp g2o_qglviewer.h
@@ -16,6 +14,10 @@ add_library(viewer_library ${G2O_LIB_TYPE}
   viewer_properties_widget.cpp viewer_properties_widget.h
   run_g2o_viewer.cpp run_g2o_viewer.h
   ${UI_HEADERS} ${UI_SOURCES}
+)
+target_include_directories(viewer_library PRIVATE
+  ${CMAKE_CURRENT_SOURCE_DIR}
+  ${CMAKE_CURRENT_BINARY_DIR}
 )
 set_target_properties(viewer_library PROPERTIES OUTPUT_NAME ${LIB_PREFIX}viewer)
 set_target_properties(viewer_library PROPERTIES

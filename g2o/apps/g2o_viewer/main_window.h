@@ -21,10 +21,11 @@
 
 #include <vector>
 
+#include "ui_base_main_window.h"
+
+#include "g2o/apps/g2o_viewer/g2o_viewer_api.h"
 #include "g2o/core/io/io_format.h"
 #include "g2o/core/optimization_algorithm_property.h"
-#include "g2o_viewer_api.h"
-#include "ui_base_main_window.h"
 
 class ViewerPropertiesWidget;
 class PropertiesWidget;

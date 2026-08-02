@@ -24,12 +24,13 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "odometry_measurement.h"
+#include "g2o/types/sclam2d/odometry_measurement.h"
 
-#include <Eigen/Core>
-#include <Eigen/Geometry>
 #include <cmath>
 #include <utility>
+
+#include "Eigen/Core"
+#include "Eigen/Geometry"
 
 namespace g2o {
 

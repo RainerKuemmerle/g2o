@@ -30,8 +30,8 @@
 #include "g2o/core/base_binary_edge.h"
 #include "g2o/core/optimizable_graph.h"
 #include "g2o/stuff/misc.h"
-#include "g2o_types_sba_api.h"
-#include "vertex_cam.h"
+#include "g2o/types/sba/g2o_types_sba_api.h"
+#include "g2o/types/sba/vertex_cam.h"
 
 namespace g2o {
 

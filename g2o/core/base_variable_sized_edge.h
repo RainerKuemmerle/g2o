@@ -27,19 +27,20 @@
 #ifndef G2O_BASE_VARIABLE_SIZED_EDGE_H
 #define G2O_BASE_VARIABLE_SIZED_EDGE_H
 
-#include <Eigen/Core>
 #include <cassert>
 #include <cstddef>
 #include <sstream>
 #include <stdexcept>
 #include <vector>
 
-#include "base_edge.h"
+#include "Eigen/Core"
+
+#include "g2o/core/base_edge.h"
 #include "g2o/core/eigen_types.h"
 #include "g2o/core/jacobian_workspace.h"
 #include "g2o/core/optimizable_graph.h"
+#include "g2o/core/robust_kernel.h"  // IWYU pragma: keep
 #include "g2o/stuff/misc.h"
-#include "robust_kernel.h"  // IWYU pragma: keep
 
 namespace g2o {
 

@@ -29,7 +29,7 @@
 
 #include "g2o/core/eigen_types.h"
 #include "g2o/core/type_traits.h"
-#include "isometry3d_mappings.h"
+#include "g2o/types/slam3d/isometry3d_mappings.h"
 
 namespace g2o {
 

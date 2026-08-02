@@ -24,15 +24,15 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "cholmod_wrapper.h"
-
-#include <cholmod.h>  // IWYU pragma: keep
+#include "g2o/solvers/cholmod/cholmod_wrapper.h"
 
 #include <cassert>
 #include <cstring>
 #include <memory>
 
-#include "cholmod_ext.h"
+#include "cholmod.h"  // IWYU pragma: keep
+
+#include "g2o/solvers/cholmod/cholmod_ext.h"
 
 namespace g2o::cholmod {
 

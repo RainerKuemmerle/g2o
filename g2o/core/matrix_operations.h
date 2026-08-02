@@ -27,7 +27,7 @@
 #ifndef G2O_CORE_MATRIX_OPERATIONS_H
 #define G2O_CORE_MATRIX_OPERATIONS_H
 
-#include <Eigen/Core>
+#include "Eigen/Core"
 
 #include "g2o/core/eigen_types.h"
 

@@ -27,11 +27,11 @@
 #ifndef G2O_ODOMETRY_MEASUREMENT_H
 #define G2O_ODOMETRY_MEASUREMENT_H
 
-#include <Eigen/Core>
+#include "Eigen/Core"
 
 #include "g2o/core/eigen_types.h"
 #include "g2o/core/type_traits.h"
-#include "g2o_types_sclam2d_api.h"
+#include "g2o/types/sclam2d/g2o_types_sclam2d_api.h"
 
 namespace g2o {
 template <typename T>

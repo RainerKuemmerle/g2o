@@ -24,15 +24,15 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "edge_se2_lotsofxy.h"
+#include "g2o/types/slam2d/edge_se2_lotsofxy.h"
 
 #include <cassert>
 #include <cmath>
 #include <vector>
 
-#include "se2.h"
-#include "vertex_point_xy.h"
-#include "vertex_se2.h"
+#include "g2o/types/slam2d/se2.h"
+#include "g2o/types/slam2d/vertex_point_xy.h"
+#include "g2o/types/slam2d/vertex_se2.h"
 
 namespace g2o {
 

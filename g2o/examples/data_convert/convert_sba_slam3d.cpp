@@ -28,6 +28,7 @@
 #include <iostream>
 
 #include "CLI/CLI.hpp"
+
 #include "g2o/core/optimizable_graph.h"
 #include "g2o/types/sba/edge_project_p2sc.h"
 #include "g2o/types/sba/vertex_cam.h"

@@ -1,7 +1,7 @@
 #include "py_jacobian_workspace.h"
 
-#include <g2o/core/jacobian_workspace.h>
-#include <g2o/core/optimizable_graph.h>
+#include "g2o/core/jacobian_workspace.h"
+#include "g2o/core/optimizable_graph.h"
 
 namespace g2o {
 

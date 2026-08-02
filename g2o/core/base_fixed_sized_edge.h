@@ -27,7 +27,6 @@
 #ifndef G2O_BASE_FIXED_SIZED_EDGE_H
 #define G2O_BASE_FIXED_SIZED_EDGE_H
 
-#include <Eigen/Core>
 #include <array>
 #include <cassert>
 #include <cstddef>
@@ -36,14 +35,16 @@
 #include <type_traits>
 #include <utility>
 
-#include "base_edge.h"
+#include "Eigen/Core"
+
+#include "g2o/core/base_edge.h"
 #include "g2o/core/eigen_types.h"
 #include "g2o/core/hyper_graph.h"
 #include "g2o/core/jacobian_workspace.h"
 #include "g2o/core/optimizable_graph.h"
+#include "g2o/core/robust_kernel.h"  // IWYU pragma: keep
 #include "g2o/stuff/misc.h"
 #include "g2o/stuff/tuple_tools.h"
-#include "robust_kernel.h"  // IWYU pragma: keep
 
 namespace g2o {
 

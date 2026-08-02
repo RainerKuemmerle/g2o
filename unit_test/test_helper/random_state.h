@@ -26,7 +26,7 @@
 
 #pragma once
 
-#include <Eigen/Geometry>
+#include "Eigen/Geometry"
 
 #include "g2o/core/eigen_types.h"
 #include "g2o/stuff/sampler.h"

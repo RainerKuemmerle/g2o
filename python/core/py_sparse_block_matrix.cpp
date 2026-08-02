@@ -1,8 +1,8 @@
 #include "py_sparse_block_matrix.h"
 
-#include <g2o/core/sparse_block_matrix.h>
-
 #include "g2opy.h"
+
+#include "g2o/core/sparse_block_matrix.h"
 
 namespace g2o {
 

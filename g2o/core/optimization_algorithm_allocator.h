@@ -33,7 +33,7 @@
 #include <string_view>
 #include <unordered_map>
 
-#include "g2o_core_api.h"
+#include "g2o/core/g2o_core_api.h"
 
 namespace g2o {
 

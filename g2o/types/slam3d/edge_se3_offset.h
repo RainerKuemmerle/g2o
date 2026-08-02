@@ -29,9 +29,9 @@
 
 #include <memory>
 
-#include "edge_se3.h"
 #include "g2o/core/optimizable_graph.h"
-#include "g2o_types_slam3d_api.h"
+#include "g2o/types/slam3d/edge_se3.h"
+#include "g2o/types/slam3d/g2o_types_slam3d_api.h"
 
 namespace g2o {
 class CacheSE3Offset;

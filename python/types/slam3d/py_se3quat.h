@@ -1,6 +1,7 @@
 #pragma once
 
 #include "detail/registry.h"
+
 #include "g2o/types/slam3d/se3quat.h"
 
 namespace g2o {

@@ -34,7 +34,7 @@
 #include <array>
 #include <utility>
 
-#include "integer_sequence_algorithm.h"
+#include "g2o/autodiff/integer_sequence_algorithm.h"
 
 namespace g2o::ceres::internal {
 

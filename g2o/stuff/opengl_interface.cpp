@@ -1,5 +1,5 @@
 // Qt OpenGL backend: use Qt's OpenGL bindings when available
-#include "opengl_interface.h"
+#include "g2o/stuff/opengl_interface.h"
 
 #include <QOpenGLContext>
 #include <QOpenGLFunctions_1_1>

@@ -1,12 +1,13 @@
 #ifndef G2O_TARGET_TYPES_6D_HPP_
 #define G2O_TARGET_TYPES_6D_HPP_
 
-#include <g2o/core/base_binary_edge.h>
-#include <g2o/core/base_unary_edge.h>
-#include <g2o/core/base_vertex.h>
-
-#include <Eigen/Core>
 #include <cassert>
+
+#include "Eigen/Core"
+
+#include "g2o/core/base_binary_edge.h"
+#include "g2o/core/base_unary_edge.h"
+#include "g2o/core/base_vertex.h"
 
 using Vector6d = Eigen::Matrix<double, 6, 1>;
 using Matrix6d = Eigen::Matrix<double, 6, 6>;

@@ -18,12 +18,12 @@
 // License along with this Module; if not, write to the Free Software
 // Foundation, Inc., 50 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-#include "csparse_extension.h"
-
-#include <cs.h>
+#include "g2o/solvers/csparse/csparse_extension.h"
 
 #include <cassert>
 #include <cmath>
+
+#include "cs.h"
 
 #include "g2o/stuff/logger.h"
 

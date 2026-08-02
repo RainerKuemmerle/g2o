@@ -28,6 +28,10 @@
 #include <string>
 #include <unordered_set>
 
+#include "gmock/gmock.h"
+#include "gtest/gtest.h"
+#include "unit_test/test_helper/graph_functions.h"
+
 #include "g2o/core/optimizable_graph.h"
 #include "g2o/simulator/simulator.h"
 #include "g2o/simulator/simulator2d_base.h"
@@ -38,9 +42,6 @@
 #include "g2o/types/slam2d/vertex_point_xy.h"
 #include "g2o/types/slam2d/vertex_se2.h"
 #include "g2o/types/slam2d_addons/edge_se2_segment2d.h"
-#include "gmock/gmock.h"
-#include "gtest/gtest.h"
-#include "unit_test/test_helper/graph_functions.h"
 using namespace g2o;      // NOLINT
 using namespace testing;  // NOLINT
 

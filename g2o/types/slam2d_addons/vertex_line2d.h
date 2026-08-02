@@ -30,8 +30,8 @@
 #include "g2o/core/base_vertex.h"
 #include "g2o/core/eigen_types.h"
 #include "g2o/stuff/misc.h"
-#include "g2o_types_slam2d_addons_api.h"
-#include "line_2d.h"
+#include "g2o/types/slam2d_addons/g2o_types_slam2d_addons_api.h"
+#include "g2o/types/slam2d_addons/line_2d.h"
 
 namespace g2o {
 

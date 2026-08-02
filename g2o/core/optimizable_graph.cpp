@@ -24,9 +24,8 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "optimizable_graph.h"
+#include "g2o/core/optimizable_graph.h"
 
-#include <Eigen/Eigenvalues>
 #include <algorithm>
 #include <cassert>
 #include <fstream>
@@ -40,22 +39,24 @@
 #include <utility>
 #include <vector>
 
-#include "cache.h"
-#include "factory.h"
+#include "Eigen/Eigenvalues"
+
 #include "g2o/config.h"  // IWYU pragma: keep
 #include "g2o/core/abstract_graph.h"
+#include "g2o/core/cache.h"
 #include "g2o/core/eigen_types.h"
+#include "g2o/core/factory.h"
 #include "g2o/core/hyper_graph.h"
+#include "g2o/core/hyper_graph_action.h"
 #include "g2o/core/io/io_format.h"
 #include "g2o/core/jacobian_workspace.h"
+#include "g2o/core/optimization_algorithm_property.h"
 #include "g2o/core/parameter.h"
 #include "g2o/core/parameter_container.h"
 #include "g2o/stuff/hash_combine.h"
 #include "g2o/stuff/logger.h"
 #include "g2o/stuff/logger_format.h"  // IWYU pragma: keep
 #include "g2o/stuff/string_tools.h"
-#include "hyper_graph_action.h"
-#include "optimization_algorithm_property.h"
 
 namespace g2o {
 

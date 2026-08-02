@@ -27,7 +27,6 @@
 #ifndef G2O_SPARSE_BLOCK_MATRIX_
 #define G2O_SPARSE_BLOCK_MATRIX_
 
-#include <Eigen/Core>
 #include <algorithm>
 #include <cassert>
 #include <cstring>
@@ -40,12 +39,14 @@
 #include <utility>
 #include <vector>
 
+#include "Eigen/Core"
+
 #include "g2o/config.h"  // IWYU pragma: keep
 #include "g2o/core/eigen_types.h"
+#include "g2o/core/matrix_operations.h"
+#include "g2o/core/matrix_structure.h"
+#include "g2o/core/sparse_block_matrix_ccs.h"
 #include "g2o/stuff/sparse_helper.h"
-#include "matrix_operations.h"
-#include "matrix_structure.h"
-#include "sparse_block_matrix_ccs.h"
 
 namespace g2o {
 /**

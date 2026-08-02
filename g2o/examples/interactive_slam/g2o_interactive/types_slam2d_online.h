@@ -29,8 +29,8 @@
 
 #include <iostream>
 
+#include "g2o/examples/interactive_slam/g2o_interactive/g2o_interactive_api.h"
 #include "g2o/types/slam2d/edge_se2.h"
-#include "g2o_interactive_api.h"
 
 namespace g2o {
 

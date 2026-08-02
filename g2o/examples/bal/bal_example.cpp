@@ -24,13 +24,14 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include <Eigen/Core>
-#include <Eigen/Geometry>
 #include <cassert>
 #include <iostream>
 #include <string_view>
 
 #include "CLI/CLI.hpp"
+#include "Eigen/Core"
+#include "Eigen/Geometry"
+
 #include "g2o/autodiff/autodiff.h"  // IWYU pragma: keep
 #include "g2o/core/auto_differentiation.h"
 #include "g2o/core/base_binary_edge.h"

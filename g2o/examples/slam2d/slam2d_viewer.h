@@ -22,6 +22,7 @@
 #include <memory>
 
 #include "../../apps/g2o_viewer/qglviewer_shim.h"
+
 #include "g2o/core/sparse_block_matrix.h"
 
 namespace g2o {

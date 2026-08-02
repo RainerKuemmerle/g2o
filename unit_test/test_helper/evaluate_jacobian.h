@@ -27,12 +27,12 @@
 #ifndef EVALUATE_JACOBIAN_H
 #define EVALUATE_JACOBIAN_H
 
-#include <gmock/gmock.h>
-
-#include <Eigen/Core>
 #include <functional>
 
+#include "Eigen/Core"
 #include "eigen_matcher.h"
+#include "gmock/gmock.h"
+
 #include "g2o/core/base_binary_edge.h"
 #include "g2o/core/base_unary_edge.h"
 #include "g2o/core/eigen_types.h"

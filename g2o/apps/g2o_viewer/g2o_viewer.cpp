@@ -18,8 +18,8 @@
 
 #include <QApplication>
 
+#include "g2o/apps/g2o_viewer/run_g2o_viewer.h"
 #include "g2o/core/optimizable_graph.h"
-#include "run_g2o_viewer.h"
 
 int main(int argc, char** argv) {
   g2o::OptimizableGraph::initMultiThreading();

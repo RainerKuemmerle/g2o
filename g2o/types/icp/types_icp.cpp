@@ -24,10 +24,10 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "types_icp.h"
+#include "g2o/types/icp/types_icp.h"
 
-#include <Eigen/Geometry>
-#include <Eigen/LU>
+#include "Eigen/Geometry"
+#include "Eigen/LU"
 
 #include "g2o/core/eigen_types.h"
 #include "g2o/core/factory.h"

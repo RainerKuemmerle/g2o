@@ -27,9 +27,10 @@
 #ifndef G2O_LINEAR_SOLVER_EIGEN_H
 #define G2O_LINEAR_SOLVER_EIGEN_H
 
-#include <Eigen/Sparse>
-#include <Eigen/SparseCholesky>
 #include <cassert>
+
+#include "Eigen/Sparse"
+#include "Eigen/SparseCholesky"
 
 #include "g2o/core/batch_stats.h"
 #include "g2o/core/linear_solver.h"

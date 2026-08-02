@@ -1,7 +1,8 @@
 #pragma once
 
-#include "g2o/types/slam2d/se2.h"
 #include "g2opy.h"
+
+#include "g2o/types/slam2d/se2.h"
 
 namespace g2o {
 

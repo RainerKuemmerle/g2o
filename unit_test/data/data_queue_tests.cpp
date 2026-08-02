@@ -24,10 +24,10 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include <gmock/gmock.h>
-
 #include <memory>
 #include <vector>
+
+#include "gmock/gmock.h"
 
 #include "g2o/types/data/data_queue.h"
 #include "g2o/types/data/robot_data.h"

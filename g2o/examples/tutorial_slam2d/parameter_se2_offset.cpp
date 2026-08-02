@@ -24,9 +24,9 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "parameter_se2_offset.h"
+#include "g2o/examples/tutorial_slam2d/parameter_se2_offset.h"
 
-#include "vertex_se2.h"
+#include "g2o/examples/tutorial_slam2d/vertex_se2.h"
 
 namespace g2o::tutorial {
 

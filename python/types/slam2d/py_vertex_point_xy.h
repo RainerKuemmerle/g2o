@@ -1,6 +1,7 @@
 #pragma once
 
 #include "detail/registry.h"
+
 #include "g2o/types/slam2d/vertex_point_xy.h"
 
 namespace g2o {

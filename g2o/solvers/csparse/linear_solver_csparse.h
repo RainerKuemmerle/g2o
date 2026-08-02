@@ -29,10 +29,10 @@
 
 #include <cassert>
 
-#include "csparse_wrapper.h"
 #include "g2o/core/batch_stats.h"
 #include "g2o/core/linear_solver.h"
 #include "g2o/core/marginal_covariance_cholesky.h"
+#include "g2o/solvers/csparse/csparse_wrapper.h"
 #include "g2o/stuff/logger.h"
 #include "g2o/stuff/timeutil.h"
 

@@ -16,7 +16,7 @@
 // You should have received a copy of the GNU General Public License
 // along with g2o.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "g2o_qglviewer.h"
+#include "g2o/apps/g2o_viewer/g2o_qglviewer.h"
 
 #include <cassert>
 

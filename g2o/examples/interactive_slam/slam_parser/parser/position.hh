@@ -8,4 +8,4 @@
 // 2. remove references to this file from your build system
 // 3. if you used to include it, include "location.hh" instead.
 
-#include "location.hh"
+#include "g2o/examples/interactive_slam/slam_parser/parser/location.hh"

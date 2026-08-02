@@ -27,7 +27,7 @@
 #ifndef G2O_BASE_MULTI_EDGE_H
 #define G2O_BASE_MULTI_EDGE_H
 
-#include "base_variable_sized_edge.h"
+#include "g2o/core/base_variable_sized_edge.h"
 
 namespace g2o {
 

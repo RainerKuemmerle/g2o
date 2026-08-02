@@ -24,9 +24,8 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "sparse_optimizer.h"
+#include "g2o/core/sparse_optimizer.h"
 
-#include <Eigen/Core>
 #include <algorithm>
 #include <cassert>
 #include <cstdlib>
@@ -37,20 +36,22 @@
 #include <unordered_set>
 #include <utility>
 
-#include "batch_stats.h"
-#include "estimate_propagator.h"
+#include "Eigen/Core"
+
 #include "g2o/config.h"  // IWYU pragma: keep
+#include "g2o/core/batch_stats.h"
 #include "g2o/core/eigen_types.h"
+#include "g2o/core/estimate_propagator.h"
 #include "g2o/core/hyper_dijkstra.h"
+#include "g2o/core/hyper_graph_action.h"
 #include "g2o/core/jacobian_workspace.h"  // IWYU pragma: keep
 #include "g2o/core/optimizable_graph.h"
+#include "g2o/core/optimization_algorithm.h"
+#include "g2o/core/robust_kernel.h"  // IWYU pragma: keep
 #include "g2o/core/sparse_block_matrix.h"
 #include "g2o/stuff/logger.h"
 #include "g2o/stuff/macros.h"
 #include "g2o/stuff/timeutil.h"
-#include "hyper_graph_action.h"
-#include "optimization_algorithm.h"
-#include "robust_kernel.h"  // IWYU pragma: keep
 
 #ifndef NDEBUG
 namespace {

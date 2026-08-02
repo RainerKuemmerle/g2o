@@ -24,9 +24,9 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "edge_xyz_prior.h"
+#include "g2o/types/slam3d/edge_xyz_prior.h"
 
-#include <Eigen/Core>
+#include "Eigen/Core"
 
 #include "g2o/types/slam3d/vertex_pointxyz.h"
 

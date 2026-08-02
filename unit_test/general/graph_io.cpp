@@ -32,6 +32,10 @@
 #include <unordered_map>
 #include <vector>
 
+#include "gmock/gmock.h"
+#include "gtest/gtest.h"
+#include "unit_test/test_helper/allocate_optimizer.h"
+
 #include "g2o/config.h"  // IWYU pragma: keep
 #include "g2o/core/abstract_graph.h"
 #include "g2o/core/io/io_format.h"
@@ -40,9 +44,6 @@
 #include "g2o/types/data/vertex_tag.h"
 #include "g2o/types/slam2d/edge_se2.h"
 #include "g2o/types/slam2d/vertex_se2.h"
-#include "gmock/gmock.h"
-#include "gtest/gtest.h"
-#include "unit_test/test_helper/allocate_optimizer.h"
 
 using namespace testing;  // NOLINT
 

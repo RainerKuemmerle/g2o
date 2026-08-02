@@ -28,10 +28,10 @@
 #define G2O_SIMULATOR2D_BASE_H_
 
 #include "g2o/simulator/g2o_simulator_api.h"
+#include "g2o/simulator/simulator.h"
 #include "g2o/types/slam2d/vertex_point_xy.h"
 #include "g2o/types/slam2d/vertex_se2.h"
 #include "g2o/types/slam2d_addons/vertex_segment2d.h"
-#include "simulator.h"
 
 namespace g2o {
 

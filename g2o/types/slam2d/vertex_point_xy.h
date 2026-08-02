@@ -27,8 +27,9 @@
 #ifndef G2O_VERTEX_POINT_XY_H
 #define G2O_VERTEX_POINT_XY_H
 
-#include <Eigen/Core>
 #include <memory>
+
+#include "Eigen/Core"
 
 #include "g2o/config.h"
 #include "g2o/core/base_vertex.h"
@@ -36,7 +37,7 @@
 #include "g2o/core/hyper_graph.h"
 #include "g2o/core/hyper_graph_action.h"
 #include "g2o/stuff/property.h"
-#include "g2o_types_slam2d_api.h"
+#include "g2o/types/slam2d/g2o_types_slam2d_api.h"
 
 namespace g2o {
 

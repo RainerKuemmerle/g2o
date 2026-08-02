@@ -1,9 +1,9 @@
 #pragma once
 
-#include <g2o/core/parameter.h>
-#include <g2o/core/parameter_container.h>
-
 #include "g2opy.h"
+
+#include "g2o/core/parameter.h"
+#include "g2o/core/parameter_container.h"
 
 namespace g2o {
 

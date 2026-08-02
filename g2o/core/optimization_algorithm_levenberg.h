@@ -30,11 +30,11 @@
 #include <iosfwd>
 #include <memory>
 
+#include "g2o/core/g2o_core_api.h"
+#include "g2o/core/optimization_algorithm_with_hessian.h"
 #include "g2o/core/solver.h"
 #include "g2o/stuff/misc.h"
 #include "g2o/stuff/property.h"
-#include "g2o_core_api.h"
-#include "optimization_algorithm_with_hessian.h"
 
 namespace g2o {
 

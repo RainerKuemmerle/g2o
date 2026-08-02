@@ -11,11 +11,11 @@
 
 #ifndef __FLEX_LEXER_H
 #define yyFlexLexer SlamFlexLexer
-#include "FlexLexer.h"
+#include "g2o/examples/interactive_slam/slam_parser/parser/FlexLexer.h"
 #undef yyFlexLexer
 #endif
 
-#include "bison_parser.h"
+#include "g2o/examples/interactive_slam/slam_parser/parser/bison_parser.h"
 
 namespace slam_parser {
 

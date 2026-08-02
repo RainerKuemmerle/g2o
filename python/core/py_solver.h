@@ -1,8 +1,8 @@
 #pragma once
 
-#include <g2o/core/solver.h>
-
 #include "g2opy.h"
+
+#include "g2o/core/solver.h"
 
 namespace g2o {
 

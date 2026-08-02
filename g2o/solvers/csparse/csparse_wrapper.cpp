@@ -24,15 +24,16 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "csparse_wrapper.h"
+#include "g2o/solvers/csparse/csparse_wrapper.h"
 
-#include <Eigen/Core>
 #include <cstring>
 #include <memory>
 
-#include "csparse_extension.h"
-#include "csparse_helper.h"
+#include "Eigen/Core"
+
 #include "g2o/core/eigen_types.h"
+#include "g2o/solvers/csparse/csparse_extension.h"
+#include "g2o/solvers/csparse/csparse_helper.h"
 
 namespace g2o::csparse {
 

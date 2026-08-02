@@ -31,10 +31,10 @@
 
 #include "g2o/core/base_fixed_sized_edge.h"
 #include "g2o/core/eigen_types.h"
+#include "g2o/types/sba/g2o_types_sba_api.h"
+#include "g2o/types/sba/parameter_cameraparameters.h"
+#include "g2o/types/sba/vertex_se3_expmap.h"
 #include "g2o/types/slam3d/vertex_pointxyz.h"
-#include "g2o_types_sba_api.h"
-#include "parameter_cameraparameters.h"
-#include "vertex_se3_expmap.h"
 
 namespace g2o {
 class CameraParameters;

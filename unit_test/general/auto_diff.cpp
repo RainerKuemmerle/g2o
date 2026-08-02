@@ -26,11 +26,12 @@
 
 #include <cmath>
 
+#include "gtest/gtest.h"
+
 #include "g2o/core/auto_differentiation.h"
 #include "g2o/core/base_fixed_sized_edge.h"
 #include "g2o/types/slam2d/edge_se2.h"
 #include "g2o/types/slam2d/vertex_point_xy.h"
-#include "gtest/gtest.h"
 
 namespace {
 

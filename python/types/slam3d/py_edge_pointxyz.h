@@ -1,6 +1,7 @@
 #pragma once
 
 #include "detail/registry.h"
+
 #include "g2o/types/slam3d/edge_pointxyz.h"
 
 namespace g2o {

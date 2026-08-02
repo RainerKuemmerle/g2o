@@ -24,7 +24,7 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "edge_se2_pointxy.h"
+#include "g2o/examples/tutorial_slam2d/edge_se2_pointxy.h"
 
 namespace g2o {
 namespace tutorial {

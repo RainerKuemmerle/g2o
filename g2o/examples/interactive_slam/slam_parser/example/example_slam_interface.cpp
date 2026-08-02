@@ -24,7 +24,7 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "example_slam_interface.h"
+#include "g2o/examples/interactive_slam/slam_parser/example/example_slam_interface.h"
 
 #include <iostream>
 using namespace std;

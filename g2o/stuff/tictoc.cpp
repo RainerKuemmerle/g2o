@@ -24,7 +24,7 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "tictoc.h"
+#include "g2o/stuff/tictoc.h"
 
 #include <algorithm>
 #include <cstdio>
@@ -34,8 +34,8 @@
 #include <utility>
 #include <vector>
 
-#include "misc.h"
-#include "timeutil.h"
+#include "g2o/stuff/misc.h"
+#include "g2o/stuff/timeutil.h"
 
 namespace g2o {
 

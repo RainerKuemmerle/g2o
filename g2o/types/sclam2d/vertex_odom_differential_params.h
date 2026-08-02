@@ -29,7 +29,7 @@
 
 #include "g2o/core/base_vertex.h"
 #include "g2o/core/eigen_types.h"
-#include "g2o_types_sclam2d_api.h"
+#include "g2o/types/sclam2d/g2o_types_sclam2d_api.h"
 
 namespace g2o {
 

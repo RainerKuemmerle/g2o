@@ -24,7 +24,7 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "vertex_point_xy.h"
+#include "g2o/types/slam2d/vertex_point_xy.h"
 
 #include "g2o/core/hyper_graph_action.h"
 

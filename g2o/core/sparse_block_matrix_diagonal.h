@@ -27,11 +27,12 @@
 #ifndef G2O_SPARSE_BLOCK_MATRIX_DIAGONAL_H
 #define G2O_SPARSE_BLOCK_MATRIX_DIAGONAL_H
 
-#include <Eigen/Core>
 #include <vector>
 
+#include "Eigen/Core"
+
 #include "g2o/config.h"  // IWYU pragma: keep
-#include "matrix_operations.h"
+#include "g2o/core/matrix_operations.h"
 
 namespace g2o {
 

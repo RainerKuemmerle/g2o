@@ -24,9 +24,9 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "edge_project_xyz2uvu.h"
+#include "g2o/types/sba/edge_project_xyz2uvu.h"
 
-#include <Eigen/Core>
+#include "Eigen/Core"
 
 #include "g2o/types/sba/parameter_cameraparameters.h"
 #include "g2o/types/sba/vertex_se3_expmap.h"

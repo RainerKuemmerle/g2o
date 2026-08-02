@@ -1,7 +1,8 @@
 #pragma once
 
-#include "g2o/types/sim3/sim3.h"
 #include "g2opy.h"
+
+#include "g2o/types/sim3/sim3.h"
 
 namespace g2o {
 

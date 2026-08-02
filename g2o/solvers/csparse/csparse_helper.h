@@ -27,8 +27,8 @@
 #ifndef G2O_CSPARSE_HELPER_H
 #define G2O_CSPARSE_HELPER_H
 
-#include "csparse_extension.h"
-#include "g2o_csparse_extension_api.h"
+#include "g2o/solvers/csparse/csparse_extension.h"
+#include "g2o/solvers/csparse/g2o_csparse_extension_api.h"
 
 namespace g2o::csparse_extension {
 

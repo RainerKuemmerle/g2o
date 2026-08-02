@@ -18,9 +18,9 @@
 #define G2O_GRAPH_OPTIMIZER_SPARSE_INCREMENTAL_H
 
 #include "g2o/core/sparse_block_matrix.h"
+#include "g2o/examples/interactive_slam/g2o_incremental/g2o_incremental_api.h"
+#include "g2o/examples/interactive_slam/g2o_incremental/linear_solver_cholmod_online.h"
 #include "g2o/examples/interactive_slam/g2o_interactive/graph_optimizer_sparse_online.h"
-#include "g2o_incremental_api.h"
-#include "linear_solver_cholmod_online.h"
 
 namespace g2o {
 

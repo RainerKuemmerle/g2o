@@ -24,7 +24,7 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "sensor_pose3d_offset.h"
+#include "g2o/simulator/sensor_pose3d_offset.h"
 
 #include <cassert>
 #include <unordered_set>
