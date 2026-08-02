@@ -30,10 +30,10 @@
 #include <memory>
 
 #include "g2o/core/base_binary_edge.h"
-#include "g2o_tutorial_slam2d_api.h"
-#include "parameter_se2_offset.h"
-#include "vertex_point_xy.h"
-#include "vertex_se2.h"
+#include "g2o/examples/tutorial_slam2d/g2o_tutorial_slam2d_api.h"
+#include "g2o/examples/tutorial_slam2d/parameter_se2_offset.h"
+#include "g2o/examples/tutorial_slam2d/vertex_point_xy.h"
+#include "g2o/examples/tutorial_slam2d/vertex_se2.h"
 
 namespace g2o::tutorial {
 

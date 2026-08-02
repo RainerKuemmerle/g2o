@@ -24,19 +24,19 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "logger.h"
+#include "g2o/stuff/logger.h"
 
 #include <string_view>
 
 #include "g2o/config.h"
 
 #ifdef G2O_HAVE_LOGGING
-#include <spdlog/cfg/env.h>
-#include <spdlog/common.h>
-#include <spdlog/sinks/stdout_color_sinks.h>
-#include <spdlog/spdlog.h>
-
 #include <cassert>
+
+#include "spdlog/cfg/env.h"
+#include "spdlog/common.h"
+#include "spdlog/sinks/stdout_color_sinks.h"
+#include "spdlog/spdlog.h"
 
 namespace g2o::internal {
 

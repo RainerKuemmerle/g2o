@@ -24,9 +24,10 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+#include "gtest/gtest.h"
+
 #include "g2o/types/slam3d/edge_se3.h"
 #include "g2o/types/slam3d/isometry3d_mappings.h"
-#include "gtest/gtest.h"
 
 TEST(MappingsSlam3D, EulerConversion) {
   const g2o::Vector3 eulerAngles(.1, .2, .3);

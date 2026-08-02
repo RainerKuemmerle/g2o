@@ -24,13 +24,13 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "optimization_algorithm_with_hessian.h"
+#include "g2o/core/optimization_algorithm_with_hessian.h"
 
 #include <cassert>
 
+#include "g2o/core/solver.h"
+#include "g2o/core/sparse_optimizer.h"
 #include "g2o/stuff/property.h"
-#include "solver.h"
-#include "sparse_optimizer.h"
 
 namespace g2o {
 

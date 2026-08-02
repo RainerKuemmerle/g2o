@@ -1,5 +1,3 @@
-include_directories(${CMAKE_BINARY_DIR} ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
-
 find_package(Qt6 COMPONENTS Widgets OpenGLWidgets REQUIRED)
 
 # Use automoc/autouic so Qt6's moc/uic are used
@@ -19,6 +17,7 @@ add_executable(slam2d_g2o
 )
 
 set_target_properties(slam2d_g2o PROPERTIES OUTPUT_NAME slam2d_g2o)
+target_include_directories(slam2d_g2o PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
 if(Qt6_POSITION_INDEPENDENT_CODE)
   set_property(TARGET slam2d_g2o PROPERTY COMPILE_FLAGS -fPIC)

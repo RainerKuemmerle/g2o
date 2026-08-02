@@ -27,8 +27,9 @@
 #include <regex>
 #include <sstream>
 
-#include "g2o/core/batch_stats.h"
 #include "gtest/gtest.h"
+
+#include "g2o/core/batch_stats.h"
 
 namespace {
 std::string extractValue(const std::string& input, const std::string& field) {

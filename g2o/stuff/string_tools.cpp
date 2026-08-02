@@ -24,7 +24,7 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "string_tools.h"
+#include "g2o/stuff/string_tools.h"
 
 #include <algorithm>
 #include <cctype>
@@ -33,13 +33,13 @@
 #include <string>
 
 #ifdef __APPLE__
-#include <TargetConditionals.h>
+#include "TargetConditionals.h"
 #endif
 
 #if (defined(UNIX) || defined(CYGWIN)) && \
     !(defined(ANDROID) || TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
 #define HAS_WORDEXP
-#include <wordexp.h>
+#include "wordexp.h"
 #else
 #include "g2o/stuff/logger.h"
 #endif

@@ -26,9 +26,9 @@
 
 #include "g2o/solvers/structure_only/structure_only_solver.h"
 
-#include <gtest/gtest.h>
-
 #include <memory>
+
+#include "gtest/gtest.h"
 
 #include "g2o/core/sparse_optimizer.h"
 #include "g2o/stuff/sampler.h"

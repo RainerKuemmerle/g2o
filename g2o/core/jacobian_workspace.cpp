@@ -24,14 +24,14 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "jacobian_workspace.h"
+#include "g2o/core/jacobian_workspace.h"
 
 #include <algorithm>
 #include <cassert>
 #include <memory>
 
 #include "g2o/core/hyper_graph.h"
-#include "optimizable_graph.h"
+#include "g2o/core/optimizable_graph.h"
 
 namespace g2o {
 

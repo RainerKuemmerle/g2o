@@ -27,13 +27,13 @@
 #ifndef G2O_LINE2D_H
 #define G2O_LINE2D_H
 
-#include <Eigen/Core>
-#include <Eigen/Geometry>
+#include "Eigen/Core"
+#include "Eigen/Geometry"
 
 #include "g2o/core/eigen_types.h"
 #include "g2o/core/type_traits.h"
 #include "g2o/types/slam2d/se2.h"
-#include "g2o_types_slam2d_addons_api.h"
+#include "g2o/types/slam2d_addons/g2o_types_slam2d_addons_api.h"
 
 namespace g2o {
 

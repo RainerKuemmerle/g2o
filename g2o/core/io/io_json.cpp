@@ -24,7 +24,7 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "io_json.h"
+#include "g2o/core/io/io_json.h"
 
 #include <exception>
 #include <iomanip>
@@ -35,9 +35,9 @@
 #include "g2o/stuff/logger.h"
 
 #ifdef G2O_HAVE_JSON
-#include <nlohmann/json.hpp>
+#include "nlohmann/json.hpp"
 
-#include "io_wrapper_json.h"
+#include "g2o/core/io/io_wrapper_json.h"
 #endif  // HAVE_JSON
 
 namespace g2o {

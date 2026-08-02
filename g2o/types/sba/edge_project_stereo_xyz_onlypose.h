@@ -29,8 +29,8 @@
 
 #include "g2o/core/base_unary_edge.h"
 #include "g2o/core/eigen_types.h"
-#include "g2o_types_sba_api.h"
-#include "vertex_se3_expmap.h"
+#include "g2o/types/sba/g2o_types_sba_api.h"
+#include "g2o/types/sba/vertex_se3_expmap.h"
 
 namespace g2o {
 

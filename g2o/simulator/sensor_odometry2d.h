@@ -27,9 +27,9 @@
 #ifndef G2O_SENSOR_ODOMETRY2D_H_
 #define G2O_SENSOR_ODOMETRY2D_H_
 
+#include "g2o/simulator/g2o_simulator_api.h"
+#include "g2o/simulator/simulator2d_base.h"
 #include "g2o/types/slam2d/edge_se2.h"
-#include "g2o_simulator_api.h"
-#include "simulator2d_base.h"
 
 namespace g2o {
 class G2O_SIMULATOR_API SensorOdometry2D

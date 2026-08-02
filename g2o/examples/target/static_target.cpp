@@ -28,16 +28,15 @@
 // place and does not move; in effect it has a "GPS" which measures
 // its position
 
-#include <g2o/core/block_solver.h>
-#include <g2o/core/optimization_algorithm_gauss_newton.h>
-#include <g2o/core/solver.h>
-#include <g2o/core/sparse_optimizer.h>
-#include <g2o/solvers/eigen/linear_solver_eigen.h>
-#include <g2o/stuff/sampler.h>
-
 #include <iostream>
 
-#include "targetTypes3D.hpp"
+#include "g2o/core/block_solver.h"
+#include "g2o/core/optimization_algorithm_gauss_newton.h"
+#include "g2o/core/solver.h"
+#include "g2o/core/sparse_optimizer.h"
+#include "g2o/examples/target/targetTypes3D.hpp"
+#include "g2o/solvers/eigen/linear_solver_eigen.h"
+#include "g2o/stuff/sampler.h"
 
 namespace g2o {
 

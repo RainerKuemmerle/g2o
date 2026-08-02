@@ -24,12 +24,12 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "se3quat.h"
+#include "g2o/types/slam3d/se3quat.h"
 
 #include <utility>
 
 #include "g2o/core/eigen_types.h"
-#include "se3_ops.h"
+#include "g2o/types/slam3d/se3_ops.h"
 
 namespace g2o {
 

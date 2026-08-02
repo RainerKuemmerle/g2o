@@ -24,14 +24,15 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+#include "gmock/gmock.h"
+#include "unit_test/test_helper/eigen_matcher.h"
+
 #include "g2o/core/block_solver.h"
 #include "g2o/core/optimization_algorithm_dogleg.h"
 #include "g2o/core/optimization_algorithm_gauss_newton.h"
 #include "g2o/core/optimization_algorithm_levenberg.h"
 #include "g2o/solvers/eigen/linear_solver_eigen.h"
 #include "g2o/types/slam3d/edge_se3.h"
-#include "gmock/gmock.h"
-#include "unit_test/test_helper/eigen_matcher.h"
 
 using namespace g2o;  // NOLINT
 using g2o::internal::print_wrap;

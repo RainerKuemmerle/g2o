@@ -1,8 +1,9 @@
 #include "py_estimate_propagator.h"
 
+#include "g2opy.h"
+
 #include "g2o/core/estimate_propagator.h"
 #include "g2o/core/sparse_optimizer.h"
-#include "g2opy.h"
 
 namespace g2o {
 

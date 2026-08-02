@@ -33,8 +33,8 @@
 #include <vector>
 
 #include "g2o/config.h"
+#include "g2o/core/g2o_core_api.h"
 #include "g2o/stuff/misc.h"  // IWYU pragma: keep // ForceLinker for the macros
-#include "g2o_core_api.h"
 
 namespace g2o {
 

@@ -26,22 +26,22 @@
 
 #pragma once
 
-#include <gmock/gmock.h>
-#include <gtest/gtest.h>
-
 #include <cstddef>
 #include <memory>
 #include <string>
 #include <tuple>
 
-#include "g2o/core/io/io_format.h"
-#include "g2o/core/optimizable_graph.h"
-#include "g2o/core/sparse_optimizer.h"
-#include "g2o/stuff/string_tools.h"
+#include "gmock/gmock.h"
+#include "gtest/gtest.h"
 #include "unit_test/test_helper/allocate_optimizer.h"
 #include "unit_test/test_helper/eigen_matcher.h"
 #include "unit_test/test_helper/random_state.h"
 #include "unit_test/test_helper/utils.h"
+
+#include "g2o/core/io/io_format.h"
+#include "g2o/core/optimizable_graph.h"
+#include "g2o/core/sparse_optimizer.h"
+#include "g2o/stuff/string_tools.h"
 
 namespace g2o::internal::testing {
 /**

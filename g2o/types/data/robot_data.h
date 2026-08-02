@@ -32,7 +32,7 @@
 
 #include "g2o/core/hyper_graph.h"
 #include "g2o/core/optimizable_graph.h"
-#include "g2o_types_data_api.h"
+#include "g2o/types/data/g2o_types_data_api.h"
 
 namespace g2o {
 

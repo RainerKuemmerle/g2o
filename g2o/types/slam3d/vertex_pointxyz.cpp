@@ -24,7 +24,7 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "vertex_pointxyz.h"
+#include "g2o/types/slam3d/vertex_pointxyz.h"
 
 #ifdef G2O_HAVE_OPENGL
 #include "g2o/stuff/opengl_interface.h"

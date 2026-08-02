@@ -1,10 +1,11 @@
 #include "py_types_pure.h"
 
 #include "detail/registry.h"
+#include "g2opy.h"
+
 #include "g2o/core/base_dynamic_vertex.h"
 #include "g2o/core/base_variable_sized_edge.h"
 #include "g2o/core/eigen_types.h"
-#include "g2opy.h"
 
 namespace g2o {
 

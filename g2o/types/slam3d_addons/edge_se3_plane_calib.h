@@ -38,7 +38,7 @@
 #include "g2o/types/slam3d/vertex_se3.h"
 #include "g2o/types/slam3d_addons/g2o_types_slam3d_addons_api.h"
 #include "g2o/types/slam3d_addons/plane3d.h"
-#include "vertex_plane.h"
+#include "g2o/types/slam3d_addons/vertex_plane.h"
 
 namespace g2o {
 /**

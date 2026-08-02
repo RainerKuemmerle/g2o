@@ -34,12 +34,12 @@
 #define GICP_ANALYTIC_JACOBIANS
 // #define SCAM_ANALYTIC_JACOBIANS
 
-#include <Eigen/Core>
-#include <Eigen/Geometry>
+#include "Eigen/Core"
+#include "Eigen/Geometry"
 
-#include "edge_gicp.h"
 #include "g2o/core/base_binary_edge.h"
-#include "g2o_types_icp_api.h"
+#include "g2o/types/icp/edge_gicp.h"
+#include "g2o/types/icp/g2o_types_icp_api.h"
 
 namespace g2o {
 

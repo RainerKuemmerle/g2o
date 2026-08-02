@@ -28,9 +28,9 @@
 #define G2O_SBA_EDGE_SE3_EXPMAP_H
 
 #include "g2o/core/base_binary_edge.h"
+#include "g2o/types/sba/g2o_types_sba_api.h"
+#include "g2o/types/sba/vertex_se3_expmap.h"
 #include "g2o/types/slam3d/se3quat.h"
-#include "g2o_types_sba_api.h"
-#include "vertex_se3_expmap.h"
 
 namespace g2o {
 

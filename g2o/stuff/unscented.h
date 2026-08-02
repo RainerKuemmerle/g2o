@@ -27,10 +27,11 @@
 #ifndef G2O_UNSCENTED_
 #define G2O_UNSCENTED_
 
-#include <Eigen/Cholesky>
-#include <Eigen/Core>
 #include <cassert>
 #include <utility>
+
+#include "Eigen/Cholesky"
+#include "Eigen/Core"
 
 namespace g2o {
 

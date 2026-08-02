@@ -24,18 +24,18 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "graph_optimizer_sparse_online.h"
+#include "g2o/examples/interactive_slam/g2o_interactive/graph_optimizer_sparse_online.h"
 
 #include <iostream>
 
 #include "g2o/core/block_solver.h"
 #include "g2o/core/optimization_algorithm_factory.h"
 #include "g2o/core/optimization_algorithm_gauss_newton.h"
+#include "g2o/examples/interactive_slam/g2o_interactive/types_slam2d_online.h"
+#include "g2o/examples/interactive_slam/g2o_interactive/types_slam3d_online.h"
 #include "g2o/solvers/cholmod/linear_solver_cholmod.h"  // IWYU pragma: keep
 #include "g2o/solvers/pcg/linear_solver_pcg.h"
 #include "g2o/stuff/macros.h"
-#include "types_slam2d_online.h"
-#include "types_slam3d_online.h"
 
 namespace g2o {
 

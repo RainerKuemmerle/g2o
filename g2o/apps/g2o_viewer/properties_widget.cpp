@@ -16,7 +16,7 @@
 // You should have received a copy of the GNU General Public License
 // along with g2o.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "properties_widget.h"
+#include "g2o/apps/g2o_viewer/properties_widget.h"
 
 #include "g2o/core/optimization_algorithm.h"
 #include "g2o/stuff/logger.h"

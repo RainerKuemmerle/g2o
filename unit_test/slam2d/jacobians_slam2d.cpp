@@ -24,7 +24,9 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include <gtest/gtest.h>
+#include "gtest/gtest.h"
+#include "unit_test/test_helper/eigen_matcher.h"
+#include "unit_test/test_helper/evaluate_jacobian.h"
 
 #include "g2o/core/eigen_types.h"
 #include "g2o/stuff/sampler.h"
@@ -33,8 +35,6 @@
 #include "g2o/types/slam2d/edge_se2_pointxy.h"
 #include "g2o/types/slam2d/edge_se2_pointxy_bearing.h"
 #include "g2o/types/slam2d/edge_se2_prior.h"
-#include "unit_test/test_helper/eigen_matcher.h"
-#include "unit_test/test_helper/evaluate_jacobian.h"
 
 using namespace g2o;  // NOLINT
 

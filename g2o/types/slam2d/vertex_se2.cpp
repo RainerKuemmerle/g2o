@@ -24,11 +24,12 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "vertex_se2.h"
+#include "g2o/types/slam2d/vertex_se2.h"
 
-#include <Eigen/Core>
 #include <string>
 #include <typeinfo>
+
+#include "Eigen/Core"
 
 #include "g2o/stuff/macros.h"
 #include "g2o/stuff/misc.h"

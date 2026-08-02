@@ -30,7 +30,6 @@
 #ifndef G2O_CERES_PUBLIC_INTERNAL_FIXED_ARRAY_H_
 #define G2O_CERES_PUBLIC_INTERNAL_FIXED_ARRAY_H_
 
-#include <Eigen/Core>  // For Eigen::aligned_allocator
 #include <algorithm>
 #include <array>
 #include <cstddef>
@@ -38,7 +37,9 @@
 #include <tuple>
 #include <type_traits>
 
-#include "memory.h"
+#include "Eigen/Core"  // For Eigen::aligned_allocator
+
+#include "g2o/autodiff/memory.h"
 
 namespace g2o::ceres::internal {
 

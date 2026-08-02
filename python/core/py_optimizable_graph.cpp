@@ -1,12 +1,13 @@
 #include "py_optimizable_graph.h"
 
+#include "g2opy.h"
+
 #include "g2o/core/eigen_types.h"
 #include "g2o/core/hyper_graph_action.h"  // IWYU pragma: keep
 #include "g2o/core/io/io_format.h"
 #include "g2o/core/jacobian_workspace.h"
 #include "g2o/core/optimizable_graph.h"
 #include "g2o/core/robust_kernel.h"  // IWYU pragma: keep
-#include "g2opy.h"
 
 namespace g2o {
 class ParameterContainer;

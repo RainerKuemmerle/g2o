@@ -25,8 +25,8 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "g2o/core/factory.h"
-#include "types_slam2d_online.h"
-#include "types_slam3d_online.h"
+#include "g2o/examples/interactive_slam/g2o_interactive/types_slam2d_online.h"
+#include "g2o/examples/interactive_slam/g2o_interactive/types_slam3d_online.h"
 
 namespace g2o {
 

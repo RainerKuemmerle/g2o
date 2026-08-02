@@ -24,9 +24,9 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "line3d.h"
+#include "g2o/types/slam3d_addons/line3d.h"
 
-#include <Eigen/Cholesky>
+#include "Eigen/Cholesky"
 
 #include "g2o/core/eigen_types.h"
 #include "g2o/stuff/misc.h"

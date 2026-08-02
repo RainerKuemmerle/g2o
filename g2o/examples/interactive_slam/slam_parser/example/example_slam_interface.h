@@ -30,7 +30,7 @@
 #include <map>
 #include <vector>
 
-#include "slam_parser/interface/abstract_slam_interface.h"
+#include "g2o/examples/interactive_slam/slam_parser/interface/abstract_slam_interface.h"
 
 /**
  * \brief example for an interface to a SLAM algorithm

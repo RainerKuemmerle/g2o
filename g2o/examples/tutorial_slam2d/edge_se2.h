@@ -28,8 +28,8 @@
 #define G2O_TUTORIAL_EDGE_SE2_H
 
 #include "g2o/core/base_binary_edge.h"
-#include "g2o_tutorial_slam2d_api.h"
-#include "vertex_se2.h"
+#include "g2o/examples/tutorial_slam2d/g2o_tutorial_slam2d_api.h"
+#include "g2o/examples/tutorial_slam2d/vertex_se2.h"
 
 namespace g2o::tutorial {
 

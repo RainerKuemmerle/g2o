@@ -30,7 +30,7 @@
 #include "g2o/config.h"
 
 #ifdef G2O_HAVE_JSON
-#include <nlohmann/json.hpp>
+#include "nlohmann/json.hpp"
 
 #include "g2o/core/abstract_graph.h"
 

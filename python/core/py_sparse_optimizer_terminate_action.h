@@ -1,8 +1,8 @@
 #pragma once
 
-#include <g2o/core/sparse_optimizer_terminate_action.h>
-
 #include "g2opy.h"
+
+#include "g2o/core/sparse_optimizer_terminate_action.h"
 
 namespace g2o {
 

@@ -24,11 +24,12 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "closed_form_calibration.h"
+#include "g2o/examples/calibration_odom_laser/closed_form_calibration.h"
 
-#include <Eigen/SVD>
 #include <iostream>
 #include <limits>
+
+#include "Eigen/SVD"
 
 #include "g2o/types/sclam2d/odometry_measurement.h"
 

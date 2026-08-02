@@ -27,11 +27,12 @@
 #ifndef G2O_GAUSSIAN_SAMPLER_
 #define G2O_GAUSSIAN_SAMPLER_
 
-#include <Eigen/Core>
 #include <memory>
 #include <random>
 
-#include "g2o_stuff_api.h"
+#include "Eigen/Core"
+
+#include "g2o/stuff/g2o_stuff_api.h"
 
 namespace g2o {
 

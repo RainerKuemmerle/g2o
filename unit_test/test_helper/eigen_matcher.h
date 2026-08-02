@@ -26,9 +26,8 @@
 
 #pragma once
 
-#include <gmock/gmock.h>
-
-#include <Eigen/Core>
+#include "Eigen/Core"
+#include "gmock/gmock.h"
 
 namespace g2o::internal {
 

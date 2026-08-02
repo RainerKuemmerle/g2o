@@ -27,8 +27,8 @@
 #ifndef G2O_LASER_PARAMETERS_H
 #define G2O_LASER_PARAMETERS_H
 
+#include "g2o/types/data/g2o_types_data_api.h"
 #include "g2o/types/slam2d/se2.h"
-#include "g2o_types_data_api.h"
 
 namespace g2o {
 

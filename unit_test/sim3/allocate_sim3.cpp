@@ -24,8 +24,9 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "g2o/types/sim3/types_seven_dof_expmap.h"
 #include "gtest/gtest.h"
+
+#include "g2o/types/sim3/types_seven_dof_expmap.h"
 
 TEST(Sim3, VertexSim3ExpmapCtor) {
   auto* v = new g2o::VertexSim3Expmap();

@@ -27,13 +27,14 @@
 #ifndef JACOBIAN_WORKSPACE_H
 #define JACOBIAN_WORKSPACE_H
 
-#include <Eigen/Core>
 #include <cassert>
 #include <vector>
 
+#include "Eigen/Core"
+
 #include "g2o/core/eigen_types.h"
-#include "g2o_core_api.h"
-#include "hyper_graph.h"
+#include "g2o/core/g2o_core_api.h"
+#include "g2o/core/hyper_graph.h"
 
 namespace g2o {
 

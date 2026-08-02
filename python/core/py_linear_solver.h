@@ -1,7 +1,7 @@
 #pragma once
-#include <g2o/core/linear_solver.h>
-
 #include "g2opy.h"
+
+#include "g2o/core/linear_solver.h"
 
 namespace g2o {
 

@@ -24,12 +24,13 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "edge_se3_line.h"
+#include "g2o/types/slam3d_addons/edge_se3_line.h"
 
-#include <Eigen/Core>
-#include <Eigen/Geometry>
 #include <string>
 #include <typeinfo>
+
+#include "Eigen/Core"
+#include "Eigen/Geometry"
 
 #include "g2o/core/parameter.h"
 #include "g2o/stuff/opengl_interface.h"

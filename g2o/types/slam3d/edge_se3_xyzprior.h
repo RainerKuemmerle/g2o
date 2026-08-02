@@ -32,9 +32,9 @@
 #include "g2o/core/base_unary_edge.h"
 #include "g2o/core/eigen_types.h"
 #include "g2o/core/optimizable_graph.h"
-#include "g2o_types_slam3d_api.h"
-#include "parameter_se3_offset.h"
-#include "vertex_se3.h"
+#include "g2o/types/slam3d/g2o_types_slam3d_api.h"
+#include "g2o/types/slam3d/parameter_se3_offset.h"
+#include "g2o/types/slam3d/vertex_se3.h"
 
 namespace g2o {
 class CacheSE3Offset;

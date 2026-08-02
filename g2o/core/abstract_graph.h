@@ -33,8 +33,9 @@
 #include <utility>
 #include <vector>
 
-#include "g2o_core_api.h"
 #include "io/io_format.h"
+
+#include "g2o/core/g2o_core_api.h"
 
 namespace g2o {
 

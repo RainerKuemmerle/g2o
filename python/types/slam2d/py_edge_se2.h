@@ -1,6 +1,7 @@
 #pragma once
 
 #include "detail/registry.h"
+
 #include "g2o/types/slam2d/edge_se2.h"
 #include "g2o/types/slam2d/edge_se2_lotsofxy.h"
 #include "g2o/types/slam2d/edge_se2_offset.h"

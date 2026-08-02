@@ -27,8 +27,9 @@
 #ifndef G2O_VERTEX_LINE3D_H_
 #define G2O_VERTEX_LINE3D_H_
 
-#include <Eigen/Core>
 #include <memory>
+
+#include "Eigen/Core"
 
 #include "g2o/config.h"
 #include "g2o/core/base_vertex.h"
@@ -36,8 +37,8 @@
 #include "g2o/core/hyper_graph.h"
 #include "g2o/core/hyper_graph_action.h"
 #include "g2o/stuff/property.h"
-#include "g2o_types_slam3d_addons_api.h"
-#include "line3d.h"
+#include "g2o/types/slam3d_addons/g2o_types_slam3d_addons_api.h"
+#include "g2o/types/slam3d_addons/line3d.h"
 
 namespace g2o {
 

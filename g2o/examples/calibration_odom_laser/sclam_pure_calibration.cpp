@@ -30,18 +30,19 @@
 #include <memory>
 
 #include "CLI/CLI.hpp"
-#include "closed_form_calibration.h"
-#include "edge_se2_pure_calib.h"
+
 #include "g2o/core/sparse_optimizer.h"
+#include "g2o/examples/calibration_odom_laser/closed_form_calibration.h"
+#include "g2o/examples/calibration_odom_laser/edge_se2_pure_calib.h"
+#include "g2o/examples/calibration_odom_laser/gm2dl_io.h"
+#include "g2o/examples/calibration_odom_laser/motion_information.h"
+#include "g2o/examples/calibration_odom_laser/sclam_helpers.h"
 #include "g2o/stuff/macros.h"
 #include "g2o/types/data/data_queue.h"
 #include "g2o/types/data/robot_laser.h"
 #include "g2o/types/sclam2d/odometry_measurement.h"
 #include "g2o/types/sclam2d/vertex_odom_differential_params.h"
 #include "g2o/types/slam2d/vertex_se2.h"
-#include "gm2dl_io.h"
-#include "motion_information.h"
-#include "sclam_helpers.h"
 
 using std::cerr;
 using std::string;

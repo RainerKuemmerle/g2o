@@ -27,7 +27,7 @@
 #ifndef G2O_SCLAM_HELPERS_H
 #define G2O_SCLAM_HELPERS_H
 
-#include "g2o_calibration_odom_laser_api.h"
+#include "g2o/examples/calibration_odom_laser/g2o_calibration_odom_laser_api.h"
 
 namespace g2o {
 

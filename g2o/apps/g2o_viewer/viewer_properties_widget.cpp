@@ -16,14 +16,14 @@
 // You should have received a copy of the GNU General Public License
 // along with g2o.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "viewer_properties_widget.h"
+#include "g2o/apps/g2o_viewer/viewer_properties_widget.h"
 
+#include "g2o/apps/g2o_viewer/g2o_qglviewer.h"
 #include "g2o/core/hyper_graph_action.h"
 #include "g2o/stuff/logger.h"
-#include "g2o_qglviewer.h"
 
 #ifdef __GNUC__
-#include <cxxabi.h>
+#include "cxxabi.h"
 #endif
 
 namespace {

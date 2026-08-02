@@ -1,10 +1,10 @@
 #ifndef G2O_TARGET_TYPES_3D_HPP_
 #define G2O_TARGET_TYPES_3D_HPP_
 
-#include <g2o/core/base_unary_edge.h>
-#include <g2o/core/base_vertex.h>
+#include "Eigen/Core"
 
-#include <Eigen/Core>
+#include "g2o/core/base_unary_edge.h"
+#include "g2o/core/base_vertex.h"
 
 // This header file specifies a set of types for the different
 // tracking examples; note that

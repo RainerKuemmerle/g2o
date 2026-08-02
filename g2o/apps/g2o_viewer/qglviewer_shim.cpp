@@ -16,7 +16,7 @@
 // You should have received a copy of the GNU General Public License
 // along with g2o.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "qglviewer_shim.h"
+#include "g2o/apps/g2o_viewer/qglviewer_shim.h"
 
 #include <QImage>
 #include <QKeyEvent>
@@ -33,7 +33,7 @@
 #include "g2o/stuff/opengl_interface.h"
 
 #if G2O_HAVE_JSON
-#include <nlohmann/json.hpp>
+#include "nlohmann/json.hpp"
 #endif
 
 namespace g2o::viewer {

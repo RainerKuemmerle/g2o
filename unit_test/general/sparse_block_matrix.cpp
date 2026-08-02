@@ -26,9 +26,9 @@
 
 #include "g2o/core/sparse_block_matrix.h"
 
-#include <gtest/gtest.h>
-
 #include <iostream>
+
+#include "gtest/gtest.h"
 
 namespace {
 using SparseBlockMatrixX = g2o::SparseBlockMatrix<g2o::MatrixX>;

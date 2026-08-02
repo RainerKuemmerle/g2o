@@ -38,8 +38,8 @@
 #include "g2o/core/parameter.h"
 #include "g2o/core/type_traits.h"
 #include "g2o/stuff/property.h"
-#include "g2o_types_slam3d_api.h"
-#include "type_traits_isometry3.h"
+#include "g2o/types/slam3d/g2o_types_slam3d_api.h"
+#include "g2o/types/slam3d/type_traits_isometry3.h"
 
 namespace g2o {
 

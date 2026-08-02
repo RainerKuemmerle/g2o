@@ -1,7 +1,8 @@
 #pragma once
 
-#include "g2o/types/slam2d/parameter_se2_offset.h"
 #include "g2opy.h"
+
+#include "g2o/types/slam2d/parameter_se2_offset.h"
 
 namespace g2o {
 

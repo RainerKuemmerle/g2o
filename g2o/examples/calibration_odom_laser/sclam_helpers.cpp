@@ -24,7 +24,7 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "sclam_helpers.h"
+#include "g2o/examples/calibration_odom_laser/sclam_helpers.h"
 
 #include <iostream>
 #include <memory>
@@ -33,6 +33,7 @@
 #include "g2o/core/optimization_algorithm_gauss_newton.h"
 #include "g2o/core/optimization_algorithm_levenberg.h"
 #include "g2o/core/sparse_optimizer.h"
+#include "g2o/examples/calibration_odom_laser/gm2dl_io.h"
 #include "g2o/solvers/eigen/linear_solver_eigen.h"
 #include "g2o/types/data/data_queue.h"
 #include "g2o/types/data/robot_laser.h"
@@ -40,7 +41,6 @@
 #include "g2o/types/sclam2d/edge_se2_sensor_calib.h"
 #include "g2o/types/sclam2d/odometry_measurement.h"
 #include "g2o/types/sclam2d/vertex_odom_differential_params.h"
-#include "gm2dl_io.h"
 
 namespace g2o {
 

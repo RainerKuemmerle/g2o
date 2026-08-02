@@ -26,7 +26,7 @@
 
 #include "g2o/core/base_fixed_sized_edge.h"
 
-#include <gtest/gtest.h>
+#include "gtest/gtest.h"
 
 #include "g2o/core/base_unary_edge.h"
 #include "g2o/core/base_variable_sized_edge.h"

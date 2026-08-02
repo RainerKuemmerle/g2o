@@ -1,9 +1,10 @@
 #pragma once
 
 #include "detail/registry.h"
+#include "g2opy.h"
+
 #include "g2o/types/slam3d/parameter_camera.h"
 #include "g2o/types/slam3d/parameter_se3_offset.h"
-#include "g2opy.h"
 
 namespace g2o {
 

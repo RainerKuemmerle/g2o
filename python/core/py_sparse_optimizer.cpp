@@ -1,17 +1,17 @@
 #include "py_sparse_optimizer.h"
 
-#include <g2o/core/estimate_propagator.h>
-#include <g2o/core/hyper_graph_action.h>
-#include <g2o/core/optimization_algorithm.h>
-#include <g2o/core/optimization_algorithm_dogleg.h>
-#include <g2o/core/optimization_algorithm_factory.h>
-#include <g2o/core/optimization_algorithm_gauss_newton.h>
-#include <g2o/core/optimization_algorithm_levenberg.h>
-#include <g2o/core/optimization_algorithm_with_hessian.h>
-#include <g2o/core/sparse_optimizer.h>
-
 #include <sstream>
 #include <utility>
+
+#include "g2o/core/estimate_propagator.h"
+#include "g2o/core/hyper_graph_action.h"
+#include "g2o/core/optimization_algorithm.h"
+#include "g2o/core/optimization_algorithm_dogleg.h"
+#include "g2o/core/optimization_algorithm_factory.h"
+#include "g2o/core/optimization_algorithm_gauss_newton.h"
+#include "g2o/core/optimization_algorithm_levenberg.h"
+#include "g2o/core/optimization_algorithm_with_hessian.h"
+#include "g2o/core/sparse_optimizer.h"
 
 namespace g2o {
 

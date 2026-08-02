@@ -31,9 +31,9 @@
 #include "g2o/core/base_vertex.h"
 #include "g2o/core/eigen_types.h"
 #include "g2o/core/optimizable_graph.h"
+#include "g2o/types/sim3/sim3.h"
+#include "g2o/types/sim3/types_seven_dof_expmap_api.h"
 #include "g2o/types/slam3d/vertex_pointxyz.h"
-#include "sim3.h"
-#include "types_seven_dof_expmap_api.h"
 
 namespace g2o {
 

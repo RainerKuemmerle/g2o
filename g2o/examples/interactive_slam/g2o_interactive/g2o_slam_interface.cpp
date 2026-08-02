@@ -24,17 +24,17 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "g2o_slam_interface.h"
+#include "g2o/examples/interactive_slam/g2o_interactive/g2o_slam_interface.h"
 
 #include <cassert>
 #include <iostream>
 
-#include "fast_output.h"
+#include "g2o/examples/interactive_slam/g2o_interactive/fast_output.h"
+#include "g2o/examples/interactive_slam/g2o_interactive/graph_optimizer_sparse_online.h"
+#include "g2o/examples/interactive_slam/g2o_interactive/types_slam2d_online.h"
+#include "g2o/examples/interactive_slam/g2o_interactive/types_slam3d_online.h"
 #include "g2o/stuff/logger.h"
 #include "g2o/types/slam3d/se3quat.h"
-#include "graph_optimizer_sparse_online.h"
-#include "types_slam2d_online.h"
-#include "types_slam3d_online.h"
 
 using std::cerr;
 using std::cout;

@@ -31,8 +31,8 @@
 #include <cassert>
 #include <type_traits>
 
-#include "eigen_types.h"
 #include "g2o/autodiff/autodiff.h"
+#include "g2o/core/eigen_types.h"
 #include "g2o/core/type_traits.h"
 
 namespace g2o {

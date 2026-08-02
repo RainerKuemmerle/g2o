@@ -27,12 +27,12 @@
 #ifndef G2O_SBA_CAMERAPARAMETERS_H
 #define G2O_SBA_CAMERAPARAMETERS_H
 
-#include <Eigen/Core>
+#include "Eigen/Core"
 
 #include "g2o/core/eigen_types.h"
 #include "g2o/core/parameter.h"
 #include "g2o/core/type_traits.h"
-#include "g2o_types_sba_api.h"
+#include "g2o/types/sba/g2o_types_sba_api.h"
 
 namespace g2o {
 

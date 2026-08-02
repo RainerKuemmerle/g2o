@@ -24,10 +24,11 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "g2o/types/slam2d/se2.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 #include "unit_test/test_helper/eigen_matcher.h"
+
+#include "g2o/types/slam2d/se2.h"
 
 using namespace g2o;      // NOLINT
 using namespace testing;  // NOLINT

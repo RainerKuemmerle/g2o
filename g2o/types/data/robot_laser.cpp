@@ -24,9 +24,8 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "robot_laser.h"
+#include "g2o/types/data/robot_laser.h"
 
-#include <Eigen/Core>
 #include <cmath>
 #include <cstddef>
 #include <iomanip>  // IWYU pragma: keep
@@ -34,6 +33,8 @@
 #include <string>
 #include <typeinfo>
 #include <vector>
+
+#include "Eigen/Core"
 
 #include "g2o/core/eigen_types.h"
 #include "g2o/core/hyper_graph_action.h"

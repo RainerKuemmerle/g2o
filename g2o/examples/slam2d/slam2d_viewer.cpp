@@ -16,10 +16,11 @@
 // You should have received a copy of the GNU General Public License
 // along with g2o.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "slam2d_viewer.h"
+#include "g2o/examples/slam2d/slam2d_viewer.h"
 
-#include <Eigen/Core>
 #include <memory>
+
+#include "Eigen/Core"
 
 #include "g2o/core/sparse_optimizer.h"
 #include "g2o/stuff/opengl_primitives.h"

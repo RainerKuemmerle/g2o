@@ -32,8 +32,8 @@
 #include <memory>
 
 #include "g2o/core/eigen_types.h"
-#include "g2o_core_api.h"
-#include "optimization_algorithm_with_hessian.h"
+#include "g2o/core/g2o_core_api.h"
+#include "g2o/core/optimization_algorithm_with_hessian.h"
 
 namespace g2o {
 

@@ -24,14 +24,14 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "stream_redirect.h"
-
-#include <qmutex.h>
+#include "g2o/apps/g2o_viewer/stream_redirect.h"
 
 #include <QMutexLocker>
 #include <QPlainTextEdit>
 #include <QString>
 #include <iostream>
+
+#include "qmutex.h"
 
 StreamRedirect::StreamRedirect(std::ostream& stream, QPlainTextEdit* te)
     : stream_(stream), te_(te) {

@@ -27,9 +27,9 @@
 #ifndef G2O_SIMUTILS_H_
 #define G2O_SIMUTILS_H_
 
-#include "g2o_simulator_api.h"
-#include "pointsensorparameters.h"
-#include "simulator2d_base.h"
+#include "g2o/simulator/g2o_simulator_api.h"
+#include "g2o/simulator/pointsensorparameters.h"
+#include "g2o/simulator/simulator2d_base.h"
 
 namespace g2o {
 // -1: outside

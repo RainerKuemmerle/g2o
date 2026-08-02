@@ -24,16 +24,17 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "abstract_graph.h"
+#include "g2o/core/abstract_graph.h"
 
 #include <memory>
 #include <optional>
+
+#include "io/io_g2o.h"
 
 #include "g2o/core/io/io_binary.h"
 #include "g2o/core/io/io_format.h"
 #include "g2o/core/io/io_json.h"
 #include "g2o/stuff/logger.h"
-#include "io/io_g2o.h"
 
 namespace {
 /**

@@ -1,7 +1,7 @@
 #include "py_robust_kernel.h"
 
-#include <g2o/core/robust_kernel.h>
-#include <g2o/core/robust_kernel_impl.h>
+#include "g2o/core/robust_kernel.h"
+#include "g2o/core/robust_kernel_impl.h"
 
 namespace g2o {
 

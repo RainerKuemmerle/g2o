@@ -27,10 +27,10 @@
 #ifndef G2O_SENSOR_SE2_PRIOR_H_
 #define G2O_SENSOR_SE2_PRIOR_H_
 
+#include "g2o/simulator/g2o_simulator_api.h"
+#include "g2o/simulator/pointsensorparameters.h"
+#include "g2o/simulator/simulator2d_base.h"
 #include "g2o/types/slam2d/edge_se2_prior.h"
-#include "g2o_simulator_api.h"
-#include "pointsensorparameters.h"
-#include "simulator2d_base.h"
 
 namespace g2o {
 

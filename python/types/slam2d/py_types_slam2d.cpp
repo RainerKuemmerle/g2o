@@ -1,7 +1,6 @@
 #include "py_types_slam2d.h"
 
 #include "detail/registry.h"
-#include "g2o/core/factory.h"
 #include "py_parameter_se2_offset.h"
 #include "py_vertex_point_xy.h"
 #include "py_vertex_se2.h"
@@ -9,6 +8,8 @@
 #include "types/slam2d/py_edge_se2.h"
 #include "types/slam2d/py_edge_se2_pointxy.h"
 #include "types/slam2d/py_se2.h"
+
+#include "g2o/core/factory.h"
 
 G2O_USE_TYPE_GROUP(slam2d)
 

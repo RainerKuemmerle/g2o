@@ -19,14 +19,14 @@
 #ifndef G2O_QGL_GRAPH_VIEWER_H
 #define G2O_QGL_GRAPH_VIEWER_H
 
-#include <GL/gl.h>
-
 #include <memory>
 #include <optional>
 
+#include "GL/gl.h"
+
+#include "g2o/apps/g2o_viewer/g2o_viewer_api.h"
+#include "g2o/apps/g2o_viewer/qglviewer_shim.h"
 #include "g2o/core/hyper_graph_action.h"
-#include "g2o_viewer_api.h"
-#include "qglviewer_shim.h"
 
 namespace g2o {
 

@@ -32,7 +32,7 @@
 #include <memory>
 
 #include "g2o/core/g2o_core_api.h"
-#include "hyper_graph.h"
+#include "g2o/core/hyper_graph.h"
 
 namespace g2o {
 

@@ -1,10 +1,10 @@
 #include "py_types_icp.h"
 
-#include <g2o/types/icp/types_icp.h>
-
 #include "detail/registry.h"
-#include "g2o/core/factory.h"
 #include "g2opy.h"
+
+#include "g2o/core/factory.h"
+#include "g2o/types/icp/types_icp.h"
 
 G2O_USE_TYPE_GROUP(icp)
 

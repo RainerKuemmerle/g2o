@@ -24,15 +24,15 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "parameter_camera.h"
+#include "g2o/types/slam3d/parameter_camera.h"
 
-#include <Eigen/src/Geometry/Transform.h>
-
-#include <Eigen/Core>
-#include <Eigen/Geometry>
-#include <Eigen/LU>
 #include <string>
 #include <typeinfo>
+
+#include "Eigen/Core"
+#include "Eigen/Geometry"
+#include "Eigen/LU"
+#include "Eigen/src/Geometry/Transform.h"
 
 #include "g2o/core/hyper_graph_action.h"
 #include "g2o/types/slam3d/vertex_se3.h"

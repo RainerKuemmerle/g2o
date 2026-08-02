@@ -4,7 +4,7 @@
 
 #include <initializer_list>
 
-#include "opengl_api.h"
+#include "g2o/stuff/opengl_api.h"
 
 namespace g2o::opengl {
 

@@ -27,6 +27,9 @@
 #include <algorithm>
 #include <unordered_set>
 
+#include "gmock/gmock.h"
+#include "unit_test/test_helper/graph_functions.h"
+
 #include "g2o/simulator/simulator3d_base.h"
 #include "g2o/types/slam3d/edge_se3.h"
 #include "g2o/types/slam3d/edge_se3_pointxyz.h"
@@ -35,8 +38,6 @@
 #include "g2o/types/slam3d/edge_se3_prior.h"
 #include "g2o/types/slam3d/vertex_pointxyz.h"
 #include "g2o/types/slam3d/vertex_se3.h"
-#include "gmock/gmock.h"
-#include "unit_test/test_helper/graph_functions.h"
 using namespace g2o;      // NOLINT
 using namespace testing;  // NOLINT
 

@@ -33,11 +33,11 @@
 #include <string>
 #include <vector>
 
-#include "creators.h"
 #include "g2o/config.h"
+#include "g2o/core/creators.h"
 #include "g2o/core/g2o_core_api.h"
+#include "g2o/core/hyper_graph.h"
 #include "g2o/stuff/misc.h"  // IWYU pragma: keep // ForceLinker for the macros
-#include "hyper_graph.h"
 
 // define to get some verbose output
 // #define G2O_DEBUG_FACTORY

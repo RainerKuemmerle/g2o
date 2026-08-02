@@ -31,8 +31,8 @@
 #include <functional>
 
 #include "g2o/core/marginal_covariance_cholesky.h"
-#include "sparse_block_matrix.h"
-#include "sparse_block_matrix_ccs.h"
+#include "g2o/core/sparse_block_matrix.h"
+#include "g2o/core/sparse_block_matrix_ccs.h"
 
 namespace g2o {
 

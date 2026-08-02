@@ -35,8 +35,8 @@
 #include <array>
 #include <vector>
 
-#include "fixed_array.h"
-#include "types.h"
+#include "g2o/autodiff/fixed_array.h"
+#include "g2o/autodiff/types.h"
 
 namespace g2o::ceres::internal {
 

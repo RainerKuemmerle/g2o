@@ -27,7 +27,7 @@
 #ifndef RUN_G2O_VIEWER_H
 #define RUN_G2O_VIEWER_H
 
-#include "g2o_viewer_api.h"
+#include "g2o/apps/g2o_viewer/g2o_viewer_api.h"
 
 namespace g2o {
 

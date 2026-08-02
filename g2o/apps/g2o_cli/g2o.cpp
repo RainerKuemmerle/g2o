@@ -34,7 +34,9 @@
 #include <string_view>
 
 #include "CLI/CLI.hpp"
-#include "dl_wrapper.h"
+
+#include "g2o/apps/g2o_cli/dl_wrapper.h"
+#include "g2o/apps/g2o_cli/g2o_common.h"
 #include "g2o/core/batch_stats.h"
 #include "g2o/core/estimate_propagator.h"
 #include "g2o/core/factory.h"
@@ -50,7 +52,6 @@
 #include "g2o/stuff/logger.h"
 #include "g2o/stuff/macros.h"
 #include "g2o/stuff/timeutil.h"
-#include "g2o_common.h"
 
 namespace {
 bool hasToStop = false;

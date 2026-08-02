@@ -46,18 +46,18 @@
 #include <string>
 #include <vector>
 
-#include "commands.h"
+#include "g2o/examples/interactive_slam/slam_parser/parser/commands.h"
 
 #line 53 "bison_parser.cpp"
 
-#include "bison_parser.h"
+#include "g2o/examples/interactive_slam/slam_parser/parser/bison_parser.h"
 
 // Second part of user prologue.
 #line 84 "parser.yy"
 
-#include "driver.h"
-#include "scanner.h"
-#include "slam_context.h"
+#include "g2o/examples/interactive_slam/slam_parser/parser/driver.h"
+#include "g2o/examples/interactive_slam/slam_parser/parser/scanner.h"
+#include "g2o/examples/interactive_slam/slam_parser/parser/slam_context.h"
 
 /* this "connects" the bison parser in the driver to the flex scanner class
  * object. it defines the yylex() function call to pull the next token from the
@@ -70,7 +70,7 @@
 #ifndef YY_
 #if defined YYENABLE_NLS && YYENABLE_NLS
 #if ENABLE_NLS
-#include <libintl.h>  // FIXME: INFRINGES ON USER NAME SPACE.
+#include "libintl.h"  // FIXME: INFRINGES ON USER NAME SPACE.
 #define YY_(msgid) dgettext("bison-runtime", msgid)
 #endif
 #endif

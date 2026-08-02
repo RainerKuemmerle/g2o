@@ -1,8 +1,8 @@
 #pragma once
 
-#include <g2o/core/eigen_types.h>
-
 #include "g2opy.h"
+
+#include "g2o/core/eigen_types.h"
 
 namespace g2o {
 

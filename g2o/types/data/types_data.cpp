@@ -29,9 +29,9 @@
 #include "g2o/config.h"
 #include "g2o/core/factory.h"
 #include "g2o/core/hyper_graph_action.h"
-#include "robot_laser.h"
-#include "vertex_ellipse.h"
-#include "vertex_tag.h"
+#include "g2o/types/data/robot_laser.h"
+#include "g2o/types/data/vertex_ellipse.h"
+#include "g2o/types/data/vertex_tag.h"
 
 namespace g2o {
 

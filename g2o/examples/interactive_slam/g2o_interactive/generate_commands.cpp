@@ -33,6 +33,7 @@
 #include <string>
 
 #include "CLI/CLI.hpp"
+
 #include "g2o/core/factory.h"
 #include "g2o/core/sparse_optimizer.h"
 

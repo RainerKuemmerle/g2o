@@ -14,7 +14,8 @@
 // changed dynamically.
 
 #include <random>
-#include <unsupported/Eigen/Polynomials>
+
+#include "unsupported/Eigen/Polynomials"
 
 #include "g2o/core/base_binary_edge.h"
 #include "g2o/core/base_dynamic_vertex.h"

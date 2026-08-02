@@ -29,6 +29,10 @@
 #include <sstream>
 #include <tuple>
 
+#include "gmock/gmock.h"
+#include "gtest/gtest.h"
+#include "unit_test/test_helper/allocate_optimizer.h"
+
 #include "g2o/config.h"  // IWYU pragma: keep
 #include "g2o/core/base_dynamic_vertex.h"
 #include "g2o/core/base_unary_edge.h"
@@ -39,9 +43,6 @@
 #include "g2o/types/slam2d/edge_se2_lotsofxy.h"
 #include "g2o/types/slam2d/vertex_point_xy.h"
 #include "g2o/types/slam2d/vertex_se2.h"
-#include "gmock/gmock.h"
-#include "gtest/gtest.h"
-#include "unit_test/test_helper/allocate_optimizer.h"
 
 using namespace testing;  // NOLINT
 

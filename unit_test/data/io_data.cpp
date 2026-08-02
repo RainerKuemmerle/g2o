@@ -24,9 +24,9 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include <gmock/gmock.h>
-
 #include <sstream>
+
+#include "gmock/gmock.h"
 
 #include "g2o/stuff/sampler.h"
 #include "g2o/types/data/raw_laser.h"

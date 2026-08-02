@@ -24,15 +24,16 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include <Eigen/Cholesky>
 #include <memory>
 #include <string>
 #include <vector>
 
+#include "Eigen/Cholesky"
+
 #include "g2o/core/optimization_algorithm.h"
 #include "g2o/core/optimization_algorithm_factory.h"
 #include "g2o/core/optimization_algorithm_property.h"
-#include "structure_only_solver.h"  // IWYU pragma: keep
+#include "g2o/solvers/structure_only/structure_only_solver.h"  // IWYU pragma: keep
 
 namespace g2o {
 

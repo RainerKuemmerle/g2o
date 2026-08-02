@@ -27,13 +27,14 @@
 #ifndef G2O_BASE_EDGE_H
 #define G2O_BASE_EDGE_H
 
-#include <Eigen/Core>
 #include <climits>
 #include <type_traits>
 
+#include "Eigen/Core"
+
 #include "g2o/config.h"  // IWYU pragma: keep
+#include "g2o/core/optimizable_graph.h"
 #include "g2o/core/type_traits.h"
-#include "optimizable_graph.h"
 
 namespace g2o {
 

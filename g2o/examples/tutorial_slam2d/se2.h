@@ -27,13 +27,14 @@
 #ifndef G2O_TUTORIAL_SE2_H
 #define G2O_TUTORIAL_SE2_H
 
-#include <Eigen/Core>
-#include <Eigen/Geometry>
 #include <cassert>
 
+#include "Eigen/Core"
+#include "Eigen/Geometry"
+
 #include "g2o/core/type_traits.h"
+#include "g2o/examples/tutorial_slam2d/g2o_tutorial_slam2d_api.h"
 #include "g2o/stuff/misc.h"
-#include "g2o_tutorial_slam2d_api.h"
 
 namespace g2o::tutorial {
 

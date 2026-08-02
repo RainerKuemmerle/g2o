@@ -1,9 +1,9 @@
 #pragma once
 
-#include <g2o/types/sclam2d/odometry_measurement.h>
-
 #include "detail/registry.h"
 #include "g2opy.h"
+
+#include "g2o/types/sclam2d/odometry_measurement.h"
 
 namespace g2o {
 

@@ -7,7 +7,7 @@
 // z_i=y(x_i)+w_i, where w_i is additive white noise with information
 // matrix Omega.
 
-#include <unsupported/Eigen/Polynomials>
+#include "unsupported/Eigen/Polynomials"
 
 #include "g2o/core/base_dynamic_vertex.h"
 #include "g2o/core/base_unary_edge.h"

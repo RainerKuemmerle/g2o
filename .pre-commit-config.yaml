@@ -10,6 +10,11 @@ repos:
     -   id: check-added-large-files
 
 # C++
+-   repo: https://github.com/RainerKuemmerle/hdrnorm
+    rev: v0.1.1
+    hooks:
+    -   id: hdrnorm-fix
+        types_or: [c++, c]
 -   repo: https://github.com/pre-commit/mirrors-clang-format
     rev: v22.1.8
     hooks:

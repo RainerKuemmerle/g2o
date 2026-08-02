@@ -4,7 +4,10 @@ add_library(g2o_interactive_library ${G2O_LIB_TYPE}
   types_online.cpp
 )
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../)
+target_include_directories(g2o_interactive_library PRIVATE
+  ${g2o_SOURCE_DIR}
+  ${CMAKE_CURRENT_SOURCE_DIR}/..
+)
 
 set_target_properties(g2o_interactive_library PROPERTIES OUTPUT_NAME ${LIB_PREFIX}interactive)
 set_target_properties(g2o_interactive_library PROPERTIES

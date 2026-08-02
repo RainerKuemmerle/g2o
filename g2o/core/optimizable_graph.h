@@ -27,7 +27,6 @@
 #ifndef G2O_AIS_OPTIMIZABLE_GRAPH_HH_
 #define G2O_AIS_OPTIMIZABLE_GRAPH_HH_
 
-#include <Eigen/Core>
 #include <cstddef>
 #include <cstdint>
 #include <functional>
@@ -38,14 +37,16 @@
 #include <unordered_set>
 #include <vector>
 
+#include "Eigen/Core"
+
 #include "g2o/core/eigen_types.h"
+#include "g2o/core/g2o_core_api.h"
+#include "g2o/core/hyper_graph.h"
 #include "g2o/core/io/io_format.h"
-#include "g2o_core_api.h"
-#include "hyper_graph.h"
-#include "jacobian_workspace.h"
-#include "openmp_mutex.h"
-#include "parameter.h"
-#include "parameter_container.h"
+#include "g2o/core/jacobian_workspace.h"
+#include "g2o/core/openmp_mutex.h"
+#include "g2o/core/parameter.h"
+#include "g2o/core/parameter_container.h"
 
 namespace g2o {
 

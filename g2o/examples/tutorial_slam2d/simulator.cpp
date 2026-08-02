@@ -24,7 +24,7 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "simulator.h"
+#include "g2o/examples/tutorial_slam2d/simulator.h"
 
 #include <cmath>
 #include <iostream>

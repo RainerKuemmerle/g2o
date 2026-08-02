@@ -2,11 +2,12 @@
 
 #include <memory>
 
+#include "g2opy.h"
+
 #include "g2o/core/optimizable_graph.h"
 #include "g2o/simulator/simulator.h"
 #include "g2o/simulator/simulator2d_base.h"
 #include "g2o/simulator/simulator3d_base.h"
-#include "g2opy.h"
 
 namespace g2o {
 

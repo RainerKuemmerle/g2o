@@ -32,10 +32,10 @@
 #include "g2o/core/base_binary_edge.h"
 #include "g2o/core/eigen_types.h"
 #include "g2o/core/optimizable_graph.h"
-#include "g2o_types_slam3d_api.h"
-#include "parameter_camera.h"
-#include "vertex_pointxyz.h"
-#include "vertex_se3.h"
+#include "g2o/types/slam3d/g2o_types_slam3d_api.h"
+#include "g2o/types/slam3d/parameter_camera.h"
+#include "g2o/types/slam3d/vertex_pointxyz.h"
+#include "g2o/types/slam3d/vertex_se3.h"
 
 namespace g2o {
 class CacheCamera;

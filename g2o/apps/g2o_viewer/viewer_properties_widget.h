@@ -21,8 +21,8 @@
 
 #include <memory>
 
-#include "abstract_properties_widget.h"
-#include "g2o_viewer_api.h"
+#include "g2o/apps/g2o_viewer/abstract_properties_widget.h"
+#include "g2o/apps/g2o_viewer/g2o_viewer_api.h"
 
 namespace g2o {
 class G2oQGLViewer;

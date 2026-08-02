@@ -17,17 +17,17 @@
 #ifndef G2O_LINEAR_SOLVER_CHOLMOD_ONLINE
 #define G2O_LINEAR_SOLVER_CHOLMOD_ONLINE
 
-#include <camd.h>
-#include <cholmod.h>
-
 #include <cassert>
+
+#include "camd.h"
+#include "cholmod.h"
 
 #include "g2o/core/batch_stats.h"
 #include "g2o/core/linear_solver.h"
+#include "g2o/examples/interactive_slam/g2o_incremental/g2o_incremental_api.h"
 #include "g2o/solvers/cholmod/cholmod_ext.h"
 #include "g2o/stuff/logger.h"
 #include "g2o/stuff/timeutil.h"
-#include "g2o_incremental_api.h"
 
 namespace g2o {
 

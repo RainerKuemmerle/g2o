@@ -27,7 +27,7 @@
 #ifndef G2O_CHOLMOD_EXT_H
 #define G2O_CHOLMOD_EXT_H
 
-#include <cholmod.h>
+#include "cholmod.h"
 
 namespace g2o::cholmod {
 

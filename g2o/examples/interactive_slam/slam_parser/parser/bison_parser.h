@@ -86,7 +86,7 @@
 #else
 #define YY_CONSTEXPR
 #endif
-#include "location.hh"
+#include "g2o/examples/interactive_slam/slam_parser/parser/location.hh"
 
 #ifndef YY_ATTRIBUTE_PURE
 #if defined __GNUC__ && 2 < __GNUC__ + (96 <= __GNUC_MINOR__)

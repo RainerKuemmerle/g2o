@@ -28,9 +28,10 @@
 #ifndef G2O_LINEAR_SOLVER_DENSE_H
 #define G2O_LINEAR_SOLVER_DENSE_H
 
-#include <Eigen/Cholesky>
-#include <Eigen/Core>
 #include <cassert>
+
+#include "Eigen/Cholesky"
+#include "Eigen/Core"
 
 #include "g2o/core/linear_solver.h"
 

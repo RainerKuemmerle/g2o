@@ -27,8 +27,8 @@
 #ifndef SPARSE_OPTIMIZER_TERMINATE_ACTION_H
 #define SPARSE_OPTIMIZER_TERMINATE_ACTION_H
 
-#include "g2o_core_api.h"
-#include "hyper_graph_action.h"
+#include "g2o/core/g2o_core_api.h"
+#include "g2o/core/hyper_graph_action.h"
 
 namespace g2o {
 

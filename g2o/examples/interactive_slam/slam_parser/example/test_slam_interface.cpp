@@ -26,8 +26,8 @@
 
 #include <iostream>
 
-#include "example_slam_interface.h"
-#include "slam_parser/interface/parser_interface.h"
+#include "g2o/examples/interactive_slam/slam_parser/example/example_slam_interface.h"
+#include "g2o/examples/interactive_slam/slam_parser/interface/parser_interface.h"
 using namespace std;
 
 int main() {
