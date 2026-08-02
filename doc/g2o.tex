@@ -585,49 +585,72 @@ are mandatory for the system to work.
 These classes are \verb+BaseVertex+ and \verb+BaseUnaryEdge+,
 \verb+BaseBinaryEdge+ and \verb+BaseMultiEdge+.
 \begin{description}
-\item \verb+BaseVertex+ templatizes the dimension of a parameter block
-  $\bx_i$ and of the corresponding manifold $\bDeltax_i$, thus it can
-  use blocks of memory whose layout is known at compile-time (means
-  efficiency). Furthermore, it implements some mapping operators to
-  store the Hessian and the parameter blocks of the linearized
-  problem, and a stack of previous values that can be used to
-  save/restore parts of the graph.  The method \verb+oplusImpl(double* v)+
-  that applies the perturbation $\bDeltax_i$ represented by \verb+v+,
-  to the member variable \verb+_estimate+ should be implemented. This
-  is the $\boxplus$ operator. Additionally,
-  \verb+setToOriginImpl()+ that should set the internal state of the vertex
-  to $\bZero$ has to specified.
+\item \verb+BaseVertex+ is a CRTP template class
+  \verb+BaseVertex<Derived, D, T>+ that implements most of the common
+  vertex functionality for the system. Here, \verb+Derived+ is the
+  concrete vertex type, \verb+D+ is the minimal update dimension of
+  $\bDeltax_i$ (with \verb+-1+ indicating a dynamic dimension assigned
+  at runtime), and \verb+T+ is the estimate type stored by the vertex.
+  It provides mapped Hessian memory and the right-hand side vector of
+  the linearized problem, as well as a backup stack for save/restore
+  of previous estimates. The derived class must implement
+  \verb+oplusImpl(const VectorX::MapType& v)+ to apply the perturbation
+  $\bDeltax_i$ to the internal estimate. The base class also updates
+  cached data automatically after \verb+oplus+ or \verb+setEstimate+
+  operations.
 
-\item \verb+BaseUnaryEdge+ is a template class to model a unary
-  hyper-edge, which can be used to represent a prior. It offers for
-  free the calculation of the Jacobians, via an implementation of the
-  \verb+linearizeOplus+ method. It requires to specify the types of
-  the (single) vertex $\bx_i$, and type and dimension of the error
-  $\be(\bx_k)$ as template parameters.  The function
-  \verb+computeError+ that stores the result of the error $\be(\bx_k)$ in the
-  member \verb+Eigen::Matrix _error+ should be implemented.
+  The class relies on the generic \verb+TypeTraits<T>+ trait to convert
+  the estimate type to and from dense vectors. This enables the
+  framework to handle estimate serialization and minimal-vector
+  conversion for both vertices and edges without manual type-specific
+  boilerplate.
 
-\item \verb+BaseBinaryEdge+ is a template class that models a binary
-  constraint, namely an error function in the form $\be_k(\bx_{k_1},
-  \bx_{k_2})$. It offers the same facilities of \verb+BaseUnaryEdge+, and it
-  requires to specify the following template parameters: the type of the nodes
-  $\bx_{k_1}$ and $\bx_{k_2}$  and the  type and the dimension of the measurement.
-  Again, it implements the numeric Jacobians via
-  a default implementation of the \verb+linearizeOplus+ method.
-  Again, the \verb+computeError+ should be implemented in a derived class.
+\item \verb+BaseUnaryEdge<D, E, VertexXi>+ is a template class to
+  model a unary hyper-edge, which can be used to represent a prior.
+  It is a thin wrapper around \verb+BaseFixedSizedEdge<D, E, VertexXi>+
+  and provides a default implementation of \verb+linearizeOplus()+
+  that computes numeric Jacobians. The derived class should implement
+  \verb+computeError()+ to store the current residual in the edge's
+  \verb+error_+ vector.
 
-\item \verb+BaseMultiEdge+ is a template class that models a
-  multi-vertex constraint in the form of $\be_k(\bx_{k_1}, \bx_{k_2},
-  \ldots, \bx_{k_q})$. It offers the same facilities of the types
-  above, and it requires to specify only the type and dimension of the
-  measurement as template parameters. The specialized class should
-  take care of resizing the connected vertices to the correct size
-  $q$.  This class relies on a dynamic memory, since too many
-  parameters are unknown, and if you need of an efficient
-  implementation for a specific problem you can program it yourself.
-  Numeric Jacobian comes for free, but you should implement the
-  \verb+computeError+ in a derived class, as usual
+\item \verb+BaseBinaryEdge<D, E, VertexXi, VertexXj>+ is a template class
+  that models a binary constraint, namely an error function in the form
+  $\be_k(\bx_{k_1}, \bx_{k_2})$. It is a thin wrapper around
+  \verb+BaseFixedSizedEdge<D, E, VertexXi, VertexXj>+, and it similarly
+  implements numeric Jacobians via a default \verb+linearizeOplus()+
+  method if the derived class does not override it. The derived class
+  should implement \verb+computeError()+.
+
+\item \verb+BaseMultiEdge<D, E>+ is a template alias for
+  \verb+BaseVariableSizedEdge<D, E>+, and it models a constraint that
+  connects an arbitrary number of vertices. It requires the measurement
+  type and dimension as template parameters, and the concrete edge
+  implementation must resize the connected vertices appropriately.
+  This class also provides a default numeric \verb+linearizeOplus()+
+  implementation and expects \verb+computeError()+ to populate the
+  edge's \verb+error_+ vector.
 \end{description}
+
+\subsubsection{TypeTraits and automatic data conversion}
+The core optimizer classes rely on the generic \verb+TypeTraits<T>+
+trait to convert estimate and measurement types to and from dense
+vectors. This trait supplies the full vector dimension,
+minimal vector dimension, and the conversion functions that are used by
+\verb+BaseVertex+, \verb+BaseEdge+, and the related input/output
+interfaces.
+
+For built-in scalar and Eigen vector types, the library already provides
+specializations. For a custom type \verb+YourType+, a
+\verb+TypeTraits<YourType>+ specialization must define:
+\begin{itemize}
+\item \verb+kVectorDimension+ and \verb+kMinimalVectorDimension+
+\item \verb+VectorType+ and \verb+MinimalVectorType+
+\item \verb+toVector+ and \verb+toMinimalVector+
+\item \verb+fromVector+ and \verb+fromMinimalVector+
+\item \verb+toData+ and \verb+toMinimalData+
+\end{itemize}
+This makes the framework manage estimate serialization, minimal
+parameterization, and edge measurement conversion automatically.
 
 In short, all you need to do to define a new problem instance is to
 derive a set of classes from those above listed, one for each type of
@@ -711,11 +734,11 @@ setting the \verb+_fixed+ attribute of a vertex.
 The \verb+computeActiveErrors()+ function takes the current estimate of
 the active vertices and for each active edge calls
 \verb+computeError()+ for computing the current error vector. Using
-the base edge classes described in Section~\ref{sec:representation}
-the error should be cached in the member variable \verb+_error+.
+the base edge classes described in Section~\ref{sec:representation},
+the error should be cached in the edge's \verb+error_+ vector.
 
- If \verb+robustKernel()+ is set to true for a particular active edge,
-\verb+robustifyError()+ is called and \verb+_error+ is robustified
+If \verb+robustKernel()+ is set to true for a particular active edge,
+\verb+robustifyError()+ is called and the error vector is robustified
 as described in Section~\ref{sec:robust_kernel}.
 
 \subsubsection{Linearizing the system}
@@ -1277,138 +1300,161 @@ class SE2 {
 };
 \end{lstlisting}
 
+After defining the group type, we also provide a \verb+TypeTraits<SE2>+
+specialization. This tells the framework how to convert the custom
+\verb+SE2+ estimate type to and from a dense 3-vector, and how to
+serialize it for the optimizer's internal data structures.
+
+\begin{lstlisting}[float,label=lst:se2typetraits,caption=TypeTraits for the
+  tutorial SE2 estimate type]
+namespace g2o {
+
+template <>
+struct TypeTraits<tutorial::SE2> {
+  enum {
+    kVectorDimension = 3,
+    kMinimalVectorDimension = 3,
+    kIsVector = 0,
+    kIsScalar = 0,
+  };
+  using Type = tutorial::SE2;
+  using VectorType = VectorN<kVectorDimension>;
+  using MinimalVectorType = VectorN<kMinimalVectorDimension>;
+
+  static VectorType toVector(const Type& t) { return t.toVector(); }
+  static void toData(const Type& t, double* data) {
+    typename VectorType::MapType v(data, kVectorDimension);
+    v = t.toVector();
+  }
+
+  static MinimalVectorType toMinimalVector(const Type& t) {
+    return t.toVector();
+  }
+  static void toMinimalData(const Type& t, double* data) {
+    typename MinimalVectorType::MapType v(data, kMinimalVectorDimension);
+    v = t.toVector();
+  }
+
+  template <typename Derived>
+  static Type fromVector(const Eigen::DenseBase<Derived>& v) {
+    return Type(v[0], v[1], v[2]);
+  }
+
+  template <typename Derived>
+  static Type fromMinimalVector(const Eigen::DenseBase<Derived>& v) {
+    return Type(v[0], v[1], v[2]);
+  }
+};
+}  // namespace g2o
+\end{lstlisting}
+
 Once we defined our nice $SE(2)$ group we are ready to implement the
-vertices.  To this end we extend the \verb+BaseVertex<>+ class, and we
-derive the classes \verb+VertexSE2+ to represent a robot pose and
-\verb+VertexPointXY+ to represent a point landmark in the plane.
-The class definition for robot pose vertices is reported in
-Listing~\ref{lst:vertexse2}.
-The pose-vertex extends a template specialization of
-\verb+BaseVertex<>+.  We should say to \gopt{} that the internal type
-has dimension 3 and that the estimate is of type \verb+SE2+. This
-means that the member \verb+_estimate+ of a \verb+VertexSE2+ is of
-type \verb+SE2+.  Then all we need to do is to redefine the methods
-\verb+setToOriginImpl()+ that resets the estimate to a known
-configuration, and the method \verb+\oplusImpl(double*)+.  The method
-should apply an increment, expressed in the increment parameterization
-(that is a vector $(\Delta x \; \Delta y \; \Delta \theta )^t$ to the
-current estimate.  To do this, we first convert the vector passed as
-argument into an \verb+SE(2)+, then we multiply this increment at the
-right of the previous estimate.  After that we should implement the
-read and write functions to a stream, but this is straight-forward and
-you can look it up yourself in the code.
+vertices. To this end we extend the CRTP class
+\verb+BaseVertex<Derived, D, T>+, and we derive the classes
+\verb+VertexSE2+ to represent a robot pose and \verb+VertexPointXY+
+to represent a point landmark in the plane. The class definition for
+robot pose vertices is reported in Listing~\ref{lst:vertexse2}.
+The pose vertex extends the template specialization
+\verb+BaseVertex<VertexSE2, 3, SE2>+. This tells \gopt{} that the
+minimal update dimension is 3 and that the stored estimate type is
+\verb+SE2+. The derived class must implement
+\verb+oplusImpl(const VectorX::MapType& update)+ to apply the
+perturbation vector. In this tutorial the vertex estimate is
+initialized in the constructor and the perturbation is interpreted as
+a small increment $(\Delta x \; \Delta y \; \Delta \theta)^T$ in
+$SE(2)$, which is converted to an \verb+SE2+ increment and composed
+with the current estimate.
 
 \begin{lstlisting}[float,label=lst:vertexse2,caption=Vertex representing
   a 2D robot pose]
-class VertexSE2 : public BaseVertex<3, SE2>
+class VertexSE2 : public BaseVertex<VertexSE2, 3, SE2>
 {
   public:
-    VertexSE2();
+    VertexSE2() { estimate_ = SE2(); }
 
-    virtual void setToOriginImpl() {
-      _estimate=SE2();
-    }
-
-    virtual void oplusImpl(double* update)
+    void oplusImpl(const g2o::VectorX::MapType& update)
     {
       SE2 up(update[0], update[1], update[2]);
-      _estimate = _estimate * up;
+      estimate_ *= up;
     }
-
-    virtual bool read(std::istream& is);
-    virtual bool write(std::ostream& os) const;
-
 };
 \end{lstlisting}
 The next step is to implement a vertex to describe a landmark
-position.  Since the landmarks are parameterized in $\Re^2$, we do not
+position. Since the landmarks are parameterized in $\Re^2$, we do not
 need to define any group for that, and we use directly the vector
 classes defined in Eigen. This class is reported in Listing~\ref{lst:vertexxy}.
 
 \begin{lstlisting}[float,label=lst:vertexxy,caption=Vertex representing
   a 2D landmark]
-class VertexPointXY : public BaseVertex<2, Eigen::Vector2d>
+class VertexPointXY : public BaseVertex<VertexPointXY, 2, Eigen::Vector2d>
 {
   public:
-      VertexPointXY();
+    VertexPointXY() { estimate_.setZero(); }
 
-    virtual void setToOriginImpl() {
-      _estimate.setZero();
-    }
-
-    virtual void oplusImpl(double* update)
+    void oplusImpl(const g2o::VectorX::MapType& update)
     {
-      _estimate[0] += update[0];
-      _estimate[1] += update[1];
+      estimate_ += update;
     }
-
-    virtual bool read(std::istream& is);
-    virtual bool write(std::ostream& os) const;
 };
 \end{lstlisting}
 
-Now we are done with the vertices. We should go for the edges.  Since
-both edges are binary edges we, extend the class
-\verb+BaseBinaryEdge<>+.
+Now we are done with the vertices. We should go for the edges. Since
+both edges are binary edges, we extend the class \verb+BaseBinaryEdge<>+.
 To represent an odometry edge (see Listing~\ref{lst:edgese2}) that
-connects two \verb+VertexSE2+, we need to extend
-\verb+BaseBinaryEdge<>+,  specialized with the types of the
-connected vertices (the order matters), where the measurement itself
-is represented by an \verb+SE2+ that has dimension 3. The second
-template parameter is the one used for the member variable
-\verb+_measurement+.  The second step is to construct an error
-function, by redefining the \verb+computeError()+ method.  The
-\verb+computeError()+ should put the error vector in a member variable
-\verb+error+ that has type \verb+Eigen::Vector<double,3>+. Here the 3
-comes from the template parameter that specifies the dimension.
+connects two \verb+VertexSE2+, we need to extend \verb+BaseBinaryEdge<>+
+using the types of the connected vertices in the template parameter list.
+The order of the vertex types is significant: the first vertex is index
+0 and the second vertex is index 1. Inside \verb+computeError()+, these
+vertices can be accessed explicitly via \verb+vertexXnRaw<0>()+ and
+\verb+vertexXnRaw<1>()+.
+
+The measurement itself is represented by an \verb+SE2+ of dimension 3
+and stored in \verb+measurement_+. The edge should override
+\verb+computeError()+ to fill \verb+error_+ with a 3D residual vector.
 Again, the read and write functions can be looked up in the code.
 Now we are done with this edge. The Jacobians are computed numerically
-by \gopt{}.  However, if you want to speed up the execution of your
-code after everything works, you are warmly invited to redefine the
-\verb+linearizeOplus+ method.
+by \gopt{}. However, if you want to speed up execution after everything
+works, you can override \verb+linearizeOplus()+ and provide analytic
+Jacobians.
 
 \begin{lstlisting}[float,label=lst:edgese2,caption=\text{Edge connecting two
   robot poses, for example, the odometry of the robot.}]
 class EdgeSE2 : public BaseBinaryEdge<3, SE2, VertexSE2, VertexSE2>
 {
   public:
-      EdgeSE2();
+    EdgeSE2();
 
-    void computeError()
+    void computeError() override
     {
-      const VertexSE2* v1 = static_cast<const VertexSE2*>(_vertices[0]);
-      const VertexSE2* v2 = static_cast<const VertexSE2*>(_vertices[1]);
-      SE2 delta = _measurement.inverse() * (v1->estimate().inverse()*v2->estimate());
-      _error = delta.toVector();
+      const VertexSE2* v1 = vertexXnRaw<0>();
+      const VertexSE2* v2 = vertexXnRaw<1>();
+      SE2 delta = inverseMeasurement_ * (v1->estimate().inverse() * v2->estimate());
+      error_ = delta.toVector();
     }
-    virtual bool read(std::istream& is);
-    virtual bool write(std::ostream& os) const;
+
 };
 \end{lstlisting}
 
 The last thing that remains to do is to define a class to represent a
-landmark measurement.  This is shown in Listing~\ref{lst:edgese2xy}.
+landmark measurement. This is shown in Listing~\ref{lst:edgese2xy}.
 Again, we extend a specialization of \verb+BaseBinaryEdge<>+, and we
 tell the system that it connects a \verb+VertexSE2+ with a
-\verb+VertexPointXY+, that the measurement is represented by an
-\verb+Eigen::Vector2d+ that has dimension 2.
+\verb+VertexPointXY+, using an \verb+Eigen::Vector2d+ measurement of
+dimension 2. In this example, the edge also uses a cached transform to
+convert the landmark into the robot frame.
 
 \begin{lstlisting}[float,label=lst:edgese2xy,caption=Edge connecting a
   robot poses and a landmark.]
 class EdgeSE2PointXY : public BaseBinaryEdge<2, Eigen::Vector2d, VertexSE2, VertexPointXY>
 {
   public:
-      EdgeSE2PointXY();
+    EdgeSE2PointXY();
 
-    void computeError()
+    void computeError() override
     {
-      const VertexSE2* v1 = static_cast<const VertexSE2*>(_vertices[0]);
-      const VertexPointXY* l2 = static_cast<const VertexPointXY*>(_vertices[1]);
-      _error = (v1->estimate().inverse() * l2->estimate()) - _measurement;
+      const VertexPointXY* l2 = vertexXnRaw<1>();
+      error_ = (sensorCache_->w2n() * l2->estimate()) - measurement_;
     }
-
-    virtual bool read(std::istream& is);
-    virtual bool write(std::ostream& os) const;
 
 };
 \end{lstlisting}
