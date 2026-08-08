@@ -391,6 +391,13 @@ void SparseOptimizer::computeInitialGuess(
 }
 
 int SparseOptimizer::optimize(int iterations, bool online) {
+  if (_algorithm == nullptr) {
+    G2O_WARN(
+        "No optimization algorithm set, maybe forgot to call "
+        "setAlgorithm()");
+    return -1;
+  }
+
   if (_ivMap.size() == 0) {
     G2O_WARN(
         "0 vertices to optimize, maybe forgot to call "
@@ -510,6 +517,13 @@ bool SparseOptimizer::updateInitialization(HyperGraph::VertexSet& vset,
     G2O_ERROR("something went wrong, size mismatch {} != {}", vset.size(),
               newVertices.size());
   }
+  if (_algorithm == nullptr) {
+    G2O_WARN(
+        "No optimization algorithm set, maybe forgot to call "
+        "setAlgorithm()");
+    return false;
+  }
+
   return _algorithm->updateStructure(newVertices, eset);
 }
 
@@ -585,6 +599,13 @@ void SparseOptimizer::setAlgorithm(OptimizationAlgorithm* algorithm) {
 bool SparseOptimizer::computeMarginals(
     SparseBlockMatrix<MatrixX>& spinv,
     const std::vector<std::pair<int, int> >& blockIndices) {
+  if (_algorithm == nullptr) {
+    G2O_WARN(
+        "No optimization algorithm set, maybe forgot to call "
+        "setAlgorithm()");
+    return false;
+  }
+
   return _algorithm->computeMarginals(spinv, blockIndices);
 }
 
